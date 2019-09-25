@@ -524,6 +524,7 @@ EXPORT Output_Layout := RECORD
 	string10 ReadmissionScore_Category;
 	string10 MedicationAdherenceScore_Category;
 	string10 MotivationScore_Category;
+	boolean isLexIdInOptOut;
 END;
 	
 END;

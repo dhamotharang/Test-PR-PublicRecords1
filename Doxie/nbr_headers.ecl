@@ -2,8 +2,8 @@
 // neighbor routines to help generate candidates.  It's based on ideas and code
 // from chuckjensen.  For effeciency it'll be accessed via a couple indexes.  See:
 //
-// doxie.key_nbr_headers
-// doxie.key_nbr_headers_uid
+// dx_header.key_nbr_headers
+// dx_header.key_nbr_headers_uid
 
 import doxie, header, Census_data, doxie_build, mdr;
 

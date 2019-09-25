@@ -1,12 +1,15 @@
-﻿import Address, AutoStandardI, Business_Risk_BIP, Census_Data, Codes, Gateway, iesp, Doxie,
-       IntlIID, Models, Risk_Indicators, Riskwise, Royalty, Seed_Files, Suppress, STD, ut;
+﻿import Address, BusinessInstantID20_Services,AutoStandardI, Business_Risk_BIP, Census_Data, Codes, Gateway, iesp, Doxie,
+       IntlIID, Models, Risk_Indicators, Riskwise, Royalty, Seed_Files, Suppress, STD;
 
 // The following function obtains Consumer InstantID data for the Authorized Reps passed in. 
 // Logic is basically copied-n-pasted straight from Risk_Indicators.InstantID_records, but
 // modified a little to handle batch records.
 EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean) ds_CleanedInput,
 	                                  Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-                                    BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat watchlists ) := 
+                                    BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat watchlists,unsigned1 LexIdSourceOptout								  = 1,
+			string TransactionID 												= '',
+			string BatchUID														  = '',
+			unsigned6 GlobalCompanyId 									= 0 ) := 
 	FUNCTION
 
 			Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
@@ -19,6 +22,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			boolean IncludeDOBInCVI                     := false : STORED('IncludeDOBInCVI');
 			boolean IncludeDriverLicenseInCVI           := false : STORED('IncludeDriverLicenseInCVI');
 			boolean DisableInquiriesInCVI               := false : STORED('DisableCustomerNetworkOptionInCVI');
+			
 
 			// Per Product Mgmt guidance, turn off Gateway calls to Targus here in CIID.
 			boolean DisallowInsurancePhoneHeaderGateway := false : STORED('DisallowInsurancePhoneHeaderGateway');	
@@ -419,7 +423,12 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 					LastSeenThreshold,
 					CompanyID, 
 					DataPermission, 
-					IncludeNAPData);
+					IncludeNAPData,
+					LexIdSourceOptout := LexIdSourceOptout, 
+					 TransactionID := TransactionID, 
+					 BatchUID := BatchUID, 
+					 GlobalCompanyID := GlobalCompanyID
+					);
 
 			targus := Royalty.RoyaltyTargus.GetOnlineRoyalties(UNGROUP(ret), src, TargusType, TRUE, FALSE, FALSE, TRUE);
 

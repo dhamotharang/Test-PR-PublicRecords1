@@ -3,7 +3,7 @@
 EXPORT IParams := MODULE
  
   EXPORT EmailParams := INTERFACE(doxie.IDataAccess)
-    EXPORT UNSIGNED2  PenaltThreshold      := $.Constants.Defaults.PenaltThreshold;  // specific to EAA search type
+    EXPORT UNSIGNED2 PenaltThreshold      := $.Constants.Defaults.PenaltThreshold;  // specific to EAA search type
     EXPORT UNSIGNED  MaxResultsPerAcct    := $.Constants.Defaults.MaxResultsPerAcct;  
     EXPORT BOOLEAN   IncludeHistoricData  := FALSE;
     EXPORT BOOLEAN   RequireLexidMatch    := FALSE;  // specific to EAA search type
@@ -15,8 +15,11 @@ EXPORT IParams := MODULE
     EXPORT UNSIGNED  MaxEmailsForDeliveryCheck := $.Constants.Defaults.MaxEmailsToCheckDeliverable;   //max number of result email addresses per account to send to gateway for delivery check
     EXPORT BOOLEAN   CheckEmailDeliverable := FALSE;  // option  for whether to use external gateway call to check if email address deliverable
     EXPORT BOOLEAN   KeepUndeliverableEmail := FALSE; // specific to EAA search type
+    EXPORT BOOLEAN   UseTMXRules          := FALSE; // if true TMX GW call is used for ERA policy check
+    EXPORT UNSIGNED  MaxEmailsForTMXCheck := 0; 
+    EXPORT BOOLEAN   SuppressTMXRejectedEmail := FALSE; // specific to EAA search type - if UseTMXRules=true it regulates whether email addresses rejected by TMX are to be removed
     EXPORT UNSIGNED1 DIDScoreThreshold := $.Constants.Defaults.DID_SCORE_THRESHOLD; 
-    EXPORT DATASET (Gateway.Layouts.Config) gateways := DATASET ([], Gateway.Layouts.Config);  // to check delivery status
+    EXPORT DATASET (Gateway.Layouts.Config) gateways := DATASET ([], Gateway.Layouts.Config);  // to check delivery status and for TMX gw
   END;
 
   EXPORT BatchParams := INTERFACE(EmailParams)
@@ -27,7 +30,7 @@ EXPORT IParams := MODULE
   
   EXPORT GetBatchParams() := FUNCTION
   
-    base_params := BatchShare.IParam.getBatchParamsV2();
+    base_params := BatchShare.IParam.getBatchParams();
 
     email_batch_params := MODULE(PROJECT(base_params,BatchParams, OPT))
       _MaxResultsPerAcct := $.Constants.Defaults.MaxResultsPerAcct : STORED('Max_Results_Per_Acct');
@@ -45,8 +48,7 @@ EXPORT IParams := MODULE
                    $.Constants.SearchType.isEAA(SearchType) => 0, // default here may change
                    $.Constants.SearchType.isEIA(SearchType) OR $.Constants.SearchType.isEIC(SearchType) => 0xF,  // by default no restrictions on search by input email address
                    0); 
-      STRING _BVAPIkey := '' : STORED('BVAPIkey');   
-      EXPORT STRING   BVAPIkey := IF(_BVAPIkey != '', _BVAPIkey, $.Constants.GatewayValues.BVAPIkey);   
+      EXPORT STRING   BVAPIkey := $.Constants.GatewayValues.BVAPIkey;   
       EXPORT UNSIGNED MaxEmailsForDeliveryCheck := $.Constants.Defaults.MaxEmailsToCheckDeliverable : STORED('MaxEmailsForDeliveryCheck');   
       STRING  _SearchTier := ''  : STORED('SearchTier');   
       STRING  SearchTier := IF(_SearchTier<>'', STD.Str.ToLowerCase(_SearchTier), $.Constants.Basic);   
@@ -55,10 +57,15 @@ EXPORT IParams := MODULE
       BOOLEAN  _KeepUndeliverableEmail := FALSE : STORED('KeepUndeliverableEmail'); 
       EXPORT BOOLEAN  KeepUndeliverableEmail := _KeepUndeliverableEmail OR $.Constants.SearchType.isEIA(SearchType) 
                                                 OR $.Constants.SearchType.isEIC(SearchType); // we never suppress email records for EIC/EIA searches
-      BOOLEAN  _BypassTMXcheck := FALSE : STORED('SkipTMXcheck'); 
-      EXPORT BOOLEAN  SkipTMXcheck := _BypassTMXcheck OR $.Constants.SearchType.isEIA(SearchType) 
+      BOOLEAN  _BypassTMXcheck := FALSE : STORED('SkipTMXcheck'); // specific to EAA search type
+      BOOLEAN  SkipTMXcheck := _BypassTMXcheck OR $.Constants.SearchType.isEIA(SearchType) 
                                       OR $.Constants.SearchType.isEIC(SearchType); // we never suppress email records for EIC/EIA searches and we are not returning TMX data otherwise
-      EXPORT UNSIGNED MaxEmailsForTMXCheck := $.Constants.Defaults.MaxEmailsToCheckDeliverable : STORED('MaxEmailsForTMXCheck');   
+
+      EXPORT BOOLEAN UseTMXRules := ~SkipTMXcheck;
+
+      EXPORT UNSIGNED MaxEmailsForTMXCheck := $.Constants.Defaults.MaxEmailsToCheckDeliverable : STORED('MaxEmailsForTMXCheck'); // specific to EAA search type  
+      BOOLEAN KeepTMXRejectedEmail := FALSE  : STORED('KeepTMXRejectedEmail'); // specific to EAA search type
+      EXPORT BOOLEAN SuppressTMXRejectedEmail := ~KeepTMXRejectedEmail AND $.Constants.SearchType.isEAA(SearchType); // specific to EAA search type - regulates whether email addresses failing TMX check are to be removed
       EXPORT DATASET (Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
     END;    
 

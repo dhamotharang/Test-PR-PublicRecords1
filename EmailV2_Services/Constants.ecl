@@ -17,6 +17,7 @@ EXPORT Constants := MODULE
     EXPORT UNSIGNED MaxResults           := 10;  
     EXPORT UNSIGNED MaxResultsPerAcct    := 10;  
     EXPORT UNSIGNED MaxEmailsToCheckDeliverable := 10;  //max number of result email addresses per account to send to gateway for delivery check
+    EXPORT UNSIGNED MaxEmailsForTMXcheck := 5;  //max number of result email addresses per account to send to TrustDefender gateway for status check
     EXPORT UNSIGNED DID_SCORE_THRESHOLD  := 80;  // BatchShare.Constants.Defaults.didScoreThreshold
     EXPORT UNSIGNED SSN_SEARCH_PENALTY   := 999;  // will be used to prevent name only match in case of blank ssn for name/ssn search 
     EXPORT UNSIGNED RELATIONSHIP_PENALTY   := 100;  // will be used for fuzzy relations match where only input lexid is available
@@ -42,6 +43,10 @@ EXPORT Constants := MODULE
   EXPORT BOOLEAN isValid(STRING _status) := STD.Str.ToLowerCase(_status) = StatusValid;
   EXPORT STRING StatusUnknown := 'unknown';
   EXPORT BOOLEAN isUnknown(STRING _status) := STD.Str.ToLowerCase(_status) = StatusUnknown;
+  EXPORT STRING StatusRejected := 'reject';
+  EXPORT BOOLEAN isRejectedEmail(STRING _status) := STD.Str.ToLowerCase(_status) = StatusRejected;
+  EXPORT STRING StatusPass := 'pass';
+  EXPORT BOOLEAN isTMXVerifiedEmail(STRING _status) := STD.Str.ToLowerCase(_status) = StatusPass;
 
   EXPORT RestrictedUseCase := MODULE
     EXPORT STRING Standard           := 'STANDARD'; // or blank, no use case restrictions
@@ -74,6 +79,11 @@ EXPORT Constants := MODULE
     EXPORT STRING    DisposableAddress  := 'Disposable Address';
     EXPORT STRING    EMAIL_DOMAIN_INVALID  := 'EMAIL_DOMAIN_INVALID';
     EXPORT STRING    BVAPIkey  := '498acc88-a5a4-4dbc-942d-4bd9ac265ae1';
+    EXPORT STRING    TMXOrgId       := 'ymyo6b64';
+    EXPORT STRING    TMXApiKey      := 'ivdshxsu3m5xmoom';
+    EXPORT STRING    TMXPolicy      := 'Email Risk Assessment';
+    EXPORT STRING    TMXServiceType := 'all';
+    EXPORT STRING    TMXApiType     := 'AttributeQuery';
 
     dict_email_address_invalid := DICTIONARY([
       {'EMAIL_ACCOUNT_INVALID' => 'Email Account Invalid'},

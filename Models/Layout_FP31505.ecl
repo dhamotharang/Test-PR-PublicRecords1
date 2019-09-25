@@ -1,4 +1,4 @@
-//  This layout was created for FraudPoint 3.0 and is used to pass all intermediate variables and Bocashell fields from the top level model 
+﻿//  This layout was created for FraudPoint 3.0 and is used to pass all intermediate variables and Bocashell fields from the top level model 
 //  to all of the sub models, which then use it to create and return the actual score back to the top level.
 
 EXPORT Layout_FP31505 := RECORD	
@@ -1611,6 +1611,33 @@ EXPORT Layout_FP31505 := RECORD
 	real	final_score_344	;
 	real	final_score_345	;
 	real	final_score_346	;	
+  real final_adj_score0 ;
+  real final_adj_score1 ;
+  real final_adj_score2 ;
+  real final_adj_score3 ;
+  real final_adj_score4 ;
+  real final_adj_score5 ;
+  real final_adj_score6 ;
+  real final_adj_score7 ;
+  real final_adj_score8 ;
+  real final_adj_score9 ;
+  real final_adj_score10;
+  real final_adj_score11;
+  real final_adj_score12;
+  real final_adj_score13;
+  real final_adj_score14;
+  real final_adj_score15;
+  real final_adj_score16;
+  real final_adj_score17;
+  real final_adj_score18;
+  real final_adj_score19;
+  real final_adj_score20;
+  real orig_FDN_FLAPSD_LGT;
+  real adj_FDN_FLAPSD_LGT;
+  real orig_FDN_FLAPS__LGT;
+  real adj_FDN_FLAPS__LGT;
+  real orig_FDN_FLA_SD_LGT;
+  real adj_FDN_FLA_SD_LGT;
 	real	FP3_wFDN_LGT	;
 	real	FP3_woFDN_LGT	;
 	

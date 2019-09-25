@@ -326,6 +326,11 @@ Models_to_use := IF(Model != '', single_model, Model_requests);
 Valid_requested_models := project(Models_to_use, Transform(Models.Layouts.Layout_Model_Request_In,
                                        self := Models.FP_models.Valid_request(left, attributesIn, ip_value, includeriskindices, RedFlag_version, glb_ok)));
 
+//Check minimum input for Digital Insights score and attributes
+IF((Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) or EXISTS(attributesIn(STD.STR.ToLowerCase(name) in [Models.FraudAdvisor_Constants.attrvTMX])))
+    and (email_value = '' or hphone_value = ''),
+    FAIL('Invalid request for Digital Insights, must supply a phone number and email.'));
+
 isWFS34 := Models.FP_models.Model_Check(Valid_requested_models, ['ain801_1']);
 
 //Grab the first 2 actual model names for scout logging later
@@ -354,11 +359,11 @@ gateways := project(gateways_in, gw_switch(left));
 if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels) and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
 if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, ['']) and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
-r := record
+r1 := record
 	unsigned4 seq;
 end;
 
-d := dataset([{(unsigned)account_value}],r);
+d := dataset([{(unsigned)account_value}],r1);
 
 risk_indicators.layout_input into(d l) := transform
 	
@@ -660,7 +665,7 @@ clam_ip := join( clam, ipdata, left.seq=right.seq,
 // ************ End Logging ************
 
 
-risk_indicators.layout_input into_test_prep(r l) := transform
+risk_indicators.layout_input into_test_prep(r1 l) := transform
 	self.seq := l.seq;	
 	self.ssn := socs_value;
 	self.phone10 := hphone_value;
@@ -1073,9 +1078,9 @@ attributes_w_redflags := if(redflag_version > 0, join(attributeout, red_flags, l
 OUTPUT(attributes_w_redflags, NAMED('Results2'));  
 
 //Only get royalties for hitting the Insurance DL information if they are allowed to access the information
-insurance := If(TrackInsuranceRoyalties, Royalty.RoyaltyFDNDLDATA.GetWebRoyalties(UNGROUP(iid), did, insurance_dl_used, true));
+insurance_royalty := If(TrackInsuranceRoyalties, Royalty.RoyaltyFDNDLDATA.GetWebRoyalties(UNGROUP(iid), did, insurance_dl_used, true));
 
-royalties := IF(~Test_Data_Enabled, Royalty.RoyaltyNetAcuity.GetOnlineRoyalties(gateways, ip_prep, ipdata) + insurance);
+royalties := IF(~Test_Data_Enabled, Royalty.RoyaltyNetAcuity.GetOnlineRoyalties(gateways, ip_prep, ipdata) + insurance_royalty);
 output(royalties,NAMED('RoyaltySet'));
 	
   
@@ -1206,7 +1211,6 @@ IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAM
   //output(v2, named('v2'));
  // OUTPUT( clam_BtSt, NAMED('clam_BtSt') );
 //============end of debug===========================
- 
 
 ENDMACRO;
 

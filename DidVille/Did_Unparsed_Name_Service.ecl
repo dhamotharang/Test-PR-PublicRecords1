@@ -7,7 +7,7 @@
 </message>
 */
 /*--INFO-- This service returns 1 did based upon the input.*/
-import address,doxie, NID; 
+import address, doxie, dx_header, NID; 
 
 export Did_Unparsed_Name_Service := MACRO
 
@@ -31,7 +31,7 @@ export Did_Unparsed_Name_Service := MACRO
   // Join to the header lname.fname key file to get a did (only 1 needed) that matches
 	// on the input LastName & Firstname accounting for the phonetic last name and
 	// the preferred first name values in the key.
-  did_by_FLName := join(ds_in_name,doxie.Key_Header_Name,
+  did_by_FLName := join(ds_in_name, dx_header.key_name(),
                         keyed(metaphonelib.DMetaPhone1(left.lname) = right.dph_lname) and 
 											  keyed(left.lname                           = right.lname)     and 
 												// NOTE: as of 08/24/10 the line below is the new way of 

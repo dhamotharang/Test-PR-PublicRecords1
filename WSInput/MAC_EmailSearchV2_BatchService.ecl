@@ -1,4 +1,4 @@
-EXPORT MAC_EmailSearchV2_BatchService := MACRO
+﻿EXPORT MAC_EmailSearchV2_BatchService := MACRO
 
 #WEBSERVICE(FIELDS('DPPAPurpose', 
                      'GLBPurpose', 
@@ -25,9 +25,9 @@ EXPORT MAC_EmailSearchV2_BatchService := MACRO
                      'CheckEmailDeliverable',
                      'KeepUndeliverableEmail',
                      'MaxEmailsForDeliveryCheck',
-                     'BVAPIkey',
                      'SkipTMXcheck',
                      'MaxEmailsForTMXcheck',
+                     'KeepTMXRejectedEmail',
                      'Gateways'
                      ));
 ENDMACRO;

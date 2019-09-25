@@ -2,9 +2,10 @@
 onThor := _Control.Environment.OnThor;
 
 EXPORT getAllBocaShellModels(grouped dataset(risk_indicators.Layout_Boca_Shell) bsData_pre, 
-	boolean isFCRA, 
-	dataset(easi.layout_census) easi_census,
-  boolean adl_based_shell= false) := function
+                             boolean isFCRA, 
+                             dataset(easi.layout_census) easi_census,
+                             boolean adl_based_shell= false,
+                             GROUPED DATASET (risk_indicators.Layout_output) iid) := function
 
 #IF(onThor)
 	bsData := group(sort(distribute(bsData_pre, hash64(seq)), seq, local), seq, local);
@@ -69,6 +70,7 @@ fp := Models.FP3710_0_0(ungroup(clam_ip));
 fp2 := Models.FP1109_0_0(ungroup(clam_ip), 6, false);	// do we want the criminal reason codes output?
 fp3 := Models.FP31505_0_Base(ungroup(clam_ip), 6, false, false);	// false, false = no criminal or FDN reason codes
 fp3_FDN := Models.FP3FDN1505_0_Base(ungroup(clam_ip), 6, false);	// false = no criminal reason codes, but we do want FDN reason codes
+DI := Models.DI31906_0_0( ungroup(iid)); //Digital Insights flagship model
 
 rvBank5 := models.RVB1503_0_0(bsdata);
 rvAuto5 := models.RVA1503_0_0(bsdata);
@@ -482,7 +484,26 @@ end;
 	wFP3_FDN := join(wFP3, fp3_FDN, left.seq=right.seq, doFP3FDN1505Model(LEFT,RIGHT), left outer);
 #END
 
-wModels1 := if(isFCRA, wCrossInd5, wFP3_FDN);
+//New Digital Insights Flagship model
+Layout_Boca_Shell doDIModel(Layout_Boca_Shell le, models.layouts.layout_fp1109 rt) := transform
+
+  self.fd_scores.digital_insight_score := rt.score;
+  self.fd_scores.digital_insight_reason1 := rt.ri[1].hri;
+  self.fd_scores.digital_insight_reason2 := rt.ri[2].hri;
+  self.fd_scores.digital_insight_reason3 := rt.ri[3].hri;
+  self.fd_scores.digital_insight_reason4 := rt.ri[4].hri;
+  self.fd_scores.digital_insight_reason5 := rt.ri[5].hri;
+  self.fd_scores.digital_insight_reason6 := rt.ri[6].hri;	
+  self := le;
+end;
+
+#IF(onThor)
+	wDigitalInsights := join(wFP3_FDN, distribute(DI, hash64(seq)), left.seq=right.seq, doDIModel(LEFT,RIGHT), left outer, local);
+#ELSE
+	wDigitalInsights := join(wFP3_FDN, DI, left.seq=right.seq, doDIModel(LEFT,RIGHT), left outer);
+#END
+
+wModels1 := if(isFCRA, wCrossInd5, wDigitalInsights);
 
 
 
@@ -595,8 +616,14 @@ self.fd_scores.reason3FP_V3_fdn	:= if(left.fd_scores.reason3FP_V3_fdn	in ['00', 
 self.fd_scores.reason4FP_V3_fdn	:= if(left.fd_scores.reason4FP_V3_fdn	in ['00', '000'], '', left.fd_scores.reason4FP_V3_fdn	);
 self.fd_scores.reason5FP_V3_fdn	:= if(left.fd_scores.reason5FP_V3_fdn	in ['00', '000'], '', left.fd_scores.reason5FP_V3_fdn	);
 self.fd_scores.reason6FP_V3_fdn	:= if(left.fd_scores.reason6FP_V3_fdn	in ['00', '000'], '', left.fd_scores.reason6FP_V3_fdn	);
-	
-	self := left));
+self.fd_scores.digital_insight_reason1	:= if(left.fd_scores.digital_insight_reason1	in ['00', '000'], '', left.fd_scores.digital_insight_reason1	);
+self.fd_scores.digital_insight_reason2	:= if(left.fd_scores.digital_insight_reason2	in ['00', '000'], '', left.fd_scores.digital_insight_reason2	);
+self.fd_scores.digital_insight_reason3	:= if(left.fd_scores.digital_insight_reason3	in ['00', '000'], '', left.fd_scores.digital_insight_reason3	);
+self.fd_scores.digital_insight_reason4	:= if(left.fd_scores.digital_insight_reason4	in ['00', '000'], '', left.fd_scores.digital_insight_reason4	);
+self.fd_scores.digital_insight_reason5	:= if(left.fd_scores.digital_insight_reason5	in ['00', '000'], '', left.fd_scores.digital_insight_reason5	);
+self.fd_scores.digital_insight_reason6	:= if(left.fd_scores.digital_insight_reason6	in ['00', '000'], '', left.fd_scores.digital_insight_reason6	);
+
+self := left));
 
 #end
 

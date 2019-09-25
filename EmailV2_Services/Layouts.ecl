@@ -158,13 +158,35 @@ EXPORT Layouts := MODULE
     INTEGER4 dob := 0;
   END;
   
+  EXPORT tmx_insights_rec := RECORD
+    STRING  account_email_first_seen := '';
+    STRING  account_email_last_event := '';
+    STRING  account_email_last_update := '';
+    STRING  account_email_result := '';
+    INTEGER account_email_score := 0;
+    INTEGER account_email_worst_score := 0;
+
+    STRING  digital_id := '';
+    INTEGER digital_id_confidence := 0;
+    STRING  digital_id_first_seen := '';
+    STRING  digital_id_last_event := '';
+    STRING  digital_id_last_update := '';
+    STRING  digital_id_result := '';
+      
+    STRING policy_score := '';
+    STRING request_result := '';
+    STRING review_status := '';
+    STRING risk_rating := '';
+  END;
+
   EXPORT email_final_rec := RECORD(email_internal_rec)
     best_rec bestinfo;
+    tmx_insights_rec TMX_insights;
     STRING15   email_status := '';
     STRING50   email_status_reason := '';
     STRING40   additional_status_info := '';
     STRING50   relationship  := '';
-    STRING   record_err_msg  := '';
+    STRING50   record_err_msg  := '';
     UNSIGNED2 record_err_code := 0;
     BOOLEAN  is_rejected_rec := FALSE;
   END;
@@ -265,12 +287,12 @@ EXPORT Layouts := MODULE
     UNSIGNED6 UltID;
     UNSIGNED2 num_email_per_did := 0;
     UNSIGNED2 num_did_per_email := 0;
-    STRING15    email_status := '';
-    STRING50    email_status_reason := '';
-    STRING40    additional_status_info := '';
-    STRING50    relationship  := '';
+    STRING15  email_status := '';
+    STRING50  email_status_reason := '';
+    STRING40  additional_status_info := '';
+    STRING50  relationship  := '';
     STRING    src;
-    STRING    record_err_msg  := '';
+    STRING50  record_err_msg  := '';
     UNSIGNED2 record_err_code := 0;
   END;
 
@@ -312,6 +334,7 @@ EXPORT Layouts := MODULE
        STRING  Latency {XPATH('Latency')};
        STRING  ExceptionMessage {XPATH('Exceptions/Exception/Message')};
     END;
+    
   END;
 
 END;

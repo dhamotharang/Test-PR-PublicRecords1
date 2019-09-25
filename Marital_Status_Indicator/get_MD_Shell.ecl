@@ -131,7 +131,7 @@ export get_MD_shell(DATASET(recordof(marital_status_indicator.key_MSI_Best_did))
 	completeHeaderInit := project(names_rolled, inferPersonDataInit(left), local);
 
 
-	// get missing genders from doxie.key_did_lookups
+	// get missing genders from key_did_lookups
 	rslim_header addBestGender(completeHeaderInit l, did_lookup r) := transform
 		self.gender := if(l.gender in ['','N','U'] ,r.gender, l.gender);
 		self := l;

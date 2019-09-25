@@ -6,7 +6,7 @@ MODULE
 	EXPORT BatchIn :=
 	RECORD
 		STRING20	acctno;
-	
+
 		STRING20	name_first;
 		STRING20	name_middle;
 		STRING20	name_last;
@@ -29,7 +29,7 @@ MODULE
 
 		UNSIGNED6 did;
 	END;
-  
+
 	EXPORT BatchInAppendAcctno :=
 	RECORD(BatchIn)
 		STRING20 orig_acctno; // [internal]
@@ -37,7 +37,7 @@ MODULE
 		UNSIGNED6 orig_did;
 		BatchShare.Layouts.ShareErrors;
 	END;
-	
+
 	// Batch input with DID appended to the layout
 	EXPORT BatchInAppendDID :=
 	RECORD(Autokey_batch.Layouts.rec_inBatchMaster)
@@ -45,11 +45,11 @@ MODULE
 		UNSIGNED6 orig_did;
 		STRING8   dod := '';
 	END;
-	
+
 	// Carrier information
 	EXPORT CarrierInfo :=
 	MODULE
-	
+
 		EXPORT Base :=
 		RECORD
 			STRING3  carrier_type;
@@ -62,32 +62,32 @@ MODULE
 			STRING   coc_description;
 			STRING   ssc_description;
 		END;
-	
+
 	END;
-	
+
 	// Phone finder layouts
 	EXPORT PhoneFinder :=
 	MODULE
-		
+
 		// Phones common layout
 		EXPORT Common :=
 		RECORD(doxie.layout_pp_raw_common)
 			BatchInAppendDID batch_in;
 			UNSIGNED1        phone_source;
-		END;		
+		END;
 		// ACCUDATA IN LAYOUT
 		EXPORT Accudata_in := RECORD
 		  	STRING20      acctno;
 		    STRING10      phone;
 		END;
-		
+
 		EXPORT PortHistory :=
 		RECORD
 			STRING ServiceProvider;
 			UNSIGNED4 PortStartDate;
-			UNSIGNED4 PortEndDate;		
+			UNSIGNED4 PortEndDate;
 		END;
-		
+
 		EXPORT Porting :=
 		RECORD
 			STRING PortingCode;
@@ -99,12 +99,12 @@ MODULE
 			UNSIGNED4 ActivationDate;
 			UNSIGNED4 DisconnectDate;
 			BOOLEAN 	NoContractCarrier;
-			BOOLEAN 	Prepaid;	
+			BOOLEAN 	Prepaid;
 			UNSIGNED1 serviceType;
-			STRING PortingStatus;	
+			STRING PortingStatus;
 
 		END;
-		
+
 		EXPORT SpoofHistory :=
 		RECORD
 			STRING1 PhoneOrigin;
@@ -117,7 +117,7 @@ MODULE
 			UNSIGNED4 FirstSpoofedDate;
 			UNSIGNED4 LastSpoofedDate;
 		END;
-		
+
 		EXPORT SpoofingData :=
 		RECORD
 			SpoofCommon Spoof;
@@ -127,14 +127,14 @@ MODULE
 			UNSIGNED4 FirstEventSpoofedDate;
 			UNSIGNED4 LastEventSpoofedDate;
 			DATASET(SpoofHistory) SpoofingHistory;
-		END;	
-		
+		END;
+
 		EXPORT OTPs :=
-		RECORD			
+		RECORD
 			BOOLEAN 	OTPStatus;
 			STRING8 	EventDate;
 		END;
-		
+
 		EXPORT OneTimePassword :=
 		RECORD
 			BOOLEAN 	OTP;
@@ -143,15 +143,15 @@ MODULE
 			UNSIGNED4 LastOTPDate;
 			BOOLEAN 	LastOTPStatus;
 			DATASET(OTPs) OTPHistory;
-		END;			
-		
-		EXPORT	Alert := 
+		END;
+
+		EXPORT	Alert :=
 		RECORD
 			STRING flag;
 			DATASET(iesp.share.t_STRINGArrayItem) messages;
 		END;
-		
-		// Phone finder common layout with carrier information	
+
+		// Phone finder common layout with carrier information
 		EXPORT Final :=
 		RECORD
 			// Batch input fields
@@ -193,7 +193,7 @@ MODULE
 			STRING5                                           county_code;
 			STRING18                                          county_name;
 			STRING1                                           tnt;
-			STRING40																				  primary_address_type;			 
+			STRING40																				  primary_address_type;
 			STRING120                                         listed_name;
 			STRING120                                         listed_name_targus;
 			STRING10                                          listed_phone;
@@ -238,7 +238,7 @@ MODULE
 			BOOLEAN                                               OTPRIFailed;
 			DATASET(Alert)                                        Alerts;
 			DATASET(iesp.phonefinder.t_PhoneFinderAlertIndicator) AlertIndicators;
-			DATASET({STRING17 InquiryDate})									      InquiryDates;		
+			DATASET({STRING17 InquiryDate})									      InquiryDates;
 			UNSIGNED                                              RecordsReturned;
 			BOOLEAN                                               PhoneOwnershipIndicator;
 			STRING                                                rec_source;
@@ -262,14 +262,20 @@ MODULE
 			UNSIGNED2                                             identity_count := 0;
 			INTEGER                                               phone_inresponse_count;
 			BOOLEAN                                               isLNameMatch;
+			INTEGER                                               imsi_Tenure_MinDays;
+			INTEGER                                               imsi_Tenure_MaxDays;
+			INTEGER                                               imei_Tenure_MinDays;
+			INTEGER                                               imei_Tenure_MaxDays;
+			INTEGER                                               sim_Tenure_MinDays;
+			INTEGER                                               sim_Tenure_MaxDays;
 		END;
-		
+
 		EXPORT ExcludePhones :=
 		RECORD
 			STRING20 acctno;
 			STRING10 phone;
 		END;
-		
+
 		EXPORT IdentitySlim :=
 		RECORD
 			STRING20  acctno;
@@ -303,7 +309,7 @@ MODULE
 			STRING4   zip4;
 			STRING5   county_code;
 			STRING18  county_name;
-			STRING40	primary_address_type;				
+			STRING40	primary_address_type;
 			UNSIGNED1 phone_source;
 			STRING1 	tnt;
 			BOOLEAN   PhoneOwnershipIndicator;
@@ -311,7 +317,7 @@ MODULE
       BOOLEAN   is_phone_verified;
       STRING100 verification_desc;
 		END;
-		
+
 		EXPORT PhoneSlim :=
 		RECORD(Doxie_Raw.PhonesPlus_Layouts.t_RealTimePhone_Ext1)
 			STRING20  acctno;
@@ -367,26 +373,30 @@ MODULE
 			STRING8 loststolen_date;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.ReasonCodes;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.TmxVariables;
-      UNSIGNED2  identity_count := 0;
+			UNSIGNED2  identity_count := 0;
+			INTEGER imsi_Tenure_MinDays;
+			INTEGER imsi_Tenure_MaxDays;
+			INTEGER imei_Tenure_MinDays;
+			INTEGER imei_Tenure_MaxDays;
 		END;
-		
+
 		EXPORT IdentityIesp :=
 		RECORD(iesp.phonefinder.t_PhoneIdentityInfo)
-			STRING20 acctno; 
-			STRING10  phone;		
+			STRING20 acctno;
+			STRING10  phone;
 			STRING2   vendor_id; // for zumigo logging dataset
 		END;
-		
+
 		EXPORT PhoneIesp :=
 		RECORD(iesp.phonefinder.t_PhoneFinderDetailedInfo)
 			STRING20 acctno;
 		END;
-		
+
 		EXPORT OtherPhoneIesp :=
 		RECORD(iesp.phonefinder.t_PhoneFinderInfo)
 			STRING20 acctno;
 		END;
-		
+
 		EXPORT TempOut :=
 		RECORD(BatchInAppendAcctno)
 			DATASET(iesp.phonefinder.t_PhoneIdentityInfo) identity_info;
@@ -394,14 +404,14 @@ MODULE
 			iesp.phonefinder.t_PhoneFinderDetailedInfo    phone_info;
 			iesp.phonefinder.t_PhoneIdentityInfo          primary_identity;
 		END;
-		
+
 		LOADXML('<xml/>');
 		#DECLARE(IdentityInfo);
 		#DECLARE(cntIdentity);
-		
+
 		#SET(IdentityInfo,'');
 		#SET(cntIdentity,1);
-		
+
 		#LOOP
 			#IF(%cntIdentity% > iesp.Constants.Phone_Finder.MaxIdentities)
 				#BREAK;
@@ -437,13 +447,13 @@ MODULE
 				#SET(cntIdentity,%cntIdentity% + 1)
 			#END
 		#END
-		
+
 		#DECLARE(Alerts);
 		#DECLARE(cntAlerts);
-		
+
 		#SET(Alerts,'');
 		#SET(cntAlerts,1);
-		
+
 		#LOOP
 			#IF(%cntAlerts% > PhoneFinder_Services.Constants.MaxAlertCategories)
 				#BREAK;
@@ -453,14 +463,14 @@ MODULE
 								'STRING Alerts' + %'cntAlerts'% + '_Messages;');
 				#SET(cntAlerts,%cntAlerts% + 1)
 			#END
-		#END		
-		
+		#END
+
 		#DECLARE(OtherPhones);
 		#DECLARE(cntPhone);
-		
+
 		#SET(OtherPhones,'');
 		#SET(cntPhone,1);
-		
+
 		#LOOP
 			#IF(%cntPhone% > iesp.Constants.Phone_Finder.MaxOtherPhones)
 				#BREAK;
@@ -499,13 +509,13 @@ MODULE
 				#SET(cntPhone,%cntPhone% + 1)
 			#END
 		#END
-		
+
 		#DECLARE(PhoneHistoryInfo);
 		#DECLARE(cntPhoneHist);
-		
+
 		#SET(PhoneHistoryInfo,'');
 		#SET(cntPhoneHist,1);
-		
+
 		#LOOP
 			#IF(%cntPhoneHist% > iesp.Constants.Phone_Finder.MaxPhoneHistory)
 				#BREAK;
@@ -538,10 +548,10 @@ MODULE
 
 		#DECLARE(PortingHistory);
 		#DECLARE(cntPorts);
-		
+
 		#SET(PortingHistory,'');
 		#SET(cntPorts,1);
-		
+
 		#LOOP
 			#IF(%cntPorts% > iesp.Constants.Phone_Finder.MaxPorts)
 				#BREAK;
@@ -553,13 +563,13 @@ MODULE
 				#SET(cntPorts,%cntPorts% + 1)
 			#END
 		#END
-			
+
 		#DECLARE(SpoofingHistory);
 		#DECLARE(cntSpoofs);
-		
+
 		#SET(SpoofingHistory,'');
 		#SET(cntSpoofs,1);
-		
+
 		#LOOP
 			#IF(%cntSpoofs% > iesp.Constants.Phone_Finder.MaxSpoofs)
 				#BREAK;
@@ -569,14 +579,14 @@ MODULE
 								'STRING8 SpoofingHistory' + %'cntSpoofs'% + '_EventDate;');
 				#SET(cntSpoofs,%cntSpoofs% + 1)
 			#END
-		#END		
-	
+		#END
+
 		#DECLARE(OTPHistory);
 		#DECLARE(cntOTPs);
-		
+
 		#SET(OTPHistory,'');
 		#SET(cntOTPs,1);
-		
+
 		#LOOP
 			#IF(%cntOTPs% > PhoneFinder_Services.Constants.MaxOTPMatches)
 				#BREAK;
@@ -586,14 +596,14 @@ MODULE
 								'STRING8 OTPHistory' + %'cntOTPs'% + '_EventDate;');
 				#SET(cntOTPs,%cntOTPs% + 1)
 			#END
-		#END			
-		
+		#END
+
 		#DECLARE(RoyaltyInfo);
 		#DECLARE(cntRoyalty);
-		
+
 		#SET(RoyaltyInfo,'');
 		#SET(cntRoyalty,1);
-		
+
 		#LOOP
 			#IF(%cntRoyalty% > PhoneFinder_Services.Constants.MaxRoyalties)
 				#BREAK;
@@ -604,7 +614,7 @@ MODULE
 				#SET(cntRoyalty,%cntRoyalty% + 1)
 			#END
 		#END
-		
+
 		EXPORT BatchOut :=
 		RECORD,MAXLENGTH(20000)
 			BatchIn;
@@ -636,9 +646,9 @@ MODULE
 			UNSIGNED4 FirstPortedDate;
 			UNSIGNED4 LastPortedDate;
 			UNSIGNED4 ActivationDate;
-			UNSIGNED4 DisconnectDate;	
+			UNSIGNED4 DisconnectDate;
 			BOOLEAN 	NoContractCarrier;
-			BOOLEAN 	Prepaid;				
+			BOOLEAN 	Prepaid;
 			STRING10 PortingStatus;
 			%PortingHistory%
 			BOOLEAN Spoof_Spoofed;
@@ -648,20 +658,20 @@ MODULE
 			BOOLEAN Destination_Spoofed;
 			UNSIGNED Destination_SpoofedCount;
 			UNSIGNED4 Destination_FirstSpoofedDate;
-			UNSIGNED4 Destination_LastSpoofedDate;	
+			UNSIGNED4 Destination_LastSpoofedDate;
 			BOOLEAN Source_Spoofed;
 			UNSIGNED Source_SpoofedCount;
 			UNSIGNED4 Source_FirstSpoofedDate;
-			UNSIGNED4 Source_LastSpoofedDate;	
+			UNSIGNED4 Source_LastSpoofedDate;
 			UNSIGNED TotalSpoofedCount;
 			UNSIGNED4 FirstEventSpoofedDate;
-			UNSIGNED4 LastEventSpoofedDate;	
+			UNSIGNED4 LastEventSpoofedDate;
 			%SpoofingHistory%
 			BOOLEAN 	OTPMatch;
 			UNSIGNED2 OTPCount;
 			UNSIGNED4 FirstOTPDate;
 			UNSIGNED4 LastOTPDate;
-			BOOLEAN 	LastOTPStatus;		
+			BOOLEAN 	LastOTPStatus;
 			%OTPHistory%
 			STRING4 PhoneRiskIndicator;
 			BOOLEAN OTPRIFailed;
@@ -718,9 +728,9 @@ MODULE
 			%RoyaltyInfo%
 			BatchShare.Layouts.ShareErrors;
 		END;
-	
+
 	END;
-	
+
 	EXPORT SubjectPhone := RECORD
 			STRING20 	acctno;
 			UNSIGNED6 DID;
@@ -732,81 +742,81 @@ MODULE
 	// Deltabase Layouts
 	EXPORT DeltaPortedDataRecord := RECORD
 		 UNSIGNED   transaction_id				{XPATH('id')};
-		 STRING     date_added				  	{XPATH('date_added')};	
-		 STRING10   phone				  				{XPATH('phone')};	
-		 STRING10   spid				  				{XPATH('spid')};	
+		 STRING     date_added				  	{XPATH('date_added')};
+		 STRING10   phone				  				{XPATH('phone')};
+		 STRING10   spid				  				{XPATH('spid')};
 		 STRING5    source				  			{XPATH('source')};
 		 UNSIGNED4  port_start_dt				  {XPATH('port_start_dt')};
 		 UNSIGNED4  port_end_dt					  {XPATH('port_end_dt')};
 		 BOOLEAN	  is_ported						  {XPATH('is_ported')};
-	END;	
-	
+	END;
+
 	EXPORT PortedMetadata := RECORD
 		RECORDOF(PhonesInfo.Key_Phones.Ported_Metadata);
-	END;	
-	
-	EXPORT DeltabaseResponse := RECORD                         
+	END;
+
+	EXPORT DeltabaseResponse := RECORD
 		DATASET (DeltaPortedDataRecord) Records	 {XPATH('Records/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxPortedMatches)};
 		STRING  RecsReturned                     {XPATH('RecsReturned'),MAXLENGTH(5)};
 		STRING  Latency													 {XPATH('Latency')};
 		STRING  ExceptionMessage								 {XPATH('Exceptions/Exception/Message')};
-	END;			
+	END;
 	EXPORT DeltaSpoofedRec := RECORD
 		 UNSIGNED   id										{XPATH('id')};
-		 STRING     date_added				  	{XPATH('date_added')};	
+		 STRING     date_added				  	{XPATH('date_added')};
 		 STRING45   reference_id					{XPATH('reference_id')};
 		 STRING20   mode_type						  {XPATH('mode_type')};
 		 STRING 		event_time						{XPATH('event_time')};
 		 STRING10   spoofed_phone_number	{XPATH('spoofed_phone_number')};
 		 STRING10   destination_number		{XPATH('destination_number')};
 		 STRING10   source_phone_number		{XPATH('source_phone_number')};
-	END;	
-	EXPORT SpoofDeltabaseResponse := RECORD                         
+	END;
+	EXPORT SpoofDeltabaseResponse := RECORD
 		DATASET (DeltaSpoofedRec) 			Records	{XPATH('Records/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxSpoofedMatches)};
 		STRING  RecsReturned                    {XPATH('RecsReturned'),MAXLENGTH(5)};
 		STRING  Latency													{XPATH('Latency')};
 		STRING  ExceptionMessage								{XPATH('Exceptions/Exception/Message')};
-	END;	
+	END;
 	EXPORT DeltaOTPRec := RECORD
 		 STRING20  	transaction_id				{XPATH('transaction_id')};
-		 STRING     date_added				  	{XPATH('date_added')};	
+		 STRING     date_added				  	{XPATH('date_added')};
 		 STRING 		event_time						{XPATH('event_time')};
 		 STRING 		function_name					{XPATH('function_name')};
 		 STRING10   otp_phone							{XPATH('otp_phone')};
 		 BOOLEAN    verify_passed					{XPATH('verify_passed')};
 		 STRING20   otp_id								{XPATH('otp_id')};
 		 STRING1    otp_delivery_method		{XPATH('otp_delivery_method')};
-	END;	
-	EXPORT OTPDeltabaseResponse := RECORD                         
+	END;
+	EXPORT OTPDeltabaseResponse := RECORD
 		DATASET (DeltaOTPRec) 					Records		{XPATH('Records/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxOTPMatches)};
 		STRING  RecsReturned                     	{XPATH('RecsReturned'),MAXLENGTH(5)};
 		STRING  Latency													 	{XPATH('Latency')};
 		STRING  ExceptionMessage								 	{XPATH('Exceptions/Exception/Message')};
-	END;			
+	END;
 	EXPORT SpoofedRec := RECORD
 		RECORDOF(PhoneFraud.Key_Spoofing);
-	END;	
+	END;
 	EXPORT OTPRec := RECORD
 		RECORDOF(PhoneFraud.Key_OTP);
 	END;
-	
+
 	EXPORT DeltaInquiryDataRecord := RECORD
 	    	UNSIGNED8    seq {XPATH('Seq')};
 				STRING10     phone {XPATH('Phone')};
 	END;
-	EXPORT DeltaInquiryDeltabaseResponse := RECORD                         
+	EXPORT DeltaInquiryDeltabaseResponse := RECORD
 		DATASET (DeltaInquiryDataRecord) Response {XPATH('Records/Rec')};
 		STRING  RecordsReturned                  	{XPATH('RecsReturned'),MAXLENGTH(5)};
 		STRING  Latency													 	{XPATH('Latency')};
 		STRING  ExceptionMessage								 	{XPATH('Exceptions/Exception/Message')};
-	END;			
-	
+	END;
+
 	EXPORT DeltaInquiry_recout := RECORD
 	  UNSIGNED8    seq;
 		STRING10     phone;
 	  UNSIGNED RecordsReturned;
 	END;
-    
+
   EXPORT Input_CompanyId := RECORD
 		STRING16  CompanyId;
 	END;
@@ -816,11 +826,11 @@ MODULE
     STRING8 EndDate;
     STRING60 UserId;
     DATASET(Input_CompanyId) CompanyIds {MAXCOUNT(iesp.Constants.PfResSnapshot.MaxCompanyIds)};
-    STRING15 PhoneNumber; 		
+    STRING15 PhoneNumber;
     STRING60 ReferenceCode;
     UNSIGNED8 UniqueId;
 	END;
-	
+
 	//	DeltaPhones
 	EXPORT delta_phones_rpt_transaction := record
    		STRING16 transaction_id;
@@ -828,7 +838,7 @@ MODULE
 		STRING60 user_id;
 		STRING8 product_code;
 		STRING16 company_Id;
-		STRING8 source_code; 		
+		STRING8 source_code;
    		STRING60 reference_code;
    		STRING32 phonefinder_type;
 		//SearchTerms
@@ -843,21 +853,21 @@ MODULE
 		STRING10 submitted_zip;
 		//Primary Phone details
         STRING30 data_source;
-   		STRING30 royalty_used;  
+   		STRING30 royalty_used;
    		STRING30 carrier;
    		STRING15 phonenumber;
    		STRING16 risk_indicator;
    		STRING32 phone_type;
    		STRING32 phone_status;
    		INTEGER  ported_count;
-		STRING32 last_ported_date; 
+		STRING32 last_ported_date;
    		INTEGER  otp_count;
    		STRING32 last_otp_date;
    		INTEGER  spoof_count;
    		STRING32 last_spoof_date;
    		STRING32 phone_forwarded;
    END;
-		
+
 	EXPORT	delta_phones_rpt_otherphones:= record
    		STRING16 transaction_id;
    		INTEGER sequence_number;
@@ -869,9 +879,9 @@ MODULE
    		STRING64 listing_name;
    		STRING16 porting_code;
    		STRING32 phone_forwarded;
-   		INTEGER1	verified_carrier; 
+   		INTEGER1	verified_carrier;
 	END;
-   	
+
    EXPORT	delta_phones_rpt_identities:= record
    		STRING16 transaction_id;
    		INTEGER  sequence_number;
@@ -881,24 +891,24 @@ MODULE
    		STRING64 city;
    		STRING16 state;
    		STRING10 zip;
-   		INTEGER1	 verified_carrier; 
+   		INTEGER1	 verified_carrier;
    	END;
 
 	EXPORT delta_phones_rpt_riskindicators:= record
         STRING16 transaction_id;
         INTEGER phone_id;
         INTEGER sequence_number;
-	    STRING256 risk_indicator_text;		 	
+	    STRING256 risk_indicator_text;
 	    INTEGER risk_indicator_id;
         STRING16 risk_indicator_level;
         STRING32 risk_indicator_category;
    END;
-	 
+
 	EXPORT delta_phones_rpt_Usage_records := RECORD
 	   DATASET(delta_phones_rpt_transaction) delta_phones_rpt_transaction {xpath('delta__phonefinder_delta__phones_rpt__transaction/Row')};
        DATASET(delta_phones_rpt_otherphones) delta_phones_rpt_otherphones {xpath('delta__phonefinder_delta__phones_rpt__otherphones/Row')};
        DATASET(delta_phones_rpt_identities) delta_phones_rpt_identities {xpath('delta__phonefinder_delta__phones_rpt__identities/Row')};
        DATASET(delta_phones_rpt_riskindicators) delta_phones_rpt_riskindicators {xpath('delta__phonefinder_delta__phones_rpt__riskindicators/Row')};
 	END;
-	
+
 END;

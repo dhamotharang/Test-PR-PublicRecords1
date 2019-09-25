@@ -354,8 +354,8 @@ EXPORT Transforms := MODULE
 		SELF.BusinessName := L.clean_business_name;
 		SELF.BusinessRiskCode := L.business_risk_code;
 		SELF.ReportingAgencyState := L.classification_source.customer_state;
-		SELF.ClearedFraud := ''; //Not in payload yet, will be updated once the data team makes the change to include this field
-		SELF.ReasonClearedCode := ''; //Not in payload yet, will be updated once the data team makes the change to include this field
+		SELF.ClearedFraud := L.cleared_fraud;
+		SELF.ReasonClearedCode := L.reason_cleared_code;
 	END;
 
 	EXPORT FraudGovPlatform_Services.Layouts.entity_information_recs xform_elements_Information(FraudGovPlatform_Services.Layouts.fragment_w_value_recs L,

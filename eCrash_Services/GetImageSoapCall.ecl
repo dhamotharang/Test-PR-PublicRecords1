@@ -30,7 +30,8 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 		iesp.share.t_Date RequestDateOfCrash,
 		BOOLEAN isOnlyTm,
 		BOOLEAN ColoredImage,
-		BOOLEAN Redact) := FUNCTION
+		BOOLEAN Redact,
+		STRING  RequestType) := FUNCTION
 		
 		//special logic for 'KYCrashLogic'
 		IsVendorCrashLogic := RequestVendorCode = Constants.VENDOR_CRASHLOGIC;
@@ -54,6 +55,7 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 			SELF.Options.DataSource2 := VendorCode;
 			SELF.Options.IyetekRoyaltyType := RoyaltyType; 
 			SELF.Options.IyetekRedact := IyetekRedactFlag; 
+			SELF.Options.RequestType := RequestType;
 			SELF.SearchBy.TransactionID := TransactionId; //This is used for external vendor Iyetek
 			//orig_accnbr is state_report_number which is being copied over original_case_ident in the deltabase and it's not cleaned from special characters
 			// ECH - 4998 - Sprint 11 Apriss Integration - VIYER - assign vendor_report_id instead of orig_accnbr
@@ -72,7 +74,8 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 			SELF.Options.DataSource2 := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.IncludeCoverPage := IncludeCoverPage;
 			SELF.Options.ColoredImage := ColoredImage;
-			SELF.Options.Redact       := Redact;
+			SELF.Options.Redact := Redact;
+			SELF.Options.RequestType := RequestType;
 			SELF.SearchBy.ImageHashes := ImageHashes;
 			SELF.SearchBy.ReportID := RequestReportId;
 			SELF := [];	
@@ -91,14 +94,15 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 	END;
 	
 	EXPORT GetDocumentImageRequest(
-		DATASET(iesp.accident_image.t_AccidentImageCRUImageHash) ImageHashes, STRING RequestReportId, BOOLEAN ColoredImage, BOOLEAN Redact) := FUNCTION
+		DATASET(iesp.accident_image.t_AccidentImageCRUImageHash) ImageHashes, STRING RequestReportId, BOOLEAN ColoredImage, BOOLEAN Redact, STRING RequestType) := FUNCTION
 			
 		iesp.accident_image.t_AccidentImageRequest CreateRequest := TRANSFORM
 			SELF.Options.DataSource := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.DataSource2 := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.IncludeCoverPage := true;
 			SELF.Options.ColoredImage := ColoredImage;
-			SELF.Options.Redact       := Redact;
+			SELF.Options.Redact := Redact;
+			SELF.Options.RequestType := RequestType;
 			SELF.SearchBy.ImageHashes := ImageHashes;
 			SELF.SearchBy.ReportID := RequestReportId;
 			SELF := [];	

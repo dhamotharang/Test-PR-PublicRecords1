@@ -1,4 +1,4 @@
-import header, ut;
+import header, dx_header, ut;
 
 export lookup_rid_src(DATASET(doxie.Layout_Rollup.RidRecDid) inrecs, boolean skipListings=false) := FUNCTION
 
@@ -6,10 +6,10 @@ export lookup_rid_src(DATASET(doxie.Layout_Rollup.RidRecDid) inrecs, boolean ski
 	boolean isFake(string rid) := (stringlib.stringfilterout(rid,'0123456789') != '');
 
 	// Source Doc info
-	ridk := header.Key_Rid_SrcID(false,false);
-	qhridk := header.Key_Rid_SrcID(true,false);
-  
-	doxie.Layout_Rollup.RidRecDid getSrcInfo(inrecs l, ridk r) := TRANSFORM
+	key_rid_src := dx_header.key_rid_SrcID( , false, false);
+	key_qhri_src := dx_header.key_rid_SrcID( , true, false);
+
+	doxie.Layout_Rollup.RidRecDid getSrcInfo(inrecs l, key_rid_src r) := TRANSFORM
 		fakeRid := isFake(l.r.rid);
 		SELF.r.src := if(r.uid = 0 and ~fakeRid, 'FI', l.r.src);
 		SELF.r.rid := l.r.rid;
@@ -17,12 +17,12 @@ export lookup_rid_src(DATASET(doxie.Layout_Rollup.RidRecDid) inrecs, boolean ski
 	END;
 
 	srcHdrRids := join(inrecs((unsigned6)r.rid < Header.constants.QH_start_rid),
-                      ridk,
+                      key_rid_src,
                       keyed((unsigned6)LEFT.r.rid = RIGHT.rid),
                       getSrcInfo(LEFT,RIGHT), LEFT OUTER, KEEP(ut.limits.HEADER_PER_DID));
   
   srcQHRids := join(inrecs((unsigned6)r.rid >= Header.constants.QH_start_rid),
-                    qhridk,
+                    key_qhri_src,
                     keyed((unsigned6)LEFT.r.rid = RIGHT.rid),
                     getSrcInfo(LEFT,RIGHT), LEFT OUTER, KEEP(ut.limits.HEADER_PER_DID));
   

@@ -17,21 +17,38 @@ EXPORT MAC := MODULE
     RETURN ROW({%'l_def_str'%, %l_field_cnt%}, {string text; integer cnt;});
   ENDMACRO;
 
-  EXPORT GetCollectionFromRaw(raw_recs, in_mod, collection_name, k_name, k_did_field, k_date_field = '', date_format = $.Constants.DateFormat.YYYYMMDD, max_records = $.Constants.MaxCollectionRecords) 
-  := FUNCTIONMACRO
+  EXPORT GetCollectionFromRaw(
+    raw_recs, 
+    in_mod, 
+    collection_name, 
+    k_name, 
+    k_sort_field = '', 
+    k_date_field = '', 
+    date_format = $.Constants.DateFormat.YYYYMMDD, 
+    max_records = $.Constants.MaxCollectionRecords,
+    global_sid_field = 'global_sid',
+    record_sid_field = 'record_sid'
+    ) := FUNCTIONMACRO
     
     IMPORT iesp, STD;
     LOCAL meta := MAC.GetLayoutMeta(k_name);
-    #IF(#TEXT(k_date_field) != '') 
-    LOCAL raw_recs_filt := SORT(raw_recs(in_mod.isDateOk((UNSIGNED) k_date_field, date_format)), k_did_field, -k_date_field, RECORD);
-    #ELSE // if dataset has no date field, just ignore it.
-    LOCAL raw_recs_filt := SORT(raw_recs, k_did_field, RECORD);
-    #END
+    LOCAL raw_recs_filt := raw_recs(
+      #IF(#TEXT(k_date_field) != '') 
+      in_mod.isDateOk((UNSIGNED) k_date_field, date_format)
+      #ELSE
+      TRUE // if dataset has no date field, just ignore it.
+      #END
+      );
 
-    LOCAL collection_recs := PROJECT(raw_recs_filt, 
+    LOCAL raw_sorted_recs := SORT(raw_recs_filt,
+      #IF(#TEXT(k_sort_field) != '') k_sort_field,#END
+      #IF(#TEXT(k_date_field) != '') -k_date_field,#END
+      RECORD);
+
+    LOCAL collection_recs := PROJECT(raw_sorted_recs, 
       TRANSFORM(iesp.consumer_collection_report.t_CollectionRecord,
-        SELF.PrivacySourceID := (string) LEFT.record_sid;
-        SELF.GlobalRecordId := (string) LEFT.global_sid;
+        SELF.PrivacySourceID := (string) LEFT.record_sid_field;
+        SELF.GlobalRecordId := (string) LEFT.global_sid_field;
         SELF.Content := TOJSON(left);
     ));
 
@@ -50,8 +67,18 @@ EXPORT MAC := MODULE
 
   ENDMACRO; 
 
-  EXPORT GetCollection(in_dids, in_mod, collection_name, k_name, k_did_field, k_date_field = '', date_format = $.Constants.DateFormat.YYYYMMDD, max_records = $.Constants.MaxCollectionRecords) 
-  := FUNCTIONMACRO
+  EXPORT GetCollection(
+    in_dids, 
+    in_mod, 
+    collection_name, 
+    k_name, 
+    k_did_field, 
+    k_date_field = '', 
+    date_format = $.Constants.DateFormat.YYYYMMDD, 
+    max_records = $.Constants.MaxCollectionRecords,
+    global_sid_field = 'global_sid',
+    record_sid_field = 'record_sid'
+  ) := FUNCTIONMACRO
     
     IMPORT iesp;
     LOCAL raw_recs := JOIN(in_dids, k_name, 
@@ -61,9 +88,10 @@ EXPORT MAC := MODULE
         SELF.k_date_field := IF(in_mod.isDateOk((unsigned) RIGHT.k_date_field, date_format), RIGHT.k_date_field, skip);
         #END
         SELF := RIGHT;
-        ), KEEP(max_records), LIMIT(0)); 
+        ), KEEP(max_records), LIMIT(0));
 
-    RETURN MAC.GetCollectionFromRaw(raw_recs, in_mod, collection_name, k_name, k_did_field, k_date_field, date_format, max_records);
+    RETURN MAC.GetCollectionFromRaw(raw_recs, in_mod, collection_name, k_name, k_did_field, k_date_field, date_format, 
+      max_records, global_sid_field, record_sid_field);
 
   ENDMACRO; 
 

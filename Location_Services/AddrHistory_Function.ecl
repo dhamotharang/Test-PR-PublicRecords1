@@ -1,5 +1,6 @@
-﻿import location_services, address, ut, risk_indicators, property, dx_BestRecords, doxie, doxie_raw, doxie_ln,
-       AutoStandardI, DeathV2_Services, LN_PropertyV2_Services, LN_PropertyV2, STD, MDR;
+﻿import address, AutoStandardI, DeathV2_Services, dx_BestRecords, doxie, doxie_raw, doxie_ln, dx_death_master,
+       LN_PropertyV2, LN_PropertyV2_Services, location_services, MDR, property, risk_indicators, 
+       STD, ut;
 
 todays_date := (string) STD.Date.Today();
 
@@ -19,8 +20,7 @@ mod_access := module(doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoS
   EXPORT unsigned1 dppa := dppaperms;
 end;
 
-deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
-glb_ok_death := deathparams.isValidGlb();
+death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
 MAX_RECS_PER_ADDRESS := 1000; // Big enough to get records back from doxie.did_from_address
 
@@ -126,22 +126,18 @@ withdidinfo := join(withbestinfo, withgonginfo,
             left.seq = right.seq,
             integrate_search(LEFT, right));
 
-withdidinfo get_death_info(withdidinfo L, doxie.key_death_masterV2_ssa_DID R) := transform
-  self.deathVerificationCode := R.VorP_Code;
-  self.deathcounty := R.county_name;
-  self.deathstate := R.state;
-  self.deceased := if (r.l_did != 0 ,'Y', L.deceased);
-  self := L;
-end;
+withDeathCodesAppend := dx_death_master.Append.byDID(withdidinfo,did,death_params,,ut.limits.DEATH_PER_DID);
 
-withDeathCodes := join(withdidinfo, doxie.key_death_masterV2_ssa_DID,
-          left.did != 0 and
-          keyed(left.did = right.l_did)
-          and not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok_death, deathparams),
-          get_death_info(LEFT,RIGHT),
-          left outer,
-          keep(ut.limits.DEATH_PER_DID), limit (0));
-
+withDeathCodes := 
+  project(withDeathCodesAppend, 
+    transform(location_services.Layout_AddrHistory_Norm,
+      self.deathVerificationCode := left.death.VorP_Code;
+      self.deathcounty := left.death.county_name;
+      self.deathstate := left.death.state;
+      self.deceased := if(left.death.is_deceased, 'Y', left.deceased);
+      self := left;
+      ));
+      
 //-------------------[ get AKAs ]--------------------
 refs := project (withdeathcodes, TRANSFORM (doxie.layout_references, SELF := Left));
 

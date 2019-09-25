@@ -13,7 +13,7 @@ EXPORT AccuityBankData_BatchService := MACRO
 
 	CNST:=BatchServices.AccuityBankData_Constants;
 
-	in_mod := BatchShare.IParam.getBatchParamsV2();
+	in_mod := BatchShare.IParam.getBatchParams();
 	BOOLEAN use_AccuityBankData := doxie.compliance.use_AccuityBankData(in_mod.DataPermissionMask);
 	BOOLEAN IncludeGeotriangulationComparison := FALSE : STORED('IncludeGeotriangulationComparison');
 

@@ -1,8 +1,8 @@
 // This is a value-add version of Gong.File_Gong_History_Full used
 // by the Where Did They Go routines.
 //
-// doxie.key_nbr_headers
-// doxie.key_nbr_headers_uid
+// dx_header.key_nbr_headers
+// dx_header.key_nbr_headers_uid
 
 
 import Gong, ut;

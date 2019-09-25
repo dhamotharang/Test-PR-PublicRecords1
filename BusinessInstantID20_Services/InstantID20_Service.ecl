@@ -31,7 +31,11 @@ EXPORT InstantID20_Service() := MACRO
 		'DataRestrictionMask',
 		'DataPermissionMask',
 		'BIID20ProductType',
-    'Gateways'
+    'Gateways',
+		'LexIdSourceOptout',
+		'_TransactionId',
+		'_BatchUID',
+		'_GCID'
 		));
 
 		/* ************************************************************************
@@ -68,6 +72,10 @@ EXPORT InstantID20_Service() := MACRO
 			BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
 			BOOLEAN DisableOutcomeTracking  := False : STORED('OutcomeTrackingOptOut');
 			BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
+			unsigned1 LexIdSourceOptout 		:= 1 : STORED('LexIdSourceOptout');
+			string TransactionID 						:= '' : STORED('_TransactionId');
+			string BatchUID 								:= '' : STORED('_BatchUID');
+			unsigned6 GlobalCompanyId			  := 0 : STORED('_GCID');
 
 			//Look up the industry by the company ID.
 			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Business_Risk__InstantID_20_Service);
@@ -155,12 +163,15 @@ EXPORT InstantID20_Service() := MACRO
 		
     
     // 4. Pass input to BIID 2.0 logic.
-		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists);
+		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists,LexIdSourceOptout := LexIdSourceOptout, 
+	  TransactionID := TransactionID, 
+	  BatchUID := BatchUID, 
+	  GlobalCompanyID := GlobalCompanyID);
 
     #if(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
 	
 		
-    //4.5 Call Testseeds Function
+    // 4.5 Call Testseeds Function
 		TestSeed_Results := BusinessInstantID20_Services.BIIDv2_TestSeed_Function(ds_Input, _TestData_TableName, , Options);
 
 		// 5. Project into IESP output.
@@ -204,6 +215,8 @@ EXPORT InstantID20_Service() := MACRO
 		Targus_royalties   := Royalty.RoyaltyTargus.GetOnlineRoyalties(Targus_PhoneSource, source, TargusType, TRUE, TRUE, FALSE, FALSE);
 
 		total_royalties := SBFE_royalties + Targus_royalties;
+		
+		
 		
 		OUTPUT(total_royalties, NAMED('RoyaltySet'));
 		

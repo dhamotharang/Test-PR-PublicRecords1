@@ -8336,26 +8336,26 @@ EXPORT _df_Property2Name(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_uniqueid(layouts._lt_Property2Name L, layouts._lt_Property2Name R) := FUNCTION
-    boolean IsInner :=  (L.UniqueId = R.UniqueId);
+  EXPORT  integer1 CheckOuter_firstlastuniqueid(layouts._lt_Property2Name L, layouts._lt_Property2Name R) := FUNCTION
+    boolean IsInner :=  (L.Last = R.Last AND L.First = R.First AND L.UniqueId = R.UniqueId);
 
-    boolean IsOuterRight :=   (L.UniqueId = '');
+    boolean IsOuterRight :=   (L.Last = '' AND L.First = '' AND L.UniqueId = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_uniqueid (dataset(layouts._lt_Property2Name) _n, dataset(layouts._lt_Property2Name) _o) := FUNCTION
+  EXPORT  AsDataset_firstlastuniqueid (dataset(layouts._lt_Property2Name) _n, dataset(layouts._lt_Property2Name) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_Property2Name, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_Property2Name, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.UniqueId = RIGHT.UniqueId,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First AND LEFT.UniqueId = RIGHT.UniqueId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_uniqueid(LEFT, RIGHT)),
+                  CheckOuter_firstlastuniqueid(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.UniqueId = RIGHT.UniqueId,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First AND LEFT.UniqueId = RIGHT.UniqueId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_uniqueid(LEFT, RIGHT)),
+                  CheckOuter_firstlastuniqueid(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_Property2Name);
@@ -8389,7 +8389,7 @@ EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
       SELF._diff := IF(is_active, m._diff, '');
       SELF._diffmeta := IF(is_active, m._diffmeta);
   
-      updated_Names := _df_Property2Name(is_active, path + '/Names/Name').AsDataset_uniqueid(L.Names, R.Names);
+      updated_Names := _df_Property2Name(is_active, path + '/Names/Name').AsDataset_firstlastuniqueid(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);
@@ -8428,7 +8428,7 @@ EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
     SELF._diff := IF(is_active, m._diff, '');
     SELF._diffmeta := IF(is_active, m._diffmeta);
    
-      updated_Names := _df_Property2Name(is_active, path + '/Names/Name').AsDataset_uniqueid(L.Names, R.Names);
+      updated_Names := _df_Property2Name(is_active, path + '/Names/Name').AsDataset_firstlastuniqueid(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);

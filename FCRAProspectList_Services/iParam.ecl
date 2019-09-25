@@ -4,13 +4,13 @@ EXPORT iParam :=
 MODULE
 
   EXPORT BatchParams :=
-  INTERFACE(BatchShare.IParam.BatchParamsV2)	
+  INTERFACE(BatchShare.IParam.BatchParams)	
   END;
 
   // Function to initalize the params
 	EXPORT getBatchParams() :=
 	FUNCTION
-			BaseBatchParams := BatchShare.IParam.getBatchParamsV2();			
+			BaseBatchParams := BatchShare.IParam.getBatchParams();			
 			inMod := MODULE (PROJECT(BaseBatchParams,BatchParams))
 			END;			
 			RETURN inMod;

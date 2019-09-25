@@ -219,7 +219,7 @@ fixWatercraft(DATASET(watercraft.Layout_Watercraft_Full) recs) := FUNCTION
 	RETURN PROJECT(recs_masked, TRANSFORM(Doxie_crs.layout_watercraft_report, SELF := LEFT, SELF := []));
 END;
 
-fixFor(DATASET(Property.Layout_Fares_Foreclosure) recs) := FUNCTION
+fixFor(DATASET(Property.Layout_Fares_Foreclosure_Ex_Sids) recs) := FUNCTION
 	doxie.MAC_PruneOldSSNs(recs, recs_1, name1_ssn, name1_did);
 	doxie.MAC_PruneOldSSNs(recs_1, recs_2, name2_ssn, name2_did);
 	doxie.MAC_PruneOldSSNs(recs_2, recs_3, name3_ssn, name3_did);

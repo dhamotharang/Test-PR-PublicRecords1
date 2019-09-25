@@ -1,4 +1,4 @@
-import AutoStandardI, didville, doxie, address, gong, ut, Relationship, clickdata;
+import AutoStandardI, didville, doxie, dx_header, address, gong, ut, Relationship, clickdata;
 
 export ClickData_Relatives_Function(dataset(clickdata.Layout_Clickdata_In_RR) inf, unsigned1 glbPurpose,
 							 boolean append_bests = false, String32 appType, unsigned1 dppaPurpose = 0) := function
@@ -78,12 +78,13 @@ didville.MAC_BestAppend(outfa,
 
 didville.MAC_HHid_Append(outfa1,'HHID_RELATIVES',outfa2)
 
-outfa2 get_head_count(outfa2 L, doxie.Key_Did_Lookups R) := transform
+key_lookups := dx_header.key_Did_Lookups();
+outfa2 get_head_count(outfa2 L, key_lookups R) := transform
 	self.head_cnt := R.head_cnt;
 	self := L;
 end;
 
-outf := join(outfa2, doxie.Key_Did_Lookups,
+outf := join(outfa2, key_lookups,
 			left.did != 0 and
 			keyed(left.did = right.did),
 		   get_head_count(LEFT,RIGHT),

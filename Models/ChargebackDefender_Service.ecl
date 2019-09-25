@@ -78,7 +78,7 @@ Scores:
 </pre>
 */
 
-import address, Risk_Indicators, RiskWise, Suppress, Models, ut, royalty, Risk_Reporting, Business_Risk_BIP, STD;
+import address, Risk_Indicators, RiskWise,Gateway, Suppress,Inquiry_AccLogs, Models,royalty, Risk_Reporting, Business_Risk_BIP, STD;
 
 export ChargebackDefender_Service := MACRO
 
@@ -145,7 +145,11 @@ export ChargebackDefender_Service := MACRO
 			'TestDataTableName',
 			'gateways',
 			'RequestedAttributeGroups',
-			'OutcomeTrackingOptOut'
+			'OutcomeTrackingOptOut',
+      'LexIdSourceOptout',
+      '_TransactionId',
+      '_BatchUID',
+      '_GCID'
 	));
 
 	// Set this to false for production
@@ -191,7 +195,7 @@ export ChargebackDefender_Service := MACRO
 
 	// perform unparsed name cleaning without a macro until we make MAC_UnparsedFullName completely BtSt-savvy. 
 	string120 unparsed_fullname_value2 :='':stored('UnParsedFullName2');
-	cleaned_name2 := Stringlib.StringToUppercase(address.CleanPerson73(unparsed_fullname_value2));
+	cleaned_name2 := std.str.ToUppercase(address.CleanPerson73(unparsed_fullname_value2));
 	boolean  valid_cleaned2 := unparsed_fullname_value2<>'';
 	string30 pre_fname_val2 := '' : stored('first2');
 	string30 first2_value :=if(pre_fname_val2='' AND valid_cleaned2,cleaned_name2[6..25],pre_fname_val2);
@@ -217,7 +221,12 @@ export ChargebackDefender_Service := MACRO
 	boolean   ipid_only    := false  : stored('ipid_only');
 	model_url    := dataset([],Models.Layout_Score_Chooser)        : stored('scores',few);
 	gateways_input  := Gateway.Configuration.Get();
-
+//CCPA fields
+  unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+  string TransactionID := '' : STORED('_TransactionId');
+  string BatchUID := '' : STORED('_BatchUID');
+  unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+  
 	//CBD 5.0
 	string TypeOfOrder_value              := risk_indicators.iid_constants.PhysicalOrder : stored('TypeOfOrder');
 	string8   dob_value := ''             : stored('DateOfBirth');
@@ -246,9 +255,9 @@ export ChargebackDefender_Service := MACRO
 	
 	ExcludeWatchLists := true;	// trying this out to save some time, doesn't seem to need it ever at this point.  will turn off ofac searching
 	
-	cbdParams := model_url(StringLib.StringToLowerCase(name)='models.chargebackdefender_service')[1].parameters;
-	cbdParamsCap := PROJECT(cbdParams, TRANSFORM(RECORDOF(cbdParams), SELF.Name := StringLib.StringToUpperCase(LEFT.Name); SELF.Value := LEFT.Value; SELF := LEFT));
-	genericModelName := trim(StringLib.StringToLowerCase(cbdParamsCap(name='VERSION')[1].value));
+	cbdParams := model_url(std.str.ToLowerCase(name)='models.chargebackdefender_service')[1].parameters;
+	cbdParamsCap := PROJECT(cbdParams, TRANSFORM(RECORDOF(cbdParams), SELF.Name := std.str.ToUpperCase(LEFT.Name); SELF.Value := LEFT.Value; SELF := LEFT));
+	genericModelName := trim(std.str.ToLowerCase(cbdParamsCap(name='VERSION')[1].value));
 	
 	
 		// Per Bug 58340 - Pricepoint does not support hitting the Targus gateway, filtering it out.
@@ -259,7 +268,7 @@ export ChargebackDefender_Service := MACRO
 				
 	Gateway.Layouts.Config gwSwitch(gateways_input le) := transform
 		self.servicename := IF(genericModelName NOT IN ['cdn1109_1','cdn1404_1','cdn1506_1'], le.servicename, '');
-		self.url := if(StringLib.StringToLowerCase(le.servicename) = 'targus' OR genericModelName IN ['cdn1109_1','cdn1404_1','cdn1506_1'], '', le.url);		 
+		self.url := if(std.str.ToLowerCase(le.servicename) = 'targus' OR genericModelName IN ['cdn1109_1','cdn1404_1','cdn1506_1'], '', le.url);		 
 		self := le;
 	end;
 	gateways_in := project(gateways_input, gwSwitch(left));
@@ -298,7 +307,7 @@ export ChargebackDefender_Service := MACRO
 		boolean getVelocity;
 	end;
 	layout_settings checkSettings( attributesIn le ) := TRANSFORM
-		name := StringLib.StringToLowercase(le.name); 
+		name := std.str.ToLowercase(le.name); 
 		self.bsVersion    := map(
 			genericModelName IN ['osn1504_0'] => 51, //all OS models should run the 51 clam
 			name in attributes_v4 => 4,
@@ -352,37 +361,37 @@ export ChargebackDefender_Service := MACRO
 	#End
 		self.historydate := history_date;
 		self.account := account_value;
-		self.first := StringLib.StringToUppercase( first_value );
-		self.middle := StringLib.StringToUppercase( mname_val );
-		self.last := StringLib.StringToUppercase( last_value );
-		self.suffix := StringLib.StringToUppercase( suffix_val );
-		self.addr := StringLib.StringToUppercase( addr_value );
-		self.city := StringLib.StringToUppercase( city_value );
-		self.state := StringLib.StringToUppercase( state_value );
-		self.zip := StringLib.StringToUppercase( zip_value );
+		self.first := std.str.ToUppercase( first_value );
+		self.middle := std.str.ToUppercase( mname_val );
+		self.last := std.str.ToUppercase( last_value );
+		self.suffix := std.str.ToUppercase( suffix_val );
+		self.addr := std.str.ToUppercase( addr_value );
+		self.city := std.str.ToUppercase( city_value );
+		self.state := std.str.ToUppercase( state_value );
+		self.zip := std.str.ToUppercase( zip_value );
 		// self.zip4 := ''; // no billo zip4
-		self.hphone := StringLib.StringToUppercase( hphone_value );
-		self.socs := StringLib.StringToUppercase( socs_value );
-		self.email := StringLib.StringToUppercase( email_value );
-		self.drlc := StringLib.StringToUppercase( drlc_value );
-		self.drlcstate := StringLib.StringToUppercase( drlcstate_value );
-		self.ipaddr := StringLib.StringToUppercase( ipaddr_value );
-		self.first2 := StringLib.StringToUppercase( first2_value );
-		self.middle2 := StringLib.StringToUppercase( mname2_val );
-		self.last2 := StringLib.StringToUppercase( last2_value );
-		self.suffix2 := StringLib.StringToUppercase( suffix2_val );
-		self.addr2 := StringLib.StringToUppercase( addr2_value );
-		self.city2 := StringLib.StringToUppercase( city2_value );
-		self.state2 := StringLib.StringToUppercase( state2_value );
-		self.zip2 := StringLib.StringToUppercase( zip2_value );
+		self.hphone := std.str.ToUppercase( hphone_value );
+		self.socs := std.str.ToUppercase( socs_value );
+		self.email := std.str.ToUppercase( email_value );
+		self.drlc := std.str.ToUppercase( drlc_value );
+		self.drlcstate := std.str.ToUppercase( drlcstate_value );
+		self.ipaddr := std.str.ToUppercase( ipaddr_value );
+		self.first2 := std.str.ToUppercase( first2_value );
+		self.middle2 := std.str.ToUppercase( mname2_val );
+		self.last2 := std.str.ToUppercase( last2_value );
+		self.suffix2 := std.str.ToUppercase( suffix2_val );
+		self.addr2 := std.str.ToUppercase( addr2_value );
+		self.city2 := std.str.ToUppercase( city2_value );
+		self.state2 := std.str.ToUppercase( state2_value );
+		self.zip2 := std.str.ToUppercase( zip2_value );
 		// self.zip42 := ''; // no shipto zip4
-		self.socs2 := StringLib.StringToUppercase( socs2_value );
-		self.hphone2 := StringLib.StringToUppercase( hphone2_value );
-		self.TypeOfOrder := StringLib.StringToUppercase( TypeOfOrder_value );
+		self.socs2 := std.str.ToUppercase( socs2_value );
+		self.hphone2 := std.str.ToUppercase( hphone2_value );
+		self.TypeOfOrder := std.str.ToUppercase( TypeOfOrder_value );
 		self.dob := riskwise.cleandob(dob_value);
-		self.drlc2 := StringLib.StringToUppercase( drlc_value2 );
-		self.drlcstate2 := StringLib.StringToUppercase( drlcstate_value2 );	
-		self.email2 := StringLib.StringToUppercase( email_value2 );
+		self.drlc2 := std.str.ToUppercase( drlc_value2 );
+		self.drlcstate2 := std.str.ToUppercase( drlcstate_value2 );	
+		self.email2 := std.str.ToUppercase( email_value2 );
 		self.dob2 := riskwise.cleandob(dob_value2);
 		self.DeviceProvider1_value := DeviceProvider1_value;
 		self.DeviceProvider2_value := DeviceProvider2_value;
@@ -397,7 +406,11 @@ export ChargebackDefender_Service := MACRO
 	BSOptions := if(bsversion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0);
 	
 	iid_results := Models.ChargebackDefender_Function(indata, gateways_in, glb_purpose, dppa_purpose, ipid_only, dataRestriction, ofac_only,
-																										suppressneardups, require2Ele, bsVersion, dataPermission, bsOptions );
+																										suppressneardups, require2Ele, bsVersion, dataPermission, bsOptions,
+                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                    TransactionID := TransactionID, 
+                                                    BatchUID := BatchUID, 
+                                                    GlobalCompanyID := GlobalCompanyID);
 
 	Models.Layout_Chargeback_Out fill_output(iid_results le, indata ri) := TRANSFORM
 		self.AccountNumber := ri.account;
@@ -477,8 +490,8 @@ export ChargebackDefender_Service := MACRO
 		
 		ip_prep := ungroup(project(iid_results, prep_ips(left)));
 		Gateway.Layouts.Config gwIPIDCheck(gateways_input le) := transform
-			self.servicename := IF(StringLib.StringToLowerCase(le.servicename) = 'netacuity' and ~ipid_only,'', le.servicename);
-			self.url := if(StringLib.StringToLowerCase(le.servicename) = 'netacuity' and ~ipid_only, '', le.url);		 
+			self.servicename := IF(std.str.ToLowerCase(le.servicename) = 'netacuity' and ~ipid_only,'', le.servicename);
+			self.url := if(std.str.ToLowerCase(le.servicename) = 'netacuity' and ~ipid_only, '', le.url);		 
 			self := le;
 		end;
 
@@ -488,13 +501,13 @@ export ChargebackDefender_Service := MACRO
 
 		Models.Layout_Chargeback_Out addIP(mapped_results le, ips ri) := TRANSFORM
 			self.ipdata.ipcontinent := ri.continent;
-			self.ipdata.ipcountry := StringLib.StringToUpperCase(ri.countrycode);
-			self.ipdata.iproutingtype := if(Stringlib.StringFilterOut(ri.ipaddr[1],'0123456789') = '', ri.iproutingmethod, '');
-			self.ipdata.ipstate := if(StringLib.StringToUpperCase(ri.countrycode[1..2]) = 'US', StringLib.StringToUpperCase(ri.state), '');
-			self.ipdata.ipzip := if(StringLib.StringToUpperCase(ri.countrycode[1..2]) = 'US', ri.zip, '');
+			self.ipdata.ipcountry := std.str.ToUpperCase(ri.countrycode);
+			self.ipdata.iproutingtype := if(std.str.FilterOut(ri.ipaddr[1],'0123456789') = '', ri.iproutingmethod, '');
+			self.ipdata.ipstate := if(std.str.ToUpperCase(ri.countrycode[1..2]) = 'US', std.str.ToUpperCase(ri.state), '');
+			self.ipdata.ipzip := if(std.str.ToUpperCase(ri.countrycode[1..2]) = 'US', ri.zip, '');
 			self.ipdata.ipareacode := if(ri.areacode <> '0', ri.areacode, '');	
-			self.ipdata.topleveldomain := StringLib.StringToUpperCase(ri.topleveldomain);
-			self.ipdata.secondleveldomain := StringLib.StringToUpperCase(ri.secondleveldomain);
+			self.ipdata.topleveldomain := std.str.ToUpperCase(ri.topleveldomain);
+			self.ipdata.secondleveldomain := std.str.ToUpperCase(ri.secondleveldomain);
 			//self.ipdata.homebusiness := ri.homebusiness;
 			self := le;
 		END;     
@@ -505,7 +518,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	self.DeviceProvider2_value := DeviceProvider2_value;
 	self.DeviceProvider3_value := DeviceProvider3_value;
 	self.DeviceProvider4_value := DeviceProvider4_value;
-	self.btst_order_type := StringLib.StringToUppercase( TypeOfOrder_value );
+	self.btst_order_type := std.str.ToUppercase( TypeOfOrder_value );
 	self.seq := left.seq));	
 	//self.seq := left.seq * 2)); //done in BTST function
 
@@ -530,19 +543,23 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 		DataPermission, 
 		ScoresInput,
 		NetAcuity_v4, //true for CBD5.1 models
-		ipid_only
+		ipid_only,
+    LexIdSourceOptout := LexIdSourceOptout, 
+    TransactionID := TransactionID, 
+    BatchUID := BatchUID, 
+    GlobalCompanyID := GlobalCompanyID
 	);
 	
 	
 	Models.Layout_Chargeback_Out addIP_BTSTFunc(mapped_results le, clam ri) := TRANSFORM
 			self.ipdata.ipcontinent := ri.ip2o.continent;
-			self.ipdata.ipcountry := StringLib.StringToUpperCase(ri.ip2o.countrycode);
-			self.ipdata.iproutingtype := if(Stringlib.StringFilterOut(ri.ip2o.ipaddr[1],'0123456789') = '', ri.ip2o.iproutingmethod, '');
-			self.ipdata.ipstate := if(StringLib.StringToUpperCase(ri.ip2o.countrycode[1..2]) = 'US', StringLib.StringToUpperCase(ri.ip2o.state), '');
-			self.ipdata.ipzip := if(StringLib.StringToUpperCase(ri.ip2o.countrycode[1..2]) = 'US', ri.ip2o.zip, '');
+			self.ipdata.ipcountry := std.str.ToUpperCase(ri.ip2o.countrycode);
+			self.ipdata.iproutingtype := if(std.str.FilterOut(ri.ip2o.ipaddr[1],'0123456789') = '', ri.ip2o.iproutingmethod, '');
+			self.ipdata.ipstate := if(std.str.ToUpperCase(ri.ip2o.countrycode[1..2]) = 'US', std.str.ToUpperCase(ri.ip2o.state), '');
+			self.ipdata.ipzip := if(std.str.ToUpperCase(ri.ip2o.countrycode[1..2]) = 'US', ri.ip2o.zip, '');
 			self.ipdata.ipareacode := if(ri.ip2o.areacode <> '0', ri.ip2o.areacode, '');	
-			self.ipdata.topleveldomain := StringLib.StringToUpperCase(ri.ip2o.topleveldomain);
-			self.ipdata.secondleveldomain := StringLib.StringToUpperCase(ri.ip2o.secondleveldomain);
+			self.ipdata.topleveldomain := std.str.ToUpperCase(ri.ip2o.topleveldomain);
+			self.ipdata.secondleveldomain := std.str.ToUpperCase(ri.ip2o.secondleveldomain);
 			self := le;
 		END;     
 		
@@ -558,31 +575,31 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 		CDN1305_1_0 := genericModelName IN ['cdn1305_1'];
 		CDN1410_1_0 := genericModelName IN ['cdn1410_1'];
 		
-		SELF.Ship_Mode_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'SHIP_MODE_')[1].value)), '');
-		SELF.Original_Total_Amount_ := IF(CDN1109_1_0, (REAL8)TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'ORIGINAL_TOTAL_AMOUNT_')[1].value)), 0.0);
-		SELF.Item_Lines_ := IF(CDN1109_1_0, (INTEGER8)TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'ITEM_LINES_')[1].value)), 0);
-		SELF.CVV_Description_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'CVV_DESCRIPTION_')[1].value)), '');
-		SELF.Payment_Type_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'PAYMENT_TYPE_')[1].value)), '');
-		SELF.AVS_Code_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'AVS_CODE_')[1].value)), '');
-		SELF.Device_Result_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'DEVICE_RESULT_')[1].value)), '');
-		SELF.True_IP_Region_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'TRUE_IP_REGION_')[1].value)), '');
-		SELF.Browser_Language_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'BROWSER_LANGUAGE_')[1].value)), '');
-		SELF.Proxy_Ip_Geo_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'PROXY_IP_GEO_')[1].value)), '');
-		SELF.Reason_Code_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'REASON_CODE_')[1].value)), '');
-		SELF.Time_Zone_Hours_ := IF(CDN1109_1_0, (INTEGER1)TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'TIME_ZONE_HOURS_')[1].value)), 0);
-		SELF.True_Ip_Geo_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'TRUE_IP_GEO_')[1].value)), '');
-		SELF.Policy_Score_ := IF(CDN1109_1_0, (REAL8)TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'POLICY_SCORE_')[1].value)), 0.0);
-		SELF.Marked_For_Full_Name_H_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'MARKED_FOR_FULL_NAME_H_')[1].value)), '');
-		SELF.Entry_Type_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'ENTRY_TYPE_')[1].value)), '');
-		SELF.Line_Type_Header_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'LINE_TYPE_(HEADER)_')[1].value)), '');
-		SELF.Paypal_Email_Address_ := IF(CDN1109_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'PAYPAL_EMAIL_ADDRESS_')[1].value)), '');
+		SELF.Ship_Mode_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'SHIP_MODE_')[1].value)), '');
+		SELF.Original_Total_Amount_ := IF(CDN1109_1_0, (REAL8)TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'ORIGINAL_TOTAL_AMOUNT_')[1].value)), 0.0);
+		SELF.Item_Lines_ := IF(CDN1109_1_0, (INTEGER8)TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'ITEM_LINES_')[1].value)), 0);
+		SELF.CVV_Description_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'CVV_DESCRIPTION_')[1].value)), '');
+		SELF.Payment_Type_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'PAYMENT_TYPE_')[1].value)), '');
+		SELF.AVS_Code_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'AVS_CODE_')[1].value)), '');
+		SELF.Device_Result_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'DEVICE_RESULT_')[1].value)), '');
+		SELF.True_IP_Region_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'TRUE_IP_REGION_')[1].value)), '');
+		SELF.Browser_Language_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'BROWSER_LANGUAGE_')[1].value)), '');
+		SELF.Proxy_Ip_Geo_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'PROXY_IP_GEO_')[1].value)), '');
+		SELF.Reason_Code_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'REASON_CODE_')[1].value)), '');
+		SELF.Time_Zone_Hours_ := IF(CDN1109_1_0, (INTEGER1)TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'TIME_ZONE_HOURS_')[1].value)), 0);
+		SELF.True_Ip_Geo_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'TRUE_IP_GEO_')[1].value)), '');
+		SELF.Policy_Score_ := IF(CDN1109_1_0, (REAL8)TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'POLICY_SCORE_')[1].value)), 0.0);
+		SELF.Marked_For_Full_Name_H_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'MARKED_FOR_FULL_NAME_H_')[1].value)), '');
+		SELF.Entry_Type_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'ENTRY_TYPE_')[1].value)), '');
+		SELF.Line_Type_Header_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'LINE_TYPE_(HEADER)_')[1].value)), '');
+		SELF.Paypal_Email_Address_ := IF(CDN1109_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'PAYPAL_EMAIL_ADDRESS_')[1].value)), '');
 		//Tiger Direct input fields
-		SELF.TD_avs := IF(CDN1305_1_0 or CDN1410_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'TD_AVS')[1].value)), '');
-		SELF.TD_pay_method := IF(CDN1305_1_0 or CDN1410_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'TD_PAY_METHOD')[1].value)), '');
-		SELF.TD_product_dollars := IF(CDN1305_1_0 or CDN1410_1_0, (REAL8)TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'TD_PRODUCT_DOLLARS')[1].value)), 0);
-		SELF.TD_ship_method := IF(CDN1305_1_0 or CDN1410_1_0, TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'TD_SHIP_METHOD')[1].value)), '');
-    SELF.TD_day_velocity_threshold := IF(CDN1410_1_0, (REAL8)TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'TD_DAY_VELOCITY_THRESHOLD')[1].value)), 0.0);
-		SELF.TD_week_velocity_threshold := IF(CDN1410_1_0, (REAL8)TRIM(StringLib.StringToUpperCase(cbdParamsCap(name = 'TD_WEEK_VELOCITY_THRESHOLD')[1].value)), 0.0);
+		SELF.TD_avs := IF(CDN1305_1_0 or CDN1410_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'TD_AVS')[1].value)), '');
+		SELF.TD_pay_method := IF(CDN1305_1_0 or CDN1410_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'TD_PAY_METHOD')[1].value)), '');
+		SELF.TD_product_dollars := IF(CDN1305_1_0 or CDN1410_1_0, (REAL8)TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'TD_PRODUCT_DOLLARS')[1].value)), 0);
+		SELF.TD_ship_method := IF(CDN1305_1_0 or CDN1410_1_0, TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'TD_SHIP_METHOD')[1].value)), '');
+    SELF.TD_day_velocity_threshold := IF(CDN1410_1_0, (REAL8)TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'TD_DAY_VELOCITY_THRESHOLD')[1].value)), 0.0);
+		SELF.TD_week_velocity_threshold := IF(CDN1410_1_0, (REAL8)TRIM(std.str.ToUpperCase(cbdParamsCap(name = 'TD_WEEK_VELOCITY_THRESHOLD')[1].value)), 0.0);
 
 		SELF := [];
 	END;
@@ -709,8 +726,8 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 		self.seq := l.seq;
 		self.ssn := socs_value;
 		self.phone10 := hphone_value;
-		self.fname := StringLib.StringToUppercase(first_value);
-		self.lname := StringLib.StringToUppercase(last_value);
+		self.fname := std.str.ToUppercase(first_value);
+		self.lname := std.str.ToUppercase(last_value);
 		self.z5 := zip_value;
 		self := [];
 	END;
@@ -783,60 +800,60 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 
 	//Log to Deltabase
 	Deltabase_Logging_prep := project(final3, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
-																								 self.company_id := (Integer)CompanyID,
-																								 self.login_id := _LoginID,
-																								 self.product_id := Risk_Reporting.ProductID.Models__ChargebackDefender_Service,
-																								 self.function_name := FunctionName,
-																								 self.esp_method := ESPMethod,
-																								 self.interface_version := InterfaceVersion,
-																								 self.delivery_method := DeliveryMethod,
-																								 self.date_added := (STRING8)Std.Date.Today(),
-																								 self.death_master_purpose := DeathMasterPurpose,
-																								 self.ssn_mask := ssnmask,
-																								 self.dob_mask := dobmask,
-																								 self.dl_mask := dlmask,
-																								 self.exclude_dmv_pii := ExcludeDMVPII,
-																								 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
-																								 self.archive_opt_in := ArchiveOptIn,
-                                                 self.glb := GLB_Purpose,
-                                                 self.dppa := DPPA_Purpose,
-																								 self.data_restriction_mask := DataRestriction,
-																								 self.data_permission_mask := DataPermission,
-																								 self.industry := Industry_Search[1].Industry,
-																								 self.i_attributes_name := stringified_attributesIn,
-																								 self.i_ssn := socs_value,
-                                                 self.i_dob := dob_value,
-                                                 self.i_name_full := fullname_value,
-																								 self.i_name_first := first_value,
-																								 self.i_name_last := last_value,
-																								 self.i_address := addr_value,
-																								 self.i_city := city_value,
-																								 self.i_state := state_value,
-																								 self.i_zip := zip_value,
-																								 self.i_dl := drlc_value,
-																								 self.i_dl_state := drlcstate_value,
-                                                 self.i_home_phone := hphone_value,
-																								 self.i_name_first_2 := first2_value,
-																								 self.i_name_last_2 := last2_value,
-																								 self.i_model_name_1 := genericModelName,
-																								 self.i_model_name_2 := '',
-																								 self.o_score_1    := IF(genericModelName != '', left.Models[1].Scores[1].i, ''),
-																								 self.o_reason_1_1 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[1].Reason_Code, ''),
-																								 self.o_reason_1_2 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[2].Reason_Code, ''),
-																								 self.o_reason_1_3 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[3].Reason_Code, ''),
-																								 self.o_reason_1_4 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[4].Reason_Code, ''),
-																								 self.o_reason_1_5 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[5].Reason_Code, ''),
-																								 self.o_reason_1_6 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[6].Reason_Code, ''),
-																								 // self.o_score_2    := '',
-																								 self.o_reason_2_1 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[1].Reason_Code, ''),
-																								 self.o_reason_2_2 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[2].Reason_Code, ''),
-																								 self.o_reason_2_3 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[3].Reason_Code, ''),
-																								 self.o_reason_2_4 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[4].Reason_Code, ''),
-																								 self.o_reason_2_5 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[5].Reason_Code, ''),
-																								 self.o_reason_2_6 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[6].Reason_Code, ''),
-                                                 self.o_lexid := clam[1].Bill_To_Out.DID,
-																								 self := left,
-																								 self := [] ));
+                            self.company_id := (Integer)CompanyID,
+                            self.login_id := _LoginID,
+                            self.product_id := Risk_Reporting.ProductID.Models__ChargebackDefender_Service,
+                            self.function_name := FunctionName,
+                            self.esp_method := ESPMethod,
+                            self.interface_version := InterfaceVersion,
+                            self.delivery_method := DeliveryMethod,
+                            self.date_added := (STRING8)Std.Date.Today(),
+                            self.death_master_purpose := DeathMasterPurpose,
+                            self.ssn_mask := ssnmask,
+                            self.dob_mask := dobmask,
+                            self.dl_mask := dlmask,
+                            self.exclude_dmv_pii := ExcludeDMVPII,
+                            self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
+                            self.archive_opt_in := ArchiveOptIn,
+                            self.glb := GLB_Purpose,
+                            self.dppa := DPPA_Purpose,
+                            self.data_restriction_mask := DataRestriction,
+                            self.data_permission_mask := DataPermission,
+                            self.industry := Industry_Search[1].Industry,
+                            self.i_attributes_name := stringified_attributesIn,
+                            self.i_ssn := socs_value,
+                            self.i_dob := dob_value,
+                            self.i_name_full := fullname_value,
+                            self.i_name_first := first_value,
+                            self.i_name_last := last_value,
+                            self.i_address := addr_value,
+                            self.i_city := city_value,
+                            self.i_state := state_value,
+                            self.i_zip := zip_value,
+                            self.i_dl := drlc_value,
+                            self.i_dl_state := drlcstate_value,
+                            self.i_home_phone := hphone_value,
+                            self.i_name_first_2 := first2_value,
+                            self.i_name_last_2 := last2_value,
+                            self.i_model_name_1 := genericModelName,
+                            self.i_model_name_2 := '',
+                            self.o_score_1    := IF(genericModelName != '', left.Models[1].Scores[1].i, ''),
+                            self.o_reason_1_1 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[1].Reason_Code, ''),
+                            self.o_reason_1_2 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[2].Reason_Code, ''),
+                            self.o_reason_1_3 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[3].Reason_Code, ''),
+                            self.o_reason_1_4 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[4].Reason_Code, ''),
+                            self.o_reason_1_5 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[5].Reason_Code, ''),
+                            self.o_reason_1_6 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[6].Reason_Code, ''),
+                            // self.o_score_2    := '',
+                            self.o_reason_2_1 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[1].Reason_Code, ''),
+                            self.o_reason_2_2 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[2].Reason_Code, ''),
+                            self.o_reason_2_3 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[3].Reason_Code, ''),
+                            self.o_reason_2_4 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[4].Reason_Code, ''),
+                            self.o_reason_2_5 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[5].Reason_Code, ''),
+                            self.o_reason_2_6 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[6].Reason_Code, ''),
+                            self.o_lexid := clam[1].Bill_To_Out.DID,
+                            self := left,
+                            self := [] ));
 	Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 	// #stored('Deltabase_Log', Deltabase_Logging);
 

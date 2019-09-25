@@ -34,7 +34,7 @@ EXPORT mac_fetch_bydid(ds_in, did_field, death_params, skip_GLB_check = FALSE, r
     #END
     KEEP(recs_per_did), LIMIT(0));
   
-  LOCAL din_with_death_suppressed := suppress.MAC_FlagSuppressedSource(din_with_death, death_params, did_field, death.global_sid, _data_env); 
+  LOCAL din_with_death_suppressed := suppress.MAC_FlagSuppressedSource(din_with_death, death_params, did_field, death.global_sid, data_env := _data_env); 
 
   LOCAL out_recs := PROJECT(din_with_death_suppressed, 
     TRANSFORM(layout_out_rec,

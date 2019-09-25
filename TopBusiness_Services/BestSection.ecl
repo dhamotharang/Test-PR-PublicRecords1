@@ -1,4 +1,4 @@
-import iesp, AutoStandardI, MDR, BIPV2, BIPV2_Best,
+﻿import iesp, AutoStandardI, MDR, BIPV2, BIPV2_Best,
        TopBusiness_Services, ut,  Gong;
 
 export BestSection := MODULE;
@@ -448,9 +448,13 @@ export BestSection := MODULE;
 						 left outer);			
 						 						 
    // now sort header recs to bring the very first non zero dt_vendor_first_reported to the top
-	 //
-	  CompActiveRecsLastReported := dedup(sort(ds_BusHeaderRecs,ultid, orgid, seleid,
-	                                   if (dt_vendor_first_reported <> 0, 0, 1), 																		
+	 // have to deal with any BIP header recs that have 6 digit dt_vendor_first_reported field so fix that so that sort remains true
+	 ds_BusHeaderRecsUCCdateFix := project(ds_BusHeaderRecs, transform(RECORDOF(LEFT),
+	                                                                        self.dt_vendor_first_reported := if (length((string) left.dt_vendor_first_reported) = 6,
+													                   left.dt_vendor_first_reported * 100, left.dt_vendor_first_reported);																		
+														  self := left));
+		   CompActiveRecsLastReported := dedup(sort( ds_BusHeaderRecsUCCdateFix,ultid, orgid, seleid,
+	                                   if (dt_vendor_first_reported <> 0, 0, 1),  				
 																		 dt_vendor_first_reported, record),
 																		 ultid, orgid, seleid);															  
    //																
@@ -464,10 +468,7 @@ export BestSection := MODULE;
 																transform(recordof(left),	
 																       // if not alrady populated fill it in with 
 	                                     // a derived field and set the YearStartedDerivedBoolean as well
-             tmpdtVendorFirstReportedAppended := if (length(trim((string)(right.dt_vendor_first_reported),left,right)) <> 8
-						                                            and length(trim((string)(right.dt_vendor_first_reported),left,right)) = 6,
-						                                              right.dt_vendor_first_reported * 100,
-																													right.dt_vendor_first_reported);
+             tmpdtVendorFirstReportedAppended := right.dt_vendor_first_reported;
 																										
              tmpDateVendorFirstReported := if (length((string)(tmpdtVendorFirstReportedAppended)) = 8,
 						                                     tmpdtVendorFirstReportedAppended div 10000,																								 
@@ -691,7 +692,7 @@ export BestSection := MODULE;
 		//output(unique_phones_against_names, named('unique_phones_against_names'));
 		// output(unique_phones_gong_rolled, named('unique_phones_gong_rolled'));		
 		   // output(choosen(ds_slimBusHeaderRecs, 3000), named('ds_slimbusheaderRecs'));
-          //output(ds_busHeaderRecs, named('ds_busHeaderRecs'));
+          // output(ds_busHeaderRecs, named('ds_busHeaderRecs'));  
           // output(choosen(ds_slimBusHeaderRecs,4000), named('ds_slimBusHeaderRecs'));
         //output(ds_slimBusHeaderRecsPre, named('ds_slimBusHeaderRecsPre'));
 			  //output(ds_slimBusHeaderRecs, named('ds_slimBusHeaderRecs'));
@@ -700,7 +701,7 @@ export BestSection := MODULE;
 		 // output(ds_year_startedFromBest, named('ds_year_startedFromBest'));		
 		// output(CompActiveRecs, named('CompActiveRecs'));
 		  //output(IsCompanyActiveRecs, named('IsCompanyActiveRecs'));
-		// output(CompActiveRecsLastReported, named('CompActiveRecsLastReported'));		
+		 // output(CompActiveRecsLastReported, named('CompActiveRecsLastReported'));		
 		
 		   //  output(tmpOtherCompanyNameVariationsPre, named('tmpOtherCompanyNameVariationsPre'));
 		    // output(tmpOtherCompanyNameVariations, named('tmpOtherCompanyNameVariations'));			
@@ -713,6 +714,9 @@ export BestSection := MODULE;
 		  // output(otherTins, named('otherTins'));
 		  // output(twoYearBackDateLastSeen, named('twoYearBackDateLastSeen'));
 		// output(CompanyDerivedStartDate, named('CompanyDerivedStartDate'));		
+		// output(tmpdtVendorFirstReportedAppended, named('tmpdtVendorFirstReportedAppended'));
+		
+	    // output(tmpDateVendorFirstReported, named('tmpDateVendorFirstReported'));
 		 // output(tickerInfo, named('tickerInfo'));
 		 // output(tickerBestRecs, named('ticker'));	
 	    // output(tmpFinalTinVariationsBestRowOnly, named('tmpFinalTinVariationsBestRowOnly'));

@@ -1,4 +1,4 @@
-﻿IMPORT FCRA, Risk_indicators;
+﻿IMPORT FCRA;
 
 EXPORT Layouts_Derog_Info := MODULE
 
@@ -175,13 +175,14 @@ EXPORT Layouts_Derog_Info := MODULE
 		String1 Eviction;
 		string20 FilingNumber       ;    
 		string10 FilingBook         ;    
-		string10 FilingPage         ;    
+		string10 FilingPage         ;
 		string7 AgencyID						;
 		string60 Agency             ;    
 		string35 AgencyCounty       ;    
 		string2 AgencyState         ; 
 		string FileTypeDesc;
-		string8 VendorDateLastSeen   ;  
+		string8 VendorDateLastSeen   ;
+    string10 orig_rmsid         ;
 	END;
 
 	EXPORT 	layout_derog_process_plus_working := RECORD
@@ -215,12 +216,13 @@ EXPORT Layouts_Derog_Info := MODULE
 		string8 DateLastSeen   ;    
 		string20 FilingNumber       ;    
 		string10 FilingBook         ;    
-		string10 FilingPage         ; 
+		string10 FilingPage         ;
 		string7	 AgencyID           ;
 		string60 Agency             ;    
 		string35 AgencyCounty       ;    
 		string2 AgencyState         ;  
 		unsigned ConsumerStatementId;
+    string10 orig_rmsid         ;
 	END;
 	
 	EXPORT Liens_seq := RECORD
@@ -244,12 +246,13 @@ EXPORT Layouts_Derog_Info := MODULE
 		string20 FilingNumber ;                
 		string10 FilingBook   ;                
 		string10 FilingPage   ;                
-		string1 Eviction      ;  
+		string1 Eviction      ;
 		string7 AgencyID      ;
 		string60 Agency       ;                
 		string35 AgencyCounty ;                
 		string2 AgencyState    ;
 		unsigned ConsumerStatementId;
+    string10 orig_rmsid   ;
 	END;	
 	
 	EXPORT Judgments_seq := RECORD

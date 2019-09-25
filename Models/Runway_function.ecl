@@ -5624,6 +5624,12 @@ self.RVA1809_1_0_reason3	:= if(model_environment in [1,2], left.RVA1809_1_0_reas
 self.RVA1809_1_0_reason4	:= if(model_environment in [1,2], left.RVA1809_1_0_reason4	, '');
 self.RVA1809_1_0_reason5	:= if(model_environment in [1,2], left.RVA1809_1_0_reason5	, '');
 
+self.RVA1904_1_0_score	:= if(model_environment in [1,2], left.RVA1904_1_0_score	, '');
+self.RVA1904_1_0_reason1	:= if(model_environment in [1,2], left.RVA1904_1_0_reason1	, '');
+self.RVA1904_1_0_reason2	:= if(model_environment in [1,2], left.RVA1904_1_0_reason2	, '');
+self.RVA1904_1_0_reason3	:= if(model_environment in [1,2], left.RVA1904_1_0_reason3	, '');
+self.RVA1904_1_0_reason4	:= if(model_environment in [1,2], left.RVA1904_1_0_reason4	, '');
+self.RVA1904_1_0_reason5	:= if(model_environment in [1,2], left.RVA1904_1_0_reason5	, '');
 
 self.RVP1012_1_0_score	:= if(model_environment in [1,2], left.RVP1012_1_0_score	, '');
 self.RVP1012_1_0_reason1	:= if(model_environment in [1,2], left.RVP1012_1_0_reason1	, '');

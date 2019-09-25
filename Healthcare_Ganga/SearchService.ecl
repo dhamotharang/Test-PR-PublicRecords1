@@ -11,8 +11,8 @@ EXPORT SearchService := MACRO
 	
 	SearchCriteria := first_row.SearchBy;
 	SearchOptions := first_row.Options;
+	#stored('GLBPurpose', first_row.user.GLBPurpose);
 	
-
 	Healthcare_Ganga.Layouts.IdentityInput getCriteria() := TRANSFORM
 		self.acctno := '1';
 		self.EntityType := SearchCriteria.EntityType;
@@ -45,6 +45,7 @@ EXPORT SearchService := MACRO
 		self.IncludeSpecialties  := Healthcare_Shared.Constants.CFG_False;
 		self.IncludeLicenses  := Healthcare_Shared.Constants.CFG_False;
 		self.IncludeResidencies  := Healthcare_Shared.Constants.CFG_False;
+		self.doDeepDive := Healthcare_Shared.Constants.CFG_True;
 		//self:=[];Do not uncomment otherwise the default values will not get set.
 	end;
 	cfg := dataset([buildConfig()]);

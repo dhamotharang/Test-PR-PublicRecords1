@@ -178,7 +178,7 @@ EXPORT Batch_Service_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) d
 		to_suppress := all_recs + too_many_w_error_code;
 				
 		//Suppress by SSN and DID.
-		base_params := BatchShare.IParam.getBatchParamsV2();
+		base_params := BatchShare.IParam.getBatchParams();
 		Suppress.MAC_Suppress(to_suppress, ssn_suppressed, base_params.application_type, Suppress.Constants.LinkTypes.SSN, ssn);
 		Suppress.MAC_Suppress(ssn_suppressed, did_suppressed, base_params.application_type, Suppress.Constants.LinkTypes.DID, did);
 			
