@@ -14,8 +14,8 @@ EXPORT macGetGlobalSid(dInFile, sdata_set, sFieldName='', sGlobalSid='global_sid
 
   aCheckDatasetEntry := IF(EXISTS(dFilterGSidFile) = FALSE, FAIL(' DATASET ENTRY NOT FOUND '))
     : FAILURE(STD.System.Email.SendEmail(_control.MyInfo.EmailAddressNotify,
-      '***FAILURE:DATASET ENTRY NOT FOUND ' + sRoxiePackage + ' - ' + WORKUNIT,
-      WORKUNIT + ' has failed. DATASET ENTRY not found for the sRoxiePackage ' + sRoxiePackage + ' provided. Please check workunit - '+ FAILMESSAGE));
+      '***FAILURE:DATASET ENTRY NOT FOUND ' + sdata_set + ' - ' + WORKUNIT,
+      WORKUNIT + ' has failed. DATASET ENTRY not found for the sdata_set ' + sdata_set + ' provided. Please check workunit - '+ FAILMESSAGE));
 
   lInRec := {RECORDOF(dInFile)};
 
@@ -29,8 +29,8 @@ EXPORT macGetGlobalSid(dInFile, sdata_set, sFieldName='', sGlobalSid='global_sid
     sGlbSrcid := dFilterGSidFile #IF(SFieldName <> '')#EXPAND(#TEXT(%sFilter%))#END;
     tGlobalSrcID := TABLE(sGlbSrcid, {global_sid, cnt:=COUNT(GROUP)},global_sid);
 
-    aCheckDatasetDups := IF(tGlobalSrcID[1].cnt > 1 AND tGlobalSrcID[1].global_sid != '', STD.System.Log.addWorkunitWarning('***WARNING:Duplicate GLB_SRCID for Dataset ' + sRoxiePackage));
-    aCheckGlobalSRCID := IF(tGlobalSrcID[1].cnt = 1 AND tGlobalSrcID[1].global_sid = '', STD.System.Log.addWorkunitWarning('***WARNING:GLB_SRCID IS BLANK for Dataset ' + sRoxiePackage)); 
+    aCheckDatasetDups := IF(tGlobalSrcID[1].cnt > 1 AND tGlobalSrcID[1].global_sid != 0, STD.System.Log.addWorkunitWarning('***WARNING:Duplicate GLB_SRCID for Dataset ' + sdata_set));
+    aCheckGlobalSRCID := IF(tGlobalSrcID[1].cnt = 1 AND tGlobalSrcID[1].global_sid = 0, STD.System.Log.addWorkunitWarning('***WARNING:GLB_SRCID IS BLANK for Dataset ' + sdata_set)); 
 
     ORDERED(aCheckDatasetDups,aCheckGlobalSRCID);
 
