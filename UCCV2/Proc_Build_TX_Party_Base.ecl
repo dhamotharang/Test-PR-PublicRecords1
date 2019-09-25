@@ -1,4 +1,4 @@
-IMPORT Address, NID, UCCV2, ut;
+﻿IMPORT Address, NID, UCCV2, ut;
 
 layout_party
          :=record
@@ -165,7 +165,7 @@ dPSecuredParty		:=  project(File_TX_PersonSecuredParty_in,tPSName_Address(left))
 dAllBusiness			:=	dBDebtor	+	dBSecuredParty;
 dAllPerson				:=	dPDebtor	+	dPSecuredParty;
 
-NID.Mac_CleanFullNames(dAllBusiness, VerifyBusRecs, Orig_name);
+NID.Mac_CleanFullNames(dAllBusiness, VerifyBusRecs, Orig_name, useV2:=true);
 
 person_flags := ['P', 'D'];
 // An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.
@@ -182,7 +182,7 @@ layout_party add_clean_name_business(VerifyBusRecs L) := TRANSFORM
 	SELF := L;
 END;
 
-NID.Mac_CleanParsedNames(dAllPerson, VerifyPersons, fname, mname, lname, name_suffix);
+NID.Mac_CleanParsedNames(dAllPerson, VerifyPersons, fname, mname, lname, name_suffix, useV2:=true);
 
 // Because the vendor will sometimes send a company name as a person's last name only, we need to make
 // sure what they sent is a person.

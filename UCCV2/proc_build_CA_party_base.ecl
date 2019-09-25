@@ -1,4 +1,4 @@
-IMPORT Address, NID, UCCV2, ut;
+﻿IMPORT Address, NID, UCCV2, ut;
 
 //CA
 layout_party	:=	record
@@ -167,11 +167,11 @@ dCAPSecuredParty			  :=  project(File_ca_PersonSecuredP_in,tPSName_Address(left)
 dAllBusiness						:=	dCABDebtor	+	dCABSecuredParty;
 dAllPerson							:=	dCAPDebtor	+	dCAPSecuredParty;
 
-NID.Mac_CleanFullNames(dAllBusiness, VerifyBusRecs, Orig_name);
+NID.Mac_CleanFullNames(dAllBusiness, VerifyBusRecs, Orig_name, useV2:=true);
 
-person_flags := ['P', 'D'];
-// An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.
-business_flags := ['B', 'U', 'I'];
+person_flags   := ['P', 'D'];
+// V2 replaced the Unclassified('U') category with the Trust ('T') category, what used to be a U should become a T or I with V2.
+business_flags := ['B', 'I', 'T'];
 
 layout_party add_clean_name_business(VerifyBusRecs L) := TRANSFORM
 	SELF.title        := IF(L.nametype IN person_flags, L.cln_title, '');
@@ -185,7 +185,7 @@ layout_party add_clean_name_business(VerifyBusRecs L) := TRANSFORM
 	SELF := L;
 END;
 
-NID.Mac_CleanParsedNames(dAllPerson, VerifyPersons, fname, mname, lname, name_suffix);
+NID.Mac_CleanParsedNames(dAllPerson, VerifyPersons, fname, mname, lname, name_suffix, useV2:=true);
 
 // Because the vendor will sometimes send a company name as a person's last name only, we need to make
 // sure what they sent is a person.
