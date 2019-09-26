@@ -1,4 +1,4 @@
-﻿import _control, CCPA, ut,address,idl_header, NID, Std;
+﻿import _control, MDR, ut,address,idl_header, NID, Std;
 
 export Prep_Input(
 
@@ -39,7 +39,7 @@ function
 
 	dPopFields := project(pInputFile, tCleanFields(left));
 	
-	addGlobalSID := CCPA.macGetGlobalSID(dPopFields, 'SalesChannel', '', 'global_sid'); //DF-25321: Populate Global_SIDs
+	addGlobalSID := MDR.macGetGlobalSid(dPopFields, 'SalesChannel', '', 'global_sid'); //DF-25321: Populate Global_SIDs
 	
 			//////////////////////////////////////////////////////////////////////////////////////
 		// -- Clean Name, determine if it is a person

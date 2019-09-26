@@ -1,4 +1,4 @@
-﻿IMPORT _control, CCPA, dx_PhonesInfo, Mdr, Std, Ut;
+﻿IMPORT _control, MDR, dx_PhonesInfo, Mdr, Std, Ut;
 
 	//DF-23660: Create Lerg6 Keybuild
 	//DF-24140: Lerg6 Layout Change
@@ -382,7 +382,7 @@
 	//Append Global SID
 	////////////////////////////////////////////////////////////////////////////////
 	
-	addGlobal_SID	:= CCPA.macGetGlobalSID(aggrRoll, 'PhonesMetadata', 'source', 'global_sid');
+	addGlobal_SID	:= MDR.macGetGlobalSid(aggrRoll, 'PhonesMetadata', 'source', 'global_sid');
 
 	////////////////////////////////////////////////////////////////////////////////
 	//Append Record SID
