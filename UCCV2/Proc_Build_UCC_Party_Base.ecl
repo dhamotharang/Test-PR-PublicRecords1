@@ -1,10 +1,10 @@
-IMPORT Address, AID, BIPV2, Business_Header, Business_Header_SS, DID_Add, MDR, NID, UCCV2;
+﻿IMPORT Address, AID, BIPV2, Business_Header, Business_Header_SS, DID_Add, MDR, NID, UCCV2;
 
 export  Proc_Build_UCC_Party_Base(boolean bvalue) := function
  
 	NID_Clean_Name_Parsed(DATASET(UCCV2.Layout_UCC_Common.Layout_Party_with_AID) pInput) := FUNCTION
 
-    NID.Mac_CleanParsedNames(pInput, cleaned_names, orig_fname, orig_mname, orig_lname, orig_suffix);
+    NID.Mac_CleanParsedNames(pInput, cleaned_names, orig_fname, orig_mname, orig_lname, orig_suffix, useV2:=true);
 
 		RETURN cleaned_names;
 
@@ -13,11 +13,11 @@ export  Proc_Build_UCC_Party_Base(boolean bvalue) := function
 	ds_has_orig_name := UCCV2.File_UCC_Party_Base_AID(orig_name != '');
 	ds_no_orig_name := UCCV2.File_UCC_Party_Base_AID(orig_name = '');
 
-  NID.Mac_CleanFullNames(ds_has_orig_name, CleanNameRecs, orig_name);
+  NID.Mac_CleanFullNames(ds_has_orig_name, CleanNameRecs, orig_name, useV2:=true);
 
-	person_flags := ['P', 'D'];
-	// An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.
-	business_flags := ['B', 'U', 'I'];
+	person_flags   := ['P', 'D'];
+	// V2 replaced the Unclassified('U') category with the Trust ('T') category, what used to be a U should become a T or I with V2.
+	business_flags := ['B', 'I', 'T'];
 
 	UCCV2.Layout_UCC_Common.Layout_Party_with_AID trfCleanName(CleanNameRecs L) := TRANSFORM
 		SELF.title        := IF(L.nametype IN person_flags, L.cln_title, '');

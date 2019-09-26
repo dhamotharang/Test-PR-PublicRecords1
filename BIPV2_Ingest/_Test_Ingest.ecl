@@ -110,7 +110,7 @@ functionmacro
     // ,[BIPV2.IDconstants.xlink_version_BIP_dev]
     ,[BIPV2.IDconstants.xlink_version_BIP]
     ,												//pURL										=	''
-    email_address,									
+    ,//email_address									
     ,v_city_name						//pCity									= ''	
     ,fname	
     ,mname												//pContact_mname					= ''
