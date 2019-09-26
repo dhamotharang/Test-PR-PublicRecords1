@@ -1,4 +1,4 @@
-IMPORT	Business_Credit,	BIPV2,	Address,	doxie,	lib_date,	STD;
+﻿IMPORT	Business_Credit,	BIPV2,	Address,	doxie,	lib_date,	STD;
 EXPORT	Key_IndividualOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																				Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	FUNCTION
 
@@ -63,6 +63,9 @@ EXPORT	Key_IndividualOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today
 		STRING9		Federal_TaxID_SSN;
 		STRING3		Federal_TaxID_SSN_Identifier;
 		STRING2		source;
+		//DF-26180 Add CCPA fields to thor_data400::key::sbfe::qa::individualownerinformation
+		UNSIGNED4	global_sid;
+		UNSIGNED8   record_sid;
 	END;
 	
 	dIOInformation			:=	PROJECT(dLinked,TRANSFORM(rIOInformation,
