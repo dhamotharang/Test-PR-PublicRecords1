@@ -76,8 +76,9 @@ R := record
 	SNA.file_prop_transaction_stats.has_mortgage_foreclosure;
 	SNA.file_prop_transaction_stats.ends_in_default_or_foreclosure;
 	//CCPA-767
-	UNSIGNED4 global_sid := 0;
-	UNSIGNED8 record_sid := 0;
+	UNSIGNED4 global_sid		:= 0;
+	UNSIGNED8 record_sid		:= 0;
+	UNSIGNED4 did						:= 0;
 END;
  
 fpts := table( SNA.file_prop_transaction_stats, R );

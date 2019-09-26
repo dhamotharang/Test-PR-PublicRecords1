@@ -1,4 +1,4 @@
-﻿IMPORT Address, NID, UCCV2, ut;
+﻿IMPORT Address, NID, UCCV2, ut; 
 
 person_flags   := ['P', 'D'];
 // V2 replaced the Unclassified('U') category with the Trust ('T') category, what used to be a U should become a T or I with V2.
@@ -164,8 +164,8 @@ UCCV2.Layout_UCC_Common.Layout_Party_with_AID project_Name_address(dName_Address
    
 	self.dt_first_seen						:=   (unsigned6)(pInput.process_date[1..6]);
 	self.dt_last_seen							:=   (unsigned6)(pInput.process_date[1..6]);
-	self.dt_vendor_first_reported	:=   (unsigned6)(pInput.process_date[1..6]);
-	self.dt_vendor_last_reported	:=   (unsigned6)(pInput.process_date[1..6]);
+	self.dt_vendor_first_reported	:=   (unsigned6) pInput.process_date;
+	self.dt_vendor_last_reported	:=   (unsigned6) pInput.process_date;
 	self.tmsid										:=  	'';
 	self													:=		pInput;
 	self													:=		[];
