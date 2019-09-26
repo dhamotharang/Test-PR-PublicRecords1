@@ -12,14 +12,14 @@ Created on Mon Jul 29 13:16:05 2019
 @author: reddka01
 """
 
-def Create_DataFrame(page_number,Attribute_Type, Attribute_Group):
+def Create_DataFrame(Attribute_Group, Attribute_Type, page_number):
     import requests
     import pandas as pd
     from pandas import DataFrame
      # Set the request parameters
     url = 'https://confluence.rsi.lexisnexis.com/rest/prototype/1/content/'+ page_number 
     user = 'reddka01@risk'
-    pwd = 'Pioneer1^'
+    pwd = 'Pioneer1&'
      
      # Set proper headers
     headers = {"Accept":"application/json"}
@@ -54,7 +54,7 @@ def Create_DataFrame(page_number,Attribute_Type, Attribute_Group):
     
     #username       = os.environ['HPCCUSER']
     #password       = os.environ['HPCCPASS']
-    auth1          = auth('10.173.14.204', '8010', 'kreddy','Pioneer1',require_auth = True )
+    auth1          = auth('10.173.14.204', '8010', 'kreddy','Pioneer2',require_auth = True )
     
     
     fourway = hpcc(auth= auth1, timeout= 1200, response_type= '.json')
@@ -137,11 +137,29 @@ def Create_DataFrame(page_number,Attribute_Type, Attribute_Group):
     
     #fileSpray_variable(platform, srcIP, srcPath, destinationCluster, destinationName)
     
+    # initialize list of lists 
+import pandas as pd     
+data_sheets =[
+               ["Person","Professional License","50411612"],
+               ["Person","Best PII","67266323"],
+               ["Business","Assets","67266367"],
+               ["Person","assets","50412528"],
+               ["Person","Derogs -Bankruptcy History","46731237"],
+               ["Person","Derogs -Criminal History","47613720"],
+               ["Business","Business B2B Trade","67269494"],
+               ["Business","Business LexID","53381983"],
+               ["Business","Business Input Validation","67266393"],
+               ["Person","Validation","52299221"]
+              ] 
   
- 
+# Create the pandas DataFrame 
+df = pd.DataFrame(data_sheets, columns = ['page_number','Attribute_Type', 'Attribute_Group']) 
+#print(df)
+
+for i in range(len(df)):
+   #print(df.loc[i, "page_number"], df.loc[i, "Attribute_Type"], df.loc[i, "Attribute_Group"]) 
+   Create_DataFrame(df.loc[i, "page_number"], df.loc[i, "Attribute_Type"], df.loc[i, "Attribute_Group"])
 	
-	#Attribute Group	Attribute Name	Attribute Description	Attribute Value	NextGenAttr	JIRA Ticket	Logic	Special Values	Output Values	Foundational Attribute	Prerequisite Attributes	Supporting Attributes	Search Key	Approved for FCRA	Development Layout	ECL Format	R Format	SAS Format	Drop Group	Monotonicity	Modeling Purpose	Predecessor Attribute Name	Predecessor Attribute Source	Priority	Risk
-	
-Create_DataFrame("67266367","Business","Assets")
+
 
 
