@@ -1,4 +1,6 @@
-﻿Rules_Generation(Attribute_Type, Attribute_Group):= FUNCTIONMACRO
+﻿
+
+Rules_Generation(Attribute_Type, Attribute_Group):= FUNCTIONMACRO
 IMPORT lib_stringlib,STD;
 lay:=RECORD
     STRING field1;
@@ -108,8 +110,8 @@ string  OtherOutputRules;
 // string	NullRate;
 // string	ZeroRate;
 SET OF INTEGER 	DefaultValues;
-// string	DefaultValueRate;
-// string	HitRate;
+SET OF STRING 	DefaultValueRate;
+string	HitRate;
 // string	Other;
 // string	Product;
 // string	Version;
@@ -162,8 +164,13 @@ Rules_ds:=project(p_ds,transform(Rules_lay,
 									// self.NullRate:=left.field18;
 									// self.ZeroRate:=left.field19;
 									// self.DefaultValues:=left.field20;
-									// self.DefaultValueRate:=left.field21;
-									// self.HitRate:=left.field22;
+									self.DefaultValueRate:= (SET OF STRING)STD.STr.SplitWords(regexreplace(',',trim(
+									                           regexreplace('-99999',trim(regexreplace('-99998', trim(regexreplace('-99997',trim(left.Special_Values,left,right),'0.05'),left,right),'0.05'),left,right),'0.05'),left,right),'|'),'|');
+									self.HitRate:=(string) MAP(count((SET OF INTEGER)STD.STr.SplitWords(regexreplace(',',trim(left.Special_Values,left,right),'|'),'|')) = 3 => '.85',
+									                           count((SET OF INTEGER)STD.STr.SplitWords(regexreplace(',',trim(left.Special_Values,left,right),'|'),'|')) = 2 => '.9',
+																						 count((SET OF INTEGER)STD.STr.SplitWords(regexreplace(',',trim(left.Special_Values,left,right),'|'),'|')) = 1 => '.95',
+																						 '1'
+									                          );
 									// self.Other:=left.field23;
 									// self.Product:=left.field24;
 									// self.Version:=left.field25;
@@ -188,4 +195,6 @@ EXPORT Automated_Rules_File :=  Rules_Generation('Person','Best PII') +
 																Rules_Generation('Person','Derogs -Bankruptcy History') +
 																Rules_Generation('Person','Derogs -Criminal History') +
 																Rules_Generation('Business','Business B2B Trade') +
-																Rules_Generation('Business','Business LexID') ;
+																Rules_Generation('Business','Business LexID') +
+																Rules_Generation('Business','Business Input Validation') +
+																Rules_Generation('Person','Validation') ;
