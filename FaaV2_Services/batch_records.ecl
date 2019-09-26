@@ -24,7 +24,18 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
   
   //**** GET bdids and dids
   AutokeyB2.mac_get_payload (ak_out, ak_key, outpl_rec, outpl1, did_out, bdid_out);
-  outpl:= ungroup(outpl1);
+  by_auto:= ungroup(outpl1);
+
+  acctno_did:=PROJECT(clean_in,TRANSFORM({STRING20 acctno,UNSIGNED did},SELF:=LEFT));
+  aircraft_ids:=JOIN(acctno_did,faa.key_aircraft_did(isFCRA),
+    KEYED(LEFT.did=RIGHT.did),LIMIT(FaaV2_Services.Constants.max_recs_on_did_join,SKIP));
+  aircraft:=JOIN(aircraft_ids,faa.key_aircraft_id(isFCRA),
+    KEYED(LEFT.aircraft_id=RIGHT.aircraft_id),LIMIT(FaaV2_Services.Constants.max_recs_on_join,SKIP));
+  by_did:=PROJECT(aircraft,TRANSFORM(recordof(by_auto),
+    SELF.did_out:=LEFT.did,SELF.bdid_out:=(UNSIGNED)LEFT.bdid_out,SELF:=LEFT,SELF:=[]));
+
+  outpl:= by_auto+by_did;
+
   // Slim down to just accounts and DIDs/BDIDs
   outpl_did := PROJECT (outpl(did_out>0), transform (id_rec, SELF.did := Left.did_out, SELF := Left));
   outpl_bdid := PROJECT (outpl(bdid_out>0), transform (id_rec,SELF.bdid := Left.bdid_out,SELF := Left, Self.did := 0));
