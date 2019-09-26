@@ -14,7 +14,7 @@ EXPORT Constants := MODULE
   
   EXPORT Defaults := MODULE
     EXPORT UNSIGNED PenaltThreshold      := 10;
-    EXPORT UNSIGNED MaxResults           := 10;  
+    EXPORT UNSIGNED MaxResults           := 25;  
     EXPORT UNSIGNED MaxResultsPerAcct    := 10;  
     EXPORT UNSIGNED MaxEmailsToCheckDeliverable := 10;  //max number of result email addresses per account to send to gateway for delivery check
     EXPORT UNSIGNED MaxEmailsForTMXcheck := 5;  //max number of result email addresses per account to send to TrustDefender gateway for status check
