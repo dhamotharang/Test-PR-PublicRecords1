@@ -121,7 +121,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_relatives_count := count(s_relatives);
 	relativesBase    := project(choosen (s_relatives,  iesp.constants.SMART.MaxRelatives),transform(iesp.smartlinxreport.t_SLRRelative, self.title := '', self.relativeofUniqueId := '', self := LEFT, self := []));;
 	relativesOf      := SmartRollup.fn_relativeOf(relativesBase,subject_did,mod_smartlinx);
-	relativesTitle   := relativesOf;  // now titles are taken directly from new index doxie.Key_Relatives_V2
+	relativesTitle   := relativesOf;  // now titles are taken directly from new relatives' index
 	p_relatives      := relativesTitle; 
 
 	//Neighbors only want for subjects "current/newest" address,  20 addresses (10up10down), 2 Residents
