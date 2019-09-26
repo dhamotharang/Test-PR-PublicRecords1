@@ -232,7 +232,7 @@ transform
 	// self.global_sid         := 0;
 	// self.record_sid         := 0;
 	//Added for DF-25578
-	// self.raw_name           := '';
+	self.raw_name           := pInput.raw_name;
 	
 	self										:=	pInput;
 end;
