@@ -1,4 +1,4 @@
-import didville, patriot, doxie, dx_header;
+import didville, patriot, doxie, dx_header, STD;
 
 export did_service_common_function( 
     dataset(didville.Layout_Did_OutBatch) file_in,
@@ -25,14 +25,22 @@ export did_service_common_function(
 		string50  DRM_val                  = '', //see DRM below 
 		boolean   GetSSNBest               = false
 	  ):= function
-			 
-allscore := stringlib.stringfind(verify_value,'ANY_',1) != 0;
+		
+mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+	EXPORT unsigned1 glb := glb_purpose_value;
+	EXPORT unsigned1 dppa := dppa_purpose_value;
+	EXPORT string DataRestrictionMask := DRM_val;
+	EXPORT string5 industry_class := IndustryClass_val;
+	EXPORT string32 application_type := appType;
+	EXPORT boolean show_minors := include_minors OR (glb_purpose_value = 2);
+END;
+allscore := STD.STR.Find(verify_value,'ANY_',1) != 0;
 
 //checking fuzzy flag
-fz1 := if(stringlib.stringfind(fuzzy_value,'ALL',1) != 0 ,'Z4G','');
-fz2 := if (fz1 != '',fz1,if(stringlib.stringfind(fuzzy_value,'ZIP',1) != 0,'Z',''));
-fz3 := if (fz1 != '',fz1, fz2 + if(stringlib.stringfind(fuzzy_value,'AGE',1) != 0,'G',''));
-fz4 := if (fz1 != '',fz1, fz3 + if(stringlib.stringfind(fuzzy_value,'SSN',1) != 0,'4',''));
+fz1 := if(STD.STR.Find(fuzzy_value,'ALL',1) != 0 ,'Z4G','');
+fz2 := if (fz1 != '',fz1,if(STD.STR.Find(fuzzy_value,'ZIP',1) != 0,'Z',''));
+fz3 := if (fz1 != '',fz1, fz2 + if(STD.STR.Find(fuzzy_value,'AGE',1) != 0,'G',''));
+fz4 := if (fz1 != '',fz1, fz3 + if(STD.STR.Find(fuzzy_value,'SSN',1) != 0,'4',''));
 
 fz := fz4 + 'N';
 
@@ -42,19 +50,19 @@ didville.MAC_DidAppend(file_in, file_w_did, dedup_flag, fz, allscore, LMaxScores
 //append hhid 
 didville.MAC_HHid_Append(file_w_did, appends_value, file_w_hhid1)
 
-file_rslt_ready := if (stringlib.stringfind(appends_value,'HHID_',1)=0, file_w_did, file_w_hhid1);
+file_rslt_ready := if (STD.STR.Find(appends_value,'HHID_',1)=0, file_w_did, file_w_hhid1);
 
 //extra effort to append hhid if hhid_plus or eda_best flag set
 file_w_hhid2 := didville.HHID_Append(file_rslt_ready);
 file_rslt0 := if(hhidplus_value OR edabest_value, file_w_hhid2, file_rslt_ready);
 
 file_rslt0 blank_scores_where_needed(file_rslt0 L) := transform
-	self.score_any_addr := if(stringlib.stringfind(verify_value,'ANY_ALL',1) != 0 or stringlib.stringfind(verify_value,'ANY_ADDR',1) != 0,L.score_any_addr,255);
-	self.any_addr_date :=  if(stringlib.stringfind(verify_value,'ANY_ALL',1) != 0 or stringlib.stringfind(verify_value,'ANY_ADDR',1) != 0,L.any_addr_date,255);
-	self.score_any_dob :=  if(stringlib.stringfind(verify_value,'ANY_ALL',1) != 0 or stringlib.stringfind(verify_value,'ANY_DOB',1) != 0,L.score_any_dob,255);
-	self.score_any_phn :=  if(stringlib.stringfind(verify_value,'ANY_ALL',1) != 0 or stringlib.stringfind(verify_value,'ANY_PHONE',1) != 0,L.score_any_phn,255);
-	self.score_any_ssn :=  if(stringlib.stringfind(verify_value,'ANY_ALL',1) != 0 or stringlib.stringfind(verify_value,'ANY_SSN',1) != 0,L.score_any_ssn,255);
-	self.score_any_fzzy := if(stringlib.stringfind(verify_value,'ANY_ALL',1) != 0 or stringlib.stringfind(verify_value,'ANY_FUZZY',1) != 0, l.score_any_fzzy,255);    
+	self.score_any_addr := if(STD.STR.Find(verify_value,'ANY_ALL',1) != 0 or STD.STR.Find(verify_value,'ANY_ADDR',1) != 0,L.score_any_addr,255);
+	self.any_addr_date :=  if(STD.STR.Find(verify_value,'ANY_ALL',1) != 0 or STD.STR.Find(verify_value,'ANY_ADDR',1) != 0,L.any_addr_date,255);
+	self.score_any_dob :=  if(STD.STR.Find(verify_value,'ANY_ALL',1) != 0 or STD.STR.Find(verify_value,'ANY_DOB',1) != 0,L.score_any_dob,255);
+	self.score_any_phn :=  if(STD.STR.Find(verify_value,'ANY_ALL',1) != 0 or STD.STR.Find(verify_value,'ANY_PHONE',1) != 0,L.score_any_phn,255);
+	self.score_any_ssn :=  if(STD.STR.Find(verify_value,'ANY_ALL',1) != 0 or STD.STR.Find(verify_value,'ANY_SSN',1) != 0,L.score_any_ssn,255);
+	self.score_any_fzzy := if(STD.STR.Find(verify_value,'ANY_ALL',1) != 0 or STD.STR.Find(verify_value,'ANY_FUZZY',1) != 0, l.score_any_fzzy,255);    
 	self := L;
 end;
 
@@ -80,14 +88,14 @@ didville.MAC_BestAppend(file_rslt1,
 												GetSSNBest);
 
 file_rslt3 := if (verify_value='' and 
-                  stringlib.stringfind(appends_value,'BEST_',1)=0 and 
-			   stringlib.stringfind(appends_value,'MAX_SSN',1) = 0,file_rslt1,file_rslt2);
+                  STD.STR.Find(appends_value,'BEST_',1)=0 and 
+                  STD.STR.Find(appends_value,'MAX_SSN',1) = 0,file_rslt1,file_rslt2);
 
 //append best gong phone if best_eda set
 file_rslt_eda := if(edabest_value, didville.gong_append(file_rslt3), file_rslt3);
 
 //append patriot information
-patriot.MAC_AppendPatriot(file_rslt_eda,did,fname,mname,lname,file_rslt4,ptys,false)
+patriot.MAC_AppendPatriot(file_rslt_eda, mod_access, did,fname,mname,lname,file_rslt4,ptys,false)
 
 file_rslt5 := if(patriot_flag, file_rslt4, file_rslt_eda);
 

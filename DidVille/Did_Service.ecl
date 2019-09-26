@@ -47,7 +47,7 @@ use integer for max score from instead
 */
 /*--INFO-- This service returns a did.*/
 
-import address, AutoStandardI, doxie, patriot, STD, ut;
+import address, AutoStandardI, doxie, patriot, STD, ut, Suppress;
 
 export Did_Service := MACRO
 
@@ -100,9 +100,9 @@ checkInputMax(unsigned2 inp) := if (inp > 100, 100, inp);
 boolean isValidFirstName := length(TRIM(fname_val,LEFT,RIGHT))> 1 ;
 boolean isValidLastName := length(TRIM(lname_val,LEFT,RIGHT)) > 1 ;
 name_value_clean := STD.Str.CleanSpaces(name_value);
-pos1 := stringlib.stringfind(name_value_clean,' ',1);
+pos1 := STD.STR.Find(name_value_clean,' ',1);
 name_f :=  name_value_clean[1..pos1-1] ;
-pos2 := stringlib.stringfind(name_value_clean,' ',2);
+pos2 := STD.STR.Find(name_value_clean,' ',2);
 name_l := if(pos2 > 0 , name_value_clean[pos2+1..], name_value_clean[pos1+1 ..]);
 boolean isValidName  := (length(TRIM(name_f,LEFT,RIGHT)) > 1 and length(TRIM(name_l,LEFT,RIGHT)) > 1)
 												OR
@@ -143,9 +143,9 @@ clean_n := if(name_is_ordered_value, address.CleanPersonFML73(name_value_clean),
 
 clean_n_parsed := Address.CleanNameFields(clean_n);
 
-appends := stringlib.stringtouppercase(append_l);
-verify := stringlib.stringtouppercase(verify_l);
-fuzzy := stringlib.stringtouppercase(fuzzy_l);
+appends := STD.STR.ToUpperCase(append_l);
+verify := STD.STR.ToUpperCase(verify_l);
+fuzzy := STD.STR.ToUpperCase(fuzzy_l);
 thresh_num := (unsigned2)thresh_val;
 DidOnlySearch := if(ssn_value = '' 
 and dob_value = '' and addr1_val = '' and addr2_val = '' and fname_val = '' and lname_val = '' and mname_val = ''
@@ -155,17 +155,17 @@ and sec_range_value = '' and pname_value = '' and name_value_clean = '',true,fal
 didville.Layout_Did_OutBatch into(rec l) := transform
 self.did := if(DidOnlySearch,(unsigned6) did_value, 0);
 self.seq := l.seq;
-self.ssn := stringlib.stringfilter(ssn_value,'0123456789');
+self.ssn := STD.STR.Filter(ssn_value,'0123456789');
 self.dob := dob_value;
 self.phone10 := phone_value;
 self.title := clean_n_parsed.title;
-self.fname := stringlib.StringFilterOut(if(fname_val='',clean_n_parsed.fname,stringlib.stringtouppercase(fname_val)),'\'');
-self.mname := stringlib.StringFilterOut(if(mname_val='',clean_n_parsed.mname,stringlib.stringtouppercase(mname_val)),'\'');
-self.lname := stringlib.StringFilterOut(if(lname_val='',clean_n_parsed.lname,stringlib.stringtouppercase(lname_val)),'\'');
-self.suffix := if(suffix_val='',clean_n_parsed.name_suffix,stringlib.stringtouppercase(suffix_val));
+self.fname := STD.STR.FilterOut(if(fname_val='',clean_n_parsed.fname,STD.STR.ToUpperCase(fname_val)),'\'');
+self.mname := STD.STR.FilterOut(if(mname_val='',clean_n_parsed.mname,STD.STR.ToUpperCase(mname_val)),'\'');
+self.lname := STD.STR.FilterOut(if(lname_val='',clean_n_parsed.lname,STD.STR.ToUpperCase(lname_val)),'\'');
+self.suffix := if(suffix_val='',clean_n_parsed.name_suffix,STD.STR.ToUpperCase(suffix_val));
 self.prim_range := IF(prange_value='',clean_a2[1..10],prange_value);
 self.predir := clean_a2[11..12];
-self.prim_name := if(pname_value='',clean_a2[13..40],stringlib.stringtouppercase(pname_value));
+self.prim_name := if(pname_value='',clean_a2[13..40],STD.STR.ToUpperCase(pname_value));
 self.addr_suffix := clean_a2[41..44];
 self.postdir := clean_a2[45..46];
 self.unit_desig := clean_a2[47..56];
@@ -174,7 +174,7 @@ self.p_city_name := clean_a2[90..114];
 self.st := clean_a2[115..116];
 self.z5 := clean_a2[117..121];
 self.zip4 := clean_a2[122..125];
-self.email := stringlib.stringtouppercase(email_val);
+self.email := STD.STR.ToUpperCase(email_val);
   end;
 
 precs := project(d,into(left));
@@ -191,7 +191,7 @@ res_ready := didville.did_service_common_function(precs, appends, verify, fuzzy,
 																									soap_xadl_version_value,
 																									IndustryClass_val := mod_access.industry_class);
 																							
-patriot.MAC_AppendPatriot(res_ready,did,fname,mname,lname,res_w_pat,ptys,false)								    
+patriot.MAC_AppendPatriot(res_ready, mod_access, did,fname,mname,lname,res_w_pat,ptys,false)								    
 
 res := if(patriotproc, res_w_pat, res_ready);
 
@@ -212,9 +212,15 @@ pj2 := JOIN(ptys, pat,
 		  ut.namematch(left.fname,left.mname,left.lname,right.fname,right.mname,right.lname)<3,
 		  TRANSFORM(patriot.Layout_Patriot, SELF := RIGHT));
 
-patrecs := IF(patriotproc,pj1+pj2);
+patrecs_all:= Suppress.MAC_SuppressSource(pj1+pj2, mod_access);
 
-output(patrecs);
+patrecs := IF(patriotproc,patrecs_all);
+
+Layout_Pat_slim := patriot.Layout_Patriot -[global_sid, record_sid];
+
+patrecs_slimmed := PROJECT(patrecs_all, Layout_Pat_slim);
+
+output(patrecs_slimmed);
 
 //bug 69994: enable did only search.
 
