@@ -284,9 +284,9 @@ soapReturn := soapcall(
 		soapaction(Orbit3SOA.EnvironmentVariables.soapactionprefix + 'GetDataViewData')
 		);
 				
-//p:= project(soapReturn, Vendor_Src.layouts.Orbit)(item_source_code<>'');
+p:= project(soapReturn, Vendor_Src.layouts.Orbit)(item_source_code<>'');
 
-RETURN soapReturn;
+RETURN p;
 END;
 END;
 
