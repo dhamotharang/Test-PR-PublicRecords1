@@ -6,8 +6,9 @@ ctr := RECORD
 	unsigned2 SecondDegrees := COUNT(GROUP,cluster.Degree > 1.0);
 	real4 Cohesivity := AVE(GROUP,cluster.Degree);
 	//CCPA-767
-	UNSIGNED4 global_sid := 0;
-	UNSIGNED8 record_sid := 0;
+	UNSIGNED4 global_sid		:= 0;
+	UNSIGNED8 record_sid		:= 0;
+	UNSIGNED4 did 						:= 0;
 END;
 
 cohesivity_table := TABLE(cluster,ctr,cluster_id,MERGE);
