@@ -434,7 +434,7 @@ EXPORT MAC_ScoredFetch_Batch(InFile,Input_Ref,Input_DOB='',Input_FNAME='',Input_
   IMPORT SALT311,HealthcareNoMatchHeader_ExternalLinking;
   #IF(#TEXT(Input_DOB)<>'' AND #TEXT(Input_FNAME)<>'')
     #UNIQUENAME(trans)
-    HealthcareNoMatchHeader_ExternalLinking.Key_HEADER_NOMATCH.InputLayout_Batch %trans%(InFile le) := TRANSFORM
+    HealthcareNoMatchHeader_ExternalLinking.Key_HEADER_NOMATCH(pSrc,pVersion,pInfile).InputLayout_Batch %trans%(InFile le) := TRANSFORM
       SELF.Reference := le.Input_Ref;
       SELF.DOB := (UNSIGNED4)le.Input_DOB;
       SELF.FNAME := (TYPEOF(SELF.FNAME))le.Input_FNAME;
@@ -481,7 +481,7 @@ EXPORT MAC_ScoredFetch_Batch(InFile,Input_Ref,Input_DOB='',Input_FNAME='',Input_
     END;
     #UNIQUENAME(p)
     %p% := PROJECT(Infile,%trans%(left));
-    output_file := HealthcareNoMatchHeader_ExternalLinking.Key_HEADER_NOMATCH.ScoredFetch_Batch(%p%,AsIndex, In_disableForce);
+    output_file := HealthcareNoMatchHeader_ExternalLinking.Key_HEADER_NOMATCH(pSrc,pVersion,pInfile).ScoredFetch_Batch(%p%,AsIndex, In_disableForce);
   #ELSE
     output_file := DATASET([],HealthcareNoMatchHeader_ExternalLinking.Process_XNOMATCH_Layouts(pSrc,pVersion,pInfile).LayoutScoredFetch); // Compulsory fields missing
   #END

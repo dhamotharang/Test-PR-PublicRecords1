@@ -1,9 +1,13 @@
-﻿ 
-EXPORT MAC_MEOW_XNOMATCH_Batch(infile,Ref = '',Input_nomatch_id = '',Input_SRC = '',Input_SSN = '',Input_DOB = '',Input_LEXID = '',Input_SUFFIX = '',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_GENDER = '',Input_PRIM_NAME = '',Input_PRIM_RANGE = '',Input_SEC_RANGE = '',Input_CITY_NAME = '',Input_ST = '',Input_ZIP = '',Input_DT_FIRST_SEEN = '',Input_DT_LAST_SEEN = '',Input_MAINNAME = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',Input_FULLNAME = '',OutFile,AsIndex = 'true',In_UpdateIDs = 'false',Stats = '',In_disableForce = 'false',DoClean = 'true') := MACRO
+﻿IMPORT  STD, HealthcareNoMatchHeader_InternalLinking, HealthcareNoMatchHeader_Ingest;
+EXPORT MAC_MEOW_XNOMATCH_Batch(
+    pSrc
+    ,pVersion
+    ,pInfile
+    , infile,Ref = '',Input_nomatch_id = '',Input_SRC = '',Input_SSN = '',Input_DOB = '',Input_LEXID = '',Input_SUFFIX = '',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_GENDER = '',Input_PRIM_NAME = '',Input_PRIM_RANGE = '',Input_SEC_RANGE = '',Input_CITY_NAME = '',Input_ST = '',Input_ZIP = '',Input_DT_FIRST_SEEN = '',Input_DT_LAST_SEEN = '',Input_MAINNAME = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',Input_FULLNAME = '',OutFile,AsIndex = 'true',In_UpdateIDs = 'false',Stats = '',In_disableForce = 'false',DoClean = 'true') := MACRO
   #UNIQUENAME(ToProcess)
   IMPORT SALT311,HealthcareNoMatchHeader_ExternalLinking;
   #UNIQUENAME(TPRec)
-  %TPRec% := RECORD(HealthcareNoMatchHeader_ExternalLinking.Process_XNOMATCH_Layouts.InputLayout)
+  %TPRec% := RECORD(HealthcareNoMatchHeader_ExternalLinking.Process_XNOMATCH_Layouts(pSrc,pVersion,pInfile).InputLayout)
   END;
   #UNIQUENAME(InputT)
   %TPRec% %InputT%(InFile le) := TRANSFORM
@@ -126,5 +130,5 @@ EXPORT MAC_MEOW_XNOMATCH_Batch(infile,Ref = '',Input_nomatch_id = '',Input_SRC =
   END;
   #UNIQUENAME(fats0)
   %fats0% := PROJECT(InFile,%InputT%(LEFT));
-  HealthcareNoMatchHeader_ExternalLinking.MAC_MEOW_XNOMATCH_Batch_InLayout(%fats0%,OutFile,AsIndex,In_UpdateIDs,Stats,In_disableForce,DoClean);
+  HealthcareNoMatchHeader_ExternalLinking.MAC_MEOW_XNOMATCH_Batch_InLayout(pSrc,pVersion,pInfile,%fats0%,OutFile,AsIndex,In_UpdateIDs,Stats,In_disableForce,DoClean);
 ENDMACRO;

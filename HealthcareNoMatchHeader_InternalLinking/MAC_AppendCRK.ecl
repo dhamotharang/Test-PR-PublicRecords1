@@ -4,6 +4,10 @@ EXPORT  MAC_AppendCRK(
     , pVersion        //  Build Version ex. (STRING)STD.Date.Today();
     , pBase           //  Base File (Usually output from previous build
     , pAsHeader       //  New AsHeader file to be ingested and linked
+    
+    // Email List for Workman Notifications
+    , pWorkmanEmailTo = HealthcareNoMatchHeader_InternalLinking.proc_Constants.emailNotify
+
     // Ingest
     , doIngest    = TRUE // perform full ingest process (ingest incremental and non-incremental sources into existing base file)
    
@@ -22,7 +26,7 @@ EXPORT  MAC_AppendCRK(
   pPrimaryQueue   :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.primaryQueue;
   pWuPrefix       :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).WUPrefix;
   pWuSuperfile    :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).MasterWUOutput_SF;
-  pEmailTo        :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.emailNotify;
+  pEmailTo        :=  pWorkmanEmailTo;
   pPollingFreq    :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.pollingFreq;
 
   //  Common Workman ECL Code
