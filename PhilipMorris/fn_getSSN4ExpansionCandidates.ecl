@@ -1,4 +1,4 @@
-import doxie, header_slimsort, header;
+import dx_Header;
 
 CN := PhilipMorris.Constants;
 LT := PhilipMorris.Layouts;
@@ -14,7 +14,7 @@ export fn_getSSN4ExpansionCandidates(DATASET(LT.Clean.FullRecordNorm) SearchData
 																(SearchName.pfname	!= '' or SearchName.pfname2 != ''));
 	
 	searchpass_candidates_dids := join(			 
-			 searchDataLocal, doxie.Key_Header_SSN4_V2,
+			 searchDataLocal, dx_Header.key_SSN4_V2(),
 			 keyed(left.ssn4=right.ssn4) and
 			 keyed(left.SearchName.PhoneticLname[1..6] = right.dph_lname) and
 			 keyed(left.SearchName.lname = right.lname) and
@@ -30,7 +30,7 @@ export fn_getSSN4ExpansionCandidates(DATASET(LT.Clean.FullRecordNorm) SearchData
 	searchpass_candidates_dids_sorted  := sort(searchpass_candidates_dids, SearchAddress.ADDRESSID, did);
 	searchpass_candidates_dids_deduped := dedup(searchpass_candidates_dids_sorted, SearchAddress.ADDRESSID, did);
 													
-	dirty_header_records	:= join (searchpass_candidates_dids_deduped, doxie.key_header,
+	dirty_header_records	:= join (searchpass_candidates_dids_deduped, dx_Header.key_header(),
 														keyed(LEFT.did = RIGHT.s_did) and
 														left.ssn4=RIGHT.SSN[FN.fn_getLen(RIGHT.SSN)-3..] and
 														left.SearchName.lname = right.lname and

@@ -1,10 +1,10 @@
-import doxie;
+import dx_Header;
 
 rec := ssn_services.layout_ssn;
 export fun_GetDIDsBySSN(grouped dataset(rec) ssns) := 
 FUNCTION	
 
-k := Doxie.Key_Header_SSN;
+k := dx_Header.key_SSN();
 
 rec get_dds(ssns l, k r) := transform
 	self.seq := l.seq;

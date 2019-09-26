@@ -1,4 +1,4 @@
-import doxie, ut,AutoHeaderV2;
+import dx_Header, ut,AutoHeaderV2;
 
 export fetch_SSNPartial (dataset (AutoHeaderV2.layouts.search) ds_search) := function
   _row := ds_search[1];
@@ -17,7 +17,7 @@ export fetch_SSNPartial (dataset (AutoHeaderV2.layouts.search) ds_search) := fun
 		isLeadingMatch(string input, string keyfield) := 
 			input = '' or trim(input) = keyfield[1..length(trim(input))];
 
-		ds4 := project(choosen(limit(doxie.Key_Header_SSN4(keyed(ssn4 = temp_ssn_value),
+		ds4 := project(choosen(limit(dx_Header.key_SSN4()(keyed(ssn4 = temp_ssn_value),
 															keyed(temp_lname_value='' or (lname IN temp_lname_set_value)), 
 															keyed(isLeadingMatch(temp_fname_value,fname)),
 															temp_lname_value<>'' or temp_fname_value = fname  //**slightly funny way of enforcing that leading match only occurs if lname is available
@@ -27,7 +27,7 @@ export fetch_SSNPartial (dataset (AutoHeaderV2.layouts.search) ds_search) := fun
                                          self.fetch_hit := AutoHeaderV2.Constants.FetchHit.SSN_PARTIAL,
                                          self.index_hit := AutoHeaderV2.Constants.IndexHit.SSN4));
 
-		ds5 := project(choosen(limit(doxie.Key_Header_SSN5(keyed(ssn5 = temp_ssn_value),
+		ds5 := project(choosen(limit(dx_Header.key_SSN5()(keyed(ssn5 = temp_ssn_value),
 															keyed(temp_lname_value='' or (lname IN temp_lname_set_value)), 
 															keyed(isLeadingMatch(temp_fname_value,fname)),
 															temp_lname_value<>'' or temp_fname_value = fname	//**

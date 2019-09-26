@@ -24,7 +24,7 @@
 
 export Did_Zip_Service := MACRO
 
-import dx_BestRecords;
+import dx_BestRecords, dx_Header;
 
 string30 fname_val := '' : stored('FirstName');
 string30 lname_val := '' : stored('LastName');
@@ -41,7 +41,7 @@ outer_radius := IF((unsigned4)outer_radius_i=0,50,(unsigned4)outer_radius_i);
 fnam := Stringlib.stringtoUpperCase(fname_val);
 lnam := stringlib.stringtouppercase(lname_val);
 
-dk := doxie.key_zip_did;
+dk := dx_Header.key_zip_did();
 
 myrec := record
   unsigned6 did1;

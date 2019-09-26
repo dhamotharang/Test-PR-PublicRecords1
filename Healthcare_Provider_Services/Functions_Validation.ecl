@@ -1,4 +1,4 @@
-import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,suppress,dx_BestRecords;
+import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,suppress,dx_BestRecords,dx_Header;
 
 export Functions_Validation := Module
 		shared myLayouts := Healthcare_Provider_Services.layouts;
@@ -62,7 +62,7 @@ export Functions_Validation := Module
 																										self.LName:=left.LastName;
 																										self.FlipFName := left.LastName[1]; 
 																										self.FlipLName:=left.FirstName;self:=left)),record),record);
-			getdidfromssn := if(hasSSN and hasName,Choosen(Doxie.Key_Header_SSN(keyed(s1=src.ssn[1]),keyed(s2=src.ssn[2]),keyed(s3=src.ssn[3]),keyed(s4=src.ssn[4]),keyed(s5=src.ssn[5]),keyed(s6=src.ssn[6]),keyed(s7=src.ssn[7]),keyed(s8=src.ssn[8]),keyed(s9=src.ssn[9])),10));
+			getdidfromssn := if(hasSSN and hasName,Choosen(dx_Header.key_SSN()(keyed(s1=src.ssn[1]),keyed(s2=src.ssn[2]),keyed(s3=src.ssn[3]),keyed(s4=src.ssn[4]),keyed(s5=src.ssn[5]),keyed(s6=src.ssn[6]),keyed(s7=src.ssn[7]),keyed(s8=src.ssn[8]),keyed(s9=src.ssn[9])),10));
 			didbasedssn := dedup(sort(project(getdidfromssn,myLayouts.layout_did),record),record);
 			bestRecs := dx_BestRecords.get(dataset([{didbasedssn[1].did}], doxie.layout_references), 
 				did, dx_BestRecords.Constants.perm_type.glb);

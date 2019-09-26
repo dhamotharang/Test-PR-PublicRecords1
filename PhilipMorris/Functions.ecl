@@ -1,4 +1,4 @@
-import Address, mdr, doxie, header, suppress, iesp, AddrBest, DayBatchEDA, NID;
+import Address, mdr, doxie, header, dx_Header, suppress, iesp, AddrBest, DayBatchEDA, NID;
 
 CN := PhilipMorris.Constants;
 LT := PhilipMorris.Layouts;
@@ -714,7 +714,7 @@ export Functions := MODULE
 	// function return dobs in the input dataset for the sources that are found in the key.
 	EXPORT getHeaderSourceDob(dataset(Layouts.Search.FullRecordNormWithHeaderData) dirty_header_records) := FUNCTION
 	
-		dob_records := JOIN (dirty_header_records, doxie.Key_TUCH_dob,
+		dob_records := JOIN (dirty_header_records, dx_Header.key_TUCH_dob(),
 											KEYED(LEFT.rid = right.rid) 
 											and	LEFT.src = RIGHT.src,
 											TRANSFORM (Layouts.Search.FullRecordNormWithHeaderData,
