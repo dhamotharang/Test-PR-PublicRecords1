@@ -1,10 +1,10 @@
-import doxie,doxie_raw,ut;
+import dx_Header, doxie_raw, ut, STD;
 
 export FN_Person_Names(
 	dataset(doxie_raw.Layout_HeaderRawOutput) d) :=
 FUNCTION
 
-
+todays_date := ((string)STD.Date.Today())[1..6];
 
 
 //***** GET THE NAME STATS
@@ -18,8 +18,8 @@ FUNCTION
 		unsigned4 last_seen :=  max(group,d.dt_last_seen);
 		// unsigned4 v_last_seen :=  max(group,d.dt_vendor_last_reported);
 		// today := ;
-		real8 av_fs := ave(group,if(d.dt_first_seen=0,(unsigned3)(ut.getdate[1..6]),d.dt_first_seen));
-		real8 av_ls := ave(group,if(d.dt_last_seen=0, (unsigned3)(ut.getdate[1..6]),d.dt_last_seen));
+		real8 av_fs := ave(group,if(d.dt_first_seen=0,(unsigned3)todays_date,d.dt_first_seen));
+		real8 av_ls := ave(group,if(d.dt_last_seen=0, (unsigned3)todays_date,d.dt_last_seen));
   end;
 	
 t := table(d(lname <> ''),r,did,lname);	
@@ -38,7 +38,7 @@ tc := join(t, didcount,
 
 
 //***** CHECK FOR PARENT NAMES
-kpl := doxie.key_ParentLnames;
+kpl := dx_Header.key_ParentLnames();
 recout addpn(tc l, kpl r) := transform
 	self.parent_lname_count := r.cnt;
 	self := l;

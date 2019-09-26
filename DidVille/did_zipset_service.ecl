@@ -28,7 +28,7 @@
 
 export did_zipset_service() := macro
 
-import doxie, ut, did_add, didville, header_slimsort, NID,AutoStandardI;
+import doxie, dx_header, ut, didville, NID, AutoStandardI;
 
 set of string5 in_Set := [] : stored('ZipSet');
 unsigned seq_value := 0 : stored('seq');
@@ -58,7 +58,7 @@ df := dataset(inSet, {TYPEOF(inSet[1]) zip});
 
 //df2 := dedup(table(df,qrec),all);
 
-dk := doxie.Key_Zip_Did_Full;
+dk := dx_header.key_zip_did_full();
 
 dk ftch(dk R) := transform
 	self.cnt := R.cnt; //if (R.cnt > maxcnt, ERROR(201, 'Too Many DID In Specified ZipCode(s)'), R.cnt);

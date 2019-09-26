@@ -1,5 +1,5 @@
-﻿IMPORT Address, AutoKey, AutoStandardI, BIPV2, Business_Risk, Data_Services, Business_Risk_BIP, DID_Add, Doxie, Drivers, Gong, dx_header,
-       MDR, Phones, Phonesplus_v2, Risk_Indicators, STD, Suppress, UT, Relationship;
+﻿IMPORT Address, AutoKey, Business_Risk, Data_Services, Business_Risk_BIP, DID_Add, Doxie, Drivers, Gong, dx_header,
+       MDR, Phones, Phonesplus_v2, Risk_Indicators, Suppress, UT, Relationship;
 
 EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -372,7 +372,8 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
     UNSIGNED8 record_sid;
 	END;
 
-	tempHeaderRec getDIDs(ShellSearchLayout le, doxie.Key_Header_SSN ri) := TRANSFORM
+	key_header_ssn := dx_header.key_ssn();
+	tempHeaderRec getDIDs(ShellSearchLayout le, key_header_ssn ri) := TRANSFORM
 		SELF.Seq := le.Seq;
 		SELF.RecordType := le.RecordType;
 		SELF.DID := ri.DID;
@@ -396,7 +397,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	END;
 	
 	// Grab all DID's associated with that SSN (FEIN) 
-	FEINSSN_DIDs := JOIN(ShellSearchRecords, doxie.Key_Header_SSN, //Input Business FEIN Matches Header SSN
+	FEINSSN_DIDs := JOIN(ShellSearchRecords, key_header_ssn, //Input Business FEIN Matches Header SSN
 																	(INTEGER)LEFT.FEINSSN > 0 AND LENGTH(TRIM(LEFT.FEINSSN)) = 9 AND
 																	KEYED(LEFT.FEINSSN[1] = RIGHT.S1 AND 
 																				LEFT.FEINSSN[2] = RIGHT.S2 AND 

@@ -1,4 +1,4 @@
-import Address, doxie, doxie_raw, MDR, DeathV2_Services;
+import Address, dx_Header, doxie_raw, DeathV2_Services;
 
 // Code below has been moved from BatchServices.Functions.fn_xtra_death_info()
 EXPORT GetExtraDeathInfo(DATASET(DeathV2_Services.Layouts.BatchIntermediateData) inrecs) := FUNCTION
@@ -22,14 +22,15 @@ EXPORT GetExtraDeathInfo(DATASET(DeathV2_Services.Layouts.BatchIntermediateData)
 		in_ssns := GROUP(PROJECT(in_ssn_dup, transform_SSNBatchCDInputToSSN(LEFT, COUNTER)), ssn);
 
 		//****** GET THE DIDS
-		
-		layout_ssn get_dds(layout_ssn l, Doxie.Key_Header_SSN r) := TRANSFORM
+
+		key_header_ssn := dx_Header.key_SSN();
+		layout_ssn get_dds(layout_ssn l, key_header_ssn r) := TRANSFORM
 			SELF.seq := l.seq;
 			SELF.ssn := l.ssn;
 			SELF.did := r.did;
 		END;
 
-		wdid := JOIN(in_ssns,Doxie.Key_Header_SSN,
+		wdid := JOIN(in_ssns, key_header_ssn,
 							LEFT.ssn[1]=RIGHT.s1 AND
 							LEFT.ssn[2]=RIGHT.s2 AND
 							LEFT.ssn[3]=RIGHT.s3 AND

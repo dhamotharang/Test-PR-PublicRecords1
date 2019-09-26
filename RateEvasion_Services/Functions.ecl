@@ -1,4 +1,4 @@
-﻿import AutoStandardI,Census_data,codes,doxie,DriversV2,gong,iesp,lib_date,Risk_Indicators,Suppress,ut,VehicleV2,Watchdog,NID,MDR,
+﻿import AutoStandardI,Census_data,codes,doxie,DriversV2,gong,iesp,Risk_Indicators,Suppress,ut,VehicleV2,Watchdog,NID,MDR,
        dx_header;
 
 export Functions := module
@@ -700,12 +700,13 @@ export Functions := module
 		ssn_did_rl := record
       unsigned6 did;
     end;
-		
-		ssn_did_rl hdr_ssn_did_xform(doxie.Key_Header_SSN le) := transform
+
+		key_header_ssn := dx_Header.key_SSN();		
+		ssn_did_rl hdr_ssn_did_xform(key_header_ssn le) := transform
       self :=le;
     end;
 
-		dids_for_all_ssns := join(in_recs_ssns_filtered,doxie.Key_Header_SSN,
+		dids_for_all_ssns := join(in_recs_ssns_filtered,key_header_ssn,
 		                          keyed(left.ssn[1] = right.s1 and
     							                  left.ssn[2] = right.s2 and
     							                  left.ssn[3] = right.s3 and
@@ -1682,7 +1683,7 @@ export Functions := module
 			                                                       l.name_suffix, check_title(l.title)),
 
 			self.DOB                 := iesp.ECL2ESP.toDate (l.dob),
-			self.Age                 := if(l.dob=0,0,lib_date.GetAge((string) l.dob)),
+			self.Age                 := if(l.dob=0,0,ut.Age(l.dob)),
 			self.DriverLicenseNumber := l.dl_number,
 			self.IssuingState        := l.orig_state,
 		  // Since 2 date fields below are only yyyymm, multiple by 100 to shift left which 
@@ -1698,7 +1699,7 @@ export Functions := module
 			                                                       l.name_suffix, check_title(l.title)),
 
 			self.DOB                 := iesp.ECL2ESP.toDate (l.dob),
-			self.Age                 := if(l.dob=0,0,lib_date.GetAge((string) l.dob)),
+			self.Age                 := if(l.dob=0,0,ut.Age(l.dob)),
 			self.DriverLicenseNumber := '',
 			self.IssuingState        := '',
 			self.DateFirstSeen       := iesp.ECL2ESP.toDate ((unsigned4) 0),
@@ -1844,7 +1845,7 @@ export Functions := module
 			self.DOB.IsValidated := if(dob_was_input, 
 			                           if(search_dob = current_dob,'YES','NO'),
 														     ' '),
-			self.Age := if(current_dob <>0,lib_date.GetAge((string) current_dob),0),
+			self.Age := if(current_dob <>0,ut.Age(current_dob),0),
 
 
 			// ***Check appropriate input "Include*" switch to determine whether to output data

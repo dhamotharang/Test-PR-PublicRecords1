@@ -1,4 +1,4 @@
-import doxie, ut,AutoheaderV2,lib_stringlib;
+import dx_Header, ut, AutoheaderV2;
 
 export fetch_wild_SSNPartial (dataset (AutoheaderV2.layouts.search) ds_search) := function
 	_row := ds_search[1];
@@ -9,8 +9,8 @@ export fetch_wild_SSNPartial (dataset (AutoheaderV2.layouts.search) ds_search) :
 	temp_lname_wild_val := _row.tname.lname; //same as temp_lname_value
 	temp_ssn_value := _row.tssn.ssn;
 
-	i4 := doxie.Key_Header_SSN4;
-	i5 := doxie.Key_Header_SSN5;
+	i4 := dx_Header.key_SSN4();
+	i5 := dx_Header.key_SSN5();
 
 	is_ssn4 := length(trim(temp_ssn_value))=4;
 	is_ssn5 := length(trim(temp_ssn_value))=5;
