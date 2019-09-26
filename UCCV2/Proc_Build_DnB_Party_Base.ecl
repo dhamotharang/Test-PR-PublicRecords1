@@ -1,10 +1,10 @@
 ﻿IMPORT Address, NID, UCCV2, ut; 
 
-person_flags := ['P', 'D'];
-// An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.
-business_flags := ['B', 'U', 'I'];
+person_flags   := ['P', 'D'];
+// V2 replaced the Unclassified('U') category with the Trust ('T') category, what used to be a U should become a T or I with V2.
+business_flags := ['B', 'I', 'T'];
 
-NID.Mac_CleanFullNames(UCCV2.File_DnB_debtor_in, dCleanName, filg_nme);
+NID.Mac_CleanFullNames(UCCV2.File_DnB_debtor_in, dCleanName, filg_nme, useV2:=true);
 
 UCCV2.Layout_File_DnB_Debtor_in CleanName(dCleanName L) := TRANSFORM
 	SELF.Personal_name1	:= MAP(L.nametype IN person_flags => L.cln_title + 
@@ -26,7 +26,7 @@ END;
 
 cleanDebtor := PROJECT(dCleanName, CleanName(LEFT));
 
-NID.Mac_CleanFullNames(UCCV2.File_DnB_SecuredParty_in, dCleanName_sec, filg_nme);
+NID.Mac_CleanFullNames(UCCV2.File_DnB_SecuredParty_in, dCleanName_sec, filg_nme, useV2:=true);
 
 UCCV2.Layout_File_DnB_SecuredParty_in CleanName_sec(dCleanName_sec L) := TRANSFORM
 	SELF.Personal_name1	:= MAP(L.nametype IN person_flags => L.cln_title + 

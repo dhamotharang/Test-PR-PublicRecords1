@@ -25,11 +25,11 @@ layout_party	:=	record
 	unsigned8	ACEAID	:= 0;		
 end;
 
-NID.Mac_CleanFullNames(UCCV2.File_NYC_Party_in, VerifyRecs, name);
+NID.Mac_CleanFullNames(UCCV2.File_NYC_Party_in, VerifyRecs, name, useV2:=true);
 
-person_flags := ['P', 'D'];
-// An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.
-business_flags := ['B', 'U', 'I'];
+person_flags   := ['P', 'D'];
+// V2 replaced the Unclassified('U') category with the Trust ('T') category, what used to be a U should become a T or I with V2.
+business_flags := ['B', 'I', 'T'];
 
 layout_party trfCleanName(VerifyRecs L) := TRANSFORM
 	SELF.title        := IF(L.nametype IN person_flags, L.cln_title, '');
