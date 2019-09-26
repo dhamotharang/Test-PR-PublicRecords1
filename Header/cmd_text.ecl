@@ -25,10 +25,10 @@ EXPORT cmd_text := module
 
 	d:=header.GetPackageKeys(pkg,cert_date,envment,bool)(lkeyname<>'');
 
-	rough:=dedup(table(d,{string250 cmd:='all_packagekeys := DATASET(['}))
+	rough:=dedup(dataset([{'all_packagekeys := DATASET(['}],{string250 cmd}))
 	+table(d,{string250 cmd:='{\'~'+regexreplace('generation',superkeys,gen)+'\', \'~'+regexreplace(cert_date,FileServices.GetSuperFileSubName('~'+regexreplace('generation',superkeys,gen),1),new_date)+'\'},'})
-	+dedup(table(d,{string250 cmd:='], ut.Layout_Superkeynames.inputlayout);'}))
-	+dedup(table(d,{string250 cmd:='nothor(ut.fLogicalKeyRenaming(all_packagekeys, false));'}));
+	+dataset([{'],  tools.Layout_SuperFilenames.inputlayout);'},
+			  {'nothor(tools.fun_RenameFiles(all_packagekeys, false));'}],{string250 cmd});
 
 	clean:=choosen(rough,count(rough)-3)  //everything but the last three lines
 			+ table(CHOOSESETS(rough,cmd<>'' => 3,last),{string250 cmd:=regexreplace('\\},',cmd,'\\}')})  // last three lines
@@ -166,11 +166,12 @@ EXPORT cmd_text := module
 		string eclstring;
 	end;
 
+	ut_GetDate:=(STRING8)Std.Date.Today();
 	buildindex_rec buildindex_code(datasetds l,integer cnt) := transform
 		self.eclstring :=  'r'+(string)cnt+':='+fgetdfuinfo(l.name) + '\n'
 					+'ds'+(string)cnt+':=dataset([],r'+(string)cnt + ');\n'
-					+'i'+(string)cnt+':=index('+'ds'+(string)cnt+',{'+fgetkeyedcolumns(l.name)+'},{'+'ds'+(string)cnt+'},\'~' + regexreplace(built_date,regexreplace('thor_data400',l.name,'prte'),ut.GetDate)+'\');\n'
-					+'BUILDINDEX(i'+(string)cnt+',\'~' + regexreplace(built_date,regexreplace('thor_data400',l.name,'prte'),ut.GetDate) + '\',update);\n\n'
+					+'i'+(string)cnt+':=index('+'ds'+(string)cnt+',{'+fgetkeyedcolumns(l.name)+'},{'+'ds'+(string)cnt+'},\'~' + regexreplace(built_date,regexreplace('thor_data400',l.name,'prte'),ut_GetDate)+'\');\n'
+					+'BUILDINDEX(i'+(string)cnt+',\'~' + regexreplace(built_date,regexreplace('thor_data400',l.name,'prte'),ut_GetDate) + '\',update);\n\n'
 					;
 	end;
 
