@@ -37,10 +37,8 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 
 	use_sbfe := DataPermissionMask[12] NOT IN ['0', ''];
 	
-	BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, fetched, Level, JoinLimit, JoinType);
-	
-	Business_Credit.MAC_check_access(fetched, out, mod_access);					// Jira# DF-26179, Function created for CCPA suppressions at key fetches.
-	
+	BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, out, Level, JoinLimit, JoinType);  //DF-26180 - Remove code calling mac_check_access b/c this key does not have lexid
+
 	RETURN out(use_sbfe);																					
 
 	END;
