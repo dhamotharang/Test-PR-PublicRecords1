@@ -486,6 +486,15 @@ OUTPUTS
 		STRING10  ClaimCount;
 		STRING25  HistKey;
 	END
+
+	DATASET PerStats:PREFIX(INPUTS.Prefix),SIDE, WUID 
+		STRING  FieldName;
+	        INTEGER FieldPercent;
+	END 
+END
+
+VISUALIZE ClaimOutlierStats:LABEL("Claim Outlier Append Stats")
+    TABLE FieldPopulationPercentage(PerStats{FieldName, FieldPercent}) : VALUE (FieldName, FieldPercent), LABEL("FieldName", "FieldPercentage");	
 END
 
 GENERATES INLINE
@@ -1468,6 +1477,11 @@ GENERATES INLINE
 
 	%^edsHistorical% := CombinedHistoryDs %^p%;
 
+
+	 IMPORT HealthCare;
+	 PercentageResults := HealthCare.Mac_Field_Percentage (%dsOutput%, '%Prefix%');
+	 %^ePerStats% := TABLE (PercentageResults,{%Prefix%FieldName, %Prefix%FieldPercent}); 
+
 ENDGENERATES
 
 GENERATES KEL
@@ -1513,6 +1527,7 @@ GENERATES KEL
 	Provider: => ExcludeAddressFlag					:= EXISTS(ExclusionList(PrimaryRange=Provider.PrimaryRange,PreDirectional = Provider.PreDirectional, PrimaryName = Provider.PrimaryName, AddressSuffix = Provider.AddressSuffix, PostDirectional = Provider.PostDirectional, SecondaryRange = Provider.SecondaryRange, City = Provider.City, State = Provider.State, Zip = Provider.Zip));
 	Patient:  => PatientDateOfDeath 				:= MAP (DOD > 0 => DOD, ClientDOD = 21991231 => 0, ClientDOD:Null => 0, ClientDOD > 0 => ClientDOD, 0); 
 
+	Provider: => PatientDOD							:= MAX (ProviderPatients.Pat, PatientDateOfDeath);
 	Provider: => ProvBankruptcyDate  				:= MAP (TRIMBOTH(BankruptcyDate) = 'Past 1M' => INTEGERFROMDATE(ADJUSTCALENDAR(CURRENTDATE(),0,-1,0)), 
 														  	TRIMBOTH(BankruptcyDate) = 'Past 3M' => INTEGERFROMDATE(ADJUSTCALENDAR(CURRENTDATE(),0,-3,0)), 
 															TRIMBOTH(BankruptcyDate) = 'Past 6M' => INTEGERFROMDATE(ADJUSTCALENDAR(CURRENTDATE(),0,-6,0)), 
@@ -1573,7 +1588,6 @@ GENERATES KEL
 	Provider: => DeceasedPatientDs					:= ProviderPatientsClaims(Prov=Provider.UID).Clm(isDeceasedPatient).ProviderPatientsClaims{Pat.PatientKey}; 
 	Provider: => DeceasedPatient					:= DeceasedPatientDs{PatientKey};
 	Provider: PatientDeceasedFlag					=> PatientDeceasedCount				:= COUNT(DeceasedPatient); 
-	Provider: => PatientDOD						:= MAX (ProviderPatientsClaims.Clm(isDeceasedPatient).ProviderPatientsClaims.Pat, PatientDateOfDeath);
 	Provider: => ProviderDeceasedFlag				:= ProviderServiceDateMax > DOD;
 	Provider: => ProviderNPIDeactivatedFlag 		:= ProviderServiceDateMax > NPIDeactivationDate AND ProviderHighChargeAmount > 0 AND NPIFlag = 'I' AND NPIDeactivationDate > 0;
 	Provider: => Dea90Date							:= ADJUSTCALENDAR(DEADate,0,0,90);

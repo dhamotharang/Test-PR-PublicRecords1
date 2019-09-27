@@ -348,6 +348,7 @@ EXPORT Layouts := MODULE
 		STRING8   StateExclusionReinstatedBeginDate_Past5Y;
 	  STRING8   OIGExclusionReinstatedBeginDate_Past5y;
 		STRING8   OPMExclusionReinstatedBeginDate_Past5y;
+		#IF((BOOLEAN)AppendProviderAttributes.ShellConfig.isCCPA) STRING1 OptOutInd := ''; #END
 	END;
 
 	EXPORT State_License_REC := RECORD
