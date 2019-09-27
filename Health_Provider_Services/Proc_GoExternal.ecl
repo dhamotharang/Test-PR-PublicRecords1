@@ -1,28 +1,29 @@
-BaseK := Process_xLNPID_Layouts.BuildAll;
-BKB := BUILDINDEX(Key_HealthProvider_.Key,Health_Provider_Services.Files.FILE_Header_Refs,OVERWRITE);
-BKBV := BUILDINDEX(Key_HealthProvider_.ValueKey,Health_Provider_Services.Files.FILE_Header_Words,OVERWRITE);
-BK0 := BUILDINDEX(Key_HealthProvider_NAMEL.Key,Health_Provider_Services.Files.FILE_Name_ST_LIC,OVERWRITE);
-BK1 := BUILDINDEX(Key_HealthProvider_FNAME.Key,Health_Provider_Services.Files.FILE_FName,OVERWRITE);
-BK2 := BUILDINDEX(Key_HealthProvider_NAMED.Key,Health_Provider_Services.Files.FILE_Name,OVERWRITE);
-BK3 := BUILDINDEX(Key_HealthProvider_LNAME.Key,Health_Provider_Services.Files.FILE_LName,OVERWRITE);
-BK4 := BUILDINDEX(Key_HealthProvider_MNAME.Key,Health_Provider_Services.Files.FILE_MName,OVERWRITE);
-BK5 := BUILDINDEX(Key_HealthProvider_ADDRESS.Key,Health_Provider_Services.Files.FILE_Address,OVERWRITE);
-BK6 := BUILDINDEX(Key_HealthProvider_ZIP_PR.Key,Health_Provider_Services.Files.FILE_ZIP,OVERWRITE);
-BK7 := BUILDINDEX(Key_HealthProvider_SSN_LP.Key,Health_Provider_Services.Files.FILE_SSN,OVERWRITE);
-BK8 := BUILDINDEX(Key_HealthProvider_CNSMR_SSN_LP.Key,Health_Provider_Services.Files.FILE_CNSMR_SSN,OVERWRITE);
-BK9 := BUILDINDEX(Key_HealthProvider_DOB_LP.Key,Health_Provider_Services.Files.FILE_DOB,OVERWRITE);
-BK10 := BUILDINDEX(Key_HealthProvider_CNSMR_DOB_LP.Key,Health_Provider_Services.Files.FILE_CNSMR_DOB,OVERWRITE);
-BK11 := BUILDINDEX(Key_HealthProvider_PHONE_LP.Key,Health_Provider_Services.Files.FILE_PHONE,OVERWRITE);
-BK12 := BUILDINDEX(Key_HealthProvider_LIC.Key,Health_Provider_Services.Files.FILE_LIC,OVERWRITE);
-BK13 := BUILDINDEX(Key_HealthProvider_VEN.Key,Health_Provider_Services.Files.FILE_VendorID,OVERWRITE);
-BK14 := BUILDINDEX(Key_HealthProvider_TAX.Key,Health_Provider_Services.Files.FILE_Tax,OVERWRITE);
-BK15 := BUILDINDEX(Key_HealthProvider_BILLING_TAX.Key,Health_Provider_Services.Files.FILE_Billing_Tax,OVERWRITE);
-BK16 := BUILDINDEX(Key_HealthProvider_DEA.Key,Health_Provider_Services.Files.FILE_DEA,OVERWRITE);
-BK17 := BUILDINDEX(Key_HealthProvider_NPI.Key,Health_Provider_Services.Files.FILE_NPI,OVERWRITE);
-BK18 := BUILDINDEX(Key_HealthProvider_BILLING_NPI.Key,Health_Provider_Services.Files.FILE_Billing_NPI,OVERWRITE);
-BK19 := BUILDINDEX(Key_HealthProvider_UPN.Key,Health_Provider_Services.Files.FILE_UPIN,OVERWRITE);
-BK20 := BUILDINDEX(Key_HealthProvider_LEXID.Key,Health_Provider_Services.Files.FILE_LexID,OVERWRITE);
-BK21 := BUILDINDEX(Key_HealthProvider_BID.Key,Health_Provider_Services.Files.FILE_BDID,OVERWRITE);
-BK22 := BUILDINDEX(Key_HealthProvider_SRC_RID.Key,Health_Provider_Services.Files.FILE_Source_RID,OVERWRITE);
-BK23 := BUILDINDEX(Key_HealthProvider_RID.Key,Health_Provider_Services.Files.FILE_RID,OVERWRITE);
-EXPORT Proc_GoExternal := PARALLEL(Keys(File_HealthProvider).BuildAll,BaseK,BKB,BKBV,BK0,BK1,BK2,BK3,BK4,BK5,BK6,BK7,BK8,BK9,BK10,BK11,BK12,BK13,BK14,BK15,BK16,BK17,BK18,BK19,BK20,BK21,BK22,BK23);
+﻿EXPORT Proc_GoExternal := PARALLEL(
+// Keys(File_HealthProvider).BuildAll,
+// Process_xLNPID_Layouts.BuildAll,
+// Key_HealthProvider_.BuildAll,
+// Key_HealthProvider_NAMEL.BuildAll,
+// Key_HealthProvider_FNAME.BuildAll,
+// Key_HealthProvider_NAMEC.BuildAll,
+// Key_HealthProvider_LNAME.BuildAll,
+// Key_HealthProvider_MNAME.BuildAll,
+// Key_HealthProvider_ADDRESS.BuildAll,
+// Key_HealthProvider_ZIP_PR.BuildAll,
+// Key_HealthProvider_SSN_LP.BuildAll,
+// Key_HealthProvider_CNSMR_SSN_LP.BuildAll,
+// Key_HealthProvider_DOB_LP.BuildAll,
+// Key_HealthProvider_CNSMR_DOB_LP.BuildAll,
+// Key_HealthProvider_PHONE_LP.BuildAll,
+// Key_HealthProvider_LIC.BuildAll,
+// Key_HealthProvider_VEN.BuildAll,
+// Key_HealthProvider_TAX.BuildAll,
+Key_HealthProvider_BILLING_TAX.BuildAll
+// Key_HealthProvider_DEA.BuildAll,
+// Key_HealthProvider_NPI.BuildAll,
+// Key_HealthProvider_BILLING_NPI.BuildAll,
+// Key_HealthProvider_UPN.BuildAll,
+// Key_HealthProvider_LEXID.BuildAll,
+// Key_HealthProvider_BID.BuildAll,
+// Key_HealthProvider_SRC_RID.BuildAll,
+// Key_HealthProvider_RID.BuildAll
+);
