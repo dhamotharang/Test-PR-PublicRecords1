@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Business_Credit, BIPV2, CCPA, STD;
+﻿IMPORT _Control, Business_Credit, BIPV2, MDR, Doxie, STD;
 
 EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 										Constants().buildType	pBuildType	=	Constants().buildType.Daily) := MODULE
@@ -38,7 +38,7 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																)
 															);
 															
-	SHARED  addGlobalSID :=  CCPA.macGetGlobalSID(dLinkedBase,'SBFECV','','global_sid');
+	SHARED  addGlobalSID :=  MDR.macGetGlobalSid(dLinkedBase,'SBFECV','','global_sid');
 	
 	SHARED	dLinkedBaseDist	:=	DEDUP(SORT(DISTRIBUTE(addGlobalSID,
 																HASH(	Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,did,DotID,EmpID,POWID,ProxID,SELEID,OrgID,UltID)),
@@ -58,7 +58,9 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 	// DEFINE THE INDEX ACCESS
 	// NOTE! SBFE (Business_Credit) data is restricted! Do not fetch records unless you have
 	// obtained approval from product management.
-	EXPORT kFetch2(DATASET(BIPV2.IDlayouts.l_xlink_ids2) inputs, 
+	// Jira# DF-26179,  Added mod_access and Mac_check_access to kfetch functions for CCPA suppressions.
+	EXPORT kFetch2(DATASET(BIPV2.IDlayouts.l_xlink_ids2) inputs,
+								Doxie.IDataAccess mod_access = MODULE(Doxie.IDataAccess) END,
 								STRING1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
 																																		 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																																		//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
@@ -70,14 +72,17 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 
 	use_sbfe := DataPermissionMask[12] NOT IN ['0', ''];
 	
-	BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, out, Level, JoinLimit, JoinType);
+	BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, fetched, Level, JoinLimit, JoinType);
+	
+	Business_Credit.MAC_check_access(fetched, out, mod_access);					// Jira# DF-26179, Function created for CCPA suppressions at key fetches.
 	
 	RETURN out(use_sbfe);																					
 
 	END;
 	
 	// Depricated version of the above kFetch2
-	EXPORT kFetch(DATASET(BIPV2.IDlayouts.l_xlink_ids) inputs, 
+	EXPORT kFetch(DATASET(BIPV2.IDlayouts.l_xlink_ids) inputs,
+								Doxie.IDataAccess mod_access = MODULE(Doxie.IDataAccess) END,
 								STRING1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
 																																		 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																																		//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
@@ -87,7 +92,7 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 								):=FUNCTION
 
 		inputs_for2 := PROJECT(inputs, BIPV2.IDlayouts.l_xlink_ids2);
-		f2 := kFetch2(inputs_for2, Level, ScoreThreshold, DataPermissionMask, JoinLimit);		
+		f2 := kFetch2(inputs_for2, mod_access, Level, ScoreThreshold, DataPermissionMask, JoinLimit);		
 		RETURN PROJECT(f2, RECORDOF(Key));																						
 
 	END;

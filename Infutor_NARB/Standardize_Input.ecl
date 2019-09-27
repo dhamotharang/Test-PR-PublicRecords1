@@ -1,4 +1,4 @@
-﻿IMPORT  _control, CCPA, ut, _Validate, std, mdr;
+﻿IMPORT  _control, MDR, ut, _Validate, std, mdr;
 
 EXPORT Standardize_Input := MODULE
 
@@ -176,7 +176,7 @@ EXPORT Standardize_Input := MODULE
 		
 		dPreProcess := PROJECT(normInput,tPreProcess(LEFT));
 	
-		gPreProcess	:= CCPA.macGetGlobalSID(dPreProcess, 'InfutorNARB', '', 'global_sid');
+		gPreProcess	:= MDR.macGetGlobalSid(dPreProcess, 'InfutorNARB', '', 'global_sid');
 
     dPreProcess_dedup  := DEDUP( SORT( DISTRIBUTE(gPreProcess, HASH(PID) ), RECORD, LOCAL ), RECORD, LOCAL );	
 	

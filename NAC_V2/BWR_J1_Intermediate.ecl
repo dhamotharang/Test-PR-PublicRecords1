@@ -1,5 +1,5 @@
-import	NAC, lib_FileServices, lib_StringLib, lib_ThorLib, Ut;
-
+﻿import	NAC, lib_FileServices, lib_StringLib, lib_ThorLib, Ut;
+ 
 // ------------------------------------------------------------------------------------------------
 string		gLandingZoneServer		:=	'edata12.br.seisint.com'					:	stored('LandingZoneServer');
 string		gLandingZonePathBase	:=	'/hds_180/nac'										:	stored('LandingZonePathBase');
@@ -13,6 +13,10 @@ string		fRemoteFilenameAsThorName(string pRemoteFileName)		:=	'~file::' + gLandi
 string		fRemoteFilenameDoneSource(string pRemoteFileName)		:=	gLandingZonePathIn + '/' + pRemoteFileName;
 string		fRemoteFilenameDoneTarget(string pRemoteFileName)		:=	gLandingZonePathDone + '/' + pRemoteFileName;
 string		fThorOutFilename(string pRemoteFileName)						:=	'~nac::out::' + pRemoteFileName;
+
+
+STRING AlertRecipients := MOD_InternalEmailsList.fn_GetInternalRecipients('Preprocess Error','');
+
 
 // ------------------------------------------------------------------------------------------------
 					fMoveFileToDone(string pRemoteFileName)			:=	lib_FileServices.FileServices.MoveExternalFile(gLandingZoneServer, fRemoteFilenameDoneSource(pRemoteFileName), fRemoteFilenameDoneTarget(pRemoteFileName));
@@ -559,4 +563,4 @@ iff(exists(dJ1InFiles),
 									fMoveFileToDone(dJ1InFiles[1].Name)
 								),
 		output('No files to analyze as of ' + ut.GetTimeDate())
-	 ) : when(cron('0-59/5 * * * *')), failure(lib_FileServices.FileServices.SendEmail('tony.kirk@lexisnexis.com', 'J1 Intermediate Failed', 'J1 Intermediate Failed'));
+	 ) : when(cron('0-59/5 * * * *')), failure(lib_FileServices.FileServices.SendEmail(AlertRecipients, 'J1 Intermediate Failed', 'J1 Intermediate Failed'));

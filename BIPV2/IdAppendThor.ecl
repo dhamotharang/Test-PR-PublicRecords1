@@ -92,7 +92,7 @@ export IdAppendThor(
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
 			res0 := BIPV2.IdAppendLocal.FetchRecords(localAppend, fetchLevel);
 			resLocal := project(res0, transform(BIPV2.IdAppendLayouts.AppendWithRecsOutput, self := left, self := []));	
-			res := resRemote;
+			res := resLocal;
 		#ELSE
 			res := resRemote;
 		#END

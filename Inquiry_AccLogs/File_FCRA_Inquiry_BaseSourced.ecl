@@ -19,8 +19,10 @@ Blank_IDs(infile, outfile) := macro
 											self := left));
 endmacro;
 
-v2_base_files := dataset(Data_Services.foreign_prod + 'uspr::inql::fcra::base::weekly::building_keys', INQL_v2.Layouts.Common_ThorAdditions, thor);
+_v2_base_files := dataset(Data_Services.foreign_prod + 'uspr::inql::fcra::base::weekly::building_keys', INQL_v2.Layouts.Common_ThorAdditions, thor);
 
+v2_base_files := Inql_v2.FN_Apply_FCRA_SAFECO_Remediation(_v2_base_files);
+			 
 base_files :=	distribute(v2_base_files
 													// (fnAddSource(inquiry_acclogs.File_FCRA_Riskwise_Logs_Common, 'RISKWISE') +
 													// fnAddSource(inquiry_acclogs.File_FCRA_Accurint_Logs_Common, 'COLLECTION') + 
