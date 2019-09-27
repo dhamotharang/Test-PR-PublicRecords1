@@ -79,6 +79,8 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Orig,Layouts.Crim,Crim_Orig,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Orig,Layouts.Death,Death_Orig,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.IPMetaData,Layouts.IPMetaData,IPMetaData,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Advo,Layouts.Advo,Advo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Advo_Demo,Layouts.Advo,Advo_Demo,,,,,,true);
 		//KEL Files
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_customeraddress_demo,Layouts.CustomerAddress,kel_customeraddress_demo,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_personstats_demo,Layouts.PersonStats, kel_personstats_demo,,,,,,true);
@@ -110,10 +112,14 @@ module
 
 	export CustomerSettings := dataset(Filenames().CustomerSettings,Layouts.CustomerSettings,thor,opt);
 	export CustomerMappings := dataset(Filenames().CustomerMappings,Layouts.CustomerMappings,thor,opt);
+	export CustomerDashboard := dataset(Filenames().CustomerDashboard,Layouts.DashboardResponse,thor,opt);
+	export ClusterDetails := dataset(Filenames().ClusterDetails,Layouts.DashboardResponse,thor,opt);
+	export ProdDashboardVersion := dataset(Filenames().ProdDashboardVersion,Layouts.ProdDashboardVersion,thor,opt);
 
 	export Flags := module
 		export FraudgovInfoFile	:= dataset(Filenames().Flags.FraudgovInfoFn,Layouts.Flags.FraudgovInfoRec,thor,opt);
 		export SkipModules	:= dataset(Filenames().Flags.SkipModules,Layouts.Flags.SkipModules,thor,opt); 
+		export RefreshProdDashVersion	:= dataset(Filenames().Flags.RefreshProdDashVersion,Layouts.Flags.RefreshProdDashVersion,thor,opt); 
 	end;
 
 	

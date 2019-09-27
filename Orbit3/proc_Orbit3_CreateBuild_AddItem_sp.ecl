@@ -36,7 +36,13 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 									tokenval,
 									get_buildinst.BuildId) ; //( Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4]);
 									
-		 get_new_build_candidates := project(get_build_candidates,transform( Orbit3.Layouts.OrbitBuildInstancenewLayout , self := left));
+		 
+		 get_build_candidates_ofac :=  get_build_candidates (  Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4] );
+		
+		get_build_candidates_final := if (  trim(buildname) = 'Global Watch Lists' and regexfind('o',Buildvs) , get_build_candidates_ofac , get_build_candidates );
+									
+		 get_new_build_candidates := project(get_build_candidates_final,transform( Orbit3.Layouts.OrbitBuildInstancenewLayout , self := left));
+
 									
 	
 											
@@ -63,6 +69,7 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 		description := map ( keyword = 'CREATE' and status = 'FAIL'   => create_build.Message,
 		                                              keyword = 'CREATE' and status =   'SKIP'  => 'User_Skipped_create_build_instance',
 		                     keyword = 'UPDATE' and  status = 'FAIL' => Update_build.Message,
+						keyword = 'UPDATE' and  status = 'ABORT' => 'Update_aborted_as_build_has_been_assigned_to_QA',
 						keyword = 'UPDATE' and  status = 'SKIP' => 'User_Skipped_Update_build_instance', 
 												 keyword = 'NO_ITEMS_FOUND' and status = 'FAIL' => 'No Build Components found to Add in Orbit',
 												 'N/A'
@@ -84,7 +91,7 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 												'---------------------'+'\n'+
 												'Build Workunit:'+wuid);
 												
-		verifystatus := if ( status <> 'FAIL' , emailtoall , Sequential ( emailtoall,
+		verifystatus := if ( status not in [  'FAIL' , 'ABORT' ] , emailtoall , Sequential ( emailtoall,
 									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+description )
 																					          )
 							);
@@ -126,9 +133,12 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 													if ( skipupdatebuild ,
 																				Sequential(sendemail('UPDATE','SKIP'),Update_build_1.Status)	,
 												
-													              if ( Update_build.Status = 'Success', 
-													                 sendemail('UPDATE','SUCCESS'),
-																					 sendemail('UPDATE','FAIL')
+													              if ( get_buildinst.Status =  'Success' and get_buildinst.BuildInstanceStatus = 'BUILD_IN_PROGRESS', 
+																				                                                                                                                                                             if ( Update_build.Status = 'Success', 
+													                                                                                                                                                                                                          sendemail('UPDATE','SUCCESS'),
+																					                                                                                                                                                                 sendemail('UPDATE','FAIL')
+																																																		),
+																																																		sendemail('UPDATE','ABORT')
 																					 )
 														),
 													 if ( skipaddcomponents,	

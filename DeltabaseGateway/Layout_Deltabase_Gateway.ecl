@@ -1,4 +1,6 @@
-﻿EXPORT Layout_Deltabase_Gateway := MODULE
+﻿//DF-26089: Deltabase Gateway History Add Additional Fields
+
+EXPORT Layout_Deltabase_Gateway := MODULE
 
 	export Historic_Results_Raw := record
 			string transaction_id;
@@ -186,6 +188,8 @@
 			integer5	imsi_change_count;
 			string20	imsi_trackedsince;
 			string20	imsi_activationdate;
+			integer5  imsi_tenure_mindays;
+			integer5  imsi_tenure_maxdays;
 			string100	iccid;
 			string8		iccid_seensince;
 			string6		iccid_seensince_time;
@@ -215,6 +219,10 @@
 			integer5	imei_change_count;
 			string20	imei_tracked_since;
 			string20	imei_activationdate;
+			integer5	imei_tenure_mindays;
+			integer5  imei_tenure_maxdays;
+			integer5  sim_tenure_mindays;
+			integer5  sim_tenure_maxdays; 
 			integer5	first_name_score;
 			integer5	last_name_score;
 			integer5	addr_score;

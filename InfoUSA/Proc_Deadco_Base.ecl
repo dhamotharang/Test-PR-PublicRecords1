@@ -1,4 +1,4 @@
-﻿IMPORT infoUSA, did_add, ut, header_slimSORT, didville, business_header,business_header_ss, address,watchdog,mdr,AID,lib_stringlib,idl_header,bipv2, PromoteSupers;
+﻿IMPORT _control, MDR, infoUSA, did_add, ut, header_slimSORT, didville, business_header,business_header_ss, address,watchdog,mdr,AID,lib_stringlib,idl_header,bipv2, PromoteSupers, std;
 
 layout_deadco_temp 
 	:= RECORD
@@ -322,7 +322,7 @@ Business_Header.MAC_Source_Match(
 									
 Dbdid								:= dSourceMatchOut + BDID_not_zero : persist('TEMP::deadco_bdid');
 
-deadco_bdid					:= DISTRIBUTE(Dbdid  ,HASH(tmsid));
+deadco_bdid					:= DISTRIBUTE(Dbdid, HASH(tmsid));
 
 deadco_bdid_append 	:= JOIN(deadco_tmsid,
 														deadco_bdid,
@@ -331,8 +331,10 @@ deadco_bdid_append 	:= JOIN(deadco_tmsid,
 														LEFT outer,
 														LOCAL
 														);
+
+addGlobalSID				:= MDR.macGetGlobalSid(deadco_bdid_append,'DEADCO','','global_sid'); //DF-25968: Add Global_SID
 														
-ut.MAC_Append_Rcid(deadco_bdid_append, source_rec_id, deadco_source_rec_id);   
+ut.MAC_Append_Rcid(addGlobalSID, source_rec_id, deadco_source_rec_id);   
 PromoteSupers.MAC_SF_BuildProcess(deadco_source_rec_id,'~thor_data400::base::INFOUSA::deadco',do1,2);
 
 export Proc_Deadco_base := do1;

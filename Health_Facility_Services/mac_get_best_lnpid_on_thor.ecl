@@ -1,10 +1,11 @@
+﻿IMPORT BIPV2_Company_Names; 
+
 export mac_get_best_lnpid_on_thor(infile,IDL = '',Input_CNAME = '',
 															Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_V_CITY_Name = '',Input_ST = '',Input_ZIP = '',
 															Input_TAX_ID = '',Input_FEIN = '',Input_PHONE = '',Input_FAX = '',Input_LIC_STATE = '',Input_C_LIC_NBR = '',Input_DEA_NUMBER = '',Input_VENDOR_ID = '',
 															Input_NPI_NUMBER = '',Input_CLIA_NUMBER = '',
 															Input_MEDICARE_FACILITY_NUMBER = '',Input_MEDICAID_NUMBER = '',Input_NCPDP_NUMBER = '',Input_Taxonomy = '',Input_BDID = '',Input_SRC = '',Input_SOURCE_RID = '',
 															OutFile, forcePull = false, score = 38) := MACRO
-
 #uniquename(asindex)
 %asIndex% := if(forcePull = true, false, if(thorlib.nodes() < 400 or count(infile) < 13000000, true, false));
 

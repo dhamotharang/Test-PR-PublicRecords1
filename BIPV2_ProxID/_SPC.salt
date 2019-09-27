@@ -41,7 +41,8 @@ FIELD:unk_corp_key:SWITCH0:PROP:19,133
 FIELD:ebr_file_number:PROP:20,427
 FIELD:company_fein:PROP:EDIT1:17,227
 FIELD:company_name:CARRY:0,0
-FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:12,334
+FIELD:cnp_name_phonetic:PHONETIC:12,334
+FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein),OR(cnp_name_phonetic)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:12,334
 // FIELD:cnp_name:BAGOFWORDS(MOST):EDIT1:FORCE(+13,OR(active_domestic_corp_key),OR(active_duns_number)):ABBR(FIRST):HYPHEN1:TYPE(string250):15,137
 //FIELD:source:CARRY:0,0
 FIELD:company_name_type_raw:CARRY:0,0

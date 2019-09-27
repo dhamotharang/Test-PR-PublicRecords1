@@ -22,6 +22,9 @@ crec := RECORD
 	unsigned8 cluster_id := rels.did1;
 	unsigned8 associated_did := rels.did2;
 	REAL4 degree := 1;
+	//CCPA-767
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 END;
 
 j1 := table(rels,crec); // The first degree relationships; cluster ID (person1) is related to associated_did (person2)

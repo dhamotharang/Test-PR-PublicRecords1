@@ -1,4 +1,4 @@
-import address, globalwatchlists, ut;
+﻿import _control, address, globalwatchlists, mdr, std, ut;
 
 export Proc_Build_BW_Base(string pFileDate) := function
 
@@ -111,6 +111,10 @@ export Proc_Build_BW_Base(string pFileDate) := function
 		self.geo_blk										:= '';
 		self.geo_match									:= '';
 		self.err_stat										:= '';
+		//Added for CCPA-393
+		self.global_sid                 :=  0;
+		self.record_sid                 :=  0;
+		self.did                        :=  0;
 		self														:=	pInput;
 	end;
 
@@ -249,6 +253,10 @@ export Proc_Build_BW_Base(string pFileDate) := function
 		self.geo_blk										:= '';
 		self.geo_match									:= '';
 		self.err_stat										:= '';
+		//Added for CCPA-393
+		self.global_sid                 :=  0;
+		self.record_sid                 :=  0;
+		self.did                        :=  0;
 		self														:= r;
 	end;
 	
@@ -371,8 +379,10 @@ export Proc_Build_BW_Base(string pFileDate) := function
 	end;
 	
 	ds_final := project(ds_name_add, addKey(left));
+	
+	addGlobalSID := mdr.macGetGlobalSID(ds_final, 'Patriot', 'source', 'global_sid'); //DF-26190: Populate Global_SID
 												
-	ds_out := output(ds_final,,'~thor_data400::in::patriot_file_fse_raw_'+pFileDate);
+	ds_out := output(addGlobalSID,,'~thor_data400::in::patriot_file_fse_raw_'+pFileDate);
 	
 	return ds_out;
 

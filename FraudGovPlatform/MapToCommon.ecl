@@ -1,4 +1,4 @@
-﻿import FraudShared, STD; 
+﻿import FraudShared, STD, doxie, Suppress,data_services; 
 EXPORT MapToCommon  (
 	 string pversion
   ,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = IF(_Flags.FileExists.Base.MainOrigQA, FraudGovPlatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
@@ -26,9 +26,12 @@ module
 		self:= left; 
 		self:= [];
 	)); 
+	
+	extra_dedup_KnownFraud := fn_dedup_knownfraud(inKnownFraud); // remove duplicate records with different customer_event_id
  
-	Export KnownFraud := project (inKnownFraud , transform(FraudShared.Layouts.Base.Main , 
+	Export KnownFraud := project (extra_dedup_KnownFraud , transform(FraudShared.Layouts.Base.Main , 
 		self.ln_report_date := left.reported_date;
+		self.event_date			:= if(left.event_date = '', left.reported_date, left.event_date);
 		self.transaction_id := left.customer_event_id;
 		self.additional_address.Street_1	:= left.Mailing_Street_1; 
 		self.additional_address.Street_2	:= left.Mailing_Street_2;
@@ -93,9 +96,16 @@ module
 	// Append Lexid
 	EXPORT NewBaseLexid := Append_Lexid (Append_CleanAdditionalAddress):independent;
 
+	// Supress CCPA
+	mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
+	EXPORT Supress_CCPA := Suppress.MAC_SuppressSource(NewBaseLexid, mod_access, did, NULL,TRUE);
+	
 	// Append RinID
-	EXPORT NewBaseRinID := Append_RinID (NewBaseLexid):independent;
+	EXPORT NewBaseRinID := Append_RinID (Supress_CCPA):independent;
+	
+	//Validate Deltabase 
+	Export NewBaseDelta	:= fn_validate_delta(NewBaseRinID):independent;
 
-	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseRinID);
+	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseDelta);
 
 END;

@@ -32,7 +32,7 @@ module
 	/////////////////////////////////////////////////////////////////////////////
 	export	typeof(rLvl2Reponse.Result) GetLoginToken()	:=
 	function
-		lResponse	:=	soapcall('https://stg.orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServicePR.svc', 
+		lResponse	:=	soapcall(Orbit3SOA.EnvironmentVariables.serviceurl, 
 													 'Login',
 													 rLoginRequest,
 													 rSOAPResponse,

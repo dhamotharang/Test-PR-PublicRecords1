@@ -1801,6 +1801,12 @@ EXPORT dsSourceCriteria := DATASET([
 {'OFAC Advisory - North Korea Sanctions Advisory','1788'},
 {'OFAC Advisory - Sanctions Risks Related to Petroleum Shipments involving Iran and Syria','1789'},
 {'Ministry of Economy (Brazil) List of Employers with Slavery-like Working Conditions','1790'},
-{'US Executive Order 13883 CBW Act','1791'}
+{'US Executive Order 13883 CBW Act','1791'},
+{'EC 2019/1375 ISIL (Da\'esh) and Al-Qaida List','1792'},
+{'National Anti-Corruption Directorate (Romania) Final Convictions','1793'},
+{'EC (CFSP) 2019/1405 Ukraine List','1794'},
+{'EC 2019/1403 Ukraine List','1795'},
+{'EC (CFSP) 2019/1576 Central African Republic List','1796'},
+{'EC 2019/1574 Central African Republic List','1797'}
 ],r);
 

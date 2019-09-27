@@ -48,15 +48,6 @@ EXPORT SuperFiles := MODULE
 			IF (~FileServices.FileExists (Files.FILE_FName_GrandFather_SF),
 					FileServices.CreateSuperFile (Files.FILE_FName_GrandFather_SF)),
 
-			IF (~FileServices.FileExists (Files.FILE_MName_Built_SF),
-					FileServices.CreateSuperFile (Files.FILE_MName_Built_SF)),
-			IF (~FileServices.FileExists (Files.FILE_MName_SF),
-					FileServices.CreateSuperFile (Files.FILE_MName_SF)),
-			IF (~FileServices.FileExists (Files.FILE_MName_Father_SF),
-					FileServices.CreateSuperFile (Files.FILE_MName_Father_SF)),
-			IF (~FileServices.FileExists (Files.FILE_MName_GrandFather_SF),
-					FileServices.CreateSuperFile (Files.FILE_MName_GrandFather_SF)),
-
 			IF (~FileServices.FileExists (Files.FILE_LName_Built_SF),
 					FileServices.CreateSuperFile (Files.FILE_LName_Built_SF)),
 			IF (~FileServices.FileExists (Files.FILE_LName_SF),
@@ -102,15 +93,6 @@ EXPORT SuperFiles := MODULE
 			IF (~FileServices.FileExists (Files.FILE_SSN_GrandFather_SF),
 					FileServices.CreateSuperFile (Files.FILE_SSN_GrandFather_SF)),
 
-			IF (~FileServices.FileExists (Files.FILE_CNSMR_SSN_Built_SF),
-					FileServices.CreateSuperFile (Files.FILE_CNSMR_SSN_Built_SF)),
-			IF (~FileServices.FileExists (Files.FILE_CNSMR_SSN_SF),
-					FileServices.CreateSuperFile (Files.FILE_CNSMR_SSN_SF)),
-			IF (~FileServices.FileExists (Files.FILE_CNSMR_SSN_Father_SF),
-					FileServices.CreateSuperFile (Files.FILE_CNSMR_SSN_Father_SF)),
-			IF (~FileServices.FileExists (Files.FILE_CNSMR_SSN_GrandFather_SF),
-					FileServices.CreateSuperFile (Files.FILE_CNSMR_SSN_GrandFather_SF)),
-
 			IF (~FileServices.FileExists (Files.FILE_DOB_Built_SF),
 					FileServices.CreateSuperFile (Files.FILE_DOB_Built_SF)),
 			IF (~FileServices.FileExists (Files.FILE_DOB_SF),
@@ -119,15 +101,6 @@ EXPORT SuperFiles := MODULE
 					FileServices.CreateSuperFile (Files.FILE_DOB_Father_SF)),
 			IF (~FileServices.FileExists (Files.FILE_DOB_GrandFather_SF),
 					FileServices.CreateSuperFile (Files.FILE_DOB_GrandFather_SF)),
-
-			IF (~FileServices.FileExists (Files.FILE_CNSMR_DOB_Built_SF),
-					FileServices.CreateSuperFile (Files.FILE_CNSMR_DOB_Built_SF)),
-			IF (~FileServices.FileExists (Files.FILE_CNSMR_DOB_SF),
-					FileServices.CreateSuperFile (Files.FILE_CNSMR_DOB_SF)),
-			IF (~FileServices.FileExists (Files.FILE_CNSMR_DOB_Father_SF),
-					FileServices.CreateSuperFile (Files.FILE_CNSMR_DOB_Father_SF)),
-			IF (~FileServices.FileExists (Files.FILE_CNSMR_DOB_GrandFather_SF),
-					FileServices.CreateSuperFile (Files.FILE_CNSMR_DOB_GrandFather_SF)),
 
 			IF (~FileServices.FileExists (Files.FILE_PHONE_Built_SF),
 					FileServices.CreateSuperFile (Files.FILE_PHONE_Built_SF)),
@@ -174,15 +147,6 @@ EXPORT SuperFiles := MODULE
 			IF (~FileServices.FileExists (Files.FILE_Tax_GrandFather_SF),
 					FileServices.CreateSuperFile (Files.FILE_Tax_GrandFather_SF)),
 
-			IF (~FileServices.FileExists (Files.FILE_Billing_Tax_Built_SF),
-					FileServices.CreateSuperFile (Files.FILE_Billing_Tax_Built_SF)),
-			IF (~FileServices.FileExists (Files.FILE_Billing_Tax_SF),
-					FileServices.CreateSuperFile (Files.FILE_Billing_Tax_SF)),
-			IF (~FileServices.FileExists (Files.FILE_Billing_Tax_Father_SF),
-					FileServices.CreateSuperFile (Files.FILE_Billing_Tax_Father_SF)),
-			IF (~FileServices.FileExists (Files.FILE_Billing_Tax_GrandFather_SF),
-					FileServices.CreateSuperFile (Files.FILE_Billing_Tax_GrandFather_SF)),
-
 			IF (~FileServices.FileExists (Files.FILE_DEA_Built_SF),
 					FileServices.CreateSuperFile (Files.FILE_DEA_Built_SF)),
 			IF (~FileServices.FileExists (Files.FILE_DEA_SF),
@@ -200,15 +164,6 @@ EXPORT SuperFiles := MODULE
 					FileServices.CreateSuperFile (Files.FILE_NPI_Father_SF)),
 			IF (~FileServices.FileExists (Files.FILE_NPI_GrandFather_SF),
 					FileServices.CreateSuperFile (Files.FILE_NPI_GrandFather_SF)),
-
-			IF (~FileServices.FileExists (Files.FILE_Billing_NPI_Built_SF),
-					FileServices.CreateSuperFile (Files.FILE_Billing_NPI_Built_SF)),
-			IF (~FileServices.FileExists (Files.FILE_Billing_NPI_SF),
-					FileServices.CreateSuperFile (Files.FILE_Billing_NPI_SF)),
-			IF (~FileServices.FileExists (Files.FILE_Billing_NPI_Father_SF),
-					FileServices.CreateSuperFile (Files.FILE_Billing_NPI_Father_SF)),
-			IF (~FileServices.FileExists (Files.FILE_Billing_NPI_GrandFather_SF),
-					FileServices.CreateSuperFile (Files.FILE_Billing_NPI_GrandFather_SF)),
 
 			IF (~FileServices.FileExists (Files.FILE_UPIN_Built_SF),
 					FileServices.CreateSuperFile (Files.FILE_UPIN_Built_SF)),
@@ -236,24 +191,6 @@ EXPORT SuperFiles := MODULE
 					FileServices.CreateSuperFile (Files.FILE_BDID_Father_SF)),
 			IF (~FileServices.FileExists (Files.FILE_BDID_GrandFather_SF),
 					FileServices.CreateSuperFile (Files.FILE_BDID_GrandFather_SF)),
-
-			IF (~FileServices.FileExists (Files.FILE_Source_RID_Built_SF),
-					FileServices.CreateSuperFile (Files.FILE_Source_RID_Built_SF)),
-			IF (~FileServices.FileExists (Files.FILE_Source_RID_SF),
-					FileServices.CreateSuperFile (Files.FILE_Source_RID_SF)),
-			IF (~FileServices.FileExists (Files.FILE_Source_RID_Father_SF),
-					FileServices.CreateSuperFile (Files.FILE_Source_RID_Father_SF)),
-			IF (~FileServices.FileExists (Files.FILE_Source_RID_GrandFather_SF),
-					FileServices.CreateSuperFile (Files.FILE_Source_RID_GrandFather_SF)),
-
-			IF (~FileServices.FileExists (Files.FILE_RID_Built_SF),
-					FileServices.CreateSuperFile (Files.FILE_RID_Built_SF)),
-			IF (~FileServices.FileExists (Files.FILE_RID_SF),
-					FileServices.CreateSuperFile (Files.FILE_RID_SF)),
-			IF (~FileServices.FileExists (Files.FILE_RID_Father_SF),
-					FileServices.CreateSuperFile (Files.FILE_RID_Father_SF)),
-			IF (~FileServices.FileExists (Files.FILE_RID_GrandFather_SF),
-					FileServices.CreateSuperFile (Files.FILE_RID_GrandFather_SF)),
 		);
 	
 	EXPORT clearFiles () := FUNCTION
@@ -284,11 +221,6 @@ EXPORT SuperFiles := MODULE
 								FileServices.ClearSuperFile (Files.FILE_FName_Father_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_FName_GrandFather_SF,true),
 
-								FileServices.ClearSuperFile (Files.FILE_MName_Built_SF,true),								
-								FileServices.ClearSuperFile (Files.FILE_MName_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_MName_Father_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_MName_GrandFather_SF,true),
-
 								FileServices.ClearSuperFile (Files.FILE_LName_Built_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_LName_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_LName_Father_SF,true),
@@ -314,21 +246,11 @@ EXPORT SuperFiles := MODULE
 								FileServices.ClearSuperFile (Files.FILE_SSN_Father_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_SSN_GrandFather_SF,true),								
 								
-								FileServices.ClearSuperFile (Files.FILE_CNSMR_SSN_Built_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_CNSMR_SSN_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_CNSMR_SSN_Father_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_CNSMR_SSN_GrandFather_SF,true),								
-
 								FileServices.ClearSuperFile (Files.FILE_DOB_Built_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_DOB_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_DOB_Father_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_DOB_GrandFather_SF,true),
 								
-								FileServices.ClearSuperFile (Files.FILE_CNSMR_DOB_Built_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_CNSMR_DOB_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_CNSMR_DOB_Father_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_CNSMR_DOB_GrandFather_SF,true),
-
 								FileServices.ClearSuperFile (Files.FILE_PHONE_Built_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_PHONE_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_PHONE_Father_SF,true),
@@ -354,11 +276,6 @@ EXPORT SuperFiles := MODULE
 								FileServices.ClearSuperFile (Files.FILE_Tax_Father_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_Tax_GrandFather_SF,true),
 								
-								FileServices.ClearSuperFile (Files.FILE_Billing_Tax_Built_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_Billing_Tax_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_Billing_Tax_Father_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_Billing_Tax_GrandFather_SF,true),
-
 								FileServices.ClearSuperFile (Files.FILE_DEA_Built_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_DEA_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_DEA_Father_SF,true),
@@ -369,11 +286,6 @@ EXPORT SuperFiles := MODULE
 								FileServices.ClearSuperFile (Files.FILE_NPI_Father_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_NPI_GrandFather_SF,true),
 								
-								FileServices.ClearSuperFile (Files.FILE_Billing_NPI_Built_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_Billing_NPI_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_Billing_NPI_Father_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_Billing_NPI_GrandFather_SF,true),
-
 								FileServices.ClearSuperFile (Files.FILE_UPIN_Built_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_UPIN_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_UPIN_Father_SF,true),
@@ -388,16 +300,6 @@ EXPORT SuperFiles := MODULE
 								FileServices.ClearSuperFile (Files.FILE_BDID_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_BDID_Father_SF,true),
 								FileServices.ClearSuperFile (Files.FILE_BDID_GrandFather_SF,true),								
-
-								FileServices.ClearSuperFile (Files.FILE_Source_RID_Built_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_Source_RID_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_Source_RID_Father_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_Source_RID_GrandFather_SF,true),								
-
-								FileServices.ClearSuperFile (Files.FILE_RID_Built_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_RID_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_RID_Father_SF,true),
-								FileServices.ClearSuperFile (Files.FILE_RID_GrandFather_SF,true),								
 								FileServices.FinishSuperFileTransaction ()																					 																					 
 						);
 		return action;
@@ -410,29 +312,22 @@ EXPORT SuperFiles := MODULE
 					FileServices.PromoteSuperFileList ([Files.FILE_Header_Refs_SF,	Files.FILE_Header_Refs_Father_SF],	Files.FILE_Header_Refs,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_Header_Words_SF,	Files.FILE_Header_Words_Father_SF],	Files.FILE_Header_Words,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_FName_SF,				Files.FILE_FName_Father_SF],				Files.FILE_FName,true);
-					FileServices.PromoteSuperFileList ([Files.FILE_MName_SF,				Files.FILE_MName_Father_SF],				Files.FILE_MName,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_LName_SF,				Files.FILE_LName_Father_SF],				Files.FILE_LName,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_Name_ST_Lic_SF,	Files.FILE_Name_ST_Lic_Father_SF],	Files.FILE_Name_St_LIC,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_Name_SF,					Files.FILE_Name_Father_SF],					Files.FILE_Name,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_Address_SF,			Files.FILE_Address_Father_SF],			Files.FILE_Address,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_SSN_SF,					Files.FILE_SSN_Father_SF],					Files.FILE_SSN,true);
-					FileServices.PromoteSuperFileList ([Files.FILE_CNSMR_SSN_SF,		Files.FILE_CNSMR_SSN_Father_SF],		Files.FILE_CNSMR_SSN,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_DOB_SF,					Files.FILE_DOB_Father_SF],					Files.FILE_DOB,true);					
-					FileServices.PromoteSuperFileList ([Files.FILE_CNSMR_DOB_SF,		Files.FILE_CNSMR_DOB_Father_SF],		Files.FILE_CNSMR_DOB,true);					
 					FileServices.PromoteSuperFileList ([Files.FILE_PHONE_SF,				Files.FILE_PHONE_Father_SF],				Files.FILE_PHONE,true);										
 					FileServices.PromoteSuperFileList ([Files.FILE_ZIP_SF,					Files.FILE_ZIP_Father_SF],					Files.FILE_ZIP,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_LIC_SF,					Files.FILE_LIC_Father_SF],					Files.FILE_LIC,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_VendorID_SF,			Files.FILE_VendorID_Father_SF],			Files.FILE_VendorID,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_Tax_SF,					Files.FILE_Tax_Father_SF],					Files.FILE_Tax,true);
-					FileServices.PromoteSuperFileList ([Files.FILE_Billing_Tax_SF,	Files.FILE_Billing_Tax_Father_SF],	Files.FILE_Billing_Tax,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_DEA_SF,					Files.FILE_DEA_Father_SF],					Files.FILE_DEA,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_NPI_SF,					Files.FILE_NPI_Father_SF],					Files.FILE_NPI,true);
-					FileServices.PromoteSuperFileList ([Files.FILE_Billing_NPI_SF,	Files.FILE_Billing_NPI_Father_SF],	Files.FILE_Billing_NPI,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_UPIN_SF,					Files.FILE_UPIN_Father_SF],					Files.FILE_UPIN,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_LexID_SF,				Files.FILE_LexID_Father_SF],				Files.FILE_LexID,true);
 					FileServices.PromoteSuperFileList ([Files.FILE_BDID_SF,					Files.FILE_BDID_Father_SF],					Files.FILE_BDID,true);					
-					FileServices.PromoteSuperFileList ([Files.FILE_Source_RID_SF,		Files.FILE_Source_RID_Father_SF],		Files.FILE_Source_RID,true);					
-					FileServices.PromoteSuperFileList ([Files.FILE_RID_SF,					Files.FILE_RID_Father_SF],					Files.FILE_RID,true);					
 		);
 		
 		RETURN action;

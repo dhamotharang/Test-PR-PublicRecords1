@@ -406,6 +406,10 @@ EXPORT Layouts := MODULE
 		export SkipValidationByGCID	 := RECORD
 			string Gc_ID;
 		end;
+		
+		export RefreshProdDashVersion := Record
+		boolean RefreshVersion;
+		end;
 	end;
 
 export temp := module 
@@ -457,9 +461,13 @@ Export PII	:=RECORD
   string20 mname;
   string20 lname;
   string5 name_suffix;
-  string28 prim_name;
-  string10 prim_range;
-  string8 sec_range;
+	string10 prim_range;
+	string2 predir;
+	string28 prim_name;
+	string4 addr_suffix;
+	string2 postdir;
+	string10 unit_desig;
+	string8 sec_range;
   string2 st;
   string5 zip;
   string10 ssn;
@@ -1864,5 +1872,87 @@ Export CIID := RECORD
   integer8 cl_active7_identity_count_percentile_;
   real8 cl_impact_weight_;
  END;
+ 
+//KEL Dashboards Response Layout
+ rresults := RECORD
+    string name{xpath('name')};
+    string value{xpath('value')};
+    string filename{xpath('filename')};
+    string total{xpath('total')};
+   END;
+
+ rappvalues := RECORD
+    string application{xpath('application')};
+    string name{xpath('name')};
+    string value{xpath('value')};
+   END;
+
+ rworkunit := RECORD
+   string wuid{xpath('wuid')};
+   string owner{xpath('owner')};
+   string cluster{xpath('cluster')};
+   string jobname{xpath('jobname')};
+   string stateid{xpath('stateID')};
+   string state{xpath('state')};
+   string totalthortime{xpath('totalThorTime')};
+   DATASET(rresults) results{xpath('results')};
+   DATASET(rappvalues) appvalues{xpath('applicationValues')};
+   integer8 errorcount{xpath('errorCount')};
+   integer8 warningcount{xpath('warningCount')};
+   integer8 infocount{xpath('infoCount')};
+   integer8 resultcount{xpath('resultCount')};
+  END;
+
+ rresponse	:= RECORD 
+  string uuid{xpath('uuid')};
+  string username{xpath('username')};
+  string workunitid{xpath('workunitId')};
+  rworkunit workunit{xpath('workunit')};
+  string failed{xpath('failed')};
+  string running{xpath('running')};
+  string connectionurl{xpath('connectionURL')};
+  string compositionuuid{xpath('compositionUuid')};
+  string paused{xpath('paused')};
+  string complete{xpath('complete')};
+  string compositionname{xpath('compositionName')};
+ END;
+ 
+ Export DashboardResponse :={ DATASET(rresponse) response{xpath('response')} END;
+ 
+ Export ProdDashboardVersion := Record
+  string version;
+ End; 
+ 
+ Export Advo	:= Record
+  unsigned8 record_id;
+  unsigned6 fdn_file_info_id;
+  string1 advo_hitflag;
+  string1 advo_vacancyindicator;
+  string1 advo_throwbackindicator;
+  string1 advo_seasonaldeliveryindicator;
+  string5 advo_seasonalsuppressionstartdate;
+  string5 advo_seasonalsuppressionenddate;
+  string1 advo_donotdeliverindicator;
+  string1 advo_collegeindicator;
+  string10 advo_collegesuppressionstartdate;
+  string10 advo_collegesuppressionenddate;
+  string1 advo_addressstyle;
+  string5 advo_simplifyaddresscount;
+  string1 advo_dropindicator;
+  string1 advo_residentialorbusinessindicator;
+  string1 advo_onlywaytogetmailindicator;
+  string1 advo_recordtypecode;
+  string1 advo_addresstype;
+  string1 advo_addressusagetype;
+  string8 advo_firstseendate;
+  string8 advo_lastseendate;
+  string8 advo_vendorfirstreporteddate;
+  string8 advo_vendorlastreporteddate;
+  string8 advo_vacationbegindate;
+  string8 advo_vacationenddate;
+  string8 advo_numberofcurrentvacationmonths;
+  string8 advo_maxvacationmonths;
+  string8 advo_vacationperiodscount;
+ End;
  
 END;

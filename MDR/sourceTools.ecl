@@ -56,6 +56,7 @@ MODULE
 	export src_Bankruptcy_Trustee        := 'BT';
 	export src_BBB_Member                := 'BM';  // Better Business Bureau members
 	export src_BBB_Non_Member            := 'BN';  // Better Business Bureau non-members
+	export src_Best_Business             := 'BB';
 	export src_BrightVerify_email				 :=	'BV';		//BrightVerify email deltabase
 	export src_Business_Credit					 := 'BC';  // SBFE Business Credit
 	export src_Business_Registration     := 'BR';
