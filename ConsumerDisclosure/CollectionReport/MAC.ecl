@@ -2,21 +2,6 @@ IMPORT $;
 
 EXPORT MAC := MODULE
 
-  EXPORT GetLayoutMeta(l_in):= FUNCTIONMACRO	
-    
-    #DECLARE(l_def_str); #SET(l_def_str,'');
-    #DECLARE(l_field_cnt); #SET(l_field_cnt,0);
-    #EXPORTXML(fields,l_in);
-    #FOR(fields)
-      #FOR(Field)
-        #APPEND(l_def_str,%'{@ecltype}'% + ' ' + %'{@label}'% + ';' + '\n');
-        #SET(l_field_cnt,%l_field_cnt% + 1);
-      #END
-    #END
-    
-    RETURN ROW({%'l_def_str'%, %l_field_cnt%}, {string text; integer cnt;});
-  ENDMACRO;
-
   EXPORT GetCollectionFromRaw(
     raw_recs, 
     in_mod, 
@@ -30,9 +15,14 @@ EXPORT MAC := MODULE
     record_sid_field = 'record_sid'
     ) := FUNCTIONMACRO
     
-    IMPORT iesp, STD;
-    LOCAL meta := MAC.GetLayoutMeta(k_name);
-    LOCAL raw_recs_filt := raw_recs(
+    IMPORT iesp, STD, ut;
+
+    // declare a 'clean' version of raw_recs layout (with proper xpath info for each field)
+    ut.mac_declare_clean_layout(raw_recs, 'loc_layout', true);
+
+    LOCAL meta := ut.get_layout_text(k_name);
+    LOCAL loc_recs := PROJECT(raw_recs, loc_layout);
+    LOCAL raw_recs_filt := loc_recs(
       #IF(#TEXT(k_date_field) != '') 
       in_mod.isDateOk((UNSIGNED) k_date_field, date_format)
       #ELSE
