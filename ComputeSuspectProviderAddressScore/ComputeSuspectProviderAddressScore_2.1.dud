@@ -338,6 +338,16 @@ STRING description;
 STRING value;
 END
 END
+
+   DATASET HitStats:PREFIX(INPUTS.Prefix),SIDE, WUID
+        INTEGER1  Hit;
+        STRING2	  State;
+        INTEGER4  Cnt;
+    END    
+END
+
+VISUALIZE ProviderStats:LABEL("Provider Stats")
+    CHORO ProviderScoreStats(HitStats{Hit, State, SUM(Cnt)}) : FILTER(Hit),STATE(State),WEIGHT(SUM(Cnt)),COLOR("Red_Yellow_Blue");
 END
 
 GENERATES INLINE
@@ -602,6 +612,9 @@ ScoreResults := ComputeSuspectProviderAddressScore.macComputeSuspectProviderAddr
 '%Prefix%');
 
 %^edsOutput% := ScoreResults %^p%;
+
+%^eHitStats% := TABLE(%dsOutput%, {INTEGER %Prefix%Hit := MAP(%Prefix%FinalProfessionalScore > 0 => 1, 0), STRING2 %Prefix%State := %State%, %Prefix%Cnt := COUNT(GROUP)}, MAP(%Prefix%FinalProfessionalScore > 0 => 1, 0), %State%, FEW);
+
 ENDGENERATES
 
 
