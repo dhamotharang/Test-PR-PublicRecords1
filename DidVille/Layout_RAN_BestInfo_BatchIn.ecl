@@ -1,5 +1,6 @@
 export Layout_RAN_BestInfo_BatchIn := record
 	STRING20 acctno;
+	UNSIGNED6 did;
 	STRING11  ssn;
 	STRING20 name_first;
 	STRING20 name_middle;
