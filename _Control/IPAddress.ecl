@@ -52,6 +52,8 @@
 	export  string bair_LZ_VIP      := 'bair-batchlz.risk.regn.net';
 	export  string bair_batchlz01      := 'bair-batchlz.risk.regn.net';//10.240.0.47
 	export  string abair_batchlz01     := 'abair-batchlz.risk.regn.net';//10.240.128.41
+  
+  export string CargoDayton       := '10.140.128.250';          //cargodayton
 
   end
  ;

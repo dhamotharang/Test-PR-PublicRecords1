@@ -10,7 +10,11 @@ EXPORT Constants := MODULE
 	EXPORT boolean is_running_in_prod :=  thisEnvironmentName = 'Prod_Thor';	
 	
 	EXPORT lnpr_IN := '~prte::in::lnpr::relate';
+	EXPORT lnpr_DBA_IN := '~prte::in::lnpr::dba';
 	
 	EXPORT Linkids := '~prte::base::lnpr::relate';
+	EXPORT DBA_Linkids := '~prte::base::lnpr::dba';
+	
+	EXPORT Prefix:='~prte::';
 															 	
 END;

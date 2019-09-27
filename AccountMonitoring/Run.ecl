@@ -1,4 +1,4 @@
-/* For notes, see the _Documentation_forAccountMonitoring attribute. */
+﻿/* For notes, see the _Documentation_forAccountMonitoring attribute. */
 
 IMPORT AccountMonitoring;
 
@@ -7,10 +7,13 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 						STRING           despray_path = '',        // the /path including filename of the destination file
 						UNSIGNED1        pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT,
 						BOOLEAN          use_daily_file = FALSE,
-						SET OF UNSIGNED6 run_pids = []
+						SET OF UNSIGNED6 run_pids = [],
+           BOOLEAN          doUpdateSuperFiles = TRUE
           ) :=	    
 	FUNCTION
-		
+		 //We first create some of our own superfiles that match the Roxie super files. 
+     UpdateRoxieLikeSuperfiles:= if(doUpdateSuperFiles,AccountMonitoring.fn_UpdateSuperFiles(product_mask),-1);
+    
 		// Get the already sorted and distributed main portfolio records and assign them to pf_AllRecords
 		// *** TODO *** Since we're saving the portfolio "already deduped", we don't need the -timestamp for: SORTED (because there is only one record for each pid/rid)
 		pf_AllRecords := SORTED( 
@@ -137,6 +140,15 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 		candidates_watercraft      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.watercraft, timestamp ) : INDEPENDENT;
 		update_history_file_watercraft	:= AccountMonitoring.fn_update_history_file( candidates_watercraft, product_config.watercraft, timestamp );
 
+		// ***** Personheader *****
+		candidates_personheader      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.personheader, timestamp ) : INDEPENDENT;
+		update_history_file_personheader	:= AccountMonitoring.fn_update_history_file( candidates_personheader, product_config.personheader, timestamp );
+
+		// ***** Email *****
+		candidates_email      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.email, timestamp ) : INDEPENDENT;
+		update_history_file_email 	:= AccountMonitoring.fn_update_history_file( candidates_email, product_config.email, timestamp );
+
+
 
 		// Union all records, maintaining record order on each node ('&' -- ref. Lang. Guide, p. 26); then filter.
 		candidates_all := IF(product_config.bankruptcy.product_is_in_mask,candidates_bankruptcy)
@@ -163,7 +175,9 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 										& IF(product_config.corp.product_is_in_mask,candidates_corp)
 										& IF(product_config.mvr.product_is_in_mask,candidates_mvr)
 										& IF(product_config.aircraft.product_is_in_mask,candidates_aircraft)
-										& IF(product_config.watercraft.product_is_in_mask,candidates_watercraft);
+										& IF(product_config.watercraft.product_is_in_mask,candidates_watercraft)
+										& IF(product_config.personheader.product_is_in_mask,candidates_personheader)
+										& IF(product_config.email.product_is_in_mask,candidates_email);
 		
 		// We check for 0 hashvalue here because we don't want to return history records that simply reflect
 		// a deleted portfolio record.
@@ -201,10 +215,12 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 													 IF(product_config.corp.product_is_in_mask,update_history_file_corp),
 													 IF(product_config.mvr.product_is_in_mask,update_history_file_mvr),
 													 IF(product_config.aircraft.product_is_in_mask,update_history_file_aircraft),
-													 IF(product_config.watercraft.product_is_in_mask,update_history_file_watercraft)
+													 IF(product_config.watercraft.product_is_in_mask,update_history_file_watercraft),
+													 IF(product_config.personheader.product_is_in_mask,update_history_file_personheader),
+													 IF(product_config.email.product_is_in_mask,update_history_file_email)
 													);
 		
-		RETURN SEQUENTIAL(
+		RETURN SEQUENTIAL(UpdateRoxieLikeSuperfiles,
 			IF(pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT OR pseudo_environment NOT IN AccountMonitoring.constants.all_pseudo,
 				FAIL('Must provide valid pseudo-environment.')),
 			output_results,

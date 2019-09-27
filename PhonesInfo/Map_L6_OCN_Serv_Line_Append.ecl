@@ -1,7 +1,9 @@
-﻿IMPORT _control, Gong, Mdr, PhonesPlus_v2, Ut;
+﻿IMPORT _control, dx_PhonesInfo, Gong, Mdr, PhonesPlus_v2, Ut;
 
 	//DF-24037: Replace LIDB Use Lerg6 for Carrier Info
-
+	//DF-24394: Add dt_first_reported/dt_last_reported to the L6 records for consistency (historical LIDB format)
+	//DF-24397: Create Dx-Prefixed Keys
+	
 EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 	
 	//Append OCNs to New Phones / Phones w/ Changed DIDs, Using the Lerg6
@@ -9,13 +11,13 @@ EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Step 1: Determine New Phones / Phones with Changed DIDs//////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////	
-	dsL6							:= PhonesInfo.Key_Phones_Lerg6;					//Lerg6
-	dsNewPhone				:= PhonesInfo.File_Lerg.Lerg6NewPhone;	//New Phones/Phones with Changed DIDs or Phone Refresh
+	dsL6							:= dx_PhonesInfo.Key_Phones_Lerg6(is_current=TRUE);	//Lerg6
+	dsNewPhone				:= PhonesInfo.File_Lerg.Lerg6NewPhone;							//New Phones/Phones with Changed DIDs or Phone Refresh
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Step 2: Run New Phone Records Through Lerg6 by Phone[1..7]///////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	srtL6							:= sort(distribute(dsL6, hash(npa+nxx+block_id)), npa, nxx, block_id, local);	
+	srtL6							:= sort(distribute(dsL6, hash(npa+nxx+block_id)), npa+nxx+block_id, local);	
 	srtNewPhone				:= sort(distribute(dsNewPhone, hash(phone[1..7])), phone[1..7], local);
 
 	//Reformatting to PMT Layout
@@ -138,6 +140,8 @@ EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 
 	//Append Carrier Reference Info
 	PhonesInfo.Layout_Lerg.lerg6UpdHist_Prep appCrTr(srt_lerg6Append l, srt_carrierRef r):= transform
+		self.dt_first_reported 					:= (integer)version;
+		self.dt_last_reported 					:= (integer)version;
 		self.vendor_first_reported_dt 	:= (integer)version;
 		self.vendor_last_reported_dt 		:= (integer)version;
 		self.carrier_name 							:= r.carrier_name;
@@ -161,6 +165,8 @@ EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 	srt_carrierRef2		:= sort(distribute(fixCr(data_type=''), hash(ocn)), ocn, carrier_name, serv, line, -dt_last_reported, local);
 
 	PhonesInfo.Layout_Lerg.lerg6UpdHist_Prep appCrTr2(remainRec l, srt_carrierRef2 r):= transform
+		self.dt_first_reported 					:= (integer)version;
+		self.dt_last_reported 					:= (integer)version;
 		self.vendor_first_reported_dt 	:= (integer)version;
 		self.vendor_last_reported_dt 		:= (integer)version;
 		self.carrier_name 							:= r.carrier_name;
@@ -193,11 +199,16 @@ EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 
 	PhonesInfo.Layout_Lerg.lerg6UpdHist_Prep rollDt(srtConcatCurrPrev l, srtConcatCurrPrev r) := transform
 			
-		minDate		:= ut.min2((integer) l.vendor_first_reported_dt, (integer) r.vendor_first_reported_dt);
-		maxDate		:= max((integer)l.vendor_last_reported_dt, (integer)r.vendor_last_reported_dt);
+		minDate1	:= ut.min2((integer) l.dt_first_reported, (integer) r.dt_first_reported);
+		maxDate1	:= max((integer)l.dt_last_reported, (integer)r.dt_last_reported);
+		
+		minDate2	:= ut.min2((integer) l.vendor_first_reported_dt, (integer) r.vendor_first_reported_dt);
+		maxDate2	:= max((integer)l.vendor_last_reported_dt, (integer)r.vendor_last_reported_dt);
 			
-		self.vendor_first_reported_dt		:= minDate;
-		self.vendor_last_reported_dt 		:= maxDate;
+		self.dt_first_reported					:= minDate1;	
+		self.vendor_first_reported_dt		:= minDate2;
+		self.dt_last_reported						:= maxDate1;
+		self.vendor_last_reported_dt 		:= maxDate2;
 		self 														:= l;
 	end;
 
@@ -213,4 +224,4 @@ EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 	
 	RETURN applyDates;
 	
-END;	
+END;

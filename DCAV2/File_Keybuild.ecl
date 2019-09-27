@@ -1,4 +1,4 @@
-import address;
+﻿import address;
 
 export File_Keybuild(
 
@@ -6,7 +6,6 @@ export File_Keybuild(
 	,dataset(layouts.base.contacts			)	pContactsBase		= files().base.contacts.built
 	,dataset(layouts.temporary.hierarchy)	pHierarchy			= File_Hierarchy()
 	,string																pPersistname		= persistnames().FileKeybuild
-
 ) :=
 function
 
@@ -25,12 +24,13 @@ function
 		self											:= left;
 	));
 	
-	dcontacts_sort := distribute(dcontactsprep	,rid);
+	dcontacts_sort := sort(distribute(dcontactsprep, 
+	                            HASH64(rawfields.enterprise_num, date_last_seen)), rawfields.enterprise_num, -date_last_seen);
 
-	dcompanies_prep := distribute(project(pCompaniesBase(record_type in [Utilities.RecordType.Updated,Utilities.RecordType.New])	,transform(lkeybuildprep	,self := left; self := [];)),rid);
+	dcompanies_prep := sort(distribute(project(pCompaniesBase(record_type in [Utilities.RecordType.Updated,Utilities.RecordType.New])	,transform(lkeybuildprep	,self := left; self := [];)),HASH64(rawfields.enterprise_num, date_last_seen)), rawfields.enterprise_num, -date_last_seen);
 
 	djoin2companies := join(dcompanies_prep,dcontacts_sort,
-				left.rid  = right.rid
+				left.rawfields.enterprise_num  = right.rawfields.enterprise_num
 		,transform(
 			lkeybuildprep,
 				self.rawfields.executives	:= right.rawfields.executives	;
@@ -42,18 +42,22 @@ function
 		,left outer
 	);
 	
-	dcontactsrollup := rollup(sort(djoin2companies	,	rid,local)
-		,		left.rid = right.rid
+	dcontactsrollup := rollup(sort(djoin2companies,	rawfields.enterprise_num, -date_vendor_last_reported)
+		,		left.rawfields.enterprise_num = right.rawfields.enterprise_num
+		    and count(left.rawfields.executives) >= 1
 		,transform(lkeybuildprep,
 			self.rawfields.executives	:= if(count(left.rawfields.executives	) < 10	,left.rawfields.executives	+ right.rawfields.executives, left.rawfields.executives);
 			self.clean_names					:= if(count(left.clean_names					) < 10	,left.clean_names						+ right.clean_names					,	left.clean_names);		
 			self											:= left;
 		)
 		,local
-	);
+	);	
+
+	dedupContactsRollup := dedup(dcontactsrollup, (UNSIGNED)rawfields.enterprise_num);	
+	
 	ldashindex(string pstring) := stringlib.stringfind(pstring,'-',1);
 
-	dproj := project(dcontactsrollup	,transform(
+	dproj := project(dedupContactsRollup	,transform(
 		{lOldlayout,string6 file_type},
 
 		//fix jv1_ and jv2_ with intformat so they can be joined later on.
@@ -257,8 +261,9 @@ function
 		self.err_statA          				:= left.mailing_address.err_stat																				;
 		self.lf                 				:= '';
 		self.file_type									:= left.file_type;
+		self.global_sid									:= left.global_sid;
 	
-	)) ;
+	));
 
 	ltrim(string pstring) := trim(stringlib.stringtouppercase(pstring));
 	
@@ -277,6 +282,7 @@ function
 		,left outer
 		,keep(1)
 	);
+	
 	dconcat1 := dgetParentNumber + dproj(Parent_Enterprise_number = '');
 
 	dgetJV1 := join(
@@ -285,7 +291,6 @@ function
 		,			left.JV1_[1..9] 				= right.root 
 			and left.JV1_[11..14] 			= right.sub
 			and ltrim(left.jv_parent1) 	= ltrim(right.name)
-//			and	left.file_type					= right.file_type
 		,transform({lOldlayout,string6 file_type}
 			,self.JV1_ 	:= if(right.lncaGID != 0	,intformat(right.lncaGID		,9,1) + '-' + intformat(right.lncaIID	,4,1)
 																						,''
@@ -295,6 +300,7 @@ function
 		,left outer
 		,keep(1)
 	);
+	
 	dconcat2 := dgetJV1 + dconcat1(JV1_ = '');
 	
 	dgetJV2 := join(
@@ -303,7 +309,6 @@ function
 		,			left.JV2_[1..9] 				= right.root 
 			and left.JV2_[11..14] 			= right.sub
 			and ltrim(left.jv_parent2) 	= ltrim(right.name)
-//			and	left.file_type					= right.file_type
 		,transform({lOldlayout,string6 file_type}
 			,self.JV2_	:= if(right.lncaGID != 0	,intformat(right.lncaGID		,9,1) + '-' + intformat(right.lncaIID	,4,1)
 																						,''
@@ -315,7 +320,7 @@ function
 	);
 
 	dreturn := project(dgetJV2 + dconcat2(JV2_ = ''),lOldlayout)
-		: persist(pPersistname)
+		: persist(pPersistname,SINGLE)
 		;
 
 	return dreturn;

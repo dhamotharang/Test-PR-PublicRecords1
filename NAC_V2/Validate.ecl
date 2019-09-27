@@ -4,6 +4,8 @@
 NormalizeName(string s) := (string)Std.Uni.CleanAccents(Std.Str.FindReplace(Std.Str.CleanSpaces(s),'¿','?'));
 
 fixupMsg(string msg) := If(msg[1]='\n', msg[2..], msg);
+rgxEmail := '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$';
+
 
 EXPORT Validate := MODULE
 
@@ -137,11 +139,11 @@ EXPORT Validate := MODULE
 				IF(ssnType = Mod_Sets.Actual_Type AND
 						NOT REGEXFIND('^\\d{9}$', TRIM(ssn)), errcodes.E116, 0);
 	shared ValidSsnType(string1 ssnType) := IF(ssnType in Mod_Sets.SSN_Type, 0, errcodes.E117);
-	shared ValidDob(string8 dob) := IF(dob <> '' and ut.ValidDate(dob), 0, errcodes.E118);
+	shared ValidDob(string8 dob) := IF(dob <> '' and Std.Date.IsValidDate((unsigned4)dob), 0, errcodes.E118);
 	shared ValidDobType(string1 dobType) := IF(dobType in Mod_Sets.Dob_Type, 0, errcodes.E119);
 	shared ValidEligibilityStatus(string1 Eligibility) := IF(Eligibility in Mod_Sets.Eligible_Status, 0, errcodes.E120);
 	shared ValidEligibilityDate(string8 date, string1 Eligibility) := IF(Eligibility <> 'E', 0,
-												IF(date <> '' and ut.ValidDate(date), 0, errcodes.E121));
+												IF(date <> '' and Std.Date.IsValidDate((unsigned4)date), 0, errcodes.E121));
 	shared ValidEligibilityPeriod(string1 period) := IF(period in Mod_Sets.Period_Type, 0, errcodes.E122);
 	shared ValidStartDate(string date) := IF(IsValidDate(date), 0, errcodes.E123);
 	shared ValidEndDate(string date) := IF(IsValidDate(date), 0, errcodes.E112);

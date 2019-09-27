@@ -1,4 +1,4 @@
-import std, address, bo_address, ut;
+﻿import std, address, bo_address, ut;
 
 EXPORT ProcessWorldBank := FUNCTION
 
@@ -28,6 +28,7 @@ EXPORT ProcessWorldBank := FUNCTION
 		self.IneligibilityPeriodfrom	:= ut.CleanSpacesAndUpper(R.IneligibilityPeriodfrom);
 		self.Ineligibilityperiodto		:= ut.CleanSpacesAndUpper(R.Ineligibilityperiodto);
 		self.grounds				:= ut.CleanSpacesAndUpper(R.grounds);
+		self.addl_firm_name        := ut.CleanSpacesAndUpper(R.addl_firm_name);
 	END;
 	
 	dsPopulateRecNum	:= ITERATE(dsAddRecIdentifier, PopRecNum(left,right));

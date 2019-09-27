@@ -1,4 +1,4 @@
-﻿export svcAppend := function
+﻿export svcAppend() := macro
 	import BIPV2;
 	import BIPV2_Best;
 
@@ -19,11 +19,6 @@
 
 	inputDs := dataset([], BIPV2.IdAppendLayouts.AppendInput) : stored('append_input');
 
-	postAppendLayout := {
-		inputDs.request_id,
-		BIPV2.IDlayouts.l_xlink_ids
-	};
-
 	withAppendRoxie := BIPV2.IdAppendRoxieLocal(inputDs
 		,scoreThreshold := score_threshold
 		,weightThreshold := weight_threshold
@@ -34,38 +29,42 @@
 		,reAppend := re_append
 	);
 
+	// matchset has to be defined outside of macro call so that code will syntax check.
+	match_set := ['A','F','P'];
+
 	withAppendThor := BIPV2.IdAppendThorLocal(
-		inputDs
-		,['A','F','P'] // matchset
-		,company_name // company_name_field
-		,prim_range // prange_field
-		,prim_name // pname_field
-		,zip5 // zip_field
-		,sec_range // srange_field
-		,state // state_field
-		,phone10 // phone_field
-		,fein // fein_field
-		,BDID_field
-		,BIPV2.IdAppendLayouts.IdsOnly // outrec
-		,true // bool_outrec_has_score
-		,BDID_Score_field
-		,//keep_count := '1'
-		,score_threshold //score_threshold := '75'
-		,url // pURL = ''
-		,email // pEmail = ''
-		,city // pCity = ''
-		,contact_fname // pContact_fname = ''
-		,contact_mname // pContact_mname = ''
-		,contact_lname // pContact_lname = ''
-		,contact_ssn // pContact_ssn = ''
-		,source // pSource = ''
-		,source_record_id // pSource_record_id = ''
+		infile := inputDs
+		,matchset := match_set
+		,company_name_field := company_name
+		,prange_field := prim_range
+		,pname_field := prim_name
+		,zip_field := zip5
+		,srange_field := sec_range
+		,state_field := state
+		,phone_field := phone10
+		,fein_field := fein
+		,outrec := BIPV2.IdAppendLayouts.IdsOnly
+		,bool_outrec_has_score := true
+		,keep_count := '1'
+		,score_threshold := score_threshold
+		,pURL := url
+		,pEmail := email
+		,pCity := city
+		,pContact_fname := contact_fname
+		,pContact_mname := contact_mname
+		,pContact_lname := contact_lname
+		,pContact_ssn := contact_ssn
+		,pSource := source
+		,pSource_record_id := source_record_id
+		,useFuzzy := use_fuzzy
+		,weightThreshold := weight_threshold
+		,disableSaltForce := disable_salt_force
 	);
 
 	withAppend := if(from_thor, withAppendThor, withAppendRoxie);
 
 	postAppend := project(withAppend,
-		transform(BIPV2.IDAppendLayouts.svcAppendOut,
+		transform(BIPV2.IDAppendLayouts.svcAppendOutv2,
 			self := left,
 			self := []));
 
@@ -73,17 +72,31 @@
 	                                           allBest := allBest, isMarketing := isMarketing);
 
 	res := if(includeBest, postBest, postAppend);
+	resv1 := project(res, transform(BIPV2.IdAppendLayouts.svcAppendOut, self := left));
 
 	postHeader := BIPV2.IdAppendLocal.FetchRecords(withAppend, fetchLevel, dnbFullRemove);
 
 	emptyHeader := dataset([], BIPV2.IdAppendLayouts.svcAppendRecsOut);
+
+	// Catch failures so roxiepipe won't fail.
+	// Return dataset with request ids in case of failure, turning an error into a no hit.
+	catchRes := catch(res, onfail(transform(recordof(res), self.error_code := FAILCODE, self.error_msg := FAILMESSAGE, self := [])));
+	isError := exists(catchRes(error_code != 0 or error_msg != ''));
+	failResultv1 := project(inputDs, transform(BIPV2.IDAppendLayouts.svcAppendOut,
+	                      self.request_id := left.request_id, self := []));
+	failResult := project(inputDs, transform(BIPV2.IDAppendLayouts.svcAppendOutv2,
+	                      self.request_id := left.request_id,
+	                      self.error_code := catchRes[1].error_code,
+	                      self.error_msg := catchRes[1].error_msg, self := []));
 				
-	return parallel(
-		output(res, named('Results'));
+	parallel(
+		output(if(isError, failResult, res), named('Results_v2'));
 		output(if(includeRecords, postHeader, emptyHeader), named('Header'));
+		output(if(isError, failResultv1, resv1), named('Results'));
+
 	);
 
-	// return parallel(
+	// parallel(
 		// output(preBest, named('preBest'));
 		// output(withBest, named('withBest'));
 		// output(withAppend, named('withappend'));
@@ -91,4 +104,4 @@
 		// output(postAppend, named('postAppend'));
 		// output(res, named('Results'));
 	// );
-end;
+endmacro;

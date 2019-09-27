@@ -1,6 +1,6 @@
-import ut, header, doxie, autokey, autokeyb, autokeyB2, AutoKeyI, _Control;
+import ut, header, doxie, autokey, autokeyb, autokeyB2, AutoKeyI, _Control,dx_header;
 
-export FN_AutokeyBuild(dataset(header.Layout_Header) head, string filedate) := 
+export FN_AutokeyBuild(dataset(dx_header.Layout_Header) head, string filedate) := 
 FUNCTION
 
 

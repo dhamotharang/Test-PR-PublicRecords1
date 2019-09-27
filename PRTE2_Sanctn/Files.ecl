@@ -1,8 +1,7 @@
 ﻿import prte_csv, data_services, sanctn, ut, std, prte2_sanctn;
 
 EXPORT Files := module
-
-  export incident_in					:= dataset(constants.in_prefix_name + 'incident',	layouts.Incident_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+	export incident_in					:= dataset(constants.in_prefix_name + 'incident',	layouts.Incident_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
 	export party_in							:= dataset(constants.in_prefix_name + 'party',	layouts.party_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
 	export party_aka_dba_in			:= dataset(constants.in_prefix_name + 'party_aka_dba',	layouts.Party_AKA_DBA_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"'))); 
 	export license_in						:= dataset(constants.in_prefix_name + 'license',	layouts.license_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
@@ -94,7 +93,7 @@ END;
 	export f_nmls_midex_new 	:= project(base_license(CLN_LICENSE_NUMBER <> '' and REGEXFIND('NMLS', TRIM(LICENSE_TYPE,LEFT,RIGHT),NOCASE)), tNMLSLicenseMidex(LEFT));
 
 
-SANCTN.layout_SANCTN_party_clean_orig tParty_key(base_party L) := transform
+SANCTN.Layout_SANCTN_Party_New tParty_key(base_party L) := transform
 	 self.BATCH_NUMBER		:= trim(L.BATCH_NUMBER,left,right);
 	 self.INCIDENT_NUMBER := trim(L.INCIDENT_NUMBER,left,right);
 	 self.PARTY_NUMBER		:= trim(L.PARTY_NUMBER,left,right);

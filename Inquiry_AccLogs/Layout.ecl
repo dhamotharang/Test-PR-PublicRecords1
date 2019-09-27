@@ -1,4 +1,4 @@
-import standard, Risk_Indicators;
+﻿import standard, Risk_Indicators;
 
 export layout := module
 
@@ -250,7 +250,6 @@ export Common_ThorAdditions_non_FCRA:=record
  Common;
  string    source               :='';
  string3   fraudpoint_score     :='';
-
 end;
 
 export Common_ThorAdditions_FCRA := record
@@ -259,8 +258,20 @@ export Common_ThorAdditions_FCRA := record
 	unsigned8 persistent_record_id := 0;
 end;
 
+export ccpaLayout := record
+ UNSIGNED4 global_sid   := 0;   
+ UNSIGNED8 record_sid   := 0; 	
+end;
+
+export Common_ccpa := record
+  Common;
+  ccpaLayout ccpa;
+end;
+
+
 export Common_indexes := record
  {Common_ThorAdditions_non_FCRA}-source-bus_q-bususer_q;
+  ccpaLayout ccpa;
  //Common;
 end;
 
@@ -279,14 +290,15 @@ export Common_indexes_DID_SBA := record
  PermissableLayout 			Permissions;
  SearchLayout 		 			Search_Info;
  string3   fraudpoint_score     :='';
+ ccpaLayout ccpa;
 end;
 
 export Common_indexes_FCRA := record
  {Common};
+ ccpaLayout ccpa;
 end;
 
 export Common_Indexes_FCRA_DID_SBA := record
- 
 	mbslayout 				 MBS;
 	allowlayout 			 Allow_Flags;
 	businfolayout 		 Bus_Intel;
@@ -302,6 +314,7 @@ export Common_Indexes_FCRA_DID_SBA := record
 	BusUserDataLayoutPlus	BusUser_Q8;
   PermissableLayout Permissions;
   SearchLayout 		 Search_Info;
+	ccpaLayout        ccpa;
 end;
 
 export adl_reappend := RECORD

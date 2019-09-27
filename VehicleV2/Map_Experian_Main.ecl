@@ -1,10 +1,10 @@
-import codes,ut,vehicleV2,vehiclecodes,vehlic;
+﻿import codes,ut,vehicleV2,vehiclecodes,vehlic;
 
 dExperianMainTemp	:=	vehiclev2.Map_Experian_Main_Temp;
 // dExperianMainTemp	:=	dataset('~thor_data400::persist::vehiclev2::experian_main_temp',VehicleV2.Layout_Experian.layout_temp_main,thor);
 
 // Reformat to the common main layout
-VehicleV2.Layout_Base_Main	tExpMain(dExperianMainTemp	pInput)	:=
+VehicleV2.Layout_Base_Main tExpMain(dExperianMainTemp	pInput)	:=
 transform
 	string3 v_major	:=	vehiclecodes.statecolorToNCICcolor(pInput.state_origin,pInput.major_color_code);
 	string3 v_minor	:=	vehiclecodes.statecolorToNCICcolor(pInput.state_origin,pInput.minor_color_code);
@@ -47,7 +47,6 @@ transform
 																					pInput.vina_body_style_desc,
 																					pInput.orig_body_desc
 																				);
-	
 	self														:=	pInput;
 end;
  

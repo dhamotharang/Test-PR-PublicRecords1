@@ -3,6 +3,12 @@
 
 import PRTE_CSV;
 export	Layouts	:= module
+
+EXPORT DEFLT_CPA := RECORD
+ unsigned4 global_sid;
+ unsigned8 record_sid;
+ end;
+
 //*  Layout for Foreclosures on LZ:    
 		
   EXPORT ERC_Record := RECORD
@@ -2636,4 +2642,63 @@ Export Linkid_Rec:=Record
 		// string err_stat := '';
 // End;
 		
+	export ccpa_global_sid := record
+		unsigned4 DatasetId;	
+		string100 DatasetName;	
+		string10 	SourceCodes;	
+		string100 CompanyName;	
+		unsigned4 UniqueSourceIdentifier;
+		string60	BuildTemplateName;
+		string10 	MaxLevel;	
+		string60	RoxiePackages;
+	end;
+	
+	Export DBA_In_Rec:=Record
+string40 Primary_Company_Name;
+string9 Primary_link_fein;
+string8 Primary_Link_Inc_Date;
+unsigned6 Primary_seleid;
+unsigned6 Primary_orgid;
+unsigned6 Primary_ultid;
+string40 DBA_Company_Name;
+string9 DBA_link_fein;
+string8 DBA_link_inc_date;
+unsigned6 DBA_seleid;
+unsigned6 DBA_orgid;
+unsigned6 DBA_ultid;
+string10 Primary_cust_name;
+string10 DBA_cust_name;
+integer6 Primary_outcome;
+end;
+
+Export Linkid_DBA_Rec:=Record
+ string40 Primary_Company_Name;
+ string9 Primary_Link_FEIN;
+ string8 Primary_Link_Inc_Date;
+ unsigned6 Primary_seleid;
+ unsigned6 Primary_orgid;
+ unsigned6 Primary_ultid;
+ string40 DBA_company_name;
+ string9 DBA_Link_Fein;
+ string8 DBA_Link_Inc_Date;
+ unsigned6 DBA_seleid;
+ unsigned6 DBA_orgid;
+ unsigned6 DBA_ultid;
+ string10 Primary_Cust_Name;
+ string10 DBA_Cust_Name;
+ integer6 Primary_outcome; 
+ end; 
+ 
+ Export DBA_Norm:=Record
+ string40 Company_Name;
+ string9 Link_Fein;
+ string8 Link_Inc_date;
+ string10 Cust_Name;
+ unsigned6 seleid;
+ unsigned6 orgid;
+ unsigned6 ultid;
+ string6 relation;
+ integer6 Primary_outcome;
+ End;
+	
 END;

@@ -172,8 +172,8 @@ function
 	self.dt_first_seen := 
 				ut.EarliestDate(ut.EarliestDate(l.dt_first_seen,r.dt_first_seen),
 				ut.EarliestDate(l.dt_last_seen,r.dt_last_seen));
-	self.dt_last_seen := ut.LatestDate(l.dt_last_seen,r.dt_last_seen);
-	self.dt_vendor_last_reported := ut.LatestDate(l.dt_vendor_last_reported, r.dt_vendor_last_reported);
+	self.dt_last_seen := MAX(l.dt_last_seen,r.dt_last_seen);
+	self.dt_vendor_last_reported := MAX(l.dt_vendor_last_reported, r.dt_vendor_last_reported);
 	self.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported, r.dt_vendor_first_reported);
 	self.company_name := IF(l.company_name = '', r.company_name, l.company_name);
 	self.group1_id := IF(l.group1_id = 0, r.group1_id, l.group1_id);

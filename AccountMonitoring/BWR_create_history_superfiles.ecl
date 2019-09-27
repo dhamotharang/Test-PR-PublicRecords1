@@ -1,4 +1,4 @@
-
+﻿
 EXPORT BWR_create_history_superfiles(UNSIGNED1 pseudo_environment) := FUNCTION
 
 	cluster := AccountMonitoring.constants.filename_cluster;
@@ -82,6 +82,21 @@ EXPORT BWR_create_history_superfiles(UNSIGNED1 pseudo_environment) := FUNCTION
 							 FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::' + ext + 'history::liens_father') );
 	csf26 := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::' + ext + 'history::liens_grandfather'),
 							 FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::' + ext + 'history::liens_grandfather') );
+  
+  csf27   := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::history::personheader'),
+	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::history::personheader') );	
+	csf28 := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::history::personheader_father'),
+	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::history::personheader_father'));
+	csf29 := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::history::personheader_grandfather'),
+	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::history::personheader_grandfather'));
+
+  csf30   := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::' + ext + 'history::email'),
+	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::' + ext + 'history::email') );	
+	csf31 := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::' + ext + 'history::email_father'),
+	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::' + ext + 'history::email_father'));
+	csf32 := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::' + ext + 'history::email_grandfather'),
+	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::' + ext + 'history::email_grandfather'));
+
 
 	RETURN SEQUENTIAL( 
 		// pf1,   pf2,   pf3, 
@@ -94,7 +109,9 @@ EXPORT BWR_create_history_superfiles(UNSIGNED1 pseudo_environment) := FUNCTION
 		// csf15, csf16, csf17, 
 		// csf18, csf19, csf20, 
 		// csf21, csf22, csf23,
-		csf24, csf25, csf26
+		//csf24, csf25, csf26,
+		//csf27, csf28, csf29,
+		csf30, csf31, csf32
 		);
 END;
 

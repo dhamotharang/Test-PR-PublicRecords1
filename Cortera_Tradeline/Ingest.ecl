@@ -1,4 +1,4 @@
-﻿IMPORT STD,SALT311;
+﻿IMPORT _control, MDR, STD, SALT311;
 EXPORT Ingest(BOOLEAN incremental=FALSE
 , DATASET(Layout_Tradeline_Base) Delta = DATASET([],Layout_Tradeline_Base)
 , DATASET(Layout_Tradeline_Base) dsBase = In_Tradeline_Base // Change IN_Tradeline_Base to change input to ingest process
@@ -81,7 +81,8 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   EXPORT UpdatedRecords := PROJECT(AllRecs(__Tpe=RecordType.Updated), NoFlagsRec);
   EXPORT UpdatedRecords_NoTag := PROJECT(UpdatedRecords,Layout_Tradeline_Base);
   EXPORT AllRecords := IF(incremental, NewRecords, PROJECT(AllRecs, NoFlagsRec));
-  EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layout_Tradeline_Base); // Records in 'pure' format
+	EXPORT AddGlobalSIDS := MDR.macGetGlobalSid(allRecords,'CorteraTradeline','','global_sid');
+  EXPORT AllRecords_NoTag := PROJECT(AddGlobalSIDS,Layout_Tradeline_Base); // Records in 'pure' format
 
 f := TABLE(dsBase,{record_sid}) : GLOBAL;
 rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,record_sid);

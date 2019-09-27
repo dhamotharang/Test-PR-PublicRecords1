@@ -1,5 +1,5 @@
-
-IMPORT Didville, Doxie, Doxie_cbrs, Doxie_Files, Header, PhonesFeedback, Property, PhonesInfo, BIPV2;
+﻿
+IMPORT AccountMonitoring, Didville, Doxie, Doxie_cbrs, Doxie_Files, Header, PhonesFeedback, Property, PhonesInfo, BIPV2;
 
 EXPORT layouts := MODULE
 
@@ -59,6 +59,7 @@ EXPORT layouts := MODULE
 			UNSIGNED6 SELEID		:= 0;
 			UNSIGNED6 OrgID			:= 0;
 			UNSIGNED6 UltID			:= 0;
+      STRING200 email_address := '';
 		END;
 		
 		EXPORT update := RECORD
@@ -102,6 +103,7 @@ EXPORT layouts := MODULE
 			STRING10 guardian_dob;
 			STRING9 guardian_ssn;
 			BIPV2.IDlayouts.l_header_ids;
+      STRING200 email_address := '';
 		END;
 	
 	END;
@@ -254,6 +256,16 @@ EXPORT layouts := MODULE
 			AccountMonitoring.product_files.watercraft.waterLinkid_key.sequence_key;
 			AccountMonitoring.product_files.watercraft.waterLinkid_key.state_origin;
 		END;
+   
+   SHARED personheader_documentid_record := RECORD
+			Header.Layout_Header.did;
+		END;
+    
+   SHARED email_documentid_record := RECORD
+			AccountMonitoring.product_files.email.main_key.did;
+			AccountMonitoring.product_files.email.main_key.clean_email;
+		END;
+    
 		template(default,doxie.layout_references);
 		template(bankruptcy,bankruptcy_documentid_record);
 		template(deceased,deceased_documentid_record);
@@ -280,6 +292,8 @@ EXPORT layouts := MODULE
 		template(mvr,mvr_documentid_record);
 		template(aircraft,aircraft_documentid_record);
 		template(watercraft,watercraft_documentid_record);
+		template(personheader,personheader_documentid_record);
+		template(email,email_documentid_record);
 	END;
 	
 	EXPORT results := RECORD
@@ -359,6 +373,37 @@ EXPORT layouts := MODULE
 		END;
 		
 	END;
+
+ 
+ export UPDATE_SOURCE := module
+ 
+  export roxie_monitor_superfile_layout := RECORD
+      STRING250 RoxieSuperFile;
+      STRING250 MonitorSuperFile;
+      UNSIGNED8 product_mask_supported;
+   end;
+   
+   export superfile_logicalfile_flat_layout := RECORD
+      STRING250 MonitorSuperFile;
+      STRING250 RoxieSuperFile;
+      STRING250 LogicalFile;
+      BOOLEAN LogicalFileExists;
+      BOOLEAN FirstInstance;
+   end;
+   
+   export logicalfile_layout := RECORD
+      STRING250 LogicalFile;
+   end;
+   
+   export superfile_logicalfile_Rollup_layout := RECORD
+      STRING250 MonitorSuperFile;
+       STRING250 RoxieSuperFile;
+      DATASET(LogicalFile_layout) LogicalFiles;
+      BOOLEAN AllLogicalFilesExist;
+   end;
+   
+ END;
+
 
 END;
 

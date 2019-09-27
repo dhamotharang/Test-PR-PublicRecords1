@@ -1,4 +1,4 @@
-﻿import tools,bipv2_proxid,bipv2_proxid_mj6,BizLinkFull,BIPV2_Best,BIPV2_Relative,TopBusiness_BIPV2,BIPV2_Seleid_Relative,bipv2_lgid3,BIPv2_HRCHY;
+﻿import tools,bipv2_proxid,bipv2_proxid_mj6,BizLinkFull,BIPV2_Best,BIPV2_Relative,TopBusiness_BIPV2,BIPV2_Seleid_Relative,bipv2_lgid3,BIPv2_HRCHY,BIPV2_Crosswalk;
 
 EXPORT keynames(
 
@@ -35,6 +35,7 @@ module
 	export biz_preferred             := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::biz_preferred'                               ,pversion    );
 
   export BIPV2FullKeys := 
+    (
       linkids                 .dall_filenames
 		+ linkids_hidden					.dall_filenames //newly added	
     + translations            .dall_filenames
@@ -44,6 +45,7 @@ module
     + aml_addr                .dall_filenames
     + biz_preferred           .dall_filenames
     + BIPv2_HRCHY.keynames            (pversion,pUseOtherEnvironment).dall_filenames
+    + BIPV2_Crosswalk.filenames(pversion,pUseOtherEnvironment).dall_filenames
  //   + bipv2_proxid.keynames(pversion).attribute_matches     .dall_filenames
     + bipv2_proxid.keynames           (pversion,pUseOtherEnvironment).match_candidates_debug.dall_filenames
     + bipv2_proxid.keynames           (pversion,pUseOtherEnvironment).specificities_debug   .dall_filenames
@@ -57,6 +59,8 @@ module
     // + BIPV2_Relative.keynames         (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Seleid_Relative.keynames  (pversion,pUseOtherEnvironment).dall_filenames
     + TopBusiness_BIPV2.KeyNames      (pversion,pUseOtherEnvironment).dall_filenames
+    )
+    (~regexfind('ext_data',logicalname,nocase)) //remove external xlink keys because they are not in this package
     ;
     
   export BIPV2WeeklyKeys := 

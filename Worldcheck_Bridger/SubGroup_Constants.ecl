@@ -272,6 +272,8 @@
 		export string TRADE_UNION					:= '22';
 		export string PORT							:= '23';
 		export string VESSEL						:= '24';
+		export string CRIME_TERROR				:= '25';
+		export string NONCONVICTION_TERROR				:= '26';
 	end;
 
 	export numSubCategory := module
@@ -1113,6 +1115,45 @@
 		export string KEYWORD_TRL_WC								:= '801';
 		export string KEYWORD_CAPTA_561							:= '802';
 		export string KEYWORD_PSPMA_LFL							:= '803';
+		export string KEYWORD_NLPOL									:= '804';
+		export string KEYWORD_NLDNB									:= '805';
+		export string KEYWORD_ZA_FICTFS							:= '806';
+		export string KEYWORD_DKDPA									:= '807';
+		export string KEYWORD_NLDPA									:= '808';
+		export string KEYWORD_NODPA									:= '809';
+		export string KEYWORD_CZDPA									:= '810';
+		export string KEYWORD_HUDPA									:= '811';
+		export string KEYWORD_ICDPA									:= '812';
+		export string KEYWORD_MDBP_W								:= '813';
+		export string KEYWORD_NLACM									:= '814';
+		export string KEYWORD_NONBIM								:= '815';
+		export string KEYWORD_SLGAZ_PO							:= '816';
+		export string KEYWORD_NIB										:= '817';
+		export string KEYWORD_BRIBAMA								:= '818';
+		export string KEYWORD_CARBQ									:= '819';
+		export string KEYWORD_AZFMS_NAT							:= '820';
+		export string KEYWORD_BECA									:= '821';
+		export string KEYWORD_OFAC_NICHRAA					:= '822';
+		export string KEYWORD_CANSEMNIC							:= '823';
+		export string KEYWORD_GHSEC									:= '824';
+		export string KEYWORD_NABON									:= '825';
+		export string KEYWORD_USCME									:= '826';
+		export string KEYWORD_INMSJE_NGO						:= '827';
+		export string KEYWORD_GIBNATSANC						:= '828';
+		export string KEYWORD_OFAC_EO13846					:= '829';
+		export string KEYWORD_TWMPB_DV							:= '830';
+		export string KEYWORD_ZMACC									:= '831';
+		export string KEYWORD_OFAC_EO13876					:= '832';
+		export string KEYWORD_TWTSA									:= '833';
+		export string KEYWORD_ARMJH_REPET						:= '834';
+		export string KEYWORD_OFAC_HIFPAA						:= '835';
+		export string KEYWORD_ILSHABAK							:= '836';
+		export string KEYWORD_FATF_SD								:= '837';
+		export string KEYWORD_USCBW_WC							:= '838';
+		export string KEYWORD_SEDPA									:= '839';
+		export string KEYWORD_LFSA_ALERT						:= '840';
+		export string KEYWORD_ESBDE									:= '841';
+		export string KEYWORD_CNCBIRC								:= '842';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

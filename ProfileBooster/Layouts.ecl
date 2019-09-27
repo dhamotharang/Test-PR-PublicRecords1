@@ -208,6 +208,9 @@ EXPORT Layout_Infutor := RECORD
 	string1 	marital_status;
 	string1 	gender;
 	string8		dob;
+	//Added for CCPA-10
+	UNSIGNED4 global_sid;
+	UNSIGNED8 record_sid;
 END;
 
 EXPORT Layout_PB_Slim := RECORD
@@ -957,4 +960,23 @@ RECORD
 
 END;
 
+// This layout is used for the One Main quarterly thor PB 1.0 job
+EXPORT LayoutPBInputThor := RECORD
+	// USING A SUBSET OF ProfileBooster.Layouts.Layout_PB_In HERE, THAT IS WHAT THE FUNCTION TAKES IN
+	qstring12  AcctNo;
+	unsigned6 LexID;
+	qSTRING20  Name_First;
+	qSTRING20  Name_Middle;
+	qSTRING20  Name_Last;
+	qSTRING5   Name_Suffix;
+	qSTRING9   ssn;
+	qSTRING10	phone10;
+	string addressline1;
+	string addressline2;
+  string50 streetaddress; 
+	qSTRING25  City_name;
+	STRING2   st;
+	qSTRING5   z5;
+	qSTRING4 z4;
+END;
 END;

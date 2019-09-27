@@ -1,4 +1,4 @@
-IMPORT AID;
+﻿IMPORT AID;
 
 EXPORT Layouts :=
 	MODULE
@@ -125,6 +125,11 @@ EXPORT Layouts :=
 						//Added for Shell 5.0 project 6/3/13
 						STRING5		tier2;
 						STRING2   source := '';
+
+						//CCPA-107 Add 2 new fields to base file, and 2 keys
+						UNSIGNED4 global_sid;
+						UNSIGNED8 record_sid;
+						
 					END;
 					
 					EXPORT layout_KeyExclusions_tier2 := RECORD

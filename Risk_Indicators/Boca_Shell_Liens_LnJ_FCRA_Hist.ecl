@@ -1,4 +1,4 @@
-import doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD;
+﻿import doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD;
  
 export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0, 
 		GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections,
@@ -231,6 +231,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.Filingnumber := ri.Filing_number;
 		SELF.Filingbook := ri.Filing_book;
 		SELF.Filingpage := ri.Filing_page;
+		SELF.AgencyID := ri.AgencyID;
 		SELF.Agency := ri.Agency;
 		SELF.Agencycounty := ri.Agency_County;
 		SELF.Agencystate := ri.Agency_state;
@@ -621,6 +622,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.Filingnumber := le.Filingnumber;
 		SELF.Filingbook := le.Filingbook;
 		SELF.Filingpage := le.Filingpage;
+		SELF.AgencyID := le.AgencyID;
 		SELF.Agency := le.Agency;
 		SELF.Agencycounty := le.Agencycounty;
 		SELF.Agencystate := le.Agencystate;

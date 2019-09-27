@@ -1,11 +1,10 @@
-import doxie, ut, property;
+﻿import doxie, ut, property;
 
 // Foreclosure_Address := property.file_Foreclosure;
 
 // Suppressing 4 Foreclosure IDs as part of dispute database Bug#: 60282 and bugzilla bug#: 170863
 FC_ids := ['058118BANKOFAMERICA', '058118ESCOBARCARLOSG', '1079290090820TRUCAPREOCORP', '1079290090820TRUCAPGRANTORTRUST2010-1','14944559950000SOUTHERNBK&TRUST', '14944559950000RABIMIKE'];
 Foreclosure_Address := property.file_Foreclosure(Trim(foreclosure_id, left, right) not in FC_ids);
-
 
 Layout_Foreclosure_In_Slim :=  record
   string70 foreclosure_id;
@@ -15,7 +14,7 @@ Layout_Foreclosure_In_Slim :=  record
   string3  deed_category;
   string55 deed_desc;
   string3  document_type;
-  string40 document_desc;
+  string55 document_desc;
   string8  recording_date;
   string4  document_year;
   string12 document_nbr;
@@ -225,6 +224,14 @@ Layout_Foreclosure_In_Slim :=  record
   // string4  situs2_err_stat;
 
   string8 process_date;
+	string1		lender_type;
+	string55	lender_type_desc;
+	string10	loan_amount;
+	string1		loan_type;
+	string60	loan_type_desc;
+	string2		source;	//FR = CL, 'B7' = BK_NOD, 'I5' = BK_REO
+	unsigned4 global_sid;	//CCPA field
+	unsigned8 record_sid;	//CCPA field
   // string2 crlf;
 end;
 
@@ -233,8 +240,11 @@ slim := project(Foreclosure_Address, Layout_Foreclosure_In_Slim);
 cleaned := slim(situs1_zip !='' and 
 								situs1_prim_range !='' and 
 								situs1_prim_name !='');
+								
+//should prevent duplicate records within each source but may have duplicates across sources - DF-26073
+dedCleaned := DEDUP(SORT(cleaned,foreclosure_id,-process_date),ALL, EXCEPT process_date); 
 							
-export key_foreclosures_addr := index(cleaned,{
+export key_foreclosures_addr := index(dedCleaned,{
 																		situs1_zip, 
 																		situs1_prim_range, 
 																		situs1_prim_name, 

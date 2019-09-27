@@ -1,0 +1,50 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_FBNV2
+FILENAME:FBNV2
+NAMESCOPE:Input_TX_Harris
+//-------------------------
+//FIELDTYPE DEFINITIONS
+//-------------------------
+FIELDTYPE:invalid_mandatory:LENGTHS(1..)
+FIELDTYPE:invalid_past_date:CUSTOM(Scrubs.fn_valid_pastDate > 0)
+
+//--------------------------------------------------------------- 
+//FIELDS -- Commented out fields are not being scrubbed
+//---------------------------------------------------------------
+// FIELD:process_date:TYPE(STRING):0,0
+FIELD:FILE_NUMBER:TYPE(STRING20):LIKE(invalid_mandatory):0,0
+// FIELD:RECORD_TYPE:TYPE(STRING):0,0
+FIELD:NAME1:TYPE(STRING192):LIKE(invalid_mandatory):0,0
+// FIELD:STREET_ADD1:TYPE(STRING):0,0	
+// FIELD:CITY1:TYPE(STRING):0,0	
+// FIELD:STATE1:TYPE(STRING):0,0	
+// FIELD:ZIP1:TYPE(STRING):0,0	
+// FIELD:TERM:TYPE(STRING):0,0	
+FIELD:NAME2:TYPE(STRING192):LIKE(invalid_mandatory):0,0
+// FIELD:STREET_ADD2:TYPE(STRING):0,0	
+// FIELD:CITY2:TYPE(STRING):0,0	
+// FIELD:STATE2:TYPE(STRING):0,0	
+// FIELD:ZIP2:TYPE(STRING):0,0	
+// FIELD:FILM_CODE:TYPE(STRING):0,0	
+// FIELD:BUS_TYPE:TYPE(STRING):0,0	
+// FIELD:ANNEX_CODE:TYPE(STRING):0,0	
+// FIELD:NUM_PAGES:TYPE(STRING):0,0 //NEW
+// FIELD:EXPIRED_TERM:TYPE(STRING):0,0 //NEW
+// FIELD:INCORPORATED:TYPE(STRING):0,0 //NEW
+// FIELD:ASSUMED_NAME:TYPE(STRING):0,0 //NEW
+FIELD:prep_addr1_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
+FIELD:prep_addr1_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
+FIELD:prep_addr2_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
+FIELD:prep_addr2_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
+// FIELD:name1_title:TYPE(STRING):0,0
+// FIELD:name1_fname:TYPE(STRING):0,0
+// FIELD:name1_mname:TYPE(STRING):0,0
+// FIELD:name1_lname:TYPE(STRING):0,0
+// FIELD:name1_name_suffix:TYPE(STRING):0,0
+// FIELD:name1_name_score:TYPE(STRING):0,0
+// FIELD:name2_title:TYPE(STRING):0,0
+// FIELD:name2_fname:TYPE(STRING):0,0
+// FIELD:name2_mname:TYPE(STRING):0,0
+// FIELD:name2_lname:TYPE(STRING):0,0
+// FIELD:name2_name_suffix:TYPE(STRING):0,0
+// FIELD:name2_name_score:TYPE(STRING):0,0

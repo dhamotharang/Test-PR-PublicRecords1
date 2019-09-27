@@ -1,7 +1,7 @@
-
+﻿
 IMPORT _control;
 
-SHARED get_product_name(AccountMonitoring.types.productMask nth_product) := 
+ get_product_name(AccountMonitoring.types.productMask nth_product) := 
 	FUNCTION
 		product_name := 
 			CASE( nth_product,
@@ -31,6 +31,8 @@ SHARED get_product_name(AccountMonitoring.types.productMask nth_product) :=
 				 AccountMonitoring.types.productMask.mvr	 					 => 'MVR',
 				 AccountMonitoring.types.productMask.aircraft				 => 'AIRCRAFT',
 				 AccountMonitoring.types.productMask.watercraft			 => 'WATERCRAFT',
+				 AccountMonitoring.types.productMask.personheader			 => 'PERSONHEADER',
+				 AccountMonitoring.types.productMask.email    			 => 'EMAIL',
 				'UNKNOWN'
 			);
 		RETURN product_name;
@@ -221,4 +223,3 @@ EXPORT fn_generate_ecm_metrics( UNSIGNED1 pseudo_environment,
 		);
 
 	END;
-	

@@ -300,11 +300,14 @@ module
 
 	export id_raw :=
 	module
-
-		export vendorRaw                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::vendorRaw::id',landing_zone,,,547,,pGroupname,,,'FIXED',,,,,);
-
+		export Filing 						       := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::id',landing_zone,,,,,pGroupname,,,'VARIABLE');
+		export FilingName 					     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filingname::id',landing_zone,,,,,pGroupname,,,'VARIABLE');
+		export Party 						         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::party::id',landing_zone,,,,,pGroupname,,,'VARIABLE');
+		
 		export dAll_filenames :=
-			  vendorRaw.dAll_filenames
+			  Filing.dAll_filenames
+			+ FilingName.dAll_filenames
+			+ Party.dAll_filenames
 			;
 
 	end;
@@ -622,28 +625,16 @@ module
 	export nd_raw :=
 	module
 
-		export Corpa_Vendor              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corpa_Vendor::nd'				,landing_zone,,,1901	,,pGroupname,,,'FIXED',,,,,);
-		export Corpb_Vendor              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corpb_Vendor::nd'				,landing_zone,,,1901	,,pGroupname,,,'FIXED',,,,,);
-		export Fictitios1_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Fictitios1_Vendor::nd'	,landing_zone,,,2601	,,pGroupname,,,'FIXED',,,,,);
-		export Fictitios2_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Fictitios2_Vendor::nd'	,landing_zone,,,2601	,,pGroupname,,,'FIXED',,,,,);
-		export Partnership_Vendor        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Partnership_Vendor::nd'	,landing_zone,,,15001,,pGroupname,,,'FIXED',,,,,);
-		export Trademarks1_Vendor        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Trademarks1_Vendor::nd'	,landing_zone,,,2601	,,pGroupname,,,'FIXED',,,,,);
-		export Trademarks2_Vendor        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Trademarks2_Vendor::nd'	,landing_zone,,,2601	,,pGroupname,,,'FIXED',,,,,);
-		export Tradename1_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Tradename1_Vendor::nd'	,landing_zone,,,2651	,,pGroupname,,,'FIXED',,,,,);
-		export Tradename2_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Tradename2_Vendor::nd'	,landing_zone,,,2651	,,pGroupname,,,'FIXED',,,,,);
-		export State_Country_Table       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::State_Country_Table::nd',landing_zone,,,,, pGroupname,,,'VARIABLE',,350,,'\\n',);
+		export Filing                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::nd'				    ,landing_zone,,,,, pGroupname,,,'VARIABLE');
+		export Owner                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::owner::nd'				    ,landing_zone,,,,, pGroupname,,,'VARIABLE');
+		export Trademark                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::trademark::nd'	      ,landing_zone,,,,, pGroupname,,,'VARIABLE');
+		export TrademarkClass             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::trademark_class::nd'	,landing_zone,,,,, pGroupname,,,'VARIABLE');
 
 		export dAll_filenames :=
-			  Corpa_Vendor.dAll_filenames
-			+ Corpb_Vendor.dAll_filenames
-			+ Fictitios1_Vendor.dAll_filenames
-			+ Fictitios2_Vendor.dAll_filenames
-			+ Partnership_Vendor.dAll_filenames
-			+ Trademarks1_Vendor.dAll_filenames
-			+ Trademarks2_Vendor.dAll_filenames
-			+ Tradename1_Vendor.dAll_filenames
-			+ Tradename2_Vendor.dAll_filenames
-			+ State_Country_Table.dAll_filenames
+			  Filing.dAll_filenames
+			+ Owner.dAll_filenames
+			+ Trademark.dAll_filenames
+			+ TrademarkClass.dAll_filenames
 			;
 
 	end;

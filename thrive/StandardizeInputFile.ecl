@@ -1,4 +1,4 @@
-IMPORT  ut, mdr, std, tools,_validate;
+﻿IMPORT  _control, MDR, ut, mdr, std, tools,_validate;
 EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= function
 thrive.layouts.base tPDMapping(thrive.layouts.input_PD L, C) := TRANSFORM
 	SELF.src    := mdr.sourceTools.src_thrive_PD;							//	Code to indicate source: 'PD' or 'LT'
@@ -94,8 +94,10 @@ END;
 dLTMapped := PROJECT(thrive.Files(filedate,pUseProd).input_LT,tLTMapping(LEFT, counter));
 
 dCombined := dPDMapped + dLTMapped;
+
+addGlobalSID 	:= MDR.macGetGlobalSid(dCombined, 'Thrive', '', 'global_sid'); //DF-25710: Populate Global_SIDs
 																						
-unique_recs := dedup(sort(distribute(dCombined,hash(Phone_Work)), record, except persistent_record_id, local),all, except persistent_record_id, local);
+unique_recs 	:= dedup(sort(distribute(addGlobalSID,hash(Phone_Work)), record, except persistent_record_id, local),all, except persistent_record_id, local);
 					
 return unique_recs;
 END;

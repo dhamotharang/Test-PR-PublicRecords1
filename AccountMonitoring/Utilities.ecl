@@ -1,4 +1,4 @@
-// A set of utility functions that can be run to effect change within the Account Monitoring system.
+﻿// A set of utility functions that can be run to effect change within the Account Monitoring system.
 
 IMPORT _control;
 
@@ -170,6 +170,12 @@ export Utilities := MODULE
 			// ***** Watercraft Update *****
 		update_history_file_watercraft := fn_purge_history( product_cfg.watercraft, timestamp, purge_pid, purge_rid );
 
+  	// ***** PersonHeader Update *****
+		update_history_file_personheader := fn_purge_history( product_cfg.personheader, timestamp, purge_pid, purge_rid );
+
+  	// ***** Email Update *****
+		update_history_file_email := fn_purge_history( product_cfg.email, timestamp, purge_pid, purge_rid );
+
 
 		update_history_files := PARALLEL( IF(product_cfg.bankruptcy.product_is_in_mask,update_history_file_bankruptcy), 
 													 IF(product_cfg.address.product_is_in_mask,update_history_file_address),
@@ -195,7 +201,9 @@ export Utilities := MODULE
 													 IF(product_cfg.corp.product_is_in_mask,update_history_file_corp),
 													 IF(product_cfg.mvr.product_is_in_mask,update_history_file_mvr),
 													 IF(product_cfg.aircraft.product_is_in_mask,update_history_file_aircraft),
-													 IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft)
+													 IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft),
+													 IF(product_cfg.personheader.product_is_in_mask,update_history_file_personheader),
+													 IF(product_cfg.email.product_is_in_mask,update_history_file_email)
 												  );
 		
 		RETURN SEQUENTIAL(
@@ -268,6 +276,8 @@ export Utilities := MODULE
 		update_history_file_mvr := fn_purge_history_multi( product_cfg.mvr, timestamp, purge_pids, purge_rids );
 		update_history_file_aircraft := fn_purge_history_multi( product_cfg.aircraft, timestamp, purge_pids, purge_rids );
 		update_history_file_watercraft := fn_purge_history_multi( product_cfg.watercraft, timestamp, purge_pids, purge_rids );
+		update_history_file_personheader := fn_purge_history_multi( product_cfg.personheader, timestamp, purge_pids, purge_rids );
+		update_history_file_email := fn_purge_history_multi( product_cfg.email, timestamp, purge_pids, purge_rids );
 
 		update_history_files := PARALLEL(IF(product_cfg.bankruptcy.product_is_in_mask,update_history_file_bankruptcy), 
 													IF(product_cfg.address.product_is_in_mask,update_history_file_address),
@@ -293,7 +303,9 @@ export Utilities := MODULE
 													IF(product_cfg.corp.product_is_in_mask,update_history_file_corp),
 													IF(product_cfg.mvr.product_is_in_mask,update_history_file_mvr),
 													IF(product_cfg.aircraft.product_is_in_mask,update_history_file_aircraft),
-													IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft));
+													IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft),
+													IF(product_cfg.personheader.product_is_in_mask,update_history_file_personheader),
+													IF(product_cfg.email.product_is_in_mask,update_history_file_email));
 		
 		RETURN SEQUENTIAL(
 			IF(pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT OR pseudo_environment NOT IN AccountMonitoring.constants.all_pseudo,
@@ -476,6 +488,8 @@ export Utilities := MODULE
 		mac_build_purge_fn(mvr);
 		mac_build_purge_fn(aircraft);
 		mac_build_purge_fn(watercraft);
+		mac_build_purge_fn(personheader);
+		mac_build_purge_fn(email);
 		
 	END;
 
@@ -497,31 +511,33 @@ export Utilities := MODULE
 			      document_purge(pseudo_env, ds_purge_pids, timestamp).doctype());	
 			ENDMACRO;
 		
-		mac_purge_doc_file(pm.bankruptcy     , bankruptcy     , purge_bankruptcy)
-		mac_purge_doc_file(pm.deceased       , deceased       , purge_deceased)
-		mac_purge_doc_file(pm.address        , address        , purge_address)
-		mac_purge_doc_file(pm.phone          , phone          , purge_phone)
-		mac_purge_doc_file(pm.paw            , paw            , purge_paw)
-		mac_purge_doc_file(pm.property       , property       , purge_property)
-		mac_purge_doc_file(pm.litigiousdebtor, litigiousdebtor, purge_litigiousdebtor)
-		mac_purge_doc_file(pm.liens          , liens          , purge_liens)
-		mac_purge_doc_file(pm.criminal       , criminal       , purge_criminal)
-		mac_purge_doc_file(pm.phonefeedback  , phonefeedback  , purge_phonefeedback)
-		mac_purge_doc_file(pm.foreclosure    , foreclosure    , purge_foreclosure)
-		mac_purge_doc_file(pm.workplace      , workplace      , purge_workplace)
-		mac_purge_doc_file(pm.reverseaddress , reverseaddress , purge_reverseaddress)
-		mac_purge_doc_file(pm.didupdate 		 , didupdate 			, purge_didupdate)
-		mac_purge_doc_file(pm.bdidupdate 		 , bdidupdate 		, purge_bdidupdate)
-		mac_purge_doc_file(pm.phoneownership , phoneownership	, purge_phoneownership)
-		mac_purge_doc_file(pm.bipbestupdate  , bipbestupdate	, purge_bipbestupdate)
-		mac_purge_doc_file(pm.sbfe  				 , sbfe						, purge_sbfe)
-		mac_purge_doc_file(pm.ucc  				 	 , ucc						, purge_ucc)
-		mac_purge_doc_file(pm.govtdebarred 	 , govtdebarred		, purge_govtdebarred)
-		mac_purge_doc_file(pm.inquiry			 	 , inquiry				, purge_inquiry)
-		mac_purge_doc_file(pm.corp 				 	 , corp						, purge_corp)
-		mac_purge_doc_file(pm.mvr  				 	 , mvr						, purge_mvr)
-		mac_purge_doc_file(pm.aircraft  	 	 , aircraft				, purge_aircraft)
-		mac_purge_doc_file(pm.watercraft	 	 , watercraft			, purge_watercraft)
+		mac_purge_doc_file(pm.bankruptcy     , bankruptcy     , purge_bankruptcy);
+		mac_purge_doc_file(pm.deceased       , deceased       , purge_deceased);
+		mac_purge_doc_file(pm.address        , address        , purge_address);
+		mac_purge_doc_file(pm.phone          , phone          , purge_phone);
+		mac_purge_doc_file(pm.paw            , paw            , purge_paw);
+		mac_purge_doc_file(pm.property       , property       , purge_property);
+		mac_purge_doc_file(pm.litigiousdebtor, litigiousdebtor, purge_litigiousdebtor);
+		mac_purge_doc_file(pm.liens          , liens          , purge_liens);
+		mac_purge_doc_file(pm.criminal       , criminal       , purge_criminal);
+		mac_purge_doc_file(pm.phonefeedback  , phonefeedback  , purge_phonefeedback);
+		mac_purge_doc_file(pm.foreclosure    , foreclosure    , purge_foreclosure);
+		mac_purge_doc_file(pm.workplace      , workplace      , purge_workplace);
+		mac_purge_doc_file(pm.reverseaddress , reverseaddress , purge_reverseaddress);
+		mac_purge_doc_file(pm.didupdate 		 , didupdate 			, purge_didupdate);
+		mac_purge_doc_file(pm.bdidupdate 		 , bdidupdate 		, purge_bdidupdate);
+		mac_purge_doc_file(pm.phoneownership , phoneownership	, purge_phoneownership);
+		mac_purge_doc_file(pm.bipbestupdate  , bipbestupdate	, purge_bipbestupdate);
+		mac_purge_doc_file(pm.sbfe  				 , sbfe						, purge_sbfe);
+		mac_purge_doc_file(pm.ucc  				 	 , ucc						, purge_ucc);
+		mac_purge_doc_file(pm.govtdebarred 	 , govtdebarred		, purge_govtdebarred);
+		mac_purge_doc_file(pm.inquiry			 	 , inquiry				, purge_inquiry);
+		mac_purge_doc_file(pm.corp 				 	 , corp						, purge_corp);
+		mac_purge_doc_file(pm.mvr  				 	 , mvr						, purge_mvr);
+		mac_purge_doc_file(pm.aircraft  	 	 , aircraft				, purge_aircraft);
+		mac_purge_doc_file(pm.watercraft	 	 , watercraft			, purge_watercraft);
+		mac_purge_doc_file(pm.personheader	 	 , personheader			, purge_personheader);
+		mac_purge_doc_file(pm.email	 	       , email			    , purge_email);
 							
 		RETURN SEQUENTIAL(
 			purge_bankruptcy, 
@@ -548,7 +564,9 @@ export Utilities := MODULE
 			purge_corp,
 			purge_mvr,
 			purge_aircraft,
-			purge_watercraft
+			purge_watercraft,
+			purge_personheader,
+			purge_email
 			);
 		
 	END;
@@ -657,6 +675,8 @@ export Utilities := MODULE
 		update_history_file_mvr  						:= fn_purge_straggler_history( product_cfg.mvr						, pseudo_environment, purge_pids );
 		update_history_file_aircraft				:= fn_purge_straggler_history( product_cfg.aircraft				, pseudo_environment, purge_pids );
 		update_history_file_watercraft			:= fn_purge_straggler_history( product_cfg.watercraft			, pseudo_environment, purge_pids );
+		update_history_file_personheader			:= fn_purge_straggler_history( product_cfg.personheader			, pseudo_environment, purge_pids );
+		update_history_file_email     			:= fn_purge_straggler_history( product_cfg.email			    , pseudo_environment, purge_pids );
 
 		update_history_files := PARALLEL(IF(product_cfg.bankruptcy.product_is_in_mask     ,update_history_file_bankruptcy), 
 													IF(product_cfg.address.product_is_in_mask        ,update_history_file_address),
@@ -682,7 +702,9 @@ export Utilities := MODULE
 													IF(product_cfg.corp.product_is_in_mask  			 	 ,update_history_file_corp),
 													IF(product_cfg.mvr.product_is_in_mask  				 	 ,update_history_file_mvr),
 													IF(product_cfg.aircraft.product_is_in_mask  	 	 ,update_history_file_aircraft),
-													IF(product_cfg.watercraft.product_is_in_mask  	 ,update_history_file_watercraft));
+													IF(product_cfg.watercraft.product_is_in_mask  	 ,update_history_file_watercraft),
+													IF(product_cfg.personheader.product_is_in_mask  	 ,update_history_file_personheader),
+													IF(product_cfg.email.product_is_in_mask  	       ,update_history_file_email));
 		
 		RETURN SEQUENTIAL(
 			IF(pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT OR pseudo_environment NOT IN AccountMonitoring.constants.all_pseudo,
@@ -799,7 +821,12 @@ export Utilities := MODULE
 			  // *****  Watercraft *****
 		   update_history_file_watercraft := fn_rollback_history( product_cfg.watercraft );
 	
-	
+	  // *****  PersonHeader *****
+		   update_history_file_personheader := fn_rollback_history( product_cfg.personheader );
+       
+	  // *****  Email *****
+		   update_history_file_email := fn_rollback_history( product_cfg.email );
+       
 		   update_history_files := PARALLEL( IF(product_cfg.bankruptcy.product_is_in_mask,update_history_file_bankruptcy), 
 													    IF(product_cfg.address.product_is_in_mask,update_history_file_address),
 													    IF(product_cfg.phone.product_is_in_mask,update_history_file_phone),
@@ -824,7 +851,9 @@ export Utilities := MODULE
 															IF(product_cfg.corp.product_is_in_mask,update_history_file_corp),
 															IF(product_cfg.mvr.product_is_in_mask,update_history_file_mvr),
 															IF(product_cfg.aircraft.product_is_in_mask,update_history_file_aircraft),
-															IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft)
+															IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft),
+															IF(product_cfg.personheader.product_is_in_mask,update_history_file_personheader),
+															IF(product_cfg.email.product_is_in_mask,update_history_file_email)
 													  );
 		
 		   RETURN SEQUENTIAL(

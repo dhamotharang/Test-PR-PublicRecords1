@@ -6,9 +6,27 @@ import ut,data_services, address, aid, lib_stringlib, address, did_add, Business
 
 /* hashes fields used to did, bdid. only outputs records that have changes (new or update) */
 export fnMapBaseAppendsJennynew(boolean isFCRA = false,
-																					string version = ut.GetDate)  := module
+																string version = ut.GetDate)  := module
 
-export base_file:=project(File_Inquiry_MBS(~(mbs.company_id = '1446154' and search_info.product_code = '1' and search_info.function_description = 'RISKINDICATORS.FLEXIDBATCHSERVICE' and search_info.datetime[..6] between '201303' and '201304') and //TEMPORARY
+Non_Batch_Base 						:= File_Inquiry_MBS(source<>'BATCH'); 
+
+Batch_D2C_filtered_Base   := File_Inquiry_MBS(source='BATCH' and 
+																							~(bus_intel.industry = 'DIRECT TO CONSUMER' and 
+																								search_info.function_description in [
+																								'ADDRBEST.BESTADDRESSBATCHSERVICE'
+																								,'BATCHSERVICES.AKABATCHSERVICE'
+																								,'BATCHSERVICES.DEATHBATCHSERVICE'
+																								,'BATCHSERVICES.EMAILBATCHSERVICE'
+																								,'BATCHSERVICES.PROPERTYBATCHSERVICE'
+																								,'DIDVILLE.DIDBATCHSERVICERAW'
+																								,'DIDVILLE.RANBESTINFOBATCHSERVICE'
+																								,'PROGRESSIVEPHONE.PROGRESSIVEPHONEWITHFEEDBACKBATCHSERVICE']
+																								)
+																						);   
+D2C_filtered_base := Non_Batch_Base + Batch_D2C_filtered_Base;
+
+base_file_before_usa_filter:=project(D2C_filtered_base(
+                       ~(mbs.company_id = '1446154' and search_info.product_code = '1' and search_info.function_description = 'RISKINDICATORS.FLEXIDBATCHSERVICE' and search_info.datetime[..6] between '201303' and '201304') and //TEMPORARY
 											 ~(mbs.company_id = '1590195' and search_info.product_code = '1' and search_info.function_description = 'RISKINDICATORS.FLEXIDBATCHSERVICE' and search_info.datetime[..6] between '201304' and '201304') and //TEMPORARY
 											 ~((mbs.company_id = '1534586' or mbs.global_company_id = '16952912') and search_info.function_description = 'FRAUDPOINT' and search_info.datetime[..6] between '201301' and '201302') and //TEMPORARY
  											 ~(mbs.company_id = '1015303' and search_info.datetime[..8] between '20160121' and '20160908') and
@@ -21,7 +39,36 @@ export base_file:=project(File_Inquiry_MBS(~(mbs.company_id = '1446154' and sear
 												~search_info.function_description[1..4] ='FCRA' and
 												~search_info.function_description[1..8]='RISKVIEW' AND
 											 mbs.company_id + mbs.global_company_id <> ''),Inquiry_AccLogs.Layout.Common_ThorAdditions_non_FCRA);
-;
+
+// Apply USA filter
+File_MBS 					:= Inquiry_AccLogs.File_MBS.File;
+NonBatch_Base    	:= base_file_before_usa_filter(source not in ['BATCHR3','BATCH']);
+Batch_Base    		:= base_file_before_usa_filter(source in ['BATCHR3','BATCH']);
+
+jnByProd		 	:= join(NonBatch_Base, FILE_MBS, 
+										 left.search_info.product_code   = right.product_id and                    
+										 left.mbs.company_id = right.company_id, 
+										 left outer, lookup);	
+
+jnSubAccd    	:= join(project(jnByProd(sub_acct_id = ''), recordof(NonBatch_Base)), File_MBS,  
+											 trim(left.mbs.global_company_id,all) = trim(right.gc_id,all),
+												left outer, lookup);						
+
+NonBatch_Base_MBS				:= jnByProd(sub_acct_id <> '') + jnSubAccd;
+
+Batch_Base_MBS		    	:= join(Batch_Base, FILE_MBS,  
+													 trim(left.mbs.global_company_id,all) = trim(right.gc_id,all),
+														left outer, lookup);						
+
+Full_Base_MBS   := NonBatch_Base_MBS + Batch_Base_MBS;
+
+USA_Base_MBS       := Full_Base_MBS(country = 'UNITED STATES');
+
+USA_Base := project(USA_Base_MBS, Inquiry_AccLogs.Layout.Common_ThorAdditions_non_FCRA);
+
+//////////////////////////////////////////////////////////
+
+export Base_File := USA_Base;
 
 export FCRAtag := if(isFCRA, 'FCRA::', '');
 

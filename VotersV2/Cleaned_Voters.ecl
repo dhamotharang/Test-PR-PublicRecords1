@@ -1,7 +1,7 @@
 ﻿/*2015-04-02T17:22:34Z (Metzmaier, AJ (RIS-DAY))
 Bug 108818 - Code changes due to layout rework and/or additional validation.
 */
-import _Validate, Address, ut, lib_stringlib;
+import _Validate, ut, lib_stringlib;
 
 export Cleaned_Voters(string filedate) := function
 
@@ -37,102 +37,7 @@ export Cleaned_Voters(string filedate) := function
 		                             l.file_acquired_date,
 																 '');
 		the_gender             := ut.fnTrim2Upper(l.gender);
-
-		string73 tempName :=
-		  if(the_first_name != '' or the_last_name != '',
-		     StringLib.StringToUpperCase(
-				   Address.CleanPersonFML73(StringLib.StringCleanSpaces(the_first_name + ' ' +
-				                                                           the_middle_name + ' ' +
-																																   the_last_name + ' ' +
-																																   the_name_suffix))),
-				 '');
-
-		string73 tempMaidenPri := if(the_maiden_prior != '',
-																 StringLib.StringToUpperCase(Address.CleanPerson73(the_maiden_prior)),
-																 '');
-																														 
-		string182 tempAddress := if(the_res_Addr1 != '' or the_res_Addr2 != '' or the_res_city != '' or
-																   the_res_state != '' or (integer)the_res_zip != 0,
-															  StringLib.StringToUpperCase(
-																  Address.CleanAddress182(trim(the_res_Addr1 + ' ' + the_res_Addr2),
-																						              trim(the_res_city + ', ' + the_res_state +
-																												          ' ' + the_res_zip))),
-																'');
-
-		string182 tempMailAddress := if(the_mail_addr1 != '' or the_mail_addr2 != '' or the_mail_city != '' or
-																       the_mail_state != '' or (integer)the_mail_zip != 0,
-															      StringLib.StringToUpperCase(
-																		  Address.CleanAddress182(trim(the_mail_addr1 + ' ' + the_mail_addr2),
-																						                  trim(the_mail_city + ', ' + the_mail_state +
-																														          ' ' + the_mail_zip))),
-																    '');
-		
 		self.vtid                  := 0;
-		self.title			           := tempName[1..5];
-		self.fname			           := tempName[6..25];
-		self.mname			           := tempName[26..45];
-		self.lname			           := tempName[46..65];
-		self.name_suffix	         := tempName[66..70];
-		self.name_score			       := tempName[71..73];
-		self.clean_maiden_pri      := tempMaidenPri[46..65];
-		self.prim_range    		     := tempAddress[1..10];
-		self.predir 	      	     := tempAddress[11..12];
-		self.prim_name 	  		     := tempAddress[13..40];
-		self.addr_suffix   		     := tempAddress[41..44];
-		self.postdir 	    	       := tempAddress[45..46];
-		self.unit_desig 	  	     := tempAddress[47..56];
-		self.sec_range 	  		     := tempAddress[57..64];
-		self.p_city_name	  	     := tempAddress[65..89];
-		self.v_city_name	  	     := tempAddress[90..114];
-		self.st 			             := if(tempAddress[115..116] = '',
-									                   ziplib.ZipToState2(tempAddress[117..121]),
-										                 tempAddress[115..116]);
-		self.zip 		      	       := tempAddress[117..121];
-		self.zip4 		      	     := tempAddress[122..125];
-		self.cart 		      	     := tempAddress[126..129];
-		self.cr_sort_sz 	 	       := tempAddress[130];
-		self.lot 		      	       := tempAddress[131..134];
-		self.lot_order 	  		     := tempAddress[135];
-		self.dpbc 		      	     := tempAddress[136..137];
-		self.chk_digit 	  		     := tempAddress[138];
-		self.rec_type		  	       := tempAddress[139..140];
-		self.ace_fips_st	  	     := tempAddress[141..142];
-		self.fips_county 	         := tempAddress[143..145];
-		self.geo_lat 	    	       := tempAddress[146..155];
-		self.geo_long 	    	     := tempAddress[156..166];
-		self.msa 		      	       := tempAddress[167..170];
-		self.geo_blk               := tempAddress[171..177];
-		self.geo_match 	  	       := tempAddress[178];
-		self.err_stat 	           := tempAddress[179..182];
-		self.mail_prim_range       := tempMailAddress[1..10];
-		self.mail_predir 	         := tempMailAddress[11..12];
-		self.mail_prim_name 	     := tempMailAddress[13..40];
-		self.mail_addr_suffix      := tempMailAddress[41..44];
-		self.mail_postdir 	       := tempMailAddress[45..46];
-		self.mail_unit_desig 	     := tempMailAddress[47..56];
-		self.mail_sec_range 	     := tempMailAddress[57..64];
-		self.mail_p_city_name	     := tempMailAddress[65..89];
-		self.mail_v_city_name	     := tempMailAddress[90..114];
-		self.mail_st 			         := if(tempMailAddress[115..116] = '',
-									                   ziplib.ZipToState2(tempMailAddress[117..121]),
-										                 tempMailAddress[115..116]);
-		self.mail_ace_zip 		     := tempMailAddress[117..121];
-		self.mail_zip4 		         := tempMailAddress[122..125];
-		self.mail_cart 		         := tempMailAddress[126..129];
-		self.mail_cr_sort_sz 	     := tempMailAddress[130];
-		self.mail_lot 		         := tempMailAddress[131..134];
-		self.mail_lot_order 	     := tempMailAddress[135];
-		self.mail_dpbc 		         := tempMailAddress[136..137];
-		self.mail_chk_digit 	     := tempMailAddress[138];
-		self.mail_rec_type		     := tempMailAddress[139..140];
-		self.mail_ace_fips_st	     := tempMailAddress[141..142];
-		self.mail_fips_county 	   := tempMailAddress[143..145];
-		self.mail_geo_lat 	       := tempMailAddress[146..155];
-		self.mail_geo_long 	       := tempMailAddress[156..166];
-		self.mail_msa 		         := tempMailAddress[167..170];
-		self.mail_geo_blk          := tempMailAddress[171..177];
-		self.mail_geo_match 	     := tempMailAddress[178];
-		self.mail_err_stat 	       := tempMailAddress[179..182];
 		self.file_acquired_date    := the_file_acquired_date;
 		self.process_date		       := the_file_acquired_date;
 		self.date_first_seen       := self.process_date;
@@ -432,6 +337,7 @@ export Cleaned_Voters(string filedate) := function
 		                                 l.LastDateVote,
 																		 '');
 		self                       := l;
+		self := [];
 	end;
 
 	Cleaned_Voters_File := project(In_Voters_File, getCleanVoters(left));

@@ -1,4 +1,4 @@
-IMPORT AID;
+﻿IMPORT AID;
 
 export Layout_Foreclosure_In :=  record
   string70 foreclosure_id;

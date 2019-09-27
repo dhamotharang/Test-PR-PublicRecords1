@@ -1,4 +1,4 @@
-import _control;
+﻿import _control;
 // #option('maxLength', 131072); // have to increase for the remote directory child datasets
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -357,23 +357,23 @@ module
 
 		end;
 		
-		userid 		:= _control.MyInfo.UserID;
-		password	:= _control.MyInfo.Password;
+		// userid 		:= _control.MyInfo.UserID;
+		// password	:= _control.MyInfo.Password;
 
-		userid_prod 	:= _control.MyInfo.UserID_prod;
-		password_prod	:= _control.MyInfo.Password_prod;
+		// userid_prod 	:= _control.MyInfo.UserID_prod;
+		// password_prod	:= _control.MyInfo.Password_prod;
 
     url1 := 'http://' + pEsp + '/WsAttributes';
-    url2 := 'http://' + userid      + ':' + password      + '@' + pEsp + '/WsAttributes';
-    url3 := 'http://' + userid_prod + ':' + password_prod + '@' + pEsp + '/WsAttributes';
-    url := map(
-       _Constants.IsDataland = true  and pEsp = '10.241.12.207:8145'  => url1
-      ,_Constants.IsDataland = true  and pEsp = '10.173.84.202:8145' => url3
-      ,_Constants.IsDataland = false and pEsp = '10.173.84.202:8145' => url1
-      ,_Constants.IsDataland = false and pEsp = '10.241.12.207:8145'  => url2
-      ,''
-    );
-
+    // url2 := 'http://' + userid      + ':' + password      + '@' + pEsp + '/WsAttributes';
+    // url3 := 'http://' + userid_prod + ':' + password_prod + '@' + pEsp + '/WsAttributes';
+    // url := map(
+       // _Constants.IsDataland = true  and pEsp = '10.241.12.207:8145'  => url1
+      // ,_Constants.IsDataland = true  and pEsp = '10.173.84.202:8145' => url3
+      // ,_Constants.IsDataland = false and pEsp = '10.173.84.202:8145' => url1
+      // ,_Constants.IsDataland = false and pEsp = '10.241.12.207:8145'  => url2
+      // ,''
+    // );
+    url := url1;
 		results := SOAPCALL(
 				url
 			,'RenameAttributes'

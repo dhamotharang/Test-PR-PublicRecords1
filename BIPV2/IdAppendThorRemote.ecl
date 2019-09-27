@@ -5,12 +5,13 @@ EXPORT IdAppendThorRemote(
 		,unsigned scoreThreshold = 75
 		,unsigned weightThreshold = 0
 		,boolean disableSaltForce = true
-		,boolean primForcePost = false 
+		,boolean primForcePost = false // not being used
 		,boolean useFuzzy = true
 		,boolean doZipExpansion = true
 		,boolean reAppend = true
 		,boolean mimicRoxie = false // This is for ease of testing and can cause slower performance
 		                            // on thor appends so should not be used for production.
+		,string svcAppendUrl = ''
 	) := module
 
 	shared serviceName := 'BizLinkFull.svcappend';
@@ -30,16 +31,16 @@ EXPORT IdAppendThorRemote(
 		+ if(val, 'true', 'false')
 		+ '</' + element + '>';
 
-	
-	isProd := _control.ThisEnvironment.Name = 'Prod';
-	certUrl := _control.RoxieEnv.boca_certvip;
-	prodUrl := _control.RoxieEnv.boca_prodvip;
-	shared urlBipAppend := if(isProd, prodUrl, certUrl);
+
+	prodUrl := IdConstants.URL_ROXIE_PROD;
+	inputUrl := if(svcAppendUrl[1..7] = 'http://', svcAppendUrl[8..], svcAppendUrl);
+	shared urlBipAppend := if(svcAppendUrl = '', prodUrl, inputUrl);
+
 
 	shared pipeParms := xmlUnsigned('score_threshold', scoreThreshold)
 		+ xmlUnsigned('weight_threshold', weightThreshold)
 		+ xmlBool('disable_salt_force', disableSaltForce)
-		+ xmlBool('prim_force_post', primForcePost)
+		+ xmlBool('prim_force_post', true) // svcAppend is using this field incorrectly so must be set to true for now
 		+ xmlBool('use_fuzzy', useFuzzy)
 		+ xmlBool('do_zip_expansion', doZipExpansion)
 		+ xmlBool('re_append', reAppend)
@@ -50,7 +51,7 @@ EXPORT IdAppendThorRemote(
 		pipeOutput := PIPE(inputDs,
 			'roxiepipe -iw ' + SIZEOF(BIPV2.IdAppendLayouts.AppendInput)+' -t 1 -ow '
 			+ SIZEOF(BIPV2.IdAppendLayouts.svcAppendOut)
-			+ ' -b 1000 -mr 2 -h '+ urlBipAppend + ' -vip -r ' + 'Results' + ' -q "<' + serviceName + ' format=\'raw\'>'
+			+ ' -b 50 -mr 2 -h '+ urlBipAppend + ' -vip -r ' + 'Results' + ' -q "<' + serviceName + ' format=\'raw\'>'
 			+ pipeParms
 			+ xmlBool('include_best', includeBest)
 			+ xmlString('fetch_level', fetchLevel)
@@ -71,7 +72,7 @@ EXPORT IdAppendThorRemote(
 		pipeOutput := PIPE(inputDs,
 			'roxiepipe -iw ' + SIZEOF(BIPV2.IdAppendLayouts.AppendInput)+' -t 1 -ow '
 			+ SIZEOF(BIPV2.IdAppendLayouts.svcAppendRecsOut)
-			+ ' -b 1000 -mr 2 -h '+ urlBipAppend + ' -vip -r ' + 'Header' + ' -q "<' + serviceName + ' format=\'raw\'>'
+			+ ' -b 50 -mr 2 -h '+ urlBipAppend + ' -vip -r ' + 'Header' + ' -q "<' + serviceName + ' format=\'raw\'>'
 			+ pipeParms
 			+ xmlBool('include_best', false)
 			+ xmlBool('include_records', true)

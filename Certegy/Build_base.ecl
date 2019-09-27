@@ -100,6 +100,10 @@ layouts.base tr_base( ds_in l) :=transform
 	self.date_last_seen             :='';
 	self.date_vendor_first_reported :=filedate;
 	self.date_vendor_last_reported  :=filedate;
+	//DF-24226 CCPA new fields
+	self.global_sid											:= 0;																					
+	self.record_sid											:= 0;																					
+
 end;
 
 ds_previous := files.certegy_base;

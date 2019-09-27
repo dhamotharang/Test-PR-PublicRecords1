@@ -41,9 +41,9 @@ EXPORT layout_ARS0835 := MODULE
 	STRING100  FullName,
 	STRING50   Address1,
 	STRING50   Address2,
-  STRING30   City,
-	STRING10   State,
-	STRING10   Zip,
+  // STRING30   City,
+	// STRING10   State,
+	// STRING10   Zip,
 	// STRING18   Firm_ID,   // removed as of 20160602
 	STRING100  Company,	
 	STRING18   LicenseNum,
@@ -51,6 +51,7 @@ EXPORT layout_ARS0835 := MODULE
 	STRING10   FirstLicenseDate,
 	STRING10   IssueDate,
 	STRING10   ExpirationDate,         //removed as of 20130327. Added back as of 20130430
+	STRING18   PBroker,
 	// STRING10	 CEAccru,						//continue education hours accrued. Added since 20130531. Back again in 20130924
  END;
  

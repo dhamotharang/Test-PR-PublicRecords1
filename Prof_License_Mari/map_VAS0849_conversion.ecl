@@ -74,7 +74,7 @@ GoodFilterRec	:= GoodNameRec(NOT REGEXFIND('UNEMPLOYED', StringLib.StringToUpper
 ut.Cleanfields(GoodFilterRec,CleanRec)																
 
 //VA Licensing to common MARIBASE layout
-Prof_License_Mari.layouts.base	xformToCommon(rRawPlusStatus_Layout pInput) 
+Prof_License_Mari.layout_base_in	xformToCommon(rRawPlusStatus_Layout pInput) 
 	:= 
 	 TRANSFORM
 		SELF.PRIMARY_KEY	    := 0;  
@@ -265,7 +265,7 @@ END;
 inFileLic	:= PROJECT(CleanRec,xformToCommon(LEFT));
 
 // Populate STD_LICENSE_TYPE field via translation on RAW_LICENSE_STATUS field
-Prof_License_Mari.layouts.base 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
 	SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 	SELF := L;
 END;
@@ -276,7 +276,7 @@ ds_map_stat_trans := JOIN(inFileLic, cmvTransLkp,
 							  trans_lic_status(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
 // Populate STD_PROF_CD field via translation on license type field
-Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_stat_trans  L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_stat_trans  L, cmvTransLkp R) := TRANSFORM
 	SELF.STD_PROF_CD := R.DM_VALUE1;
 	SELF := L;
 END;
@@ -290,7 +290,7 @@ ds_map_lic_trans := JOIN(ds_map_stat_trans, cmvTransLkp,
 //Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 company_only_lookup := ds_map_lic_trans(RAW_LICENSE_TYPE = '0226F');
 
-Prof_License_Mari.layouts.base 	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
 	SELF.pcmc_slpk := R.cmc_slpk;
 	SELF := L;
 END;
@@ -299,7 +299,7 @@ ds_map_affil := JOIN(ds_map_lic_trans, company_only_lookup,
 										AND LEFT.RAW_LICENSE_TYPE ='0226B',
 										assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER);	
 
-Prof_License_Mari.layouts.base  xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+Prof_License_Mari.layout_base_in  xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 	SELF.PROVNOTE_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + Comments,
 												 L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => Comments,
 						  												       L.PROVNOTE_1);

@@ -1,4 +1,4 @@
-import  lib_stringlib, ut, _validate, Address, aid, NID;
+﻿import  _Control, MDR, lib_stringlib, ut, _validate, Address, aid, NID, Std;
 
 export Standardize_Input :=	module
 
@@ -16,7 +16,7 @@ export Standardize_Input :=	module
 			self.prep_addr_line1										          := ut.CleanSpacesAndUpper(l.Address); 
 			self.prep_addr_line_last								          := ut.CleanSpacesAndUpper(l.City)+ if (trim(l.City) <> '',', ','') + 
 																													 ut.CleanSpacesAndUpper(l.State)+ ' '	+trim(l.Zip_Code,left,right);
-			self.dt_first_seen	                              := if (temp_first_seen > temp_last_seen and temp_last_seen<>0 , temp_last_seen, temp_first_seen); //Since raw dates "Establish_Date" is greater "Latest_Reported_Date" for some records, making sure we have always lowest date in â€œfirst_seen â€ field!    
+			self.dt_first_seen	                              := if (temp_first_seen > temp_last_seen and temp_last_seen<>0 , temp_last_seen, temp_first_seen); //Since raw dates "Establish_Date" is greater "Latest_Reported_Date" for some records, making sure we have always lowest date in Ã¢â‚¬Å“first_seen Ã¢â‚¬Â field!    
 			self.dt_last_seen												          := temp_last_seen;
 			self.dt_vendor_first_reported											:= (unsigned8)pversion;
 			self.dt_vendor_last_reported											:= (unsigned8)pversion;			
@@ -265,8 +265,12 @@ export Standardize_Input :=	module
 			
 		end;
 		
-		dPreProcess := project(pRawFileInput, trans_PreProcessor(left));
-	  return dPreProcess;
+		dPreProcess 	:= project(pRawFileInput, trans_PreProcessor(left));
+		
+		//Add Global_SID
+		addGlobalSID	:= MDR.macGetGlobalSid(dPreProcess, 'ExperianCRDB', '', 'global_sid'); //DF-25404
+		
+	  return addGlobalSID;
 
 end;
 

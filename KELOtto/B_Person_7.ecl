@@ -1,11 +1,11 @@
 ﻿//HPCC Systems KEL Compiler Version 0.11.0
 IMPORT KEL011 AS KEL;
-IMPORT E_Customer,E_Person FROM KELOtto;
+IMPORT B_Person_8,E_Customer,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_7 := MODULE
-  SHARED VIRTUAL TYPEOF(E_Person.__Result) __E_Person := E_Person.__Result;
-  SHARED __EE25604 := __E_Person;
-  EXPORT __ST23470_Layout := RECORD
+  SHARED VIRTUAL TYPEOF(B_Person_8.__ENH_Person_8) __ENH_Person_8 := B_Person_8.__ENH_Person_8;
+  SHARED __EE25101 := __ENH_Person_8;
+  EXPORT __ST23320_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nint Lex_Id_;
@@ -72,13 +72,16 @@ EXPORT B_Person_7 := MODULE
     KEL.typ.nint _name__ssn__dob__match_;
     KEL.typ.ndataset(E_Person.Offenses_Layout) Offenses_;
     KEL.typ.int Deceased_ := 0;
+    KEL.typ.int Deceased_Dob_Match_ := 0;
+    KEL.typ.int Deceased_Match_ := 0;
+    KEL.typ.int Deceased_Name_Match_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST23470_Layout __ND26325__Project(E_Person.Layout __PP25607) := TRANSFORM
-    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP25607.Deceased_Date_))=>1,0);
-    SELF := __PP25607;
+  SHARED __ST23320_Layout __ND25864__Project(B_Person_8.__ST23475_Layout __PP25104) := TRANSFORM
+    SELF.Deceased_Match_ := MAP(__PP25104.Deceased_ = 1 AND __PP25104.Deceased_Name_Match_ = 1 AND __PP25104.Deceased_Dob_Match_ = 1=>1,0);
+    SELF := __PP25104;
   END;
-  EXPORT __ENH_Person_7 := PROJECT(__EE25604,__ND26325__Project(LEFT));
+  EXPORT __ENH_Person_7 := PROJECT(__EE25101,__ND25864__Project(LEFT));
 END;

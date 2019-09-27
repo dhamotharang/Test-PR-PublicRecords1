@@ -47,9 +47,9 @@ shared SearchCriteria(string sourceCode) :=
 		'<SearchCriteria>\r\n'
 		+	GetSearchCriteria(SourceCodetoFilter(sourceCode), SourceCodetoCountryFilter(sourceCode))
 		+ '</SearchCriteria>\r\n';
-shared SearchCriteriaEx(dataset(Layouts.rEntity) srcfile) := 
+shared SearchCriteriaEx(dataset(Layouts.rEntity) srcfile, boolean IncludeSanctionsCriteria) := 
 		'<SearchCriteria>\r\n'
-		+	GetSearchCriteriaEx(srcfile)
+		+	GetSearchCriteriaEx(srcfile, IncludeSanctionsCriteria)
 		+ '</SearchCriteria>\r\n';
 
 shared SpecialId(string SourceCode) := TRIM(CASE(SourceCode,
@@ -97,7 +97,8 @@ shared SourceCodetoDescr(string SourceCode) := CASE(SourceCode,
 NameSources.CodeToDesc(SourceCode));
 //SourceCode + ' from World Compliance, a LexisNexis Company');
 
-export unicode MakeXMLHdr(string SourceCode, string version, integer cnt, dataset(Layouts.rEntity) srcfile) := 
+export unicode MakeXMLHdr(string SourceCode, string version, integer cnt, 
+										dataset(Layouts.rEntity) srcfile, boolean IncludeSanctionsCriteria) := 
 				hdg_Pt1 
 							+	SourceCodetoBridgerSourceID(SourceCode)		
 							+hdg_Pt2
@@ -105,11 +106,9 @@ export unicode MakeXMLHdr(string SourceCode, string version, integer cnt, datase
 							+hdg_Pt3
 							+ SourceCodetoDescr(SourceCode)
 							+hdg_Pt4
-					//		+filedate[1..4]+'-'+filedate[5..6]+'-'+filedate[7..8]+'T12:00:00.0000000Z'
 					+ GetPublicationDate(version)
 							+ hdg_Pt5 
-							//+SearchCriteria(SourceCode)  
-							+SearchCriteriaEx(srcfile)  
+							+SearchCriteriaEx(srcfile, IncludeSanctionsCriteria)  
 							+ SpecialId(SourceCode)
 							+ hdg_pt5a64 //All files 64 bit.
 							//+ IF(SourceCode in ['PEP', 'ALL'],hdg_pt5a64, hdg_pt5a) old only PEP and FULL 64
@@ -120,21 +119,14 @@ export unicode MakeXMLHdr(string SourceCode, string version, integer cnt, datase
 						
 export 	Footer := '</Entity_List></Watchlist>\r\n';
 export 	GeoFooter := '\r\n</Country_List></Watchlist>\r\n';
-/*
-export CreateXMLFileHdr(string code, string version,
-		dataset(Layout_XG.routp) infile) := FUNCTION
-	cnt := count(infile);
-	hdr := MakeXMLHdr(code, version, cnt);
-	return hdr;
-END;
-*/
 
 export OutputDataXMLFile(string code, string filename, string version,
-		dataset(Layout_XG.routp) infile, dataset(Layouts.rEntity) srcfile) := FUNCTION
+		dataset(Layout_XG.routp) infile, dataset(Layouts.rEntity) srcfile, 
+							boolean IncludeSanctionsCriteria = false) := FUNCTION
 	
 	datafile := infile;		//SAMPLE(infile,400);
 	cnt := count(datafile);
-	hdr := MakeXMLHdr(code, version, cnt, srcfile);
+	hdr := MakeXMLHdr(code, version, cnt, srcfile, IncludeSanctionsCriteria);
 	return OUTPUT(datafile,,'~thor::WorldCompliance::'+filename,
 			xml('Entity', heading(FROMUNICODE(hdr, 'utf8'),Footer),trim, OPT), overwrite);
 END;

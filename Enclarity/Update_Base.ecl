@@ -1050,8 +1050,21 @@ end;
 																	self							:= left));
 																	
 		recombined_provs	:= non_historical_provs + non_mo_historical + non_mo_apn + clear_exp_stat;
-
-		RETURN recombined_provs;
+		sort_recomb_provs := sort(distribute(recombined_provs, hash(group_key, lic_state, lic_num_in, lic_num)), group_key, lic_state, lic_num_in, lic_num, local);
+		
+		exception_lu	  := sort(Enclarity.files().exceptions.qa, group_key, lic_state, lic_num_in, lic_num, local);
+		
+		get_exceptions	:= join(sort_recomb_provs, exception_lu, 
+							left.group_key		= right.group_key	
+					and left.lic_state		= right.lic_state
+					and left.lic_num_in		= right.lic_num_in
+					and left.lic_num			= right.lic_num
+			,TRANSFORM(enclarity.Layouts.individual_base,
+					 SELF.record_type			:= if(((left.group_key = right.group_key) and (left.lic_state = right.lic_state) and (left.lic_num_in = right.lic_num_in) and (left.lic_num = right.lic_num)),'H', left.record_type)
+					,SELF									:= left)
+					,LEFT OUTER, LOOKUP);					
+					
+		RETURN get_exceptions;
 	END;
 			
 	EXPORT Associate_Base := FUNCTION

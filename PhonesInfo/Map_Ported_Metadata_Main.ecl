@@ -1,13 +1,13 @@
 ﻿import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;	
 	
-//DF-24037: Replace LIDB Use Lerg6 for Carrier Info
+//DF-24394: Filtering for complete L6 records (account_owner/serv/line types populated)
 	
 	portFile 					:= PhonesInfo.File_Phones.Ported_Current; 																																																						//Port File
 	lidbFile					:= PhonesInfo.File_LIDB.Response_Processed;																																																						//LIDB File
 	discFile					:= PhonesInfo.File_Deact.Main_Current2;																																																								//Deact File
 	discGHFile				:= PhonesInfo.File_Deact_GH.Main_Current;																																																							//Deact Gong History File
 	lidbDelt					:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0); 	//Deltabase Gateway File
-	l6UpdPhone				:= project(PhonesInfo.File_Lerg.Lerg6UpdPhone, PhonesInfo.Layout_Common.portedMetadata_Main);																													//Lerg6 Updated Phones	
+	l6UpdPhone				:= project(PhonesInfo.File_Lerg.Lerg6UpdPhone(account_owner<>'' and serv<>'' and line<>''), PhonesInfo.Layout_Common.portedMetadata_Main);						//Lerg6 Updated Phones	
 	srcRef						:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE); 																																														//Source Reference Table
 	
 //////////////////////////////////////////////////////////////////////////////////////////

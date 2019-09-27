@@ -1,4 +1,4 @@
-﻿import promotesupers, roxiekeybuild, ut;
+﻿import promotesupers, roxiekeybuild;
 
 pre1 := promotesupers.SF_MaintBuilding('~thor_Data400::base::ska_nixie');
 pre2 := promotesupers.SF_MaintBuilding('~thor_Data400::base::ska_verified');

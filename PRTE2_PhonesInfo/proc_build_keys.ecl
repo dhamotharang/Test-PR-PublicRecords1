@@ -53,9 +53,12 @@ RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_phones + Constants.KeyN
 		//---------- making DOPS optional and only in PROD build -------------------------------
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
-	updatedops					:=	PRTE.UpdateVersion(Constants.dops_name, file_date, notifyEmail,'B','N','N');
-		
+	
+	updatedops          :=  PRTE.UpdateVersion(Constants.dops_name, file_date, notifyEmail, l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
+			
 	PerformUpdateOrNot	:= IF(doDOPS,PARALLEL(updatedops),NoUpdate);
+	
+	
 
 	RETURN 		sequential(			
 				build_key_phones_ported_metadata, 
@@ -68,7 +71,8 @@ RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_phones + Constants.KeyN
 				
 				build_key_lerg6, 
 				move_built_key_lerg6, 
-				move_qa_key_lerg6, 	
+				move_qa_key_lerg6, 
+			  copy_seeds(file_date),
 			 	PerformUpdateOrNot);
 
 END;

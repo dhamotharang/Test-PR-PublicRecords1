@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.4';
+  EXPORT salt_VERSION := 'V3.11.6';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -43,8 +43,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:DunnData_email\n'
     + '\n'
     + 'RIDFIELD:RCID:GENERATE\n'
-    + 'INGESTFILE:DunnData_update:NAMED(DunnData_email.prep_ingest_file)\n'
-    + '\n'
+    + 'INGESTFILE:DunnData_update:NAMED(DunnData_email.prep_ingest_file) \n'
     + '\n'
     + 'FIELD:dtmatch:TYPE(STRING32):0,0\n'
     + 'FIELD:email:TYPE(STRING60):0,0\n'
