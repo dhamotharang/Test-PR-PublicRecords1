@@ -31,6 +31,9 @@ be changed to True if you want only executives to be listed.
 ReturnCurrentContacts returns current contacts only. Current contacts are contacts with a date last seen within 
 2 (730 days) years of the current date. The default value for this is true which will select only current contacts.
 
+SuppressCCPAOptOut suppresses CCPA Opt records when True is selected; otherwise, it appends a flag informing record is 
+a CCPA Opt Out record. The default for this value is true.
+
 The following global variables need to be defined in order to run this plugin:
 	Application Type
 	DPPA Purpose
@@ -67,3 +70,6 @@ DateLastSeen - Date last seen in system/
 IsCurrent - Boolean value of true if current (within 730 days)
 ContactAppended - Boolean value of true if appended
 ContactIdentified - Boolean value of true if identified	
+
+IsOptOutFlag - INTEGER representing if a record is a CCPA Opt Out.
+This field is OPTIONAL and will only be displayed if SuppressCCPAOptOut is set to FALSE.
