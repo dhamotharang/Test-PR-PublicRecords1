@@ -298,7 +298,7 @@ MODULE
 
       EXPORT BOOLEAN hasActiveIdentityCountRules        := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId = $.Constants.RiskRules.IdentityCount AND Active)));
       EXPORT BOOLEAN hasActivePhoneTransactionCountRule := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount AND ACTIVE));
-      EXPORT BOOLEAN IsGovsearch := ApplicationType in [AutoStandardI.Constants.APPLICATION_TYPE_LE,AutoStandardI.Constants.APPLICATION_TYPE_GOV];
+      EXPORT BOOLEAN IsGovsearch := ApplicationType in AutoStandardI.Constants.GOV_TYPES;
     END;
 
     RETURN in_params;
@@ -414,7 +414,7 @@ MODULE
                                                       IncludeCallHandlingInfo OR IncludeDeviceHistory OR
                                                       IncludeDeviceInfo OR IncludeDeviceHistory;
       EXPORT BOOLEAN UseZumigoIdentity	          := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity;
-      EXPORT BOOLEAN IsGovsearch := ApplicationType in [AutoStandardI.Constants.APPLICATION_TYPE_LE,AutoStandardI.Constants.APPLICATION_TYPE_GOV];
+      EXPORT BOOLEAN IsGovsearch := ApplicationType in AutoStandardI.Constants.GOV_TYPES;
     END;
 
     RETURN input_Mod;
