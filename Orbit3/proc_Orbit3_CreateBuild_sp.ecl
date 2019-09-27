@@ -27,7 +27,7 @@ sendemail(string keyword = '',string status = '') := function
 		description := map ( keyword = 'CREATE' and status = 'FAIL'   => create_build.Message,
 		                                              keyword = 'CREATE' and status =   'SKIP'  => 'User_Skipped_create_build_instance',
 		                     keyword = 'UPDATE' and  status = 'FAIL' => Update_build.Message,
-						keyword = 'UPDATE' and  status = 'ABORT' => 'Assigned_to_QA_as_Status_is_not_BUILD_IN_PROGRESS',
+						keyword = 'UPDATE' and  status = 'ABORT' => 'Update_aborted_as_build_has_been_assigned_to_QA',
 						keyword = 'UPDATE' and  status = 'SKIP' => 'User_Skipped_Update_build_instance', 
 												 keyword = 'NO_ITEMS_FOUND' and status = 'FAIL' => 'No Build Components found to Add in Orbit',
 												 'N/A'
