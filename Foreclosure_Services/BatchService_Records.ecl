@@ -44,8 +44,10 @@ EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in
 			);
 			
 		//Get data
-		response := Foreclosure_Vacancy.getData(isRenewal := true).fn_Find_Foreclosure_By_Addr(input_cleaned, Property.Key_Foreclosures_Addr, includeBlackKnight);
-		
+		byAddr := Foreclosure_Vacancy.getData(isRenewal:=TRUE).fn_Find_Foreclosure_By_Addr(input_cleaned,Property.Key_Foreclosures_Addr,includeBlackKnight);
+		byDid := Foreclosure_Vacancy.getData(isRenewal:=TRUE).fn_Find_Foreclosure_By_Did(ds_xml_in,includeBlackKnight);
+		response := byAddr+ByDid;
+
 		//Add Acct No back on linked via uniqueID
 		Foreclosure_Services.Layouts.Final_Batch addAcctNoBack(input_cleaned l, response r) := transform
 			self.acctno      := l.UniqueID_in;
@@ -144,6 +146,10 @@ EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in
 				)
 			);
 
-		RETURN results;
+		// restore unique id input
+		RETURN JOIN(results,ds_xml_in,LEFT.acctno=RIGHT.acctno,
+			TRANSFORM(layout_final_batch_plus,
+				SELF.UniqueID_in:=RIGHT.UniqueID,
+				SELF:=LEFT),LEFT OUTER);
 		
 	END;
