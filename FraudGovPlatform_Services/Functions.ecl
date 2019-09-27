@@ -856,5 +856,9 @@ EXPORT Functions := MODULE
 	EXPORT GetCleanBankAccountFragmentValue(string bank_information) := FUNCTION
 		return REGEXFIND('(.*)@@@(.*)$',bank_information,2);
 	END;
+	
+	EXPORT GetLastRecentActivityDate() := FUNCTION
+		return STD.Date.AdjustDate(STD.Date.Today(),day_delta:=FraudGovPlatform_Services.Constants.RECENT_ACTIVITY_DAYS*-1);
+	END;
 
 END;

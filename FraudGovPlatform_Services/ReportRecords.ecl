@@ -112,8 +112,18 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 		SHARED ds_recentTransactions_sorted := IF(batch_params.IsOnline AND batch_params.UseAllSearchFields,
 																	SORT(ds_delta_recentActivity(UniqueId = (STRING)ds_in[1].did),-eventDate.year, -eventDate.Month, -eventDate.day),
 																	SORT(ds_delta_recentActivity,-eventDate.year, -eventDate.Month, -eventDate.day));
-
-		SHARED numOfDeltabaseTransactions := COUNT(ds_recentTransactions_sorted);	
+																	
+		/* Returning the Timeline Data */
+		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT)) + ds_recentTransactions_sorted;
+		SHARED ds_timeline_sorted := SORT(ds_timeline, -IsRecentActivity, FileType, -ReportedDateTime.Year,-ReportedDateTime.Month, 
+																-ReportedDateTime.Day,-ReportedDateTime.Hour24,-ReportedDateTime.Minute,-ReportedDateTime.Second,
+																-EventDate.Year, -EventDate.Month, -EventDate.Day,
+																record);
+																
+		first_recentActivity_date := FraudGovPlatform_Services.Functions.GetLastRecentActivityDate();
+		
+		/*GRP-3682: New recent transactions definition is last 30 days (including Deltabase and payload) */
+		SHARED numOfDeltabaseTransactions := COUNT(ds_timeline_sorted(iesp.ECL2ESP.DateToInteger(ReportedDateTime) > first_recentActivity_date));	
 		
 		ds_ElementcardDetail_w_score := JOIN(ds_fragment_recs_rolled, ds_cluster_recs_scores,
 																			LEFT.fragment = RIGHT.entity_name AND
@@ -235,13 +245,6 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																				SELF.ScoreDetails.ElementValue := (STRING)LEFT.lexid, 
 																				SELF.ScoreDetails.Score := LEFT.risk_score,
 																				SELF := []));
-		
-		/* Returning the Timeline Data */
-		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT)) + ds_recentTransactions_sorted;
-		ds_timeline_sorted := SORT(ds_timeline, -IsRecentActivity, FileType, -ReportedDateTime.Year,-ReportedDateTime.Month, 
-																-ReportedDateTime.Day,-ReportedDateTime.Hour24,-ReportedDateTime.Minute,-ReportedDateTime.Second,
-																-EventDate.Year, -EventDate.Month, -EventDate.Day,
-																record);
 		
 		/* Returning the Associated Address Data  - This is based on the Timeline Records found above */
 		ds_associated_addresses := FraudGovPlatform_Services.Functions.getAssociatedAddresses(ds_payload);
