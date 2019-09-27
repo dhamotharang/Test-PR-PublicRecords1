@@ -10,18 +10,20 @@
 </message>
 */
 
-IMPORT doxie, Autokey_batch, FBNV2_services, Address, FBNV2, BatchServices, AutokeyB2, AutoStandardI,AutoheaderV2;
+IMPORT Address, AutoheaderV2, Autokey_batch, AutokeyB2, AutoStandardI, BatchServices, doxie, 
+       FBNV2, FBNV2_services, STD, Suppress;
 
 EXPORT Batch_Service() := FUNCTION
  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	// Key
 	keyIdDID := FBNV2.Key_DID;
-
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 	// Aliases
 	Consts := FBNV2.Constant('');
 	AutoKeyBatchInput := Autokey_batch.Layouts.rec_inBatchMaster;
 	PLRec := FBNV2.File_SearchAutokey();
+  
 	SearchLayout := FBNV2_services.layout_search_IDs;
 	ReportLayout := FBNV2_services.Layout_FBN_Report;
 	PenaltyI := AutoStandardI.LIBIN.PenaltyI;
@@ -36,7 +38,7 @@ EXPORT Batch_Service() := FUNCTION
 
 	// Functions
 	trimBoth(STRING input) := TRIM(input, LEFT, RIGHT);
-	toUpper(STRING input) := StringLib.StringToUpperCase(trimBoth(input));
+	toUpper(STRING input) := STD.Str.ToUpperCase(trimBoth(input));
 
 
 	// Records/Transforms
@@ -117,8 +119,10 @@ EXPORT Batch_Service() := FUNCTION
 	// Search via AutoKey
 	input_c := PROJECT(data_in, cleanInput(LEFT));
 	fids := UNGROUP(Autokey_batch.get_fids(input_c, Consts.ak_QAname, cfgs));
-	AutokeyB2.mac_get_payload(fids, Consts.ak_QAname, PLRec, with_pl, did, bdid, Consts.ak_typeStr);
-	with_pl_x := PROJECT(with_pl(tmsid <> BLNK), AcctRec);
+	AutokeyB2.mac_get_payload(fids, Consts.ak_QAname, PLRec, with_pl_raw, did, bdid, Consts.ak_typeStr);
+	with_pl := Suppress.MAC_SuppressSource(with_pl_raw, mod_access, did);
+  
+  with_pl_x := PROJECT(with_pl(tmsid <> BLNK), AcctRec);
 	fromAK := DEDUP(SORT(with_pl_x, acctno, tmsid, rmsid), acctno, tmsid, rmsid);
 
 	// Search via DID lookup
