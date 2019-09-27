@@ -1,4 +1,4 @@
-﻿IMPORT	_control, Business_Credit,	BIPV2,	CCPA, Address,	doxie,	lib_date,	STD;
+﻿IMPORT	_control, Business_Credit,	BIPV2,	MDR, Address,	doxie,	lib_date,	STD;
 EXPORT	Key_BusinessOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																			Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	MODULE
 
@@ -70,7 +70,7 @@ EXPORT	Key_BusinessOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today()
 																	SELF.global_sid																:=  0;
 																	SELF																					:=	LEFT));
 																	
-	SHARED  addGlobalSID :=  CCPA.macGetGlobalSID(dBOInformation,'SBFECV','','global_sid');
+	SHARED  addGlobalSID :=  MDR.macGetGlobalSid(dBOInformation,'SBFECV','','global_sid');
 	
 	SHARED	dBOInformationDist	:=	SORT(DISTRIBUTE(addGlobalSID,
 																	HASH(	record_type, Sbfe_Contributor_Number, Contract_Account_Number, Account_Type_Reported, Account_Holder_Business_Name, Clean_Account_Holder_Business_Name, 
