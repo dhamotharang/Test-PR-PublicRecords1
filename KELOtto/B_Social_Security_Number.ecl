@@ -9542,7 +9542,7 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.int Cl_Identity_Count_ := 0;
     KEL.typ.nint Cl_Identity_Count_Decile_;
     KEL.typ.nint Cl_Identity_Count_Percentile_;
-    KEL.typ.float Cl_Identity_Event_Avg_ := 0.0;
+    KEL.typ.nstr Cl_Identity_Event_Avg_ := 0.0;
     KEL.typ.nfloat Cl_Impact_Weight_;
     KEL.typ.int Cl_Ip_High_Risk_City_Event_Count_ := 0;
     KEL.typ.int Cl_Ip_High_Risk_City_Identity_Count_ := 0;
@@ -9635,7 +9635,7 @@ EXPORT B_Social_Security_Number := MODULE
     SELF.Cl_High_Risk_Pattern5_Flag_ := MAP(__PP2448178.Cl_High_Kr_Identity_Count_ > 4=>1,0);
     SELF.Cl_High_Risk_Routing_Count_ := __PP2448178.C_O_U_N_T___Person__6_;
     SELF.Cl_Identity_Count_Decile_ := __PP2448178.D_E_C_I_L_E___Cl_Identity_Count_;
-    SELF.Cl_Identity_Event_Avg_ := __PP2448178.Cl_Event_Count_ / __PP2448178.Cl_Identity_Count_;
+    SELF.Cl_Identity_Event_Avg_ := FN_Graph.FN_Clean_Spaces(__ECAST(KEL.typ.nstr,__CN(REALFORMAT(__PP2448178.Cl_Event_Count_ / __PP2448178.Cl_Identity_Count_,6,2))));
     SELF.Cl_Impact_Weight_ := __OP2(__OP2(__OP2(__OP2(__PP2448178.Cl_Identity_Count_Percentile_,*,__CN(0.3)),+,__OP2(__PP2448178.Cl_Event_Count_Percentile_,*,__CN(0.3))),+,__OP2(__PP2448178.Cl_Active30_Identity_Count_Percentile_,*,__CN(0.2))),+,__OP2(__PP2448178.Cl_Active7_Identity_Count_Percentile_,*,__CN(0.2)));
     SELF.Cl_Ip_High_Risk_City_Event_Count_ := __PP2448178.C_O_U_N_T___Person_Event__4_;
     SELF.Cl_Ip_High_Risk_City_Identity_Count_ := __PP2448178.C_O_U_N_T___Person__5_;

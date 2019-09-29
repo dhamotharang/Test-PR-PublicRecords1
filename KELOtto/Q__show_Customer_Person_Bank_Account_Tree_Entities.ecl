@@ -127,7 +127,7 @@ EXPORT Q__show_Customer_Person_Bank_Account_Tree_Entities := MODULE
     KEL.typ.int Cl_Identity_Count_ := 0;
     KEL.typ.nint Cl_Identity_Count_Decile_;
     KEL.typ.nint Cl_Identity_Count_Percentile_;
-    KEL.typ.float Cl_Identity_Event_Avg_ := 0.0;
+    KEL.typ.nstr Cl_Identity_Event_Avg_ := 0.0;
     KEL.typ.nfloat Cl_Impact_Weight_;
     KEL.typ.int Cl_Ip_High_Risk_City_Event_Count_ := 0;
     KEL.typ.int Cl_Ip_High_Risk_City_Identity_Count_ := 0;
@@ -437,7 +437,7 @@ EXPORT Q__show_Customer_Person_Bank_Account_Tree_Entities := MODULE
     KEL.typ.int Cl_Identity_Count_ := 0;
     KEL.typ.nint Cl_Identity_Count_Decile_;
     KEL.typ.nint Cl_Identity_Count_Percentile_;
-    KEL.typ.float Cl_Identity_Event_Avg_ := 0.0;
+    KEL.typ.nstr Cl_Identity_Event_Avg_ := 0.0;
     KEL.typ.nfloat Cl_Impact_Weight_;
     KEL.typ.int Cl_Ip_High_Risk_City_Event_Count_ := 0;
     KEL.typ.int Cl_Ip_High_Risk_City_Identity_Count_ := 0;
@@ -656,7 +656,7 @@ EXPORT Q__show_Customer_Person_Bank_Account_Tree_Entities := MODULE
     KEL.typ.int Cl_Identity_Count__1_ := 0;
     KEL.typ.nint Cl_Identity_Count_Decile__1_;
     KEL.typ.nint Cl_Identity_Count_Percentile__1_;
-    KEL.typ.float Cl_Identity_Event_Avg__1_ := 0.0;
+    KEL.typ.nstr Cl_Identity_Event_Avg__1_ := 0.0;
     KEL.typ.nfloat Cl_Impact_Weight__1_;
     KEL.typ.int Cl_Ip_High_Risk_City_Event_Count__1_ := 0;
     KEL.typ.int Cl_Ip_High_Risk_City_Identity_Count__1_ := 0;
@@ -950,7 +950,7 @@ EXPORT Q__show_Customer_Person_Bank_Account_Tree_Entities := MODULE
     KEL.typ.int Cl_Identity_Count_ := 0;
     KEL.typ.nint Cl_Identity_Count_Decile_;
     KEL.typ.nint Cl_Identity_Count_Percentile_;
-    KEL.typ.float Cl_Identity_Event_Avg_ := 0.0;
+    KEL.typ.nstr Cl_Identity_Event_Avg_ := 0.0;
     KEL.typ.nfloat Cl_Impact_Weight_;
     KEL.typ.int Cl_Ip_High_Risk_City_Event_Count_ := 0;
     KEL.typ.int Cl_Ip_High_Risk_City_Identity_Count_ := 0;
@@ -1169,7 +1169,7 @@ EXPORT Q__show_Customer_Person_Bank_Account_Tree_Entities := MODULE
     KEL.typ.int Cl_Identity_Count__1_ := 0;
     KEL.typ.nint Cl_Identity_Count_Decile__1_;
     KEL.typ.nint Cl_Identity_Count_Percentile__1_;
-    KEL.typ.float Cl_Identity_Event_Avg__1_ := 0.0;
+    KEL.typ.nstr Cl_Identity_Event_Avg__1_ := 0.0;
     KEL.typ.nfloat Cl_Impact_Weight__1_;
     KEL.typ.int Cl_Ip_High_Risk_City_Event_Count__1_ := 0;
     KEL.typ.int Cl_Ip_High_Risk_City_Identity_Count__1_ := 0;

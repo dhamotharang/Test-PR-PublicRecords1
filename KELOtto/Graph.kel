@@ -1655,7 +1655,7 @@ Person: => ClEmailCount := COUNT(PersonPerson.ToPerson.PersonEmail{Emailof});
 Person: => ClHighRiskEmailCount := COUNT(PersonPerson.ToPerson.PersonEmail(Emailof.isdisposableemail=1 OR Emailof.NotSafeLastDomainGt2 = 1){Emailof});
 Person: => ClHighRiskEmailTop10 := MAP(ClHighRiskEmailCount > ClHighRiskEmailCount$GROUP{ClIdentityCountPercentile}:Percentile(70) => 1, 0);
 
-Person: => ClIdentityEventAvg := ClEventCount / ClIdentityCount; // Average number of events/transactions per identity within cluster.
+Person: => ClIdentityEventAvg := CleanSpaces(REALFORMAT(ClEventCount / ClIdentityCount, 6, 2)); // Average number of events/transactions per identity within cluster.
 
 Person: => ClHighRiskPattern1Flag := MAP(ClIdentityCount > 9 => 1, 0); // High Identity Count Cluster
 Person: => ClHighRiskPattern2Flag := MAP(ClNas9IdentityCount > 10 AND ClNap3IdentityCount > 0 => 1, 0); // Pattern of Phone and Addresses not being associated with identities. 
@@ -1791,7 +1791,7 @@ SocialSecurityNumber: => ClActive7IdentityCount := COUNT(PersonSSN.Subject.Perso
 SocialSecurityNumber: => ClActive30IdentityCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson(VlEvent30ActiveFlag=1){LexId});  // Count within cluster of active identities in the last 30 days.
 
 SocialSecurityNumber: => ClAddressCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonAddress.Location(InCustomerPopulation=1));  // Count within cluster of distict addresses within customer population
-SocialSecurityNumber: => ClIdentityEventAvg := ClEventCount / ClIdentityCount; // Average number of events/transactions per identity within cluster.
+SocialSecurityNumber: => ClIdentityEventAvg := CleanSpaces(REALFORMAT(ClEventCount / ClIdentityCount, 6, 2)); // Average number of events/transactions per identity within cluster.
 
 SocialSecurityNumber: => ClEmailCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonEmail{Emailof});
 SocialSecurityNumber: => ClHighRiskEmailCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.isdisposableemail=1 OR Emailof.NotSafeLastDomainGt2 = 1){Emailof});
@@ -1936,7 +1936,7 @@ Phone: => ClActive7IdentityCount := COUNT(PersonPhone.Subject.PersonPerson.ToPer
 Phone: => ClActive30IdentityCount := COUNT(PersonPhone.Subject.PersonPerson.ToPerson(VlEvent30ActiveFlag=1){LexId});  // Count within cluster of active identities in the last 30 days.
 
 Phone: => ClAddressCount := COUNT(PersonPhone.Subject.PersonPerson.ToPerson.PersonAddress.Location(InCustomerPopulation=1));  // Count within cluster of distict addresses within customer population
-Phone: => ClIdentityEventAvg := ClEventCount / ClIdentityCount; // Average number of events/transactions per identity within cluster.
+Phone: => ClIdentityEventAvg := CleanSpaces(REALFORMAT(ClEventCount / ClIdentityCount, 6, 2)); // Average number of events/transactions per identity within cluster.
 
 Phone: => ClEmailCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonEmail{Emailof});
 Phone: => ClHighRiskEmailCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.isdisposableemail=1 OR Emailof.NotSafeLastDomainGt2 = 1){Emailof});
@@ -2070,7 +2070,7 @@ Email: => ClActive7IdentityCount := COUNT(PersonEmail.Subject.PersonPerson.ToPer
 Email: => ClActive30IdentityCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson(VlEvent30ActiveFlag=1){LexId});  // Count within cluster of active identities in the last 30 days.
 
 Email: => ClAddressCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson.PersonAddress.Location(InCustomerPopulation=1));  // Count within cluster of distict addresses within customer population
-Email: => ClIdentityEventAvg := ClEventCount / ClIdentityCount; // Average number of events/transactions per identity within cluster.
+Email: => ClIdentityEventAvg := CleanSpaces(REALFORMAT(ClEventCount / ClIdentityCount, 6, 2)); // Average number of events/transactions per identity within cluster.
 
 Email: => ClEmailCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson.PersonEmail{Emailof});
 Email: => ClHighRiskEmailCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.isdisposableemail=1 OR Emailof.NotSafeLastDomainGt2 = 1){Emailof});
@@ -2215,7 +2215,7 @@ BankAccount: => ClActive7IdentityCount := COUNT(PersonBankAccount.Subject.Person
 BankAccount: => ClActive30IdentityCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson(VlEvent30ActiveFlag=1){LexId});  // Count within cluster of active identities in the last 30 days.
 
 BankAccount: => ClAddressCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson.PersonAddress.Location(InCustomerPopulation=1));  // Count within cluster of distict addresses within customer population
-BankAccount: => ClIdentityEventAvg := ClEventCount / ClIdentityCount; // Average number of events/transactions per identity within cluster.
+BankAccount: => ClIdentityEventAvg := CleanSpaces(REALFORMAT(ClEventCount / ClIdentityCount, 6, 2)); // Average number of events/transactions per identity within cluster.
 
 BankAccount: => ClEmailCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson.PersonEmail{Emailof});
 BankAccount: => ClHighRiskEmailCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.isdisposableemail=1 OR Emailof.NotSafeLastDomainGt2 = 1){Emailof});
@@ -2367,7 +2367,7 @@ DriversLicense: => ClActive7IdentityCount := COUNT(PersonDriversLicense.Subject.
 DriversLicense: => ClActive30IdentityCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson(VlEvent30ActiveFlag=1){LexId});  // Count within cluster of active identities in the last 30 days.
 
 DriversLicense: => ClAddressCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson.PersonAddress.Location(InCustomerPopulation=1));  // Count within cluster of distict addresses within customer population
-DriversLicense: => ClIdentityEventAvg := ClEventCount / ClIdentityCount; // Average number of events/transactions per identity within cluster.
+DriversLicense: => ClIdentityEventAvg := CleanSpaces(REALFORMAT(ClEventCount / ClIdentityCount, 6, 2)); // Average number of events/transactions per identity within cluster.
 
 DriversLicense: => ClEmailCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson.PersonEmail{Emailof});
 DriversLicense: => ClHighRiskEmailCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.isdisposableemail=1 OR Emailof.NotSafeLastDomainGt2 = 1){Emailof});
@@ -2511,7 +2511,7 @@ InternetProtocol: => ClActive7IdentityCount := COUNT(PersonIpAddress.Subject.Per
 InternetProtocol: => ClActive30IdentityCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson(VlEvent30ActiveFlag=1){LexId});  // Count within cluster of active identities in the last 30 days.
 
 InternetProtocol: => ClAddressCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson.PersonAddress.Location(InCustomerPopulation=1));  // Count within cluster of distict addresses within customer population
-InternetProtocol: => ClIdentityEventAvg := ClEventCount / ClIdentityCount; // Average number of events/transactions per identity within cluster.
+InternetProtocol: => ClIdentityEventAvg := CleanSpaces(REALFORMAT(ClEventCount / ClIdentityCount, 6, 2)); // Average number of events/transactions per identity within cluster.
 
 InternetProtocol: => ClEmailCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson.PersonEmail{Emailof});
 InternetProtocol: => ClHighRiskEmailCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.isdisposableemail=1 OR Emailof.NotSafeLastDomainGt2 = 1){Emailof});
@@ -2694,7 +2694,7 @@ Address: => ClActive7IdentityCount := COUNT(PersonAddress.Subject.PersonPerson.T
 Address: => ClActive30IdentityCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson(VlEvent30ActiveFlag=1){LexId});  // Count within cluster of active identities in the last 30 days.
 
 Address: => ClAddressCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson.PersonAddress.Location(InCustomerPopulation=1));  // Count within cluster of distict addresses within customer population
-Address: => ClIdentityEventAvg := ClEventCount / ClIdentityCount; // Average number of events/transactions per identity within cluster.
+Address: => ClIdentityEventAvg := CleanSpaces(REALFORMAT(ClEventCount / ClIdentityCount, 6, 2)); // Average number of events/transactions per identity within cluster.
 
 Address: => ClEmailCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson.PersonEmail{Emailof});
 Address: => ClHighRiskEmailCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.isdisposableemail=1 OR Emailof.NotSafeLastDomainGt2 = 1){Emailof});
