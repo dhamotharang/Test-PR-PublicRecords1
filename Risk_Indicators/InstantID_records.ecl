@@ -1,4 +1,4 @@
-﻿import address, Doxie, models, riskwise, ut, codes, Suppress, AutoStandardI, seed_files, iesp,
+﻿	import address, Doxie, models, riskwise, ut, codes, Suppress, AutoStandardI, seed_files, iesp,
 			 IntlIID, gateway, Royalty, census_data, OFAC_XG5, STD;
 // NOTE! If you make any logic changes here, please change also BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs.
 
@@ -114,6 +114,10 @@ unsigned2 EverOccupant_PastMonths := 0      : stored('EverOccupant_PastMonths');
 unsigned4 EverOccupant_StartDate  := 99999999 : stored('EverOccupant_StartDate');
 unsigned3 LastSeenThresholdIn := iid_constants.oneyear : stored('LastSeenThreshold');
 boolean   IncludeNAPData := false : stored('IncludeNAPData');
+ unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 
 string DataRestriction := AutoStandardI.GlobalModule().DataRestrictionMask; 
@@ -381,7 +385,10 @@ ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purp
 																					ExactMatchLevel, DataRestriction, CustomDataFilter, IncludeDLverification, watchlists_request, 
 																					DOBMatchOptions_in, EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSOptions, 
 																					LastSeenThreshold,
-																					CompanyID, DataPermission, IncludeNAPData);
+																					CompanyID, DataPermission, IncludeNAPData,LexIdSourceOptout := LexIdSourceOptout, 
+	TransactionID := TransactionID, 
+	BatchUID := BatchUID, 
+	GlobalCompanyID := GlobalCompanyID);
 //might be able to set special chase conditions here at a later date, 
 // want is to fail immediately as we don't want customers to think there was no hit on OFAC
 
