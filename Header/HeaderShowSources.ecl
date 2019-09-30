@@ -23,6 +23,8 @@ key_data_rec := record
   unsigned6 first_seen;
   unsigned3 dt_nonglb_last_seen;
   Header.Layout_Source_ID;
+  unsigned4 global_sid;
+  unsigned8 record_sid; 
 end;
 
 key_data_rec  loadit(Doxie.Layout_ref_rid l, recordof(key_hdr_rid) r) := transform
@@ -30,6 +32,7 @@ key_data_rec  loadit(Doxie.Layout_ref_rid l, recordof(key_hdr_rid) r) := transfo
   self := r;
   self.uid := 0;
   self.src := '';
+  self := []; // commenting out source related fields (global_sid & record_sid)
 end;
 
 withDIDFromHeader := join(rid_data,key_hdr_rid,
@@ -59,6 +62,8 @@ key_data_rec getRids(key_data_rec L, key_rid_src R) := transform
   self.dt_nonglb_last_seen := l.dt_nonglb_last_seen;
   self.uid := r.uid;
   self.src := r.src;
+  self.global_sid := r.global_sid;
+  self.record_sid := r.record_sid;
 end;
 
 srcIDFromHeader := join(withDIDFromHeader,key_rid_src,
@@ -71,12 +76,14 @@ srcIDFromQHeader := join(withDIDFromQHeader,key_qhri_src,
 
 with_rid_all := srcIDFromHeader + srcIDFromQHeader;
 
+with_rid_optout := Suppress.MAC_SuppressSource(with_rid_all, mod_access, did);
+
 //filters for GLB, DPPA, headerSourceRestrictions
-with_rid_filtered := with_rid_all((glb_ok or mod_access.isHeaderPreGLB((unsigned3)dt_nonglb_last_seen, (unsigned3)first_seen, src))
+with_rid_filtered := with_rid_optout((glb_ok or mod_access.isHeaderPreGLB((unsigned3)dt_nonglb_last_seen, (unsigned3)first_seen, src))
                                    AND
                                    (~mdr.SourceTools.SourceIsDPPA(src) OR (dppa_ok AND 
                                    mod_access.isValidDPPAState (header.translateSource(src), src)))
-                                   AND (NOT doxie.DataRestriction.isHeaderSourceRestricted(src, doxie.DataRestriction.fixed_DRM))
+                                   AND (NOT doxie.compliance.isHeaderSourceRestricted(src, doxie.DataRestriction.fixed_DRM))
                                   );
 
 //pull records with restricted dids
