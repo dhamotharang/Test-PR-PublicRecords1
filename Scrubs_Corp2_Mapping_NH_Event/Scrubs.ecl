@@ -1,4 +1,4 @@
-IMPORT CORP2_MAPPING,SALT34,UT;
+﻿IMPORT CORP2_MAPPING,SALT311,UT;
 IMPORT Scrubs,Scrubs_Corp2_Mapping_NH_Event; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
@@ -20,16 +20,16 @@ EXPORT Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(Corp2_Mapping.LayoutsCommon.Events) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.corp_key_Invalid := Fields.InValid_corp_key((SALT34.StrType)le.corp_key);
-    SELF.corp_vendor_Invalid := Fields.InValid_corp_vendor((SALT34.StrType)le.corp_vendor);
-    SELF.corp_state_origin_Invalid := Fields.InValid_corp_state_origin((SALT34.StrType)le.corp_state_origin);
-    SELF.corp_process_date_Invalid := Fields.InValid_corp_process_date((SALT34.StrType)le.corp_process_date);
-    SELF.corp_sos_charter_nbr_Invalid := Fields.InValid_corp_sos_charter_nbr((SALT34.StrType)le.corp_sos_charter_nbr);
-    SELF.event_filing_reference_nbr_Invalid := Fields.InValid_event_filing_reference_nbr((SALT34.StrType)le.event_filing_reference_nbr);
-    SELF.event_filing_date_Invalid := Fields.InValid_event_filing_date((SALT34.StrType)le.event_filing_date);
-    SELF.event_date_type_cd_Invalid := Fields.InValid_event_date_type_cd((SALT34.StrType)le.event_date_type_cd);
-    SELF.event_date_type_desc_Invalid := Fields.InValid_event_date_type_desc((SALT34.StrType)le.event_date_type_desc);
-    SELF.event_desc_Invalid := Fields.InValid_event_desc((SALT34.StrType)le.event_desc);
+    SELF.corp_key_Invalid := Fields.InValid_corp_key((SALT311.StrType)le.corp_key);
+    SELF.corp_vendor_Invalid := Fields.InValid_corp_vendor((SALT311.StrType)le.corp_vendor);
+    SELF.corp_state_origin_Invalid := Fields.InValid_corp_state_origin((SALT311.StrType)le.corp_state_origin);
+    SELF.corp_process_date_Invalid := Fields.InValid_corp_process_date((SALT311.StrType)le.corp_process_date);
+    SELF.corp_sos_charter_nbr_Invalid := Fields.InValid_corp_sos_charter_nbr((SALT311.StrType)le.corp_sos_charter_nbr);
+    SELF.event_filing_reference_nbr_Invalid := Fields.InValid_event_filing_reference_nbr((SALT311.StrType)le.event_filing_reference_nbr);
+    SELF.event_filing_date_Invalid := Fields.InValid_event_filing_date((SALT311.StrType)le.event_filing_date);
+    SELF.event_date_type_cd_Invalid := Fields.InValid_event_date_type_cd((SALT311.StrType)le.event_date_type_cd);
+    SELF.event_date_type_desc_Invalid := Fields.InValid_event_date_type_desc((SALT311.StrType)le.event_date_type_desc);
+    SELF.event_desc_Invalid := Fields.InValid_event_desc((SALT311.StrType)le.event_desc);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -87,8 +87,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT34.StrType ErrorMessage;
-    SALT34.StrType FieldContents;
+    SALT311.StrType ErrorMessage;
+    SALT311.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -107,14 +107,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.event_desc_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'corp_key','corp_vendor','corp_state_origin','corp_process_date','corp_sos_charter_nbr','event_filing_reference_nbr','event_filing_date','event_date_type_cd','event_date_type_desc','event_desc','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_date','invalid_charter_nbr','invalid_event_filing_reference_nbr','invalid_future_date','invalid_event_date_type_cd','invalid_event_date_type_desc','invalid_event_desc','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT34.StrType)le.corp_key,(SALT34.StrType)le.corp_vendor,(SALT34.StrType)le.corp_state_origin,(SALT34.StrType)le.corp_process_date,(SALT34.StrType)le.corp_sos_charter_nbr,(SALT34.StrType)le.event_filing_reference_nbr,(SALT34.StrType)le.event_filing_date,(SALT34.StrType)le.event_date_type_cd,(SALT34.StrType)le.event_date_type_desc,(SALT34.StrType)le.event_desc,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.corp_key,(SALT311.StrType)le.corp_vendor,(SALT311.StrType)le.corp_state_origin,(SALT311.StrType)le.corp_process_date,(SALT311.StrType)le.corp_sos_charter_nbr,(SALT311.StrType)le.event_filing_reference_nbr,(SALT311.StrType)le.event_filing_date,(SALT311.StrType)le.event_date_type_cd,(SALT311.StrType)le.event_date_type_desc,(SALT311.StrType)le.event_desc,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,10,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10,UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(),STRING10 Src='UNK') := FUNCTION
-    SALT34.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -168,12 +168,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT34.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT311.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT34.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT311.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
