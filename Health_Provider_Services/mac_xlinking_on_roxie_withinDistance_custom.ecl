@@ -4,7 +4,7 @@
 																							Input_TAX_ID = '',Input_DEA_NUMBER = '',Input_VENDOR_ID = '',Input_NPI_NUMBER = '',
 																							Input_UPIN = '',Input_DID = '',Input_BDID = '',Input_SRC = '',
 																							Input_SOURCE_RID = '',OutFile, Input_IDL = '', Match_Records = false, Full_Match = false, score = 45, distance = 0,Max_ID = 10) := MACRO
-
+import AppendProviderAttributes;
 #uniquename(in_score)
 %in_score% := score;
 #uniquename(in_distance)
