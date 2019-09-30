@@ -260,16 +260,14 @@ MODULE
 
       SHARED BOOLEAN ValidDeviceConsentInquiry    := ValidZumigoConsents AND hasActiveDeviceRules;
 
-      EXPORT BOOLEAN NameAddressInfo              := pfOptions.IncludeZumigoOptions.NameAddressInfo;
-      EXPORT BOOLEAN IncludeNameAddressInfo       := ValidZumigoConsents AND
-                                                          (TransactionType = $.Constants.TransType.Ultimate OR NameAddressInfo);
+      EXPORT BOOLEAN NameAddressInfo              := FALSE;
+      EXPORT BOOLEAN IncludeNameAddressInfo       := FALSE;
 
       EXPORT BOOLEAN NameAddressValidation        := pfOptions.IncludeZumigoOptions.NameAddressValidation;
-      EXPORT BOOLEAN IncludeNameAddressValidation := IncludeNameAddressInfo OR (full_consent AND (TransactionType = $.Constants.TransType.Ultimate OR NameAddressValidation));   // when NameAddressInfo is requested, NameAddressValidation should also be selected
+      EXPORT BOOLEAN IncludeNameAddressValidation := (full_consent AND (TransactionType = $.Constants.TransType.Ultimate OR NameAddressValidation));
 
-      EXPORT BOOLEAN AccountInfo                  := pfOptions.IncludeZumigoOptions.AccountInfo;
-      EXPORT BOOLEAN IncludeAccountInfo           := ValidZumigoConsents AND
-                                                     (TransactionType = $.Constants.TransType.Ultimate OR AccountInfo);
+      EXPORT BOOLEAN AccountInfo                  := FALSE;
+      EXPORT BOOLEAN IncludeAccountInfo           := FALSE;
 
       EXPORT BOOLEAN CallHandlingInfo             := pfOptions.IncludeZumigoOptions.CallHandlingInfo;
       EXPORT BOOLEAN IncludeCallHandlingInfo           := full_consent AND
@@ -287,13 +285,12 @@ MODULE
       EXPORT BOOLEAN DeviceChangeInfo            := pfOptions.IncludeZumigoOptions.DeviceChangeInfo;
       EXPORT BOOLEAN IncludeDeviceChangeInfo     :=(TransactionType = $.Constants.TransType.Ultimate OR DeviceChangeInfo) AND ValidDeviceConsentInquiry;
 
-      EXPORT BOOLEAN IncludeZumigoOptions        := IncludeNameAddressValidation OR IncludeNameAddressInfo OR
-                                                    IncludeCallHandlingInfo OR IncludeDeviceHistory OR 
-                                                    IncludeDeviceInfo OR IncludeDeviceHistory;                                        	
+      EXPORT BOOLEAN IncludeZumigoOptions        := IncludeNameAddressValidation OR IncludeCallHandlingInfo OR IncludeDeviceHistory
+                                                    OR IncludeDeviceInfo OR IncludeDeviceChangeInfo;
 
       EXPORT BOOLEAN UseZumigoIdentity	         := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity;
 
-      EXPORT BOOLEAN InputZumigoOptions          := NameAddressValidation OR NameAddressInfo OR CallHandlingInfo OR DeviceInfo OR DeviceChangeInfo OR DeviceHistory;
+      EXPORT BOOLEAN InputZumigoOptions          := NameAddressValidation OR CallHandlingInfo OR DeviceInfo OR DeviceChangeInfo OR DeviceHistory;
       EXPORT BOOLEAN UseThreatMetrixRules        := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId  IN $.Constants.AllThreatMetrixRules) AND Active));
 
       EXPORT BOOLEAN hasActiveIdentityCountRules        := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId = $.Constants.RiskRules.IdentityCount AND Active)));
@@ -401,7 +398,6 @@ MODULE
       BOOLEAN hasActiveDeviceRules                := EXISTS(RiskIndicators((RiskId = $.Constants.RiskRules.SimCardInfo OR RiskId = $.Constants.RiskRules.DeviceInfo) AND Active));
 
       SHARED BOOLEAN ValidDeviceConsentInquiry    := ValidZumigoConsents  AND hasActiveDeviceRules;
-      EXPORT BOOLEAN IncludeNameAddressInfo       := ValidZumigoConsents AND (TransactionType = $.Constants.TransType.Ultimate);
       EXPORT BOOLEAN IncludeAccountInfo           := ValidZumigoConsents AND (TransactionType = $.Constants.TransType.Ultimate);
       EXPORT BOOLEAN IncludeNameAddressValidation := ValidZumigoConsents AND (TransactionType = $.Constants.TransType.Ultimate);
 
@@ -410,9 +406,8 @@ MODULE
       EXPORT BOOLEAN IncludeDeviceHistory         := TransactionType = $.Constants.TransType.Ultimate AND ValidDeviceConsentInquiry;
       EXPORT BOOLEAN IncludeDeviceInfo            := TransactionType = $.Constants.TransType.Ultimate AND ValidDeviceConsentInquiry;
       EXPORT BOOLEAN IncludeDeviceChangeInfo      := TransactionType = $.Constants.TransType.Ultimate AND ValidDeviceConsentInquiry;
-      EXPORT BOOLEAN IncludeZumigoOptions         :=  IncludeNameAddressValidation OR IncludeNameAddressInfo OR
-                                                      IncludeCallHandlingInfo OR IncludeDeviceHistory OR
-                                                      IncludeDeviceInfo OR IncludeDeviceHistory;
+      EXPORT BOOLEAN IncludeZumigoOptions         :=  IncludeNameAddressValidation OR IncludeCallHandlingInfo OR IncludeDeviceHistory OR
+                                                      IncludeDeviceInfo OR IncludeDeviceChangeInfo;
       EXPORT BOOLEAN UseZumigoIdentity	          := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity;
       EXPORT BOOLEAN IsGovsearch := ApplicationType in AutoStandardI.Constants.GOV_TYPES;
     END;

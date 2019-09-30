@@ -376,8 +376,8 @@ MODULE
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.ReasonCodes;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.TmxVariables;
 			UNSIGNED2  identity_count := 0;
-			INTEGER imsi_Tenure_MinDays;
-			INTEGER imsi_Tenure_MaxDays;
+			INTEGER sim_Tenure_MinDays;
+			INTEGER sim_Tenure_MaxDays;
 			INTEGER imei_Tenure_MinDays;
 			INTEGER imei_Tenure_MaxDays;
 		END;
