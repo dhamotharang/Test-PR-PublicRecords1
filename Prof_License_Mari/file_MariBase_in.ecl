@@ -1,4 +1,4 @@
-﻿import _control, CCPA, Data_services, lib_stringlib, Prof_License_Mari, Std, Ut;
+﻿import _control, MDR, Data_services, lib_stringlib, Prof_License_Mari, Std, Ut;
 
 FileName	:=	data_services.foreign_prod+'thor_data400::in::proflic_mari::';
 
@@ -178,7 +178,7 @@ concatenated_basefiles :=  PROJECT(dataset(FileName + 'cmrflat',Prof_License_Mar
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
 													 + PROJECT(dataset(FileName + 'S0858',	Prof_License_Mari.layout_base_in,thor),						// ** Wyoming Real Estate Commission
 																				 TRANSFORM(Prof_License_Mari.layouts.base,SELF.global_sid:=0;SELF.record_sid:=0,SELF:=LEFT))
-													 + CCPA.macGetGlobalSID(fixS0900, 'Mari', 'std_source_upd', 'global_sid');								// ** NMLS
+													 + MDR.macGetGlobalSid(fixS0900, 'Mari', 'std_source_upd', 'global_sid');								// ** NMLS
 													 
 													 // + PROJECT(dataset(FileName + 'S0690',	Prof_License_Mari.layout_base_in,thor)					// ** Wyoming Division of Banking
 													 

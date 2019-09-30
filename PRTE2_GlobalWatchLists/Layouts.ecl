@@ -1,4 +1,4 @@
-//Layouts
+﻿//Layouts
 
 Import GlobalWatchLists, Patriot, aid;
 
@@ -39,7 +39,6 @@ Export Layout_Base_Patriot:= Record
   string9 link_fein;
   string8 link_inc_date;
 	STRING8 link_dob;
-	unsigned6 did;
   unsigned6 bdid;
 	End;
 	
@@ -128,7 +127,6 @@ Export GWL_base_Layout_Ext := RECORD
 			 string9 link_ssn;
        string9 link_fein;
        string8 link_inc_date;
-			 unsigned6 did;
 			 unsigned6 bdid;
 End;
 

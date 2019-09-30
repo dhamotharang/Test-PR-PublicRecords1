@@ -1,4 +1,4 @@
-﻿import _control, CCPA, Address, Ut, lib_stringlib, _Control, business_header, _Validate, idl_header, Std;
+﻿import _control, MDR, Address, Ut, lib_stringlib, _Control, business_header, _Validate, idl_header, Std;
 
 // -- add unique id
 // -- standardize name
@@ -203,7 +203,7 @@ module
 																,left outer
 															);
 		
-		addGlobalSID := CCPA.macGetGlobalSID(dCleanDatesAppended, 'Spoke', '', 'global_sid'); //DF-25334: Append Global_SIDs
+		addGlobalSID := MDR.macGetGlobalSid(dCleanDatesAppended, 'Spoke', '', 'global_sid'); //DF-25334: Append Global_SIDs
 	
 		return addGlobalSID;
 	

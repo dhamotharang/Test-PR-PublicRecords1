@@ -1,4 +1,4 @@
-﻿IMPORT _Control, BIPV2_Best_SBFE, BIPV2_Best,	BIPV2, Business_Credit, CCPA, doxie, STD;
+﻿IMPORT _Control, BIPV2_Best_SBFE, BIPV2_Best,	BIPV2, Business_Credit, MDR, doxie, STD;
 EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 										Constants().buildType	pBuildType	=	Constants().buildType.Daily) := MODULE
 
@@ -10,7 +10,7 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 														
 	SHARED dSBFEBestKey := PROJECT(dSBFEBestBase, TRANSFORM(BIPV2_Best.layouts.key, SELF:=LEFT, SELF:=[]));  //DF-25791: Populate Global_SID Field
 		
-	SHARED  addGlobalSID :=  CCPA.macGetGlobalSID(dSBFEBestKey,'SBFECV','','global_sid');	
+	SHARED  addGlobalSID :=  MDR.macGetGlobalSid(dSBFEBestKey,'SBFECV','','global_sid');	
 	
 	// DEFINE THE INDEX
 	SHARED	superfile_name	:=	BIPV2_Best_SBFE.Keynames().LinkIds.QA;	

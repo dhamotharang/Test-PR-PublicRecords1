@@ -1,7 +1,9 @@
-﻿import demowatchlistscreening;
+﻿import demowatchlistscreening, dx_demowatchlistscreening;
 
 EXPORT Layouts := module
 	
+	export matches_entity_name := dx_DemoWatchlistScreening.layouts.matches_entity_name_layout;
+/*	
 export matches_entity_name := record
 	String50	Block_ID;
 	String50	Error_Message;
@@ -377,5 +379,6 @@ export matches_entity_name := record
 	String50	Matches_Descriptions_Value_5;
 	String100	Matches_Descriptions_Notes_5;
 end;
+*/
 
 end;
