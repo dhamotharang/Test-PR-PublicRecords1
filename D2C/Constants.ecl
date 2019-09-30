@@ -1,7 +1,13 @@
 ﻿IMPORT MDR;
 EXPORT Constants := MODULE
 
-	
+ EXPORT CNSMR := 'CNSMR'; //Industry class for D2C 
+	EXPORT src_AK_commercial_fishing_vessels := 'WT'; //Alaska Commercial Fishing Vessels
+	EXPORT src_Property_Fares := 'F'; //Property Assessments & Deeds(Fares)
+	EXPORT src_Property_Fares_supplemental := 'S'; //Property Assessments & Deeds supplemental(Fares)
+	EXPORT vendor_CIVPABUCKS := 'CIV60'; //CIVPA-BUCKS-CIVIL-COURT  
+	EXPORT vendor_CIVTXHARRISCNTY := 'CIV90'; //CIVTX-HARRISCNTYCIVIL    
+
 		
 	EXPORT CCWRestrictedSources := [
 		MDR.sourceTools.src_EMerge_CCW_NY
@@ -98,7 +104,39 @@ EXPORT Constants := MODULE
 																		//18259
 																		];
  
+//------------------------------------------------------------------------------------------------------//
+EXPORT WatercraftRestrictedSources := [
+		MDR.sourceTools.src_AL_Watercraft, MDR.sourceTools.src_AK_Watercraft, MDR.sourceTools.src_AZ_Watercraft, 
+		MDR.sourceTools.src_AR_Watercraft, MDR.sourceTools.src_CO_Watercraft, MDR.sourceTools.src_CT_Watercraft, 
+		MDR.sourceTools.src_FL_Watercraft, MDR.sourceTools.src_GA_Watercraft, MDR.sourceTools.src_IL_Watercraft, 
+		MDR.sourceTools.src_IA_Watercraft, MDR.sourceTools.src_KS_Watercraft, MDR.sourceTools.src_KY_Watercraft, 
+		MDR.sourceTools.src_ME_Watercraft, MDR.sourceTools.src_MD_Watercraft, MDR.sourceTools.src_MA_Watercraft, 
+		MDR.sourceTools.src_MI_Watercraft, MDR.sourceTools.src_MN_Watercraft, MDR.sourceTools.src_MS_Watercraft, 
+		MDR.sourceTools.src_MT_Watercraft, MDR.sourceTools.src_MO_Watercraft, MDR.sourceTools.src_NE_Watercraft, 
+		MDR.sourceTools.src_NH_Watercraft, MDR.sourceTools.src_NV_Watercraft, MDR.sourceTools.src_NY_Watercraft, 
+		MDR.sourceTools.src_NC_Watercraft, MDR.sourceTools.src_ND_Watercraft, MDR.sourceTools.src_OH_Watercraft, 
+		MDR.sourceTools.src_OR_Watercraft, MDR.sourceTools.src_SC_Watercraft, MDR.sourceTools.src_TN_Watercraft, 
+		MDR.sourceTools.src_TX_Watercraft, MDR.sourceTools.src_UT_Watercraft, MDR.sourceTools.src_VA_Watercraft, 
+		MDR.sourceTools.src_WA_Watercraft, MDR.sourceTools.src_WV_Watercraft, MDR.sourceTools.src_WI_Watercraft, 
+		MDR.sourceTools.src_WY_Watercraft, MDR.sourceTools.src_Infutor_Watercraft, src_AK_commercial_fishing_vessels];
 
+//------------------------------------------------------------------------------------------------------//
+
+EXPORT PhonesPlusV2RestrictedSources := [
+		mdr.sourceTools.src_Targus_White_Pages, mdr.sourceTools.src_Equifax, mdr.sourceTools.src_Utilities,
+		mdr.sourceTools.src_LnPropV2_Fares_Asrs, mdr.sourceTools.src_Voters_v2, mdr.sourceTools.src_Util_Work_Phone,
+		mdr.sourceTools.src_Professional_License, mdr.sourceTools.src_Certegy, mdr.sourceTools.src_KY_Watercraft,
+		mdr.sourceTools.src_VA_Watercraft, mdr.sourceTools.src_NC_Watercraft, mdr.sourceTools.src_TUCS_Ptrack,
+		mdr.sourceTools.src_MD_Watercraft, mdr.sourceTools.src_MO_Veh, mdr.sourceTools.src_MO_DL,
+		mdr.sourceTools.src_MO_Experian_Veh, mdr.sourceTools.src_Experian_Credit_Header, mdr.sourceTools.src_MO_Watercraft,
+		mdr.sourceTools.src_Wired_Assets_Royalty, mdr.sourceTools.src_Wired_Assets_Owned, mdr.sourceTools.src_ZUtil_Work_Phone,
+		mdr.sourceTools.src_ZUtilities, mdr.sourceTools.src_InquiryAcclogs, mdr.sourceTools.src_TU_CreditHeader];
+//------------------------------------------------------------------------------------------------------//
+
+EXPORT LNPropertyV2RestrictedSources := [src_Property_Fares, src_Property_Fares_supplemental];
+//------------------------------------------------------------------------------------------------------//
+
+EXPORT MDV2Restrictedvendors := [vendor_CIVPABUCKS, vendor_CIVTXHARRISCNTY];
 //------------------------------------------------------------------------------------------------------//
 /*	PersonHeaderKeys 
 		Keys :  
@@ -108,6 +146,12 @@ EXPORT Constants := MODULE
 			thor_data400::key::header_qa
 		Source field : src
  */
+ 
+ //------------------------------------------------------------------------------------------------------//
+
+EXPORT PhonemetadataRestrictedSources := [ MDR.sourceTools.src_PhonesPorted_TCPA];
+
+ //------------------------------------------------------------------------------------------------------//
 
  EXPORT PersonHeaderRestrictedSources := [
 			MDR.sourceTools.src_WV_Watercraft,					
@@ -147,17 +191,5 @@ EXPORT Constants := MODULE
 			MDR.sourceTools.src_VA_Watercraft, 							
 			MDR.sourceTools.src_Targus_White_pages
 ];
-
-
-EXPORT PhonesPlusV2RestrictedSources := [
-		mdr.sourceTools.src_Targus_White_Pages, mdr.sourceTools.src_Equifax, mdr.sourceTools.src_Utilities,
-		mdr.sourceTools.src_LnPropV2_Fares_Asrs, mdr.sourceTools.src_Voters_v2, mdr.sourceTools.src_Util_Work_Phone,
-		mdr.sourceTools.src_Professional_License, mdr.sourceTools.src_Certegy, mdr.sourceTools.src_KY_Watercraft,
-		mdr.sourceTools.src_VA_Watercraft, mdr.sourceTools.src_NC_Watercraft, mdr.sourceTools.src_TUCS_Ptrack,
-		mdr.sourceTools.src_MD_Watercraft, mdr.sourceTools.src_MO_Veh, mdr.sourceTools.src_MO_DL,
-		mdr.sourceTools.src_MO_Experian_Veh, mdr.sourceTools.src_Experian_Credit_Header, mdr.sourceTools.src_MO_Watercraft,
-		mdr.sourceTools.src_Wired_Assets_Royalty, mdr.sourceTools.src_Wired_Assets_Owned, mdr.sourceTools.src_ZUtil_Work_Phone,
-		mdr.sourceTools.src_ZUtilities, mdr.sourceTools.src_InquiryAcclogs, mdr.sourceTools.src_TU_CreditHeader
-        ];
 
 END;
