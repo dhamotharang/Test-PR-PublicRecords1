@@ -12,7 +12,7 @@ EXPORT SmartLinx_Person_Sections (STRING in_did, BOOLEAN include_sourceDocSectio
     // Each heading below are the sections from the person smartlinx code the boolean flags were taken from
     in_mod := AutoStandardI.GlobalModule();  
     
-    search_mod := MODULE (PROJECT (in_mod, PersonReports.input._didsearch, OPT))
+    search_mod := MODULE (PROJECT (in_mod, PersonReports.IParam._didsearch, OPT))
       END;
 
     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(in_mod);  

@@ -147,8 +147,8 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	//combine proflic,  medprov, medsanc
   profmod   := personReports.proflic_records (dids, PROJECT(mod_smartlinx, $.IParam.proflic), IsFCRA);
 	prof      := IF (mod_smartlinx.include_proflicenses and count(profmod.proflicenses_v2) <= iesp.constants.SMART.MaxUnRolledRecords, profmod.proflicenses_v2,dataset([],iesp.proflicense.t_ProfessionalLicenseRecord));
-  sanc	    := IF (mod_smartlinx.include_proflicenses, personReports.sanctions_records (dids, module (project (old_param, $.input.sanctions, opt)) end, IsFCRA),dataset([],iesp.proflicense.t_SanctionRecord));
-	prov_recs := IF (mod_smartlinx.include_proflicenses, personReports.providers_records (dids, module (project (old_param, $.input.providers)) end, IsFCRA));
+  sanc	    := IF (mod_smartlinx.include_proflicenses, personReports.sanctions_records (dids, PROJECT (mod_smartlinx, $.IParam.sanctions), IsFCRA),dataset([],iesp.proflicense.t_SanctionRecord));
+	prov_recs := IF (mod_smartlinx.include_proflicenses, personReports.providers_records (dids, PROJECT (mod_smartlinx, $.IParam.providers), IsFCRA));
 	prov      := IF (mod_smartlinx.include_proflicenses and count(prov_recs) <= iesp.constants.SMART.MaxUnRolledRecords, prov_recs,dataset([],iesp.proflicense.t_ProviderRecord));
 	s_profSancProv := SmartRollup.fn_smart_rollup_prof_lic(prof,prov,sanc);
 	s_profSancProv_count := count(s_profSancProv);
@@ -163,18 +163,18 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_firearms_count := count(s_firearms);
   p_firearms  := choosen(if (mod_smartlinx.Smart_rollup,s_firearms, firearms), iesp.Constants.SMART.MaxFirearms);
 
-  dea         := IF (mod_smartlinx.include_controlledsubstances, PersonReports.dea_records(dids), dataset([],iesp.deacontrolledsubstance.t_DEAControlledSubstanceSearch2Record));
+  dea         := IF (mod_smartlinx.include_controlledsubstances, PersonReports.dea_records(dids, PROJECT (mod_smartlinx, $.IParam.dea)), dataset([],iesp.deacontrolledsubstance.t_DEAControlledSubstanceSearch2Record));
 	s_dea       := SmartRollup.fn_smart_rollup_dea(dea);
 	s_dea_count := count(s_dea);
   p_dea       := choosen (if (mod_smartlinx.Smart_Rollup, s_dea, dea),iesp.Constants.SMART.MaxDEA);
  
-	weaponsIesp_pre := IF (mod_smartlinx.include_weaponpermits, PersonReports.ccw_records (dids, module (project (old_param, $.input.ccw)) end, isFCRA));
-	weaponsIesp 	 := project(weaponsIesp_pre,iesp.concealedweapon.t_WeaponRecord);
+  weaponsIesp_pre := IF (mod_smartlinx.include_weaponpermits, PersonReports.ccw_records (dids, PROJECT (mod_smartlinx, $.IParam.ccw), isFCRA));
+  weaponsIesp 	 := project(weaponsIesp_pre,iesp.concealedweapon.t_WeaponRecord);
   s_weapons      := SmartRollup.fn_smart_rollup_cweapons(weaponsIesp);
-	s_weapons_count := count(s_weapons);
+  s_weapons_count := count(s_weapons);
   p_weapons      := choosen (if (mod_smartlinx.Smart_rollup, s_weapons, weaponsIesp),iesp.Constants.SMART.MaxWeapons);
- 
-	HF_recs 			 := doxie.hunting_records(dids, isFCRA, ds_flags(file_id = FCRA.FILE_ID.HUNTING_FISHING));
+	
+  HF_recs 			 := doxie.hunting_records(dids, isFCRA, ds_flags(file_id = FCRA.FILE_ID.HUNTING_FISHING));
  	hunting        := IF (mod_smartlinx.include_huntingfishing, HF_recs, dataset([],doxie_crs.layout_hunting_records));
   huntfishing    := SmartRollup.fn_hunting_iesp(hunting);
 	s_hunting      := SmartRollup.fn_smart_rollup_hunting(huntfishing);
@@ -331,7 +331,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 		 pawNonExec_count := count(pawNonExec);
 		 pawExec   := SmartRollup.fn_smart_rollup_paw(pawMod.paw_exec);  //executives ONLY rolled up
 		 p_paw     := choosen (pawNonExec, iesp.Constants.SMART.MaxPeopleAtWork);    
-     corp_aff_raw  := IF (mod_smartlinx.include_corpaffiliations,PersonReports.corpaffiliation_records (dids, module (project (old_param, $.input.corpaffil)) end, IsFCRA),dataset([],iesp.bpsreport.t_BpsCorpAffiliation));
+     corp_aff_raw  := IF (mod_smartlinx.include_corpaffiliations,PersonReports.corpaffiliation_records (dids, PROJECT (mod_smartlinx, $.IParam.corpaffil), IsFCRA),dataset([],iesp.bpsreport.t_BpsCorpAffiliation));
 		 corp_aff  := SmartRollup.fn_corp_aff_titles(corp_aff_raw); //standardizes titles
 		 fbn       := IF (mod_smartlinx.include_corpaffiliations,doxie.Comp_FBN2Search(dids),dataset([],iesp.fictitiousbusinesssearch.t_FictitiousBusinessSearchRecord)); 
      s_corp_aff := SmartRollup.fn_smart_rollup_corp_aff(corp_aff, fbn, pawExec);  //fbn added to corp_aff as part of requirements bug 97177   

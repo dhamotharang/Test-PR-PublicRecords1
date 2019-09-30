@@ -1,10 +1,10 @@
-import iesp, doxie,Prof_LicenseV2_Services;
+IMPORT $, iesp, doxie,Prof_LicenseV2_Services;
 
 out_rec := iesp.proflicense.t_SanctionRecord;
 
 EXPORT dataset (out_rec) sanctions_records (
   dataset (doxie.layout_references) dids,
-  input.sanctions in_params = module (input.sanctions) end,
+  $.IParam.sanctions in_params = module ($.IParam.sanctions) end, //currently, a placeholder
   boolean IsFCRA = false
 ) := FUNCTION
 

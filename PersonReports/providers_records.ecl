@@ -1,10 +1,10 @@
-IMPORT iesp, doxie, Prof_LicenseV2_Services;
+IMPORT $, iesp, doxie;
 
 out_rec := iesp.proflicense.t_ProviderRecord;
 
 EXPORT out_rec providers_records (
   DATASET(doxie.layout_references) dids,
-  input.providers in_params = MODULE(input.providers) END,
+  $.IParam.providers in_params = MODULE($.IParam.providers) END, //currently, a placeholder
   BOOLEAN IsFCRA = FALSE
 ) := FUNCTION
 
