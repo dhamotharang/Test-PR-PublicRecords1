@@ -120,7 +120,7 @@ iesp.WsSearchCore.t_SearchResponse WatchlistTransform (iesp.WsSearchCore.t_Searc
                                                                                               self.Entity.EntityDetails._Type := (integer)ri.Matches_Entity_Entity_Details_Type;
                                                                                               self.Entity.EntityUniqueID := ri.Matches_Entity_Entity_Unique_ID;
                                                                                               self.Entity.SearchCriteria := ri.Matches_Entity_Search_Criteria;
-                                                                                              self.Entity.Name := ri.Matches_Entity_Name;
+                                                                                              self.Entity.Name := ri.Matches_Entity_Name_Unicode;
                                                                                               self.Entity.Score := (integer)ri.Matches_Entity_Score;
                                                                                                                                                                                         
                                                                                               self.File.Build := ri.Matches_File_Build;
