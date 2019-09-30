@@ -30,13 +30,23 @@ FUNCTION
 		lBatchIn batch_in;
 	END;
 	
+  mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+    EXPORT unsigned1 glb := inMod.GLBPurpose;
+    EXPORT unsigned1 dppa := inMod.DPPAPurpose;
+    EXPORT string DataPermissionMask := inMod.DataPermissionMask;
+    EXPORT string DataRestrictionMask := inMod.DataRestrictionMask;
+    EXPORT string5 industry_class := inMod.industryclass;
+    EXPORT string32 application_type := inMod.applicationType;
+		EXPORT boolean show_minors := inMod.IncludeMinors OR (inMod.glbPurpose = 2);
+  END;
+
 	rTargus_Layout tGetTargusData(dInReformat pInput) :=
 	TRANSFORM
 		SELF.targus_recs := doxie.MAC_Get_GLB_DPPA_Targus(TRUE,
 																											pInput.homephone,pInput.name_first,pInput.name_middle,pInput.name_last,
 																											pInput.prim_range,pInput.predir,pInput.prim_name,pInput.addr_suffix,
 																											pInput.postdir,pInput.unit_desig,pInput.sec_range,pInput.p_city_name,pInput.st,
-																											pInput.z5,pInput.zip4,inMod.GLBPurpose,inMod.DPPAPurpose,
+																											pInput.z5,pInput.zip4,mod_access,
 																											inMod.ScoreThreshold,pGateway,pInput.comp_name,TRUE);
 		SELF.batch_in    := pInput;
 	END;

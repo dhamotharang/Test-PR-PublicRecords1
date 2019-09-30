@@ -1,12 +1,17 @@
-import targus, royalty;
+import $, targus, royalty, doxie, dx_gateway;
 
 // replacement for Targus.Targus_Soapcall_Function
 
-EXPORT SoapCall_Targus(dataset(targus.Layout_Targus_In) df, 
-											 Gateway.Layouts.Config gateway_cfg, 
+EXPORT SoapCall_Targus(dataset(targus.Layout_Targus_In) d_recs_in, 
+											 Gateway.Layouts.Config gateway_cfg,
 											 integer timeout=1, 
 											 integer retries=1,
-											 boolean makeGatewayCall = false) := function
+											 boolean makeGatewayCall = false,
+                       doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END,
+                       boolean apply_opt_out = false) := function
+
+d_recs_in_clean := dx_gateway.parser_targus.CleanRequest(d_recs_in, mod_access);
+d_recs_in_ready := IF(apply_opt_out, d_recs_in_clean, d_recs_in);
 
 gateway_URL := gateway_cfg.url;
 
@@ -22,7 +27,7 @@ end;
 
 //'http://web_bps_roxie:[PASSWORD_REDACTED]@172.16.18.165:7996/WsGateway'
 
-targus.layout_targus_in into_in(df L) := transform
+targus.layout_targus_in into_in(d_recs_in L) := transform
 	self.user.referenceCode := if(L.user.referenceCode <> '', trim(L.user.referenceCode), gateway_cfg.TransactionId);
 	self.user.BillingCode := trim(L.user.BillingCode);
 	self.user.queryId := trim(L.user.QueryId);
@@ -78,12 +83,13 @@ targus.layout_targus_in into_in(df L) := transform
 	self := L;
 end;
 
-outf := if (makeGatewayCall, soapcall(df,gateway_URL,'TargusComprehensive',
+d_recs_out := if (makeGatewayCall, soapcall(d_recs_in_ready,gateway_URL,'TargusComprehensive',
 				targus.Layout_Targus_In, into_in(LEFT),  
 				dataset(targus.Layout_Targus_Out),
 				XPATH('TargusComprehensiveResponseEx'),
 				ONFAIL(errX(left)), timeout(timeout), retry(retries)));
 
-return outf;
+d_recs_out_clean := dx_gateway.parser_targus.CleanResponse(d_recs_out, mod_access);
+return IF(apply_opt_out, d_recs_out_clean, d_recs_out);
 
 end;

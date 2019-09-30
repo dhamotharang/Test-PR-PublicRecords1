@@ -11,6 +11,14 @@ EXPORT val (dataset(doxie.layout_references) dids,
 targus_cfg := gateways(Gateway.Configuration.isTargus(servicename))[1];
 //Address HRIs option
 unsigned1 maxHriPer_value := 10;
+
+mod_access  := module(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+  export unsigned1 dppa := inMod.DPPAPurpose;
+  export unsigned1 glb := inMod.GLBPurpose;
+  export string5 industry_class := inMod.IndustryClass;
+  export string32 application_type := inMod.ApplicationType;          
+end;
+
 //adding targus and qsent options
 boolean use_tg := doxie.DataPermission.use_targus;
 boolean use_LR := doxie.DataPermission.Use_LastResort and inMod.IncludeLastResort;
@@ -42,7 +50,7 @@ fullNameAddressSearch := (inMod.FirstName != '' and inMod.LastName != '' or inMo
 // add did if coming from inMod
 
 doxie.MAC_Get_GLB_DPPA_PhonesPlus(dids, h0_tf, true,,
-                                  inMod.GLBPurpose, inMod.DPPAPurpose, inMod.IndustryClass,if(inMod.IncludeFullPhonesPlus,0,11),
+                                  mod_access.glb, mod_access.dppa, mod_access.industry_class, if(inMod.IncludeFullPhonesPlus,0,11),
                                   inMod.CompanyName,,false,doxie.DataRestriction.fixed_DRM);
 
 h0 := h0_tf(((phoneOnlySearch or phoneStSearch) AND PhoneSize=7 AND inMod.Phone=phone[4..10]) OR
@@ -54,20 +62,11 @@ h0 := h0_tf(((phoneOnlySearch or phoneStSearch) AND PhoneSize=7 AND inMod.Phone=
 
 //targus gateway
 h_targus := if(~call_PVS,doxie.MAC_Get_GLB_DPPA_Targus(phoneOnlySearch,
-                                          inMod.Phone, inMod.FirstName, inMod.MiddleName, inMod.LastName,
-                                          inMod.PrimRange, inMod.PreDir, inMod.PrimName, inMod.Suffix,
-                                          inMod.PostDir, '', inMod.SecRange, inMod.City, inMod.State,
-                                          inMod.Zip, '', inMod.GLBPurpose, inMod.DPPAPurpose,
-                                          score_threshold_value, targus_cfg, inMod.CompanyName)(phone<>'',penalt<score_threshold_value));
-
-  mod_access  := module(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
-		export unsigned1 dppa := inMod.DPPAPurpose;
-		export unsigned1 glb :=  inMod.GLBPurpose;
-		export string5   industry_class := inMod.IndustryClass;
-		export string32   application_type := inMod.ApplicationType;
-
-  end;
-
+  inMod.Phone, inMod.FirstName, inMod.MiddleName, inMod.LastName,
+  inMod.PrimRange, inMod.PreDir, inMod.PrimName, inMod.Suffix,
+  inMod.PostDir, '', inMod.SecRange, inMod.City, inMod.State, inMod.Zip, '', 
+  mod_access, score_threshold_value, targus_cfg, inMod.CompanyName,,TRUE)
+  (phone<>'',penalt<score_threshold_value));
 
 //In house QSent
 doxie.MAC_Get_GLB_DPPA_Qsent(dids, h_qsent, mod_access, true,,inMod.CompanyName);
@@ -161,7 +160,7 @@ h3_ready := sort(h3_dep, penalt, map(Phonesplus_v2.IsCell(append_phone_type)=>1,
 
 //Targus and confirm
 h3 := if(use_tg and use_cfm and ~call_PVS,
-         targus.FN_PPL_Confirm_Connect(h3_ready, inMod.GLBPurpose, inMod.DPPAPurpose, targus_cfg),
+         targus.FN_PPL_Confirm_Connect(h3_ready, mod_access, targus_cfg),
          h3_ready);
 census_data.MAC_Fips2County_Keyed(h3,st,county_code,county_name,g0);
 
