@@ -1,4 +1,4 @@
-﻿IMPORT KEL011 AS KEL;
+﻿IMPORT KEL11 AS KEL;
 IMPORT PublicRecords_KEL;
 
 EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) InputData,
@@ -8,12 +8,12 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
     PROJECT(
        InputData,
       TRANSFORM( PublicRecords_KEL.ECL_Functions.Input_UID_Bus_Layout,
-        SELF.BusInputUIDAppend := COUNTER,
+        SELF.G_ProcBusUID := COUNTER,
         SELF := LEFT;
 				SELF := []));
 				
 	//Get the 5 Rep information into a dataset with unique RepNumbers			
-	echoReps := SORT(PublicRecords_KEL.ECL_Functions.Fn_InputEchoBusReps_Roxie( ds_input ), BusInputUIDAppend);
+	echoReps := SORT(PublicRecords_KEL.ECL_Functions.Fn_InputEchoBusReps_Roxie( ds_input ), G_ProcBusUID);
 	
 	//Get the business information
 	echoBusiness := PublicRecords_KEL.ECL_Functions.Fn_InputEchoBus_Roxie( ds_input );
@@ -37,13 +37,13 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, Options, withBIPIDs );
 
 	// Get Business attributes
-	// When we get the cleaned attributes, then BusInputArchiveDateEcho will change to BusInputArchiveDateClean
+	// When we get the cleaned attributes, then B_InpArchDt will change to B_InpClnArchDt
 	InputPIIBIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Bus_Attributes_V1(withRepLexIDs, withBIPIDs, 
-		(STRING) withBIPIDs[1].BusInputArchiveDateClean[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
+		(STRING) withBIPIDs[1].B_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 		
 	BusinessSeleIDAttributes := PublicRecords_KEL.FnRoxie_GetBusinessSeleIDAttributes(withBIPIDs, FDCDataset, Options);
 	
-	withBusinessSeleIDAttributes := JOIN(InputPIIBIIAttributes, BusinessSeleIDAttributes, LEFT.BusInputUIDAppend = RIGHT.BusInputUIDAppend,
+	withBusinessSeleIDAttributes := JOIN(InputPIIBIIAttributes, BusinessSeleIDAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
 			SELF := RIGHT,
 			SELF := LEFT,
@@ -51,20 +51,20 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 		LEFT OUTER, KEEP(1), ATMOST(100));	
 
 	// Get consumer attributes
-	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(Rep1Input, Rep1Input[1].InputArchiveDateClean[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
+	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(Rep1Input, Rep1Input[1].P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 
 	Rep1PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(Rep1Input, FDCDataset, Options);
 
 	// Join Consumer Results back in with business results
-	withRep1InputPII := JOIN(withBusinessSeleIDAttributes, Rep1InputPIIAttributes, LEFT.BusInputUIDAppend = RIGHT.BusInputUIDAppend,
+	withRep1InputPII := JOIN(withBusinessSeleIDAttributes, Rep1InputPIIAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
-			SELF.InputUIDAppend := RIGHT.InputUIDAppend, // Set InputUIDAppend to Rep1 value so we can use this value for other rep 1 attributes.
+			SELF.G_ProcUID := RIGHT.G_ProcUID, // Set G_ProcUID to Rep1 value so we can use this value for other rep 1 attributes.
 			SELF := RIGHT,
 			SELF := LEFT,
 			SELF := []),
 		LEFT OUTER, KEEP(1), ATMOST(100));	
 		
-	withRep1PersonAttributes := JOIN(withRep1InputPII, Rep1PersonAttributes, LEFT.InputUIDAppend = RIGHT.InputUIDAppend,
+	withRep1PersonAttributes := JOIN(withRep1InputPII, Rep1PersonAttributes, LEFT.G_ProcUID  = RIGHT.G_ProcUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
 			SELF := RIGHT,
 			SELF := LEFT,
@@ -72,9 +72,9 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 		LEFT OUTER, KEEP(1), ATMOST(100));	
 		
 	// If consumer shell attributes are turned off, we can bypass these calculations as a performance enhancement.	
-	FinalResult := IF(Options.ExcludeConsumerShell, withBusinessSeleIDAttributes, withRep1PersonAttributes);
+	FinalResult := IF(Options.ExcludeConsumerAttributes, withBusinessSeleIDAttributes, withRep1PersonAttributes);
 	
-	MasterResults := SORT(FinalResult, BusInputUIDAppend);
+	MasterResults := SORT(FinalResult, G_ProcBusUID);
 	
 	IF(Options.OutputMasterResults, OUTPUT(MasterResults, NAMED('MasterResults')));
 

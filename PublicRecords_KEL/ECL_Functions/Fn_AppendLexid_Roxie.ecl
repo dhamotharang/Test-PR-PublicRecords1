@@ -15,63 +15,63 @@ EXPORT Fn_AppendLexid_Roxie(
   allscores := FALSE;
   indata_did := PROJECT(indata, 
     TRANSFORM(didville.Layout_Did_OutBatch, 
-      SELF.Did := LEFT.InputLexIDEcho;
-      SELF.dl_nbr:= LEFT.InputDLClean;
-      SELF.email:= LEFT.InputEmailClean;
+      SELF.Did := LEFT.P_InpLexID;
+      SELF.dl_nbr:= LEFT.P_InpClnDL;
+      SELF.email:= LEFT.P_InpClnEmail;
       //Same between the layouts
       SELF.Score := 0;
-      SELF.Seq := LEFT.InputUIDAppend;
-      SELF.SSN := LEFT.InputSSNClean;
-      SELF.DOB := LEFT.InputDOBClean; 
-      SELF.Phone10 := LEFT.InputHomePhoneClean;
-      SELF.title:= LEFT.InputPrefixClean;
-      SELF.fname:= LEFT.InputFirstNameClean;
-      SELF.mname:= LEFT.InputMiddleNameClean;
-      SELF.lname:= LEFT.InputLastNameClean;
-      SELF.suffix:= LEFT.InputSuffixClean;
-      SELF.prim_range:= LEFT.InputPrimaryRangeClean;
-      SELF.predir:= LEFT.InputPreDirectionClean;
-      SELF.prim_name:= LEFT.InputPrimaryNameClean;
-      SELF.addr_suffix:= LEFT.InputAddressSuffixClean;
-      SELF.postdir:= LEFT.InputPostDirectionClean;
-      SELF.unit_desig:= LEFT.InputUnitDesigClean;
-      SELF.sec_range:= LEFT.InputSecondaryRangeClean;
-      SELF.p_city_name:= LEFT.InputCityClean;
-      SELF.st:= LEFT.InputStateClean;
-      SELF.z5:= LEFT.InputZip5Clean;
-      SELF.zip4:= LEFT.InputZip4Clean;
-      SELF.dl_state:= LEFT.InputDLStateClean;
-      SELF := LEFT;
+      SELF.Seq := LEFT.G_ProcUID;
+      SELF.SSN := LEFT.P_InpClnSSN;
+      SELF.DOB := LEFT.P_InpClnDOB; 
+      SELF.Phone10 := LEFT.P_InpClnPhoneHome;
+      SELF.title:= LEFT.P_InpClnNamePrfx;
+      SELF.fname:= LEFT.P_InpClnNameFirst;
+      SELF.mname:= LEFT.P_InpClnNameMid;
+      SELF.lname:= LEFT.P_InpClnNameLast;
+      SELF.suffix:= LEFT.P_InpClnNameSffx;
+      SELF.prim_range:= LEFT.P_InpClnAddrPrimRng;
+      SELF.predir:= LEFT.P_InpClnAddrPreDir;
+      SELF.prim_name:= LEFT.P_InpClnAddrPrimName;
+      SELF.addr_suffix:= LEFT.P_InpClnAddrSffx;
+      SELF.postdir:= LEFT.P_InpClnAddrPostDir;
+      SELF.unit_desig:= LEFT.P_InpClnAddrUnitDesig;
+      SELF.sec_range:= LEFT.P_InpClnAddrSecRng;
+      SELF.p_city_name:= LEFT.P_InpClnAddrCity;
+      SELF.st:= LEFT.P_InpClnAddrState;
+      SELF.z5:= LEFT.P_InpClnAddrZip5;
+      SELF.zip4:= LEFT.P_InpClnAddrZip4;
+      SELF.dl_state:= LEFT.P_InpClnDLState;
+	  SELF := LEFT;
       )); 
   //The Roxie Lexid Append
 	didville.Mac_DIDAppend(indata_did, resu, dedup_these, fz, allscores) ;
  //Since Layout_Did_OutBatch doesn't have all the output from our indata, rejoin back to indata
   IndataGotDid := JOIN(indata, resu,
-   LEFT.InputUIDAppend = RIGHT.Seq,
+   LEFT.G_ProcUID = RIGHT.Seq,
     TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, 
-			SELF.InputLexIDEcho := LEFT.InputLexIDEcho;
-      SELF.LexIDAppend := RIGHT.Did, 
-      SELF.LexIDScoreAppend := RIGHT.Score,
-      SELF.InputUIDAppend := LEFT.InputUIDAppend;
-      SELF := LEFT),
+		SELF.P_InpLexID := LEFT.P_InpLexID;
+		SELF.P_LexID := RIGHT.Did, 
+		SELF.P_LexIDScore := RIGHT.Score,
+		SELF.G_ProcUID := LEFT.G_ProcUID;
+		SELF := LEFT),
    LEFT OUTER);
   
-  dids_with_good_scores := IndataGotDid((INTEGER) LexIDScoreAppend >= Options.ScoreThreshold);
+  dids_with_good_scores := IndataGotDid((INTEGER) P_LexIDScore >= Options.ScoreThreshold);
 
   //Change the lexid and score to be 0 for records below the score threshold
   dids_with_below_scores := DEDUP(SORT(
-    PROJECT(IndataGotDid((INTEGER) LexIDScoreAppend < Options.ScoreThreshold), 
+    PROJECT(IndataGotDid((INTEGER) P_LexIDScore < Options.ScoreThreshold), 
     TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, 
-      SELF.LexIDAppend := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-      SELF.LexIDScoreAppend := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+      SELF.P_LexID := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+      SELF.P_LexIDScore := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
       SELF := LEFT))
-      , InputUIDAppend, LexIDAppend), InputUIDAppend);
+      , G_ProcUID, P_LexID), G_ProcUID);
 
 	all_dids := dids_with_good_scores + dids_with_below_scores; 
 	
 	// On roxie, dedup dids to keep only the DID with the highest score.
 	// On thor, this code is not needed since thor append only returns one did.
-	dids_deduped := DEDUP(SORT(all_dids, InputUIDAppend, -LexIDScoreAppend, LexIDAppend), InputUIDAppend);
+	dids_deduped := DEDUP(SORT(all_dids, G_ProcUID, -P_LexIDScore, P_LexID), G_ProcUID);
 	
 RETURN dids_deduped;
 
