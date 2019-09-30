@@ -1,8 +1,8 @@
-﻿import suppress, mdr, doxie_raw, DriversV2_Services, ut, CriminalRecords_Services;
+﻿import suppress, mdr, Doxie, doxie_raw, DriversV2_Services, ut, CriminalRecords_Services;
 
-export base_presentation(DATASET(doxie.layout_presentation) pre_outf, 
-												 string phoneToMatch = '',
-												 boolean reduceddata = false) := FUNCTION
+export base_presentation(DATASET(doxie.layout_presentation) pre_outf,
+  string phoneToMatch = '',
+  boolean reduceddata = false) := FUNCTION
 
 boolean nolookupsearch := false : stored('NoLookupSearch');
 boolean bestonly := false : stored('BestOnly');
@@ -20,6 +20,8 @@ isKnowx := ut.IndustryClass.is_knowx;
 doxie.mac_selection_declare();
 doxie.mac_header_field_declare();
 
+mod_access := doxie.compliance.GetGlobalDataAccessModule();
+
 score_tab := MIN(pre_outf, penalt)+3;
 
 withphones := doxie.layout_presentation_phones;
@@ -31,8 +33,10 @@ outf_raw := pre_outf(penalt < score_tab OR ~bestonly);
 outf_raw_no_ph := outf_raw(doxie.needAppends(src, listed_name));
 
 dids_for_rels := dedup(sort(project(outf_raw_no_ph, doxie.layout_references),did),did);
-outf_no_ph := if(reduceddata,project(outf_raw_no_ph,transform(doxie.layout_presentation_phones, self:=left)),doxie.Append_Gong(outf_raw_no_ph,doxie.relative_dids(dids_for_rels),dial_contactprecision_value,
-                          include_phonesPlus, score_threshold_value, glb_purpose,dppa_purpose,phoneToMatch));
+outf_no_ph := if(reduceddata,
+  project(outf_raw_no_ph,transform(doxie.layout_presentation_phones, self:=left)),
+  doxie.Append_Gong(outf_raw_no_ph, doxie.relative_dids(dids_for_rels), mod_access,
+    dial_contactprecision_value, include_phonesPlus, score_threshold_value, phoneToMatch));
 
 // if CurrentResidentsOnly selected, filter any historical records after AppendGong has upgraded
 // the tnt values of the header records
@@ -69,7 +73,7 @@ outf_raw_dates_rolled := doxie.fn_roll_gong_dates(outf_raw(~doxie.needAppends(sr
 outf_raw_ph_ready patch_ph_first_seen(outf_raw_ph_ready l, outf_raw_dates_rolled r) := transform
      picked_phone_first_seen := if(r.phone_first_seen < l.phone_first_seen and r.phone_first_seen>0,r.phone_first_seen,l.phone_first_seen);
 	   SELF.phone_first_seen := picked_phone_first_seen;
-     SELF.phones := project(l.phones, transform(doxie.Layout_Phones, 
+     SELF.phones := project(l.phones, transform(doxie.Layout_Phones,
 	                                              SELF.phone_first_seen := if(left.phone10 = l.listed_phone, picked_phone_first_seen, left.phone_first_seen),
 	                                              SELF := LEFT));
 	self := l;
@@ -79,7 +83,7 @@ outf_raw_ph := join(outf_raw_ph_ready, outf_raw_dates_rolled,
                     left.prim_name=right.prim_name and
 			              left.prim_range=right.prim_range and
 			              left.st=right.st and
-			              left.zip=right.zip and 
+			              left.zip=right.zip and
 			              left.listed_phone=right.phone,
 			              patch_ph_first_seen(left, right), left outer, keep(1), limit(0));
 
@@ -91,8 +95,8 @@ doxie.Layout_HeaderFileSearch trans(outf le) :=
 TRANSFORM
 	SELF.did := IF(le.did=0,'',INTFORMAT(le.did,12,1));
 	// current phone source doc retrieveal requires a DID, so blank out any RIDs for empty DIDs
-	SELF.rid := MAP(le.src='PH'	=>	IF(SELF.did<> '',SELF.did+'PH'+(STRING)le.phone, ''), 
-					le.src in MDR.sourceTools.set_Daily_Utility_sources	=>	SELF.did+'UT'+(STRING)le.rid, 
+	SELF.rid := MAP(le.src='PH'	=>	IF(SELF.did<> '',SELF.did+'PH'+(STRING)le.phone, ''),
+					le.src in MDR.sourceTools.set_Daily_Utility_sources	=>	SELF.did+'UT'+(STRING)le.rid,
 					le.src='QH'	=>	SELF.did+'QH'+(STRING)le.rid,
 									(STRING)le.rid);
 // note that although daily utilities are split into good and bad, method for 'rid' above is the same for both.
@@ -150,14 +154,14 @@ outf check_valid_ssn(outf_pulled le, suppress.Key_SSN_Bad ri) := TRANSFORM
 	self := le;
 END;
 
-outf_valid := JOIN(outf_pulled, suppress.Key_SSN_Bad, 
-									left.ssn <> '' and left.valid_ssn IN ['G','M'] and 
-									keyed(left.ssn = right.s_ssn) AND right.cnt>4, 
+outf_valid := JOIN(outf_pulled, suppress.Key_SSN_Bad,
+									left.ssn <> '' and left.valid_ssn IN ['G','M'] and
+									keyed(left.ssn = right.s_ssn) AND right.cnt>4,
 									check_valid_ssn(LEFT, RIGHT),
 									KEEP(1), LIMIT(0), LEFT OUTER);
 
 // need to exempt daily util from the SSN pruning
-// SSN pruning key does not get updated as frequently as the daily util data, which by definition is current 
+// SSN pruning key does not get updated as frequently as the daily util data, which by definition is current
 ta3_daily_util := PROJECT(outf_valid(src = 'DU'),trans(LEFT));
 ta3 := PROJECT(outf_valid(src <> 'DU'), trans(LEFT));
 
@@ -171,11 +175,11 @@ use_dids := dedup(sort(PROJECT(ta4(did <> ''), TRANSFORM(doxie.layout_references
 dd := doxie_raw.death_raw(use_dids,,dateVal,dppa_purpose,glb_purpose);
 
 Death_source_grp:= Sort(group(dd,did,dod8), if(src = MDR.sourceTools.src_Death_Restricted, 1,0));
-Death_source_info := iterate(Death_source_grp, TRANSFORM(doxie_raw.Layout_Death_Raw, 
+Death_source_info := iterate(Death_source_grp, TRANSFORM(doxie_raw.Layout_Death_Raw,
 									SELF.IsLimitedAccessDMF :=if(COUNTER = 1 , ((INTEGER)RIGHT.dod8 != 0 AND RIGHT.src= MDR.sourceTools.src_Death_Restricted),
 	                                LEFT.IsLimitedAccessDMF ) ,
 									SELF :=right));
-									
+
 doxie.Layout_HeaderFileSearch check_death1(doxie.Layout_HeaderFileSearch le, Death_source_info ri) :=
 TRANSFORM
 	SELF.did := le.did;
@@ -193,7 +197,7 @@ death_checked := JOIN(ta4, Death_source_info, (INTEGER)LEFT.did=(INTEGER)RIGHT.d
 clean_age := if(reduced_data_value, ta4, death_checked);
 
 doxie.Layout_HeaderFileSearch add_lookups(clean_age le, doxie.Key_Did_Lookups_v2 ri) := transform
-	// bug 58262 -- remove the override processing for singleton DIDs 
+	// bug 58262 -- remove the override processing for singleton DIDs
   // self.valid_ssn := IF(le.valid_ssn IN ['G','M'] AND ri.head_cnt=1, '', le.valid_ssn);
   self.valid_ssn := le.valid_ssn;
   self.did := le.did;
@@ -205,7 +209,7 @@ doxie.Layout_HeaderFileSearch add_lookups(clean_age le, doxie.Key_Did_Lookups_v2
 lookup_rec := doxie.header_lookups(use_dids);
 
 doxie.Layout_HeaderFileSearch revise_counts(clean_age le, doxie.Key_Did_Lookups_v2 ri) := transform
-	// bug 58262 -- remove the override processing for singleton DIDs 
+	// bug 58262 -- remove the override processing for singleton DIDs
   // self.valid_ssn := IF(le.valid_ssn IN ['G','M'] AND ri.head_cnt=1, '', le.valid_ssn);
   self.did := le.did;
   self.prop_count := if(ri.prop_count>0,1,0);

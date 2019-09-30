@@ -1,10 +1,10 @@
-﻿import doxie_raw, gong_services, phonesPlus_Services, Suppress, risk_indicators, targus, ut, Gateway, Census_data, std, doxie;
+﻿import doxie_raw, gong_services, phonesPlus_Services, Suppress, targus, ut, Gateway, Census_data, std, doxie;
 
 EXPORT phone_noreconn_records($.phone_noreconn_param.searchParams inMod) := module
-																																							
+
 EXPORT val (dataset(doxie.layout_references) dids,
 						dataset(gateway.Layouts.Config)gateways = dataset([],gateway.Layouts.Config)):= FUNCTION
-						
+
 #stored('ZipRadius', 15);
 #stored('IncludeZeroDIDRefs', true);
 #stored('IsPhonePlus', true);
@@ -32,11 +32,11 @@ phoneOnlySearch := inMod.Phone != '' and
 phoneStSearch := inMod.Phone != '' and inMod.State != '' and
                  inMod.FirstName = '' and inMod.LastName = '' and inMod.MiddleName = '' and inMod.NameSuffix = '' and
                  inMod.Addr = '' and inMod.PrimRange = '' and inMod.PrimName = '' and inMod.SecRange = '' and
-                 inMod.City = '' and inMod.Zip = '' and inMod.County = '' and 
+                 inMod.City = '' and inMod.Zip = '' and inMod.County = '' and
 								 inMod.DID = '' and inMod.UnParsedFullName = '';
 
 fullNameAddressSearch := (inMod.FirstName != '' and inMod.LastName != '' or inMod.UnParsedFullName != '') and
-                         (inMod.Addr != '' or inMod.PrimName != '') and 
+                         (inMod.Addr != '' or inMod.PrimName != '') and
                          (inMod.City != '' and inMod.State !='' or inMod.Zip !='');
 
 // add did if coming from inMod
@@ -65,7 +65,7 @@ h_targus := if(~call_PVS,doxie.MAC_Get_GLB_DPPA_Targus(phoneOnlySearch,
 		export unsigned1 glb :=  inMod.GLBPurpose;
 		export string5   industry_class := inMod.IndustryClass;
 		export string32   application_type := inMod.ApplicationType;
-                
+
   end;
 
 
@@ -78,7 +78,12 @@ UseAllDids := lengthSSN > 0 or fullNameAddressSearch; // if there is a ssn then 
 gong_dids := if (UseAllDids, dids, dataset([{(unsigned6)inMod.DID}],doxie.layout_references));
 noFail := true; //this parameter prevents the execution from failing even if we don't have gong history records to return.
 
-gong_recs := gong_services.Fetch_Gong_History(gong_dids,noFail,true,,,true,,false,if(~(lengthSSN > 0), true, false),,,,fullNameAddressSearch);
+gong_recs := gong_services.Fetch_Gong_History(gong_dids, mod_access, noFail,
+  includeParsedDifferences := true,
+  SuppressNoncurrent := true,
+  AllowFallBack := false,
+  AllowBlankFnameMatch := if(~(lengthSSN > 0), true, false),
+  UseHigherPenaltyScore := fullNameAddressSearch);
 
 doxie.layout_pp_raw_common gong2Pretty(gong_recs le) := TRANSFORM
 	SELF.did := le.did;
@@ -110,7 +115,7 @@ END;
 h1_raw := project(gong_recs((unsigned)phone10 > 10000000, current_record_flag='Y'), gong2Pretty(left));
 
 doxie.layout_pp_raw_common get_gong_penalt(h1_raw le) := TRANSFORM
-	self.penalt := doxie.FN_Tra_Penalty_addr(le.predir,le.prim_range,le.prim_name,le.suffix,le.postdir,le.sec_range,le.city_name,le.st,le.zip, false) + 
+	self.penalt := doxie.FN_Tra_Penalty_addr(le.predir,le.prim_range,le.prim_name,le.suffix,le.postdir,le.sec_range,le.city_name,le.st,le.zip, false) +
                  doxie.FN_Tra_Penalty_name(le.fname,le.mname,le.lname,false ,false) +
                  doxie.FN_Tra_Penalty_phone(le.phone) +
                  doxie.FN_Tra_Penalty_DID((string)le.did);
@@ -128,8 +133,8 @@ h1 := h1_tf(((phoneOnlySearch or phoneStSearch)  AND PhoneSize=7  AND inMod.Phon
 //Gong Recs
 h2 := if(inMod.ExcludeCurrentGong, h0(activeflag=''), h1 + h0(activeflag=''));
 
-h_targus_ex := join(h_targus, h1, 
-                    left.phone=right.phone, 
+h_targus_ex := join(h_targus, h1,
+                    left.phone=right.phone,
                     transform({h_targus}, self := left), left only);
 
 //Gong + Targus
@@ -144,16 +149,16 @@ h3_raw := map(exists(h3p) => h3p,
 Suppress.MAC_Suppress(h3_raw,h3_pulled,inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,did);
 
 //sort to prepare for dedup
-h3_srt := sort(h3_pulled, phone, if(lname<>'',lname, listed_name), fname, prim_range, prim_name, zip,  
-               penalt, map(Phonesplus_v2.IsCell(append_phone_type)=>1,vendor_id='TG'=>2, vendor_id='GH'=>3,4), -ConfidenceScore, 
+h3_srt := sort(h3_pulled, phone, if(lname<>'',lname, listed_name), fname, prim_range, prim_name, zip,
+               penalt, map(Phonesplus_v2.IsCell(append_phone_type)=>1,vendor_id='TG'=>2, vendor_id='GH'=>3,4), -ConfidenceScore,
                -dt_last_seen, if(activeflag='Y',0,1), doxie.tnt_score(tnt), dt_first_seen);
-									
+
 h3_dep := dedup(h3_srt, phone, if(lname<>'',lname, listed_name), fname, prim_range, prim_name, zip);
 
 //sort to pick the 'top' record
-h3_ready := sort(h3_dep, penalt, map(Phonesplus_v2.IsCell(append_phone_type)=>1,vendor_id='TG'=>2, vendor_id='GH'=>3,4), -ConfidenceScore, 
+h3_ready := sort(h3_dep, penalt, map(Phonesplus_v2.IsCell(append_phone_type)=>1,vendor_id='TG'=>2, vendor_id='GH'=>3,4), -ConfidenceScore,
                  -dt_last_seen, if(activeflag='Y',0,1), doxie.tnt_score(tnt), dt_first_seen);
-								 
+
 //Targus and confirm
 h3 := if(use_tg and use_cfm and ~call_PVS,
          targus.FN_PPL_Confirm_Connect(h3_ready, inMod.GLBPurpose, inMod.DPPAPurpose, targus_cfg),
@@ -165,15 +170,15 @@ telcordia_phones := Doxie.phone_metadata(g0, inMod.Phone);
 
 pp_lay.preFinalLayout initialMap(telcordia_phones l) := transform
 	self.did              := (string12)l.did;
-	self.typeflag         := map(l.src != 'PH' => Phones.Constants.TypeFlag.NonDirectoryAssistance, 
-														l.src  = 'PH' and l.tnt = 'H' => Phones.Constants.TypeFlag.DirectoryAssistance_Disconnected, 
+	self.typeflag         := map(l.src != 'PH' => Phones.Constants.TypeFlag.NonDirectoryAssistance,
+														l.src  = 'PH' and l.tnt = 'H' => Phones.Constants.TypeFlag.DirectoryAssistance_Disconnected,
 														l.src  = 'PH' and l.tnt != 'H' => Phones.Constants.TypeFlag.DirectoryAssistance,
 														'');
 	self.dial_indicator    := map(l.dial_ind = '1' => 'Y',
 																l.dial_ind = '0' => 'N',
-																'');		
+																'');
 	self.Carrier_Name      := l.ocn;
-	self.phone_region_city := l.city;  
+	self.phone_region_city := l.city;
 	self.phone_region_st   := l.state;
 	self.COCDescription    := if(Phonesplus_v2.IsCell(l.append_phone_type),
 									 dataset([{'Cellular'}], pp_lay.Layout_Phone_Description),
@@ -184,39 +189,39 @@ pp_lay.preFinalLayout initialMap(telcordia_phones l) := transform
 	self                   := l;
 	self                   := [];
 end;
-TelcordiaMap := project(telcordia_phones, initialMap(left));  
+TelcordiaMap := project(telcordia_phones, initialMap(left));
 
-//  Create child records for COC description 
+//  Create child records for COC description
 pp_lay.preFinalLayout addChildren(TelcordiaMap l) := transform
-	cell_test1 := l.coctype = Phones.Constants.COCType.EndofOfficeCode and 
-								(l.ssc		= Phones.Constants.SSC.Cellular or 
+	cell_test1 := l.coctype = Phones.Constants.COCType.EndofOfficeCode and
+								(l.ssc		= Phones.Constants.SSC.Cellular or
 								 l.ssc 		= Phones.Constants.SSC.Radio);
-								
-	cell_test2 := (l.coctype != Phones.Constants.COCType.EndofOfficeCode)and 
+
+	cell_test2 := (l.coctype != Phones.Constants.COCType.EndofOfficeCode)and
 								 (l.ssc = Phones.Constants.SSC.Cellular or
 									l.ssc = Phones.Constants.SSC.Radio or
 									l.ssc = Phones.Constants.SSC.MiscServices);
-								 
-	cell_test3 := l.ssc = Phones.Constants.SSC.Cellular;							 
 
-	page_test1 := l.coctype = Phones.Constants.COCType.EndofOfficeCode and 
+	cell_test3 := l.ssc = Phones.Constants.SSC.Cellular;
+
+	page_test1 := l.coctype = Phones.Constants.COCType.EndofOfficeCode and
 								l.ssc			= Phones.Constants.SSC.Paging;
-								
+
 	page_test2 := l.coctype != Phones.Constants.COCType.EndofOfficeCode and
 								l.ssc			 = Phones.Constants.SSC.Paging;
 
 	// types are mutually exclusive
 	string type_description := map (
 		l.coctype = Phones.Constants.COCType.EndofOfficeCode   => 'LandLine',
-		cell_test1 or cell_test2 or cell_test3									=> 'Cellular', 
-		page_test1 or page_test2  															=> 'Paging', 
+		cell_test1 or cell_test2 or cell_test3									=> 'Cellular',
+		page_test1 or page_test2  															=> 'Paging',
 																															 '');
 	add_types := if (type_description != '', dataset([{type_description}], pp_lay.Layout_Phone_Description));
 	self.COCDescription := dedup (l.cocDescription + add_types, all);
 	self.cell_type := if(cell_test1 or cell_test2 or cell_test3, l.cell_type*5, l.cell_type);
-	
-	self.new_type := map(l.typeflag = Phones.Constants.TypeFlag.DataSource_PV or l.typeflag = Phones.Constants.TypeFlag.DataSource_iQ411   => 'Real Time Phones' 
-											,l.typeflag = Phones.Constants.TypeFlag.DirectoryAssistance or 
+
+	self.new_type := map(l.typeflag = Phones.Constants.TypeFlag.DataSource_PV or l.typeflag = Phones.Constants.TypeFlag.DataSource_iQ411   => 'Real Time Phones'
+											,l.typeflag = Phones.Constants.TypeFlag.DirectoryAssistance or
 											 l.telcordia_only = 'Y' and exists(h1) 														 => if(call_PVS,'Directory Assistance','Current DA')
 											,~(self.cell_type%3=0 or self.cell_type%5=0) and l.confirmed_flag  => if(call_PVS,'Combined Phones Source','Confirmed non-DA')
 											,~(self.cell_type%3=0 or self.cell_type%5=0) and ~l.confirmed_flag => if(call_PVS,'Combined Phones Source','Possible non-DA')
@@ -233,12 +238,12 @@ pp_lay.preFinalLayout addChildren(TelcordiaMap l) := transform
 end;
 
 withTelcordiaData:= project(TelcordiaMap, addChildren(left));
-											
+
 //Get HRI address and phone for in_house records:
 doxie.mac_AddHRIAddress(withTelcordiaData, records_HRIAddress);
 doxie.mac_AddHRIPhone(records_HRIAddress,records_HRI);
 
-resultOut := sort(if(inMod.IncludeHRI, records_HRI, withTelcordiaData), telcordia_only, penalt, -confirmed_flag, map(Phonesplus_v2.IsCell(append_phone_type)=>1,vendor_id='TG'=>2, vendor_id='GH'=>3,4), 
+resultOut := sort(if(inMod.IncludeHRI, records_HRI, withTelcordiaData), telcordia_only, penalt, -confirmed_flag, map(Phonesplus_v2.IsCell(append_phone_type)=>1,vendor_id='TG'=>2, vendor_id='GH'=>3,4),
                   -ConfidenceScore, listed_name, phone, fname, mname, lname, prim_name, prim_range, city_name, zip, zip4);
 
 ut.getTimeZone(resultOut,phone,timezone,resultOut_w_tzone);
@@ -250,7 +255,7 @@ ut.getTimeZone(resultOut,phone,timezone,resultOut_w_tzone);
 // OUTPUT(h_qsent,NAMED('QSENT'));
 // OUTPUT(h_Last_Resort,NAMED('LASTRESORT'));
 // OUTPUT(resultOut_w_tzone,NAMED('RESULTOUT'));
-   
+
 
 doxie.compliance.logSoldToSources(h_qsent, mod_access);
 

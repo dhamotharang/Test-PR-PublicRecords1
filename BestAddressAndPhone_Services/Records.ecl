@@ -1,10 +1,11 @@
-import AddrBest,progressive_phone, address,iesp,AutoStandardI;
+import AddrBest, progressive_phone, Doxie;
 
-export Records (dataset(AddrBest.Layout_BestAddr.Batch_in_both) f_in_raw) := function
+export Records (dataset(AddrBest.Layout_BestAddr.Batch_in_both) f_in_raw,
+  Doxie.IDataAccess mod_access) := function
 
 f_in_best_addr := project(f_in_raw,AddrBest.Layout_BestAddr.Batch_in);
 
-bestaddrs := AddrBest.BestAddr_common(f_in_best_addr);
+bestaddrs := AddrBest.BestAddr_common(f_in_best_addr, mod_access);
 
 f_in_progressive_phone := project(f_in_raw,transform(progressive_phone.layout_progressive_batch_in,self.did := 0,self := left));
 

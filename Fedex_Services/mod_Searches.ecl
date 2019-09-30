@@ -1,9 +1,9 @@
-import gong_services, doxie, business_header, 
+import gong_services, doxie, business_header,
 	autokey, doxie_cbrs, AutoStandardI, CanadianPhones,
 	can_ph, Business_Header_SS, fedex, autokeyb2, Suppress;
 
 
-export mod_Searches := 
+export mod_Searches :=
 MODULE;
 //***** INPUTS
 SHARED mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
@@ -22,7 +22,7 @@ export FedexNoHit := byak;
 //***** CANADA
 ck := CanadianPhones.key_fdids;
 cids := CAN_PH.Get_IDs(workhard := true, nofail := true);
-export Canada := 
+export Canada :=
 	join(
 		cids,
 		ck,
@@ -33,31 +33,29 @@ export Canada :=
 		),
 		keep(1)
 	);
-// CanadianPhonesV1Keys and CanadianPhonesV1Keys are out of scope for CCPA phase-I, when DID field is added to these keys 
-// FDID should be changed to valid DID and Source suppression can be uncommented	
+// CanadianPhonesV1Keys and CanadianPhonesV1Keys are out of scope for CCPA phase-I, when DID field is added to these keys
+// FDID should be changed to valid DID and Source suppression can be uncommented
 // export Canada := Suppress.MAC_SuppressSource(can_all, mod_access, fdid);
 // doxie.compliance.logSoldToSources (Canada, mod_access, fdid);
 
 //***** GONG
-results := gong_services.Fetch_Gong_History(
-	,//Dataset(doxie.layout_references) indids = dummydidDS, 
-	true,//boolean noFail=false,
-	,//boolean includeParsedDifferences=false,
-	,//boolean include_HHID_DIDs = false,
-	,//boolean did_onlyL = false,
-	SuppressNoncurrent := true,
-	AllowLeadingLnameMatch := AutoKey.skipSetTools(fedex_services.Contants.autokey_skipset).AddZipL,
-	AllowFallBack := fedex_services.Contants.AllowGongFallBack
+results := gong_services.Fetch_Gong_History(,//Dataset(doxie.layout_references) indids = dummydidDS,
+  mod_access,
+  noFail := true,//boolean noFail=false,
+  SuppressNoncurrent := true,
+  AllowLeadingLnameMatch := AutoKey.skipSetTools(fedex_services.Contants.autokey_skipset).AddZipL,
+  AllowFallBack := fedex_services.Contants.AllowGongFallBack
 );
+
 results_fil := doxie.compliance.MAC_FilterOutMinors (results, , , mod_access.show_minors);
 export GongSearch := results_fil;
-		
-		
+
+
 //***** PHONES+
 doxie.MAC_Get_GLB_DPPA_PhonesPlus(
-	dataset([], doxie.layout_references), 
+	dataset([], doxie.layout_references),
 	results,
-	true,//is_roxie=false, 
+	true,//is_roxie=false,
 	false,//skipAutokeys = false,
 	mod_access.glb,
 	mod_access.dppa,
@@ -77,17 +75,17 @@ bizrec := record
 	UNSIGNED1 score := 0;
 end;
 
-gbdids := 
+gbdids :=
 	Business_Header.doxie_get_bdids_plus(
 		forceLocal := true,
 		nofail := true,
 		use_exec_search := false,
 		score_results := true
 	);
-	
-byz := Business_Header.Fetch_ZipPRLName(nofail := true); 
 
-bdids := 
+byz := Business_Header.Fetch_ZipPRLName(nofail := true);
+
+bdids :=
 	(
 		project(
 			gbdids,
@@ -104,12 +102,12 @@ bdids :=
 	)
 	(score >= fedex_services.Contants.min_BusinessSearchScore);   //filter both result sets
 
-doxie_cbrs.mac_best_records(bdids, bestf)	
-		
-		
+doxie_cbrs.mac_best_records(bdids, bestf)
+
+
 //** if this company has used the input phone, sub that in for the best phone
-	
-kp := Business_Header_SS.Key_BH_Phone;	
+
+kp := Business_Header_SS.Key_BH_Phone;
 bdid_phones := 	//these are the bdids that have used the phone which was input by the user
 	dedup(
 		project(
@@ -120,11 +118,11 @@ bdid_phones := 	//these are the bdids that have used the phone which was input b
 			),
 			{kp.phone, kp.bdid}
 		),
-		bdid, 
+		bdid,
 		all
 	);
-		
-export BusinessSearch := 
+
+export BusinessSearch :=
 	join(
 		bestf,
 		bdid_phones,

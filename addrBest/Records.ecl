@@ -1,14 +1,16 @@
-import Address_Rank;
+import Address_Rank, AutoStandardI, Doxie;
 
-export Records (dataset(AddrBest.Layout_BestAddr.Batch_in) batch_in , AddrBest.IParams.SearchParams in_mod)  := module
-	
+export Records (dataset(AddrBest.Layout_BestAddr.Batch_in) batch_in,
+  AddrBest.IParams.SearchParams in_mod)  := module
+
 	//*****************Get ranked records to account for any address not returned based on input***************/
 	rank_batch_in := project(batch_in, transform(Address_Rank.Layouts.Batch_in, self:=left, self:=[]));
 	temp_mod := module(project(in_mod, Address_Rank.IParams.BatchParams, opt))
 		export unsigned1 MaxRecordsToReturn		:= max(in_mod.MaxRecordsToReturn,Address_Rank.Constants.MaxRecordsToReturn);
 	end;
+  mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 	ranked_recs	:= Address_Rank.fn_getRank_wMetadata(rank_batch_in,temp_mod);
-	
+
 	AddrBest.layout_header_ext popHeaderFormat(Address_Rank.Layouts.Bestrec l):= transform
 		self.did  								:= (unsigned)l.acctno;
 		self.rid  								:= l.did;
@@ -28,11 +30,11 @@ export Records (dataset(AddrBest.Layout_BestAddr.Batch_in) batch_in , AddrBest.I
 	end;
 	rank_in 			 := project(ranked_recs, popHeaderFormat(left));
 	rank_result 	 :=if(in_mod.IncludeRanking,rank_in, dataset([],AddrBest.layout_header_ext)); // Conditionally use ranked records
-	
-	//*****************process original Addr_best code***************/
-	orig_best_recs := AddrBest.fn_getAddrBestOrig(batch_in,rank_result,in_mod );
 
-	//*****************restore ranked attributes***************/	
+	//*****************process original Addr_best code***************/
+	orig_best_recs := AddrBest.fn_getAddrBestOrig(batch_in, mod_access, rank_result, in_mod);
+
+	//*****************restore ranked attributes***************/
 	recordof(orig_best_recs) getAddrSeq (orig_best_recs l, ranked_recs r):= transform
 		self.address_history_seq 	:= r.address_history_seq;
 		self.ba_flag 							:= r.ba_flag;
@@ -68,10 +70,10 @@ export Records (dataset(AddrBest.Layout_BestAddr.Batch_in) batch_in , AddrBest.I
 
 	best_recs						:= if(not in_mod.IncludeRanking, orig_best_recs, include_rank);
 
-	//*****************conditionally append Short Term Rental***************/	
+	//*****************conditionally append Short Term Rental***************/
 	best_final			 		:= if(in_mod.IncludeRanking and (in_mod.IncludeShortTermRental or in_mod.IncludeSTRSplitFlag),
-														Address_Rank.fn_getSTR_Values(best_recs,project(in_mod, Address_Rank.IParams.BatchParams, opt)), 
-														best_recs);	
-														
+														Address_Rank.fn_getSTR_Values(best_recs,project(in_mod, Address_Rank.IParams.BatchParams, opt)),
+														best_recs);
+
 	export best_records := sort(best_final, acctno, address_history_seq);
 end;
