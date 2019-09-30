@@ -5,17 +5,12 @@
 
 // Currently almost all of these are "fake": just synonyms of a superset input
 
-import AutoHeaderI, AutoStandardI, Accident_Services,
-  Hunting_Fishing_Services, ATF_Services,
-  Foreclosure_Services, InternetDomain_Services,
-  suppress, relationship, FCRA;
+import AutoStandardI, Accident_Services,
+  Hunting_Fishing_Services,
+  InternetDomain_Services,
+  suppress, FCRA;
 
 EXPORT input := MODULE
-
-  // Most generous structure for reading input parameters. Unfortunately, individual structures must extend
-  // this huge structure, because of legacy code (sudden "#store" calls)
-  export _didsearch := INTERFACE (AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full)
-  end;
 
   // 2 interfaces to replace AutoStandardI/DataRestrictionI.params; with defaults
   export restrictions := INTERFACE
@@ -56,12 +51,6 @@ EXPORT input := MODULE
   export accidents := INTERFACE (Accident_Services.IParam.searchRecords)
   end;
 
-  export ccw := INTERFACE (_report)
-  end;
-
-  export corpaffil := INTERFACE (_report)
-  end;
-
   export criminal := INTERFACE (_report)
     export boolean AllowGraphicDescription := false;
     export boolean Include_BestAddress := false;
@@ -69,21 +58,9 @@ EXPORT input := MODULE
     export boolean IncludeSexualOffenses := false;
   end;
 
-  export dea := INTERFACE (_report)
-  end;
-
-  export dl := INTERFACE
-    // defines whether Certegy data will be used in addition to the Government+Experian
-    export boolean use_nonDMVSources := false;
-  end;
-
   export faacerts := INTERFACE (_report)
   end;
 	
-	//not used ?
-  export firearms := INTERFACE (ATF_Services.IParam.search_params)
-  end;
-
   export huntingfishing := INTERFACE (Hunting_Fishing_Services.Search_Records.params)
   end;
 
@@ -93,26 +70,6 @@ EXPORT input := MODULE
   end;
 
   export internetdomains := INTERFACE (InternetDomain_Services.SearchService_Records.params)
-  end;
-
-  // general (vs. productwise) phones options
-  export phones := INTERFACE
-    export boolean indicate_restricted := false; // will show "UNPUB"
-    export boolean include_phonesfeedback := false;
-  end;
-
-  export phonesplus := INTERFACE (phones, _report)
-  end;
-
-  // health care providers
-  export providers := INTERFACE
-    export boolean include_groupaffiliations    := false;
-    export boolean include_hospitalaffiliations := false;
-    export boolean include_education            := false;
-    export boolean include_businessaddress      := false;
-  end;
-
-  export sanctions := INTERFACE (_didsearch)
   end;
 
   export sexoffenses := INTERFACE (_report)
@@ -134,8 +91,6 @@ EXPORT input := MODULE
   export watercrafts := INTERFACE (_report)
 		export boolean include_NonRegulated_WatercraftSources:= FALSE;
   end;
-
-  export mardiv := INTERFACE (_didsearch) end;
 
   // =========================================================================
   // ================= Central Records, Comprehensive Report ================= 

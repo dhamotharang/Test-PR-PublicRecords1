@@ -5,7 +5,7 @@ out_rec := iesp.peoplereport.t_PeopleReportIndividual;
 // accepts atmost one DID, actually
 EXPORT out_rec FinderReport (
   dataset (doxie.layout_references) dids,
-  PersonReports.IParam._finderreport mod_finder,
+  $.IParam._finderreport mod_finder,
   boolean IsFCRA = false) := FUNCTION
 
   //Convert to the old _report style module: $.input._finderreport
@@ -28,7 +28,7 @@ EXPORT out_rec FinderReport (
   p_associates := choosen (pers.AssociatesSlim(exists (Addresses)), iesp.constants.BR.MaxAssociates);
   p_neighbors  := choosen (pers.NeighborsSlim (exists (NeighborAddresses)), iesp.constants.BR.MaxNeighborhood);
 
-  pplus := PersonReports.phonesplus_records (dids, module (project (param, input.phonesplus,  opt)) end, IsFCRA);
+  pplus := $.phonesplus_records (dids, PROJECT (mod_finder, $.IParam.phonesplus), IsFCRA);
   p_phonesplus_v2  := choosen (pplus.phonesplus_v2,  iesp.constants.BR.MaxPhonesPlus);
   old_phones := old_phones_records ();
   p_hist       := choosen (old_phones.oldphones, iesp.constants.BR.MaxPhonesHistorical);
@@ -37,13 +37,13 @@ EXPORT out_rec FinderReport (
   // "single source" person's data
   vehs := if(~isCNSMR, vehicle_records (dids, module (project (param, input.vehicles)) end, IsFCRA).vehicles);
   p_vehicles   := choosen (vehs, iesp.Constants.BR.MaxVehicles);
-  proflic := PersonReports.proflic_records (dids, PROJECT (mod_finder, $.IParam.proflic), IsFCRA);
+  proflic := $.proflic_records (dids, PROJECT (mod_finder, $.IParam.proflic), IsFCRA);
 
   p_proflic    := choosen (proflic.proflicenses_v2, iesp.constants.BR.MaxProfLicenses);
   bankrpt := $.bankruptcy_records (dids, mod_access, PROJECT (mod_finder, $.IParam.bankruptcy, OPT), IsFCRA);
   p_bankruptcy := choosen (bankrpt.bankruptcy, iesp.Constants.BR.MaxBankruptcies);
   p_at_work    := choosen ($.peopleatwork_records (dids, PROJECT (mod_finder, $.IParam.peopleatwork, OPT), IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
-  p_corp_aff   := choosen (corpaffiliation_records (dids, module (project (param, input.corpaffil)) end, IsFCRA), iesp.Constants.BR.MaxCorpAffiliations);
+  p_corp_aff   := choosen ($.corpaffiliation_records (dids, PROJECT (mod_finder, $.IParam.corpaffil), IsFCRA), iesp.Constants.BR.MaxCorpAffiliations);
 
   p_dlsr := choosen (pers.dlsr, 1);
   p_drivers    := choosen (pers.driver_licenses, iesp.Constants.BR.MaxDLs);

@@ -37,6 +37,12 @@ EXPORT IParam := MODULE
     EXPORT boolean bk_suppress_withdrawn := FALSE;
   END;
 
+  EXPORT ccw := INTERFACE (doxie.IDataAccess)
+  END;
+
+  EXPORT corpaffil := INTERFACE (doxie.IDataAccess) //currently, no fields are used.
+  END;
+
   EXPORT criminal := INTERFACE
     EXPORT boolean AllowGraphicDescription := FALSE;
     EXPORT boolean Include_BestAddress := FALSE;
@@ -44,7 +50,10 @@ EXPORT IParam := MODULE
     EXPORT boolean IncludeSexualOffenses := FALSE;
   END;
 
-  EXPORT dl := INTERFACE
+  EXPORT dea := INTERFACE (doxie.IDataAccess)
+  END;
+
+  EXPORT dl := INTERFACE //currently, no fields are used.
     // defines whether Certegy data will be used in addition to the Government+Experian
     EXPORT boolean use_nonDMVSources := FALSE;
   END;
@@ -57,6 +66,9 @@ EXPORT IParam := MODULE
     EXPORT string50 tmsid_value := ''; // reserved for future needs if any
   END;
 
+  EXPORT mardiv := INTERFACE (doxie.IDataAccess) //currently, no fields are used.
+  END;
+
   EXPORT peopleatwork := INTERFACE (doxie.IDataAccess, _report)
   END;
 
@@ -67,6 +79,9 @@ EXPORT IParam := MODULE
   EXPORT phones := INTERFACE
     EXPORT boolean indicate_restricted := FALSE; // will show "UNPUB"
     EXPORT boolean include_phonesfeedback := FALSE;
+  END;
+
+  EXPORT phonesplus := INTERFACE (phones, _report, doxie.IDataAccess)
   END;
 
   EXPORT property := INTERFACE(_report)
@@ -82,11 +97,14 @@ EXPORT IParam := MODULE
   END;
 
   // health care providers
-  EXPORT providers := INTERFACE
+  EXPORT providers := INTERFACE //currently, no fields are used.
     EXPORT boolean include_groupaffiliations    := FALSE;
     EXPORT boolean include_hospitalaffiliations := FALSE;
     EXPORT boolean include_education            := FALSE;
     EXPORT boolean include_businessaddress      := FALSE;
+  END;
+
+  EXPORT sanctions := INTERFACE (doxie.IDataAccess) //currently, no fields are used.
   END;
 
   EXPORT ucc := INTERFACE

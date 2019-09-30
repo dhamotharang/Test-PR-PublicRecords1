@@ -31,57 +31,6 @@
 </message>
 */
 /*--INFO-- IDM (Identity Management) searches through nine services to create a set of questions.
-<pre>
-&lt;IdentityManagementReportRequest&gt;
- &lt;row&gt;
-  &lt;User&gt;
-   &lt;GLBPurpose&gt;&lt;/GLBPurpose&gt;
-   &lt;DLPurpose&gt;&lt;/DLPurpose&gt;
-   &lt;SSNMask&gt;&lt;/SSNMask&gt;
-   &lt;DOBMask&gt;&lt;/DOBMask&gt;
-   &lt;DLMask&gt;&lt;/DLMask&gt;
-   &lt;DataRestrictionMask&gt;&lt;/DataRestrictionMask&gt;
-   &lt;DataPermissionMask&gt;&lt;/DataPermissionMask&gt;
-   &lt;ApplicationType&gt;&lt;/ApplicationType&gt;
-   &lt;SSNMaskingOn&gt;&lt;/SSNMaskingOn&gt;
-   &lt;DLMaskingOn&gt;&lt;/DLMaskingOn&gt;
-  &lt;/User&gt;
-  &lt;Options&gt;
-   &lt;IncludePersonReport&gt;&lt;/IncludePersonReport&gt;
-   &lt;IncludeDriversLicenses&gt;&lt;/IncludeDriversLicenses&gt;
-   &lt;IncludeMotorVehicles&gt;&lt;/IncludeMotorVehicles&gt;
-   &lt;IncludeHistoricalPhones&gt;&lt;/IncludeHistoricalPhones&gt;
-   &lt;IncludeProperties&gt;&lt;/IncludeProperties&gt;
-   &lt;IncludeRelatives&gt;&lt;/IncludeRelatives&gt;
-   &lt;IncludeNeighbors&gt;&lt;/IncludeNeighbors&gt;
-   &lt;IncludeAssociates&gt;&lt;/IncludeAssociates&gt;
-   &lt;IncludeStudentRecords&gt;&lt;/IncludeStudentRecords&gt;
-   &lt;IncludeWatercrafts&gt;&lt;/IncludeWatercrafts&gt;
-   &lt;IncludeAircrafts&gt;&lt;/IncludeAircrafts&gt;
-   &lt;IncludePeopleAtWork&gt;&lt;/IncludePeopleAtWork&gt;
-   &lt;IncludeCorporateAffiliations&gt;&lt;/IncludeCorporateAffiliations&gt;
-   &lt;IncludeEmailAddresses&gt;&lt;/IncludeEmailAddresses&gt;
-   &lt;IncludeTransactionHistory&gt;&lt;/IncludeTransactionHistory&gt;
-   &lt;IncludeRealTimeVehicle&gt;&lt;/IncludeRealTimeVehicle&gt;
-   &lt;IncludeNonRegulatedVehicleSources&gt;&lt;/IncludeRealTimeVehicle&gt;
-   &lt;IncludeNonRegulatedWatercraftSources&gt;&lt;/IncludeRealTimeVehicle&gt;
-   &lt;IncludeProfessionalLicenses&gt;&lt;/IncludeProfessionalLicenses&gt;
-   &lt;IncludeInternetDomains&gt;&lt;/IncludeProfessionalLicenses&gt;
-   &lt;RelativeDepth&gt;1&lt;/RelativeDepth&gt;
-   &lt;MaxNeighborhoods&gt;0&lt;/MaxNeighborhoods&gt;
-   &lt;NeighborsPerAddress&gt;3&lt;/NeighborsPerAddress&gt;
-   &lt;NeighborsPerNA&gt;6&lt;/NeighborsPerNA&gt;
-	 &lt;RealTimePermissibleUse&gt;&lt;/RealTimePermissibleUse&gt;
-	 &lt;LinkingWeightThreshold&gt;&lt;/LinkingWeightThreshold&gt;
-   &lt;ReturnCount&gt;0&lt;/ReturnCount&gt;
-   &lt;StartingRecord&gt;0&lt;/StartingRecord&gt;
-  &lt;/Options&gt;
-  &lt;ReportBy&gt;
-   &lt;UniqueId&gt;&lt;/UniqueId&gt;
-  &lt;/ReportBy&gt;
- &lt;/row&gt;
-&lt;/IdentityManagementReportRequest&gt;
-</pre>
 */
 
 
@@ -182,7 +131,7 @@ import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, Identit
 		SetInputLocalOptions(idm_mod);
 
 		// only needed for search did
-		search_mod := module (project (global_mod, PersonReports.input._didsearch, opt))
+		search_mod := module (project (global_mod, PersonReports.IParam._didsearch, opt))
 		end;
 
 		//Only one DID is expected; otherwise fail:

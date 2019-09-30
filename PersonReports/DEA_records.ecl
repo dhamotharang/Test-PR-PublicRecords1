@@ -1,10 +1,10 @@
-IMPORT iesp, DEAV2_Services, doxie, ut; 
+IMPORT $, iesp, DEAV2_Services, doxie; 
 
 out_rec := iesp.deacontrolledsubstance.t_DEAControlledSubstanceSearch2Record;
 
 EXPORT out_rec DEA_records (
   DATASET(doxie.layout_references) dids,
-  input.dea in_params = MODULE(input.dea) END,
+  $.IParam.dea in_params = MODULE($.IParam.dea) END,
   BOOLEAN IsFCRA = FALSE
 ) := FUNCTION
 
@@ -33,7 +33,7 @@ EXPORT out_rec DEA_records (
 	END;
 
 	deaIds := DEAV2_Services.dea_raw.get_deaKeys_from_dids(dids);
-  deaRecs := DEAV2_Services.DEAV2_Search_recs(deaIds, in_params.ssn_mask, in_params.applicationType);
+  deaRecs := DEAV2_Services.DEAV2_Search_recs(deaIds, in_params.ssn_mask, in_params.application_type);
 
 	RETURN PROJECT(deaRecs,toOut(LEFT));
 END;

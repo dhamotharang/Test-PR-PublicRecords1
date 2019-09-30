@@ -35,12 +35,12 @@ export StoredReader := MODULE
     export boolean return_AllImposterRecords := false : stored('ReturnAllImposters'); //new
   end;
 
-  export phones_options := MODULE (PersonReports.input.phones)
+  export phones_options := MODULE (PersonReports.IParam.phones)
     export boolean include_phonesfeedback := IncludePhonesFeedback;
     export boolean indicate_restricted    := false : stored ('IndicateUnpub'); //new
   end;
 
-  export providers_options := MODULE (PersonReports.input.providers)
+  export providers_options := MODULE (PersonReports.IParam.providers)
     // same exactly way as in doxie@prov_records
     export boolean include_groupaffiliations    := false : stored('IncludeGroupAffiliations');
     export boolean include_hospitalaffiliations := false : stored('IncludeHospitalAffiliations');
