@@ -3775,7 +3775,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 	targusGatewayPrep := targusGatewayPrep_pre(Input.InputCheckBusPhone = '1');
 
-	targusGateway := Business_Risk_BIP.getTargusGateway(targusGatewayPrep, Options, linkingOptions, AllowedSourcesSet);
+	targusGateway := Business_Risk_BIP.getTargusGateway(targusGatewayPrep, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
 	withTargusGateway := JOIN(withSBFE, targusGateway, LEFT.Seq = Right.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Input_Characteristics.InputPhoneEntityCount := (STRING)MAX((INTEGER)LEFT.Input_Characteristics.InputPhoneEntityCount, (INTEGER)RIGHT.InputPhoneEntityCount),

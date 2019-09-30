@@ -24,11 +24,12 @@ targus_in := project(indata, prep_for_Targus(left));
 
 timeout := 2;	// 2 seconds
 retries := 0;	// don't retry because of SLA's
+gw_mod_access := Gateway.IParam.GetGatewayModAccess(glb, dppa);
 
 // Redundant makeGatewayCall passed to SOAP call as a safety mechanism in case Roxie 
 // ever decides to execute both sides of the IF statement.
 gateway_result := if(makeGatewayCall, 
-													Gateway.SoapCall_Targus(targus_in, targus_gateway_cfg, timeout, retries, makeGatewayCall),
+													Gateway.SoapCall_Targus(targus_in, targus_gateway_cfg, timeout, retries, makeGatewayCall, gw_mod_access),
 													dataset([],targus.layout_targus_out));
 
 riskwise.Layout_Dirs_Phone tran(indata le, gateway_result rt) := transform

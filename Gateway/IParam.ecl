@@ -1,4 +1,4 @@
-IMPORT BatchShare, Gateway;
+IMPORT BatchShare, doxie, Gateway;
 
 EXPORT IParam := MODULE
 
@@ -28,5 +28,18 @@ EXPORT IParam := MODULE
 
 		RETURN in_mod;
 	END;
+
+  // for gateway calls (Gateway.SOAPCALL_XXX()) made from libraries.
+  //  -- this mod_access is not fully compliant (use with caution)
+  EXPORT GetGatewayModAccess(unsigned1 glb_purpose, unsigned1 dppa_purpose) := FUNCTION
+    mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT glb := glb_purpose;
+      EXPORT dppa := dppa_purpose;
+      // EXPORT DataRestrictionMask := drm;
+      // EXPORT DataPermissionMask := dpm;
+    END;
+    RETURN mod_access;
+  END;
+
 
 END;

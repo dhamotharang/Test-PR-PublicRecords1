@@ -1,9 +1,10 @@
-IMPORT Address, BIPV2, Business_Risk, Gateway, MDR, Phones, Risk_Indicators, Riskwise, Targus, ut;
+IMPORT Address, BIPV2, Business_Risk, doxie, Gateway, MDR, Phones, Risk_Indicators, Riskwise, Targus, ut;
 
 EXPORT getTargusGateway(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+                       doxie.IDataAccess mod_access) := FUNCTION
 	
 	// Gateway url for development: 'http://rw_score_dev:[PASSWORD_REDACTED]@gatewaycertesp.sc.seisint.com:7726/WsGateway'
 
@@ -30,8 +31,8 @@ EXPORT getTargusGateway(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// 2. Prep Business Shell records for input to Targus Gateway.
 	targus.layout_targus_in prep_for_Targus(Business_Risk_BIP.Layouts.Shell le) := TRANSFORM
-		SELF.user.GLBPurpose                      := Options.GLBA_Purpose;
-		SELF.user.DLPurpose                       := Options.DPPA_Purpose;
+		SELF.user.GLBPurpose                      := mod_access.glb;
+		SELF.user.DLPurpose                       := mod_access.dppa;
 		SELF.user.QueryID                         := (STRING)le.seq;
 		SELF.searchBy.CompanyName                 := le.Clean_Input.CompanyName;
 		SELF.searchby.ConsumerName.Fname          := le.Clean_Input.Rep_FirstName;
@@ -81,7 +82,7 @@ EXPORT getTargusGateway(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	targus_out_pre := // Targus.Layout_Targus_Out
 		IF(
 			makeGatewayCall, 
-			Gateway.SoapCall_Targus(targus_in, targus_gateway_cfg, timeout, retries, makeGatewayCall),
+			Gateway.SoapCall_Targus(targus_in, targus_gateway_cfg, timeout, retries, makeGatewayCall, mod_access),
 			DATASET([],targus.layout_targus_out)
 		);
 	
