@@ -4,6 +4,7 @@ EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.I
                                   Business_Risk_BIP.LIB_Business_Shell_LIBIN Options
 																) := 	FUNCTION
 		UCase := STD.Str.ToUpperCase;
+    UpperUniCase := STD.Uni.ToUpperCase;
 		
 		ofac_only := FALSE;
 		
@@ -467,18 +468,18 @@ EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.I
             SELF.seq        := left.seq,
             SELF.isOFAC     := left.EntityPartyKey[1..4]  = 'OFAC',
             SELF.bus_watchlist_sequence      := '',
-            SELF.bus_watchlist_table         := if(left.errormessage <> '', 'ERR', left.FileName[1..(sourceLength - 4)]),
+            SELF.bus_watchlist_table         := if(left.errormessage <> '', 'ERR', UCase(left.FileName[1..(sourceLength - 4)])),
             SELF.bus_watchlist_program       := OFAC_XG5.Program_lookup(UCase(trim(left.EntityReason))),
-            SELF.bus_watchlist_record_number := left.EntityPartyKey;
-            SELF.bus_watchlist_country       := left.country;
-            SELF.bus_watchlist_entity_name   := left.BestName,
-            SELF.bus_watchlist_companyname   := left.EntityName,
-            SELF.bus_watchlist_firstname     := If(left.BestID = 0, left.EntityNamefirst, left.FirstName);
-            SELF.bus_watchlist_lastname      := If(left.BestID = 0, left.EntityNameLast , left.LastName);
-            SELF.bus_watchlist_address       := trim(left.StreetAddress1),
+            SELF.bus_watchlist_record_number := UCase(left.EntityPartyKey);
+            SELF.bus_watchlist_country       := UCase(left.country);
+            SELF.bus_watchlist_entity_name   := UpperUniCase(left.BestName),
+            SELF.bus_watchlist_companyname   := UpperUniCase(left.EntityName),
+            SELF.bus_watchlist_firstname     := If(left.BestID = 0, UpperUniCase(left.EntityNamefirst), UpperUniCase(left.FirstName));
+            SELF.bus_watchlist_lastname      := If(left.BestID = 0, UpperUniCase(left.EntityNameLast) , UpperUniCase(left.LastName));
+            SELF.bus_watchlist_address       := trim(UCase(left.StreetAddress1)),
             // parsed watchlist address
-            SELF.bus_watchlist_city  := trim(left.city),
-            SELF.bus_watchlist_state := if(noaddr, '', left.state),
+            SELF.bus_watchlist_city  := trim(UCase(left.city)),
+            SELF.bus_watchlist_state := if(noaddr, '', UCase(left.state)),
             SELF.bus_watchlist_zip   := if(noaddr, '', left.PostalCode),
             
             SELF.bus_watchlist_entitydate := left.entitydate,
