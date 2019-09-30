@@ -1,4 +1,4 @@
-IMPORT Data_Services, BIPV2;
+﻿IMPORT Data_Services, Doxie, BIPV2;
 
 EXPORT Key_DEADCO_LinkIds := MODULE
 
@@ -11,8 +11,10 @@ EXPORT Key_DEADCO_LinkIds := MODULE
 	export Key := k;
 
 	//DEFINE THE INDEX ACCESS
+	// Jira# CCPA-820,  Added mod_access and Mac_check_access to kfetch functions for CCPA suppressions.
 	export kFetch2(
-		dataset(BIPV2.IDlayouts.l_xlink_ids2) inputs, 
+		dataset(BIPV2.IDlayouts.l_xlink_ids2) inputs,
+		Doxie.IDataAccess mod_access = MODULE(Doxie.IDataAccess) END,
 		string1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
 																								//Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																								//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
@@ -22,14 +24,16 @@ EXPORT Key_DEADCO_LinkIds := MODULE
 		) :=
 	FUNCTION
 
-		BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, out, Level, joinLimit, JoinType);
+		BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, fetched, Level, joinLimit, JoinType);
+		InfoUSA.MAC_Check_Access(fetched, out, mod_access);					// Jira# CCPA-820, Function created for CCPA suppressions at key fetches.
 		return out;																					
 
 	END;
 	
 	// Depricated version of the above kFetch2
 	export kFetch(
-		dataset(BIPV2.IDlayouts.l_xlink_ids) inputs, 
+		dataset(BIPV2.IDlayouts.l_xlink_ids) inputs,
+		Doxie.IDataAccess mod_access = MODULE(Doxie.IDataAccess) END,
 		string1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
 																								//Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																								//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
@@ -39,7 +43,7 @@ EXPORT Key_DEADCO_LinkIds := MODULE
 	FUNCTION
 
 		inputs_for2 := project(inputs, BIPV2.IDlayouts.l_xlink_ids2);
-		f2 := kFetch2(inputs_for2, Level, ScoreThreshold, joinLimit);
+		f2 := kFetch2(inputs_for2, mod_access, Level, ScoreThreshold, joinLimit);
 		return project(f2, recordof(Key));																			
 
 	END;
