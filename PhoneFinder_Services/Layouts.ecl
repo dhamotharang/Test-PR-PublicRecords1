@@ -155,7 +155,7 @@ MODULE
 		EXPORT Final :=
 		RECORD
 			// Batch input fields
-			BatchInAppendDID                                  batch_in;
+			// BatchInAppendDID                                  batch_in;
 			STRING20                                          acctno;
 			UNSIGNED8                                         seq;
 			UNSIGNED6                                         did;
@@ -281,6 +281,7 @@ MODULE
 			STRING20  acctno;
 			UNSIGNED6 did;
 			UNSIGNED6 InputDID;
+			BOOLEAN   isPrimaryIdentity;
 			UNSIGNED2 penalt;
 			STRING2   vendor_id;
 			STRING2   src;
@@ -327,6 +328,7 @@ MODULE
 			STRING1   typeflag;
 			STRING10  orig_phone;
 			STRING10  phone;
+			BOOLEAN   isPrimaryPhone;
 			STRING2	  phone_state;
 			STRING60  carrier_name;
 			STRING50  phone_region_city;

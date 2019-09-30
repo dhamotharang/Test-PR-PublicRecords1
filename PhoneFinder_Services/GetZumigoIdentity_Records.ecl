@@ -8,7 +8,7 @@ MODULE
 
    SHARED Ph_Wireless := dPhoneRecs(phone <> '' AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
 
-   Ph_Wireless_Ddp := DEDUP(SORT(Ph_Wireless(phone = batch_in.homephone), acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip), acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip);
+   Ph_Wireless_Ddp := DEDUP(SORT(Ph_Wireless(isPrimaryPhone), acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip), acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip);
 
    // when   NameAddressInfo is true and no name addr resolved in a phone search, pass a fake a name and addr to get zumigo identity info.
 
@@ -38,7 +38,7 @@ MODULE
   // for pii search, sending in one primary wireless phone , if available, else one other phone per acct
   // sorting other phones(non primary) by score and dates
 
-   PII_wireless_pre := DEDUP(SORT(Ph_Wireless(batch_in.homephone = ''), acctno, IF(isprimaryphone, 0, 1), -phone_score, -dt_last_seen, dt_first_seen), acctno);
+   PII_wireless_pre := DEDUP(SORT(Ph_Wireless(isPrimaryPhone), acctno, IF(isprimaryphone, 0, 1), -phone_score, -dt_last_seen, dt_first_seen), acctno);
 
      // sending in best identities name/addr to first wireless phone
    PhoneFinder_Services.Layouts.PhoneFinder.Final in_addr(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
@@ -92,7 +92,6 @@ MODULE
      SELF.zip4 := l.zip4;
      SELF.county_name := l.county_name;
      SELF := [];
-
    END;
 
    SHARED Zum_inrecs := PROJECT(Phones_wireless, toZin(LEFT));
@@ -122,6 +121,7 @@ MODULE
    END;
 
    Zumigo_Response := Phones.GetZumigoIdentity(Zum_inrecs, Zum_inMod, inMod.GLBPurpose, inMod.DPPAPurpose,,,,FALSE,FALSE);
+
    // getting zumigo error-free response
    EXPORT Zumigo_Hist := Zumigo_Response(source = Phones.Constants.GatewayValues.ZumigoIdentity AND device_mgmt_status = '');
    SHARED today := STD.Date.Today();
@@ -133,7 +133,7 @@ MODULE
                            RIGHT ONLY);
 
 
-   PhoneFinder_Services.Layouts.PhoneFinder.Final  addZum(Phones.Layouts.ZumigoIdentity.zOut l) :=    TRANSFORM
+   PhoneFinder_Services.Layouts.PhoneFinder.Final addZum(Phones.Layouts.ZumigoIdentity.zOut l) := TRANSFORM
       Acct_tenure := l.acct_tenure_min * $.Constants.ZumigoConstants.MonthlyDays;
       SELF.acctno := l.acctno;
       SELF.phone := l.submitted_phonenumber;
@@ -157,9 +157,6 @@ MODULE
       SELF.CallForwardingIndicator   := IF(Zum_inMod.CallHandlingInfo,
                                        PhoneFinder_Services.Functions.CallForwardingDesc(l.call_forwarding),''); //get call forwarded value only when CallHandlingInfo is selected
       SELF.rec_source    := l.source;
-      SELF.batch_in.acctno    := l.acctno;
-      SELF.batch_in.homephone    := l.submitted_phonenumber;    // inputted acct and phone
-
       SELF := [];
 
    END;
