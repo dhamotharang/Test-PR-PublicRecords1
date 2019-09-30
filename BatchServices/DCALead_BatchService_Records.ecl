@@ -1,4 +1,4 @@
-import Corp2_Services, Autokey_Batch, AutokeyB2, Corp2, Business_Header, Domains, doxie_cbrs;
+﻿import Corp2_Services, Autokey_Batch, AutokeyB2, Corp2, Business_Header, Domains, doxie_cbrs, doxie, AutoStandardI, Suppress;
 
 export DCALead_BatchService_Records(dataset(Autokey_Batch.Layouts.rec_inBatchMaster) autokey_in) := function
 
@@ -8,7 +8,7 @@ export DCALead_BatchService_Records(dataset(Autokey_Batch.Layouts.rec_inBatchMas
 	corp_autokey_config := MODULE(BatchServices.Interfaces.i_AK_Config)
 			export skip_set :=  ['P','Q','S'];
 	END;
-														
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());													
 	corp_autokey_base := '~thor_data400::key::corp2::qa::autokey::';
 	corp_autokey_out := Autokey_batch.get_fids(autokey_in, corp_autokey_base, corp_autokey_config);
 
@@ -192,6 +192,8 @@ export DCALead_BatchService_Records(dataset(Autokey_Batch.Layouts.rec_inBatchMas
 	get_contacts := join(add_url,business_header.Key_Business_Contacts_BDID,
 		left.bdid = right.bdid and
 		right.from_hdr = 'N');
+    
+  Contacts_byBDID_a := Suppress.MAC_SuppressSource(get_contacts, mod_access);
 	// Add title weight
 	join_titles := join(get_contacts,doxie_cbrs.executive_titles,
 		left.company_title = right.stored_title,
