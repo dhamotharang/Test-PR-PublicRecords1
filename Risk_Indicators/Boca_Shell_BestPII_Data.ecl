@@ -1,4 +1,4 @@
-﻿import _Control, doxie, did_add, ut, riskwise, address, gateway, watchdog;
+﻿import _Control, doxie, did_add, riskwise, address, gateway, watchdog, Risk_Indicators;
 onThor := _Control.Environment.OnThor;
 
 // this function will first append the BEST fname, lname, phone and ssn
@@ -11,7 +11,8 @@ EXPORT Boca_Shell_BestPII_Data(grouped dataset(risk_indicators.Layout_Boca_Shell
 	integer bsversion,
 	string datarestrictionmask, 
 	string datapermissionmask,
-	unsigned8 BSOptions
+	unsigned8 BSOptions,
+    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 	) := function
 
 gateways := dataset([], Gateway.Layouts.Config); // set this to nothing for now until we can prove any of this logic needs gateway info 
@@ -148,7 +149,7 @@ inquiries_prep := project(iid_prep, transform(risk_indicators.layout_bocashell_n
 	self := [];) );
 	
 best_inquiries := if(isFCRA, risk_indicators.Boca_Shell_Inquiries_FCRA(inquiries_prep, bsoptions, bsversion, gateways),
-														risk_indicators.Boca_Shell_Inquiries(inquiries_prep, bsoptions, bsversion, gateways, datapermissionmask) );
+														risk_indicators.Boca_Shell_Inquiries(inquiries_prep, bsoptions, bsversion, gateways, datapermissionmask, mod_access) );
 
 with_best_inquiries := join(with_match_flags, best_inquiries, left.seq=right.seq,
 	transform(risk_indicators.Layout_Boca_Shell,

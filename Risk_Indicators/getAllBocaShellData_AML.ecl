@@ -1,4 +1,4 @@
-﻿IMPORT Ut, riskwise, american_student_list, models, easi, doxie, doxie_files, dma, fcra_opt_out, USPIS_HotList, AML, paw, gateway, risk_indicators;
+﻿IMPORT Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, risk_indicators;
 
 EXPORT getAllBocaShellData_AML (
   GROUPED DATASET (risk_indicators.Layout_output) iid, 
@@ -113,11 +113,11 @@ production_realtime_mode := iid[1].historydate=risk_indicators.iid_constants.def
   // without history date
   prop := IF (IsFCRA, 
 	            Risk_Indicators.Boca_Shell_Property_FCRA (p_address, ids_only),
-								Risk_Indicators.Boca_Shell_Property (p_address, ids_only, includeRelativeInfo, filter_out_fares, mod_access)) ;
+								Risk_Indicators.Boca_Shell_Property (p_address, ids_only, includeRelativeInfo, filter_out_fares)) ;
   // with history date
   prop_hist :=  IF (IsFCRA, 
 	                  Risk_Indicators.Boca_Shell_Property_Hist_FCRA (p_address, ids_only),
-                    Risk_Indicators.Boca_Shell_Property_Hist (p_address, ids_only, includeRelativeInfo, filter_out_fares, mod_access));
+                    Risk_Indicators.Boca_Shell_Property_Hist (p_address, ids_only, includeRelativeInfo, filter_out_fares));
 										
   AMLSingleProperty :=  if (production_realtime_mode,   AML.AMLProperty(p_address, ids_only,includeRelativeInfo, filter_out_fares, mod_access), AML.AMLPropertyHist(p_address, ids_only,includeRelativeInfo, filter_out_fares, mod_access));
  
@@ -365,7 +365,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	History_2_Property_added := History_2_Property_Added_a + group(sort(pullid_recs, seq),seq);
 
   // =============== Vehicles ===============
-  vehicles := Risk_Indicators.Boca_Shell_Vehicles(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion, mod_access);
+  vehicles := Risk_Indicators.Boca_Shell_Vehicles(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion);
   vehicles_hist := Risk_Indicators.Boca_Shell_Vehicles_Hist(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion, mod_access);
   vehicles_rolled := if (production_realtime_mode, vehicles, vehicles_hist);
 
@@ -425,9 +425,9 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 
 // =============== Aircraft ===============
 	aircraft := IF (IsFCRA,		Risk_Indicators.Boca_Shell_aircraft_FCRA (ids_only(~isrelat)),
-						                Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/, mod_access));
+						                Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/));
 	aircraft_hist := IF (IsFCRA, Risk_Indicators.Boca_Shell_aircraft_Hist_FCRA (ids_only(~isrelat)),
-					              Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/, mod_access) );
+					              Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/) );
 	aircraft_rolled := if (production_realtime_mode, aircraft, aircraft_hist);
 
   aircraft_rolled_indv := aircraft_rolled(~isrelat);
@@ -437,7 +437,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== AVM ===============
 	avm_rolled := IF (IsFCRA,
 												Risk_Indicators.Boca_Shell_AVM_FCRA (ids_wide(~isrelat)),
-												Risk_Indicators.Boca_Shell_AVM      (ids_wide(~isrelat), mod_access));
+												Risk_Indicators.Boca_Shell_AVM      (ids_wide(~isrelat)));
 								
 								
 	//=========== Gong ============
@@ -1177,7 +1177,7 @@ shell3_bsdata := map(
 );
 
 // new sections of data for shell 4.0 content
-advo_rolled := boca_shell_advo(ids_wide(~isrelat), isFCRA, datarestriction, isPreScreen, bsversion, mod_access);  // change to neutral layout
+advo_rolled := boca_shell_advo(ids_wide(~isrelat), isFCRA, datarestriction, isPreScreen, bsversion);  // change to neutral layout
 employment_rolled := boca_shell_employment(ids_wide(~isrelat), isFCRA, isPreScreen, bsversion, mod_access);
 
 gateways := Gateway.Constants.void_gateway;  // AML won't use the collection shell neutral gateway, just hard code gateways to empty dataset
@@ -1214,8 +1214,8 @@ with_email_summary := JOIN(with_inquiries, email_summary_rolled,
 														self := left),
 									LEFT OUTER, LOOKUP, PARALLEL);										
 // todo using BH to get Office/agent need to change if we go with PAW											
-with_bus_header_summary := if(isFCRA, with_email_summary, boca_shell_Bus_header(with_email_summary, bsversion, mod_access)); // won't use business header on FCRA queries
-with_address_risk := if(isFCRA, with_bus_header_summary, Boca_Shell_Address_Risk(with_bus_header_summary, bsversion, mod_access));
+with_bus_header_summary := if(isFCRA, with_email_summary, boca_shell_Bus_header(with_email_summary, bsversion)); // won't use business header on FCRA queries
+with_address_risk := if(isFCRA, with_bus_header_summary, Boca_Shell_Address_Risk(with_bus_header_summary, bsversion));
 
 
 												

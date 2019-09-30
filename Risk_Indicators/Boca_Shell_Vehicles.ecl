@@ -1,13 +1,13 @@
-﻿import drivers, VehicleV2, riskwise, doxie;
+﻿import drivers, VehicleV2, riskwise, risk_indicators;
 
-export Boca_Shell_Vehicles (GROUPED DATASET(Layout_Boca_Shell_ids) ids, unsigned1 dppa, boolean dppa_ok, boolean includeRel,
-														unsigned1 BSversion, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+export Boca_Shell_Vehicles (GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids, unsigned1 dppa, boolean dppa_ok, boolean includeRel,
+														unsigned1 BSversion) := FUNCTION
 
 kv := VehicleV2.Key_BocaShell_Vehicles;
 
 vehrec := RECORD
-	Layout_Boca_Shell_ids;
-	Layout_Vehicles.Vehicle_Set;
+	risk_indicators.Layout_Boca_Shell_ids;
+	risk_indicators.Layout_Vehicles.Vehicle_Set;
 	unsigned1 relative_owned_count;
 END;
 

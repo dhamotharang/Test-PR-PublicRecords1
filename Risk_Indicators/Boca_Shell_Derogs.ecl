@@ -1,4 +1,4 @@
-﻿import doxie_files, property, riskwise, bankruptcyv3, liensv2, ut, risk_indicators, MDR, doxie;
+﻿import doxie_files, property, riskwise, bankruptcyv3, liensv2, ut, risk_indicators, MDR, doxie, Suppress;
 
 export Boca_Shell_Derogs (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, unsigned1 BSversion=1, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
@@ -154,8 +154,13 @@ END;
 liens_added := JOIN(bankrupt_rolled, kld, keyed(LEFT.did=RIGHT.did), add_liens(LEFT,RIGHT), LEFT OUTER, KEEP(100),
 					ATMOST(keyed(left.did=right.did), Riskwise.max_atmost));
 
+layout_extended_CCPA := RECORD
+unsigned4 global_sid; //CCPA Changes
+layout_extended;
+END;
 
-layout_extended get_liens_nonFCRA(layout_extended le, klr_nonFCRA ri) := TRANSFORM
+layout_extended_CCPA get_liens_nonFCRA(layout_extended le, klr_nonFCRA ri) := TRANSFORM
+    self.global_sid := ri.global_sid;
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	isRecent := ut.DaysApart(ri.date_first_seen,myGetDate)<365*2+1;
 	
@@ -222,7 +227,7 @@ layout_extended get_liens_nonFCRA(layout_extended le, klr_nonFCRA ri) := TRANSFO
 	SELF := le;
 END;
 
-liens_full := JOIN (liens_added, klr_nonFCRA, 
+liens_full_unsuppressed := JOIN (liens_added, klr_nonFCRA, 
                     LEFT.rmsid<>'' AND
                     keyed(left.tmsid=right.tmsid) and keyed(LEFT.rmsid=RIGHT.rmsid) AND 
 										right.name_type='D' and 
@@ -231,8 +236,10 @@ liens_full := JOIN (liens_added, klr_nonFCRA,
 										LEFT OUTER, KEEP(100),
 				ATMOST(keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid), Riskwise.max_atmost));
 
-
-layout_extended get_evictions(liens_full le, liensV2.key_liens_main_ID ri) := transform
+liens_full := Suppress.Suppress_ReturnOldLayout(liens_full_unsuppressed, mod_access, layout_extended);
+    
+layout_extended_CCPA get_evictions(liens_full le, liensV2.key_liens_main_ID ri) := transform
+    self.global_sid := ri.global_sid;
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	isRecent := ut.DaysApart((string8)le.date_first_seen,myGetDate)<365*2+1;
 	
@@ -409,13 +416,15 @@ layout_extended get_evictions(liens_full le, liensV2.key_liens_main_ID ri) := tr
 
 	SELF := le;
 end;
-liens_main := JOIN(liens_full, liensV2.key_liens_main_ID,
+liens_main_unsuppressed := JOIN(liens_full, liensV2.key_liens_main_ID,
 											left.rmsid<>'' and left.tmsid<>'' and 
 											keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid)	and
 											(bsversion < 50 or trim(stringlib.stringtouppercase(right.filing_type_desc)) not in risk_indicators.iid_constants.set_Invalid_Liens_50), // ignore certain lien types completely if running shell version 5.0 or higher, 
 											get_evictions(LEFT,RIGHT), left outer, 
 											ATMOST(keyed(LEFT.tmsid=RIGHT.tmsid) and keyed(left.rmsid=right.rmsid), riskwise.max_atmost));
-	
+                                                  
+liens_main := Suppress.Suppress_ReturnOldLayout(liens_main_unsuppressed, mod_access, layout_extended);
+                                                  
 layout_extended roll_liens(layout_extended le, layout_extended ri) := TRANSFORM
 	sameLien := le.tmsid=ri.tmsid and le.rmsid=ri.rmsid;
 
@@ -579,16 +588,24 @@ wFID := join(w_crim, property.key_foreclosure_did,
 						transform(layout_extended, self.fid := right.fid, self.BJL.foreclosure_flag := right.did!=0, self := left, self := []), 
 						left outer, atmost(keyed(left.did=right.did), riskwise.max_atmost), keep(50));
 
+layout_derog_process_CCPA := RECORD
+unsigned4 global_sid;
+layout_derog_process;
+END;
 
-all_foreclosures := join(wFID, property.key_foreclosures_fid,
+all_foreclosures_unsuppressed := join(wFID, property.key_foreclosures_fid,
 						left.fid!='' and 
 						keyed(left.fid=right.fid) and
 						right.source=MDR.sourceTools.src_Foreclosures,
-						transform(layout_derog_process, 
+						transform(layout_derog_process_CCPA, 
+                                self.did := left.did;
+                                self.global_sid := right.global_sid;
 								self.BJL.last_foreclosure_date := right.recording_date,
 								self.BJL.foreclosure_flag := right.fid!='',
 								self := left),
 						left outer, atmost(keyed(left.fid=right.fid), riskwise.max_atmost), keep(50));
+                                                  
+all_foreclosures := Suppress.Suppress_ReturnOldLayout(all_foreclosures_unsuppressed, mod_access, layout_derog_process);
 
 wForeclosures := dedup(sort(all_foreclosures, seq, did, -BJL.last_foreclosure_date), seq, did);
 

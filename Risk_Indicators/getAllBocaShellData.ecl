@@ -38,7 +38,7 @@ EXPORT getAllBocaShellData (
 	// check the first record in the batch to determine if this a realtime transaction or an archive test
 	// if the record is default_history_date or same month as today's date, run production_realtime_mode
 	production_realtime_mode := iid[1].historydate=risk_indicators.iid_constants.default_history_date
-														or iid[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate[1..6]);
+														or iid[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate)[1..6];
 
 	// myGetDate := iid_constants.myGetDate(history_date);	// full history date
 	checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
@@ -496,7 +496,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 
   derogs := IF (IsFCRA,
                 Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, iid, ReportingPeriod),
-								Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion));
+								Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion, mod_access));
 
 	derogs_hist := IF (IsFCRA,
                      Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, ReportingPeriod),
@@ -548,9 +548,9 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 
 // =============== Aircraft ===============
 	aircraft := IF (IsFCRA,		Risk_Indicators.Boca_Shell_aircraft_FCRA (ids_only(~isrelat)),
-						                Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/, mod_access));
+						                Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/));
 	aircraft_hist := IF (IsFCRA, Risk_Indicators.Boca_Shell_aircraft_Hist_FCRA (ids_only(~isrelat)),
-					              Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/, mod_access));
+					              Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/));
 	aircraft_rolled := if (production_realtime_mode, aircraft, aircraft_hist);
 
   aircraft_rolled_indv := aircraft_rolled(~isrelat);
@@ -560,7 +560,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== AVM ===============
 	avm_rolled := IF (IsFCRA,
 												Risk_Indicators.Boca_Shell_AVM_FCRA (ids_wide(~isrelat)),
-												Risk_Indicators.Boca_Shell_AVM      (ids_wide(~isrelat), mod_access));
+												Risk_Indicators.Boca_Shell_AVM      (ids_wide(~isrelat)));
 								
 								
 	//=========== Gong ============
@@ -1444,9 +1444,9 @@ inquiries_input_thor := join(
  						
 inquiries_rolled := if(isFCRA, 
 										risk_indicators.boca_shell_inquiries_FCRA(inquiries_input, BSOptions, bsversion, gateways),
-										risk_indicators.boca_shell_inquiries(inquiries_input, BSOptions, bsversion, gateways, DataPermission));
+										risk_indicators.boca_shell_inquiries(inquiries_input, BSOptions, bsversion, gateways, DataPermission, mod_access));
 LastSeenThreshold := risk_indicators.iid_constants.oneyear;	// set this to default like what it was prior to my BSOptions change
-email_summary_rolled := risk_indicators.boca_shell_email(ids_wide(~isrelat), isFCRA, bsversion, LastSeenThreshold, BSOptions);
+email_summary_rolled := risk_indicators.boca_shell_email(ids_wide(~isrelat), isFCRA, bsversion, LastSeenThreshold, BSOptions, mod_access);
 
 with_advo := JOIN(shell3_bsdata, advo_rolled,
 									LEFT.seq=RIGHT.seq,
@@ -1668,7 +1668,7 @@ bsdata41 := if(isFCRA, rhode_island_patch, with_DNM_PreScreen);
 // --------------------[ add 5.0 sections here ]--------------------
 
 // nonfcra 5.0 data only
-insurance_phones_rolled := Risk_Indicators.Boca_Shell_Insurance_Phones(ids_wide(~isrelat));
+insurance_phones_rolled := Risk_Indicators.Boca_Shell_Insurance_Phones(ids_wide(~isrelat), mod_access);
 bureau_phones_rolled := Risk_Indicators.Boca_Shell_Bureau_Phones(ids_wide(~isrelat), mod_access);
 
 with_insurance_phones := join(bsdata41, insurance_phones_rolled, left.seq=right.seq,
@@ -1723,7 +1723,7 @@ bsData51 := if(bsversion>=51, group(shell51_branch1, seq), group(bsData50, seq))
 bsData52_a := if(bsversion >= 52 and ~isFCRA, risk_indicators.Boca_Shell_PII_Stability(bsdata51), bsdata51);
 
 bsData := if(bsversion >= 52,
-	risk_indicators.Boca_Shell_BestPII_Data(bsData52_a, isFCRA, glb, dppa, bsversion, datarestriction, datapermission, bsoptions),
+	risk_indicators.Boca_Shell_BestPII_Data(bsData52_a, isFCRA, glb, dppa, bsversion, datarestriction, datapermission, bsoptions, mod_access),
 	bsData52_a);
 
 // output fraudPoint 2.0 attributes

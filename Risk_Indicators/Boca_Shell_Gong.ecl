@@ -1,5 +1,4 @@
-﻿import riskwise, ut, gong, risk_indicators, doxie;
-// doxie, Suppress; for later use in CCPA, will be cleaned up when CCPA changes are made
+﻿import riskwise, ut, gong, risk_indicators, doxie, Suppress;
 
 export Boca_Shell_Gong(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
@@ -10,7 +9,6 @@ Layout_Gong := RECORD
 	string50 gongAddr;	// internal
 	string20 gongFirst;	// internal
 	string20 gongLast;	// internal
-	
 	string10 invalid_phone_from_did := '';	// internal
 	unsigned2 invalid_phones_per_adl := 0; 
 	unsigned2 invalid_phones_per_adl_created_6months := 0; 
@@ -22,8 +20,13 @@ Layout_Gong := RECORD
 	qstring120 phones_on_file_created12months := '';  // internal
 END;
 
+Layout_Gong_CCPA := RECORD
+    unsigned4 global_sid; // CCPA changes
+    Layout_Gong;
+END;
 
-Layout_Gong addPhone(ids_wide le, gong.Key_History_did ri) := transform	
+
+Layout_Gong_CCPA addPhone(ids_wide le, gong.Key_History_did ri) := transform	
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	self.gong_did.gong_ADL_dt_first_seen_full := ri.dt_first_seen;
 	self.gong_did.gong_ADL_dt_last_seen_full := if(ri.dt_last_seen>myGetDate, myGetDate, ri.dt_last_seen);	//set date last seen to history date if in future
@@ -38,7 +41,7 @@ Layout_Gong addPhone(ids_wide le, gong.Key_History_did ri) := transform
 	
 	// invalid stuff
 	self.did := le.did;
-	
+	self.global_sid := ri.global_sid;
 	self.phones_on_file := if(trim(ri.phone10)='', '', ri.phone10 + ',');		
 	self.phones_on_file_created12months := if(trim(ri.phone10)<>'' and 
 		risk_indicators.iid_constants.checkdays(risk_indicators.iid_constants.myGetDate(le.historydate),
@@ -53,10 +56,12 @@ Layout_Gong addPhone(ids_wide le, gong.Key_History_did ri) := transform
 	
 	self := le;
 END;
-gong_by_did1 := join(ids_wide, gong.key_history_did, left.did != 0 and keyed(left.did=right.l_did) and			
+gong_by_did_unsuppressed := join(ids_wide, gong.key_history_did, left.did != 0 and keyed(left.did=right.l_did) and			
 										// check date
 										((unsigned)RIGHT.dt_first_seen <= (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)), 
 										addPhone(LEFT,RIGHT), left outer, atmost(left.did=right.l_did, Riskwise.max_atmost), keep(100));
+                                                  
+gong_by_did1 := Suppress.Suppress_ReturnOldLayout(gong_by_did_unsuppressed, mod_access, Layout_Gong);
 
 // make this check to telcordia it's own join instead of nested inside the previous transform
 gong_by_did := join(gong_by_did1, risk_indicators.Key_Telcordia_tpm_Slim, 

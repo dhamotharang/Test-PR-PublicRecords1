@@ -1,4 +1,4 @@
-/*
+﻿/*
 Used in the BTST shell
 BT ST Identity-tied Transaction Count - (btst_cbd_inq_ver_count) - number of times 
 a BT and a ST have been seen together as part of the same transaction in the search activity (inquiry) database.  
@@ -16,12 +16,13 @@ st_ssn_found_on_bt_inq_count  - Number of Ship-To ssn found on the Bill-to Inqui
 ...then more fields like this with same definition but broken down by bucket.
 */
 
-import Inquiry_AccLogs, ut, gateway, Inquiry_Deltabase, riskwise;
+import Inquiry_AccLogs, gateway, Inquiry_Deltabase, riskwise, doxie, Suppress, Risk_Indicators;
 
 export Boca_Shell_BtSt_Inquiries(
 	grouped dataset(Risk_Indicators.layout_ciid_btst_Output) input, 
-		integer bsVersion,
-	dataset(Gateway.Layouts.Config) gateways) := FUNCTION
+	integer bsVersion,
+	dataset(Gateway.Layouts.Config) gateways,
+    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	ungrpd_input := ungroup(input);
 	isFCRA := false;
@@ -149,7 +150,14 @@ export Boca_Shell_BtSt_Inquiries(
 		integer st_ssn_found_on_bt_inq_Utilities_count       := -1;
 	end;
 
-	inq_tmp add_inquiry_raw(Risk_Indicators.layout_ciid_btst_Output le, key_did rt, integer c) := transform
+    inq_tmp_CCPA := RECORD
+        unsigned4 global_sid;
+        inq_tmp;
+    END;
+    
+getBtStInquiryRaw(btStField, InquiryRawCount, KeyName, getDelta) := FUNCTIONMACRO
+	inq_tmp_CCPA add_inquiry_raw(Risk_Indicators.layout_ciid_btst_Output le, key_did rt, integer c) := transform
+        self.global_sid := rt.ccpa.global_sid;
 		self.seq := if(c = 1, le.bill_to_output.seq, le.ship_to_output.seq);
 		self.did := if(c = 1, le.bill_to_output.did, le.ship_to_output.did);
 		hist_date := if(c = 1, le.ship_to_output.historydate, le.bill_to_output.historydate);;
@@ -251,30 +259,28 @@ export Boca_Shell_BtSt_Inquiries(
 	end;
 
 	// did
-	inq_bt_did := join(ungrpd_input, key_did, 
-							left.bill_to_output.did<>0 and keyed(left.bill_to_output.did=right.s_did) and
-							Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.bill_to_output.historyDateTimeStamp, left.bill_to_output.historyDate, bsversion),	
-							add_inquiry_raw(left, right, 1),
+    #IF(~getDelta)
+	inq_unsuppressed := join(ungrpd_input, #EXPAND(KeyName), 
+							left.#EXPAND(btStField).did<>0 and keyed(left.#EXPAND(btStField).did=right.s_did) and
+							Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.#EXPAND(btStField).historyDateTimeStamp, left.#EXPAND(btStField).historyDate, bsversion),	
+							add_inquiry_raw(left, right, InquiryRawCount),
 							left outer, atmost(5000));	
-
-	inq_st_did := join(ungrpd_input, key_did, 
-							left.ship_to_output.did<>0 and keyed(left.ship_to_output.did=right.s_did) and
-							Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.ship_to_output.historyDateTimeStamp, left.ship_to_output.historyDate, bsversion),	
-							add_inquiry_raw(left, right, 2),
-							left outer, atmost(5000));	
-//did update
-	inq_bt_didUpd := join(ungrpd_input, key_upd_did, 
-							left.bill_to_output.did<>0 and keyed(left.bill_to_output.did=right.s_did) and
-							Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.bill_to_output.historyDateTimeStamp, left.bill_to_output.historyDate, bsversion),	
-							add_inquiry_raw(left, right, 1),
-							left outer, atmost(5000));	
-
-	inq_st_didUpd := join(ungrpd_input, key_upd_did, 
-							left.ship_to_output.did<>0 and keyed(left.ship_to_output.did=right.s_did) and
-							Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.ship_to_output.historyDateTimeStamp, left.ship_to_output.historyDate, bsversion),	
-							add_inquiry_raw(left, right, 2),
-							left outer, atmost(5000));	
-
+    #ELSE
+    inq_unsuppressed := join(ungrpd_input, #EXPAND(KeyName), 
+						(unsigned6) left.#EXPAND(btStField).seq = (unsigned6) right.Search_Info.Sequence_Number,
+						add_inquiry_raw(left, right, InquiryRawCount),
+						left outer, atmost(5000));	
+    #END             
+    inq := Suppress.Suppress_ReturnOldLayout(inq_unsuppressed, mod_access, inq_tmp);
+    
+    RETURN inq;
+    
+    ENDMACRO;
+    inq_bt_did := getBtStInquiryRaw('bill_to_output', 1, 'key_did', false);
+    inq_st_did := getBtStInquiryRaw('ship_to_output', 2, 'key_did', false);
+    inq_bt_didUpd := getBtStInquiryRaw('bill_to_output', 1, 'key_upd_did', false);
+    inq_st_didUpd := getBtStInquiryRaw('ship_to_output', 2, 'key_upd_did', false);
+                                    
 	inq_bt_delta := project(ungrpd_input, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_DID,
 																	self.seq := left.bill_to_output.seq;
 																	self.did := left.bill_to_output.did));
@@ -295,16 +301,10 @@ export Boca_Shell_BtSt_Inquiries(
 
 	// st_deltaBase_did_results := Inquiry_Deltabase.Search_DID(inq_st_delta, 
 		// Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
+                                     
+    bt_delta := getBtStInquiryRaw('bill_to_output', 1, 'btst_deltaBase_did_results', true);
+    st_delta := getBtStInquiryRaw('ship_to_output', 2, 'btst_deltaBase_did_results', true);                                         
 
-	bt_delta := join(ungrpd_input, btst_deltaBase_did_results, 
-						(unsigned6) left.bill_to_output.seq = (unsigned6) right.Search_Info.Sequence_Number,
-						add_inquiry_raw(left, right, 1),
-						left outer, atmost(5000));	
-	
-	st_delta := join(ungrpd_input, btst_deltaBase_did_results, 
-						(unsigned6) left.Ship_to_output.seq = (unsigned6) right.Search_Info.Sequence_Number,
-						add_inquiry_raw(left, right, 2),
-						left outer, atmost(5000));	
 //get hits
 	btInq_hits := inq_bt_did(Hit = true) + inq_bt_didUpd(Hit = true) + bt_delta(Hit = true);
 	btInq_hits_dpd := dedup(sort(btInq_hits, seq, transaction_id, -(unsigned3) first_log_date, Sequence_Number), seq, transaction_id);
@@ -713,7 +713,7 @@ end;
 	bt_trans_info := bt_trans(CBD_Hit = true) + bttrans_didUpd(CBD_Hit = true) + tbt_delta(CBD_Hit = true);	
 	bt_trans_info_std := sort(bt_trans_info(did != 0), seq, did, transaction_id);
 	bt_trans_info_dpd := dedup(bt_trans_info_std,seq, did);
-	bt_trans_hits := group(bt_trans_info_dpd, seq);
+	bt_trans_hits := bt_trans_info_dpd;
 	bt_trans_did_cnt := table(bt_trans_hits, {seq, cnt := count(group)}, seq);	
 
 	stassbt_info :=	join(ungrpd_input, bt_trans_did_cnt,
@@ -728,7 +728,7 @@ end;
 	st_trans_info := st_trans(CBD_Hit = true) + sttrans_didUpd(CBD_Hit = true)+ tst_delta(CBD_Hit = true);
 	st_trans_info_std := sort(st_trans_info(did != 0), seq, did, transaction_id);
 	st_trans_info_dpd := dedup(st_trans_info_std,seq, did);
-	st_trans_hits := group(st_trans_info_dpd, seq);	
+	st_trans_hits := st_trans_info_dpd;	
 	st_trans_did_cnt := table(st_trans_hits, {seq, cnt := count(group)}, seq);
 
 	btassst_info :=	join(ungrpd_input, st_trans_did_cnt,
