@@ -14,7 +14,11 @@ IMPORT Gong, Phone_Shell, Risk_Indicators, RiskWise, UT, STD, doxie;
 
 todays_date := (string) STD.Date.Today();
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, DATASET(Phone_Shell.Layouts.layoutUniqueAddresses) HeaderAddresses, UNSIGNED1 PhoneRestrictionMask, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, DATASET(Phone_Shell.Layouts.layoutUniqueAddresses) HeaderAddresses, UNSIGNED1 PhoneRestrictionMask, 
+          UNSIGNED2 PhoneShellVersion = 10, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+          
+ IncludeLexIDCounts := if(PhoneShellVersion >= 21, true, false); // LexID Counts/'all' attributes added in PhoneShell version 2.1    
+          
 	 /* ***************************************************************
 		* 							Get the EDA (Gong) Data by DID									*
 	  *************************************************************** */
@@ -36,11 +40,14 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASE
 		SELF.Sources.Source_Owner_Name_Last		:= ri.name_last;
 		SELF.Sources.Source_Owner_Name_Suffix := ri.name_suffix;
 		SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+    
+  SELF.Sources.Source_List_All_Last_Seen := if(IncludeLexIDCounts, Phone_Shell.Common.parseDate((STRING)ri.dt_last_seen), '');
+  SELF.Sources.Source_Owner_All_DIDs := if(includeLexIDCounts, (string)ri.DID, '');
 		
-		didMatch := StringLib.StringFind(matchcode, 'L', 1) > 0;
-		nameMatch := StringLib.StringFind(matchcode, 'N', 1) > 0;
-		addrMatch := StringLib.StringFind(matchcode, 'A', 1) > 0;
-		ssnMatch := StringLib.StringFind(matchcode, 'S', 1) > 0;
+		didMatch := STD.Str.Find(matchcode, 'L', 1) > 0;
+		nameMatch := STD.Str.Find(matchcode, 'N', 1) > 0;
+		addrMatch := STD.Str.Find(matchcode, 'A', 1) > 0;
+		ssnMatch := STD.Str.Find(matchcode, 'S', 1) > 0;
 		
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := MAP(didMatch AND nameMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Subject,
 																															didMatch AND addrMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Household,
@@ -83,8 +90,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASE
 		SELF.Clean_Input.seq := le.seq; // Need to save this to join back to the input data in a moment
 		SELF.Gathered_Phone := TRIM(ri.phone10);
 		
-		SELF.Raw_Input.FirstName := StringLib.StringToUpperCase(TRIM(ri.name_first));
-		SELF.Raw_Input.LastName := StringLib.StringToUpperCase(TRIM(ri.name_last));
+		SELF.Raw_Input.FirstName := STD.Str.ToUpperCase(TRIM(ri.name_first));
+		SELF.Raw_Input.LastName := STD.Str.ToUpperCase(TRIM(ri.name_last));
 		
 		matchcode := Phone_Shell.Common.generateMatchcode(le.FirstName, le.LastName,  	'', le.Prim_Range, le.Prim_Name, le.Addr_Suffix, le.City, 			le.State, le.Zip5,	le.DateOfBirth, le.SSN, le.DID, le.HomePhone, le.WorkPhone, 
 																											ri.name_first, ri.name_last, '', ri.Prim_Range,	ri.Prim_Name,	ri.Suffix,			ri.P_City_Name,	ri.st, 		ri.Z5,		'',							'',			ri.DID, ri.phone10);
@@ -92,7 +99,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASE
 		// If seen within last 5 years the last name must also match (fuzzy logic applied), if seen within last 6 months no need to match last name
 		Source_List_Temp := MAP((INTEGER)le.DateLastSeen >= (INTEGER)(ut.date_math(todays_date, -1 * Phone_Shell.Constants.HeaderSixMonthsDate)[1..6])																									=> 'EDACA',
 																		(INTEGER)le.DateLastSeen >= (INTEGER)(ut.date_math(todays_date, -1 * Phone_Shell.Constants.HeaderSearchDate)[1..6]) AND
-																		Risk_Indicators.iid_constants.g(Risk_Indicators.LnameScore(StringLib.StringToUpperCase(TRIM(le.LastName)), StringLib.StringToUpperCase(TRIM(ri.name_last))))	=> 'EDAHistory',
+																		Risk_Indicators.iid_constants.g(Risk_Indicators.LnameScore(STD.Str.ToUpperCase(TRIM(le.LastName)), STD.Str.ToUpperCase(TRIM(ri.name_last))))	=> 'EDAHistory',
 																																																																																																		 '');
 		// Check the Phone Restriction Mask, only keep the phone if the mask is ok
 		SELF.Sources.Source_List := IF(Phone_Shell.Common.PhoneRestrictionMaskOK(PhoneRestrictionMask, matchcode, le.LastName, ri.name_last, anyAddress := TRUE), Source_List_Temp, '');
@@ -105,12 +112,15 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASE
 		SELF.Sources.Source_Owner_Name_Middle := ri.name_middle;
 		SELF.Sources.Source_Owner_Name_Last		:= ri.name_last;
 		SELF.Sources.Source_Owner_Name_Suffix := ri.name_suffix;
-    SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+  SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+  
+  SELF.Sources.Source_List_All_Last_Seen := if(IncludeLexIDCounts, Phone_Shell.Common.parseDate((STRING)ri.dt_last_seen), '');
+  SELF.Sources.Source_Owner_All_DIDs := if(includeLexIDCounts, (string)ri.DID, '');
 
-		didMatch := StringLib.StringFind(matchcode, 'L', 1) > 0;
-		nameMatch := StringLib.StringFind(matchcode, 'N', 1) > 0;
-		addrMatch := StringLib.StringFind(matchcode, 'A', 1) > 0;
-		ssnMatch := StringLib.StringFind(matchcode, 'S', 1) > 0;
+		didMatch := STD.Str.Find(matchcode, 'L', 1) > 0;
+		nameMatch := STD.Str.Find(matchcode, 'N', 1) > 0;
+		addrMatch := STD.Str.Find(matchcode, 'A', 1) > 0;
+		ssnMatch := STD.Str.Find(matchcode, 'S', 1) > 0;
 		
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := MAP(didMatch AND nameMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Subject,
 																															didMatch AND addrMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Household,
@@ -171,12 +181,15 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASE
 		SELF.Sources.Source_Owner_Name_Middle := ri.name_middle;
 		SELF.Sources.Source_Owner_Name_Last		:= ri.name_last;
 		SELF.Sources.Source_Owner_Name_Suffix := ri.name_suffix;
-	  SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+  SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+    
+  SELF.Sources.Source_List_All_Last_Seen := if(IncludeLexIDCounts, Phone_Shell.Common.parseDate((STRING)ri.dt_last_seen), '');
+  SELF.Sources.Source_Owner_All_DIDs := if(IncludeLexIDCounts, (string)ri.DID, '');
 	
-		didMatch := StringLib.StringFind(matchcode, 'L', 1) > 0;
-		nameMatch := StringLib.StringFind(matchcode, 'N', 1) > 0;
-		addrMatch := StringLib.StringFind(matchcode, 'A', 1) > 0;
-		ssnMatch := StringLib.StringFind(matchcode, 'S', 1) > 0;
+		didMatch := STD.Str.Find(matchcode, 'L', 1) > 0;
+		nameMatch := STD.Str.Find(matchcode, 'N', 1) > 0;
+		addrMatch := STD.Str.Find(matchcode, 'A', 1) > 0;
+		ssnMatch := STD.Str.Find(matchcode, 'S', 1) > 0;
 		
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := MAP(didMatch AND nameMatch									=> Phone_Shell.Constants.Phone_Subject_Level.Subject, 
 																															didMatch AND addrMatch									=> Phone_Shell.Constants.Phone_Subject_Level.Household,
@@ -205,8 +218,27 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASE
 	// Don't keep the phones which didn't match on some part of the name
 	byAddress := byAddressAll (TRIM(Sources.Source_List) <> '');
 	
-	final := DEDUP(SORT((byDID + byUniqueAddresses + byAddress), Clean_Input.seq, Gathered_Phone, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code))), Clean_Input.seq, Gathered_Phone, Sources.Source_List);
+	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus get_Alls(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
+   self.Sources.Source_List_All_Last_Seen := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID, 
+                                                   le.Sources.Source_List_All_Last_Seen, 
+                                                   le.Sources.Source_List_All_Last_Seen + ',' + ri.Sources.Source_List_All_Last_Seen);
+   self.Sources.Source_Owner_All_DIDs := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID,
+                                               le.Sources.Source_Owner_All_DIDs,
+                                               le.Sources.Source_Owner_All_DIDs + ',' + ri.Sources.Source_Owner_All_DIDs);
+   self := le;
+ end;
+ 
+ sortedEDA := SORT((byDID + byUniqueAddresses + byAddress), Clean_Input.seq, Gathered_Phone, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code)));
 	
+	final := if(IncludeLexIDCounts,
+             ROLLUP(sortedEDA,
+               left.Clean_Input.seq = right.Clean_Input.seq and 
+               left.Gathered_Phone = right.Gathered_Phone and 
+               left.Sources.Source_List = right.Sources.Source_List,
+               get_Alls(left,right)),
+             DEDUP(sortedEDA, Clean_Input.seq, Gathered_Phone, Sources.Source_List)
+            );
+            
 	// OUTPUT(CHOOSEN(HeaderAddresses ((INTEGER)DateLastSeen >= (INTEGER)(ut.date_math((string) STD.Date.Today(), -1 * Phone_Shell.Constants.HeaderSearchDate)[1..6])), 100), NAMED('HeaderAddressesUsable'));
 	// OUTPUT(CHOOSEN(HeaderAddresses ((INTEGER)DateLastSeen >= (INTEGER)(ut.date_math((string) STD.Date.Today(), -1 * Phone_Shell.Constants.HeaderSixMonthsDate)[1..6])), 100), NAMED('HeaderAddresses6Months'));
 	// OUTPUT(CHOOSEN(uniqueAddressSearchResultsAll, 100), NAMED('uniqueAddressSearchResultsAll'));

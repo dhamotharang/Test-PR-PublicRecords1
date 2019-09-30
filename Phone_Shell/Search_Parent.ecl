@@ -1,14 +1,15 @@
-/*2013-11-21T00:12:28Z (Lorraine Hill)
-
-*/
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function searches for parent by:																	*
  * - LexID (DID):: Source: MD																							*
  ************************************************************************ */
 
-IMPORT Phone_Shell, Risk_Indicators, RiskWise, UT;
+IMPORT Phone_Shell, Risk_Indicators, RiskWise, UT, STD;
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Parent (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, DATASET(Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData) phones, UNSIGNED1 PhoneRestrictionMask) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Parent (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, DATASET(Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData) phones, UNSIGNED1 PhoneRestrictionMask,
+         UNSIGNED2 PhoneShellVersion = 10) := FUNCTION
+         
+ IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1
+ 
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getSpousePhones(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData ri) := TRANSFORM
 		
 		SELF.Gathered_Phone := ri.subj_phone10;
@@ -27,8 +28,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Parent (DAT
 		SELF.Sources.Source_Owner_Name_Last 	:= ri.subj_last;
 		SELF.Sources.Source_Owner_Name_Suffix := ri.subj_suffix;
 		SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+    
+  SELF.Sources.Source_List_All_Last_Seen := if(IncludeLexIDCounts, Phone_Shell.Common.parseDate((STRING)ri.subj_date_last), '');
+  SELF.Sources.Source_Owner_All_DIDs := if(IncludeLexIDCounts, (string)ri.DID, '');
 		
-		addrMatch := StringLib.StringFind(matchcode, 'A', 1) > 0;
+		addrMatch := STD.Str.Find(matchcode, 'A', 1) > 0;
 		
 		// A Parent is your first degree relative (As is a parent, sibling or child).  If they also have the same address as input consider it the household
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := IF(addrMatch, Phone_Shell.Constants.Phone_Subject_Level.Household,
@@ -46,7 +50,26 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Parent (DAT
 	END;
 	parentPhones := JOIN(input, phones, (STRING)LEFT.Clean_Input.Seq = RIGHT.AcctNo, getSpousePhones(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
 
-	final := DEDUP(SORT(parentPhones, Clean_Input.seq, Gathered_Phone, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code))), Clean_Input.seq, Gathered_Phone, Sources.Source_List);
+	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus get_Alls(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
+   self.Sources.Source_List_All_Last_Seen := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID, 
+                                                   le.Sources.Source_List_All_Last_Seen, 
+                                                   le.Sources.Source_List_All_Last_Seen + ',' + ri.Sources.Source_List_All_Last_Seen);
+   self.Sources.Source_Owner_All_DIDs := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID,
+                                               le.Sources.Source_Owner_All_DIDs,
+                                               le.Sources.Source_Owner_All_DIDs + ',' + ri.Sources.Source_Owner_All_DIDs);
+   self := le;
+ end;
+ 
+ sortedParents := SORT(parentPhones, Clean_Input.seq, Gathered_Phone, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code)));
+
+	final := if(IncludeLexIDCounts,
+              ROLLUP(sortedParents,
+                left.Clean_Input.seq = right.Clean_Input.seq and 
+                left.Gathered_Phone = right.Gathered_Phone and 
+                left.Sources.Source_List = right.Sources.Source_List,
+                get_Alls(left,right)),
+              DEDUP(sortedParents, Clean_Input.seq, Gathered_Phone, Sources.Source_List)
+             );
 	
 	RETURN(final);
 END;
