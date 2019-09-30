@@ -13,7 +13,7 @@ boolean include_wealsofound := return_waf AND ~negate_true_defaults;
 boolean includeBankruptcyCount := false : stored('IncludeBankruptcyCount');
 
 without_risk := doxie.base_presentation(presRecs);
-rolled := doxie.header_base_rollup(without_risk);
+rolled := doxie.header_base_rollup(without_risk, mod_access);
 
 doxie.mac_AddHRISSN(rolled, with_ssn_risk, ~include_hri)
 doxie.mac_AddHRIAddress(with_ssn_risk, with_addr_risk)

@@ -1,4 +1,4 @@
-import doxie, dx_header, ut, header;
+import doxie, dx_header, ut, header, Suppress;
 
 // ================================================================== handshake
 
@@ -12,6 +12,11 @@ key2 := dx_header.key_nbr_headers_uid();
 // output record type
 cnRec := doxie.layout_nbr_records_cn;
 
+cnRec_Layout_sids := RECORD
+	doxie.layout_nbr_records_cn;
+	UNSIGNED4 global_sid;
+	UNSIGNED8 record_sid;
+END;
 
 // ============================================================== main function
 
@@ -21,7 +26,7 @@ export DATASET(cnRec) nbr_records_cn(
 	boolean checkRNA = true,  
 	string1		mode,												 // or part of results for the subject.
 	unsigned1 Neighbor_Recency,
-	doxie.IDataAccess modAccess
+	doxie.IDataAccess mod_access
 ) := FUNCTION
 
   // how many addrs do we want on each side of each target?
@@ -60,13 +65,13 @@ export DATASET(cnRec) nbr_records_cn(
 	// Use the second key to retrieve the candidate neighbors,
 	// based on the uids we identified above...
 
-	 cnRec getCN(uidTargetHR L, key2 R) := TRANSFORM
+	 cnRec_Layout_sids getCN(uidTargetHR L, key2 R) := TRANSFORM
 		 SELF.seqtarget := L.seqtarget;
 		 SELF.base_did := L.did;
 		 SELF := R;
 	 END;
 
-	 cn2 := JOIN(
+	 cn2_all := JOIN(
 		 uidTargetHR, key2,
 		  keyed(LEFT.zip = RIGHT.zip) and
 			keyed(LEFT.prim_name = RIGHT.prim_name) and
@@ -79,7 +84,7 @@ export DATASET(cnRec) nbr_records_cn(
 		limit(20000, skip),
 		keep(keep_recs)
 	 );
-
+	 cn2:= Suppress.MAC_SuppressSource(cn2_all, mod_access, base_did);
 //filter out the historical neighbors so that we do not look up the header records 
 
 	 widenedCN := doxie.nbr_records_affinity(
@@ -104,9 +109,9 @@ export DATASET(cnRec) nbr_records_cn(
     // should we go to the best file to get the best name for the neighbors ?													
 		// clean the records when it still have the src and dates 
 	//TODO: why _ok are recalculated again here?	
-	 glb_ok  := modAccess.isValidGLB (checkRNA);
-	 dppa_ok := modAccess.isValidDPPA (checkRNA);
-	 header.MAC_GlbClean_Header(headerNbrForAddr, headerNbrForAddr_clean, , ,modAccess);
+	 glb_ok  := mod_access.isValidGLB (checkRNA);
+	 dppa_ok := mod_access.isValidDPPA (checkRNA);
+	 header.MAC_GlbClean_Header(headerNbrForAddr, headerNbrForAddr_clean, , ,mod_access);
 			
 		// rollup records 
 	 df3:= group(
