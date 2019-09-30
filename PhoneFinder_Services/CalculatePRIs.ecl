@@ -109,8 +109,8 @@ FUNCTION
                                 32 => dt_first_seen = 0,
                                 33 => dt_last_seen = 0,
                                 34 => dt_first_seen = 0 AND dt_last_seen = 0,
-                                35 => (pInput.imsi_Tenure_MinDays != 0 AND pInput.imsi_Tenure_MinDays < le.Threshold) OR
-                                      (pInput.imsi_Tenure_MaxDays != 0 AND pInput.imsi_Tenure_MaxDays <= le.Threshold),
+                                35 => (pInput.sim_Tenure_MinDays != 0 AND pInput.sim_Tenure_MinDays < le.Threshold) OR
+                                      (pInput.sim_Tenure_MaxDays != 0 AND pInput.sim_Tenure_MaxDays <= le.Threshold),
                                 36 => (pInput.imei_Tenure_MinDays != 0 AND pInput.imei_Tenure_MinDays < le.Threshold) OR
                                       (pInput.imei_Tenure_MaxDays != 0 AND pInput.imei_Tenure_MaxDays <= le.Threshold),
                                 37 => MAP(le.ThresholdB = 'Day' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Day')),
