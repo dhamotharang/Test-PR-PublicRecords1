@@ -375,6 +375,7 @@ export matches_entity_name_layout := record
 	String50	Matches_Descriptions_Type_5;
 	String50	Matches_Descriptions_Value_5;
 	String100	Matches_Descriptions_Notes_5;
+	String150 Matches_Entity_Name_Unicode;
 end;
 
 end;
