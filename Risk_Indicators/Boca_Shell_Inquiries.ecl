@@ -1,4 +1,4 @@
-﻿import Risk_indicators, inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master, STD, doxie;
+﻿import Risk_indicators, inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master, STD, doxie, suppress;
 
 isFCRA := false;
 
@@ -85,6 +85,12 @@ layout_temp := record
 	risk_indicators.layouts.layout_virtual_fraud Virtual_Fraud;
 
 end;
+
+layout_temp_ccpa := RECORD
+    unsigned4 global_sid; // CCPA changes
+    layout_temp;
+END;
+
 //can have multiple gateways so account for them
 deltabase_check := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1].url;
 deltabase_Name := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1].servicename;
@@ -102,7 +108,8 @@ clam_pre_Inquiries_deltabase := ungroup(clam_pre_Inquiries);
 
 MAC_raw_did_transform (trans_name, key_did) := MACRO
 
-layout_temp trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) := transform
+layout_temp_ccpa trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) := transform
+    self.global_sid := rt.ccpa.global_sid;
 	self.seq := le.seq;
 	self.did := le.did;
 	self.truedid := le.truedid;	//MS-104 and MS-105 
@@ -672,7 +679,7 @@ j_raw := if(bsversion >= 50, dedup(sort(ungroup(j_raw_nonfcra_full + j_raw_nonfc
 						dedup(sort(ungroup(j_raw_nonfcra_full + j_raw_nonfcra_update), seq, transaction_id, Sequence_Number), seq, transaction_id, Sequence_Number));
 
 // layout_final roll( layout_final le, layout_final rt ) := TRANSFORM
-layout_temp roll( layout_temp le, layout_temp rt ) := TRANSFORM	
+layout_temp_CCPA roll( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM	
 	first_log_date := (string)ut.min2((unsigned)le.first_log_date, (unsigned)rt.first_log_date);
 	last_log_date := (string)MAX((unsigned)le.last_log_date, (unsigned)rt.last_log_date);
 	self.first_log_date := if(first_log_date='0', '', first_log_date);
@@ -988,7 +995,7 @@ rolled_raw := rollup( grouped_raw, roll(left,right), true);
 // sort and roll addresses per adl
 sorted_addrs_per_adl := group(sort(j_raw, seq, -inquiryAddrsFromADL, -unverifiedAddrsPerAdl, -cbd_inquiryAddrsFromADL, -first_log_date), seq);
 
-layout_temp count_addrs_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
+layout_temp_CCPA count_addrs_per_adl( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM		
 	self.unverifiedAddrsPerADL     := le.unverifiedAddrsPerADL     + IF(le.inquiryAddrsFromADL     = rt.inquiryAddrsFromADL, 0, rt.unverifiedAddrsPerADL);
 	self.inquiryAddrsPerADL     := le.inquiryAddrsPerADL     + IF(le.inquiryAddrsFromADL     = rt.inquiryAddrsFromADL, 0, rt.inquiryAddrsPerADL);
 	self.cbd_inquiryAddrsPerADL := le.cbd_inquiryAddrsPerADL + IF(le.cbd_inquiryAddrsFromADL = rt.cbd_inquiryAddrsFromADL, 0, rt.cbd_inquiryAddrsPerADL);
@@ -1004,7 +1011,7 @@ rolled_addrs_per_adl := rollup( sorted_addrs_per_adl, count_addrs_per_adl(left,r
 // sort and roll fnames per adl
 sorted_fnames_per_adl := group(sort(j_raw, seq,  -inquiryfnamesFromADL, -first_log_date), seq);
 
-layout_temp count_fnames_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
+layout_temp_CCPA count_fnames_per_adl( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM		
 	self.inquiryfnamesPerADL := le.inquiryfnamesPerADL + IF(le.inquiryfnamesFromADL=rt.inquiryfnamesFromADL, 0, rt.inquiryfnamesPerADL);
 	self.inq_fnamesperadl_count_day := le.inq_fnamesperadl_count_day + IF(le.inquiryfnamesFromADL=rt.inquiryfnamesFromADL, 0, rt.inq_fnamesperadl_count_day);
 	self.inq_fnamesperadl_count_week := le.inq_fnamesperadl_count_week + IF(le.inquiryfnamesFromADL=rt.inquiryfnamesFromADL, 0, rt.inq_fnamesperadl_count_week);
@@ -1019,7 +1026,7 @@ rolled_fnames_per_adl := rollup( sorted_fnames_per_adl, count_fnames_per_adl(lef
 // sort and roll lnames per adl
 sorted_lnames_per_adl := group(sort(j_raw, seq,  -inquirylnamesFromADL, -first_log_date), seq);
 
-layout_temp count_lnames_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
+layout_temp_CCPA count_lnames_per_adl( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM		
 	self.inquirylnamesPerADL := le.inquirylnamesPerADL + IF(le.inquirylnamesFromADL=rt.inquirylnamesFromADL, 0, rt.inquirylnamesPerADL);
 	self.inq_lnamesperadl_count_day := le.inq_lnamesperadl_count_day + IF(le.inquirylnamesFromADL=rt.inquirylnamesFromADL, 0, rt.inq_lnamesperadl_count_day);
 	self.inq_lnamesperadl_count_week := le.inq_lnamesperadl_count_week + IF(le.inquirylnamesFromADL=rt.inquirylnamesFromADL, 0, rt.inq_lnamesperadl_count_week);
@@ -1035,7 +1042,7 @@ rolled_lnames_per_adl := rollup( sorted_lnames_per_adl, count_lnames_per_adl(lef
 sorted_phones_per_adl_cbd := group(sort(j_raw, seq,  -cbd_inquiryphonesFromADL, -first_log_date), seq);
 sorted_phones_per_adl := group(sort(j_raw, seq,  -inquiryphonesFromADL, -unverifiedphonesPerADL, -first_log_date), seq);
 
-layout_temp count_phones_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
+layout_temp_CCPA count_phones_per_adl( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM		
 	self.unverifiedphonesPerADL     := le.unverifiedphonesPerADL     + IF(le.inquiryphonesFromADL     = rt.inquiryphonesFromADL,     0, rt.unverifiedphonesPerADL);			
 	self.inquiryphonesPerADL     := le.inquiryphonesPerADL     + IF(le.inquiryphonesFromADL     = rt.inquiryphonesFromADL,     0, rt.inquiryphonesPerADL);			
 	self.cbd_InquiryPhonesPerADL := le.cbd_InquiryPhonesPerADL + IF(le.cbd_inquiryphonesFromADL = rt.cbd_inquiryphonesFromADL, 0, rt.cbd_InquiryPhonesPerADL);
@@ -1052,7 +1059,7 @@ rolled_phones_per_adl := rollup( sorted_phones_per_adl, count_phones_per_adl(lef
 // sort and roll DOB per adl
 sorted_DOBs_per_adl := group(sort(j_raw, seq,  -inquiryDOBsFromADL, -unverifiedDOBsPerADL, -first_log_date), seq);
 
-layout_temp count_DOBs_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
+layout_temp_CCPA count_DOBs_per_adl( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM		
 	self.unverifiedDOBsPerADL := le.unverifiedDOBsPerADL + 
 								IF(le.inquiryDOBsFromADL=rt.inquiryDOBsFromADL, 0, rt.unverifiedDOBsPerADL);		
 	self.inquiryDOBsPerADL := le.inquiryDOBsPerADL + IF(le.inquiryDOBsFromADL=rt.inquiryDOBsFromADL, 0, rt.inquiryDOBsPerADL);		
@@ -1068,7 +1075,7 @@ rolled_DOBs_per_adl := rollup( sorted_DOBs_per_adl, count_DOBs_per_adl(left,righ
 // sort and roll emails per adl
 sorted_Emails_per_adl := group(sort(j_raw, seq,  -inquiryEmailsFromADL, -first_log_date), seq);
 
-layout_temp count_Emails_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM			
+layout_temp_CCPA count_Emails_per_adl( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM			
 	self.inquiryEmailsPerADL := le.inquiryEmailsPerADL + IF(le.inquiryEmailsFromADL=rt.inquiryEmailsFromADL, 0, rt.inquiryEmailsPerADL);			
 	
 	self.inq_emailsperadl_count_day := le.inq_emailsperadl_count_day + IF(le.inquiryEmailsFromADL=rt.inquiryEmailsFromADL, 0, rt.inq_emailsperadl_count_day);			
@@ -1309,7 +1316,7 @@ rolledDOBsperadl_1dig := rollup(DOBsperadl_1dig, rollSubs(left,right), seq);
 
 // append the counts to the rolled_raw (or to with_DOBsperadl_1dig if BS version is 53 or higher)
 with_addr_per_adl := join(rolled_raw, rolled_addrs_per_adl, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inquiryAddrsPerADL := right.inquiryAddrsPerADL, 
 											self.unverifiedAddrsPerADL  := right.unverifiedAddrsPerADL , 
 											self.inq_addrsperadl_count_day	:= right.inq_addrsperadl_count_day;
@@ -1321,7 +1328,7 @@ with_addr_per_adl := join(rolled_raw, rolled_addrs_per_adl, left.seq=right.seq,
 											self := left));
 
 with_fname_per_adl := join(with_addr_per_adl, rolled_fnames_per_adl, left.seq=right.seq,
-											transform(layout_temp, self.inquiryfnamesPerADL := right.inquiryfnamesPerADL, 
+											transform(layout_temp_CCPA, self.inquiryfnamesPerADL := right.inquiryfnamesPerADL, 
 												self.inq_fnamesperadl_count_day := right.inq_fnamesperadl_count_day;
 												self.inq_fnamesperadl_count_week := right.inq_fnamesperadl_count_week;
 												self.inq_fnamesperadl_count01 := right.inq_fnamesperadl_count01;
@@ -1331,7 +1338,7 @@ with_fname_per_adl := join(with_addr_per_adl, rolled_fnames_per_adl, left.seq=ri
 											self := left));
 											
 with_lname_per_adl := join(with_fname_per_adl, rolled_lnames_per_adl, left.seq=right.seq,
-											transform(layout_temp, self.inquirylnamesPerADL := right.inquirylnamesPerADL, 
+											transform(layout_temp_CCPA, self.inquirylnamesPerADL := right.inquirylnamesPerADL, 
 												self.inq_lnamesperadl_count_day := right.inq_lnamesperadl_count_day;
 												self.inq_lnamesperadl_count_week := right.inq_lnamesperadl_count_week;
 												self.inq_lnamesperadl_count01 := right.inq_lnamesperadl_count01;
@@ -1341,10 +1348,10 @@ with_lname_per_adl := join(with_fname_per_adl, rolled_lnames_per_adl, left.seq=r
 	self := left));
 
 with_phones_per_adl_cbd := join(with_lname_per_adl, rolled_phones_per_adl_cbd, left.seq=right.seq,
-											transform(layout_temp, self.cbd_inquiryphonesPerADL := right.cbd_inquiryphonesPerADL, self := left));
+											transform(layout_temp_CCPA, self.cbd_inquiryphonesPerADL := right.cbd_inquiryphonesPerADL, self := left));
 
 with_phones_per_adl := join(with_phones_per_adl_cbd, rolled_phones_per_adl, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inquiryphonesPerADL := right.inquiryphonesPerADL, 
 											self.unverifiedphonesPerADL := right.unverifiedphonesPerADL, 
 											self.inq_phonesperadl_count_day	:= right.inq_phonesperadl_count_day;	
@@ -1356,7 +1363,7 @@ with_phones_per_adl := join(with_phones_per_adl_cbd, rolled_phones_per_adl, left
 											self := left));
 
 with_DOBs_per_adl := join(with_phones_per_adl, rolled_DOBs_per_adl, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inquiryDOBsPerADL := right.inquiryDOBsPerADL, 
 											self.unverifiedDOBsPerADL := right.unverifiedDOBsPerADL, 
 											self.inq_dobsperadl_count_day	:= right.inq_dobsperadl_count_day;
@@ -1368,7 +1375,7 @@ with_DOBs_per_adl := join(with_phones_per_adl, rolled_DOBs_per_adl, left.seq=rig
 											self := left));
 											
 with_Emails_per_adl := join(with_DOBs_per_adl, rolled_Emails_per_adl, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inquiryEmailsPerADL := right.inquiryEmailsPerADL, 
 											self.inq_emailsperadl_count_day := right.inq_emailsperadl_count_day;			
 											self.inq_emailsperadl_count_week := right.inq_emailsperadl_count_week;			
@@ -1385,7 +1392,7 @@ with_Emails_per_adl := join(with_DOBs_per_adl, rolled_Emails_per_adl, left.seq=r
 //		-3 = there are valid inquiries within the past 12 months but the field associated with the counter (first name, last name, SSN...) is not populated in the inquiry record/s
 
 with_SubFnames := join(with_Emails_per_adl, rolledSubFnames, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_fnamesperadl_1subs	:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
@@ -1393,7 +1400,7 @@ with_SubFnames := join(with_Emails_per_adl, rolledSubFnames, left.seq=right.seq,
 											self := left), left outer);
 
 with_SubLnames := join(with_SubFnames, rolledSubLnames, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_lnamesperadl_1subs	:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
@@ -1401,7 +1408,7 @@ with_SubLnames := join(with_SubFnames, rolledSubLnames, left.seq=right.seq,
 											self := left), left outer);
 
 with_SubSSNs := join(with_SubLnames, rolledSubSSNs, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_ssnsperadl_1subs	:= 				map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
@@ -1409,7 +1416,7 @@ with_SubSSNs := join(with_SubLnames, rolledSubSSNs, left.seq=right.seq,
 											self := left), left outer);
 											
 with_SubPhones := join(with_SubSSNs, rolledSubPhones, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_phnsperadl_1subs	:= 				map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
@@ -1417,7 +1424,7 @@ with_SubPhones := join(with_SubSSNs, rolledSubPhones, left.seq=right.seq,
 											self := left), left outer);
 											
 with_SubPrimrange := join(with_SubPhones, rolledSubPrimrange, left.seq=right.seq,
-											transform(layout_temp, 							
+											transform(layout_temp_CCPA, 							
 											self.inq_primrangesperadl_1subs	:= 	map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
@@ -1425,7 +1432,7 @@ with_SubPrimrange := join(with_SubPhones, rolledSubPrimrange, left.seq=right.seq
 											self := left), left outer);
 											
 with_SubDOBs := join(with_SubPrimrange, rolledSubDOBs, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_dobsperadl_1subs	:= 				map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
@@ -1433,7 +1440,7 @@ with_SubDOBs := join(with_SubPrimrange, rolledSubDOBs, left.seq=right.seq,
 											self := left), left outer);
 											
 with_SubDOBDay := join(with_SubDOBs, rolledSubDOBDay, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_dobsperadl_daysubs	:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
@@ -1441,7 +1448,7 @@ with_SubDOBDay := join(with_SubDOBs, rolledSubDOBDay, left.seq=right.seq,
 											self := left), left outer);
 
 with_SubDOBMonth := join(with_SubDOBDay, rolledSubDOBMonth, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_dobsperadl_mosubs	:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
@@ -1449,7 +1456,7 @@ with_SubDOBMonth := join(with_SubDOBDay, rolledSubDOBMonth, left.seq=right.seq,
 											self := left), left outer);
 
 with_SubDOBYear := join(with_SubDOBMonth, rolledSubDOBYear, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_dobsperadl_yrsubs	:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
@@ -1457,7 +1464,7 @@ with_SubDOBYear := join(with_SubDOBMonth, rolledSubDOBYear, left.seq=right.seq,
 											self := left), left outer);
 
 with_ssnsperadl_1dig := join(with_SubDOBYear, rolledssnsperadl_1dig, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_ssnsperadl_1dig		:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
@@ -1465,7 +1472,7 @@ with_ssnsperadl_1dig := join(with_SubDOBYear, rolledssnsperadl_1dig, left.seq=ri
 											self := left), left outer);
 
 with_phonesperadl_1dig := join(with_ssnsperadl_1dig, rolledphonesperadl_1dig, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_phnsperadl_1dig		:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
@@ -1473,7 +1480,7 @@ with_phonesperadl_1dig := join(with_ssnsperadl_1dig, rolledphonesperadl_1dig, le
 											self := left), left outer);
 
 with_primrangesperadl_1dig := join(with_phonesperadl_1dig, rolledprimrangesperadl_1dig, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_primrangesperadl_1dig	:= 	map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
@@ -1481,7 +1488,7 @@ with_primrangesperadl_1dig := join(with_phonesperadl_1dig, rolledprimrangesperad
 											self := left), left outer);
 
 with_DOBsperadl_1dig := join(with_primrangesperadl_1dig, rolledDOBsperadl_1dig, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 											self.inq_dobsperadl_1dig	:= 				map(left.DID = 0	or left.truedid = false															=> -1,	
 																															left.inquiryPerADL = 0 																						=> -2,	
 																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
@@ -1496,7 +1503,8 @@ with_all_per_adl := if(BSversion >= 53, with_DOBsperadl_1dig, with_Emails_per_ad
 // -----------------------------------------------------
 MAC_raw_ssn_transform (trans_name, ssn_key) := MACRO
 
-layout_temp trans_name(layout_temp le, ssn_key rt) := transform
+layout_temp_CCPA trans_name(layout_temp_CCPA le, ssn_key rt) := transform
+    self.global_sid := rt.ccpa.global_sid;
 	// self.raw_ssn := rt;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
@@ -1691,7 +1699,7 @@ ssn_raw := if(bsversion >= 50, dedup(sort(ungroup(ssn_raw_base + ssn_raw_updates
 
 grouped_ssn_raw := group(sort( ssn_raw, seq, -inquiryADLsFromSSN, -first_log_date), seq);
 
-layout_temp roll_ssn( layout_temp le, layout_temp rt ) := TRANSFORM	
+layout_temp_CCPA roll_ssn( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM	
 	self.inquiryPerSSN := le.inquiryPerSSN + rt.inquiryPerSSN;
 	self.inq_perssn_count_day := le.inq_perssn_count_day + rt.inq_perssn_count_day;
 	self.inq_perssn_count_week := le.inq_perssn_count_week + rt.inq_perssn_count_week;
@@ -1746,7 +1754,7 @@ rolled_ssn_raw := rollup( grouped_ssn_raw, roll_ssn(left,right), true);
 
 // sort and roll lnames per SSN
 sorted_lnames_per_SSN := group(sort(ssn_raw, seq,  -inquiryLnamesFromSSN, -first_log_date), seq);
-layout_temp count_lnames_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
+layout_temp_CCPA count_lnames_per_SSN( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM		
 	self.inquirylnamesPerSSN := le.inquirylnamesPerSSN + IF(le.inquirylnamesFromSSN=rt.inquirylnamesFromSSN, 0, rt.inquirylnamesPerSSN);	
 	
 	self.inq_lnamesperssn_count_day := le.inq_lnamesperssn_count_day + IF(le.inquirylnamesFromSSN=rt.inquirylnamesFromSSN, 0, rt.inq_lnamesperssn_count_day);	
@@ -1761,7 +1769,7 @@ rolled_lnames_per_SSN := rollup( sorted_lnames_per_SSN, count_lnames_per_SSN(lef
 
 // sort and roll Addrs per SSN
 sorted_Addrs_per_SSN := group(sort(ssn_raw, seq,  -inquiryAddrsFromSSN, -first_log_date), seq);
-layout_temp count_Addrs_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
+layout_temp_CCPA count_Addrs_per_SSN( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM		
 	self.inquiryAddrsPerSSN := le.inquiryAddrsPerSSN + IF(le.inquiryAddrsFromSSN=rt.inquiryAddrsFromSSN, 0, rt.inquiryAddrsPerSSN);		
 	self.inq_addrsperssn_count_day := le.inq_addrsperssn_count_day + IF(le.inquiryAddrsFromSSN=rt.inquiryAddrsFromSSN, 0, rt.inq_addrsperssn_count_day);	
 	self.inq_addrsperssn_count_week := le.inq_addrsperssn_count_week + IF(le.inquiryAddrsFromSSN=rt.inquiryAddrsFromSSN, 0, rt.inq_addrsperssn_count_week);	
@@ -1775,7 +1783,7 @@ rolled_Addrs_per_SSN := rollup( sorted_Addrs_per_SSN, count_Addrs_per_SSN(left,r
 
 // sort and roll DOBs per SSN
 sorted_DOBs_per_SSN := group(sort(ssn_raw, seq,  -inquiryDOBsFromSSN, -first_log_date), seq);
-layout_temp count_DOBs_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
+layout_temp_CCPA count_DOBs_per_SSN( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM		
 	self.inquiryDOBsPerSSN := le.inquiryDOBsPerSSN + IF(le.inquiryDOBsFromSSN=rt.inquiryDOBsFromSSN, 0, rt.inquiryDOBsPerSSN);	
 	self.inq_dobsperssn_count_day := le.inq_dobsperssn_count_day + IF(le.inquiryDOBsFromSSN=rt.inquiryDOBsFromSSN, 0, rt.inq_dobsperssn_count_day);	
 	self.inq_dobsperssn_count_week := le.inq_dobsperssn_count_week + IF(le.inquiryDOBsFromSSN=rt.inquiryDOBsFromSSN, 0, rt.inq_dobsperssn_count_week);	
@@ -1823,7 +1831,7 @@ DOBsperSSN_1dig := project(slim_DOBsFromSSN, tfDOBsperSSN_1dig(left, counter));
 rolledDOBsperSSN_1dig := rollup(DOBsperSSN_1dig, rollSubs(left,right), seq);											
 
 with_Lnames_per_SSN := join(rolled_ssn_raw, rolled_lnames_per_ssn, left.seq=right.seq,
-											transform(layout_temp, self.inquirylnamesPerSSN := right.inquirylnamesPerSSN,
+											transform(layout_temp_CCPA, self.inquirylnamesPerSSN := right.inquirylnamesPerSSN,
 											self.inq_lnamesperssn_count_day := right.inq_lnamesperssn_count_day;	
 											self.inq_lnamesperssn_count_week := right.inq_lnamesperssn_count_week;	
 											self.inq_lnamesperssn_count01 := right.inq_lnamesperssn_count01;	
@@ -1832,7 +1840,7 @@ with_Lnames_per_SSN := join(rolled_ssn_raw, rolled_lnames_per_ssn, left.seq=righ
 											self := left));
 
 with_Addrs_per_SSN := join(with_Lnames_per_SSN, rolled_addrs_per_ssn, left.seq=right.seq,
-											transform(layout_temp, self.inquiryAddrsPerSSN := right.inquiryAddrsPerSSN, 
+											transform(layout_temp_CCPA, self.inquiryAddrsPerSSN := right.inquiryAddrsPerSSN, 
 											self.inq_Addrsperssn_count_day := right.inq_Addrsperssn_count_day;	
 											self.inq_Addrsperssn_count_week := right.inq_Addrsperssn_count_week;	
 											self.inq_Addrsperssn_count01 := right.inq_Addrsperssn_count01;	
@@ -1841,7 +1849,7 @@ with_Addrs_per_SSN := join(with_Lnames_per_SSN, rolled_addrs_per_ssn, left.seq=r
 											self := left));
 											
 with_ssn_velocity := join(with_Addrs_per_SSN, rolled_DOBs_per_ssn, left.seq=right.seq,
-											transform(layout_temp, self.inquiryDOBsPerSSN := right.inquiryDOBsPerSSN, 
+											transform(layout_temp_CCPA, self.inquiryDOBsPerSSN := right.inquiryDOBsPerSSN, 
 											self.inq_dobsperssn_count_day := right.inq_dobsperssn_count_day;	
 											self.inq_dobsperssn_count_week := right.inq_dobsperssn_count_week;	
 											self.inq_dobsperssn_count01 := right.inq_dobsperssn_count01;	
@@ -1851,7 +1859,7 @@ with_ssn_velocity := join(with_Addrs_per_SSN, rolled_DOBs_per_ssn, left.seq=righ
 
 //MS-105 -  append new Tumblings counters by SSN
 with_primrangesperssn_1dig := join(with_ssn_velocity, rolledprimrangesperSSN_1dig, left.seq=right.seq,
-											transform(layout_temp,  
+											transform(layout_temp_CCPA,  
 											self.inq_primrangesperssn_1dig := 	map(left.shell_input.ssn=''																						=> -1,	
 																															left.inquiryPerSSN = 0 																						=> -2,	
 																															left.inquiryPerSSN > 0 and left.seq<>right.seq										=> -3,
@@ -1859,7 +1867,7 @@ with_primrangesperssn_1dig := join(with_ssn_velocity, rolledprimrangesperSSN_1di
 											self := left), left outer);
 
 with_DOBsperssn_1dig := join(with_primrangesperssn_1dig, rolledDOBsperSSN_1dig, left.seq=right.seq,
-											transform(layout_temp,  
+											transform(layout_temp_CCPA,  
 											self.inq_dobsperssn_1dig := 				map(left.shell_input.ssn=''																						=> -1,	
 																															left.inquiryPerSSN = 0 																						=> -2,	
 																															left.inquiryPerSSN > 0 and left.seq<>right.seq										=> -3,
@@ -1872,7 +1880,8 @@ with_all_per_ssn := if(BSversion >= 53, with_DOBsperssn_1dig, with_ssn_velocity)
 // start of the Address velocity counter section
 // -----------------------------------------------------
 MAC_raw_addr_transform (trans_name, addr_key) := MACRO
-layout_temp trans_name(layout_temp le, addr_key rt) := transform
+layout_temp_CCPA trans_name(layout_temp_CCPA le, addr_key rt) := transform
+    self.global_sid := rt.ccpa.global_sid;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -2069,7 +2078,7 @@ suspicious_identities := if(production_realtime_mode, suspicious_identities_real
 
 with_suspcious_ids := join(addr_raw, suspicious_identities, 
 															left.inquiryADLsFromAddr=right.did, 
-															transform(layout_temp,
+															transform(layout_temp_CCPA,
 															self.inquirySuspciousADLsperAddr := if(right.did<>0, 1, 0);
 															self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
@@ -2079,7 +2088,7 @@ address_velocity_raw := if(isFraudpoint or bsversion>=41, with_suspcious_ids, ad
 grouped_addr_raw := group(sort(address_velocity_raw, seq, -inquiryADLsFromAddr, -first_log_date), seq);
 
 
-layout_temp roll_Addr( layout_temp le, layout_temp rt ) := TRANSFORM	
+layout_temp_CCPA roll_Addr( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM	
 	self.inquiryPerAddr := le.inquiryPerAddr + rt.inquiryPerAddr;
 	self.inq_peraddr_count_day := le.inq_peraddr_count_day + rt.inq_peraddr_count_day;
 	self.inq_peraddr_count_week := le.inq_peraddr_count_week + rt.inq_peraddr_count_week;
@@ -2122,7 +2131,7 @@ rolled_Addr_raw := rollup( grouped_addr_raw, roll_addr(left,right), true);
 
 // sort and roll lnames per Addr
 sorted_lnames_per_Addr := group(sort(Addr_raw, seq,  -inquiryLnamesFromAddr, -first_log_date), seq);
-layout_temp count_lnames_per_Addr( layout_temp le, layout_temp rt ) := TRANSFORM		
+layout_temp_CCPA count_lnames_per_Addr( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM		
 	self.inquirylnamesPerAddr := le.inquirylnamesPerAddr + IF(le.inquirylnamesFromAddr=rt.inquirylnamesFromAddr, 0, rt.inquirylnamesPerAddr);		
 	self.inq_lnamesperaddr_count_day := le.inq_lnamesperaddr_count_day + IF(le.inquirylnamesFromAddr=rt.inquirylnamesFromAddr, 0, rt.inq_lnamesperaddr_count_day);	
 	self.inq_lnamesperaddr_count_week := le.inq_lnamesperaddr_count_week + IF(le.inquirylnamesFromAddr=rt.inquirylnamesFromAddr, 0, rt.inq_lnamesperaddr_count_week);	
@@ -2136,7 +2145,7 @@ rolled_lnames_per_Addr := rollup( sorted_lnames_per_Addr, count_lnames_per_Addr(
 
 // sort and roll SSNs per Addr
 sorted_SSNs_per_Addr := group(sort(Addr_raw, seq,  -inquirySSNsFromAddr, -first_log_date), seq);
-layout_temp count_SSNs_per_Addr( layout_temp le, layout_temp rt ) := TRANSFORM		
+layout_temp_CCPA count_SSNs_per_Addr( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM		
 	self.inquirySSNsPerAddr := le.inquirySSNsPerAddr + IF(le.inquirySSNsFromAddr=rt.inquirySSNsFromAddr, 0, rt.inquirySSNsPerAddr);				
 	self.inq_ssnsperaddr_count_day := le.inq_ssnsperaddr_count_day + IF(le.inquirySSNsFromAddr=rt.inquirySSNsFromAddr, 0, rt.inq_ssnsperaddr_count_day);
 	self.inq_ssnsperaddr_count_week := le.inq_ssnsperaddr_count_week + IF(le.inquirySSNsFromAddr=rt.inquirySSNsFromAddr, 0, rt.inq_ssnsperaddr_count_week);
@@ -2166,7 +2175,7 @@ SSNsFromAddr_1dig := project(slim_SSNsFromAddr, tfSSNsFromAddr_1dig(left, counte
 rolledSSNsFromAddr_1dig := rollup(SSNsFromAddr_1dig, rollSubs(left,right), seq);											
 
 with_Lnames_per_Addr := join(rolled_Addr_raw, rolled_lnames_per_Addr, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 												self.inquirylnamesPerAddr := right.inquirylnamesPerAddr, 
 												self.inq_lnamesperaddr_count_day := right.inq_lnamesperaddr_count_day;	
 												self.inq_lnamesperaddr_count_week := right.inq_lnamesperaddr_count_week;	
@@ -2177,7 +2186,7 @@ with_Lnames_per_Addr := join(rolled_Addr_raw, rolled_lnames_per_Addr, left.seq=r
 											self := left));
 
 with_address_velocities := join(with_Lnames_per_Addr, rolled_SSNs_per_Addr, left.seq=right.seq,
-											transform(layout_temp, 
+											transform(layout_temp_CCPA, 
 												self.inquirySSNsPerAddr := right.inquirySSNsPerAddr,
 												self.inq_SSNsperaddr_count_day := right.inq_SSNsperaddr_count_day;	
 												self.inq_SSNsperaddr_count_week := right.inq_SSNsperaddr_count_week;	
@@ -2189,7 +2198,7 @@ with_address_velocities := join(with_Lnames_per_Addr, rolled_SSNs_per_Addr, left
 
 //MS-105 - append the new counter of SSNs off by one digit
 with_SSNsFromAddr_1dig := join(with_address_velocities, rolledSSNsFromAddr_1dig, left.seq=right.seq,
-											transform(layout_temp,  
+											transform(layout_temp_CCPA,  
 											self.inq_ssnsperaddr_1dig := 	map(left.shell_input.in_streetaddress=''															=> -1,	
 																												left.inquiryPerAddr = 0 																					=> -2,	
 																												left.inquiryPerAddr > 0 and left.seq<>right.seq										=> -3,
@@ -2202,7 +2211,8 @@ with_all_per_addr := if(BSversion >= 53, with_SSNsFromAddr_1dig, with_address_ve
 // start of the Phone velocity counter section
 // -----------------------------------------------------
 MAC_raw_phone_transform (trans_name, phone_key) := MACRO
-layout_temp trans_name(layout_temp le, phone_key rt) := transform
+layout_temp_CCPA trans_name(layout_temp_CCPA le, phone_key rt) := transform
+    self.global_sid := rt.ccpa.global_sid;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -2343,7 +2353,7 @@ phone_raw := if(bsversion >= 50, dedup(sort(ungroup(phone_raw_base + phone_raw_u
 grouped_Phone_raw := group(sort(Phone_raw, seq, -inquiryADLsFromPhone, -first_log_date), seq);
 
 
-layout_temp roll_Phone( layout_temp le, layout_temp rt ) := TRANSFORM	
+layout_temp_CCPA roll_Phone( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM	
 	self.inquiryPerPhone := le.inquiryPerPhone + rt.inquiryPerPhone;
 	self.inquiryADLsPerPhone := le.inquiryADLsPerPhone + IF(le.inquiryADLsFromPhone=rt.inquiryADLsFromPhone, 0, rt.inquiryADLsPerPhone);		
 								
@@ -2389,7 +2399,8 @@ with_phone_velocities := rollup( grouped_Phone_raw, roll_Phone(left,right), true
 // start of the Email velocity counter section
 // -----------------------------------------------------
 MAC_raw_email_transform (trans_name, email_key) := MACRO
-layout_temp trans_name(layout_temp le, email_key rt) := transform
+layout_temp_CCPA trans_name(layout_temp_CCPA le, email_key rt) := transform
+    self.global_sid := rt.ccpa.global_sid;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -2459,7 +2470,7 @@ email_raw:= if(bsversion >= 50, dedup(sort(ungroup(Email_raw_base + Email_raw_up
 									
 grouped_Email_raw := group(sort(Email_raw, seq, -inquiryADLsFromEmail, -first_log_date), seq);
 
-layout_temp roll_Email( layout_temp le, layout_temp rt ) := TRANSFORM	
+layout_temp_CCPA roll_Email( layout_temp_CCPA le, layout_temp_CCPA rt ) := TRANSFORM	
 	self.inquiryPerEmail := le.inquiryPerEmail + rt.inquiryPerEmail;
 	self.inquiryADLsPerEmail := le.inquiryADLsPerEmail + IF(le.inquiryADLsFromEmail=rt.inquiryADLsFromEmail, 0, rt.inquiryADLsPerEmail);	
 	
@@ -2475,7 +2486,9 @@ end;
 with_email_velocities := rollup( grouped_Email_raw, roll_Email(left,right), true);
 
 // email velocity is nonfcra only and only shell 5.0 and higher
-with_all_velocities := if(bsversion>=50, with_email_velocities, with_phone_velocities);
+with_all_velocities_unsuppressed := if(bsversion>=50, with_email_velocities, with_phone_velocities);
+                                                  
+with_all_velocities := Suppress.Suppress_ReturnOldLayout(with_all_velocities_unsuppressed, mod_access, layout_temp);
 
 with_inquiries := group(join(clam_pre_Inquiries, with_all_velocities, left.seq=right.seq,
 													transform(risk_indicators.layout_boca_shell,

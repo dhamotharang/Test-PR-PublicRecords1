@@ -1,4 +1,4 @@
-﻿import _Control, email_data, riskwise, ut, fcra, mdr, risk_indicators, doxie;
+﻿import _Control, email_data, riskwise, ut, fcra, mdr, risk_indicators, doxie, Suppress;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Email(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_email_in, 
@@ -102,7 +102,15 @@ emailrec := record
 	layout_reverse_email reverse_email;
 end;
 
-emailrec add_email_raw(clam_pre_email le, ekey rt) := transform
+emailrec_ccpa := RECORD
+    unsigned8 did; // CCPA changes
+    unsigned4 global_sid; // CCPA changes
+    emailrec;
+END;
+
+emailrec_ccpa add_email_raw(clam_pre_email le, ekey rt) := transform
+    self.did := le.did;
+    self.global_sid := rt.global_sid;
 	self.seq := le.seq;
 	
 	domain_type := TRIM(rt.append_domain_type);
@@ -165,11 +173,13 @@ email_recs_nonfcra_minus_behavior_thor := join(distribute(clam_pre_email, hash64
 						atmost(riskwise.max_atmost), keep(1000), LOCAL);
 
 #IF(onThor)
-	email_recs_nonfcra_minus_behavior := email_recs_nonfcra_minus_behavior_thor;
+	email_recs_nonfcra_minus_behavior_unsuppressed := email_recs_nonfcra_minus_behavior_thor;
 #ELSE
-	email_recs_nonfcra_minus_behavior := ungroup(email_recs_nonfcra_minus_behavior_roxie);
+	email_recs_nonfcra_minus_behavior_unsuppressed := ungroup(email_recs_nonfcra_minus_behavior_roxie);
 #END
-
+                                                  
+email_recs_nonfcra_minus_behavior := Suppress.Suppress_ReturnOldLayout(email_recs_nonfcra_minus_behavior_unsuppressed, mod_access, emailrec);
+                                                  
 email_recs_nonfcra_roxie := join(clam_pre_email, email_data.key_did,
 						left.did<>0 and 
 						keyed(left.did=right.did) 
@@ -190,11 +200,13 @@ email_recs_nonfcra_thor := join(distribute(clam_pre_email, hash64(did)),
 						atmost(riskwise.max_atmost), keep(1000), LOCAL);
 						
 #IF(onThor)
-	email_recs_non_fcra := email_recs_nonfcra_thor;
+	email_recs_non_fcra_unsuppressed := email_recs_nonfcra_thor;
 #ELSE
-	email_recs_non_fcra := ungroup(email_recs_nonfcra_roxie);
+	email_recs_non_fcra_unsuppressed  := ungroup(email_recs_nonfcra_roxie);
 #END
-
+                                                  
+email_recs_non_fcra := Suppress.Suppress_ReturnOldLayout(email_recs_non_fcra_unsuppressed, mod_access, emailrec);
+                                                  
 emailfile_raw_fcra_roxie := join(clam_pre_email, email_data.Key_Did_FCRA,
 						left.did<>0 and 
 						keyed(left.did=right.did) and
@@ -219,10 +231,13 @@ emailfile_raw_fcra_thor := join(distribute(clam_pre_email, hash64(did)),
 						atmost(left.did=right.did, riskwise.max_atmost), keep(1000), LOCAL);
 
 #IF(onThor)
-	emailfile_raw_fcra := emailfile_raw_fcra_thor;
+	emailfile_raw_fcra_untransformed := emailfile_raw_fcra_thor;
 #ELSE
-	emailfile_raw_fcra := ungroup(emailfile_raw_fcra_roxie);
+	emailfile_raw_fcra_untransformed := ungroup(emailfile_raw_fcra_roxie);
 #END
+
+emailfile_raw_fcra := PROJECT(emailfile_raw_fcra_untransformed, TRANSFORM(emailrec,
+                                                  SELF := LEFT));
 
 emailrec add_email_corrections(clam_pre_email le, fcra.Key_Override_Email_Data_ffid rt) := transform
 	self.seq := le.seq;
@@ -287,11 +302,14 @@ emailfile_corrections_fcra_thor := join(clam_pre_email,
 						keep(1000), LOCAL, ALL);
 
 #IF(onThor)
-	emailfile_corrections_fcra := emailfile_corrections_fcra_thor;
+	emailfile_corrections_fcra_untransformed := emailfile_corrections_fcra_thor;
 #ELSE
-	emailfile_corrections_fcra := emailfile_corrections_fcra_roxie;
+	emailfile_corrections_fcra_untransformed := emailfile_corrections_fcra_roxie;
 #END
 
+emailfile_corrections_fcra := PROJECT(emailfile_corrections_fcra_untransformed, TRANSFORM(emailrec,
+                                                  SELF := LEFT));
+                                                  
 email_recs_fcra := 	ungroup(emailfile_raw_fcra + emailfile_corrections_fcra);
 
 emailfile := if(isFCRA, email_recs_fcra, email_recs_non_fcra);		
@@ -370,7 +388,9 @@ with_identity_email_summary := join(clam_pre_Email, rolled_Identity_source_count
 													
 
 // now add the revers searching logic for shell 5.0 NONFCRA
-emailrec add_reverse_email_verification(clam_pre_email le, emailaddr_key rt) := transform
+emailrec_CCPA add_reverse_email_verification(clam_pre_email le, emailaddr_key rt) := transform
+    self.did := le.did;
+    self.global_sid := rt.global_sid;
 	self.seq := le.seq;
 	
 	isrecent := risk_indicators.iid_constants.myDaysApart(le.historydate, rt.date_last_seen, LastSeenThreshold);
@@ -435,11 +455,13 @@ with_reverse_email_lookup_thor := join(distribute(clam_pre_email, hash64(shell_i
 		atmost(riskwise.max_atmost), keep(1000), left outer, LOCAL);
 		
 #IF(onThor)
-	with_reverse_email_lookup := group(sort(with_reverse_email_lookup_thor,seq),seq);
+	with_reverse_email_lookup_unsuppressed := group(sort(with_reverse_email_lookup_thor,seq),seq);
 #ELSE
-	with_reverse_email_lookup := with_reverse_email_lookup_roxie;
+	with_reverse_email_lookup_unsuppressed := with_reverse_email_lookup_roxie;
 #END
-
+                                                  
+with_reverse_email_lookup := Suppress.Suppress_ReturnOldLayout(with_reverse_email_lookup_unsuppressed, mod_access, emailrec);
+                                                  
 reverse_source_stats := table(with_reverse_email_lookup, {seq, email_src,
 											ver_level_per_source := max(group, (integer)Reverse_Email.Verification_level),
 											records_per_source := count(group),

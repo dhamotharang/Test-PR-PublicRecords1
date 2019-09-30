@@ -1,9 +1,9 @@
-﻿import _Control, advo, riskwise, ut, fcra, risk_indicators, doxie;
+﻿import _Control, advo, riskwise, ut, fcra, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Advo(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_ADVO, 
 											boolean isFCRA, string50 DataRestrictionMask, boolean isPreScreen,
-											integer bsVersion, doxie.IDataAccess mod_access  = doxie.IDataAccess) := FUNCTION
+											integer bsVersion) := FUNCTION
 
 // they wanted to change value of blank in the data to an S to distinguish between a simplified carrier route and a miss on advo
 simplified_carrier_rt := 'S'; 

@@ -1,18 +1,17 @@
-﻿import LN_PropertyV2, ut, RiskWise, doxie;
+﻿import LN_PropertyV2, ut, RiskWise, Risk_Indicators;
 
-export Boca_Shell_Property_Hist (GROUPED DATASET(Layout_PropertyRecord) p_address,
-                                 GROUPED DATASET(Layout_Boca_Shell_ids) ids, 
+export Boca_Shell_Property_Hist (GROUPED DATASET(Risk_Indicators.Layout_PropertyRecord) p_address,
+                                 GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids, 
 																 boolean includeRelatives = true,
-																 boolean filter_out_fares=false,
-                                                                 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION											
+																 boolean filter_out_fares=false) := FUNCTION											
 
 proprec := record
-	Layouts.Layout_PropertyRecordv2 - layout_overrides;
+	Risk_Indicators.Layouts.Layout_PropertyRecordv2 - layout_overrides;
 	unsigned4 purchase_date_by_did := 0;
 	unsigned4 sale_date_by_did := 0;
 	
 	// recent property sales
-	Layouts.Layout_Recent_Property_Sales;
+	Risk_Indicators.Layouts.Layout_Recent_Property_Sales;
 	unsigned4 iter_seq := 1;
 END;
 
@@ -24,7 +23,7 @@ kafid_nonFCRA	:= LN_PropertyV2.key_assessor_fid();
 kdf_nonFCRA	:= LN_PropertyV2.key_deed_fid();
 
 
-proprec get_property_by_addr(layout_PropertyRecord le, kaf ri) :=
+proprec get_property_by_addr(Risk_Indicators.layout_PropertyRecord le, kaf ri) :=
 TRANSFORM
 	SELF.own_fares_id := ri.ln_fares_id;
 	SELF.dataSrce := '0';
@@ -82,7 +81,7 @@ property_by_address_filtered := JOIN(p_address, KAF,
 // if filter_out_fares boolean, use the join which has the fares records filtered out
 property_by_address := if(filter_out_fares, property_by_address_filtered, property_by_address_all);
 
-proprec get_property_by_did(Layout_Boca_Shell_ids le, kpd ri) :=
+proprec get_property_by_did(Risk_Indicators.Layout_Boca_Shell_ids le, kpd ri) :=
 TRANSFORM
 	SELF.own_fares_id := ri.ln_fares_id;
 	SELF := le;
@@ -142,8 +141,8 @@ MAP(~f AND ~l AND ~a	=> 0,
 // adds in addresses on by_did records that don't have them
 proprec getSearch_NONFCRA(proprec le, kfs_nonFCRA ri) :=
 TRANSFORM
-	fname_match := g(FnameScore(le.fname,ri.fname));
-	lname_match := g(Risk_Indicators.LnameScore(le.lname,ri.lname));
+	fname_match := Risk_Indicators.g(Risk_Indicators.FnameScore(le.fname,ri.fname));
+	lname_match := Risk_Indicators.g(Risk_Indicators.LnameScore(le.lname,ri.lname));
 	addr_match := true;
 	SELF.NAProp := calc_napprop(fname_match,lname_match,addr_match);
 	

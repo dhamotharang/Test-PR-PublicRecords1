@@ -1,7 +1,6 @@
-﻿import doxie_files, riskwise, ut, faa, risk_indicators, doxie;
-// doxie, Suppress; for later use in CCPA, will be cleaned up when CCPA changes are made
+﻿import riskwise, ut, faa, risk_indicators;
 
-export Boca_Shell_Aircraft(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+export Boca_Shell_Aircraft(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only) := FUNCTION
 
 aircraft_build_date := Risk_Indicators.get_Build_date('faa_build_version');	    
 
