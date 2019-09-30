@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.6
-IMPORT KEL011 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+IMPORT KEL11 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL011.Null;
+IMPORT * FROM KEL11.Null;
 EXPORT E_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -33,7 +33,7 @@ EXPORT E_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(UID),accidentnumber(Accident_Number_:\'\'),accidentdate(Accident_Date_:DATE),accidentlocation(Accident_Location_:\'\'),accidentstreet(Accident_Street_:\'\'),accidentcrossstreet(Accident_Cross_Street_:\'\'),nextstreet(Next_Street_:\'\'),incidentcity(Incident_City_:\'\'),incidentstate(Incident_State_:\'\'),jurisdictionstate(Jurisdiction_State_:\'\'),jurisdiction(Jurisdiction_:\'\'),jurisdictionnumber(Jurisdiction_Number_:0),reportcode(Report_Code_:\'\'),reportcategory(Report_Category_:\'\'),reporttypeid(Report_Type_I_D_:\'\'),reportcodedescription(Report_Code_Description_:\'\'),reporthascoversheet(Report_Has_Cover_Sheet_),additionalreportnumber(Additional_Report_Number_:\'\'),reportstatus(Report_Status_:\'\'),datevendorlastreported(Date_Vendor_Last_Reported_:DATE),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(DEFAULT:UID),accidentnumber(DEFAULT:Accident_Number_:\'\'),accidentdate(DEFAULT:Accident_Date_:DATE),accidentlocation(DEFAULT:Accident_Location_:\'\'),accidentstreet(DEFAULT:Accident_Street_:\'\'),accidentcrossstreet(DEFAULT:Accident_Cross_Street_:\'\'),nextstreet(DEFAULT:Next_Street_:\'\'),incidentcity(DEFAULT:Incident_City_:\'\'),incidentstate(DEFAULT:Incident_State_:\'\'),jurisdictionstate(DEFAULT:Jurisdiction_State_:\'\'),jurisdiction(DEFAULT:Jurisdiction_:\'\'),jurisdictionnumber(DEFAULT:Jurisdiction_Number_:0),reportcode(DEFAULT:Report_Code_:\'\'),reportcategory(DEFAULT:Report_Category_:\'\'),reporttypeid(DEFAULT:Report_Type_I_D_:\'\'),reportcodedescription(DEFAULT:Report_Code_Description_:\'\'),reporthascoversheet(DEFAULT:Report_Has_Cover_Sheet_),additionalreportnumber(DEFAULT:Additional_Report_Number_:\'\'),reportstatus(DEFAULT:Report_Status_:\'\'),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:DATE),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -56,7 +56,7 @@ EXPORT E_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   SHARED __d0_UID_Mapped := JOIN(__in,Lookup,TRIM((STRING)LEFT.AccidentNumber) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0;
   EXPORT Report_Statuses_Layout := RECORD
     KEL.typ.nstr Report_Status_;
@@ -116,18 +116,20 @@ EXPORT E_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     SELF.Report_Code_Description_ := KEL.Intake.SingleValue(__recs,Report_Code_Description_);
     SELF.Report_Has_Cover_Sheet_ := KEL.Intake.SingleValue(__recs,Report_Has_Cover_Sheet_);
     SELF.Additional_Report_Number_ := KEL.Intake.SingleValue(__recs,Additional_Report_Number_);
-    SELF.Report_Statuses_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Report_Status_},Report_Status_),Report_Statuses_Layout)(__NN(Report_Status_)));
+    SELF.Report_Statuses_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Report_Status_},Report_Status_),Report_Statuses_Layout)(__NN(Report_Status_)));
     SELF.Date_Vendor_Last_Reported_ := KEL.Intake.SingleValue(__recs,Date_Vendor_Last_Reported_);
-    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
-    SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,TRUE);
+    SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Date_Last_Seen_,MAX,FALSE);
     SELF := __r;
   END;
   Layout Accident__Single_Rollup(InLayout __r) := TRANSFORM
-    SELF.Report_Statuses_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Report_Statuses_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(Report_Status_)));
-    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(Source_)));
+    SELF.Report_Statuses_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Report_Statuses_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Report_Status_)));
+    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
+    SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);
+    SELF.Date_Last_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_Last_Seen_,FALSE);
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Accident_Group,COUNT(ROWS(LEFT))=1),GROUP,Accident__Single_Rollup(LEFT)) + ROLLUP(HAVING(Accident_Group,COUNT(ROWS(LEFT))>1),GROUP,Accident__Rollup(LEFT, ROWS(LEFT)));

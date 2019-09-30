@@ -2,18 +2,34 @@
 <message name="MAS_Business_nonFCRA_Service">
 	<part name="input" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="ScoreThreshold" type="xsd:integer"/> 
-	<part name="ExcludeConsumerShell" type="xsd:boolean"/>
+	<part name="ExcludeConsumerAttributes" type="xsd:boolean"/>
 	<part name="OutputMasterResults" type="xsd:boolean"/>
+	<part name="BIPAppendScoreThreshold" type="xsd:integer"/>
+	<part name="BIPAppendWeightThreshold" type="xsd:integer"/>
+	<part name="BIPAppendPrimForce" type="xsd:boolean"/>
+	<part name="BIPAppendIncludeAuthRep" type="xsd:boolean"/>
+	<part name="BIPAppendNoReAppend" type="xsd:boolean"/>
+	<part name="DataRestrictionMask" type="xsd:string"/>
+	<part name="DataPermissionMask" type="xsd:string"/>
+	<part name="GLBPurpose" type="xsd:integer"/>
+	<part name="DPPAPurpose" type="xsd:integer"/>
+	<part name="IsMarketing" type="xsd:boolean"/>
+	<part name="AllowedSources" type="xsd:string"/>
+	<part name="IndustryClass" type="xsd:string"/>
+	<part name="LexIdSourceOptout" type="xsd:integer"/>
+	<part name="_TransactionId" type="xsd:string"/>
+	<part name="_BatchUID" type="xsd:string"/>
+	<part name="_GCID" type="xsd:integer"/>
 </message>
 */
 
-IMPORT Std, PublicRecords_KEL;
+IMPORT Std, PublicRecords_KEL, PublicRecords_KEL.ECL_Functions;
 
 EXPORT MAS_Business_nonFCRA_Service() := MACRO
   #WEBSERVICE(FIELDS(
 		'input',
 		'ScoreThreshold',
-		'ExcludeConsumerShell',
+		'ExcludeConsumerAttributes',
 		'OutputMasterResults',
 		'BIPAppendScoreThreshold',
 		'BIPAppendWeightThreshold',
@@ -22,21 +38,35 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
 		'BIPAppendNoReAppend',
 		'DataRestrictionMask',
 		'DataPermissionMask',
-		'GLBA_Purpose',
-		'DPPA_Purpose',
+		'GLBPurpose',
+		'DPPAPurpose',
+		'IndustryClass',
 		'IsMarketing',
-		'AllowedSources'
+		'AllowedSources',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'
   ));
+
+STRING5 Default_Industry_Class := '';	
+#stored('IndustryClass',Default_Industry_Class);
+STRING Default_data_permission_mask := '';	
+#stored('DataPermissionMask',Default_data_permission_mask);
+UNSIGNED1 Default_GLB_Purpose := 0;
+#STORED('GLBPurpose', Default_GLB_Purpose);
+STRING Default_Data_Restriction_Mask := '';
+#STORED('DataRestrictionMask',Default_Data_Restriction_Mask);
 
   // Read interface params
   ds_input := DATASET([],PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) : STORED('input');
   INTEGER Score_threshold := 80 : STORED('ScoreThreshold');
-	BOOLEAN Exclude_Consumer_Shell := FALSE : STORED('ExcludeConsumerShell');
+	BOOLEAN Exclude_Consumer_Attributes := FALSE : STORED('ExcludeConsumerAttributes');
 	BOOLEAN Output_Master_Results := FALSE : STORED('OutputMasterResults');
 	STRING DataRestrictionMask := '' : STORED('DataRestrictionMask');
-	STRING DataPermissionMask := '' : STORED('DataPermissionMask');
-	UNSIGNED1 GLBA := 0 : STORED('GLBA_Purpose');
-	UNSIGNED1 DPPA := 0 : STORED('DPPA_Purpose');
+	STRING DataPermissionMask := Default_data_permission_mask : STORED('DataPermissionMask');
+	UNSIGNED1 GLBA := 0 : STORED('GLBPurpose');
+	UNSIGNED1 DPPA := 0 : STORED('DPPAPurpose');
 	UNSIGNED BIPAppend_Score_Threshold := 75 : STORED('BIPAppendScoreThreshold');
 	UNSIGNED BIPAppend_Weight_Threshold := 0 : STORED('BIPAppendWeightThreshold');
 	BOOLEAN BIPAppend_PrimForce := FALSE : STORED('BIPAppendPrimForce');
@@ -45,8 +75,16 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
 	STRING AllowedSources := '' : STORED('AllowedSources');
-  
+	STRING Industry_Class := Default_Industry_Class : STORED('IndustryClass');
+	//CCPA fields
+	UNSIGNED1 _LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+	STRING _TransactionId := '' : STORED ('_TransactionId');
+	STRING _BatchUID := '' : STORED('_BatchUID');
+	UNSIGNED6 _GCID := 0 : STORED('_GCID');
+	
+	
 	BOOLEAN Allow_DNBDMI := STD.Str.Find( AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1 ) > 0; // When TRUE this will unmask DNB DMI data - NO CUSTOMERS CAN USE THIS, FOR RESEARCH PURPOSES ONLY
+	#STORED('AllowAll', Allow_DNBDMI); // If DNBDMI is allowed, set AllowAll to TRUE for Business Best test
 	
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
@@ -55,7 +93,7 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN IsFCRA := FALSE;
-		EXPORT BOOLEAN ExcludeConsumerShell := Exclude_Consumer_Shell;
+		EXPORT BOOLEAN ExcludeConsumerAttributes := Exclude_Consumer_Attributes;
 		EXPORT BOOLEAN OutputMasterResults := Output_Master_Results;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
@@ -69,6 +107,8 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
 			Is_Marketing, 
 			Allow_DNBDMI, 
 			OverrideExperianRestriction,
+			'', /* PermissiblePurpose - For FCRA Products Only */
+			Industry_Class,
 			PublicRecords_KEL.CFG_Compile);
 		
 		// BIP Append Options
@@ -77,7 +117,11 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
 		EXPORT BOOLEAN BIPAppendPrimForce := BIPAppend_PrimForce;
 		EXPORT BOOLEAN BIPAppendReAppend := NOT BIPAppend_No_ReAppend;
 		EXPORT BOOLEAN BIPAppendIncludeAuthRep := BIPAppend_Include_AuthRep;
-		
+		// CCPA Options
+		EXPORT UNSIGNED1 LexIdSourceOptout := _LexIdSourceOptout;
+    EXPORT STRING TransactionID := _TransactionId;
+    EXPORT STRING BatchUID := _BatchUID;
+    EXPORT UNSIGNED6 GlobalCompanyId := _GCID;
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FCRA_FDC if the keys don't contribute to any 
 		// ENTITIES/ASSOCIATIONS being used by the query.

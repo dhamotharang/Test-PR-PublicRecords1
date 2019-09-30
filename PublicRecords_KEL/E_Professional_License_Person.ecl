@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.6
-IMPORT KEL011 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+IMPORT KEL11 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Person,E_Professional_License FROM PublicRecords_KEL;
-IMPORT * FROM KEL011.Null;
+IMPORT * FROM KEL11.Null;
 EXPORT E_Professional_License_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -15,15 +15,30 @@ EXPORT E_Professional_License_Person(CFG_Compile.FDCDataset __in = CFG_Compile.F
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'Prof_Lic_(Prof_Lic_:0),subject(Subject_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'Prof_Lic_(DEFAULT:Prof_Lic_:0),subject(DEFAULT:Subject_:0),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH)';
+  SHARED Date_First_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping0 := 'Prof_Lic_(DEFAULT:Prof_Lic_:0),did(OVERRIDE:Subject_:0),src(OVERRIDE:Source_:\'\'),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH:Date_First_Seen_0Rule),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Prof_LicenseV2__Key_Proflic_Did,TRANSFORM(RECORDOF(__in.Dataset_Prof_LicenseV2__Key_Proflic_Did),SELF:=RIGHT));
+  EXPORT __d0_KELfiltered := __d0_Norm(TRIM(cleaned_license_number) != '' AND TRIM(source_st) != '' AND did != 0);
   SHARED __d0_Prof_Lic__Layout := RECORD
-    RECORDOF(__in);
+    RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Prof_Lic_;
   END;
-  SHARED __d0_Prof_Lic__Mapped := JOIN(__in,E_Professional_License(__in,__cfg).Lookup,TRIM((STRING)LEFT.LicenseNumber) + '|' + TRIM((STRING)LEFT.LicenseState) = RIGHT.KeyVal,TRANSFORM(__d0_Prof_Lic__Layout,SELF.Prof_Lic_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Prof_Lic__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d0_KELfiltered,'cleaned_license_number,source_st,did','__in'),E_Professional_License(__in,__cfg).Lookup,TRIM((STRING)LEFT.cleaned_license_number) + '|' + TRIM((STRING)LEFT.source_st) + '|' + TRIM((STRING)LEFT.did) = RIGHT.KeyVal,TRANSFORM(__d0_Prof_Lic__Layout,SELF.Prof_Lic_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Prefiltered := __d0_Prof_Lic__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
-  EXPORT InData := __d0;
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __Mapping1 := 'Prof_Lic_(DEFAULT:Prof_Lic_:0),did(OVERRIDE:Subject_:0),src(OVERRIDE:Source_:\'\'),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Prof_License_Mari__Key_Did,TRANSFORM(RECORDOF(__in.Dataset_Prof_License_Mari__Key_Did),SELF:=RIGHT));
+  EXPORT __d1_KELfiltered := __d1_Norm(TRIM(cleaned_license_number) != '' AND TRIM(license_state) != '' AND did != 0);
+  SHARED __d1_Prof_Lic__Layout := RECORD
+    RECORDOF(__d1_KELfiltered);
+    KEL.typ.uid Prof_Lic_;
+  END;
+  SHARED __d1_Prof_Lic__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d1_KELfiltered,'cleaned_license_number,license_state,did','__in'),E_Professional_License(__in,__cfg).Lookup,TRIM((STRING)LEFT.cleaned_license_number) + '|' + TRIM((STRING)LEFT.license_state) + '|' + TRIM((STRING)LEFT.did) = RIGHT.KeyVal,TRANSFORM(__d1_Prof_Lic__Layout,SELF.Prof_Lic_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Prefiltered := __d1_Prof_Lic__Mapped;
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  EXPORT InData := __d0 + __d1;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -41,15 +56,17 @@ EXPORT E_Professional_License_Person(CFG_Compile.FDCDataset __in = CFG_Compile.F
   EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Prof_Lic_,Subject_,ALL));
   Professional_License_Person_Group := __PostFilter;
   Layout Professional_License_Person__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
-    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
-    SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,TRUE);
+    SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Date_Last_Seen_,MAX,FALSE);
     SELF := __r;
   END;
   Layout Professional_License_Person__Single_Rollup(InLayout __r) := TRANSFORM
-    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
+    SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);
+    SELF.Date_Last_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_Last_Seen_,FALSE);
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Professional_License_Person_Group,COUNT(ROWS(LEFT))=1),GROUP,Professional_License_Person__Single_Rollup(LEFT)) + ROLLUP(HAVING(Professional_License_Person_Group,COUNT(ROWS(LEFT))>1),GROUP,Professional_License_Person__Rollup(LEFT, ROWS(LEFT)));
@@ -60,9 +77,14 @@ EXPORT E_Professional_License_Person(CFG_Compile.FDCDataset __in = CFG_Compile.F
   EXPORT SanityCheck := DATASET([{COUNT(Prof_Lic__Orphan),COUNT(Subject__Orphan)}],{KEL.typ.int Prof_Lic__Orphan,KEL.typ.int Subject__Orphan});
   EXPORT NullCounts := DATASET([
     {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ProfLic',COUNT(__d0(__NL(Prof_Lic_))),COUNT(__d0(__NN(Prof_Lic_)))},
-    {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Subject',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
-    {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','did',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
+    {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
     {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
+    {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ProfLic',COUNT(__d1(__NL(Prof_Lic_))),COUNT(__d1(__NN(Prof_Lic_)))},
+    {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','did',COUNT(__d1(__NL(Subject_))),COUNT(__d1(__NN(Subject_)))},
+    {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
+    {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'ProfessionalLicensePerson','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;
