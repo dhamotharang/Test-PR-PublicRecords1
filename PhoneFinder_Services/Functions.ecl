@@ -368,7 +368,7 @@ MODULE
 
       vFullName      := IF( pInput.fname != '' or pInput.lname != '',
                             Address.NameFromComponents(pInput.fname, pInput.mname, pInput.lname, pInput.name_suffix),
-                            pInput.listed_name);
+                            '');
       vStreetAddress := Address.Addr1FromComponents(pInput.prim_range, pInput.predir, pInput.prim_name, pInput.suffix,
                                                     pInput.postdir, pInput.unit_desig, pInput.sec_range);
       vCityStZip     := Address.Addr2FromComponentsWithZip4(pInput.city_name, pInput.st, pInput.zip, pInput.zip4);
