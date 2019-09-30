@@ -1,4 +1,4 @@
-﻿IMPORT advo, DueDiligence, iesp, STD, Suppress, ut;
+﻿IMPORT Advo, DueDiligence, iesp, STD, Suppress, ut;
 
 EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData, 
                          STRING6 ssnMask) := FUNCTION
@@ -6,32 +6,11 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                          
     //mask best ssn for the report    
     Suppress.MAC_Mask(inData, maskedBestData, bestSSN, '', TRUE, FALSE,,,, ssnMask);
-                                                                                        
-		fnGetKeyAddr1History(leftDS, fieldName) := FUNCTIONMACRO
-			addKeyAddr1History := JOIN(leftDS, Advo.Key_Addr1_history,  
-                          LEFT.#EXPAND(fieldName).zip5 != '' AND 
-                          LEFT.#EXPAND(fieldName).prim_range != '' AND
-                          KEYED(LEFT.#EXPAND(fieldName).zip5 = RIGHT.zip) AND
-                          KEYED(LEFT.#EXPAND(fieldName).prim_range = RIGHT.prim_range) AND
-                          KEYED(LEFT.#EXPAND(fieldName).prim_name = RIGHT.prim_name) AND
-                          KEYED(LEFT.#EXPAND(fieldName).addr_suffix = RIGHT.addr_suffix) AND
-                          KEYED(LEFT.#EXPAND(fieldName).predir = RIGHT.predir) AND
-                          KEYED(LEFT.#EXPAND(fieldName).postdir = RIGHT.postdir) AND
-                          KEYED(LEFT.#EXPAND(fieldName).sec_range = RIGHT.sec_range), 
-                          TRANSFORM({RECORDOF(LEFT), STRING1  #EXPAND(if(fieldName='indvRawInput.cleanAddress','Residential_OR_Business_Ind_Clean','Residential_OR_Business_Ind_Best'))},
-																		  #EXPAND(if(fieldName='indvRawInput.cleanAddress',
-																			'SELF.Residential_OR_Business_Ind_Clean := RIGHT.Residential_OR_Business_Ind;',
-																			'SELF.Residential_OR_Business_Ind_Best := RIGHT.Residential_OR_Business_Ind;'));
-                                      SELF := LEFT,
-                                      SELF := []), LEFT outer, 
-                          KEEP(DueDiligence.Constants.MAX_ATMOST_1));
-			return addKeyAddr1History;
-		ENDMACRO;
     
     
-		//get Residential_OR_Business_Ind for Advo.Lookup_Descriptions.fn_resbus
-    formatCleanAddressType := fnGetKeyAddr1History(maskedBestData, 'indvRawInput.cleanAddress');
-    formatBestAddressType  := fnGetKeyAddr1History(formatCleanAddressType, 'bestaddress');
+    //get Residential_OR_Business_Ind for Advo.Lookup_Descriptions.fn_resbus
+    formatCleanAddressType := DueDiligence.CommonAddress.GetKeyAddr1HistoryResidentialOrBusiness(maskedBestData, 'indvRawInput.cleanAddress');
+    formatBestAddressType  := DueDiligence.CommonAddress.GetKeyAddr1HistoryResidentialOrBusiness(formatCleanAddressType, 'bestaddress');
     
     //remove all duplicate values
     addAddressTypesDeduped := DEDUP(formatBestAddressType, ALL);
@@ -62,8 +41,8 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                                                                                                               bestAddr.streetAddress1, bestAddr.streetAddress2,
                                                                                                               TRIM(bestAddr.state) + TRIM(bestAddr.city) + TRIM(bestAddr.zip5));
                                                     
-                                                    SELF.personalInfo.inputAddressType := Advo.Lookup_Descriptions.fn_resbus(LEFT.Residential_OR_Business_Ind_Clean);
-                                                    SELF.personalInfo.bestAddressType := Advo.Lookup_Descriptions.fn_resbus(LEFT.Residential_OR_Business_Ind_Best);
+                                                    SELF.personalInfo.inputAddressType := Advo.Lookup_Descriptions.fn_resbus(LEFT.Residential_OR_Business_Clean);
+                                                    SELF.personalInfo.bestAddressType := Advo.Lookup_Descriptions.fn_resbus(LEFT.Residential_OR_Business_Best);
                                                     
                                                     SELF.personalInfo.InputSSN := LEFT.inputSSN;
                                                     SELF.personalInfo.BestSSN := LEFT.bestSSN;

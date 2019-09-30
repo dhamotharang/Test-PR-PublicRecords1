@@ -1,5 +1,10 @@
-﻿IMPORT Address, DueDiligence, Risk_Indicators, STD;
+﻿IMPORT Address, Advo, DueDiligence, Risk_Indicators, STD;
 
+
+/*
+	Following Keys being used:
+			Advo.Key_Addr1_history
+*/
 EXPORT CommonAddress := MODULE
 
 
@@ -53,5 +58,28 @@ EXPORT CommonAddress := MODULE
 
         RETURN cleanedAddress;
     END;
+    
+    
+    
+    EXPORT GetKeyAddr1HistoryResidentialOrBusiness(leftDS, fieldName) := FUNCTIONMACRO
+        addKeyAddr1History := JOIN(leftDS, Advo.Key_Addr1_history,  
+                                    LEFT.#EXPAND(fieldName).zip5 != '' AND 
+                                    LEFT.#EXPAND(fieldName).prim_range != '' AND
+                                    KEYED(LEFT.#EXPAND(fieldName).zip5 = RIGHT.zip) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).prim_range = RIGHT.prim_range) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).prim_name = RIGHT.prim_name) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).addr_suffix = RIGHT.addr_suffix) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).predir = RIGHT.predir) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).postdir = RIGHT.postdir) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).sec_range = RIGHT.sec_range), 
+                                    TRANSFORM({RECORDOF(LEFT), STRING1  #EXPAND(if(fieldName='indvRawInput.cleanAddress','Residential_OR_Business_Clean','Residential_OR_Business_Best'))},
+                                                #EXPAND(if(fieldName='indvRawInput.cleanAddress',
+                                                'SELF.Residential_OR_Business_Clean := RIGHT.Residential_OR_Business_Ind;',
+                                                'SELF.Residential_OR_Business_Best := RIGHT.Residential_OR_Business_Ind;'));
+                                                SELF := LEFT,
+                                                SELF := []), LEFT OUTER, 
+                                    KEEP(DueDiligence.Constants.MAX_ATMOST_1));
+        RETURN addKeyAddr1History;
+    ENDMACRO;
 
 END;
