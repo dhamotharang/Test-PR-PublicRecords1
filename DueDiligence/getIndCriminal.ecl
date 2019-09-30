@@ -212,15 +212,18 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                             
                                                             maxPriority := MAX(typeLevel_9, typeLevel_8, typeLevel_7, typeLevel_6,
                                                                                typeLevel_5, typeLevel_4, typeLevel_3, typeLevel_2);
+                                                                               
+                                                            maxOffenseLevel := DueDiligence.translateExpression.dctByPriority[maxPriority].level;
                                                             
-                                                            SELF.attr_legalEventCat9 := typeLevel_9 > 0;
-                                                            SELF.attr_legalEventCat8 := typeLevel_8 > 0;
-                                                            SELF.attr_legalEventCat7 := typeLevel_7 > 0;
-                                                            SELF.attr_legalEventCat6 := typeLevel_6 > 0;
-                                                            SELF.attr_legalEventCat5 := typeLevel_5 > 0;
-                                                            SELF.attr_legalEventCat4 := typeLevel_4 > 0;
-                                                            SELF.attr_legalEventCat3 := typeLevel_3 > 0;
-                                                            SELF.attr_legalEventCat2 := typeLevel_2 > 0;
+                                                            SELF.attr_legalEventCat9 := maxOffenseLevel = DueDiligence.translateExpression.LEVEL_9;
+                                                            SELF.attr_legalEventCat8 := maxOffenseLevel = DueDiligence.translateExpression.LEVEL_8;
+                                                            SELF.attr_legalEventCat7 := maxOffenseLevel = DueDiligence.translateExpression.LEVEL_7;
+                                                            SELF.attr_legalEventCat6 := maxOffenseLevel = DueDiligence.translateExpression.LEVEL_6;
+                                                            SELF.attr_legalEventCat5 := maxOffenseLevel = DueDiligence.translateExpression.LEVEL_5;
+                                                            SELF.attr_legalEventCat4 := maxOffenseLevel = DueDiligence.translateExpression.LEVEL_4;
+                                                            SELF.attr_legalEventCat3 := maxOffenseLevel = DueDiligence.translateExpression.LEVEL_3;
+                                                            SELF.attr_legalEventCat2 := maxOffenseLevel = DueDiligence.translateExpression.LEVEL_2;  
+                                                            SELF.attr_legalEventCat0 := maxOffenseLevel = DueDiligence.translateExpression.LEVEL_0;
                                                                                                   
                                                             SELF.offenseDDLegalEventTypeCode := maxPriority;                                                        
                                                             
@@ -237,7 +240,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                                                     BOOLEAN attr_misdemeanorConvictionPast3Yrs, BOOLEAN attr_misdemeanorConvictionOver3Yrs, 
                                                                                     BOOLEAN attr_legalEventCat9, BOOLEAN attr_legalEventCat8, BOOLEAN attr_legalEventCat7;
                                                                                     BOOLEAN attr_legalEventCat6, BOOLEAN attr_legalEventCat5, BOOLEAN attr_legalEventCat4;
-                                                                                    BOOLEAN attr_legalEventCat3, BOOLEAN attr_legalEventCat2;
+                                                                                    BOOLEAN attr_legalEventCat3, BOOLEAN attr_legalEventCat2, BOOLEAN attr_legalEventCat0;
                                                                                     DATASET(DueDiligence.Layouts.CriminalOffenses) indCrimOffenses},
                                                                 
                                                                 SELF.indCrimOffenses := DATASET([TRANSFORM(DueDiligence.Layouts.CriminalOffenses, SELF := LEFT;)]);
@@ -271,6 +274,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                       SELF.attr_legalEventCat4 := LEFT.attr_legalEventCat4 OR RIGHT.attr_legalEventCat4;
                                       SELF.attr_legalEventCat3 := LEFT.attr_legalEventCat3 OR RIGHT.attr_legalEventCat3;
                                       SELF.attr_legalEventCat2 := LEFT.attr_legalEventCat2 OR RIGHT.attr_legalEventCat2;
+                                      SELF.attr_legalEventCat0 := LEFT.attr_legalEventCat0 OR RIGHT.attr_legalEventCat0;
                                       
                                       SELF.indCrimOffenses := LEFT.indCrimOffenses + RIGHT.indCrimOffenses;
                                       SELF := LEFT;));
@@ -304,6 +308,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                         SELF.indv.atleastOneCategory4 := LEFT.attr_legalEventCat4;
                                                         SELF.indv.atleastOneCategory3 := LEFT.attr_legalEventCat3;
                                                         SELF.indv.atleastOneCategory2 := LEFT.attr_legalEventCat2;
+                                                        SELF.indv.atleastOneCategory0 := LEFT.attr_legalEventCat0;
                                                         SELF := [];));
     
     
