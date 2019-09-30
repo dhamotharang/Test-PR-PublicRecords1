@@ -1,4 +1,5 @@
-IMPORT BIPV2, BizLinkFull, doxie, dx_email, Experian_CRDB,  MIDEX_Services, paw, SANCTN, vehiclev2;
+IMPORT bipv2, bizlinkfull, Business_Header, doxie, domains, dx_email, experian_crdb, FBNV2, 
+  midex_services, paw, patriot, sanctn, vehiclev2;
 
 EXPORT Raw := MODULE
   EXPORT GetEmailRecs(DATASET(doxie.layout_references) dids) := FUNCTION
@@ -53,4 +54,80 @@ EXPORT Raw := MODULE
       TRANSFORM(RIGHT), LIMIT(50,skip)); // VehicleV2_Services.Constant.VEHICLE_PER_KEY
     RETURN vehicle_main;
   ENDMACRO;
+  EXPORT GetInquiryRecs(dids, k) := FUNCTIONMACRO
+    LOCAL raw_recs := JOIN(dids, k, 
+      KEYED(LEFT.did = RIGHT.s_did), 
+      TRANSFORM(RECORDOF(k),
+        SELF := RIGHT;
+        ), KEEP($.Constants.MaxCollectionRecords), LIMIT(0));
+    // -- the requirement is to disclose unique inquiries per 'query', hence, sort/dedup below
+    LOCAL raw_recs_ddp := DEDUP(
+      SORT(raw_recs, 
+      person_q.full_name, person_q.first_name, person_q.middle_name, person_q.last_name, 
+      person_q.address, person_q.city, person_q.zip, person_q.personal_phone, person_q.work_phone, person_q.dob,
+      person_q.dl, person_q.dl_st, person_q.email_address, person_q.ssn
+      ),
+      person_q.full_name, person_q.first_name, person_q.middle_name, person_q.last_name, 
+      person_q.address, person_q.city, person_q.zip, person_q.personal_phone, person_q.work_phone, person_q.dob,
+      person_q.dl, person_q.dl_st, person_q.email_address, person_q.ssn);
+    RETURN raw_recs_ddp;
+  ENDMACRO;
+  EXPORT GetPatriotRecs(DATASET(doxie.layout_references) dids) := FUNCTION
+    // -- we may need to revisit how we are fetching these records. Is it ok to just go by dids?
+    k_did := patriot.key_did_patriot_file;
+    ids := JOIN(dids, k_did,
+      KEYED(LEFT.did = RIGHT.did),
+      TRANSFORM({k_did.did; k_did.pty_key;}, SELF := RIGHT), 
+      KEEP(100), LIMIT(0));
+    recs := JOIN(ids, patriot.key_patriot_file,
+      KEYED(LEFT.pty_key = RIGHT.pty_key), // AND LEFT.did = RIGHT.did -- no did on patriot file yet.
+      TRANSFORM(RIGHT),
+      KEEP(1), LIMIT(0));
+    RETURN recs;
+  END;
+  EXPORT GetInternetRecs(DATASET(doxie.layout_references) dids) := FUNCTION
+    ids := JOIN(dids, domains.key_did, 
+      KEYED(LEFT.did = RIGHT.did),
+      TRANSFORM(RIGHT),
+      LIMIT(2000, SKIP)); //iesp.Constants.INTERNETDOMAIN_MAX_COUNT_SEARCH_RESPONSE_RECORDS
+    dd_ids := DEDUP(SORT(ids, internetservices_id),internetservices_id);
+	  recs := JOIN(dd_ids,domains.Key_id,
+      KEYED(LEFT.internetservices_id = RIGHT.internetservices_id),
+      TRANSFORM(RIGHT),
+      KEEP(1), LIMIT(0));
+    RETURN recs;                    
+  END;
+  EXPORT GetFBNIDs(DATASET(doxie.layout_references) dids) := FUNCTION
+    ids := JOIN(dids, FBNV2.Key_DID,
+      KEYED(LEFT.did = RIGHT.did),
+      TRANSFORM(RIGHT),
+      KEEP(2000), LIMIT(0)); // max in index: 1650 - 09/20/2019 - did for testing: 1206344612
+    RETURN DEDUP(SORT(ids, did, tmsid, rmsid), did, tmsid, rmsid);
+  END;
+  EXPORT GetFBNContacts(ids) := FUNCTIONMACRO
+    recs := JOIN(ids, FBNV2.Key_Rmsid_Contact, // <- this key has duplicate records all over
+      KEYED(LEFT.tmsid = RIGHT.tmsid AND LEFT.rmsid = RIGHT.rmsid) AND
+      LEFT.did = RIGHT.did,
+      TRANSFORM(RIGHT),
+      KEEP(1), LIMIT(0)); 
+    RETURN recs;
+  ENDMACRO;
+  EXPORT GetFBNBusiness(ids) := FUNCTIONMACRO
+    recs := JOIN(ids, FBNV2.Key_Rmsid_Business,
+      KEYED(LEFT.tmsid = RIGHT.tmsid AND LEFT.rmsid = RIGHT.rmsid),
+      TRANSFORM(RIGHT),
+      KEEP(1), LIMIT(0)); 
+    RETURN recs;
+  ENDMACRO;
+  EXPORT GetBusHeaderContacts(DATASET(doxie.layout_references) dids) := FUNCTION
+    fps := JOIN(dids, Business_Header.Key_Business_Contacts_DID,
+      KEYED(LEFT.did = RIGHT.did),
+      TRANSFORM(RIGHT),
+      ATMOST(1000), keep(1000)); // same as AMLEmployment - max per did in index: 47K, 27K, 19K... did for testing: 306383637
+    recs := JOIN(fps, Business_Header.Key_Business_Contacts_FP,
+      KEYED(LEFT.fp = RIGHT.fp),
+      TRANSFORM(RIGHT),
+      ATMOST(1000), KEEP(1000));
+    RETURN recs;
+  END;
 END;
