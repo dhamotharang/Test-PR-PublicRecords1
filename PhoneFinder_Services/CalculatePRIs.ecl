@@ -80,7 +80,7 @@ FUNCTION
 
       BOOLEAN isPRIFail := CASE(le.RiskId,
                                 -1 => pInput.isPrimaryPhone AND pInput.phone = '',
-                                0  => pInput.isPrimaryPhone AND (pInput.fname = '' AND pInput.lname = '' AND pInput.listed_name = '' AND pInput.prim_name = '' AND pInput.phone <> ''),
+                                0  => pInput.isPrimaryPhone AND (pInput.fname = '' AND pInput.lname = '' AND pInput.phone <> ''),
                                 1  => IF(inmod.IsGovsearch, (pInput.fname <>'' OR pInput.lname <> '' OR pInput.listed_name <> '') AND pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive,
 																         pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive),
                                 2  => STD.Date.DaysBetween(dt_first_seen, currentDate) BETWEEN le.ThresholdA AND le.Threshold,
