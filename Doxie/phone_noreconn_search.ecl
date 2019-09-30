@@ -68,7 +68,7 @@ if the permission is set. Try Qsent data if nothing found above.
 <message name="phone_noreconn_search" wuTimeout="300000">
 */
 
-IMPORT AutoStandardI, BatchServices, D2C, DeathV2_Services, DidVille, Doxie_Raw, dx_death_master, iesp, MDR, 
+IMPORT AutoStandardI, BatchServices, D2C, DeathV2_Services, DidVille, Doxie_Raw, dx_death_master, iesp, MDR,
        Phones, PhonesFeedback_Services, Royalty, SSNBest_Services, STD, Suppress, ut, WSInput;
 
 EXPORT phone_noreconn_search := MACRO
@@ -267,7 +267,7 @@ EXPORT phone_noreconn_search := MACRO
 										transform(infile_rec_hhid, self.hhid := right.hhid_relat, self := left),
 										left outer, atmost(ut.limits.HHID_PER_PERSON));
 
-	doxie.MAC_getTNTValue(cmp_res3_whhid, outfile, cmp_res_wtnt);
+	doxie.MAC_getTNTValue(cmp_res3_whhid, outfile, cmp_res_wtnt, mod_access);
 
 	//Rollup records to keep best TNT value
 	cmp_res_wtnt keepBestTNT(cmp_res_wtnt le, cmp_res_wtnt ri) := transform
@@ -313,11 +313,11 @@ EXPORT phone_noreconn_search := MACRO
     BOOLEAN is_deceased := FALSE;
   END;
 
-  resultsPlusDeath_info_append := dx_death_master.Append.byDid(results_best, did, death_params,,ut.limits.DEATH_PER_DID); 
-  
-  out_layout_info xfm_add_death_info (RECORDOF(resultsPlusDeath_info_append) l) := 
+  resultsPlusDeath_info_append := dx_death_master.Append.byDid(results_best, did, death_params,,ut.limits.DEATH_PER_DID);
+
+  out_layout_info xfm_add_death_info (RECORDOF(resultsPlusDeath_info_append) l) :=
     TRANSFORM
-      SELF.deceased := IF(l.death.is_deceased, 'Y', 'N'), 
+      SELF.deceased := IF(l.death.is_deceased, 'Y', 'N'),
       SELF.dod := IF(l.death.is_deceased, (UNSIGNED4)l.death.dod8, 0),
       SELF.is_src_restricted := l.death.src = MDR.sourceTools.src_Death_Restricted,
       SELF := l
@@ -325,21 +325,21 @@ EXPORT phone_noreconn_search := MACRO
 
   resultsPlusDeath_info := PROJECT(resultsPlusDeath_info_append, xfm_add_death_info(LEFT));
   filteredResults := PROJECT(resultsPlusDeath_info(deceased = 'N'), out_layout);
-  
+
 	Death_source_srt:= Sort(resultsPlusDeath_info,did,dod);
 	Death_source_grp:= Sort(group(Death_source_srt,did,dod), is_src_restricted);
-	Death_source_info := 
-    iterate(Death_source_grp, 
-      transform(out_layout_info, 
-        self.IsLimitedAccessDMF := if(counter = 1, 
+	Death_source_info :=
+    iterate(Death_source_grp,
+      transform(out_layout_info,
+        self.IsLimitedAccessDMF := if(counter = 1,
                                       right.dod != 0 and right.is_src_restricted,
 	                                    left.IsLimitedAccessDMF ),
 				self :=right));
 
   resultsPlusSSA := dedup(sort(ungroup(Death_source_info), except dod, is_src_restricted, IsLimitedAccessDMF), except dod, is_src_restricted, IsLimitedAccessDMF);
 
-  resultsPlusDeath := 
-    Project(resultsPlusSSA, 
+  resultsPlusDeath :=
+    Project(resultsPlusSSA,
       transform(out_layout,
 				self := left));
 
@@ -356,17 +356,17 @@ EXPORT phone_noreconn_search := MACRO
 		unsigned8 did ;
 	end;
 
-  prepGovSSN := 
+  prepGovSSN :=
     project(resultsFilterBus,
       Transform(RecprepGovSSN,
         self.did := (unsigned)left.did, self:=left));
 
 	_withGovBestSSN := SSNBest_Services.Functions.fetchSSNs_generic(prepGovSSN, ssnBestParams, ssn, did, false);
 
-  withGovBestSSN  := 
+  withGovBestSSN  :=
     PROJECT(_withGovBestSSN,
       TRANSFORM(recordof(resultsFilterBus),
-        self.did := (string)left.did, 
+        self.did := (string)left.did,
         self:=left));
 
 	resultsGovSSN := if(GetSSNBest,withGovBestSSN,resultsFilterBus);
@@ -385,16 +385,16 @@ EXPORT phone_noreconn_search := MACRO
 	// and keep the matching key records to be used for mutiple places below.
 
 
-  phoneInfo := 
+  phoneInfo :=
     DEDUP(
       SORT(
-        PROJECT(ds_cmp_res_out_dd, 
-          TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn, 
-            SELF.phoneno := LEFT.Phone, 
-            SELF := [])), 
-        phoneno), 
+        PROJECT(ds_cmp_res_out_dd,
+          TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
+            SELF.phoneno := LEFT.Phone,
+            SELF := [])),
+        phoneno),
       phoneno);
-      
+
 	in_mod := MODULE(Phones.IParam.BatchParams)
 		EXPORT UNSIGNED	max_age_days := Phones.Constants.PhoneAttributes.LastActivityThreshold;
 	END;

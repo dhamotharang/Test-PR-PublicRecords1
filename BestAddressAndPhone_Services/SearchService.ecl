@@ -1,9 +1,9 @@
 /*--SOAP--
 <message name="BestAddress and Progressive Phones Search_Service">
-  
+
   <part name="AcctNo" type="xsd:string"/>
   <part name="DID" type="xsd:string"/>
-	
+
   <part name="SSN" type="xsd:string"/>
   <part name="Phone" type="xsd:string"/>
   <part name="FirstName" type="xsd:string"/>
@@ -15,60 +15,60 @@
   <part name="State" type="xsd:string"/>
   <part name="Zip" type="xsd:string"/>
   <part name="DOB" type="xsd:unsignedInt"/>
-  <part name="DateLastSeen" type="xsd:string"/>	
+  <part name="DateLastSeen" type="xsd:string"/>
 
   <separator/>
-  <part name="addr1" type="xsd:string"/>	
-  <part name="addr1_2" type="xsd:string"/>	
+  <part name="addr1" type="xsd:string"/>
+  <part name="addr1_2" type="xsd:string"/>
   <part name="city_name1" type="xsd:string"/>
   <part name="st1" type="xsd:string"/>
   <part name="zip1" type="xsd:string"/>
-  <part name="addr2" type="xsd:string"/>	
-  <part name="addr2_2" type="xsd:string"/>	
+  <part name="addr2" type="xsd:string"/>
+  <part name="addr2_2" type="xsd:string"/>
   <part name="city_name2" type="xsd:string"/>
   <part name="st2" type="xsd:string"/>
   <part name="zip2" type="xsd:string"/>
-  <part name="addr3" type="xsd:string"/>	
-  <part name="addr3_2" type="xsd:string"/>	
+  <part name="addr3" type="xsd:string"/>
+  <part name="addr3_2" type="xsd:string"/>
   <part name="city_name3" type="xsd:string"/>
   <part name="st3" type="xsd:string"/>
   <part name="zip3" type="xsd:string"/>
-  <part name="addr4" type="xsd:string"/>	
-  <part name="addr4_2" type="xsd:string"/>	
+  <part name="addr4" type="xsd:string"/>
+  <part name="addr4_2" type="xsd:string"/>
   <part name="city_name4" type="xsd:string"/>
   <part name="st4" type="xsd:string"/>
   <part name="zip4" type="xsd:string"/>
-  <part name="addr5" type="xsd:string"/>	
-  <part name="addr5_2" type="xsd:string"/>	
+  <part name="addr5" type="xsd:string"/>
+  <part name="addr5_2" type="xsd:string"/>
   <part name="city_name5" type="xsd:string"/>
   <part name="st5" type="xsd:string"/>
   <part name="zip5" type="xsd:string"/>
-  <part name="addr6" type="xsd:string"/>	
-  <part name="addr6_2" type="xsd:string"/>	
+  <part name="addr6" type="xsd:string"/>
+  <part name="addr6_2" type="xsd:string"/>
   <part name="city_name6" type="xsd:string"/>
   <part name="st6" type="xsd:string"/>
   <part name="zip6" type="xsd:string"/>
-  <part name="addr7" type="xsd:string"/>	
-  <part name="addr7_2" type="xsd:string"/>	
+  <part name="addr7" type="xsd:string"/>
+  <part name="addr7_2" type="xsd:string"/>
   <part name="city_name7" type="xsd:string"/>
   <part name="st7" type="xsd:string"/>
   <part name="zip7" type="xsd:string"/>
-  <part name="addr8" type="xsd:string"/>	
-  <part name="addr8_2" type="xsd:string"/>	
+  <part name="addr8" type="xsd:string"/>
+  <part name="addr8_2" type="xsd:string"/>
   <part name="city_name8" type="xsd:string"/>
   <part name="st8" type="xsd:string"/>
   <part name="zip8" type="xsd:string"/>
-  <part name="addr9" type="xsd:string"/>	
-  <part name="addr9_2" type="xsd:string"/>	
+  <part name="addr9" type="xsd:string"/>
+  <part name="addr9_2" type="xsd:string"/>
   <part name="city_name9" type="xsd:string"/>
   <part name="st9" type="xsd:string"/>
   <part name="zip9" type="xsd:string"/>
-  <part name="addr10" type="xsd:string"/>	
-  <part name="addr10_2" type="xsd:string"/>	
+  <part name="addr10" type="xsd:string"/>
+  <part name="addr10_2" type="xsd:string"/>
   <part name="city_name10" type="xsd:string"/>
   <part name="st10" type="xsd:string"/>
   <part name="zip10" type="xsd:string"/>
-  
+
   <separator/>
   <part name="phoneno_1" type="xsd:string"/>
   <part name="phoneno_2" type="xsd:string"/>
@@ -82,7 +82,7 @@
   <part name="phoneno_10" type="xsd:string"/>
 
   <separator/>
-  <part name="MaxRecordsToReturn" type="xsd:unsignedInt"/>	
+  <part name="MaxRecordsToReturn" type="xsd:unsignedInt"/>
   <part name="PhoneticMatch" type="xsd:boolean"/>
   <part name="AllowNickNames" type="xsd:boolean"/>
   <part name="DPPAPurpose" type="xsd:unsignedInt"/>
@@ -91,14 +91,14 @@
 	<part name="DataPermissionMask" type="xsd:string"/>
   <part name="UseNameUniqueDID" type="xsd:boolean"/>
   <part name="PartialAddressDedup" type="xsd:boolean"/>
-  <part name="InputAddressDedup" type="xsd:boolean"/>	
+  <part name="InputAddressDedup" type="xsd:boolean"/>
   <part name="StartWithNextMostCurrent" type="xsd:boolean"/>
   <part name="EndWithNextMostCurrent" type="xsd:boolean"/>
-  <part name="FirstNameLastNameMatch" type="xsd:boolean"/>	
-  <part name="FirstNameMatch" type="xsd:boolean"/>	
-  <part name="LastNameMatch" type="xsd:boolean"/>	
-  <part name="FullNameMatch" type="xsd:boolean"/>	
-  <part name="FirstInitialLastNameMatch" type="xsd:boolean"/>	
+  <part name="FirstNameLastNameMatch" type="xsd:boolean"/>
+  <part name="FirstNameMatch" type="xsd:boolean"/>
+  <part name="LastNameMatch" type="xsd:boolean"/>
+  <part name="FullNameMatch" type="xsd:boolean"/>
+  <part name="FirstInitialLastNameMatch" type="xsd:boolean"/>
   <part name="ReturnDedupFlag" type="xsd:boolean"/>
   <separator/>
   <part name="KeepSamePhoneInDiffLevels" type="xsd:boolean"/>
@@ -137,7 +137,7 @@
   <part name="IncludeLandlordPhone" type="xsd:boolean"/>
   <part name="IncludeAllPhonesPlusData" type="xsd:boolean"/>
   <part name="StrictAPSXMatch" type="xsd:boolean"/>
-  <part name="BestAddressAndPhoneSearchRequest" type = "tns:XmlDataSet" cols="80" rows="30" 
+  <part name="BestAddressAndPhoneSearchRequest" type = "tns:XmlDataSet" cols="80" rows="30"
   default="insert XML here" />
 
 </message>
@@ -145,7 +145,7 @@
 /*--INFO-- This service returns best addresses and progressive phones */
 
 
-IMPORT iesp,AddrBest,AutoStandardI,Address,WSInput;
+IMPORT iesp, AddrBest, AutoStandardI, Address, Doxie, WSInput;
 
 EXPORT SearchService := MACRO
 		#onwarning(4207, ignore);
@@ -154,9 +154,9 @@ EXPORT SearchService := MACRO
 
     rec_in := iesp.bestaddressandphone.t_BestAddressAndPhoneSearchRequest;
     ds_in := DATASET ([], rec_in) : STORED ('BestAddressAndPhoneSearchRequest', FEW);
-    first_row := ds_in[1] : independent; 
+    first_row := ds_in[1] : independent;
 
-		 
+
     //set options
     iesp.ECL2ESP.SetInputBaseRequest (first_row);
     //set main search criteria:
@@ -166,11 +166,11 @@ EXPORT SearchService := MACRO
     iesp.ECL2ESP.SetInputDate (search_by.DOB,'DOB');
     iesp.ECL2ESP.SetInputDate (search_by.DateLastSeen,'DateLastSeen');
     iesp.ECL2ESP.SetInputSearchOptions (first_row.options);
-    
+
     search_opt	 := global (first_row.options);
     count_opt	 := global (search_opt.MaxPhoneCounts);
     sort_opt 	 := global (search_opt.CustomSortOrder);
-		
+
 		// Search options Translation
 		#stored('MaxRecordsToReturn'					,search_opt.MaxAddressCount);
 		#stored('ReturnDedupFlag'					,search_opt.IncludeDedupFlag);
@@ -180,7 +180,7 @@ EXPORT SearchService := MACRO
 		#stored('DynamicOrdering'					,search_opt.UseCustomSortOrder);
 		#stored('IncludeAllPhonesPlusData'				,search_opt.IncludePhones);
 		#stored('StrictAPSXMatch'					,search_opt.StrictMatch);
-		
+
 		// Count options Translation
 		#stored('CountType1_Es_EDASEARCH'				,count_opt.EDA);
 		#stored('CountType2_Se_SKIPTRACESEARCH'			,count_opt.SkipTrace);
@@ -195,7 +195,7 @@ EXPORT SearchService := MACRO
 		#stored('CountType_Ne_CLOSESTNEIGHBOR'			,count_opt.ClosestNeighbor);
 		#stored('CountType_Wk_PEOPLEATWORK'			,count_opt.PeopleAtWork);
 		#stored('CountType_Rl_POSSIBLERELOCATION'		,count_opt.PossibleRelocation);
-		
+
 		// Sort order options Translation
 		#stored('OrderType1_Es_EDASEARCH'				,sort_opt.EDA);
 		#stored('OrderType2_Se_SKIPTRACESEARCH'			,sort_opt.SkipTrace);
@@ -210,7 +210,7 @@ EXPORT SearchService := MACRO
 		#stored('OrderType_Ne_CLOSESTNEIGHBOR'			,sort_opt.ClosestNeighbor);
 		#stored('OrderType_Wk_PEOPLEATWORK'			,sort_opt.PeopleAtWork);
 		#stored('OrderType_Rl_POSSIBLERELOCATION'		,sort_opt.PossibleRelocation);
-		
+
 		#stored ('SSN', search_by.SSN);
 		#stored ('Phone', search_by.Phone10);
 		#stored ('phoneno_1', search_by.DedupPhones[1].value);
@@ -223,25 +223,25 @@ EXPORT SearchService := MACRO
 		#stored ('phoneno_8', search_by.DedupPhones[8].value);
 		#stored ('phoneno_9', search_by.DedupPhones[9].value);
 		#stored ('phoneno_10', search_by.DedupPhones[10].value);
-		
+
 		#stored('addr1',search_by.DedupAddresses[1].StreetAddress1);
 		#stored('addr1_2',search_by.DedupAddresses[1].StreetAddress2);
 		#stored('city_name1',search_by.DedupAddresses[1].City);
 		#stored('st1',search_by.DedupAddresses[1].State);
 		#stored('zip1',search_by.DedupAddresses[1].Zip5);
-		
+
 		#stored('addr2',search_by.DedupAddresses[2].StreetAddress1);
 		#stored('addr2_2',search_by.DedupAddresses[2].StreetAddress2);
 		#stored('city_name2',search_by.DedupAddresses[2].City);
 		#stored('st2',search_by.DedupAddresses[2].State);
 		#stored('zip2',search_by.DedupAddresses[2].Zip5);
-		
+
 		#stored('addr3',search_by.DedupAddresses[3].StreetAddress1);
 		#stored('addr3_2',search_by.DedupAddresses[3].StreetAddress2);
 		#stored('city_name3',search_by.DedupAddresses[3].City);
 		#stored('st3',search_by.DedupAddresses[3].State);
 		#stored('zip3',search_by.DedupAddresses[3].Zip5);
-		
+
 		#stored('addr4',search_by.DedupAddresses[4].StreetAddress1);
 		#stored('addr4_2',search_by.DedupAddresses[4].StreetAddress2);
 		#stored('city_name4',search_by.DedupAddresses[4].City);
@@ -253,38 +253,39 @@ EXPORT SearchService := MACRO
 		#stored('city_name5',search_by.DedupAddresses[5].City);
 		#stored('st5',search_by.DedupAddresses[5].State);
 		#stored('zip5',search_by.DedupAddresses[5].Zip5);
-		
+
 		#stored('addr6',search_by.DedupAddresses[6].StreetAddress1);
 		#stored('addr6_2',search_by.DedupAddresses[6].StreetAddress2);
 		#stored('city_name6',search_by.DedupAddresses[6].City);
 		#stored('st6',search_by.DedupAddresses[6].State);
 		#stored('zip6',search_by.DedupAddresses[6].Zip5);
-		
+
 		#stored('addr7',search_by.DedupAddresses[7].StreetAddress1);
 		#stored('addr7_2',search_by.DedupAddresses[7].StreetAddress2);
 		#stored('city_name7',search_by.DedupAddresses[7].City);
 		#stored('st7',search_by.DedupAddresses[7].State);
-		#stored('zip7',search_by.DedupAddresses[7].Zip5);		
+		#stored('zip7',search_by.DedupAddresses[7].Zip5);
 
 		#stored('addr8',search_by.DedupAddresses[8].StreetAddress1);
 		#stored('addr8_2',search_by.DedupAddresses[8].StreetAddress2);
 		#stored('city_name8',search_by.DedupAddresses[8].City);
 		#stored('st8',search_by.DedupAddresses[8].State);
 		#stored('zip8',search_by.DedupAddresses[8].Zip5);
-		
+
 		#stored('addr9',search_by.DedupAddresses[9].StreetAddress1);
 		#stored('addr9_2',search_by.DedupAddresses[9].StreetAddress2);
 		#stored('city_name9',search_by.DedupAddresses[9].City);
 		#stored('st9',search_by.DedupAddresses[9].State);
 		#stored('zip9',search_by.DedupAddresses[9].Zip5);
-		
+
 		#stored('addr10',search_by.DedupAddresses[10].StreetAddress1);
 		#stored('addr10_2',search_by.DedupAddresses[10].StreetAddress2);
 		#stored('city_name10',search_by.DedupAddresses[10].City);
 		#stored('st10',search_by.DedupAddresses[10].State);
-		#stored('zip10',search_by.DedupAddresses[10].Zip5);		
+		#stored('zip10',search_by.DedupAddresses[10].Zip5);
 
     tempmod := AutoStandardI.GlobalModule();
+    mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(tempmod);
 
 		AddrBest.Layout_BestAddr.Batch_in_both xform ():=transform
 		// self.p_city_name:=tempmod.city;
@@ -383,7 +384,7 @@ EXPORT SearchService := MACRO
 		self.z4		 := clean_addr [122..125];
 		self.phoneno	 := tempmod.phone;
 		self.ssn		 := tempmod.ssn;
-		self.dob		 :=(string) tempmod.dob; 
+		self.dob		 :=(string) tempmod.dob;
 		self.addr1	 := addr1;
 		self.addr1_2	 := addr1_2;
 		self.city_name1 := city_name1;
@@ -447,11 +448,11 @@ EXPORT SearchService := MACRO
 		end;
 
 		f_in_raw:=DATASET ([xform ()]);
-			
-		tmp := BestAddressAndPhone_Services.Records(f_in_raw);
+
+		tmp := BestAddressAndPhone_Services.Records(f_in_raw, mod_access);
 		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tmp, results, iesp.bestaddressandphone.t_BestAddressAndPhoneSearchResponse,,true);
 		output(results, named('Results'));
-		
+
 ENDMACRO;
 
 // Searchservice();

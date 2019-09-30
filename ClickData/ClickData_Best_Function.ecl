@@ -1,16 +1,20 @@
-﻿import didville, address, ut, gong, Marketing_Best, dx_header;
+import doxie, didville, address, ut, gong, Marketing_Best, dx_header;
 
 Loadxml('<FOO/>');
 
-export ClickData_Best_Function(dataset(clickdata.Layout_ClickData_In) inf, boolean append_bests, 
-																boolean include_demographics = false, boolean enhanced_search = false,
-																Zip_Radius = 0, string32 appType) := function
+export ClickData_Best_Function(
+  dataset(clickdata.Layout_ClickData_In) inf,
+  doxie.IDataAccess mod_access,
+  boolean append_bests,
+  boolean include_demographics = false,
+  boolean enhanced_search = false,
+  Zip_Radius = 0) := function
 
 	seqrec := record
 		inf;
 		unsigned4	seq;
 	end;
-	
+
 	r := record
 		didville.layout_did_outbatch;
 		string10  best_prim_range := '';
@@ -18,16 +22,16 @@ export ClickData_Best_Function(dataset(clickdata.Layout_ClickData_In) inf, boole
 		string8 	best_sec_range := '';
 	  unsigned3	best_addr_date_first_seen := 0;
 	end;
-	
+
 	seqrec into_seq(inf L, integer C) := transform
 		self.seq := C;
 
 		self.dob := L.dob;
-		
+
 		// Name bit
 		to_clean := IF(L.full_name='',L.unParsedFullName,L.full_name);
 		isParsed := L.Name_Last<>'' OR L.Name_First<>'';
-		
+
 		clean_name := IF(~isParsed, address.CleanPerson73(to_clean), '');
 		self.name_first := IF(isParsed, L.Name_First, clean_name[6..25]);
 		self.name_middle := IF(isParsed, L.Name_Middle, clean_name[26..45]);
@@ -41,27 +45,27 @@ export ClickData_Best_Function(dataset(clickdata.Layout_ClickData_In) inf, boole
 		SELF.zip := IF(L.zip='',L.z5,L.zip);
 		self := l;
 	end;
-	
+
 	df := project(inf, into_seq(LEFT,COUNTER));
-	
+
 	didville.layout_did_outbatch into_outbatch(df L) := transform
 		clean_address := Address.CleanAddress182(L.addr1, address.Addr2FromComponents(L.city, L.state, L.zip));
 		ut.MAC_Insert_CleanAddrs(clean_address,'P')
-		
+
 		self.phone10 := L.phone;
-		
+
 		SELF.fname := L.Name_First;
 		SELF.mname := L.Name_MIddle;
 		SELF.lname := L.Name_Last;
 		SELF.suffix := L.Name_Suffix;
-		
+
 		SELF := L;
 		self := [];
 	end;
 
 
 	df2_a := project(df(addr1<>''),into_outbatch(LEFT));
-	
+
 	didville.layout_did_outbatch noparse(df L) := transform
 		SELF.prim_range := L.prim_range;
 		SELF.predir := L.predir;
@@ -74,67 +78,66 @@ export ClickData_Best_Function(dataset(clickdata.Layout_ClickData_In) inf, boole
 		SELF.st := L.state;
 		SELF.z5 := L.zip;
 		SELF.zip4 := L.zip4;
-		
+
 		self.phone10 := L.phone;
-		
+
 		SELF.fname := L.Name_First;
 		SELF.mname := L.Name_MIddle;
 		SELF.lname := L.Name_Last;
 		SELF.suffix := L.Name_Suffix;
-		
+
 		SELF := L;
 		SELF := [];
 	end;
-	
+
 	df2_b := PROJECT(df(addr1=''), noparse(LEFT));
-	
+
 	df2 := df2_a+df2_b;
 
 	didville.MAC_DidAppend(df2,outf0,true,'ZG');
-	
+
 	//Expanded Search:
 	outf0_enhanced := clickdata.ClickData_Enhanced_Search(df2, ungroup(outf0), zip_radius);
-	
+
 	outf0_final := if(enhanced_search, group(sort(outf0_enhanced, SEQ), SEQ), outf0);
-	
+
 	didville.MAC_HHid_Append(outf0_final, 'HHID_RELATIVES', outf0a);
-	
+
 	// Append another version of HHID, also add if they've asked for EDA
 	outf0b := didville.HHID_Append(outf0a);
-	outf0c := didville.Gong_Append(outf0b,true);
-	//NOTE Gong must go here do not move it.	
+	outf0c := didville.Gong_Append(outf0b, mod_access, true);
+	//NOTE Gong must go here do not move it.
 	temp :=	project(outf0c,transform(r,self:=left));
-		
-  IndustryClass := ut.IndustryClass.Get();
+
 	didville.MAC_BestAppend(temp,
 												  'BEST_ALL',
-													'BEST_ALL', 
-													0, 
-													false, 
-													outf1, 
-													true, 
+													'BEST_ALL',
+													0,
+													false,
+													outf1,
+													true,
 													doxie.DataRestriction.fixed_DRM,
 													,
 													,
 													true,
 													,
-													appType,
+													mod_access.application_type,
 													,
-													IndustryClass)
+													mod_access.industry_class);
 
 	key_lookups := dx_header.key_did_lookups();
 	r get_head_cnt(outf1 L, key_lookups R) := transform
 		self.head_cnt := R.head_cnt;
 		self := L;
 	end;
-	
+
 	outf3 := join(outf1, key_lookups,
 					left.did != 0 and
 					keyed(left.did = right.did),
 				get_head_cnt(LEFT,RIGHT),
 				limit(0), keep(1),
 				left outer);
-	
+
 	outseq := record
 		clickdata.Layout_ClickData_Out_Ext;
 		unsigned4	seq;
@@ -142,7 +145,7 @@ export ClickData_Best_Function(dataset(clickdata.Layout_ClickData_In) inf, boole
 		string28  best_prim_name;
 		string8 	best_sec_range;
 	end;
-	
+
 	outseq into_out(outf3 L, df R) := transform
 		self.best_name_score 	   	:= IF (L.did=0, '', intformat(L.verify_best_name,3,1));
 		self.best_title  			:= if (append_bests, L.best_title, '');
@@ -168,49 +171,49 @@ export ClickData_Best_Function(dataset(clickdata.Layout_ClickData_In) inf, boole
 		self.num_header_recs 		:= if (L.did = 0, '', intformat(L.head_Cnt, 4, 1));
 		self.eda_connect			:= '';
 		self.eda_disconnect			:= '';
-		self.score := IF (L.did=0, '', intformat(L.score,3,1));		
-		self.score_any_ssn := IF (L.did=0, '', intformat(L.score_any_ssn,3,1));		
-		self.score_any_addr := IF (L.did=0, '', intformat(L.score_any_addr,3,1));		
-		self.score_any_dob := IF (L.did=0, '', intformat(L.score_any_dob,3,1));		
-		self.score_any_phn := IF (L.did=0, '', intformat(L.score_any_phn,3,1));		
-		self.score_any_fzzy := IF (L.did=0, '', intformat(L.score_any_fzzy,3,1));		
+		self.score := IF (L.did=0, '', intformat(L.score,3,1));
+		self.score_any_ssn := IF (L.did=0, '', intformat(L.score_any_ssn,3,1));
+		self.score_any_addr := IF (L.did=0, '', intformat(L.score_any_addr,3,1));
+		self.score_any_dob := IF (L.did=0, '', intformat(L.score_any_dob,3,1));
+		self.score_any_phn := IF (L.did=0, '', intformat(L.score_any_phn,3,1));
+		self.score_any_fzzy := IF (L.did=0, '', intformat(L.score_any_fzzy,3,1));
 		self := R;
 		self := [];
 	end;
-	
+
 	outf4 := join(outf3, df,
 					left.seq = right.seq,
 				into_out(LEFT,RIGHT), LOOKUP);
-	
-	
+
+
 	outf4 get_EDA(outf4 L, gong.Key_History_Hhid R) := transform
 		self.eda_connect := R.dt_first_seen;
 		self.eda_disconnect := R.deletion_date;
 		self := l;
 	end;
-	
-	
+
+
 	outf4 get_EDA_Did(outf4 L, gong.Key_History_Did R) := transform
 		self.eda_connect := R.dt_first_seen;
 		self.eda_disconnect := R.deletion_date;
 		self := l;
 	end;
-	
-	
+
+
 	outf5a := join(outf4, gong.key_history_hhid,
 					keyed((integer)Left.hhid = right.s_hhid),
 				get_EDA(LEFT,RIGHT), left outer, KEEP(20));
-	
+
 	outf5 := join(outf5a(eda_connect = ''), gong.Key_History_Did,
 					keyed((integer)Left.adl = right.l_did),
 				get_EDA_Did(LEFT,RIGHT), left outer, KEEP(20)) + outf5a(eda_connect != '');
-				
+
 	outf5 roll_EDA(outf5 L, outf5 R) := transform
 		self.eda_connect := if ((integer)L.eda_connect != 0 and (integer)L.eda_connect < (integer)R.eda_connect or (integer)R.eda_connect = 0, L.eda_connect, R.eda_connect);
 		self.eda_disconnect := if ((integer)L.eda_disconnect > (integer)R.eda_disconnect, L.eda_disconnect, R.eda_disconnect);
 		self := l;
 	end;
-	
+
 	outf6 := rollup(outf5, true, Roll_EDA(LEFT,RIGHT));
 
   boolean Chr2Bool(string1 chr) := chr='Y' or chr='1';
@@ -239,7 +242,7 @@ export ClickData_Best_Function(dataset(clickdata.Layout_ClickData_In) inf, boole
 		self := R;
 		self := L;
 	end;
-	
+
 	// join by DID and address as we may have one DID to many households
 	outf7 := join(outf6, Marketing_Best.key_equifax_DID,
 								keyed((integer)left.adl = right.l_did) and
@@ -250,27 +253,27 @@ export ClickData_Best_Function(dataset(clickdata.Layout_ClickData_In) inf, boole
 								left.best_sec_range = right.sec_range,
 								get_dlb(LEFT, RIGHT),
 								left outer, KEEP(1), limit(0));
-	
+
 	outf8 := if(include_demographics, outf7, outf6);
-	
+
 	outf9 := project(outf8, transform(clickdata.Layout_ClickData_Out_Ext, self := LEFT));
-	
+
 	clickdata.Layout_ClickData_Out_Ext markEnhancedSearch(outf8 L, outf0 R) := transform
-		self.enhanced_srch := R.did = 0 and L.adl <> '';  //all DIDs will be 0 from the right 
+		self.enhanced_srch := R.did = 0 and L.adl <> '';  //all DIDs will be 0 from the right
 																										 //if from extended search
 		self := L;
 	end;
-	
+
 	outf10 := join(outf8, outf0, left.seq = right.seq and left.adl = intformat(right.did, 12, 1),
 																					markEnhancedSearch(left, right),
 																					left outer);
-	
+
 	results_rec := if(enhanced_search, outf10, group(outf9));
 	//For Debug:
 	// output(df2, named('df2'));
 	// output(outf0, named('outf0'));
 	// output(outf0_enhanced, named('outf0_enhanced'));
-	
+
 	return results_rec;
-	
+
 end;
