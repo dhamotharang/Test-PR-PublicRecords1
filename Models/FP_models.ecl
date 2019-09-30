@@ -234,7 +234,8 @@ EXPORT FP_models := MODULE
     model_fp1509_1  := Project(Models.FP1509_1_0( ungroup(FP_mod._clam), 6), transform(models.layouts.layout_fp1109, self := left, self := []));
     model_fp1510_2  := Project(Models.FP1510_2_0( ungroup(FP_mod._clam), 6), transform(models.layouts.layout_fp1109, self := left, self := []));
     model_fp1511_1  := Project(Models.FP1511_1_0( ungroup(FP_mod._clam), 6), transform(models.layouts.layout_fp1109, self := left, self := []));
-
+    model_msn1803_1 := Project(Models.MSN1803_1_0( ungroup(FP_mod._clam) ), transform(models.layouts.layout_fp1109, self := left, self := []));
+    model_rsn804_1  := Project(Models.RSN804_1_0( FP_mod._clam, FP_mod._skiptrace, FP_mod._easicensus ), transform(models.layouts.layout_fp1109, self := left, self := []));
 
     // These models are already in layout fp1109 so they can continue doing what they were doing.
     model_fp1109_0   := Models.FP1109_0_0( FP_mod._clam_ip, 6, false);
@@ -264,7 +265,6 @@ EXPORT FP_models := MODULE
     model_fp1803_1 := Models.FP1803_1_0( ungroup(FP_mod._clam), 6);
     model_fp1902_1 := Models.FP1902_1_0( FP_mod._clam_ip, 6); 
     model_di31906_0 := Models.DI31906_0_0( ungroup(FP_mod.IID_ret)); 
-    
     
     //These models use the RiskIndicies from fp1109 so they are assigned to temp variables for the joins below
     model_fp1303_1_temp := Models.FP1303_1_0( ungroup(FP_mod._clam), 6, false);
@@ -448,7 +448,9 @@ EXPORT FP_models := MODULE
                         'fp1806_1' => model_fp1806_1,
                         'fp1902_1' => model_fp1902_1,
                         'di31906_0' => model_di31906_0,
-                                      DATASET([], models.layouts.layout_fp1109) // Return blank dataset if unknown model
+                        'msn1803_1' => model_msn1803_1,
+                        'rsn804_1'  => model_rsn804_1,
+                                       DATASET([], models.layouts.layout_fp1109) // Return blank dataset if unknown model
                        );
                      
     return model_info[1];

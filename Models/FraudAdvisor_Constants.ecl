@@ -1,4 +1,4 @@
-﻿IMPORT models, risk_indicators, STD;
+﻿IMPORT models, risk_indicators, STD, riskwise, easi;
 
 
 EXPORT FraudAdvisor_Constants := MODULE
@@ -30,7 +30,7 @@ EXPORT fraudpoint3_custom_models := ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611
 //The ‘bill_to_ship_to_models’ set are models that use the new second input address that was introduced in Fraudpoint 3.0.
 EXPORT bill_to_ship_to_models := ['fp1409_2', 'fp1509_2'];
 																		 
-EXPORT Paro_models := ['msn1803_1', 'rsn804_1', 'msnrsn_1'];																		 
+EXPORT Paro_models := ['msn1803_1', 'rsn804_1'];																		 
 																		 
 //The ‘custom_models’ set are all possible models and so add any new model name to this set.  
 //The model requested must be in this set or the query will return an “Invalid model” error. 
@@ -81,7 +81,7 @@ EXPORT List_Include_RiskIndices  :=  [fraudpoint2_models, 'fp31310_2','fp1509_2'
 EXPORT List_detailed_model_description := ['ain801_1','fp31505_0','fp31505_9','fp3fdn1505_0','fp3fdn1505_9','fp1509_1','fp1510_2','fp1511_1','fp1509_2',
                                            'fp1512_1','fp31604_0','fp1610_1','fp1610_2','fp1609_1','fp1611_1','fp1606_1','fp1702_2','fp1702_1','fp1706_1',
                                            'fp1609_2','fp1607_1','fp1712_0','fp1508_1','fp1802_1','fp1705_1','fp1801_1','fp1806_1','fp1710_1','fp1803_1',
-                                           'fp1704_1','fp1902_1','di31906_0'];																							
+                                           'fp1704_1','fp1902_1','di31906_0', Paro_models];																							
 
 EXPORT FP_model_params := INTERFACE
   EXPORT Grouped Dataset(risk_indicators.Layout_Boca_Shell) _clam := Group(Dataset([], risk_indicators.Layout_Boca_Shell), seq);
@@ -89,6 +89,8 @@ EXPORT FP_model_params := INTERFACE
   EXPORT Dataset(models.layouts.bs_with_ip) _clam_ip :=  Dataset([], models.layouts.bs_with_ip);
   EXPORT Grouped Dataset(Risk_Indicators.Layout_Output) IID_ret := Group(Dataset([], Risk_Indicators.Layout_Output), seq);
   EXPORT Dataset(Models.Layouts.Layout_Model_Options) modeloptions := Dataset([], Models.Layouts.Layout_Model_Options);
+  EXPORT Dataset(riskwise.Layout_SkipTrace) _skiptrace := Dataset([], riskwise.Layout_SkipTrace);
+  EXPORT Dataset(easi.layout_census) _easicensus := Dataset([], easi.layout_census);
 END;
 
 
@@ -96,8 +98,8 @@ END;
  //All Models will get a short description sent back with the response    
 EXPORT getModel_Description( STRING model_name) := FUNCTION
 
-    FP_Model_Description := map(model_name in List_detailed_model_description	=> 'FraudPoint' + STD.STR.ToUpperCase(trim(model_name)),
-                                                                                 'FraudPoint');
+    FP_Model_Description := map(STD.STR.ToLowerCase(model_name) in List_detailed_model_description	=> 'FraudPoint' + STD.STR.ToUpperCase(trim(model_name)),
+                                                                                                       'FraudPoint');
     RETURN FP_Model_Description;
 	END;
 	
