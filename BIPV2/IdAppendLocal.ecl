@@ -3,13 +3,17 @@ import BIPV2;
 import BIPV2_Best;
 import BIPV2_Build;
 import BIPV2_Company_Names;
+import BIPV2_Contacts;
 import doxie;
 import ut;
 
 export IdAppendLocal := module
 
-	export AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend, string fetchLevel,
-	                  boolean allBest, boolean isMarketing = false) := function
+	shared defaultDataAccess := MODULE(doxie.IDataAccess) END;
+
+	export AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend, string fetchLevel
+	                  ,boolean allBest, boolean isMarketing = false
+					  ,Doxie.IDataAccess mod_access = defaultDataAccess) := function
 		isSeleBest := fetchLevel = BIPV2.IdConstants.fetch_level_seleid;
 		preBest :=
 			project(withAppend(proxid != 0 or (isSeleBest and seleid != 0)),
@@ -75,7 +79,8 @@ export IdAppendLocal := module
 				keep(1), left outer);
 
 		preContact := preBest;
-		getContact := bipv2_build.key_contact_title_linkids().kfetch2(preContact, fetchlevel);
+		getContact := bipv2_build.key_contact_title_linkids().kfetch2(preContact, fetchlevel, mod_access := mod_access);
+
 		withContact :=
 			join(withBType, getContact,
 				left.request_id = right.uniqueid
@@ -104,9 +109,10 @@ export IdAppendLocal := module
 
 	end;
 
-	export FetchRecords(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
-	                    string fetchLevel = BIPV2.IdConstants.fetch_level_proxid,
-	                    boolean dnbFullRemove = false) := function
+	export FetchRecords(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend
+	                    ,string fetchLevel = BIPV2.IdConstants.fetch_level_proxid
+	                    ,boolean dnbFullRemove = false
+						,Doxie.IDataAccess mod_access = defaultDataAccess) := function
 
 		isProxLevel := fetchlevel = BIPV2.IdConstants.fetch_level_proxid;
 
@@ -115,7 +121,9 @@ export IdAppendLocal := module
 				transform(BIPV2.IdLayouts.l_xlink_ids2,
 					self.uniqueid := left.request_id,
 					self := left));
-		headerFetch := BIPV2.Key_BH_Linking_Ids.kfetch2(preHeaderFetch, level := fetchLevel, dnbFullRemove := dnbFullRemove);
+		headerFetch := BIPV2.Key_BH_Linking_Ids.kfetch2(preHeaderFetch, level := fetchLevel
+		                 ,dnbFullRemove := dnbFullRemove
+						 ,mod_access := mod_access);
 			
 		postHeader := 
 			join(withAppend, headerFetch,
