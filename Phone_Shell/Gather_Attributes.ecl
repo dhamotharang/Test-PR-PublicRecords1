@@ -7,7 +7,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Attributes 
 																																									UNSIGNED3 InsuranceVerificationAgeLimit,
 																																									STRING30 IndustryClass,
                                          UNSIGNED2 PhoneShellVersion = 10, // default to PhoneShell V1.0, use 20 (for version 2.0) and so on for other versions
-										 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+										                               doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	/* ******************************************************************************
    ********************************************************************************
 	 ** This function gathers attributes for all of the discovered phone numbers.  **
@@ -60,7 +60,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Attributes 
 																																																			
 	withSubjectLevel := JOIN(withRawPhone, SubjectLevel, LEFT.Unique_Record_Sequence = RIGHT.Unique_Record_Sequence, TRANSFORM(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus,
 																																																			SELF.Subject_Level := RIGHT.Subject_Level,
-																																																			SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(RiskWise.max_atmost));
+																																																			SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(RiskWise.max_atmost));                                                                                           
 																																														
 	final_temp := PROJECT(SORT(withSubjectLevel, Clean_Input.seq, -LENGTH(TRIM(Sources.Source_List)), Raw_Phone_Characteristics.Phone_Subject_Level, Gathered_Phone), TRANSFORM(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus,
 																																																			SELF := LEFT));
@@ -108,6 +108,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Attributes 
 		SELF.Inquiries.Inq_Num_Addresses_06 := IF(TRIM(le.Inquiries.Inq_Num_Addresses_06) = '', '0', le.Inquiries.Inq_Num_Addresses_06);
 		SELF.Inquiries.Inq_Num_ADLs := IF(TRIM(le.Inquiries.Inq_Num_ADLs) = '', '0', le.Inquiries.Inq_Num_ADLs);
 		SELF.Inquiries.Inq_Num_ADLs_06 := IF(TRIM(le.Inquiries.Inq_Num_ADLs_06) = '', '0', le.Inquiries.Inq_Num_ADLs_06);
+		SELF.Inquiries.Inq_Num_MatchADL := IF(TRIM(le.Inquiries.Inq_Num_MatchADL) = '', '0', le.Inquiries.Inq_Num_MatchADL);
+		SELF.Inquiries.Inq_Num_MatchADL_06 := IF(TRIM(le.Inquiries.Inq_Num_MatchADL_06) = '', '0', le.Inquiries.Inq_Num_MatchADL_06);
 		
 		SELF := le;
 	END;

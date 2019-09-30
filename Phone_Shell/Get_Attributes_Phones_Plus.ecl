@@ -58,6 +58,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 																														'T$' => 'THRIVE',
 																														'WO' => 'WIRED',
 																														'WR' => 'WIRED',
+                              'N2' => 'N2CONSM',
 																														'' 	 => '',
 																																		'OTHER');
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Carrier := le.PhonesPlus_Characteristics.PhonesPlus_Carrier;
@@ -95,6 +96,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 																														'T$' => 'THRIVE',
 																														'WO' => 'WIRED',
 																														'WR' => 'WIRED',
+                              'N2' => 'N2CONSM',
 																														'' 	 => '',
 																																		'OTHER');
 		SELF.PhonesPlus_Characteristics.PhonesPlus_RP_Source := IF(reversePhoneLookup, rpSource, '');
@@ -134,7 +136,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Src := TRIM(adjusted_src);
 		Src_All := STD.Str.Reverse(ut.IntegerToBinaryString(Src_All_Masked, FALSE));
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Src_All := Src_All;
-		SELF.PhonesPlus_Characteristics.PhonesPlus_Src_Cnt := StringLib.StringFindCount(Src_All, '1');
+		SELF.PhonesPlus_Characteristics.PhonesPlus_Src_Cnt := STD.Str.FindCount(Src_All, '1');
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Src_Rule := STD.Str.Reverse(ut.IntegerToBinaryString(ri.src_rule, FALSE));
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Avg_Source_Conf := ri.append_avg_source_conf;
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Max_Source_Conf := ri.append_max_source_conf;

@@ -12,9 +12,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DA
 					STRING50 DataRestrictionMask, 
 					UNSIGNED1 PhoneRestrictionMask,
 					BOOLEAN UsePremiumSource_A = FALSE,
-                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+     UNSIGNED2 PhoneShellVersion = 10,
+     doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	
 	EquifaxAllowed :=	UsePremiumSource_A = true and Phone_Shell.Constants.EquiaxDRMCheck(DataRestrictionMask);
+ IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1
 
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getEquiFax(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhoneMart.key_phonemart_did ri) := TRANSFORM
 		SELF.Gathered_Phone := ri.phone;
@@ -34,6 +36,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DA
 		SELF.Sources.Source_Owner_Name_Middle := ri.Mname;
 		SELF.Sources.Source_Owner_Name_Last 	:=  ri.Lname;
 		SELF.Sources.Source_Owner_Name_Suffix :=  ri.name_Suffix;	
+    
+  SELF.Sources.Source_List_All_Last_Seen := if(IncludeLexIDCounts, Phone_Shell.Common.parseDate((STRING)ri.dt_last_seen), '');
+  SELF.Sources.Source_Owner_All_DIDs := if(IncludeLexIDCounts, (string)ri.DID, '');
 
 		//No relative data in the PhoneMart key...it's all for the subject only
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := Phone_Shell.Constants.Phone_Subject_Level.Subject;
@@ -61,10 +66,30 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DA
 	//if don't have the right permissions then don't allow
 	EquifaxPhones := if(EquifaxAllowed, NonLNbutEquifax, DATASET([], Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus));
 
-	EquifaxPhones_dpd := DEDUP(SORT(EquifaxPhones, Clean_Input.seq, Gathered_Phone, Sources.Source_List,
+ Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus get_Alls(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
+   self.Sources.Source_List_All_Last_Seen := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID, 
+                                                   le.Sources.Source_List_All_Last_Seen, 
+                                                   le.Sources.Source_List_All_Last_Seen + ',' + ri.Sources.Source_List_All_Last_Seen);
+   self.Sources.Source_Owner_All_DIDs := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID,
+                                               le.Sources.Source_Owner_All_DIDs,
+                                               le.Sources.Source_Owner_All_DIDs + ',' + ri.Sources.Source_Owner_All_DIDs);
+   self := le;
+ end;
+ 
+ sortedEquifax := SORT(EquifaxPhones, Clean_Input.seq, Gathered_Phone, Sources.Source_List,
 		- (integer) Sources.Source_List_Last_Seen, 
-		- (integer) Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code))), 
-		Clean_Input.seq, Gathered_Phone, Sources.Source_List);
+		- (integer) Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code)));
+
+	EquifaxPhones_dpd := if(IncludeLexIDCounts, 
+                         ROLLUP(sortedEquifax,
+                           left.Clean_Input.seq = right.Clean_Input.seq and 
+                           left.Gathered_Phone = right.Gathered_Phone and 
+                           left.Sources.Source_List = right.Sources.Source_List,
+                           get_Alls(left,right)),
+                         DEDUP(sortedEquifax, 
+		                         Clean_Input.seq, Gathered_Phone, Sources.Source_List)
+                        );
+                        
 	//resort in case the limit is 1 then take the most recent last seen record
 	final := TOPN(EquifaxPhones_dpd, Phone_Shell.Constants.Default_MaxPhones, Clean_Input.seq,Sources.Source_List,
 		-Sources.Source_List_Last_Seen, 
@@ -74,7 +99,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DA
 	// OUTPUT(EquifaxPhones_dpd, NAMED('EquifaxPhones_dpd'));
 	// OUTPUT(EquifaxPhones, NAMED('EquifaxPhones'));
 	// OUTPUT(CHOOSEN(NonLNbutEquifax, 100), NAMED('NonLNbutEquifax'));
-  // OUTPUT(CHOOSEN(WithPhoneMart, 100), NAMED('WithPhoneMart'));
+ // OUTPUT(CHOOSEN(WithPhoneMart, 100), NAMED('WithPhoneMart'));
 	// output(foundPhones, named('foundPhones'));
 
 	RETURN(final);

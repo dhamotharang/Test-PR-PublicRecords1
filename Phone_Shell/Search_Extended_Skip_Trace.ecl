@@ -1,4 +1,4 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function searches Extended Skip Trace by:													*
  * - Address (Name/City/State):: Source: SX																*
  **************************************************************************
@@ -9,7 +9,10 @@ IMPORT Doxie, Gong, NID, Phone_Shell, Progressive_Phone, RiskWise, UT, Watchdog,
 
 todays_date := (string) STD.Date.Today();
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Extended_Skip_Trace (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask, STRING50 DataRestrictionMask, UNSIGNED2 sx_match_restriction_limit = 10, BOOLEAN Strict_APSX = FALSE) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Extended_Skip_Trace (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask, STRING50 DataRestrictionMask, UNSIGNED2 sx_match_restriction_limit = 10, BOOLEAN Strict_APSX = FALSE,
+          UNSIGNED2 PhoneShellVersion = 10) := FUNCTION
+          
+ IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1
 	inputDIDSet := SET(Input, Clean_Input.DID);
 	
 	prepInput := PROJECT(Input, TRANSFORM(Progressive_Phone.Layout_Header_Seq,
@@ -38,16 +41,16 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Extended_Sk
 	/* ***************************************************************
 		* 						        	Get Blue Records						      			*
 	  *************************************************************** */
-  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
-    EXPORT string DataRestrictionMask := ^.DataRestrictionMask;
-  END;
-  glb_ok := mod_access.isValidGLB();
-  dppa_ok := mod_access.isValidDPPA();
+ mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+   EXPORT string DataRestrictionMask := ^.DataRestrictionMask;
+ END;
+ glb_ok := mod_access.isValidGLB();
+ dppa_ok := mod_access.isValidDPPA();
 
 	Progressive_Phone.Mac_Get_Blue(prepInput, blueRecords, FALSE, FALSE, FALSE, mod_access);
 	
-	sixMonths := blueRecords(src <> '' AND ut.DaysApart(StringLib.GetDateYYYYMMDD(), (STRING6)dt_last_seen + '15') <= 180
-																			OR ut.DaysApart(StringLib.GetDateYYYYMMDD(), (STRING6)dt_vendor_last_reported + '15') <= 180);
+	sixMonths := blueRecords(src <> '' AND ut.DaysApart((string8)STD.Date.Today(), (STRING6)dt_last_seen + '15') <= 180
+																			OR ut.DaysApart((string8)STD.Date.Today(), (STRING6)dt_vendor_last_reported + '15') <= 180);
 	
 	b_out_plus := RECORD
 		Progressive_Phone.Layout_Progressive_Batch_Out_With_DID;
@@ -85,7 +88,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Extended_Sk
 																													KEYED(LEFT.sec_range = RIGHT.sec_range) AND
 																													KEYED(LEFT.st = RIGHT.st) AND 
 																													RIGHT.current_flag = TRUE AND TRIM(RIGHT.phone10) <> '' AND
-																													((LENGTH(TRIM(LEFT.lname)) > 1 AND StringLib.StringFind(TRIM(RIGHT.listed_name), TRIM(LEFT.lname), 1) > 0) OR
+																													((LENGTH(TRIM(LEFT.lname)) > 1 AND STD.Str.Find(TRIM(RIGHT.listed_name), TRIM(LEFT.lname), 1) > 0) OR
 																													(LENGTH(TRIM(LEFT.fname)) > 1 AND TRIM(LEFT.fname) = TRIM(RIGHT.name_last))),
 																					by_rule_1(LEFT, RIGHT), LIMIT(ut.limits.PHONE_PER_PERSON, SKIP));
 	
@@ -239,12 +242,15 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Extended_Sk
 		SELF.Sources.Source_Owner_Name_Middle := ri.subj_middle;
 		SELF.Sources.Source_Owner_Name_Last := ri.subj_last;
 		SELF.Sources.Source_Owner_Name_Suffix := ri.subj_suffix;
-	  SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+	 SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+    
+  SELF.Sources.Source_List_All_Last_Seen := if(IncludeLexIDCounts, Phone_Shell.Common.parseDate((STRING)ri.subj_date_last), '');
+  SELF.Sources.Source_Owner_All_DIDs := if(IncludeLexIDCounts, (string)ri.DID, '');
 	
-		didMatch := StringLib.StringFind(matchcode, 'L', 1) > 0;
-		nameMatch := StringLib.StringFind(matchcode, 'N', 1) > 0;
-		addrMatch := StringLib.StringFind(matchcode, 'A', 1) > 0;
-		ssnMatch := StringLib.StringFind(matchcode, 'S', 1) > 0;
+		didMatch := STD.Str.Find(matchcode, 'L', 1) > 0;
+		nameMatch := STD.Str.Find(matchcode, 'N', 1) > 0;
+		addrMatch := STD.Str.Find(matchcode, 'A', 1) > 0;
+		ssnMatch := STD.Str.Find(matchcode, 'S', 1) > 0;
 		
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := MAP(didMatch AND nameMatch => Phone_Shell.Constants.Phone_Subject_Level.Subject,
 																															didMatch AND addrMatch => Phone_Shell.Constants.Phone_Subject_Level.Household,
@@ -263,8 +269,27 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Extended_Sk
 	END;
 	withSkipTrace := JOIN(Input, skiptrace_all, (STRING)LEFT.Clean_Input.seq = RIGHT.AcctNo, getSkipTrace(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
 	
-	final := DEDUP(SORT(withSkipTrace, Clean_Input.seq, Gathered_Phone, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code))), 
-																		 Clean_Input.seq, Gathered_Phone, Sources.Source_List);
+	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus get_Alls(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
+   self.Sources.Source_List_All_Last_Seen := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID, 
+                                                   le.Sources.Source_List_All_Last_Seen, 
+                                                   le.Sources.Source_List_All_Last_Seen + ',' + ri.Sources.Source_List_All_Last_Seen);
+   self.Sources.Source_Owner_All_DIDs := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID,
+                                               le.Sources.Source_Owner_All_DIDs,
+                                               le.Sources.Source_Owner_All_DIDs + ',' + ri.Sources.Source_Owner_All_DIDs);
+   self := le;
+ end;
+ 
+ sortedSkipTrace := SORT(withSkipTrace, Clean_Input.seq, Gathered_Phone, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code)));
+  
+	final := if(IncludeLexIDCounts,
+             ROLLUP(sortedSkipTrace,
+               left.Clean_Input.seq = right.Clean_Input.seq and 
+               left.Gathered_Phone = right.Gathered_Phone and 
+               left.Sources.Source_List = right.Sources.Source_List,
+               get_Alls(left,right)),
+             DEDUP(sortedSkipTrace, 
+																		 Clean_Input.seq, Gathered_Phone, Sources.Source_List)
+            );
 
 	RETURN(final);
 END;

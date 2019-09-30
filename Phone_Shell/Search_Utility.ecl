@@ -1,17 +1,15 @@
-﻿/*Now (lhill)
-Text In Open Window
-*/
-/*2013-11-21T00:11:15Z (Lorraine Hill)
-
-*/
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function searches Utility by:																			*
  * - LexID (DID):: Source: UtilDID																				*
  ************************************************************************ */
 
 IMPORT Phone_Shell, RiskWise, UT, Utilfile, STD, Doxie;
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Utility (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 GLBPurpose, UNSIGNED1 PhoneRestrictionMask, STRING30 IndustryClass, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Utility (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 GLBPurpose, UNSIGNED1 PhoneRestrictionMask, STRING30 IndustryClass, 
+         UNSIGNED2 PhoneShellVersion = 10, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+         
+ IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1
+         
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getUtility(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Utilfile.Key_DID ri) := TRANSFORM
 		
 		SELF.Gathered_Phone := IF((INTEGER)ri.phone <> 0, TRIM(ri.phone), TRIM(ri.work_phone));
@@ -32,10 +30,13 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Utility (DA
 		SELF.Sources.Source_Owner_Name_Suffix := ri.orig_name_suffix;
 		SELF.Sources.Source_Owner_DID := (STRING)ri.s_DID;
 		
-		didMatch := StringLib.StringFind(matchcode, 'L', 1) > 0;
-		nameMatch := StringLib.StringFind(matchcode, 'N', 1) > 0;
-		addrMatch := StringLib.StringFind(matchcode, 'A', 1) > 0;
-		ssnMatch := StringLib.StringFind(matchcode, 'S', 1) > 0;
+  SELF.Sources.Source_List_All_Last_Seen := if(IncludeLexIDCounts, Phone_Shell.Common.parseDate((STRING)STD.Date.Today()), '');
+  SELF.Sources.Source_Owner_All_DIDs := if(IncludeLexIDCounts, (string)ri.s_DID, '');    
+    
+		didMatch := STD.Str.Find(matchcode, 'L', 1) > 0;
+		nameMatch := STD.Str.Find(matchcode, 'N', 1) > 0;
+		addrMatch := STD.Str.Find(matchcode, 'A', 1) > 0;
+		ssnMatch := STD.Str.Find(matchcode, 'S', 1) > 0;
 		
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := MAP(didMatch AND nameMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Subject,
 																															didMatch AND addrMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Household,
@@ -58,7 +59,26 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Utility (DA
 																					((INTEGER)RIGHT.phone <> 0 OR (INTEGER)RIGHT.work_phone <> 0),
 																							getUtility(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
 
-	final := DEDUP(SORT(byDID, Clean_Input.seq, Gathered_Phone, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code))), Clean_Input.seq, Gathered_Phone, Sources.Source_List);
+	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus get_Alls(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
+   self.Sources.Source_List_All_Last_Seen := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID, 
+                                                   le.Sources.Source_List_All_Last_Seen, 
+                                                   le.Sources.Source_List_All_Last_Seen + ',' + ri.Sources.Source_List_All_Last_Seen);
+   self.Sources.Source_Owner_All_DIDs := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID,
+                                               le.Sources.Source_Owner_All_DIDs,
+                                               le.Sources.Source_Owner_All_DIDs + ',' + ri.Sources.Source_Owner_All_DIDs);
+   self := le;
+ end;
+ 
+ sortedUtility := SORT(byDID, Clean_Input.seq, Gathered_Phone, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code)));
+
+	final := if(IncludeLexIDCounts,
+              ROLLUP(sortedUtility,
+                left.Clean_Input.seq = right.Clean_Input.seq and 
+                left.Gathered_Phone = right.Gathered_Phone and 
+                left.Sources.Source_List = right.Sources.Source_List,
+                get_Alls(left,right)),
+              DEDUP(sortedUtility, Clean_Input.seq, Gathered_Phone, Sources.Source_List)
+             );
 
 	RETURN(final);
 END;
