@@ -1,4 +1,4 @@
-IMPORT $, Phones, Std;
+IMPORT $, Phones, Risk_Indicators, Std;
 
 EXPORT GetPhonesFinal(DATASET($.Layouts.PhoneFinder.Final) dSearchResults,
                       $.iParam.SearchParams                inMod,
@@ -7,7 +7,7 @@ FUNCTION
   // Primary phones
   dPhoneSlim := PROJECT(dSearchResults(phone != ''),
                         TRANSFORM($.Layouts.PhoneFinder.PhoneSlim,
-                                  SELF.orig_phone    := LEFT.batch_in.homephone,
+                                  SELF.orig_phone    := LEFT.phone,
                                   SELF.phone_state   := LEFT.phoneState,
                                   SELF.ListingType   := $.Functions.GetListingType( LEFT.RealTimePhone_Ext.ListingType,
                                                                                     LEFT.listing_type_bus,
@@ -65,6 +65,16 @@ FUNCTION
                           LEFT.phone  = RIGHT.phone,
                           tPhoneRollup(LEFT, RIGHT));
 
+  // Get the state where the phone account is opened
+  dPhoneState  := JOIN(dPhoneRollup,
+                        Risk_Indicators.Key_Telcordia_tds,
+                        KEYED(LEFT.phone[1..3]=RIGHT.npa) AND
+                        KEYED(LEFT.phone[4..6]=RIGHT.nxx),
+                        TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.PhoneSlim,
+                                  SELF.phone_state := RIGHT.state,
+                                  SELF             := LEFT),
+                        LEFT OUTER, LIMIT(0), KEEP(1));
+
   // Overwrite the primary phone details with the phone detail information from TU
   dPrimaryPhoneDetail := dPhoneSlim(typeflag = Phones.Constants.TypeFlag.DataSource_PV);
 
@@ -72,6 +82,7 @@ FUNCTION
   TRANSFORM
     SELF.acctno                  := le.acctno;
     SELF.phone                   := le.phone;
+    SELF.phone_state             := le.phone_state;
     SELF.phone_source            := IF(ri.phone != '', ri.phone_source, le.phone_source);
     SELF.typeflag                := IF(ri.phone != '', ri.typeflag, le.typeflag);
     SELF.Phonestatus		         := IF(ri.phone != '', ri.Phonestatus, le.Phonestatus);
@@ -136,7 +147,7 @@ FUNCTION
     SELF                         := ri;
   END;
 
-  dPhoneDetail := JOIN( dPhoneRollup,
+  dPhoneDetail := JOIN( dPhoneState,
                         dPrimaryPhoneDetail,
                         LEFT.acctno = RIGHT.acctno AND
                         LEFT.phone  = RIGHT.phone,

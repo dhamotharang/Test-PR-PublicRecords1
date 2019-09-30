@@ -12,32 +12,13 @@ FUNCTION
                             $.GetIdentitiesCount(dSearchResults),
                             dSearchResults);
 
-  // Assign the primary phone flag
-	$.Layouts.PhoneFinder.Final tPrimaryPhoneHist($.Layouts.PhoneFinder.Final le, $.Layouts.PhoneFinder.Final ri) :=
-	TRANSFORM
-		SELF.isPrimaryPhone    := TRUE;
-		SELF.isPrimaryIdentity := FALSE;
-		SELF.batch_in          := PROJECT(le.batch_in, TRANSFORM($.Layouts.BatchInAppendDID, SELF.did := ri.batch_in.did, SELF.homephone := '', SELF := LEFT));
-		SELF                   := le;
-	END;
-	
-	dPrimaryPhoneHist := JOIN(dCntPhoneIdentities(~isPrimaryIdentity),
-                            dSearchResults(isPrimaryPhone),
-                            LEFT.acctno = RIGHT.acctno AND
-                            LEFT.phone  = RIGHT.phone,
-                            tPrimaryPhoneHist(LEFT, RIGHT),
-                            LIMIT(0), KEEP(1));
+  dRemoveOtherPhoneHistory := dCntPhoneIdentities(isPrimaryIdentity OR isPrimaryPhone);
 
-  dPrimaryIdentityRecs := dCntPhoneIdentities(isPrimaryIdentity);
-
-	dSearchResultsCombined := dPrimaryIdentityRecs(~isPrimaryPhone) + dPrimaryIdentityRecs(isPrimaryPhone) + dPrimaryPhoneHist;
-  
   // Remove phone history records for other phones
-  // Need to revisit for Batch
-  dSearchResultsWCnt := IF(inMod.isPrimarySearchPII, dSearchResultsCombined, dCntPhoneIdentities);
-  
+  dSearchResultsWCnt := IF(inMod.isPrimarySearchPII, dRemoveOtherPhoneHistory, dCntPhoneIdentities);
+
   // Identities
-  dIdentitiesInfo   := $.GetIdentitiesFinal(dSearchResultsWCnt, dInBestInfo, inMod);
+  dIdentitiesInfo := $.GetIdentitiesFinal(dSearchResultsWCnt, dInBestInfo, inMod);
 
   // Primary phone
   dSearchResultsPrimaryPhone := IF(~inMod.IsPrimarySearchPII,
@@ -45,47 +26,46 @@ FUNCTION
                                     dSearchResultsWCnt(isPrimaryPhone AND phone_source in [$.Constants.PhoneSource.Waterfall, $.Constants.PhoneSource.QSentGateway]));
 
   dPrimaryPhoneInfo_pre := $.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
-	
-	// ThreatMetrix                  
+
+  // ThreatMetrix
   dDupThreatMetrixIn := PROJECT(DEDUP(SORT(dPrimaryPhoneInfo_pre, phone), phone), Phones.Layouts.PhoneAcctno);
-  
+
   dPrimaryThreatMetrixRecs := Phones.GetThreatMetrixRecords(dDupThreatMetrixIn, inMod.UseThreatMetrixRules, dGateways);
-                                
-  $.Layouts.PhoneFinder.PhoneSlim getThreatMetrix($.Layouts.PhoneFinder.PhoneSlim l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM  
-   SELF.ReasonCodes := r.response.Summary.ReasonCodes;
-   SELF.TmxVariables := r.response._data.TmxVariables;
-   SELF := l;
+
+  $.Layouts.PhoneFinder.PhoneSlim getThreatMetrix($.Layouts.PhoneFinder.PhoneSlim l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM
+    SELF.ReasonCodes  := r.response.Summary.ReasonCodes;
+    SELF.TmxVariables := r.response._data.TmxVariables;
+    SELF              := l;
   END;
- 
-  dPrepPrimaryThreatMetrix	:= JOIN(dPrimaryPhoneInfo_pre,
+
+  dPrepPrimaryThreatMetrix := JOIN(dPrimaryPhoneInfo_pre,
                                     dPrimaryThreatMetrixRecs,
                                     LEFT.phone = RIGHT.response._Data.AccountTelephone.Content_,
-                                    getThreatMetrix(LEFT, RIGHT), LEFT OUTER, LIMIT(0), KEEP(1));
-                         
-                         
+                                    getThreatMetrix(LEFT, RIGHT),
+                                    LEFT OUTER, LIMIT(0), KEEP(1));
+
   dPrimaryPhoneInfo := IF(inMod.UseThreatMetrixRules, dPrepPrimaryThreatMetrix, dPrimaryPhoneInfo_pre);
-  
+
   // Other phones
   dSearchResultsOtherPhones := IF(inMod.isPrimarySearchPII, dSearchResultsWCnt(~isPrimaryPhone));
-  
+
   dOtherPhoneInfo := $.GetPhonesFinal(dSearchResultsOtherPhones, inMod, FALSE);
 
   // Prep for Risk indicator calculation
   // Format identities to Final layout
   dIdentitiesFormat2Final := PROJECT(dIdentitiesInfo,
                                       TRANSFORM($.Layouts.PhoneFinder.Final,
-                                                SELF.isPrimaryIdentity := FALSE,
                                                 SELF.isPrimaryPhone    := FALSE,
                                                 SELF.dt_first_seen     := (STRING)LEFT.dt_first_seen,
                                                 SELF.dt_last_seen      := (STRING)LEFT.dt_last_seen,
                                                 SELF.is_verified       := LEFT.is_identity_verified OR LEFT.is_phone_verified,
                                                 SELF := LEFT, SELF := []));
-  
+
   // Identify Primary identity and pass only the top identity record for RI calculation
-	// Input did should be on top of identities
-  dIdentityInfoGrp := SORT(GROUP(SORT(dIdentitiesFormat2Final, acctno), acctno), IF(did != 0, 0, 1),
-                           IF(InputDID !=0, did != InputDID, FALSE), IF(PhoneOwnershipIndicator, 0, 1), penalt, -dt_last_seen, IF(dt_first_seen != '', dt_first_seen, '99999999'), phone_source, RECORD);
-  
+  dIdentityInfoGrp := SORT(GROUP(SORT(dIdentitiesFormat2Final, acctno), acctno), IF(isPrimaryIdentity, 0, 1), IF(PhoneOwnershipIndicator, 0, 1),
+                            IF(InputDID != 0 AND did = InputDID, 0, 1), IF(inMod.isPrimarySearchPII, 0, penalt), IF(did != 0, 0, 1), -dt_last_seen,
+                            IF(dt_first_seen != '', dt_first_seen, '99999999'), phone_source, RECORD);
+
   dPrepIdentityForRI := UNGROUP(ITERATE(dIdentityInfoGrp,
                                         TRANSFORM($.Layouts.PhoneFinder.Final,
                                                   SELF.isPrimaryIdentity := (COUNTER = 1),
@@ -123,39 +103,20 @@ FUNCTION
                                         SELF.RealTimePhone_Ext := RIGHT,
                                         SELF.isLNameMatch      := STD.Str.findword(TRIM(IF(RIGHT.ListingName != '', RIGHT.ListingName, LEFT.listed_name)),TRIM(LEFT.lname), TRUE),
                                         SELF := RIGHT, SELF := LEFT),
-                              LEFT OUTER,
-                              LIMIT(0), KEEP(1));
-  
-  dPrepPrimaryPhoneOnlyForRIs := JOIN(dPrepPrimaryForRIs,
-                                      dPrimaryPhoneInfo,
-                                      LEFT.acctno = RIGHT.acctno,
-                                      TRANSFORM($.Layouts.PhoneFinder.Final,
-                                                SELF.isPrimaryPhone    := TRUE;
-                                                SELF.phone             := RIGHT.phone,
-                                                SELF.dt_first_seen     := (STRING)RIGHT.dt_first_seen,
-                                                SELF.dt_last_seen      := (STRING)RIGHT.dt_last_seen,
-                                                SELF.listed_name       := RIGHT.ListingName,
-                                                SELF.phoneState        := RIGHT.phone_state,
-                                                SELF.listing_type_res  := IF(STD.Str.Find(RIGHT.ListingType, 'RESIDENTIAL') > 0, 'R', ''),
-                                                SELF.listing_type_bus  := IF(STD.Str.Find(RIGHT.ListingType, 'BUSINESS') > 0, 'B', ''),
-                                                SELF.listing_type_gov  := IF(STD.Str.Find(RIGHT.ListingType, 'GOVERNMENT') > 0, 'G', ''),
-                                                SELF.RealTimePhone_Ext := RIGHT,
-                                                SELF := RIGHT, SELF := []),
-                                      RIGHT ONLY);
-  
-  // Combine primary identity and phone
-  dPrimaryForRIs := dPrepPrimaryForRIs + dPrepPrimaryPhoneOnlyForRIs;
+                              FULL OUTER,
+                              LIMIT(1, SKIP));
 
   // Other identities
-  dOtherIdentities := dPrepIdentityForRI(~isPrimaryIdentity);
+  dOtherIdentities := PROJECT(dPrepIdentityForRI(~isPrimaryIdentity), TRANSFORM($.Layouts.PhoneFinder.Final, SELF.isPrimaryPhone := TRUE, SELF := LEFT));
 
   // Other phones
   // Other phones would only exist for a PII search. Hence, we can blindly assign the deceased indicator just using the acctno
   dPrepOtherPhonesForRIs := JOIN( dOtherPhoneInfo,
-                                  dPrimaryForRIs,
+                                  dPrepPrimaryForRIs,
                                   LEFT.acctno = RIGHT.acctno,
                                   TRANSFORM($.Layouts.PhoneFinder.Final,
                                             SELF.isPrimaryPhone    := FALSE,
+                                            SELF.isPrimaryIdentity := FALSE,
                                             SELF.deceased          := RIGHT.deceased,
                                             SELF.dt_first_seen     := (STRING)LEFT.dt_first_seen,
                                             SELF.dt_last_seen      := (STRING)LEFT.dt_last_seen,
@@ -165,61 +126,63 @@ FUNCTION
                                             SELF.listing_type_bus  := IF(STD.Str.Find(LEFT.ListingType, 'BUSINESS') > 0, 'B', ''),
                                             SELF.listing_type_gov  := IF(STD.Str.Find(LEFT.ListingType, 'GOVERNMENT') > 0, 'G', ''),
                                             SELF.RealTimePhone_Ext := LEFT,
-                                            SELF.isLNameMatch      := STD.Str.findword(TRIM(LEFT.ListingName),TRIM(RIGHT.lname), TRUE),                                          
+                                            SELF.isLNameMatch      := STD.Str.findword(TRIM(LEFT.ListingName),TRIM(RIGHT.lname), TRUE),
                                             SELF := LEFT, SELF := []),
                                     LIMIT(0), KEEP(1));
-  
+
   // Send primary and other phones for RI calculation
-  dPrepForRIs_pre_info := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
+  dPrepForRIs_pre_info := dPrepPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
 
   //Calculte the count of phones in response
   dPhonesIn := PROJECT(dPrepForRIs_pre_info, TRANSFORM({$.Layouts.PhoneFinder.Final.phone}, SELF.phone := LEFT.phone));
-  
+
   Threshold_PhoneTransactionCount := inMod.RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount)[1].Threshold;
 
-  dPhoneTransactionsCount := IF(inMod.hasActivePhoneTransactionCountRule, $.GetPhoneTransactionCount(dPhonesIn(phone != ''), Threshold_PhoneTransactionCount)); 
+  dPhoneTransactionsCount := IF(inMod.hasActivePhoneTransactionCountRule, $.GetPhoneTransactionCount(dPhonesIn(phone != ''), Threshold_PhoneTransactionCount));
 
   dPrepForRIs_pre := JOIN(dPrepForRIs_pre_info, dPhoneTransactionsCount,
-                        LEFT.phone = RIGHT.phone,
-                        TRANSFORM($.Layouts.PhoneFinder.Final, SELF.phone_inresponse_count := RIGHT.phonecount, SELF:= LEFT),
-                        LEFT OUTER);
+                          LEFT.phone = RIGHT.phone,
+                          TRANSFORM($.Layouts.PhoneFinder.Final, SELF.phone_inresponse_count := RIGHT.phonecount, SELF:= LEFT),
+                          LEFT OUTER, LIMIT(0), KEEP(1));
 
-  dPrepForRIs := IF(EXISTS(dPrepForRIs_pre),
-                    dPrepForRIs_pre,
-                    PROJECT(dProcessInput,
-                            TRANSFORM($.Layouts.PhoneFinder.Final, 
-                                      SELF.phone          := LEFT.homephone,
-                                      SELF.fname          := LEFT.name_first,
-                                      SELF.lname          := LEFT.name_last,
-                                      SELF.prim_name      := LEFT.prim_name, 
-                                      SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for "no identity and no phone"
-                                      SELF                := [])));
-
+  // Need this if we didn't find any results for phone or PII search to trigger No Identity or No phone RIs
+  dPrepForRIs := JOIN(dProcessInput,
+                      dPrepForRIs_pre,
+                      LEFT.acctno = RIGHT.acctno,
+                      TRANSFORM($.Layouts.PhoneFinder.Final,
+                                BOOLEAN isResExists := RIGHT.acctno != '';
+                                SELF.phone          := IF(isResExists, RIGHT.phone, LEFT.homephone),
+                                SELF.fname          := IF(isResExists, RIGHT.fname, LEFT.name_first),
+                                SELF.lname          := IF(isResExists, RIGHT.lname, LEFT.name_last),
+                                SELF.prim_name      := IF(isResExists, RIGHT.prim_name, LEFT.prim_name),
+                                SELF.isPrimaryPhone := IF(isResExists, RIGHT.isPrimaryPhone, TRUE), // This will process the RiskIndicators for "no identity and no phone"
+                                SELF                := RIGHT,
+                                SELF                := []),
+                      LEFT OUTER,
+                      LIMIT(100, SKIP));
 
   dRIs := IF(inMod.IncludeRiskIndicators, $.CalculatePRIs(dPrepForRIs, inMod));
-  
+
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,
                 inMod.IncludeRiskIndicators                                           => dRIs + dPrepOtherPhonesForRIs + dOtherIdentities,
-                dPrimaryForRIs + dPrepOtherPhonesForRIs + dOtherIdentities);
+                dPrepPrimaryForRIs + dPrepOtherPhonesForRIs + dOtherIdentities);
 
   #IF($.Constants.Debug.Main)
-		OUTPUT(dCntPhoneIdentities, NAMED('dCntPhoneIdentities'));
-		OUTPUT(dPrimaryPhoneHist, NAMED('dPrimaryPhoneHist'));
-		OUTPUT(dPrimaryIdentityRecs, NAMED('dPrimaryIdentityRecs'));
-		OUTPUT(dSearchResultsCombined, NAMED('dSearchResultsCombined'));
-    OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo_PRI'));
-    OUTPUT(dSearchResultsPrimaryPhone, NAMED('dSearchResultsPrimaryPhone_PRI'));
-    IF(inMod.isPrimarySearchPII, OUTPUT(dSearchResultsOtherPhones, NAMED('dSearchResultsOtherPhones_PRI')));
-    IF(inMod.isPrimarySearchPII, OUTPUT(dOtherPhoneInfo, NAMED('dOtherPhoneInfo_PRI')));
-    OUTPUT(dIdentitiesFormat2Final, NAMED('dIdentitiesFormat2Final_PRI'));
-    OUTPUT(dPrepIdentityForRI, NAMED('dPrepIdentityForRI_PRI'));
-    OUTPUT(dPrepPrimaryForRIs, NAMED('dPrepPrimaryForRIs_PRI'));
-    OUTPUT(dPrepPrimaryPhoneOnlyForRIs, NAMED('dPrepPrimaryPhoneOnlyForRIs_PRI'));
-    OUTPUT(dPrimaryForRIs, NAMED('dPrimaryForRIs_PRI'));
-    OUTPUT(dOtherIdentities, NAMED('dOtherIdentities_PRI'));
-    IF(inMod.isPrimarySearchPII, OUTPUT(dPrepOtherPhonesForRIs, NAMED('dPrepOtherPhonesForRIs_PRI')));
-    IF(inMod.IncludeRiskIndicators, OUTPUT(dPrepForRIs, NAMED('dPrepForRIs_PRI')));
-    IF(inMod.IncludeRiskIndicators, OUTPUT(dRIs, NAMED('dRIs_PRI')));
+    OUTPUT(dCntPhoneIdentities, NAMED('dCntPhoneIdentities'), EXTEND);
+    OUTPUT(dRemoveOtherPhoneHistory, NAMED('dRemoveOtherPhoneHistory'), EXTEND);
+    OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo_PRI'), EXTEND);
+    OUTPUT(dSearchResultsPrimaryPhone, NAMED('dSearchResultsPrimaryPhone_PRI'), EXTEND);
+    IF(inMod.isPrimarySearchPII, OUTPUT(dSearchResultsOtherPhones, NAMED('dSearchResultsOtherPhones_PRI'), EXTEND));
+    IF(inMod.isPrimarySearchPII, OUTPUT(dOtherPhoneInfo, NAMED('dOtherPhoneInfo_PRI'), EXTEND));
+    OUTPUT(dIdentitiesFormat2Final, NAMED('dIdentitiesFormat2Final_PRI'), EXTEND);
+    OUTPUT(dPrepIdentityForRI, NAMED('dPrepIdentityForRI_PRI'), EXTEND);
+    OUTPUT(dPrepPrimaryForRIs, NAMED('dPrepPrimaryForRIs_PRI'), EXTEND);
+    OUTPUT(dOtherIdentities, NAMED('dOtherIdentities_PRI'), EXTEND);
+    IF(inMod.isPrimarySearchPII, OUTPUT(dPrepOtherPhonesForRIs, NAMED('dPrepOtherPhonesForRIs_PRI'), EXTEND));
+    IF(inMod.IncludeRiskIndicators, OUTPUT(dPrepForRIs_pre_info, NAMED('dPrepForRIs_pre_info_PRI'), EXTEND));
+    IF(inMod.IncludeRiskIndicators, OUTPUT(dPrepForRIs_pre, NAMED('dPrepForRIs_pre_PRI'), EXTEND));
+    IF(inMod.IncludeRiskIndicators, OUTPUT(dPrepForRIs, NAMED('dPrepForRIs_PRI'), EXTEND));
+    IF(inMod.IncludeRiskIndicators, OUTPUT(dRIs, NAMED('dRIs_PRI'), EXTEND));
   #END
 
   RETURN dFinal;
