@@ -1,10 +1,11 @@
-IMPORT AutoHeaderI, AutoStandardI, Business_Header, Business_Header_SS, Corp2, DCA, doxie_cbrs, 
-  LiensV2, LN_PropertyV2, UCCv2, BankruptcyV3, ut, STD;
+﻿IMPORT AutoHeaderI, AutoStandardI, Business_Header, Business_Header_SS, Corp2, DCA, doxie_cbrs, 
+  LiensV2, LN_PropertyV2, UCCv2, BankruptcyV3, ut, STD, doxie, Suppress;
 
 EXPORT RollupBusiness_BatchService_Records(
 	DATASET(RollupBusiness_BatchService_Layouts.Input) indata,
 	RollupBusiness_BatchService_Interfaces.Input args) := MODULE
-	
+  
+	SHARED mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 	SHARED limits := RollupBusiness_BatchService_Constants.Limits;
 	
 	// First, project into the layout for Business Header Fetch.
@@ -465,9 +466,13 @@ EXPORT RollupBusiness_BatchService_Records(
 		
 	// Get executives
 	glb_ok:=ut.PermissionTools.glb.ok(AutoStandardI.InterfaceTranslator.glb_purpose.val(PROJECT(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.glb_purpose.params)));
-	Contacts_byBDID_a := JOIN(Deduped_GroupId_Results,Business_Header.Key_Business_Contacts_BDID,
+	
+  Contacts_byBDID_pre := JOIN(Deduped_GroupId_Results,Business_Header.Key_Business_Contacts_BDID,
 		KEYED(LEFT.related_bdid = RIGHT.bdid),
 		KEEP(limits.CONTACTS_KEEP));	
+    
+  Contacts_byBDID_a := Suppress.MAC_SuppressSource(Contacts_byBDID_pre, mod_access);
+    
 	SHARED Contacts_byBDID := Contacts_byBDID_a(~glb or glb_ok);
 	SHARED Contacts_withTitle := JOIN(Contacts_byBDID,doxie_cbrs.executive_titles,
 		LEFT.company_title = RIGHT.stored_title);
