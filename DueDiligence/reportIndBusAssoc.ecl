@@ -3,7 +3,7 @@
 
 /*
 	Following Keys being used:
-			Risk_Indicators.Key_Sic_Description
+      Risk_Indicators.Key_Sic_Description
       Codes.Key_NAICS
 */
 EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
@@ -14,33 +14,45 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                           
 
     //convert those that have associated businesses, regardless of any BEOs
-    convertToBusiness := NORMALIZE(inData, LEFT.perBusinessAssociations(seleID > 0), TRANSFORM({UNSIGNED6 inquiredDID, DueDiligence.Layouts.CleanedData, DueDiligence.Layouts.BusAsscoiations perBusAssoc},
+    convertToBusiness := NORMALIZE(inData, LEFT.perBusinessAssociations(seleID > 0), TRANSFORM({UNSIGNED6 inquiredDID, DueDiligence.Layouts.Busn_Internal, DueDiligence.Layouts.BusAsscoiations perBusAssoc},
                                                                                                 SELF.inquiredDID := LEFT.inquiredDID;
-                                                                                                SELF.cleanedInput.business.BIP_IDs.UltID.LinkID := RIGHT.ultID;
-                                                                                                SELF.cleanedInput.business.BIP_IDs.OrgID.LinkID := RIGHT.orgID;
-                                                                                                SELF.cleanedInput.business.BIP_IDs.SeleID.LinkID := RIGHT.seleID;
-                                                                                                SELF.cleanedInput.business.inputSeq := LEFT.seq;
-                                                                                                SELF.cleanedInput.historyDateYYYYMMDD := LEFT.historyDate;
-                                                                                                SELF.inputecho.inputSeq := LEFT.seq;
+                                                                                                SELF.busn_info.BIP_IDs.SeleID.LinkID := RIGHT.seleID;
+                                                                                                SELF.busn_info.inputSeq := LEFT.seq;
+                                                                                                SELF.busn_input.inputSeq := LEFT.seq;
                                                                                                 SELF.perBusAssoc := RIGHT;
                                                                                                 SELF := [];));
                                                                                     
     uniqueBusinessID := PROJECT(convertToBusiness, TRANSFORM(RECORDOF(LEFT), 
-                                                              SELF.inputecho.seq := COUNTER; 
-                                                              SELF.cleanedInput.seq := COUNTER;
+                                                              SELF.seq := COUNTER; 
                                                               SELF := LEFT;));
+
+
+
+
+
+
+    //========================================================================================
+    //  This section retrieves information specific to the associated business:
+    //       Name
+    //       Address
+    //       Structure
+    //       BEOs (Business Executive Officers)
+    //========================================================================================
                                                               
-    layoutForBusInfo := PROJECT(uniqueBusinessID, TRANSFORM(DueDiligence.Layouts.CleanedData, SELF := LEFT));																													
+    layoutForBusInfo := PROJECT(uniqueBusinessID, TRANSFORM(DueDiligence.Layouts.Busn_Internal, SELF := LEFT));																													
 
     //retrieve the best info for a business
-    busInfo := DueDiligence.getBusInformation(options, linkingOptions).GetBusinessBestDataWithPII(layoutForBusInfo);
+    busInfo := DueDiligence.getBusInformation(options, linkingOptions).GetBusinessBestDataWithLexID(layoutForBusInfo);
+    
+    //based on the best address for a given business - determine if their address type is residential or business
+    getAddressType := DueDiligence.CommonAddress.GetKeyAddr1HistoryResidentialOrBusiness(busInfo, 'busn_info.address');
 
-    populateBusiness := JOIN(busInfo, uniqueBusinessID,
-                              LEFT.seq = RIGHT.inputEcho.seq,
+    populateBusiness := JOIN(getAddressType, uniqueBusinessID,
+                              LEFT.seq = RIGHT.seq,
                               TRANSFORM(DueDiligence.LayoutsInternalReport.IndivBusAssociationLayout,
                                         SELF.seq := LEFT.seq;
                                         SELF.inquiredDID := RIGHT.inquiredDID;
-                                        SELF.inputSeq := LEFT.busn_info.inputSeq;
+                                        SELF.inputSeq := RIGHT.busn_info.inputSeq;
                                         SELF.ultID := LEFT.busn_info.BIP_IDs.UltID.LinkID;
                                         SELF.orgID := LEFT.busn_info.BIP_IDs.OrgID.LinkID;
                                         SELF.seleID := LEFT.busn_info.BIP_IDs.SeleID.LinkID;
@@ -52,7 +64,7 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                                                                     address.sec_range, address.city, address.state, address.zip5,
                                                                                                     address.zip4, address.county, DueDiligence.Constants.EMPTY,
                                                                                                     address.streetAddress1, address.streetAddress2);
-                                        SELF.association.BusinessAddressType := advo.Lookup_Descriptions.Record_Type_Description_lookup(address.rec_type);
+                                        SELF.association.BusinessAddressType := Advo.Lookup_Descriptions.fn_resbus(LEFT.Residential_OR_Business_Best);
                                         SELF.association.LexID := LEFT.busn_info.lexID;
                                         SELF.association.StructureType := RIGHT.perBusAssoc.structure;
                                         SELF.association.ExecutiveOfficers := NORMALIZE(RIGHT.perBusAssoc.beos, LEFT.positions, 
@@ -67,12 +79,19 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
 
 
+
+    //========================================================================================
+    //  This section retrieves information specific to the associated business:
+    //       SIC (Standard Industrial Classification)
+    //       NAICS (North American Industry Classification System)
+    //========================================================================================
+
     //get the SIC/NAIC descriptions
     industryRisk := NORMALIZE(uniqueBusinessID, (LEFT.perBusAssoc.sicNAICRisk.bestSic + LEFT.perBusAssoc.sicNAICRisk.bestNAICS + LEFT.perBusAssoc.sicNAICRisk.highestRisk)(code <> DueDiligence.Constants.EMPTY),
                               TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED6 inputSeq, DueDiligence.Layouts.SICNAICRating, STRING8 rawCode, iesp.duediligencepersonreport.t_DDRIndustryRisk espRisk},
-                                        SELF.seq := LEFT.inputecho.seq;
-                                        SELF.inputSeq := LEFT.inputecho.inputSeq;
-                                        SELF.seleID := LEFT.cleanedInput.business.BIP_IDS.SeleID.LinkID;																				
+                                        SELF.seq := LEFT.seq;
+                                        SELF.inputSeq := LEFT.busn_input.inputSeq;
+                                        SELF.seleID := LEFT.busn_info.BIP_IDs.SeleID.LinkID;																				
                                         
                                         tempSic := TRIM(RIGHT.code) + '00000000';
                                         newSic := tempSic[1..8];
@@ -83,11 +102,11 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                         SELF := RIGHT;
                                         SELF := [];));
                                                                     
-    // filter out sic and naics
+    //filter out sic and naics
     sicOnly := industryRisk(sicNAICSIndicator = DueDiligence.Constants.INDUSTRY_INDICATOR_SIC);
     naicsOnly := industryRisk(sicNAICSIndicator = DueDiligence.Constants.INDUSTRY_INDICATOR_NAICS);
                                                                       
-    // get descriptions
+    //get descriptions
     sicDescriptions := JOIN(sicOnly, Risk_Indicators.Key_Sic_Description,
                             LEFT.code = RIGHT.sic_code,
                             TRANSFORM(RECORDOF(LEFT),	
@@ -112,7 +131,7 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                               KEEP(1)); // should only be 1 matching naics code on right					 
 
 
-    // add the descriptions back together
+    //add the descriptions back together
     addIndustryCodes := DENORMALIZE(populateBusiness, sicDescriptions + naicDiscriptions,
                                     LEFT.seq = RIGHT.seq AND
                                     LEFT.inputSeq = RIGHT.inputSeq AND
@@ -126,36 +145,37 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
 
 
+
+
+    //========================================================================================
+    //  This section retrieves information specific to the associated business:
+    //       Registered Agents
+    //========================================================================================
+
     //grab the registered agents
     agents := NORMALIZE(uniqueBusinessID, LEFT.perBusAssoc.registeredAgents,
-                        TRANSFORM({DueDiligence.Layouts.CleanedData clean, UNSIGNED6 agentBusID, BOOLEAN agentIsBus, DueDiligence.Layouts.SlimIndividual agent, DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout bus},
+                        TRANSFORM({DueDiligence.Layouts.CleanedData clean, UNSIGNED6 agentBusID, BOOLEAN agentIsBus, DueDiligence.Layouts.SlimIndividual agent, {DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED6 inquiredInputSeqID} bus},
+                                  
                                   agentsAreBusiness := RIGHT.fullName <> DueDiligence.Constants.EMPTY;
                                   
                                   SELF.clean.cleanedInput.business.companyName := IF(agentsAreBusiness, RIGHT.fullname, DueDiligence.Constants.EMPTY);
                                   SELF.clean.cleanedInput.business.address := IF(agentsAreBusiness, RIGHT);
-                                  
-                                  SELF.clean.cleanedInput.business.BIP_IDs.UltID.LinkID := DueDiligence.Constants.NUMERIC_ZERO;
-                                  SELF.clean.cleanedInput.business.BIP_IDs.OrgID.LinkID := DueDiligence.Constants.NUMERIC_ZERO;
-                                  SELF.clean.cleanedInput.business.BIP_IDs.SeleID.LinkID := DueDiligence.Constants.NUMERIC_ZERO;
-                                  
-                                  
-                                  SELF.clean.cleanedInput.fullCleanAddressExists := TRUE;
+
                                   SELF.clean.cleanedInput.individual.name := IF(agentsAreBusiness = FALSE, RIGHT);
                                   SELF.clean.cleanedInput.individual.address := IF(agentsAreBusiness = FALSE, RIGHT);
                                   
                                   SELF.agentIsBus := agentsAreBusiness;
-                                  SELF.agentBusID := LEFT.inputecho.seq;
+                                  SELF.agentBusID := LEFT.seq;
                                   
-                                  SELF.bus.seq := LEFT.inputecho.seq;
-                                  SELF.bus.ultID := LEFT.cleanedInput.business.BIP_IDs.UltID.LinkID;
-                                  SELF.bus.orgID := LEFT.cleanedInput.business.BIP_IDs.OrgID.LinkID;
-                                  SELF.bus.SeleID := LEFT.cleanedInput.business.BIP_IDs.SeleID.LinkID;
+                                  SELF.bus.seq := LEFT.seq;
+                                  SELF.bus.SeleID := LEFT.busn_info.BIP_IDs.SeleID.LinkID;
+                                  SELF.bus.inquiredInputSeqID := LEFT.busn_info.inputSeq;
                                   
                                   SELF.agent := RIGHT;
                                   SELF.clean := LEFT;
                                   SELF := [];));
                                                                                     
-    uniqueAgentID := PROJECT(agents, TRANSFORM({DATASET(DueDiligence.Layouts.CleanedData) clean, UNSIGNED6 agentBusID, BOOLEAN agentIsBus, DueDiligence.Layouts.SlimIndividual agent, DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout bus},
+    uniqueAgentID := PROJECT(agents, TRANSFORM({DATASET(DueDiligence.Layouts.CleanedData) clean, UNSIGNED6 agentBusID, BOOLEAN agentIsBus, DueDiligence.Layouts.SlimIndividual agent, {DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED6 inquiredInputSeqID} bus},
                                                 SELF.clean := DATASET([TRANSFORM(DueDiligence.Layouts.CleanedData,
                                                                                   SELF.inputecho.seq := COUNTER;
                                                                                   SELF.cleanedInput.seq := COUNTER;
@@ -163,7 +183,8 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                 SELF := LEFT;
                                                 SELF := [];));
                                                 
-    // get LexIDs
+                                              
+    //get LexIDs
     busAgents := uniqueAgentID(agentIsBus);
     indAgents := uniqueAgentID(agentIsBus = FALSE);
 
@@ -171,7 +192,7 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     indLexIDs := DueDiligence.getIndInformation(options).GetIndividualBestDataWithPII(indAgents.clean);
                                         
                                         
-                                        
+                                          
     //retrieve LexIDs                                               
     addBusAgentLexID := JOIN(uniqueAgentID, busLexIDs,
                             LEFT.clean[1].inputEcho.seq = RIGHT.seq,
@@ -197,7 +218,7 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                     SELF.ultID := LEFT.bus.ultID;
                                                     SELF.orgID := LEFT.bus.orgID;
                                                     SELF.seleID := LEFT.bus.seleID;
-                                                    SELF.inputSeq := LEFT.clean[1].cleanedInput.business.inputSeq;
+                                                    SELF.inputSeq := LEFT.bus.inquiredInputSeqID;
                                                     
                                                     espName := iesp.ECL2ESP.SetName(LEFT.agent.firstName, LEFT.agent.middleName, LEFT.agent.lastName, LEFT.agent.suffix, DueDiligence.Constants.EMPTY, LEFT.agent.fullName);
                                                     
@@ -230,7 +251,7 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                             SELF := LEFT;),
                                 LEFT OUTER);
                                 
-                                
+                              
     //roll the associated businesses up to the inqured
     businessDS := PROJECT(addRegisteredAgents, TRANSFORM({UNSIGNED6 inputSeq, UNSIGNED6 inquiredDID, DATASET(iesp.duediligencepersonreport.t_DDRBusinessAssocationDetails) busAssocs}, 
                                                           SELF.inputSeq := LEFT.inputSeq;
@@ -262,7 +283,9 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     // OUTPUT(convertToBusiness, NAMED('convertToBusiness'));
     // OUTPUT(uniqueBusinessID, NAMED('uniqueBusinessID'));
+    // OUTPUT(layoutForBusInfo, NAMED('layoutForBusInfo'));
     // OUTPUT(busInfo, NAMED('busInfo'));
+    // OUTPUT(getAddressType, NAMED('getAddressType'));
     // OUTPUT(populateBusiness, NAMED('populateBusiness'));
 
     // OUTPUT(industryRisk, NAMED('industryRisk'));
