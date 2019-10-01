@@ -1273,44 +1273,59 @@ EXPORT ConsumerIIDrep1Layout	:= RECORD
 	
 //BIID20 Testseeds layout 1
 	EXPORT BIID20Testseedslayout1 := record 
-										in_key;
-		BusinessInstantID20_Services.Layouts.BatchInputEchoLayout;
-		BusinessInstantID20_Services.Layouts.BatchVerifiedLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.BatchVerificationLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.BatchBestInfoLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.BatchLinkIDsLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.BatchBusinessVerificationLayout;
-		BusinessInstantID20_Services.Layouts.RiskIndicatorLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.Business2ExecLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.ResidentialBusLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.BatchVerificationSummariesLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.BusinessByPhoneLayout AND NOT [Seq, bus_phone_match_ultid_1, bus_phone_match_orgid_1, bus_phone_match_proxid_1, bus_phone_match_powid_1,bus_phone_match_seleid_1, bus_phone_match_ultid_2, bus_phone_match_orgid_2, bus_phone_match_proxid_2, bus_phone_match_powid_2,bus_phone_match_seleid_2, bus_phone_match_ultid_3, bus_phone_match_orgid_3, bus_phone_match_proxid_3, bus_phone_match_powid_3,bus_phone_match_seleid_3];
-		BusinessInstantID20_Services.Layouts.PhonesByAddressLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.BusinessByFEINLayout AND NOT [Seq, bus_fein_match_ultid_1, bus_fein_match_orgid_1, bus_fein_match_proxid_1, bus_fein_match_powid_1,bus_fein_match_seleid_1, bus_fein_match_ultid_2, bus_fein_match_orgid_2, bus_fein_match_proxid_2, bus_fein_match_powid_2,bus_fein_match_seleid_2, bus_fein_match_ultid_3, bus_fein_match_orgid_3, bus_fein_match_proxid_3, bus_fein_match_powid_3,bus_fein_match_seleid_3];
-		BusinessInstantID20_Services.Layouts.WatchlistLayoutFlat AND NOT [bus_watchlist_entitydate_1,bus_watchlist_publisheddate_1,bus_watchlist_entitydate_2,bus_watchlist_publisheddate_2,bus_watchlist_entitydate_3,bus_watchlist_publisheddate_3,bus_watchlist_entitydate_4,bus_watchlist_publisheddate_4,bus_watchlist_entitydate_5,bus_watchlist_publisheddate_5,bus_watchlist_entitydate_6,bus_watchlist_publisheddate_6,bus_watchlist_entitydate_7,bus_watchlist_publisheddate_7];
-		BusinessInstantID20_Services.Layouts.BatchFirmographicLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.BatchPersonRoleLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.BatchParentLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.SBFEVerificationLayout AND NOT [Seq];
-		BusinessInstantID20_Services.Layouts.BusinessAddressRiskLayout AND NOT [Seq];
-		//BusinessInstantID20_Services.Layouts.OutputLayout_batch;
-END;
+    in_key;
+    BusinessInstantID20_Services.Layouts.BatchInputEchoLayout;
+    BusinessInstantID20_Services.Layouts.BatchVerifiedLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.BatchVerificationLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.BatchBestInfoLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.BatchLinkIDsLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.BatchBusinessVerificationLayout;
+    BusinessInstantID20_Services.Layouts.RiskIndicatorLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.Business2ExecLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.ResidentialBusLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.BatchVerificationSummariesLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.BusinessByPhoneLayout AND NOT [Seq, bus_phone_match_ultid_1, bus_phone_match_orgid_1, bus_phone_match_proxid_1, bus_phone_match_powid_1,bus_phone_match_seleid_1, bus_phone_match_ultid_2, bus_phone_match_orgid_2, bus_phone_match_proxid_2, bus_phone_match_powid_2,bus_phone_match_seleid_2, bus_phone_match_ultid_3, bus_phone_match_orgid_3, bus_phone_match_proxid_3, bus_phone_match_powid_3,bus_phone_match_seleid_3];
+    BusinessInstantID20_Services.Layouts.PhonesByAddressLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.BusinessByFEINLayout AND NOT [Seq, bus_fein_match_ultid_1, bus_fein_match_orgid_1, bus_fein_match_proxid_1, bus_fein_match_powid_1,bus_fein_match_seleid_1, bus_fein_match_ultid_2, bus_fein_match_orgid_2, bus_fein_match_proxid_2, bus_fein_match_powid_2,bus_fein_match_seleid_2, bus_fein_match_ultid_3, bus_fein_match_orgid_3, bus_fein_match_proxid_3, bus_fein_match_powid_3,bus_fein_match_seleid_3];
+    BusinessInstantID20_Services.Layouts.WatchlistLayoutFlat AND NOT [bus_watchlist_entitydate_1,bus_watchlist_publisheddate_1,bus_watchlist_entitydate_2,bus_watchlist_publisheddate_2,bus_watchlist_entitydate_3,bus_watchlist_publisheddate_3,bus_watchlist_entitydate_4,bus_watchlist_publisheddate_4,bus_watchlist_entitydate_5,bus_watchlist_publisheddate_5,bus_watchlist_entitydate_6,bus_watchlist_publisheddate_6,bus_watchlist_entitydate_7,bus_watchlist_publisheddate_7];
+    BusinessInstantID20_Services.Layouts.BatchFirmographicLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.BatchPersonRoleLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.BatchParentLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.SBFEVerificationLayout AND NOT [Seq];
+    BusinessInstantID20_Services.Layouts.BusinessAddressRiskLayout AND NOT [Seq];
+    //Model fields
+    STRING50 Model1_Name;
+    STRING50 Model2_Name;
+    STRING5 Model1_Score;
+    STRING5 Model1_RC1;
+    STRING5 Model1_RC2;
+    STRING5 Model1_RC3;
+    STRING5 Model1_RC4;
+    STRING5 Model1_RC5;
+    STRING5 Model1_RC6;
+    STRING5 Model2_Score;
+    STRING5 Model2_RC1;
+    STRING5 Model2_RC2;
+    STRING5 Model2_RC3;
+    STRING5 Model2_RC4;
+    STRING5 Model2_RC5;
+    STRING5 Model2_RC6;
+  END;
 
 //BIID20 Testseeds layout 2
 	EXPORT BIID20Testseedslayout2 := record 
-										in_key;
-		ConsumerIIDrep1Layout;
-		ConsumerIIDrep2Layout;
-		ConsumerIIDrep3Layout;
+    in_key;
+    ConsumerIIDrep1Layout;
+    ConsumerIIDrep2Layout;
+    ConsumerIIDrep3Layout;
 	END;
 	
 	//BIID20 Testseeds layout 3
 	EXPORT BIID20Testseedslayout3 := record 
-										in_key;							
-		ConsumerIIDrep4Layout;
-		ConsumerIIDrep5Layout;
-//END;
-		
+    in_key;							
+    ConsumerIIDrep4Layout;
+    ConsumerIIDrep5Layout;
 	END;
-	END;
+  
+END;
 	
