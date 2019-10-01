@@ -5,14 +5,23 @@ EXPORT _Versions := Module;
 shared appd_weekly_base_version_regexp 		:= '([0-9]{8}[a-z]?_reappend)';
 shared version_regexp 										:= '([0-9]{8}[a-z]?)';
 
+EXPORT dops_get_release_history           := DOPS.GetReleaseHistory('B','N','InquiryTableUpdateKeys','prod');
+
 EXPORT dops_fcra_keys_prod   							:= dops.Getbuildversion('FCRA_InquiryTableKeys','B','F','P','prod');
 EXPORT dops_fcra_keys_certQA							:= dops.Getbuildversion('FCRA_InquiryTableKeys','B','F','C','prod');
+EXPORT dops_fcra_keys_thor  							:= dops.Getbuildversion('FCRA_InquiryTableKeys','B','F','T','prod');
+
 
 EXPORT dops_nonfcra_update_keys_prod			:= dops.Getbuildversion('InquiryTableUpdateKeys','B','N','P','prod');
 EXPORT dops_nonfcra_update_keys_certQA		:= dops.Getbuildversion('InquiryTableUpdateKeys','B','N','C','prod');
+EXPORT dops_nonfcra_update_keys_thor	  	:= dops.Getbuildversion('InquiryTableUpdateKeys','B','N','T','prod');
+
+shared dops_versions_table                := dops_get_release_history (certversion < dops_nonfcra_update_keys_prod);	
+EXPORT dops_nonfcra_update_keys_father    := dops_versions_table[1].certversion;
 
 EXPORT dops_nonfcra_keys_prod							:= dops.Getbuildversion('InquiryTableKeys','B','N','P','prod');
 EXPORT dops_nonfcra_keys_certQA						:= dops.Getbuildversion('InquiryTableKeys','B','N','C','prod');
+EXPORT dops_nonfcra_keys_thor							:= dops.Getbuildversion('InquiryTableKeys','B','N','T','prod');
 
 shared nonfcra_appd_weekly_base_file 			:= nothor(fileservices.superfilecontents(Data_Services.foreign_prod+'thor_data400::out::inquiry_tracking::weekly_historical')[1].name);
 EXPORT nonfcra_appd_weekly_base 					:= STD.Str.FindReplace(regexfind(appd_weekly_base_version_regexp, nonfcra_appd_weekly_base_file,1),'_reappend','');
@@ -28,8 +37,11 @@ EXPORT nonfcra_daily_base 								:= regexfind(version_regexp, nonfcra_daily_bas
 
 EXPORT nonfcra_daily_base_files						:= nothor(fileservices.superfilecontents(INQL_v2.Filenames(,pFCRA:=false, pDaily:=true).INQL_Base.QA));
 
-shared nonfcra_did_update_key_file 				:= nothor(fileservices.superfilecontents(Inql_V2.Keynames(isUpdate:=true,isFCRA:=false).DID.QA))[1].name;
-EXPORT thor_nonfcra_update_keys 					:= regexfind(version_regexp, nonfcra_did_update_key_file,1);	
+// shared nonfcra_did_update_key_file 		    := nothor(fileservices.superfilecontents(Inql_V2.Keynames(isUpdate:=true,isFCRA:=false).DID.QA))[1].name;
+// EXPORT thor_nonfcra_update_keys 			   	:= regexfind(version_regexp, nonfcra_did_update_key_file,1);
+
+// EXPORT nonfcra_did_update_key_file 		:= nothor(fileservices.superfilecontents(Inql_V2.Keynames(isUpdate:=true,isFCRA:=false).DID.QA))[1].name;
+EXPORT thor_nonfcra_update_keys 				:= dops_nonfcra_update_keys_thor;
 
 shared fcra_daily_base_file								:= sort(nothor(fileservices.superfilecontents(INQL_v2.Filenames(,pFCRA:=true, pDaily:=true).INQL_Base.QA)),-name)[1].name;
 EXPORT fcra_daily_base 										:= regexfind(version_regexp, fcra_daily_base_file,1);	
@@ -53,25 +65,49 @@ shared fcra_next_batch_file					  		:= sort(nothor(fileservices.superfilecontent
 Export fcra_next_daily_base 							:= regexfind(version_regexp, fcra_next_batch_file,1);	
 
 
-shared GetActiveWU (string wuname =''):= function
-				 valid_state := ['','unknown','submitted', 'compiling','compiled','blocked','running','wait'];
-				 d := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=wuname))(wuid <> thorlib.wuid() and state in valid_state), -wuid):independent;
-				 return d[1].wuid;
+
+SHARED GetActiveWU(string wuname) := function
+
+  valid_state :=['','unknown','submitted', 'compiling','compiled','blocked','running','wait'];
+	d := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=wuname ))(wuid <> thorlib.wuid() and state in valid_state), -wuid):independent;
+	active_workunit :=  exists(d);
+
+	return d;//active_workunit;
+
 END;
 
-export 	FCRA_Daily_Base_Build_ActiveWU 			:= GetActiveWU(INQL_v2._Constants.FCRA_DAILY_BLD_SCHEDULERNAME + ' BASE*');
+SHARED GetActiveWUState(string wuname) := function
 
-export 	FCRA_Weekly_Base_Build_ActiveWU 		:= GetActiveWU(INQL_v2._Constants.FCRA_WEEKLY_BLD_SCHEDULERNAME + ' BASE*');
+  valid_state :=['','unknown','submitted', 'compiling','compiled','blocked','running','wait','completed'];
+	d := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=wuname ))(wuid <> thorlib.wuid() and state in valid_state), -wuid):independent;
+	active_workunit :=  exists(d);
 
-export 	NonFCRA_Daily_Base_Build_ActiveWU 	:= GetActiveWU(INQL_v2._Constants.NON_FCRA_DAILY_BLD_SCHEDULERNAME + ' BASE*');
+	return d;//active_workunit;
 
-export 	NonFCRA_Weekly_Base_Build_ActiveWU 	:= GetActiveWU(INQL_v2._Constants.NON_FCRA_WEEKLY_BLD_SCHEDULERNAME + ' BASE*');
+END;
 
-export 	FCRA_Weekly_Keys_Build_ActiveWU   	:= GetActiveWU(INQL_v2._Constants.FCRA_DAILY_BLD_SCHEDULERNAME + ' KEYS*');
+EXPORT NonFCRA_Daily_Base_Build_ActiveWU    := GetActiveWU(Inql_v2._CRON_ECL('BASE BUILD', false, true).WU_NAME+' 2*')[1].wuid;
+EXPORT NonFCRA_Daily_Base_Build_State       := GetActiveWUState(Inql_v2._CRON_ECL('BASE BUILD', false, true).WU_NAME+' 2*')[1].state;
 
-export 	NonFCRA_Weekly_Keys_Build_ActiveWU  := GetActiveWU(INQL_v2._Constants.NON_FCRA_WEEKLY_BLD_SCHEDULERNAME + ' KEYS*');
+EXPORT NonFCRA_Weekly_Base_Build_ActiveWU 	:= GetActiveWU(Inql_v2._CRON_ECL('BASE BUILD', false, false).WU_NAME+' 2*')[1].wuid;
+EXPORT NonFCRA_Weekly_Base_Build_State 	    := GetActiveWUState(Inql_v2._CRON_ECL('BASE BUILD', false, false).WU_NAME+' 2*')[1].state;
 
-export 	NonFCRA_Daily_Keys_Build_ActiveWU  	:= GetActiveWU(INQL_v2._Constants.NON_FCRA_DAILY_BLD_SCHEDULERNAME + ' KEYS*');
-	
+EXPORT NonFCRA_Daily_Keys_Build_ActiveWU    := GetActiveWU(Inql_v2._CRON_ECL('KEYS BUILD', false, true).WU_NAME+' 2*')[1].wuid;
+EXPORT NonFCRA_Daily_Keys_Build_State       := GetActiveWUState(Inql_v2._CRON_ECL('KEYS BUILD', false, true).WU_NAME+' 2*')[1].state;
 
-end;
+EXPORT NonFCRA_Weekly_Keys_Build_ActiveWU   := GetActiveWU(Inql_v2._CRON_ECL('KEYS BUILD', false, false).WU_NAME+' 2*')[1].wuid;
+EXPORT NonFCRA_Weekly_Keys_Build_State      := GetActiveWUState(Inql_v2._CRON_ECL('KEYS BUILD', false, false).WU_NAME+' 2*')[1].state;
+
+EXPORT FCRA_Daily_Base_Build_ActiveWU       := GetActiveWU(Inql_v2._CRON_ECL('BASE BUILD', true, true).WU_NAME+' 2*')[1].wuid;
+EXPORT FCRA_Daily_Base_Build_State          := GetActiveWUState(Inql_v2._CRON_ECL('BASE BUILD', true, true).WU_NAME+' 2*')[1].state;
+
+EXPORT FCRA_Weekly_Base_Build_ActiveWU 		  := GetActiveWU(Inql_v2._CRON_ECL('BASE BUILD', true, false).WU_NAME+' 2*')[1].wuid;
+EXPORT FCRA_Weekly_Base_Build_State   		  := GetActiveWUState(Inql_v2._CRON_ECL('BASE BUILD', true, false).WU_NAME+' 2*')[1].state;
+
+EXPORT FCRA_Weekly_Keys_Build_ActiveWU    	:= GetActiveWU(Inql_v2._CRON_ECL('KEYS BUILD', true, false).WU_NAME+' 2*')[1].wuid;
+EXPORT FCRA_Weekly_Keys_Build_State    	    := GetActiveWUState(Inql_v2._CRON_ECL('KEYS BUILD', true, false).WU_NAME+' 2*')[1].state;
+
+END;
+
+
+

@@ -174,8 +174,9 @@ nonfcra_move2QA 						:= parallel ( mv2qa_addr, mv2qa_did, mv2qa_fein, mv2qa_ipa
 																				);
     
 nonfcra_Keys								:= sequential(	nonfcra_build
-																					, nonfcra_move2build
-																					, nonfcra_move2QA
+                                          , INQL_v2.FN_Update_Keys_SF(pversion).run
+																					// , nonfcra_move2build
+																					// , nonfcra_move2QA
 																				// , RoxieKeybuild.updateversion('InquiryTableUpdateKeys',pVersion,INQL_v2.email_notification_lists.BuildSuccess,,'N')
 																				, output(choosen(sort(choosen(INQL_v2.Data_NonFcra_Keys(isupdate).base_icommon(person_q.appended_adl > 0 and bus_intel.industry not in ['UNASSIGNED','BLANK','']), 1000000), -search_info.datetime), 100), named('Sample_Update_Records'))
 																				, output(choosen(INQL_v2.Data_NonFcra_Keys(isupdate).base_icommon(person_q.email_address <> ''), 5), named('Sample_Update_Email_Records'))
