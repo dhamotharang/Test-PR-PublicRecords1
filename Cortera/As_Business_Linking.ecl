@@ -93,10 +93,21 @@ EXPORT As_Business_Linking(dataset(Cortera.Layout_Executives) hdr) := FUNCTION
 		
 		self.company_foreign_domestic := IF(hdr.country='US','D','F');
 
-		self.source_record_id            := ((unsigned8)hdr.link_id << 32) | HASH32(self.company_name,SELF.company_phone,hdr.EXECUTIVE_NAME,hdr.EXEC_TITLE);
-
+		self.source_record_id            := ((unsigned8)hdr.link_id << 32) | HASH32(self.company_name,SELF.company_phone,hdr.EXECUTIVE_NAME,hdr.EXEC_TITLE);   
+		//position_type 
+		//Location in the corporate hierarchy.  
+		//Possible Values: 'S' - Single Location, 'B' - Branch, 'H' - Headquarters
+		string temp_employees            := if(trim(hdr.total_employees) = '', trim(hdr.employee_range), trim(hdr.total_employees));
+		string temp_sales                := if(trim(hdr.total_sales) = '', trim(hdr.sales_range), trim(hdr.total_sales));
+		self.employee_count_org_raw      := if(trim(hdr.position_type) = 'H' or trim(hdr.position_type) = 'S', 
+		                                    trim(temp_employees), '');
+    self.revenue_org_raw             := if(trim(hdr.position_type) = 'H' or trim(hdr.position_type) = 'S', 
+		                                    trim(temp_sales), '');
+    self.employee_count_local_raw    := if(trim(hdr.position_type) = 'B', 
+		                                    trim(temp_employees), '');
+		self.revenue_local_raw           := if(trim(hdr.position_type) = 'B', 
+		                                    trim(temp_sales), '');
 		self := [];
-		
 	END;
 
 	 link := NORMALIZE(hdr, 4, xBiz(Left, counter));
