@@ -216,7 +216,7 @@ EXPORT spray_Foreclosure_Raw(
 	FormatRaw := IF(
 		STD.File.FileExists(Property.thor_cluster + 'in::foreclosure::using::fares_update'+ pVersion),
 		OUTPUT('Foreclosure file transformed in previous run'),
-		OUTPUT(rsForeclosureRawFormattedID, , Property.thor_cluster + 'in::foreclosure::using::fares_update'+ pVersion, CLUSTER(pGroup), COMPRESSED)
+		OUTPUT(rsForeclosureRawFormattedID, , Property.thor_cluster + 'in::foreclosure::using::fares_update'+ pVersion, COMPRESSED)
 	);
 
 	delTemp := IF(

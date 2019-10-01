@@ -31,7 +31,7 @@ Layout_Foreclosure_Base_Normalized normalizeRecords (foreclosureIn l, unsigned1 
 	self.site_zip:=l.situs1_zip;
 	self.site_zip4:=l.situs1_zip4;
 	self.name_indicator := nameCounter;
-	self.source := MDR.sourceTools.src_Foreclosures;
+	self.source := IF(TRIM(l.source) IN ['B7','I5'],l.source,MDR.sourceTools.src_Foreclosures); //Probably not needed but ensures setting source code currectly
 	self := l;
 end;
 ds_name_normalized := normalize (foreclosureIn,8,normalizeRecords(left,counter));
@@ -110,7 +110,7 @@ Business_Header_SS.MAC_Match_Flex(
 
 DID_Add.MAC_Add_SSN_By_DID(foreclosureDID_BDID,did,ssn,appendSSN);
 
-appendSSNSortDist	:=	SORT(DISTRIBUTE(appendSSN, HASH(foreclosure_id)), RECORD, LOCAL);
+appendSSNSortDist	:=	SORT(DISTRIBUTE(appendSSN, HASH(foreclosure_id)), RECORD, -process_date, LOCAL);
 
 //Normalize BKL file prior to append
 BKforeclosureIn	:= BKForeclosure.Fn_Map_BK2Foreclosure;
@@ -139,16 +139,17 @@ Layout_Foreclosure_Base_Normalized normalizeBK(BKforeclosureIn l, unsigned1 name
 	self.site_zip:=l.situs1_zip;
 	self.site_zip4:=l.situs1_zip4;
 	self.name_indicator := nameCounter;
+	self.sequence := L.source_rec_id;
 	self.source := L.source;
 	self := l;
 end;
 
 ds_BK_normalized := NORMALIZE(BKforeclosureIn,8,normalizeBK(LEFT,COUNTER));
 
-SrtBKNorm	:= SORT(DISTRIBUTE(ds_BK_normalized(name_first != '' OR name_last != '' OR name_company != ''), HASH(foreclosure_id)), RECORD, LOCAL);
+SrtBKNorm	:= SORT(DISTRIBUTE(ds_BK_normalized(name_first != '' OR name_last != '' OR name_company != ''), HASH(foreclosure_id)), RECORD, -process_date, LOCAL);
 
 CombineAll	:= appendSSNSortDist + SrtBKNorm;
 
-EXPORT foreclosure_normalized := dedup(CombineAll,RECORD,LOCAL);
+EXPORT foreclosure_normalized := dedup(CombineAll,ALL,EXCEPT process_date,LOCAL);
 
 //EXPORT foreclosure_normalized := dedup(appendSSNSortDist,RECORD,LOCAL);	//: persist('~thor_data400::persist::file_foreclosure_normalized'); // use persist here, if needed

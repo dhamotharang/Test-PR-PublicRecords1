@@ -1,4 +1,4 @@
-﻿import Header_SlimSort,header,address_file,utilfile,lib_fileservices,misc,Text_FragV1,doxie_build,Watchdog,nid,PersonLinkingADL2V3,Promotesupers;
+﻿import Header_SlimSort,header,utilfile,lib_fileservices,misc,Text_FragV1,doxie_build,Watchdog,nid,PersonLinkingADL2V3,Promotesupers;
 
 #option('skipFileFormatCrcCheck', 1);
 #option ('filteredReadSpillThreshold', 9999) ;
@@ -17,7 +17,7 @@ fcra_keys := doxie.proc_fcra_header_keys_dx(filedate);
  fcra_mv2QA := header.Proc_FCRAacceptSK_toQA(filedate,false,inc);
 
  return sequential(
-									if(~inc,Header.Proc_re_did_FCRA_EN) // only run in monthly
+									if(~inc,Header.Proc_re_did_FCRA_EN(filedate)) // only run in monthly
                                     ,header.build_FCRA_header(filedate,inc)
 									,fcra_clr_super
 									,fcra_chk_build(if(inc,'_inc',''))

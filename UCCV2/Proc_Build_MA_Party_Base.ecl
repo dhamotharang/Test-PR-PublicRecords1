@@ -1,4 +1,4 @@
-IMPORT Address, NID, UCCV2, ut;
+﻿IMPORT Address, NID, UCCV2, ut; 
 
 Layout_party	:=	Record
 	string8   process_date;
@@ -71,11 +71,11 @@ dBusiness	:=	dParty(orgname!='');
 dPerson		:=	dParty(orgname='');
 
 // Since the layout contains nametype, need to declare the NID attriubte to be something else.
-NID.Mac_CleanFullNames(dBusiness, cleanedNameRecs, orgname, , nid_nametype);
+NID.Mac_CleanFullNames(dBusiness, cleanedNameRecs, orgname, , nid_nametype, useV2:=true);
 
-person_flags := ['P', 'D'];
-// An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.
-business_flags := ['B', 'U', 'I'];
+person_flags   := ['P', 'D'];
+// V2 replaced the Unclassified('U') category with the Trust ('T') category, what used to be a U should become a T or I with V2.
+business_flags := ['B', 'I', 'T'];
 
 layout_party trfCleanName(cleanedNameRecs L) := TRANSFORM
 	SELF.title        := IF(L.nid_nametype IN person_flags, L.cln_title, '');
@@ -90,7 +90,7 @@ layout_party trfCleanName(cleanedNameRecs L) := TRANSFORM
 END;
 
 // Since the layout contains nametype, need to declare the NID attriubte to be something else.
-NID.Mac_CleanParsedNames(dPerson, VerifyPersons, fname, mname, lname, name_suffix, , , nid_nametype);
+NID.Mac_CleanParsedNames(dPerson, VerifyPersons, fname, mname, lname, name_suffix, , , nid_nametype, useV2:=true);
 
 // Because the vendor will sometimes send a company name as a person's last name only, we need to make
 // sure what they sent is a person.
@@ -131,8 +131,8 @@ UCCV2.Layout_UCC_Common.Layout_Party_with_AID tProjParty(dParty  pInput)
 																			);               //'S' (secured) - per Rosemary Murphy.
 	self.dt_first_seen						:=   (unsigned6)(pInput.process_date[1..6]);
 	self.dt_last_seen							:=   (unsigned6)(pInput.process_date[1..6]);
-	self.dt_vendor_first_reported	:=   (unsigned6)(pInput.process_date[1..6]);
-	self.dt_vendor_last_reported	:=   (unsigned6)(pInput.process_date[1..6]);
+	self.dt_vendor_first_reported	:=   (unsigned6) pInput.process_date;
+	self.dt_vendor_last_reported	:=   (unsigned6) pInput.process_date;
 	self													:=	pInput;
 	self													:=	[];
 END;

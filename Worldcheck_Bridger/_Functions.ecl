@@ -1254,6 +1254,10 @@
 				trim(kword, left, right) = 'USCBW-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCBW_WC,
 				trim(kword, left, right) = 'SEDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_SEDPA,
 				trim(kword, left, right) = 'LFSA-ALERT' =>SubGroup_Constants.numKeywordsID.KEYWORD_LFSA_ALERT,
+				trim(kword, left, right) = 'ESBDE' =>SubGroup_Constants.numKeywordsID.KEYWORD_ESBDE,
+				trim(kword, left, right) = 'CNCBIRC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNCBIRC,
+				trim(kword, left, right) = 'CAQCMELCC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CAQCMELCC,
+				trim(kword, left, right) = 'OFAC-EO13848' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13848,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
