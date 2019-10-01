@@ -2,4 +2,4 @@
 #STORED('DJVersion','20190925');
 #STORED('UseDeltaFile',false);
 
-DowJones.BuildDelta;
+DowJones.BuildAll;
