@@ -51,6 +51,7 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 		LEFT OUTER, KEEP(1), ATMOST(100));	
 
 	// Get consumer attributes
+/*  Comenting out consumer attrributes until we have a solution in place.  
 	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(Rep1Input, Rep1Input[1].P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 
 	Rep1PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(Rep1Input, FDCDataset, Options);
@@ -70,9 +71,11 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 			SELF := LEFT,
 			SELF := []),
 		LEFT OUTER, KEEP(1), ATMOST(100));	
-		
+*/		
 	// If consumer shell attributes are turned off, we can bypass these calculations as a performance enhancement.	
-	FinalResult := IF(Options.ExcludeConsumerAttributes, withBusinessSeleIDAttributes, withRep1PersonAttributes);
+	// FinalResult := IF(Options.ExcludeConsumerAttributes, withBusinessSeleIDAttributes, withRep1PersonAttributes);
+	FinalResult := withBusinessSeleIDAttributes;
+	
 	
 	MasterResults := SORT(FinalResult, G_ProcBusUID);
 	
