@@ -29,8 +29,9 @@ EXPORT ProcessOFAC_Random(string filedate) := FUNCTION	//filedate = date process
 	
 		parse_remark (string premark) := function
 		
-		out_remark   :=   map(regexfind('^([-Ã¢â‚¬â„¢#)(A-Z0-9\\.,:;?/ ]+)[-A-Z0-9]*[ ]|(.*)',premark[1..75])   => regexreplace('^([-Ã¢â‚¬â„¢#)(A-Z0-9\\.,:;?/ ]+)[-A-Z0-9]*[ ]|(.*)',premark[1..75],'$1'), 
-												  regexfind('^([-Ã¢â‚¬â„¢#)(A-Z0-9\\.,:;?/ ]+)[ ]([-A-Z0-9\\.,:/Ã¢â‚¬Â ]*)+$',premark[1..75]) => regexreplace('^([-Ã¢â‚¬â„¢#)(A-Z0-9\\.,:;?/ ]+)[ ]([-A-Z0-9\\.,:/Ã¢â‚¬Â ]*)+$',premark[1..75],'$1'),'');
+		out_remark   :=   map(regexfind('^([-â€™#)(A-Z0-9\\.,:;?/ ]+)[-A-Z0-9]*[ ]|(.*)',premark[1..75])   => regexreplace('^([-â€™#)(A-Z0-9\\.,:;?/ ]+)[-A-Z0-9]*[ ]|(.*)',premark[1..75],'$1'), 
+												  regexfind('^([-â€™#)(A-Z0-9\\.,:;?/ ]+)[ ]([-A-Z0-9\\.,:/â€ ]*)+$',premark[1..75]) => regexreplace('^([-â€™#)(A-Z0-9\\.,:;?/ ]+)[ ]([-A-Z0-9\\.,:/â€ ]*)+$',premark[1..75],'$1'),'');
+
 	return out_remark;
 	end;
 	
