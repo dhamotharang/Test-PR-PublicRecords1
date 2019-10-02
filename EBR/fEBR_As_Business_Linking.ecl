@@ -204,16 +204,18 @@ EXPORT fEBR_As_Business_Linking(
 				// N = Division; 
 				// U = Subsidiary; 
 				// Blank = Not Available
-		    string temp_employees            := l.empl_size_actual;
-		    string temp_sales                := if(trim(l.sales_actual) != '',(STRING)((INTEGER)l.sales_actual * 1000),'');
-		    self.employee_count_org_raw      := if(trim(l.location_code) = 'H' OR trim(l.location_code) = 'S',
-		                                      trim(temp_employees), '');
-        self.revenue_org_raw             := if(trim(l.location_code) = 'H' OR trim(l.location_code) = 'S', 
-		                                      trim(temp_sales), '');
-        self.employee_count_local_raw    := if(trim(l.location_code) != 'H' AND trim(l.location_code) != 'S', 
-		                                      trim(temp_employees), '');
-		    self.revenue_local_raw           := if(trim(l.location_code) != 'H' AND trim(l.location_code) != 'S', 
-		                                      trim(temp_sales), '');
+		    string temp_employees               := trim(l.empl_size_actual);
+		    string temp_sales                   := if(trim(l.sales_actual) != '',(STRING)((INTEGER)trim(l.sales_actual) * 1000),'');
+		    // self.employee_count_org_raw      := if(trim(l.location_code) = 'H' OR trim(l.location_code) = 'S',
+		                                      // trim(temp_employees), '');
+        // self.revenue_org_raw             := if(trim(l.location_code) = 'H' OR trim(l.location_code) = 'S', 
+		                                      // trim(temp_sales), '');
+        // self.employee_count_local_raw    := if(trim(l.location_code) != 'H' AND trim(l.location_code) != 'S', 
+		                                      // trim(temp_employees), '');
+		    // self.revenue_local_raw           := if(trim(l.location_code) != 'H' AND trim(l.location_code) != 'S', 
+		                                      // trim(temp_sales), '');
+			  self.employee_count_local_raw       := temp_employees;
+				self.revenue_local_raw              := temp_sales;
 				self																:= l;
 				self																:= [];
 		end;			
