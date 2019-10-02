@@ -218,6 +218,7 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			Options.IncludeZipCodePerson;
 
 	EXPORT DoFDCJoin_Inquiry_AccLogs__Key_DID := 
+		Options.IsFCRA AND(
 		Options.IncludeInquiry OR
 		Options.IncludePerson OR
 		Options.IncludeAddress OR
@@ -228,12 +229,14 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		Options.IncludeAddressInquiry OR
 		Options.IncludeSSNInquiry OR
 		Options.IncludePhoneInquiry OR
-		Options.IncludeDriversLicenseInquiry;
+		Options.IncludeDriversLicenseInquiry);
 
-	EXPORT DoFDCJoin_USPIS_HotList__key_addr_search_zip := 
-			Options.IncludeAddress;
+	EXPORT DoFDCJoin_USPIS_HotList__key_addr_search_zip :=
+        NOT Options.IsFCRA AND (   
+            Options.IncludeAddress);
 
 	EXPORT DoFDCJoin_UtilFile__Key_Address := 
+			NOT Options.IsFCRA AND (
 			Options.IncludeUtility OR
 			Options.IncludeUtilityHomeAddress OR
 			Options.IncludeAddress OR
@@ -241,9 +244,10 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			Options.IncludePhone OR
 			Options.IncludeUtilityPerson OR
 			Options.IncludePersonPhone OR
-			Options.IncludeAddressPhone;
+			Options.IncludeAddressPhone);
 
 	EXPORT DoFDCJoin_UtilFile__Key_DID := 
+			NOT Options.IsFCRA AND (
 			Options.IncludeUtility OR
 			Options.IncludeUtilityHomeAddress OR
 			Options.IncludeAddress OR
@@ -251,7 +255,7 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			Options.IncludePhone OR
 			Options.IncludeUtilityPerson OR
 			Options.IncludePersonPhone OR
-			Options.IncludeAddressPhone;
+			Options.IncludeAddressPhone);
 
 	EXPORT DoFDCJoin_Email_Data__Key_DID :=
 		NOT Options.isFCRA AND
