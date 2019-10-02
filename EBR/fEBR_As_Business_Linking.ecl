@@ -9,7 +9,7 @@ EXPORT fEBR_As_Business_Linking(
 		//The following is a function that takes a string and converts it to uppercase and then trims off leading.
 		//and trailing blanks.
 		fTrimUpper(string s) := function
-			return trim(stringlib.StringToUppercase(s),left,right);
+			return trim(stringlib.stringToUppercase(s),left,right);
 		end;				
 
 		//////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,12 +28,15 @@ EXPORT fEBR_As_Business_Linking(
 		DemoBase5610_dist		:= distribute(pInput5610DemoBase, hash(FILE_NUMBER));
 
 		Layout_5600_Slim := record
-				STRING10  file_number;	
-				STRING4 	sic_1_code;
-				STRING4 	sic_2_code;		
-				STRING4 	sic_3_code;		
-				STRING4 	sic_4_code;								
-				STRING20	bus_type_desc;
+				string10  file_number;	
+				string8 	sic_1_code;
+				string8 	sic_2_code;		
+				string8 	sic_3_code;		
+				string8 	sic_4_code;								
+				string20	bus_type_desc;
+				string7   sales_actual;
+        string7   empl_size_actual;
+        string20  location_code;
 		end;
 
 		//Propagate slim layout
@@ -44,11 +47,14 @@ EXPORT fEBR_As_Business_Linking(
 		//This rollup maintains the sic codes in the current 5600 record. However for those sic code fields that 
 		//contain blanks, the historical records with data in the associated fields will rollup their data.
 		Layout_5600_Slim SIC_Code_Rollup(ds_5600_proj_srt L, ds_5600_proj_srt R) := transform
-			self.sic_1_code 		:= if(l.sic_1_code <> '',l.sic_1_code,r.sic_1_code);
-			self.sic_2_code 		:= if(l.sic_2_code <> '',l.sic_2_code,r.sic_2_code);
-			self.sic_3_code 		:= if(l.sic_3_code <> '',l.sic_3_code,r.sic_3_code);
-			self.sic_4_code 		:= if(l.sic_4_code <> '',l.sic_4_code,r.sic_4_code);
-			self.bus_type_desc 	:= if(l.bus_type_desc <> '',l.bus_type_desc,r.bus_type_desc);	
+			self.sic_1_code 		  := if(l.sic_1_code <> '',l.sic_1_code,r.sic_1_code);
+			self.sic_2_code 		  := if(l.sic_2_code <> '',l.sic_2_code,r.sic_2_code);
+			self.sic_3_code 		  := if(l.sic_3_code <> '',l.sic_3_code,r.sic_3_code);
+			self.sic_4_code 		  := if(l.sic_4_code <> '',l.sic_4_code,r.sic_4_code);
+			self.bus_type_desc 	  := if(l.bus_type_desc <> '',l.bus_type_desc,r.bus_type_desc);	
+			// self.sales_actual     := if(l.sales_actual <> '', l.sales_actual, r.sales_actual);
+      // self.empl_size_actual := if(l.empl_size_actual <> '', l.empl_size_actual, r.empl_size_actual);			
+      // self.location_code    := if(l.location_code <> '', l.location_code, r.location_code);
 			self := l;
 		end;
 
@@ -56,11 +62,14 @@ EXPORT fEBR_As_Business_Linking(
 
 		Layout_EBR_Local := record
 				EBR.layout_0010_header_base_aid;
-				STRING4 	sic_1_code;
-				STRING4 	sic_2_code;		
-				STRING4 	sic_3_code;		
-				STRING4 	sic_4_code;								
-				STRING20	bus_type_desc;				
+				string8 	sic_1_code;
+				string8 	sic_2_code;		
+				string8 	sic_3_code;		
+				string8 	sic_4_code;								
+				string20	bus_type_desc;	
+				string7   sales_actual;
+        string7   empl_size_actual;
+        string20  location_code;			
 		end;
 	
 		//////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,12 +77,15 @@ EXPORT fEBR_As_Business_Linking(
 		//Header/Main Business file.
 		//////////////////////////////////////////////////////////////////////////////////////////////		
 		Layout_EBR_Local tJoin_0010_5600(HeaderBase0010_dist L, ds_5600_rollup R) := transform
-				self.sic_1_code			:= R.sic_1_code;
-				self.sic_2_code			:= R.sic_2_code;
-				self.sic_3_code			:= R.sic_3_code;
-				self.sic_4_code			:= R.sic_4_code;	
-				self.bus_type_desc	:= trim(stringlib.StringToUppercase(R.bus_type_desc),left,right);				
-				self								:= L;
+				self.sic_1_code			  := R.sic_1_code;
+				self.sic_2_code			  := R.sic_2_code;
+				self.sic_3_code			  := R.sic_3_code;
+				self.sic_4_code			  := R.sic_4_code;	
+				self.bus_type_desc	  := trim(stringlib.stringToUppercase(R.bus_type_desc),left,right);
+			  self.sales_actual     := trim(r.sales_actual);
+        self.empl_size_actual := trim(r.empl_size_actual);			
+        self.location_code    := trim(stringlib.stringToUppercase(r.location_code),left,right);
+				self								  := L;
 		end;	
 	
 		joined_0010_and_5600 := join(HeaderBase0010_dist,ds_5600_rollup, 
@@ -90,7 +102,7 @@ EXPORT fEBR_As_Business_Linking(
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		// -- Load Layout_Business_Linking.Company_
 		//////////////////////////////////////////////////////////////////////////////////////////////	
-		bh_layout_company Translate_EBR_To_BHL(joined_0010_and_5600 L) := transform
+		bh_layout_company Translate_EBR_To_BHL(joined_0010_and_5600 L ):= transform
 				self.tmp_join_id_company         		:= fTrimUpper(L.file_number);
 				self.source 												:= MDR.sourceTools.src_EBR;
 				self.dt_first_seen 									:= (unsigned4)L.date_first_seen;
@@ -180,7 +192,28 @@ EXPORT fEBR_As_Business_Linking(
 				self.phone_score 										:= IF((UNSIGNED8)self.company_phone  = 0, 0, 1);
 				self.match_company_name							:= '';
 				self.match_branch_city							:= '';
-				self.match_geo_city									:= '';		
+				self.match_geo_city									:= '';
+				//Location Description-5600
+				//One of the following descriptions will be listed: 
+				//B= Branch, 
+				// D = Department Store; 
+				// F = Franchise; 
+				// H = HQ; 
+				// S = Single Entity; 
+				// X = Multiple Name Occurrence; 
+				// N = Division; 
+				// U = Subsidiary; 
+				// Blank = Not Available
+		    string temp_employees            := l.empl_size_actual;
+		    string temp_sales                := if(trim(l.sales_actual) != '',(STRING)((INTEGER)l.sales_actual * 1000),'');
+		    self.employee_count_org_raw      := if(trim(l.location_code) = 'H' OR trim(l.location_code) = 'S',
+		                                      trim(temp_employees), '');
+        self.revenue_org_raw             := if(trim(l.location_code) = 'H' OR trim(l.location_code) = 'S', 
+		                                      trim(temp_sales), '');
+        self.employee_count_local_raw    := if(trim(l.location_code) != 'H' AND trim(l.location_code) != 'S', 
+		                                      trim(temp_employees), '');
+		    self.revenue_local_raw           := if(trim(l.location_code) != 'H' AND trim(l.location_code) != 'S', 
+		                                      trim(temp_sales), '');
 				self																:= l;
 				self																:= [];
 		end;			
