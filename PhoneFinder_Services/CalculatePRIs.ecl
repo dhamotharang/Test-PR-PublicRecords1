@@ -1,36 +1,36 @@
 ﻿/*
-Indicator ID	Risk Alert
-0	No identity
-1	Phone is not active with this person
-2	First Seen Date is within “Input A” and “Input B” days (1st date range)
-3	Last Seen Date is within last “Input B” days
-4								Unused
-5	Primary Phone is listed as a Business
-6	Phone # has been ported within the past “Input B” days
-7	Phone # has been ported more than “Input B” times with this person.
-8	Phone # was the origination phone used to spoof another phone # within the past “Input B” days.
-9	Phone # has been spoofed within the past “Input B” days
-10	 	 	 	 	 	 	Unused
-11	 	 	 	 	 	 	Unused
-12	 	 	 	 	 	 	Unused
-13	 	 	 	 	 	 	Unused
-14	 	 	 	 	 	 	Unused
-15	Phone # has received “Input A” OTP requests within the past “Input B” days.
-16	Phone # is a Prepaid Phone
-17	Phone # is associated with a No Contract Carrier
-18	Phone Service Type is Landline
-19	Phone Service Type is Wireless
-20	Phone Service Type is VOIP
-21							Unused
-22	First Seen Date is within “Input A” and “Input B” days (2nd date range)
-23	First Seen Date is within “Input A” and “Input B” days (3rd date range)
-24	Primary address is zoned as Commercial
-25	Primary address is not the “Current" address for the Primary Subject
-26	Phone # was the destination phone used in a spoofing activity with the past “Input B” days.
-27	Phone # was the spoofed phone used in a spoofing activity within the past “Input B” days.
-28	Primary Subject associated to the phone is deceased
-29	Primary Phone Area Code is not in same state as Primary Address.
-30	Phone # has had “Input A” search requests within the past “Input B” days
+Indicator ID  Risk Alert
+0   No identity
+1   Phone is not active with this person
+2   First Seen Date is within “Input A” and “Input B” days (1st date range)
+3   Last Seen Date is within last “Input B” days
+4   Unused
+5   Primary Phone is listed as a Business
+6   Phone # has been ported within the past “Input B” days
+7   Phone # has been ported more than “Input B” times with this person.
+8   Phone # was the origination phone used to spoof another phone # within the past “Input B” days.
+9   Phone # has been spoofed within the past “Input B” days
+10  Unused
+11  Unused
+12  Unused
+13  Unused
+14  Unused
+15  Phone # has received “Input A” OTP requests within the past “Input B” days.
+16  Phone # is a Prepaid Phone
+17  Phone # is associated with a No Contract Carrier
+18  Phone Service Type is Landline
+19  Phone Service Type is Wireless
+20  Phone Service Type is VOIP
+21  Unused
+22  First Seen Date is within “Input A” and “Input B” days (2nd date range)
+23  First Seen Date is within “Input A” and “Input B” days (3rd date range)
+24  Primary address is zoned as Commercial
+25  Primary address is not the “Current" address for the Primary Subject
+26  Phone # was the destination phone used in a spoofing activity with the past “Input B” days.
+27  Phone # was the spoofed phone used in a spoofing activity within the past “Input B” days.
+28  Primary Subject associated to the phone is deceased
+29  Primary Phone Area Code is not in same state as Primary Address.
+30  Phone # has had “Input A” search requests within the past “Input B” days
 31  Phone # is currently being Forwarded
 32  No First Seen Date associated to Phone#
 33  No Last Seen Date associated to Phone #
@@ -50,7 +50,7 @@ Indicator ID	Risk Alert
 47  Phone returned more than X times in past Y days.
 */
 
-IMPORT $, iesp, STD, ut;
+IMPORT $, iesp, MDR, STD, ut;
 
 EXPORT CalculatePRIs( DATASET($.Layouts.PhoneFinder.Final) dIn,
                       $.iParam.SearchParams                inMod) :=
@@ -80,9 +80,10 @@ FUNCTION
 
       BOOLEAN isPRIFail := CASE(le.RiskId,
                                 -1 => pInput.isPrimaryPhone AND pInput.phone = '',
-                                0  => pInput.isPrimaryPhone AND (pInput.fname = '' AND pInput.lname = '' AND pInput.phone <> ''),
+                                // If the listed name is coming from CNAM, then we don't populate in Full Name since we might be invalid valid from the gateway (values like city, state)
+                                0  => pInput.isPrimaryIdentity AND (pInput.fname = '' AND pInput.lname = '' AND (pInput.subj_phone_type_new = MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2 AND pInput.listed_name != '')),
                                 1  => IF(inmod.IsGovsearch, (pInput.fname <>'' OR pInput.lname <> '' OR pInput.listed_name <> '') AND pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive,
-																         pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive),
+                                         pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive),
                                 2  => STD.Date.DaysBetween(dt_first_seen, currentDate) BETWEEN le.ThresholdA AND le.Threshold,
                                 3  => dt_last_seen <> 0 AND STD.Date.DaysBetween(dt_last_seen, currentDate) > le.Threshold,
                                 5  => pInput.listing_type_bus <> '',
@@ -93,9 +94,9 @@ FUNCTION
                                 15 => COUNT(pInput.OTPHistory(STD.Date.DaysBetween((UNSIGNED)EventDate, currentDate) <= le.Threshold)) >= IF(le.ThresholdA > 0, le.ThresholdA, $.Constants.OTPRiskLimit),
                                 16 => pInput.Prepaid,
                                 17 => pInput.NoContractCarrier,
-                                18 => pInput.coc_description = $.Constants.PhoneType.LANDLINE,
-                                19 => pInput.coc_description = $.Constants.PhoneType.WIRELESS,
-                                20 => pInput.coc_description = $.Constants.PhoneType.VoIP,
+                                18 => Std.Str.ToUpperCase(pInput.coc_description) = $.Constants.PhoneType.LANDLINE,
+                                19 => Std.Str.ToUpperCase(pInput.coc_description) = $.Constants.PhoneType.WIRELESS,
+                                20 => Std.Str.ToUpperCase(pInput.coc_description) = $.Constants.PhoneType.VoIP,
                                 22 => STD.Date.DaysBetween(dt_first_seen, currentDate) BETWEEN le.ThresholdA AND le.Threshold,
                                 23 => STD.Date.DaysBetween(dt_first_seen, currentDate) BETWEEN le.ThresholdA AND le.Threshold,
                                 24 => STD.Str.ToUpperCase(pInput.primary_address_type) = 'BUSINESS',

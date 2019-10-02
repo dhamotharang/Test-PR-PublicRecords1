@@ -68,13 +68,15 @@ FUNCTION
   vmod := PROJECT(inMod, $.IParam.PhoneVerificationParams, OPT);
 
   // Need this for calculation of phone verification if no identities present
+  doVerify := ~(inMod.IsPrimarySearchPII) AND (inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress);
+
   dOtherRecs := JOIN( dIdentitySlim,
                       dIdentityTopn,
                       LEFT.acctno = RIGHT.acctno,
                       TRANSFORM(LEFT),
                       LEFT ONLY);
 
-  dIdentityRecs := IF(inMod.VerifyPhoneIsActive, dIdentityTopn + dOtherRecs, dIdentityTopn);
+  dIdentityRecs := IF(doVerify, dIdentityTopn + dOtherRecs, dIdentityTopn);
 
   // Input criteria
   $.Layouts.BatchIn input2Match($.Layouts.BatchInAppendDID pInput) := TRANSFORM
@@ -86,8 +88,6 @@ FUNCTION
   dFormat2BatchIn := PROJECT(dInBestInfo, input2Match(LEFT));
 
 	dVerifiedIdentity := $.GetVerifiedRecs(vmod).verify(dIdentityRecs, dFormat2BatchIn);
-
-	doVerify := ~(inMod.IsPrimarySearchPII) AND (inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress);
 
   dIdentitiesInfo := IF(doVerify, dVerifiedIdentity, dIdentityTopn);
 
@@ -132,12 +132,12 @@ FUNCTION
 
   // Primary Address flag: Look up data by address (using zip)
   dPrimaryAddressByZip := JOIN(dIdentitiesFinal, Advo.Key_Addr1,
-                                KEYED(LEFT.zip = RIGHT.zip) AND
-                                KEYED(LEFT.prim_range = RIGHT.prim_range) AND
-                                KEYED(LEFT.prim_name = RIGHT.prim_name) AND
-                                KEYED(LEFT.suffix = RIGHT.addr_suffix) AND
-                                KEYED(LEFT.predir = RIGHT.predir) AND
-                                KEYED(LEFT.postdir = RIGHT.postdir),
+                                KEYED(LEFT.zip != '' AND LEFT.zip = RIGHT.zip) AND
+                                KEYED(LEFT.prim_range != '' AND LEFT.prim_range = RIGHT.prim_range) AND
+                                KEYED(LEFT.prim_name != '' AND LEFT.prim_name = RIGHT.prim_name) AND
+                                KEYED(LEFT.suffix = '' OR LEFT.suffix = RIGHT.addr_suffix) AND
+                                KEYED(LEFT.predir = '' OR LEFT.predir = RIGHT.predir) AND
+                                KEYED(LEFT.postdir = '' OR LEFT.postdir = RIGHT.postdir),
                                 TRANSFORM($.Layouts.PhoneFinder.IdentitySlim,
                                           SELF.primary_address_type := Advo.Lookup_Descriptions.fn_resbus_mixed(RIGHT.Residential_Or_Business_Ind),
                                           SELF := LEFT),
@@ -146,10 +146,10 @@ FUNCTION
 
   // Look up data by address (using City/State)
   dPrimaryAddressByCitySt := JOIN(dPrimaryAddressByZip(primary_address_type = ''), Advo.Key_Addr2,
-                                  KEYED(LEFT.st = RIGHT.st) AND
-                                  KEYED(LEFT.city_name = RIGHT.v_city_name) AND
-                                  KEYED(LEFT.prim_range = RIGHT.prim_range) AND
-                                  KEYED(LEFT.prim_name = RIGHT.prim_name),
+                                  KEYED(LEFT.st != '' AND LEFT.st = RIGHT.st) AND
+                                  KEYED(LEFT.city_name != '' AND LEFT.city_name = RIGHT.v_city_name) AND
+                                  KEYED(LEFT.prim_range != '' AND LEFT.prim_range = RIGHT.prim_range) AND
+                                  KEYED(LEFT.prim_name != '' AND LEFT.prim_name = RIGHT.prim_name),
                                   TRANSFORM($.Layouts.PhoneFinder.IdentitySlim,
                                             SELF.primary_address_type := Advo.Lookup_Descriptions.fn_resbus_mixed(RIGHT.Residential_Or_Business_Ind),
                                             SELF                      := LEFT),
@@ -169,7 +169,7 @@ FUNCTION
 
   withGovBestSSN := SSNBest_Services.Functions.fetchSSNs_generic(dSearchRecswAddrType, ssnBestParams, ssn, did, false);
 
-  dIdentitiesWssn := IF(inmod.IsGovsearch, withGovBestSSN, dIdentitiesFinal);
+  dIdentitiesWssn := IF(inmod.IsGovsearch, withGovBestSSN, dSearchRecswAddrType);
 
   #IF($.Constants.Debug.Main)
     OUTPUT(dIdentitySlim, NAMED('dIdentitySlim'), EXTEND);
@@ -177,7 +177,7 @@ FUNCTION
     OUTPUT(dDIDRollUp, NAMED('dIdentityDIDRollUp'), EXTEND);
     OUTPUT(dNoDIDRollUp, NAMED('dIdentityNoDIDRollUp'), EXTEND);
     OUTPUT(dIdentityTopn, NAMED('dIdentityTopn'), EXTEND);
-    IF(inMod.VerifyPhoneIsActive, OUTPUT(dOtherRecs, NAMED('dOtherRecs'), EXTEND));
+    IF(doVerify, OUTPUT(dOtherRecs, NAMED('dOtherRecs'), EXTEND));
     OUTPUT(dIdentityRecs, NAMED('dIdentityRecs'), EXTEND);
     OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo'), EXTEND);
     OUTPUT(dIdentitiesFinal, NAMED('dIdentitiesFinal'), EXTEND);
