@@ -1,15 +1,15 @@
-IMPORT Address, Autokey_batch, Doxie, iesp, Phones, PhoneFinder_Services, std, ut, SSNBest_Services;
+  IMPORT Address, Autokey_batch, Doxie, iesp, MDR, Phones, PhoneFinder_Services, std, ut, SSNBest_Services;
 
-pfLayouts     := PhoneFinder_Services.Layouts;
-lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
-lBatchInDID   := pfLayouts.BatchInAppendDID;
-lFinal        := pfLayouts.PhoneFinder.Final;
-lIdentitySlim := pfLayouts.PhoneFinder.IdentitySlim;
-lIdentityIesp := pfLayouts.PhoneFinder.IdentityIesp;
-lPhoneSlim    := pfLayouts.PhoneFinder.PhoneSlim;
+  pfLayouts     := PhoneFinder_Services.Layouts;
+  lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
+  lBatchInDID   := pfLayouts.BatchInAppendDID;
+  lFinal        := pfLayouts.PhoneFinder.Final;
+  lIdentitySlim := pfLayouts.PhoneFinder.IdentitySlim;
+  lIdentityIesp := pfLayouts.PhoneFinder.IdentityIesp;
+  lPhoneSlim    := pfLayouts.PhoneFinder.PhoneSlim;
 
-EXPORT Functions :=
-MODULE
+  EXPORT Functions :=
+  MODULE
 
   EXPORT ValidateDate(UNSIGNED4 pDate) :=
   FUNCTION
@@ -26,13 +26,11 @@ MODULE
   END;
 
   EXPORT GetSubjectInfo(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dInRecs,
-                                  PhoneFinder_Services.iParam.SearchParams      inMod) := FUNCTION
+                                PhoneFinder_Services.iParam.SearchParams        inMod) := FUNCTION
+    // phone searches do not generate other phones related to the subject, hence all phone searches are subject related.
+    dNeedPortingInfo := IF(inMod.SubjectMetadataOnly, dInRecs(isprimaryphone), dInRecs);
 
-
-  //phone searches do not generate other phones related to the subject, hence all phone searches are subject related.
-    dNeedPortingInfo 	:= IF(inMod.SubjectMetadataOnly, dInRecs(isprimaryphone), dInRecs);
-
-    //reduce layout by selecting necessary fields
+    // reduce layout by selecting necessary fields
     PhoneFinder_Services.Layouts.SubjectPhone getSubjectPhone(dNeedPortingInfo l) := TRANSFORM
       SELF.acctno := l.acctno;
       SELF.did := l.did;
@@ -41,15 +39,16 @@ MODULE
       SELF.FirstSeenDate := IF((UNSIGNED)l.dt_first_seen<> 0, (UNSIGNED)ut.date_math(l.dt_first_seen, -PhoneFinder_Services.Constants.PortingMarginOfError), 0);
       SELF.LastSeenDate  := IF((UNSIGNED)l.dt_last_seen <> 0, (UNSIGNED)ut.date_math(l.dt_last_seen, PhoneFinder_Services.Constants.PortingMarginOfError), 0);
     END;
+
     dsSubjects := PROJECT(dNeedPortingInfo, getSubjectPhone(LEFT));
 
-    //rollup to get comprehensive port period
+    // rollup to get comprehensive port period
     PhoneFinder_Services.Layouts.SubjectPhone rollSubject(PhoneFinder_Services.Layouts.SubjectPhone l, PhoneFinder_Services.Layouts.SubjectPhone r) := TRANSFORM
       SELF.FirstSeenDate := ut.Min2(l.FirstSeenDate, r.FirstSeenDate);
       SELF               := l;
     END;
 
-  dSubjectInfo:= ROLLUP(SORT(dsSubjects, acctno, did, phone, -LastSeenDate, FirstSeenDate),
+    dSubjectInfo := ROLLUP(SORT(dsSubjects, acctno, did, phone, -LastSeenDate, FirstSeenDate),
                             LEFT.acctno=RIGHT.acctno AND
                             LEFT.did=RIGHT.did AND
                             LEFT.phone=RIGHT.phone,
@@ -59,301 +58,301 @@ MODULE
 
   END;
 
-	EXPORT STRING ServiceClassDesc(STRING pServiceClass) := CASE(pServiceClass,
-																																'0' => PhoneFinder_Services.Constants.PhoneType.Landline,
-																																'1' => PhoneFinder_Services.Constants.PhoneType.Wireless,
-																																'2' => PhoneFinder_Services.Constants.PhoneType.VoIP,
-																																PhoneFinder_Services.Constants.PhoneType.Other);
+  EXPORT STRING ServiceClassDesc(STRING pServiceClass) := CASE(pServiceClass,
+                                                                '0' => PhoneFinder_Services.Constants.PhoneType.Landline,
+                                                                '1' => PhoneFinder_Services.Constants.PhoneType.Wireless,
+                                                                '2' => PhoneFinder_Services.Constants.PhoneType.VoIP,
+                                                                PhoneFinder_Services.Constants.PhoneType.Other);
 
-	EXPORT STRING PhoneStatusDesc(INTEGER pPhoneStatus):= MAP(pPhoneStatus IN [10, 11, 12, 13, 20, 21, 22, 23] => PhoneFinder_Services.Constants.PhoneStatus.Active,
-																														pPhoneStatus IN [30, 31, 32, 33]             => PhoneFinder_Services.Constants.PhoneStatus.Inactive,
-																														PhoneFinder_Services.Constants.PhoneStatus.NotAvailable);
+  EXPORT STRING PhoneStatusDesc(INTEGER pPhoneStatus):= MAP(pPhoneStatus IN [10, 11, 12, 13, 20, 21, 22, 23] => PhoneFinder_Services.Constants.PhoneStatus.Active,
+                                                            pPhoneStatus IN [30, 31, 32, 33]             => PhoneFinder_Services.Constants.PhoneStatus.Inactive,
+                                                            PhoneFinder_Services.Constants.PhoneStatus.NotAvailable);
 
-	EXPORT STRING AddressTypeDesc(STRING pAddressType) := CASE(pAddressType,
-																															'F' => 'FIRM',
-																															'G' => 'GENERAL DELIVERY',
-																															'H' => 'MULTI-DWELLING RESIDENTIAL OR OFFICE BUILDING',
-																															'M' => 'MILITARY',
-																															'P' => 'POST OFFICE BOX',
-																															'R' => 'RURAL ROUTE OR HIGHWAY CONTRACT',
-																															'S' => 'STREET ADDRESS',
-																															'U' => 'UNKNOWN',
-																															'');
-	EXPORT STRING CallForwardingDesc(INTEGER pCallFwd) := CASE(pCallFwd,
-																																0 => 'NOT FORWARDED',
-																																1 => 'FORWARDED',
-																																'');
-	// Best info
-	EXPORT GetBestInfo(DATASET(lBatchInDID) dIn) :=
-	FUNCTION
+  EXPORT STRING AddressTypeDesc(STRING pAddressType) := CASE(pAddressType,
+                                                              'F' => 'FIRM',
+                                                              'G' => 'GENERAL DELIVERY',
+                                                              'H' => 'MULTI-DWELLING RESIDENTIAL OR OFFICE BUILDING',
+                                                              'M' => 'MILITARY',
+                                                              'P' => 'POST OFFICE BOX',
+                                                              'R' => 'RURAL ROUTE OR HIGHWAY CONTRACT',
+                                                              'S' => 'STREET ADDRESS',
+                                                              'U' => 'UNKNOWN',
+                                                              '');
+  EXPORT STRING CallForwardingDesc(INTEGER pCallFwd) := CASE(pCallFwd,
+                                                              0 => 'NOT FORWARDED',
+                                                              1 => 'FORWARDED',
+                                                              '');
+  // Best info
+  EXPORT GetBestInfo(DATASET(lBatchInDID) dIn) :=
+  FUNCTION
 
-	  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
 
-		dids := DEDUP(SORT(PROJECT(dIn, doxie.layout_references), did), did);
+    dids := DEDUP(SORT(PROJECT(dIn, doxie.layout_references), did), did);
 
-		dBestRecs := Doxie.best_records(dids, includeDOD:=true, modAccess := mod_access);
+    dBestRecs := Doxie.best_records(dids, includeDOD:=true, modAccess := mod_access);
 
-		lBatchInDID tGetBestInfo(dIn le, dBestRecs ri) :=
-		TRANSFORM
-			SELF.acctno      := le.acctno;
-			SELF.name_first  := ri.fname;
-			SELF.name_middle := ri.mname;
-			SELF.name_last   := ri.lname;
-			SELF.addr_suffix := ri.suffix;
-			SELF.p_city_name := ri.city_name;
-			SELF.z5          := ri.zip;
-			SELF.ssn         := (STRING)ri.ssn;
-			SELF.dob         := (STRING)ri.dob;
-			SELF             := ri;
-			SELF             := le;
-		END;
+    lBatchInDID tGetBestInfo(dIn le, dBestRecs ri) :=
+    TRANSFORM
+      SELF.acctno      := le.acctno;
+      SELF.name_first  := ri.fname;
+      SELF.name_middle := ri.mname;
+      SELF.name_last   := ri.lname;
+      SELF.addr_suffix := ri.suffix;
+      SELF.p_city_name := ri.city_name;
+      SELF.z5          := ri.zip;
+      SELF.ssn         := (STRING)ri.ssn;
+      SELF.dob         := (STRING)ri.dob;
+      SELF             := ri;
+      SELF             := le;
+    END;
 
-		dBestInfo := JOIN(dIn,
-											dBestRecs,
-											LEFT.did = RIGHT.did,
-											tGetBestInfo(LEFT, RIGHT),
-											LEFT OUTER,
-											LIMIT(0), keep(1));
+    dBestInfo := JOIN(dIn,
+                      dBestRecs,
+                      LEFT.did = RIGHT.did,
+                      tGetBestInfo(LEFT, RIGHT),
+                      LEFT OUTER,
+                      LIMIT(0), keep(1));
 
-		RETURN dBestInfo;
-	END;
+    RETURN dBestInfo;
+  END;
 
-	// Function to check IF name is populated
-	EXPORT isNamePopulated(iesp.share.t_Name pName) := pName.Full	!=	'' or pName.Last != '';
+  // Function to check IF name is populated
+  EXPORT isNamePopulated(iesp.share.t_Name pName) := pName.Full != '' or pName.Last != '';
 
-	// Function to check IF address is populated
-	EXPORT isAddrPopulated(iesp.share.t_Address pAddr) :=
-	FUNCTION
-		STRING	vStreetAddress			:=	Address.Addr1FromComponents(	pAddr.StreetNumber,
-																																	pAddr.StreetPreDirection,
-																																	pAddr.StreetName,
-																																	pAddr.StreetSuffix,
-																																	pAddr.StreetPostDirection,
-																																	pAddr.UnitDesignation,
-																																	pAddr.UnitNumber
-																																);
-		STRING	vStreetAddressl			:=	IF(pAddr.StreetAddress1	=	'', vStreetAddress, pAddr.StreetAddress1);
-		STRING	vStreetAddressFull	:=	STRINGlib.STRINGcleanspaces(vStreetAddressl	+	' '	+	pAddr.StreetAddress2);
-		STRING	vCityStateZip				:=	IF(	pAddr.StatecityZip	!=	'',
-																				pAddr.StateCityZip,
-																				Address.Addr2FromComponents(pAddr.city, pAddr.state, pAddr.zip5)
-																			);
+  // Function to check IF address is populated
+  EXPORT isAddrPopulated(iesp.share.t_Address pAddr) :=
+  FUNCTION
+    STRING vStreetAddress     := Address.Addr1FromComponents(pAddr.StreetNumber,
+                                                              pAddr.StreetPreDirection,
+                                                              pAddr.StreetName,
+                                                              pAddr.StreetSuffix,
+                                                              pAddr.StreetPostDirection,
+                                                              pAddr.UnitDesignation,
+                                                              pAddr.UnitNumber
+                                                            );
+    STRING vStreetAddressl    := IF(pAddr.StreetAddress1 = '', vStreetAddress, pAddr.StreetAddress1);
+    STRING vStreetAddressFull := STRINGlib.STRINGcleanspaces(vStreetAddressl + ' ' + pAddr.StreetAddress2);
+    STRING vCityStateZip      := IF(pAddr.StatecityZip != '',
+                                    pAddr.StateCityZip,
+                                    Address.Addr2FromComponents(pAddr.city, pAddr.state, pAddr.zip5)
+                                    );
 
-		BOOLEAN vAddrPopulated      := vStreetAddressFull != '' and vCityStateZip != '';
+    BOOLEAN vAddrPopulated    := vStreetAddressFull != '' and vCityStateZip != '';
 
-		RETURN vAddrPopulated;
-	END;
+    RETURN vAddrPopulated;
+  END;
 
-	// Function to append carrier information
-	EXPORT GetPhoneCarrierInfo(dIn) :=
-	FUNCTIONMACRO
-		IMPORT risk_indicators;
+  // Function to append carrier information
+  EXPORT GetPhoneCarrierInfo(dIn) :=
+  FUNCTIONMACRO
+    IMPORT risk_indicators;
 
-		rAppendCarrierInfo :=
-		RECORD
-			RECORDOF(dIn);
-			PhoneFinder_Services.Layouts.CarrierInfo.Base;
-		END;
+    rAppendCarrierInfo :=
+    RECORD
+      RECORDOF(dIn);
+      PhoneFinder_Services.Layouts.CarrierInfo.Base;
+    END;
 
-		dTelcoridaTPM := JOIN(dIn,
-													risk_indicators.Key_Telcordia_tpm,
-															KEYED(LEFT.phone[1..3] = RIGHT.npa)
-													and KEYED(LEFT.phone[4..6] = RIGHT.nxx)
-													and KEYED(LEFT.phone[7]    = RIGHT.tb),
-													LEFT OUTER,
-													KEEP(1), LIMIT(0));
+    dTelcoridaTPM := JOIN(dIn,
+                          risk_indicators.Key_Telcordia_tpm,
+                              KEYED(LEFT.phone[1..3] = RIGHT.npa)
+                          and KEYED(LEFT.phone[4..6] = RIGHT.nxx)
+                          and KEYED(LEFT.phone[7]    = RIGHT.tb),
+                          LEFT OUTER,
+                          KEEP(1), LIMIT(0));
 
-		dTelcorida    := JOIN(dTelcoridaTPM,
-													risk_indicators.Key_Telcordia_tds,
-															KEYED(LEFT.phone[1..3] = RIGHT.npa)
-													and KEYED(LEFT.phone[4..6] = RIGHT.nxx)
-													and LEFT.phone[7] = RIGHT.tb,
-													LEFT OUTER,
-													KEEP(1), LIMIT(0));
+    dTelcorida    := JOIN(dTelcoridaTPM,
+                          risk_indicators.Key_Telcordia_tds,
+                              KEYED(LEFT.phone[1..3] = RIGHT.npa)
+                          and KEYED(LEFT.phone[4..6] = RIGHT.nxx)
+                          and LEFT.phone[7] = RIGHT.tb,
+                          LEFT OUTER,
+                          KEEP(1), LIMIT(0));
 
-		rAppendCarrierInfo tFormat(dTelcorida pInput) :=
-		TRANSFORM
-			vCOCTypeUpper := STRINGlib.STRINGtouppercase(pInput.COCType);
-			vSSCTypeUpper := STRINGlib.STRINGtouppercase(pInput.SSC);
+    rAppendCarrierInfo tFormat(dTelcorida pInput) :=
+    TRANSFORM
+      vCOCTypeUpper := STRINGlib.STRINGtouppercase(pInput.COCType);
+      vSSCTypeUpper := STRINGlib.STRINGtouppercase(pInput.SSC);
 
-			BOOLEAN vCell :=      (vCOCTypeUpper in ['EOC', 'PMC', 'RCC', 'SP1', 'SP2', 'VOI'])
-												and (     stringlib.stringfind(vSSCTypeUpper, 'C', 1) > 0
-															or  stringlib.stringfind(vSSCTypeUpper, 'R', 1) > 0
-															or  stringlib.stringfind(vSSCTypeUpper, 'S', 1) > 0
-														);
+      BOOLEAN vCell :=      (vCOCTypeUpper in ['EOC', 'PMC', 'RCC', 'SP1', 'SP2', 'VOI'])
+                        and (     stringlib.stringfind(vSSCTypeUpper, 'C', 1) > 0
+                              or  stringlib.stringfind(vSSCTypeUpper, 'R', 1) > 0
+                              or  stringlib.stringfind(vSSCTypeUpper, 'S', 1) > 0
+                            );
 
-			BOOLEAN vPage :=      vCOCTypeUpper in ['EOC', 'PMC', 'RCC', 'SP1', 'SP2', 'VOI']
-												and stringlib.stringfind(vSSCTypeUpper, 'B', 1) > 0;
+      BOOLEAN vPage :=      vCOCTypeUpper in ['EOC', 'PMC', 'RCC', 'SP1', 'SP2', 'VOI']
+                        and stringlib.stringfind(vSSCTypeUpper, 'B', 1) > 0;
 
-			BOOLEAN vVOIP := vCOCTypeUpper = 'VOI' or stringlib.stringfind(vSSCTypeUpper, 'V', 1) > 0;
+      BOOLEAN vVOIP := vCOCTypeUpper = 'VOI' or stringlib.stringfind(vSSCTypeUpper, 'V', 1) > 0;
 
-			STRING vTypeDesc := MAP(vCell                 => PhoneFinder_Services.Constants.PhoneType.Wireless,
-															vPage                 => PhoneFinder_Services.Constants.PhoneType.Pager,
-															vVOIP                 => PhoneFinder_Services.Constants.PhoneType.VoIP,
-															vCOCTypeUpper = 'EOC' => PhoneFinder_Services.Constants.PhoneType.LandLine,
-															PhoneFinder_Services.Constants.PhoneType.Other);
+      STRING vTypeDesc := MAP(vCell                 => PhoneFinder_Services.Constants.PhoneType.Wireless,
+                              vPage                 => PhoneFinder_Services.Constants.PhoneType.Pager,
+                              vVOIP                 => PhoneFinder_Services.Constants.PhoneType.VoIP,
+                              vCOCTypeUpper = 'EOC' => PhoneFinder_Services.Constants.PhoneType.LandLine,
+                              PhoneFinder_Services.Constants.PhoneType.Other);
 
-			SELF.carrier_name    := pInput.ocn;
-			SELF.carrier_city    := pInput.city;
-			SELF.carrier_state   := pInput.state;
-			SELF.carrier_type    := pInput.COCType;
-			SELF.coc_description := vTypeDesc;
-			SELF.ssc_description := CASE(pInput.ssc,
-																		'A' => 'INTRALATA USE ONLY',
-																		'B' => 'PAGING SERVICES',
-																		'C' => 'CELLULAR SERVICES',
-																		'I' => 'PSEUDO 800 SERVICE CODE',
-																		'J' => 'EXTENDED/EXPANDED CALLING SCOPE',
-																		'M' => 'LOCAL MASS CALLING CODE',
-																		'N' => 'N/A',
-																		'O' => 'OTHER',
-																		'R' => 'TWO-WAY CONVENTIONAL MOBILE RADIO',
-																		'S' => 'MISCELLANEOUS SERVICES',
-																		'T' => 'TIME',
-																		'W' => 'WEATHER',
-																		'X' => 'LOCAL EXCHANGE INTRALATA SPECIAL BILLING OPTION',
-																		'Z' => 'SELECTIVE LOCAL EXCHANGE INTRALATA SPECIAL BILLING OPTION',
-																		'8' => 'PUERTO RICO and U.S. VIRGIN ISLANDS CODES',
-																		'');
-			SELF                 := pInput;
-		END;
+      SELF.carrier_name    := pInput.ocn;
+      SELF.carrier_city    := pInput.city;
+      SELF.carrier_state   := pInput.state;
+      SELF.carrier_type    := pInput.COCType;
+      SELF.coc_description := vTypeDesc;
+      SELF.ssc_description := CASE(pInput.ssc,
+                                    'A' => 'INTRALATA USE ONLY',
+                                    'B' => 'PAGING SERVICES',
+                                    'C' => 'CELLULAR SERVICES',
+                                    'I' => 'PSEUDO 800 SERVICE CODE',
+                                    'J' => 'EXTENDED/EXPANDED CALLING SCOPE',
+                                    'M' => 'LOCAL MASS CALLING CODE',
+                                    'N' => 'N/A',
+                                    'O' => 'OTHER',
+                                    'R' => 'TWO-WAY CONVENTIONAL MOBILE RADIO',
+                                    'S' => 'MISCELLANEOUS SERVICES',
+                                    'T' => 'TIME',
+                                    'W' => 'WEATHER',
+                                    'X' => 'LOCAL EXCHANGE INTRALATA SPECIAL BILLING OPTION',
+                                    'Z' => 'SELECTIVE LOCAL EXCHANGE INTRALATA SPECIAL BILLING OPTION',
+                                    '8' => 'PUERTO RICO and U.S. VIRGIN ISLANDS CODES',
+                                    '');
+      SELF                 := pInput;
+    END;
 
-		dCarrierInfo := PROJECT(dTelcorida, tFormat(LEFT));
+    dCarrierInfo := PROJECT(dTelcorida, tFormat(LEFT));
 
-		RETURN dCarrierInfo;
-	ENDMACRO;
+    RETURN dCarrierInfo;
+  ENDMACRO;
 
-	// Listing Type
-	EXPORT GetListingType(STRING pListingType, STRING pListingTypeBus, STRING pListingTypeGov, STRING pListingTypeRes) :=
-	FUNCTION
-		RETURN MAP( pListingType = 'BR'                                                       => PhoneFinder_Services.Constants.ListingType.BusGovRes,
-								pListingType = 'BG'                                                       => PhoneFinder_Services.Constants.ListingType.BusGov,
-								pListingType = 'RS'                                                       => PhoneFinder_Services.Constants.ListingType.Residential,
-								pListingTypeBus = 'B' and pListingTypeGov = 'G' and pListingTypeRes = 'R' => PhoneFinder_Services.Constants.ListingType.BusGovRes,   // ListingType for TU takes preference over in-house
-								pListingTypeBus = 'B' and pListingTypeGov = 'G'                           => PhoneFinder_Services.Constants.ListingType.BusGov,      // ListingType for TU takes preference over in-house
-								pListingTypeBus = 'B'                                                     => PhoneFinder_Services.Constants.ListingType.Business,
-								pListingTypeGov = 'G'                                                     => PhoneFinder_Services.Constants.ListingType.Government,
-								pListingTypeRes = 'R'                                                     => PhoneFinder_Services.Constants.ListingType.Residential, // ListingType for TU takes preference over in-house
-								'');
-	END;
+  // Listing Type
+  EXPORT GetListingType(STRING pListingType, STRING pListingTypeBus, STRING pListingTypeGov, STRING pListingTypeRes) :=
+  FUNCTION
+    RETURN MAP( pListingType = 'BR'                                                       => PhoneFinder_Services.Constants.ListingType.BusGovRes,
+                pListingType = 'BG'                                                       => PhoneFinder_Services.Constants.ListingType.BusGov,
+                pListingType = 'RS'                                                       => PhoneFinder_Services.Constants.ListingType.Residential,
+                pListingTypeBus = 'B' and pListingTypeGov = 'G' and pListingTypeRes = 'R' => PhoneFinder_Services.Constants.ListingType.BusGovRes,   // ListingType for TU takes preference over in-house
+                pListingTypeBus = 'B' and pListingTypeGov = 'G'                           => PhoneFinder_Services.Constants.ListingType.BusGov,      // ListingType for TU takes preference over in-house
+                pListingTypeBus = 'B'                                                     => PhoneFinder_Services.Constants.ListingType.Business,
+                pListingTypeGov = 'G'                                                     => PhoneFinder_Services.Constants.ListingType.Government,
+                pListingTypeRes = 'R'                                                     => PhoneFinder_Services.Constants.ListingType.Residential, // ListingType for TU takes preference over in-house
+                '');
+  END;
 
-	// Clean and uppercase the fields
-	SHARED UppercaseFields(dIn, dOut)	:=
-	MACRO
-		LOADXML('<xml/>');
+  // Clean and uppercase the fields
+  SHARED UppercaseFields(dIn, dOut)	:=
+  MACRO
+    LOADXML('<xml/>');
 
-		#EXPORTXML(doCleanFieldMetaInfo, RECORDOF(dIn));
+    #EXPORTXML(doCleanFieldMetaInfo, RECORDOF(dIn));
 
-		#UNIQUENAME(fnClean)
-		%fnClean%(string x) := ut.CleanSpacesAndUpper(x);
+    #UNIQUENAME(fnClean)
+    %fnClean%(string x) := ut.CleanSpacesAndUpper(x);
 
-		#UNIQUENAME(tCleanFields)
-		RECORDOF(dIn)	%tCleanFields%(dIn pInput) :=
-		TRANSFORM
-			#IF(%'doCleanFieldText'% = '')
-				#DECLARE(doCleanField)
-				#DECLARE(doCleanFieldText)
-				#DECLARE(datasetStartCount)
-				#DECLARE(datasetEndCount)
-			#END
+    #UNIQUENAME(tCleanFields)
+    RECORDOF(dIn)	%tCleanFields%(dIn pInput) :=
+    TRANSFORM
+      #IF(%'doCleanFieldText'% = '')
+        #DECLARE(doCleanField)
+        #DECLARE(doCleanFieldText)
+        #DECLARE(datasetStartCount)
+        #DECLARE(datasetEndCount)
+      #END
 
-			#SET(doCleanField, TRUE)
-			#SET(doCleanFieldText, FALSE)
-			#SET(datasetStartCount, 0)
-			#SET(datasetEndCount, 0)
+      #SET(doCleanField, TRUE)
+      #SET(doCleanFieldText, FALSE)
+      #SET(datasetStartCount, 0)
+      #SET(datasetEndCount, 0)
 
-			#FOR(doCleanFieldMetaInfo)
-				#FOR(Field)
-					#IF(stringlib.stringfind(%'@isDataset'%, '1', 1) != 0 or stringlib.stringfind(%'@isRecord'%, '1', 1) != 0)
-						#SET(doCleanField, FALSE)
-						#APPEND(doCleanFieldText, '')
-						#SET(datasetStartCount, %datasetStartCount% + 1)
-					#ELSEIF(stringlib.stringfind(%'@isEnd'%, '1', 1) != 0)
-						#SET(datasetEndCount, %datasetEndCount% + 1)
-						#IF(%datasetEndCount% = %datasetStartCount%)
-							#SET(doCleanField, TRUE)
-						#END
-						#APPEND(doCleanFieldText, '')
-					#ELSEIF(%doCleanField%	and	%'@type'% = 'string')
-						#SET(doCleanFieldText, 'SELF.' + %'@name'%)
-						#APPEND(doCleanFieldText, ' := ' + %'fnClean'% + '(pInput.')
-						#APPEND(doCleanFieldText, %'@name'%)
-						#APPEND(doCleanFieldText, ')')
-						%doCleanFieldText%;
-					#ELSE
-						#APPEND(doCleanFieldText, '')
-					#END
-				#END
-			#END
-			SELF := pInput;
-		END;
+      #FOR(doCleanFieldMetaInfo)
+        #FOR(Field)
+          #IF(stringlib.stringfind(%'@isDataset'%, '1', 1) != 0 or stringlib.stringfind(%'@isRecord'%, '1', 1) != 0)
+            #SET(doCleanField, FALSE)
+            #APPEND(doCleanFieldText, '')
+            #SET(datasetStartCount, %datasetStartCount% + 1)
+          #ELSEIF(stringlib.stringfind(%'@isEnd'%, '1', 1) != 0)
+            #SET(datasetEndCount, %datasetEndCount% + 1)
+            #IF(%datasetEndCount% = %datasetStartCount%)
+              #SET(doCleanField, TRUE)
+            #END
+            #APPEND(doCleanFieldText, '')
+          #ELSEIF(%doCleanField%	and	%'@type'% = 'string')
+            #SET(doCleanFieldText, 'SELF.' + %'@name'%)
+            #APPEND(doCleanFieldText, ' := ' + %'fnClean'% + '(pInput.')
+            #APPEND(doCleanFieldText, %'@name'%)
+            #APPEND(doCleanFieldText, ')')
+            %doCleanFieldText%;
+          #ELSE
+            #APPEND(doCleanFieldText, '')
+          #END
+        #END
+      #END
+      SELF := pInput;
+    END;
 
-		dOut := PROJECT(dIn, %tCleanFields%(LEFT));
-	ENDMACRO;
+    dOut := PROJECT(dIn, %tCleanFields%(LEFT));
+  ENDMACRO;
 
-	// Is minimum info populated to get a DID
-	SHARED noDIDWithMinInfo(UNSIGNED did,
-													STRING lname, STRING fname,
-													STRING ssn,
-													STRING prim_range, STRING prim_name, STRING zip, STRING city, STRING st) :=
-	FUNCTION
-		RETURN (did = 0) and (ssn != '' or
-						(lname != '' and fname != '' and prim_range != '' and prim_name != '' and (zip != '' or (city != '' and st != ''))));
-		END;
+  // Is minimum info populated to get a DID
+  SHARED noDIDWithMinInfo(UNSIGNED did,
+                          STRING lname, STRING fname,
+                          STRING ssn,
+                          STRING prim_range, STRING prim_name, STRING zip, STRING city, STRING st) :=
+  FUNCTION
+    RETURN (did = 0) and (ssn != '' or
+            (lname != '' and fname != '' and prim_range != '' and prim_name != '' and (zip != '' or (city != '' and st != ''))));
+    END;
 
-	// Append DIDs to the search results which didn't have a DID
-	EXPORT AppendDIDs(DATASET(lFinal) dIn, BOOLEAN getBest = FALSE) :=
-	FUNCTION
-		dInSeq := UNGROUP(PROJECT(GROUP(dIn, acctno, ALL), TRANSFORM(lFinal, SELF.seq := COUNTER, SELF := LEFT)));
+  // Append DIDs to the search results which didn't have a DID
+  EXPORT AppendDIDs(DATASET(lFinal) dIn, BOOLEAN getBest = FALSE) :=
+  FUNCTION
+    dInSeq := UNGROUP(PROJECT(GROUP(dIn, acctno, ALL), TRANSFORM(lFinal, SELF.seq := COUNTER, SELF := LEFT)));
 
-		// Convert fields to uppercase
-		UppercaseFields(dInSeq, dInUppercase);
+    // Convert fields to uppercase
+    UppercaseFields(dInSeq, dInUppercase);
 
-		// Get DIDs for records that have enough information
-		dInNoDIDs := dInUppercase(noDIDWithMinInfo(did, lname, fname, ssn, prim_range, prim_name, zip, city_name, st));
+    // Get DIDs for records that have enough information
+    dInNoDIDs := dInUppercase(noDIDWithMinInfo(did, lname, fname, ssn, prim_range, prim_name, zip, city_name, st));
 
-		Autokey_batch.Layouts.rec_inBatchMaster tFormat2DIDReady(dInNoDIDs pInput) :=
-		TRANSFORM
-			SELF.name_first  := pInput.fname;
-			SELF.name_middle := pInput.mname;
-			SELF.name_last   := pInput.lname;
-			SELF.addr_suffix := pInput.suffix;
-			SELF.homephone   := pInput.phone;
-			SELF.p_city_name := pInput.city_name;
-			SELF.z5          := pInput.zip;
-			SELF.dob         := (STRING)pInput.dob;
-			SELF             := pInput;
-			SELF             := [];
-		END;
+    Autokey_batch.Layouts.rec_inBatchMaster tFormat2DIDReady(dInNoDIDs pInput) :=
+    TRANSFORM
+      SELF.name_first  := pInput.fname;
+      SELF.name_middle := pInput.mname;
+      SELF.name_last   := pInput.lname;
+      SELF.addr_suffix := pInput.suffix;
+      SELF.homephone   := pInput.phone;
+      SELF.p_city_name := pInput.city_name;
+      SELF.z5          := pInput.zip;
+      SELF.dob         := (STRING)pInput.dob;
+      SELF             := pInput;
+      SELF             := [];
+    END;
 
-		dFormat2DIDReady := PROJECT(dInNoDIDs, tFormat2DIDReady(LEFT));
+    dFormat2DIDReady := PROJECT(dInNoDIDs, tFormat2DIDReady(LEFT));
 
-		dGetDIDs := PhoneFinder_Services.GetDIDs(dFormat2DIDReady, getBest)(did_count = 1); //Filter out records which got multiple DIDs
+    dGetDIDs := PhoneFinder_Services.GetDIDs(dFormat2DIDReady, getBest)(did_count = 1); //Filter out records which got multiple DIDs
 
-		lFinal tAppendDID(dInUppercase le, dGetDIDs ri) :=
-		TRANSFORM
-			SELF.did := IF(le.did != 0, le.did, ri.did);
-			SELF     := le;
-		END;
+    lFinal tAppendDID(dInUppercase le, dGetDIDs ri) :=
+    TRANSFORM
+      SELF.did := IF(le.did != 0, le.did, ri.did);
+      SELF     := le;
+    END;
 
-		dAppendDIDs := JOIN(dInUppercase,
-												dGetDIDs,
-												LEFT.acctno = RIGHT.acctno and
-												LEFT.seq    = RIGHT.seq,
-												tAppendDID(LEFT, RIGHT),
-												LEFT OUTER,
-												LIMIT(0), KEEP(1)); //only one DID per acctno
+    dAppendDIDs := JOIN(dInUppercase,
+                        dGetDIDs,
+                        LEFT.acctno = RIGHT.acctno and
+                        LEFT.seq    = RIGHT.seq,
+                        tAppendDID(LEFT, RIGHT),
+                        LEFT OUTER,
+                        LIMIT(0), KEEP(1)); //only one DID per acctno
 
-		#IF(PhoneFinder_Services.Constants.Debug.Intermediate)
-			OUTPUT(dInSeq, NAMED('dInSeq'), EXTEND);
-			OUTPUT(dInUppercase, NAMED('dInUppercase'), EXTEND);
-			OUTPUT(dInNoDIDs, NAMED('dInNoDIDs'), EXTEND);
-			OUTPUT(dFormat2DIDReady, NAMED('dFormat2DIDReady'), EXTEND);
-			OUTPUT(dGetDIDs, NAMED('dGetDIDs'), EXTEND);
-		#END
+    #IF(PhoneFinder_Services.Constants.Debug.Intermediate)
+      OUTPUT(dInSeq, NAMED('dInSeq'), EXTEND);
+      OUTPUT(dInUppercase, NAMED('dInUppercase'), EXTEND);
+      OUTPUT(dInNoDIDs, NAMED('dInNoDIDs'), EXTEND);
+      OUTPUT(dFormat2DIDReady, NAMED('dFormat2DIDReady'), EXTEND);
+      OUTPUT(dGetDIDs, NAMED('dGetDIDs'), EXTEND);
+    #END
 
-		RETURN dAppendDIDs;
-	END;
+    RETURN dAppendDIDs;
+  END;
 
   // Format search results to IESP layout
   EXPORT FormatResults2IESP(DATASET(lFinal) dIn, PhoneFinder_Services.iParam.SearchParams inMod) :=
@@ -366,8 +365,8 @@ MODULE
       dt_first_seen := ValidateDate((INTEGER)pInput.dt_first_seen);
       dt_last_seen  := ValidateDate((INTEGER)pInput.dt_last_seen);
 
-      vFullName      := IF( pInput.fname != '' or pInput.lname != '',
-                            Address.NameFromComponents(pInput.fname, pInput.mname, pInput.lname, pInput.name_suffix),
+      vFullName      := MAP(pInput.fname != '' or pInput.lname != ''                                    => Address.NameFromComponents(pInput.fname, pInput.mname, pInput.lname, pInput.name_suffix),
+                            pInput.subj_phone_type_new != MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2 => pInput.listed_name,
                             '');
       vStreetAddress := Address.Addr1FromComponents(pInput.prim_range, pInput.predir, pInput.prim_name, pInput.suffix,
                                                     pInput.postdir, pInput.unit_desig, pInput.sec_range);
@@ -404,7 +403,7 @@ MODULE
 
     dIdentities := IF(inMod.isPrimarySearchPII, dIn(isPrimaryIdentity), dIn);
 
-    dIdentitiesIesp := PROJECT(dIdentities(fname != '' OR lname != ''), tFormat2IespIdentity(LEFT));
+    dIdentitiesIesp := PROJECT(dIdentities(fname != '' OR lname != '' OR listed_name != ''), tFormat2IespIdentity(LEFT));
     dOtherIdentitiesIesp := PROJECT(dIn(~isPrimaryIdentity AND isPrimaryPhone AND (fname != '' OR lname != '')), tFormat2IespIdentity(LEFT));
 
     // Primary phone section
@@ -437,25 +436,25 @@ MODULE
                                                                   SELF.FirstSpoofedDate := iesp.ECL2ESP.toDate(ValidateDate(LEFT.FirstSpoofedDate)),
                                                                   SELF.LastSpoofedDate  := iesp.ECL2ESP.toDate(ValidateDate(LEFT.LastSpoofedDate)),
                                                                   SELF                  := LEFT));
-      SELF.SpoofingData.Source			        := PROJECT(pInput.Source,
+      SELF.SpoofingData.Source              := PROJECT(pInput.Source,
                                                         TRANSFORM(iesp.phonefinder.t_SpoofCommon,
                                                                   SELF.FirstSpoofedDate 	:= iesp.ECL2ESP.toDate(ValidateDate(LEFT.FirstSpoofedDate)),
                                                                   SELF.LastSpoofedDate  	:= iesp.ECL2ESP.toDate(ValidateDate(LEFT.LastSpoofedDate)),
                                                                   SELF:=LEFT));
       SELF.SpoofingData.FirstEventSpoofedDate := iesp.ECL2ESP.toDate(ValidateDate(pInput.FirstEventSpoofedDate));
       SELF.SpoofingData.LastEventSpoofedDate  := iesp.ECL2ESP.toDate(ValidateDate(pInput.LastEventSpoofedDate));
-      SELF.SpoofingData.TotalSpoofedCount 	  := pInput.TotalSpoofedCount;
-      SELF.SpoofingData.SpoofingHistory	 		  := CHOOSEN(PROJECT(pInput.SpoofingHistory,
+      SELF.SpoofingData.TotalSpoofedCount     := pInput.TotalSpoofedCount;
+      SELF.SpoofingData.SpoofingHistory       := CHOOSEN(PROJECT(pInput.SpoofingHistory,
                                                                   TRANSFORM(iesp.phonefinder.t_SpoofHistory,
                                                                             SELF.EventDate := iesp.ECL2ESP.toDate(ValidateDate((INTEGER)LEFT.EventDate)),
                                                                             SELF           := LEFT)),
                                                           iesp.Constants.Phone_Finder.MaxSpoofs);
-      SELF.OneTimePassword.FirstOTPDate			:= iesp.ECL2ESP.toDate(ValidateDate(pInput.FirstOTPDate));
-      SELF.OneTimePassword.LastOTPDate			:= iesp.ECL2ESP.toDate(ValidateDate(pInput.LastOTPDate));
-      SELF.OneTimePassword.OTP							:= pInput.OTP;
-      SELF.OneTimePassword.OTPCount					:= pInput.OTPCount;
-      SELF.OneTimePassword.LastOTPStatus		:= pInput.LastOTPStatus;
-      SELF.OneTimePassword.OTPHistory	 			:= CHOOSEN(PROJECT(pInput.OTPHistory,
+      SELF.OneTimePassword.FirstOTPDate     := iesp.ECL2ESP.toDate(ValidateDate(pInput.FirstOTPDate));
+      SELF.OneTimePassword.LastOTPDate      := iesp.ECL2ESP.toDate(ValidateDate(pInput.LastOTPDate));
+      SELF.OneTimePassword.OTP              := pInput.OTP;
+      SELF.OneTimePassword.OTPCount         := pInput.OTPCount;
+      SELF.OneTimePassword.LastOTPStatus    := pInput.LastOTPStatus;
+      SELF.OneTimePassword.OTPHistory       := CHOOSEN(PROJECT(pInput.OTPHistory,
                                                                 TRANSFORM(iesp.phonefinder.t_OTPHistory,
                                                                           SELF.EventDate := iesp.ECL2ESP.toDate(ValidateDate((INTEGER)LEFT.EventDate)),
                                                                           SELF           := LEFT)),
@@ -493,9 +492,9 @@ MODULE
                                               + pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxLine;
       SELF.VerificationStatus               := ROW({pInput.verification_desc, pInput.is_verified}, iesp.phonefinder.t_PhoneFinderVerificationStatus);
       SELF.PhoneAddressState                := '';
-      SELF.source := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
-                        inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
-                        '');
+      SELF.source                           := MAP( inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
+                                                    inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
+                                                    '');
       SELF                                  := pInput.RealTimePhone_Ext;
       SELF                                  := pInput;
 
@@ -518,10 +517,10 @@ MODULE
       SELF.CarrierCity             := pInput.phone_region_city;
       SELF.CarrierState            := pInput.phone_region_st;
       SELF.ListingName             := pInput.listed_name;
-      SELF.PortingCode	           := pInput.PortingCode;
-      SELF.LastPortedDate	         := iesp.ECL2ESP.toDate(ValidateDate(pInput.LastPortedDate));
-      SELF.PhoneRiskIndicator	     := pInput.PhoneRiskIndicator;
-      SELF.OTPRIFailed	           := pInput.OTPRIFailed;
+      SELF.PortingCode             := pInput.PortingCode;
+      SELF.LastPortedDate          := iesp.ECL2ESP.toDate(ValidateDate(pInput.LastPortedDate));
+      SELF.PhoneRiskIndicator      := pInput.PhoneRiskIndicator;
+      SELF.OTPRIFailed             := pInput.OTPRIFailed;
       SELF.PhoneStatus             := pInput.PhoneStatus,
       SELF.Address                 := iesp.ECL2ESP.SetAddress(pInput.prim_name, pInput.prim_range,
                                                               pInput.predir, pInput.postdir, pInput.suffix,
@@ -538,9 +537,9 @@ MODULE
                                           '');
       SELF.PhoneOwnershipIndicator := pInput.PhoneOwnershipIndicator;
       SELF.CallForwardingIndicator := pInput.CallForwardingIndicator;
-      SELF.source := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
-                        inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
-                        '');
+      SELF.source                  := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
+                                          inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
+                                          '');
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
 
@@ -583,7 +582,7 @@ MODULE
   // Format search results to batch layout
   EXPORT FormatResults2Batch(dIn, dSearchIn, inMod, isPhoneSearch = FALSE) :=
   FUNCTIONMACRO
-    IMPORT $, iesp;
+    IMPORT $, iesp, MDR;
 
     today := STD.Date.Today();
 
@@ -604,9 +603,9 @@ MODULE
       dt_first_seen := $.Functions.ValidateDate((INTEGER)pInput.dt_first_seen);
       dt_last_seen  := $.Functions.ValidateDate((INTEGER)pInput.dt_last_seen);
 
-      vFullName      := IF( pInput.fname != '' or pInput.lname != '',
-                            Address.NameFromComponents(pInput.fname, pInput.mname, pInput.lname, pInput.name_suffix),
-                            pInput.listed_name);
+      vFullName      := MAP(pInput.fname != '' or pInput.lname != '' => Address.NameFromComponents(pInput.fname, pInput.mname, pInput.lname, pInput.name_suffix),
+                            pInput.subj_phone_type_new != MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2 => pInput.listed_name,
+                            '');
       vStreetAddress := Address.Addr1FromComponents(pInput.prim_range, pInput.predir, pInput.prim_name, pInput.suffix,
                                                     pInput.postdir, pInput.unit_desig, pInput.sec_range);
       vCityStZip     := Address.Addr2FromComponentsWithZip4(pInput.city_name, pInput.st, pInput.zip, pInput.zip4);
@@ -642,7 +641,7 @@ MODULE
 
     dIdentities := IF(inMod.isPrimarySearchPII, dIn(isPrimaryIdentity), dIn);
 
-    dPrimaryIdentityInfo := PROJECT(dIdentities(fname != '' OR lname != ''), tFormat2IespIdentity(LEFT));
+    dPrimaryIdentityInfo := PROJECT(dIdentities(fname != '' OR lname != '' OR listed_name != ''), tFormat2IespIdentity(LEFT));
     dOtherIdentitiesInfo := PROJECT(dIn(~isPrimaryIdentity AND isPrimaryPhone AND (fname != '' OR lname != '')), tFormat2IespIdentity(LEFT));
 
     pf.PhoneFinder.TempOut tPrimaryIdentity(pf.PhoneFinder.TempOut le, pf.PhoneFinder.IdentityIesp ri) :=
@@ -786,25 +785,25 @@ MODULE
                                                                   SELF.FirstSpoofedDate := iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.FirstSpoofedDate)),
                                                                   SELF.LastSpoofedDate  := iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.LastSpoofedDate)),
                                                                   SELF                  := LEFT));
-      SELF.SpoofingData.Source			        := PROJECT(pInput.Source,
+      SELF.SpoofingData.Source                := PROJECT(pInput.Source,
                                                         TRANSFORM(iesp.phonefinder.t_SpoofCommon,
                                                                   SELF.FirstSpoofedDate 	:= iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.FirstSpoofedDate)),
                                                                   SELF.LastSpoofedDate  	:= iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.LastSpoofedDate)),
                                                                   SELF:=LEFT));
       SELF.SpoofingData.FirstEventSpoofedDate := iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.FirstEventSpoofedDate));
       SELF.SpoofingData.LastEventSpoofedDate  := iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastEventSpoofedDate));
-      SELF.SpoofingData.TotalSpoofedCount 	  := pInput.TotalSpoofedCount;
-      SELF.SpoofingData.SpoofingHistory	 		  := CHOOSEN(PROJECT(pInput.SpoofingHistory,
+      SELF.SpoofingData.TotalSpoofedCount     := pInput.TotalSpoofedCount;
+      SELF.SpoofingData.SpoofingHistory       := CHOOSEN(PROJECT(pInput.SpoofingHistory,
                                                                   TRANSFORM(iesp.phonefinder.t_SpoofHistory,
                                                                             SELF.EventDate := iesp.ECL2ESP.toDate($.Functions.ValidateDate((INTEGER)LEFT.EventDate)),
                                                                             SELF           := LEFT)),
                                                           iesp.Constants.Phone_Finder.MaxSpoofs);
-      SELF.OneTimePassword.FirstOTPDate			:= iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.FirstOTPDate));
-      SELF.OneTimePassword.LastOTPDate			:= iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastOTPDate));
-      SELF.OneTimePassword.OTP							:= pInput.OTP;
-      SELF.OneTimePassword.OTPCount					:= pInput.OTPCount;
-      SELF.OneTimePassword.LastOTPStatus		:= pInput.LastOTPStatus;
-      SELF.OneTimePassword.OTPHistory	 			:= CHOOSEN(PROJECT(pInput.OTPHistory,
+      SELF.OneTimePassword.FirstOTPDate     := iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.FirstOTPDate));
+      SELF.OneTimePassword.LastOTPDate      := iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastOTPDate));
+      SELF.OneTimePassword.OTP              := pInput.OTP;
+      SELF.OneTimePassword.OTPCount         := pInput.OTPCount;
+      SELF.OneTimePassword.LastOTPStatus    := pInput.LastOTPStatus;
+      SELF.OneTimePassword.OTPHistory       := CHOOSEN(PROJECT(pInput.OTPHistory,
                                                                 TRANSFORM(iesp.phonefinder.t_OTPHistory,
                                                                           SELF.EventDate := iesp.ECL2ESP.toDate($.Functions.ValidateDate((INTEGER)LEFT.EventDate)),
                                                                           SELF           := LEFT)),
@@ -1189,4 +1188,4 @@ MODULE
 
     RETURN dFormat2BatchOut;
   ENDMACRO;
-END;
+  END;
