@@ -77,7 +77,6 @@
 '7S', // FLORIDA_PASCO_COUNTY_TRAFFIC                                                                        
 '7V', // FLORIDA_ESCAMBIA_COUNTY_CIRCUIT_COURT                                                               
 '7W', // FLORIDA_FLAGLER_COUNTY_CIRCUIT_COURT                                                                
-'7X', // FLORIDA_MANATEE_CIRCUIT_AND_COUNTY_COURTS                                                           
 '7Z', // ILLINOIS_PEORIA_COUNTY                                                                              
 '8A', // NEVADA_CLARK_COUNTY_DISTRICT_COURTS                                                                 
 '8D', // OHIO_SHELBY_COUNTY_COMMON_PLEAS_COURT                                                               
@@ -202,7 +201,10 @@
 'HX', // MASSACHUSETTS_WRENTHAM_POLICE_ARRESTS                                                               
 'HY', // MICHIGAN_KENT_COUNTY_ARRESTS                                                                        
 'HZ', // MICHIGAN_WAYNE_COUNTY_ARRESTS                                                                       
+'I0009', // NE LANCASTER DISTRICT COURT_IE                                                                      
 'I0010', // GA DEKALB COUNTY JUDICIAL SYSTEM_IE                                                                 
+'I0015', // CO DENVER COUNTY COURT_IE                                                                           
+'I0020', // NE LANCASTER COUNTY COURT_IE                                                                        
 'I0024', // OH PORTAGE RAVENNA MUNICIPAL COURT_IE                                                               
 'I0032', // TN DAVIDSON GENERAL SESSIONS COURT (LEGACY)_IE                                                      
 'I0040', // NV CLARK LAS VEGAS JUSTICE COURT_IE                                                                 
@@ -403,7 +405,6 @@
 'VW', // OHIO_COSHOCTON_COUNTY_MUNICIPAL_COURT                                                               
 'VZ', // OHIO_CUYAHOGA_COUNTY_EAST_CLEVELAND_MUNICIPAL_COURT                                                 
 'WG', // NORTH_CAROLINA_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                    
-'WH', // OKLAHOMA_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                          
 'WK', // UTAH_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                              
 'WS', // OHIO_JEFFERSON_COUNTY_TORONTO                                                                       
 'WT', // OHIO_GUERNSEY_COUNTY_CAMBRIDGE_MUNICIPAL_COURT                                                      
@@ -451,6 +452,7 @@
 //CrimWise Sources
 'W0001', // ILLINOIS_ADMINISTRATOR_OF_THE_COURTS_CW                                                             
 'W0002', // MINNESOTA_ADMINISTRATOR_OF_THE_COURTS_CW                                                            
+'W0004', // VIRGINIA_ADMINISTRATOR_OF_THE_COURTS_DISTRICT_COURTS_WEBSITE_CW                                     
 'W0005', // CALIFORNIA_AMADOR_COUNTY_CW                                                                         
 'W0006', // CALIFORNIA_COLUSA_COUNTY_CW                                                                         
 'W0007', // CALIFORNIA_EL_DORADO_COUNTY_CW                                                                      
