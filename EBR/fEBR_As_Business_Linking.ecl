@@ -214,8 +214,10 @@ EXPORT fEBR_As_Business_Linking(
 		                                      // trim(temp_employees), '');
 		    // self.revenue_local_raw           := if(trim(l.location_code) != 'H' AND trim(l.location_code) != 'S', 
 		                                      // trim(temp_sales), '');
-			  self.employee_count_local_raw       := temp_employees;
-				self.revenue_local_raw              := temp_sales;
+			  self.employee_count_local_raw       := if(temp_employees != '0',temp_employees,'');
+				//this is due to invalid characters in the sales_actual field causing temp_sales to be equal to zero 
+        //after multiplied by 1000.
+				self.revenue_local_raw              := if(temp_sales != '0',temp_sales,'');
 				self																:= l;
 				self																:= [];
 		end;			
