@@ -2,20 +2,24 @@
 import PAW;
 import BIPV2_Build;
 import InsuranceHeader_PostProcess;
+import mdr;
 
 export GenCrosswalk( 
                     string  pVersion    = BIPV2.KeySuffix
 			    ,boolean promoteToQA = false) := function
     
+	RestrictedSources := [mdr.sourceTools.src_Business_Credit, mdr.sourceTools.src_CClue];
+
      outputFileName := Files(trim(pVersion),false).FILE_LOGICAL;
      b2cKeyName     := Keys(trim(pVersion),false).KEY_LOGICAL_B2C;
      c2bKeyName     := Keys(trim(pVersion),false).KEY_LOGICAL_C2B;
-     bestContacts   := BIPV2_Crosswalk.BestContactTitles();
+     bestContacts   := BIPV2_Crosswalk.BestContactTitles;
 	
      contactKeyDs   := distribute(pull(BIPV2_Build.key_contact_linkids.keybuilt), hash32(seleid));
      // contactSources := set(dedup(contactKeyDs, source, all, hash), source);
 
-     bipBase        := BIPV2.CommonBase.DS_Built;
+     bipBaseA       := BIPV2.CommonBase.DS_Built;
+	bipBase        := BIPV2.CommonBase.xlink(bipBaseA);
 	bipDates       := dedup(project(bipBase(dt_first_seen>0 and dt_last_seen>0), Layouts.DateWorkRec), ultid, orgid, seleid, dt_first_seen, dt_last_seen, all, hash);
 
 	bipContacts    := bipBase(empId>0 or contact_did>0 and lname!='');
@@ -38,7 +42,7 @@ export GenCrosswalk(
 								  self.jobTitleOrder               := map(left.dt_last_seen > TwoYearsAgo   => 1,
 								                                          left.dt_last_seen > SevenYearsAgo => 2,
 																  3);								  
-								  self.job_title                   := if(left.executive_ind_order > 0, left.contact_job_title_derived, ''),
+								  self.job_title                   := if(left.executive_ind_order > 0 and left.source not in RestrictedSources, left.contact_job_title_derived, ''),
 								  self.contact_title_rank          := 0,
 								  self.seg_ind                     := '',
 								  self.sourceGroup                 := 'CONTACT_KEYS',
@@ -54,8 +58,8 @@ export GenCrosswalk(
 				              self.executive_ind_order           := 0,
 				              self.jobTitleOrder                 := 0,
 					         self.sourceGroup                   := 'BIP',
-						    self.contact_title_rank          := 0,
-						    self.seg_ind                     := '',
+						    self.contact_title_rank            := 0,
+						    self.seg_ind                       := '',
 						    self.dt_first_seen_at_business     := left.dt_first_seen_contact;
 						    self.dt_last_seen_at_business      := left.dt_last_seen_contact;
 						    self.dt_first_seen                 := if(left.company_incorporation_date > 0, left.company_incorporation_date, left.dt_first_seen),
@@ -94,8 +98,8 @@ export GenCrosswalk(
 						     self.job_title                 := '',
 						     self.contact_email             := '',
 						     self.vl_id                     := '',
-							self.contact_title_rank          := 0,
-						     self.seg_ind                     := '',
+							self.contact_title_rank        := 0,
+						     self.seg_ind                   := '',
 						     self.contact_phone             := (string) left.subject_phone,
 							self.contact_ssn               := (string) left.subject_ssn,
 							self.contact_dob               := left.subject_dob,
@@ -123,7 +127,7 @@ export GenCrosswalk(
 		 3. Contacts that have No IDs
 	**/
 	recsWithLexID := combineRecs(contact_did > 0);
-	recsWithEmpID := combineRecs(contact_did = 0 and empId>0);
+	recsWithEmpID := combineRecs(contact_did = 0 and empId>0 and source not in RestrictedSources);
 	recsWithNoID  := dedup(combineRecs(contact_did = 0 and empId=0)
 	                      ,ultid,orgid,seleid,proxid
 	                      ,title,fname,mname,lname,name_suffix, contact_ssn, contact_dob
@@ -204,6 +208,8 @@ export GenCrosswalk(
 		 for EmpID.
 		 
 	 **/
+	 sortedRecs              := sort(distribute(recsWithEmpID, hash32(empid)),ultid,orgid,seleid,proxid,empid,source,sourceGroup,-dt_last_seen_at_business);
+	 
       empIDNamesRec           := project(dedup(recsWithEmpID,ultid,orgid,seleid,proxid,empid,source,sourceGroup,all,hash),
 	                                    transform(Layouts.BipToConsumerCrossWalkRec,
 								           permits               := BIPV2.mod_sources.src2bmap(left.source, left.vl_id);
@@ -270,18 +276,17 @@ export GenCrosswalk(
 		 all job titles regardless of which location the job title was associatd with the contact.
 	  **/
 	  dedupLexIDJobTitleRecs    := dedup(recsWithLexID(job_title!=''),ultid,orgid,seleid,contact_did,job_title,source,sourceGroup,all,hash);
-
-	  createJobTitles           := project(dedupLexIDJobTitleRecs,
+       sortLexIDJobTitleRecs     := sort(distribute(dedupLexIDJobTitleRecs, hash32(contact_did)), ultid,orgid,seleid,contact_did,jobTitleOrder,executive_ind_order,-dt_last_seen,local);
+	  
+	  createJobTitles           := project(sortLexIDJobTitleRecs,
 								    transform(Layouts.CrossWalkWorkRec2,
 								              permits                 := BIPV2.mod_sources.src2bmap(left.source, left.vl_id);
 								              self.jobTitles          := dataset([{left.job_title,left.executive_ind_order,left.sourceGroup, left.source,left.source_record_id,permits }],Layouts.JobTitleRec),
 										    self                    := left));
 										    
-	
-       sortContactRank           := group(sort(distribute(createJobTitles, hash32(contact_did)), ultid,orgid,seleid,contact_did,local),ultid,orgid,seleid,contact_did,local);
-	  
-	  rollJobTitles             := rollup(sortContactRank,
-	                                      true,
+		  
+	  rollJobTitles             := rollup(createJobTitles,
+	                                      left.ultid=right.ultid and left.orgid=right.orgid and left.seleid=right.seleid and left.contact_did=right.contact_did,
 								   transform(Layouts.CrossWalkWorkRec2,
 								             self.jobTitles := left.jobTitles + right.jobTitles,
 								             self           := left));

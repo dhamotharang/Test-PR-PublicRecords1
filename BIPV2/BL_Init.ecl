@@ -56,19 +56,19 @@ function
 			self.Contact_status_derived					:= BIPV2.BL_Tables.ContactStatus(l.Contact_status_raw);
 			//*** Blank out wrong length FEIN's (Valid length of FEINs is 9), as per bug# 151785
 			self.company_fein										:= if (length(stringlib.stringcleanspaces(l.company_fein)) = 9, stringlib.stringcleanspaces(l.company_fein), '');   //*** Bug: 151785 - TIN format not correct for specific example
-			self.company_sic_code1							:= if ((mdr.sourceTools.SourceIsDunn_Bradstreet(l.source) or 
-																									mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(l.source)) and length(trim(l.company_sic_code1)) in [4,8], trim(l.company_sic_code1),
+			self.company_sic_code1							:= if ((mdr.sourceTools.SourceIsDunn_Bradstreet(l.source) or mdr.sourceTools.SourceIsInfutor_NARB(l.source) or 
+																	mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(l.source)) and length(trim(l.company_sic_code1)) in [4,8], trim(l.company_sic_code1),
 																									if(length(trim(l.company_sic_code1)) = 4, trim(l.company_sic_code1), ''));
-			self.company_sic_code2							:= if ((mdr.sourceTools.SourceIsDunn_Bradstreet(l.source) or 
+			self.company_sic_code2							:= if ((mdr.sourceTools.SourceIsDunn_Bradstreet(l.source) or mdr.sourceTools.SourceIsInfutor_NARB(l.source) or 
 																									mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(l.source)) and length(trim(l.company_sic_code2)) in [4,8], trim(l.company_sic_code2),
 																									if(length(trim(l.company_sic_code2)) = 4, trim(l.company_sic_code2), ''));
-			self.company_sic_code3							:= if ((mdr.sourceTools.SourceIsDunn_Bradstreet(l.source) or 
+			self.company_sic_code3							:= if ((mdr.sourceTools.SourceIsDunn_Bradstreet(l.source) or mdr.sourceTools.SourceIsInfutor_NARB(l.source) or
 																									mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(l.source)) and length(trim(l.company_sic_code3)) in [4,8], trim(l.company_sic_code3),
 																									if(length(trim(l.company_sic_code3)) = 4, trim(l.company_sic_code3), ''));
-			self.company_sic_code4							:= if ((mdr.sourceTools.SourceIsDunn_Bradstreet(l.source) or 
+			self.company_sic_code4							:= if ((mdr.sourceTools.SourceIsDunn_Bradstreet(l.source) or mdr.sourceTools.SourceIsInfutor_NARB(l.source) or
 																									mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(l.source)) and length(trim(l.company_sic_code4)) in [4,8], trim(l.company_sic_code4),
 																									if(length(trim(l.company_sic_code4)) = 4, trim(l.company_sic_code4), ''));
-			self.company_sic_code5							:= if ((mdr.sourceTools.SourceIsDunn_Bradstreet(l.source) or 
+			self.company_sic_code5							:= if ((mdr.sourceTools.SourceIsDunn_Bradstreet(l.source) or mdr.sourceTools.SourceIsInfutor_NARB(l.source) or
 																									mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(l.source)) and length(trim(l.company_sic_code5)) in [4,8], trim(l.company_sic_code5),
 																									if(length(trim(l.company_sic_code5)) = 4, trim(l.company_sic_code5), ''));
 			self.company_naics_code1						:= if (length(trim(l.company_naics_code1)) = 6, trim(l.company_naics_code1), '');
