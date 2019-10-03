@@ -1,36 +1,40 @@
-IMPORT $, BizLinkFull, bipv2, business_credit, business_header, doxie, domains, fbnv2, gong, experian_crdb, sanctn, 
-  inquiry_acclogs, patriot, phonesplus_v2;
+IMPORT $, BizLinkFull, bipv2, BIPV2_Build, business_credit, business_header, doxie, domains, fbnv2, experian_crdb, 
+  sanctn, inquiry_acclogs;
 
-EXPORT RecordsTier2(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
+EXPORT RecordsTier2(UNSIGNED6 in_lexid, $.IParam.IReportParam in_mod) := FUNCTION
 
-  dids := DATASET([{lexid}], doxie.layout_references);
+  dids := DATASET([{in_lexid}], doxie.layout_references);
 
   // In general, whenever we have a did payload key, we can just call MAC.GetCollection() below and append to results directly.
   // If a did payload is not available, then we need some additional code to fetch raw payload recs.
   bus_header_recs := $.Raw.GetBusHeaderContacts(dids);
   link_ids := $.Raw.GetLinkIds(dids);
-  exp_recs := $.Raw.GetExperianCRDBRecs(link_ids)(did = lexid);
+  exp_recs := $.Raw.GetExperianCRDBRecs(link_ids)(did = in_lexid);
   sanct_recs := $.Raw.GetSanctionRecs(dids);
   inquiry_recs := $.Raw.GetInquiryRecs(dids, inquiry_acclogs.Key_Inquiry_DID);
   inquiry_upd_recs := $.Raw.GetInquiryRecs(dids, inquiry_acclogs.Key_Inquiry_DID_Update);
-  patriot_recs := $.Raw.GetPatriotRecs(dids); //-- special considerations (?)
   internet_recs := $.Raw.GetInternetRecs(dids);
   fbn_ids := $.Raw.GetFBNIDs(dids);
   fbn_contact_recs := $.Raw.GetFbnContacts(fbn_ids);
   fbn_bus_recs := $.Raw.GetFbnBusiness(fbn_ids);
 
+  // BIPV2 raw records
+  bip_contact_linkids := join(dids, BizLinkFull.Key_BizHead_L_CONTACT_DID.key,
+    keyed(left.did = right.contact_did),
+    transform(RIGHT),
+    LIMIT($.Constants.MaxCollectionRecords, SKIP));
+  bip_link_ids := PROJECT(bip_contact_linkids, TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2, SELF := LEFT));
+  bip_recs := BIPV2.Key_BH_Linking_Ids.kFetch2(bip_link_ids, BIPV2.IDconstants.Fetch_Level_SELEID)(contact_did=in_lexid);
+
   // get collections for all in-scope datasets
   recs := 
-      $.MAC.GetCollectionFromRaw(bus_header_recs, in_mod, $.Constants.Collection.BUSINESS_HEADER, Business_Header.Key_Business_Contacts_FP, fp, dt_last_seen)
+      $.MAC.GetCollectionFromRaw(bip_recs, in_mod, $.Constants.Collection.BIP, BIPV2.Key_BH_Linking_Ids.kFetch2(bip_link_ids),, dt_last_seen)
+    + $.MAC.GetCollectionFromRaw(bus_header_recs, in_mod, $.Constants.Collection.BUSINESS_HEADER, Business_Header.Key_Business_Contacts_FP, fp, dt_last_seen)
     + $.MAC.GetCollectionFromRaw(exp_recs, in_mod, $.Constants.Collection.EXPERIAN_CRDB, experian_crdb.Key_LinkIDs.kFetch(link_ids),, dt_last_seen)
     + $.MAC.GetCollectionFromRaw(fbn_contact_recs, in_mod, $.Constants.Collection.FBN_CONTACTS, fbnv2.Key_Rmsid_Contact, did, dt_last_seen)
     + $.MAC.GetCollectionFromRaw(fbn_bus_recs, in_mod, $.Constants.Collection.FBN_BUSINESS, fbnv2.Key_Rmsid_Business, tmsid, dt_last_seen)
-    + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.GONG, Gong.Key_History_did, l_did, dt_last_seen)
     + $.MAC.GetCollectionFromRaw(inquiry_recs, in_mod, $.Constants.Collection.INQUIRY_TABLE, inquiry_acclogs.Key_Inquiry_DID, s_did,,,,ccpa.global_sid, ccpa.record_sid)
     + $.MAC.GetCollectionFromRaw(inquiry_upd_recs, in_mod, $.Constants.Collection.INQUIRY_TABLE_UPDATE, inquiry_acclogs.Key_Inquiry_DID_Update, s_did,,,,ccpa.global_sid, ccpa.record_sid)
-    + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.PHONESPLUS, phonesplus_v2.Key_Phonesplus_Did, l_did, datelastseen, $.Constants.DateFormat.YYYYMM)
-    + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.PHONESPLUS_ROYALTY, phonesplus_v2.Key_Royalty_Did, l_did, datelastseen, $.Constants.DateFormat.YYYYMM)
-    + $.MAC.GetCollectionFromRaw(patriot_recs, in_mod, $.Constants.Collection.PATRIOT, patriot.key_patriot_file, pty_key)
     + $.MAC.GetCollectionFromRaw(sanct_recs, in_mod, $.Constants.Collection.SANCTN, sanctn.key_MIDEX_RPT_NBR, midex_rpt_nbr)
     // Pending confirmation and missing sids
     // + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.SBFE_OWNERS, Business_Credit.Key_IndividualOwnerInformation(), did, dt_last_seen)
@@ -46,21 +50,8 @@ EXPORT RecordsTier2(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
   // sbfecvkeys
   // Business_Credit.Key_IndividualOwnerInformation (need to add, but it's missing sids)
   // Business_Credit.Key_BusinessInformation (need to add, but it is missing sids)
-  // bip header
-  // bip header weekly
+  // bip header weekly - BIPV2_Build.key_contact_linkids.key (?)
   //
-  // TODO: need to clarify which BIP key needs to be disclosed
-  // Angela has BIPV2.Key_BH_Linking_Ids as the payload, but that does not seem to have contact information.
-  // bip_contact_linkids := join(dids, BizLinkFull.Key_BizHead_L_CONTACT_DID.key,
-  //   keyed(left.did = right.contact_did),
-  //   transform(RIGHT),
-  //   LIMIT($.Constants.MaxCollectionRecords, SKIP));
-  // bip_link_ids := PROJECT(bip_contact_linkids, TRANSFORM(BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT));
-  // bip_recs := BIPV2.Key_BH_Linking_Ids.kFetch(link_ids, BIPV2.IDconstants.Fetch_Level_SELEID);
-  // BIPV2.Key_BH_Linking_Ids (business_header linkid)
-  // BIPV2_Build.key_contact_linkids (contact linkid)
-  // bip header weekly: BIPV2_Build.key_contact_linkids.key (?)
-  
   // fraudgov - not discloseable (according to CCPA-763)
   // FDN - not discloseable (according to CCPA-763)
   // death_mi? DEATH_MI.Keys().SSNCustID.qa - healtch care (?)
@@ -68,6 +59,7 @@ EXPORT RecordsTier2(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
   // deadco: InfoUSA.Key_DEADCO_LinkIds.key - phase 2 - no did
   // settlement_keys: Debt_Settlement.Key_LinkIds - in scope, but we have no did key to fetch
   // infutor narb: not in-scope
+
   RETURN recs;
 
 END;
