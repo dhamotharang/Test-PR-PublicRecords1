@@ -22,7 +22,7 @@
 */
 /*--INFO-- This service searches the business header file.*/
 
-IMPORT WSInput, STD, doxie, AutoStandardI, Suppress;
+IMPORT WSInput, STD, doxie, Suppress;
 
 EXPORT BH_SearchService() := MACRO
 		
@@ -54,7 +54,7 @@ EXPORT BH_SearchService() := MACRO
 		boolean IncludeAllContacts := false : stored('IncludeAllContacts');
 
 		Business_Header.doxie_MAC_Field_Declare()
-    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+    mod_access := doxie.compliance.GetGlobalDataAccessModule();
 
 		slimrec := record
 			unsigned6	bdid;
@@ -196,21 +196,21 @@ EXPORT BH_SearchService() := MACRO
 			prim_range != '' or predir != '' or prim_name != '' or addr_suffix != '' or
 				postdir != '' or unit_desig != '' or sec_range != '' or city != '' or
 				state != '' or zip != 0 or zip4 != 0);
-    // temporary record for supressions
-    temp_f_suppress := RECORD
-       business_header.Layout_Business_Contact_full;
-       unsigned4 	global_sid := 0;
-	     unsigned8 	record_sid := 0;
-    end;
 
-		by_contact_for_include_all_pre := dedup(sort(if (IncludeAllContacts,join(dedup(sort(remove_blank_addresses,bdid),bdid),business_header.Key_Business_Contacts_BDID,
-			left.bdid = right.bdid and
-			(~right.glb OR glb_ok),
-			TRANSFORM(temp_f_suppress,
-			self := right),limit(10000,skip))),ssn,lname,fname,mname,name_suffix,title,company_title),ssn,lname,fname,mname,name_suffix,title,company_title);
-      
-    by_contact_for_include_all := project(Suppress.MAC_SuppressSource(by_contact_for_include_all_pre, mod_access),
-                                          business_header.Layout_Business_Contact_full);    
+		d_bids := dedup(sort(remove_blank_addresses, bdid), bdid);
+
+    d_contacts_all := 
+    join(d_bids,business_header.Key_Business_Contacts_BDID,
+    left.bdid = right.bdid and (~right.glb OR glb_ok),
+    transform(RIGHT), limit(10000,skip));  
+
+    d_contacts_ddp := dedup(sort(d_contacts_all, ssn, lname, fname, mname, name_suffix, title, company_title),
+       ssn, lname, fname, mname, name_suffix, title, company_title);
+
+    d_contacts := Suppress.MAC_SuppressSource(d_contacts_ddp, mod_access);
+
+    by_contact_for_include_all :=  if(IncludeAllContacts, project(d_contacts, business_header.Layout_Business_Contact_full));
+
     
 		join_to_contacts := join(remove_blank_addresses(~exact_only or ut.CleanCompany(company_name) = ut.CleanCompany(company_name_value) or (bdv != '' and bdid = (integer)bdv)), if(lname_value != '' or ssn_value != '',bycontact,by_contact_for_include_all),
 			left.bdid = right.bdid,
