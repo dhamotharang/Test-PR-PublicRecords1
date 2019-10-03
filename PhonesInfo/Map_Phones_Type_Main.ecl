@@ -1,4 +1,4 @@
-﻿IMPORT _control, CCPA, DeltabaseGateway, dx_PhonesInfo, Lib_date, Std, Ut;
+﻿IMPORT _control, MDR, DeltabaseGateway, dx_PhonesInfo, Lib_date, Std, Ut;
 
 //DF-24397: Create Dx-Prefixed Keys
 
@@ -260,7 +260,7 @@
 	//////////////////////////////////////////////////////////////////////////////////////////	
 	
 	//Add Global_SID
-	addGlobalSID			:= CCPA.macGetGlobalSID(allFiles, 'PhonesMetadata', 'source', 'global_sid');
+	addGlobalSID			:= MDR.macGetGlobalSid(allFiles, 'PhonesMetadata', 'source', 'global_sid');
 		
 	//////////////////////////////////////////////////////////////////////////////////////////	
 	//Append Record_SID///////////////////////////////////////////////////////////////////////	

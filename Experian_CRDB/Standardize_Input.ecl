@@ -1,4 +1,4 @@
-﻿import  _Control, CCPA, lib_stringlib, ut, _validate, Address, aid, NID, Std;
+﻿import  _Control, MDR, lib_stringlib, ut, _validate, Address, aid, NID, Std;
 
 export Standardize_Input :=	module
 
@@ -268,7 +268,7 @@ export Standardize_Input :=	module
 		dPreProcess 	:= project(pRawFileInput, trans_PreProcessor(left));
 		
 		//Add Global_SID
-		addGlobalSID	:= CCPA.macGetGlobalSID(dPreProcess, 'ExperianCRDB', '', 'global_sid'); //DF-25404
+		addGlobalSID	:= MDR.macGetGlobalSid(dPreProcess, 'ExperianCRDB', '', 'global_sid'); //DF-25404
 		
 	  return addGlobalSID;
 

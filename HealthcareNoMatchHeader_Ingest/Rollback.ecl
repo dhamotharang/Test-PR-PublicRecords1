@@ -1,4 +1,4 @@
-﻿IMPORT	tools;
+﻿IMPORT	STD, tools;
 ///////////////////////////////////////////////////////////////////////////
 // -- Works best when run on HTHOR
 //////////////////////////////////////////////////////////////////////////
@@ -7,21 +7,32 @@ lay_builds 	:=	tools.Layout_FilenameVersions.builds;
 
 EXPORT Rollback(  STRING              pSrc                = '',
                   STRING							pVersion					  =	'',
-                  STRING              pIter               = '1',
-                  BOOLEAN							pDeleteBuildFiles	  =	FALSE,
-                  BOOLEAN							pDeleteLinkingFiles	=	FALSE,
+                  BOOLEAN							pDeleteFiles        =	FALSE,
                   BOOLEAN							pIsTesting				  =	FALSE,
-                  STRING							pFilter						  =	'',
-                  DATASET(lay_builds)	pBuildFilenames 	  =	Filenames(pSrc,pVersion).dAll_filenames,
-                  DATASET(lay_builds)	pLinkingFilenames   =	Filenames(pSrc,pVersion).Linking(pIter).dAll_filenames)	:=	MODULE
+                  STRING							pFilter						  =	''
+                  )	:=	MODULE
 
-  SHARED  pLinkingVersion :=  Filenames(pSrc,pVersion).Linking(pIter).getVersion;
-	EXPORT	buildfiles	  :=	tools.mod_RollbackBuild(pversion, pBuildFilenames, pFilter, pDeleteBuildFiles, pIsTesting);
-	EXPORT	linkingfiles  :=	tools.mod_RollbackBuild(pLinkingVersion, pLinkingFilenames, pFilter, pDeleteLinkingFiles, pIsTesting);
+	EXPORT	buildfiles	  :=	tools.mod_RollbackBuild(pversion, Filenames(pSrc,pVersion).dAll_filenames, pFilter, pDeleteFiles, pIsTesting);
+	EXPORT	linkingfiles(STRING pIter)  :=	tools.mod_RollbackBuild(Filenames(pSrc,pVersion).Linking(pIter).getVersion, Filenames(pSrc,pVersion).Linking(pIter).dAll_filenames, pFilter, pDeleteFiles, pIsTesting);
+  EXPORT  clearWorkmanFiles :=  IF(~pIsTesting AND STD.File.SuperFileExists(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).MasterWUOutput_SF),
+                                  SEQUENTIAL(
+                                    STD.File.StartSuperFileTransaction(),
+                                    STD.File.DeleteSuperFile(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).MasterWUOutput_SF,TRUE),
+                                    STD.File.FinishSuperFileTransaction()
+                                  ),
+                                  OUTPUT('Skipped Clearing Workman Files')
+                                );
+
 
 	EXPORT	fullbuild		:=	SEQUENTIAL(	
+                            linkingfiles('5').Father2QA,
+                            linkingfiles('4').Father2QA,
+                            linkingfiles('3').Father2QA,
+                            linkingfiles('2').Father2QA,
+                            linkingfiles('1').Father2QA,
+                            linkingfiles('0').Father2QA,
                             buildfiles.Father2QA,
-                            linkingfiles.Father2QA
+                            clearWorkmanFiles
                           );
 
 END;

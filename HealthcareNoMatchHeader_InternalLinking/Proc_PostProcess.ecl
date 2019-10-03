@@ -14,6 +14,7 @@ EXPORT Proc_PostProcess(
                       OutputResults
                       ,HealthcareNoMatchHeader_Ingest.Promote(pSrc, pVersion,,'CustomerRecordKey').buildfiles.New2Built
                       ,HealthcareNoMatchHeader_Ingest.Promote(pSrc, pVersion,,'CustomerRecordKey').buildfiles.Built2QA	
+                      ,HealthcareNoMatchHeader_InternalLinking.Proc_Stats(pSrc,,HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).CRK).NoMatchID_Stats
                     );
 
   RETURN  runPostProcess;

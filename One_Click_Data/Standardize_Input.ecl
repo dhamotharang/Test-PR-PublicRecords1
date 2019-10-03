@@ -1,4 +1,4 @@
-﻿import Address, CCPA, Ut, lib_stringlib, _Control, business_header,_Validate,aid, Std;
+﻿import Address, MDR, Ut, lib_stringlib, _Control, business_header,_Validate,aid, Std;
 
 // -- prep address for cleaning
 // -- map data to the base layout
@@ -53,7 +53,7 @@ module
 		
 		dPreProcess 	:= project(dconcatsprayedfiles, tPreProcess(left));
 		
-		addGlobalSID 	:= CCPA.macGetGlobalSID(dPreProcess, 'OneClickData','','global_sid'); //DF-25341: Add Global_SID
+		addGlobalSID 	:= MDR.macGetGlobalSid(dPreProcess, 'OneClickData','','global_sid'); //DF-25341: Add Global_SID
 	
 		return addGlobalSID; 
 	end;

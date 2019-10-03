@@ -1,13 +1,13 @@
 ﻿import BIPv2_Files, ut, BIPv2_PostProcess, BIPV2_PROX_SALT_int_fullfile,tools,BIPv2_HRCHY,BIPV2,tools,BIPV2_Tools, BIPV2_Segmentation;
 EXPORT proc_segmentation(
    string                            pversion
-  ,dataset(BIPV2.CommonBase.layout ) pInputDirty          = BIPV2.CommonBase.DS_BUILT
+  ,dataset(BIPV2.CommonBase.layout ) pInputDirty          = BIPV2.CommonBase.DS_Clean
   ,boolean                           pPromote2QA          = false
   ,boolean                           pOverwrite           = false
   ,string                            pToday               = bipv2.KeySuffix_mod2.MostRecentWithIngestVersionDate//in case you want to run as of a date in the past.  default to date of newest data.
   ,boolean                           pTurnOffStrata       = false
   ,string                            pGoldOutputModifier  = ''
-  ,boolean                           pPopulateStatus      = false
+  ,boolean                           pPopulateStatus      = false //pass in the clean file if this is false for pInputDirty.  if this is true, then pass in ds_base(the whole file)
   ,boolean                           pUseClean2           = false //for testing so that persists will not have to be rebuilt each time(the regulatory suppression causes that to happen)
   ,string                            pLgid3KeyVersion     = 'built'  
 ) := 
@@ -72,7 +72,7 @@ module
       ) 
       ,keep(1),hash,left outer);
     export pInput := if(pPopulateStatus = true  ,ds_set_status_ultid_public
-                                                ,ds_Input_clean            
+                                                ,pInputDirty            
     ) : persist('~persist::BIPV2_PostProcess::proc_segmentation.pInput' + pGoldOutputModifier);
     
 ////// -- patch status fields on full dirty file for output

@@ -1,4 +1,4 @@
-﻿import _control, CCPA, header, gong, Risk_Indicators,Data_Services, Std;
+﻿import _control, MDR, header, gong, Risk_Indicators,Data_Services, Std;
 
 ppCandidate := dataset(Data_Services.foreign_prod + 'thor_data400::in::qsent_clean',Phonesplus.layoutCommonOut,thor);
 
@@ -143,6 +143,6 @@ ActiveDiffName 	:= join(sort(distribute(ppmatch,hash(CellPhone,prim_range,prim_n
 						left.zip5 = right.z5,
 						t_mrkActive(left,right),left outer,local);
 
-addGlobalSID 		:= CCPA.macGetGlobalSID(ActiveDiffName, 'Qsent', '', 'global_sid'); //DF-25332: Populate Global_SIDs
+addGlobalSID 		:= MDR.macGetGlobalSid(ActiveDiffName, 'Qsent', '', 'global_sid'); //DF-25332: Populate Global_SIDs
 		
 export proc_Qsent_asPhonesplus := addGlobalSID;

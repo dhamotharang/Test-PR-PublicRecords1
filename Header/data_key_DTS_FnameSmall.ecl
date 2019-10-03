@@ -59,7 +59,7 @@ t_slim_rec roll_dt_seen(t_slim_rec l, t_slim_rec r) := transform
 	self := l;
 end;
 
-t_roll := rollup(t_grp, true, roll_dt_seen(left, right));
+t_roll := ungroup(rollup(t_grp, true, roll_dt_seen(left, right)));
 
 out_rec := record
 	STRING20 pfname;
