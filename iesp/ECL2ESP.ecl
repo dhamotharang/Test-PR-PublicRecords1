@@ -108,7 +108,7 @@ EXPORT ECL2ESP := MODULE
   // these are ESP-specific and they must be read from XML directly in the future.
   shared string q_id := '' : stored ('_QueryId');
   shared string t_id := '' : stored ('_TransactionId');
-  EXPORT GetHeaderRow () := ROW ({0, '', q_id, t_id, []}, iesp.share.t_ResponseHeader);
+  EXPORT GetHeaderRow () := ROW ({0, '', q_id, t_id, [], []}, iesp.share.t_ResponseHeader);
 
   // This block of code is modeled after MAC_Marshall_Results, but it uses iesp-style
   // parameters and returns everything in a dataset instead of OUTPUTting the RecordCount

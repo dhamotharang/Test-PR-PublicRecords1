@@ -77,7 +77,7 @@ export ReportService() := macro
 	dExceptions	:=	dataset([tException()]);
 	
 	iesp.property_info.t_PropertyInformation	tInvalidAcctPropResult()	:= transform
-		self._Header																						:=	row(	{0,'',Request.User.QueryId,InsContext.Common.TransactionId,dExceptions},
+		self._Header																						:=	row(	{0,'',Request.User.QueryId,InsContext.Common.TransactionId,dExceptions,[]},
 																																			iesp.share.t_ResponseHeader
 																																		);
 		self.ReportBy																						:=	Request.ReportBy;

@@ -166,7 +166,7 @@ function
 																''
 															);
 
-		GetHeaderRow()		:=	row({vStatus,vMessage,vQueryID,vTransID,[]},iesp.share.t_ResponseHeader);
+		GetHeaderRow()		:=	row({vStatus,vMessage,vQueryID,vTransID,[],[]},iesp.share.t_ResponseHeader);
 
 		self._Header			:=	GetHeaderRow();
 		self.InputEcho		:=	pReqSearchBy;

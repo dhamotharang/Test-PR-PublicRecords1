@@ -171,7 +171,7 @@ EXPORT Report_Service() := MACRO
     dExceptions	:=	DATASET([transform_Exception()]);
 
     // Create the Header row that will be placed in the report return record structure.
-    dHeaderRow := ROW( {0, '', icrRequest.User.QueryId, '', dExceptions},
+    dHeaderRow := ROW( {0, '', icrRequest.User.QueryId, '', dExceptions, []},
                        iesp.share.t_ResponseHeader);
 
     // Toss all of our return elements together, gently, and add them to the Report Response record.
