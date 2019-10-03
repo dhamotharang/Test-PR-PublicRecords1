@@ -36,7 +36,6 @@ EXPORT fEBR_As_Business_Linking(
 				string20	bus_type_desc;
 				string7   sales_actual;
         string7   empl_size_actual;
-        string20  location_code;
 		end;
 
 		//Propagate slim layout
@@ -52,9 +51,8 @@ EXPORT fEBR_As_Business_Linking(
 			self.sic_3_code 		  := if(l.sic_3_code <> '',l.sic_3_code,r.sic_3_code);
 			self.sic_4_code 		  := if(l.sic_4_code <> '',l.sic_4_code,r.sic_4_code);
 			self.bus_type_desc 	  := if(l.bus_type_desc <> '',l.bus_type_desc,r.bus_type_desc);	
-			// self.sales_actual     := if(l.sales_actual <> '', l.sales_actual, r.sales_actual);
-      // self.empl_size_actual := if(l.empl_size_actual <> '', l.empl_size_actual, r.empl_size_actual);			
-      // self.location_code    := if(l.location_code <> '', l.location_code, r.location_code);
+			self.sales_actual     := if(l.sales_actual <> '', l.sales_actual, r.sales_actual);
+      self.empl_size_actual := if(l.empl_size_actual <> '', l.empl_size_actual, r.empl_size_actual);			
 			self := l;
 		end;
 
@@ -68,8 +66,7 @@ EXPORT fEBR_As_Business_Linking(
 				string8 	sic_4_code;								
 				string20	bus_type_desc;	
 				string7   sales_actual;
-        string7   empl_size_actual;
-        string20  location_code;			
+        string7   empl_size_actual;	
 		end;
 	
 		//////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,8 +80,7 @@ EXPORT fEBR_As_Business_Linking(
 				self.sic_4_code			  := R.sic_4_code;	
 				self.bus_type_desc	  := trim(stringlib.stringToUppercase(R.bus_type_desc),left,right);
 			  self.sales_actual     := trim(r.sales_actual);
-        self.empl_size_actual := trim(r.empl_size_actual);			
-        self.location_code    := trim(stringlib.stringToUppercase(r.location_code),left,right);
+        self.empl_size_actual := trim(r.empl_size_actual);	
 				self								  := L;
 		end;	
 	
@@ -193,27 +189,8 @@ EXPORT fEBR_As_Business_Linking(
 				self.match_company_name							:= '';
 				self.match_branch_city							:= '';
 				self.match_geo_city									:= '';
-				//Location Description-5600
-				//One of the following descriptions will be listed: 
-				//B= Branch, 
-				// D = Department Store; 
-				// F = Franchise; 
-				// H = HQ; 
-				// S = Single Entity; 
-				// X = Multiple Name Occurrence; 
-				// N = Division; 
-				// U = Subsidiary; 
-				// Blank = Not Available
 		    string temp_employees               := if(trim(l.empl_size_actual) != '0',trim(l.empl_size_actual),'');
 		    string temp_sales                   := if(trim(l.sales_actual) != '' AND trim(l.sales_actual) != '0',(STRING)((INTEGER)trim(l.sales_actual) * 1000),'');
-		    // self.employee_count_org_raw      := if(trim(l.location_code) = 'H' OR trim(l.location_code) = 'S',
-		                                      // trim(temp_employees), '');
-        // self.revenue_org_raw             := if(trim(l.location_code) = 'H' OR trim(l.location_code) = 'S', 
-		                                      // trim(temp_sales), '');
-        // self.employee_count_local_raw    := if(trim(l.location_code) != 'H' AND trim(l.location_code) != 'S', 
-		                                      // trim(temp_employees), '');
-		    // self.revenue_local_raw           := if(trim(l.location_code) != 'H' AND trim(l.location_code) != 'S', 
-		                                      // trim(temp_sales), '');
 			  self.employee_count_local_raw       := if(temp_employees != '0',temp_employees,'');
 				//this is due to invalid characters in the sales_actual field causing temp_sales to be equal to zero 
         //after multiplied by 1000.
