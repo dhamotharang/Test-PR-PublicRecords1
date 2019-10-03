@@ -1,0 +1,15 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Suppress
+FILENAME:Suppress
+NAMESCOPE:OptOut
+
+FIELDTYPE:Invalid_Entry_Type:ENUM(DELETE|OPTOUT)
+FIELDTYPE:Invalid_Nums:ALLOW(0123456789)
+FIELDTYPE:Invalid_Prof_Data:ENUM(Y|N):LENGTHS(1)
+FIELDTYPE:invalid_state_Act:ENUM(CA|NM):LENGTHS(2)
+
+FIELD:entry_type:LIKE(Invalid_Entry_Type):TYPE(STRING30):0,0
+FIELD:lexid:LIKE(Invalid_Nums):TYPE(UNSIGNED8):0,0
+FIELD:prof_data:LIKE(Invalid_Prof_Data):TYPE(STRING1):0,0
+FIELD:state_act:LIKE(invalid_state_Act):TYPE(STRING2):0,0
+FIELD:date_of_request:LIKE(Invalid_Nums):TYPE(STRING8):0,0
