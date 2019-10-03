@@ -63,7 +63,7 @@ export Raw := module
 			doxie.mac_AddHRIPhone(addr_risk_use, with_phone_risk)
 			phone_risk_use := IF(in_mod.includePhoneHri, with_phone_risk, addr_risk_use);
 
-			mod_access := module(project(in_mod, doxie.IDataAccess,opt))end;
+			mod_access := PROJECT(in_mod, doxie.IDataAccess);
 			hbr1 := doxie.header_base_rollup(phone_risk_use, mod_access);
 			
 			Layouts.HFS_wide Norm_phones(hbr1 L,integer cnt) := TRANSFORM
@@ -193,7 +193,7 @@ export Raw := module
 			END;
 			inRids := dedup(sort(project(recs_ssn,getRids(left)),record),record); // needs dedup
 
-			mod_access := module(project(in_mod, doxie.IDataAccess,opt))end;
+			mod_access := PROJECT(in_mod, doxie.IDataAccess);
 			srcRids := doxie.lookup_rid_src(inRids, mod_access, true);
 			recs_ssn addRids(recs_ssn le, srcRids ri) := transform
 				self.rids := ri.r + le.rids;

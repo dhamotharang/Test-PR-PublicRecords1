@@ -1,9 +1,9 @@
-import header, dx_header, ut, Suppress;
+import header, dx_header, ut, Suppress, STD;
 
 export lookup_rid_src(DATASET(doxie.Layout_Rollup.RidRecDid) inrecs, doxie.IDataAccess mod_access, boolean skipListings=false) := FUNCTION
 
 	// fake rids have the 2 char src code embedded
-	boolean isFake(string rid) := (stringlib.stringfilterout(rid,'0123456789') != '');
+	boolean isFake(string rid) := (STD.str.FilterOut(rid,'0123456789') != '');
 
 	// Source Doc info
 	key_rid_src := dx_header.key_rid_SrcID( , false, false);
@@ -36,9 +36,12 @@ export lookup_rid_src(DATASET(doxie.Layout_Rollup.RidRecDid) inrecs, doxie.IData
   
   srcRids_all := srcHdrRids + srcQHRids;
   
-  srcRids_with_sids := Suppress.MAC_SuppressSource(srcRids_all, mod_access, did);
+  srcRids_flagged := Suppress.MAC_FlagSuppressedSource(srcRids_all, mod_access, did);
 
-  srcRids := PROJECT(srcRids_with_sids, doxie.Layout_Rollup.RidRecDid);
+  srcRids := PROJECT(srcRids_flagged, TRANSFORM(doxie.Layout_Rollup.RidRecDid,
+                                                fakeRid := isFake(LEFT.r.rid);
+                                                SELF.r.src := if(LEFT.is_suppressed AND ~fakeRid, 'FI', LEFT.r.src);
+                                                SELF:= LEFT));
   
 	doxie.Layout_Rollup.RidRecDid getDocCnts(doxie.Layout_Rollup.RidRecDid L,doxie.Layout_Rollup.RidRecDid R) := TRANSFORM
 		// don't accumulate counts for fakeRids
