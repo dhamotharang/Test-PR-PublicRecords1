@@ -1,4 +1,4 @@
-﻿IMPORT _Control, BIPV2_Best_SBFE, BIPV2_Best,	BIPV2, Business_Credit, CCPA, doxie, STD;
+﻿IMPORT _Control, BIPV2_Best_SBFE, BIPV2_Best,	BIPV2, Business_Credit, MDR, doxie, STD;
 EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 										Constants().buildType	pBuildType	=	Constants().buildType.Daily) := MODULE
 
@@ -10,7 +10,7 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 														
 	SHARED dSBFEBestKey := PROJECT(dSBFEBestBase, TRANSFORM(BIPV2_Best.layouts.key, SELF:=LEFT, SELF:=[]));  //DF-25791: Populate Global_SID Field
 		
-	SHARED  addGlobalSID :=  CCPA.macGetGlobalSID(dSBFEBestKey,'SBFECV','','global_sid');	
+	SHARED  addGlobalSID :=  MDR.macGetGlobalSid(dSBFEBestKey,'SBFECV','','global_sid');	
 	
 	// DEFINE THE INDEX
 	SHARED	superfile_name	:=	BIPV2_Best_SBFE.Keynames().LinkIds.QA;	
@@ -25,7 +25,6 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 	// obtained approval from product management.
 	// Jira# DF-26179,  Added mod_access and Mac_check_access to kfetch functions for CCPA suppressions.
 	EXPORT kFetch2(DATASET(BIPV2.IDlayouts.l_xlink_ids2) inputs,
-								Doxie.IDataAccess mod_access = MODULE(Doxie.IDataAccess) END,
 								STRING1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
 																																		 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																																		//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
@@ -45,7 +44,6 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 	
 	// Depricated version of the above kFetch2
 	EXPORT kFetch(DATASET(BIPV2.IDlayouts.l_xlink_ids) inputs,
-								Doxie.IDataAccess mod_access = MODULE(Doxie.IDataAccess) END,
 								STRING1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
 																																		 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																																		//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
@@ -55,7 +53,7 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 								):=FUNCTION
 
 		inputs_for2 := PROJECT(inputs, BIPV2.IDlayouts.l_xlink_ids2);
-		f2 := kFetch2(inputs_for2, mod_access, Level, ScoreThreshold, DataPermissionMask, JoinLimit);		
+		f2 := kFetch2(inputs_for2, Level, ScoreThreshold, DataPermissionMask, JoinLimit);		
 		RETURN PROJECT(f2, RECORDOF(Key));																						
 
 	END;
