@@ -1807,6 +1807,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2019/1405 Ukraine List','1794'},
 {'EC 2019/1403 Ukraine List','1795'},
 {'EC (CFSP) 2019/1576 Central African Republic List','1796'},
-{'EC 2019/1574 Central African Republic List','1797'}
+{'EC 2019/1574 Central African Republic List','1797'},
+{'EC (CFSP) 2019/1596 Venezuela List','1798'},
+{'EC 2019/1586 Venezuela List','1799'},
+{'OFAC - Foreign Interference in a United States Election List','1800'}
 ],r);
 
