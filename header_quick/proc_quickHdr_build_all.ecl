@@ -5,8 +5,12 @@ EXPORT proc_quickHdr_build_all (
 	STRING sourcePathWeekly  = '/data/Builds/builds/quick_header/data/',
 	STRING sourcePathMonthly = '/data/Builds/builds/quick_header/data/',
 	STRING destinationGroup  = STD.System.Thorlib.Group(),
-	STRING overwriteFileDate = ''
+	STRING overwriteFileDate = '',
+	STRING buildRunWatchers  =    'Gregory.Rose@lexisnexisrisk.com'
+								+',Debendra.Kumar@lexisnexisrisk.com'
+								+',Gabriel.Marcan@lexisnexisrisk.com'
 ) := FUNCTION
+
 
 	filedate := header_quick._config(sourceIP, sourcePathWeekly).get_v_eq_as_of_date;
 	getVname (string superfile, string v_end = ':') := FUNCTION
@@ -21,7 +25,12 @@ EXPORT proc_quickHdr_build_all (
 	xlink_superfile_ver := getVname(keyPrefix+'key::insuranceheader_xlink::qa::did::refs::name')[1..8];
 	header_raw_prod_ver := getVname('~thor_data400::base::header_raw_Prod','')[1..8];
 
-	check_superfiles_are_in_sync := IF( xlink_superfile_ver <> header_raw_prod_ver,fail('Superfiles are not in sync!'));
+	EM1 := 'Superfiles are not in sync!';
+
+	check_superfiles_are_in_sync := IF( xlink_superfile_ver <> header_raw_prod_ver,
+										 sequential(
+											 STD.System.Email.SendEmail(buildRunWatchers,'QuickHeader Failed - '+EM1,workunit),
+											 fail(EM1)));
 	recordSize := 600;
                                                      
 	weeklyFileName := STD.File.remotedirectory(sourceIP,sourcePathWeekly,'WEEKLY_HEADER_*.DAT',false)(size != 0 )[1].name;

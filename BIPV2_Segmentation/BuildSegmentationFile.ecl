@@ -21,13 +21,13 @@ export BuildSegmentationFile(
      bestRecs       := BIPV2_Best.Files().base.built;	
 
      //Current Build CommonBase Header
-	headerRecs     := BIPV2.CommonBase.DS_Built;
+	headerRecs     := BIPV2.CommonBase.DS_Clean;  //this is the "built" version of the base file cleaned, no need to further clean it.  should be faster
 
 	
      //Current Consumer Header Segmentation	
      seg_key := InsuranceHeader_PostProcess.segmentation_keys.key_did_ind;
 
-     header_clean := distribute(BIPV2.CommonBase.clean(headerRecs), hash32(seleid));
+     header_clean := distribute(headerRecs, hash32(seleid));
 
      nonResidentAddress := dedup(table(header_clean(address_type_derived!='R'), {prim_range, predir, prim_name, addr_suffix, postdir, unit_desig, sec_range, p_city_name, st, zip, zip4}), all, hash);
 							  
