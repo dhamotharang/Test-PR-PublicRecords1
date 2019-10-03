@@ -1,4 +1,4 @@
-﻿IMPORT $, Advo, iesp, Phones, STD, ut, SSNBest_Services;
+﻿IMPORT $, Advo, DID_Add, iesp, Phones, STD, ut, SSNBest_Services;
 
 EXPORT GetIdentitiesFinal(DATASET($.Layouts.PhoneFinder.Final) dSearchResults,
                           DATASET($.Layouts.BatchInAppendDID)  dInBestInfo,
@@ -28,6 +28,7 @@ FUNCTION
     SELF.dt_last_seen            := IF(le.dt_last_seen <= (INTEGER)today AND le.dt_last_seen >= ri.dt_last_seen, le.dt_last_seen, ri.dt_last_seen);
     SELF.PhoneOwnershipIndicator := le.PhoneOwnershipIndicator OR ri.PhoneOwnershipIndicator;
     SELF.isPrimaryIdentity       := le.isPrimaryIdentity OR ri.isPrimaryIdentity;
+    SELF.TNT                     := IF(le.TNT != '', le.TNT, ri.TNT);
     SELF.prim_range              := IF(isAddrMissing, ri.prim_range, le.prim_range);
     SELF.prim_name               := IF(isAddrMissing, ri.prim_name, le.prim_name);
     SELF.predir                  := IF(isAddrMissing, ri.predir, le.predir);
@@ -87,17 +88,21 @@ FUNCTION
 
   dFormat2BatchIn := PROJECT(dInBestInfo, input2Match(LEFT));
 
-	dVerifiedIdentity := $.GetVerifiedRecs(vmod).verify(dIdentityRecs, dFormat2BatchIn);
+  dVerifiedIdentity := $.GetVerifiedRecs(dIdentityRecs, dFormat2BatchIn, vmod);
 
   dIdentitiesInfo := IF(doVerify, dVerifiedIdentity, dIdentityTopn);
 
   // Show the best name/address/DOD for the identities - Only for PII search
   $.Layouts.PhoneFinder.IdentitySlim tBestInfo($.Layouts.PhoneFinder.IdentitySlim le, $.Layouts.BatchInAppendDID ri) :=
   TRANSFORM
-    BOOLEAN isInputDID := ri.did != 0;
+    BOOLEAN isInputDID := inMod.IsPrimarySearchPII AND ri.did != 0;
 
     SELF.did         := le.did;
     SELF.InputDID    := ri.did;
+    SELF.TNT         := MAP((UNSIGNED)le.did = 0 => '',
+                            (DID_Add.Address_Match_Score(le.prim_range, le.prim_name, le.sec_range, le.zip, ri.prim_range, ri.prim_name, ri.sec_range, ri.z5) BETWEEN 76 AND 254) AND
+                             le.prim_range = ri.prim_range => Phones.Constants.TNT.Current,
+                            Phones.Constants.TNT.History);
     SELF.fname       := IF(isInputDID, ri.name_first, le.fname);
     SELF.mname       := IF(isInputDID, ri.name_middle, le.mname);
     SELF.lname       := IF(isInputDID, ri.name_last, le.lname);
@@ -120,15 +125,13 @@ FUNCTION
     SELF             := le;
   END;
 
-  dIdentityBestInfo := JOIN(dIdentitiesInfo,
+  dIdentitiesFinal := JOIN(dIdentitiesInfo,
                             dInBestInfo,
                             LEFT.acctno        = RIGHT.acctno AND
                             (UNSIGNED)LEFT.did = RIGHT.did,
                             tBestInfo(LEFT, RIGHT),
                             LEFT OUTER,
                             LIMIT(0), KEEP(1));
-
-  dIdentitiesFinal := IF(~inMod.IsPrimarySearchPII, dIdentitiesInfo, dIdentityBestInfo);
 
   // Primary Address flag: Look up data by address (using zip)
   dPrimaryAddressByZip := JOIN(dIdentitiesFinal, Advo.Key_Addr1,
