@@ -38,9 +38,10 @@ MACRO
     SELF._Header.Status        := rpt.Status;
     SELF._Header.Message       := rpt.Message;
     SELF._Header.Exceptions    := rpt.Exceptions;
+    SELF._Header.Disclaimers   := service_header.Disclaimers;
     SELF.Results      := rpt.Records;
     SELF.LexId        := report_by.LexID;
-    SELF.RoxieCluster := STD.System.Thorlib.Cluster();                             
+    SELF.RoxieCluster := STD.System.Thorlib.Cluster(); 
   END;
   outfile := DATASET([xform()]);
   

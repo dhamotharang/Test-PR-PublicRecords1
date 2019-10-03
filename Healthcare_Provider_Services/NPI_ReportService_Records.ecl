@@ -38,8 +38,8 @@ EXPORT NPI_ReportService_Records(IParams.searchParams aInputData) := FUNCTION
 			string msg := map(foundMoreThanOneRec => ut.MapMessageCodes(ut.constants_MessageCodes.SUBJECT_NOT_UNIQUE),
 												~checkInputMatched => 'Input data does not match',
 												'');
-			goodheader := ROW ({0, '', q_id, t_id, []}, iesp.share.t_ResponseHeader);
-			badheader := ROW ({msg_code, msg, q_id, t_id, []}, iesp.share.t_ResponseHeader);
+			goodheader := ROW ({0, '', q_id, t_id, [], []}, iesp.share.t_ResponseHeader);
+			badheader := ROW ({msg_code, msg, q_id, t_id, [], []}, iesp.share.t_ResponseHeader);
 			self._Header  := if(hasSomething2Report and checkInputMatched and not foundMoreThanOneRec or noHit,goodheader,badheader);
 			self.RecordCount 	:= if(hasSomething2Report and not foundMoreThanOneRec,count(final_recs),0);
 			self.NPIReports := if(hasSomething2Report and not foundMoreThanOneRec,nppes_final,emptyBase);

@@ -359,6 +359,7 @@ EXPORT Transforms := MODULE
                                                         SELF.Code := LEFT.record_err_code,
                                                         SELF.Message := LEFT.record_err_msg,
                                                         SELF.Location := ''));
+    SELF.Disclaimers   := service_header.Disclaimers;
   END;
   
   EXPORT iesp.emailsearchv2.t_EmailSearchV2InputSubject  xfInputEcho(iesp.emailsearchv2.t_EmailSearchV2SearchBy _in, UNSIGNED lexid)
