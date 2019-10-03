@@ -8,8 +8,7 @@ Industry_Layout	MapIndustry (Base L, INTEGER C)	:=	TRANSFORM,
 SKIP((C = 2 AND L.sic2 in ['',L.sic1 ])                           OR
      (C = 3 AND L.sic3 in ['',L.sic1,L.sic2 ])              OR
      (C = 4 AND L.sic4 in ['',L.sic1,L.sic2,L.sic3 ]) OR
-     (C = 5 AND L.sic5 in ['',L.sic1,L.sic2,L.sic3,L.sic4 ]))
-	
+     (C = 5 AND L.sic5 in ['',L.sic1,L.sic2,L.sic3,L.sic4 ]))	
   SELF.bdid 										:=	0;
 	SELF.bdid_score								:=	0;
 	SELF.UltID										:=	L.UltID;

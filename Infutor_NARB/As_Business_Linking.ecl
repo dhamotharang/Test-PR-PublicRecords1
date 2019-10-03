@@ -96,7 +96,7 @@ EXPORT As_Business_Linking (
 																								 'G' => '250 to 499',
 				                                         'H' => '500 to 999',
 																								 'I' => 'Over 1000',
-																								 'Unknown');
+																								 '');
 				string temp_revenue              := case(l.sales_code,
 																								 'A' => 'Under $500,000',
 				                                         'B' => '$500,000 to $999,999',
@@ -108,14 +108,9 @@ EXPORT As_Business_Linking (
 				                                         'H' => '$200,000,000 to $499,999,999',
 																								 'I' => '$500,000,000 to $999,999,999',
 																								 'J' => 'Over $1,000,000,000',
-																								 'Unknown');
-				//location type H equals headquarters
-				//location type B equals branch
-				//location type S equals single
-				self.employee_count_org_raw      := if(l.location_type = 'H' or l.location_type = 'S', temp_employee_count, '');
-		    self.revenue_org_raw             := if(l.location_type = 'H' or l.location_type = 'S', temp_revenue, '');
-		    self.employee_count_local_raw    := if(l.location_type = 'B', temp_employee_count, '');;
-		    self.revenue_local_raw           := if(l.location_type = 'B', temp_revenue, '');;
+																								 '');
+		    self.employee_count_local_raw    := temp_employee_count;
+		    self.revenue_local_raw           := temp_revenue;
 				self 							   						 := l;
 				self 							   						 := [];
 		end;
