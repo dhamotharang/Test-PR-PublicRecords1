@@ -87,7 +87,7 @@ FUNCTION
                   TRANSFORM(RIGHT),
                   RIGHT ONLY);
 
-  dAll := dResultsByPhone + dWFOnly;
+  dAll := PROJECT(dResultsByPhone, TRANSFORM(lFinal, SELF.isPrimaryPhone := TRUE, SELF := LEFT)) + dWFOnly;
 
   // Append DIDs
   dAppendDIDs := PhoneFinder_Services.Functions.AppendDIDs(dAll, TRUE);

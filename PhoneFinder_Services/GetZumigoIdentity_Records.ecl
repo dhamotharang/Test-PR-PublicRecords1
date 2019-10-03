@@ -7,7 +7,8 @@ EXPORT GetZumigoIdentity_Records(DATASET(PhoneFinder_Services.Layouts.PhoneFinde
 MODULE
   SHARED Ph_Wireless := dPhoneRecs(phone <> '' AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
 
-  Ph_Wireless_Ddp := DEDUP(SORT(Ph_Wireless(isPrimaryPhone), acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip), acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip);
+  Ph_Wireless_Ddp := DEDUP(SORT(Ph_Wireless, acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip),
+                            acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip);
 
   // for phone search, we are sending upto 10 different identities per acct, by picking recent ones.
   SHARED PhoneSrch_wireless := TOPN(GROUP(SORT(Ph_Wireless_Ddp, acctno,  -dt_last_seen, dt_first_seen, seq), acctno), 10, acctno);
