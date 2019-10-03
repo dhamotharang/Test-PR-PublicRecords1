@@ -4,6 +4,18 @@ EXPORT  MAC_AppendCRK(
     , pVersion        //  Build Version ex. (STRING)STD.Date.Today();
     , pBase           //  Base File (Usually output from previous build
     , pAsHeader       //  New AsHeader file to be ingested and linked
+    
+    // Email List for Workman Notifications
+    , pWorkmanEmailTo = 'HealthcareNoMatchHeader_InternalLinking.proc_Constants.emailNotify'
+
+    // Ingest
+    , doIngest    = TRUE // perform full ingest process (ingest incremental and non-incremental sources into existing base file)
+   
+    // Internal Linking
+    , doInternalLinking  = TRUE // perform internal linking
+	
+    // Append CRK
+    , doAppendCRK = TRUE // Append CRK to Internal Linking Base File
 )	:=	FUNCTIONMACRO
 
   #WORKUNIT('NAME','Healthcare NoMatch Customer Record Key for SRC='+pSrc);
@@ -14,7 +26,7 @@ EXPORT  MAC_AppendCRK(
   pPrimaryQueue   :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.primaryQueue;
   pWuPrefix       :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).WUPrefix;
   pWuSuperfile    :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).MasterWUOutput_SF;
-  pEmailTo        :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.emailNotify;
+  pEmailTo        :=  pWorkmanEmailTo;
   pPollingFreq    :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.pollingFreq;
 
   //  Common Workman ECL Code
@@ -98,33 +110,49 @@ EXPORT  MAC_AppendCRK(
                         ',doAppendCRK:=FALSE'+
                         ').All;';
   pRunIterations    :=  Workman.mac_WorkMan(
-                        runIteration_ECL                //  pECL
-                        ,pVersion                       //  pversion
-                        ,pPrimaryQueue                  //  pcluster
-                        , //  pStartIteration       = '1'
-                        ,pMaxNumIter                    //  pNumMaxIterations
-                        , //  pNumMinIterations     = ''
-                        ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runIteration_Text) //  pOutputFilename  :=  
-                        ,pWuSuperfile                   //  pOutputSuperfile
-                        ,pIterationSetResults           //  pSetResults
-                        ,pIterationStopCondition        //  pStopCondition
-                        ,pIterationSetNameCalculations  //  pSetNameCalculations
-                        ,runIteration_Text              //  pBuildName
-                        , //  pESP                  = 'WorkMan._Config.LocalEsp'
-                        ,pEmailTo                       //  pNotifyEmails
-                        , //  pFailureEmails        = ''
-                        , //  pShouldEmail          = 'true'
-                        ,pPollingFreq                   //  pPollingFrequency
-                        , //  pForceRun             = 'false' 
-                        , //  pForceSkip            = 'false' 
-                        , //  pCleanupSuper         = 'false'
-                        , //  pDebugValues          = 'dataset([],WsWorkunits.Layouts.DebugValues)'
-                        , //  pDont_Wait            = 'false'
-                        , //  pParallel             = 'false'
-                        , //  pCompileOnly          = 'false'
-                      );
+                          runIteration_ECL                //  pECL
+                          ,pVersion                       //  pversion
+                          ,pPrimaryQueue                  //  pcluster
+                          , //  pStartIteration       = '1'
+                          ,pMaxNumIter                    //  pNumMaxIterations
+                          , //  pNumMinIterations     = ''
+                          ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runIteration_Text) //  pOutputFilename  :=  
+                          ,pWuSuperfile                   //  pOutputSuperfile
+                          ,pIterationSetResults           //  pSetResults
+                          ,pIterationStopCondition        //  pStopCondition
+                          ,pIterationSetNameCalculations  //  pSetNameCalculations
+                          ,runIteration_Text              //  pBuildName
+                          , //  pESP                  = 'WorkMan._Config.LocalEsp'
+                          ,pEmailTo                       //  pNotifyEmails
+                          , //  pFailureEmails        = ''
+                          , //  pShouldEmail          = 'true'
+                          ,pPollingFreq                   //  pPollingFrequency
+                          , //  pForceRun             = 'false' 
+                          , //  pForceSkip            = 'false' 
+                          , //  pCleanupSuper         = 'false'
+                          , //  pDebugValues          = 'dataset([],WsWorkunits.Layouts.DebugValues)'
+                          , //  pDont_Wait            = 'false'
+                          , //  pParallel             = 'false'
+                          , //  pCompileOnly          = 'false'
+                        );
 
   //  One Append Customer Record Key Iteration
+  pAppendCRKSetResults  :=  [ 'Source Stats[3].val1'
+                              ,'SourceName Stats[4].val1'
+                              ,'TotalRecordCount Stats[5].val1'
+                              ,'TotalSingletons Stats[7].val1'
+                              ,'TotalSingletonsWithNoLexID Stats[8].val1'
+                              ,'TotalSingletonsWithLexID Stats[9].val1'
+                              ,'TotalRecordsWithNoLexIDInALexIDCluster Stats[10].val1'
+                              ,'TotalNonSingletonClusters Stats[12].val1'
+                              ,'ClustersWithNoLexID Stats[14].val1'
+                              ,'ClustersWithUniqueLexID Stats[15].val1'
+                              ,'ClustersWithMultipleNoMatchIDs Stats[16].val1'
+                              ,'ClustersWithMultipleLexIDs Stats[20].val1'
+                              ,'ClustersWithMultipleNames Stats[21].val1'
+                              ,'ClustersWithMultipleDOBs Stats[22].val1'
+                              ,'ClustersWithMultipleAddresses Stats[23].val1'
+                            ];
   runAppendCRK_Text  := 'AppendCustomerRecordKey';
   runAppendCRK_ECL   := workmanPreamble(runAppendCRK_Text)+
                         '\nHealthcareNoMatchHeader_InternalLinking.proc_build_all(pSrc,pVersion,pIteration'+
@@ -135,31 +163,31 @@ EXPORT  MAC_AppendCRK(
                         ',doAppendCRK:=TRUE'+
                         ').All;';
   pRunAppendCRK     :=  Workman.mac_WorkMan(
-                        runAppendCRK_ECL   //  pECL
-                        ,pVersion       //  pversion
-                        ,pPrimaryQueue  //  pcluster
-                        , //  pStartIteration       = '1'
-                        , //  pNumMaxIterations     = '1'
-                        , //  pNumMinIterations     = ''
-                        ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runAppendCRK_Text) //  pOutputFilename
-                        ,pWuSuperfile   //  pOutputSuperfile
-                        , //  pSetResults           = '[]'
-                        , //  pStopCondition        = '\'\''
-                        , //  pSetNameCalculations  = '[]'
-                        ,runAppendCRK_Text //  pBuildName
-                        , //  pESP                  = 'WorkMan._Config.LocalEsp'
-                        ,pEmailTo       //  pNotifyEmails
-                        , //  pFailureEmails        = ''
-                        , //  pShouldEmail          = 'true'
-                        ,pPollingFreq   //  pPollingFrequency
-                        , //  pForceRun             = 'false' 
-                        , //  pForceSkip            = 'false' 
-                        , //  pCleanupSuper         = 'false'
-                        , //  pDebugValues          = 'dataset([],WsWorkunits.Layouts.DebugValues)'
-                        , //  pDont_Wait            = 'false'
-                        , //  pParallel             = 'false'
-                        , //  pCompileOnly          = 'false'
-                      );
+                          runAppendCRK_ECL   //  pECL
+                          ,pVersion       //  pversion
+                          ,pPrimaryQueue  //  pcluster
+                          , //  pStartIteration       = '1'
+                          , //  pNumMaxIterations     = '1'
+                          , //  pNumMinIterations     = ''
+                          ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runAppendCRK_Text) //  pOutputFilename
+                          ,pWuSuperfile   //  pOutputSuperfile
+                          ,pAppendCRKSetResults //  pSetResults
+                          , //  pStopCondition        = '\'\''
+                          , //  pSetNameCalculations  = '[]'
+                          ,runAppendCRK_Text //  pBuildName
+                          , //  pESP                  = 'WorkMan._Config.LocalEsp'
+                          ,pEmailTo       //  pNotifyEmails
+                          , //  pFailureEmails        = ''
+                          , //  pShouldEmail          = 'true'
+                          ,pPollingFreq   //  pPollingFrequency
+                          , //  pForceRun             = 'false' 
+                          , //  pForceSkip            = 'false' 
+                          , //  pCleanupSuper         = 'false'
+                          , //  pDebugValues          = 'dataset([],WsWorkunits.Layouts.DebugValues)'
+                          , //  pDont_Wait            = 'false'
+                          , //  pParallel             = 'false'
+                          , //  pCompileOnly          = 'false'
+                        );
 
     //  Build Prep
   pCreateTempFiles  :=  SEQUENTIAL(
@@ -173,11 +201,9 @@ EXPORT  MAC_AppendCRK(
                         );
                         
   allSteps  :=  SEQUENTIAL(
-                  pCreateTempFiles  //  Make Base and Header files available for Workman
-                  ,pRunIngest       //  Ingest
-                  ,pRunIterations   //  Linking Iterations
-                  ,pRunAppendCRK    //  Append Customer Record Key
-                  ,pDeleteTempFiles //  Cleanup
+                  IFF(doIngest, SEQUENTIAL(pCreateTempFiles,pRunIngest,pDeleteTempFiles), OUTPUT('Ingest Skipped.'))                           //  Ingest
+                  ,IFF(doInternalLinking, pRunIterations, OUTPUT('Internal Linking Build Skipped.'))     //  Linking Iterations
+                  ,IFF(doAppendCRK, pRunAppendCRK, OUTPUT('Append Customer Record Key Skipped.')) //  Append Customer Record Key
                 );
                 
   RETURN  allSteps;

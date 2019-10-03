@@ -21,7 +21,7 @@ EXPORT DOB_Force := 3;
 EXPORT DOB_UseGenerationForce := TRUE;
 EXPORT FNAME_Force := 0; 
 EXPORT MAINNAME_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'does it match'
-/*HACK-O-MATIC*/EXPORT SSN_Score_Min_MAINNAME 	  := 2500;
+/*HACK-O-MATIC*/EXPORT SSN_Score_Min_MAINNAME     := 2500;
 /*HACK-O-MATIC*/EXPORT DOB_Score_Min_MAINNAME 	  := 1500;
-/*HACK-O-MATIC*/EXPORT Mismatch_Score_GENDER 	  := -5000;
+/*HACK-O-MATIC*/EXPORT Mismatch_Score_GENDER      := -3000;
 END;

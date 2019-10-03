@@ -15,6 +15,7 @@ export proc_Build_Phase_2(
   ,pSkipQASamples         = 'false'
   ,pSkipSegStats          = 'false'
   ,pSkipStrata            = 'false'
+  ,pSkipDataCard          = 'false'
   ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
   ,pSkipCrosswalk         = 'false'
@@ -45,8 +46,9 @@ functionmacro
       ,if(pSkipQASamples        = false ,BIPV2_Build.proc_BIPV2_QA_Samples     (pversion,pCompileTest)                                                                                        )
       ,if(pSkipSegStats         = false ,BIPV2_Build.proc_segmentation         (pversion             )                                                                                        )
       ,if(pSkipStrata           = false ,BIPV2_Build.proc_Strata               (pversion             )                                                                                        )
+      ,if(pSkipDataCard         = false ,BIPV2_Build.proc_DataCard             (pversion             )                                                                                        )
       ,if(pSkipOverlinking      = false ,BIPV2_Build.proc_overlinking_samples  (pversion             )                                                                                        )
-      ,if(pSkipSeleidRelative   = false ,BIPV2_Build.proc_Seleid_relatives     (pversion,false,true,false)                                                                                        )
+      ,if(pSkipSeleidRelative   = false ,BIPV2_Build.proc_Seleid_relatives     (pversion,false,true,false)                                                                                    )
 
     )  
 		:	FAILURE(email.BIPV2FullKeys.buildfailure);
