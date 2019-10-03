@@ -7,6 +7,7 @@ EXPORT Constants := MODULE
   EXPORT Collection := MODULE
     EXPORT STRING ALLOY := 'AlloyKeys'; 
     EXPORT STRING ASL := 'AmericanstudentKeys'; 
+    EXPORT STRING BIP := 'BipV2FullKeys'; 
     EXPORT STRING BUSINESS_HEADER := 'BusinessHeaderKeys'; 
     EXPORT STRING DEATH_MASTER := 'DeathMasterSsaKeys'; 
     EXPORT STRING EMAIL := 'EmailV2Keys'; 
