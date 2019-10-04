@@ -76,6 +76,7 @@ FUNCTION
                               LEFT.acctno = RIGHT.acctno,
                               TRANSFORM($.Layouts.PhoneFinder.Final,
                                         SELF.phone             := RIGHT.phone,
+                                        SELF.isPrimaryIdentity := TRUE,
                                         SELF.isPrimaryPhone    := TRUE,
                                         // Need this mapping as SELF := RIGHT happens first before SELF := LEFT mapping
                                         SELF.dt_first_seen     := IF(LEFT.dt_first_seen != '', LEFT.dt_first_seen, (STRING)RIGHT.dt_first_seen),
@@ -150,14 +151,15 @@ FUNCTION
                       dPrepForRIs_pre,
                       LEFT.acctno = RIGHT.acctno,
                       TRANSFORM($.Layouts.PhoneFinder.Final,
-                                BOOLEAN isResExists := RIGHT.acctno != '';
-                                SELF.phone          := IF(isResExists, RIGHT.phone, LEFT.homephone),
-                                SELF.fname          := IF(isResExists, RIGHT.fname, LEFT.name_first),
-                                SELF.lname          := IF(isResExists, RIGHT.lname, LEFT.name_last),
-                                SELF.prim_name      := IF(isResExists, RIGHT.prim_name, LEFT.prim_name),
-                                SELF.isPrimaryPhone := IF(isResExists, RIGHT.isPrimaryPhone, TRUE), // This will process the RiskIndicators for "no identity and no phone"
-                                SELF                := RIGHT,
-                                SELF                := []),
+                                BOOLEAN isResExists    := RIGHT.acctno != '';
+                                SELF.phone             := IF(isResExists, RIGHT.phone, LEFT.homephone),
+                                SELF.fname             := IF(isResExists, RIGHT.fname, LEFT.name_first),
+                                SELF.lname             := IF(isResExists, RIGHT.lname, LEFT.name_last),
+                                SELF.prim_name         := IF(isResExists, RIGHT.prim_name, LEFT.prim_name),
+                                SELF.isPrimaryPhone    := IF(isResExists, RIGHT.isPrimaryPhone, TRUE), // This will process the RiskIndicators for "no identity and no phone"
+                                SELF.isPrimaryIdentity := IF(isResExists, RIGHT.isPrimaryIdentity, TRUE), // This will process the RiskIndicators for "no identity and no phone"
+                                SELF                   := RIGHT,
+                                SELF                   := []),
                       LEFT OUTER,
                       LIMIT(100, SKIP));
 

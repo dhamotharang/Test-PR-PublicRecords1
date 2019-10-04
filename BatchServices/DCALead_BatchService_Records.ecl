@@ -189,11 +189,11 @@ export DCALead_BatchService_Records(dataset(Autokey_Batch.Layouts.rec_inBatchMas
 			self := left));
 	
 	// Get contacts
-	get_contacts := join(add_url,business_header.Key_Business_Contacts_BDID,
+	get_contacts_join := join(add_url,business_header.Key_Business_Contacts_BDID,
 		left.bdid = right.bdid and
 		right.from_hdr = 'N');
     
-  Contacts_byBDID_a := Suppress.MAC_SuppressSource(get_contacts, mod_access);
+  get_contacts := Suppress.MAC_SuppressSource(get_contacts_join, mod_access);
 	// Add title weight
 	join_titles := join(get_contacts,doxie_cbrs.executive_titles,
 		left.company_title = right.stored_title,

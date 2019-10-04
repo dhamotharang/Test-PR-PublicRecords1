@@ -71,7 +71,7 @@ export IdAppendRoxie(
 	                   ,boolean dnbFullRemove = false
 					   ,Doxie.IDataAccess mod_access = defaultDataAccess) := function
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
-			res0 := BIPV2.IdAppendLocal.FetchRecords(localAppend, fetchLevel, dnbFullRemove);
+			res0 := BIPV2.IdAppendLocal.FetchRecords(localAppend, fetchLevel, dnbFullRemove, mod_access := mod_access);
 			res := project(res0, transform(BIPV2.IdAppendLayouts.AppendWithRecsOutput, self := left, self := []));	
 		#ELSE
 			res := remoteAppend.WithRecords(fetchLevel := fetchLevel, mod_access := mod_access);

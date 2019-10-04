@@ -5,7 +5,11 @@ EXPORT RollupBusiness_BatchService_Records(
 	DATASET(RollupBusiness_BatchService_Layouts.Input) indata,
 	RollupBusiness_BatchService_Interfaces.Input args) := MODULE
   
-	SHARED mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+	SHARED mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+    EXPORT unsigned1 glb := args.glbpurpose;
+    EXPORT unsigned1 dppa := args.dppapurpose;
+    
+  END;
 	SHARED limits := RollupBusiness_BatchService_Constants.Limits;
 	
 	// First, project into the layout for Business Header Fetch.
@@ -368,14 +372,13 @@ EXPORT RollupBusiness_BatchService_Records(
 	SHARED Sorted_Phone_Records := DEDUP(SORT(Phone_Records,acctno,groupid,level,-cnt,phone),acctno,groupid,keep 10);
 	
 	// Get the Address records
-  glb_purpose:=AutoStandardI.InterfaceTranslator.glb_purpose.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.glb_purpose.params));
   SHARED ExtraBestInfo_Records :=
 	  SORT(
       JOIN(Deduped_GroupId_Results_No_Filter, Business_Header_SS.Key_BH_BDID_pl,
         KEYED(LEFT.related_bdid = RIGHT.bdid)
 				AND LEFT.level <= 1
         AND (RIGHT.dt_first_seen != 0 OR RIGHT.dt_last_seen != 0) AND
-        ut.PermissionTools.glb.SrcOk(glb_purpose,right.source),
+        doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, right.source),
 				KEEP(Limits.EXTRABEST_KEEP), 
 				LIMIT(Limits.EXTRABEST_LIMIT, SKIP)), 
 	    company_name, bdid);
@@ -465,7 +468,6 @@ EXPORT RollupBusiness_BatchService_Records(
 	//	output(Bankruptcies_ByTMSID, named('Bankruptcies_ByTMSID'));
 		
 	// Get executives
-	glb_ok:=ut.PermissionTools.glb.ok(AutoStandardI.InterfaceTranslator.glb_purpose.val(PROJECT(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.glb_purpose.params)));
 	
   Contacts_byBDID_pre := JOIN(Deduped_GroupId_Results,Business_Header.Key_Business_Contacts_BDID,
 		KEYED(LEFT.related_bdid = RIGHT.bdid),
@@ -473,7 +475,7 @@ EXPORT RollupBusiness_BatchService_Records(
     
   Contacts_byBDID_a := Suppress.MAC_SuppressSource(Contacts_byBDID_pre, mod_access);
     
-	SHARED Contacts_byBDID := Contacts_byBDID_a(~glb or glb_ok);
+	SHARED Contacts_byBDID := Contacts_byBDID_a(~glb or mod_access.isValidGLB());
 	SHARED Contacts_withTitle := JOIN(Contacts_byBDID,doxie_cbrs.executive_titles,
 		LEFT.company_title = RIGHT.stored_title);
 	
