@@ -1,6 +1,7 @@
 ﻿#OPTION('MultiplePersistInstances', false);
 version := '20190605';
-root := '~thor::bridger::medicaid::hc_med_sanc_extract_20190605.tab';
+baseversion := '20190926';
+root := '~thor::bridger::medicaid::hc_med_sanc_extract_' + baseversion + '.tab';
 
 ds1 := dataset(root, MedicaidSanctions.Layout_Sanctions, CSV);
 
@@ -15,5 +16,9 @@ SEQUENTIAL(
 	OUTPUT(CHOOSEN(dsbad, 100), named('rejected_samples')),
 	MedicaidSanctions.WriteXGFormat.OutputDataXMLFile(version, mapped, ds)
 	// despray XML file
+	MedicaidSanctions.Unspray(
+				'~thor::medicaidsanctions::' + version,
+				'medicaidsanctions_' + version + '.xml');
+
 );
 	
