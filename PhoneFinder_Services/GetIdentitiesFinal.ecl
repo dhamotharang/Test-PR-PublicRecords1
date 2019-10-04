@@ -96,12 +96,13 @@ FUNCTION
   $.Layouts.PhoneFinder.IdentitySlim tBestInfo($.Layouts.PhoneFinder.IdentitySlim le, $.Layouts.BatchInAppendDID ri) :=
   TRANSFORM
     BOOLEAN isInputDID := inMod.IsPrimarySearchPII AND ri.did != 0;
+    UNSIGNED addressMatchScore := DID_Add.Address_Match_Score(le.prim_range, le.prim_name, le.sec_range, le.zip, ri.prim_range, ri.prim_name, ri.sec_range, ri.z5);
 
     SELF.did         := le.did;
     SELF.InputDID    := ri.did;
+    // Need to double check mapping - doesn't make any sense, but trying to match production
     SELF.TNT         := MAP((UNSIGNED)le.did = 0 => '',
-                            (DID_Add.Address_Match_Score(le.prim_range, le.prim_name, le.sec_range, le.zip, ri.prim_range, ri.prim_name, ri.sec_range, ri.z5) BETWEEN 76 AND 254) AND
-                             le.prim_range = ri.prim_range => Phones.Constants.TNT.Current,
+                            ri.did != 0 OR addressMatchScore BETWEEN 76 AND 254 AND le.prim_range = ri.prim_range => Phones.Constants.TNT.Current,
                             Phones.Constants.TNT.History);
     SELF.fname       := IF(isInputDID, ri.name_first, le.fname);
     SELF.mname       := IF(isInputDID, ri.name_middle, le.mname);

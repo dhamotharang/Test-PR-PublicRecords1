@@ -13,18 +13,18 @@ MODULE
 
 
 	// Phone Porting
-	EXPORT UNSIGNED1 MaxPortedMatches    	 := 100;
-	EXPORT UNSIGNED1 MaxSpoofedMatches     := 100;
-	EXPORT UNSIGNED1 MaxOTPMatches     		 := 100;
-	EXPORT UNSIGNED1 MaxOTPBatch	     		 := 30;
-	EXPORT UNSIGNED1 PortingMarginOfError  := 5; 	// plus or minus 5 days from the date fields
-	EXPORT UNSIGNED  MetadataLimit 			 	 := 10000;
-	EXPORT UNSIGNED1 MaxAlertCategories 	 := 3;
-	EXPORT UNSIGNED1 SQLSelectLimit			 	 := 100;  // Limit SQL select for each phone
-	EXPORT UNSIGNED1 gatewayTimeout			 	 := 2;
-	EXPORT UNSIGNED1 gatewayRetries			 	 := 0;
-	EXPORT UNSIGNED1 NoPenalty           := 0;
-	EXPORT UNSIGNED1 LERG6_LastActivityThreshold           := 30;
+	EXPORT UNSIGNED1 MaxPortedMatches     := 100;
+	EXPORT UNSIGNED1 MaxSpoofedMatches    := 100;
+	EXPORT UNSIGNED1 MaxOTPMatches        := 100;
+	EXPORT UNSIGNED1 MaxOTPBatch	        := 30;
+	EXPORT UNSIGNED1 PortingMarginOfError := 5; // plus or minus 5 days from the date fields
+	EXPORT UNSIGNED  MetadataLimit        := 10000;
+	EXPORT UNSIGNED1 MaxAlertCategories   := 3;
+	EXPORT UNSIGNED1 SQLSelectLimit       := 100;  // Limit SQL select for each phone
+	EXPORT UNSIGNED1 gatewayTimeout       := 2;
+	EXPORT UNSIGNED1 gatewayRetries       := 0;
+	EXPORT UNSIGNED1 NoPenalty            := 0;
+	EXPORT UNSIGNED1 LERG6_LastActivityThreshold := 30;
 
 	// Enum for TransactionType and Phone source
 	EXPORT TransType   := ENUM(Basic = 0,Premium = 1,Ultimate = 2, PhoneRiskAssessment = 3, Blank = 255);
@@ -62,7 +62,7 @@ END;
 		EXPORT Landline := 'LANDLINE';
 		EXPORT Wireless := 'POSSIBLE WIRELESS';
 		EXPORT Pager    := 'PAGER';
-		EXPORT VoIP     := 'POSSIBLE VoIP';
+		EXPORT VoIP     := 'POSSIBLE VOIP';
 		EXPORT Other    := 'OTHER/UNKNOWN';
 	END;
 
@@ -72,9 +72,9 @@ END;
 
   EXPORT PhoneStatus :=
   MODULE
-    EXPORT Inactive := 'INACTIVE';
-    EXPORT Active 	:= 'ACTIVE';
-    EXPORT NotAvailable 	:= 'NOT AVAILABLE';
+    EXPORT Inactive     := 'INACTIVE';
+    EXPORT Active       := 'ACTIVE';
+    EXPORT NotAvailable := 'NOT AVAILABLE';
 
   END;
 
@@ -91,10 +91,10 @@ END;
 	// Waterfall phones constants
 	EXPORT WFConstants :=
 	MODULE
-		EXPORT UNSIGNED1 MaxPhones 					 := 6;
-		EXPORT UNSIGNED1 MaxSubjects         := 5;
-		EXPORT UNSIGNED1 MaxPremiumSource    := 2; //PHPR-95 update to return 2 equifax phones
-		EXPORT UNSIGNED1 MaxSectionLimit	   := 35;
+		EXPORT UNSIGNED1 MaxPhones        := 6;
+		EXPORT UNSIGNED1 MaxSubjects      := 5;
+		EXPORT UNSIGNED1 MaxPremiumSource := 2; //PHPR-95 update to return 2 equifax phones
+		EXPORT UNSIGNED1 MaxSectionLimit  := 35;
 	END;
 
 	// Ported metadata phones constants
@@ -117,9 +117,9 @@ END;
 
 	EXPORT SpoofPhoneOrigin :=
 		MODULE
-			EXPORT STRING1 Spoofed 			:= 'S';
-			EXPORT STRING1 Destination 	:= 'D';
-			EXPORT STRING1 Source 			:= 'C';
+			EXPORT STRING1 Spoofed      := 'S';
+			EXPORT STRING1 Destination  := 'D';
+			EXPORT STRING1 Source       := 'C';
 		END;
 
 	EXPORT MaxCheckIdentities := 10;
@@ -160,11 +160,11 @@ END;
 
 	EXPORT ZumigoConstants := MODULE
 		EXPORT STRING20 Usecase     := 'FCIP';
-		EXPORT STRING3 	productCode := 'ACC';
+		EXPORT STRING3  productCode := 'ACC';
 		EXPORT STRING20 productName := 'PHONE FINDER';
 		EXPORT STRING10 optInType   := 'Whitelist';
-		EXPORT STRING5 	optInMethod := 'TCO';
-		EXPORT STRING3 	optinDuration := 'ONG';
+		EXPORT STRING5  optInMethod := 'TCO';
+		EXPORT STRING3  optinDuration := 'ONG';
 		EXPORT UNSIGNED1 IdentityDateThreshold := 61;
 		EXPORT UNSIGNED1 MonthlyDays := 31;
 	END;

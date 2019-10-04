@@ -387,8 +387,8 @@
                                                                         pInput.zip4, pInput.county_name, '',
                                                                         vStreetAddress[1..60], vStreetAddress[61..],
                                                                         vCityStZip);
-      SELF.PrimaryAddressType								 := pInput.primary_address_type;
-      SELF.RecordType												 := pInput.TNT;
+      SELF.PrimaryAddressType                := pInput.primary_address_type;
+      SELF.RecordType                        := pInput.TNT;
       SELF.FirstSeenWithPrimaryPhone         := iesp.ECL2ESP.toDate(dt_first_seen);
       SELF.LastSeenWithPrimaryPhone          := iesp.ECL2ESP.toDate(dt_last_seen);
       SELF.TimeWithPrimaryPhone              := IF(dt_first_seen != 0 AND dt_last_seen != 0,
@@ -409,6 +409,10 @@
     // Primary phone section
     iesp.phonefinder.t_PhoneFinderDetailedInfo tFormat2IespPrimaryPhone(lFinal pInput) :=
     TRANSFORM
+      doVerify := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneIsActive;
+
+      vVerificationDesc := IF(doVerify AND ~pInput.is_verified AND pInput.verification_desc = '', $.Constants.VerifyMessage.PhoneCannotBeVerified, pInput.verification_desc);
+
       SELF.Number                           := pInput.phone;
       SELF._Type                            := pInput.coc_description;
       SELF.Carrier                          := pInput.carrier_name;
@@ -490,7 +494,7 @@
       SELF.OperatingCompany.Fax             :=  pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxNPA
                                               + pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxNXX
                                               + pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxLine;
-      SELF.VerificationStatus               := ROW({pInput.verification_desc, pInput.is_verified}, iesp.phonefinder.t_PhoneFinderVerificationStatus);
+      SELF.VerificationStatus               := ROW({vVerificationDesc, pInput.is_verified}, iesp.phonefinder.t_PhoneFinderVerificationStatus);
       SELF.PhoneAddressState                := '';
       SELF.source                           := MAP( inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
                                                     inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
@@ -728,7 +732,7 @@
       SELF.PhoneOwnershipIndicator := pInput.PhoneOwnershipIndicator;
       SELF.CallForwardingIndicator := pInput.CallForwardingIndicator;
       SELF.source                  := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
-                                          inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
+                                          inmod.IsPrimarySearchPII                                                                          => PhoneFinder_Services.Constants.SOURCES.Internal,
                                           '');
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
@@ -758,6 +762,10 @@
     // Primary phone info
     pf.PhoneFinder.PhoneIesp tFormat2IespPrimaryPhone(lFinal pInput) :=
     TRANSFORM
+      doVerify := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneIsActive;
+
+      vVerificationDesc := IF(doVerify AND ~pInput.is_verified AND pInput.verification_desc = '', $.Constants.VerifyMessage.PhoneCannotBeVerified, pInput.verification_desc);
+
       SELF.Number                           := pInput.phone;
       SELF._Type                            := pInput.coc_description;
       SELF.Carrier                          := pInput.carrier_name;
@@ -839,11 +847,11 @@
       SELF.OperatingCompany.Fax             :=  pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxNPA
                                               + pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxNXX
                                               + pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxLine;
-      SELF.VerificationStatus               := ROW({pInput.verification_desc, pInput.is_verified}, iesp.phonefinder.t_PhoneFinderVerificationStatus);
+      SELF.VerificationStatus               := ROW({vVerificationDesc, pInput.is_verified}, iesp.phonefinder.t_PhoneFinderVerificationStatus);
       SELF.PhoneAddressState                := '';
-      SELF.source := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
-                        inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
-                        '');
+      SELF.source                           := MAP( inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
+                                                    inmod.IsPrimarySearchPII                                                                          => PhoneFinder_Services.Constants.SOURCES.Internal,
+                                                    '');
       SELF                                  := pInput.RealTimePhone_Ext;
       SELF                                  := pInput;
 

@@ -152,10 +152,10 @@ FUNCTION
                       LEFT.acctno = RIGHT.acctno,
                       TRANSFORM($.Layouts.PhoneFinder.Final,
                                 BOOLEAN isResExists    := RIGHT.acctno != '';
+                                SELF.acctno            := LEFT.acctno,
                                 SELF.phone             := IF(isResExists, RIGHT.phone, LEFT.homephone),
                                 SELF.fname             := IF(isResExists, RIGHT.fname, LEFT.name_first),
                                 SELF.lname             := IF(isResExists, RIGHT.lname, LEFT.name_last),
-                                SELF.prim_name         := IF(isResExists, RIGHT.prim_name, LEFT.prim_name),
                                 SELF.isPrimaryPhone    := IF(isResExists, RIGHT.isPrimaryPhone, TRUE), // This will process the RiskIndicators for "no identity and no phone"
                                 SELF.isPrimaryIdentity := IF(isResExists, RIGHT.isPrimaryIdentity, TRUE), // This will process the RiskIndicators for "no identity and no phone"
                                 SELF                   := RIGHT,

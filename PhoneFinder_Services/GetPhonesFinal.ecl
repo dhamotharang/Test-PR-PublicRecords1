@@ -34,7 +34,7 @@ FUNCTION
                                         le.coc_description = ri.coc_description OR ri.coc_description = ''                                 => le.coc_description,
                                         PhoneFinder_Services.Constants.PhoneType.Other);
     SELF.ListingType             := IF(le.ListingType != '', le.ListingType, ri.ListingType);
-    SELF.PhoneStatus	           := IF(le.PhoneStatus = $.Constants.PhoneStatus.NotAvailable, ri.PhoneStatus, le.PhoneStatus);
+    SELF.PhoneStatus             := IF(le.PhoneStatus = $.Constants.PhoneStatus.NotAvailable, ri.PhoneStatus, le.PhoneStatus);
     SELF.PhoneOwnershipIndicator := le.PhoneOwnershipIndicator OR ri.PhoneOwnershipIndicator; // only valid for other phones
     SELF.CallForwardingIndicator := IF(ri.CallForwardingIndicator = '' OR le.CallForwardingIndicator = $.Functions.CallForwardingDesc(1),
                                         le.CallForwardingIndicator,
@@ -57,7 +57,7 @@ FUNCTION
     SELF.sim_Tenure_MaxDays      := IF(le.sim_Tenure_MaxDays = 0, ri.sim_Tenure_MaxDays, le.sim_Tenure_MaxDays);
     SELF.imei_Tenure_MinDays     := IF(le.imei_Tenure_MinDays = 0, ri.imei_Tenure_MinDays, le.imei_Tenure_MinDays);
     SELF.imei_Tenure_MaxDays     := IF(le.imei_Tenure_MaxDays = 0, ri.imei_Tenure_MaxDays, le.imei_Tenure_MaxDays);
-    SELF                 		     := le;
+    SELF                         := le;
   END;
 
   dPhoneRollup := ROLLUP(dPhoneSort,
@@ -168,7 +168,7 @@ FUNCTION
 
   dAllPhonesDetail := IF(isPrimaryPhone,
                           dPhoneDetail + dTUPhonesOnly,
-                          UNGROUP(TOPN(GROUP(dPhoneRollup, acctno), PhoneFinder_Services.Constants.WFConstants.MaxSectionLimit, acctno, -phone_score)));
+                          UNGROUP(TOPN(GROUP(dPhoneState, acctno), PhoneFinder_Services.Constants.WFConstants.MaxSectionLimit, acctno, -phone_score)));
 
   #IF(PhoneFinder_Services.Constants.Debug.Main)
       OUTPUT(dPhoneSlim, NAMED('dPhoneSlim'), EXTEND);
