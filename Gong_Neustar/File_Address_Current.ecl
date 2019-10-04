@@ -1,9 +1,10 @@
-//gong key based on some address fields
+﻿//gong key based on some address fields
 import doxie, Data_Services, header_services, gong;
 
 g := File_History_Full_Prepped_For_Keys(current_record_flag='Y',trim(prim_name)<>'', trim(z5)<>'');
 
-lraw := Layout_bscurrent_raw;
+//DF-26180 - Need to include lexid, global_sid and record_sid
+lraw := Layout_Gong_DID;
 
 // TODO: if "history" key will ever be adjusted, then it'd make sense to publish this layout
 rec_address := record
@@ -29,6 +30,9 @@ rec_address := record
   lraw.listed_name;
   string8 date_first_seen;// := lraw.filedate[1..8];
   lraw.dual_name_flag;
+  lraw.DID;
+  lraw.global_sid;
+  lraw.record_sid;
 end;
 
 rec_address addcn(g l) := transform
