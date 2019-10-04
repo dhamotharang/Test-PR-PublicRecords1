@@ -24,9 +24,9 @@ RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::new_suppression::fcra::@versio
 RoxieKeyBuild.Mac_SK_Move_V2('~thor::key::new_suppression::@version@::opt_out','Q',mv_qa_optout);
 RoxieKeyBuild.Mac_SK_Move_V2('~thor::key::new_suppression::fcra::@version@::opt_out','Q',mv_qa_optout_fcra);
 
-update_dops 					:= dops.updateversion('SuppressionKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com',,'N|F|B');
-update_dops_fcra := dops.updateversion('FCRA_SuppressionKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com',,'F');
-update_idops 				:= dops.updateversion('SuppressionKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com',,'N',,,'A');
+update_dops 					:= dops.updateversion('SuppressionKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N|F|B');
+update_dops_fcra := dops.updateversion('FCRA_SuppressionKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'F');
+update_idops 				:= dops.updateversion('SuppressionKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N',,,'A');
 
 create_build := Orbit3.proc_Orbit3_CreateBuild('Suppressions',pVersion,'N|B|F');
          										

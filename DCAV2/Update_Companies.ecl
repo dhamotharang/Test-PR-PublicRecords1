@@ -1,4 +1,4 @@
-import tools,aid,address,mdr,TopBusiness_External,Business_Header_SS,business_header,DID_Add,bipv2;
+﻿import _control, MDR, tools,aid,address,mdr,TopBusiness_External,Business_Header_SS,business_header,DID_Add,bipv2, Std;
 
 export Update_Companies(
 	 string																					pversion
@@ -73,7 +73,10 @@ function
 	dAppendBdid		  := dedup(dAppendBdidDups, whole record, local );
 
 	dAppendSrcRid		:= DCAV2.Append_Source_Rid (project(dAppendBdid,	layouts.base.companies));
+	
+	//Add Global_SID
+	addGlobalSID		:= MDR.macGetGlobalSid(dAppendSrcRid, 'DCA', 'file_type', 'global_sid'); //DF-26145: Populate Global_SID
 
-	return dAppendSrcRid;
+	return addGlobalSID;
 	
 end;

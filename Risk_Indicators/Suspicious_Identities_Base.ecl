@@ -1,4 +1,4 @@
-IMPORT ut, doxie_build, header_quick, header, mdr, STD;
+﻿IMPORT ut, doxie_build, header_quick, header, mdr, STD;
 
 today := risk_indicators.iid_constants.todaydate DIV 100;
 isFCRA := false;  // currently only need to build this for non-fcra for fraud
@@ -55,9 +55,16 @@ suspicious_ssns := join(
 dids_with_suspicious_ssns := dedup(sort(distribute(suspicious_ssns, hash(did)), did, ssn, local), did, local);
 
 // atmost 1 record per DID in suspicious_header and 1 per DID in dids_with_suspicious_ssns
+layout_suspicious_id := RECORD
+	risk_indicators.Boca_Shell_Fraud.layout_identities_output - historydate;
+	//CCPA-768
+	UNSIGNED4	global_sid := 0;
+	UNSIGNED8 record_sid := 0;
+END;
+
 suspicious_identities := join(suspicious_header,dids_with_suspicious_ssns, left.did=right.did,
 	transform(
-		risk_indicators.Boca_Shell_Fraud.layout_identities_output - historydate, 
+		layout_suspicious_id, 
 		// don't need the date on the key, we'll be able to see the date in the logical file name
 		// risk_indicators.Boca_Shell_Fraud.layout_identities_output, 
 		// self.historydate := today;

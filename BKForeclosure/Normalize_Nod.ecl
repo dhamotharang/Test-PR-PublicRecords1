@@ -53,13 +53,21 @@ Layout_BK.CleanFields_NOD t_norm_nod (layout_BK.base_nod_ext le, INTEGER C) := T
 	                           ,REGEXREPLACE('=',trim_borrower1_fname,' '),'');
 	borrower1_lname     := IF(NOT REGEXFIND(invalid_pattern, trim_borrower1_lname) 
 	                           ,REGEXREPLACE('=',trim_borrower1_lname,' '),'');	
-	borrower2_fname     := IF(NOT REGEXFIND(invalid_pattern, trim_borrower2_fname) 
+	borrower2_fname     := IF(NOT REGEXFIND(invalid_pattern, trim_borrower2_fname) AND
+															trim_borrower2_fname <> trim_borrower1_fname AND 
+															trim_borrower2_lname <> trim_borrower1_lname
 	                           ,REGEXREPLACE('=',trim_borrower2_fname,' '),'');
-	borrower2_lname     := IF(NOT REGEXFIND(invalid_pattern, trim_borrower2_lname) 
+	borrower2_lname     := IF(NOT REGEXFIND(invalid_pattern, trim_borrower2_lname) AND
+															trim_borrower2_fname <> trim_borrower1_fname AND 
+															trim_borrower2_lname <> trim_borrower1_lname	
 	                           ,REGEXREPLACE('=',trim_borrower2_lname,' '),'');
-	contact_fname       := IF(NOT REGEXFIND(invalid_pattern, trim_contact_fname) 
+	contact_fname       := IF(NOT REGEXFIND(invalid_pattern, trim_contact_fname) AND 
+															trim_contact_fname <> trim_trustee_fname AND
+															trim_contact_lname <> trim_trustee_lname
 	                           ,REGEXREPLACE('=',trim_contact_fname,' '),'');
-	contact_lname       := IF(NOT REGEXFIND(invalid_pattern, trim_contact_lname) 
+	contact_lname       := IF(NOT REGEXFIND(invalid_pattern, trim_contact_lname) AND
+															trim_contact_fname <> trim_trustee_fname AND
+															trim_contact_lname <> trim_trustee_lname
 	                          ,REGEXREPLACE('=',trim_contact_lname,' '),'');
   trustee_fname       := IF(NOT REGEXFIND(invalid_pattern, trim_trustee_fname) 
 	                          ,REGEXREPLACE('=',trim_trustee_fname,' '),'');

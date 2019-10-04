@@ -1,4 +1,4 @@
-IMPORT _control;
+﻿IMPORT _control;
 EXPORT NtlConstants := MODULE
 		EXPORT LandingZone		 								:= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 		
@@ -40,14 +40,14 @@ EXPORT NtlConstants := MODULE
 
 	EXPORT DestinationCluster 		        := IF (_control.ThisEnvironment.Name = 'Prod_Thor', 'thor400_44', 'thor40_241');	
 	EXPORT SprayCompleteFile							:= '~thor::CD::Spray::Complete';
-	EXPORT IntorderFileMask												:= 'CRUP1.int_order*';
-	EXPORT OrdervsFileMask												  := 'CRUP1.order_version*';
-	EXPORT VehicleFileMask											:= 'CRUP1.vehicle*';
-	EXPORT ResultFileMask												:= 'CRUP1.result*';
-	EXPORT VehIncidntFileMask												:= 'CRUP1.vehicle_incident*';
-	EXPORT VehPtyFileMask												:= 'CRUP1.vehicle_party*';
-		EXPORT ClientFileMask												:= 'CRUP1.client*';
-				EXPORT VehinscrFileMask												:= 'CRUP1.vehicle_insurance_carrier*';
+	EXPORT IntorderFileMask												:= '*.int_order*';
+	EXPORT OrdervsFileMask												  := '*.order_version*';
+	EXPORT VehicleFileMask											:= '*.vehicle*';
+	EXPORT ResultFileMask												:= '*.result*';
+	EXPORT VehIncidntFileMask												:= '*.vehicle_incident*';
+	EXPORT VehPtyFileMask												:= '*.vehicle_party*';
+		EXPORT ClientFileMask												:= '*.client*';
+				EXPORT VehinscrFileMask												:= '*.vehicle_insurance_carrier*';
 
 
 

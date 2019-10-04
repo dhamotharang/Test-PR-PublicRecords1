@@ -1150,6 +1150,12 @@
 		export string KEYWORD_ILSHABAK							:= '836';
 		export string KEYWORD_FATF_SD								:= '837';
 		export string KEYWORD_USCBW_WC							:= '838';
+		export string KEYWORD_SEDPA									:= '839';
+		export string KEYWORD_LFSA_ALERT						:= '840';
+		export string KEYWORD_ESBDE									:= '841';
+		export string KEYWORD_CNCBIRC								:= '842';
+		export string KEYWORD_CAQCMELCC							:= '843';
+		export string KEYWORD_OFAC_EO13848					:= '844';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

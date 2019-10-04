@@ -74,6 +74,6 @@ BuildKeys := sequential(
 									 parallel(mv2qa_xmltid, mv2qa_xmlint1, mv2qa_xmlint2, mv2qa_xmlint3, mv2qa_xmlint4, mv2qa_xmlint5, mv2qa_xmlint6,  mv2qa_xmlint7, mv2qa_xmlint8, mv2qa_xmlint9, mv2qa_FCRA_xmltid, mv2qa_FCRA_xmlint1, mv2qa_FCRA_xmlint2, mv2qa_FCRA_xmlint3, mv2qa_FCRA_xmlint4, mv2qa_FCRA_xmlint5, mv2qa_FCRA_xmlint6));
 
 RETURN sequential(BuildKeys, orbit_update;
-										RoxieKeybuild.updateversion('SAOKeys',rundate,'john.freibaum@lexisnexisrisk.com, Wenhong.Ma@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com',,'N')
+										RoxieKeybuild.updateversion('SAOKeys',rundate,'jason.allerdings@lexisnexisrisk.com, Wenhong.Ma@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com',,'N')
 										);
 END;

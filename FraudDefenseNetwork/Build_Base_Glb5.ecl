@@ -1,4 +1,4 @@
-﻿Import ut, tools, inquiry_acclogs, Address, did_Add, didville;
+﻿Import ut, tools, inquiry_acclogs, Address, did_Add, didville, FraudShared;
 
 export Build_Base_Glb5 (
                          string pversion
@@ -57,7 +57,7 @@ export Build_Base_Glb5 (
 
   // Rollup Update and previous base
    Pcombined := if(UpdateGlb5, inBaseGlb5 + GLB5WithIDL, GLB5WithIDL);
-   pDataset_Dist := distribute(Pcombined, hash(transaction_id));
+   pDataset_Dist := distribute(Pcombined, hash32(transaction_id));
    pDataset_sort := sort(pDataset_Dist, -transaction_id, -dt_last_seen, -process_date, record, local);
 
    Layouts.Base.Glb5 RollupUpdate(Layouts.Base.Glb5 l, Layouts.Base.Glb5 r) :=
@@ -77,9 +77,74 @@ export Build_Base_Glb5 (
                               ,Record
                               ,except process_date, dt_first_seen, dt_last_seen, dt_vendor_last_reported, dt_vendor_first_reported, source_rec_id, current, local
                             );
+   
+// GLB5 Append Market information 
+  inBaseGLB5_dist       := distribute(pDataset_rollup, hash32(orig_company_id));
+  MBSmarketAppend_dist  := distribute(FraudShared.Files().Input.MBSmarketAppend.Sprayed, hash32(company_id));
 
-   tools.mac_WriteFile(Filenames(pversion).Base.Glb5.New, pDataset_rollup, Build_Base_File);
+	Glb5MarketAppend      := join(inBaseGLB5_dist, MBSmarketAppend_dist, left.orig_company_id = right.company_id,
+                                              transform(FraudDefenseNetwork.Layouts.base.Glb5,
+																							               self.sybase_company_id        := stringlib.stringtouppercase(right.company_id); 
+																							               self.sybase_main_country_code := stringlib.stringtouppercase(right.main_country_code); 
+																							               self.sybase_bill_country_code := stringlib.stringtouppercase(right.bill_country_code);
+																							               self.sybase_app_type          := stringlib.stringtouppercase(right.app_type);
+																							               self.sybase_market            := stringlib.stringtouppercase(right.market);
+																							               self.sybase_sub_market        := stringlib.stringtouppercase(right.sub_market);
+																							               self.sybase_vertical          := stringlib.stringtouppercase(right.vertical) ;
+																							               self                          := left; 
+																							               self                          := []), left outer, local);
 
+
+// Source exlusions 
+
+  FilterSet    := ['GOV', 'GOVERNMENT & ACADEMIC', 'GOVERNMENT', 'HEA', 'HEALTHCARE INITIATIVE', 'GOVERNMENT HEALTHCARE', 'INTERNAL', 'HC -   PROVIDER',  'TAX & REVENUE.FEDERAL','HEALTHCARE' , 'PROVIDER', 'PHARMACY' ,'PAYER'];
+  SrcExclusion := set(FraudShared.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0  and status = 1), (string)gc_id); 
+	SrcExclusionC := set(FraudShared.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0 and status = 1), (string)company_id); 
+  Jfiltered    := Glb5MarketAppend(global_company_id   not in SrcExclusion ); 
+	Jfiltered1   := Jfiltered(company_id    not in SrcExclusionC );
+  JcountryCode := Jfiltered1(sybase_MAIN_COUNTRY_CODE = 'USA'); 
+  Japptype     := JcountryCode(sybase_app_type          not in FilterSet ); 
+  Jvertical    := Japptype (sybase_vertical             not in FilterSet ); 
+  Jsub_market  := Jvertical(sybase_sub_market           not in FilterSet ); 
+  Jmarket      := Jsub_market(sybase_market             not in FilterSet ):persist('temp::glb5_1'); 
+   
+   dInSegment   := project (Jmarket , transform( FraudDefenseNetwork.Layouts.base.Glb5, 
+
+       self.Industry_segment := map( 
+                              left.sybase_app_type in ['INS','AUTO','AIG','LIFE']    => 'INSURANCE' , 
+			                        left.sybase_app_type in ['LE','LEG','USLM']      => 'LEGAL' , 
+			                        left.sybase_app_type in ['TCOL', 'FCOL', 'COL','COLLECTIONS'] => 'COLLECTIONS' ,
+															left.sybase_app_type ='IRB' => 'IRB',
+			                        left.sybase_app_type = 'XBPS' => 'OTHERS',
+															left.sybase_app_type = ''  and left.sybase_vertical ='LIFE' => 'INSURANCE',
+															left.sybase_app_type = ''  and left.sybase_vertical ='AUTO' => 'INSURANCE',
+															left.sybase_app_type = ''  and left.sybase_vertical ='USLM' => 'LEGAL',
+															left.sybase_app_type = ''  and left.sybase_vertical not in [ 'CORE','','AUTO','USLM'] => left.sybase_vertical ,
+			                        left.sybase_app_type = ''  and left.sybase_vertical in [ 'CORE',''] 
+															and left.sybase_sub_market = 'PRIVATE INVESTIGATORS' => 'PRIVATE INVESTIGATORS' , 'OTHERS'); 
+				
+				self.sybase_app_type  := map ( 	left.sybase_app_type = ''  and left.sybase_vertical ='LIFE' => 'LIFE',
+															left.sybase_app_type = ''  and left.sybase_vertical ='AUTO' => 'AUTO',
+															left.sybase_app_type = ''  and left.sybase_vertical ='USLM' => 'USLM',
+															left.sybase_app_type = ''  and left.sybase_vertical ='COLLECTIONS' => 'COLLECTIONS',
+															left.sybase_app_type = ''  and left.sybase_vertical ='EMERGING' => 'EMERGING',
+															left.sybase_app_type = ''  and left.sybase_vertical ='FINANCIAL SERVICES' => 'FINANCIAL SERVICES',
+															left.sybase_app_type = ''  and self.Industry_segment ='OTHERS' => 'OTHERS',
+															left.sybase_app_type = ''  and left.sybase_sub_market ='PRIVATE INVESTIGATORS' => 'PRIVATE INVESTIGATORS',
+															left.sybase_app_type);
+				
+				self := left ));
+				
+				Jdedup := dedup(dInSegment,(unsigned)linkid, trim(company_id,left,right), trim(global_company_id,left,right) , trim(datetime[1..8],left,right),all ); 
+   
+   dBase_RecordID := Project(Jdedup, transform(recordof(Jdedup),
+                                                        RecordID := Constants().GLB5RecIDSeries + left.source_rec_id;
+                                                        self.record_sid := RecordID;
+                                                        self := left;
+                                                       ));     
+
+   tools.mac_WriteFile(Filenames(pversion).Base.Glb5.New, dBase_RecordID, Build_Base_File);
+  
 // Return
    export full_build := sequential(
                                     Build_Base_File, Promote(pversion).buildfiles.New2Built

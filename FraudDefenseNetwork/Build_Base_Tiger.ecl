@@ -42,7 +42,7 @@ EXPORT Build_Base_Tiger (
 
     //Rollup Update and previous base
       Pcombined := If(UpdateTiger, inBaseTiger + TigerUpdateCleaned, TigerUpdateCleaned);
-      pDataset_Dist := distribute(Pcombined, hash(app_number));
+      pDataset_Dist := distribute(Pcombined, hash32(app_number));
       pDataset_sort := sort(
                              pDataset_Dist,
                              App_Number,
@@ -118,8 +118,16 @@ EXPORT Build_Base_Tiger (
                                   RollupUpdate(left, right), local
                                );
 
-      tools.mac_WriteFile(Filenames(pversion).Base.Tiger.New, pDataset_rollup, Build_Base_File);
+   dBase_RecordID := Project(pDataset_rollup, transform(recordof(pDataset_rollup),
+                                                        RecordID := Constants().TigerRecIDSeries + left.source_rec_id;
+                                                        self.record_sid := RecordID;
+                                                        self := left;
+                                                       ));     
 
+   tools.mac_WriteFile(Filenames(pversion).Base.tiger.New, dBase_RecordID, Build_Base_File);  
+      
+      
+     
     //Return
       export full_build := sequential(
                                        Build_Base_File, Promote(pversion).buildfiles.New2Built

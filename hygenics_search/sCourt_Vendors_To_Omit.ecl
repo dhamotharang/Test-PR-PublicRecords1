@@ -75,8 +75,8 @@
 '7O', // TEXAS_LAMAR_COUNTY_JUSTICE_OF_THE_PEACE_COURTS                                                      
 '7R', // FLORIDA_PASCO_COUNTY                                                                                
 '7S', // FLORIDA_PASCO_COUNTY_TRAFFIC                                                                        
+'7V', // FLORIDA_ESCAMBIA_COUNTY_CIRCUIT_COURT                                                               
 '7W', // FLORIDA_FLAGLER_COUNTY_CIRCUIT_COURT                                                                
-'7X', // FLORIDA_MANATEE_CIRCUIT_AND_COUNTY_COURTS                                                           
 '7Z', // ILLINOIS_PEORIA_COUNTY                                                                              
 '8A', // NEVADA_CLARK_COUNTY_DISTRICT_COURTS                                                                 
 '8D', // OHIO_SHELBY_COUNTY_COMMON_PLEAS_COURT                                                               
@@ -141,8 +141,6 @@
 'DV', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DW', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE                                                   
 'EB', // NEW_MEXICO_DEPARTMENT_OF_CORRECTIONS                                                                
-'ED', // NEW_YORK_DEPARTMENT_OF_CORRECTIONS                                                                  
-'EF', // OKLAHOMA_DEPARTMENT_OF_CORRECTIONS                                                                  
 'EM', // UTAH_DEPARTMENT_OF_CORRECTIONS                                                                      
 'EN', // VIRGINIA_DEPARTMENT_OF_CORRECTIONS                                                                  
 'EP', // WASHINGTON_DEPARTMENT_OF_CORRECTIONS                                                                
@@ -151,8 +149,6 @@
 'EZ', // OHIO_SUMMIT_COUNTY_BARBERTON_MUNICIPAL_COURT                                                        
 'FB', // FLORIDA_SARASOTA_COUNTY                                                                             
 'FQ', // FLORIDA_HERNANDO_COUNTY                                                                             
-'FR', // FLORIDA_ORANGE_COUNTY                                                                               
-'FS', // FLORIDA_PINELLAS_COUNTY                                                                             
 'FU', // FLORIDA_MARION_COUNTY                                                                               
 'FV', // FLORIDA_ADMINISTRATOR_OF_THE_COURTS                                                                 
 'FW', // FLORIDA_ESCAMBIA_COUNTY_ARRESTS                                                                     
@@ -205,6 +201,10 @@
 'HX', // MASSACHUSETTS_WRENTHAM_POLICE_ARRESTS                                                               
 'HY', // MICHIGAN_KENT_COUNTY_ARRESTS                                                                        
 'HZ', // MICHIGAN_WAYNE_COUNTY_ARRESTS                                                                       
+'I0009', // NE LANCASTER DISTRICT COURT_IE                                                                      
+'I0010', // GA DEKALB COUNTY JUDICIAL SYSTEM_IE                                                                 
+'I0015', // CO DENVER COUNTY COURT_IE                                                                           
+'I0020', // NE LANCASTER COUNTY COURT_IE                                                                        
 'I0024', // OH PORTAGE RAVENNA MUNICIPAL COURT_IE                                                               
 'I0032', // TN DAVIDSON GENERAL SESSIONS COURT (LEGACY)_IE                                                      
 'I0040', // NV CLARK LAS VEGAS JUSTICE COURT_IE                                                                 
@@ -220,6 +220,7 @@
 'IO', // MONTANA_MISSOULA_COUNTY_ARRESTS                                                                     
 'IP', // MONTANA_YELLOWSTONE_COUNTY_ARRESTS                                                                  
 'IQ', // NORTH_CAROLINA_CABARRUS_COUNTY_ARRESTS                                                              
+'IR', // NORTH_CAROLINA_CATAWBA_COUNTY_ARRESTS                                                               
 'IS', // NORTH_CAROLINA_DURHAM_COUNTY_ARRESTS                                                                
 'IT', // NORTH_CAROLINA_GUILFORD_COUNTY_ARRESTS                                                              
 'IU', // NORTH_CAROLINA_LINCOLN_COUNTY_ARRESTS                                                               
@@ -403,10 +404,7 @@
 'VR', // OHIO_CHAMPAIGN_COUNTY                                                                               
 'VW', // OHIO_COSHOCTON_COUNTY_MUNICIPAL_COURT                                                               
 'VZ', // OHIO_CUYAHOGA_COUNTY_EAST_CLEVELAND_MUNICIPAL_COURT                                                 
-'WC', // NEVADA_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                            
-'WF', // NEW_YORK_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                          
 'WG', // NORTH_CAROLINA_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                    
-'WH', // OKLAHOMA_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                          
 'WK', // UTAH_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                              
 'WS', // OHIO_JEFFERSON_COUNTY_TORONTO                                                                       
 'WT', // OHIO_GUERNSEY_COUNTY_CAMBRIDGE_MUNICIPAL_COURT                                                      
@@ -451,10 +449,10 @@
 'ZY', // SOUTH_CAROLINA_DARLINGTON_COUNTY_CIRCUIT_COURTS                                                     
 'ZZ', // SOUTH_CAROLINA_DARLINGTON_COUNTY_SUMMARY_COURTS                                                     
 
-
 //CrimWise Sources
 'W0001', // ILLINOIS_ADMINISTRATOR_OF_THE_COURTS_CW                                                             
 'W0002', // MINNESOTA_ADMINISTRATOR_OF_THE_COURTS_CW                                                            
+'W0004', // VIRGINIA_ADMINISTRATOR_OF_THE_COURTS_DISTRICT_COURTS_WEBSITE_CW                                     
 'W0005', // CALIFORNIA_AMADOR_COUNTY_CW                                                                         
 'W0006', // CALIFORNIA_COLUSA_COUNTY_CW                                                                         
 'W0007', // CALIFORNIA_EL_DORADO_COUNTY_CW                                                                      
@@ -508,6 +506,7 @@
 'W0108', // CALIFORNIA_YOLO_COUNTY_BOOKINGS_CW                                                                  
 'W0109', // MAINE_BIDDEFORD_POLICE_DEPARTMENT_CW                                                                
 'W0113', // CALIFORNIA_HUMBOLDT_COUNTY_BOOKINGS_CW                                                              
+'W0114', // CALIFORNIA_IRVINE_POLICE_DEPARTMENT_CW                                                              
 'W0115', // CALIFORNIA_NAPA_COUNTY_BOOKINGS_CW                                                                  
 'W0116', // CALIFORNIA_SAN_JOAQUIN_COUNTY_BOOKINGS_CW                                                           
 'W0117', // CALIFORNIA_SOLANO_COUNTY_BOOKINGS_CW                                                                
@@ -679,6 +678,7 @@
 'W0317', // ARIZONA_WICKENBURG_CW                                                                               
 'W0318', // OHIO_CHAMPAIGN_COUNTY_MUNICIPAL_COURT_CW                                                            
 'W0323', // FLORIDA_CLAY_COUNTY_SHERIFF_CW                                                                      
+'W0324', // FLORIDA_DIXIE_COUNTY_SHERIFF_CW                                                                     
 'W0327', // MASSACHUSETTS_BROOKLINE_POLICE_DEPARTMENT_CW                                                        
 'W0330', // MASSACHUSETTS_IPSWICH_POLICE_DEPARTMENT_CW                                                          
 'W0332', // MASSACHUSETTS_SANDWICH_POLICE_DEPARTMENT_CW                                                         
