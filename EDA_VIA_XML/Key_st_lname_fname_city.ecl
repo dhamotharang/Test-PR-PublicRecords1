@@ -1,11 +1,11 @@
-import gong_Neustar, doxie, ut, NID;
+﻿import gong_Neustar, doxie, ut, NID;
 
 input_recs := gong_Neustar.File_Gong_Full_Prepped_For_Keys((listing_type_res = 'R') AND (TRIM(name_last)<>'') AND (TRIM(name_first)<>''));
 
 Layout_extra := RECORD
 	STRING20	fname;
 	STRING25	city;
-	gong_Neustar.Layout_bscurrent_raw;
+	gong_Neustar.Layout_Gong_DID;			//CCPA-22 Add did/global_sid/record_sid fields
 END;
 
 Layout_extra addOrig(recordof(input_recs) l) := TRANSFORM
