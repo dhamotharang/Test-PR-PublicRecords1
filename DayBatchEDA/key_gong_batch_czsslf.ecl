@@ -1,5 +1,5 @@
 ﻿import gong, doxie, data_services;
-f := PROJECT(gong.File_Gong_full(trim(p_city_name) <> ''), gong.Layout_bscurrent_raw);
+f := PROJECT(gong.File_Gong_full(trim(p_city_name) <> ''), gong.Layout_Gong_DID);
 export key_gong_batch_czsslf :=	
    	index(f,
 				 {p_city_name,
