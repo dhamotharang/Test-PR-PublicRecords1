@@ -1,10 +1,12 @@
 ﻿import _Control;
 
+gwlfile := Accuity.GetGWLFile;
+
 export Build_all(string versiondate) := sequential(
 SprayAccuityFiles(versiondate),
 Accuity.SprayAKAList,
 Accuity.MakeHdr.OutputDataXMLFile('GWL', 'Accuity Global WatchList.xml',
-		Accuity.GetGWLFile, true),
+		gwlfile, true),
 Accuity.MakeHdr.OutputDataXMLFile('OGO 1072', 'source_ofac.xml',Accuity.Reformat.outputs.allofac),
 Accuity.MakeHdr.OutputDataXMLFile('DB 1088', 'source_DB_1088.xml',Accuity.Reformat.outputs.source_DB_1088),
 output(Accuity.Reformat.outputs.source_ACB_1040,,'~thor_data400::accuity::source_ACB_1040.xml', 

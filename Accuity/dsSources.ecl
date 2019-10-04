@@ -11,7 +11,7 @@
 		
 	src1 := DISTRIBUTE($.Files.Input.gwl.srccode, hash32(list_id));
 	src := src1(LIST_ID NOT IN ['1072','0']) 
-										+ DATASET([{'1072','OFAC','','','',''},
+										+ DATASET([{'1072','OFAC','OFAC','','',''},
 																{'0','US Treasury SDN List (OFAC)','UST','','',''}],
 											$.Layouts.input.rSrccode);
 	s1 := DEDUP(SORT(src, list_id, source_code, local), list_id, source_code, local);
