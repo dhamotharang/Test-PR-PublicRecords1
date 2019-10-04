@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Address, CanadianPhones, CCPA, VersionControl, Std, ut;
+﻿IMPORT _Control, Address, CanadianPhones, MDR, VersionControl, Std, ut;
 
 EXPORT map_axciomCanBus(string8 abusFileDate) := FUNCTION
 
@@ -67,7 +67,7 @@ EXPORT map_axciomCanBus(string8 abusFileDate) := FUNCTION
 	pacb := PROJECT(dacb,tacb(left));
 	
 	//Add Global_SID
-	addGlobalSID	:= CCPA.macGetGlobalSID(pacb, 'CanadianPhones', 'source_file', 'global_sid'); //DF-25404
+	addGlobalSID	:= MDR.macGetGlobalSID(pacb, 'CanadianPhones', 'source_file', 'global_sid'); //DF-25404
 
 	RETURN SEQUENTIAL(
 						fileservices.removeOwnedSubFiles(CanadianPhones.thor_cluster + 'in::axciomBus_v2');

@@ -1,4 +1,4 @@
-﻿import _control, CCPA, std;
+﻿import _control, MDR, std;
 
 export Update_Contacts(
 
@@ -17,7 +17,7 @@ function
 																														,dStandardizedInputFile
 															);
 
-	addGlobalSID						:= CCPA.macGetGlobalSID(update_combined, 'SheilaGrecoContact', '', 'global_sid'); //DF : Populate Global_SID;
+	addGlobalSID						:= MDR.macGetGlobalSid(update_combined, 'SheilaGrecoContact', '', 'global_sid'); //DF : Populate Global_SID;
 	
 	dStandardizedAddr				:= Standardize_Addr_Contacts	(addGlobalSID		);	
 	dAppendIds							:= Append_Ids.fAppendDid			(dStandardizedAddr	);

@@ -1,4 +1,4 @@
-﻿import _control, CCPA, Std, ut;
+﻿import _control, MDR, Std, ut;
 
 export Update_Companies(
 
@@ -39,7 +39,7 @@ function
 	update_combined					:= map(_Flags.Update.Companies =>	 dStandardizedInputFile + base_file
 																														,dStandardizedInputFile );
 																														
-	addGlobalSID						:= CCPA.macGetGlobalSID(update_combined, 'SheilaGrecoCompany', '', 'global_sid'); //DF : Populate Global_SID;	
+	addGlobalSID						:= MDR.macGetGlobalSid(update_combined, 'SheilaGrecoCompany', '', 'global_sid'); //DF : Populate Global_SID;	
 	
 	dStandardizedAddr				:= Standardize_Addr_Companies	(addGlobalSID		);
 	 

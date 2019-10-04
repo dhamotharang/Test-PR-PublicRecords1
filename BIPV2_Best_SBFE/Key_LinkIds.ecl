@@ -1,4 +1,4 @@
-﻿IMPORT _Control, BIPV2_Best_SBFE, BIPV2_Best,	BIPV2, CCPA, STD;
+﻿IMPORT _Control, BIPV2_Best_SBFE, BIPV2_Best,	BIPV2, Business_Credit, MDR, doxie, STD;
 EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 										Constants().buildType	pBuildType	=	Constants().buildType.Daily) := MODULE
 
@@ -10,7 +10,7 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 														
 	SHARED dSBFEBestKey := PROJECT(dSBFEBestBase, TRANSFORM(BIPV2_Best.layouts.key, SELF:=LEFT, SELF:=[]));  //DF-25791: Populate Global_SID Field
 		
-	SHARED  addGlobalSID :=  CCPA.macGetGlobalSID(dSBFEBestKey,'SBFECV','','global_sid');	
+	SHARED  addGlobalSID :=  MDR.macGetGlobalSid(dSBFEBestKey,'SBFECV','','global_sid');	
 	
 	// DEFINE THE INDEX
 	SHARED	superfile_name	:=	BIPV2_Best_SBFE.Keynames().LinkIds.QA;	
@@ -23,7 +23,8 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 	// DEFINE THE INDEX ACCESS
 	// NOTE! SBFE (Business_Credit) data is restricted! Do not fetch records unless you have
 	// obtained approval from product management.
-	EXPORT kFetch2(DATASET(BIPV2.IDlayouts.l_xlink_ids2) inputs, 
+	// Jira# DF-26179,  Added mod_access and Mac_check_access to kfetch functions for CCPA suppressions.
+	EXPORT kFetch2(DATASET(BIPV2.IDlayouts.l_xlink_ids2) inputs,
 								STRING1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
 																																		 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																																		//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
@@ -35,14 +36,14 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 
 	use_sbfe := DataPermissionMask[12] NOT IN ['0', ''];
 	
-	BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, out, Level, JoinLimit, JoinType);
-	
+	BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, out, Level, JoinLimit, JoinType);  //DF-26180 - Remove code calling mac_check_access b/c this key does not have lexid
+
 	RETURN out(use_sbfe);																					
 
 	END;
 	
 	// Depricated version of the above kFetch2
-	EXPORT kFetch(DATASET(BIPV2.IDlayouts.l_xlink_ids) inputs, 
+	EXPORT kFetch(DATASET(BIPV2.IDlayouts.l_xlink_ids) inputs,
 								STRING1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
 																																		 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																																		//Should be enumerated or something?  at least need constants defined somewhere if you keep string1

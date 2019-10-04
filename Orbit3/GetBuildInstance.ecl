@@ -33,6 +33,7 @@ rGetBuildRequest	:= RECORD
 rStatus := RECORD
 	STRING	Status {XPATH('GetBuildInstanceResponse/GetBuildInstanceResult/Result/RecordResponseGetBuildInstance/Status')};
 	STRING BuildId {XPATH('GetBuildInstanceResponse/GetBuildInstanceResult/Result/RecordResponseGetBuildInstance/Result/BuildInstanceId')};
+	STRING	BuildInstanceStatus {XPATH('GetBuildInstanceResponse/GetBuildInstanceResult/Result/RecordResponseGetBuildInstance/Result/Status')};
 
 	end;
 	

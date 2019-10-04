@@ -1,4 +1,4 @@
-IMPORT Address, NID, UCCV2, ut;
+﻿IMPORT Address, NID, UCCV2, ut; 
 
 layout_party
          :=record
@@ -129,8 +129,8 @@ UCCV2.Layout_UCC_Common.Layout_Party_with_AID tProjParty(layout_party    pInput)
 		self.tmsid 					    				:=  'TX'+pInput.Original_filing_number;	 
 		self.dt_first_seen							:=	(unsigned6)(pInput.process_date[1..6]);
 		self.dt_last_seen								:=	(unsigned6)(pInput.process_date[1..6]);
-		self.dt_vendor_first_reported		:=	(unsigned6)(pInput.process_date[1..6]);
-		self.dt_vendor_last_reported		:=	(unsigned6)(pInput.process_date[1..6]);
+		self.dt_vendor_first_reported		:=	(unsigned6) pInput.process_date;
+		self.dt_vendor_last_reported		:=	(unsigned6) pInput.process_date;
 		self														:=	pInput;
 		self														:=	[];
 END;
@@ -165,7 +165,7 @@ dPSecuredParty		:=  project(File_TX_PersonSecuredParty_in,tPSName_Address(left))
 dAllBusiness			:=	dBDebtor	+	dBSecuredParty;
 dAllPerson				:=	dPDebtor	+	dPSecuredParty;
 
-NID.Mac_CleanFullNames(dAllBusiness, VerifyBusRecs, Orig_name);
+NID.Mac_CleanFullNames(dAllBusiness, VerifyBusRecs, Orig_name, useV2:=true);
 
 person_flags := ['P', 'D'];
 // An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.
@@ -182,7 +182,7 @@ layout_party add_clean_name_business(VerifyBusRecs L) := TRANSFORM
 	SELF := L;
 END;
 
-NID.Mac_CleanParsedNames(dAllPerson, VerifyPersons, fname, mname, lname, name_suffix);
+NID.Mac_CleanParsedNames(dAllPerson, VerifyPersons, fname, mname, lname, name_suffix, useV2:=true);
 
 // Because the vendor will sometimes send a company name as a person's last name only, we need to make
 // sure what they sent is a person.
@@ -238,4 +238,3 @@ OutParty                :=  output(dPartyJoin   ,,UCCV2.cluster.cluster_out+'bas
 AddSuperfile            :=  FileServices.AddSuperFile(UCCV2.cluster.cluster_out+'base::UCC::Party_Name',UCCV2.cluster.cluster_out+'base::UCC::Party::TX');
 
 export proc_build_TX_party_base    :=sequential(OutParty,AddSuperfile); 
- 

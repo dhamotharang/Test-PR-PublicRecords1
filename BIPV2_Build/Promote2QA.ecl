@@ -43,7 +43,7 @@ functionmacro
        if(pShouldCheckfullKeys    = true ,outputBIPV2Fullkeys   )
       ,if(pShouldCheckWeeklyKeys  = true ,outputBIPV2Weeklykeys )
        // BIPV2.CommonBase.updateSuperfiles(f_out) //update base file
-      ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).new2base  //update commonbase file
+      // ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).new2base  //update commonbase file
       ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).built2qa  //update commonbase file
       ,BIPV2_Build.Promote().Built2QA //this includes everything
       ,UpdateFullKeysDops
