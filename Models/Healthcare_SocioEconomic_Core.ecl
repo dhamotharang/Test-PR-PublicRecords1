@@ -6,7 +6,7 @@ IMPORT HCSE_LT_18_LUCI_MODEL;
 IMPORT HCSE_SERA_GBM_M0_V1_model_LUCI;
 
 
-export Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Options_in, ofac_version_in, gateways_in_ds, CoreResults,
+export Healthcare_SocioEconomic_Core(Socio_TC_Model_Version_in, SuppressResultsForOptOuts, isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Options_in, ofac_version_in, gateways_in_ds, CoreResults,
                                                                         LexIdSourceOptout,
                                                                         TransactionID,
                                                                         BatchUID,
@@ -19,6 +19,7 @@ export Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestVal
 	string DataRestriction := DataRestrictionMask_in;
 	string50 DataPermission := DataPermissionMask_in;
 	String Options := (string)Options_in;
+	unsigned1 Socio_TC_Model_Version := Socio_TC_Model_Version_in;
 	unsigned1 ofac_version_ := ofac_version_in; //Pass OFACVersion value here
 
 	string5   industry_class_val := '';
@@ -162,6 +163,8 @@ export Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestVal
 									self.CrosswalkStatusMostRecent := Models.Healthcare_SocioEconomic_Functions_Core.CrosswalkStatusMostRecent(left.version4.StatusMostRecent);
 									self.CrosswalkStatusNextPrevious := Models.Healthcare_SocioEconomic_Functions_Core.CrosswalkStatusNextPrevious(left.version4.StatusNextPrevious);
 									self.CrosswalkStatusPrevious := Models.Healthcare_SocioEconomic_Functions_Core.CrosswalkStatusPrevious(left.version4.StatusPrevious);
+									self.Payor_LOB := (unsigned) right.LOB;
+									self.isSeTCInvalidLOB := IF(trim(right.LOB, left, right) IN Models.Healthcare_SocioEconomic_Ref_Data.SeRs_LOB_Ref_SET, 0, 1); 
 									self:=left;), 
 								left outer, keep(1), atmost(1));
 	rawResults_append12 := join(rawResults_appendInput,rawResults12,(integer)left.seq=(integer)right.seq,
@@ -205,7 +208,7 @@ export Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestVal
 	Combined_LI_PB_Prep_Pre_Proc := project(Combined_LI_PB_Attributes_flat, Models.Healthcare_SocioEconomic_Transforms_Core.Prep_For_Pre_Processing_Xform(LEFT));
 	
 	/*===============================================================================
-	=            Begin - Steps for Total Cost Health Score a.k.a "Score"            =
+	=            Begin - Steps for Total Cost Health Score 2.0 a.k.a "Score"            =
 	===============================================================================*/
 
 	//Run Pre Processing Transform to generate derived attributes
@@ -237,10 +240,47 @@ export Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestVal
 		self.seq := (integer)right.TransactionID;
 		self.acctno := (string) left.acctno;
 		self := right;),left outer, keep(1), atmost(1));
-	
-	SeHs_GE_LT_Predictions := GE_18_Prediction_Post_Proc +  LT_18_Prediction_Post_Proc;
 
-	/*=====  End of Total Cost Health Score  ======*/
+	Empty_SeHs_GE_LT_Predictions := DATASET([],Models.Layouts_Healthcare_Core.PostProcessing_Layout_LUCI_Model);
+	SeHs_GE_LT_Predictions := IF(Socio_TC_Model_Version <> 2, Empty_SeHs_GE_LT_Predictions, GE_18_Prediction_Post_Proc +  LT_18_Prediction_Post_Proc);
+
+	/*=====  End of Total Cost Health Score 2.0 ======*/
+
+	/*===============================================================================
+	=            		Begin - Steps for Total Cost Risk Score 3.0    				=
+	===============================================================================*/
+	// The selection of these results will be driven by the model selection information via 'Socio_TC_Model_Version'.
+	SeTC_Pre_Proc_Out := Project(Combined_LI_PB_Prep_Pre_Proc, Models.Healthcare_SocioEconomic_Transforms_Core.SeTC_Pre_Processing_Xform(LEFT));
+	SeTC_Patterns_Applied := Models.Healthcare_SocioEconomic_Transforms_Core.SeTC_Apply_Patterns(SeTC_Pre_Proc_Out(age_in_years >= 18), Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed);
+	SeTC_Model_Input := PROJECT(SeTC_Patterns_Applied, TRANSFORM(Models.Layouts_Healthcare_Core.SeTC_Combined_Model_Typed_Input_Layout, SELF.do_Model1 := TRUE,SELF.TransactionID := (string)LEFT.SEQ, SELF := LEFT));
+	
+	SeTC_Model_Input_ZERO := SeTC_Model_Input(SeTCModelUsed=0);
+	SeTC_Model_Input_LOB := SeTC_Model_Input(SeTCModelUsed=1);
+	SeTC_Model_Input_LOB_EXT := SeTC_Model_Input(SeTCModelUsed=2);
+	// Running LUCI Models
+	SeTC_Model_ZERO_results_base := HCSE_SETC_V3_ZERO_MODEL.AsResults(SeTC_Model_Input_ZERO).Base();
+	SeTC_Model_LOB_results_base := HCSE_SETC_V3_LOB_MODEL.AsResults(SeTC_Model_Input_LOB).Base();
+	SeTC_Model_LOB_EXT_results_base := HCSE_SETC_V3_LOB_EXT_MODEL.AsResults(SeTC_Model_Input_LOB_EXT).Base();
+	// Post Processing and input prep for care drivers
+	SeTC_Model_Input_And_Score := Join(SeTC_Model_Input, SeTC_Model_ZERO_results_base + SeTC_Model_LOB_results_base + SeTC_Model_LOB_EXT_results_base, left.seq=(integer)right.TransactionID, transform(Models.Layouts_Healthcare_Core.SeTC_Combined_Model_Typed_Input_And_Score_Layout,
+										self.SeTC_Raw_Score := (string) right.score;
+										REAL8 post_proc_score := IF(left.SeTCModelUsed=2, MAX((REAL8)right.score, (left.AG_Pred_10K_LOB_EXT * 0.2)),
+																	IF(left.SeTCModelUsed=1, MAX((REAL8)right.score, (left.AG_Pred_10K_LOB * 0.2)),
+																		MAX((REAL8)right.score, (left.AG_Pred_10K * 0.2))));
+										DECIMAL9_4 vScore :=  TRUNCATE((real8)post_proc_score*10000)/10000;
+										self.SeTC_Score := (string)vScore;
+										self.seq := (integer)right.TransactionID;
+										self := left;),left outer, keep(1), atmost(1));
+
+	SeTC_Care_Drivers := Models.Healthcare_SocioEconomic_Transforms_Core.getSeTC_RiskDrivers(SeTC_Model_Input_And_Score);
+	SeTC_V3_Results := Join(SeTC_Model_Input_And_Score, SeTC_Care_Drivers, left.seq=right.seq, 
+							transform(Models.Layouts_Healthcare_Core.SeTC_Post_Procs_Risk_Drivers_Layout,
+													self := right;
+							self := left;),left outer, keep(1), atmost(1));
+	Empty_SeTC_V3_Results := DATASET([],Models.Layouts_Healthcare_Core.SeTC_Post_Procs_Risk_Drivers_Layout);
+	SeTC_V3_Results_Out := IF(Socio_TC_Model_Version > 2, SeTC_V3_Results, Empty_SeTC_V3_Results);
+
+	/*=====  End of Total Cost Health Score 3.0 ======*/
 	
 	/*=========================================================
 	=            Begin - Readmission Score Section            =
@@ -393,7 +433,13 @@ export Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestVal
 	// OUTPUT(SeMO_V1_Results_RD, NAMED('SeMO_V1_Results_RD'));
 	
 	/*=====  End of Motivation Score  ======*/
-	
+	/* Prepping Results for Score Only Options */
+	Bat_inp := PROJECT(batchinseq, TRANSFORM(Models.Layouts_Healthcare_Core.Final_Output_Layout, 
+																		SELF.seq := (string)LEFT.seq;
+																		SELF.acctno := (string) LEFT.acctno;
+																		SELF := [])); 
+	Batch_Inp_LexID_ADLScore :=  Models.Healthcare_SocioEconomic_Transforms_Core.Add_LexID_ADLScore(Bat_inp, iid,Models.Layouts_Healthcare_Core.Final_Output_Layout);
+
 	/*----------  OPTION '1' Attributes Only  ----------*/
 	
 	Results_Attributes_Only := project(Combined_LI_PB_Attributes_flat, Models.Healthcare_SocioEconomic_Transforms_Core.OPTION_1_SE_A(LEFT));					
@@ -405,15 +451,14 @@ export Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestVal
 	Results_OPTION_2_SE_RS_ADL := Models.Healthcare_SocioEconomic_Transforms_Core.Add_ADLScore(Results_OPTION_2_SE_RS, iid, Models.Layouts_Healthcare_Core.Final_Output_Layout);
 
 	/*----------  OPTION '3' Health Score Only  ----------*/
-	
 	Results_OPTION_3_SE_HS := project(SeHs_GE_LT_Predictions, Models.Healthcare_SocioEconomic_Transforms_Core.OPTION_3_SE_HS(LEFT));					
 	Results_OPTION_3_SE_HS_ADL := Models.Healthcare_SocioEconomic_Transforms_Core.Add_LexID_ADLScore(Results_OPTION_3_SE_HS, iid, Models.Layouts_Healthcare_Core.Final_Output_Layout);
-
+	Results_OPTION_3_SE_TC_ADL := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SETC_Score_RD(Batch_Inp_LexID_ADLScore, SeTC_V3_Results_Out,Models.Layouts_Healthcare_Core.Final_Output_Layout);
+	Results_OPTION_3_SE_TC_FINAL := IF(Socio_TC_Model_Version > 2, Results_OPTION_3_SE_TC_ADL, Results_OPTION_3_SE_HS_ADL);
+	
 	/*----------  OPTION '4' Health Score and Readmission Score Only  ----------*/
-	  
-	Results_OPTION_4_SE_HS_RS := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SERS_Score_RD(Results_OPTION_3_SE_HS, SeRs_Combined_M0_M1_results_RD, Models.Layouts_Healthcare_Core.Final_Output_Layout);
-	Results_OPTION_4_SE_HS_RS_ADL := Models.Healthcare_SocioEconomic_Transforms_Core.Add_ADLScore(Results_OPTION_4_SE_HS_RS, iid, Models.Layouts_Healthcare_Core.Final_Output_Layout);
-
+	Results_OPTION_4_SE_HS_RS_ADL := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SERS_Score_RD(Results_OPTION_3_SE_TC_FINAL, SeRs_Combined_M0_M1_results_RD, Models.Layouts_Healthcare_Core.Final_Output_Layout);
+	
 	/*----------  OPTION '5' Attributes and Readmission Score Only  ----------*/
 	
 	Results_OPTION_5_SE_A_RS := Join(Combined_LI_PB_Attributes_flat, SeRs_Combined_M0_M1_results_RD, (string)left.seq=(string)right.seq, 
@@ -421,31 +466,18 @@ export Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestVal
 	Results_OPTION_5_SE_A_RS_ADL := Models.Healthcare_SocioEconomic_Transforms_Core.Add_ADLScore(Results_OPTION_5_SE_A_RS, iid, Models.Layouts_Healthcare_Core.Final_Output_Layout);
 
 	/*----------  OPTION '6' Attributes and Health Score Only  ----------*/
-	
-	Results_OPTION_6_SE_A_HS := Join(Combined_LI_PB_Attributes_flat, SeHs_GE_LT_Predictions, (string)left.seq=(string)right.seq, 
+	Results_OPTION_6_SE_A_HS_ADL := Join(Combined_LI_PB_Attributes_flat, Results_OPTION_3_SE_TC_FINAL, (string)left.seq=(string)right.seq, 
 									Models.Healthcare_SocioEconomic_Transforms_Core.OPTION_6_SE_A_HS(LEFT, RIGHT),left outer, keep(1), atmost(1));
-	Results_OPTION_6_SE_A_HS_ADL := Models.Healthcare_SocioEconomic_Transforms_Core.Add_ADLScore(Results_OPTION_6_SE_A_HS, iid, Models.Layouts_Healthcare_Core.Final_Output_Layout);
-
+	
 	/*----------  OPTION '7' Attributes, Health Score and Readmission Score Only  ----------*/
-	
-	Results_OPTION_7_SE_A_HS_RS := Join(Combined_LI_PB_Attributes_flat, Results_OPTION_4_SE_HS_RS, (string)left.seq=(string)right.seq, 
+	Results_OPTION_7_SE_A_HS_RS_ADL := Join(Combined_LI_PB_Attributes_flat, Results_OPTION_4_SE_HS_RS_ADL, (string)left.seq=(string)right.seq, 
 										Models.Healthcare_SocioEconomic_Transforms_Core.OPTION_7_SE_A_HS_RS(LEFT, RIGHT),left outer, keep(1), atmost(1));
-	Results_OPTION_7_SE_A_HS_RS_ADL := Models.Healthcare_SocioEconomic_Transforms_Core.Add_ADLScore(Results_OPTION_7_SE_A_HS_RS, iid, Models.Layouts_Healthcare_Core.Final_Output_Layout);
-
+	
 	/*----------  OPTION '8' Attributes, Health Score, Readmission Score and DEBUG fields  ----------*/
-	
-	Results_OPTION_8_SE_HS_RS := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SERS_Score_RD_DEBUG(SeHs_GE_LT_Predictions, SeRs_Combined_M0_M1_results_RD, Models.Layouts_Healthcare_Core.Final_Output_Layout);
-	Results_OPTION_8_SE_DEBUG := Join(Combined_LI_PB_Attributes_flat, Results_OPTION_8_SE_HS_RS, (string)left.seq=(string)right.seq, 
+	Results_OPTION_8_SE_HS_RS := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SERS_Score_RD_DEBUG(Results_OPTION_3_SE_TC_FINAL, SeRs_Combined_M0_M1_results_RD, Models.Layouts_Healthcare_Core.Final_Output_Layout);
+	Results_OPTION_8_SE_DEBUG_ADL := Join(Combined_LI_PB_Attributes_flat, Results_OPTION_8_SE_HS_RS, (string)left.seq=(string)right.seq, 
 									  Models.Healthcare_SocioEconomic_Transforms_Core.OPTION_8_SE_DEBUG(LEFT, RIGHT),left outer, keep(1), atmost(1));
-	Results_OPTION_8_SE_DEBUG_ADL := Models.Healthcare_SocioEconomic_Transforms_Core.Add_ADLScore(Results_OPTION_8_SE_DEBUG, iid, Models.Layouts_Healthcare_Core.Final_Output_Layout);
 
-	/* Prepping Results for Medication Adherence Only Option */
-	Bat_inp := PROJECT(batchinseq, TRANSFORM(Models.Layouts_Healthcare_Core.Final_Output_Layout, 
-																		SELF.seq := (string)LEFT.seq;
-																		SELF.acctno := (string) LEFT.acctno;
-																		SELF := [])); //To get accountno
-	Batch_Inp_LexID_ADLScore :=  Models.Healthcare_SocioEconomic_Transforms_Core.Add_LexID_ADLScore(Bat_inp, iid,Models.Layouts_Healthcare_Core.Final_Output_Layout);
-	
 	/*----------  Adding Medication Adherence to all eight options  ----------*/
 	Results_OPTION_M := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMA_Score_RD(Batch_Inp_LexID_ADLScore, M0_SeMA_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
 	// output(Results_OPTION_M, NAMED('Results_OPTION_M'));
