@@ -1,5 +1,5 @@
 ﻿
-import versioncontrol, _control, ut, tools, RoxieKeyBuild,dops,DOPSGrowthCheck;
+import versioncontrol, _control, ut, tools, RoxieKeyBuild,dops,DOPSGrowthCheck, Scrubs, Scrubs_Thrive;
 export Build_all(string pversion, boolean pUseProd = false) := function
 
 spray_lt  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd).lt);
@@ -29,6 +29,8 @@ dops_update  := sequential(RoxieKeybuild.updateversion('ThriveKeys',pversion,'an
 built := sequential(
 					spray_lt
 					,spray_pd
+					,Scrubs.ScrubsPlus('Thrive','Scrubs_Thrive','Scrubs_Thrive_Input_LT', 'Input_LT', pversion,Email_Notification_Lists.BuildFailure,false)
+					,Scrubs.ScrubsPlus('Thrive','Scrubs_Thrive','Scrubs_Thrive_Input_PD', 'Input_PD', pversion,Email_Notification_Lists.BuildFailure,false)
 					,Build_Base(pversion,pUseProd).all
 					,Build_Keys(pversion,pUseProd).all
 					,Promote(pversion,pUseProd).buildfiles.Built2QA
