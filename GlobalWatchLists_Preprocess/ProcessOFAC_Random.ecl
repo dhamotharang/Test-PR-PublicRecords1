@@ -1,4 +1,4 @@
-IMPORT GlobalWatchLists_Preprocess, GlobalWatchLists, STD, ut, address, bo_Address;
+﻿IMPORT _control, GlobalWatchLists_Preprocess, GlobalWatchLists, mdr, STD, ut, address, bo_Address;
 
 
 EXPORT ProcessOFAC_Random(string filedate) := FUNCTION	//filedate = date processed
@@ -31,6 +31,7 @@ EXPORT ProcessOFAC_Random(string filedate) := FUNCTION	//filedate = date process
 		
 		out_remark   :=   map(regexfind('^([-â€™#)(A-Z0-9\\.,:;?/ ]+)[-A-Z0-9]*[ ]|(.*)',premark[1..75])   => regexreplace('^([-â€™#)(A-Z0-9\\.,:;?/ ]+)[-A-Z0-9]*[ ]|(.*)',premark[1..75],'$1'), 
 												  regexfind('^([-â€™#)(A-Z0-9\\.,:;?/ ]+)[ ]([-A-Z0-9\\.,:/â€ ]*)+$',premark[1..75]) => regexreplace('^([-â€™#)(A-Z0-9\\.,:;?/ ]+)[ ]([-A-Z0-9\\.,:/â€ ]*)+$',premark[1..75],'$1'),'');
+
 	return out_remark;
 	end;
 	
@@ -630,10 +631,15 @@ EXPORT ProcessOFAC_Random(string filedate) := FUNCTION	//filedate = date process
 		self := [];
 	END;
 	
-	OFAC_out	:= sort(project(CombineOFAC, xformFinal(left)),pty_key)(orig_pty_name <> '' or orig_vessel_name <> '');
+	OFAC_out				:= sort(project(CombineOFAC, xformFinal(left)),pty_key)(orig_pty_name <> '' or orig_vessel_name <> '');
 	
 	//Combine with existing Sanctions base file
-	Sanctions_All := output(dsGWLBase + OFAC_out,,'~thor_data400::in::globalwatchlists_'+filedate,overwrite);
+	concatFiles			:= dsGWLBase + OFAC_out;
+	
+	//DF-26191: Append Global_SIDs
+	addGlobalSID		:= mdr.macGetGlobalSID(concatFiles, 'GlobalWatchList', 'source', 'global_sid');	
+	
+	Sanctions_All 	:= output(addGlobalSID,,'~thor_data400::in::globalwatchlists_'+filedate,overwrite);
 	
 	RETURN Sanctions_All;
 	

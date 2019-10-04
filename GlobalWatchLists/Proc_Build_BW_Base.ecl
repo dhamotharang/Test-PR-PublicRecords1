@@ -1,4 +1,4 @@
-﻿import address, globalwatchlists, ut;
+﻿import _control, address, globalwatchlists, mdr, std, ut;
 
 export Proc_Build_BW_Base(string pFileDate) := function
 
@@ -1050,10 +1050,13 @@ export Proc_Build_BW_Base(string pFileDate) := function
 		self := l;
 	end;
 	
-	final_file := project(dDenormSanc(trim(pty_key) <> ''), finalTran(left));
-	ded_final	:= DEDUP(SORT(DISTRIBUTE(final_file),RECORD,LOCAL),RECORD, LOCAL);
+	final_file 		:= project(dDenormSanc(trim(pty_key) <> ''), finalTran(left));
+	ded_final			:= DEDUP(SORT(DISTRIBUTE(final_file),RECORD,LOCAL),RECORD, LOCAL);
 	
-	ds_out := output(ded_final,,'~thor_data400::in::globalwatchlists_ofac_fse_'+pFileDate, overwrite);
+	//DF-26191: Append Global_SIDs
+	addGlobalSID	:= mdr.macGetGlobalSID(ded_final, 'GlobalWatchList', 'source', 'global_sid');	
+	
+	ds_out := output(addGlobalSID,,'~thor_data400::in::globalwatchlists_ofac_fse_'+pFileDate, overwrite);
 	
 	return ds_out;
 
