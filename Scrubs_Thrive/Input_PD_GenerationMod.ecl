@@ -58,7 +58,7 @@ EXPORT Input_PD_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_wrkphone:CUSTOM(Scrubs.Functions.fn_verify_phone>0,TRUE)\n'
     + 'FIELDTYPE:invalid_email:CUSTOM(Scrubs_Thrive.Functions.fn_chk_email >0)\n'
     + 'FIELDTYPE:invalid_dob:CUSTOM(Scrubs.Functions.fn_valid_pastDate>0)\n'
-    + 'FIELDTYPE:invalid_employer:CUSTOM(Scrubs_Thrive.Functions.fn_chk_employer>0):LENGTHS(1..)\n'
+    + 'FIELDTYPE:invalid_employer:CUSTOM(Scrubs_Thrive.Functions.fn_chk_employer>0)\n'
     + 'FIELDTYPE:invalid_date:CUSTOM(Scrubs_Thrive.Functions.fn_invalid_date>0)\n'
     + '//--------------------------------------------------------------- \n'
     + '//FIELDS TO SCRUB -- Commented out fields are not being scrubbed\n'

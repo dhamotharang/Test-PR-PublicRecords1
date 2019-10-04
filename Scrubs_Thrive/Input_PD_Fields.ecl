@@ -89,8 +89,8 @@ EXPORT InValidMessageFT_invalid_dob(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneEr
 EXPORT MakeFT_invalid_employer(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_employer(SALT311.StrType s) := WHICH(~Scrubs_Thrive.Functions.fn_chk_employer(s)>0,~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_employer(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Thrive.Functions.fn_chk_employer'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_employer(SALT311.StrType s) := WHICH(~Scrubs_Thrive.Functions.fn_chk_employer(s)>0);
+EXPORT InValidMessageFT_invalid_employer(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Thrive.Functions.fn_chk_employer'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -101,7 +101,7 @@ EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneE
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'orig_fname','orig_mname','orig_lname','orig_addr','orig_city','orig_state','orig_zip5','orig_zip4','phone_home','phone_cell','phone_work','email','dob','employer','dt');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'orig_fname','orig_mname','orig_lname','orig_addr','orig_city','orig_state','orig_zip5','orig_zip4','phone_home','phone_cell','phone_work','email','dob','employer','dt');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'orig_fname' => 0,'orig_mname' => 1,'orig_lname' => 2,'orig_addr' => 3,'orig_city' => 4,'orig_state' => 5,'orig_zip5' => 6,'orig_zip4' => 7,'phone_home' => 8,'phone_cell' => 9,'phone_work' => 10,'email' => 11,'dob' => 12,'employer' => 13,'dt' => 14,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM','LENGTHS'],['CUSTOM'],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation

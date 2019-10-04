@@ -18,7 +18,7 @@ FIELDTYPE:invalid_cellphone:CUSTOM(Scrubs.Functions.fn_verify_phone>0,TRUE)
 FIELDTYPE:invalid_wrkphone:CUSTOM(Scrubs.Functions.fn_verify_phone>0,TRUE)
 FIELDTYPE:invalid_email:CUSTOM(Scrubs_Thrive.Functions.fn_chk_email >0)
 FIELDTYPE:invalid_dob:CUSTOM(Scrubs.Functions.fn_valid_pastDate>0)
-FIELDTYPE:invalid_employer:CUSTOM(Scrubs_Thrive.Functions.fn_chk_employer>0):LENGTHS(1..)
+FIELDTYPE:invalid_employer:CUSTOM(Scrubs_Thrive.Functions.fn_chk_employer>0)
 FIELDTYPE:invalid_date:CUSTOM(Scrubs_Thrive.Functions.fn_invalid_date>0)
 //--------------------------------------------------------------- 
 //FIELDS TO SCRUB -- Commented out fields are not being scrubbed
