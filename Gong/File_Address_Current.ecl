@@ -3,6 +3,7 @@ import doxie, gong, Data_Services, header_services;
 
 g := Gong.File_Gong_Full_Prepped_For_Keys(trim(prim_name)<>'', trim(z5)<>'');
 
+//CCPA-22 
 lraw := Gong.Layout_bscurrent_raw;
 
 // TODO: if "history" key will ever be adjusted, then it'd make sense to publish this layout
@@ -29,6 +30,9 @@ rec_address := record
   lraw.listed_name;
   string8 date_first_seen;// := lraw.filedate[1..8];
   lraw.dual_name_flag;
+	UNSIGNED6 DID:=0;
+	UNSIGNED4 global_sid:=0;
+	UNSIGNED8 record_sid:=0;
 end;
 
 rec_address addcn(g l) := transform
@@ -53,14 +57,7 @@ header_services.Supplemental_Data.mac_verify('file_gong_inj.txt', layout_gong_in
 
 Base_File_Append_In := attr();
 
-//CCPA-22 CCPA new fields
-layout_bscurrent_ccpa := RECORD
-	gong.Layout_bscurrent_raw;
-	UNSIGNED4 global_sid := 0;
-	UNSIGNED8 record_sid := 0;
-END;
-
-layout_bscurrent_ccpa  xTo_bscurrent_raw (Base_File_Append_In L ):= TRANSFORM
+g  xTo_bscurrent_raw (Base_File_Append_In L ):= TRANSFORM
 
 	SELF := L ;
  
