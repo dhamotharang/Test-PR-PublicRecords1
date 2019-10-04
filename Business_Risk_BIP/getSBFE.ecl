@@ -1,14 +1,12 @@
-﻿/*2016-11-15T02:48:01Z (aleksandar tomovic)
-corrected as per code review 
-*/
-IMPORT BIPV2, Business_Credit, Business_Risk_BIP, MDR, ut, Business_Credit_KEL, risk_indicators, DID_Add, Business_Risk, STD;
+﻿IMPORT BIPV2, Business_Credit, Business_Credit_KEL,  Business_Risk,  Business_Risk_BIP, DID_Add, doxie, MDR, risk_indicators, ut, STD;
 
 EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
-	// Add fifteen minutes to the historydatetime to accommodate for delays in 
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+  // Add fifteen minutes to the historydatetime to accommodate for delays in 
 	// the real time database information being available in production runs
 	Shell := 
 		PROJECT(
@@ -20,7 +18,8 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		);
 	
 	SBFERaw := Business_Credit.Key_LinkIds().kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-																		Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+																		mod_access,
+                                    Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																		0, /*ScoreThreshold --> 0 = Give me everything*/
 																		Options.DataPermissionMask,
 																		Business_Risk_BIP.Constants.Limit_SBFE_LinkIds,
