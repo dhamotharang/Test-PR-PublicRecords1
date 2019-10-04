@@ -80,8 +80,8 @@ FUNCTION
 
       BOOLEAN isPRIFail := CASE(le.RiskId,
                                 -1 => pInput.isPrimaryPhone AND pInput.phone = '',
-                                // If the listed name is coming from CNAM, then we don't populate in Full Name since we might be invalid valid from the gateway (values like city, state)
-                                0  => pInput.isPrimaryIdentity AND (pInput.fname = '' AND pInput.lname = '' AND (pInput.subj_phone_type_new = MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2 AND pInput.listed_name != '')),
+                                // If the listed name is coming from CNAM, then we don't populate in Full Name since we might get invalid values from the gateway (values like city, state, UNKNOWN)
+                                0  => pInput.isPrimaryIdentity AND (pInput.fname = '' AND pInput.lname = '' AND (pInput.listed_name = '' OR pInput.subj_phone_type_new = MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2)),
                                 1  => IF(inmod.IsGovsearch, (pInput.fname <>'' OR pInput.lname <> '' OR pInput.listed_name <> '') AND pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive,
                                          pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive),
                                 2  => STD.Date.DaysBetween(dt_first_seen, currentDate) BETWEEN le.ThresholdA AND le.Threshold,
@@ -165,6 +165,10 @@ FUNCTION
                                     EXISTS(dIterateRIs)                          => $.Constants.RiskIndicator[$.Constants.RiskLevel.WARN],
                                     $.Constants.RiskIndicator[$.Constants.RiskLevel.PASS]);
     SELF.OTPRIFailed        := EXISTS(dIterateRIs(OTPRIFailed));
+      // Blanking out fname, lname, phone fields since we didn't find any results for the search criteria
+    SELF.phone              := IF(EXISTS(SELF.AlertIndicators(RiskId IN [-1, 0])), '', pInput.phone),
+    SELF.fname              := IF(EXISTS(SELF.AlertIndicators(RiskId IN [-1, 0])), '', pInput.fname),
+    SELF.lname              := IF(EXISTS(SELF.AlertIndicators(RiskId IN [-1, 0])), '', pInput.lname),
     SELF                    := pInput;
   END;
 
