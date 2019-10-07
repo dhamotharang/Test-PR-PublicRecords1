@@ -13,7 +13,7 @@ export GenCrosswalk(
      outputFileName := Files(trim(pVersion),false).FILE_LOGICAL;
      b2cKeyName     := Keys(trim(pVersion),false).KEY_LOGICAL_B2C;
      c2bKeyName     := Keys(trim(pVersion),false).KEY_LOGICAL_C2B;
-     bestContacts   := BIPV2_Crosswalk.BestContactTitles;
+     bestContacts   := BIPV2_Crosswalk.BestContactTitles();
      
      contactKeyDs   := distribute(pull(BIPV2_Build.key_contact_linkids.keybuilt), hash32(seleid));
      // contactSources := set(dedup(contactKeyDs, source, all, hash), source);

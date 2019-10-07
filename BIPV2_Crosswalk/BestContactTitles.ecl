@@ -1,5 +1,5 @@
 ﻿ 
-﻿import BIPV2_Contacts;
+import BIPV2_Contacts;
 import BIPV2_Build;
 import STD;
 
