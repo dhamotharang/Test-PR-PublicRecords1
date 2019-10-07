@@ -22,6 +22,8 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
                     unsigned4 days_old_title;
                     unsigned4 days_old_contact;
                     unsigned data_permits;
+				unsigned4 global_sid;
+				unsigned8 record_sid;
                     };	
  				
     contacts_proj := project(contactKey, 
@@ -106,6 +108,8 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         unsigned2 data_permits;
         unsigned2 accum_data_permits;
         BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
+			  unsigned4 global_sid;
+	      unsigned8 record_sid;
         };
 				
     slim_child_title_layout := {
@@ -168,6 +172,8 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         unsigned contact_rank;
         unsigned2 data_permits;
         unsigned2 accum_data_permits;
+	   unsigned4 global_sid;
+	   unsigned8 record_sid;
         BIPV2_Build.key_contact_linkids.Key.contact_did,
         dataset(title_layout) titles;
         };
@@ -213,6 +219,8 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         unsigned2 accum_data_permits;
         BIPV2_Build.key_contact_linkids.Key.contact_did,
         BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
+	   unsigned4 global_sid;
+	   unsigned8 record_sid;
         };
 
     contact_title_layout := {
@@ -230,12 +238,16 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
               self.data_permits := r.data_permits;
 	  																												self.accum_data_permits := r.data_permits;
                                self.contact_did := l.contact_did;
+						 self.global_sid := r.global_sid;
+						 self.record_sid := r.record_sid;
 	  																												self.contact_job_title_derived := r.contact_job_title_derived;
 		  		end;
       x := normalize(contacts, left.titles, transform(flat_contact_title_layout,
 																																																					 self.contact_title_rank := counter;
 																																																						self.data_permits := right.data_permits;
 																																																						self.accum_data_permits := right.data_permits;
+																																																						self.global_sid := right.global_sid,
+																																																						self.record_sid := right.record_sid,
 																																																						self.contact_did := left.contact_did;
 																																																						self.contact_job_title_derived := right.contact_job_title_derived));
 																																					
