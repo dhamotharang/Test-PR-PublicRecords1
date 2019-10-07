@@ -50,8 +50,10 @@ EXPORT	Key_BusinessOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today()
 		STRING10	Phone_Number;
 		STRING9		Federal_TaxID_SSN;
 		STRING3		Federal_TaxID_SSN_Identifier;
-    UNSIGNED4 global_sid;
-    UNSIGNED8 record_sid  :=  0;
+    	UNSIGNED4 	global_sid := 0;
+    	UNSIGNED8 	record_sid  :=  0;
+		//DF-26180 Add DID
+		UNSIGNED6 	did := 0;
 		STRING2		source;
 	END;
 	
