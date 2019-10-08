@@ -1,5 +1,6 @@
 ﻿import AutoStandardI;
 import BIPV2;
+import Doxie;
 
 export IdAppendLayouts := module
 	
@@ -127,6 +128,7 @@ export IdAppendLayouts := module
 		typeof(baseLayout.contact_job_title_derived) contact_job_title,
 		baselayout.contact_did,
 		errorRec,
+		boolean is_suppressed := false,
 	};
 
 	// BizLinkFull.svcAppend service also returns a dataset of this layout to return the header records.
@@ -147,6 +149,7 @@ export IdAppendLayouts := module
 	};
 
 	shared globalMod := AutoStandardI.GlobalModule();
+	shared defaultDataAccess := MODULE(doxie.IDataAccess) END;
 	export Permissions := {
 		string dummy_field, // Needed to create a record that uses the defaults for the other fields.
 		typeof(globalMod.AllowAll) allowAll {xpath('AllowAll')} := globalMod.AllowAll,
@@ -158,6 +161,9 @@ export IdAppendLayouts := module
 		typeof(globalMod.ignoreFidelity) ignoreFidelity {xpath('ignoreFidelity')} := globalMod.ignoreFidelity,
 		typeof(globalMod.IndustryClass) IndustryClass {xpath('IndustryClass')} := globalMod.IndustryClass,
 		typeof(globalMod.LnBranded) LnBranded {xpath('LnBranded')} := globalMod.LnBranded,
+		typeof(defaultDataAccess.glb) data_access_glb {xpath('data_access_glb')} := defaultDataAccess.glb,
+		typeof(defaultDataAccess.dppa) data_access_dppa {xpath('data_access_dppa')} := defaultDataAccess.dppa,
+		typeof(defaultDataAccess.lexid_source_optout) data_access_lexid_source_optout {xpath('data_access_lexid_source_optout')} := defaultDataAccess.lexid_source_optout,
 	};
 
 	export SoapRequest := {

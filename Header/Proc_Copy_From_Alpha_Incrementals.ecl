@@ -151,26 +151,27 @@ SHARED updateSupers(string kNm,boolean skipIncSFupdate=false,string kNml=kNm, st
        std.file.startsuperfiletransaction(),
                           
        // remove the previous incrementals from the monthly regular lab key qa superfiles
-       nothor(if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName('qa' ,kNm)))>0,
-          std.file.RemoveSuperFile          (fName('qa' ,kNm),currLgInc(kNm))          )),
-
-       nothor(if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName4('qa' ,kNm)))>0,
-          std.file.RemoveSuperFile          (fName4('qa' ,kNm),currLgInc(kNm))          )),
-     
-       nothor(if(count(std.file.LogicalFileSuperOwners(currLgInc8(kNm))('~'+name=fName8('qa' ,kNm)))>0,
-          std.file.RemoveSuperFile          (fName8('qa' ,kNm),currLgInc8(kNm))          )),
-                  
-       // We add both to make sure the monthly
-       // std.file.RemoveOwnedSubFiles      (fName('inc',kNm)),
-       nothor(if(~skipIncSFupdate,std.file.RemoveOwnedSubFiles      (fName('inc',kNm),true))),
-       nothor(if(~skipIncSFupdate,std.file.clearsuperfile           (fName('inc',kNm)))),
-       nothor(if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(filedt,kNml)))),
-       nothor(if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName8(filedt,kNml)))),
-               
+       if( count(nothor(STD.File.SuperFileContents (fName ('qa',kNm)))('~'+name=fName (filedt,kNml)))=0, 
+                 std.file.RemoveSuperFile          (fName ('qa',kNm),currLgInc(kNm))),
+       if( count(nothor(STD.File.SuperFileContents (fName4('qa',kNm)))('~'+name=fName (filedt,kNml)))=0,
+                 std.file.RemoveSuperFile          (fName4('qa',kNm),currLgInc(kNm))),
+       if( count(nothor(STD.File.SuperFileContents (fName8('qa',kNm)))('~'+name=fName8(filedt,kNml)))=0,
+                 std.file.RemoveSuperFile          (fName8('qa',kNm),currLgInc8(kNm))),
+       
+       if( count(nothor(STD.File.SuperFileContents (fName ('inc',kNm)))('~'+name=fName (filedt,kNml)))=0,
+        sequential(
+                nothor(if(~skipIncSFupdate,std.file.RemoveOwnedSubFiles      (fName('inc',kNm),true))),
+                nothor(if(~skipIncSFupdate,std.file.clearsuperfile           (fName('inc',kNm)))),
+                nothor(if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(filedt,kNml)))),
+                nothor(if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName8(filedt,kNml)))),
+        )),
        // Add the new incrementals to the monthly regular lab keys qa superfiles
-       nothor(std.file.AddSuperFile             (fName ('qa',kNm),fName (filedt,kNml))),
-       nothor(std.file.AddSuperFile             (fName4('qa',kNm),fName (filedt,kNml))),
-       nothor(std.file.AddSuperFile             (fName8('qa',kNm),fName8(filedt,kNml))),
+       if( count(nothor(STD.File.SuperFileContents (fName ('qa',kNm)))('~'+name=fName (filedt,kNml)))=0,
+                nothor(std.file.AddSuperFile       (fName ('qa',kNm)           ,fName (filedt,kNml)))),
+       if( count(nothor(STD.File.SuperFileContents (fName4('qa',kNm)))('~'+name=fName (filedt,kNml)))=0,
+                 nothor(std.file.AddSuperFile      (fName4('qa',kNm)           ,fName (filedt,kNml)))),
+       if( count(nothor(STD.File.SuperFileContents (fName8('qa',kNm)))('~'+name=fName8 (filedt,kNml)))=0,
+                 nothor(std.file.AddSuperFile      (fName8('qa',kNm)           ,fName8 (filedt,kNml)))),
        std.file.finishsuperfiletransaction()
     ))
   );
@@ -262,13 +263,10 @@ EXPORT Refresh_copy(string filedt) :=  FUNCTION
     return sequential(cpLab, cpUniqEx);
 END;
 
-copy_to_dataland:= _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland');
-
 EXPORT movetoQA(string filedt) := sequential(
     // The following can only copy after the key is built in Boca
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
     update_inc_superfiles(,filedt),
-    copy_to_dataland
     );
         
 EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(  
