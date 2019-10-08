@@ -102,7 +102,7 @@ FUNCTION
     SELF.InputDID    := ri.did;
     // Need to double check mapping - doesn't make any sense, but trying to match production
     SELF.TNT         := MAP((UNSIGNED)le.did = 0 => '',
-                            ri.did != 0 OR addressMatchScore BETWEEN 76 AND 254 AND le.prim_range = ri.prim_range => Phones.Constants.TNT.Current,
+                            ri.did != 0 OR (addressMatchScore BETWEEN 76 AND 254 AND le.prim_range = ri.prim_range) => Phones.Constants.TNT.Current,
                             Phones.Constants.TNT.History);
     SELF.fname       := IF(isInputDID, ri.name_first, le.fname);
     SELF.mname       := IF(isInputDID, ri.name_middle, le.mname);
@@ -120,8 +120,8 @@ FUNCTION
     SELF.zip         := IF(isInputDID, ri.z5, le.zip);
     SELF.zip4        := IF(isInputDID, ri.zip4, le.zip4);
     SELF.dob         := IF(isInputDID, (INTEGER)ri.dob, le.dob);
-    SELF.county_code := '';
-    SELF.county_name := '';
+    SELF.county_code := IF(isInputDID, '', le.county_code);
+    SELF.county_name := IF(isInputDID, '', le.county_name);
     SELF.Deceased    := IF(isInputDID, IF((INTEGER)ri.dod != 0, 'Y', 'N'), le.Deceased);
     SELF             := le;
   END;
