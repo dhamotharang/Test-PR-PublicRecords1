@@ -74,6 +74,7 @@ OUTPUT (choosen(inds, eyeball), NAMED ('input'));
 		Risk_Indicators.Layout_Batch_In /*- HistoryDateYYYYMM*/; //???
 		string20 HistoryDateTimeStamp;
 		STRING12 	LexID;
+		string email;
 	end;
   
 Batch_In := PROJECT(inds, TRANSFORM(batch_in50,
@@ -103,7 +104,9 @@ Batch_In := PROJECT(inds, TRANSFORM(batch_in50,
 	SELF.Home_Phone := LEFT.HomePhone;
 	SELF.Work_Phone := LEFT.WorkPhone;
 	SELF.ip_addr := '';
+	self.email := left.email;
   SELF.lexid := left.lexid;
+	
     // When hard-coding archive dates, uncomment and modify one of the following sets of code 
 	//   below and comment out the existing  code for self.historydateyyyymm and self.historyDateTimeStamp 
 	//****************************************************************************************
@@ -250,12 +253,13 @@ layout_acctno iidPrep( inds_dist le, INTEGER c ) := TRANSFORM
 	SELF.dl_number := STD.Str.ToUpperCase(riskwise.cleanDL_num(le.dl_number));
 	SELF.dl_state  := STD.Str.ToUpperCase(le.dl_state);
 
+	self.email_address := STD.Str.ToUpperCase(le.email);
 	SELF.ip_address := le.ip_addr;
 
 // to speed up the query, accept the LexID on input instead of appending it again.
 	SELF.DID := (UNSIGNED)le.LexID;
 	SELF.score := if((UNSIGNED)le.lexid<>0, 100, 0);  // hard code the score to something greater than 0 to avoid trying to append DID by SSN in Risk_Indicators.iid_getDID_prepOutput
-		
+	
 	SELF := [];
 END;
 	

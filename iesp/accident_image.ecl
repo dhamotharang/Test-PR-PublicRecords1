@@ -33,11 +33,12 @@ export t_AccidentImageSearchOption := record (iesp.share.t_BaseSearchOption)
 	boolean IyetekRedact {xpath('IyetekRedact')};
 	boolean ColoredImage {xpath('ColoredImage')};
 	boolean Redact {xpath('Redact')};
+	string250 RequestType {xpath('RequestType')};
 end;
 		
 export t_AccidentImageResponse := record
 	string Source {xpath('Source')};
-	string ImageData {xpath('ImageData'), maxlength(iesp.Constants.Retrieve_Image.MaxImageSize)}; // Xsd type: base64binary
+	string ImageData {xpath('ImageData'), maxlength(iesp.Constants.Retrieve_Image.MaxImageSize)}; // Xsd type: base64Binary
 end;
 		
 export t_AccidentImageRequest := record (iesp.share.t_BaseRequest)

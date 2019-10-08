@@ -4,7 +4,7 @@
 // update AC_Lay here...
 Base_Lay:=Kel_Shell_QA.Layouts.AC_Lay;
 
-logical_file_name:='~calbrecht::tradline_vault_100k_current_business_03262019_ks-1394_ks-1395_w20190326-161605_masterlayout.csv';
+logical_file_name:='~jastad01::addednewattributes_ks3177_w20190917-143502.csv';
 
 unique_id:='p_inpacct';
 Tag:= regexreplace('~',logical_file_name,'');
@@ -29,7 +29,9 @@ parallel(Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, fi
          Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Assets'),
          Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'B2B Trade'),
          Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay, 'Criminal History'),
-         Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Bankruptcy History')
+         Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Bankruptcy History'),
+				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Input Validation'),
+				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Validation')
 				 );
 
 

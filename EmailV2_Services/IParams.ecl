@@ -48,8 +48,7 @@ EXPORT IParams := MODULE
                    $.Constants.SearchType.isEAA(SearchType) => 0, // default here may change
                    $.Constants.SearchType.isEIA(SearchType) OR $.Constants.SearchType.isEIC(SearchType) => 0xF,  // by default no restrictions on search by input email address
                    0); 
-      STRING _BVAPIkey := '' : STORED('BVAPIkey');   
-      EXPORT STRING   BVAPIkey := IF(_BVAPIkey != '', _BVAPIkey, $.Constants.GatewayValues.BVAPIkey);   
+      EXPORT STRING   BVAPIkey := $.Constants.GatewayValues.BVAPIkey;   
       EXPORT UNSIGNED MaxEmailsForDeliveryCheck := $.Constants.Defaults.MaxEmailsToCheckDeliverable : STORED('MaxEmailsForDeliveryCheck');   
       STRING  _SearchTier := ''  : STORED('SearchTier');   
       STRING  SearchTier := IF(_SearchTier<>'', STD.Str.ToLowerCase(_SearchTier), $.Constants.Basic);   
@@ -62,8 +61,7 @@ EXPORT IParams := MODULE
       BOOLEAN  SkipTMXcheck := _BypassTMXcheck OR $.Constants.SearchType.isEIA(SearchType) 
                                       OR $.Constants.SearchType.isEIC(SearchType); // we never suppress email records for EIC/EIA searches and we are not returning TMX data otherwise
 
-      BOOLEAN  _UseTMXRules := FALSE : STORED('UseTMXRules');   // temporary exposed core option to run TMX for EIA,EIC,EAA. If set to true it will override SkipTMXcheck 
-      EXPORT BOOLEAN UseTMXRules := ~SkipTMXcheck OR _UseTMXRules;
+      EXPORT BOOLEAN UseTMXRules := ~SkipTMXcheck;
 
       EXPORT UNSIGNED MaxEmailsForTMXCheck := $.Constants.Defaults.MaxEmailsToCheckDeliverable : STORED('MaxEmailsForTMXCheck'); // specific to EAA search type  
       BOOLEAN KeepTMXRejectedEmail := FALSE  : STORED('KeepTMXRejectedEmail'); // specific to EAA search type

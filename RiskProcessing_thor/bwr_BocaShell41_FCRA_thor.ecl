@@ -64,7 +64,12 @@ output(count(ds_in));
 inds := IF (record_limit = 0, ds_in, CHOOSEN (ds_in, record_limit));
 OUTPUT (choosen(inds, eyeball), NAMED ('input'));
 
-Batch_In := PROJECT(inds, TRANSFORM(Risk_Indicators.CDIP_Layouts.Batch_In,
+layout_batch_in := record
+	Risk_Indicators.CDIP_Layouts.Batch_In;
+	string email;
+end;
+
+Batch_In := PROJECT(inds, TRANSFORM(layout_batch_in,
 	SELF.seq := COUNTER;
 	SELF.AcctNo := LEFT.Account;
 	SELF.SSN := LEFT.SSN;
@@ -91,6 +96,7 @@ Batch_In := PROJECT(inds, TRANSFORM(Risk_Indicators.CDIP_Layouts.Batch_In,
 	SELF.Home_Phone := LEFT.HomePhone;
 	SELF.Work_Phone := LEFT.WorkPhone;
 	SELF.ip_addr := '';
+	SELF.email := left.email;
 	SELF.HistoryDateYYYYMM := LEFT.HistoryDateYYYYMM;));
 
   inds_dist := DISTRIBUTE(Batch_In); //Distribute randomly
@@ -209,6 +215,7 @@ layout_acctno iidPrep( inds_dist le) := TRANSFORM
 	SELF.dl_number := StringLib.StringToUppercase(riskwise.cleanDL_num(le.dl_number));
 	SELF.dl_state  := StringLib.StringToUppercase(le.dl_state);
 
+	self.email_address := STD.Str.ToUpperCase(le.email);
 	SELF.ip_address := le.ip_addr;
 
 // to speed up the query, accept the LexID on input instead of appending it again.

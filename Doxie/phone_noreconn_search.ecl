@@ -307,39 +307,41 @@ EXPORT phone_noreconn_search := MACRO
 	/*--- Back to code ---*/
 	death_params := DeathV2_Services.IParam.GetDeathRestrictions(globalmod);
 
-	filteredResults_supp := dx_death_master.exclude(results_best, did, death_params); 
+  out_layout_info := RECORD
+    RECORDOF(out_layout);
+    BOOLEAN is_src_restricted;
+    BOOLEAN is_deceased := FALSE;
+  END;
+
+  resultsPlusDeath_info_append := dx_death_master.Append.byDid(results_best, did, death_params,,ut.limits.DEATH_PER_DID); 
   
-  filteredResults := 
-    project(filteredResults_supp, 
-      transform(out_layout,
-        self.deceased := 'N';  
-        self := left));   
+  out_layout_info xfm_add_death_info (RECORDOF(resultsPlusDeath_info_append) l) := 
+    TRANSFORM
+      SELF.deceased := IF(l.death.is_deceased, 'Y', 'N'), 
+      SELF.dod := IF(l.death.is_deceased, (UNSIGNED4)l.death.dod8, 0),
+      SELF.is_src_restricted := l.death.src = MDR.sourceTools.src_Death_Restricted,
+      SELF := l
+    END;
 
-  out_layout_info := record
-	  recordof(out_layout);
-    string src := '';
-  end;
-
-	resultsPlusDeath_info_append := dx_death_master.Append.byDid(results_best, did, death_params,,ut.limits.DEATH_PER_DID); 
-
-  resultsPlusDeath_info := 
-    project(resultsPlusDeath_info_append, 
-      transform(out_layout_info,
-        self.deceased := if(left.death.is_deceased, 'Y', 'N'), 
-        self.dod := if(left.death.is_deceased, (unsigned4)left.death.dod8, 0),
-        self.src := if(left.death.is_deceased, left.death.src, ''),
-        self := left));
-
+  resultsPlusDeath_info := PROJECT(resultsPlusDeath_info_append, xfm_add_death_info(LEFT));
+  filteredResults := PROJECT(resultsPlusDeath_info(deceased = 'N'), out_layout);
+  
 	Death_source_srt:= Sort(resultsPlusDeath_info,did,dod);
-	Death_source_grp:= Sort(group(Death_source_srt,did,dod), if(src = MDR.sourceTools.src_Death_Restricted, 1,0));
-	Death_source_info := iterate(Death_source_grp, transform(out_layout_info, self.IsLimitedAccessDMF :=if(counter = 1 , right.dod != 0 and right.src= MDR.sourceTools.src_Death_Restricted,
-	                                   left.IsLimitedAccessDMF ) ,
-																																				self :=right));
+	Death_source_grp:= Sort(group(Death_source_srt,did,dod), is_src_restricted);
+	Death_source_info := 
+    iterate(Death_source_grp, 
+      transform(out_layout_info, 
+        self.IsLimitedAccessDMF := if(counter = 1, 
+                                      right.dod != 0 and right.is_src_restricted,
+	                                    left.IsLimitedAccessDMF ),
+				self :=right));
 
-resultsPlusSSA := dedup(sort(ungroup(Death_source_info), except dod, src, IsLimitedAccessDMF), except dod, src, IsLimitedAccessDMF);
+  resultsPlusSSA := dedup(sort(ungroup(Death_source_info), except dod, is_src_restricted, IsLimitedAccessDMF), except dod, is_src_restricted, IsLimitedAccessDMF);
 
-resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
-																  self := left));
+  resultsPlusDeath := 
+    Project(resultsPlusSSA, 
+      transform(out_layout,
+				self := left));
 
 	resultsToMask := if (IncludeDeadContacts,resultsPlusDeath,filteredResults);
 
@@ -354,11 +356,18 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 		unsigned8 did ;
 	end;
 
-	prepGovSSN := project(resultsFilterBus,Transform(RecprepGovSSN,self.did := (unsigned)left.did, self:=left));
+  prepGovSSN := 
+    project(resultsFilterBus,
+      Transform(RecprepGovSSN,
+        self.did := (unsigned)left.did, self:=left));
 
 	_withGovBestSSN := SSNBest_Services.Functions.fetchSSNs_generic(prepGovSSN, ssnBestParams, ssn, did, false);
 
-	withGovBestSSN  := PROJECT(_withGovBestSSN,TRANSFORM(recordof(resultsFilterBus),self.did := (string)left.did, self:=left));
+  withGovBestSSN  := 
+    PROJECT(_withGovBestSSN,
+      TRANSFORM(recordof(resultsFilterBus),
+        self.did := (string)left.did, 
+        self:=left));
 
 	resultsGovSSN := if(GetSSNBest,withGovBestSSN,resultsFilterBus);
 
@@ -376,8 +385,17 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 	// and keep the matching key records to be used for mutiple places below.
 
 
-  phoneInfo := DEDUP(SORT(PROJECT(ds_cmp_res_out_dd, TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn, SELF.phoneno := LEFT.Phone, SELF := [])), phoneno), phoneno);
-	  in_mod := MODULE(Phones.IParam.BatchParams)
+  phoneInfo := 
+    DEDUP(
+      SORT(
+        PROJECT(ds_cmp_res_out_dd, 
+          TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn, 
+            SELF.phoneno := LEFT.Phone, 
+            SELF := [])), 
+        phoneno), 
+      phoneno);
+      
+	in_mod := MODULE(Phones.IParam.BatchParams)
 		EXPORT UNSIGNED	max_age_days := Phones.Constants.PhoneAttributes.LastActivityThreshold;
 	END;
 	ds_ported_metadata := Phones.GetPhoneMetadata_wLERG6(phoneInfo,in_mod);

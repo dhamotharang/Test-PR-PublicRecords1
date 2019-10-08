@@ -25,11 +25,9 @@
                      'CheckEmailDeliverable',
                      'KeepUndeliverableEmail',
                      'MaxEmailsForDeliveryCheck',
-                     'BVAPIkey',
                      'SkipTMXcheck',
                      'MaxEmailsForTMXcheck',
                      'KeepTMXRejectedEmail',
-                     'UseTMXRules',  // temporary option to be used for qa testing core functionality in Cert
                      'Gateways'
                      ));
 ENDMACRO;

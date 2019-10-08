@@ -107,7 +107,7 @@ EXPORT ING_provider_legacy := module
 		boolean checkDeath(dataset(pid_did_rec) l) := FUNCTION
     death_recs_raw := dx_death_master.Get.byDid(l, did, death_params);
     
-		return if(count(death_recs_raw(death.state_death_id <> '')) > 0,true,false);
+		return count(death_recs_raw(death.state_death_id <> '')) > 0;
 		end;
 
 		//get SSN's

@@ -52,8 +52,9 @@ EXPORT ImageSearchService() := FUNCTION
 	RequestVendorCode := Request[1].ReportBy.Vendor;
 	RequestAgencyOri := Request[1].ReportBy.AgencyORI;
 	RequestDateOfCrash := Request[1].ReportBy.DateOfCrash;
-    RequestColoredImage := Request[1].Options.ColoredImage;
+	RequestColoredImage := Request[1].Options.ColoredImage;
 	RequestRedact       := Request[1].Options.Redact;
+	RequestType         := Request[1].Options.RequestType;
 
 	RequestReportIdRaw := Request[1].ReportBy.ReportID;
 	//blanking out RequestReportId for KYCrashLogic since we need to get an image for it straigt away without search performed. 
@@ -150,7 +151,8 @@ EXPORT ImageSearchService() := FUNCTION
 		RequestDateOfCrash,
 		isOnlyTm,
 		RequestColoredImage,
-		RequestRedact
+		RequestRedact,
+		RequestType
 	);
 
 	//We don't know which report_id was used to retreive image for TM that's why we are searching by all the possible report ids. ESP inserts report_id from the request.
