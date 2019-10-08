@@ -128,6 +128,7 @@ EXPORT map_NJS0033_conversion(STRING pVersion) := FUNCTION
 																 TRIMLIC_TYPE='APPROVED INSTRUCTOR' => '4206',
 																 TRIMLIC_TYPE='TEMPORARY PRACTICE PERMIT' => '4205',
 																 TRIMLIC_TYPE='CERT RESIDENTIAL APPRAISER' => '4203',
+																 TRIMLIC_TYPE='AMC CONTROLLING PERSON' => '4207',
 																 '');
 	  SELF.RAW_LICENSE_STATUS := TrimLIC_STATUS;
 		SELF.STD_LICENSE_STATUS := CASE(SELF.RAW_LICENSE_STATUS,
@@ -229,8 +230,8 @@ EXPORT map_NJS0033_conversion(STRING pVersion) := FUNCTION
 		clnAddrAddr1					:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(fixAddr1,TrimAddress4); //Address cleaner to remove 'c/o' AND 'attn' from address
 		tmpADDR_ADDR1_1				:= TRIM(clnAddrAddr1[1..10],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[11..12],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[13..40],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[41..44],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[45..46],LEFT,RIGHT);																	
 		tmpADDR_ADDR2_1				:= TRIM(clnAddrAddr1[47..56],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[57..64],LEFT,RIGHT);
-		SELF.ADDR_ADDR1_1			:= StringLib.StringCleanSpaces(tmpADDR_ADDR1_1);	
-		SELF.ADDR_ADDR2_1			:= StringLib.StringCleanSpaces(tmpADDR_ADDR2_1); 
+		SELF.ADDR_ADDR1_1			:= IF(StringLib.StringCleanSpaces(tmpADDR_ADDR1_1)!= '',StringLib.StringCleanSpaces(tmpADDR_ADDR1_1),StringLib.StringCleanSpaces(tmpADDR_ADDR2_1));	
+		SELF.ADDR_ADDR2_1			:= IF(StringLib.StringCleanSpaces(tmpADDR_ADDR1_1)!= '',StringLib.StringCleanSpaces(tmpADDR_ADDR2_1),'');
 		SELF.ADDR_CITY_1			:= TRIM(clnAddrAddr1[65..89]);
 		SELF.ADDR_STATE_1			:= TRIM(clnAddrAddr1[115..116]);
 		SELF.ADDR_ZIP5_1			:= TRIM(clnAddrAddr1[117..121]);

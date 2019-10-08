@@ -1,4 +1,7 @@
-﻿IMPORT Address, BIPV2, AID, HMS_STLIC;
+﻿/*2019-06-19T17:11:54Z (Hennigar, Jennifer (RIS-BCT))
+CCPA-260
+*/
+IMPORT Address, BIPV2, AID, HMS_STLIC;
 
 EXPORT layouts := MODULE
 
@@ -777,6 +780,8 @@ EXPORT layouts := MODULE
 			string50 	source_code;
 			string15 	taxonomy_code;
 			string 		file_date;
+			unsigned4 								global_sid					:=	26691; // Source ID for HMS State License - CCPA project 20190612 
+			unsigned8 								record_sid; 
 		END;
 		
 		EXPORT autokey_common	:= RECORD
