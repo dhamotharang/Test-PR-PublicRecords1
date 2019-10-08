@@ -598,6 +598,8 @@ EXPORT Functions := MODULE
 											uc_s = 'NONCOMPLIANCE/NONPAYMENT'     => uc_s,
 											uc_s = 'NON-QUALIFYING/NON-FILING'    => uc_s,
 											uc_s = 'PENDING'									    => uc_s,
+											uc_s = 'PENDING CANCELLATION'					=> uc_s,
+											uc_s = 'PENDING CONVERSION'						=> uc_s,
 											uc_s = 'PENDING DISSOLUTION'					=> uc_s,
 											uc_s = 'PENDING MERGER'				        => uc_s,
 											uc_s = 'PENDING TERMINATION'				 	=> uc_s,
