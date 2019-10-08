@@ -264,7 +264,7 @@ export Key_BipToConsumer := module
 
      ) := function
 					
-					     bip2Consumer  := pull(Key);
+					bip2Consumer  := pull(Key);
           allowCodeBmap := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
 
           bip2Consumer apply_restrict(bip2Consumer L) := transform
@@ -297,6 +297,39 @@ export Key_BipToConsumer := module
 										
           BIPV2_Crosswalk.mac_check_access(remove_restricted, remove_restricted_ccpa, mod_access);							
 
-									 return remove_restricted_ccpa;   
+          withContactDids := remove_restricted_ccpa(contact_did>0);
+          withEmpids      := remove_restricted_ccpa(empid>0 and contact_did=0);
+          withNoids       := remove_restricted_ccpa(empid=0 and contact_did=0);
+					
+					sortContactDids := sort(distribute(withContactDids, hash32(seleid)), seleid, contact_did, local);
+					sortEmpIds      := sort(distribute(withEmpids, hash32(seleid)), seleid, empid, local);
+			 
+					rollContactDids := rollup(sortContactDids, left.seleid = right.seleid and left.contact_did=right.contact_did,
+					                          transform(recordof(remove_restricted_ccpa),
+																		          self.contactNames     := left.contactNames + right.contactNames,
+																		          self.contactSSNs      := left.contactSSNs + right.contactSSNs,
+																		          self.contactDOBs      := left.contactDOBs + right.contactDOBs,
+																		          self.contactEmails    := left.contactEmails + right.contactEmails,
+																		          self.contactPhones    := left.contactPhones + right.contactPhones,
+																		          self.contactAddresses := left.contactAddresses + right.contactAddresses,
+																		          self.jobTitles        := left.jobTitles + right.jobTitles,
+																							self                  := left),local);
+																		
+					rollEmpIds      := rollup(sortEmpIds, left.seleid = right.seleid and left.empid=right.empid,
+					                          transform(recordof(remove_restricted_ccpa),
+																		          self.contactNames     := left.contactNames + right.contactNames,
+																		          self.contactSSNs      := left.contactSSNs + right.contactSSNs,
+																		          self.contactDOBs      := left.contactDOBs + right.contactDOBs,
+																		          self.contactEmails    := left.contactEmails + right.contactEmails,
+																		          self.contactPhones    := left.contactPhones + right.contactPhones,
+																		          self.contactAddresses := left.contactAddresses + right.contactAddresses,
+																		          self.jobTitles        := left.jobTitles + right.jobTitles,
+																							self                  := left),local);
+	
+	        rollSeleIDs      := rollEmpIds + rollContactDids + withNoids;
+					
+					finalDs          := if(Level = BIPV2.IDconstants.Fetch_Level_SeleID, rollSeleIDs, remove_restricted_ccpa);
+
+					return finalDs;   
      end;
 end;
