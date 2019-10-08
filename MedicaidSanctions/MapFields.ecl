@@ -41,7 +41,7 @@ $.Layout_XG.routp xForm($.Layout_Sanctions infile) := TRANSFORM
 													'I' => 'Individual',
 													'O' => 'Business',
 													''));
-						self.Entity_Unique_ID := 'MS'+IntFormat(infile.key,20,1);
+						self.Entity_Unique_ID := 'MS'+ (string)infile.key; //     IntFormat(infile.key,20,1);
 						self.Reference_id := (string)infile.key;
 						self.title := '';
 						self.first_name := infile.first;

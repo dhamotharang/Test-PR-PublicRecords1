@@ -20,7 +20,7 @@ shared GetPublicationDate(string version) := version[1..4] + '-' + version[5..6]
 
 guid := 'CCC022A3-C8D3-4F32-9E20-CD206E19D08F';
 
-export unicode MakeXMLHdr(string version, integer cnt, dataset($.Layout_Sanctions) srcfile) := 
+export string MakeXMLHdr(string version, integer cnt) := 
 				hdg_Pt1 
 							+	guid		
 							+hdg_Pt2
@@ -42,13 +42,13 @@ export 	Footer := '</Entity_List></Watchlist>\r\n';
 
 
 export OutputDataXMLFile(string version,
-		dataset($.Layout_XG.routp) infile, dataset($.Layout_Sanctions) srcfile) := FUNCTION
+		dataset($.Layout_XG.routp) infile) := FUNCTION
 	
-	datafile := infile;	
-	cnt := count(datafile);
-	hdr := MakeXMLHdr(version, cnt, srcfile);
-	return OUTPUT(datafile,,'~thor::medicaidsanctions::'+version,
-			xml('Entity', heading(FROMUNICODE(hdr, 'utf8'),Footer),trim, OPT), overwrite);
+	cnt := count(infile);
+	hdr := MakeXMLHdr(version, cnt);
+	 OUTPUT(infile,,'~thor::medicaidsanctions::'+version,
+			xml('Entity', heading(hdr,Footer),trim, OPT), overwrite);
+	return 1;
 END;
 
 

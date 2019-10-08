@@ -4,7 +4,7 @@ baseversion := '20190926';
 root := '~thor::bridger::medicaid::hc_med_sanc_extract_' + baseversion + '.tab';
 
 ds1 := dataset(root, MedicaidSanctions.Layout_Sanctions, 
-							CSV(SEPARATOR('\t'),QUOTE('"')));
+							CSV(SEPARATOR('\t'),QUOTE('"'),TERMINATOR(['\n','\r\n','\n\r'])));
 
 ds := ds1((last <> '' OR name <> ''), type_id<>'');			// valid entries
 dsbad := ds1((last='' AND name='') OR type_id='');
