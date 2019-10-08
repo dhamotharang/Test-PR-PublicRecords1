@@ -1,6 +1,6 @@
-﻿import Address, GlobalWatchLists, GlobalWatchLists_Services, iesp, Patriot, riskwise, ut, OFAC_XG5, Gateway, std;
+﻿import GlobalWatchLists, iesp, Patriot, ut, OFAC_XG5, Gateway, std, Risk_Indicators;
 
-export getWatchLists2(GROUPED DATASET(Layout_Output) inl, boolean ofac_only = false, boolean skip_company_search = false,unsigned1 ofac_version=1,
+export getWatchLists2(GROUPED DATASET(Risk_Indicators.Layout_Output) inl, boolean ofac_only = false, boolean skip_company_search = false,unsigned1 ofac_version=1,
 				boolean include_ofac =FALSE, boolean include_additional_watchlists=FALSE,real global_watchlist_threshold=0.00,integer2 dob_radius = -1, 
 				dataset(iesp.share.t_StringArrayItem) watchlists_requested=dataset([], iesp.share.t_StringArrayItem), 
 				dataset(Gateway.Layouts.Config) gateways = dataset([], Gateway.Layouts.Config)) := FUNCTION
@@ -22,7 +22,7 @@ TRANSFORM
 	SELF.name_middle := IF(isPerson,le.mname,'');
 	SELF.name_last := IF(isPerson,le.lname,'');
 	SELF.name_unparsed := IF(isCo,le.employer_name,'');
-	SELF.country := IF(isPerson,stringlib.stringtouppercase(le.in_country),'');
+	SELF.country := IF(isPerson,STD.Str.ToUpperCase(le.in_country),'');
 	SELF.search_type := IF(isPerson,'I','B');
   
 	yob := if(le.dob='' and le.age<>'', 
@@ -134,7 +134,7 @@ Risk_Indicators.layout_output rejoin(inl le, patOut ri) := transform
 										transform(recordof(GlobalWatchLists.Key_GlobalWatchLists_Key), 
 											name_matches := right.first_name=left.first_name AND ut.NBEQ(right.last_name,left.last_name);
 											cmpy_matches := ut.NBEQ(right.cname,left.cname);
-											country_matches := stringlib.stringtouppercase(right.name_type)='COUNTRY' AND ut.NBEQ(right.address_country, left.country);
+											country_matches := STD.Str.ToUpperCase(right.name_type)='COUNTRY' AND ut.NBEQ(right.address_country, left.country);
 											something_matched := name_matches or cmpy_matches or country_matches;
 											self.first_name := if(something_matched, right.first_name, skip);
 											self := right), atmost(5000), keep(1));
@@ -257,24 +257,24 @@ END;
  AddXG5back := join(inl, (XG5Formatted + BlankXG5), left.seq = right.seq,
 										transform(Risk_Indicators.layout_output, 	
 	// keep these fields here for all of our legacy products still using them
-										SELF.watchlist_table := right.watchlist_table;
-										SELF.watchlist_program :=  right.watchlist_program;
-										SELF.watchlist_record_number :=  right.watchlist_record_number;
-										SELF.watchlist_contry :=  right.watchlist_contry;
-										SELF.watchlist_fname :=  right.watchlist_fname;
-										SELF.watchlist_lname :=  right.watchlist_lname;
-										SELF.watchlist_address :=  right.watchlist_address;
-										SELF.WatchlistPrimRange :=  right.WatchlistPrimRange;	
-										SELF.WatchlistPreDir :=  right.WatchlistPreDir;
-										SELF.WatchlistPrimName :=  right.WatchlistPrimName;
-										SELF.WatchlistAddrSuffix :=  right.WatchlistAddrSuffix;
-										SELF.WatchlistPostDir :=  right.WatchlistPostDir;
-										SELF.WatchlistUnitDesignation :=  right.WatchlistUnitDesignation;
-										SELF.WatchlistSecRange :=  right.WatchlistSecRange;
-										SELF.watchlist_city :=  right.watchlist_city;
-										SELF.watchlist_state :=  right.watchlist_state;
-										SELF.watchlist_zip :=  right.watchlist_zip;
-										SELF.watchlist_entity_name :=  right.watchlist_entity_name;
+										SELF.watchlist_table := STD.Str.ToUpperCase(right.watchlist_table);
+										SELF.watchlist_program :=  STD.Str.ToUpperCase(right.watchlist_program);
+										SELF.watchlist_record_number :=  STD.Str.ToUpperCase(right.watchlist_record_number);
+										SELF.watchlist_contry :=  STD.Str.ToUpperCase(right.watchlist_contry);
+										SELF.watchlist_fname :=  STD.Uni.ToUpperCase(right.watchlist_fname);
+										SELF.watchlist_lname :=  STD.Uni.ToUpperCase(right.watchlist_lname);
+										SELF.watchlist_address :=  STD.Str.ToUpperCase(right.watchlist_address);
+										SELF.WatchlistPrimRange :=  STD.Str.ToUpperCase(right.WatchlistPrimRange);	
+										SELF.WatchlistPreDir :=  STD.Str.ToUpperCase(right.WatchlistPreDir);
+										SELF.WatchlistPrimName :=  STD.Str.ToUpperCase(right.WatchlistPrimName);
+										SELF.WatchlistAddrSuffix :=  STD.Str.ToUpperCase(right.WatchlistAddrSuffix);
+										SELF.WatchlistPostDir :=  STD.Str.ToUpperCase(right.WatchlistPostDir);
+										SELF.WatchlistUnitDesignation :=  STD.Str.ToUpperCase(right.WatchlistUnitDesignation);
+										SELF.WatchlistSecRange :=  STD.Str.ToUpperCase(right.WatchlistSecRange);
+										SELF.watchlist_city :=  STD.Str.ToUpperCase(right.watchlist_city);
+										SELF.watchlist_state :=  STD.Str.ToUpperCase(right.watchlist_state);
+										SELF.watchlist_zip :=  STD.Str.ToUpperCase(right.watchlist_zip);
+										SELF.watchlist_entity_name :=  STD.Uni.ToUpperCase(right.watchlist_entity_name);
 										self.watchlists := right.watchlists;
 	
  
@@ -282,7 +282,7 @@ END;
 
  // *****************XG5 END
  
-WLResults := if(ofac_version = 4, group(AddXG5back,seq), pj3);			
+WLResults := if(ofac_version = 4, group(AddXG5back,seq), pj3);		
 
 RETURN WLResults;
 

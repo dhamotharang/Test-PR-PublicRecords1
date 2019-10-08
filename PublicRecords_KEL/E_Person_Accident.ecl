@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.6
-IMPORT KEL011 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+IMPORT KEL11 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Accident,E_Person FROM PublicRecords_KEL;
-IMPORT * FROM KEL011.Null;
+IMPORT * FROM KEL11.Null;
 EXPORT E_Person_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -56,14 +56,14 @@ EXPORT E_Person_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'subject(Subject_:0),Acc_(Acc_:0),pointofimpact(Point_Of_Impact_:\'\'),driverbactesttype(Driver_B_A_C_Test_Type_:\'\'),driverbactestresults(Driver_B_A_C_Test_Results_:\'\'),driveralcoholdrugcode(Driver_Alcohol_Drug_Code_:\'\'),driverphysicaldefects(Driver_Physical_Defects_:\'\'),driverresidence(Driver_Residence_:\'\'),driverinjuryseverity(Driver_Injury_Severity_:\'\'),firstdriversafety(First_Driver_Safety_:\'\'),seconddriversafety(Second_Driver_Safety_:\'\'),driverejectcode(Driver_Eject_Code_:\'\'),recommendreexam(Recommend_Reexam_:\'\'),firstcontributingcause(First_Contributing_Cause_:\'\'),secondcontributingcause(Second_Contributing_Cause_:\'\'),thirdcontributingcause(Third_Contributing_Cause_:\'\'),vehicleincidentid(Vehicle_Incident_I_D_:\'\'),vehiclestatus(Vehicle_Status_:\'\'),recordtype(Record_Type_:\'\'),airbagsdeploy(Airbags_Deploy_:\'\'),towed(Towed_:\'\'),impactlocation(Impact_Location_:\'\'),vehicleownerdrivercode(Vehicle_Owner_Driver_Code_:\'\'),vehicledriveraction(Vehicle_Driver_Action_:\'\'),vehicletravelon(Vehicle_Travel_On_:\'\'),directionoftravel(Direction_Of_Travel_:\'\'),estimatedvehiclespeed(Estimated_Vehicle_Speed_:0),postedspeed(Posted_Speed_:0),estimatedvehicledamage(Estimated_Vehicle_Damage_:0),damagetype(Damage_Type_:\'\'),vehicleremovedby(Vehicle_Removed_By_:\'\'),howremovedcode(How_Removed_Code_:\'\'),vehiclemovement(Vehicle_Movement_:\'\'),vehiclefunction(Vehicle_Function_:\'\'),vehiclefirstdefect(Vehicle_First_Defect_:\'\'),vehicleseconddefect(Vehicle_Second_Defect_:\'\'),vehicleroadwaylocation(Vehicle_Roadway_Location_:\'\'),hazardousmaterialtransport(Hazardous_Material_Transport_:\'\'),totaloccupancyvehicle(Total_Occupancy_Vehicle_:0),totaloccupancysafetyequipment(Total_Occupancy_Safety_Equipment_:0),movingviolation(Moving_Violation_:\'\'),vehiclefaultcode(Vehicle_Fault_Code_:\'\'),vehicleinsuredcode(Vehicle_Insured_Code_:\'\'),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'subject(DEFAULT:Subject_:0),Acc_(DEFAULT:Acc_:0),pointofimpact(DEFAULT:Point_Of_Impact_:\'\'),driverbactesttype(DEFAULT:Driver_B_A_C_Test_Type_:\'\'),driverbactestresults(DEFAULT:Driver_B_A_C_Test_Results_:\'\'),driveralcoholdrugcode(DEFAULT:Driver_Alcohol_Drug_Code_:\'\'),driverphysicaldefects(DEFAULT:Driver_Physical_Defects_:\'\'),driverresidence(DEFAULT:Driver_Residence_:\'\'),driverinjuryseverity(DEFAULT:Driver_Injury_Severity_:\'\'),firstdriversafety(DEFAULT:First_Driver_Safety_:\'\'),seconddriversafety(DEFAULT:Second_Driver_Safety_:\'\'),driverejectcode(DEFAULT:Driver_Eject_Code_:\'\'),recommendreexam(DEFAULT:Recommend_Reexam_:\'\'),firstcontributingcause(DEFAULT:First_Contributing_Cause_:\'\'),secondcontributingcause(DEFAULT:Second_Contributing_Cause_:\'\'),thirdcontributingcause(DEFAULT:Third_Contributing_Cause_:\'\'),vehicleincidentid(DEFAULT:Vehicle_Incident_I_D_:\'\'),vehiclestatus(DEFAULT:Vehicle_Status_:\'\'),recordtype(DEFAULT:Record_Type_:\'\'),airbagsdeploy(DEFAULT:Airbags_Deploy_:\'\'),towed(DEFAULT:Towed_:\'\'),impactlocation(DEFAULT:Impact_Location_:\'\'),vehicleownerdrivercode(DEFAULT:Vehicle_Owner_Driver_Code_:\'\'),vehicledriveraction(DEFAULT:Vehicle_Driver_Action_:\'\'),vehicletravelon(DEFAULT:Vehicle_Travel_On_:\'\'),directionoftravel(DEFAULT:Direction_Of_Travel_:\'\'),estimatedvehiclespeed(DEFAULT:Estimated_Vehicle_Speed_:0),postedspeed(DEFAULT:Posted_Speed_:0),estimatedvehicledamage(DEFAULT:Estimated_Vehicle_Damage_:0),damagetype(DEFAULT:Damage_Type_:\'\'),vehicleremovedby(DEFAULT:Vehicle_Removed_By_:\'\'),howremovedcode(DEFAULT:How_Removed_Code_:\'\'),vehiclemovement(DEFAULT:Vehicle_Movement_:\'\'),vehiclefunction(DEFAULT:Vehicle_Function_:\'\'),vehiclefirstdefect(DEFAULT:Vehicle_First_Defect_:\'\'),vehicleseconddefect(DEFAULT:Vehicle_Second_Defect_:\'\'),vehicleroadwaylocation(DEFAULT:Vehicle_Roadway_Location_:\'\'),hazardousmaterialtransport(DEFAULT:Hazardous_Material_Transport_:\'\'),totaloccupancyvehicle(DEFAULT:Total_Occupancy_Vehicle_:0),totaloccupancysafetyequipment(DEFAULT:Total_Occupancy_Safety_Equipment_:0),movingviolation(DEFAULT:Moving_Violation_:\'\'),vehiclefaultcode(DEFAULT:Vehicle_Fault_Code_:\'\'),vehicleinsuredcode(DEFAULT:Vehicle_Insured_Code_:\'\'),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH)';
   SHARED __d0_Acc__Layout := RECORD
     RECORDOF(__in);
     KEL.typ.uid Acc_;
   END;
-  SHARED __d0_Acc__Mapped := JOIN(__in,E_Accident(__in,__cfg).Lookup,TRIM((STRING)LEFT.AccidentNumber) = RIGHT.KeyVal,TRANSFORM(__d0_Acc__Layout,SELF.Acc_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Acc__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__in,'AccidentNumber','__in'),E_Accident(__in,__cfg).Lookup,TRIM((STRING)LEFT.AccidentNumber) = RIGHT.KeyVal,TRANSFORM(__d0_Acc__Layout,SELF.Acc_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Prefiltered := __d0_Acc__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
@@ -123,15 +123,17 @@ EXPORT E_Person_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Subject_,Acc_,Point_Of_Impact_,Driver_B_A_C_Test_Type_,Driver_B_A_C_Test_Results_,Driver_Alcohol_Drug_Code_,Driver_Physical_Defects_,Driver_Residence_,Driver_Injury_Severity_,First_Driver_Safety_,Second_Driver_Safety_,Driver_Eject_Code_,Recommend_Reexam_,First_Contributing_Cause_,Second_Contributing_Cause_,Third_Contributing_Cause_,Vehicle_Incident_I_D_,Vehicle_Status_,Record_Type_,Airbags_Deploy_,Towed_,Impact_Location_,Vehicle_Owner_Driver_Code_,Vehicle_Driver_Action_,Vehicle_Travel_On_,Direction_Of_Travel_,Estimated_Vehicle_Speed_,Posted_Speed_,Estimated_Vehicle_Damage_,Damage_Type_,Vehicle_Removed_By_,How_Removed_Code_,Vehicle_Movement_,Vehicle_Function_,Vehicle_First_Defect_,Vehicle_Second_Defect_,Vehicle_Roadway_Location_,Hazardous_Material_Transport_,Total_Occupancy_Vehicle_,Total_Occupancy_Safety_Equipment_,Moving_Violation_,Vehicle_Fault_Code_,Vehicle_Insured_Code_,ALL));
   Person_Accident_Group := __PostFilter;
   Layout Person_Accident__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
-    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
-    SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,TRUE);
+    SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Date_Last_Seen_,MAX,FALSE);
     SELF := __r;
   END;
   Layout Person_Accident__Single_Rollup(InLayout __r) := TRANSFORM
-    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
+    SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);
+    SELF.Date_Last_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_Last_Seen_,FALSE);
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Person_Accident_Group,COUNT(ROWS(LEFT))=1),GROUP,Person_Accident__Single_Rollup(LEFT)) + ROLLUP(HAVING(Person_Accident_Group,COUNT(ROWS(LEFT))>1),GROUP,Person_Accident__Rollup(LEFT, ROWS(LEFT)));

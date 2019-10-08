@@ -14,11 +14,12 @@ Historic – is not the best address and is not HHID or DID verified
 *** A dead, historic address
 */
 
-EXPORT MAC_getTNTValue(infile, 
+EXPORT MAC_getTNTValue(infile,
               best_infile, //preferably from mac_best_records to obtain best address
-              outfile, 
-              didfield='did', 
-              hhidfield='hhid', 
+              outfile,
+              mod_access, //Doxie.IDataAccess expected
+              didfield='did',
+              hhidfield='hhid',
               tntfield='tnt',
               zipfield='zip',
 							primnamefield='prim_name',
@@ -27,23 +28,23 @@ EXPORT MAC_getTNTValue(infile,
 							statefield='st',
               dtlastseenfield = 'dt_last_seen'
               ) := macro
-    
-		import doxie, Doxie_Raw, gong, ut, DID_Add, std;
-		
-    //1. Check best records to determine if best address    
+
+		import gong, ut, DID_Add, Suppress, std;
+
+    //1. Check best records to determine if best address
     #uniquename(trans_best)
     #uniquename(results_best)
     infile %trans_best%(infile l,best_infile r) := transform
-      self.tntfield := if(DID_Add.Address_Match_Score(L.primrangefield, L.primnamefield, L.secrangefield, L.zipfield, 
+      self.tntfield := if(DID_Add.Address_Match_Score(L.primrangefield, L.primnamefield, L.secrangefield, L.zipfield,
                           R.prim_range, R.prim_name, R.sec_range, R.zip) BETWEEN 76 AND 254
                           AND l.primrangefield=r.prim_range, 'C', //Current - is best address but not validated by the gong file
-                          'H'); 
+                          'H');
       self := l;
     end;
 
     %results_best%:= join(infile,best_infile,(integer)left.didfield = right.did,%trans_best%(left,right),
                         left outer,keep(1),limit(0));
-                        
+
     //2. Check for DID match to the Gong file
     #uniquename(layout_gong_out)
     %layout_gong_out% :=
@@ -52,24 +53,29 @@ EXPORT MAC_getTNTValue(infile,
       string15 did;
       unsigned6 hhid;
       unsigned6 bdid := 0;
+      unsigned4 global_sid := 0;
+      unsigned8 record_sid := 0;
     END;
 
     //use the most current gong did records
     #uniquename(get_did_base)
     #uniquename(did_base_recs)
+    #uniquename(did_base_recs_suppressed)
     #uniquename(final_did)
     %layout_gong_out% %get_did_base%(infile le, gong.key_did ri) := transform
       self.did := le.didfield;
       self := ri;
       self := [];
-    end;  
-      
+    end;
+
     %did_base_recs% := join(%results_best%,gong.key_did,
                             keyed((integer)left.didfield = right.l_did),%get_did_base%(left,right), ATMOST(50));
 
-    %final_did% := dedup(sort(%did_base_recs%,bdid,did,listed_name,phone10),
+    %did_base_recs_suppressed% := Suppress.MAC_SuppressSource(%did_base_recs%, mod_access);
+
+    %final_did% := dedup(sort(%did_base_recs_suppressed%,bdid,did,listed_name,phone10),
                        bdid,did,listed_name,phone10);
-   
+
     #uniquename(checkgDID)
     #uniquename(results_best_tnt)
     infile %checkgDID%(%results_best% le, %final_did% ri) := transform
@@ -80,16 +86,16 @@ EXPORT MAC_getTNTValue(infile,
       SELF := le;
     END;
 
-    %results_best_tnt% := JOIN(%results_best%, %final_did%, 
-               (string)LEFT.didfield = RIGHT.did AND 
-               ((DID_Add.Address_Match_Score(LEFT.primrangefield, LEFT.primnamefield, LEFT.secrangefield, LEFT.zipfield, 
-                        RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range, RIGHT.z5) BETWEEN 76 AND 254 AND 
+    %results_best_tnt% := JOIN(%results_best%, %final_did%,
+               (string)LEFT.didfield = RIGHT.did AND
+               ((DID_Add.Address_Match_Score(LEFT.primrangefield, LEFT.primnamefield, LEFT.secrangefield, LEFT.zipfield,
+                        RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range, RIGHT.z5) BETWEEN 76 AND 254 AND
                LEFT.primrangefield=RIGHT.prim_range) OR
                (RIGHT.prim_name='' AND RIGHT.prim_range='' AND LEFT.zipfield=RIGHT.z5 AND
-                (LEFT.tntfield='C' OR 
+                (LEFT.tntfield='C' OR
                 (ut.DaysApart(LEFT.dtlastseenfield+'00', (STRING8)Std.Date.Today()) < ut.DaysInNYears(1))))),
                         %checkgDID%(LEFT, RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL);
-                        
+
     //3. Check for HHID match to the Gong file
     //use the most current gong hhid records
     #uniquename(get_hhid_base)
@@ -99,14 +105,14 @@ EXPORT MAC_getTNTValue(infile,
       SELF.didfield := '';
       self := ri;
       self := [];
-    end;  
-      
+    end;
+
     %hhid_base_recs% := join(%results_best_tnt%,gong.key_hhid,
                              (integer)left.hhidfield = right.s_hhid,%get_hhid_base%(LEFT, RIGHT), ATMOST(50));
-              
+
     %final_hhid% := dedup(sort(%hhid_base_recs%,bdid,did,listed_name,phone10)
                           ,bdid,did,listed_name,phone10);;
-    
+
     #uniquename(checkgHHID)
     infile %checkgHHID%(%results_best_tnt% le, %final_hhid% ri) := transform
       self.tntfield := MAP(le.tntfield = 'B' => 'B',
@@ -120,10 +126,10 @@ EXPORT MAC_getTNTValue(infile,
     END;
 
     outfile := JOIN(%results_best_tnt%(hhidfield != 0), %final_hhid%,
-                (integer)left.hhidfield = right.hhid and 
-             DID_Add.Address_Match_Score(LEFT.primrangefield, LEFT.primnamefield, LEFT.secrangefield, LEFT.zipfield, 
+                (integer)left.hhidfield = right.hhid and
+             DID_Add.Address_Match_Score(LEFT.primrangefield, LEFT.primnamefield, LEFT.secrangefield, LEFT.zipfield,
                         RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range, RIGHT.z5) BETWEEN 76 AND 254
                         AND LEFT.primrangefield=RIGHT.prim_range,
              %checkgHHID%(LEFT, RIGHT), left outer, MANY LOOKUP, PARALLEL) + %results_best_tnt%(hhidfield = 0);
-    
+
 endmacro;

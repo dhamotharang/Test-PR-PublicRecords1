@@ -1,41 +1,41 @@
-﻿import AutostandardI,doxie,driversv2,mdr;
+﻿import AutostandardI, doxie, driversv2, mdr;
 
 export Did_Score() := FUNCTION
 
 	inputmod := AutoStandardI.GlobalModule();
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (inputmod);
-	
-	zip_value := AutoStandardI.InterfaceTranslator.zip_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.zip_value.params)); 
+
+	zip_value := AutoStandardI.InterfaceTranslator.zip_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.zip_value.params));
 
 	string2 dl_state_val := '' : stored('dl_state');
-	
+
 	just_digits_and_alphas(string20 dl) :=  Stringlib.StringFilter(dl,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-	
-	dl_val := just_digits_and_alphas(AutoStandardI.InterfaceTranslator.dl_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.dl_value.params))); 
+
+	dl_val := just_digits_and_alphas(AutoStandardI.InterfaceTranslator.dl_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.dl_value.params)));
 
 
 	in_rec := record
 		didville.Layout_Did_OutBatch;
-	end;	
+	end;
 
 
 	in_rec get_inputs(doxie.layout_references l, unsigned cnt) := transform
 		self.seq := cnt;
 		self.title := '';
-		self.addr_suffix := AutoStandardI.InterfaceTranslator.addr_suffix_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.addr_suffix_value.params));			
-		self.suffix :=AutoStandardI.InterfaceTranslator.name_suffix_val.val(project(inputmod,AutoStandardI.InterfaceTranslator.name_suffix_val.params)); 
-		self.fname := AutoStandardI.InterfaceTranslator.fname_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.fname_value.params)); 
-		self.mname := AutoStandardI.InterfaceTranslator.mname_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.mname_value.params)); 
-		self.lname := AutoStandardI.InterfaceTranslator.lname_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.lname_value.params)); 
+		self.addr_suffix := AutoStandardI.InterfaceTranslator.addr_suffix_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.addr_suffix_value.params));
+		self.suffix :=AutoStandardI.InterfaceTranslator.name_suffix_val.val(project(inputmod,AutoStandardI.InterfaceTranslator.name_suffix_val.params));
+		self.fname := AutoStandardI.InterfaceTranslator.fname_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.fname_value.params));
+		self.mname := AutoStandardI.InterfaceTranslator.mname_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.mname_value.params));
+		self.lname := AutoStandardI.InterfaceTranslator.lname_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.lname_value.params));
 		self.dob := (qstring8) AutoStandardI.InterfaceTranslator.dob_val.val(project(inputmod,AutoStandardI.InterfaceTranslator.dob_val.params));
-		self.prim_name := AutoStandardI.InterfaceTranslator.pname_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.pname_value.params)); 
-		self.prim_range := AutoStandardI.InterfaceTranslator.prange_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.prange_value.params)); 
-		self.predir := AutoStandardI.InterfaceTranslator.predir_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.predir_value.params)); 
-		self.postdir := AutoStandardI.InterfaceTranslator.postdir_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.postdir_value.params)); 
-		self.sec_range := AutoStandardI.InterfaceTranslator.sec_range_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.sec_range_value.params)); 
-		self.p_city_name := AutoStandardI.InterfaceTranslator.city_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.city_value.params)); 
-		self.st := AutoStandardI.InterfaceTranslator.state_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.state_value.params)); 
-		self.z5 := AutoStandardI.InterfaceTranslator.zip_val.val(project(inputmod,AutoStandardI.InterfaceTranslator.zip_val.params)); 
+		self.prim_name := AutoStandardI.InterfaceTranslator.pname_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.pname_value.params));
+		self.prim_range := AutoStandardI.InterfaceTranslator.prange_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.prange_value.params));
+		self.predir := AutoStandardI.InterfaceTranslator.predir_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.predir_value.params));
+		self.postdir := AutoStandardI.InterfaceTranslator.postdir_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.postdir_value.params));
+		self.sec_range := AutoStandardI.InterfaceTranslator.sec_range_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.sec_range_value.params));
+		self.p_city_name := AutoStandardI.InterfaceTranslator.city_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.city_value.params));
+		self.st := AutoStandardI.InterfaceTranslator.state_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.state_value.params));
+		self.z5 := AutoStandardI.InterfaceTranslator.zip_val.val(project(inputmod,AutoStandardI.InterfaceTranslator.zip_val.params));
 		self := [];
 	end;
 
@@ -46,7 +46,7 @@ export Did_Score() := FUNCTION
 
 
 	score_threshold_val := AutoStandardI.InterfaceTranslator.score_threshold_value.val(project(inputmod
-	 ,AutoStandardI.InterfaceTranslator.score_threshold_value.params)); 
+	 ,AutoStandardI.InterfaceTranslator.score_threshold_value.params));
 
 	score_threshold_value := if(score_threshold_val=10,75,score_threshold_val);
 
@@ -68,9 +68,7 @@ export Did_Score() := FUNCTION
 		false,true,,,true, modAccess := mod_access_local).results(project(did,doxie.layout_references_hh));
 
 	// Get best address record
-	best_from_func := didville.BestAddress.Best_Recs(header_recs0,did,mod_access.dppa,mod_access.glb,'','',0,0);
-
-
+	best_from_func := didville.BestAddress.Best_Recs(header_recs0, did, mod_access, '','', 0, 0);
 
 	best_addr_rec := if(exists(best_from_func),best_from_func,project(br,Didville.Layout_Did_Numeric_Out.Addr_Best));
 
@@ -104,16 +102,16 @@ export Did_Score() := FUNCTION
 	// The dl score is for the current dl
 	matching_dl_by_did_any := join(did,driversV2.Key_DL_DID,keyed(left.did=right.did),
 	transform(recordof(driversV2.Key_DL_DID),self:=right),limit(ut.limits.did_per_person,skip));
-	
+
 	// if either one of the following attributes exist the score any dl number field is 100
 	matching_dl_by_dl_num_any := matching_dl_by_did_any(dl_val=just_digits_and_alphas(dl_number));
 	matching_dl_by_dl_num_prev := matching_dl_by_did_any(dl_val= just_digits_and_alphas(oos_previous_dl_number));
-		
+
 	matching_dl_by_did_best := matching_dl_by_did_any(history='');
-	
+
 	matching_dl_by_dl_num_best := matching_dl_by_did_best(dl_val=just_digits_and_alphas(dl_number) );
 
-	didville.layout_Did_Score  w_dl(driversV2.Key_DL_DID r):=transform		
+	didville.layout_Did_Score  w_dl(driversV2.Key_DL_DID r):=transform
 		// The best dl addr score is in this field for matching_dl_w_scores_best until we compute dl_addr_score_best
 		self.score_dl_addr_any :=MAX(if((unsigned3) r.zip in zip_value,9,0),100-(10*doxie.FN_Tra_Penalty_Addr(r.predir,r.prim_range,r.prim_name,r.suffix,
 			r.postdir, r.sec_range,r.city,r.st,r.zip)));
@@ -126,18 +124,18 @@ export Did_Score() := FUNCTION
 
 
 	dl_addr_score_best :=   if(~exists(matching_dl_by_dl_num_best),255,max(matching_dl_w_scores_best,score_dl_addr_any));
-	
+
 	// A dl addr score may be 255 if either there are no dl matches for the did or there are matches but the only dl number match
 	// is on a previous dl number and we do not have addresses for previous dl numbers (which are different than historical or expired
 	// dl records).
 	dl_addr_score_any :=   if(~exists(matching_dl_by_dl_num_any),255, max(matching_dl_w_scores_any,score_dl_addr_any));
-	
-	dl_number_score_best := map(~exists(matching_dl_by_did_best) or dl_val=''=>255, 
+
+	dl_number_score_best := map(~exists(matching_dl_by_did_best) or dl_val=''=>255,
 														  ~exists(matching_dl_by_dl_num_best)=>0,
 															100);
-	
-	// dl number must be input for this score to work properly													
-	dl_number_score_any := map(~exists(matching_dl_by_did_any) or dl_val=''=>255, 
+
+	// dl number must be input for this score to work properly
+	dl_number_score_any := map(~exists(matching_dl_by_did_any) or dl_val=''=>255,
 														 ~exists(matching_dl_by_dl_num_any)  and ~exists(matching_dl_by_dl_num_prev) =>0,
 														 100);
 
@@ -157,8 +155,8 @@ export Did_Score() := FUNCTION
 		self.score := l.score;
 		self.did := l.did;
 		self := [];
-	END;											
-													
+	END;
+
 
 
 
@@ -176,7 +174,7 @@ export Did_Score() := FUNCTION
 		self.score_dl_addr_best := dl_addr_score_best;
 		self.score_threshold := score_threshold_value;
 		self := l;
-	end;	
+	end;
 
 
 

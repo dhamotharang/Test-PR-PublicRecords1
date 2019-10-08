@@ -1,9 +1,9 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.6
-IMPORT KEL011 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+IMPORT KEL11 AS KEL;
 IMPORT PublicRecords_KEL,Risk_Indicators,STD;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL011.Null;
-EXPORT FN_Compile := MODULE
+IMPORT * FROM KEL11.Null;
+EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT KEL.typ.nint FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(KEL.typ.nkdate __Pfrom, KEL.typ.nkdate __Pto) := FUNCTION
     RETURN __FN1(ABS,__FN2(KEL.Routines.DaysBetween,__Pfrom,__Pto));
   END;
@@ -41,14 +41,14 @@ EXPORT FN_Compile := MODULE
     field1 := __T(__Pfield1);
     field2 := __T(__Pfield2);
     __IsNull := __NL(__Pfield1) OR __NL(__Pfield2);
-    __Value := STD.Str.EditDistance(field1,field2);
+    __Value := STD.Str.EditDistance(field1, field2);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
   END;
   EXPORT KEL.typ.nint FN_Find_Count(KEL.typ.nstr __Psource, KEL.typ.nstr __Ptarget) := FUNCTION
     source := __T(__Psource);
     target := __T(__Ptarget);
     __IsNull := __NL(__Psource) OR __NL(__Ptarget);
-    __Value := STD.Str.FindCount(source,target);
+    __Value := STD.Str.FindCount(source, target);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
   END;
   EXPORT KEL.typ.nstr FN_Source_Group(KEL.typ.nstr __PRawSource) := FUNCTION

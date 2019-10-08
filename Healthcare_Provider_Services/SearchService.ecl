@@ -139,8 +139,8 @@ export SearchService := MACRO
 				string q_id := '' : stored ('_QueryId');
 				string t_id := '' : stored ('_TransactionId');
 				string msg	:= 'Too many subjects found.';
-				badheader := ROW ({203, msg, q_id, t_id, []}, iesp.share.t_ResponseHeader);
-				goodheader := ROW ({0, '', q_id, t_id, []}, iesp.share.t_ResponseHeader);
+				badheader := ROW ({203, msg, q_id, t_id, [], []}, iesp.share.t_ResponseHeader);
+				goodheader := ROW ({0, '', q_id, t_id, [], []}, iesp.share.t_ResponseHeader);
 				self._Header         := map(returnThresholdExceeded =>badheader,
 																		goodheader);
 				self.SearchBy				 := first_row.searchby;

@@ -31,7 +31,7 @@ MODULE
 
 	useADL := tmpMod.IsPrimarySearchPII OR vPhoneBlank OR (vIsPhone10 AND (tmpMod.VerifyPhoneNameAddress OR tmpMod.VerifyPhoneName));
 
-	SHARED dGetDIDs := IF(~IsPhoneRiskAssessment AND vDIDBlank, PhoneFinder_Services.GetDIDs(dProcessInput, useADL));
+	SHARED dGetDIDs := IF(~IsPhoneRiskAssessment AND vDIDBlank, PhoneFinder_Services.GetDIDs(dProcessInput));
 
 	PhoneFinder_Services.Layouts.BatchInAppendDID tDIDs(Autokey_batch.Layouts.rec_inBatchMaster le,
 																											PhoneFinder_Services.Layouts.BatchInAppendDID ri) :=
@@ -46,7 +46,7 @@ MODULE
 													LEFT.acctno = RIGHT.acctno,
 													tDIDs(LEFT,RIGHT),
 													LEFT OUTER,
-													LIMIT(PhoneFinder_Services.Constants.MaxDIDs,SKIP));
+													LIMIT(0), KEEP(1));
 
 	SHARED dAppendDIDs := IF(vDIDBlank,
 														dInDIDs,
@@ -76,15 +76,26 @@ MODULE
 
 	dSearchRecs_pre_a := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
 
-  dInputPhone := PROJECT(dInPhone, TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final, SELF.batch_in := LEFT, SELF := []));
+  dInputPhone := PROJECT(dInPhone,
+                          TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
+                                    SELF.dob            := (INTEGER)LEFT.dob,
+                                    SELF.dod            := (INTEGER)LEFT.dod,
+                                    SELF.fname          := LEFT.name_first,
+                                    SELF.mname          := LEFT.name_middle,
+                                    SELF.lname          := LEFT.name_last,
+                                    SELF.phone          := LEFT.homephone,
+                                    SELF.suffix         := LEFT.addr_suffix,
+                                    SELF.city_name      := LEFT.p_city_name,
+                                    SELF.zip            := LEFT.z5,
+                                    SELF.isPrimaryPhone := TRUE,
+                                    SELF := LEFT, SELF := []));
 
   PhoneFinder_Services.Layouts.PhoneFinder.Final withInputphone(PhoneFinder_Services.Layouts.PhoneFinder.Final L) := TRANSFORM
-    SELF.acctno               := L.batch_in.acctno;
-    SELF.seq                  := L.batch_in.seq;
-    SELF.phone                := L.batch_in.homephone;
-    SELF.batch_in.homephone   := L.batch_in.homephone;
+    SELF.acctno               := L.acctno;
+    SELF.seq                  := L.seq;
+    SELF.phone                := L.phone;
     SELF.phonestatus          := PhoneFinder_Services.Constants.PhoneStatus.NotAvailable;
-    BOOLEAN UseInternal_pvs    := L.typeflag = 'P';
+    BOOLEAN UseInternal_pvs   := L.typeflag = 'P';
     SELF.coc_description      := IF(UseInternal_pvs, L.coc_description, '');
     SELF.carrier_name         := IF(UseInternal_pvs, L.carrier_name, '');
     SELF.phone_region_city    := IF(UseInternal_pvs, L.phone_region_city, '');
@@ -105,7 +116,7 @@ MODULE
 	SHARED dZum_final := IF(tmpMod.UseZumigoIdentity, dZumigo_recs, dSearchRecs);
 
   // Accudata OCN
-  dAccuIn  := dZum_final(isprimaryphone OR batch_in.homephone <> '');
+  dAccuIn  := dZum_final(isPrimaryPhone);
   dDupAccuIn := PROJECT(DEDUP(SORT(dAccuIn, acctno), acctno), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in);
 
   AccuDataGateway := IF(tmpMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));

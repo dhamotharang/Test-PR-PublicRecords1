@@ -1,4 +1,4 @@
-﻿import census_data,doxie_cbrs,ebr,gong,risk_indicators,TopBusiness_Services,ut;
+﻿import AutostandardI,census_data,doxie,doxie_cbrs,ebr,ebr_services,gong,risk_indicators,suppress,TopBusiness_Services,ut;
 
 export ebr_raw := MODULE
 
@@ -9,7 +9,7 @@ export ebr_raw := MODULE
 		key := ebr.Key_0010_Header_BDID;
 		res := join(dedup(sort(in_bdids,bdid),bdid),key,
 								keyed(left.bdid = right.bdid),
-								transform(layout_file_number,self := right),
+								transform(ebr_services.layout_file_number,self := right),
 								keep(1000));
 		return dedup(res,file_number,all);
 	end;
@@ -29,7 +29,7 @@ export ebr_raw := MODULE
 			RETURN p_w_tzone;
 		END;
 		
-		export by_file_number(DATASET(layout_file_number) fnums) :=
+		export by_file_number(DATASET(ebr_services.layout_file_number) fnums) :=
 			FUNCTION
 				ebr_services.Layout_EBR_Search form(fnums le, ebr.Key_0010_Header_FILE_NUMBER ri) :=
 				TRANSFORM
@@ -50,16 +50,16 @@ export ebr_raw := MODULE
 	
 	export report_view := MODULE
 		
-		export by_file_number(DATASET(layout_file_number) fnums,boolean current_demo5610=true) :=
+		export by_file_number(DATASET(ebr_services.layout_file_number) fnums,boolean current_demo5610=true) :=
 			FUNCTION
-	
+	    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 			get_county_name(STRING2 st, STRING5 county_code) :=
 				CHOOSEN(Census_Data.Key_Fips2County(st <> '' and county_code <> '' and 
 																						keyed(state_code=st) and 
 																						keyed(county_fips=county_code[3..5])),1)[1].county_name;
 	
 
-			Layout_0010_Header_Base_Expanded add_header_county(ebr.Key_0010_Header_FILE_NUMBER le) :=
+			ebr_services.Layout_0010_Header_Base_Expanded add_header_county(ebr.Key_0010_Header_FILE_NUMBER le) :=
 			TRANSFORM
 				SELF.county_name := get_county_name(le.st,le.county);
 					telcordia := Risk_Indicators.Key_Telcordia_tds(
@@ -70,7 +70,7 @@ export ebr_raw := MODULE
 				SELF := le;
 			END;
 			
-			Layout_5000_Bank_Details_Expanded add_bank_details_county(ebr.Key_5000_Bank_Details_FILE_NUMBER le) :=
+			ebr_services.Layout_5000_Bank_Details_Expanded add_bank_details_county(ebr.Key_5000_Bank_Details_FILE_NUMBER le) :=
 			TRANSFORM
 				SELF.county_name :=get_county_name(le.st,le.county);
 					telcordia := Risk_Indicators.Key_Telcordia_tds(
@@ -90,7 +90,7 @@ export ebr_raw := MODULE
 			END;
 
 
-			Layout_6510_Government_Debarred_Contractor_Expanded add_gvt_debarred_county(ebr.Key_6510_Government_Debarred_Contractor_FILE_NUMBER le) :=
+			ebr_services.Layout_6510_Government_Debarred_Contractor_Expanded add_gvt_debarred_county(ebr.Key_6510_Government_Debarred_Contractor_FILE_NUMBER le) :=
 			TRANSFORM
 				SELF.county_name := get_county_name(le.clean_business_address.st,le.clean_business_address.county);
 				SELF := le;
@@ -103,7 +103,7 @@ export ebr_raw := MODULE
 						SELF :=[];
 			END;
 			
-			Layout_1000_Executive_Summary_Expanded add_exec_summary(ebr.Key_1000_Executive_Summary_FILE_NUMBER le):=
+			ebr_services.Layout_1000_Executive_Summary_Expanded add_exec_summary(ebr.Key_1000_Executive_Summary_FILE_NUMBER le):=
 			transform
 							self.PAYMENT_PERFORMANCE_DECODE := EBR_Services.decode.DPP(le.PAYMENT_PERFORMANCE);
 							self.PAYMENT_TREND_DECODE := EBR_Services.decode.DPT(le.PAYMENT_TREND);
@@ -135,16 +135,20 @@ export ebr_raw := MODULE
 						SELF.executive_summary_recs := m(PROJECT(ebr.Key_1000_Executive_Summary_FILE_NUMBER(keyed(file_number=le.file_number)),add_exec_summary(left)),constants.maxcounts.Executive_Summary);
 						SELF.trade_recs := m(PROJECT(ebr.Key_2000_Trade_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2000_Trade_In),constants.maxcounts.Trade,-date_reported);
 						SELF.trade_payment_total_recs := m(PROJECT(ebr.Key_2015_Trade_Payment_Totals_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2015_Trade_Payment_Totals_In),constants.maxcounts.Trade_Payment_Totals);
-						SELF.trade_payment_trend_recs := m(PROJECT(ebr.Key_2020_Trade_Payment_Trends_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2020_Trade_Payment_Trends_Base),200,-(unsigned)(trend_yy+trend_mm));
-						SELF.trade_quarterly_average_recs := m(PROJECT(ebr.Key_2025_Trade_Quarterly_Averages_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2025_Trade_Quarterly_Averages_Base),constants.maxcounts.Trade_Payment_Trends,-(unsigned)(quarter_yy+quarter));
+						SELF.trade_payment_trend_recs := m(PROJECT(ebr.Key_2020_Trade_Payment_Trends_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2020_Trade_Payment_Trends_Base and not[global_sid,record_sid]),200,-(unsigned)(trend_yy+trend_mm));
+						SELF.trade_quarterly_average_recs := m(PROJECT(ebr.Key_2025_Trade_Quarterly_Averages_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2025_Trade_Quarterly_Averages_Base and not[global_sid,record_sid] ),constants.maxcounts.Trade_Payment_Trends,-(unsigned)(quarter_yy+quarter));
 						SELF.collateral_account_recs := m(PROJECT(ebr.Key_4500_Collateral_Accounts_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4500_Collateral_Accounts_In),constants.maxcounts.Collateral_Accounts);
 						self.bank_detail_recs := m(PROJECT(ebr.Key_5000_Bank_Details_FILE_NUMBER(keyed(file_number=le.file_number)),add_bank_details_county(LEFT)),constants.maxcounts.Bank_Details);
 						SELF.demographic_data_5600_recs := m(PROJECT(ebr.Key_5600_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),
                                                    TRANSFORM(EBR_Services.Layouts.demographic_5600_output_rec,
                                                              SELF.SALES_ACTUAL := (STRING20)TopBusiness_Services.Functions.convert_EBR_sales(left.sales_actual),
-                                                             SELF := LEFT)),constants.maxcounts.Demographic_Data);			
-						SELF.demographic_data_5610_recs := IF(current_demo5610,m(PROJECT(ebr.Key_5610_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),add_demographic_5610(left)),constants.maxcounts.Demographic_Data),
-																																	m_all(PROJECT(ebr.Key_5610_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),add_demographic_5610(left)),constants.maxcounts.Demographic_Data));
+                                                             SELF := LEFT)),constants.maxcounts.Demographic_Data);
+           demographic_data_5610_recs_pre := PROJECT(ebr.Key_5610_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),add_demographic_5610(left));                                                  
+           demographic_data_5610_recs_suppressed := suppress.MAC_SuppressSource(demographic_data_5610_recs_pre,mod_access);
+           demographic_data_5610_recs_slim := project(demographic_data_5610_recs_suppressed, ebr.Layout_5610_demographic_data_Out and not[global_sid,record_sid]);
+           
+						SELF.demographic_data_5610_recs := IF(current_demo5610,m(demographic_data_5610_recs_slim ,constants.maxcounts.Demographic_Data),
+																																	   m_all(demographic_data_5610_recs_slim,constants.maxcounts.Demographic_Data));
 						SELF.government_trade_recs := m(PROJECT(ebr.Key_6500_Government_Trade_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_6500_Government_Trade_In),constants.maxcounts.Government_Trade);
 						SELF.government_debarred_contractor_recs := m(PROJECT(ebr.Key_6510_Government_Debarred_Contractor_FILE_NUMBER(keyed(file_number=le.file_number)),add_gvt_debarred_county(LEFT)),constants.maxcounts.Government_Debarred_Contractor);
 						SELF.snp_data_recs := m(PROJECT(ebr.Key_7010_SNP_Data_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_7010_SNP_Data_In),constants.maxcounts.SNP_Data);
@@ -175,7 +179,7 @@ export ebr_raw := MODULE
 	
 	export source_view := MODULE
 	
-		export by_file_number(DATASET(layout_file_number) fnums) :=	FUNCTION
+		export by_file_number(DATASET(ebr_services.layout_file_number) fnums) :=	FUNCTION
 			// Get current report and then add to it.
 			rpt_recs := report_view.by_file_number(fnums,false);
 			
@@ -185,9 +189,9 @@ export ebr_raw := MODULE
 						SELF.historical_header_recs := SORT(
 																							CHOOSEN(
 																									PROJECT(ebr.Key_0010_Header_FILE_NUMBER(keyed(file_number=l.file_number),record_type != 'C'),
-																															TRANSFORM(Layout_0010_Header_Base_Expanded,
+																															TRANSFORM(ebr_services.Layout_0010_Header_Base_Expanded,
 																																				SELF := LEFT,SELF:=[])),
-																									constants.maxcounts.Historical_Header),
+																									ebr_services.constants.maxcounts.Historical_Header),
 																							-process_date_last_seen);
 						SELF := l;
 						SELF :=[];

@@ -7,7 +7,7 @@
 	<part name="TrackSplit" type="xsd:boolean" required="0"/>
   </message>
 */
-import AutoStandardI, doxie, ut;
+import AutoStandardI, doxie, dx_Header, ut;
 export DID_Did_Update_Batch_Service() := macro
 
 in_format := didville.layout_did_update_in;
@@ -22,8 +22,8 @@ boolean trackSplit := false : stored('TrackSplit');
 
 appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
-
-out_format into_new(in_format le,doxie.key_did_rid ri) := transform
+key_did_rid := dx_header.key_did_rid();
+out_format into_new(in_format le,key_did_rid ri) := transform
   self.cust_code := Le.cust_code;
   self.did := le.did;
   self.current_did := if (ignoreStability or ri.stable or ri.did = 0,ri.did,le.did);
@@ -35,15 +35,13 @@ out_format into_newSplit(in_format le,{unsigned6 rid, unsigned6 did} ri) := tran
   self.current_did := ri.did;
   end;
 	
-//j := join(f,doxie.Key_Did_Rid,left.did=right.rid,into_new(left,right),left outer);
-				
 j1 := if (TrackSplit, 
-					join(f,doxie.key_did_rid_split, left.did=right.rid, into_newSplit(left, right), left outer),
-					join(f,doxie.Key_Did_Rid,left.did=right.rid,into_new(left,right),left outer));
+					join(f,dx_header.key_did_rid_split(), left.did=right.rid, into_newSplit(left, right), left outer),
+					join(f,key_did_rid,left.did=right.rid,into_new(left,right),left outer));
 
 					
 j := if(TrackSplit,
-					join(j1(current_did=0), doxie.Key_Did_Rid,left.did=right.rid, // gets info for the dids not found before.
+					join(j1(current_did=0), key_did_rid,left.did=right.rid, // gets info for the dids not found before.
 							transform(out_format, self.current_did := right.did, self := left),left outer) +
 					j1(current_did<>0), 
 					j1);

@@ -1,4 +1,4 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function formats and returns the input phone(s) - Home and Work   *
  * :: Source: INPUT																												*
  ************************************************************************ */
@@ -7,7 +7,10 @@ IMPORT Phone_Shell, UT, STD;
 
 todays_date := (string) STD.Date.Today();
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Input (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Input (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask,
+          UNSIGNED2 PhoneShellVersion = 10) := FUNCTION
+          
+          
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getPhone (Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, UNSIGNED1 whichPhone) := TRANSFORM
 		SElf.Gathered_Phone := CASE(whichPhone,
 														1 => le.Raw_Input.HomePhone,
@@ -35,7 +38,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Input (DATA
 		SELF.Raw_Phone_Characteristics.Phone_Match_Code := Phone_Shell.Common.generateMatchcode(le.Clean_Input.FirstName, le.Clean_Input.LastName, le.Clean_Input.StreetAddress1, le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Addr_Suffix, le.Clean_Input.City, le.Clean_Input.State, le.Clean_Input.Zip5, le.Clean_Input.DateOfBirth, le.Clean_Input.SSN, le.DID, le.Clean_Input.HomePhone, le.Clean_Input.WorkPhone, 
 																																														'', 												'', 										'', 														'',												'',												'',													'',										'',										'',									'',													'',									0,			IF(TRIM(le.Clean_Input.HomePhone) <> '', le.Clean_Input.HomePhone, le.Clean_Input.WorkPhone));
 		
-		
+  // on a single record like this, the 'all' attributes are the same as the regular attributes
+  // only populated for PhoneShell version 2.1+
+		SELF.Sources.Source_List_All_Last_Seen := if(PhoneShellVersion >= 21, Phone_Shell.Common.parseDate(todays_date), '');
+  SELF.Sources.Source_Owner_All_DIDs := if(PhoneShellVersion >= 21, IF(le.DID <> 0,(STRING)le.DID,(STRING)le.Raw_Input.DID), '');		
+    
 		SELF := le;
 	END;
 	home := PROJECT(input, getPhone(LEFT, 1));

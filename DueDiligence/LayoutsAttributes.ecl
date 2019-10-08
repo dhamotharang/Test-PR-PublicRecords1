@@ -138,6 +138,7 @@
     BOOLEAN			atleastOneCategory4;
     BOOLEAN			atleastOneCategory3;
     BOOLEAN			atleastOneCategory2;
+    BOOLEAN			atleastOneCategory0;
     //PerCivilLegalEvent
     BOOLEAN     tenPlusLiensJudgementsEvictionsPast3Yrs;
     BOOLEAN     five2NineLiensJudgementsEvictionsPast3Yrs;

@@ -48,7 +48,7 @@ EXPORT AssetReport (
   p_relatives  := choosen (pers.Relatives,  iesp.constants.BR.MaxRelatives);
   p_associates := choosen (pers.Associates, iesp.constants.BR.MaxAssociates);
 
-  pplus := PersonReports.phonesplus_records (dids, module (project (param, PersonReports.input.phonesplus, opt)) end, IsFCRA);
+  pplus := PersonReports.phonesplus_records (dids, PROJECT (mod_asset, $.IParam.phonesplus, OPT), IsFCRA);
   p_phonesplus  := choosen (pplus.phonesplus,  iesp.constants.BR.MaxPhonesPlus);
 
   proflic := PersonReports.proflic_records (dids, PROJECT (mod_asset, $.IParam.proflic), IsFCRA);

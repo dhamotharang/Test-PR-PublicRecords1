@@ -4,11 +4,11 @@ in_layout := BatchServices.Layouts.RTPhones.rec_batch_RTPhones_input;
 
 export SearchInHouse(BatchServices.RealTimePhones_Params.params in_mod,
 									dataset(in_layout) f_in):= FUNCTION
-                  
+
 	  doxie.MAC_Header_Field_Declare()
-		GM := AutoStandardI.GlobalModule();		
+		GM := AutoStandardI.GlobalModule();
     mod_access := doxie.compliance.GetGlobalDataAccessModule();
-    
+
   	flat_out := BatchServices.Layouts.RTPhones.rec_output_internal;
 		dataset(doxie.layout_pp_raw_common) call_phones_macro(dataset(doxie.layout_references) dids,
 																													unsigned1 GLB_Purpose,
@@ -47,7 +47,13 @@ export SearchInHouse(BatchServices.RealTimePhones_Params.params in_mod,
 			unsigned1 lengthSSN := length(trim(SSN_value));
 			UseAllDids := lengthSSN > 0; // if there is a ssn then use all dids
 			gong_dids := if (UseAllDids, dids, dataset([{(unsigned6)did_value}],doxie.layout_references_hh));
-			gong_recs := gong_services.Fetch_Gong_History(gong_dids,false,true,,,true,,false,if(~UseAllDids, true, false));
+
+      gong_recs := gong_services.Fetch_Gong_History(gong_dids, mod_access,
+        includeParsedDifferences := true,
+        SuppressNoncurrent := true,
+        AllowFallBack := false,
+        AllowBlankFnameMatch := if(~UseAllDids, true, false));
+
 			doxie.layout_pp_raw_common gong2Pretty(gong_recs le) :=
 			TRANSFORM
 				SELF.did := le.did;
@@ -71,7 +77,7 @@ export SearchInHouse(BatchServices.RealTimePhones_Params.params in_mod,
 				SELF.dt_last_seen := (string) STD.Date.Today ();
 				SELF.TNT := 'V';
 				self.ConfidenceScore := 30;
-				self.Activeflag := 'Y'; 
+				self.Activeflag := 'Y';
 				SELF := le;
 				SELF := [];
 			END;
@@ -86,11 +92,11 @@ export SearchInHouse(BatchServices.RealTimePhones_Params.params in_mod,
 												(lout.prim_range = '' OR	lout.prim_range = prim_range) and
 												(lout.prim_name = ''	OR 	lout.prim_name = prim_name) and
 												(LOUT.phoneno = ''	OR 	LOUT.phoneno = phone));
-			
+
 			flat_out inbatch_trans( ds_sort L ) := transform
 				self.acctno := Lout.acctno;
-				self.ssn := l.ssn; 
-				Self.DID := intformat(L.did,12,1); 
+				self.ssn := l.ssn;
+				Self.DID := intformat(L.did,12,1);
 				self.phone := L.phone;
 				self.name := stringlib.StringCleanSpaces(l.lname +' '+ l.fname +' '+ l.mname) ;//L.listed_name;
 				self.address := StringLib.StringCleanSpaces(l.prim_range + ' ' + l.predir + ' ' + l.prim_name + ' ' + l.suffix +
@@ -101,18 +107,18 @@ export SearchInHouse(BatchServices.RealTimePhones_Params.params in_mod,
 				self.zip := L.zip;
 				self.responsestatus := trim(lout.requeststatus)+'i' ;
 				self := L;
-				self := []; 
+				self := [];
 			end;
 			ds_results := project(ds_sort,inbatch_trans(left));
-			ds_sort_results := choosen(sort(DEDUP(SORT(lout.results & ds_results,name,address,phone,-dt_last_seen,-dt_first_seen,did,responsestatus),name,address,phone,dt_last_seen,dt_first_seen,did),responseStatus,-dt_last_seen,-dt_first_seen),in_mod.maxResults );  
-			self.results := ds_sort_results; 
+			ds_sort_results := choosen(sort(DEDUP(SORT(lout.results & ds_results,name,address,phone,-dt_last_seen,-dt_first_seen,did,responsestatus),name,address,phone,dt_last_seen,dt_first_seen,did),responseStatus,-dt_last_seen,-dt_first_seen),in_mod.maxResults );
+			self.results := ds_sort_results;
 			self.resultcount := count(ds_sort_results);
 			self := Lout;
-     
+
 		end;
 		ds_response := project(f_in, SearchLocalTrans(left));
-    
+
     doxie.compliance.logSoldToSources(ds_response.results, mod_access);
-    
+
 		return ds_response;
 END;

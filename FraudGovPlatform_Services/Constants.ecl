@@ -30,6 +30,7 @@
   END;
 	
 	EXPORT IDENTITY_RESOLVED_REALTIME := 'R';
+	EXPORT UNSIGNED2 RECENT_ACTIVITY_DAYS := 30;
 
   // GOV FDN id key classification_entity.entity_type field possible data values
   EXPORT Entity_Types := MODULE

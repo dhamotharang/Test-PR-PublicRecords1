@@ -1,4 +1,4 @@
-import ut,doxie,NID,autokey,header_quick,AutoHeaderV2,lib_metaphone,dx_BestRecords;
+import ut, NID, autokey, header_quick,AutoHeaderV2, lib_metaphone, dx_BestRecords, dx_Header;
 
 export fetch_SSN (dataset (AutoheaderV2.layouts.search) ds_search) := function
 
@@ -13,7 +13,7 @@ export fetch_SSN (dataset (AutoheaderV2.layouts.search) ds_search) := function
 	temp_searchgoodssnonly_value := _row.tssn.only_good_ssn;
 	temp_score_threshold_value := _options.score_threshold;
 	useSSnPartialFetch :=  _row.tssn.partial_ssn;
-	i := doxie.Key_Header_SSN;
+	i := dx_Header.key_SSN();
 
 	pfe(string20 l, string20 r) := NID.mod_PFirstTools.SubLinPFR(l, r);
 	unsigned1 mplname_len_raw := length(metaphonelib.DMetaPhone1(temp_lname_value));

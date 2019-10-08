@@ -1,6 +1,7 @@
-import FBNV2, ut, doxie, Census_Data, Codes, AutoStandardI;
+﻿import AutoStandardI, Census_Data, Codes, doxie, FBNV2, FBNV2_services, Suppress, ut;
 
 dfltM := AutoStandardI.GlobalModule();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(dfltM);
 
 export get_FBN(dataset(FBNV2_services.layout_search_IDs) in_rmsids,
                boolean is_search,
@@ -240,9 +241,11 @@ export get_FBN(dataset(FBNV2_services.layout_search_IDs) in_rmsids,
   
   shared ded_payload_base := dedup(sort(with_payload_base,tmsid, rmsid), tmsid,rmsid);
                                       
-  shared with_payload_owners := join(in_rmsids, c_key,keyed(left.tmsid =right.tmsid) and 
+  with_payload_owners_raw := join(in_rmsids, c_key,keyed(left.tmsid =right.tmsid) and 
                                     keyed(left.rmsid=right.rmsid or left.rmsid=''), 
                                     get_FBN_cont_r(right),limit(1000, skip));  
+  
+  shared with_payload_owners := Suppress.MAC_SuppressSource(with_payload_owners_raw, mod_access, did);
   
   shared ded_payload_owners := if(is_search,dedup(sort(with_payload_owners,tmsid,rmsid,contact_name,contact_phone,
               contact_addr,contact_city,contact_state,contact_zip,fname,mname,lname,name_suffix,prim_range,prim_name,
@@ -264,9 +267,9 @@ export get_FBN(dataset(FBNV2_services.layout_search_IDs) in_rmsids,
   
   shared rolled_owners := rollup(pre_roll_owners,group,do_roll(LEFT,rows(left)));
   
-  shared Layout_FBN_Report get_together(base_layout l,cont_layout r) := transform
+  shared FBNV2_services.Layout_FBN_Report get_together(base_layout l,cont_layout r) := transform
     self.contacts := r.contacts;
-    mac_PickPenalty(
+    FBNV2_services.mac_PickPenalty(
 			l.penalt_1,l.penalt_phone_1,l.penalt_addr_1,l.penalt_bdid_1,
 			r.penalt_1,r.penalt_phone_1,r.penalt_addr_1,r.penalt_bdid_1,
 			l.penalt_2,l.penalt_phone_2,l.penalt_addr_2,l.penalt_bdid_2,

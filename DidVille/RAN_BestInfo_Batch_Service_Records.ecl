@@ -24,6 +24,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	//convert to standard input layout
 	in_seq_rec := record
 		STRING20 acctno;
+		UNSIGNED6 did;
 		DidVille.Layout_Did_InBatch;
 		STRING14 driver_license;
 		String10 phoneno_1;
@@ -54,7 +55,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	end;
 
 	f_in_seq := project(f_in_raw, get_seq(left, counter));
-	f_in_ready := project(f_in_seq, didville.Layout_Did_OutBatch);
+	f_in_ready := project(f_in_seq(did=0), didville.Layout_Did_OutBatch);
 
 	/* Use the data provided by the customer to first find a DID for each record. Exclude any dids
 		 whose score is less than 75.
@@ -62,7 +63,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	//append did to the input subjs
 	didville.MAC_DidAppend(f_in_ready, f_with_did_raw, true, 'true');
 
-	f_with_did := project(f_with_did_raw, transform({f_with_did_raw}, self.did:=if(left.score>=75, left.did, 0), self:=left));
+	f_with_did := project(f_with_did_raw, transform({f_with_did_raw}, self.did:=if(left.score>=75, left.did, 0), self:=left))+
+		project(f_in_seq(did>0),transform({f_with_did_raw},self.score:=100, self:=left, self:=[]));
 	
 	/* Get the subject Best Address by did. Join against Watchdog GLB and non-GLB keys. If the 
 		 customer has sufficient GLB permissions, retain the records from the Watchdog GLB key. If

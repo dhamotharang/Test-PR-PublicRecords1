@@ -4,6 +4,13 @@
 	<part name="ScoreThreshold" type="xsd:integer"/> 
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
 	<part name="OutputMasterResults" type="xsd:boolean"/>
+	<part name="DataRestrictionMask" type="xsd:string"/>
+	<part name="DataPermissionMask" type="xsd:string"/>
+	<part name="GLBPurpose" type="xsd:integer"/>
+	<part name="DPPAPurpose" type="xsd:integer"/>
+	<part name="IsMarketing" type="xsd:boolean"/>
+	<part name="IndustryClass" type="xsd:string"/>
+	<part name="PermissiblePurpose" type="xsd:string"/>
 </message>
 */
 
@@ -17,9 +24,11 @@ EXPORT MAS_FCRA_Service() := MACRO
 		'OutputMasterResults',
 		'DataRestrictionMask',
 		'DataPermissionMask',
-		'GLBA_Purpose',
-		'DPPA_Purpose',
-		'IsMarketing'
+		'GLBPurpose',
+		'DPPAPurpose',
+		'IndustryClass',
+		'IsMarketing',
+		'PermissiblePurpose'
   ));
 
 	// Read interface params
@@ -28,9 +37,11 @@ EXPORT MAS_FCRA_Service() := MACRO
 	BOOLEAN Output_Master_Results := FALSE : STORED('OutputMasterResults');
 	STRING DataRestrictionMask := '' : STORED('DataRestrictionMask');
 	STRING DataPermissionMask := '' : STORED('DataPermissionMask');
-	UNSIGNED1 GLBA := 0 : STORED('GLBA_Purpose');
-	UNSIGNED1 DPPA := 0 : STORED('DPPA_Purpose');
+	UNSIGNED1 GLBA := 0 : STORED('GLBPurpose');
+	UNSIGNED1 DPPA := 0 : STORED('DPPAPurpose');
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
+	STRING Industry_Class := '' : STORED('IndustryClass');
+	STRING Permissible_Purpose := '' : STORED('PermissiblePurpose'); // Can be set to 'PRESCREENING' for FCRA Pre-Screen applications
 	
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
@@ -50,6 +61,8 @@ EXPORT MAS_FCRA_Service() := MACRO
 			Is_Marketing, 
 			'' /* Allowed_Sources */ = Business_Risk_BIP.Constants.AllowDNBDMI, 
 			FALSE, /*OverrideExperianRestriction*/
+			Permissible_Purpose,
+			Industry_Class,
 			PublicRecords_KEL.CFG_Compile);
 
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.

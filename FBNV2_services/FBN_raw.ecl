@@ -1,4 +1,4 @@
-import doxie, doxie_cbrs, FBNv2, suppress, ut, AutoStandardI;
+﻿import AutoStandardI, doxie, doxie_cbrs, FBNv2, FBNV2_services, suppress, ut;
 
 
 export FBN_raw := module
@@ -84,7 +84,7 @@ export FBN_raw := module
 	
 	export batch_view := MODULE
 		
-		export batch_layout(dataset(Layout_FBN_Report) rpt) := FUNCTION
+		export batch_layout(dataset(FBNV2_services.Layout_FBN_Report) rpt) := FUNCTION
 		  out_rec := FBNV2_services.assorted_layouts.batch_out_layout;
 			format_addr_1(FBNV2_services.Layout_Contact ct) := FUNCTION
 				  addr_1 := TRIM(ct.prim_range) + ' '+ TRIM(ct.predir) + ' '+ TRIM(ct.prim_name) + ' '+ TRIM(ct.addr_suffix) + ' '+ TRIM(ct.postdir)   ;
@@ -152,7 +152,7 @@ export FBN_raw := module
 			clean_str(string val) := FUNCTION
 				RETURN IF(val='0','',val);
 			END;
-			out_rec xfm_final(Layout_FBN_Report r) := TRANSFORM
+			out_rec xfm_final(FBNV2_services.Layout_FBN_Report r) := TRANSFORM
 			   cnts := r.contacts;
 				 SELF.Tmsid_1	:=   cnts[1].Tmsid   ;
 				 SELF.Rmsid_1	:=   cnts[1].Rmsid   ;

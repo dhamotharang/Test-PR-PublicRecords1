@@ -1,5 +1,5 @@
 import AddrBest, Advo, USAA, DriversV2, doxie, dx_death_master, AutoStandardI, Suppress, ut, Autokey_batch, BatchServices, 
-       DriversV2_Services, DeathV2_Services;
+       DriversV2_Services, DeathV2_Services, dx_Header;
 
 EXPORT functions := MODULE
   //***************************************************************************
@@ -202,7 +202,7 @@ EXPORT functions := MODULE
 	EXPORT AddrBest.Layout_BestAddr.batch_out_final fn_setSSNlooseMatch(dataset(AddrBest.Layout_BestAddr.Batch_in) f_in,
 																																			dataset(AddrBest.Layout_BestAddr.batch_out_final) final_recs) := FUNCTION
 		// keyed join with Doxie Key Header to find out whether SSN4/Lname has a match with a DID
-		f_in_matched := join(f_in, doxie.Key_Header_SSN4, fn_getSSN4(left.ssn) = right.ssn4 and left.name_last = right.lname,
+		f_in_matched := join(f_in, dx_Header.key_SSN4(), fn_getSSN4(left.ssn) = right.ssn4 and left.name_last = right.lname,
 																	KEYED, LEFT OUTER, KEEP(1), LIMIT(0));
 		out_recs := join(f_in_matched, final_recs, left.acctno = right.acctno,
 														transform(AddrBest.Layout_BestAddr.batch_out_final,

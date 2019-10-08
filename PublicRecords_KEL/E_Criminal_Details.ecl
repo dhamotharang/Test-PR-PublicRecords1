@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.6
-IMPORT KEL011 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+IMPORT KEL11 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Criminal_Offender,E_Criminal_Offense,E_Criminal_Punishment FROM PublicRecords_KEL;
-IMPORT * FROM KEL011.Null;
+IMPORT * FROM KEL11.Null;
 EXPORT E_Criminal_Details(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -16,8 +16,8 @@ EXPORT E_Criminal_Details(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'Offender_(Offender_:0),Offense_(Offense_:0),Punishment_(Punishment_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'Offender_(Offender_:0),Offense_(Offense_:0),Punishment_(Punishment_:0),event_dt(Date_First_Seen_:EPOCH),process_date(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
+  SHARED __Mapping := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),event_dt(OVERRIDE:Date_First_Seen_:EPOCH),process_date(OVERRIDE:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('DC');
     SELF := __r;
@@ -27,20 +27,20 @@ EXPORT E_Criminal_Details(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     RECORDOF(__d0_Norm);
     KEL.typ.uid Offender_;
   END;
-  SHARED __d0_Offender__Mapped := JOIN(__d0_Norm,E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Offender__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d0_Norm,'offender_key','__in'),E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Offense__Layout := RECORD
     RECORDOF(__d0_Offender__Mapped);
     KEL.typ.uid Offense_;
   END;
-  SHARED __d0_Offense__Mapped := JOIN(__d0_Offender__Mapped,E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Offense__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d0_Offender__Mapped,'offender_key','__in'),E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Punishment__Layout := RECORD
     RECORDOF(__d0_Offense__Mapped);
     KEL.typ.uid Punishment_;
   END;
-  SHARED __d0_Punishment__Mapped := JOIN(__d0_Offense__Mapped,E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Punishment__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d0_Offense__Mapped,'offender_key','__in'),E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d0_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Prefiltered := __d0_Punishment__Mapped;
-  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0),__Mapping0_Transform(LEFT)));
-  SHARED __Mapping1 := 'Offender_(Offender_:0),Offense_(Offense_:0),Punishment_(Punishment_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
+  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping0_Transform(LEFT)));
+  SHARED __Mapping1 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
   SHARED InLayout __Mapping1_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('DC');
     SELF := __r;
@@ -50,57 +50,57 @@ EXPORT E_Criminal_Details(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     RECORDOF(__d1_Norm);
     KEL.typ.uid Offender_;
   END;
-  SHARED __d1_Offender__Mapped := JOIN(__d1_Norm,E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Offender__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d1_Norm,'offender_key','__in'),E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d1_Offense__Layout := RECORD
     RECORDOF(__d1_Offender__Mapped);
     KEL.typ.uid Offense_;
   END;
-  SHARED __d1_Offense__Mapped := JOIN(__d1_Offender__Mapped,E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Offense__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d1_Offender__Mapped,'offender_key','__in'),E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d1_Punishment__Layout := RECORD
     RECORDOF(__d1_Offense__Mapped);
     KEL.typ.uid Punishment_;
   END;
-  SHARED __d1_Punishment__Mapped := JOIN(__d1_Offense__Mapped,E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Punishment__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d1_Offense__Mapped,'offender_key','__in'),E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d1_Prefiltered := __d1_Punishment__Mapped;
-  SHARED __d1 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1),__Mapping1_Transform(LEFT)));
-  SHARED __Mapping2 := 'Offender_(Offender_:0),Offense_(Offense_:0),Punishment_(Punishment_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
+  SHARED __d1 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping1_Transform(LEFT)));
+  SHARED __Mapping2 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
   SHARED __d2_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Court_Offenses,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Court_Offenses),SELF:=RIGHT));
   SHARED __d2_Offender__Layout := RECORD
     RECORDOF(__d2_Norm);
     KEL.typ.uid Offender_;
   END;
-  SHARED __d2_Offender__Mapped := JOIN(__d2_Norm,E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d2_Offender__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d2_Norm,'offender_key','__in'),E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d2_Offense__Layout := RECORD
     RECORDOF(__d2_Offender__Mapped);
     KEL.typ.uid Offense_;
   END;
-  SHARED __d2_Offense__Mapped := JOIN(__d2_Offender__Mapped,E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d2_Offense__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d2_Offender__Mapped,'offender_key','__in'),E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d2_Punishment__Layout := RECORD
     RECORDOF(__d2_Offense__Mapped);
     KEL.typ.uid Punishment_;
   END;
-  SHARED __d2_Punishment__Mapped := JOIN(__d2_Offense__Mapped,E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d2_Punishment__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d2_Offense__Mapped,'offender_key','__in'),E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d2_Prefiltered := __d2_Punishment__Mapped;
-  SHARED __d2 := __SourceFilter(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2));
-  SHARED __Mapping3 := 'Offender_(Offender_:0),Offense_(Offense_:0),Punishment_(Punishment_:0),src(Source_:\'\'),fcra_date(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
+  SHARED __d2 := __SourceFilter(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  SHARED __Mapping3 := 'Offender_(DEFAULT:Offender_:0),Offense_(DEFAULT:Offense_:0),Punishment_(DEFAULT:Punishment_:0),src(OVERRIDE:Source_:\'\'),fcra_date(OVERRIDE:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
   SHARED __d3_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenders),SELF:=RIGHT));
   SHARED __d3_Offender__Layout := RECORD
     RECORDOF(__d3_Norm);
     KEL.typ.uid Offender_;
   END;
-  SHARED __d3_Offender__Mapped := JOIN(__d3_Norm,E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d3_Offender__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d3_Norm,'offender_key','__in'),E_Criminal_Offender(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Offender__Layout,SELF.Offender_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d3_Offense__Layout := RECORD
     RECORDOF(__d3_Offender__Mapped);
     KEL.typ.uid Offense_;
   END;
-  SHARED __d3_Offense__Mapped := JOIN(__d3_Offender__Mapped,E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d3_Offense__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d3_Offender__Mapped,'offender_key','__in'),E_Criminal_Offense(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Offense__Layout,SELF.Offense_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d3_Punishment__Layout := RECORD
     RECORDOF(__d3_Offense__Mapped);
     KEL.typ.uid Punishment_;
   END;
-  SHARED __d3_Punishment__Mapped := JOIN(__d3_Offense__Mapped,E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d3_Punishment__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d3_Offense__Mapped,'offender_key','__in'),E_Criminal_Punishment(__in,__cfg).Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Punishment__Layout,SELF.Punishment_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d3_Prefiltered := __d3_Punishment__Mapped;
-  SHARED __d3 := __SourceFilter(KEL.FromFlat.Convert(__d3_Prefiltered,InLayout,__Mapping3));
+  SHARED __d3 := __SourceFilter(KEL.FromFlat.Convert(__d3_Prefiltered,InLayout,__Mapping3,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0 + __d1 + __d2 + __d3;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
@@ -120,15 +120,17 @@ EXPORT E_Criminal_Details(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Offender_,Offense_,Punishment_,ALL));
   Criminal_Details_Group := __PostFilter;
   Layout Criminal_Details__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
-    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
-    SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,TRUE);
+    SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Date_Last_Seen_,MAX,FALSE);
     SELF := __r;
   END;
   Layout Criminal_Details__Single_Rollup(InLayout __r) := TRANSFORM
-    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
+    SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);
+    SELF.Date_Last_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_Last_Seen_,FALSE);
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Criminal_Details_Group,COUNT(ROWS(LEFT))=1),GROUP,Criminal_Details__Single_Rollup(LEFT)) + ROLLUP(HAVING(Criminal_Details_Group,COUNT(ROWS(LEFT))>1),GROUP,Criminal_Details__Rollup(LEFT, ROWS(LEFT)));

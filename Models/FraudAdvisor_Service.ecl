@@ -81,7 +81,7 @@
 */
 /*--INFO-- Contains Fraud Advisor 3, 5, 9, Version1 and Fraud Attributes */
 
-import Address, Risk_Indicators, Riskwise, ut, seed_files, doxie, Risk_Reporting, Inquiry_AccLogs, STD;
+import Address, Risk_Indicators, Riskwise, ut, seed_files, doxie, Risk_Reporting, Inquiry_AccLogs, STD, Models;
 
 export FraudAdvisor_Service := MACRO
 
@@ -94,79 +94,79 @@ export FraudAdvisor_Service := MACRO
 	 *     Force the order on the WsECL page     *
 	 ********************************************* */
 	#WEBSERVICE(FIELDS(
-		'DID',
-		'AccountNumber',
-		'UnParsedFullName',
-		'FirstName',
-		'MiddleName',
-		'LastName',
-		'NameSuffix',
-		'StreetAddress',
-		'City',
-		'State',
-		'Zip',
-		'Country',
-		'SSN',
-		'DateOfBirth',
-		'Age',
-		'DLNumber',
-		'DLState',
-		'Email',
-		'IPAddress',
-		'HomePhone',
-		'WorkPhone',
-		'EmployerName',
-		'FormerName',
+        'DID',
+        'AccountNumber',
+        'UnParsedFullName',
+        'FirstName',
+        'MiddleName',
+        'LastName',
+        'NameSuffix',
+        'StreetAddress',
+        'City',
+        'State',
+        'Zip',
+        'Country',
+        'SSN',
+        'DateOfBirth',
+        'Age',
+        'DLNumber',
+        'DLState',
+        'Email',
+        'IPAddress',
+        'HomePhone',
+        'WorkPhone',
+        'EmployerName',
+        'FormerName',
 
-		'UnparsedFullName2',
-		'FirstName2',
-		'MiddleName2',
-		'LastName2',
-		'NameSuffix2',
-		'StreetAddress2',
-		'City2',
-		'State2',
-		'Zip2',
-		'HomePhone2',
+        'UnparsedFullName2',
+        'FirstName2',
+        'MiddleName2',
+        'LastName2',
+        'NameSuffix2',
+        'StreetAddress2',
+        'City2',
+        'State2',
+        'Zip2',
+        'HomePhone2',
 
-		'DPPAPurpose',
-		'GLBPurpose',
-		'DataRestrictionMask',
-		'DataPermissionMask',
-		'IndustryClass',
-		'HistoryDateYYYYMM',
-		'historyDateTimeStamp',
-		'OfacOnly',
-		'OFACSearching',
+        'DPPAPurpose',
+        'GLBPurpose',
+        'DataRestrictionMask',
+        'DataPermissionMask',
+        'IndustryClass',
+        'HistoryDateYYYYMM',
+        'historyDateTimeStamp',
+        'OfacOnly',
+        'OFACSearching',
 
-		'ExcludeWatchLists',
-		'OFACversion',
-		'IncludeOfac',
-		'GlobalWatchlistThreshold',
-		'IncludeAdditionalWatchLists',
-		'UseDOBFilter',
-		'DOBRadius',
+        'ExcludeWatchLists',
+        'OFACversion',
+        'IncludeOfac',
+        'GlobalWatchlistThreshold',
+        'IncludeAdditionalWatchLists',
+        'UseDOBFilter',
+        'DOBRadius',
 
-		'TestDataEnabled',
-		'TestDataTableName',
-		'Model',
-		'ModelRequests',
-		'RedFlag_version',
-		'RequestedAttributeGroups',
-		'gateways',
+        'TestDataEnabled',
+        'TestDataTableName',
+        'Model',
+        'ModelRequests',
+        'RedFlag_version',
+        'RequestedAttributeGroups',
+        'gateways',
 
-		'IncludeRiskIndices',
-		'Channel',
-		'Income',
-		'OwnOrRent',
-		'LocationIdentifier',
-		'OtherApplicationIdentifier',
-		'OtherApplicationIdentifier2',
-		'OtherApplicationIdentifier3',
-		'DateofApplication',
-		'TimeofApplication',
-		'OutcomeTrackingOptOut',
-		'SuppressCompromisedDLs',
+        'IncludeRiskIndices',
+        'Channel',
+        'Income',
+        'OwnOrRent',
+        'LocationIdentifier',
+        'OtherApplicationIdentifier',
+        'OtherApplicationIdentifier2',
+        'OtherApplicationIdentifier3',
+        'DateofApplication',
+        'TimeofApplication',
+        'OutcomeTrackingOptOut',
+        'SuppressCompromisedDLs',
         'IncludeQAOutputs',
         'LexIdSourceOptout',
         '_TransactionId',
@@ -260,7 +260,7 @@ integer2  dobradius0        := 2       	: stored('DOBRadius');
 unsigned1 RedFlag_version 	:= 0 				: stored('RedFlag_version');
 string 	 	DataRestriction 	:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string	 	DataPermission 		:= Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
-boolean   Test_Data_Enabled := false  		: stored('TestDataEnabled');
+boolean   Test_Data_Enabled := false  	: stored('TestDataEnabled');
 string20  Test_Data_Table_Name := ''   	: stored('TestDataTableName');
  
 
@@ -567,7 +567,8 @@ bsVersion := map(
 //=========================
 BSOptions := Models.FP_Models.Set_BSOptions(Valid_requested_models, attributesIn, input_ok, doInquiries);
 
-iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn, 
+iid := //Group(Dataset([],risk_indicators.layout_output), seq);
+       risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn, 
 																					ofac_only, suppressNearDups, require2Ele, from_biid, isFCRA, excludewatchlists, 
 																					from_IT1O, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius, 
 																					BSversion, in_runDLverification:=IncludeDLverification,
@@ -579,7 +580,8 @@ iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purp
                                                                                     BatchUID := BatchUID, 
                                                                                     GlobalCompanyID := GlobalCompanyID);
 
-clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn,  
+clam := //Group(Dataset([], risk_indicators.Layout_Boca_Shell), seq);
+        risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn,  
 																						doRelatives, doDL, doVehicle, doDerogs, bsVersion, doScore, nugen,
 																						DataRestriction:=DataRestriction, BSOptions := BSOptions, DataPermission:=DataPermission,
                                                                                         LexIdSourceOptout := LexIdSourceOptout, 
@@ -589,7 +591,7 @@ clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Pur
 
 
 // Run Bill-to-Ship-to Shell if necessary.
-clam_BtSt := 
+clam_BtSt := //Group(Dataset([], risk_indicators.layout_bocashell_btst_out), bill_to_out.seq);
 	IF( Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.bill_to_ship_to_models),
 				Models.FraudAdvisor_BtSt_Function(prep, prep2, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn,
 																					ofac_only, suppressNearDups, require2Ele, from_biid, isFCRA, excludewatchlists,
@@ -623,8 +625,10 @@ clam_BtSt :=
   end;
 
   full_skiptrace := join(skiptrace_call, iid, LEFT.seq= RIGHT.seq, get_confidence(left,right) );
+  
+  skiptrace := IF(Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.Paro_models), full_skiptrace, Dataset([], riskwise.Layout_SkipTrace));
 
-  easi_census := join(ungroup(iid), Easi.Key_Easi_Census,
+  easi_census1 := join(ungroup(iid), Easi.Key_Easi_Census,
                       keyed(left.st+left.county+left.geo_blk=right.geolink) and
                       Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.Paro_models),
                       transform(easi.layout_census, 
@@ -634,6 +638,8 @@ clam_BtSt :=
                                 self.blkgrp:=left.geo_blk[7],
                                 self.geo_blk:=left.geo_blk,
                                 self := right));
+                                
+  easi_census := IF(Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.Paro_models), easi_census1, Dataset([], easi.layout_census));
   //End for Paro
   
 ip_prep := project( ungroup(iid), transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := ip_value ) );
@@ -819,16 +825,10 @@ attributeOut_temp := project(pick_attr, formAttributeGroup(left));
 attributeOut := Models.FP_models.custom_field_replacement(attributeOut_temp, Valid_requested_models, '', 'input.grade', 'grade', 'string');
 // attributeOut := join(pick_attr,clam,  left.input.seq=right.seq, formAttributeGroup(LEFT,RIGHT));
 
-
 // Get the Fraud Defender models
 ret  := Models.FD3510_0_0(clam, ofacSearching, isFCRA, inCalif, fdReasonsWith38, nugen, addtl_watchlists);
 ret2 := Models.FD5510_0_0(clam, ofacSearching, nugen, addtl_watchlists);
 ret3 := Models.FD9510_0_0(clam, ofacSearching, nugen, addtl_watchlists);
-
-//Get the Paro models
-Paro_ret  := Models.MSN1803_1_0( ungroup(clam) );
-Paro_ret2 := Models.RSN804_1_0( clam, full_skiptrace, easi_census );
-
 
 All_models := Project(Valid_requested_models, transform(Models.layouts.Enhanced_layout_fp1109,
                                               Model_params := MODULE(models.FraudAdvisor_Constants.FP_model_params)
@@ -837,6 +837,8 @@ All_models := Project(Valid_requested_models, transform(Models.layouts.Enhanced_
                                                 EXPORT Dataset(models.layouts.bs_with_ip) _clam_ip :=  clam_ip;
                                                 EXPORT Grouped Dataset(Risk_Indicators.Layout_Output) IID_ret := iid;
                                                 EXPORT Dataset(Models.Layouts.Layout_Model_Options) modeloptions  := left.modeloptions;
+                                                EXPORT Dataset(riskwise.Layout_SkipTrace) _skiptrace := skiptrace;
+                                                EXPORT Dataset(easi.layout_census) _easicensus := easi_census;
                                               END;
                                               
                                               custom_temp  := left.ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom');
@@ -845,8 +847,14 @@ All_models := Project(Valid_requested_models, transform(Models.layouts.Enhanced_
                                               self.model_name := custom_name, // piping model name through to keep track of what's what
                                               self := Models.FP_models.Execute_model(Model_params)));
 
-fp_test_seed := Risk_Indicators.FraudPoint_TestSeed_Function(test_prep, Test_Data_Table_Name);
+temp_fp_test_seed := Project(Valid_requested_models, Transform(Models.layouts.Enhanced_layout_fp1109,
+                                                seed_custom_temp  := left.ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom');
+                                                seed_custom_name  := STD.STR.ToLowerCase(TRIM(seed_custom_temp[1].OptionValue));
+                                                
+                                                self := Risk_Indicators.FraudPoint_TestSeed_Function(test_prep, Test_Data_Table_Name, seed_custom_name)));
 
+//Filter out testseeds that don't have a score or reason codes as we didn't get a proper hit.
+fp_test_seed := temp_fp_test_seed(score != '' and ri[1].hri != '');
 
 models.Layout_Reason_Codes form_modelout_rc(Models.Layout_ModelOut le, unsigned1 cnt) :=
 TRANSFORM
@@ -936,66 +944,19 @@ final_v1 := if(Test_Data_Enabled, fd_seeds, final2);
 //---------------END FraudDefender Score Section-------------------------------------
 
 
-//---------------Paro Score Section-------------------------------------
-
 models.Layout_Reason_Codes form_fp1109_rc(Models.layouts.Enhanced_layout_fp1109 le, unsigned1 cnt) :=
 TRANSFORM
 	SELF.reason_code := if(le.ri[cnt].hri <> '00', le.ri[cnt].hri, '');
 	SELF.reason_description := le.ri[cnt].desc;
 end;
 
-Models.layouts.Layout_Score_FP form_Paroscore(Models.Layout_ModelOut le, Integer1 c) := TRANSFORM
-	// SELF.seq := le.seq;
-	SELF.i := le.Score;
-	SELF.description := IF(Models.FP_models.Model_Check(Valid_requested_models, ['msn1803_1','msnrsn_1']) and c = 1, '0 to 999', '250 to 999');
-  self.index := Models.FraudAdvisor_Constants.getBilling_Index(model_name_1);
-	self := [];
-END;
-
-Models.layouts.FP_Layout_Model form_Paro(Paro_ret le, Paro_ret2 ri) := TRANSFORM
-	// self.seq := le.seq;
-	self.accountnumber := account_value;
-	self.description := 'FraudPoint' + Std.Str.ToUpperCase(model_name_1);
-	self.scores := Map(Models.FP_models.Model_Check(Valid_requested_models, ['msnrsn_1'])  => PROJECT(le,form_Paroscore(LEFT, 1)) + PROJECT(ri,form_Paroscore(LEFT, 2)),
-                     Models.FP_models.Model_Check(Valid_requested_models, ['msn1803_1']) => DATASET([form_Paroscore(le, 1)]),
-                     Models.FP_models.Model_Check(Valid_requested_models, ['rsn804_1'])  => DATASET([form_Paroscore(ri, 1)]),
-                                                 DATASET([], Models.layouts.Layout_Score_FP));
-	self := [];
-END;
-paro_model := join(Paro_ret,Paro_ret2,left.seq=right.seq, form_Paro(LEFT,RIGHT));
-
-Models.layouts.Layout_Score_FP paro_testseeds_trans(fp_test_seed le, integer c) := transform 
-                self.i := le.score;
-                SELF.description := MAP(Models.FP_models.Model_Check(Valid_requested_models, ['msnrsn_1']) and c = 1 => '0 to 999', 
-																				Models.FP_models.Model_Check(Valid_requested_models, ['msnrsn_1']) and c = 2 => '250 to 999',
-																				Models.FP_models.Model_Check(Valid_requested_models, ['rsn804_1'])  and c = 1 =>  '250 to 999',
-																				Models.FP_models.Model_Check(Valid_requested_models, ['msn1803_1']) and c = 1 => '0 to 999','');
-                self.index := Models.FraudAdvisor_Constants.getBilling_Index(model_name_1);
-                // self.reason_codes := left.ri;
-                self := [];
-								
-end;	
-	
-paro_seeds_projected := project(fp_test_seed, paro_testseeds_trans(left,counter)); 
-
-paro_test_seed := project(Risk_Indicators.iid_constants.ds_Record, transform(Models.layouts.FP_Layout_Model,
-                self.accountnumber := account_value;
-                self.description := 'FraudPoint' + Std.Str.ToUpperCase(model_name_1);
-                self.scores := paro_seeds_projected;
-                self := [];
-                ));
-								
-Paro_final := IF(test_data_enabled, paro_test_seed, paro_model);
-// Paro_final := paro_model;
-
-//---------------END Paro Score Section-------------------------------------
-
-
 //---------------Normal Score Section-------------------------------------
 Models.Layouts.Layout_Score_FP form_fp_scores(Models.layouts.Enhanced_layout_fp1109 le) :=
 TRANSFORM
 	SELF.i := le.Score;
-	SELF.description := if(le.model_name = 'fd5609_2', '10 to 50', '0 to 999');
+	SELF.description := map(le.model_name = 'fd5609_2' => '10 to 50',
+                          le.model_name = 'rsn804_1' => '250 to 999',
+                                                        '0 to 999');
 	// get the le into layout_modelout to re-use the form_rc function
 	reason_codes_temp := PROJECT(le,form_fp1109_rc(LEFT,1)) + PROJECT(le,form_fp1109_rc(LEFT,2)) + PROJECT(le,form_fp1109_rc(LEFT,3)) +
                        PROJECT(le,form_fp1109_rc(LEFT,4)) + PROJECT(le,form_fp1109_rc(LEFT,5)) + PROJECT(le,form_fp1109_rc(LEFT,6));
@@ -1017,14 +978,13 @@ end;
 Models.layouts.FP_Layout_Model form_fraudpoint_models(Models.layouts.Enhanced_layout_fp1109 le) := 
 TRANSFORM
 	self.accountnumber := account_value;
-	self.description  := IF(test_data_enabled, Models.FraudAdvisor_Constants.getModel_Description(trim(model_name_1)), //temporary fix to get testseeds working until real fix included with DI model
-                                             Models.FraudAdvisor_Constants.getModel_Description(trim(le.model_name)));
+	self.description  := Models.FraudAdvisor_Constants.getModel_Description(trim(le.model_name));
 	self.scores := project(le, form_fp_scores(left));
 
 END;
 
 all_fraudpoint_models := if(input_ok, 
-	project(if(test_data_enabled, fp_test_seed, All_models), form_fraudpoint_models(LEFT)), 
+	project(if(test_data_enabled, fp_test_seed, All_models), form_fraudpoint_models(LEFT)),  
 	// project( All_models, form_fraudpoint_models(LEFT)), 
 	dataset([], models.layouts.FP_layout_model) );
 
@@ -1049,11 +1009,12 @@ custom_idn6051 := project(ret_idn6051,
 									self := [];
 									));
 
-finalcustom := map( Models.FP_models.Model_Check(Valid_requested_models, ['idn6051'])                                 => custom_idn6051,
-                    Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.Paro_models)   => Paro_final,
-                    Models.FP_models.Model_Check(Valid_requested_models, ['ain801_1', Models.FraudAdvisor_Constants.fraudpoint3_models, Models.FraudAdvisor_Constants.fraudpoint3_custom_models,
-                    Models.FraudAdvisor_Constants.fraudpoint2_models, Models.FraudAdvisor_Constants.XML_custom_models ]) => all_fraudpoint_models,
-                                                                                                                            final_v1 ); 
+standard_model_set := ['ain801_1', Models.FraudAdvisor_Constants.fraudpoint3_models, Models.FraudAdvisor_Constants.fraudpoint3_custom_models,
+                       Models.FraudAdvisor_Constants.fraudpoint2_models, Models.FraudAdvisor_Constants.XML_custom_models,Models.FraudAdvisor_Constants.Paro_models ];
+
+finalcustom := map( Models.FP_models.Model_Check(Valid_requested_models, ['idn6051'])        => custom_idn6051,
+                    Models.FP_models.Model_Check(Valid_requested_models, standard_model_set) => all_fraudpoint_models,
+                                                                                                final_v1 ); 
 
 // Note: All intermediate logs must have the following name schema:
 // Starts with 'LOG_' (Upper case is important!!)

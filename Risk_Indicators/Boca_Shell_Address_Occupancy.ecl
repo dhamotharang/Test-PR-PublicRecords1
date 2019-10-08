@@ -1,7 +1,7 @@
-﻿import _Control, dx_header, riskwise, address, ut, data_services, risk_indicators, doxie;
+﻿import _Control, dx_header, riskwise, address, ut, data_services, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (risk_indicators.Layout_Boca_Shell) clam, boolean isFCRA, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
+EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (risk_indicators.Layout_Boca_Shell) clam, boolean isFCRA) := function
 
 	temp := record
 		unsigned seq;

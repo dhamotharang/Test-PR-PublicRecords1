@@ -13,7 +13,7 @@ EXPORT iid_append_ThreatMetrix( DATASET(risk_indicators.layout_input) indata,
 
   in_slim := project(indata, transform(PublicRecords_KEL.ECL_Functions.Input_Layout_Slim, 
                                       // self.account:=left.seq;
-                                      self.InputUIDAppend:=left.seq;
+                                      self.G_ProcUID:=left.seq;
                                       self.historydate := (string)left.historydate; 
                                       self.FirstName:= left.fname;
                                       self.MiddleName:= left.mname;

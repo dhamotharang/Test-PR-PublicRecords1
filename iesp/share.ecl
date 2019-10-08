@@ -330,12 +330,18 @@ export t_WsException := record
 	string256 Message {xpath('Message')};
 end;
 		
+export t_ResultDisclaimer := record
+	string Code {xpath('Code')};
+	string Message {xpath('Message')};
+end;
+              
 export t_ResponseHeader := record
 	integer Status {xpath('Status')};
 	string256 Message {xpath('Message')};
 	string50 QueryId {xpath('QueryId')};
 	string16 TransactionId {xpath('TransactionId')};
 	dataset(t_WsException) Exceptions {xpath('Exceptions/Item'), MAXCOUNT(iesp.Constants.MaxResponseExceptions)};
+	dataset(t_ResultDisclaimer) Disclaimers {xpath('Disclaimers/Disclaimer'), MAXCOUNT(1)};
 end;
 		
 export t_ServiceParameter := record

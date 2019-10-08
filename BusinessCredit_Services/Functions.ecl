@@ -1,15 +1,19 @@
-﻿IMPORT Address, AutoStandardI, BIPV2, BIPV2_Best, Business_Credit, doxie, iesp, Risk_Indicators,
-                        Business_Risk,  DID_Add,  STD, ut, TopBusiness_Services;
+﻿IMPORT Address, AutoStandardI, BIPV2, BIPV2_Best, Business_Credit, Business_Risk, BusinessCredit_Services, DID_Add, 
+       doxie, iesp, Risk_Indicators, STD, Suppress, TopBusiness_Services, ut;
+
 
 EXPORT Functions := MODULE
-           // efficiency addition to move BIP and bus credit related kfetches into 1 place and pass in common params used in both.
+		 
+     SHARED mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()); 
+
+     // efficiency addition to move BIP and bus credit related kfetches into 1 place and pass in common params used in both.
 		 EXPORT bipkfetch(dataset(BIPV2.IDlayouts.l_xlink_ids2) BipLinkids,
 		                                             STRING1 FETCHLEVEL,
 							                   INTEGER FETCHLIMIT = 10000,
 									         STRING DataPermissionMask) := MODULE
                       
-          // efficiency add true on END since not using for contacts skips the Suppression											
-		EXPORT BIPBusHeaderRecsSlim := BIPV2.Key_BH_Linking_Ids.kfetch(project(Biplinkids, transform(BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT))
+		 // efficiency add true on END since not using for contacts skips the Suppression											
+		 EXPORT BIPBusHeaderRecsSlim := BIPV2.Key_BH_Linking_Ids.kfetch(project(Biplinkids, transform(BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT))
 		                                                                                                              ,FETCHLEVEL
 																						    ,
 																							,
@@ -26,9 +30,10 @@ EXPORT Functions := MODULE
 																				)(proxid = 0);
 				                                                                                              		                                        			 
 	     EXPORT   BusCreditHeaderRecs :=  Business_Credit.Key_LinkIds().kfetch2(BIpLinkids
-			                                                                                                                              ,FETCHLEVEL
-																				                                    ,
-																										    ,DatapermissionMask);
+																				                                      ,mod_access
+                                                                              ,FETCHLEVEL
+																				                                      ,
+																				                                      ,DatapermissionMask);
 	END;
 
 	EXPORT fn_useBusinessCredit (STRING in_dataPermissionMask, BOOLEAN IncludeBusinessCredit ) := FUNCTION
@@ -156,7 +161,7 @@ EXPORT Functions := MODULE
 		BusinessIds := DATASET([initialize()]);
 		
 		BOOLEAN exists_BipHeader 			:= EXISTS(BIPV2_Best.Key_LinkIds.Kfetch2(BusinessIds, , , ,false,BusinessCredit_Services.Constants.BestKfetchMaxLimit));
-		BOOLEAN exists_BuzCreditHeader:= IF(buzCreditAccess, EXISTS(Business_Credit.Key_LinkIds().Kfetch2(BusinessIds,,,in_dataPermissionMask,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase)), FALSE);
+		BOOLEAN exists_BuzCreditHeader:= IF(buzCreditAccess, EXISTS(Business_Credit.Key_LinkIds().Kfetch2(BusinessIds,mod_access,,,in_dataPermissionMask,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase)), FALSE);
 
 		integer BuzCreditIndicator := MAP(exists_BipHeader and ~exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.HEADER_FILE_ONLY,
 																			~exists_BipHeader and exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BUSINESS_CREDIT_ONLY,
@@ -178,7 +183,7 @@ EXPORT Functions := MODULE
 		BusinessIds := DATASET([initialize()]);
 		
 		BOOLEAN exists_BipHeader 			:= true; // always going to be in bip v2 header since results are from this key:  BIPV2.Key_BH_Relationship_SELEID.kFetch
-		BOOLEAN exists_BuzCreditHeader:= IF(buzCreditAccess, EXISTS(Business_Credit.Key_LinkIds().Kfetch2(BusinessIds,,,in_dataPermissionMask,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase)), FALSE);
+		BOOLEAN exists_BuzCreditHeader:= IF(buzCreditAccess, EXISTS(Business_Credit.Key_LinkIds().Kfetch2(BusinessIds,mod_access,,,in_dataPermissionMask,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase)), FALSE);
 
 		integer BuzCreditIndicator := MAP(exists_BipHeader and ~exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.HEADER_FILE_ONLY,
 													//~exists_BipHeader and exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BUSINESS_CREDIT_ONLY, // will never exist at this point

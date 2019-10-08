@@ -60,11 +60,22 @@ export t_CollectionReportRequest := record (iesp.share.t_BaseRequest)
   t_CollectionReportOptions Options {xpath('Options')};
   t_CollectionReportBy ReportBy {xpath('ReportBy')};
 end;
+
+export t_CollectionReportTier2Response := record
+  iesp.share.t_ResponseHeader _Header {xpath('Header')};
+  t_CollectionReportResult Result {xpath('Result')};
+end;
     
+export t_CollectionReportTier2Request := record (iesp.share.t_BaseRequest)
+  t_CollectionReportOptions Options {xpath('Options')};
+  t_CollectionReportBy ReportBy {xpath('ReportBy')};
+end;
+
 export t_CollectionReportResponseEx := record
   t_CollectionReportResponse response {xpath('response')};
 end;
-    
+
+
 
 end;
 

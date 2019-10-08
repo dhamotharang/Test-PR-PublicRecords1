@@ -196,6 +196,7 @@ EXPORT Header_xlinking_Service := MACRO
  allRecs := IDLExternalLinking.did_getAllRecs_batch(didRes, did, uid);
  finalLayout := {resTrimLayout AND NOT [did,rid], keyLayout};
  finalRes1 := join(dsNorm, allRecs, left.did=right.inputDid, transform(finalLayout, 
+   self.did := right.did,
 	 self.rid := right.rid,
 		self := left, 
 		self := right));

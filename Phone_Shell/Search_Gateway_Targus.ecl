@@ -52,14 +52,15 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Gateway_Tar
 
 	timeoutSecs := 2;	// 2 Seconds
 	numRetries := 0;	// Don't retry because of SLA's
-	
+  gw_mod_access := Gateway.IParam.GetGatewayModAccess(GLBPurpose, DPPAPurpose);
+
 	// Don't call the Gateway unless the Gateway URL is populated
 	// Redundant makeGatewayCall passed to SOAP call as a safety mechanism in case Roxie 
   // ever decides to execute both sides of the IF statement.
   targus_cfg := gateways(Gateway.Configuration.IsTargus(servicename))[1];
 	makeGatewayCall := targus_cfg.url != '' AND EXISTS(targus_in);
 	gateway_result := IF(makeGatewayCall, 
-                       Gateway.SoapCall_Targus(targus_in, targus_cfg, timeoutSecs, numRetries, makeGatewayCall), 
+                       Gateway.SoapCall_Targus(targus_in, targus_cfg, timeoutSecs, numRetries, makeGatewayCall, gw_mod_access), 
                        DATASET([], targus.layout_targus_out));
 
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getTargus(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Targus.layout_targus_out ri) := transform

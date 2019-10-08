@@ -6,7 +6,7 @@ EXPORT Neutral_Lexid_Soapcall(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.La
 inrec := RECORD, MAXLENGTH(500000)
 	DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) In_Layout;
 	INTEGER	Score_Threshold;
-	INTEGER InputUIDAppend := 0;
+	INTEGER G_ProcUID := 0;
 END;
 		
 LexidInput := DATASET([{PROJECT(inputNoLexid, 
@@ -16,7 +16,7 @@ LexidInput := DATASET([{PROJECT(inputNoLexid,
 
 PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII errX(LexidInput L) := TRANSFORM
 //	self.errmsg := ERROR (FAILCODE, 'Neutral Lexid Service: ' + FAILMESSAGE);
-	SELF.InputUIDAppend := L.InputUIDAppend; 
+	SELF.G_ProcUID := L.G_ProcUID; 
 	SELF := [];
 END;
 
