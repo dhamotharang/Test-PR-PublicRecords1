@@ -20,8 +20,18 @@ FUNCTION
                                   SELF             	 := LEFT.RealTimePhone_Ext,
                                   SELF             	 := LEFT));
 
+  // Get the state where the phone account is opened
+  dPhoneState  := JOIN(dPhoneSlim,
+                        Risk_Indicators.Key_Telcordia_tds,
+                        KEYED(LEFT.phone[1..3]=RIGHT.npa) AND
+                        KEYED(LEFT.phone[4..6]=RIGHT.nxx),
+                        TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.PhoneSlim,
+                                  SELF.phone_state := RIGHT.state,
+                                  SELF             := LEFT),
+                        LEFT OUTER, LIMIT(0), KEEP(1));
+
   // creates a more consistent output by matching the logic in GetIdentitiesFinal
-  dPhoneSort := SORT(dPhoneSlim(typeflag != Phones.Constants.TypeFlag.DataSource_PV),
+  dPhoneSort := SORT(dPhoneState(typeflag != Phones.Constants.TypeFlag.DataSource_PV),
                       acctno, phone, -dt_last_seen, dt_first_seen);
 
   $.Layouts.PhoneFinder.PhoneSlim tPhoneRollup($.Layouts.PhoneFinder.PhoneSlim le, $.Layouts.PhoneFinder.PhoneSlim ri) :=
@@ -65,20 +75,10 @@ FUNCTION
                           LEFT.phone  = RIGHT.phone,
                           tPhoneRollup(LEFT, RIGHT));
 
-  // Get the state where the phone account is opened
-  dPhoneState  := JOIN(dPhoneRollup,
-                        Risk_Indicators.Key_Telcordia_tds,
-                        KEYED(LEFT.phone[1..3]=RIGHT.npa) AND
-                        KEYED(LEFT.phone[4..6]=RIGHT.nxx),
-                        TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.PhoneSlim,
-                                  SELF.phone_state := RIGHT.state,
-                                  SELF             := LEFT),
-                        LEFT OUTER, LIMIT(0), KEEP(1));
-
   // Overwrite the primary phone details with the phone detail information from TU
   dPrimaryPhoneDetail := dPhoneSlim(typeflag = Phones.Constants.TypeFlag.DataSource_PV);
 
-  $.Layouts.PhoneFinder.PhoneSlim tOverwriteWithTU(dPhoneRollup le, dPrimaryPhoneDetail ri) :=
+  $.Layouts.PhoneFinder.PhoneSlim tOverwriteWithTU($.Layouts.PhoneFinder.PhoneSlim le, $.Layouts.PhoneFinder.PhoneSlim ri) :=
   TRANSFORM
     SELF.acctno                  := le.acctno;
     SELF.phone                   := le.phone;
@@ -148,7 +148,7 @@ FUNCTION
     SELF                         := ri;
   END;
 
-  dPhoneDetail := JOIN( dPhoneState,
+  dPhoneDetail := JOIN( dPhoneRollup,
                         dPrimaryPhoneDetail,
                         LEFT.acctno = RIGHT.acctno AND
                         LEFT.phone  = RIGHT.phone,
@@ -172,6 +172,7 @@ FUNCTION
 
   #IF(PhoneFinder_Services.Constants.Debug.Main)
       OUTPUT(dPhoneSlim, NAMED('dPhoneSlim'), EXTEND);
+      OUTPUT(dPhoneState, NAMED('dPhoneState'), EXTEND);
       OUTPUT(dPhoneSort, NAMED('dPhoneSort'), EXTEND);
       OUTPUT(dPhoneRollup, NAMED('dPhoneRollup'), EXTEND);
       OUTPUT(dPrimaryPhoneDetail, NAMED('dPrimaryPhoneDetail'), EXTEND);
