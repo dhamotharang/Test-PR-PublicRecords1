@@ -627,29 +627,5 @@ EXPORT Functions := MODULE
 										 corp2.t2u(fc) NOT IN ['USA','US','UNITED STATES','GA','GEORGIA',''] => 'F',
 										 '');
 		END;
-		
-		//****************************************************************************
-		//Inc_or_Forgn_Date: returns date for "corp_inc_date" and "corp_forgn_date" 
-		//						input: fdi    -> Foreign Domestic Indicator	
-		//					  input: fc     -> ForeignCountry	
-		//						input: cDate  -> CommencementDate
-		//						input: eDate  -> EffectiveDate
-		//****************************************************************************
-		EXPORT Inc_or_Forgn_Date(STRING fdi, STRING fc, STRING cDate, STRING eDate) := FUNCTION
-					 US_list	:= ['USA','US','UNITED STATES','GA','GEORGIA','']; 
-					 uc_fc		:= corp2.t2u(fc);
-					 CommDate	:= Corp2_Mapping.fValidateDate(cDate).PastDate;
-					 EffDate	:= Corp2_Mapping.fValidateDate(eDate).PastDate;
-					 RETURN MAP(fdi = 'D' AND CommDate <> ''											    => CommDate,
-					 						fdi = 'D' AND EffDate <> ''												    => EffDate,
-											fdi = 'F' AND CommDate <> ''													=> CommDate,
-					 						fdi = 'F' AND EffDate <> ''														=> EffDate,
-											fdi = ''  AND uc_fc IN US_list AND CommDate <> ''	    => CommDate,
-											fdi = ''  AND uc_fc IN US_list AND EffDate <> ''	    => EffDate,
-											fdi = ''  AND uc_fc NOT IN US_list AND CommDate <> ''	=> CommDate,
-											fdi = ''  AND uc_fc NOT IN US_list AND EffDate <> ''	=> EffDate,
-										  ''
-										 );
-		END;
 
 END;		
