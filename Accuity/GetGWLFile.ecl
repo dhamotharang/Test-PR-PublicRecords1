@@ -13,7 +13,7 @@ EXPORT GetGWLFile := FUNCTION
 								self.search_criteria := (string)right.criteria;
 								words := Std.Str.WordCount(left.accuitydatasource);
 								code := (integer)Std.Str.GetNthWord(left.accuitydatasource, words);
-								self.comments := TRIM($.dictSources[code].source_name) + 
+								self.comments := 'Source: ' + TRIM($.dictSources[code].source_name) + 
 																		IF(TRIM(left.comments)='', '',
 																		' | ' + TRIM(left.comments));
 								self := left;), left outer, local);
