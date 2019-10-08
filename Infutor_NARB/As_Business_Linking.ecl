@@ -36,11 +36,11 @@ EXPORT As_Business_Linking (
 				                                         'P' => 'PARENT COMPANY',
 																								 'T' => 'TRADENAME',
 																								 '');
-				self.company_sic_code1           := l.sic1;
-				self.company_sic_code2           := l.sic2;
-				self.company_sic_code3           := l.sic3;
-				self.company_sic_code4           := l.sic4;
-				self.company_sic_code5           := l.sic5;
+				self.company_sic_code1           := l.sic1[1..4];
+				self.company_sic_code2           := l.sic2[1..4];
+				self.company_sic_code3           := l.sic3[1..4];
+				self.company_sic_code4           := l.sic4[1..4];
+				self.company_sic_code5           := l.sic5[1..4];
 				self.company_org_structure_raw   := map(l.government = 'Y' and l.small = 'Y' => 'GOVERNMENT-SMALL_BUSINESS',
 																							  l.government = 'Y'   								 => 'GOVERNMENT',
 																								l.small = 'Y' 											 => 'SMALL_BUSINESS',
@@ -86,6 +86,7 @@ EXPORT As_Business_Linking (
 				self.contact_email							 := l.email;
 				self.contact_email_username			 := email_data.fn_clean_email_username(l.email);
 				self.contact_email_domain				 := email_data.fn_clean_email_domain(l.email);
+<<<<<<< HEAD
 				string temp_employee_count       := case(l.employee_code,
 																								 'A' => '1 to 4',
 				                                         'B' => '5 to 9',
@@ -111,6 +112,8 @@ EXPORT As_Business_Linking (
 																								 '');
 		    self.employee_count_local_raw    := temp_employee_count;
 		    self.revenue_local_raw           := temp_revenue;
+=======
+>>>>>>> 9063cb3eb2cb1e6eff9c6a42fc29d6c8a87cacb7
 				self 							   						 := l;
 				self 							   						 := [];
 		end;
