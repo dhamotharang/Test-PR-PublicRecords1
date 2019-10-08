@@ -17,4 +17,4 @@ payload := RECORD
 	$.layouts.i_driverslicense.DISPUTE_STATUS;
 END;
 
-EXPORT key_driverslicense := INDEX ({keyed_fields}, {payload}, $.names().i_driverslicense, OPT);
+EXPORT key_driverslicense() := INDEX ({keyed_fields}, {payload}, $.names().i_driverslicense, OPT);
