@@ -1,4 +1,4 @@
-import business_header,header,gong,fcra, ut, std;
+﻿import business_header,header,gong,fcra, ut, std;
 
 EXPORT Phone_Table_v2 (boolean isFCRA = false, boolean gongFilter=false) := FUNCTION
 
@@ -26,6 +26,10 @@ rec := RECORD
 	STRING2 	nxx_type := '';
 	integer did_ct;
 	integer did_ct_c6;	
+	//CCPA-22 add did/global_sid/record_sid
+	UNSIGNED6 did := 0;
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 END;
 
 

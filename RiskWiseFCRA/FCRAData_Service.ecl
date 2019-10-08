@@ -590,7 +590,8 @@ ssn_deduped := dedup(sort(ungroup(ssn_main1 + ssn_main2), record),all);
 ssn_recs1 := ssn_deduped + PROJECT( ssn_corr,
 		transform( Layout_ssn,
 									self.death_sources := '',
-									self := LEFT
+									self := LEFT,
+									self := []   // Commenting out source related fields (global_sid and record_sid) //
 							) );
 							
 // add the death_sources to the ssn_table result	
