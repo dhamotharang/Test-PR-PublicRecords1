@@ -93,6 +93,7 @@
   <part name="NoSmartRollup" type="xsd:boolean"/>
   <part name="IncludeKeyRiskIndicators" type="xsd:boolean"/>
 	<part name="IncludeAMLProperty" type="xsd:boolean"/>
+<part name="includeAddressSourceInfo" type="xsd:boolean"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
 -->
 
@@ -263,6 +264,7 @@ EXPORT SmartLinxReportService () := MACRO
 		export boolean include_sanctions := true;
     export boolean include_criminalindicators := false : stored ('IncludeCriminalIndicators');
     export boolean Include_NonRegulated_WatercraftSources := false : stored ('IncludeNonRegulatedWatercraftSources');
+    export boolean include_AddressSourceInfo := false : stored('IncludeAddressSourceInfo');
   end;
 
 
