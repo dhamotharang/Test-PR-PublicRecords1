@@ -12,6 +12,7 @@ export Healthcare_SocioEconomic_Batch_Service_V4 := MACRO
 	IF(DataRestrictionMask_in='', FAIL('A blank DataRestrictionMask value is supplied.'));
 	IF(DataPermissionMask_in='', FAIL('A blank DataPermissionMask value is supplied.'));
 	String Socio_Core_Option := '1' : stored('Options');
+	unsigned1 Socio_TC_Model_Version_in := 2 : stored('Socio_TC_Model_Version');
 	unsigned1 ofac_version_in     := 1        : stored('OFACVersion'); //TODO: Don't expose, set it to default
 	gateways_in_ds := Gateway.Configuration.Get();
 	IF(DPPAPurpose_in <> Models.Healthcare_Constants_Core.authorized_DPPA OR GLBPurpose_in <> Models.Healthcare_Constants_Core.authorized_GLBA, FAIL('Supplied Permissible Purpose Settings (GLBPurpose and/or DPPAPurpose) are invalid'));
@@ -73,7 +74,7 @@ export Healthcare_SocioEconomic_Batch_Service_V4 := MACRO
 		MedicationAdherenceScore_Category_1_Low <= MedicationAdherenceScore_Category_2_High,
 		FAIL('Bad MedicationAdherenceScore_Category thresholds supplied.'));
 
-	Models.Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, 
+	Models.Healthcare_SocioEconomic_Core(Socio_TC_Model_Version_in, SuppressResultsForOptOuts, isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, 
 											trim(STD.Str.ToUpperCase(Socio_Core_Option),left,right), ofac_version_in, gateways_in_ds, coreResults,
                                                     LexIdSourceOptout := LexIdSourceOptout, 
                                                     TransactionID := TransactionID, 
