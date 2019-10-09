@@ -369,6 +369,7 @@ EXPORT LayoutsInternal := MODULE
     BOOLEAN attr_legalEventCat4;
     BOOLEAN attr_legalEventCat3;
     BOOLEAN attr_legalEventCat2;
+    BOOLEAN attr_legalEventCat0;
 
     //Top Level Data
     //Remove duplicate fields that are in the source detail - will be rolled up

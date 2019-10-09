@@ -56,6 +56,7 @@ MODULE
 	export src_Bankruptcy_Trustee        := 'BT';
 	export src_BBB_Member                := 'BM';  // Better Business Bureau members
 	export src_BBB_Non_Member            := 'BN';  // Better Business Bureau non-members
+	export src_Best_Business             := 'BB';
 	export src_Business_Credit					 := 'BC';  // SBFE Business Credit
 	export src_Business_Registration     := 'BR';
 	export src_Calbus										 := 'C#';  // California business locator/CA sales & use tax permit holders
@@ -352,6 +353,7 @@ MODULE
 	export src_SalesChannel              := 'SC';
 	export src_CA_Sales_Tax              := 'FT';  // California sales & use tax permit holders
 	export src_IA_Sales_Tax              := 'IT';  // Iowa sales tax 
+	export src_SAM_Gov_Debarred          := 'DB';
 	export src_SDA                       := 'SA';  // Standard Directory of Advertisers
 	export src_SDAA                      := 'AA';  // Standard Directory of Advertising Agencies
 	export src_SEC_Broker_Dealer         := 'SB';  // US Securities & Exchange Commission  

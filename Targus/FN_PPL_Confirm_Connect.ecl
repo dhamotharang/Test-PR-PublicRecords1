@@ -1,8 +1,7 @@
 import doxie, gateway, targus, NID,Phones;
 
 export FN_PPL_Confirm_Connect(dataset(doxie.layout_pp_raw_common) in_data,
-                              unsigned1 glb, 
-                              unsigned1 dppa,
+                              doxie.IDataAccess mod_access,
 															gateway.Layouts.Config gateway_cfg) := function
 
 targus_gateway_url := gateway_cfg.url;
@@ -28,8 +27,8 @@ cfm_sp_init := choosen(in_data,1)(phone<>'' and
 cfm_overlap := join(cfm_from_in, cfm_sp_init, left.phone = right.phone);
 
 targus.layout_targus_in prep_for_connect(cfm_sp_init le) := transform
-	self.user.GLBPurpose := glb;
-	self.user.DLPurpose := dppa;
+	self.user.GLBPurpose := mod_access.glb;
+	self.user.DLPurpose := mod_access.dppa;
 	self.user.QueryID := '3';
 	self.SearchBy.PhoneNumber := le.phone;
 	self.options.IncludeWirelessConnectionSearch := true;
@@ -40,7 +39,7 @@ cfm_sp_ready := project(cfm_sp_init, prep_for_connect(left));
 
 vMakeGWCall := targus_gateway_url!='' and exists(cfm_sp_init) and ~exists(cfm_overlap);
 cfm_sp_rslt := if(vMakeGWCall, 
-                  Gateway.SoapCall_Targus(cfm_sp_ready, gateway_cfg, 3,,vMakeGWCall), dataset([],targus.layout_targus_out));
+                  Gateway.SoapCall_Targus(cfm_sp_ready, gateway_cfg, 3, , vMakeGWCall, mod_access, TRUE), dataset([],targus.layout_targus_out));
 
 cfm_data_rec get_cfm_sp(cfm_sp_rslt le, unsigned cnt) := transform
 	self.phone := if(cnt=1, le.searchby.phonenumber, skip);

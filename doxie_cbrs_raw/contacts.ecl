@@ -1,4 +1,4 @@
-import business_header, doxie_cbrs, doxie, MDR, suppress, ut;
+﻿import AutoStandardI, business_header, doxie_cbrs, doxie, MDR, suppress, ut;
 export contacts(
 	dataset(doxie_cbrs.layout_references) bdids,
 	boolean Include_val = false,
@@ -10,8 +10,12 @@ shared k := Business_Header.Key_Business_Contacts_BDID;
 nn := Max_val * 4;
 
 doxie_cbrs.mac_RollStart
-	(bdids, outf0, k,
+	(bdids, outfile, k,
 	 nn,Include_val,bdid,right.from_hdr = 'N',bdid,did,lname+fname)
+   
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+
+outf0 := Suppress.MAC_SuppressSource(outfile, mod_access);
 
 out_f0a0 := outf0(NOT MDR.sourceTools.SourceIsEBR(source) OR NOT doxie.DataRestriction.EBR);
 out_f0a := out_f0a0(business_header.is_ContactName(fname, lname));

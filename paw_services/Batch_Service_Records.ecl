@@ -1,9 +1,15 @@
 ﻿
 IMPORT AutoStandardI,Autokey_batch, AutokeyB2, BatchServices, Doxie, PAW, paw_services, AutokeyB2_batch, NID, BatchShare, Suppress;
 
-EXPORT Batch_Service_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) ds_batch_in = DATASET([],Autokey_batch.Layouts.rec_inBatchMaster),
+EXPORT Batch_Service_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) ds_batch_recs_in = DATASET([],Autokey_batch.Layouts.rec_inBatchMaster),
                               Doxie.IDataAccess mod_access, BOOLEAN return_current_only = FALSE ) := 
 	FUNCTION
+
+		// sync seq and acctno of incomming recs
+		ds_batch_in:=PROJECT(ds_batch_recs_in,TRANSFORM(Autokey_batch.Layouts.rec_inBatchMaster,
+			SELF.seq:=IF(LEFT.seq=0,(UNSIGNED)LEFT.acctno,LEFT.seq),
+			SELF.acctno:=IF(LEFT.acctno='',(STRING)LEFT.seq,LEFT.acctno),
+			SELF:=LEFT));
 
 	  // constants:
 		
@@ -34,8 +40,49 @@ EXPORT Batch_Service_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) d
 		outpl_rec := PAW.file_SearchAutokey(PAW.File_Base);
 		typestr   := PAW.Constant('').ak_typeStr;
 		AutokeyB2.mac_get_payload(ak_out,ak_key,outpl_rec,outPLfat,did,bdid,typestr);
-		outpl     := UNGROUP(outplfat); 
-		
+		by_auto:= UNGROUP(outplfat);
+
+		acctno_did:=PROJECT(ds_batch_in(did>0),TRANSFORM({STRING20 acctno,UNSIGNED did},SELF:=LEFT));
+		contact_ids:=JOIN(acctno_did,paw.Key_Did,
+			KEYED(LEFT.did=RIGHT.did),LIMIT(paw_services.Constants.CONTACTID_LIMIT,SKIP));
+		paw_recs:=JOIN(contact_ids,paw.Key_contactID,
+			KEYED(LEFT.contact_id=RIGHT.contact_id),LIMIT(ut.limits.PAW_PER_CONTACTID,SKIP));
+		by_did:=PROJECT(paw_recs,TRANSFORM(RECORDOF(by_auto),
+			SELF.Bus_addr.prim_range  := LEFT.company_prim_range,
+			SELF.Bus_addr.predir      := LEFT.company_predir,
+			SELF.Bus_addr.prim_name   := LEFT.company_prim_name,
+			SELF.Bus_addr.addr_suffix := LEFT.company_addr_suffix,
+			SELF.Bus_addr.postdir     := LEFT.company_postdir,
+			SELF.Bus_addr.unit_desig  := LEFT.company_unit_desig,
+			SELF.Bus_addr.sec_range   := LEFT.company_sec_range,
+			SELF.Bus_addr.p_city_name := LEFT.company_city,
+			SELF.Bus_addr.st          := LEFT.company_state,
+			SELF.Bus_addr.zip5        := LEFT.company_zip,
+			SELF.Bus_addr.zip4        := LEFT.company_zip4,
+			SELF.person_addr.prim_range    := LEFT.prim_range,
+			SELF.person_addr.predir        := LEFT.predir,
+			SELF.person_addr.prim_name     := LEFT.prim_name,
+			SELF.person_addr.addr_suffix   := LEFT.addr_suffix,
+			SELF.person_addr.postdir       := LEFT.postdir,
+			SELF.person_addr.unit_desig    := LEFT.unit_desig,
+			SELF.person_addr.sec_range     := LEFT.sec_range,
+			SELF.person_addr.v_city_name   := LEFT.city,
+			SELF.person_addr.st            := LEFT.state,
+			SELF.person_addr.zip5          := LEFT.zip,
+			SELF.person_addr.zip4          := LEFT.zip4,
+			SELF.person_addr.fips_county   := LEFT.county,
+			SELF.person_addr.addr_rec_type := LEFT.record_type,
+			SELF.person_name.title       := LEFT.title,
+			SELF.person_name.fname       := LEFT.fname,
+			SELF.person_name.mname       := LEFT.mname,
+			SELF.person_name.lname       := LEFT.lname,
+			SELF.person_name.name_suffix := LEFT.name_suffix,
+			SELF.isdid:=TRUE,
+			SELF:=LEFT,
+			SELF:=[]));
+
+		outpl:= by_auto+by_did;
+
 		ds_batch_in_capitalized := project(ds_batch_in, batchservices.transforms.xfm_capitalize_input(left));
 		
 		 nameMatch_value := ak_config_data.MatchName;

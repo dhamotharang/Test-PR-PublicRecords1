@@ -56,6 +56,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		// Only count if the date is populated (inquiryMonths >= 0) and is within 6 months
 		SELF.Inquiries.Inq_Num_ADLs_06 := IF(inquiryMonths >= 0 AND inquiryMonths <= 6, '1', '');
     
+  // Phone Shell V2.1 brings back the count of inquiries that match the input ADL/DID
+  SELF.Inquiries.Inq_Num_MatchADL := if(PhoneShellVersion >= 21 and sameADL, '1', '');
+  SELF.Inquiries.Inq_Num_MatchADL_06 := if(PhoneShellVersion >= 21 and sameADL and inquiryMonths >= 0 and inquiryMonths <= 6, '1', '');
+    
 		SELF.Inquiries.Inq_FirstSeen := (STRING)inquiryMonths;
 		SELF.Inquiries.Inq_LastSeen := (STRING)inquiryMonths;
 		SELF.Inquiries.Inq_ADL_FirstSeen := IF(sameADL, (STRING)inquiryMonths, '');
@@ -116,6 +120,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
   // For Phone Shell V2 fix this rollup to roll up the correct field
 		SELF.Inquiries.Inq_Num_06 := (STRING)(if(PhoneShellVersion >= 20,(integer)le.inquiries.inq_num_06 + (integer)ri.inquiries.inq_num_06,
                                                                    (INTEGER)le.Inquiries.Inq_Num + (INTEGER)ri.Inquiries.Inq_Num));
+  
+  // For Phone Shell V2.1 roll up the matchADL counts here
+  SELF.Inquiries.Inq_Num_MatchADL := (string)((integer)le.Inquiries.Inq_Num_MatchADL + (integer)ri.Inquiries.Inq_Num_MatchADL);
+  SELF.Inquiries.Inq_Num_MatchADL_06 := (string)((integer)le.Inquiries.Inq_Num_MatchADL_06 + (integer)ri.Inquiries.Inq_Num_MatchADL_06);
                                                                    
                                                                    
 		SELF.Inquiries.Inq_FirstSeen := MAP((INTEGER)le.Inquiries.Inq_FirstSeen = 0 => ri.Inquiries.Inq_FirstSeen,
@@ -135,7 +143,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		rightInq := TRIM(ri.Inquiries.Inq_ADL_Phone_Industry_List_12);
 		SELF.Inquiries.Inq_ADL_Phone_Industry_List_12 := MAP(leftInq = '' 																	=> rightInq,
 																												                           rightInq = '' 																=> leftInq,
-																												          StringLib.StringFind(leftInq, rightInq, 1) > 0 => leftInq,
+																												          STD.Str.Find(leftInq, rightInq, 1) > 0 => leftInq,
 																																																					                                   leftInq + ',' + rightInq);
 		
 		SELF := le;
@@ -163,6 +171,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 	withInquiries := JOIN(withAddress, countedInquiries, LEFT.Unique_Record_Sequence = RIGHT.Unique_Record_Sequence, TRANSFORM(layoutInquiries,
 																																																									SELF.Inquiries.Inq_Num := RIGHT.Inquiries.Inq_Num;
 																																																									SELF.Inquiries.Inq_Num_06 := RIGHT.Inquiries.Inq_Num_06;
+                                                         SELF.Inquiries.Inq_Num_MatchADL := RIGHT.Inquiries.Inq_Num_MatchADL;
+                                                         SELF.Inquiries.Inq_Num_MatchADL_06 := RIGHT.Inquiries.Inq_Num_MatchADL_06;
 																																																									SELF.Inquiries.Inq_FirstSeen := RIGHT.Inquiries.Inq_FirstSeen;
 																																																									SELF.Inquiries.Inq_LastSeen := RIGHT.Inquiries.Inq_LastSeen;
 																																																									SELF.Inquiries.Inq_ADL_FirstSeen := RIGHT.Inquiries.Inq_ADL_FirstSeen;
@@ -177,6 +187,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		SELF.Inquiries.Inq_Num_06 := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_06) = '', '0', le.Inquiries.Inq_Num_06);
 		SELF.Inquiries.Inq_Num_ADLs := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_ADLs) = '', '0', le.Inquiries.Inq_Num_ADLs);
 		SELF.Inquiries.Inq_Num_ADLs_06 := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_ADLs_06) = '', '0', le.Inquiries.Inq_Num_ADLs_06);
+		SELF.Inquiries.Inq_Num_MatchADL := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_MatchADL) = '', '0', le.Inquiries.Inq_Num_MatchADL);
+		SELF.Inquiries.Inq_Num_MatchADL_06 := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_MatchADL_06) = '', '0', le.Inquiries.Inq_Num_MatchADL_06);
 		SELF.Inquiries.Inq_Num_Addresses := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_Addresses) = '', '0', le.Inquiries.Inq_Num_Addresses);
 		SELF.Inquiries.Inq_Num_Addresses_06 := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_Addresses_06) = '', '0', le.Inquiries.Inq_Num_Addresses_06);
 		SELF.Inquiries.Inq_FirstSeen := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_FirstSeen) = '', '0', le.Inquiries.Inq_FirstSeen);

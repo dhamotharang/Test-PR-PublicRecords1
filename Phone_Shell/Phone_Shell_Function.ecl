@@ -41,20 +41,20 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 																																							 BOOLEAN BlankOutDuplicatePhones = FALSE,
 																																							 BOOLEAN UsePremiumSource_A = FALSE,
 																																							 BOOLEAN RunRelocation = FALSE,
-                                                                                                                                                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                                        doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	/* ************************************************************************
 	 *  Clean the input and copy the input data into appropriate echo fields  *
 	 ************************************************************************ */
 	// If you are outside the PhoneRestrictionMask range, set it to the default of 0 - ALL PHONES
-  
-    // CCPA Changes
-    unsigned1 LexIdSourceOptout := mod_access.lexid_source_optout;
-    string TransactionID := mod_access.transaction_id;
-    string BatchUID := '';
-    unsigned6 GlobalCompanyId := mod_access.global_company_id;
-
 	PhoneRestrictionMask := IF(PhoneRestrictionMaskTemp > 5 OR PhoneRestrictionMaskTemp < 0, 0, PhoneRestrictionMaskTemp);
+  
+ // CCPA Changes
+ unsigned1 LexIdSourceOptout := mod_access.lexid_source_optout;
+ string TransactionID := mod_access.transaction_id;
+ string BatchUID := '';
+ unsigned6 GlobalCompanyId := mod_access.global_company_id;
+
 	
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus cleanInputs(Phone_Shell.Layout_Phone_Shell.Input le, UNSIGNED4 seqCounter) := TRANSFORM
 		cleaned_name := Address.CleanPerson73(le.FullName);
@@ -63,13 +63,13 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 		SELF.Input_Echo.seq 								:= seqCounter;
 		SELF.Input_Echo.LexID								:= le.DID;
 		SELF.Input_Echo.AcctNo				 			:= le.AcctNo;
-		SELF.Input_Echo.in_FName 						:= TRIM(StringLib.StringToUppercase(IF(le.FirstName = '' AND valid_cleaned, cleaned_name[6..25], le.FirstName)));
-		SELF.Input_Echo.in_MName						:= TRIM(StringLib.StringToUppercase(IF(le.MiddleName = '' AND valid_cleaned, cleaned_name[26..45], le.MiddleName)));
-		SELF.Input_Echo.in_LName 						:= TRIM(StringLib.StringToUppercase(IF(le.LastName = '' AND valid_cleaned, cleaned_name[46..65], le.LastName)));
-		SELF.Input_Echo.in_SName 						:= TRIM(StringLib.StringToUppercase(IF(le.SuffixName = '' AND valid_cleaned, cleaned_name[66..70], le.SuffixName)));
-		SELF.Input_Echo.in_StreetAddress 		:= TRIM(StringLib.StringToUppercase(Risk_Indicators.MOD_AddressClean.street_address(le.StreetAddress1, le.Prim_Range, le.Predir, le.Prim_Name, le.Addr_Suffix, le.Postdir, le.Unit_Desig, le.Sec_Range)));
-		SELF.Input_Echo.in_City 						:= TRIM(StringLib.StringToUppercase(le.City));
-		SELF.Input_Echo.in_State 						:= TRIM(StringLib.StringToUppercase(le.State));
+		SELF.Input_Echo.in_FName 						:= TRIM(STD.Str.ToUppercase(IF(le.FirstName = '' AND valid_cleaned, cleaned_name[6..25], le.FirstName)));
+		SELF.Input_Echo.in_MName						:= TRIM(STD.Str.ToUppercase(IF(le.MiddleName = '' AND valid_cleaned, cleaned_name[26..45], le.MiddleName)));
+		SELF.Input_Echo.in_LName 						:= TRIM(STD.Str.ToUppercase(IF(le.LastName = '' AND valid_cleaned, cleaned_name[46..65], le.LastName)));
+		SELF.Input_Echo.in_SName 						:= TRIM(STD.Str.ToUppercase(IF(le.SuffixName = '' AND valid_cleaned, cleaned_name[66..70], le.SuffixName)));
+		SELF.Input_Echo.in_StreetAddress 		:= TRIM(STD.Str.ToUppercase(Risk_Indicators.MOD_AddressClean.street_address(le.StreetAddress1, le.Prim_Range, le.Predir, le.Prim_Name, le.Addr_Suffix, le.Postdir, le.Unit_Desig, le.Sec_Range)));
+		SELF.Input_Echo.in_City 						:= TRIM(STD.Str.ToUppercase(le.City));
+		SELF.Input_Echo.in_State 						:= TRIM(STD.Str.ToUppercase(le.State));
 		//Since batch uses zip5 and XML uses zip, we want to send the populated zip to the address cleaner
 		//as if no zip is populated into addr cleaner than zip could come back empty if no zip is found. But if the zip
 		//is populated and no address cleaned then the zip would still be populated. So trying to be consistent between the 2 input fields 
@@ -88,18 +88,18 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 		SELF.Clean_Input.did						:= le.DID;
 		SELF.Clean_Input.AcctNo				 	:= le.AcctNo;
 		
-		SELF.Clean_Input.FullName 			:= StringLib.StringToUpperCase(le.FullName);
-		SELF.Clean_Input.FirstName  		:= TRIM(StringLib.StringToUppercase(IF(le.FirstName = '' AND valid_cleaned, cleaned_name[6..25], le.FirstName)));
-		SELF.Clean_Input.MiddleName  		:= TRIM(StringLib.StringToUppercase(IF(le.MiddleName = '' AND valid_cleaned, cleaned_name[26..45], le.MiddleName)));
-		SELF.Clean_Input.LastName  			:= TRIM(StringLib.StringToUppercase(IF(le.LastName = '' AND valid_cleaned, cleaned_name[46..65], le.LastName)));
-		SELF.Clean_Input.SuffixName 		:= TRIM(StringLib.StringToUppercase(IF(le.SuffixName = '' AND valid_cleaned, cleaned_name[66..70], le.SuffixName)));	
-		SELF.Clean_Input.TitleName  		:= TRIM(StringLib.StringToUppercase(IF(le.TitleName = '' AND valid_cleaned, cleaned_name[1..5], le.TitleName)));
+		SELF.Clean_Input.FullName 			:= STD.Str.ToUpperCase(le.FullName);
+		SELF.Clean_Input.FirstName  		:= TRIM(STD.Str.ToUppercase(IF(le.FirstName = '' AND valid_cleaned, cleaned_name[6..25], le.FirstName)));
+		SELF.Clean_Input.MiddleName  		:= TRIM(STD.Str.ToUppercase(IF(le.MiddleName = '' AND valid_cleaned, cleaned_name[26..45], le.MiddleName)));
+		SELF.Clean_Input.LastName  			:= TRIM(STD.Str.ToUppercase(IF(le.LastName = '' AND valid_cleaned, cleaned_name[46..65], le.LastName)));
+		SELF.Clean_Input.SuffixName 		:= TRIM(STD.Str.ToUppercase(IF(le.SuffixName = '' AND valid_cleaned, cleaned_name[66..70], le.SuffixName)));	
+		SELF.Clean_Input.TitleName  		:= TRIM(STD.Str.ToUppercase(IF(le.TitleName = '' AND valid_cleaned, cleaned_name[1..5], le.TitleName)));
 		
 		// Determine if we had StreetAddress populated or if the parsed elements were populated
 		street_address := Risk_Indicators.MOD_AddressClean.street_address(le.StreetAddress1 + ' ' + le.StreetAddress2, le.Prim_Range, le.Predir, le.Prim_Name, le.Addr_Suffix, le.Postdir, le.Unit_Desig, le.Sec_Range);
 		cleaned_address := Risk_Indicators.MOD_AddressClean.clean_addr(street_address, le.City, le.State, ZipToUse);											
-		SELF.Clean_Input.StreetAddress1 := TRIM(StringLib.StringToUppercase(Risk_Indicators.MOD_AddressClean.street_address(le.StreetAddress1, le.Prim_Range, le.Predir, le.Prim_Name, le.Addr_Suffix, le.Postdir, le.Unit_Desig, le.Sec_Range)));
-		SELF.Clean_Input.StreetAddress2 := TRIM(StringLib.StringToUppercase(le.StreetAddress2));
+		SELF.Clean_Input.StreetAddress1 := TRIM(STD.Str.ToUppercase(Risk_Indicators.MOD_AddressClean.street_address(le.StreetAddress1, le.Prim_Range, le.Predir, le.Prim_Name, le.Addr_Suffix, le.Postdir, le.Unit_Desig, le.Sec_Range)));
+		SELF.Clean_Input.StreetAddress2 := TRIM(STD.Str.ToUppercase(le.StreetAddress2));
 		SELF.Clean_Input.Prim_Range 		:= cleaned_address[1..10];
 		SELF.Clean_Input.Predir 				:= cleaned_address[11..12];
 		SELF.Clean_Input.Prim_Name 			:= cleaned_address[13..40];
@@ -119,11 +119,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 		SELF.Clean_Input.State					:= cleaned_address[115..116];
 		SELF.Clean_Input.Zip						:= TRIM(cleaned_address[117..121] + cleaned_address[122..125]);
 		
-		SELF.Clean_Input.SSN						:= StringLib.StringFilter(le.SSN, '0123456789');
-		SELF.Clean_Input.DateOfBirth		:= StringLib.StringFilter(le.DateOfBirth, '0123456789');
-		SELF.Clean_Input.Age						:= IF((INTEGER)le.DateOfBirth != 0,	(STRING3)ut.Age ((UNSIGNED)le.DateOfBirth, (UNSIGNED)risk_indicators.iid_constants.myGetDate(999999)), StringLib.StringFilter(le.Age, '0123456789'));
-		SELF.Clean_Input.HomePhone			:= StringLib.StringFilter(le.HomePhone, '0123456789');
-		SELF.Clean_Input.WorkPhone			:= StringLib.StringFilter(le.WorkPhone, '0123456789');
+		SELF.Clean_Input.SSN						:= STD.Str.Filter(le.SSN, '0123456789');
+		SELF.Clean_Input.DateOfBirth		:= STD.Str.Filter(le.DateOfBirth, '0123456789');
+		SELF.Clean_Input.Age						:= IF((INTEGER)le.DateOfBirth != 0,	(STRING3)ut.Age ((UNSIGNED)le.DateOfBirth, (UNSIGNED)risk_indicators.iid_constants.myGetDate(999999)), STD.Str.Filter(le.Age, '0123456789'));
+		SELF.Clean_Input.HomePhone			:= STD.Str.Filter(le.HomePhone, '0123456789');
+		SELF.Clean_Input.WorkPhone			:= STD.Str.Filter(le.WorkPhone, '0123456789');
 
 		SELF.Clean_Input.TargusGatewayEnabled					:= le.TargusGatewayEnabled;
 		SELF.Clean_Input.TransUnionGatewayEnabled			:= le.TransUnionGatewayEnabled;
@@ -278,7 +278,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 	withPhones := Phone_Shell.Gather_Phones(withBocaShell, Gateways, GLBPurpose, DPPAPurpose, DataRestrictionMask, DataPermissionMask, PhoneRestrictionMask, MaxPhones, InsuranceVerificationAgeLimit,
 																					SPIIAccessLevel, VerticalMarket, IndustryClass, RelocationsMaxDaysBefore, RelocationsMaxDaysAfter, RelocationsTargetRadius, IncludeLastResort, IncludePhonesFeedback, TestAccount, Batch, SX_Match_Restriction_Limit, Strict_APSX, 
 																					BlankOutDuplicatePhones, 
-																					UsePremiumSource_A, RunRelocation, mod_access);
+																					UsePremiumSource_A, RunRelocation, PhoneShellVersion, mod_access);
 
 	/* ************************************************************************
 	 *  Gather attributes for the discovered phones                           *

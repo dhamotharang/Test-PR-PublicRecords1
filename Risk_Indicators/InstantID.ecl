@@ -211,7 +211,11 @@ export InstantID := MACRO
 		'EnableEmergingID',
 		'AllowEmergingID',
 		'NameInputOrder',
-		'outcometrackingoptout'
+		'outcometrackingoptout',
+    'LexIdSourceOptout',
+	'_TransactionId',
+	'_BatchUID',
+	'_GCID'
 	));
 
 Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
@@ -232,6 +236,7 @@ Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suf
 	string1 ExcludeDMVPII       := '' : STORED('ExcludeDMVPII');
 	BOOLEAN DisableOutcomeTracking := FALSE : STORED('OutcomeTrackingOptOut');
 	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
+    
 	
 	//Look up the industry by the company ID.
 	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Risk_Indicators__InstantID);
@@ -240,6 +245,9 @@ Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suf
 boolean Test_Data_Enabled := FALSE   	: stored('TestDataEnabled');
 string120 addr1_val := ''    : stored('StreetAddress');
 string200 addr2_val := ''		 : stored('Addr');
+
+
+
 // Parsed address input
 string10 PrimRange := AutoStandardI.GlobalModule().primrange;
 string2 PreDir := AutoStandardI.GlobalModule().predir;
@@ -248,6 +256,7 @@ string4 AddrSuffix := '' : stored('AddrSuffix');
 string2 PostDir := AutoStandardI.GlobalModule().postdir;
 string10 UnitDesignation := '' : stored('UnitDesignation');
 string8 SecRange := AutoStandardI.GlobalModule().secrange;
+
 
 addr_value := map( 
 										trim(addr2_val)!='' => addr2_val,

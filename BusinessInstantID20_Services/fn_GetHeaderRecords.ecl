@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP;
+﻿IMPORT AutoStandardI, BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP, doxie;
 
 	// The following function reads Business Header Records, which'll be used in at least two other 
 	// functions a bit later. Slims 'em down too, for a lighter footprint.
@@ -66,7 +66,8 @@
 
 			ds_SBFERaw := 
 					Business_Credit.Key_LinkIds().kFetch2(inputs             := ds_BIPIDs,
-																								Level              := Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
+																								mod_access         := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()),
+                                                Level              := Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
 																								ScoreThreshold     := 0, // ScoreThreshold --> 0 = Give me everything
 																								DataPermissionMask := Options.DataPermissionMask,
 																								JoinLimit          := Business_Risk_BIP.Constants.Limit_SBFE_LinkIds,

@@ -62,6 +62,9 @@ layout_addr_risk := record
 	layout_counts en;
 	layout_counts tn;
 	layout_avm;
+	//CCPA-768
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 end;
 
 // join combo to eq

@@ -19,7 +19,7 @@ b) A new number is returned: this DID has merged to form a new one
 c) A null (0) is returned: this data needs to be resubmitted to obtain a new valid did
 */
 
-import AutoStandardI, doxie, ut;
+import AutoStandardI, doxie, dx_Header, ut;
 
 
 export Did_Did_Update_Service := MACRO
@@ -39,13 +39,13 @@ boolean %trackSplit% := false : stored('TrackSplit');
 %appType% := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
 #uniquename(splitData);
-%splitData% := project(doxie.key_did_rid_split(keyed(rid=(integer8)%od%)), 
-						transform({doxie.Key_Did_Rid},self.stable := true, self := left, self := []));
+%splitData% := project(dx_header.key_did_rid_split()(keyed(rid=(integer8)%od%)), 
+						transform(dx_Header.layouts.i_did_rid,self.stable := true, self := left, self := []));
 						
 #uniquename(p)
 %p% := if (%TrackSplit% and exists(%splitData%),  // if asked for split and no data found gets normal data.  
 					%splitData%,
-					doxie.Key_Did_Rid(Keyed(rid=(integer8)%od%)));
+					PROJECT(dx_Header.key_did_rid()(Keyed(rid=(integer8)%od%)), dx_Header.layouts.i_did_rid));
 
 #uniquename(p2)
 #uniquename(withbests)

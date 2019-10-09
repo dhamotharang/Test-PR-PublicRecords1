@@ -1,10 +1,10 @@
-import gong, doxie, data_services;
+﻿import gong, doxie, data_services;
 
 input_recs := gong.File_Gong_Full((listing_type_res = 'R') AND (TRIM(name_last)<>''));
 
 Layout_extra_city := RECORD
 	STRING25	city;
-	gong.Layout_bscurrent_raw;
+	gong.Layout_Gong_DID;			//CCPA-22 Add did/global_sid/record_sid fields
 END;
 
 Layout_extra_city addOrig(RECORDOF(input_recs) l) := TRANSFORM

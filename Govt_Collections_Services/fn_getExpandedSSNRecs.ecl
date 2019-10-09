@@ -1,5 +1,5 @@
 ﻿
-IMPORT Doxie, Govt_Collections_Services, PhilipMorris;
+IMPORT dx_header, Govt_Collections_Services, PhilipMorris;
 
 EXPORT fn_getExpandedSSNRecs( dataset(Layouts.batch_working) ds_batch_in,
 	                            Govt_Collections_Services.IParams.BatchParams in_mod ) :=
@@ -28,7 +28,7 @@ EXPORT fn_getExpandedSSNRecs( dataset(Layouts.batch_working) ds_batch_in,
 																			(SearchName.pfname	!= '' or SearchName.pfname2 != ''));
 				
 				searchpass_candidates_dids := join(			 
-						 searchDataLocal, doxie.Key_Header_SSN4_V2,
+						 searchDataLocal, dx_header.key_SSN4_V2(),
 						 keyed(left.ssn4=right.ssn4) and
 						 keyed(left.SearchName.PhoneticLname[1..6] = right.dph_lname) and
 						 keyed(left.SearchName.lname = right.lname) and
@@ -46,7 +46,7 @@ EXPORT fn_getExpandedSSNRecs( dataset(Layouts.batch_working) ds_batch_in,
 																
 				dirty_header_records := 
 					join(
-						searchpass_candidates_dids_deduped, doxie.key_header,
+						searchpass_candidates_dids_deduped, dx_header.key_header(),
 						keyed(LEFT.did = RIGHT.s_did) and
 						left.ssn4 = RIGHT.SSN[FN.fn_getLen(RIGHT.SSN)-3..] and
 						left.SearchName.lname = right.lname and

@@ -1,4 +1,4 @@
-﻿IMPORT iesp, doxie, marriage_divorce_v2_Services;
+﻿IMPORT $, iesp, doxie, marriage_divorce_v2_Services;
 
 mardiv_layout    := iesp.marriagedivorce.t_MarriageSearch2Record;
 partyLayout      := iesp.marriagedivorce.t_MarriageSearch2Party ;
@@ -6,7 +6,7 @@ partyRawLayout   := marriage_divorce_v2_Services.layouts.party_combined.wide;
   
 EXPORT mardiv_layout marriagedivorce_records (
   dataset (doxie.layout_references) dids,
-  input.mardiv in_params = module (input.mardiv) end,
+  $.IParam.mardiv in_params = module ($.IParam.mardiv) end,  //currently, a placeholder
   boolean IsFCRA = false
   ) := FUNCTION
   //get marriage and divorce records for did

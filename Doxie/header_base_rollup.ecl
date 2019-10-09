@@ -6,7 +6,7 @@ l_out := record(Layout_HeaderFileSearch)
 	DATASET(doxie.Layout_Rollup.RidRec) rids {maxcount(ut.limits.HEADER_PER_DID)};
 end;
 
-export dataset(l_out) header_base_rollup(DATASET(doxie.Layout_HeaderFileSearch) infile) :=
+export dataset(l_out) header_base_rollup(DATASET(doxie.Layout_HeaderFileSearch) infile, doxie.IDataAccess mod_access) :=
 FUNCTION
 
 // add Listing rids
@@ -27,7 +27,7 @@ doxie.Layout_Rollup.RidRecDid getRids(infile L) := transform
 	self							:= L;
 END;
 inRids := dedup(sort(project(infile,getRids(left)),record),record);
-srcRids := doxie.lookup_rid_src(inRids, true);
+srcRids := doxie.lookup_rid_src(inRids, mod_access, true);
 
 // and merge them into the dataset
 l_out addRids(with_listings le, srcRids ri) := transform

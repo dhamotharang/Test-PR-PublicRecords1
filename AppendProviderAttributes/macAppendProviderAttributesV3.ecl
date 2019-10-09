@@ -140,6 +140,7 @@ EXPORT macAppendProviderAttributesV3 (Infile, InputLnpid, InputState, UseIndexTh
 			STRING2	  #EXPAND(appendPrefix + 'ClientInactiveLicenseState');			
 			STRING25  #EXPAND(appendPrefix + 'ClientInactiveLicenseNumber');
 			UNSIGNED4 #EXPAND(appendPrefix + 'ClientInactiveLicenseDate');
+			#IF((BOOLEAN)AppendProviderAttributes.ShellConfig.isCCPA) STRING1 #EXPAND(appendPrefix + 'OptOutInd') := ''; #END
 		END;		
 		
 		//concatenate these in the output
@@ -155,7 +156,7 @@ EXPORT macAppendProviderAttributesV3 (Infile, InputLnpid, InputState, UseIndexTh
 		joinKeyDs := PROJECT(validLnpidDsDist, joinKeyRecord, LOCAL);
 		joinKeyDsDedup := DEDUP(SORT(joinKeyDs, InputLnpid, LOCAL), InputLnpid, LOCAL);
 		
-		joinDs := hipie_ecl.macJoinKey(joinKeyDsDedup, AppendProviderAttributes.Key_Provider_Attributes_v3,
+		joinDs := hipie_ecl.macJoinKey(joinKeyDsDedup, AppendProviderAttributes.Key_Provider_Attributes_v4,
 			'KEYED(LEFT.' + #TEXT(InputLnpid) + ' = RIGHT.LNPID)', 
 			'RIGHT.' + #TEXT(InputLnpid) + ' = LEFT.LNPID', 
 			UseIndexThreshold,'INNER',true,1,,,TRUE);
@@ -314,6 +315,7 @@ EXPORT macAppendProviderAttributesV3 (Infile, InputLnpid, InputState, UseIndexTh
 			SELF.#EXPAND(appendPrefix + 'ClientInactiveLicenseState')											:= R.InactiveLicenseStates(L.InputState = State and L.InputState <> '' and DT_LIC_EXPIRATION > 0 and DT_LIC_EXPIRATION < (integer) CURRENT_DATE)[1].State;
 			SELF.#EXPAND(appendPrefix + 'ClientInactiveLicenseNumber')										:= R.InactiveLicenseStates(L.InputState = State and L.InputState <> '' and DT_LIC_EXPIRATION > 0 and DT_LIC_EXPIRATION < (integer) CURRENT_DATE)[1].LIC_NBR;
 			SELF.#EXPAND(appendPrefix + 'ClientInactiveLicenseDate')										  := R.InactiveLicenseStates(L.InputState = State and L.InputState <> '' and DT_LIC_EXPIRATION > 0 and DT_LIC_EXPIRATION < (integer) CURRENT_DATE)[1].DT_LIC_EXPIRATION;
+			#IF((BOOLEAN)AppendProviderAttributes.ShellConfig.isCCPA) SELF.#EXPAND(appendPrefix + 'OptOutInd') := R.optoutind,#END
 			SELF :=  L;
 			SELF :=  R;
 			SELF :=  [];

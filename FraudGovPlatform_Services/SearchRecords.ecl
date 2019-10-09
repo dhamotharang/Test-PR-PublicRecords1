@@ -175,6 +175,12 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// getting the records from deltabase database.
 	ds_delta_recentTransactions := FraudGovPlatform_Services.mod_Deltabase_Functions(batch_params).getDeltabaseSearchRecords();
 	
+	first_recentActivity_date := FraudGovPlatform_Services.Functions.GetLastRecentActivityDate();
+	
+	ds_payload_timeline := PROJECT(ds_allPayloadRecs,FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT));
+	
+	ds_recentTransactions_w_timeline := ds_delta_recentTransactions + ds_payload_timeline(iesp.ECL2ESP.DateToInteger(ReportedDateTime) > first_recentActivity_date);
+	
 	//Getting the public records best to fill identity Detail card.
 	ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids_to_use, batch_params);
 	
@@ -225,16 +231,16 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		SELF.NoOfClusters := L.NumberOfClusters;
 
 		ds_recentTransactions := MAP( 
-				 L.fragment = Fragment_Types_const.PERSON_FRAGMENT => ds_delta_recentTransactions(UniqueId = L.fragment_value),
-				 L.fragment = Fragment_Types_const.SSN_FRAGMENT => ds_delta_recentTransactions(SSN = L.fragment_value),
+				 L.fragment = Fragment_Types_const.PERSON_FRAGMENT => ds_recentTransactions_w_timeline(UniqueId = L.fragment_value),
+				 L.fragment = Fragment_Types_const.SSN_FRAGMENT => ds_recentTransactions_w_timeline(SSN = L.fragment_value),
 				 L.fragment = Fragment_Types_const.NAME_FRAGMENT => 
-															ds_delta_recentTransactions(
+															ds_recentTransactions_w_timeline(
 																		STD.Str.ToUpperCase(
 																				Address.NameFromComponents(STD.Str.CleanSpaces(Name.First), '', 
 																				STD.Str.CleanSpaces(Name.Last),'')) = STD.Str.ToUpperCase(STD.Str.CleanSpaces(L.fragment_value))),
 
 				 L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => 
-															ds_delta_recentTransactions(
+															ds_recentTransactions_w_timeline(
 					  												STD.Str.ToUpperCase(
 																		  STD.Str.CleanSpaces(PhysicalAddress.StreetAddress1) +'@@@' + 
 															  					Address.Addr2FromComponents(STD.Str.CleanSPaces(PhysicalAddress.City), 
@@ -243,24 +249,24 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																						) = STD.Str.ToUpperCase(STD.Str.CleanSPaces(L.fragment_value))),
 
 																		
-				 L.fragment = Fragment_Types_const.PHONE_FRAGMENT => ds_delta_recentTransactions(Phones[1].PhoneNumber = L.fragment_value),
-				 L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => ds_delta_recentTransactions(IpAddress = L.fragment_value),
+				 L.fragment = Fragment_Types_const.PHONE_FRAGMENT => ds_recentTransactions_w_timeline(Phones[1].PhoneNumber = L.fragment_value),
+				 L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => ds_recentTransactions_w_timeline(IpAddress = L.fragment_value),
 				 L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => 
-															ds_delta_recentTransactions(BankInformation1.BankAccountNumber = 
+															ds_recentTransactions_w_timeline(BankInformation1.BankAccountNumber = 
 																			FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(L.fragment_value)),
-				 L.fragment = Fragment_Types_const.EMAIL_FRAGMENT => ds_delta_recentTransactions(
+				 L.fragment = Fragment_Types_const.EMAIL_FRAGMENT => ds_recentTransactions_w_timeline(
 																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(EmailAddress)) = 
 																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(L.fragment_value))),																			
 				 L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => 
-															ds_delta_recentTransactions(DriversLicense.DriversLicenseNumber = L.fragment_value AND 
+															ds_recentTransactions_w_timeline(DriversLicense.DriversLicenseNumber = L.fragment_value AND 
 																													DriversLicense.DriversLicenseState = ds_in[1].dl_state),
 				 DATASET([], iesp.fraudgovreport.t_FraudGovTimelineDetails));
 
 		ds_recentTransactions_sorted := SORT(ds_recentTransactions,-eventDate.year, -eventDate.Month, -eventDate.day);
 
-		numOfDeltabaseTransactions := COUNT(ds_recentTransactions);
+		numOfDeltabaseTransactions := COUNT(ds_recentTransactions(IsRecentActivity=true));
 		
-		SELF.NoOfRecentTransactions := numOfDeltabaseTransactions;
+		SELF.NoOfRecentTransactions := COUNT(ds_recentTransactions);
 		SELF.NoOfTransactions := R.NoOfTransactions + numOfDeltabaseTransactions; //Total velocity count.
 		SELF.NoOfKnownRisks := R.NoOfKnownRisks; //Total Known Risk count.
 		SELF.LastActivityDate := IF(numOfDeltabaseTransactions = 0,
@@ -291,7 +297,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
 	// output(ds_in, named('ds_in'));
 	// output(batch_params.DIDScoreThreshold, named('DIDScoreThreshold'));
-	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
+	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'), EXTEND);
 	// output(DidFoundInPR, named('DidFoundInPR'));
 	// output(IsInputDidRINID, named('IsInputDidRINID'));
 	// output(ds_in_didville_layout, named('ds_in_didville_layout'));

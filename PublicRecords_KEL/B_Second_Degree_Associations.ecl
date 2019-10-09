@@ -1,16 +1,14 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.6
-IMPORT KEL011 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+IMPORT KEL11 AS KEL;
 IMPORT CFG_Compile,E_First_Degree_Associations,E_Person,E_Second_Degree_Associations FROM PublicRecords_KEL;
-IMPORT * FROM KEL011.Null;
+IMPORT * FROM KEL11.Null;
 EXPORT B_Second_Degree_Associations(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_First_Degree_Associations(__in,__cfg).__Result) __E_First_Degree_Associations := E_First_Degree_Associations(__in,__cfg).__Result;
-  SHARED VIRTUAL TYPEOF(E_Second_Degree_Associations(__in,__cfg).__Result) __E_Second_Degree_Associations := E_Second_Degree_Associations(__in,__cfg).__Result;
-  SHARED __EE798163 := __E_Second_Degree_Associations;
-  SHARED __EE798211 := __E_First_Degree_Associations;
-  SHARED __EE798222 := __EE798211(__NN(__EE798211.First_Degree_Association_));
-  SHARED __EE798421 := __EE798211;
-  SHARED __EE798436 := __EE798421(__NN(__EE798421.Subject_));
-  SHARED __ST797592_Layout := RECORD
+  SHARED __EE1420814 := __E_First_Degree_Associations;
+  SHARED __EE1421551 := __EE1420814(__NN(__EE1420814.First_Degree_Association_));
+  SHARED __EE1421799 := __EE1420814;
+  SHARED __EE1421811 := __EE1421799(__NN(__EE1421799.Subject_));
+  SHARED __ST1421262_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Person().Typ) First_Degree_Association_;
     KEL.typ.nint Title_;
@@ -33,8 +31,8 @@ EXPORT B_Second_Degree_Associations(CFG_Compile.FDCDataset __in = CFG_Compile.FD
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC798446(E_First_Degree_Associations(__in,__cfg).Layout __EE798222, E_First_Degree_Associations(__in,__cfg).Layout __EE798436) := __NNEQ(__EE798222.First_Degree_Association_,__EE798436.Subject_) AND __T(__AND(__OP2(__EE798222.First_Degree_Association_,=,__EE798436.Subject_),__OP2(__EE798222.Subject_,<>,__EE798436.First_Degree_Association_)));
-  __ST797592_Layout __JT798446(E_First_Degree_Associations(__in,__cfg).Layout __l, E_First_Degree_Associations(__in,__cfg).Layout __r) := TRANSFORM
+  __JC1421821(E_First_Degree_Associations(__in,__cfg).Layout __EE1421551, E_First_Degree_Associations(__in,__cfg).Layout __EE1421811) := __NNEQ(__EE1421551.First_Degree_Association_,__EE1421811.Subject_) AND __T(__AND(__OP2(__EE1421551.First_Degree_Association_,=,__EE1421811.Subject_),__OP2(__EE1421551.Subject_,<>,__EE1421811.First_Degree_Association_)));
+  __ST1421262_Layout __JT1421821(E_First_Degree_Associations(__in,__cfg).Layout __l, E_First_Degree_Associations(__in,__cfg).Layout __r) := TRANSFORM
     SELF.Subject__1_ := __r.Subject_;
     SELF.First_Degree_Association__1_ := __r.First_Degree_Association_;
     SELF.Title__1_ := __r.Title_;
@@ -47,8 +45,8 @@ EXPORT B_Second_Degree_Associations(CFG_Compile.FDCDataset __in = CFG_Compile.FD
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE798447 := JOIN(__EE798222,__EE798436,__JC798446(LEFT,RIGHT),__JT798446(LEFT,RIGHT),INNER,HASH);
-  SHARED __ST797748_Layout := RECORD
+  SHARED __EE1421822 := JOIN(__EE1421551,__EE1421811,__JC1421821(LEFT,RIGHT),__JT1421821(LEFT,RIGHT),INNER,HASH);
+  SHARED __ST1421418_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Person().Typ) First_Degree_Association_;
     KEL.typ.nint Title_;
@@ -72,25 +70,24 @@ EXPORT B_Second_Degree_Associations(CFG_Compile.FDCDataset __in = CFG_Compile.FD
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE798424 := __EE798211;
-  SHARED __EE798496 := __EE798424(__NN(__EE798424.First_Degree_Association_) AND __NN(__EE798424.Subject_));
-  __JC798510(__ST797592_Layout __EE798447, E_First_Degree_Associations(__in,__cfg).Layout __EE798496) := __NNEQ(__EE798447.Subject_,__EE798496.Subject_) AND __NNEQ(__EE798447.First_Degree_Association__1_,__EE798496.First_Degree_Association_) AND __T(__AND(__OP2(__EE798447.Subject_,=,__EE798496.Subject_),__OP2(__EE798447.First_Degree_Association__1_,=,__EE798496.First_Degree_Association_)));
-  __JF798510(E_First_Degree_Associations(__in,__cfg).Layout __EE798496) := __NN(__EE798496.Subject_) OR __NN(__EE798496.First_Degree_Association_);
-  SHARED __EE798511 := JOIN(__EE798447,__EE798496,__JC798510(LEFT,RIGHT),TRANSFORM(__ST797748_Layout,SELF:=LEFT,SELF.First_Degree_Associations_:=__JF798510(RIGHT)),HASH,LEFT OUTER,KEEP(1));
-  SHARED __EE798538 := __EE798511(NOT (__EE798511.First_Degree_Associations_));
-  SHARED __EE798705 := PROJECT(__EE798538,__ST797592_Layout);
-  SHARED E_Second_Degree_Associations(__in,__cfg).Layout __ND798729__Project(__ST797592_Layout __PP798706) := TRANSFORM
-    SELF.First_Degree_Association_ := __PP798706.Subject_;
-    SELF.Second_Degree_Association_ := __PP798706.First_Degree_Association__1_;
-    SELF.Title_ := __PP798706.Title__1_;
-    SELF.Relationship_Type_ := __PP798706.Relationship_Type__1_;
-    SELF.Relationship_Confidence_ := __PP798706.Relationship_Confidence__1_;
-    SELF.Relationship_Score_ := __PP798706.Relationship_Score__1_;
-    SELF.Generation_ := __PP798706.Generation__1_;
-    SELF.Relationship_Date_First_Seen_ := __PP798706.Relationship_Date_First_Seen__1_;
-    SELF.Relationship_Date_Last_Seen_ := __PP798706.Relationship_Date_Last_Seen__1_;
-    SELF := __PP798706;
+  SHARED __EE1421802 := __EE1420814;
+  SHARED __EE1421871 := __EE1421802(__NN(__EE1421802.First_Degree_Association_) AND __NN(__EE1421802.Subject_));
+  __JC1421885(__ST1421262_Layout __EE1421822, E_First_Degree_Associations(__in,__cfg).Layout __EE1421871) := __NNEQ(__EE1421822.Subject_,__EE1421871.Subject_) AND __NNEQ(__EE1421822.First_Degree_Association__1_,__EE1421871.First_Degree_Association_) AND __T(__AND(__OP2(__EE1421822.Subject_,=,__EE1421871.Subject_),__OP2(__EE1421822.First_Degree_Association__1_,=,__EE1421871.First_Degree_Association_)));
+  __JF1421885(E_First_Degree_Associations(__in,__cfg).Layout __EE1421871) := __NN(__EE1421871.Subject_) OR __NN(__EE1421871.First_Degree_Association_);
+  SHARED __EE1421886 := JOIN(__EE1421822,__EE1421871,__JC1421885(LEFT,RIGHT),TRANSFORM(__ST1421418_Layout,SELF:=LEFT,SELF.First_Degree_Associations_:=__JF1421885(RIGHT)),HASH,LEFT OUTER,KEEP(1));
+  SHARED __EE1421913 := __EE1421886(NOT (__EE1421886.First_Degree_Associations_));
+  SHARED __EE1422035 := PROJECT(__EE1421913,__ST1421262_Layout);
+  SHARED E_Second_Degree_Associations(__in,__cfg).Layout __ND1422059__Project(__ST1421262_Layout __PP1422036) := TRANSFORM
+    SELF.First_Degree_Association_ := __PP1422036.Subject_;
+    SELF.Second_Degree_Association_ := __PP1422036.First_Degree_Association__1_;
+    SELF.Title_ := __PP1422036.Title__1_;
+    SELF.Relationship_Type_ := __PP1422036.Relationship_Type__1_;
+    SELF.Relationship_Confidence_ := __PP1422036.Relationship_Confidence__1_;
+    SELF.Relationship_Score_ := __PP1422036.Relationship_Score__1_;
+    SELF.Generation_ := __PP1422036.Generation__1_;
+    SELF.Relationship_Date_First_Seen_ := __PP1422036.Relationship_Date_First_Seen__1_;
+    SELF.Relationship_Date_Last_Seen_ := __PP1422036.Relationship_Date_Last_Seen__1_;
+    SELF := __PP1422036;
   END;
-  SHARED __EE798768 := __EE798163 + PROJECT(TABLE(PROJECT(__EE798705,__ND798729__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),First_Degree_Association_,Second_Degree_Association_,Title_,Relationship_Type_,Relationship_Confidence_,Relationship_Score_,Generation_,Relationship_Date_First_Seen_,Relationship_Date_Last_Seen_},First_Degree_Association_,Second_Degree_Association_,Title_,Relationship_Type_,Relationship_Confidence_,Relationship_Score_,Generation_,Relationship_Date_First_Seen_,Relationship_Date_Last_Seen_,MERGE),E_Second_Degree_Associations(__in,__cfg).Layout);
-  EXPORT __ENH_Second_Degree_Associations := PROJECT(TABLE(PROJECT(__EE798768,E_Second_Degree_Associations(__in,__cfg).Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),First_Degree_Association_,Second_Degree_Association_,Title_,Relationship_Type_,Relationship_Confidence_,Relationship_Score_,Generation_,Relationship_Date_First_Seen_,Relationship_Date_Last_Seen_},First_Degree_Association_,Second_Degree_Association_,Title_,Relationship_Type_,Relationship_Confidence_,Relationship_Score_,Generation_,Relationship_Date_First_Seen_,Relationship_Date_Last_Seen_,MERGE),E_Second_Degree_Associations(__in,__cfg).Layout);
+  EXPORT __ENH_Second_Degree_Associations := PROJECT(TABLE(PROJECT(__EE1422035,__ND1422059__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),First_Degree_Association_,Second_Degree_Association_,Title_,Relationship_Type_,Relationship_Confidence_,Relationship_Score_,Generation_,Relationship_Date_First_Seen_,Relationship_Date_Last_Seen_},First_Degree_Association_,Second_Degree_Association_,Title_,Relationship_Type_,Relationship_Confidence_,Relationship_Score_,Generation_,Relationship_Date_First_Seen_,Relationship_Date_Last_Seen_,MERGE),E_Second_Degree_Associations(__in,__cfg).Layout);
 END;

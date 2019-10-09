@@ -1,4 +1,4 @@
-import doxie, header_slimsort, header;
+import dx_Header;
 
 CN := PhilipMorris.Constants;
 LT := PhilipMorris.Layouts;
@@ -14,7 +14,7 @@ export fn_getSearchPassSSNIgnoreLastNameCandidates(DATASET(LT.Clean.FullRecordNo
 																
 	searchpass_candidates_dids := join(		
 			 searchDataLocal, 			 
-			 doxie.Key_Header_SSN,//s1-s9, dph_lname, pfname, did
+			 dx_Header.key_SSN(),//s1-s9, dph_lname, pfname, did
 			 keyed(
 				left.SearchSSN[1] = right.s1 and
     		left.SearchSSN[2] = right.s2 and
@@ -40,7 +40,7 @@ export fn_getSearchPassSSNIgnoreLastNameCandidates(DATASET(LT.Clean.FullRecordNo
 	searchpass_candidates_dids_sorted  := sort(searchpass_candidates_dids, InternalSeqNo, SearchAddress.ADDRESSID, did);
 	searchpass_candidates_dids_deduped := dedup(searchpass_candidates_dids_sorted, InternalSeqNo, SearchAddress.ADDRESSID, did);
 															
-	dirty_header_records	:= join (searchpass_candidates_dids_deduped, doxie.key_header,
+	dirty_header_records	:= join (searchpass_candidates_dids_deduped, dx_Header.key_header(),
 														keyed(LEFT.did = RIGHT.s_did) and 
 														// conditions from did search also apply here.. don't need the extra records 
 														left.SearchSSN=right.ssn and

@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.6
-IMPORT KEL011 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+IMPORT KEL11 AS KEL;
 IMPORT CFG_Compile,E_Person,E_Person_S_S_N,E_Social_Security_Number FROM PublicRecords_KEL;
-IMPORT * FROM KEL011.Null;
+IMPORT * FROM KEL11.Null;
 EXPORT B_Person_S_S_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_S_S_N(__in,__cfg).__Result) __E_Person_S_S_N := E_Person_S_S_N(__in,__cfg).__Result;
-  SHARED __EE791504 := __E_Person_S_S_N;
-  EXPORT __ST47442_Layout := RECORD
+  SHARED __EE1415459 := __E_Person_S_S_N;
+  EXPORT __ST58740_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Social_Security_Number().Typ) Social_;
     KEL.typ.ndataset(E_Person_S_S_N(__in,__cfg).Temp_Legacy_S_S_N_Layout) Temp_Legacy_S_S_N_;
@@ -15,9 +15,9 @@ EXPORT B_Person_S_S_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST47442_Layout __ND791569__Project(E_Person_S_S_N(__in,__cfg).Layout __PP791429) := TRANSFORM
-    SELF.Legacy_S_S_N_ := EXISTS(__T(__PP791429.Temp_Legacy_S_S_N_));
-    SELF := __PP791429;
+  SHARED __ST58740_Layout __ND1415528__Project(E_Person_S_S_N(__in,__cfg).Layout __PP1415381) := TRANSFORM
+    SELF.Legacy_S_S_N_ := EXISTS(__T(__PP1415381.Temp_Legacy_S_S_N_));
+    SELF := __PP1415381;
   END;
-  EXPORT __ENH_Person_S_S_N := PROJECT(__EE791504,__ND791569__Project(LEFT));
+  EXPORT __ENH_Person_S_S_N := PROJECT(__EE1415459,__ND1415528__Project(LEFT));
 END;

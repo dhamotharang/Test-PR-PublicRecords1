@@ -33,19 +33,22 @@ shared boolean is_knowx := modAccess.isConsumer ();
 export mod_Daily(dataset(Doxie.layout_references_hh) d):=
 MODULE
 
-  shared DailyGong := 
+  shared DailyGong :=
     IF(include_dailies AND ~is_knowx,
-       gong_services.Fetch_Gong_History(d(~includedByHHID),true,true,,/*did_onlyL:=*/ not DoSearch or GongByDidOnly,suppress_gong_noncurrent, 
-                                        AllowLeadingLnameMatch := AutoKey.skipSetTools(daily_autokey_skipset).AddZipL, 
-                                        AllowFallBack := AllowGongFallBack, AllowLooseSuffixMatch:=false));
-  shared DailyUtil := 
+      gong_services.Fetch_Gong_History(d(~includedByHHID), modAccess, true, true,
+      did_onlyL := not DoSearch or GongByDidOnly,
+      SuppressNoncurrent := suppress_gong_noncurrent,
+      AllowLeadingLnameMatch := AutoKey.skipSetTools(daily_autokey_skipset).AddZipL,
+      AllowFallBack := AllowGongFallBack, AllowLooseSuffixMatch:=false));
+
+  shared DailyUtil :=
     IF(include_dailies AND ~modAccess.isUtility() and ~is_knowx and glb_ok /* glb_ok is redundant here, because the underlying attributes apply glb. But it should perform better, since we avoid an additional call. */,
-       IF(DoSearch, 
+       IF(DoSearch,
           doxie.Fetch_Utility_Daily(d,modAccess,allow_wildcard,daily_autokey_skipset,ApplyBpsFilter),
           Doxie_Raw.Util_Daily_Raw(d, modAccess)));
-  shared DailyQuick := 
-    IF(include_dailies AND ~is_knowx, 
-       IF(DoSearch, 
+  shared DailyQuick :=
+    IF(include_dailies AND ~is_knowx,
+       IF(DoSearch,
           header_quick.fetch_records(d, modAccess, include_dailies, allow_wildcard,daily_autokey_skipset,ApplyBpsFilter),
                     doxie_Raw.QuickHeader_raw(d, modAccess, maskSSN:=false)));
 
@@ -56,10 +59,10 @@ MODULE
     PROJECT(DailyUtil((unsigned6)did<>0),TRANSFORM(layout_references_hh, SELF.did := (unsigned6)LEFT.did;SELF := LEFT;))+
     PROJECT(DailyQuick(did<>0),layout_references_hh)+
     d,all);
-        
+
 
   //***** FORMAT AND CHECK PERMISSIONS FOR AND EXPORT THE DAILIES
-    
+
   doxie.layout_header_records gong2Pretty(DailyGong le, INTEGER i) :=
   TRANSFORM
     isCur := le.current_record_flag='Y';
@@ -138,13 +141,13 @@ MODULE
     self.valid_ssn := if(ri.did = 0, 'U', ri.valid_ssn);
     self := le;
   end;
-  
-  dailies_w_validssn := join(dailies_pre(ssn <> ''), doxie.Key_Header, 
-                             keyed(left.did = right.s_did) and 
-                                   left.ssn = right.ssn and 
-                                   right.valid_ssn <> 'M', 
+
+  dailies_w_validssn := join(dailies_pre(ssn <> ''), doxie.Key_Header,
+                             keyed(left.did = right.s_did) and
+                                   left.ssn = right.ssn and
+                                   right.valid_ssn <> 'M',
                              getValidSSN(left, right), left outer, keep(1), limit (0));
-  
+
   dailies := dailies_pre(ssn = '') + dailies_w_validssn;
 
   // output(industry_class);
@@ -153,31 +156,31 @@ MODULE
   // output(DailyUtil);
   //output(dailies_uncleaned);
   //output(dailies);
-  
+
   export Records := project(dailies, doxie.layout_presentation);
 END;
 
 //***** FETCH AND CHECK PERMISSIONS FOR AND EXPORT THE HEADER RECORDS
 export mod_Header(dataset(Doxie.layout_references_hh) d):=
 MODULE
-  
+
   HeaderPretty_MACRO(key_hp,hp_out) := MACRO
   hp_out := join(d, key_hp, KEYED(left.did=right.s_did) and
                               doxie.DidType.Test(right.lookup_did, did_bitmask) and
-                              (not ApplyBpsFilter or 
+                              (not ApplyBpsFilter or
                               doxie.bpssearch_filter.rec_OK(right.ssn, right.lname,right.fname,right.mname,
                                                             right.prim_range,right.prim_name,right.suffix,
                                                             right.sec_range,right.city_name,right.zip,
                                                             right.phone,right.listed_phone,right.dob)
-                              ), 
-                       transform(doxie.layout_header_records, 
+                              ),
+                       transform(doxie.layout_header_records,
                                  self.includedByHHID := left.includedByHHID,
                                  SELF.global_sid:= RIGHT.global_sid,
                                  SELF.record_sid:= RIGHT.record_sid,
                                  self := right,
                                  self.penalt := 0,
                                  self.num_compares := 0),
-                       LIMIT(ut.limits .DID_PER_PERSON, SKIP));	
+                       LIMIT(ut.limits .DID_PER_PERSON, SKIP));
   ENDMACRO;
   HeaderPretty_MACRO(Infutor.Key_Header_Infutor_Knowx,infr_out1)
   HeaderPretty_MACRO(doxie.key_header,hdr_out1)
@@ -195,7 +198,7 @@ END;
 
 export Results(dataset(Doxie.layout_references_hh) d) :=
 project(
-  mod_Daily(d).Records + mod_Header(d).Records, 
+  mod_Daily(d).Records + mod_Header(d).Records,
   doxie.layout_presentation
 );
 

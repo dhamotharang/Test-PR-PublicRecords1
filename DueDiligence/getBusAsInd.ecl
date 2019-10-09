@@ -1,10 +1,10 @@
-﻿IMPORT Advo, BIPv2, Business_Risk, Business_Risk_BIP, Drivers, DueDiligence, doxie, Header, MDR, Risk_Indicators, UT;
+﻿IMPORT Advo, BIPv2, Business_Risk, Business_Risk_BIP, Drivers, DueDiligence, dx_Header, MDR, Risk_Indicators, UT;
 
 /* 
 	Following Keys being used:
 			Advo.Key_Addr1_history
-			doxie.Key_Header_SSN
-			doxie.Key_Header
+			dx_header.key_ssn
+			dx_Header.key_header
 			Business_Risk.Key_SSN_Address
 */
 
@@ -83,7 +83,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													
     //Taken from Business_Risk_BIP.getConsumerHeader
     //Grab all DID's associated with the business FEIN
-    feinIsSSNWithDID := JOIN(indata, doxie.Key_Header_SSN, //Input Business FEIN Matches Header SSN
+    feinIsSSNWithDID := JOIN(indata, dx_header.key_ssn(), //Input Business FEIN Matches Header SSN
                               (INTEGER)LEFT.Busn_info.fein > 0 AND LENGTH(TRIM(LEFT.Busn_info.fein)) = 9 AND
                               KEYED(LEFT.Busn_info.fein[1] = RIGHT.S1 AND 
                                     LEFT.Busn_info.fein[2] = RIGHT.S2 AND 
@@ -151,7 +151,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                            
 
     //If the FEIN is an SSN of a BEO then continue looking up information to determine if the business is a SOHO (Small Office/Home Office)
-    consumerHeaderDidRaw := JOIN(FEINisSSNofBEO, doxie.Key_Header, 
+    consumerHeaderDidRaw := JOIN(FEINisSSNofBEO, dx_Header.key_header(),
                                   LEFT.did > 0 AND 
                                   KEYED(LEFT.did = RIGHT.s_did) AND
                                   ((INTEGER)LEFT.fein > 0 AND LEFT.fein = RIGHT.ssn) AND 
@@ -159,7 +159,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                   ut.PermissionTools.glb.SrcOk(Options.GLBA_Purpose, RIGHT.src, RIGHT.dt_first_seen) AND
                                   RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(Options.DataRestrictionMask, FALSE) AND
                                   (MDR.Source_is_DPPA(RIGHT.src) = FALSE OR
-                                  (Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE) AND Drivers.State_DPPA_OK(Header.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
+                                  (Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE) AND Drivers.State_DPPA_OK(dx_Header.functions.translateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
                                   Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
                                   TRANSFORM({STRING fname, STRING mname, STRING lname, STRING name_suffix, STRING dt_first_seen, STRING dt_last_seen, 
                                                             INTEGER feinPersonAddrOverlap, UNSIGNED feinPersonNameMatchLevel, RECORDOF(LEFT)},

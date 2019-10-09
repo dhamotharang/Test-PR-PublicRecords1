@@ -1,4 +1,4 @@
-EXPORT mac_assign_lnpid_with_description  (Infile,Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_SNAME = '',Input_GENDER = '',
+﻿EXPORT mac_assign_lnpid_with_description  (Infile,Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_SNAME = '',Input_GENDER = '',
 																									Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_V_CITY_Name = '',
 																									Input_ST = '',Input_ZIP = '',Input_SSN = '',Input_DOB = '',Input_PHONE = '',Input_LIC_STATE = '',Input_LIC_NBR = '',
 																									Input_TAX_ID = '',Input_DEA_NUMBER = '',Input_VENDOR_ID = '',Input_NPI_NUMBER = '',
@@ -120,7 +120,7 @@ layout_ref assignDID (infiledist l, exlinkdist r) := TRANSFORM
 																		IF (r.results[1].LOCALE_match_code 		 = 99, '-',  (STRING)r.results[1].LOCALE_match_code) + '/' + 
 																		IF (r.results[1].ADDRESS_match_code 		 = 99, '-',  (STRING)r.results[1].ADDRESS_match_code);
   self.pid_keys_desc := Health_Provider_Services.Process_xLNPID_Layouts.KeysUsedToText(r.results[1].keys_used);
-	noMatch := [(String)SALT29.MatchCode.OneComponentNull, (String)SALT29.MatchCode.OneSideNull, '0', '-'];
+	noMatch := [(String)SALT311.MatchCode.OneComponentNull, (String)SALT311.MatchCode.OneSideNull, '0', '-'];
 	m := self.pid_matches;
 	matchSet := StringLib.SplitWords(m, '/', false);
 	res := IF(TRIM(M)='',m, 

@@ -7,9 +7,9 @@ Common e-mail Num EDU - btst_edu_emails_in_common - Number of unique EDU emails 
 Common e-mail Num Corp - btst_corp_emails_in_common - Number of unique Corp emails in intersection of BT emails and ST emails
 */
 
-import email_data, riskwise, ut, mdr, risk_indicators;
+import email_data, riskwise, risk_indicators, doxie, Suppress;
 
-export Boca_Shell_BtSt_Email(grouped dataset(Risk_Indicators.layout_ciid_btst_Output) input) := FUNCTION
+export Boca_Shell_BtSt_Email(grouped dataset(Risk_Indicators.layout_ciid_btst_Output) input, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	email_tmp := record
 		unsigned4 bt_seq;	
@@ -23,15 +23,43 @@ export Boca_Shell_BtSt_Email(grouped dataset(Risk_Indicators.layout_ciid_btst_Ou
 		integer btst_corp_emails_in_common := 0;
 	end;
 
-
-	email_tmp	email_details(Risk_Indicators.layout_ciid_btst_Output le, email_data.key_did rt, integer c) := transform
+    email_tmp_CCPA := RECORD
+      unsigned6 did;  //CCPA Changes
+      unsigned4 global_sid; //CCPA Changes
+      email_tmp;
+    END;
+    
+    getBtStEmailDetails(btStField, btStSeqField, EmailDetailsCount) := FUNCTIONMACRO
+	email_tmp_CCPA	email_details(Risk_Indicators.layout_ciid_btst_Output le, email_data.key_did rt, integer c) := transform
+        self.did := rt.did;
+        self.global_sid := rt.global_sid;
 		self.bt_seq := if(c = 1, le.bill_to_output.seq, 0);
 		self.st_seq := if(c = 2, le.ship_to_output.seq, 0);	
 		self.domain_type := TRIM(rt.append_domain_type);
 		self.email := rt.clean_email;
 		self := []
 	end;
-	
+
+	emails_orig_unsuppressed := join(input, email_data.key_did,
+				left.#EXPAND(btStField).did <> 0 and 
+				keyed(left.#EXPAND(btStField).did=right.did) and
+				right.email_src IN Risk_Indicators.iid_constants.SetEmailSources and
+				right.did < Risk_Indicators.iid_constants.EmailFakeIds and // don't include Fake DIDs
+				(unsigned)right.date_first_seen[1..6] < left.#EXPAND(btStField).historydate,
+			email_details(left, right, EmailDetailsCount), 
+				atmost(riskwise.max_atmost), keep(1000), left outer);
+                                                  
+    emails_orig := Suppress.Suppress_ReturnOldLayout(emails_orig_unsuppressed, mod_access, email_tmp);
+                                                  
+	emails := sort(dedup(emails_orig, #EXPAND(btStSeqField), email), #EXPAND(btStSeqField), email);
+  
+    RETURN emails;
+    
+    ENDMACRO;
+    
+    bt_emails := getBtStEmailDetails('bill_to_output', 'bt_seq', 1);
+    st_emails := getBtStEmailDetails('ship_to_output', 'st_seq', 2);
+
 	email_tmp email_combo(email_tmp l, email_tmp r) := transform	
 		self.bt_seq := l.bt_seq;
 		self.btst_emails_in_common := if(l.email <>'' and r.email <>'' and l.email = r.email, 1, 0);
@@ -44,29 +72,7 @@ export Boca_Shell_BtSt_Email(grouped dataset(Risk_Indicators.layout_ciid_btst_Ou
 		self.email := '';
 		self := [];
 	end;
-
-	bt_emails_orig := join(input, email_data.key_did,
-				left.bill_to_output.did <> 0 and 
-				keyed(left.bill_to_output.did=right.did) and
-				right.email_src IN Risk_Indicators.iid_constants.SetEmailSources and
-				right.did < Risk_Indicators.iid_constants.EmailFakeIds and // don't include Fake DIDs
-				(unsigned)right.date_first_seen[1..6] < left.bill_to_output.historydate,
-			email_details(left, right, 1), 
-				atmost(riskwise.max_atmost), keep(1000), left outer);
-
-	bt_emails := sort(dedup(bt_emails_orig, bt_seq, email), bt_seq, email);
-
-	st_emails_orig := join(input, email_data.key_did,
-				left.ship_to_output.did <> 0 and 
-				keyed(left.ship_to_output.did=right.did) and
-				right.email_src IN Risk_Indicators.iid_constants.setEmailsources and
-				right.did < Risk_Indicators.iid_constants.EmailFakeIds and // don't include Fake DIDs
-				(unsigned)right.date_first_seen[1..6] < left.ship_to_output.historydate,
-			email_details(left, right, 2), 
-				atmost(riskwise.max_atmost), keep(1000), left outer);
-
-	st_emails := sort(dedup(st_emails_orig, st_seq, email), st_seq, email);
-
+  
 	btst_email_combo_tmp :=	join(bt_emails, st_emails, 
 		left.bt_seq = right.st_seq -1,
 		email_combo(left, right),

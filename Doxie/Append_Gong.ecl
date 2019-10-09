@@ -3,19 +3,18 @@ import lib_datalib, NID; // to be able to call a macro in a JOIN condition
 
 todays_date := (string) STD.Date.Today();
 
-export Append_Gong(DATASET(doxie.layout_presentation) in_f, 
-									 DATASET(doxie.layout_relative_dids_v3) rels, 
-									 integer dcp_value = 5,
-									 boolean include_phonesPlus = FALSE,
-									 unsigned1 score_threshold_value = 0,
-                   unsigned1 GLB_Purpose = 0,
-                   unsigned1 DPPA_Purpose = 0,
-									 string phoneToMatch = '') :=
+export Append_Gong(DATASET(doxie.layout_presentation) in_f,
+  DATASET(doxie.layout_relative_dids_v3) rels,
+  Doxie.IDataAccess mod_access,
+  integer dcp_value = 5,
+  boolean include_phonesPlus = FALSE,
+  unsigned1 score_threshold_value = 0,
+  string phoneToMatch = '') :=
 FUNCTION
 // TODO: only add did in Phones if <> orig did?
 cell_text := 'Possible Cell Phone';
 nonDA_text := 'Possible non DA';
-	
+
 layout_new := doxie.layout_presentation_phones;
 
 layout_didmatch :=
@@ -47,9 +46,9 @@ layout_hhidmatch take_hhid(index_did_hdid le) := transform
   self.hhid := le.hhid_relat;
 	SELF.did2return2 := le.did;
 	SELF.is_relat := true;
-end;  
+end;
 rels2match_hhid := join(rels2match,index_did_hdid,
-                        keyed (left.did=right.did) and 
+                        keyed (left.did=right.did) and
                         keyed (right.ver = 1),
                         take_hhid(right), atmost (ut.limits.HHID_PER_PERSON), left outer);
 
@@ -73,6 +72,8 @@ RECORD
 	unsigned6 hhid := 0;
 	unsigned6 bdid := 0;
 	boolean is_relat;
+  UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 END;
 
 //use the most current gong did records
@@ -80,16 +81,19 @@ layout_gong_out get_did_base(dids le, did_key ri) := transform
 	SELF.is_relat := le.is_relat;
   self.did := le.did;
 	self.did2match := ri.l_did;
+  self.global_sid := ri.global_sid;
+  self.record_sid := ri.record_sid;
 	self := ri;
 	self := [];
-end;  
-  
-did_base_recs := join(dids,did_key,
-                        left.did2match = right.l_did,get_did_base(left,right), ATMOST(50));
+end;
 
+_did_base_recs := join(dids,did_key,
+  left.did2match = right.l_did,get_did_base(left,right), ATMOST(50));
+
+did_base_recs := Suppress.MAC_SuppressSource(_did_base_recs, mod_access, did2match);
 final_did := dedup(sort(did_base_recs(ut.NNEQ(phoneToMatch,phone10)),
 									 bdid,did,listed_name,phone10),bdid,did,listed_name,phone10);
-									 
+
 //use the most current gong hhid records
 layout_gong_out get_hhid_base(in_hhid le, hhid_key ri) := transform
   SELF.did2return2 := le.did2return2;
@@ -97,11 +101,11 @@ layout_gong_out get_hhid_base(in_hhid le, hhid_key ri) := transform
 	SELF.is_relat := le.is_relat;
 	self := ri;
 	self := [];
-end;  
-  
+end;
+
 hhid_base_recs := join(in_hhid,hhid_key,
                          left.hhid = right.s_hhid,get_hhid_base(LEFT, RIGHT), ATMOST(50));
-			    
+
 final_hhid := dedup(sort(hhid_base_recs(ut.NNEQ(phoneToMatch,phone10)),
 										bdid,did,listed_name,phone10),bdid,did,listed_name,phone10);;
 
@@ -114,17 +118,17 @@ relats_hhids := PROJECT(final_hhid(is_relat), hhid2did(LEFT));
 
 non_relat_dids := project(dids(~is_relat),doxie.layout_references);
 doxie.mac_best_records(non_relat_dids,did,b,true,true,false,doxie.DataRestriction.fixed_DRM);
-/*NOTE: Notice that glb_per has been set as TRUE even when GLB_Purpose is a parameter received by this attribute. 
+/*NOTE: Notice that glb_per has been set as TRUE even when GLB_Purpose is a parameter received by this attribute.
 				The reason for doing that is because the address of the best record (returned by mac_best_records) is used solely to categorize
 				the address that the procedure actually returns.  GLB information is not exposed at this point.
-				Furthermore, the hardcoded value of TRUE is necessary for a consistent result of the value of "tnt", which is the only one affected (see next TRANSFORM) 
+				Furthermore, the hardcoded value of TRUE is necessary for a consistent result of the value of "tnt", which is the only one affected (see next TRANSFORM)
 				This comment was added for ticket 191943 */
 
 doxie.layout_presentation init_tnt(doxie.layout_presentation le, b ri) := transform
-	self.tnt := if(DID_Add.Address_Match_Score(LE.prim_range, LE.prim_name, LE.sec_range, LE.zip, 
+	self.tnt := if(DID_Add.Address_Match_Score(LE.prim_range, LE.prim_name, LE.sec_range, LE.zip,
 							RI.prim_range, RI.prim_name, RI.sec_range, RI.zip) BETWEEN 76 AND 254
 	                AND le.prim_range=ri.prim_range,
-				'C', 'H');			 
+				'C', 'H');
 	self := le;
 end;
 
@@ -144,7 +148,7 @@ in_init := join(in_init_ready, f_slim_ap_roll,
 	  	      left.prim_name=right.prim_name and
 			 left.prim_range=right.prim_range and
 			 left.st=right.st and
-			 left.zip=right.zip and 
+			 left.zip=right.zip and
 			 left.phone=right.phone,
 			 append_phone_dates(left, right), left outer, keep(1));
 
@@ -166,13 +170,13 @@ TRANSFORM
 	SELF.carrier := '';
 	SELF.carrier_city := '';
 	SELF.carrier_state := '';
-	SELF.PhoneType := ''; 
+	SELF.PhoneType := '';
 	SELF.phone_first_seen := (integer)le.filedate[1..6];
 	SELF.phone_last_seen := (integer)(todays_date[1..6]);
 	SELF.timezone := '';
 	SELF := le;
 END;
-  
+
 ext_in_rec checkgDID(in_init le, final_did ri) := transform
 	self.listed_name := ri.listed_name;
 	self.listed_name_prefix:= ri.name_prefix;
@@ -183,8 +187,8 @@ ext_in_rec checkgDID(in_init le, final_did ri) := transform
 	self.listed_phone := ri.phone10;
 	SELF.phone_first_seen := if(ri.phone10='',le.phone_first_seen,(integer)ri.filedate[1..6]);
 	SELF.phone_last_seen := if(ri.phone10='',le.phone_last_seen,(integer)(todays_date[1..6]));
-	self.gong_score := if(ri.listed_name = '', 500, 
-					  datalib.nameMatch(le.fname, le.mname, le.lname, 
+	self.gong_score := if(ri.listed_name = '', 500,
+					  datalib.nameMatch(le.fname, le.mname, le.lname,
 									ri.name_first, ri.name_middle, ri.name_last));
 	self.tnt := map(ri.is_relat => le.tnt,
 				 ri.did != 0 AND le.tnt = 'C' => 'B',
@@ -192,17 +196,17 @@ ext_in_rec checkgDID(in_init le, final_did ri) := transform
 				 ri.did != 0 AND ut.DaysApart(le.dt_last_seen+'00', todays_date) < 31*6 => 'P',
 				 le.tnt);
 	SELF.phones := IF(ri.did<>0,DATASET(PROJECT(ri,add_did_phones(LEFT,self.gong_score))));
-	SELF.publish_code := ri.publish_code; 
+	SELF.publish_code := ri.publish_code;
 	SELF := le;
 END;
 
-in_by_did := JOIN(in_init, final_did+relats_hhids, 
-			     LEFT.did = RIGHT.did AND 
-			     ((DID_Add.Address_Match_Score(LEFT.prim_range, LEFT.prim_name, LEFT.sec_range, LEFT.zip, 
-		     	  				RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range, RIGHT.z5) BETWEEN 76 AND 254 AND 
+in_by_did := JOIN(in_init, final_did+relats_hhids,
+			     LEFT.did = RIGHT.did AND
+			     ((DID_Add.Address_Match_Score(LEFT.prim_range, LEFT.prim_name, LEFT.sec_range, LEFT.zip,
+		     	  				RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range, RIGHT.z5) BETWEEN 76 AND 254 AND
 					 LEFT.prim_range=RIGHT.prim_range) OR
            (RIGHT.prim_name='' AND RIGHT.prim_range='' AND LEFT.zip=RIGHT.z5 AND
-            (LEFT.tnt='C' OR 
+            (LEFT.tnt='C' OR
 						(ut.DaysApart(LEFT.dt_last_seen+'00', todays_date) < ut.DaysInNYears(1))))),
                     checkgDID(LEFT, RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL);
 
@@ -215,10 +219,10 @@ END;
 justdids := dedup(sort(project(in_init, didTrans(left)),did),did);
 phplRecs := moxie_phonesplus_server.phonesplus_did_records (
             justdids,
-            iesp.Constants.BR.MaxPhonesPlus, 
+            iesp.Constants.BR.MaxPhonesPlus,
             score_threshold_value,
-            GLB_Purpose,
-            DPPA_Purpose,, TRUE).w_timezoneSeenDt; 
+            mod_access.glb,
+            mod_access.dppa,, TRUE).w_timezoneSeenDt;
 
 doxie.Layout_Phones add_phonesPlus(phplRecs le, integer gong_score) :=
 TRANSFORM
@@ -235,10 +239,10 @@ TRANSFORM
 	SELF.caption_text := '';
 	SELF := le;
 END;
-  
+
 ext_in_rec checkphplDID(in_by_did le, phplRecs ri) := transform
 	SELF.listed_name := ri.listed_name;
-	SELF.listed_name_prefix:= ''; 
+	SELF.listed_name_prefix:= '';
   SELF.listed_name_first:= ri.name_first;
   SELF.listed_name_middle:= ri.name_middle;
   SELF.listed_name_last:= ri.name_last;
@@ -246,17 +250,17 @@ ext_in_rec checkphplDID(in_by_did le, phplRecs ri) := transform
 	SELF.listed_phone := ri.phoneno;
 	SELF.gong_score := if(ri.listed_name = '', 500, datalib.nameMatch(le.fname, le.mname, le.lname, ri.name_first, ri.name_middle, ri.name_last));
 	SELF.phones := IF((integer)ri.did<>0,DATASET(PROJECT(ri,add_phonesPlus(LEFT,self.gong_score))));
-	SELF.publish_code := le.publish_code; 
+	SELF.publish_code := le.publish_code;
 	SELF := le;
 END;
-in_by_phpl := JOIN(in_by_did, phplRecs, (string)LEFT.did = RIGHT.did AND 
-			     ((DID_Add.Address_Match_Score(LEFT.prim_range, LEFT.prim_name, LEFT.sec_range, LEFT.zip, 
-		     	     RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range, RIGHT.z5) BETWEEN 76 AND 254 AND 
-			     LEFT.prim_range=RIGHT.prim_range) OR (RIGHT.prim_name='' AND RIGHT.prim_range='' AND 
-			     LEFT.zip=RIGHT.z5 AND (LEFT.tnt='C' OR 
+in_by_phpl := JOIN(in_by_did, phplRecs, (string)LEFT.did = RIGHT.did AND
+			     ((DID_Add.Address_Match_Score(LEFT.prim_range, LEFT.prim_name, LEFT.sec_range, LEFT.zip,
+		     	     RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range, RIGHT.z5) BETWEEN 76 AND 254 AND
+			     LEFT.prim_range=RIGHT.prim_range) OR (RIGHT.prim_name='' AND RIGHT.prim_range='' AND
+			     LEFT.zip=RIGHT.z5 AND (LEFT.tnt='C' OR
 			     (ut.DaysApart(LEFT.dt_last_seen+'00', todays_date) < ut.DaysInNYears(1))))),
                              checkphplDID(LEFT, RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL);
-in_next := if (include_phonesPlus,in_by_phpl,in_by_did);							 
+in_next := if (include_phonesPlus,in_by_phpl,in_by_did);
 
 //gjw//endOF add PhonesPlus records
 //update listed_name, listed_phone, tnt fields with gong hhid records
@@ -273,7 +277,7 @@ TRANSFORM
 	SELF.carrier := '';
 	SELF.carrier_city := '';
 	SELF.carrier_state := '';
-	SELF.PhoneType := ''; 
+	SELF.PhoneType := '';
 	SELF.phone_first_seen := (integer)le.filedate[1..6];
 	SELF.phone_last_seen := (integer)(todays_date[1..6]);
 	SELF := le;
@@ -307,8 +311,8 @@ END;
 
 in_by_hhid := JOIN(in_next(hhid != 0), final_hhid(~is_relat),
 						dcp_value >=2 AND
-			      left.hhid = right.hhid and 
-				 DID_Add.Address_Match_Score(LEFT.prim_range, LEFT.prim_name, LEFT.sec_range, LEFT.zip, 
+			      left.hhid = right.hhid and
+				 DID_Add.Address_Match_Score(LEFT.prim_range, LEFT.prim_name, LEFT.sec_range, LEFT.zip,
 		     	  				RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range, RIGHT.z5) BETWEEN 76 AND 254
     	              AND LEFT.prim_range=RIGHT.prim_range,
 				 checkgHHID(LEFT, RIGHT), left outer, MANY LOOKUP, PARALLEL) + in_next(hhid = 0);
@@ -364,38 +368,38 @@ out_roll checkAddr(out_roll le, gong.key_address_current ri) := TRANSFORM
 	self.phone_first_seen := if(le.listed_phone = '' and ri.phone10<>'',(integer)ri.date_first_seen[1..6],le.phone_first_seen);
 	self.phone_last_seen := if(le.listed_phone = '' and ri.phone10<>'',(integer)(todays_date[1..6]),le.phone_last_seen);
 	self.publish_code := IF(le.listed_phone != '', le.publish_code, '');
-	SELF.gong_score := if(ri.listed_name = '' 
-	                      or (ri.lname ='' and ri.fname =''), 500, 
-					  						datalib.nameMatch(le.fname, le.mname, le.lname, 
+	SELF.gong_score := if(ri.listed_name = ''
+	                      or (ri.lname ='' and ri.fname =''), 500,
+					  						datalib.nameMatch(le.fname, le.mname, le.lname,
 									ri.fname, ri.mname, ri.lname)) + address.Sec_Range_EQ(le.sec_range,ri.sec_range);
 	// if name/addr match, upgrade tnt to a 'V' since it is a 'virtual' hhid match (test lname match and optional
 	// input phone match)
 	SELF.tnt := IF(le.tnt = 'C' and le.lname = ri.lname and (ut.NNEQ(phoneToMatch,ri.phone10)),'V',le.tnt);
 	SELF.phones := choosen(le.phones&IF(ri.prim_name<>'',DATASET(PROJECT(ri,add_addr_phones(LEFT, self.gong_score)))),rollup_limits.phones);
 	SELF := le;
-END;	
+END;
 
 // Join current Gong records:
 //To avoid inappropriate matches among persons living in apartment buildings, among other things. . .
 //The street number of both addresses must match, *AND* . . .
 // . . .( the LEFT dwelling is a house (apt_cnt <= 1). OR . . .
 // . . .  both dwellings have similar enough sec_ranges. OR . . .
-// . . .  both dwellings have differing sec_ranges but whose occupants have similar enough names ).     
+// . . .  both dwellings have differing sec_ranges but whose occupants have similar enough names ).
 
-j_addr := JOIN(out_roll, gong.key_address_current, 
+j_addr := JOIN(out_roll, gong.key_address_current,
 								(ut.DaysApart((STRING6)LEFT.dt_last_seen+'31',todays_date) < 365 or dcp_value >= 5) AND
 								keyed(LEFT.prim_name = RIGHT.prim_name) AND
 								keyed(LEFT.st = RIGHT.st) AND
 								keyed(LEFT.zip = RIGHT.z5) AND
-								keyed(LEFT.prim_range = RIGHT.prim_range) AND 
+								keyed(LEFT.prim_range = RIGHT.prim_range) AND
                 ut.NNEQ (Left.suffix, Right.suffix) AND
 								doxie.gong_append_utils.MAC_sec_range(true), checkAddr(LEFT,RIGHT), LEFT OUTER, ATMOST(100));
-									 
+
 
 out_roll2_ready := ROLLUP(SORT(j_addr, rid, gong_score, -listed_phone, -listed_name), rid, keepBestTNT(LEFT, RIGHT));
 
-f_slim_ap_roll2 := doxie.fn_roll_gong_dates(project(out_roll2_ready(listed_phone<>''), 
-                                                    transform(doxie.layout_presentation, 
+f_slim_ap_roll2 := doxie.fn_roll_gong_dates(project(out_roll2_ready(listed_phone<>''),
+                                                    transform(doxie.layout_presentation,
 																										           self.prim_name := left.prim_name,
                                                                self.prim_range := left.prim_range,
                                                                self.st := left.st,
@@ -406,7 +410,7 @@ f_slim_ap_roll2 := doxie.fn_roll_gong_dates(project(out_roll2_ready(listed_phone
 out_roll patch_phone_first_seen(out_roll2_ready l, f_slim_ap_roll2 r) := transform
      picked_phone_first_seen := if(r.phone_first_seen < l.phone_first_seen and r.phone_first_seen>0,r.phone_first_seen,l.phone_first_seen);
 	   SELF.phone_first_seen := picked_phone_first_seen;
-     SELF.phones := project(l.phones, transform(doxie.Layout_Phones, 
+     SELF.phones := project(l.phones, transform(doxie.Layout_Phones,
 	                                           SELF.phone_first_seen := if(left.phone10 = l.listed_phone and left.match_type<>3, picked_phone_first_seen, left.phone_first_seen),
 	                                           SELF := LEFT));
 	self := l;
@@ -416,10 +420,10 @@ out_roll2 := join(out_roll2_ready, f_slim_ap_roll2,
                   left.prim_name=right.prim_name and
 			            left.prim_range=right.prim_range and
 			            left.st=right.st and
-			            left.zip=right.zip and 
+			            left.zip=right.zip and
 			            left.listed_phone=right.phone,
 			            patch_phone_first_seen(left, right), left outer, keep(1));
-			   
+
 doxie.Layout_Phones AddUnlisted(out_roll2 le, string listed_name) :=
 TRANSFORM
 	SELF.match_type := 0;
@@ -454,16 +458,16 @@ end;
 
 out_roll3 := IF(dcp_value>=4,out_roll2,out_roll);
 
-// For all the other phone numbers we have in the dataset, find all current holders of phone numbers we've 
-//collected, or those that have not been matched by DID, HHID, Name, or Address. NOTE! Doing this will append 
-//a lot of records of people working at a perticular business who share the same phone number. 
+// For all the other phone numbers we have in the dataset, find all current holders of phone numbers we've
+//collected, or those that have not been matched by DID, HHID, Name, or Address. NOTE! Doing this will append
+//a lot of records of people working at a perticular business who share the same phone number.
 
 outReady := JOIN(out_roll3, gong.Key_History_phone, LENGTH(TRIM(LEFT.phone)) = 10 and LEFT.phone[4..10] = RIGHT.p7
-                             and LEFT.phone[1..3] = RIGHT.p3 and RIGHT.current_flag, 
-														 backOne(LEFT,RIGHT), left outer, 
+                             and LEFT.phone[1..3] = RIGHT.p3 and RIGHT.current_flag,
+														 backOne(LEFT,RIGHT), left outer,
 														 ATMOST(LENGTH(TRIM(LEFT.phone)) = 10 and LEFT.phone[4..10] = RIGHT.p7
                              and LEFT.phone[1..3] = RIGHT.p3, 1000));
-				    
+
 //isolate last 7 digits
 normedPhone(string10 p) := p[MAX(1, LENGTH(TRIM(p))-6)..];
 //determine if all zeros (exempt empty phones from consideration -- these are unpublished)
@@ -480,11 +484,11 @@ layout_new checkListed(outReady le, supp_key ri) := transform
 	SELF.phone := IF(le.phone=ri.phone10,'',le.phone);
 	//filter any phones whose last 7 digit are all-zero
 	SELF.phones := le.phones(nonZeroPhone(phone10));
-	SELF.publish_code := IF(le.listed_phone=ri.phone10,'',le.publish_code); 
+	SELF.publish_code := IF(le.listed_phone=ri.phone10,'',le.publish_code);
 	SELF := le;
 END;
 
-outFilt_1 := JOIN(outReady, supp_key, 
+outFilt_1 := JOIN(outReady, supp_key,
 				(LEFT.listed_phone<>'' OR LEFT.phone<>'') AND
 				keyed(LEFT.did=RIGHT.did) AND RIGHT.phone10 IN [LEFT.listed_phone, LEFT.phone],
         checkListed(LEFT,RIGHT), LEFT OUTER, KEEP (1), LIMIT (ut.limits .PHONE_PER_PERSON, SKIP));
@@ -504,7 +508,7 @@ doxie.layout_phones get_timezone_child(doxie.Layout_Phones le):=transform
 	telcordia := Risk_Indicators.Key_Telcordia_tds(length(trim(le.phone10,all))=10 and
 					keyed(le.phone10[1..3]=npa) and
 					keyed(le.phone10[4..6]=nxx))[1];
-	SELF.timezone := ut.TimeZone_Convert((unsigned1) telcordia.timezone,telcordia.state);		
+	SELF.timezone := ut.TimeZone_Convert((unsigned1) telcordia.timezone,telcordia.state);
 	SELF := le;
 END;
 
@@ -525,7 +529,7 @@ ut.getTimeZone(outFilt_w_timezone1,listed_phone,listed_timezone,outFilt_w_timezo
 // output(j_addr_add, NAMED('j_addr_add'));
 // output(out_roll2, NAMED('out_roll2'));
 // output(outReady, NAMED('outReady'));
-    
+
 return outFilt_w_timezone2;
 
 END;

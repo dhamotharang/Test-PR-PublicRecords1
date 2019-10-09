@@ -1,5 +1,5 @@
 ﻿
-IMPORT BusinessInstantID20_Services, iesp, Risk_Indicators, RiskWise, Seed_Files, STD, ut;
+IMPORT BusinessInstantID20_Services, iesp, Risk_Indicators, RiskWise, Seed_Files, STD;
 
 EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) inData = DATASET([],BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo),
 																STRING32 TestDataTableName_in = '',
@@ -47,7 +47,14 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
   fn_CreateFakeDID( STRING fname, STRING lname ) := 
     (UNSIGNED6)(STD.Str.Filter( (STRING)(HASH(fname,lname)), '0123456789' )[1..12]);
 
-	
+  get_rc_dataset(pos, seq) := FunctionMacro
+    ds := dataset([Transform(iesp.smallbusinessanalytics.t_SBARiskIndicator,
+             self.Sequence := seq,
+             self.ReasonCode := #Expand('key1.Model'+pos+'_RC'+seq),
+             self.Description := Risk_Indicators.getHRIDesc(#Expand('key1.Model'+pos+'_RC'+seq)))]);
+    return ds;
+  ENDMACRO;
+
 //rep1	
 	BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout xfm_buildConsumerInstantID_1 := 
 		TRANSFORM
@@ -1169,7 +1176,47 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.OFAC.bus_ofac_sequence_7     	 := key1.bus_watchlist_sequence_7;
 
       SELF.BusinessAddressRisk.AddressIsCMRA := key1.AddressIsCMRA;
-      // SELF.Models := key1.Models;
+      
+
+      model1_rc1 := get_rc_dataset(1, 1);
+      model1_rc2 := get_rc_dataset(1, 2);
+      model1_rc3 := get_rc_dataset(1, 3);
+      model1_rc4 := get_rc_dataset(1, 4);
+      model1_rc5 := get_rc_dataset(1, 5);
+      model1_rc6 := get_rc_dataset(1, 6);
+      
+      temp_model1_reason_codes := model1_rc1 + model1_rc2 + model1_rc3 + model1_rc4 + model1_rc5 + model1_rc6;
+      model1_reason_codes := temp_model1_reason_codes(ReasonCode != '');
+ 
+      model2_rc1 := get_rc_dataset(2, 1);
+      model2_rc2 := get_rc_dataset(2, 2);
+      model2_rc3 := get_rc_dataset(2, 3);
+      model2_rc4 := get_rc_dataset(2, 4);
+      model2_rc5 := get_rc_dataset(2, 5);
+      model2_rc6 := get_rc_dataset(2, 6);
+      
+      temp_model2_reason_codes := model2_rc1 + model2_rc2 + model2_rc3 + model2_rc4 + model2_rc5 + model2_rc6;
+      model2_reason_codes := temp_model2_reason_codes(ReasonCode != '');
+      
+      Model1 := dataset([Transform(iesp.smallbusinessanalytics.t_SBAModelHRI,
+                         self.Name := key1.Model1_Name,
+                         self.Scores := dataset([Transform(iesp.smallbusinessanalytics.t_SBAScoreHRI,
+                                                 self._Type := '0 to 999',
+                                                 self.Value := (Integer)key1.Model1_Score,
+                                                 self.ScoreReasons := model1_reason_codes
+                                               )])
+                        )]);
+      Model2 := dataset([Transform(iesp.smallbusinessanalytics.t_SBAModelHRI,
+                         self.Name := key1.Model2_Name,
+                         self.Scores := dataset([Transform(iesp.smallbusinessanalytics.t_SBAScoreHRI,
+                                                 self._Type := '0 to 999',
+                                                 self.Value := (Integer)key1.Model2_Score,
+                                                 self.ScoreReasons := model2_reason_codes
+                                               )])
+                        )]);
+      
+      
+      SELF.Models := Model1 + Model2;
       // SELF.AttributeGroup := key1.AttributeGroup;
       
 			SELF.ConsumerInstantID               := buildConsumerInstantIDDataset;
@@ -1177,7 +1224,6 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 		END;
 		
 	testseed_intermediateLayout := DATASET( [xfm_toIntermediateLayout] );
-	
 	// output(testseed_intermediateLayout);
 
 	FinalSeed := PROJECT( testseed_intermediateLayout, BusinessInstantID20_Services.xfm_ToIespLayout(LEFT) );

@@ -1,4 +1,4 @@
-﻿IMPORT BIPv2, BizLinkFull, Business_Risk_BIP, Doxie, DueDiligence, iesp, MDR, Risk_Indicators, STD;
+﻿IMPORT BIPv2, BizLinkFull, Business_Risk_BIP, Doxie, DueDiligence, iesp, MDR, Risk_Indicators, dx_header;
 
 
 EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
@@ -216,7 +216,7 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
                       
                       
   //check to see if more than 2 individuals are associated with the ssn                    
-  indsAssocWithSSN := JOIN(uniqueDIDs, doxie.Key_Header_SSN,
+  indsAssocWithSSN := JOIN(uniqueDIDs, dx_header.key_SSN(),
                             (INTEGER)LEFT.SSN > 0 AND LENGTH(TRIM(LEFT.SSN)) = 9 AND
                             KEYED(LEFT.SSN[1] = RIGHT.S1 AND 
                                   LEFT.SSN[2] = RIGHT.S2 AND 
@@ -326,4 +326,4 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
 
    
   RETURN addBEOToReport;                                  
-END;                                  
+END;

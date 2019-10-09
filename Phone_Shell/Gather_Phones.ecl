@@ -1,4 +1,4 @@
-﻿IMPORT Gateway, Phone_Shell, RiskWise, PhoneMart, doxie;
+﻿IMPORT Gateway, Phone_Shell, RiskWise, PhoneMart, doxie, Models, STD;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) Input,
 																																						 DATASET(Gateway.Layouts.Config) Gateways,
@@ -24,7 +24,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 																																						 BOOLEAN BlankOutDuplicatePhones = FALSE,
 																																						 BOOLEAN UsePremiumSource_A = FALSE, 
 																																						 BOOLEAN RunRelocation = FALSE,
-                                                                                                                                                         doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                                       UNSIGNED2 PhoneShellVersion = 10, // use 2-digit notation (10 = Phone Shell Version 1.0, 20 = Version 2.0, etc)
+                                       doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                                       
+  IncludeLexIDCounts := if(PhoneShellVersion >= 21, true, false); // include LexID Count/'all' attributes if PhoneShell Version 2.1+
+  
 	/* ******************************************************************************
    ********************************************************************************
 	 ** This function calls all of the search functions and then joins the results **
@@ -41,33 +45,33 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 
 	 NonSubjectPhones := Phone_Shell.Search_Parent_Spouse_Relative_RawData(Input, GLBPurpose, DPPAPurpose, DataRestrictionMask);
 	 
-	 InputPhones := Phone_Shell.Search_Input(Input, PhoneRestrictionMask);
+	 InputPhones := Phone_Shell.Search_Input(Input, PhoneRestrictionMask, PhoneShellVersion);
 
-	 Infutor := Phone_Shell.Search_Infutor(Input, PhoneRestrictionMask, mod_access);
+	 Infutor := Phone_Shell.Search_Infutor(Input, PhoneRestrictionMask, PhoneShellVersion, mod_access);
 
-	 PeopleAtWork := Phone_Shell.Search_PeopleAtWork(Input, PhoneRestrictionMask, mod_access);
+	 PeopleAtWork := Phone_Shell.Search_PeopleAtWork(Input, PhoneRestrictionMask, PhoneShellVersion, mod_access);
 
-	 PhonesFeedback := IF(IncludePhonesFeedback, Phone_Shell.Search_PhonesFeedback(Input, PhoneRestrictionMask, mod_access));
+	 PhonesFeedback := IF(IncludePhonesFeedback, Phone_Shell.Search_PhonesFeedback(Input, PhoneRestrictionMask, PhoneShellVersion, mod_access));
 
-	 Relocation := IF(RunRelocation, Phone_Shell.Search_Relocation(Input, RelocationsMaxDaysBefore, RelocationsMaxDaysAfter, RelocationsTargetRadius, PhoneRestrictionMask));
+	 Relocation := IF(RunRelocation, Phone_Shell.Search_Relocation(Input, RelocationsMaxDaysBefore, RelocationsMaxDaysAfter, RelocationsTargetRadius, PhoneRestrictionMask, PhoneShellVersion));
 
-	 Utility := Phone_Shell.Search_Utility(Input, GLBPurpose, PhoneRestrictionMask, IndustryClass, mod_access);
+	 Utility := Phone_Shell.Search_Utility(Input, GLBPurpose, PhoneRestrictionMask, IndustryClass, PhoneShellVersion, mod_access);
 	 
-	 Spouse := Phone_Shell.Search_Spouse(Input, NonSubjectPhones (Subj_Phone_Type = '41'), PhoneRestrictionMask);
+	 Spouse := Phone_Shell.Search_Spouse(Input, NonSubjectPhones (Subj_Phone_Type = '41'), PhoneRestrictionMask, PhoneShellVersion);
 
-	 Parent := Phone_Shell.Search_Parent(Input, NonSubjectPhones (Subj_Phone_Type = '42'), PhoneRestrictionMask);
+	 Parent := Phone_Shell.Search_Parent(Input, NonSubjectPhones (Subj_Phone_Type = '42'), PhoneRestrictionMask, PhoneShellVersion);
 
-	 RelativeCloseProximity := Phone_Shell.Search_RelativeCloseProximity(Input, NonSubjectPhones (Subj_Phone_Type = '43'), PhoneRestrictionMask);
+	 RelativeCloseProximity := Phone_Shell.Search_RelativeCloseProximity(Input, NonSubjectPhones (Subj_Phone_Type = '43'), PhoneRestrictionMask, PhoneShellVersion);
 
-	 CoResident := Phone_Shell.Search_CoResident(Input, NonSubjectPhones (Subj_Phone_Type = '44'), PhoneRestrictionMask);
+	 CoResident := Phone_Shell.Search_CoResident(Input, NonSubjectPhones (Subj_Phone_Type = '44'), PhoneRestrictionMask, PhoneShellVersion);
 	 
-	 EDA := Phone_Shell.Search_EDA(Input, HeaderAddresses, PhoneRestrictionMask, mod_access);
+	 EDA := Phone_Shell.Search_EDA(Input, HeaderAddresses, PhoneRestrictionMask, PhoneShellVersion, mod_access);
 	 
-	 PhonesPlus := Phone_Shell.Search_PhonesPlus(Input, HeaderAddresses, GLBPurpose, DPPAPurpose, IncludeLastResort, PhoneRestrictionMask, DataPermissionMask, IndustryClass, DataRestrictionMask, mod_access);
+	 PhonesPlus := Phone_Shell.Search_PhonesPlus(Input, HeaderAddresses, GLBPurpose, DPPAPurpose, IncludeLastResort, PhoneRestrictionMask, DataPermissionMask, IndustryClass, DataRestrictionMask, PhoneShellVersion, mod_access);
 	 
-	 SkipTrace := Phone_Shell.Search_Extended_Skip_Trace(Input, PhoneRestrictionMask, DataRestrictionMask, SX_Match_Restriction_Limit, Strict_APSX);
+	 SkipTrace := Phone_Shell.Search_Extended_Skip_Trace(Input, PhoneRestrictionMask, DataRestrictionMask, SX_Match_Restriction_Limit, Strict_APSX, PhoneShellVersion);
 	 
-	 Neighbors := Phone_Shell.Search_Neighbors(Input, PhoneRestrictionMask, DataRestrictionMask, GLBPurpose, DPPAPurpose);
+	 Neighbors := Phone_Shell.Search_Neighbors(Input, PhoneRestrictionMask, DataRestrictionMask, GLBPurpose, DPPAPurpose, PhoneShellVersion := PhoneShellVersion);
 	 
 	 /* ***************************************************************
 		* 		Gateway Searches *
@@ -121,7 +125,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 											SELF.Experian_File_One_Verification.Experian_Last_Update := TRIM((string) left.Bureau_Last_Update); //for sake of existing model
 											SELF := RIGHT),
 											RIGHT OUTER);	
-	 Equifax := Phone_Shell.Search_Equifax(Input, WithPhoneMartDate, DataRestrictionMask, PhoneRestrictionMask, UsePremiumSource_A, mod_access);
+	 Equifax := Phone_Shell.Search_Equifax(Input, WithPhoneMartDate, DataRestrictionMask, PhoneRestrictionMask, UsePremiumSource_A, PhoneShellVersion, mod_access);
 	 Combined_data := WithPhoneMartDate + Equifax (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '');
 		
 	 ValidCombined := Combined_data (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '');
@@ -150,9 +154,12 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 			SELF.Sources.Source_Owner_Name_Prefix := TRIM(le.Sources.Source_Owner_Name_Prefix) + ',' + TRIM(ri.Sources.Source_Owner_Name_Prefix);
 			SELF.Sources.Source_Owner_Name_First 	:= TRIM(le.Sources.Source_Owner_Name_First) + ',' + TRIM(ri.Sources.Source_Owner_Name_First);
 			SELF.Sources.Source_Owner_Name_Middle := TRIM(le.Sources.Source_Owner_Name_Middle) + ',' + TRIM(ri.Sources.Source_Owner_Name_Middle);
-			SELF.Sources.Source_Owner_Name_Last 	:= TRIM(le.Sources.Source_Owner_Name_Last) + ',' + TRIM(ri.Sources.Source_Owner_Name_Last);
+			SELF.Sources.Source_Owner_Name_Last  	:= TRIM(le.Sources.Source_Owner_Name_Last) + ',' + TRIM(ri.Sources.Source_Owner_Name_Last);
 			SELF.Sources.Source_Owner_Name_Suffix := TRIM(le.Sources.Source_Owner_Name_Suffix) + ',' + TRIM(ri.Sources.Source_Owner_Name_Suffix);
 			SELF.Sources.Source_Owner_DID := TRIM(le.Sources.Source_Owner_DID) + ',' + TRIM(ri.Sources.Source_Owner_DID);
+
+   SELF.Sources.Source_List_All_Last_Seen := if(IncludeLexIDCounts,TRIM(le.Sources.Source_List_All_Last_Seen) + ',' + TRIM(ri.Sources.Source_List_All_Last_Seen),'');
+			SELF.Sources.Source_Owner_All_DIDs     := if(IncludeLexIDCounts,TRIM(le.Sources.Source_Owner_All_DIDs) + ',' + TRIM(ri.Sources.Source_Owner_All_DIDs),'');
 
 			SELF.Raw_Phone_Characteristics.Phone_Subject_Level := MIN(le.Raw_Phone_Characteristics.Phone_Subject_Level, ri.Raw_Phone_Characteristics.Phone_Subject_Level); // Keep whichever was closest to the subject
 			
@@ -239,16 +246,44 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 																																																								// All other masks the filtering gets done in each of the Phone_Shell.Search_* attributes
 																																																							 [Phone_Shell.Constants.Phone_Subject_Level.Subject, Phone_Shell.Constants.Phone_Subject_Level.Household, Phone_Shell.Constants.Phone_Subject_Level.FirstDegreeRelative, Phone_Shell.Constants.Phone_Subject_Level.LeadToSubject]);
 	 // Catch all to ensure we only return Subject/Address/First Degree Relative phones and no phones under the full 10 digits
-	 filteredNumbers := combinedNumbers (Raw_Phone_Characteristics.Phone_Subject_Level IN PhoneRestrictionMaskSet AND LENGTH(StringLib.StringFilter(Gathered_Phone, '0123456789')) = 10 AND Gathered_Phone[1] <> '0');
+	 filteredNumbers := combinedNumbers (Raw_Phone_Characteristics.Phone_Subject_Level IN PhoneRestrictionMaskSet AND LENGTH(STD.Str.Filter(Gathered_Phone, '0123456789')) = 10 AND Gathered_Phone[1] <> '0');
 	 
 	 groupedNumbers := GROUP(SORT(filteredNumbers, Clean_Input.seq), Clean_Input.seq);
 	 
 	 // Keep the MaxPhones, but we need it to be deterministic as well so keep the ones matching subject, followed by the best match code, followed by the most sources, followed by the phone number itself
-	 keepers := TOPN(groupedNumbers, MaxPhones, Clean_Input.seq, Raw_Phone_Characteristics.Phone_Subject_Level, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code)), -StringLib.StringFindCount(Sources.Source_List, ','), -LENGTH(TRIM(Sources.Source_List)), Gathered_Phone);
+	 keepers := TOPN(groupedNumbers, MaxPhones, Clean_Input.seq, Raw_Phone_Characteristics.Phone_Subject_Level, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code)), -STD.Str.FindCount(Sources.Source_List, ','), -LENGTH(TRIM(Sources.Source_List)), Gathered_Phone);
 	
 	 Sequenced := PROJECT(UNGROUP(keepers), TRANSFORM(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, SELF.Unique_Record_Sequence := COUNTER; 
 																																																						// Strangely enough, somewhere in our data Grandchild is misspelled - fix those spelling issues
 																																																						SELF.Raw_Phone_Characteristics.Phone_Subject_Title := IF(LEFT.Raw_Phone_Characteristics.Phone_Subject_Title = 'Gradchild', 'Grandchild', LEFT.Raw_Phone_Characteristics.Phone_Subject_Title);
+                                                                                                            
+                                                      // now that we have all the data populated and filtered from all sources, time to clean up and count the 'all' parameters
+                                                      allNumbers := models.common.zip2(LEFT.Sources.Source_Owner_All_DIDs, LEFT.Sources.Source_List_All_Last_Seen,',',models.common.options.leftouter);
+                                                      // keep one record per DID (str1), with the most recent (str2 descending) date for each did
+                                                      allNumbersDeduped := dedup(sort(allNumbers,str1,-str2),str1);
+                                                      todaysDate := Phone_Shell.Common.parseDate((string) STD.Date.Today(), TRUE);
+                                                      
+                                                      SELF.Sources.Source_Count_All_DIDs := count(allNumbersDeduped);
+                                                      SELF.Sources.Source_Count_DIDs_3yr := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=36));
+                                                      SELF.Sources.Source_Count_DIDs_2yr := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=24));
+                                                      SELF.Sources.Source_Count_DIDs_18mo := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=18));
+                                                      SELF.Sources.Source_Count_DIDs_12mo := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=12));
+                                                      SELF.Sources.Source_Count_DIDs_9mo := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=9));
+                                                      SELF.Sources.Source_Count_DIDs_6mo := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=6));
+                                                      SELF.Sources.Source_Count_DIDs_3mo := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=3));
+                                                      
+                                                      // prob a denormalize to get allNumbersDeduped back into comma-delimited format for putting it back in.
+                                                      // ref publicrecords_kel.ecl_functions.common_functions.roll_field
+                                                      DIDList := PROJECT(allNumbersDeduped,TRANSFORM({string roll_field}, self.roll_field := (string)left.str1));
+                                                      concatDIDs := ROLLUP(DIDList, TRUE, TRANSFORM({string roll_field},
+			                                                      SELF.roll_field := LEFT.roll_field + ',' + RIGHT.roll_field));
+                                                      SELF.Sources.Source_Owner_All_DIDs := concatDIDs[1].roll_field;
+                                                      
+                                                      DateList := PROJECT(allNumbersDeduped,TRANSFORM({string roll_field}, self.roll_field := (string)left.str2));
+                                                      concatDates := ROLLUP(DateList, TRUE, TRANSFORM({string roll_field},
+                                                         SELF.roll_field := left.roll_field + ',' + right.roll_field));
+                                                      SELF.Sources.Source_List_All_Last_Seen := concatDates[1].roll_field;
+                                                      
 																																																						SELF := LEFT));
 	
 	 /* ***************************************************************
