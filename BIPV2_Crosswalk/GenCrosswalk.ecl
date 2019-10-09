@@ -39,7 +39,7 @@ export GenCrosswalk(
                                 transform(Layouts.CrossWalkWorkRec1,
                                           self                             := left.contact_name,
                                           self                             := left.company_address,
-                                          self.jobTitleOrder               := map(left.dt_first_seen_contact > TwoYearsAgo   => 1,
+                                          self.jobTitleOrder               := map(left.dt_last_seen_contact  > TwoYearsAgo   => 1,
                                                                                   left.dt_last_seen_contact  > SevenYearsAgo => 2,
                                                                                   3);                                          
                                           self.job_title                   := if(left.executive_ind_order > 0 and left.source not in RestrictedSources, left.contact_job_title_derived, ''),
