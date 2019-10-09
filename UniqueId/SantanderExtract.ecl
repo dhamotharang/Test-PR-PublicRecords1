@@ -41,8 +41,41 @@ phones := NORMALIZE(w, left.phone_number_list.phones,
 						self.Entity_Unique_ID := LEFT.Entity_Unique_ID;
 						self := RIGHT;));
 
-records := SORT(TABLE(Entities, {Entities.WatchListName, records := COUNT(GROUP)}, 
-							WatchListName, few), WatchListName);
+							
+// *** country reports
+lfn1 := '~thor::uniqueid::hpcc-uid-ofacsanctions.xml';
+c1 := PROJECT(DATASET(lfn1, UniqueId.Layout_Watchlist.rGeo, 
+									XML('Watchlist/Country_List/Country')),
+					TRANSFORM(UniqueId.Layout_Watchlist.rGeo,
+					self.WatchListName := 'OFAC SANCTIONS';
+					self := left;));
+
+lfn2 := '~thor::uniqueid::hpcc-uid-primarymoneylaunderingconcern-jurisdictions.xml ';
+c2 := PROJECT(DATASET(lfn2, UniqueId.Layout_Watchlist.rGeo, 
+									XML('Watchlist/Country_List/Country')),
+					TRANSFORM(UniqueId.Layout_Watchlist.rGeo,
+					self.WatchListName := 'PRIMARY MONEY LAUNDERING CONCERN - JURISDICTIONS';
+					self := left;));
+
+c := c1 + c2;
+
+Countries := PROJECT(c, UniqueId.Layout_Santander.rCountry);
+
+countryakas := NORMALIZE(c, left.aka_list.aka, TRANSFORM(UniqueId.Layout_Santander.rCountryAka,
+						self.Entity_Unique_ID := LEFT.Entity_Unique_ID;
+						self := RIGHT;));
+
+locations := NORMALIZE(c, left.location_list.location, TRANSFORM(UniqueId.Layout_Santander.rLocation,
+						self.Entity_Unique_ID := LEFT.Entity_Unique_ID;
+						self := RIGHT;));
+
+// ***
+records := SORT(
+						TABLE(Entities, {Entities.WatchListName, records := COUNT(GROUP)}, 
+							WatchListName, few) +
+						TABLE(Countries, {Countries.WatchListName, records := COUNT(GROUP)}, 
+							WatchListName, few),							
+							WatchListName);
 
 ip := _Control.IPAddress.bctlpedata12;
 
@@ -61,6 +94,9 @@ DespryaSantnder := PARALLEL(
 	UnsprayReport('info'),
 	UnsprayReport('identifiers'),
 	UnsprayReport('phones'),
+	UnsprayReport('countries'),
+	UnsprayReport('countryakas'),
+	UnsprayReport('locations'),
 	UnsprayReport('counts')
 );
 
@@ -77,8 +113,15 @@ OUTPUT(ids,,'~thor::uniqueid::santander::identifiers',
 						CSV(HEADING(SINGLE),SEPARATOR(','),TERMINATOR('\n'),QUOTE('"')),OVERWRITE),
 OUTPUT(phones,,'~thor::uniqueid::santander::phones', 
 						CSV(HEADING(SINGLE),SEPARATOR(','),TERMINATOR('\n'),QUOTE('"')),OVERWRITE),
+OUTPUT(Countries,,'~thor::uniqueid::santander::countries',
+						CSV(HEADING(SINGLE),SEPARATOR(','),TERMINATOR('\n'),QUOTE('"')),OVERWRITE),
+OUTPUT(countryakas,,'~thor::uniqueid::santander::countryakas',
+						CSV(HEADING(SINGLE),SEPARATOR(','),TERMINATOR('\n'),QUOTE('"')),OVERWRITE),
+OUTPUT(Locations,,'~thor::uniqueid::santander::locations',
+						CSV(HEADING(SINGLE),SEPARATOR(','),TERMINATOR('\n'),QUOTE('"')),OVERWRITE),
 OUTPUT(records,,'~thor::uniqueid::santander::counts',
 						CSV(HEADING('Watch List,Count',SINGLE),SEPARATOR(','),TERMINATOR('\n'),QUOTE('"')),OVERWRITE),
+
 DespryaSantnder
 );
 

@@ -75,4 +75,29 @@
 			unicode comments;
    END;
 
+	export rCountry := RECORD
+			string Entity_Unique_ID;
+			string WatchListName;
+			//string WatchListDate;
+			//string type;
+			unicode Country_Name;
+			string listed_date;
+			string reason_listed;
+			//string reference_id;
+			string id;
+			unicode comments;	
+	END;
+	
+	export rCountryAka := RECORD
+			string Entity_Unique_ID;
+			string type;
+			unicode name;
+	END;
+	
+	export rLocation := RECORD
+		string Entity_Unique_ID;
+    string type;
+    unicode name;
+   END;	
+	
 END;
