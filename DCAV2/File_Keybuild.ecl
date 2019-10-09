@@ -261,6 +261,7 @@ function
 		self.err_statA          				:= left.mailing_address.err_stat																				;
 		self.lf                 				:= '';
 		self.file_type									:= left.file_type;
+		self.global_sid									:= left.global_sid;
 	
 	));
 

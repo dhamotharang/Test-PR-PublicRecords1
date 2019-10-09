@@ -157,11 +157,12 @@ functionmacro
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
   ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
   ds_previous_build_final_iterations := sort(ds_previous_builds,-version,-(unsigned)iteration);
+  latest_previous_iteration          := (string)max(ds_previous_builds  ,(unsigned)iteration);
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
     default_start_iteration            := if(pOutputSuperfile != ''  
     // default_start_iteration            := if((#TEXT(pStartIteration) = '' or trim((string)pStartIteration) = '') and pOutputSuperfile != '' //and trim(ds_previous_build_final_iterations[1].iteration) != '' 
-                                            ,(string)((unsigned)ds_previous_build_final_iterations[1].iteration + 1)
+                                            ,(string)((unsigned)latest_previous_iteration + 1)
                                             ,''
                                          );
     StartIteration := default_start_iteration;

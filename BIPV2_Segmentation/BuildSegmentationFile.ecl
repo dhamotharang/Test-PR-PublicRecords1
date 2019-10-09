@@ -21,13 +21,13 @@ export BuildSegmentationFile(
      bestRecs       := BIPV2_Best.Files().base.built;	
 
      //Current Build CommonBase Header
-	headerRecs     := BIPV2.CommonBase.DS_Built;
+	headerRecs     := BIPV2.CommonBase.DS_Clean;  //this is the "built" version of the base file cleaned, no need to further clean it.  should be faster
 
 	
      //Current Consumer Header Segmentation	
      seg_key := InsuranceHeader_PostProcess.segmentation_keys.key_did_ind;
 
-     header_clean := distribute(BIPV2.CommonBase.clean(headerRecs), hash32(seleid));
+     header_clean := distribute(headerRecs, hash32(seleid));
 
      nonResidentAddress := dedup(table(header_clean(address_type_derived!='R'), {prim_range, predir, prim_name, addr_suffix, postdir, unit_desig, sec_range, p_city_name, st, zip, zip4}), all, hash);
 							  
@@ -38,7 +38,6 @@ export BuildSegmentationFile(
           self.addr_state_cnt:= count(table(allrows(trim(st)<>''), {st}, st)) ;
           self.record_cnt    := count(allrows) ;
           self.has_SOS       := exists(allrows(MDR.sourcetools.SourceIsCorpV2(source)));     
-          self.org_structure := project(table(allrows(company_org_structure_derived<>''), {company_org_structure_derived, cnt := count(group)}, company_org_structure_derived), Layouts.OrgStructureLayout);
           self:=l;
      end;
 
@@ -87,6 +86,7 @@ export BuildSegmentationFile(
      sourceGroupInfo    := ExtractSourceGroups(header_clean);
      allAddressTypeInfo := ExtractAllAddressType(header_clean);
      parentSeleIDInfo   := ExtractParentSeleidInfo(header_clean);
+	orgStructureInfo   := ExtractCompanyOrgStructure(header_clean);
 	
      withContacts := join(withBest, contactInfo, 
 	                     left.seleid = right.seleid, 
@@ -123,8 +123,15 @@ export BuildSegmentationFile(
 						     transform(Layouts.SegmentationLayout,
 						               self.parent_seleid := right.seleid,
 								     self := left), left outer, hash);
+
+     withOrgStructInfo     := join(withParentSeleidInfo, orgStructureInfo,
+	                              left.seleid = right.seleid,
+						     transform(Layouts.SegmentationLayout,
+						               self.org_structure     := right.org_structure,
+						               self.org_sub_structure := right.org_sub_structure,
+								     self := left), left outer, hash);
 		
-     withBestAddrInfo      := join(withParentSeleidInfo, nonResidentAddress,
+     withBestAddrInfo      := join(withOrgStructInfo, nonResidentAddress,
 	                                  left.company_prim_range  = right.prim_range
 	                              and left.company_predir      = right.predir
 	                              and left.company_prim_name   = right.prim_name

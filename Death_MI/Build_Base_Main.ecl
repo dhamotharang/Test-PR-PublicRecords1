@@ -1,4 +1,4 @@
-﻿IMPORT _control, ccpa, std, tools, ut;
+﻿IMPORT _control, MDR, std, tools, ut;
 
 EXPORT Build_Base_Main(STRING pversion,
 	                     DATASET(Death_MI.Layouts.Base) inMainBase) := MODULE
@@ -33,7 +33,7 @@ EXPORT Build_Base_Main(STRING pversion,
 	workingILMainUpdate := PROJECT(inILDeathUpdate, add_IL_dates(LEFT));	
 	workingMainUpdate := workingMIMainUpdate + workingILMainUpdate;	
 	
-	addGlobal_SID			:= CCPA.macGetGlobalSID(workingMainUpdate, 'Death_MI', 'customer_id', 'global_sid');	
+	addGlobal_SID			:= MDR.macGetGlobalSid(workingMainUpdate, 'Death_MI', 'customer_id', 'global_sid');	
 	
 	workingMainUpdate_clean_input := Death_MI.Standardize_Input(addGlobal_SID);
 	workingMainUpdate_clean_name := Death_MI.Standardize_Name(workingMainUpdate_clean_input);

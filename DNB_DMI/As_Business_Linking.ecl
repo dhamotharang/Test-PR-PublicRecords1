@@ -1,4 +1,4 @@
-#OPTION('multiplePersistInstances',FALSE);
+﻿#OPTION('multiplePersistInstances',FALSE);
 import dnb_dmi,mdr,business_header,ut,_Validate,address,business_headerv2,mdr,lib_stringlib;
 
 export As_Business_Linking (boolean pUseOtherEnviron = _Constants().IsDataland
@@ -183,8 +183,18 @@ export As_Business_Linking (boolean pUseOtherEnviron = _Constants().IsDataland
 		self.match_company_name					 := ''; //Not available
 		self.match_branch_city 					 := ''; //Not available
 		self.match_geo_city							 := ''; //Not available		
-		self.group1_id									 := 0;
-		self.duns_number								 := l.rawfields.duns_number;
+		self.group1_id									 := 0;	
+		self.duns_number								 := l.rawfields.duns_number;			
+    temp_employees_total_sign        := if(trim(l.rawfields.employees_total_sign) = '-', '-', '');
+    temp_annual_sales_volume_sign    := if(trim(l.rawfields.annual_sales_volume_sign) = '-', '-', '');
+    temp_employees_here_sign         := if(trim(l.rawfields.employees_here_sign) = '-', '-', '');
+		temp_employees_org               := if(trim(l.rawfields.employees_total) != '0',trim(l.rawfields.employees_total),'');
+		temp_employees_local             := if(trim(l.rawfields.employees_here) != '0',trim(l.rawfields.employees_here),'');
+		temp_sales                       := if(trim(l.rawfields.annual_sales_volume) != '0',trim(l.rawfields.annual_sales_volume),'');
+    self.employee_count_org_raw      := trim(temp_employees_total_sign) +temp_employees_org;
+    self.revenue_org_raw             := trim(temp_annual_sales_volume_sign) +temp_sales;
+    self.employee_count_local_raw    := trim(temp_employees_here_sign) +temp_employees_local;
+		self.revenue_local_raw           := '';
 		self 														 := l;
 		self 														 := [];
 	end;

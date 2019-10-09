@@ -1,12 +1,13 @@
 ﻿IMPORT wk_ut;
 IMPORT WsDFU;
+IMPORT MDR;
 
 // JA 20190718: LinkingTools.modXLinkValidation modified per JIRA epic LBP-173 //
 // Sandbox BizLinkFull.Filename_keys.superkey_version to appropriate (built) version before running //
 
   IMPORT Std.Str AS Str;
   IMPORT Std.File AS File;
-  IMPORT Std.Date AS Date;git 
+  IMPORT Std.Date AS Date;
 	
 			// pare down the fields in File_BizHead that are relevant to external linking 
 		lSlim:=RECORD
@@ -97,7 +98,7 @@ IMPORT WsDFU;
   INTEGER fToInteger(STRING s):=(INTEGER)REGEXREPLACE('[^-0-9]',s,'');
 		STRING11 fDecimalFormat(DECIMAL n) := function 
 		times_100 := (string)(n*100);
-		dec_start := std.str.find(times_100, '.', 1);
+		dec_start := str.find(times_100, '.', 1);
 		ret_val := if(dec_start > 0, (times_100 + '0000')[1..dec_start+4] + '%', times_100 + '.0000%');
 		return ret_val;
 	end;

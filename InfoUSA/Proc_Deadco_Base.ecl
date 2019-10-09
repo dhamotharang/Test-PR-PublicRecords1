@@ -1,4 +1,4 @@
-﻿IMPORT _control, CCPA, infoUSA, did_add, ut, header_slimSORT, didville, business_header,business_header_ss, address,watchdog,mdr,AID,lib_stringlib,idl_header,bipv2, PromoteSupers, std;
+﻿IMPORT _control, MDR, infoUSA, did_add, ut, header_slimSORT, didville, business_header,business_header_ss, address,watchdog,mdr,AID,lib_stringlib,idl_header,bipv2, PromoteSupers, std;
 
 layout_deadco_temp 
 	:= RECORD
@@ -332,7 +332,7 @@ deadco_bdid_append 	:= JOIN(deadco_tmsid,
 														LOCAL
 														);
 
-addGlobalSID				:= CCPA.macGetGlobalSID(deadco_bdid_append,'DEADCO','','global_sid'); //DF-25968: Add Global_SID
+addGlobalSID				:= MDR.macGetGlobalSid(deadco_bdid_append,'DEADCO','','global_sid'); //DF-25968: Add Global_SID
 														
 ut.MAC_Append_Rcid(addGlobalSID, source_rec_id, deadco_source_rec_id);   
 PromoteSupers.MAC_SF_BuildProcess(deadco_source_rec_id,'~thor_data400::base::INFOUSA::deadco',do1,2);

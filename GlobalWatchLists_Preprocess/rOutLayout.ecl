@@ -1,4 +1,4 @@
-EXPORT rOutLayout := RECORD
+﻿EXPORT rOutLayout := RECORD
   string20 		pty_key;
   string60 		source;
   string350 	orig_pty_name;
@@ -373,4 +373,8 @@ EXPORT rOutLayout := RECORD
   string1 		orig_foreign_principal_terminated_flag := '';
   string1 		orig_short_form_terminated_flag := '';
 	string350		orig_raw_name := '';
+	//Added for CCPA-94
+	unsigned4 global_sid := 0;
+	unsigned8 record_sid := 0;
+	unsigned6 did        := 0;
 END;
