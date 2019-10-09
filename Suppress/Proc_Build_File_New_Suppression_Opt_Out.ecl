@@ -1,18 +1,22 @@
-﻿EXPORT Proc_Build_File_New_Suppression_Opt_Out(String pVersion) := FUNCTION
+﻿IMPORT	versioncontrol;
+EXPORT Proc_Build_File_New_Suppression_Opt_Out(String pVersion) := FUNCTION
 
 	//Spray input file
-	STRING		vSourceIP		:=	Constants.serverIP;
-	STRING		vDirectory	:=	Constants.SuppressOptOut.Directory + pVersion + '/';
-	STRING		vfileName		:=	Constants.SuppressOptOut.FileToSpray;
+	STRING		vSourceIP		:=	Suppress.Constants.serverIP;
+	STRING		vDirectory		:=	Suppress.Constants.OptOut.Directory + pVersion + '/';
+	STRING		vfileName		:=	Suppress.Constants.OptOut.FileToSpray;
 
 	checkFileExists		:=	IF(pVersion<>'' AND COUNT(FileServices.remotedirectory(vSourceIP,vDirectory,vfileName,FALSE)(size	<>	0))	=	1,
-																	TRUE,
-																	FALSE);
-	clearSprayedFile	:= SEQUENTIAL(FileServices.StartSuperFileTransaction()
-																						,FileServices.clearsuperfile(Filenames(pVersionDate).SuppressOptOut.input.sprayed,TRUE)
-																						,FileServices.finishSuperFileTransaction());																																	
-	sprayInputFile			:= fSprayFiles.OptOutSrc(pVersion,,'/data/hds_2/test/',,'thor400_dev01');																	
+								TRUE,
+								FALSE);
+	clearSprayedFile	:= SEQUENTIAL(	FileServices.StartSuperFileTransaction()
+									   ,FileServices.clearsuperfile(Suppress.Filenames().OptOut.input.sprayed,TRUE)
+									   ,FileServices.finishSuperFileTransaction());																																	
+	sprayInputFile		:= Suppress.fSprayFiles.OptOutSrc(pVersion);																	
 
 	//Build base file
-	newUpdate						:= Input_Raw
+	buildBase 			:= Suppress.Proc_Build_Base_OptOut(pVersion);
+
+	RETURN SEQUENTIAL(sprayInputFile, buildBase);
+
 END;
