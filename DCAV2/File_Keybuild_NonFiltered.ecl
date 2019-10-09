@@ -264,6 +264,8 @@ function
 		self.err_statA          				:= left.mailing_address.err_stat																				;
 		self.lf                 				:= '';
 		self.file_type									:= left.file_type;
+		self.global_sid									:= left.global_sid;	//DF-26145: Populate Global_SID
+		self.record_sid									:= left.record_sid;
 	
 	)) 
 	;
