@@ -1,4 +1,4 @@
-IMPORT doxie,Address,Advo,Advo_Services,iesp,PersonReports;
+﻿IMPORT doxie,Address,Advo,Advo_Services,iesp,PersonReports;
 
 EXPORT fn_smart_getAddrMetadata := MODULE
 	
@@ -109,5 +109,45 @@ EXPORT fn_smart_getAddrMetadata := MODULE
 		addrMetadata := Advo_Services.Advo_Batch_Service_Records(DATASET([getAddr()]),doBadSecRange);
 		RETURN PROJECT(addrMetadata,toESDL(LEFT));
 	END;
+	EXPORT AddAddressSourceCounts(unsigned6 DIDVal,
+                                                                dataset (iesp.smartlinxreport.t_SLRAddress) addresses,
+												PersonReports.IParam._smartlinxreport param) := function
+
+	      HeaderRecsDS := project(addresses, transform( PersonReports.layouts.header_recPlusSource, 
+	      // setup address recs to be passed into above function just address and DID	
+	                                                           self.did := didVal;
+                                                                self.prim_range :=  left.address.StreetNumber;
+											     self.predir :=  left.address.streetPreDirection;
+												self.prim_name :=  left.address.streetName;
+												self.suffix :=  left.address.StreetSuffix;
+												self.postdir :=  left.address.StreetPostDirection;
+												self.unit_desig :=  left.address.UnitDesignation;
+												self.sec_range :=  left.address.UnitNumber;
+												self.city_name :=  left.address.City;
+												self.st :=  left.address.state;
+												self.zip :=  left.address.zip5;
+											      self.zip4 :=  left.address.zip4;													
+											      self := [];
+												));
+											 	 
+		outAddrWSourceInfo		:=   PersonReports.functions.GetAddressIndicators(HeaderRecsDS,param);
+		addressesWithSourceInfo := join(addresses, outAddrWSourceInfo,
+		                                left.address.state = right.address.state and
+								 left.address.city = right.address.city and
+						           left.address.zip5 = right.address.zip5 and
+								 left.address.streetName = right.address.StreetName and
+								 left.address.StreetNumber = right.address.StreetNumber and
+								 left.address.UnitNumber = right.address.UnitNumber,							
+								 transform(iesp.smartlinxreport.t_SLRAddress,
+								    self.address.SourceCount := right.SourceCount;
+								    self.address.sources := choosen(project(right.sources, transform(iesp.smartlinxreport.t_SLRSources,
+										                                                                            self._type := left._type;
+																								 self.Count := left.count;
+																								 )), iesp.Constants.SLR.MaxSourceTypes);
+								 self := left), LEFT OUTER);  
+         FinalAddress :=   if ( param.include_AddressSourceInfo, addressesWithSourceInfo,  addresses);	
+		 return FinalAddress;
+      END;
+
 
 END;
