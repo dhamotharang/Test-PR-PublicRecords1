@@ -1,9 +1,12 @@
 ﻿IMPORT BIPV2,BIPV2_Best,BIPV2_Best_SBFE,Business_Credit,
-       BusinessCredit_Services,Business_Risk_BIP,Codes;
+       BusinessCredit_Services,Business_Risk_BIP,Codes,doxie;
 
 EXPORT Batch_Records( DATASET(BusinessCredit_Services.Batch_layouts.Batch_Input_Processed) ds_BatchIn,
 															BusinessCredit_Services.Iparam.BatchParams inMod) :=
 FUNCTION
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+
+  
   // Get links ids for the search criteria
   // Format to BIP search layout
   BIPV2.IDfunctions.rec_SearchInput tFormat2SearchInput(BusinessCredit_Services.Batch_layouts.Batch_Input_Processed pInput) := TRANSFORM
@@ -123,7 +126,7 @@ FUNCTION
   ds_bestLinkidsPerAcct_kfetchLayout := PROJECT(ds_bestLinkidsPerAcct,TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,SELF := LEFT)); 
   
   //Get SBFE Header Records, NOTE only keep Account Base Records
-	ds_SBFEAcctRecs	:= Business_Credit.Key_LinkIds().kFetch2(ds_bestLinkidsPerAcct_kfetchLayout, inmod.BIPFetchLevel,,inmod.DataPermissionMask)(record_type='AB');
+	ds_SBFEAcctRecs	:= Business_Credit.Key_LinkIds().kFetch2(ds_bestLinkidsPerAcct_kfetchLayout, mod_access, inmod.BIPFetchLevel,,inmod.DataPermissionMask)(record_type='AB');
 
 	ds_TradeRecs := BusinessCredit_Services.Batch_Functions.getTradelineInfo(ds_SBFEAcctRecs,inMod);
 	

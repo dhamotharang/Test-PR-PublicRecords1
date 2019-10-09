@@ -1,22 +1,20 @@
-IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, moxie_phonesplus_server;
+IMPORT $, iesp, doxie, moxie_phonesplus_server;
 
 out_rec    := iesp.dirassistwireless.t_PhonesPlusRecord;
 out_rec_v2 := iesp.bpsreport.t_BpsReportPhonesPlusRecord; // same as above + PhonesFeedback
 
 EXPORT phonesplus_records (
   dataset (doxie.layout_references) dids,
-  input.phonesplus in_params = module (input.phonesplus) end,
+  $.IParam.phonesplus in_params = module ($.IParam.phonesplus) end,
   boolean IsFCRA = false
 ) := MODULE
-
-//  score_threshold_value := AutoStandardI.InterfaceTranslator.score_threshold_value.val (in_params);
 
   phpl := moxie_phonesplus_server.phonesplus_did_records (
             dids,
             iesp.Constants.BR.MaxPhonesPlus, //this is ignored, actually...
             in_params.score_threshold,
-            in_params.GLBPurpose,
-            in_params.DPPAPurpose,, TRUE).w_timezone; //IsRoxie
+            in_params.glb,
+            in_params.dppa,, TRUE).w_timezone; //IsRoxie
 
   rec_in := Moxie_phonesplus_Server.Layout_batch_did.w_timezone;
 

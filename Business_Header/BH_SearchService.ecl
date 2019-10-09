@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BH_SearchService">
 	<part name="CompanyName" type="xsd:string"/>
 	<part name="ExactOnly" 	type="xsd:boolean"/>
@@ -22,7 +22,7 @@
 */
 /*--INFO-- This service searches the business header file.*/
 
-IMPORT WSInput, STD;
+IMPORT WSInput, STD, doxie, Suppress;
 
 EXPORT BH_SearchService() := MACRO
 		
@@ -54,6 +54,7 @@ EXPORT BH_SearchService() := MACRO
 		boolean IncludeAllContacts := false : stored('IncludeAllContacts');
 
 		Business_Header.doxie_MAC_Field_Declare()
+    mod_access := doxie.compliance.GetGlobalDataAccessModule();
 
 		slimrec := record
 			unsigned6	bdid;
@@ -196,12 +197,21 @@ EXPORT BH_SearchService() := MACRO
 				postdir != '' or unit_desig != '' or sec_range != '' or city != '' or
 				state != '' or zip != 0 or zip4 != 0);
 
-		by_contact_for_include_all := dedup(sort(if (IncludeAllContacts,join(dedup(sort(remove_blank_addresses,bdid),bdid),business_header.Key_Business_Contacts_BDID,
-			left.bdid = right.bdid and
-			(~right.glb OR glb_ok),
-			TRANSFORM(business_header.Layout_Business_Contact_full,
-			self := right),limit(10000,skip))),ssn,lname,fname,mname,name_suffix,title,company_title),ssn,lname,fname,mname,name_suffix,title,company_title);
+		d_bids := dedup(sort(remove_blank_addresses, bdid), bdid);
 
+    d_contacts_all := 
+    join(d_bids,business_header.Key_Business_Contacts_BDID,
+    left.bdid = right.bdid and (~right.glb OR glb_ok),
+    transform(RIGHT), limit(10000,skip));  
+
+    d_contacts_ddp := dedup(sort(d_contacts_all, ssn, lname, fname, mname, name_suffix, title, company_title),
+       ssn, lname, fname, mname, name_suffix, title, company_title);
+
+    d_contacts := Suppress.MAC_SuppressSource(d_contacts_ddp, mod_access);
+
+    by_contact_for_include_all :=  if(IncludeAllContacts, project(d_contacts, business_header.Layout_Business_Contact_full));
+
+    
 		join_to_contacts := join(remove_blank_addresses(~exact_only or ut.CleanCompany(company_name) = ut.CleanCompany(company_name_value) or (bdv != '' and bdid = (integer)bdv)), if(lname_value != '' or ssn_value != '',bycontact,by_contact_for_include_all),
 			left.bdid = right.bdid,
 			TRANSFORM(Business_Header.layout_biz_search.result_with_input_and_dt_first_seen,

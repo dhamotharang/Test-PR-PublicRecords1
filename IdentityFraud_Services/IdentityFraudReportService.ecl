@@ -41,58 +41,6 @@
 /*--INFO-- 
 (Note: "SOAP" options will always override ESDL options)
 */
-/*--USES-- ut.input_xslt */
-/*--HELP-- 
-<pre>
-&lt;IdentityFraudReportRequest&gt;
- &lt;Row&gt;
- &lt;User&gt;
-  &lt;ReferenceCode&gt;ref_code_str&lt;/ReferenceCode&gt;
-  &lt;BillingCode&gt;billing_code&lt;/BillingCode&gt;
-  &lt;QueryId&gt;query_id&lt;/QueryId&gt;
-  &lt;GLBPurpose&gt;1&lt;/GLBPurpose&gt;
-  &lt;DLPurpose&gt;1&lt;/DLPurpose&gt;
-  &lt;DataRestrictionMask&gt;00000000000&lt;/DataRestrictionMask&gt;
-  &lt;TestDataEnabled&gt;&lt;/TestDataEnabled&gt;
-  &lt;TestDataTableName&gt;&lt;/TestDataTableName&gt;
-  &lt;EndUser/&gt;
- &lt;/User&gt;
-  &lt;Options&gt;
-  &lt;IncludePhonesPlus&gt;&lt;/IncludePhonesPlus&gt;
-  &lt;IncludeIdentityRisklevel&gt;&lt;/IncludeIdentityRisklevel&gt;
-  &lt;IncludeSourceRisklevel&gt;&lt;/IncludeSourceRisklevel&gt;
-  &lt;IncludeVelocityRisklevel&gt;&lt;/IncludeVelocityRisklevel&gt;
-  &lt;SkipPenaltyFilter&gt;&lt;/SkipPenaltyFilter&gt;
- &lt;/Options&gt;
- &lt;ReportBy&gt;
-  &lt;UniqueId&gt;&lt;/UniqueId&gt;
-  &lt;DLNumber&gt;&lt;/DLNumber&gt;
-  &lt;DLState&gt;&lt;/DLState&gt;
-  &lt;Name&gt;
-   &lt;Full&gt;&lt;/Full&gt;
-   &lt;First&gt;&lt;/First&gt;
-   &lt;Middle&gt;&lt;/Middle&gt;
-   &lt;Last&gt;&lt;/Last&gt;
-  &lt;/Name&gt;
-  &lt;Address&gt;
-   &lt;StreetAddress1&gt;&lt;/StreetAddress1&gt;
-   &lt;City&gt;&lt;/City&gt;
-   &lt;State&gt;&lt;/State&gt;
-   &lt;Zip5&gt;&lt;/Zip5&gt;
-  &lt;/Address&gt;
-  &lt;Phone10&gt;&lt;/Phone10&gt;
-  &lt;DOB&gt;
-   &lt;Year&gt;&lt;/Year&gt;
-   &lt;Month&gt;&lt;/Month&gt;
-   &lt;Day&gt;&lt;/Day&gt;
-  &lt;/DOB&gt;
-  &lt;SSN&gt;&lt;/SSN&gt;
- &lt;/ReportBy&gt;
-&lt;/Row&gt;
-&lt;/IdentityFraudReportRequest&gt;
-</pre>
-*/
-
 
 
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, IdentityFraud_Services, PersonReports, ut, seed_files, suppress;
@@ -151,7 +99,7 @@ string dob_mask_overload := '' : stored ('DOBMask_Overload');
 
   // get search parameters from global #stored variables;
   gmod := AutoStandardI.GlobalModule();
-  search_mod := module (project (gmod, PersonReports.input._didsearch, opt))
+  search_mod := module (project (gmod, PersonReports.IParam._didsearch, opt))
   end;
   t_user := global(first_row.User);
 

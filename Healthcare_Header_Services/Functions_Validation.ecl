@@ -1,5 +1,5 @@
 import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,suppress,enclarity, std, 
-	dx_BestRecords;
+	dx_BestRecords, dx_Header;
 
 export Functions_Validation := Module
 		shared currentDate := (STRING8)Std.Date.Today();
@@ -58,7 +58,7 @@ export Functions_Validation := Module
 																										self.LName:=stringlib.StringToUpperCase(left.LastName);
 																										self.FlipFName := stringlib.StringToUpperCase(left.LastName[1..2]); 
 																										self.FlipLName:=stringlib.StringToUpperCase(left.FirstName);self:=left)),record),record);
-			getdidfromssn := if(hasSSN and hasName,Choosen(Doxie.Key_Header_SSN(keyed(s1=src.ssn[1]),keyed(s2=src.ssn[2]),keyed(s3=src.ssn[3]),keyed(s4=src.ssn[4]),keyed(s5=src.ssn[5]),keyed(s6=src.ssn[6]),keyed(s7=src.ssn[7]),keyed(s8=src.ssn[8]),keyed(s9=src.ssn[9])),50));
+			getdidfromssn := if(hasSSN and hasName,Choosen(dx_Header.key_SSN()(keyed(s1=src.ssn[1]),keyed(s2=src.ssn[2]),keyed(s3=src.ssn[3]),keyed(s4=src.ssn[4]),keyed(s5=src.ssn[5]),keyed(s6=src.ssn[6]),keyed(s7=src.ssn[7]),keyed(s8=src.ssn[8]),keyed(s9=src.ssn[9])),50));
 			didbasedssn := dedup(sort(project(getdidfromssn(ut.NameMatch100(pfname,'','',stringlib.StringToUpperCase(src.name_first),'','')>80),layouts.layout_did),record),record);
 			bestRecs := dx_BestRecords.get(dataset([{didbasedssn[1].did}], doxie.layout_references), 
 				did, dx_BestRecords.Constants.perm_type.glb);

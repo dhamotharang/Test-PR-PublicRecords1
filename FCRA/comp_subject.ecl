@@ -147,7 +147,7 @@ ssn_main := join(best_header, Risk_Indicators.Key_SSN_Table_v4_filtered_FCRA,
 						left.ssn<>'' and keyed(left.ssn=right.ssn) and (right.ssn not in ssn_ids),
 						transform( layout_ssn, self := right ),
 						KEEP(1), LIMIT(0));		// what should we keep here
-ssn_corrected := ssn_main + PROJECT( ssn_corr, Layout_SSN);
+ssn_corrected := ssn_main + PROJECT( ssn_corr, TRANSFORM(Layout_SSN, SELF:= LEFT, SELF:=[]));  // Commenting out source related fields (global_sid and record_sid) //
 dear := ssn_corrected[1]; // at most one record by definition
 
 

@@ -1,4 +1,4 @@
-﻿IMPORT KEL011 AS KEL;
+﻿IMPORT KEL11 AS KEL;
 IMPORT PublicRecords_KEL;
 
 EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) InputData,
@@ -7,7 +7,7 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 	ds_input_slim := 
     PROJECT(InputData,
       TRANSFORM( PublicRecords_KEL.ECL_Functions.Input_Layout_Slim,
-        SELF.InputUIDAppend := COUNTER,
+        SELF.G_ProcUID := COUNTER,
         SELF := LEFT ));														
 								
 	// Echo input
@@ -24,18 +24,18 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( withLexID, Options );
 
   // Get Attributes - cleans the attributes after KEL is done 
-  InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(withLexID, (STRING) withLexID[1].InputArchiveDateClean[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
+  InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(withLexID, (STRING) withLexID[1].P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 	
 	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(withLexID, FDCDataset, Options); 
 
-	withPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, LEFT.InputUIDAppend = RIGHT.InputUIDAppend,
+	withPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, LEFT.G_ProcUID = RIGHT.G_ProcUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
 			SELF := RIGHT,
 			SELF := LEFT,
 			SELF := []),
 		LEFT OUTER, KEEP(1), ATMOST(100));
 
-	MasterResults := SORT(withPersonAttributes, InputUIDAppend);
+	MasterResults := SORT(withPersonAttributes, G_ProcUID);
 	
 	IF(Options.OutputMasterResults, OUTPUT(MasterResults, NAMED('MasterResults')));
 

@@ -1,7 +1,7 @@
 ﻿ID "e5c68b61-9ce3-495a-b297-93ee9f78db2e";
 NAME AppendBusinessContacts;
 LABEL "Append Business Contacts";
-VERSION "1.0.0";
+VERSION "1.1.0";
 AUTHOR "CarmigJX";
 CATEGORY COMPUTE;
 DESCRIPTION "Appends business contacts for a business that has previously had the BIP Ids appended.";
@@ -20,6 +20,7 @@ INPUTS
   END
 	ENUM("False","True") ReturnExecutivesOnly: LABEL("Return Executives Only"),DESCRIPTION("Returns contacts that are executives only"),OPTIONAL,DEFAULT("False");
 	ENUM("True","False") ReturnCurrentContacts: LABEL("Return Current Contacts"),DESCRIPTION("Returns current contacts only"),OPTIONAL,DEFAULT("True");
+	ENUM("True","False") SuppressCCPAOptOut: LABEL("Suppress CCPA Opt Out Records"),DESCRIPTION("True - suppresses CCPA Opt Out records\False - appends a flag informing record is a CCPA Opt Out"),OPTIONAL,DEFAULT("True");
 	STRING APPLICATIONTYPE: LABEL("Application Type"),DEFAULT(""), OPTIONAL;
   STRING DPPAPURPOSE:LABEL("DPPA Purpose"),DEFAULT("^GLOBAL|DPPAPURPOSE");
   STRING GLBPURPOSE:LABEL("GLB Purpose"),DEFAULT("^GLOBAL|GLBPURPOSE");
@@ -45,6 +46,7 @@ OUTPUTS
     BOOLEAN isCurrent;
     BOOLEAN ContactAppended;
     BOOLEAN ContactIdentified;
+    INTEGER IsOptOutFlag: OPTIONAL;
   END
   DATASET dsContacts(dsInput): PREFIX(INPUTS.Prefix)
     UNSIGNED6 LexID;
@@ -62,6 +64,7 @@ OUTPUTS
     BOOLEAN isCurrent;
     BOOLEAN ContactAppended;
     BOOLEAN ContactIdentified;
+    INTEGER IsOptOutFlag: OPTIONAL;
   END
   
 	DATASET BusinessesStats: SIDE,WUID
@@ -88,11 +91,12 @@ END
 
 GENERATES INLINE
 	IMPORT Business;
-  returnCurrent     := '%ReturnCurrentContacts%'='True';
-  returnExecutives  := '%ReturnExecutivesOnly%'='True';
+  returnCurrent     := %^qReturnCurrentContacts%  = 'True';
+  returnExecutives  := %^qReturnExecutivesOnly%   = 'True';
+  suppressCCPARecs  := %^qSuppressCCPAOptOut%     = 'True';
 
   dAppendContacts   := Business.macAppendBusinessContacts(%dsInput%, %UltID%, %OrgID%, %SeleID%,returnCurrent,returnExecutives,
-    '%Prefix%','%APPLICATIONTYPE%','%DATARESTRICTIONMASK%','%GLBPURPOSE%','%DPPAPURPOSE%'); 
+    '%Prefix%','%APPLICATIONTYPE%','%DATARESTRICTIONMASK%','%GLBPURPOSE%','%DPPAPURPOSE%',,suppressCCPARecs); 
     
   %^edsContacts%              := dAppendContacts %^p%;
   %^sdsContactsDistributed%   := DISTRIBUTE(%dsContacts%, HASH32(%UltID%, %OrgID%, %SeleID%));
@@ -118,6 +122,9 @@ RESOURCES
 	ECL  BIPV2:FILENAME("BIPV2"), URL("<http://10.241.100.153:8010>"); 
 	ECL  UT:FILENAME("UT"), URL("<http://10.241.100.153:8010>"); 
 	ECL  BIPV2_Suppression:FILENAME("BIPV2_Suppression"), URL("<http://10.241.100.153:8010>"); 
+	ECL  BIPV2_Build:FILENAME("BIPV2_Build"), URL("<http://10.241.100.153:8010>"); 
+	ECL  doxie:FILENAME("doxie"), URL("<http://10.241.100.153:8010>"); 
+	ECL  Suppress:FILENAME("Suppress"), URL("<http://10.241.100.153:8010>"); 
 	LOGICALFILE test: FILENAME("~qa::business::appendbusinesscontacts::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100cert");
 	INDEX Keys.Key_Contacts:FILENAME("~thor_data400::key::bipv2::business_header::qa::contact_linkids"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100dev");  
 END

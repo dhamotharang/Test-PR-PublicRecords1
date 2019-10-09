@@ -155,38 +155,39 @@ IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie, A
 		self.UniqueId := (STRING)l.did;
 		self := l;
 		self := [];
-
 	END;
 
 	cleanpSearchBy := PROJECT(dReqBatch, CleanupSearch(LEFT));
 
 	formattedSearchBy := cleanpSearchBy[1];
 
-	modRecords := PhoneFinder_Services.PhoneFinder_Records(dReqBatch, reportMod, IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
-															dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways),
- 															formattedSearchBy, pfSearchBy);
-iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
-      		TRANSFORM
-      			SELF._Header   := iesp.ECL2ESP.GetHeaderRow();
-      			SELF.Records   := modRecords.dFormat2IESP;
-      			SELF.InputEcho := pfSearchBy;
- END;
+  dPFGateways := IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
+                    dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),
+                    dGateways);
 
- dPhoneFinder := DATASET([tFormat2IespResponse()]);
+	modRecords := PhoneFinder_Services.PhoneFinder_Records(dReqBatch, reportMod, dPFGateways, formattedSearchBy, pfSearchBy);
 
- // return blank  dataset when identities child dataset is blank
- results := if(~reportMod.SuppressBlankNameAddress or (reportMod.SuppressBlankNameAddress and exists(dPhoneFinder.records.identities)),
-                       dPhoneFinder);
+  iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
+  TRANSFORM
+    SELF._Header   := iesp.ECL2ESP.GetHeaderRow();
+    SELF.Records   := modRecords.dFormat2IESP;
+    SELF.InputEcho := pfSearchBy;
+  END;
 
- royalties	:= modRecords.dRoyalties;
- Zumigo_Log := modRecords.Zumigo_History_Recs;
- PF_Reporting_Dataset := modRecords.ReportingDataset;
+  dPhoneFinder := DATASET([tFormat2IespResponse()]);
 
- OUTPUT(results, named('Results'));
- OUTPUT(royalties, named('RoyaltySet'));
- OUTPUT(Zumigo_Log, named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
- OUTPUT(PF_Reporting_Dataset, named('LOG_DELTABASE'));
+  // return blank  dataset when identities child dataset is blank
+  results := if(~reportMod.SuppressBlankNameAddress or (reportMod.SuppressBlankNameAddress and exists(dPhoneFinder.records.identities)),
+                        dPhoneFinder);
 
+  royalties	:= modRecords.dRoyalties;
+  Zumigo_Log := modRecords.Zumigo_History_Recs;
+  PF_Reporting_Dataset := modRecords.ReportingDataset;
+
+  OUTPUT(results, named('Results'));
+  OUTPUT(royalties, named('RoyaltySet'));
+  OUTPUT(Zumigo_Log, named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
+  OUTPUT(PF_Reporting_Dataset, named('LOG_DELTABASE'));
 ENDMACRO;
 
 /*--HELP--

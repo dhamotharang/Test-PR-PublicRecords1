@@ -304,7 +304,10 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
     END;
 	
 	EXPORT cWeaponsRecsByDid(Ioptions in_mod):= FUNCTION
-       ccw_mod   := module (project (in_mod, PersonReports.input.ccw, opt)) end;	
+       ccw_mod  := module (PersonReports.IParam.ccw)
+         $.IParams.MAC_copy_old_report_fields(in_mod);
+       end;
+	
        ccw_raw := PersonReports.ccw_records(in_did,ccw_mod);
        //SmartRollup.fn_smart_rollup_cweapons
        ccw_sorted := sort(ccw_raw, StateCode, Permit.PermitNumber,Permit.PermitType, -d2i(Permit.ExpirationDate));
@@ -452,7 +455,9 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
    	END;
 	
 	EXPORT deaConSubRecsByDid(Ioptions in_mod):= FUNCTION
-       dea_mod  := module (project (in_mod, PersonReports.input.dea, opt)) end;	
+       dea_mod  := module (PersonReports.IParam.dea)
+         $.IParams.MAC_copy_old_report_fields(in_mod);
+       end;
        dea_raw  := PersonReports.dea_records(in_did,dea_mod);
        //SmartRollup.fn_smart_rollup_dea
        dea_sorted := sort(dea_raw, RegistrationNumber, -d2i(controlledSubstancesInfo[1].expirationDate));

@@ -3,7 +3,7 @@
 valid_gong_full := gong.File_Gong_full(trim(phone10) <> '');
 
 new_gong_record := record
-	gong.Layout_bscurrent_raw;
+	valid_gong_full;
 	string7 phone7;
 	string3 area_code;
 end;

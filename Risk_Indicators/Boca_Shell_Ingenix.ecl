@@ -1,7 +1,6 @@
-﻿import risk_indicators, riskwise, doxie_files, ingenix_natlprof, doxie;
-// doxie, Suppress; for later use in CCPA, will be cleaned up when CCPA changes are made
+﻿import risk_indicators, riskwise, doxie_files, ingenix_natlprof;
 
-EXPORT Boca_Shell_Ingenix(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+EXPORT Boca_Shell_Ingenix(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only) := FUNCTION
 
 temp := record
 	risk_indicators.Layout_Boca_Shell_ids;

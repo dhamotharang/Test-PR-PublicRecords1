@@ -72,8 +72,7 @@ EXPORT RawEmail := MODULE
     
     recs_filt:= recs_all(
       in_mod.ReturnOverwritten or ~compliance_flags.isOverwritten,
-      in_mod.ReturnSuppressed or ~compliance_flags.isSuppressed,
-      $.Functions.FCRADateIsOk(date_last_seen, todaysdate)
+      in_mod.ReturnSuppressed or ~compliance_flags.isSuppressed
       );
   
     layout_email_rawrec xformStatements(layout_email_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,

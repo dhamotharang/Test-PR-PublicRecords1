@@ -1,10 +1,9 @@
-﻿import AutoStandardI, business_header, doxie_raw, ut, risk_indicators, paw, doxie, STD, suppress;
+﻿IMPORT business_header, doxie_raw, ut, risk_indicators, paw, doxie, STD, suppress;
 
-export Add_Phones(DATASET(layout_references) in_dids, 
-									DATASET(doxie.layout_relative_dids_v3) rels, 
-                Doxie.IDataAccess mod_access,
-                integer dbd_value = 0
-                ) :=
+EXPORT Add_Phones(DATASET(layout_references) in_dids,
+	DATASET(doxie.layout_relative_dids_v3) rels,
+  Doxie.IDataAccess mod_access,
+  integer dbd_value = 0) :=
 FUNCTION
 
 
@@ -19,7 +18,7 @@ END;
   unsigned4 global_sid;
   unsigned8 record_sid;
  end;
- 
+
  Layout_Employment_Out_plus get_paw(paw.Key_Did le, paw.Key_contactID ri) :=
 TRANSFORM
 	SELF.did := intformat(ri.did,12,1);
@@ -33,7 +32,7 @@ paw_pre := JOIN(paw_did,paw.Key_contactID,keyed(LEFT.contact_id=RIGHT.contact_id
 						get_paw(LEFT,RIGHT),
 						LIMIT(ut.limits.PAW_PER_CONTACTID,SKIP)); // < 26  in index
 paw := project(suppress.MAC_SuppressSource(paw_pre,mod_access),business_header.Layout_Employment_Out);
-						
+
 layout_phones form_paw_phones(paw le) :=
 TRANSFORM
 	SELF.listed := false;
@@ -51,7 +50,7 @@ TRANSFORM
 		length(trim(ri_phone,all))=10 and
 		keyed(ri_phone[1..3]=npa) and
 		keyed(ri_phone[4..6]=nxx))[1]);
-	SELF.timezone := ut.TimeZone_Convert((unsigned1) telcordia.timezone,telcordia.state);		
+	SELF.timezone := ut.TimeZone_Convert((unsigned1) telcordia.timezone,telcordia.state);
 	SELF := le;
 END;
 
@@ -84,7 +83,9 @@ best_rel := DEDUP(SORT(rels,person1,-number_cohabits),person1,KEEP(2))+
 						DEDUP(SORT(rels,person1,-recent_cohabit),person1,KEEP(2));
 for_batch := GROUP(DEDUP(SORT(project(best_rel, tra_for_Batch(left)),input.seq,input.did),input.seq,input.did),input.seq,input.did);
 rel_header := CHOOSEN(SORT(DEDUP(SORT(doxie_Raw.Header_Raw_batch(for_batch),did,-dt_last_seen),did,KEEP(2)),-dt_last_seen),10);
-rel_appended := append_gong(PROJECT(rel_header,TRANSFORM(doxie.Layout_presentation,SELF := LEFT,SELF := [])),rels,2);
+rel_appended := doxie.append_gong(PROJECT(rel_header, TRANSFORM(doxie.Layout_presentation,SELF := LEFT,SELF := [])),
+  rels, mod_access, 2);
+
 rel_appended patch_did(rel_appended le, for_batch ri) :=
 TRANSFORM
 	SELF.did := ri.input.seq;

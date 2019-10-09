@@ -399,7 +399,7 @@ ds_newModels;
     _curr_Scores_good_hit	:= PROJECT(ds_modelScores_res_filtered , xfm_current_scores(LEFT));
 		_curr_Scores_no_hit   := PROJECT(ds_modelScores_res_filtered , xfm_current_scores_no_hit(LEFT));
 		
-		_curr_Scores := IF( isGoodHit, _curr_Scores_good_hit, _curr_Scores_no_hit );
+		_curr_Scores := IF( isGoodHit OR SmallBizCombined_inmod.TestDataEnabled, _curr_Scores_good_hit, _curr_Scores_no_hit );
 		
     iesp.businesscreditreport.t_BusinessCreditScoring xfm_CurrScores_toIESP_Layout() := 
       TRANSFORM

@@ -43,13 +43,16 @@ Output_Master_Results := FALSE;
 // Output_Master_Results := TRUE; 
 
 // Toggle to include/exclude SALT profile of results file
-// Output_SALT_Profile := FALSE;
-Output_SALT_Profile := TRUE;
+Output_SALT_Profile := FALSE;
+// Output_SALT_Profile := TRUE;
 
 RecordsToRun := 0;
 eyeball := 100;
 
-OutputFile := '~AFA::Consumer_KAS1832_100K_RoxieDev_current_12312018_FCRA'+ ThorLib.wuid() ;
+OutputFile := '~calbrecht::BundleTest_100K_RoxieDev_current_09172019_FCRA'+ ThorLib.wuid() ;
+// OutputFile := '~calbrecht::BundleTest_100K_RoxieDev_archive_09172019_FCRA'+ ThorLib.wuid() ;
+
+
 prii_layout := RECORD
     STRING Account             ;
     STRING FirstName           ;
@@ -92,8 +95,8 @@ soapLayout := RECORD
 	INTEGER ScoreThreshold;
 	STRING DataRestrictionMask;
 	STRING DataPermissionMask;
-	UNSIGNED1 GLBA_Purpose;
-	UNSIGNED1 DPPA_Purpose;
+	UNSIGNED1 GLBPurpose;
+	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
@@ -127,8 +130,8 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.ScoreThreshold := Settings.LexIDThreshold;
 	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
-	SELF.GLBA_Purpose := Settings.GLBAPurpose;
-	SELF.DPPA_Purpose := Settings.DPPAPurpose;
+	SELF.GLBPurpose := Settings.GLBAPurpose;
+	SELF.DPPAPurpose := Settings.DPPAPurpose;
 	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
 END;
@@ -148,11 +151,11 @@ OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 layout_MAS_Test_Service_output := RECORD
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
-	STRING ErrorCode := '';
+	STRING G_ProcErrorCode := '';
 END;
 
 layout_MAS_Test_Service_output myFail(soap_in le) := TRANSFORM
-	SELF.ErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
+	SELF.G_ProcErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
 	//SELF.Account := le.Account;
 	SELF := [];
 END;
@@ -168,8 +171,8 @@ bwr_results :=
 				PARALLEL(threads), 
         onFail(myFail(LEFT)));
 
-Passed := bwr_results(TRIM(ErrorCode) = '');
-Failed := bwr_results(TRIM(ErrorCode) <> '');
+Passed := bwr_results(TRIM(G_ProcErrorCode) = '');
+Failed := bwr_results(TRIM(G_ProcErrorCode) <> '');
 
 OUTPUT( CHOOSEN(Passed,eyeball), NAMED('bwr_results_Passed') );
 OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
@@ -177,7 +180,7 @@ OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 LayoutMaster_With_Extras := RECORD
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
-	STRING ErrorCode;
+	STRING G_ProcErrorCode;
 	STRING ln_project_id;
 	STRING pf_fraud;
 	STRING pf_bad;
@@ -190,27 +193,31 @@ END;
 
 Layout_Person := RECORD
 	PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA;
-	STRING ErrorCode;
+	STRING G_ProcErrorCode;
 END;
 
 Passed_with_Extras := 
-	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.InputAccountEcho, 
+	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.P_InpAcct, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
 			SELF := LEFT, //input performance fields
-			SELF.ErrorCode := RIGHT.ErrorCode,
+			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
 		INNER, KEEP(1));
 	
 Passed_Person := 
-	JOIN(p, Passed, LEFT.Account = RIGHT.Results.InputAccountEcho, 
+	JOIN(p, Passed, LEFT.Account = RIGHT.Results.P_InpAcct, 
 		TRANSFORM(Layout_Person,
 			SELF := RIGHT.Results, //fields from passed
 			SELF := LEFT, //input performance fields
-			SELF.ErrorCode := RIGHT.ErrorCode,
+			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
 		INNER, KEEP(1));
-	
+      
+Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY); 
+OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV (QUOTE('"')), OVERWRITE);
+
+  
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_FCRA_Layout'));
 

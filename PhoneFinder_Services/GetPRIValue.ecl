@@ -40,7 +40,8 @@ alertRec:= RECORD
 										// Eventually we will obtain PortingStatus from the LIBD file, however for now we continue to use TU as authoritative
 										// 1  => SubjectPhone.PortingStatus='Inactive',
 									 -1 => SubjectPhone.phone = '',
-										1  => SubjectPhone.PhoneStatus = PhoneFinder_Services.Constants.PhoneStatus.Inactive ,
+										1  => IF(inmod.IsGovsearch, (SubjectPhone.fname <>'' OR SubjectPhone.lname <> '' OR SubjectPhone.listed_name <> '') AND SubjectPhone.PhoneStatus = $.Constants.PhoneStatus.Inactive,
+																         SubjectPhone.PhoneStatus = $.Constants.PhoneStatus.Inactive),
 										2  => (UNSIGNED)SubjectPhone.dt_first_seen>(UNSIGNED)ut.date_math(currentDate,-l.Threshold ) AND
 																		(UNSIGNED)SubjectPhone.dt_first_seen <= (UNSIGNED)ut.date_math(currentDate, -l.ThresholdA),
 										3  => SubjectPhone.dt_last_seen<>'' AND ut.DaysApart(SubjectPhone.dt_last_seen,currentDate)>l.Threshold,

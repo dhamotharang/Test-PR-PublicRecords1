@@ -1,4 +1,4 @@
-import doxie_build, header, header_quick, fcra, BankruptcyV2, doxie, address, ut, mdr, STD;
+﻿import doxie_build, header, header_quick, fcra, BankruptcyV2, doxie, address, ut, mdr, STD;
 
 todays_date := (string) risk_indicators.iid_constants.todaydate;
 export SSN_Table_v4_2(boolean isFCRA) := function
@@ -85,6 +85,9 @@ final_rec := RECORD
 	common_rec eq;
 	common_rec en;
 	common_rec tn;
+	//CCPA-768
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 END;
 
 

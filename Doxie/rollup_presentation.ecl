@@ -75,7 +75,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
     SELF := le;
   END;
 
-  nondidHBR := doxie.header_base_rollup(with_risk((INTEGER)did=0));
+  nondidHBR := doxie.header_base_rollup(with_risk((INTEGER)did=0), mod_access);
 
   doxie.Layout_Rollup.KeyRec nondidFormat(nondidHBR le) := TRANSFORM
     SELF.nameRecs := PROJECT(le,noDidNames(LEFT));
@@ -561,7 +561,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
   END;
 
   whichRids := join(tagrp, ta2, LEFT.did = RIGHT.did, getRids(LEFT));
-  srcRids := doxie.lookup_rid_src(dedup(sort(whichRids,record),record));
+  srcRids := doxie.lookup_rid_src(dedup(sort(whichRids,record),record), mod_access);
 
   mod_access_local := MODULE (mod_access)
     EXPORT unsigned1 glb := 1;

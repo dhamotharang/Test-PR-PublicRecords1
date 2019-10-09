@@ -14,7 +14,9 @@ EXPORT GetPhoneIndicators (
   dataset (doxie.layout_best) bestrecs,
   dataset ($.layouts.slim_header) header_recs,
   $.IParam._identityfraudreport param) := FUNCTION
- 
+
+  mod_access := PROJECT(param, Doxie.IDataAccess, OPT);
+
   // ===================================================================
   // =========================== Get phones  ===========================
   // ===================================================================
@@ -41,8 +43,8 @@ EXPORT GetPhoneIndicators (
   // take only header records with same address as a best file: make it easier for Roxie
   ds_in := join (header_recs, bestrecs,
                  Left.did = Right.did and
-                 Left.prim_name = Right.prim_name and 
-                 Left.prim_range = Right.prim_range and 
+                 Left.prim_name = Right.prim_name and
+                 Left.prim_range = Right.prim_range and
                  Left.predir=Right.predir and
                  //NB: exact match: TODO: check if it's better to ease it on sec range
                  Left.sec_range = Right.sec_range and
@@ -56,12 +58,12 @@ EXPORT GetPhoneIndicators (
   // -------------------------------------------------------------------
   // First, fetch Gong phones, explicitely excluding PP
   // -------------------------------------------------------------------
-  all_gong_phones := doxie.Append_Gong (ds_in, doxie.relative_dids (project (bestrecs, doxie.layout_references)),
-                                        ,// integer dcp_value = 5
-                                        false, //do not include PhonesPlus phones
-                                        param.score_threshold,
-                                        param.glb,
-                                        param.dppa);
+  all_gong_phones := doxie.Append_Gong(ds_in,
+    doxie.relative_dids(project(bestrecs, doxie.layout_references)),
+    mod_access,
+    ,// integer dcp_value = 5
+    false, //do not include PhonesPlus phones
+    param.score_threshold);
 
   // TODO: check whether Append_Gong can bring phones at completely different addresses,
   // then I will have to make an extra join with best records here
@@ -78,7 +80,7 @@ EXPORT GetPhoneIndicators (
       Self.carrier_city := R.carrier_city;
       Self.carrier_state := R.carrier_state;
 
-      Self.listing_type_res := R.listing_type_res;	
+      Self.listing_type_res := R.listing_type_res;
       Self.listing_type_bus := R.listing_type_bus;
       Self.listing_type_gov := R.listing_type_gov;
       Self.listing_type_cell:= R.listing_type_cell;
@@ -91,14 +93,14 @@ EXPORT GetPhoneIndicators (
 
   // save whatever phone's data we need
   phones_hri_rec SetPhoneData (phones_hri_rec L, phones_hri_rec R) := transform
-    // 0-dates are ignored 
+    // 0-dates are ignored
     Self.phone_first_seen := if (R.phone_first_seen < L.phone_first_seen, R.phone_first_seen, L.phone_first_seen);
     Self.hri_Phone := [];
     Self := L;
   end;
-  phones_gong_hri := rollup (sort (gong_phones, did, phone, -phone_last_seen), 
+  phones_gong_hri := rollup (sort (gong_phones, did, phone, -phone_last_seen),
                            (Left.did = Right.did) and (Left.phone = Right.phone),
-                           SetPhoneData (Left, Right)); 
+                           SetPhoneData (Left, Right));
 
 
 
@@ -108,13 +110,13 @@ EXPORT GetPhoneIndicators (
   // -------------------------------------------------------------------
   phplRecs := moxie_phonesplus_server.phonesplus_did_records (
             project (bestrecs, doxie.layout_references),
-            iesp.Constants.BR.MaxPhonesPlus, 
+            iesp.Constants.BR.MaxPhonesPlus,
             param.score_threshold,
             param.glb,
             param.dppa,, TRUE).w_timezoneSeenDt; //isRoxie
 
   pp_rec := recordof (phplRecs);
- 
+
   // rollup by did+phone //TODO: what else?
   pp_rec RollPhonesPlus (pp_rec L, pp_rec R) := transform
     Self.first_seen := if (L.first_seen = 0 or L.first_seen > R.first_seen, R.first_seen, L.first_seen);
@@ -122,7 +124,7 @@ EXPORT GetPhoneIndicators (
   end;
   pp_rolled := rollup (sort (phplRecs, did, phoneno, -last_seen),
                        (Left.did=Right.did) and (Left.phoneno = Right.phoneno),
-                       RollPhonesPlus (Left, Right)); 
+                       RollPhonesPlus (Left, Right));
 
   phones_hri_rec CreatePhonesPlus (pp_rec L) := transform
     Self.phone := L.phoneno;
@@ -139,7 +141,7 @@ EXPORT GetPhoneIndicators (
   end;
   phones_plus_hri := project (pp_rolled, CreatePhonesPlus (Left));
 
-  // get Gong and PP together  
+  // get Gong and PP together
   phones_hri_pre := phones_gong_hri + if (param.include_phonesplus, phones_plus_hri);
 
   maxHriPer_value := param.max_hri;
@@ -199,7 +201,7 @@ EXPORT GetPhoneIndicators (
     Self.CarrierName := L.carrier;
     Self.CarrierCity := L.carrier_city;
     Self.CarrierState := L.carrier_state;
-    ltypes := dataset ([{L.listing_type_res}, {L.listing_type_bus}, {L.listing_type_gov}, {L.listing_type_cell}], 
+    ltypes := dataset ([{L.listing_type_res}, {L.listing_type_bus}, {L.listing_type_gov}, {L.listing_type_cell}],
                        iesp.share.t_StringArrayItem);
     Self.ListingTypes := ltypes (Value != '');
     // patch for the case when no phones were found in header (phones_counted is empty in this case)
@@ -207,11 +209,11 @@ EXPORT GetPhoneIndicators (
     Self.Sources := if (L.is_phonesplus,
                         dataset ([{'PHONE', 1}], ifr.t_IFRLinkIdSources),
                         if (R.count = 0, $.Functions.GetSources (ph_fabricated), R.Sources));
-    Self.Sourcecount := if (R.count = 0 or L.is_phonesplus, 1, R.count); 
+    Self.Sourcecount := if (R.count = 0 or L.is_phonesplus, 1, R.count);
 
     Self.DateFirstSeen := iesp.ECL2ESP.toDateYM (L.phone_first_seen);
     Self.DateLastSeen := iesp.ECL2ESP.toDateYM (L.phone_last_seen);
-    
+
     // take previously calculated RIs
     all_inds := project (L.hri_phone, $.Functions.TransformRiskIndicators (Left));
     selected_inds := choosen (sort (all_inds, -all_inds.Rank), $.Constants.MAX_PHONES_INDICATORS);
@@ -219,7 +221,7 @@ EXPORT GetPhoneIndicators (
   end;
 
   // A precaution: Gong and Phones+ phones must not intersect, in theory, but to be on the safe side
-  // dedup seems to be appropriate. 
+  // dedup seems to be appropriate.
   // Also, I can't yet tell if a phone is from header or "other" source whithin phones+ data.
   // For the simplicity sake, I will discard a duplicate coming from Gong
   phones_ddp := dedup (sort (phones_hri, did, phone, ~is_phonesplus), did, phone);

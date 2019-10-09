@@ -8,6 +8,9 @@ export mac_get_targus_by_phone(f_in, f_out, targus_cfg, use_tg_flag) := macro
 	string20 acctno;
 	dataset(doxie.layout_pp_raw_common) targus_out;						
 end;	
+
+#uniquename(gw_mod_access)
+%gw_mod_access% := gateway.IParam.GetGatewayModAccess(1, 1); // <-- doing this to keep it backwards compatible, but is this ok?
 			
 #uniquename(get_targus_out_raw)			
 %targus_out_rec% %get_targus_out_raw%(f_in l) := transform
@@ -15,7 +18,7 @@ end;
                                                     l.phoneno, '', '', '',
                                                     '', '', '', '',
 				                            				        '', '', '', '', '',
-								                                    '', '', 1, 1,
+								                                    '', '', %gw_mod_access%,
 								                                    10, targus_cfg, '');
 	 self := l;																									
 end;			

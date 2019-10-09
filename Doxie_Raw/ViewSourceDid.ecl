@@ -1,5 +1,5 @@
 ﻿import Doxie, Doxie_Raw, doxie_ln, utilfile, header_quick, autokeyb, ut, moxie_phonesplus_server,
-       LN_PropertyV2_Services, mdr, iesp, AutoStandardI, CriminalRecords_Services, American_Student_Services, Suppress;
+  LN_PropertyV2_Services, mdr, iesp, AutoStandardI, CriminalRecords_Services, American_Student_Services, Suppress;
 
 doxie.MAC_Header_Field_Declare();
 doxie.MAC_Selection_Declare ();
@@ -298,7 +298,7 @@ util_out := project(utils_in,dailyUtility(left));
 //gong records
 
 input_dids := PROJECT(input(idtype = 'DID',viewPhone(section)), TRANSFORM(doxie.layout_references, SELF.did := (unsigned6)LEFT.id;));
-gong_did_recs := PROJECT(Doxie_Raw.Phone_Raw(input_dids), TRANSFORM(Doxie_Raw.Layout_crs_raw, SELF.did := 0; SELF.rid := 0;
+gong_did_recs := PROJECT(Doxie_Raw.Phone_Raw(input_dids, mod_access), TRANSFORM(Doxie_Raw.Layout_crs_raw, SELF.did := 0; SELF.rid := 0;
                                                    SELF.phone_child := LEFT; SELF := []));;
 
 gong_in := input(is_gong(id));
@@ -311,7 +311,7 @@ doxie.layout_references getD(gong_in le) := TRANSFORM
 end;
 
 dids_from_rids := project(gong_in, getD(left));
-gong_raw_recs := Doxie_Raw.Phone_Raw(dids_from_rids);
+gong_raw_recs := Doxie_Raw.Phone_Raw(dids_from_rids, mod_access);
 
 // bug 26751 -- only require phone match
 gong_rid_recs := join(gong_raw_recs, gong_in, left.phone10 = phone_from_gong_rid(right.id),
@@ -323,7 +323,7 @@ gong_out := gong_did_recs + gong_rid_recs;
 QuickHeader_in := input(is_QuickHeader(id));
 
 header_quick_temp:= record
-    header_quick.layout_records; 
+    header_quick.layout_records;
     unsigned4 global_sid;
 	unsigned8 record_sid;
 end;
@@ -341,13 +341,13 @@ Doxie_Raw.Layout_crs_raw QuickHeader(QuickHeader_in L) := transform
  self.did := 0;
 
   w_weekly(string2 src) := if(doxie.DataRestriction.WH,~mdr.sourceTools.sourceisWeeklyHeader(src),TRUE);
-  
+
   QH_recs := if(isfake,
     project(header_quick.key_AutokeyPayload(fakeid = iDID and rid = iRID and w_weekly(src)), header_quick_temp),
     project(header_quick.key_DID(DID = iDID and rid = iRID and w_weekly(src) ), header_quick_temp));
- 
+
  self.QuickHeader_child := project(Suppress.MAC_SuppressSource(QH_recs, mod_access), header_quick.layout_records);
-  
+
  self := [];
 end;
 

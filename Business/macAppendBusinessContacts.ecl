@@ -4,8 +4,8 @@ EXPORT macAppendBusinessContacts(dIn, InUltid, InOrgId, InSeleId,
   appendPrefix = '\'\'', 
   ApplicationType = '\'\'', _DataRestrictionMask = AutoStandardI.Constants.DataRestrictionMask_default, 
   _GLBPurpose = AutoStandardI.Constants.GLBPurpose_default, _DPPAPurpose = '0',
-  UseIndexThreshold=10000000) := FUNCTIONMACRO
-IMPORT BIPV2, ut, BIPV2_Suppression, BIPV2_Build, hipie_ecl;
+  UseIndexThreshold=10000000, suppressOptOut = TRUE) := FUNCTIONMACRO
+IMPORT BIPV2, ut, BIPV2_Suppression, BIPV2_Build, hipie_ecl, doxie, Suppress;
   LOCAL _contactsModule := MODULE
     EXPORT STRING DataRestrictionMask := (STRING)_DataRestrictionMask;
 		EXPORT UNSIGNED1 DPPAPurpose      := (UNSIGNED)_DPPAPurpose;
@@ -42,7 +42,14 @@ IMPORT BIPV2, ut, BIPV2_Suppression, BIPV2_Build, hipie_ecl;
 	//This macro handles the suppression for Contacts
   BIPV2_Suppression.mac_contacts(dContactsRestricted, LOCAL dContacts, LOCAL dContactsDirty);
   
-  LOCAL dContactsFiltered := IF(returnExecutivesOnly, dContacts(executive_ind), dContacts);
+  //Apply CCPA Opt Out
+  LOCAL mod_access := PROJECT(_contactsModule,doxie.IDataAccess,OPT);
+  LOCAL dContactsCCPASuppress := Suppress.MAC_SuppressSource(dContacts, mod_access, contact_did);
+  LOCAL dContactsCCPAFlagged  := Suppress.MAC_FlagSuppressedSource(dContacts, mod_access, contact_did);
+  LOCAL dContactsCCPA     := #IF((BOOLEAN)suppressOptOut) dContactsCCPASuppress #ELSE dContactsCCPAFlagged #END;
+  
+  //Filter executives if desired
+  LOCAL dContactsFiltered := IF(returnExecutivesOnly, dContactsCCPA(executive_ind), dContactsCCPA);
     
   LOCAL rContactsFinal :=
   RECORD
@@ -62,6 +69,7 @@ IMPORT BIPV2, ut, BIPV2_Suppression, BIPV2_Build, hipie_ecl;
     BOOLEAN   #EXPAND(appendPrefix + 'isCurrent');
     BOOLEAN   #EXPAND(appendPrefix + 'ContactAppended');
     BOOLEAN   #EXPAND(appendPrefix + 'ContactIdentified');
+    #IF(NOT(BOOLEAN)suppressOptOut) INTEGER1 #EXPAND(appendPrefix + 'IsOptOutFlag') := 0; #END
   END;
   
   LOCAL rContactsFinal tContactsAppendCurrentFlag(dContactsFiltered pIn) :=
@@ -88,6 +96,7 @@ IMPORT BIPV2, ut, BIPV2_Suppression, BIPV2_Build, hipie_ecl;
     SELF.InUltID    := (TYPEOF(SELF.InUltID))pIn.UltID;
     SELF.InOrgID    := (TYPEOF(SELF.InOrgID))pIn.OrgID;
     SELF.InSeleID   := (TYPEOF(SELF.InSeleID))pIn.SeleID;
+    #IF(NOT(BOOLEAN)suppressOptOut) SELF.#EXPAND(appendPrefix + 'IsOptOutFlag') := (INTEGER)pIn.is_suppressed, #END
     SELF            := pIn;
     SELF            := [];
   END;
@@ -115,6 +124,5 @@ IMPORT BIPV2, ut, BIPV2_Suppression, BIPV2_Build, hipie_ecl;
     LOCAL) 
       + PROJECT(dIn((UNSIGNED)InUltId = 0), TRANSFORM(rContactsFinal,
         SELF := LEFT, SELF := []));
-    
   RETURN dOut;
 ENDMACRO;
