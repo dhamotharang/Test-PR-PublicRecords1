@@ -86,7 +86,6 @@ EXPORT As_Business_Linking (
 				self.contact_email							 := l.email;
 				self.contact_email_username			 := email_data.fn_clean_email_username(l.email);
 				self.contact_email_domain				 := email_data.fn_clean_email_domain(l.email);
-<<<<<<< HEAD
 				string temp_employee_count       := case(l.employee_code,
 																								 'A' => '1 to 4',
 				                                         'B' => '5 to 9',
@@ -112,8 +111,6 @@ EXPORT As_Business_Linking (
 																								 '');
 		    self.employee_count_local_raw    := temp_employee_count;
 		    self.revenue_local_raw           := temp_revenue;
-=======
->>>>>>> 9063cb3eb2cb1e6eff9c6a42fc29d6c8a87cacb7
 				self 							   						 := l;
 				self 							   						 := [];
 		end;
