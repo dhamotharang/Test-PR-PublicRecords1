@@ -39,11 +39,11 @@ export GenCrosswalk(
                                 transform(Layouts.CrossWalkWorkRec1,
                                           self                             := left.contact_name,
                                           self                             := left.company_address,
-                                          self.jobTitleOrder               := map(left.dt_last_seen > TwoYearsAgo   => 1,
-                                                                                  left.dt_last_seen > SevenYearsAgo => 2,
+                                          self.jobTitleOrder               := map(left.dt_first_seen_contact > TwoYearsAgo   => 1,
+                                                                                  left.dt_last_seen_contact  > SevenYearsAgo => 2,
                                                                                   3);                                          
                                           self.job_title                   := if(left.executive_ind_order > 0 and left.source not in RestrictedSources, left.contact_job_title_derived, ''),
-                                          self.contact_title_rank          := 0,
+                                          self.contact_rank          := 0,
                                           self.seg_ind                     := '',
                                           self.sourceGroup                 := 'CONTACT_KEYS',
                                           self.dt_first_seen_at_business   := left.dt_first_seen_contact;
@@ -58,7 +58,7 @@ export GenCrosswalk(
                                   self.executive_ind_order           := 0,
                                   self.jobTitleOrder                 := 0,
                                   self.sourceGroup                   := 'BIP',
-                                  self.contact_title_rank            := 0,
+                                  self.contact_rank            := 0,
                                   self.seg_ind                       := '',
                                   self.dt_first_seen_at_business     := left.dt_first_seen_contact;
                                   self.dt_last_seen_at_business      := left.dt_last_seen_contact;
@@ -77,7 +77,7 @@ export GenCrosswalk(
                                   self.contact_phone             := left.phone,
                                   self.v_city_name               := left.city,
                                   self.st                        := left.state,
-                                  self.contact_title_rank        := 0,
+                                  self.contact_rank        := 0,
                                   self.seg_ind                   := '',
                                   self.executive_ind_order       := 0,
                                   self.jobTitleOrder             := 0,
@@ -100,7 +100,7 @@ export GenCrosswalk(
                                    self.job_title                 := '',
                                    self.contact_email             := '',
                                    self.vl_id                     := '',
-                                   self.contact_title_rank        := 0,
+                                   self.contact_rank        := 0,
                                    self.seg_ind                   := '',
                                    self.contact_phone             := (string) left.subject_phone,
                                    self.contact_ssn               := (string) left.subject_ssn,
@@ -327,7 +327,7 @@ export GenCrosswalk(
 																																									left.proxid=right.proxid and
                                          left.contact_did=right.contact_did,
                                          transform(Layouts.BipToConsumerCrossWalkRec,
-                                                   self.contact_title_rank := right.contact_title_rank,
+                                                   self.contact_rank := right.contact_rank,
                                                    self.jobTitles          := right.jobTitles,
                                                    self                    := left), left outer, hash);
                                                    
@@ -337,8 +337,8 @@ export GenCrosswalk(
                                          left.seleid=right.seleid and
                                          left.contact_did=right.contact_did,
                                          transform(Layouts.BipToConsumerCrossWalkRec,
-                                                   self.contact_title_rank := right.contact_title_rank,
-                                                   self                    := left), hash, left outer, keep(1));
+                                                   self.contact_rank := right.contact_title_rank,
+                                                   self              := left), hash, left outer, keep(1));
                                                    
        /**
          Recombine the Contacts with LexIDs, EmpIDs, and noIDs and add business dates.

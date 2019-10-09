@@ -96,7 +96,7 @@
           unsigned2          job_title_permits;
           unsigned4          dt_title_first_seen;
           unsigned4          dt_title_last_seen;
-										integer            jobTitleOrder;
+					integer            jobTitleOrder;
           unsigned4          global_sid;
           unsigned8          record_sid;
      end;
@@ -111,7 +111,7 @@
           unsigned6                   proxid;
           unsigned6                   empid;
           unsigned6                   contact_did;
-          unsigned8                   contact_title_rank;
+          unsigned8                   contact_rank;
           unsigned4                   dt_first_seen;
           unsigned4                   dt_last_seen;
           dataset(ContactNameRec)     contactNames;
@@ -144,7 +144,7 @@
           unsigned6          proxid;
           unsigned6          empid;
           unsigned6          contact_did;
-          unsigned8          contact_title_rank; 
+          unsigned8          contact_rank; 
           string10           seg_ind;
           integer            executive_ind_order;
           string5            title;
@@ -187,7 +187,7 @@
           unsigned6                   seleid;
           unsigned6                   proxid;
           unsigned6                   contact_did;
-          unsigned8                   contact_title_rank; 
+          unsigned8                   contact_rank; 
           unsigned6                   empid;
           dataset(JobTitleRec)        jobTitles;
      end;     
