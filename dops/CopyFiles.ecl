@@ -302,7 +302,7 @@ EXPORT CopyFiles(string srcesp
 										WriteAllFiles
 										// copy only missing files in dest
 										,if (GetCount('missing') > 0
-											,if ( (GetCount('missing') < 6 and copywithsoap) or (GetCount('missing') >= 6 and ~copywithsoap)
+											,if ( (GetCount('missing') < 6 and copywithsoap) or ~copywithsoap
 												,apply(GetFilesDataset('missing')
 													,sequential(
 														output('Copying file ' + (string)cnt + ' of ' + (string)GetCount('missing') + ' from ' + srcdali + ' to ' + destdali + ':' + destcluster,named('Copy_Status'))

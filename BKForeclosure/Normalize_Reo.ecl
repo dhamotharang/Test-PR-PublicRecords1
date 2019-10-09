@@ -52,18 +52,26 @@ Layout_BK.CleanFields_REO t_norm_reo (Layout_BK.Base_Reo_ext  le, INTEGER C) := 
 													AND trim_buyer_fname1 != '',REGEXREPLACE('=',trim_buyer_fname1,' '),'');
 	buyer_lname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_lname1) 
 													AND trim_buyer_lname1 != '',REGEXREPLACE('=',trim_buyer_lname1,' '),'');
-	buyer_fname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_fname2) 
-													AND trim_buyer_fname2 != '',REGEXREPLACE('=',trim_buyer_fname2,' '),'');
+	buyer_fname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_fname2)
+													AND trim_buyer_fname2 != ''
+													AND trim_buyer_fname2 != trim_buyer_fname1
+													AND	trim_buyer_lname2 != trim_buyer_lname1,REGEXREPLACE('=',trim_buyer_fname2,' '),'');
 	buyer_lname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_lname2) 
-													AND trim_buyer_lname2 != '',REGEXREPLACE('=',trim_buyer_lname2,' '),'');  
+													AND trim_buyer_lname2 != ''
+													AND trim_buyer_fname2 != trim_buyer_fname1
+													AND	trim_buyer_lname2 != trim_buyer_lname1,REGEXREPLACE('=',trim_buyer_lname2,' '),'');  
 	seller_fname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_fname1)
 													AND trim_seller_fname1 != '',REGEXREPLACE('=',trim_seller_fname1,' '),'');
 	seller_lname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_lname1) 
 													AND trim_seller_lname1 != '',REGEXREPLACE('=',trim_seller_lname1,' '),'');
 	seller_fname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_fname2) 
-													AND trim_seller_fname2 != '',REGEXREPLACE('=',trim_seller_fname2,' '),'');
+													AND trim_seller_fname2 != ''
+													AND trim_seller_fname2 != trim_seller_fname1
+													AND trim_seller_lname2 != trim_seller_lname1,REGEXREPLACE('=',trim_seller_fname2,' '),'');
 	seller_lname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_lname2) 
-													AND trim_seller_lname2 != '',REGEXREPLACE('=',trim_seller_lname2,' '),'');  
+													AND trim_seller_lname2 != ''
+													AND trim_seller_fname2 != trim_seller_fname1
+													AND trim_seller_lname2 != trim_seller_lname1,REGEXREPLACE('=',trim_seller_lname2,' '),'');  
 																																		
 	SELF.Name_First   := CHOOSE(C,buyer_fname1,buyer_fname2,seller_fname1,seller_fname2);
 	SELF.Name_Last		:= CHOOSE(C,buyer_lname1,buyer_lname2,seller_lname1,seller_lname2);

@@ -1,4 +1,5 @@
-﻿export Constants := module
+﻿IMPORT _control;
+export Constants := module
 	export dateMask := enum(unsigned1,NONE=0,DAY,MONTH,YEAR,ALL);
 	Export NonSubjectSuppression := ENUM(integer1,notSpecified=0,doNothing,returnRestrictedDescription,returnBlank,returnNameOnly);
 	Export set of integer1 ValidNSS_Set := [NonSubjectSuppression.doNothing,NonSubjectSuppression.returnRestrictedDescription,NonSubjectSuppression.returnBlank,NonSubjectSuppression.returnNameOnly];
@@ -69,4 +70,20 @@
       EXPORT STRING6 MONTH := 'MONTH';
       EXPORT STRING6 YEAR  := 'YEAR';
     END;
-end;
+
+	//	Server IP to Spray from
+	EXPORT	STRING serverIP	:=	IF(_Control.thisenvironment.name='Dataland',
+																					_Control.IPAddress.bctlpedata12,
+																					_Control.IPAddress.bctlpedata11);
+
+	EXPORT OptOut := MODULE
+	
+		//	Directory to Spray from
+		EXPORT	STRING Directory					:=	IF(	_control.thisenvironment.name='Dataland',
+																										'/data/hds_2/suppress_opt_out_src/',
+																										'/data/hds_2/suppress_opt_out_src/');
+		EXPORT STRING FileToSpray 			:= '*.txt';		
+		EXPORT SET OF UNSIGNED4 CACCPA_Global_Sid := [	23361,23371,23381,8271,23311,22751,22911,23571,24051,24141,23431,22401,23421,25751,25041,27581,27001,24011,23401,23411,16281,16331,22611,24591,24361,22771,24371,23611,23621,24351,24961,25651,19521,25681,25901,27651,24221,23461,23471,23481,23781,24911,23581,26631,23591,22661,22671,22691,23561,23451,22651,22921,22641,22961,22971,22981,22991,23001,23011,23021,23031,23041,23051,23061,23071,23121,22371,22381,23441,22601,14761,23601,27441,23931,23961,23991,27621,25371,17591,17871,26651,24611,24641,23231,25031,24451,25471,25781,25721,25321,27591,22681,23241,25791,26041,26051,26061,26191,26211,23521,23531,24261,26541,26641,23161,26671,26881,23331,27681,27161,27371,27381,27571,24331,25731,26521,27641];
+	END;	
+
+END;

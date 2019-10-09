@@ -1,6 +1,7 @@
 ﻿export svcAppend() := macro
 	import BIPV2;
 	import BIPV2_Best;
+	import Doxie;
 
 	boolean includeBest := false : stored('include_best');
 	boolean allBest := false : stored('all_best');
@@ -16,6 +17,18 @@
 	boolean includeRecords := false : stored('include_records');
 	boolean isMarketing := false : stored('is_marketing');
 	boolean dnbFullRemove := false : stored('dnb_full_remove');
+
+	defaultDataAccess := MODULE(doxie.IDataAccess) END;
+	typeof(Doxie.IDataAccess.glb) dataAccessGlb := defaultDataAccess.glb : stored('data_access_glb');
+	typeof(Doxie.IDataAccess.dppa) dataAccessDppa := defaultDataAccess.dppa : stored('data_access_dppa');
+	typeof(Doxie.IDataAccess.lexid_source_optout) dataAccessLexidSourceOptout := defaultDataAccess.lexid_source_optout : stored('data_access_lexid_source_optout');
+
+	modAccess := module(Doxie.IDataAccess)
+		export glb := dataAccessGlb;
+		// export typeof(Doxie.IDataAccess.glb) glb := dataAccessGlb;
+		export typeof(Doxie.IDataAccess.dppa) dppa := dataAccessDppa;
+		export typeof(Doxie.IDataAccess.lexid_source_optout) lexid_source_optout := dataAccessLexidSourceOptout;
+	end;
 
 	inputDs := dataset([], BIPV2.IdAppendLayouts.AppendInput) : stored('append_input');
 
@@ -68,13 +81,15 @@
 			self := left,
 			self := []));
 
-	postBest := BIPV2.IdAppendLocal.AppendBest(withAppend, fetchLevel := fetchLevel,
-	                                           allBest := allBest, isMarketing := isMarketing);
+	postBest := BIPV2.IdAppendLocal.AppendBest(withAppend, fetchLevel := fetchLevel
+	                                           ,allBest := allBest, isMarketing := isMarketing
+											   ,mod_access := modAccess);
 
 	res := if(includeBest, postBest, postAppend);
 	resv1 := project(res, transform(BIPV2.IdAppendLayouts.svcAppendOut, self := left));
 
-	postHeader := BIPV2.IdAppendLocal.FetchRecords(withAppend, fetchLevel, dnbFullRemove);
+	postHeader := BIPV2.IdAppendLocal.FetchRecords(withAppend, fetchLevel, dnbFullRemove
+	                                               ,mod_access := modAccess);
 
 	emptyHeader := dataset([], BIPV2.IdAppendLayouts.svcAppendRecsOut);
 
