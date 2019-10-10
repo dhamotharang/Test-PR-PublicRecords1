@@ -1,4 +1,4 @@
-﻿IMPORT Std, KELOtto, FraudShared, data_services;
+﻿IMPORT Std, KELOtto, FraudShared, data_services, ut;
 #CONSTANT ('Platform','FraudGov');
 RunKelDemo :=false:stored('RunKelDemo');
 
@@ -65,8 +65,8 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
                        */
                        // end of test code.
 											 // Clean name to avoid blank labels
-											 SELF.cleaned_name.fname := TRIM(LEFT.cleaned_name.fname),
-											 SELF.cleaned_name.lname := TRIM(LEFT.cleaned_name.lname),
+											 SELF.cleaned_name.fname := TRIM(ut.fn_RemoveSpecialChars(LEFT.cleaned_name.fname)),
+											 SELF.cleaned_name.lname := TRIM(ut.fn_RemoveSpecialChars(LEFT.cleaned_name.lname)),
 											 SELF := LEFT));
 
 // trim the data down for R&D speed.
