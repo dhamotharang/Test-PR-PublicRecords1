@@ -17,7 +17,7 @@ MODULE
 	BatchShare.MAC_CapitalizeInput(dIn, SHARED dProcessInput);
 
   // Modify IsPrimarySearchPII depending on input if value not provided
-  SHARED tmpMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.SearchParams, OPT))
+  SHARED tmpMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.SearchParams))
       EXPORT BOOLEAN IsPrimarySearchPII := inMod.IsPrimarySearchPII OR vPhoneBlank;
   END;
 
@@ -58,13 +58,13 @@ MODULE
 	SHARED dPIISearch := dAppendDIDs(homephone = '' and did != 0 and ~IsPhoneRiskAssessment);
 
 	// Best information
-	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dPIISearch);
+	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dPIISearch, PROJECT (inMod, doxie.IDataAccess));
 
   SHARED dInBest := IF(verifyInputDID, dInDIDs, dInNoPhoneBestInfo);
 
-	// Primary identity
-	Suppress.MAC_Suppress(dInBest, SHARED dInBestInfo, tmpMod.ApplicationType, Suppress.Constants.LinkTypes.DID,did, '', '', FALSE, '', TRUE);
-
+	// Primary identity		
+	Suppress.MAC_Suppress(dInBest, SHARED dInBestInfo, tmpMod.application_type, Suppress.Constants.LinkTypes.DID,did, '', '', FALSE, '', TRUE);
+												
 	// Search inhouse phone sources and gateways when phone number is provided
 	dPhoneSearchResults := IF(EXISTS(dInPhone), PhoneFinder_Services.PhoneSearch(dInPhone,tmpMod,dGateways));
 

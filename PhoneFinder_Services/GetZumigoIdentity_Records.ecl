@@ -1,10 +1,14 @@
-﻿IMPORT Gateway, Phones, PhoneFinder_Services, STD, ut;
+IMPORT doxie, Gateway, Phones, PhoneFinder_Services, STD, ut;
+
 EXPORT GetZumigoIdentity_Records(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)  dPhoneRecs,
                                  DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
                                  PhoneFinder_Services.iParam.SearchParams         inMod,
                                  DATASET(Gateway.Layouts.Config) dGateways) :=
 
 MODULE
+
+  SHARED mod_access := PROJECT(inMod, doxie.IDataAccess);
+
   SHARED Ph_Wireless := dPhoneRecs(phone <> '' AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
 
   Ph_Wireless_Ddp := DEDUP(SORT(Ph_Wireless, acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip),
@@ -92,7 +96,7 @@ MODULE
     EXPORT DATASET(Gateway.Layouts.Config) gateways := dGateways(Gateway.Configuration.IsZumigoIdentity(servicename));
   END;
 
-  Zumigo_Response := Phones.GetZumigoIdentity(Zum_inrecs, Zum_inMod, inMod.GLBPurpose, inMod.DPPAPurpose,,,,FALSE,FALSE);
+  Zumigo_Response := Phones.GetZumigoIdentity(Zum_inrecs, Zum_inMod, mod_access, FALSE, FALSE);
 
   // getting zumigo error-free response
   EXPORT Zumigo_Hist := Zumigo_Response(source = Phones.Constants.GatewayValues.ZumigoIdentity AND device_mgmt_status = '');

@@ -72,6 +72,7 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean isPreGLBRestricted ()      := $.compliance.isPreGLBRestricted      (DataRestrictionMask);
   EXPORT boolean isFdnInquiry ()            := $.compliance.isFdnInquiry            (DataRestrictionMask);
   EXPORT boolean isJuliRestricted ()        := $.compliance.isJuliRestricted        (DataRestrictionMask);
+  EXPORT boolean isAccuDataRestricted    () := $.compliance.isAccuDataRestricted    (DataRestrictionMask);
   EXPORT BOOLEAN isBriteVerifyRestricted () := $.compliance.isBriteVerifyRestricted (DataRestrictionMask); // BriteVerify gateway for Email verification 
 
   EXPORT boolean isHeaderSourceRestricted (string2 src) := 

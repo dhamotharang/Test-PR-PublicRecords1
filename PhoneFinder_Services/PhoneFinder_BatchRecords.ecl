@@ -1,4 +1,4 @@
-﻿  IMPORT Autokey_Batch,BatchShare,Gateway,MDR,Phones,PhoneFinder_Services,Royalty,Suppress, Ut;
+IMPORT Autokey_Batch, BatchShare, Gateway, MDR, Phones, PhoneFinder_Services, Royalty, Suppress, doxie;
 
   EXPORT PhoneFinder_BatchRecords(DATASET(PhoneFinder_Services.Layouts.BatchIn) dIn,
                                 PhoneFinder_Services.iParam.SearchParams      inMod,
@@ -66,8 +66,9 @@
   SHARED dInNoPhone := dAppendDIDsFormat(did != 0 and homephone = '' and ~IsPhoneRiskAssessment and IsValidTransactionType);
 
   // Append best info
-  SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone);
-  Suppress.MAC_Suppress(dInNoPhoneBestInfo,SHARED dinBestInfo,inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,did,'','',FALSE,'',TRUE);
+  SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone, PROJECT(inMod, doxie.IDataAccess));
+
+  Suppress.MAC_Suppress(dInNoPhoneBestInfo,SHARED dinBestInfo,inMod.application_type,Suppress.Constants.LinkTypes.DID,did,'','',FALSE,'',TRUE);
 
   // Search inhouse phone sources and gateways when phone number is provided
   SHARED phoneMod := MODULE(PROJECT(inMod, $.iParam.SearchParams))

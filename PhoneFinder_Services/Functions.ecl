@@ -83,10 +83,8 @@
                                                               1 => 'FORWARDED',
                                                               '');
   // Best info
-  EXPORT GetBestInfo(DATASET(lBatchInDID) dIn) :=
+  EXPORT GetBestInfo(DATASET(lBatchInDID) dIn, doxie.IDataAccess mod_access) :=
   FUNCTION
-
-    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
 
     dids := DEDUP(SORT(PROJECT(dIn, doxie.layout_references), did), did);
 

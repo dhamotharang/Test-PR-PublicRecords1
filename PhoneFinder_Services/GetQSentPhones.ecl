@@ -1,4 +1,4 @@
-﻿IMPORT Address,AutoStandardI,BatchServices,Doxie_Raw,Gateway,iesp,Phones,Risk_Indicators,std,PhoneFinder_Services;
+﻿IMPORT Address,AutoStandardI,BatchServices,Doxie_Raw,Gateway,iesp,Phones,std,PhoneFinder_Services;
 
 globalMod := AutoStandardI.GlobalModule();
 
@@ -18,8 +18,8 @@ MODULE
 													getPhoneDetails = FALSE,
 													pGateway) :=
 	FUNCTIONMACRO
-		IMPORT AutoStandardI,BatchServices,Doxie_Raw,Gateway,iesp,Phones,Risk_Indicators,std,ut;
-
+		IMPORT AutoStandardI,BatchServices,Doxie_Raw,Gateway,iesp,Phones,std;
+		
 		globalMod := AutoStandardI.GlobalModule();
 
 		timeoutSecs  := 5; // gateway timeout

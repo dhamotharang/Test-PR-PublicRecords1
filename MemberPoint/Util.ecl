@@ -15,13 +15,4 @@ IMPORT Suppress;
 									'U');
 		END;
 		
-		EXPORT STRING toStrMask(UNSIGNED1 mask):= FUNCTION
-			SC:= Suppress.constants;
-			RETURN	MAP(mask = SC.dateMask.DAY		=>	SC.DATE_MASK_TYPE.DAY,
-									mask = SC.dateMask.MONTH	=>	SC.DATE_MASK_TYPE.MONTH,
-									mask = SC.dateMask.YEAR		=>	SC.DATE_MASK_TYPE.YEAR,
-									mask = SC.dateMask.ALL		=>	SC.DATE_MASK_TYPE.ALL,
-																								SC.DATE_MASK_TYPE.NONE);
-		END;
-
 	END;

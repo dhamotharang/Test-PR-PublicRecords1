@@ -27,9 +27,7 @@ IMPORT MemberPoint, PhoneFinder_Services, Gateway;
 				SELF 						:= []
 			));
 			pfOptionsIn := MODULE(PROJECT(options, PhoneFinder_Services.iParam.SearchParams, OPT))
-				EXPORT BOOLEAN IncludeMinors					:= FALSE;
-				EXPORT STRING6 SSNMask								:= options.ssn_mask;
-				EXPORT STRING6 DOBMask								:= MemberPoint.Util.toStrMask(options.dob_mask);
+				EXPORT BOOLEAN show_minors					:= FALSE;
 				EXPORT UNSIGNED PenaltyThreshold			:= options.PenaltThreshold;
 			END;
 			//PhoneFinder_Services.Layouts.PhoneFinder.BatchOut
