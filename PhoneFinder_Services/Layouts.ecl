@@ -1,4 +1,4 @@
-﻿﻿  IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhoneFraud, ThreatMetrix, PhonesInfo;
+﻿﻿IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhoneFraud, ThreatMetrix, PhonesInfo;
 
   EXPORT Layouts :=
   MODULE

@@ -1,4 +1,4 @@
-﻿﻿IMPORT iesp, Gateway, MDR, ut;
+﻿IMPORT iesp, Gateway, MDR, ut;
 EXPORT Constants :=
 MODULE
 

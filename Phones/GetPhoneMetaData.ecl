@@ -1,4 +1,4 @@
-﻿﻿IMPORT PhonesInfo, dx_PhonesInfo, Phones, UT, STD;
+IMPORT PhonesInfo, dx_PhonesInfo, Phones, UT, STD;
 EXPORT GetPhoneMetadata := MODULE
 
 //Based on subject info get ALL ports and CURRENT deact records
