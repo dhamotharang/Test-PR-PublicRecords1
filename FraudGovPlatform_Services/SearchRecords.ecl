@@ -60,6 +60,8 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																					~DidFoundInPR => RIGHT.DID,
 																					0); 													
 													SELF	:= []));
+													
+	BOOLEAN lexid_resolved := EXISTS(ds_adl(did>0));
 	
 	ds_contributory := PROJECT(ds_allPayloadRecs , 
 												TRANSFORM(DidVille.Layout_Did_OutBatch,
@@ -82,7 +84,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		3.Bring back ELEMENT cards (ONLY MVP SUPPORTED ELEMENTs),  for each ELEMENT in the Search Criteria,   
 			when ALL ELEMENTS in the Search Criteria is found to match a single contributed row.
 		*/
-	ds_dids_to_use := IF(DidFoundInPR , ds_adl , ds_contributory_dedup);
+	ds_dids_to_use := IF(lexid_resolved, ds_adl , ds_contributory_dedup);
 	
 	//adding additional elements lexid's to ds_in , so velocities can be calculated.
 	ds_elements_dids := PROJECT(ds_contributory_dedup, 
@@ -188,7 +190,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids_to_use, _Constant.FRAUD_PLATFORM, batch_params);
 
 	//realtime record:
-	BOOLEAN isRealtimeRecord := DidFoundInPR AND COUNT(ds_contributoryBest) = 0;
+	BOOLEAN isRealtimeRecord := lexid_resolved AND COUNT(ds_contributoryBest) = 0;
 	
 	ds_in_orig := JOIN(ds_in, ds_adl, 
 											LEFT.acctno = (string)RIGHT.seq,
