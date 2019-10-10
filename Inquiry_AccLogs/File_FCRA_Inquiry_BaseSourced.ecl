@@ -21,8 +21,12 @@ endmacro;
 
 _v2_base_files := dataset(Data_Services.foreign_prod + 'uspr::inql::fcra::base::weekly::building_keys', INQL_v2.Layouts.Common_ThorAdditions, thor);
 
-v2_base_files := Inql_v2.FN_Apply_FCRA_SAFECO_Remediation(_v2_base_files);
-			 
+todaysdate:= ut.getDate:independent;
+_v2_base_files_2years   :=_v2_base_files (ut.fn_date_is_ok(todaysdate, search_info.datetime[1..8], 2));
+
+v2_base_files 					:= Inql_v2.FN_Apply_FCRA_SAFECO_Remediation(_v2_base_files_2years);
+
+		 
 base_files :=	distribute(v2_base_files
 													// (fnAddSource(inquiry_acclogs.File_FCRA_Riskwise_Logs_Common, 'RISKWISE') +
 													// fnAddSource(inquiry_acclogs.File_FCRA_Accurint_Logs_Common, 'COLLECTION') + 

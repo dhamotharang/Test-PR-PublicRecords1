@@ -93,10 +93,14 @@ EXPORT As_Business_Linking(dataset(Cortera.Layout_Executives) hdr) := FUNCTION
 		
 		self.company_foreign_domestic := IF(hdr.country='US','D','F');
 
-		self.source_record_id            := ((unsigned8)hdr.link_id << 32) | HASH32(self.company_name,SELF.company_phone,hdr.EXECUTIVE_NAME,hdr.EXEC_TITLE);
-
+		self.source_record_id            := ((unsigned8)hdr.link_id << 32) | HASH32(self.company_name,SELF.company_phone,hdr.EXECUTIVE_NAME,hdr.EXEC_TITLE);   
+		string temp_employees            := if(trim(hdr.total_employees) = '' OR trim(hdr.total_employees) = '0', trim(hdr.employee_range), trim(hdr.total_employees));
+		string temp_sales                := if(trim(hdr.total_sales) = '' OR trim(hdr.total_sales) = '0', trim(hdr.sales_range), trim(hdr.total_sales));
+    self.employee_count_local_raw    := if(temp_employees != '0', 
+		                                    temp_employees, '');
+		self.revenue_local_raw           := if(temp_sales != '0', 
+		                                    temp_sales, '');
 		self := [];
-		
 	END;
 
 	 link := NORMALIZE(hdr, 4, xBiz(Left, counter));
