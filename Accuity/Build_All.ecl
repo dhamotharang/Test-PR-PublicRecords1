@@ -142,7 +142,7 @@ output(Accuity.Geo.source_OFAC_countries,,'~thor_data400::accuity::source_OFAC_c
 output(Accuity.AkaReport,,'~thor::accuity::akalog.csv',CSV(HEADING(SINGLE),QUOTE('"')),overwrite),
 
 parallel(
-Accuity.Despray('~thor::accuity::Accuity Global WatchList.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_global_watchList.xml');
+Accuity.Despray('~thor::accuity::Accuity Global WatchList.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_global_watchList.xml'),
 Accuity.Despray('~thor::accuity::source_ofac.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_source_ofac.xml'),
 Accuity.Despray('~thor::accuity::source_DB_1088.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_source_DB_1088.xml'),
 Accuity.Despray('~thor_data400::accuity::source_ACB_1040.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_source_ACB_1040.xml'),
