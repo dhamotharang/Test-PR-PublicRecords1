@@ -343,5 +343,4 @@ export string LastName(string name) := MAP(
 	;
 export string FullName(string name) := '';
 	
-
 END;
