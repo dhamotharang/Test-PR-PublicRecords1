@@ -1,5 +1,5 @@
 ﻿
-import std, header_services, vehiclev2, Watercraft;
+import std, header_services, vehiclev2, Watercraft; 
 
 export applyRegulatory := module
 
@@ -358,6 +358,7 @@ export applyRegulatory := module
 											string8   zip;
 											string5   prim_range;
 											string1   same_lname;
+											string2   title ;
 											string5   number_cohabits;
 											string2   eor;
 									end; 
@@ -402,7 +403,7 @@ export applyRegulatory := module
 											self.confidence 						:= 'HIGH';
 											self.cluster    						:= 'CORE';
 											self.generation 						:= 'S';
-											self.title 									:= 43;
+											self.title 									:= (unsigned1) L.title;
 											self.personal 							:= TRUE;
 											self.lname_cnt 							:= 1;
 											self 												:= L;
@@ -736,7 +737,7 @@ export applyRegulatory := module
 							
 			export hdr_incremental_sup(ds) := 
 				functionmacro
-					local hashFunc(recordof(ds) l) := hashmd5(l.rid);
+					local hashFunc(recordof(ds) l) := hashmd5(intformat((unsigned6)l.rid,15,1));
 					local reverse_sup_result := Suppress.applyRegulatory.simple_reverse_sup(ds, 'hdr_incremental_sup.txt', hashFunc);
 					return reverse_sup_result;
 				endmacro;
