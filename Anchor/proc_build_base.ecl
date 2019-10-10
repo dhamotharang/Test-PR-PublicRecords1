@@ -166,7 +166,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 																			,																			// use prod version of superfiles
 																			,														 					// default is to hit prod from dataland, and on prod hit prod.	
 																			,[BIPV2.IDconstants.xlink_version_BIP]// create BIP keys only
-																			,URL																	// url
+																			,SourceURL														// url
 																			,EmailAddress													// email 
 																			,v_city_name													// city
 																			,																			// fname

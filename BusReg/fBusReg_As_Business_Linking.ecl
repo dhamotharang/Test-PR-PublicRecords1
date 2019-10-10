@@ -1,4 +1,4 @@
-import mdr,business_header,ut;
+﻿import mdr,business_header,ut;
 
 //NOTE:  
 //No data exists in the fax number field and therefore it is not being mapped here.
@@ -197,6 +197,7 @@ export fBusReg_As_Business_Linking(dataset(BusReg.Layout_BusReg_Company) pCompan
 				self.match_branch_city					 		:= '';
 				self.match_geo_city							 		:= '';
 				self.orig_id                	      := l.record_id;
+        self.employee_count_local_raw       := if(trim(l.emp_size) != '0',trim(l.emp_size),'');
 				self 																:= l;
 				self 																:= [];
 			end;

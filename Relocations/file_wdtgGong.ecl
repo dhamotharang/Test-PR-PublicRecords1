@@ -1,4 +1,4 @@
-// This is a value-add version of Gong.File_Gong_History_Full used
+﻿// This is a value-add version of Gong.File_Gong_History_Full used
 // by the Where Did They Go routines.
 //
 // doxie.key_nbr_headers
@@ -23,6 +23,9 @@ layout_span := record
 	layout_narrow;
 	typeof(gong_raw.dt_first_seen)	span_first_seen;
 	typeof(gong_raw.dt_last_seen) 	span_last_seen := '';
+	//CCPA-22 add global_sid/record_sid
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 end;
 
 

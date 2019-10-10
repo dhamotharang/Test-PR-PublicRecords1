@@ -65,7 +65,7 @@ RoxieKeyBuild.Mac_Daily_Email_Local('GLOBAL WATCH LISTS','FAIL',filedate,%send_f
 #uniquename(create_orbit)
 
 
-%create_orbit% := if ( trim(filedate)[9] <> 'o',Orbit3.proc_Orbit3_CreateBuild_AddItem( 'Global Watch Lists',filedate),Orbit3.proc_Orbit3_CreateOFACBuild( 'Global Watch Lists',filedate));
+%create_orbit% := Orbit3.proc_Orbit3_CreateBuild_AddItem( 'Global Watch Lists',filedate);
 
 #uniquename(getupdate)
 

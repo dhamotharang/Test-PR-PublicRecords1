@@ -14,7 +14,7 @@ EXPORT Proc_Iterate_Master(
     pDoAll
     ,HealthcareNoMatchHeader_Ingest.Promote(pSrc, pVersion, pIter).linkingfiles.New2Built
     ,HealthcareNoMatchHeader_Ingest.Promote(pSrc, pVersion, pIter).linkingfiles.Built2QA
-    ,HealthcareNoMatchHeader_InternalLinking.Proc_Stats(pSrc,pIter,HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).Linking(pIter).Iteration)
+    ,HealthcareNoMatchHeader_InternalLinking.Proc_Stats(pSrc,pIter,HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).Linking(pIter).Iteration).Iteration_Stats
 	);
                 
   RETURN  runIteration;
