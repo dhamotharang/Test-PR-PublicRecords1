@@ -13,15 +13,15 @@ EXPORT Functions := MODULE
 									         STRING DataPermissionMask) := MODULE
                       
 		 // efficiency add true on END since not using for contacts skips the Suppression											
-		 EXPORT BIPBusHeaderRecsSlim := BIPV2.Key_BH_Linking_Ids.kfetch(project(Biplinkids, transform(BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT))
-		                                                                                                              ,FETCHLEVEL
-																						    ,
-																							,
+		 BIPBusHeaderRecsSlim_pre := BIPV2.Key_BH_Linking_Ids.kfetch2(BipLinkids
+                                              ,FETCHLEVEL,,
 																							,FETCHLIMIT
 																							,TRUE
-																							,TRUE)
+																							,TRUE,,
+                                              ,mod_access)
 											(source not in BusinessCredit_Services.Constants.EXCLUDED_EXPERIAN_SRC); //restricting ER and Q3 experian sources
-        EXPORT BIpv2bestKeyResults := BIPv2_best.Key_LinkIds.kfetch(Project(BIPlinkids, transform(BIPV2.IDlayouts.l_xlink_ids,SELF := LEFT))
+      EXPORT BIPBusHeaderRecsSlim   := Project(BIPBusHeaderRecsSlim_pre, BIPV2.Key_BH_Linking_Ids.kFetchOutRec);
+      EXPORT BIpv2bestKeyResults := BIPv2_best.Key_LinkIds.kfetch(Project(BIPlinkids, transform(BIPV2.IDlayouts.l_xlink_ids,SELF := LEFT))
 				                                                                                      ,FETCHLEVEL
 																				,
 																				,

@@ -1,22 +1,23 @@
-// ================================================================================
+﻿// ================================================================================
 // ===== RETURNS Business Header Source Count Info, currently no source docs are returned
 // ================================================================================
-IMPORT BIPV2, ut;
+IMPORT BIPV2, ut, Doxie;
 
 EXPORT BusHeadSource_Records (
  dataset(Layouts.rec_input_ids_wSrc) in_docids,
   SourceService_Layouts.OptionsLayout inoptions, 
+  Doxie.IDataAccess mod_access,
 	boolean IsFCRA = false) 
  := MODULE
  	
 	//Use the bip linkid file to retreive records via linkids
-	in_docs_linkonly := PROJECT(in_docids(IdValue = ''),TRANSFORM(BIPV2.IDlayouts.l_xlink_ids,
+	in_docs_linkonly := PROJECT(in_docids(IdValue = ''),TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
 																																		SELF := LEFT,
 																																		SELF := []));
 																																		
 	// *** Key fetch to get bus head data
-  SHARED bh_recs := BIPV2.Key_BH_Linking_Ids.kFetch(DEDUP(in_docs_linkonly,ALL),
-            inoptions.fetch_level,,,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit);
+  SHARED bh_recs := BIPV2.Key_BH_Linking_Ids.kFetch2(DEDUP(in_docs_linkonly,ALL),
+            inoptions.fetch_level,,,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit,,,,,mod_access);
  		
 	SHARED SourceCount_Layouts.SourceDetailsLayout xform_Details(recordof(bh_recs) L) := TRANSFORM
 			self.src			:= 'BFINDER';

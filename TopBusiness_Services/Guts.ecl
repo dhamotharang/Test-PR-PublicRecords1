@@ -56,7 +56,7 @@ export Guts := MODULE
 														self := left));
 
   ds_in_unique_ids_only := project(ds_tmpInput_data, 
-	                            transform(BIPV2.IDlayouts.l_xlink_ids, 	
+	                            transform(BIPV2.IDlayouts.l_xlink_ids2, 	
 															 self.dotid := 0;
                                self.powid := 0;															 
 															 self.empid := 0;															
@@ -87,9 +87,9 @@ export Guts := MODULE
 	// RR 188676 pass the ds_busHeaderRecs as param to sourceSection so as to eliminate
 	// multiple calls to this kfetch hoping to reduce memory footprint of query and improve efficiency.
 	   
-       ds_busHeaderRecsForCnameVariations := BIPV2.Key_BH_Linking_Ids.kfetch(ds_in_unique_ids_only,FETCH_LEVEL,
-	                             ,,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimitLarger,
-															 TRUE);	
+       ds_busHeaderRecsForCnameVariations := project(BIPV2.Key_BH_Linking_Ids.kfetch2(ds_in_unique_ids_only,FETCH_LEVEL,
+	                             , ,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimitLarger,
+															 TRUE,,,,mod_access), BIPV2.Key_BH_Linking_Ids.kFetchOutRec);	
        ds_busHeaderRecs := choosen(ds_busHeaderRecsForCnameVariations,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit);											 
        											     		                          		
     BestSection :=  TopBusiness_Services.BestSection.fn_fullView(
