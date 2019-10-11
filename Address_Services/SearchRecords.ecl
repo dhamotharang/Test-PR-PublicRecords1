@@ -1,6 +1,6 @@
-IMPORT Address, doxie, Advo, Address_Services, iesp, dx_header, AutoStandardI;
+IMPORT Address, doxie, Advo, Address_Services, iesp, dx_header, Suppress;
 
-EXPORT SearchRecords(dataset(iesp.addresssearch.t_AddressSearchBy) in_ds, Address_Services.IParams.address_search in_mod) := FUNCTION
+EXPORT SearchRecords(dataset(iesp.addresssearch.t_AddressSearchBy) in_ds, Doxie.IDataAccess mod_access) := FUNCTION
 		
 	Address_Services.Layouts.clean_rec cleanInput(in_ds Le) := transform
 		L	:= Le.Address;
@@ -32,7 +32,10 @@ EXPORT SearchRecords(dataset(iesp.addresssearch.t_AddressSearchBy) in_ds, Addres
 		KEYED(LEFT.sec_range = '' or LEFT.sec_range = RIGHT.sec_range),
 		TRANSFORM(RIGHT),
 			LIMIT(0), KEEP(Address_Services.Constants.MAX_HEADER_ADDR));
-	header_addr_filt := doxie.compliance.MAC_FilterSources(pre_header_addr, src, in_mod.DataRestrictionMask);
+  
+  pre_header_addr_suppressed := Suppress.MAC_SuppressSource(pre_header_addr, mod_access);
+
+  header_addr_filt := doxie.compliance.MAC_FilterSources(pre_header_addr_suppressed, src, mod_access.DataRestrictionMask);
 	
 	header_addr := project(header_addr_filt,
 		TRANSFORM(Address_Services.Layouts.int_rec,
@@ -66,7 +69,7 @@ EXPORT SearchRecords(dataset(iesp.addresssearch.t_AddressSearchBy) in_ds, Addres
 			SELF.valid	:= TRUE),
 		LIMIT(0), KEEP(Address_Services.Constants.MAX_ADVO_ADDR));
 
-	advo_recs := if(NOT AutoStandardI.DataRestrictionI.val(in_mod).ADVO, advo_zip + advo_city_state);
+	advo_recs := IF(NOT mod_access.isAdvoRestricted(), advo_zip + advo_city_state);
 	
 	iesp.addresssearch.t_AddressSearchRecord xformOut (Address_Services.Layouts.int_rec L, Address_Services.Layouts.int_rec R) := TRANSFORM
 		SELF.Valid := R.valid; 	//if an address is found in Advo, we consider it to be valid; otherwise we do not
