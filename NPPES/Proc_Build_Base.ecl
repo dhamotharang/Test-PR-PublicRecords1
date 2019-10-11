@@ -1,7 +1,4 @@
-﻿/*2019-08-17T22:07:47Z (Hennigar, Jennifer (RIS-BCT))
-CCPA-256
-*/
-#stored('did_add_force','thor');
+﻿#stored('did_add_force','thor');
 import address, 
 	   business_header_ss, 
 	   business_header, 
@@ -150,7 +147,7 @@ nppes.Layouts.base   buildBase(outfile15 L) := transform, skip (length(trim(rege
 															'5' => 'OTHER NAME',									
 															'');
 		self.mailing_country_desc					:= ut.Country_ISO2_To_Name(l.provider_business_mailing_address_country_code);
-		self.practice_location_country_desc			:= ut.Country_ISO2_To_Name(l.provider_business_practice_location_address_city_name);
+		self.practice_location_country_desc			:= ut.Country_ISO2_To_Name(l.Provider_Business_Practice_Location_Address_Country_Code);
 		self.other_pid_issuer_desc_1                := getIssuerDesc(l.other_provider_identifier_type_code_1);
 		self.other_pid_issuer_desc_2                := getIssuerDesc(l.other_provider_identifier_type_code_2);
 		self.other_pid_issuer_desc_3                := getIssuerDesc(l.other_provider_identifier_type_code_3);
@@ -330,16 +327,7 @@ end;
             										 ,local);
 
 	ut.MAC_Append_Rcid (sync_dates, source_rec_id, addSourceRid);
-	
-	// move source_rec_id to record_sid field for CCPA project
-	nppes.layouts.base addRecSid(nppes.layouts.base L) := transform
-			self.global_sid	:= 22931;
-			self.record_sid := L.source_rec_id;
-			self						:= L;
-	end;
-	
-	with_record_sid := project(addSourceRid, addRecSid (left));
-
-	return with_record_sid;
+   
+	return addSourceRid;
 
 end;
