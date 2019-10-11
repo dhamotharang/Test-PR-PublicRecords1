@@ -7,13 +7,18 @@ EXPORT AllInfo(DATASET($.Layout_Sanctions) infile) := FUNCTION
 	3		Occupation (Cred)
 
 ****/		
+
+
 	{unsigned8 id, $.Layout_XG.layout_addlinfo} 
 					xForm($.Layout_Sanctions infile, integer n) := TRANSFORM
 		self.type := CHOOSE(n, 
 												IF(infile.type_id = 'I' AND infile.DateOfBirth<>'0',
 													'DOB',
 													SKIP),
-												IF(infile.action<>'', 'Incident', SKIP),
+												IF(infile.action<>'' OR 
+													infile.action_date not in ['','0'] or infile.action_start not in ['','0'] or 
+																				infile.action_end not in ['','0'] or infile.fine <>'',
+																	'Incident', SKIP),
 												IF(infile.cred<>'', 'Occupation', SKIP),
 												SKIP);
 		self.information := TRIM(CHOOSE(n,
@@ -33,7 +38,11 @@ EXPORT AllInfo(DATASET($.Layout_Sanctions) infile) := FUNCTION
 		self.id := infile.key;
 END;
 
-	addlInfo := Normalize(infile(DateOfBirth<>'0' OR action<>'' OR cred<>''), 3, xform(LEFT, COUNTER))(information<>'');
+	addlInfo := Normalize(infile(DateOfBirth<>'0' OR action<>'' OR
+													action_date not in ['','0'] or action_start not in ['','0'] or 
+																				action_end not in ['','0'] or fine <>''
+												OR cred<>''),
+												3, xform(LEFT, COUNTER))(type<>'');
 	
 	AddlSorted := SORT(DISTRIBUTE(addlInfo, id), id, Type, -parsed, information, comments, LOCAL);
 							

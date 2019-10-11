@@ -1,5 +1,5 @@
 ﻿#OPTION('MultiplePersistInstances', false);
-version := '20190605';
+version := '20191011';
 baseversion := '20190926';
 root := '~thor::bridger::medicaid::hc_med_sanc_extract_' + baseversion + '.tab';
 
@@ -13,9 +13,11 @@ mapped := MedicaidSanctions.MapFields(ds);
 
 SEQUENTIAL(
 	//***** spray file here
+	OUTPUT(COUNT(ds), named('n_records')),
+	OUTPUT(CHOOSEN(ds, 250), named('samples')),
 	OUTPUT(COUNT(dsbad), named('n_rejectedrecords')),
 	OUTPUT(CHOOSEN(dsbad, 100), named('rejected_samples')),
-	MedicaidSanctions.WriteXGFormat.OutputDataXMLFile(version, mapped, ds),
+	MedicaidSanctions.WriteXGFormat.OutputDataXMLFile(version, mapped),
 	// despray XML file
 	MedicaidSanctions.Unspray(
 				'~thor::medicaidsanctions::' + version,
