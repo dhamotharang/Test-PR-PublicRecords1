@@ -1,4 +1,4 @@
-Import Healthcare_Provider_Services,iesp;
+﻿Import Healthcare_Provider_Services,iesp,Suppress;
 EXPORT Datasource_ABMS := MODULE
 		Export getABMSData(dataset(layouts.autokeyInput) input, dataset(layouts.layout_slim) inputSlim,dataset(Layouts.common_runtime_config) cfg) := function
 			convertedInputRecordsUserData := project(input,transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput,
@@ -35,7 +35,10 @@ EXPORT Datasource_ABMS := MODULE
 																															self.includeProfessionalAssociations := cfg[1].IncludeABMSProfessionalAssociations;
 																															self := left),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 			convertedInputRecords := convertedInputRecordsUserData+convertedInputRecordsDerivedDid+convertedInputRecordsDerivedNPI;
-			abmsRecsRaw := Healthcare_Provider_Services.ABMS_Records().getRecords(convertedInputRecords);	
+       mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);      
+			testmacabmsfile:=Suppress.MAC_FlagSuppressedSource(convertedInputRecords, mod_access); 
+      setOptOutselectabmsfile := project(testmacabmsfile, transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput,self.hasOptOut:= left.is_suppressed;self:=left;self:=[]))   ;              
+			abmsRecsRaw := Healthcare_Provider_Services.ABMS_Records().getRecords(setOptOutselectabmsfile,cfg);	;	
 			//build small table of results sort by accoutnumber and penalty and dedup by accountnumber to get the best record per input
 			getBestRec := record
 				string acctno;
@@ -59,24 +62,7 @@ EXPORT Datasource_ABMS := MODULE
 				self.childinfo := project(r,iesp.abms.t_ABMSResults);
 			END;
 			results_rolled := rollup(group(sort(reformatDedup,AccountNumber,ABMSBiogID),AccountNumber,ABMSBiogID),group,doRollup(left,rows(left)));
-			// output(input,named('inputABMSCall'));
-			// output(inputSlim,named('inputSlim'));
-			// output(convertedInputRecordsUserData,named('convertedInputRecordsUserData'));
-			// output(getDerivedDids,named('getDerivedDids'));
-			// output(getDerivedNPIs,named('getDerivedNPIs'));
-			// output(convertedInputRecordsDerivedDid,named('convertedInputRecordsDerivedDid'));
-			// output(convertedInputRecordsDerivedNPI,named('convertedInputRecordsDerivedNPI'));
-			// output(convertedInputRecords,named('convertedInputRecords'));
-			// output(abmsRecsRaw,named('abmsRecsRaw'));
-			// output(abmsRecsRawBest,named('abmsRecsRawBest'));
-			// output(abmsRecsRawFilter,named('abmsRecsRawFilter'));
-			// output(abmsRecs,named('abmsRecs4Abms'));
-			// output(relink2InputAcctno,named('relink2InputAcctno'));
-			// output(relink2DerivedData,named('relink2DerivedData'));
-			// output(finalABMSData,named('finalABMSData'));
-			// output(reformatDedup,named('reformatDedup'));
-			// output(results_rolled,named('results_rolled4Abms'));
-			return results_rolled;
+						return results_rolled;
 		end;
 		Export appendABMSData (dataset(layouts.autokeyInput) input,
 													 dataset(layouts.layout_slim) inputSlim,

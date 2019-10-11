@@ -1,4 +1,4 @@
-Import iesp, address, ABMS, AutoStandardI;
+﻿Import iesp, address, ABMS, AutoStandardI;
 EXPORT ABMS_Functions := Module
 	shared myLayout := Healthcare_Provider_Services.ABMS_Layouts;
 	shared myConst := Healthcare_Provider_Services.ABMS_Constants;
@@ -97,7 +97,7 @@ EXPORT ABMS_Functions := Module
 	end;
 
 	export appendTypeOfPractice(dataset(ABMS_Layouts.LayoutOutput) inRecs) := function
-		myTop := join(InRecs,ABMS.Keys().TypeOfPractice.BIOGNumber.qa,left.abmsbiogid=right.biog_number,
+		myTop := join(InRecs(hasoptout=false),ABMS.Keys().TypeOfPractice.BIOGNumber.qa,left.abmsbiogid=right.biog_number,
 											Transform(ABMS_Layouts.LayoutTypeOfPractice, 
 																self.acctno := left.accountnumber;
 																self.abmsbiogid := left.abmsbiogid;
@@ -121,7 +121,7 @@ EXPORT ABMS_Functions := Module
 		return recs;
 	end;
 	export appendCertificates(dataset(ABMS_Layouts.LayoutOutput) inRecs) := function
-		myCerts := join(InRecs,ABMS.Keys().Cert.BIOGNumber.qa,left.abmsbiogid=right.biog_number,
+		myCerts := join(InRecs(hasoptout=false),ABMS.Keys().Cert.BIOGNumber.qa,left.abmsbiogid=right.biog_number,
 											Transform(ABMS_Layouts.LayoutCertificates, 
 																self.acctno := left.accountnumber;
 																self.abmsbiogid := left.abmsbiogid;
@@ -160,7 +160,7 @@ EXPORT ABMS_Functions := Module
 		return recs;
 	end;
 	export appendBatchCertificates(dataset(ABMS_Layouts.LayoutOutput) inRecs) := function
-		rawCerts := join(InRecs,ABMS.Keys().Cert.BIOGNumber.qa,left.abmsbiogid=right.biog_number,
+		rawCerts := join(InRecs(hasoptout=false),ABMS.Keys().Cert.BIOGNumber.qa,left.abmsbiogid=right.biog_number,
 											Transform(ABMS_Layouts.LayoutCertificates, 
 																self.acctno := left.accountnumber;
 																self.abmsbiogid := left.abmsbiogid;
@@ -291,7 +291,7 @@ EXPORT ABMS_Functions := Module
 
 	export appendOptionalData(dataset(ABMS_Layouts.LayoutOutput) inRecs, dataset(ABMS_Layouts.autokeyInput) inputData) := function
 		appendCareerRecs := inputData(includeCareer=true);
-		recToAppendCareer := join(inRecs,appendCareerRecs,left.accountnumber=right.acctno,
+		recToAppendCareer := join(inRecs(hasoptout=false),appendCareerRecs,left.accountnumber=right.acctno,
 																		Transform(ABMS_Layouts.LayoutOutput,self := left;),
 																		keep(myConst.MAX_RECS_ON_JOIN),limit(0));
 		recsWithCareer := join(inRecs,appendCareer(recToAppendCareer),

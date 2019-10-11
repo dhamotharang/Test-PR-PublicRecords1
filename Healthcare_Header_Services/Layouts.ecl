@@ -1,4 +1,4 @@
-import HMS_STLIC,doxie_files, doxie, doxie_cbrs, NPPES, ingenix_natlprof,standard,ams,Autokey_batch,iesp, dea,Prof_LicenseV2,Enclarity,clia,ncpdp,BIPV2,org_mast;
+﻿import HMS_STLIC,doxie_files, doxie, doxie_cbrs, NPPES, ingenix_natlprof,standard,ams,Autokey_batch,iesp, dea,Prof_LicenseV2,Enclarity,clia,ncpdp,BIPV2,org_mast;
 
 export Layouts := MODULE
 
@@ -747,7 +747,17 @@ export Layouts := MODULE
 			boolean IncludeTaxonomy := Constants.CFG_False;
 			boolean IncludeMedicare := Constants.CFG_False;
 			boolean IncludeAffiliations := Constants.CFG_False;
+			string25 transaction_id:=''; 
+			string25 customer_GCID:='';
+			STRING25  userid:=''; 
+			UNSIGNED1 glb:=0;
+			UNSIGNED1 dppa:=0;
+			unsigned1 lexid_source_optout := 1;
+		//	boolean log_record_source := TRUE;
+			string  product_name:='';
+			unsigned6 global_company_id := 0
 	end;
+
 	export autokeyInput_base := record
 	    Autokey_batch.Layouts.rec_inBatchMaster;
 	    string20 license_number := '';
@@ -809,6 +819,9 @@ export Layouts := MODULE
 	end;
 	export autokeyInput := record
 			autokeyInput_base_validations;
+			unsigned4 	global_sid :=0;
+			unsigned4 	record_sid :=0;
+			boolean hasoptout:=false;
 			boolean IncludeABMSSpecialty := false;//Usage for including ABMS Records
 			boolean IncludeABMSCareer := false;//Usage for including ABMS Career Records
 			boolean IncludeABMSEducation := false;//Usage for including ABMS Education Records
@@ -1102,10 +1115,10 @@ export Layouts := MODULE
 		string 		SancCategory :='';
 		string 		SancLevel :='';
 		string 		SancLegacyType :='';
-		string 		SancLossOfLic :='';
 		string 		StateOrFederal :='';
 		string 		RegulatingBoard :='';
 		string 		SpecialNotes :='';
+		string 		SancLossOfLic :='';
 		string 		LicenseStatus :='';
 		boolean		isReinstatement := false;
 	END;	
@@ -1224,21 +1237,25 @@ export Layouts := MODULE
 	Export layout_customerDeath := record
 		string20	acctno := '';
 		unsigned6		ProviderID:=0;
+		boolean hasoptout:=false;
 		iesp.healthcare.t_StateVitalRecord;
 	end;
 	Export layout_fullchild_customerDeath := record
 		string20	acctno := '';
 		unsigned6		ProviderID:=0;
+		boolean hasoptout:=false;
 		Dataset(iesp.healthcare.t_StateVitalRecord) childinfo;
 	end;
 	Export layout_customerLicense := record
 		string20	acctno := '';
 		unsigned6		ProviderID:=0;
+		boolean hasoptout:=false;
 		iesp.healthcare.t_StateLicenseRecord;
 	end;
 	Export layout_fullchild_customerLicense := record
 		string20	acctno := '';
 		unsigned6		ProviderID:=0;
+		boolean hasoptout:=false;
 		Dataset(iesp.healthcare.t_StateLicenseRecord) childinfo;
 	end;
 	Export layout_abms := record
@@ -1363,6 +1380,7 @@ export Layouts := MODULE
 		boolean	 glb_ok := false;
 		boolean	 dppa_ok := false;
 		boolean  isSearchFailed := false;
+		boolean hasOptout := false;
 		string100 keysfailed_decode :='';
 		boolean  isExactLNID := false;
 		boolean  isExactDEA := false;
@@ -1477,6 +1495,9 @@ export Layouts := MODULE
 
 	Export searchKeyResults_plus_input := record 
 		searchKeyResults;
+		unsigned4 	global_sid :=0;
+		unsigned4 	record_sid :=0;
+		boolean hasoptout := false;
 		string20	name_first := '';
 		string20	name_middle := '';
 		string20	name_last := '';

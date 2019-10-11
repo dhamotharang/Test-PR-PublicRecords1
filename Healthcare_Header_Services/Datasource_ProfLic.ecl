@@ -1,4 +1,4 @@
-Import Prof_LicenseV2, Healthcare_Header_Services;
+﻿Import Prof_LicenseV2, Healthcare_Header_Services,suppress;
 
 EXPORT Datasource_ProfLic := Module
 	Export get_proflic_entity (dataset(Healthcare_Header_Services.Layouts.searchKeyResults_plus_input) input,dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg):= function
@@ -8,7 +8,7 @@ EXPORT Datasource_ProfLic := Module
 																		self.l_providerid := left.lnpid;
 																		self.vendorid:=(string)right.prolic_seq_id;
 																		self.rawData:=[];
-																		self:=left),
+																		self:=left;),
 											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)); 
 			noHits := join(input,rawdataIndividual,left.acctno=right.acctno,transform(Healthcare_Header_Services.Layouts.searchKeyResults_plus_input, self:=left),left only);
 			
@@ -18,7 +18,7 @@ EXPORT Datasource_ProfLic := Module
 																		self.l_providerid := left.l_providerid;
 																		self.vendorid:=left.vendorid;
 																		self.rawData:=right;
-																		self:=left),
+																		self:=left;),
 											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)); //I believe this should be a 1:1 join...
 					
 			rawdataBusbyVendorid:= join(dedup(sort(noHits(vendorid<>''),record),record), Prof_LicenseV2.Key_Proflic_Bdid(),
@@ -48,8 +48,10 @@ EXPORT Datasource_ProfLic := Module
 			baseInput_sorted := sort(baseInput, acctno, LNPID);
 			baseInput_grouped := group(baseInput_sorted, acctno, LNPID);
 			baseInput_rolled := rollup(baseInput_grouped, group, Healthcare_Header_Services.Transforms.doProfLicBaseRecordSrcIdRollup(left,rows(left)));	
-			
-			baseRecs := project(sort(rawdataIndividualbyVendorid+rawdataBusbyVendorid,-rawData.expiration_date,rawData.prolic_seq_id),Healthcare_Header_Services.Transforms.build_ProfLic_base(left));
+			mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);
+			supmacprof:=Suppress.MAC_FlagSuppressedSource(rawdataIndividualbyVendorid+rawdataBusbyVendorid, mod_access); 
+			setOptOutproflic := project(supmacprof, transform(healthcare_header_services.Layouts.proflic_base_with_input,self.hasOptOut:= left.is_suppressed;self:=left;self:=[];));    
+			baseRecs := project(sort(setOptOutproflic,-rawData.expiration_date,rawData.prolic_seq_id),Healthcare_Header_Services.Transforms.build_ProfLic_base(left));
 			proflic_providers_final_sorted := sort(baseRecs, acctno, LNPID);
 			proflic_providers_final_grouped := group(proflic_providers_final_sorted, acctno, LNPID);
 			proflic_providers_rolled := rollup(proflic_providers_final_grouped, group, Healthcare_Header_Services.Transforms.doProfLicBaseRecordSrcIdRollup(left,rows(left)));			
@@ -68,8 +70,11 @@ EXPORT Datasource_ProfLic := Module
 					self.StateLicenses 	:= RIGHT.StateLicenses;
 					self.ProfLicRaw 		:= RIGHT.ProfLicRaw;
 					Self.SrcRecRaw 			:=  RIGHT.SrcRecRaw;
+					self.hasoptout      := RIGHT.HASOPTOUT;
 					self				 				:= LEFT),
 				limit(0), keep(1));
+				
 			return finalRecs;
+			
 	end;
 end;

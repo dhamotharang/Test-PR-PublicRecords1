@@ -11,7 +11,8 @@ EXPORT SearchService := MACRO
 	
 	SearchCriteria := first_row.SearchBy;
 	SearchOptions := first_row.Options;
-	#stored('GLBPurpose', first_row.user.GLBPurpose);
+   #CONSTANT('GLBPurpose', 7);
+
 	
 	Healthcare_Ganga.Layouts.IdentityInput getCriteria() := TRANSFORM
 		self.acctno := '1';
@@ -37,7 +38,7 @@ EXPORT SearchService := MACRO
 	
 	dsCriteria := DATASET([getCriteria()]);
 	Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform	 
-		GLB := (integer)first_row.user.GLBPurpose;
+		GLB := 7;
 		DL := (integer)first_row.user.DLPurpose;
 		self.glb_ok := ut.glb_ok (GLB);
 		self.dppa_ok := ut.dppa_ok (DL);
