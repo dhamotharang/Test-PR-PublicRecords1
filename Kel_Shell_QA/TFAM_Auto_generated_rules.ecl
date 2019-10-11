@@ -1,6 +1,35 @@
-﻿EXPORT Layouts := MODULE
+﻿
 
-EXPORT AC_Lay:=RECORD
+EXPORT Traditional_Stats_Report(unique_field, inut_file_records, Tag) := FUNCTIONMACRO
+
+test:=record
+	unsigned seq_num;
+ recordof(inut_file_records);
+end;
+
+Kel_Shell_QA.Data_change_macro2(inut_file_records,test,fileop);
+
+Kel_Shell_QA.Distribution_Module.Traditional_Metrics_Macro(unique_field, fileop, op)
+
+result:=project(op,transform( {integer file_cnt;
+	                                    string category;
+	                                    string attribute;
+																			string distribution_type;
+																			string attribute_value;
+																			string attribute_range;
+																			integer8 min_value;
+																			integer8 max_value;
+																			real8 mid_range;
+																			real8 mean;
+																			real8 std_dev;},self.file_cnt:=count(inut_file_records);self:=left;
+																		))(attribute_value in ['VALID']);
+
+RETURN result;			
+
+ENDMACRO;
+
+
+lay:=RECORD
   integer8 g_procuid;
   string65 p_inpacct;
   integer7 p_inplexid;
@@ -8,7 +37,6 @@ EXPORT AC_Lay:=RECORD
   string78 p_inpnamemid;
   string78 p_inpnamelast;
   string120 p_inpaddrline1;
-  string120 p_inpaddrline2;
   string50 p_inpaddrcity;
   string25 p_inpaddrstate;
   string10 p_inpaddrzip;
@@ -25,7 +53,7 @@ EXPORT AC_Lay:=RECORD
   string1 p_inpnamefirstflag;
   string1 p_inpnamemidflag;
   string1 p_inpnamelastflag;
-  string1 p_inpaddrstflag;
+  string1 p_inpaddrline1flag;
   string1 p_inpaddrcityflag;
   string1 p_inpaddrstateflag;
   string1 p_inpaddrzipflag;
@@ -258,7 +286,6 @@ EXPORT AC_Lay:=RECORD
   string120 b_inpname;
   string120 b_inpaltname;
   string120 b_inpaddrline1;
-  string120 b_inpaddrline2;
   string50 b_inpaddrcity;
   string25 b_inpaddrstate;
   string10 b_inpaddrzip;
@@ -275,7 +302,6 @@ EXPORT AC_Lay:=RECORD
   string78 b_rep1inpnamemid;
   string78 b_rep1inpnamelast;
   string120 b_rep1inpaddrline1;
-  string120 b_rep1inpaddrline2;
   string50 b_rep1inpaddrcity;
   string25 b_rep1inpaddrstate;
   string10 b_rep1inpaddrzip;
@@ -290,7 +316,6 @@ EXPORT AC_Lay:=RECORD
   string78 b_rep2inpnamemid;
   string78 b_rep2inpnamelast;
   string120 b_rep2inpaddrline1;
-  string120 b_rep2inpaddrline2;
   string50 b_rep2inpaddrcity;
   string25 b_rep2inpaddrstate;
   string10 b_rep2inpaddrzip;
@@ -305,7 +330,6 @@ EXPORT AC_Lay:=RECORD
   string78 b_rep3inpnamemid;
   string78 b_rep3inpnamelast;
   string120 b_rep3inpaddrline1;
-  string120 b_rep3inpaddrline2;
   string50 b_rep3inpaddrcity;
   string25 b_rep3inpaddrstate;
   string10 b_rep3inpaddrzip;
@@ -320,7 +344,6 @@ EXPORT AC_Lay:=RECORD
   string78 b_rep4inpnamemid;
   string78 b_rep4inpnamelast;
   string120 b_rep4inpaddrline1;
-  string120 b_rep4inpaddrline2;
   string50 b_rep4inpaddrcity;
   string25 b_rep4inpaddrstate;
   string10 b_rep4inpaddrzip;
@@ -335,7 +358,6 @@ EXPORT AC_Lay:=RECORD
   string78 b_rep5inpnamemid;
   string78 b_rep5inpnamelast;
   string120 b_rep5inpaddrline1;
-  string120 b_rep5inpaddrline2;
   string50 b_rep5inpaddrcity;
   string25 b_rep5inpaddrstate;
   string10 b_rep5inpaddrzip;
@@ -348,7 +370,7 @@ EXPORT AC_Lay:=RECORD
   string1 b_inparchdtflag;
   string1 b_inpnameflag;
   string1 b_inpaltnameflag;
-  string1 b_inpaddrstflag;
+  string1 b_inpaddrline1flag;
   string1 b_inpaddrcityflag;
   string1 b_inpaddrstateflag;
   string1 b_inpaddrzipflag;
@@ -360,7 +382,7 @@ EXPORT AC_Lay:=RECORD
   string1 b_rep1inpnamefirstflag;
   string1 b_rep1inpnamemidflag;
   string1 b_rep1inpnamelastflag;
-  string1 b_rep1inpaddrstflag;
+  string1 b_rep1inpaddrline1flag;
   string1 b_rep1inpaddrcityflag;
   string1 b_rep1inpaddrstateflag;
   string1 b_rep1inpaddrzipflag;
@@ -374,7 +396,7 @@ EXPORT AC_Lay:=RECORD
   string1 b_rep2inpnamefirstflag;
   string1 b_rep2inpnamemidflag;
   string1 b_rep2inpnamelastflag;
-  string1 b_rep2inpaddrstflag;
+  string1 b_rep2inpaddrline1flag;
   string1 b_rep2inpaddrcityflag;
   string1 b_rep2inpaddrstateflag;
   string1 b_rep2inpaddrzipflag;
@@ -388,7 +410,7 @@ EXPORT AC_Lay:=RECORD
   string1 b_rep3inpnamefirstflag;
   string1 b_rep3inpnamemidflag;
   string1 b_rep3inpnamelastflag;
-  string1 b_rep3inpaddrstflag;
+  string1 b_rep3inpaddrline1flag;
   string1 b_rep3inpaddrcityflag;
   string1 b_rep3inpaddrstateflag;
   string1 b_rep3inpaddrzipflag;
@@ -402,7 +424,7 @@ EXPORT AC_Lay:=RECORD
   string1 b_rep4inpnamefirstflag;
   string1 b_rep4inpnamemidflag;
   string1 b_rep4inpnamelastflag;
-  string1 b_rep4inpaddrstflag;
+  string1 b_rep4inpaddrline1flag;
   string1 b_rep4inpaddrcityflag;
   string1 b_rep4inpaddrstateflag;
   string1 b_rep4inpaddrzipflag;
@@ -416,7 +438,7 @@ EXPORT AC_Lay:=RECORD
   string1 b_rep5inpnamefirstflag;
   string1 b_rep5inpnamemidflag;
   string1 b_rep5inpnamelastflag;
-  string1 b_rep5inpaddrstflag;
+  string1 b_rep5inpaddrline1flag;
   string1 b_rep5inpaddrcityflag;
   string1 b_rep5inpaddrstateflag;
   string1 b_rep5inpaddrzipflag;
@@ -793,26 +815,6 @@ EXPORT AC_Lay:=RECORD
   integer3 b_rep4lexidscore;
   integer7 b_rep5lexid;
   integer3 b_rep5lexidscore;
-  string6 b_inpvalnameinvalidflag;
-  string6 b_inpvalaltnameinvalidflag;
-  string6 b_inpvaladdrstinvalidflag;
-  string6 b_inpvalphoneinvalidflag;
-  string6 b_inpvaltininvalidflag;
-  string6 b_inpvalemailinvalidflag;
-  string6 b_inpvaladdrzipbadlenflag;
-  string6 b_inpvaladdrzipallzeroflag;
-  string6 b_inpvaladdrstatebadabbrflag;
-  string6 b_inpvalphonebadcharflag;
-  string6 b_inpvalphonebadlenflag;
-  string6 b_inpvalphonebogusflag;
-  string6 b_inpvaltinbadcharflag;
-  string6 b_inpvaltinbadlenflag;
-  string6 b_inpvaltinbogusflag;
-  string6 b_inpvalemailbogusflag;
-  string6 b_inpvalemailuserbadcharflag;
-  string6 b_inpvalemailuserallzeroflag;
-  string6 b_inpvalemaildombadcharflag;
-  string6 b_inpvalemaildomallzeroflag;
   string6 b_lexidlegalseenflag;
   string6 b_lexidlegalrstdonlyflag;
   string10 g_buildbushdrdt;
@@ -993,16 +995,14 @@ EXPORT AC_Lay:=RECORD
   decimal7_2 be_b2bmatbalvol24mc;
   decimal7_2 be_b2bopsbalvol24mc;
   decimal7_2 be_b2bothbalvol24mc;
-  integer3 be_astvehaircntev;
-  integer3 be_astvehwtrcntev;
-  integer3 be_astvehautocntev;
-  integer3 be_astvehautocnt2y;
-  integer3 be_astvehautoperscnt2y;
-  integer3 be_astvehautocommcnt2y;
-  integer3 be_astvehautoothercnt2y;
-  integer3 be_astvehautovaltot2y;
-  integer3 be_astvehautoemrgnewmsncev;
-  string10 be_astvehautoemrgnewdtev;
+  string2 phoneverificationbureau;
+  string1 dialindicator;
+  string1 pointid;
+  string2 nxxtype;
+  boolean zipmatch;
+  string3 coctype;
+  string4 ssc;
+  string4 wirelessindicator;
   string g_procerrorcode;
   string ln_project_id;
   string pf_fraud;
@@ -1014,545 +1014,242 @@ EXPORT AC_Lay:=RECORD
   string proj;
  END;
 
-/////////////////////////////////////////////////////////////////////// 
-EXPORT Criminal_History := RECORD
-string	ArrestCnt1Y;
-string	ArrestCnt7Y;
-string	ArrestNew1Y;
-string	ArrestOld1Y;
-string	ArrestNew7Y;
-string	ArrestOld7Y;
-string	MonSinceNewestArrestCnt1Y;
-string	MonSinceOldestArrestCnt1Y;
-string	MonSinceNewestArrestCnt7Y;
-string	MonSinceOldestArrestCnt7Y;
-string	CrimCnt1Y;
-string	CrimCnt7Y;
-string	CrimNew1Y;
-string	CrimOld1Y;
-string	CrimNew7Y;
-string	CrimOld7Y;
-string	MonSinceNewestCrimCnt1Y;
-string	MonSinceOldestCrimCnt1Y;
-string	MonSinceNewestCrimCnt7Y;
-string	MonSinceOldestCrimCnt7Y;
-string	FelonyCnt1Y;
-string	FelonyCnt7Y;
-string	FelonyNew1Y;
-string	FelonyOld1Y;
-string	FelonyNew7Y;
-string	FelonyOld7Y;
-string	MonSinceNewestFelonyCnt1Y;
-string	MonSinceOldestFelonyCnt1Y;
-string	MonSinceNewestFelonyCnt7Y;
-string	MonSinceOldestFelonyCnt7Y;
-string	NonfelonyCnt1Y;
-string	NonfelonyCnt7Y;
-string	NonfelonyNew1Y;
-string	NonfelonyOld1Y;
-string	NonfelonyNew7Y;
-string	NonfelonyOld7Y;
-string	MonSinceNewestNonfelonyCnt1Y;
-string	MonSinceOldestNonfelonyCnt1Y;
-string	MonSinceNewestNonfelonyCnt7Y;
-string	MonSinceOldestNonfelonyCnt7Y;
-string	HistHavingPrisonAddrFlag;
-string	CrimSeverityIndex7Y;
-string	CrimBehaviorIndex7Y;
+logical_file_name:='~kel_shell::out::nonfcra::vehicleattrbug_100k_vault_archive_nonfcraw_20191008_1';
+
+unique_id:='p_inpacct';
+
+Tag:= regexreplace('~',logical_file_name,'');
+
+// Tag:= logical_file_name;
+
+sample_size:=0;
+   
+input_file := dataset(logical_file_name ,Lay,CSV(HEADING(7), QUOTE('"')));
+// input_file;
+
+input_file_recs:= if(sample_size=0, choosen(input_file,all),choosen(input_file,sample_size) );
+ 
+ 
+ // input_file_recs;
+ 
+stats_file:=Traditional_Stats_Report(unique_id, input_file_recs, Tag);
+
+// stats_file;
+
+
+
+Rules_Generation(Attribute_Type, Attribute_Group):= FUNCTIONMACRO
+IMPORT lib_stringlib,STD;
+lay:=RECORD
+    STRING field1;
+    STRING field2;
+    STRING field3;
+    STRING field4;
+    STRING field5;
+    STRING field6;
+    STRING field7;
+    STRING field8;
+    STRING field9;
+    STRING field10;
+    STRING field11;
+    STRING field12;
+    STRING field13;
+    STRING field14;
+    STRING field15;
+    STRING field16;
+    STRING field17;
+    STRING field18;
+    STRING field19;
+    STRING field20;
+    STRING field21;
+    STRING field22;
+    STRING field23;
+    STRING field24;
+    STRING field25;
 END;
 
+ds:=dataset('~kel_shell::in::kel_shell_qa_confluence_' + Attribute_Group + '_' + Attribute_Type + '_sprayed',lay,CSV(HEADING(1), QUOTE('"')));
 
-EXPORT INPUT_CLEAN_POPULATED := RECORD
-string	InputPrefixCleanPop;
-string	InputFirstNameCleanPop;
-string	InputSuffixCleanPop;
-string	InputPrimaryRangeCleanPop;
-string	InputPreDirectionCleanPop;
-string	InputPrimaryNameCleanPop;
-string	InputAddressSuffixCleanPop;
-string	InputPostDirectionCleanPop;
-string	InputUnitDesigCleanPop;
-string	InputSecondaryRangeCleanPop;
-string	InputCityCleanPop;
-string	InputStateCleanPop;
-string	InputZip5CleanPop;
-string	InputZip4CleanPop;
-string	InputLatitudeCleanPop;
-string	InputLongitudeCleanPop;
-string	InputCountyCleanPop;
-string	InputGeoblockCleanPop;
-string	InputAddressTypeCleanPop;
-string	InputAddressStatusCleanPop;
-string	InputEmailCleanPop;
-string	InputHomePhoneCleanPop;
-string	InputWorkPhoneCleanPop;
-string	InputArchiveDateCleanPop;
+// ds;
+
+p_lay:=RECORD
+  string  Sno;
+	string	Attribute_Name;
+	string	Attribute_Description;
+	string	Attribute_Value;
+	string	NextGenAttr;
+	string	JIRA_Ticket;
+	string	Logic;
+	string	Special_Values;
+	string	Output_Values;
+	string	Foundational_Attribute;
+	string	Prerequisite_Attributes;
+	string	Supporting_Attributes;
+	string	Search_Key;
+	string	Approved_for_FCRA;
+	string	Development_Layout;
+	string	ECL_Format;
+	string	R_Format;
+	string	SAS_Format;
+	string	Drop_Group;
+	string	Monotonicity;
+	string	Modeling_Purpose;
+	string	Predecessor_Attribute_Name;
+	string	Predecessor_Attribute_Source;
+	string	Priority;
+	string	Risk;
 END;
 
-EXPORT INPUT_ECHO_POPULATED := RECORD
-string	InputAccountEchoPop	;
-string	InputLexIDEchoPop	;
-string	InputFirstNameEchoPop	;
-string	InputAddressEchoPop	;
-string	InputCityEchoPop	;
-string	InputStateEchoPop	;
-string	InputZipEchoPop	;
-string	InputHomePhoneEchoPop	;
-string	InputWorkPhoneEchoPOp	;
-string	InputEmailEchoPop	;
-string	InputArchiveDateEchoPop	;
-END;
+p_ds:=project(ds,transform(p_lay,   self.Sno:=left.field1;
+																		self.Attribute_Name:=left.field2;
+																		self.Attribute_Description:=left.field3;
+																		self.Attribute_Value:=left.field4;
+																		self.NextGenAttr:=left.field5;
+																		self.JIRA_Ticket:=left.field6;
+																		self.Logic:=left.field7;
+																		self.Special_Values:=left.field8;
+																		self.Output_Values:=left.field9;
+																		self.Foundational_Attribute:=left.field10;
+																		self.Prerequisite_Attributes:=left.field11;
+																		self.Supporting_Attributes:=left.field12;
+																		self.Search_Key:=left.field13;
+																		self.Approved_for_FCRA:=left.field14;
+																		self.Development_Layout:=left.field15;
+																		self.ECL_Format:=left.field16;
+																		self.R_Format:=left.field17;
+																		self.SAS_Format:=left.field18;
+																		self.Drop_Group:=left.field19;
+																		self.Monotonicity:=left.field20;
+																		self.Modeling_Purpose:=left.field21;
+																		self.Predecessor_Attribute_Name:=left.field22;
+																		self.Predecessor_Attribute_Source:=left.field23;
+																		self.Priority:=left.field24;
+																		self.Risk:=left.field25;
+																		));
 
-EXPORT CONSUMER_INPUT_CLEAN_ECHO := RECORD
-  integer8 inputid;
-  string65 account;
-  integer7 inputlexid;
-  string78 inputfirstname;
-  string120 inputaddress;
-  string50 inputcity;
-  string25 inputstate;
-  string10 inputzip;
-  string16 inputhomephone;
-  string16 inputworkphone;
-  string54 inputemail;
-  string20 inputarchivedate;
-  integer7 appendedlexid;
-  integer2 appendedlexidscore;
-  string5 inputcleanprefix;
-  string20 inputcleanfirstname;
-  string5 inputcleansuffix;
-  string10 inputcleanprimaryrange;
-  string3 inputcleanpredirection;
-  string28 inputcleanprimaryname;
-  string4 inputcleanaddresssuffix;
-  string3 inputcleanpostdirection;
-  string10 inputcleanunitdesig;
-  string8 inputcleansecondaryrange;
-  string25 inputcleancityname;
-  string3 inputcleanstate;
-  string5 inputcleanzip5;
-  string4 inputcleanzip4;
-  string10 inputcleanlatitude;
-  string11 inputcleanlongitude;
-  string3 inputcleancounty;
-  string7 inputcleangeoblock;
-  string3 inputcleanaddresstype;
-  string4 inputcleanaddressstatus;
-  string54 inputcleanemail;
-  string10 inputcleanhomephone;
-  string10 inputcleanworkphone;
- END;
+Rules_lay:=record
+string	ECLFieldname;
+// string	KELFieldname;
+string	Category;
+// string	AttributeDefinition;
+string	SourceDescription;
+// string	NumericCharactersallowed;
+// string	Type;
+string	Min;
+string	Max;
+// string	AlphaCharactersallowed;
+// string	AllSpecialCharactersallowed;
+// string	ExcludedCharacters;
+// string	UniqueAcceptableOutputs;
+// string	NULLAcceptable;
+string  OtherOutputRules;
+string	Average;
+string	StdDev;
+// string	NullRate;
+// string	ZeroRate;
+string 	DefaultValues;
+string 	DefaultValueRate;
+string	HitRate;
+// string	Other;
+// string	Product;
+// string	Version;
+// string	Other_p;
+// string	AdditionalComments;
+// string	CurrentlyUsed;
+// string	InitialDate;
+// string	DateofLastUpdate;
+// string	DescriptionofChange;
+// string	ResetFlag;
+end;																		
 
-EXPORT INPUT_CLEAN_ECHO := RECORD
-  integer8 inputid;
-  string30 account;
-  integer7 inputlexid;
-  string70 inputfirstname;
-  string120 inputaddress;
-  string50 inputcity;
-  string25 inputstate;
-  string10 inputzip;
-  string10 inputhomephone;
-  string10 inputworkphone;
-  string50 inputemail;
-  string20 inputarchivedate;
-  integer7 appendedlexid;
-  integer2 appendedlexidscore;
-  string5 inputcleanprefix;
-  string20 inputcleanfirstname;
-  string5 inputcleansuffix;
-  string10 inputcleanprimaryrange;
-  string3 inputcleanpredirection;
-  string28 inputcleanprimaryname;
-  string4 inputcleanaddresssuffix;
-  string3 inputcleanpostdirection;
-  string10 inputcleanunitdesig;
-  string8 inputcleansecondaryrange;
-  string25 inputcleancityname;
-  string3 inputcleanstate;
-  string5 inputcleanzip5;
-  string4 inputcleanzip4;
-  string10 inputcleanlatitude;
-  string11 inputcleanlongitude;
-  string3 inputcleancounty;
-  string7 inputcleangeoblock;
-  string3 inputcleanaddresstype;
-  string4 inputcleanaddressstatus;
-  string25 inputcleancountry;
-  string50 inputcleanemail;
-  string10 inputcleanhomephone;
-  string10 inputcleanworkphone;
-  string20 inputcleandlnumber;
-  string3 inputcleandlstate;
-  string8 inputcleandob;
-  string9 inputcleanssn;
-  string errorcode;
-END;
-
-EXPORT Business_Input_Echo :=RECORD
-  string65 businputaccountecho;
-  integer8 businputuidappend;
-  integer7 inputlexidbusextendedfamilyecho;
-  integer7 inputlexidbuslegalfamilyecho;
-  integer7 inputlexidbuslegalentityecho;
-  integer7 inputlexidbusplacegroupecho;
-  integer7 inputlexidbusplaceecho;
-  string120 businputnameecho;
-  string120 businputalternatenameecho;
-  string120 businputstreetecho;
-  string50 businputcityecho;
-  string25 businputstateecho;
-  string10 businputzipecho;
-  string16 businputphoneecho;
-  string45 businputipaddressecho;
-  string50 businputurlecho;
-  string54 businputemailecho;
-  string6 businputsiccodeecho;
-  string6 businputnaicscodeecho;
-  string20 businputarchivedateecho;
-  integer7 businputrep1lexidecho;
-  string78 businputrep1firstnameecho;
-  string120 businputrep1streetecho;
-  string50 businputrep1cityecho;
-  string25 businputrep1stateecho;
-  string10 businputrep1zipecho;
-  string16 businputrep1phoneecho;
-  string54 businputrep1emailecho;
-  integer7 businputrep2lexidecho;
-  string78 businputrep2firstnameecho;
-  string120 businputrep2streetecho;
-  string50 businputrep2cityecho;
-  string25 businputrep2stateecho;
-  string10 businputrep2zipecho;
-  string16 businputrep2phoneecho;
-  string54 businputrep2emailecho;
-  integer7 businputrep3lexidecho;
-  string78 businputrep3firstnameecho;
-  string120 businputrep3streetecho;
-  string50 businputrep3cityecho;
-  string25 businputrep3stateecho;
-  string10 businputrep3zipecho;
-  string16 businputrep3phoneecho;
-  string54 businputrep3emailecho;
-  integer7 businputrep4lexidecho;
-  string78 businputrep4firstnameecho;
-  string120 businputrep4streetecho;
-  string50 businputrep4cityecho;
-  string25 businputrep4stateecho;
-  string10 businputrep4zipecho;
-  string16 businputrep4phoneecho;
-  string54 businputrep4emailecho;
-  integer7 businputrep5lexidecho;
-  string78 businputrep5firstnameecho;
-  string120 businputrep5streetecho;
-  string50 businputrep5cityecho;
-  string25 businputrep5stateecho;
-  string10 businputrep5zipecho;
-  string16 businputrep5phoneecho;
-  string54 businputrep5emailecho;
- END;
+IMPORT Std;
+																	
+Rules_ds:=project(p_ds,transform(Rules_lay,
+									self.ECLFieldname:=left.Attribute_Name;
+									// self.KELFieldname:=left.field2;
+									self.Category:=Attribute_Group;
+									// self.AttributeDefinition:=left.field4;
+									self.SourceDescription:=left.Attribute_Description;
+									// self.NumericCharactersallowed:=left.field6;
+									// self.Type:=left.field7;
+									self.Min:=IF(STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[1] in ['YYYYMMDD'] OR 
+									             REGEXFIND(',', left.Output_Values) OR
+															 REGEXFIND('[a-zA-Z]', left.Output_Values),
+																								 'No Min',
+																								 STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[1]);
+									self.Max:=IF(STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2] in ['YYYYMMDD'] OR
+									             REGEXFIND(',', left.Output_Values) OR
+															 REGEXFIND('[a-zA-Z]', left.Output_Values),
+																								 'No Max',
+																								 STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]);
+																								 
+									// self.AlphaCharactersallowed:=left.field10;
+									// self.AllSpecialCharactersallowed:=left.field11;
+									// self.ExcludedCharacters:=left.field12;
+									// self.UniqueAcceptableOutputs:=left.field13;
+									// self.NULLAcceptable:=left.field14;
+									self.OtherOutputRules:=MAP(REGEXFIND(',', left.Output_Values) OR REGEXFIND('[a-zA-Z]', left.Output_Values) =>'No BinSize',
+									                           STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[1] in ['YYYYMMDD'] or STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2] in ['YYYYMMDD'] =>'No BinSize',
+									                           (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]> 99999 => (string)ROUNDUP((integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]/10),
+									                           (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]> 999 and (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2] <= 99999 => '100',
+									                           (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]>= 99 and (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2] <= 999 => '10',
+									                           (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]>= 11 and (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2] <= 98 => '5',
+																						 (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]>= 0 and (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2] <= 9 => '1',
+																						 'No BinSize'
+									                           );
+									// self.Average:=left.field16;
+									// self.StdDev:=left.field17;
+									// self.NullRate:=left.field18;
+									// self.ZeroRate:=left.field19;
+									// self.DefaultValues:=left.field20;
+									self.DefaultValueRate:= trim(regexreplace('-99999',trim(regexreplace('-99998', trim(regexreplace('-99997',trim(left.Special_Values,left,right),'0.05'),left,right),'0.05'),left,right),'0.05'),left,right);
+									self.HitRate:=(string) MAP(count((SET OF INTEGER)STD.STr.SplitWords(regexreplace(',',trim(left.Special_Values,left,right),'|'),'|')) = 3 => '.85',
+									                           count((SET OF INTEGER)STD.STr.SplitWords(regexreplace(',',trim(left.Special_Values,left,right),'|'),'|')) = 2 => '.9',
+																						 count((SET OF INTEGER)STD.STr.SplitWords(regexreplace(',',trim(left.Special_Values,left,right),'|'),'|')) = 1 => '.95',
+																						 '1'
+									                          );
+									// self.Other:=left.field23;
+									// self.Product:=left.field24;
+									// self.Version:=left.field25;
+									// self.Other_p:=left.field26;
+									// self.AdditionalComments:=left.field27;
+									// self.CurrentlyUsed:=left.field28;
+									// self.InitialDate:=left.field29;
+									// self.DateofLastUpdate:=left.field30;
+									// self.DescriptionofChange:=left.field31;
+									// self.ResetFlag:=left.field32;
+									self.DefaultValues:=trim(left.Special_Values,left,right) ;
+									self:=[];
+									));
+																		
+RETURN Rules_ds;																		
+																																		
+ENDMACRO;							
+									
+Automated_Rules_File :=  Rules_Generation('Person','Best PII') +
+                                Rules_Generation('Person','Professional License') +
+                                Rules_Generation('Person','assets') +
+																Rules_Generation('Person','Derogs -Bankruptcy History') +
+																Rules_Generation('Person','Derogs -Criminal History') +
+																Rules_Generation('Business','Business B2B Trade') +
+																Rules_Generation('Business','Business LexID') +
+																Rules_Generation('Business','Business Input Validation') +
+																Rules_Generation('Person','Validation') ;
 
 
-EXPORT Base_Layout :=RECORD
+// Automated_Rules_File;
 
-  INPUT_CLEAN_ECHO;
-	CONSUMER_INPUT_CLEAN_ECHO;
-	Business_Input_Echo;
-	INPUT_CLEAN_POPULATED;
-	INPUT_ECHO_POPULATED;
-	Criminal_History;
-  // string sno;
-  string bkcount120;
-  string bkcount24;
-  string bkfilingdateoldest120;
-  string bkfilingdatenewest120;
-  string bktimeoldest120;
-  string bktimenewest120;
-  string bkchapter120;
-  string bkch7count120;
-  string bkch13count120;
-  string bkupdatedatenewest120;
-  string bktimenewestupdate120;
-  string bkdispositiondatenewest120;
-  string bkdisposition120;
-  string bkdismissedcount120;
-  string bkdismissedcount24;
-  string bkdisposedcount120;
-  string bkdischargedcount120;
-  string bkbusinessfiling120;
-  string bkseverityindex120;
-  // string crimarrestcount84;
-  // string crimarrestcount12;
-  // string crimarrestdatenewest;
-  // string crimarrestdateoldest;
-  // string crimarresttimenewest;
-  // string crimarresttimeoldest;
-  // string crimcount;
-  // string crimcount12;
-  // string crimdatenewest;
-  // string crimdateoldest;
-  // string crimtimenewest;
-  // string crimtimeoldest;
-  // string crimfelonycount;
-  // string crimfelonycount12;
-  // string crimfelonydatenewest;
-  // string crimfelonydateoldest;
-  // string crimfelonytimenewest;
-  // string crimfelonytimeoldest;
-  // string crimnonfelonycount;
-  // string crimnonfelonycount12;
-  // string crimnonfelonydatenewest;
-  // string crimnonfelonydateoldest;
-  // string crimnonfelonytimenewest;
-  // string crimnonfelonytimeoldest;
-  // string crimaddresshistory;
-  // string crimxfelony;
-  // string crimbehaviorlevel;
-  string associatecount;
-  string associatebusinesscount;
-  string associatebusinessavg;
-  string associateactivebusinesscount;
-  string associateactivebusinessavg;
-  string associateactivebusinesspct;
-  string associatepropownercount;
-  string associatepropownerpct;
-  string associatederogcount;
-  string associatederogpct;
-  string associatederogindex;
-  string associatefelonycount;
-  string associatefelonypct;
-  string associatecriminalcount;
-  string associatecriminalpct;
-  string associatebankruptcycount;
-  string associatebankruptcypct;
-  string associateevictioncount;
-  string associateevictionpct;
-  string associateliencount;
-  string associatelienpct;
-  string associatejudgmentcount;
-  string associatejudgmentpct;
-  string busbkcount120;
-  string busbkdisposedcount120;
-  string busbkdischargedcount120;
-  string busbkdismissedcount120;
-  string busbkch7count120;
-  string busbkch11count120;
-  string busbkch13count120;
-  string busbktimeoldest120;
-  string busbktimenewest120;
-  string busbktimenewestupdate120;
-  string busbknewestchapter120;
-  string busbknewestdisposition120;
-  string busbkdateoldest120;
-  string busbkdatenewest120;
-  string busbkdatenewestupdate120;
-  string executivecount;
-  string executivebusinesscount;
-  string executivebusinessavg;
-  string executiveactivebusinesscount;
-  string executiveactivebusinessavg;
-  string executiveactivebusinesspct;
-  string executivepropownercount;
-  string executivepropownerpct;
-  string executivederogcount;
-  string executivederogpct;
-  string executivederogindex;
-  string executivefelonycount;
-  string executivefelonypct;
-  string executivecriminalcount;
-  string executivecriminalpct;
-  string executivebankruptcycount;
-  string executivebankruptcypct;
-  string executiveevictioncount;
-  string executiveevictionpct;
-  string executiveliencount;
-  string executivelienpct;
-  string executivejudgmentcount;
-  string executivejudgmentpct;
-  string archive_dt;
-  string archivedate;
-	string InqTimeNewest12;
-	
-string InqTimeOldest12;
-string InqTimeNewest60;
-string InqTimeOldest60;
-string InqCountDay;
-string InqCountWeek;
-string InqCount01;
-string InqCount03;
-string InqCount06;
-string InqCount12;
-string InqCount24;
-string InqCount60;
-string InqAutoTimeNewest12;
-string InqAutoTimeOldest12;
-string InqAutoTimeNewest60;
-string InqAutoTimeOldest60;
-string InqAutoCountDay;
-string InqAutoCountWeek;
-string InqAutoCount01;
-string InqAutoCount03;
-string InqAutoCount06;
-string InqAutoCount12;
-string InqAutoCount24;
-string InqAutoCount60;
-string InqBankingTimeNewest12;
-string InqBankingTimeOldest12;
-string InqBankingTimeNewest60;
-string InqBankingTimeOldest60;
-string InqBankingCountDay;
-string InqBankingCountWeek;
-string InqBankingCount01;
-string InqBankingCount03;
-string InqBankingCount06;
-string InqBankingCount12;
-string InqBankingCount24;
-string InqBankingCount60;
-string InqCommTimeNewest12;
-string InqCommTimeOldest12;
-string InqCommTimeNewest60;
-string InqCommTimeOldest60;
-string InqCommCountDay;
-string InqCommCountWeek;
-string InqCommCount01;
-string InqCommCount03;
-string InqCommCount06;
-string InqCommCount12;
-string InqCommCount24;
-string InqCommCount60;
-string InqCreditSeekingTimeNewest12;
-string InqCreditSeekingTimeOldest12;
-string InqCreditSeekingTimeNewest60;
-string InqCreditSeekingTimeOldest60;
-string InqCreditSeekingCountDay;
-string InqCreditSeekingCountWeek;
-string InqCreditSeekingCount01;
-string InqCreditSeekingCount03;
-string InqCreditSeekingCount06;
-string InqCreditSeekingCount12;
-string InqCreditSeekingCount24;
-string InqCreditSeekingCount60;
-string InqHighRiskTimeNewest12;
-string InqHighRiskTimeOldest12;
-string InqHighRiskTimeNewest60;
-string InqHighRiskTimeOldest60;
-string InqHighRiskCountDay;
-string InqHighRiskCountWeek;
-string InqHighRiskCount01;
-string InqHighRiskCount03;
-string InqHighRiskCount06;
-string InqHighRiskCount12;
-string InqHighRiskCount24;
-string InqHighRiskCount60;
-string InqMortgageTimeNewest12;
-string InqMortgageTimeOldest12;
-string InqMortgageTimeNewest60;
-string InqMortgageTimeOldest60;
-string InqMortgageCountDay;
-string InqMortgageCountWeek;
-string InqMortgageCount01;
-string InqMortgageCount03;
-string InqMortgageCount06;
-string InqMortgageCount12;
-string InqMortgageCount24;
-string InqMortgageCount60;
-string InqOtherTimeNewest12;
-string InqOtherTimeOldest12;
-string InqOtherTimeNewest60;
-string InqOtherTimeOldest60;
-string InqOtherCountDay;
-string InqOtherCountWeek;
-string InqOtherCount01;
-string InqOtherCount03;
-string InqOtherCount06;
-string InqOtherCount12;
-string InqOtherCount24;
-string InqOtherCount60;
-string InqPrepaidCardsTimeNewest12;
-string InqPrepaidCardsTimeOldest12;
-string InqPrepaidCardsTimeNewest60;
-string InqPrepaidCardsTimeOldest60;
-string InqPrepaidCardsCountDay;
-string InqPrepaidCardsCountWeek;
-string InqPrepaidCardsCount01;
-string InqPrepaidCardsCount03;
-string InqPrepaidCardsCount06;
-string InqPrepaidCardsCount12;
-string InqPrepaidCardsCount24;
-string InqPrepaidCardsCount60;
-string InqRetailTimeNewest12;
-string InqRetailTimeOldest12;
-string InqRetailTimeNewest60;
-string InqRetailTimeOldest60;
-string InqRetailCountDay;
-string InqRetailCountWeek;
-string InqRetailCount01;
-string InqRetailCount03;
-string InqRetailCount06;
-string InqRetailCount12;
-string InqRetailCount24;
-string InqRetailCount60;
-string InqRetailPaymentTimeNewest12;
-string InqRetailPaymentTimeOldest12;
-string InqRetailPaymentTimeNewest60;
-string InqRetailPaymentTimeOldest60;
-string InqRetailPaymentCountDay;
-string InqRetailPaymentCountWeek;
-string InqRetailPaymentCount01;
-string InqRetailPaymentCount03;
-string InqRetailPaymentCount06;
-string InqRetailPaymentCount12;
-string InqRetailPaymentCount24;
-string InqRetailPaymentCount60;
-string InqStudentLoanTimeNewest12;
-string InqStudentLoanTimeOldest12;
-string InqStudentLoanTimeNewest60;
-string InqStudentLoanTimeOldest60;
-string InqStudentLoanCountDay;
-string InqStudentLoanCountWeek;
-string InqStudentLoanCount01;
-string InqStudentLoanCount03;
-string InqStudentLoanCount06;
-string InqStudentLoanCount12;
-string InqStudentLoanCount24;
-string InqStudentLoanCount60;
-string InqUtilityTimeNewest12;
-string InqUtilityTimeOldest12;
-string InqUtilityTimeNewest60;
-string InqUtilityTimeOldest60;
-string InqUtilityCountDay;
-string InqUtilityCountWeek;
-string InqUtilityCount01;
-string InqUtilityCount03;
-string InqUtilityCount06;
-string InqUtilityCount12;
-string InqUtilityCount24;
-string InqUtilityCount60;
-string InqQuizProviderTimeNewest12;
-string InqQuizProviderTimeOldest12;
-string InqQuizProviderTimeNewest60;
-string InqQuizProviderTimeOldest60;
-string InqQuizProviderCountDay;
-string InqQuizProviderCountWeek;
-string InqQuizProviderCount01;
-string InqQuizProviderCount03;
-string InqQuizProviderCount06;
-string InqQuizProviderCount12;
-string InqQuizProviderCount24;
-string InqQuizProviderCount60;
-string InqCollectionTimeNewest12;
-string InqCollectionTimeOldest12;
-string InqCollectionTimeNewest60;
-string InqCollectionTimeOldest60;
-string InqCollectionCountDay;
-string InqCollectionCountWeek;
-string InqCollectionCount01;
-string InqCollectionCount03;
-string InqCollectionCount06;
-string InqCollectionCount12;
-string InqCollectionCount24;
-string InqCollectionCount60;
+jn:=JOIN(Automated_Rules_File,stats_file, 
+                    STD.Str.ToLowerCase(left.ECLFieldname)=STD.Str.ToLowerCase(right.attribute),
+										TRANSFORM(recordof(Automated_Rules_File),
+										   self.Average:=(string)right.mean;
+											 self.StdDev:=(string)right.std_dev;
+								       self:=left;
+											 // self:=right;
+        ));
 
- END;
+// jn;
 
-END;
+output(jn,,'~Kel_Shell_QA::in::tfam_automated_rules_' + (string8)std.date.today(),compressed,thor,overwrite);
+
+EXPORT TFAM_Auto_generated_rules := jn;
