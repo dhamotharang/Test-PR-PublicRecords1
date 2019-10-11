@@ -32,10 +32,12 @@ EXPORT EmailIdentityCheckSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   // add best info
   email_with_best_recs := $.Functions.AddBestInfo(email_with_num_recs,in_mod);
   
-  // check email delivery status
-  email_recs_valdtd := $.GatewayData.VerifyDeliveryStatus(email_with_best_recs, in_mod, clnd_input_email);
-  email_recs_ready := IF(in_mod.CheckEmailDeliverable, email_recs_valdtd.Records,
-                          email_with_best_recs);
+  // add email status
+  email_recs_with_hist_status := $.GatewayData.AddStatusFromHistory(email_with_best_recs, in_mod, clnd_input_email);  // per EMAIL-158 reqs. we now add status info using BV history for basic search as well
+  email_recs_valdtd := $.GatewayData.VerifyDeliveryStatus(email_with_best_recs, in_mod);  // validate status using external GW calls
+  email_recs_with_status := IF(in_mod.CheckEmailDeliverable, email_recs_valdtd.Records, email_recs_with_hist_status);
+  //filter out records with no internal identity info AND BV status = unknown (so we aren’t charging for a hit without any valuable insight) - req.2.4 of EMAIL-158
+  email_recs_ready := email_recs_with_status(~$.Constants.isUnknown(email_status) OR email_id>0);
 
   //use TMX ERA policy
   email_with_tmx_recs := IF(in_mod.UseTMXRules, $.GatewayData.getTMXInsights(email_recs_ready, in_mod), email_recs_ready);

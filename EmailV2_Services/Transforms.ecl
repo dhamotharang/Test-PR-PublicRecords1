@@ -70,33 +70,33 @@ EXPORT Transforms := MODULE
     EXPORT $.Layouts.email_raw_rec addRawPayload ($.Layouts.email_ids_rec LE,
                                                                dx_Email.Layouts.i_Payload RI)
     := TRANSFORM
-                              SELF.acctno         := LE.acctno,
-                              SELF.seq            := LE.seq,
-                              SELF.subject_lexid  := LE.subject_lexid,
-                              SELF.isdeepdive     := LE.isdeepdive,
-                              SELF.email_id       := RI.email_rec_key,
-                              SELF.is_current     := RI.current_rec,
-                              SELF.email_username := RI.append_email_username,
-                              SELF.email_domain   := RI.append_domain,
-                              SELF.original.first_name  := RI.orig_first_name;
-                              SELF.original.last_name   := RI.orig_last_name;
-                              SELF.original.middle_name := RI.orig_middle_name;
-                              SELF.original.name_suffix := RI.orig_name_suffix;
-                              SELF.original.address     := RI.orig_address;
-                              SELF.original.city        := RI.orig_city;
-                              SELF.original.state       := RI.orig_state;
-                              SELF.original.zip         := RI.orig_zip;
-                              SELF.original.zip4        := RI.orig_zip4;
-                              SELF.original.email       := RI.orig_email;
-                              SELF.original.ip          := RI.orig_ip;
-                              SELF.original.login_date  := RI.orig_login_date;
-                              SELF.original.site        := RI.orig_site;
-                              SELF.original.phone       := RI.orig_phone;
-                              SELF.original.ssn         := RI.orig_ssn;
-                              SELF.original.dob         := RI.orig_dob;
-                              SELF.cleaned.Name    := RI.Clean_Name,
-                              SELF.cleaned.Address := RI.clean_address,
-                              SELF.cleaned := RI;
+      SELF.acctno         := LE.acctno,
+      SELF.seq            := LE.seq,
+      SELF.subject_lexid  := LE.subject_lexid,
+      SELF.isdeepdive     := LE.isdeepdive,
+      SELF.email_id       := RI.email_rec_key,
+      SELF.is_current     := RI.current_rec,
+      SELF.email_username := RI.append_email_username,
+      SELF.email_domain   := RI.append_domain,
+      SELF.original.first_name  := RI.orig_first_name;
+      SELF.original.last_name   := RI.orig_last_name;
+      SELF.original.middle_name := RI.orig_middle_name;
+      SELF.original.name_suffix := RI.orig_name_suffix;
+      SELF.original.address     := RI.orig_address;
+      SELF.original.city        := RI.orig_city;
+      SELF.original.state       := RI.orig_state;
+      SELF.original.zip         := RI.orig_zip;
+      SELF.original.zip4        := RI.orig_zip4;
+      SELF.original.email       := RI.orig_email;
+      SELF.original.ip          := RI.orig_ip;
+      SELF.original.login_date  := RI.orig_login_date;
+      SELF.original.site        := RI.orig_site;
+      SELF.original.phone       := RI.orig_phone;
+      SELF.original.ssn         := RI.orig_ssn;
+      SELF.original.dob         := RI.orig_dob;
+      SELF.cleaned.Name    := RI.Clean_Name,
+      SELF.cleaned.Address := RI.clean_address,
+      SELF.cleaned := RI;
                               SELF := RI;
                               SELF := [];
   END;
@@ -197,7 +197,7 @@ EXPORT Transforms := MODULE
     SELF:=_indiv;
   END;
 
-  EXPORT $.Layouts.Gateway_Data.bv_history_rec xfBVDeltabaseResp($.Layouts.Gateway_Data.bv_history_deltabase_rec le)
+  EXPORT $.Layouts.event_history_rec xfBVDeltabaseResp($.Layouts.Gateway_Data.bv_history_deltabase_rec le)
   := TRANSFORM
       SELF.email := STD.Str.ToUpperCase(TRIM(le.email_address, ALL));
       SELF.email_username := STD.Str.ToUpperCase(le.Account);
@@ -207,12 +207,10 @@ EXPORT Transforms := MODULE
       SELF.email_status_reason := MAP(error_desc<>''=> error_desc, 
                                       le.Error ='(null)' => '', // ESP is returning (null) in case of blank, we need to clean up
                                       STD.Str.ToTitleCase(le.Error));
-      isDisposableAddress := STD.Str.ToLowerCase(le.disposable) = $.Constants.STR_TRUE;
-      isRoleAddress := STD.Str.ToLowerCase(le.role_address) = $.Constants.STR_TRUE;
-      additional_status := MAP(isDisposableAddress AND isRoleAddress => $.Constants.GatewayValues.RoleAddress+' / '+$.Constants.GatewayValues.DisposableAddress,
-                               isRoleAddress => $.Constants.GatewayValues.RoleAddress,
-                               isDisposableAddress => $.Constants.GatewayValues.DisposableAddress,'');
-      SELF.additional_status_info := additional_status;
+      SELF.is_disposable_address := STD.Str.ToLowerCase(le.disposable) = $.Constants.STR_TRUE;
+      SELF.is_role_address := STD.Str.ToLowerCase(le.role_address) = $.Constants.STR_TRUE;
+      SELF.date_added := STD.Str.FilterOut(le.date_added[1..10],'-');
+      SELF.error_code := STD.Str.ToUpperCase(le.error_code);
   END;
 
   EXPORT $.Layouts.Gateway_Data.bv_history_rec xfBVSoapResp(iesp.briteverify_email.t_BriteVerifyEmailResponse le)
@@ -233,7 +231,7 @@ EXPORT Transforms := MODULE
    
   EXPORT iesp.briteverify_email.t_BriteVerifyEmailRequest xfBVSoapRequest($.Layouts.Gateway_Data.batch_in_bv_rec L, STRING apikey)
   := TRANSFORM
-    SELF.SearchBy.EmailAddress  := L.email;
+    SELF.SearchBy.EmailAddress  := TRIM(L.email,ALL);
     SELF.Options.JSONServiceAPIKey := apikey;
     SELF:=[];
   END;
@@ -335,7 +333,14 @@ EXPORT Transforms := MODULE
     SELF.PenaltyDidSsnDob := le.penalt_didssndob;
     SELF.EmailStatus := le.email_status;
     SELF.EmailStatusReason := le.email_status_reason;
-    SELF.AdditionalStatusInfo := le.additional_status_info;
+    
+    _last_verified := IF(le.email_status<>'' AND le.date_last_verified<>'' AND ~$.Constants.isUnknown(le.email_status), 
+                         $.Constants.LastVerified + ' ' + le.date_last_verified,'');
+    SELF.AdditionalStatusInfo := MAP(le.additional_status_info<>'' AND _last_verified<>'' => TRIM(le.additional_status_info) + '; '+_last_verified,
+                                     le.additional_status_info<>'' => le.additional_status_info, 
+                                     _last_verified<>'' => _last_verified, 
+                                     ''); 
+                                 
     SELF.EmailId := le.email_id;
     SELF.Relationship := le.Relationship;
     SELF.isDeepDive := le.isDeepDive;
@@ -371,44 +376,51 @@ EXPORT Transforms := MODULE
   
   EXPORT $.Layouts.batch_final_rec xfBatchOut($.Layouts.email_final_rec le)
     := TRANSFORM
-                              SELF.acctno          := le.acctno,
-                              SELF.orig_first_name := le.original.first_name;
-                              SELF.orig_last_name  := le.original.last_name;
-                              SELF.orig_address    := le.original.address;
-                              SELF.orig_city       := le.original.city;
-                              SELF.orig_state      := le.original.state;
-                              SELF.orig_zip        := le.original.zip;
-                              SELF.orig_zip4       := le.original.zip4;
-                              SELF.orig_email      := le.original.email;
-                              SELF.orig_ip         := le.original.ip;
-                              SELF.orig_login_date := le.original.login_date;
-                              SELF.orig_site       := le.original.site;
-                              SELF.orig_company_name := le.orig_CompanyName;
-                              SELF.cln_company_name := le.cln_CompanyName;
-                              SELF.company_title := le.CompanyTitle;
-                              SELF.src := le.email_src;
-                              SELF.best_title := le.bestinfo.title;
-                              SELF.best_fname := le.bestinfo.fname;
-                              SELF.best_mname := le.bestinfo.mname;
-                              SELF.best_lname := le.bestinfo.lname;
-                              SELF.best_name_suffix := le.bestinfo.name_suffix;
-                              SELF.best_prim_range := le.bestinfo.prim_range;
-                              SELF.best_predir := le.bestinfo.predir;
-                              SELF.best_prim_name := le.bestinfo.prim_name;
-                              SELF.best_addr_suffix := le.bestinfo.suffix;
-                              SELF.best_postdir := le.bestinfo.postdir;
-                              SELF.best_unit_desig := le.bestinfo.unit_desig;
-                              SELF.best_sec_range := le.bestinfo.sec_range;
-                              SELF.best_city_name := le.bestinfo.city_name;
-                              SELF.best_st := le.bestinfo.st;
-                              SELF.best_zip := le.bestinfo.zip;
-                              SELF.best_zip4 := le.bestinfo.zip4;
-                              SELF.best_ssn := le.bestinfo.ssn;
-                              SELF.best_dob := le.bestinfo.dob;
-                              SELF.clean_email := le.cleaned.clean_email;
-                              SELF := le.cleaned.Name;
-                              SELF := le.cleaned.Address;
-                              SELF := le;
+      SELF.acctno          := le.acctno,
+      SELF.orig_first_name := le.original.first_name;
+      SELF.orig_last_name  := le.original.last_name;
+      SELF.orig_address    := le.original.address;
+      SELF.orig_city       := le.original.city;
+      SELF.orig_state      := le.original.state;
+      SELF.orig_zip        := le.original.zip;
+      SELF.orig_zip4       := le.original.zip4;
+      SELF.orig_email      := le.original.email;
+      SELF.orig_ip         := le.original.ip;
+      SELF.orig_login_date := le.original.login_date;
+      SELF.orig_site       := le.original.site;
+      SELF.orig_company_name := le.orig_CompanyName;
+      SELF.cln_company_name := le.cln_CompanyName;
+      SELF.company_title := le.CompanyTitle;
+      SELF.src := le.email_src;
+      SELF.best_title := le.bestinfo.title;
+      SELF.best_fname := le.bestinfo.fname;
+      SELF.best_mname := le.bestinfo.mname;
+      SELF.best_lname := le.bestinfo.lname;
+      SELF.best_name_suffix := le.bestinfo.name_suffix;
+      SELF.best_prim_range := le.bestinfo.prim_range;
+      SELF.best_predir := le.bestinfo.predir;
+      SELF.best_prim_name := le.bestinfo.prim_name;
+      SELF.best_addr_suffix := le.bestinfo.suffix;
+      SELF.best_postdir := le.bestinfo.postdir;
+      SELF.best_unit_desig := le.bestinfo.unit_desig;
+      SELF.best_sec_range := le.bestinfo.sec_range;
+      SELF.best_city_name := le.bestinfo.city_name;
+      SELF.best_st := le.bestinfo.st;
+      SELF.best_zip := le.bestinfo.zip;
+      SELF.best_zip4 := le.bestinfo.zip4;
+      SELF.best_ssn := le.bestinfo.ssn;
+      SELF.best_dob := le.bestinfo.dob;
+      SELF.clean_email := le.cleaned.clean_email;
+      SELF := le.cleaned.Name;
+      SELF := le.cleaned.Address;
+      _last_verified := IF(le.email_status<>'' AND le.date_last_verified<>'' AND ~$.Constants.isUnknown(le.email_status), 
+                         $.Constants.LastVerified + ' ' + le.date_last_verified,'');
+      SELF.additional_status_info := 
+                                  MAP(le.additional_status_info<>'' AND _last_verified<>'' => TRIM(le.additional_status_info) + '; '+_last_verified,
+                                     le.additional_status_info<>'' => le.additional_status_info, 
+                                     _last_verified<>'' => _last_verified, 
+                                     ''); 
+      SELF := le;
   END;
 
 END;
