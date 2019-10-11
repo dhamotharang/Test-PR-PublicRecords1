@@ -1,5 +1,5 @@
 ﻿IMPORT Address, BIPv2, Business_Risk_BIP, BusinessCredit_Services, Cortera, Gateway, IESP, 
-       Models, Risk_Indicators, Risk_Reporting,RiskWise,  
+       Models, Risk_Indicators, Risk_Reporting, RiskWise, STD,
        UT,LNSmallBusiness;
 
 EXPORT SmallBusiness_BIP_Function (
@@ -38,7 +38,9 @@ EXPORT SmallBusiness_BIP_Function (
 
 	// Use the SBFE restriction to return Scores or not.
 	allow_SBFE_scores := DataPermissionMask[12] NOT IN RESTRICTED_SET;
-  BusShellv22_scores_requested := EXISTS(ModelsRequested(ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBB_SLBO+BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM + BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BOFM + BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_SBFEATTR + BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_NSBFEWITHEXP + BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBBNFEL_SLBONFEL));
+  SBFE_models_requested        := EXISTS(ModelsRequested(ModelName IN LNSmallBusiness.Constants.set_SBFE_models));
+  BusShellv22_scores_requested := EXISTS(ModelsRequested(ModelName IN LNSmallBusiness.Constants.set_BusShellv22_models));
+   
   
 /* ************************************************************************
 	 *                    Set common Business Shell Options                 *
@@ -349,11 +351,11 @@ unsigned8 BSOptions :=
 		cleaned_name := Address.CleanPerson73(le.Rep_FullName);
 		BOOLEAN valid_cleaned := le.Rep_FullName <> '';
 		
-		SELF.fname  := StringLib.StringToUppercase(if(le.Rep_FirstName=''   AND valid_cleaned, cleaned_name[6..25], le.Rep_FirstName));
-		SELF.lname  := StringLib.StringToUppercase(if(le.Rep_LastName=''    AND valid_cleaned, cleaned_name[46..65], le.Rep_LastName));
-		SELF.mname  := StringLib.StringToUppercase(if(le.Rep_MiddleName=''  AND valid_cleaned, cleaned_name[26..45], le.Rep_MiddleName));
-		SELF.suffix := StringLib.StringToUppercase(if(le.Rep_NameSuffix ='' AND valid_cleaned, cleaned_name[66..70], le.Rep_NameSuffix));	
-		SELF.title  := StringLib.StringToUppercase(if(valid_cleaned, cleaned_name[1..5],''));
+		SELF.fname  := STD.Str.ToUpperCase(if(le.Rep_FirstName=''   AND valid_cleaned, cleaned_name[6..25], le.Rep_FirstName));
+		SELF.lname  := STD.Str.ToUpperCase(if(le.Rep_LastName=''    AND valid_cleaned, cleaned_name[46..65], le.Rep_LastName));
+		SELF.mname  := STD.Str.ToUpperCase(if(le.Rep_MiddleName=''  AND valid_cleaned, cleaned_name[26..45], le.Rep_MiddleName));
+		SELF.suffix := STD.Str.ToUpperCase(if(le.Rep_NameSuffix ='' AND valid_cleaned, cleaned_name[66..70], le.Rep_NameSuffix));	
+		SELF.title  := STD.Str.ToUpperCase(if(valid_cleaned, cleaned_name[1..5],''));
 
 		Street_Address := risk_indicators.MOD_AddressClean.street_address(le.Rep_StreetAddress1);
 		clean_a2 := risk_indicators.MOD_AddressClean.clean_addr(Street_Address, le.Rep_City, le.Rep_State, le.Rep_Zip ) ;											
@@ -381,8 +383,8 @@ unsigned8 BSOptions :=
 		SELF.county        := clean_a2[143..145];
 		SELF.geo_blk       := clean_a2[171..177];
 		
-		SELF.dl_number := StringLib.StringToUppercase(riskwise.cleanDL_num(le.Rep_DLNumber));
-		SELF.dl_state  := StringLib.StringToUppercase(le.Rep_DLState);
+		SELF.dl_number := STD.Str.ToUpperCase(riskwise.cleanDL_num(le.Rep_DLNumber));
+		SELF.dl_state  := STD.Str.ToUpperCase(le.Rep_DLState);
 
 		SELF := [];
 	END;
@@ -462,25 +464,45 @@ unsigned8 BSOptions :=
 		DATASET([], Layout_ModelOut_Plus);
 
 	// If no rep info is input, but a blended model is requested, set the score to 0 and blank out the reason codes since there isn't enough info to calculate.
-	Model_Results_Good_Inputs := JOIN(Model_Results_unsorted, SeqInput, LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
-		Invalid_Blended_Request := LEFT.ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL AND 
-																													(TRIM(RIGHT.Rep_1_Full_Name) = '' AND TRIM(RIGHT.Rep_1_First_Name) = '' AND TRIM(RIGHT.Rep_1_Last_Name) = '');
-		SELF.Score := IF(Invalid_Blended_Request, '0', LEFT.Score);
-		SELF.ri := IF(Invalid_Blended_Request, DATASET([],	Risk_Indicators.Layout_Desc), LEFT.ri);
-		SELF := LEFT), 
+	Model_Results_Good_Inputs := 
+    JOIN(
+      Model_Results_unsorted, SeqInput, 
+      LEFT.Seq = RIGHT.Seq, 
+      TRANSFORM( RECORDOF(LEFT),
+        Invalid_Blended_Request := 
+            LEFT.ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL AND 
+            (
+              TRIM(RIGHT.Rep_1_Full_Name) = '' AND 
+              TRIM(RIGHT.Rep_1_First_Name) = '' AND 
+              TRIM(RIGHT.Rep_1_Last_Name) = ''
+            );
+        SELF.Score := IF(Invalid_Blended_Request, '0', LEFT.Score);
+        SELF.ri := IF(Invalid_Blended_Request, DATASET([],	Risk_Indicators.Layout_Desc), LEFT.ri);
+        SELF := LEFT), 
 		LEFT OUTER, KEEP(1));
 		
 	Model_Results_sorted := 
 		SORT( 
 			Model_Results_Good_Inputs, // Sort to the top the "real" model names.
 			seq,
-			IF( StringLib.StringFind(ModelName,'1601_0_0',1) > 0, 0, 1 ), 
+			IF( STD.Str.Find(ModelName,'1601_0_0',1) > 0, 0, 1 ), 
 			ModelName 
 		);
 	
-	Model_Results := IF( allow_SBFE_scores or BusShellv22_scores_requested,
-																	Model_Results_sorted, 
-																	DATASET([], Layout_ModelOut_Plus) );
+  A := allow_SBFE_scores;
+  B := BusShellv22_scores_requested;
+  C := SBFE_models_requested;
+
+  Model_Results :=
+    MAP( 
+       A AND  B AND  C => Model_Results_sorted,
+       A AND  B AND ~C => Model_Results_sorted( ModelName NOT IN LNSmallBusiness.Constants.set_SBFE_models ),
+       A AND ~B AND  C => Model_Results_sorted( ModelName NOT IN LNSmallBusiness.Constants.set_BusShellv22_models ),
+       A AND ~B AND ~C => Model_Results_sorted( ModelName NOT IN (LNSmallBusiness.Constants.set_SBFE_models + LNSmallBusiness.Constants.set_BusShellv22_models) ),
+      ~A AND  B        => Model_Results_sorted( ModelName NOT IN LNSmallBusiness.Constants.set_SBFE_models ), // this condition is the only one that needs to be corrected
+      ~A AND ~B        => Model_Results_sorted( ModelName NOT IN (LNSmallBusiness.Constants.set_SBFE_models + LNSmallBusiness.Constants.set_BusShellv22_models) ),
+      Model_Results_sorted( ModelName NOT IN (LNSmallBusiness.Constants.set_SBFE_models + LNSmallBusiness.Constants.set_BusShellv22_models) ) 
+    );
 	
 /* ************************************************************************
 	 *             Flatten Model results for Intermediate Log               *

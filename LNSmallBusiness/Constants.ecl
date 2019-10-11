@@ -28,7 +28,19 @@ EXPORT Constants :=
 		EXPORT SMALL_BIZ_ATTR_NOFEL			 	:= 'SmallBusinessAttrV101';
     
     EXPORT BEST_INFO_REQ_TYPE	    	:= ENUM(INTEGER, SELEID, PHONE, LEXID_ONLY );
-                   
+    
+    EXPORT set_SBFE_models :=
+        BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED + 
+        BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT;
+
+    EXPORT set_BusShellv22_models :=
+        BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBB_SLBO + 
+        BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM + 
+        BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BOFM + 
+        BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_SBFEATTR + 
+        BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_NSBFEWITHEXP + 
+        BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBBNFEL_SLBONFEL;
+
     EXPORT DATASET_MODELS := 
       MODULE
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) BLENDED        := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED], LNSmallBusiness.Layouts.ModelNameRec); 
