@@ -297,7 +297,11 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 																											(dt_last_seen = header_recs_coa_slim_latestDate) or 																										
 																											(dt_first_seen = header_recs_coa_slim_latestDate) 																										
 																										 );
-			 
+			 	COA_rawRec_sids:= RECORD
+					COA_services.Layouts.rawRec;
+					UNSIGNED4 global_sid;
+					UNSIGNED8 record_sid; 
+				END;
 			  // use either prim_name/prim_range or use parsed address pieces determined above
 				// thus in_prim_range and in_prim_name used instead.
 			  header_recs_coa_slim := join(header_recs_coa_cleaned, dx_header.key_header_address(),
@@ -305,7 +309,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 			                        keyed(in_mod.zip = right.zip) AND
 			                        keyed(in_prim_range = right.prim_range),
 															      
-															transform(COA_services.Layouts.rawRec,
+															transform(COA_rawRec_sids,
 															self.latestDate := if (left.dt_last_seen > left.dt_first_seen, left.dt_last_seen,
 																				                       left.dt_first_seen), // not used anymore, actually
 															self.inputFirstSeenDate := right.dt_first_seen,
@@ -326,9 +330,13 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 			  coa_lead_temp := dedup(sort(header_recs_coa_slim_final, st, city_name, zip, fname), st, city_name, zip,fname);
 					
 		    //fname mname lname name suffix prim range predir prim name suffix postdir unit desig sec range city name st zip zip4 
-		 												
-		    coa_result_temp := sort(coa_lead_temp, -dt_first_seen);
-		 		 
+				coa_result_temp := Suppress.MAC_SuppressSource(coa_lead_temp, mod_access);
+
+				coa_result_sorted := sort(coa_result_temp, -dt_first_seen);
+		 		
+				coa_result := PROJECT(coa_result_temp, COA_services.Layouts.rawRec);
+
+
 			
 		  ///////////////// DEBUG
 
@@ -348,7 +356,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 			// output(coa_result_temp,named('coa_result_temp'));
 
 		
-	return(coa_result_temp);
+	return(coa_result);
 	
   end;
 end;

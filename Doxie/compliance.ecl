@@ -159,6 +159,7 @@ EXPORT compliance := MODULE
   // TCH = Transunion Credit Header data
   EXPORT boolean isTCHRestricted        (string drm) := drm[10] NOT IN restrictedSet;
   EXPORT boolean isTTRestricted         (string drm) := drm[11] NOT IN restrictedSet; //TeleTrack, a.k.a. TT
+  EXPORT boolean isAdvoRestricted       (string drm) := drm[12] NOT IN restrictedSet;
   EXPORT boolean isInfutorMVRestricted  (string drm) := drm[17] NOT IN restrictedSet;
   EXPORT boolean isPhoneFinderTargusRestricted  (string drm) := drm[20] NOT IN restrictedSet;  //Targus gateway for phone finder
   EXPORT boolean isPreGLBRestricted     (string drm) := drm[23] NOT IN restrictedSet; //customer can see GLB protected data prior to June 2001
