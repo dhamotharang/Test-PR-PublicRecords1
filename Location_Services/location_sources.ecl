@@ -1,4 +1,4 @@
-import Location_Services;
+﻿import Location_Services;
 import dx_header, property, Doxie, Doxie_Raw, Doxie_LN, doxie_cbrs,
 		LN_PropertyV2, LN_PropertyV2_Services, iesp, MDR, BIPV2, Suppress;
 
@@ -79,9 +79,9 @@ bus_hdr_raw := recordof(doxie_cbrs.header_records_raw);
 bus_mod := GetByBDID(addr, application_type_value);
 bus_hdr_county := bus_mod.GetCountyRecs(); 
 
-bus_hdr_link_ids := GetByBusinessIds(addr).GetSourceRecs();
+bus_hdr_link_ids := GetByBusinessIds(addr, mod_access).GetSourceRecs();
 
-bus_prop := IF(useBusinessIds, GetByBusinessIds(addr).GetPropFids(), bus_mod.GetPropFids());
+bus_prop := IF(useBusinessIds, GetByBusinessIds(addr, mod_access).GetPropFids(), bus_mod.GetPropFids());
 
 deed_out := Location_Services.deed_records(addr,bus_prop);
 asset_out := Location_Services.asses_records(addr,bus_prop);

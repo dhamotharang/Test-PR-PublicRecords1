@@ -53,7 +53,7 @@ EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid,
 			self := left));
 
 	ds_in_unique_ids_only := project(in_linkid, 
-		transform(BIPV2.IDlayouts.l_xlink_ids, 	
+		transform(BIPV2.IDlayouts.l_xlink_ids2, 	
 			self.dotid := 0;
 			self.powid := 0;															 
 			self.empid := 0;															
@@ -74,9 +74,9 @@ EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid,
 			self := left, 														
 			));
 														 
-	ds_busHeaderRecs := BIPV2.Key_BH_Linking_Ids.kfetch(ds_in_unique_ids_only,BusinessIDFetchLevel,
-	                             ,,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit,TRUE);
-			
+	ds_busHeaderRecs_pre := BIPV2.Key_BH_Linking_Ids.kfetch2(ds_in_unique_ids_only, BusinessIDFetchLevel,
+	                             ,, TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit, TRUE,,,, mod_access);
+	ds_busHeaderRecs := project(ds_busHeaderRecs_pre, BIPV2.Key_BH_Linking_Ids.kFetchOutRec);
 	seed_results := project(ds_input_data,
 		transform(MIDEX_Services.Layouts.rec_TopBusiness,
 			self.acctno := '001',

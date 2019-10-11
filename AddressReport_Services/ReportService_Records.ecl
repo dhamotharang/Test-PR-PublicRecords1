@@ -378,7 +378,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 											flag_bus_old(LEFT,RIGHT),limit(ut.limits.DEFAULT,skip),keep(1),left outer);
 	
 	//New Business header
-	business_recs_new				:= Location_Services.GetByBusinessIDs(bus_input).linkIdsBestOut;
+	business_recs_new				:= Location_Services.GetByBusinessIDs(bus_input, mod_access).linkIdsBestOut;
 			
 	//Remove Invalid address records from business
 	AddressReport_Services.Mac_address_Filter(business_recs_new,

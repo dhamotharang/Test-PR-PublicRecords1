@@ -1,35 +1,36 @@
-/* Status as of 02/24/2015, coding is DONE to count source docs for these sources: 
-      11. Government Agencies - ATF, CALBUS, CA sales tax, DEA, Edgar, FCC, FDIC, FL Non profit, 
-                                GSA, IA sales tax, Insurance Certification, IRS5500(ret), 
-                                IRS990(nonprofit), MS Workers Comp, Natural Disaster Readiness, 
+﻿/* Status as of 02/24/2015, coding is DONE to count source docs for these sources:
+      11. Government Agencies - ATF, CALBUS, CA sales tax, DEA, Edgar, FCC, FDIC, FL Non profit,
+                                GSA, IA sales tax, Insurance Certification, IRS5500(ret),
+                                IRS990(nonprofit), MS Workers Comp, Natural Disaster Readiness,
                                 OIG, OR Workers Comp, OSHAIR, Prof Lics, SEC_Broker/Dealer, TXBUS
                                 & Workers Compensation
 TBD:
-   1. Add coding: to use appropriate TopBusiness_Services.***Source_Records (vers1)            
+   1. Add coding: to use appropriate TopBusiness_Services.***Source_Records (vers1)
                OR to use individual source ***.key_linkids.kfetch, (vers2b)
                OR to use (new as of 07/28/14) TopBusiness_Services.Key_Fetches attr, (vers3)
                Then sort/dedup/count to match # docs returned by the SourceService.
       for these categories/sources: see below
-       
+
        As of 02/24/15, still need to add coding for these sources?:
        (these sources do not display in any section of the report, nor are they included in the
         BIP Bus Hdr, Contacts, Industry or License linkids keys, but they need to be counted???)
-       a. FDIC Sod Annual 
-       b. Mari professional licenses 
+       a. FDIC Sod Annual
+       b. Mari professional licenses
        c. Mari public sanctions (Aka SANCTN)
 */
-IMPORT BIPV2, iesp, MDR, TopBusiness_Services;
+IMPORT BIPV2, iesp, MDR, TopBusiness_Services, Doxie;
 
 EXPORT SourceSection_GovAgency := MODULE
 
- // *********** Main function to return count of all sources in the the BIP report SourceSection, 
+ // *********** Main function to return count of all sources in the the BIP report SourceSection,
  //             "Government Agency" category (#11).
  export fn_count_govagency(
-	 dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_ids_woacctno 
+	 dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_ids_woacctno
 	 ,dataset(TopBusiness_Services.Layouts.rec_input_ids_wSrc) ds_in_ids_srcrecs_inlayout
    ,TopBusiness_Services.SourceService_Layouts.OptionsLayout rs_options
 	 ,dataset(TopBusiness_Services.Layouts.rec_busHeaderLayout) ds_bh_keyrecs
-   ):= function 
+   ,Doxie.IDataAccess mod_access
+   ):= function
 
   FETCH_LEVEL := rs_options.fetch_level;
 
@@ -41,9 +42,9 @@ EXPORT SourceSection_GovAgency := MODULE
 																										 TopBusiness_Services.Constants.AtfSourceDocsKfetchMaxLimit).ds_atf_linkidskey_recs;
 
   ds_atf_keyrecs_dd := dedup(sort(ds_atf_keyrecs,
-		     			                     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+		     			                     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
                                    license_number),
-	     			                  #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+	     			                  #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
                               license_number);
 
   // table to count # of recs (license_numbers) per group (set of linkids)
@@ -54,7 +55,7 @@ EXPORT SourceSection_GovAgency := MODULE
 																		 },
 																     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),few);
 
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_atf_count(recordof(ds_atf_keyrecs_dd_tabled) l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := l.recs_count;
@@ -69,7 +70,7 @@ EXPORT SourceSection_GovAgency := MODULE
 
   // ***** Get CALBUS counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_calbus_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := TopBusiness_Services.CalbusSource_Records(
@@ -80,12 +81,12 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source            := MDR.sourceTools.src_Calbus;
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_calbus_counts := project(ds_in_ids_srcrecs_inlayout,tf_calbus_count(left));
 
   // ***** Get CA Sales Tax counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_castx_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := TopBusiness_Services.CASalesTaxSource_Records(
@@ -96,7 +97,7 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source            := MDR.sourceTools.src_CA_Sales_Tax;
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_castx_counts := project(ds_in_ids_srcrecs_inlayout,tf_castx_count(left));
 
 	// ***** Get DEA counts
@@ -106,9 +107,9 @@ EXPORT SourceSection_GovAgency := MODULE
 																										 TopBusiness_Services.Constants.DeaSourceDocsKfetchMaxLimit).ds_dea_linkidskey_recs;
 
   ds_dea_keyrecs_dd := dedup(sort(ds_dea_keyrecs,
-	     			                      #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+	     			                      #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
                                   dea_registration_number),
-	     			                 #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+	     			                 #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
                              dea_registration_number);
 
   // table to count # of recs (dea_registration_number) per group (set of linkids)
@@ -119,7 +120,7 @@ EXPORT SourceSection_GovAgency := MODULE
 																		 },
 																     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),few);
 
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_dea_count(recordof(ds_dea_keyrecs_dd_tabled) l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := l.recs_count;
@@ -133,24 +134,24 @@ EXPORT SourceSection_GovAgency := MODULE
 
   // ***** Get Edgar counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_edgar_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
-				// use generic OtherSource_Records atrribute, since Edgar data is on the 
+				// use generic OtherSource_Records atrribute, since Edgar data is on the
 				// BIP Directories key and no Edgar Linkids key currently exists in prod.
 	      self.category_doccount := TopBusiness_Services.OtherSource_Records(
 			     //create dataset with 1 rec in the layout input to all ***Source_Records
            // v---  need ids plus source code when using generic OtherSource_Records attr.
  					 dataset([{'',l.dotid,l.empid,l.powid,l.proxid,l.seleid,l.orgid,l.ultid,'','','',MDR.sourceTools.src_Edgar}],
 					          TopBusiness_Services.Layouts.rec_input_ids_wSrc),
-					 rs_options,false,ds_bh_keyrecs).SourceView_RecCount;
+					 rs_options ,false, ds_bh_keyrecs, mod_access).SourceView_RecCount;
 				self.Section           := ''; //section name N/A
 				self.Source            := MDR.sourceTools.src_Edgar;
 				self                   := l; // to assign all linkids
 		 end;
-	
-  ds_edgar_counts := project(ds_in_ids_srcrecs_inlayout,tf_edgar_count(left));	
-	
+
+  ds_edgar_counts := project(ds_in_ids_srcrecs_inlayout,tf_edgar_count(left));
+
 
   // ***** Get FCC counts
   // *** Key fetch to get linkids key data.
@@ -160,9 +161,9 @@ EXPORT SourceSection_GovAgency := MODULE
 																		TopBusiness_Services.Constants.FCCSourceDocsKfetchMaxLimit).ds_fcc_linkidskey_recs;
 
   ds_fcc_keyrecs_dd := dedup(sort(ds_fcc_keyrecs,
-	     			                      #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+	     			                      #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
                                   fcc_seq),
-	     			                 #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+	     			                 #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
                              fcc_seq);
 
   // table to count # of recs (fcc_seq) per group (set of linkids)
@@ -173,7 +174,7 @@ EXPORT SourceSection_GovAgency := MODULE
 																		},
 																    #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),few);
 
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_fcc_count(recordof(ds_fcc_keyrecs_dd_tabled) l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := l.recs_count;
@@ -187,7 +188,7 @@ EXPORT SourceSection_GovAgency := MODULE
 
   // ***** Get FDIC (institutions) counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_fdic_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := TopBusiness_Services.FDICSource_Records(
@@ -198,32 +199,32 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source            := MDR.sourceTools.src_FDIC;
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_fdic_counts := project(ds_in_ids_srcrecs_inlayout,tf_fdic_count(left));
 
   // ***** Get FL non-profit counts
   // vers1 used instead of vers2b since a small amount of data
-	TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+	TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_flnonpt_count(Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
-				// use generic OtherSource_Records atrribute, since FL NP data is on the 
+				// use generic OtherSource_Records atrribute, since FL NP data is on the
 				// BIP Directories key and the FL NP linkids key in prod is currently empty.
 	      self.category_doccount := TopBusiness_Services.OtherSource_Records(
 			     //create dataset with 1 rec in the layout input to all ***Source_Records
            // v---  need ids plus source code when using generic OtherSource_Records attr.
  					 dataset([{'',l.dotid,l.empid,l.powid,l.proxid,l.seleid,l.orgid,l.ultid,'','','',MDR.sourceTools.src_FL_Non_Profit}],
 					          TopBusiness_Services.Layouts.rec_input_ids_wSrc),
-					 rs_options,false,ds_bh_keyrecs).SourceView_RecCount;
+					 rs_options, false, ds_bh_keyrecs, mod_access).SourceView_RecCount;
 				self.Section           := ''; //section name N/A
 				self.Source            := MDR.sourceTools.src_FL_Non_Profit;
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_flnonpt_counts := project(ds_in_ids_srcrecs_inlayout,tf_flnonpt_count(left));
 
   // ***** Get GSA (General Service Administration) counts
   // vers1 used instead of vers2b since a small amount of data
-	TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+	TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	tf_gsa_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
 		 self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 		 self.category_doccount := TopBusiness_Services.GSASource_Records(
@@ -239,7 +240,7 @@ EXPORT SourceSection_GovAgency := MODULE
 
   // ***** Get IA(Iowa) Sales Tax counts
   // vers1 used instead of vers2b since a small amount of data
-	TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+	TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_iastx_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := TopBusiness_Services.IASalesTaxSource_Records(
@@ -250,12 +251,12 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source            := MDR.sourceTools.src_IA_Sales_Tax;
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_iastx_counts := project(ds_in_ids_srcrecs_inlayout,tf_iastx_count(left));
 
   // ***** Get Insurance Certification counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_inscert_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := TopBusiness_Services.InsuranceCertSource_Records(
@@ -266,12 +267,12 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source            := MDR.sourceTools.src_Insurance_Certification;
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_inscert_counts := project(ds_in_ids_srcrecs_inlayout,tf_inscert_count(left));
 
   // ***** Get IRS5500(retirement info) counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_irs5500_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := TopBusiness_Services.IRS5500Source_Records(
@@ -282,12 +283,12 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source            := MDR.sourceTools.src_IRS_5500;
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_irs5500_counts := project(ds_in_ids_srcrecs_inlayout,tf_irs5500_count(left));
 
   // ***** Get IRS990(non-profit info) counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_irs990_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := TopBusiness_Services.IRS990Source_Records(
@@ -298,12 +299,12 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source            := MDR.sourceTools.src_IRS_Non_Profit;
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_irs990_counts := project(ds_in_ids_srcrecs_inlayout,tf_irs990_count(left));
 
   // ***** Get MS(Mississippi) Workers Comp counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	  tf_mswork_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
        self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	     self.category_doccount := TopBusiness_Services.MSWorkSource_Records(
@@ -314,12 +315,12 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source            := MDR.sourceTools.src_MS_Worker_Comp; // but need source code
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_mswork_counts := project(ds_in_ids_srcrecs_inlayout,tf_mswork_count(left));
 
   // ***** Get Natural Disaster Readiness counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	  tf_ndr_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
        self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	     self.category_doccount := TopBusiness_Services.NDRSource_Records(
@@ -330,12 +331,12 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source            := MDR.sourceTools.src_NaturalDisaster_Readiness; // but need source code
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_ndr_counts := project(ds_in_ids_srcrecs_inlayout,tf_ndr_count(left));
-	
+
   // ***** Get OIG(Office of Inspector General) counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	  tf_oig_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
        self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	     self.category_doccount := TopBusiness_Services.OIGSource_Records(
@@ -346,12 +347,12 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source           := MDR.sourceTools.src_OIG; // but need source code
 				self                  := l; // to assign all linkids
 		 end;
-	
+
   ds_oig_counts := project(ds_in_ids_srcrecs_inlayout,tf_oig_count(left));
 
   // ***** Get OR(Oregon) Workers Comp counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	  tf_orwork_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
        self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	     self.category_doccount := TopBusiness_Services.ORWorkSource_Records(
@@ -362,20 +363,20 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source           := MDR.sourceTools.src_OR_Worker_Comp; // but need source code
 				self                  := l; // to assign all linkids
 		 end;
-	
+
   ds_orwork_counts := project(ds_in_ids_srcrecs_inlayout,tf_orwork_count(left));
 
   // ***** Get OSHA IR (Occupational Safety & Hazard Act Incident Reports) counts
-  // Probably could use vers1 instead of vers3 since a small amount of data, 
+  // Probably could use vers1 instead of vers3 since a small amount of data,
 	// but this works so leave it as is.
   // *** Key fetch to get linkids key data.
   ds_oshair_keyrecs := TopBusiness_Services.Key_Fetches(ds_in_ids_woacctno, // input file to join key with
 								                                        FETCH_LEVEL,TopBusiness_Services.Constants.SlimKeepLimit).ds_osha_linkidskey_recs;
- 
+
   ds_oshair_keyrecs_dd := dedup(sort(ds_oshair_keyrecs,
-	     			                         #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+	     			                         #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
                                      activity_number),
-	     			                    #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+	     			                    #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
                                 activity_number);
 
   // table to count # of recs (activity_numbers) per group (set of linkids)
@@ -386,7 +387,7 @@ EXPORT SourceSection_GovAgency := MODULE
 																		   },
 																       #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),few);
 
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_oshair_count(recordof(ds_oshair_keyrecs_dd_tabled) l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := l.recs_count;
@@ -402,12 +403,12 @@ EXPORT SourceSection_GovAgency := MODULE
   // *** Key fetch to get linkids key data.
   ds_prolic_keyrecs := TopBusiness_Services.Key_Fetches(ds_in_ids_woacctno, // input file to join key with
 								                                        FETCH_LEVEL,
-																												TopBusiness_Services.Constants.ProfLicSourceDocsKfetchMaxLimit).ds_pl_linkidskey_recs;													
+																												TopBusiness_Services.Constants.ProfLicSourceDocsKfetchMaxLimit).ds_pl_linkidskey_recs;
 
   ds_prolic_keyrecs_dd := dedup(sort(ds_prolic_keyrecs,
-	     			                         #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+	     			                         #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
                                      prolic_seq_id),
-	     			                    #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+	     			                    #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
                                 prolic_seq_id);
 
   // table to count # of recs (prolic_seq_ids) per group (set of linkids)
@@ -418,7 +419,7 @@ EXPORT SourceSection_GovAgency := MODULE
 																		   },
 																       #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),few);
 
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_prolic_count(recordof(ds_prolic_keyrecs_dd_tabled) l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := l.recs_count;
@@ -429,10 +430,10 @@ EXPORT SourceSection_GovAgency := MODULE
 		 end;
 
   ds_prolic_counts := project(ds_prolic_keyrecs_dd_tabled,tf_prolic_count(left));
-	
+
 	// ***** Get SEC Broker/Dealer counts
   // vers1 used instead of vers2b since a small amount of data
-	TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+	TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	tf_secbd_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
 		 self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 		 self.category_doccount := TopBusiness_Services.SEC_BDSource_Records(
@@ -448,7 +449,7 @@ EXPORT SourceSection_GovAgency := MODULE
 
   // ***** Get TXBUS counts
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_txbus_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := TopBusiness_Services.TxbusSource_Records(
@@ -459,13 +460,13 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source            := MDR.sourceTools.src_TXBUS; // but need source code
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_txbus_counts := project(ds_in_ids_srcrecs_inlayout,tf_txbus_count(left));
 
 
   // ***** Get Workers Compensation counts (NOTE: different than MS & OR Worker's comp data)
   // vers1 used instead of vers2b since a small amount of data
-  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount
 	   tf_wkcomp_count(TopBusiness_Services.Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.GovAgCategoryName,
 	      self.category_doccount := TopBusiness_Services.WorkersCompensationSource_Records(
@@ -476,14 +477,14 @@ EXPORT SourceSection_GovAgency := MODULE
 				self.Source            := MDR.sourceTools.src_Workers_Compensation; // but need source code
 				self                   := l; // to assign all linkids
 		 end;
-	
+
   ds_wkcomp_counts := project(ds_in_ids_srcrecs_inlayout,tf_wkcomp_count(left));
 
 // */
 
   // Concatenate counts info from all categories/sources
-	ds_all_ga_counts := 
-/* */   
+	ds_all_ga_counts :=
+/* */
 									   ds_atf_counts     +
                      ds_calbus_counts  +
 									   ds_castx_counts   +
@@ -492,22 +493,22 @@ EXPORT SourceSection_GovAgency := MODULE
 									   ds_fcc_counts     +
 								     ds_fdic_counts    +
 										 ds_flnonpt_counts +
-										 ds_gsa_counts     + 
-										 ds_iastx_counts   +  
-										 ds_inscert_counts + 
+										 ds_gsa_counts     +
+										 ds_iastx_counts   +
+										 ds_inscert_counts +
 									   ds_irs5500_counts +
 									   ds_irs990_counts  +
-                     ds_mswork_counts  +  
-                     ds_ndr_counts		 +  
+                     ds_mswork_counts  +
+                     ds_ndr_counts		 +
                      ds_oig_counts     +
                      ds_orwork_counts  +
-									   ds_oshair_counts  + 
+									   ds_oshair_counts  +
 								     ds_prolic_counts  +
-									   ds_secbd_counts   + 
-									   ds_txbus_counts   + 
-									   ds_wkcomp_counts  + 
+									   ds_secbd_counts   +
+									   ds_txbus_counts   +
+									   ds_wkcomp_counts  +
 /* */
-									 // v--- Empty dataset to make it easier to comment out/uncomment 
+									 // v--- Empty dataset to make it easier to comment out/uncomment
 									 // ds_***s above for testing.
 									 // REMOVE (-^ & -v) WHEN FINAL PROD VERSION IS CHECKED IN <---------------!!! ???
 									 dataset([],TopBusiness_Services.SourceSection_Layouts.rec_SourceCount) // for initial testing
@@ -557,15 +558,15 @@ EXPORT SourceSection_GovAgency := MODULE
 	// output(ds_wkcomp_counts,                  named('ds_wkcomp_counts'));
 
   // output(ds_all_ga_counts,                 named('ds_all_ga_counts'));
- 
+
 	return ds_all_ga_counts;
 
  end; // end of fn_count_govagency
 
 END; // end of module
 
-/*  to test, in a builder window use this: 
-// v--- Needed for testing any section:  
+/*  to test, in a builder window use this:
+// v--- Needed for testing any section:
 IMPORT AutoStandardI;
 
 //v--- for use with Todd's macro???
@@ -589,7 +590,7 @@ IMPORT AutoStandardI;
 		export boolean ignoreFidelity := false;
 	end;
 
-  // Set SSN Mask for testing in certain sections: UCC, Liens, Bankr 
+  // Set SSN Mask for testing in certain sections: UCC, Liens, Bankr
 	string6 SSNMask := 'NONE'; //for testing chg default to: FIRST5, LAST4 or ALL
 	//string6 SSNMask := 'FIRST5';
   #stored('SSNMask', SSNMask);
@@ -598,12 +599,12 @@ IMPORT AutoStandardI;
 	// Just 2 booleans & 1 char for now: lnbranded , internal_testing and busrpt_fetch_level
   ds_options := dataset([{false, false, 'S'} //3rd parm=BusinessReportFetchLevel, default='S'=seleid
                         ],topbusiness_services.Layouts.rec_input_options);
-// ^--- Needed for testing any section:  
+// ^--- Needed for testing any section:
 
-// input dataset for all sections, layout = topbusiness_services.Layouts.rec_input_ids = 
+// input dataset for all sections, layout = topbusiness_services.Layouts.rec_input_ids =
 //         acctno,DotID,EmpID,POWID,ProxID,SeleID,OrgID,UltID
 
-// To test the Source section: 
+// To test the Source section:
 
 source_sec := TopBusiness_Services.SourceSection.fn_FullView(
              dataset([
@@ -629,7 +630,7 @@ source_sec := TopBusiness_Services.SourceSection.fn_FullView(
                       //{'test68oig1', 0, 0, 0, 0, 324658, 324658, 324658} // bug 156775 add OIG; 7 li key recs/1 src  docs counted/retd
                       //{'test68oig2', 0, 0, 0, 0, 2080621, 2080621, 2080621} // bug 156775 add OIG; 7 li key recs/2 src  docs counted/retd
 											//{'test81atfp1', 0, 0, 0, 0, 3471, 3471, 3471} // no bug/chg to use new ga attr - atf 4 li key recs/3 source docs
-											//{'test81govagy2p1', 0, 0, 0, 0, 2218, 2218, 2218} // no bug/chg to use new ga attr - calbus 1 li key recs/1 source docs & casalestax 1 li key recs/1 source docs 
+											//{'test81govagy2p1', 0, 0, 0, 0, 2218, 2218, 2218} // no bug/chg to use new ga attr - calbus 1 li key recs/1 source docs & casalestax 1 li key recs/1 source docs
 
 											//{'testiastx1', 0, 0, 0, 0, 7842, 7842, 7842}, // bug 156760 to add src for IASTX; 3 li key recs/3 src docs counted/retd
 											//{'testiastx2', 0, 0, 0, 0, 20454, 20454, 20454}, // bug 156760 to add src for IASTX; 2 li key recs/2 src docs counted/retd
