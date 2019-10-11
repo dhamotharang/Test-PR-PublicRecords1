@@ -271,7 +271,39 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
                                                                             PerAssetOwnVehicle_Flag1);
 
     SELF.PerAssetOwnVehicle_Flag := PerAssetOwnVehicle_Flag_Final;                                             
-		SELF.PerAssetOwnVehicle := (STRING)(10-STD.Str.Find(PerAssetOwnVehicle_Flag_Final, DueDiligence.Constants.T_INDICATOR, 1));           
+		SELF.PerAssetOwnVehicle := (STRING)(10-STD.Str.Find(PerAssetOwnVehicle_Flag_Final, DueDiligence.Constants.T_INDICATOR, 1));  
+    
+    
+    //INDIVIDUAL IDENTITY RISK
+    idFirstReported := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.firstReportedDate, (STRING)le.historyDate);
+    idRiskLastSeenDays := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.lastSeenBySource, (STRING)le.historyDate);
+    
+    ssnRedFlags := le.redFlagSSNInvalid OR le.redFlagSSNIssuedPriorDOB OR le.redFlagSSNRandomIssuedInvalid OR
+                   le.redFlagLexIDContainsMultiSSNs OR le.redFlagInputSSNAssocAtleast3LexIDs OR le.redFlagInputSSNIsITIN;
+    
+    perIDRiskFlag9 := IF(idRiskLastSeenDays > ut.DaysInNYears(3), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perIDRiskFlag8 := IF(le.ssnReportedDeceased OR le.lexIDReportedDeceased, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perIDRiskFlag7 := IF(ssnRedFlags, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perIDRiskFlag6 := IF(le.bestDOBExists = FALSE OR le.bestAddressExists = FALSE, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perIDRiskFlag5 := IF(idFirstReported < ut.DaysInNYears(2), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perIDRiskFlag4 := IF(idFirstReported >= ut.DaysInNYears(2) AND idFirstReported < ut.DaysInNYears(5), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perIDRiskFlag3 := IF(idFirstReported >= ut.DaysInNYears(5) AND idFirstReported < ut.DaysInNYears(10), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perIDRiskFlag2 := IF(idFirstReported >= ut.DaysInNYears(10) AND idFirstReported < ut.DaysInNYears(20), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perIDRiskFlag1 := IF(idFirstReported >= ut.DaysInNYears(20), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+
+    perIDRiskFinal := DueDiligence.Common.calcFinalFlagField(perIDRiskFlag9,
+                                                             perIDRiskFlag8,
+                                                             perIDRiskFlag7,
+                                                             perIDRiskFlag6,
+                                                             perIDRiskFlag5,
+                                                             perIDRiskFlag4,
+                                                             perIDRiskFlag3,
+                                                             perIDRiskFlag2,
+                                                             perIDRiskFlag1);
+
+    SELF.PerIdentityRisk_Flag := perIDRiskFinal;                                             
+		SELF.PerIdentityRisk := (STRING)(10-STD.Str.Find(perIDRiskFinal, DueDiligence.Constants.T_INDICATOR, 1));
+    
 
     
     
@@ -280,7 +312,6 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
     //PERSON LEXID/DID
     //is already populated in DueDiligence.getIndInformation (if exists)  
     SELF.PerLexID := (STRING)le.inquiredDID;
-    
     SELF.PerLexIDMatch := (STRING)le.individual.score;
     
     //PERSON STATE CRIMINAL
@@ -335,8 +366,8 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
                                               SELF.PerOffenseType_Flag := INVALID_INDIVIDUAL_FLAGS;
                                               SELF.PerAgeRange := INVALID_INDIVIDUAL_SCORE;
                                               SELF.PerAgeRange_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              // SELF.PerIdentityRisk := INVALID_INDIVIDUAL_SCORE;
-                                              // SELF.PerIdentityRisk_Flag := INVALID_INDIVIDUAL_FLAGS;
+                                              SELF.PerIdentityRisk := INVALID_INDIVIDUAL_SCORE;
+                                              SELF.PerIdentityRisk_Flag := INVALID_INDIVIDUAL_FLAGS;
                                               SELF.PerUSResidency := INVALID_INDIVIDUAL_SCORE;
                                               SELF.PerUSResidency_Flag := INVALID_INDIVIDUAL_FLAGS;
                                               SELF.PerMatchLevel := INVALID_INDIVIDUAL_SCORE;
