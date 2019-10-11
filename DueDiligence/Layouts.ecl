@@ -704,6 +704,33 @@ EXPORT Layouts := MODULE
     UNSIGNED4 numberOfParents;
     DATASET(SlimIndividual) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			  //populated in DueDiligence.getIndRelatives
     STRING2 indvType;                         		  //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
+    
+    INTEGER2 cit_inputSSNInvalid;
+    INTEGER2 cit_inputSSNIssuePriorToDOB;
+    INTEGER2 cit_inputSSNRandomIssuedInvalid;
+    INTEGER2 cit_inputSSNReportedDeceased;
+    INTEGER2 cit_lexIDBestSSNInvalid;
+    INTEGER2 cit_lexIDMultipleSSNs;
+    INTEGER2 cit_lexIDReportedDeceased;
+    UNSIGNED4 cit_lastReportedByAnySource;
+    INTEGER2 cit_inputSSNITIN;
+    INTEGER7 cit_lexID;
+    STRING1 bs_iidSocsValFlag;
+    STRING1 bs_iidPwSocsValFlag;
+    STRING1 bs_inputSocsCharFlag;
+    UNSIGNED2 bs_adlPerBestSSN;
+    UNSIGNED1 bs_adlsPerSSN;
+    STRING1 bs_bestSSNDecsFlag;
+    STRING1 bs_bestSSNSSNDOBFlag;
+    BOOLEAN bs_lexIDDeceased;
+    STRING9 bs_bestSSN;
+    STRING1 bs_bestSSNValid;
+    STRING1 dd_bestSSNReportedDeceased;
+    BOOLEAN dd_bestSSNInvalid;
+    BOOLEAN dd_bestSSNIssuedPriorDOB;
+    BOOLEAN dd_bestSSNRandomIssuedInvalid;
+    
+    
 
     DueDiligence.LayoutsAttributes.PersonAttributeValues;         //used in calc'ing attribute values in getIndKRI
 

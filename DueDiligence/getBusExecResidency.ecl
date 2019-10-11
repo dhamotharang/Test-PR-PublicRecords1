@@ -36,7 +36,7 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 		indHeader := DueDiligence.getIndHeader(inquiredRelatives, dataRestrictionMask, dppa, glba, isFCRA, FALSE);
 		
 		//get information pertaining to SSN
-		indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, isFCRA, FALSE);
+		indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, bsVersion, bsOptions);
 		
 		//add the best data to the execs with the residency score for the given exec
     combineExecs := JOIN(pullExecs, indSSNData,
