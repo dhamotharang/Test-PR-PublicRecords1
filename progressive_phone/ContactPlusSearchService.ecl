@@ -183,7 +183,7 @@ EXPORT ContactPlusSearchService := MACRO
 		Gateways := Gateway.Configuration.Get();
 
 		g_mod := AutoStandardI.GlobalModule();
-
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (g_mod);
 // stlf RQ-12930 - check the lines below that use this new attribute
 		BOOLEAN isGLB_Ok := ut.glb_ok(g_mod.glbpurpose);
 
@@ -364,7 +364,7 @@ EXPORT ContactPlusSearchService := MACRO
 		royalties := lastresort_royalties + equifax_royalties;
 		output(royalties,named('RoyaltySet'));
 
-		PhonesFeedback_Services.Mac_Append_Feedback(tempresults1,did,subj_phone10,f_out_w_fb);
+		PhonesFeedback_Services.Mac_Append_Feedback(tempresults1,did,subj_phone10,f_out_w_fb,mod_access);
  	  rslt := if(IncludePhonesFeedback,f_out_w_fb,tempresults1);
     ut.getTimeZone(rslt,subj_phone10,timeZone,finalout);
 		// If we are skipping the phone scoring model sort by sort order, else sort by the phone score returned from the model
