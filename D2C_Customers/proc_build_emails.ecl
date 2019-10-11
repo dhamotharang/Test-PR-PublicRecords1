@@ -3,7 +3,7 @@
 /********* EMAIL_ADDRESSES **********/
 
 Wdog := distribute(Watchdog.File_Best_nonglb(adl_ind = 'CORE'), hash(did));
-em	 := Email_Data.Key_Did(did > 0, email_src not in D2C.Constants.EmailRestrictedSources);
+em  := Email_Data.File_Email_Base(did > 0, current_rec=true, Clean_Email<>'', email_src not in D2C.Constants.EmailRestrictedSources);
 
 //keeping ONLY 3 email address per did based on latest date_last_seen
 em_d  := dedup(sort(distribute(em, hash(did)), did, clean_email, -date_last_seen, local), did, clean_email, all, local);  
@@ -13,7 +13,7 @@ em_ug := group(em_t);
 
 EXPORT proc_build_emails(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   ds := project(em_ug, transform(layouts.email_addresses,
+   ds := project(em_ug, transform(D2C_Customers.layouts.rEmails,
             self.LexID         := (unsigned6)left.did;
             self.Email_Address := left.clean_email;       
             ));

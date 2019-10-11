@@ -7,7 +7,7 @@ pl := prof_licensev2.File_ProfLic_Base((unsigned6)did > 0);//Unrestricted
 
 EXPORT proc_build_professional_licenses(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   ds := project(pl, transform(layouts.professional_licenses,
+   ds := project(pl, transform(D2C_Customers.layouts.rProfessional_Licenses,
             self.LexID            := (unsigned6)left.did;
             self.License_Number   := left.orig_license_number;
             self.License_State    := left.Source_St;
@@ -35,6 +35,5 @@ EXPORT proc_build_professional_licenses(unsigned1 mode, string8 ver, string20 cu
                 
    PromoteSupers.MAC_SF_BuildProcess(outDS,'~thor_data400::output::d2c::' + sMode + '::professional_licenses',doit,2,,true,ver);
    return if(Mode not in [1,2,3], output('professional_licenses - INVALID MODE - ' + Mode), doit);
-
 
 END;

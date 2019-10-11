@@ -2,7 +2,7 @@
 
 /********* AKAS **********/
 
-layouts.akas xf(header.Layout_Header L) := transform
+D2C_Customers.layouts.rAkas xf(header.Layout_Header L) := transform
     self.LexID       := L.did;
     self.Title       := L.title;
     self.Name        := L.fname + ' ' + L.mname + ' ' + L.lname;

@@ -12,7 +12,7 @@ cert_d := dedup(sort(cert, letter, unique_id, cer_type, -date_last_seen), letter
 
 EXPORT proc_build_airmen(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   layouts.airmen JoinAirmen_w_Cert(airmen L, cert_d R) := transform
+   D2C_Customers.layouts.rAirmen JoinAirmen_w_Cert(airmen L, cert_d R) := transform
     self.LexID         := (unsigned6)L.did_out;
     self.Name          := L.fname + ' ' + L.mname + ' ' + L.lname;
     self.Record_Status := L.record_type;  // (Active/Historical/Unknown)
@@ -20,10 +20,8 @@ EXPORT proc_build_airmen(unsigned1 mode, string8 ver, string20 customer_name) :=
                 + L.unit_desig + ' ' + L.sec_range + if(L.unit_desig <> '' or L.sec_range <> '', ', ', '')
                 + L.p_city_name + ', ' + L.st + ' ' + L.zip;
     self.Class              := R.cer_type_mapped;
-    self.Certification_Date := 0;    // N/A
     self.Expiration_Date    := (unsigned4)R.cer_exp_date;
     self.Region             := L.Region;
-    self.License_Number     := '';   // N/A
     self.Ratings            := R.Ratings;          
    end;
    

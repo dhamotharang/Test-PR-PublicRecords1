@@ -20,7 +20,7 @@ dPS  :=	distribute(LatestProperty(source_code = 'OP'),hash(ln_fares_id));
 
 EXPORT proc_build_tax(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   {layouts.tax_assessments, string12 ln_fares_id} AddTax(dPS L, dPT R) := transform
+   {D2C_Customers.layouts.rTax_Assessments, string12 ln_fares_id} AddTax(dPS L, dPT R) := transform
         self.LexID             := (unsigned6)L.did;
         self.ln_fares_id       := L.ln_fares_id;
         self.State             := R.State_code;

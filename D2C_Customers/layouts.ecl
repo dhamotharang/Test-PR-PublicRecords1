@@ -1,6 +1,6 @@
 ﻿EXPORT layouts := module
 
-    EXPORT consumers := record  //consumers file
+    EXPORT rConsumers := record  //consumers file
         unsigned1 Record_Type := 1;
         unsigned6 LexID;
         string60  Best_Name;
@@ -11,7 +11,7 @@
         string1   Report_Candidate;
     END;
     
-    EXPORT address_hist := record
+    EXPORT rAddressHist := record
         unsigned1 Record_Type := 2;
         unsigned6 LexID;
         string200 Address;
@@ -19,21 +19,21 @@
         unsigned4 Date_Last_Seen;
     END;
     
-    EXPORT akas := record
+    EXPORT rAkas := record
         unsigned1 Record_Type := 3;
         unsigned6 LexID;
         string5   Title;
         string60  Name;
     END;
     
-    EXPORT relatives := record
+    EXPORT rRelatives := record
         unsigned1 Record_Type := 4;
         unsigned1 Type;
         unsigned6 LexID1;
         unsigned6 LexID2;
     END;
     
-    EXPORT bankruptcy := record
+    EXPORT rBankruptcy := record
         unsigned1 Record_Type := 5;
         unsigned6 LexID;
         string200 Debtor_Name;
@@ -48,7 +48,7 @@
         string90  Trustee_Address;
     END;
     
-    EXPORT cwp := record  //concealed_weapon_permits
+    EXPORT rCWP := record  //concealed_weapon_permits
         unsigned1 Record_Type := 6;
         unsigned6 LexID;
         string90  Name;
@@ -61,37 +61,53 @@
         unsigned4 Expiration_Date;
     END;
     
-    EXPORT crims := record //civil_criminal_records
+    EXPORT rCrims := record
         unsigned1 Record_Type := 7;
         unsigned6 LexID;
-        string    Name;
-        string    Address;
-        string    County_Of_Origin;
-        string    Offense_State;
-        string    Source;
-        string    Case_Number;
-        string    Doc_Number;
-        string    Fbi_Number;
-        string    Ncic_Number;
-        string    Arresting_Agency;
-        string    Arrest_Type;
-        string    Court_Description;
-        string    Court_Offense;
-        string    Court_Plea;
-        string    Court_Disposition;
-        string    Court_Level; //Court Level/Degree
+        string60  Name;
+        string200 Address;
+        string30  County_Of_Origin;
+        string25  Offense_State;
+        string45  Source;
+        string35  Case_Number;
+        string10  Doc_Number;
+        string9   Fbi_Number;
+        string50  Arresting_Agency;
+        string75  Arrest_Type;
+        string40  Court_Description;
+        string125 Court_Offense;
+        string30  Court_Plea;
+        string80  Court_Disposition;
+        string5   Court_Level; //Court Level/Degree
+        unsigned4 Court_Disposition_Date;
+        unsigned4 Court_Filing_Date;
+    END;
+
+    EXPORT rCivil := record
+        unsigned1 Record_Type := 8;
+        unsigned6 LexID;
+        string60  Name;
+        string200 Address;
+        string2   state_origin;
+        string35  case_number;
+        string60  case_type;
+        string10  case_type_code;
+        string30  entity_type_description_1_orig;
+        string1   entity_nm_format_1;
+        string60  court;
+        string10  court_code;
         unsigned4 Court_Disposition_Date;
         unsigned4 Court_Filing_Date;
     END;
     
-    EXPORT email_addresses := record
-        unsigned1 Record_Type := 8;
+    EXPORT rEmails := record
+        unsigned1 Record_Type := 9;
         unsigned6 LexID;
         string100 Email_Address;
     END;
     
-    EXPORT faa_aircraft := record
-        unsigned1 Record_Type := 9;
+    EXPORT rAircraft := record
+        unsigned1 Record_Type := 10;
         unsigned6 LexID;
         string60  Name;
         string200 Address;
@@ -105,39 +121,36 @@
         string20  Model;
     END;
     
-    EXPORT airmen := record
-        unsigned1 Record_Type := 10;
+    EXPORT rAirmen := record
+        unsigned1 Record_Type := 11;
         unsigned6 LexID;
         string60  Name;
         string10  Record_Status;// (Active/Historical/Unknown)
         string200 Address;
         string20  Class;
-        unsigned4 Certification_Date;  //N/A
         unsigned4 Expiration_Date; 
         string2   Region;
-        string30  License_Number;  //N/A
         string99  Ratings;
     END;
     
-    EXPORT hf := record //hunting_fishing_permits
-        unsigned1 Record_Type := 11;
+    EXPORT rHunting := record //hunting_fishing_permits
+        unsigned1 Record_Type := 12;
         unsigned6 LexID;
         string    Name;
         string    Address;
         string    Gender;
         unsigned4 License_Date;
-        string    License_Number;
         string    License_Type;
         string    Home_State;
         string    License_State;
     END;
     
-    EXPORT liens := record  //Liens & Judgments
-        unsigned1 Record_Type := 12;
+    EXPORT rLiens := record  //Liens & Judgments
+        unsigned1 Record_Type := 13;
         unsigned6 LexID;
         string    Name;
         string    Address;
-        string    Original_Filing_Date;
+        unsigned4 Original_Filing_Date;
         string    Creditors;
         string    Eviction;
         string    Filing_Number;
@@ -148,8 +161,8 @@
         unsigned4 Release_Date;
     END;
     
-    EXPORT ucc := record
-        unsigned1 Record_Type := 13;
+    EXPORT rUCC := record
+        unsigned1 Record_Type := 14;
         unsigned6 LexID;
         string    Debtor;
         string    Address;
@@ -165,8 +178,8 @@
         unsigned4 Expiration_Date;
     END;
 
-    EXPORT people_at_work := record
-        unsigned1 Record_Type := 14;
+    EXPORT rPeople_At_Work := record
+        unsigned1 Record_Type := 15;
         unsigned6 LexID;
         string    Company;
         string    Address;
@@ -176,8 +189,8 @@
         unsigned4 Date_Last_Seen;
     END;
     
-    EXPORT phones := record
-        unsigned1 Record_Type := 15;
+    EXPORT rPhones := record
+        unsigned1 Record_Type := 16;
         unsigned6 LexID;
         string    Name;
         string    Address;
@@ -186,8 +199,8 @@
         string    Phone_Product;// (Directory Assistance or PhonesPlus)
     END;
     
-    EXPORT professional_licenses := record
-        unsigned1 Record_Type := 16;
+    EXPORT rProfessional_Licenses := record
+        unsigned1 Record_Type := 17;
         unsigned6 LexID;
         string20  License_Number;
         string2   License_State;
@@ -198,8 +211,8 @@
         string45  License_Status;
     END;
     
-    EXPORT sex_offenders := record
-        unsigned1 Record_Type := 17;
+    EXPORT rSex_Offenders := record
+        unsigned1 Record_Type := 18;
         unsigned6 LexID;
         string60  Name;
         string900 akas := '';
@@ -211,16 +224,15 @@
         string50  Offender_Status;
         unsigned4 Date_Last_Reported;
         string200 Scars;//Marks/tattoos
-        string10  Adjudication;
-        unsigned4 Adjudication_Date;
+        unsigned4 Adjudication_Date; //Conviction Date
         string30  DOC_Number;
         string30  FBI_Number;
         string30  NCIC_Number;
         string30  Sex_Offender_Registry_ID;
     END;
     
-    EXPORT voter_registration := record
-        unsigned1 Record_Type := 18;
+    EXPORT rVoter_Registration := record
+        unsigned1 Record_Type := 19;
         unsigned6 LexID;
         string    Name;
         string    Resident_Address;
@@ -233,8 +245,8 @@
         string    Status;
     END;
     
-    EXPORT deeds_mortgages := record
-        unsigned1 Record_Type := 19;
+    EXPORT rDeeds_Mortgages := record
+        unsigned1 Record_Type := 20;
         unsigned6 LexID;
         string2   State;
         string18  County;
@@ -254,7 +266,6 @@
         string5   Loan_Type;
         string5   Interest_Rate;
         string5   Term;
-        string5   Term_Indicator;
         unsigned4 Due_Date;
         string60  Lender;
         string1   Lender_Type;
@@ -269,8 +280,8 @@
         string100 Legal_Description;
     END;
     
-    EXPORT tax_assessments := record
-        unsigned1 Record_Type := 20;
+    EXPORT rTax_Assessments := record
+        unsigned1 Record_Type := 21;
         unsigned6 LexID;
         string2   State;
         string30  County;
@@ -319,6 +330,14 @@
         string20  Property_Lot_Size;
         string9   Building_Area;
         string250 Legal_Description;
+    END;
+
+    EXPORT rStudent := RECORD
+      unsigned1 record_type:=22;
+      unsigned6 LexID;
+      string2   CLASS;
+      string50  COLLEGE_NAME;
+      string18  COLLEGE_MAJOR;
     END;
 
 END;
