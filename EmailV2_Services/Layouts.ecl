@@ -184,7 +184,8 @@ EXPORT Layouts := MODULE
     tmx_insights_rec TMX_insights;
     STRING15   email_status := '';
     STRING50   email_status_reason := '';
-    STRING40   additional_status_info := '';
+    STRING70   additional_status_info := '';
+    STRING8    date_last_verified := '';
     STRING50   relationship  := '';
     STRING50   record_err_msg  := '';
     UNSIGNED2 record_err_code := 0;
@@ -289,7 +290,7 @@ EXPORT Layouts := MODULE
     UNSIGNED2 num_did_per_email := 0;
     STRING15  email_status := '';
     STRING50  email_status_reason := '';
-    STRING40  additional_status_info := '';
+    STRING70  additional_status_info := '';
     STRING50  relationship  := '';
     STRING    src;
     STRING50  record_err_msg  := '';
@@ -304,6 +305,8 @@ EXPORT Layouts := MODULE
   EXPORT Gateway_Data := MODULE
     EXPORT batch_in_bv_rec := RECORD
       STRING   email := '';
+      INTEGER  rec_no := 0;
+      INTEGER  group_no := 0;
     END;
     
     EXPORT bv_history_rec := RECORD
