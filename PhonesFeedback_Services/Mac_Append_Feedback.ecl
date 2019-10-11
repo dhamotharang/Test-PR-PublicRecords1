@@ -1,12 +1,13 @@
-export Mac_Append_Feedback (pInputfile		// Input File
+﻿export Mac_Append_Feedback (pInputfile		// Input File
 					  ,pDIDField
 					  ,pPhoneField
 					  ,pOutputFile	// Output file with feedback dataset
+           ,mod_access
 					  ,dFeedback='Feedback' // Feedback dataset name
 					  ) :=
 macro
   //import cannot be inside macro when the macro is being called from within a transform
-
+   
 		// sequence input: designates [phone, DID] combination as unique
 		#uniquename(input_layout_seq)
 		#uniquename(pInputfile_seq)
@@ -28,22 +29,36 @@ macro
 		%feedback_rec_flat%:=record
 			%input_layout_seq%;
 			%base_feedback_rec% %feedback_flat%; // using named subrecord to avoid name collisions
+      unsigned4 global_sid;
+      unsigned8 record_sid;
 		end;
-
+    
+    
 		#uniquename(join_data);
 		%feedback_rec_flat% %join_data% (%pInputfile_seq% l, PhonesFeedback.Key_PhonesFeedback_phone r):=transform
 			self:=l;
 			self.%feedback_flat% := r;
+     self.global_sid := r.global_sid;
+     self.record_sid := r.record_sid;
 		end;
-		
-		#uniquename(joinup);
-		%joinup% := join(%pInputfile_seq%, PhonesFeedback.Key_PhonesFeedback_phone,
-										(left.pPhoneField <> '') and
-										keyed (left.pPhoneField =  right.Phone_number) and 
-										(unsigned) left.pDIDField= (unsigned) right.did and
-										right.phone_contact_type not in %skip_set%,
-										%join_data%(Left,right),left outer, limit(0), keep(1000));
 
+   #uniquename(joinup_pre);
+   %joinup_pre% := join(%pInputfile_seq%, PhonesFeedback.Key_PhonesFeedback_phone,
+                   (left.pPhoneField <> '') and
+                   keyed (left.pPhoneField =  right.Phone_number) and 
+                   (unsigned) left.pDIDField= (unsigned) right.did and
+                   right.phone_contact_type not in %skip_set%,
+                   %join_data%(Left,right),left outer, limit(0), keep(1000));
+
+   #uniquename(joinup_flagged)
+   %joinup_flagged% := Suppress.MAC_FlagSuppressedSource(%joinup_pre%, mod_access, pDIDField);
+
+   #uniquename(joinup);
+   %joinup% := project(%joinup_flagged%, transform(%feedback_rec_flat%, 
+     self.%feedback_flat% := if(~left.is_suppressed, left.%feedback_flat%);
+     self := left));
+
+   
 		// group and rollup to create a child feedback data
 		#uniquename(feedback_data)
 		#uniquename(tmp_rec_layout)
