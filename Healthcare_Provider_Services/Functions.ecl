@@ -1,5 +1,8 @@
-﻿import iesp, AutoStandardI, Ingenix_NatlProf, doxie, doxie_files, ut,
-			Business_Header,address, NPPES, Healthcare_Services;
+﻿/*2016-02-25T21:35:40Z (Rhodes, Mark (RIS-BCT))
+RR 200433  fixed ayntax error
+*/
+import iesp, AutoStandardI,Ingenix_NatlProf, doxie,doxie_files,DeaV2_Services,Business_Risk,prof_licensev2_services,DeathV2_Services,doxie_crs,ut,clia,
+			BankruptcyV3_Services,bankruptcyv2_services,LiensV2_Services,Identifier2,Business_Header,address, NPPES, ams, dea, watchdog, suppress, Healthcare_Services,Healthcare_Header_Services;
 export Functions := Module
 
 	shared myLayouts := Healthcare_Provider_Services.layouts;
@@ -498,6 +501,7 @@ export Functions := Module
 		RETURN penaltyRecs;
 	END;
 
+	
 	EXPORT apply_penalty_bdids(Dataset(myLayouts.deepBDids) bdids, 
 												IParams.reportParams aInputData) := FUNCTION												
 
@@ -1069,7 +1073,7 @@ export Functions := Module
 			return results;
 			// return inputRecs;
 		end;
-		Export getABMSData(dataset(myLayouts.autokeyInput) input, dataset(mylayouts.layout_slim_sanction) inputSlim) := function
+		shared getABMSData(dataset(myLayouts.autokeyInput) input, dataset(mylayouts.layout_slim_sanction) inputSlim,dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := function
 			convertedInputRecordsUserData := project(input,transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput,
 																															hasAddr := left.prim_name <> '' and ((left.p_city_name <>'' and left.st <> '') or left.z5 <> '');
 																															hasDid := left.did > 0;
@@ -1085,7 +1089,10 @@ export Functions := Module
 			convertedInputRecordsDerivedDid := join(input,getDerivedDids,left.acctno = (string)right.seq, transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput, self.acctno := right.acctno; self.seq := right.seq; self.did:=right.did;self := left));
 			convertedInputRecordsDerivedNPI := join(input,getDerivedNPIs,left.acctno = (string)right.seq, transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput, self.acctno := right.acctno; self.seq := right.seq; self.npi:=right.npi;self := left));
 			convertedInputRecords := convertedInputRecordsUserData+convertedInputRecordsDerivedDid+convertedInputRecordsDerivedNPI;
-			abmsRecsRaw := Healthcare_Provider_Services.ABMS_Records().getRecords(convertedInputRecords);	
+			 mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);      
+			supressabms:=Suppress.MAC_FlagSuppressedSource(convertedInputRecords, mod_access); 
+      OptOutabms := project(supressabms, transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput,self.hasOptOut:= left.is_suppressed;self:=left;self:=[]))   ;              
+			abmsRecsRaw := Healthcare_Provider_Services.ABMS_Records().getRecords(OptOutabms,cfg);	
 			abmsRecs := project(abmsRecsRaw,iesp.abms.t_ABMSResults);	
 			//Now that we have records back we need to rejoin them back to the correct acctno
 			relink2InputAcctno := join(convertedInputRecordsUserData,abmsRecs, left.acctno = right.AccountNumber, transform(mylayouts.layout_abms, self.acctno := right.AccountNumber; self := right));
@@ -1101,27 +1108,15 @@ export Functions := Module
 				self.childinfo := project(r,iesp.abms.t_ABMSResults);
 			END;
 			results_rolled := rollup(group(sort(reformatDedup,AccountNumber,ABMSBiogID),AccountNumber,ABMSBiogID),group,doRollup(left,rows(left)));
-			// output(input,named('inputABMSCall'));
-			// output(inputSlim,named('inputSlim'));
-			// output(convertedInputRecordsUserData,named('convertedInputRecordsUserData'));
-			// output(getDerivedDids,named('getDerivedDids'));
-			// output(getDerivedNPIs,named('getDerivedNPIs'));
-			// output(convertedInputRecordsDerivedDid,named('convertedInputRecordsDerivedDid'));
-			// output(convertedInputRecordsDerivedNPI,named('convertedInputRecordsDerivedNPI'));
-			// output(convertedInputRecords,named('convertedInputRecords'));
-			// output(abmsRecsRaw,named('abmsRecsRaw'));
-			// output(abmsRecs,named('abmsRecs4Abms'));
-			// output(relink2InputAcctno,named('relink2InputAcctno'));
-			// output(relink2DerivedData,named('relink2DerivedData'));
-			// output(finalABMSData,named('finalABMSData'));
-			// output(reformatDedup,named('reformatDedup'));
-			// output(results_rolled,named('results_rolled4Abms'));
+		
 			return results_rolled;
 		end;
 		Export appendABMSData (dataset(myLayouts.autokeyInput) input,
 													 dataset(mylayouts.layout_slim_sanction) inputSlim,
-													 dataset(myLayouts.CombinedHeaderResultsDoxieLayout) inputRecs) := function
-			fmtRec_ABMSData := getABMSData(input(name_last <> '' and IncludeABMSSpecialty=true),inputSlim);//Remove business only search records
+													 dataset(myLayouts.CombinedHeaderResultsDoxieLayout) inputRecs,
+													 dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg)
+													 := function
+			fmtRec_ABMSData := getABMSData(input(name_last <> '' and IncludeABMSSpecialty=true),inputSlim,cfg);//Remove business only search records
 			results := join(inputRecs,fmtRec_ABMSData, left.acctno=right.acctno,
 																			transform(myLayouts.CombinedHeaderResultsDoxieLayout,
 																								self.abmsRaw := right.childinfo;
