@@ -1,4 +1,4 @@
-﻿IMPORT Std, KELOtto, FraudShared, data_services;
+﻿IMPORT Std, KELOtto, FraudShared, data_services, ut;
 #CONSTANT ('Platform','FraudGov');
 RunKelDemo :=false:stored('RunKelDemo');
 
@@ -13,10 +13,22 @@ fraudgov_dataset_base_prep := dataset(data_services.foreign_prod+FileIn, FraudSh
 // Add an address id (rawaid is always 0)
 // email id
 // ipaddress id
+//Need to define layout to remove the string20 for the cleaned name to avoid confusing KEL
+Layout_Clean_Name := 	record
+	string  title					;
+	string fname					;
+	string mname					;
+	string lname					;
+	string name_suffix		;
+	string  name_score			;
+end;
+
+Main         :=  FraudShared.Layouts.Base.Main - cleaned_name;
 
 fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep, 
                        TRANSFORM({
-                         RECORDOF(LEFT), 
+                         Main, 
+												 Layout_Clean_name cleaned_name,
                          STRING SsnFormatted, 
                          STRING Phone_Number_Formatted, 
                          STRING Cell_phone_Formatted, 
@@ -48,6 +60,9 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
                        SELF.event_type_2 := MAP(LEFT.drivers_license != '' => CHOOSE((HASH32(LEFT.record_id) % 7)+1, '800','891','801','802','892','893','890'),''),
                        */
                        // end of test code.
+											 // Clean name to avoid blank labels
+											 SELF.cleaned_name.fname := TRIM(ut.fn_RemoveSpecialChars(LEFT.cleaned_name.fname)),
+											 SELF.cleaned_name.lname := TRIM(ut.fn_RemoveSpecialChars(LEFT.cleaned_name.lname)),
 											 SELF := LEFT));
 
 // trim the data down for R&D speed.
