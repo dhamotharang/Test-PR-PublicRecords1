@@ -40,15 +40,16 @@ export Layouts := module
 
 Export i_GatewayCollectionlog_DID := record
 UNSIGNED6 did;
-STRING50  transaction_id;
+STRING20  transaction_id;
 UNSIGNED4 global_sid;
 UNSIGNED8 record_sid;
-string10  date_added; // YYYYMMDD
-string6   time_added; // HHMMSS
+STRING8   date_added; // YYYYMMDD
+STRING6   time_added; // HHMMSS
+STRING8   process_date;
 STRING    esp_method;
 STRING    request_data;
 STRING    response_data;
-string    process_date;
+
 end;
 
 end;

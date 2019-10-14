@@ -19,21 +19,21 @@ export mac_append_did(ds_in, ds_out, mod_access, append_did_local = TRUE,matchse
  import did_add, AutoKeyI;     
  #uniquename(ds_in_append_local)    
  did_add.MAC_Match_Flex(%ds_in_nodids%                                      // export MAC_Match_Flex(infile, 
-                       ,matchset                                           // matchset,    //see above
-                       ,ssn,dob,fname,mname,lname,suffix                   // ssn_field, dob_field, fname_field, mname_field,lname_field, suffix_field, 
-                       ,prim_range,prim_name,sec_range,zip4,st,phone10     // prange_field, pname_field, srange_field,zip_field, state_field, phone_field,
-                       ,did                                                // DID_field,  //these will be set to zero before the linking                                            
-                       ,%layout_append_did%                                // outrec, 
-                       ,false,fake_DID_Score_field                         // bool_outrec_has_score, DID_Score_field,              //these should default to zero in definition
-                       ,75                                                 // low_score_threshold,    //dids with a score below here will be dropped 
-                       ,%ds_in_append_local% );                            // outfile,
-                       // ,true,src)                                       // bool_infile_has_name_source = 'false', src_field = '',
-                                                                           // bool_all_scores ='false',  // will pass through even records with a 100 score// on to further match macros, to get further scores
-                                                                           // bool_outrec_has_indiv_scores='false',score_a_field='score_a',score_d_field='score_d',
-                                                                           // score_s_field='score_s',score_p_field='score_p', score_f_field='score_f', score_n_field = 'score_n',// appends individual match scores
-                                                                           // bool_clean_addr = 'false', // re-cleans addresses before trying match. 
-                                                                           // predir_field = 'predir',addr_suffix_field = 'addr_suffix',postdir_field = 'postdir',
-                                                                           // udesig_field = 'unit_desig',city_field = 'p_city_name', zip4_field = 'zip4', weight_threshold=30, distance=3, segmentation=true)      
+                        ,matchset                                           // matchset,    //see above
+                        ,ssn,dob,fname,mname,lname,suffix                   // ssn_field, dob_field, fname_field, mname_field,lname_field, suffix_field, 
+                        ,prim_range,prim_name,sec_range,zip4,st,phone10     // prange_field, pname_field, srange_field,zip_field, state_field, phone_field,
+                        ,did                                                // DID_field,  //these will be set to zero before the linking                                            
+                        ,%layout_append_did%                                // outrec, 
+                        ,false,fake_DID_Score_field                         // bool_outrec_has_score, DID_Score_field,              //these should default to zero in definition
+                        ,$.Constants.DID_SCORE_THRESHOLD                    // low_score_threshold,    //dids with a score below here will be dropped 
+                        ,%ds_in_append_local% );                            // outfile,
+                        // ,true,src)                                       // bool_infile_has_name_source = 'false', src_field = '',
+                                                                            // bool_all_scores ='false',  // will pass through even records with a 100 score// on to further match macros, to get further scores
+                                                                            // bool_outrec_has_indiv_scores='false',score_a_field='score_a',score_d_field='score_d',
+                                                                            // score_s_field='score_s',score_p_field='score_p', score_f_field='score_f', score_n_field = 'score_n',// appends individual match scores
+                                                                            // bool_clean_addr = 'false', // re-cleans addresses before trying match. 
+                                                                            // predir_field = 'predir',addr_suffix_field = 'addr_suffix',postdir_field = 'postdir',
+                                                                            // udesig_field = 'unit_desig',city_field = 'p_city_name', zip4_field = 'zip4', weight_threshold=30, distance=3, segmentation=true)      
                                                                                                    
   
  ds_out := join(%ds_in_seq%, %ds_in_append_local%,       
