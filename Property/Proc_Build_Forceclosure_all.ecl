@@ -6,8 +6,8 @@ EXPORT Proc_Build_Forceclosure_all(
 	STRING  pHostname,
 	STRING  pSource,
 	STRING  pGroup = STD.System.Thorlib.Group(),
-	STRING  pGlob  = 'REOOut.txt',
-	BOOLEAN pSpray = TRUE
+	BOOLEAN pSpray = TRUE,
+	STRING  pGlob  = 'REOOut.txt'
 ) := FUNCTION
 
 	doSpray := Property.spray_Foreclosure_Raw(
