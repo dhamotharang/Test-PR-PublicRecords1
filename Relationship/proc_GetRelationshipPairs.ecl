@@ -1,4 +1,4 @@
-﻿import std, dx_Relatives_v3;
+﻿import std, Watchdog_V2, dx_BestRecords;
 
 noTx := row([],Layout_GetRelationship.TransactionalFlags_layout);
 
@@ -83,8 +83,9 @@ shared isTx   :=  txflag.VehicleFlag OR
                   txflag.POBoxFlag;
 
 shared relationship_key_qa        := Relationship.key_relatives_v3;
-shared relationship_key_Marketing := dx_Relatives_v3.key_Marketing_Header_Relatives();
-shared relationship_key_D2C       := dx_Relatives_v3.key_D2C_Header_Relatives();
+shared dWatchdogUniversalKey      := Watchdog_V2.fn_UniversalKeySearch.basekey;
+shared relationship_key_Marketing := dWatchdogUniversalKey(permissions & dx_BestRecords.Constants.PERM_TYPE.marketing > 0);
+shared relationship_key_D2C       := dWatchdogUniversalKey(permissions & dx_BestRecords.Constants.PERM_TYPE.glb_d2c_filtered > 0);
 shared DID_ds_dist                := distribute(DID_ds,hash(did));
 
 shared layout_GetRelationship.interfaceOutputNeutral xform(DID_ds l, relationship_key_qa r) := TRANSFORM
@@ -125,26 +126,38 @@ doJoinThor(relKey) := functionmacro
   out := join(DID_ds_dist, relKeyJ, left.did=right.did1, xform(left,right),local);
   return out;
 endmacro;
+
+doFilteredJoin(relKey, joinOptions) := functionmacro
+  filteredOut := join(relationship_key_qa, relKey, keyed(left.did1=right.did), TRANSFORM(LEFT));
+  return doJoin(filteredOut,joinOptions);
+endmacro;
+doFilteredJoinThor(relKey) := functionmacro
+  relFilteredKeyJ := distribute(pull(relKey),hash(did));
+  fullFilteredKey := distribute(pull(relationship_key_qa),hash(did1));
+  filteredOut := join(fullFilteredKey, relFilteredKeyJ, left.did1=right.did, TRANSFORM(LEFT), local);
+  return doJoinThor(filteredOut);
+endmacro;
+
 skipOption   := 'LIMIT(MaxCount,SKIP)';
 failOption   := 'LIMIT(MaxCount)';
 atmostOption := 'ATMOST(MaxCount)';
 allOption    := 'KEEP(20000),LIMIT(0)';
 thorOption   := '';//atmostOption;
-relsSkip         := MAP(RelKeyFlag='D2C'       => doJoin(relationship_key_D2C, skipOption),
-                        RelKeyFlag='MARKETING' => doJoin(relationship_key_Marketing, skipOption),
+relsSkip         := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_key_D2C, skipOption),
+                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_key_Marketing, skipOption),
                         doJoin(relationship_key_qa, skipOption));
-relsFail         := MAP(RelKeyFlag='D2C'       => doJoin(relationship_key_D2C, failOption),
-                        RelKeyFlag='MARKETING' => doJoin(relationship_key_Marketing, failOption),
+relsFail         := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_key_D2C, failOption),
+                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_key_Marketing, failOption),
                         doJoin(relationship_key_qa, failOption));
-relsAtmost       := MAP(RelKeyFlag='D2C'       => doJoin(relationship_key_D2C, atmostOption),
-                        RelKeyFlag='MARKETING' => doJoin(relationship_key_Marketing, atmostOption),
+relsAtmost       := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_key_D2C, atmostOption),
+                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_key_Marketing, atmostOption),
                         doJoin(relationship_key_qa, atmostOption));
-relsAll0         := MAP(RelKeyFlag='D2C'       => doJoin(relationship_key_D2C, allOption),
-                        RelKeyFlag='MARKETING' => doJoin(relationship_key_Marketing, allOption),
+relsAll0         := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_key_D2C, allOption),
+                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_key_Marketing, allOption),
                         doJoin(relationship_key_qa, allOption));
 relsAll          := TOPN(relsAll0, 10000, -total_score, -total_cnt);
-relsTHOR         := MAP(RelKeyFlag='D2C'       => doJoinThor(relationship_key_D2C),
-                        RelKeyFlag='MARKETING' => doJoinThor(relationship_key_Marketing),
+relsTHOR         := MAP(RelKeyFlag='D2C'       => doFilteredJoinThor(relationship_key_D2C),
+                        RelKeyFlag='MARKETING' => doFilteredJoinThor(relationship_key_Marketing),
                         doJoinThor(relationship_key_qa));
 
 shared rels      := MAP(doThor                       => relsThor,
