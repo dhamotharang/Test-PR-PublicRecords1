@@ -1,4 +1,4 @@
-import data_services;
+﻿import data_services;
 
 /*
   **
@@ -38,12 +38,11 @@ EXPORT mac_fetch_bydid(ds_in, did_field, death_params, skip_GLB_check = FALSE, r
 
   LOCAL out_recs := PROJECT(din_with_death_suppressed, 
     TRANSFORM(layout_out_rec,
-      // TODO: uncomment lines below to enable ccpa suppression once dx_death_master changes are in place.
-      // #IF(left_outer)
-      // SELF.death := IF(~LEFT.is_suppressed, LEFT.death); // if appending (left outer), blank deceased data if suppressed
-      // #ELSE
-      // SELF.did_field := IF(LEFT.is_suppressed, SKIP, LEFT.did_field); // drop entire record if suppressed 
-      // #END
+      #IF(left_outer)
+      SELF.death := IF(~LEFT.is_suppressed, LEFT.death); // if appending (left outer), blank deceased data if suppressed
+      #ELSE
+      SELF.did_field := IF(LEFT.is_suppressed, SKIP, LEFT.did_field); // drop entire record if suppressed 
+      #END
       SELF := LEFT));
   
   RETURN out_recs;
