@@ -30,7 +30,7 @@ MODULE
 		EXPORT BOOLEAN   UseDeltabase 			 := FALSE;
     EXPORT BOOLEAN   SubjectMetadataOnly := FALSE;
 		EXPORT BOOLEAN 	 DetailedRoyalties 	 := FALSE;
-    EXPORT BOOLEAN   SuppressBlankNameAddress := FALSE;
+    EXPORT BOOLEAN   SuppressNonRelevantRecs := FALSE;
 		// Options for phone verification
 		EXPORT BOOLEAN   VerifyPhoneName      	:= FALSE;
 		EXPORT BOOLEAN	 VerifyPhoneNameAddress	:= FALSE;
@@ -156,7 +156,7 @@ MODULE
       EXPORT BOOLEAN   IncludePhoneMetadata := pfOptions.IncludePhoneMetadata;
       BOOLEAN          SubjectMetadata      := pfOptions.SubjectMetadataOnly;
       EXPORT BOOLEAN   SubjectMetadataOnly  := IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
-      EXPORT BOOLEAN   SuppressBlankNameAddress := pfOptions.SuppressBlankNameAddress;
+      EXPORT BOOLEAN   SuppressNonRelevantRecs := pfOptions.SuppressNonRelevantRecs;
 
       // Options for phone verification
       EXPORT BOOLEAN   VerifyPhoneName				:= pfOptions.VerificationOptions.VerifyPhoneName;
@@ -325,7 +325,7 @@ MODULE
 
              BOOLEAN   SubjectMetadata 		 := FALSE : STORED('SubjectMetadataOnly');
       EXPORT BOOLEAN   SubjectMetadataOnly := IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
-      EXPORT BOOLEAN   SuppressBlankNameAddress := FALSE : STORED('SuppressBlankNameAddress');
+      EXPORT BOOLEAN   SuppressNonRelevantRecs := FALSE : STORED('SuppressNonRelevantRecs');
 
       EXPORT BOOLEAN 	 DetailedRoyalties 	            := FALSE : STORED('ReturnDetailedRoyalties');
       EXPORT UNSIGNED1 LineIdentityConsentLevel       := 0 : STORED('LineIdentityConsentLevel');
