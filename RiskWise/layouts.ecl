@@ -207,7 +207,7 @@ export reasoncode_settings := RECORD
 	boolean verfirst_chase := False;// reason codes for chase custom model
 	boolean verlast_chase := False;// reason codes for chase custom model
 	boolean veraddr_chase := False;// reason codes for chase custom model
-
+	boolean includeemailverification := False;
 end;
 
 export actioncode_settings := RECORD

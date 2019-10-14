@@ -1,4 +1,4 @@
-import address, ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
+﻿import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std, Models;
 
 export TBD609_2_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) inputclam, boolean OFAC, boolean inCalif) := 
 
@@ -10,7 +10,7 @@ clam := project(inputclam,
 			self.consumerflags.security_freeze := if(left.rhode_island_insufficient_verification, true, left.consumerflags.security_freeze);
 			self := left));
 			
-Layout_ModelOut doModel(clam le) := TRANSFORM
+Models.Layout_ModelOut doModel(clam le) := TRANSFORM
 	
 	sysyear := IF(le.historydate <> 999999, (integer)(((STRING)le.historydate)[1..4]) + 1, (integer)(((STRING)Std.Date.Today())[1..4]) + 1);
 		
@@ -245,11 +245,12 @@ Risk_Indicators.Layout_Output into_layout_output(clam le) := TRANSFORM
 	self := le.iid;
 	self := le.shell_input;
 	self := le;
+	self :=[];
 END;
 iid := project(clam, into_layout_output(left));
 
 
-Layout_ModelOut addReasons(Layout_ModelOut le, iid ri) := TRANSFORM
+Models.Layout_ModelOut addReasons(Models.Layout_ModelOut le, iid ri) := TRANSFORM
 	self.ri := if(le.ri[1].hri <> '00', le.ri, RiskWise.mmReasonCodes(ri, 4, OFAC, inCalif));
 	self := le;
 END;

@@ -1,4 +1,4 @@
-﻿import risk_indicators, Phone_Shell, Data_Services;
+﻿import risk_indicators, Phone_Shell, Data_Services, RiskWise;
 
 // placeholder for all of the roxie VIPs to use when processing files using soapcall
 export shortcuts := module
@@ -57,20 +57,20 @@ export shortcuts := module
 	// WsECL: http://10.173.3.6:9022/
 
 
-	export gw_empty     := dataset( [], risk_indicators.layout_gateways_in );
-	export gw_targus    := dataset( [{'targus','http://rw_data_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
-	export gw_targus_sco:= dataset( [{'targus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
-	export gw_attus     := dataset( [{'attus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
-	export gw_netacuityv4_cert := dataset( [{'netacuity','http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
-// use this version for anything that is customer paid test  
-	export gw_netacuityv4_prod := dataset( [{'netacuity','https://rox_netacuitygw:g3t3m2018@gatewayprodesp.sc.seisint.com:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
+  export gw_empty     := dataset( [], risk_indicators.layout_gateways_in );
+  export gw_targus    := dataset( [{'targus','http://rw_data_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
+  export gw_targus_sco:= dataset( [{'targus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
+  export gw_attus     := dataset( [{'attus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
+  export gw_netacuityv4_cert := dataset( [{'netacuity','http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
+  // use this version for anything that is customer paid test  
+  export gw_netacuityv4_prod := dataset( [{'netacuity','https://rox_netacuitygw:g3t3m2018@gatewayprodesp.sc.seisint.com:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
   export gw_netacuityv4 := gw_netacuityv4_cert  :DEPRECATED('If running a paid customer test, use gw_netacuityv4_prod instead');
-
+  export gw_emailrisk:= dataset( [{'emailrisk','http://rwgatewaycert.sc.seisint.com:7726/WsGatewayEx/EmailRisk?form&ver_=2.9'}], risk_indicators.layout_gateways_in );
   export gw_FCRA      := dataset( [{'FCRA','http://roxieqavip.br.seisint.com:9876'}], risk_indicators.layout_gateways_in );
-	export gw_personContext	:= dataset( [{'delta_personcontext','http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.172:7534/WsSupport/?ver_=2'}], risk_indicators.layout_gateways_in );
-	//deltabase gateways for Inquiries
-	export gw_delta_dev := dataset( [{'delta_inquiry','http://rw_score_dev:Password01@10.176.68.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
-	export gw_delta_prod := dataset( [{'delta_inquiry','http://delta_iid_api_user:2rch%40p1$$@10.176.69.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
+  export gw_personContext	:= dataset( [{'delta_personcontext','http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.172:7534/WsSupport/?ver_=2'}], risk_indicators.layout_gateways_in );
+    //deltabase gateways for Inquiries
+  export gw_delta_dev := dataset( [{'delta_inquiry','http://rw_score_dev:Password01@10.176.68.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
+  export gw_delta_prod := dataset( [{'delta_inquiry','http://delta_iid_api_user:2rch%40p1$$@10.176.69.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
 	
 // <gateways><row><servicename>insurancephoneheader</servicename><url>http://rw_score_dev:Password01@10.176.68.164:7526/WsPrism/?ver_=1.82</url></row></gateways>
 

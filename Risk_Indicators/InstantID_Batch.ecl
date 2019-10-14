@@ -86,9 +86,15 @@
 	<part name="IIDVersionOverride" type="xsd:boolean"/>
 	<part name="IncludeDPBC" type="xsd:boolean"/>
 
-	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
-	<part name="EnableEmergingID" type="xsd:boolean"/>	
-	<part name="NameInputOrder" type="xsd:string"/>	
+ <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
+ <part name="EnableEmergingID" type="xsd:boolean"/>	
+ <part name="NameInputOrder" type="xsd:string"/>	
+ <part name="disablenongovernmentdldata" type="xsd:boolean"/>
+ <part name="IncludeEmailVerification" type="xsd:boolean"/>
+ <part name="IncludeITIN" type="xsd:boolean"/>
+ <part name="ExcludeMinors" type="xsd:boolean"/>
+ <part name="IncludeComplianceCap" type="xsd:boolean"/>
+ <part name="IncludeDigitalIdentity" type="xsd:boolean"/>
 </message>
 */
 /*--HELP--
@@ -293,6 +299,12 @@ string1 IIDVersion := '0'										: STORED('InstantIDVersion');	// this is pass
 boolean IncludeDPBC := false 								: stored('IncludeDPBC');
 boolean EnableEmergingID := false 					: stored('EnableEmergingID');
 string3 NameInputOrder := ''								: STORED('NameInputOrder');	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
+boolean IncludeEmailverification := false : STORED('IncludeEmailverification');
+boolean disablenongovernmentdldata := false : STORED('disablenongovernmentdldata'); //to exclude non government data in DL Verification
+boolean IncludeITIN := false                : STORED('IncludeITIN'); // to disable override option when ITIN exists.
+boolean ExcludeMinors := false              : STORED('ExcludeMinors'); //to exclude minors(age 18 and below)
+boolean IncludeComplianceCap  := false      : STORED('IncludeComplianceCap');  // to prevent cvi increase when dob and license are included in NAS and NAP combination.
+boolean IncludeDigitalIdentity  := false      : STORED('IncludeDigitalIdentity');
 
 // CCPA Fields
 
@@ -513,6 +525,8 @@ unsigned1 AppendBest := 1;		// search best file
 boolean doInquiries := ~DisableInquiriesInCVI AND dataRestriction[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue AND
 												actualIIDVersion=1;
 boolean AllowInsuranceDL := true;
+enableEquifaxPhoneMart:=   DataRestriction[Risk_indicators.iid_constants.enableEquifaxPhoneMart]=Risk_indicators.iid_constants.sFalse;
+
 unsigned8 BSOptions := 
 								if(bsversion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0) +
                 if(doInquiries, risk_indicators.iid_constants.BSOptions.IncludeInquiries, 0) +
@@ -523,7 +537,10 @@ unsigned8 BSOptions :=
 																					risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
 										0) +
 								if(AllowInsuranceDL, risk_indicators.iid_constants.BSOptions.AllowInsuranceDLInfo, 0) + //Allows use of Insurance DL information
-								if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0);	//Invokes additional DID append logic
+								if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0)+
+            if(IncludeDigitalIdentity,Risk_indicators.iid_constants.BSOptions.runthreatmetrix,0)+
+            if(disablenongovernmentdldata, risk_indicators.iid_constants.BSOptions.disablenongovernmentdldata, 0) + //check to disable use of Non Governmental DL information
+            if(enableEquifaxPhoneMart,Risk_indicators.iid_constants.BSOptions.enableEquifaxPhoneMart,0);
 
 
 ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, ofac_only, suppressNearDups, 
@@ -543,22 +560,38 @@ Layout_InstandID_NuGenExt := record
 	boolean insurance_dl_used;
 end;
 
-Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
-	SELF.acctNo		:=R.acctno;
-	
-	SELF.transaction_id := 0;
+//  For ThreatMetrix reasoncodes
+TMX_model:=Models.IID1906_0_0(ret);
+// DRM_threatmetrix:= ~doxie.DataRestriction.allowDigitalIdentity;
+DRM_threatmetrix:= DataRestriction[Risk_indicators.iid_constants.IncludeDigitalIdentity]=Risk_indicators.iid_constants.sFalse;
+ retplus_tmx:= if(DRM_threatmetrix,join(ret,TMX_model,left.seq=right.seq,
+ transform(risk_indicators.layout_output,
+ self.iid_tmx.phonehighriskind:=RIGHT.phonehighriskind,
+ self.iid_tmx.emailhighriskind:=Right.emailhighriskind,
+ self:=LEFT),left outer),ungroup(ret));
 
+Layout_InstandID_NuGenExt format_out(retplus_tmx le, fs R) := TRANSFORM
+  SELF.acctNo		:=R.acctno;
+    
+  SELF.transaction_id := 0;
+  
 	isFirstExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression + '|' + Risk_Indicators.iid_constants.endingInc_expression, TRIM(STD.STR.ToUpperCase(r.Name_First)), NOCASE), TRUE, FALSE), FALSE);
 	verfirst := Map(ischase AND isFirstExpressionFound => '',
 											 le.combo_firstcount>0 => le.combo_first,
 											 '');
-	self.verfirst := verfirst;
+  SELF.verfirst := verfirst;
+  
+isMiddleExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression, TRIM(STD.STR.ToUpperCase(r.Name_Middle)), NOCASE), TRUE, FALSE), FALSE);
+	vermiddle := Map(ischase AND isMiddleExpressionFound => '',
+											 le.combo_middlecount>0 => le.combo_middle,
+											 '');
+  SELF.vermiddle := vermiddle;
 
 	isLastExpressionFound  := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression + '|' + Risk_Indicators.iid_constants.lastEndsWith_expression + '|' + Risk_Indicators.iid_constants.endingInc_expression, TRIM(STD.STR.ToUpperCase(r.Name_Last)), NOCASE), TRUE, FALSE), FALSE);
 	verlast := Map(ischase AND isLastExpressionFound => '',
 											le.combo_lastcount>0 => le.combo_last, 
 											'');
-		self.verlast := verlast;
+  SELF.verlast := verlast;
 
 	isAddrExpressionFound := if(ischase AND le.addr_type ='P', TRUE,FALSE);
 
@@ -680,6 +713,7 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	SELF.ssa_state_name := Codes.GENERAL.STATE_LONG(le.soclstate);
 	
 	SELF.current_fname := le.verfirst;
+	SELF.current_mname := le.vermiddle;
 	SELF.current_lname := le.verlast;
 	
 	addr1 := Risk_Indicators.MOD_AddressClean.street_address('',le.chronoprim_range, le.chronopredir, 
@@ -762,10 +796,10 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 
 	SELF.fua := if(ischase and chase_expressions, risk_indicators.getActionCodes(le,4, NAS_summary1, NAP_summary1, ac_settings := actioncode_settings),risk_indicators.getActionCodes(le,4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings /*, rc*/));
 	
-	cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI),
-									ischase => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI),
+	cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,'',IncludeITIN,IncludeComplianceCap),
+									ischase => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,'',IncludeITIN,IncludeComplianceCap),
 										actualIIDVersion=0 => risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC),	
-										risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI));
+										risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,'',IncludeITIN,IncludeComplianceCap));
 		//need two chase checks here because chase would like their model returned in the normal CVI slot even though it is a custom model call. one for Custom model with modification, and one without.																		
 									
 	isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
@@ -778,7 +812,9 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 							cvi_temp);
 	
 	
-	self.verdl := le.verified_dl;
+  SELF.verdl := le.verified_dl;
+  SELF.corrected_dl:= IF(self.verdl <>le.dl_number,le.verified_dl,'');
+  SELF.VerifiedEmail:= IF(IncludeEmailverification,le.VerifiedEmail,'');
 		
 	self.SubjectSSNCount := if(risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months), (string)le.ssns_per_adl_seen_18months, '');
 
@@ -812,9 +848,15 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	reasoncode_settings_chase := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, '', ischase, isFirstExpressionFound, isLastExpressionFound, isAddrExpressionFound}],riskwise.layouts.reasoncode_settings);
 
 	// add a sequence number to the reason codes for sorting in XML
-	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings), reasons_with_seq);
-	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings_chase), reason_with_seq_chase);
+	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings), original_reasons_with_seq);
+	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings_chase), original_reason_with_seq_chase);
+ 
+ Excluded_Minor := if(Excludeminors,risk_indicators.rcSet.isCodeAM((INTEGER)le.age,le.dob),false);
 
+  risk_indicators.mac_add_sequence(dataset([{'AM', risk_indicators.getHRIDesc('AM')}], risk_indicators.Layout_Desc), excluded_minors_set);
+  reasons_with_seq := if(Excluded_Minor, excluded_minors_set, original_reasons_with_seq);
+  reason_with_seq_chase := if(Excluded_Minor, excluded_minors_set, original_reason_with_seq_chase);
+  
 	self.ri := if(ischase and chase_expressions, reason_with_seq_chase, reasons_with_seq);
 		
 	passportline := r.PassportUpperLine + r.PassportLowerLine;
@@ -828,8 +870,8 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	self.addressPOBox := (Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass)) and actualIIDVersion=1;
 	self.addressCMRA := (le.hrisksic in risk_indicators.iid_constants.setCRMA or le.ADVODropIndicator='C') and actualIIDVersion=1;
 	
-	custom_cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName_in),
-													CustomCVIModelName_in <> '' => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName_in),
+	custom_cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName_in,IncludeITIN,IncludeComplianceCap),
+													CustomCVIModelName_in <> '' => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName_in,IncludeITIN,IncludeComplianceCap),
 													'');
 	
 	SELF.cviCustomScore := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)custom_cvi_temp > 10 => '10',
@@ -856,12 +898,71 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	self.StreetAddress1 := address.Addr1FromComponents(le.prim_range,le.predir,le.prim_name,le.addr_suffix,le.postdir,le.unit_desig,le.sec_range);
 	self.StreetAddress2 := address.Addr2FromComponents(le.p_city_name,le.st,le.z5);
 	self.DID := if(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, 0, le.DID); //if DID is fake, zero it out
-	
-	SELF := le;
+  
+  SELF.BureauDeleted  := if(le.header_summary.EQ_ssn_nlr or le.header_summary.EN_ssn_nlr or le.header_summary.TN_ssn_nlr, true, false);
+  SELF.ITINExpired:=le.ITINExpired;
+  SELF.IsPhoneCurrent:=le.IsPhoneCurrent;
+  SELF.PhoneLineType:=le.PhoneLineType;
+  SELF.PhoneLineDescription:=le.PhoneLineDescription;
+  SELF := le;
 	SELF := [];  // default models and red flags datasets to empty
 END;
 
-formed_pre1 := join(ret, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
+formed_pre1_temp := join(ret, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
+
+
+Layout_InstandID_NuGenExt minorsTransform(formed_pre1_temp l) := transform
+                self.acctNo:=l.acctno;
+                self.seq:=(Integer)l.seq;
+                self.DID:=(Integer)l.did;                      
+                self.title :=l.title;
+                self.fname:=l.fname;
+                self.mname:=l.mname;
+                self.lname:=l.lname;
+                self.suffix:=l.suffix;
+                self.in_streetAddress:=l.in_streetAddress;
+                self.in_city:=l.in_city;
+                self.in_state:=l.in_state;
+                self.in_zipCode:=l.in_zipCode;
+                self.in_country:=l.in_country;
+                self.prim_range:=l.prim_range;
+                self.predir:=l.predir;
+                self.prim_name:=l.prim_name;
+                self.addr_suffix:=l.addr_suffix;
+                self.postdir:=l.postdir;
+                self.unit_desig:=l.unit_desig;
+                self.sec_range:=l.sec_range;
+                self.p_city_name:=l.p_city_name;
+                self.st:=l.st;
+                self.z5:=l.z5;
+                self.zip4:=l.zip4;
+                self.lat :=l.lat;
+                self.long :=l.long;
+                self.county :=l.county;
+                self.geo_blk :=l.geo_blk;          
+                self.addr_type:=l.addr_type;
+                self.addr_status:=l.addr_status;                
+                self.country:=l.country;                
+                self.ssn:=l.ssn;
+                self.dob:=l.dob;
+                self.age:=l.age;                
+                self.dl_number :=l.dl_number;
+                self.dl_state :=l.dl_state;               
+                self.email_address:=l.email_address;
+                self.ip_address:=l.ip_address;
+                self.phone10:=l.phone10;
+                self.wphone10:=l.wphone10;
+                self.employer_name :=l.employer_name;
+                self.lname_prev :=l.lname_prev;
+                self.ri:= Dataset([transform(risk_indicators.layouts.layout_desc_plus_seq,
+                          self.seq:=1;
+                          self.hri:='AM';
+                          self.desc:=risk_indicators.getHRIDesc('AM') )]);
+                self:=[];
+                
+END;
+temp_output:= Project(formed_pre1_temp,minorsTransform(LEFT));
+formed_pre1:=if(excludeminors,temp_output,formed_pre1_temp);
 
 //for Emerging Identities, return standardized county name
 formed_pre := join(formed_pre1, census_data.Key_Fips2County, 
@@ -1319,6 +1420,7 @@ just_red_flags := join(iid_results, red_flags_ret, (unsigned)left.seq=right.seq,
 												self := []), // blank out all other fields if RedFlagsOnly is selected
 												left outer);												
 final := if(RedFlagsOnly, just_red_flags, with_red_flags);
+
 output(final,named('RESULTS')) ;
 
 BOOLEAN  ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
@@ -1326,6 +1428,5 @@ dIPIn := PROJECT(fs,TRANSFORM(Royalty.RoyaltyNetAcuity.IPData,SELF.AcctNo := LEF
 dRoyaltiesByAcctno 	:= IF(trackNetacuityRoyalties, Royalty.RoyaltyNetAcuity.GetBatchRoyaltiesByAcctno(gateways, dIPIn, formed, TRUE));
 dRoyalties 					:= Royalty.GetBatchRoyalties(dRoyaltiesByAcctno + InsuranceRoyalties, ReturnDetailedRoyalties);
 output(dRoyalties,NAMED('RoyaltySet'));
-
 endmacro;
 // risk_indicators.InstantID_Batch();

@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, easi, std;
+﻿import Risk_Indicators, RiskWise, easi, std;
 
 
 export FP5812_1_0(
@@ -59,9 +59,9 @@ export FP5812_1_0(
 		combo_dobscore                   :=  le.bs.iid.combo_dobscore;
 		combo_dobcount                   :=  le.bs.iid.combo_dobcount;
 		rc_watchlist_flag                :=  le.bs.iid.watchlistHit;
-		fname_sources                    :=  StringLib.StringToUppercase(trim(le.bs.Source_Verification.firstnamesources));
-		lname_sources                    :=  StringLib.StringToUppercase(trim(le.bs.Source_Verification.lastnamesources));
-		addr_sources                     :=  StringLib.StringToUppercase(trim(le.bs.Source_Verification.addrsources));
+		fname_sources                    :=  STD.Str.ToUppercase(trim(le.bs.Source_Verification.firstnamesources));
+		lname_sources                    :=  STD.Str.ToUppercase(trim(le.bs.Source_Verification.lastnamesources));
+		addr_sources                     :=  STD.Str.ToUppercase(trim(le.bs.Source_Verification.addrsources));
 		ssnlength                        :=  le.bs.input_validation.ssn_length;
 		dobpop                           :=  (INTEGER)le.bs.input_validation.dateofbirth;
 		add1_isbestmatch                 :=  le.bs.address_verification.input_address_information.isbestmatch;
@@ -150,7 +150,7 @@ export FP5812_1_0(
 		
 		
 		/********************************************************************************/
-		INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
+		INTEGER contains_i( string haystack, string needle ) := (INTEGER)(STD.Str.Find(haystack, needle, 1) > 0);
 		/********************************************************************************/
 
 		
@@ -1883,6 +1883,7 @@ export FP5812_1_0(
 		self := le.iid;
 		self := le.shell_input;
 		self := le;
+   self := [];
 	END;
 	iid := project(clam, into_layout_output(left));
 

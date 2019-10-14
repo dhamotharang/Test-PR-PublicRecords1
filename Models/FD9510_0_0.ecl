@@ -1,4 +1,4 @@
-import ut, risk_indicators, address, RiskWise, std;
+﻿import ut, risk_indicators, RiskWise, std;
 
 export FD9510_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC=true, boolean nugen=false, boolean other_watchlists=false) := 
 
@@ -277,14 +277,15 @@ out := PROJECT(clam, doModel(LEFT));
 
 
 Risk_Indicators.Layout_Output into_layout_output(clam le) := transform
-	self.seq := le.seq;
-	self.socllowissue := (string)le.SSN_Verification.Validation.low_issue_date;
-	self.soclhighissue := (string)le.SSN_Verification.Validation.high_issue_date;
-	self.socsverlevel := le.iid.NAS_summary;
-	self.nxx_type := le.phone_verification.telcordia_type;
-	self := le.iid;
-	self := le.shell_input;
-	self := le;
+  self.seq := le.seq;
+  self.socllowissue := (string)le.SSN_Verification.Validation.low_issue_date;
+  self.soclhighissue := (string)le.SSN_Verification.Validation.high_issue_date;
+  self.socsverlevel := le.iid.NAS_summary;
+  self.nxx_type := le.phone_verification.telcordia_type;
+  self := le.iid;
+  self := le.shell_input;
+  self := le;
+  self:=[];
 end;
 iid := project(clam, into_layout_output(left));
 
