@@ -120,7 +120,7 @@ export t_User := record
 	string6 DOBMask {xpath('DOBMask')};//hidden[internal]
 	boolean ExcludeDMVPII {xpath('ExcludeDMVPII')};//hidden[internal]
 	boolean DLMask {xpath('DLMask')};//hidden[internal]
-	string DataRestrictionMask {xpath('DataRestrictionMask')};//hidden[internal]
+	string50 DataRestrictionMask {xpath('DataRestrictionMask')};//hidden[internal]
 	string50 DataPermissionMask {xpath('DataPermissionMask')};//hidden[internal]
 	string SourceCode {xpath('SourceCode')};//hidden[internal]
 	string32 ApplicationType {xpath('ApplicationType')};//hidden[internal]
@@ -136,9 +136,6 @@ export t_User := record
 	boolean OutcomeTrackingOptOut {xpath('OutcomeTrackingOptOut')};//hidden[internal]
 	integer NonSubjectSuppression {xpath('NonSubjectSuppression')};//hidden[ecl_only]
 	string ProductCode {xpath('ProductCode')};//hidden[internal]
-  string OutputType {xpath('OutputType')};
-	string10 DeathMasterPurpose {xpath('DeathMasterPurpose')};//hidden[internal]
-	string2 ResellerType {xpath('ResellerType')};//hidden[internal]
 end;
 		
 export t_LoginInfo := record
@@ -228,8 +225,6 @@ export t_OptionsForCVICalculation := record
 	boolean IncludeDOB {xpath('IncludeDOB')};
 	boolean IncludeDriverLicense {xpath('IncludeDriverLicense')};
 	boolean DisableCustomerNetworkOption {xpath('DisableCustomerNetworkOption')};
-  boolean IncludeITIN {xpath('IncludeITIN')};
-  boolean IncludeComplianceCap {xpath('IncludeComplianceCap')};
 end;
 		
 export t_AddressEx := record (t_Address)
@@ -332,18 +327,12 @@ export t_WsException := record
 	string256 Message {xpath('Message')};
 end;
 		
-export t_ResultDisclaimer := record
-	string Code {xpath('Code')};
-	string Message {xpath('Message')};
-end;
-              
 export t_ResponseHeader := record
 	integer Status {xpath('Status')};
 	string256 Message {xpath('Message')};
 	string50 QueryId {xpath('QueryId')};
 	string16 TransactionId {xpath('TransactionId')};
 	dataset(t_WsException) Exceptions {xpath('Exceptions/Item'), MAXCOUNT(iesp.Constants.MaxResponseExceptions)};
-	dataset(t_ResultDisclaimer) Disclaimers {xpath('Disclaimers/Disclaimer'), MAXCOUNT(1)};
 end;
 		
 export t_ServiceParameter := record
@@ -371,7 +360,6 @@ end;
 export t_BaseOption := record
 	boolean Blind {xpath('Blind')};//hidden[inhouse]
 	integer MakeVendorGatewayCall {xpath('MakeVendorGatewayCall')};//hidden[internal]
-	string2 IntendedUse {xpath('IntendedUse')};//hidden[internal]
 end;
 		
 export t_BaseSearchOption := record (t_BaseOption)
@@ -403,7 +391,6 @@ export t_Identity := record
 	string18 DeathCounty {xpath('DeathCounty')};
 	string2 DeathState {xpath('DeathState')};
 	string1 DeathVerificationCode {xpath('DeathVerificationCode')};
-	boolean IsLimitedAccessDMF {xpath('IsLimitedAccessDMF')};
 end;
 		
 export t_DocumentSource := record
