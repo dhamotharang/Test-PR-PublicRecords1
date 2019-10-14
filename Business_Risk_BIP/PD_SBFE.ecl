@@ -1,6 +1,4 @@
-﻿/*2016-01-05T00:34:45Z (Chris Albee_prod)
-Fix SBFE data. RR Bug # 196604.
-*/
+﻿
 IMPORT AutoStandardI, BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP, doxie, MDR;
 
 EXPORT PD_SBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre, 
@@ -19,12 +17,22 @@ EXPORT PD_SBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 			)
 		);
 		
-	 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+
+  mod_access := 
+    MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+      EXPORT STRING DataPermissionMask := '00000000000100000000'; // Flip Pos 12 on
+      EXPORT UNSIGNED1 glb := linkingOptions.GLBPurpose;
+      EXPORT UNSIGNED1 dppa := linkingOptions.DPPAPurpose;
+      EXPORT BOOLEAN show_minors := linkingOptions.IncludeMinors;
+      EXPORT UNSIGNED1 unrestricted := (UNSIGNED1)linkingOptions.AllowAll;
+      EXPORT BOOLEAN isPreGLBRestricted() := linkingOptions.restrictPreGLB;
+      EXPORT BOOLEAN ln_branded :=  linkingOptions.lnbranded;
+    END;
+ 
 	SHARED SBFERaw := Business_Credit.Key_LinkIds().kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
 																		mod_access,
                                     Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																		0, // ScoreThreshold --> 0 = Give me everything
-																		'00000000000100000000', // Flip Pos 12 on
 																		Business_Risk_BIP.Constants.Limit_SBFE_LinkIds,
 																		Options.KeepLargeBusinesses
 																		);
