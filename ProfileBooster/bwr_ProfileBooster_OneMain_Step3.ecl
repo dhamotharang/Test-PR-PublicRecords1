@@ -8,13 +8,13 @@
 
 import _Control, STD;
 
-EXPORT bwr_ProfileBooster_OneMain_Step3(string IPaddr, string AbsolutePath, string NotifyList, boolean onThor = TRUE) := function
+EXPORT bwr_ProfileBooster_OneMain_Step3(string IPaddr, string AbsolutePath, string NotifyList) := function
 
-// onThor := _Control.Environment.onThor;
+onThor := _Control.Environment.onThor;
 
 
 original_input := dataset('~thor400::profilebooster::SpringLeaf_full_infile.csv', ProfileBooster.Layouts.LayoutPBInputThor, csv(quote('"')));
-
+EmailList := If(NotifyList = '', ProfileBooster.Constants.ECL_Developers_Slim, ProfileBooster.Constants.ECL_Developers_Slim + ',' + NotifyList);
 
 
 // copied from ProfileBooster.Layouts.Layout_PB_BatchOutFlat and removed the v1_ so that the field names match batchout, which is what the customer wants
@@ -220,11 +220,11 @@ modified_batchoutflat_layout := RECORD
 END; 
 // read in the file into renamed layout, dedup it and remove lexid=0 records, which indicate pullid records, they dont want those
 original_output1 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part1', modified_batchoutflat_layout, csv(quote('"')));
-original_output2 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part2', modified_batchoutflat_layout, csv(quote('"')));
+original_output2 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part2test', modified_batchoutflat_layout, csv(quote('"')));
 original_output3 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part3', modified_batchoutflat_layout, csv(quote('"')));
 original_output4 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part4', modified_batchoutflat_layout, csv(quote('"')));
 
-original_output_full := original_output1 + original_output2 + original_output3 + original_output4;
+original_output_full := original_output1 + original_output2 + original_output3 + original_output4 : FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
 dedup_original_output := dedup(sort(original_output_full(lexid<>0), lexid), lexid);	// REMOVE RECORDS WHERE LEXID = 0 (PULLID)
 
 
@@ -443,15 +443,20 @@ reducedInput := join(original_input, project_deduped, left.lexid=right.lexid, tr
  t := table(original_output_full, {lexid, lexidcount := count(group)}, lexid); 
  output(t(lexidcount>1), named('count_output_with_lexid'));
  	
- EmailList := If(NotifyList = '', ProfileBooster.Constants.ECL_Developers_Slim, ProfileBooster.Constants.ECL_Developers_Slim + ',' + NotifyList);
+ 
+ desprayPath := AbsolutePath  + '/' +  'LN_Output_springleaf_layout_ProfBooster.csv';
+ desprayPathPII := AbsolutePath +  '/' + 'LN_Output_springleaf_layout_PII.csv';
+
+STD.File.DeSpray('~thor400::profilebooster::LN_Output_springleaf_layout_ProfBooster.csv', IPaddr, desprayPath): FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 Despray failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+STD.File.DeSpray('~thor400::profilebooster::LN_Output_springleaf_layout_PII.csv', IPaddr, desprayPathPII): FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 PII Despray failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));	
 	
 // email results of this bwr
-FileServices.SendEmail(EmailList, 'OneMain Step3 finished ' + WORKUNIT, 'Original Input count  ' + ded + '    Original Output count ' + ded2 +
-																																			'   Duplicate LexID count ' + count(t(lexidcount>1)) + '  Reduced Input count ' + count(reducedInput) + '   Output count ' + count(project_deduped)):
-FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+	
+	FileServices.SendEmail(EmailList, 'OneMain Step3 finished ' + WORKUNIT, 'Original Input count  ' + ded + '    Original Output count ' + ded2 +
+																																			' Duplicate LexID count ' + count(t(lexidcount>1)) + '  Reduced Input count ' + count(reducedInput) + '   Output count ' + count(project_deduped)):
+	FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
 
-STD.File.DeSpray('~thor400::profilebooster::LN_Output_springleaf_layout_ProfBooster.csv', IPaddr, AbsolutePath);
-STD.File.DeSpray('~thor400::profilebooster::LN_Output_springleaf_layout_PII.csv', IPaddr, AbsolutePath);
+
 
 RETURN 'SUCCESSFUL';
 

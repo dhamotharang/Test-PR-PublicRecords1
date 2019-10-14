@@ -1,6 +1,6 @@
 ﻿import risk_indicators, address;
 
-EXPORT OneMain_Step2_Function(DATASET(ProfileBooster.Layouts.LayoutPBInputThor) ds_in, integer eyeball_count=10) := function
+EXPORT OneMain_Step2_Function(DATASET(ProfileBooster.Layouts.LayoutPBInputThor) ds_in, integer eyeball_count=10, string StepName = '') := function
 	
 	dist_ds := distribute(ds_in, random());
 	batch_in := project(dist_ds, transform(ProfileBooster.Layouts.Layout_PB_In, 
@@ -39,7 +39,7 @@ EXPORT OneMain_Step2_Function(DATASET(ProfileBooster.Layouts.LayoutPBInputThor) 
 																	self.street_addr := street_address;
 																	self := left ) );
 																		
-	attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest);  
+	attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest,false, '',  StepName);  
  
 	ProfileBooster.Layouts.Layout_PB_BatchOutFlat addAcct(attributes le, PB_wSeq ri) := transform
 		self.AcctNo 																	:= ri.AcctNo;
@@ -234,9 +234,9 @@ EXPORT OneMain_Step2_Function(DATASET(ProfileBooster.Layouts.LayoutPBInputThor) 
 								left.seq = right.seq,
 								addAcct(left, right)); 
 
-output(choosen(batch_in, eyeball_count), named('batch_in_sample'));
-output(choosen(pb_wseq, eyeball_count), named('pb_wseq'));																
-output(choosen(attributes, eyeball_count), named('Search_Function_attributes'));
+output(choosen(batch_in, eyeball_count), named('batch_in_sample_' + StepName));
+output(choosen(pb_wseq, eyeball_count), named('pb_wseq_' + StepName));																
+output(choosen(attributes, eyeball_count), named('Search_Function_attributes_' + StepName));
 		
 return search_function_with_acctno;
 
