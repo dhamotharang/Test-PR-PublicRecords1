@@ -1371,7 +1371,7 @@ Person: => AssociatedWithFraudOffensesFlag := MAP(name_ssn_dob_match = 0 AND Fra
 
 // NOTE: This is "best" from the contributed not Best Best.
 
-Person: => BestFullName := ONLY(TOPN(FullName(NOT FirstName:Null AND NOT LastName:Null), 1, -EventDate));
+Person: => BestFullName := ONLY(TOPN(FullName(TRIM(FirstName) != '' AND TRIM(LastName) != ''), 1, -EventDate));
 Person: => Label := TRIM(BestFullName.FirstName) + ' ' + TRIM(BestFullName.LastName);
 
 Person: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
