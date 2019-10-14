@@ -45,9 +45,9 @@ EXPORT Raw_ProfessionalLicenses :=
             RETURN ds_outDataSet;  
           END; // fn_get_ProfLicMari_BdidData
             
-        EXPORT fn_get_ProfLicMari_LinkIdData (  dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid, STRING1 FetchLevel ):=
+        EXPORT fn_get_ProfLicMari_LinkIdData (  dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid, doxie.IDataAccess mod_access, STRING1 FetchLevel ):=
           FUNCTION
-            ds_ProfLicMari_linkid_recs := CHOOSEN(Prof_License_Mari.key_Linkids.kFetch(in_linkid, FetchLevel),ut.limits.default);
+            ds_ProfLicMari_linkid_recs := CHOOSEN(Prof_License_Mari.key_Linkids.kFetch(in_linkid, mod_access, FetchLevel),ut.limits.default);
             MIDEX_Services.Macros.MAC_GetProfLic_MidexLayout_mariRid(ds_ProfLicMari_linkid_recs, ds_outDataSet );
             RETURN ds_outDataSet;  
           END; // fn_get_ProfLicMari_LinkIdData

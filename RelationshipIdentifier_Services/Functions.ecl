@@ -129,7 +129,7 @@ EXPORT Functions := MODULE
 		 // sample did = 969216909 showing realestate as a lic_type
 		 FETCHLEVEL := BIPV2.IDconstants.Fetch_Level_SELEID;
 	   mari_rid_did := MIDEX_Services.Raw_ProfessionalLicenses.fn_get_ProfLicMari_DidData(Midexdid);
-		 mari_rid_bus := MIDEX_Services.Raw_ProfessionalLicenses.fn_get_ProfLicMari_LinkIdData(midexLinkids, FETCHLEVEL);
+		 mari_rid_bus := MIDEX_Services.Raw_ProfessionalLicenses.fn_get_ProfLicMari_LinkIdData(midexLinkids, mod_access, FETCHLEVEL);
 		 mari_rid := if (midexDID <> 0, mari_rid_did, 
 		                   mari_rid_bus);
      // MIDEX_Services.Raw_ProfessionalLicenses.license.report_view.by_mari_num
@@ -149,7 +149,7 @@ EXPORT Functions := MODULE
 		 
     //sancData := MIDEX_Services.Raw_Public.fn_get_PublicSanctnDidData(963597298);
 		sancData_did := MIDEX_Services.Raw_Public.fn_get_PublicSanctnDidData(midexDID);
-		sancData_bus := MIDEX_Services.Raw_Public.fn_get_PublicSanctnLinkIdData(midexlinkids, FETCHLEVEL);
+		sancData_bus := MIDEX_Services.Raw_Public.fn_get_PublicSanctnLinkIdData(midexlinkids, mod_access, FETCHLEVEL);
 		sancdata := if (midexDID <> 0, sancData_did, sancData_bus);
 		SancDataPayload := MIDEX_Services.Raw_Public.license.report_view.by_midex_rpt_num(sancData,mod_access);
 		
