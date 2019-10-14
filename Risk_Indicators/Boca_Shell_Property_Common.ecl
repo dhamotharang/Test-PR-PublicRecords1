@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster, risk_indicators;
+﻿IMPORT _Control, Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster, risk_indicators, STD;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_PropertyRecord) p_address,
@@ -165,8 +165,8 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_Propert
 	// We wouldn't ever want to use this id among, say, 1 million records, but among all
 	// the properties owned by a particular person, it's unique enough.
 	STRING8 unique_property_id(STRING prim_range, STRING prim_name) :=
-		StringLib.StringFilter(
-			StringLib.StringToUpperCase(
+		STD.str.Filter(
+			STD.str.ToUpperCase(
 				TRIM(prim_range) + TRIM(prim_name)
 			), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'	);
 	
@@ -178,7 +178,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_Propert
 		
 	getMortgageType(STRING mortgage_loan_type_code, STRING vendor_source_flag) :=
 		FUNCTION
-			loan_type_code := TRIM(stringlib.stringtouppercase(mortgage_loan_type_code));
+			loan_type_code := TRIM(STD.str.touppercase(mortgage_loan_type_code));
 			is_fares       := vendor_source_flag = FARES;
 			is_fidelity    := vendor_source_flag = FIDELITY;
 			mortgage_type  := risk_indicators.iid_constants.mortgage_type(is_fidelity, is_fares, loan_type_code);
@@ -187,7 +187,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_Propert
 
 	getFinancingType(STRING finance_type_code, STRING vendor_source_flag) :=
 		FUNCTION
-			finance_type_cd := TRIM(stringlib.stringtouppercase(finance_type_code));
+			finance_type_cd := TRIM(STD.str.touppercase(finance_type_code));
 			is_fares        := vendor_source_flag = FARES;
 			is_fidelity     := vendor_source_flag = FIDELITY;
 			mortgage_type   := risk_indicators.iid_constants.type_financing(is_fidelity, is_fares, finance_type_cd);
@@ -359,7 +359,7 @@ end;
 
 	// dataset named 'ids' coming in contains all input DIDs, relative DIDs and neighborhood DIDs.  
 	// going to dedup this down to all unique DIDs before searching property data
-	unique_dids := dedup( sort( distribute(ids, did), did, local), did, local ) ;
+	unique_dids := dedup( sort( distribute(ids, did), did, historydate, local), did, historydate, local ) ;
 	ids_plus_fares_by_did_thor :=
 
 		JOIN( 
@@ -371,6 +371,8 @@ end;
 			ATMOST(left.did=right.s_did, RiskWise.max_atmost) ,
 			local
 		);
+
+
 
 #IF(onThor)
 	ids_plus_fares_by_did := group(ids_plus_fares_by_did_thor, seq); // add group by seq to make both branches have same grouping
@@ -384,19 +386,19 @@ end;
 		DEDUP(
 			SORT(
 				p_address,
-				seq, did, isrelat, fname, lname, prim_range, prim_name, sec_range, city_name, st, zip5
+				seq, did, historydate, isrelat, fname, lname, prim_range, prim_name, sec_range, city_name, st, zip5
 
 			),
-			seq, did, isrelat, fname, lname, prim_range, prim_name, sec_range, city_name, st, zip5
+			seq, did, historydate, isrelat, fname, lname, prim_range, prim_name, sec_range, city_name, st, zip5
 		);	
 	
 	p_addr_thor := 
 		DEDUP(
 			SORT(
 				distribute(p_address, did),
-				did, prim_range, prim_name, sec_range, city_name, st, zip5, isrelat, fname, lname, local
+				did, historydate, prim_range, prim_name, sec_range, city_name, st, zip5, isrelat, fname, lname, local
 			),
-			did, prim_range, prim_name, sec_range, city_name, st, zip5, local
+			did, historydate, prim_range, prim_name, sec_range, city_name, st, zip5, local
 		);
 		
 	#IF(onThor)
@@ -481,6 +483,7 @@ end;
 			), 
 			seq, inp_did, ln_fares_id, local 
 		);
+
 		
 // dedup the dids and ln_fares_ids so we're only searching the property data 1 time with those combinations
 // do it now just for the thor job, but likely would be a good idea to do this in roxie version as well 
@@ -539,10 +542,10 @@ end;
 				SELF.assessment := LEFT.assessments[1];
 				SELF.parties    := LEFT.parties;
 	// need to extract state from deed and assessment record so we can filter out restricted states for Profile Booster
-				deed_comma 			:= stringlib.stringfind(LEFT.deeds[1].property_address_citystatezip, ',', 1);
+				deed_comma 			:= STD.str.find(LEFT.deeds[1].property_address_citystatezip, ',', 1);
 				deed_st    			:= LEFT.deeds[1].property_address_citystatezip[deed_comma+2..deed_comma+3];  //city is followed by comma and space, then state
 				SELF.deed_st    := deed_st;
-				assm_comma 			:= stringlib.stringfind(LEFT.assessments[1].property_city_state_zip, ',', 1);
+				assm_comma 			:= STD.str.find(LEFT.assessments[1].property_city_state_zip, ',', 1);
 				assm_st    			:= LEFT.assessments[1].property_city_state_zip[assm_comma+2..assm_comma+3];  //city is followed by comma and space, then state
 				SELF.assm_st    := assm_st;
 				SELF            := LEFT;
@@ -552,7 +555,7 @@ end;
 	// 2.c. And now project into a (much) slimmer layout to conserve memory.
 	property_records_full := 
 		PROJECT(if(is_from_PB,  //need to filter out restricted states if this is being called from Profile Booster
-			property_records_full_pre(TRIM(stringlib.stringtouppercase(deed_st)) not in ProfileBooster.Constants.setPropertyStatesRes and TRIM(stringlib.stringtouppercase(assm_st)) not in ProfileBooster.Constants.setPropertyStatesRes),
+			property_records_full_pre(TRIM(STD.str.touppercase(deed_st)) not in ProfileBooster.Constants.setPropertyStatesRes and TRIM(STD.str.touppercase(assm_st)) not in ProfileBooster.Constants.setPropertyStatesRes),
 			property_records_full_pre),
 			TRANSFORM( layout_properties_temp,
 				SELF.deed       := LEFT.deed;
@@ -1248,7 +1251,7 @@ end;
 	// output(ds_property_sold_records, named('ds_property_sold_records'));
 	// output(ds_final, named('ds_final'));
 	// output(single_property, named('single_property'));
-
+																	
 	RETURN Single_Property;
 
 END;
