@@ -784,8 +784,7 @@ export fn_add_xtra_bk_matchcodes(dataset(BatchServices.layout_BankruptcyV3_Batch
 	ds_adl_append := JOIN(ds_xtra_mc_rulz, ds_comp,
 							LEFT.acctno = RIGHT.acctno,
 							TRANSFORM(rec_out,
-								SELF.matchcode 		:= IF(matchcode_adl_append,
-															Functions.fn_augment_addr_matchcode(LEFT.matchcode, 
+								matchcode:=Functions.fn_augment_addr_matchcode(LEFT.matchcode,
 																								RIGHT.prim_range + 
 																									RIGHT.predir + 
 																									RIGHT.prim_name + 
@@ -797,8 +796,8 @@ export fn_add_xtra_bk_matchcodes(dataset(BatchServices.layout_BankruptcyV3_Batch
 																								RIGHT.score,
 																								RIGHT.score_bdid,
 																								did_score_threshold,
-																								bdid_score_threshold),
-															StringLib.StringFilterOut(LEFT.matchcode, MatchCodes.did));
+																								bdid_score_threshold);
+								SELF.matchcode:=IF(matchcode_adl_append and matchcode!='',matchcode,LEFT.matchcode),
 								SELF := LEFT));
 
 	ds_ddp := DEDUP(SORT(ds_adl_append, acctno, tmsid, -matchcode), acctno, tmsid, matchcode);
