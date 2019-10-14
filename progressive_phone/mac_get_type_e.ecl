@@ -1,4 +1,4 @@
-export mac_get_type_e(f_e_did, f_e_acctno, f_e_out, includeRelativeCell=false, modAccess) := macro
+export mac_get_type_e(f_e_did, f_e_acctno, f_e_out, mod_access, includeRelativeCell=false) := macro
 
 import doxie_raw, didville, ut, NID, Header, Suppress, STD;
 
@@ -13,8 +13,8 @@ import doxie_raw, didville, ut, NID, Header, Suppress, STD;
 doxie_raw.Layout_RelativeRawBatchInput %get_rel%(f_e_did l) := transform
 	self.input.seq := l.seq;
 	self.input.did := l.did;
-	self.input.glb_purpose := modAccess.glb;
-	self.input.dppa_purpose := modAccess.dppa;
+	self.input.glb_purpose := mod_access.glb;
+	self.input.dppa_purpose := mod_access.dppa;
 	self.input.ln_branded_value := true;
 	self.input.include_relatives_val := true;
 	self.input.include_associates_val := true;
@@ -56,7 +56,7 @@ end;
 %f_rel_did% := project(%f_rel_match_w_title%, %get_rel_did%(left));
 
 #uniquename(blue_recs)
-progressive_phone.mac_get_blue(%f_rel_did%, %blue_recs%, false, false, false, modAccess)
+progressive_phone.mac_get_blue(%f_rel_did%, %blue_recs%, false, false, false, mod_access)
 
 #uniquename(todays_date)
 %todays_date% := (string8) Std.Date.Today();
@@ -72,6 +72,7 @@ progressive_phone.mac_get_blue(%f_rel_did%, %blue_recs%, false, false, false, mo
   boolean   same_lname;
 	unsigned  recent_cohabit;
 	unsigned4 rel_rank;
+  unsigned6 key_did := 0;
   unsigned4 global_sid := 0;
   unsigned8 record_sid := 0;
 end;
@@ -100,11 +101,16 @@ end;
   self.p_name_last := r.name_last;
 	self.p_name_first := r.name_first;
 	self.sub_rule_number := 41;
+  self.key_did := r.did;
+  self.global_sid := r.global_sid;
+  self.record_sid := r.record_sid;
 	self := r;
 	self := [];
 end;
 
 #uniquename(f_e_out_by_addr_lname)
+#uniquename(f_e_out_by_addr_lname_optout)
+
 %f_e_out_by_addr_lname% := join(%f_six_months%, %gong_addr_key%,
                                 keyed(left.prim_name = right.prim_name) and
 	                              keyed(left.zip = right.z5) and
@@ -119,6 +125,7 @@ end;
 										             NID.mod_PFirstTools.PFLeqPFR(left.fname, right.name_first) or left.fname[1]=right.name_first),
 		                            %by_addr_lname%(left, right),limit(ut.limits.PHONE_PER_PERSON, skip));
 
+%f_e_out_by_addr_lname_optout% := Suppress.MAC_SuppressSource(%f_e_out_by_addr_lname%, mod_access, key_did);
 #uniquename(by_did)
 %with_cohabit_did_rec% %by_did%(%f_rel_did% l,
                                 %gong_did_key% r) := transform
@@ -160,7 +167,7 @@ end;
 %f_e_out_by_did_suppressed% := Suppress.MAC_SuppressSource(%f_e_out_by_did%, mod_access);
 
 #uniquename(f_e_out_ready)
-%f_e_out_ready% := %f_e_out_by_addr_lname% + %f_e_out_by_did_suppressed%;
+%f_e_out_ready% := %f_e_out_by_addr_lname_optout% + %f_e_out_by_did_suppressed%;
 
 #uniquename(f_e_out_dep)
 %f_e_out_dep% := dedup(sort(%f_e_out_ready%, record), record);
@@ -206,7 +213,7 @@ end;
 %g_in% := join(%f_rel_match_init%,f_e_acctno,left.seq = right.seq,transform(recordof(f_e_did),self.acctno :=right.acctno,self.did := left.person2,self := left,self := []));
 
 #uniquename(f_out_type_g_for_e)
-progressive_phone.mac_get_type_g(%g_in%, f_e_acctno, %f_out_type_g_for_e%, modAccess)
+progressive_phone.mac_get_type_g(%g_in%, f_e_acctno, %f_out_type_g_for_e%, mod_access)
 
 #uniquename(f_g_to_e_ready)
 // the join below assigns the sequence number vs the account number to the acctno to be like the other relative rows
