@@ -1,91 +1,96 @@
 ﻿/*--SOAP--
 <message name="FlexID (aka IID Model)">
-	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="33"/>
-	<part name="DPPAPurpose" type="xsd:byte"/>
-	<part name="GLBPurpose" type="xsd:byte"/> 
-	<part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="DataPermissionMask" type="xsd:string"/>
-	<part name="IndustryClass" type="xsd:string"/>
-	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
-	<part name="PoBoxCompliance" type="xsd:boolean"/>	
-	<part name="UseDOBFilter" type="xsd:boolean"/>
-	<part name="DOBRadius" type="xsd:unsignedInt"/>	
-	<part name="Model" type="xsd:string"/>
-	<part name="Targus" type="xsd:boolean"/>
-	<part name="IncludeTargusE3220" type="xsd:boolean"/>
-	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
-	<part name="IncludeMSoverride" type="xsd:boolean"/>
-	<part name="IncludeCLOverride" type="xsd:boolean"/>
+    <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="33"/>
+    <part name="DPPAPurpose" type="xsd:byte"/>
+    <part name="GLBPurpose" type="xsd:byte"/> 
+    <part name="DataRestrictionMask" type="xsd:string"/>
+    <part name="DataPermissionMask" type="xsd:string"/>
+    <part name="IndustryClass" type="xsd:string"/>
+    <part name="HistoryDateYYYYMM" type="xsd:integer"/>
+    <part name="PoBoxCompliance" type="xsd:boolean"/>	
+    <part name="UseDOBFilter" type="xsd:boolean"/>
+    <part name="DOBRadius" type="xsd:unsignedInt"/>	
+    <part name="Model" type="xsd:string"/>
+    <part name="Targus" type="xsd:boolean"/>
+    <part name="IncludeTargusE3220" type="xsd:boolean"/>
+    <part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
+    <part name="IncludeMSoverride" type="xsd:boolean"/>
+    <part name="IncludeCLOverride" type="xsd:boolean"/>
 
-	<part name="ExactFirstNameMatch" type="xsd:boolean"/>
-	<part name="ExactLastNameMatch" type="xsd:boolean"/>
-	<part name="ExactFirstNameMatchAllowNicknames" type="xsd:boolean"/>
-	<part name="ExactPhoneMatch" type="xsd:boolean"/>
-	<part name="ExactSSNMatch" type="xsd:boolean"/>
-	<part name="ExactDOBMatch" type="xsd:boolean"/>
-	<part name="ExactAddrMatch" type="xsd:boolean"/>
-	<part name="ExactDriverLicenseMatch" type="xsd:boolean"/>
+    <part name="ExactFirstNameMatch" type="xsd:boolean"/>
+    <part name="ExactLastNameMatch" type="xsd:boolean"/>
+    <part name="ExactFirstNameMatchAllowNicknames" type="xsd:boolean"/>
+    <part name="ExactPhoneMatch" type="xsd:boolean"/>
+    <part name="ExactSSNMatch" type="xsd:boolean"/>
+    <part name="ExactDOBMatch" type="xsd:boolean"/>
+    <part name="ExactAddrMatch" type="xsd:boolean"/>
+    <part name="ExactDriverLicenseMatch" type="xsd:boolean"/>
 
-	<part name="IncludeAllRiskIndicators" type="xsd:boolean"/>
-	<part name="IncludeVerifiedElementSummary" type="xsd:boolean"/>
-	<part name="IncludeDLverification" type="xsd:boolean"/>
-	<part name="DOBMatchType" type="xsd:string"/>
-	<part name="DOBMatchYearRadius" type="xsd:unsignedInt"/>
+    <part name="IncludeAllRiskIndicators" type="xsd:boolean"/>
+    <part name="IncludeVerifiedElementSummary" type="xsd:boolean"/>
+    <part name="IncludeDLverification" type="xsd:boolean"/>
+    <part name="DOBMatchType" type="xsd:string"/>
+    <part name="DOBMatchYearRadius" type="xsd:unsignedInt"/>
 
-	<part name="IncludeRiskIndices" type="xsd:boolean"/>
-	<part name="CustomCVIModelName" type="xsd:string"/>
-	<part name="LastSeenThreshold" type="xsd:string"/>
-	<part name="IncludeMIoverride" type="xsd:boolean"/>
-	<part name="IncludeDOBinCVI" type="xsd:boolean"/>
-	<part name="IncludeDriverLicenseInCVI" type="xsd:boolean"/>
-	<part name="DisableInquiriesInCVI" type="xsd:boolean"/>
-	<part name="IncludeVerifiedSSN" type="xsd:boolean"/>
-	<part name="DisallowInsurancePhoneHeaderGateway" type="xsd:boolean"/>
-	<part name="CompanyID" type="xsd:string"/>
-	<part name="ProductCode" type="xsd:string"/>
-	<part name="InstantIDVersion" type="xsd:string"/>
-	<part name="IIDVersionOverride" type="xsd:boolean"/>
-	
-	<part name="Include_ALL_Watchlist" type="xsd:boolean"/>
-	<part name="Include_BES_Watchlist" type="xsd:boolean"/>
-	<part name="Include_CFTC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_DTC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_EUDT_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FBI_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FCEN_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FAR_Watchlist" type="xsd:boolean"/>
-	<part name="Include_IMW_Watchlist" type="xsd:boolean"/>
-	<part name="Include_OFAC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_OCC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_OSFI_Watchlist" type="xsd:boolean"/>
-	<part name="Include_PEP_Watchlist" type="xsd:boolean"/>
-	<part name="Include_SDT_Watchlist" type="xsd:boolean"/>
-	<part name="Include_BIS_Watchlist" type="xsd:boolean"/>
-	<part name="Include_UNNT_Watchlist" type="xsd:boolean"/>
-	<part name="Include_WBIF_Watchlist" type="xsd:boolean"/>
+    <part name="IncludeRiskIndices" type="xsd:boolean"/>
+    <part name="CustomCVIModelName" type="xsd:string"/>
+    <part name="LastSeenThreshold" type="xsd:string"/>
+    <part name="IncludeMIoverride" type="xsd:boolean"/>
+    <part name="IncludeDOBinCVI" type="xsd:boolean"/>
+    <part name="IncludeDriverLicenseInCVI" type="xsd:boolean"/>
+    <part name="DisableInquiriesInCVI" type="xsd:boolean"/>
+    <part name="IncludeVerifiedSSN" type="xsd:boolean"/>
+    <part name="DisallowInsurancePhoneHeaderGateway" type="xsd:boolean"/>
+    <part name="CompanyID" type="xsd:string"/>
+    <part name="ProductCode" type="xsd:string"/>
+    <part name="InstantIDVersion" type="xsd:string"/>
+    <part name="IIDVersionOverride" type="xsd:boolean"/>
+    
+    <part name="Include_ALL_Watchlist" type="xsd:boolean"/>
+    <part name="Include_BES_Watchlist" type="xsd:boolean"/>
+    <part name="Include_CFTC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_DTC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_EUDT_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FBI_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FCEN_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FAR_Watchlist" type="xsd:boolean"/>
+    <part name="Include_IMW_Watchlist" type="xsd:boolean"/>
+    <part name="Include_OFAC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_OCC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_OSFI_Watchlist" type="xsd:boolean"/>
+    <part name="Include_PEP_Watchlist" type="xsd:boolean"/>
+    <part name="Include_SDT_Watchlist" type="xsd:boolean"/>
+    <part name="Include_BIS_Watchlist" type="xsd:boolean"/>
+    <part name="Include_UNNT_Watchlist" type="xsd:boolean"/>
+    <part name="Include_WBIF_Watchlist" type="xsd:boolean"/>
 
-	<part name="Include_ADFA_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FAJC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FATF_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FBIH_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FBIS_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FBIT_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FBIW_Watchlist" type="xsd:boolean"/>
-	<part name="Include_HKMA_Watchlist" type="xsd:boolean"/>
-	<part name="Include_MASI_Watchlist" type="xsd:boolean"/>
-	<part name="Include_OFFC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_PMLC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_PMLJ_Watchlist" type="xsd:boolean"/>
+    <part name="Include_ADFA_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FAJC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FATF_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FBIH_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FBIS_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FBIT_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FBIW_Watchlist" type="xsd:boolean"/>
+    <part name="Include_HKMA_Watchlist" type="xsd:boolean"/>
+    <part name="Include_MASI_Watchlist" type="xsd:boolean"/>
+    <part name="Include_OFFC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_PMLC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_PMLJ_Watchlist" type="xsd:boolean"/>
 
-	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
-	<part name="EnableEmergingID" type="xsd:boolean"/>	
-	<part name="NameInputOrder" type="xsd:string"/>	
-	<part name="IncludeOFAC" type="xsd:boolean"/>	
-	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>	
-	<part name="ExcludeWatchLists" type="xsd:boolean"/>	
-	<part name="OFACOnly" type="xsd:boolean"/>	
-	<part name="GlobalWatchlistThreshold" type="xsd:real"/>	
-	<part name="OFACversion" type="xsd:unsignedInt"/>	
+    <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
+    <part name="EnableEmergingID" type="xsd:boolean"/>	
+    <part name="NameInputOrder" type="xsd:string"/>	
+    <part name="IncludeOFAC" type="xsd:boolean"/>	
+    <part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>	
+    <part name="ExcludeWatchLists" type="xsd:boolean"/>	
+    <part name="OFACOnly" type="xsd:boolean"/>	
+    <part name="GlobalWatchlistThreshold" type="xsd:real"/>	
+    <part name="OFACversion" type="xsd:unsignedInt"/>
+    <part name="disablenongovernmentdldata" type="xsd:boolean"/>
+    <part name="IncludeEmailVerification" type="xsd:boolean"/>
+    <part name="IncludeITIN" type="xsd:boolean"/>
+    <part name="IncludeComplianceCap" type="xsd:boolean"/>
+    <part name="IncludeDigitalIdentity" type="xsd:boolean"/>
  </message>
 */
 /*--HELP--
@@ -226,6 +231,11 @@ string1 IIDVersion := '0'										: STORED('InstantIDVersion');		// set this ve
 boolean IIDVersionOverride := false					: STORED('IIDVersionOverride');	// back office tag that, if true, allows a version lower than the lowestAllowedVersion
 boolean EnableEmergingID := false						: STORED('EnableEmergingID');	// back office tag that, if true, invokes additional logic for appending DID
 string3 NameInputOrder := ''								: STORED('NameInputOrder');	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
+boolean IncludeEmailverification := false : STORED('IncludeEmailverification');
+boolean disablenongovernmentdldata := false : STORED('disablenongovernmentdldata'); //to exclude non government data in DL Verification
+boolean IncludeITIN := false                : STORED('IncludeITIN'); // to disable override option when ITIN exists.
+boolean IncludeComplianceCap  := false      : STORED('IncludeComplianceCap');  // to prevent cvi increase when dob and license are included in NAS and NAP combination.
+boolean IncludeDigitalIdentity  := false      : STORED('IncludeDigitalIdentity');
 
 unsigned1 lowestAllowedVersion := 1;	// lowest allowed version according to product, unless the IIDVersionOveride is true
 unsigned1 maxAllowedVersion := 1;	// maximum allowed version as of 1/28/2014
@@ -387,6 +397,7 @@ integer BSVersion := MAP (
 													ModelName in ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9'] => 51,	
 													51);  //for the Emerging Identities project, default BS version to 51
 
+enableEquifaxPhoneMart:= DataRestriction[Risk_indicators.iid_constants.enableEquifaxPhoneMart]=Risk_indicators.iid_constants.sFalse;
 unsigned8 BSOptions := 	if(doInquiries, risk_indicators.iid_constants.BSOptions.IncludeInquiries, 0) +
 												if(~DisallowInsurancePhoneHeaderGateway and actualIIDVersion=1, risk_indicators.iid_constants.BSOptions.IncludeInsNAP, 0) +
 												if(actualIIDVersion=1, risk_indicators.iid_constants.BSOptions.IsInstantIDv1, 0) +
@@ -396,8 +407,10 @@ unsigned8 BSOptions := 	if(doInquiries, risk_indicators.iid_constants.BSOptions.
 														0) +
 												if(AllowInsuranceDL, risk_indicators.iid_constants.BSOptions.AllowInsuranceDLInfo, 0) +  //Allows use of Insurance DL information
 												if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0) +
-												if(bsversion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0);	//Invokes additional DID append logic
-												
+												if(bsversion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0)+	//Invokes additional DID append logic
+												if(IncludeDigitalIdentity,Risk_indicators.iid_constants.BSOptions.runthreatmetrix,0)+
+                  if(disablenongovernmentdldata, risk_indicators.iid_constants.BSOptions.disablenongovernmentdldata, 0) + //check to disable use of Non Governmental DL information
+                  if(enableEquifaxPhoneMart,Risk_indicators.iid_constants.BSOptions.enableEquifaxPhoneMart,0);
 // JRP 02/12/2008 - Dataset of actioncode and reasoncode settings which are passed to the getactioncodes and reasoncodes functions.
 boolean IsInstantID := true;
 reasoncode_settings := dataset([{IsInstantID,actualIIDVersion,EnableEmergingID}],riskwise.layouts.reasoncode_settings);
@@ -529,7 +542,16 @@ LayoutFlexIDBatchOutExt := RECORD
 	boolean insurance_dl_used;
 END;
 
-LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
+//  For ThreatMetrix reasoncodes
+TMX_model:=Models.IID1906_0_0(ret);
+DRM_threatmetrix:= DataRestriction[Risk_indicators.iid_constants.IncludeDigitalIdentity]=Risk_indicators.iid_constants.sFalse;
+ retplus_tmx:= if(DRM_threatmetrix,join(ret,TMX_model,left.seq=right.seq,
+ transform(risk_indicators.layout_output,
+ self.iid_tmx.phonehighriskind:=RIGHT.phonehighriskind,
+ self.iid_tmx.emailhighriskind:=Right.emailhighriskind,
+ self:=LEFT),left outer),ungroup(ret));
+ 
+LayoutFlexIDBatchOutExt format_out(retplus_tmx le, fs ri) := TRANSFORM
 	SELF.seq := (string)ri.seq;
 	SELF.acctNo := ri.acctno;
 	
@@ -548,7 +570,7 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 	cvi_temp := if(actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel, le.socsverlevel, le, le.correctssn, le.correctaddr, le.correcthphone, '', veraddr, verlast,
 																															OFAC),
 																			risk_indicators.cviScoreV1(le.phoneverlevel, le.socsverlevel, le, le.correctssn, le.correctaddr, le.correcthphone, '', veraddr, verlast,
-																																	OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI));
+																																	OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,'',IncludeITIN,IncludeComplianceCap));
 	isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
 	SELF.ComprehensiveVerificationIndex := MAP(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
 							IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
@@ -603,6 +625,7 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 		
 	// Summary Verification flags
 	SELF.VerifiedElementSummaryFirstName := if(IncludeSummaryFlags, if(le.combo_firstcount>0, '1', '0'), '');
+	SELF.VerifiedElementSummaryMiddleName := if(IncludeSummaryFlags, if(le.combo_middlecount>0, '1', '0'), '');
 	SELF.VerifiedElementSummaryLastName := if(IncludeSummaryFlags, if(le.combo_lastcount>0, '1', '0'), '');
 	addrScore := Risk_Indicators.AddrScore.AddressScore(	le.combo_prim_range, le.combo_prim_name, le.combo_sec_range,
 																			le.prim_range, le.prim_name, le.sec_range);																					
@@ -624,6 +647,7 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 	SELF.VerifiedElementSummaryDOB := if(le.combo_dobcount>0, '1', '0');
 	SELF.VerifiedElementSummaryDOBMatchLevel := le.dobmatchlevel;
 	SELF.VerifiedElementSummaryDL := if(IncludeDLVerification, if(le.verified_dl<>'', '1', '0'), '');
+	SELF.VerifiedElementSummaryEmail := if(IncludeEmailVerification, if(le.VerifiedEmail<>'', '1', '0'), '');
 	
 	// Summary Validation flags
 	SELF.ValidElementSummarySSNDeceased := if(le.decsflag='1', '1', '0');
@@ -655,8 +679,12 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 																						le.sec_range <> '' and isReasonCodeSR															=> 'M',	 //input sec range, but our data shows different sec range
 																						le.sec_range = '' and ~isReasonCodeSR															=> 'N',	 //no input sec range and our data does not have one
 																																																								 'V'); //input sec range matches our data
-	
-	SELF := [];
+ SELF.BureauDeleted  := if(le.header_summary.EQ_ssn_nlr or le.header_summary.EN_ssn_nlr or le.header_summary.TN_ssn_nlr, true, false);
+ SELF.ITINExpired:=le.ITINExpired;
+ SELF.IsPhoneCurrent:=le.IsPhoneCurrent;
+ SELF.PhoneLineType:=le.PhoneLineType;
+ SELF.PhoneLineDescription:=le.PhoneLineDescription;
+ SELF := [];
 END;
 formedbeforeAdvo := join(ret, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
 formedWithAdvo := join(formedbeforeAdvo, with_advo, (integer)left.seq = right.seq, 

@@ -6,7 +6,7 @@ export iid_combine_verification(grouped dataset(risk_indicators.Layout_Output) s
 								boolean from_IT1O=false, string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel,
 								boolean isFCRA, unsigned8 BSOptions,
 								integer bsVersion, string50 DataPermission=iid_constants.default_DataPermission, 
-								string50 DataRestriction=iid_constants.default_DataRestriction) := function	
+								string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction) := function	
 								
 
 ExactAddrRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactAddrMatch]=iid_constants.sTrue;								
@@ -34,6 +34,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	self.did := le.did;
   self.truedid := le.truedid;
 	self.firstscore := le.firstscore;
+	self.middlescore := le.middlescore;
 	self.lastscore := le.lastscore;
 	self.addrscore := le.addrscore;
 	self.citystatescore := le.citystatescore;
@@ -42,6 +43,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	// choose the higher of header dob or inquiry dob
 	self.dobscore := if(risk_indicators.iid_constants.tscore(le.dobscore)>=risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore), le.dobscore, ri.inquiryNAPdobScore);
 	self.verfirst := 	le.verfirst;
+	self.vermiddle := 	le.vermiddle;
 	self.verlast := 	le.verlast;
 	self.vercmpy := 	le.vercmpy;
 	self.verprim_range := 	le.verprim_range;
@@ -135,6 +137,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonblank(lastnamesources);
 	nonblank(addrsources);
 	nonblank(socssources);
+	nonzero(middlecount);
 	nonzero(firstcount);
 	nonzero(lastcount);
 	nonzero(addrcount);	
@@ -186,6 +189,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 // End Boca Shell Section
 	
 	nonzero(phonefirstcount);
+	nonzero(phonemiddlecount);
 	nonzero(phonelastcount);
 	nonzero(phoneaddrcount);
 	nonzero(phonephonecount);
@@ -238,6 +242,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonblank(formerzip2);
 	
 	nonblank(dirsfirst);
+	nonblank(dirsmiddle);
 	nonblank(dirslast);
 	nonblank(dirs_prim_range);
 	nonblank(dirs_predir);
@@ -251,6 +256,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonblank(dirszip);
 	nonblank(dirscmpy);
 	nonzero(dirs_firstscore);
+	nonzero(dirs_middlescore);
 	nonzero(dirs_lastscore);
 	nonzero(dirs_addrscore);
 	// these fields come from the phone side, the rest of them should also be changed when we get a chance instead of using nonzero
@@ -261,6 +267,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonzero(phone_date_last_seen);
 	
 	nonblank(dirsaddr_first);
+	nonblank(dirsaddr_middle);
 	nonblank(dirsaddr_last);
 	nonblank(dirsaddr_prim_range);
 	nonblank(dirsaddr_predir);
@@ -274,6 +281,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonblank(dirsaddr_zip);
 	nonblank(dirsaddr_cmpy);
 	nonzero(dirsaddr_firstscore);
+	nonzero(dirsaddr_middlescore);
 	nonzero(dirsaddr_lastscore);
 	nonzero(dirsaddr_addrscore);
 	self.dirsaddr_citystatescore := ri.dirsaddr_citystatescore;
@@ -283,6 +291,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonzero(phoneaddr_date_last_seen);
 	
 	nonblank(utilifirst);
+	nonblank(utilimiddle);
 	nonblank(utililast);
 	nonblank(utili_prim_range);
 	nonblank(utili_predir);
@@ -296,6 +305,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonblank(utilizip);
 	nonblank(utiliphone);
 	nonzero(utili_firstscore);
+	nonzero(utili_middlescore);
 	nonzero(utili_lastscore);
 	nonzero(utili_addrscore);
 	self.utili_citystatescore := ri.utili_citystatescore;
@@ -303,6 +313,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonzero(utili_phonescore);
 	
 	self.inquiryNAPfirstcount := ri.inquiryNAPfirstcount; 
+	self.inquiryNAPmiddlecount := ri.inquiryNAPmiddlecount; 
 	self.inquiryNAPlastcount := ri.inquiryNAPlastcount; 
 	self.inquiryNAPaddrcount := ri.inquiryNAPaddrcount;  
 	self.inquiryNAPphonecount := ri.inquiryNAPphonecount;
@@ -319,12 +330,14 @@ temp combo(temp le, temp ri) := TRANSFORM
 	self.InquiryNAPst := ri.inquiryNAPst;
 	self.InquiryNAPz5 := ri.inquiryNAPz5;
 	self.InquiryNAPfname := ri.inquiryNAPfname;
+	self.InquiryNAPmname := ri.inquiryNAPmname;
 	self.InquiryNAPlname := ri.inquiryNAPlname;
 	self.InquiryNAPssn := ri.inquiryNAPssn;
 	self.InquiryNAPdob := ri.inquiryNAPdob;
 	self.InquiryNAPphone := ri.inquiryNAPphone;
 	self.InquiryNAPaddrScore := ri.inquiryNAPaddrScore;
 	self.InquiryNAPfnameScore := ri.inquiryNAPfnameScore;
+	self.InquiryNAPmnameScore := ri.inquiryNAPmnameScore;
 	self.InquiryNAPlnameScore := ri.inquiryNAPlnameScore;
 	self.InquiryNAPssnScore := ri.inquiryNAPssnScore;
 	self.InquiryNAPdobScore := ri.inquiryNAPdobScore;
@@ -554,7 +567,9 @@ temp combo(temp le, temp ri) := TRANSFORM
 	self.iid_flags := le.iid_flags | ri.iid_flags;
 	
 	self.chrono_addr_flags := le.chrono_addr_flags;	// these are on the ssn records
-	
+	self.isphonecurrent:= ri.isphonecurrent;
+	self.phonelinedescription:=ri.phonelinedescription;
+	self.phonelinetype:=ri.phonelinetype;
 	SELF := le;
 END;
 
@@ -713,6 +728,19 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 					    '');
 	self.combo_first := combo_first;
 	
+	//for middle name
+  combo_middle := MAP(le.middlescore=100 OR (le.phonever_type IN ['P','I'] and iid_constants.tscore(le.middlescore)>=iid_constants.tscore(le.dirs_middlescore)) OR 
+										(le.phonever_type='A' and iid_constants.tscore(le.middlescore)>=iid_constants.tscore(le.dirsaddr_middlescore)) OR
+										(le.phonever_type='U' and iid_constants.tscore(le.middlescore)>=iid_constants.tscore(le.utili_middlescore)) OR
+										(le.phonever_type='S' and iid_constants.tscore(le.middlescore)>=iid_constants.tscore(le.inquiryNAPmnameScore)) => le.vermiddle,
+					    le.phonever_type IN ['P','I'] => le.dirsmiddle,
+					    le.phonever_type = 'A' => le.dirsaddr_middle,
+					    le.phonever_type = 'U' => le.utilimiddle,
+							le.phonever_type = 'S' => le.inquiryNAPmname,
+							le.middlecount > 0			 => le.vermiddle, 
+					    '');
+	self.combo_middle := combo_middle;
+	
 	combo_last := MAP(le.lastscore=100 OR (le.phonever_type IN ['P','I'] and iid_constants.tscore(le.lastscore)>=iid_constants.tscore(le.dirs_lastscore)) OR 
 									   (le.phonever_type='A' and iid_constants.tscore(le.lastscore)>=iid_constants.tscore(le.dirsaddr_lastscore)) OR
 									   (le.phonever_type='U' and iid_constants.tscore(le.lastscore)>=iid_constants.tscore(le.utili_lastscore)) OR
@@ -770,6 +798,9 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 	combo_firstscore := risk_indicators.FnameScore(combo_first, le.fname);
 	self.combo_firstscore := combo_firstscore;
 	
+	combo_middlescore := risk_indicators.FnameScore(combo_middle, le.mname);
+	self.combo_middlescore := combo_middlescore;
+	
 	combo_lastscore := risk_indicators.LnameScore(combo_last, le.lname);
 	self.combo_lastscore := combo_lastscore;
 	
@@ -800,6 +831,7 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 	
 	// Only give a count of 1 if that count was used as part of the nap level
 	phonefirst := IF((le.phonever_type in ['P','I'] and le.phonefirstcount>0) or (le.phonever_type='A' and le.phoneaddr_firstcount>0),1,0);	
+	phonemiddle := IF((le.phonever_type in ['P','I'] and le.phonemiddlecount>0) or (le.phonever_type='A' and le.phoneaddr_middlecount>0),1,0);	
 	phonelast := IF((le.phonever_type in ['P','I']  and le.phonelastcount >0) or (le.phonever_type='A' and le.phoneaddr_lastcount >0),1,0);
 	phoneaddr := IF((le.phonever_type in ['P','I']  and le.phoneaddrcount >0) or (le.phonever_type='A' and le.phoneaddr_addrcount >0),1,0);
 	phonephone := IF((le.phonever_type in ['P','I'] and le.phoneverlevel > 1 and le.phonephonecount>0) or (le.phonever_type='A' and le.phoneaddr_phonecount>0),1,0);
@@ -807,12 +839,14 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 	
 	// Only count the utility verification if it was used in the nap level
 	utiliFcount := IF(le.phonever_type='U' and le.utiliaddr_firstcount>0, 1,0);
+	utiliMcount := IF(le.phonever_type='U' and le.utiliaddr_middlecount>0, 1,0);
 	utiliLcount := IF(le.phonever_type='U' and le.utiliaddr_lastcount >0, 1,0);
 	utiliAcount := IF(le.phonever_type='U' and le.utiliaddr_addrcount >0, 1,0);
 	utiliPcount := IF(le.phonever_type='U' and le.utiliaddr_phonecount>0, 1,0);
 	
 	// Only count the inquiry verification if it was used in the nap level
 	inquiryFcount := IF(le.phonever_type='S' and le.inquiryNAPfirstcount>0, 1,0);
+	inquiryMcount := IF(le.phonever_type='S' and le.inquiryNAPmiddlecount>0, 1,0);
 	inquiryLcount := IF(le.phonever_type='S' and le.inquiryNAPlastcount >0, 1,0);
 	
 	merged8_9 := le.phonever_type='S' and le.phoneverlevel=12 and 
@@ -823,6 +857,9 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 	
 	combo_firstcount := le.firstcount + phonefirst + utiliFcount + inquiryFcount;
 	self.combo_firstcount := combo_firstcount;
+	
+	combo_middlecount:= le.middlecount + phonemiddle + utiliMcount + inquiryMcount;
+  self.combo_middlecount := combo_middlecount;
 	
 	combo_lastcount := le.lastcount + phonelast + utiliLcount + inquiryLcount;
 	self.combo_lastcount := combo_lastcount;
@@ -1238,16 +1275,16 @@ group(rolledDeceased, seq),
 group(with_advo, seq));	// only do the deceased by DID for CIID/FLEXID											
 //combinedFinal := project(combinedFinal_tmp, Risk_Indicators.Layout_Output);
 
- //output(ssnrecs, named('ssnrecs'));
- //output(pphonerecs, named('pphonerecs'));
- //output(combined_records, named('combined_records'));
- //output(combine_Scores, named('combine_Scores'));
- //output(finalCombo, named('finalCombo'));
- //output(biggerrec);
- //output(flagrecs);
- //output(with_hotlist);
- //output(with_advo_temp);
- //OUTPUT(	with_advo_rolled);	
+ // output(ssnrecs, named('ssnrecs'));
+ // output(pphonerecs, named('pphonerecs'));
+ // output(combined_records, named('combined_records'));
+ // output(combine_Scores, named('combine_Scores'));
+ // output(finalCombo, named('finalCombo'));
+ // output(biggerrec);
+ // output(flagrecs);
+ // output(with_hotlist);
+ // output(with_advo_temp);
+ // OUTPUT(	with_advo_rolled);	
 return combinedFinal;
 
 end;

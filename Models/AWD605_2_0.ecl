@@ -1,4 +1,4 @@
-import ut, risk_indicators, riskwise, riskwisefcra, std;
+﻿import ut, risk_indicators, riskwise, riskwisefcra, std;
 
 export AWD605_2_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean inCalif) := FUNCTION
 
@@ -314,6 +314,8 @@ Risk_Indicators.Layout_Output into_layout_output(clam le) := TRANSFORM
 	self := le.iid;
 	self := le.shell_input;
 	self := le;
+	self := [];
+
 END;
 iid := project(clam, into_layout_output(left));
 

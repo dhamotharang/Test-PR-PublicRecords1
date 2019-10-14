@@ -1,4 +1,4 @@
-IMPORT EASI, Business_Risk, ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
+﻿IMPORT EASI, RiskWise, Risk_Indicators, std;
 
 EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
 										DATASET(Models.Layout_CD_CustomModelInputs) customInputs,
@@ -780,7 +780,7 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	rc_hrisksic_s                    := le.bs.Ship_To_Out.iid.hrisksic;
 	addrpop_s                        := le.bs.Ship_To_Out.input_validation.address;
 	// drop_addr_s                      := le.bs.Bill_To_Out.advo_input_addr.drop_indicator in ['C','Y'];  
-	drop_addr_s                      := TRIM(StringLib.StringToUpperCase(le.bs.Ship_To_Out.advo_input_addr.Drop_Indicator)) IN ['C','Y'];  
+	drop_addr_s                      := TRIM(STD.Str.ToUpperCase(le.bs.Ship_To_Out.advo_input_addr.Drop_Indicator)) IN ['C','Y'];  
 	add1_advo_address_vacancy_s      := le.bs.Ship_To_Out.advo_input_addr.address_vacancy_indicator;
 	add1_advo_res_or_business_s      := le.bs.Ship_To_Out.advo_input_addr.residential_or_business_ind;
 	add1_applicant_owned_s           := le.bs.Ship_To_Out.address_verification.input_address_information.applicant_owned;
@@ -806,7 +806,7 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	NULL := -999999999;
 	
 	
-	INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
+	INTEGER contains_i( string haystack, string needle ) := (INTEGER)(STD.Str.Find(haystack, needle, 1) > 0);
 	
 	sysdate := Common.SAS_Date((STRING)(archive_date));
 	
@@ -851,14 +851,14 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	pf_pmt_type := map(
 	    not(trim(bb_PayPal_Customer_ID_) = '')      => 'PAYPAL         ',
 	    trim(bb_CC_Type_) = ''                      => 'GIFT CARD      ',
-	    stringlib.stringtoUpperCase(trim(bb_CC_Type_)) = 'AMERICANEXPRESS' => 'AMERICANEXPRESS',
-	    stringlib.stringtoUpperCase(trim(bb_CC_Type_)) = 'CHASECONSUMER'   => 'CHASECONSUMER  ',
-	    stringlib.stringtoUpperCase(trim(bb_CC_Type_)) = 'DINERS'          => 'DINERS         ',
-	    stringlib.stringtoUpperCase(trim(bb_CC_Type_)) = 'DISCOVER'        => 'DISCOVER       ',
-	    stringlib.stringtoUpperCase(trim(bb_CC_Type_)) = 'HRS'             => 'HRS            ',
-	    stringlib.stringtoUpperCase(trim(bb_CC_Type_)) = 'MASTERCARD'      => 'MASTERCARD     ',
-	    stringlib.stringtoUpperCase(trim(bb_CC_Type_)) = 'VISA'            => 'VISA           ',
-	    stringlib.stringtoUpperCase(trim(bb_CC_Type_)) = 'JCB'             => 'JCB            ',
+	    STD.Str.ToUpperCase(trim(bb_CC_Type_)) = 'AMERICANEXPRESS' => 'AMERICANEXPRESS',
+	    STD.Str.ToUpperCase(trim(bb_CC_Type_)) = 'CHASECONSUMER'   => 'CHASECONSUMER  ',
+	    STD.Str.ToUpperCase(trim(bb_CC_Type_)) = 'DINERS'          => 'DINERS         ',
+	    STD.Str.ToUpperCase(trim(bb_CC_Type_)) = 'DISCOVER'        => 'DISCOVER       ',
+	    STD.Str.ToUpperCase(trim(bb_CC_Type_)) = 'HRS'             => 'HRS            ',
+	    STD.Str.ToUpperCase(trim(bb_CC_Type_)) = 'MASTERCARD'      => 'MASTERCARD     ',
+	    STD.Str.ToUpperCase(trim(bb_CC_Type_)) = 'VISA'            => 'VISA           ',
+	    STD.Str.ToUpperCase(trim(bb_CC_Type_)) = 'JCB'             => 'JCB            ',
 																																						'OTHER     ');
 	
 	avs_name_ver_1 := 0;
@@ -947,56 +947,56 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	tm_score_not_zero_f := valid_tm_account and TM_Policy_Score_ < 0;
 	
 	ip_state := map(
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'ALABAMA'        => 'AL',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'ALASKA'         => 'AK',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'ARIZONA'        => 'AZ',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'ARKANSAS'       => 'AR',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'CALIFORNIA'     => 'CA',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'COLORADO'       => 'CO',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'CONNECTICUT'    => 'CT',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'DELAWARE'       => 'DE',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'FLORIDA'        => 'FL',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'GEORGIA'        => 'GA',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'HAWAII'         => 'HI',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'IDAHO'          => 'ID',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'ILLINOIS'       => 'IL',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'INDIANA'        => 'IN',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'IOWA'           => 'IA',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'KANSAS'         => 'KS',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'KENTUCKY'       => 'KY',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'LOUISIANA'      => 'LA',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'MAINE'          => 'ME',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'MARYLAND'       => 'MD',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'MASSACHUSETTS'  => 'MA',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'MICHIGAN'       => 'MI',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'MINNESOTA'      => 'MN',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'MISSISSIPPI'    => 'MS',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'MISSOURI'       => 'MO',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'MONTANA'        => 'MT',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'NEBRASKA'       => 'NE',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'NEVADA'         => 'NV',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'NEW HAMPSHIRE'  => 'NH',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'NEW JERSEY'     => 'NJ',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'NEW MEXICO'     => 'NM',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'NEW YORK'       => 'NY',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'NORTH CAROLINA' => 'NC',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'NORTH DAKOTA'   => 'ND',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'OHIO'           => 'OH',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'OKLAHOMA'       => 'OK',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'OREGON'         => 'OR',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'PENNSYLVANIA'   => 'PA',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'RHODE ISLAND'   => 'RI',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'SOUTH CAROLINA' => 'SC',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'SOUTH DAKOTA'   => 'SD',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'TENNESSEE'      => 'TN',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'TEXAS'          => 'TX',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'UTAH'           => 'UT',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'VERMONT'        => 'VT',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'VIRGINIA'       => 'VA',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'WASHINGTON'     => 'WA',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'WEST VIRGINIA'  => 'WV',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'WISCONSIN'      => 'WI',
-	    stringlib.stringtoUpperCase(trim(TM_True_IP_Region_)) = 'WYOMING'        => 'WY',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'ALABAMA'        => 'AL',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'ALASKA'         => 'AK',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'ARIZONA'        => 'AZ',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'ARKANSAS'       => 'AR',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'CALIFORNIA'     => 'CA',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'COLORADO'       => 'CO',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'CONNECTICUT'    => 'CT',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'DELAWARE'       => 'DE',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'FLORIDA'        => 'FL',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'GEORGIA'        => 'GA',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'HAWAII'         => 'HI',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'IDAHO'          => 'ID',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'ILLINOIS'       => 'IL',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'INDIANA'        => 'IN',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'IOWA'           => 'IA',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'KANSAS'         => 'KS',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'KENTUCKY'       => 'KY',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'LOUISIANA'      => 'LA',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'MAINE'          => 'ME',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'MARYLAND'       => 'MD',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'MASSACHUSETTS'  => 'MA',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'MICHIGAN'       => 'MI',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'MINNESOTA'      => 'MN',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'MISSISSIPPI'    => 'MS',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'MISSOURI'       => 'MO',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'MONTANA'        => 'MT',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'NEBRASKA'       => 'NE',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'NEVADA'         => 'NV',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'NEW HAMPSHIRE'  => 'NH',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'NEW JERSEY'     => 'NJ',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'NEW MEXICO'     => 'NM',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'NEW YORK'       => 'NY',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'NORTH CAROLINA' => 'NC',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'NORTH DAKOTA'   => 'ND',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'OHIO'           => 'OH',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'OKLAHOMA'       => 'OK',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'OREGON'         => 'OR',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'PENNSYLVANIA'   => 'PA',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'RHODE ISLAND'   => 'RI',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'SOUTH CAROLINA' => 'SC',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'SOUTH DAKOTA'   => 'SD',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'TENNESSEE'      => 'TN',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'TEXAS'          => 'TX',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'UTAH'           => 'UT',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'VERMONT'        => 'VT',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'VIRGINIA'       => 'VA',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'WASHINGTON'     => 'WA',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'WEST VIRGINIA'  => 'WV',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'WISCONSIN'      => 'WI',
+	    STD.Str.ToUpperCase(trim(TM_True_IP_Region_)) = 'WYOMING'        => 'WY',
 																																								 '  ');
 	
 	tm_problem_lvl := map(
@@ -1007,12 +1007,12 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	                                                                                                                               0);
 	
 	state_match_lvl := map(
-	    valid_tm_account and not(ip_state = '') and not(in_state = '') and stringlib.stringtoUpperCase(in_state) = ip_state => 1,
+	    valid_tm_account and not(ip_state = '') and not(in_state = '') and STD.Str.ToUpperCase(in_state) = ip_state => 1,
 	    valid_tm_account and not(ip_state = '') and not(in_state = '')                                 									=> 0,
 	    valid_tm_account and (ip_state = '' or in_state = '')                                          									=> -1,
 																																																														 -2);
 	
-	add_apt := StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or out_unit_desig != ' ' or out_sec_range != ' ';
+	add_apt := STD.Str.ToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or STD.Str.ToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or out_unit_desig != ' ' or out_sec_range != ' ';
 	
 	_header_first_seen := Common.SAS_Date((STRING)(header_first_seen));
 	
@@ -1253,11 +1253,11 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	
 	ids_per_addr_max_c6 := max(adls_per_addr_c6, ssns_per_addr_c6);
 	
-	email_domain := TRIM(StringLib.StringToUpperCase(in_email_address [(StringLib.StringFind(in_email_address, '@', StringLib.StringFindCount(in_email_address, '@')) + 1)..]));
+	email_domain := TRIM(STD.Str.ToUpperCase(in_email_address [(STD.Str.Find(in_email_address, '@', STD.Str.FindCount(in_email_address, '@')) + 1)..]));
 	
-	email_topleveldomain := TRIM(email_domain [(StringLib.StringFind(email_domain, '.', StringLib.StringFindCount(email_domain, '.')) + 1)..]);
+	email_topleveldomain := TRIM(email_domain [(STD.Str.Find(email_domain, '.', STD.Str.FindCount(email_domain, '.')) + 1)..]);
 	
-	email_secondleveldomain := TRIM(email_domain [1..(StringLib.StringFind(email_domain, '.', StringLib.StringFindCount(email_domain, '.')) - 1)]);
+	email_secondleveldomain := TRIM(email_domain [1..(STD.Str.Find(email_domain, '.', STD.Str.FindCount(email_domain, '.')) - 1)]);
 	
 	_email_topleveldomain := if(TRIM(email_topleveldomain) in ['EDU', 'GOV', 'MIL', 'NET', 'ORG', 'US', 'COM', ''], email_topleveldomain, 'OTHER');
 	
@@ -1946,11 +1946,11 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	    // (pf_pmt_type in ['AMERICANEXPRESS'])                  => st_pmt_type_x_amt_lvl_c98,
 	                                                             // st_pmt_type_x_amt_lvl_c99);
 					
-		case1 := TRIM(StringLib.StringToUpperCase(pf_pmt_type)) IN ['CHASECONSUMER', 'GIFT CARD', 'HRS'];																 
-		case2 := TRIM(StringLib.StringToUpperCase(pf_pmt_type)) IN ['DINERS', 'DISCOVER', 'MASTERCARD'];																 
-		case3 := TRIM(StringLib.StringToUpperCase(pf_pmt_type)) IN ['VISA'];																 
-		case4 := TRIM(StringLib.StringToUpperCase(pf_pmt_type)) IN ['AMERICANEXPRESS'];																 
-		case5 := TRIM(StringLib.StringToUpperCase(pf_pmt_type)) IN ['PAYPAL'];	
+		case1 := TRIM(STD.Str.ToUpperCase(pf_pmt_type)) IN ['CHASECONSUMER', 'GIFT CARD', 'HRS'];																 
+		case2 := TRIM(STD.Str.ToUpperCase(pf_pmt_type)) IN ['DINERS', 'DISCOVER', 'MASTERCARD'];																 
+		case3 := TRIM(STD.Str.ToUpperCase(pf_pmt_type)) IN ['VISA'];																 
+		case4 := TRIM(STD.Str.ToUpperCase(pf_pmt_type)) IN ['AMERICANEXPRESS'];																 
+		case5 := TRIM(STD.Str.ToUpperCase(pf_pmt_type)) IN ['PAYPAL'];	
 		
 		st_pmt_type_x_amt_lvl := map(
 																	case1 AND st_avg_pmt_amt <= 25		=> 0,
@@ -2133,7 +2133,7 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	
 	add_correction_s := (integer)rc_hrisksic_s = 2225;
 	
-	add_apt_s := StringLib.StringToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'H' or out_unit_desig_s != ' ' or out_sec_range_s != ' ';
+	add_apt_s := STD.Str.ToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'A' or STD.Str.ToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'H' or out_unit_desig_s != ' ' or out_sec_range_s != ' ';
 	
 	add_highrisk_s := (integer)rc_hriskaddrflag_s = 4 or (integer)rc_addrcommflag_s = 2;
 	
@@ -3086,6 +3086,7 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 		SELF := le.bs.Bill_To_Out.iid;
 		SELF := le.bs.Bill_To_Out.shell_input;
 		SELF := le.bs.bill_to_out;
+		SELF :=[];
 	END;
 	iidBT := PROJECT(clam_with_easi, into_layout_output(LEFT));
 
@@ -3096,7 +3097,7 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	ipInfo := PROJECT(clam_with_easi, fill_ip(LEFT));
 
 
-	Layout_ModelOut addBTReasons(iidBT le, ipInfo rt) := TRANSFORM
+	Models.Layout_ModelOut addBTReasons(iidBT le, ipInfo rt) := TRANSFORM
 		SELF.seq := le.seq;
 		SELF.ri := RiskWise.cdReasonCodes(le, 6, rt, TRUE, IBICID, WantstoSeeBillToShipToDifferenceFlag);
 		SELF := [];
@@ -3107,7 +3108,7 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	#if(MODEL_DEBUG)
 	Layout_debug fillReasons(layout_debug le, BTreasons rt) := TRANSFORM
 	#else
-	Layout_ModelOut fillReasons(Layout_ModelOut le, BTreasons rt) := TRANSFORM
+	Models.Layout_ModelOut fillReasons(Layout_ModelOut le, BTreasons rt) := TRANSFORM
 	SELF.ri := rt.ri;
 	#end
 		SELF := le;
@@ -3129,6 +3130,7 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 		SELF := le.bs.Ship_To_Out.iid;
 		SELF := le.bs.Ship_To_Out.shell_input;
 		SELF := le.bs.ship_to_out;
+		SELF :=[];
 	END;
 	iidST := PROJECT(clam_with_easi, into_layout_output2(LEFT));
 

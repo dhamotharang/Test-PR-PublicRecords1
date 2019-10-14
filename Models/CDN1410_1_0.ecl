@@ -1,5 +1,5 @@
-
-IMPORT EASI, Business_Risk, ut, RiskWise, RiskWiseFCRA, Risk_Indicators;
+﻿
+IMPORT EASI, RiskWise, Risk_Indicators,Models,STD;
 
 EXPORT cdn1410_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
 										DATASET(Models.Layout_CD_CustomModelInputs) customInputs,
@@ -223,7 +223,7 @@ EXPORT cdn1410_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 		END;
 		Layout_Debug doModel(clam_with_easi le, customInputs ri) := TRANSFORM
 	#else
-		Layout_ModelOut doModel( clam_with_easi le, customInputs ri ) := TRANSFORM
+		Models.Layout_ModelOut doModel( clam_with_easi le, customInputs ri ) := TRANSFORM
 	#end
 	
 	/* ***********************************************************
@@ -244,7 +244,7 @@ EXPORT cdn1410_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	//st_cen_urban_p                   := ;
 	ipaddr                           := le.bs.ip2o.ipaddr;
 	iproutingmethod                  := le.bs.ip2o.iproutingmethod;
-	ipconnection                     := StringLib.StringtoUppercase(trim(le.bs.ip2o.ipconnection));
+	ipconnection                     := STD.Str.ToUpperCase(trim(le.bs.ip2o.ipconnection));
 	ipdma                            := trim(le.bs.ip2o.ipdma);
 	continent                        := le.bs.ip2o.continent;
 	td_day_velocity_threshold        := ri.td_day_velocity_threshold;
@@ -369,13 +369,13 @@ s_add_input_nhood_bus_pct_i := map(
     add_input_nhood_BUS_ct_s = 0 => NULL,
                                     add_input_nhood_BUS_ct_s / s_add_input_nhood_prop_sum_1);
 
-num_inp_lat := if((string)out_lat = '', NULL, (real)StringLib.StringFilterOut(out_lat, '<>'));
+num_inp_lat := if((string)out_lat = '', NULL, (real)STD.Str.FilterOut(out_lat, '<>'));
 
-num_inp_long := if((string)out_long = '', NULL,(real)StringLib.StringFilterOut(out_long, '<>'));
+num_inp_long := if((string)out_long = '', NULL,(real)STD.Str.FilterOut(out_long, '<>'));
 
-num_ip_lat := if((string)latitude= '', NULL,(real)StringLib.StringFilterOut((string)latitude, '<>'));
+num_ip_lat := if((string)latitude= '', NULL,(real)STD.Str.FilterOut((string)latitude, '<>'));
 
-num_ip_long := if((string)longitude = '', NULL,(real)StringLib.StringFilterOut((string)longitude, '<>'));
+num_ip_long := if((string)longitude = '', NULL,(real)STD.Str.FilterOut((string)longitude, '<>'));
 
 // added code here to check if either one is 0, then set to null like SAS does
 d_lat := if(num_inp_lat=NULL or num_ip_lat=NULL, NULL, if(num_inp_lat=0 or num_ip_lat=0, null, num_inp_lat - num_ip_lat));
@@ -491,8 +491,8 @@ b_inq_per_phone_i := if(not(hphnpop), NULL, min(if(inq_perphone = NULL, -NULL, i
 s_inq_retail_count_day_i := if(not(truedid_s), NULL, min(if(inq_Retail_count_day_s = NULL, -NULL, inq_Retail_count_day_s), 999));
 
 // email_topleveldomain := Models.Common.getw(Models.Common.getw(in_email_address, -1, '@'), -1, '.');
-email_domain := TRIM(StringLib.StringToUpperCase(in_email_address [(StringLib.StringFind(in_email_address, '@', StringLib.StringFindCount(in_email_address, '@')) + 1)..]));
-email_topleveldomain :=TRIM(email_domain [(StringLib.StringFind(email_domain, '.', StringLib.StringFindCount(email_domain, '.')) + 1)..]);
+email_domain := TRIM(STD.Str.ToUpperCase(in_email_address [(STD.Str.Find(in_email_address, '@', STD.Str.FindCount(in_email_address, '@')) + 1)..]));
+email_topleveldomain :=TRIM(email_domain [(STD.Str.Find(email_domain, '.', STD.Str.FindCount(email_domain, '.')) + 1)..]);
 
 btst_email_topleveldomain_n := map(
     in_email_address = ''                                                             => ' ',
@@ -1563,7 +1563,7 @@ ip_routingmethod_n := map(
 ip_connection_n := map(
     ipaddr = ''       => ' ',
     ipconnection = '' => '-1',
-                           StringLib.StringtoUppercase(ipconnection));
+                           STD.Str.ToUpperCase(ipconnection));
 
 ip_dma_lvl_n := map(
     ipaddr = ''        => '               ',
@@ -1795,6 +1795,7 @@ cdn1410_1_0 := map(
 		SELF := le.bs.Bill_To_Out.iid;
 		SELF := le.bs.Bill_To_Out.shell_input;
 		SELF := le.bs.bill_to_out;
+		SELF :=[];
 
 	END;
 	iidBT := PROJECT(clam_with_easi, into_layout_output(LEFT));
@@ -1807,7 +1808,7 @@ cdn1410_1_0 := map(
 	ipInfo := PROJECT(clam_with_easi, fill_ip(LEFT));
 
 
-	Layout_ModelOut addBTReasons(iidBT le, ipInfo rt) := TRANSFORM
+	Models.Layout_ModelOut addBTReasons(iidBT le, ipInfo rt) := TRANSFORM
 		SELF.seq := le.seq;
 		SELF.ri := RiskWise.cdReasonCodes(le, 6, rt, TRUE, IBICID, WantstoSeeBillToShipToDifferenceFlag, WantsToSeeEA);
 		SELF := [];
@@ -1819,7 +1820,7 @@ cdn1410_1_0 := map(
 	Layout_debug fillReasons(layout_debug le, BTreasons rt) := TRANSFORM
 	SELF.ri := rt.ri;
 	#else
-	Layout_ModelOut fillReasons(Layout_ModelOut le, BTreasons rt) := TRANSFORM
+	Models.Layout_ModelOut fillReasons(Layout_ModelOut le, BTreasons rt) := TRANSFORM
 	SELF.ri := rt.ri;
 	#end
 		SELF := le;
@@ -1842,11 +1843,12 @@ cdn1410_1_0 := map(
 		SELF := le.bs.Ship_To_Out.iid;
 		SELF := le.bs.Ship_To_Out.shell_input;
 		SELF := le.bs.ship_to_out;
+		SELF := [];
 	END;
 	iidST := PROJECT(clam_with_easi, into_layout_output2(LEFT));
 
 
-	Layout_ModelOut addSTReasons(iidST le, ipInfo rt) := TRANSFORM
+	Models.Layout_ModelOut addSTReasons(iidST le, ipInfo rt) := TRANSFORM
 		SELF.seq := le.seq;
 		SELF.ri := RiskWise.cdReasonCodes(le, 6, rt, FALSE, IBICID, false, false);
 		SELF := [];

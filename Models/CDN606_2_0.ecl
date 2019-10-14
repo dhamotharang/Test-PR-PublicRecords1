@@ -1,4 +1,4 @@
-import ut, risk_indicators, address, RiskWise, Business_Risk, std;
+﻿import ut, risk_indicators, address, RiskWise, Business_Risk, std;
 
 export CDN606_2_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam, dataset(RiskWise.Layout_CD2I) indata, boolean IBICID, boolean isBusiness, dataset(business_risk.layout_biid_btst_output) biid ) := 
 
@@ -1057,6 +1057,7 @@ Risk_Indicators.Layout_Output into_layout_output(clam le) := TRANSFORM
 	self := le.Bill_To_Out.iid;
 	self := le.Bill_To_Out.shell_input;
 	self := le.bill_to_out;
+	self := [];
 END;
 iidBT := project(clam, into_layout_output(left));
 
@@ -1104,6 +1105,7 @@ Risk_Indicators.Layout_Output into_layout_output2(clam le) := TRANSFORM
 	self := le.Ship_To_Out.iid;
 	self := le.Ship_To_Out.shell_input;
 	self := le.ship_to_out;
+	self :=[];
 END;
 iidST := project(clam, into_layout_output2(left));
 

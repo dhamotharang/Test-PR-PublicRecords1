@@ -1,4 +1,4 @@
-﻿import iesp;
+﻿import iesp,Models,Risk_Indicators;
 
 export Layout_Output := RECORD
 	
@@ -6,7 +6,7 @@ export Layout_Output := RECORD
 	string15 adlCategory := '';
 	STRING30 account := '';
 	
-	Layout_Input;
+	Risk_indicators.Layout_Input;
 	
 	STRING32 riskwiseid := '';
 
@@ -63,16 +63,22 @@ export Layout_Output := RECORD
 	STRING2 coastate := '';
 	STRING9 coazip := '';
 	
-	STRING1 idtheftflag := '';
-	BOOLEAN aptscamflag := false;
-	
+  STRING1 idtheftflag := '';
+  BOOLEAN aptscamflag := false;
+  BOOLEAN BureauDeleted  := false;
+  BOOLEAN ITINExpired  := false;
+	 BOOLEAN IsPhoneCurrent :=false;
+  STRING2 PhoneLineDescription  := '';
+  STRING2 PhoneLineType  := '';
+
 	
 // This section purely support Boca Shell
-	STRING50 sources := '';
-	STRING50 firstnamesources := '';
-	STRING50 lastnamesources := '';
-	STRING50 addrsources := '';
-	STRING50 socssources := '';
+  STRING50 sources := '';
+  STRING50 firstnamesources := '';
+  STRING50 middlenamesources := '';
+  STRING50 lastnamesources := '';
+  STRING50 addrsources := '';
+  STRING50 socssources := '';
 	
 	STRING50 hphonesources := '';
 	STRING50 wphonesources := '';
@@ -90,14 +96,15 @@ export Layout_Output := RECORD
 	
 	// these should be 1-per source
 	UNSIGNED2 firstcount := 0;
-	UNSIGNED2 lastcount := 0;
+  UNSIGNED2 middlecount := 0;	
+  UNSIGNED2 lastcount := 0;
 	UNSIGNED2 addrcount := 0;
 	UNSIGNED2 hphonecount := 0;
 	UNSIGNED2 wphonecount := 0;
 	UNSIGNED2 socscount := 0;
 	UNSIGNED2 dobcount := 0;
 	UNSIGNED2 cmpycount := 0;
-	
+	UNSIGNED2 emailcount := 0;
 	UNSIGNED2 numelever := 0;
 	UNSIGNED2 numsource := 0;	
 	
@@ -152,6 +159,7 @@ export Layout_Output := RECORD
 // End Boca Shell Section
 	
 	UNSIGNED2 phonefirstcount := 0;
+	UNSIGNED2 phonemiddlecount := 0;
 	UNSIGNED2 phonelastcount := 0;
 	UNSIGNED2 phoneaddrcount := 0;
 	UNSIGNED2 phonephonecount := 0;
@@ -163,6 +171,7 @@ export Layout_Output := RECORD
 	UNSIGNED4 phone_date_first_seen := 0;
 	
 	UNSIGNED2 phoneaddr_firstcount := 0;
+	UNSIGNED2 phoneaddr_middlecount := 0;
 	UNSIGNED2 phoneaddr_lastcount := 0;
 	UNSIGNED2 phoneaddr_addrcount := 0;
 	UNSIGNED2 phoneaddr_phonecount := 0;
@@ -174,6 +183,7 @@ export Layout_Output := RECORD
 
 	
 	UNSIGNED2 utiliaddr_firstcount := 0;
+	UNSIGNED2 utiliaddr_middlecount := 0;
 	UNSIGNED2 utiliaddr_lastcount := 0;
 	UNSIGNED2 utiliaddr_addrcount := 0;
 	UNSIGNED2 utiliaddr_phonecount := 0;
@@ -182,8 +192,9 @@ export Layout_Output := RECORD
 	UNSIGNED3 utiliaddr_first_seen_date := 0;
 	UNSIGNED3 utiliaddr_last_seen_date := 0;
 
-		STRING15 verfirst := '';
-	STRING20 verlast := '';
+ STRING15 verfirst := '';
+ STRING15 vermiddle := '';
+ STRING20 verlast := '';
 	STRING30 vercmpy := '';
 	boolean  veraddr_isBest := false;
 	string10 verprim_range := '';
@@ -204,8 +215,13 @@ export Layout_Output := RECORD
 	STRING10 verwphone := '';
 	STRING9 versocs := '';
 	STRING8 verdob := '';
+	STRING9 verdl := '';
+	STRING50 VerifiedEmail := '';
+
+  
 
 	UNSIGNED1 firstscore := 0;
+	UNSIGNED1 middlescore  := 0;
 	UNSIGNED1 lastscore := 0;
 	UNSIGNED1 cmpyscore := 0;
 	UNSIGNED1 addrscore := 0;
@@ -217,10 +233,13 @@ export Layout_Output := RECORD
 	STRING1   socsvalid := '';
 	unsigned2 socsdidCount := 0;
 	UNSIGNED1 dobscore := 0;
+	UNSIGNED1 dlscore  := 0;
+	UNSIGNED1 emailscore  := 0;
 	
 	BOOLEAN socsmiskeyflag := false;
 	BOOLEAN hphonemiskeyflag := false;
 	BOOLEAN addrmiskeyflag := false;
+	BOOLEAN dlmiskeyflag  := false;
 	
 	STRING1 addrcommflag := '';
 	
@@ -251,8 +270,10 @@ export Layout_Output := RECORD
 	STRING50 correctaddr := '';
 	STRING10 correcthphone := '';
 	STRING20 correctlast := '';
+	STRING9 correctdl  := '';
 	
 	STRING15 dirsfirst := '';
+	STRING15 dirsmiddle := '';
 	STRING20 dirslast := '';
 	string10 dirs_prim_range := '';
 	string2  dirs_predir:= '';
@@ -266,6 +287,7 @@ export Layout_Output := RECORD
 	STRING9 dirszip := '';
 	STRING50 dirscmpy := '';
 	UNSIGNED1 dirs_firstscore := 0;
+ UNSIGNED1 dirs_middlescore := 0;
 	UNSIGNED1 dirs_lastscore := 0;
 	UNSIGNED1 dirs_addrscore := 0;	
 	unsigned1 dirs_citystatescore := 0;
@@ -274,6 +296,7 @@ export Layout_Output := RECORD
 	UNSIGNED1 dirs_cmpyscore := 0;
 	
 	STRING15 dirsaddr_first := '';
+	STRING15 dirsaddr_middle := '';
 	STRING20 dirsaddr_last := '';
 	string10 dirsaddr_prim_range := '';
 	string2  dirsaddr_predir:= '';
@@ -288,6 +311,7 @@ export Layout_Output := RECORD
 	STRING10 dirsaddr_phone := '';
 	STRING50 dirsaddr_cmpy := '';
 	UNSIGNED1 dirsaddr_firstscore := 0;
+	UNSIGNED1 dirsaddr_middlescore := 0;
 	UNSIGNED1 dirsaddr_lastscore := 0;
 	UNSIGNED1 dirsaddr_addrscore := 0;
 	unsigned1 dirsaddr_citystatescore := 0;
@@ -296,6 +320,7 @@ export Layout_Output := RECORD
 	UNSIGNED1 dirsaddr_cmpyscore := 0;
 	
 	STRING15 utilifirst := '';
+	STRING15 utilimiddle := '';
 	STRING20 utililast := '';
 	string10 utili_prim_range := '';
 	string2  utili_predir:= '';
@@ -309,6 +334,7 @@ export Layout_Output := RECORD
 	STRING9 utilizip := '';
 	STRING10 utiliphone := '';
 	UNSIGNED1 utili_firstscore := 0;
+	UNSIGNED1 utili_middlescore := 0;
 	UNSIGNED1 utili_lastscore := 0;
 	UNSIGNED1 utili_addrscore := 0;
 	unsigned1 utili_citystatescore := 0;
@@ -454,6 +480,7 @@ export Layout_Output := RECORD
 	BOOLEAN ssnexists := true;
 	
 	STRING15 combo_first := '';
+	STRING15 combo_middle := '';
 	STRING20 combo_last := '';
 	string10 combo_prim_range := '';
 	string2  combo_predir:= '';
@@ -471,7 +498,10 @@ export Layout_Output := RECORD
 	STRING9 combo_ssn := '';
 	STRING8 combo_dob := '';
 	STRING50 combo_cmpy := '';
+	STRING9 combo_email  := '';
+	STRING9 combo_dl   := '';
 	UNSIGNED1 combo_firstscore := 0;
+	UNSIGNED1 combo_middlescore := 0;
 	UNSIGNED1 combo_lastscore := 0;
 	UNSIGNED1 combo_addrscore := 0;
 	unsigned1 combo_citystatescore := 0;
@@ -483,6 +513,7 @@ export Layout_Output := RECORD
 	UNSIGNED1 combo_dobscore := 0;
 	UNSIGNED1 combo_cmpyscore := 0;
 	UNSIGNED1 combo_firstcount := 0;
+	UNSIGNED1 combo_middlecount := 0;
 	UNSIGNED1 combo_lastcount := 0;
 	UNSIGNED1 combo_addrcount := 0;
 	UNSIGNED1 combo_hphonecount := 0;
@@ -490,6 +521,9 @@ export Layout_Output := RECORD
 	UNSIGNED1 combo_dobcount := 0;
 	UNSIGNED1 combo_cmpycount := 0;
 	UNSIGNED1 combo_wphonecount := 0;
+	UNSIGNED1 combo_emailscore  := 0;
+	UNSIGNED1 combo_dlscore  := 0;
+	UNSIGNED1 combo_emailcount   := 0;
 	
 	UNSIGNED2 score1 := 0;
 	UNSIGNED2 score2 := 0;
@@ -725,8 +759,8 @@ export Layout_Output := RECORD
 	unsigned3 hdr_dt_first_seen := 0;
 	unsigned3 hdr_dt_last_seen := 0;
 	UNSIGNED2 dobcount2 := 0;	
-	layouts.header_verification_summary 		header_summary;
-	layouts.layout_address_history_summary 	address_history_summary;
+	Risk_indicators.layouts.header_verification_summary 		header_summary;
+	Risk_indicators.layouts.layout_address_history_summary 	address_history_summary;
 	
 	unsigned8 iid_flags := 0;
 	string9 BestSSN := '';
@@ -761,14 +795,13 @@ export Layout_Output := RECORD
 	BOOLEAN IsShiptoBilltoDifferent := false;	// used for CBD check
 	INTEGER email_verification := 0;	// used for CBD check
 	
-	
 	boolean EverAssocITIN := false;	// used for AML
 	boolean EverAssocIm := false;		// used for AML
 	
-	layout_overrides;
+	Risk_Indicators.layout_overrides;
 	
 	// new shell 5.0 intermediate fields
-	layouts.layout_hhid_summary hhid_summary; 
+	Risk_Indicators.layouts.layout_hhid_summary hhid_summary; 
 	risk_indicators.layouts.layout_address_sources_summary	address_sources_summary;
 	Integer address_history_seq := 0;	
 	string10 addr_hierarchy_best_prim_range := '';
@@ -792,8 +825,9 @@ export Layout_Output := RECORD
 	unsigned8 rawaid3 := 0;
 	integer ssnLookupFlag := 0;
 	string120 errMsg := '';
-	risk_indicators.Layout_ConsumerFlags						ConsumerFlags;
+  risk_indicators.Layout_ConsumerFlags						ConsumerFlags;
   risk_indicators.layouts.layout_threatmetrix_shell_internal_results ThreatMetrix;
+  Models.Layout_IID - seq iid_tmx;
 	dataset(Risk_Indicators.Layouts.tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 
 END;

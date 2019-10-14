@@ -1,7 +1,7 @@
-/* Modeling group is calling this model TBN509_0_1 as it is the second version with score caps added. We are keeping the 
+﻿/* Modeling group is calling this model TBN509_0_1 as it is the second version with score caps added. We are keeping the 
 		original name TBN509_0_0  */
 
-import ut, risk_indicators, address, RiskWise, std;
+import risk_indicators, RiskWise, std;
 
 export TBN509_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC=true) := 
 FUNCTION
@@ -351,6 +351,7 @@ Risk_Indicators.Layout_Output into_layout_output(clam le) := transform
 	self := le.iid;
 	self := le.shell_input;
 	self := le;
+	self := [];
 end;
 iid := project(clam, into_layout_output(left));
 

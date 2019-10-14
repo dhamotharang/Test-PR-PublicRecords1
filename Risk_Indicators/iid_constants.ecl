@@ -170,6 +170,8 @@ export posRestrictPreGLB := 23; //this is high level check use other code not ju
 export posFDNvfRestriction := 25; //FDN Virtual Fraud data
 export posLiensJudgRestriction := 41; //Liens/Judgments 
 export posCortera := 42;
+export IncludeDigitalIdentity:=26;
+export enableEquifaxPhoneMart:=24;
 
 export FDNvf_ok(string DataRestriction) := DataRestriction[posFDNvfRestriction]=sFalse;
 
@@ -513,9 +515,11 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		BCBLienFtlr = 1									<< 29,
 		InsuranceFCRABankruptcyException = 1 << 30,
 		InsuranceFCRABankruptcyAllow10Yr = 1 << 31,
-    FilterVoter = 1                 << 32,
-    InsuranceFCRASODataFilter = 1   << 33,
-    RunThreatMetrix = 1             << 34
+		FilterVoter = 1									<< 32,
+   InsuranceFCRASODataFilter    = 1 << 33,
+   RunThreatMetrix= 1          << 34,
+   disablenongovernmentdldata =1 << 35,
+   enableEquifaxPhoneMart   =1 << 36
 		);
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);

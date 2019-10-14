@@ -1,5 +1,4 @@
-//laure fischer is using this as an example//
-IMPORT EASI, ut, RiskWise, Risk_Indicators, std;
+﻿IMPORT EASI, RiskWise, Risk_Indicators, std;
 
 EXPORT osn1504_0_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,  
 										DATASET(RiskWise.Layout_CD2I) indata,
@@ -2053,7 +2052,7 @@ rel_score0 := __common__(round((base + pts * (rel_final_score - offset - lgt)),8
 
 btst_relationship_index_v1 := __common__(if(not(truedid and truedid_s and did != did_s and did != 0 and did_s != 0), -1, round(min(if(max(rel_score0, (real)301) = NULL, -NULL, max(rel_score0, (real)301)), 999))));
 
-bt_add_apt := __common__(StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or out_unit_desig != '' or out_sec_range != '');
+bt_add_apt := __common__(STD.Str.ToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or STD.Str.ToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or out_unit_desig != '' or out_sec_range != '');
 
 mortgage_type_1 := __common__(add_input_mortgage_type);
 
@@ -2081,11 +2080,11 @@ bt_adls_per_phone_c6 := __common__(if(not(hphnpop), NULL, min(if(adls_per_phone_
 
 bt_inq_highriskcredit_count := __common__(if(not(truedid), NULL, min(if(inq_HighRiskCredit_count = NULL, -NULL, inq_HighRiskCredit_count), 999)));
 
-curr_util_i := __common__(if(contains_i(StringLib.StringToUpperCase(util_add_curr_type_list), '1') > 0, 'I', ' '));
+curr_util_i := __common__(if(contains_i(STD.Str.ToUpperCase(util_add_curr_type_list), '1') > 0, 'I', ' '));
 
-curr_util_c := __common__(if(contains_i(StringLib.StringToUpperCase(util_add_curr_type_list), '2') > 0, 'C', ' '));
+curr_util_c := __common__(if(contains_i(STD.Str.ToUpperCase(util_add_curr_type_list), '2') > 0, 'C', ' '));
 
-curr_util_m := __common__(if(contains_i(StringLib.StringToUpperCase(util_add_curr_type_list), 'Z') > 0, 'M', ' '));
+curr_util_m := __common__(if(contains_i(STD.Str.ToUpperCase(util_add_curr_type_list), 'Z') > 0, 'M', ' '));
 
 bt_util_add_curr_summary := __common__(if(not(truedid) and add_curr_pop, '', '|' + (string)curr_util_i + (string)curr_util_c + (string)curr_util_m + '|'));
 
@@ -2468,11 +2467,11 @@ bt_c20_m_bureau_adl_fs := __common__(map(
 
 bt_inq_billgrp_count := __common__(if(not(truedid), NULL, min(if(inq_billgroup_count = NULL, -NULL, inq_billgroup_count), 999)));
 
-adl_util_i := __common__(if(contains_i(StringLib.StringToUpperCase(util_adl_type_list), '1') > 0, 'I', ' '));
+adl_util_i := __common__(if(contains_i(STD.Str.ToUpperCase(util_adl_type_list), '1') > 0, 'I', ' '));
 
-adl_util_c := __common__(if(contains_i(StringLib.StringToUpperCase(util_adl_type_list), '2') > 0, 'C', ' '));
+adl_util_c := __common__(if(contains_i(STD.Str.ToUpperCase(util_adl_type_list), '2') > 0, 'C', ' '));
 
-adl_util_m := __common__(if(contains_i(StringLib.StringToUpperCase(util_adl_type_list), 'Z') > 0, 'M', ' '));
+adl_util_m := __common__(if(contains_i(STD.Str.ToUpperCase(util_adl_type_list), 'Z') > 0, 'M', ' '));
 
 bt_util_adl_summary := __common__(if(not(truedid), '', '|' + (string)adl_util_i + (string)adl_util_c + (string)adl_util_m + '|'));
 
@@ -2577,11 +2576,11 @@ bt_inq_ssns_per_apt_addr := __common__(map(
     (integer) bt_add_apt = 0 => -1,
     min(if(inq_ssnsperaddr = NULL, -NULL, inq_ssnsperaddr), 999)));
 
-add_ec1 := __common__((StringLib.StringToUpperCase(trim(out_addr_status, LEFT)))[1..1]);
+add_ec1 := __common__((STD.Str.ToUpperCase(trim(out_addr_status, LEFT)))[1..1]);
 
-add_ec3 := __common__((StringLib.StringToUpperCase(trim(out_addr_status, LEFT)))[3..3]);
+add_ec3 := __common__((STD.Str.ToUpperCase(trim(out_addr_status, LEFT)))[3..3]);
 
-add_ec4 := __common__((StringLib.StringToUpperCase(trim(out_addr_status, LEFT)))[4..4]);
+add_ec4 := __common__((STD.Str.ToUpperCase(trim(out_addr_status, LEFT)))[4..4]);
 
 bt_l70_add_standardized := __common__(map(
     not(addrpop)                                         => '                           ',
@@ -2667,7 +2666,7 @@ inp_util_i := __common__(if(contains_i(util_add_input_type_list, '1') > 0, 'I', 
 
 inp_util_c := __common__(if(contains_i(util_add_input_type_list, '2') > 0, 'C', ' '));
 
-inp_util_m := __common__(if(contains_i(StringLib.StringToUpperCase(util_add_input_type_list), 'Z') > 0, 'M', ' '));
+inp_util_m := __common__(if(contains_i(STD.Str.ToUpperCase(util_add_input_type_list), 'Z') > 0, 'M', ' '));
 
 bt_util_add_input_summary := __common__(if(not(addrpop), '', '|' + (string)inp_util_i + (string)inp_util_c + (string)inp_util_m + '|'));
 
@@ -2681,15 +2680,15 @@ bt_vf_altlexid_addr_hi_risk_ct := __common__(if(not(truedid), NULL, min(if(vf_al
 
 bt_hh_criminals := __common__(if(not(truedid), NULL, min(if(hh_criminals = NULL, -NULL, hh_criminals), 999)));
 
-major_medical := __common__(contains_i(StringLib.StringToUpperCase(college_major), 'A') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'E') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'L') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'Q') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'T') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'V') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '040') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '041') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '044') > 0);
+major_medical := __common__(contains_i(STD.Str.ToUpperCase(college_major), 'A') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'E') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'L') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'Q') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'T') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'V') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '040') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '041') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '044') > 0);
 
-major_science := __common__(contains_i(StringLib.StringToUpperCase(college_major), 'D') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'H') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'M') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'N') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '046') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '006') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '022') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '026') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '029') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '031') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '036') > 0);
+major_science := __common__(contains_i(STD.Str.ToUpperCase(college_major), 'D') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'H') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'M') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'N') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '046') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '006') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '022') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '026') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '029') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '031') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '036') > 0);
 
-major_liberal := __common__(contains_i(StringLib.StringToUpperCase(college_major), 'C') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'F') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'I') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'J') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'K') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'O') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'W') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'Y') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '007') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '013') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '015') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '027') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '032') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '033') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '035') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '037') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '038') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '039') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '042') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '043') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '003') > 0);
+major_liberal := __common__(contains_i(STD.Str.ToUpperCase(college_major), 'C') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'F') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'I') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'J') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'K') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'O') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'W') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'Y') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '007') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '013') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '015') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '027') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '032') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '033') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '035') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '037') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '038') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '039') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '042') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '043') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '003') > 0);
 
-major_business := __common__(contains_i(StringLib.StringToUpperCase(college_major), 'B') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'G') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'P') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'R') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'S') > 0 or contains_i(StringLib.StringToUpperCase(college_major), 'Z') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '009') > 0 or contains_i(StringLib.StringToUpperCase(college_major), '045') > 0);
+major_business := __common__(contains_i(STD.Str.ToUpperCase(college_major), 'B') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'G') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'P') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'R') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'S') > 0 or contains_i(STD.Str.ToUpperCase(college_major), 'Z') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '009') > 0 or contains_i(STD.Str.ToUpperCase(college_major), '045') > 0);
 
-major_unknown := __common__(contains_i(StringLib.StringToUpperCase(college_major), 'U') > 0);
+major_unknown := __common__(contains_i(STD.Str.ToUpperCase(college_major), 'U') > 0);
 
 bt_college_major := __common__(map(
     not(truedid)                                 => '                ',
@@ -2816,7 +2815,7 @@ bt_prop2_purch_sale_diff := __common__(map(
 
 bt_l77_add_po_box := __common__(map(
     not(addrpop or not(out_z5 = ''))                                                                                                                                                                                                                           => ' ',
-    (integer) rc_hriskaddrflag = 1 or (integer) rc_ziptypeflag = 1 or StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'E' or StringLib.StringToUpperCase(trim(rc_zipclass, LEFT, RIGHT)) = 'P' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'P' => '1',
+    (integer) rc_hriskaddrflag = 1 or (integer) rc_ziptypeflag = 1 or STD.Str.ToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'E' or STD.Str.ToUpperCase(trim(rc_zipclass, LEFT, RIGHT)) = 'P' or STD.Str.ToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'P' => '1',
                                                                                                                                                                                                                                                                     '0'));
 
 bt_fp_divaddrsuspidcountnew := __common__(if(not(truedid), NULL, min(if(fp_divaddrsuspidcountnew = '', -NULL, (integer) fp_divaddrsuspidcountnew), 999)));
@@ -2966,7 +2965,7 @@ st_p85_phn_invalid := __common__(map(
     (integer) rc_phonevalflag_s = 0 or (integer)rc_hphonevalflag_s = 0 or (integer)rc_phonetype_s = 5 => '1',
                                                                              '0'));
 
-st_add_apt := __common__(StringLib.StringToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'H' or not(out_unit_desig_s = '') or not(out_sec_range_s = ''));
+st_add_apt := __common__(STD.Str.ToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'A' or STD.Str.ToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'H' or not(out_unit_desig_s = '') or not(out_sec_range_s = ''));
 
 st_inq_per_ssn := __common__(if(not((integer) ssnlength_s > 0), NULL, min(if(inq_perssn_s = NULL, -NULL, inq_perssn_s), 999)));
 
@@ -3250,7 +3249,7 @@ st_fp_assoccredbureaucount := __common__(if(not(truedid_s), NULL, min(if(fp_asso
 
 st_l77_add_po_box := __common__(map(
     not(addrpop_s or not(out_z5_s = ''))                                                                                                                                                                                                                                       => ' ',
-    (integer) rc_hriskaddrflag_s = 1 or (integer) rc_ziptypeflag_s = 1 or StringLib.StringToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'E' or StringLib.StringToUpperCase(trim((string)rc_zipclass_s, LEFT, RIGHT)) = 'P' or StringLib.StringToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'P' => '1',
+    (integer) rc_hriskaddrflag_s = 1 or (integer) rc_ziptypeflag_s = 1 or STD.Str.ToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'E' or STD.Str.ToUpperCase(trim((string)rc_zipclass_s, LEFT, RIGHT)) = 'P' or STD.Str.ToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'P' => '1',
                                                                                                                                                                                                                                                                                                       '0'));
 
 st_inq_adls_per_phone := __common__(if(not(hphnpop_s), NULL, min(if(inq_adlsperphone_s = NULL, -NULL, inq_adlsperphone_s), 999)));
@@ -3268,7 +3267,7 @@ st_l80_inp_avm_autoval := __common__(if(not(add_input_pop_s), NULL, add_input_av
 
 inp_util_i_s := __common__(if(contains_i(util_add_input_type_list_s, '1') > 0, 'I', ' '));
 
-inp_util_m_s := __common__(if(contains_i(StringLib.StringToUpperCase(util_add_input_type_list_s), 'Z') > 0, 'M', ' '));
+inp_util_m_s := __common__(if(contains_i(STD.Str.ToUpperCase(util_add_input_type_list_s), 'Z') > 0, 'M', ' '));
 
 inp_util_c_s := __common__(if(contains_i(util_add_input_type_list_s, '2') > 0, 'C', ' '));
 
@@ -3311,10 +3310,10 @@ st_vf_lexid_phn_lo_risk_ct := __common__(if(not(truedid_s), NULL, min(if(vf_lexi
 st_l77_dwelltype := __common__(map(
     not(add_input_pop_s) => '   ',
     trim(rc_dwelltype_s) = ''                  																=> 'SFD',
-    StringLib.StringToUpperCase(trim(rc_dwelltype_s)) = 'A'                   => 'MFD',
-    StringLib.StringToUpperCase(trim(rc_dwelltype_s)) = 'E'                   => 'POB',
-    StringLib.StringToUpperCase(trim(rc_dwelltype_s)) = 'R'                   => 'RR ',
-    StringLib.StringToUpperCase(trim(rc_dwelltype_s)) = 'S'                   => 'GEN',
+    STD.Str.ToUpperCase(trim(rc_dwelltype_s)) = 'A'                   => 'MFD',
+    STD.Str.ToUpperCase(trim(rc_dwelltype_s)) = 'E'                   => 'POB',
+    STD.Str.ToUpperCase(trim(rc_dwelltype_s)) = 'R'                   => 'RR ',
+    STD.Str.ToUpperCase(trim(rc_dwelltype_s)) = 'S'                   => 'GEN',
                                                ''));
 
 st_inq_retail_count24 := __common__(if(not(truedid_s), NULL, min(if(inq_retail_count24_s = NULL, -NULL, inq_retail_count24_s), 999)));
@@ -3408,7 +3407,7 @@ curr_util_i_s := __common__(if(contains_i(util_add_curr_type_list_s, '1') > 0, '
 
 curr_util_c_s := __common__(if(contains_i(util_add_curr_type_list_s, '2') > 0, 'C', ' '));
 
-curr_util_m_s := __common__(if(contains_i(StringLib.StringToUpperCase(util_add_curr_type_list_s), 'Z') > 0, 'M', ' '));
+curr_util_m_s := __common__(if(contains_i(STD.Str.ToUpperCase(util_add_curr_type_list_s), 'Z') > 0, 'M', ' '));
 
 st_util_add_curr_summary := __common__(if(not(truedid_s) and add_curr_pop_s, '', '|' + (string)curr_util_i_s + (string)curr_util_c_s + (string)curr_util_m_s + '|'));
 
@@ -3445,15 +3444,15 @@ st_i60_inq_hiriskcred_count12 := __common__(if(not(truedid_s), NULL, min(if(inq_
 
 st_fp_curraddrcrimeindex := __common__(if(not(truedid_s), NULL, (integer) fp_curraddrcrimeindex_s));
 
-major_medical_s := __common__(contains_i(StringLib.StringToUpperCase(college_major_s), 'A') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'E') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'L') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'Q') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'T') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'V') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '040') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '041') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '044') > 0);
+major_medical_s := __common__(contains_i(STD.Str.ToUpperCase(college_major_s), 'A') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'E') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'L') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'Q') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'T') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'V') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '040') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '041') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '044') > 0);
 
-major_science_s := __common__(contains_i(StringLib.StringToUpperCase(college_major_s), 'D') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'H') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'M') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'N') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '046') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '006') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '022') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '026') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '029') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '031') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '036') > 0);
+major_science_s := __common__(contains_i(STD.Str.ToUpperCase(college_major_s), 'D') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'H') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'M') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'N') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '046') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '006') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '022') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '026') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '029') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '031') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '036') > 0);
 
-major_liberal_s := __common__(contains_i(StringLib.StringToUpperCase(college_major_s), 'C') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'F') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'I') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'J') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'K') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'O') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'W') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'Y') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '007') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '013') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '015') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '027') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '032') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '033') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '035') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '037') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '038') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '039') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '042') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '043') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '003') > 0);
+major_liberal_s := __common__(contains_i(STD.Str.ToUpperCase(college_major_s), 'C') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'F') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'I') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'J') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'K') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'O') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'W') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'Y') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '007') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '013') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '015') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '027') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '032') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '033') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '035') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '037') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '038') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '039') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '042') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '043') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '003') > 0);
 
-major_business_s := __common__(contains_i(StringLib.StringToUpperCase(college_major_s), 'B') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'G') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'P') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'R') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'S') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), 'Z') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '009') > 0 or contains_i(StringLib.StringToUpperCase(college_major_s), '045') > 0);
+major_business_s := __common__(contains_i(STD.Str.ToUpperCase(college_major_s), 'B') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'G') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'P') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'R') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'S') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), 'Z') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '009') > 0 or contains_i(STD.Str.ToUpperCase(college_major_s), '045') > 0);
 
-major_unknown_s := __common__(contains_i(StringLib.StringToUpperCase(college_major_s), 'U') > 0);
+major_unknown_s := __common__(contains_i(STD.Str.ToUpperCase(college_major_s), 'U') > 0);
 
 st_fp_idveraddressnotcurrent_1 := __common__(if(not(truedid_s), NULL, NULL));
 
@@ -3541,17 +3540,17 @@ st_c20_m_bureau_adl_fs := __common__(map(
 		sysdate = NULL => 999,
     min(if(if ((sysdate - _src_bureau_adl_fseen_s) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen_s) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen_s) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _src_bureau_adl_fseen_s) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_adl_fseen_s) / (365.25 / 12)), roundup((sysdate - _src_bureau_adl_fseen_s) / (365.25 / 12)))), 999)));
 
-adl_util_i_s := __common__(if(contains_i(StringLib.StringToUpperCase(util_adl_type_list_s), '1') > 0, 'I', ' '));
+adl_util_i_s := __common__(if(contains_i(STD.Str.ToUpperCase(util_adl_type_list_s), '1') > 0, 'I', ' '));
 
-adl_util_c_s := __common__(if(contains_i(StringLib.StringToUpperCase(util_adl_type_list_s), '2') > 0, 'C', ' '));
+adl_util_c_s := __common__(if(contains_i(STD.Str.ToUpperCase(util_adl_type_list_s), '2') > 0, 'C', ' '));
 
-adl_util_m_s := __common__(if(contains_i(StringLib.StringToUpperCase(util_adl_type_list_s), 'Z') > 0, 'M', ' '));
+adl_util_m_s := __common__(if(contains_i(STD.Str.ToUpperCase(util_adl_type_list_s), 'Z') > 0, 'M', ' '));
 
-add_ec1_s := __common__((StringLib.StringToUpperCase(trim((string)out_addr_status_s, LEFT)))[1..1]);
+add_ec1_s := __common__((STD.Str.ToUpperCase(trim((string)out_addr_status_s, LEFT)))[1..1]);
 
-add_ec3_s := __common__((StringLib.StringToUpperCase(trim((string)out_addr_status_s, LEFT)))[3..3]);
+add_ec3_s := __common__((STD.Str.ToUpperCase(trim((string)out_addr_status_s, LEFT)))[3..3]);
 
-add_ec4_s := __common__((StringLib.StringToUpperCase(trim((string)out_addr_status_s, LEFT)))[4..4]);
+add_ec4_s := __common__((STD.Str.ToUpperCase(trim((string)out_addr_status_s, LEFT)))[4..4]);
 
 st_l70_add_standardized := __common__(map(
     not(addrpop_s)                           => '                           ',
@@ -3816,9 +3815,9 @@ _ver_src_tu := Models.Common.findw_cpp(ver_sources, 'TU' , ',', '') > 0;
 
 _credit_source_cnt := if(max((integer)_ver_src_eq, (integer)_ver_src_en, (integer)_ver_src_tn, (integer)_ver_src_tu) = NULL, NULL, sum((integer)_ver_src_eq, (integer)_ver_src_en, (integer)_ver_src_tn, (integer)_ver_src_tu));
 
-_ver_src_cnt := Models.Common.countw((string)(StringLib.StringToUpperCase(trim(ver_sources, ALL))), ',');	//kh-changed to this
+_ver_src_cnt := Models.Common.countw((string)(STD.Str.ToUpperCase(trim(ver_sources, ALL))), ',');	//kh-changed to this
 
-_bureauonly := _credit_source_cnt > 0 AND _credit_source_cnt = _ver_src_cnt AND (StringLib.StringToUpperCase(nap_type) = 'U' or (nap_summary in [0, 1, 2, 3, 4, 6]));
+_bureauonly := _credit_source_cnt > 0 AND _credit_source_cnt = _ver_src_cnt AND (STD.Str.ToUpperCase(nap_type) = 'U' or (nap_summary in [0, 1, 2, 3, 4, 6]));
 
 _derog := felony_count > 0 OR (integer) addrs_prison_history > 0 OR attr_num_unrel_liens60 > 0 OR attr_eviction_count > 0 OR stl_inq_count > 0 OR inq_highriskcredit_count12 > 0 OR inq_collection_count12 >= 2;
 
@@ -3863,10 +3862,10 @@ _credit_source_cnt_s := if(max((integer)_ver_src_eq_s, (integer)_ver_src_en_s,
 	(integer)_ver_src_tn_s, (integer)_ver_src_tu_s) = NULL, NULL, sum((integer)_ver_src_eq_s, 
 	(integer)_ver_src_en_s, (integer)_ver_src_tn_s, (integer)_ver_src_tu));
 
-_ver_src_cnt_s := Models.Common.countw((string)(StringLib.StringToUpperCase(trim(ver_sources_s, ALL))), ',');	//kh-changed to this
+_ver_src_cnt_s := Models.Common.countw((string)(STD.Str.ToUpperCase(trim(ver_sources_s, ALL))), ',');	//kh-changed to this
 
 _bureauonly_s := _credit_source_cnt_s > 0 AND _credit_source_cnt_s = _ver_src_cnt_s AND 
-	(StringLib.StringToUpperCase(nap_type_s) = 'U' or (nap_summary_s in [0, 1, 2, 3, 4, 6]));
+	(STD.Str.ToUpperCase(nap_type_s) = 'U' or (nap_summary_s in [0, 1, 2, 3, 4, 6]));
 
 _derog_s := felony_count_s > 0 OR (integer) addrs_prison_history_s > 0 OR 
 	attr_num_unrel_liens60_s > 0 OR attr_eviction_count_s > 0 OR stl_inq_count_s > 0 OR 
@@ -17794,6 +17793,7 @@ osn1504_0_0 := round(min(if(max(osn1504_0_0_base, (real)300) = NULL, -NULL, max(
 		SELF := le.bs.Bill_To_Out.shell_input;
 		SELF := le.bs.bill_to_out;
 		SELF := ri;
+		self := [];
 	END;
 	iidBT := JOIN(clam_with_easi, model,
 		LEFT.bs.Bill_To_Out.seq = RIGHT.SEQ,
@@ -17842,6 +17842,7 @@ osn1504_0_0 := round(min(if(max(osn1504_0_0_base, (real)300) = NULL, -NULL, max(
 		SELF := le.bs; //BTST fields
 		SELF.nf_seg_fraudpoint_3_0 := ri.nf_seg_fraudpoint_3_0_ST;
 		SELF := ri;
+		SELF :=[];
 	END;
 
 	iidST := JOIN(clam_with_easi, model,

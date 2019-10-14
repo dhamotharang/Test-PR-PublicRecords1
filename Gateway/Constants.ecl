@@ -38,6 +38,7 @@ export Constants := module
 		export String40 Attus			:= 'attus';								// active, as of 07/24/2012
 		export String40 EquifaxSts := 'equifaxsts';					// active, as of 03/22/2016
 		export String40 ThreatMetrix := 'threatmetrix';      // added for threatmetrix
+		export String40 EmailRisk := 'emailrisk';      // added for EmailRisk
 
 
 		export String40 News			:= 'news';								// WSK news gateway (currently for AML Attributes)

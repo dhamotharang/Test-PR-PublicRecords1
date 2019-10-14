@@ -1,4 +1,4 @@
-import ut, risk_indicators, RiskWise, daybatchpcnsr, std;
+﻿import ut, risk_indicators, RiskWise, daybatchpcnsr, std;
 
 export FD9607_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean isStudent, boolean other_watchlists = false) := 
 
@@ -323,6 +323,7 @@ Risk_Indicators.Layout_Output into_layout_output(clam le) := TRANSFORM
 	self := le.iid;
 	self := le.shell_input;
 	self := le;
+	self :=[];
 END;
 iid := project(clam, into_layout_output(left));
 
