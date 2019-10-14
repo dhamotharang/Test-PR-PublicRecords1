@@ -50,10 +50,8 @@ EXPORT	Key_BusinessOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today()
 		STRING10	Phone_Number;
 		STRING9		Federal_TaxID_SSN;
 		STRING3		Federal_TaxID_SSN_Identifier;
-    	UNSIGNED4 	global_sid := 0;
-    	UNSIGNED8 	record_sid  :=  0;
-		//DF-26180 Add DID
-		UNSIGNED6 	did := 0;
+    UNSIGNED4 global_sid;
+    UNSIGNED8 record_sid  :=  0;
 		STRING2		source;
 	END;
 	
@@ -194,12 +192,12 @@ EXPORT	Key_BusinessOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today()
 																																		 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																																		//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
 								UNSIGNED2 ScoreThreshold = 0,											 //Applied at lowest leve of ID
-								STRING DataPermissionMask = '',										//Default will fail the fetch. Pos 12 must be set to '1'
 								INTEGER JoinLimit = 10000,
 								UNSIGNED1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin
 								):=FUNCTION
 
-	use_sbfe := DataPermissionMask[12] NOT IN ['0', ''];
+	// Default will fail the fetch. Pos 12 must be set to '1'
+  use_sbfe := mod_access.DataPermissionMask[12] NOT IN ['0', ''];
 	
 	BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, fetched, Level, JoinLimit, JoinType);
 	
@@ -216,12 +214,11 @@ EXPORT	Key_BusinessOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today()
 																																		 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																																		//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
 								UNSIGNED2 ScoreThreshold = 0,											 //Applied at lowest leve of ID
-								STRING DataPermissionMask = '',										//Default will fail the fetch. Pos 12 must be set to '1'
 								INTEGER JoinLimit = 10000 
 								):=FUNCTION
 
 		inputs_for2 := PROJECT(inputs, BIPV2.IDlayouts.l_xlink_ids2);
-		f2 := kFetch2(inputs_for2, mod_access, Level, ScoreThreshold, DataPermissionMask, JoinLimit);		
+		f2 := kFetch2(inputs_for2, mod_access, Level, ScoreThreshold, JoinLimit);		
 		RETURN PROJECT(f2, RECORDOF(Key));																						
 
 	END;

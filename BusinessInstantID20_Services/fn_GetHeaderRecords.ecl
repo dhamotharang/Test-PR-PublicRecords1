@@ -64,12 +64,22 @@
 				RECORDOF(Business_Credit_KEL.File_SBFE_temp);
 			END;
 
+      _mod_access := 
+        MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+          EXPORT STRING DataRestrictionMask := linkingOptions.DataRestrictionMask;
+          EXPORT UNSIGNED1 glb := linkingOptions.GLBPurpose;
+          EXPORT UNSIGNED1 dppa := linkingOptions.DPPAPurpose;
+          EXPORT BOOLEAN show_minors := linkingOptions.IncludeMinors;
+          EXPORT UNSIGNED1 unrestricted := (UNSIGNED1)linkingOptions.AllowAll;
+          EXPORT BOOLEAN isPreGLBRestricted() := linkingOptions.restrictPreGLB;
+          EXPORT BOOLEAN ln_branded :=  linkingOptions.lnbranded;
+        END;
+          
 			ds_SBFERaw := 
 					Business_Credit.Key_LinkIds().kFetch2(inputs             := ds_BIPIDs,
-																								mod_access         := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()),
+																								mod_access         := _mod_access,
                                                 Level              := Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
 																								ScoreThreshold     := 0, // ScoreThreshold --> 0 = Give me everything
-																								DataPermissionMask := Options.DataPermissionMask,
 																								JoinLimit          := Business_Risk_BIP.Constants.Limit_SBFE_LinkIds,
 																								JoinType           := Options.KeepLargeBusinesses );				
 
