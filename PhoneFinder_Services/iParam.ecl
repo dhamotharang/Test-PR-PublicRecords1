@@ -229,7 +229,7 @@ MODULE
       EXPORT BOOLEAN UseQSent           	   := UseTransUnionIQ411 OR UseTransUnionPVS;
       EXPORT BOOLEAN UseInHousePhoneMetadata := pfOptions.UseInHousePhoneMetadata : STORED('UseInHousePhoneMetadata'); // Need to read from stored for options defined in MBS for API transactions as they would come under the root tag
       EXPORT BOOLEAN UseAccuData_CNAM        := UseInHousePhoneMetadata AND ~doxie.compliance.isAccuDataRestricted(drm);
-        
+
       EXPORT BOOLEAN IncludeInhousePhones    := pfOptions.IncludeInhousePhones;
       EXPORT BOOLEAN UseInhousePhones        := IncludeInhousePhones OR (displayAll OR TransactionType = $.Constants.TransType.BASIC);
       EXPORT BOOLEAN UseLastResort      		 := (IncludeInhousePhones OR TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT) AND doxie.compliance.use_LastResort(dpm);
@@ -261,10 +261,10 @@ MODULE
 
       // zumigo gateway is configured to turn deviceinfo to true when devicehistory is true
       EXPORT BOOLEAN DeviceHistory               := pfOptions.IncludeZumigoOptions.DeviceHistory;
-      EXPORT BOOLEAN IncludeDeviceHistory        :=(TransactionType = $.Constants.TransType.Ultimate OR DeviceHistory) AND ValidDeviceConsentInquiry;
+      EXPORT BOOLEAN IncludeDeviceHistory        := FALSE;
 
       EXPORT BOOLEAN DeviceInfo                  := pfOptions.IncludeZumigoOptions.DeviceInfo;
-      EXPORT BOOLEAN IncludeDeviceInfo           :=(TransactionType = $.Constants.TransType.Ultimate OR DeviceHistory OR DeviceInfo) AND ValidDeviceConsentInquiry;
+      EXPORT BOOLEAN IncludeDeviceInfo           := FALSE;
 
       EXPORT BOOLEAN DeviceChangeInfo            := pfOptions.IncludeZumigoOptions.DeviceChangeInfo;
       EXPORT BOOLEAN IncludeDeviceChangeInfo     :=(TransactionType = $.Constants.TransType.Ultimate OR DeviceChangeInfo) AND ValidDeviceConsentInquiry;
@@ -297,7 +297,7 @@ MODULE
 
     // Search module
     searchMod := PROJECT(globalMod,DIDParams,OPT);
-	
+
     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalMod);
     drm := mod_access.DataRestrictionMask;
     dpm := mod_access.DataPermissionMask;
@@ -395,5 +395,5 @@ MODULE
 
     RETURN input_Mod;
   END;
- 
+
 END;
