@@ -112,7 +112,7 @@ d_InputWithParsedReqResp := join(d_InputWithParsedReq,d_resp_did_optout,left.seq
 gateway_collection_log.Layouts.Baselayout FullRecReqcln(d_InputWithParsedReqResp L,d_req_clean R):=transform
 
    self.cln_request_data := (string)tojson(ROW({R.gatewayparams,R.user,R.options,R.searchby},Targus.Layout_Targus_In));
-self := L;
+   self := L;
 end;
 d_InputWithclnReq := join(d_InputWithParsedReqResp,d_req_clean,left.seq =(UNSIGNED) right.User.QueryId,FullRecReqcln(left,right),left outer);
 

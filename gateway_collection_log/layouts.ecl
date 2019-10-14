@@ -26,22 +26,18 @@ export layouts := MODULE
   end;
 	
 	export BaseLayout := record
-	   string    process_date;
+	   string8   process_date;
 	   unsigned4 seq;
 		 string    esp_method;
-		 STRING50  transaction_id;
+		 STRING20  transaction_id;
 		 data      request_data;    // decoded
      string    request_format;
      data      response_data;   // decoded
      string    response_format;
-     string10  date_added;      // YYYYMMDD
-     string10  time_added;      // HHMMSS
+     string8   date_added;      // YYYYMMDD
+     string8   time_added;      // HHMMSS
      UNSIGNED4 global_sid;
      UNSIGNED8 record_sid;		 
-		 
-	    // recordof(targus.Layout_Targus_out.response) response {XPATH('TargusComprehensiveResponse')};
-			// recordof(targus.Layout_Targus_out) response {XPATH('TargusComprehensiveResponseEx')};
-      
 		 recordof(targus.Layout_Targus_out) temp_response_data1 {XPATH('TargusComprehensiveResponseEx')};
      string    cln_request_data; 
      string    cln_response_data; 		 

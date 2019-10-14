@@ -1,6 +1,6 @@
 ﻿IMPORT	VersionControl,	ut, STD;
 EXPORT	proc_build_base(STRING	pVersion	,
-												Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	MODULE
+												Constants.buildType	pBuildType	=	Constants.buildType.Daily)	:=	MODULE
 
 	//May individual gateway files and add it here															
 	EXPORT	dGateway_sources			:=	Map_GatewayLog_Targus();
@@ -10,16 +10,16 @@ EXPORT	proc_build_base(STRING	pVersion	,
 
                                                                                     
 	EXPORT	full_build	:=SEQUENTIAL(
-				                         	 IF(NOTHOR( STD.File.GetSuperFileSubCount(Filenames(pVersion).Input.Sprayed)
-                                             +STD.File.GetSuperFileSubCount(Filenames(pVersion).Input.Using))>0,
-						                         SEQUENTIAL(
-																								 Promote(pversion).inputfiles.Sprayed2Using
-																								,GatewayCollection_BuildFile
-																								,Promote(pversion).Inputfiles.Using2Used
-																								),output('No Sprayed file, skipping GatewayCollection.proc_build_base().All attribute'))
-																		,Promote(pversion, 'base').buildfiles.New2Built
-																		,Promote(pversion, 'base').buildfiles.Built2QA	
-																 );
+                                    IF(NOTHOR( STD.File.GetSuperFileSubCount(Filenames(pVersion).Input.Sprayed)
+                                              +STD.File.GetSuperFileSubCount(Filenames(pVersion).Input.Using))>0,
+                                      SEQUENTIAL(
+                                                 Promote(pversion).inputfiles.Sprayed2Using
+                                                ,GatewayCollection_BuildFile
+                                                ,Promote(pversion).Inputfiles.Using2Used
+                                                ),output('No Sprayed file, skipping GatewayCollection.proc_build_base().All attribute'))
+                                    ,Promote(pversion, 'base').buildfiles.New2Built
+                                    ,Promote(pversion, 'base').buildfiles.Built2QA	
+                                  );
 				
 
 	EXPORT	ALL	:= IF(VersionControl.IsValidVersion(pversion)

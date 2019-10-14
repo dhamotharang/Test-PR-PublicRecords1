@@ -1,14 +1,14 @@
 ﻿IMPORT	VersionControl,	Tools,	ut;
 
 EXPORT	proc_build_keys(STRING	pVersion,
-												Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	MODULE
+												Constants.buildType	pBuildType	=	Constants.buildType.Daily)	:=	MODULE
 
 /*****************/
 /*	Build Keys   */
 /*****************/
 	SHARED	names			:=	keynames(pVersion);
 	SHARED	bestNames	:=	gateway_collection_log.Keynames(pVersion);
-	SHARED	isDelta		:=	pBuildType=Constants().buildType.Daily;
+	SHARED	isDelta		:=	pBuildType=Constants.buildType.Daily;
 
 	VersionControl.macBuildNewLogicalKeyWithName(gateway_collection_log.KeyPrep_GatewayCollectionlog_DID(pVersion,pBuildType),
 	                                             names.kGatewayCollectionDid.new,BuildGatewayCollectionKey);
