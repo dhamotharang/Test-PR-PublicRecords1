@@ -21,6 +21,7 @@ onThor := _Control.Environment.onThor;
 #workunit('name', 'profile booster ' + 	if(onThor, 'thor ', 'roxie ') );
 #stored('did_add_force', if(onThor, 'thor', 'roxi') );  // this option is the stored parameter used inside the DID append macro to determine which version of the macro to use
 #OPTION('multiplePersistInstances', FALSE); // doesn't rename the persist files for each job
+#OPTION('splitterSpill', 1);
 
 eyeball_count := 25;
 StepName := 'Step2_3';
