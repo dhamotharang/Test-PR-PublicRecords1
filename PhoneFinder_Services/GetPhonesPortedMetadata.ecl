@@ -1,4 +1,4 @@
-﻿IMPORT  Gateway, MDR, PhoneFinder_Services, STD, ut, PhonesInfo;
+﻿IMPORT  Gateway, MDR, PhoneFinder_Services, STD, ut, Phones;
 
 EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dSearchRecs0,
 													     PhoneFinder_Services.iParam.SearchParams inMod,
@@ -10,9 +10,14 @@ FUNCTION
   currentDate := (STRING)STD.Date.Today();
 
   //Based on subject info get ALL ports and CURRENT deact records
+  dInPhones := DEDUP(SORT(PROJECT(subjectInfo, TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn, SELF.phoneno := LEFT.Phone, SELF := [])), phoneno), phoneno);
+	in_mod := MODULE(Phones.IParam.BatchParams)
+		EXPORT UNSIGNED	max_age_days := Phones.Constants.PhoneAttributes.LastActivityThreshold;
+	END;
+  dsPhonesmetadata:= PROJECT(Phones.GetPhoneMetadata_wLERG6(dInPhones, in_mod), TRANSFORM(Phones.Layouts.portedMetadata_Main, SELF := LEFT));
 
-  dPorted	:= JOIN(subjectInfo, PhonesInfo.Key_Phones.Ported_Metadata,
-                  KEYED(LEFT.phone = RIGHT.phone) AND
+  dPorted	:= JOIN(subjectInfo, dsPhonesmetadata,
+                 (LEFT.phone = RIGHT.phone) AND
                   ((LEFT.FirstSeenDate <= RIGHT.port_start_dt) OR
                     (LEFT.FirstSeenDate <= RIGHT.dt_last_reported) OR
                     (RIGHT.deact_code=PhoneFinder_Services.Constants.PortingStatus.Disconnected AND RIGHT.is_deact='Y')),
@@ -39,11 +44,12 @@ FUNCTION
                               acctno, phone, MAX(-dt_last_reported, -port_start_dt)), acctno, phone),
                         PhoneFinder_Services.Constants.MaxPortedMatches, acctno, phone, MAX(-dt_last_reported, -port_start_dt));
 
-  // There are 4 sources in Ported_Metadata - PK, PJ, PB, PX.
+  // There are 4 sources in Ported_Metadata - PK, PB, PX, L6.
   // PB records will NOT have a port_start_dt and are base records created for gong and phonesplus records without any ports.
   // PX records will NOT have a port_start_dt and represents disconnect activities.
   // Both PB and PX will be ordered by dt_last_reported.
-  // PK and PJ represents actual moves between carriers record by port_start_dt. These records will have a zero dt_last_reported value
+  // PK represents actual moves between carriers record by port_start_dt. These records will have a zero dt_last_reported value
+  // L6 gives carrier information
   sortedPorts  := GROUP(SORT(dPortedPhones, acctno, phone, port_start_dt=0, port_start_dt, spid, -deact_start_dt, -dt_last_reported),
                         acctno, phone, spid);
 

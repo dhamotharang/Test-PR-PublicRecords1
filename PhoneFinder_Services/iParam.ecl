@@ -110,6 +110,7 @@ MODULE
     EXPORT BOOLEAN hasActiveIdentitycountRules        := FALSE;
     EXPORT BOOLEAN hasActivePhoneTransactionCountRule := FALSE;
     EXPORT BOOLEAN IsGovSearch := FALSE;
+    EXPORT BOOLEAN UseInHousePhoneMetadataOnly := FALSE;
   END;
 
   EXPORT PhoneVerificationParams :=
@@ -228,7 +229,8 @@ MODULE
       EXPORT BOOLEAN UseTransUnionPVS        := (TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate] OR IncludeTransUnionPVS) AND ~doxie.compliance.isQSentRestricted(drm);
       EXPORT BOOLEAN UseQSent           	   := UseTransUnionIQ411 OR UseTransUnionPVS;
       EXPORT BOOLEAN UseInHousePhoneMetadata := pfOptions.UseInHousePhoneMetadata : STORED('UseInHousePhoneMetadata'); // Need to read from stored for options defined in MBS for API transactions as they would come under the root tag
-      EXPORT BOOLEAN UseAccuData_CNAM        := UseInHousePhoneMetadata AND ~doxie.compliance.isAccuDataRestricted(drm);
+      EXPORT BOOLEAN UseInHousePhoneMetadataOnly := IF(UseTransUnionPVS, FALSE, TRUE);
+      EXPORT BOOLEAN UseAccuData_CNAM        := UseInHousePhoneMetadata AND ~doxie.compliance.isAccuDataRestricted(drm) AND TransactionType != $.Constants.TransType.PhoneRiskAssessment;
 
       EXPORT BOOLEAN IncludeInhousePhones    := pfOptions.IncludeInhousePhones;
       EXPORT BOOLEAN UseInhousePhones        := IncludeInhousePhones OR (displayAll OR TransactionType = $.Constants.TransType.BASIC);
@@ -337,7 +339,8 @@ MODULE
       EXPORT INTEGER   MaxOtherPhones		              := iesp.Constants.Phone_Finder.MaxOtherPhones;// TO LIMIT OTHER PHONES
 
       EXPORT BOOLEAN   UseInHousePhoneMetadata	:= FALSE : STORED('UseInHousePhoneMetadata');
-      EXPORT BOOLEAN   UseAccuData_CNAM         := UseInHousePhoneMetadata AND ~doxie.compliance.isAccuDataRestricted(drm);
+      EXPORT BOOLEAN UseInHousePhoneMetadataOnly := IF(UseTransUnionPVS, FALSE, TRUE);
+      EXPORT BOOLEAN   UseAccuData_CNAM         := UseInHousePhoneMetadata AND ~doxie.compliance.isAccuDataRestricted(drm) AND TransactionType != $.Constants.TransType.PhoneRiskAssessment;
 
 
       EXPORT BOOLEAN   VerifyPhoneName        :=  FALSE : STORED('VerifyPhoneName');

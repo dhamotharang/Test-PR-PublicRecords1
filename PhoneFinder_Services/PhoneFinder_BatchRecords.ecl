@@ -192,7 +192,7 @@ IMPORT Autokey_Batch, BatchShare, Gateway, MDR, Phones, PhoneFinder_Services, Ro
   SHARED dResultsDedupRecs := dResultsDedup_More + dSearchRecs_pre(typeflag = Phones.Constants.TypeFlag.DataSource_PV);
 
   // filtering out inhouse phonmetadata records
-  SHARED dFilteringInHousePhoneData_typeflag := IF(inMod.UseInHousePhoneMetadata,
+  SHARED dFilteringInHousePhoneData_typeflag := IF(inMod.UseInHousePhoneMetadataOnly,
                                                     PROJECT(dResultsDedupRecs,
                                                             TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
                                                                       SELF.typeflag     :=  IF(LEFT.typeflag = 'P', '', LEFT.typeflag),
