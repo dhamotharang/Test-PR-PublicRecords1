@@ -1,4 +1,4 @@
-IMPORT	Address, BIPV2;
+﻿IMPORT	Address, BIPV2;
 EXPORT	Layouts	:=	MODULE
 	EXPORT	FileHeaderSegment	:=	RECORD	// (FA)
 		STRING2		Segment_Identifier;
@@ -603,6 +603,9 @@ EXPORT	Layouts	:=	MODULE
 		STRING1		correction_type;
 		STRING8		correction_date;
 		STRING		original_process_date;
+		//DF-26180 Add CCPA fields to . thor_data400::key::sbfe::qa::businessownerinformation
+		UNSIGNED4	global_sid 			:= 0;
+		UNSIGNED8   record_sid 			:= 0;
 	END;
 	
 	EXPORT	rAccountBase	:=	RECORD
@@ -646,6 +649,10 @@ EXPORT	Layouts	:=	MODULE
 		BS;
 		STRING2		source:=Constants().source;
 		BOOLEAN		active;
+		//DF-26180 Add CCPA fields to thor_data400::key::sbfe::qa::businessowner
+		UNSIGNED6	did					:= 0;
+		UNSIGNED4	global_sid 			:= 0;
+		UNSIGNED8   record_sid 			:= 0;
 	END;
 	
 	EXPORT	rCollateral	:=	RECORD
@@ -688,6 +695,10 @@ EXPORT	Layouts	:=	MODULE
 		IS;
 		STRING2		source:=Constants().source;
 		BOOLEAN		active;
+		//DF-26180 Add CCPA fields to  thor_data400::key::sbfe::qa::individualowner
+		UNSIGNED6	did					:= 0;
+		UNSIGNED4	global_sid 			:= 0;
+		UNSIGNED8   record_sid 			:= 0;
 	END;
 	
 	EXPORT	rMasterAccount	:=	RECORD

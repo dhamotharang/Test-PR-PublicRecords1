@@ -1,4 +1,4 @@
-/*
+﻿/*
 IMPORT BusReg,DNB_FEINV2,MDR,TopBusiness_BIPV2,BIPV2;
 
 EXPORT Build_Industry_base := MODULE
@@ -34,11 +34,13 @@ module
 													 transform(Layouts.rec_industry_combined_layout, 
 																		 self.industry_description := ut.fnTrim2Upper(left.industry_description),
 																		 self.business_description := ut.fnTrim2Upper(left.business_description),
+																		 self.siccode      := trim(left.siccode[1..4]),
+																		 self.siccode_plus := trim(left.siccode[5..8]),
 																		 self 										 := left));
 
 	//*** filter bad records and sort the file for rollup.
 	dBaseFile_srt := sort(distribute(pBaseFile_fil, hash64(source, ultid, orgid, seleid, proxid, bdid)),
-												source, ultid, orgid, seleid, proxid, powid, empid, dotid, bdid, source_docid, source_rec_id, siccode, naics, industry_description,
+												source, ultid, orgid, seleid, proxid, powid, empid, dotid, bdid, source_docid, source_rec_id, siccode, siccode_plus, naics, industry_description,
 												business_description, record_type, local);
 		
 	//*** rollup the file to remove the dupicate records.
