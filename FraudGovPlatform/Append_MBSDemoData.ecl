@@ -26,7 +26,7 @@ tools.mac_WriteFile(Fraudshared.Filenames().Input.mbsfdnmasteridindtypeinclusion
 
 Export MbsIncl		:= Sequential( Build_MbsInclusion_PatchFile
 												,STD.File.StartSuperFileTransaction()
-												,FileServices.clearsuperfile(FraudShared.Filenames().Input.mbsfdnmasteridindtypeinclusion.Sprayed)
+												,FileServices.clearsuperfile(FraudShared.Filenames().Input.mbsfdnmasteridindtypeinclusion.Sprayed, true)
 												,FileServices.AddSuperfile(FraudShared.Filenames().Input.mbsfdnmasteridindtypeinclusion.Sprayed
 																,Fraudshared.Filenames().Input.mbsfdnmasteridindtypeinclusion.New(pversion+'_Patch'))
 												,STD.File.FinishSuperFileTransaction()
