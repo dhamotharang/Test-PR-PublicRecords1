@@ -11,7 +11,10 @@ function
 	transform,
 	 skip(cnt = 2 and trim(l.Title_Desc_2,left,right) = '' or
 	      cnt = 3 and trim(l.Title_Desc_3,left,right) = '' or
-				cnt = 4 and trim(l.Title_Desc_4,left,right) = '')
+				cnt = 4 and trim(l.Title_Desc_4,left,right) = '' or
+				trim(l.fname + l.lname,left,right)          = '' or
+				trim(l.clean_company_name,left,right)       = '' )
+				
 		self.source	                     := l.source;
 		self.did												 := l.did;																	
 		self.did_score									 := l.did_score;														
@@ -23,6 +26,17 @@ function
 	  self.subject_name.mname					 := l.mname;
 	  self.subject_name.lname					 := l.lname;
 	  self.subject_name.name_suffix		 := l.name_suffix;
+		self.subject_address.prim_range	 := l.prim_range;
+	  self.subject_address.predir      := l.predir;
+	  self.subject_address.prim_name   := l.prim_name;
+	  self.subject_address.addr_suffix := l.addr_suffix;
+	  self.subject_address.postdir		 := l.postdir;
+	  self.subject_address.unit_desig	 := l.unit_desig;
+	  self.subject_address.sec_range	 := l.sec_range;
+	  self.subject_address.city_name	 := l.v_city_name;
+	  self.subject_address.st					 := l.st;
+	  self.subject_address.zip				 := l.zip;
+	  self.subject_address.zip4				 := l.zip4;
 		self.subject_job_title					 := choose(cnt,l.Title_Desc_1,l.Title_Desc_2,l.Title_Desc_3,l.Title_Desc_4);
 		self.company_name							   := l.clean_company_name;
 		self.company_address.prim_range	 := l.prim_range;
