@@ -377,9 +377,9 @@ phone_velocity_grped := group(phone_velocity_sorted, seq);
 ds_for_rollup := if(BSversion>1, if(BSversion >= 50, phone_velocity_grped, phone_velocity),
 							biggestrec_history);
 
-//Phone_metadata added.
 biggestrec_rolled_temp := rollup(ds_for_rollup,true,roll_phone_trans(left,right));
-
+biggestrec_rolled_temp_nonFCRA := if(~isFCRA,biggestrec_rolled_temp);
+//Phone_metadata added.
 valid_phone_inputs:= Ungroup(with_address_info(phone10<>''));
 
 emptygateways := dataset([], gateway.layouts.config);	
@@ -440,7 +440,7 @@ string2 PhoneLineDescription ;
 string2 PhoneLineType ;
 END;
 
-with_phone_metadata:= join(biggestrec_rolled_temp,phone_metadata_results,left.phone10=right.phonenumber,
+with_phone_metadata:= join(biggestrec_rolled_temp_nonFCRA,phone_metadata_results,left.phone10=right.phonenumber,
 transform(mylayout_output,
 self.IsPhoneCurrent := right.iscurrent;
 self.PhoneLineDescription := right.phonelinedescription;
@@ -456,16 +456,16 @@ sorted_meta_phone:= group(sort(with_phone_metadata,seq,phone10,-IsPhoneCurrent,-
 rolled_meta_phone:= rollup(sorted_meta_phone,left.seq=right.seq,phoneroll(left,right));
      
   
-  Risk_indicators.Layout_Output add_metadata_phone(biggestrec_rolled_temp l, rolled_meta_phone r):= transform
+  Risk_indicators.Layout_Output add_metadata_phone(biggestrec_rolled_temp_nonFCRA l, rolled_meta_phone r):= transform
   self.IsPhoneCurrent:=r.IsPhoneCurrent;
   self.PhoneLineDescription:= r.PhoneLineDescription;
   self.PhoneLineType:= r.PhoneLineType;
   self:= l;
   END;
   
- biggestrec_rolled_join:= join(biggestrec_rolled_temp, rolled_meta_phone, left.seq=right.seq, add_metadata_phone(left,right),left outer);
+ biggestrec_rolled_join:=join(biggestrec_rolled_temp, rolled_meta_phone, left.seq=right.seq, add_metadata_phone(left,right),left outer);
  biggestrec_rolled:= group(biggestrec_rolled_join,seq);
-    
+
    //phone_metadata has been added. 
 
 risk_indicators.layout_output wphvertrans(risk_indicators.layout_output l, dirs_by_phone r) := transform
