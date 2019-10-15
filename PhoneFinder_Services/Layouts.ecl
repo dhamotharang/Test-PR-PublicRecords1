@@ -1,4 +1,4 @@
-﻿﻿IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhoneFraud, ThreatMetrix, PhonesInfo;
+﻿﻿ IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhoneFraud, ThreatMetrix, Phones;
 
   EXPORT Layouts :=
   MODULE
@@ -755,7 +755,7 @@
   END;
 
   EXPORT PortedMetadata := RECORD
-    RECORDOF(PhonesInfo.Key_Phones.Ported_Metadata);
+    Phones.Layouts.portedMetadata_Main;
   END;
 
   EXPORT DeltabaseResponse := RECORD

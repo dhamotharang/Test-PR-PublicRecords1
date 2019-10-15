@@ -40,7 +40,7 @@
   TRANSFORM
     SELF.acctno                                                   := le.acctno;
     SELF.phone                                                    := le.phone;
-    SELF.typeflag                                                 := 'P';
+    SELF.typeflag                                                 := Phones.Constants.TypeFlag.DataSource_PV;
     SELF.phone_source                                             := PhoneFinder_Services.Constants.PhoneSource.QSentGateway;
     SELF.dt_last_seen                                             := (STRING8)MAX(ri,ri.dt_last_reported);
     SELF.coc_description                                          := IF(le.phone_serv_type <> '',
