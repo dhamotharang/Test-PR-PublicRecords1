@@ -279,6 +279,22 @@ EXPORT Functions := MODULE
       SELF.DateFiled:=iesp.ECL2ESP.toDate((UNSIGNED4)L.DateFiled);
       SELF.ReleaseDate:=iesp.ECL2ESP.toDate((UNSIGNED4)L.ReleaseDate);
       SELF.DateLastSeen:=iesp.ECL2ESP.toDate((UNSIGNED4)L.DateLastSeen);
+			self.Defendantaddress.streetnumber := L.StreetNumber;
+			self.Defendantaddress.streetpredirection := L.StreetPreDirection;			
+			self.Defendantaddress.streetname := L.streetname;
+			self.Defendantaddress.streetsuffix := L.streetsuffix;
+			self.Defendantaddress.streetpostdirection := L.streetpostdirection;
+			self.Defendantaddress.unitdesignation := L.unitdesignation;
+			self.Defendantaddress.unitnumber := L.unitnumber;
+			self.Defendantaddress.streetaddress1 := L.streetaddress1;
+			self.Defendantaddress.streetaddress2 := L.streetaddress2;
+			self.Defendantaddress.city := L.city;
+			self.Defendantaddress.state := L.state;
+			self.Defendantaddress.zip5 := L.zip5;
+			self.Defendantaddress.zip4 := L.zip4;
+			self.Defendantaddress.county := L.county;
+			self.Defendantaddress.postalcode := L.postalcode;
+			self.Defendantaddress.statecityzip := L.statecityzip;
       SELF:=L;
     END;
 
@@ -286,6 +302,22 @@ EXPORT Functions := MODULE
       SELF.DateFiled:=iesp.ECL2ESP.toDate((UNSIGNED4)L.DateFiled);
       SELF.ReleaseDate:=iesp.ECL2ESP.toDate((UNSIGNED4)L.ReleaseDate);
       SELF.DateLastSeen:=iesp.ECL2ESP.toDate((UNSIGNED4)L.DateLastSeen);
+			self.Defendantaddress.streetnumber := L.StreetNumber;
+			self.Defendantaddress.streetpredirection := L.StreetPreDirection;			
+			self.Defendantaddress.streetname := L.streetname;
+			self.Defendantaddress.streetsuffix := L.streetsuffix;
+			self.Defendantaddress.streetpostdirection := L.streetpostdirection;
+			self.Defendantaddress.unitdesignation := L.unitdesignation;
+			self.Defendantaddress.unitnumber := L.unitnumber;
+			self.Defendantaddress.streetaddress1 := L.streetaddress1;
+			self.Defendantaddress.streetaddress2 := L.streetaddress2;
+			self.Defendantaddress.city := L.city;
+			self.Defendantaddress.state := L.state;
+			self.Defendantaddress.zip5 := L.zip5;
+			self.Defendantaddress.zip4 := L.zip4;
+			self.Defendantaddress.county := L.county;
+			self.Defendantaddress.postalcode := L.postalcode;
+			self.Defendantaddress.statecityzip := L.statecityzip;
       SELF:=L;
     END;
 
