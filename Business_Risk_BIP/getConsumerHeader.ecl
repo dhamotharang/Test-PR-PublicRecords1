@@ -228,7 +228,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																			(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(dx_header.functions.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
 																		Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
 																	getConsumerHeaderAddrAttributes(LEFT, RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
-	ConsumerHeaderAddrRaw:= Suppress.MAC_SuppressSource(ConsumerHeaderAddrRaw_all, mod_access, LexIDs.LexID);
+	ConsumerHeaderAddrRaw:= Suppress.MAC_SuppressSource(ConsumerHeaderAddrRaw_all, mod_access, LexIDs[1].LexID); // There’s no more than one LexId here //
 	// Filter out records after our history date
 	ConsumerHeaderAddr := Business_Risk_BIP.Common.FilterRecords(ConsumerHeaderAddrRaw, Dt_First_Seen, (UNSIGNED)Business_Risk_BIP.Constants.MissingDate, '', AllowedSourcesSet);
 	
