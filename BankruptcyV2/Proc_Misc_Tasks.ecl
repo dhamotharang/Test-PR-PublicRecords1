@@ -1,5 +1,5 @@
 ﻿export Proc_Misc_Tasks(filedate) := macro
-import Bankruptcyv3,BankruptcyV2,RoxieKeyBuild,orbit_report,_Control;	
+import Bankruptcyv3,BankruptcyV2,RoxieKeyBuild,orbit_report,_Control,STD;;	
 
 dummy_rec := record
 string dummy_field := '';
@@ -15,7 +15,7 @@ BankruptcyV3.proc_BK_stats(filedate,zRunStatsReferenceV3);
 
 proc_BK_Stats			    := zRunStatsReference					   : success(output(' V2 Stats created successfully.'));
 proc_BK_Stats_v3		    := zRunStatsReferenceV3					   : success(output(' V3 Stats created successfully.'));
-new_records_sample_for_qa	:= BankruptcyV2.New_records_sample        : success(fileservices.sendemail('wma@seisint.com;qualityassurance@seisint.com;christopher.brodeur@lexisnexis.com;CAmaral@seisint.com;mohammad.alam@lexisnexis.com;Sayeed.ahmed@lexisnexis.com',
+new_records_sample_for_qa	:= BankruptcyV2.New_records_sample        : success(fileservices.sendemail('wma@seisint.com;qualityassurance@seisint.com;christopher.brodeur@lexisnexis.com;CAmaral@seisint.com;mohammad.alam@lexisnexis.com;Sayeed.ahmed@lexisnexis.com;Manuel.Tarectecan@lexisnexisrisk.com',
 			'BankruptcyV2 Full Build Process Completed ' + filedate,
 			'workunit: ' + workunit));
 //boolean_build := bankruptcyv2.Proc_Build_Boolean_Key(filedate);
@@ -60,7 +60,7 @@ Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.layout_bankruptcy_search_in,'~tho
 
 // DF-22748 Bankruptcy: Send email when WithdrawnStatus records are added that contain valid LexID
 send_withdrawnstatus_email := IF(COUNT(BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()((UNSIGNED)did>0))>0,
-                               fileservices.sendemail('Kevin.Garrity@LexisNexisRisk.com,Christopher.Brodeur@lexisnexisrisk.com,Stephen.Powers@lexisnexisrisk.com,Ruel.Barrina@lexisnexisrisk.com',
+                               fileservices.sendemail('Kevin.Garrity@LexisNexisRisk.com,Christopher.Brodeur@lexisnexisrisk.com,Stephen.Powers@lexisnexisrisk.com,Ruel.Barrina@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com',
                                'Bankruptcy Build Version ' + filedate,
                                'BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus() contains '
                                +COUNT(BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()((UNSIGNED)did>0))
@@ -77,6 +77,26 @@ send_withdrawnstatus_email := IF(COUNT(BankruptcyV3.Key_BankruptcyV3_WithdrawnSt
                                +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[10].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[10].did+'\n','')
                               ));
 	
+File_Check:=  
+output('');
+output('Starting file consolidation check -');
+
+output('thor_data400::in::bankruptcyv3::case_full');
+output('thor_data400::in::bankruptcyv3::defendants_full');
+output('thor_data400::in::bankruptcyv3::main_full');
+output('thor_data400::in::bankruptcyv3::search_full');
+
+DFS := 
+STD.File.VerifyFile('~thor_data400::in::bankruptcyv3::case_full',true);
+STD.File.VerifyFile('~thor_data400::in::bankruptcyv3::defendants_full',true);
+STD.File.VerifyFile('~thor_data400::in::bankruptcyv3::main_full',true);
+STD.File.VerifyFile('~thor_data400::in::bankruptcyv3::search_full',true);
+
+output(DFS);
+IF(DFS = 'OK',
+output('The BK consolidated files were verified to be intact'), 
+FileServices.SendEmail('Christopher.Brodeur@LexisNexisrisk.com; Manuel.Tarectecan@lexisnexisrisk.com', 'BK stats file verification Failure',WORKUNIT + '\n' + '\n' + 'Please check above WUID to see which file failed verification'));
+
 sequential(/*dops_update
 		,*/build_relationships
 		//,send_package
@@ -92,6 +112,7 @@ sequential(/*dops_update
 		,addfullfilestosuper
 		,BIP_dops_update
 		,parallel(caseret,defret,mainret,searchret)
+		,File_Check
   ,send_withdrawnstatus_email
 		) : WHEN(event('Yogurt:BANKRUPTCY ROXIE KEY BUILD COMPLETE','*'), count(1));
 
