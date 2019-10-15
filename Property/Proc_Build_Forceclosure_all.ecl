@@ -2,11 +2,12 @@
 
 #OPTION('skipfileformatcrccheck',1);
 EXPORT Proc_Build_Forceclosure_all(
-	STRING pVersion,
-	STRING pHostname,
-	STRING pSource,
-	STRING pGroup = STD.System.Thorlib.Group(),
-	STRING pGlob  = 'REOOut.txt'
+	STRING  pVersion,
+	STRING  pHostname,
+	STRING  pSource,
+	STRING  pGroup = STD.System.Thorlib.Group(),
+	BOOLEAN pSpray = TRUE,
+	STRING  pGlob  = 'REOOut.txt'
 ) := FUNCTION
 
 	doSpray := Property.spray_Foreclosure_Raw(
@@ -14,7 +15,7 @@ EXPORT Proc_Build_Forceclosure_all(
 		pHostname,
 		pVersion,
 		pGroup,
-		pSource + '/' + pGlob,
+		pSource + '/' + pGlob
 	);
 
 	doKeyBuild := Property.Foreclosure_Keys(pVersion);
@@ -27,7 +28,7 @@ EXPORT Proc_Build_Forceclosure_all(
 	);
 
 	retval := SEQUENTIAL(
-		doSpray,
+		IF(pSpray, doSpray),
 		doOrbitStat,
 		doKeyBuild,
 		orbit_update
