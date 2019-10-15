@@ -1,7 +1,7 @@
 ﻿IMPORT SALT311;
 EXPORT Fields := MODULE
  
-EXPORT NumFields := 36;
+EXPORT NumFields := 37;
  
 // Processing for each FieldType
 EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'alpha','number','upper','multiword','Noblanks');
@@ -47,11 +47,11 @@ END;
 EXPORT InValidFT_Noblanks(SALT311.StrType s) := WHICH(SALT311.stringtouppercase(s)<>s,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' <>{}[]-^=!+&,./'))),~(LENGTH(TRIM(s)) >= 1));
 EXPORT InValidMessageFT_Noblanks(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotCaps,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' <>{}[]-^=!+&,./'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
  
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'active_duns_number','active_enterprise_number','active_domestic_corp_key','hist_enterprise_number','hist_duns_number','hist_domestic_corp_key','foreign_corp_key','unk_corp_key','ebr_file_number','company_fein','company_name','cnp_name','company_name_type_raw','company_name_type_derived','cnp_hasnumber','cnp_number','cnp_btype','cnp_lowv','cnp_translated','cnp_classid','company_foreign_domestic','company_bdid','company_phone','prim_name','prim_name_derived','sec_range','v_city_name','st','zip','prim_range','prim_range_derived','company_csz','company_addr1','company_address','dt_first_seen','dt_last_seen');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'active_duns_number','active_enterprise_number','active_domestic_corp_key','hist_enterprise_number','hist_duns_number','hist_domestic_corp_key','foreign_corp_key','unk_corp_key','ebr_file_number','company_fein','company_name','cnp_name','company_name_type_raw','company_name_type_derived','cnp_hasnumber','cnp_number','cnp_btype','cnp_lowv','cnp_translated','cnp_classid','company_foreign_domestic','company_bdid','company_phone','prim_name','prim_name_derived','sec_range','v_city_name','st','zip','prim_range','prim_range_derived','company_csz','company_addr1','company_address','dt_first_seen','dt_last_seen');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'active_duns_number' => 0,'active_enterprise_number' => 1,'active_domestic_corp_key' => 2,'hist_enterprise_number' => 3,'hist_duns_number' => 4,'hist_domestic_corp_key' => 5,'foreign_corp_key' => 6,'unk_corp_key' => 7,'ebr_file_number' => 8,'company_fein' => 9,'company_name' => 10,'cnp_name' => 11,'company_name_type_raw' => 12,'company_name_type_derived' => 13,'cnp_hasnumber' => 14,'cnp_number' => 15,'cnp_btype' => 16,'cnp_lowv' => 17,'cnp_translated' => 18,'cnp_classid' => 19,'company_foreign_domestic' => 20,'company_bdid' => 21,'company_phone' => 22,'prim_name' => 23,'prim_name_derived' => 24,'sec_range' => 25,'v_city_name' => 26,'st' => 27,'zip' => 28,'prim_range' => 29,'prim_range_derived' => 30,'company_csz' => 31,'company_addr1' => 32,'company_address' => 33,'dt_first_seen' => 34,'dt_last_seen' => 35,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],[],[],[],[],[],[],[],[],[],[],['CAPS','ALLOW','LENGTHS'],[],[],[],[],[],[],[],[],[],[],[],[],['CAPS','ALLOW','LENGTHS'],[],[],['CAPS','ALLOW'],['ALLOW'],[],[],[],[],[],[],[],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'active_duns_number','active_enterprise_number','active_domestic_corp_key','hist_enterprise_number','hist_duns_number','hist_domestic_corp_key','foreign_corp_key','unk_corp_key','ebr_file_number','company_fein','company_name','cnp_name_phonetic','cnp_name','company_name_type_raw','company_name_type_derived','cnp_hasnumber','cnp_number','cnp_btype','cnp_lowv','cnp_translated','cnp_classid','company_foreign_domestic','company_bdid','company_phone','prim_name','prim_name_derived','sec_range','v_city_name','st','zip','prim_range','prim_range_derived','company_csz','company_addr1','company_address','dt_first_seen','dt_last_seen');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'active_duns_number','active_enterprise_number','active_domestic_corp_key','hist_enterprise_number','hist_duns_number','hist_domestic_corp_key','foreign_corp_key','unk_corp_key','ebr_file_number','company_fein','company_name','cnp_name_phonetic','cnp_name','company_name_type_raw','company_name_type_derived','cnp_hasnumber','cnp_number','cnp_btype','cnp_lowv','cnp_translated','cnp_classid','company_foreign_domestic','company_bdid','company_phone','prim_name','prim_name_derived','sec_range','v_city_name','st','zip','prim_range','prim_range_derived','company_csz','company_addr1','company_address','dt_first_seen','dt_last_seen');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'active_duns_number' => 0,'active_enterprise_number' => 1,'active_domestic_corp_key' => 2,'hist_enterprise_number' => 3,'hist_duns_number' => 4,'hist_domestic_corp_key' => 5,'foreign_corp_key' => 6,'unk_corp_key' => 7,'ebr_file_number' => 8,'company_fein' => 9,'company_name' => 10,'cnp_name_phonetic' => 11,'cnp_name' => 12,'company_name_type_raw' => 13,'company_name_type_derived' => 14,'cnp_hasnumber' => 15,'cnp_number' => 16,'cnp_btype' => 17,'cnp_lowv' => 18,'cnp_translated' => 19,'cnp_classid' => 20,'company_foreign_domestic' => 21,'company_bdid' => 22,'company_phone' => 23,'prim_name' => 24,'prim_name_derived' => 25,'sec_range' => 26,'v_city_name' => 27,'st' => 28,'zip' => 29,'prim_range' => 30,'prim_range_derived' => 31,'company_csz' => 32,'company_addr1' => 33,'company_address' => 34,'dt_first_seen' => 35,'dt_last_seen' => 36,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],[],[],[],[],[],[],[],[],[],[],[],['CAPS','ALLOW','LENGTHS'],[],[],[],[],[],[],[],[],[],[],[],[],['CAPS','ALLOW','LENGTHS'],[],[],['CAPS','ALLOW'],['ALLOW'],[],[],[],[],[],[],[],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
@@ -98,6 +98,10 @@ EXPORT InValidMessage_company_fein(UNSIGNED1 wh) := '';
 EXPORT Make_company_name(SALT311.StrType s0) := s0;
 EXPORT InValid_company_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_company_name(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_cnp_name_phonetic(SALT311.StrType s0) := s0;
+EXPORT InValid_cnp_name_phonetic(SALT311.StrType s) := 0;
+EXPORT InValidMessage_cnp_name_phonetic(UNSIGNED1 wh) := '';
  
 EXPORT Make_cnp_name(SALT311.StrType s0) := MakeFT_Noblanks(s0);
 EXPORT InValid_cnp_name(SALT311.StrType s) := InValidFT_Noblanks(s);
@@ -231,6 +235,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_ebr_file_number;
     BOOLEAN Diff_company_fein;
     BOOLEAN Diff_company_name;
+    BOOLEAN Diff_cnp_name_phonetic;
     BOOLEAN Diff_cnp_name;
     BOOLEAN Diff_company_name_type_raw;
     BOOLEAN Diff_company_name_type_derived;
@@ -270,6 +275,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_ebr_file_number := le.ebr_file_number <> ri.ebr_file_number;
     SELF.Diff_company_fein := le.company_fein <> ri.company_fein;
     SELF.Diff_company_name := le.company_name <> ri.company_name;
+    SELF.Diff_cnp_name_phonetic := le.cnp_name_phonetic <> ri.cnp_name_phonetic;
     SELF.Diff_cnp_name := le.cnp_name <> ri.cnp_name;
     SELF.Diff_company_name_type_raw := le.company_name_type_raw <> ri.company_name_type_raw;
     SELF.Diff_company_name_type_derived := le.company_name_type_derived <> ri.company_name_type_derived;
@@ -294,7 +300,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_dt_last_seen := le.dt_last_seen <> ri.dt_last_seen;
     SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
     SELF.SourceField := le.source;
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_active_duns_number,1,0)+ IF( SELF.Diff_active_enterprise_number,1,0)+ IF( SELF.Diff_active_domestic_corp_key,1,0)+ IF( SELF.Diff_hist_enterprise_number,1,0)+ IF( SELF.Diff_hist_duns_number,1,0)+ IF( SELF.Diff_hist_domestic_corp_key,1,0)+ IF( SELF.Diff_foreign_corp_key,1,0)+ IF( SELF.Diff_unk_corp_key,1,0)+ IF( SELF.Diff_ebr_file_number,1,0)+ IF( SELF.Diff_company_fein,1,0)+ IF( SELF.Diff_company_name,1,0)+ IF( SELF.Diff_cnp_name,1,0)+ IF( SELF.Diff_company_name_type_raw,1,0)+ IF( SELF.Diff_company_name_type_derived,1,0)+ IF( SELF.Diff_cnp_hasnumber,1,0)+ IF( SELF.Diff_cnp_number,1,0)+ IF( SELF.Diff_cnp_btype,1,0)+ IF( SELF.Diff_cnp_lowv,1,0)+ IF( SELF.Diff_cnp_translated,1,0)+ IF( SELF.Diff_cnp_classid,1,0)+ IF( SELF.Diff_company_foreign_domestic,1,0)+ IF( SELF.Diff_company_bdid,1,0)+ IF( SELF.Diff_company_phone,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_prim_name_derived,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_zip,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_prim_range_derived,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_active_duns_number,1,0)+ IF( SELF.Diff_active_enterprise_number,1,0)+ IF( SELF.Diff_active_domestic_corp_key,1,0)+ IF( SELF.Diff_hist_enterprise_number,1,0)+ IF( SELF.Diff_hist_duns_number,1,0)+ IF( SELF.Diff_hist_domestic_corp_key,1,0)+ IF( SELF.Diff_foreign_corp_key,1,0)+ IF( SELF.Diff_unk_corp_key,1,0)+ IF( SELF.Diff_ebr_file_number,1,0)+ IF( SELF.Diff_company_fein,1,0)+ IF( SELF.Diff_company_name,1,0)+ IF( SELF.Diff_cnp_name_phonetic,1,0)+ IF( SELF.Diff_cnp_name,1,0)+ IF( SELF.Diff_company_name_type_raw,1,0)+ IF( SELF.Diff_company_name_type_derived,1,0)+ IF( SELF.Diff_cnp_hasnumber,1,0)+ IF( SELF.Diff_cnp_number,1,0)+ IF( SELF.Diff_cnp_btype,1,0)+ IF( SELF.Diff_cnp_lowv,1,0)+ IF( SELF.Diff_cnp_translated,1,0)+ IF( SELF.Diff_cnp_classid,1,0)+ IF( SELF.Diff_company_foreign_domestic,1,0)+ IF( SELF.Diff_company_bdid,1,0)+ IF( SELF.Diff_company_phone,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_prim_name_derived,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_zip,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_prim_range_derived,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -318,6 +324,7 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_ebr_file_number := COUNT(GROUP,%Closest%.Diff_ebr_file_number);
     Count_Diff_company_fein := COUNT(GROUP,%Closest%.Diff_company_fein);
     Count_Diff_company_name := COUNT(GROUP,%Closest%.Diff_company_name);
+    Count_Diff_cnp_name_phonetic := COUNT(GROUP,%Closest%.Diff_cnp_name_phonetic);
     Count_Diff_cnp_name := COUNT(GROUP,%Closest%.Diff_cnp_name);
     Count_Diff_company_name_type_raw := COUNT(GROUP,%Closest%.Diff_company_name_type_raw);
     Count_Diff_company_name_type_derived := COUNT(GROUP,%Closest%.Diff_company_name_type_derived);

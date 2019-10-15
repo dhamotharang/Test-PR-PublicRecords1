@@ -103,13 +103,14 @@
  BaseBus := case(logType,
    1 => baseFile(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = 'ACCURINT'),
    2 => baseFile(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = 'CUSTOM'),
-   3 => baseFile(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = 'BATCH'),
+	 3 => baseFile(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = 'BATCH'),
    4 => baseFile(domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = 'BATCHR3'),
    6 => baseFile(ORIG_REFERENCE_CODE <> 'ENTITYINDIVIDUAL' and source_file = 'BRIDGER'),
    8 => baseFile(domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = 'IDM_BLS'),
    dataset([], INQL_v2.Layouts.Common_layout)
    );
    
+  	 
 //-----------PROJECT INTO BUSINESS QUERY LAYOUT-----------//
  bus_project := project(BaseBus, 
 		transform(INQL_v2.Layouts.Common_ThorAdditions,
@@ -179,11 +180,12 @@
 
  BaseBusUser := case(logType,
    1 => baseFile(repflag <> '' and source_file = 'ACCURINT'),
-   2 => baseFile(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number = '' and source_file = 'CUSTOM'),
+   // 2 => baseFile(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number = '' and source_file = 'CUSTOM'),
+   2 => baseFile(repflag <> '' and source_file = 'CUSTOM'),
    3 => baseFile(repflag <> '' and source_file = 'BATCH'),
    5 => baseFile(repflag <> ''and source_file = 'BANKO'),
    7 => baseFile(repflag <> '' and source_file = 'RISKWISE'),
-   8 => baseFile(domain_name + clean_cname1 + ucc_number + ein + charter_number = '' and source_file = 'IDM_BLS'),
+   //8 => baseFile(domain_name + clean_cname1 + ucc_number + ein + charter_number = '' and source_file = 'IDM_BLS'),
    dataset([], INQL_v2.Layouts.Common_layout)
    );
 //-----------PROJECT INTO BUSINESS USER QUERY LAYOUT-----------//			
@@ -268,15 +270,20 @@
       self := left;  
 			self := []));
 
+ // comball := person_project + bus_project + bususer_project;
+ // combacc := person_project + bususer_project;
+ 
+ // comb := if (logType = 1, combacc,comball);
+ 
  comb := person_project + bus_project + bususer_project;
  
  Base := if(logType = 4
           ,dedup(sort(distribute(comb, hash(search_info.Sequence_Number + person_q.lname + bususer_q.lname + bus_q.cname))(mbs.company_id + mbs.global_company_id <> ''), record, local), record, local)
-          ,if(logType = 3
-            ,dedup(sort(distribute(comb, hash(search_info.Sequence_Number))(mbs.company_id + mbs.global_company_id <> ''), record, local), record, local)
-            ,dedup(sort(distribute(comb, hash(search_info.Transaction_ID))(mbs.company_id + mbs.global_company_id <> ''), record, local), record, local)
-            )
+					,if(logType = 3
+						,dedup(sort(distribute(comb, hash(search_info.Sequence_Number))(mbs.company_id + mbs.global_company_id <> ''), record, local), record, local)
+						,dedup(sort(distribute(comb, hash(search_info.Transaction_ID))(mbs.company_id + mbs.global_company_id <> ''), record, local), record, local)
+						)
           );
- return  comb;
+ return  Base;
 
 END;

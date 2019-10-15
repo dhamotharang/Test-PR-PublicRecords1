@@ -108,8 +108,14 @@ EXPORT Layout_Collisions := RECORD
 	,string1 ClientSSNType
 	,string8 ClientDOB
 	,string1 ClientDOBType
+	,string20	ClientCertificateType
+	,string10	ClientMonthlyAllotment
 	,string1 ClientEligibilityStatus
 	,string8 ClientEligibilityDate
+	,string1	ClientEligibilityPeriodType
+	,string5	ClientEligibilityPeriodCount
+	,string8	ClientEligibilityStartDate
+	,string8	ClientEligibilityEndDate
 	,string10 ClientPhone
 	,string256 ClientEmail
 	,string50 StateContactName

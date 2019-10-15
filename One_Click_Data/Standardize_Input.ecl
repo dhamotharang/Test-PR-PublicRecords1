@@ -1,4 +1,4 @@
-﻿import Address, Ut, lib_stringlib, _Control, business_header,_Validate,aid;
+﻿import Address, MDR, Ut, lib_stringlib, _Control, business_header,_Validate,aid, Std;
 
 // -- prep address for cleaning
 // -- map data to the base layout
@@ -47,14 +47,15 @@ module
 		  self.prep_home_addr_line_last	   	:= ''                                       ;
 		  self.prep_work_addr_line1				 	:= ''                                       ;
 		  self.prep_work_addr_line_last	   	:= ''                                       ;
-			self.global_sid 									:= 25721;
 			SELF															:= []		  																	; 
 		end;
  		
 		
-		dPreProcess := project(dconcatsprayedfiles, tPreProcess(left));
+		dPreProcess 	:= project(dconcatsprayedfiles, tPreProcess(left));
+		
+		addGlobalSID 	:= MDR.macGetGlobalSid(dPreProcess, 'OneClickData','','global_sid'); //DF-25341: Add Global_SID
 	
-		return dPreProcess; 
+		return addGlobalSID; 
 	end;
 
      

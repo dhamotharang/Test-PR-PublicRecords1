@@ -3,7 +3,16 @@
 EXPORT fnMap_Batch(boolean fcra = false, unsigned logType = 0) := function
 
 	n := INQL_v2.test_count; /* n - to test a sample set, 0 to run all */																
-	rblankRefCode := choosen(INQL_v2.Standardize_input(fcra,logType).Batch(length(orig_address1_z5 + orig_address1_z4) < 12), IF(n > 0, n, choosen:ALL));
+	allBlankRefCode := choosen(INQL_v2.Standardize_input(fcra,logType).Batch
+													(length(orig_address1_z5 + orig_address1_z4) < 12)
+													, IF(n > 0, n, choosen:ALL));
+
+ fcraBlankRefCode := allBlankRefCode(orig_method <> 'METHOD' and 
+																		 stringlib.stringfind(orig_datetime_stamp, '|', 1) = 0 and
+																		 regexfind('(FCRA)|(MODELS)',orig_function_name, nocase)
+																		 );
+ rblankRefCode := if(fcra,fcraBlankRefCode,allBlankRefCode);
+ 
  blankRefCode  := project(rblankRefCode,
                     transform(INQL_v2.Layouts.rBatch_In_Ext - INQL_v2.Layouts.rBatch_In_PIIs,
 													         self := left
@@ -83,7 +92,9 @@ EXPORT fnMap_Batch(boolean fcra = false, unsigned logType = 0) := function
 				self.Function_Description 		:= left.orig_function_name;
 				self.PERSON_ORIG_IP_ADDRESS1 	:= left.orig_ip_address_executed;
 				self.ORIG_IP_ADDRESS2 				:= left.orig_ip_address_initiated;
-				self.repflag	:= '';
+				self.repflag						:= map((left.orig_process_id in _Constants.SBFE_REPORT_BATCH_PROCESS_ID_FILTER)
+																								and (left.orig_last_name <> '' or left.orig_full_name <> '') 
+																								and fcra = false => 'Y', '');
 				
 				self.login_history_id 	:= left.orig_login_history_id;
 				self.transaction_type 	:= left.orig_transaction_type;

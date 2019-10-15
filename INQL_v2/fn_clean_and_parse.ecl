@@ -3,8 +3,8 @@ import standard, header_slimsort, didville, business_header,watchdog, mdr, heade
 
 export fn_clean_and_parse(dataset(INQL_v2.Layouts.Common_layout) longfile = dataset([], INQL_v2.Layouts.Common_layout)) := function
 
-	repflag(string function_description, string orig_lname, string orig_full_name)
-		:=  map(function_description = 'BUSINESS INSTANT ID' and (orig_lname <> '' or orig_full_name <> '') => 'Y', '');
+	// repflag(string function_description, string orig_lname, string orig_full_name)
+		// :=  map(function_description = 'BUSINESS INSTANT ID' and (orig_lname <> '' or orig_full_name <> '') => 'Y', '');
 
 	fraudback(string function_description, string orig_ip_address)
 		:= map(stringlib.stringfind(function_description, 'CHARGEBACK',1) > 0
@@ -19,6 +19,10 @@ export fn_clean_and_parse(dataset(INQL_v2.Layouts.Common_layout) longfile = data
 
 	trimInfile := trimInfile1 + trimInfile2;													
 
+	trimInfile3 := trimInfile(LIB_Word.Word(ORIG_NAME,2) <> '');
+	// Nid.Mac_CleanFullNames(trimInfile3,OUTFILE1x,ORIG_NAME, IncludeInRepository := false);
+	// outfile1 := PROJECT(OUTFILE1x,recordof(trimInFile));
+	// outfile1A := trimInfile(LIB_Word.Word(ORIG_NAME,2) = '') + outfile1;
 	outfile1A := trimInfile;
 
 	outfile2A := join(outfile1A(NM = 'P'), outfile1A(NM = 'B'), left.hashkey = right.hashkey,
@@ -62,8 +66,7 @@ export fn_clean_and_parse(dataset(INQL_v2.Layouts.Common_layout) longfile = data
 	CommonNameAddrClean := CommonNameAddrClean_1(ORIG_ADDR2 = '') + CommonNameAddrClean_2;
 
 	return project(CommonNameAddrClean, TRANSFORM(INQL_v2.Layouts.Common_layout,
-					self.REPFLAG	:= RepFlag(left.FUNCTION_DESCRIPTION,left.orig_full_name1,left.fname+left.lname+left.orig_fname+left.orig_lname);
-					
+					//self.REPFLAG	:= RepFlag(left.FUNCTION_DESCRIPTION,left.orig_full_name1,left.fname+left.lname+left.orig_fname+left.orig_lname);
 					cleanname := left.clean_name;
 														
 					self.title := stringlib.stringfilter(cleanName[1..5], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ-\' ');

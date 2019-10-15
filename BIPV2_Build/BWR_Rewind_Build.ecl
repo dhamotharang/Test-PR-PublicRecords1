@@ -8,12 +8,13 @@
    // {'~thor_data400::key::bizlinkfull::20181002a::proxid::meow'                       ,'prod_esp.br.seisint.com'}
   // ,{'~thor_data400::key::bizlinkfull::20181002a::proxid::refs::l_address1'           ,'prod_esp.br.seisint.com'}
 // ],{string name,string esp});
-
+// to get the restore and/or delete working, you may have to add the output of this: ut.Credentials().fGetEncodedValues() as a constant to this: ut.Credentials().mac_add2Soapcall()
+// in your sandbox to prevent errors since it is stored in a file and that causes errors.
 workman.Rewind_Build(
-   pversion            := '20190401'                                // version of the build you are rolling back
-  ,PWuid               := 'W20190402-103652'                        // all files created in this workunit and subsequent workunits(more recent) in this build will be deleted.
+   pversion            := '20190701'                                // version of the build you are rolling back
+  ,PWuid               := 'W20190708-210116'                        // all files created in this workunit and subsequent workunits(more recent) in this build will be deleted.
   ,pWorkman_Superfile  := BIPV2_Build.files().workunit_history_.qa
   ,pDeleteFiles        := false                                     // true = output the files to the workunit + delete them.  false = output the files to the workunit
-  ,pFilter             := ''                                        // optional additional regex filter for the files to delete.
-  ,pRestoreWuids       := false
+  ,pFilter             := '^(?!.*?_underlinks.*).*$'                                        // optional additional regex filter for the files to delete.
+  ,pRestoreWuids       := true
 );

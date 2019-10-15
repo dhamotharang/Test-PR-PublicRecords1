@@ -51,6 +51,11 @@ EXPORT company_fein_ChildRec := RECORD
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+EXPORT cnp_name_phonetic_ChildRec := RECORD
+  TYPEOF(l.cnp_name_phonetic) cnp_name_phonetic;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
 EXPORT cnp_name_ChildRec := RECORD
   TYPEOF(l.cnp_name) cnp_name;
   UNSIGNED8 cnt;
@@ -203,6 +208,10 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 company_fein_switch;
   REAL4 company_fein_maximum;
   DATASET(company_fein_ChildRec) nulls_company_fein {MAXCOUNT(100)};
+  REAL4 cnp_name_phonetic_specificity;
+  REAL4 cnp_name_phonetic_switch;
+  REAL4 cnp_name_phonetic_maximum;
+  DATASET(cnp_name_phonetic_ChildRec) nulls_cnp_name_phonetic {MAXCOUNT(100)};
   REAL4 cnp_name_specificity;
   REAL4 cnp_name_switch;
   REAL4 cnp_name_maximum;

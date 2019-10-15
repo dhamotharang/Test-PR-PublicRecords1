@@ -38,13 +38,30 @@ Correct_Function_Descriptions :=
 										self := left), lookup, left outer,local);
 									
 export updates := Inquiry_AccLogs.fn_cleanup_spec_char(dedup(sort(Correct_Function_Descriptions, 
-																 source, search_info.product_code, search_info.transaction_id, search_info.login_history_id, search_info.datetime, search_info.sequence_number, search_info.function_description, local), 
-																 source, search_info.product_code, search_info.transaction_id, search_info.login_history_id, search_info.datetime, search_info.sequence_number, search_info.function_description, local))
+																 source, search_info.product_code, search_info.transaction_id, search_info.login_history_id, search_info.datetime, search_info.sequence_number, search_info.function_description, person_q.appended_adl, local), 
+																 source, search_info.product_code, search_info.transaction_id, search_info.login_history_id, search_info.datetime, search_info.sequence_number, search_info.function_description, person_q.appended_adl, local))
 																 ;
  
-
-export history :=  dataset(data_services.foreign_prod+'thor_data400::out::inquiry_tracking::weekly_historical',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor);
-
+// export updates := Inquiry_AccLogs.fn_cleanup_spec_char(dedup(sort(Correct_Function_Descriptions, 
+																 // source, search_info.product_code, search_info.transaction_id, search_info.login_history_id, search_info.datetime, search_info.sequence_number, search_info.function_description, local), 
+																 // source, search_info.product_code, search_info.transaction_id, search_info.login_history_id, search_info.datetime, search_info.sequence_number, search_info.function_description, local))
+																 // :persist('~uspr::inql::nonfcra::base::daily::20190512::dedup') 
+																 // ;
+ 
+export history :=  dataset(data_services.foreign_prod+'thor_data400::out::inquiry_tracking::weekly_historical',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor)
+									(
+																		~(bus_intel.industry = 'DIRECT TO CONSUMER' and 
+																			search_info.function_description in [
+																			'ADDRBEST.BESTADDRESSBATCHSERVICE'
+																			,'BATCHSERVICES.AKABATCHSERVICE'
+																			,'BATCHSERVICES.DEATHBATCHSERVICE'
+																			,'BATCHSERVICES.EMAILBATCHSERVICE'
+																			,'BATCHSERVICES.PROPERTYBATCHSERVICE'
+																			,'DIDVILLE.DIDBATCHSERVICERAW'
+																			,'DIDVILLE.RANBESTINFOBATCHSERVICE'
+																			,'PROGRESSIVEPHONE.PROGRESSIVEPHONEWITHFEEDBACKBATCHSERVICE']
+																			)
+																		);
 
 
 

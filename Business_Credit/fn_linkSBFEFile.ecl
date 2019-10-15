@@ -1,4 +1,4 @@
-IMPORT	Business_Credit,	Business_Header,	Business_Header_SS,	DID_Add,	NID,	ut,	STD;
+﻿IMPORT	Business_Credit,	Business_Header,	Business_Header_SS,	DID_Add,	NID,	ut,	STD;
 EXPORT	fn_linkSBFEFile(STRING	pVersion,
 												Constants().buildType	pBuildType	= Constants().buildType.Daily)	:=	FUNCTION
 
@@ -216,14 +216,14 @@ EXPORT	fn_linkSBFEFile(STRING	pVersion,
 																			 ,													 		// use prod version of superfiles
 																			 ,														 // default is to hit prod from dataland, and on prod hit prod.		
 																			 ,[BIPV2.IDconstants.xlink_version_BIP]	// Create BIP Keys only
-																			 ,Comp_Website           		 // Url
+																			 ,Company_Website           		 // Url
 																			 ,													// Email
 																			 ,p_city_name							 // City
 																			 ,												// fname
 																			 ,											 // mname
 																			 ,											// lname
 																			 ,										 // Contact_SSN
-																			 ,source							// Source Â– MDR.sourceTools
+																			 ,source							// Source Ã‚â€“ MDR.sourceTools
 																			 ,persistent_record_ID	// Source_Record_Id
 																			 ,									// Src_Matching_is_priorty
 																		);
@@ -248,14 +248,14 @@ EXPORT	fn_linkSBFEFile(STRING	pVersion,
 																			 ,													 		// use prod version of superfiles
 																			 ,														 // default is to hit prod from dataland, and on prod hit prod.		
 																			 ,[BIPV2.IDconstants.xlink_version_BIP]	// Create BIP Keys only
-																			 ,Comp_Website           		 // Url
+																			 ,Company_Website           		 // Url
 																			 ,E_Mail_Address						// Email
 																			 ,p_city_name							 // City
 																			 ,Clean_fname							// fname
 																			 ,Clean_mname						 // mname
 																			 ,Clean_lname						// lname
 																			 ,Federal_TaxID_SSN		 // Contact_SSN
-																			 ,source							// Source Â– MDR.sourceTools
+																			 ,source							// Source Ã‚â€“ MDR.sourceTools
 																			 ,persistent_record_ID	// Source_Record_Id
 																			 ,									// Src_Matching_is_priorty
 																		);

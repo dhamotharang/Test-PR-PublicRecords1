@@ -51,10 +51,10 @@ transform
 	self.Reg_True_License_Plate				:=	if(le.Reg_True_License_Plate	<>	'',le.Reg_True_License_Plate,ri.Reg_True_License_Plate);
 	self.source_rec_id								:=  if(le.source_rec_id<>0,if(le.source_rec_id<ri.source_rec_id,le.source_rec_id,ri.source_rec_id),0);	
 	//Added for CCPA-103
-	self.global_sid                   := 0;
-	self.record_sid                   := 0;
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
 	//Added for DF-25578
-	self.raw_name                     := '';
+	// self.raw_name                     := '';
 
 	self															:=	le;
 
@@ -99,10 +99,10 @@ transform
 	//DF-16772. Modified to remove warning messae substring applied to value of type integer.
 	self.sequence_key									:=	self.Reg_Latest_Effective_Date	+	((string8) pInput.date_vendor_Last_Reported)[1..6]	+	'R';	
 	//Added for CCPA-103
-	self.global_sid                   := 0;
-	self.record_sid                   := 0;
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
 	//Added for DF-25578
-	self.raw_name                     := '';
+	// self.raw_name                     := '';
 
 	self															:=	pInput;
 

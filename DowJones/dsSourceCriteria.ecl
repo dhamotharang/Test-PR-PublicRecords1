@@ -1793,6 +1793,23 @@ EXPORT dsSourceCriteria := DATASET([
 {'Canada Regulations Establishing a List of Entities','1780'},
 {'Canada Regulations Implementing the United Nations Resolutions on the Suppression of Terrorism','1781'},
 {'NDRC (China) Suspected Financial Blacklist','1782'},
-{'OFAC - Hizballah International Financing Prevention Amendments Act of 2018','1783'}
+{'OFAC - Hizballah International Financing Prevention Amendments Act of 2018','1783'},
+{'EC (CFSP) 2019/1341 EU Terrorism List','1784'},
+{'EC 2019/1337 Terrorism List','1785'},
+{'US Executive Order 13884','1786'},
+{'EC 2019/1353 ISIL (Da\'esh) and Al-Qaida List','1787'},
+{'OFAC Advisory - North Korea Sanctions Advisory','1788'},
+{'OFAC Advisory - Sanctions Risks Related to Petroleum Shipments involving Iran and Syria','1789'},
+{'Ministry of Economy (Brazil) List of Employers with Slavery-like Working Conditions','1790'},
+{'US Executive Order 13883 CBW Act','1791'},
+{'EC 2019/1375 ISIL (Da\'esh) and Al-Qaida List','1792'},
+{'National Anti-Corruption Directorate (Romania) Final Convictions','1793'},
+{'EC (CFSP) 2019/1405 Ukraine List','1794'},
+{'EC 2019/1403 Ukraine List','1795'},
+{'EC (CFSP) 2019/1576 Central African Republic List','1796'},
+{'EC 2019/1574 Central African Republic List','1797'},
+{'EC (CFSP) 2019/1596 Venezuela List','1798'},
+{'EC 2019/1586 Venezuela List','1799'},
+{'OFAC - Foreign Interference in a United States Election List','1800'}
 ],r);
 

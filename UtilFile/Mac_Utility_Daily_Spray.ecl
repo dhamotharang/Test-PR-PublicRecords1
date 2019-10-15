@@ -47,7 +47,7 @@ macro
 	#uniquename(send_fail_msg)
 
 	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','SUCC', filedate, %send_succ_msg%,if(email_target<>' ',email_target,UtilFile.Spray_Notification_Email_Address));
-	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','FAIL', filedate, %send_fail_msg%,if(email_target<>' ',email_target,'John.Freibaum@risk.lexisnexis.com, Michael.Gould@lexisnexis.com, Vesa.Niemela@lexisnexis.com, Sudhir.Kasavajjala@risk.lexisnexis.com'));
+	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','FAIL', filedate, %send_fail_msg%,if(email_target<>' ',email_target,'Sudhir.Kasavajjala@lexisnexisrisk.com'));
 
 	//Add DID to daily file then move into did superfile for keys
 	#uniquename(did_daily)
@@ -104,9 +104,9 @@ macro
 	%keys_relationship% := UtilFile.Proc_Create_Relationships(filedate); 
 	
 	#uniquename(updatedops)
-	%updatedops% := RoxieKeyBuild.updateversion('UtilityDailyKeys',filedate,'Michael.Gould@lexisnexis.com;John.Freibaum@risk.lexisnexis.com;Sudhir.Kasavajjala@risk.lexisnexis.com',,'N');
+	%updatedops% := RoxieKeyBuild.updateversion('UtilityDailyKeys',filedate,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'N');
   #uniquename(updatefcradops)
-	%updatefcradops% := RoxieKeyBuild.updateversion('UtilityhvalKeys',filedate,'Michael.Gould@lexisnexis.com;John.Freibaum@risk.lexisnexis.com;Sudhir.Kasavajjala@risk.lexisnexis.com',,'N|F');
+	%updatefcradops% := RoxieKeyBuild.updateversion('UtilityhvalKeys',filedate,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'N|F');
 	
 	#uniquename(despraydaily) 
 	%despraydaily% := utilfile.pro_monitor().util_despray ; 
@@ -136,7 +136,7 @@ macro
 	
 ///////////SCRUBS REPORTS//////////////
 	  #uniquename(util_didScrubsReport)
-	  %util_didScrubsReport% := UtilFile.UtilDid_Scrubs(filedate,'michael.gould@lexisnexis.com,wenhong.ma@lexisnexis.com,gabriel.marcan@lexisnexis.com');
+	  %util_didScrubsReport% := UtilFile.UtilDid_Scrubs(filedate,'Wenhong.Ma@lexisnexisrisk.com,Gabriel.Marcan@lexisnexisrisk.com');
 	  
 ///////////SCRUBS REPORTS//////////////
 	

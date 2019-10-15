@@ -1,14 +1,15 @@
 ﻿//Defines full build process
 import _control, versioncontrol, std;
 
-export Build_Base(string pVersion, boolean isFCRA = false, boolean pDaily	= false) := module
+export Build_Base(string pVersion, boolean isFCRA = false, boolean pDaily	= true) := module
 	
 	shared FS := fileservices;
 	
 	shared lfn 	:= INQL_v2.Filenames(pVersion, isFCRA, pDaily).INQL_base.new;
-	baseFile 			:= INQL_v2.Update_Base(pVersion, isFCRA, pDaily).INQL_ALL;	
+	baseFile 			:= if(pDaily, INQL_v2.Update_Base(pVersion, isFCRA, pDaily).INQL_ALL,
+	                            INQL_v2.Update_Base(pVersion, isFCRA, pDaily).INQL_HIST);	
 	VersionControl.macBuildNewLogicalFile(lfn, baseFile, BuildINQL);
-
+	
 	bld := sequential(				
 										 if(STD.File.FileExists(lfn), output(lfn + ' already exist;'), BuildINQL)
 										,INQL_v2.Promote(pVersion, isFCRA, pDaily, true, '', false).INQL.buildfiles.New2Built
@@ -40,6 +41,18 @@ export Build_Base(string pVersion, boolean isFCRA = false, boolean pDaily	= fals
 										);
 	
 	export Batch_PIIs_all := bld;
+	
+	shared lfn_BillGroups_DID				:= INQL_v2.Filenames(pVersion, isFCRA, pDaily).BillGroups_DID_Base.new;
+	baseFile 										    := INQL_v2.Update_Base(pVersion, isFCRA, pDaily).BillGroups_DID_ALL;	
+	VersionControl.macBuildNewLogicalFile(lfn_BillGroups_DID, baseFile, BuildBillGroups_DID);
+
+	bld := sequential(				
+										 if(STD.File.FileExists(lfn_BillGroups_DID), output(lfn_BillGroups_DID + ' already exist;'), BuildBillGroups_DID)
+										,INQL_v2.Promote(pVersion, isFCRA, pDaily, true, '', false).BillGroups_DID.buildfiles.New2Built
+										,INQL_v2.Promote(pVersion, isFCRA, pDaily, true, '', false).BillGroups_DID.buildfiles.Built2QA
+										);
+	
+	export BillGroups_DID_all := bld;
 		
 end;
 

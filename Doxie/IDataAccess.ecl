@@ -21,7 +21,7 @@ EXPORT IDataAccess := INTERFACE
 
   // this controls whether to skip logging (for instance, in Cert environment, to save diskspace)
   EXPORT boolean log_record_source := TRUE; //save records' source info in Roxie logs
-  EXPORT boolean lexid_source_optout := TRUE; //suppress LexId by record's source (CCPA, for instance)
+  EXPORT unsigned1 lexid_source_optout := 1; //suppress LexId by record's source (CCPA, for instance): 0 - disabled | 1 - enabled | 2 - enabled test mode
 
   // a combination of "include" and dppa; I don't like it, but need to keep for backward compatibility 
   //TODO: try rid of it completely, or at least of "include" part
@@ -68,6 +68,7 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean isEQCHRestricted ()        := $.compliance.isEQCHRestricted        (DataRestrictionMask);
   EXPORT boolean isTCHRestricted ()         := $.compliance.isTCHRestricted         (DataRestrictionMask);
   EXPORT boolean isTTRestricted ()          := $.compliance.isTTRestricted          (DataRestrictionMask); //TeleTrack
+  EXPORT boolean isInfutorMVRestricted ()   := $.compliance.isInfutorMVRestricted   (DataRestrictionMask); //Infutor Motorvehicles
   EXPORT boolean isPreGLBRestricted ()      := $.compliance.isPreGLBRestricted      (DataRestrictionMask);
   EXPORT boolean isFdnInquiry ()            := $.compliance.isFdnInquiry            (DataRestrictionMask);
   EXPORT boolean isJuliRestricted ()        := $.compliance.isJuliRestricted        (DataRestrictionMask);

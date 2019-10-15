@@ -9,6 +9,9 @@ layoutForeclosureSec := record
 end;
 ds_init := project (foreclosureIn, layoutForeclosureSec);
 
-ut.MAC_Sequence_Records (ds_init, sequence, ds_sequenced);
+//Removing BK as not needed for the CL build since it is appended at the end of the build
+CLOnly	:= ds_init(source NOT IN ['B7','I5']);
+
+ut.MAC_Sequence_Records (CLOnly, sequence, ds_sequenced);
 
 export File_Foreclosure_In := ds_sequenced;

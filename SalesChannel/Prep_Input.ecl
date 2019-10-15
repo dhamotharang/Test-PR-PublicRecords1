@@ -1,4 +1,4 @@
-﻿import ut,address,idl_header, NID;
+﻿import _control, MDR, ut,address,idl_header, NID, Std;
 
 export Prep_Input(
 
@@ -33,17 +33,18 @@ function
 		SELF.rawfields.Country					:= ut.CleanSpacesAndUpper(l.Country);
 		SELF.rawfields.Phone_Number			:= ut.CleanSpacesAndUpper(l.Phone_Number);
 		SELF.rawfields.Email						:= ut.CleanSpacesAndUpper(l.Email);
-		SELF.global_sid									:= 25681;
 		self														:= l;
 		self 														:= [];
 	end;
 
 	dPopFields := project(pInputFile, tCleanFields(left));
 	
+	addGlobalSID := MDR.macGetGlobalSid(dPopFields, 'SalesChannel', '', 'global_sid'); //DF-25321: Populate Global_SIDs
+	
 			//////////////////////////////////////////////////////////////////////////////////////
 		// -- Clean Name, determine if it is a person
 		//////////////////////////////////////////////////////////////////////////////////////
-	NID.Mac_CleanParsedNames(dPopFields, FileClnName, 
+	NID.Mac_CleanParsedNames(addGlobalSID, FileClnName, 
 													rawfields.First_Name, rawfields.Last_Name
 													,rawfields.Middle_Name, clean_name.name_suffix
 													,includeInRepository:=false, normalizeDualNames:=false, useV2 := true);

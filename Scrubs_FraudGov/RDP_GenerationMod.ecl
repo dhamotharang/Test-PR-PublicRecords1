@@ -56,7 +56,7 @@ EXPORT RDP_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LENGTHS(0,4..):ONFAIL(BLANK)\n'
     + 'FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( <>{}[]-^=\'`!+&,./#()_)\n'
     + 'FIELDTYPE:invalid_email:ALLOW(-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)\n'
-    + 'FIELDTYPE:invalid_date:ALLOW(0123456789):SPACES( <>{}[]-^=\'`!+&,./#()_: ):LEFTTRIM:ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_date:ALLOW(0123456789):SPACES( ./:- ):LEFTTRIM:ONFAIL(BLANK)\n'
     + 'FIELDTYPE:invalid_numeric:ALLOW(0123456789)\n'
     + 'FIELDTYPE:invalid_zip:ALLOW(-0123456789):SPACES( <>{}[]-^=\'`!+&,./#()_):LEFTTRIM:LENGTHS(0,5..):ONFAIL(BLANK)\n'
     + 'FIELDTYPE:invalid_state:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):SPACES( <>{}[]-^=\'`!+&,./#()_):LEFTTRIM:LENGTHS(0,2):ONFAIL(BLANK)\n'

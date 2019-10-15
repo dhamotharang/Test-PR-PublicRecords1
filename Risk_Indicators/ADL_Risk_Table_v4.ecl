@@ -1,4 +1,4 @@
-// added transunion 'TN'
+﻿// added transunion 'TN'
 // added college address in college history flag
 
 IMPORT fcra, header, gong, ut, doxie_build, header_quick, ADVO, mdr;
@@ -54,6 +54,9 @@ layout_adl_risk_v4 := RECORD
 	common_adl_risk eq;  		// equifax table
 	common_adl_risk en;			// experian table
 	common_adl_risk tn;			// transunion table
+	//CCPA-768
+	UNSIGNED4	global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 END;
 
 j := JOIN(all_bureaus, equifax_recs, LEFT.did=RIGHT.did, 

@@ -10,7 +10,7 @@ EXPORT _Preprocess(
 ) := 
 function
 
-  ds_slim           := project(pDataset,BIPV2_ProxID.layout_DOT_Base);
+  ds_slim           := project(pDataset,transform(BIPV2_ProxID.layout_DOT_Base ,self.cnp_name_phonetic := left.cnp_name,self := left));
   ds_patch_proxids  := BIPV2_ProxID._fPatch_Proxids(ds_slim);
   ds_use            := if(pStrataBuildStep = 'Proxid' ,ds_patch_proxids ,ds_slim);
 

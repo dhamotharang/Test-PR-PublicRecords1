@@ -1,8 +1,9 @@
-import ecl;
-EXPORT mac_append_provider_best_data  (Infile,Input_LNPID = '',
+﻿EXPORT mac_append_provider_best_data  (Infile,Input_LNPID = '',
 																			 Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_V_CITY_Name = '',Input_ST = '',Input_ZIP = '',
 																			 Input_LIC_STATE = '',Input_LIC_NBR = '',
 																			 Input_DEA_NUMBER = '',Input_NPI_NUMBER = '',in_prefix = 'idv') := FUNCTIONMACRO
+
+	import hipie_ecl, Health_Provider_Services;	
 	
 	Layout_best := RECORD
 		UNSIGNED8 uniqueID;
@@ -26,6 +27,7 @@ EXPORT mac_append_provider_best_data  (Infile,Input_LNPID = '',
 		STRING10  Header_Fax;
 		STRING6	  Header_UPIN;
 		STRING10  Header_NPINUMBER;
+		UNSIGNED4 Header_DateNPIDeactivated;		
 		STRING1	  Header_DEABusinessActivityIndicator;		
 		STRING10  Header_DEANumber;
 		UNSIGNED4 Header_DateDEAExpired;
@@ -63,6 +65,7 @@ EXPORT mac_append_provider_best_data  (Infile,Input_LNPID = '',
 		STRING1	  Client_NPIFlag;
 		UNSIGNED4 Client_DateDEAExpired;		
 		STRING1	  Client_DEAFlag;		
+		STRING40	Group_Key;
 	END;
 	
 	Health_Provider_Services.mac_append_provider_data  (Infile,Input_LNPID,
@@ -70,7 +73,7 @@ EXPORT mac_append_provider_best_data  (Infile,Input_LNPID = '',
 																	Input_LIC_STATE,Input_LIC_NBR,
 																	Input_DEA_NUMBER,Input_NPI_NUMBER,Outfile);
 
-	Results := ecl.macFieldRename(Outfile, in_prefix, 'prefix_',,true);
+	Results := hipie_ecl.macFieldRename(Outfile, in_prefix, 'prefix_',,true);
 
 	RETURN Results;
 ENDMACRO;

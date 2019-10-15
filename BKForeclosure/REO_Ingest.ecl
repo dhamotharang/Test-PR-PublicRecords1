@@ -49,6 +49,9 @@ EXPORT REO_Ingest(BOOLEAN incremental=FALSE
                      (UNSIGNED)le.ln_filedate < (UNSIGNED)ri.ln_filedate => ri.ln_filedate, // Want the highest value
                      le.ln_filedate);
     SELF.bk_infile_type := ri.bk_infile_type; // Derived(NEW)
+		SELF.lps_internal_pid := ri.lps_internal_pid; // Derived(NEW)
+    SELF.reo_flag := ri.reo_flag; // Derived(NEW)
+    SELF.distressedsaleflag := ri.distressedsaleflag; // Derived(NEW)
     SELF.name1_nid := ri.name1_nid; // Derived(NEW)
     SELF.name1_prefix := ri.name1_prefix; // Derived(NEW)
     SELF.name1_first := ri.name1_first; // Derived(NEW)
@@ -343,16 +346,16 @@ EXPORT REO_Ingest(BOOLEAN incremental=FALSE
   END;
  
   // Ingest Files: Rollup to get unique new records
-  DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
+   DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
              ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
              ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
              ,buyer1_id_cd,buyer2_fname,buyer2_lname,buyer_vesting_cd,concurrent_doc_num,buyer_mail_city,buyer_mail_state,buyer_mail_zip5,buyer_mail_zip4,legal_lot_cd
              ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
              ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
              ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
+             ,buyer_mail_unit_type,buyer_mail_unit_no,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
              ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag));
+             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line));
   SortIngest0 := SORT(DistIngest0,fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
              ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
              ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
@@ -360,9 +363,9 @@ EXPORT REO_Ingest(BOOLEAN incremental=FALSE
              ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
              ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
              ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
+             ,buyer_mail_unit_type,buyer_mail_unit_no,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
              ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag, __Tpe, record_id, LOCAL);
+             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line, __Tpe, record_id, LOCAL);
   GroupIngest0 := GROUP(SortIngest0,fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
              ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
              ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
@@ -370,9 +373,9 @@ EXPORT REO_Ingest(BOOLEAN incremental=FALSE
              ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
              ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
              ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
+             ,buyer_mail_unit_type,buyer_mail_unit_no,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
              ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag, LOCAL, ORDERED, STABLE);
+             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Existing Base: combine delta with base file
@@ -383,9 +386,9 @@ EXPORT REO_Ingest(BOOLEAN incremental=FALSE
              ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
              ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
              ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
+             ,buyer_mail_unit_type,buyer_mail_unit_no,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
              ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag));
+             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line));
   SortBase0 := SORT(DistBase0,fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
              ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
              ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
@@ -393,9 +396,9 @@ EXPORT REO_Ingest(BOOLEAN incremental=FALSE
              ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
              ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
              ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
+             ,buyer_mail_unit_type,buyer_mail_unit_no,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
              ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag, __Tpe, record_id, LOCAL);
+             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line, __Tpe, record_id, LOCAL);
   GroupBase0 := GROUP(SortBase0,fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
              ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
              ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
@@ -403,9 +406,9 @@ EXPORT REO_Ingest(BOOLEAN incremental=FALSE
              ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
              ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
              ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
+             ,buyer_mail_unit_type,buyer_mail_unit_no,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
              ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag, LOCAL, ORDERED, STABLE);
+             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Everything: combine ingest and base recs
@@ -416,9 +419,9 @@ EXPORT REO_Ingest(BOOLEAN incremental=FALSE
              ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
              ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
              ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
+             ,buyer_mail_unit_type,buyer_mail_unit_no,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
              ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag, __Tpe,record_id,LOCAL);
+             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line, __Tpe,record_id,LOCAL);
   Group0 := GROUP(Sort0,fips_cd,prop_full_addr,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,prop_addr_unit_type,prop_addr_unit_no,prop_addr_house_no
              ,prop_addr_predir,prop_addr_street,prop_addr_suffix,prop_addr_postdir,prop_addr_carrier_rt,recording_date,recording_book_num,recording_page_num,recording_doc_num,doc_type_cd
              ,apn,multi_apn,partial_interest_trans,seller1_fname,seller1_lname,seller1_id,seller2_fname,seller2_lname,buyer1_fname,buyer1_lname
@@ -426,9 +429,9 @@ EXPORT REO_Ingest(BOOLEAN incremental=FALSE
              ,legal_lot_num,legal_block,legal_section,legal_district,legal_land_lot,legal_unit,legacl_city,legal_subdivision,legal_phase_num,legal_tract_num
              ,legal_brief_desc,legal_township,recorder_map_ref,prop_buyer_mail_addr_cd,property_use_cd,orig_contract_date,sales_price,sales_price_cd,city_xfer_tax,county_xfer_tax
              ,total_xfer_tax,concurrent_lender_name,concurrent_lender_type,concurrent_loan_amt,concurrent_loan_type,concurrent_type_fin,concurrent_interest_rate,concurrent_due_dt,concurrent_2nd_loan_amt,buyer_mail_full_addr
-             ,buyer_mail_unit_type,buyer_mail_unit_no,lps_internal_pid,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
+             ,buyer_mail_unit_type,buyer_mail_unit_no,buyer_mail_careof,title_co_name,legal_desc_cd,adj_rate_rider,adj_rate_index,change_index,rate_change_freq
              ,int_rate_ngt,int_rate_nlt,max_int_rate,int_only_period,fixed_rate_rider,first_chg_dt_yy,first_chg_dt_mmdd,prepayment_rider,prepayment_term,asses_land_use
-             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,reo_flag,distressedsaleflag,LOCAL, ORDERED, STABLE);
+             ,res_indicator,construction_loan,inter_family,cash_purchase,stand_alone_refi,equity_credit_line,LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
  
   //Now need to update 'rid' numbers on new records

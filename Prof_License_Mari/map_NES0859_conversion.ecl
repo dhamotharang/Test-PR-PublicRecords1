@@ -78,8 +78,7 @@ EXPORT map_NES0859_conversion(string pVersion) := FUNCTION
 		//Populate license information
 		SELF.LICENSE_NBR			:= 'NR';							//license number is not available
 		SELF.RAW_LICENSE_TYPE	:= trim_lic_type;
-		SELF.STD_LICENSE_TYPE	:= trim_lic_type;
-		
+		SELF.STD_LICENSE_TYPE	:= IF(SELF.RAW_LICENSE_TYPE='TCG','N/A',SELF.RAW_LICENSE_TYPE); // 'N/A' is TEMPORARY APPRAISER       
 		SELF.RAW_LICENSE_STATUS := '';
 		SELF.STD_LICENSE_STATUS	:= 'A';
 		SELF.STD_STATUS_DESC	:= 'ACTIVE';
@@ -107,7 +106,7 @@ EXPORT map_NES0859_conversion(string pVersion) := FUNCTION
 															IF(TempBusName<>'',
 															   StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctMisc(TempBusName)),
 															   ''));
-		dba_Pattern         := '( DBA |^DBA |D/B/A)';
+		dba_Pattern         := '( DBA |^DBA |D/B/A|C/O )';
 		tempdba             := IF(REGEXFIND(dba_Pattern,stdNAME_OFFICE), Prof_License_Mari.mod_clean_name_addr.GetDBAName(stdNAME_OFFICE),'');
 		rmvdba              := IF(REGEXFIND(dba_Pattern,stdNAME_OFFICE), Prof_License_Mari.mod_clean_name_addr.GetCorpName(stdNAME_OFFICE),stdNAME_OFFICE);														 
 		SELF.NAME_OFFICE    := MAP(TRIM(rmvdba,ALL)= TRIM(SELF.NAME_FIRST + SELF.NAME_LAST,ALL) => '',

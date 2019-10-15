@@ -1,4 +1,4 @@
-
+﻿
 #OPTION('multiplePersistInstances',false);
 
 ds_denied_entity := DATASET('~thor::in::globalwatchlists::denied_entity', 
@@ -307,6 +307,7 @@ Patriot_preprocess.layout_patriot_common tr_patriot_common(Filter_empty_entities
 	self.remarks_13 := remarks13;
 	self.remarks_14 := remarks14;
 	self.entity_flag := map(regexfind(concat_entity,l.Entity,nocase) = true => 'Y','');		
+
 	self := [];	
 end;
 

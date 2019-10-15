@@ -8,7 +8,7 @@ EXPORT Fn_EmailEventStatus (DATASET(RECORDOF(Email_DataV2.Layouts.temp_Validate)
 	
 	//Validate email status
 	Layouts.temp_Validate ValidStatus(email_in L, event_lkp R) := TRANSFORM
-		SELF.InvalidEmail		:= IF(R.error_code <> '' and R.error_code in ErrorCodes,TRUE,FALSE);
+		// SELF.InvalidEmail		:= IF(R.error_code <> '' and R.error_code in ErrorCodes,TRUE,FALSE);
 		SELF.InvalidDomain	:= IF(R.error_code <> '' and R.error_code = 'EMAIL_DOMAIN_INVALID',TRUE,FALSE);
 		SELF.InvalidAccount	:= IF(R.error_code <> '' and R.error_code = 'EMAIL_ACCOUNT_INVALID',TRUE,FALSE);
 		SELF.disposable			:= IF(R.disposable = 'TRUE',TRUE,FALSE);

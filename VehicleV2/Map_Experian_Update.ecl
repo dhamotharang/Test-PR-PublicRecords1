@@ -275,9 +275,6 @@ transform
 	self.Append_MailPrepAddr2						:=	stringlib.stringtouppercase(tmpMailPrepAddr2);
 	self.Append_PhysicalPrepAddr1				:=	stringlib.stringtouppercase(tmpPhysicalPrepAddr1);
 	self.Append_PhysicalPrepAddr2				:=	stringlib.stringtouppercase(tmpPhysicalPrepAddr2);
-	//Added for CCPA-103
-	self.global_sid                     := 0; 
-	self.record_sid                     := 0;
 	
 	self																:=	pInput;
 	self																:=	[];

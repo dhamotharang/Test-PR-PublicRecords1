@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_ND_Main
 FILENAME:In_ND
 //Uncomment up to NINES for internal or external adl
@@ -14,20 +14,19 @@ FILENAME:In_ND
 //FUZZY can be used to create new types of FUZZY linking
 
 //FIELDTYPE DEFINITIONS
-FIELDTYPE:invalid_corp_key:ALLOW(0123456789-):LENGTHS(4..11)
-FIELDTYPE:invalid_charter:ALLOW(0123456789):LENGTHS(1..8)
+FIELDTYPE:invalid_corp_key:ALLOW(0123456789-):LENGTHS(13)
+FIELDTYPE:invalid_charter:ALLOW(0123456789):LENGTHS(10)
 FIELDTYPE:invalid_mandatory:LENGTHS(1..)
 FIELDTYPE:invalid_date:ALLOW(0123456789):LENGTHS(8):CUSTOM(Scrubs.fn_valid_pastDate>0)
 FIELDTYPE:invalid_optional_date:ALLOW(0123456789):LENGTHS(0,1,8):CUSTOM(Scrubs.fn_valid_GeneralDate>0)
-FIELDTYPE:invalid_corp_vendor:ENUM(38)
-FIELDTYPE:invalid_state_origin:ENUM(ND)
-FIELDTYPE:invalid_corp_status_cd:ENUM(A|C|CV|E|I|M|N|R|RD|T|V| )
+FIELDTYPE:invalid_corp_vendor:ENUM(38|38)
+FIELDTYPE:invalid_state_origin:ENUM(ND|ND)
 FIELDTYPE:invalid_forgn_dom_code:ENUM(D|F| )
 FIELDTYPE:invalid_for_profit_ind:ENUM(N| )
-FIELDTYPE:invalid_corp_orig_org_structure_cd:ENUM(AA|BANK|BC|C|CH|CITY|F|FC|FLC|FNLC|FPC|FPLC|FNP|CNPD|NP|NPLC|CU|EC|FARM|FID|FMLC|GA|IC|ID|LC|MAC|MP|PC|PLC|PTC|REIT|SCD|VC|VCD|WMD|G|L|LLLP|LLP|LP|PLLP| )
-FIELDTYPE:invalid_name_type_cd:ENUM(01|F|03|04| )
-FIELDTYPE:invalid_name_type_desc:ENUM(LEGAL|FBN|TRADEMARK|TRADENAME| )
-FIELDTYPE:invalid_alphablankhyphencommaperiod:ALLOW( ,.-ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid_status:ENUM(Scrubs_Corp2_Mapping_ND_Main.Functions.set_valid_status)
+FIELDTYPE:invalid_name_type_desc:CUSTOM(Scrubs_Corp2_Mapping_ND_Main.Functions.invalid_name_type_desc>0,recordorigin)
+FIELDTYPE:invalid_name_type_cd:ENUM(01|03|04|F| )
+FIELDTYPE:invalid_recordorigin:ENUM(C|T)
 
 //FIELD DEFINITIONS
 DATEFIELD:dt_vendor_first_reported:TYPE(STRING8):LIKE(invalid_date):0,0
@@ -44,21 +43,25 @@ DATEFIELD:corp_process_date:TYPE(STRING8):LIKE(invalid_date):0,0
 FIELD:corp_orig_sos_charter_nbr:TYPE(STRING32):LIKE(invalid_charter):0,0
 FIELD:corp_legal_name:TYPE(STRING350):LIKE(invalid_mandatory):0,0
 DATEFIELD:corp_filing_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-FIELD:corp_status_cd:TYPE(STRING8):LIKE(invalid_corp_status_cd):0,0
 DATEFIELD:corp_status_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
+FIELD:corp_status_desc:TYPE(STRING60):LIKE(invalid_status):0,0
 FIELD:corp_inc_state:TYPE(STRING2):LIKE(invalid_state_origin):0,0
 DATEFIELD:corp_inc_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
 FIELD:corp_foreign_domestic_ind:TYPE(STRING1):LIKE(invalid_forgn_dom_code):0,0
 DATEFIELD:corp_forgn_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-FIELD:corp_orig_org_structure_cd:TYPE(STRING8):LIKE(invalid_corp_orig_org_structure_cd):0,0
 FIELD:corp_for_profit_ind:TYPE(STRING1):LIKE(invalid_for_profit_ind):0,0
-FIELD:corp_trademark_renewal_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-FIELD:corp_last_renewal_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
 FIELD:corp_ln_name_type_cd:TYPE(STRING2):LIKE(invalid_name_type_cd):0,0
 FIELD:corp_ln_name_type_desc:TYPE(STRING30):LIKE(invalid_name_type_desc):0,0
-FIELD:corp_forgn_state_desc:TYPE(STRING60):LIKE(invalid_alphablankhyphencommaperiod):0,0
+DATEFIELD:corp_delayed_effective_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0 
+DATEFIELD:corp_term_exist_exp:TYPE(STRING60):LIKE(invalid_optional_date):0,0    
+DATEFIELD:corp_trademark_expiration_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
+FIELD:recordorigin:TYPE(STRING1):LIKE(invalid_recordorigin):0,0
+
 
 //FIELDS NOT BEING SCRUBBED
+// FIELD:corp_trademark_renewal_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
+// FIELD:corp_orig_org_structure_cd:TYPE(STRING8):0,0
+// FIELD:corp_last_renewal_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
 // DATEFIELD:corp_ra_effective_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
 // DATEFIELD:corp_ra_resign_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
 // DATEFIELD:cont_effective_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
@@ -74,10 +77,10 @@ FIELD:corp_forgn_state_desc:TYPE(STRING60):LIKE(invalid_alphablankhyphencommaper
 // DATEFIELD:corp_merger_effective_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
 // FIELD:corp_fed_tax_id:TYPE(STRING32):LIKE(invalid_fein):0,0
 // FIELD:cont_status_cd:TYPE(STRING8):LIKE(invalid_cont_status_cd):0,0 
-// DATEFIELD:corp_term_exist_exp:TYPE(STRING60):LIKE(invalid_optional_date):0,0
 // DATEFIELD:corp_status_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
+// FIELD:corp_status_cd:TYPE(STRING8):LIKE(invalid_corp_status_cd):0,0
 // DATEFIELD:corp_merger_effective_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-// FIELD:corp_status_desc:TYPE(STRING60):LIKE(invalid_corp_status_desc):0,0
+// FIELD:corp_forgn_state_desc:TYPE(STRING60):0,0
 // FIELD:corp_forgn_state_cd:TYPE(STRING3):0,0
 // FIELD:corp_address1_type_cd:TYPE(STRING8):LIKE(invalid_address1_type_cd):0,0
 // FIELD:corp_address1_type_desc:TYPE(STRING60):LIKE(invalid_address1_type_desc):0,0
@@ -205,7 +208,6 @@ FIELD:corp_forgn_state_desc:TYPE(STRING60):LIKE(invalid_alphablankhyphencommaper
 // FIELD:corp_converted:TYPE(STRING1):0,0
 // FIELD:corp_converted_from:TYPE(STRING50):0,0
 // DATEFIELD:corp_date_of_organization_meeting:TYPE(STRING8):0,0
-// DATEFIELD:corp_delayed_effective_date:TYPE(STRING8):0,0
 // FIELD:corp_directors_from_to:TYPE(STRING10):0,0
 // FIELD:corp_farm_exemptions:TYPE(STRING30):0,0
 // DATEFIELD:corp_farm_qual_date:TYPE(STRING10):0,0
@@ -279,7 +281,6 @@ FIELD:corp_forgn_state_desc:TYPE(STRING60):LIKE(invalid_alphablankhyphencommaper
 // FIELD:corp_trademark_class_description6:TYPE(STRING250):0,0
 // FIELD:corp_trademark_disclaimer1:TYPE(STRING50):0,0
 // FIELD:corp_trademark_disclaimer2:TYPE(STRING50):0,0
-// DATEFIELD:corp_trademark_expiration_date:TYPE(STRING8):0,0
 // FIELD:corp_trademark_keywords:TYPE(STRING250):0,0
 // FIELD:corp_trademark_logo:TYPE(STRING250):0,0
 // FIELD:corp_trademark_name_expiration_date:TYPE(STRING8):0,0
@@ -292,8 +293,6 @@ FIELD:corp_forgn_state_desc:TYPE(STRING60):LIKE(invalid_alphablankhyphencommaper
 // FIELD:cont_country:TYPE(STRING50):0,0
 // FIELD:cont_country_mailing:TYPE(STRING50):0,0
 // FIELD:cont_nondislosure:TYPE(STRING1):0,0
-
-//NEVER USED FOR CORP MAPPER SCRUBBING
 // FIELD:corp_prep_addr1_line1:TYPE(STRING100):0,0
 // FIELD:corp_prep_addr1_last_line:TYPE(STRING50):0,0
 // FIELD:corp_prep_addr2_line1:TYPE(STRING100):0,0
@@ -323,7 +322,6 @@ FIELD:corp_forgn_state_desc:TYPE(STRING60):LIKE(invalid_alphablankhyphencommaper
 // FIELD:corp_address2_line1:TYPE(STRING70):0,0
 // FIELD:corp_address2_line2:TYPE(STRING70):0,0
 // FIELD:corp_address2_line3:TYPE(STRING70):0,0
-// FIELD:recordorigin:TYPE(STRING1):0,0
 
 //CONCEPT statements should be used to group together interellated fields; such as address
 //RELATIONSHIP is used to find non-obvious relationships between the clusters

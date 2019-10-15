@@ -243,20 +243,19 @@ PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::header_nlr::did.rid',         
 Roxiekeybuild.Mac_SK_Move_V3('~thor_data400::key::headerquick::fraud_flag::@version@::eq','Q',MQ5,filedate);
 
 RETURN SEQUENTIAL(
-		build_source_key(filedate),
-		build_qh_base,
-		header_quick.proc_build_fraud_flag_eq(filedate),
-		notify('QuickHeader BaseFile Complete','*'),
-		build_rid_srid_keys(filedate),
-		PARALLEL(
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.build_source_key(filedate),611),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, build_qh_base, 612),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.proc_build_fraud_flag_eq(filedate), 613),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, build_rid_srid_keys(filedate), 614),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, PARALLEL(
 			autoKeys,
 			SEQUENTIAL(B1,M1,MQ1),
 			SEQUENTIAL(B2,M2,MQ2),
 			SEQUENTIAL(B3,M3,MQ3),
 			SEQUENTIAL(B4,M4,MQ4),
 			SEQUENTIAL(B5,M5,MQ5)
-		)
-		,build_source_key_prep(filedate)
+																		), 615),
+		build_source_key_prep(filedate)
 	);
 
 END;

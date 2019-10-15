@@ -1,4 +1,4 @@
-﻿import instantid_logs, aid, address, ut, did_add, header_slimsort, didville, header, address, watchdog, yellowpages, gong, cellphone, risk_indicators, lib_stringlib, ut, idl_header, address, Std;
+﻿import _Control, instantid_logs, aid, address, MDR, ut, did_add, header_slimsort, didville, header, address, watchdog, yellowpages, gong, cellphone, risk_indicators, lib_stringlib, ut, idl_header, address, Std;
 
 export Map_InfutorCIDv2(string filedate) := function
 
@@ -371,9 +371,10 @@ fixDates := project(jnHeader, transform(recordof(jnHeader),
 									self.dt_first_seen := min(left.dt_first_seen, left.dt_last_seen);
 									self.dt_last_seen := max(left.dt_first_seen, left.dt_last_seen);
 									self := left))(orig_phone <> '7725593733', orig_phone <> '8583422994');
+
+addGlobalSID := MDR.macGetGlobalSid(fixDates, 'Infutorcid', '' , 'global_sid');										
 										
-										
-groupInfo := group(fixDates, sequence_number, local);
+groupInfo := group(addGlobalSID, sequence_number, local);
 
 infutorcid.Layout_InfutorCID_Base t_Sequence(groupInfo l, groupInfo r, unsigned c) := TRANSFORM
   self.persistent_record_id := trim(r.persistent_record_id,left, right) + '_' + filedate + '_' +  (string)intformat(c, 3,1);
