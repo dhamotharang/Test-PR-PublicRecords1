@@ -1,5 +1,5 @@
-﻿IMPORT SALT311,STD;
-IMPORT Scrubs_Corp2_Mapping_NH_Main,Scrubs,Corp2_mapping; // Import modules for FieldTypes attribute definitions
+﻿IMPORT SALT311,STD,Corp2_mapping;
+IMPORT Scrubs_Corp2_Mapping_NH_Main,Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist

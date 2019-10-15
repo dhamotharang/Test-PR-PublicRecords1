@@ -9,11 +9,11 @@ EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_corp_key'
 EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_corp_key' => 1,'invalid_corp_vendor' => 2,'invalid_state_origin' => 3,'invalid_mandatory' => 4,'invalid_date' => 5,'invalid_future_date' => 6,'invalid_charter_nbr' => 7,'invalid_Y_N' => 8,'invalid_ar_report_nbr' => 9,'invalid_numeric' => 10,0);
  
 EXPORT MakeFT_invalid_corp_key(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'-0123456789'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'-0123456789ABT'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_corp_key(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'-0123456789'))),~(LENGTH(TRIM(s)) >= 4));
-EXPORT InValidMessageFT_invalid_corp_key(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('-0123456789'),SALT311.HygieneErrors.NotLength('4..'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_corp_key(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'-0123456789ABT'))),~(LENGTH(TRIM(s)) >= 4));
+EXPORT InValidMessageFT_invalid_corp_key(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('-0123456789ABT'),SALT311.HygieneErrors.NotLength('4..'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_corp_vendor(SALT311.StrType s0) := FUNCTION
   RETURN  s0;

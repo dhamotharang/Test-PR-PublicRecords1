@@ -54,7 +54,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + '//FUZZY can be used to create new types of FUZZY linking\n'
     + '\n'
     + '//FIELDTYPE DEFINITIONS\n'
-    + 'FIELDTYPE:invalid_corp_key:ALLOW(-0123456789):LENGTHS(4..)\n'
+    + 'FIELDTYPE:invalid_corp_key:ALLOW(-0123456789ABT):LENGTHS(4..)\n'
     + 'FIELDTYPE:invalid_corp_vendor:ENUM(33)\n'
     + 'FIELDTYPE:invalid_state_origin:ENUM(NH)\n'
     + 'FIELDTYPE:invalid_mandatory:LENGTHS(1..)\n'

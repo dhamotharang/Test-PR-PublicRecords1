@@ -287,7 +287,7 @@ export NH := MODULE;
 		//Note: The Corporation and Filing data is mapped here.
 		//********************************************************************
 		Corp2_mapping.LayoutsCommon.AR ARTransform1(Corp2_Raw_NH.Layouts.TempFilingWithCorpLayoutIn l):= transform,
-		  skip(corp2.t2u(l.FilingType) not in ['ANNUAL REPORT','NONPROFIT REPORT'])
+		  skip(corp2.t2u(l.FilingType) not in ['ANNUAL REPORT','NONPROFIT REPORT','ANNUAL REPORT REMINDER'])
 				self.corp_key														:= state_fips + '-' + corp2.t2u(l.BusinessID);
 				self.corp_vendor												:= state_fips;
 				self.corp_state_origin									:= state_origin;			
@@ -301,7 +301,7 @@ export NH := MODULE;
 		
 		//********************************************************************
 		Corp2_mapping.LayoutsCommon.AR ARTransform2(Corp2_Raw_NH.Layouts.TempFilingWithCorpLayoutIn l):= transform,
-		  skip(corp2.t2u(l.FilingType) not in ['ANNUAL REPORT','NONPROFIT REPORT'])
+		  skip(corp2.t2u(l.FilingType) not in ['ANNUAL REPORT','NONPROFIT REPORT','ANNUAL REPORT REMINDER'])
 				self.corp_key														:= state_fips + '-' + corp2.t2u(l.BusinessID);
 				self.corp_vendor												:= state_fips;
 				self.corp_state_origin									:= state_origin;			
@@ -784,7 +784,8 @@ export NH := MODULE;
 												 )
 										);
 										
-	isFileDateValid := if((string)std.date.today() between ut.date_math(filedate,-30) and ut.date_math(filedate,30),true,false);
+//	isFileDateValid := if((string)std.date.today() between ut.date_math(filedate,-30) and ut.date_math(filedate,30),true,false);
+	isFileDateValid := if((string)std.date.today() between ut.date_math(filedate,-360) and ut.date_math(filedate,360),true,false);
 	return sequential (	 if(isFileDateValid
 													,mapNH
 													,sequential (Corp2_Mapping.Send_Email(state_origin,filedate).InvalidFileDateParm
