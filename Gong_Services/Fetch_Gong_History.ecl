@@ -108,9 +108,12 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     unsigned4 record_sid;
   END;
 
-  joinedRecord doZipNameProject (gong.key_history_zip_name l) := TRANSFORM,
+  joinedRecord_w_compliance doZipNameProject (gong.key_history_zip_name l) := TRANSFORM,
       SKIP(Gong_Services.MAC_Gong_History_Penalty(l, false)>score_threshold_value)
     SELF.businessIds := nullRow;
+    SELF.record_sid := l.record_sid;
+    SELF.global_sid := l.global_sid;
+    SELF.did := l.did;
     SELF := l;
   END;
   joinedRecord_w_compliance doNameProject (gong.key_history_name l) := TRANSFORM,
@@ -133,16 +136,22 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     SELF.businessIds := nullRow;
     SELF := l;
   END;
-  joinedRecord doPhoneProject (gong.Key_History_phone l) := TRANSFORM
+  joinedRecord_w_compliance doPhoneProject (gong.Key_History_phone l) := TRANSFORM
     SELF.businessIds := nullRow;
+    SELF.record_sid := l.record_sid;
+    SELF.global_sid := l.global_sid;
+    SELF.did := l.did;
     SELF := l;
   END;
   joinedRecord doDidProject (gong.Key_History_did l) := TRANSFORM
     SELF.businessIds := nullRow;
     SELF := l;
   END;
-  joinedRecord doCompanyNameProject (gong.key_history_companyname l) := TRANSFORM
+  joinedRecord_w_compliance doCompanyNameProject (gong.key_history_companyname l) := TRANSFORM
     SELF.businessIds := nullRow;
+    SELF.record_sid := l.record_sid;
+    SELF.global_sid := l.global_sid;
+    SELF.did := l.did;
     SELF := l;
   END;
   joinedRecord_w_compliance doCityStNameProject (gong.key_history_city_st_name l) := TRANSFORM
@@ -306,24 +315,22 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
 
   znm_w_daily(unsigned1 flt_type) := FUNCTION
     znm_filtered := znm(zipnm_filt1);
-    znm_optout := Suppress.MAC_SuppressSource(znm_filtered, mod_access);
     res := CASE(flt_type,
-      11 => LIMIT(LIMIT(znm_optout(~SuppressNoncurrent or current_record_flag<>''), 20000,
+      11 => LIMIT(LIMIT(znm_filtered(~SuppressNoncurrent or current_record_flag<>''), 20000,
         FAIL(203, doxie.ErrorCodes(203)), keyed, count), 4000, FAIL(203, doxie.ErrorCodes(203))),
 
-      12 => LIMIT(LIMIT(znm_optout, 2000, SKIP, keyed, count), 1000, skip));
+      12 => LIMIT(LIMIT(znm_filtered, 2000, SKIP, keyed, count), 1000, skip));
     return res;
   END;
 
-  zipnm_read1_fail := project(znm_w_daily(11),	doZipNameProject(LEFT));
-
+  zipnm_read1_fail := project(znm_w_daily(11), doZipNameProject(LEFT));
   zipnm_read1_skip := project(znm_w_daily(12), doZipNameProject(LEFT));
-
-  zipnm_read1 := IF(noFail, zipnm_read1_skip, zipnm_read1_fail);
-
+  pre_zipnm_read1 := IF(noFail, zipnm_read1_skip, zipnm_read1_fail);
+  zipnm_read1_optout := Suppress.MAC_SuppressSource(pre_zipnm_read1, mod_access);
+  zipnm_read1 := PROJECT(zipnm_read1_optout, joinedRecord);
   // adding city state name search here
 
-  _city_st_name_read_skip := project(LIMIT(LIMIT(csnm(city_value<>'' AND lname_value_better<>''
+  city_st_name_read_skip := project(LIMIT(LIMIT(csnm(city_value<>'' AND lname_value_better<>''
     AND keyed(city_code in doxie.Make_CityCodes(city_value).rox )
     AND keyed(st=state_value OR (state_value=''))
     AND keyed(dph_name_last[1..if(phonetics,6,length(trim(lname_value_ph_better)))]= trim(lname_value_ph_better) OR (lname_value_better=''))
@@ -339,10 +346,7 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     AND (~SuppressNoncurrent or current_record_flag<>'')),
     10000, SKIP,keyed,count),3000, SKIP), doCityStNameProject(left));
 
-  city_st_name_read_skip_optout := Suppress.MAC_SuppressSource(_city_st_name_read_skip, mod_access);
-  city_st_name_read_skip := PROJECT(city_st_name_read_skip_optout, joinedRecord);
-
-  _city_st_name_read_fail := project(LIMIT(LIMIT(csnm(city_value<>'' AND lname_value_better<>''
+  city_st_name_read_fail := project(LIMIT(LIMIT(csnm(city_value<>'' AND lname_value_better<>''
     AND keyed(city_code in doxie.Make_CityCodes(city_value).rox )
     AND keyed(st=state_value OR (state_value=''))
     AND keyed(dph_name_last[1..if(phonetics,6,length(trim(lname_value_ph_better)))]= trim(lname_value_ph_better) OR (lname_value_better=''))
@@ -359,10 +363,10 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
       10000, FAIL(203,doxie.ErrorCodes(203)),keyed,count),
     3000, FAIL(203,doxie.ErrorCodes(203))), doCityStNameProject(left));
 
-  city_st_name_read_fail_optout := Suppress.MAC_SuppressSource(_city_st_name_read_fail, mod_access);
-  city_st_name_read_fail := PROJECT(city_st_name_read_fail_optout, joinedRecord);
-  city_st_name_read	:= if(noFail,city_st_name_read_skip, city_st_name_read_fail);
-//fetch by zip codes within the city
+  pre_city_st_name_read	:= if(noFail, city_st_name_read_skip, city_st_name_read_fail);
+  city_st_name_read_optout := Suppress.MAC_SuppressSource(pre_city_st_name_read, mod_access);
+  city_st_name_read := PROJECT(city_st_name_read_optout, joinedRecord);
+  //fetch by zip codes within the city
 
   city_st_name_read_by_zip_skip := project(LIMIT(LIMIT(znm(city_value<>'' AND lname_value_better<>''
     AND keyed(dph_name_last=(string6)metaphonelib.DMetaPhone1(STD.Str.FilterOut(lname_value_better,' ')))
@@ -391,7 +395,9 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     20000, FAIL(203,doxie.ErrorCodes(203)), keyed, count),
     4000,  FAIL(203,doxie.ErrorCodes(203))), doZipNameProject(left));
 
-  city_st_name_read_by_zip := if(noFail, city_st_name_read_by_zip_skip, city_st_name_read_by_zip_fail);
+  pre_city_st_name_read_by_zip := if(noFail, city_st_name_read_by_zip_skip, city_st_name_read_by_zip_fail);
+  city_st_name_read_by_zip_optout := Suppress.MAC_SuppressSource(pre_city_st_name_read_by_zip, mod_access);
+  city_st_name_read_by_zip := PROJECT(city_st_name_read_by_zip_optout, joinedRecord);
 
   name_key_recs :=
   if(lname_value_better<>'',
@@ -427,20 +433,15 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     name_first[1..2] = fname_value[1] + ' ')
     ,(~SuppressNoncurrent or current_flag));
 
-  addr_key_read_history_optout := Suppress.MAC_SuppressSource(addr_key_read_history, mod_access);
-
   // So far using default limit, since a lot of blank key-field are assumed here (theoretically)
-  addr_key_recs_fail := LIMIT(addr_key_read_history_optout, 10000, FAIL(203,doxie.ErrorCodes(203)));
-
-  addr_key_recs_skip := LIMIT(LIMIT(addr_key_read_history_optout, 10000, SKIP, keyed), 5000, SKIP);
-
-  addr_key_pick := IF(noFail, addr_key_recs_skip, addr_key_recs_fail);
-
+  addr_key_recs_fail := LIMIT(addr_key_read_history, 10000, FAIL(203,doxie.ErrorCodes(203)));
+  addr_key_recs_skip := LIMIT(LIMIT(addr_key_read_history, 10000, SKIP, keyed), 5000, SKIP);
+  pre_addr_key_pick := IF(noFail, addr_key_recs_skip, addr_key_recs_fail);
+  addr_key_pick := Suppress.MAC_SuppressSource(pre_addr_key_pick, mod_access);
   addr_key_recs := project(addr_key_pick,doAddrProject(LEFT));
 
-
   //get records by phone
-  phone_key_recs := project(choosen(gong.Key_History_phone(local_phone7 != ''
+  pre_phone_key_recs := project(choosen(gong.Key_History_phone(local_phone7 != ''
     , keyed(p7 = local_phone7)
     , keyed(local_area_code = '' OR p3 = local_area_code)
     , (state_value = '') OR (st = state_value)
@@ -449,6 +450,8 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     doPhoneProject(LEFT));
   // if we didn't get a hit on phone_key_recs, change the search to phone7 and state
   best_state := CHOOSEN (Risk_Indicators.Key_Telcordia_NPA_St(npa = local_area_code), 1);
+  phone_key_recs_optout := Suppress.MAC_SuppressSource(pre_phone_key_recs, mod_access);
+  phone_key_recs := PROJECT(phone_key_recs_optout, joinedRecord);
 
   regional_phone_key_recs := project(LIMIT (LIMIT(gong.Key_History_phone(local_phone7 != ''
     , best_state[1].st != '' or state_value != ''
@@ -457,7 +460,9 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     ),1000,SKIP,keyed,count), 500, SKIP),
     doPhoneProject(LEFT));
 
-  additional_phone_key_recs := if(AllowFallBack and not Exists(phone_key_recs),regional_phone_key_recs);
+  pre_additional_phone_key_recs := if(AllowFallBack and not Exists(phone_key_recs),regional_phone_key_recs);
+  additional_phone_key_recs_optout := Suppress.MAC_SuppressSource(pre_additional_phone_key_recs, mod_access);
+  additional_phone_key_recs := PROJECT(additional_phone_key_recs_optout, joinedRecord);
 
   // need to output an indication message that we reverted to a 7-digit match within state
   fallback := (~SuppressNoncurrent and exists(additional_phone_key_recs)) or
@@ -504,12 +509,15 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
 
   MatchingNameAddrPhone_in := dedup(sort(name_addr_phone_key_recs,phone10,name_last),phone10,name_last);
 
-  MatchingNameAddrPhoneToPhoneRecs := JOIN(MatchingNameAddrPhone_in ,gong.Key_History_phone,
+  pre_MatchingNameAddrPhoneToPhoneRecs := JOIN(MatchingNameAddrPhone_in ,gong.Key_History_phone,
                                            LEFT.phone10 <> ''
                                            and LEFT.phone10[4..10]  = RIGHT.p7
                                            and LEFT.phone10[1..3]  = RIGHT.p3
                                            and LEFT.name_last = RIGHT.name_last
                                            ,doPhoneProject(RIGHT),LIMIT(1000,SKIP));
+
+  MatchingNameAddrPhoneToPhoneRecs_optout := Suppress.MAC_SuppressSource(pre_MatchingNameAddrPhoneToPhoneRecs, mod_access);
+  MatchingNameAddrPhoneToPhoneRecs := PROJECT(MatchingNameAddrPhoneToPhoneRecs_optout, joinedRecord);
 
   hhid_dids := PROJECT(doxie.Get_Household_DIDs(indids(did<>0)),doxie.layout_references);
   use_dids := IF(include_HHID_DIDs, hhid_dids, indids(did<>0));
@@ -553,18 +561,18 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     (~dir_prange_wild or STD.Str.WildMatch(prim_range, dir_prange_value, TRUE)),
     (~SuppressNoncurrent OR current_record_flag<>''));
 
-  MatchingCompanyNameRecs_regular_Fetch_OptOut := Suppress.MAC_SuppressSource(MatchingCompanyNameRecs_regular_Fetch,
-    mod_access);
-
-  MatchingCompanyNameRecs_regular_Fetch_fail :=  project(limit(MatchingCompanyNameRecs_regular_Fetch_OptOut,
+  MatchingCompanyNameRecs_regular_Fetch_fail :=  project(limit(MatchingCompanyNameRecs_regular_Fetch,
     1000,FAIL(203,doxie.ErrorCodes(203))), doCompanyNameProject(left));
 
-  MatchingCompanyNameRecs_regular_Fetch_skip :=  project(limit(MatchingCompanyNameRecs_regular_Fetch_OptOut,
+  MatchingCompanyNameRecs_regular_Fetch_skip :=  project(limit(MatchingCompanyNameRecs_regular_Fetch,
     1000,skip), doCompanyNameProject(left));
 
-  MatchingCompanyNameRecs_regular :=  if(noFail,
+  pre_MatchingCompanyNameRecs_regular :=  if(noFail,
                                          MatchingCompanyNameRecs_regular_Fetch_skip,
                                          MatchingCompanyNameRecs_regular_Fetch_fail);
+
+  MatchingCompanyNameRecs_regular_optout := Suppress.MAC_SuppressSource(pre_MatchingCompanyNameRecs_regular, mod_access);
+  MatchingCompanyNameRecs_regular := PROJECT(MatchingCompanyNameRecs_regular_optout, joinedRecord);
 
   MatchingCompanyNameRecs_wild_keydata := gong.key_history_companyname(
     listed_name_new[1..length(trim(company_name))] = trim(company_name) and company_name<>'',
@@ -580,11 +588,11 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     (~dir_prange_wild or STD.Str.WildMatch(prim_range, dir_prange_value, TRUE)),
     (~SuppressNoncurrent OR current_record_flag<>''));
 
-  MatchingCompanyNameRecs_wild_optout := Suppress.MAC_SuppressSource(MatchingCompanyNameRecs_wild_keydata,
-    mod_access);
-
-  MatchingCompanyNameRecs_wild := PROJECT(LIMIT(MatchingCompanyNameRecs_wild_optout,
+  pre_MatchingCompanyNameRecs_wild := PROJECT(LIMIT(MatchingCompanyNameRecs_wild_keydata,
      1000, FAIL(203, doxie.ErrorCodes(203))), doCompanyNameProject(left));
+
+  MatchingCompanyNameRecs_wild_OptOut := Suppress.MAC_SuppressSource(pre_MatchingCompanyNameRecs_wild, mod_access);
+  MatchingCompanyNameRecs_wild := PROJECT(pre_MatchingCompanyNameRecs_wild, joinedRecord);
 
   cn_key_1_recs := limit(gong.key_cn(keyed(dph_cn[1..if(phonetics,6,length(trim(metaphonelib.DMetaPhone1(lib_word.word(company_name,1)))))]=
         metaphonelib.DMetaPhone1(lib_word.word(company_name,1)) and length(trim(company_name))>0),
@@ -629,7 +637,6 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     SELF.businessIds := nullRow;
     SELF := r;
   END;
-
 
   MatchingCompanyNameRecs_cn_pre_suppress := join(dedup(sort(cn_key_recs, record), record),
     gong.key_cn_to_company,
