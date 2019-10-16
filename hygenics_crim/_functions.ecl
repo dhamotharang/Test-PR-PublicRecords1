@@ -1388,20 +1388,14 @@ export fn_shorten_sourcename(string psourcename) := function
 		      // added for IE AOC phase2
 					regexreplace('SUPREME COURT JUDICIAL BRANCH',                // added by tp
 					regexreplace('OFFENDERS',                                    // added by tp 
-					regexreplace('DEPARTMENT OF PUBLIC SAFETY',                  // added by tp 
-					regexreplace('JUSTICE',                                      // added by tp
+					regexreplace('DEPARTMENT OF PUBLIC SAFETY',                  // added by tp 				
 					regexreplace('VIOLENCE REGISTRY',                            // added by tp
 					regexreplace('JUDICIARY',                                    // added by tp
 					regexreplace('DISTRICT OF COLUMBIA',                         // added by tp
 					regexreplace('METHAMPHETAMINE',                              // added by tp 
-					regexreplace('ADMINISTRATIVE OFFICE OF COURTS',              // added by tp
-					regexreplace('ADMINISTRATOR OF COURTS',                      // added by tp  	
-					regexreplace('ADMIN OFFICE OF COURTS',                       // added by tp  	
 					regexreplace(' - FUGITIVES',                                 // added by tp  	
 					regexreplace('MAGISTRATE COURTS',                            // added by tp  		
-          regexreplace(' ADMINISTRATIVE OFFICE OF THE COURTS - ',		   // added by tp	
-		
-		
+    		
 		      regexreplace('ARRESTS',
 					regexreplace('COMMON_PLEAS',
 					regexreplace('COMMON_PLEAS_COURT|COURT OF COMMON PLEAS',
@@ -1419,10 +1413,10 @@ export fn_shorten_sourcename(string psourcename) := function
 					regexreplace('DEPARTMENT_OF_CORRECTIONS_ALTERNATE|DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE',
 					regexreplace('DEPARTMENT OF CORRECTIONS - SUPERVISED|DEPARTMENT OF CORRECTIONS [(]SUPERVISION[)]',
 					regexreplace('SUMMARY_COURTS|SUMMARY COURT',
-					regexreplace('ADMINISTRATOR_OF_THE_COURTS',
+					regexreplace('ADMINISTRATOR_OF_THE_COURTS| ADMINISTRATIVE OFFICE OF THE COURTS - |ADMINISTRATIVE OFFICE OF COURTS|ADMINISTRATOR OF COURTS|ADMIN OFFICE OF COURTS',
 					regexreplace('JUSTICE_OF_THE_PEACE_COURTS|JUSTICE OF THE PEACE',
 					regexreplace('SUPERIOR[_ ]COURT|SUPERIOR CLERK OF COURTS',
-					regexreplace('JUSTICE[_ ]COURT[S]*',
+					regexreplace('JUSTICE[_ ]COURT[S]*|JUSTICE',
 					//regexreplace('WEBSITE',
 					regexreplace('BOOKING',
 					regexreplace('COUNTY_POLICE',
@@ -1439,8 +1433,10 @@ export fn_shorten_sourcename(string psourcename) := function
 					regexreplace('_CW|_IE',psourcename,''),'JUD'),'COC'),'CCDC'),'GSC'),'DTC'),'CIL'),'SD'),'PD'),'SO'),'CTY_SO'),'CTY_PD'),'BKN')/*,'WEB')*/,'JUSTICE'),'SPC'),'JPC'),'AOC'),'SC'),
 					                                      'DOC_SUP'),'DOC_ALT'),'DOC_PAROLE'),'DOC_PROB'),'DOC_INM'),'DOC_REL'),'DOC'),'MTC'),'MC'),'TC'),'CRC'),'DC'),'CTY'),'CPC'),'CPC'),'ARR')
 																								
-																								// added for AOC phase2
-																							   ,'_AOC_'),'MAGC'),'_FUGTV'),'AOC'),'AOC'),'AOC'),'METH'),'DC'),'JUD'),'VIOL_REG'),'JUST'),'DPS'),'OFND'),'SUP CT JUD BRNCH');   // added by tp
+																								// added for AOC phase2																							  
+																								 ,'MAGC'),'_FUGTV')
+																								 ,'METH'),'DC'),'JUD'),'VIOL_REG')
+																								   ,'DPS'),'OFND'),'SUP CT JUD BRNCH');   // added by tp
 			
 					
 	space_count := 
@@ -1653,16 +1649,16 @@ export fn_shorten_sourcename(string psourcename) := function
                  psourcename = 'OH WARREN FRANKLIN MUNICIPAL COURT_IE'                => 'OHWARRENFRANKLIN_MC',       //added by tp
 								 psourcename = 'OH SANDUSKY FREMONT MUNICIPAL COURT_IE'               => 'OHSANDUSKYFREMONT_MC',      //added by tp
 								 psourcename = 'FL PINELLAS CIRCUIT CLERK OF COURTS_IE'               => 'FL_PINELLAS_CIR_COC',       //added by tp
-								 psourcename = 'OH SUMMIT STOW MUNICIPAL COURT TRAFFIC_IE'            => 'OH_SUMMIT_STOW_MT',         //added by tp
+								 psourcename = 'OH SUMMIT STOW MUNICIPAL COURT TRAFFIC_IE'            => 'OH_SUMMIT_STOW_MTC',         //added by tp
 								 psourcename = 'FL CITRUS CLERK OF COURT DISPOSITION_IE'              => 'FLCITRS_COC_DISP',          //added by tp
 								 psourcename = 'FL ORANGE COUNTY CLERK OF COURTS TRAFFIC_IE'          => 'FLORNGE_COC_TRAF',          //added by tp
 								 psourcename = 'OH MONTGOMERY MIAMISBURG MUNICIPAL COURT_IE'          => 'OHMNTGMRYMIASBRG_MC',       //added by tp
-								 psourcename = 'OH WARREN LEBANON MUNICIPAL_IE'                       => 'OH_WARN_LEBANON_MUN',       //added by tp
+								 psourcename = 'OH WARREN LEBANON MUNICIPAL_IE'                       => 'OH_WARN_LEBANON_MC',       //added by tp
 								 psourcename = 'OH WYANDOT UPPER SANDUSKY MUNICIPAL COURT_IE'         => 'OHWYANDTUPRSNDSKY_MC',      //added by tp
-								 psourcename = 'OH FRANKLIN MUNICIPAL TRAFFIC_IE'                     => 'OH_FRANKLIN_MT',            //added by tp
-								 psourcename = 'OH WARREN MORROW MAYORS COURT_IE'                     => 'OHWARNMORROW_MYRSCRT',      //added by tp
+								 psourcename = 'OH FRANKLIN MUNICIPAL TRAFFIC_IE'                     => 'OH_FRANKLIN_MTC',            //added by tp
+								 psourcename = 'OH WARREN MORROW MAYORS COURT_IE'                     => 'OHWARNMORROW_MAYORSC',      //added by tp
 								 psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT COURTS(WEB)_IE'      => 'FLMIADADE_CNTY_CRCWB',      //added by tp
-								 psourcename = 'OH CLARK MUNICIPAL TRAFFIC COURT_IE'                  => 'OH_CLARK_MT',               //added by tp
+								 psourcename = 'OH CLARK MUNICIPAL TRAFFIC COURT_IE'                  => 'OH_CLARK_MTC',               //added by tp
 								 psourcename = 'OH WARREN SPRINGBORO MAYORS COURT_IE'                 => 'OH_WARNSPRBORO_MYRSC',      //added by tp
 								 psourcename = 'OH MONTGOMERY DAYTON MUNICIPAL COURTS - TRAFFIC_IE'   => 'OH_MONTGOMRYDAYTN_MT',      //added by tp
 								 psourcename = 'OH MONTGOMERY MUNICIPAL COURTS EASTERN DIVISION_IE'   => 'OHMONTGOMRY_MC_EDIV',       //added by tp
