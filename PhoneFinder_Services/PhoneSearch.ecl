@@ -17,7 +17,8 @@ FUNCTION
   // Search by PII - Don't use royalty based sources when searching on PII when phone is also sent in
   // Experian File One and Waterfall process
   wfMod := MODULE(PROJECT(inMod,PhoneFinder_Services.iParam.SearchParams))
-    EXPORT BOOLEAN UseQSent      := FALSE;
+    EXPORT BOOLEAN UseTransUnionIQ411      := FALSE;
+    EXPORT BOOLEAN UseTransUnionPVS        := FALSE;
     EXPORT BOOLEAN UseLastResort := FALSE;
     EXPORT BOOLEAN UseInHousePhoneMetadata := FALSE;
   END;

@@ -76,7 +76,7 @@ with_best_addr := risk_indicators.iid_check_best(with_hhid_summary, with_ssn_fla
 
 common := if(runBestAddrCheck or bsversion >=50, with_best_addr, with_ssn_flags);
 
-valid_email_inputs := common(did<>0 and trim(email_address)<>'');  // only send the transactions with a populated email address and populated DID
+valid_email_inputs := if(~isFCRA,common(did<>0 and trim(email_address)<>''));  // only send the transactions with a populated email address and populated DID
 ret_email := Ungroup(project(valid_email_inputs, transform(risk_indicators.Layout_Input, self.did := left.did, 
              self.email_address := left.email_address, self.seq := left.seq, self := [])));
 email_in:= Project(ret_email,transform(EmailV2_Services.Layouts.batch_in_rec,

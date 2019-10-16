@@ -6,20 +6,21 @@ lFinal   := PhoneFinder_Services.Layouts.PhoneFinder.Final;
 
 qSentPhones := PhoneFinder_Services.GetQSentPhones;
 
-EXPORT GetPhones( DATASET(lBatchIn)                        dIn,
-									PhoneFinder_Services.iParam.SearchParams inMod,
-									DATASET(Gateway.Layouts.Config)          dGateways = DATASET([], Gateway.Layouts.Config)) :=
+EXPORT GetPhones( DATASET(lBatchIn)  dIn,
+                                     PhoneFinder_Services.iParam.SearchParams inMod,
+                                     DATASET(Gateway.Layouts.Config)          dGateways = DATASET([], Gateway.Layouts.Config)) :=
 FUNCTION
 	targusGateway := dGateways(inMod.useTargus and Gateway.Configuration.isTargus(servicename))[1];
 	qSentPVSGateway  := dGateways(inMod.UseTransUnionPVS and Gateway.Configuration.isQSentV2(servicename))[1];
 
-
+ 
 	// Create module with autokey paramaters to pass to the batch function
 	akMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.AKParams, OPT))
 		EXPORT SET OF STRING1 skip_set := ['B'];
 		EXPORT BOOLEAN WorkHard        := TRUE;
 		EXPORT BOOLEAN UseAllLookups   := FALSE;
 	END;
+
 
 	// Phonesplus data
 	dPhonesPlus_ := IF(inMod.UseInhousePhones, Phones.Functions.GetPhonesPlusData(dIn, akMod, MDR.SourceTools.src_Phones_Plus, FALSE, TRUE, inMod.IsPhone7Search));
@@ -81,9 +82,9 @@ FUNCTION
 	TRANSFORM
 		SELF.acctno            := pInput.batch_in.acctno;
 		SELF.typeflag          := MAP(pInput.src != MDR.SourceTools.src_Gong_phone_append                                               => Phones.Constants.TypeFlag.NonDirectoryAssistance,
-																	pInput.src = MDR.SourceTools.src_Gong_phone_append and pInput.tnt = Phones.Constants.TNT.History  => Phones.Constants.TypeFlag.DirectoryAssistance_Disconnected,
-																	pInput.src = MDR.SourceTools.src_Gong_phone_append and pInput.tnt != Phones.Constants.TNT.History => Phones.Constants.TypeFlag.DirectoryAssistance,
-																	'');
+									  pInput.src = MDR.SourceTools.src_Gong_phone_append and pInput.tnt = Phones.Constants.TNT.History  => Phones.Constants.TypeFlag.DirectoryAssistance_Disconnected,
+									  pInput.src = MDR.SourceTools.src_Gong_phone_append and pInput.tnt != Phones.Constants.TNT.History => Phones.Constants.TypeFlag.DirectoryAssistance,
+									  '');
 		SELF.dial_indicator    := MAP(pInput.dial_ind = '1' => 'Y',
 																	pInput.dial_ind = '0' => 'N',
 																	'');
@@ -110,9 +111,9 @@ FUNCTION
 
 	// If data source is not 'PV', call the gateway again with the primary phone number using service type 'PVSD' to get the phone info
 	dQSentAppendPrimaryPhoneDetails := IF(EXISTS(dQSentPrimaryPhoneNoDetails),
-																				qSentPhones.GetQSentPVSData(dQSentPrimaryPhoneNoDetails,
-																																		inMod, phone, acctno,
-																																		TRUE, qSentPVSGateway));
+										  qSentPhones.GetQSentPVSData(dQSentPrimaryPhoneNoDetails,
+	 															     inMod, phone, acctno,
+																	 TRUE, qSentPVSGateway));
 
 	dQSentCombined := dQSentPVS + dQSentAppendPrimaryPhoneDetails;
 
@@ -120,23 +121,23 @@ FUNCTION
 	dQSentRecs := IF(inMod.UseTransUnionPVS and qSentPVSGateway.url != '', dQSentCombined);
 
 	dInhousePhoneDetail	:= PhoneFinder_Services.GetPhoneDetails(PROJECT(dIn,
-                                                                      TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
-                                                                                SELF.acctno := LEFT.acctno, SELF.phoneno := LEFT.homephone, SELF := [])),
+                                                              TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
+                                                              SELF.acctno := LEFT.acctno, SELF.phoneno := LEFT.homephone, SELF := [])),
                                                               dGateways, inMod);
 
 	dPhoneDetailWBatchIn := PROJECT(dInhousePhoneDetail, TRANSFORM(lFinal, SELF.isPrimaryPhone := TRUE, SELF := LEFT));
 
- //use inhouse metada (metadata index, att libd, carrier reference index)
-	dPhoneDetail := IF(inMod.UseInHousePhoneMetadata, dPhoneDetailWBatchIn, dQSentRecs);
+ //use inhouse metada (metadata index, L6, libd, carrier reference index)
+
+	dPhoneDetail := IF(inMod.UseInHousePhoneMetadataOnly, dPhoneDetailWBatchIn, dQSentRecs);
 
 	// Combine all the sources
 	dPhonesCombined := dReformat2Common + dPhoneDetail;
 
 	dPhoneRecs := PROJECT(dPhonesCombined,
                         TRANSFORM(lFinal,
-                                  SELF.phonestatus := IF(inMod.UseInHousePhoneMetadata,
-                                                          LEFT.phonestatus,
-                                                          PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode)),
+                                  SELF.phonestatus := IF(inMod.UseInHousePhoneMetadataOnly, LEFT.phonestatus,
+                                  PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode)),
                                   SELF             := LEFT));
 
 	// Debug
@@ -152,6 +153,7 @@ FUNCTION
 		OUTPUT(dPhoneRecsCombinedDedup, NAMED('dPhoneRecsCombinedDedup'), EXTEND);
 		OUTPUT(dPhoneCarrierInfo, NAMED('dPhoneCarrierInfo'), EXTEND);
 		OUTPUT(dReformat2Common, NAMED('dReformat2Common'), EXTEND);
+		OUTPUT(dPhoneDetail, NAMED('dPhoneDetail'), EXTEND);
 		#IF(PhoneFinder_Services.Constants.Debug.QSent)
 			OUTPUT(dQSentPVS, NAMED('dQSentPVS'), EXTEND);
 			OUTPUT(dQSentPrimaryPhoneDetails, NAMED('dQSentPrimaryPhoneDetails'), EXTEND);
