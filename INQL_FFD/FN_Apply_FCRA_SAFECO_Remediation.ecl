@@ -12,6 +12,7 @@ fsafeco := dataset(data_services.foreign_fcra_logs + 'thor10_231::in::safeco::20
 
 new_base_file := join(base_file, fsafeco, 
                         left.transaction_id = right.transaction_id,
+												transform(INQL_FFD.Layouts.Base, self:=left;),
 										     left only, lookup);
 
 return new_base_file;
