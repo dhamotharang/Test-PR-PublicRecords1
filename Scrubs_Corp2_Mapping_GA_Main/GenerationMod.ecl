@@ -1,18 +1,40 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-EXPORT GenerationMod := MODULE
+IMPORT SALT311;
+EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.8.0';
-  EXPORT salt_MODULE := 'SALT38'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.11.4';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_Corp2_Mapping_GA_Main';
   EXPORT spc_NAMESCOPE := '';
   EXPORT spc_PROCESS := '';
+  EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
   EXPORT spc_RIDFIELD := ''; // record id
+  EXPORT spc_CONFIG := 'Config';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := '';
+  EXPORT spc_FILEPREFIX := 'In_';
+  EXPORT spc_FILENAME := 'in_file';
+  EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,dt_vendor_first_reported,dt_vendor_last_reported,dt_first_seen,dt_last_seen,corp_ra_dt_first_seen,corp_ra_dt_last_seen,corp_key,corp_supp_key,corp_vendor,corp_vendor_county,corp_vendor_subcode,corp_state_origin,corp_process_date,corp_orig_sos_charter_nbr,corp_legal_name,corp_ln_name_type_cd,corp_ln_name_type_desc,corp_supp_nbr,corp_name_comment,corp_address1_type_cd,corp_address1_type_desc,corp_address1_line1,corp_address1_line2,corp_address1_line3,corp_address1_effective_date,corp_address2_type_cd,corp_address2_type_desc,corp_address2_line1,corp_address2_line2,corp_address2_line3,corp_address2_effective_date,corp_phone_number,corp_phone_number_type_cd,corp_phone_number_type_desc,corp_fax_nbr,corp_email_address,corp_web_address,corp_filing_reference_nbr,corp_filing_date,corp_filing_cd,corp_filing_desc,corp_status_cd,corp_status_desc,corp_status_date,corp_standing,corp_status_comment,corp_ticker_symbol,corp_stock_exchange,corp_inc_state,corp_inc_county,corp_inc_date,corp_anniversary_month,corp_fed_tax_id,corp_state_tax_id,corp_term_exist_cd,corp_term_exist_exp,corp_term_exist_desc,corp_foreign_domestic_ind,corp_forgn_state_cd,corp_forgn_state_desc,corp_forgn_sos_charter_nbr,corp_forgn_date,corp_forgn_fed_tax_id,corp_forgn_state_tax_id,corp_forgn_term_exist_cd,corp_forgn_term_exist_exp,corp_forgn_term_exist_desc,corp_orig_org_structure_cd,corp_orig_org_structure_desc,corp_for_profit_ind,corp_public_or_private_ind,corp_sic_code,corp_naic_code,corp_orig_bus_type_cd,corp_orig_bus_type_desc,corp_entity_desc,corp_certificate_nbr,corp_internal_nbr,corp_previous_nbr,corp_microfilm_nbr,corp_amendments_filed,corp_acts,corp_partnership_ind,corp_mfg_ind,corp_addl_info,corp_taxes,corp_franchise_taxes,corp_tax_program_cd,corp_tax_program_desc,corp_ra_full_name,corp_ra_fname,corp_ra_mname,corp_ra_lname,corp_ra_suffix,corp_ra_title_cd,corp_ra_title_desc,corp_ra_fein,corp_ra_ssn,corp_ra_dob,corp_ra_effective_date,corp_ra_resign_date,corp_ra_no_comp,corp_ra_no_comp_igs,corp_ra_addl_info,corp_ra_address_type_cd,corp_ra_address_type_desc,corp_ra_address_line1,corp_ra_address_line2,corp_ra_address_line3,corp_ra_phone_number,corp_ra_phone_number_type_cd,corp_ra_phone_number_type_desc,corp_ra_fax_nbr,corp_ra_email_address,corp_ra_web_address,corp_prep_addr1_line1,corp_prep_addr1_last_line,corp_prep_addr2_line1,corp_prep_addr2_last_line,ra_prep_addr_line1,ra_prep_addr_last_line,cont_filing_reference_nbr,cont_filing_date,cont_filing_cd,cont_filing_desc,cont_type_cd,cont_type_desc,cont_full_name,cont_fname,cont_mname,cont_lname,cont_suffix,cont_title1_desc,cont_title2_desc,cont_title3_desc,cont_title4_desc,cont_title5_desc,cont_fein,cont_ssn,cont_dob,cont_status_cd,cont_status_desc,cont_effective_date,cont_effective_cd,cont_effective_desc,cont_addl_info,cont_address_type_cd,cont_address_type_desc,cont_address_line1,cont_address_line2,cont_address_line3,cont_address_effective_date,cont_address_county,cont_phone_number,cont_phone_number_type_cd,cont_phone_number_type_desc,cont_fax_nbr,cont_email_address,cont_web_address,corp_acres,corp_action,corp_action_date,corp_action_employment_security_approval_date,corp_action_pending_cd,corp_action_pending_desc,corp_action_statement_of_intent_date,corp_action_tax_dept_approval_date,corp_acts2,corp_acts3,corp_additional_principals,corp_address_office_type,corp_agent_assign_date,corp_agent_commercial,corp_agent_country,corp_agent_county,corp_agent_status_cd,corp_agent_status_desc,corp_agent_id,corp_agriculture_flag,corp_authorized_partners,corp_comment,corp_consent_flag_for_protected_name,corp_converted,corp_converted_from,corp_country_of_formation,corp_date_of_organization_meeting,corp_delayed_effective_date,corp_directors_from_to,corp_dissolved_date,corp_farm_exemptions,corp_farm_qual_date,corp_farm_status_cd,corp_farm_status_desc,corp_fiscal_year_month,corp_foreign_fiduciary_capacity_in_state,corp_governing_statute,corp_has_members,corp_has_vested_managers,corp_home_incorporated_county,corp_home_state_name,corp_is_professional,corp_is_non_profit_irs_approved,corp_last_renewal_date,corp_last_renewal_year,corp_license_type,corp_llc_managed_desc,corp_llc_managed_ind,corp_management_desc,corp_management_type,corp_manager_managed,corp_merged_corporation_id,corp_merged_fein,corp_merger_allowed_flag,corp_merger_date,corp_merger_desc,corp_merger_effective_date,corp_merger_id,corp_merger_indicator,corp_merger_name,corp_merger_type_converted_to_cd,corp_merger_type_converted_to_desc,corp_naics_desc,corp_name_effective_date,corp_name_reservation_date,corp_name_reservation_desc,corp_name_reservation_expiration_date,corp_name_reservation_nbr,corp_name_reservation_type,corp_name_status_cd,corp_name_status_date,corp_name_status_desc,corp_non_profit_irs_approved_purpose,corp_non_profit_solicit_donations,corp_nbr_of_amendments,corp_nbr_of_initial_llc_members,corp_nbr_of_partners,corp_operating_agreement,corp_opt_in_llc_act_desc,corp_opt_in_llc_act_ind,corp_organizational_comments,corp_partner_contributions_total,corp_partner_terms,corp_percentage_voters_required_to_approve_amendments,corp_profession,corp_province,corp_public_mutual_corporation,corp_purpose,corp_ra_required_flag,corp_registered_counties,corp_regulated_ind,corp_renewal_date,corp_standing_other,corp_survivor_corporation_id,corp_tax_base,corp_tax_standing,corp_termination_cd,corp_termination_desc,corp_termination_date,corp_trademark_business_mark_type,corp_trademark_cancelled_date,corp_trademark_class_desc1,corp_trademark_class_desc2,corp_trademark_class_desc3,corp_trademark_class_desc4,corp_trademark_class_desc5,corp_trademark_class_desc6,corp_trademark_classification_nbr,corp_trademark_disclaimer1,corp_trademark_disclaimer2,corp_trademark_expiration_date,corp_trademark_filing_date,corp_trademark_first_use_date,corp_trademark_first_use_date_in_state,corp_trademark_keywords,corp_trademark_logo,corp_trademark_name_expiration_date,corp_trademark_nbr,corp_trademark_renewal_date,corp_trademark_status,corp_trademark_used_1,corp_trademark_used_2,corp_trademark_used_3,cont_owner_percentage,cont_country,cont_country_mailing,cont_nondislosure,cont_prep_addr_line1,cont_prep_addr_last_line,recordorigin';
+  EXPORT spc_HAS_TWOSTEP := FALSE;
+  EXPORT spc_HAS_PARTITION := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := TRUE;
+  EXPORT spc_HAS_INCREMENTAL := FALSE;
+  EXPORT spc_HAS_ASOF := FALSE;
+  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
+  EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := FALSE;
+  EXPORT spc_HAS_PARENTS := FALSE;
+  EXPORT spc_HAS_FORCE := FALSE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
  
   // The entire spec file
   EXPORT spcString :=
@@ -32,8 +54,8 @@ EXPORT GenerationMod := MODULE
     + '//FUZZY can be used to create new types of FUZZY linking\n'
     + '\n'
     + 'FIELDTYPE:invalid_corp_key:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-):LENGTHS(4..)\n'
-    + 'FIELDTYPE:invalid_corp_vendor:ENUM(13)\n'
-    + 'FIELDTYPE:invalid_state_origin:ENUM(GA)\n'
+    + 'FIELDTYPE:invalid_corp_vendor:ENUM(13|13)\n'
+    + 'FIELDTYPE:invalid_state_origin:ENUM(GA|GA)\n'
     + 'FIELDTYPE:invalid_name_type_code:CUSTOM(Scrubs_Corp2_Mapping_GA_Main.Functions.invalid_ln_name_type_cd>0,recordorigin)\n'
     + 'FIELDTYPE:invalid_name_type_desc:CUSTOM(Scrubs_Corp2_Mapping_GA_Main.Functions.invalid_ln_name_type_desc>0,recordorigin)\n'
     + 'FIELDTYPE:invalid_forgn_dom_code:ENUM(D|F| )\n'
@@ -47,7 +69,7 @@ EXPORT GenerationMod := MODULE
     + 'FIELDTYPE:invalid_phone:ALLOW(0123456789-):LENGTHS(0..12):SPACES( )\n'
     + 'FIELDTYPE:invalid_recordorigin:ENUM(C|T|)\n'
     + 'FIELDTYPE:invalid_alphablank:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
-    + 'FIELDTYPE:invalid_characters:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ/-())\n'
+    + 'FIELDTYPE:invalid_characters:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ/-()&.\')\n'
     + 'FIELDTYPE:invalid_State_Desc:ALLOW( &ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
     + '\n'
     + 'DATEFIELD:dt_vendor_first_reported:TYPE(STRING8):LIKE(invalid_date):0,0\n'
@@ -92,7 +114,7 @@ EXPORT GenerationMod := MODULE
     + 'FIELD:corp_filing_cd:TYPE(STRING8):0,0\n'
     + 'FIELD:corp_filing_desc:TYPE(STRING60):0,0\n'
     + 'FIELD:corp_status_cd:TYPE(STRING8):0,0\n'
-    + 'FIELD:corp_status_desc:TYPE(STRING60):0,0\n'
+    + 'FIELD:corp_status_desc:TYPE(STRING60):LIKE(invalid_characters):0,0\n'
     + 'FIELD:corp_status_date:TYPE(STRING8):LIKE(invalid_date):0,0\n'
     + 'FIELD:corp_standing:TYPE(STRING1):0,0\n'
     + 'FIELD:corp_status_comment:TYPE(STRING350):0,0\n'
@@ -234,7 +256,7 @@ EXPORT GenerationMod := MODULE
     + 'FIELD:corp_consent_flag_for_protected_name:TYPE(STRING1):0,0\n'
     + 'FIELD:corp_converted:TYPE(STRING1):0,0\n'
     + 'FIELD:corp_converted_from:TYPE(STRING50):0,0\n'
-    + 'FIELD:corp_country_of_formation:TYPE(STRING50):0,0\n'
+    + 'FIELD:corp_country_of_formation:TYPE(STRING50):LIKE(invalid_characters):0,0\n'
     + 'FIELD:corp_date_of_organization_meeting:TYPE(STRING8):0,0\n'
     + 'FIELD:corp_delayed_effective_date:TYPE(STRING8):0,0\n'
     + 'FIELD:corp_directors_from_to:TYPE(STRING10):0,0\n'
@@ -350,3 +372,4 @@ EXPORT GenerationMod := MODULE
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+
