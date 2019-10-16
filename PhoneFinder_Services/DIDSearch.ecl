@@ -30,7 +30,8 @@ FUNCTION
 	dFormat2BatchIn := PROJECT(dPhoneHistIn, TRANSFORM(lBatchIn, SELF.homephone := LEFT.phone, SELF.acctno := LEFT.acctno, SELF := []));
 
 	psMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.SearchParams))
-		EXPORT BOOLEAN UseQSent                := FALSE;
+	    EXPORT BOOLEAN UseTransUnionIQ411      := FALSE;
+		EXPORT BOOLEAN UseTransUnionPVS        := FALSE;
 		EXPORT BOOLEAN UseTargus               := FALSE;
 		EXPORT BOOLEAN UseLastResort           := FALSE;
 		EXPORT BOOLEAN UseInHousePhoneMetadata := FALSE;
