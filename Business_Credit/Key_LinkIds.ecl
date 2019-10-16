@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Business_Credit, BIPV2, CCPA, Doxie, STD;
+﻿IMPORT _Control, Business_Credit, BIPV2, MDR, Doxie, STD;
 
 EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 										Constants().buildType	pBuildType	=	Constants().buildType.Daily) := MODULE
@@ -38,7 +38,7 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																)
 															);
 															
-	SHARED  addGlobalSID :=  CCPA.macGetGlobalSID(dLinkedBase,'SBFECV','','global_sid');
+	SHARED  addGlobalSID :=  MDR.macGetGlobalSid(dLinkedBase,'SBFECV','','global_sid');
 	
 	SHARED	dLinkedBaseDist	:=	DEDUP(SORT(DISTRIBUTE(addGlobalSID,
 																HASH(	Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,did,DotID,EmpID,POWID,ProxID,SELEID,OrgID,UltID)),
@@ -65,12 +65,11 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																																		 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																																		//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
 								UNSIGNED2 ScoreThreshold = 0,											 //Applied at lowest leve of ID
-								STRING DataPermissionMask = '',										//Default will fail the fetch. Pos 12 must be set to '1'
 								INTEGER JoinLimit = 10000,
 								UNSIGNED1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin
 								):=FUNCTION
 
-	use_sbfe := DataPermissionMask[12] NOT IN ['0', ''];
+	use_sbfe := mod_access.DataPermissionMask[12] NOT IN ['0', ''];
 	
 	BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, fetched, Level, JoinLimit, JoinType);
 	
@@ -87,12 +86,11 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																																		 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																																		//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
 								UNSIGNED2 ScoreThreshold = 0,											 //Applied at lowest leve of ID
-								STRING DataPermissionMask = '',										//Default will fail the fetch. Pos 12 must be set to '1'
 								INTEGER JoinLimit = 10000 
 								):=FUNCTION
 
 		inputs_for2 := PROJECT(inputs, BIPV2.IDlayouts.l_xlink_ids2);
-		f2 := kFetch2(inputs_for2, mod_access, Level, ScoreThreshold, DataPermissionMask, JoinLimit);		
+		f2 := kFetch2(inputs_for2, mod_access, Level, ScoreThreshold, JoinLimit);		
 		RETURN PROJECT(f2, RECORDOF(Key));																						
 
 	END;

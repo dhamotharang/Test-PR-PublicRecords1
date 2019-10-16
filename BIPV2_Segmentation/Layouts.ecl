@@ -52,10 +52,10 @@
           dataset(ContactProxLayout) contacts;
      end;
 												
-     export OrgStructureLayout := record
-          string60 company_org_structure_derived;
-          COUNT_TYPE cnt;
-     end;
+     // export OrgStructureLayout := record
+          // string60 company_org_structure_derived;
+          // COUNT_TYPE cnt;
+     // end;
 	
      export SegmentationLayout := record
           ID_TYPE                     seleid;
@@ -96,8 +96,9 @@
 		string3                     sourceGroups;
 		unsigned6                   best_contact_did;
 		string50                    best_contact_job_title; 
-          string10                    best_contact_seg_ind;     
-		// dataset(OrgStructureLayout) org_structure;                 //CHANGE   	
+          string10                    best_contact_seg_ind;  
+		string20                    org_structure;
+		string20                    org_sub_structure;
      end;
 
      export SlimLayout := record
@@ -121,7 +122,6 @@
           COUNT_TYPE proxid_cnt;
           COUNT_TYPE record_cnt;
           COUNT_TYPE addr_state_cnt;
-          dataset(OrgStructureLayout) org_structure; 
           boolean has_SOS;
 	end;
 end;

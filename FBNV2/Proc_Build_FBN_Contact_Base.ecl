@@ -1,4 +1,4 @@
-﻿IMPORT _control, Address, AID, CCPA, DID_Add, NID, PromoteSupers, Std, lib_stringLib;
+﻿IMPORT _control, Address, AID, MDR, DID_Add, NID, PromoteSupers, Std, lib_stringLib;
 
 dContactInputs  	:=ungroup(Mapping_FBN_FL_Contact)+
 				                         ungroup(Mapping_FBN_CA_San_Diego_Contact)+
@@ -163,13 +163,13 @@ dOut    	 :=rollup(sort_dsFBN,rollupXform(left,right),
 ///////////////////////////////////////////////////////////////////////////////////////     
          
 //Apply Global_SID - TMSID[1..3]     
-addGlobalSID 		:= CCPA.macGetGlobalSID(dOut, 'Fbn2', 'tmsid[1..3]', 'global_sid');      
+addGlobalSID 		:= MDR.macGetGlobalSid(dOut, 'Fbn2', 'tmsid[1..3]', 'global_sid');      
          
 withGSIDs				:= addGlobalSID(global_sid<>0);	//Global_SIDs Populated     
 remainRec				:= addGlobalSID(global_sid=0);	//No Global_SIDs Populated     
          
 //Apply Global_SID - TMSID[1..2]     
-addGlobalSID2		:= CCPA.macGetGlobalSID(remainRec, 'Fbn2', 'tmsid[1..2]', 'global_sid');     
+addGlobalSID2		:= MDR.macGetGlobalSid(remainRec, 'Fbn2', 'tmsid[1..2]', 'global_sid');     
 
 //Concat All Results     
 concatOut 			:= (withGSIDs + addGlobalSID2) : persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Contact'); 

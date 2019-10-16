@@ -7,7 +7,8 @@ EXPORT Search_Function(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_In,
 																						string50 DataPermissionMask,
 																						string8 AttributesVersion, 
                                             boolean domodel=false,
-                                            string modelname = ''
+                                            string modelname = '',
+																						string prt = '1'
                                             ) := FUNCTION
 
 BOOLEAN DEBUG := FALSE;
@@ -279,7 +280,7 @@ donotmail_key := dma.key_DNM_Name_Address;
 		left.DID = right.DID, 
 		getInfutor(left,right), left outer, keep(1), local)
 	// ;	
-	: PERSIST('~PROFILEBOOSTER::with_infutor_thor_full'); // remove persists because low on disk space and it's rebuilding persist file each time anyway
+	: PERSIST('~PROFILEBOOSTER::with_infutor_thor_full::' + prt); // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
 	#IF(onThor)
 		withInfutor := withInfutor_thor;
@@ -748,7 +749,7 @@ end;
 																	self.HHInterestSportPersonMmbrCnt 	:= if(left.rec_type in [ProfileBooster.Constants.recType.Prospect,ProfileBooster.Constants.recType.Household] and right.sportsInterest = 1, 1, 0);  
 																	self.RaAInterestSportPersonMmbrCnt	:= if(left.rec_type = ProfileBooster.Constants.recType.Relative and right.sportsInterest = 1, 1, 0); 
 																	self := left), left outer, parallel);
-	with_Sports_thor := withSports_temp : PERSIST('~PROFILEBOOSTER::with_Sports_thor') ;  // try adding another stopping point here to help out  // remove persists because low on disk space and it's rebuilding persist file each time anyway
+	with_Sports_thor := withSports_temp : PERSIST('~PROFILEBOOSTER::with_Sports_thor::' + prt) ;  // try adding another stopping point here to help out  // remove persists because low on disk space and it's rebuilding persist file each time anyway
 
 	#IF(onThor)
 		withSports := with_Sports_thor;

@@ -1,9 +1,8 @@
-Import GlobalWatchLists,ut,prte2_header,aid,header,lib_datalib,Data_Services,doxie;
+﻿Import GlobalWatchLists,ut,prte2_header,aid,header,lib_datalib,Data_Services,doxie;
 
 EXPORT files := module
 
-EXPORT GWL_IN := DATASET(constants.In_GWL, Layouts.GWL_base_Layout_ext - [did, bdid], CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), maxlength(25000),QUOTE('"')));
-
+EXPORT GWL_IN := DATASET(constants.In_GWL, Layouts.GWL_base_Layout_ext - [did,bdid,global_sid,record_sid], CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), maxlength(25000),QUOTE('"')));
 Export GWL_IN_1 := project(GWL_IN(cust_name = ''), 
 transform(Layouts.Layout_GWL, 
 self := Left;

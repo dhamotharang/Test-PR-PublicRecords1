@@ -1,7 +1,7 @@
-﻿import _control, bipv2, CCPA, ut, MDR, BKForeclosure, Std;
+﻿import _control, bipv2, MDR, ut, MDR, BKForeclosure, Std;
 
 foreclosureIn 				:= property.File_Foreclosure_In;  //contains both new and base file data
-addGSForeclosureIn		:= CCPA.macGetGlobalSID(foreclosureIn,'Foreclosure','','global_sid'); //DF-25926: Add Global_SID
+addGSForeclosureIn		:= MDR.macGetGlobalSid(foreclosureIn,'Foreclosure','','global_sid'); //DF-25926: Add Global_SID
 
 layout_foreclosureIn 	:= recordof(addGSForeclosureIn);
 normalizeDIDLayout 		:= recordof(Property.File_Foreclosure_Normalized);

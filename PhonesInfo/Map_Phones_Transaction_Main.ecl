@@ -1,4 +1,4 @@
-﻿IMPORT _control, CCPA, Std;
+﻿IMPORT _control, MDR, Std;
 
 	//Base Files by Source
 	portFile		:= 	PhonesInfo.File_TCPA.Main(vendor_first_reported_dt<=20150308);					//Neustar Ported
@@ -15,6 +15,6 @@
 									otpFile; 
 									
 	//Add Global_SID Field
-	addGlobalSID:= 	CCPA.macGetGlobalSID(concatFiles, 'PhonesMetadata', 'source', 'global_sid');												
+	addGlobalSID:= 	MDR.macGetGlobalSid(concatFiles, 'PhonesMetadata', 'source', 'global_sid');												
 
 EXPORT Map_Phones_Transaction_Main := addGlobalSID;

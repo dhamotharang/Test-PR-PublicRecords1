@@ -1,4 +1,4 @@
-import Address, Risk_Indicators, SexOffender;
+﻿import Address, Risk_Indicators, SexOffender;
 
 //Layout
 Layout_Out_Main :=  record
@@ -193,6 +193,9 @@ Layout_Out_Main :=  record
    string1      curr_incar_flag := '';
    string1      curr_parole_flag := '';
    string1      curr_probation_flag := '';
+	 //Added for CCPA-758
+	 unsigned4 global_sid := 0;
+	 unsigned8 record_sid := 0;
 end;
 
 

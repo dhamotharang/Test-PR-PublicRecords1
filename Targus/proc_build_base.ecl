@@ -1,4 +1,4 @@
-﻿import address, CCPA, did_add, didville,ut,header_slimsort,mdr,header, idl_header, PromoteSupers, Scrubs, Scrubs_Targus, _Control, lib_date, tools, std;
+﻿import address, MDR, did_add, didville,ut,header_slimsort,mdr,header, idl_header, PromoteSupers, Scrubs, Scrubs_Targus, _Control, lib_date, tools, std;
 export proc_build_base(string versionDate, string emailList='') := function
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Pull Input Data Sample
@@ -319,7 +319,7 @@ dNewBase_final := join(distribute(dNewBase_Dedup, hash(phone_number)), 	dDatesFi
 	                                                                  SELF            := LEFT)
 														 );
 	
-	addGSFiltered		:= CCPA.macGetGlobalSID(dFilteredBase,'Targus','','global_sid'); //Add Global_SID
+	addGSFiltered		:= MDR.macGetGlobalSid(dFilteredBase,'Targus','','global_sid'); //Add Global_SID
 	
 	PromoteSupers.MAC_SF_BuildProcess(dNewBase_Dedup_,'~thor_data400::base::consumer_targus_unfiltered',buildBase,3,,TRUE); // Compressed
   PromoteSupers.MAC_SF_BuildProcess(addGSFiltered,'~thor_data400::base::consumer_targus',buildFilteredBase,3,,TRUE);
