@@ -12,13 +12,13 @@ module
   export prod_name          := 'Prod_Thor'                        ; //should match what _Control.ThisEnvironment.Name is in your dev and prod environments
   export dev_name           := 'Dataland'                         ;
 
-  export prod_dali          := 'prod_dali.br.seisint.com'         ;
+  export prod_dali          := 'uspr-prod-thor-dali.risk.regn.net'         ;
   export dev_dali           := 'dataland_dali.br.seisint.com'     ; //10.173.14.201
 
   export prod_hthor         := 'hthor_eclcc'                            ;
   export dev_hthor          := 'hthor_dev_eclcc'                        ;
 
-  export ProdEsps           := ['prod_esp.br.seisint.com'     ,'10.173.84.202'  ,'10.173.85.202'  ,'10.241.20.202','10.241.30.202','10.173.84.205' ];
+  export ProdEsps           := ['uspr-prod-thor-esp.risk.regn.net', '10.173.84.202'  ,'10.173.85.202'  ,'10.241.20.202','10.241.30.202','10.173.84.205' ];
   export DevEsps            := ['10.173.14.204','dataland_esp.br.seisint.com'  ,'10.173.14.207'                                 ];  
   
   export emailSender        := 'eclsystem@seisint.com'            ;
