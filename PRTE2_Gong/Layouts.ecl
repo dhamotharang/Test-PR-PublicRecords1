@@ -2,15 +2,20 @@
 
 EXPORT Layouts := module
 
-EXPORT Layout_bscurrent_raw := Gong_Neustar.Layout_bscurrent_raw;
-//CCPA layout
+EXPORT Layout_bscurrent_raw := record
+  unsigned6 did;
+	Gong_Neustar.Layout_bscurrent_raw;
+	prte2.Layouts.DEFLT_CPA;
+end;
+
+//Append CCPA fields
 EXPORT Layout_history := {Gong.Layout_history or {string100 cust_name,string20 bug_num, string address1 := '', string city := '', string state := ''
 																		, string zip := '',string link_ssn :='',string link_dob:='',string link_fein:='',string link_inc_date:=''
 																		, unsigned6 powid := 0, unsigned6 proxid := 0, unsigned6 seleid := 0, unsigned6 orgid := 0, unsigned6 ultid := 0}};
-
+//Append CCPA fields
 EXPORT  layout_historyaid := gong.layout_historyaid;
 
-//CCPA Project
+//Append CCPA fields
 EXPORT Layout_Gong_DID := record
 Watchdog.Layout_Gong_DID;
 prte2.layouts.DEFLT_CPA;
@@ -34,6 +39,7 @@ EXPORT AreaCodeFinal :=record
 	 integer occurs;
 end;
 
+//Need to add CCPA fields
 EXPORT cn_layout := record
 	Layout_bscurrent_raw.listed_name;
 	Layout_bscurrent_raw.caption_text;
@@ -45,6 +51,7 @@ EXPORT cn_layout := record
 	string5 z5 := '';
 	string10 phone10;
 end;
+
 export phone_table_rec := RECORD
 	STRING10	phone10;
 	BOOLEAN 	isCurrent;
@@ -66,12 +73,19 @@ export phone_table_rec := RECORD
 	STRING2 	nxx_type := '';
 	integer did_ct;
 	integer did_ct_c6;	
+	unsigned6 did;
+	prte2.layouts.deflt_cpa;
 END;
+
+export phone_table_rec_fcra := record
+phone_table_rec - [did, global_sid, record_sid];
+end;
 
 Export LayoutScoringAttributes := Gong_Platinum.LayoutScoringAttributes;
 
 Export ScoringRecord := RECORD
  Gong_Platinum.LayoutScoringAttributes.KeyLayout;
+ prte2.layouts.deflt_cpa;
 END;
 
 EXPORT rec_address := record
@@ -93,6 +107,8 @@ EXPORT rec_address := record
   Layout_bscurrent_raw.listed_name;
   string8 date_first_seen;
   Layout_bscurrent_raw.dual_name_flag;
+	unsigned6 did;
+	prte2.Layouts.deflt_cpa;
 END;
 
 
@@ -114,6 +130,7 @@ export layout_gng_hhid_temp := RECORD
 	Layout_Gong_DID;
 END;
 
+// Append CCPA fields
 export layout_gng_hhid := RECORD
 	UNSIGNED6 hhid := 0;
 	Layout_bscurrent_raw;
@@ -133,12 +150,17 @@ export f_layout_num := RECORD(f_layout_cnt)
 	unsigned num := 0;
 END;
 
+//Append ccpa fields
+export layout_narrow := record
+Relocations.layout_wdtg.narrow;
+// prte2.Layouts.deflt_cpa;
+end;
 
-export layout_narrow := Relocations.layout_wdtg.narrow;
 export layout_span := record
 	layout_narrow;
 	typeof(layout_historyaid.dt_first_seen)	span_first_seen;
 	typeof(layout_historyaid.dt_last_seen) 	span_last_seen := '';
+	prte2.Layouts.deflt_cpa;
 end;
 
 export new_gong_record := record
@@ -285,6 +307,7 @@ string link_fein:='';
 string link_inc_date:='';
 end;
 
+//Append CCPA fields
 EXPORT layout_historyaid_clean := record
 gong.layout_historyaid and not [global_sid, record_sid];
 PRTE2.Layouts.DEFLT_CPA;
