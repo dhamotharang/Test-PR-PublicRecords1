@@ -1,12 +1,12 @@
-﻿IMPORT SALT38,STD;
+﻿IMPORT SALT311,STD;
 IMPORT Scrubs_Corp2_Mapping_GA_Main,Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 58;
-  EXPORT NumRulesFromFieldType := 58;
+  EXPORT NumRules := 60;
+  EXPORT NumRulesFromFieldType := 60;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 29;
+  EXPORT NumFieldsWithRules := 31;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(Layout_in_file)
@@ -27,6 +27,7 @@ EXPORT Scrubs := MODULE
     UNSIGNED1 corp_address1_effective_date_Invalid;
     UNSIGNED1 corp_phone_number_Invalid;
     UNSIGNED1 corp_filing_date_Invalid;
+    UNSIGNED1 corp_status_desc_Invalid;
     UNSIGNED1 corp_status_date_Invalid;
     UNSIGNED1 corp_inc_state_Invalid;
     UNSIGNED1 corp_inc_date_Invalid;
@@ -38,6 +39,7 @@ EXPORT Scrubs := MODULE
     UNSIGNED1 corp_for_profit_ind_Invalid;
     UNSIGNED1 corp_ra_phone_number_Invalid;
     UNSIGNED1 corp_agent_assign_date_Invalid;
+    UNSIGNED1 corp_country_of_formation_Invalid;
     UNSIGNED1 recordorigin_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(Layout_in_file)
@@ -45,41 +47,43 @@ EXPORT Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(Layout_in_file) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.dt_vendor_first_reported_Invalid := Fields.InValid_dt_vendor_first_reported((SALT38.StrType)le.dt_vendor_first_reported);
-    SELF.dt_vendor_last_reported_Invalid := Fields.InValid_dt_vendor_last_reported((SALT38.StrType)le.dt_vendor_last_reported);
-    SELF.dt_first_seen_Invalid := Fields.InValid_dt_first_seen((SALT38.StrType)le.dt_first_seen);
-    SELF.dt_last_seen_Invalid := Fields.InValid_dt_last_seen((SALT38.StrType)le.dt_last_seen);
-    SELF.corp_ra_dt_first_seen_Invalid := Fields.InValid_corp_ra_dt_first_seen((SALT38.StrType)le.corp_ra_dt_first_seen);
-    SELF.corp_ra_dt_last_seen_Invalid := Fields.InValid_corp_ra_dt_last_seen((SALT38.StrType)le.corp_ra_dt_last_seen);
-    SELF.corp_key_Invalid := Fields.InValid_corp_key((SALT38.StrType)le.corp_key);
-    SELF.corp_vendor_Invalid := Fields.InValid_corp_vendor((SALT38.StrType)le.corp_vendor);
-    SELF.corp_state_origin_Invalid := Fields.InValid_corp_state_origin((SALT38.StrType)le.corp_state_origin);
-    SELF.corp_process_date_Invalid := Fields.InValid_corp_process_date((SALT38.StrType)le.corp_process_date);
-    SELF.corp_orig_sos_charter_nbr_Invalid := Fields.InValid_corp_orig_sos_charter_nbr((SALT38.StrType)le.corp_orig_sos_charter_nbr);
-    SELF.corp_legal_name_Invalid := Fields.InValid_corp_legal_name((SALT38.StrType)le.corp_legal_name);
-    SELF.corp_ln_name_type_cd_Invalid := Fields.InValid_corp_ln_name_type_cd((SALT38.StrType)le.corp_ln_name_type_cd,(SALT38.StrType)le.recordorigin);
-    SELF.corp_ln_name_type_desc_Invalid := Fields.InValid_corp_ln_name_type_desc((SALT38.StrType)le.corp_ln_name_type_desc,(SALT38.StrType)le.recordorigin);
-    SELF.corp_address1_effective_date_Invalid := Fields.InValid_corp_address1_effective_date((SALT38.StrType)le.corp_address1_effective_date);
-    SELF.corp_phone_number_Invalid := Fields.InValid_corp_phone_number((SALT38.StrType)le.corp_phone_number);
-    SELF.corp_filing_date_Invalid := Fields.InValid_corp_filing_date((SALT38.StrType)le.corp_filing_date);
-    SELF.corp_status_date_Invalid := Fields.InValid_corp_status_date((SALT38.StrType)le.corp_status_date);
-    SELF.corp_inc_state_Invalid := Fields.InValid_corp_inc_state((SALT38.StrType)le.corp_inc_state);
-    SELF.corp_inc_date_Invalid := Fields.InValid_corp_inc_date((SALT38.StrType)le.corp_inc_date);
-    SELF.corp_foreign_domestic_ind_Invalid := Fields.InValid_corp_foreign_domestic_ind((SALT38.StrType)le.corp_foreign_domestic_ind);
-    SELF.corp_forgn_state_cd_Invalid := Fields.InValid_corp_forgn_state_cd((SALT38.StrType)le.corp_forgn_state_cd);
-    SELF.corp_forgn_state_desc_Invalid := Fields.InValid_corp_forgn_state_desc((SALT38.StrType)le.corp_forgn_state_desc);
-    SELF.corp_forgn_date_Invalid := Fields.InValid_corp_forgn_date((SALT38.StrType)le.corp_forgn_date);
-    SELF.corp_orig_org_structure_desc_Invalid := Fields.InValid_corp_orig_org_structure_desc((SALT38.StrType)le.corp_orig_org_structure_desc);
-    SELF.corp_for_profit_ind_Invalid := Fields.InValid_corp_for_profit_ind((SALT38.StrType)le.corp_for_profit_ind);
-    SELF.corp_ra_phone_number_Invalid := Fields.InValid_corp_ra_phone_number((SALT38.StrType)le.corp_ra_phone_number);
-    SELF.corp_agent_assign_date_Invalid := Fields.InValid_corp_agent_assign_date((SALT38.StrType)le.corp_agent_assign_date);
-    SELF.recordorigin_Invalid := Fields.InValid_recordorigin((SALT38.StrType)le.recordorigin);
+    SELF.dt_vendor_first_reported_Invalid := Fields.InValid_dt_vendor_first_reported((SALT311.StrType)le.dt_vendor_first_reported);
+    SELF.dt_vendor_last_reported_Invalid := Fields.InValid_dt_vendor_last_reported((SALT311.StrType)le.dt_vendor_last_reported);
+    SELF.dt_first_seen_Invalid := Fields.InValid_dt_first_seen((SALT311.StrType)le.dt_first_seen);
+    SELF.dt_last_seen_Invalid := Fields.InValid_dt_last_seen((SALT311.StrType)le.dt_last_seen);
+    SELF.corp_ra_dt_first_seen_Invalid := Fields.InValid_corp_ra_dt_first_seen((SALT311.StrType)le.corp_ra_dt_first_seen);
+    SELF.corp_ra_dt_last_seen_Invalid := Fields.InValid_corp_ra_dt_last_seen((SALT311.StrType)le.corp_ra_dt_last_seen);
+    SELF.corp_key_Invalid := Fields.InValid_corp_key((SALT311.StrType)le.corp_key);
+    SELF.corp_vendor_Invalid := Fields.InValid_corp_vendor((SALT311.StrType)le.corp_vendor);
+    SELF.corp_state_origin_Invalid := Fields.InValid_corp_state_origin((SALT311.StrType)le.corp_state_origin);
+    SELF.corp_process_date_Invalid := Fields.InValid_corp_process_date((SALT311.StrType)le.corp_process_date);
+    SELF.corp_orig_sos_charter_nbr_Invalid := Fields.InValid_corp_orig_sos_charter_nbr((SALT311.StrType)le.corp_orig_sos_charter_nbr);
+    SELF.corp_legal_name_Invalid := Fields.InValid_corp_legal_name((SALT311.StrType)le.corp_legal_name);
+    SELF.corp_ln_name_type_cd_Invalid := Fields.InValid_corp_ln_name_type_cd((SALT311.StrType)le.corp_ln_name_type_cd,(SALT311.StrType)le.recordorigin);
+    SELF.corp_ln_name_type_desc_Invalid := Fields.InValid_corp_ln_name_type_desc((SALT311.StrType)le.corp_ln_name_type_desc,(SALT311.StrType)le.recordorigin);
+    SELF.corp_address1_effective_date_Invalid := Fields.InValid_corp_address1_effective_date((SALT311.StrType)le.corp_address1_effective_date);
+    SELF.corp_phone_number_Invalid := Fields.InValid_corp_phone_number((SALT311.StrType)le.corp_phone_number);
+    SELF.corp_filing_date_Invalid := Fields.InValid_corp_filing_date((SALT311.StrType)le.corp_filing_date);
+    SELF.corp_status_desc_Invalid := Fields.InValid_corp_status_desc((SALT311.StrType)le.corp_status_desc);
+    SELF.corp_status_date_Invalid := Fields.InValid_corp_status_date((SALT311.StrType)le.corp_status_date);
+    SELF.corp_inc_state_Invalid := Fields.InValid_corp_inc_state((SALT311.StrType)le.corp_inc_state);
+    SELF.corp_inc_date_Invalid := Fields.InValid_corp_inc_date((SALT311.StrType)le.corp_inc_date);
+    SELF.corp_foreign_domestic_ind_Invalid := Fields.InValid_corp_foreign_domestic_ind((SALT311.StrType)le.corp_foreign_domestic_ind);
+    SELF.corp_forgn_state_cd_Invalid := Fields.InValid_corp_forgn_state_cd((SALT311.StrType)le.corp_forgn_state_cd);
+    SELF.corp_forgn_state_desc_Invalid := Fields.InValid_corp_forgn_state_desc((SALT311.StrType)le.corp_forgn_state_desc);
+    SELF.corp_forgn_date_Invalid := Fields.InValid_corp_forgn_date((SALT311.StrType)le.corp_forgn_date);
+    SELF.corp_orig_org_structure_desc_Invalid := Fields.InValid_corp_orig_org_structure_desc((SALT311.StrType)le.corp_orig_org_structure_desc);
+    SELF.corp_for_profit_ind_Invalid := Fields.InValid_corp_for_profit_ind((SALT311.StrType)le.corp_for_profit_ind);
+    SELF.corp_ra_phone_number_Invalid := Fields.InValid_corp_ra_phone_number((SALT311.StrType)le.corp_ra_phone_number);
+    SELF.corp_agent_assign_date_Invalid := Fields.InValid_corp_agent_assign_date((SALT311.StrType)le.corp_agent_assign_date);
+    SELF.corp_country_of_formation_Invalid := Fields.InValid_corp_country_of_formation((SALT311.StrType)le.corp_country_of_formation);
+    SELF.recordorigin_Invalid := Fields.InValid_recordorigin((SALT311.StrType)le.recordorigin);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_in_file);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.dt_vendor_first_reported_Invalid << 0 ) + ( le.dt_vendor_last_reported_Invalid << 2 ) + ( le.dt_first_seen_Invalid << 4 ) + ( le.dt_last_seen_Invalid << 6 ) + ( le.corp_ra_dt_first_seen_Invalid << 8 ) + ( le.corp_ra_dt_last_seen_Invalid << 10 ) + ( le.corp_key_Invalid << 12 ) + ( le.corp_vendor_Invalid << 14 ) + ( le.corp_state_origin_Invalid << 15 ) + ( le.corp_process_date_Invalid << 16 ) + ( le.corp_orig_sos_charter_nbr_Invalid << 18 ) + ( le.corp_legal_name_Invalid << 20 ) + ( le.corp_ln_name_type_cd_Invalid << 21 ) + ( le.corp_ln_name_type_desc_Invalid << 22 ) + ( le.corp_address1_effective_date_Invalid << 23 ) + ( le.corp_phone_number_Invalid << 25 ) + ( le.corp_filing_date_Invalid << 27 ) + ( le.corp_status_date_Invalid << 29 ) + ( le.corp_inc_state_Invalid << 31 ) + ( le.corp_inc_date_Invalid << 32 ) + ( le.corp_foreign_domestic_ind_Invalid << 34 ) + ( le.corp_forgn_state_cd_Invalid << 35 ) + ( le.corp_forgn_state_desc_Invalid << 36 ) + ( le.corp_forgn_date_Invalid << 37 ) + ( le.corp_orig_org_structure_desc_Invalid << 39 ) + ( le.corp_for_profit_ind_Invalid << 40 ) + ( le.corp_ra_phone_number_Invalid << 41 ) + ( le.corp_agent_assign_date_Invalid << 43 ) + ( le.recordorigin_Invalid << 45 );
+    SELF.ScrubsBits1 := ( le.dt_vendor_first_reported_Invalid << 0 ) + ( le.dt_vendor_last_reported_Invalid << 2 ) + ( le.dt_first_seen_Invalid << 4 ) + ( le.dt_last_seen_Invalid << 6 ) + ( le.corp_ra_dt_first_seen_Invalid << 8 ) + ( le.corp_ra_dt_last_seen_Invalid << 10 ) + ( le.corp_key_Invalid << 12 ) + ( le.corp_vendor_Invalid << 14 ) + ( le.corp_state_origin_Invalid << 15 ) + ( le.corp_process_date_Invalid << 16 ) + ( le.corp_orig_sos_charter_nbr_Invalid << 18 ) + ( le.corp_legal_name_Invalid << 20 ) + ( le.corp_ln_name_type_cd_Invalid << 21 ) + ( le.corp_ln_name_type_desc_Invalid << 22 ) + ( le.corp_address1_effective_date_Invalid << 23 ) + ( le.corp_phone_number_Invalid << 25 ) + ( le.corp_filing_date_Invalid << 27 ) + ( le.corp_status_desc_Invalid << 29 ) + ( le.corp_status_date_Invalid << 30 ) + ( le.corp_inc_state_Invalid << 32 ) + ( le.corp_inc_date_Invalid << 33 ) + ( le.corp_foreign_domestic_ind_Invalid << 35 ) + ( le.corp_forgn_state_cd_Invalid << 36 ) + ( le.corp_forgn_state_desc_Invalid << 37 ) + ( le.corp_forgn_date_Invalid << 38 ) + ( le.corp_orig_org_structure_desc_Invalid << 40 ) + ( le.corp_for_profit_ind_Invalid << 41 ) + ( le.corp_ra_phone_number_Invalid << 42 ) + ( le.corp_agent_assign_date_Invalid << 44 ) + ( le.corp_country_of_formation_Invalid << 46 ) + ( le.recordorigin_Invalid << 47 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -105,18 +109,20 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.corp_address1_effective_date_Invalid := (le.ScrubsBits1 >> 23) & 3;
     SELF.corp_phone_number_Invalid := (le.ScrubsBits1 >> 25) & 3;
     SELF.corp_filing_date_Invalid := (le.ScrubsBits1 >> 27) & 3;
-    SELF.corp_status_date_Invalid := (le.ScrubsBits1 >> 29) & 3;
-    SELF.corp_inc_state_Invalid := (le.ScrubsBits1 >> 31) & 1;
-    SELF.corp_inc_date_Invalid := (le.ScrubsBits1 >> 32) & 3;
-    SELF.corp_foreign_domestic_ind_Invalid := (le.ScrubsBits1 >> 34) & 1;
-    SELF.corp_forgn_state_cd_Invalid := (le.ScrubsBits1 >> 35) & 1;
-    SELF.corp_forgn_state_desc_Invalid := (le.ScrubsBits1 >> 36) & 1;
-    SELF.corp_forgn_date_Invalid := (le.ScrubsBits1 >> 37) & 3;
-    SELF.corp_orig_org_structure_desc_Invalid := (le.ScrubsBits1 >> 39) & 1;
-    SELF.corp_for_profit_ind_Invalid := (le.ScrubsBits1 >> 40) & 1;
-    SELF.corp_ra_phone_number_Invalid := (le.ScrubsBits1 >> 41) & 3;
-    SELF.corp_agent_assign_date_Invalid := (le.ScrubsBits1 >> 43) & 3;
-    SELF.recordorigin_Invalid := (le.ScrubsBits1 >> 45) & 1;
+    SELF.corp_status_desc_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.corp_status_date_Invalid := (le.ScrubsBits1 >> 30) & 3;
+    SELF.corp_inc_state_Invalid := (le.ScrubsBits1 >> 32) & 1;
+    SELF.corp_inc_date_Invalid := (le.ScrubsBits1 >> 33) & 3;
+    SELF.corp_foreign_domestic_ind_Invalid := (le.ScrubsBits1 >> 35) & 1;
+    SELF.corp_forgn_state_cd_Invalid := (le.ScrubsBits1 >> 36) & 1;
+    SELF.corp_forgn_state_desc_Invalid := (le.ScrubsBits1 >> 37) & 1;
+    SELF.corp_forgn_date_Invalid := (le.ScrubsBits1 >> 38) & 3;
+    SELF.corp_orig_org_structure_desc_Invalid := (le.ScrubsBits1 >> 40) & 1;
+    SELF.corp_for_profit_ind_Invalid := (le.ScrubsBits1 >> 41) & 1;
+    SELF.corp_ra_phone_number_Invalid := (le.ScrubsBits1 >> 42) & 3;
+    SELF.corp_agent_assign_date_Invalid := (le.ScrubsBits1 >> 44) & 3;
+    SELF.corp_country_of_formation_Invalid := (le.ScrubsBits1 >> 46) & 1;
+    SELF.recordorigin_Invalid := (le.ScrubsBits1 >> 47) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -127,80 +133,82 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     TotalCnt := COUNT(GROUP); // Number of records in total
     dt_vendor_first_reported_ALLOW_ErrorCount := COUNT(GROUP,h.dt_vendor_first_reported_Invalid=1);
     dt_vendor_first_reported_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_vendor_first_reported_Invalid=2);
-    dt_vendor_first_reported_LENGTH_ErrorCount := COUNT(GROUP,h.dt_vendor_first_reported_Invalid=3);
+    dt_vendor_first_reported_LENGTHS_ErrorCount := COUNT(GROUP,h.dt_vendor_first_reported_Invalid=3);
     dt_vendor_first_reported_Total_ErrorCount := COUNT(GROUP,h.dt_vendor_first_reported_Invalid>0);
     dt_vendor_last_reported_ALLOW_ErrorCount := COUNT(GROUP,h.dt_vendor_last_reported_Invalid=1);
     dt_vendor_last_reported_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_vendor_last_reported_Invalid=2);
-    dt_vendor_last_reported_LENGTH_ErrorCount := COUNT(GROUP,h.dt_vendor_last_reported_Invalid=3);
+    dt_vendor_last_reported_LENGTHS_ErrorCount := COUNT(GROUP,h.dt_vendor_last_reported_Invalid=3);
     dt_vendor_last_reported_Total_ErrorCount := COUNT(GROUP,h.dt_vendor_last_reported_Invalid>0);
     dt_first_seen_ALLOW_ErrorCount := COUNT(GROUP,h.dt_first_seen_Invalid=1);
     dt_first_seen_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_first_seen_Invalid=2);
-    dt_first_seen_LENGTH_ErrorCount := COUNT(GROUP,h.dt_first_seen_Invalid=3);
+    dt_first_seen_LENGTHS_ErrorCount := COUNT(GROUP,h.dt_first_seen_Invalid=3);
     dt_first_seen_Total_ErrorCount := COUNT(GROUP,h.dt_first_seen_Invalid>0);
     dt_last_seen_ALLOW_ErrorCount := COUNT(GROUP,h.dt_last_seen_Invalid=1);
     dt_last_seen_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_last_seen_Invalid=2);
-    dt_last_seen_LENGTH_ErrorCount := COUNT(GROUP,h.dt_last_seen_Invalid=3);
+    dt_last_seen_LENGTHS_ErrorCount := COUNT(GROUP,h.dt_last_seen_Invalid=3);
     dt_last_seen_Total_ErrorCount := COUNT(GROUP,h.dt_last_seen_Invalid>0);
     corp_ra_dt_first_seen_ALLOW_ErrorCount := COUNT(GROUP,h.corp_ra_dt_first_seen_Invalid=1);
     corp_ra_dt_first_seen_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_ra_dt_first_seen_Invalid=2);
-    corp_ra_dt_first_seen_LENGTH_ErrorCount := COUNT(GROUP,h.corp_ra_dt_first_seen_Invalid=3);
+    corp_ra_dt_first_seen_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_ra_dt_first_seen_Invalid=3);
     corp_ra_dt_first_seen_Total_ErrorCount := COUNT(GROUP,h.corp_ra_dt_first_seen_Invalid>0);
     corp_ra_dt_last_seen_ALLOW_ErrorCount := COUNT(GROUP,h.corp_ra_dt_last_seen_Invalid=1);
     corp_ra_dt_last_seen_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_ra_dt_last_seen_Invalid=2);
-    corp_ra_dt_last_seen_LENGTH_ErrorCount := COUNT(GROUP,h.corp_ra_dt_last_seen_Invalid=3);
+    corp_ra_dt_last_seen_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_ra_dt_last_seen_Invalid=3);
     corp_ra_dt_last_seen_Total_ErrorCount := COUNT(GROUP,h.corp_ra_dt_last_seen_Invalid>0);
     corp_key_ALLOW_ErrorCount := COUNT(GROUP,h.corp_key_Invalid=1);
-    corp_key_LENGTH_ErrorCount := COUNT(GROUP,h.corp_key_Invalid=2);
+    corp_key_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_key_Invalid=2);
     corp_key_Total_ErrorCount := COUNT(GROUP,h.corp_key_Invalid>0);
     corp_vendor_ENUM_ErrorCount := COUNT(GROUP,h.corp_vendor_Invalid=1);
     corp_state_origin_ENUM_ErrorCount := COUNT(GROUP,h.corp_state_origin_Invalid=1);
     corp_process_date_ALLOW_ErrorCount := COUNT(GROUP,h.corp_process_date_Invalid=1);
     corp_process_date_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_process_date_Invalid=2);
-    corp_process_date_LENGTH_ErrorCount := COUNT(GROUP,h.corp_process_date_Invalid=3);
+    corp_process_date_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_process_date_Invalid=3);
     corp_process_date_Total_ErrorCount := COUNT(GROUP,h.corp_process_date_Invalid>0);
     corp_orig_sos_charter_nbr_ALLOW_ErrorCount := COUNT(GROUP,h.corp_orig_sos_charter_nbr_Invalid=1);
-    corp_orig_sos_charter_nbr_LENGTH_ErrorCount := COUNT(GROUP,h.corp_orig_sos_charter_nbr_Invalid=2);
+    corp_orig_sos_charter_nbr_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_orig_sos_charter_nbr_Invalid=2);
     corp_orig_sos_charter_nbr_Total_ErrorCount := COUNT(GROUP,h.corp_orig_sos_charter_nbr_Invalid>0);
-    corp_legal_name_LENGTH_ErrorCount := COUNT(GROUP,h.corp_legal_name_Invalid=1);
+    corp_legal_name_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_legal_name_Invalid=1);
     corp_ln_name_type_cd_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_ln_name_type_cd_Invalid=1);
     corp_ln_name_type_desc_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_ln_name_type_desc_Invalid=1);
     corp_address1_effective_date_ALLOW_ErrorCount := COUNT(GROUP,h.corp_address1_effective_date_Invalid=1);
     corp_address1_effective_date_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_address1_effective_date_Invalid=2);
-    corp_address1_effective_date_LENGTH_ErrorCount := COUNT(GROUP,h.corp_address1_effective_date_Invalid=3);
+    corp_address1_effective_date_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_address1_effective_date_Invalid=3);
     corp_address1_effective_date_Total_ErrorCount := COUNT(GROUP,h.corp_address1_effective_date_Invalid>0);
     corp_phone_number_ALLOW_ErrorCount := COUNT(GROUP,h.corp_phone_number_Invalid=1);
-    corp_phone_number_LENGTH_ErrorCount := COUNT(GROUP,h.corp_phone_number_Invalid=2);
+    corp_phone_number_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_phone_number_Invalid=2);
     corp_phone_number_Total_ErrorCount := COUNT(GROUP,h.corp_phone_number_Invalid>0);
     corp_filing_date_ALLOW_ErrorCount := COUNT(GROUP,h.corp_filing_date_Invalid=1);
     corp_filing_date_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_filing_date_Invalid=2);
     corp_filing_date_Total_ErrorCount := COUNT(GROUP,h.corp_filing_date_Invalid>0);
+    corp_status_desc_ALLOW_ErrorCount := COUNT(GROUP,h.corp_status_desc_Invalid=1);
     corp_status_date_ALLOW_ErrorCount := COUNT(GROUP,h.corp_status_date_Invalid=1);
     corp_status_date_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_status_date_Invalid=2);
-    corp_status_date_LENGTH_ErrorCount := COUNT(GROUP,h.corp_status_date_Invalid=3);
+    corp_status_date_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_status_date_Invalid=3);
     corp_status_date_Total_ErrorCount := COUNT(GROUP,h.corp_status_date_Invalid>0);
     corp_inc_state_ENUM_ErrorCount := COUNT(GROUP,h.corp_inc_state_Invalid=1);
     corp_inc_date_ALLOW_ErrorCount := COUNT(GROUP,h.corp_inc_date_Invalid=1);
     corp_inc_date_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_inc_date_Invalid=2);
-    corp_inc_date_LENGTH_ErrorCount := COUNT(GROUP,h.corp_inc_date_Invalid=3);
+    corp_inc_date_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_inc_date_Invalid=3);
     corp_inc_date_Total_ErrorCount := COUNT(GROUP,h.corp_inc_date_Invalid>0);
     corp_foreign_domestic_ind_ENUM_ErrorCount := COUNT(GROUP,h.corp_foreign_domestic_ind_Invalid=1);
     corp_forgn_state_cd_ALLOW_ErrorCount := COUNT(GROUP,h.corp_forgn_state_cd_Invalid=1);
     corp_forgn_state_desc_ALLOW_ErrorCount := COUNT(GROUP,h.corp_forgn_state_desc_Invalid=1);
     corp_forgn_date_ALLOW_ErrorCount := COUNT(GROUP,h.corp_forgn_date_Invalid=1);
     corp_forgn_date_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_forgn_date_Invalid=2);
-    corp_forgn_date_LENGTH_ErrorCount := COUNT(GROUP,h.corp_forgn_date_Invalid=3);
+    corp_forgn_date_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_forgn_date_Invalid=3);
     corp_forgn_date_Total_ErrorCount := COUNT(GROUP,h.corp_forgn_date_Invalid>0);
     corp_orig_org_structure_desc_ALLOW_ErrorCount := COUNT(GROUP,h.corp_orig_org_structure_desc_Invalid=1);
     corp_for_profit_ind_ENUM_ErrorCount := COUNT(GROUP,h.corp_for_profit_ind_Invalid=1);
     corp_ra_phone_number_ALLOW_ErrorCount := COUNT(GROUP,h.corp_ra_phone_number_Invalid=1);
-    corp_ra_phone_number_LENGTH_ErrorCount := COUNT(GROUP,h.corp_ra_phone_number_Invalid=2);
+    corp_ra_phone_number_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_ra_phone_number_Invalid=2);
     corp_ra_phone_number_Total_ErrorCount := COUNT(GROUP,h.corp_ra_phone_number_Invalid>0);
     corp_agent_assign_date_ALLOW_ErrorCount := COUNT(GROUP,h.corp_agent_assign_date_Invalid=1);
     corp_agent_assign_date_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_agent_assign_date_Invalid=2);
-    corp_agent_assign_date_LENGTH_ErrorCount := COUNT(GROUP,h.corp_agent_assign_date_Invalid=3);
+    corp_agent_assign_date_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_agent_assign_date_Invalid=3);
     corp_agent_assign_date_Total_ErrorCount := COUNT(GROUP,h.corp_agent_assign_date_Invalid>0);
+    corp_country_of_formation_ALLOW_ErrorCount := COUNT(GROUP,h.corp_country_of_formation_Invalid=1);
     recordorigin_ENUM_ErrorCount := COUNT(GROUP,h.recordorigin_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.dt_vendor_first_reported_Invalid > 0 OR h.dt_vendor_last_reported_Invalid > 0 OR h.dt_first_seen_Invalid > 0 OR h.dt_last_seen_Invalid > 0 OR h.corp_ra_dt_first_seen_Invalid > 0 OR h.corp_ra_dt_last_seen_Invalid > 0 OR h.corp_key_Invalid > 0 OR h.corp_vendor_Invalid > 0 OR h.corp_state_origin_Invalid > 0 OR h.corp_process_date_Invalid > 0 OR h.corp_orig_sos_charter_nbr_Invalid > 0 OR h.corp_legal_name_Invalid > 0 OR h.corp_ln_name_type_cd_Invalid > 0 OR h.corp_ln_name_type_desc_Invalid > 0 OR h.corp_address1_effective_date_Invalid > 0 OR h.corp_phone_number_Invalid > 0 OR h.corp_filing_date_Invalid > 0 OR h.corp_status_date_Invalid > 0 OR h.corp_inc_state_Invalid > 0 OR h.corp_inc_date_Invalid > 0 OR h.corp_foreign_domestic_ind_Invalid > 0 OR h.corp_forgn_state_cd_Invalid > 0 OR h.corp_forgn_state_desc_Invalid > 0 OR h.corp_forgn_date_Invalid > 0 OR h.corp_orig_org_structure_desc_Invalid > 0 OR h.corp_for_profit_ind_Invalid > 0 OR h.corp_ra_phone_number_Invalid > 0 OR h.corp_agent_assign_date_Invalid > 0 OR h.recordorigin_Invalid > 0);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.dt_vendor_first_reported_Invalid > 0 OR h.dt_vendor_last_reported_Invalid > 0 OR h.dt_first_seen_Invalid > 0 OR h.dt_last_seen_Invalid > 0 OR h.corp_ra_dt_first_seen_Invalid > 0 OR h.corp_ra_dt_last_seen_Invalid > 0 OR h.corp_key_Invalid > 0 OR h.corp_vendor_Invalid > 0 OR h.corp_state_origin_Invalid > 0 OR h.corp_process_date_Invalid > 0 OR h.corp_orig_sos_charter_nbr_Invalid > 0 OR h.corp_legal_name_Invalid > 0 OR h.corp_ln_name_type_cd_Invalid > 0 OR h.corp_ln_name_type_desc_Invalid > 0 OR h.corp_address1_effective_date_Invalid > 0 OR h.corp_phone_number_Invalid > 0 OR h.corp_filing_date_Invalid > 0 OR h.corp_status_desc_Invalid > 0 OR h.corp_status_date_Invalid > 0 OR h.corp_inc_state_Invalid > 0 OR h.corp_inc_date_Invalid > 0 OR h.corp_foreign_domestic_ind_Invalid > 0 OR h.corp_forgn_state_cd_Invalid > 0 OR h.corp_forgn_state_desc_Invalid > 0 OR h.corp_forgn_date_Invalid > 0 OR h.corp_orig_org_structure_desc_Invalid > 0 OR h.corp_for_profit_ind_Invalid > 0 OR h.corp_ra_phone_number_Invalid > 0 OR h.corp_agent_assign_date_Invalid > 0 OR h.corp_country_of_formation_Invalid > 0 OR h.recordorigin_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -208,9 +216,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.dt_vendor_first_reported_Total_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_Total_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_Total_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_key_Total_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_Total_ErrorCount > 0, 1, 0) + IF(le.corp_legal_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_desc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_address1_effective_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_phone_number_Total_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_status_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_inc_state_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_foreign_domestic_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_cd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_orig_org_structure_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_for_profit_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_phone_number_Total_ErrorCount > 0, 1, 0) + IF(le.corp_agent_assign_date_Total_ErrorCount > 0, 1, 0) + IF(le.recordorigin_ENUM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.dt_vendor_first_reported_Total_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_Total_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_Total_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_key_Total_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_Total_ErrorCount > 0, 1, 0) + IF(le.corp_legal_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_desc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_address1_effective_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_phone_number_Total_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_status_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_status_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_inc_state_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_foreign_domestic_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_cd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_orig_org_structure_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_for_profit_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_phone_number_Total_ErrorCount > 0, 1, 0) + IF(le.corp_agent_assign_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_country_of_formation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recordorigin_ENUM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.dt_vendor_first_reported_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_LENGTH_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_LENGTH_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_LENGTH_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_key_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_key_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_legal_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_desc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_address1_effective_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_address1_effective_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_address1_effective_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_phone_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_phone_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_status_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_status_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_status_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_inc_state_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_foreign_domestic_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_cd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_orig_org_structure_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_for_profit_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_phone_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_ra_phone_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_agent_assign_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_agent_assign_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_agent_assign_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.recordorigin_ENUM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.dt_vendor_first_reported_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_key_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_key_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_legal_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_desc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_address1_effective_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_address1_effective_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_address1_effective_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_phone_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_phone_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_status_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_status_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_status_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_status_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_inc_state_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_foreign_domestic_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_cd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_orig_org_structure_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_for_profit_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_phone_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_ra_phone_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_agent_assign_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_agent_assign_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_agent_assign_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_country_of_formation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recordorigin_ENUM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -220,86 +228,90 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT38.StrType ErrorMessage;
-    SALT38.StrType FieldContents;
+    SALT311.StrType ErrorMessage;
+    SALT311.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.dt_vendor_first_reported_Invalid,le.dt_vendor_last_reported_Invalid,le.dt_first_seen_Invalid,le.dt_last_seen_Invalid,le.corp_ra_dt_first_seen_Invalid,le.corp_ra_dt_last_seen_Invalid,le.corp_key_Invalid,le.corp_vendor_Invalid,le.corp_state_origin_Invalid,le.corp_process_date_Invalid,le.corp_orig_sos_charter_nbr_Invalid,le.corp_legal_name_Invalid,le.corp_ln_name_type_cd_Invalid,le.corp_ln_name_type_desc_Invalid,le.corp_address1_effective_date_Invalid,le.corp_phone_number_Invalid,le.corp_filing_date_Invalid,le.corp_status_date_Invalid,le.corp_inc_state_Invalid,le.corp_inc_date_Invalid,le.corp_foreign_domestic_ind_Invalid,le.corp_forgn_state_cd_Invalid,le.corp_forgn_state_desc_Invalid,le.corp_forgn_date_Invalid,le.corp_orig_org_structure_desc_Invalid,le.corp_for_profit_ind_Invalid,le.corp_ra_phone_number_Invalid,le.corp_agent_assign_date_Invalid,le.recordorigin_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_dt_vendor_first_reported(le.dt_vendor_first_reported_Invalid),Fields.InvalidMessage_dt_vendor_last_reported(le.dt_vendor_last_reported_Invalid),Fields.InvalidMessage_dt_first_seen(le.dt_first_seen_Invalid),Fields.InvalidMessage_dt_last_seen(le.dt_last_seen_Invalid),Fields.InvalidMessage_corp_ra_dt_first_seen(le.corp_ra_dt_first_seen_Invalid),Fields.InvalidMessage_corp_ra_dt_last_seen(le.corp_ra_dt_last_seen_Invalid),Fields.InvalidMessage_corp_key(le.corp_key_Invalid),Fields.InvalidMessage_corp_vendor(le.corp_vendor_Invalid),Fields.InvalidMessage_corp_state_origin(le.corp_state_origin_Invalid),Fields.InvalidMessage_corp_process_date(le.corp_process_date_Invalid),Fields.InvalidMessage_corp_orig_sos_charter_nbr(le.corp_orig_sos_charter_nbr_Invalid),Fields.InvalidMessage_corp_legal_name(le.corp_legal_name_Invalid),Fields.InvalidMessage_corp_ln_name_type_cd(le.corp_ln_name_type_cd_Invalid),Fields.InvalidMessage_corp_ln_name_type_desc(le.corp_ln_name_type_desc_Invalid),Fields.InvalidMessage_corp_address1_effective_date(le.corp_address1_effective_date_Invalid),Fields.InvalidMessage_corp_phone_number(le.corp_phone_number_Invalid),Fields.InvalidMessage_corp_filing_date(le.corp_filing_date_Invalid),Fields.InvalidMessage_corp_status_date(le.corp_status_date_Invalid),Fields.InvalidMessage_corp_inc_state(le.corp_inc_state_Invalid),Fields.InvalidMessage_corp_inc_date(le.corp_inc_date_Invalid),Fields.InvalidMessage_corp_foreign_domestic_ind(le.corp_foreign_domestic_ind_Invalid),Fields.InvalidMessage_corp_forgn_state_cd(le.corp_forgn_state_cd_Invalid),Fields.InvalidMessage_corp_forgn_state_desc(le.corp_forgn_state_desc_Invalid),Fields.InvalidMessage_corp_forgn_date(le.corp_forgn_date_Invalid),Fields.InvalidMessage_corp_orig_org_structure_desc(le.corp_orig_org_structure_desc_Invalid),Fields.InvalidMessage_corp_for_profit_ind(le.corp_for_profit_ind_Invalid),Fields.InvalidMessage_corp_ra_phone_number(le.corp_ra_phone_number_Invalid),Fields.InvalidMessage_corp_agent_assign_date(le.corp_agent_assign_date_Invalid),Fields.InvalidMessage_recordorigin(le.recordorigin_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.dt_vendor_first_reported_Invalid,le.dt_vendor_last_reported_Invalid,le.dt_first_seen_Invalid,le.dt_last_seen_Invalid,le.corp_ra_dt_first_seen_Invalid,le.corp_ra_dt_last_seen_Invalid,le.corp_key_Invalid,le.corp_vendor_Invalid,le.corp_state_origin_Invalid,le.corp_process_date_Invalid,le.corp_orig_sos_charter_nbr_Invalid,le.corp_legal_name_Invalid,le.corp_ln_name_type_cd_Invalid,le.corp_ln_name_type_desc_Invalid,le.corp_address1_effective_date_Invalid,le.corp_phone_number_Invalid,le.corp_filing_date_Invalid,le.corp_status_desc_Invalid,le.corp_status_date_Invalid,le.corp_inc_state_Invalid,le.corp_inc_date_Invalid,le.corp_foreign_domestic_ind_Invalid,le.corp_forgn_state_cd_Invalid,le.corp_forgn_state_desc_Invalid,le.corp_forgn_date_Invalid,le.corp_orig_org_structure_desc_Invalid,le.corp_for_profit_ind_Invalid,le.corp_ra_phone_number_Invalid,le.corp_agent_assign_date_Invalid,le.corp_country_of_formation_Invalid,le.recordorigin_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_dt_vendor_first_reported(le.dt_vendor_first_reported_Invalid),Fields.InvalidMessage_dt_vendor_last_reported(le.dt_vendor_last_reported_Invalid),Fields.InvalidMessage_dt_first_seen(le.dt_first_seen_Invalid),Fields.InvalidMessage_dt_last_seen(le.dt_last_seen_Invalid),Fields.InvalidMessage_corp_ra_dt_first_seen(le.corp_ra_dt_first_seen_Invalid),Fields.InvalidMessage_corp_ra_dt_last_seen(le.corp_ra_dt_last_seen_Invalid),Fields.InvalidMessage_corp_key(le.corp_key_Invalid),Fields.InvalidMessage_corp_vendor(le.corp_vendor_Invalid),Fields.InvalidMessage_corp_state_origin(le.corp_state_origin_Invalid),Fields.InvalidMessage_corp_process_date(le.corp_process_date_Invalid),Fields.InvalidMessage_corp_orig_sos_charter_nbr(le.corp_orig_sos_charter_nbr_Invalid),Fields.InvalidMessage_corp_legal_name(le.corp_legal_name_Invalid),Fields.InvalidMessage_corp_ln_name_type_cd(le.corp_ln_name_type_cd_Invalid),Fields.InvalidMessage_corp_ln_name_type_desc(le.corp_ln_name_type_desc_Invalid),Fields.InvalidMessage_corp_address1_effective_date(le.corp_address1_effective_date_Invalid),Fields.InvalidMessage_corp_phone_number(le.corp_phone_number_Invalid),Fields.InvalidMessage_corp_filing_date(le.corp_filing_date_Invalid),Fields.InvalidMessage_corp_status_desc(le.corp_status_desc_Invalid),Fields.InvalidMessage_corp_status_date(le.corp_status_date_Invalid),Fields.InvalidMessage_corp_inc_state(le.corp_inc_state_Invalid),Fields.InvalidMessage_corp_inc_date(le.corp_inc_date_Invalid),Fields.InvalidMessage_corp_foreign_domestic_ind(le.corp_foreign_domestic_ind_Invalid),Fields.InvalidMessage_corp_forgn_state_cd(le.corp_forgn_state_cd_Invalid),Fields.InvalidMessage_corp_forgn_state_desc(le.corp_forgn_state_desc_Invalid),Fields.InvalidMessage_corp_forgn_date(le.corp_forgn_date_Invalid),Fields.InvalidMessage_corp_orig_org_structure_desc(le.corp_orig_org_structure_desc_Invalid),Fields.InvalidMessage_corp_for_profit_ind(le.corp_for_profit_ind_Invalid),Fields.InvalidMessage_corp_ra_phone_number(le.corp_ra_phone_number_Invalid),Fields.InvalidMessage_corp_agent_assign_date(le.corp_agent_assign_date_Invalid),Fields.InvalidMessage_corp_country_of_formation(le.corp_country_of_formation_Invalid),Fields.InvalidMessage_recordorigin(le.recordorigin_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
-          ,CHOOSE(le.dt_vendor_first_reported_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.dt_vendor_last_reported_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.dt_first_seen_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.dt_last_seen_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.corp_ra_dt_first_seen_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.corp_ra_dt_last_seen_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.corp_key_Invalid,'ALLOW','LENGTH','UNKNOWN')
+          ,CHOOSE(le.dt_vendor_first_reported_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.dt_vendor_last_reported_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.dt_first_seen_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.dt_last_seen_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.corp_ra_dt_first_seen_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.corp_ra_dt_last_seen_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.corp_key_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.corp_vendor_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.corp_state_origin_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.corp_process_date_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.corp_orig_sos_charter_nbr_Invalid,'ALLOW','LENGTH','UNKNOWN')
-          ,CHOOSE(le.corp_legal_name_Invalid,'LENGTH','UNKNOWN')
+          ,CHOOSE(le.corp_process_date_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.corp_orig_sos_charter_nbr_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.corp_legal_name_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.corp_ln_name_type_cd_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.corp_ln_name_type_desc_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.corp_address1_effective_date_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
-          ,CHOOSE(le.corp_phone_number_Invalid,'ALLOW','LENGTH','UNKNOWN')
+          ,CHOOSE(le.corp_address1_effective_date_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.corp_phone_number_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.corp_filing_date_Invalid,'ALLOW','CUSTOM','UNKNOWN')
-          ,CHOOSE(le.corp_status_date_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
+          ,CHOOSE(le.corp_status_desc_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.corp_status_date_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.corp_inc_state_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.corp_inc_date_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
+          ,CHOOSE(le.corp_inc_date_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.corp_foreign_domestic_ind_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.corp_forgn_state_cd_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.corp_forgn_state_desc_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.corp_forgn_date_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
+          ,CHOOSE(le.corp_forgn_date_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.corp_orig_org_structure_desc_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.corp_for_profit_ind_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.corp_ra_phone_number_Invalid,'ALLOW','LENGTH','UNKNOWN')
-          ,CHOOSE(le.corp_agent_assign_date_Invalid,'ALLOW','CUSTOM','LENGTH','UNKNOWN')
+          ,CHOOSE(le.corp_ra_phone_number_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.corp_agent_assign_date_Invalid,'ALLOW','CUSTOM','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.corp_country_of_formation_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.recordorigin_Invalid,'ENUM','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_key','corp_vendor','corp_state_origin','corp_process_date','corp_orig_sos_charter_nbr','corp_legal_name','corp_ln_name_type_cd','corp_ln_name_type_desc','corp_address1_effective_date','corp_phone_number','corp_filing_date','corp_status_date','corp_inc_state','corp_inc_date','corp_foreign_domestic_ind','corp_forgn_state_cd','corp_forgn_state_desc','corp_forgn_date','corp_orig_org_structure_desc','corp_for_profit_ind','corp_ra_phone_number','corp_agent_assign_date','recordorigin','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_date','invalid_charter','invalid_mandatory','invalid_name_type_code','invalid_name_type_desc','invalid_date','invalid_phone','invalid_future_date','invalid_date','invalid_state_origin','invalid_date','invalid_forgn_dom_code','invalid_alphablank','invalid_State_Desc','invalid_date','invalid_characters','invalid_flag_code','invalid_phone','invalid_date','invalid_recordorigin','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.dt_vendor_first_reported,(SALT38.StrType)le.dt_vendor_last_reported,(SALT38.StrType)le.dt_first_seen,(SALT38.StrType)le.dt_last_seen,(SALT38.StrType)le.corp_ra_dt_first_seen,(SALT38.StrType)le.corp_ra_dt_last_seen,(SALT38.StrType)le.corp_key,(SALT38.StrType)le.corp_vendor,(SALT38.StrType)le.corp_state_origin,(SALT38.StrType)le.corp_process_date,(SALT38.StrType)le.corp_orig_sos_charter_nbr,(SALT38.StrType)le.corp_legal_name,(SALT38.StrType)le.corp_ln_name_type_cd,(SALT38.StrType)le.corp_ln_name_type_desc,(SALT38.StrType)le.corp_address1_effective_date,(SALT38.StrType)le.corp_phone_number,(SALT38.StrType)le.corp_filing_date,(SALT38.StrType)le.corp_status_date,(SALT38.StrType)le.corp_inc_state,(SALT38.StrType)le.corp_inc_date,(SALT38.StrType)le.corp_foreign_domestic_ind,(SALT38.StrType)le.corp_forgn_state_cd,(SALT38.StrType)le.corp_forgn_state_desc,(SALT38.StrType)le.corp_forgn_date,(SALT38.StrType)le.corp_orig_org_structure_desc,(SALT38.StrType)le.corp_for_profit_ind,(SALT38.StrType)le.corp_ra_phone_number,(SALT38.StrType)le.corp_agent_assign_date,(SALT38.StrType)le.recordorigin,'***SALTBUG***');
+    SELF.FieldName := CHOOSE(c,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_key','corp_vendor','corp_state_origin','corp_process_date','corp_orig_sos_charter_nbr','corp_legal_name','corp_ln_name_type_cd','corp_ln_name_type_desc','corp_address1_effective_date','corp_phone_number','corp_filing_date','corp_status_desc','corp_status_date','corp_inc_state','corp_inc_date','corp_foreign_domestic_ind','corp_forgn_state_cd','corp_forgn_state_desc','corp_forgn_date','corp_orig_org_structure_desc','corp_for_profit_ind','corp_ra_phone_number','corp_agent_assign_date','corp_country_of_formation','recordorigin','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_date','invalid_charter','invalid_mandatory','invalid_name_type_code','invalid_name_type_desc','invalid_date','invalid_phone','invalid_future_date','invalid_characters','invalid_date','invalid_state_origin','invalid_date','invalid_forgn_dom_code','invalid_alphablank','invalid_State_Desc','invalid_date','invalid_characters','invalid_flag_code','invalid_phone','invalid_date','invalid_characters','invalid_recordorigin','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_vendor_last_reported,(SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen,(SALT311.StrType)le.corp_ra_dt_first_seen,(SALT311.StrType)le.corp_ra_dt_last_seen,(SALT311.StrType)le.corp_key,(SALT311.StrType)le.corp_vendor,(SALT311.StrType)le.corp_state_origin,(SALT311.StrType)le.corp_process_date,(SALT311.StrType)le.corp_orig_sos_charter_nbr,(SALT311.StrType)le.corp_legal_name,(SALT311.StrType)le.corp_ln_name_type_cd,(SALT311.StrType)le.corp_ln_name_type_desc,(SALT311.StrType)le.corp_address1_effective_date,(SALT311.StrType)le.corp_phone_number,(SALT311.StrType)le.corp_filing_date,(SALT311.StrType)le.corp_status_desc,(SALT311.StrType)le.corp_status_date,(SALT311.StrType)le.corp_inc_state,(SALT311.StrType)le.corp_inc_date,(SALT311.StrType)le.corp_foreign_domestic_ind,(SALT311.StrType)le.corp_forgn_state_cd,(SALT311.StrType)le.corp_forgn_state_desc,(SALT311.StrType)le.corp_forgn_date,(SALT311.StrType)le.corp_orig_org_structure_desc,(SALT311.StrType)le.corp_for_profit_ind,(SALT311.StrType)le.corp_ra_phone_number,(SALT311.StrType)le.corp_agent_assign_date,(SALT311.StrType)le.corp_country_of_formation,(SALT311.StrType)le.recordorigin,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,29,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,31,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Layout_in_file) prevDS = DATASET([], Layout_in_file), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT38.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
-          ,'dt_vendor_first_reported:invalid_date:ALLOW','dt_vendor_first_reported:invalid_date:CUSTOM','dt_vendor_first_reported:invalid_date:LENGTH'
-          ,'dt_vendor_last_reported:invalid_date:ALLOW','dt_vendor_last_reported:invalid_date:CUSTOM','dt_vendor_last_reported:invalid_date:LENGTH'
-          ,'dt_first_seen:invalid_date:ALLOW','dt_first_seen:invalid_date:CUSTOM','dt_first_seen:invalid_date:LENGTH'
-          ,'dt_last_seen:invalid_date:ALLOW','dt_last_seen:invalid_date:CUSTOM','dt_last_seen:invalid_date:LENGTH'
-          ,'corp_ra_dt_first_seen:invalid_date:ALLOW','corp_ra_dt_first_seen:invalid_date:CUSTOM','corp_ra_dt_first_seen:invalid_date:LENGTH'
-          ,'corp_ra_dt_last_seen:invalid_date:ALLOW','corp_ra_dt_last_seen:invalid_date:CUSTOM','corp_ra_dt_last_seen:invalid_date:LENGTH'
-          ,'corp_key:invalid_corp_key:ALLOW','corp_key:invalid_corp_key:LENGTH'
+          ,'dt_vendor_first_reported:invalid_date:ALLOW','dt_vendor_first_reported:invalid_date:CUSTOM','dt_vendor_first_reported:invalid_date:LENGTHS'
+          ,'dt_vendor_last_reported:invalid_date:ALLOW','dt_vendor_last_reported:invalid_date:CUSTOM','dt_vendor_last_reported:invalid_date:LENGTHS'
+          ,'dt_first_seen:invalid_date:ALLOW','dt_first_seen:invalid_date:CUSTOM','dt_first_seen:invalid_date:LENGTHS'
+          ,'dt_last_seen:invalid_date:ALLOW','dt_last_seen:invalid_date:CUSTOM','dt_last_seen:invalid_date:LENGTHS'
+          ,'corp_ra_dt_first_seen:invalid_date:ALLOW','corp_ra_dt_first_seen:invalid_date:CUSTOM','corp_ra_dt_first_seen:invalid_date:LENGTHS'
+          ,'corp_ra_dt_last_seen:invalid_date:ALLOW','corp_ra_dt_last_seen:invalid_date:CUSTOM','corp_ra_dt_last_seen:invalid_date:LENGTHS'
+          ,'corp_key:invalid_corp_key:ALLOW','corp_key:invalid_corp_key:LENGTHS'
           ,'corp_vendor:invalid_corp_vendor:ENUM'
           ,'corp_state_origin:invalid_state_origin:ENUM'
-          ,'corp_process_date:invalid_date:ALLOW','corp_process_date:invalid_date:CUSTOM','corp_process_date:invalid_date:LENGTH'
-          ,'corp_orig_sos_charter_nbr:invalid_charter:ALLOW','corp_orig_sos_charter_nbr:invalid_charter:LENGTH'
-          ,'corp_legal_name:invalid_mandatory:LENGTH'
+          ,'corp_process_date:invalid_date:ALLOW','corp_process_date:invalid_date:CUSTOM','corp_process_date:invalid_date:LENGTHS'
+          ,'corp_orig_sos_charter_nbr:invalid_charter:ALLOW','corp_orig_sos_charter_nbr:invalid_charter:LENGTHS'
+          ,'corp_legal_name:invalid_mandatory:LENGTHS'
           ,'corp_ln_name_type_cd:invalid_name_type_code:CUSTOM'
           ,'corp_ln_name_type_desc:invalid_name_type_desc:CUSTOM'
-          ,'corp_address1_effective_date:invalid_date:ALLOW','corp_address1_effective_date:invalid_date:CUSTOM','corp_address1_effective_date:invalid_date:LENGTH'
-          ,'corp_phone_number:invalid_phone:ALLOW','corp_phone_number:invalid_phone:LENGTH'
+          ,'corp_address1_effective_date:invalid_date:ALLOW','corp_address1_effective_date:invalid_date:CUSTOM','corp_address1_effective_date:invalid_date:LENGTHS'
+          ,'corp_phone_number:invalid_phone:ALLOW','corp_phone_number:invalid_phone:LENGTHS'
           ,'corp_filing_date:invalid_future_date:ALLOW','corp_filing_date:invalid_future_date:CUSTOM'
-          ,'corp_status_date:invalid_date:ALLOW','corp_status_date:invalid_date:CUSTOM','corp_status_date:invalid_date:LENGTH'
+          ,'corp_status_desc:invalid_characters:ALLOW'
+          ,'corp_status_date:invalid_date:ALLOW','corp_status_date:invalid_date:CUSTOM','corp_status_date:invalid_date:LENGTHS'
           ,'corp_inc_state:invalid_state_origin:ENUM'
-          ,'corp_inc_date:invalid_date:ALLOW','corp_inc_date:invalid_date:CUSTOM','corp_inc_date:invalid_date:LENGTH'
+          ,'corp_inc_date:invalid_date:ALLOW','corp_inc_date:invalid_date:CUSTOM','corp_inc_date:invalid_date:LENGTHS'
           ,'corp_foreign_domestic_ind:invalid_forgn_dom_code:ENUM'
           ,'corp_forgn_state_cd:invalid_alphablank:ALLOW'
           ,'corp_forgn_state_desc:invalid_State_Desc:ALLOW'
-          ,'corp_forgn_date:invalid_date:ALLOW','corp_forgn_date:invalid_date:CUSTOM','corp_forgn_date:invalid_date:LENGTH'
+          ,'corp_forgn_date:invalid_date:ALLOW','corp_forgn_date:invalid_date:CUSTOM','corp_forgn_date:invalid_date:LENGTHS'
           ,'corp_orig_org_structure_desc:invalid_characters:ALLOW'
           ,'corp_for_profit_ind:invalid_flag_code:ENUM'
-          ,'corp_ra_phone_number:invalid_phone:ALLOW','corp_ra_phone_number:invalid_phone:LENGTH'
-          ,'corp_agent_assign_date:invalid_date:ALLOW','corp_agent_assign_date:invalid_date:CUSTOM','corp_agent_assign_date:invalid_date:LENGTH'
+          ,'corp_ra_phone_number:invalid_phone:ALLOW','corp_ra_phone_number:invalid_phone:LENGTHS'
+          ,'corp_agent_assign_date:invalid_date:ALLOW','corp_agent_assign_date:invalid_date:CUSTOM','corp_agent_assign_date:invalid_date:LENGTHS'
+          ,'corp_country_of_formation:invalid_characters:ALLOW'
           ,'recordorigin:invalid_recordorigin:ENUM'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
@@ -326,6 +338,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Fields.InvalidMessage_corp_address1_effective_date(1),Fields.InvalidMessage_corp_address1_effective_date(2),Fields.InvalidMessage_corp_address1_effective_date(3)
           ,Fields.InvalidMessage_corp_phone_number(1),Fields.InvalidMessage_corp_phone_number(2)
           ,Fields.InvalidMessage_corp_filing_date(1),Fields.InvalidMessage_corp_filing_date(2)
+          ,Fields.InvalidMessage_corp_status_desc(1)
           ,Fields.InvalidMessage_corp_status_date(1),Fields.InvalidMessage_corp_status_date(2),Fields.InvalidMessage_corp_status_date(3)
           ,Fields.InvalidMessage_corp_inc_state(1)
           ,Fields.InvalidMessage_corp_inc_date(1),Fields.InvalidMessage_corp_inc_date(2),Fields.InvalidMessage_corp_inc_date(3)
@@ -337,6 +350,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Fields.InvalidMessage_corp_for_profit_ind(1)
           ,Fields.InvalidMessage_corp_ra_phone_number(1),Fields.InvalidMessage_corp_ra_phone_number(2)
           ,Fields.InvalidMessage_corp_agent_assign_date(1),Fields.InvalidMessage_corp_agent_assign_date(2),Fields.InvalidMessage_corp_agent_assign_date(3)
+          ,Fields.InvalidMessage_corp_country_of_formation(1)
           ,Fields.InvalidMessage_recordorigin(1)
           ,'Fields with errors'
           ,'Fields without errors'
@@ -346,34 +360,36 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'Records with at least one error'
           ,'Records without errors','UNKNOWN');
       SELF.rulecnt := CHOOSE(c
-          ,le.dt_vendor_first_reported_ALLOW_ErrorCount,le.dt_vendor_first_reported_CUSTOM_ErrorCount,le.dt_vendor_first_reported_LENGTH_ErrorCount
-          ,le.dt_vendor_last_reported_ALLOW_ErrorCount,le.dt_vendor_last_reported_CUSTOM_ErrorCount,le.dt_vendor_last_reported_LENGTH_ErrorCount
-          ,le.dt_first_seen_ALLOW_ErrorCount,le.dt_first_seen_CUSTOM_ErrorCount,le.dt_first_seen_LENGTH_ErrorCount
-          ,le.dt_last_seen_ALLOW_ErrorCount,le.dt_last_seen_CUSTOM_ErrorCount,le.dt_last_seen_LENGTH_ErrorCount
-          ,le.corp_ra_dt_first_seen_ALLOW_ErrorCount,le.corp_ra_dt_first_seen_CUSTOM_ErrorCount,le.corp_ra_dt_first_seen_LENGTH_ErrorCount
-          ,le.corp_ra_dt_last_seen_ALLOW_ErrorCount,le.corp_ra_dt_last_seen_CUSTOM_ErrorCount,le.corp_ra_dt_last_seen_LENGTH_ErrorCount
-          ,le.corp_key_ALLOW_ErrorCount,le.corp_key_LENGTH_ErrorCount
+          ,le.dt_vendor_first_reported_ALLOW_ErrorCount,le.dt_vendor_first_reported_CUSTOM_ErrorCount,le.dt_vendor_first_reported_LENGTHS_ErrorCount
+          ,le.dt_vendor_last_reported_ALLOW_ErrorCount,le.dt_vendor_last_reported_CUSTOM_ErrorCount,le.dt_vendor_last_reported_LENGTHS_ErrorCount
+          ,le.dt_first_seen_ALLOW_ErrorCount,le.dt_first_seen_CUSTOM_ErrorCount,le.dt_first_seen_LENGTHS_ErrorCount
+          ,le.dt_last_seen_ALLOW_ErrorCount,le.dt_last_seen_CUSTOM_ErrorCount,le.dt_last_seen_LENGTHS_ErrorCount
+          ,le.corp_ra_dt_first_seen_ALLOW_ErrorCount,le.corp_ra_dt_first_seen_CUSTOM_ErrorCount,le.corp_ra_dt_first_seen_LENGTHS_ErrorCount
+          ,le.corp_ra_dt_last_seen_ALLOW_ErrorCount,le.corp_ra_dt_last_seen_CUSTOM_ErrorCount,le.corp_ra_dt_last_seen_LENGTHS_ErrorCount
+          ,le.corp_key_ALLOW_ErrorCount,le.corp_key_LENGTHS_ErrorCount
           ,le.corp_vendor_ENUM_ErrorCount
           ,le.corp_state_origin_ENUM_ErrorCount
-          ,le.corp_process_date_ALLOW_ErrorCount,le.corp_process_date_CUSTOM_ErrorCount,le.corp_process_date_LENGTH_ErrorCount
-          ,le.corp_orig_sos_charter_nbr_ALLOW_ErrorCount,le.corp_orig_sos_charter_nbr_LENGTH_ErrorCount
-          ,le.corp_legal_name_LENGTH_ErrorCount
+          ,le.corp_process_date_ALLOW_ErrorCount,le.corp_process_date_CUSTOM_ErrorCount,le.corp_process_date_LENGTHS_ErrorCount
+          ,le.corp_orig_sos_charter_nbr_ALLOW_ErrorCount,le.corp_orig_sos_charter_nbr_LENGTHS_ErrorCount
+          ,le.corp_legal_name_LENGTHS_ErrorCount
           ,le.corp_ln_name_type_cd_CUSTOM_ErrorCount
           ,le.corp_ln_name_type_desc_CUSTOM_ErrorCount
-          ,le.corp_address1_effective_date_ALLOW_ErrorCount,le.corp_address1_effective_date_CUSTOM_ErrorCount,le.corp_address1_effective_date_LENGTH_ErrorCount
-          ,le.corp_phone_number_ALLOW_ErrorCount,le.corp_phone_number_LENGTH_ErrorCount
+          ,le.corp_address1_effective_date_ALLOW_ErrorCount,le.corp_address1_effective_date_CUSTOM_ErrorCount,le.corp_address1_effective_date_LENGTHS_ErrorCount
+          ,le.corp_phone_number_ALLOW_ErrorCount,le.corp_phone_number_LENGTHS_ErrorCount
           ,le.corp_filing_date_ALLOW_ErrorCount,le.corp_filing_date_CUSTOM_ErrorCount
-          ,le.corp_status_date_ALLOW_ErrorCount,le.corp_status_date_CUSTOM_ErrorCount,le.corp_status_date_LENGTH_ErrorCount
+          ,le.corp_status_desc_ALLOW_ErrorCount
+          ,le.corp_status_date_ALLOW_ErrorCount,le.corp_status_date_CUSTOM_ErrorCount,le.corp_status_date_LENGTHS_ErrorCount
           ,le.corp_inc_state_ENUM_ErrorCount
-          ,le.corp_inc_date_ALLOW_ErrorCount,le.corp_inc_date_CUSTOM_ErrorCount,le.corp_inc_date_LENGTH_ErrorCount
+          ,le.corp_inc_date_ALLOW_ErrorCount,le.corp_inc_date_CUSTOM_ErrorCount,le.corp_inc_date_LENGTHS_ErrorCount
           ,le.corp_foreign_domestic_ind_ENUM_ErrorCount
           ,le.corp_forgn_state_cd_ALLOW_ErrorCount
           ,le.corp_forgn_state_desc_ALLOW_ErrorCount
-          ,le.corp_forgn_date_ALLOW_ErrorCount,le.corp_forgn_date_CUSTOM_ErrorCount,le.corp_forgn_date_LENGTH_ErrorCount
+          ,le.corp_forgn_date_ALLOW_ErrorCount,le.corp_forgn_date_CUSTOM_ErrorCount,le.corp_forgn_date_LENGTHS_ErrorCount
           ,le.corp_orig_org_structure_desc_ALLOW_ErrorCount
           ,le.corp_for_profit_ind_ENUM_ErrorCount
-          ,le.corp_ra_phone_number_ALLOW_ErrorCount,le.corp_ra_phone_number_LENGTH_ErrorCount
-          ,le.corp_agent_assign_date_ALLOW_ErrorCount,le.corp_agent_assign_date_CUSTOM_ErrorCount,le.corp_agent_assign_date_LENGTH_ErrorCount
+          ,le.corp_ra_phone_number_ALLOW_ErrorCount,le.corp_ra_phone_number_LENGTHS_ErrorCount
+          ,le.corp_agent_assign_date_ALLOW_ErrorCount,le.corp_agent_assign_date_CUSTOM_ErrorCount,le.corp_agent_assign_date_LENGTHS_ErrorCount
+          ,le.corp_country_of_formation_ALLOW_ErrorCount
           ,le.recordorigin_ENUM_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
@@ -383,35 +399,37 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.AnyRule_WithErrorsCount
           ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
-          ,le.dt_vendor_first_reported_ALLOW_ErrorCount,le.dt_vendor_first_reported_CUSTOM_ErrorCount,le.dt_vendor_first_reported_LENGTH_ErrorCount
-          ,le.dt_vendor_last_reported_ALLOW_ErrorCount,le.dt_vendor_last_reported_CUSTOM_ErrorCount,le.dt_vendor_last_reported_LENGTH_ErrorCount
-          ,le.dt_first_seen_ALLOW_ErrorCount,le.dt_first_seen_CUSTOM_ErrorCount,le.dt_first_seen_LENGTH_ErrorCount
-          ,le.dt_last_seen_ALLOW_ErrorCount,le.dt_last_seen_CUSTOM_ErrorCount,le.dt_last_seen_LENGTH_ErrorCount
-          ,le.corp_ra_dt_first_seen_ALLOW_ErrorCount,le.corp_ra_dt_first_seen_CUSTOM_ErrorCount,le.corp_ra_dt_first_seen_LENGTH_ErrorCount
-          ,le.corp_ra_dt_last_seen_ALLOW_ErrorCount,le.corp_ra_dt_last_seen_CUSTOM_ErrorCount,le.corp_ra_dt_last_seen_LENGTH_ErrorCount
-          ,le.corp_key_ALLOW_ErrorCount,le.corp_key_LENGTH_ErrorCount
+          ,le.dt_vendor_first_reported_ALLOW_ErrorCount,le.dt_vendor_first_reported_CUSTOM_ErrorCount,le.dt_vendor_first_reported_LENGTHS_ErrorCount
+          ,le.dt_vendor_last_reported_ALLOW_ErrorCount,le.dt_vendor_last_reported_CUSTOM_ErrorCount,le.dt_vendor_last_reported_LENGTHS_ErrorCount
+          ,le.dt_first_seen_ALLOW_ErrorCount,le.dt_first_seen_CUSTOM_ErrorCount,le.dt_first_seen_LENGTHS_ErrorCount
+          ,le.dt_last_seen_ALLOW_ErrorCount,le.dt_last_seen_CUSTOM_ErrorCount,le.dt_last_seen_LENGTHS_ErrorCount
+          ,le.corp_ra_dt_first_seen_ALLOW_ErrorCount,le.corp_ra_dt_first_seen_CUSTOM_ErrorCount,le.corp_ra_dt_first_seen_LENGTHS_ErrorCount
+          ,le.corp_ra_dt_last_seen_ALLOW_ErrorCount,le.corp_ra_dt_last_seen_CUSTOM_ErrorCount,le.corp_ra_dt_last_seen_LENGTHS_ErrorCount
+          ,le.corp_key_ALLOW_ErrorCount,le.corp_key_LENGTHS_ErrorCount
           ,le.corp_vendor_ENUM_ErrorCount
           ,le.corp_state_origin_ENUM_ErrorCount
-          ,le.corp_process_date_ALLOW_ErrorCount,le.corp_process_date_CUSTOM_ErrorCount,le.corp_process_date_LENGTH_ErrorCount
-          ,le.corp_orig_sos_charter_nbr_ALLOW_ErrorCount,le.corp_orig_sos_charter_nbr_LENGTH_ErrorCount
-          ,le.corp_legal_name_LENGTH_ErrorCount
+          ,le.corp_process_date_ALLOW_ErrorCount,le.corp_process_date_CUSTOM_ErrorCount,le.corp_process_date_LENGTHS_ErrorCount
+          ,le.corp_orig_sos_charter_nbr_ALLOW_ErrorCount,le.corp_orig_sos_charter_nbr_LENGTHS_ErrorCount
+          ,le.corp_legal_name_LENGTHS_ErrorCount
           ,le.corp_ln_name_type_cd_CUSTOM_ErrorCount
           ,le.corp_ln_name_type_desc_CUSTOM_ErrorCount
-          ,le.corp_address1_effective_date_ALLOW_ErrorCount,le.corp_address1_effective_date_CUSTOM_ErrorCount,le.corp_address1_effective_date_LENGTH_ErrorCount
-          ,le.corp_phone_number_ALLOW_ErrorCount,le.corp_phone_number_LENGTH_ErrorCount
+          ,le.corp_address1_effective_date_ALLOW_ErrorCount,le.corp_address1_effective_date_CUSTOM_ErrorCount,le.corp_address1_effective_date_LENGTHS_ErrorCount
+          ,le.corp_phone_number_ALLOW_ErrorCount,le.corp_phone_number_LENGTHS_ErrorCount
           ,le.corp_filing_date_ALLOW_ErrorCount,le.corp_filing_date_CUSTOM_ErrorCount
-          ,le.corp_status_date_ALLOW_ErrorCount,le.corp_status_date_CUSTOM_ErrorCount,le.corp_status_date_LENGTH_ErrorCount
+          ,le.corp_status_desc_ALLOW_ErrorCount
+          ,le.corp_status_date_ALLOW_ErrorCount,le.corp_status_date_CUSTOM_ErrorCount,le.corp_status_date_LENGTHS_ErrorCount
           ,le.corp_inc_state_ENUM_ErrorCount
-          ,le.corp_inc_date_ALLOW_ErrorCount,le.corp_inc_date_CUSTOM_ErrorCount,le.corp_inc_date_LENGTH_ErrorCount
+          ,le.corp_inc_date_ALLOW_ErrorCount,le.corp_inc_date_CUSTOM_ErrorCount,le.corp_inc_date_LENGTHS_ErrorCount
           ,le.corp_foreign_domestic_ind_ENUM_ErrorCount
           ,le.corp_forgn_state_cd_ALLOW_ErrorCount
           ,le.corp_forgn_state_desc_ALLOW_ErrorCount
-          ,le.corp_forgn_date_ALLOW_ErrorCount,le.corp_forgn_date_CUSTOM_ErrorCount,le.corp_forgn_date_LENGTH_ErrorCount
+          ,le.corp_forgn_date_ALLOW_ErrorCount,le.corp_forgn_date_CUSTOM_ErrorCount,le.corp_forgn_date_LENGTHS_ErrorCount
           ,le.corp_orig_org_structure_desc_ALLOW_ErrorCount
           ,le.corp_for_profit_ind_ENUM_ErrorCount
-          ,le.corp_ra_phone_number_ALLOW_ErrorCount,le.corp_ra_phone_number_LENGTH_ErrorCount
-          ,le.corp_agent_assign_date_ALLOW_ErrorCount,le.corp_agent_assign_date_CUSTOM_ErrorCount,le.corp_agent_assign_date_LENGTH_ErrorCount
-          ,le.recordorigin_ENUM_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,le.corp_ra_phone_number_ALLOW_ErrorCount,le.corp_ra_phone_number_LENGTHS_ErrorCount
+          ,le.corp_agent_assign_date_ALLOW_ErrorCount,le.corp_agent_assign_date_CUSTOM_ErrorCount,le.corp_agent_assign_date_LENGTHS_ErrorCount
+          ,le.corp_country_of_formation_ALLOW_ErrorCount
+          ,le.recordorigin_ENUM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -425,12 +443,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT38.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT311.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT38.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT311.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
@@ -445,7 +463,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT38.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -1324,7 +1342,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldPopStats := NORMALIZE(hygiene_summaryStats,289,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
-    SALT38.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -1349,12 +1367,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
 END;
  
 EXPORT StandardStats(DATASET(Layout_in_file) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT38.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT38.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_Corp2_Mapping_GA_Main, Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_Corp2_Mapping_GA_Main, Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
@@ -1365,10 +1383,10 @@ EXPORT StandardStats(DATASET(Layout_in_file) inFile, BOOLEAN doErrorOverall = TR
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT38.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT311.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT38.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
  
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;

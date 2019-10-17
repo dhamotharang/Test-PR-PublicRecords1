@@ -1,4 +1,4 @@
-import header, ut, avm_v2, fcra, header_quick, doxie_build, mdr,PRTE2_Header,Risk_Indicators, prte2_gong,PRTE2_Bankruptcy, Address;
+﻿import header, ut, avm_v2, fcra, header_quick, doxie_build, mdr,PRTE2_Header,Risk_Indicators, prte2_gong,PRTE2_Bankruptcy, Address;
 
 EXPORT files := module
 
@@ -337,6 +337,8 @@ EXPORT files := module
 																		risk_indicators.iid_constants.checkdays(risk_indicators.iid_constants.full_history_date(today),firstseen31, risk_indicators.iid_constants.sixmonths, today);
 											self.suspicious_ssn := right.did<>0;
 											self.ssn := if(right.did<>0, right.ssn, '');
+											self.global_sid := 0;
+											self.record_sid := 0;
 											), 
 										full outer);
 
