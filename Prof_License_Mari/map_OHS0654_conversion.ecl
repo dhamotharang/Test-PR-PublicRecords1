@@ -32,7 +32,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 	GR_Ind	:= ['AMC','CILA','CILAB','FREDC','FREDI','MB','MBBO','MBCUSO','MBMBE', 'MBMBEB','REC','REBO','NP','SMBO','SMCUSO','SM','SMCU','TP'];
 	
 	MD_Ind	:= ['ACGO','ACRO','ALRO','BRKM','LO','CGREAR','CGREA','CGREAT','CRREA','CRREAR','CRREAT','FRES','MLO','LRREAR','LRREA',
-	            'LRREAT','RREAA','REB','REPB','REAB','REMS','RES','OM','SOLE','TLO', 'TMLO'];
+	            'LRREAT','RREAA','REB','REPB','REAB','REMS','RES','OM','SOLE','TLO', 'TMLO','OHI'];
 		
 	RemovePattern	  := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 					 '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|^.* CORP\\.$|' +
@@ -266,6 +266,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 																				'TEMPORARY LOAN ORIGINATOR' => 'TLO',
 	                                      'TEMPORARY MORTGAGE LOAN ORIGINATOR' => 'TMLO', // Add new type 10/21/2014	
                                         'THIRD PARTY PROCESSER' => 'TP',
+																				'OHIO HOME INSPECTOR' => 'OHI',
 																				// 'THIRD PARTY PROCESSING AND/OR UNDERWRITING COMPANY'  => 'TPPUC', 
 																			  ''),LEFT,RIGHT);
     // SELF.std_license_desc := prepLIC_TYPE;

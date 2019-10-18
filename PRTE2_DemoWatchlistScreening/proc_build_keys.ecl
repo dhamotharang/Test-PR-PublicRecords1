@@ -22,10 +22,10 @@ Roxiekeybuild.MAC_SK_Move_v2(prte2_demoWatchlistScreening.constants.keyname+ '@v
 	doDOPS 							:= is_running_in_prod AND NOT skipDOPS;
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it'); 
-	updatedops					:= PRTE.UpdateVersion('WatchlistScreeningKeys', filedate, notifyEmail,'B','N','N');
+	updatedops					:= PRTE.UpdateVersion('WatchlistScreeningKeys', filedate, notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
 	PerformUpdateOrNot	:= IF(doDOPS,updatedops,NoUpdate);
 	//----------------------------------------------------------------
 
-return sequential(build_match_key, mv_match_key,qa_match_key, PerformUpdateOrNot);
+return sequential(build_match_key, mv_match_key,qa_match_key/*, PerformUpdateOrNot*/);
 
 end;

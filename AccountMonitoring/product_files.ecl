@@ -2,7 +2,7 @@
 Add BK daily files.
 */
 IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
-			 Data_Services, Gong, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
+			 Data_Services, Gong, Gong_Neustar, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
 			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
 			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
 			 Business_Credit, Business_Credit_Scoring, UCCV2, SAM, Inquiry_AccLogs, Corp2,
@@ -675,8 +675,8 @@ EXPORT product_files := MODULE
 		EXPORT gong_filename_nocluster := 'base::gong_history';
 		EXPORT gong_filename_raw := 'thor_data400::' + gong_filename_nocluster;
 		EXPORT gong_filename := AccountMonitoring.constants.DATA_LOCATION + gong_filename_raw;	
-		
-		SHARED File_Gong_History_Full := DATASET(gong_filename, Gong.layout_historyaid, THOR, __COMPRESSED__);
+		//CCPA-22 use new gong history layout defined in Gong_Neustar
+		SHARED File_Gong_History_Full := DATASET(gong_filename, Gong_Neustar.Layout_History, THOR, __COMPRESSED__);
 		//SHARED File_Gong_History_Current := File_Gong_History_Full(current_record_flag = 'Y');
 		EXPORT File_Gong_History_Current := File_Gong_History_Full(current_record_flag = 'Y');
 

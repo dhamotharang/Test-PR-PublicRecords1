@@ -1,4 +1,4 @@
-﻿IMPORT  ut, _Validate, std, mdr;
+﻿IMPORT  _control, MDR, ut, _Validate, std, mdr;
 
 EXPORT Standardize_Input := MODULE
 
@@ -175,8 +175,10 @@ EXPORT Standardize_Input := MODULE
 		END;
 		
 		dPreProcess := PROJECT(normInput,tPreProcess(LEFT));
+	
+		gPreProcess	:= MDR.macGetGlobalSid(dPreProcess, 'InfutorNARB', '', 'global_sid');
 
-    dPreProcess_dedup  := DEDUP( SORT( DISTRIBUTE(dPreProcess, HASH(PID) ), RECORD, LOCAL ), RECORD, LOCAL );	
+    dPreProcess_dedup  := DEDUP( SORT( DISTRIBUTE(gPreProcess, HASH(PID) ), RECORD, LOCAL ), RECORD, LOCAL );	
 	
 		RETURN dPreProcess_dedup;
 

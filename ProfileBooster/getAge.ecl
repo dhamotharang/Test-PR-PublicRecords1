@@ -1,7 +1,7 @@
 ﻿IMPORT ProfileBooster, _Control, Doxie, RiskWise, ut, risk_indicators, MDR, header_quick, easi;
 onThor := _Control.Environment.OnThor;
 
-EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, boolean onThor_original=false) := FUNCTION
+EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
 
 //search header by DID to pick up DOB and calculate age and also append HHID to each rec	
 	ProfileBooster.Layouts.Layout_PB_Slim_header getHeader(PBslim le, Doxie.Key_Header ri) := transform

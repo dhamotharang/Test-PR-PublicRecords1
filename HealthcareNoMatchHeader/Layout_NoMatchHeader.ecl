@@ -7,6 +7,7 @@
   UNSIGNED1 guardian_lexid_score;
   STRING50  crk;  //  Customer Record Key
   STRING10  src;
+  STRING100 gcid_name;
   UNSIGNED8 source_rid;
   UNSIGNED4 dt_first_seen;
   UNSIGNED4 dt_last_seen;
@@ -60,4 +61,6 @@
   STRING50  persistent_rid;
   UNSIGNED4 global_sid;
   UNSIGNED8 record_sid;
+  STRING10  batch_jobid;
+  STRING12  batch_seq_number;
 END;

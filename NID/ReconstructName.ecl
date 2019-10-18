@@ -52,7 +52,7 @@ export string ReconstructName(string fname, string mname, string lname, string s
 		gen := CASE(sfx,
 			//'1' => 'SR',
 			//'2' => 'JR',
-			//'3' => 'III',
+			'3' => 'III',
 			//'4' => 'IV',
 			//'5' => 'V',
 			//'6' => '',
@@ -79,7 +79,7 @@ export string ReconstructName(string fname, string mname, string lname, string s
 			'ND' => 'II',
 			'3D' => 'III',
 			'3RD' => 'III',
-			'RD' => 'III',
+			//'RD' => 'III',	Registered Dietician
 			'3 D' => 'III',
 			'3 I' => '',
 			'4TH' => 'IV',

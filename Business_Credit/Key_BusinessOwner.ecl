@@ -1,4 +1,4 @@
-IMPORT	Business_Credit,	lib_date,	STD;
+﻿IMPORT	Business_Credit,	lib_date,	STD;
 EXPORT	Key_BusinessOwner(STRING pVersion	=	(STRING8)Std.Date.Today(),
 													Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	FUNCTION
 
@@ -23,6 +23,11 @@ EXPORT	Key_BusinessOwner(STRING pVersion	=	(STRING8)Std.Date.Today(),
 		STRING3		Relationship_To_Business_Indicator;
 		STRING3		Percent_Of_Liability;
 		STRING3		Percent_Of_Ownership_If_Owner_Principal;
+		//DF-26180 Add CCPA fields to thor_data400::key::sbfe::qa::businessowner
+		UNSIGNED6	did;
+		UNSIGNED4	global_sid;
+		UNSIGNED8   record_sid;
+
 	END;
 
 	rBusinessOwnerKey	tBusinessOwnerKey(dBusinessOwner	pInput)	:=	TRANSFORM

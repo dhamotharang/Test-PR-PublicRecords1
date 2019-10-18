@@ -1,37 +1,38 @@
 ﻿export NameIndicators := module
 
-		export Unknown  := 000b;			// Not Cleaned
-		export Person_  := 001b;			// Person
-		export Dual     := 010b;			// Dual Name
-		export Business := 011b;			// Business or Organization
-		export Trust  := 100b;		// Unclassified (trustees, estates, ie, neither person nor business)
-		export Invalid  := 101b;			// Invalid Name (scatological, nonsense, etc)
-		export Blank    := 110b;			// Name is blank or whitespaces
-		export Unexpected	 := 111b;			// this will be going away
-		export Unclassified  := 100b;		// Unclassified (trustees, estates, ie, neither person nor business)
+export NameQuality := enum(UNSIGNED2, NotAName = 0, InvalidNameFormat = 1,
+				StandaloneName = 2, 
+				ProbableName = 3, PossibleName = 4, ImprobableName = 5,
+				PossibleDualName = 6);
 				
+export NameTypes := enum(UNSIGNED2,
+					Unknown = 0,		// not cleaned
+					PersonType = 1,
+					Dual = 2,
+					Business = 3,
+					Trust = 4,
+					Invalid = 5,
+					Blank = 6);
+// name quality
+		
 		export DerivedName   := 000000001000b;		// Individual name Derived from dual name
 		export DerivedName2  := 000000010000b;		// second Individual name Derived from dual name
 		export MaleName  	 := 000000100000b;		// Male Name
 		export FemaleName 	 := 000001000000b;		// Female Name
-		export Alias 		 := 000010000000b;		// Name is an alias (AKA, FKA, NKA, ...)
-		export SingularName  := 000100000000b;		// Recognizable part of dual name. MR & MRS A JONES, A JONES ET UX
-		export Standalone 	 := 001000000000b;		// Standalone last name (no first or middle)
-		export PartialName 	 := 010000000000b;		// Partial name (no last name)
-		export Trustee 		 := 100000000000b;		// Name is a trustee
 
 		shared NameTypeBits := 111b;		// nametype bit map
+		shared NameQualityBits := 111000b;		// nametype bit map
 		
 		export unsigned2 fn_nameTypeToIndicator(string1 nametype) := CASE(nametype,
-			'' => Blank,
-			'P' => Person_,
-			'D' => Dual,
-			'B' => Business,
-			'I' => Invalid,
-			'T' => Trustee,
-			'U' => Unexpected,
-			'?' => Unexpected,
-			Unknown);
+			'' => NameTypes.Blank,
+			'P' => NameTypes.PersonType,
+			'D' => NameTypes.Dual,
+			'B' => NameTypes.Business,
+			'I' => NameTypes.Invalid,
+			'T' => NameTypes.Trust,
+			'U' => NameTypes.Trust,
+			'?' => NameTypes.Unknown,
+			NameTypes.Unknown);
 			
 		export unsigned2 fn_setNameIndicator(string1 nametype, unsigned1 derivation, string1 gender='U', boolean FInitial = false) :=
 			fn_nameTypeToIndicator(nametype) |
@@ -46,13 +47,25 @@
 		
 		export string1 GetTypeFromInd(unsigned2 name_ind) := CASE(
 			fn_getNameType(name_ind),
-			Person_ => 'P',
-			Business => 'B',
-			Dual => 'D',
-			Invalid => 'I',
-			Trust => 'T',
-			Blank => '',
+			NameTypes.PersonType => 'P',
+			NameTypes.Business => 'B',
+			NameTypes.Dual => 'D',
+			NameTypes.Invalid => 'I',
+			NameTypes.Trust => 'T',
+			NameTypes.Blank => '',
 			'U');
+			
+		export fn_getNameQuality(unsigned2 name_ind) := (name_ind & NameQualityBits) >> 3;
+		export string3 GetQualityFromInd(unsigned2 name_ind) := CASE(
+			fn_getNameQuality(name_ind),
+				NameQuality.NotAName => 'NAN',
+				NameQuality.InvalidNameFormat => 'INV',
+				NameQuality.StandaloneName => 'STA',
+				NameQuality.ProbableName => 'YES',
+				NameQuality.PossibleName => 'MAY',
+				NameQuality.ImprobableName => 'NO',
+				NameQuality.PossibleDualName => 'DUL',
+				'?');			
 		shared DerivedNameFlags := DerivedName | DerivedName2;
 		export boolean fn_IsDerivedName(unsigned2 name_ind) := (name_ind & DerivedNameFlags) > 0;
 		export boolean fn_IsMaleName(unsigned2 name_ind) := (name_ind & MaleName) > 0;

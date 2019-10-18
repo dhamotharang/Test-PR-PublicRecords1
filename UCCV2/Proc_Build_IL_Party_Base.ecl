@@ -1,4 +1,4 @@
-IMPORT Address, NID, UCCV2, ut;
+﻿IMPORT Address, NID, UCCV2, ut; 
 
 dCanada  := ['AB','BC','MB','NS','ON','PQ','SN','AE'];
 
@@ -105,8 +105,8 @@ UCCV2.Layout_UCC_Common.Layout_Party_with_AID tProjParty(layout_party    pInput)
 	 self.tmsid 					    			:=	'IL'+pInput.file_no;	 
 	 self.dt_first_seen							:=  (unsigned6)(pInput.process_date[1..6]);
    self.dt_last_seen							:=  (unsigned6)(pInput.process_date[1..6]);
-   self.dt_vendor_first_reported	:=  (unsigned6)(pInput.process_date[1..6]);
-   self.dt_vendor_last_reported		:=  (unsigned6)(pInput.process_date[1..6]);
+   self.dt_vendor_first_reported	:=  (unsigned6) pInput.process_date;
+   self.dt_vendor_last_reported		:=  (unsigned6) pInput.process_date;
 	 self														:=	pInput;
 	 self														:=	[];
 END;
@@ -139,11 +139,11 @@ dSecuredParty		:= project(File_IL_SecuredParty_in,tBSName_Address(left));
 dMaster					:= project(File_IL_Master_in,tPDName_Address(left));
 dParty					:= dSecuredParty+dMaster;
 
-NID.Mac_CleanFullNames(dParty, CleanNameRecs, orig_name);
+NID.Mac_CleanFullNames(dParty, CleanNameRecs, orig_name, useV2:=true);
 
-person_flags := ['P', 'D'];
-// An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.
-business_flags := ['B', 'U', 'I'];
+person_flags   := ['P', 'D'];
+// V2 replaced the Unclassified('U') category with the Trust ('T') category, what used to be a U should become a T or I with V2.
+business_flags := ['B', 'I', 'T'];
 
 layout_party trfCleanName(CleanNameRecs L) := TRANSFORM
 	SELF.title        := IF(L.nametype IN person_flags, L.cln_title, '');
@@ -157,7 +157,7 @@ layout_party trfCleanName(CleanNameRecs L) := TRANSFORM
 	SELF := L;
 END;
 
-NID.Mac_CleanFullNames(dDebtor, VerifyDebtors, orig_name);
+NID.Mac_CleanFullNames(dDebtor, VerifyDebtors, orig_name, useV2:=true);
 
 layout_party add_clean_name_debtor(VerifyDebtors L) := TRANSFORM
 	SELF.title        := IF(L.nametype IN person_flags, L.cln_title, '');
@@ -216,4 +216,3 @@ OutParty				:=  output(dReassignRmsid   ,,UCCV2.cluster.cluster_out+'base::UCC::
 AddSuperfile		:=  FileServices.AddSuperFile(UCCV2.cluster.cluster_out+'base::UCC::Party_Name',UCCV2.cluster.cluster_out+'base::UCC::Party::IL');
 
 export proc_build_IL_party_base    :=sequential(OutParty,AddSuperfile); 
- 

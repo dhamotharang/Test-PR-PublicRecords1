@@ -65,7 +65,9 @@ module
 			or (_Validate.Date.fIsValid(reported_date) = false  or (unsigned)reported_date > (unsigned)(STRING8)Std.Date.Today())
 			or 	reported_time = ''
 			or 	reported_by = ''
-			or source = ''
+			or  source = ''
+			or  event_type_1 = ''
+			or	reason_description = ''
 		);
 
 	shared fn_dedup(inputs):=FUNCTIONMACRO

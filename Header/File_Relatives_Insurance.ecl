@@ -16,6 +16,7 @@ EXPORT File_Relatives_Insurance(boolean suppressed=false) :=FUNCTION
 								string8   zip;
 								string5   prim_range;
 								string1   same_lname;
+								string2   title; 
 								string5   number_cohabits;
 								string2   eor;
 							end; 
@@ -27,7 +28,7 @@ EXPORT File_Relatives_Insurance(boolean suppressed=false) :=FUNCTION
 							Relationship.layout_output.titled reformat_header(Base_File_Append_In L) := transform
 									self.did1 := (unsigned6) L.did1;
 									self.did2 := (unsigned6) L.did2;
-
+                  self.title:= (unsigned1) L.title;
 									self := L;
 									self:= []; 
 									

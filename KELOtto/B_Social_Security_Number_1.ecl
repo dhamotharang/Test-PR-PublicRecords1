@@ -20,7 +20,7 @@ EXPORT B_Social_Security_Number_1 := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -233,7 +233,7 @@ EXPORT B_Social_Security_Number_1 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nunk Ssn_;
-    KEL.typ.nint Otto_S_S_N_Id_;
+    KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Ssn_Formatted_;
     KEL.typ.nunk _v2__divssnidentitycountnew_;
     KEL.typ.nkdate Deceased_Date_;
@@ -289,7 +289,7 @@ EXPORT B_Social_Security_Number_1 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nunk Ssn_;
-    KEL.typ.nint Otto_S_S_N_Id_;
+    KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Ssn_Formatted_;
     KEL.typ.nunk _v2__divssnidentitycountnew_;
     KEL.typ.nkdate Deceased_Date_;
@@ -344,7 +344,7 @@ EXPORT B_Social_Security_Number_1 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nunk Ssn_;
-    KEL.typ.nint Otto_S_S_N_Id_;
+    KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Ssn_Formatted_;
     KEL.typ.nunk _v2__divssnidentitycountnew_;
     KEL.typ.nkdate Deceased_Date_;
@@ -382,7 +382,7 @@ EXPORT B_Social_Security_Number_1 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE341424 := JOIN(__EE341380,__EE340821,__JC341386(LEFT,RIGHT),__JT341386(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE341424 := JOIN(__EE341380,__EE340821,__JC341386(LEFT,RIGHT),__JT341386(LEFT,RIGHT),LEFT OUTER,LOOKUP);
   SHARED __EE340787 := __EE335260;
   SHARED __ST336336_Layout := RECORD
     KEL.typ.nint Exp1_;
@@ -401,7 +401,7 @@ EXPORT B_Social_Security_Number_1 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nunk Ssn_;
-    KEL.typ.nint Otto_S_S_N_Id_;
+    KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Ssn_Formatted_;
     KEL.typ.nunk _v2__divssnidentitycountnew_;
     KEL.typ.nkdate Deceased_Date_;
@@ -441,7 +441,7 @@ EXPORT B_Social_Security_Number_1 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE341470 := JOIN(__EE341424,__EE340895,__JC341430(LEFT,RIGHT),__JT341430(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE341470 := JOIN(__EE341424,__EE340895,__JC341430(LEFT,RIGHT),__JT341430(LEFT,RIGHT),LEFT OUTER,LOOKUP);
   SHARED __EE340784 := __EE335260;
   SHARED __ST336217_Layout := RECORD
     KEL.typ.nint Exp1_;
@@ -460,7 +460,7 @@ EXPORT B_Social_Security_Number_1 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nunk Ssn_;
-    KEL.typ.nint Otto_S_S_N_Id_;
+    KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Ssn_Formatted_;
     KEL.typ.nunk _v2__divssnidentitycountnew_;
     KEL.typ.nkdate Deceased_Date_;
@@ -502,7 +502,7 @@ EXPORT B_Social_Security_Number_1 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE341518 := JOIN(__EE341470,__EE340973,__JC341476(LEFT,RIGHT),__JT341476(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE341518 := JOIN(__EE341470,__EE340973,__JC341476(LEFT,RIGHT),__JT341476(LEFT,RIGHT),LEFT OUTER,LOOKUP);
   SHARED __EE340781 := __EE335260;
   SHARED __ST336065_Layout := RECORD
     KEL.typ.nint Exp1_;
@@ -521,7 +521,7 @@ EXPORT B_Social_Security_Number_1 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nunk Ssn_;
-    KEL.typ.nint Otto_S_S_N_Id_;
+    KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Ssn_Formatted_;
     KEL.typ.nunk _v2__divssnidentitycountnew_;
     KEL.typ.nkdate Deceased_Date_;
@@ -565,13 +565,13 @@ EXPORT B_Social_Security_Number_1 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE341568 := JOIN(__EE341518,__EE341053,__JC341524(LEFT,RIGHT),__JT341524(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE341568 := JOIN(__EE341518,__EE341053,__JC341524(LEFT,RIGHT),__JT341524(LEFT,RIGHT),LEFT OUTER,LOOKUP);
   EXPORT __ST20308_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nunk Ssn_;
-    KEL.typ.nint Otto_S_S_N_Id_;
+    KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Ssn_Formatted_;
     KEL.typ.nunk _v2__divssnidentitycountnew_;
     KEL.typ.nkdate Deceased_Date_;

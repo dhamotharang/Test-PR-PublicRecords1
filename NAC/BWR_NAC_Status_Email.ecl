@@ -8,8 +8,12 @@ import	NAC, Std, lib_fileservices;
 unsigned2	gFilenameDatesToKeep	:=	40;
 unsigned2	gNCFFileListLimit			:=	200;
 string		gEmailTarget					:=	'tony.kirk@lexisnexis.com,nacprojectsupport@lnssi.com,jennifer.paganacci@lexisnexis.com,'
+																+		'radames.ortega@lexisnexisrisk.com, gabriel.marcan@lexisnexisrisk.com,'
 																+		'Tim.Meeks@mdhs.ms.gov,Reshma.Khatkhate@mdhs.ms.gov,'
-																+		'Patricia.Roberts@dhr.alabama.gov,OACIS_HELPDESK@dhr.alabama.gov,MELISSA.BAKER@DHR.ALABAMA.GOV,'
+																+		'Patricia.Roberts@dhr.alabama.gov,MELISSA.BAKER@DHR.ALABAMA.GOV,'
+																+ 		'Sandra.Harris@dhr.alabama.gov, Tammala.Goodson@dhr.alabama.gov,'
+																+		'Wanda.Hails@dhr.alabama.gov, Courtney.Frost@dhr.alabama.gov,'
+																+		'Jacqueline.Griner@dhr.alabama.gov, Rosie.Leashore@dhr.alabama.gov, '
 																+		'Lynn_Rossow@dcf.state.fl.us,Karen_Hawkins@dcf.state.fl.us,'
 																+		'Kimberlin.Donald@dhs.ga.gov,Latonya.James@dhs.ga.gov,sonya.ward@dhs.ga.gov,wewebb@dhr.state.ga.us,cmjohnson2@dhr.state.ga.us,Jean.Cliche@dhs.ga.gov,'
 																+		'Michael.A.Morris@la.gov,Michael.Dronet@la.gov,Kevin.Bourgeois.DCFS@la.gov,J.Funderburk.DCFS@la.gov'

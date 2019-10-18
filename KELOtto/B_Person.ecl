@@ -709,7 +709,7 @@ EXPORT B_Person := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE633448 := JOIN(__EE615049,__EE633441,__JC633447(LEFT,RIGHT),__JT633447(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+  SHARED __EE633448 := JOIN(__EE615049,__EE633441,__JC633447(LEFT,RIGHT),__JT633447(LEFT,RIGHT),LEFT OUTER,HASH);
   SHARED __EE632921 := __EE625570;
   SHARED __EE632894 := __EE520399;
   SHARED __EE633606 := __EE632894(__EE632894.Ip_Tor_ = 1);
@@ -2810,7 +2810,7 @@ EXPORT B_Person := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nunk Ssn_;
-    KEL.typ.nint Otto_S_S_N_Id_;
+    KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Ssn_Formatted_;
     KEL.typ.nunk _v2__divssnidentitycountnew_;
     KEL.typ.nkdate Deceased_Date_;
@@ -2861,7 +2861,7 @@ EXPORT B_Person := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer__1_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nunk Ssn_;
-    KEL.typ.nint Otto_S_S_N_Id_;
+    KEL.typ.nstr Otto_S_S_N_Id_;
     KEL.typ.nstr Ssn_Formatted_;
     KEL.typ.nunk _v2__divssnidentitycountnew_;
     KEL.typ.nkdate Deceased_Date_;
@@ -5464,7 +5464,7 @@ EXPORT B_Person := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -5782,7 +5782,7 @@ EXPORT B_Person := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date__1_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -7885,7 +7885,7 @@ EXPORT B_Person := MODULE
     SELF.Cl_High_Kr_Identity_Top10_ := MAP(__T(__OP2(__CN(__PP655158.Cl_High_Kr_Identity_Percent_),>,__PP655158.P_E_R_C_E_N_T_I_L_E___Cl_High_Kr_Identity_Percent_))=>1,0);
     SELF.Cl_High_Risk_Death_Prior_To_All_Events_Identity_Top10_ := MAP(__T(__OP2(__CN(__PP655158.Cl_High_Risk_Death_Prior_To_All_Events_Identity_Percent_),>,__PP655158.P_E_R_C_E_N_T_I_L_E___Cl_High_Risk_Death_Prior_To_All_Events_Identity_Percent_))=>1,0);
     SELF.Cl_High_Risk_Pattern1_Flag_ := MAP(__PP655158.Cl_Identity_Count_ > 9=>1,0);
-    SELF.Cl_High_Risk_Pattern2_Flag_ := MAP(__PP655158.Cl_Nas9_Identity_Count_ > 3 AND __PP655158.Cl_Nap3_Identity_Count_ > 0=>1,0);
+    SELF.Cl_High_Risk_Pattern2_Flag_ := MAP(__PP655158.Cl_Nas9_Identity_Count_ > 10 AND __PP655158.Cl_Nap3_Identity_Count_ > 0=>1,0);
     SELF.Cl_High_Risk_Pattern3_Flag_ := MAP(__PP655158.Cl_High_Risk_Death_Prior_To_All_Events_Identity_Count_ > 0=>1,0);
     SELF.Cl_High_Risk_Pattern4_Flag_ := MAP(__PP655158.Cl_Ip_High_Risk_Identity_Count_ > 4=>1,0);
     SELF.Cl_High_Risk_Pattern5_Flag_ := MAP(__PP655158.Cl_High_Kr_Identity_Count_ > 4=>1,0);

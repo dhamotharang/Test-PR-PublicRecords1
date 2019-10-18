@@ -5,7 +5,7 @@ EXPORT IdAppendThorRemote(
 		,unsigned scoreThreshold = 75
 		,unsigned weightThreshold = 0
 		,boolean disableSaltForce = true
-		,boolean primForcePost = false 
+		,boolean primForcePost = false // not being used
 		,boolean useFuzzy = true
 		,boolean doZipExpansion = true
 		,boolean reAppend = true
@@ -40,7 +40,7 @@ EXPORT IdAppendThorRemote(
 	shared pipeParms := xmlUnsigned('score_threshold', scoreThreshold)
 		+ xmlUnsigned('weight_threshold', weightThreshold)
 		+ xmlBool('disable_salt_force', disableSaltForce)
-		+ xmlBool('prim_force_post', primForcePost)
+		+ xmlBool('prim_force_post', true) // svcAppend is using this field incorrectly so must be set to true for now
 		+ xmlBool('use_fuzzy', useFuzzy)
 		+ xmlBool('do_zip_expansion', doZipExpansion)
 		+ xmlBool('re_append', reAppend)

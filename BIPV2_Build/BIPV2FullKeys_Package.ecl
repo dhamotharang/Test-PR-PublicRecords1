@@ -1,6 +1,6 @@
 ﻿//Compile all keys in this package in one place
 //easy to output this module to see if keys exist/are correct layout/etc
-import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3,Address_Attributes,BIPv2_HRCHY,tools;
+import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3,Address_Attributes,BIPv2_HRCHY,tools,BIPV2_Crosswalk;
 
 EXPORT BIPV2FullKeys_Package(
 
@@ -80,6 +80,9 @@ module
   export biz_preferred                  := tools.macf_FilesIndex('BIPV2_Company_Names.key_preferred             ' ,keynames(pversion,puseotherenvironment).biz_preferred   );
   export Xlinkrefs_l_sic                := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_SIC.Key             ' ,bizknames.refs_l_sic               );
 
+  export bip2ConsumerKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).bipToConsumer;
+  export consumer2BipKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).ConsumerToBip;
+  // export consumer2BipKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).ConsumerToBipKey();
   // export AML_Addr                       := index(Address_Attributes.key_AML_addr                   ,keynames(pversion).aml_addr.logical     );
   // export biz_preferred                  := index(BIPV2_Company_Names.key_preferred                 ,keynames(pversion).biz_preferred.logical     );
   // export Xlinkrefs_l_sic                := index(BizLinkFull.Key_BizHead_L_SIC.Key                 ,bizknames.refs_l_sic             .logical);
@@ -140,6 +143,8 @@ module
     ,if(pKey in [0 ,44] ,sequential(output(44 ,named('KeyNumber'),overwrite) ,output(choosen(AML_Addr                     .logical ,100),named('AML_Addr'                      ))))
     ,if(pKey in [0 ,45] ,sequential(output(45 ,named('KeyNumber'),overwrite) ,output(choosen(biz_preferred                .logical ,100),named('biz_preferred'                 ))))
     ,if(pKey in [0 ,46] ,sequential(output(46 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_sic              .logical ,100),named('Xlinkrefs_l_sic'               ))))
+    ,if(pKey in [0 ,47] ,sequential(output(47 ,named('KeyNumber'),overwrite) ,output(choosen(bip2ConsumerKey              .logical ,100),named('bip2ConsumerKey'               ))))
+    ,if(pKey in [0 ,48] ,sequential(output(48 ,named('KeyNumber'),overwrite) ,output(choosen(consumer2BipKey              .logical ,100),named('consumer2BipKey'               ))))
   );       
 /*
   regexfilter := pRegexFieldFilter;

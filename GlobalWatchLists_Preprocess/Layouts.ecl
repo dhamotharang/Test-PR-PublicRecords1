@@ -1,4 +1,4 @@
-EXPORT Layouts := MODULE
+﻿EXPORT Layouts := MODULE
 
 EXPORT rInputBOE := RECORD
    string Name_6;
@@ -173,6 +173,7 @@ END;
 
 EXPORT rWorldBank := RECORD
   string orig_firm_name;
+  string addl_firm_name;
   string address;
   string country;
   string IneligibilityPeriodfrom;

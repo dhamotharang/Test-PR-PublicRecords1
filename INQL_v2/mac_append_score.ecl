@@ -117,10 +117,11 @@ infile_iter := iterate(infile_batch_group, iter_id(left, right));
 
 fdInput := project(infile_iter, transform(%fp_batch_in%, self := left));
 infile_id_dedup := group(dedup(fdInput, AcctNo));
-roxie_IP := std.str.splitwords(RiskWise.shortcuts.prod_batch_analytics_roxie,'//')[2]:INDEPENDENT;
+roxie_IP := INQL_v2._Constants.RISKWISE_ROXIE_IP;//std.str.splitwords(RiskWise.shortcuts.prod_batch_analytics_roxie,'//')[2]:INDEPENDENT;
 
-insize := sizeof(%fp_batch_in%);
-outsize := sizeof(models.Layout_FD_Batch_Out);		
+﻿insize := sizeof(%fp_batch_in%);
+outsize := sizeof(inql_v2.models_Layout_FD_Batch_Out);
+// outsize := sizeof(models.Layout_FD_Batch_Out);		
 options := '<ModelName>fp3710_0</ModelName><DPPAPurpose>1</DPPAPurpose><GLBPurpose>1</GLBPurpose><DataRestrictionMask>0000000000000</DataRestrictionMask>';
 
 // -b:  send batch packets of 100 records at a time
@@ -133,7 +134,8 @@ pipe_results := PIPE(DISTRIBUTE(choosen(infile_id_dedup, daily_file_fraud_count)
 									+ options +'<batch_in id=\'id\' format=\'raw\'></batch_in>'
 									+ '</Models.FraudAdvisor_Batch_Service>" -h ' 
 									+ roxie_ip + ' -r Results', 
-									models.Layout_FD_Batch_Out);
+									// models.Layout_FD_Batch_Out);
+									inql_v2.models_Layout_FD_Batch_Out);
 							
 // append a 3 digit score to the end of the layout of the inquiry keys
 inquiries_with_score_appended := project(join(distribute(infile_iter,hash(acctno)),distribute(pipe_results,hash(acctno)),

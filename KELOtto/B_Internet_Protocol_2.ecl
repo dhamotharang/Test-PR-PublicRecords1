@@ -77,7 +77,7 @@ EXPORT B_Internet_Protocol_2 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;
@@ -428,7 +428,7 @@ EXPORT B_Internet_Protocol_2 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;
@@ -777,7 +777,7 @@ EXPORT B_Internet_Protocol_2 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;
@@ -1145,7 +1145,7 @@ EXPORT B_Internet_Protocol_2 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;
@@ -1238,7 +1238,7 @@ EXPORT B_Internet_Protocol_2 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;

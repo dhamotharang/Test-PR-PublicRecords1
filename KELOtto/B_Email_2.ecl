@@ -77,7 +77,7 @@ EXPORT B_Email_2 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Email.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Email_Address_;
-    KEL.typ.nint Otto_Email_Id_;
+    KEL.typ.nstr Otto_Email_Id_;
     KEL.typ.ndataset(E_Email.Details_Layout) Details_;
     KEL.typ.int C_O_U_N_T___Person_Person_ := 0;
     KEL.typ.ntyp(E_Email.Typ) U_I_D__1_;
@@ -375,7 +375,7 @@ EXPORT B_Email_2 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Email.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Email_Address_;
-    KEL.typ.nint Otto_Email_Id_;
+    KEL.typ.nstr Otto_Email_Id_;
     KEL.typ.ndataset(E_Email.Details_Layout) Details_;
     KEL.typ.int C_O_U_N_T___Person_Person_ := 0;
     KEL.typ.ntyp(E_Email.Typ) U_I_D__1_;
@@ -454,7 +454,7 @@ EXPORT B_Email_2 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Email.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Email_Address_;
-    KEL.typ.nint Otto_Email_Id_;
+    KEL.typ.nstr Otto_Email_Id_;
     KEL.typ.ndataset(E_Email.Details_Layout) Details_;
     KEL.typ.int C_O_U_N_T___Person_Person_ := 0;
     KEL.typ.ntyp(E_Email.Typ) U_I_D__1_;
@@ -534,7 +534,7 @@ EXPORT B_Email_2 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Email.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Email_Address_;
-    KEL.typ.nint Otto_Email_Id_;
+    KEL.typ.nstr Otto_Email_Id_;
     KEL.typ.ndataset(E_Email.Details_Layout) Details_;
     KEL.typ.int C_O_U_N_T___Person_Person_ := 0;
     KEL.typ.ntyp(E_Email.Typ) U_I_D__1_;
@@ -561,7 +561,7 @@ EXPORT B_Email_2 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Email.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Email_Address_;
-    KEL.typ.nint Otto_Email_Id_;
+    KEL.typ.nstr Otto_Email_Id_;
     KEL.typ.ndataset(E_Email.Details_Layout) Details_;
     KEL.typ.int Cl_Active30_Identity_Count_ := 0;
     KEL.typ.int Cl_Active7_Identity_Count_ := 0;

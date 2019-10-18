@@ -9,7 +9,7 @@ export Build_All(
 	,boolean														pIsTesting			= false
 	,boolean														pOverwrite			= false																												
 	,dataset(Layouts.Sprayed_Input	)		pSprayedFile		= Files().Input.using                  
-	,dataset(Layouts.Base )   pBaseFile     = Files().base.qa
+	,dataset(Layouts.Base )             pBaseFile       = Files().base.qa
 ) :=
 function
 
@@ -19,14 +19,14 @@ function
 		Equifax_Business_Data.Spray       (pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite),
 		Equifax_Business_Data.Build_Base(pversion,pIsTesting,pSprayedFile,pBaseFile)
 		,Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Input', 'Input', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false)
-		,Equifax_Business_Data.Build_Keys	(pversion).all
+	  ,Equifax_Business_Data.Build_Keys	(pversion).all
 		,Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Base', 'Base', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false)
 		,Equifax_Business_Data.Build_Strata(pversion	,pOverwrite,,,	pIsTesting)
-		,Equifax_Business_Data.Promote().Inputfiles.using2used
-		,Equifax_Business_Data.Promote().Buildfiles.Built2QA		
+		,
+		Equifax_Business_Data.Promote().Inputfiles.using2used
+		,Equifax_Business_Data.Promote().Buildfiles.Built2QA
 		,Equifax_Business_Data.QA_Records()
-	// ) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
-	) : success(Send_Emails(pversion,,not pIsTesting).buildsuccess), 
+	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	    failure(send_emails(pversion,,not pIsTesting).buildfailure);
 	
 	return

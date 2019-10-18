@@ -123,11 +123,11 @@ cnt_fcra_autokey_payload := OUTPUT(strata.macf_pops(PRTE2_liens.key_autokey_payl
 		
 //		
 		//---------- making DOPS optional and only in PROD build -------------------------------													
-		notifyEmail := IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
-		NoUpdate := OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
-		updatedops   		 := PRTE.UpdateVersion('LiensV2Keys',filedate,notifyEmail,'B','N','N');
-		updatedops_fcra  := PRTE.UpdateVersion('FCRA_LiensV2Keys',filedate,notifyEmail,'B','F','N');
-		PerformUpdateOrNot := IF(doDOPS,parallel(updatedops,updatedops_fcra),NoUpdate);
+		notifyEmail 				:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
+		NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
+		updatedops   		 		:= PRTE.UpdateVersion('LiensV2Keys',filedate,notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
+		updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_LiensV2Keys',filedate,notifyEmail,l_inloc:='B',l_inenvment:='F',l_includeboolean := 'N');
+		PerformUpdateOrNot 	:= IF(doDOPS,parallel(updatedops,updatedops_fcra),NoUpdate);
 		//--------------------------------------------------------------------------------------
 
 

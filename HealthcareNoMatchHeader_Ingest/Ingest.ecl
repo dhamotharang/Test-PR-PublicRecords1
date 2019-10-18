@@ -1,10 +1,11 @@
 ﻿IMPORT STD,SALT311,HealthcareNoMatchHeader_InternalLinking;
 EXPORT Ingest( 
   STRING	pSrc      = ''
+, STRING  pVersion  = (STRING)STD.Date.Today()
 , BOOLEAN incremental=FALSE
 , DATASET(Layout_Base) Delta = DATASET([],Layout_Base)
-, DATASET(HealthcareNoMatchHeader_InternalLinking.Layout_Header) dsBase = HealthcareNoMatchHeader_Ingest.Files(pSrc).AllRecords // Change IN_Base to change input to ingest process
-, DATASET(RECORDOF(HealthCareNoMatchHeader_Ingest.In_Ingest))  infile = HealthcareNoMatchHeader_Ingest.Files(pSrc).AsHeaderIngest
+, DATASET(HealthcareNoMatchHeader_InternalLinking.Layout_Header) dsBase = HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).BaseTemp
+, DATASET(HealthcareNoMatchHeader_Ingest.Layout_Base)  infile = HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).AsHeaderTemp 
 ) := MODULE
   SHARED NullFile := DATASET([],Layout_Base); // Use to replace files you wish to remove
  
@@ -160,7 +161,7 @@ EXPORT Ingest(
     SELF.pct_ingest_New := 100.0 * L.cnt_New / cnt_ingest;
     SELF := L;
   END;
-  SHARED UpdateStatsXtab := PROJECT(ROLLUP(PROJECT(SORT(UpdateStatsSrc,src),toRoll(LEFT)),doRoll(LEFT,RIGHT),src),toPct(LEFT));
+  EXPORT UpdateStatsXtab := PROJECT(ROLLUP(PROJECT(SORT(UpdateStatsSrc,src),toRoll(LEFT)),doRoll(LEFT,RIGHT),src),toPct(LEFT));
   SHARED S3 := IF(~incremental, OUTPUT(UpdateStatsXtab,ALL,NAMED('UpdateStatsXtab')));
  
   SHARED NoFlagsRec := WithRT;

@@ -2,9 +2,10 @@
 
 EXPORT proc_build_base := FUNCTION
 
-  PRTE2.CleanFields(Files.incoming, cln_incoming);
-	
-	PromoteSupers.MAC_SF_BuildProcess(cln_incoming,Constants.base_filename, basefile);
+  // PRTE2.CleanFields(Files.incoming, cln_incoming);
+		
+	dsFile := project(Files.incoming(block_id <> ''), transform(layouts.base, self := left));
+	PromoteSupers.MAC_SF_BuildProcess(dsFile,Constants.base_filename, basefile);
  
  RETURN basefile;
 

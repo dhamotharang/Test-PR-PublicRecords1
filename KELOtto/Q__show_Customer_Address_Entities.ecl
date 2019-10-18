@@ -23,7 +23,7 @@ EXPORT Q__show_Customer_Address_Entities := MODULE
     KEL.typ.nint Cluster_Score_;
     KEL.typ.int Contributor_Safe_Flag_ := 0;
     KEL.typ.int Deceased_Person_Count_ := 0;
-    KEL.typ.nunk Entity_Context_Uid_;
+    KEL.typ.nstr Entity_Context_Uid_;
     KEL.typ.int Entity_Type_ := 0;
     KEL.typ.int High_Frequency_Flag_ := 0;
     KEL.typ.int High_Risk_Death_Prior_To_All_Events_Percent_Flag_ := 0;
@@ -71,7 +71,7 @@ EXPORT Q__show_Customer_Address_Entities := MODULE
     KEL.typ.nint Cluster_Score_;
     KEL.typ.int Contributor_Safe_Flag_ := 0;
     KEL.typ.int Deceased_Person_Count_ := 0;
-    KEL.typ.nunk Entity_Context_Uid_;
+    KEL.typ.nstr Entity_Context_Uid_;
     KEL.typ.int Entity_Type_ := 0;
     KEL.typ.int High_Frequency_Flag_ := 0;
     KEL.typ.int High_Risk_Death_Prior_To_All_Events_Percent_Flag_ := 0;
@@ -99,7 +99,7 @@ EXPORT Q__show_Customer_Address_Entities := MODULE
     KEL.typ.ntyp(E_Customer.Typ) Source_Customer_;
     KEL.typ.nint Customer_Id_;
     KEL.typ.nint Industry_Type_;
-    KEL.typ.nunk Entity_Context_Uid_;
+    KEL.typ.nstr Entity_Context_Uid_;
     KEL.typ.nstr Label_;
     KEL.typ.nint Score_;
     KEL.typ.nint Cluster_Score_;

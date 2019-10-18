@@ -572,9 +572,18 @@ EXPORT Layouts := MODULE
 			string8		name7_link_inc_date;
 		//Name8	
 			string8		name8_link_dob;
-   string9		name8_link_ssn;      
+			string9		name8_link_ssn;      
 			string9		name8_link_fein;
-			string8		name8_inc_date;		
+			string8		name8_inc_date;	
+	//Black Knight fields		
+			string1		lender_type := '';
+			string55	lender_type_desc	:= '';
+			string10	loan_amount	:= '';
+			string1		loan_type	:= '';
+			string60	loan_type_desc	:= '';
+			string2		source	:= '';	//FR = CL, 'B7' = BK_NOD, 'I5' = BK_REO
+			unsigned4 global_sid	:= 0;	//CCPA field
+			unsigned8 record_sid	:= 0;	//CCPA field
 		end;
 		
 		EXPORT incoming_alpha := RECORD,maxlength(32768)

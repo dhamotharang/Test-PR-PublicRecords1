@@ -90,12 +90,16 @@ module
 	//////////////////////////////////////////////////////////////////
 	export CustomerSettings := FraudGov_Prefix('config') + 'CustomerSettings';
 	export CustomerMappings := FraudGov_Prefix('config') + 'CustomerMappings';
+	export CustomerDashboard := FraudGov_Prefix('config') + 'kel::customerdashboard';
+	export ClusterDetails := FraudGov_Prefix('config') + 'kel::clusterdetails';
+	export ProdDashboardVersion := FraudGov_Prefix('config') + 'kel::ProdDashboardVersion';
 
 	export Flags := module
 		export NewHeader := FraudGov_Prefix('flags') + 'NewHeader_flag';
 		export FraudgovInfoFn := FraudGov_Prefix('flags') + 'NewFraudgov_flag';
 		export RefreshAddresses := FraudGov_Prefix('flags') + 'RefreshAddresses_flag';	
 		export SkipModules := FraudGov_Prefix('flags') + 'SkipModules_flag';
+		export RefreshProdDashVersion := FraudGov_Prefix('flags') + 'kel::RefreshProdDashVersion';
 	end;
 	//////////////////////////////////////////////////////////////////
 	// -- Output Filename Versions
@@ -121,6 +125,7 @@ module
 		export Death				:= tools.mod_FilenamesBuild(Template('Death'),pversion);
 		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
 		export IPMetaData		:= tools.mod_FilenamesBuild(Template('IPMetaData'),pversion);
+		export Advo					:= tools.mod_FilenamesBuild(Template('Advo'),pversion);
 		
 		
 		//Kel Files
@@ -180,7 +185,8 @@ module
 		export Crim_Demo				:= tools.mod_FilenamesBuild(Template('Crim_Demo'),pversion);
 		export Death_Demo				:= tools.mod_FilenamesBuild(Template('Death_Demo'),pversion);
 		export FraudPoint_Demo	:= tools.mod_FilenamesBuild(Template('FraudPoint_Demo'),pversion);
-		Export IpMetaData_Demo	:= tools.mod_FilenamesBuild(Template('IpMetaData_Demo'),pversion);
+		export IpMetaData_Demo	:= tools.mod_FilenamesBuild(Template('IpMetaData_Demo'),pversion);
+		export Advo_Demo				:= tools.mod_FilenamesBuild(Template('Advo_Demo'),pversion);
 			
 		export dAll_filenames :=
 			AddressCache.dAll_filenames +
@@ -239,7 +245,9 @@ module
 			CIID_Orig.dAll_filenames +
 			Crim_Orig.dAll_filenames +
 			Death_Orig.dAll_filenames +
-			IPMetaData.dAll_filenames;
+			IPMetaData.dAll_filenames + 
+			Advo.dAll_filenames +
+			Advo_Demo.dAll_filenames;;
 			; 
 	
 	end;

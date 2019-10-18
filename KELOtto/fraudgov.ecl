@@ -1,4 +1,4 @@
-﻿IMPORT Std, KELOtto, FraudShared, data_services;
+﻿IMPORT Std, KELOtto, FraudShared, data_services, ut;
 #CONSTANT ('Platform','FraudGov');
 RunKelDemo :=false:stored('RunKelDemo');
 
@@ -13,10 +13,22 @@ fraudgov_dataset_base_prep := dataset(data_services.foreign_prod+FileIn, FraudSh
 // Add an address id (rawaid is always 0)
 // email id
 // ipaddress id
+//Need to define layout to remove the string20 for the cleaned name to avoid confusing KEL
+Layout_Clean_Name := 	record
+	string  title					;
+	string fname					;
+	string mname					;
+	string lname					;
+	string name_suffix		;
+	string  name_score			;
+end;
+
+Main         :=  FraudShared.Layouts.Base.Main - cleaned_name;
 
 fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep, 
                        TRANSFORM({
-                         RECORDOF(LEFT), 
+                         Main, 
+												 Layout_Clean_name cleaned_name,
                          STRING SsnFormatted, 
                          STRING Phone_Number_Formatted, 
                          STRING Cell_phone_Formatted, 
@@ -33,13 +45,13 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
                        SELF.SsnFormatted := LEFT.ssn[1..3] + '-' + LEFT.ssn[4..5] + '-' + LEFT.ssn[6..9], 
                        SELF.Phone_Number_Formatted := MAP(TRIM(LEFT.clean_phones.phone_number) !='' => '(' + LEFT.clean_phones.phone_number[1..3] + ') ' + LEFT.clean_phones.phone_number[4..6] + '-' + LEFT.clean_phones.phone_number[7..10], ''),
                        SELF.Cell_phone_Formatted := MAP(TRIM(LEFT.clean_phones.cell_phone) != '' => '(' + LEFT.clean_phones.cell_phone[1..3] + ') ' + LEFT.clean_phones.cell_phone[4..6] + '-' + LEFT.clean_phones.cell_phone[7..10], ''),
-											 SELF.OttoAddressId := HASH32(TRIM(LEFT.address_1)+ '|' + TRIM(LEFT.address_2)), 
-											 SELF.OttoIpAddressId := HASH32(LEFT.ip_address), 
-											 SELF.OttoEmailId := HASH32(LEFT.email_address),
-                       SELF.OttoSSNId := HASH32(LEFT.ssn),
-                       SELF.OttoBankAccountId := HASH32(TRIM(LEFT.bank_routing_number_1, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_1, LEFT, RIGHT)),
-                       SELF.OttoBankAccountId2 := HASH32(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
-                       SELF.OttoDriversLicenseId := HASH32(LEFT.drivers_license),
+											 SELF.OttoAddressId := HASH64(TRIM(LEFT.address_1)+ '|' + TRIM(LEFT.address_2)), 
+											 SELF.OttoIpAddressId := HASH64(LEFT.ip_address), 
+											 SELF.OttoEmailId := HASH64(LEFT.email_address),
+                       SELF.OttoSSNId := HASH64(LEFT.ssn),
+                       SELF.OttoBankAccountId := HASH64(TRIM(LEFT.bank_routing_number_1, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_1, LEFT, RIGHT)),
+                       SELF.OttoBankAccountId2 := HASH64(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
+                       SELF.OttoDriversLicenseId := HASH64(LEFT.drivers_license),
                        SELF.Confidence_that_activity_was_deceitful_id := LEFT.classification_Activity.Confidence_that_activity_was_deceitful_id,
 											 SELF.event_date := MAP(LEFT.event_date = '' => MAP(LEFT.ln_report_date='' => '20100101', LEFT.ln_report_date), LEFT.event_date), 											 
                        // fake bank account and dl risk stuff for testing JP
@@ -48,6 +60,9 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
                        SELF.event_type_2 := MAP(LEFT.drivers_license != '' => CHOOSE((HASH32(LEFT.record_id) % 7)+1, '800','891','801','802','892','893','890'),''),
                        */
                        // end of test code.
+											 // Clean name to avoid blank labels
+											 SELF.cleaned_name.fname := TRIM(ut.fn_RemoveSpecialChars(LEFT.cleaned_name.fname)),
+											 SELF.cleaned_name.lname := TRIM(ut.fn_RemoveSpecialChars(LEFT.cleaned_name.lname)),
 											 SELF := LEFT));
 
 // trim the data down for R&D speed.

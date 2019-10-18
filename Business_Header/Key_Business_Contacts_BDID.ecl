@@ -1,4 +1,4 @@
-Import Data_Services, business_header_ss, mdr, PRTE2_Business_Header;
+﻿Import Data_Services, business_header_ss, mdr, PRTE2_Business_Header;
 
 #IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
 fbc := PRTE2_Business_Header.File_Prep_Business_Contacts_Plus(bdid > 0);
@@ -6,7 +6,7 @@ fbc := PRTE2_Business_Header.File_Prep_Business_Contacts_Plus(bdid > 0);
 fbc := File_Prep_Business_Contacts_Plus(bdid > 0);
 #END;
 
-Layout_Business_Contact_Full t2full(fbc l) :=
+Layout_Business_Contact_Full_New t2full(fbc l) :=
 transform
   self.ssn := if(mdr.sourceTools.sourceIsUtility(l.source), 0, l.ssn);
 	self := l;

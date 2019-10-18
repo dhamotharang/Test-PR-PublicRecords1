@@ -159,4 +159,55 @@ EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
 		return dWUInfoResponse;
 	end;
 	
+	export GetWUErrors(string wuid
+										,boolean getOnlyErrors = false) := function
+	
+		
+		
+		rWUInfoRequest := record
+			string Name{xpath('Wuid')} := wuid;
+		end;
+
+	
+		rMessages := record, maxlength(30000)
+			string Severity {XPATH('Severity')} := '';
+			string message {XPATH('Message')} := '';
+		end;
+
+		rErrors := record
+			string wuid;
+			rMessages;
+			
+		end;
+	
+		rFileNames := record
+			string100 name {XPATH('FileName')} := '';
+		end;
+
+	
+		rWUInfoResponse := record,maxlength(300000)
+			string20 Wuid{xpath('Wuid')};
+			dataset(rMessages) errormessages{xpath('Exceptions/ECLException')};
+			//dataset(resultnames) resultfiles{xpath('Results/ECLResult')};
+		end;
+	
+		dWUInfoResponse := SOAPCALL('http://' + lTargetESPAddress + ':' + lTargetESPPort + '/WsWorkunits'
+											,'WUInfo' 
+											,rWUInfoRequest
+											,dataset(rWUInfoResponse)
+											,xpath('WUInfoResponse/Workunit')
+											,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
+										 );
+										 
+		rErrors xErrors(dWUInfoResponse l, rMessages r) := transform
+			self.wuid := wuid;
+			self := r;
+		end;
+		
+		dErrors := normalize(dWUInfoResponse, left.errormessages,xErrors(left,right));
+										 
+		return if (getOnlyErrors, dErrors(regexfind('error',Severity,nocase)), dErrors);
+		
+	end;
+	
 end;

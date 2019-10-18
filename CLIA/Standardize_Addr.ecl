@@ -1,4 +1,4 @@
-IMPORT AID;
+﻿IMPORT AID;
 
 //////////////////////////////////////////////////////////////////////////////////////
 // -- Apply AID process on the entire base recs for getting fresh address.
@@ -39,14 +39,15 @@ EXPORT Standardize_Addr(DATASET(Layouts.Base) pBaseFile) := FUNCTION
 	//////////////////////////////////////////////////////////////////////////////////////
 	HasAddress :=	TRIM(dPreAddrRec.city_st_zip, LEFT, RIGHT) != '';
 
-	dWith_address		 := dPreAddrRec(HasAddress);
+	dWith_address0	 := dPreAddrRec(HasAddress);
+	dWith_address		 := sort(distribute(dWith_address0, hash(street_info, city_st_zip, clia_number)), street_info, city_st_zip, clia_number, skew(1), local);
 	dWithout_address := dPreAddrRec(NOT(HasAddress));
 
 	UNSIGNED4	lFlags := AID.Common.eReturnValues.ACEAIDs | AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;	
 
 	AID.MacAppendFromRaw_2Line(dWith_address, street_info, city_st_zip, raw_aid, dwithAID, lFlags);
 
-	dBase := PROJECT(dwithAID,
+	dBase0 := PROJECT(dwithAID,
 		               TRANSFORM(Layouts.Base,
 			                       SELF.ace_aid                           := LEFT.aidwork_acecache.aid;
 			                       SELF.raw_aid                           := LEFT.aidwork_rawaid;
@@ -55,7 +56,11 @@ EXPORT Standardize_Addr(DATASET(Layouts.Base) pBaseFile) := FUNCTION
 			                       SELF.Clean_Company_address.zip					:= LEFT.aidwork_acecache.zip5;
 			                       SELF.Clean_Company_address							:= LEFT.aidwork_acecache;
 														 
-			                       SELF := LEFT;)) + PROJECT(dWithout_address, Layouts.Base);
+			                       SELF := LEFT;));
+
+	dBase1	:= PROJECT(dWithout_address, Layouts.Base);
+
+	dBase := dBase0 + dBase1;
 
 	RETURN dBase;
 

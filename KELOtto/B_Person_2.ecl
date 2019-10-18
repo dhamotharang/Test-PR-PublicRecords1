@@ -1607,7 +1607,7 @@ EXPORT B_Person_2 := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -1782,7 +1782,7 @@ EXPORT B_Person_2 := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date__1_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -2184,7 +2184,7 @@ EXPORT B_Person_2 := MODULE
     SELF.All_Deceased_Event_Percent_ := __PP171613.A_V_E___Deceased_Prior_To_Event_;
     __EE171991 := __PP171613.Full_Name_;
     __BS171995 := __T(__EE171991);
-    __EE172007 := __BS171995(__T(__AND(__NOT(__NT(__T(__EE171991).First_Name_)),__NOT(__NT(__T(__EE171991).Last_Name_)))));
+ 		__EE172007 := __BS171995(__T(__AND(__OP2(__FN1(TRIM,__T(__EE171991).First_Name_),<>,__CN('')),__OP2(__FN1(TRIM,__T(__EE171991).Last_Name_),<>,__CN('')))));		
     __EE172016 := TOPN(__EE172007(__NN(__EE172007.Event_Date_)),1, -__T(__EE172007.Event_Date_),__T(Title_),__T(First_Name_),__T(Middle_Name_),__T(Last_Name_),__T(Name_Suffix_));
     __EE172018 := __EE172016;
     SELF.Best_Full_Name_ := (__EE172018)[1];

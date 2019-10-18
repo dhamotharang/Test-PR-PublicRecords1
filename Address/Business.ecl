@@ -576,6 +576,8 @@ string1 GetNameClass(string nm) :=
 string3 GetNameTypes(string s) :=
 		GetNameClass(REGEXFIND(rgxFirm, s, 1)) +
 			GetNameClass(REGEXFIND(rgxFirm, s, 2)) + GetNameClass(REGEXFIND(rgxFirm, s, 4));
+			
+NonFirmNames := ['JR','SR','II','III','MC'];
 
 boolean LikelyFirmName(string s) := FUNCTION
 	//t := GetNameTypes(s);
@@ -590,7 +592,9 @@ boolean LikelyFirmName(string s) := FUNCTION
 		REGEXFIND(rgxFirm1, s) => true,
 		REGEXFIND('^([A-Z]+) +(\\1+) *(&| AND ) *([A-Z]+)[.,/\\\']?$',s) => true,		// MORGAN MORGAN AND JONES
 		KnownFirmName(s) => true,
-		Persons.TestDualName(REGEXFIND(rgxFirm, s, 1), REGEXFIND(rgxFirm, s, 2), REGEXFIND(rgxFirm, s, 4)) => false,
+		REGEXFIND(rgxFirm, s, 1) IN NonFirmNames OR REGEXFIND(rgxFirm, s, 2) IN NonFirmNames OR
+							REGEXFIND(rgxFirm, s, 4) IN NonFirmNames => false,
+		NOT Persons.TestDualName(REGEXFIND(rgxFirm, s, 1), REGEXFIND(rgxFirm, s, 2), REGEXFIND(rgxFirm, s, 4)) => true,
 		//t[2] = 'F' OR t[3] = 'F' => false,
 		//t IN ['LFF','LBF','LFB','LBB','BLF','FLF','FLB'] => false,
 		//t in ['LBL','BBL','BLL','BLB','LLL','LXL','LLX'] => true,
@@ -875,7 +879,8 @@ MatchType MatchX(string str, string options) := FUNCTION
 		IsSaintWord(REGEXFIND('^(SAINT|SAINTS|ST\\.?|SS|STS|FIRST|LIFE) +[A-Z ]+ +([A-Z]+)\\b', s, 2))
 										=> MatchType.Business,
 		REGEXFIND('^(SAINT|SAINTS|ST\\.?|SS|STS) +[A-Z]+ *( AND |&) *[A-Z]+', s) => MatchType.Business,
-		CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, s, 1), preferBiz) => MatchType.Business, 
+		CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, s, 1), preferBiz) 
+				OR CheckPersonalBusiness(REGEXFIND(rgxPersonalBusiness, name, 1), preferBiz)=> MatchType.Business, 
 		
 		StringLib.StringFind(s, 'CORPORATION', 1) > 0 OR
 		StringLib.StringFind(s, 'MORTGAGE', 1) > 0 OR
@@ -957,9 +962,9 @@ MatchType MatchX(string str, string options) := FUNCTION
 										=> MatchType.Business,
 		IsGeoDesignation2(REGEXFIND('^(CENTRAL|NORTH(ERN)?|SOUTH(ERN)?|WEST(ERN)?|EAST(ERN)?) +[A-Z]+ +([A-Z]+)\\b', s, 6))
 										=> MatchType.Business,
+		Persons.IsDualName(name) => MatchType.Dual,
 		IsFirmName(s, name) => MatchType.Business,
 		IsAmbiguousBusiness(words, s, name) => MatchType.Business,
-		Persons.IsDualName(name) => MatchType.Dual,
 		REGEXFIND('^[A-Z]{2,} *(&| AND ) *+[A-Z]{2,} +L +[CP],?$', s) => MatchType.Business,
 		NameTester.IsAmbiguousWord(REGEXFIND('^[A-Z]+ *& *[A-Z]+ +([A-Z]+)$',s,1)) => MatchType.Business,
 		// from Gong

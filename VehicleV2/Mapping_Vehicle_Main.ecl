@@ -38,8 +38,8 @@ transform
 																					trim(L.body_style_description,left,right) <> ''  => l.body_style_description,L.orig_body_desc
 																				    );
 	//Added for CCPA-103
-	self.global_sid               := 0;
-	self.record_sid               := 0;
+	// self.global_sid               := 0;
+	// self.record_sid               := 0;
 																						
 	self													:=	L;
 	self := [] ;//blank all experian new fields.

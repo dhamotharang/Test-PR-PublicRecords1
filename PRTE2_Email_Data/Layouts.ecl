@@ -131,7 +131,7 @@ shared incoming_base := record
 		END;		
 		   
 		EXPORT incoming_alpha := record
-			 Email_Data.Layout_Email.Scrubs_bits_base - [scrubsbits1];
+			 Email_Data.Layout_Email.Scrubs_bits_base - [scrubsbits1,global_sid,record_sid];
 			 
 		END;
 	

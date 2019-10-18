@@ -125,7 +125,7 @@ pj7 do_computes(pj7 le) := TRANSFORM
   SELF.FULLNAME_prop := IF( SELF.MAINNAME_prop > 0, 1, 0 ) + IF( le.SUFFIX_prop > 0, 2, 0 );
   SELF := le;
 END;
-SHARED propogated := PROJECT(pj7,do_computes(left)) : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+STD.Date.Today()+'::'+'mc_props::HEADER',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire)); // to allow to 'jump' over an exported value
+SHARED propogated := PROJECT(pj7,do_computes(left)) : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+pVersion+'::'+'mc_props::HEADER',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire)); // to allow to 'jump' over an exported value
 PostPropCounts := RECORD
   REAL8 SSN_pop := AVE(GROUP,IF((propogated.SSN  IN SET(s.nulls_SSN,SSN) OR propogated.SSN = (TYPEOF(propogated.SSN))''),0,100));
   REAL8 DOB_year_pop := AVE(GROUP,IF(propogated.DOB_year  IN SET(s.nulls_DOB_year,DOB_year) AND propogated.DOB_month  IN SET(s.nulls_DOB_month,DOB_month) AND propogated.DOB_day  IN SET(s.nulls_DOB_day,DOB_day),0,100));
@@ -390,9 +390,9 @@ END;
 SALT311.MAC_Choose_JoinType(j1,s.nulls_LEXID,/*HACK-O-MATIC*/Specificities(pSrc,pVersion,ih).LEXID_values_persisted,LEXID,LEXID_weight100,add_LEXID,j0);
 //Using HASH(did) to get smoother distribution
 SHARED j0_dist := DISTRIBUTE(j0, HASH(nomatch_id));
-SHARED Annotated_NoDedup := j0_dist : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+STD.Date.Today()+'::'+'mc_nodedup',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire)); // No dedup- for aggressive slicing
+SHARED Annotated_NoDedup := j0_dist : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+pVersion+'::'+'mc_nodedup',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire)); // No dedup- for aggressive slicing
 SHARED Annotated_Dedup := IF(Config.FastSlice, j0_dist, MAC_RollupCandidates(Annotated_NoDedup, fieldListWithPropFlags, fieldList, FALSE));
-SHARED Annotated := Annotated_Dedup : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+STD.Date.Today()+'::'+'mc',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire)); // Distributed for keybuild case
+SHARED Annotated := Annotated_Dedup : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+pVersion+'::'+'mc',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire)); // Distributed for keybuild case
 //Now see if these records are actually linkable
 TotalWeight := Annotated.LEXID_weight100 + Annotated.FULLNAME_weight100 + Annotated.ADDRESS_weight100 + Annotated.GENDER_weight100 + Annotated.SSN_weight100 + Annotated.DOB_year_weight100 + Annotated.DOB_month_weight100 + Annotated.DOB_day_weight100;
 SHARED Linkable := TotalWeight >= Config.MatchThreshold;

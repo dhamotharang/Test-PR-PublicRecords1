@@ -1,4 +1,4 @@
-﻿import bipv2_build,topbusiness_bipv2,bipv2,AutoStandardI,tools;
+﻿import bipv2_build,topbusiness_bipv2,bipv2,AutoStandardI,tools,doxie;
 
 export key_directories_linkids :=
 module
@@ -60,6 +60,7 @@ module
                   ,unsigned2 ScoreThreshold = 0
 									,BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
 									JoinLimit=25000
+                  ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
                   ) :=
   function
 
@@ -69,7 +70,10 @@ module
     ds_restricted := out(isperm.bySource(industry_fields.source, contacts_fields.vl_id)
     and isperm.bySource(contacts_fields.source, contacts_fields.vl_id)
     );
-    return ds_restricted;
+    
+    BIPV2_build.mac_check_access(ds_restricted, ds_restricted_out, mod_access, false);
+    
+    return ds_restricted_out;
 									
   end;
   

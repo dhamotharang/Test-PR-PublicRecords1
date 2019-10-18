@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 
 EXPORT BuildAll(string version) := FUNCTION
 
@@ -26,11 +26,11 @@ doit := SEQUENTIAL(
 		WriteXGFormat.OutputDataXMLFile('PEP', 'WorldCompliance - Politically Exposed Persons.xml', version,
 								dsPep, Files.srcPep),
 		WriteXGFormat.OutputDataXMLFile('SAE', 'WorldCompliance - Sanctions and Enforcements.xml', version,
-								dsSanctionsAndEnforcement, Files.srcSanctionsAndEnforcement),
+								dsSanctionsAndEnforcement, Files.srcSanctionsAndEnforcement, true),
 		WriteXGFormat.OutputDataXMLFile('SAN', 'WorldCompliance - Sanctions.xml', version,
-								dsSanctions, Files.srcSanctions),
+								dsSanctions, Files.srcSanctions, true),
 		WriteXGFormat.OutputDataXMLFile('ALL', 'WorldCompliance - Full.xml', version,
-								dsFull, Files.srcFull),
+								dsFull, Files.srcFull, true),
 		worldcompliance.WriteXGFormat.OutputGeoXMLFile('CNT', 'WorldCompliance - Countries.xml', version,
 								dsNations),
 		WriteXGFormat.OutputDataXMLFile('REG', 'WorldCompliance - Registrations.xml', version,

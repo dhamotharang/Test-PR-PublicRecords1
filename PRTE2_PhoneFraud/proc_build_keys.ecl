@@ -37,9 +37,9 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 	//---------- making DOPS optional and only in PROD build -------------------------------
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
-	updatedops					:=	PRTE.UpdateVersion(Constants.dops_name, file_date, notifyEmail,'B','N','N');
+	updatedops					:=	PRTE.UpdateVersion(Constants.dops_name, file_date, notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean:='N');
 
-	PerformUpdateOrNot	:= IF(doDOPS,PARALLEL(updatedops),NoUpdate);
+ PerformUpdateOrNot	:= IF(doDOPS,PARALLEL(updatedops),NoUpdate);
 
 	RETURN 		sequential(			
 				build_key_otp, 

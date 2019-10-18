@@ -1,12 +1,12 @@
-import ut;
+﻿import ut;
 
 import doxie,FLAccidents;
 
 export Sample_data := module
-befor := FLAccidents_Ecrash.key_EcrashV2_accnbr_father;
+befor := distribute(pull(FLAccidents_Ecrash.key_EcrashV2_accnbr_father),hash32(l_accnbr));
  
 
-after := FLAccidents_Ecrash.key_EcrashV2_accnbr;
+after := distribute(pull(FLAccidents_Ecrash.key_EcrashV2_accnbr),hash32(l_accnbr));
 
 after trecs(after L, befor R) := transform
 self := L;
@@ -14,7 +14,7 @@ end;
 
 shared jrecs := join(after,befor,
 					left.l_accnbr = right.l_accnbr,
-					trecs(left,right),left only) : persist('~thor_data400::ecrash::samples');
+					trecs(left,right),left only,local) : persist('~thor_data400::ecrash::samples');
 //Work type id [0,1] has Jurisdiction info and [2,3] comes from CRU and does not have jurisdiction 
  //  
 

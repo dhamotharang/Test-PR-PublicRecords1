@@ -1,5 +1,5 @@
 ﻿IMPORT Address, AID, BIPV2;
-
+ 
 //KeyBase includes all fields except for web_address and email. 
 //The parsed web_address and email (if present and valid) are included
   EXPORT Layout_Keybase := RECORD

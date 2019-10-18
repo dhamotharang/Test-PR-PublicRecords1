@@ -1,5 +1,5 @@
 ﻿EXPORT Layout_SBA_logs := module
-
+ 
 export input_raw := record
 
 string16 transaction_id;           
@@ -361,6 +361,13 @@ export common := record
 string16 transaction_id; 
 string22 datetime;   
 
+string100 cmp_name;                
+string60 cmp_address;            
+string50 cmp_city;                
+string2 cmp_state;               
+string9 cmp_zip;                  
+string20 cmp_phone;      
+
 string20 	cmp_fax_number;         
 string9 	cmp_fein;                
 string8 	cmp_sic_code;            
@@ -370,6 +377,49 @@ string3 	cmp_years_in_business;
 string8 	cmp_bus_start_date;       
 string12 	cmp_yearly_revenue;
 string100 cmp_alt_name;
+
+string30 first_name;          
+string30 middle_name;         
+string30 last_name;         
+string10 suffix_name;         
+string30 former_last_name;    
+string60 address;            
+string50 city;              
+string2 state;              
+string9 zip;                 
+string20 phone;              
+string20 work_phone;         
+string8 dob;                 
+string30 dl;                 
+string2 dl_state;            
+string30 email;               
+string9 ssn;                 
+string64 business_title;     
+integer8 response_lexid; 
+string30 clean_first_name;          
+string30 clean_middle_name;         
+string30 clean_last_name;         
+string10 clean_suffix_name;       
+string10 clean_prim_range;    
+string40 clean_prim_name;     
+string10 clean_addr_suffix;   
+string10 clean_postdir;       
+string15 clean_unit_desig;    
+string10 clean_sec_range;    
+string50 clean_v_city_name;   
+string2 clean_st;            
+string9 clean_zip5;          
+string4 clean_zip4;          
+string2 clean_addr_rec_type; 
+string2 clean_fips_state;   
+string3 clean_fips_county;   
+string15 clean_geo_lat;      
+string15 clean_geo_long;      
+string4 clean_cbsa;         
+string10 clean_geo_blk;      
+string2 clean_geo_match;   
+string5 clean_err_stat;     
+string2 clean_predir;
 
 string30 pii2_first_name;          
 string30 pii2_middle_name;         

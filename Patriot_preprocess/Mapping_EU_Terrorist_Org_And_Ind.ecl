@@ -228,6 +228,7 @@ self.remarks_8 := map(l.Subject_to_Common_Pos_2001_931_CFSP <> ''
                        => 'Subject of Article 4 of Common Position 2001/931/CFSP only.','');
 self.remarks_9 := map(l.name = 'Joma, in charge of the Communist Party of the Philippines including NPA'
                          => 'Comment: ' + l.Name , '');
+
 self := [];
 end;
 

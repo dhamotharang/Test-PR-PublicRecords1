@@ -206,10 +206,10 @@ transform
 	self.Ttl_Odometer_Date						:=	'';
 	self.ttl_rollup_count							:=	0;
 	//Added for CCPA-103
-	self.global_sid                   := 0;
-	self.record_sid                   := 0;
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
 	//Added for DF-25578
-	self.raw_name                     := '';
+	// self.raw_name                     := '';
 	self 															:=	pInput;
 	self															:=	[];
 end;
@@ -257,10 +257,10 @@ transform
 	
 	self.Append_Ace1_RawAID	:=	pInput.AIDWork_RawAID;
 	//Added for CCPA-103
-	self.global_sid                   := 0;
-	self.record_sid                   := 0;
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
 	//Added for DF-25578
-	self.raw_name                     := '';
+	// self.raw_name                     := '';
 	
 	self										:=	pInput;
 end;

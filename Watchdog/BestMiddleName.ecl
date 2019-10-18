@@ -37,7 +37,7 @@ self := rt;
 mname_did_cnt := iterate(grp,cnt_mname(left,right));
 
 //Sort and dedup by mname to give one record per DID/mname with the highest count
-cnt_dedup := dedup(sort(mname_did_cnt,-mname_count),mname);
+cnt_dedup := ungroup(dedup(sort(mname_did_cnt,-mname_count),mname));
 
 
 //Find DIDs where mname=lname and take those out of mname compare.
@@ -67,8 +67,7 @@ end;
 with_lname_score := join(same_name_only,all_lnames,left.did=right.did and left.mname=right.lname,
 						mnamescore(left,right),left outer,local);
 
-//Ungroup and resort
-mname_ready := sort(group(with_lname_score + no_same_name),did,-mname_count,local);
+mname_ready := sort(with_lname_score + no_same_name,did,-mname_count,local);
 
 //Dedup by DID keeping the top two most frequent
 two_DID := dedup(mname_ready,did,keep 2,local);
@@ -91,4 +90,5 @@ sorted_duped := dedup(sort(join_cnt,did,-mname_count,-mname,local),did,local);
 
 
 //output only the 'best' mname records (at most one per DID)
+
 export BestMiddleName := sorted_duped(mname <> '') : Persist('persist::Watchdog_BestMiddleName');

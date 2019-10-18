@@ -1,4 +1,4 @@
-﻿IMPORT DeltabaseGateway, dx_PhonesInfo, Lib_date, Ut;
+﻿IMPORT _control, MDR, DeltabaseGateway, dx_PhonesInfo, Lib_date, Std, Ut;
 
 //DF-24397: Create Dx-Prefixed Keys
 
@@ -256,15 +256,22 @@
 	allFiles					:= applyiConDates + concatLIDB 	 + dsL6Phones;	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////	
+	//Append Global_SID///////////////////////////////////////////////////////////////////////	
+	//////////////////////////////////////////////////////////////////////////////////////////	
+	
+	//Add Global_SID
+	addGlobalSID			:= MDR.macGetGlobalSid(allFiles, 'PhonesMetadata', 'source', 'global_sid');
+		
+	//////////////////////////////////////////////////////////////////////////////////////////	
 	//Append Record_SID///////////////////////////////////////////////////////////////////////	
 	//////////////////////////////////////////////////////////////////////////////////////////	
 	
 	//Add Record_SID to All Records
-	dx_PhonesInfo.Layouts.Phones_Type_Main trID(allFiles l):= transform
+	dx_PhonesInfo.Layouts.Phones_Type_Main trID(addGlobalSID l):= transform
 		self.record_sid := hash64(l.phone + l.source + l.account_owner + l.carrier_name + l.vendor_first_reported_dt + l.vendor_first_reported_time + l.spid + l.operator_fullname + l.serv + l.line + l.high_risk_indicator + l.prepaid + l.reference_id) + (integer)l.phone;	
 		self 						:= l;
 	end;
 	
-	idAll						:= project(allFiles, trID(left));
+	idAll						:= project(addGlobalSID, trID(left));
 
 EXPORT Map_Phones_Type_Main := idAll;

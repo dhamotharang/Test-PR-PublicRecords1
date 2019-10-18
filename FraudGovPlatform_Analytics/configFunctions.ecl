@@ -1,9 +1,10 @@
 ﻿EXPORT configFunctions := MODULE
 	IMPORT FraudGovPlatform_Analytics;
 		
-	EXPORT getHpccConnection(BOOLEAN runProd, BOOLEAN newVersion) := FUNCTION
+	EXPORT getHpccConnection(BOOLEAN runProd, BOOLEAN newVersion, BOOLEAN updateROSE = FALSE) := FUNCTION
 	
-		hpccConnection 			:= MAP(runProd AND newVersion => FraudGovPlatform_Analytics.Constants.RampsWebServices.HpccConnectionProd, 
+		hpccConnection 			:= MAP(updateROSE => FraudGovPlatform_Analytics.Constants.RampsWebServices.HpccConnectionDev,
+			runProd AND newVersion => FraudGovPlatform_Analytics.Constants.RampsWebServices.HpccConnectionProd, 
 			// runProd AND ~newVersion  => FraudGovPlatform_Analytics.Constants.RampsWebServices.HpccConnectionProdQa, //use this once Drea is done
 			runProd AND ~newVersion  => FraudGovPlatform_Analytics.Constants.RampsWebServices.HpccConnectionProd, //remove this once Drea is done
 			~runProd AND newVersion => FraudGovPlatform_Analytics.Constants.RampsWebServices.HpccConnectionQa,

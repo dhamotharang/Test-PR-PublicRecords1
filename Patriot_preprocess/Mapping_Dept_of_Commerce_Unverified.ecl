@@ -1,4 +1,4 @@
-
+﻿
 #OPTION('multiplePersistInstances',false);
 
 Dept_of_Commerce_Unverified	:= 	DATASET('~thor::in::globalwatchlists::unverified', 
@@ -62,6 +62,7 @@ self.country := map(regexfind('China',address)
                             => 'UAE',
 										           '');
 self.entity_flag := 'Y';										 
+
 self := [];
 
 end;

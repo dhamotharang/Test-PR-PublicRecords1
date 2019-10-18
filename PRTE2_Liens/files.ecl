@@ -32,8 +32,8 @@ EXPORT SprayParty		:=	DATASET(PRTE2_Liens.Constants.IN_PREFIX + 'party', PRTE2_L
 																CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')))(tmsid != 'tmsid');
 																
 //Base output files
-Main_out_ext		:= DATASET(PRTE2_Liens.Constants.BASE_PREFIX + 'main', PRTE2_Liens.Layouts.main_base_ext,flat);
+EXPORT Main_out_ext		:= DATASET(PRTE2_Liens.Constants.BASE_PREFIX + 'main', PRTE2_Liens.Layouts.main_base_ext,flat);
 EXPORT Main_out := PROJECT(Main_out_ext,PRTE2_Liens.Layouts.main_base);
-Party_out_ext 	:= DATASET(PRTE2_Liens.Constants.BASE_PREFIX + 'party', PRTE2_Liens.Layouts.party_base_ext,flat); 
+EXPORT Party_out_ext 	:= DATASET(PRTE2_Liens.Constants.BASE_PREFIX + 'party', PRTE2_Liens.Layouts.party_base_ext,flat); 
 EXPORT Party_out:= PROJECT(Party_out_ext, PRTE2_Liens.Layouts.party_base);																
 END;

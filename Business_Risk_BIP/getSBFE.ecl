@@ -1,14 +1,22 @@
-/*2016-11-15T02:48:01Z (aleksandar tomovic)
-corrected as per code review 
-*/
-IMPORT BIPV2, Business_Credit, Business_Risk_BIP, MDR, ut, Business_Credit_KEL, risk_indicators, DID_Add, Business_Risk, STD;
+﻿IMPORT BIPV2, Business_Credit, Business_Credit_KEL,  Business_Risk,  Business_Risk_BIP, DID_Add, doxie, MDR, risk_indicators, ut, STD;
 
 EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
-	// Add fifteen minutes to the historydatetime to accommodate for delays in 
+	mod_access :=
+    MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+      EXPORT STRING DataRestrictionMask := linkingOptions.DataRestrictionMask;
+      EXPORT UNSIGNED1 glb := linkingOptions.GLBPurpose;
+      EXPORT UNSIGNED1 dppa := linkingOptions.DPPAPurpose;
+      EXPORT BOOLEAN show_minors := linkingOptions.IncludeMinors;
+      EXPORT UNSIGNED1 unrestricted := (UNSIGNED1)linkingOptions.AllowAll;
+      EXPORT BOOLEAN isPreGLBRestricted() := linkingOptions.restrictPreGLB;
+      EXPORT BOOLEAN ln_branded :=  linkingOptions.lnbranded;
+    END;
+
+  // Add fifteen minutes to the historydatetime to accommodate for delays in 
 	// the real time database information being available in production runs
 	Shell := 
 		PROJECT(
@@ -20,9 +28,9 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		);
 	
 	SBFERaw := Business_Credit.Key_LinkIds().kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-																		Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+																		mod_access,
+                                    Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																		0, /*ScoreThreshold --> 0 = Give me everything*/
-																		Options.DataPermissionMask,
 																		Business_Risk_BIP.Constants.Limit_SBFE_LinkIds,
 																		Options.KeepLargeBusinesses
 																		);
@@ -58,7 +66,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 	
   linkid_recs_loaddate := JOIN(SBFESeq, Business_Credit.Key_ReleaseDates(), LEFT.original_version=RIGHT.version, getacctno_loaddate(LEFT,RIGHT), LEFT OUTER);
 	
-	linkid_recs_loaddate_dedup := DEDUP(SORT(linkid_recs_loaddate, seq, acct_no, -load_date), seq, acct_no);
+	linkid_recs_loaddate_dedup := DEDUP(SORT(linkid_recs_loaddate, seq, acct_no, original_version, -load_date), seq, acct_no);
 
   linkid_recs := Business_Risk_BIP.Common.FilterRecords2(linkid_recs_loaddate_dedup, load_date, MDR.SourceTools.src_Business_Credit, AllowedSourcesSet);
 	
@@ -148,7 +156,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																								NameMatched 																		=> (STRING)ri.dt_first_seen,
 																																																	 '');
 		SELF.SBFE.SBFENameMatchDateLastSeen := MAP(NOT NamePopulated 																=> '-99',
-																								NameMatched 																		=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)le.Clean_Input.HistoryDateTime[1..8]),
+																								NameMatched 																		=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
 																																																	 '');
 		
 		
@@ -161,7 +169,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																								AddressMatched 																	=> (STRING)ri.dt_first_seen, 
 																																																	 '');
 		SELF.SBFE.SBFEAddrMatchDateLastSeen := MAP(NOT AddressPopulated 														=> '-99',
-																								AddressMatched 																	=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)le.Clean_Input.HistoryDateTime[1..8]),
+																								AddressMatched 																	=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
 																																																	 '');
 		
 		
@@ -175,7 +183,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																								 PhoneMatched 																	=> (STRING)ri.dt_first_seen, 
 																																																	 '');
 		SELF.SBFE.SBFEPhoneMatchDateLastSeen := MAP(NOT PhonePopulated 															=> '-99',
-																								 PhoneMatched  																	=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)le.Clean_Input.HistoryDateTime[1..8]),
+																								 PhoneMatched  																	=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
 																																																	 '');																																																
 																																																			
 		SELF.SBFE.SBFEVerBusInputPhoneAddr := MAP(PhoneMatched AND AddressMatched	AND NameMatched		=> '2',
@@ -192,7 +200,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																							 FEINMatched 																			=> (STRING)ri.dt_first_seen, 
 																																																	 '');
 		SELF.SBFE.SBFEFEINMatchDateLastSeen := MAP(NOT FEINPopulated 																=> '-99',
-																							 FEINMatched 																			=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)le.Clean_Input.HistoryDateTime[1..8]),
+																							 FEINMatched 																			=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
 																																																	 '');
 
 																																																			 
@@ -509,7 +517,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		JOIN(SBFEPersonVerificationRolled, SBFE_data, 
 			LEFT.seq = RIGHT.UID,
 			TRANSFORM(Business_Risk_BIP.Layouts.Shell,
-				dateToday := IF((STRING)(LEFT.Clean_Input.HistoryDateTime)[1..6] = '999999', (UNSIGNED)StringLib.getDateYYYYMMDD(), (UNSIGNED4)(((STRING)LEFT.Clean_Input.HistoryDateTime + '01')[1..8]));
+				dateToday := IF(((STRING)LEFT.Clean_Input.HistoryDateTime)[1..6] = '999999', (UNSIGNED)StringLib.getDateYYYYMMDD(), (UNSIGNED4)((((STRING)LEFT.Clean_Input.HistoryDateTime) + '01')[1..8]));
 
 				SBFENameMatchDateFirstSeen := IF(LEFT.SBFE.SBFENameMatchDateFirstSeen ='', '-98', LEFT.SBFE.SBFENameMatchDateFirstSeen);
 				SELF.SBFE.SBFENameMatchDateFirstSeen := SBFENameMatchDateFirstSeen;

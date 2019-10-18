@@ -35,10 +35,10 @@ transform
 	self.date_vendor_Last_Reported		:=	(unsigned4)VehicleV2.validate_date.fLatestNonZeroDate((string)le.date_vendor_Last_Reported,(string)ri.date_vendor_Last_Reported);
 	self.source_rec_id								:=  if(le.source_rec_id<>0,if(le.source_rec_id<ri.source_rec_id,le.source_rec_id,ri.source_rec_id),0);
 	//Added for CCPA-103
-	self.global_sid                   := 0;
-	self.record_sid                   := 0;
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
 	//Added for DF-25578
-	self.raw_name                     := '';
+	// self.raw_name                     := '';
 	self															:=	le;
 
 

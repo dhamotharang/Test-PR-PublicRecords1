@@ -30,6 +30,8 @@ EXPORT Layouts := MODULE
 		STRING10	cust_name;
 		STRING8	 	link_dob;
 		STRING9		link_ssn;
+		STRING8		cust_dob;	
+		STRING9		cust_ssn;
 		STRING9		link_fein;
 		STRING8		link_inc_date;
 	END;
@@ -39,7 +41,7 @@ EXPORT Layouts := MODULE
 		BankruptcyV2.layout_bankruptcy_main.layout_bankruptcy_main_filing;
 	END;
 	
-	EXPORT Main_BaseV3_ext := RECORD //Includes additional fields added by DI
+	EXPORT Main_BaseV3_ext := RECORD,maxlength(32766) //Includes additional fields added by DI
 		BankruptcyV2.layout_bankruptcy_main_v3.layout_bankruptcy_main_filing_supp_excludescrubs;
 		STRING10	bug_num;
 		STRING10	cust_name;
@@ -47,7 +49,11 @@ EXPORT Layouts := MODULE
 		STRING9		link_ssn;
 	END;
 	
-	EXPORT Main_BaseV3 := RECORD
+	EXPORT Main_BaseV3 := RECORD,maxlength(32766)
+		BankruptcyV2.layout_bankruptcy_main_v3.layout_bankruptcy_main_filing_supp_excludescrubs;
+	END;
+	
+	EXPORT Main_BaseV3_supp := RECORD
 		BankruptcyV2.layout_bankruptcy_main_v3.layout_bankruptcy_main_filing_supp_excludescrubs;
 	END;
 	

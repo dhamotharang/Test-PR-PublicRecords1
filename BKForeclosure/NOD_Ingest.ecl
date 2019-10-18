@@ -49,6 +49,10 @@ EXPORT NOD_Ingest(BOOLEAN incremental=FALSE
                      (UNSIGNED)le.ln_filedate < (UNSIGNED)ri.ln_filedate => ri.ln_filedate, // Want the highest value
                      le.ln_filedate);
     SELF.bk_infile_type := ri.bk_infile_type; // Derived(NEW)
+    SELF.sam_pid := ri.sam_pid; // Derived(NEW)
+    SELF.deed_pid := ri.deed_pid; // Derived(NEW)
+		SELF.lps_internal_pid := ri.lps_internal_pid; // Derived(NEW)
+    SELF.nod_source := ri.nod_source; // Derived(NEW)
     SELF.name1_nid := ri.name1_nid; // Derived(NEW)
     SELF.name1_prefix := ri.name1_prefix; // Derived(NEW)
     SELF.name1_first := ri.name1_first; // Derived(NEW)
@@ -350,7 +354,7 @@ EXPORT NOD_Ingest(BOOLEAN incremental=FALSE
              ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
              ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
              ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
-             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn,sam_pid,deed_pid,lps_internal_pid,nod_source));
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn));
   SortIngest0 := SORT(DistIngest0,src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
              ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
              ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
@@ -358,7 +362,7 @@ EXPORT NOD_Ingest(BOOLEAN incremental=FALSE
              ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
              ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
              ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
-             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn,sam_pid,deed_pid,lps_internal_pid,nod_source, __Tpe, record_id, LOCAL);
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn, __Tpe, record_id, LOCAL);
   GroupIngest0 := GROUP(SortIngest0,src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
              ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
              ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
@@ -366,7 +370,7 @@ EXPORT NOD_Ingest(BOOLEAN incremental=FALSE
              ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
              ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
              ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
-             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn,sam_pid,deed_pid,lps_internal_pid,nod_source, LOCAL, ORDERED, STABLE);
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Existing Base: combine delta with base file
@@ -377,7 +381,7 @@ EXPORT NOD_Ingest(BOOLEAN incremental=FALSE
              ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
              ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
              ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
-             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn,sam_pid,deed_pid,lps_internal_pid,nod_source));
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn));
   SortBase0 := SORT(DistBase0,src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
              ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
              ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
@@ -385,7 +389,7 @@ EXPORT NOD_Ingest(BOOLEAN incremental=FALSE
              ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
              ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
              ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
-             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn,sam_pid,deed_pid,lps_internal_pid,nod_source, __Tpe, record_id, LOCAL);
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn, __Tpe, record_id, LOCAL);
   GroupBase0 := GROUP(SortBase0,src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
              ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
              ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
@@ -393,7 +397,7 @@ EXPORT NOD_Ingest(BOOLEAN incremental=FALSE
              ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
              ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
              ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
-             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn,sam_pid,deed_pid,lps_internal_pid,nod_source, LOCAL, ORDERED, STABLE);
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Everything: combine ingest and base recs
@@ -404,7 +408,7 @@ EXPORT NOD_Ingest(BOOLEAN incremental=FALSE
              ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
              ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
              ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
-             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn,sam_pid,deed_pid,lps_internal_pid,nod_source, __Tpe,record_id,LOCAL);
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn, __Tpe,record_id,LOCAL);
   Group0 := GROUP(Sort0,src_county,src_state,fips_cd,doc_type,recording_dt,recording_doc_num,book_number,page_number,loan_number
              ,trustee_sale_number,case_number,orig_contract_date,unpaid_balance,past_due_amt,as_of_dt,contact_fname,contact_lname,attention_to,contact_mail_full_addr
              ,contact_mail_unit,contact_mail_city,contact_mail_state,contact_mail_zip5,contact_mail_zip4,contact_telephone,due_date,trustee_fname,trustee_lname,trustee_mail_full_addr
@@ -412,7 +416,7 @@ EXPORT NOD_Ingest(BOOLEAN incremental=FALSE
              ,borrower2_lname,borrower2_id_cd,orig_lender_name,orig_lender_type,curr_lender_name,curr_lender_type,mers_indicator,loan_recording_date,loan_doc_num,loan_book
              ,loan_page,orig_loan_amt,legal_lot_num,legal_block,legal_subdivision_name,legal_brief_desc,auction_date,auction_time,auction_location,auction_min_bid_amt
              ,trustee_mail_careof,property_addr_cd,auction_city,original_nod_recording_date,original_nod_doc_num,original_nod_book,original_nod_page,nod_apn,property_full_addr,prop_addr_unit_type
-             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn,sam_pid,deed_pid,lps_internal_pid,nod_source,LOCAL, ORDERED, STABLE);
+             ,prop_addr_unit_no,prop_addr_city,prop_addr_state,prop_addr_zip5,prop_addr_zip4,apn,LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
  
   //Now need to update 'rid' numbers on new records

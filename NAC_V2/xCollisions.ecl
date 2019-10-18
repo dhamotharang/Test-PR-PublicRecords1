@@ -93,6 +93,7 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 			
 			self.SearchEligibilityDate := fn_left(l.eligibility_status_date,r.eligibility_status_date);
 			self.SearchEligibilityStatus := fn_left(l.eligibility_status_indicator,r.eligibility_status_indicator);
+			
 			self.SearchAddress1StreetAddress1 := fn_left(l.Physical_Street1,r.Physical_Street1);
 			self.SearchAddress1StreetAddress2 := fn_left(l.Physical_Street2,r.Physical_Street2);
 			self.SearchAddress1City := fn_left(l.Physical_City,r.Physical_City);
@@ -122,11 +123,15 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 			self.CasePhone1 := fn_right(l.case_Phone1,r.case_Phone1);
 			self.CasePhone2 := fn_right(l.case_Phone2,r.case_Phone2);
 			self.CaseEmail := fn_right(l.case_Email,r.case_Email);
+			
+			self.AddressPhysicalCategory := fn_right(l.Physical_AddressCategory,r.Physical_AddressCategory);	
 			self.CasePhysicalStreet1 := fn_right(l.Physical_Street1,r.Physical_Street1);
 			self.CasePhysicalStreet2 := fn_right(l.Physical_Street2,r.Physical_Street2);
 			self.CasePhysicalCity := fn_right(l.Physical_City,r.Physical_City);
 			self.CasePhysicalState := fn_right(l.Physical_State,r.Physical_State);
 			self.CasePhysicalZip := fn_right(l.Physical_Zip,r.Physical_Zip);
+			
+			self.AddressMailCategory := fn_right(l.Mailing_AddressCategory,r.Mailing_AddressCategory);	
 			self.CaseMailStreet1 := fn_right(l.Mailing_Street1,r.Mailing_Street1);
 			self.CaseMailStreet2 := fn_right(l.Mailing_Street2,r.Mailing_Street2);
 			self.CaseMailCity := fn_right(l.Mailing_City,r.Mailing_City);
@@ -134,7 +139,11 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 			self.CaseMailZip := fn_right(l.Mailing_Zip,r.Mailing_Zip);
 			self.CaseCountyParishCode := fn_right(l.CountyCode,r.CountyCode);
 			self.CaseCountyParishName := fn_right(l.CountyName,r.CountyName);
+			
 			self.ClientID := fn_right(l.ClientId,r.ClientId);
+			self.HoHIndicator := fn_right(l.HoH_Indicator,r.HoH_Indicator);
+			self.RelationshipIndicator :=fn_right(l.Relationship,r.Relationship);
+
 			self.ClientLastName := fn_right(l.LastName,r.LastName);
 			self.ClientFirstName := fn_right(l.FirstName,r.FirstName);
 			self.ClientMiddleName := fn_right(l.MiddleName,r.MiddleName);
@@ -145,8 +154,14 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 			self.ClientSSNType := fn_right(l.ssn_Type_indicator,r.ssn_Type_indicator);
 			self.ClientDOB := fn_right(l.DOB,r.DOB);
 			self.ClientDOBType := fn_right(l.dob_Type_indicator,r.dob_Type_indicator);
-			self.ClientEligibilityStatus := fn_right(l.eligibility_status_indicator,r.eligibility_status_indicator);
+			self.ClientCertificateType := fn_right(l.Certificate_id_type, r.Certificate_id_type);
+			self.ClientMonthlyAllotment := fn_right(l.MonthlyAllotment, r.MonthlyAllotment);
+			self.ClientEligibilityStatus := fn_right(l.eligibility_status_indicator, r.eligibility_status_indicator);
 			self.ClientEligibilityDate := fn_right(l.eligibility_status_date,r.eligibility_status_date);
+			self.ClientEligibilityPeriodType := fn_right(l.PeriodType, r.PeriodType);
+			self.ClientEligibilityPeriodCount := fn_right(l.HistoricalBenefitCount, r.HistoricalBenefitCount);
+			self.ClientEligibilityStartDate := fn_right(l.StartDate_Raw, r.StartDate_Raw);
+			self.ClientEligibilityEndDate := fn_right(l.EndDate_Raw, r.EndDate_Raw);
 			self.ClientPhone := fn_right(l.client_Phone,r.client_Phone);
 			self.ClientEmail := fn_right(l.client_Email,r.client_Email);
 			self.StateContactName := fn_right(l.ContactName,r.ContactName);
