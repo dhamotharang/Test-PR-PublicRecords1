@@ -1,14 +1,9 @@
 ﻿
 
-
 IMPORT _Control, STD;
 
-
-
-
-
 //
-//	Dataland PPA/RIN Scheduler
+//	Dataland NAC2 Scheduler
 //
 envVars :=
  '#WORKUNIT(\'protect\',true);\n'
@@ -25,15 +20,12 @@ envVars :=
 
 
 ip := _Control.IPAddress.bctlpedata12;
-datadir := '/data/rin_ppa/';
-opsdir := '/data/rin_ppa/data_ops/ncf2/';  //  what about  MRR2 & MRX2?
+datadir := '/data/projects/nac2/';
+opsdir := '/data/projects/nac2/';
 
 
 //Nac_V2.ProcessContributoryFile(ip, rootdir, lfn, ip2, root2, version);
 files := STD.File.RemoteDirectory(ip, datadir, 'ncf2*.dat',true)(size>0);
-//  rin_ppa file types:  MRR2, MRX2, NCF2
-
-
 
 nac_V2.rNAC2Config	tNAC2ConfigForceLower(nac_V2.dNAC2Config pInput)	:=
 transform
