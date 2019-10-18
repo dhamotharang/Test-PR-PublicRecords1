@@ -32,6 +32,7 @@ EXPORT AllInfo(DATASET($.Layout_Sanctions) infile) := FUNCTION
 									Std.Str.CleanSpaces(
 										IF(infile.action_date IN ['','0'], '', 'Action Date: ' + infile.action_date) + ' ' +
 										IF(infile.action_start IN ['','0'], '', 'Action Start: ' + infile.action_start) + ' ' +
+										IF(infile.action_end IN ['','0'], '', 'Action End: ' + infile.action_end) + ' ' +
 										IF(infile.fine='', '', 'Fine: ' + infile.fine)
 									),
 									'');
