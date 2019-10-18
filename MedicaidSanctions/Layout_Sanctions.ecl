@@ -20,7 +20,7 @@
   string			action;
   string8			action_date;
   string8			action_start;
-  string8			action_end;
+  string			action_end;
   string			fine;
   string			license_number;
   string1			type_id;				// Individual or Organization
