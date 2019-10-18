@@ -1,4 +1,4 @@
-import ut, Business_Header, Business_Header_SS, did_add;
+import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -29,5 +29,9 @@ transform
 	self := l;
 end;
 
-export BDID_4010_Bankruptcy := project(BDID_Append,  tLayout_4010_Bankruptcy_Base(left))
+projectBase  := project(BDID_Append,  tLayout_4010_Bankruptcy_Base(left));
+
+addGlobalSID := mdr.macGetGlobalSID(projectBase,'EBR','','global_sid'); //DF-26349: Populate Global_SID Field
+
+export BDID_4010_Bankruptcy := addGlobalSID
 	/*: persist(EBR_thor + 'TEMP::BDID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code))*/;
