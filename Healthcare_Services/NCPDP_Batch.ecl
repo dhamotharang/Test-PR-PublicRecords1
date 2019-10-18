@@ -16,9 +16,9 @@ export NCPDP_Batch := MACRO
 	unsigned1 DPPA_Purpose  := 0 : STORED('DPPAPurpose');
 	unsigned1 GLB_Purpose := 8 : STORED('GLBPurpose');
 	gm := AutoStandardI.GlobalModule();									
-  Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
+        Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
 		self.DRM := gm.DataRestrictionMask;
-    self.glb_ok :=ut.glb_ok(gm.GLBPurpose);
+                self.glb_ok :=ut.glb_ok(gm.GLBPurpose);
 		self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
 		self.hasFullNCPDP:=hasFullNCPDP;
 		
@@ -27,5 +27,5 @@ export NCPDP_Batch := MACRO
 
 	results := Healthcare_Services.NCPDP_Records().getRecordsBatch(ds_batch_in_stored,cfgdata);
 	finalResults := project(results,Healthcare_Services.NCPDP_Transforms.fmtBatchResults(left,hasFullNCPDP));
-	
+	output(finalResults, named('Results'));
 	EndMacro;
