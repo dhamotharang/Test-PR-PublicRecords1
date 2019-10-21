@@ -1158,6 +1158,8 @@
 		export string KEYWORD_OFAC_EO13848					:= '844';
 		export string KEYWORD_NFSRC									:= '845';
 		export string KEYWORD_SKFSRC								:= '846';
+		export string KEYWORD_TTFIU_TTPS						:= '847';
+		export string KEYWORD_OFAC_SYR_EO						:= '848';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

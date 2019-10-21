@@ -1,4 +1,4 @@
-IMPORT PRTE, PRTE2_Neighborhood, PRTE2_Common, roxiekeybuild, ut, VersionControl, _control;
+﻿IMPORT PRTE, PRTE2_Neighborhood, PRTE2_Common, roxiekeybuild, ut, VersionControl, _control;
 
 EXPORT proc_build_keys (string filedate, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 		is_running_in_prod 			:= PRTE2_Common.Constants.is_running_in_prod;
@@ -56,12 +56,12 @@ RoxieKeyBuild.Mac_SK_Move_V2(Constants.KEY_PREFIX + '@version@::geoblk_info_geol
 move_to_qa	:=	parallel(mv_aca_QA,mv_stats_QA,mv_business_QA,mv_sexoff_QA,mv_schools_QA,mv_colleges_QA,mv_cius_QA,mv_fd_QA,mv_le_QA,mv_geodist_QA,mv_latlon_QA,mv_geoinfo_QA);
 
 //Make a copy of Prod key for prte::key::neighborhood::crime::geolink key
-copy_key	:= PRTE2_Neighborhood.proc_CopyFiles(filedate);
+copy_key	:= PRTE2_Neighborhood.Copy_Seeds(filedate);
 
 //---------- making DOPS optional and only in PROD build -------------------------------
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
-	updatedops					:=	PRTE.UpdateVersion('NeighborhoodKeys', filedate, notifyEmail,'B','N','N');
+	updatedops          := PRTE.UpdateVersion(Constants.dops_name, filedate, notifyEmail, l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
 	PerformUpdateOrNot	:= IF(doDOPS,updatedops,NoUpdate);
 
 // -- Actions
