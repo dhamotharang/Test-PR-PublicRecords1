@@ -85,7 +85,7 @@
 
     EXPORT rCivil := record
         unsigned1 Record_Type := 8;
-        unsigned6 LexID;
+        // unsigned6 LexID; not available
         string60  Name;
         string200 Address;
         string2   state_origin;
@@ -240,7 +240,6 @@
         string    Ethnicity;
         unsigned4 Last_Vote_Date;
         unsigned4 Registration_Date;
-        string    Political_Party;
         string    State_of_registration;
         string    Status;
     END;
