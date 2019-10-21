@@ -24,7 +24,7 @@ EXPORT keys := MODULE
 		FILES.File_Address_Current, 
 		 {prim_name, st, z5, prim_range, sec_range, predir, suffix}, 
 		 {phone10, listed_name, fname, mname, lname, name_suffix, dual_name_flag, 
-		 date_first_seen, listing_type, publish_code, omit_phone}, 
+		 date_first_seen, listing_type, publish_code, omit_phone, did, global_sid, record_sid}, 
 		'~prte::key::gong_address_current_' + doxie.Version_SuperKey );
 		
 	EXPORT key_gong_cn := INDEX(

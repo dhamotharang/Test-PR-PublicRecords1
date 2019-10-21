@@ -1,4 +1,4 @@
-IMPORT PRTE2_Neighborhood;
+﻿IMPORT PRTE2_Neighborhood;
 
 EXPORT Constants := MODULE
 
@@ -6,5 +6,6 @@ EXPORT Constants := MODULE
 		// EXPORT IN_PREFIX 		:= '~prte::in::neighborhood::';
 		// EXPORT BASE_PREFIX	:= '~prte::base::neighborhood::';
 		EXPORT KEY_PREFIX		:= '~prte::key::neighborhood::';
+		Export dops_name:=('NeighborhoodKeys');
 		
 END;
