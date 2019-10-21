@@ -544,6 +544,7 @@ EXPORT NE  := MODULE;
 																									corp_process_date_Invalid		    <> 0 or
 																									corp_sos_charter_nbr_Invalid    <> 0 or
 																									event_filing_cd_Invalid 			  <> 0 or
+																									corp_legal_name_Invalid 			  <> 0 or
 																									InternalField1_Invalid          <> 0 
 																									);
 																																						
@@ -553,6 +554,7 @@ EXPORT NE  := MODULE;
 																									corp_process_date_Invalid				= 0 and
 																									corp_sos_charter_nbr_Invalid 		= 0 and
 																									event_filing_cd_Invalid 				= 0 and 
+																									corp_legal_name_Invalid 			  = 0 or
 																									InternalField1_Invalid          = 0	
 																									);
    
