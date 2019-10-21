@@ -1,7 +1,8 @@
-IMPORT BIPV2;
+﻿IMPORT BIPV2, doxie;
 
 EXPORT Key_Linkids_kFetch(
-  DATASET(BIPV2.IDlayouts.l_xlink_ids) inputs, 
+  DATASET(BIPV2.IDlayouts.l_xlink_ids) inputs,
+	doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END,
   string fraud_platform,
   string1 Level = BIPV2.IDconstants.Fetch_Level_DotID, 
     // The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
@@ -11,7 +12,9 @@ EXPORT Key_Linkids_kFetch(
 
   Key := FraudShared.Key_Linkids(fraud_platform);
 
-  BIPV2.IDmacros.mac_IndexFetch(inputs, Key, out, Level);
+  BIPV2.IDmacros.mac_IndexFetch(inputs, Key, fetched, Level);
+	
+	FraudShared.Mac_Check_Access(fetched, out, mod_access);
   
   RETURN out;                                          
 
