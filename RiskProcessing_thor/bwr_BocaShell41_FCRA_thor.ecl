@@ -97,7 +97,8 @@ Batch_In := PROJECT(inds, TRANSFORM(layout_batch_in,
 	SELF.Work_Phone := LEFT.WorkPhone;
 	SELF.ip_addr := '';
 	SELF.email := left.email;
-	SELF.HistoryDateYYYYMM := LEFT.HistoryDateYYYYMM;));
+	SELF.HistoryDateYYYYMM := (unsigned)((string)LEFT.HistoryDateYYYYMM)[1..6];
+));
 
   inds_dist := DISTRIBUTE(Batch_In); //Distribute randomly
 

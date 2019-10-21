@@ -403,8 +403,12 @@
 
     dIdentities := IF(inMod.isPrimarySearchPII, dIn(isPrimaryIdentity), dIn);
 
-    dIdentitiesIesp := PROJECT(dIdentities(fname != '' OR lname != '' OR listed_name != ''), tFormat2IespIdentity(LEFT));
-    dOtherIdentitiesIesp := PROJECT(dIn(~isPrimaryIdentity AND isPrimaryPhone AND (fname != '' OR lname != '')), tFormat2IespIdentity(LEFT));
+    dIdentitiesIesp := PROJECT(SORT(dIdentities(fname != '' OR lname != '' OR listed_name != ''),
+                                    IF(PhoneOwnershipIndicator, 0, 1), IF(did != 0, 0, 1), IF(TNT = Phones.Constants.TNT.Current, 0, 1), -dt_last_seen, dt_first_seen, IF(deceased = 'N', 0, 1)),
+                                tFormat2IespIdentity(LEFT));
+    dOtherIdentitiesIesp := PROJECT(SORT(dIn(~isPrimaryIdentity AND isPrimaryPhone AND (fname != '' OR lname != '')),
+                                          IF(PhoneOwnershipIndicator, 0, 1), IF(did != 0, 0, 1), IF(TNT = Phones.Constants.TNT.Current, 0, 1), -dt_last_seen, dt_first_seen, IF(deceased = 'N', 0, 1)),
+                                    tFormat2IespIdentity(LEFT));
 
     // Primary phone section
     iesp.phonefinder.t_PhoneFinderDetailedInfo tFormat2IespPrimaryPhone(lFinal pInput) :=
@@ -552,7 +556,7 @@
       SELF.ZumigoDeviceDetails     := [];
     END;
 
-    dOtherPhonesIesp := PROJECT(SORT(dIn(~isPrimaryPhone AND ~isPrimaryIdentity AND phone != ''), acctno, -phone_score), tFormat2IespOtherPhones(LEFT));
+    dOtherPhonesIesp := PROJECT(SORT(dIn(~isPrimaryPhone AND ~isPrimaryIdentity AND phone != ''), acctno, -phone_score, -dt_last_seen, dt_first_seen), tFormat2IespOtherPhones(LEFT));
 
     // Format to final iesp layout
     iesp.phonefinder.t_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
