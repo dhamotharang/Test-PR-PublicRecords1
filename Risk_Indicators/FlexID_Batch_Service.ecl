@@ -686,7 +686,7 @@ LayoutFlexIDBatchOutExt format_out(retplus_tmx le, fs ri) := TRANSFORM
  SELF.PhoneLineDescription:=le.PhoneLineDescription;
  SELF := [];
 END;
-formedbeforeAdvo := join(ret, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
+formedbeforeAdvo := join(retplus_tmx, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
 formedWithAdvo := join(formedbeforeAdvo, with_advo, (integer)left.seq = right.seq, 
 									TRANSFORM(LayoutFlexIDBatchOutExt,
 										self.ValidElementSummaryAddressCMRA := IF(LEFT.ValidElementSummaryAddressCMRA = '1' OR RIGHT.ADVODropIndicator = 'C', '1', '0');
