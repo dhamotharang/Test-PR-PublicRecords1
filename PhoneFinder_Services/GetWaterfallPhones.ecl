@@ -177,7 +177,7 @@
     SELF.servicetype       := ri.servicetype;
     SELF.prepaid           := ri.prepaid;
     SELF.RealTimePhone_Ext := ri.RealTimePhone_Ext;
-    SELF.typeflag          := ri.typeflag;
+    SELF.typeflag          := IF(isPrimaryPhone, ri.typeflag, le.typeflag);
     SELF.phone_source      := ri.phone_source;
     SELF.dt_last_seen      := ri.dt_last_seen;
     SELF.isPrimaryPhone    := isPrimaryPhone;
