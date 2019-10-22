@@ -2,12 +2,9 @@
 
 EXPORT Spray(
 	 STRING		pversion			= ''
-	// ,STRING		pServerIP			= 'uspr-edata11.risk.regn.net'
-	,string		pServerIP			= 'bctlpedata12.risk.regn.net'
-	// ,STRING		pDirectory		= '/data/business/Database_USA/' + pversion[1..8] 
-	,string		pDirectory		=	'/data/temp/jfranzer/database_usa/'	
-	// ,STRING		pFileType			= 'LexisNexis_Exec@Home_Database*.txt'
-	,STRING		pFileType			= 'Lexis_Nexis_Exec_at_home_Jan_2019*.txt'
+	,STRING		pServerIP			= 'uspr-edata11.risk.regn.net'
+	,STRING		pDirectory		= '/data/business/Database_USA/' + pversion[1..8] 
+	,STRING		pFileType			= 'LexisNexis_Exec@Home_Database*.txt'
 	,STRING		pGroupName		= STD.System.Thorlib.Group( )
 	,BOOLEAN	pIsTesting		= FALSE
 	,BOOLEAN	pOverwrite		= FALSE
