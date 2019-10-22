@@ -61,6 +61,7 @@ RECORD
 	string12 transaction_id;
 // field 3-8: consumer id verification
 	STRING20 verfirst;
+	STRING20 vermiddle;
 	STRING20 verlast;
 	STRING65 veraddr;
 	STRING25 vercity;
@@ -76,6 +77,7 @@ RECORD
 	STRING1  verify_addr;
 	STRING1  verify_dob;
 	STRING1  valid_ssn;
+	STRING50  VerifiedEmail;
 // field 9
 	string3 NAS_Summary;
 // field 10
@@ -114,6 +116,8 @@ RECORD
 	STRING10 corrected_phone;
 	STRING9  corrected_ssn;
 	STRING65 corrected_address;
+	STRING20 corrected_dl;
+
 // field 27-28: area code split
 	STRING3  area_code_split;			
 	STRING8  area_code_split_date;
@@ -134,6 +138,7 @@ RECORD
 // field 38-54: chronological address history
 	// 38-44: current info
 	STRING20  current_fname;
+	STRING20 current_mname;
 	STRING20  current_lname;
 	STRING65  Chron_Address_1;
 	STRING25  Chron_City_1;
@@ -438,6 +443,12 @@ RECORD
 	STRING65 StreetAddress1;	//cleaned address 1
 	STRING65 StreetAddress2;  //cleaned address 2
 	STRING20 CountyName;
+	
+	 BOOLEAN  BureauDeleted:=false ;
+  BOOLEAN  ITINExpired := false;
+  BOOLEAN  IsPhoneCurrent := false;
+  STRING2 PhoneLineDescription  := '';
+  STRING2 PhoneLineType  := '';
 	
 	
 END;

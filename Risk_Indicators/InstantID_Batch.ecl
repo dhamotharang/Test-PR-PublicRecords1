@@ -908,7 +908,7 @@ isMiddleExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constant
 	SELF := [];  // default models and red flags datasets to empty
 END;
 
-formed_pre1_temp := join(ret, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
+formed_pre1_temp := join(retplus_tmx, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
 
 
 Layout_InstandID_NuGenExt minorsTransform(formed_pre1_temp l) := transform
