@@ -18,7 +18,8 @@ function
 	update_combined    :=  ingestMod.AllRecords_Notag;  
 
 	dStandardize_Addr	 :=  Database_USA.Standardize_NameAddr.fAll (update_combined);
-	dAppendIds				 :=  Database_USA.AppendIds.fAll (dStandardize_Addr); 								 
+	dAppendIds				 :=  Database_USA.AppendIds.fAll (dStandardize_Addr); 	
+	dRollup						 :=	 Database_USA.Rollup_Base (dAppendIds);
 		
 	return dAppendIds;
 	

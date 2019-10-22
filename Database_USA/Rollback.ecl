@@ -10,7 +10,8 @@ EXPORT Rollback(
 	,BOOLEAN							pIsTesting					= 	FALSE
 	,STRING								pFilter							= 	''
 	,DATASET(lay_inputs)	pInputFilenames 		= 	Database_USA.Filenames(pversion).Input.dAll_filenames 
-	,DATASET(lay_builds)	pBuildFilenames 		= 	Database_USA.Filenames(pversion).dAll_filenames
+	,DATASET(lay_builds)	pBuildFilenames 		= 	Database_USA.Filenames(pversion).dAll_filenames +
+	                                              dx_Database_USA.Names(pversion).dAll_filenames
 ) :=
 MODULE
 	

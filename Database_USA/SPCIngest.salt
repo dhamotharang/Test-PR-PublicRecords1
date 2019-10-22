@@ -4,7 +4,7 @@ FILENAME:Base
 IDFIELD:EXISTS:seleid
 RIDFIELD:record_sid:GENERATE
 SOURCEFIELD:source
-SOURCERIDFIELD: 
+SOURCERIDFIELD:dbusa_business_id+dbusa_executive_id 
 INGESTFILE:Database_USA_inputfile:NAMED(Database_USA.In_File)
 
 FIELD:dt_first_seen:TYPE(UNSIGNED4):RECORDDATE(FIRST):0,0

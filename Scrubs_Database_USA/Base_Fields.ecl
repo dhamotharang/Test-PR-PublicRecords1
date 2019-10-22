@@ -29,8 +29,8 @@ EXPORT InValidMessageFT_invalid_record_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.H
 EXPORT MakeFT_invalid_ind_frm(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_ind_frm(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['B','D','F','I',' ']);
-EXPORT InValidMessageFT_invalid_ind_frm(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('B|D|F|I| '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_ind_frm(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['B','D','F','I','P',' ']);
+EXPORT InValidMessageFT_invalid_ind_frm(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('B|D|F|I|P| '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_mandatory(SALT311.StrType s0) := FUNCTION
   RETURN  s0;

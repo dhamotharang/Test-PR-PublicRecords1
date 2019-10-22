@@ -55,7 +55,7 @@ EXPORT Standardize_NameAddr := MODULE
 		addresslayout :=	record
 			unsigned8					unique_id;								//to tie back to original record
 			string1						record_type;
-			unsigned4					address_type;							// physical or mailing
+			unsigned4					address_type;							// company (physical & mailing) and contact
 			string100					Append_Prep_Address1;
 			string50					Append_Prep_AddressLast;
 			AID.Common.xAID		Append_RawAID;		

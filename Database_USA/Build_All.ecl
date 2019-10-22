@@ -2,9 +2,12 @@
 						
 export Build_All(
 	 string															pversion
-	,string													    pDirectory			= '/data/hds_180/Database_USA/data/' + pversion[1..8]	 
-	,string															pServerIP				= 'uspr-edata11.risk.regn.net'
-	,string															pFilename				= 'LexisNexis_Exec@Home_Database*.txt'
+	// ,string													    pDirectory			= '/data/hds_180/Database_USA/data/' + pversion[1..8]	 
+	// ,string															pServerIP				= 'uspr-edata11.risk.regn.net'
+	,string													    pDirectory			=	'/data/temp/jfranzer/database_usa/'
+	,string															pServerIP				= 'bctlpedata12.risk.regn.net'
+	// ,string															pFilename				= 'LexisNexis_Exec@Home_Database*.txt'
+	,string															pFilename				= 'Lexis_Nexis_Exec_at_home_Jan_2019*.txt'
 	,string															pGroupName			= STD.System.Thorlib.Group( )
 	,boolean														pIsTesting			= false
 	,boolean														pOverwrite			= false																												

@@ -1,8 +1,8 @@
 ﻿IMPORT STD,SALT311;
 EXPORT Ingest(BOOLEAN incremental=FALSE
-, DATASET(Database_USA.Layouts.Base) 					Delta = DATASET([],Database_USA.Layouts.Base)
-, DATASET(Database_USA.Layouts.Base) 					dsBase
-, DATASET(RECORDOF(Database_USA.Layouts.Base))	infile
+, DATASET(Database_USA.Layouts.Base) 						Delta = DATASET([],Database_USA.Layouts.Base)
+, DATASET(Database_USA.Layouts.Base) 						dsBase
+, DATASET(RECORDOF(Database_USA.Layouts.Base)) 	infile
 ) := MODULE
   SHARED NullFile := DATASET([],Database_USA.Layouts.Base); // Use to replace files you wish to remove
  
@@ -117,6 +117,64 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.phy_ace_aid := ri.phy_ace_aid; // Derived(NEW)
     SELF.phy_prep_address_line1 := ri.phy_prep_address_line1; // Derived(NEW)
     SELF.phy_prep_address_line_last := ri.phy_prep_address_line_last; // Derived(NEW)
+    SELF.DB_cons_prim_range := ri.DB_cons_prim_range; // Derived(NEW)
+    SELF.DB_cons_predir := ri.DB_cons_predir; // Derived(NEW)
+    SELF.DB_cons_prim_name := ri.DB_cons_prim_name; // Derived(NEW)
+    SELF.DB_cons_addr_suffix := ri.DB_cons_addr_suffix; // Derived(NEW)
+    SELF.DB_cons_postdir := ri.DB_cons_postdir; // Derived(NEW)
+    SELF.DB_cons_unit_desig := ri.DB_cons_unit_desig; // Derived(NEW)
+    SELF.DB_cons_sec_range := ri.DB_cons_sec_range; // Derived(NEW)
+    SELF.DB_cons_p_city_name := ri.DB_cons_p_city_name; // Derived(NEW)
+    SELF.DB_cons_v_city_name := ri.DB_cons_v_city_name; // Derived(NEW)
+    SELF.DB_cons_st := ri.DB_cons_st; // Derived(NEW)
+    SELF.DB_cons_cart := ri.DB_cons_cart; // Derived(NEW)
+    SELF.DB_cons_cr_sort_sz := ri.DB_cons_cr_sort_sz; // Derived(NEW)
+    SELF.DB_cons_lot := ri.DB_cons_lot; // Derived(NEW)
+    SELF.DB_cons_lot_order := ri.DB_cons_lot_order; // Derived(NEW)
+    SELF.DB_cons_dbpc := ri.DB_cons_dbpc; // Derived(NEW)
+    SELF.DB_cons_chk_digit := ri.DB_cons_chk_digit; // Derived(NEW)
+    SELF.DB_cons_rec_type := ri.DB_cons_rec_type; // Derived(NEW)
+    SELF.DB_cons_fips_state := ri.DB_cons_fips_state; // Derived(NEW)
+    SELF.DB_cons_fips_county := ri.DB_cons_fips_county; // Derived(NEW)
+    SELF.DB_cons_geo_lat := ri.DB_cons_geo_lat; // Derived(NEW)
+    SELF.DB_cons_geo_long := ri.DB_cons_geo_long; // Derived(NEW)
+    SELF.DB_cons_msa := ri.DB_cons_msa; // Derived(NEW)
+    SELF.DB_cons_geo_blk := ri.DB_cons_geo_blk; // Derived(NEW)
+    SELF.DB_cons_geo_match := ri.DB_cons_geo_match; // Derived(NEW)
+    SELF.DB_cons_err_stat := ri.DB_cons_err_stat; // Derived(NEW)
+    SELF.DB_cons_raw_aid := ri.DB_cons_raw_aid; // Derived(NEW)
+    SELF.DB_cons_ace_aid := ri.DB_cons_ace_aid; // Derived(NEW)
+    SELF.DB_cons_prep_address_line1 := ri.DB_cons_prep_address_line1; // Derived(NEW)
+    SELF.DB_cons_prep_address_line_last := ri.DB_cons_prep_address_line_last; // Derived(NEW)		
+    SELF.mail_prim_range := ri.mail_prim_range; // Derived(NEW)
+    SELF.mail_predir := ri.mail_predir; // Derived(NEW)
+    SELF.mail_prim_name := ri.mail_prim_name; // Derived(NEW)
+    SELF.mail_addr_suffix := ri.mail_addr_suffix; // Derived(NEW)
+    SELF.mail_postdir := ri.mail_postdir; // Derived(NEW)
+    SELF.mail_unit_desig := ri.mail_unit_desig; // Derived(NEW)
+    SELF.mail_sec_range := ri.mail_sec_range; // Derived(NEW)
+    SELF.mail_p_city_name := ri.mail_p_city_name; // Derived(NEW)
+    SELF.mail_v_city_name := ri.mail_v_city_name; // Derived(NEW)
+    SELF.mail_st := ri.mail_st; // Derived(NEW)
+    SELF.mail_cart := ri.mail_cart; // Derived(NEW)
+    SELF.mail_cr_sort_sz := ri.mail_cr_sort_sz; // Derived(NEW)
+    SELF.mail_lot := ri.mail_lot; // Derived(NEW)
+    SELF.mail_lot_order := ri.mail_lot_order; // Derived(NEW)
+    SELF.mail_dbpc := ri.mail_dbpc; // Derived(NEW)
+    SELF.mail_chk_digit := ri.mail_chk_digit; // Derived(NEW)
+    SELF.mail_rec_type := ri.mail_rec_type; // Derived(NEW)
+    SELF.mail_fips_state := ri.mail_fips_state; // Derived(NEW)
+    SELF.mail_fips_county := ri.mail_fips_county; // Derived(NEW)
+    SELF.mail_geo_lat := ri.mail_geo_lat; // Derived(NEW)
+    SELF.mail_geo_long := ri.mail_geo_long; // Derived(NEW)
+    SELF.mail_msa := ri.mail_msa; // Derived(NEW)
+    SELF.mail_geo_blk := ri.mail_geo_blk; // Derived(NEW)
+    SELF.mail_geo_match := ri.mail_geo_match; // Derived(NEW)
+    SELF.mail_err_stat := ri.mail_err_stat; // Derived(NEW)
+    SELF.mail_raw_aid := ri.mail_raw_aid; // Derived(NEW)
+    SELF.mail_ace_aid := ri.mail_ace_aid; // Derived(NEW)
+    SELF.mail_prep_address_line1 := ri.mail_prep_address_line1; // Derived(NEW)
+    SELF.mail_prep_address_line_last := ri.mail_prep_address_line_last; // Derived(NEW)			
     __Tpe0 := MAP (
       le.__Tpe = 0 => ri.__Tpe,
       le.__Tpe = RecordType.Updated OR ri.__Tpe = 0 OR ri.__Tpe = le.__Tpe => le.__Tpe,
@@ -420,12 +478,18 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   EXPORT AllRecords := IF(incremental, NewRecords, PROJECT(AllRecs, NoFlagsRec));
   EXPORT AllRecords_NoTag := PROJECT(AllRecords,Database_USA.Layouts.Base); // Records in 'pure' format
  
+  // Compute field level differences
+  IOR := JOIN(OldRecords,InputSourceCounts,left.source=right.source,TRANSFORM(LEFT),LOOKUP); // Only send in old records from sources in this ingest
+  Fields.MAC_CountDifferencesByPivot(NewRecords,IOR,((SALT311.StrType)source+'|'+(SALT311.StrType)dbusa_business_id+dbusa_executive_id),BadPivs,DC)
+  EXPORT FieldChangeStats := DC;
+  SHARED S4 := OUTPUT(FieldChangeStats,ALL,NAMED('FieldChangeStats'));
+ 
 f := TABLE(dsBase,{record_sid}) : GLOBAL;
 rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,record_sid);
 DuplicateRids0 := COUNT(dsBase) - SUM(rcid_clusters,NumberOfClusters); // Should be zero
 d := DATASET([{DuplicateRids0}],{UNSIGNED2 DuplicateRids0});
 EXPORT ValidityStats := OUTPUT(d,NAMED('ValidityStatistics'));
-  EXPORT DoStats := PARALLEL(S0,S1,S2,S3);
+  EXPORT DoStats := PARALLEL(S0,S1,S2,S3,S4);
  
   EXPORT StandardStats(BOOLEAN doInfileOverallCnt = TRUE, BOOLEAN doStatusOverallCnt = TRUE, BOOLEAN doInfilePerSrcCnt = TRUE, BOOLEAN doStatusPerSrcCnt = TRUE) := FUNCTION
     myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;

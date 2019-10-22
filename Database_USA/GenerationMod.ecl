@@ -44,7 +44,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'IDFIELD:EXISTS:seleid\n'
     + 'RIDFIELD:record_sid:GENERATE\n'
     + 'SOURCEFIELD:source\n'
-    + 'SOURCERIDFIELD: \n'
+    + 'SOURCERIDFIELD:dbusa_business_id+dbusa_executive_id \n'
     + 'INGESTFILE:Database_USA_inputfile:NAMED(Database_USA.In_File)\n'
     + '\n'
     + 'FIELD:dt_first_seen:TYPE(UNSIGNED4):RECORDDATE(FIRST):0,0\n'
