@@ -31,6 +31,7 @@
         unsigned1 Type;
         unsigned6 LexID1;
         unsigned6 LexID2;
+        string1   Association;
     END;
     
     EXPORT rBankruptcy := record
