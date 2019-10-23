@@ -13,7 +13,7 @@ BKMainDS :=	dataset('~thor_data400::base::bankruptcy::main_v3',bankruptcyV2.Layo
 f_search := distribute(BKSearchDS(case_number[1..3] <> '449'),hash(case_number,court_code));
 f_main   := distribute(BKMainDS(case_number[1..3] <> '449'),hash(case_number,court_code));
     
-layouts.bankruptcy JoinSearch_W_Main(f_search L, f_main R) := transform
+D2C_Customers.layouts.rBankruptcy JoinSearch_W_Main(f_search L, f_main R) := transform
     self.LexID              := (unsigned6)L.did;    
     self.Debtor_Name        := if(L.name_type = 'D', L.orig_name, '');
     self.Filing_Address     := L.orig_addr1	+ ' ' + L.orig_addr2;

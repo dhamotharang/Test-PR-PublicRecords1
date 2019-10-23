@@ -2,13 +2,13 @@
 
 /********* CIVIL_CRIMINAL_RECORDS **********/
 
-Wdog := distribute(Watchdog.File_Best_nonglb(adl_ind = 'CORE'), hash(did));
-crims := doxie_files.File_Offenders((unsigned6)did > 0, data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
+Wdog   := distribute(Watchdog.File_Best_nonglb(adl_ind = 'CORE'), hash(did));
+crims  := doxie_files.File_Offenders((unsigned6)did > 0, data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
 courts := doxie_files.file_court_offenses(data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
 
 EXPORT proc_build_criminals(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   layouts.crims AddCourt(crims L, courts R) := transform
+   D2C_Customers.layouts.rCrims AddCourt(crims L, courts R) := transform
     self.LexID             := (unsigned6)L.did;
     self.Name              := L.fname + ' ' + L.mname + ' ' + L.lname;
     self.Address           := L.prim_range + ' ' + L.predir + ' ' + L.prim_name + ' ' + L.addr_suffix + ' ' + L.postdir + ', '
@@ -20,7 +20,6 @@ EXPORT proc_build_criminals(unsigned1 mode, string8 ver, string20 customer_name)
     self.Case_Number       := L.Case_Num;
     self.Doc_Number        := L.Doc_Num;
     self.Fbi_Number        := L.Fbi_Num;
-    self.Ncic_Number       := '';
     self.Arresting_Agency  := R.sent_agency_rec_cust;
     self.Arrest_Type       := R.arr_off_desc_1;
     self.Court_Description := R.court_desc;

@@ -2,7 +2,7 @@
 
 /********* ADDRESS_HISTORY **********/
 
-layouts.address_hist xf(header.Layout_Header L) := transform
+D2C_Customers.layouts.rAddressHist xf(header.Layout_Header L) := transform
     self.LexID         := L.did;
     self.Address       := L.prim_range + ' ' + L.predir + ' ' + L.prim_name + ' ' + L.suffix + ' ' + L.postdir + ', '
                         + L.unit_desig + ' ' + L.sec_range + if(L.unit_desig <> '' or L.sec_range <> '', ', ', '')
@@ -13,9 +13,9 @@ end;
      
 EXPORT proc_build_addresses(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   ds := map( mode = 1 => Files.FullHdrDS,            //FULL
-              mode = 2 => Files.coreHdrDS,            //QUARTERLY
-              mode = 3 => Files.coreHdrDerogatoryDS   //MONTHLY              
+   ds := map( mode = 1 => D2C_Customers.Files.FullHdrDS,            //FULL
+              mode = 2 => D2C_Customers.Files.coreHdrDS,            //QUARTERLY
+              mode = 3 => D2C_Customers.Files.coreHdrDerogatoryDS   //MONTHLY              
             );
    
    sMode := map(Mode = 1 => 'full',

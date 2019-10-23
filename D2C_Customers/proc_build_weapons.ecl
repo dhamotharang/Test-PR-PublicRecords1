@@ -7,7 +7,7 @@ cw := eMerges.file_ccw_base((unsigned6)did_out > 0, Source_Code not in D2C.Const
 
 EXPORT proc_build_weapons(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   ds := project(cw, transform(layouts.cwp,
+   ds := project(cw, transform(D2C_Customers.layouts.rCWP,
             self.LexID             := (unsigned6)left.did_out;
             self.Name              := left.fname_in + ' ' + left.mname_in + ' ' + left.lname_in;
             self.Address           := left.prim_range + ' ' + left.predir + ' ' + left.prim_name + ' ' + left.suffix + ' ' + left.postdir + ', '

@@ -8,7 +8,7 @@ party := UCCV2.File_UCC_Party_Base(did > 0);
 
 EXPORT proc_build_ucc(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   layouts.ucc CombineMain_Party(party L, main R) := transform
+   D2C_Customers.layouts.rUCC CombineMain_Party(party L, main R) := transform
         self.LexID                 := (unsigned6)L.did;
         self.Debtor                := if(L.party_type	= 'D', L.fname + ' ' + L.mname + ' ' + L.lname,'');
         self.Address               := if(L.party_type	= 'D', L.orig_address1 + ', ' + if(L.orig_address1 <> '', L.orig_address2 + ', ', '') + L.orig_city + ', ' + L.orig_state + ' ' + L.orig_zip5,'');
