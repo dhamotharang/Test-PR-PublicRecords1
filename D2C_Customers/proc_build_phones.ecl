@@ -11,7 +11,7 @@ ph := _keybuild_phonesplus_base(vendor not in D2C.Constants.PhonesPlusV2Restrict
 
 EXPORT proc_build_phones(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   ds := project(ph, transform(layouts.phones,
+   ds := project(ph, transform(D2C_Customers.layouts.rPhones,
             self.LexID         := (unsigned6)left.did;
             self.Name          := left.fname + ' ' + left.mname + ' ' + left.lname;
             self.Address       := left.prim_range + ' ' + left.predir + ' ' + left.prim_name + ' ' + left.addr_suffix + ' ' + left.postdir + ', '

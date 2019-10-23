@@ -9,7 +9,7 @@ vo	:=	dataset('~thor_data400::base::voters_reg',Layout_in,flat)(did > 0);
 
 EXPORT proc_build_voters(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   ds := project(vo, transform(layouts.voter_registration,
+   ds := project(vo, transform(D2C_Customers.layouts.rVoter_Registration,
             self.LexID            := (unsigned6)left.did;
             self.Name             := left.first_name + ' ' + left.middle_name + ' ' + left.last_name;
             self.Resident_Address := left.res_addr1 + ', ' + left.res_addr1 + if(left.res_addr1 <> '', ', ','') + left.res_city + ', ' + left.res_state + ' ' + left.res_zip;

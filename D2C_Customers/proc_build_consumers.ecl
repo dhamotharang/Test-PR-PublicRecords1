@@ -9,7 +9,7 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
               mode = 3 => Files.coreInfutorDerogatoryDS   //MONTHLY
               );
 
-   ds_p := project(ds, transform(layouts.consumers,
+   ds_p := project(ds, transform(D2C_Customers.layouts.rConsumers,
             self.LexID         := left.did;
             self.Best_Name     := left.fname + ' ' + left.mname + ' ' + left.lname;
             self.Best_Address  := left.prim_range + ' ' + left.predir + ' ' + left.prim_name + ' ' + left.suffix + ' ' + left.postdir + ', '
