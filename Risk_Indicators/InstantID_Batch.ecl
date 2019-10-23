@@ -430,7 +430,7 @@ fs := project(f, into_seq(LEFT,COUNTER));
 
 // JRP 02/12/2008 - Dataset of actioncode and reasoncode settings which are passed to the getactioncodes and reasoncodes functions.
 boolean IsInstantID := true;
-reasoncode_settings := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, '', ischase}],riskwise.layouts.reasoncode_settings);
+reasoncode_settings := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID,false, ischase,false,false,false,includeemailverification}],riskwise.layouts.reasoncode_settings);
 actioncode_settings := dataset([{IsPOBoxCompliant, IsInstantID}],riskwise.layouts.actioncode_settings);
 
 
@@ -811,8 +811,7 @@ isMiddleExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constant
 							isCodeDI AND (INTEGER)cvi_temp > 10 => '10',
 							cvi_temp);
 	
-	
-  SELF.verdl := le.verified_dl;
+	 SELF.verdl := if(IncludeDLverification,le.verified_dl,'');
   SELF.corrected_dl:= IF(self.verdl <>le.dl_number,le.verified_dl,'');
   SELF.VerifiedEmail:= IF(IncludeEmailverification,le.VerifiedEmail,'');
 		
@@ -845,7 +844,7 @@ isMiddleExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constant
 	risk_indicators.mac_add_sequence(le.watchlists, watchlists_with_seq);
 	self.watchlists := watchlists_with_seq;
 	
-	reasoncode_settings_chase := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, '', ischase, isFirstExpressionFound, isLastExpressionFound, isAddrExpressionFound}],riskwise.layouts.reasoncode_settings);
+	reasoncode_settings_chase := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID,false, ischase, isFirstExpressionFound, isLastExpressionFound, isAddrExpressionFound,includeemailverification}],riskwise.layouts.reasoncode_settings);
 
 	// add a sequence number to the reason codes for sorting in XML
 	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings), original_reasons_with_seq);
