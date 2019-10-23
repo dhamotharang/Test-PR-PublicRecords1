@@ -158,15 +158,19 @@
                                     PhoneFinder_Services.GetQSentPhones.GetQSentPVSData(dPrimaryPhones,
                                                                                         inMod, phone, acctno,
                                                                                         TRUE, qSentGateway));
+  // dPrimaryPhones + dPrimaryPhoneDetail - Primary phones including Qsent if no Waterfall phones found
+  // dWFQSentOtherPhones - If no phones found in waterfall, Qsent other phones
+  // dWFQSentMatches - If phones found in waterfall, all Qsent phones other than Primary
+  dOtherPhones := dWaterfallOtherPhones + dWFQSentOtherPhones + dWFQSentMatches;
 
-  dInhouseMetadataPhones := dWaterfallAssignPrimary + dWFQSentOnly;
+  dInhouseMetadataPhones := dPrimaryPhones + dOtherPhones;
 
   dInhousePhoneDetail	:= IF(EXISTS(dInhouseMetadataPhones),
                             PhoneFinder_Services.GetPhoneDetails(PROJECT(dInhouseMetadataPhones,
                                                                           TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
                                                                                       SELF.acctno:= LEFT.acctno, SELF.phoneno:= LEFT.phone, SELF:= [])),
                                                                   dGateways, inMod));
-
+ 
   lFinal tAppendCarrierInfo (lFinal le, lFinal ri, BOOLEAN isPrimaryPhone) :=
   TRANSFORM
     SELF.carrier_name      := ri.carrier_name;
@@ -190,12 +194,7 @@
                                       tAppendCarrierInfo(LEFT, RIGHT, TRUE),
                                       LIMIT(0), KEEP(1));
 
-  // dPrimaryPhones + dPrimaryPhoneDetail - Primary phones including Qsent if no Waterfall phones found
-  // dWFQSentOtherPhones - If no phones found in waterfall, Qsent other phones
-  // dWFQSentMatches - If phones found in waterfall, all Qsent phones other than Primary
-  dAllOtherPhones := dWaterfallOtherPhones + dWFQSentOtherPhones + dWFQSentMatches;
-
-  dOtherPhonesInHouseDetail := JOIN(dAllOtherPhones, dInhousePhoneDetail,
+  dOtherPhonesInHouseDetail := JOIN(dOtherPhones, dInhousePhoneDetail,
                                     LEFT.acctno = RIGHT.acctno AND
                                     LEFT.phone  = RIGHT.phone,
                                     tAppendCarrierInfo(LEFT, RIGHT, FALSE),
