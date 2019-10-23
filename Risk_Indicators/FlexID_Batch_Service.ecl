@@ -413,7 +413,7 @@ unsigned8 BSOptions := 	if(doInquiries, risk_indicators.iid_constants.BSOptions.
                   if(enableEquifaxPhoneMart,Risk_indicators.iid_constants.BSOptions.enableEquifaxPhoneMart,0);
 // JRP 02/12/2008 - Dataset of actioncode and reasoncode settings which are passed to the getactioncodes and reasoncodes functions.
 boolean IsInstantID := true;
-reasoncode_settings := dataset([{IsInstantID,actualIIDVersion,EnableEmergingID}],riskwise.layouts.reasoncode_settings);
+reasoncode_settings := dataset([{IsInstantID,actualIIDVersion,EnableEmergingID,false,false,false,false,false,includeemailverification}],riskwise.layouts.reasoncode_settings);
 
 
 gateways_in := Gateway.Configuration.Get();
