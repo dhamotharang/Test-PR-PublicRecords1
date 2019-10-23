@@ -1,35 +1,42 @@
-﻿import doxie_build, mdr, d2c, Watchdog, Infutor, SexOffender, doxie_files, BankruptcyV2, LiensV2;
+﻿import doxie_build, mdr, d2c, Watchdog, Infutor, SexOffender, doxie_files, BankruptcyV2, LiensV2, header, death_master;
 
 EXPORT Files := MODULE
 
-    shared Wdog := Watchdog.File_Best_nonglb;
-    shared inf  := Infutor.file_infutor_best;
-    shared hdr := doxie_build.file_header_building(~MDR.sourceTools.SourceIsGLB(src), ~MDR.sourceTools.SourceIsDPPA(src), did > 0);//, src not in D2C.Constants.PersonHeaderRestrictedSources); 
+    death := Header.File_DID_Death_MasterV2 ((integer)did <>0 and state_death_id=death_master.fn_fake_state_death_id(ssn,lname,dod8)) ; 
+    //crlf='SA' flags Direct records where the SSN was overlaid w/ one from the SSA
+    dist_death := distribute(death(crlf<>'SA'), hash(did));
+    shared dsDeath := dedup(sort(dist_death, did, -filedate, local), did, filedate, local);
+ 
+    EXPORT coresDS := Header.key_ADL_segmentation(ind1 = 'CORE');
+    shared inf     := Infutor.file_infutor_best;
+    shared hdr     := Infutor.infutor_header;
     
     EXPORT FullInfutorDS := join(
       distribute(inf, hash(did)),
-      distribute(Wdog, hash(did)),
-      left.did = right.did,
-      transform({inf, unsigned4 Date_of_Death}, self.Date_of_Death := (unsigned4)right.dod; self := left;),
+      distribute(dsDeath, hash((unsigned6)did)),
+      left.did = (unsigned6)right.did,
+      transform({inf, unsigned4 Date_of_Death}, self.Date_of_Death := (unsigned4)right.dod8; self := left;),
       local);
     
-    EXPORT FullHdrDS := join(
-      distribute(hdr, hash(did)),
-      distribute(Wdog, hash(did)),
+    EXPORT FullHdrDS := hdr;
+
+    shared core_and_infutor := join(
+      distribute(inf, hash(did)),
+      distribute(coresDS, hash(did)),  // CORE - 248,957,730
       left.did = right.did,
       transform(left),
       local);
-      
+
     EXPORT coreInfutorDS := join(
-      distribute(inf, hash(did)),
-      distribute(Wdog(adl_ind = 'CORE'), hash(did)),  // CORE - 248,957,730
-      left.did = right.did,
-      transform({inf, unsigned4 Date_of_Death}, self.Date_of_Death := (unsigned4)right.dod; self := left;),
+      distribute(core_and_infutor, hash(did)),
+      distribute(dsDeath, hash((unsigned6)did)),
+      left.did = (unsigned6)right.did,
+      transform({core_and_infutor, unsigned4 Date_of_Death}, self.Date_of_Death := (unsigned4)right.dod8; self := left;),
       local);
    
     EXPORT coreHdrDS := join(
       distribute(hdr, hash(did)),
-      distribute(Wdog(adl_ind = 'CORE'), hash(did)),  // CORE - 248,957,730
+      distribute(coresDS, hash(did)),  // CORE - 248,957,730
       left.did = right.did,
       transform(left),
       local);
