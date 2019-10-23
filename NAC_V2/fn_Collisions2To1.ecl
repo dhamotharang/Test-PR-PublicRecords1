@@ -1,8 +1,8 @@
 ﻿IMPORT NAC, Std;
 
 nac.Layouts.Collisions x2To1(NAC_V2.Layout_Collisions2.Layout_Collisions c2, integer n) := TRANSFORM
-					self.SearchBenefitMonth := c2.StartDate[1..6];
-					self.CaseBenefitMonth := c2.CaseStartDate[1..6];
+					self.SearchBenefitMonth := c2.EndDate[1..6];
+					self.CaseBenefitMonth := c2.CaseEndDate[1..6];
 					self.ClientEligibleStatusIndicator := c2.ClientEligibilityStatus;
 					self := c2;
 					self := [];
