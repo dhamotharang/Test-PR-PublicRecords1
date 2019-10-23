@@ -67,7 +67,7 @@ rCounty_Names cnty(ds_MS_RealEstate L, county_names R) := TRANSFORM
   ut.CleanFields(ValidMSFile,clnValidMSFile);
 
 	//MS Real Estate layout to Common
-	Prof_License_Mari.layouts.base transformToCommon(rCounty_Names L) := TRANSFORM
+	Prof_License_Mari.layout_base_in transformToCommon(rCounty_Names L) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -254,14 +254,17 @@ rCounty_Names cnty(ds_MS_RealEstate L, county_names R) := TRANSFORM
 																tmpFirstLicDate);
 		SELF.ORIG_ISSUE_DTE		:= IF(TRIM(L.FIRST_LIC_DATE) = ' ','17530101',
 																Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(tmpFirstLicDate1));
-		SELF.CURR_ISSUE_DTE		:= '17530101';
-		tmpExpireDate			  	:= REGEXFIND('([0-9/]+)[ |$]',L.EXP_DATE,1);
-		tmpExpireDate1		  	:= IF(LENGTH(REGEXFIND('[0-9]+/[0-9]+/([0-9]+)',tmpExpireDate,1))=2,
-																Prof_License_Mari.DateCleaner.fix_date(tmpExpireDate,'/'),
-																tmpExpireDate);											
+
+		tempCurIssueDt      	:= prof_license_mari.DateCleaner.ToYYYYMMDD(L.EFF_DATE);
+		SELF.CURR_ISSUE_DTE 	:= IF(TRIM(L.EFF_DATE) = ' ','17530101',(STRING) tempCurIssueDt);
+		
+		// tmpExpireDate			  	:= REGEXFIND('([0-9/]+)[ |$]',L.EXP_DATE,1);
+		tmpExpireDate		  	:= IF(REGEXFIND('[0-9/]( )[:]',TRIM(L.EXP_DATE)),
+																REGEXFIND('[0-9/]( )[:]',TRIM(L.EXP_DATE),1),
+																TRIM(L.EXP_DATE));											
 																
 		SELF.EXPIRE_DTE				:= IF(TRIM(L.EXP_DATE) = '','17530101',
-																Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(tmpExpireDate1));
+																Prof_License_Mari.DateCleaner.ToYYYYMMDD(tmpExpireDate));
 		tmpInactiveDate				:= REGEXFIND('([0-9/]+)[ |$]',L.RENEW_DATE,1);
 		tmpInactiveDate1			:= IF(LENGTH(REGEXFIND('[0-9]+/[0-9]+/([0-9]+)',tmpInactiveDate,1))=2,
 																Prof_License_Mari.DateCleaner.fix_date(tmpInactiveDate,'/'),
@@ -421,7 +424,7 @@ rCounty_Names cnty(ds_MS_RealEstate L, county_names R) := TRANSFORM
   ds_map_deduped:= DEDUP(ds_map_sorted,RECORD,ALL,LOCAL);
 
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map_deduped L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_deduped L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -430,7 +433,7 @@ rCounty_Names cnty(ds_MS_RealEstate L, county_names R) := TRANSFORM
 																LEFT.STD_SOURCE_UPD=RIGHT.source_upd AND RIGHT.fld_name='LIC_TYPE' AND STD.Str.ToUpperCase(TRIM(LEFT.STD_LICENSE_TYPE,LEFT,RIGHT))=TRIM(RIGHT.fld_value,LEFT,RIGHT),
 																			trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
-	Prof_License_Mari.layouts.base trans_status_trans(ds_map_lic_trans L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_status_trans(ds_map_lic_trans L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;

@@ -1,4 +1,4 @@
-// THIS MODULE CAN BE EXPANDED BY ADDING FUNCTIONALITIES WHEN NEW
+﻿// THIS MODULE CAN BE EXPANDED BY ADDING FUNCTIONALITIES WHEN NEW
 // PACKAGE ID TYPES ARE INTRODUCED INTO THE ROXIE PACKAGE FILE
 EXPORT add(string clustername = '') := module
 	////////////////////////////////////////////////////////////////////////
@@ -11,7 +11,9 @@ EXPORT add(string clustername = '') := module
 	////////////////////////////////////////////////////////////////////////
 	export SFiles(dataset(layouts.flat_layouts.FileRecord) File_DS, string pkgfileversion = WORKUNIT[2..]) := function
 		// Existing package - flat file 
-		PKG_DS := pkgfile.files('flat',clustername).getflatpackage;
+		KEY_DS := pkgfile.files('flat',clustername).getflatpackage(pkgcode = 'K');
+		NONKEY_DS := pkgfile.files('flat',clustername).getflatpackage(pkgcode <> 'K');
+		PKG_DS_CheckTil := KEY_DS;
 		// Take care of '~'
 		layouts.flat_layouts.FileRecord PrefixTild(File_DS l) := transform
 			self.superfile := '~'+regexreplace('~',l.superfile,'');
@@ -19,50 +21,53 @@ EXPORT add(string clustername = '') := module
 			self := l;
 		end;
 		
-		FilePrefixed := project(File_DS,PrefixTild(left));
-		// Superfiles that requires full replacement
-		FullReplaceRecs := FilePrefixed(isfullreplace);
-		// Subfiles that requires full replacement
-		AppendRecs := FilePrefixed(isdeltareplace);
-		
-		// Remove the new full replacement records from existing package
-		layouts.flat_layouts.packageid RemoveNew(PKG_DS l,FilePrefixed r) := transform
+		pkgfile.layouts.flat_layouts.packageid fullprefixtild(PKG_DS_CheckTil l) := transform
+			self.superfileid := '~'+regexreplace('~',l.superfileid,'');
+			self.subfilevalue := '~'+regexreplace('~',l.subfilevalue,'');
 			self := l;
 		end;
 		
-		NewRemoved := join(PKG_DS,FilePrefixed,stringlib.StringToUpperCase(left.id) = stringlib.StringToUpperCase(right.packageid) and
+		FilePrefixed := project(File_DS,PrefixTild(left));
+		PKG_DS := project(PKG_DS_CheckTil,fullprefixtild(left));
+		// full or delta replacement records
+		FullReplaceRecs := FilePrefixed(isfullreplace or isdeltareplace);
+		// delta update or delta replacement records
+		AppendRecs := FilePrefixed(~isfullreplace);
+		
+		// Remove the new full/delta replacement records from existing package
+		layouts.flat_layouts.packageid RemoveNew(PKG_DS l,FullReplaceRecs r) := transform
+			// (l.superfileid = r.superfile and (~l.isfullreplace and r.isdeltareplace) - will take care of delta replace
+			// (l.superfileid = r.superfile and r.isfullreplace) - will take care of full replace
+			// both will removed
+			self.subfilevalue := if ((l.superfileid = r.superfile and (~l.isfullreplace and r.isdeltareplace))
+																	or (l.superfileid = r.superfile and r.isfullreplace)
+																	,''
+																	,l.subfilevalue
+																	);
+			self := l;
+		end;
+		
+		NewRemoved := join(PKG_DS,FullReplaceRecs,stringlib.StringToUpperCase(left.id) = stringlib.StringToUpperCase(right.packageid) and
 																						stringlib.StringToUpperCase(left.superfileid) = stringlib.StringToUpperCase(right.superfile),
 																						RemoveNew(left,right),
-																						left only,
-																						lookup);
-		// handle new records
-		layouts.flat_layouts.packageid xNewRecords(PKG_DS l,FilePrefixed r) := transform
-			
-			self.subfilevalue := if ((r.isdeltareplace and ~l.isfullreplace) or r.isfullreplace 
-																	or (l.superfileid = r.superfile and l.subfilevalue = r.subfile), '', l.subfilevalue);
+																						left outer,
+																						lookup)(subfilevalue <> '');
+		
+		// handle new delta records if any
+		layouts.flat_layouts.packageid xNewRecords(PKG_DS l,AppendRecs r) := transform
+			// (l.superfileid = r.superfile and l.subfilevalue = r.subfile) - remove the record from result if both super/sub are same between
+							// package file and new request
+			self.subfilevalue := if ((l.superfileid = r.superfile and l.subfilevalue = r.subfile), '', r.subfile);
+			self.isfullreplace := r.isfullreplace;
 			self := l;
 		end;
 		
-		dNewRecords := join(PKG_DS,FilePrefixed,stringlib.StringToUpperCase(left.id) = stringlib.StringToUpperCase(right.packageid) and
+		dNewRecords := dedup(sort(join(PKG_DS,AppendRecs,stringlib.StringToUpperCase(left.id) = stringlib.StringToUpperCase(right.packageid) and
 																						stringlib.StringToUpperCase(left.superfileid) = stringlib.StringToUpperCase(right.superfile),
-																						xNewRecords(left,right),
-																						lookup);
+																						xNewRecords(left,right))(subfilevalue <> ''),id,superfileid,subfilevalue), record, except whenupdated);
 		
-		// Remove the new non full replacement records from existing package
-		// layouts.flat_layouts.packageid RemoveExisting(NewRemoved l,AppendRecs r) := transform
-			// self.subfilevalue := if (r.isdeltareplace,'',l.subfilevalue);
-			// self := l;
-		// end;
-		
-		// RemovedAllNew := join(NewRemoved,AppendRecs,stringlib.StringToUpperCase(left.id) = stringlib.StringToUpperCase(right.packageid) and
-																						// stringlib.StringToUpperCase(left.superfileid) = stringlib.StringToUpperCase(right.superfile) and
-																						// stringlib.StringToUpperCase(left.subfilevalue) = stringlib.StringToUpperCase(right.subfile),
-																						// RemoveExisting(left,right),
-																						// left only,
-																						// lookup);
-		
-		// Convert New records of Package Layout
-		layouts.flat_layouts.packageid ConvertNew(FilePrefixed l) := transform
+		// Convert New records that are full replace of Package Layout
+		layouts.flat_layouts.packageid ConvertNew(FullReplaceRecs l) := transform
 			self.pkgcode := 'K';
 			self.id := l.packageid;
 			self.superfileid := l.superfile;
@@ -73,9 +78,9 @@ EXPORT add(string clustername = '') := module
 			self := [];
 		end;
 		
-		NewConverted := project(FilePrefixed,ConvertNew(left));
+		NewConverted := project(FullReplaceRecs(isfullreplace),ConvertNew(left));
 		
-		ADD_DS := NewRemoved + dNewRecords(subfilevalue <> '') + NewConverted;
+		ADD_DS := sort(NewRemoved + dNewRecords + NewConverted + NONKEY_DS,id,superfileid,-isfullreplace,subfilevalue);
 
 		// Promote to Package Super File
 		

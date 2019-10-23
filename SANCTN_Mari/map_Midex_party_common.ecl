@@ -1,4 +1,4 @@
-//The purpose of this process will be to map the Non-Public and FreddieMac common layout
+﻿//The purpose of this process will be to map the Non-Public and FreddieMac common layout
 //party data to the Sanction party dataset
 
 IMPORT SANCTN_Mari, Ut, Address, Lib_FileServices, lib_stringlib,std;
@@ -53,7 +53,14 @@ SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_base clnPartyToCommon(Layout_Part
 		self.PHONE						:= trim(input.PHONE);
 		self.AKANAME					:= trim(STD.Str.ToUpperCase(input.AKANAME));
 		self.DBANAME					:= trim(STD.Str.ToUpperCase(input.DBANAME));
+
+		//CCPA-97 Initialize new fields
+		self.date_vendor_first_reported := '';
+		self.date_vendor_last_reported 	:= '';
+		self.global_sid											 	:= 0;
+		self.record_sid											 	:= 0;
 		self := input;
+
 		// self := [];
 END;
 

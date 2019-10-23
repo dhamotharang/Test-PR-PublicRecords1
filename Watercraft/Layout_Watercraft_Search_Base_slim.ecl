@@ -1,4 +1,4 @@
-export Layout_Watercraft_Search_Base_slim
+﻿export Layout_Watercraft_Search_Base_slim
  :=
   record
 	string8		date_first_seen;
@@ -75,5 +75,7 @@ export Layout_Watercraft_Search_Base_slim
 	unsigned8 RawAID:=0;
 	string100 Reg_Owner_Name_2:=''; 
 	unsigned8 persistent_record_id := 0; 
-  end
- ;
+	//CCPA-206 Add 2 CCPA fields
+	UNSIGNED4	global_sid:=0;
+	UNSIGNED8	record_sid:=0;
+end;

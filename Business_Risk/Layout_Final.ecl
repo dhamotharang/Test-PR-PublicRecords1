@@ -1,4 +1,4 @@
-import risk_indicators;
+﻿import risk_indicators;
 
 export Layout_Final := record
      string12 		bdid := '';
@@ -163,7 +163,7 @@ export Layout_Final := record
 	/* ----- DONE -------- */
 	STRING60 		watchlist_table 	:= '';
 	STRING10 		watchlist_record_number := '';
-	STRING120	 	watchlist_cmpy 	:= '';
+	UNICODE120	 	watchlist_cmpy 	:= '';
 	STRING50 		watchlist_address 	:= '';
 	STRING30 		watchlist_city 	:= '';
 	STRING2 		watchlist_state 	:= '';
@@ -227,8 +227,8 @@ export Layout_Final := record
 	/* ------ Done ---------*/
 	STRING60 		RepWatchlist_table 			:= '';
 	STRING10 		RepWatchlist_record_number 	:= '';
-	STRING20	 	RepWatchlist_lname 			:= '';
-	STRING20	 	RepWatchlist_fname 			:= '';
+	UNICODE20	 	RepWatchlist_lname 			:= '';
+	UNICODE20	 	RepWatchlist_fname 			:= '';
 	STRING50 		RepWatchlist_address 		:= '';
 	STRING30 		RepWatchlist_city 			:= '';
 	STRING2 		RepWatchlist_state 			:= '';

@@ -1,4 +1,4 @@
-import FBNv2,_validate,ut, address;
+﻿import FBNv2,_validate,ut, address, data_services;
 Fbn_hist_in:=Cleaned_FBN_CP_HIST_Bdid;
         reformatDate(string rDate) := function
 			string8 newDate := rDate[5..]+rDate[1..2]+rDate[3..4];	
@@ -37,28 +37,6 @@ trimUpper(string s) := function
 			self.BUS_PHONE_NUM              :=if((integer)pInput.bus_phone <> 0,trim(pInput.bus_phone,left,right),'');
 			self.fips_state 				:= pinput.Bus_fips_state	;
 			self.fips_county 				:= pinput.Bus_fips_county	;
-/*
-			self.prim_range 				:= pinput.Bus_prim_range	;
-			self.predir 					:= pinput.Bus_predir	;
-			self.prim_name 					:= pinput.Bus_prim_name	;
-			self.addr_suffix				:= pinput.Bus_addr_suffix	;
-			self.postdir 					:= pinput.Bus_postdir	;
-			self.unit_desig 				:= pinput.Bus_unit_desig	;
-			self.sec_range 					:= pinput.Bus_sec_range	;
-			self.v_city_name 				:= pinput.Bus_v_city_name	;
-			self.st 						:= pinput.Bus_st	;
-			self.zip5 						:= pinput.Bus_zip5	;
-			self.zip4 						:= pinput.Bus_zip4	;
-			self.addr_rec_type				:= pinput.Bus_addr_rec_type	;
-			self.fips_state 				:= pinput.Bus_fips_state	;
-			self.fips_county 				:= pinput.Bus_fips_county	;
-			self.geo_lat 					:= pinput.Bus_geo_lat	;
-			self.geo_long 					:= pinput.Bus_geo_long	;
-			self.cbsa						:= pinput.Bus_cbsa	;
-			self.geo_blk 					:= pinput.Bus_geo_blk	;
-			self.geo_match 					:= pinput.Bus_geo_match	;
-			self.err_stat 					:= pinput.Bus_err_stat	;
-*/
 			self.prep_addr_line1		 := address.Addr1FromComponents(
 																					stringlib.stringtouppercase(trim(pinput.ADDR_1,left,right))
 																					,stringlib.stringtouppercase(trim(pinput.ADDR_2,left,right))
@@ -86,7 +64,7 @@ trimUpper(string s) := function
 			string1 lf;
 		END;
 		
-		fips_to_countyTable := dataset('~thor_data400::in::fips_to_counties',fips_to_countyLayout,flat);
+		fips_to_countyTable := dataset(data_services.foreign_prod + 'thor_data400::in::fips_to_counties',fips_to_countyLayout,flat);
 		
 		FBNv2.layout_common.Business_AID   findCountyName(Hist_Business l, fips_to_countyTable r) := transform
 		fips_county1 := L.fips_county;

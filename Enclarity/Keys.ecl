@@ -1,4 +1,4 @@
-import doxie, tools;
+﻿import doxie, tools;
 
 export Keys(string		pversion							= '',boolean pUseProd = false) := module
 
@@ -6,12 +6,25 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	shared fac_Base_gk							:= facility_Base(group_key <> '');
 	shared fac_Base_ak							:= facility_Base(addr_key <> '');
 
-	shared individual_Base					:= Files(pversion,pUseProd).individual_Base.Built;
+	shared revised_ind_layout	:= record
+		Enclarity.Layouts.individual_base - 
+				[xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];
+	end;
+	
+	shared individual_Base					:= project(Files(pversion,pUseProd).individual_Base.Built, revised_ind_layout);
 	shared ind_Base_gk							:= individual_Base(group_key <> '');
 	shared ind_Base_lnpid						:= individual_Base(lnpid > 0);
 
-	shared associate_Base						:= Files(pversion,pUseProd).associate_Base.Built;
-	shared assoc_Base_gk						:= associate_Base(group_key <> '');
+	shared revised_assoc_layout	:= record
+		Enclarity.Layouts.associate_base - 
+				[xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];
+	end;
+
+	shared associate_Base0					:= project(Files(pversion,pUseProd).associate_Base.Built, revised_assoc_layout):persist('~thor_data400::persist::enclarity::associate_mod_layout');												
+	shared associate_base						:= dedup(associate_base0, all):persist('~thor_data400::persist::enclarity::associte_base_for_keys');
+
+	shared assoc_Base_gk						:= associate_base(group_key <> '');
+																					
 	shared assoc_Base_ak						:= associate_Base(addr_key <> '');
 	shared assoc_Base_bill_tin			:= dedup(associate_Base((unsigned)bill_tin > 0),bill_tin,group_key,sloc_group_key,billing_group_key,all);
 	shared associate_base_bk				:= associate_Base(billing_group_key <> '');
@@ -24,7 +37,19 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	shared dea_Base_gk							:= dea_Base(group_key <> '');
 	shared dea_Base_dea							:= dea_Base(dea_num <> '');
 
-	shared license_Base							:= Files(pversion,pUseProd).license_Base.Built;
+	// shared license_Base							:= Files(pversion,pUseProd).license_Base.Built;
+	// Modification 20180703 - Sometime this year, the MO nurse practitioner licensing boards stopped providing updated records when a
+	// provider surrendered their license, or it was revoked, or any other reason it became expired prematurely.  Expired licenses no
+	// longer appear in the list provided by the board, so the absence of a previously issued license from this list implies it is 
+	// expired.  For the purposes of this build, since the license record was previously received with a future expiration date 
+	// that could now be erroneous, the license_base build was changed to create an additional "persist" file to wipe out what is
+	// assumed to be bad expiration dates, and then the key created from that base.  It is important to know that the original license
+	// base still contains the expiration dates, so this means that the key and the base file will not match for the qualifying records.
+	// The modified code for this additional persist file can be found in Enclarity.Update_base.Modified_License_base.
+	
+	make_lic_base	:= 									Update_Base(pversion,pUseProd).Modified_License_Base; 
+	
+	shared license_base							:= make_lic_base;  
 	shared lic_Base_gk							:= license_Base(group_key <> '');
 	shared lic_Base_lic							:= license_Base(lic_num_in <> '');
 
@@ -80,8 +105,9 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	tools.mac_FilesIndex('individual_base(lnpid>0)		,{lnpid			}	  ,{ind_Base_lnpid	}'	,keynames(pversion,pUseProd).individual_lnpid		,individual_lnpid	 );
 
 	// associate keys - group_key, addr_key
-	tools.mac_FilesIndex('associate_base		,{group_key	}	  ,{assoc_Base_gk	}'	,keynames(pversion,pUseProd).associate_group_key		,associate_group_key	 );
-	tools.mac_FilesIndex('associate_base		,{addr_key	}	  ,{assoc_Base_ak	}'	,keynames(pversion,pUseProd).associate_addr_key		,associate_addr_key	 );
+	// tools.mac_FilesIndex('associate_base		,{group_key	}	  ,{assoc_Base_gk	}'	,keynames(pversion,pUseProd).associate_group_key		,associate_group_key	 );
+	tools.mac_FilesIndex('assoc_base_gk		,{group_key	}	  ,{assoc_Base_gk	}'	,keynames(pversion,pUseProd).associate_group_key		,associate_group_key	 );
+	tools.mac_FilesIndex('assoc_base_ak		,{addr_key	}	  ,{assoc_Base_ak	}'	,keynames(pversion,pUseProd).associate_addr_key		,associate_addr_key	 );
 	tools.mac_FilesIndex('assoc_Base_bill_tin,{bill_tin},{group_key,sloc_group_key,billing_group_key}'	,keynames(pversion,pUseProd).associate_bill_tin		,associate_bill_tin	 );
 	tools.mac_FilesIndex('associate_base_bk ,{billing_group_key},{associate_base_bk}'	,keynames(pversion,pUseProd).associate_bgk		,associate_bgk	 );
 		
@@ -131,4 +157,5 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	tools.mac_FilesIndex('specialty_base		,{group_key,spec_code	}	  ,{specialty_Base_gk	}'	,keynames(pversion,pUseProd).specialty_group_key_spec_code		,specialty_group_key_spec_code	 );
 	tools.mac_FilesIndex('specialty_base		,{spec_desc,group_key	}	  ,{specialty_Base_gk	}'	,keynames(pversion,pUseProd).specialty_spec_desc_group_key		,specialty_spec_desc_group_key	 );
 			
+	
 end;

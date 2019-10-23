@@ -1,4 +1,4 @@
-IMPORT PRTE2_Common, PRTE2_Email_Data, data_services,PRTE2_Common;
+﻿IMPORT PRTE2_Common, PRTE2_Email_Data, data_services,PRTE2_Common;
 
 
 EXPORT Files := MODULE
@@ -12,15 +12,19 @@ EXPORT Files := MODULE
 	EXPORT BOCA_BASE							:= dataset(Constants.base_prefix_name+'boca', Layouts.base, thor);
 	
 	EXPORT Combined_Base    			:= ALPHA_BASE + BOCA_BASE;
-	EXPORT File_Key								:= project(Combined_Base, transform(Layouts.keyRec, self.best_ssn := if(left.best_ssn <> '', left.best_ssn, left.ssn);
+	EXPORT File_Key								:= project(Combined_Base, transform(Layouts.keyRec, 
+																																									 self.best_ssn := if(left.best_ssn <> '', left.best_ssn, left.link_ssn);
 																																										self.best_dob := if(left.best_dob <> 0, left.best_dob, (unsigned)left.best_dob);
 																																										self := left;
-																																										));
+																																										)): INDEPENDENT;
 	EXPORT File_AutoKey 					:= project(File_Key,Layouts.Autokey_layout);
 
 //Eliminate src_InfutorNare 	
 	EXPORT FCRA_Email_did					:= File_Key(did > 0 and activecode <> 'I' and email_src <> '!I' );
-  
+
+// just for early testing  
+	EXPORT email_Base_SF					:= '~'+Constants.base_prefix_alpha + Constants.qaVersion + 'alpha_base';
+	EXPORT INCOMING_ALPHA_DEV		:= DATASET( email_Base_SF, Layouts.incoming_alpha, THOR);
 
 END;
 

@@ -1,4 +1,4 @@
-export Layout_deadco_Base := RECORD
+﻿export Layout_deadco_Base := RECORD
 
 		    unsigned integer6 bdid	:=0;
 		    qstring34 vendor_id		;
@@ -19,7 +19,10 @@ export Layout_deadco_Base := RECORD
 			string50 secondary_sic_desc1;
 			string50 secondary_sic_desc2;
 			string50 secondary_sic_desc3;
-			string50 secondary_sic_desc4
+			string50 secondary_sic_desc4;
+			//DF-24528 Add 2 new fields for CCPA
+			unsigned4 global_sid;
+			unsigned8 record_sid;
 			
 		
 

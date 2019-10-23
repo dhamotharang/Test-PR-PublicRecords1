@@ -1,0 +1,49 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Civil_Court
+FILENAME:Civil_Court
+NAMESCOPE:Matter
+
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)
+FIELDTYPE:Invalid_Num:ALLOW(0123456789 -)
+FIELDTYPE:Invalid_CapLetter:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ -*:&,'.)
+FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -*:&,'.)
+
+
+FIELD:dt_first_reported:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:dt_last_reported:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:process_date:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:vendor:LIKE(Invalid_Num):TYPE(STRING2):0,0
+FIELD:state_origin:LIKE(Invalid_CapLetter):TYPE(STRING2):0,0
+FIELD:source_file:TYPE(STRING20):0,0
+FIELD:case_key:LIKE(Invalid_Char):TYPE(STRING60):0,0
+FIELD:parent_case_key:LIKE(Invalid_Char):TYPE(STRING60):0,0
+FIELD:court_code:LIKE(Invalid_Char):TYPE(STRING10):0,0
+FIELD:court:TYPE(STRING60):0,0
+FIELD:case_number:LIKE(Invalid_Char):TYPE(STRING35):0,0
+FIELD:case_type_code:LIKE(Invalid_Char):TYPE(STRING10):0,0
+FIELD:case_type:TYPE(STRING60):0,0
+FIELD:case_title:TYPE(STRING175):0,0
+FIELD:case_cause_code:LIKE(Invalid_Char):TYPE(STRING10):0,0
+FIELD:case_cause:TYPE(STRING60):0,0
+FIELD:manner_of_filing_code:LIKE(Invalid_CapLetter):TYPE(STRING10):0,0
+FIELD:manner_of_filing:TYPE(STRING50):0,0
+FIELD:filing_date:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:manner_of_judgmt_code:LIKE(Invalid_Char):TYPE(STRING10):0,0
+FIELD:manner_of_judgmt:TYPE(STRING50):0,0
+FIELD:judgmt_date:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:ruled_for_against_code:LIKE(Invalid_CapLetter):TYPE(STRING5):0,0
+FIELD:ruled_for_against:TYPE(STRING20):0,0
+FIELD:judgmt_type_code:LIKE(Invalid_CapLetter):TYPE(STRING10):0,0
+FIELD:judgmt_type:TYPE(STRING65):0,0
+FIELD:judgmt_disposition_date:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:judgmt_disposition_code:LIKE(Invalid_CapLetter):TYPE(STRING10):0,0
+FIELD:judgmt_disposition:TYPE(STRING65):0,0
+FIELD:disposition_code:LIKE(Invalid_Char):TYPE(STRING10):0,0
+FIELD:disposition_description:TYPE(STRING65):0,0
+FIELD:disposition_date:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:suit_amount:LIKE(Invalid_Num):TYPE(STRING15):0,0
+FIELD:award_amount:LIKE(Invalid_Num):TYPE(STRING15):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

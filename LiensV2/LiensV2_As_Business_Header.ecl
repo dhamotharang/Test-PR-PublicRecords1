@@ -1,4 +1,4 @@
-#OPTION('multiplePersistInstances',FALSE);
+﻿#OPTION('multiplePersistInstances',FALSE);
 import Business_Header,Business_HeaderV2;
 bfiles := Business_HeaderV2.Source_Files;
 
@@ -24,14 +24,14 @@ function
 
 
 	dfile_liens_party := 
-	Hogan_party		((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-	+ pILFDLN			((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-	+ pNYC				((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-	+ pNYFDLN			((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-	+ pSA					((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-	+ pChicago		((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-	+ pCA					((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-	+ pSuperior		((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
+	Hogan_party		((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+	+ pILFDLN			((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+	+ pNYC				((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+	+ pNYFDLN			((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+	+ pSA					((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+	+ pChicago		((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+	+ pCA					((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+	+ pSuperior		((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
 	;
 	dasbh 					:= fliensV2_As_Business_Header(dfile_liens_party) ;
 	dasbh_persisted := dasbh : persist(pPersistname);

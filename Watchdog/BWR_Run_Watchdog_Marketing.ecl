@@ -1,8 +1,8 @@
-/* delete thor_data400::in::watchdog_check2 before starting a new weekly run */
+﻿/* delete thor_data400::in::watchdog_check2 before starting a new weekly run */
 
 import watchdog,ut,RoxieKeyBuild;
 
-#workunit('name','Watchdog-marketing');
+#workunit('name','Yogurt:Watchdog-marketing');
 #workunit('priority','hight');
 
 #stored ('watchtype', 'marketing'); 

@@ -5,7 +5,7 @@ EXPORT Proc_build_suppression(STRING filedate, STRING filename='AS*SUPP*.TXT') :
 	server_group := VersionControl.GroupName('44');
 	//Spray the new input file
 	American_student_list.Mac_Spray_american_student_suppression(filedate,filename,server_dir,
-																															 _control.IPAddress.bctlpedata12,server_group,'Y',SpraySuppressed);
+																															 _control.IPAddress.bctlpedata11,server_group,'Y',SpraySuppressed);
 
 	new := American_student_list.File_american_student_suppression.raw;
 	

@@ -1,4 +1,4 @@
-import lib_stringlib, Address;
+﻿import lib_stringlib, Address;
 
 export Cleaned_Calbus(string8 pdate, string8 fdate) := function
 
@@ -108,8 +108,9 @@ export Cleaned_Calbus(string8 pdate, string8 fdate) := function
 	self.dt_last_seen                 := stringlib.stringfilter(self.process_date,'0123456789');
 	self.DISTRICT_BRANCH              := stringlib.StringToUpperCase(trim(l.DISTRICT_BRANCH,left,right));
 	self.ACCOUNT_NUMBER               := trim(l.ACCOUNT_NUMBER,left,right);
+	self.sub_account_number           := trim(l.sub_account_number,left,right);
+	self.account_type 							  := stringlib.StringToUpperCase(trim(l.account_type,left,right));           
 	self.DISTRICT                     := stringlib.StringToUpperCase(trim(l.DISTRICT,left,right));
-	self.TAX_CODE_FULL                := stringlib.StringToUpperCase(trim(l.TAX_CODE_FULL,left,right));
 	self.FIRM_NAME                    := stringlib.StringToUpperCase(trim(l.FIRM_NAME,left, right));
 	self.OWNER_NAME                   := stringlib.StringToUpperCase(trim(l.OWNER_NAME,left, right));
 	self.BUSINESS_STREET              := stringlib.StringToUpperCase(trim(l.BUSINESS_STREET,left, right));
@@ -119,17 +120,20 @@ export Cleaned_Calbus(string8 pdate, string8 fdate) := function
 	self.BUSINESS_ZIP_PLUS_4          := trim(l.BUSINESS_ZIP_PLUS_4,left, right);
 	self.BUSINESS_FOREIGN_ZIP         := trim(l.BUSINESS_FOREIGN_ZIP,left, right);
 	self.BUSINESS_COUNTRY_NAME        := stringlib.StringToUpperCase(trim(l.BUSINESS_COUNTRY_NAME,left, right));
-	self.MAILING_STREET               := stringlib.StringToUpperCase(trim(l.MAILING_STREET,left, right));
-	self.MAILING_CITY                 := stringlib.StringToUpperCase(trim(l.MAILING_CITY,left, right));
-	self.MAILING_STATE                := stringlib.StringToUpperCase(trim(l.MAILING_STATE,left, right));
-	self.MAILING_ZIP_5                := trim(l.MAILING_ZIP_5,left, right);
-	self.MAILING_ZIP_PLUS_4           := trim(l.MAILING_ZIP_PLUS_4,left, right);
-	self.MAILING_COUNTRY_NAME         := stringlib.StringToUpperCase(trim(l.MAILING_COUNTRY_NAME,left, right));
+// Removing below fields to apply layout changes 
+/* 	self.TAX_CODE_FULL                := stringlib.StringToUpperCase(trim(l.TAX_CODE_FULL,left,right));
+		self.MAILING_STREET               := stringlib.StringToUpperCase(trim(l.MAILING_STREET,left, right));
+   	self.MAILING_CITY                 := stringlib.StringToUpperCase(trim(l.MAILING_CITY,left, right));
+   	self.MAILING_STATE                := stringlib.StringToUpperCase(trim(l.MAILING_STATE,left, right));
+   	self.MAILING_ZIP_5                := trim(l.MAILING_ZIP_5,left, right);
+   	self.MAILING_ZIP_PLUS_4           := trim(l.MAILING_ZIP_PLUS_4,left, right);
+   	self.MAILING_COUNTRY_NAME         := stringlib.StringToUpperCase(trim(l.MAILING_COUNTRY_NAME,left, right));
+    self.INDUSTRY_CODE                := stringlib.StringToUpperCase(trim(l.INDUSTRY_CODE,left, right));
+   	self.NAICS_CODE                   := stringlib.StringToUpperCase(trim(l.NAICS_CODE,left, right));	
+   	self.COUNTY_CODE                  := stringlib.StringToUpperCase(trim(l.COUNTY_CODE,left, right));	
+    self.CITY_CODE                    := stringlib.StringToUpperCase(trim(l.CITY_CODE,left, right));
+*/
 	self.START_DATE                   := stringlib.stringfilter(l.START_DATE,'0123456789');
-	self.INDUSTRY_CODE                := stringlib.StringToUpperCase(trim(l.INDUSTRY_CODE,left, right));
-	self.NAICS_CODE                   := stringlib.StringToUpperCase(trim(l.NAICS_CODE,left, right));	
-	self.COUNTY_CODE                  := stringlib.StringToUpperCase(trim(l.COUNTY_CODE,left, right));	
-  self.CITY_CODE                    := stringlib.StringToUpperCase(trim(l.CITY_CODE,left, right));
 	self.OWNERSHIP_CODE               := stringlib.StringToUpperCase(trim(l.OWNERSHIP_CODE,left, right));
 	self                              := l;
 	self                              := [];

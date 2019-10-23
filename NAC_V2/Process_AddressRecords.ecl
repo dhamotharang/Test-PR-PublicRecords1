@@ -1,4 +1,4 @@
-/*
+﻿/*
 Update Logic
 There is no special update logic for Address Records.  
 The latest received set of Address Records for a Case or Client are considered to be the whole truth,
@@ -11,8 +11,8 @@ To ensure each NCF2 can be validated alone, if the Address Record is related to 
 If related to a Client, then that Client/Individual Record should be submitted.  
 Note that submission of a Client/Individual Record similarly requires its Case/Household Record to be submitted, as well.
 
-If easier to process, sending the entire Case data to update an Addressâ€”that is, the Case/Household Record, 
-  all Client/Individual Records, and all updated Address Recordsâ€”can be submitted to update the Address(es).
+If easier to process, sending the entire Case data to update an Address—that is, the Case/Household Record, 
+  all Client/Individual Records, and all updated Address Records—can be submitted to update the Address(es).
 
 
 */

@@ -1,4 +1,4 @@
-import BIPV2,BIPV2_Build,BIPV2_ProxID,tools,mdr,BIPV2_Files;
+﻿import BIPV2,BIPV2_Build,BIPV2_ProxID,tools,mdr,BIPV2_Files;
 iteration       := '@iteration@'                          ;
 pversion        := '@version@'                            ;
 pFirstIteration := false                                  ;

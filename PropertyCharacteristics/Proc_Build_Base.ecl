@@ -1,4 +1,4 @@
-import	AID,codes,ut,PropertyCharacteristics,Scrubs_Property_Characteristics, PropertyFieldFillInByLA2,PromoteSupers;
+﻿import	AID,codes,ut,PropertyCharacteristics,Scrubs_Property_Characteristics, PropertyFieldFillInByLA2,PromoteSupers;
 
 export	Proc_Build_Base(string	pVersion, string emailList='')	:=
 function	
@@ -66,9 +66,30 @@ dPropAttrDefaultData	:=
 																								)
 																		);
 	
+	//JIRA DF-21659 Bad Square Footage Data Correction - begin
+	//final scrub of file to remove bad values for the county.  This should be removed once we get a corrected data file from the vendor
 	// Distribute on property rid
-	dPropAttrDefaultDataDist	:=	distribute(dPropAttrDefaultData,hash32(property_rid));
-	
+	dPropAttrDefaultDataDistOrig	:=	distribute(dPropAttrDefaultData,hash32(property_rid));
+	//blank out bad square footage values
+	dPropAttrDefaultDataDistBad := 
+			Project(dPropAttrDefaultDataDistOrig(vendor_source = 'A' //fares source only
+																																				and st = 'NJ'								
+																																				and trim(county_name) in (['UNION','HUDSON'])
+																																				and (
+																																									(trim(sale_amount)=trim(building_square_footage) and trim(building_square_footage) <> '')
+																																									or 
+																																									(trim(sale_amount)=trim(living_area_square_footage)and trim(living_area_square_footage) <> '')
+																																									)
+																																				)
+		,TRANSFORM(PropertyCharacteristics.Layouts.TempBase, SELF.building_square_footage := '';	SELF.living_area_square_footage := '';	SELF := LEFT;));
+																				
+ Output(count(dPropAttrDefaultDataDistBad), named('count_dPropAttrDefaultDataDistBad'));
+
+	dPropAttrDefaultDataDistGood := join(dPropAttrDefaultDataDistOrig, dPropAttrDefaultDataDistBad, LEFT.property_rid = RIGHT.property_rid, LOCAL, LEFT ONLY);							
+																			
+	dPropAttrDefaultDataDist := dPropAttrDefaultDataDistBad + dPropAttrDefaultDataDistGood;							
+	//JIRA DF-21659 Bad Square Footage Data Correction - end
+					
 	// Project to the base file layout
 	dBase	:=	project(dPropAttrDefaultDataDist,PropertyCharacteristics.Layouts.Base);
 	

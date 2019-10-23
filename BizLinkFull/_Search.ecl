@@ -120,6 +120,7 @@ EXPORT _Search:=MODULE
   #END
   #SET(f,REGEXREPLACE(',maxids,',%'f'%,','))
   #SET(f,REGEXREPLACE(',leadthreshold,',%'f'%,','))
+	#SET(f,REGEXREPLACE(',efr_bitmap,',%'f'%,',')) // JA 20190429
   #SET(f,REGEXREPLACE(',matchrecords.*',%'f'%,''))
   EXPORT sMEOWParameters:=%'f'%[2..];
   // Process through which the formalizer maps the input fields to the
@@ -143,7 +144,7 @@ EXPORT _Search:=MODULE
       #FOR(Field)
         #IF(%inChild%=0)
           #APPEND(pbl,'SELF.'+%'{@label}'%+':=(TYPEOF(BizLinkFull._Search.lInputAugmented.'+%'{@label}'%+'))')
-          #IF(%'{@label}'% IN ['uniqueid','maxids','leadthreshold','zip_cases','matchrecords','fullmatch','entered_rcid','entered_proxid','entered_seleid','entered_orgid','entered_ultid','entered_powid','zip_radius','allow7digitmatch','hierarchicalsort','soapcallmode','bgetallscores','disableforce'])
+          #IF(%'{@label}'% IN ['uniqueid','maxids','leadthreshold','zip_cases','matchrecords','fullmatch','entered_rcid','entered_proxid','entered_seleid','entered_orgid','entered_ultid','entered_powid','zip_radius','allow7digitmatch','hierarchicalsort','soapcallmode','bgetallscores','disableforce','efr_bitmap'])  // JA 20190429
             #APPEND(pbl,'___;\n')
           #ELSE
             #APPEND(pbl,'BizLinkFull.Fields.Make_'+%'{@label}'%+'((STRING)___);\n')

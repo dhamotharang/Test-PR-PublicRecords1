@@ -1,6 +1,6 @@
-import strata;
+﻿import strata;
 export Strata_Stats(
-	 dataset(layouts.base							)	pBaseFile					= files().base.built
+	 dataset(layouts.base_new							)	pBaseFile					= files().base.built
 ) :=
 module
 

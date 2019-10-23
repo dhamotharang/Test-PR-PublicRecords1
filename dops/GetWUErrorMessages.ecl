@@ -1,6 +1,6 @@
-// function to capture error messages in a WU
+﻿// function to capture error messages in a WU
 // and send the messages as attachment in CSV
-import STD;
+import STD,ut;
 export GetWUErrorMessages(string wid
 												,string esp // pass in esp ip or dns, ignore http://
 												,string port = '8010'
@@ -34,6 +34,7 @@ export GetWUErrorMessages(string wid
 		results := SOAPCALL('http://'+esp+':'+port+'/WsWorkunits', 'WUInfo', 
 											InRecord, dataset(OutRecord),
 											xpath('WUInfoResponse/Workunit')
+											,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 										 );
 
 		filenames := record, maxlength(30000)

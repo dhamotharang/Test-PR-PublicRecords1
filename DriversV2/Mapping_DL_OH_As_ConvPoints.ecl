@@ -1,6 +1,6 @@
-import Drivers, DriversV2, lib_stringlib, ut;
+﻿import Drivers, DriversV2, lib_stringlib, ut, VersionControl;
  
-export Mapping_DL_OH_As_ConvPoints := module
+export Mapping_DL_OH_As_ConvPoints( string  pversion, dataset(DriversV2.Layouts_DL_OH_In.Layout_OH_CP_Pdate) in_file) := module
 
 	 // function to suppress all zero and parenthesis string data to empty string
 	 export AllZeroClean(string instr) := function
@@ -27,7 +27,7 @@ export Mapping_DL_OH_As_ConvPoints := module
    //**************** CONVICTIONS Mapping **********************************************************************************
    Conviction_Type_Cd := Tables_CP_OH.Conviction_Type_Cd;
    
-   in_OH_Convictions := DriversV2.File_DL_OH_ConvPoints(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in Conviction_Type_Cd);
+   in_OH_Convictions := in_file(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in Conviction_Type_Cd);
    
    Layout_Oh_Conv_out := Layouts_DL_OH_In.Layout_OH_CONVICTIONS;
    
@@ -72,7 +72,7 @@ export Mapping_DL_OH_As_ConvPoints := module
 			self.OUT_OF_STATE_DRIVER_LICENSE_NBR := l.payload[224..248];
 			self.STATE_OF_ORIGIN                 := l.payload[249..250];
 			self.SUSPENSION_CLASS_CODE           := l.payload[251..251];  //string1
-		    self.COURT_ORDERED_REMEDIAL_COURSE   := l.payload[252..252]; //string1
+			self.COURT_ORDERED_REMEDIAL_COURSE   := l.payload[252..252]; //string1
 			//self.FILLER                          := l.payload[253..578];
 			self                                 := l;
 			self := [];
@@ -137,7 +137,7 @@ export Mapping_DL_OH_As_ConvPoints := module
    //**************** SUSPENSIONS Mapping **********************************************************************************
    Suspension_Type_Cd := Tables_CP_OH.Suspension_Type_Cd;
    
-   in_OH_Suspention := DriversV2.File_DL_OH_ConvPoints(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in Suspension_Type_Cd);
+   in_OH_Suspention := in_file(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in Suspension_Type_Cd);
    
    Layout_Oh_Susp_out := Layouts_DL_OH_In.Layout_OH_SUSPENSIONS;
    
@@ -224,13 +224,13 @@ export Mapping_DL_OH_As_ConvPoints := module
 			self.CHILD_SUPPORT_ENFORCE_ORDER_NBR := l.payload[452..468];
 			self.CHILD_SUPP_ENF_PARTICIPANT_NBR  := Map_Signed_Field(l.payload[469..480]);
 			self.SIX_POINT_LETTER_DATE           := l.payload[481..488]; //string8
-		    self.APPEAL_HEARING_DEADLINE_DATE    := l.payload[489..496]; //string8
-		    self.REMEDIAL_DRIVING_SCHOOL_CERTIF  := l.payload[497..502]; //string6
-		    self.COURT_APPEARANCE_EFFECTIVE_DATE := l.payload[503..510]; //string8
-		    self.SUSPENSION_CLASS_CODE           := l.payload[511..511]; //string1
-		    self.BLOCKING_TYPE_CODE              := l.payload[512..512]; //string1
-		    self.MODIFY_ORDER_BY_CODE            := l.payload[513..518]; //string6
-		    //self.FILLER                          := l.payload[519..578]; //string60
+			self.APPEAL_HEARING_DEADLINE_DATE    := l.payload[489..496]; //string8
+			self.REMEDIAL_DRIVING_SCHOOL_CERTIF  := l.payload[497..502]; //string6
+			self.COURT_APPEARANCE_EFFECTIVE_DATE := l.payload[503..510]; //string8
+			self.SUSPENSION_CLASS_CODE           := l.payload[511..511]; //string1
+			self.BLOCKING_TYPE_CODE              := l.payload[512..512]; //string1
+			self.MODIFY_ORDER_BY_CODE            := l.payload[513..518]; //string6
+			//self.FILLER                          := l.payload[519..578]; //string60
 			self                                 := l;
 			self                                 := [];
    end;
@@ -341,7 +341,7 @@ export Mapping_DL_OH_As_ConvPoints := module
    //**************** DRIVER RECORD INFORMATION Mapping ********************************************************************
    DR_Info_Type_Cd := Tables_CP_OH.DR_Info_Type_Cd;
    
-   in_OH_DR_Info := DriversV2.File_DL_OH_ConvPoints(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in DR_Info_Type_Cd);
+   in_OH_DR_Info := in_file(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in DR_Info_Type_Cd);
    
    Layout_Oh_DR_Info_out := Layouts_DL_OH_In.Layout_OH_DR_INFo;
    
@@ -377,24 +377,24 @@ export Mapping_DL_OH_As_ConvPoints := module
 			self.USER_IDENTIFICATION_CODE        := l.payload[367..372];	   
 			self.WARRANT_BLOCK_EFFECTIVE_DATE    := l.payload[373..380];
 			self.NARRATIVE_RECORD_DISPLAY_FLAG   := l.payload[381..381];
-		    self.REMEDIAL_DRIVING_SCHOOL_CERTIF  := l.payload[382..387]; //string6   
-		    self.RETENTION_DATE                  := l.payload[388..395];//string8   
-		    self.COURT_ORDERED_REMEDIAL_COURSE   := l.payload[396..396];//string1   
-		    self.PAYMENT_PLAN_CODE               := l.payload[397..397];//string1   
-		    self.PAYMENT_PLAN_START_DATE         := l.payload[398..405];//string8   
-		    self.PAYMENT_PLAN_END_DATE           := l.payload[406..413];//string8   
-		    self.MODIFIED_DRIVING_DATE           := l.payload[414..421];//string8   
-		    self.MODIFIED_DRIVING_END_DATE       := l.payload[422..429];//string8   
-		    self.NOTIFY_COURT_FLAG               := l.payload[430..430];//string1   
-		    self.PAYMENT_PLAN_TERMINATION_DATE   := l.payload[431..438];//string8   
-		    self.FEE_REQUIRED_FLAG               := l.payload[439..439];//string1   
-		    self.FEE_PAID_DATE                   := l.payload[440..447];//string8   
-	        self.RELEASE_DATE                    := l.payload[448..455];//string8   
-		    self.BANKRUPTCY_FLAG                 := l.payload[456..456];//string1   
-		    self.FAILURE_TO_REINSTATE_DATE       := l.payload[457..464];//string8   
-		    //self.FILLER                          := l.payload[465..578];//string114 
-		    self                                 := l;
-			self  := [];
+			self.REMEDIAL_DRIVING_SCHOOL_CERTIF  := l.payload[382..387]; //string6   
+			self.RETENTION_DATE                  := l.payload[388..395];//string8   
+			self.COURT_ORDERED_REMEDIAL_COURSE   := l.payload[396..396];//string1   
+			self.PAYMENT_PLAN_CODE               := l.payload[397..397];//string1   
+			self.PAYMENT_PLAN_START_DATE         := l.payload[398..405];//string8   
+			self.PAYMENT_PLAN_END_DATE           := l.payload[406..413];//string8   
+			self.MODIFIED_DRIVING_DATE           := l.payload[414..421];//string8   
+			self.MODIFIED_DRIVING_END_DATE       := l.payload[422..429];//string8   
+			self.NOTIFY_COURT_FLAG               := l.payload[430..430];//string1   
+			self.PAYMENT_PLAN_TERMINATION_DATE   := l.payload[431..438];//string8   
+			self.FEE_REQUIRED_FLAG               := l.payload[439..439];//string1   
+			self.FEE_PAID_DATE                   := l.payload[440..447];//string8   
+			self.RELEASE_DATE                    := l.payload[448..455];//string8   
+			self.BANKRUPTCY_FLAG                 := l.payload[456..456];//string1   
+			self.FAILURE_TO_REINSTATE_DATE       := l.payload[457..464];//string8   
+			//self.FILLER                          := l.payload[465..578];//string114 
+			self                                 := l;
+			self  															 := [];
    end;
   
    export file_Oh_DR_Info := project(in_OH_DR_Info, trfOHDRInfo(left));
@@ -435,7 +435,7 @@ export Mapping_DL_OH_As_ConvPoints := module
    //**************** ACCIDENT Mapping *************************************************************************************
    Accident_Type_Cd := Tables_CP_OH.Accident_Type_Cd;
    
-   in_OH_Accident := DriversV2.File_DL_OH_ConvPoints(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in Accident_Type_Cd);
+   in_OH_Accident := in_file(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in Accident_Type_Cd);
    
    Layout_Oh_Accident_out := Layouts_DL_OH_In.Layout_OH_ACCIDENT;
    
@@ -500,7 +500,7 @@ export Mapping_DL_OH_As_ConvPoints := module
 														Tables_CP_OH.DR_Info_Type_Cd +
 														Tables_CP_OH.Accident_Type_Cd;
    
-   in_OH_FRA_Insurance := DriversV2.File_DL_OH_ConvPoints(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) not in FRA_Insurance_Type_Cd);
+   in_OH_FRA_Insurance := in_file(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) not in FRA_Insurance_Type_Cd);
    
    Layout_Oh_FRA_Insurance_out := Layouts_DL_OH_In.Layout_OH_FRA_Insurance;
    
@@ -554,5 +554,30 @@ export Mapping_DL_OH_As_ConvPoints := module
    Oh_FRA_Insurance := project(file_Oh_FRA_Insurance, trfOHToFRA(left));
    
    export OH_As_FRA_Insurance := Oh_FRA_Insurance;
+	 
+	 shared logical_name := DriversV2.Constants.Cluster+'in::dl2::'+pversion+'::OH::';	 
+
+	 VersionControl.macBuildNewLogicalFile( logical_name+'As_Convictions'	,OH_As_Convictions		,Bld_OH_As_Convictions		);
+	 VersionControl.macBuildNewLogicalFile( logical_name+'As_Suspension'	,OH_As_Suspension			,Bld_OH_As_Suspension			);
+	 VersionControl.macBuildNewLogicalFile( logical_name+'As_DR_Info'			,OH_As_DR_Info				,Bld_OH_As_DR_Info				);
+	 VersionControl.macBuildNewLogicalFile( logical_name+'As_Accident'		,OH_As_Accident				,Bld_OH_As_Accident				);
+	 VersionControl.macBuildNewLogicalFile( logical_name+'As_Insurance'		,OH_As_FRA_Insurance	,Bld_OH_As_FRA_Insurance	);
+	 
+	 export Build_DL_OH_Convpoints :=	 
+	 sequential (parallel( Bld_OH_As_Convictions
+												,Bld_OH_As_Suspension
+												,Bld_OH_As_DR_Info
+												,Bld_OH_As_Accident
+												,Bld_OH_As_FRA_Insurance
+											 )
+								,sequential( FileServices.StartSuperFileTransaction()
+														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Convictions',logical_name+'As_Convictions')
+														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Suspension',logical_name+'As_Suspension')
+														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_DR_Info',logical_name+'As_DR_Info')
+														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Accident',logical_name+'As_Accident')
+														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Insurance',logical_name+'As_Insurance')
+														,FileServices.FinishSuperFileTransaction()
+													 )
+							);			 
 
 end;

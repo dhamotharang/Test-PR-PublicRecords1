@@ -1,4 +1,4 @@
-IMPORT SALT37;
+﻿IMPORT SALT37;
 EXPORT Config := MODULE,VIRTUAL
 // The wildcard match function currently being used
 EXPORT WildMatch(SALT37.StrType src,SALT37.StrType Pat,BOOLEAN _NoCase) := SALT37.WildMatch(src,Pat,_NoCase);
@@ -29,13 +29,13 @@ EXPORT JoinLimit := 10000;
 EXPORT SSN5_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'does it match'
 EXPORT SSN4_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'does it match'
 EXPORT DOB_Force := 3;
-EXPORT DOB_NotUseForce := IF (Environment.Current=Environment.Values.ALPHA, TRUE, FALSE)/*HACK*/; 
+EXPORT DOB_NotUseForce := IF (Environment.Current=Environment.Values.ALPHA, TRUE, FALSE)/*HACK01a*/; 
 EXPORT DOB_OR1_SSN5_Force := 0;
 EXPORT DOB_OR2_SSN4_Force := 0;
 EXPORT DOB_UseGenerationForce := TRUE;
 EXPORT MAINNAME_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'does it match'
  
-EXPORT PayloadKeyName := InsuranceHeader_xLink.KeyNames().header_super;
+EXPORT PayloadKeyName :=  InsuranceHeader_xLink.KeyNames().header_super;/*HACK01b*/;
 h := DATASET([],Layout_InsuranceHeader);
 d := DATASET([],RECORDOF(h));
  
@@ -43,7 +43,7 @@ EXPORT PayloadKey := INDEX(d,{DID},{d},PayloadKeyName,OPT);
 EXPORT MaxMergeFiles := 100;
 // Configuration of linkpath atmost/limit thresholds
 EXPORT NAME_MAXBLOCKSIZE:=500;
-EXPORT NAME_MAXBLOCKLIMIT:=5000;
+EXPORT NAME_MAXBLOCKLIMIT:=500;
 EXPORT ADDRESS_MAXBLOCKSIZE:=5000;
 EXPORT ADDRESS_MAXBLOCKLIMIT:=5000;
 EXPORT SSN_MAXBLOCKSIZE:=5000;
@@ -52,6 +52,8 @@ EXPORT SSN4_MAXBLOCKSIZE:=5000;
 EXPORT SSN4_MAXBLOCKLIMIT:=5000;
 EXPORT DOB_MAXBLOCKSIZE:=5000;
 EXPORT DOB_MAXBLOCKLIMIT:=5000;
+EXPORT DOBF_MAXBLOCKSIZE:=5000;
+EXPORT DOBF_MAXBLOCKLIMIT:=5000;
 EXPORT ZIP_PR_MAXBLOCKSIZE:=5000;
 EXPORT ZIP_PR_MAXBLOCKLIMIT:=5000;
 EXPORT SRC_RID_MAXBLOCKSIZE:=5000;
@@ -67,5 +69,5 @@ EXPORT RELATIVE_MAXBLOCKLIMIT:=5000;
 EXPORT INTEGER FNAME_LENGTH_EDIT2 := 6; // fname length to use edit2 
 EXPORT INTEGER LNAME_LENGTH_EDIT2 := 8; // lname length to use edit2 
 EXPORT NAME_WEIGHT := 0.8; 
-EXPORT ADDR_WEIGHT := 1.0; /*HACK*/
+EXPORT ADDR_WEIGHT := 1.0; /*HACK01c*/
 END;

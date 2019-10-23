@@ -1,10 +1,10 @@
-/*2008-04-25T14:41:19Z (Faisal_prod Humayun)
+﻿/*2008-04-25T14:41:19Z (Faisal_prod Humayun)
 Per Tony Kirk/Supercomputer services thor400_84 is the correct new cluster replacement for thor_dell400_2
 Giri is on vacation, and I made this correction to fix the build.
 */
 import did_add,ut,header_slimsort,lib_stringlib, watchdog, didville, fair_isaac, Drivers,mdr,header;
 
-dlj := DriversV2.DL_Joined;
+dlj := DriversV2.DL_Update;
 
 dl_file := project(dlj, transform(DriversV2.Layout_Base_withAID, self.did := 0, self := left));
 
@@ -24,7 +24,7 @@ matchset := ['A','D','S'];
 
 did_add.MAC_Match_Flex
 	(dl_file_seq_src, matchset,						//see above
-	 ssn, dob, fname, mname, lname, name_suffix, 
+	 ssn_safe, dob, fname, mname, lname, name_suffix, 
 	 prim_range, prim_name, sec_range, zip5, st, JUNK,
 	 DID,
 	 src_rec, 
@@ -33,7 +33,6 @@ did_add.MAC_Match_Flex
 	 res,true,src)
 
 DriversV2.Layout_Base_withAID lFieldTransform(src_rec l) := TRANSFORM
-self.ssn_safe := l.ssn;
 self.restrictions_delimited := if(l.restrictions_delimited <> '',
 								  l.restrictions_delimited,
 								  l.Restrictions[1] + 

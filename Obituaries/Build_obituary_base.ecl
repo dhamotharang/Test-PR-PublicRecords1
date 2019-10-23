@@ -1,4 +1,4 @@
-Import Obituaries, ut, VersionControl;
+﻿Import Obituaries, ut, VersionControl,	PromoteSupers,	Std;
 
 EXPORT Build_obituary_base := FUNCTION
 
@@ -22,20 +22,20 @@ Obituaries.layouts.Obituary_raw_base cleanFields(ds_obit_in l) := TRANSFORM
 
 		self.filedate				:= (string8)file_date;
 		self.person_id			:= l.person_id;
-		self.lname					:= stringlib.StringFindReplace(RemoveNickname(ut.fnTrim2Upper(l.lname)),'NULL','');
-		self.fname					:= stringlib.StringFindReplace(ut.fnTrim2Upper(l.fname),'NULL','');
-		self.mname					:= stringlib.StringFindReplace(ut.fnTrim2Upper(l.mname),'NULL','');
-		tempSuffix					:= ut.fnTrim2Upper(stringlib.StringFindReplace(l.name_suffix,'.',''));
-		self.name_prefix		:= stringlib.StringFindReplace(ut.fnTrim2Upper(l.name_prefix),'NULL','');
+		self.lname					:= stringlib.StringFindReplace(RemoveNickname(ut.CleanSpacesAndUpper(l.lname)),'NULL','');
+		self.fname					:= stringlib.StringFindReplace(ut.CleanSpacesAndUpper(l.fname),'NULL','');
+		self.mname					:= stringlib.StringFindReplace(ut.CleanSpacesAndUpper(l.mname),'NULL','');
+		tempSuffix					:= ut.CleanSpacesAndUpper(stringlib.StringFindReplace(l.name_suffix,'.',''));
+		self.name_prefix		:= stringlib.StringFindReplace(ut.CleanSpacesAndUpper(l.name_prefix),'NULL','');
 		self.name_suffix		:= stringlib.StringFindReplace(tempSuffix,'NULL','');
-		self.DateOfBirth		:=	ut.ConvertDateMultiple(l.DateOfBirth,fmtsin,fmtout);
-		self.DateOfDeath		:=	ut.ConvertDateMultiple(l.DateOfDeath,fmtsin,fmtout);
-		self.City_in				:= stringlib.StringFindReplace(ut.fnTrim2Upper(l.City_in),'NULL','');
-		self.State_in				:= stringlib.StringFindReplace(ut.fnTrim2Upper(l.State_in),'NULL','');
+		self.DateOfBirth		:=	Std.date.ConvertDateFormatMultiple(l.DateOfBirth,fmtsin,fmtout);
+		self.DateOfDeath		:=	Std.date.ConvertDateFormatMultiple(l.DateOfDeath,fmtsin,fmtout);
+		self.City_in				:= stringlib.StringFindReplace(ut.CleanSpacesAndUpper(l.City_in),'NULL','');
+		self.State_in				:= stringlib.StringFindReplace(ut.CleanSpacesAndUpper(l.State_in),'NULL','');
 		self.Age						:= stringlib.StringFindReplace(l.Age,'NULL','');
-		self.create_dt			:=	ut.ConvertDateMultiple(l.create_dt,fmtsin,fmtout);
-		self.update_dt			:=	ut.ConvertDateMultiple(l.update_dt,fmtsin,fmtout);
-//		self.ObituaryText		:= ut.fnTrim2Upper(l.ObituaryText);  --vendor removed this field
+		self.create_dt			:=	Std.date.ConvertDateFormatMultiple(l.create_dt,fmtsin,fmtout);
+		self.update_dt			:=	Std.date.ConvertDateFormatMultiple(l.update_dt,fmtsin,fmtout);
+//		self.ObituaryText		:= ut.CleanSpacesAndUpper(l.ObituaryText);  --vendor removed this field
 END;
 
 dsClean				:=	project(ds_obit_in,cleanFields(left));
@@ -63,7 +63,7 @@ END;
 
 RollupObituary	:=	ROLLUP(dsSort,xformCombined(LEFT,RIGHT),person_id,local);
 
-ut.MAC_SF_BuildProcess(RollupObituary,'~thor_data400::base::obituarydata_death_master',build_obituary_out,3, /*csvout*/false, /*compress*/false,(string8)file_date);
+PromoteSupers.MAC_SF_BuildProcess(RollupObituary,'~thor_data400::base::obituarydata_death_master',build_obituary_out,3, /*csvout*/false, /*compress*/true,(string8)file_date);
 
 return build_obituary_out;
 	

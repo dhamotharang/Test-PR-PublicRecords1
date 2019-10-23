@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 
 export Filenames(
 
@@ -23,6 +23,7 @@ module
 		export TextMinedCrim                 := tools.mod_FilenamesInput(Template('TextMinedCrim'                    ),pversion);
 		export OIG                           := tools.mod_FilenamesInput(Template('OIG'                              ),pversion);
 		export Erie                          := tools.mod_FilenamesInput(Template('Erie'                             ),pversion);
+		export ErieWatchList                 := tools.mod_FilenamesInput(Template('ErieWatchList'                    ),pversion);
 
 
 		export dAll_filenames :=
@@ -33,7 +34,8 @@ module
 			AInspection.dAll_filenames +
 			TextMinedCrim.dAll_filenames +
 			OIG.dAll_filenames + 
-			Erie.dAll_filenames;
+			Erie.dAll_filenames +
+			ErieWatchList.dAll_filenames;
 			
 			
 	end;
@@ -52,6 +54,7 @@ module
 	  export TextMinedCrim         := tools.mod_FilenamesBuild(Template('TextMinedCrim'       ),pversion);
 		export OIG                   := tools.mod_FilenamesBuild(Template('OIG'                 ),pversion);
 		export Erie                  := tools.mod_FilenamesBuild(Template('Erie'                ),pversion);
+		export ErieWatchList         := tools.mod_FilenamesBuild(Template('ErieWatchList'       ),pversion);
 
 		export dAll_filenames :=
 			SuspectIP.dAll_filenames  +
@@ -61,11 +64,17 @@ module
 			AInspection.dAll_filenames +
 			TextMinedCrim.dAll_filenames   +
 			OIG.dAll_filenames +
-			Erie.dAll_filenames ;
+			Erie.dAll_filenames +
+			ErieWatchList.dAll_filenames ;
 	
 	end;
 	
 	export dAll_filenames :=
 		Base.dAll_filenames;
- 
+	
+	export Fdn_Prefix                 := '~THOR_DATA400::BASE::FDN';
+	export LexID_Header_Build_Suffix  := 'PRODLEXIDHEADERVERSION';
+	export BIP_Header_Build_Suffix    := 'PRODBIPHEADERVERSION';
+  export LexID_Header_Build_Version := Fdn_Prefix + '::QA::' + LexID_Header_Build_Suffix;
+  export BIP_Header_Build_Version   := Fdn_Prefix + '::QA::' + BIP_Header_Build_Suffix;
 end;

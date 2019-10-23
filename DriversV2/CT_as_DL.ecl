@@ -1,4 +1,7 @@
-import Lib_StringLib, Drivers;
+﻿import Lib_StringLib, Drivers;
+
+export CT_as_DL(dataset(drivers.Layout_CT_Full) pFile_CT_Input)	:= function
+
 
 fGetAddressToken(string pAddressIn, unsigned pToken)
  :=	choose(pToken,
@@ -10,7 +13,7 @@ fGetAddressToken(string pAddressIn, unsigned pToken)
 		   ''
 		  );
 
-DriversV2.Layout_DL_Extended tCTAsDL(Drivers.File_CT_Full pInput)
+DriversV2.Layout_DL_Extended tCTAsDL(pFile_CT_Input pInput)
  :=
   transform
 	self.dt_first_seen 						:=	(unsigned8)pInput.append_PROCESS_DATE div 100;
@@ -98,6 +101,9 @@ DriversV2.Layout_DL_Extended tCTAsDL(Drivers.File_CT_Full pInput)
 	//self							:=	pInput; //no go
 end;
 
-export CT_as_DL	:=	project(Drivers.File_CT_Full + Drivers.File_CT_Update + DriversV2.File_DL_CT_Update_Clean,tCTasDL(left));
+CT_as_DL	:=	project(pFile_CT_Input,tCTasDL(left));
+
+return(CT_as_DL);
+end;
 
 

@@ -1,4 +1,4 @@
-/* Oct.2016 - IPAddress length expanded to 45 characters in queries, related fields have comment: //IP-update related */
+﻿/* Oct.2016 - IPAddress length expanded to 45 characters in queries, related fields have comment: //IP-update related */
 export Layout_InstantID := record
 string20 dataset_name;
 string30 acctNo;
@@ -51,6 +51,7 @@ string100 outemployer_name;
 string20 outlname_prev;
 string12 outtransaction_id;
 string20 outverfirst;
+string20 outvermiddle;
 string20 outverlast;
 string65 outveraddr;
 STRING10 outVerPrimRange;
@@ -71,6 +72,7 @@ string10 outverhphone;
 string1 outverify_addr;
 string1 outverify_dob;
 string1 outvalid_ssn;
+string50 outverified_Email;
 string3 outNAS_Summary;
 string3 outNAP_Summary;
 string1 outNAP_Type;
@@ -138,6 +140,7 @@ STRING4  outCorrectedAddrSuffix;
 STRING2  outCorrectedPostDir;
 STRING10 outCorrectedUnitDesignation;
 STRING8  outCorrectedSecRange;
+STRING20  outCorrecteddl;
 string3 outarea_code_split;
 string8 outarea_code_split_date;
 string20 outphone_fname;
@@ -159,6 +162,7 @@ string6 outssa_date_last;
 string2 outssa_state;
 string20 outssa_state_name;
 string20 outcurrent_fname;
+string20 outcurrent_mname;
 string20 outcurrent_lname;
 string65 outChron_Address_1;
 STRING10 outChronPrimRange1;
@@ -360,5 +364,12 @@ string12 outverDPBC;
 string12 outChron_DPBC_1;
 string12 outChron_DPBC_2;
 string12 outChron_DPBC_3;
+string1 AddressSecondaryRangeMismatch;
+BOOLEAN  BureauDeleted;
+BOOLEAN  Exclude_Minors;
+BOOLEAN  ITINExpired;
+BOOLEAN  IsPhoneCurrent;
+STRING2 PhoneLineDescription;
+STRING2 PhoneLineType;
 
 end;

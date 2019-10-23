@@ -1,4 +1,4 @@
-IMPORT SALT37;
+﻿IMPORT SALT37;
 EXPORT specificities(DATASET(layout_InsuranceHeader) ih) := MODULE
  
 EXPORT ih_init := SALT37.initNullIDs.baseLevel(ih,RID,DID);
@@ -34,6 +34,7 @@ EXPORT input_layout := RECORD // project out required fields
   h.PHONE;
   TYPEOF(h.DL_STATE) DL_STATE := (TYPEOF(h.DL_STATE))Fields.Make_DL_STATE((SALT37.StrType)h.DL_STATE ); // Cleans before using
   TYPEOF(h.DL_NBR) DL_NBR := (TYPEOF(h.DL_NBR))Fields.Make_DL_NBR((SALT37.StrType)h.DL_NBR ); // Cleans before using
+  UNSIGNED1 DL_NBR_len := LENGTH(TRIM((SALT37.StrType)h.DL_NBR));
   TYPEOF(h.SRC) SRC := (TYPEOF(h.SRC))Fields.Make_SRC((SALT37.StrType)h.SRC ); // Cleans before using
   TYPEOF(h.SOURCE_RID) SOURCE_RID := (TYPEOF(h.SOURCE_RID))Fields.Make_SOURCE_RID((SALT37.StrType)h.SOURCE_RID ); // Cleans before using
   UNSIGNED4 DT_FIRST_SEEN := (UNSIGNED4)Fields.Make_DT_FIRST_SEEN((SALT37.StrType)h.DT_FIRST_SEEN ); // Cleans before using
@@ -295,7 +296,8 @@ EXPORT  DL_NBR_deduped := SALT37.MAC_Field_By_UID(input_file,DID,DL_NBR) : PERSI
   with_id := table(counted,r1);
   SALT37.utMAC_Sequence_Records(with_id,id,sequenced)
   SALT37.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT DL_NBR_values_persisted_temp := specs_added : PERSIST('~temp::DID::InsuranceHeader_xLink::values::DL_NBR',EXPIRE(InsuranceHeader_xLink.Config.PersistExpire));
+  SALT37.mac_edit_distance_pairs(specs_added,DL_NBR,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
+EXPORT DL_NBR_values_persisted_temp := distance_computed : PERSIST('~temp::DID::InsuranceHeader_xLink::values::DL_NBR',EXPIRE(InsuranceHeader_xLink.Config.PersistExpire));
  
 EXPORT  SRC_deduped := SALT37.MAC_Field_By_UID(input_file,DID,SRC) : PERSIST('~temp::DID::InsuranceHeader_xLink::dedups::SRC',EXPIRE(InsuranceHeader_xLink.Config.PersistExpire)); // Reduce to field values by UID
   SALT37.Mac_Field_Count_UID(SRC_deduped,SRC,DID,counted,counted_clusters) // count the number of UIDs with each field value
@@ -418,11 +420,11 @@ EXPORT  ADDRESS_deduped := SALT37.MAC_Field_By_UID(input_file,DID,ADDRESS) : PER
   SALT37.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT ADDRESS_values_persisted_temp := specs_added : PERSIST('~temp::DID::InsuranceHeader_xLink::values::ADDRESS',EXPIRE(InsuranceHeader_xLink.Config.PersistExpire));
  
-EXPORT SNAMEValuesIndexKeyName := KeyNames().sname_spc_logical;/*hack*/
+EXPORT SNAMEValuesIndexKeyName := KeyNames().SNAME_spc_logical;/*SPECHACK01*/
  
-EXPORT SNAMEValuesIndexKeyName_sf := KeyNames().sname_spc_super;/*hack*/
+EXPORT SNAMEValuesIndexKeyName_sf := KeyNames().SNAME_spc_super;/*SPECHACK02*/
  
-EXPORT SNAME_values_index := INDEX(SNAME_values_persisted_temp,{SNAME},{SNAME_values_persisted_temp},SNAMEValuesIndexKeyName_sf/*HACK*/);
+EXPORT SNAME_values_index := INDEX(SNAME_values_persisted_temp,{SNAME},{SNAME_values_persisted_temp},SNAMEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT SNAME_values_persisted := SNAME_values_index;
 SALT37.MAC_Field_Nulls(SNAME_values_persisted,Layout_Specificities.SNAME_ChildRec,nv) // Use automated NULL spotting
 EXPORT SNAME_nulls := nv;
@@ -435,11 +437,11 @@ SALT37.MAC_Concept3_Specificities(MAINNAME_cnt,FNAME_values_persisted_temp,FNAME
 SALT37.MAC_Concept3_Specificities(MAINNAME_fuzzy_cnt,ofile,FNAME,e1p_cnt,0,MNAME_values_persisted_temp,MNAME,e2_cnt,0,LNAME_values_persisted_temp,LNAME,e1p_cnt,0,ofile_wfuzzy)
 SHARED FNAME_values_persisted0 := ofile_wfuzzy; // Skip over EXPORT
  
-EXPORT FNAMEValuesIndexKeyName := KeyNames().fname_spc_logical;/*hack*/
+EXPORT FNAMEValuesIndexKeyName := KeyNames().FNAME_spc_logical;/*SPECHACK01*/
  
-EXPORT FNAMEValuesIndexKeyName_sf := KeyNames().fname_spc_super;/*hack*/
+EXPORT FNAMEValuesIndexKeyName_sf := KeyNames().FNAME_spc_super;/*SPECHACK02*/
  
-EXPORT FNAME_values_index := INDEX(FNAME_values_persisted0,{FNAME},{FNAME_values_persisted0},FNAMEValuesIndexKeyName_sf/*HACK*/);
+EXPORT FNAME_values_index := INDEX(FNAME_values_persisted0,{FNAME},{FNAME_values_persisted0},FNAMEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT FNAME_values_persisted := FNAME_values_index;
 EXPORT FNAME_nulls := DATASET([{'',0,0}],Layout_Specificities.FNAME_ChildRec); // Automated null spotting not applicable
 SALT37.MAC_Field_Bfoul(FNAME_deduped,FNAME,DID,FNAME_nulls,ClusterSizes,true,false,bf) // Compute the chances of a field having 2 values for one entity
@@ -451,11 +453,11 @@ SALT37.MAC_Concept3_Specificities(MAINNAME_cnt,MNAME_values_persisted_temp,MNAME
 SALT37.MAC_Concept3_Specificities(MAINNAME_fuzzy_cnt,ofile,MNAME,e2_cnt,0,FNAME_values_persisted_temp,FNAME,e1p_cnt,0,LNAME_values_persisted_temp,LNAME,e1p_cnt,0,ofile_wfuzzy)
 SHARED MNAME_values_persisted0 := ofile_wfuzzy; // Skip over EXPORT
  
-EXPORT MNAMEValuesIndexKeyName := KeyNames().mname_spc_logical;/*hack*/
+EXPORT MNAMEValuesIndexKeyName := KeyNames().MNAME_spc_logical;/*SPECHACK01*/
  
-EXPORT MNAMEValuesIndexKeyName_sf := KeyNames().mname_spc_super;/*hack*/
+EXPORT MNAMEValuesIndexKeyName_sf := KeyNames().MNAME_spc_super;/*SPECHACK02*/
  
-EXPORT MNAME_values_index := INDEX(MNAME_values_persisted0,{MNAME},{MNAME_values_persisted0},MNAMEValuesIndexKeyName_sf/*HACK*/);
+EXPORT MNAME_values_index := INDEX(MNAME_values_persisted0,{MNAME},{MNAME_values_persisted0},MNAMEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT MNAME_values_persisted := MNAME_values_index;
 EXPORT MNAME_nulls := DATASET([{'',0,0}],Layout_Specificities.MNAME_ChildRec); // Automated null spotting not applicable
 SALT37.MAC_Field_Bfoul(MNAME_deduped,MNAME,DID,MNAME_nulls,ClusterSizes,true,false,bf) // Compute the chances of a field having 2 values for one entity
@@ -467,11 +469,11 @@ SALT37.MAC_Concept3_Specificities(MAINNAME_cnt,LNAME_values_persisted_temp,LNAME
 SALT37.MAC_Concept3_Specificities(MAINNAME_fuzzy_cnt,ofile,LNAME,e1p_cnt,0,FNAME_values_persisted_temp,FNAME,e1p_cnt,0,MNAME_values_persisted_temp,MNAME,e2_cnt,0,ofile_wfuzzy)
 SHARED LNAME_values_persisted0 := ofile_wfuzzy; // Skip over EXPORT
  
-EXPORT LNAMEValuesIndexKeyName := KeyNames().lname_spc_logical;/*hack*/
+EXPORT LNAMEValuesIndexKeyName := KeyNames().LNAME_spc_logical;/*SPECHACK01*/
  
-EXPORT LNAMEValuesIndexKeyName_sf := KeyNames().lname_spc_super;/*hack*/
+EXPORT LNAMEValuesIndexKeyName_sf := KeyNames().LNAME_spc_super;/*SPECHACK02*/
  
-EXPORT LNAME_values_index := INDEX(LNAME_values_persisted0,{LNAME},{LNAME_values_persisted0},LNAMEValuesIndexKeyName_sf/*HACK*/);
+EXPORT LNAME_values_index := INDEX(LNAME_values_persisted0,{LNAME},{LNAME_values_persisted0},LNAMEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT LNAME_values_persisted := LNAME_values_index;
 SALT37.MAC_Field_Nulls(LNAME_values_persisted,Layout_Specificities.LNAME_ChildRec,nv) // Use automated NULL spotting
 EXPORT LNAME_nulls := nv;
@@ -481,11 +483,11 @@ EXPORT LNAME_max := MAX(LNAME_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(LNAME_values_persisted,LNAME,LNAME_nulls,ol) // Compute column level specificity
 EXPORT LNAME_specificity := ol;
  
-EXPORT DERIVED_GENDERValuesIndexKeyName := KeyNames().derived_gender_spc_logical;/*hack*/
+EXPORT DERIVED_GENDERValuesIndexKeyName := KeyNames().DERIVED_GENDER_spc_logical;/*SPECHACK01*/
  
-EXPORT DERIVED_GENDERValuesIndexKeyName_sf := KeyNames().derived_gender_spc_super;/*hack*/
+EXPORT DERIVED_GENDERValuesIndexKeyName_sf := KeyNames().DERIVED_GENDER_spc_super;/*SPECHACK02*/
  
-EXPORT DERIVED_GENDER_values_index := INDEX(DERIVED_GENDER_values_persisted_temp,{DERIVED_GENDER},{DERIVED_GENDER_values_persisted_temp},DERIVED_GENDERValuesIndexKeyName_sf/*HACK*/);
+EXPORT DERIVED_GENDER_values_index := INDEX(DERIVED_GENDER_values_persisted_temp,{DERIVED_GENDER},{DERIVED_GENDER_values_persisted_temp},DERIVED_GENDERValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT DERIVED_GENDER_values_persisted := DERIVED_GENDER_values_index;
 EXPORT DERIVED_GENDER_nulls := DATASET([{'',0,0}],Layout_Specificities.DERIVED_GENDER_ChildRec); // Automated null spotting not applicable
 SALT37.MAC_Field_Bfoul(DERIVED_GENDER_deduped,DERIVED_GENDER,DID,DERIVED_GENDER_nulls,ClusterSizes,true,false,bf) // Compute the chances of a field having 2 values for one entity
@@ -494,11 +496,11 @@ EXPORT DERIVED_GENDER_max := MAX(DERIVED_GENDER_values_persisted,field_specifici
 SALT37.MAC_Field_Specificity(DERIVED_GENDER_values_persisted,DERIVED_GENDER,DERIVED_GENDER_nulls,ol) // Compute column level specificity
 EXPORT DERIVED_GENDER_specificity := ol;
  
-EXPORT PRIM_RANGEValuesIndexKeyName := KeyNames().prim_range_spc_logical;/*hack*/
+EXPORT PRIM_RANGEValuesIndexKeyName := KeyNames().PRIM_RANGE_spc_logical;/*SPECHACK01*/
  
-EXPORT PRIM_RANGEValuesIndexKeyName_sf := KeyNames().prim_range_spc_super;/*hack*/
+EXPORT PRIM_RANGEValuesIndexKeyName_sf := KeyNames().PRIM_RANGE_spc_super;/*SPECHACK02*/
  
-EXPORT PRIM_RANGE_values_index := INDEX(PRIM_RANGE_values_persisted_temp,{PRIM_RANGE},{PRIM_RANGE_values_persisted_temp},PRIM_RANGEValuesIndexKeyName_sf/*HACK*/);
+EXPORT PRIM_RANGE_values_index := INDEX(PRIM_RANGE_values_persisted_temp,{PRIM_RANGE},{PRIM_RANGE_values_persisted_temp},PRIM_RANGEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT PRIM_RANGE_values_persisted := PRIM_RANGE_values_index;
 SALT37.MAC_Field_Nulls(PRIM_RANGE_values_persisted,Layout_Specificities.PRIM_RANGE_ChildRec,nv) // Use automated NULL spotting
 EXPORT PRIM_RANGE_nulls := nv;
@@ -508,11 +510,11 @@ EXPORT PRIM_RANGE_max := MAX(PRIM_RANGE_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(PRIM_RANGE_values_persisted,PRIM_RANGE,PRIM_RANGE_nulls,ol) // Compute column level specificity
 EXPORT PRIM_RANGE_specificity := ol;
  
-EXPORT PRIM_NAMEValuesIndexKeyName := KeyNames().prim_name_spc_logical;/*hack*/
+EXPORT PRIM_NAMEValuesIndexKeyName := KeyNames().PRIM_NAME_spc_logical;/*SPECHACK01*/
  
-EXPORT PRIM_NAMEValuesIndexKeyName_sf := KeyNames().prim_name_spc_super;/*hack*/
+EXPORT PRIM_NAMEValuesIndexKeyName_sf := KeyNames().PRIM_NAME_spc_super;/*SPECHACK02*/
  
-EXPORT PRIM_NAME_values_index := INDEX(PRIM_NAME_values_persisted_temp,{PRIM_NAME},{PRIM_NAME_values_persisted_temp},PRIM_NAMEValuesIndexKeyName_sf/*HACK*/);
+EXPORT PRIM_NAME_values_index := INDEX(PRIM_NAME_values_persisted_temp,{PRIM_NAME},{PRIM_NAME_values_persisted_temp},PRIM_NAMEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT PRIM_NAME_values_persisted := PRIM_NAME_values_index;
 SALT37.MAC_Field_Nulls(PRIM_NAME_values_persisted,Layout_Specificities.PRIM_NAME_ChildRec,nv) // Use automated NULL spotting
 EXPORT PRIM_NAME_nulls := nv;
@@ -522,11 +524,11 @@ EXPORT PRIM_NAME_max := MAX(PRIM_NAME_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(PRIM_NAME_values_persisted,PRIM_NAME,PRIM_NAME_nulls,ol) // Compute column level specificity
 EXPORT PRIM_NAME_specificity := ol;
  
-EXPORT SEC_RANGEValuesIndexKeyName := KeyNames().sec_range_spc_logical;/*hack*/
+EXPORT SEC_RANGEValuesIndexKeyName := KeyNames().SEC_RANGE_spc_logical;/*SPECHACK01*/
  
-EXPORT SEC_RANGEValuesIndexKeyName_sf := KeyNames().sec_range_spc_super;/*hack*/
+EXPORT SEC_RANGEValuesIndexKeyName_sf := KeyNames().SEC_RANGE_spc_super;/*SPECHACK02*/
  
-EXPORT SEC_RANGE_values_index := INDEX(SEC_RANGE_values_persisted_temp,{SEC_RANGE},{SEC_RANGE_values_persisted_temp},SEC_RANGEValuesIndexKeyName_sf/*HACK*/);
+EXPORT SEC_RANGE_values_index := INDEX(SEC_RANGE_values_persisted_temp,{SEC_RANGE},{SEC_RANGE_values_persisted_temp},SEC_RANGEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT SEC_RANGE_values_persisted := SEC_RANGE_values_index;
 SALT37.MAC_Field_Nulls(SEC_RANGE_values_persisted,Layout_Specificities.SEC_RANGE_ChildRec,nv) // Use automated NULL spotting
 EXPORT SEC_RANGE_nulls := nv;
@@ -536,11 +538,11 @@ EXPORT SEC_RANGE_max := MAX(SEC_RANGE_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(SEC_RANGE_values_persisted,SEC_RANGE,SEC_RANGE_nulls,ol) // Compute column level specificity
 EXPORT SEC_RANGE_specificity := ol;
  
-EXPORT CITYValuesIndexKeyName := KeyNames().city_spc_logical;/*hack*/
+EXPORT CITYValuesIndexKeyName := KeyNames().CITY_spc_logical;/*SPECHACK01*/
  
-EXPORT CITYValuesIndexKeyName_sf := KeyNames().city_spc_super;/*hack*/
+EXPORT CITYValuesIndexKeyName_sf := KeyNames().CITY_spc_super;/*SPECHACK02*/
  
-EXPORT CITY_values_index := INDEX(CITY_values_persisted_temp,{CITY},{CITY_values_persisted_temp},CITYValuesIndexKeyName_sf/*HACK*/);
+EXPORT CITY_values_index := INDEX(CITY_values_persisted_temp,{CITY},{CITY_values_persisted_temp},CITYValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT CITY_values_persisted := CITY_values_index;
 SALT37.MAC_Field_Nulls(CITY_values_persisted,Layout_Specificities.CITY_ChildRec,nv) // Use automated NULL spotting
 EXPORT CITY_nulls := nv;
@@ -550,11 +552,11 @@ EXPORT CITY_max := MAX(CITY_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(CITY_values_persisted,CITY,CITY_nulls,ol) // Compute column level specificity
 EXPORT CITY_specificity := ol;
  
-EXPORT STValuesIndexKeyName := KeyNames().st_spc_logical;/*hack*/
+EXPORT STValuesIndexKeyName := KeyNames().ST_spc_logical;/*SPECHACK01*/
  
-EXPORT STValuesIndexKeyName_sf := KeyNames().st_spc_super;/*hack*/
+EXPORT STValuesIndexKeyName_sf := KeyNames().ST_spc_super;/*SPECHACK02*/
  
-EXPORT ST_values_index := INDEX(ST_values_persisted_temp,{ST},{ST_values_persisted_temp},STValuesIndexKeyName_sf/*HACK*/);
+EXPORT ST_values_index := INDEX(ST_values_persisted_temp,{ST},{ST_values_persisted_temp},STValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT ST_values_persisted := ST_values_index;
 SALT37.MAC_Field_Nulls(ST_values_persisted,Layout_Specificities.ST_ChildRec,nv) // Use automated NULL spotting
 EXPORT ST_nulls := nv;
@@ -564,11 +566,11 @@ EXPORT ST_max := MAX(ST_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(ST_values_persisted,ST,ST_nulls,ol) // Compute column level specificity
 EXPORT ST_specificity := ol;
  
-EXPORT ZIPValuesIndexKeyName := KeyNames().zip_spc_logical;/*hack*/
+EXPORT ZIPValuesIndexKeyName := KeyNames().ZIP_spc_logical;/*SPECHACK01*/
  
-EXPORT ZIPValuesIndexKeyName_sf := KeyNames().zip_spc_super;/*hack*/
+EXPORT ZIPValuesIndexKeyName_sf := KeyNames().ZIP_spc_super;/*SPECHACK02*/
  
-EXPORT ZIP_values_index := INDEX(ZIP_values_persisted_temp,{ZIP},{ZIP_values_persisted_temp},ZIPValuesIndexKeyName_sf/*HACK*/);
+EXPORT ZIP_values_index := INDEX(ZIP_values_persisted_temp,{ZIP},{ZIP_values_persisted_temp},ZIPValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT ZIP_values_persisted := ZIP_values_index;
 SALT37.MAC_Field_Nulls(ZIP_values_persisted,Layout_Specificities.ZIP_ChildRec,nv) // Use automated NULL spotting
 EXPORT ZIP_nulls := nv;
@@ -578,11 +580,11 @@ EXPORT ZIP_max := MAX(ZIP_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(ZIP_values_persisted,ZIP,ZIP_nulls,ol) // Compute column level specificity
 EXPORT ZIP_specificity := ol;
  
-EXPORT SSN5ValuesIndexKeyName := KeyNames().ssn5_spc_logical;/*hack*/
+EXPORT SSN5ValuesIndexKeyName := KeyNames().SSN5_spc_logical;/*SPECHACK01*/
  
-EXPORT SSN5ValuesIndexKeyName_sf := KeyNames().ssn5_spc_super;/*hack*/
+EXPORT SSN5ValuesIndexKeyName_sf := KeyNames().SSN5_spc_super;/*SPECHACK02*/
  
-EXPORT SSN5_values_index := INDEX(SSN5_values_persisted_temp,{SSN5},{SSN5_values_persisted_temp},SSN5ValuesIndexKeyName_sf/*HACK*/);
+EXPORT SSN5_values_index := INDEX(SSN5_values_persisted_temp,{SSN5},{SSN5_values_persisted_temp},SSN5ValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT SSN5_values_persisted := SSN5_values_index;
 SALT37.MAC_Field_Nulls(SSN5_values_persisted,Layout_Specificities.SSN5_ChildRec,nv) // Use automated NULL spotting
 EXPORT SSN5_nulls := nv;
@@ -592,11 +594,11 @@ EXPORT SSN5_max := MAX(SSN5_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(SSN5_values_persisted,SSN5,SSN5_nulls,ol) // Compute column level specificity
 EXPORT SSN5_specificity := ol;
  
-EXPORT SSN4ValuesIndexKeyName := KeyNames().ssn4_spc_logical;/*hack*/
+EXPORT SSN4ValuesIndexKeyName := KeyNames().SSN4_spc_logical;/*SPECHACK01*/
  
-EXPORT SSN4ValuesIndexKeyName_sf := KeyNames().ssn4_spc_super;/*hack*/
+EXPORT SSN4ValuesIndexKeyName_sf := KeyNames().SSN4_spc_super;/*SPECHACK02*/
  
-EXPORT SSN4_values_index := INDEX(SSN4_values_persisted_temp,{SSN4},{SSN4_values_persisted_temp},SSN4ValuesIndexKeyName_sf/*HACK*/);
+EXPORT SSN4_values_index := INDEX(SSN4_values_persisted_temp,{SSN4},{SSN4_values_persisted_temp},SSN4ValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT SSN4_values_persisted := SSN4_values_index;
 SALT37.MAC_Field_Nulls(SSN4_values_persisted,Layout_Specificities.SSN4_ChildRec,nv) // Use automated NULL spotting
 EXPORT SSN4_nulls := nv;
@@ -606,11 +608,11 @@ EXPORT SSN4_max := MAX(SSN4_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(SSN4_values_persisted,SSN4,SSN4_nulls,ol) // Compute column level specificity
 EXPORT SSN4_specificity := ol;
  
-EXPORT DOB_yearValuesIndexKeyName := KeyNames().dob_year_spc_logical;/*hack*/
+EXPORT DOB_yearValuesIndexKeyName := KeyNames().DOB_year_spc_logical;/*SPECHACK01*/
  
-EXPORT DOB_yearValuesIndexKeyName_sf := KeyNames().dob_year_spc_super;/*hack*/
+EXPORT DOB_yearValuesIndexKeyName_sf := KeyNames().DOB_year_spc_super;/*SPECHACK02*/
  
-EXPORT DOB_year_values_index := INDEX(DOB_year_values_persisted_temp,{DOB_year},{DOB_year_values_persisted_temp},DOB_yearValuesIndexKeyName_sf/*HACK*/);
+EXPORT DOB_year_values_index := INDEX(DOB_year_values_persisted_temp,{DOB_year},{DOB_year_values_persisted_temp},DOB_yearValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT DOB_year_values_persisted := DOB_year_values_index;
 SALT37.MAC_Field_Nulls(DOB_year_values_persisted,Layout_Specificities.DOB_year_ChildRec,nv) // Use automated NULL spotting
 EXPORT DOB_year_nulls := nv;
@@ -620,11 +622,11 @@ EXPORT DOB_year_max := MAX(DOB_year_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(DOB_year_values_persisted,DOB_year,DOB_year_nulls,ol) // Compute column level specificity
 EXPORT DOB_year_specificity := ol;
  
-EXPORT DOB_monthValuesIndexKeyName := KeyNames().dob_month_spc_logical;/*hack*/
+EXPORT DOB_monthValuesIndexKeyName := KeyNames().DOB_month_spc_logical;/*SPECHACK01*/
  
-EXPORT DOB_monthValuesIndexKeyName_sf := KeyNames().dob_month_spc_super;/*hack*/
+EXPORT DOB_monthValuesIndexKeyName_sf := KeyNames().DOB_month_spc_super;/*SPECHACK02*/
  
-EXPORT DOB_month_values_index := INDEX(DOB_month_values_persisted_temp,{DOB_month},{DOB_month_values_persisted_temp},DOB_monthValuesIndexKeyName_sf/*HACK*/);
+EXPORT DOB_month_values_index := INDEX(DOB_month_values_persisted_temp,{DOB_month},{DOB_month_values_persisted_temp},DOB_monthValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT DOB_month_values_persisted := DOB_month_values_index;
 SALT37.MAC_Field_Nulls(DOB_month_values_persisted,Layout_Specificities.DOB_month_ChildRec,nv) // Use automated NULL spotting
 EXPORT DOB_month_nulls := nv;
@@ -634,11 +636,11 @@ EXPORT DOB_month_max := MAX(DOB_month_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(DOB_month_values_persisted,DOB_month,DOB_month_nulls,ol) // Compute column level specificity
 EXPORT DOB_month_specificity := ol;
  
-EXPORT DOB_dayValuesIndexKeyName := KeyNames().dob_day_spc_logical;/*hack*/
+EXPORT DOB_dayValuesIndexKeyName := KeyNames().DOB_day_spc_logical;/*SPECHACK01*/
  
-EXPORT DOB_dayValuesIndexKeyName_sf := KeyNames().dob_day_spc_super;/*hack*/
+EXPORT DOB_dayValuesIndexKeyName_sf := KeyNames().DOB_day_spc_super;/*SPECHACK02*/
  
-EXPORT DOB_day_values_index := INDEX(DOB_day_values_persisted_temp,{DOB_day},{DOB_day_values_persisted_temp},DOB_dayValuesIndexKeyName_sf/*HACK*/);
+EXPORT DOB_day_values_index := INDEX(DOB_day_values_persisted_temp,{DOB_day},{DOB_day_values_persisted_temp},DOB_dayValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT DOB_day_values_persisted := DOB_day_values_index;
 SALT37.MAC_Field_Nulls(DOB_day_values_persisted,Layout_Specificities.DOB_day_ChildRec,nv) // Use automated NULL spotting
 EXPORT DOB_day_nulls := nv;
@@ -648,11 +650,11 @@ EXPORT DOB_day_max := MAX(DOB_day_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(DOB_day_values_persisted,DOB_day,DOB_day_nulls,ol) // Compute column level specificity
 EXPORT DOB_day_specificity := ol;
  
-EXPORT PHONEValuesIndexKeyName := KeyNames().phone_spc_logical;/*hack*/
+EXPORT PHONEValuesIndexKeyName := KeyNames().PHONE_spc_logical;/*SPECHACK01*/
  
-EXPORT PHONEValuesIndexKeyName_sf := KeyNames().phone_spc_super;/*hack*/
+EXPORT PHONEValuesIndexKeyName_sf := KeyNames().PHONE_spc_super;/*SPECHACK02*/
  
-EXPORT PHONE_values_index := INDEX(PHONE_values_persisted_temp,{PHONE},{PHONE_values_persisted_temp},PHONEValuesIndexKeyName_sf/*HACK*/);
+EXPORT PHONE_values_index := INDEX(PHONE_values_persisted_temp,{PHONE},{PHONE_values_persisted_temp},PHONEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT PHONE_values_persisted := PHONE_values_index;
 SALT37.MAC_Field_Nulls(PHONE_values_persisted,Layout_Specificities.PHONE_ChildRec,nv) // Use automated NULL spotting
 EXPORT PHONE_nulls := nv;
@@ -662,11 +664,11 @@ EXPORT PHONE_max := MAX(PHONE_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(PHONE_values_persisted,PHONE,PHONE_nulls,ol) // Compute column level specificity
 EXPORT PHONE_specificity := ol;
  
-EXPORT DL_STATEValuesIndexKeyName := KeyNames().dl_state_spc_logical;/*hack*/
+EXPORT DL_STATEValuesIndexKeyName := KeyNames().DL_STATE_spc_logical;/*SPECHACK01*/
  
-EXPORT DL_STATEValuesIndexKeyName_sf := KeyNames().dl_state_spc_super;/*hack*/
+EXPORT DL_STATEValuesIndexKeyName_sf := KeyNames().DL_STATE_spc_super;/*SPECHACK02*/
  
-EXPORT DL_STATE_values_index := INDEX(DL_STATE_values_persisted_temp,{DL_STATE},{DL_STATE_values_persisted_temp},DL_STATEValuesIndexKeyName_sf/*HACK*/);
+EXPORT DL_STATE_values_index := INDEX(DL_STATE_values_persisted_temp,{DL_STATE},{DL_STATE_values_persisted_temp},DL_STATEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT DL_STATE_values_persisted := DL_STATE_values_index;
 SALT37.MAC_Field_Nulls(DL_STATE_values_persisted,Layout_Specificities.DL_STATE_ChildRec,nv) // Use automated NULL spotting
 EXPORT DL_STATE_nulls := nv;
@@ -676,11 +678,11 @@ EXPORT DL_STATE_max := MAX(DL_STATE_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(DL_STATE_values_persisted,DL_STATE,DL_STATE_nulls,ol) // Compute column level specificity
 EXPORT DL_STATE_specificity := ol;
  
-EXPORT DL_NBRValuesIndexKeyName := KeyNames().dl_nbr_spc_logical;/*hack*/
+EXPORT DL_NBRValuesIndexKeyName := KeyNames().DL_NBR_spc_logical;/*SPECHACK01*/
  
-EXPORT DL_NBRValuesIndexKeyName_sf := KeyNames().dl_nbr_spc_super;/*hack*/
+EXPORT DL_NBRValuesIndexKeyName_sf := KeyNames().DL_NBR_spc_super;/*SPECHACK02*/
  
-EXPORT DL_NBR_values_index := INDEX(DL_NBR_values_persisted_temp,{DL_NBR},{DL_NBR_values_persisted_temp},DL_NBRValuesIndexKeyName_sf/*HACK*/);
+EXPORT DL_NBR_values_index := INDEX(DL_NBR_values_persisted_temp,{DL_NBR},{DL_NBR_values_persisted_temp},DL_NBRValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT DL_NBR_values_persisted := DL_NBR_values_index;
 SALT37.MAC_Field_Nulls(DL_NBR_values_persisted,Layout_Specificities.DL_NBR_ChildRec,nv) // Use automated NULL spotting
 EXPORT DL_NBR_nulls := nv;
@@ -690,11 +692,11 @@ EXPORT DL_NBR_max := MAX(DL_NBR_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(DL_NBR_values_persisted,DL_NBR,DL_NBR_nulls,ol) // Compute column level specificity
 EXPORT DL_NBR_specificity := ol;
  
-EXPORT SRCValuesIndexKeyName := KeyNames().src_spc_logical;/*hack*/
+EXPORT SRCValuesIndexKeyName := KeyNames().SRC_spc_logical;/*SPECHACK01*/
  
-EXPORT SRCValuesIndexKeyName_sf := KeyNames().src_spc_super;/*hack*/
+EXPORT SRCValuesIndexKeyName_sf := KeyNames().SRC_spc_super;/*SPECHACK02*/
  
-EXPORT SRC_values_index := INDEX(SRC_values_persisted_temp,{SRC},{SRC_values_persisted_temp},SRCValuesIndexKeyName_sf/*HACK*/);
+EXPORT SRC_values_index := INDEX(SRC_values_persisted_temp,{SRC},{SRC_values_persisted_temp},SRCValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT SRC_values_persisted := SRC_values_index;
 EXPORT SRC_nulls := DATASET([{'',0,0}],Layout_Specificities.SRC_ChildRec); // Automated null spotting not applicable
 SALT37.MAC_Field_Bfoul(SRC_deduped,SRC,DID,SRC_nulls,ClusterSizes,false,false,bf) // Compute the chances of a field having 2 values for one entity
@@ -703,11 +705,11 @@ EXPORT SRC_max := MAX(SRC_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(SRC_values_persisted,SRC,SRC_nulls,ol) // Compute column level specificity
 EXPORT SRC_specificity := ol;
  
-EXPORT SOURCE_RIDValuesIndexKeyName := KeyNames().source_rid_spc_logical;/*hack*/
+EXPORT SOURCE_RIDValuesIndexKeyName := KeyNames().SOURCE_RID_spc_logical;/*SPECHACK01*/
  
-EXPORT SOURCE_RIDValuesIndexKeyName_sf := KeyNames().source_rid_spc_super;/*hack*/
+EXPORT SOURCE_RIDValuesIndexKeyName_sf := KeyNames().SOURCE_RID_spc_super;/*SPECHACK02*/
  
-EXPORT SOURCE_RID_values_index := INDEX(SOURCE_RID_values_persisted_temp,{SOURCE_RID},{SOURCE_RID_values_persisted_temp},SOURCE_RIDValuesIndexKeyName_sf/*HACK*/);
+EXPORT SOURCE_RID_values_index := INDEX(SOURCE_RID_values_persisted_temp,{SOURCE_RID},{SOURCE_RID_values_persisted_temp},SOURCE_RIDValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT SOURCE_RID_values_persisted := SOURCE_RID_values_index;
 SALT37.MAC_Field_Nulls(SOURCE_RID_values_persisted,Layout_Specificities.SOURCE_RID_ChildRec,nv) // Use automated NULL spotting
 EXPORT SOURCE_RID_nulls := nv;
@@ -717,11 +719,11 @@ EXPORT SOURCE_RID_max := MAX(SOURCE_RID_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(SOURCE_RID_values_persisted,SOURCE_RID,SOURCE_RID_nulls,ol) // Compute column level specificity
 EXPORT SOURCE_RID_specificity := ol;
  
-EXPORT DT_FIRST_SEENValuesIndexKeyName := KeyNames().dt_first_seen_spc_logical;/*hack*/
+EXPORT DT_FIRST_SEENValuesIndexKeyName := KeyNames().DT_FIRST_SEEN_spc_logical;/*SPECHACK01*/
  
-EXPORT DT_FIRST_SEENValuesIndexKeyName_sf := KeyNames().dt_first_seen_spc_super;/*hack*/
+EXPORT DT_FIRST_SEENValuesIndexKeyName_sf := KeyNames().DT_FIRST_SEEN_spc_super;/*SPECHACK02*/
  
-EXPORT DT_FIRST_SEEN_values_index := INDEX(DT_FIRST_SEEN_values_persisted_temp,{DT_FIRST_SEEN},{DT_FIRST_SEEN_values_persisted_temp},DT_FIRST_SEENValuesIndexKeyName_sf/*HACK*/);
+EXPORT DT_FIRST_SEEN_values_index := INDEX(DT_FIRST_SEEN_values_persisted_temp,{DT_FIRST_SEEN},{DT_FIRST_SEEN_values_persisted_temp},DT_FIRST_SEENValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT DT_FIRST_SEEN_values_persisted := DT_FIRST_SEEN_values_index;
 SALT37.MAC_Field_Nulls(DT_FIRST_SEEN_values_persisted,Layout_Specificities.DT_FIRST_SEEN_ChildRec,nv) // Use automated NULL spotting
 EXPORT DT_FIRST_SEEN_nulls := nv;
@@ -731,11 +733,11 @@ EXPORT DT_FIRST_SEEN_max := MAX(DT_FIRST_SEEN_values_persisted,field_specificity
 SALT37.MAC_Field_Specificity(DT_FIRST_SEEN_values_persisted,DT_FIRST_SEEN,DT_FIRST_SEEN_nulls,ol) // Compute column level specificity
 EXPORT DT_FIRST_SEEN_specificity := ol;
  
-EXPORT DT_LAST_SEENValuesIndexKeyName := KeyNames().dt_last_seen_spc_logical;/*hack*/
+EXPORT DT_LAST_SEENValuesIndexKeyName := KeyNames().DT_LAST_SEEN_spc_logical;/*SPECHACK01*/
  
-EXPORT DT_LAST_SEENValuesIndexKeyName_sf := KeyNames().dt_last_seen_spc_super;/*hack*/
+EXPORT DT_LAST_SEENValuesIndexKeyName_sf := KeyNames().DT_LAST_SEEN_spc_super;/*SPECHACK02*/
  
-EXPORT DT_LAST_SEEN_values_index := INDEX(DT_LAST_SEEN_values_persisted_temp,{DT_LAST_SEEN},{DT_LAST_SEEN_values_persisted_temp},DT_LAST_SEENValuesIndexKeyName_sf/*HACK*/);
+EXPORT DT_LAST_SEEN_values_index := INDEX(DT_LAST_SEEN_values_persisted_temp,{DT_LAST_SEEN},{DT_LAST_SEEN_values_persisted_temp},DT_LAST_SEENValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT DT_LAST_SEEN_values_persisted := DT_LAST_SEEN_values_index;
 SALT37.MAC_Field_Nulls(DT_LAST_SEEN_values_persisted,Layout_Specificities.DT_LAST_SEEN_ChildRec,nv) // Use automated NULL spotting
 EXPORT DT_LAST_SEEN_nulls := nv;
@@ -745,11 +747,11 @@ EXPORT DT_LAST_SEEN_max := MAX(DT_LAST_SEEN_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(DT_LAST_SEEN_values_persisted,DT_LAST_SEEN,DT_LAST_SEEN_nulls,ol) // Compute column level specificity
 EXPORT DT_LAST_SEEN_specificity := ol;
  
-EXPORT DT_EFFECTIVE_FIRSTValuesIndexKeyName := KeyNames().dt_effective_first_spc_logical;/*hack*/
+EXPORT DT_EFFECTIVE_FIRSTValuesIndexKeyName := KeyNames().DT_EFFECTIVE_FIRST_spc_logical;/*SPECHACK01*/
  
-EXPORT DT_EFFECTIVE_FIRSTValuesIndexKeyName_sf := KeyNames().dt_effective_first_spc_super;/*hack*/
+EXPORT DT_EFFECTIVE_FIRSTValuesIndexKeyName_sf := KeyNames().DT_EFFECTIVE_FIRST_spc_super;/*SPECHACK02*/
  
-EXPORT DT_EFFECTIVE_FIRST_values_index := INDEX(DT_EFFECTIVE_FIRST_values_persisted_temp,{DT_EFFECTIVE_FIRST},{DT_EFFECTIVE_FIRST_values_persisted_temp},DT_EFFECTIVE_FIRSTValuesIndexKeyName_sf/*HACK*/);
+EXPORT DT_EFFECTIVE_FIRST_values_index := INDEX(DT_EFFECTIVE_FIRST_values_persisted_temp,{DT_EFFECTIVE_FIRST},{DT_EFFECTIVE_FIRST_values_persisted_temp},DT_EFFECTIVE_FIRSTValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT DT_EFFECTIVE_FIRST_values_persisted := DT_EFFECTIVE_FIRST_values_index;
 SALT37.MAC_Field_Nulls(DT_EFFECTIVE_FIRST_values_persisted,Layout_Specificities.DT_EFFECTIVE_FIRST_ChildRec,nv) // Use automated NULL spotting
 EXPORT DT_EFFECTIVE_FIRST_nulls := nv;
@@ -759,11 +761,11 @@ EXPORT DT_EFFECTIVE_FIRST_max := MAX(DT_EFFECTIVE_FIRST_values_persisted,field_s
 SALT37.MAC_Field_Specificity(DT_EFFECTIVE_FIRST_values_persisted,DT_EFFECTIVE_FIRST,DT_EFFECTIVE_FIRST_nulls,ol) // Compute column level specificity
 EXPORT DT_EFFECTIVE_FIRST_specificity := ol;
  
-EXPORT DT_EFFECTIVE_LASTValuesIndexKeyName := KeyNames().dt_effective_last_spc_logical;/*hack*/
+EXPORT DT_EFFECTIVE_LASTValuesIndexKeyName := KeyNames().DT_EFFECTIVE_LAST_spc_logical;/*SPECHACK01*/
  
-EXPORT DT_EFFECTIVE_LASTValuesIndexKeyName_sf := KeyNames().dt_effective_last_spc_super;/*hack*/
+EXPORT DT_EFFECTIVE_LASTValuesIndexKeyName_sf := KeyNames().DT_EFFECTIVE_LAST_spc_super;/*SPECHACK02*/
  
-EXPORT DT_EFFECTIVE_LAST_values_index := INDEX(DT_EFFECTIVE_LAST_values_persisted_temp,{DT_EFFECTIVE_LAST},{DT_EFFECTIVE_LAST_values_persisted_temp},DT_EFFECTIVE_LASTValuesIndexKeyName_sf/*HACK*/);
+EXPORT DT_EFFECTIVE_LAST_values_index := INDEX(DT_EFFECTIVE_LAST_values_persisted_temp,{DT_EFFECTIVE_LAST},{DT_EFFECTIVE_LAST_values_persisted_temp},DT_EFFECTIVE_LASTValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT DT_EFFECTIVE_LAST_values_persisted := DT_EFFECTIVE_LAST_values_index;
 SALT37.MAC_Field_Nulls(DT_EFFECTIVE_LAST_values_persisted,Layout_Specificities.DT_EFFECTIVE_LAST_ChildRec,nv) // Use automated NULL spotting
 EXPORT DT_EFFECTIVE_LAST_nulls := nv;
@@ -773,11 +775,11 @@ EXPORT DT_EFFECTIVE_LAST_max := MAX(DT_EFFECTIVE_LAST_values_persisted,field_spe
 SALT37.MAC_Field_Specificity(DT_EFFECTIVE_LAST_values_persisted,DT_EFFECTIVE_LAST,DT_EFFECTIVE_LAST_nulls,ol) // Compute column level specificity
 EXPORT DT_EFFECTIVE_LAST_specificity := ol;
  
-EXPORT MAINNAMEValuesIndexKeyName := KeyNames().mainname_spc_logical;/*hack*/
+EXPORT MAINNAMEValuesIndexKeyName := KeyNames().MAINNAME_spc_logical;/*SPECHACK01*/
  
-EXPORT MAINNAMEValuesIndexKeyName_sf := KeyNames().mainname_spc_super;/*hack*/
+EXPORT MAINNAMEValuesIndexKeyName_sf := KeyNames().MAINNAME_spc_super;/*SPECHACK02*/
  
-EXPORT MAINNAME_values_index := INDEX(MAINNAME_values_persisted_temp,{MAINNAME},{MAINNAME_values_persisted_temp},MAINNAMEValuesIndexKeyName_sf/*HACK*/);
+EXPORT MAINNAME_values_index := INDEX(MAINNAME_values_persisted_temp,{MAINNAME},{MAINNAME_values_persisted_temp},MAINNAMEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT MAINNAME_values_persisted := MAINNAME_values_index;
 SALT37.MAC_Field_Nulls(MAINNAME_values_persisted,Layout_Specificities.MAINNAME_ChildRec,nv) // Use automated NULL spotting
 EXPORT MAINNAME_nulls := nv;
@@ -787,11 +789,11 @@ EXPORT MAINNAME_max := MAX(MAINNAME_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(MAINNAME_values_persisted,MAINNAME,MAINNAME_nulls,ol) // Compute column level specificity
 EXPORT MAINNAME_specificity := ol;
  
-EXPORT FULLNAMEValuesIndexKeyName := KeyNames().fullname_spc_logical;/*hack*/
+EXPORT FULLNAMEValuesIndexKeyName := KeyNames().FULLNAME_spc_logical;/*SPECHACK01*/
  
-EXPORT FULLNAMEValuesIndexKeyName_sf := KeyNames().fullname_spc_super;/*hack*/
+EXPORT FULLNAMEValuesIndexKeyName_sf := KeyNames().FULLNAME_spc_super;/*SPECHACK02*/
  
-EXPORT FULLNAME_values_index := INDEX(FULLNAME_values_persisted_temp,{FULLNAME},{FULLNAME_values_persisted_temp},FULLNAMEValuesIndexKeyName_sf/*HACK*/);
+EXPORT FULLNAME_values_index := INDEX(FULLNAME_values_persisted_temp,{FULLNAME},{FULLNAME_values_persisted_temp},FULLNAMEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT FULLNAME_values_persisted := FULLNAME_values_index;
 SALT37.MAC_Field_Nulls(FULLNAME_values_persisted,Layout_Specificities.FULLNAME_ChildRec,nv) // Use automated NULL spotting
 EXPORT FULLNAME_nulls := nv;
@@ -801,11 +803,11 @@ EXPORT FULLNAME_max := MAX(FULLNAME_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(FULLNAME_values_persisted,FULLNAME,FULLNAME_nulls,ol) // Compute column level specificity
 EXPORT FULLNAME_specificity := ol;
  
-EXPORT ADDR1ValuesIndexKeyName := KeyNames().addr1_spc_logical;/*hack*/
+EXPORT ADDR1ValuesIndexKeyName := KeyNames().ADDR1_spc_logical;/*SPECHACK01*/
  
-EXPORT ADDR1ValuesIndexKeyName_sf := KeyNames().addr1_spc_super;/*hack*/
+EXPORT ADDR1ValuesIndexKeyName_sf := KeyNames().ADDR1_spc_super;/*SPECHACK02*/
  
-EXPORT ADDR1_values_index := INDEX(ADDR1_values_persisted_temp,{ADDR1},{ADDR1_values_persisted_temp},ADDR1ValuesIndexKeyName_sf/*HACK*/);
+EXPORT ADDR1_values_index := INDEX(ADDR1_values_persisted_temp,{ADDR1},{ADDR1_values_persisted_temp},ADDR1ValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT ADDR1_values_persisted := ADDR1_values_index;
 SALT37.MAC_Field_Nulls(ADDR1_values_persisted,Layout_Specificities.ADDR1_ChildRec,nv) // Use automated NULL spotting
 EXPORT ADDR1_nulls := nv;
@@ -815,11 +817,11 @@ EXPORT ADDR1_max := MAX(ADDR1_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(ADDR1_values_persisted,ADDR1,ADDR1_nulls,ol) // Compute column level specificity
 EXPORT ADDR1_specificity := ol;
  
-EXPORT LOCALEValuesIndexKeyName := KeyNames().locale_spc_logical;/*hack*/
+EXPORT LOCALEValuesIndexKeyName := KeyNames().LOCALE_spc_logical;/*SPECHACK01*/
  
-EXPORT LOCALEValuesIndexKeyName_sf := KeyNames().locale_spc_super;/*hack*/
+EXPORT LOCALEValuesIndexKeyName_sf := KeyNames().LOCALE_spc_super;/*SPECHACK02*/
  
-EXPORT LOCALE_values_index := INDEX(LOCALE_values_persisted_temp,{LOCALE},{LOCALE_values_persisted_temp},LOCALEValuesIndexKeyName_sf/*HACK*/);
+EXPORT LOCALE_values_index := INDEX(LOCALE_values_persisted_temp,{LOCALE},{LOCALE_values_persisted_temp},LOCALEValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT LOCALE_values_persisted := LOCALE_values_index;
 SALT37.MAC_Field_Nulls(LOCALE_values_persisted,Layout_Specificities.LOCALE_ChildRec,nv) // Use automated NULL spotting
 EXPORT LOCALE_nulls := nv;
@@ -829,11 +831,11 @@ EXPORT LOCALE_max := MAX(LOCALE_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(LOCALE_values_persisted,LOCALE,LOCALE_nulls,ol) // Compute column level specificity
 EXPORT LOCALE_specificity := ol;
  
-EXPORT ADDRESSValuesIndexKeyName := KeyNames().address_spc_logical;/*hack*/
+EXPORT ADDRESSValuesIndexKeyName := KeyNames().ADDRESS_spc_logical;/*SPECHACK01*/
  
-EXPORT ADDRESSValuesIndexKeyName_sf := KeyNames().address_spc_super;/*hack*/
+EXPORT ADDRESSValuesIndexKeyName_sf := KeyNames().ADDRESS_spc_super;/*SPECHACK02*/
  
-EXPORT ADDRESS_values_index := INDEX(ADDRESS_values_persisted_temp,{ADDRESS},{ADDRESS_values_persisted_temp},ADDRESSValuesIndexKeyName_sf/*HACK*/);
+EXPORT ADDRESS_values_index := INDEX(ADDRESS_values_persisted_temp,{ADDRESS},{ADDRESS_values_persisted_temp},ADDRESSValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT ADDRESS_values_persisted := ADDRESS_values_index;
 SALT37.MAC_Field_Nulls(ADDRESS_values_persisted,Layout_Specificities.ADDRESS_ChildRec,nv) // Use automated NULL spotting
 EXPORT ADDRESS_nulls := nv;
@@ -843,7 +845,7 @@ EXPORT ADDRESS_max := MAX(ADDRESS_values_persisted,field_specificity);
 SALT37.MAC_Field_Specificity(ADDRESS_values_persisted,ADDRESS,ADDRESS_nulls,ol) // Compute column level specificity
 EXPORT ADDRESS_specificity := ol;
  
-EXPORT BuildFields := PARALLEL(BUILDINDEX(SNAME_values_index, SNAMEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(FNAME_values_index, FNAMEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(MNAME_values_index, MNAMEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(LNAME_values_index, LNAMEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(DERIVED_GENDER_values_index, DERIVED_GENDERValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(PRIM_RANGE_values_index, PRIM_RANGEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(PRIM_NAME_values_index, PRIM_NAMEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(SEC_RANGE_values_index, SEC_RANGEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(CITY_values_index, CITYValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(ST_values_index, STValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(ZIP_values_index, ZIPValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(SSN5_values_index, SSN5ValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(SSN4_values_index, SSN4ValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(DOB_year_values_index, DOB_yearValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(DOB_month_values_index, DOB_monthValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(DOB_day_values_index, DOB_dayValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(PHONE_values_index, PHONEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(DL_STATE_values_index, DL_STATEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(DL_NBR_values_index, DL_NBRValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(SRC_values_index, SRCValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(SOURCE_RID_values_index, SOURCE_RIDValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(DT_FIRST_SEEN_values_index, DT_FIRST_SEENValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(DT_LAST_SEEN_values_index, DT_LAST_SEENValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(DT_EFFECTIVE_FIRST_values_index, DT_EFFECTIVE_FIRSTValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(DT_EFFECTIVE_LAST_values_index, DT_EFFECTIVE_LASTValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(MAINNAME_values_index, MAINNAMEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(FULLNAME_values_index, FULLNAMEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(ADDR1_values_index, ADDR1ValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(LOCALE_values_index, LOCALEValuesIndexKeyName, OVERWRITE)/*HACK*/,BUILDINDEX(ADDRESS_values_index, ADDRESSValuesIndexKeyName, OVERWRITE)/*HACK*/);
+EXPORT BuildFields := PARALLEL(BUILDINDEX(SNAME_values_index, SNAMEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(FNAME_values_index, FNAMEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(MNAME_values_index, MNAMEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(LNAME_values_index, LNAMEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(DERIVED_GENDER_values_index, DERIVED_GENDERValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(PRIM_RANGE_values_index, PRIM_RANGEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(PRIM_NAME_values_index, PRIM_NAMEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(SEC_RANGE_values_index, SEC_RANGEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(CITY_values_index, CITYValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(ST_values_index, STValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(ZIP_values_index, ZIPValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(SSN5_values_index, SSN5ValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(SSN4_values_index, SSN4ValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(DOB_year_values_index, DOB_yearValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(DOB_month_values_index, DOB_monthValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(DOB_day_values_index, DOB_dayValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(PHONE_values_index, PHONEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(DL_STATE_values_index, DL_STATEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(DL_NBR_values_index, DL_NBRValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(SRC_values_index, SRCValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(SOURCE_RID_values_index, SOURCE_RIDValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(DT_FIRST_SEEN_values_index, DT_FIRST_SEENValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(DT_LAST_SEEN_values_index, DT_LAST_SEENValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(DT_EFFECTIVE_FIRST_values_index, DT_EFFECTIVE_FIRSTValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(DT_EFFECTIVE_LAST_values_index, DT_EFFECTIVE_LASTValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(MAINNAME_values_index, MAINNAMEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(FULLNAME_values_index, FULLNAMEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(ADDR1_values_index, ADDR1ValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(LOCALE_values_index, LOCALEValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/,BUILDINDEX(ADDRESS_values_index, ADDRESSValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/);
  
   infile := Relatives;
   r := RECORD
@@ -861,9 +863,9 @@ SHARED RES_attributes := DEDUP( SORT( DISTRIBUTE( t, DID ), DID, Basis, LOCAL), 
   SALT37.Mac_Specificity_Local(RES_attributes,Basis,DID,RES_nulls,Layout_Specificities.RES_ChildRec,RES_specificity,RES_switch,RES_values);
 EXPORT RES_max := MAX(RES_values,field_specificity);
  
-EXPORT RESValuesIndexKeyName := KeyNames().res_spc_logical;/*hack*/
+EXPORT RESValuesIndexKeyName := KeyNames().RES_spc_logical;/*SPECHACK01*/
  
-EXPORT RESValuesIndexKeyName_sf := KeyNames().res_spc_super;/*hack*/
+EXPORT RESValuesIndexKeyName_sf := KeyNames().RES_spc_super;/*SPECHACK02*/
   TYPEOF(RES_attributes) take(RES_attributes le,RES_values ri,BOOLEAN patch_default) := TRANSFORM
     SELF.Basis_cnt := ri.cnt;
     SELF.Basis_weight100 := ri.field_specificity*100;
@@ -874,23 +876,27 @@ EXPORT RESValuesIndexKeyName_sf := KeyNames().res_spc_super;/*hack*/
   non_null_atts := RES_attributes(Basis NOT IN SET(RES_nulls,Basis));
 SALT37.MAC_Choose_JoinType(non_null_atts,RES_nulls,RES_values,Basis,Basis_weight100,take,RES_v);
  
-EXPORT RES_values_index := INDEX(RES_v,{Basis},{RES_v},RESValuesIndexKeyName_sf/*HACK*/);
+EXPORT RES_values_index := INDEX(RES_v,{Basis},{RES_v},RESValuesIndexKeyName_sf/*SPECHACK03*/);
 EXPORT RES_values_persisted := RES_values_index;
  
-EXPORT BuildAttributes := BUILDINDEX(RES_values_index, RESValuesIndexKeyName, OVERWRITE)/*HACK*/;
+EXPORT BuildAttributes := BUILDINDEX(RES_values_index, RESValuesIndexKeyName, OVERWRITE)/*SPECHACK04*/;
 EXPORT BuildAll := PARALLEL(BuildFields, BuildAttributes);
  
-EXPORT SpecIndexKeyName := KeyNames().main_spc_logical;/*HACK*/
+EXPORT SpecIndexKeyName := KeyNames().main_spc_logical;/*SPECHACK05*/
  
-EXPORT SpecIndexKeyName_sf := KeyNames().main_spc_super;/*HACK*/
+EXPORT SpecIndexKeyName_sf := KeyNames().main_spc_super;/*SPECHACK06*/
 iSpecificities := DATASET([{0,SNAME_specificity,SNAME_switch,SNAME_max,SNAME_nulls,FNAME_specificity,FNAME_switch,FNAME_max,FNAME_nulls,MNAME_specificity,MNAME_switch,MNAME_max,MNAME_nulls,LNAME_specificity,LNAME_switch,LNAME_max,LNAME_nulls,DERIVED_GENDER_specificity,DERIVED_GENDER_switch,DERIVED_GENDER_max,DERIVED_GENDER_nulls,PRIM_RANGE_specificity,PRIM_RANGE_switch,PRIM_RANGE_max,PRIM_RANGE_nulls,PRIM_NAME_specificity,PRIM_NAME_switch,PRIM_NAME_max,PRIM_NAME_nulls,SEC_RANGE_specificity,SEC_RANGE_switch,SEC_RANGE_max,SEC_RANGE_nulls,CITY_specificity,CITY_switch,CITY_max,CITY_nulls,ST_specificity,ST_switch,ST_max,ST_nulls,ZIP_specificity,ZIP_switch,ZIP_max,ZIP_nulls,SSN5_specificity,SSN5_switch,SSN5_max,SSN5_nulls,SSN4_specificity,SSN4_switch,SSN4_max,SSN4_nulls,DOB_year_specificity,DOB_year_switch,DOB_year_max,DOB_year_nulls,DOB_month_specificity,DOB_month_switch,DOB_month_max,DOB_month_nulls,DOB_day_specificity,DOB_day_switch,DOB_day_max,DOB_day_nulls,PHONE_specificity,PHONE_switch,PHONE_max,PHONE_nulls,DL_STATE_specificity,DL_STATE_switch,DL_STATE_max,DL_STATE_nulls,DL_NBR_specificity,DL_NBR_switch,DL_NBR_max,DL_NBR_nulls,SRC_specificity,SRC_switch,SRC_max,SRC_nulls,SOURCE_RID_specificity,SOURCE_RID_switch,SOURCE_RID_max,SOURCE_RID_nulls,DT_FIRST_SEEN_specificity,DT_FIRST_SEEN_switch,DT_FIRST_SEEN_max,DT_FIRST_SEEN_nulls,DT_LAST_SEEN_specificity,DT_LAST_SEEN_switch,DT_LAST_SEEN_max,DT_LAST_SEEN_nulls,DT_EFFECTIVE_FIRST_specificity,DT_EFFECTIVE_FIRST_switch,DT_EFFECTIVE_FIRST_max,DT_EFFECTIVE_FIRST_nulls,DT_EFFECTIVE_LAST_specificity,DT_EFFECTIVE_LAST_switch,DT_EFFECTIVE_LAST_max,DT_EFFECTIVE_LAST_nulls,MAINNAME_specificity,MAINNAME_switch,MAINNAME_max,MAINNAME_nulls,FULLNAME_specificity,FULLNAME_switch,FULLNAME_max,FULLNAME_nulls,ADDR1_specificity,ADDR1_switch,ADDR1_max,ADDR1_nulls,LOCALE_specificity,LOCALE_switch,LOCALE_max,LOCALE_nulls,ADDRESS_specificity,ADDRESS_switch,ADDRESS_max,ADDRESS_nulls,RES_specificity,RES_switch,RES_max,RES_nulls}],Layout_Specificities.R);
  
-EXPORT Specificities_Index := INDEX(iSpecificities,{1},{iSpecificities},SpecIndexKeyName_sf/*HACK*/);
+EXPORT Specificities_Index := INDEX(iSpecificities,{1},{iSpecificities},SpecIndexKeyName_sf/*SPECHACK07*/);
 EXPORT Build := SEQUENTIAL(BuildAll,
-                           createUpdateSuperFile().updateFieldSpecificitiesSuperFiles,
-                           createUpdateSuperFile().updateAttrSpecificitiesSuperFiles,
-                           BUILDINDEX(Specificities_Index, SpecIndexKeyName, OVERWRITE, FEW),
-                           createUpdateSuperFile().updateMainSpecificitiesSuperFiles);/*HACK*/
+
+createUpdateSuperFile().updateFieldSpecificitiesSuperFiles,
+
+createUpdateSuperFile().updateAttrSpecificitiesSuperFiles,
+
+BUILDINDEX(Specificities_Index, SpecIndexKeyName, OVERWRITE, FEW),
+
+createUpdateSuperFile().updateMainSpecificitiesSuperFiles);/*SPECHACK08*/
 Layout_Specificities.R Into(Specificities_Index i) := TRANSFORM
   SELF := i;
 END;

@@ -21,7 +21,7 @@ EXPORT map_AZS0808_conversion(STRING pVersion) := FUNCTION
 	cnt_valid_rec := COUNT(ValidRecs);
 	
 	//Map Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(Prof_License_Mari.layout_AZS0808 pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(Prof_License_Mari.layout_AZS0808 pInput) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -38,9 +38,9 @@ EXPORT map_AZS0808_conversion(STRING pVersion) := FUNCTION
 
 		SELF.TYPE_CD					:= 'MD'; 
 			
-		trimNAME_LAST					:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.NAME_LAST);
+		trimNAME_LAST					:= ut.CleanSpacesAndUpper(pInput.NAME_LAST);
 		//Some of the first names have partial nick name. Remove it.
-		prepNAME_FIRST				:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.NAME_FIRST);
+		prepNAME_FIRST				:= ut.CleanSpacesAndUpper(pInput.NAME_FIRST);
 		trimNAME_FIRST				:= MAP(REGEXFIND('^([^\\(]+)\\([^\\)]*\\)', prepNAME_FIRST) => prepNAME_FIRST,
 																 REGEXFIND('\\(', prepNAME_FIRST) AND NOT REGEXFIND('\\)',prepNAME_FIRST)
 																		=> REGEXFIND('^([^\\(]+)\\(',prepNAME_FIRST,1),
@@ -79,9 +79,9 @@ EXPORT map_AZS0808_conversion(STRING pVersion) := FUNCTION
 		ConcatNAME_FULL 			:= 	StringLib.StringCleanSpaces(LastName +' '+FirstName);
 		
 		SELF.NAME_ORG		    	:= ConcatNAME_FULL;
-		SELF.NAME_ORG_ORIG		:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.NAME_FIRST) +
+		SELF.NAME_ORG_ORIG		:= StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(pInput.NAME_FIRST) +
 		                                                     ' ' +
-																												 Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.NAME_LAST));
+																												 ut.CleanSpacesAndUpper(pInput.NAME_LAST));
 		SELF.NAME_FORMAT			:= 'F';
 		
 		SELF.NAME_FIRST		   	:= FirstName;
@@ -93,7 +93,7 @@ EXPORT map_AZS0808_conversion(STRING pVersion) := FUNCTION
 																 '');	
 		SELF.LICENSE_NBR	    := pInput.LICENSE_NBR;
 			
-		TrimLicType						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LICENSE);
+		TrimLicType						:= ut.CleanSpacesAndUpper(pInput.LICENSE);
 		SELF.RAW_LICENSE_TYPE	:= TrimLicType;
 			
 		StripLicType  				:= StringLib.StringCleanSpaces(
@@ -136,7 +136,7 @@ EXPORT map_AZS0808_conversion(STRING pVersion) := FUNCTION
 	
 		//Extract company name out of address field
 		COMPANY_PATTERN := '^(.*LLC,)';
-		TrimAddress1				:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDR_ADDRESS1);
+		TrimAddress1				:= ut.CleanSpacesAndUpper(pInput.ADDR_ADDRESS1);
 		TempBusNameFlag			:= IF(REGEXFIND(COMPANY_PATTERN,TrimAddress1),'YES','NO');
 		TempBusName					:= IF(REGEXFIND(COMPANY_PATTERN,TrimAddress1),
 														 REGEXFIND(COMPANY_PATTERN,TrimAddress1,1),
@@ -164,8 +164,8 @@ EXPORT map_AZS0808_conversion(STRING pVersion) := FUNCTION
 					 '^C-21 .*$|^PRUDENTIAL .*$|^.* REALTORS$|^.* PROPERTIES$' +
 					 ')';
 
-  	TrimCity							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDR_CITY);
-   	TrimState							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDR_STATE);
+  	TrimCity							:= ut.CleanSpacesAndUpper(pInput.ADDR_CITY);
+   	TrimState							:= ut.CleanSpacesAndUpper(pInput.ADDR_STATE);
  		tmpZip	        			:= MAP(LENGTH(TRIM(pInput.ADDR_ZIP))=3 => '00'+TRIM(pInput.ADDR_ZIP),
 		                             LENGTH(TRIM(pInput.ADDR_ZIP))=4 => '0'+TRIM(pInput.ADDR_ZIP),
 																 TRIM(pInput.ADDR_ZIP));
@@ -210,10 +210,10 @@ EXPORT map_AZS0808_conversion(STRING pVersion) := FUNCTION
 											 +TRIM(SELF.std_source_upd,LEFT,RIGHT)
 											 //Use SELF.name_org_orig instead of SELF.name_org. BIG # 124107
 											 +TRIM(SELF.name_org_orig,LEFT,RIGHT)
-											 // +Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.NAME_FIRST)
-											 // +Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.NAME_LAST)
-											 +Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDR_ADDRESS1)
-											 +Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDR_CITY)
+											 // +ut.CleanSpacesAndUpper(pInput.NAME_FIRST)
+											 // +ut.CleanSpacesAndUpper(pInput.NAME_LAST)
+											 +ut.CleanSpacesAndUpper(pInput.ADDR_ADDRESS1)
+											 +ut.CleanSpacesAndUpper(pInput.ADDR_CITY)
 											 +TRIM(pInput.ADDR_ZIP,LEFT,RIGHT));
 											 
 			SELF.PROVNOTE_3 	    := '{LIC_STATUS ASSIGNED}';    //std_license_status is always assigned to 'A' 10/4/13
@@ -224,7 +224,7 @@ EXPORT map_AZS0808_conversion(STRING pVersion) := FUNCTION
 	inFileLic := PROJECT(ValidRecs, xformToCommon(left));	
 
 	// Translating Raw codes to standardized status/license codes
-	Prof_License_Mari.layouts.base	doTypeJoin(inFileLic L, SrcCmvTrans R) := TRANSFORM
+	Prof_License_Mari.layout_base_in	doTypeJoin(inFileLic L, SrcCmvTrans R) := TRANSFORM
 	  	SELF.STD_PROF_CD	:= R.DM_VALUE1;
 	  	SELF := L;
 	END;

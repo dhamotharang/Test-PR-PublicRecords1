@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP;
+﻿IMPORT AutoStandardI, BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP, doxie;
 
 	// The following function reads Business Header Records, which'll be used in at least two other 
 	// functions a bit later. Slims 'em down too, for a lighter footprint.
@@ -13,7 +13,7 @@ IMPORT BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP;
 			
 			// --------------- LexisNexis Business Header ----------------
 			
-			ds_BusinessHeaderRaw := 
+			ds_BusinessHeaderRaw1 := 
 					BIPV2.Key_BH_Linking_Ids.kFetch2(inputs                   := ds_BIPIDs,
 																					 Level                    := Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
 																					 ScoreThreshold           := 0, // ScoreThreshold --> 0 = Give me everything
@@ -23,6 +23,9 @@ IMPORT BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP;
 																					 bypassContactSuppression := TRUE,
 																					 JoinType                 := BIPV2.IDconstants.JoinTypes.LimitTransformJoin );// Options.KeepLargeBusinesses  Business_Risk_BIP.Constants.DefaultJoinType );
 	
+		// clean up the business header before doing anything else
+		Business_Risk_BIP.Common.mac_slim_header(ds_BusinessHeaderRaw1, ds_BusinessHeaderRaw);	
+		
 			// Add back our Seq numbers.
 			ds_BusinessHeaderSeq := 
 				JOIN(
@@ -32,7 +35,8 @@ IMPORT BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP;
 						SELF.seq := LEFT.seq,
 						SELF.uniqueid := RIGHT.uniqueid, 
 						SELF.HistoryDate := LEFT.HistoryDate,
-						SELF := RIGHT), 
+						SELF := RIGHT,
+						self := []), 
 					FEW);				
 					
 			// Filter out records after our history date and sources that aren't allowed. NOTE: 
@@ -60,11 +64,22 @@ IMPORT BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP;
 				RECORDOF(Business_Credit_KEL.File_SBFE_temp);
 			END;
 
+      _mod_access := 
+        MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+          EXPORT STRING DataRestrictionMask := linkingOptions.DataRestrictionMask;
+          EXPORT UNSIGNED1 glb := linkingOptions.GLBPurpose;
+          EXPORT UNSIGNED1 dppa := linkingOptions.DPPAPurpose;
+          EXPORT BOOLEAN show_minors := linkingOptions.IncludeMinors;
+          EXPORT UNSIGNED1 unrestricted := (UNSIGNED1)linkingOptions.AllowAll;
+          EXPORT BOOLEAN isPreGLBRestricted() := linkingOptions.restrictPreGLB;
+          EXPORT BOOLEAN ln_branded :=  linkingOptions.lnbranded;
+        END;
+          
 			ds_SBFERaw := 
 					Business_Credit.Key_LinkIds().kFetch2(inputs             := ds_BIPIDs,
-																								Level              := Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
+																								mod_access         := _mod_access,
+                                                Level              := Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
 																								ScoreThreshold     := 0, // ScoreThreshold --> 0 = Give me everything
-																								DataPermissionMask := Options.DataPermissionMask,
 																								JoinLimit          := Business_Risk_BIP.Constants.Limit_SBFE_LinkIds,
 																								JoinType           := Options.KeepLargeBusinesses );				
 

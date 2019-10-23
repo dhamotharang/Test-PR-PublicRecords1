@@ -1,4 +1,4 @@
-export Corrections := 
+﻿export Corrections := 
 
 module
 
@@ -1175,4 +1175,4 @@ export dthor_data400__key__corrections_offenders_risk__bocashell_did		:= dataset
 export dthor_data400__key__corrections_offenders_risk__did 							:= dataset([], rthor_data400__key__corrections_offenders_risk__did);
 export dthor_data400__key__corrections_offenders_bocashell_did_fcra 		:= dataset([], rthor_data400__key__corrections_offenders_bocashell_did_fcra);
 export dthor_data400__key__corrections_offenders__casenumber_public     := dataset([], rthor_data400__key__corrections_offenders__casenumber_public);
-end;
+end: DEPRECATED('Use PRTE2_DOC.PROC_BUILD_ALL');;

@@ -10,7 +10,7 @@ if(process_date='',fail('ERROR -- UNABLE TO OBTAIN PROCESS DATE FOR WA UCC DATA'
    
 newInput 				:= 	UCCV2.File_WA_in;
 mainBase 				:= 	UCCV2.File_WA_Main_Base;
-suppressionFile	:=	if (COUNT(FileServices.SuperFileContents(uccv2.Cluster.Cluster_In + 'in::uccv2::WA::suppression')) > 0,
+suppressionFile	:=	if (COUNT(NOTHOR(FileServices.SuperFileContents(uccv2.Cluster.Cluster_In + 'in::uccv2::WA::suppression'))) > 0,
 													UCCV2.File_WA_Suppression,
 													DATASET([], UCCV2.Layout_File_WA_Suppression)
 												);

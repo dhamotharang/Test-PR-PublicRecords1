@@ -1,4 +1,4 @@
-import address, LiensV2, bipv2;
+﻿import address, LiensV2, bipv2;
 export Layouts :=
 module
 
@@ -9,53 +9,38 @@ module
 	//////////////////////////////////////////////////////////////////////// 
 	export Input :=
 	module
-	
-		export SprayedOld := 
+		
+	export Sprayed := 
 		record
-			string Charter;
-			string Address1;
-			string City;
-			string State;
-			string Zip_Code;
-			string Contact_Name;
-			string Phone;
-			string Assets;
-			string Loans;
-			string NetWorthRatio;
-			string Perc_ShareGrowth;
-			string Perc_LoanGrowth;
-			string LoantoAssetsRatio;
-			string InvestAssetsRatio;
-			string NumMem;
-			string NumFull;
-			string CU_NAME;
-		end;                            	
+		  STRING CU_Number;
+			STRING cycle_date;
+			STRING join_number;
+			STRING SiteId;
+			STRING CU_Name;
+			STRING SiteName;
+			STRING SiteTypeName;
+			STRING MainOffice;
+			STRING PhysicalAddressLine1;
+			STRING PhysicalAddressLine2;
+			STRING PhysicalAddressCity;
+			STRING PhysicalAddressStateCode;
+			STRING PhysicalAddressPostalCode;
+			STRING PhysicalAddressCountyName;
+			STRING PhysicalAddressCountry;
+			STRING MailingAddressLine1;
+			STRING MailingAddressLine2;
+			STRING MailingAddressCity;
+			STRING MailingAddressStateCode;
+			STRING MailingAddressStateName;
+			STRING MailingAddressPostalCode;
+			STRING PhoneNumber;
+	end;
 
-		export Sprayed := 
+  
+  //Fixed layout is based on the old base layout.  This layout is used for the keybuild.
+	export Fixed := 
 		record
-			string Charter;
-			string CU_NAME;
-			string Address1;
-			string City;
-			string State;
-			string Zip_Code;
-			string Contact_Name;
-			string Phone;
-			string Assets;
-			string Loans;
-			string NetWorthRatio;
-			string Perc_ShareGrowth;
-			string Perc_LoanGrowth;
-			string LoantoAssetsRatio;
-			string InvestAssetsRatio;
-			string NumMem;
-			string NumFull;
-//			string __filename { virtual(logicalfilename)};	//doesn't work on csv or xml files yet :(
-		end;                            	
-	
-		export Fixed := 
-		record
-			string7		Charter;
+			string7		Charter;     //CU_Number
 			string35	CU_NAME;
 			string35	Address1;
 			string15	City;
@@ -72,15 +57,49 @@ module
 			string17	InvestAssetsRatio;
 			string10	NumMem;
 			string8 	NumFull;
-		end;                            	
+	 end;                        
 	end;
 
+    export NormRec	:=	record 
+			/* Normalize the records to split the physical and mailing addresses */
+			unsigned8	unique_id;
+			string Charter;                    //CU_Number
+			string cycle_date;                 //New Field
+			string join_number;                //New Field
+			string SiteId;                     //New Field
+			string CU_Name;
+			string SiteName;                   //New Field
+			string SiteTypeName;               //New Field
+			string MainOffice;                 //New Field
+			string addrtype;                   
+			string Address1;
+			string Address2;                   //New Field
+			string City;
+			string State;
+			string StateName;                  //New Field
+			string Zip_Code;
+			string CountyName;                 //New Field
+			string Country;                    //New Field
+			string Phone;
+			string Contact_Name;               
+			string Assets;
+			string Loans;
+			string NetWorthRatio;
+			string Perc_ShareGrowth;
+			string Perc_LoanGrowth;
+			string LoantoAssetsRatio;
+			string InvestAssetsRatio;
+			string NumMem;
+			string NumFull;
+		end;
+		
 	////////////////////////////////////////////////////////////////////////
 	// -- Base Layouts
 	////////////////////////////////////////////////////////////////////////
-	export Base :=
+	
+  export Base :=
 	record
-		bipv2.IDlayouts.l_xlink_ids;	//Added for BIP project
+	  bipv2.IDlayouts.l_xlink_ids;	//Added for BIP project
 		unsigned8 source_rec_id := 0; //Added for BIP project	
 		unsigned6														did											:= 0;
 		unsigned1														did_score										;
@@ -88,17 +107,18 @@ module
 		unsigned1														bdid_score									;
 		unsigned8							    					raw_aid									:= 0;
 		unsigned8							    					ace_aid									:= 0;
+		unsigned8							    					mail_raw_aid						:= 0;
+    unsigned8							    					mail_ace_aid						:= 0;		
 		string1															record_type									;
 		unsigned4 													dt_vendor_first_reported		;
 		unsigned4 													dt_vendor_last_reported			;
-		input.sprayed 											rawfields										;
-		Address.Layout_Clean_Name						clean_contact_name					;
-		Address.Layout_Clean182_fips		    Clean_address								;
+		NormRec - unique_id;
+		Address.Layout_Clean_Name						                    				;
+		Address.Layout_Clean182_fips		                                ;
 		string100														Prep_Addr_Line1					:='';
 		string50														Prep_Addr_Line_Last			:='';
 	end;
 	
-
 	////////////////////////////////////////////////////////////////////////
 	// -- Keybuild Layouts
 	////////////////////////////////////////////////////////////////////////
@@ -131,15 +151,18 @@ module
 	export Temporary :=
 	module
 
+    export TempRec := record
+			unsigned8	unique_id;
+			Input.Sprayed;
+		end;
+		
 	  export StandardizeInput :=
 	  record
 			unsigned8		unique_id		 				;
-			//string100 	address1		;
-			//string50		address2		;
 			base 					 					 				;
 	  end;
 		
-	  export DidSlim := 
+ 	  export DidSlim := 
 	  record
 			unsigned8		unique_id				;
 			string20 		fname						;

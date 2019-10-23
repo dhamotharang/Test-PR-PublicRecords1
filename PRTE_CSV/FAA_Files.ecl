@@ -1,4 +1,4 @@
-import versioncontrol;
+﻿import versioncontrol;
 
 export FAA_Files(
 
@@ -16,4 +16,5 @@ module
 	 versioncontrol.macInputFileVersions(PRTE_CSV.filenames('faa_airmen_certs').input,PRTE_CSV.FAA_Input_Layouts.input.sprayed.layout_faa_airmen_certs, input_faa_airmen_certs,'CSV',,'\n','\t',1);
 
 
-end;
+end: DEPRECATED('Use PRTE2_FAA.Files instead.');
+;

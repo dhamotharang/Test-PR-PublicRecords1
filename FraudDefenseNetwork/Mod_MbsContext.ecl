@@ -1,4 +1,4 @@
-IMPORT FraudShared;
+﻿IMPORT FraudShared;
 EXPORT Mod_MbsContext := MODULE
 
 	  shared Mbs_ds                                 := FraudShared.Files().Input.MBS.sprayed(status = 1);
@@ -11,6 +11,8 @@ EXPORT Mod_MbsContext := MODULE
 		shared Mbs_ds_TextMinedCrim                   := Mbs_ds(fdn_file_code='TextMinedCrim')[1];
 		shared Mbs_ds_tiger                           := Mbs_ds(fdn_file_code='TIGER')[1];
 		shared Mbs_ds_Erie                            := Mbs_ds(fdn_file_code='ERIE')[1];
+		shared Mbs_ds_ErieWatchList                   := Mbs_ds(fdn_file_code='ERIE_Watchlist')[1];
+		shared Mbs_ds_ErieNICBWatchList               := Mbs_ds(fdn_file_code='ERIE_NICB_Watchlist')[1];
 
 		export AInspectionExpdays                     := Mbs_ds_ainspection.expiration_days;
 		export CfnaExpdays                            := Mbs_ds_cfna.expiration_days;
@@ -21,6 +23,8 @@ EXPORT Mod_MbsContext := MODULE
 	  export TextMinedCrimExpdays                   := Mbs_ds_TextMinedCrim.expiration_days;
 		export TigerExpdays                           := Mbs_ds_tiger.expiration_days;	
 		export ErieExpdays                            := Mbs_ds_Erie.expiration_days;	
+		export ErieWatchListExpdays                   := Mbs_ds_ErieWatchList.expiration_days;	
+		export ErieNICBWatchListExpdays               := Mbs_ds_ErieNICBWatchList.expiration_days;	
 		
 		//file_type
 		export Glb5FileType                           := FraudShared.MBS_CVD(column_name = 'FILE_TYPE', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.file_type )[1].description;
@@ -32,6 +36,8 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGIndividualFileType                  := FraudShared.MBS_CVD(column_name = 'FILE_TYPE', status = Mbs_ds_OIGIndividual.status, desc_value = Mbs_ds_OIGIndividual.file_type )[1].description;
 		export OIGBusinessFileType                    := FraudShared.MBS_CVD(column_name = 'FILE_TYPE', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.file_type )[1].description;
 		export ErieFileType                           := FraudShared.MBS_CVD(column_name = 'FILE_TYPE', status = Mbs_ds_Erie.status,          desc_value = Mbs_ds_Erie.file_type )[1].description;
+		export ErieWatchListFileType                  := FraudShared.MBS_CVD(column_name = 'FILE_TYPE', status = Mbs_ds_ErieWatchList.status, desc_value = Mbs_ds_ErieWatchList.file_type )[1].description;
+		export ErieNICBWatchListFileType              := FraudShared.MBS_CVD(column_name = 'FILE_TYPE', status = Mbs_ds_ErieNICBWatchList.status, desc_value = Mbs_ds_ErieNICBWatchList.file_type )[1].description;
 
 	//primary_source_entity
 		export Glb5PrimarySrcEntity                   := FraudShared.MBS_CVD(column_name = 'PRIMARY_SOURCE_ENTITY', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.primary_source_entity )[1].description;
@@ -43,6 +49,8 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGIndividualPrimarySrcEntity          := FraudShared.MBS_CVD(column_name = 'PRIMARY_SOURCE_ENTITY', status = Mbs_ds_OIGIndividual.status, desc_value = Mbs_ds_OIGIndividual.primary_source_entity )[1].description;
 		export OIGBusinessPrimarySrcEntity            := FraudShared.MBS_CVD(column_name = 'PRIMARY_SOURCE_ENTITY', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.primary_source_entity )[1].description;
 		export EriePrimarySrcEntity                   := FraudShared.MBS_CVD(column_name = 'PRIMARY_SOURCE_ENTITY', status = Mbs_ds_Erie.status,          desc_value = Mbs_ds_Erie.primary_source_entity )[1].description;
+		export ErieWatchListPrimarySrcEntity          := FraudShared.MBS_CVD(column_name = 'PRIMARY_SOURCE_ENTITY', status = Mbs_ds_ErieWatchList.status, desc_value = Mbs_ds_ErieWatchList.primary_source_entity )[1].description;
+		export ErieNICBWatchListPrimarySrcEntity      := FraudShared.MBS_CVD(column_name = 'PRIMARY_SOURCE_ENTITY', status = Mbs_ds_ErieNICBWatchList.status, desc_value = Mbs_ds_ErieNICBWatchList.primary_source_entity )[1].description;
 
 		//Expectation_of_Victim_Entities
 		export Glb5ExpOfVicEntities                   := FraudShared.MBS_CVD(column_name = 'VICTIM_ENTITIES', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.Expectation_of_Victim_Entities )[1].description;
@@ -54,6 +62,8 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGIndividualExpOfVicEntities          := FraudShared.MBS_CVD(column_name = 'VICTIM_ENTITIES', status = Mbs_ds_OIGIndividual.status, desc_value = Mbs_ds_OIGIndividual.Expectation_of_Victim_Entities )[1].description;
 		export OIGBusinessExpOfVicEntities            := FraudShared.MBS_CVD(column_name = 'VICTIM_ENTITIES', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.Expectation_of_Victim_Entities )[1].description;
 		export ErieExpOfVicEntities                   := FraudShared.MBS_CVD(column_name = 'VICTIM_ENTITIES', status = Mbs_ds_Erie.status,          desc_value = Mbs_ds_Erie.Expectation_of_Victim_Entities )[1].description;
+		export ErieWatchListExpOfVicEntities          := FraudShared.MBS_CVD(column_name = 'VICTIM_ENTITIES', status = Mbs_ds_ErieWatchList.status, desc_value = Mbs_ds_ErieWatchList.Expectation_of_Victim_Entities )[1].description;
+		export ErieNICBWatchListExpOfVicEntities      := FraudShared.MBS_CVD(column_name = 'VICTIM_ENTITIES', status = Mbs_ds_ErieNICBWatchList.status, desc_value = Mbs_ds_ErieNICBWatchList.Expectation_of_Victim_Entities )[1].description;
 
 		//suspected_discrepancy
 		export Glb5SuspDiscrepancy                    := FraudShared.MBS_CVD(column_name = 'SUSPECTED_DISCREPANCY', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.suspected_discrepancy )[1].description;
@@ -65,6 +75,8 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGIndividualSuspDiscrepancy           := FraudShared.MBS_CVD(column_name = 'SUSPECTED_DISCREPANCY', status = Mbs_ds_OIGIndividual.status, desc_value = Mbs_ds_OIGIndividual.suspected_discrepancy )[1].description;
 		export OIGBusinessSuspDiscrepancy             := FraudShared.MBS_CVD(column_name = 'SUSPECTED_DISCREPANCY', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.suspected_discrepancy )[1].description;
 		export ErieSuspDiscrepancy                    := FraudShared.MBS_CVD(column_name = 'SUSPECTED_DISCREPANCY', status = Mbs_ds_Erie.status,          desc_value = Mbs_ds_Erie.suspected_discrepancy )[1].description;
+		export ErieWatchListSuspDiscrepancy           := FraudShared.MBS_CVD(column_name = 'SUSPECTED_DISCREPANCY', status = Mbs_ds_ErieWatchList.status, desc_value = Mbs_ds_ErieWatchList.suspected_discrepancy )[1].description;
+		export ErieNICBWatchListSuspDiscrepancy       := FraudShared.MBS_CVD(column_name = 'SUSPECTED_DISCREPANCY', status = Mbs_ds_ErieNICBWatchList.status,          desc_value = Mbs_ds_ErieNICBWatchList.suspected_discrepancy )[1].description;
 
 	//confidence_that_activity_was_deceitful
 		export Glb5ConfActivityDeceitful              := FraudShared.MBS_CVD(column_name = 'DECEITFUL_ACTIVITY', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.confidence_that_activity_was_deceitful )[1].description;
@@ -81,13 +93,9 @@ EXPORT Mod_MbsContext := MODULE
 		export ErieConfActivityDeceitful_pr_id        := FraudShared.MBS_CVD(column_name = 'DECEITFUL_ACTIVITY', status = Mbs_ds_Erie.status,          description = 'PROBABLE' )[1].desc_value;
 		export ErieConfActivityDeceitful_po_id        := FraudShared.MBS_CVD(column_name = 'DECEITFUL_ACTIVITY', status = Mbs_ds_Erie.status,          description = 'POTENTIAL' )[1].desc_value;
 		export ErieConfActivityDeceitful_ne_id        := FraudShared.MBS_CVD(column_name = 'DECEITFUL_ACTIVITY', status = Mbs_ds_Erie.status,          description = 'NEUTRAL' )[1].desc_value;
-
-		// 1	PROBABLE                                                                                                                                                                                                                                                                                                    
-		// 2	POTENTIAL                                                                                                                                                                                                                                                                                                   
-		// 5	PROVEN                                                                                                                                                                                                                                                                                                      
-		// 3	KNOWN GOOD                                                                                                                                                                                                                                                                                                  
-		// 4	NEUTRAL
-		
+		export ErieWatchListConfActivityDeceitful     := FraudShared.MBS_CVD(column_name = 'DECEITFUL_ACTIVITY', status = Mbs_ds_ErieWatchList.status, desc_value = Mbs_ds_ErieWatchList.confidence_that_activity_was_deceitful )[1].description;
+		export ErieNICBWatchListConfActivityDeceitful := FraudShared.MBS_CVD(column_name = 'DECEITFUL_ACTIVITY', status = Mbs_ds_ErieNICBWatchList.status, desc_value = Mbs_ds_ErieNICBWatchList.confidence_that_activity_was_deceitful )[1].description;
+	
 		//workflow_stage_committed
 		export Glb5WrkFlowStgComtd                    := FraudShared.MBS_CVD(column_name = 'WORKFLOW_COMMITTED', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.workflow_stage_committed )[1].description;
 		export TigerWrkFlowStgComtd                   := FraudShared.MBS_CVD(column_name = 'WORKFLOW_COMMITTED', status = Mbs_ds_tiger.status,         desc_value = Mbs_ds_tiger.workflow_stage_committed )[1].description;
@@ -98,6 +106,8 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGIndividualWrkFlowStgComtd           := FraudShared.MBS_CVD(column_name = 'WORKFLOW_COMMITTED', status = Mbs_ds_OIGIndividual.status, desc_value = Mbs_ds_OIGIndividual.workflow_stage_committed )[1].description;
 		export OIGBusinessWrkFlowStgComtd             := FraudShared.MBS_CVD(column_name = 'WORKFLOW_COMMITTED', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.workflow_stage_committed )[1].description;
 		export ErieWrkFlowStgComtd                    := FraudShared.MBS_CVD(column_name = 'WORKFLOW_COMMITTED', status = Mbs_ds_Erie.status,          desc_value = Mbs_ds_Erie.workflow_stage_committed )[1].description;
+		export ErieWatchListWrkFlowStgComtd           := FraudShared.MBS_CVD(column_name = 'WORKFLOW_COMMITTED', status = Mbs_ds_ErieWatchList.status, desc_value = Mbs_ds_ErieWatchList.workflow_stage_committed )[1].description;
+		export ErieNICBWatchListWrkFlowStgComtd       := FraudShared.MBS_CVD(column_name = 'WORKFLOW_COMMITTED', status = Mbs_ds_ErieNICBWatchList.status, desc_value = Mbs_ds_ErieNICBWatchList.workflow_stage_committed )[1].description;
 
 		//workflow_stage_detected
 		export Glb5WrkFlowStgDetected                 := FraudShared.MBS_CVD(column_name = 'WORKFLOW_DETECTED', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.workflow_stage_detected )[1].description;
@@ -109,6 +119,8 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGIndividualWrkFlowStgDetected        := FraudShared.MBS_CVD(column_name = 'WORKFLOW_DETECTED', status = Mbs_ds_OIGIndividual.status, desc_value = Mbs_ds_OIGIndividual.workflow_stage_detected )[1].description;
 		export OIGBusinessWrkFlowStgDetected          := FraudShared.MBS_CVD(column_name = 'WORKFLOW_DETECTED', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.workflow_stage_detected )[1].description;		
 		export ErieWrkFlowStgDetected                 := FraudShared.MBS_CVD(column_name = 'WORKFLOW_DETECTED', status = Mbs_ds_Erie.status,          desc_value = Mbs_ds_Erie.workflow_stage_detected )[1].description;		
+		export ErieWatchListWrkFlowStgDetected        := FraudShared.MBS_CVD(column_name = 'WORKFLOW_DETECTED', status = Mbs_ds_ErieWatchList.status, desc_value = Mbs_ds_ErieWatchList.workflow_stage_detected )[1].description;		
+		export ErieNICBWatchListWrkFlowStgDetected    := FraudShared.MBS_CVD(column_name = 'WORKFLOW_DETECTED', status = Mbs_ds_ErieNICBWatchList.status, desc_value = Mbs_ds_ErieNICBWatchList.workflow_stage_detected )[1].description;		
 	
 	//channels
 		export Glb5Channels                           := FraudShared.MBS_CVD(column_name = 'CHANNEL', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.channels )[1].description;
@@ -120,6 +132,8 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGIndividualChannels                  := FraudShared.MBS_CVD(column_name = 'CHANNEL', status = Mbs_ds_OIGIndividual.status, desc_value = Mbs_ds_OIGIndividual.channels )[1].description;
 		export OIGBusinessChannels                    := FraudShared.MBS_CVD(column_name = 'CHANNEL', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.channels )[1].description;
 		export ErieChannels                           := FraudShared.MBS_CVD(column_name = 'CHANNEL', status = Mbs_ds_Erie.status,          desc_value = Mbs_ds_Erie.channels )[1].description;
+		export ErieWatchListChannels                  := FraudShared.MBS_CVD(column_name = 'CHANNEL', status = Mbs_ds_ErieWatchList.status,          desc_value = Mbs_ds_ErieWatchList.channels )[1].description;
+		export ErieNICBWatchListChannels              := FraudShared.MBS_CVD(column_name = 'CHANNEL', status = Mbs_ds_ErieNICBWatchList.status,          desc_value = Mbs_ds_ErieNICBWatchList.channels )[1].description;
 
 		//Threat
 		export Glb5Threat                             := FraudShared.MBS_CVD(column_name = 'THREAT', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.threat )[1].description;
@@ -131,6 +145,8 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGIndividualThreat                    := FraudShared.MBS_CVD(column_name = 'THREAT', status = Mbs_ds_OIGIndividual.status, desc_value = Mbs_ds_OIGIndividual.threat )[1].description;
 		export OIGBusinessThreat                      := FraudShared.MBS_CVD(column_name = 'THREAT', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.threat )[1].description;
 		export ErieThreat                             := FraudShared.MBS_CVD(column_name = 'THREAT', status = Mbs_ds_Erie.status,          desc_value = Mbs_ds_Erie.threat )[1].description;
+		export ErieWatchListThreat                    := FraudShared.MBS_CVD(column_name = 'THREAT', status = Mbs_ds_ErieWatchList.status,          desc_value = Mbs_ds_ErieWatchList.threat )[1].description;
+		export ErieNICBWatchListThreat                := FraudShared.MBS_CVD(column_name = 'THREAT', status = Mbs_ds_ErieNICBWatchList.status,          desc_value = Mbs_ds_ErieNICBWatchList.threat )[1].description;
 		
 		//Alert_level
 		export Glb5AlertLevel                         := FraudShared.MBS_CVD(column_name = 'ALERT_LEVEL', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.alert_level )[1].description;
@@ -142,6 +158,8 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGIndividualAlertLevel                := FraudShared.MBS_CVD(column_name = 'ALERT_LEVEL', status = Mbs_ds_OIGIndividual.status, desc_value = Mbs_ds_OIGIndividual.alert_level )[1].description;
 		export OIGBusinessAlertLevel                  := FraudShared.MBS_CVD(column_name = 'ALERT_LEVEL', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.alert_level )[1].description;
 		export ErieAlertLevel                         := FraudShared.MBS_CVD(column_name = 'ALERT_LEVEL', status = Mbs_ds_Erie.status,          desc_value = Mbs_ds_Erie.alert_level )[1].description;
+		export ErieWatchListAlertLevel                := FraudShared.MBS_CVD(column_name = 'ALERT_LEVEL', status = Mbs_ds_ErieWatchList.status, desc_value = Mbs_ds_ErieWatchList.alert_level )[1].description;
+		export ErieNICBWatchListAlertLevel            := FraudShared.MBS_CVD(column_name = 'ALERT_LEVEL', status = Mbs_ds_ErieNICBWatchList.status, desc_value = Mbs_ds_ErieNICBWatchList.alert_level )[1].description;
  
  //entity_type
 		export Glb5EntityType                         := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.entity_type )[1].description;
@@ -158,6 +176,18 @@ EXPORT Mod_MbsContext := MODULE
 		export ErieEntityType_person_id               := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_Erie.status,          description = 'PERSON' )[1].desc_value;
 		export ErieEntityType_business_id             := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_Erie.status,          description = 'BUSINESS' )[1].desc_value;
 		export ErieEntityType_unknown_id              := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_Erie.status,          description = 'UNKNOWN' )[1].desc_value;
+    export ErieWatchListEntityType_person         := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieWatchList.status,          desc_value = 9 )[1].description;
+		export ErieWatchListEntityType_business       := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieWatchList.status,          desc_value = 2 )[1].description;
+		export ErieWatchListEntityType_unknown        := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieWatchList.status,          desc_value = 13 )[1].description;
+		export ErieWatchListEntityType_person_id      := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieWatchList.status,          description = 'PERSON' )[1].desc_value;
+		export ErieWatchListEntityType_business_id    := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieWatchList.status,          description = 'BUSINESS' )[1].desc_value;
+		export ErieWatchListEntityType_unknown_id     := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieWatchList.status,          description = 'UNKNOWN' )[1].desc_value;		
+    export ErieNICBWatchListEntityType_person     := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieNICBWatchList.status,          desc_value = 9 )[1].description;
+		export ErieNICBWatchListEntityType_business    := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieNICBWatchList.status,          desc_value = 2 )[1].description;
+		export ErieNICBWatchListEntityType_unknown     := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieNICBWatchList.status,          desc_value = 13 )[1].description;
+		export ErieNICBWatchListEntityType_person_id   := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieNICBWatchList.status,          description = 'PERSON' )[1].desc_value;
+		export ErieNICBWatchListEntityType_business_id := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieNICBWatchList.status,          description = 'BUSINESS' )[1].desc_value;
+		export ErieNICBWatchListEntityType_unknown_id  := FraudShared.MBS_CVD(column_name = 'ENTITY_TYPE', status = Mbs_ds_ErieNICBWatchList.status,          description = 'UNKNOWN' )[1].desc_value;
 	 
   	//entity_sub_type
 		export Glb5EntitySubType                      := FraudShared.MBS_CVD(column_name = 'ENTITY_SUB_TYPE', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.entity_sub_type )[1].description;
@@ -170,6 +200,8 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGBusinessEntitySubType               := FraudShared.MBS_CVD(column_name = 'ENTITY_SUB_TYPE', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.entity_sub_type )[1].description;
 		export ErieEntitySubType_AsscP                := FraudShared.MBS_CVD(column_name = 'ENTITY_SUB_TYPE', status = Mbs_ds_Erie.status,          desc_value = 5 )[1].description;
 		export ErieEntitySubType_AsscP_id             := FraudShared.MBS_CVD(column_name = 'ENTITY_SUB_TYPE', status = Mbs_ds_Erie.status,          description = 'ASSOCIATED PARTY' )[1].desc_value;
+		export ErieWatchListEntitySubType             := FraudShared.MBS_CVD(column_name = 'ENTITY_SUB_TYPE', status = Mbs_ds_ErieWatchList.status,   desc_value = Mbs_ds_ErieWatchList.entity_sub_type )[1].description;
+		export ErieNICBWatchListEntitySubType         := FraudShared.MBS_CVD(column_name = 'ENTITY_SUB_TYPE', status = Mbs_ds_ErieNICBWatchList.status,   desc_value = Mbs_ds_ErieNICBWatchList.entity_sub_type )[1].description;
 	 
 		//role
 		export Glb5Role                               := FraudShared.MBS_CVD(column_name = 'ROLE', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.role )[1].description;
@@ -182,6 +214,8 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGBusinessRole                        := FraudShared.MBS_CVD(column_name = 'ROLE', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.role )[1].description;
 		export ErieRole_Susp                          := FraudShared.MBS_CVD(column_name = 'ROLE', status = Mbs_ds_Erie.status,          desc_value = 4 )[1].description;
 		export ErieRole_Susp_id                       := FraudShared.MBS_CVD(column_name = 'ROLE', status = Mbs_ds_Erie.status,          description = 'SUSPICIOUS' )[1].desc_value;
+		export ErieWatchListRole                      := FraudShared.MBS_CVD(column_name = 'ROLE', status = Mbs_ds_ErieWatchList.status, desc_value = Mbs_ds_ErieWatchList.role )[1].description;
+		export ErieNICBWatchListRole                  := FraudShared.MBS_CVD(column_name = 'ROLE', status = Mbs_ds_ErieNICBWatchList.status, desc_value = Mbs_ds_ErieNICBWatchList.role )[1].description;
 		
 		//evidence
 		export Glb5Evidence                           := FraudShared.MBS_CVD(column_name = 'EVIDENCE', status = Mbs_ds_glb5.status,          desc_value = Mbs_ds_glb5.evidence )[1].description;
@@ -193,5 +227,7 @@ EXPORT Mod_MbsContext := MODULE
 		export OIGIndividualEvidence                  := FraudShared.MBS_CVD(column_name = 'EVIDENCE', status = Mbs_ds_OIGIndividual.status, desc_value = Mbs_ds_OIGIndividual.evidence )[1].description;
 		export OIGBusinessEvidence                    := FraudShared.MBS_CVD(column_name = 'EVIDENCE', status = Mbs_ds_OIGBusiness.status,   desc_value = Mbs_ds_OIGBusiness.evidence )[1].description;
 		export ErieEvidence                           := FraudShared.MBS_CVD(column_name = 'EVIDENCE', status = Mbs_ds_Erie.status,          desc_value = Mbs_ds_Erie.evidence )[1].description;
+		export ErieWatchListEvidence                  := FraudShared.MBS_CVD(column_name = 'EVIDENCE', status = Mbs_ds_ErieWatchList.status, desc_value = Mbs_ds_ErieWatchList.evidence )[1].description;
+		export ErieNICBWatchListEvidence              := FraudShared.MBS_CVD(column_name = 'EVIDENCE', status = Mbs_ds_ErieNICBWatchList.status, desc_value = Mbs_ds_ErieNICBWatchList.evidence )[1].description;
 		
 END;		

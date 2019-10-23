@@ -1,4 +1,4 @@
-// spray KSS0903 Professional Licenses Files for MARI	   
+﻿// spray KSS0903 Professional Licenses Files for MARI	   
 IMPORT ut
 	   ,_control
        ,Prof_License_Mari
@@ -10,7 +10,7 @@ IMPORT ut
 //Files for S0903 are Located  //
 EXPORT spray_KSS0903 (STRING filedate) := MODULE
 
-#workunit('name','Spray KSS0903');
+#workunit('name','Yogurt: Spray KSS0903');
 
 SHARED filepath		  :=	'/data/data_build_5_2/MARI/in/KSS0903/' + filedate +'/';
 SHARED sourcepath		:=	'/data/data_build_5_2/MARI/';

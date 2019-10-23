@@ -1,4 +1,4 @@
-﻿import	_control,RoxieKeyBuild,ut,Orbit3;
+﻿import	_control,RoxieKeyBuild,ut,Orbit3,Scrubs_DoNotCall;
 
 export	proc_build_DNC(string	sourceIP,string	fileDate,string	NationalSourceFile,string	DMASourceFile	=	'',string	groupName	=	'thor400_44',string	emailTarget	=	' ')	:=
 function
@@ -87,7 +87,8 @@ function
 											updateVersion,
 											create_orbit_build,
 											qaRecs,
-											qaEmail
+											qaEmail,
+											Scrubs_DoNotCall.fnRunScrubs(fileDate,'')
 										);
 	
 end;

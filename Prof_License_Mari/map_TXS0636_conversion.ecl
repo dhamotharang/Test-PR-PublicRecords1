@@ -1,11 +1,11 @@
-/* Converting Texas Office of Consumer Credit Commissioner / Other Lenders // Professions Licenses File to MARI common layout
+﻿/* Converting Texas Office of Consumer Credit Commissioner / Other Lenders // Professions Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
-#workunit('name','map_TXS0636_conversion');
+
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, standard,STD;
 
 EXPORT map_TXS0636_conversion(STRING pVersion) := FUNCTION
-
+#workunit('name','Yogurt:Prof License MARI - TXS0636  ' + pVersion);
 	code 								:= 'TXS0636';
 	src_cd							:= code[3..7];
 	src_st							:= code[1..2];	//License state
@@ -20,7 +20,7 @@ EXPORT map_TXS0636_conversion(STRING pVersion) := FUNCTION
 	//Comments := 'THIS IS NOT A MAIN OFFICE. IT IS A BRANCH OFFICE WITHOUT AN ASSOCIATED MAIN OFFICE FROM THIS SOURCE.';
 	BusExceptions  := '(REMAX |RE/MAX|HOME EXPERTS| AND |JD R E| ASSOCIATE| STREETS|CENTURY 21|KEYSTONE 1 |2.5% |-2-|ASSIST 2 |INTEGRITY 1ST|'+
 										'REALTY|COMMERCIAL|REAL ESTATE| STS|PROPERTIES|KEYSTONE| GROUP|REALTORS| RE BRK|SEC\'Y| INC| RE AGENCY | SERVS|INVESTMENTS|'+
-										'PALM HARBOR |SUNTRUST BANK|PIONEER BANK|LENDING\\>| FINANCE\\>|CORP\\>|BROKERS| HOME |EVOFI ONE|^AMERI|L.L.C.| LP\\>|'+
+										'PALM HARBOR |SUNTRUST BANK|PIONEER BANK|LENDING\\>| FINANCE\\>|CORP\\>|BROKERS| HOME |EVOFI ONE|^AMERI|L.L.C.| LP\\>|LOANS|'+
 										'.COM| L.C.|SOUTHWEST |HAMPTON COTTAGE|CORPORTION|CORPORAITON|CENTURA BANK|FIDELITY|EXCLUSIVE|PLC|ET AL|CO\\>|SFMC L P)';
 
 	MiscExceptions := '(C.I.T. GROUP|C I T GROUP|CIT GROUP|ATM/|ATM /|ATM, |ATM |BRANCH|C.I.T. GROUP|T/S |D/FW |FLORES/ALVAREZ|A/T/S|I/C|LAND/HOME|'+
@@ -53,7 +53,7 @@ EXPORT map_TXS0636_conversion(STRING pVersion) := FUNCTION
 	GoodFilterRec 	:= FilterBlankRec(NOT REGEXFIND('LIC #',StringLib.StringToUpperCase(LIC_NUMR)));
 
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(GoodFilterRec  pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(GoodFilterRec  pInput) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];		//yyyymmdd
@@ -421,7 +421,7 @@ EXPORT map_TXS0636_conversion(STRING pVersion) := FUNCTION
 	inFileLic_dedup:= DEDUP(inFilelic,cmc_slpk);
 
 	// Populate STD_STATUS_CD field via translation on statu field
-	Prof_License_Mari.layouts.base trans_lic_status(inFileLic_dedup L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_status(inFileLic_dedup L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS :=  IF(L.STD_LICENSE_STATUS = '',StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT)),
 																			L.STD_LICENSE_STATUS);
 		SELF := L;
@@ -433,7 +433,7 @@ EXPORT map_TXS0636_conversion(STRING pVersion) := FUNCTION
 							trans_lic_status(LEFT,RIGHT),LEFT OUTER,MANY LOOKUP);
 		
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map_status_trans L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_status_trans L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));
 		SELF := L;
 	END;
@@ -447,7 +447,7 @@ EXPORT map_TXS0636_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(ds_map_lic_trans L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(ds_map_lic_trans L) := TRANSFORM
 		SELF.NAME_ORG 				:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_ORG,'/',' '));
 		SELF.NAME_DBA					:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_DBA,'/',' '));
 		SELF.NAME_MARI_ORG		:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_ORG,'/',' '));

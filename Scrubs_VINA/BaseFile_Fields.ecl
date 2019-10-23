@@ -1,843 +1,1235 @@
-IMPORT ut,SALT31;
+﻿IMPORT SALT311;
 EXPORT BaseFile_Fields := MODULE
+
+EXPORT NumFields := 162;
+
 // Processing for each FieldType
-EXPORT SALT31.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_engine_information_cylinders','Invalid_Nums','Invalid_Num_Axles','Invalid_Tire_Size','Invalid_Decimal','Invalid_Nums_Blank','Invalid_Nums_Rotary','Invalid_Vehicle_Type','Invalid_Abbreviation','Invalid_Vin','Invalid_Body_Type','Invalid_Char','Invalid_Char_No_Spec','Invalid_Fuel','Invalid_HPC','Invalid_Wheel','Invalid_Ton','Invalid_Location','Invalid_Option_SOUNA','Invalid_Option_SOUN','Invalid_Radio','Invalid_Roof','Invalid_ALB','Invalid_Transmission','Invalid_Security','Invalid_Visrap','Invalid_Cab','Invalid_FAC','Invalid_RAC','Invalid_Brakes','Invalid_Engine_Type','Invalid_Trailer_Body','Invalid_Trailer_length','Invalid_Proactive_VIN_Ind','Invalid_VIN_Pattern','Invalid_Segmentation_Codes','Invalid_Country','Invalid_Liter','Invalid_Block_Type','Invalid_Carburetion','Invalid_Carburetion_Num','Invalid_Head_Configuration','Invalid_Valves','Invalid_Aspiration_Code','Invalid_Carburetion_Code','Invalid_VPC','Invalid_Transmission_Speed','Invalid_Transmission_Type','Invalid_Transmission_Code','Invalid_Transmission_Speed_Code','Invalid_Y_or_N','Invalid_Y_or_N_orBlank','Invalid_Battery_Type','Invalid_Battery_KW','Invalid_Battery_Volts','Invalid_Engine_Brand','Invalid_Supercharged','Invalid_Turbocharged');
-EXPORT FieldTypeNum(SALT31.StrType fn) := CASE(fn,'Invalid_engine_information_cylinders' => 1,'Invalid_Nums' => 2,'Invalid_Num_Axles' => 3,'Invalid_Tire_Size' => 4,'Invalid_Decimal' => 5,'Invalid_Nums_Blank' => 6,'Invalid_Nums_Rotary' => 7,'Invalid_Vehicle_Type' => 8,'Invalid_Abbreviation' => 9,'Invalid_Vin' => 10,'Invalid_Body_Type' => 11,'Invalid_Char' => 12,'Invalid_Char_No_Spec' => 13,'Invalid_Fuel' => 14,'Invalid_HPC' => 15,'Invalid_Wheel' => 16,'Invalid_Ton' => 17,'Invalid_Location' => 18,'Invalid_Option_SOUNA' => 19,'Invalid_Option_SOUN' => 20,'Invalid_Radio' => 21,'Invalid_Roof' => 22,'Invalid_ALB' => 23,'Invalid_Transmission' => 24,'Invalid_Security' => 25,'Invalid_Visrap' => 26,'Invalid_Cab' => 27,'Invalid_FAC' => 28,'Invalid_RAC' => 29,'Invalid_Brakes' => 30,'Invalid_Engine_Type' => 31,'Invalid_Trailer_Body' => 32,'Invalid_Trailer_length' => 33,'Invalid_Proactive_VIN_Ind' => 34,'Invalid_VIN_Pattern' => 35,'Invalid_Segmentation_Codes' => 36,'Invalid_Country' => 37,'Invalid_Liter' => 38,'Invalid_Block_Type' => 39,'Invalid_Carburetion' => 40,'Invalid_Carburetion_Num' => 41,'Invalid_Head_Configuration' => 42,'Invalid_Valves' => 43,'Invalid_Aspiration_Code' => 44,'Invalid_Carburetion_Code' => 45,'Invalid_VPC' => 46,'Invalid_Transmission_Speed' => 47,'Invalid_Transmission_Type' => 48,'Invalid_Transmission_Code' => 49,'Invalid_Transmission_Speed_Code' => 50,'Invalid_Y_or_N' => 51,'Invalid_Y_or_N_orBlank' => 52,'Invalid_Battery_Type' => 53,'Invalid_Battery_KW' => 54,'Invalid_Battery_Volts' => 55,'Invalid_Engine_Brand' => 56,'Invalid_Supercharged' => 57,'Invalid_Turbocharged' => 58,0);
-EXPORT MakeFT_Invalid_engine_information_cylinders(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789U'); // Only allow valid symbols
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_engine_information_cylinders','Invalid_Nums','Invalid_Num_Axles','Invalid_Tire_Size','Invalid_Decimal','Invalid_Nums_Blank','Invalid_Nums_Rotary','Invalid_Vehicle_Type','Invalid_Abbreviation','Invalid_Vin','Invalid_Body_Type','Invalid_Char','Invalid_Char_No_Spec','Invalid_Fuel','Invalid_HPC','Invalid_Wheel','Invalid_Ton','Invalid_Location','Invalid_Option_SOUNA','Invalid_Option_SOUN','Invalid_Radio','Invalid_Roof','Invalid_ALB','Invalid_Transmission','Invalid_Security','Invalid_Visrap','Invalid_Cab','Invalid_FAC','Invalid_RAC','Invalid_Brakes','Invalid_Engine_Type','Invalid_Trailer_Body','Invalid_Trailer_length','Invalid_Proactive_VIN_Ind','Invalid_VIN_Pattern','Invalid_Segmentation_Codes','Invalid_Country','Invalid_Liter','Invalid_Block_Type','Invalid_Carburetion','Invalid_Carburetion_Num','Invalid_Head_Configuration','Invalid_Valves','Invalid_Aspiration_Code','Invalid_Carburetion_Code','Invalid_VPC','Invalid_Transmission_Speed','Invalid_Transmission_Type','Invalid_Transmission_Code','Invalid_Transmission_Speed_Code','Invalid_Y_or_N','Invalid_Y_or_N_orBlank','Invalid_Battery_Type','Invalid_Battery_KW','Invalid_Battery_Volts','Invalid_Engine_Brand','Invalid_Supercharged','Invalid_Turbocharged');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_engine_information_cylinders' => 1,'Invalid_Nums' => 2,'Invalid_Num_Axles' => 3,'Invalid_Tire_Size' => 4,'Invalid_Decimal' => 5,'Invalid_Nums_Blank' => 6,'Invalid_Nums_Rotary' => 7,'Invalid_Vehicle_Type' => 8,'Invalid_Abbreviation' => 9,'Invalid_Vin' => 10,'Invalid_Body_Type' => 11,'Invalid_Char' => 12,'Invalid_Char_No_Spec' => 13,'Invalid_Fuel' => 14,'Invalid_HPC' => 15,'Invalid_Wheel' => 16,'Invalid_Ton' => 17,'Invalid_Location' => 18,'Invalid_Option_SOUNA' => 19,'Invalid_Option_SOUN' => 20,'Invalid_Radio' => 21,'Invalid_Roof' => 22,'Invalid_ALB' => 23,'Invalid_Transmission' => 24,'Invalid_Security' => 25,'Invalid_Visrap' => 26,'Invalid_Cab' => 27,'Invalid_FAC' => 28,'Invalid_RAC' => 29,'Invalid_Brakes' => 30,'Invalid_Engine_Type' => 31,'Invalid_Trailer_Body' => 32,'Invalid_Trailer_length' => 33,'Invalid_Proactive_VIN_Ind' => 34,'Invalid_VIN_Pattern' => 35,'Invalid_Segmentation_Codes' => 36,'Invalid_Country' => 37,'Invalid_Liter' => 38,'Invalid_Block_Type' => 39,'Invalid_Carburetion' => 40,'Invalid_Carburetion_Num' => 41,'Invalid_Head_Configuration' => 42,'Invalid_Valves' => 43,'Invalid_Aspiration_Code' => 44,'Invalid_Carburetion_Code' => 45,'Invalid_VPC' => 46,'Invalid_Transmission_Speed' => 47,'Invalid_Transmission_Type' => 48,'Invalid_Transmission_Code' => 49,'Invalid_Transmission_Speed_Code' => 50,'Invalid_Y_or_N' => 51,'Invalid_Y_or_N_orBlank' => 52,'Invalid_Battery_Type' => 53,'Invalid_Battery_KW' => 54,'Invalid_Battery_Volts' => 55,'Invalid_Engine_Brand' => 56,'Invalid_Supercharged' => 57,'Invalid_Turbocharged' => 58,0);
+
+EXPORT MakeFT_Invalid_engine_information_cylinders(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789U'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_engine_information_cylinders(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789U'))));
-EXPORT InValidMessageFT_Invalid_engine_information_cylinders(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789U'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Nums(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_engine_information_cylinders(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789U'))));
+EXPORT InValidMessageFT_Invalid_engine_information_cylinders(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789U'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Nums(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Nums(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789'))));
-EXPORT InValidMessageFT_Invalid_Nums(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Num_Axles(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'FTUYZ0123456789'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Nums(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))));
+EXPORT InValidMessageFT_Invalid_Nums(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Num_Axles(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'FTUYZ0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Num_Axles(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'FTUYZ0123456789'))));
-EXPORT InValidMessageFT_Invalid_Num_Axles(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('FTUYZ0123456789'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Tire_Size(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789.-R'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Num_Axles(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'FTUYZ0123456789'))));
+EXPORT InValidMessageFT_Invalid_Num_Axles(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('FTUYZ0123456789'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Tire_Size(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789.-ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Tire_Size(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789.-R'))));
-EXPORT InValidMessageFT_Invalid_Tire_Size(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789.-R'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Decimal(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789.'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Tire_Size(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789.-ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
+EXPORT InValidMessageFT_Invalid_Tire_Size(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789.-ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Decimal(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789.'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Decimal(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789.'))));
-EXPORT InValidMessageFT_Invalid_Decimal(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789.'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Nums_Blank(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789 '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Decimal(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789.'))));
+EXPORT InValidMessageFT_Invalid_Decimal(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789.'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Nums_Blank(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789 '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Nums_Blank(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_Invalid_Nums_Blank(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789 '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Nums_Rotary(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'R0123456789 '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Nums_Blank(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789 '))));
+EXPORT InValidMessageFT_Invalid_Nums_Blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789 '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Nums_Rotary(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'R0123456789 U'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Nums_Rotary(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'R0123456789 '))));
-EXPORT InValidMessageFT_Invalid_Nums_Rotary(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('R0123456789 '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Vehicle_Type(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'PTMC'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Nums_Rotary(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'R0123456789 U'))));
+EXPORT InValidMessageFT_Invalid_Nums_Rotary(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('R0123456789 U'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Vehicle_Type(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'PTMC'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Vehicle_Type(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'PTMC'))));
-EXPORT InValidMessageFT_Invalid_Vehicle_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('PTMC'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Abbreviation(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Vehicle_Type(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'PTMC'))));
+EXPORT InValidMessageFT_Invalid_Vehicle_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('PTMC'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Abbreviation(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Abbreviation(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'))));
-EXPORT InValidMessageFT_Invalid_Abbreviation(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Vin(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Abbreviation(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz '))));
+EXPORT InValidMessageFT_Invalid_Abbreviation(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Vin(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Vin(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*'))));
-EXPORT InValidMessageFT_Invalid_Vin(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Body_Type(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Vin(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*'))));
+EXPORT InValidMessageFT_Invalid_Vin(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Body_Type(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Body_Type(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'))));
-EXPORT InValidMessageFT_Invalid_Body_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Char(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*&'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Body_Type(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'))));
+EXPORT InValidMessageFT_Invalid_Body_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Char(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*&"\'`()/+!,'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Char(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*&'))));
-EXPORT InValidMessageFT_Invalid_Char(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*&'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Char_No_Spec(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Char(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*&"\'`()/+!,'))));
+EXPORT InValidMessageFT_Invalid_Char(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*&"\'`()/+!,'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Char_No_Spec(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*&"\'`()/+!,'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Char_No_Spec(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*'))));
-EXPORT InValidMessageFT_Invalid_Char_No_Spec(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Fuel(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'BCEFGHMNPD'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Char_No_Spec(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*&"\'`()/+!,'))));
+EXPORT InValidMessageFT_Invalid_Char_No_Spec(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*&"\'`()/+!,'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Fuel(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'BCEFGHMNPDU'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Fuel(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'BCEFGHMNPD'))));
-EXPORT InValidMessageFT_Invalid_Fuel(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('BCEFGHMNPD'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_HPC(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ACDHJLMN03 '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Fuel(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'BCEFGHMNPDU'))));
+EXPORT InValidMessageFT_Invalid_Fuel(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('BCEFGHMNPDU'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_HPC(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ACDHJLMN03 '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_HPC(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ACDHJLMN03 '))));
-EXPORT InValidMessageFT_Invalid_HPC(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ACDHJLMN03 '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Wheel(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'F4A '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_HPC(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ACDHJLMN03 '))));
+EXPORT InValidMessageFT_Invalid_HPC(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ACDHJLMN03 '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Wheel(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'F4A '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Wheel(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'F4A '))));
-EXPORT InValidMessageFT_Invalid_Wheel(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('F4A '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Ton(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDJKLMNOPQRFGHI'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Wheel(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'F4A '))));
+EXPORT InValidMessageFT_Invalid_Wheel(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('F4A '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Ton(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDJKLMNOPQRFGHI'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Ton(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDJKLMNOPQRFGHI'))));
-EXPORT InValidMessageFT_Invalid_Ton(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDJKLMNOPQRFGHI'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Location(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'CPM '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Ton(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDJKLMNOPQRFGHI'))));
+EXPORT InValidMessageFT_Invalid_Ton(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDJKLMNOPQRFGHI'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Location(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'CPM '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Location(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'CPM '))));
-EXPORT InValidMessageFT_Invalid_Location(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('CPM '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Option_SOUNA(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'SOUNA '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Location(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'CPM '))));
+EXPORT InValidMessageFT_Invalid_Location(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('CPM '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Option_SOUNA(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'SOUNA '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Option_SOUNA(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'SOUNA '))));
-EXPORT InValidMessageFT_Invalid_Option_SOUNA(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('SOUNA '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Option_SOUN(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'SOUN '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Option_SOUNA(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'SOUNA '))));
+EXPORT InValidMessageFT_Invalid_Option_SOUNA(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('SOUNA '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Option_SOUN(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'SOUN A'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Option_SOUN(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'SOUN '))));
-EXPORT InValidMessageFT_Invalid_Option_SOUN(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('SOUN '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Radio(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'123456789A'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Option_SOUN(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'SOUN A'))));
+EXPORT InValidMessageFT_Invalid_Option_SOUN(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('SOUN A'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Radio(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'123456789A'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Radio(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'123456789A'))));
-EXPORT InValidMessageFT_Invalid_Radio(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('123456789A'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Roof(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'1234567'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Radio(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'123456789A'))));
+EXPORT InValidMessageFT_Invalid_Radio(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('123456789A'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Roof(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'1234567'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Roof(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'1234567'))));
-EXPORT InValidMessageFT_Invalid_Roof(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('1234567'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_ALB(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'12345678U'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Roof(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'1234567'))));
+EXPORT InValidMessageFT_Invalid_Roof(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('1234567'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_ALB(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'12345678U'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_ALB(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'12345678U'))));
-EXPORT InValidMessageFT_Invalid_ALB(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('12345678U'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Transmission(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFGHIJKLMNOPQRST'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_ALB(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'12345678U'))));
+EXPORT InValidMessageFT_Invalid_ALB(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('12345678U'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Transmission(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRST'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Transmission(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFGHIJKLMNOPQRST'))));
-EXPORT InValidMessageFT_Invalid_Transmission(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRST'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Security(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ESKABCDFGHJONUZPITUN'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Transmission(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRST'))));
+EXPORT InValidMessageFT_Invalid_Transmission(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRST'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Security(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ESKABCDFGHJONUZPITUN'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Security(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ESKABCDFGHJONUZPITUN'))));
-EXPORT InValidMessageFT_Invalid_Security(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ESKABCDFGHJONUZPITUN'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Visrap(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFGHIJKLMPRSTUVWXY347'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Security(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ESKABCDFGHJONUZPITUN'))));
+EXPORT InValidMessageFT_Invalid_Security(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ESKABCDFGHJONUZPITUN'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Visrap(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMPRSTUVWXY347'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Visrap(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFGHIJKLMPRSTUVWXY347'))));
-EXPORT InValidMessageFT_Invalid_Visrap(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFGHIJKLMPRSTUVWXY347'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Cab(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFGHIJKLMNOU'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Visrap(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMPRSTUVWXY347'))));
+EXPORT InValidMessageFT_Invalid_Visrap(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMPRSTUVWXY347'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Cab(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOU'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Cab(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFGHIJKLMNOU'))));
-EXPORT InValidMessageFT_Invalid_Cab(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOU'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_FAC(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCU'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Cab(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOU'))));
+EXPORT InValidMessageFT_Invalid_Cab(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOU'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_FAC(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCU'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_FAC(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCU'))));
-EXPORT InValidMessageFT_Invalid_FAC(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCU'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_RAC(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'STU'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_FAC(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCU'))));
+EXPORT InValidMessageFT_Invalid_FAC(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCU'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_RAC(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'STU'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_RAC(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'STU'))));
-EXPORT InValidMessageFT_Invalid_RAC(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('STU'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Brakes(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFU'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_RAC(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'STU'))));
+EXPORT InValidMessageFT_Invalid_RAC(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('STU'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Brakes(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFU'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Brakes(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFU'))));
-EXPORT InValidMessageFT_Invalid_Brakes(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFU'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Engine_Type(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'HLMU'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Brakes(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFU'))));
+EXPORT InValidMessageFT_Invalid_Brakes(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFU'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Engine_Type(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'HLMU'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Engine_Type(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'HLMU'))));
-EXPORT InValidMessageFT_Invalid_Engine_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('HLMU'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Trailer_Body(SALT31.StrType s0) := FUNCTION
+EXPORT InValidFT_Invalid_Engine_Type(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'HLMU'))));
+EXPORT InValidMessageFT_Invalid_Engine_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('HLMU'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Trailer_Body(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Trailer_Body(SALT31.StrType s) := WHICH(((SALT31.StrType) s) NOT IN ['AUT','BEV','CCH','CHP','CUR','DMP','DOL','ENB','ENT','ENU','FBD','FDD','GRN','HPR','LBD','LDD','LGO','LIV','LOG','ROL','SPE','TAG','TNK','TPN','TRN','T06','T07','T12','T27','T31','UNK','UTL','VAN','VDR','VOT','VRF',' ']);
-EXPORT InValidMessageFT_Invalid_Trailer_Body(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInEnum('AUT|BEV|CCH|CHP|CUR|DMP|DOL|ENB|ENT|ENU|FBD|FDD|GRN|HPR|LBD|LDD|LGO|LIV|LOG|ROL|SPE|TAG|TNK|TPN|TRN|T06|T07|T12|T27|T31|UNK|UTL|VAN|VDR|VOT|VRF| '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Trailer_length(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789XUNKL'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Trailer_Body(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['407','412','AUT','BEV','CCH','CHP','CUR','DMP','DOL','ENB','ENT','ENU','FBD','FDD','GRN','HPR','LBD','LDD','LGO','LIV','LOG','ROL','SPE','TAG','TNK','TPN','TRN','T06','T07','T12','T13','T19','T20','T21','T22','T23','T24','T25','T26','T27','T28','T29','T31','T53','T54','T55','T56','T57','T58','T69','T75','UNK','UOC','UTL','VAN','VDR','VOT','VRF',' ','U','N']);
+EXPORT InValidMessageFT_Invalid_Trailer_Body(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('407|412|AUT|BEV|CCH|CHP|CUR|DMP|DOL|ENB|ENT|ENU|FBD|FDD|GRN|HPR|LBD|LDD|LGO|LIV|LOG|ROL|SPE|TAG|TNK|TPN|TRN|T06|T07|T12|T13|T19|T20|T21|T22|T23|T24|T25|T26|T27|T28|T29|T31|T53|T54|T55|T56|T57|T58|T69|T75|UNK|UOC|UTL|VAN|VDR|VOT|VRF| |U|N'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Trailer_length(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789XUNKLG'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Trailer_length(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789XUNKL'))));
-EXPORT InValidMessageFT_Invalid_Trailer_length(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789XUNKL'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Proactive_VIN_Ind(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'YNU'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Trailer_length(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789XUNKLG'))));
+EXPORT InValidMessageFT_Invalid_Trailer_length(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789XUNKLG'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Proactive_VIN_Ind(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'YNU'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Proactive_VIN_Ind(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'YNU'))));
-EXPORT InValidMessageFT_Invalid_Proactive_VIN_Ind(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('YNU'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_VIN_Pattern(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEGHIKMNOPRSTVWXYZU'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Proactive_VIN_Ind(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'YNU'))));
+EXPORT InValidMessageFT_Invalid_Proactive_VIN_Ind(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('YNU'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_VIN_Pattern(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEGHIKMNOPRSTVWXYZU'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_VIN_Pattern(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEGHIKMNOPRSTVWXYZU'))));
-EXPORT InValidMessageFT_Invalid_VIN_Pattern(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEGHIKMNOPRSTVWXYZU'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Segmentation_Codes(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'AB0DEFGHIJKLMNOPQRSTUVWCYZ123456789'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_VIN_Pattern(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEGHIKMNOPRSTVWXYZU'))));
+EXPORT InValidMessageFT_Invalid_VIN_Pattern(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEGHIKMNOPRSTVWXYZU'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Segmentation_Codes(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'AB0DEFGHIJKLMNOPQRSTUVWCYZ123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Segmentation_Codes(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'AB0DEFGHIJKLMNOPQRSTUVWCYZ123456789'))));
-EXPORT InValidMessageFT_Invalid_Segmentation_Codes(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('AB0DEFGHIJKLMNOPQRSTUVWCYZ123456789'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Country(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Segmentation_Codes(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'AB0DEFGHIJKLMNOPQRSTUVWCYZ123456789'))));
+EXPORT InValidMessageFT_Invalid_Segmentation_Codes(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('AB0DEFGHIJKLMNOPQRSTUVWCYZ123456789'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Country(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Country(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'))));
-EXPORT InValidMessageFT_Invalid_Country(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Liter(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789L.'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Country(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'))));
+EXPORT InValidMessageFT_Invalid_Country(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Liter(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789L.'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Liter(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789L.'))));
-EXPORT InValidMessageFT_Invalid_Liter(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789L.'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Block_Type(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'VILHWR'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Liter(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789L.'))));
+EXPORT InValidMessageFT_Invalid_Liter(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789L.'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Block_Type(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'VILHWRU'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Block_Type(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'VILHWR'))));
-EXPORT InValidMessageFT_Invalid_Block_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('VILHWR'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Carburetion(SALT31.StrType s0) := FUNCTION
+EXPORT InValidFT_Invalid_Block_Type(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'VILHWRU'))));
+EXPORT InValidMessageFT_Invalid_Block_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('VILHWRU'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Carburetion(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Carburetion(SALT31.StrType s) := WHICH(((SALT31.StrType) s) NOT IN ['1BL','2BL','3BL','4BL','CPI','DIR','FI','HSC','IDI','MPI','PFI','SFI','TBI','TPI',' ']);
-EXPORT InValidMessageFT_Invalid_Carburetion(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInEnum('1BL|2BL|3BL|4BL|CPI|DIR|FI|HSC|IDI|MPI|PFI|SFI|TBI|TPI| '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Carburetion_Num(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789FT'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Carburetion(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['1BL','2BL','3BL','4BL','CPI','DIR','FI','HSC','IDI','MPI','PFI','SFI','TBI','TPI',' ']);
+EXPORT InValidMessageFT_Invalid_Carburetion(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('1BL|2BL|3BL|4BL|CPI|DIR|FI|HSC|IDI|MPI|PFI|SFI|TBI|TPI| '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Carburetion_Num(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789CFLTUVYZ'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Carburetion_Num(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789FT'))));
-EXPORT InValidMessageFT_Invalid_Carburetion_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789FT'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Head_Configuration(SALT31.StrType s0) := FUNCTION
+EXPORT InValidFT_Invalid_Carburetion_Num(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789CFLTUVYZ'))));
+EXPORT InValidMessageFT_Invalid_Carburetion_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789CFLTUVYZ'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Head_Configuration(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Head_Configuration(SALT31.StrType s) := WHICH(((SALT31.StrType) s) NOT IN ['SOHC','DOHC','OHV',' ']);
-EXPORT InValidMessageFT_Invalid_Head_Configuration(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInEnum('SOHC|DOHC|OHV| '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Valves(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789V'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Head_Configuration(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['SOHC','DOHC','OHV',' ','U']);
+EXPORT InValidMessageFT_Invalid_Head_Configuration(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('SOHC|DOHC|OHV| |U'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Valves(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789V'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Valves(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789V'))));
-EXPORT InValidMessageFT_Invalid_Valves(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789V'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Aspiration_Code(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'EHNU'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Valves(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789V'))));
+EXPORT InValidMessageFT_Invalid_Valves(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789V'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Aspiration_Code(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'EHNUYI'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Aspiration_Code(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'EHNU'))));
-EXPORT InValidMessageFT_Invalid_Aspiration_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('EHNU'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Carburetion_Code(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'1234BCDFHIMPSTUX'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Aspiration_Code(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'EHNUYI'))));
+EXPORT InValidMessageFT_Invalid_Aspiration_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('EHNUYI'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Carburetion_Code(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'01234BCDFHIMPSTUX'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Carburetion_Code(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'1234BCDFHIMPSTUX'))));
-EXPORT InValidMessageFT_Invalid_Carburetion_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('1234BCDFHIMPSTUX'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_VPC(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'2345 '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Carburetion_Code(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'01234BCDFHIMPSTUX'))));
+EXPORT InValidMessageFT_Invalid_Carburetion_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('01234BCDFHIMPSTUX'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_VPC(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'12345 '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_VPC(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'2345 '))));
-EXPORT InValidMessageFT_Invalid_VPC(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('2345 '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Transmission_Speed(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'2345678SPDCVT '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_VPC(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'12345 '))));
+EXPORT InValidMessageFT_Invalid_VPC(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('12345 '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Transmission_Speed(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789SPDCVT '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Transmission_Speed(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'2345678SPDCVT '))));
-EXPORT InValidMessageFT_Invalid_Transmission_Speed(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('2345678SPDCVT '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Transmission_Type(SALT31.StrType s0) := FUNCTION
+EXPORT InValidFT_Invalid_Transmission_Speed(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789SPDCVT '))));
+EXPORT InValidMessageFT_Invalid_Transmission_Speed(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789SPDCVT '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Transmission_Type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Transmission_Type(SALT31.StrType s) := WHICH(((SALT31.StrType) s) NOT IN ['MANUAL','AUTO',' ']);
-EXPORT InValidMessageFT_Invalid_Transmission_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInEnum('MANUAL|AUTO| '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Transmission_Code(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'AM '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Transmission_Type(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['MANUAL','AUTO',' ']);
+EXPORT InValidMessageFT_Invalid_Transmission_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('MANUAL|AUTO| '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Transmission_Code(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'AM '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Transmission_Code(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'AM '))));
-EXPORT InValidMessageFT_Invalid_Transmission_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('AM '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Transmission_Speed_Code(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'02345678'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Transmission_Code(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'AM '))));
+EXPORT InValidMessageFT_Invalid_Transmission_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('AM '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Transmission_Speed_Code(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Transmission_Speed_Code(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'02345678'))));
-EXPORT InValidMessageFT_Invalid_Transmission_Speed_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('02345678'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Y_or_N(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'YN'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Transmission_Speed_Code(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))));
+EXPORT InValidMessageFT_Invalid_Transmission_Speed_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Y_or_N(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'YN'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Y_or_N(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'YN'))));
-EXPORT InValidMessageFT_Invalid_Y_or_N(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('YN'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Y_or_N_orBlank(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'YN '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Y_or_N(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'YN'))));
+EXPORT InValidMessageFT_Invalid_Y_or_N(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('YN'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Y_or_N_orBlank(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'YN '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Y_or_N_orBlank(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'YN '))));
-EXPORT InValidMessageFT_Invalid_Y_or_N_orBlank(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('YN '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Battery_Type(SALT31.StrType s0) := FUNCTION
+EXPORT InValidFT_Invalid_Y_or_N_orBlank(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'YN '))));
+EXPORT InValidMessageFT_Invalid_Y_or_N_orBlank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('YN '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Battery_Type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Battery_Type(SALT31.StrType s) := WHICH(((SALT31.StrType) s) NOT IN ['NIMH','PBA','HYB',' ']);
-EXPORT InValidMessageFT_Invalid_Battery_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInEnum('NIMH|PBA|HYB| '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Battery_KW(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789KW'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Battery_Type(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['NIMH','PBA','HYB','LIPO','LTHI',' ']);
+EXPORT InValidMessageFT_Invalid_Battery_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('NIMH|PBA|HYB|LIPO|LTHI| '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Battery_KW(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789KW'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Battery_KW(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789KW'))));
-EXPORT InValidMessageFT_Invalid_Battery_KW(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789KW'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Battery_Volts(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'0123456789V'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Battery_KW(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789KW'))));
+EXPORT InValidMessageFT_Invalid_Battery_KW(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789KW'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Battery_Volts(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'0123456789V'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Battery_Volts(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'0123456789V'))));
-EXPORT InValidMessageFT_Invalid_Battery_Volts(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('0123456789V'),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Engine_Brand(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'HV '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Battery_Volts(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789V'))));
+EXPORT InValidMessageFT_Invalid_Battery_Volts(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789V'),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Engine_Brand(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'HV '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Engine_Brand(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'HV '))));
-EXPORT InValidMessageFT_Invalid_Engine_Brand(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('HV '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Supercharged(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'YNIU '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Engine_Brand(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'HV '))));
+EXPORT InValidMessageFT_Invalid_Engine_Brand(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('HV '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Supercharged(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'YNIU '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Supercharged(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'YNIU '))));
-EXPORT InValidMessageFT_Invalid_Supercharged(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('YNIU '),SALT31.HygieneErrors.Good);
-EXPORT MakeFT_Invalid_Turbocharged(SALT31.StrType s0) := FUNCTION
-  s1 := SALT31.stringfilter(s0,'YNIU '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Supercharged(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'YNIU '))));
+EXPORT InValidMessageFT_Invalid_Supercharged(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('YNIU '),SALT311.HygieneErrors.Good);
+
+EXPORT MakeFT_Invalid_Turbocharged(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'YNIU '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Turbocharged(SALT31.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT31.StringFilter(s,'YNIU '))));
-EXPORT InValidMessageFT_Invalid_Turbocharged(UNSIGNED1 wh) := CHOOSE(wh,SALT31.HygieneErrors.NotInChars('YNIU '),SALT31.HygieneErrors.Good);
-EXPORT SALT31.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'match_make','match_year','match_vin','make_abbreviation','model_year','vehicle_type','make_name','series_name','body_type','wheels','displacement','cylinders','fuel','carburetion','gvw','wheel_base','tire_size','ton_rating','base_shipping_weight','variance_weight','base_list_price','price_variance','high_performance_code','driving_wheels','iso_physical_damage','location_indicator','air_conditioning','power_steering','power_brakes','power_windows','tilt_wheel','roof','optional_roof1','optional_roof2','radio','optional_radio1','optional_radio2','transmission','optional_transmission1','optional_transmission2','anti_lock_brakes','security_system','daytime_running_lights','visrap','cab_configuration','front_axle_code','rear_axle_code','brakes_code','engine_manufacturer','engine_model','engine_type_code','trailer_body_style','trailer_number_of_axles','trailer_length','proactive_vin','ma_state_exceptions','filler_1','series_abbreviation','vin_pattern','ncic_data','full_body_style_name','nvpp_make_code','nvpp_make_abbreviation','nvpp_series_model','nvpp_series_name','segmentation_code','country_of_origin','engine_liter_information','engine_information_filler1','engine_information_block_type','engine_information_cylinders','engine_information_filler2','engine_information_carburetion','engine_information_filler3','engine_information_head_configuration','engine_information_filler4','engine_information_total_valves','engine_information_filler5','engine_information_aspiration_code','engine_information_carburetion_code','engine_information_valves_per_cylinder','transmission_speed','transmission_filler1','transmission_type','transmission_filler2','transmission_code','transmission_filler3','transmission_speed_code','base_model','complete_prefix_file_id','series_name_full_spelling','vis_theft_code','base_list_price_expanded','default_nada_vehicle_id','default_nada_model','default_nada_body_style','default_nada_msrp','default_nada_gvwr','default_nada_gcwr','alt_1_nada_vehicle_id','alt_1_nada_model','alt_1_nada_body_style','alt_1_nada_msrp','alt_1_nada_gvwr','alt_1_nada_gcwr','alt_2_nada_vehicle_id','alt_2_nada_model','alt_2_nada_body_style','alt_2_nada_msrp','alt_2_nada_gvwr','alt_2_nada_gcwr','alt_3_nada_vehicle_id','alt_3_nada_model','alt_3_nada_body_style','alt_3_nada_msrp','alt_3_nada_gvwr','alt_3_nada_gcwr','alt_4_nada_vehicle_id','alt_4_nada_model','alt_4_nada_body_style','alt_4_nada_msrp','alt_4_nada_gvwr','alt_4_nada_gcwr','alt_5_nada_vehicle_id','alt_5_nada_model','alt_5_nada_body_style','alt_5_nada_msrp','alt_5_nada_gvwr','alt_5_nada_gcwr','alt_6_nada_vehicle_id','alt_6_nada_model','alt_6_nada_body_style','alt_6_nada_msrp','alt_6_nada_gvwr','alt_6_nada_gcwr','alt_7_nada_vehicle_id','alt_7_nada_model','alt_7_nada_body_style','alt_7_nada_msrp','alt_7_nada_gvwr','alt_7_nada_gcwr','aaia_codes','incomplete_vehicle_flag','filler2','electric_battery_info_type','filler3','electric_battery_kilowatts','filler4','electric_battery_volts','filler5','engine_info_proprietary_engine_brand','filler6','engine_info_high_output_engine','engine_info_supercharged','engine_info_turbocharged','engine_info_vvtl','iso_liability','series_name_condensed','aces_data','base_shipping_weight_expanded','filler7','customer_defined_data');
-EXPORT FieldNum(SALT31.StrType fn) := CASE(fn,'match_make' => 1,'match_year' => 2,'match_vin' => 3,'make_abbreviation' => 4,'model_year' => 5,'vehicle_type' => 6,'make_name' => 7,'series_name' => 8,'body_type' => 9,'wheels' => 10,'displacement' => 11,'cylinders' => 12,'fuel' => 13,'carburetion' => 14,'gvw' => 15,'wheel_base' => 16,'tire_size' => 17,'ton_rating' => 18,'base_shipping_weight' => 19,'variance_weight' => 20,'base_list_price' => 21,'price_variance' => 22,'high_performance_code' => 23,'driving_wheels' => 24,'iso_physical_damage' => 25,'location_indicator' => 26,'air_conditioning' => 27,'power_steering' => 28,'power_brakes' => 29,'power_windows' => 30,'tilt_wheel' => 31,'roof' => 32,'optional_roof1' => 33,'optional_roof2' => 34,'radio' => 35,'optional_radio1' => 36,'optional_radio2' => 37,'transmission' => 38,'optional_transmission1' => 39,'optional_transmission2' => 40,'anti_lock_brakes' => 41,'security_system' => 42,'daytime_running_lights' => 43,'visrap' => 44,'cab_configuration' => 45,'front_axle_code' => 46,'rear_axle_code' => 47,'brakes_code' => 48,'engine_manufacturer' => 49,'engine_model' => 50,'engine_type_code' => 51,'trailer_body_style' => 52,'trailer_number_of_axles' => 53,'trailer_length' => 54,'proactive_vin' => 55,'ma_state_exceptions' => 56,'filler_1' => 57,'series_abbreviation' => 58,'vin_pattern' => 59,'ncic_data' => 60,'full_body_style_name' => 61,'nvpp_make_code' => 62,'nvpp_make_abbreviation' => 63,'nvpp_series_model' => 64,'nvpp_series_name' => 65,'segmentation_code' => 66,'country_of_origin' => 67,'engine_liter_information' => 68,'engine_information_filler1' => 69,'engine_information_block_type' => 70,'engine_information_cylinders' => 71,'engine_information_filler2' => 72,'engine_information_carburetion' => 73,'engine_information_filler3' => 74,'engine_information_head_configuration' => 75,'engine_information_filler4' => 76,'engine_information_total_valves' => 77,'engine_information_filler5' => 78,'engine_information_aspiration_code' => 79,'engine_information_carburetion_code' => 80,'engine_information_valves_per_cylinder' => 81,'transmission_speed' => 82,'transmission_filler1' => 83,'transmission_type' => 84,'transmission_filler2' => 85,'transmission_code' => 86,'transmission_filler3' => 87,'transmission_speed_code' => 88,'base_model' => 89,'complete_prefix_file_id' => 90,'series_name_full_spelling' => 91,'vis_theft_code' => 92,'base_list_price_expanded' => 93,'default_nada_vehicle_id' => 94,'default_nada_model' => 95,'default_nada_body_style' => 96,'default_nada_msrp' => 97,'default_nada_gvwr' => 98,'default_nada_gcwr' => 99,'alt_1_nada_vehicle_id' => 100,'alt_1_nada_model' => 101,'alt_1_nada_body_style' => 102,'alt_1_nada_msrp' => 103,'alt_1_nada_gvwr' => 104,'alt_1_nada_gcwr' => 105,'alt_2_nada_vehicle_id' => 106,'alt_2_nada_model' => 107,'alt_2_nada_body_style' => 108,'alt_2_nada_msrp' => 109,'alt_2_nada_gvwr' => 110,'alt_2_nada_gcwr' => 111,'alt_3_nada_vehicle_id' => 112,'alt_3_nada_model' => 113,'alt_3_nada_body_style' => 114,'alt_3_nada_msrp' => 115,'alt_3_nada_gvwr' => 116,'alt_3_nada_gcwr' => 117,'alt_4_nada_vehicle_id' => 118,'alt_4_nada_model' => 119,'alt_4_nada_body_style' => 120,'alt_4_nada_msrp' => 121,'alt_4_nada_gvwr' => 122,'alt_4_nada_gcwr' => 123,'alt_5_nada_vehicle_id' => 124,'alt_5_nada_model' => 125,'alt_5_nada_body_style' => 126,'alt_5_nada_msrp' => 127,'alt_5_nada_gvwr' => 128,'alt_5_nada_gcwr' => 129,'alt_6_nada_vehicle_id' => 130,'alt_6_nada_model' => 131,'alt_6_nada_body_style' => 132,'alt_6_nada_msrp' => 133,'alt_6_nada_gvwr' => 134,'alt_6_nada_gcwr' => 135,'alt_7_nada_vehicle_id' => 136,'alt_7_nada_model' => 137,'alt_7_nada_body_style' => 138,'alt_7_nada_msrp' => 139,'alt_7_nada_gvwr' => 140,'alt_7_nada_gcwr' => 141,'aaia_codes' => 142,'incomplete_vehicle_flag' => 143,'filler2' => 144,'electric_battery_info_type' => 145,'filler3' => 146,'electric_battery_kilowatts' => 147,'filler4' => 148,'electric_battery_volts' => 149,'filler5' => 150,'engine_info_proprietary_engine_brand' => 151,'filler6' => 152,'engine_info_high_output_engine' => 153,'engine_info_supercharged' => 154,'engine_info_turbocharged' => 155,'engine_info_vvtl' => 156,'iso_liability' => 157,'series_name_condensed' => 158,'aces_data' => 159,'base_shipping_weight_expanded' => 160,'filler7' => 161,'customer_defined_data' => 162,0);
+EXPORT InValidFT_Invalid_Turbocharged(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'YNIU '))));
+EXPORT InValidMessageFT_Invalid_Turbocharged(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('YNIU '),SALT311.HygieneErrors.Good);
+
+
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'match_make','match_year','match_vin','make_abbreviation','model_year','vehicle_type','make_name','series_name','body_type','wheels','displacement','cylinders','fuel','carburetion','gvw','wheel_base','tire_size','ton_rating','base_shipping_weight','variance_weight','base_list_price','price_variance','high_performance_code','driving_wheels','iso_physical_damage','location_indicator','air_conditioning','power_steering','power_brakes','power_windows','tilt_wheel','roof','optional_roof1','optional_roof2','radio','optional_radio1','optional_radio2','transmission','optional_transmission1','optional_transmission2','anti_lock_brakes','security_system','daytime_running_lights','visrap','cab_configuration','front_axle_code','rear_axle_code','brakes_code','engine_manufacturer','engine_model','engine_type_code','trailer_body_style','trailer_number_of_axles','trailer_length','proactive_vin','ma_state_exceptions','filler_1','series_abbreviation','vin_pattern','ncic_data','full_body_style_name','nvpp_make_code','nvpp_make_abbreviation','nvpp_series_model','nvpp_series_name','segmentation_code','country_of_origin','engine_liter_information','engine_information_filler1','engine_information_block_type','engine_information_cylinders','engine_information_filler2','engine_information_carburetion','engine_information_filler3','engine_information_head_configuration','engine_information_filler4','engine_information_total_valves','engine_information_filler5','engine_information_aspiration_code','engine_information_carburetion_code','engine_information_valves_per_cylinder','transmission_speed','transmission_filler1','transmission_type','transmission_filler2','transmission_code','transmission_filler3','transmission_speed_code','base_model','complete_prefix_file_id','series_name_full_spelling','vis_theft_code','base_list_price_expanded','default_nada_vehicle_id','default_nada_model','default_nada_body_style','default_nada_msrp','default_nada_gvwr','default_nada_gcwr','alt_1_nada_vehicle_id','alt_1_nada_model','alt_1_nada_body_style','alt_1_nada_msrp','alt_1_nada_gvwr','alt_1_nada_gcwr','alt_2_nada_vehicle_id','alt_2_nada_model','alt_2_nada_body_style','alt_2_nada_msrp','alt_2_nada_gvwr','alt_2_nada_gcwr','alt_3_nada_vehicle_id','alt_3_nada_model','alt_3_nada_body_style','alt_3_nada_msrp','alt_3_nada_gvwr','alt_3_nada_gcwr','alt_4_nada_vehicle_id','alt_4_nada_model','alt_4_nada_body_style','alt_4_nada_msrp','alt_4_nada_gvwr','alt_4_nada_gcwr','alt_5_nada_vehicle_id','alt_5_nada_model','alt_5_nada_body_style','alt_5_nada_msrp','alt_5_nada_gvwr','alt_5_nada_gcwr','alt_6_nada_vehicle_id','alt_6_nada_model','alt_6_nada_body_style','alt_6_nada_msrp','alt_6_nada_gvwr','alt_6_nada_gcwr','alt_7_nada_vehicle_id','alt_7_nada_model','alt_7_nada_body_style','alt_7_nada_msrp','alt_7_nada_gvwr','alt_7_nada_gcwr','aaia_codes','incomplete_vehicle_flag','filler2','electric_battery_info_type','filler3','electric_battery_kilowatts','filler4','electric_battery_volts','filler5','engine_info_proprietary_engine_brand','filler6','engine_info_high_output_engine','engine_info_supercharged','engine_info_turbocharged','engine_info_vvtl','iso_liability','series_name_condensed','aces_data','base_shipping_weight_expanded','filler7','customer_defined_data');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'match_make','match_year','match_vin','make_abbreviation','model_year','vehicle_type','make_name','series_name','body_type','wheels','displacement','cylinders','fuel','carburetion','gvw','wheel_base','tire_size','ton_rating','base_shipping_weight','variance_weight','base_list_price','price_variance','high_performance_code','driving_wheels','iso_physical_damage','location_indicator','air_conditioning','power_steering','power_brakes','power_windows','tilt_wheel','roof','optional_roof1','optional_roof2','radio','optional_radio1','optional_radio2','transmission','optional_transmission1','optional_transmission2','anti_lock_brakes','security_system','daytime_running_lights','visrap','cab_configuration','front_axle_code','rear_axle_code','brakes_code','engine_manufacturer','engine_model','engine_type_code','trailer_body_style','trailer_number_of_axles','trailer_length','proactive_vin','ma_state_exceptions','filler_1','series_abbreviation','vin_pattern','ncic_data','full_body_style_name','nvpp_make_code','nvpp_make_abbreviation','nvpp_series_model','nvpp_series_name','segmentation_code','country_of_origin','engine_liter_information','engine_information_filler1','engine_information_block_type','engine_information_cylinders','engine_information_filler2','engine_information_carburetion','engine_information_filler3','engine_information_head_configuration','engine_information_filler4','engine_information_total_valves','engine_information_filler5','engine_information_aspiration_code','engine_information_carburetion_code','engine_information_valves_per_cylinder','transmission_speed','transmission_filler1','transmission_type','transmission_filler2','transmission_code','transmission_filler3','transmission_speed_code','base_model','complete_prefix_file_id','series_name_full_spelling','vis_theft_code','base_list_price_expanded','default_nada_vehicle_id','default_nada_model','default_nada_body_style','default_nada_msrp','default_nada_gvwr','default_nada_gcwr','alt_1_nada_vehicle_id','alt_1_nada_model','alt_1_nada_body_style','alt_1_nada_msrp','alt_1_nada_gvwr','alt_1_nada_gcwr','alt_2_nada_vehicle_id','alt_2_nada_model','alt_2_nada_body_style','alt_2_nada_msrp','alt_2_nada_gvwr','alt_2_nada_gcwr','alt_3_nada_vehicle_id','alt_3_nada_model','alt_3_nada_body_style','alt_3_nada_msrp','alt_3_nada_gvwr','alt_3_nada_gcwr','alt_4_nada_vehicle_id','alt_4_nada_model','alt_4_nada_body_style','alt_4_nada_msrp','alt_4_nada_gvwr','alt_4_nada_gcwr','alt_5_nada_vehicle_id','alt_5_nada_model','alt_5_nada_body_style','alt_5_nada_msrp','alt_5_nada_gvwr','alt_5_nada_gcwr','alt_6_nada_vehicle_id','alt_6_nada_model','alt_6_nada_body_style','alt_6_nada_msrp','alt_6_nada_gvwr','alt_6_nada_gcwr','alt_7_nada_vehicle_id','alt_7_nada_model','alt_7_nada_body_style','alt_7_nada_msrp','alt_7_nada_gvwr','alt_7_nada_gcwr','aaia_codes','incomplete_vehicle_flag','filler2','electric_battery_info_type','filler3','electric_battery_kilowatts','filler4','electric_battery_volts','filler5','engine_info_proprietary_engine_brand','filler6','engine_info_high_output_engine','engine_info_supercharged','engine_info_turbocharged','engine_info_vvtl','iso_liability','series_name_condensed','aces_data','base_shipping_weight_expanded','filler7','customer_defined_data');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'match_make' => 0,'match_year' => 1,'match_vin' => 2,'make_abbreviation' => 3,'model_year' => 4,'vehicle_type' => 5,'make_name' => 6,'series_name' => 7,'body_type' => 8,'wheels' => 9,'displacement' => 10,'cylinders' => 11,'fuel' => 12,'carburetion' => 13,'gvw' => 14,'wheel_base' => 15,'tire_size' => 16,'ton_rating' => 17,'base_shipping_weight' => 18,'variance_weight' => 19,'base_list_price' => 20,'price_variance' => 21,'high_performance_code' => 22,'driving_wheels' => 23,'iso_physical_damage' => 24,'location_indicator' => 25,'air_conditioning' => 26,'power_steering' => 27,'power_brakes' => 28,'power_windows' => 29,'tilt_wheel' => 30,'roof' => 31,'optional_roof1' => 32,'optional_roof2' => 33,'radio' => 34,'optional_radio1' => 35,'optional_radio2' => 36,'transmission' => 37,'optional_transmission1' => 38,'optional_transmission2' => 39,'anti_lock_brakes' => 40,'security_system' => 41,'daytime_running_lights' => 42,'visrap' => 43,'cab_configuration' => 44,'front_axle_code' => 45,'rear_axle_code' => 46,'brakes_code' => 47,'engine_manufacturer' => 48,'engine_model' => 49,'engine_type_code' => 50,'trailer_body_style' => 51,'trailer_number_of_axles' => 52,'trailer_length' => 53,'proactive_vin' => 54,'ma_state_exceptions' => 55,'filler_1' => 56,'series_abbreviation' => 57,'vin_pattern' => 58,'ncic_data' => 59,'full_body_style_name' => 60,'nvpp_make_code' => 61,'nvpp_make_abbreviation' => 62,'nvpp_series_model' => 63,'nvpp_series_name' => 64,'segmentation_code' => 65,'country_of_origin' => 66,'engine_liter_information' => 67,'engine_information_filler1' => 68,'engine_information_block_type' => 69,'engine_information_cylinders' => 70,'engine_information_filler2' => 71,'engine_information_carburetion' => 72,'engine_information_filler3' => 73,'engine_information_head_configuration' => 74,'engine_information_filler4' => 75,'engine_information_total_valves' => 76,'engine_information_filler5' => 77,'engine_information_aspiration_code' => 78,'engine_information_carburetion_code' => 79,'engine_information_valves_per_cylinder' => 80,'transmission_speed' => 81,'transmission_filler1' => 82,'transmission_type' => 83,'transmission_filler2' => 84,'transmission_code' => 85,'transmission_filler3' => 86,'transmission_speed_code' => 87,'base_model' => 88,'complete_prefix_file_id' => 89,'series_name_full_spelling' => 90,'vis_theft_code' => 91,'base_list_price_expanded' => 92,'default_nada_vehicle_id' => 93,'default_nada_model' => 94,'default_nada_body_style' => 95,'default_nada_msrp' => 96,'default_nada_gvwr' => 97,'default_nada_gcwr' => 98,'alt_1_nada_vehicle_id' => 99,'alt_1_nada_model' => 100,'alt_1_nada_body_style' => 101,'alt_1_nada_msrp' => 102,'alt_1_nada_gvwr' => 103,'alt_1_nada_gcwr' => 104,'alt_2_nada_vehicle_id' => 105,'alt_2_nada_model' => 106,'alt_2_nada_body_style' => 107,'alt_2_nada_msrp' => 108,'alt_2_nada_gvwr' => 109,'alt_2_nada_gcwr' => 110,'alt_3_nada_vehicle_id' => 111,'alt_3_nada_model' => 112,'alt_3_nada_body_style' => 113,'alt_3_nada_msrp' => 114,'alt_3_nada_gvwr' => 115,'alt_3_nada_gcwr' => 116,'alt_4_nada_vehicle_id' => 117,'alt_4_nada_model' => 118,'alt_4_nada_body_style' => 119,'alt_4_nada_msrp' => 120,'alt_4_nada_gvwr' => 121,'alt_4_nada_gcwr' => 122,'alt_5_nada_vehicle_id' => 123,'alt_5_nada_model' => 124,'alt_5_nada_body_style' => 125,'alt_5_nada_msrp' => 126,'alt_5_nada_gvwr' => 127,'alt_5_nada_gcwr' => 128,'alt_6_nada_vehicle_id' => 129,'alt_6_nada_model' => 130,'alt_6_nada_body_style' => 131,'alt_6_nada_msrp' => 132,'alt_6_nada_gvwr' => 133,'alt_6_nada_gcwr' => 134,'alt_7_nada_vehicle_id' => 135,'alt_7_nada_model' => 136,'alt_7_nada_body_style' => 137,'alt_7_nada_msrp' => 138,'alt_7_nada_gvwr' => 139,'alt_7_nada_gcwr' => 140,'aaia_codes' => 141,'incomplete_vehicle_flag' => 142,'filler2' => 143,'electric_battery_info_type' => 144,'filler3' => 145,'electric_battery_kilowatts' => 146,'filler4' => 147,'electric_battery_volts' => 148,'filler5' => 149,'engine_info_proprietary_engine_brand' => 150,'filler6' => 151,'engine_info_high_output_engine' => 152,'engine_info_supercharged' => 153,'engine_info_turbocharged' => 154,'engine_info_vvtl' => 155,'iso_liability' => 156,'series_name_condensed' => 157,'aces_data' => 158,'base_shipping_weight_expanded' => 159,'filler7' => 160,'customer_defined_data' => 161,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ENUM'],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],[],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW'],[],['ENUM'],[],['ENUM'],[],['ALLOW'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ENUM'],[],['ALLOW'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ENUM'],[],['ALLOW'],[],['ALLOW'],[],['ALLOW'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+
 //Individual field level validation
-EXPORT Make_match_make(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_match_make(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_match_make(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_match_make(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_match_make(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_match_year(SALT31.StrType s0) := MakeFT_Invalid_Nums(s0);
-EXPORT InValid_match_year(SALT31.StrType s) := InValidFT_Invalid_Nums(s);
+
+
+EXPORT Make_match_year(SALT311.StrType s0) := MakeFT_Invalid_Nums(s0);
+EXPORT InValid_match_year(SALT311.StrType s) := InValidFT_Invalid_Nums(s);
 EXPORT InValidMessage_match_year(UNSIGNED1 wh) := InValidMessageFT_Invalid_Nums(wh);
-EXPORT Make_match_vin(SALT31.StrType s0) := MakeFT_Invalid_Vin(s0);
-EXPORT InValid_match_vin(SALT31.StrType s) := InValidFT_Invalid_Vin(s);
+
+
+EXPORT Make_match_vin(SALT311.StrType s0) := MakeFT_Invalid_Vin(s0);
+EXPORT InValid_match_vin(SALT311.StrType s) := InValidFT_Invalid_Vin(s);
 EXPORT InValidMessage_match_vin(UNSIGNED1 wh) := InValidMessageFT_Invalid_Vin(wh);
-EXPORT Make_make_abbreviation(SALT31.StrType s0) := MakeFT_Invalid_Abbreviation(s0);
-EXPORT InValid_make_abbreviation(SALT31.StrType s) := InValidFT_Invalid_Abbreviation(s);
+
+
+EXPORT Make_make_abbreviation(SALT311.StrType s0) := MakeFT_Invalid_Abbreviation(s0);
+EXPORT InValid_make_abbreviation(SALT311.StrType s) := InValidFT_Invalid_Abbreviation(s);
 EXPORT InValidMessage_make_abbreviation(UNSIGNED1 wh) := InValidMessageFT_Invalid_Abbreviation(wh);
-EXPORT Make_model_year(SALT31.StrType s0) := MakeFT_Invalid_Nums(s0);
-EXPORT InValid_model_year(SALT31.StrType s) := InValidFT_Invalid_Nums(s);
+
+
+EXPORT Make_model_year(SALT311.StrType s0) := MakeFT_Invalid_Nums(s0);
+EXPORT InValid_model_year(SALT311.StrType s) := InValidFT_Invalid_Nums(s);
 EXPORT InValidMessage_model_year(UNSIGNED1 wh) := InValidMessageFT_Invalid_Nums(wh);
-EXPORT Make_vehicle_type(SALT31.StrType s0) := MakeFT_Invalid_Vehicle_Type(s0);
-EXPORT InValid_vehicle_type(SALT31.StrType s) := InValidFT_Invalid_Vehicle_Type(s);
+
+
+EXPORT Make_vehicle_type(SALT311.StrType s0) := MakeFT_Invalid_Vehicle_Type(s0);
+EXPORT InValid_vehicle_type(SALT311.StrType s) := InValidFT_Invalid_Vehicle_Type(s);
 EXPORT InValidMessage_vehicle_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_Vehicle_Type(wh);
-EXPORT Make_make_name(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_make_name(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_make_name(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_make_name(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_make_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_series_name(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_series_name(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_series_name(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_series_name(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_series_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_body_type(SALT31.StrType s0) := MakeFT_Invalid_Body_Type(s0);
-EXPORT InValid_body_type(SALT31.StrType s) := InValidFT_Invalid_Body_Type(s);
+
+
+EXPORT Make_body_type(SALT311.StrType s0) := MakeFT_Invalid_Body_Type(s0);
+EXPORT InValid_body_type(SALT311.StrType s) := InValidFT_Invalid_Body_Type(s);
 EXPORT InValidMessage_body_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_Body_Type(wh);
-EXPORT Make_wheels(SALT31.StrType s0) := MakeFT_Invalid_Nums(s0);
-EXPORT InValid_wheels(SALT31.StrType s) := InValidFT_Invalid_Nums(s);
+
+
+EXPORT Make_wheels(SALT311.StrType s0) := MakeFT_Invalid_Nums(s0);
+EXPORT InValid_wheels(SALT311.StrType s) := InValidFT_Invalid_Nums(s);
 EXPORT InValidMessage_wheels(UNSIGNED1 wh) := InValidMessageFT_Invalid_Nums(wh);
-EXPORT Make_displacement(SALT31.StrType s0) := MakeFT_Invalid_Nums_Blank(s0);
-EXPORT InValid_displacement(SALT31.StrType s) := InValidFT_Invalid_Nums_Blank(s);
+
+
+EXPORT Make_displacement(SALT311.StrType s0) := MakeFT_Invalid_Nums_Blank(s0);
+EXPORT InValid_displacement(SALT311.StrType s) := InValidFT_Invalid_Nums_Blank(s);
 EXPORT InValidMessage_displacement(UNSIGNED1 wh) := InValidMessageFT_Invalid_Nums_Blank(wh);
-EXPORT Make_cylinders(SALT31.StrType s0) := MakeFT_Invalid_Nums_Rotary(s0);
-EXPORT InValid_cylinders(SALT31.StrType s) := InValidFT_Invalid_Nums_Rotary(s);
+
+
+EXPORT Make_cylinders(SALT311.StrType s0) := MakeFT_Invalid_Nums_Rotary(s0);
+EXPORT InValid_cylinders(SALT311.StrType s) := InValidFT_Invalid_Nums_Rotary(s);
 EXPORT InValidMessage_cylinders(UNSIGNED1 wh) := InValidMessageFT_Invalid_Nums_Rotary(wh);
-EXPORT Make_fuel(SALT31.StrType s0) := MakeFT_Invalid_Fuel(s0);
-EXPORT InValid_fuel(SALT31.StrType s) := InValidFT_Invalid_Fuel(s);
+
+
+EXPORT Make_fuel(SALT311.StrType s0) := MakeFT_Invalid_Fuel(s0);
+EXPORT InValid_fuel(SALT311.StrType s) := InValidFT_Invalid_Fuel(s);
 EXPORT InValidMessage_fuel(UNSIGNED1 wh) := InValidMessageFT_Invalid_Fuel(wh);
-EXPORT Make_carburetion(SALT31.StrType s0) := MakeFT_Invalid_Carburetion_Num(s0);
-EXPORT InValid_carburetion(SALT31.StrType s) := InValidFT_Invalid_Carburetion_Num(s);
+
+
+EXPORT Make_carburetion(SALT311.StrType s0) := MakeFT_Invalid_Carburetion_Num(s0);
+EXPORT InValid_carburetion(SALT311.StrType s) := InValidFT_Invalid_Carburetion_Num(s);
 EXPORT InValidMessage_carburetion(UNSIGNED1 wh) := InValidMessageFT_Invalid_Carburetion_Num(wh);
-EXPORT Make_gvw(SALT31.StrType s0) := MakeFT_Invalid_Nums_Rotary(s0);
-EXPORT InValid_gvw(SALT31.StrType s) := InValidFT_Invalid_Nums_Rotary(s);
+
+
+EXPORT Make_gvw(SALT311.StrType s0) := MakeFT_Invalid_Nums_Rotary(s0);
+EXPORT InValid_gvw(SALT311.StrType s) := InValidFT_Invalid_Nums_Rotary(s);
 EXPORT InValidMessage_gvw(UNSIGNED1 wh) := InValidMessageFT_Invalid_Nums_Rotary(wh);
-EXPORT Make_wheel_base(SALT31.StrType s0) := MakeFT_Invalid_Decimal(s0);
-EXPORT InValid_wheel_base(SALT31.StrType s) := InValidFT_Invalid_Decimal(s);
+
+
+EXPORT Make_wheel_base(SALT311.StrType s0) := MakeFT_Invalid_Decimal(s0);
+EXPORT InValid_wheel_base(SALT311.StrType s) := InValidFT_Invalid_Decimal(s);
 EXPORT InValidMessage_wheel_base(UNSIGNED1 wh) := InValidMessageFT_Invalid_Decimal(wh);
-EXPORT Make_tire_size(SALT31.StrType s0) := MakeFT_Invalid_Tire_Size(s0);
-EXPORT InValid_tire_size(SALT31.StrType s) := InValidFT_Invalid_Tire_Size(s);
+
+
+EXPORT Make_tire_size(SALT311.StrType s0) := MakeFT_Invalid_Tire_Size(s0);
+EXPORT InValid_tire_size(SALT311.StrType s) := InValidFT_Invalid_Tire_Size(s);
 EXPORT InValidMessage_tire_size(UNSIGNED1 wh) := InValidMessageFT_Invalid_Tire_Size(wh);
-EXPORT Make_ton_rating(SALT31.StrType s0) := MakeFT_Invalid_Char_No_Spec(s0);
-EXPORT InValid_ton_rating(SALT31.StrType s) := InValidFT_Invalid_Char_No_Spec(s);
+
+
+EXPORT Make_ton_rating(SALT311.StrType s0) := MakeFT_Invalid_Char_No_Spec(s0);
+EXPORT InValid_ton_rating(SALT311.StrType s) := InValidFT_Invalid_Char_No_Spec(s);
 EXPORT InValidMessage_ton_rating(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char_No_Spec(wh);
-EXPORT Make_base_shipping_weight(SALT31.StrType s0) := MakeFT_Invalid_Decimal(s0);
-EXPORT InValid_base_shipping_weight(SALT31.StrType s) := InValidFT_Invalid_Decimal(s);
+
+
+EXPORT Make_base_shipping_weight(SALT311.StrType s0) := MakeFT_Invalid_Decimal(s0);
+EXPORT InValid_base_shipping_weight(SALT311.StrType s) := InValidFT_Invalid_Decimal(s);
 EXPORT InValidMessage_base_shipping_weight(UNSIGNED1 wh) := InValidMessageFT_Invalid_Decimal(wh);
-EXPORT Make_variance_weight(SALT31.StrType s0) := MakeFT_Invalid_Nums(s0);
-EXPORT InValid_variance_weight(SALT31.StrType s) := InValidFT_Invalid_Nums(s);
+
+
+EXPORT Make_variance_weight(SALT311.StrType s0) := MakeFT_Invalid_Nums(s0);
+EXPORT InValid_variance_weight(SALT311.StrType s) := InValidFT_Invalid_Nums(s);
 EXPORT InValidMessage_variance_weight(UNSIGNED1 wh) := InValidMessageFT_Invalid_Nums(wh);
-EXPORT Make_base_list_price(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_base_list_price(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_base_list_price(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_base_list_price(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_base_list_price(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_price_variance(SALT31.StrType s0) := MakeFT_Invalid_Nums(s0);
-EXPORT InValid_price_variance(SALT31.StrType s) := InValidFT_Invalid_Nums(s);
+
+
+EXPORT Make_price_variance(SALT311.StrType s0) := MakeFT_Invalid_Nums(s0);
+EXPORT InValid_price_variance(SALT311.StrType s) := InValidFT_Invalid_Nums(s);
 EXPORT InValidMessage_price_variance(UNSIGNED1 wh) := InValidMessageFT_Invalid_Nums(wh);
-EXPORT Make_high_performance_code(SALT31.StrType s0) := MakeFT_Invalid_HPC(s0);
-EXPORT InValid_high_performance_code(SALT31.StrType s) := InValidFT_Invalid_HPC(s);
+
+
+EXPORT Make_high_performance_code(SALT311.StrType s0) := MakeFT_Invalid_HPC(s0);
+EXPORT InValid_high_performance_code(SALT311.StrType s) := InValidFT_Invalid_HPC(s);
 EXPORT InValidMessage_high_performance_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_HPC(wh);
-EXPORT Make_driving_wheels(SALT31.StrType s0) := MakeFT_Invalid_Wheel(s0);
-EXPORT InValid_driving_wheels(SALT31.StrType s) := InValidFT_Invalid_Wheel(s);
+
+
+EXPORT Make_driving_wheels(SALT311.StrType s0) := MakeFT_Invalid_Wheel(s0);
+EXPORT InValid_driving_wheels(SALT311.StrType s) := InValidFT_Invalid_Wheel(s);
 EXPORT InValidMessage_driving_wheels(UNSIGNED1 wh) := InValidMessageFT_Invalid_Wheel(wh);
-EXPORT Make_iso_physical_damage(SALT31.StrType s0) := s0;
-EXPORT InValid_iso_physical_damage(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_iso_physical_damage(SALT311.StrType s0) := s0;
+EXPORT InValid_iso_physical_damage(SALT311.StrType s) := 0;
 EXPORT InValidMessage_iso_physical_damage(UNSIGNED1 wh) := '';
-EXPORT Make_location_indicator(SALT31.StrType s0) := MakeFT_Invalid_Location(s0);
-EXPORT InValid_location_indicator(SALT31.StrType s) := InValidFT_Invalid_Location(s);
+
+
+EXPORT Make_location_indicator(SALT311.StrType s0) := MakeFT_Invalid_Location(s0);
+EXPORT InValid_location_indicator(SALT311.StrType s) := InValidFT_Invalid_Location(s);
 EXPORT InValidMessage_location_indicator(UNSIGNED1 wh) := InValidMessageFT_Invalid_Location(wh);
-EXPORT Make_air_conditioning(SALT31.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
-EXPORT InValid_air_conditioning(SALT31.StrType s) := InValidFT_Invalid_Option_SOUN(s);
+
+
+EXPORT Make_air_conditioning(SALT311.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
+EXPORT InValid_air_conditioning(SALT311.StrType s) := InValidFT_Invalid_Option_SOUN(s);
 EXPORT InValidMessage_air_conditioning(UNSIGNED1 wh) := InValidMessageFT_Invalid_Option_SOUN(wh);
-EXPORT Make_power_steering(SALT31.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
-EXPORT InValid_power_steering(SALT31.StrType s) := InValidFT_Invalid_Option_SOUN(s);
+
+
+EXPORT Make_power_steering(SALT311.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
+EXPORT InValid_power_steering(SALT311.StrType s) := InValidFT_Invalid_Option_SOUN(s);
 EXPORT InValidMessage_power_steering(UNSIGNED1 wh) := InValidMessageFT_Invalid_Option_SOUN(wh);
-EXPORT Make_power_brakes(SALT31.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
-EXPORT InValid_power_brakes(SALT31.StrType s) := InValidFT_Invalid_Option_SOUN(s);
+
+
+EXPORT Make_power_brakes(SALT311.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
+EXPORT InValid_power_brakes(SALT311.StrType s) := InValidFT_Invalid_Option_SOUN(s);
 EXPORT InValidMessage_power_brakes(UNSIGNED1 wh) := InValidMessageFT_Invalid_Option_SOUN(wh);
-EXPORT Make_power_windows(SALT31.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
-EXPORT InValid_power_windows(SALT31.StrType s) := InValidFT_Invalid_Option_SOUN(s);
+
+
+EXPORT Make_power_windows(SALT311.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
+EXPORT InValid_power_windows(SALT311.StrType s) := InValidFT_Invalid_Option_SOUN(s);
 EXPORT InValidMessage_power_windows(UNSIGNED1 wh) := InValidMessageFT_Invalid_Option_SOUN(wh);
-EXPORT Make_tilt_wheel(SALT31.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
-EXPORT InValid_tilt_wheel(SALT31.StrType s) := InValidFT_Invalid_Option_SOUN(s);
+
+
+EXPORT Make_tilt_wheel(SALT311.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
+EXPORT InValid_tilt_wheel(SALT311.StrType s) := InValidFT_Invalid_Option_SOUN(s);
 EXPORT InValidMessage_tilt_wheel(UNSIGNED1 wh) := InValidMessageFT_Invalid_Option_SOUN(wh);
-EXPORT Make_roof(SALT31.StrType s0) := MakeFT_Invalid_Roof(s0);
-EXPORT InValid_roof(SALT31.StrType s) := InValidFT_Invalid_Roof(s);
+
+
+EXPORT Make_roof(SALT311.StrType s0) := MakeFT_Invalid_Roof(s0);
+EXPORT InValid_roof(SALT311.StrType s) := InValidFT_Invalid_Roof(s);
 EXPORT InValidMessage_roof(UNSIGNED1 wh) := InValidMessageFT_Invalid_Roof(wh);
-EXPORT Make_optional_roof1(SALT31.StrType s0) := MakeFT_Invalid_Roof(s0);
-EXPORT InValid_optional_roof1(SALT31.StrType s) := InValidFT_Invalid_Roof(s);
+
+
+EXPORT Make_optional_roof1(SALT311.StrType s0) := MakeFT_Invalid_Roof(s0);
+EXPORT InValid_optional_roof1(SALT311.StrType s) := InValidFT_Invalid_Roof(s);
 EXPORT InValidMessage_optional_roof1(UNSIGNED1 wh) := InValidMessageFT_Invalid_Roof(wh);
-EXPORT Make_optional_roof2(SALT31.StrType s0) := MakeFT_Invalid_Roof(s0);
-EXPORT InValid_optional_roof2(SALT31.StrType s) := InValidFT_Invalid_Roof(s);
+
+
+EXPORT Make_optional_roof2(SALT311.StrType s0) := MakeFT_Invalid_Roof(s0);
+EXPORT InValid_optional_roof2(SALT311.StrType s) := InValidFT_Invalid_Roof(s);
 EXPORT InValidMessage_optional_roof2(UNSIGNED1 wh) := InValidMessageFT_Invalid_Roof(wh);
-EXPORT Make_radio(SALT31.StrType s0) := MakeFT_Invalid_Radio(s0);
-EXPORT InValid_radio(SALT31.StrType s) := InValidFT_Invalid_Radio(s);
+
+
+EXPORT Make_radio(SALT311.StrType s0) := MakeFT_Invalid_Radio(s0);
+EXPORT InValid_radio(SALT311.StrType s) := InValidFT_Invalid_Radio(s);
 EXPORT InValidMessage_radio(UNSIGNED1 wh) := InValidMessageFT_Invalid_Radio(wh);
-EXPORT Make_optional_radio1(SALT31.StrType s0) := MakeFT_Invalid_Radio(s0);
-EXPORT InValid_optional_radio1(SALT31.StrType s) := InValidFT_Invalid_Radio(s);
+
+
+EXPORT Make_optional_radio1(SALT311.StrType s0) := MakeFT_Invalid_Radio(s0);
+EXPORT InValid_optional_radio1(SALT311.StrType s) := InValidFT_Invalid_Radio(s);
 EXPORT InValidMessage_optional_radio1(UNSIGNED1 wh) := InValidMessageFT_Invalid_Radio(wh);
-EXPORT Make_optional_radio2(SALT31.StrType s0) := MakeFT_Invalid_Radio(s0);
-EXPORT InValid_optional_radio2(SALT31.StrType s) := InValidFT_Invalid_Radio(s);
+
+
+EXPORT Make_optional_radio2(SALT311.StrType s0) := MakeFT_Invalid_Radio(s0);
+EXPORT InValid_optional_radio2(SALT311.StrType s) := InValidFT_Invalid_Radio(s);
 EXPORT InValidMessage_optional_radio2(UNSIGNED1 wh) := InValidMessageFT_Invalid_Radio(wh);
-EXPORT Make_transmission(SALT31.StrType s0) := MakeFT_Invalid_Transmission(s0);
-EXPORT InValid_transmission(SALT31.StrType s) := InValidFT_Invalid_Transmission(s);
+
+
+EXPORT Make_transmission(SALT311.StrType s0) := MakeFT_Invalid_Transmission(s0);
+EXPORT InValid_transmission(SALT311.StrType s) := InValidFT_Invalid_Transmission(s);
 EXPORT InValidMessage_transmission(UNSIGNED1 wh) := InValidMessageFT_Invalid_Transmission(wh);
-EXPORT Make_optional_transmission1(SALT31.StrType s0) := MakeFT_Invalid_Transmission(s0);
-EXPORT InValid_optional_transmission1(SALT31.StrType s) := InValidFT_Invalid_Transmission(s);
+
+
+EXPORT Make_optional_transmission1(SALT311.StrType s0) := MakeFT_Invalid_Transmission(s0);
+EXPORT InValid_optional_transmission1(SALT311.StrType s) := InValidFT_Invalid_Transmission(s);
 EXPORT InValidMessage_optional_transmission1(UNSIGNED1 wh) := InValidMessageFT_Invalid_Transmission(wh);
-EXPORT Make_optional_transmission2(SALT31.StrType s0) := MakeFT_Invalid_Transmission(s0);
-EXPORT InValid_optional_transmission2(SALT31.StrType s) := InValidFT_Invalid_Transmission(s);
+
+
+EXPORT Make_optional_transmission2(SALT311.StrType s0) := MakeFT_Invalid_Transmission(s0);
+EXPORT InValid_optional_transmission2(SALT311.StrType s) := InValidFT_Invalid_Transmission(s);
 EXPORT InValidMessage_optional_transmission2(UNSIGNED1 wh) := InValidMessageFT_Invalid_Transmission(wh);
-EXPORT Make_anti_lock_brakes(SALT31.StrType s0) := MakeFT_Invalid_ALB(s0);
-EXPORT InValid_anti_lock_brakes(SALT31.StrType s) := InValidFT_Invalid_ALB(s);
+
+
+EXPORT Make_anti_lock_brakes(SALT311.StrType s0) := MakeFT_Invalid_ALB(s0);
+EXPORT InValid_anti_lock_brakes(SALT311.StrType s) := InValidFT_Invalid_ALB(s);
 EXPORT InValidMessage_anti_lock_brakes(UNSIGNED1 wh) := InValidMessageFT_Invalid_ALB(wh);
-EXPORT Make_security_system(SALT31.StrType s0) := MakeFT_Invalid_Security(s0);
-EXPORT InValid_security_system(SALT31.StrType s) := InValidFT_Invalid_Security(s);
+
+
+EXPORT Make_security_system(SALT311.StrType s0) := MakeFT_Invalid_Security(s0);
+EXPORT InValid_security_system(SALT311.StrType s) := InValidFT_Invalid_Security(s);
 EXPORT InValidMessage_security_system(UNSIGNED1 wh) := InValidMessageFT_Invalid_Security(wh);
-EXPORT Make_daytime_running_lights(SALT31.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
-EXPORT InValid_daytime_running_lights(SALT31.StrType s) := InValidFT_Invalid_Option_SOUN(s);
+
+
+EXPORT Make_daytime_running_lights(SALT311.StrType s0) := MakeFT_Invalid_Option_SOUN(s0);
+EXPORT InValid_daytime_running_lights(SALT311.StrType s) := InValidFT_Invalid_Option_SOUN(s);
 EXPORT InValidMessage_daytime_running_lights(UNSIGNED1 wh) := InValidMessageFT_Invalid_Option_SOUN(wh);
-EXPORT Make_visrap(SALT31.StrType s0) := MakeFT_Invalid_Visrap(s0);
-EXPORT InValid_visrap(SALT31.StrType s) := InValidFT_Invalid_Visrap(s);
+
+
+EXPORT Make_visrap(SALT311.StrType s0) := MakeFT_Invalid_Visrap(s0);
+EXPORT InValid_visrap(SALT311.StrType s) := InValidFT_Invalid_Visrap(s);
 EXPORT InValidMessage_visrap(UNSIGNED1 wh) := InValidMessageFT_Invalid_Visrap(wh);
-EXPORT Make_cab_configuration(SALT31.StrType s0) := MakeFT_Invalid_Cab(s0);
-EXPORT InValid_cab_configuration(SALT31.StrType s) := InValidFT_Invalid_Cab(s);
+
+
+EXPORT Make_cab_configuration(SALT311.StrType s0) := MakeFT_Invalid_Cab(s0);
+EXPORT InValid_cab_configuration(SALT311.StrType s) := InValidFT_Invalid_Cab(s);
 EXPORT InValidMessage_cab_configuration(UNSIGNED1 wh) := InValidMessageFT_Invalid_Cab(wh);
-EXPORT Make_front_axle_code(SALT31.StrType s0) := MakeFT_Invalid_FAC(s0);
-EXPORT InValid_front_axle_code(SALT31.StrType s) := InValidFT_Invalid_FAC(s);
+
+
+EXPORT Make_front_axle_code(SALT311.StrType s0) := MakeFT_Invalid_FAC(s0);
+EXPORT InValid_front_axle_code(SALT311.StrType s) := InValidFT_Invalid_FAC(s);
 EXPORT InValidMessage_front_axle_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_FAC(wh);
-EXPORT Make_rear_axle_code(SALT31.StrType s0) := MakeFT_Invalid_RAC(s0);
-EXPORT InValid_rear_axle_code(SALT31.StrType s) := InValidFT_Invalid_RAC(s);
+
+
+EXPORT Make_rear_axle_code(SALT311.StrType s0) := MakeFT_Invalid_RAC(s0);
+EXPORT InValid_rear_axle_code(SALT311.StrType s) := InValidFT_Invalid_RAC(s);
 EXPORT InValidMessage_rear_axle_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_RAC(wh);
-EXPORT Make_brakes_code(SALT31.StrType s0) := MakeFT_Invalid_Brakes(s0);
-EXPORT InValid_brakes_code(SALT31.StrType s) := InValidFT_Invalid_Brakes(s);
+
+
+EXPORT Make_brakes_code(SALT311.StrType s0) := MakeFT_Invalid_Brakes(s0);
+EXPORT InValid_brakes_code(SALT311.StrType s) := InValidFT_Invalid_Brakes(s);
 EXPORT InValidMessage_brakes_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Brakes(wh);
-EXPORT Make_engine_manufacturer(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_engine_manufacturer(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_engine_manufacturer(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_engine_manufacturer(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_engine_manufacturer(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_engine_model(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_engine_model(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_engine_model(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_engine_model(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_engine_model(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_engine_type_code(SALT31.StrType s0) := MakeFT_Invalid_Engine_Type(s0);
-EXPORT InValid_engine_type_code(SALT31.StrType s) := InValidFT_Invalid_Engine_Type(s);
+
+
+EXPORT Make_engine_type_code(SALT311.StrType s0) := MakeFT_Invalid_Engine_Type(s0);
+EXPORT InValid_engine_type_code(SALT311.StrType s) := InValidFT_Invalid_Engine_Type(s);
 EXPORT InValidMessage_engine_type_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Engine_Type(wh);
-EXPORT Make_trailer_body_style(SALT31.StrType s0) := MakeFT_Invalid_Trailer_Body(s0);
-EXPORT InValid_trailer_body_style(SALT31.StrType s) := InValidFT_Invalid_Trailer_Body(s);
+
+
+EXPORT Make_trailer_body_style(SALT311.StrType s0) := MakeFT_Invalid_Trailer_Body(s0);
+EXPORT InValid_trailer_body_style(SALT311.StrType s) := InValidFT_Invalid_Trailer_Body(s);
 EXPORT InValidMessage_trailer_body_style(UNSIGNED1 wh) := InValidMessageFT_Invalid_Trailer_Body(wh);
-EXPORT Make_trailer_number_of_axles(SALT31.StrType s0) := MakeFT_Invalid_Num_Axles(s0);
-EXPORT InValid_trailer_number_of_axles(SALT31.StrType s) := InValidFT_Invalid_Num_Axles(s);
+
+
+EXPORT Make_trailer_number_of_axles(SALT311.StrType s0) := MakeFT_Invalid_Num_Axles(s0);
+EXPORT InValid_trailer_number_of_axles(SALT311.StrType s) := InValidFT_Invalid_Num_Axles(s);
 EXPORT InValidMessage_trailer_number_of_axles(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num_Axles(wh);
-EXPORT Make_trailer_length(SALT31.StrType s0) := MakeFT_Invalid_Trailer_length(s0);
-EXPORT InValid_trailer_length(SALT31.StrType s) := InValidFT_Invalid_Trailer_length(s);
+
+
+EXPORT Make_trailer_length(SALT311.StrType s0) := MakeFT_Invalid_Trailer_length(s0);
+EXPORT InValid_trailer_length(SALT311.StrType s) := InValidFT_Invalid_Trailer_length(s);
 EXPORT InValidMessage_trailer_length(UNSIGNED1 wh) := InValidMessageFT_Invalid_Trailer_length(wh);
-EXPORT Make_proactive_vin(SALT31.StrType s0) := MakeFT_Invalid_Proactive_VIN_Ind(s0);
-EXPORT InValid_proactive_vin(SALT31.StrType s) := InValidFT_Invalid_Proactive_VIN_Ind(s);
+
+
+EXPORT Make_proactive_vin(SALT311.StrType s0) := MakeFT_Invalid_Proactive_VIN_Ind(s0);
+EXPORT InValid_proactive_vin(SALT311.StrType s) := InValidFT_Invalid_Proactive_VIN_Ind(s);
 EXPORT InValidMessage_proactive_vin(UNSIGNED1 wh) := InValidMessageFT_Invalid_Proactive_VIN_Ind(wh);
-EXPORT Make_ma_state_exceptions(SALT31.StrType s0) := s0;
-EXPORT InValid_ma_state_exceptions(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_ma_state_exceptions(SALT311.StrType s0) := s0;
+EXPORT InValid_ma_state_exceptions(SALT311.StrType s) := 0;
 EXPORT InValidMessage_ma_state_exceptions(UNSIGNED1 wh) := '';
-EXPORT Make_filler_1(SALT31.StrType s0) := s0;
-EXPORT InValid_filler_1(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_filler_1(SALT311.StrType s0) := s0;
+EXPORT InValid_filler_1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_filler_1(UNSIGNED1 wh) := '';
-EXPORT Make_series_abbreviation(SALT31.StrType s0) := s0;
-EXPORT InValid_series_abbreviation(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_series_abbreviation(SALT311.StrType s0) := s0;
+EXPORT InValid_series_abbreviation(SALT311.StrType s) := 0;
 EXPORT InValidMessage_series_abbreviation(UNSIGNED1 wh) := '';
-EXPORT Make_vin_pattern(SALT31.StrType s0) := MakeFT_Invalid_VIN_Pattern(s0);
-EXPORT InValid_vin_pattern(SALT31.StrType s) := InValidFT_Invalid_VIN_Pattern(s);
+
+
+EXPORT Make_vin_pattern(SALT311.StrType s0) := MakeFT_Invalid_VIN_Pattern(s0);
+EXPORT InValid_vin_pattern(SALT311.StrType s) := InValidFT_Invalid_VIN_Pattern(s);
 EXPORT InValidMessage_vin_pattern(UNSIGNED1 wh) := InValidMessageFT_Invalid_VIN_Pattern(wh);
-EXPORT Make_ncic_data(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_ncic_data(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_ncic_data(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_ncic_data(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_ncic_data(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_full_body_style_name(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_full_body_style_name(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_full_body_style_name(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_full_body_style_name(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_full_body_style_name(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_nvpp_make_code(SALT31.StrType s0) := s0;
-EXPORT InValid_nvpp_make_code(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_nvpp_make_code(SALT311.StrType s0) := s0;
+EXPORT InValid_nvpp_make_code(SALT311.StrType s) := 0;
 EXPORT InValidMessage_nvpp_make_code(UNSIGNED1 wh) := '';
-EXPORT Make_nvpp_make_abbreviation(SALT31.StrType s0) := s0;
-EXPORT InValid_nvpp_make_abbreviation(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_nvpp_make_abbreviation(SALT311.StrType s0) := s0;
+EXPORT InValid_nvpp_make_abbreviation(SALT311.StrType s) := 0;
 EXPORT InValidMessage_nvpp_make_abbreviation(UNSIGNED1 wh) := '';
-EXPORT Make_nvpp_series_model(SALT31.StrType s0) := s0;
-EXPORT InValid_nvpp_series_model(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_nvpp_series_model(SALT311.StrType s0) := s0;
+EXPORT InValid_nvpp_series_model(SALT311.StrType s) := 0;
 EXPORT InValidMessage_nvpp_series_model(UNSIGNED1 wh) := '';
-EXPORT Make_nvpp_series_name(SALT31.StrType s0) := s0;
-EXPORT InValid_nvpp_series_name(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_nvpp_series_name(SALT311.StrType s0) := s0;
+EXPORT InValid_nvpp_series_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_nvpp_series_name(UNSIGNED1 wh) := '';
-EXPORT Make_segmentation_code(SALT31.StrType s0) := MakeFT_Invalid_Segmentation_Codes(s0);
-EXPORT InValid_segmentation_code(SALT31.StrType s) := InValidFT_Invalid_Segmentation_Codes(s);
+
+
+EXPORT Make_segmentation_code(SALT311.StrType s0) := MakeFT_Invalid_Segmentation_Codes(s0);
+EXPORT InValid_segmentation_code(SALT311.StrType s) := InValidFT_Invalid_Segmentation_Codes(s);
 EXPORT InValidMessage_segmentation_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Segmentation_Codes(wh);
-EXPORT Make_country_of_origin(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_country_of_origin(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_country_of_origin(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_country_of_origin(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_country_of_origin(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_engine_liter_information(SALT31.StrType s0) := MakeFT_Invalid_Liter(s0);
-EXPORT InValid_engine_liter_information(SALT31.StrType s) := InValidFT_Invalid_Liter(s);
+
+
+EXPORT Make_engine_liter_information(SALT311.StrType s0) := MakeFT_Invalid_Liter(s0);
+EXPORT InValid_engine_liter_information(SALT311.StrType s) := InValidFT_Invalid_Liter(s);
 EXPORT InValidMessage_engine_liter_information(UNSIGNED1 wh) := InValidMessageFT_Invalid_Liter(wh);
-EXPORT Make_engine_information_filler1(SALT31.StrType s0) := s0;
-EXPORT InValid_engine_information_filler1(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_engine_information_filler1(SALT311.StrType s0) := s0;
+EXPORT InValid_engine_information_filler1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_engine_information_filler1(UNSIGNED1 wh) := '';
-EXPORT Make_engine_information_block_type(SALT31.StrType s0) := MakeFT_Invalid_Block_Type(s0);
-EXPORT InValid_engine_information_block_type(SALT31.StrType s) := InValidFT_Invalid_Block_Type(s);
+
+
+EXPORT Make_engine_information_block_type(SALT311.StrType s0) := MakeFT_Invalid_Block_Type(s0);
+EXPORT InValid_engine_information_block_type(SALT311.StrType s) := InValidFT_Invalid_Block_Type(s);
 EXPORT InValidMessage_engine_information_block_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_Block_Type(wh);
-EXPORT Make_engine_information_cylinders(SALT31.StrType s0) := MakeFT_Invalid_engine_information_cylinders(s0);
-EXPORT InValid_engine_information_cylinders(SALT31.StrType s) := InValidFT_Invalid_engine_information_cylinders(s);
+
+
+EXPORT Make_engine_information_cylinders(SALT311.StrType s0) := MakeFT_Invalid_engine_information_cylinders(s0);
+EXPORT InValid_engine_information_cylinders(SALT311.StrType s) := InValidFT_Invalid_engine_information_cylinders(s);
 EXPORT InValidMessage_engine_information_cylinders(UNSIGNED1 wh) := InValidMessageFT_Invalid_engine_information_cylinders(wh);
-EXPORT Make_engine_information_filler2(SALT31.StrType s0) := s0;
-EXPORT InValid_engine_information_filler2(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_engine_information_filler2(SALT311.StrType s0) := s0;
+EXPORT InValid_engine_information_filler2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_engine_information_filler2(UNSIGNED1 wh) := '';
-EXPORT Make_engine_information_carburetion(SALT31.StrType s0) := MakeFT_Invalid_Carburetion(s0);
-EXPORT InValid_engine_information_carburetion(SALT31.StrType s) := InValidFT_Invalid_Carburetion(s);
+
+
+EXPORT Make_engine_information_carburetion(SALT311.StrType s0) := MakeFT_Invalid_Carburetion(s0);
+EXPORT InValid_engine_information_carburetion(SALT311.StrType s) := InValidFT_Invalid_Carburetion(s);
 EXPORT InValidMessage_engine_information_carburetion(UNSIGNED1 wh) := InValidMessageFT_Invalid_Carburetion(wh);
-EXPORT Make_engine_information_filler3(SALT31.StrType s0) := s0;
-EXPORT InValid_engine_information_filler3(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_engine_information_filler3(SALT311.StrType s0) := s0;
+EXPORT InValid_engine_information_filler3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_engine_information_filler3(UNSIGNED1 wh) := '';
-EXPORT Make_engine_information_head_configuration(SALT31.StrType s0) := MakeFT_Invalid_Head_Configuration(s0);
-EXPORT InValid_engine_information_head_configuration(SALT31.StrType s) := InValidFT_Invalid_Head_Configuration(s);
+
+
+EXPORT Make_engine_information_head_configuration(SALT311.StrType s0) := MakeFT_Invalid_Head_Configuration(s0);
+EXPORT InValid_engine_information_head_configuration(SALT311.StrType s) := InValidFT_Invalid_Head_Configuration(s);
 EXPORT InValidMessage_engine_information_head_configuration(UNSIGNED1 wh) := InValidMessageFT_Invalid_Head_Configuration(wh);
-EXPORT Make_engine_information_filler4(SALT31.StrType s0) := s0;
-EXPORT InValid_engine_information_filler4(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_engine_information_filler4(SALT311.StrType s0) := s0;
+EXPORT InValid_engine_information_filler4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_engine_information_filler4(UNSIGNED1 wh) := '';
-EXPORT Make_engine_information_total_valves(SALT31.StrType s0) := MakeFT_Invalid_Valves(s0);
-EXPORT InValid_engine_information_total_valves(SALT31.StrType s) := InValidFT_Invalid_Valves(s);
+
+
+EXPORT Make_engine_information_total_valves(SALT311.StrType s0) := MakeFT_Invalid_Valves(s0);
+EXPORT InValid_engine_information_total_valves(SALT311.StrType s) := InValidFT_Invalid_Valves(s);
 EXPORT InValidMessage_engine_information_total_valves(UNSIGNED1 wh) := InValidMessageFT_Invalid_Valves(wh);
-EXPORT Make_engine_information_filler5(SALT31.StrType s0) := s0;
-EXPORT InValid_engine_information_filler5(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_engine_information_filler5(SALT311.StrType s0) := s0;
+EXPORT InValid_engine_information_filler5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_engine_information_filler5(UNSIGNED1 wh) := '';
-EXPORT Make_engine_information_aspiration_code(SALT31.StrType s0) := MakeFT_Invalid_Aspiration_Code(s0);
-EXPORT InValid_engine_information_aspiration_code(SALT31.StrType s) := InValidFT_Invalid_Aspiration_Code(s);
+
+
+EXPORT Make_engine_information_aspiration_code(SALT311.StrType s0) := MakeFT_Invalid_Aspiration_Code(s0);
+EXPORT InValid_engine_information_aspiration_code(SALT311.StrType s) := InValidFT_Invalid_Aspiration_Code(s);
 EXPORT InValidMessage_engine_information_aspiration_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Aspiration_Code(wh);
-EXPORT Make_engine_information_carburetion_code(SALT31.StrType s0) := MakeFT_Invalid_Carburetion_Code(s0);
-EXPORT InValid_engine_information_carburetion_code(SALT31.StrType s) := InValidFT_Invalid_Carburetion_Code(s);
+
+
+EXPORT Make_engine_information_carburetion_code(SALT311.StrType s0) := MakeFT_Invalid_Carburetion_Code(s0);
+EXPORT InValid_engine_information_carburetion_code(SALT311.StrType s) := InValidFT_Invalid_Carburetion_Code(s);
 EXPORT InValidMessage_engine_information_carburetion_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Carburetion_Code(wh);
-EXPORT Make_engine_information_valves_per_cylinder(SALT31.StrType s0) := MakeFT_Invalid_VPC(s0);
-EXPORT InValid_engine_information_valves_per_cylinder(SALT31.StrType s) := InValidFT_Invalid_VPC(s);
+
+
+EXPORT Make_engine_information_valves_per_cylinder(SALT311.StrType s0) := MakeFT_Invalid_VPC(s0);
+EXPORT InValid_engine_information_valves_per_cylinder(SALT311.StrType s) := InValidFT_Invalid_VPC(s);
 EXPORT InValidMessage_engine_information_valves_per_cylinder(UNSIGNED1 wh) := InValidMessageFT_Invalid_VPC(wh);
-EXPORT Make_transmission_speed(SALT31.StrType s0) := MakeFT_Invalid_Transmission_Speed(s0);
-EXPORT InValid_transmission_speed(SALT31.StrType s) := InValidFT_Invalid_Transmission_Speed(s);
+
+
+EXPORT Make_transmission_speed(SALT311.StrType s0) := MakeFT_Invalid_Transmission_Speed(s0);
+EXPORT InValid_transmission_speed(SALT311.StrType s) := InValidFT_Invalid_Transmission_Speed(s);
 EXPORT InValidMessage_transmission_speed(UNSIGNED1 wh) := InValidMessageFT_Invalid_Transmission_Speed(wh);
-EXPORT Make_transmission_filler1(SALT31.StrType s0) := s0;
-EXPORT InValid_transmission_filler1(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_transmission_filler1(SALT311.StrType s0) := s0;
+EXPORT InValid_transmission_filler1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_transmission_filler1(UNSIGNED1 wh) := '';
-EXPORT Make_transmission_type(SALT31.StrType s0) := MakeFT_Invalid_Transmission_Type(s0);
-EXPORT InValid_transmission_type(SALT31.StrType s) := InValidFT_Invalid_Transmission_Type(s);
+
+
+EXPORT Make_transmission_type(SALT311.StrType s0) := MakeFT_Invalid_Transmission_Type(s0);
+EXPORT InValid_transmission_type(SALT311.StrType s) := InValidFT_Invalid_Transmission_Type(s);
 EXPORT InValidMessage_transmission_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_Transmission_Type(wh);
-EXPORT Make_transmission_filler2(SALT31.StrType s0) := s0;
-EXPORT InValid_transmission_filler2(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_transmission_filler2(SALT311.StrType s0) := s0;
+EXPORT InValid_transmission_filler2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_transmission_filler2(UNSIGNED1 wh) := '';
-EXPORT Make_transmission_code(SALT31.StrType s0) := MakeFT_Invalid_Transmission_Code(s0);
-EXPORT InValid_transmission_code(SALT31.StrType s) := InValidFT_Invalid_Transmission_Code(s);
+
+
+EXPORT Make_transmission_code(SALT311.StrType s0) := MakeFT_Invalid_Transmission_Code(s0);
+EXPORT InValid_transmission_code(SALT311.StrType s) := InValidFT_Invalid_Transmission_Code(s);
 EXPORT InValidMessage_transmission_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Transmission_Code(wh);
-EXPORT Make_transmission_filler3(SALT31.StrType s0) := s0;
-EXPORT InValid_transmission_filler3(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_transmission_filler3(SALT311.StrType s0) := s0;
+EXPORT InValid_transmission_filler3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_transmission_filler3(UNSIGNED1 wh) := '';
-EXPORT Make_transmission_speed_code(SALT31.StrType s0) := MakeFT_Invalid_Transmission_Speed_Code(s0);
-EXPORT InValid_transmission_speed_code(SALT31.StrType s) := InValidFT_Invalid_Transmission_Speed_Code(s);
+
+
+EXPORT Make_transmission_speed_code(SALT311.StrType s0) := MakeFT_Invalid_Transmission_Speed_Code(s0);
+EXPORT InValid_transmission_speed_code(SALT311.StrType s) := InValidFT_Invalid_Transmission_Speed_Code(s);
 EXPORT InValidMessage_transmission_speed_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Transmission_Speed_Code(wh);
-EXPORT Make_base_model(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_base_model(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_base_model(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_base_model(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_base_model(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_complete_prefix_file_id(SALT31.StrType s0) := MakeFT_Invalid_Nums(s0);
-EXPORT InValid_complete_prefix_file_id(SALT31.StrType s) := InValidFT_Invalid_Nums(s);
+
+
+EXPORT Make_complete_prefix_file_id(SALT311.StrType s0) := MakeFT_Invalid_Nums(s0);
+EXPORT InValid_complete_prefix_file_id(SALT311.StrType s) := InValidFT_Invalid_Nums(s);
 EXPORT InValidMessage_complete_prefix_file_id(UNSIGNED1 wh) := InValidMessageFT_Invalid_Nums(wh);
-EXPORT Make_series_name_full_spelling(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_series_name_full_spelling(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_series_name_full_spelling(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_series_name_full_spelling(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_series_name_full_spelling(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_vis_theft_code(SALT31.StrType s0) := MakeFT_Invalid_Y_or_N(s0);
-EXPORT InValid_vis_theft_code(SALT31.StrType s) := InValidFT_Invalid_Y_or_N(s);
+
+
+EXPORT Make_vis_theft_code(SALT311.StrType s0) := MakeFT_Invalid_Y_or_N(s0);
+EXPORT InValid_vis_theft_code(SALT311.StrType s) := InValidFT_Invalid_Y_or_N(s);
 EXPORT InValidMessage_vis_theft_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Y_or_N(wh);
-EXPORT Make_base_list_price_expanded(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_base_list_price_expanded(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_base_list_price_expanded(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_base_list_price_expanded(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_base_list_price_expanded(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_default_nada_vehicle_id(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_default_nada_vehicle_id(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_default_nada_vehicle_id(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_default_nada_vehicle_id(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_default_nada_vehicle_id(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_default_nada_model(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_default_nada_model(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_default_nada_model(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_default_nada_model(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_default_nada_model(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_default_nada_body_style(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_default_nada_body_style(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_default_nada_body_style(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_default_nada_body_style(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_default_nada_body_style(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_default_nada_msrp(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_default_nada_msrp(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_default_nada_msrp(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_default_nada_msrp(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_default_nada_msrp(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_default_nada_gvwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_default_nada_gvwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_default_nada_gvwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_default_nada_gvwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_default_nada_gvwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_default_nada_gcwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_default_nada_gcwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_default_nada_gcwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_default_nada_gcwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_default_nada_gcwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_1_nada_vehicle_id(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_1_nada_vehicle_id(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_1_nada_vehicle_id(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_1_nada_vehicle_id(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_1_nada_vehicle_id(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_1_nada_model(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_1_nada_model(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_1_nada_model(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_1_nada_model(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_1_nada_model(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_1_nada_body_style(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_1_nada_body_style(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_1_nada_body_style(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_1_nada_body_style(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_1_nada_body_style(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_1_nada_msrp(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_1_nada_msrp(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_1_nada_msrp(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_1_nada_msrp(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_1_nada_msrp(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_1_nada_gvwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_1_nada_gvwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_1_nada_gvwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_1_nada_gvwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_1_nada_gvwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_1_nada_gcwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_1_nada_gcwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_1_nada_gcwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_1_nada_gcwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_1_nada_gcwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_2_nada_vehicle_id(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_2_nada_vehicle_id(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_2_nada_vehicle_id(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_2_nada_vehicle_id(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_2_nada_vehicle_id(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_2_nada_model(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_2_nada_model(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_2_nada_model(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_2_nada_model(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_2_nada_model(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_2_nada_body_style(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_2_nada_body_style(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_2_nada_body_style(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_2_nada_body_style(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_2_nada_body_style(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_2_nada_msrp(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_2_nada_msrp(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_2_nada_msrp(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_2_nada_msrp(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_2_nada_msrp(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_2_nada_gvwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_2_nada_gvwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_2_nada_gvwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_2_nada_gvwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_2_nada_gvwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_2_nada_gcwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_2_nada_gcwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_2_nada_gcwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_2_nada_gcwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_2_nada_gcwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_3_nada_vehicle_id(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_3_nada_vehicle_id(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_3_nada_vehicle_id(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_3_nada_vehicle_id(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_3_nada_vehicle_id(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_3_nada_model(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_3_nada_model(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_3_nada_model(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_3_nada_model(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_3_nada_model(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_3_nada_body_style(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_3_nada_body_style(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_3_nada_body_style(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_3_nada_body_style(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_3_nada_body_style(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_3_nada_msrp(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_3_nada_msrp(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_3_nada_msrp(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_3_nada_msrp(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_3_nada_msrp(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_3_nada_gvwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_3_nada_gvwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_3_nada_gvwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_3_nada_gvwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_3_nada_gvwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_3_nada_gcwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_3_nada_gcwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_3_nada_gcwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_3_nada_gcwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_3_nada_gcwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_4_nada_vehicle_id(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_4_nada_vehicle_id(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_4_nada_vehicle_id(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_4_nada_vehicle_id(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_4_nada_vehicle_id(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_4_nada_model(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_4_nada_model(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_4_nada_model(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_4_nada_model(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_4_nada_model(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_4_nada_body_style(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_4_nada_body_style(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_4_nada_body_style(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_4_nada_body_style(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_4_nada_body_style(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_4_nada_msrp(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_4_nada_msrp(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_4_nada_msrp(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_4_nada_msrp(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_4_nada_msrp(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_4_nada_gvwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_4_nada_gvwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_4_nada_gvwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_4_nada_gvwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_4_nada_gvwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_4_nada_gcwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_4_nada_gcwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_4_nada_gcwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_4_nada_gcwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_4_nada_gcwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_5_nada_vehicle_id(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_5_nada_vehicle_id(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_5_nada_vehicle_id(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_5_nada_vehicle_id(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_5_nada_vehicle_id(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_5_nada_model(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_5_nada_model(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_5_nada_model(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_5_nada_model(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_5_nada_model(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_5_nada_body_style(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_5_nada_body_style(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_5_nada_body_style(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_5_nada_body_style(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_5_nada_body_style(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_5_nada_msrp(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_5_nada_msrp(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_5_nada_msrp(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_5_nada_msrp(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_5_nada_msrp(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_5_nada_gvwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_5_nada_gvwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_5_nada_gvwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_5_nada_gvwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_5_nada_gvwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_5_nada_gcwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_5_nada_gcwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_5_nada_gcwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_5_nada_gcwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_5_nada_gcwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_6_nada_vehicle_id(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_6_nada_vehicle_id(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_6_nada_vehicle_id(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_6_nada_vehicle_id(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_6_nada_vehicle_id(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_6_nada_model(SALT31.StrType s0) := s0;
-EXPORT InValid_alt_6_nada_model(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_alt_6_nada_model(SALT311.StrType s0) := s0;
+EXPORT InValid_alt_6_nada_model(SALT311.StrType s) := 0;
 EXPORT InValidMessage_alt_6_nada_model(UNSIGNED1 wh) := '';
-EXPORT Make_alt_6_nada_body_style(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_6_nada_body_style(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_6_nada_body_style(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_6_nada_body_style(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_6_nada_body_style(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_6_nada_msrp(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_6_nada_msrp(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_6_nada_msrp(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_6_nada_msrp(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_6_nada_msrp(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_6_nada_gvwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_6_nada_gvwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_6_nada_gvwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_6_nada_gvwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_6_nada_gvwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_6_nada_gcwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_6_nada_gcwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_6_nada_gcwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_6_nada_gcwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_6_nada_gcwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_7_nada_vehicle_id(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_7_nada_vehicle_id(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_7_nada_vehicle_id(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_7_nada_vehicle_id(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_7_nada_vehicle_id(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_7_nada_model(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_7_nada_model(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_7_nada_model(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_7_nada_model(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_7_nada_model(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_7_nada_body_style(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_7_nada_body_style(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_7_nada_body_style(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_7_nada_body_style(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_7_nada_body_style(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_7_nada_msrp(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_7_nada_msrp(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_7_nada_msrp(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_7_nada_msrp(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_7_nada_msrp(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_7_nada_gvwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_7_nada_gvwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_7_nada_gvwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_7_nada_gvwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_7_nada_gvwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_alt_7_nada_gcwr(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_alt_7_nada_gcwr(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_alt_7_nada_gcwr(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_alt_7_nada_gcwr(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_alt_7_nada_gcwr(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_aaia_codes(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_aaia_codes(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_aaia_codes(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_aaia_codes(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_aaia_codes(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_incomplete_vehicle_flag(SALT31.StrType s0) := MakeFT_Invalid_Y_or_N(s0);
-EXPORT InValid_incomplete_vehicle_flag(SALT31.StrType s) := InValidFT_Invalid_Y_or_N(s);
+
+
+EXPORT Make_incomplete_vehicle_flag(SALT311.StrType s0) := MakeFT_Invalid_Y_or_N(s0);
+EXPORT InValid_incomplete_vehicle_flag(SALT311.StrType s) := InValidFT_Invalid_Y_or_N(s);
 EXPORT InValidMessage_incomplete_vehicle_flag(UNSIGNED1 wh) := InValidMessageFT_Invalid_Y_or_N(wh);
-EXPORT Make_filler2(SALT31.StrType s0) := s0;
-EXPORT InValid_filler2(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_filler2(SALT311.StrType s0) := s0;
+EXPORT InValid_filler2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_filler2(UNSIGNED1 wh) := '';
-EXPORT Make_electric_battery_info_type(SALT31.StrType s0) := MakeFT_Invalid_Battery_Type(s0);
-EXPORT InValid_electric_battery_info_type(SALT31.StrType s) := InValidFT_Invalid_Battery_Type(s);
+
+
+EXPORT Make_electric_battery_info_type(SALT311.StrType s0) := MakeFT_Invalid_Battery_Type(s0);
+EXPORT InValid_electric_battery_info_type(SALT311.StrType s) := InValidFT_Invalid_Battery_Type(s);
 EXPORT InValidMessage_electric_battery_info_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_Battery_Type(wh);
-EXPORT Make_filler3(SALT31.StrType s0) := s0;
-EXPORT InValid_filler3(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_filler3(SALT311.StrType s0) := s0;
+EXPORT InValid_filler3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_filler3(UNSIGNED1 wh) := '';
-EXPORT Make_electric_battery_kilowatts(SALT31.StrType s0) := MakeFT_Invalid_Battery_KW(s0);
-EXPORT InValid_electric_battery_kilowatts(SALT31.StrType s) := InValidFT_Invalid_Battery_KW(s);
+
+
+EXPORT Make_electric_battery_kilowatts(SALT311.StrType s0) := MakeFT_Invalid_Battery_KW(s0);
+EXPORT InValid_electric_battery_kilowatts(SALT311.StrType s) := InValidFT_Invalid_Battery_KW(s);
 EXPORT InValidMessage_electric_battery_kilowatts(UNSIGNED1 wh) := InValidMessageFT_Invalid_Battery_KW(wh);
-EXPORT Make_filler4(SALT31.StrType s0) := s0;
-EXPORT InValid_filler4(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_filler4(SALT311.StrType s0) := s0;
+EXPORT InValid_filler4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_filler4(UNSIGNED1 wh) := '';
-EXPORT Make_electric_battery_volts(SALT31.StrType s0) := MakeFT_Invalid_Battery_Volts(s0);
-EXPORT InValid_electric_battery_volts(SALT31.StrType s) := InValidFT_Invalid_Battery_Volts(s);
+
+
+EXPORT Make_electric_battery_volts(SALT311.StrType s0) := MakeFT_Invalid_Battery_Volts(s0);
+EXPORT InValid_electric_battery_volts(SALT311.StrType s) := InValidFT_Invalid_Battery_Volts(s);
 EXPORT InValidMessage_electric_battery_volts(UNSIGNED1 wh) := InValidMessageFT_Invalid_Battery_Volts(wh);
-EXPORT Make_filler5(SALT31.StrType s0) := s0;
-EXPORT InValid_filler5(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_filler5(SALT311.StrType s0) := s0;
+EXPORT InValid_filler5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_filler5(UNSIGNED1 wh) := '';
-EXPORT Make_engine_info_proprietary_engine_brand(SALT31.StrType s0) := MakeFT_Invalid_Engine_Brand(s0);
-EXPORT InValid_engine_info_proprietary_engine_brand(SALT31.StrType s) := InValidFT_Invalid_Engine_Brand(s);
+
+
+EXPORT Make_engine_info_proprietary_engine_brand(SALT311.StrType s0) := MakeFT_Invalid_Engine_Brand(s0);
+EXPORT InValid_engine_info_proprietary_engine_brand(SALT311.StrType s) := InValidFT_Invalid_Engine_Brand(s);
 EXPORT InValidMessage_engine_info_proprietary_engine_brand(UNSIGNED1 wh) := InValidMessageFT_Invalid_Engine_Brand(wh);
-EXPORT Make_filler6(SALT31.StrType s0) := s0;
-EXPORT InValid_filler6(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_filler6(SALT311.StrType s0) := s0;
+EXPORT InValid_filler6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_filler6(UNSIGNED1 wh) := '';
-EXPORT Make_engine_info_high_output_engine(SALT31.StrType s0) := MakeFT_Invalid_Y_or_N(s0);
-EXPORT InValid_engine_info_high_output_engine(SALT31.StrType s) := InValidFT_Invalid_Y_or_N(s);
+
+
+EXPORT Make_engine_info_high_output_engine(SALT311.StrType s0) := MakeFT_Invalid_Y_or_N(s0);
+EXPORT InValid_engine_info_high_output_engine(SALT311.StrType s) := InValidFT_Invalid_Y_or_N(s);
 EXPORT InValidMessage_engine_info_high_output_engine(UNSIGNED1 wh) := InValidMessageFT_Invalid_Y_or_N(wh);
-EXPORT Make_engine_info_supercharged(SALT31.StrType s0) := MakeFT_Invalid_Supercharged(s0);
-EXPORT InValid_engine_info_supercharged(SALT31.StrType s) := InValidFT_Invalid_Supercharged(s);
+
+
+EXPORT Make_engine_info_supercharged(SALT311.StrType s0) := MakeFT_Invalid_Supercharged(s0);
+EXPORT InValid_engine_info_supercharged(SALT311.StrType s) := InValidFT_Invalid_Supercharged(s);
 EXPORT InValidMessage_engine_info_supercharged(UNSIGNED1 wh) := InValidMessageFT_Invalid_Supercharged(wh);
-EXPORT Make_engine_info_turbocharged(SALT31.StrType s0) := MakeFT_Invalid_Turbocharged(s0);
-EXPORT InValid_engine_info_turbocharged(SALT31.StrType s) := InValidFT_Invalid_Turbocharged(s);
+
+
+EXPORT Make_engine_info_turbocharged(SALT311.StrType s0) := MakeFT_Invalid_Turbocharged(s0);
+EXPORT InValid_engine_info_turbocharged(SALT311.StrType s) := InValidFT_Invalid_Turbocharged(s);
 EXPORT InValidMessage_engine_info_turbocharged(UNSIGNED1 wh) := InValidMessageFT_Invalid_Turbocharged(wh);
-EXPORT Make_engine_info_vvtl(SALT31.StrType s0) := MakeFT_Invalid_Y_or_N_orBlank(s0);
-EXPORT InValid_engine_info_vvtl(SALT31.StrType s) := InValidFT_Invalid_Y_or_N_orBlank(s);
+
+
+EXPORT Make_engine_info_vvtl(SALT311.StrType s0) := MakeFT_Invalid_Y_or_N_orBlank(s0);
+EXPORT InValid_engine_info_vvtl(SALT311.StrType s) := InValidFT_Invalid_Y_or_N_orBlank(s);
 EXPORT InValidMessage_engine_info_vvtl(UNSIGNED1 wh) := InValidMessageFT_Invalid_Y_or_N_orBlank(wh);
-EXPORT Make_iso_liability(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_iso_liability(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_iso_liability(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_iso_liability(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_iso_liability(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_series_name_condensed(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_series_name_condensed(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_series_name_condensed(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_series_name_condensed(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_series_name_condensed(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_aces_data(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_aces_data(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_aces_data(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_aces_data(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_aces_data(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
-EXPORT Make_base_shipping_weight_expanded(SALT31.StrType s0) := MakeFT_Invalid_Decimal(s0);
-EXPORT InValid_base_shipping_weight_expanded(SALT31.StrType s) := InValidFT_Invalid_Decimal(s);
+
+
+EXPORT Make_base_shipping_weight_expanded(SALT311.StrType s0) := MakeFT_Invalid_Decimal(s0);
+EXPORT InValid_base_shipping_weight_expanded(SALT311.StrType s) := InValidFT_Invalid_Decimal(s);
 EXPORT InValidMessage_base_shipping_weight_expanded(UNSIGNED1 wh) := InValidMessageFT_Invalid_Decimal(wh);
-EXPORT Make_filler7(SALT31.StrType s0) := s0;
-EXPORT InValid_filler7(SALT31.StrType s) := FALSE;
+
+
+EXPORT Make_filler7(SALT311.StrType s0) := s0;
+EXPORT InValid_filler7(SALT311.StrType s) := 0;
 EXPORT InValidMessage_filler7(UNSIGNED1 wh) := '';
-EXPORT Make_customer_defined_data(SALT31.StrType s0) := MakeFT_Invalid_Char(s0);
-EXPORT InValid_customer_defined_data(SALT31.StrType s) := InValidFT_Invalid_Char(s);
+
+
+EXPORT Make_customer_defined_data(SALT311.StrType s0) := MakeFT_Invalid_Char(s0);
+EXPORT InValid_customer_defined_data(SALT311.StrType s) := InValidFT_Invalid_Char(s);
 EXPORT InValidMessage_customer_defined_data(UNSIGNED1 wh) := InValidMessageFT_Invalid_Char(wh);
+
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
-  IMPORT SALT31,Scrubs_VINA;
+  IMPORT SALT311,Scrubs_VINA;
 //Find those highly occuring pivot values to remove them from consideration
 #uniquename(tr)
   %tr% := table(in_left+in_right,{ val := pivot_exp; });
@@ -1019,7 +1411,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_filler7;
     BOOLEAN Diff_customer_defined_data;
     UNSIGNED Num_Diffs;
-    SALT31.StrType Val {MAXLENGTH(1024)};
+    SALT311.StrType Val {MAXLENGTH(1024)};
   END;
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
@@ -1185,7 +1577,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_base_shipping_weight_expanded := le.base_shipping_weight_expanded <> ri.base_shipping_weight_expanded;
     SELF.Diff_filler7 := le.filler7 <> ri.filler7;
     SELF.Diff_customer_defined_data := le.customer_defined_data <> ri.customer_defined_data;
-    SELF.Val := (SALT31.StrType)evaluate(le,pivot_exp);
+    SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
     SELF.Num_Diffs := 0+ IF( SELF.Diff_match_make,1,0)+ IF( SELF.Diff_match_year,1,0)+ IF( SELF.Diff_match_vin,1,0)+ IF( SELF.Diff_make_abbreviation,1,0)+ IF( SELF.Diff_model_year,1,0)+ IF( SELF.Diff_vehicle_type,1,0)+ IF( SELF.Diff_make_name,1,0)+ IF( SELF.Diff_series_name,1,0)+ IF( SELF.Diff_body_type,1,0)+ IF( SELF.Diff_wheels,1,0)+ IF( SELF.Diff_displacement,1,0)+ IF( SELF.Diff_cylinders,1,0)+ IF( SELF.Diff_fuel,1,0)+ IF( SELF.Diff_carburetion,1,0)+ IF( SELF.Diff_gvw,1,0)+ IF( SELF.Diff_wheel_base,1,0)+ IF( SELF.Diff_tire_size,1,0)+ IF( SELF.Diff_ton_rating,1,0)+ IF( SELF.Diff_base_shipping_weight,1,0)+ IF( SELF.Diff_variance_weight,1,0)+ IF( SELF.Diff_base_list_price,1,0)+ IF( SELF.Diff_price_variance,1,0)+ IF( SELF.Diff_high_performance_code,1,0)+ IF( SELF.Diff_driving_wheels,1,0)+ IF( SELF.Diff_iso_physical_damage,1,0)+ IF( SELF.Diff_location_indicator,1,0)+ IF( SELF.Diff_air_conditioning,1,0)+ IF( SELF.Diff_power_steering,1,0)+ IF( SELF.Diff_power_brakes,1,0)+ IF( SELF.Diff_power_windows,1,0)+ IF( SELF.Diff_tilt_wheel,1,0)+ IF( SELF.Diff_roof,1,0)+ IF( SELF.Diff_optional_roof1,1,0)+ IF( SELF.Diff_optional_roof2,1,0)+ IF( SELF.Diff_radio,1,0)+ IF( SELF.Diff_optional_radio1,1,0)+ IF( SELF.Diff_optional_radio2,1,0)+ IF( SELF.Diff_transmission,1,0)+ IF( SELF.Diff_optional_transmission1,1,0)+ IF( SELF.Diff_optional_transmission2,1,0)+ IF( SELF.Diff_anti_lock_brakes,1,0)+ IF( SELF.Diff_security_system,1,0)+ IF( SELF.Diff_daytime_running_lights,1,0)+ IF( SELF.Diff_visrap,1,0)+ IF( SELF.Diff_cab_configuration,1,0)+ IF( SELF.Diff_front_axle_code,1,0)+ IF( SELF.Diff_rear_axle_code,1,0)+ IF( SELF.Diff_brakes_code,1,0)+ IF( SELF.Diff_engine_manufacturer,1,0)+ IF( SELF.Diff_engine_model,1,0)+ IF( SELF.Diff_engine_type_code,1,0)+ IF( SELF.Diff_trailer_body_style,1,0)+ IF( SELF.Diff_trailer_number_of_axles,1,0)+ IF( SELF.Diff_trailer_length,1,0)+ IF( SELF.Diff_proactive_vin,1,0)+ IF( SELF.Diff_ma_state_exceptions,1,0)+ IF( SELF.Diff_filler_1,1,0)+ IF( SELF.Diff_series_abbreviation,1,0)+ IF( SELF.Diff_vin_pattern,1,0)+ IF( SELF.Diff_ncic_data,1,0)+ IF( SELF.Diff_full_body_style_name,1,0)+ IF( SELF.Diff_nvpp_make_code,1,0)+ IF( SELF.Diff_nvpp_make_abbreviation,1,0)+ IF( SELF.Diff_nvpp_series_model,1,0)+ IF( SELF.Diff_nvpp_series_name,1,0)+ IF( SELF.Diff_segmentation_code,1,0)+ IF( SELF.Diff_country_of_origin,1,0)+ IF( SELF.Diff_engine_liter_information,1,0)+ IF( SELF.Diff_engine_information_filler1,1,0)+ IF( SELF.Diff_engine_information_block_type,1,0)+ IF( SELF.Diff_engine_information_cylinders,1,0)+ IF( SELF.Diff_engine_information_filler2,1,0)+ IF( SELF.Diff_engine_information_carburetion,1,0)+ IF( SELF.Diff_engine_information_filler3,1,0)+ IF( SELF.Diff_engine_information_head_configuration,1,0)+ IF( SELF.Diff_engine_information_filler4,1,0)+ IF( SELF.Diff_engine_information_total_valves,1,0)+ IF( SELF.Diff_engine_information_filler5,1,0)+ IF( SELF.Diff_engine_information_aspiration_code,1,0)+ IF( SELF.Diff_engine_information_carburetion_code,1,0)+ IF( SELF.Diff_engine_information_valves_per_cylinder,1,0)+ IF( SELF.Diff_transmission_speed,1,0)+ IF( SELF.Diff_transmission_filler1,1,0)+ IF( SELF.Diff_transmission_type,1,0)+ IF( SELF.Diff_transmission_filler2,1,0)+ IF( SELF.Diff_transmission_code,1,0)+ IF( SELF.Diff_transmission_filler3,1,0)+ IF( SELF.Diff_transmission_speed_code,1,0)+ IF( SELF.Diff_base_model,1,0)+ IF( SELF.Diff_complete_prefix_file_id,1,0)+ IF( SELF.Diff_series_name_full_spelling,1,0)+ IF( SELF.Diff_vis_theft_code,1,0)+ IF( SELF.Diff_base_list_price_expanded,1,0)+ IF( SELF.Diff_default_nada_vehicle_id,1,0)+ IF( SELF.Diff_default_nada_model,1,0)+ IF( SELF.Diff_default_nada_body_style,1,0)+ IF( SELF.Diff_default_nada_msrp,1,0)+ IF( SELF.Diff_default_nada_gvwr,1,0)+ IF( SELF.Diff_default_nada_gcwr,1,0)+ IF( SELF.Diff_alt_1_nada_vehicle_id,1,0)+ IF( SELF.Diff_alt_1_nada_model,1,0)+ IF( SELF.Diff_alt_1_nada_body_style,1,0)+ IF( SELF.Diff_alt_1_nada_msrp,1,0)+ IF( SELF.Diff_alt_1_nada_gvwr,1,0)+ IF( SELF.Diff_alt_1_nada_gcwr,1,0)+ IF( SELF.Diff_alt_2_nada_vehicle_id,1,0)+ IF( SELF.Diff_alt_2_nada_model,1,0)+ IF( SELF.Diff_alt_2_nada_body_style,1,0)+ IF( SELF.Diff_alt_2_nada_msrp,1,0)+ IF( SELF.Diff_alt_2_nada_gvwr,1,0)+ IF( SELF.Diff_alt_2_nada_gcwr,1,0)+ IF( SELF.Diff_alt_3_nada_vehicle_id,1,0)+ IF( SELF.Diff_alt_3_nada_model,1,0)+ IF( SELF.Diff_alt_3_nada_body_style,1,0)+ IF( SELF.Diff_alt_3_nada_msrp,1,0)+ IF( SELF.Diff_alt_3_nada_gvwr,1,0)+ IF( SELF.Diff_alt_3_nada_gcwr,1,0)+ IF( SELF.Diff_alt_4_nada_vehicle_id,1,0)+ IF( SELF.Diff_alt_4_nada_model,1,0)+ IF( SELF.Diff_alt_4_nada_body_style,1,0)+ IF( SELF.Diff_alt_4_nada_msrp,1,0)+ IF( SELF.Diff_alt_4_nada_gvwr,1,0)+ IF( SELF.Diff_alt_4_nada_gcwr,1,0)+ IF( SELF.Diff_alt_5_nada_vehicle_id,1,0)+ IF( SELF.Diff_alt_5_nada_model,1,0)+ IF( SELF.Diff_alt_5_nada_body_style,1,0)+ IF( SELF.Diff_alt_5_nada_msrp,1,0)+ IF( SELF.Diff_alt_5_nada_gvwr,1,0)+ IF( SELF.Diff_alt_5_nada_gcwr,1,0)+ IF( SELF.Diff_alt_6_nada_vehicle_id,1,0)+ IF( SELF.Diff_alt_6_nada_model,1,0)+ IF( SELF.Diff_alt_6_nada_body_style,1,0)+ IF( SELF.Diff_alt_6_nada_msrp,1,0)+ IF( SELF.Diff_alt_6_nada_gvwr,1,0)+ IF( SELF.Diff_alt_6_nada_gcwr,1,0)+ IF( SELF.Diff_alt_7_nada_vehicle_id,1,0)+ IF( SELF.Diff_alt_7_nada_model,1,0)+ IF( SELF.Diff_alt_7_nada_body_style,1,0)+ IF( SELF.Diff_alt_7_nada_msrp,1,0)+ IF( SELF.Diff_alt_7_nada_gvwr,1,0)+ IF( SELF.Diff_alt_7_nada_gcwr,1,0)+ IF( SELF.Diff_aaia_codes,1,0)+ IF( SELF.Diff_incomplete_vehicle_flag,1,0)+ IF( SELF.Diff_filler2,1,0)+ IF( SELF.Diff_electric_battery_info_type,1,0)+ IF( SELF.Diff_filler3,1,0)+ IF( SELF.Diff_electric_battery_kilowatts,1,0)+ IF( SELF.Diff_filler4,1,0)+ IF( SELF.Diff_electric_battery_volts,1,0)+ IF( SELF.Diff_filler5,1,0)+ IF( SELF.Diff_engine_info_proprietary_engine_brand,1,0)+ IF( SELF.Diff_filler6,1,0)+ IF( SELF.Diff_engine_info_high_output_engine,1,0)+ IF( SELF.Diff_engine_info_supercharged,1,0)+ IF( SELF.Diff_engine_info_turbocharged,1,0)+ IF( SELF.Diff_engine_info_vvtl,1,0)+ IF( SELF.Diff_iso_liability,1,0)+ IF( SELF.Diff_series_name_condensed,1,0)+ IF( SELF.Diff_aces_data,1,0)+ IF( SELF.Diff_base_shipping_weight_expanded,1,0)+ IF( SELF.Diff_filler7,1,0)+ IF( SELF.Diff_customer_defined_data,1,0);
   END;
 // Now need to remove bad pivots from comparison

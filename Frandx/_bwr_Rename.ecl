@@ -1,4 +1,4 @@
-pversion					:= '';
+﻿pversion					:= '';
 pJustKeys					:= true	;// only rename the keys(not files)?
 pIsTesting				:= true	;// set to false to actually rename the keys
 pFilesToRename		:= if(pJustKeys	, Frandx.keynames	(pversion).dall_filenames

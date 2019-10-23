@@ -1,4 +1,4 @@
-//Assigns DIDs and BDIDs on the passed records
+﻿//Assigns DIDs and BDIDs on the passed records
 import Address, Ut, lib_stringlib, _Control, business_header,_Validate,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS,watchdog,Business_HeaderV2,TopBusiness_External;
 
@@ -9,11 +9,11 @@ module
 	// -- function: fStandardizeName
 	// -- Standardizes names
 	//////////////////////////////////////////////////////////////////////////////////////
-	export fAppendDid(dataset(Layouts.Base) pDataset) :=
+	export fAppendDid(dataset(Credit_Unions.Layouts.Base) pDataset) :=
 	function
 		
 		//Add unique id
-		Layouts.Temporary.UniqueId tAddUniqueId(Layouts.Base l, unsigned8 cnt) :=
+		Layouts.Temporary.UniqueId tAddUniqueId(Credit_Unions.Layouts.Base l, unsigned8 cnt) :=
 		transform
  		    self.unique_id	:= cnt;
 			self            := L;
@@ -25,21 +25,21 @@ module
 		//////////////////////////////////////////////////////////////////////////////////////
 		// -- Slim record for Diding
 		//////////////////////////////////////////////////////////////////////////////////////
-		Layouts.Temporary.DidSlim tSlimForDiding(Layouts.Temporary.UniqueId l) :=
+		Layouts.Temporary.DidSlim tSlimForDiding(Credit_Unions.Layouts.Temporary.UniqueId l) :=
 		transform
-			self.fname				:= l.clean_contact_name.fname		    	;
-			self.mname				:= l.clean_contact_name.mname	 	    	;
-			self.lname				:= l.clean_contact_name.lname					;
-			self.name_suffix	:= l.clean_contact_name.name_suffix		;
-			self.prim_range		:= l.clean_address.prim_range	;
-			self.prim_name		:= l.clean_address.prim_name	;
-			self.sec_range		:= l.clean_address.sec_range	;
-			self.zip5		 			:= l.clean_address.zip				;
-			self.state		    := l.clean_address.st					;
-			self.phone				:= l.rawfields.phone					;
-			self.did					:= 0  													;
-			self.did_score		:= 0  													;
-			self		 	    		:= l  													;
+			self.fname				:= l.fname;
+			self.mname				:= l.mname;
+			self.lname				:= l.lname;
+			self.name_suffix	:= l.name_suffix;
+			self.prim_range		:= l.prim_range;
+			self.prim_name		:= l.prim_name;
+			self.sec_range		:= l.sec_range;
+			self.zip5		 			:= l.zip;
+			self.state		    := l.st;
+			self.phone				:= l.phone;
+			self.did					:= 0;
+			self.did_score		:= 0;
+			self		 	    		:= l;
 		end;
 			
 		dSlimForDiding	:= project(dAddUniqueId,tSlimForDiding(left));
@@ -133,21 +133,21 @@ module
 		Layouts.Temporary.BdidSlim tSlimForBdiding(Layouts.Temporary.UniqueId l) :=
   	transform
 			self.unique_id		:= l.unique_id																;
-			self.company_name	:= stringlib.stringtouppercase(l.rawfields.CU_NAME) 		;
-			self.prim_range		:= l.clean_address.prim_range									;
-			self.prim_name		:= l.clean_address.prim_name									;
-			self.zip5					:= l.clean_address.zip			    							;
-			self.sec_range		:= l.clean_address.sec_range									;
-			self.state				:= l.clean_address.st													;
-			self.phone				:= l.rawfields.phone													;
-			self.bdid					:= 0																					;
-			self.bdid_score		:= 0																					;
-			self.source_rec_id:= l.source_rec_id              							;
-			self.source       := MDR.sourceTools.src_Credit_Unions					;
-			self.fname        := l.clean_contact_name.fname									;
-			self.mname        := l.clean_contact_name.mname									;
-			self.lname			  := l.clean_contact_name.lname									;
-			self.city 				:= l.clean_address.p_city_name								;
+			self.company_name	:= stringlib.stringtouppercase(l.CU_NAME) 		;
+			self.prim_range		:= l.prim_range;
+			self.prim_name		:= l.prim_name;
+			self.zip5					:= l.zip;
+			self.sec_range		:= l.sec_range;
+			self.state				:= l.st;
+			self.phone				:= l.phone;
+			self.bdid					:= 0;
+			self.bdid_score		:= 0;
+			self.source_rec_id:= l.source_rec_id;
+			self.source       := MDR.sourceTools.src_Credit_Unions;
+			self.fname        := l.fname;
+			self.mname        := l.mname;
+			self.lname			  := l.lname;
+			self.city 				:= l.p_city_name;
 		end;   
     
 	  dSlimForBdiding :=  project( dAddUniqueId

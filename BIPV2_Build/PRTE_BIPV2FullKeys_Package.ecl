@@ -1,4 +1,4 @@
-// BIPV2_Build.PRTE_BIPV2FullKeys_Package('20150810a').outputpackage;
+﻿// BIPV2_Build.PRTE_BIPV2FullKeys_Package('20150810a').outputpackage;
 // Compile all keys in this package in one place
 // easy to output this module to see if keys exist/are correct layout/etc
 // BIPV2_Build.BWR_Check_PRTE_BIPV2FullKeys -- checks all of these keys in different wuids so you don't have to sandbox anything to figure out all the offending keys
@@ -46,11 +46,11 @@ module
   export lgid3_mtch_cand                := index(BIPV2_LGID3.Keys2().MatchCandidates.qa             ,toPRTE(lgid3knames.match_candidates_debug  .logical));
   export lgid3_specs                    := index(BIPV2_LGID3.Keys2().Specificity.qa                 ,toPRTE(lgid3knames.specificities_debug   .logical));
   export best_linkids                   := index(BIPV2_Best.Key_LinkIds.key                      ,toPRTE(bestknames.LinkIds                .logical));
-  export relative_assoc                 := index(BIPv2_Relative.keys(relbase).ASSOC              ,toPRTE(relknames.assoc                   .logical));
+  // export relative_assoc                 := index(BIPv2_Relative.keys(relbase).ASSOC              ,toPRTE(relknames.assoc                   .logical));
   export Seleid_relative_assoc          := index(BIPV2_Seleid_Relative.keys(Seleidrelbase).ASSOC ,toPRTE(Seleidrelknames.assoc             .logical));
   export Xlinkmeow                      := index(BizLinkFull.Process_Biz_Layouts.Key             ,toPRTE(bizknames.meow                    .logical));
-  export Xlinkrefs                      := index(BizLinkFull.Key_BizHead_.Key                    ,toPRTE(bizknames.refs                    .logical));
-  export Xlinkwords                     := index(BizLinkFull.Key_BizHead_.ValueKey               ,toPRTE(bizknames.words                   .logical));
+  // export Xlinkrefs                      := index(BizLinkFull.Key_BizHead_.Key                    ,toPRTE(bizknames.refs                    .logical));
+  // export Xlinkwords                     := index(BizLinkFull.Key_BizHead_.ValueKey               ,toPRTE(bizknames.words                   .logical));
   export Xlinkrefs_l_cnpname            := index(BizLinkFull.Key_BizHead_L_CNPNAME.Key           ,toPRTE(bizknames.refs_l_cnpname          .logical));
   export Xlinkrefs_l_cnpname_st         := index(BizLinkFull.Key_BizHead_L_CNPNAME_ST.Key        ,toPRTE(bizknames.refs_l_cnpname_st       .logical));
   export Xlinkrefs_l_cnpname_zip        := index(BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.Key       ,toPRTE(bizknames.refs_l_cnpname_zip      .logical));
@@ -98,11 +98,11 @@ module
     ,if(pKey in [0 ,11] ,output(choosen(lgid3_mtch_cand               ,100),named('lgid3_mtch_cand'               )))
     ,if(pKey in [0 ,12] ,output(choosen(lgid3_specs                   ,100),named('lgid3_specs'                   )))
     ,if(pKey in [0 ,13] ,output(choosen(best_linkids                  ,100),named('best_linkids'                  )))
-    ,if(pKey in [0 ,14] ,output(choosen(relative_assoc                ,100),named('relative_assoc'                )))
+    // ,if(pKey in [0 ,14] ,output(choosen(relative_assoc                ,100),named('relative_assoc'                )))
     ,if(pKey in [0 ,15] ,output(choosen(Seleid_relative_assoc         ,100),named('Seleid_relative_assoc'         )))
     ,if(pKey in [0 ,16] ,output(choosen(Xlinkmeow                     ,100),named('Xlinkmeow'                     )))
-    ,if(pKey in [0 ,17] ,output(choosen(Xlinkrefs                     ,100),named('Xlinkrefs'                     )))
-    ,if(pKey in [0 ,18] ,output(choosen(Xlinkwords                    ,100),named('Xlinkwords'                    )))
+    // ,if(pKey in [0 ,17] ,output(choosen(Xlinkrefs                     ,100),named('Xlinkrefs'                     )))
+    // ,if(pKey in [0 ,18] ,output(choosen(Xlinkwords                    ,100),named('Xlinkwords'                    )))
     ,if(pKey in [0 ,19] ,output(choosen(Xlinkrefs_l_cnpname           ,100),named('Xlinkrefs_l_cnpname'           )))
     ,if(pKey in [0 ,20] ,output(choosen(Xlinkrefs_l_cnpname_st        ,100),named('Xlinkrefs_l_cnpname_st'        )))
     ,if(pKey in [0 ,21] ,output(choosen(Xlinkrefs_l_cnpname_zip       ,100),named('Xlinkrefs_l_cnpname_zip'       )))

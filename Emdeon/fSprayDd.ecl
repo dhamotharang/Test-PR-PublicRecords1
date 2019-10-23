@@ -1,13 +1,13 @@
-IMPORT lib_fileservices,_control,lib_stringlib,Versioncontrol,emdeon, ut, tools;
+﻿IMPORT lib_fileservices,_control,lib_stringlib,Versioncontrol,emdeon, ut, tools;
 
 EXPORT fSprayDd(
 
 	STRING		pVersion              = '',
 	BOOLEAN   pUseProd              = FALSE,
-	//STRING		pServerIP							= _control.IPAddress.bctlpedata12,
-	STRING		pServerIP							= 'bctlpedata12.risk.regn.net',
+	STRING		pServerIP							= _control.IPAddress.bctlpedata10,
+	//STRING		pServerIP							= 'bctlpedata10.risk.regn.net',
 	STRING		pRawfile							= '*.dat',
-	STRING		pDirectory						= '/data/hds_3/uniqueid/enclarity/emdeon/',
+	STRING		pDirectory						= '/data/run_enclarity/emdeon/input/',
 	STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor40_241','thor400_44'),
 	BOOLEAN		pIsTesting						= FALSE,
 	BOOLEAN		pOverwrite						= TRUE,
@@ -17,7 +17,7 @@ EXPORT fSprayDd(
 
 	remoteDir := pVersion[1..4] + '_' + pVersion[5..6];
 
-	//fileList := NOTHOR(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata12, pDirectory + remoteDir + '/', pRawfile)) :INDEPENDENT;
+	//fileList := NOTHOR(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata10, pDirectory + remoteDir + '/', pRawfile)) :INDEPENDENT;
 	fileList := NOTHOR(FileServices.RemoteDirectory(pServerIP, pDirectory + remoteDir + '/', pRawfile)) :INDEPENDENT;
 		//(name[7..8] IN ['01']) :INDEPENDENT;
 

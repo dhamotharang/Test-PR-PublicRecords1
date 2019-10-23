@@ -77,7 +77,7 @@ dw_final_1 := join(blank_dwellers,dw_singfull,
 
 /*------------------------- [ check relatives ]-----------*/
 
-dr := header.File_Relatives(recent_cohabit > 0);
+dr := header.File_Relatives_v3(recent_cohabit > 0);
 
 dr twisted(dr l) := transform
 	self.person1 := l.person2;

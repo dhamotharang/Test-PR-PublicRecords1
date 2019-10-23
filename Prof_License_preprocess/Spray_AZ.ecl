@@ -1,6 +1,6 @@
-EXPORT Spray_AZ (dataset({string ftype,string fdate})infile) := module
+﻿EXPORT Spray_AZ (dataset({string ftype,string fdate})infile) := module
 
-import VersionControl,_Control;
+import VersionControl,_Control,lib_thorlib;
 //spray dentists
 
 	string		pServer			              :=  _Control.IPAddress.bctlpedata11  ;
@@ -12,7 +12,7 @@ import VersionControl,_Control;
 																							                        '/data/hds_4/prolic/az/nurses/'+infile(ftype = 'nurse')[1].fdate
 																             );
 	                               
-	string		pGroupName	             := if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' ,'thor400_dev01','thor400_60');
+	string		pGroupName	             := thorlib.group();
 	boolean    pIsTesting              := false;
 
  string filedt(string pkeyword)           := map ( pkeyword = 'acupuncturist'  => infile(ftype = 'acupuncturist')[1].fdate,

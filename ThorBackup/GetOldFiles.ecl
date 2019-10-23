@@ -1,10 +1,10 @@
-import ut,dops,lib_fileservices;
+﻿import ut,dops,lib_fileservices,wk_ut,STD;
 EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = ''
 ,string dopsenv = dops.constants.dopsenvironment) := module
 
 	export FullList := thorbackup.Constants.Fulllist(environment);
 	
-	export TodaysDate := ut.GetDate : independent;
+	export TodaysDate := (STRING8)Std.Date.Today() : independent;
 	
 	export GetFullListWithPattern() := function
 		fulllogicallist := fileservices.logicalfilelist();
@@ -46,7 +46,8 @@ EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = 
 		//preds := sort(fileservices.logicalfilelist()(ut.DaysApart(regexreplace('-',modified,'')[1..8],ut.GetDate) > thorbackup.constants.getthreshold(noofdays).ndays and cluster not in thorbackup.ignoreclusters),-name);
 		
 		
-		preds := sort(GetFullListWithPattern()(Age > thorbackup.constants.getthreshold(noofdays).ndays and cluster not in thorbackup.ignoreclusters),-name);
+		//preds := sort(GetFullListWithPattern()(Age > thorbackup.constants.getthreshold(noofdays).ndays and cluster not in thorbackup.ignoreclusters),-name);
+		preds := sort(GetFullListWithPattern()(cluster not in thorbackup.ignoreclusters),-name);
 		
 		ds := if (in_cluster <> '' , preds(cluster = in_cluster), preds(cluster in thorbackup.Constants.allowedclusters(environment).clusterset))(~regexfind('[	]',name));
 		
@@ -91,19 +92,46 @@ EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = 
 													left only
 													);
 		
-		layout_filelist proj_recs(getnotinsuper l) := transform
+		dGetWUDetails := dops.WorkunitTimingDetails(thorbackup.Constants.esp.bocaprodthor,'','',false).GetDetails() : independent;
+		
+		rlayout_filelist := record
+			layout_filelist;
+			dataset(wk_ut.get_DFUInfo().DFUInfoOutRecord) dfuinfo;
+		end;	
+		
+		
+		rlayout_filelist proj_recs(getnotinsuper l) := transform
 			//getpattern := regexreplace('[0-9]+',regexreplace('[0-9]+[a-z]',l.name,'*',nocase),'*',nocase);
 			self.filename := l.name;
 			self.filepattern := l.FilePattern;
 			self.modified := if (l.modified <> '',l.modified,'_blank_');
 			self.size := l.size;
-			self.owner := if (l.owner <> '',l.owner,'_blank_');
+			
 			self.cluster := if(l.cluster <> '',l.cluster,'_blank_');
 			self.totalmatchedfiles := 0;//count(GetFileList(getpattern));
 			self.daliip := environment;
+			self.dfuinfo := wk_ut.get_DFUInfo(trim(l.name)).DFUInfo();
+			self.owner := l.owner;
 		end;
 		
-		getpatternswithnocount := project(getnotinsuper,proj_recs(left))(size >= thorbackup.Constants.deletethresholdsize) : independent;
+		getpatternswithdfuinfo := project(getnotinsuper,proj_recs(left))(size >= thorbackup.Constants.deletethresholdsize) : independent;
+		
+		layout_filelist xGetPatternsWithnoCount(getpatternswithdfuinfo l) := transform
+			// DUS-314
+			jname := if (l.dfuinfo[1].wuid[1..1] = 'W'
+										,l.dfuinfo[1].JobName
+										,dGetWUDetails(regexfind(l.dfuinfo[1].wuid,dfujobid,nocase))[1].job
+										); // DUS-314
+			self.owner := if (l.owner <> ''
+												,if (regexfind('dataopsowner',jname)
+														,STD.Str.GetNthWord(STD.Str.SplitWords(jname,':')[2],1)
+														,l.owner)
+											,'_blank_');
+			// end DUS-314
+			self := l;
+		end;
+	
+		getpatternswithnocount := project(getpatternswithdfuinfo,xGetPatternsWithnoCount(left));
 		
 		rPatternCounts2	:=
 		record
@@ -254,7 +282,7 @@ EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = 
 									sequential(
 										//output(choosen(soapds(rstatus[1].Code = '-1'),100)),
 										fileservices.sendemail(thorbackup.constants.yogurt().emailerrors,
-			'Yogurt Delete Soap Calls failed on ' + environment + ' - ' + ut.GetTimeDate(),
+			'Yogurt Delete Soap Calls failed on ' + environment + ' - ' + Std.Date.SecondsToString(Std.Date.CurrentSeconds(TRUE), '%F%H%M%S%u'),
 			'workunit: ' + workunit
 																	,
 																	,
@@ -267,7 +295,7 @@ EXPORT GetOldFiles(string environment,integer noofdays = 0, string in_cluster = 
 	end;
 	
 	export run :=  updatethorfilelist() : failure(fileservices.sendemail(thorbackup.constants.yogurt().emailerrors,
-			'Yogurt DOPS DB Update failed on ' + environment + ' - ' + ut.GetTimeDate(),
+			'Yogurt DOPS DB Update failed on ' + environment + ' - ' + Std.Date.SecondsToString(Std.Date.CurrentSeconds(TRUE), '%F%H%M%S%u'),
 			'workunit: ' + workunit+ '\r\n' + failmessage
 																	,
 																	,

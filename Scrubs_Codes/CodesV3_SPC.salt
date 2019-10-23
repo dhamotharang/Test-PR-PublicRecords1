@@ -1,0 +1,13 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Codes
+FILENAME:Codes
+NAMESCOPE:CodesV3
+
+FIELDTYPE:InvalidCode:Lengths(1..)
+
+FIELD:file_name:TYPE(STRING35):0,0
+FIELD:field_name:TYPE(STRING50):0,0
+FIELD:field_name2:TYPE(STRING5):0,0
+FIELD:code:LIKE(InvalidCode):TYPE(STRING15):0,0
+FIELD:long_flag:TYPE(STRING1):0,0
+FIELD:long_desc:TYPE(STRING330):0,0

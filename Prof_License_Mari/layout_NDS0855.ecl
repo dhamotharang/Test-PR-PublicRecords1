@@ -1,8 +1,8 @@
-// NDS0855 / North Dakota Real Estate Commission / Real Estate //
+﻿// NDS0855 / North Dakota Real Estate Commission / Real Estate //
 
 export layout_NDS0855 := RECORD
 	string			filler1;			//new since 20140725
-	string			filler2;			//new since 20140725
+	// string			filler2;			//new since 20140725
 	string100   ORG_NAME;
 	string10		LICSTAT;
 	string20		LICTYPE;

@@ -1,6 +1,8 @@
-IMPORT  PRTE2,PromoteSupers;
+﻿IMPORT  PRTE2,PromoteSupers, ut;
 
 EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
+
+// PRTE2.CleanFields(files.POE_IN, CleanPOE);
 
 df_POE := project(files.POE_IN,
    Transform(Layouts.Base,
@@ -30,7 +32,9 @@ df_POE := project(files.POE_IN,
 	 Self.Company_address.st:=left.company_st;
 	 Self.Company_address.zip:=left.company_zip;
 	 Self.Company_address.zip4:=left.company_zip4;
-	 self.Did:=Prte2.fn_AppendFakeID.did(left.fname, left.lname, (string)left.subject_ssn, (string)left.subject_dob, left.cust_name);	
+	 // self.Did:=Prte2.fn_AppendFakeID.did(left.fname, left.lname, (string)left.subject_ssn, (string)left.subject_dob, left.cust_name);	
+   self.Did		:= Prte2.fn_AppendFakeID.did(left.fname, left.lname, left.link_ssn, left.link_dob, left.cust_name);	
+	 self.bdid  := prte2.fn_AppendFakeID.bdid(left.company_name,	left.company_PRIM_RANGE,	left.Company_PRIM_NAME, left.Company_CITY_NAME, left.Company_ST, left.Company_ZIP, left.Cust_name);
 	 Self:=Left;
    self := []; 
    ));

@@ -1,4 +1,4 @@
-IMPORT Civ_Court, ut;
+﻿IMPORT Civ_Court, ut;
 
 EXPORT Layouts_In_WA := MODULE
 
@@ -99,6 +99,18 @@ EXPORT Layouts_In_WA := MODULE
 		string20	code_desc;
 		string1		lf;
 	END;	
+	
+	EXPORT sealed_rec := record 	//VC - DF-23245
+    string3   CourtID;
+    string9   CaseNumber;
+    string3   LawEnforcementCode;
+    string2   CaseType;
+    string128 CaseTitle;
+    string10  FileDate;
+    string10  DispositionDate;
+    string2   DispositionCode;
+    string1   filler;
+end;
 
 END;
 

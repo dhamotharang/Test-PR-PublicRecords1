@@ -1,16 +1,16 @@
-IMPORT BIPV2, AID;
+﻿IMPORT BIPV2, AID;
 EXPORT Layout_BK := MODULE
   EXPORT Delete_Nod  := RECORD
 	STRING5    fips_cd;
-	STRING20    Pid;
-	STRING15    NOD_Source;
+	STRING10	 Pid;
+	STRING1	   NOD_Source;
 	STRING6    Delete_Flag := '';
 	STRING8    ln_filedate;
 	END;
 	
 	EXPORT Delete_Reo  := RECORD
 	STRING5    fips_cd;
-	STRING20    Pid;
+	STRING10   Pid;
 	STRING6    Delete_Flag := '';
 	STRING8    ln_filedate;
 	END;
@@ -197,124 +197,54 @@ EXPORT Layout_BK := MODULE
 	STRING1     nod_source;
  END;
  
-  EXPORT reo  := RECORD
+  EXPORT reo_in  := RECORD
 	STRING70 foreclosure_id;
 	STRING8 ln_filedate := ''; 
-	STRING6 Delete_Flag;
 	STRING30 bk_infile_type := '';	
   REO_raw;
 	END;
 	
-	EXPORT nod  := RECORD
+	EXPORT nod_in  := RECORD
 	STRING70 foreclosure_id;
 	STRING8 ln_filedate := '';
-	STRING6 Delete_Flag;
 	STRING30 bk_infile_type := '';	
 	NOD_raw;
 	END;
-
-// EXPORT rowID_Reo  := RECORD
-			// integer8  append_row_ID := 0;			
-			// REO;
-// END; 
  
- 
-// EXPORT rowID_Nod  := RECORD
-			// integer8  append_row_ID := 0;			
-			// nod;
-// END;
- 
- 
-EXPORT Norm_Names_reo := RECORD
-  STRING100   NAME_FULL;
-	STRING30    Name_First;
-	STRING30    Name_Last;
-	STRING15    Name_Type; 
-	STRING15    TYPE_CODE;
-	STRING100   Company_Name;
-	Reo;
-END;
-	
-EXPORT Norm_Names_nod := RECORD
-  STRING100   NAME_FULL;
-	STRING30    Name_First;
-	STRING30    Name_Last;
-	STRING15    Name_Type; 
-	STRING15    TYPE_CODE;
-	STRING100   Company_Name;
-	Nod;
-END;		 
-
-EXPORT Norm_Addr_REO := RECORD
+EXPORT Norm_Name_addr := RECORD
+	STRING100 NAME_FULL;
+	STRING30  Name_First;
+	STRING30  Name_Last;
+	STRING15  Name_Type;
+	STRING10	phone;
 	STRING100 Orig_Address;
+	STRING11	Orig_Unit;
 	STRING25  Orig_City;
 	STRING2   Orig_State;
 	STRING5   Orig_Zip5;
 	STRING4   Orig_Zip4;	
   STRING15  AddrType;
-	Norm_Names_REO;
+	STRING9 	ssn := ''; //Appended via DID
+END;	
+ 
+EXPORT  ClnName:= RECORD
+  UNSIGNED8 nid := 0;
+	STRING5		cln_title := '';
+	STRING20	cln_fname := '';
+	STRING20	cln_mname := '';
+	STRING20	cln_lname := '';
+	STRING5		cln_suffix := '';
+	STRING5		cln_title2 := '';
+	STRING20	cln_fname2 := '';
+	STRING20	cln_mname2 := '';
+	STRING20	cln_lname2 := '';
+	STRING5		cln_suffix2 := '';
+	STRING180 cname := '';
 END;
 
-EXPORT Norm_Addr_NOD := RECORD
-	STRING100 Orig_Address;
-	STRING25  Orig_Unit;
-	STRING25  Orig_City;
-	STRING2   Orig_State;
-	STRING5   Orig_Zip5;
-	STRING4   Orig_Zip4;
-  STRING15  AddrType;
-	Norm_Names_nod;
-END; 
- 
-export ClnName_REO:= record
-	STRING20  pdid := '';
-	STRING20  pfrd_address_ind:='';
-	UNSIGNED8 rawAid := 0;
-  UNSIGNED8 nid := 0;
-	STRING25 		cln_title := '';
-	STRING30  	cln_fname := '';
-	STRING30  	cln_mname := '';
-	STRING30  	cln_lname := '';
-	STRING5 		cln_suffix := '';
-	STRING25		cln_title2 := '';
-	STRING30  	cln_fname2 := '';
-	STRING30  	cln_mname2 := '';
-	STRING30  	cln_lname2 := '';
-	STRING5   	cln_suffix2 := '';
-  UNSIGNED8  name_ind := 0;
-  UNSIGNED8  persistent_record_id := 0;
-	STRING100   cname := '';
-	Norm_Addr_REO;
-	BIPV2.IDlayouts.l_xlink_ids;	
-end;
- 
-EXPORT  ClnName_NOD:= RECORD
-	STRING20  pdid := '';
-	STRING20  pfrd_address_ind:='';
-	UNSIGNED8 rawAid := 0;
-  UNSIGNED8 nid := 0;
-	STRING25 		cln_title := '';
-	STRING30  	cln_fname := '';
-	STRING30  	cln_mname := '';
-	STRING30  	cln_lname := '';
-	STRING5 		cln_suffix := '';
-	STRING25		cln_title2 := '';
-	STRING30  	cln_fname2 := '';
-	STRING30  	cln_mname2 := '';
-	STRING30  	cln_lname2 := '';
-	STRING5   	cln_suffix2 := '';
-  UNSIGNED8  name_ind := 0;
-  UNSIGNED8  persistent_record_id := 0;
-	STRING100   cname := '';
-	Norm_Addr_NOD;
-	BIPV2.IDlayouts.l_xlink_ids;	
-end;
- 
-EXPORT ClnAddr_Reo		:= RECORD
-	 UNSIGNED8   rawaidin;
+EXPORT ClnAddr		:= RECORD
+	 UNSIGNED8   rawAid := 0;
 /* AID fields */
-   UNSIGNED8  cleanaid;
-   STRING1		addresstype;
    STRING10		prim_range;
    STRING2		predir;
    STRING28		prim_name;
@@ -341,88 +271,542 @@ EXPORT ClnAddr_Reo		:= RECORD
    STRING7		geo_blk;
    STRING1		geo_match;
    STRING4		err_stat;
-   ClnName_REO;	 
+END;	
+ 
+EXPORT ClnFields	:= RECORD
+//Using same clean fields as Property.Layout_Fare_Foreclosurev2 for easier mapping
+		UNSIGNED8 name1_nid := 0;
+		STRING5		name1_prefix;
+		STRING20	name1_first;
+		STRING20	name1_middle;
+		STRING20	name1_last;
+		STRING5		name1_suffix;
+		STRING60	name1_company;
+		STRING9		name1_ssn := '';
+		STRING		name1_did_score	:= '0';
+		STRING12	name1_did	:= intformat(0,12,1);
+		STRING3		name1_bdid_score	:= '0';
+		STRING12	name1_bdid	:= intformat(0,12,1);
+		BIPV2.IDlayouts.l_xlink_ids name1;
+		UNSIGNED8 name2_nid := 0;
+		STRING5		name2_prefix;
+		STRING20	name2_first;
+		STRING20	name2_middle;
+		STRING20	name2_last;
+		STRING5		name2_suffix;
+		STRING60	name2_company;
+		STRING9		name2_ssn := '';
+		STRING		name2_did_score	:= '0';
+		STRING12	name2_did	:= intformat(0,12,1);
+		STRING3		name2_bdid_score	:= '0';
+		STRING12	name2_bdid	:= intformat(0,12,1);
+		BIPV2.IDlayouts.l_xlink_ids name2;
+		UNSIGNED8 name3_nid := 0;
+		STRING5		name3_prefix;
+		STRING20	name3_first;
+		STRING20	name3_middle;
+		STRING20	name3_last;
+		STRING5		name3_suffix;
+		STRING60	name3_company;
+		STRING9		name3_ssn := '';
+		STRING		name3_did_score	:= '0';
+		STRING12	name3_did	:= intformat(0,12,1);
+		STRING3		name3_bdid_score	:= '0';
+		STRING12	name3_bdid	:= intformat(0,12,1);
+		BIPV2.IDlayouts.l_xlink_ids name3;
+		UNSIGNED8 name4_nid := 0;
+		STRING5		name4_prefix;
+		STRING20	name4_first;
+		STRING20	name4_middle;
+		STRING20	name4_last;
+		STRING5		name4_suffix;
+		STRING60	name4_company;
+		STRING9		name4_ssn := '';
+		STRING		name4_did_score	:= '0';
+		STRING12	name4_did	:= intformat(0,12,1);
+		STRING3		name4_bdid_score	:= '0';
+		STRING12	name4_bdid	:= intformat(0,12,1);
+		BIPV2.IDlayouts.l_xlink_ids name4;
+		UNSIGNED8 name5_nid := 0;
+		STRING5		name5_prefix;
+		STRING20	name5_first;
+		STRING20	name5_middle;
+		STRING20	name5_last;
+		STRING5		name5_suffix;
+		STRING60	name5_company;
+		STRING9		name5_ssn := '';
+		STRING		name5_did_score	:= '0';
+		STRING12	name5_did	:= intformat(0,12,1);
+		STRING3		name5_bdid_score	:= '0';
+		STRING12	name5_bdid	:= intformat(0,12,1);
+		BIPV2.IDlayouts.l_xlink_ids name5;
+		UNSIGNED8 name6_nid := 0;
+		STRING5		name6_prefix;
+		STRING20	name6_first;
+		STRING20	name6_middle;
+		STRING20	name6_last;
+		STRING5		name6_suffix;
+		STRING60	name6_company;
+		STRING9		name6_ssn := '';
+		STRING		name6_did_score	:= '0';
+		STRING12	name6_did	:= intformat(0,12,1);
+		STRING3		name6_bdid_score	:= '0';
+		STRING12	name6_bdid	:= intformat(0,12,1);
+		BIPV2.IDlayouts.l_xlink_ids name6;
+		UNSIGNED8 name7_nid := 0;
+		STRING5		name7_prefix;
+		STRING20	name7_first;
+		STRING20	name7_middle;
+		STRING20	name7_last;
+		STRING5		name7_suffix;
+		STRING60	name7_company;
+		STRING9		name7_ssn := '';
+		STRING		name7_did_score	:= '0';
+		STRING12	name7_did	:= intformat(0,12,1);
+		STRING3		name7_bdid_score	:= '0';
+		STRING12	name7_bdid	:= intformat(0,12,1);
+		BIPV2.IDlayouts.l_xlink_ids name7;
+		UNSIGNED8 name8_nid := 0;
+		STRING5		name8_prefix;
+		STRING20	name8_first;
+		STRING20	name8_middle;
+		STRING20	name8_last;
+		STRING5		name8_suffix;
+		STRING60	name8_company;
+		STRING9		name8_ssn := '';
+		STRING		name8_did_score	:= '0';
+		STRING12	name8_did	:= intformat(0,12,1);
+		STRING3		name8_bdid_score	:= '0';
+		STRING12	name8_bdid	:= intformat(0,12,1);
+		BIPV2.IDlayouts.l_xlink_ids name8;
+		UNSIGNED8	situs1_RawAID;
+		STRING10	situs1_prim_range;
+		STRING2		situs1_predir;
+		STRING28	situs1_prim_name;
+		STRING4		situs1_addr_suffix;
+		STRING2		situs1_postdir;
+		STRING10	situs1_unit_desig;
+		STRING8		situs1_sec_range;
+		STRING25	situs1_p_city_name;
+		STRING25	situs1_v_city_name;
+		STRING2		situs1_st;
+		STRING5		situs1_zip;
+		STRING4		situs1_zip4;
+		STRING4		situs1_cart;
+		STRING1		situs1_cr_sort_sz;
+		STRING4		situs1_lot;
+		STRING1		situs1_lot_order;
+		STRING2		situs1_dpbc;
+		STRING1		situs1_chk_digit;
+		STRING2		situs1_record_type;
+		STRING2		situs1_ace_fips_st;
+		STRING3		situs1_fipscounty;
+		STRING10	situs1_geo_lat;
+		STRING11	situs1_geo_long;
+		STRING4		situs1_msa;
+		STRING7		situs1_geo_blk;
+		STRING1		situs1_geo_match;
+		STRING4		situs1_err_stat;
 END;
-
-
-EXPORT ClnAddr_nod		:= RECORD
-	 UNSIGNED8   rawaidin;
-/* AID fields */
-   UNSIGNED8 cleanaid;
-   STRING5		addresstype;
-   STRING10		prim_range;
-   STRING2		predir;
-   STRING28		prim_name;
-   STRING4		addr_suffix;
-   STRING2		postdir;
-   STRING10		unit_desig;
-   STRING8		sec_range;
-   STRING25		p_city_name;
-   STRING25		v_city_name;
-   STRING2		st;
-   STRING5		zip;
-   STRING6		zip4;
-   STRING6		cart;
-   STRING1		cr_sort_sz;
-   STRING4		lot;
-   STRING1		lot_order;
-   STRING2		dbpc;
-   STRING1		chk_digit;
-   STRING2		rec_type;
-   STRING5		county;
-   STRING10		geo_lat;
-   STRING11		geo_long;
-   STRING4		msa;
-   STRING7		geo_blk;
-   STRING1		geo_match;
-   STRING4		err_stat;
-   ClnName_NOD;
-END;
-
-EXPORT did_reo := RECORD
-   UNSIGNED6  did := 0;
-	 ClnAddr_Reo;
-	 END;
-
-EXPORT did_nod := RECORD
-   UNSIGNED6  did := 0;
-	 ClnAddr_nod;
-	 END;
-
-EXPORT did_reo_plus := RECORD
-      bipv2.IDlayouts.l_xlink_ids;
-      did_reo;
-		END;		
-EXPORT did_nod_plus := RECORD
-      bipv2.IDlayouts.l_xlink_ids;
-      did_nod;
-		END;
 		
-EXPORT base_nod  := record 
-   STRING19 create_dte;
-	 STRING19 last_upd_dte;
-	 STRING19 stamp_dte;
-	 STRING8 date_first_seen;
-	 STRING8 date_last_seen;
-	 STRING8 date_vendor_first_reported;
-	 STRING8 date_vendor_last_reported;
-	 STRING8 process_date;
-   STRING25 src;
-	 STRING25 record_id;
-   did_nod_plus;
-end;
+EXPORT base_nod  := RECORD 
+		UNSIGNED6 record_id;
+		STRING8 date_first_seen;
+		STRING8 date_last_seen;
+		STRING8 date_vendor_first_reported;
+		STRING8 date_vendor_last_reported;
+		STRING8 process_date;
+		STRING2 src;
+		STRING6 Delete_Flag;
+		nod_in;
+//Add code description fields
+		STRING55 document_desc;	//doc_type
+		ClnFields;
+END;
 
-export base_reo  := record
-   STRING19 create_dte;
-	 STRING19 last_upd_dte;
-	 STRING19 stamp_dte;
+EXPORT base_reo  := RECORD
+	 UNSIGNED6 record_id;
 	 STRING8 date_first_seen;
 	 STRING8 date_last_seen;
 	 STRING8 date_vendor_first_reported;
 	 STRING8 date_vendor_last_reported;
 	 STRING8 process_date;
-   STRING25 src;
-	 STRING25 record_id;
-   did_reo_plus;
-end;
+   STRING2 src;
+	 STRING6 Delete_Flag;
+   reo_in;
+//Add code description fields
+	 STRING55 document_desc; //doc_type
+	 STRING55 property_desc; //property_use_cd
+	 STRING55 use_desc; //asses_land_use
+	 STRING55 lender_type_desc; //concurrent TD: lender type
+	 STRING60 loan_type_desc; //concurrent TD: loan type
+	 ClnFields;
+END;
+	
+
+//Slimmed for normalizing and cleaning names and addresses
+EXPORT CleanFields_REO := RECORD
+	UNSIGNED6 record_id;
+	STRING2 src;
+	Norm_Name_addr;
+	ClnName;
+	UNSIGNED8 did 			:= 0;
+	UNSIGNED8 did_score	:= 0;
+	UNSIGNED8 bdid 			:= 0;
+	UNSIGNED8 bdid_score	:= 0;
+	BIPV2.IDlayouts.l_xlink_ids;
+	ClnAddr;
+END;
+
+EXPORT CleanFields_NOD	:= RECORD
+	UNSIGNED6 record_id;
+	STRING2 src;
+	Norm_Name_addr;
+	ClnName;
+	UNSIGNED8 did 			:= 0;
+	UNSIGNED8 did_score	:= 0;
+	UNSIGNED8 bdid 			:= 0;
+	UNSIGNED8 bdid_score	:= 0;
+	BIPV2.IDlayouts.l_xlink_ids;
+	ClnAddr;
+END;
+
+//Added to translate codes for both NOD and REO
+EXPORT CodeTable := RECORD
+	STRING		src;
+	STRING		field_name;
+	STRING		code;
+	STRING		code_desc;
+END;
+
+//Flattened layout for Ingest process
+EXPORT ClnFields_ext	:= RECORD
+		UNSIGNED8 name1_nid := 0;
+		STRING5		name1_prefix;
+		STRING20	name1_first;
+		STRING20	name1_middle;
+		STRING20	name1_last;
+		STRING5		name1_suffix;
+		STRING60	name1_company;
+		STRING9		name1_ssn := '';
+		STRING		name1_did_score	:= '0';
+		STRING12	name1_did	:= intformat(0,12,1);
+		STRING3		name1_bdid_score	:= '0';
+		STRING12	name1_bdid	:= intformat(0,12,1);
+		UNSIGNED6	name1_dotid;
+		UNSIGNED2	name1_dotscore;
+		UNSIGNED2	name1_dotweight;
+		UNSIGNED6	name1_empid;
+		UNSIGNED2	name1_empscore;
+		UNSIGNED2	name1_empweight;
+		UNSIGNED6	name1_powid;
+		UNSIGNED2	name1_powscore;
+		UNSIGNED2	name1_powweight;
+		UNSIGNED6 name1_proxid;
+		UNSIGNED2	name1_proxscore;
+		UNSIGNED2	name1_proxweight;
+		UNSIGNED6	name1_seleid;
+		UNSIGNED2	name1_selescore;
+		UNSIGNED2	name1_seleweight;
+		UNSIGNED6	name1_orgid;
+		UNSIGNED2	name1_orgscore;
+		UNSIGNED2	name1_orgweight;
+		UNSIGNED6	name1_ultid;
+		UNSIGNED2	name1_ultscore;
+		UNSIGNED2	name1_ultweight;
+		UNSIGNED8 name2_nid := 0;
+		STRING5		name2_prefix;
+		STRING20	name2_first;
+		STRING20	name2_middle;
+		STRING20	name2_last;
+		STRING5		name2_suffix;
+		STRING60	name2_company;
+		STRING9		name2_ssn := '';
+		STRING		name2_did_score	:= '0';
+		STRING12	name2_did	:= intformat(0,12,1);
+		STRING3		name2_bdid_score	:= '0';
+		STRING12	name2_bdid	:= intformat(0,12,1);
+		UNSIGNED6	name2_dotid;
+		UNSIGNED2	name2_dotscore;
+		UNSIGNED2	name2_dotweight;
+		UNSIGNED6	name2_empid;
+		UNSIGNED2	name2_empscore;
+		UNSIGNED2	name2_empweight;
+		UNSIGNED6	name2_powid;
+		UNSIGNED2	name2_powscore;
+		UNSIGNED2	name2_powweight;
+		UNSIGNED6 name2_proxid;
+		UNSIGNED2	name2_proxscore;
+		UNSIGNED2	name2_proxweight;
+		UNSIGNED6	name2_seleid;
+		UNSIGNED2	name2_selescore;
+		UNSIGNED2	name2_seleweight;
+		UNSIGNED6	name2_orgid;
+		UNSIGNED2	name2_orgscore;
+		UNSIGNED2	name2_orgweight;
+		UNSIGNED6	name2_ultid;
+		UNSIGNED2	name2_ultscore;
+		UNSIGNED2	name2_ultweight;
+		UNSIGNED8 name3_nid := 0;
+		STRING5		name3_prefix;
+		STRING20	name3_first;
+		STRING20	name3_middle;
+		STRING20	name3_last;
+		STRING5		name3_suffix;
+		STRING60	name3_company;
+		STRING9		name3_ssn := '';
+		STRING		name3_did_score	:= '0';
+		STRING12	name3_did	:= intformat(0,12,1);
+		STRING3		name3_bdid_score	:= '0';
+		STRING12	name3_bdid	:= intformat(0,12,1);
+		UNSIGNED6	name3_dotid;
+		UNSIGNED2	name3_dotscore;
+		UNSIGNED2	name3_dotweight;
+		UNSIGNED6	name3_empid;
+		UNSIGNED2	name3_empscore;
+		UNSIGNED2	name3_empweight;
+		UNSIGNED6	name3_powid;
+		UNSIGNED2	name3_powscore;
+		UNSIGNED2	name3_powweight;
+		UNSIGNED6 name3_proxid;
+		UNSIGNED2	name3_proxscore;
+		UNSIGNED2	name3_proxweight;
+		UNSIGNED6	name3_seleid;
+		UNSIGNED2	name3_selescore;
+		UNSIGNED2	name3_seleweight;
+		UNSIGNED6	name3_orgid;
+		UNSIGNED2	name3_orgscore;
+		UNSIGNED2	name3_orgweight;
+		UNSIGNED6	name3_ultid;
+		UNSIGNED2	name3_ultscore;
+		UNSIGNED2	name3_ultweight;
+		UNSIGNED8 name4_nid := 0;
+		STRING5		name4_prefix;
+		STRING20	name4_first;
+		STRING20	name4_middle;
+		STRING20	name4_last;
+		STRING5		name4_suffix;
+		STRING60	name4_company;
+		STRING9		name4_ssn := '';
+		STRING		name4_did_score	:= '0';
+		STRING12	name4_did	:= intformat(0,12,1);
+		STRING3		name4_bdid_score	:= '0';
+		STRING12	name4_bdid	:= intformat(0,12,1);
+		UNSIGNED6	name4_dotid;
+		UNSIGNED2	name4_dotscore;
+		UNSIGNED2	name4_dotweight;
+		UNSIGNED6	name4_empid;
+		UNSIGNED2	name4_empscore;
+		UNSIGNED2	name4_empweight;
+		UNSIGNED6	name4_powid;
+		UNSIGNED2	name4_powscore;
+		UNSIGNED2	name4_powweight;
+		UNSIGNED6 name4_proxid;
+		UNSIGNED2	name4_proxscore;
+		UNSIGNED2	name4_proxweight;
+		UNSIGNED6	name4_seleid;
+		UNSIGNED2	name4_selescore;
+		UNSIGNED2	name4_seleweight;
+		UNSIGNED6	name4_orgid;
+		UNSIGNED2	name4_orgscore;
+		UNSIGNED2	name4_orgweight;
+		UNSIGNED6	name4_ultid;
+		UNSIGNED2	name4_ultscore;
+		UNSIGNED2	name4_ultweight;
+		UNSIGNED8 name5_nid := 0;
+		STRING5		name5_prefix;
+		STRING20	name5_first;
+		STRING20	name5_middle;
+		STRING20	name5_last;
+		STRING5		name5_suffix;
+		STRING60	name5_company;
+		STRING9		name5_ssn := '';
+		STRING		name5_did_score	:= '0';
+		STRING12	name5_did	:= intformat(0,12,1);
+		STRING3		name5_bdid_score	:= '0';
+		STRING12	name5_bdid	:= intformat(0,12,1);
+		UNSIGNED6	name5_dotid;
+		UNSIGNED2	name5_dotscore;
+		UNSIGNED2	name5_dotweight;
+		UNSIGNED6	name5_empid;
+		UNSIGNED2	name5_empscore;
+		UNSIGNED2	name5_empweight;
+		UNSIGNED6	name5_powid;
+		UNSIGNED2	name5_powscore;
+		UNSIGNED2	name5_powweight;
+		UNSIGNED6 name5_proxid;
+		UNSIGNED2	name5_proxscore;
+		UNSIGNED2	name5_proxweight;
+		UNSIGNED6	name5_seleid;
+		UNSIGNED2	name5_selescore;
+		UNSIGNED2	name5_seleweight;
+		UNSIGNED6	name5_orgid;
+		UNSIGNED2	name5_orgscore;
+		UNSIGNED2	name5_orgweight;
+		UNSIGNED6	name5_ultid;
+		UNSIGNED2	name5_ultscore;
+		UNSIGNED2	name5_ultweight;
+		UNSIGNED8 name6_nid := 0;
+		STRING5		name6_prefix;
+		STRING20	name6_first;
+		STRING20	name6_middle;
+		STRING20	name6_last;
+		STRING5		name6_suffix;
+		STRING60	name6_company;
+		STRING9		name6_ssn := '';
+		STRING		name6_did_score	:= '0';
+		STRING12	name6_did	:= intformat(0,12,1);
+		STRING3		name6_bdid_score	:= '0';
+		STRING12	name6_bdid	:= intformat(0,12,1);
+		UNSIGNED6	name6_dotid;
+		UNSIGNED2	name6_dotscore;
+		UNSIGNED2	name6_dotweight;
+		UNSIGNED6	name6_empid;
+		UNSIGNED2	name6_empscore;
+		UNSIGNED2	name6_empweight;
+		UNSIGNED6	name6_powid;
+		UNSIGNED2	name6_powscore;
+		UNSIGNED2	name6_powweight;
+		UNSIGNED6 name6_proxid;
+		UNSIGNED2	name6_proxscore;
+		UNSIGNED2	name6_proxweight;
+		UNSIGNED6	name6_seleid;
+		UNSIGNED2	name6_selescore;
+		UNSIGNED2	name6_seleweight;
+		UNSIGNED6	name6_orgid;
+		UNSIGNED2	name6_orgscore;
+		UNSIGNED2	name6_orgweight;
+		UNSIGNED6	name6_ultid;
+		UNSIGNED2	name6_ultscore;
+		UNSIGNED2	name6_ultweight;
+		UNSIGNED8 name7_nid := 0;
+		STRING5		name7_prefix;
+		STRING20	name7_first;
+		STRING20	name7_middle;
+		STRING20	name7_last;
+		STRING5		name7_suffix;
+		STRING60	name7_company;
+		STRING9		name7_ssn := '';
+		STRING		name7_did_score	:= '0';
+		STRING12	name7_did	:= intformat(0,12,1);
+		STRING3		name7_bdid_score	:= '0';
+		STRING12	name7_bdid	:= intformat(0,12,1);
+		UNSIGNED6	name7_dotid;
+		UNSIGNED2	name7_dotscore;
+		UNSIGNED2	name7_dotweight;
+		UNSIGNED6	name7_empid;
+		UNSIGNED2	name7_empscore;
+		UNSIGNED2	name7_empweight;
+		UNSIGNED6	name7_powid;
+		UNSIGNED2	name7_powscore;
+		UNSIGNED2	name7_powweight;
+		UNSIGNED6 name7_proxid;
+		UNSIGNED2	name7_proxscore;
+		UNSIGNED2	name7_proxweight;
+		UNSIGNED6	name7_seleid;
+		UNSIGNED2	name7_selescore;
+		UNSIGNED2	name7_seleweight;
+		UNSIGNED6	name7_orgid;
+		UNSIGNED2	name7_orgscore;
+		UNSIGNED2	name7_orgweight;
+		UNSIGNED6	name7_ultid;
+		UNSIGNED2	name7_ultscore;
+		UNSIGNED2	name7_ultweight;
+		UNSIGNED8 name8_nid := 0;
+		STRING5		name8_prefix;
+		STRING20	name8_first;
+		STRING20	name8_middle;
+		STRING20	name8_last;
+		STRING5		name8_suffix;
+		STRING60	name8_company;
+		STRING9		name8_ssn := '';
+		STRING		name8_did_score	:= '0';
+		STRING12	name8_did	:= intformat(0,12,1);
+		STRING3		name8_bdid_score	:= '0';
+		STRING12	name8_bdid	:= intformat(0,12,1);
+		UNSIGNED6	name8_dotid;
+		UNSIGNED2	name8_dotscore;
+		UNSIGNED2	name8_dotweight;
+		UNSIGNED6	name8_empid;
+		UNSIGNED2	name8_empscore;
+		UNSIGNED2	name8_empweight;
+		UNSIGNED6	name8_powid;
+		UNSIGNED2	name8_powscore;
+		UNSIGNED2	name8_powweight;
+		UNSIGNED6 name8_proxid;
+		UNSIGNED2	name8_proxscore;
+		UNSIGNED2	name8_proxweight;
+		UNSIGNED6	name8_seleid;
+		UNSIGNED2	name8_selescore;
+		UNSIGNED2	name8_seleweight;
+		UNSIGNED6	name8_orgid;
+		UNSIGNED2	name8_orgscore;
+		UNSIGNED2	name8_orgweight;
+		UNSIGNED6	name8_ultid;
+		UNSIGNED2	name8_ultscore;
+		UNSIGNED2	name8_ultweight;
+		UNSIGNED8	situs1_RawAID;
+		STRING10	situs1_prim_range;
+		STRING2		situs1_predir;
+		STRING28	situs1_prim_name;
+		STRING4		situs1_addr_suffix;
+		STRING2		situs1_postdir;
+		STRING10	situs1_unit_desig;
+		STRING8		situs1_sec_range;
+		STRING25	situs1_p_city_name;
+		STRING25	situs1_v_city_name;
+		STRING2		situs1_st;
+		STRING5		situs1_zip;
+		STRING4		situs1_zip4;
+		STRING4		situs1_cart;
+		STRING1		situs1_cr_sort_sz;
+		STRING4		situs1_lot;
+		STRING1		situs1_lot_order;
+		STRING2		situs1_dpbc;
+		STRING1		situs1_chk_digit;
+		STRING2		situs1_record_type;
+		STRING2		situs1_ace_fips_st;
+		STRING3		situs1_fipscounty;
+		STRING10	situs1_geo_lat;
+		STRING11	situs1_geo_long;
+		STRING4		situs1_msa;
+		STRING7		situs1_geo_blk;
+		STRING1		situs1_geo_match;
+		STRING4		situs1_err_stat;
+END;
+
+EXPORT base_nod_ext  := RECORD 
+		UNSIGNED6 record_id;
+		STRING8 date_first_seen;
+		STRING8 date_last_seen;
+		STRING8 date_vendor_first_reported;
+		STRING8 date_vendor_last_reported;
+		STRING8 process_date;
+		STRING2 src;
+		STRING6 Delete_Flag;
+		nod_in;
+//Add code description fields
+		STRING55 document_desc;	//doc_type
+		ClnFields_ext;
+END;
+
+EXPORT base_reo_ext  := RECORD
+	 UNSIGNED6 record_id;
+	 STRING8 date_first_seen;
+	 STRING8 date_last_seen;
+	 STRING8 date_vendor_first_reported;
+	 STRING8 date_vendor_last_reported;
+	 STRING8 process_date;
+   STRING2 src;
+	 STRING6 Delete_Flag;
+   reo_in;
+//Add code description fields
+	 STRING55 document_desc; //doc_type
+	 STRING55 property_desc; //property_use_cd
+	 STRING55 use_desc; //asses_land_use
+	 STRING55 lender_type_desc; //concurrent TD: lender type
+	 STRING60 loan_type_desc; //concurrent TD: loan type
+	 ClnFields_ext;
+END;
+
 END;		

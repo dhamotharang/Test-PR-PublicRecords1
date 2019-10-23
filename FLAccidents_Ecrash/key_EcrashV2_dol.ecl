@@ -1,4 +1,4 @@
-/*2015-11-16T20:52:51Z (Srilatha Katukuri)
+﻿/*2015-11-16T20:52:51Z (Srilatha Katukuri)
 #193680 - CR 323
 */
 /*2015-08-07T18:13:16Z (Srilatha Katukuri)
@@ -13,9 +13,10 @@
 /*2015-02-11T00:43:45Z (Ayeesha Kayttala)
 bug# 173256 - code review 
 */
-Import Data_Services, doxie,FLAccidents;
+Import Data_Services, doxie,FLAccidents, STD;
 
-allrecs := FLAccidents_Ecrash.File_KeybuildV2.out(vin+driver_license_nbr+tag_nbr+lname <>'' and trim(report_type_id,all) in ['A','DE']);
+allrecs := FLAccidents_Ecrash.File_KeybuildV2.out(vin+driver_license_nbr+tag_nbr+lname <>'' and 
+																									(trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'));
 
 slim_layout := RECORD
   string8 accident_date;

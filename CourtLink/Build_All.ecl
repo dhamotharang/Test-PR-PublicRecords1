@@ -1,9 +1,9 @@
-import versioncontrol, _control;
+﻿import versioncontrol, _control;
 
 export Build_All(
     string	pversion
    ,string	pDirectory	= '/data/hds_180/CourtLink/20090804'
-   ,string	pServerIP	= _control.IPAddress.bctlpedata10
+   ,string	pServerIP	= 'uspr-edata10.risk.regn.net'
    ,string	pFilename	= 'docket.txt'
    ,string	pGroupName	= _Dataset().groupname                                                    
    ,boolean	pIsTesting	= false

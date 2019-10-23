@@ -1,10 +1,11 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take NC Appraisal Board raw file and convert it to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_StringLib;
 
 EXPORT  map_NCS0841_conversion(STRING pVersion) := FUNCTION
+#workunit('name',' Yogurt:Prof License MARI - NCS0841  Build   ' + pVersion);
 	src_cd	:= 'S0841'; //Vendor code
 	src_st	:= 'NC';	//License state
 	code		:= src_st+src_cd;
@@ -33,7 +34,7 @@ EXPORT  map_NCS0841_conversion(STRING pVersion) := FUNCTION
 	ValidNCFile	:= ds_NC_Appraisal(TRIM(LASTNAME,LEFT,RIGHT) != 'NONE');
 
 	//NC Appraisal layout to Common
-	Prof_License_Mari.layouts.base	TransformToCommon(Prof_License_Mari.layout_NCS0841.src L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	TransformToCommon(Prof_License_Mari.layout_NCS0841.src L) := TRANSFORM
 	
 		SELF.PRIMARY_KEY	:= 0;
 		SELF.DATE_FIRST_SEEN	:= thorlib.wuid()[2..9];
@@ -76,7 +77,12 @@ EXPORT  map_NCS0841_conversion(STRING pVersion) := FUNCTION
 		stdOfficeName			:= IF(UpperOfficeName != ' ' AND GetOffice = ' ',Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(REGEXREPLACE('/',UpperOfficeName,' ')),
 														Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(REGEXREPLACE('/',GetOffice,' ')));
 		clnOfficeName			:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(StringLib.StringFindReplace(stdOfficeName,'DBA','')));
-		SELF.NAME_OFFICE	:= IF(REGEXFIND(IPpattern,stdOfficeName),TRIM(stdOfficeName,LEFT,RIGHT),REGEXREPLACE(' COMPANY',clnOfficeName,' CO'));
+		GoodNAME_OFFICE	:= IF(REGEXFIND(IPpattern,stdOfficeName),TRIM(stdOfficeName,LEFT,RIGHT),REGEXREPLACE(' COMPANY',clnOfficeName,' CO'));
+		SELF.NAME_OFFICE	  := MAP(TRIM(GoodNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_MID + SELF.NAME_LAST + SELF.NAME_SUFX,ALL)=> '',
+		                           TRIM(GoodNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_MID + SELF.NAME_LAST,ALL) => '',
+		                           TRIM(GoodNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_LAST,ALL) => '',
+															 TRIM(GoodNAME_OFFICE,ALL) = TRIM(SELF.NAME_ORG,ALL) => '',
+		                           StringLib.StringCleanSpaces(GoodNAME_OFFICE));
 		SELF.OFFICE_PARSE	:= IF(SELF.NAME_OFFICE != ' ','GR','');
 		
 	  //Clean DBA name and remove from Officename field
@@ -86,8 +92,9 @@ EXPORT  map_NCS0841_conversion(STRING pVersion) := FUNCTION
 		clnDba							:= IF(REGEXFIND(IPpattern,tmpNameDBA),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(tmpNameDBA),
 															Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE('/',tmpNameDBA,' ')));
 		SELF.NAME_DBA				:= REGEXREPLACE(' COMPANY',clnDba,' CO');
-		SELF.NAME_DBA_SUFX	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
+		SELF.NAME_DBA_SUFX	:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
 		SELF.DBA_FLAG				:= IF(TRIM(SELF.NAME_DBA) != ' ', 1, 0);
+		SELF.NAME_MARI_DBA		:= StringLib.StringCleanSpaces(tmpNameDBA);
 		
 		tempLicenseNbr					:= ut.CleanSpacesAndUpper(L.LICENSEID);
 		SELF.LICENSE_NBR				:= tempLicenseNbr;
@@ -110,9 +117,9 @@ EXPORT  map_NCS0841_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_MARI_ORG		:= SELF.NAME_OFFICE;	
 		
 		//Clean phone/fax and remove +1 and non-numerics
-		clnPhone							:= IF(REGEXFIND('NONE',TRIM(L.PHONE1)),'',L.PHONE1);
-		SELF.PHN_MARI_1				:= clnPhone;				//PHN_MARI_1 - Phone number before running through our clean process.
-		SELF.PHN_PHONE_1			:= StringLib.STRINGFilter(clnPhone,'0123456789');
+		clnPhone              := TRIM(StringLib.StringFilter(L.PHONE1,'0123456789'));
+		SELF.PHN_MARI_1				:= IF(clnPhone = '0000000000','',ut.CleanPhone(clnPhone));				//PHN_MARI_1 - Phone number before running through our clean process.
+		SELF.PHN_PHONE_1			:= IF(clnPhone = '0000000000','',ut.CleanPhone(clnPhone));
 
 		//Prepare the input to address cleaner
 		temp_preaddr1 				:= StringLib.STRINGCleanSpaces(L.ADDRESS); 
@@ -125,8 +132,8 @@ EXPORT  map_NCS0841_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_ADDR1_1			:= IF(AddrWithContact != ' ' AND tmpADDR_ADDR2_1 != '',StringLib.STRINGCleanSpaces(tmpADDR_ADDR2_1),
 																StringLib.STRINGCleanSpaces(tmpADDR_ADDR1_1));	
 		SELF.ADDR_ADDR2_1			:= IF(AddrWithContact != '','',StringLib.STRINGCleanSpaces(tmpADDR_ADDR2_1)); 
-		SELF.ADDR_CITY_1		  := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.CITY));
-		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.STATE));
+		SELF.ADDR_CITY_1		  := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),ut.CleanSpacesAndUpper(L.CITY));
+		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),ut.CleanSpacesAndUpper(L.STATE));
 		SELF.ADDR_ZIP5_1		  := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),TRIM(L.ZIP,LEFT,RIGHT)[1..5]);
 		SELF.ADDR_ZIP4_1		  := clnAddrAddr1[122..125];
 																
@@ -169,7 +176,7 @@ EXPORT  map_NCS0841_conversion(STRING pVersion) := FUNCTION
 	ds_map := PROJECT(ValidNCFile, TRANSFORMToCommon(LEFT));
 
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;

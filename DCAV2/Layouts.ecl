@@ -1,4 +1,4 @@
-/*2012-10-10T20:21:17Z (Vern Bentley)
+﻿/*2012-10-10T20:21:17Z (Vern Bentley)
 use xlink_ids instead of header_ids.
 */
 IMPORT AID,address,dca,standard,bipv2;
@@ -884,6 +884,14 @@ MODULE
 	
 	EXPORT base :=
 	module
+	
+		export CCPA_fields := 
+		Record
+			// The below 2 fields are added for CCPA (California Consumer Protection Act) project.
+			// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+			unsigned4 											global_sid 									:= 0;
+			unsigned8 											record_sid 									:= 0;
+		end;
 
 		export Companies := 
 		RECORD
@@ -912,6 +920,8 @@ MODULE
 			Address.Layout_Clean182_fips				mailing_address							;
 			clean_phones												clean_phones								;
 			clean_dates													clean_dates									;
+			//*** Adding CCPA project fields as per Jira# CCPA-12
+			CCPA_fields																											;
 		END;
 
 		export Contacts := 
@@ -1191,6 +1201,9 @@ MODULE
 			string1              geo_matchA                                                                  ;
 			string4              err_statA                                                                   ;
 			string1              LF                                                                          ;
+			//*** Adding CCPA project fields as per Jira# CCPA-12
+			CCPA_fields																																											 ;
+			
 		end;
 
 		export keybuildEntNum := 
@@ -1320,6 +1333,7 @@ MODULE
 			Address.Layout_Clean182_fips				mailing_address							;
 			clean_phones												clean_phones								;
 			clean_dates													clean_dates									;
+			Base.CCPA_Fields;
 		END;
 
 		export ContactsPrep := 

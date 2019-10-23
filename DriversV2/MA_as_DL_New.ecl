@@ -1,6 +1,8 @@
-import lib_stringlib, Drivers,idl_header,std;
+﻿import lib_stringlib, Drivers,idl_header,std;
 
-in_file  :=  DriversV2.File_DL_MA_Update_Clean;
+export MA_As_DL_New(dataset(DriversV2.Layout_DL_MA_In.Layout_MA_With_Clean) pFile_MA_Input) := function
+
+in_file  :=  pFile_MA_Input;
 
 /* Normalize Cleaned Vendor data on the two Addresses (Mailing & Residential) */
 layout_norm := record
@@ -67,9 +69,22 @@ DriversV2.Layout_DL_Extended  map_to_common(dNormalizeKeep l)   := transform
 	self.RawFullName							:= l.LICENSE_FIRST_NAME + ' ' + l.LICENSE_MIDDLE_NAME + ' ' + l.LICENSE_LAST_NAME; 			 
 	self.lic_issue_date 					:= (integer)l.ISSUE_DATE_YYYYMMDD;
 	self.Status										:= l.clean_status;
+	self.Permit_Flag							:= l.Permit_Flag;
+	self.Permit_Class1						:= l.Permit_Class1;
+	self.Permit_Exp_Date1					:= l.Permit_Exp_Date1;
+	self.Permit_Class2						:= l.Permit_Class2;
+	self.Permit_Exp_Date2					:= l.Permit_Exp_Date2;
+	self.Permit_Class3						:= l.Permit_Class3;
+	self.Permit_Exp_Date3					:= l.Permit_Exp_Date3;
+	self.Permit_Class4						:= l.Permit_Class4;
+	self.Permit_Exp_Date4					:= l.Permit_Exp_Date4;
+	self.Permit_Class5						:= l.Permit_Class5;
+	self.Permit_Exp_Date5					:= l.Permit_Exp_Date5;
 	self                  				:= [];
 end;
 
-MA_Update := project(dNormalizeKeep, map_to_common(left));
+MA_As_DL_mapper := project(dNormalizeKeep, map_to_common(left));
 
-export MA_As_DL_New := MA_Update : persist(DriversV2.Constants.Cluster + 'Persist::DL2::DrvLic_MA_as_DL_New');
+return MA_As_DL_mapper;
+
+end;

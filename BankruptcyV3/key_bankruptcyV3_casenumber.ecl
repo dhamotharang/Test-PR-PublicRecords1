@@ -1,20 +1,20 @@
-import BankruptcyV2, fcra, Doxie, ut;
+﻿import BankruptcyV2, fcra, Doxie, ut,dops;
 
 export key_bankruptcyV3_casenumber(boolean isFCRA = false) := function
   todaysdate := ut.GetDate;
 	get_recs := BankruptcyV2.file_bankruptcy_main_v3(~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed));
-
+	FCRATest:=if(isFCRA,get_recs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),get_recs);
 	slim_rec := record
-		get_recs.tmsid;
-		get_recs.court_code;
-		get_recs.orig_case_number;
-		get_recs.case_number;
+		FCRATest.tmsid;
+		FCRATest.court_code;
+		FCRATest.orig_case_number;
+		FCRATest.case_number;
 		string2 filing_state ;
 	end;
 
 	strip_leadingzeroes(string25 number) := regexreplace('^[ |0]*',number,'');
 	
-	slim_rec tslim(get_recs L, integer cnt) := transform
+	slim_rec tslim(FCRATest L, integer cnt) := transform
 		string25 s_case_number        := if(strip_leadingzeroes(L.case_number)   <> '', L.case_number, ''); 
 		string25 s_orig_case_number   := if(strip_leadingzeroes(L.orig_case_number)   <> '', L.orig_case_number, ''); 
 		self.case_number := choose(cnt, s_case_number, s_orig_case_number);						  	
@@ -22,7 +22,7 @@ export key_bankruptcyV3_casenumber(boolean isFCRA = false) := function
 		self := L;
 	end;
 					   
-	slim_file := normalize(get_recs(case_number <> '' or orig_case_number <> '' ), 2, tslim(left, counter));
+	slim_file := normalize(FCRATest(case_number <> '' or orig_case_number <> '' ), 2, tslim(left, counter));
 
 	slim_rec tformat(slim_rec L, integer cnt) := transform
 		self.case_number := choose(cnt, L.case_number, strip_leadingzeroes(L.case_number));

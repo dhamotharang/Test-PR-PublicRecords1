@@ -1,7 +1,7 @@
 IMPORT PRTE2_Header;
-export fn_ApartmentBuildings(boolean isEN=false) := function
+export fn_ApartmentBuildings(boolean isEN=false,string filedate) := function
 
-gds := header.fn_did_addresses(isEN);
+gds := header.fn_did_addresses(isEN,filedate);
 
 scnt := record
 	gds.prim_range;

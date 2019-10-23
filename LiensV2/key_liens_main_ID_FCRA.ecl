@@ -1,24 +1,12 @@
-Import Data_Services, liensv2, Doxie, ut;
+﻿Import Data_Services, liensv2, Doxie, ut;
 
-get_recs := LiensV2.file_liens_fcra_main;
-dist_id := distribute(get_recs, hash(TMSID,RMSID));
-sort_id := sort(dist_id, TMSID, RMSID,local);
-dFillbCBFlag	:=	JOIN(
-										sort_id,
-										DEDUP(SORT(DISTRIBUTE(LiensV2.file_Hogan_party,
-											HASH(	TMSID,RMSID)),
-														TMSID,RMSID,bCBFlag,LOCAL), // We want any FALSE records at the top
-														TMSID,RMSID,LOCAL),
-											LEFT.tmsid	=	RIGHT.tmsid	AND
-											LEFT.rmsid	=	RIGHT.rmsid,
-										TRANSFORM(
-											RECORDOF(LEFT),
-											SELF.bCBFlag	:=	IF(RIGHT.tmsid<>'',RIGHT.bCBFlag,FALSE);
-											SELF					:=	LEFT;
-										),
-										LEFT OUTER,
-										LOCAL
-									);
+dFCRAMain				:=	LiensV2.file_liens_fcra_main;
+dFCRAMainDist		:=	SORT(DISTRIBUTE(dFCRAMain,HASH(	TMSID,RMSID)),
+															TMSID,RMSID,LOCAL);
 
-export 	key_liens_main_ID_FCRA := index(dFillbCBFlag,{tmsid,RMSID},{dFillbCBFlag},
+//DF-22188 - Deprecate speicified in thor_data400::key::liensv2::fcra::main::tmsid.rmsid_qa
+ut.MAC_CLEAR_FIELDS(dFCRAMainDist, dFCRAMainDist_cleared, LiensV2.Constants.fields_to_clear_main_id_fcra);
+dFCRAMainDist_proj := project(dFCRAMainDist_cleared,recordof(dFCRAMainDist));
+	
+EXPORT	key_liens_main_ID_FCRA	:=	INDEX(dFCRAMainDist_proj,{TMSID,RMSID},{dFCRAMainDist_proj},
 Data_Services.Data_location.Prefix('Liensv2')+'thor_data400::key::liensv2::fcra::main::TMSID.RMSID_' + doxie.Version_SuperKey);

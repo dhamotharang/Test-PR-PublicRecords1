@@ -1,7 +1,7 @@
 ﻿/////////////////////////////////////////////////////////////////
 //Expand Florida file 
 /////////////////////////////////////////////////////////////////
-import FLAccidents,ut;
+import FLAccidents,ut, STD;
 
 export File_KeybuildV2 := module 
 
@@ -59,6 +59,8 @@ FLAccidents_Ecrash.Layout_keybuild_SSv2 xpndrecs(flc_ss L, FLAccidents.basefile_
 		self.Report_Has_Coversheet		:= '0';
 		self.date_vendor_last_reported := L.accident_date; // need to create date field...
 		//self.IdField 								:=	R.IdField;
+		//Appriss Integration
+		self.Releasable                     := '1'; 	
 		self 								:= L;
 		self 								:= R;
 		self                := []; 
@@ -77,6 +79,8 @@ FLAccidents_Ecrash.Layout_keybuild_SSv2 xpndrecs1(pflc_ss L,FLAccidents.BaseFile
 	self.carrier_name := if(l.carrier_name <> '', l.carrier_name,  R.ins_company_name);
 	self.Policy_num   := if(l.Policy_num <>'',l.Policy_num, R.ins_policy_nbr); 
 	//self.IdField 			:=	R.IdField;
+	//Appriss Integration
+	self.Releasable                     := '1'; 	
 	self 							:= L;
 end;
 
@@ -93,6 +97,8 @@ pflc_ss1 := dedup(distribute(join(distribute(pflc_ss,hash(accident_nbr))
 FLAccidents_Ecrash.Layout_keybuild_SSv2 xpndrecs2(pflc_ss1 L,FLAccidents.basefile_flcrash0 R) := transform
 
 	self.vehicle_incident_city			:= stringlib.stringtouppercase(if(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
+	//Appriss Integration
+	self.Releasable                     := '1'; 	
 	self 														:= L;
 end;
 
@@ -176,6 +182,8 @@ pflc_ss slimrec(ntlFile L) := transform
                                            7000000000000 );  // national accidents 
        SELF.idfield                  := prefix + (unsigned6) if(trim(L.vehicle_incident_id,all) <> '', L.vehicle_incident_id, '0');
 */
+		//Appriss Integration
+		self.Releasable                     := '1'; 	
 		self						:= L;
 		self						:= [];
 end;
@@ -283,7 +291,10 @@ FLAccidents_Ecrash.Layout_keybuild_SSv2 slimrec2(inqFile L ,unsigned1 cnt) := tr
                                            7000000000000 );  // national accidents 
        self.idfield                  := prefix + (unsigned6) if(trim(L.vehicle_incident_id,all) <> '', L.vehicle_incident_id, '0');
 */ 
-  		self						:= L;
+  				
+		//Appriss Integration
+		self.Releasable                     := '1'; 	
+		self						:= L;
 
 		self						:= [];
 
@@ -400,8 +411,9 @@ pflc_ss slimrec3(eFile L, unsigned1 cnt) := transform
 	  
 		// BuyCrash
 		self.officer_id                     := L.officer_id;
+		
 		//Appriss Integration
-		self.Releasable                     := '1'; 		
+		self.Releasable                     := IF(TRIM(L.Releasable,left,right) IN ['\\N', 'NULL', ''],  '1', L.Releasable); 			
 		self								                := L;
 		self                                := [];
    
@@ -461,7 +473,7 @@ AlphaCoplogic := AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC' and ((tri
 export Alpha  :=  AlphaOtherVendors + AlphaCoplogic;
 export out    := outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
 
-shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']);
+shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and (trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'));
 export eCrashSearchRecs := distribute(project(searchRecs, Layouts.key_search_layout), hash64(accident_nbr)):independent;
 
 end; 

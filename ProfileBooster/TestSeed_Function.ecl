@@ -1,4 +1,4 @@
-IMPORT Seed_Files, Risk_Indicators;
+﻿IMPORT Seed_Files, Risk_Indicators;
 
 EXPORT TestSeed_Function(
 	DATASET(Risk_Indicators.Layout_Input) inData,
@@ -186,7 +186,22 @@ EXPORT TestSeed_Function(
 		self.attributes.version1.RaACrtRecBkrptMmbrCnt36Mo					:= ri.RaACrtRecBkrptMmbrCnt36Mo;
 		self.attributes.version1.RaAOccProfLicMmbrCnt								:= ri.RaAOccProfLicMmbrCnt;
 		self.attributes.version1.RaAOccBusinessAssocMmbrCnt					:= ri.RaAOccBusinessAssocMmbrCnt;
-		self.attributes.version1.RaAInterestSportPersonMmbrCnt			:= ri.RaAInterestSportPersonMmbrCnt;
+		self.attributes.version1.RaAInterestSportPersonMmbrCnt			:= ri.RaAInterestSportPersonMmbrCnt;		
+		self.attributes.version1.PPCurrOwnedAutoVIN			:= ri.PPCurrOwnedAutoVIN;
+		self.attributes.version1.PPCurrOwnedAutoYear			:= ri.PPCurrOwnedAutoYear;
+		self.attributes.version1.PPCurrOwnedAutoMake			:= ri.PPCurrOwnedAutoMake;
+		self.attributes.version1.PPCurrOwnedAutoModel			:= ri.PPCurrOwnedAutoModel;
+		self.attributes.version1.PPCurrOwnedAutoSeries			:= ri.PPCurrOwnedAutoSeries;
+		self.attributes.version1.PPCurrOwnedAutoType			:= ri.PPCurrOwnedAutoType;	
+		
+    self.attributes.version1.score1 := ri.score1;
+    self.attributes.version1.scorename1 := ri.scorename1;
+    self.attributes.version1.reason1 := ri.reason1;
+    self.attributes.version1.reason2 := ri.reason2;
+    self.attributes.version1.reason3 := ri.reason3;
+    self.attributes.version1.reason4 := ri.reason4;
+    self.attributes.version1.reason5 := ri.reason5;
+    self.attributes.version1.reason6 := ri.reason6;
 	END;
 	
 	ProfileBooster_rec := JOIN(inData, Seed_Files.Key_ProfileBooster, 
@@ -196,3 +211,4 @@ EXPORT TestSeed_Function(
 		create_output(LEFT,RIGHT), LEFT OUTER, ATMOST(100),KEEP(1));
 	RETURN ProfileBooster_rec;
 END;
+

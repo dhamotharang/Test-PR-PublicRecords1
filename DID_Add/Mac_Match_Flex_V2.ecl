@@ -1,4 +1,4 @@
-//MATCHSET should be set of char1's indicating matchfields
+﻿//MATCHSET should be set of char1's indicating matchfields
 /*
    matchset   -    should be set of char1's indicating the indicatives in infile
                           'A' = Address
@@ -504,7 +504,7 @@ EXPORT Mac_Match_Flex_V2
 		TRANSFORM({InsuranceHeader_xLink.Layout_Person_xLink, InsuranceHeader_xLink.DebugFields}, 		
 					SELF.uniqueid := left.temp_id,
 					#IF('S' in matchset or '4' in matchset)
-						SELF.ssn := left.ssn,							
+						SELF.ssn := left.ssn_field,
 					#ELSE
 						SELF.ssn := '',						
 					#END

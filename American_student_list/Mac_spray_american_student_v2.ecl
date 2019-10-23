@@ -1,4 +1,4 @@
-import American_student_list;
+﻿import American_student_list;
 
 export Mac_spray_american_student_v2(source_IP,source_path,filedate,file_name,group_name,clear_Super,retval) := 
 macro
@@ -14,7 +14,6 @@ macro
 #uniquename(CreateSuperFiles)
 
 
-#workunit('name','American Student List Spray');
 
 %sourceCsvSeparater% := '\\,';
 %sourceCsvTeminater% := '\\n';

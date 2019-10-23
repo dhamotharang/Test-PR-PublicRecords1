@@ -1,4 +1,4 @@
-EXPORT JapaneseNames := MODULE
+﻿EXPORT JapaneseNames := MODULE
 
 shared SET OF STRING20 JapaneseSurnames := [
 'ABE',                          
@@ -1107,7 +1107,7 @@ shared GivenNames := DATASET([
 {'ANA','N'},                    
 {'ANCI','G'},                   
 {'ANIKA','N'},                  
-{'ANIKÃ³','G'},                  
+{'ANIKó','G'},                  
 {'ANJU','G'},                   
 {'ANKA','G'},                   
 {'ANNA','N'},                   

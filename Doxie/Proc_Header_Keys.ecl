@@ -1,4 +1,4 @@
-import header,address,lssi,doxie_build,RoxieKeyBuild,business_risk,doxie_files,AddrFraud,aid_build,PromoteSupers;
+import header,address,lssi,doxie_build,RoxieKeyBuild,business_risk,doxie_files,AddrFraud,aid_build,PromoteSupers,InsuranceHeader_xLink;
 
 export Proc_Header_Keys(string filedate, boolean pFastHeader=false) := function
 
@@ -71,6 +71,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(doxie.Key_TUCH_dob,'~thor_data400::ke
 RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.Key_Did_Rid_Split,'~thor_data400::key::rid_did_split','~thor_data400::key::header::'+filedate+'::rid_did_split',rid_did_split);
 RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(header.key_addr_hist(), '~thor_data400::key::header::address_rank', '~thor_data400::key::header::'+filedate+'::address_rank',address_rank);
 RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(Header.Key_DMV_restricted(filedate), '~thor_data400::key::header::DMV_restricted', '~thor_data400::key::header::'+filedate+'::DMV_restricted',DMV_restricted);
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(InsuranceHeader_xLink.Key_InsuranceHeader_DID,'~thor_data400::key::insuranceheader_xlink::did','~thor_data400::key::insuranceheader_xlink::'+filedate+'::did',ins_did);
 
 //Move to Built
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::zip_did','~thor_data400::key::header::'+filedate+'::zip_did',mv_zip);
@@ -123,6 +124,7 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::header.TUCH_dob','~th
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::rid_did_split','~thor_data400::key::header::'+filedate+'::rid_did_split',mv_rid_did_split);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::header::address_rank','~thor_data400::key::header::'+filedate+'::address_rank',mv_address_rank);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::header::DMV_restricted','~thor_data400::key::header::'+filedate+'::DMV_restricted',mv_DMV_restricted);
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::insuranceheader_xlink::did','~thor_data400::key::insuranceheader_xlink::'+filedate+'::did',mv_ins_did);
 
 header_key_builds := sequential(
 														lookup_pre
@@ -168,6 +170,7 @@ header_key_builds := sequential(
 																,dob_name
 																,bld_percent
 																,addrrisk_geolink
+																,ins_did
 																)
 														,head_data
 														,address_payload
@@ -183,6 +186,7 @@ header_key_builds := sequential(
 														,rid_did_split
 														,address_rank
 														,DMV_restricted
+														,mv_ins_did
 														,parallel(
 																mv_rid
 																,mv_rid_srid_key

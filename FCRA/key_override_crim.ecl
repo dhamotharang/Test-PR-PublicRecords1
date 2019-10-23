@@ -1,4 +1,4 @@
-import corrections, data_services;
+﻿import corrections, data_services, ut, hygenics_crim;
 /*
 // existing overrides (in the layout different from regular keys)
 FCRA.Key_Override_Crim_Offender_FFID
@@ -23,14 +23,18 @@ export key_override_crim := MODULE
 	dailyds_offenders := dataset (daily_prefix + 'offenders', offenders_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_offenders, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_offenders,offender_persistent_id,replaceds);  
-  export offenders := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'offenders');
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::crim::qa::offenders
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, hygenics_crim.constants('').fields_to_clear_offenders);  
+  export offenders := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'offenders');
 	
 	//offenders plus --- override for doxie_files.key_offenders_offenderKey
   ds_offenders_plus := dataset (fname_prefix + 'offenders_plus', offenders_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
 	dailyds_offenders_plus := dataset (daily_prefix + 'offenders_plus', offenders_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_offenders_plus, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_offenders_plus,offender_persistent_id,replaceds);  
-  export offenders_plus := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'offenders_plus');
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::crim::qa::offenders_plus
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, hygenics_crim.constants('').fields_to_clear_offenders);  
+  export offenders_plus := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'offenders_plus');
 	
   // offenses
   offenses_rec := record
@@ -43,7 +47,9 @@ export key_override_crim := MODULE
 	dailyds_offenses := dataset (daily_prefix + 'offenses', offenses_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_offenses, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_offenses,offense_persistent_id,replaceds);  
-  export offenses := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'offenses');
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::crim::qa::offenses
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, hygenics_crim.constants('').fields_to_clear_offender_key);  
+  export offenses := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'offenses');
 
   //court_offenses
   court_offenses_rec := record
@@ -56,7 +62,9 @@ export key_override_crim := MODULE
   dailyds_court_offenses := dataset (daily_prefix + 'court_offenses', court_offenses_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_court_offenses, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_court_offenses,offense_persistent_id,replaceds);  
-  export court_offenses := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'courtoffenses');
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::crim::qa::courtoffenses
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, hygenics_crim.constants('').fields_to_clear_court_offenses + ',sent_date');
+  export court_offenses := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'courtoffenses');
 
   // punishment
   punishment_rec := record
@@ -69,7 +77,9 @@ export key_override_crim := MODULE
   dailyds_punishment := dataset (daily_prefix + 'punishment', punishment_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_punishment, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_punishment,punishment_persistent_id,replaceds); 
-  export punishment := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'punishment');
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::crim::qa::punishment
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, hygenics_crim.constants('').fields_to_clear_punishment_type);
+  export punishment := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'punishment');
 
   // activity
   activity_rec := record
@@ -82,7 +92,8 @@ export key_override_crim := MODULE
 	dailyds_activity := dataset (daily_prefix + 'activity', activity_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_activity, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_activity,activity_persistent_id,replaceds);
-  
-  export activity := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'activity');
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::crim::qa::activity
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, 'off_comp');  
+  export activity := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'activity');
 
 END;

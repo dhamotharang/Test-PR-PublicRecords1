@@ -1,4 +1,4 @@
-import bankruptcyv2, address, ut, data_services;
+﻿import bankruptcyv2, address, ut, data_services, BankruptcyV3;
 
 
 kfMain	 := dedup(sort(dataset('~thor_data400::base::override::fcra::qa::bankrupt_main',FCRA.layout_main_ffid_v3,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt),-flag_file_id),except flag_file_id,keep(1));
@@ -26,7 +26,8 @@ end;
 
 file_flat := project(file_in_sort, tmakefatrecord(left));
 
+// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::bankrupt_filing::qa::ffid_v3
+ut.MAC_CLEAR_FIELDS(file_flat, file_flat_cleared, BankruptcyV3.Constants().fields_to_clear.main_tmsid);
 
-
-export key_override_bkv3_main_ffid := index (file_flat, {flag_file_id}, {file_flat}, 
+export key_override_bkv3_main_ffid := index (file_flat_cleared, {flag_file_id}, {file_flat_cleared}, 
 data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::bankrupt_filing::qa::ffid_v3');

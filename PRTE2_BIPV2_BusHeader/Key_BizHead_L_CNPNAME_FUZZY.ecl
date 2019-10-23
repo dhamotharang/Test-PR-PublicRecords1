@@ -1,4 +1,4 @@
-﻿IMPORT BizLinkFull,SALT37,std;
+﻿IMPORT BizLinkFull,SALT311,std;
 EXPORT Key_BizHead_L_CNPNAME_FUZZY := MODULE
  
 //company_name_prefix:?:cnp_name:zip:city:st:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag
@@ -7,10 +7,11 @@ SHARED h := CandidatesForKey;//The input file - distributed by proxid
 layout := RECORD // project out required fields
 // Compulsory fields
   h.company_name_prefix;
+	h.fallback_value; // Populate the fallback field
 // Optional fields
   h.zip;
   h.st;
-  h.fallback_value; // Populate the fallback field
+ // h.fallback_value; // Populate the fallback field
   h.ultid; // Parent #3
   h.orgid; // Parent #2
   h.seleid; // Parent #1
@@ -35,15 +36,16 @@ layout := RECORD // project out required fields
   h.city_len;
   h.prim_range_len;
   h.sec_range_len;
+	h.EFR_BMap;
 //Scores for various field components
   h.company_name_prefix_weight100 ; // Contains 100x the specificity
   h.cnp_name_weight100 ; // Contains 100x the specificity
   h.cnp_name_initial_char_weight100 ; // Contains 100x the specificity
   h.zip_weight100 ; // Contains 100x the specificity
   h.city_weight100 ; // Contains 100x the specificity
-  INTEGER2 city_p_Weight100 := SALT37.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_p_cnt)/log(2)); // Precompute phonetic specificity
-  INTEGER2 city_e2_Weight100 := SALT37.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2_cnt)/log(2)); // Precompute edit-distance specificity
-  INTEGER2 city_e2p_Weight100 := SALT37.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2p_cnt)/log(2)); // Precompute phonetic & edit_distance specificity
+  INTEGER2 city_p_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_p_cnt)/log(2)); // Precompute phonetic specificity
+  INTEGER2 city_e2_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2_cnt)/log(2)); // Precompute edit-distance specificity
+  INTEGER2 city_e2p_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2p_cnt)/log(2)); // Precompute phonetic & edit_distance specificity
   h.st_weight100 ; // Contains 100x the specificity
   h.company_sic_code1_weight100 ; // Contains 100x the specificity
   h.cnp_number_weight100 ; // Contains 100x the specificity
@@ -100,14 +102,14 @@ EXPORT BuildAll := BUILDINDEX(Key, OVERWRITE);
   CntRed_org_flag := (KeyCnt-COUNT(Rem_org_flag))/KeyCnt;
   Rem_ult_flag := GROUP( DEDUP( SORT( Grpd, EXCEPT ult_flag), EXCEPT ult_flag));
   CntRed_ult_flag := (KeyCnt-COUNT(Rem_ult_flag))/KeyCnt;
-EXPORT Shrinkage := DATASET([{'L_CNPNAME_FUZZY','company_sic_code1',CntRed_company_sic_code1*100,CntRed_company_sic_code1*TSize},{'L_CNPNAME_FUZZY','cnp_number',CntRed_cnp_number*100,CntRed_cnp_number*TSize},{'L_CNPNAME_FUZZY','cnp_btype',CntRed_cnp_btype*100,CntRed_cnp_btype*TSize},{'L_CNPNAME_FUZZY','cnp_lowv',CntRed_cnp_lowv*100,CntRed_cnp_lowv*TSize},{'L_CNPNAME_FUZZY','prim_range',CntRed_prim_range*100,CntRed_prim_range*TSize},{'L_CNPNAME_FUZZY','sec_range',CntRed_sec_range*100,CntRed_sec_range*TSize},{'L_CNPNAME_FUZZY','parent_proxid',CntRed_parent_proxid*100,CntRed_parent_proxid*TSize},{'L_CNPNAME_FUZZY','sele_proxid',CntRed_sele_proxid*100,CntRed_sele_proxid*TSize},{'L_CNPNAME_FUZZY','org_proxid',CntRed_org_proxid*100,CntRed_org_proxid*TSize},{'L_CNPNAME_FUZZY','ultimate_proxid',CntRed_ultimate_proxid*100,CntRed_ultimate_proxid*TSize},{'L_CNPNAME_FUZZY','sele_flag',CntRed_sele_flag*100,CntRed_sele_flag*TSize},{'L_CNPNAME_FUZZY','org_flag',CntRed_org_flag*100,CntRed_org_flag*TSize},{'L_CNPNAME_FUZZY','ult_flag',CntRed_ult_flag*100,CntRed_ult_flag*TSize}],SALT37.ShrinkLayout);
-EXPORT CanSearch(PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.InputLayout le) := le.company_name_prefix <> (TYPEOF(le.company_name_prefix))'' AND BizLinkFull.Fields.InValid_company_name_prefix((SALT37.StrType)le.company_name_prefix)=0;
+EXPORT Shrinkage := DATASET([{'L_CNPNAME_FUZZY','company_sic_code1',CntRed_company_sic_code1*100,CntRed_company_sic_code1*TSize},{'L_CNPNAME_FUZZY','cnp_number',CntRed_cnp_number*100,CntRed_cnp_number*TSize},{'L_CNPNAME_FUZZY','cnp_btype',CntRed_cnp_btype*100,CntRed_cnp_btype*TSize},{'L_CNPNAME_FUZZY','cnp_lowv',CntRed_cnp_lowv*100,CntRed_cnp_lowv*TSize},{'L_CNPNAME_FUZZY','prim_range',CntRed_prim_range*100,CntRed_prim_range*TSize},{'L_CNPNAME_FUZZY','sec_range',CntRed_sec_range*100,CntRed_sec_range*TSize},{'L_CNPNAME_FUZZY','parent_proxid',CntRed_parent_proxid*100,CntRed_parent_proxid*TSize},{'L_CNPNAME_FUZZY','sele_proxid',CntRed_sele_proxid*100,CntRed_sele_proxid*TSize},{'L_CNPNAME_FUZZY','org_proxid',CntRed_org_proxid*100,CntRed_org_proxid*TSize},{'L_CNPNAME_FUZZY','ultimate_proxid',CntRed_ultimate_proxid*100,CntRed_ultimate_proxid*TSize},{'L_CNPNAME_FUZZY','sele_flag',CntRed_sele_flag*100,CntRed_sele_flag*TSize},{'L_CNPNAME_FUZZY','org_flag',CntRed_org_flag*100,CntRed_org_flag*TSize},{'L_CNPNAME_FUZZY','ult_flag',CntRed_ult_flag*100,CntRed_ult_flag*TSize}],SALT311.ShrinkLayout);
+EXPORT CanSearch(PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.InputLayout le) := le.company_name_prefix <> (TYPEOF(le.company_name_prefix))'' AND BizLinkFull.Fields.InValid_company_name_prefix((SALT311.StrType)le.company_name_prefix)=0;
 KeyRec := RECORDOF(Key);
  
 EXPORT RawFetch_server(TYPEOF(h.company_name_prefix) param_company_name_prefix = (TYPEOF(h.company_name_prefix))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
     STEPPED( LIMIT( Key(
           KEYED(( company_name_prefix = param_company_name_prefix AND param_company_name_prefix <> (TYPEOF(company_name_prefix))''))
-      AND ( cnp_name = (TYPEOF(cnp_name))'' OR param_cnp_name = (TYPEOF(cnp_name))'' OR SALT37.MatchBagOfWords(cnp_name,param_cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100)
+      AND ( cnp_name = (TYPEOF(cnp_name))'' OR param_cnp_name = (TYPEOF(cnp_name))'' OR SALT311.MatchBagOfWords(cnp_name,param_cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100)
       AND KEYED(( zip IN SET(param_zip,zip) OR ~EXISTS(param_zip) OR zip = (TYPEOF(zip))''))
       AND ( city = (TYPEOF(city))'' OR param_city = (TYPEOF(city))'' OR metaphonelib.DMetaPhone1(city)=metaphonelib.DMetaPhone1(param_city) OR BizLinkFull.Config_BIP.WithinEditN(city,city_len,param_city,param_city_len,2, 0) )
       AND KEYED(( st = (TYPEOF(st))'' OR param_st = (TYPEOF(st))'' OR st = param_st ))
@@ -118,7 +120,7 @@ EXPORT RawFetch(TYPEOF(h.company_name_prefix) param_company_name_prefix = (TYPEO
   RawData0 := RawFetch_server(param_company_name_prefix,param_cnp_name,param_zip,param_city,param_city_len,param_st,0);
   RawData1 := RawFetch_server(param_company_name_prefix,param_cnp_name,param_zip,param_city,param_city_len,param_st,1);
   RawData2 := RawFetch_server(param_company_name_prefix,param_cnp_name,param_zip,param_city,param_city_len,param_st,2);
-  Returnable(DATASET(RECORDOF(RawData0)) d) := COUNT(NOFOLD(d))<>1 OR EXISTS(NOFOLD(d((SALT37.StrType)company_name_prefix != '')));
+  Returnable(DATASET(RECORDOF(RawData0)) d) := COUNT(NOFOLD(d))<>1 OR EXISTS(NOFOLD(d((SALT311.StrType)company_name_prefix != '')));
   res := MAP (
       param_fallback_value <= 0 AND Returnable(RawData0) => RawData0,
       param_fallback_value <= 1 AND Returnable(RawData1) => RawData1,
@@ -138,22 +140,23 @@ EXPORT ScoredproxidFetch(TYPEOF(h.company_name_prefix) param_company_name_prefix
           le.company_name_prefix = (TYPEOF(le.company_name_prefix))'' OR param_company_name_prefix = (TYPEOF(le.company_name_prefix))'' => 0,
           -0.915*le.company_name_prefix_weight100))/100*0.10; 
     SELF.cnp_name_match_code := MAP(
-           le.cnp_name = (TYPEOF(le.cnp_name))'' OR param_cnp_name = (TYPEOF(param_cnp_name))'' => SALT37.MatchCode.OneSideNull,
+           le.cnp_name = (TYPEOF(le.cnp_name))'' OR param_cnp_name = (TYPEOF(param_cnp_name))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_name(le.cnp_name,param_cnp_name,FALSE));
     SELF.cnp_nameWeight := (50+MAP (
            le.cnp_name = (TYPEOF(le.cnp_name))'' OR param_cnp_name = (TYPEOF(param_cnp_name))'' => 0,
            le.cnp_name = param_cnp_name  => le.cnp_name_weight100,
-           SALT37.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)))/100; 
+           SALT311.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)))/100; 
     SELF.zip_match_code := MAP(
-le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,param_zip,FALSE));
+le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT311.MatchCode.OneSideNull,
+         //  BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,param_zip,FALSE));
+					   BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            EXISTS(param_zip(le.zip=zip)) => /*HACK16  le.zip_weight100 */ 1100 * param_zip(zip=le.zip)[1].weight/100.0,
           le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => 0,
           -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.layout_zip_cases);
     SELF.city_match_code := MAP(
-           le.city = (TYPEOF(le.city))'' OR param_city = (TYPEOF(param_city))'' => SALT37.MatchCode.OneSideNull,
+           le.city = (TYPEOF(le.city))'' OR param_city = (TYPEOF(param_city))'' => SALT311.MatchCode.OneSideNull,
            le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' OR le.st <> param_st => 0, // Only valid if the context variable is equal
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_city(le.city,param_city,le.city_len,param_city_len,FALSE));
     SELF.cityWeight := (50+MAP (
@@ -164,42 +167,42 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT37.MatchCode.OneSideNul
            metaphonelib.DMetaPhone1(le.city)=metaphonelib.DMetaPhone1(param_city)  =>le.city_p_weight100,
            -0.947*le.city_weight100))/100; 
     SELF.st_match_code := MAP(
-           le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' => SALT37.MatchCode.OneSideNull,
+           le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_st(le.st,param_st,FALSE));
     SELF.stWeight := (50+MAP (
            le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' => 0,
            le.st = param_st  => le.st_weight100,
            -1.000*le.st_weight100))/100; 
     SELF.company_sic_code1_match_code := MAP(
-           le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR param_company_sic_code1 = (TYPEOF(param_company_sic_code1))'' => SALT37.MatchCode.OneSideNull,
+           le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR param_company_sic_code1 = (TYPEOF(param_company_sic_code1))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_company_sic_code1(le.company_sic_code1,param_company_sic_code1,FALSE));
     SELF.company_sic_code1Weight := (50+MAP (
            le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR param_company_sic_code1 = (TYPEOF(param_company_sic_code1))'' => 0,
            le.company_sic_code1 = param_company_sic_code1  => le.company_sic_code1_weight100,
            -0.727*le.company_sic_code1_weight100))/100; 
     SELF.cnp_number_match_code := MAP(
-           le.cnp_number = (TYPEOF(le.cnp_number))'' OR param_cnp_number = (TYPEOF(param_cnp_number))'' => SALT37.MatchCode.OneSideNull,
+           le.cnp_number = (TYPEOF(le.cnp_number))'' OR param_cnp_number = (TYPEOF(param_cnp_number))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_number(le.cnp_number,param_cnp_number,FALSE));
     SELF.cnp_numberWeight := (50+MAP (
            le.cnp_number = (TYPEOF(le.cnp_number))'' OR param_cnp_number = (TYPEOF(param_cnp_number))'' => 0,
            le.cnp_number = param_cnp_number  => le.cnp_number_weight100,
            -0.996*le.cnp_number_weight100))/100; 
     SELF.cnp_btype_match_code := MAP(
-           le.cnp_btype = (TYPEOF(le.cnp_btype))'' OR param_cnp_btype = (TYPEOF(param_cnp_btype))'' => SALT37.MatchCode.OneSideNull,
+           le.cnp_btype = (TYPEOF(le.cnp_btype))'' OR param_cnp_btype = (TYPEOF(param_cnp_btype))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_btype(le.cnp_btype,param_cnp_btype,FALSE));
     SELF.cnp_btypeWeight := (50+MAP (
            le.cnp_btype = (TYPEOF(le.cnp_btype))'' OR param_cnp_btype = (TYPEOF(param_cnp_btype))'' => 0,
            le.cnp_btype = param_cnp_btype  => le.cnp_btype_weight100,
            -0.958*le.cnp_btype_weight100))/100; 
     SELF.cnp_lowv_match_code := MAP(
-           le.cnp_lowv = (TYPEOF(le.cnp_lowv))'' OR param_cnp_lowv = (TYPEOF(param_cnp_lowv))'' => SALT37.MatchCode.OneSideNull,
+           le.cnp_lowv = (TYPEOF(le.cnp_lowv))'' OR param_cnp_lowv = (TYPEOF(param_cnp_lowv))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_lowv(le.cnp_lowv,param_cnp_lowv,FALSE));
     SELF.cnp_lowvWeight := (50+MAP (
            le.cnp_lowv = (TYPEOF(le.cnp_lowv))'' OR param_cnp_lowv = (TYPEOF(param_cnp_lowv))'' => 0,
            le.cnp_lowv = param_cnp_lowv  => le.cnp_lowv_weight100,
            -0.962*le.cnp_lowv_weight100))/100; 
     SELF.prim_range_match_code := MAP(
-           le.prim_range = (TYPEOF(le.prim_range))'' OR param_prim_range = (TYPEOF(param_prim_range))'' => SALT37.MatchCode.OneSideNull,
+           le.prim_range = (TYPEOF(le.prim_range))'' OR param_prim_range = (TYPEOF(param_prim_range))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_prim_range(le.prim_range,param_prim_range,le.prim_range_len,param_prim_range_len,FALSE));
     SELF.prim_rangeWeight := (50+MAP (
            le.prim_range = (TYPEOF(le.prim_range))'' OR param_prim_range = (TYPEOF(param_prim_range))'' => 0,
@@ -207,7 +210,7 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT37.MatchCode.OneSideNul
            BizLinkFull.Config_BIP.WithinEditN(le.prim_range,le.prim_range_len,param_prim_range,param_prim_range_len,1, 0)  =>le.prim_range_e1_weight100,
            -1.000*le.prim_range_weight100))/100; 
     SELF.sec_range_match_code := MAP(
-           le.sec_range = (TYPEOF(le.sec_range))'' OR param_sec_range = (TYPEOF(param_sec_range))'' => SALT37.MatchCode.OneSideNull,
+           le.sec_range = (TYPEOF(le.sec_range))'' OR param_sec_range = (TYPEOF(param_sec_range))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sec_range(le.sec_range,param_sec_range,le.sec_range_len,param_sec_range_len,FALSE));
     SELF.sec_rangeWeight := (50+MAP (
            le.sec_range = (TYPEOF(le.sec_range))'' OR param_sec_range = (TYPEOF(param_sec_range))'' => 0,
@@ -215,49 +218,49 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT37.MatchCode.OneSideNul
            BizLinkFull.Config_BIP.WithinEditN(le.sec_range,le.sec_range_len,param_sec_range,param_sec_range_len,1, 0)  =>le.sec_range_e1_weight100,
            -0.888*le.sec_range_weight100))/100; 
     SELF.parent_proxid_match_code := MAP(
-           le.parent_proxid = (TYPEOF(le.parent_proxid))'' OR param_parent_proxid = (TYPEOF(param_parent_proxid))'' => SALT37.MatchCode.OneSideNull,
+           le.parent_proxid = (TYPEOF(le.parent_proxid))'' OR param_parent_proxid = (TYPEOF(param_parent_proxid))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_parent_proxid(le.parent_proxid,param_parent_proxid,FALSE));
     SELF.parent_proxidWeight := (50+MAP (
            le.parent_proxid = (TYPEOF(le.parent_proxid))'' OR param_parent_proxid = (TYPEOF(param_parent_proxid))'' => 0,
            le.parent_proxid = param_parent_proxid  => le.parent_proxid_weight100,
            -1.000*le.parent_proxid_weight100))/100*0.00; 
     SELF.sele_proxid_match_code := MAP(
-           le.sele_proxid = (TYPEOF(le.sele_proxid))'' OR param_sele_proxid = (TYPEOF(param_sele_proxid))'' => SALT37.MatchCode.OneSideNull,
+           le.sele_proxid = (TYPEOF(le.sele_proxid))'' OR param_sele_proxid = (TYPEOF(param_sele_proxid))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sele_proxid(le.sele_proxid,param_sele_proxid,FALSE));
     SELF.sele_proxidWeight := (50+MAP (
            le.sele_proxid = (TYPEOF(le.sele_proxid))'' OR param_sele_proxid = (TYPEOF(param_sele_proxid))'' => 0,
            le.sele_proxid = param_sele_proxid  => le.sele_proxid_weight100,
            -1.000*le.sele_proxid_weight100))/100*0.00; 
     SELF.org_proxid_match_code := MAP(
-           le.org_proxid = (TYPEOF(le.org_proxid))'' OR param_org_proxid = (TYPEOF(param_org_proxid))'' => SALT37.MatchCode.OneSideNull,
+           le.org_proxid = (TYPEOF(le.org_proxid))'' OR param_org_proxid = (TYPEOF(param_org_proxid))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_org_proxid(le.org_proxid,param_org_proxid,FALSE));
     SELF.org_proxidWeight := (50+MAP (
            le.org_proxid = (TYPEOF(le.org_proxid))'' OR param_org_proxid = (TYPEOF(param_org_proxid))'' => 0,
            le.org_proxid = param_org_proxid  => le.org_proxid_weight100,
            -1.000*le.org_proxid_weight100))/100*0.00; 
     SELF.ultimate_proxid_match_code := MAP(
-           le.ultimate_proxid = (TYPEOF(le.ultimate_proxid))'' OR param_ultimate_proxid = (TYPEOF(param_ultimate_proxid))'' => SALT37.MatchCode.OneSideNull,
+           le.ultimate_proxid = (TYPEOF(le.ultimate_proxid))'' OR param_ultimate_proxid = (TYPEOF(param_ultimate_proxid))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_ultimate_proxid(le.ultimate_proxid,param_ultimate_proxid,FALSE));
     SELF.ultimate_proxidWeight := (50+MAP (
            le.ultimate_proxid = (TYPEOF(le.ultimate_proxid))'' OR param_ultimate_proxid = (TYPEOF(param_ultimate_proxid))'' => 0,
            le.ultimate_proxid = param_ultimate_proxid  => le.ultimate_proxid_weight100,
            -1.000*le.ultimate_proxid_weight100))/100*0.00; 
     SELF.sele_flag_match_code := MAP(
-           le.sele_flag = (TYPEOF(le.sele_flag))'' OR param_sele_flag = (TYPEOF(param_sele_flag))'' => SALT37.MatchCode.OneSideNull,
+           le.sele_flag = (TYPEOF(le.sele_flag))'' OR param_sele_flag = (TYPEOF(param_sele_flag))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sele_flag(le.sele_flag,param_sele_flag,FALSE));
     SELF.sele_flagWeight := (50+MAP (
            le.sele_flag = (TYPEOF(le.sele_flag))'' OR param_sele_flag = (TYPEOF(param_sele_flag))'' => 0,
            le.sele_flag = param_sele_flag  => le.sele_flag_weight100,
            -1.000*le.sele_flag_weight100))/100*0.00; 
     SELF.org_flag_match_code := MAP(
-           le.org_flag = (TYPEOF(le.org_flag))'' OR param_org_flag = (TYPEOF(param_org_flag))'' => SALT37.MatchCode.OneSideNull,
+           le.org_flag = (TYPEOF(le.org_flag))'' OR param_org_flag = (TYPEOF(param_org_flag))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_org_flag(le.org_flag,param_org_flag,FALSE));
     SELF.org_flagWeight := (50+MAP (
            le.org_flag = (TYPEOF(le.org_flag))'' OR param_org_flag = (TYPEOF(param_org_flag))'' => 0,
            le.org_flag = param_org_flag  => le.org_flag_weight100,
            -1.000*le.org_flag_weight100))/100*0.00; 
     SELF.ult_flag_match_code := MAP(
-           le.ult_flag = (TYPEOF(le.ult_flag))'' OR param_ult_flag = (TYPEOF(param_ult_flag))'' => SALT37.MatchCode.OneSideNull,
+           le.ult_flag = (TYPEOF(le.ult_flag))'' OR param_ult_flag = (TYPEOF(param_ult_flag))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_ult_flag(le.ult_flag,param_ult_flag,FALSE));
     SELF.ult_flagWeight := (50+MAP (
            le.ult_flag = (TYPEOF(le.ult_flag))'' OR param_ult_flag = (TYPEOF(param_ult_flag))'' => 0,
@@ -275,7 +278,7 @@ END;
 //Now code for the Thor batch version of the computation
 // First the 'clean' functional interface
 EXPORT InputLayout_Batch := RECORD
-  SALT37.UIDType Reference;//How to recognize this record in the subsequent
+  SALT311.UIDType Reference;//How to recognize this record in the subsequent
   TYPEOF(h.company_name_prefix) company_name_prefix := (TYPEOF(h.company_name_prefix))'';
   TYPEOF(h.cnp_name) cnp_name := (TYPEOF(h.cnp_name))'';
   DATASET(PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.layout_zip_cases) zip_cases := DATASET([],PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.layout_zip_cases);
@@ -310,22 +313,22 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
           le.company_name_prefix = (TYPEOF(le.company_name_prefix))'' OR ri.company_name_prefix = (TYPEOF(le.company_name_prefix))'' => 0,
           -0.915*le.company_name_prefix_weight100))/100*0.10; 
     SELF.cnp_name_match_code := MAP(
-           le.cnp_name = (TYPEOF(le.cnp_name))'' OR ri.cnp_name = (TYPEOF(ri.cnp_name))'' => SALT37.MatchCode.OneSideNull,
+           le.cnp_name = (TYPEOF(le.cnp_name))'' OR ri.cnp_name = (TYPEOF(ri.cnp_name))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_name(le.cnp_name,ri.cnp_name,FALSE));
     SELF.cnp_nameWeight := (50+MAP (
            le.cnp_name = (TYPEOF(le.cnp_name))'' OR ri.cnp_name = (TYPEOF(ri.cnp_name))'' => 0,
            le.cnp_name = ri.cnp_name  => le.cnp_name_weight100,
-           SALT37.MatchBagOfWords(le.cnp_name,ri.cnp_name,3177747,1)))/100; 
+           SALT311.MatchBagOfWords(le.cnp_name,ri.cnp_name,3177747,1)))/100; 
     SELF.zip_match_code := MAP(
-le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,ri.zip_cases,FALSE));
+le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT311.MatchCode.OneSideNull,
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,SET(ri.zip_cases,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            EXISTS(ri.zip_cases(le.zip=zip)) => le.zip_weight100 * ri.zip_cases(zip=le.zip)[1].weight/100.0,
           le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => 0,
           -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.layout_zip_cases);
     SELF.city_match_code := MAP(
-           le.city = (TYPEOF(le.city))'' OR ri.city = (TYPEOF(ri.city))'' => SALT37.MatchCode.OneSideNull,
+           le.city = (TYPEOF(le.city))'' OR ri.city = (TYPEOF(ri.city))'' => SALT311.MatchCode.OneSideNull,
            le.st = (TYPEOF(le.st))'' OR ri.st = (TYPEOF(ri.st))'' OR le.st <> ri.st => 0, // Only valid if the context variable is equal
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_city(le.city,ri.city,le.city_len,ri.city_len,FALSE));
     SELF.cityWeight := (50+MAP (
@@ -336,42 +339,42 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSide
            metaphonelib.DMetaPhone1(le.city)=metaphonelib.DMetaPhone1(ri.city)  =>le.city_p_weight100,
            -0.947*le.city_weight100))/100; 
     SELF.st_match_code := MAP(
-           le.st = (TYPEOF(le.st))'' OR ri.st = (TYPEOF(ri.st))'' => SALT37.MatchCode.OneSideNull,
+           le.st = (TYPEOF(le.st))'' OR ri.st = (TYPEOF(ri.st))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_st(le.st,ri.st,FALSE));
     SELF.stWeight := (50+MAP (
            le.st = (TYPEOF(le.st))'' OR ri.st = (TYPEOF(ri.st))'' => 0,
            le.st = ri.st  => le.st_weight100,
            -1.000*le.st_weight100))/100; 
     SELF.company_sic_code1_match_code := MAP(
-           le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR ri.company_sic_code1 = (TYPEOF(ri.company_sic_code1))'' => SALT37.MatchCode.OneSideNull,
+           le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR ri.company_sic_code1 = (TYPEOF(ri.company_sic_code1))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_company_sic_code1(le.company_sic_code1,ri.company_sic_code1,FALSE));
     SELF.company_sic_code1Weight := (50+MAP (
            le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR ri.company_sic_code1 = (TYPEOF(ri.company_sic_code1))'' => 0,
            le.company_sic_code1 = ri.company_sic_code1  => le.company_sic_code1_weight100,
            -0.727*le.company_sic_code1_weight100))/100; 
     SELF.cnp_number_match_code := MAP(
-           le.cnp_number = (TYPEOF(le.cnp_number))'' OR ri.cnp_number = (TYPEOF(ri.cnp_number))'' => SALT37.MatchCode.OneSideNull,
+           le.cnp_number = (TYPEOF(le.cnp_number))'' OR ri.cnp_number = (TYPEOF(ri.cnp_number))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_number(le.cnp_number,ri.cnp_number,FALSE));
     SELF.cnp_numberWeight := (50+MAP (
            le.cnp_number = (TYPEOF(le.cnp_number))'' OR ri.cnp_number = (TYPEOF(ri.cnp_number))'' => 0,
            le.cnp_number = ri.cnp_number  => le.cnp_number_weight100,
            -0.996*le.cnp_number_weight100))/100; 
     SELF.cnp_btype_match_code := MAP(
-           le.cnp_btype = (TYPEOF(le.cnp_btype))'' OR ri.cnp_btype = (TYPEOF(ri.cnp_btype))'' => SALT37.MatchCode.OneSideNull,
+           le.cnp_btype = (TYPEOF(le.cnp_btype))'' OR ri.cnp_btype = (TYPEOF(ri.cnp_btype))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_btype(le.cnp_btype,ri.cnp_btype,FALSE));
     SELF.cnp_btypeWeight := (50+MAP (
            le.cnp_btype = (TYPEOF(le.cnp_btype))'' OR ri.cnp_btype = (TYPEOF(ri.cnp_btype))'' => 0,
            le.cnp_btype = ri.cnp_btype  => le.cnp_btype_weight100,
            -0.958*le.cnp_btype_weight100))/100; 
     SELF.cnp_lowv_match_code := MAP(
-           le.cnp_lowv = (TYPEOF(le.cnp_lowv))'' OR ri.cnp_lowv = (TYPEOF(ri.cnp_lowv))'' => SALT37.MatchCode.OneSideNull,
+           le.cnp_lowv = (TYPEOF(le.cnp_lowv))'' OR ri.cnp_lowv = (TYPEOF(ri.cnp_lowv))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_lowv(le.cnp_lowv,ri.cnp_lowv,FALSE));
     SELF.cnp_lowvWeight := (50+MAP (
            le.cnp_lowv = (TYPEOF(le.cnp_lowv))'' OR ri.cnp_lowv = (TYPEOF(ri.cnp_lowv))'' => 0,
            le.cnp_lowv = ri.cnp_lowv  => le.cnp_lowv_weight100,
            -0.962*le.cnp_lowv_weight100))/100; 
     SELF.prim_range_match_code := MAP(
-           le.prim_range = (TYPEOF(le.prim_range))'' OR ri.prim_range = (TYPEOF(ri.prim_range))'' => SALT37.MatchCode.OneSideNull,
+           le.prim_range = (TYPEOF(le.prim_range))'' OR ri.prim_range = (TYPEOF(ri.prim_range))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_prim_range(le.prim_range,ri.prim_range,le.prim_range_len,ri.prim_range_len,FALSE));
     SELF.prim_rangeWeight := (50+MAP (
            le.prim_range = (TYPEOF(le.prim_range))'' OR ri.prim_range = (TYPEOF(ri.prim_range))'' => 0,
@@ -379,7 +382,7 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSide
            BizLinkFull.Config_BIP.WithinEditN(le.prim_range,le.prim_range_len,ri.prim_range,ri.prim_range_len,1, 0)  =>le.prim_range_e1_weight100,
            -1.000*le.prim_range_weight100))/100; 
     SELF.sec_range_match_code := MAP(
-           le.sec_range = (TYPEOF(le.sec_range))'' OR ri.sec_range = (TYPEOF(ri.sec_range))'' => SALT37.MatchCode.OneSideNull,
+           le.sec_range = (TYPEOF(le.sec_range))'' OR ri.sec_range = (TYPEOF(ri.sec_range))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sec_range(le.sec_range,ri.sec_range,le.sec_range_len,ri.sec_range_len,FALSE));
     SELF.sec_rangeWeight := (50+MAP (
            le.sec_range = (TYPEOF(le.sec_range))'' OR ri.sec_range = (TYPEOF(ri.sec_range))'' => 0,
@@ -387,49 +390,49 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSide
            BizLinkFull.Config_BIP.WithinEditN(le.sec_range,le.sec_range_len,ri.sec_range,ri.sec_range_len,1, 0)  =>le.sec_range_e1_weight100,
            -0.888*le.sec_range_weight100))/100; 
     SELF.parent_proxid_match_code := MAP(
-           le.parent_proxid = (TYPEOF(le.parent_proxid))'' OR ri.parent_proxid = (TYPEOF(ri.parent_proxid))'' => SALT37.MatchCode.OneSideNull,
+           le.parent_proxid = (TYPEOF(le.parent_proxid))'' OR ri.parent_proxid = (TYPEOF(ri.parent_proxid))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_parent_proxid(le.parent_proxid,ri.parent_proxid,FALSE));
     SELF.parent_proxidWeight := (50+MAP (
            le.parent_proxid = (TYPEOF(le.parent_proxid))'' OR ri.parent_proxid = (TYPEOF(ri.parent_proxid))'' => 0,
            le.parent_proxid = ri.parent_proxid  => le.parent_proxid_weight100,
            -1.000*le.parent_proxid_weight100))/100*0.00; 
     SELF.sele_proxid_match_code := MAP(
-           le.sele_proxid = (TYPEOF(le.sele_proxid))'' OR ri.sele_proxid = (TYPEOF(ri.sele_proxid))'' => SALT37.MatchCode.OneSideNull,
+           le.sele_proxid = (TYPEOF(le.sele_proxid))'' OR ri.sele_proxid = (TYPEOF(ri.sele_proxid))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sele_proxid(le.sele_proxid,ri.sele_proxid,FALSE));
     SELF.sele_proxidWeight := (50+MAP (
            le.sele_proxid = (TYPEOF(le.sele_proxid))'' OR ri.sele_proxid = (TYPEOF(ri.sele_proxid))'' => 0,
            le.sele_proxid = ri.sele_proxid  => le.sele_proxid_weight100,
            -1.000*le.sele_proxid_weight100))/100*0.00; 
     SELF.org_proxid_match_code := MAP(
-           le.org_proxid = (TYPEOF(le.org_proxid))'' OR ri.org_proxid = (TYPEOF(ri.org_proxid))'' => SALT37.MatchCode.OneSideNull,
+           le.org_proxid = (TYPEOF(le.org_proxid))'' OR ri.org_proxid = (TYPEOF(ri.org_proxid))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_org_proxid(le.org_proxid,ri.org_proxid,FALSE));
     SELF.org_proxidWeight := (50+MAP (
            le.org_proxid = (TYPEOF(le.org_proxid))'' OR ri.org_proxid = (TYPEOF(ri.org_proxid))'' => 0,
            le.org_proxid = ri.org_proxid  => le.org_proxid_weight100,
            -1.000*le.org_proxid_weight100))/100*0.00; 
     SELF.ultimate_proxid_match_code := MAP(
-           le.ultimate_proxid = (TYPEOF(le.ultimate_proxid))'' OR ri.ultimate_proxid = (TYPEOF(ri.ultimate_proxid))'' => SALT37.MatchCode.OneSideNull,
+           le.ultimate_proxid = (TYPEOF(le.ultimate_proxid))'' OR ri.ultimate_proxid = (TYPEOF(ri.ultimate_proxid))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_ultimate_proxid(le.ultimate_proxid,ri.ultimate_proxid,FALSE));
     SELF.ultimate_proxidWeight := (50+MAP (
            le.ultimate_proxid = (TYPEOF(le.ultimate_proxid))'' OR ri.ultimate_proxid = (TYPEOF(ri.ultimate_proxid))'' => 0,
            le.ultimate_proxid = ri.ultimate_proxid  => le.ultimate_proxid_weight100,
            -1.000*le.ultimate_proxid_weight100))/100*0.00; 
     SELF.sele_flag_match_code := MAP(
-           le.sele_flag = (TYPEOF(le.sele_flag))'' OR ri.sele_flag = (TYPEOF(ri.sele_flag))'' => SALT37.MatchCode.OneSideNull,
+           le.sele_flag = (TYPEOF(le.sele_flag))'' OR ri.sele_flag = (TYPEOF(ri.sele_flag))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sele_flag(le.sele_flag,ri.sele_flag,FALSE));
     SELF.sele_flagWeight := (50+MAP (
            le.sele_flag = (TYPEOF(le.sele_flag))'' OR ri.sele_flag = (TYPEOF(ri.sele_flag))'' => 0,
            le.sele_flag = ri.sele_flag  => le.sele_flag_weight100,
            -1.000*le.sele_flag_weight100))/100*0.00; 
     SELF.org_flag_match_code := MAP(
-           le.org_flag = (TYPEOF(le.org_flag))'' OR ri.org_flag = (TYPEOF(ri.org_flag))'' => SALT37.MatchCode.OneSideNull,
+           le.org_flag = (TYPEOF(le.org_flag))'' OR ri.org_flag = (TYPEOF(ri.org_flag))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_org_flag(le.org_flag,ri.org_flag,FALSE));
     SELF.org_flagWeight := (50+MAP (
            le.org_flag = (TYPEOF(le.org_flag))'' OR ri.org_flag = (TYPEOF(ri.org_flag))'' => 0,
            le.org_flag = ri.org_flag  => le.org_flag_weight100,
            -1.000*le.org_flag_weight100))/100*0.00; 
     SELF.ult_flag_match_code := MAP(
-           le.ult_flag = (TYPEOF(le.ult_flag))'' OR ri.ult_flag = (TYPEOF(ri.ult_flag))'' => SALT37.MatchCode.OneSideNull,
+           le.ult_flag = (TYPEOF(le.ult_flag))'' OR ri.ult_flag = (TYPEOF(ri.ult_flag))'' => SALT311.MatchCode.OneSideNull,
            BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_ult_flag(le.ult_flag,ri.ult_flag,FALSE));
     SELF.ult_flagWeight := (50+MAP (
            le.ult_flag = (TYPEOF(le.ult_flag))'' OR ri.ult_flag = (TYPEOF(ri.ult_flag))'' => 0,
@@ -439,15 +442,15 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSide
     SELF := le;
   END;
   Recs0 := Recs(company_name_prefix <> (TYPEOF(company_name_prefix))'');
-  SALT37.MAC_Dups_Note(Recs0,InputLayout_Batch,Recs1,outdups,Reference,BizLinkFull.Config_BIP.meow_dedup) // Whilst duplicates have been removed for the whole input; there may still be dups on a per linkpath basis
+  SALT311.MAC_Dups_Note(Recs0,InputLayout_Batch,Recs1,outdups,Reference,BizLinkFull.Config_BIP.meow_dedup) // Whilst duplicates have been removed for the whole input; there may still be dups on a per linkpath basis
   J0 := JOIN(Recs1,Key,LEFT.company_name_prefix = RIGHT.company_name_prefix
-     AND ( LEFT.cnp_name = (TYPEOF(LEFT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR SALT37.MatchBagOfWords(LEFT.cnp_name,RIGHT.cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100 )
+     AND ( LEFT.cnp_name = (TYPEOF(LEFT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR SALT311.MatchBagOfWords(LEFT.cnp_name,RIGHT.cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100 )
      AND ( LEFT.zip_cases[1].zip = (TYPEOF(LEFT.zip_cases[1].zip))'' OR RIGHT.zip = (TYPEOF(RIGHT.zip))'' OR LEFT.zip_cases[1].zip = RIGHT.zip  )
      AND ( LEFT.city = (TYPEOF(LEFT.city))'' OR RIGHT.city = (TYPEOF(RIGHT.city))''  OR metaphonelib.DMetaPhone1(LEFT.city)=metaphonelib.DMetaPhone1(RIGHT.city) OR BizLinkFull.Config_BIP.WithinEditN(LEFT.city,LEFT.city_len,RIGHT.city,RIGHT.city_len,2, 0)  )
      AND ( LEFT.st = (TYPEOF(LEFT.st))'' OR RIGHT.st = (TYPEOF(RIGHT.st))'' OR LEFT.st = RIGHT.st  ),Score_Batch(RIGHT,LEFT),
     ATMOST(LEFT.company_name_prefix = RIGHT.company_name_prefix,BizLinkFull.Config_BIP.L_CNPNAME_FUZZY_MAXBLOCKSIZE)); // Use indexed join (used for smaller batches
   J1 := JOIN(Recs1,PULL(Key),LEFT.company_name_prefix = RIGHT.company_name_prefix
-     AND ( LEFT.cnp_name = (TYPEOF(LEFT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR SALT37.MatchBagOfWords(LEFT.cnp_name,RIGHT.cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100 )
+     AND ( LEFT.cnp_name = (TYPEOF(LEFT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR SALT311.MatchBagOfWords(LEFT.cnp_name,RIGHT.cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100 )
      AND ( LEFT.zip_cases[1].zip = (TYPEOF(LEFT.zip_cases[1].zip))'' OR RIGHT.zip = (TYPEOF(RIGHT.zip))'' OR LEFT.zip_cases[1].zip = RIGHT.zip  )
      AND ( LEFT.city = (TYPEOF(LEFT.city))'' OR RIGHT.city = (TYPEOF(RIGHT.city))''  OR metaphonelib.DMetaPhone1(LEFT.city)=metaphonelib.DMetaPhone1(RIGHT.city) OR BizLinkFull.Config_BIP.WithinEditN(LEFT.city,LEFT.city_len,RIGHT.city,RIGHT.city_len,2, 0)  )
      AND ( LEFT.st = (TYPEOF(LEFT.st))'' OR RIGHT.st = (TYPEOF(RIGHT.st))'' OR LEFT.st = RIGHT.st  ),Score_Batch(RIGHT,LEFT),
@@ -456,12 +459,12 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSide
   J3 := PROJECT(J2, PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.update_forcefailed(LEFT,In_disableForce));
   J4 := PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.CombineLinkpathScores(J3,In_disableForce); // Combine results and restrict number for one linkpath
   DD := DISTRIBUTE(outdups,HASH(__Shadow_Ref)); // Restore dups driven in local mode
-  SALT37.MAC_Dups_Restore(J4,DD,J5,Reference,TRUE)
+  SALT311.MAC_Dups_Restore(J4,DD,J5,Reference,TRUE)
   RETURN J5;
 END;
 // Now the sloppier macro to allow processing of an 'arbitrary' file
 EXPORT MAC_ScoredFetch_Batch(InFile,Input_Ref,Input_company_name_prefix='',Input_cnp_name='',Input_zip='',Input_city='',Input_st='',Input_company_sic_code1='',Input_cnp_number='',Input_cnp_btype='',Input_cnp_lowv='',Input_prim_range='',Input_sec_range='',Input_parent_proxid='',Input_sele_proxid='',Input_org_proxid='',Input_ultimate_proxid='',Input_sele_flag='',Input_org_flag='',Input_ult_flag='',output_file,AsIndex='true', In_disableForce = 'false') := MACRO
-IMPORT SALT37,BizLinkFull;
+IMPORT SALT311,BizLinkFull;
 #IF(#TEXT(Input_company_name_prefix)<>'')
   #uniquename(trans)
   PRTE2_BIPV2_BusHeader.Key_BizHead_L_CNPNAME_FUZZY.InputLayout_Batch %trans%(InFile le) := TRANSFORM

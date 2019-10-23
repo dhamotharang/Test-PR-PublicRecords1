@@ -1,11 +1,11 @@
-/* ************************************************************************************************************ */	
+﻿/* ************************************************************************************************************ */	
 //
 // set version number (date of run) for proper input file handling.
 //
 /* ************************************************************************************************************ */	
 
-import Prof_License,fieldstats,did_add,ut,header_slimsort,watchdog,didville,census_data,business_header,business_header_ss,mdr,header,BIPV2,BizLinkFull,Health_Provider_Services,
-       Health_Facility_Services, BIPV2_Company_Names, HealthCareFacility, PromoteSupers;
+import _control, Prof_License,fieldstats,did_add,ut,header_slimsort,watchdog,didville,census_data,business_header,business_header_ss,mdr,header,BIPV2,BizLinkFull,Health_Provider_Services,
+       Health_Facility_Services, BIPV2_Company_Names, HealthCareFacility, PromoteSupers, Mdr, Std;
 
 	/* ***DID PROCESS--do_out************************************************************************************** */	
 
@@ -37,6 +37,13 @@ import Prof_License,fieldstats,did_add,ut,header_slimsort,watchdog,didville,cens
 			  unsigned6	bdid := 0;
         unsigned8	source_rec_id  :=  0;
 			  BIPV2.IDlayouts.l_xlink_ids;
+				INTEGER2  xadl2_weight := 0;
+				UNSIGNED2 xadl2_score := 0;
+				INTEGER1  xadl2_distance := 0;
+				UNSIGNED4 xadl2_keys_used := 0;
+				STRING    xadl2_keys_desc := '';
+				STRING60  xadl2_matches := '';
+				STRING    xadl2_matches_desc := '';
 			end;
 	
 			rec addtemp(dAID l) := transform	
@@ -252,6 +259,9 @@ import Prof_License,fieldstats,did_add,ut,header_slimsort,watchdog,didville,cens
         self.score    := intformat(l.temp_DID_score, 3, 1);
         self.bdid 	  := if (L.bdid = 0, '', intformat(L.bdid,12,1));
         self.best_ssn := l.ssn;
+				//DF-24056 initialize new CCPA fields
+				self.global_sid := 0;
+				self.record_sid := 0;				
         self 					:= l;
 			end;
 
@@ -352,7 +362,9 @@ import Prof_License,fieldstats,did_add,ut,header_slimsort,watchdog,didville,cens
       preFPOS_fixed0 := prepFPOS_orig_PL + prepFPOS_new_sources_fixed;
 
 			preFPOS_fixed := Prof_License.fRemoveBadSource(preFPOS_fixed0);
-			PromoteSupers.MAC_SF_BuildProcess(preFPOS_fixed,'~thor_data400::base::prof_licenses_AID',do_out,,,true);
+			addGlobalSID 	:= mdr.macGetGlobalSID(preFPOS_fixed, 'ProfLic', 'vendor', 'global_sid'); //DF-25422: Populate Global_SID	
+			
+			PromoteSupers.MAC_SF_BuildProcess(addGlobalSID,'~thor_data400::base::prof_licenses_AID',do_out,,,true);
 
 /* ************************************************************************************************************ */
 

@@ -1,4 +1,4 @@
-import RoxieKeyBuild,PRTE, _control, STD,prte2,tools,Doxie,AutoStandardI,AutoKeyB2, UtilFile, Autokey, ut, AutokeyB,PRTE2_Common;
+﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools,Doxie,AutoStandardI,AutoKeyB2, UtilFile, Autokey, ut, AutokeyB,PRTE2_Common;
 
 EXPORT proc_build_keys(string filedate) := function
 
@@ -68,7 +68,7 @@ buildKey	:=	ordered(
 											build_roxie_keys
 											,to_qa
 											,build_autokeys(filedate)
-											,if(not is_running_in_prod, DOPS_Comment, parallel(updatedops,updatedops_fcra))
+										,if(not is_running_in_prod, DOPS_Comment, parallel(updatedops,updatedops_fcra))
 											);
 													
 return	buildKey;

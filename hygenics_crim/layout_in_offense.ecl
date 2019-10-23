@@ -1,7 +1,7 @@
-export layout_in_offense := record
+﻿export layout_in_offense := record
 	string40	RecordID;
 	string2		StateCode;
-	string40	CaseID;
+	string100	CaseID;
 	string50	CaseNumber;
 	string100	CaseTitle;
 	string20	CaseType;
@@ -40,7 +40,7 @@ export layout_in_offense := record
 	string20	TrialType;
 	string8		CourtDate;
 	string100	SourceName;
-	string		SourceID;
+	string100 SourceID;
   string 		classification_code; //New fieldsVC
 	string 		Sub_classification_code; //New fields VC
 	//new fields

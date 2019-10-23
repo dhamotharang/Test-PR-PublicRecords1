@@ -1,0 +1,7 @@
+﻿EXPORT Layout_TMSIDRMSID_Mappingfile := RECORD
+LiensV2.Layout_liens_main_module_for_hogan.layout_liens_main.TMSID_old;
+LiensV2.Layout_liens_main_module_for_hogan.layout_liens_main.RMSID_old;
+LiensV2.Layout_liens_main_module_for_hogan.layout_liens_main.TMSID;
+LiensV2.Layout_liens_main_module_for_hogan.layout_liens_main.RMSID;
+
+END;

@@ -1,3 +1,4 @@
+﻿
 EXPORT Mac_find_collisions
 	(
 	infile
@@ -170,12 +171,12 @@ NAC.Layouts.Collisions tr(inf_ddp l, inf_ddp r) := transform
 								or l.lname_field=r.client_last_name,'W','')))
 
 					+if((unsigned)l.ssn_field>0 and (unsigned)r.ssn_field>0 and l.ssn_field=r.ssn_field,'S',
-						if((unsigned)l.ssn_field>0 and (unsigned)r.ssn_field>0 and ssn_value(l.ssn_field,r.ssn_field) > -1,'P',''))
+						if((unsigned)l.ssn_field>0 and (unsigned)r.ssn_field>0 and ssn_value(l.ssn_field,r.ssn_field) > 0,'P','')) //*FIX
 
 					+if((unsigned)l.dob_field>0 and	(unsigned)r.dob_field>0 and	l.dob_field=r.dob_field,'D',
 						if(header.gens_ok(l.suffix_field,l.dob_field,r.suffix_field,r.dob_field) and
 									(unsigned)l.dob_field>0 and	(unsigned)r.dob_field>0 and
-									(header.sig_near_dob(l.dob_field,r.dob_field) or header.date_value(l.dob_field,r.dob_field) > 0),'B',''))
+									(header.sig_near_dob(l.dob_field,r.dob_field) or header.date_value(l.dob_field,r.dob_field) > 1),'B','')) //*FIX
 
 					+if(l.pname_field<>'' and	r.pname_field<>'' and	l.pname_field=r.pname_field and	l.prange_field=r.prange_field,'A','')
 
@@ -277,8 +278,9 @@ match:=join(inf_ddp,inf_ddp,
 			left.month_field=right.month_field and
 		#end
 
-		left.Client_Eligible_Status_Indicator=right.Client_Eligible_Status_Indicator and
-		left.Case_Benefit_Type=right.Case_Benefit_Type and
+		//left.Client_Eligible_Status_Indicator=right.Client_Eligible_Status_Indicator and
+		IF(left.Case_Benefit_Type='D','S',left.Case_Benefit_Type)=
+					IF(right.Case_Benefit_Type='D','S',right.Case_Benefit_Type) and
 		left.seq_field<>right.seq_field and
 		(left.Case_Identifier<>right.Case_Identifier
 		or

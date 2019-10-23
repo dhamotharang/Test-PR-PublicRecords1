@@ -1,4 +1,4 @@
-import header,ut;
+﻿import header,ut;
 
 a:=distribute(header.Mod_FCRA_Header_EN_retro_test.best_file,hash(random()));// : persist('~thor_data::persist::retro_test_best');
 b:=distribute(header.Mod_FCRA_Header_EN_retro_test.address_file,hash(random()));// : persist('~thor_data::persist::retro_test_addr');
@@ -12,7 +12,7 @@ ut.MAC_SF_BuildProcess(c,'~thor400_data::Experian_Extract::ssn',bld3,csvout:=tru
 
 IsNewHeader := ut.IsNewProdHeaderVersion('FCRA_ExperianCred_extracts','header_file_version'); 
 
-EXPORT Proc_build_extracts :=
+EXPORT Proc_build_extracts(string ver) :=
 								if(IsNewHeader
 											,sequential(
 																	output('IsNewHeader=true; creting new extracts')
@@ -20,9 +20,9 @@ EXPORT Proc_build_extracts :=
 																	,bld2
 																	,bld3
 																	,ut.PostDID_HeaderVer_Update('FCRA_ExperianCred_extracts','header_file_version')
-																	,FCRA_ExperianCred.Send_Email(Version).Build_extracts_Success
+																	,FCRA_ExperianCred.Send_Email(ver).Build_extracts_Success
 																	)
 											,output('IsNewHeader=false; nothing done')
 									)
-			: failure(FCRA_ExperianCred.Send_Email(Version).Build_extracts_Failure)
+			: failure(FCRA_ExperianCred.Send_Email(ver).Build_extracts_Failure)
 ;

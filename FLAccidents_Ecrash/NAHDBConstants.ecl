@@ -1,4 +1,4 @@
-IMPORT _control;
+﻿IMPORT _control;
 EXPORT NAHDBConstants := MODULE
 		EXPORT LandingZone		 								:= _control.IPAddress.bctlpedata10;
 		
@@ -26,7 +26,7 @@ EXPORT NAHDBConstants := MODULE
 	EXPORT BackupPathForPerson					  := prefix + 'noniyetek/person/backup';
 		EXPORT BackupPathForPtyDamage					  := prefix + 'noniyetek/propertyDamage/backup';
 
-	EXPORT DestinationCluster 		        := IF (_control.ThisEnvironment.Name = 'Prod_Thor', 'thor400_60', 'thor400_dev01');	
+	EXPORT DestinationCluster 		        := IF (_control.ThisEnvironment.Name = 'Prod_Thor', 'thor400_44', 'thor400_dev01');	
 	EXPORT SprayCompleteFile							:= '~thor::CD::Spray::Complete';
 	EXPORT IncidentFileMask												:= 'dbpeccl-ala.risk.regn.net.incident*';
 	EXPORT PersonFileMask												  := 'dbpeccl-ala.risk.regn.net.person*';

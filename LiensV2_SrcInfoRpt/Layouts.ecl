@@ -1,4 +1,5 @@
-﻿IMPORT	LiensV2;
+﻿//	Needed in file_liens_fcra_main
+IMPORT	LiensV2;
 EXPORT	Layouts	:=	MODULE
 
 	EXPORT	rActionGroups	:=	RECORD

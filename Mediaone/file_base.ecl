@@ -1,4 +1,4 @@
-EXPORT file_base := MODULE
+﻿EXPORT file_base := MODULE
   EXPORT layout:=RECORD
     // Original Data
     STRING    email;

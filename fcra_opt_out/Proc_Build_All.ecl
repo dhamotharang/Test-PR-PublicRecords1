@@ -1,4 +1,4 @@
-﻿import _Control,RoxieKeybuild,Orbit3;
+﻿import _Control,RoxieKeybuild,Orbit3,Scrubs_FCRA_Opt_Out;
 
 export Proc_Build_All(string filedate,string inFilename = 'no file',string fileflag = 'B', boolean isfullreplace = false) := function
 
@@ -101,6 +101,7 @@ retval := sequential(if (fileflag = 'B' or fileflag = 'E',spray_super_transact),
 						),
 						
 					buildkeys,
+					Scrubs_FCRA_Opt_Out.fnRunScrubs(filedate,''),
 					dops_update,
 					new_records_sample_for_qa,
 					// move the new file to processed

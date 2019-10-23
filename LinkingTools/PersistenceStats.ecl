@@ -5,7 +5,7 @@ rec_id := record id field in both datasets
 cluster_id := cluster id field in both datasets
 output_name := name appended to outputs (allows for multiple runs in a single WU)
 */
-EXPORT PersistenceStats(base,father,rec_id,cluster_id,output_name = '') := functionmacro
+EXPORT PersistenceStats(base,father,rec_id,cluster_id,output_name = '',pDoOutputs = 'true') := functionmacro
 	
 	#IF(#TEXT(output_name) <> '')local op_name := '_'+(STRING)output_name; #ELSE local op_name := ''; #END
 	
@@ -39,19 +39,14 @@ EXPORT PersistenceStats(base,father,rec_id,cluster_id,output_name = '') := funct
 	
 	//Standard record level stats
 	local new_recs := total_recs(recId_father = 0);
-	OUTPUT(CHOOSEN(new_recs,100),NAMED('new_recs'+op_name));
 	local cnt_new_recs := COUNT(new_recs);
 	local old_recs := total_recs(recId_base = 0);
-	OUTPUT(CHOOSEN(old_recs,100),NAMED('deleted_recs'+op_name));
 	local cnt_old_recs := COUNT(old_recs);
 	local persistent_recs := total_recs(recId_base > 0 AND recId_father > 0);
-	OUTPUT(CHOOSEN(persistent_recs,100),NAMED('persistent_recs'+op_name));
 	local cnt_persistent_recs := COUNT(persistent_recs);
 	local persistent_recs_same_cluster := persistent_recs(clustId_father = clustId_base);
-	OUTPUT(CHOOSEN(persistent_recs_same_cluster,100),NAMED('persistent_recs_same_cluster'+op_name));
 	local cnt_persistent_recs_same_cluster := COUNT(persistent_recs_same_cluster);
 	local persistent_recs_diff_cluster := persistent_recs(clustId_father <> clustId_base);
-	OUTPUT(CHOOSEN(persistent_recs_diff_cluster,100),NAMED('persistent_recs_diff_cluster'+op_name));
 	local cnt_persistent_recs_diff_cluster := COUNT(persistent_recs_diff_cluster);
 
 	local clusterDataRec := RECORD
@@ -63,29 +58,23 @@ EXPORT PersistenceStats(base,father,rec_id,cluster_id,output_name = '') := funct
 	local total_clusters := JOIN(base_cluster_tot,father_cluster_tot,LEFT.cluster_id=RIGHT.cluster_id,TRANSFORM(clusterDataRec,SELF.clustId_father:=RIGHT.cluster_id;SELF.clustId_base:=LEFT.cluster_id),LOCAL,FULL OUTER);
 	
 	local new_ids := total_clusters(clustId_father = 0 and clustId_base <> 0);
-	OUTPUT(CHOOSEN(new_ids,100),NAMED('new_clusters'+op_name));
 	local cnt_new_ids := COUNT(new_ids);
 	local old_ids := total_clusters(clustId_base = 0 and clustId_father <> 0);
-	OUTPUT(CHOOSEN(old_ids,100),NAMED('missing_clusters'+op_name));
 	local cnt_old_ids := COUNT(old_ids);
 	local same_ids := total_clusters(clustId_base = clustId_father);
 	local cnt_same_ids := COUNT(same_ids);
-	OUTPUT(CHOOSEN(same_ids,100),NAMED('same_clusters'+op_name));
 	
 		
 	//Completely new entities will have a recId_father sum of 0. Fully deleted entities will have a recId_base sum of 0.
 	local tab_new_id_recs := TABLE(DISTRIBUTE(total_recs(clustId_base <> 0),clustId_base),{total_recs.clustId_base, tot := SUM(GROUP,total_recs.recId_father)},clustId_base,LOCAL);
 	local all_new_ids := tab_new_id_recs(tot = 0 and clustId_base <> 0);
-	OUTPUT(CHOOSEN(all_new_ids,100),NAMED('all_new_clusters'+op_name));
 	local cnt_all_new_ids := COUNT(all_new_ids);
 	local lowest_new_id_recs_pre := DEDUP(SORT(DISTRIBUTE(total_recs(clustId_base <> 0),clustId_base),clustId_base,recId_base,LOCAL),clustId_base,LOCAL);
 	local lowest_new_id_recs := JOIN(lowest_new_id_recs_pre(recId_father = 0),tab_new_id_recs(tot > 0),LEFT.clustId_base=RIGHT.clustId_base,TRANSFORM(RIGHT),LOCAL);
 	local tab_lowest_new_id_recs := JOIN(new_ids,lowest_new_id_recs,LEFT.clustId_base=RIGHT.clustId_base,TRANSFORM(RIGHT),LOCAL);
-	OUTPUT(CHOOSEN(tab_lowest_new_id_recs,100),NAMED('new_base_record_clusters'+op_name));
 	local cnt_lowest_new_id := COUNT(tab_lowest_new_id_recs);
 	local tab_old_id_recs := TABLE(DISTRIBUTE(total_recs(clustId_father <> 0),clustId_father),{total_recs.clustId_father, tot := SUM(GROUP,total_recs.recId_base)},clustId_father,LOCAL);
 	local all_old_ids := tab_old_id_recs(tot = 0);
-	OUTPUT(CHOOSEN(all_old_ids,100),NAMED('old_clusters_deleted'+op_name));
 	local cnt_all_old_ids := COUNT(all_old_ids);
 	
 	//Counts of base clusters making up each father cluster and vice versa.
@@ -103,16 +92,12 @@ EXPORT PersistenceStats(base,father,rec_id,cluster_id,output_name = '') := funct
 	local possibly_persistent_ids0 := JOIN(DISTRIBUTE(same_ids,clustId_father),tab_all_ids_father,LEFT.clustID_father = RIGHT.clustId_father,TRANSFORM(totalDataRec,SELF.cnt_clustId_father := 0;SELF.cnt_clustId_base := RIGHT.cnt;SELF:=LEFT),LOCAL);
 	local possibly_persistent_ids := JOIN(DISTRIBUTE(possibly_persistent_ids0,clustId_base),tab_all_ids_base,LEFT.clustId_base = RIGHT.clustId_base,TRANSFORM(totalDataRec,SELF.cnt_clustId_father := RIGHT.cnt;SELF:=LEFT),LOCAL);
 	local tab_ids_recs_removed := possibly_persistent_ids(cnt_clustId_father = 1 AND cnt_clustId_base > 1);
-	OUTPUT(CHOOSEN(tab_ids_recs_removed,100),NAMED('same_clusters_recs_removed'+op_name));
 	local cnt_ids_recs_removed := COUNT(tab_ids_recs_removed);
 	local tab_ids_recs_added := possibly_persistent_ids(cnt_clustId_father > 1 AND cnt_clustId_base = 1);
-	OUTPUT(CHOOSEN(tab_ids_recs_added,100),NAMED('same_clusters_recs_added'+op_name));
 	local cnt_ids_recs_added := COUNT(tab_ids_recs_added);
 	local tab_ids_recs_mixed := possibly_persistent_ids(cnt_clustId_father > 1 AND cnt_clustId_base > 1);
-	OUTPUT(CHOOSEN(tab_ids_recs_mixed,100),NAMED('same_clusters_recs_mixed'+op_name));
 	local cnt_ids_recs_mixed := COUNT(tab_ids_recs_mixed);
 	local tab_persistent_ids_fin := possibly_persistent_ids(cnt_clustId_father = 1 AND cnt_clustId_base = 1);
-	OUTPUT(CHOOSEN(tab_persistent_ids_fin,100),NAMED('persistent_clusters'+op_name));
 	local cnt_persistent_ids := COUNT(tab_persistent_ids_fin);
 
 
@@ -156,19 +141,15 @@ EXPORT PersistenceStats(base,father,rec_id,cluster_id,output_name = '') := funct
 	
 
 	local persistent_recs_collapsed := PROJECT(collapse0,TRANSFORM(debugDataRec,SELF.category := 'collapse';SELF:=LEFT));
-	OUTPUT(CHOOSEN(persistent_recs_collapsed,100),NAMED('persistent_recs_collapsed'+op_name));
 	local cnt_persistent_recs_collapsed := COUNT(persistent_recs_collapsed);
 	
 	local persistent_recs_shifted := PROJECT(shift0,TRANSFORM(debugDataRec,SELF.category := 'shift';SELF:=LEFT));
-	OUTPUT(CHOOSEN(persistent_recs_shifted,100),NAMED('persistent_recs_shifted'+op_name));
 	local cnt_persistent_recs_shifted := COUNT(persistent_recs_shifted);
 	
 	local persistent_recs_split := PROJECT(split0,TRANSFORM(debugDataRec,SELF.category := 'split';SELF:=LEFT));
-	OUTPUT(CHOOSEN(persistent_recs_split,100),NAMED('persistent_recs_split'+op_name));
 	local cnt_persistent_recs_split := COUNT(persistent_recs_split);
 	
 	local persistent_recs_shuffled := PROJECT(shuffle0,TRANSFORM(debugDataRec,SELF.category := 'shuffle';SELF:=LEFT));
-	OUTPUT(CHOOSEN(persistent_recs_shuffled,100),NAMED('persistent_recs_shuffled'+op_name));
 	local cnt_persistent_recs_shuffled := COUNT(persistent_recs_shuffled);
 
 	//Tables for missing/new clusters, based on above categories
@@ -178,25 +159,48 @@ EXPORT PersistenceStats(base,father,rec_id,cluster_id,output_name = '') := funct
 	local pers_base_pre := JOIN(DISTRIBUTE(new_ids,clustId_base),DEDUP(SORT(DISTRIBUTE(tot_pers3,clustId_base),clustId_base,recId_base,LOCAL),clustId_base,LOCAL),LEFT.clustId_base = RIGHT.clustId_base,TRANSFORM(RIGHT),LOCAL);
 	local pers_base := JOIN(pers_base_pre(clustId_base <> 0),tab_lowest_new_id_recs,LEFT.clustId_base = RIGHT.clustId_base,TRANSFORM(LEFT),LEFT ONLY, LOCAL);
 	local tab_ids_split := TABLE(DISTRIBUTE(pers_base(category[..5] = 'split'),clustId_base),{pers_base.clustId_base},clustId_base,LOCAL);
-	OUTPUT(CHOOSEN(tab_ids_split,100),NAMED('new_clusters_from_split'+op_name));
 	local cnt_ids_split := COUNT(tab_ids_split);
 	local tab_ids_shifted_new := TABLE(DISTRIBUTE(pers_base(category[..5] = 'shift'),clustId_base),{pers_base.clustId_base},clustId_base,LOCAL);
-	OUTPUT(CHOOSEN(tab_ids_shifted_new,100),NAMED('new_clusters_deleted_base_record'+op_name));	
 	local cnt_ids_shifted_new := COUNT(tab_ids_shifted_new);
 	local tab_ids_shifted_old := TABLE(DISTRIBUTE(pers_father(category[..5] = 'shift'),clustId_father),{pers_father.clustId_father},clustId_father,LOCAL);
-	OUTPUT(CHOOSEN(tab_ids_shifted_old,100),NAMED('old_clusters_deleted_base_record'+op_name));
 	local cnt_ids_shifted_old := COUNT(tab_ids_shifted_old);
 	local tab_ids_collapsed := TABLE(DISTRIBUTE(pers_father(category[..8] = 'collapse'),clustId_father),{pers_father.clustId_father},clustId_father,LOCAL);
-	OUTPUT(CHOOSEN(tab_ids_collapsed,100),NAMED('old_clusters_collapsed'+op_name));
 	local cnt_ids_collapsed := COUNT(tab_ids_collapsed);
 	local tab_ids_shuffled_new := TABLE(DISTRIBUTE(pers_base(category[..7] = 'shuffle'),clustId_base),{pers_base.clustId_base},clustId_base,LOCAL);
-	OUTPUT(CHOOSEN(tab_ids_shuffled_new,100),NAMED('new_clusters_from_shuffle'+op_name));
 	local cnt_ids_shuffled_new := COUNT(tab_ids_shuffled_new);
 	local tab_ids_shuffled_old := TABLE(DISTRIBUTE(pers_father(category[..7] = 'shuffle'),clustId_father),{pers_father.clustId_father},clustId_father,LOCAL);
-	OUTPUT(CHOOSEN(tab_ids_shuffled_old,100),NAMED('old_clusters_shuffled'+op_name));
 	local cnt_ids_shuffled_old := COUNT(tab_ids_shuffled_old);
 
+
   local PersistenceStatsResults := MODULE
+
+export  output_samples := parallel(
+   OUTPUT(CHOOSEN(new_recs,100),NAMED('new_recs'+op_name))
+  ,OUTPUT(CHOOSEN(old_recs,100),NAMED('deleted_recs'+op_name))
+  ,OUTPUT(CHOOSEN(persistent_recs,100),NAMED('persistent_recs'+op_name))
+  ,OUTPUT(CHOOSEN(persistent_recs_same_cluster,100),NAMED('persistent_recs_same_cluster'+op_name))
+  ,OUTPUT(CHOOSEN(persistent_recs_diff_cluster,100),NAMED('persistent_recs_diff_cluster'+op_name))
+  ,OUTPUT(CHOOSEN(new_ids,100),NAMED('new_clusters'+op_name))
+  ,OUTPUT(CHOOSEN(old_ids,100),NAMED('missing_clusters'+op_name))
+  ,OUTPUT(CHOOSEN(same_ids,100),NAMED('same_clusters'+op_name))
+  ,OUTPUT(CHOOSEN(all_new_ids,100),NAMED('all_new_clusters'+op_name))
+  ,OUTPUT(CHOOSEN(tab_lowest_new_id_recs,100),NAMED('new_base_record_clusters'+op_name))
+  ,OUTPUT(CHOOSEN(all_old_ids,100),NAMED('old_clusters_deleted'+op_name))
+  ,OUTPUT(CHOOSEN(tab_ids_recs_removed,100),NAMED('same_clusters_recs_removed'+op_name))
+  ,OUTPUT(CHOOSEN(tab_ids_recs_added,100),NAMED('same_clusters_recs_added'+op_name))
+  ,OUTPUT(CHOOSEN(tab_ids_recs_mixed,100),NAMED('same_clusters_recs_mixed'+op_name))
+  ,OUTPUT(CHOOSEN(tab_persistent_ids_fin,100),NAMED('persistent_clusters'+op_name))
+  ,OUTPUT(CHOOSEN(persistent_recs_collapsed,100),NAMED('persistent_recs_collapsed'+op_name))
+  ,OUTPUT(CHOOSEN(persistent_recs_shifted,100),NAMED('persistent_recs_shifted'+op_name))
+  ,OUTPUT(CHOOSEN(persistent_recs_split,100),NAMED('persistent_recs_split'+op_name))
+  ,OUTPUT(CHOOSEN(persistent_recs_shuffled,100),NAMED('persistent_recs_shuffled'+op_name))
+  ,OUTPUT(CHOOSEN(tab_ids_split,100),NAMED('new_clusters_from_split'+op_name))
+  ,OUTPUT(CHOOSEN(tab_ids_shifted_new,100),NAMED('new_clusters_deleted_base_record'+op_name)) 
+  ,OUTPUT(CHOOSEN(tab_ids_shifted_old,100),NAMED('old_clusters_deleted_base_record'+op_name))
+  ,OUTPUT(CHOOSEN(tab_ids_collapsed,100),NAMED('old_clusters_collapsed'+op_name))
+  ,OUTPUT(CHOOSEN(tab_ids_shuffled_new,100),NAMED('new_clusters_from_shuffle'+op_name))
+  ,OUTPUT(CHOOSEN(tab_ids_shuffled_old,100),NAMED('old_clusters_shuffled'+op_name))
+);
 
 	EXPORT StatRec := RECORD
 		string stat_name;

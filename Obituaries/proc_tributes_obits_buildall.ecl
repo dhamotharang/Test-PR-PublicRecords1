@@ -1,10 +1,10 @@
-IMPORT Obituaries, ut, header, _Control;
+﻿IMPORT Obituaries, ut, header, _Control;
 EXPORT proc_tributes_obits_buildall(string	filedate) := FUNCTION
-	#workunit('name','Tributes/Obituary Build '+ filedate);
+	#workunit('name','Yogurt: Tributes/Obituary Build '+ filedate);
 
 	// Build Checks
-	doTributes	:=	EXISTS(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata10,'/data/hds_4/death_master/in/obituary','memorial_lexis_nexis*xml'));
-	doObits			:=	EXISTS(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata10,'/data/hds_4/death_master/in/obituary_dotcom','Obit*txt'));
+doTributes	:=	EXISTS(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata10,'/data/hds_4/death_master/in/obituary','memorial_lexis_nexis*xml'));
+doObits			:=	EXISTS(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata10,'/data/hds_4/death_master/in/obituary_dotcom','Obit*txt'));
 
 	//Spray files.  
 	SprayTributes			:= Obituaries.proc_obit_sprayxml;

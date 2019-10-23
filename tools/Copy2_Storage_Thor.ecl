@@ -1,4 +1,4 @@
-﻿IMPORT STD, ut,wk_ut,tools;
+﻿IMPORT STD, ut,wk_ut,tools,WsDFU;
 //works on thor and hthor now
 export  Copy2_Storage_Thor(
 
@@ -31,7 +31,7 @@ Function
   
   copyfilecmd := serv + over + repl + action + dstcluster + dstname + srcname + nsplit + wrap + comp + srcdali;
                     
-  getorigcreatewuid := wk_ut.get_DFUInfo(lfilename).wuid;
+  getorigcreatewuid := WsDFU.GetFileCreationWuid(lfilename);
   copywuid          := workunit                         ;
 
   // -- Execute command

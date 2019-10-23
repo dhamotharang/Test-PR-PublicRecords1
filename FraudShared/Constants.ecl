@@ -1,4 +1,4 @@
-
+﻿
 EXPORT Constants(  
   string fraud_platform,
   boolean  pUseOtherEnvironment = true
@@ -16,9 +16,7 @@ EXPORT Constants(
 */
   EXPORT TYPE_STR := 'AK';
   
-  #STORED('Platform',fraud_platform);
-  
-  EXPORT ak_dataset       := FraudShared.File_Autokey();
+  EXPORT ak_dataset       := PROJECT(FraudShared.Key_Auto_Payload(fraud_platform), Layouts_Key.autokey);
   EXPORT ak_qa_keyname    := FraudShared._Dataset(fraud_platform).thor_cluster_files + 'key::' + fraud_platform + '::qa::autokey::';
   EXPORT AUTOKEY_SKIP_SET := autokey_buildskipset;  
 

@@ -1,4 +1,4 @@
-IMPORT ut,SALT32;
+﻿IMPORT SALT37;
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
@@ -27,24 +27,24 @@ EXPORT Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(Layout_ALC_INSURANCE_AGENTS) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.fname_Invalid := Fields.InValid_fname((SALT32.StrType)le.fname);
-    SELF.lname_Invalid := Fields.InValid_lname((SALT32.StrType)le.lname);
-    SELF.title_Invalid := Fields.InValid_title((SALT32.StrType)le.title);
-    SELF.state_Invalid := Fields.InValid_state((SALT32.StrType)le.state);
-    SELF.zip_Invalid := Fields.InValid_zip((SALT32.StrType)le.zip);
-    SELF.zip4_Invalid := Fields.InValid_zip4((SALT32.StrType)le.zip4);
-    SELF.cart_Invalid := Fields.InValid_cart((SALT32.StrType)le.cart);
-    SELF.bar_Invalid := Fields.InValid_bar((SALT32.StrType)le.bar);
-    SELF.gender_Invalid := Fields.InValid_gender((SALT32.StrType)le.gender);
-    SELF.addr_type_Invalid := Fields.InValid_addr_type((SALT32.StrType)le.addr_type);
-    SELF.county_cd_Invalid := Fields.InValid_county_cd((SALT32.StrType)le.county_cd);
-    SELF.insurance_type_Invalid := Fields.InValid_insurance_type((SALT32.StrType)le.insurance_type);
-    SELF.license_type_Invalid := Fields.InValid_license_type((SALT32.StrType)le.license_type);
-    SELF.msa_Invalid := Fields.InValid_msa((SALT32.StrType)le.msa);
-    SELF.nielsen_county_cd_Invalid := Fields.InValid_nielsen_county_cd((SALT32.StrType)le.nielsen_county_cd);
-    SELF.list_id_Invalid := Fields.InValid_list_id((SALT32.StrType)le.list_id);
-    SELF.scno_Invalid := Fields.InValid_scno((SALT32.StrType)le.scno);
-    SELF.custno_Invalid := Fields.InValid_custno((SALT32.StrType)le.custno);
+    SELF.fname_Invalid := Fields.InValid_fname((SALT37.StrType)le.fname);
+    SELF.lname_Invalid := Fields.InValid_lname((SALT37.StrType)le.lname);
+    SELF.title_Invalid := Fields.InValid_title((SALT37.StrType)le.title);
+    SELF.state_Invalid := Fields.InValid_state((SALT37.StrType)le.state);
+    SELF.zip_Invalid := Fields.InValid_zip((SALT37.StrType)le.zip);
+    SELF.zip4_Invalid := Fields.InValid_zip4((SALT37.StrType)le.zip4);
+    SELF.cart_Invalid := Fields.InValid_cart((SALT37.StrType)le.cart);
+    SELF.bar_Invalid := Fields.InValid_bar((SALT37.StrType)le.bar);
+    SELF.gender_Invalid := Fields.InValid_gender((SALT37.StrType)le.gender);
+    SELF.addr_type_Invalid := Fields.InValid_addr_type((SALT37.StrType)le.addr_type);
+    SELF.county_cd_Invalid := Fields.InValid_county_cd((SALT37.StrType)le.county_cd);
+    SELF.insurance_type_Invalid := Fields.InValid_insurance_type((SALT37.StrType)le.insurance_type);
+    SELF.license_type_Invalid := Fields.InValid_license_type((SALT37.StrType)le.license_type);
+    SELF.msa_Invalid := Fields.InValid_msa((SALT37.StrType)le.msa);
+    SELF.nielsen_county_cd_Invalid := Fields.InValid_nielsen_county_cd((SALT37.StrType)le.nielsen_county_cd);
+    SELF.list_id_Invalid := Fields.InValid_list_id((SALT37.StrType)le.list_id);
+    SELF.scno_Invalid := Fields.InValid_scno((SALT37.StrType)le.scno);
+    SELF.custno_Invalid := Fields.InValid_custno((SALT37.StrType)le.custno);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -110,8 +110,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT32.StrType ErrorMessage;
-    SALT32.StrType FieldContents;
+    SALT37.StrType ErrorMessage;
+    SALT37.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -138,14 +138,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.custno_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'fname','lname','title','state','zip','zip4','cart','bar','gender','addr_type','county_cd','insurance_type','license_type','msa','nielsen_county_cd','list_id','scno','custno','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'invalid_alphaspacequote','invalid_alphaspacequote','invalid_alphaspace','invalid_alpha','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_numeric','invalid_gender','invalid_addr_type','invalid_alphanumeric','invalid_numericpound','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_numeric','invalid_numeric','invalid_alphanumeric','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT32.StrType)le.fname,(SALT32.StrType)le.lname,(SALT32.StrType)le.title,(SALT32.StrType)le.state,(SALT32.StrType)le.zip,(SALT32.StrType)le.zip4,(SALT32.StrType)le.cart,(SALT32.StrType)le.bar,(SALT32.StrType)le.gender,(SALT32.StrType)le.addr_type,(SALT32.StrType)le.county_cd,(SALT32.StrType)le.insurance_type,(SALT32.StrType)le.license_type,(SALT32.StrType)le.msa,(SALT32.StrType)le.nielsen_county_cd,(SALT32.StrType)le.list_id,(SALT32.StrType)le.scno,(SALT32.StrType)le.custno,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.fname,(SALT37.StrType)le.lname,(SALT37.StrType)le.title,(SALT37.StrType)le.state,(SALT37.StrType)le.zip,(SALT37.StrType)le.zip4,(SALT37.StrType)le.cart,(SALT37.StrType)le.bar,(SALT37.StrType)le.gender,(SALT37.StrType)le.addr_type,(SALT37.StrType)le.county_cd,(SALT37.StrType)le.insurance_type,(SALT37.StrType)le.license_type,(SALT37.StrType)le.msa,(SALT37.StrType)le.nielsen_county_cd,(SALT37.StrType)le.list_id,(SALT37.StrType)le.scno,(SALT37.StrType)le.custno,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,18,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10,UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(),STRING10 Src='UNK') := FUNCTION
-    SALT32.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT37.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -231,12 +231,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT32.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT37.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT32.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT37.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;

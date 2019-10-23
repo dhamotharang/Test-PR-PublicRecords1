@@ -59,7 +59,7 @@ EXPORT Mac_Prof_License_Update_Spray(source_IP, source_path, file_name, state, f
 	  %spray_raw% :=
 		  IF(%st% IN ['IN', 'WY'],
 				 FileServices.SprayVariable(Source_IP
-													          ,source_path + filedate + file_name
+													          ,source_path + filedate + '/' +  file_name
 													          ,
 													          ,%sourceCsvSeparater%
 													          ,
@@ -74,7 +74,7 @@ EXPORT Mac_Prof_License_Update_Spray(source_IP, source_path, file_name, state, f
 													          ,
 													          ,TRUE),
 				 FileServices.SprayFixed(Source_IP
-												         ,source_path + filedate + file_name
+												         ,source_path + filedate + '/' + file_name
 												         ,%recSize%
 												         ,group_name
 												         ,Prof_License.Constants.cluster + 'in::prolic::' + filedate +

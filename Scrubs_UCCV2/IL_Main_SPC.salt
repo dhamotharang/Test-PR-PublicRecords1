@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_UCCV2
 FILENAME:UCCV2
 NAMESCOPE:IL_Main
@@ -32,6 +32,7 @@ FIELDTYPE:invalid_orig_filing_number:CUSTOM(Scrubs_UCCV2.Functions.fn_non_empty_
 FIELDTYPE:invalid_orig_filing_type:CUSTOM(Scrubs_UCCV2.Functions.fn_il_orig_filing_type>0)
 FIELDTYPE:invalid_orig_filing_date:CUSTOM(Scrubs_UCCV2.Functions.fn_orig_filing_date>0)
 FIELDTYPE:invalid_orig_filing_time:CUSTOM(Scrubs_UCCV2.Functions.fn_check_time>0)
+FIELDTYPE:invalid_filing_number:CUSTOM(Scrubs_UCCV2.Functions.fn_numeric_or_blank>0)
 FIELDTYPE:invalid_filing_type:CUSTOM(Scrubs_UCCV2.Functions.fn_il_filing_type>0)
 FIELDTYPE:invalid_filing_date:CUSTOM(Scrubs_UCCV2.Functions.fn_past_yyyymmdd>0)
 FIELDTYPE:invalid_filing_time:CUSTOM(Scrubs_UCCV2.Functions.fn_check_time>0)
@@ -49,7 +50,7 @@ FIELD:orig_filing_number:TYPE(STRING25):LIKE(invalid_orig_filing_number):0,0
 FIELD:orig_filing_type:TYPE(STRING40):LIKE(invalid_orig_filing_type):0,0
 FIELD:orig_filing_date:TYPE(STRING8):LIKE(invalid_orig_filing_date):0,0
 FIELD:orig_filing_time:TYPE(STRING4):LIKE(invalid_orig_filing_time):0,0
-FIELD:filing_number:TYPE(STRING25):LIKE(invalid_mandatory):0,0
+FIELD:filing_number:TYPE(STRING25):LIKE(invalid_filing_number):0,0
 FIELD:filing_number_indc:TYPE(STRING1):0,0
 FIELD:filing_type:TYPE(STRING40):LIKE(invalid_filing_type):0,0
 FIELD:filing_date:TYPE(STRING8):LIKE(invalid_filing_date):0,0

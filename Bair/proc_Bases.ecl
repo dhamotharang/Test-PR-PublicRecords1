@@ -1,4 +1,4 @@
-import versioncontrol, ut, std, bair_boolean,Bair_importer,wk_ut;
+﻿import versioncontrol, ut, std, bair_boolean,Bair_importer,wk_ut;
 
 EXPORT proc_Bases(string buildName, string version, boolean pUseProd = false, boolean pDelta = false, boolean pRecover = false, unsigned1 ChkPtPos) := module
 	
@@ -113,7 +113,7 @@ EXPORT proc_Bases(string buildName, string version, boolean pUseProd = false, bo
 											)
 										 ,Bair.Mod_BadDate_Reports(version, true).send
 										 // ,bair.fUpdateORBIT('bair_input_candidate', version[1..8], pFromStatus:='Loaded', pToSatatus:='Sprayed')
-										 ,wk_ut.CreateWuid(ECL_OrbitUpdate,'hthor',Bair._ESP)
+										 // ,wk_ut.CreateWuid(ECL_OrbitUpdate,'hthor',Bair._ESP)
 								 )
 								,sequential(
 									 if(ChkPtPos > 9 and pRecover

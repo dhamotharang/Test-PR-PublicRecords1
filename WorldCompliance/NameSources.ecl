@@ -1,4 +1,4 @@
-EXPORT	NameSources := MODULE
+﻿EXPORT	NameSources := MODULE
 
 rSourceInfo := RECORD
 	string		source;			// identifier
@@ -31,7 +31,7 @@ EXPORT dsNameSources := DATASET([
 {'CNT',[],0,'WorldCompliance - Countries','08B8D210-ECD4-49D9-8B41-9380AAB618BC',
 'Includes Countries from all WorldCompliance Categories that need additional due diligence'},
 {'REG',[],0,'WorldCompliance - Registrations','1C0C4602-9835-4E45-B398-D21858CF43C7',
-U'US IRS FATCA â€“ Foreign Financial Institutions; Marijuana Registered Businesses (MRB); IHS (FATF High-Risk Country) Vessels; US Money Services Businesses (MSBs); UAE Money Services Businesses (MSBs)'},
+U'US IRS FATCA – Foreign Financial Institutions; Marijuana Registered Businesses (MRB); IHS (FATF High-Risk Country) Vessels; US Money Services Businesses (MSBs); UAE Money Services Businesses (MSBs)'},
 
 // accuity replacements
 {'BCW',['CBOB'],1074,'Central Bank of Bahamas Cumulative Warnings','21DE3441-F3DD-401F-A046-7EF662422BB9',

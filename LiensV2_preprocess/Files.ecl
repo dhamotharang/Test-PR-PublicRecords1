@@ -1,3 +1,4 @@
+﻿// Used in LiensV2.file_liens_main
 Import LiensV2_preprocess, STD, ut;
 
 EXPORT Files := MODULE
@@ -117,7 +118,7 @@ EXPORT Files := MODULE
 	
 	EXPORT CA_Collateral	:= sort(project(CA_raw(row_data[1] = '7'), xfrmCollateral(left)),Initial_Filing_Number);
 	
-	EXPORT Hogan	:= dataset(root+'hgn', LiensV2_preprocess.Layouts_Hogan.raw_in, flat);
+	EXPORT Hogan	:= dataset(root+'hgn', LiensV2_preprocess.Layouts_Hogan.raw_in, CSV(HEADING(0), SEPARATOR(','), QUOTE('"'), TERMINATOR('\r\n'), MAXLENGTH(100000)));
 	
 END;
 		

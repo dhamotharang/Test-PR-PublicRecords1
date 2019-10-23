@@ -1,4 +1,4 @@
-import PRTE_CSV;
+﻿import PRTE_CSV;
 
 EXPORT Sanctn := module
 
@@ -585,7 +585,7 @@ EXPORT Sanctn := module
 		STRING8 	batch_number;
 		STRING8 	incident_number;
 		STRING8 	party_number;
-		UNSIGNED8 __internal_fpos__;
+		// UNSIGNED8 __internal_fpos__;
 	END;
 
  EXPORT rthor_data400__key__sanctn__party_aka_dba	:= RECORD

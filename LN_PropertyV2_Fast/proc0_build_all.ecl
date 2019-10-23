@@ -1,4 +1,4 @@
-﻿IMPORT LN_PropertyV2_Fast,STD, RoxieKeyBuild,AVM_V2, header,Std, PromoteSupers;
+﻿IMPORT LN_PropertyV2_Fast,STD, RoxieKeyBuild,AVM_V2, _Control,Std, PromoteSupers;
 #OPTION('multiplePersistInstances',FALSE);
 
 EXPORT proc0_build_all(string8 process_date, boolean isFast, string emailRecipients) := FUNCTION
@@ -38,29 +38,39 @@ UPDT_AVM_DOPS	:=	parallel(	RoxieKeyBuild.updateversion('AVMV2Keys'			, process_d
 
 BUILD_QA_SMPL	:= 	LN_PropertyV2_Fast.New_records_sample(process_date,isFast);
 
+current_date_time := (STRING) STD.Date.CurrentDate(true)+ STD.Date.CurrentTime(true) : INDEPENDENT;
+current_minute := STD.Date.Minute(STD.Date.CurrentTime(true));
+minute_to_launch := if(current_minute >= 50, current_minute+10-60, current_minute+10);
+wuid_cluster := 'thor400_44_eclcc';
+
 // Jira SLP-1
 ECLSpecificty := '#option(\'multiplePersistInstances\',FALSE);\n'
-								+'#OPTION(\'AllowedClusters\',\'thor400_44,thor400_60\');\n'
 								+'#workunit(\'protect\', \'true\');\n'
 								+'#workunit(\'name\', \'property.InsuranceKeybuild '+process_date+'\');\n'
 								+'SpecMod:= InsuranceHeader_Property_Transactions_DeedsMortgages.specificities(InsuranceHeader_Property_Transactions_DeedsMortgages.In_PROPERTY_TRANSACTION);\n'
 								+'SpecMod.Build;\n';
-SubmitSpecificty := header.fSubmitNewWorkunit(ECLSpecificty, 'thor400_44');
+SubmitSpecificty := _Control.fSubmitNewWorkunit(ECLSpecificty, wuid_cluster);
 
 //Jira DF-11862
 ECLClearbase := '#option(\'multiplePersistInstances\',FALSE);\n'
-								+'#OPTION(\'AllowedClusters\',\'thor400_44,thor400_60\');\n'
 								+'#workunit(\'name\', \'property.clearbase '+process_date+'\');\n'
 								+'BaseFileInUseByDelta := IF(FileServices.FileExists(\'~thor::property_base_being_written_by_delta\'),true,false);\n'
 								+'ReadyToClearBaseFile := IF(NOT(BaseFileInUseByDelta),notify(\'Ok_To_Clear_Property_Fast_Base\',\'*\'));\n'
 								+'SubmitClearBaseFile  := LN_PropertyV2_Fast.clear_base_fast_previous_deltas(\''+process_date+'\');\n'
 								+'LaunchCron           := sequential(ReadyToClearBaseFile,\n'
-								+'																	 output(ut.getTimeDate()[1..10]+\' \'+ut.getTimeDate()[11..],named(\'Last_Checked\')),\n'
+								+'																	 output(STD.Date.CurrentDate(true)+\' \'+STD.Date.CurrentTime(true),named(\'Last_Checked\')),\n' //DF-22825 replaced deprecated code to remove warnings
 								+'																	 output(BaseFileInUseByDelta,named(\'Base_Being_Written\')));\n'
-								+'LaunchEvent          := sequential(SubmitClearBaseFile,fail(\'Base Fast Cleared, Not an error\'));\n'
-								+'LaunchCron : when(cron (\'45 0-23/1 * * 1-5\'));\n'
+								+'LaunchEvent          := sequential(SubmitClearBaseFile, notify(\'Ok_To_Run_Build_Delta_With_Full_Keys_' + current_date_time + '\',\'*\'), fail(\'Base Fast Cleared, Not an error\'));\n'
+								+'LaunchCron : when(cron (\''+ minute_to_launch +' 0-23/1 * * *\'));\n' //DF-22825 minute to start to 10 minutes in the future and removed weekday restriction
 								+'LaunchEvent: when(event(\'Ok_To_Clear_Property_Fast_Base\',\'*\'),count(1));\n';
-SubmitClearBase	:= header.fSubmitNewWorkunit(ECLClearbase, 'thor400_44');
+SubmitClearBase	:= _Control.fSubmitNewWorkunit(ECLClearbase, wuid_cluster);
+
+//DF-22825 separated clear files and keybuild steps to force keys to be built after files are cleared.  Boolean persist was running out of scope.
+DeltaKeyBuild := '#option(\'multiplePersistInstances\',FALSE);\n'
+								+'#workunit(\'name\', \'property.build_delta_with_full_keys '+process_date+'\');\n'
+								+'RunBuildDeltaKeys  := LN_PropertyV2_Fast.fn_build_delta_with_full_keys();\n'
+								+'RunBuildDeltaKeys: when(event(\'Ok_To_Run_Build_Delta_With_Full_Keys_' + current_date_time + '\',\'*\'),count(1));\n';
+SubmitDeltaKeyBuild	:= _Control.fSubmitNewWorkunit(DeltaKeyBuild, wuid_cluster);
 
 mostcurrentlog	:= sort(LN_PropertyV2_Fast.BuildLogger.file,-version)[1];
 
@@ -107,8 +117,9 @@ run_all := sequential(  LN_PropertyV2_Fast.fn_reset_raw_files,
 																							
 																						LN_PropertyV2_Fast.JobInfo.updateViaEmail('Full build is not waiting for delta to finish')
 													 ),
-												// When full build finisshes it needs to clear deltas already added to the full, it runs until file available to clear
-												if(NOT(isFast),sequential(SubmitClearBase,SubmitSpecificty)),
+												// When full build finishes it needs to clear deltas already added to the full and rebuild delat keys, it runs until file available to clear
+												//submit the keybuild job first so it has time to compile and go into waiting mode for the notify event that SubmitClearBase raises
+												if(NOT(isFast),sequential(SubmitDeltaKeyBuild, SubmitClearBase,  SubmitSpecificty)), //DF-22825 separated clear files and keybuild steps
 												//ppr extract build process -- 20170310
 												if(isFast , sequential(ppr_extract , LN_PropertyV2_Fast.JobInfo.updateViaEmail ( 'PPR Extract file built success') ))
 											);

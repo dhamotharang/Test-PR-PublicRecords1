@@ -1,6 +1,5 @@
-import wk_ut;
-EXPORT GetFileDescription(
+﻿EXPORT GetFileDescription(
    string pfilename
-  ,string pesp          = wk_ut._constants.LocalEsp
+  ,string pesp          = _Config.LocalEsp
 ) :=
-WsDFU.soapcall_DFUInfo(pfilename,'',false,'','',pesp)[1].Description;
+WsDFU.soapcall_DFUInfo(pfilename,'',false,'',pesp)[1].Description;

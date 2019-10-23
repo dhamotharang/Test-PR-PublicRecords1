@@ -1,4 +1,4 @@
-EXPORT fn_ValidateInput := function
+﻿EXPORT fn_ValidateInput := function
 
 fnew := nothor(FileServices.Superfilecontents( '~thor_data400::in::prolic::allsources'));
 
@@ -21,7 +21,8 @@ st_missing := jdiff[1].flname;
 
 dsconcatall := output(Prof_License.File_prolic_in,,'~thor_data400::in::prolic_all_sources_'+workunit,compressed,overwrite);
 
-return Sequential (dsconcatall,
+return Sequential (IsValidDate,
+                         dsconcatall,
                         FileServices.AddSuperfile('~thor_data400::in::prolic_all_sources', '~thor_data400::in::prolic_all_sources_'+workunit),
                         if ( count(jdiff) > 0 ,Sequential(output(jdiff,named('Missingfiles')),FAIL('IN files  missing.Please verify --'+st_missing),Output('Please go ahead with build process')));
               );

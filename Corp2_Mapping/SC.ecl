@@ -1,4 +1,4 @@
-import corp2,corp2_mapping,corp2_raw_sc,scrubs,scrubs_corp2_mapping_sc_event,scrubs_corp2_mapping_sc_main,std,tools,ut,versioncontrol; 			 
+﻿import corp2,corp2_mapping,corp2_raw_sc,scrubs,scrubs_corp2_mapping_sc_event,scrubs_corp2_mapping_sc_main,std,tools,ut,versioncontrol; 			 
 
 export SC := MODULE;
 	
@@ -312,22 +312,20 @@ export SC := MODULE;
 		Event_TranslateBitMap			:= output(Event_T);
 
 		//Creates Profile's alert template for Orbit - Can be copied & imported into Orbit; Only required first time & if scrub rules change
-		Event_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').ProfileAlertsTemplate;
+		Event_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').ProfileAlertsTemplate;
 		//Submits Profile's stats to Orbit
-		Event_SubmitStats 				:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').SubmitStats;
+		Event_SubmitStats 				:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').SubmitStats;
 
-		Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').CompareToProfile_with_Examples;
+		Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').CompareToProfile_with_Examples;
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
-		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpEvent_SC Report' //subject
 																																 ,'Scrubs CorpEvent_SC Report' //body
 																																 ,(data)Event_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpSCEventScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 
 		Event_BadRecords				 	:= Event_N.ExpandedInFile(corp_key_Invalid							  			<> 0 or
 																												corp_vendor_Invalid 									<> 0 or																						
@@ -398,15 +396,13 @@ export SC := MODULE;
 		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').CompareToProfile_with_Examples;
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_MailFile							:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_MailFile							:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_SC Report' //subject
 																																	 ,'Scrubs CorpMain_SC Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpSCMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray);
+																																	);
 
 		Main_BadRecords						:= Main_N.ExpandedInFile(dt_vendor_first_reported_Invalid 			<> 0 or
 																											 dt_vendor_last_reported_Invalid 				<> 0 or

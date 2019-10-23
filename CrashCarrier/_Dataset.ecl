@@ -1,7 +1,7 @@
-import _control, versioncontrol;
+﻿import _control, versioncontrol;
 
 export _Dataset(boolean pUseOtherEnvironment = false) := module
-	export Name										:= 	'CrashCarrier';
+	export Name										:= 	'Yogurt: CrashCarrier';
 	export pName									:= 	'CrashCarrier';
 	export thor_cluster_Files			:= 	'~thor_data400::';
 	export thor_cluster_Persists	:= 	thor_cluster_Files;

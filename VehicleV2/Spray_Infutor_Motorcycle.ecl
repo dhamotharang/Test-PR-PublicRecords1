@@ -1,8 +1,8 @@
-//Spray Infutor Motorcycle file. Use thor40_241 for dataland cluster
+﻿//Spray Infutor Motorcycle file. Use thor40_241 for dataland cluster
 IMPORT _control,lib_fileservices,Address;
 
  EXPORT Spray_Infutor_Motorcycle(string	pProcessDate,
-																 string	pGroupName	=	'thor400_60',
+																 string	pGroupName	=	'thor400_36',
 																 boolean	pOverwrite	=	true
 																 )	:=
  FUNCTION

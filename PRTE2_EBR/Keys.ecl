@@ -1,4 +1,4 @@
-Import Data_Services, doxie, ut, mdr, standard, PRTE2_EBR, autokey, AutoKeyB, BIPV2, Doxie,AutoStandardI;
+﻿Import Data_Services, doxie, ut, mdr, standard, PRTE2_EBR, autokey, AutoKeyB, BIPV2, Doxie,AutoStandardI;
 
 EXPORT Keys := module
 
@@ -80,7 +80,8 @@ EXPORT Key_0010_Header_linkids := MODULE
 
 // DEFINE THE INDEX
 shared superfile_name	:=  Constants.key_prefix + doxie.Version_SuperKey + '::0010_header::linkids';
-BIPV2.IDmacros.mac_IndexWithXLinkIDs(Files.BASE_0010_Header, k, superfile_name);
+//BIPV2.IDmacros.mac_IndexWithXLinkIDs(Files.BASE_0010_Header, k, superfile_name);
+BIPV2.IDmacros.mac_IndexWithXLinkIDs(Files.BASE_0010_Header_linkids, k, superfile_name);
 export Key := k;
 
 //DEFINE THE INDEX ACCESS
@@ -108,7 +109,8 @@ EXPORT Key_5600_Demographic_Data_linkids := MODULE
 
   // DEFINE THE INDEX
 	shared superfile_name := Constants.key_prefix + doxie.Version_SuperKey + '::5600_Demographic_data::linkids';
-	BIPV2.IDmacros.mac_IndexWithXLinkIDs(Files.BASE_5600_Demographic, k, superfile_name)
+	//BIPV2.IDmacros.mac_IndexWithXLinkIDs(Files.BASE_5600_Demographic, k, superfile_name)
+	BIPV2.IDmacros.mac_IndexWithXLinkIDs(Files.BASE_5600_Demographic_linkids, k, superfile_name)
 	export Key := k;
 
 

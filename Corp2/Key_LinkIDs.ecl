@@ -1,5 +1,4 @@
-IMPORT BIPV2;
-
+﻿IMPORT BIPV2, corp2_mapping;
 
 EXPORT Key_LinkIds := MODULE
 
@@ -13,7 +12,7 @@ export Corp :=
 
 //Cleanup Corp base file	
   CorpBase TFixCorpBase(CorpBase L) := TRANSFORM
-		SELF.corp_legal_name := Corp2.fCleanupTextInput(L.corp_legal_name,'corp_legal_name');
+		SELF.corp_legal_name 			:= Corp2_Mapping.fn_RemoveSpecialChars(L.corp_legal_name);
 		SELF.corp_sos_charter_nbr := StringLib.StringToUpperCase(L.corp_sos_charter_nbr);
     SELF := L;
   END;
@@ -70,14 +69,14 @@ export Cont :=
 
 
   ContBase TFixContBase(ContBase L) := TRANSFORM,
-												skip(length(Corp2.fCleanupTextInput(L.cont_name,'alpha')) <= 1)
+												skip(length(Corp2_Mapping.fn_RemoveSpecialChars(L.cont_name)) <= 1)
 												
-		SELF.corp_legal_name := Corp2.fCleanupTextInput(L.corp_legal_name,'corp_legal_name');
-		SELF.cont_cname := Corp2.fCleanupTextInput(L.cont_cname,'other_names');
-		SELF.cont_name  := Corp2.fCleanupTextInput(L.cont_name,'other_names');
-    SELF.cont_fname := Corp2.fCleanupTextInput(L.cont_fname,'clean_names');
-    SELF.cont_mname := Corp2.fCleanupTextInput(L.cont_mname,'clean_names');
-    SELF.cont_lname := Corp2.fCleanupTextInput(L.cont_lname,'clean_names');
+		SELF.corp_legal_name 	:= Corp2_Mapping.fn_RemoveSpecialChars(L.corp_legal_name);
+		SELF.cont_cname 			:= Corp2_Mapping.fn_RemoveSpecialChars(L.cont_cname);
+		SELF.cont_name  			:= Corp2_Mapping.fn_RemoveSpecialChars(L.cont_name);
+    SELF.cont_fname 			:= Corp2_Mapping.fn_RemoveSpecialChars(L.cont_fname);
+    SELF.cont_mname 			:= Corp2_Mapping.fn_RemoveSpecialChars(L.cont_mname);
+    SELF.cont_lname 			:= Corp2_Mapping.fn_RemoveSpecialChars(L.cont_lname);
 		SELF.corp_sos_charter_nbr := StringLib.StringToUpperCase(L.corp_sos_charter_nbr);
     SELF := L;
   END;

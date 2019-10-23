@@ -1,3 +1,7 @@
-//EXPORT File_DJ := '~file::edata12-bld.br.seisint.com::hds_3::^Dow^Jones::^P^F^A2_201306052200_^F.xml';
+﻿import _control;
 Version := '20130605' : STORED('DJVersion');
-EXPORT File_DJ := '~file::bctlpedata10.risk.regn.net::data::hds_3::^Dow^Jones::input::^P^F^A2_'+Version+'2200_^F.xml';
+boolean isDelta := false : STORED('UseDeltaFile');
+EXPORT File_DJ := IF(isDelta,
+	'~file::'+_control.IPAddress.bctlpedata10+'::data::hds_3::^Dow^Jones::input::^P^F^A2_'+Version+'2200_^D.xml',
+	'~file::'+_control.IPAddress.bctlpedata10+'::data::hds_3::^Dow^Jones::input::^P^F^A2_'+Version+'2200_^F.xml'
+);

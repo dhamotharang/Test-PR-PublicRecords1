@@ -1,12 +1,12 @@
-import tools;
+﻿import tools;
 
 export proc_Build_Base(
 
 	 string										pversion
 	,boolean									pIsTesting			= false
 	,dataset(Layouts.Input	)	pSprayedFile		= Files().Input.using
-	,dataset(Layouts.Base		)	pBaseFile				= Files().base.qa									
-	,dataset(Layouts.Base		)	pNewBaseFile		= Update_Base(pversion,pSprayedFile,pBaseFile)
+	,dataset(Layouts.Base_new)	pBaseFile				= Files().base.qa									
+	,dataset(Layouts.Base_new)	pNewBaseFile		= Update_Base(pversion,pSprayedFile,pBaseFile)
 	,boolean									pWriteFileOnly	= false
 ) :=
 function

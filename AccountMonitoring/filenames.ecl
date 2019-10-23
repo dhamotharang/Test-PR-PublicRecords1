@@ -1,11 +1,21 @@
-IMPORT AccountMonitoring;
+﻿IMPORT AccountMonitoring;
 
 // The file names/locations for the products in the various systems (ie: results, history, documents, inquiry tracking, ecm, etc)
 EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 
 	// The top most folder in the Account Monitoring structure
 	SHARED base_template := AccountMonitoring.constants.filename_cluster + 'base::Account_Monitoring::' + TRIM(AccountMonitoring.constants.pseudo_ext(pseudo_environment));
-
+	// The file name and location of the base, update, archive and remote Portfolio files
+	
+  EXPORT monitor := MODULE
+		SHARED monitor_template(string var) := base_template + 'monitor::' + var;
+		EXPORT base            := monitor_template('base');
+		// EXPORT update          := portfolio_template('update');
+		// EXPORT archive         := portfolio_template('archive');
+		// EXPORT super           := portfolio_template('super');
+		// EXPORT remote          := 'portfolio.txt';
+	END;
+  
 	// The file name and location of the base, update, archive and remote Portfolio files
 	EXPORT portfolio := MODULE
 	
@@ -53,6 +63,7 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 		EXPORT mvr					 	 := documents_template('mvr');
 		EXPORT aircraft			 	 := documents_template('aircraft');
 		EXPORT watercraft		 	 := documents_template('watercraft');
+		EXPORT personheader		 	 := documents_template('personheader');
 	END;
 	
 	// The file name and location of the history files.  
@@ -85,6 +96,7 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 		EXPORT mvr	 					 := history_template('mvr');
 		EXPORT aircraft				 := history_template('aircraft');
 		EXPORT watercraft			 := history_template('watercraft');
+    EXPORT personheader		 	 := history_template('personheader');
 	END;
 	
 	// The file name and location of the Inquiry tracking files are used solely for auditing purposes

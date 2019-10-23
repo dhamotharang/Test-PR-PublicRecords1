@@ -1,1 +1,1 @@
-export Roxie_Email_List := 'Xia.Sheng@LexisNexis.com';
+﻿export Roxie_Email_List := 'shannon.skumanich@lexisnexis.com';

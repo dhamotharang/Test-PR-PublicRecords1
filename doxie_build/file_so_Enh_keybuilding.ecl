@@ -1,4 +1,4 @@
-import watchdog, didville, doxie, sexoffender, mdr, header, utilfile, drivers, codes, ut;
+﻿import watchdog, didville, doxie, sexoffender, mdr, header, utilfile, drivers, codes, ut,relationship;
 
 export file_so_Enh_keybuilding := function
 
@@ -112,10 +112,10 @@ GLBFile      := join(RawFileDids, best_address_glb,  left.did = right.did, AddAl
 NonGLBFile   := join(RawFileDids, best_address_nonglb, left.did = right.did, AddAltDetailsNonGLB(left,right), hash);
 BestResults  := GLBFile + NonGLBFile;
 
-
+loadfile:=pull(Relationship.key_relatives_v3)(type in ['PERSONAL','TRANS CLOSURE'] and confidence in ['MEDIUM','HIGH']);
 // Create relatives table **********
 //  Add relatives linking table
-SORelativesLinkTable := join(RawFileDids, doxie.Key_Relatives, left.did = right.person1);
+SORelativesLinkTable := join(distribute(RawFileDids,hash(did)), distribute(loadfile,hash(did1)), left.did = right.did1,local);
 
 
 //  Get relatives best address
@@ -164,8 +164,8 @@ AltLayout AddRelativeBestNonGLB(SORelativesLinkTable le, best_address_nonglb ri)
 	SELF.src									 := '';
 end;		
 
-SORelativesAddedGLB    := join(SORelativesLinkTable, best_address_glb, left.person2 = right.did, AddRelativeBestGLB(left, right), hash);
-SORelativesAddedNonGLB := join(SORelativesLinkTable, best_address_nonglb, left.person2 = right.did, AddRelativeBestNonGLB(left, right), hash);
+SORelativesAddedGLB    := join(distribute(SORelativesLinkTable,hash(did2)), distribute(best_address_glb,hash(did)), left.did2 = right.did, AddRelativeBestGLB(left, right),local);
+SORelativesAddedNonGLB := join(distribute(SORelativesLinkTable,hash(did2)), distribute(best_address_nonglb,hash(did)), left.did2 = right.did, AddRelativeBestNonGLB(left, right),local);
 SORelativesAdded       := SORelativesAddedGLB + SORelativesAddedNonGLB; //if(pGLB != 0, SORelativesAddedGLB, SORelativesAddedNonGLB);
 
 // Get historical records

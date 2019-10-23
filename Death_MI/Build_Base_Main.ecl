@@ -1,4 +1,4 @@
-IMPORT tools, ut;
+﻿IMPORT _control, MDR, std, tools, ut;
 
 EXPORT Build_Base_Main(STRING pversion,
 	                     DATASET(Death_MI.Layouts.Base) inMainBase) := MODULE
@@ -32,7 +32,10 @@ EXPORT Build_Base_Main(STRING pversion,
 	workingMIMainUpdate := PROJECT(inDeathUpdate, add_dates(LEFT));	
 	workingILMainUpdate := PROJECT(inILDeathUpdate, add_IL_dates(LEFT));	
 	workingMainUpdate := workingMIMainUpdate + workingILMainUpdate;	
-	workingMainUpdate_clean_input := Death_MI.Standardize_Input(workingMainUpdate);
+	
+	addGlobal_SID			:= MDR.macGetGlobalSid(workingMainUpdate, 'Death_MI', 'customer_id', 'global_sid');	
+	
+	workingMainUpdate_clean_input := Death_MI.Standardize_Input(addGlobal_SID);
 	workingMainUpdate_clean_name := Death_MI.Standardize_Name(workingMainUpdate_clean_input);
 
 	// Join base and update

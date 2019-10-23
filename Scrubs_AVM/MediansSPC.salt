@@ -1,0 +1,16 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_AVM
+FILENAME:AVM 
+NAMESCOPE:Medians
+
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)
+FIELDTYPE:Invalid_AlphaNum:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)
+FIELDTYPE:Invalid_Chars:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .+)
+FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
+FIELDTYPE:Invalid_Num:ALLOW(0123456789)
+
+FIELD:history_date:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:fips_geo_12:LIKE(Invalid_Num):TYPE(STRING12):0,0
+FIELD:median_valuation:LIKE(Invalid_Num):TYPE(INTEGER8):0,0
+FIELD:history_history_date:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:history_median_valuation:LIKE(Invalid_Num):TYPE(INTEGER8):0,0

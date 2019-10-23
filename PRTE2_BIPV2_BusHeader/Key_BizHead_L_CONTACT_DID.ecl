@@ -13,6 +13,7 @@ layout := RECORD // project out required fields
   h.seleid; // Parent #1
   h.proxid; // The ID field
   h.powid; // Uncle #1
+	h.EFR_BMap;
 //Scores for various field components
   h.contact_did_weight100 ; // Contains 100x the specificity
 END;

@@ -1,4 +1,4 @@
-IMPORT _control;
+﻿IMPORT _control, LiensV2;
 EXPORT Constants	:= MODULE
 		
 		//Base/Input/Key Prefix
@@ -20,4 +20,7 @@ EXPORT Constants	:= MODULE
 
 		//EXPORT TYPE_STR := 'ak';
 	
+	
+	EXPORT fields_to_clear_main_id_fcra 	:=  LiensV2.Constants.fields_to_clear_main_id_fcra;
+	EXPORT fields_to_clear_party_id_fcra 	:= LiensV2.Constants.fields_to_clear_party_id_fcra;
 END;

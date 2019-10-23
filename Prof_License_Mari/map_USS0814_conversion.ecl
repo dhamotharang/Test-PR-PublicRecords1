@@ -1,6 +1,7 @@
-/* Converting Asc National Registry Real Estate Appraisers Professional License File to MARI common layout
+﻿/* Converting Asc National Registry Real Estate Appraisers Professional License File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND*/
 //Input file location: \\Tapeload02b\k\professional_licenses\mari\national\real_estate_appraisers_(en)
+#workunit('name','Yogurt: map_USS0814_conversion'); 
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, STD;
 
 EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION
@@ -76,7 +77,7 @@ EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION
 	DBApattern				:= '^(.*)(DBA |(DBA)|D B A |D/B/A |T/A | / )(.*)';
 
 	//ASC National Registry to common MARIBASE layout
-	Prof_License_Mari.layouts.base 		xformToCommon(Prof_License_Mari.layout_USS0814 pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in 		xformToCommon(Prof_License_Mari.layout_USS0814 pInput) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -94,35 +95,35 @@ EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION
 		SELF.TYPE_CD					:= 'MD';
 			
 		// License Information
-		SELF.LICENSE_NBR	  	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_NUMR);
+		SELF.LICENSE_NBR	  	:= ut.CleanSpacesAndUpper(pInput.LIC_NUMR);
 		SELF.OFF_LICENSE_NBR	:= '';
-		SELF.LICENSE_STATE	 	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ST_ABBR);
+		SELF.LICENSE_STATE	 	:= ut.CleanSpacesAndUpper(pInput.ST_ABBR);
 			
-		TrimLicenseType 			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_TYPE);
+		TrimLicenseType 			:= ut.CleanSpacesAndUpper(pInput.LIC_TYPE);
 		SELF.RAW_LICENSE_TYPE	:= TrimLicenseType;
 			
-		TrimStatus 						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATUS);
-		TrimAQB 							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.AQB_COMPLIANT);
+		TrimStatus 						:= ut.CleanSpacesAndUpper(pInput.STATUS);
+		TrimAQB 							:= ut.CleanSpacesAndUpper(pInput.AQB_COMPLIANT);
 		TrimAQBValid					:= IF(REGEXFIND('([0-9]+)',TrimAQB),'UNKNOWN',TrimAQB);					//digit is not a valid compliance status, treat is as blank
 		tmpStatus 						:= IF(TrimAQBValid != '',TrimStatus+' AQB COMPLIANCE-'+ TrimAQBValid,TrimStatus);
 		SELF.RAW_LICENSE_STATUS := tmpStatus;
 																			
 		//Standardize Fields
-		TrimLName							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LNAME);
-		TrimFName							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.FNAME);
-		TrimMNAME					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MNAME);
-		TrimNAME_SUFX					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.NAME_SUFFIX);
-		TrimNAME_OFFICE 			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(StringLib.StringFilterOut(pInput.COMPANY, '='));
-		TrimAddress1 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STREET);
+		TrimLName							:= ut.CleanSpacesAndUpper(pInput.LNAME);
+		TrimFName							:= ut.CleanSpacesAndUpper(pInput.FNAME);
+		TrimMNAME					:= ut.CleanSpacesAndUpper(pInput.MNAME);
+		TrimNAME_SUFX					:= ut.CleanSpacesAndUpper(pInput.NAME_SUFFIX);
+		TrimNAME_OFFICE 			:= ut.CleanSpacesAndUpper(StringLib.StringFilterOut(pInput.COMPANY, '='));
+		TrimAddress1 					:= ut.CleanSpacesAndUpper(pInput.STREET);
 		TrimCity							:= IF(REGEXFIND('(^NI|NONE INDICATED|N/|\\.)',pInput.CITY, NOCASE),
 		                            '',
-		                            Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY));
+		                            ut.CleanSpacesAndUpper(pInput.CITY));
 		TrimState							:= IF(REGEXFIND('(^NI|^NO|N/|\\.)',pInput.STATE),
 		                            '',
-		                            Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE));
+		                            ut.CleanSpacesAndUpper(pInput.STATE));
 		TrimZIP 							:= IF(REGEXFIND('(NI|NONE|N/|^0$|\\.)',TRIM(pInput.ZIP),NOCASE),
 		                            '',
-		                            Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZIP));
+		                            ut.CleanSpacesAndUpper(pInput.ZIP));
 
 		//Clean up suffix from suffix and last name
 		tmpSuffixName					:= MAP(TrimNAME_SUFX<>''=>TrimNAME_SUFX,
@@ -412,13 +413,13 @@ EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),TrimState);
 		SELF.ADDR_ZIP5_1		  := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),tmpZip[1..5]);
 		SELF.ADDR_ZIP4_1		  := clnAddrAddr1[122..125];
-		SELF.ADDR_CNTY_1			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.COUNTY);
+		SELF.ADDR_CNTY_1			:= ut.CleanSpacesAndUpper(pInput.COUNTY);
 		SELF.PHN_PHONE_1			:= SELF.PHN_MARI_1;
 	
 		SELF.OOC_IND_1				:= 0;    
 		SELF.OOC_IND_2				:= 0;
 		
-		TrimDispAction 				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.DISCIPLINARY_ACTION);
+		TrimDispAction 				:= ut.CleanSpacesAndUpper(pInput.DISCIPLINARY_ACTION);
 		SELF.DISP_TYPE_CD			:= MAP(TrimDispAction = 'VOLUNTARY SURRENDER' => 'V',
 																	TrimDispAction = 'SUSPENSION' => 'D',
 																	TrimDispAction = 'REVOCATION' => 'R',
@@ -449,9 +450,9 @@ EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION
 																			+TRIM(SELF.NAME_ORG_ORIG,LEFT,RIGHT)
 																			+TRIM(SELF.NAME_DBA_ORIG,LEFT,RIGHT)
 																			+TRIM(SELF.DISP_TYPE_CD,LEFT,RIGHT)    //There are records with same info but differnt disciplinary actions
-//																			+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STREET)
-//																			+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY)
-//																			+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZIP));
+//																			+ut.CleanSpacesAndUpper(pInput.STREET)
+//																			+ut.CleanSpacesAndUpper(pInput.CITY)
+//																			+ut.CleanSpacesAndUpper(pInput.ZIP));
 			                                +TRIM(SELF.ADDR_ADDR1_1)
 			                                +TRIM(SELF.ADDR_ADDR2_1)
 			                                +TRIM(SELF.ADDR_CITY_1)
@@ -507,7 +508,7 @@ EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION
 	inFileLic	:= project(GoodFilterRec,xformToCommon(LEFT));
 
 	//Populate STD_STATUS_CD field via translation on statu field
-	Prof_License_Mari.layouts.base 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS :=  StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));
 		SELF := L;
 	END;
@@ -520,7 +521,7 @@ EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION
 
 
 	// Populate STD_LICENSE_TYPE field via translation on license type field
-	Prof_License_Mari.layouts.base 	trans_lic_type1(ds_map_status_trans L, cmvTransLkp R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_type1(ds_map_status_trans L, cmvTransLkp R) := TRANSFORM
 		SELF.STD_LICENSE_TYPE := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -534,7 +535,7 @@ EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION
 							trans_lic_type1(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 																			
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base 	trans_lic_type2(ds_map_lic_trans1 L, cmvTransLkp R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_type2(ds_map_lic_trans1 L, cmvTransLkp R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -548,7 +549,7 @@ EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(ds_map_lic_trans L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(ds_map_lic_trans L) := TRANSFORM
 		tmpAddr1_1 := StringLib.Stringfindreplace(L.ADDR_ADDR1_1,'C/O ',' ');
 		SELF.ADDR_ADDR1_1		:= Prof_License_Mari.mod_clean_name_addr.strippunctMisc(tmpAddr1_1);
 		SELF.ADDR_ADDR2_1		:= Prof_License_Mari.mod_clean_name_addr.strippunctMisc(L.ADDR_ADDR2_1);

@@ -1,4 +1,4 @@
-import header, ut, STRATA, lib_fileservices, MDR, std, PromoteSupers;
+﻿import header, ut, STRATA, lib_fileservices, MDR, std, PromoteSupers;
 
 
 #workunit('priority','high');
@@ -15,16 +15,39 @@ zVerifyVersion	:=	if(ut.DaysApart((string8)Std.Date.Today(), pversion) >= 10,
 					   output(pversion,named('Version_Date'))
 					  );
  
-zTXData       :=  DriversV2.File_DL_TX_Update2 + DriversV2.File_DL_TX_Update_Clean;
+zTXData       :=  DriversV2.File_DL_TX_Update_Clean;
 zVerifyTXData	:=	if (count(zTXData(length(trim(dl_number)) = 10 and trim(dl_number)[1..2]!='00' and trans_indicator ='U')) > 0,
 												fail('TX DLs is sending data containing something other than 2 leading zeroes in the DL_number field  - Development is needed!')
 											);
 
 // Split the restricted DL information out of the data.
-dl_patched    := Driversv2.DL(source_code != MDR.sourceTools.src_MN_RESTRICTED_DL);
-dl_restricted := Driversv2.DL(source_code = MDR.sourceTools.src_MN_RESTRICTED_DL);
+dl_nonRestricted	:= Driversv2.DL(source_code != MDR.sourceTools.src_MN_RESTRICTED_DL);
+dl_restricted 		:= Driversv2.DL(source_code = MDR.sourceTools.src_MN_RESTRICTED_DL);
 
-// The restricted DL information has already been removed at this point
+// We need to work with just the WI data for opt out purposes. 
+dl_WIOnly	:=	distribute(dl_nonRestricted(orig_state='WI' and source_code = 'AD'),hash(dl_number));
+dl_Rest		:=	dl_nonRestricted(orig_state<>'WI' or (orig_state = 'WI' and source_code <> 'AD'));
+
+// Determine the latest time a record was opted out. All records including and prior will be supressed.
+dl_WIOptOut		:=	dedup(sort(dl_WIOnly(Opt_Out	=	'S'),dl_number,-dateReceived,local),dl_number,local);
+
+recordof(dl_WIOnly) tremoveOptOut(dl_WIOnly le, dl_WIOptOut ri) :=
+transform
+	self := le;
+end;
+
+dWIFinal := join( dl_WIOnly,
+									dl_WIOptOut,
+									left.dl_number = right.dl_number and 
+									left.dateReceived<=right.dateReceived,
+									tremoveoptout(left,right),
+									left only,
+									local
+								);
+
+// Bring the non WI data back in.								
+dl_patched		:=	dWIFinal + dl_rest;
+
 d := dl_patched;
 
 //** general check
@@ -52,7 +75,7 @@ END;
 dl_patched_slim := PROJECT(dl_patched,tSlim(LEFT));						  
 
 PromoteSupers.MAC_SF_BuildProcess(dl_patched_slim + 
-                       Driversv2.File_Dummy_Data(pversion), DriversV2.Constants.Cluster+'base::DL2::drvlic',aBuildDLBase,2, ,true);
+                       Driversv2.File_Dummy_Data(pversion), DriversV2.Constants.Cluster+'base::DL2::drvlic',aBuildDLBase,3, ,true);
 
 /* Transform/Project the dummy data to map to Base w/AID format */
 DriversV2.Layout_Base_withAID tMapping(DriversV2.Layout_DL_Extended L) := TRANSFORM
@@ -64,9 +87,9 @@ DriversV2.Layout_Base_withAID tMapping(DriversV2.Layout_DL_Extended L) := TRANSF
 END;
 dMapping := PROJECT(Driversv2.File_Dummy_Data(pversion),tMapping(LEFT));
 
-PromoteSupers.MAC_SF_BuildProcess(dl_patched + dMapping, DriversV2.Constants.Cluster+'base::DL2::drvlic_AID',bBuildDLBase,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(dl_patched + dMapping, DriversV2.Constants.Cluster+'base::DL2::drvlic_AID',bBuildDLBase,3, ,true);
 											                                                          
-PromoteSupers.MAC_SF_BuildProcess(dl_restricted, DriversV2.Constants.Cluster+'base::DL2::RESTRICTED_drvlic_AID',resBuildDLBase,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(dl_restricted, DriversV2.Constants.Cluster+'base::DL2::RESTRICTED_drvlic_AID',resBuildDLBase,3, ,true);
 
 DriversV2.Layout_DL_For_Insurance trfSlim(DriversV2.File_DL_Extended input) := TRANSFORM
 // Note! In June of 2009 a layout change for TX occured where dl_numbers went from 8 to 10 in length
@@ -77,12 +100,16 @@ DriversV2.Layout_DL_For_Insurance trfSlim(DriversV2.File_DL_Extended input) := T
 														input.dl_number
 												 );
 	self.ssn				:=	'';
+	// December 2018 - DF-23661:  Insurance team requested that for FL records, orig_county be populated with 
+	// values from state field if 01-67 because those are actually county codes. 
+	self.orig_county := if(input.orig_state = 'FL' and (integer)input.state >= 01 and (integer)input.state <= 67
+												 ,input.state, '');
 	SELF 						:= 	input;
 END;
 											 
 dSlimDLBase	:=	project(DriversV2.File_DL_Extended(source_code != 'CY'), trfSlim(left));
 
-PromoteSupers.MAC_SF_BuildProcess(dSlimDLBase, DriversV2.Constants.Cluster+'base::DL2::InsuranceSlim',aSlimDLBase,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(dSlimDLBase, DriversV2.Constants.Cluster+'base::DL2::InsuranceSlim',aSlimDLBase,3, ,true);
 
 //---------------------------------------------------
 // New Stats
@@ -145,17 +172,17 @@ e_mail_fail := fileservices.sendemail('fhumayun@seisint.com;giri.rajulapalli@lex
                     // DriversV2.Layouts_DL_Conv_Points_Common.Layout_FRA_Insurance,thor);
 // ut.MAC_SF_BuildProcess(_upd_ins,DriversV2.Constants.Cluster+'base::DL2::CP_FRA_Insurance',aFRABuild,2, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Convictions,DriversV2.Constants.Cluster+'base::DL2::CP_Convictions',aConvBuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Convictions,DriversV2.Constants.Cluster+'base::DL2::CP_Convictions',aConvBuild,3, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Convictions_Restricted,DriversV2.Constants.Cluster+'base::DL2::CP_Convictions_Restricted',aResConvBuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Convictions_Restricted,DriversV2.Constants.Cluster+'base::DL2::CP_Convictions_Restricted',aResConvBuild,3, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Suspensions,DriversV2.Constants.Cluster+'base::DL2::CP_Suspensions',aSuspBuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Suspensions,DriversV2.Constants.Cluster+'base::DL2::CP_Suspensions',aSuspBuild,3, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_DR_Info,DriversV2.Constants.Cluster+'base::DL2::CP_DR_Info',aDRInfoBuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_DR_Info,DriversV2.Constants.Cluster+'base::DL2::CP_DR_Info',aDRInfoBuild,3, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Accidents,DriversV2.Constants.Cluster+'base::DL2::CP_Accidents',aAccidBuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Accidents,DriversV2.Constants.Cluster+'base::DL2::CP_Accidents',aAccidBuild,3, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Insurance,DriversV2.Constants.Cluster+'base::DL2::CP_FRA_Insurance',aFRABuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Insurance,DriversV2.Constants.Cluster+'base::DL2::CP_FRA_Insurance',aFRABuild,3, ,true);
 
 results := sequential(parallel(zVerifyVersion,
 						zVerifyTXData,

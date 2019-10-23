@@ -1,4 +1,4 @@
-import bair_boolean,Bair_composite, _Control, ut, std, bair_importer,wk_ut;
+﻿import bair_boolean,Bair_composite, _Control, ut, std, bair_importer,wk_ut;
 
 export Build_all(string buildName, string version, boolean pUseProd = false, boolean pDelta = false, boolean pRecover = false) := function
 	
@@ -48,7 +48,7 @@ export Build_all(string buildName, string version, boolean pUseProd = false, boo
 									)
 								)
 							,Bair.UpdateCheckPt(12, pDelta)  //Delta Cycle completed.
-							,if(pDelta and nightly, sequential(wk_ut.CreateWuid(ECL_OrbitUpdate,'hthor',Bair._ESP)))
+							// ,if(pDelta and nightly, sequential(wk_ut.CreateWuid(ECL_OrbitUpdate,'hthor',Bair._ESP)))
 							,if(not pDelta, parallel(
 																Bair.HeaderInfo.Post
 															 ,Bair.Mod_Report_LexID(version, pDelta).sendLexid

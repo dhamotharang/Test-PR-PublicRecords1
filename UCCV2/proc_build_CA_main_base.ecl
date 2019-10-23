@@ -1,4 +1,4 @@
-import address, did_add, didville,ut,header_slimsort,UccV2,business_header,Business_Header_SS;
+﻿import address, did_add, didville,ut,header_slimsort,UccV2,business_header,Business_Header_SS;
 
 dMaster	 			             	:= sort(distribute(file_ca_Filing_Master_in,hash(initial_filing_number)),initial_filing_number,filing_status,-process_date,local);
 dUcc3      	 			 			:= sort(distribute(file_ca_ucc3_in,hash(initial_filing_number)),initial_filing_number,ucc3_filing,-process_date,local);
@@ -109,14 +109,13 @@ dMainBase1                            := join(nofilingnumber ,
 											Tadd_collateral(left,right),
 											left outer,local);
 
-dfinalBase := dMainBase1 + dMainBase;
+dfinalBase := dMainBase1 + dMainBase + dfile;
 
 // *******************************************************
+AddRecordID := uccv2.fnAddPersistentRecordID_Main(dfinalBase);
 
-dDedup                               :=  dedup(dfinalBase+dfile,except process_date,vendor_entry_date,vendor_upd_date,rmsid, ALL);																
+dDedup                               :=  dedup(AddRecordID,except process_date,vendor_entry_date,vendor_upd_date,rmsid, ALL);																
 dsort                                :=  sort(distribute(dDedup,hash(tmsid,filing_number)),record,local);
 Outmain                              :=  rollup(dsort(tmsid<>'CA057017217898'),tRollupStatus(left,right),except filing_status,Status_type,rmsid,process_date,local);
-AddRecordID := uccv2.fnAddPersistentRecordID_Main(Outmain);
-										
 
-export proc_build_CA_main_base       :=	AddRecordID;
+export proc_build_CA_main_base       :=	Outmain;

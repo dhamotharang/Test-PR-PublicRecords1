@@ -1,12 +1,12 @@
-import header;
-r := header.File_Relatives;
+﻿import header,relationship;
+r := pull(Relationship.key_relatives_v3)(type in ['PERSONAL','TRANS CLOSURE'] and confidence in ['MEDIUM','HIGH']);
 
 rp := record
-  r.person1;
-  r.person2;
+  unsigned6 person1;
+  unsigned6 person2;
   end;
 
-r1 := table(r,rp);
+r1 := project(r,transform(rp,Self.person1:=Left.did1;Self.person2:=Left.did2;));
 
 rp switch(r1 le) := transform
   self.person1 := le.person2;

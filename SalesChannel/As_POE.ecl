@@ -1,10 +1,10 @@
-import POE,mdr;
+﻿import POE,mdr;
 
 export As_POE(
 
 	 boolean 										pUsingInPOE				= true
 	,boolean 										pUseOtherEnviron	= _Constants().IsDataland
-	,dataset(layouts.Base			)	pDataset					= if(pUsingInPOE
+	,dataset(layouts.Base_new			)	pDataset					= if(pUsingInPOE
 																												,files('Using_In_POE',pUseOtherEnviron).base.logical
 																												,files(,pUseOtherEnviron).base.qa
 																									)
@@ -15,7 +15,7 @@ export As_POE(
 ) :=
 function
 
-	POE.Layouts.Base	tMapToPOE(layouts.Base l) :=
+	POE.Layouts.Base	tMapToPOE(layouts.Base_new l) :=
 	transform
 		
 		self.source								 				:= mdr.sourceTools.src_SalesChannel				;

@@ -13,7 +13,7 @@ module
 	//////////////////////////////////////////////////////////////////
 	export Input := module
 	
-		shared Template(string tag) := Platform.InputTemplate(false) + tag;
+		shared Template(string tag) := Platform.InputTemplate(pUseOtherEnvironment) + tag;
 		export MBS                           := tools.mod_FilenamesInput(Template('mbs'                              ),pversion);
 		export MbsNewGcIdExclusion           := tools.mod_FilenamesInput(Template('MbsNewGcIdExclusion'              ),pversion); //In this new file gcid is replaced by exclusion_id and exclusion_type
 		export MbsIndTypeExclusion           := tools.mod_FilenamesInput(Template('MbsIndTypeExclusion'              ),pversion);
@@ -25,7 +25,8 @@ module
     export MBSTableCol                   := tools.mod_FilenamesInput(Template('MBSTableCol'                      ),pversion);
     export MBSColValDesc                 := tools.mod_FilenamesInput(Template('MBSColValDesc'                    ),pversion);
     export MBSmarketAppend               := tools.mod_FilenamesInput(Template('MBSmarketAppend'                  ),pversion);
-		export MbsFdnMasterIDIndTypeInclusion	:= tools.mod_FilenamesInput(Template('MbsFdnMasterIDIndTypeInclusion'   ),pversion);
+		export MbsFdnMasterIDIndTypeInclusion:= tools.mod_FilenamesInput(Template('MbsFdnMasterIDIndTypeInclusion'   ),pversion);
+		export MbsVelocityRules							 :=	tools.mod_FilenamesInput(Template('MbsVelocityRules'   							 ),pversion);
 
 
 		export dAll_filenames :=
@@ -40,7 +41,8 @@ module
 			MBSTableCol.dAll_filenames +
 			MBSColValDesc.dAll_filenames +
 			MBSmarketAppend.dAll_filenames +
-			MbsFdnMasterIDIndTypeInclusion.dAll_filenames;
+			MbsFdnMasterIDIndTypeInclusion.dAll_filenames +
+			MbsVelocityRules.dAll_filenames;
 			
 			
 	end;
@@ -50,7 +52,7 @@ module
 	//////////////////////////////////////////////////////////////////
 	export Base := module
 	
-		shared Template(string tag) := Platform.FileTemplate(false) + tag;
+		shared Template(string tag) := Platform.FileTemplate(pUseOtherEnvironment) + tag;
 		export Main                  := tools.mod_FilenamesBuild(Template('Main'                ),pversion);
 
 		export dAll_filenames :=

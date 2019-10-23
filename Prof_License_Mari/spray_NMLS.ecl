@@ -1,4 +1,4 @@
-// spray Nationwide Mortgage Licensing System Professional Licenses Files for MARI	   
+﻿// spray Nationwide Mortgage Licensing System Professional Licenses Files for MARI	   
 
 import ut
 	   ,_control
@@ -14,7 +14,7 @@ export spray_NMLS (string filedate):= MODULE
 shared filepath		  :=	'/data/data_build_5_2/MARI/in/NMLS123/' + filedate +'/';	
 
 shared maxRecordSize	:=	8192;
-shared group_name	:=	'thor400_44';
+shared group_name	:=	Common_Prof_Lic_Mari.group_name;;
 shared destination := Common_Prof_Lic_Mari.SourcesFolder + 'NMLS::'+ filedate + '::';
 
 shared superfile_branch:= Common_Prof_Lic_Mari.SourcesFolder + 'NMLS::branch';

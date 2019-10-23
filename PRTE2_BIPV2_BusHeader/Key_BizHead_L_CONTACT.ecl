@@ -43,6 +43,7 @@ layout := RECORD // project out required fields
   h.city_len;
   h.prim_range_len;
   h.sec_range_len;
+	h.EFR_BMap;
 //Scores for various field components
   h.fname_preferred_weight100 ; // Contains 100x the specificity
   h.lname_weight100 ; // Contains 100x the specificity
@@ -187,7 +188,7 @@ EXPORT ScoredproxidFetch(TYPEOF(h.fname_preferred) param_fname_preferred = (TYPE
            SALT37.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)))/100; 
     SELF.zip_match_code := MAP(
 le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,param_zip,FALSE));
+       	  BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            EXISTS(param_zip(le.zip=zip)) => /*HACK16  le.zip_weight100 */ 1100 * param_zip(zip=le.zip)[1].weight/100.0,
           le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => 0,
@@ -400,7 +401,8 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
            SALT37.MatchBagOfWords(le.cnp_name,ri.cnp_name,3177747,1)))/100; 
     SELF.zip_match_code := MAP(
 le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,ri.zip_cases,FALSE));
+          // BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,ri.zip_cases,FALSE));
+					 BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,SET(ri.zip_cases,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            EXISTS(ri.zip_cases(le.zip=zip)) => le.zip_weight100 * ri.zip_cases(zip=le.zip)[1].weight/100.0,
           le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => 0,

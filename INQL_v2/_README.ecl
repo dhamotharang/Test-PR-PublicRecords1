@@ -1,4 +1,4 @@
-/*
+﻿/*
 	AlloyMediaConsumer:
 	
 		Overview: Alloy Media's "Alloy Directory" file is an unrelated and a separate data feed to the 
@@ -26,13 +26,13 @@
 							Alloy collects personal information, as well as other related demographical and search information, 
 							on a consumer who registers (opts-in) to use  one of their sites.
 
-							Th file contains Â“non-directoryÂ” data (i.e., it is not a student list) and is collected from 
+							Th file contains non-directory data (i.e., it is not a student list) and is collected from 
 							the websites owned by Alloy (described above).  The Alloy Directory is more of a ""person"" 
 							file that only contains personal data such as, name, address, date of birth, phone number, 
 							and email address, but does not contain school-related information (unless the email address 
 							is an indicator of which school the individual attends). The Alloy Directory reflects 
 							the subset of the population that is, at a minimum, interested in attending an institution 
-							of higher education; i.e., the Â‘core studentÂ’ population, where the persons in the file typically 
+							of higher education; i.e., the core student population, where the persons in the file typically 
 							have ages ranging from 18-30.
 							
 							The Alloy Directory data is updated at Alloy on a monthly basis but LN will receive updates 

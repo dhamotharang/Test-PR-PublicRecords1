@@ -1,9 +1,9 @@
-IMPORT FraudGovPlatform;
-EXPORT InvalidNumberOfColumnsReport(string fname):=module
+﻿IMPORT FraudGovPlatform,ut;
+EXPORT InvalidNumberOfColumnsReport(string fname, string pSeparator, string pTerminator):=module
 
-rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,{string line},CSV(separator(['~|~']),quote([]),terminator('~<EOL>~'))));
+rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,{string line},CSV(separator([pSeparator]),quote([]),terminator(pTerminator))));
 
-		dFields			:=Mod_Stats.ValidateNumberOfColumns(fname).ValidationResults(ReportName='fields');
+		dFields			:=Mod_Stats.ValidateNumberOfColumns(fname,pSeparator,pTerminator).ValidationResults(ReportName='fields');
 		
 		InvalidNumberOfColumnsFound:=exists( dFields(err='F2') );				
 
@@ -14,10 +14,10 @@ rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fnam
 				 
 		p1	:=	project(dFields
 							,transform(rText
-								,self.TextLine	:=(string7)left.FileState
-															+ (string20)regexfind('([0-9])\\w+',fname, 0)
-															+ (string8)left.seq
-															+ (string50)left.line[1..50]
+								,self.TextLine	:=(string15)left.FileState
+															+ (string16)(trim((string)left.FileDate)+'_'+trim((string)left.FileTime))
+															+ (string11)left.seq
+															+ (string50)ut.fn_RemoveSpecialChars(left.line)[1..50]
 															+ (string3)'   '
 															+ (string10)left.err
 															+ (string10)left.err_cnt
@@ -35,11 +35,11 @@ rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fnam
 
 		string130		HeaderLine1
 										:=	
-										'====================================== FILE COLUMNS MESSAGES ======================================================='
+										'===================================================== FILE COLUMNS MESSAGES =============================================================='
 										;
 		string130		HeaderLine2
 										:=	
-											(string8)'STATE'
+											(string15)'ACCOUNT'
 										+ (string16)'FILE DATE_TIME'
 										+ (string11)'SMP REC#'
 										+ (string50)'SAMPLE DATA'
@@ -51,7 +51,7 @@ rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fnam
 
 		string130		HeaderLine3
 										:=	
-										'===================================================================================================================='
+										'=========================================================================================================================================='
 										;
 		FooterLine1
 										:=	
@@ -74,7 +74,7 @@ rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fnam
 										+ 'F2 = ERROR - INVALID NUMBER OF COLUMNS\n'
 										;
 
-EXPORT BODY := fname
+EXPORT BODY := if(regexfind('inquirylog',fname,nocase),regexreplace('\\_[a-z0-9]*',fname,'',nocase),fname)
 						+'\n'+ HeaderLine1
 						+'\n'+ HeaderLine2
 						+'\n'+ HeaderLine3

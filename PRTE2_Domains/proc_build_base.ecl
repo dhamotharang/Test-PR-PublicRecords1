@@ -1,4 +1,4 @@
-import ut,promotesupers,prte_csv, Address,Prte2,AID,AID_Support,std, PRTE2_Domains;
+﻿import ut,promotesupers,prte_csv, Address,Prte2,AID,AID_Support,std, PRTE2_Domains;
 #constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
 
 EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
@@ -122,6 +122,8 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
       SELF.orgid	:= vLinkingIds.orgid;
       SELF.ultid	:= vLinkingIds.ultid;	     
       
+			self.global_sid := 0;
+			self.record_sid := 0;
       SELF := L;
       SELF := [];
   END;

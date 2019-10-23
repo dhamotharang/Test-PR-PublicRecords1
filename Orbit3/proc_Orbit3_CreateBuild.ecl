@@ -1,52 +1,31 @@
-import ut,Orbit3,_Control;
-export Proc_Orbit3_CreateBuild(string buildname,string Buildvs,string Envmt = 'N', boolean runcreatebuild = true) := function
+﻿/*2019-01-12T01:11:26Z (Kasavajjala, Sudhir (RIS-BCT))
 
-	tokenval := orbit3.GetToken();
+*/
+import std,ut,Orbit3,_Control;
+export Proc_Orbit3_CreateBuild(string buildname,string Buildvs,string Envmt = 'N', boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true, string email_list = '') := function
 
-	create_build := orbit3.CreateBuild(buildname,
-									Buildvs,
-									tokenval,		
-									).retcode;
-									
-	
-									
-	Update_build := Orbit3.UpdateBuildInstance(buildname,
-									Buildvs,
-									tokenval,
-									'BUILD_AVAILABLE_FOR_USE',
-									Orbit3.Constants(Envmt).platform_upd
-						                                  
-									).retcode;
-																
+string wuid := workunit;
 
+ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
+		 'Orbit3.proc_Orbit3_CreateBuild_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\', \''+email_list+'\', '+skipcreatebuild+', '+skipupdatebuild+', '+runcreatebuild+',  \''+wuid+'\') \n' 
+		+'	  : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
+          +'	, failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
+           +'	;\n';
 
-	return sequential
-							(
-									if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
-									if( runcreatebuild,
-									if( create_build.Status = 'Success',
-									   if ( Update_build.Status = 'Success',
-									           fileservices.sendemail(
-												_Control.MyInfo.EmailAddressNotify,
-												buildname +' Orbit Create and Update Build:'+Buildvs+':SUCCESS for Env : '+Orbit3.Constants(Envmt).which_env,
-												buildname +' Create build Success for Env :'+Orbit3.Constants(Envmt).which_env)
-									          ,
-									           fileservices.sendemail(
-												_Control.MyInfo.EmailAddressNotify,
-												buildname +'  Orbit Create and Update Build:'+Buildvs+':FAILED for Env : '+Orbit3.Constants(Envmt).which_env,
-												buildname +' Update build failed for Env:'+Orbit3.Constants(Envmt).which_env +'. Reason: ' + Update_build.Message)
-									        ),
-													
-													 fileservices.sendemail(
-												_Control.MyInfo.EmailAddressNotify,
-												buildname +'  Orbit Create  Build:'+Buildvs+':FAILED for Env : '+Orbit3.Constants(Envmt).which_env,
-												buildname +' Create build failed for Env:'+Orbit3.Constants(Envmt).which_env +'. Reason: ' + create_build.Message)
-									  ),
-									Output('Dont run build')
-									),
-									output('Not a prod environment')
-									),
-				
-								);
-								
+	tgtcluster := STD.System.Job.Target();
+
+spcluster := map  ( regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment.Name = 'Dataland'  => 'hthor_dev_eclcc',
+                                 regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment.Name <> 'Dataland'  => 'hthor_eclcc',
+                                   regexfind('_eclcc',tgtcluster)  = false and _Control.ThisEnvironment.Name = 'Dataland'       =>  'hthor_dev',
+							 'hthor'									 );
+
+    fswu :=  _control.fSubmitNewWorkunit(ECL1, trim(spcluster)) :   SUCCESS(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
+																			                                                                                                     ,'Orbit3  submit WU to spawn status'+ workunit
+																			                                                                                                      ,'Orbit3 submit WU to spawn success -- '+ workunit
+																			                                                                                                       )),
+		                                                                                                                                                                                      FAILURE(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
+																			                                                                                                     ,'Orbit3 submit WU to spawn status'+ workunit
+																			                                                                                                      ,'Orbit3 submit WU to spawn failed -- '+ workunit
+																			                                                                                                       ));
+return    evaluate(fswu);
 end;

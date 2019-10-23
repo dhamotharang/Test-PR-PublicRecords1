@@ -1,4 +1,4 @@
-import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus, NID;
+﻿import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus, NID;
 
 export Proc_Build_Royalty_Keys(string filedate) := 
 function
@@ -40,7 +40,7 @@ DS_phonesplus := PROJECT(multiCityPhonesplus,xpand_phonesplus(LEFT,COUNTER)) : P
 
 dist_DSphonesplus := distribute(DS_phonesplus,random());
 
-Phonesplus_v2.MAC_Build('Phonesplusv2_royalty', dist_DSphonesplus,fname,mname,lname,
+Phonesplus_v2.MAC_Build('Phonesplusv2_royalty', filedate, dist_DSphonesplus,fname,mname,lname,
 				 blk,
 				 zero,
 				 cellphone,
@@ -92,10 +92,10 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonesplusv2_royalty_
 /////////////////////////////////////////////////////////////////////////////////
 // -- Move Keys to QA
 /////////////////////////////////////////////////////////////////////////////////
-
-ut.mac_sk_move('~thor_data400::key::phonesplusv2_royalty_did','Q',mv2qa_did);
-ut.mac_sk_move('~thor_data400::key::phonesplusv2_royalty_fdids','Q',mv2qa_fdids);
-ut.mac_sk_move('~thor_data400::key::phonesplusv2_royalty_companyname','Q',mv2qa_pcname);
+//Jira DF-24336 change from ut.mac_sk_move to ut.mac_sk_move_v2 because files were not being promoted correctly.  Prior version was getting deleted on rebuild.
+ut.mac_sk_move_v2('~thor_data400::key::phonesplusv2_royalty_did','Q',mv2qa_did);
+ut.mac_sk_move_v2('~thor_data400::key::phonesplusv2_royalty_fdids','Q',mv2qa_fdids);
+ut.mac_sk_move_v2('~thor_data400::key::phonesplusv2_royalty_companyname','Q',mv2qa_pcname);
 CellPhone.MAC_AcceptSK_to_QA('~thor_data400::key::phonesplusv2_royalty_' ,mv_autokey,false);
 
 /////////////////////////////////////////////////////////////////////////////////

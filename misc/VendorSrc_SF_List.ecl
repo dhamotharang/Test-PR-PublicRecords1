@@ -1,4 +1,4 @@
-IMPORT ut;
+﻿IMPORT ut;
 
 EXPORT VendorSrc_SF_List(STRING pVersion) := MODULE
 		
@@ -35,5 +35,7 @@ EXPORT VendorSrc_SF_List(STRING pVersion) := MODULE
 		EXPORT SO_Main					:= '~thor::in::vendor_src::offender_main';
 		EXPORT SO_Offenses					:= '~thor::in::vendor_src::offender_offenses';
 		EXPORT MasterList					:= '~thor::in::vendor_src::MasterList';
-		
+		EXPORT CollegeLocator				:= '~thor::in::vendor_src::CollegeLocator';
+		EXPORT CollegeLocator_Father				:= '~thor::in::vendor_src::CollegeLocator_Father';
+
 END;

@@ -1,10 +1,10 @@
-/* Converting South Dakota Revenue and Regulation Real Estate Appraisers License File to MARI common layout
+﻿/* Converting South Dakota Revenue and Regulation Real Estate Appraisers License File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, standard;
 
 EXPORT map_SDS0810_conversion(STRING pVersion) := FUNCTION
-
+#workunit('name',' Yogurt:Prof License MARI - SDS0810  Build   ' + pVersion);
 	code 										:= 'SDS0810';
 	src_cd									:= code[3..7];
 	src_st									:= code[1..2];	//License state
@@ -30,7 +30,7 @@ EXPORT map_SDS0810_conversion(STRING pVersion) := FUNCTION
 	GoodNameRec							:= ValidLicenseType(TRIM(ORG_NAME + LIC_NO) != '');
 
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base			xformToCommon(GoodNameRec pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in			xformToCommon(GoodNameRec pInput) := TRANSFORM
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];		//yyyymmdd
 		SELF.LAST_UPD_DTE			:= pVersion;							//it was set to process_date before
@@ -146,7 +146,7 @@ EXPORT map_SDS0810_conversion(STRING pVersion) := FUNCTION
 	inFileLic	:= PROJECT(GoodNameRec,xformToCommon(LEFT));
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base 	trans_lic_type(inFileLic L, Cmvtranslation R) := transform
+	Prof_License_Mari.layout_base_in 	trans_lic_type(inFileLic L, Cmvtranslation R) := transform
 		SELF.STD_PROF_CD := StringLib.stringtouppercase(TRIM(R.DM_VALUE1));
 																
 		self := L;

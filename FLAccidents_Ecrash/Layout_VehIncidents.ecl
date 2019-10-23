@@ -32,6 +32,11 @@
 		STRING10 		Date_of_Birth;
 		STRING3 		Unit_Number;
 	END;
+	
+	enum_code_desc := RECORD
+   STRING50 code;
+   STRING50 description;
+  END;
 
 	EXPORT MeowLayout := RECORD
 		UNSIGNED6 	idfield;
@@ -104,9 +109,56 @@
 		STRING20 home_phone;
 		STRING50 Policy_num;
 		STRING8 Policy_Expiration_Date;
-		STRING25  v_city_name;
+		STRING25 v_city_name;
     //BuyCrash project KY Integration
-		STRING3  contrib_source;
+		STRING3 contrib_source;
+		//Buycrash Release6
+		STRING10 date_report_submitted;
+		//CrashLogic Release4
+    STRING1 releasable;
+    BOOLEAN flag_for_delete;
+		//PRtCC new fields
+		STRING7 citation_issued;
+		STRING7 citation_type;
+		STRING100 citation_detail1;
+		STRING60 violation_code1;
+		STRING60 violation_code2;
+		STRING60 violation_code3;
+		STRING60 violation_code4;
+		STRING1 photographs_taken;
+		STRING100 photographed_by;
+		STRING100 photograph_type;
+		STRING10 posted_satutory_speed_limit;
+		STRING25 safety_equipment_available_or_used;
+		STRING20 ejection;
+		STRING40 safety_equipment_helmet;
+		STRING60 transported_to;
+		STRING20 dispatch_time;
+		STRING1 ready_to_sell_data;
+		//PRtcc enum fields
+		DATASET(enum_code_desc) report_weather_condition;
+		DATASET(enum_code_desc) report_road_condition;
+		DATASET(enum_code_desc) report_injury_status;
+		DATASET(enum_code_desc) report_contributing_circumstances_v;
+	  DATASET(enum_code_desc) Alcohol_Drug_Use;
+		DATASET(enum_code_desc) alcohol_drug_test_given;
+		DATASET(enum_code_desc) alcohol_test_status;
+		DATASET(enum_code_desc) alcohol_test_type;
+		DATASET(enum_code_desc) alcohol_drug_test_type;
+		DATASET(enum_code_desc) drug_test_type;
+		DATASET(enum_code_desc) driver_distracted_by;
+		DATASET(enum_code_desc) safety_equipment_restraint1;
+		DATASET(enum_code_desc) condition_at_time_of_crash;
+		DATASET(enum_code_desc) drug_use_suspected;
+		DATASET(enum_code_desc) alcohol_use_suspected;
+		DATASET(enum_code_desc) drug_test_status;
+		DATASET(enum_code_desc) report_contributing_circumstances_p;
+		DATASET(enum_code_desc) driver_actions_at_time_of_crash;
+		DATASET(enum_code_desc) prior_nonmotorist_action;
+		DATASET(enum_code_desc) non_motorist_actions_at_time_of_crash;
+		DATASET(enum_code_desc) pedestrian_actions_at_time_of_crash;
+		DATASET(enum_code_desc) pedalcyclist_actions_at_time_of_crash;
+		DATASET(enum_code_desc) passenger_actions_at_time_of_crash;
 		UNSIGNED8 	__internal_fpos__;
 	END;
 

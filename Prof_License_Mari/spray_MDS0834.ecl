@@ -1,4 +1,4 @@
-// spray MDS0834 Professional Licenses Files for MARI	   
+﻿// spray MDS0834 Professional Licenses Files for MARI	   
 IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib,Lib_date;  
 EXPORT spray_MDS0834(STRING filedate) := MODULE
 
@@ -26,6 +26,20 @@ TransformFile(STRING filename) := FUNCTION
 	RETURN ds;
 END;		
 
+TransformFile_Two(STRING filename) := FUNCTION
+	n := StringLib.StringFind(filename, '.',1);
+	newname 			:= filename[1..(n-1)];
+	sprayed_file	:= destination + filedate + '::' + StringLib.StringToLowerCase(newname)+ '.raw';
+	
+	dsraw := DATASET(sprayed_file,
+										Prof_License_Mari.Layout_MDS0834.raw_2,CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR(['\r','\r\n'])));
+					
+	ds := PROJECT(dsraw,TRANSFORM(Prof_License_Mari.Layout_MDS0834.Common, SELF := LEFT; 
+																																				 SELF:= []));
+	RETURN ds;
+END;	
+
+
 
 AddTosuperfile(STRING filename) := FUNCTION
 	RETURN 	
@@ -46,9 +60,9 @@ spray_all	:=
 xform_all
 	:= PARALLEL(
 							OUTPUT(TransformFile('sp1.csv'),, 	destination + filedate + '::sp1.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
-							OUTPUT(TransformFile('sp2.csv'),, 	destination + filedate + '::sp2.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
-							OUTPUT(TransformFile('sp3.csv'),, 	destination + filedate + '::sp3.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
-							OUTPUT(TransformFile('sp4.csv'),, 	destination + filedate + '::sp4.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE)
+							OUTPUT(TransformFile_Two('sp2.csv'),, 	destination + filedate + '::sp2.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_Two('sp3.csv'),, 	destination + filedate + '::sp3.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_Two('sp4.csv'),, 	destination + filedate + '::sp4.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE)
 					 	);	
 
 

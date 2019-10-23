@@ -1,6 +1,6 @@
 ﻿//Compile all keys in this package in one place
 //easy to output this module to see if keys exist/are correct layout/etc
-import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3,Address_Attributes,BIPv2_HRCHY,tools;
+import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3,Address_Attributes,BIPv2_HRCHY,tools,BIPV2_Crosswalk;
 
 EXPORT BIPV2FullKeys_Package(
 
@@ -23,7 +23,7 @@ module
   shared proxknames       := BIPV2_ProxID.keynames          (pversion,puseotherenvironment);
   shared lgid3knames      := BIPV2_LGID3.keynames           (pversion,puseotherenvironment);
   shared bestknames       := BIPV2_Best.Keynames            (pversion,puseotherenvironment);
-  shared relknames        := BIPV2_Relative.keynames        (pversion,puseotherenvironment);
+  // shared relknames        := BIPV2_Relative.keynames        (pversion,puseotherenvironment);
   shared Seleidrelknames  := BIPV2_Seleid_Relative.keynames (pversion,puseotherenvironment);
 
   //key definitions
@@ -40,12 +40,15 @@ module
   export proxid_atts                    := tools.macf_FilesIndex('BIPV2_ProxID.Keys().Attribute_Matches          ' ,proxknames.Attribute_Matches      );
   export lgid3_mtch_cand                := BIPV2_LGID3.Keys2(,pversion,puseotherenvironment).MatchCandidates;
   export lgid3_specs                    := BIPV2_LGID3.Keys2(,pversion,puseotherenvironment).Specificity    ;
+  export lgid3_atts                     := BIPV2_LGID3.Keys2(,pversion,puseotherenvironment).Attribute_Match;
   export best_linkids                   := tools.macf_FilesIndex('BIPV2_Best.Key_LinkIds.key                     ' ,bestknames.LinkIds                );
-  export relative_assoc                 := tools.macf_FilesIndex('BIPv2_Relative.keys(relbase).ASSOC             ' ,relknames.assoc                   );
+  // export relative_assoc                 := tools.macf_FilesIndex('BIPv2_Relative.keys(relbase).ASSOC             ' ,relknames.assoc                   );
+  export Seleid_relative_specs          := tools.macf_FilesIndex('BIPV2_Seleid_Relative.keys(Seleidrelbase).Specificities_Key' ,Seleidrelknames.specs             );
+  export Seleid_relative_mc             := tools.macf_FilesIndex('BIPV2_Seleid_Relative.keys(Seleidrelbase).Candidates' ,Seleidrelknames.mc             );
   export Seleid_relative_assoc          := tools.macf_FilesIndex('BIPV2_Seleid_Relative.keys(Seleidrelbase).ASSOC' ,Seleidrelknames.assoc             );
   export Xlinkmeow                      := tools.macf_FilesIndex('BizLinkFull.Process_Biz_Layouts.Key            ' ,bizknames.meow                    );
-  export Xlinkrefs                      := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.Key                   ' ,bizknames.refs                    );
-  export Xlinkwords                     := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.ValueKey              ' ,bizknames.words                   );
+  // export Xlinkrefs                      := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.Key                   ' ,bizknames.refs                    );
+  // export Xlinkwords                     := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.ValueKey              ' ,bizknames.words                   );
   export Xlinkrefs_l_cnpname            := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME.Key          ' ,bizknames.refs_l_cnpname          );
   export Xlinkrefs_l_cnpname_st         := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME_ST.Key       ' ,bizknames.refs_l_cnpname_st       );
   export Xlinkrefs_l_cnpname_zip        := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.Key      ' ,bizknames.refs_l_cnpname_zip      );
@@ -77,6 +80,9 @@ module
   export biz_preferred                  := tools.macf_FilesIndex('BIPV2_Company_Names.key_preferred             ' ,keynames(pversion,puseotherenvironment).biz_preferred   );
   export Xlinkrefs_l_sic                := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_SIC.Key             ' ,bizknames.refs_l_sic               );
 
+  export bip2ConsumerKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).bipToConsumer;
+  export consumer2BipKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).ConsumerToBip;
+  // export consumer2BipKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).ConsumerToBipKey();
   // export AML_Addr                       := index(Address_Attributes.key_AML_addr                   ,keynames(pversion).aml_addr.logical     );
   // export biz_preferred                  := index(BIPV2_Company_Names.key_preferred                 ,keynames(pversion).biz_preferred.logical     );
   // export Xlinkrefs_l_sic                := index(BizLinkFull.Key_BizHead_L_SIC.Key                 ,bizknames.refs_l_sic             .logical);
@@ -100,10 +106,13 @@ module
     ,if(pKey in [0 ,10] ,sequential(output(10 ,named('KeyNumber'),overwrite) ,output(choosen(proxid_atts                  .logical ,100),named('proxid_atts'                   ))))
     ,if(pKey in [0 ,11] ,sequential(output(11 ,named('KeyNumber'),overwrite) ,output(choosen(lgid3_mtch_cand              .logical ,100),named('lgid3_mtch_cand'               ))))
     ,if(pKey in [0 ,12] ,sequential(output(12 ,named('KeyNumber'),overwrite) ,output(choosen(lgid3_specs                  .logical ,100),named('lgid3_specs'                   ))))
-    ,if(pKey in [0 ,13] ,sequential(output(13 ,named('KeyNumber'),overwrite) ,output(choosen(best_linkids                 .logical ,100),named('best_linkids'                  ))))
-    ,if(pKey in [0 ,14] ,sequential(output(14 ,named('KeyNumber'),overwrite) ,output(choosen(relative_assoc               .logical ,100),named('relative_assoc'                ))))
-    ,if(pKey in [0 ,15] ,sequential(output(15 ,named('KeyNumber'),overwrite) ,output(choosen(Seleid_relative_assoc        .logical ,100),named('Seleid_relative_assoc'         ))))
-    ,if(pKey in [0 ,16] ,sequential(output(16 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkmeow                    .logical ,100),named('Xlinkmeow'                     ))))
+    ,if(pKey in [0 ,13] ,sequential(output(13 ,named('KeyNumber'),overwrite) ,output(choosen(lgid3_atts                   .logical ,100),named('lgid3_atts'                    ))))
+    ,if(pKey in [0 ,14] ,sequential(output(14 ,named('KeyNumber'),overwrite) ,output(choosen(best_linkids                 .logical ,100),named('best_linkids'                  ))))
+    // ,if(pKey in [0 ,14] ,sequential(output(14 ,named('KeyNumber'),overwrite) ,output(choosen(relative_assoc               .logical ,100),named('relative_assoc'                ))))
+    ,if(pKey in [0 ,15] ,sequential(output(15 ,named('KeyNumber'),overwrite) ,output(choosen(Seleid_relative_specs        .logical ,100),named('Seleid_relative_specs'         ))))
+    ,if(pKey in [0 ,16] ,sequential(output(16 ,named('KeyNumber'),overwrite) ,output(choosen(Seleid_relative_mc           .logical ,100),named('Seleid_relative_mc'            ))))
+    ,if(pKey in [0 ,17] ,sequential(output(17 ,named('KeyNumber'),overwrite) ,output(choosen(Seleid_relative_assoc        .logical ,100),named('Seleid_relative_assoc'         ))))
+    ,if(pKey in [0 ,18] ,sequential(output(18 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkmeow                    .logical ,100),named('Xlinkmeow'                     ))))
     // ,if(pKey in [0 ,17] ,sequential(output(17 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs                    .logical ,100),named('Xlinkrefs'                     ))))
     // ,if(pKey in [0 ,18] ,sequential(output(18 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkwords                   .logical ,100),named('Xlinkwords'                    ))))
     ,if(pKey in [0 ,19] ,sequential(output(19 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_cnpname          .logical ,100),named('Xlinkrefs_l_cnpname'           ))))
@@ -134,6 +143,8 @@ module
     ,if(pKey in [0 ,44] ,sequential(output(44 ,named('KeyNumber'),overwrite) ,output(choosen(AML_Addr                     .logical ,100),named('AML_Addr'                      ))))
     ,if(pKey in [0 ,45] ,sequential(output(45 ,named('KeyNumber'),overwrite) ,output(choosen(biz_preferred                .logical ,100),named('biz_preferred'                 ))))
     ,if(pKey in [0 ,46] ,sequential(output(46 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_sic              .logical ,100),named('Xlinkrefs_l_sic'               ))))
+    ,if(pKey in [0 ,47] ,sequential(output(47 ,named('KeyNumber'),overwrite) ,output(choosen(bip2ConsumerKey              .logical ,100),named('bip2ConsumerKey'               ))))
+    ,if(pKey in [0 ,48] ,sequential(output(48 ,named('KeyNumber'),overwrite) ,output(choosen(consumer2BipKey              .logical ,100),named('consumer2BipKey'               ))))
   );       
 /*
   regexfilter := pRegexFieldFilter;

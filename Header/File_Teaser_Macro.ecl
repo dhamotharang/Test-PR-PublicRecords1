@@ -19,7 +19,7 @@ export File_Teaser_Macro(teaserInFile, teaserOutFile, is_watchdog_best = 'true')
 	hdrClean := hdrNonAmbig(isValidStr(st, true) and isValidStr(lname) and isValidStr(fname));
 
 	// remove all of the records for minors
-	minors := distribute(pull(doxie_files.key_minors), hash(did));
+	minors := distribute(header.File_minors, hash(did));
 	hdrAdult := join(hdrClean, minors, left.did = right.did and ut.GetAgeI(right.dob) < 18, transform(left), 
 									 left only, local);
 

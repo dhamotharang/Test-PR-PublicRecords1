@@ -1,4 +1,4 @@
-IMPORT doxie, bipv2, ut, Data_Services, autokeyb2, PRTE2_Marriage_Divorce, marriage_divorce_v2;
+﻿IMPORT doxie, bipv2, ut, Data_Services, autokeyb2, PRTE2_Marriage_Divorce, marriage_divorce_v2;
 
 EXPORT Keys := MODULE
 
@@ -62,23 +62,30 @@ EXPORT Keys := MODULE
 	EXPORT key_mar_div_filing_nbr := INDEX(p_unformat,
 																				{filing_number,filing_type,filing_subtype,state_origin,county},{record_id},
 																				PRTE2_Marriage_Divorce.Constants.KEY_PREFIX + doxie.Version_SuperKey + '::filing_nbr');
-																				
-	EXPORT 	key_mar_div_id_main(boolean IsFCRA = false) := FUNCTION
-		slim_mar_div := PROJECT(PRTE2_Marriage_Divorce.Files.Base, TRANSFORM(marriage_divorce_v2.layout_mar_div_base_slim,SELF := LEFT));
-		ded_mar_div := DEDUP(SORT(slim_mar_div, record_id),ALL); 
 	
-	RETURN INDEX(ded_mar_div, {record_id},{slim_mar_div},
-							IF(IsFCRA, 
-											PRTE2_Marriage_Divorce.Constants.KEY_PREFIX + 'fcra::',
-											PRTE2_Marriage_Divorce.Constants.KEY_PREFIX) + doxie.Version_SuperKey + '::id_main');
+	//DF-21803:FCRA Consumer Data Fields Depreciation
+	EXPORT 	key_mar_div_id_main(boolean IsFCRA = false) := FUNCTION
+	slim_mar_div := PROJECT(PRTE2_Marriage_Divorce.Files.Base, TRANSFORM(marriage_divorce_v2.layout_mar_div_base_slim,SELF := LEFT));
+	ded_mar_div := DEDUP(SORT(slim_mar_div, record_id),ALL); 
+	
+	ut.MAC_CLEAR_FIELDS(ded_mar_div, ded_mar_div_cleared, constants.key_main_id);
+ ds_main_id_new := if(isFCRA, ded_mar_div_cleared, ded_mar_div);
+	
+	RETURN INDEX(ds_main_id_new, {record_id},{ds_main_id_new},
+														IF(IsFCRA, 
+																	PRTE2_Marriage_Divorce.Constants.KEY_PREFIX + 'fcra::',
+																	PRTE2_Marriage_Divorce.Constants.KEY_PREFIX) + doxie.Version_SuperKey + '::id_main');
 	END;
 	
+	//DF-21803:FCRA Consumer Data Fields Depreciation
 	EXPORT key_mar_div_id_search(boolean IsFCRA = false) := FUNCTION
+	 ut.MAC_CLEAR_FIELDS(PRTE2_Marriage_Divorce.Files.Search, search_cleared, constants.key_search_id);
+ ds_Search_id_new := if(isFCRA, search_cleared, PRTE2_Marriage_Divorce.Files.Search);
 	
-	RETURN INDEX(PRTE2_Marriage_Divorce.Files.Search, {record_id,which_party}, {PRTE2_Marriage_Divorce.Files.Search},
-							IF(IsFCRA, 
-											PRTE2_Marriage_Divorce.Constants.KEY_PREFIX + 'fcra::',
-											PRTE2_Marriage_Divorce.Constants.KEY_PREFIX) + doxie.Version_SuperKey + '::id_search');
+	RETURN INDEX(ds_Search_id_new, {record_id,which_party}, {ds_Search_id_new},
+													IF(IsFCRA, 
+																PRTE2_Marriage_Divorce.Constants.KEY_PREFIX + 'fcra::',
+																PRTE2_Marriage_Divorce.Constants.KEY_PREFIX) + doxie.Version_SuperKey + '::id_search');
 	END;
 	
 END;

@@ -1,4 +1,4 @@
-import address, BIPV2;
+﻿import address, BIPV2;
 export Layouts :=
 module
 
@@ -116,7 +116,9 @@ module
 		string50											      prep_home_addr_line_last	:='';
 		string100												    prep_work_addr_line1		 	:='';
 		string50											      prep_work_addr_line_last	:='';
-		
+		//CCPA-15 Add new CCPA fields
+		unsigned4 global_sid;
+		unsigned8 record_sid;
 	end;
 	
 	export Keybuild :=
@@ -140,7 +142,9 @@ module
 		Address.Layout_Clean182_fips		    Clean_work_address    				;
 		Miscellaneous.Cleaned_Dates		    	Clean_dates    								;
 		Miscellaneous.Cleaned_Phones		    Clean_phones    							;
-		
+		//CCPA-15 Add new CCPA fields
+		unsigned4 global_sid;
+		unsigned8 record_sid;		
 	end;
 
   

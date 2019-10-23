@@ -1,4 +1,4 @@
-//  The purpose of this development is take KansasProfessional License raw files and convert them to a common
+﻿//  The purpose of this development is take KansasProfessional License raw files and convert them to a common
 //  professional license (BASE) layout to be used for MARI and PL_BASE development.
 //	05/05/2015 T.George - New Development
 //************************************************************************************************************* */	
@@ -6,7 +6,7 @@
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
 EXPORT map_KSS0902_conversion(STRING pVersion) := FUNCTION
-
+#workunit('name','Yogurt: map_KSS0902_conversion');
 	code 		:= 'KSS0902';
 	src_cd	:= 'S0902';
 	src_st	:= 'KS';	//License state
@@ -26,7 +26,7 @@ EXPORT map_KSS0902_conversion(STRING pVersion) := FUNCTION
 	
 
 	maribase_plus_dbas := record, maxsize(5000)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		string60 dba1;
 		string60 dba2;
 		string60 dba3;
@@ -57,7 +57,7 @@ EXPORT map_KSS0902_conversion(STRING pVersion) := FUNCTION
 			SELF.PROCESS_DATE			:= thorlib.wuid()[2..9];
 
 			// If individual and not identified as a corporation names, parse into (FMLS) fmt
-			TrimNAME_ORG			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ORG_NAME);
+			TrimNAME_ORG			:= ut.CleanSpacesAndUpper(pInput.ORG_NAME);
 			clnParseName			:= IF(StringLib.stringfind(TRIM(TrimNAME_ORG,LEFT,RIGHT),' ',1)<1, ' ',Prof_License_Mari.mod_clean_name_addr.cleanFMLName(TrimNAME_ORG));					
 			title		:= TRIM(clnParseName[1..5],LEFT,RIGHT);
 			fname		:= TRIM(clnParseName[6..25],LEFT,RIGHT);
@@ -73,15 +73,20 @@ EXPORT map_KSS0902_conversion(STRING pVersion) := FUNCTION
 			SELF.NAME_MID			:= mname;
 			SELF.NAME_LAST		:= lname;
 			SELF.NAME_SUFX		:= suffix;
-					 
-			SELF.LICENSE_NBR	:= 'NR';
+			
+			TrimLicense_NBR   := ut.CleanSpacesAndUpper(pInput.LICENSE_NUMBER);
+			SELF.LICENSE_NBR	:= IF(TrimLicense_NBR <> '',TrimLicense_NBR,'NR');
 			SELF.LICENSE_STATE:= src_st;
 		
 			SELF.RAW_LICENSE_TYPE		:= StringLib.StringToUpperCase(pInput.LICENSE_TYPE);
-			SELF.STD_LICENSE_TYPE		:= StringLib.StringToUpperCase(pInput.LICENSE_TYPE); 	
+			SELF.STD_LICENSE_TYPE		:= map(SELF.RAW_LICENSE_TYPE = 'GENERAL CERTIFIED' => 'G',
+			                               SELF.RAW_LICENSE_TYPE = 'STATE LICENSED' => 'L',
+																		 SELF.RAW_LICENSE_TYPE = 'PROVISIONAL (TRAINEE)' => 'P',
+																		 SELF.RAW_LICENSE_TYPE = 'RESIDENTIAL CERTIFIED' => 'R',
+																		 SELF.RAW_LICENSE_TYPE); 	
 				 
 			//Reformatting date from MM/DD/YYYY to YYYYMMDD
-			SELF.ORIG_ISSUE_DTE	  	:= '17530101';
+			SELF.ORIG_ISSUE_DTE	  	:= Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.ORIGINAL_ISSUE_DATE);
 			SELF.CURR_ISSUE_DTE			:= '17530101';
 			SELF.EXPIRE_DTE					:= Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.EXPIRATION_DATE);	 
 					 
@@ -96,8 +101,8 @@ EXPORT map_KSS0902_conversion(STRING pVersion) := FUNCTION
 					 
 			// moving city, state, and zip to their respective fields
 			//Allow zip to be more than 5 digits so thatthe rest of address data will be generated correctly.
-			tempaddr								:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUSINESS_ADDRESS);
-			tempaddr1								:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUSINESS_CITY_ST_ZIP);
+			tempaddr								:= ut.CleanSpacesAndUpper(pInput.BUSINESS_ADDRESS);
+			tempaddr1								:= ut.CleanSpacesAndUpper(pInput.BUSINESS_CITY_ST_ZIP);
 			tempaddr2								:= StringLib.StringFilterOut(tempaddr1, '.');
 			tempzip                 := REGEXFIND('[0-9]{5,}(-[0-9]{4})?$', TRIM(tempaddr2,left,right), 0);	
 			tempaddr4               := tempaddr2[..(LENGTH(tempaddr2)-LENGTH(tempzip))];
@@ -139,8 +144,8 @@ EXPORT map_KSS0902_conversion(STRING pVersion) := FUNCTION
 																	+ TRIM(SELF.std_license_type) + ','
 																	+ TRIM(SELF.std_source_upd) + ','
 																	+ TRIM(SELF.name_org) + ','
-																	+ Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.business_address) +','
-																	+ Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.BUSINESS_CITY_ST_ZIP)
+																	+ ut.CleanSpacesAndUpper(pInput.business_address) +','
+																	+ ut.CleanSpacesAndUpper(pInput.BUSINESS_CITY_ST_ZIP)
 																	);
 			SELF.PROVNOTE_2				:= '';
 			SELF.PROVNOTE_3 	    := '[LICENSE_STATUS ASSIGNED]';	
@@ -215,7 +220,7 @@ company_only_lookup := ds_map_lic_prof(affil_type_cd='CO');
 	AllRecs  := DBARecs + NoDBARecs;
 
 	// transform expanded dataset to MARIBASE layout
-	Prof_License_Mari.layouts.base trans_to_base(AllRecs L) := transform
+	Prof_License_Mari.layout_base_in trans_to_base(AllRecs L) := transform
 		SELF := L;
 	END;
 

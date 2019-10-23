@@ -1,9 +1,10 @@
-﻿import ut,_Control,Address;
+﻿import ut,_Control,Address, STD;
 export Proc_BK_Preprocess(string filedate) := function
 	inCase := Bankruptcyv2.File_In_Case;
 	inDefendants := Bankruptcyv2.File_In_Defendants;
 	courtcodelookup := Bankruptcyv2.File_Lookup_CourtCode;
 	courtcaselookup := Bankruptcyv2.File_Lookup_Courtcase;
+
 	
 	// Cleaning case *************************
 	blank_string_set := [ 'INFORMATION UNAVAILABLE',
@@ -711,7 +712,7 @@ export Proc_BK_Preprocess(string filedate) := function
 									if(trim(l.ssnMSrc) = 'M' ,'MANUAL', 
 										if(trim(l.ssnMSrc) = 'O' ,'OKLAHOMA',   
 											if(trim(l.ssnMSrc) = 'T' ,'ACCURINT-COURT VERIFIED', ''))));
-		self.dcodeDesc     :=  if(trim(l.dCode) = '2' 	,'OPEN',
+		self.dcodeDesc     :=  if(trim(l.dCode) = '02' 	,'OPEN',
 									if(trim(l.dCode) = '15' ,'DISMISSED', 
 										if(trim(l.dCode) = '20' ,'DISCHARGED',   
 											if(trim(l.dCode) = '30' ,'CONVERSION',
@@ -733,7 +734,23 @@ export Proc_BK_Preprocess(string filedate) := function
 		self.orig_st := trim(l.orig_st,left,right);
 		self.orig_zip5 := trim(l.orig_zip5,left,right);
 		self.orig_zip4 := trim(l.orig_zip4,left,right);
-		self.clean_name := if(stringlib.stringtouppercase(l.orig_name) in infoset or l.orig_name = '','',Address.CleanPersonFML73(l.orig_name)) ;
+
+  // DF-23773 Use Orig_Name Values instead of Address.CleanPersonFML73 for Defendants
+    STRING73 BuildName(STRING5 title='', STRING20 fname, STRING20 mname, STRING20 lname, STRING5 suffix, INTEGER2 score=99) :=
+      STD.Str.ToUpperCase(title)+
+      STD.Str.ToUpperCase(fname)+
+      STD.Str.ToUpperCase(mname)+
+      STD.Str.ToUpperCase(lname)+
+      STD.Str.ToUpperCase(suffix)+
+      IF(fname='' AND lname='','',INTFORMAT(score,3,0));
+		self.clean_name :=  IF(stringlib.stringtouppercase(l.orig_name) in infoset or l.orig_name = '',
+                          '',
+                          IF(l.name_type='D' AND TRIM(l.orig_fname+l.orig_mname+l.orig_lname+l.orig_name_suffix)<>'',
+                            BuildName('',l.orig_fname,l.orig_mname,l.orig_lname,l.orig_name_suffix),
+                            Address.CleanPersonFML73(l.orig_name)
+                          )
+                        ) ;
+                          
 		self.clean_address := if(l.orig_addr1 = '' and l.orig_addr2 = '','',
 								Address.CleanAddress182(l.orig_addr1,l.orig_addr2));
 		self.ssn := if(l.ssn[1..5] = '00000',l.ssn[6..9],l.ssn);
@@ -802,7 +819,7 @@ export Proc_BK_Preprocess(string filedate) := function
 									sequential(
 									output(choosen(clean_missing_cases,10)),
 									fileservices.sendemail('Anantha.Venkatachalam@lexisnexis.com, Christopher.Brodeur@lexisnexis.com, Valerie.Minnis@lexisnexis.com',
-			'Bankruptcy Missing Cases ' + ut.GetDate,
+			'Bankruptcy Missing Cases ' + (STRING8)Std.Date.Today(),
 			'Please check the WU to determine the missing cases and check with Banko.' + WORKUNIT)),
 			output('No missing cases'));
 	
@@ -813,10 +830,10 @@ export Proc_BK_Preprocess(string filedate) := function
 								((totmainaddresscount / totmaincount) > .01)),
 					 sequential(
 					 if(_Control.ThisEnvironment.Name != 'Prod_Thor', fileservices.sendemail('Anantha.Venkatachalam@lexisnexis.com',
-			'Bankruptcy Process failure:ERROR:' + ut.GetDate,
+			'Bankruptcy Process failure:ERROR:' + (STRING8)Std.Date.Today(),
 			'More than 1% of Bankruptcy records have clean names with value ERR\n'),
 					fileservices.sendemail('Joseph.Lezcano@lexisnexis.com,Vesa.Niemela@lexisnexis.com,Lisa.Simmons@lexisnexis.com,Mike.Schumacher@lexisnexis.com,Brian.Dunnam@lexisnexis.com,Victor.tavernini@lexisnexis.com,Jeff.Torres@lexisnexis.com,Anantha.Venkatachalam@lexisnexis.com,afterhourssupport@lexisnexis.com,Christopher.Brodeur@lexisnexis.com,Sayeed.ahmed@lexisnexis.com',
-			'Bankruptcy Process failure:ERROR:' + ut.GetDate,
+			'Bankruptcy Process failure:ERROR:' + (STRING8)Std.Date.Today(),
 			'More than 1% of Bankruptcy records have clean names or clean_addresses with value ERR or U001\n')),
 					 fail('Process Abort: More than 1% of the records have clean name or clean address with value ERR or U001')),
 					 sequential(missing_case,create_files,super_main,super_search));

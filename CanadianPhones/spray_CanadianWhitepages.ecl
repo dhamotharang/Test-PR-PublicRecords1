@@ -1,4 +1,4 @@
-import _control;
+﻿import _control;
 
 export spray_CanadianWhitepages(string filedate) := function
 
@@ -8,13 +8,13 @@ export spray_CanadianWhitepages(string filedate) := function
 // sprayupdate2     := FileServices.SprayFixed(_Control.IPAddress.edata12, '/data/hds_2/telephones/canadian/business/'+ filedate +'/canada.dat' ,291, 'thor_dell400', 
 							  // CanadianPhones.thor_cluster + 'base::infoUSA::'+filedate+ '::canada.dat' , , , ,true,true,false);
 
-sprayupdate3     := FileServices.SprayVariable(_Control.IPAddress.bctlpedata10,
-                        '/data/hds_2/telephones/canadian/axciom/residential/'+ filedate +'/canres.csv',
+sprayupdate3     := FileServices.SprayVariable(_Control.IPAddress.bctlpedata11,
+                        '/data/hds_2/telephones/canadian/axciom/data/residential/'+ filedate +'/canres.csv',
                         ,                  					// max rec size
                         ',',              					// separator
 						'\r\n',             				// end of rec terminator
                         ,              					    // quotations included
-                        'thor400_60',    	// cluster
+                        'thor400_44',    	// cluster
                         CanadianPhones.thor_cluster + 'in::axciomRes::'+filedate+ '::canada.dat',      // filename on Thor
                         ,
                         ,
@@ -24,13 +24,13 @@ sprayupdate3     := FileServices.SprayVariable(_Control.IPAddress.bctlpedata10,
                         false             // compress
                    ); 
 				   	  
-sprayupdate4     := FileServices.SprayVariable(_Control.IPAddress.bctlpedata10,
-                        '/data/hds_2/telephones/canadian/axciom/business/'+ filedate +'/canbus.csv',
+sprayupdate4     := FileServices.SprayVariable(_Control.IPAddress.bctlpedata11,
+                        '/data/hds_2/telephones/canadian/axciom/data/business/'+ filedate +'/canbus.csv',
                         ,                  					// max rec size
                         ',',              					// separator
 						'\r\n',             				// end of rec terminator
                         ,              					    // quotations included
-                        'thor400_60',    	// cluster
+                        'thor400_44',    	// cluster
                         CanadianPhones.thor_cluster + 'in::axciomBus::'+filedate+ '::canada.dat',      // filename on Thor
                         ,
                         ,

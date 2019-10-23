@@ -71,7 +71,8 @@ self.parent_case_key		:= '';
 self.court						  := 'KERN COUNTY-CIVIL COURT';
 self.case_number				:= input.CaseNumber;
 a := stringlib.StringFind(input.FileDate, ' 0:00', 1);
-self.filing_date				:= Std.Date.ConvertDateFormatMultiple(input.FileDate[1..a],fmtsin,fmtout);
+self.filing_date				:= if(stringlib.StringFind(input.FileDate, ' 0:00', 1) = 1,Std.Date.ConvertDateFormatMultiple(input.FileDate[1..a],fmtsin,fmtout),
+                              Std.Date.ConvertDateFormatMultiple(input.FileDate,fmtsin,fmtout));
 self := [];
 END;
 										

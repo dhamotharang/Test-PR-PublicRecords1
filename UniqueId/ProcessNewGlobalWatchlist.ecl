@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 new0 := DISTRIBUTE(UniqueId.Files.new);
 prev := DISTRIBUTE(UniqueId.Files.current,HASH(WatchListName,type,reason_listed,reference_id)) : INDEPENDENT;			
 newseed := MAX(prev, UniqueId.GetMaxLNid(Entity_Unique_id));
@@ -12,7 +12,7 @@ n_noid := COUNT(new);
 withid := new2b(Entity_Unique_Id<>'');
 n_withid := COUNT(withid);
 ToUpper(unicode s) := Std.Uni.ToUpperCase(s);
-fixItUp(unicode s) := Std.Uni.FindReplace(Std.Uni.FindReplace(s, U'Â¶', U'||'), U'Â§', U'|');
+fixItUp(unicode s) := Std.Uni.FindReplace(Std.Uni.FindReplace(s, U'¶', U'||'), U'§', U'|');
 
 // these are records that have not changed
 common := JOIN(new,prev,
@@ -149,7 +149,9 @@ SEQUENTIAL(
 		OUTPUT(newrec,,'~thor::uniqueid::newrecords.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
 		OUTPUT(remrec,,'~thor::uniqueid::deletedrecords.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
 		OUTPUT(watchliststats,,'~thor::uniqueid::watchliststats.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
-		OUTPUT(UniqueId.PubDates,,'~thor::uniqueid::listcounts.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
+		
+	
+
 		OUTPUT(scored,,'~thor::uniqueid::scores.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
 		//OUTPUT(reconstruct(WatchListName NOT IN uniqueId.SetOfLists),named('unplanned')),	// should be 0
 		//OUTPUT(new2,,'~thor::uniqueid::new2::'+version,OVERWRITE),
@@ -157,8 +159,11 @@ SEQUENTIAL(
 		//OUTPUT(unmatched,,'~thor::uniqueid::unmatched',OVERWRITE),
 		//OUTPUT(totalrecords,,'~thor::uniqueid::totalrecords',OVERWRITE),
 		OUTPUT(newrecords,,'~thor::uniqueid::newrecords',OVERWRITE),
-		OUTPUT(watchliststats,,'~thor::uniqueid::watchliststats',OVERWRITE)
+		OUTPUT(watchliststats,,'~thor::uniqueid::watchliststats',OVERWRITE),
+		UniqueID.ChangeReport,
+		UniqueID.ListsReport
 	),
+	OUTPUT(UniqueId.PubDates,,'~thor::uniqueid::listcounts.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
 	PARALLEL(
 	UniqueId.UnsprayCSV('~thor::uniqueid::stats.csv'),
 	UniqueId.UnsprayCSV('~thor::uniqueid::likelymatches.csv'),
@@ -167,6 +172,9 @@ SEQUENTIAL(
 	UniqueId.UnsprayCSV('~thor::uniqueid::listcounts.csv'),
 	UniqueId.UnsprayCSV('~thor::uniqueid::scores.csv'),
 	UniqueId.UnsprayCSV('~thor::uniqueid::watchliststats.csv'),
+	UniqueId.UnsprayCSV('~thor::uniqueid::changes.csv'),
+	UniqueId.UnsprayCSV('~thor::uniqueid::listsreport.csv'),
+	UniqueId.UnsprayCSV('~thor::uniqueid::ListCreatedDates.csv'),
 	UniqueId.BuildAll,
 	UniqueId.DemoteFiles(totalrecords,version),
 	)

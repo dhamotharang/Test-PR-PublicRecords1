@@ -23,9 +23,9 @@ new_records_sample_for_qa	:= BankruptcyV2.New_records_sample        : success(fi
 scrubs_step2 := bankruptcyV2.proc_build_scrubs_step2(filedate);
 Stats_For_DR := bankruptcyv2.BK_Stats_Metadata;
 orbit_report.Bankruptcy_Stats(orbitreport);
-build_relationships := BankruptcyV2.Proc_Create_Relationships(filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Michael.Gould@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net');
-dops_update := Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Michael.Gould@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com','Y',,,'Y');
-BIP_dops_update := RoxieKeyBuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Michael.Gould@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com',,'BN');
+build_relationships := BankruptcyV2.Proc_Create_Relationships(filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net');
+dops_update := Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com','Y',,,'Y');
+BIP_dops_update := RoxieKeyBuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com',,'BN');
 send_package := if(_Control.ThisEnvironment.Name = 'Dataland',output('Package Sent'),
 			fileservices.sendemail('Roxiedeployment@seisint.com,QualityAssurance@seisint.com',
 			'Roxie Prod NonFCRA BK Package Files ' + ut.GetDate,
@@ -57,6 +57,25 @@ Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.Layout_In_Case,'~thor_data400::in
 Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.Layout_In_Defendants,'~thor_data400::in::bankruptcyv3::defendants_full',true,defret);
 Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.layout_bankruptcy_main_in,'~thor_data400::in::bankruptcyv3::main_full',false,mainret);
 Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.layout_bankruptcy_search_in,'~thor_data400::in::bankruptcyv3::search_full',false,searchret);
+
+// DF-22748 Bankruptcy: Send email when WithdrawnStatus records are added that contain valid LexID
+send_withdrawnstatus_email := IF(COUNT(BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()((UNSIGNED)did>0))>0,
+                               fileservices.sendemail('Kevin.Garrity@LexisNexisRisk.com,Christopher.Brodeur@lexisnexisrisk.com,Stephen.Powers@lexisnexisrisk.com,Ruel.Barrina@lexisnexisrisk.com',
+                               'Bankruptcy Build Version ' + filedate,
+                               'BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus() contains '
+                               +COUNT(BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()((UNSIGNED)did>0))
+                               +' valid LexID(s)\n\n'
+                               +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[1].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[1].did+'\n','')
+                               +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[2].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[2].did+'\n','')
+                               +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[3].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[3].did+'\n','')
+                               +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[4].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[4].did+'\n','')
+                               +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[5].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[5].did+'\n','')
+                               +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[6].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[6].did+'\n','')
+                               +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[7].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[7].did+'\n','')
+                               +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[8].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[8].did+'\n','')
+                               +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[9].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[9].did+'\n','')
+                               +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[10].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[10].did+'\n','')
+                              ));
 	
 sequential(/*dops_update
 		,*/build_relationships
@@ -73,6 +92,7 @@ sequential(/*dops_update
 		,addfullfilestosuper
 		,BIP_dops_update
 		,parallel(caseret,defret,mainret,searchret)
+  ,send_withdrawnstatus_email
 		) : WHEN(event('Yogurt:BANKRUPTCY ROXIE KEY BUILD COMPLETE','*'), count(1));
 
 endmacro;

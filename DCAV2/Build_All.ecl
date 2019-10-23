@@ -1,4 +1,4 @@
-import tools, _control;
+﻿import tools, _control, Scrubs, Scrubs_DCA, ut, std;
 export Build_All(
 	 string														pversion
 	,string														pDirectory					= '/data/prod_data_build_13/eval_data/dca/build/'
@@ -31,14 +31,16 @@ function
 		 Create_Supers	(pKeyDatasetName)
 		,Spray					(pversion,pServerIP,pDirectory,pFilenameint,pFilenameprv,pFilenamepub,pFilenamepriv,pFilenamePeop,pFilenamePos,pFilenameBoard,pFilenameKill,pFilenameMA,pGroupName,not pShouldSpray,pOverwrite)
 		,Build_Base			(pversion,pIsTesting,pSprayedintFile,pSprayedprvFile,pSprayedpubFile,pSprayedPrivcoFile,pBaseCompaniesFile,pBaseContactsFile).doall
+		,Scrubs.ScrubsPlus('DCA','Scrubs_DCA','Scrubs_DCA_Base_Companies','Base_Companies',pversion,DCAV2.Email_Notification_Lists().ScrubsPlus,false)
+    ,Scrubs.ScrubsPlus('DCA','Scrubs_DCA','Scrubs_DCA_Base_Contacts' ,'Base_Contacts' ,pversion,DCAV2.Email_Notification_Lists().ScrubsPlus,false)	
 		,Build_Keys			(pversion	,pKeyDatasetName																	).all
 		,Build_Autokeys	(pversion	,pKeyDatasetName																	).all
-		,Build_Strata		(pversion	,pOverwrite,pIsTesting			)
+		,Build_Strata		(pversion	,pOverwrite,pIsTesting			) 
 		,QA_Records()
 		,Promote().Inputfiles.using2used
 		,Promote(,'base').Buildfiles.Built2QA
 		,Promote(,'key',,,pKeyDatasetName).Buildfiles.Built2QA
-	) : success(Send_Emails(pversion,,not pIsTesting,pKeyDatasetName).roxie), failure(send_emails(pversion,,not pIsTesting).buildfailure);
+	) : success(Send_Emails(pversion,,,pKeyDatasetName).roxie), failure(send_emails(pversion).buildfailure);
 	
 	return
 		if(tools.fun_IsValidVersion(pversion)

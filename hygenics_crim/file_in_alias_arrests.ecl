@@ -1,4 +1,4 @@
-import data_services;
+﻿import data_services;
 alias_arrests1:= dataset(data_services.foreign_prod+ 'thor_200::in::crim::hd::arrest_alias',
 											hygenics_crim.layout_in_alias,
 											CSV(SEPARATOR('|'), TERMINATOR(['\n', '\r\n']), QUOTE('"'), MAXLENGTH(2000)))(stringlib.StringToUpperCase(recordid[1..8])<>'RECORDID'
@@ -10,7 +10,12 @@ alias_cw      :=  dataset(data_services.foreign_prod+'thor_200::in::crim::hd::ar
 								   CSV(SEPARATOR('|'), TERMINATOR(['\n', '\r\n']), QUOTE('"'), MAXLENGTH(4096)))  (stringlib.StringToUpperCase(recordid[1..8])<>'RECORDID' and trim(SourceName, left, right)<>'NORTH_CAROLINA_ADMINISTRATIVE_OFFICE_OF_THE_COURTS');// and StateCode in _include_states);
 proj_alias_cw  := Project(alias_cw,transform(hygenics_crim.layout_in_alias,self.sourcename := trim(left.sourcename)+'_CW'; self := left;));
 
-alias_arrests  := proj_alias_cw+alias_arrests1;
+alias_ie      :=  dataset(data_services.foreign_prod+'thor_200::in::crim::hd::arrest_alias_ie',
+								   layout_in_alias,
+								   CSV(SEPARATOR('|'), TERMINATOR(['\n', '\r\n']), QUOTE('"'), MAXLENGTH(4096)))  (stringlib.StringToUpperCase(recordid[1..8])<>'RECORDID' and trim(SourceName, left, right)<>'NORTH_CAROLINA_ADMINISTRATIVE_OFFICE_OF_THE_COURTS');// and StateCode in _include_states);
+proj_alias_ie  := Project(alias_ie,transform(hygenics_crim.layout_in_alias,self.sourcename := trim(left.sourcename)+'_IE'; self := left;));
+
+alias_arrests  := proj_alias_ie+proj_alias_cw+alias_arrests1;
 
 filter_invalid := alias_arrests(trim(akaname) <>'AKA' and
                                           akaname+akalastname+akafirstname+akamiddlename <> '' and

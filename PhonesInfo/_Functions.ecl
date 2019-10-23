@@ -1,9 +1,11 @@
-import std, ut;
+﻿IMPORT dx_PhonesInfo, Std, Ut;
+
+	//DF-24397: Create Dx-Prefixed Keys
 
 EXPORT _Functions := MODULE
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	//iConectiv Port//////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////////////////	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	EXPORT fn_FixTimeStamp(string ds_filter):= FUNCTION
 
 		ds_year 		:= ds_filter[1..4];
@@ -101,9 +103,25 @@ EXPORT _Functions := MODULE
 	
 	EXPORT fn_carrierName(string name):= FUNCTION
 	
-		carrName := stringlib.stringfilter(stringlib.stringtouppercase(trim(name, left, right)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ .-:*&/_;\'"()!+,@#');
+		carrName := stringlib.stringfilter(stringlib.stringtouppercase(trim(name, left, right)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ3 .-:*&/_;\'"()!+,@#');
 	
 		return carrName;
+	
+	END;
+	
+	EXPORT fn_alphaText(string name):= FUNCTION
+		
+		alphaText := stringlib.stringfilter(stringlib.stringtouppercase(trim(name, left, right)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
+	
+		return alphaText;
+	
+	END;
+	
+	EXPORT fn_alphaNumText(string name):= FUNCTION
+		
+		alphaNumText := stringlib.stringfilter(stringlib.stringtouppercase(trim(name, left, right)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ');
+	
+		return alphaNumText;
 	
 	END;
 		
@@ -211,47 +229,13 @@ EXPORT _Functions := MODULE
 	
 	EXPORT fn_FindActCode(string cd):= FUNCTION
 	
-		actCode 				:= trim(map(cd = 'MDN Deactivation' => 'DE', 	//Deactivation
-																cd = 'MDN Resume' 			=> 'RE',	//Reactivation
-																cd = 'MDN Suspend' 			=> 'SU',	//Suspend
-																cd = 'MDN Transfer' 		=> 'SW',	//Swap
-																''), left, right);
+		actCode 				:= trim(map(cd = '1' => 'DE', //Deactivation - MDN Deactivation
+																										cd = '2' => 'RE',	//Reactivation - MDN Resume
+																										cd = '3' => 'SU',	//Suspend 					- MDN Suspend
+																										cd = '4' => 'SW',	//Swap 								- MDN Transfer
+																										cd = '5'	=> '', 		//No PSMS 					- No PSMS
+																										''), left, right);
 		return actCode;
-		
-	END;
-	
-	EXPORT fn_FindOpName(string id):= FUNCTION
-	
-		opName 					:= trim(map(id = '31002' => 'ATTWirelessUS',
-																id = '31003' => 'VerizonWirelessUS',
-																id = '31004' => 'T-MobileUS',
-																id = '31005' => 'SprintUS',
-																id = '31022' => 'Syringa[US]',
-																id = '31054' => 'CellcomUS',
-																id = '31055' => 'NtelosUS',
-																id = '31056' => 'ViaeroWirelessUS',
-																id = '31058' => 'ElementMobileUS',
-																id = '31061' => 'iWirelessUS',
-																id = '31063' => 'CellOneofMTUS',
-																id = '31069' => 'AppalachianWlessUS',
-																id = '31075' => 'CellOneECenILUS',
-																id = '31076' => 'Nex-TechWlessUS',
-																id = '31078' => 'BluegrassUS',
-																id = '31079' => 'WestCentralUS',
-																id = '31086' => 'GCICommUS',
-																id = '31087' => 'InlandCellularUS',
-																id = '31088' => 'IllinoisValleyUS',
-																id = '31096' => 'Syringa[US]',
-																id = '31097' => 'ThumbCellularUS',
-																id = '31099' => 'ACSValleyUS',
-																id = '31120' => 'UnionWirelessUS',
-																id = '31127' => 'PanhandleUS',
-																id = '31143' => 'DuetWirelessUS',
-																id = '31154' => 'CleartalkWireless',
-																id = '31155' => 'CopperValleyUS',
-																id = '31168' => 'ASTAC[US]',
-																''), left, right);
-		return opName;
 		
 	END;
 	
@@ -280,6 +264,27 @@ EXPORT _Functions := MODULE
 	//remove nulls
 	EXPORT rmNull(string fld):= FUNCTION
 		return std.str.findReplace(trim(fld, left, right), 'NULL', '');
+	END;
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+	//LERG6//////////////////////////////////////////////////////////////////////////////	
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	EXPORT fn_maxLerg6FileDt(dataset(dx_PhonesInfo.Layouts.lerg6Main) ds):= function
+
+		dtLayout := record
+			string filename;
+		end;
+
+		dtLayout rTr(ds l):= transform			
+			self.filename := l.dt_last_reported;
+		end;
+
+		findDate	:= project(ds, rTr(left));
+		findMax		:=(string)max(findDate(std.date.isValidDate((unsigned)(filename[1..8]))), (unsigned)filename); //Pull Highest Filedate
+
+		return findMax;
+
 	END;
 
 END;

@@ -1,4 +1,4 @@
-import AID, SexOffender, lib_date, address, hygenics_soff, lib_stringlib, nid;
+﻿import AID, SexOffender, lib_date, address, hygenics_soff, lib_stringlib, nid;
 
 ds := hygenics_soff.Mapping_Offender;
 
@@ -556,8 +556,9 @@ cleanAddress := dataset('~thor_200::persist::soff_offender_aid2', dslayout, flat
 
 //Name ID/////////////////////////////////
 
-	nid.mac_cleanfullnames(cleanAddress, cleanfullnames, name_orig);
-
+	//nid.mac_cleanfullnames(cleanAddress, cleanfullnames, name_orig);
+	nid.mac_cleanfullnames(cleanAddress, cleanfullnames, name_orig,,,,,,,,,,,,,,,,,,, true);
+	
 	cleanfullnames projFile(cleanfullnames l):= transform
 		self := l;
 	end;
@@ -838,7 +839,7 @@ primarynameRecs := ds_restAppended(name_type = '0');
 		persist_seisint_primary_key 		:=    'C2'+ 
 																					trim(InputRecord.orig_state, all)+ 
 																					'SOR'+                   
-																					(String)hash64(if(trim(InputRecord.sor_number, left, right)<>'' and trim(InputRecord.orig_state, all) in ['LA', 'SC', 'WA'],
+																					(String)hash64(if(trim(InputRecord.sor_number, left, right)<>'' and trim(InputRecord.orig_state, all) in ['LA', 'SC', 'WA','IN','CT'],
 																					                  trim(trim(InputRecord.source_file, all) + trim(InputRecord.sor_number, all) + trim(InputRecord.name_orig, all), all),
 																					               if(trim(InputRecord.sor_number, left, right)<>'' and trim(InputRecord.orig_state, all) not in ['GA','LA', 'SC', 'WA'],
 																														trim(trim(InputRecord.source_file, all) + trim(InputRecord.sor_number, all), all),
@@ -884,7 +885,48 @@ ds_transfer_persistent_seisint_primary_key := project(concat_primary_and_alias, 
 // Add offender_persistent_id
 
 	ds_transfer_persistent_seisint_primary_key addNPID(ds_transfer_persistent_seisint_primary_key l):= transform
-		self.offender_persistent_id := hash64(trim(l.seisint_primary_key, left, right)+trim((string)l.nid, left, right)+trim(l.date_of_birth, left, right)+trim(l.date_of_birth_aka, left, right));
+		// self.offender_persistent_id := hash64(trim(l.seisint_primary_key, left, right)+trim((string)l.nid, left, right)+trim(l.date_of_birth, left, right)+trim(l.date_of_birth_aka, left, right));
+		
+			filterField(String s) := FUNCTION
+			return StringLib.StringFilter(StringLib.StringToUpperCase(s),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+		END;
+		
+		Vlname          		:= filterField(l.lname);
+		Vfname          		:= filterField(l.fname);
+		Vmname          		:= filterField(l.mname);
+		Vname_suffix		    := filterField(l.name_suffix);
+		Vrace 							:= filterField(l.race);
+		Vheight							:= filterField(l.height);
+		Vsex 								:= filterField(l.sex);
+		Vweight							:= filterField(l.weight);
+		Veye_color					:= filterField(l.eye_color);	
+		Vhair_color					:= filterField(l.hair_color);	
+		VOffender_status   	:= filterField(l.Offender_status);
+	  Vscars_marks_tattoos:= filterField(l.scars_marks_tattoos);
+		Vimage_link         := filterField(l.image_link);
+		VregistrationAddr   := filterField(l.registration_address_1 +l.registration_address_2);
+		Voffender_id        := filterField(l.offender_id);
+		
+		self.offender_persistent_id := hash64(trim(l.seisint_primary_key, left, right)+
+		                                      trim((string)l.nid, left, right)+
+																					trim(l.date_of_birth, left, right)+
+																					trim(l.date_of_birth_aka, left, right)+
+																					// Vlname               +           	
+																					// Vfname          	   +
+																					// Vmname          	   +
+																					// Vname_suffix		     +
+																					Vrace 						   +
+																					Vheight						   +
+																					Vsex 							   +
+																					Vweight						   +
+																					Veye_color				   +
+																					Vhair_color				   +
+																					// VOffender_status     +
+																					Vscars_marks_tattoos +
+																					// Vimage_link          +
+																					VregistrationAddr    +
+																					Voffender_id
+																					);
 		self := l;
 	end;
 
@@ -1211,4 +1253,5 @@ dslayout := RECORD
 
 ds := dataset('~thor_data400::Persist::Cleaned_HD_Sex_Offender_test', dslayout, flat);
 */
+output(nPId_Added(seisint_primary_key ='C2CTSOR4298271687694912252'));
 export Cleaned_OKC_Sex_Offender := nPId_Added : persist('~thor_data400::Persist::Cleaned_HD_Sex_Offender');

@@ -1,4 +1,4 @@
-import MediaOne, address, ut,emailservice, mdr, _validate, Entiera;
+﻿import MediaOne, address, ut,emailservice, mdr, _validate, Entiera;
 export Map_MediaOne_as_Email(version) := function
 //************Acquireweb is under develoment.  AID and other fields will be mapped when available
 with_email := MediaOne.file_base.file(length(trim(email,left, right)) > 4 and StringLib.StringFindCount(email,  '@') > 0);

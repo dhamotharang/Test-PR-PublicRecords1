@@ -1,4 +1,4 @@
-IMPORT ut,RoxieKeyBuild,_control, PRTE2_Gong,PRTE2_Common, PRTE;
+﻿IMPORT ut,RoxieKeyBuild,_control, PRTE2_Gong,PRTE2_Common, PRTE, strata;
 
 EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 	
@@ -461,16 +461,31 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 		'Q', 
 		move_qa_key_gong_historyfcra_phone);
 		
+	//DF-22185 Verify followings fields are cleared in fcra keys
+cnt_gong_fcra_address := OUTPUT(strata.macf_pops(Keys.key_gong_history_address(true),,,,,,FALSE,
+																['caption_text','county_code','designation','disc_cnt18','disc_cnt6',
+																'prior_area_code','see_also_text']), 
+																named('CNT_HISTORY_ADDRESS_FCRA'));
+cnt_gong_fcra_did 		:= OUTPUT(strata.macf_pops(Keys.key_gong_history_did(true),,,,,,FALSE,
+																['caption_text','county_code','designation','disc_cnt18','disc_cnt6',
+																'prior_area_code','see_also_text']), 
+																named('CNT_HISTORY_DID_FCRA'));
+cnt_gong_fcra_phone 	:= OUTPUT(strata.macf_pops(Keys.key_gong_history_phone(true),,,,,,FALSE,
+																['caption_text','county_code','designation','disc_cnt18','disc_cnt6',
+																'prior_area_code','see_also_text']), 
+																 named('CNT_HISTORY_PHONE_FCRA'));
+	
+		
 	//---------- making DOPS optional and only in PROD build -------------------------------
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
-	updatedops					:=	PRTE.UpdateVersion('GongKeys', file_date, notifyEmail,'B','N','N');
-	updatedops_fcra  		:=  PRTE.UpdateVersion('FCRA_GongKeys',file_date,notifyEmail,'B','F','N');
-	
-	
+	updatedops					:=	PRTE.UpdateVersion('GongKeys', file_date, notifyEmail,	l_inloc:='B', l_inenvment:='N',l_includeboolean :='N');
+	updatedops_fcra  		:=  PRTE.UpdateVersion('FCRA_GongKeys',file_date,notifyEmail,	l_inloc:='B', l_inenvment:='F',l_includeboolean :='N');
 	PerformUpdateOrNot	:= IF(doDOPS,PARALLEL(updatedops,updatedops_fcra),NoUpdate);
+  //---------------------------------------------------------------------------------------
 
 	RETURN 		sequential(			
+	
 				build_key_cbrs_phone10_gong, 
 				build_key_gong_npa, 
 				build_key_gong_zip, 
@@ -484,7 +499,7 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 				build_key_gong_eda_st_city_prim_name_prim_range, 
 				build_key_gong_eda_st_lname_city, 
 				build_key_gong_eda_st_lname_fname_city, 
-				build_key_gong_hhid, 
+			  build_key_gong_hhid, 
 				build_key_gong_history_surnames, 
 				build_key_gong_history_address, 
 				build_key_gong_history_city_st_name, 
@@ -492,10 +507,10 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 				build_key_gong_history_companyname, 
 				build_key_gong_history_did, 
 				build_key_gong_history_hhid, 
-				build_key_gong_history_linkids, 
+			  build_key_gong_history_linkids, 
 				build_key_gong_history_name, 
 				build_key_gong_history_npa_nxx_line, 
-				build_key_gong_history_phone, 
+	      build_key_gong_history_phone, 
 				build_key_gong_history_wdtg, 
 				build_key_gong_history_wild_name_zip, 
 				build_key_gong_history_zip_name, 
@@ -505,10 +520,11 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 				build_key_gong_scoring, 
 				build_key_gong_surnamecnt, 
 				build_key_phone_table_v2, 
-				build_key_business_headerfilteredfcra_hriphone10_v2, 
+				build_key_business_headerfilteredfcra_hriphone10_v2,
 				build_key_gong_historyfcra_address, 
 				build_key_gong_historyfcra_did, 
-				build_key_gong_historyfcra_phone, 
+				build_key_gong_historyfcra_phone ,
+				
 				move_built_key_cbrs_phone10_gong, 
 				move_built_key_gong_npa, 
 				move_built_key_gong_zip, 
@@ -585,6 +601,8 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 				move_qa_key_gong_historyfcra_address, 
 				move_qa_key_gong_historyfcra_did, 
 				move_qa_key_gong_historyfcra_phone,
-				PerformUpdateOrNot);
+				parallel(cnt_gong_fcra_address, cnt_gong_fcra_did, cnt_gong_fcra_phone),
+				PerformUpdateOrNot
+				);
 
 END;

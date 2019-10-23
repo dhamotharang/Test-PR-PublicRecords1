@@ -1,4 +1,4 @@
-import ut, doxie;
+﻿import ut, doxie, data_services;
 
 baseCID := InfutorCID.File_InfutorCID_Base((unsigned)phone<>0);
 
@@ -34,6 +34,11 @@ slim_layout := RECORD
 	/* Standard Additional Base Fields */
 	unsigned6 dt_first_seen:=0;
 	unsigned6 dt_last_seen:=0;
+	
+	//CCPA-9 Add CCPA fields
+	unsigned4 global_sid:=0;
+	unsigned8 record_sid:=0;
+
 end;
 
 // remove all seemingly unnecessary fields
@@ -42,4 +47,4 @@ slim_layout into_slim(baseCID le) := transform
 end;
 p := project(baseCID, into_slim(left));
 
-export Key_Infutor_Phone_FCRA := index(p,{phone},{p},'~thor_data400::key::infutorcid::fcra::phone_' + doxie.Version_SuperKey);
+export Key_Infutor_Phone_FCRA := index(p,{phone},{p},data_services.data_location.prefix() + 'thor_data400::key::infutorcid::fcra::phone_' + doxie.Version_SuperKey);

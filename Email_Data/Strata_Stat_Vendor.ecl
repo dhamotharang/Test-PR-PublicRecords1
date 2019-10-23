@@ -1,4 +1,4 @@
-import STRATA;
+﻿import STRATA;
 
 export Strata_Stat_Vendor(
 

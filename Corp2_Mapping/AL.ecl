@@ -1,4 +1,4 @@
-import ut, std, corp2, _validate, VersionControl, corp2_raw_AL, scrubs, scrubs_corp2_mapping_AL_main, scrubs_corp2_mapping_AL_event, Tools;
+﻿import ut, std, corp2, _validate, VersionControl, corp2_raw_AL, scrubs, scrubs_corp2_mapping_AL_main, scrubs_corp2_mapping_AL_event, Tools;
 
 export AL := MODULE; 
 		
@@ -818,16 +818,13 @@ export AL := MODULE;
 		
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_AL Report' //subject
 																																	 ,'Scrubs CorpMain_AL Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpALMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );		
+																																	);		
 																																 
 		Main_BadRecords := Main_T.ExpandedInFile(	dt_vendor_first_reported_invalid 	 <> 0 or
 																							dt_vendor_last_reported_invalid 	 <> 0 or
@@ -932,16 +929,13 @@ export AL := MODULE;
 		
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
-		Event_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Event_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpEvent_AL Report' //subject
 																																	 ,'Scrubs CorpEvent_AL Report' //body
 																																	 ,(data)Event_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpALEventScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );		
+																																);		
 																																 
 		Event_BadRecords := Event_T.ExpandedInFile ( event_filing_cd_invalid 	<> 0 );	
 

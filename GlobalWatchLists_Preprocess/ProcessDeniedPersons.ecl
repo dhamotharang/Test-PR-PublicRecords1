@@ -1,4 +1,4 @@
-import GlobalWatchLists_Preprocess, STD, lib_StringLib, ut, Address, codes;
+﻿import GlobalWatchLists_Preprocess, STD, lib_StringLib, ut, Address, codes;
 
 EXPORT ProcessDeniedPersons := FUNCTION
 
@@ -42,13 +42,13 @@ EXPORT ProcessDeniedPersons := FUNCTION
 	
 	GlobalWatchLists_Preprocess.IntermediaryLayoutDeniedPersons.tempLayout1 AssignValues(GlobalWatchLists_Preprocess.IntermediaryLayoutDeniedPersons.tempLayout L, INTEGER Ctr) := TRANSFORM
 		self.ent_key 						:= 'DPL' + INTFORMAT(Ctr, 3, 1);
-		self.source 						:= 'US Bureau of Industry and Security - Denied Person List';
-		self.lst_vend_upd 			:= GlobalWatchlists_Preprocess.Versions.DeniedPersons_Version;
-		self.lstd_entity 				:= if(length(TRIM(L.Name, left, right)) > 54
-																,TRIM(L.Name, left, right)[1..STD.Str.Find(TRIM(L.Name, left, right), ',', 1)-1]
-																,TRIM(L.Name, left, right));
+		self.source 							:= 'US Bureau of Industry and Security - Denied Person List';
+		self.lst_vend_upd 	:= GlobalWatchlists_Preprocess.Versions.DeniedPersons_Version;
+		self.lstd_entity 		:= if(length(TRIM(L.Name, left, right)) > 54 and STD.Str.Find(TRIM(L.Name, left, right), ',', 1) > 1
+																											,TRIM(L.Name, left, right)[1..STD.Str.Find(TRIM(L.Name, left, right), ',', 1)-1]
+																											,TRIM(L.Name, left, right));
 		TempAddr1								:= L.Street_Address[1..STD.Str.Find(L.Street_Address, ',', 1)-1];
-		self.address_1 					:= IF(REGEXFIND('P.OBOX|P.O. [0-9]+',TempAddr1,NOCASE), REGEXREPLACE('P.OBOX|P.O. ',TempAddr1,'PO BOX ', NOCASE),TempAddr1);
+		self.address_1 		:= IF(REGEXFIND('P.OBOX|P.O. [0-9]+',TempAddr1,NOCASE), REGEXREPLACE('P.OBOX|P.O. ',TempAddr1,'PO BOX ', NOCASE),TempAddr1);
 		TempAddr2 							:= STD.Str.FindReplace(
 																STD.Str.FindReplace(
 																	STD.Str.FindReplace(

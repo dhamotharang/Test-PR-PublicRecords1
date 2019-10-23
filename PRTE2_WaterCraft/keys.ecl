@@ -1,4 +1,4 @@
-IMPORT doxie, bipv2, ut, Data_Services, autokeyb2, PRTE2_Watercraft, Watercraft, fcra, AutoStandardI, mdr;
+﻿IMPORT doxie, bipv2, ut, Data_Services, autokeyb2, PRTE2_Watercraft, Watercraft, fcra, AutoStandardI, mdr;
 
 EXPORT keys := MODULE
 	
@@ -15,9 +15,15 @@ EXPORT keys := MODULE
 
   // fcra-restricted states:
 	base_cid 			:= PRTE2_Watercraft.Files.CoastGuard(~IsFCRA OR state_origin NOT IN Constants.states);
+	
+	// DF-21901 Blank out specified fields in prte::key::watercraft::fcra::cid_qa
+	ut.MAC_CLEAR_FIELDS(base_cid, base_cid_cleared, constants.fields_to_clear_cid);
+	
+	base_file_cid := if(IsFCRA, base_cid_cleared, base_cid);   
+	
        
-  RETURN INDEX(base_cid, 
-							{state_origin,watercraft_key,sequence_key}, {base_cid},
+  RETURN INDEX(base_file_cid, 
+							{state_origin,watercraft_key,sequence_key},{base_file_cid},
                if(IsFCRA, 
 												PRTE2_Watercraft.Constants.KEY_PREFIX + 'fcra::',
 												PRTE2_Watercraft.Constants.KEY_PREFIX) + doxie.Version_SuperKey + '::cid');
@@ -108,10 +114,16 @@ END;
 
   // fcra-restricted states:
   base_sid 					:= PRTE2_Watercraft.Files.Search_Ph_Supressed_bdid (~IsFCRA OR state_origin NOT IN Constants.states);
+	
+	// DF-21901 Blank out specified fields in prte::key::watercraft::fcra:sid
+	ut.MAC_CLEAR_FIELDS(base_sid, base_sid_cleared, constants.fields_to_clear_sid);
+	
+	base_file_sid := if(IsFCRA, base_sid_cleared, base_sid);   
 
-  RETURN INDEX(base_sid, 
+
+  RETURN INDEX(base_file_sid, 
 							{state_origin, watercraft_key, sequence_key}, 
-							{base_sid}-{Layouts.Exclusions},
+							{base_file_sid}-{Layouts.Exclusions},
               if(IsFCRA, 
 												PRTE2_Watercraft.Constants.KEY_PREFIX + 'fcra::',
 												PRTE2_Watercraft.Constants.KEY_PREFIX) + doxie.Version_SuperKey + '::sid');
@@ -177,10 +189,15 @@ END;
 
   // fcra-restricted states:
 	base_wid 		:= PRTE2_Watercraft.Files.Main(~IsFCRA OR state_origin NOT IN Constants.states);
+	
+	// DF-21920 Blank out specified fields in prte::key::watercraft::fcra:wid
+	ut.MAC_CLEAR_FIELDS(base_wid, base_wid_cleared, constants.fields_to_clear_wid);
+	
+	base_file_wid := if(IsFCRA, base_wid_cleared, base_wid);  
 
-  RETURN INDEX(base_wid, 
+  RETURN INDEX(base_file_wid, 
 							{state_origin,watercraft_key,sequence_key},
-              {base_wid},
+              {base_file_wid},
               if(IsFCRA, 
 											PRTE2_Watercraft.Constants.KEY_PREFIX + 'fcra::',
 											PRTE2_Watercraft.Constants.KEY_PREFIX) + doxie.Version_SuperKey + '::wid');

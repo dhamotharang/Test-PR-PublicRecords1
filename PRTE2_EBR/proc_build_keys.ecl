@@ -1,4 +1,4 @@
-import RoxieKeyBuild,PRTE, _control, STD,prte2,tools,AutoKeyB,Doxie,AutoStandardI,AutoKeyB2;
+﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools,AutoKeyB,Doxie,AutoStandardI,AutoKeyB2;
 
 EXPORT proc_build_keys(string filedate) := function
 
@@ -161,7 +161,7 @@ return retval;
 end;
 
 // -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
-updatedops   		 := PRTE.UpdateVersion('EBRKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
+updatedops   		 := PRTE.UpdateVersion('EBRKeys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean :='N');
 
 
 // -- Actions

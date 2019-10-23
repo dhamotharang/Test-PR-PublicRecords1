@@ -1,7 +1,7 @@
-IMPORT _Control, RoxieKeyBuild, tools, Orbit3;
+﻿IMPORT _Control, RoxieKeyBuild, tools, Orbit3;
 
 EXPORT Build_All(
-  STRING																	pversion,
+ STRING																	pversion,
 	STRING																	pDirectory									= '/data/hds_3/ABMS/build',
 	STRING																	pServerIP										= _Control.IPAddress.bctlpedata11,
 	BOOLEAN																	pIsTesting									= FALSE,
@@ -63,8 +63,8 @@ EXPORT Build_All(
 		                               pIsTesting,
 		                               pOverwrite,
 		                               pReplicate);
-	
-	EXPORT dops_update := RoxieKeyBuild.updateversion('ABMSKeys', pversion, _Control.MyInfo.EmailAddressNotify, , 'N'); 															
+	//Added ;michael.gould@lexisnexisrisk.com
+	EXPORT dops_update := RoxieKeyBuild.updateversion('ABMSKeys', pversion, _Control.MyInfo.EmailAddressNotify + ';michael.gould@lexisnexisrisk.com;darren.knowles@lexisnexisrisk.com', , 'N'); 															
 
 	EXPORT orbitUpdate := Orbit3.proc_Orbit3_CreateBuild('ABMS',pversion,'N');
 

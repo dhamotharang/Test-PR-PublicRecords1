@@ -11,6 +11,7 @@ pValidEmail	:= PROJECT(ds_base, TRANSFORM(Layout_email.temp_Validate, SELF.SkipR
 																						 
 //Determine if record meets DOD filter
 fNoDeathRecs	:= Email_Data.Fn_ApplyDeathRule(pValidEmail);
+//persist removed to avoid using previous base.
 									
 //Concat Emails that do not meet death criteria with valid emails with no DID(these were removed from the death join)
 ValidEmailAll := fNoDeathRecs + pValidEmail(SkipRec = FALSE and DID = 0);

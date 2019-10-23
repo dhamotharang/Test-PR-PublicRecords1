@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take MD Real Estate License raw file and convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
@@ -62,10 +62,10 @@ layout_MD_FixField := RECORD
 END;
 
 layout_MD_FixField map_MD_2_fix(ValidMDFile L)	:= TRANSFORM
-self.ORG_NAME			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.ORG_NAME);
-UpperOfficeName		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.OFFICENAME);
-UpperAddress1			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.ADDRESS1_1);
-UpperAddress2			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.ADDRESS2_1);
+self.ORG_NAME			:= ut.CleanSpacesAndUpper(L.ORG_NAME);
+UpperOfficeName		:= ut.CleanSpacesAndUpper(L.OFFICENAME);
+UpperAddress1			:= ut.CleanSpacesAndUpper(L.ADDRESS1_1);
+UpperAddress2			:= ut.CleanSpacesAndUpper(L.ADDRESS2_1);
 IsAddr								:= IF((REGEXFIND('^[0-9]+',TRIM(L.ADDRESS1_1,LEFT,RIGHT))
 														OR REGEXFIND('^ONE ',TRIM(L.ADDRESS1_1,LEFT,RIGHT))
 														OR REGEXFIND('PO BOX',TRIM(L.ADDRESS1_1,LEFT,RIGHT))
@@ -107,10 +107,10 @@ self.ADDRESS1_1		:= IF(TRIM(self.OFFICENAME2) != ' ' AND TRIM(L.ADDRESS2_1) != '
 												IF(TRIM(L.ADDRESS2_1) != ' ' AND (REGEXFIND(Addr2Pattern,UpperAddress1) OR REGEXFIND(Addr2_2Pattern,UpperAddress1)),UpperAddress2,UpperAddress1));
 self.ADDRESS2_1		:= IF(TRIM(self.OFFICENAME2) != ' ' AND TRIM(L.ADDRESS2_1) != ' ',' ',
 												IF(TRIM(L.ADDRESS2_1) != ' ' AND (REGEXFIND(Addr2Pattern,UpperAddress1) OR REGEXFIND(Addr2_2Pattern,UpperAddress1)),UpperAddress1,UpperAddress2));
-self.CITY					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.CITY_1);
-self.STATE				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.STATE_1);
+self.CITY					:= ut.CleanSpacesAndUpper(L.CITY_1);
+self.STATE				:= ut.CleanSpacesAndUpper(L.STATE_1);
 self.EXPDT				:= REGEXREPLACE('-',L.EXPDT,'/');
-self.LIC_TYPE			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.LIC_TYPE);
+self.LIC_TYPE			:= ut.CleanSpacesAndUpper(L.LIC_TYPE);
 self.LAST_UPDT		:= L.LAST_UPDT;
 self	:= L;
 END;
@@ -161,7 +161,7 @@ Parse name using F M. and L, Sx. pattern for names that do not clean*/
 	ClnDBAName					:= IF(REGEXFIND(IPpattern,tmpNameDBA),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(tmpNameDBA),
 														Prof_License_Mari.mod_clean_name_addr.cleanFName(tmpNameDBA));
 	self.NAME_DBA				:= IF(temp_dba_name <> L.ORG_NAME and temp_dba_name <> L.ADDRESS1_1,REGEXREPLACE(' COMPANY',ClnDBAName,' CO'),' ');
-	self.NAME_DBA_SUFX	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
+	self.NAME_DBA_SUFX	:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
 	self.DBA_FLAG				:= IF(trim(self.NAME_DBA) != ' ', 1, 0); // 1: true  0: false
 	
 	//Parse name

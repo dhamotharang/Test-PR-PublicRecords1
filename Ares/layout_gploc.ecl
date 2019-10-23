@@ -1,0 +1,26 @@
+﻿EXPORT layout_gploc := record
+	STRING1	Update_Flag := '';
+	STRING2	ISO_Country_Code := '';
+	STRING8	Primary_Key_Accuity_Location_ID := '';
+	STRING4	Institution_Type := '';
+	STRING4	Office_Type := '';
+	STRING35	Institution_Name_Abbreviated := '';
+	STRING100	Institution_Name_Full := '';
+	STRING70	Branch_Name := '';
+	STRING35	Physical_Address_1 := '';
+	STRING35	Physical_Address_2 := '';
+	STRING30	City_Town := '';
+	STRING3	State_Province_Region_Abbreviated := '';
+	STRING40	State_Province_Region_Full := '';
+	STRING15	Postal_Code := '';
+	STRING35	Country_Name_Full := '';
+	STRING10	Employer_Tax_ID := '';
+	STRING8	Date_of_Financials := '';
+	STRING14	Current_Assets := '';
+	STRING8	Head_Office_Accuity_Location_ID := '';
+	STRING8	Institution_Identifier := '';
+	STRING35	Filler1 := '';
+	STRING35	Filler2 := '';
+	STRING35	Filler3 := '';
+	String2 crlf := '\r\n'; 
+end;

@@ -1,4 +1,4 @@
-/* Converting National Credit Union Administration / Other Lenders  Professions Licenses File to MARI common layout
+﻿/* Converting National Credit Union Administration / Other Lenders  Professions Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 import Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
@@ -107,7 +107,7 @@ EXPORT map_USS0648_conversion(STRING pVersion) := FUNCTION
 	//FilterHeaderRec 	:= inFile(REGEXFIND('(^[0-9]+$)', TRIM(SITE_ID,LEFT,RIGHT)) OR TRIM(SITE_ID,LEFT,RIGHT)='');
 																				
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(rLayout_License pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(rLayout_License pInput) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -125,22 +125,22 @@ EXPORT map_USS0648_conversion(STRING pVersion) := FUNCTION
 		self.TYPE_CD					:= 'GR';
 			
 		//Standardize Fields
-		TrimNAME_ORG					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CU_NAME);
-		pre_TrimAddress1			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STREET);
+		TrimNAME_ORG					:= ut.CleanSpacesAndUpper(pInput.CU_NAME);
+		pre_TrimAddress1			:= ut.CleanSpacesAndUpper(pInput.STREET);
 		pre_TrimAddress2			:= StringLib.StringFindReplace(pre_TrimAddress1,'C O BLDG','BLDG');  //fix the string before processing
 		TrimAddress1					:= StringLib.StringFindReplace(pre_TrimAddress2,'C/O BLDG','BLDG');  //fix the string before processing
-		TrimAddress2					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_ADDRESS2);
-		TrimCity							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY);
-		TrimState							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE);
-		TrimCnty							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_CNTY_NAME);
-		TrimCntry							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_COUNTRY);
-		TrimNAME_CONTACT 			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ATTENTION_OF);
-		pre_TrimMailAddress1 	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIL_ADDRESS1);
+		TrimAddress2					:= ut.CleanSpacesAndUpper(pInput.BUS_ADDRESS2);
+		TrimCity							:= ut.CleanSpacesAndUpper(pInput.CITY);
+		TrimState							:= ut.CleanSpacesAndUpper(pInput.STATE);
+		TrimCnty							:= ut.CleanSpacesAndUpper(pInput.BUS_CNTY_NAME);
+		TrimCntry							:= ut.CleanSpacesAndUpper(pInput.BUS_COUNTRY);
+		TrimNAME_CONTACT 			:= ut.CleanSpacesAndUpper(pInput.ATTENTION_OF);
+		pre_TrimMailAddress1 	:= ut.CleanSpacesAndUpper(pInput.MAIL_ADDRESS1);
 		TrimMailAddress1 			:= StringLib.StringFindReplace(pre_TrimMailAddress1,'C/O BLDG','BLDG');;
-		TrimMailAddress2			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIL_ADDRESS2);
-		TrimMailCity					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIL_CITY);
-		TrimMailState					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIL_ST_CODE);
-		TrimOFF_TYPE		 			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SITE_TYPE_NAME);
+		TrimMailAddress2			:= ut.CleanSpacesAndUpper(pInput.MAIL_ADDRESS2);
+		TrimMailCity					:= ut.CleanSpacesAndUpper(pInput.MAIL_CITY);
+		TrimMailState					:= ut.CleanSpacesAndUpper(pInput.MAIL_ST_CODE);
+		TrimOFF_TYPE		 			:= ut.CleanSpacesAndUpper(pInput.SITE_TYPE_NAME);
 		
 		// License Information
 /* 		self.LICENSE_NBR	  	:= IF(pInput.SITE_ID != '' and TrimOFF_TYPE = 'BRANCH OFFICE',pInput.SITE_ID,
@@ -437,7 +437,7 @@ EXPORT map_USS0648_conversion(STRING pVersion) := FUNCTION
    		self.ADDR_ADDR4_2			:= '';
    		self.ADDR_CITY_2			:= IF(getMailAddr1 != '',TrimMailCity,'');
    		self.ADDR_STATE_2			:= IF(getMailAddr1 != '',
-   																	Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIL_ST_CODE),
+   																	ut.CleanSpacesAndUpper(pInput.MAIL_ST_CODE),
    																					'');
    		ParsedMailZIP       	:=  IF(getMailAddr1 != '',REGEXFIND('[0-9]{5}[\\-]?([0-9]{4})?',trim(pInput.MAIL_ZIPCODE), 0),
    																	'');
@@ -482,14 +482,14 @@ EXPORT map_USS0648_conversion(STRING pVersion) := FUNCTION
 															 '');		
 			
 /* 			self.MISC_OTHER_ID	:= IF(pInput.SITE_ID!=' ',
-   			                          Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SITE_ID) +		//new. 3/21/13, per Terri
-   														    '/' + Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SITE_NAME),
+   			                          ut.CleanSpacesAndUpper(pInput.SITE_ID) +		//new. 3/21/13, per Terri
+   														    '/' + ut.CleanSpacesAndUpper(pInput.SITE_NAME),
    																' ');
    			self.MISC_OTHER_TYPE:= 'SITE_NAME';		//new. 3/21/13, per Terri
 */
 			//New fields have been added for SITE_ID & SITE_NAME
-		SELF.AGENCY_ID			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SITE_ID);
-		SELF.SITE_LOCATION	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SITE_NAME);
+		SELF.AGENCY_ID			:= ut.CleanSpacesAndUpper(pInput.SITE_ID);
+		SELF.SITE_LOCATION	:= ut.CleanSpacesAndUpper(pInput.SITE_NAME);
 		
 		SELF.INST_BEG_DTE		:= IF(pInput.YEAR_OPENED<>'',TRIM(pInput.YEAR_OPENED,LEFT,RIGHT) + '0101','');
 
@@ -532,7 +532,7 @@ EXPORT map_USS0648_conversion(STRING pVersion) := FUNCTION
 	inFileLic_disted	:= DISTRIBUTE(inFileLic,hash(name_org,license_nbr,affil_type_cd));
 	inFileLic_sorted	:= SORT(inFileLic_disted,name_org,license_nbr,affil_type_cd,-addr_cnty_1,local);
 
-	Prof_License_Mari.layouts.base	rollup_co(inFileLic_sorted L, inFileLic_sorted R) := transform
+	Prof_License_Mari.layout_base_in	rollup_co(inFileLic_sorted L, inFileLic_sorted R) := transform
 		SELF.AGENCY_ID := MAP(L.AGENCY_ID='' AND R.AGENCY_ID<>'' => TRIM(R.AGENCY_ID),
 		                      L.AGENCY_ID<>'' AND R.AGENCY_ID='' => TRIM(L.AGENCY_ID),
 													'');
@@ -548,7 +548,7 @@ EXPORT map_USS0648_conversion(STRING pVersion) := FUNCTION
 
 	
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base	trans_lic_type(inFileLic_rolluped L, cmvTransLkp R) := transform
+	Prof_License_Mari.layout_base_in	trans_lic_type(inFileLic_rolluped L, cmvTransLkp R) := transform
 		self.STD_PROF_CD := StringLib.stringtouppercase(trim(R.DM_VALUE1,LEFT,RIGHT));
 		self := L;
 	end;
@@ -609,7 +609,7 @@ EXPORT map_USS0648_conversion(STRING pVersion) := FUNCTION
 	
 	//***BR to CO Lender License Records
 	//Prof_License_Mari.layouts_reference.MARIBASE 	assign_pcmcslpk(ds_map_source_desc L, company_only_lookup R) := transform
-	Prof_License_Mari.layouts.base 	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := transform
+	Prof_License_Mari.layout_base_in 	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := transform
 		self.pcmc_slpk := R.cmc_slpk;
 		//self.provnote_3:= 'i am here.r.license_nbr='+trim(r.LICENSE_NBR)+',l.license_nbr='+L.license_nbr;
 		self := L;
@@ -626,7 +626,7 @@ EXPORT map_USS0648_conversion(STRING pVersion) := FUNCTION
 											 AND TRIM(LEFT.AFFIL_TYPE_CD,LEFT,RIGHT) = 'BR',
 											assign_pcmcslpk(left,right),left outer);	
 
-	Prof_License_Mari.layouts.base  xTransPROVNOTE(ds_map_affil L) := transform
+	Prof_License_Mari.layout_base_in  xTransPROVNOTE(ds_map_affil L) := transform
 		self.PROVNOTE_1 := map(	L.provnote_1 != '' and L.pcmc_slpk = 0 and L.affil_type_cd = 'BR' => TRIM(L.provnote_1,left,right)+ '|' + Comments,
 														L.provnote_1 = '' and L.pcmc_slpk = 0 and L.affil_type_cd = 'BR' => Comments,
 																														L.PROVNOTE_1);
@@ -638,7 +638,7 @@ EXPORT map_USS0648_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(OutRecs L) := transform
+	Prof_License_Mari.layout_base_in xTransToBase(OutRecs L) := transform
 		self.NAME_ORG 				:= IF(regexfind('(%|")',L.NAME_ORG),
 																StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctMisc(L.NAME_ORG)),
 																	StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_ORG,'/',' ')));
@@ -674,328 +674,4 @@ EXPORT map_USS0648_conversion(STRING pVersion) := FUNCTION
 	RETURN SEQUENTIAL(move_to_using, oFOICU, oCUBI, o1, o2, d_final, add_super, move_to_used, notify_missing_codes, notify_invalid_address);
 
 END;
-
-//export map_USS0648_conversion := 'todo';
-// END;
-/* Prof_License_Mari.layouts_reference.MARIBASE 		xformToCommon(rLayout_License pInput) 
-   	:= 
-   	 TRANSFORM
-   		self.PRIMARY_KEY	    := 0;  
-   		self.CREATE_DTE				:= PROCESS_DTE;
-   		self.LAST_UPD_DTE			:= PROCESS_DTE;
-   		self.STAMP_DTE		    := PROCESS_DTE;
-   		self.STD_PROF_CD			:= '';
-   		self.STD_PROF_DESC    := '';
-   		self.STD_SOURCE_UPD		:= src_cd;
-   		self.STD_SOURCE_DESC  := '';
-   		
-   		//Standardize Fields
-   		TrimNAME_ORG		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CU_NAME);
-   		TrimAddress1		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STREET);
-   		TrimAddress2		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_ADDRESS2);
-   		TrimCity				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY);
-   		TrimState				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE);
-   		TrimCnty				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_CNTY_NAME);
-   		TrimCntry				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_COUNTRY);
-   		TrimNAME_CONTACT := Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ATTENTION_OF);
-   		TrimMailAddress1 	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIL_ADDRESS1);
-   		TrimMailAddress2	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIL_ADDRESS2);
-   		TrimMailCity			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIL_CITY);
-   		TrimMailState			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIL_ST_CODE);
-   		TrimOFF_TYPE		 := Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SITE_TYPE_NAME);
-   			
-   		// License Information
-   		self.LICENSE_NBR	  		:= IF(pInput.SITE_ID != '' and TrimOFF_TYPE = 'BRANCH OFFICE',pInput.SITE_ID,
-   																		IF(pInput.CU_NUMBER != '',pInput.CU_NUMBER,'NR'));
-   		self.OFF_LICENSE_NBR		:= IF(pInput.SITE_ID != '' and TrimOFF_TYPE = 'BRANCH OFFICE',pInput.CU_NUMBER,
-   																	IF(pInput.SITE_ID != '' and TrimOFF_TYPE != 'BRANCH OFFICE',pInput.SITE_ID,''));
-   		self.LICENSE_STATE	 		:= 'US';
-   		self.RAW_LICENSE_TYPE		:= pInput.CU_TYPE;
-   		self.STD_LICENSE_TYPE  	:= self.RAW_LICENSE_TYPE;
-   		self.STD_LICENSE_DESC		:= '';
-   	  self.RAW_LICENSE_STATUS := '';
-   		self.STD_LICENSE_STATUS := 'A';
-   		self.STD_STATUS_DESC		:= 'ACTIVE';
-   		self.TYPE_CD						:= 'GR';
-   		
-   		//Reformatting date to YYYYMMDD
-   		stripIssueTime := IF(pInput.ISSUE_DATE != '',Prof_License_Mari.DateCleaner.norm_date3(pInput.ISSUE_DATE),'');
-   		self.CURR_ISSUE_DTE		:= IF(stripIssueTime != '',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(stripIssueTime), '17530101');
-   		self.ORIG_ISSUE_DTE		:= '17530101';
-   		self.EXPIRE_DTE				:= '17530101';
-   		self.RENEWAL_DTE			:= '';
-   		self.ACTIVE_FLAG			:= '';
-   
-   //Prepping ORG_DBA field for parsing
-   		prepNAME_ORG := MAP(StringLib.Stringfind(TrimNAME_ORG,' T/A ',1) > 0 => StringLib.StringFindReplace(TrimNAME_ORG,' T/A ',' D/B/A '),
-   												 StringLib.Stringfind(TrimNAME_ORG,'.T/A ',1) > 0 => StringLib.StringFindReplace(TrimNAME_ORG,'.T/A ',' D/B/A '),
-   												 StringLib.Stringfind(TrimNAME_ORG,'/DBA ',1) > 0 => StringLib.StringFindReplace(TrimNAME_ORG,'/DBA ',' D/B/A '),
-   												 				 																													TrimNAME_ORG);
-   		getNAME_ORG := IF(REGEXFIND(DBA_Ind,prepNAME_ORG), Prof_License_Mari.mod_clean_name_addr.GetCorpName(prepNAME_ORG),
-   																prepNAME_ORG);
-   		
-   		getORG_DBA  := IF(REGEXFIND(DBA_Ind,prepNAME_ORG), Prof_License_Mari.mod_clean_name_addr.GetDBAName(prepNAME_ORG),'');
-   											 
-   
-   // Identify NICKNAME in the various format 
-   		tempNick		:= MAP(StringLib.stringfind(getNAME_ORG,'""',1) >0 and REGEXFIND(dbl_quote_pattern,getNAME_ORG)
-   														=> REGEXFIND(dbl_quote_pattern,getNAME_ORG,2),
-   												StringLib.stringfind(getNAME_ORG,'(',1) >0 
-   													and REGEXFIND('^([A-Za-z ][^\\(]+)[\\(][\\"]([^\\"][A-Z ][^\\"]+)[\\"][\\)]*.',getNAME_ORG)
-   														=> REGEXFIND('^([A-Za-z ][^\\(]+)[\\(][\\"]([^\\"][A-Z ][^\\"]+)[\\"][\\)]*.',getNAME_ORG,2),			  
-   												StringLib.stringfind(getNAME_ORG,'"',1) >0 and REGEXFIND(quote_pattern,getNAME_ORG)
-   															=> REGEXFIND(quote_pattern,getNAME_ORG,2),
-   												StringLib.stringfind(getNAME_ORG,'(',1) >0 and REGEXFIND(paren_pattern,getNAME_ORG)
-   																=> REGEXFIND(paren_pattern,getNAME_ORG,2),
-   																				' ');
-   		
-   	//Removing NickName from Parsed First/Last Name fields
-   	  removeNick		:= MAP(StringLib.StringFind(tempNick,'(',1) > 0 => StringLib.StringFindReplace(getNAME_ORG,tempNick,''),
-   												 StringLib.StringFind(tempNick,'"',1) >= 1 => REGEXREPLACE(tempNick,getNAME_ORG,''),
-   												 StringLib.StringFind(getNAME_ORG,'"',1) > 0 => REGEXREPLACE('\"'+ tempNick +'\"',getNAME_ORG,''),
-   																					StringLib.StringFindReplace(getNAME_ORG,'('+ tempNick +')','')
-   																																									);
-   		stripNickName	:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeNick));
-   		GoodName	:= IF(tempNick != '',stripNickName,getNAME_ORG);
-   		
-   		rmvOFF_ORG	:= IF(REGEXFIND(C_O_Ind,getNAME_ORG),Prof_License_Mari.mod_clean_name_addr.GetCorpName(getNAME_ORG),
-   																getNAME_ORG);	
-       
-   		rmvNAME_Misc := IF(REGEXFIND('(&|[0-9])',tempNick),GoodName,
-   												IF(regexfind('[\\(]',rmvOFF_ORG) and not regexfind('[\\)]',rmvOFF_ORG),
-   																regexreplace('[(\\(\\>]',rmvOFF_ORG,''),rmvOFF_ORG));
-   		 
-   		StdNAME_ORG := Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(trim(rmvNAME_Misc,left,right));
-   		CleanNAME_ORG	:= MAP(REGEXFIND('(([A-Za-z ]+)([\\(]THE[\\)]$)+)',StdNAME_ORG) => REGEXFIND('(([A-Za-z ]+)([\\(]THE[\\)]$)+)',StdNAME_ORG,2), 	
-   												 REGEXFIND('(.COM|.NET|.ORG)',StdNAME_ORG) => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(StdNAME_ORG),
-   		                     REGEXFIND('(%)',StdNAME_ORG) => REGEXFIND('^([A-Za-z0-9 ][^\\,]+)',StdNAME_ORG,1),
-   												 REGEXFIND('^([A-Za-z ]*)(CORP)[ ](INC)',TRIM(StdNAME_ORG,left,right))
-   														OR REGEXFIND('^([A-Za-z ]*)(CORP)[ ](LLC)',TRIM(StdNAME_ORG,left,right)) => Prof_License_Mari.mod_clean_name_addr.cleanFName(StdNAME_ORG),
-   									    
-   													REGEXFIND('^([A-Za-z ]*)(CORP)[ ]([A-Za-z ]*)',TRIM(StdNAME_ORG,left,right))
-   														OR REGEXFIND('^([A-Za-z ]*)(INC)[ ]([A-Za-z ]*)',TRIM(StdNAME_ORG,left,right)) => StdNAME_ORG,
-   													REGEXFIND('^([A-Za-z \\.]*)(INC|THE)([A-Za-z ]*)',TRIM(StdNAME_ORG,left,right))
-   																		and not REGEXFIND('( INC$| THE$)',TRIM(StdNAME_ORG,left,right))=> StdNAME_ORG,
-   																								Prof_License_Mari.mod_clean_name_addr.cleanFName(StdNAME_ORG));		
-   		
-   		self.NAME_ORG_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(rmvOFF_ORG); 
-   		self.NAME_ORG		    	:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(CleanNAME_ORG,'()',''));
-   		
-   		tmpORG_SUFX := Prof_License_Mari.mod_clean_name_addr.strippunctName(
-   																	Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(StdNAME_ORG));
-   		self.NAME_ORG_SUFX	  := StringLib.StringFilterOut(tmpORG_SUFX,' ');		
-   		self.STORE_NBR				:= IF(REGEXFIND('[0-9]',tempNick),tempNick,'');																											 
-   		self.NAME_FIRST		   	:= '';
-   		self.NAME_MID					:= '';							
-   		self.NAME_LAST		   	:= '';
-   		self.NAME_SUFX				:= '';
-   		self.NAME_NICK				:= '';
-   		self.BIRTH_DTE				:= '';
-   		self.GENDER						:= '';
-   		self.PROV_STAT				:= '';
-   		self.CREDENTIAL				:= '';
-   		getNAME_DBA := IF(REGEXFIND('(&)',tempNick),tempNick,'');
-   		StdNAME_DBA := StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(getNAME_DBA));
-   		CleanNAME_DBA	:= MAP(REGEXFIND('(.COM|.NET|.ORG)',StdNAME_DBA) => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(StdNAME_DBA),
-   													REGEXFIND('^([A-Za-z ]*)(CORP)[ ](INC)',TRIM(StdNAME_DBA,left,right))
-   														OR REGEXFIND('^([A-Za-z ]*)(CORP)[ ](LLC)',TRIM(StdNAME_DBA,left,right)) => Prof_License_Mari.mod_clean_name_addr.cleanFName(StdNAME_DBA),
-   									    
-   													REGEXFIND('^([A-Za-z ]*)(CORP)[ ]([A-Za-z ]*)',TRIM(StdNAME_DBA,left,right))
-   														OR REGEXFIND('^([A-Za-z ]*)(INC)[ ]([A-Za-z ]*)',TRIM(StdNAME_DBA,left,right)) => StdNAME_DBA,
-   									   														Prof_License_Mari.mod_clean_name_addr.cleanFName(StdNAME_DBA));
-   		self.NAME_DBA_PREFX	  := Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(StdNAME_DBA);  
-   		self.NAME_DBA					:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(CleanNAME_DBA,'()',''));
-   		tmpDBASufx := Prof_License_Mari.mod_clean_name_addr.strippunctName(
-   																	Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(StdNAME_DBA));
-   		self.NAME_DBA_SUFX	  := StringLib.StringFilterOut(tmpDBASufx,' '); 
-   		self.DBA_FLAG					:= IF(self.NAME_DBA != '',1,0);	
-   		
-   		getNAME_OFFICE	:= MAP(REGEXFIND(C_O_Ind,prepNAME_ORG)=> Prof_License_Mari.mod_clean_name_addr.GetDBAName(prepNAME_ORG),
-   												   REGEXFIND(C_O_Ind,TrimAddress1)=> Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimAddress1),
-   													 StringLib.Stringfind(TrimAddress1[1],'%',1) > 0 and not StringLib.Stringfind(TrimAddress1,',',1) > 0
-   																		=> REGEXFIND('^([\\%A-Za-z ][^\\,]+)',TrimAddress1,0),
-   													 StringLib.Stringfind(TrimAddress1[1],'%',1) > 0 => REGEXFIND('^([\\%A-Za-z ][^\\,]+)[\\,]([0-9A-Za-z \\.]+)',TrimAddress1,1),
-   													 REGEXFIND(C_O_Ind,TrimAddress2)=> Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimAddress2),
-   													 StringLib.Stringfind(TrimAddress2[1],'%',1) > 0 => REGEXFIND('^([\\%A-Za-z ][^\\,]+)[\\,]([0-9A-Za-z \\.]+)',TrimAddress2,1),
-   													 REGEXFIND('(C/O|C/0)',TrimMailAddress1) and REGEXFIND('(ATTN:|ATTN;|ATTN|ATTENTION)',TrimMailAddress1)
-   																	 => REGEXFIND('^(([A-Za-z ]+) C/O ([A-Za-z ]+) ATTN: ([A-Za-z ]+))$',TrimMailAddress1,3),
-   											  	 REGEXFIND(C_O_Ind,TrimMailAddress1) and TrimAddress1 != TrimMailAddress1 => Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimMailAddress1),
-   													 StringLib.Stringfind(TrimMailAddress1[1],'%',1) > 0 => StringLib.StringFilterOut(TrimMailAddress1,'%'),
-   													 REGEXFIND('(C/O|C/0)',TrimMailAddress2) and TrimAddress2 != TrimMailAddress2 => Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimMailAddress2),
-   													 StringLib.Stringfind(TrimMailAddress2[1],'%',1) > 0 => StringLib.StringFilterOut(TrimMailAddress2,'%'),
-   																		'');
-   		prepNAME_OFFICE := MAP(StringLib.Stringfind(getNAME_OFFICE,')',1) > 0 => REGEXFIND('^([A-Za-z ][^\\)]+)',getNAME_OFFICE,1),
-   		                       StringLib.Stringfind(getNAME_OFFICE[1],'%',1) > 0 => StringLib.StringFindReplace(getNAME_OFFICE,'%',''),
-   													 REGEXFIND('[0-9]',getNAME_OFFICE) and NOT REGEXFIND('(BLDG)',getNAME_OFFICE)
-   																=> REGEXFIND('^([A-Za-z \\,]+)([0-9A-Za-z ]+)$',getNAME_OFFICE,1),
-   																									getNAME_OFFICE);
-   		self.NAME_OFFICE	    := prepNAME_OFFICE;
-   		self.OFFICE_PARSE			:= IF(self.NAME_OFFICE = '','',
-   																IF(Prof_License_Mari.func_is_company(self.NAME_OFFICE),'GR','MD'));
-   		
-   	  prepNAME_CONTACT :=  MAP(TrimNAME_CONTACT != '' and StringLib.StringFind(Trim(TrimNAME_CONTACT,left,right),' ',1) < 1 => '', 
-   														 LENGTH(TrimNAME_CONTACT)= 1 => '',
-   														 StringLib.Stringfind(TrimNAME_CONTACT,'C/0 ',1) > 0 => StringLib.StringFindReplace(TrimNAME_CONTACT,'C/0 ','C/O '),
-   														 StringLib.Stringfind(TrimNAME_CONTACT,'C/O, ',1) > 0 => StringLib.StringFindReplace(TrimNAME_CONTACT,'C/O, ','C/O '),
-   														 REGEXFIND('(ATTN)',TrimAddress2) and not REGEXFIND(MiscExceptions,TrimAddress2) => TrimAddress2,
-   																						TrimNAME_CONTACT);
-   		prepMAIL_CONTACT :=  MAP(REGEXFIND('(C/O|C/0)',TrimMailAddress1) and REGEXFIND('(ATTN:|ATTN;|ATTN)',TrimMailAddress1)
-   																	 => REGEXFIND('^(([A-Za-z ]+) C/O ([A-Za-z ]+) ATTN: ([A-Za-z ]+))$',TrimMailAddress1,4),
-   														 REGEXFIND('(ATTN)',TrimMailAddress1) and not REGEXFIND(MiscExceptions,TrimMailAddress1) => TrimMailAddress1,
-   														 REGEXFIND('(C/O|C/0)',TrimMailAddress2) and REGEXFIND('(ATTN:|ATTN;|ATTN)',TrimMailAddress2)
-   																	=> REGEXFIND('^(([A-Za-z ]+) C/O ([A-Za-z ]+) ATTN: ([A-Za-z ]+))$',TrimMailAddress2,4),
-   														 REGEXFIND('(ATTN)',TrimMailAddress2) and not REGEXFIND(MiscExceptions,TrimMailAddress2)=> TrimMailAddress2,
-   																								'');
-   		tmpNAME_CONTACT := MAP(REGEXFIND(C_O_Ind,prepNAME_CONTACT) => Prof_License_Mari.mod_clean_name_addr.GetDBAName(prepNAME_CONTACT),
-   							             REGEXFIND('(%)',prepNAME_CONTACT) => REGEXREPLACE('(%)',prepNAME_CONTACT,''),
-   												   REGEXFIND(C_O_Ind,prepMAIL_CONTACT) => Prof_License_Mari.mod_clean_name_addr.GetDBAName(prepMAIL_CONTACT),		
-   													 prepNAME_CONTACT != '' => prepNAME_CONTACT,	
-   																		prepMAIL_CONTACT);
-   		getNAME_CONTACT := IF(tmpNAME_CONTACT!= '' and not StringLib.stringfind(trim(tmpNAME_CONTACT,left,right),' ',1) < 1
-   													and not REGEXFIND('[0-9]',tmpNAME_CONTACT) and not REGEXFIND(AddrExceptions,tmpNAME_CONTACT)
-   													and not REGEXFIND(BusExceptions,tmpNAME_CONTACT) and not Prof_License_Mari.func_is_company(tmpNAME_CONTACT)
-   													and not Prof_License_Mari.func_is_address(tmpNAME_CONTACT),
-   																tmpNAME_CONTACT,'');
-   		stripTTL := MAP(StringLib.Stringfind(getNAME_CONTACT,',',2) > 1 => REGEXFIND('^([A-Za-z][^\\.]+)[\\.][\\,]([A-Za-z \\-\\/\\.\\,]+)',getNAME_CONTACT,1),
-   										REGEXFIND('(TREASURER|TREAS|TRES|TR.|MANAGER|MGR|PRESIDENT|VP\\/)',getNAME_CONTACT) 
-   																and StringLib.Stringfind(getNAME_CONTACT,',',1) > 0 => REGEXFIND('^([A-Za-z][^\\,]+)[\\,]([A-Za-z \\-\\/\\.]+)',getNAME_CONTACT,1),
-   		                StringLib.Stringfind(getNAME_CONTACT,'-',1) > 0 => REGEXFIND('^([A-Za-z][^\\-]+)[\\-]([A-Za-z \\-\\/\\.]+)',getNAME_CONTACT,1),
-   										StringLib.Stringfind(getNAME_CONTACT,'(',1) > 0 => REGEXFIND('^([A-Za-z][^\\(]+)[\\(]([A-Za-z \\-\\/\\.][^\\)]+)',getNAME_CONTACT,1),
-   										REGEXFIND('(TREADSURER|TREAS|TRES|MANAGER)',getNAME_CONTACT) => REGEXFIND('^(([A-Za-z \\.]+)(TREASURER|TREAS|TRES|MANAGER)+)',getNAME_CONTACT,2),
-   																			getNAME_CONTACT);
-   		ParseContact	:= IF(NOT StringLib.StringFind(stripTTL,',',1) > 0,Prof_License_Mari.mod_clean_name_addr.cleanFMLName(stripTTL),
-   												IF(StringLib.StringFind(stripTTL,',',1) > 0 and REGEXFIND('(JR.|, JR)',stripTTL),Prof_License_Mari.mod_clean_name_addr.cleanFMLName(stripTTL),
-   															Prof_License_Mari.mod_clean_name_addr.cleanLFMName(stripTTL)));
-   		self.LICENSE_NBR_CONTACT 	:= '';											
-   		self.NAME_CONTACT_PREFX		:= '';
-   		self.NAME_CONTACT_FIRST		:= TRIM(ParseContact[6..25],left,right);
-   		self.NAME_CONTACT_MID			:= TRIM(ParseContact[26..45],left,right);
-   		self.NAME_CONTACT_LAST		:= TRIM(ParseContact[46..65],left,right);
-   		self.NAME_CONTACT_SUFX		:= TRIM(ParseContact[66..70],left,right);
-   		self.NAME_CONTACT_NICK		:= '';
-   		self.NAME_CONTACT_TTL			:= MAP(StringLib.Stringfind(getNAME_CONTACT,',',2) > 1 => REGEXFIND('^([A-Za-z][^\\.]+)[\\.][\\,]([A-Za-z \\-\\/\\.\\,]+)',getNAME_CONTACT,2),
-   																		 REGEXFIND('(TREASURER|TREAS|TRES|TR.|MANAGER|MGR|PRESIDENT|VP\\/)',getNAME_CONTACT)
-   																								AND StringLib.Stringfind(getNAME_CONTACT,',',1) > 0 => REGEXFIND('^([A-Za-z][^\\,]+)[\\,]([A-Za-z \\-\\/\\.]+)',getNAME_CONTACT,2),
-   																		 StringLib.Stringfind(getNAME_CONTACT,'-',1) > 0 => REGEXFIND('^([A-Za-z][^\\-]+)[\\-]([A-Za-z \\-\\/\\.]+)',getNAME_CONTACT,2),
-   																		 StringLib.Stringfind(getNAME_CONTACT,'(',1) > 0 => REGEXFIND('^([A-Za-z][^\\(]+)[\\(]([A-Za-z \\-\\/\\.][^\\)]+)',getNAME_CONTACT,2),
-   																		 REGEXFIND('(TREADSURER|TRES|MANAGER)',getNAME_CONTACT) => REGEXFIND('^(([A-Za-z \\.]+)(TREASURER|TREAS|MANAGER)+)',getNAME_CONTACT,3),
-   																				'');
-   		
-   	//Populating MARI Name Fields
-   		self.NAME_ORG_ORIG	  := TrimNAME_ORG;
-   		self.NAME_DBA_ORIG	  := rmvNAME_Misc;
-   		self.NAME_MARI_ORG	  := StdNAME_ORG;
-   		self.NAME_MARI_DBA	  := StdNAME_DBA;
-    		self.PHN_MARI_1				:= '';
-   		self.PHN_MARI_2				:= pInput.MAIL_PHONE;
-   		self.ADDR_BUS_IND			:= IF(TrimAddress1 + TrimAddress2 + pInput.ZIP_CODE != '','B','');	
-   		tmpAddress1	:= MAP(TrimAddress1[1..4] = 'C/O ' and REGEXFIND('[0-9]',TrimAddress1) and not REGEXFIND('(BLDG)',TrimAddress1)
-   														=> REGEXFIND('^([A-Za-z \\,]+)([0-9A-Za-z ]+)',getNAME_OFFICE,2),
-   											 REGEXFIND(C_O_Ind,TrimAddress1)=> Prof_License_Mari.mod_clean_name_addr.GetCorpName(TrimAddress1),
-   											 TrimAddress1[1] = '%' => REGEXFIND('^([\\%A-Za-z ][^\\,]+)[\\,]([0-9A-Za-z \\.]+)',TrimAddress1,2),
-   													 NOT REGEXFIND(C_O_Ind,TrimAddress1)=> TrimAddress1,'');
-   																			
-   		tmpAddress2	:= MAP(REGEXFIND(C_O_Ind,TrimAddress2)=> Prof_License_Mari.mod_clean_name_addr.GetCorpName(TrimAddress2),
-   											 TrimAddress2 != '' => TrimAddress2,
-   											 REGEXFIND(AddrExceptions,prepNAME_CONTACT) and NOT REGEXFIND(BusExceptions,prepNAME_CONTACT)
-   														=> prepNAME_CONTACT,
-   											 REGEXFIND('[0-9]',prepNAME_CONTACT) and Prof_License_Mari.func_is_address(prepNAME_CONTACT)
-   														and not REGEXFIND(BusExceptions,TrimNAME_CONTACT) and not REGEXFIND(MiscExceptions,prepNAME_CONTACT)
-   															=> prepNAME_CONTACT,'');
-   		self.ADDR_ADDR1_1			:= IF(tmpAddress1 != '',tmpAddress1,tmpAddress2);
-   		self.ADDR_ADDR2_1			:= IF(tmpAddress1 != '',tmpAddress2,'');
-   		self.ADDR_ADDR3_1			:= '';
-   		self.ADDR_ADDR4_1			:= '';
-   		self.ADDR_CITY_1			:= TrimCity;
-   		self.ADDR_STATE_1     := Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE);
-   															
-   		ParsedZIP       :=  REGEXFIND('[0-9]{5}[\\-]?([0-9]{4})?',trim(pInput.ZIP_CODE), 0);
-   		self.ADDR_ZIP5_1			:= ParsedZIP[1..5];
-   		self.ADDR_ZIP4_1			:= IF(LENGTH(ParsedZIP) = 9, ParsedZIP[6..9],ParsedZIP[7..10]);
-   		self.ADDR_CNTY_1			:= TrimCnty;
-   		self.ADDR_CNTRY_1			:= IF(TrimCntry = 'UNITED STATES','',TrimCntry);
-   		self.PHN_PHONE_1			:= '';
-   		
-   		slamwsAddress 			:= StringLib.StringFilterOut(TrimAddress1+TrimAddress2+TrimCity+TrimState,' ');
-   		slamwsMailAddress		:= StringLib.StringFilterOut(TrimMailAddress1+TrimMailAddress2+TrimMailCity+TrimMailState,' ');
-   		getMailAddr1 	:= IF(slamwsAddress = slamwsMailAddress,'',TrimMailAddress1);
-   		getMailAddr2	:= IF(slamwsAddress = slamwsMailAddress,'',TrimMailAddress2);
-   		self.ADDR_MAIL_IND		:= IF(getMailAddr1!= '','M','');
-   		tmpMailAddress1	:= MAP(REGEXFIND('(C/O|C/0)',TrimMailAddress1) and REGEXFIND('(ATTN:|ATTN;|ATTN)',TrimMailAddress1)
-   														 => REGEXFIND('^(([A-Za-z ]+) C/O ([A-Za-z ]+) ATTN: ([A-Za-z ]+))$',TrimMailAddress1,2),
-   													 getMailAddr1 != '' and REGEXFIND(C_O_Ind,TrimMailAddress1)
-   														 => Prof_License_Mari.mod_clean_name_addr.GetCorpName(TrimMailAddress1),
-   													 getMailAddr1 != '' and TrimMailAddress1[1] = '%' and not REGEXFIND('[0-9]',TrimMailAddress1) => '',
-   																			getMailAddr1);
-   		tmpMailAddress2	:= MAP(getMailAddr2 != '' and REGEXFIND('(ATTN:|ATTN |ATTENTION:)',TrimMailAddress2) and trim(ParseContact) = ''
-   															=> Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimMailAddress2),	
-   													 getMailAddr2 != '' and REGEXFIND(C_O_Ind,TrimMailAddress2) and  REGEXFIND(AddrExceptions,TrimMailAddress2)
-   															=> Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimMailAddress2),							
-   													 getMailAddr2 != '' and REGEXFIND(C_O_Ind,TrimMailAddress2) and not REGEXFIND(MiscExceptions,TrimMailAddress2)
-   															=> 	Prof_License_Mari.mod_clean_name_addr.GetCorpName(TrimMailAddress2),
-   											 	   getMailAddr2 != '' and TrimMailAddress2[1] = '%' and not REGEXFIND('[0-9]',TrimMailAddress2)=> '',
-   																		getMailAddr2);
-   		self.ADDR_ADDR1_2			:= IF(tmpMailAddress1 != '',tmpMailAddress1,tmpMailAddress2);
-   		self.ADDR_ADDR2_2			:= IF(tmpMailAddress1 != '' and REGEXFIND('(ATTN:|ATTN |ATTENTION:)',tmpMailAddress2),
-   																		Prof_License_Mari.mod_clean_name_addr.GetDBAName(tmpMailAddress2),
-   																	IF(tmpMailAddress1 = '', '',tmpMailAddress2));
-   																		
-   		self.ADDR_ADDR3_2			:= '';
-   		self.ADDR_ADDR4_2			:= '';
-   		self.ADDR_CITY_2			:= IF(getMailAddr1 != '',TrimMailCity,'');
-   		self.ADDR_STATE_2			:= IF(getMailAddr1 != '',
-   																	Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIL_ST_CODE),
-   																					'');
-   		ParsedMailZIP       :=  IF(getMailAddr1 != '',REGEXFIND('[0-9]{5}[\\-]?([0-9]{4})?',trim(pInput.MAIL_ZIPCODE), 0),
-   																	'');
-   		self.ADDR_ZIP5_2			:= ParsedMailZIP[1..5];
-   		self.ADDR_ZIP4_2			:= IF(LENGTH(ParsedMailZIP) = 9, ParsedMailZIP[6..9],ParsedMailZIP[7..10]);
-   		self.ADDR_CNTY_2			:= '';
-   		self.ADDR_CNTRY_2			:= '';
-   		self.PHN_PHONE_2			:= self.PHN_MARI_2;
-   		// self.EMAIL							:= '';
-   		// self.ORIGIN_CD			  	:= '';
-   		// self.ORIGIN_CD_DESC		:= ''; 
-   		// self.DISP_TYPE_CD     := '';
-   		// self.DISP_TYPE_DESC	  := '';
-   		self.OOC_IND_1				:= 0;    
-   		self.OOC_IND_2				:= 0;
-   															
-   	//Expected codes [CO,BR,IN], Set during business/individual filter
-   		self.AFFIL_TYPE_CD	:= MAP(self.TYPE_CD = 'MD' => 'IN',
-   															 self.TYPE_CD = 'GR' and TrimOFF_TYPE != 'BRANCH OFFICE'=> 'CO',
-   															 self.TYPE_CD = 'GR' and TrimOFF_TYPE = 'BRANCH OFFICE' => 'BR','');		
-   		
-   		self.mltrec_key			:= 0;											
-   
-   	// Fields used to create unique key are: license number, license type, source update, name, address,dba 
-   		self.CMC_SLPK       := hash32(trim(self.license_nbr,left,right) 
-   																	+trim(self.std_license_type,left,right)
-   																	+trim(self.std_source_upd,left,right)
-   																	+trim(self.NAME_ORG,left,right)
-   																	+trim(TrimAddress1,left,right)
-   																	+trim(TrimAddress2,left,right)
-   																	+trim(pInput.ZIP_CODE));
-   																			
-   		self.PCMC_SLPK			:= 0;
-   		self.PROVNOTE_1			:= IF(LENGTH(TrimNAME_CONTACT)= 1,'',
-   															 IF(TrimNAME_CONTACT = '','','ATTENTION OF: '+ TrimNAME_CONTACT));
-   		self.PROVNOTE_2			:= '{LIC_STATUS ASSIGNED}';
-   		self.PROVNOTE_3 		:= ''; 
-   		// self.ACTION_STATUS	:= '';
-   		// self.ACTION_STATUS_DTE := '';                 
-   		// self.ACTION_FILE_NAME := '';													
-   		// self.OCCUPATION := '';
-   		// self.MISC_OTHER_ID	:= '';
-   		// self.MISC_OTHER_TYPE := '';
-   		// self.CONT_EDUCATION	:= '';
-   		// self.RACE_CD				:= '';
-   		// self.STD_RACE_CD		:= '';
-   		// self.RACE_DESC			:= '';
-   		SELF := [];	
-   		   
-   END;
-*/
-
-
 

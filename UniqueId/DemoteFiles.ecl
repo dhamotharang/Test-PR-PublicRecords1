@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 uniqueIdFileBase := '~thor::uniqueid::base';
 
 superFileName(string level) := uniqueIdFileBase + '::' + level;
@@ -14,34 +14,16 @@ CreateSuperFiles := SEQUENTIAL(
 				STD.File.CreateSuperFile(superFileName('current')));
 );
 
-CopySuperFile(string superFrom, string superTo, boolean clearFrom = false) := 
-
-	If(NOTHOR(Exists(FileServices.SuperFileContents(superFrom))),
-		SEQUENTIAL(
-			FileServices.StartSuperFileTransaction( ),
-			NOTHOR(apply(FileServices.SuperFileContents(superFrom),
-				FileServices.AddSuperFile(superTo, '~'+name))),
-			IF(clearFrom,NOTHOR(FileServices.ClearSuperFile(superFrom))),
-			FileServices.FinishSuperFileTransaction( )
-		)
-	);
-	
-Move(string fromVersion, string toVersion) :=
-	CopySuperFile(uniqueIdFileBase+'::'+fromVersion,
-					uniqueIdFileBase+'::'+toVersion, true);
 					
 fullFileName(string version) := uniqueIdFileBase + '::file::' + version;
+
 					
 EXPORT DemoteFiles(DATASET(Layout_Flat) file, string version) := SEQUENTIAL(
-	OUTPUT(file,,fullFileName(version),OVERWRITE);
-	NOTHOR(CreateSuperfiles),
-	Move('grandfather','delete'),	// move grandfather to delete
-	Move('father','grandfather'),	// move father to grandfather
-	Move('current','father'),	// move current to father
-	// add new files to current
-	FileServices.StartSuperFileTransaction( ),
-		NOTHOR(FileServices.AddSuperFile(uniqueIdFileBase+'::current', fullFileName(version))),
-	FileServices.FinishSuperFileTransaction( ),
-
+	OUTPUT(file,,fullFileName(version),compressed,OVERWRITE);
+STD.File.PromoteSuperFileList([
+'~thor::uniqueid::base::current',
+'~thor::uniqueid::base::father',
+'~thor::uniqueid::base::grandfather',
+'~thor::uniqueid::base::delete'], fullFileName(version), true);
 
 );

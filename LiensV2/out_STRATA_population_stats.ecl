@@ -1,4 +1,4 @@
-export out_STRATA_population_stats(pMain
+﻿export out_STRATA_population_stats(pMain
                                   ,pParty
 								  ,pVersion
 								  ,zOut) := MACRO
@@ -14,6 +14,9 @@ import STRATA;
     #uniquename(rDIDstats_pParty);
     #uniquename(dDIDstats_pParty);
 	#uniquename(zPartyDIDStats);
+	
+string email_notify := 'Sudhir.Kasavajjala@lexisnexisrisk.com; Michael.Gould@lexisnexisrisk.com; Kevin.Garrity@lexisnexisrisk.com'; 
+
 
 %rPopulationStats_pMain%
  :=
@@ -169,7 +172,7 @@ end;
 	                     ,'Liens V2'
 						 ,'Main'
 						 ,pVersion
-						 ,''
+						 ,email_notify
 						 ,%zMainStats%
 						 ,'view'
 						 ,'PopulationV2');
@@ -182,7 +185,7 @@ end;
 	                     ,'Liens V2'
 						 ,'Party_BaseV2'
 						 ,pVersion
-						 ,''
+						 ,email_notify
 						 ,%zPartyStats%
 						 ,'view'
 					 ,'PopulationV2');
@@ -195,7 +198,7 @@ end;
 	                     ,'Liens V2'
 						 ,'Party_BaseV2'
 						 ,pVersion
-						 ,''
+						 ,email_notify
 						 ,%zPartyDIDStats%
 						 ,'view'
 					     ,'DIDStats');

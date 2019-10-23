@@ -13,11 +13,10 @@ EXPORT BuildHeaderScrubsReport(DATASET(cortera.Layout_Header) F, string version)
 		//Generating a template to upload rules to Orbit
 		//Scrubs.OrbitProfileStats(,,stats).ProfileTemplate;
 
-
 		orbitStats := U.OrbitStats();
 
 		submitStats :=
-			Scrubs.OrbitProfileStats('Scrubs_cortera_header_in','ScrubsAlerts',orbitStats,version,'Cortera').SubmitStats 
+			Scrubs.OrbitProfileStats('Scrubs_cortera_header_in2','ScrubsAlerts',orbitStats,version,'Cortera').SubmitStats 
 									: FAILURE(OUTPUT('Could not update Orbit with Scrubs'));
 		return SEQUENTIAL(
 				ErrorSummary,
@@ -25,6 +24,7 @@ EXPORT BuildHeaderScrubsReport(DATASET(cortera.Layout_Header) F, string version)
 				SomeErrorValues,
 				OrbitReport,
 				submitStats
+				//GenerateAlertCSVTemplate
 		);
 
 END;

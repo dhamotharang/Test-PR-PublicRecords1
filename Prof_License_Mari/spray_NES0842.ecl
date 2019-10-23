@@ -1,4 +1,4 @@
-// spray NES0842 Nebraska Real Estate Professional Licenses Files for MARI
+﻿// spray NES0842 Nebraska Real Estate Professional Licenses Files for MARI
 // These is a problem where newline(\r\n or 0d0a) is found within  double quotes in the label and label2 fields.	
 // Solution - excel function clean(substitute(cell,char(10),char(124)))
 // Steps -
@@ -15,7 +15,7 @@ IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib, Lib_dat
 
 EXPORT spray_NES0842 (string filedate):= MODULE
 
-#workunit('name','Spray NES0842');
+#workunit('name','Yogurt: Spray NES0842');
 shared string7 code := 'NES0842';
 
 shared filepath				:=	Common_Prof_Lic_Mari.sourcepath + code + '/' + filedate + '/';

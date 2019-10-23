@@ -1,6 +1,6 @@
-import sexoffender, doxie_build, images, orbit_report;
+﻿import sexoffender, doxie_build, images, orbit_report;
 
-export Mac_SO_Spray(sourceIP,M_file,O_file,MP_file,filedate,group_name ='\'thor400_20\'',email_target='\' \'') := 
+export Mac_SO_Spray(sourceIP,M_file,O_file,MP_file,filedate,group_name ='\'thor400_44\'',email_target='\' \'') := 
 macro
 #uniquename(spray_main)
 #uniquename(spray_offense)
@@ -22,8 +22,6 @@ macro
 #uniquename(build_delimited_files)
 #uniquename(super_main_delimited)
 #uniquename(super_offenses_delimited)
-
-#workunit('name','SexOffender Build ' + filedate);
 
 %recordsizeMain% :=18899;
 %recordsizeOffense% :=1524;

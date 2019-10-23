@@ -1,9 +1,9 @@
-IMPORT Drivers, DriversV2, lib_stringlib, _Validate, codes;
+﻿IMPORT Drivers, DriversV2, lib_stringlib, _Validate, codes, VersionControl;
 
-EXPORT Mapping_DL_MO_New_As_ConvPoints := MODULE
+EXPORT Mapping_DL_MO_New_As_ConvPoints( string  pversion) := MODULE
 
   //********* Conviction Mapping *****************************************************************************
-  in_Conv_file   := DriversV2.File_DL_MO_Points_MedCert;
+  in_Conv_file   := DriversV2.File_DL_MO_Points_MedCert(pversion);
 
   Layout_Conv_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Convictions;
 
@@ -43,7 +43,7 @@ EXPORT Mapping_DL_MO_New_As_ConvPoints := MODULE
   
   //********* Suspension Mapping *****************************************************************************
   
-  in_Susp_file   := DriversV2.File_DL_MO_Actions_MedCert;
+  in_Susp_file   := DriversV2.File_DL_MO_Actions_MedCert(pversion);
 
   Layout_Susp_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Suspensions;
 
@@ -86,7 +86,7 @@ EXPORT Mapping_DL_MO_New_As_ConvPoints := MODULE
   
   //********* Drivers Record Information Mapping *****************************************************************
   
-  in_DR_Info_file   := DriversV2.File_DL_MO_DPRDPS_MedCert;
+  in_DR_Info_file   := DriversV2.File_DL_MO_DPRDPS_MedCert(pversion);
 
   Layout_DR_Info_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Driver_Record_Info;
 
@@ -112,7 +112,7 @@ EXPORT Mapping_DL_MO_New_As_ConvPoints := MODULE
 
   //********* Accident Record Information Mapping *****************************************************************
 
-  in_Accident_file   := DriversV2.File_DL_MO_Accidents;
+  in_Accident_file   := DriversV2.File_DL_MO_Accidents(pversion);
 
   Layout_Accident_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Accident;
 	
@@ -137,6 +137,50 @@ EXPORT Mapping_DL_MO_New_As_ConvPoints := MODULE
   END;
 
   EXPORT MO_As_Accident := PROJECT(in_Accident_file, trfToAccident(LEFT));
+	
+	shared logical_name := DriversV2.Constants.Cluster+'in::dl2::'+pversion+'::MO::';	 
+
+	VersionControl.macBuildNewLogicalFile( logical_name+'As_Convictions'	,MO_As_Convictions		,Bld_MO_As_Convictions	);
+	VersionControl.macBuildNewLogicalFile( logical_name+'As_Suspension'		,MO_As_Suspension			,Bld_MO_As_Suspension		);
+	VersionControl.macBuildNewLogicalFile( logical_name+'As_DR_Info'			,MO_As_DR_Info				,Bld_MO_As_DR_Info			);
+	VersionControl.macBuildNewLogicalFile( logical_name+'As_Accident'			,MO_As_Accident				,Bld_MO_As_Accident			);
+	
+	 
+	export Build_DL_MO_Convpoints :=
+	sequential(parallel( Bld_MO_As_Convictions
+											,Bld_MO_As_Suspension
+											,Bld_MO_As_DR_Info
+											,Bld_MO_As_Accident			
+										 )
+							//** Create superfiles if not already exist, before moving the logical sub files created. 
+						 ,sequential( if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::As_Convictions'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::As_Convictions')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::father::As_Convictions'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::father::As_Convictions')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::grandfather::As_Convictions'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::grandfather::As_Convictions')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::delete::As_Convictions'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::delete::As_Convictions')),
+													
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::As_Suspension'),FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::As_Suspension')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::father::As_Suspension'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::father::As_Suspension')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::grandfather::As_Suspension'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::grandfather::As_Suspension')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::delete::As_Suspension'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::delete::As_Suspension')),
+													
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::As_DR_Info'),FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::As_DR_Info')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::father::As_DR_Info'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::father::As_DR_Info')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::grandfather::As_DR_Info'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::grandfather::As_DR_Info')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::delete::As_DR_Info'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::delete::As_DR_Info')),
+													
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::As_Accident'),FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::As_Accident')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::father::As_Accident'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::father::As_Accident')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::grandfather::As_Accident'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::grandfather::As_Accident')),
+													if (~FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::delete::As_Accident'), FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::ConvPoints::delete::As_Accident'))						
+												)
+						 ,sequential(  FileServices.StartSuperFileTransaction()
+													,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Convictions',logical_name+'As_Convictions')
+													,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Suspension',logical_name+'As_Suspension')
+													,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_DR_Info',logical_name+'As_DR_Info')
+													,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Accident',logical_name+'As_Accident')													
+													,FileServices.FinishSuperFileTransaction()
+												)
+						);
 
 	
 END;

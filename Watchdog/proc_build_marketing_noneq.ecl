@@ -1,7 +1,11 @@
-EXPORT proc_build_marketing_noneq :=  function
+﻿EXPORT proc_build_marketing_noneq :=  function
 
-#stored ('watchtype', 'marketing_noneq');
+//#stored ('watchtype', 'marketing_noneq');
+//changed from using #stored to just setting the variable.  Something has changed
+//at the platform level so in a Sequential 2 variables called watchtype can't be 
+//set at the same time.
 
+watchtype := 'marketing_noneq';
 import watchdog,ut,RoxieKeyBuild;
 
 boolean isnewheader := Watchdog.proc_Validate_NewHdr.out;

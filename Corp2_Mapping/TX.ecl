@@ -1,4 +1,4 @@
- import Corp2, std, ut, versioncontrol, Corp2_Raw_TX, tools, Scrubs, Scrubs_Corp2_Mapping_TX_Main;
+﻿ import Corp2, std, ut, versioncontrol, Corp2_Raw_TX, tools, Scrubs, Scrubs_Corp2_Mapping_TX_Main;
  
  export TX := MODULE; 
 
@@ -620,16 +620,13 @@
 		
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_TX Report' //subject
 																																	 ,'Scrubs CorpMain_TX Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpTXMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );		
+																																	);		
 																																 
 		Main_BadRecords := Main_T.ExpandedInFile(	dt_vendor_first_reported_invalid 			 				<> 0 or
 																							dt_vendor_last_reported_invalid 			 				<> 0 or

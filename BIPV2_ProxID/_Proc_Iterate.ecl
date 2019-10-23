@@ -11,7 +11,7 @@ EXPORT _Proc_Iterate(
 ) := 
 functionmacro
     
-  import tools,std,BIPV2_Files,wk_ut,bipv2_build,BIPV2_ProxID;
+  import tools,std,BIPV2_Files,wk_ut,bipv2_build,BIPV2_ProxID,BIPV2_QA_Tool;
   
   InFile            := pInfile;
   string siter      := piteration;
@@ -45,6 +45,7 @@ functionmacro
     ,BIPV2_Tools.mac_Check_Samples(BIPV2_ProxID.files(combo).base.logical,'Prox' + siter)
     // ,BIPV2_ProxID.fStatMissingProxIDLinks(BIPV2_ProxID.In_DOT_Base, piteration)
 		,if(BIPV2_ProxID._Constants().doTraceBackFiles  ,constructTraceFiles)//PUT BACK!!!
+    ,BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,proxid ,pversion  ,piteration  ,BIPV2_Proxid.Config.MatchThreshold ,'BIPV2_Proxid')
     ,BIPV2_Build.mod_email.SendSuccessEmail(msg := wk_ut.get_Errors(workunit),subProduct := wk_ut.get_jobname(workunit))
   );
 ENDmacro;

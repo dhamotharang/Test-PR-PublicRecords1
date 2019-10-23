@@ -1,10 +1,10 @@
 ﻿IMPORT HEADER , InsuranceHeader_xLink, mdr , idl_header ;
  
-Key := idl_header.files.DS_IDL_POLICY_HEADER_BASE(src[1..3]='ADL');//InsuranceHeader_xLink.file_insuranceheader(src[1..3]='ADL') ; //PULL(InsuranceHeader_xLink.Process_xIDL_Layouts().key); 
+Alphabase := idl_header.files.DS_IDL_POLICY_HEADER_BASE(src[1..3]='ADL');
   
 hr  := DISTRIBUTE(header.file_header_raw(header.Blocked_data()),HASH(rid));											
 
-/*EXPORT File_InsuranceHeader_Payload := JOIN(hr,DISTRIBUTE(Key,HASH(source_rid))
+EXPORT File_InsuranceHeader_Payload := JOIN(hr,DISTRIBUTE(Alphabase,HASH(source_rid))
                                   ,LEFT.rid = RIGHT.source_rid AND 
                                    LEFT.src = RIGHT.src[4..5]
                                   ,TRANSFORM(header.layout_header,
@@ -20,25 +20,25 @@ hr  := DISTRIBUTE(header.file_header_raw(header.Blocked_data()),HASH(rid));
                                    SELF.mname := RIGHT.mname;
                                    SELF.lname := RIGHT.lname;
                                    SELF.name_suffix:= RIGHT.sname; 
-// get from raw header as Alpha doesnt have county , cbsa , geo_blk 
-                                   SELF.rid := LEFT.rid;
-                                   SELF.prim_range  := LEFT.prim_range; 
-                                   SELF.predir      := LEFT.predir; 
-                                   SELF.prim_name   := LEFT.prim_name; 
-                                   SELF.suffix      := LEFT.suffix; 
-                                   SELF.postdir     := LEFT.postdir; 
-                                   SELF.unit_desig  := LEFT.unit_desig; 
-                                   SELF.sec_range   := LEFT.sec_range; 
-                                   SELF.city_name   := LEFT.city_name; 
-                                   SELF.st          := LEFT.st; 
-                                   SELF.zip         := LEFT.zip; 
-                                   SELF.zip4        := LEFT.zip4; 
+                                   SELF.rid := RIGHT.rid;
+                                   SELF.prim_range  := RIGHT.prim_range; 
+                                   SELF.predir      := RIGHT.predir; 
+                                   SELF.prim_name   := RIGHT.prim_name; 
+                                   SELF.suffix      := RIGHT.ADDR_SUFFIX; 
+                                   SELF.postdir     := RIGHT.postdir; 
+                                   SELF.unit_desig  := RIGHT.unit_desig; 
+                                   SELF.sec_range   := RIGHT.sec_range; 
+                                   SELF.city_name   := RIGHT.city; 
+                                   SELF.st          := RIGHT.st; 
+                                   SELF.zip         := RIGHT.zip; 
+                                   SELF.zip4        := RIGHT.zip4; 
+// missing address fields get from raw header as Alpha doesnt have county , cbsa , geo_blk 
                                    SELF.county      := LEFT.county; 
                                    SELF.geo_blk     := LEFT.geo_blk; 
                                    SELF.cbsa        := LEFT.cbsa; 
                                    
                                    SELF.dt_nonglb_last_seen := LEFT.dt_nonglb_last_seen; 
-																	 SELF.dt_first_seen := LEFT.dt_first_seen;
+																	                  SELF.dt_first_seen := LEFT.dt_first_seen;
                                    SELF.dt_last_seen  := LEFT.dt_last_seen;
                                    SELF.dt_vendor_last_reported  := LEFT.dt_vendor_last_reported;
                                    SELF.dt_vendor_first_reported := LEFT.dt_vendor_first_reported;
@@ -57,7 +57,6 @@ hr  := DISTRIBUTE(header.file_header_raw(header.Blocked_data()),HASH(rid));
                                    SELF.NID:=0; 
                                    SELF.address_ind:=0;  
                                    SELF.name_ind:=0;  
-                                   SELF.persistent_record_ID := 0 ),local) :persist('test::ak::header_full_base');
+                                   SELF.persistent_record_ID := 0 ),LOCAL) :PERSIST('persist::header::insurancepayload'); 
 
-*/EXPORT File_InsuranceHeader_Payload :=DATASET('~thor400_44::test::ak::header_full_base__p1490819976_fixrids',header.layout_header,FLAT);
-																	 
+				

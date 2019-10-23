@@ -1,3 +1,4 @@
+﻿import ut;
 EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget) := module
 
 	export rSubFile := record
@@ -46,7 +47,8 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget) :=
 				'GetPackage',
 				InputRec
 				,dataset(outrec),
-				xpath('GetPackageResponse'));
+				xpath('GetPackageResponse')
+				,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues()));
 	
 		xmlout_rec := record,maxlength(5000000)
 			string xmlline;

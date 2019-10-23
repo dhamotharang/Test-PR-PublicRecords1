@@ -1,4 +1,4 @@
-/*
+﻿/*
 Suppress.File_New_Suppression is a replacement for doxie.Key_PullSSN
 Usage: InFile = input file to be checked
 			 childFile = This is a disassociated (not embedded) dataset file that contains the data to be filtered
@@ -28,7 +28,7 @@ export MAC_Suppress_Child := module
 				#uniquename(xfrmRec)
 				#uniquename(outfile1)
 				
-				%suppressFile% := suppress.Key_New_Suppression;
+				%suppressFile% := suppress.Key_New_Suppression();
 
 
 				#uniquename (suppress_set)

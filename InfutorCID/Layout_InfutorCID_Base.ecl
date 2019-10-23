@@ -1,4 +1,4 @@
-import address;
+﻿import address;
 
 export Layout_InfutorCID_Base := 
 record
@@ -87,5 +87,9 @@ record
   unsigned8 rawAIDin := 0;
   string1 addresstype := '';
   string182 previous_cleanaddress := ''; 
+
+	//CCPA-9 Add 2 CCPA fields
+	unsigned4 global_sid := 0;
+	unsigned8 record_sid := 0;
 
 end;

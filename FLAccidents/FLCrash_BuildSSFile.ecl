@@ -1,4 +1,4 @@
-// This attribute gets certain fields from the base flcrash2v, 4, 7, and 9 files and appends them
+﻿// This attribute gets certain fields from the base flcrash2v, 4, 7, and 9 files and appends them
 // to the already created base flcrash_did file to create a new base flcrash_ss (Search 
 // Service) file which will be used to create certain key files (AccNbr, DLNbr, etc.).  
 // Those key files will then be used by the FLAccidents_Services.SearchService.
@@ -103,6 +103,6 @@ base_did9 := join(base_did7, base_file9,
                        left.record_type = 'Witness',
 				   xf9(left,right), left outer, keep(1), hash);
 
-ut.MAC_SF_BuildProcess(base_did9, '~thor_data400::base::flcrash_ss', build_flcrash_ss, 2);
+ut.MAC_SF_BuildProcess(base_did9, '~thor_data400::base::flcrash_ss', build_flcrash_ss, 2,,true);
 
 export FLCrash_BuildSSFile := build_flcrash_ss;

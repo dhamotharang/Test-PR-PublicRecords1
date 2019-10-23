@@ -1,4 +1,4 @@
-IMPORT Address, AID, Infogroup, Business_Header_SS, DID_Add, Health_Provider_Services, NID, ut;
+﻿IMPORT Address, AID, Infogroup, Business_Header_SS, DID_Add, Health_Provider_Services, NID, ut;
 
 EXPORT Update_Base(STRING                          pversion,
                    BOOLEAN                         pUseProd = FALSE,
@@ -266,7 +266,7 @@ EXPORT Update_Base(STRING                          pversion,
 		,														// use other environment?
 		,BIPV2.xlink_version_set  	// BIP2 ids
 		,														// URL
-		,email_notexist							// email
+		,							// email
 		,clean_p_city_name					// city
 		,clean_fname								// fname
 		,clean_mname								// mname

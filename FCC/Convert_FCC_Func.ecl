@@ -1,4 +1,4 @@
-import fcc;
+﻿import fcc;
 import text_search;
 
 export Convert_fcc_Func := function
@@ -13,7 +13,7 @@ export Convert_fcc_Func := function
 							{1,0,l.licensees_name},
 							{2,0,l.dba_name},
 							{3,0,l.licensees_attention_line + ' ' + l.licensees_street + ' ' + l.licensees_city + ' ' +
-										l.licensees_state + '-' +	l.licensees_zip},
+										l.licensees_state + ' ' +	l.licensees_zip},
 							//{4,0,l.licensees_city + ';' + l.contact_firms_city},
 							//{5,0,l.licensees_state + ';' + l.contact_firms_state},
 							//{6,0,l.licensees_zip + ';' + l.contact_firms_zipcode},

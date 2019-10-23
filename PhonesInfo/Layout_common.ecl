@@ -1,55 +1,37 @@
-import Phonesplus_v2;
+﻿IMPORT dx_PhonesInfo, Phonesplus_v2;
+
+	//DF-23525: Phones Metadata - Split Key into Transaction & Phone Type
+	//DF-24397: Create Dx-Prefixed Keys
 
 EXPORT Layout_common := module
 
-	export sourceRefIn := record
-		string 			OCN_Master;
-		string 			Carrier_Name;
-		string 			Serv;
-		string 			Line;
-		string      Prepaid;
-		string 			High_Risk_Indicator;
-		string 			Spid;								//IConectiv
-		string 			Operator_Full_Name; //IConectiv Name
-		string 			OCN;
+	//Source Reference Review	Layout
+	export sourceRefReview_in := record
+		string ocn;
+		string carrier_name;
+		string serv;
+		string line;
+		string spid;
+		string operator_full_name;
+		string country;
+		string override_file;
+		string is_new;
 	end;
 	
-	export sourceRefBase_temp := record
-		string8 dt_first_reported;
-		string8 dt_last_reported;
-		string8 dt_start;
-		string8 dt_end;
-		string  ocn;
-		string  carrier_name;
-		string  name;
-		string1 serv;
-		string1 line;
-		string2 prepaid;
-		string2 high_risk_indicator;
-		string  spid;
-		string  operator_full_name;
-		boolean is_current;
+	export sourceRefReview := record
+		sourceRefReview_in;
+		string255 filename{virtual (logicalfilename)};
 	end;
 	
-	export sourceRefBase := record
-		string8 dt_first_reported;
-		string8 dt_last_reported;
-		string8 dt_start;
-		string8 dt_end;
-		string8  ocn;
-		string60  carrier_name;
-		string60  name;
-		string1 serv;
-		string1 line;
-		string2 prepaid;
-		string2 high_risk_indicator;
-		unsigned8	activation_dt;
-		string5	number_in_service;
-		string10  spid;
-		string  operator_full_name;
-		boolean is_current;
+	export sourceRefReviewHist := record
+		sourceRefReview_in;
+		string255 filename;
 	end;
 	
+	//Carrier Reference Layout
+	//dx_PhonesInfo.Layout.sourceRefBase
+	
+	//Ported Base File
 	export portedMain := record
 		string5			source;
 		string2 		phoneType;
@@ -77,10 +59,6 @@ EXPORT Layout_common := module
 	
 	export inFile := record
 		string   		reference_id;
-	/*unsigned6 	did 							:= 0;
-		string20  	lname;
-		unsigned6		bdid							:= 0;
-		string120 	listed_name;*/
 	  string10 		phone;
 	end;
 	
@@ -107,13 +85,12 @@ EXPORT Layout_common := module
 		string5 		local_area_transport_area;
 		string9 		point_code; 									//3 digits - network; 3 digits - cluster; 3 digits = member
 	end;
-		
+	
+	//LIDB Base Layout
 	export lidbRespProcess := record
 		string 			reference_id;
 		unsigned8 	dt_first_reported;
 		unsigned8		dt_last_reported;
-		//unsigned8		dt_start;	
-		//unsigned8		dt_end;
 		string10 		phone;
 		string3 		reply_code;
 		string10 		local_routing_number;
@@ -130,9 +107,9 @@ EXPORT Layout_common := module
 		string5			number_in_service					:= '';
 		string2			high_risk_indicator				:= '';
 		string2			prepaid										:= '';
-		//boolean		is_current 					:= false;
 	end;
 	
+	//Phones Metadata Base Layout
 	export portedMetadata_Main := record
 		string30 		reference_id							:= '';
 		string5			source										:= '';
@@ -149,7 +126,6 @@ EXPORT Layout_common := module
 		string10 		point_code								:= ''; 
 		string3			country_code							:= '';
 		string1			dial_type									:= '';
-		//string1Â Â  	service_type
 		string10 		routing_code							:= '';
 		unsigned8		porting_dt								:= 0;
 		string6			porting_time							:= '';
@@ -189,15 +165,12 @@ EXPORT Layout_common := module
 		string2			is_react									:= '';
 		unsigned8		call_forward_dt						:= 0;
 		string15		caller_id									:= '';
-		string60		subpoena_company_name			:= '';
-		string60		subpoena_contact_name			:= '';
-		string60		subpoena_carrier_address	:= '';
-		string20		subpoena_carrier_city			:= '';
-		string20		subpoena_carrier_state		:= '';
-		string5			subpoena_carrier_zip			:= '';
-		string30		subpoena_email						:= '';
-		string10 		subpoena_contact_phone		:= '';
-		string10 		subpoena_contact_fax			:= '';
-end;
+	end;
+	
+	//Phones Transaction Base Layout
+	//dx_PhonesInfo.Layouts.Phones_Transaction_Main;
+	
+	//Phones Type Base Layout
+	//dx_PhonesInfo.Layouts.Phones_Type_Main;
 
 end;

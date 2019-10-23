@@ -1,13 +1,13 @@
-EXPORT Spray_TX (dataset({string ftype,string fdate})infile) := module
+﻿EXPORT Spray_TX (dataset({string ftype,string fdate})infile) := module
 
-import VersionControl,_Control;
+import VersionControl,_Control,lib_thorlib;
 
 
 	string		pServer			:=  _Control.IPAddress.bctlpedata11 ;
 	string		pDir(string lictype)		:=  map ( lictype = 'nurses'  => '/data/hds_4/prolic/tx/nurses/'+infile(ftype = 'nurses')[1].fdate,
 	                                                                      '/data/hds_4/prolic/tx/medical_pl/'+infile(ftype = 'medical')[1].fdate
 																						);
-	string		pGroupName	:= if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' ,'thor400_dev01','thor400_60');
+	string		pGroupName	:= thorlib.group();
 	boolean    pIsTesting  := false;
 
 

@@ -1,4 +1,4 @@
-import SANCTN,STANDARD;
+﻿import SANCTN,STANDARD;
 
 file_base_in := dataset('~thor_data400::base::SANCTN::incident',SANCTN.layout_SANCTN_incident_clean,thor);									
 file_base_in_father := 	dataset('~thor_data400::base::SANCTN::incident_father',SANCTN.layout_SANCTN_incident_clean,thor);																			 
@@ -22,7 +22,13 @@ end;
 join_incident := join(dist_file_in,
 						 dist_file_in_var,
 						 LEFT.BATCH_NUMBER = RIGHT.BATCH_NUMBER AND
-						 LEFT.INCIDENT_NUMBER = RIGHT.INCIDENT_NUMBER  
+						 LEFT.INCIDENT_NUMBER = RIGHT.INCIDENT_NUMBER AND
+						 LEFT.ORDER_NUMBER = RIGHT.ORDER_NUMBER AND
+						 LEFT.CASE_NUMBER = RIGHT.CASE_NUMBER AND
+						 LEFT.JURISDICTION = RIGHT.JURISDICTION AND
+						 LEFT.SOURCE_DOCUMENT = RIGHT.SOURCE_DOCUMENT AND
+						 LEFT.ADDITIONAL_INFO = RIGHT.ADDITIONAL_INFO AND
+						 LEFT.incident_text = RIGHT.incident_text
 						,join_tr(LEFT,RIGHT),
 						left only,
 						local);
@@ -67,7 +73,19 @@ end;
 joutpar := join(dist_file_party,
 								dist_file_in_party,
 								LEFT.BATCH_NUMBER = RIGHT.BATCH_NUMBER AND 
-								LEFT.INCIDENT_NUMBER = RIGHT.INCIDENT_NUMBER 
+								LEFT.INCIDENT_NUMBER = RIGHT.INCIDENT_NUMBER AND
+								LEFT.PARTY_NUMBER = RIGHT.PARTY_NUMBER AND
+								LEFT.ORDER_NUMBER = RIGHT.ORDER_NUMBER AND
+								LEFT.PARTY_NAME = RIGHT.PARTY_NAME AND
+								LEFT.PARTY_POSITION = RIGHT.PARTY_POSITION AND
+								LEFT.PARTY_VOCATION = RIGHT.PARTY_VOCATION AND
+								LEFT.PARTY_FIRM = RIGHT.PARTY_FIRM AND
+								LEFT.inADDRESS = RIGHT.inADDRESS AND
+								LEFT.inCITY = RIGHT.inCITY AND
+								LEFT.inSTATE = RIGHT.inSTATE AND
+								LEFT.inZIP = RIGHT.inZIP AND
+								LEFT.RESTITUTION = RIGHT.RESTITUTION AND
+								LEFT.party_text = RIGHT.party_text
 								,join_tr_par(LEFT,RIGHT),
 								left only,
 								local);
@@ -144,7 +162,9 @@ end;
 join_rebuttal := join(dist_file_rebuttal,
 											dist_file_rebuttal_father,
 											LEFT.BATCH_NUMBER = RIGHT.BATCH_NUMBER AND
-											LEFT.INCIDENT_NUMBER = RIGHT.INCIDENT_NUMBER  
+											LEFT.INCIDENT_NUMBER = RIGHT.INCIDENT_NUMBER AND
+											LEFT.ORDER_NUMBER  = RIGHT.ORDER_NUMBER AND  
+											LEFT.PARTY_TEXT  = RIGHT.PARTY_TEXT 
 											,tx_rebuttal(LEFT,RIGHT),
 											left only,
 											local);

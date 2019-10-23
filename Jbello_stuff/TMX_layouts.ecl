@@ -1,0 +1,1848 @@
+﻿EXPORT TMX_layouts := module
+
+export raw:=record
+string200 provenance;
+string date_time;
+string org_id;
+string event_id;
+string api_type;
+string event_type;
+string policy_score;
+string reason_code;
+string request_id;
+string request_result;
+string review_status;
+string risk_rating;
+string service_type;
+string browser_language;
+string browser_string_hash;
+string browser_string;
+string css_file_loaded;
+string css_image_loaded;
+string detected_fl;
+string device_activities;
+string device_assert_history;
+string device_attributes;
+string device_first_seen;
+string device_id;
+string device_last_assertion;
+string device_last_event;
+string device_last_update;
+string device_match_result;
+string device_result;
+string device_score;
+string device_worst_score;
+string enabled_ck;
+string enabled_fl;
+string enabled_im;
+string enabled_js;
+string first_party_cookie;
+string flash_anomaly;
+string flash_guid;
+string flash_lang;
+string flash_os;
+string flash_system_state;
+string flash_tcp_tstmp_rate;
+string flash_tstmp_measure_time;
+string flash_version;
+string headers_name_value_hash;
+string headers_order_string_hash;
+string http_os_signature;
+string http_os_sig_raw;
+string http_referer;
+string https_proxy_flag;
+string image_anomaly;
+string image_loaded;
+string local_time_offset;
+string local_time_offset_range;
+string os_anomaly;
+string os;
+string os_fonts_hash;
+string os_fonts_number;
+string plugin_adobe_acrobat;
+string plugin_flash;
+string plugin_hash;
+string plugin_realplayer;
+string plugin_shockwave;
+string plugin_silverlight;
+string plugin_windows_media_player;
+string profiling_datetime;
+string screen_res;
+string session_anomaly;
+string session_id;
+string silverlight_guid;
+string system_state;
+string tcp_os_signature;
+string tcp_os_sig_raw;
+string tcp_tstmp_rate;
+string third_party_cookie;
+string time_zone;
+string transaction_id;
+string tstmp_measure_time;
+string local_attrib_1;
+string local_attrib_2;
+string local_attrib_3;
+string local_attrib_4;
+string local_attrib_5;
+string custom_match_1;
+string custom_match_2;
+string custom_match_3;
+string custom_match_4;
+string custom_match_5;
+string custom_match_6;
+string custom_match_7;
+string custom_match_8;
+string ua_agent;
+string ua_browser;
+string ua_mobile;
+string ua_os;
+string ua_platform;
+string ua_proxy;
+string offset_measure_time;
+string screen_res_anomaly;
+string screen_aspect_ratio_anomaly;
+string time_zone_dst_offset;
+string timezone_offset_anomaly;
+string request_duration;
+string profile_api_timedelta;
+string url_anomaly;
+string browser_language_anomaly;
+string browser_string_mismatch;
+string browser_string_anomaly;
+string js_browser_string;
+string mime_type_hash;
+string mime_type_number;
+string plugin_number;
+string plugin_quicktime;
+string plugin_java;
+string plugin_vlc_player;
+string plugin_devalvr;
+string plugin_svg_viewer;
+string multiple_session_id;
+string device_id_reason_code;
+string unknown_session;
+string localstorage_guid;
+string fuzzy_device_id;
+string fuzzy_device_id_confidence;
+string fuzzy_device_match_result;
+string fuzzy_device_activities;
+string fuzzy_device_assert_history;
+string fuzzy_device_attributes;
+string fuzzy_device_last_update;
+string fuzzy_device_last_assertion;
+string fuzzy_device_last_event;
+string fuzzy_device_first_seen;
+string fuzzy_device_result;
+string fuzzy_device_score;
+string fuzzy_device_worst_score;
+string custom_count_1;
+string custom_count_2;
+string custom_count_3;
+string custom_count_4;
+string input_ip_address;
+string tps_result;
+string tps_error;
+string tps_vendor_error;
+string tps_vendor_result;
+string tps_was_timeout;
+string policy;
+string error_detail;
+string cidr_number;
+string true_ip_activities;
+string true_ip_assert_history;
+string true_ip_attributes;
+string true_ip_city;
+string true_ip_first_seen;
+string true_ip_geo;
+string true_ip;
+string true_ip_isp;
+string true_ip_last_assertion;
+string true_ip_last_event;
+string true_ip_last_update;
+string true_ip_latitude;
+string true_ip_longitude;
+string true_ip_organization;
+string true_ip_region;
+string true_ip_result;
+string true_ip_score;
+string true_ip_worst_score;
+string proxy_ip_activities;
+string proxy_ip_assert_history;
+string proxy_ip_attributes;
+string proxy_ip_city;
+string proxy_ip_first_seen;
+string proxy_ip_geo;
+string proxy_ip;
+string proxy_ip_isp;
+string proxy_ip_last_assertion;
+string proxy_ip_last_event;
+string proxy_ip_last_update;
+string proxy_ip_latitude;
+string proxy_ip_longitude;
+string proxy_ip_organization;
+string proxy_ip_region;
+string proxy_ip_result;
+string proxy_ip_score;
+string proxy_ip_worst_score;
+string proxy_type;
+string proxy_name;
+string account_name_activities;
+string account_name_assert_history;
+string account_name_attributes;
+string account_name;
+string account_name_first_seen;
+string account_name_last_assertion;
+string account_name_last_event;
+string account_name_last_update;
+string account_name_result;
+string account_name_score;
+string account_name_worst_score;
+string account_login_activities;
+string account_login_assert_history;
+string account_login_attributes;
+string account_login;
+string account_login_first_seen;
+string account_login_last_assertion;
+string account_login_last_event;
+string account_login_last_update;
+string account_login_result;
+string account_login_score;
+string account_login_worst_score;
+string password_hash_activities;
+string password_hash_assert_history;
+string password_hash_attributes;
+string password_hash;
+string password_hash_first_seen;
+string password_hash_last_assertion;
+string password_hash_last_event;
+string password_hash_last_update;
+string password_hash_result;
+string password_hash_score;
+string password_hash_worst_score;
+string account_number_activities;
+string account_number_assert_history;
+string account_number_attributes;
+string account_number;
+string account_number_first_seen;
+string account_number_last_assertion;
+string account_number_last_event;
+string account_number_last_update;
+string account_number_result;
+string account_number_score;
+string account_number_worst_score;
+string online_id_handle;
+string online_tld;
+string drivers_licence_number_hash;
+string ssn_hash;
+string online_id;
+string online_id_activities;
+string online_id_assert_history;
+string online_id_attributes;
+string online_id_first_seen;
+string online_id_last_assertion;
+string online_id_last_event;
+string online_id_last_update;
+string online_id_result;
+string online_id_score;
+string online_id_worst_score;
+string drivers_licence_hash_activities;
+string drivers_licence_hash_assert_history;
+string drivers_licence_hash_attributes;
+string drivers_licence_hash_first_seen;
+string drivers_licence_hash_last_assertion;
+string drivers_licence_hash_last_event;
+string drivers_licence_hash_last_update;
+string drivers_licence_hash_result;
+string drivers_licence_hash_score;
+string drivers_licence_hash_worst_score;
+string ssn_hash_activities;
+string ssn_hash_assert_history;
+string ssn_hash_attributes;
+string ssn_hash_first_seen;
+string ssn_hash_last_assertion;
+string ssn_hash_last_event;
+string ssn_hash_last_update;
+string ssn_hash_result;
+string ssn_hash_score;
+string ssn_hash_worst_score;
+string account_email_activities;
+string account_email_assert_history;
+string account_email_attributes;
+string account_email;
+string account_email_first_seen;
+string account_email_last_assertion;
+string account_email_last_event;
+string account_email_last_update;
+string account_email_result;
+string account_email_score;
+string account_email_worst_score;
+string account_address_activities;
+string account_address_assert_history;
+string account_address_attributes;
+string account_address_city;
+string account_address_country;
+string account_address_first_seen;
+string account_address_last_assertion;
+string account_address_last_event;
+string account_address_last_update;
+string account_address_result;
+string account_address_score;
+string account_address_state;
+string account_address_street1;
+string account_address_street2;
+string account_address_worst_score;
+string account_address_zip;
+string account_telephone_activities;
+string account_telephone_assert_history;
+string account_telephone_attributes;
+string account_telephone;
+string account_telephone_first_seen;
+string account_telephone_last_assertion;
+string account_telephone_last_event;
+string account_telephone_last_update;
+string account_telephone_result;
+string account_telephone_score;
+string account_telephone_worst_score;
+string shipping_address_activities;
+string shipping_address_assert_history;
+string shipping_address_attributes;
+string shipping_address_city;
+string shipping_address_country;
+string shipping_address_first_seen;
+string shipping_address_last_assertion;
+string shipping_address_last_event;
+string shipping_address_last_update;
+string shipping_address_result;
+string shipping_address_score;
+string shipping_address_state;
+string shipping_address_street1;
+string shipping_address_street2;
+string shipping_address_worst_score;
+string shipping_address_zip;
+string cc_bin_number;
+string cc_number_hash_activities;
+string cc_number_hash_assert_history;
+string cc_number_hash_attributes;
+string cc_number_hash;
+string cc_number_hash_first_seen;
+string cc_number_hash_last_assertion;
+string cc_number_hash_last_event;
+string cc_number_hash_last_update;
+string cc_number_hash_result;
+string cc_number_hash_score;
+string cc_number_hash_worst_score;
+string ach_account_hash;
+string ach_routing_number;
+string payment_gateway_provider;
+string payment_request_type;
+string payment_response_code;
+string payment_response;
+string processing_provider;
+string settlement_amount;
+string settlement_currency;
+string transaction_amount;
+string transaction_auth_amount;
+string transaction_auth_currency;
+string transaction_currency;
+string transaction_shipping_amount;
+string transaction_shipping_currency;
+string ach_number;
+string ach_number_activities;
+string ach_number_assert_history;
+string ach_number_attributes;
+string ach_number_first_seen;
+string ach_number_last_assertion;
+string ach_number_last_event;
+string ach_number_last_update;
+string ach_number_result;
+string ach_number_score;
+string ach_number_worst_score;
+string cc_bin_number_geo;
+string encrypted_data_blob;
+string import_id;
+string device_fingerprint;
+string device_fingerprint_activities;
+string device_fingerprint_assert_history;
+string device_fingerprint_attributes;
+string device_fingerprint_first_seen;
+string device_fingerprint_last_assertion;
+string device_fingerprint_last_event;
+string device_fingerprint_last_update;
+string device_fingerprint_result;
+string device_fingerprint_score;
+string device_fingerprint_worst_score;
+string page_fingerprint;
+string page_fingerprint_activities;
+string page_fingerprint_assert_history;
+string page_fingerprint_attributes;
+string page_fingerprint_first_seen;
+string page_fingerprint_last_assertion;
+string page_fingerprint_last_event;
+string page_fingerprint_last_update;
+string page_fingerprint_result;
+string page_fingerprint_score;
+string page_fingerprint_worst_score;
+string page_fingerprint_check;
+string page_summary;
+string unknown_page_diff;
+string page_id;
+string enabled_services;
+string page_fingerprint_diff;
+string tcp_os_sig_adv_mss;
+string tcp_os_sig_snd_mss;
+string tcp_os_sig_rcv_mss;
+string http_os_sig_adv_mss;
+string http_os_sig_snd_mss;
+string http_os_sig_rcv_mss;
+string tcp_os_sig_ttl;
+string http_os_sig_ttl;
+string profiling_delta;
+string profiling_site_id;
+string http_referer_domain;
+string profiled_domain;
+string http_referer_url;
+string profiled_url;
+string condition_attrib_1;
+string condition_attrib_2;
+string condition_attrib_3;
+string condition_attrib_4;
+string condition_attrib_5;
+string condition_attrib_6;
+string condition_attrib_7;
+string condition_attrib_8;
+string condition_attrib_9;
+string condition_attrib_10;
+string condition_attrib_11;
+string condition_attrib_12;
+string condition_attrib_13;
+string condition_attrib_14;
+string condition_attrib_15;
+string condition_attrib_16;
+string condition_attrib_17;
+string condition_attrib_18;
+string unencrypted_condition_attrib_1;
+string unencrypted_condition_attrib_2;
+string tmx_reason_code;
+string related_device_id;
+string related_request_id;
+string related_custom_id;
+string tcp_connection_type;
+string http_connection_type;
+string profile_arf_millisec;
+string page_time_on;
+string screen_res_alt;
+string page_fingerprint_match;
+string honeypot_fingerprint_check;
+string honeypot_fingerprint_diff;
+string honeypot_fingerprint;
+string honeypot_unknown_diff;
+string honeypot_fingerprint_match;
+string js_fonts_hash;
+string js_fonts_number;
+string summary_reason_code;
+string tmx_policy_score;
+string tmx_review_status;
+string tmx_risk_rating;
+string tmx_summary_reason_code;
+string custom_mobile_1;
+string custom_mobile_2;
+string custom_mobile_3;
+string custom_mobile_4;
+string custom_mobile_5;
+string agent_device_id;
+string agent_device_state;
+string hw_latitude;
+string hw_longitude;
+string hw_gps_accuracy;
+string experiment_1;
+string experiment_2;
+string experiment_3;
+string experiment_4;
+string experiment_5;
+string agent_type;
+string agent_version;
+string dns_ip;
+string dns_ip_city;
+string dns_ip_geo;
+string dns_ip_isp;
+string dns_ip_latitude;
+string dns_ip_longitude;
+string dns_ip_organization;
+string dns_ip_region;
+string cc_bin_number_type;
+string cc_bin_number_brand;
+string cc_bin_number_category;
+string cc_bin_number_org;
+string screen_color_depth;
+string local_attrib_6;
+string local_attrib_7;
+string local_attrib_8;
+string local_attrib_9;
+string local_attrib_10;
+string js_fonts_list;
+string etag_guid;
+string agent_session_id;
+string agent_event_time;
+string agent_os;
+string fw_name;
+string av_name;
+string os_daysupdated;
+string browser_process;
+string browser_version;
+string hdd_encryption_name;
+string pwd_policy_min_length;
+string pwd_policy_auto_lock_minutes;
+string agent_health_details;
+string jb_root;
+string jb_root_reason;
+string fw_status;
+string av_enabled;
+string av_uptodate;
+string os_update_strategy;
+string hdd_encryption_status;
+string pwd_policy_enabled;
+string pwd_policy_complexity;
+string pwd_policy_max_days;
+string pwd_policy_min_days;
+string pwd_policy_auto_logon;
+string agent_health_status;
+string custom_output_1;
+string custom_output_2;
+string custom_output_3;
+string custom_output_4;
+string custom_output_5;
+string custom_output_6;
+string custom_output_7;
+string custom_output_8;
+string custom_output_9;
+string custom_output_10;
+string input_ip_activities;
+string input_ip_assert_history;
+string input_ip_attributes;
+string input_ip_city;
+string input_ip_first_seen;
+string input_ip_geo;
+string input_ip_isp;
+string input_ip_last_assertion;
+string input_ip_last_event;
+string input_ip_last_update;
+string input_ip_latitude;
+string input_ip_longitude;
+string input_ip_organization;
+string input_ip_region;
+string input_ip_result;
+string input_ip_score;
+string input_ip_worst_score;
+string profile_org_id;
+string agent_os_version;
+string agent_language;
+string agent_locale;
+string agent_brand;
+string agent_model;
+string apprep_selfhash;
+string apprep_selfhash_category;
+string apprep_installedapps;
+string apprep_runningapps;
+string apprep_installed_unknown;
+string apprep_running_unknown;
+string apprep_installed_malicious;
+string apprep_running_malicious;
+string apprep_installed_unwanted;
+string apprep_running_unwanted;
+string apprep_installed_suspicious;
+string apprep_running_suspicious;
+string apprep_installed_moderate;
+string apprep_running_moderate;
+string apprep_installed_benign;
+string apprep_running_benign;
+string action;
+string experiment_mobile_1;
+string experiment_mobile_2;
+string experiment_mobile_3;
+string experiment_mobile_4;
+string experiment_mobile_5;
+string experiment_mobile_6;
+string experiment_mobile_7;
+string experiment_mobile_8;
+string experiment_mobile_9;
+string experiment_mobile_10;
+string agent_image_creation;
+string agent_app_links;
+string agent_free_space;
+string agent_name;
+string agent_app_info;
+string agent_bssid;
+string agent_ssid;
+string agent_boot_time;
+string agent_connection_type;
+string tmx_variables;
+string api_site_id;
+string remote_desktop;
+string true_ip_organization_type;
+string true_ip_postal_code;
+string true_ip_routing_type;
+string true_ip_country_code;
+string true_ip_connection_type;
+string true_ip_home;
+string true_ip_hosting_facility;
+string true_ip_line_speed;
+string proxy_ip_organization_type;
+string proxy_ip_postal_code;
+string proxy_ip_routing_type;
+string proxy_ip_country_code;
+string proxy_ip_connection_type;
+string proxy_ip_home;
+string proxy_ip_hosting_facility;
+string proxy_ip_line_speed;
+string dns_ip_organization_type;
+string dns_ip_postal_code;
+string dns_ip_routing_type;
+string dns_ip_country_code;
+string dns_ip_connection_type;
+string dns_ip_home;
+string dns_ip_hosting_facility;
+string dns_ip_line_speed;
+string input_ip_organization_type;
+string input_ip_postal_code;
+string input_ip_routing_type;
+string input_ip_country_code;
+string input_ip_connection_type;
+string input_ip_home;
+string input_ip_hosting_facility;
+string input_ip_line_speed;
+string agent_total_space;
+string agent_signal_strength;
+string agent_wps_accuracy;
+string page_fingerprint_hooks;
+string honeypot_fingerprint_hooks;
+string carrier_id;
+string carrier_id_activities;
+string carrier_id_assert_history;
+string carrier_id_attributes;
+string carrier_id_first_seen;
+string carrier_id_last_assertion;
+string carrier_id_last_event;
+string carrier_id_last_update;
+string carrier_id_result;
+string carrier_id_score;
+string carrier_id_worst_score;
+string tmx_raw_score;
+string tmx_fraud_rating;
+string tmx_p_score;
+string session_id_query_count;
+string input_latitude;
+string input_longitude;
+string tmx_risk_rank;
+string cba_score;
+string policy_version;
+string agent_profiling_delta;
+string js_os;
+string js_browser;
+string js_browser_string_hash;
+string browser;
+string os_version;
+string browser_anomaly;
+string agent_wps_latitude;
+string agent_wps_longitude;
+string agent_cell_id;
+string true_ip_region_iso_code;
+string proxy_ip_region_iso_code;
+string dns_ip_region_iso_code;
+string input_ip_region_iso_code;
+string fuzzy_device_id_reason_code;
+string additional_data;
+string event_tag;
+string agent_publickey_hash;
+string agent_publickey_hash_type;
+string input_request_id;
+string tmx_internal_variables;
+string apiversion;
+string segment_name;
+string html_location_latitude;
+string html_location_longitude;
+string html_location_accuracy;
+string html_location_altitude;
+string html_location_heading;
+string webrtc_external_ip;
+string webrtc_internal_ip;
+string webrtc_ipv6;
+string agent_publickey_hash_activities;
+string agent_publickey_hash_assert_history;
+string agent_publickey_hash_attributes;
+string agent_publickey_hash_first_seen;
+string agent_publickey_hash_last_assertion;
+string agent_publickey_hash_last_event;
+string agent_publickey_hash_last_update;
+string agent_publickey_hash_result;
+string agent_publickey_hash_score;
+string agent_publickey_hash_worst_score;
+string smart_learning_policy_score;
+string smart_learning_risk_rank;
+string smart_learning_fraud_rating;
+string smart_learning_p_score;
+string smart_learning_variables;
+string smart_learning_reason_code;
+string smart_learning_summary_reason_code;
+string yyyymm;
+string carrier_name;
+string carrier_mobile_number;
+string carrier_mobile_number_activities;
+string carrier_mobile_number_assert_history;
+string carrier_mobile_number_attributes;
+string carrier_mobile_number_first_seen;
+string carrier_mobile_number_last_assertion;
+string carrier_mobile_number_last_event;
+string carrier_mobile_number_last_update;
+string carrier_mobile_number_result;
+string carrier_mobile_number_score;
+string carrier_mobile_number_worst_score;
+string carrier_mobile_number_match_result;
+string carrier_account;
+string carrier_account_activities;
+string carrier_account_assert_history;
+string carrier_account_attributes;
+string carrier_account_first_seen;
+string carrier_account_last_assertion;
+string carrier_account_last_event;
+string carrier_account_last_update;
+string carrier_account_result;
+string carrier_account_score;
+string carrier_account_worst_score;
+string carrier_account_match_result;
+string experiment_6;
+string experiment_7;
+string experiment_8;
+string experiment_9;
+string experiment_10;
+string account_email_domain;
+string private_browsing;
+string policy_site_id;
+string account_first_name;
+string account_last_name;
+string agent_device_caps;
+string virtual_machine;
+string virtual_machine_reason;
+string customer_event_type;
+string application_name;
+string line_of_business;
+string local_attrib_11;
+string local_attrib_12;
+string local_attrib_13;
+string local_attrib_14;
+string local_attrib_15;
+string account_date_of_birth;
+string digital_id;
+string digital_id_confidence;
+string digital_id_reason_code;
+string digital_id_activities;
+string digital_id_attributes;
+string digital_id_first_seen;
+string digital_id_last_event;
+string digital_id_last_update;
+string digital_id_result;
+string digital_id_score;
+string test_digital_id;
+string test_digital_id_confidence;
+string test_digital_id_reason_code;
+string test_digital_id_activities;
+string test_digital_id_attributes;
+string test_digital_id_first_seen;
+string test_digital_id_last_event;
+string test_digital_id_last_update;
+string test_digital_id_result;
+string test_digital_id_score;
+string account_address_zip_latitude;
+string account_address_zip_longitude;
+string shipping_address_zip_latitude;
+string shipping_address_zip_longitude;
+string carrier_id_token;
+string webgl_hash;
+string canvas_hash;
+string targeted_malware;
+string local_ipv4;
+string local_ipv6;
+string mac_address;
+string flash_version_detected;
+string page_fingerprint_diff_names;
+string honeypot_fingerprint_diff_names;
+string advertising_id;
+string device_imei;
+string account_home_phone;
+string account_work_phone;
+string external_device_info;
+string account_address_zip_normalized;
+string shipping_address_zip_normalized;
+string selinux_status;
+string app_integrity_score;
+string custom_count_5;
+string custom_count_6;
+string custom_count_7;
+string custom_count_8;
+string custom_count_9;
+string custom_count_10;
+string custom_count_11;
+string custom_count_12;
+string custom_count_13;
+string custom_count_14;
+string custom_count_15;
+string custom_output_11;
+string custom_output_12;
+string custom_output_13;
+string custom_output_14;
+string custom_output_15;
+string custom_output_16;
+string custom_output_17;
+string custom_output_18;
+string custom_output_19;
+string custom_output_20;
+string ua_os_alt;
+string ua_os_version_alt;
+string ua_browser_alt;
+string ua_browser_version_alt;
+string virtual_device;
+string virtual_device_reason;
+string dns_ip_assert_history;
+string dns_ip_attributes;
+string dns_ip_activities;
+string primary_industry;
+string secondary_industry;
+string ship_address_is_bill_address;
+string merchant_category_code;
+string merchant_country_code;
+string merchant_name;
+string merchant_id;
+string auth_methods;
+string device_health_reasons;
+string local_attrib_1_activities;
+string local_attrib_2_activities;
+string local_attrib_3_activities;
+string local_attrib_4_activities;
+string local_attrib_5_activities;
+string local_attrib_6_activities;
+string local_attrib_7_activities;
+string local_attrib_8_activities;
+string local_attrib_9_activities;
+string local_attrib_10_activities;
+string local_attrib_11_activities;
+string local_attrib_12_activities;
+string local_attrib_13_activities;
+string local_attrib_14_activities;
+string local_attrib_15_activities;
+string local_attrib_1_first_seen;
+string local_attrib_2_first_seen;
+string local_attrib_3_first_seen;
+string local_attrib_4_first_seen;
+string local_attrib_5_first_seen;
+string local_attrib_6_first_seen;
+string local_attrib_7_first_seen;
+string local_attrib_8_first_seen;
+string local_attrib_9_first_seen;
+string local_attrib_10_first_seen;
+string local_attrib_11_first_seen;
+string local_attrib_12_first_seen;
+string local_attrib_13_first_seen;
+string local_attrib_14_first_seen;
+string local_attrib_15_first_seen;
+string experiment_mobile_array;
+string experiment_array;
+string web_session_id;
+string web_session_id_activities;
+string web_session_id_attributes;
+string web_session_id_first_seen;
+string web_session_id_last_event;
+string web_session_id_last_update;
+string web_session_id_result;
+string web_session_id_score;
+string wurfl_info;
+string collected_ip_addresses;
+string exact_id_health;
+string use_test_apn;
+string challenger_policy;
+string challenger_policy_score;
+string challenger_reason_code;
+string challenger_risk_rating;
+string challenger_summary_reason_code;
+string challenger_review_status;
+string digital_id_confidence_rating;
+string digital_id_trust_score_reason_code;
+string digital_id_trust_score_summary_reason_code;
+string digital_id_trust_score;
+string digital_id_trust_score_rating;
+string digital_id_trust_score_variables;
+string rules;
+string external_guid;
+string global_third_party_cookie;
+string national_id_type;
+string national_id_number;
+string threeds_comp_ind;
+string targeted_storage;
+string turn_os_sig_raw;
+string turn_os_sig_ttl;
+string turn_os_signature;
+string turn_system_state;
+string turn_tcp_tstmp_rate;
+string org_group_id;
+string ssl_fp_client;
+string ssl_fp_category;
+string digital_id_summary_reason_code;
+end;
+
+export strings:=record
+string25 provenance;
+raw - [provenance];
+end;
+
+export prepped:=record
+string25 provenance
+,string23 date_time
+,string8 org_id
+,string11 event_id
+,string206 api_type// {blob,maxlength(206)}
+,string376 event_type// {blob,maxlength(376)}
+,integer2 policy_score
+,string reason_code {blob,maxlength(12059)}
+,string32 request_id
+,string40 request_result
+,string15 review_status
+,string15 risk_rating
+,string service_type {blob,maxlength(281)}
+,string browser_language {blob,maxlength(281)}
+,string35 browser_string_hash
+,string browser_string {blob,maxlength(285)}
+,boolean css_file_loaded
+,boolean css_image_loaded
+,boolean detected_fl
+,string device_activities {blob,maxlength(318)}
+,string52 device_assert_history
+,string device_attributes {blob,maxlength(347)}
+,string10 device_first_seen
+,string32 device_id
+,string10 device_last_assertion
+,string10 device_last_event
+,string10 device_last_update
+,string20 device_match_result
+,string10 device_result
+,integer2 device_score
+,integer2 device_worst_score
+,boolean enabled_ck
+,boolean enabled_fl
+,boolean enabled_im
+,boolean enabled_js
+,string first_party_cookie {blob,maxlength(281)}
+,boolean flash_anomaly
+,string35 flash_guid
+,string flash_lang {blob,maxlength(164)}
+,string flash_os {blob,maxlength(281)}
+,integer4 flash_system_state
+,integer4 flash_tcp_tstmp_rate
+,integer4 flash_tstmp_measure_time
+,string54 flash_version
+,string35 headers_name_value_hash
+,string35 headers_order_string_hash
+,string35 http_os_signature
+,string http_os_sig_raw {blob,maxlength(217)}
+,string35 http_referer
+,integer4 https_proxy_flag
+,boolean image_anomaly
+,boolean image_loaded
+,real4 local_time_offset
+,real4 local_time_offset_range
+,boolean os_anomaly
+,string15 os
+,string44 os_fonts_hash
+,integer4 os_fonts_number
+,string17 plugin_adobe_acrobat
+,string19 plugin_flash
+,string35 plugin_hash
+,string17 plugin_realplayer
+,string17 plugin_shockwave
+,string12 plugin_silverlight
+,string24 plugin_windows_media_player
+,string10 profiling_datetime
+,string13 screen_res
+,boolean session_anomaly
+,string session_id {blob,maxlength(936)}
+,string35 silverlight_guid
+,integer4 system_state
+,string34 tcp_os_signature
+,string tcp_os_sig_raw {blob,maxlength(217)}
+,integer4 tcp_tstmp_rate
+,string35 third_party_cookie
+,integer4 time_zone
+,string transaction_id {blob,maxlength(541)}
+,integer4 tstmp_measure_time
+,string35 local_attrib_1
+,string35 local_attrib_2
+,string35 local_attrib_3
+,string35 local_attrib_4
+,string35 local_attrib_5
+,string35 custom_match_1
+,string35 custom_match_2
+,string35 custom_match_3
+,string35 custom_match_4
+,string35 custom_match_5
+,string35 custom_match_6
+,string35 custom_match_7
+,string35 custom_match_8
+,string ua_agent
+,string44 ua_browser
+,boolean ua_mobile
+,string62 ua_os
+,string54 ua_platform
+,boolean ua_proxy
+,unsigned8 offset_measure_time
+,boolean screen_res_anomaly
+,boolean screen_aspect_ratio_anomaly
+,integer4 time_zone_dst_offset
+,boolean timezone_offset_anomaly
+,integer4 request_duration
+,integer4 profile_api_timedelta
+,boolean url_anomaly
+,boolean browser_language_anomaly
+,boolean browser_string_mismatch
+,boolean browser_string_anomaly
+,string js_browser_string {blob,maxlength(842)}
+,string35 mime_type_hash
+,integer4 mime_type_number
+,integer4 plugin_number
+,string17 plugin_quicktime
+,string17 plugin_java
+,string17 plugin_vlc_player
+,string17 plugin_devalvr
+,string17 plugin_svg_viewer
+,boolean multiple_session_id
+,string19 device_id_reason_code
+,boolean unknown_session
+,string35 localstorage_guid
+,string32 fuzzy_device_id
+,real4 fuzzy_device_id_confidence
+,string11 fuzzy_device_match_result
+,string fuzzy_device_activities {blob,maxlength(300)}
+,string20 fuzzy_device_assert_history
+,string fuzzy_device_attributes {blob,maxlength(300)}
+,string10 fuzzy_device_last_update
+,string10 fuzzy_device_last_assertion
+,string10 fuzzy_device_last_event
+,string10 fuzzy_device_first_seen
+,string10 fuzzy_device_result
+,integer2 fuzzy_device_score
+,integer2 fuzzy_device_worst_score
+,real4 custom_count_1
+,real4 custom_count_2
+,real4 custom_count_3
+,real4 custom_count_4
+,string43 input_ip_address
+,string8 tps_result
+,string123 tps_error
+,string3 tps_vendor_error
+,string tps_vendor_result
+,boolean tps_was_timeout
+,string policy {blob,maxlength(281)}
+,string error_detail {blob,maxlength(281)}
+,integer2 cidr_number
+,string true_ip_activities {blob,maxlength(300)}
+,string39 true_ip_assert_history
+,string true_ip_attributes {blob,maxlength(377)}
+,string55 true_ip_city
+,string10 true_ip_first_seen
+,string2 true_ip_geo
+,string39 true_ip
+,string55 true_ip_isp
+,string10 true_ip_last_assertion
+,string10 true_ip_last_event
+,string10 true_ip_last_update
+,real4 true_ip_latitude
+,real4 true_ip_longitude
+,string55 true_ip_organization
+,string55 true_ip_region
+,string10 true_ip_result
+,integer2 true_ip_score
+,integer2 true_ip_worst_score
+,string proxy_ip_activities {blob,maxlength(195)}
+,string20 proxy_ip_assert_history
+,string proxy_ip_attributes {blob,maxlength(375)}
+,string55 proxy_ip_city
+,string10 proxy_ip_first_seen
+,string2 proxy_ip_geo
+,string17 proxy_ip
+,string55 proxy_ip_isp
+,string10 proxy_ip_last_assertion
+,string10 proxy_ip_last_event
+,string10 proxy_ip_last_update
+,real4 proxy_ip_latitude
+,real4 proxy_ip_longitude
+,string55 proxy_ip_organization
+,string55 proxy_ip_region
+,string10 proxy_ip_result
+,integer2 proxy_ip_score
+,integer2 proxy_ip_worst_score
+,string12 proxy_type
+,string10 proxy_name
+,string85 account_name_activities
+,string36 account_name_assert_history
+,string100 account_name_attributes
+,string35 account_name
+,string10 account_name_first_seen
+,string10 account_name_last_assertion
+,string10 account_name_last_event
+,string10 account_name_last_update
+,string10 account_name_result
+,integer2 account_name_score
+,integer2 account_name_worst_score
+,string account_login_activities {blob,maxlength(486)}
+,string36 account_login_assert_history
+,string account_login_attributes {blob,maxlength(195)}
+,string35 account_login
+,string10 account_login_first_seen
+,string10 account_login_last_assertion
+,string10 account_login_last_event
+,string10 account_login_last_update
+,string10 account_login_result
+,integer2 account_login_score
+,integer2 account_login_worst_score
+,string58 password_hash_activities
+,string35 password_hash_assert_history
+,string58 password_hash_attributes
+,string35 password_hash
+,string10 password_hash_first_seen
+,string10 password_hash_last_assertion
+,string10 password_hash_last_event
+,string10 password_hash_last_update
+,string10 password_hash_result
+,integer2 password_hash_score
+,integer2 password_hash_worst_score
+,string account_number_activities {blob,maxlength(179)}
+,string32 account_number_assert_history
+,string138 account_number_attributes
+,string35 account_number
+,string10 account_number_first_seen
+,string10 account_number_last_assertion
+,string10 account_number_last_event
+,string10 account_number_last_update
+,string10 account_number_result
+,integer2 account_number_score
+,integer2 account_number_worst_score
+,string35 online_id_handle
+,string35 online_tld
+,string35 drivers_licence_number_hash
+,string35 ssn_hash
+,string35 online_id
+,string32 online_id_activities
+,string20 online_id_assert_history
+,string32 online_id_attributes
+,string10 online_id_first_seen
+,string10 online_id_last_assertion
+,string10 online_id_last_event
+,string10 online_id_last_update
+,string10 online_id_result
+,integer2 online_id_score
+,integer2 online_id_worst_score
+,string32 drivers_licence_hash_activities
+,string20 drivers_licence_hash_assert_history
+,string32 drivers_licence_hash_attributes
+,string10 drivers_licence_hash_first_seen
+,string10 drivers_licence_hash_last_assertion
+,string10 drivers_licence_hash_last_event
+,string10 drivers_licence_hash_last_update
+,string10 drivers_licence_hash_result
+,integer2 drivers_licence_hash_score
+,integer2 drivers_licence_hash_worst_score
+,string43 ssn_hash_activities
+,string20 ssn_hash_assert_history
+,string43 ssn_hash_attributes
+,string10 ssn_hash_first_seen
+,string10 ssn_hash_last_assertion
+,string10 ssn_hash_last_event
+,string10 ssn_hash_last_update
+,string10 ssn_hash_result
+,integer2 ssn_hash_score
+,integer2 ssn_hash_worst_score
+,string account_email_activities {blob,maxlength(308)}
+,string52 account_email_assert_history
+,string account_email_attributes {blob,maxlength(222)}
+,string35 account_email
+,string10 account_email_first_seen
+,string10 account_email_last_assertion
+,string10 account_email_last_event
+,string10 account_email_last_update
+,string10 account_email_result
+,integer2 account_email_score
+,integer2 account_email_worst_score
+,string51 account_address_activities
+,string20 account_address_assert_history
+,string51 account_address_attributes
+,string35 account_address_city
+,string35 account_address_country
+,string10 account_address_first_seen
+,string10 account_address_last_assertion
+,string10 account_address_last_event
+,string10 account_address_last_update
+,string10 account_address_result
+,integer2 account_address_score
+,string35 account_address_state
+,string35 account_address_street1
+,string35 account_address_street2
+,integer2 account_address_worst_score
+,string35 account_address_zip
+,string107 account_telephone_activities
+,string32 account_telephone_assert_history
+,string107 account_telephone_attributes
+,string35 account_telephone
+,string10 account_telephone_first_seen
+,string10 account_telephone_last_assertion
+,string10 account_telephone_last_event
+,string10 account_telephone_last_update
+,string10 account_telephone_result
+,integer2 account_telephone_score
+,integer2 account_telephone_worst_score
+,string102 shipping_address_activities
+,string20 shipping_address_assert_history
+,string102 shipping_address_attributes
+,string35 shipping_address_city
+,string35 shipping_address_country
+,string10 shipping_address_first_seen
+,string10 shipping_address_last_assertion
+,string10 shipping_address_last_event
+,string10 shipping_address_last_update
+,string10 shipping_address_result
+,integer2 shipping_address_score
+,string35 shipping_address_state
+,string35 shipping_address_street1
+,string35 shipping_address_street2
+,integer2 shipping_address_worst_score
+,string35 shipping_address_zip
+,integer4 cc_bin_number
+,string102 cc_number_hash_activities
+,string35 cc_number_hash_assert_history
+,string102 cc_number_hash_attributes
+,string35 cc_number_hash
+,string10 cc_number_hash_first_seen
+,string10 cc_number_hash_last_assertion
+,string10 cc_number_hash_last_event
+,string10 cc_number_hash_last_update
+,string10 cc_number_hash_result
+,integer2 cc_number_hash_score
+,integer2 cc_number_hash_worst_score
+,string35 ach_account_hash
+,string35 ach_routing_number
+,string39 payment_gateway_provider
+,string20 payment_request_type
+,string23 payment_response_code
+,string18 payment_response
+,string22 processing_provider
+,real4 settlement_amount
+,string7 settlement_currency
+,real4 transaction_amount
+,real4 transaction_auth_amount
+,string3 transaction_auth_currency
+,string25 transaction_currency
+,real4 transaction_shipping_amount
+,string19 transaction_shipping_currency
+,string35 ach_number
+,string32 ach_number_activities
+,string20 ach_number_assert_history
+,string32 ach_number_attributes
+,string10 ach_number_first_seen
+,string10 ach_number_last_assertion
+,string10 ach_number_last_event
+,string10 ach_number_last_update
+,string10 ach_number_result
+,integer2 ach_number_score
+,integer2 ach_number_worst_score
+,string3 cc_bin_number_geo
+,string encrypted_data_blob {blob,maxlength(1862)}
+,integer4 import_id
+,string44 device_fingerprint
+,string72 device_fingerprint_activities
+,string20 device_fingerprint_assert_history
+,string72 device_fingerprint_attributes
+,string10 device_fingerprint_first_seen
+,string10 device_fingerprint_last_assertion
+,string10 device_fingerprint_last_event
+,string10 device_fingerprint_last_update
+,string10 device_fingerprint_result
+,integer2 device_fingerprint_score
+,integer2 device_fingerprint_worst_score
+,string44 page_fingerprint
+,string135 page_fingerprint_activities
+,string page_fingerprint_assert_history
+,string page_fingerprint_attributes
+,string10 page_fingerprint_first_seen
+,string10 page_fingerprint_last_assertion
+,string10 page_fingerprint_last_event
+,string10 page_fingerprint_last_update
+,string10 page_fingerprint_result
+,integer2 page_fingerprint_score
+,integer2 page_fingerprint_worst_score
+,boolean page_fingerprint_check
+,string page_summary {blob,maxlength(281)}
+,string unknown_page_diff {blob,maxlength(549976)}
+,integer4 page_id
+,string24 enabled_services
+,string page_fingerprint_diff {blob,maxlength(14816)}
+,integer4 tcp_os_sig_adv_mss
+,integer4 tcp_os_sig_snd_mss
+,integer4 tcp_os_sig_rcv_mss
+,integer4 http_os_sig_adv_mss
+,integer4 http_os_sig_snd_mss
+,integer4 http_os_sig_rcv_mss
+,integer4 tcp_os_sig_ttl
+,integer4 http_os_sig_ttl
+,integer4 profiling_delta
+,string15 profiling_site_id
+,string http_referer_domain {blob,maxlength(183)}
+,string profiled_domain {blob,maxlength(281)}
+,string http_referer_url {blob,maxlength(400)}
+,string profiled_url {blob,maxlength(323)}
+,string35 condition_attrib_1
+,string35 condition_attrib_2
+,string35 condition_attrib_3
+,string35 condition_attrib_4
+,string35 condition_attrib_5
+,string35 condition_attrib_6
+,string35 condition_attrib_7
+,string35 condition_attrib_8
+,string35 condition_attrib_9
+,string35 condition_attrib_10
+,string35 condition_attrib_11
+,string35 condition_attrib_12
+,string35 condition_attrib_13
+,string35 condition_attrib_14
+,string35 condition_attrib_15
+,string35 condition_attrib_16
+,string35 condition_attrib_17
+,string35 condition_attrib_18
+,string unencrypted_condition_attrib_1 {blob,maxlength(281)}
+,string unencrypted_condition_attrib_2 {blob,maxlength(369)}
+,string tmx_reason_code {blob,maxlength(17931)}
+,string related_device_id {blob,maxlength(1635)}
+,string related_request_id {blob,maxlength(1635)}
+,string related_custom_id {blob,maxlength(1255)}
+,string23 tcp_connection_type
+,string23 http_connection_type
+,unsigned8 profile_arf_millisec
+,integer4 page_time_on
+,string11 screen_res_alt
+,string18 page_fingerprint_match
+,boolean honeypot_fingerprint_check
+,string honeypot_fingerprint_diff {blob,maxlength(82398)}
+,string44 honeypot_fingerprint
+,string honeypot_unknown_diff {blob,maxlength(549976)}
+,string18 honeypot_fingerprint_match
+,string35 js_fonts_hash
+,integer4 js_fonts_number
+,string summary_reason_code {blob,maxlength(828)}
+,integer2 tmx_policy_score
+,string4 tmx_review_status
+,string8 tmx_risk_rating
+,string tmx_summary_reason_code {blob,maxlength(237)}
+,string129 custom_mobile_1
+,string custom_mobile_2 {blob,maxlength(281)}
+,string129 custom_mobile_3
+,string129 custom_mobile_4
+,string129 custom_mobile_5
+,string44 agent_device_id
+,string35 agent_device_state
+,real4 hw_latitude
+,real4 hw_longitude
+,real4 hw_gps_accuracy
+,string experiment_1 {blob,maxlength(4224)}
+,string68 experiment_2
+,string18 experiment_3
+,real4 experiment_4
+,real4 experiment_5
+,string34 agent_type
+,string22 agent_version
+,string17 dns_ip
+,string55 dns_ip_city
+,string2 dns_ip_geo
+,string55 dns_ip_isp
+,real4 dns_ip_latitude
+,real4 dns_ip_longitude
+,string55 dns_ip_organization
+,string55 dns_ip_region
+,string13 cc_bin_number_type
+,string28 cc_bin_number_brand
+,string35 cc_bin_number_category
+,string96 cc_bin_number_org
+,integer4 screen_color_depth
+,string35 local_attrib_6
+,string35 local_attrib_7
+,string35 local_attrib_8
+,string35 local_attrib_9
+,string35 local_attrib_10
+,string js_fonts_list {blob,maxlength(4224)}
+,string35 etag_guid
+,string70 agent_session_id
+,string10 agent_event_time
+,string123 agent_os
+,string48 fw_name
+,string55 av_name
+,integer2 os_daysupdated
+,string30 browser_process
+,string26 browser_version
+,string15 hdd_encryption_name
+,integer2 pwd_policy_min_length
+,integer2 pwd_policy_auto_lock_minutes
+,string61 agent_health_details
+,integer2 jb_root
+,string jb_root_reason {blob,maxlength(579)}
+,string9 fw_status
+,string9 av_enabled
+,string3 av_uptodate
+,string10 os_update_strategy
+,string3 hdd_encryption_status
+,string3 pwd_policy_enabled
+,string9 pwd_policy_complexity
+,integer2 pwd_policy_max_days
+,integer2 pwd_policy_min_days
+,string3 pwd_policy_auto_logon
+,string7 agent_health_status
+,string146 custom_output_1
+,string37 custom_output_2
+,string37 custom_output_3
+,string37 custom_output_4
+,string37 custom_output_5
+,string37 custom_output_6
+,string37 custom_output_7
+,string37 custom_output_8
+,string74 custom_output_9
+,string37 custom_output_10
+,string input_ip_activities {blob,maxlength(300)}
+,string22 input_ip_assert_history
+,string input_ip_attributes {blob,maxlength(375)}
+,string55 input_ip_city
+,string10 input_ip_first_seen
+,string2 input_ip_geo
+,string55 input_ip_isp
+,string10 input_ip_last_assertion
+,string10 input_ip_last_event
+,string10 input_ip_last_update
+,real4 input_ip_latitude
+,real4 input_ip_longitude
+,string55 input_ip_organization
+,string55 input_ip_region
+,string10 input_ip_result
+,integer2 input_ip_score
+,integer2 input_ip_worst_score
+,string9 profile_org_id
+,string95 agent_os_version
+,string21 agent_language
+,string21 agent_locale
+,string agent_brand {blob,maxlength(220)}
+,string agent_model {blob,maxlength(156)}
+,string apprep_selfhash {blob,maxlength(238)}
+,string12 apprep_selfhash_category
+,integer2 apprep_installedapps
+,integer2 apprep_runningapps
+,string apprep_installed_unknown {blob,maxlength(35827)}
+,string apprep_running_unknown {blob,maxlength(3193)}
+,string apprep_installed_malicious {blob,maxlength(1124)}
+,string apprep_running_malicious {blob,maxlength(943)}
+,string apprep_installed_unwanted {blob,maxlength(1015)}
+,string apprep_running_unwanted {blob,maxlength(253)}
+,string apprep_installed_suspicious {blob,maxlength(12595)}
+,string apprep_running_suspicious {blob,maxlength(1342)}
+,string apprep_installed_moderate {blob,maxlength(12631)}
+,string apprep_running_moderate {blob,maxlength(2649)}
+,string apprep_installed_benign {blob,maxlength(22360)}
+,string apprep_running_benign {blob,maxlength(2903)}
+,string30 action
+,string69 experiment_mobile_1
+,string73 experiment_mobile_2
+,string experiment_mobile_3
+,string experiment_mobile_4
+,string experiment_mobile_5
+,string2 experiment_mobile_6
+,string experiment_mobile_7 {blob,maxlength(283)}
+,string experiment_mobile_8
+,string experiment_mobile_9
+,string experiment_mobile_10 {blob,maxlength(373)}
+,string10 agent_image_creation
+,string92 agent_app_links
+,unsigned8 agent_free_space
+,string44 agent_name
+,string112 agent_app_info
+,string25 agent_bssid
+,string61 agent_ssid
+,string10 agent_boot_time
+,string21 agent_connection_type
+,string tmx_variables {blob,maxlength(11259)}
+,string18 api_site_id
+,string87 remote_desktop
+,string32 true_ip_organization_type
+,string10 true_ip_postal_code
+,string21 true_ip_routing_type
+,string true_ip_country_code
+,string20 true_ip_connection_type
+,boolean true_ip_home
+,boolean true_ip_hosting_facility
+,string7 true_ip_line_speed
+,string32 proxy_ip_organization_type
+,string10 proxy_ip_postal_code
+,string21 proxy_ip_routing_type
+,string proxy_ip_country_code
+,string20 proxy_ip_connection_type
+,boolean proxy_ip_home
+,boolean proxy_ip_hosting_facility
+,string7 proxy_ip_line_speed
+,string32 dns_ip_organization_type
+,string10 dns_ip_postal_code
+,string21 dns_ip_routing_type
+,string dns_ip_country_code
+,string20 dns_ip_connection_type
+,boolean dns_ip_home
+,boolean dns_ip_hosting_facility
+,string7 dns_ip_line_speed
+,string32 input_ip_organization_type
+,string10 input_ip_postal_code
+,string21 input_ip_routing_type
+,string2 input_ip_country_code
+,string20 input_ip_connection_type
+,boolean input_ip_home
+,boolean input_ip_hosting_facility
+,string7 input_ip_line_speed
+,unsigned8 agent_total_space
+,real4 agent_signal_strength
+,real4 agent_wps_accuracy
+,string page_fingerprint_hooks {blob,maxlength(48503)}
+,string honeypot_fingerprint_hooks {blob,maxlength(27291)}
+,string carrier_id
+,string carrier_id_activities
+,string carrier_id_assert_history
+,string carrier_id_attributes
+,string10 carrier_id_first_seen
+,string10 carrier_id_last_assertion
+,string10 carrier_id_last_event
+,string10 carrier_id_last_update
+,string carrier_id_result
+,integer2 carrier_id_score
+,integer2 carrier_id_worst_score
+,integer2 tmx_raw_score
+,string tmx_fraud_rating
+,real4 tmx_p_score
+,integer4 session_id_query_count
+,real4 input_latitude
+,real4 input_longitude
+,real4 tmx_risk_rank
+,real4 cba_score
+,integer4 policy_version
+,integer4 agent_profiling_delta
+,string js_os {blob,maxlength(281)}
+,string js_browser {blob,maxlength(281)}
+,string35 js_browser_string_hash
+,string19 browser
+,string95 os_version
+,boolean browser_anomaly
+,real4 agent_wps_latitude
+,real4 agent_wps_longitude
+,string61 agent_cell_id
+,string2 true_ip_region_iso_code
+,string2 proxy_ip_region_iso_code
+,string2 dns_ip_region_iso_code
+,string2 input_ip_region_iso_code
+,string fuzzy_device_id_reason_code {blob,maxlength(231)}
+,string32 additional_data
+,string19 event_tag
+,string44 agent_publickey_hash
+,string agent_publickey_hash_type {blob,maxlength(281)}
+,string55 input_request_id
+,string tmx_internal_variables {blob,maxlength(9338)}
+,string5 apiversion
+,string11 segment_name
+,real4 html_location_latitude
+,real4 html_location_longitude
+,real4 html_location_accuracy
+,real4 html_location_altitude
+,real4 html_location_heading
+,string webrtc_external_ip {blob,maxlength(281)}
+,string webrtc_internal_ip {blob,maxlength(281)}
+,string webrtc_ipv6 {blob,maxlength(281)}
+,string107 agent_publickey_hash_activities
+,string20 agent_publickey_hash_assert_history
+,string107 agent_publickey_hash_attributes
+,string10 agent_publickey_hash_first_seen
+,string10 agent_publickey_hash_last_assertion
+,string10 agent_publickey_hash_last_event
+,string10 agent_publickey_hash_last_update
+,string10 agent_publickey_hash_result
+,integer2 agent_publickey_hash_score
+,integer2 agent_publickey_hash_worst_score
+,integer2 smart_learning_policy_score
+,real4 smart_learning_risk_rank
+,string10 smart_learning_fraud_rating
+,real4 smart_learning_p_score
+,string smart_learning_variables {blob,maxlength(2463)}
+,string smart_learning_reason_code {blob,maxlength(527)}
+,string22 smart_learning_summary_reason_code
+,integer4 yyyymm
+,string carrier_name
+,string carrier_mobile_number
+,string carrier_mobile_number_activities
+,string carrier_mobile_number_assert_history
+,string carrier_mobile_number_attributes
+,string10 carrier_mobile_number_first_seen
+,string10 carrier_mobile_number_last_assertion
+,string10 carrier_mobile_number_last_event
+,string10 carrier_mobile_number_last_update
+,string carrier_mobile_number_result
+,integer2 carrier_mobile_number_score
+,integer2 carrier_mobile_number_worst_score
+,string carrier_mobile_number_match_result
+,string carrier_account
+,string carrier_account_activities
+,string carrier_account_assert_history
+,string carrier_account_attributes
+,string10 carrier_account_first_seen
+,string10 carrier_account_last_assertion
+,string10 carrier_account_last_event
+,string10 carrier_account_last_update
+,string carrier_account_result
+,integer2 carrier_account_score
+,integer2 carrier_account_worst_score
+,string carrier_account_match_result
+,string experiment_6 {blob,maxlength(4224)}
+,string experiment_7 {blob,maxlength(3634)}
+,string8 experiment_8
+,string experiment_9
+,string25 experiment_10
+,string account_email_domain {blob,maxlength(256)}
+,boolean private_browsing
+,string30 policy_site_id
+,string35 account_first_name
+,string35 account_last_name
+,string4 agent_device_caps
+,integer2 virtual_machine
+,string virtual_machine_reason
+,string58 customer_event_type
+,string35 application_name
+,string line_of_business {blob,maxlength(281)}
+,string35 local_attrib_11
+,string35 local_attrib_12
+,string35 local_attrib_13
+,string35 local_attrib_14
+,string35 local_attrib_15
+,string35 account_date_of_birth
+,string32 digital_id
+,integer4 digital_id_confidence
+,string digital_id_reason_code {blob,maxlength(446)}
+,string107 digital_id_activities
+,string107 digital_id_attributes
+,string10 digital_id_first_seen
+,string10 digital_id_last_event
+,string10 digital_id_last_update
+,string20 digital_id_result
+,integer4 digital_id_score
+,string test_digital_id
+,integer4 test_digital_id_confidence
+,string test_digital_id_reason_code {blob,maxlength(446)}
+,string test_digital_id_activities
+,string test_digital_id_attributes
+,string10 test_digital_id_first_seen
+,string10 test_digital_id_last_event
+,string10 test_digital_id_last_update
+,string test_digital_id_result
+,integer4 test_digital_id_score
+,real4 account_address_zip_latitude
+,real4 account_address_zip_longitude
+,real4 shipping_address_zip_latitude
+,real4 shipping_address_zip_longitude
+,string30 carrier_id_token
+,string webgl_hash {blob,maxlength(281)}
+,string canvas_hash {blob,maxlength(281)}
+,string targeted_malware {blob,maxlength(385)}
+,string local_ipv4 {blob,maxlength(281)}
+,string local_ipv6 {blob,maxlength(281)}
+,string mac_address {blob,maxlength(281)}
+,string flash_version_detected
+,string page_fingerprint_diff_names {blob,maxlength(14814)}
+,string honeypot_fingerprint_diff_names {blob,maxlength(77561)}
+,string40 advertising_id
+,string99 device_imei
+,string35 account_home_phone
+,string35 account_work_phone
+,string external_device_info
+,string account_address_zip_normalized
+,string shipping_address_zip_normalized
+,string11 selinux_status
+,integer2 app_integrity_score
+,real4 custom_count_5
+,real4 custom_count_6
+,real4 custom_count_7
+,real4 custom_count_8
+,real4 custom_count_9
+,real4 custom_count_10
+,real4 custom_count_11
+,real4 custom_count_12
+,real4 custom_count_13
+,real4 custom_count_14
+,real4 custom_count_15
+,string37 custom_output_11
+,string37 custom_output_12
+,string37 custom_output_13
+,string37 custom_output_14
+,string37 custom_output_15
+,string37 custom_output_16
+,string37 custom_output_17
+,string37 custom_output_18
+,string37 custom_output_19
+,string37 custom_output_20
+,string62 ua_os_alt
+,string67 ua_os_version_alt
+,string28 ua_browser_alt
+,string66 ua_browser_version_alt
+,integer2 virtual_device
+,string virtual_device_reason {blob,maxlength(464)}
+,string22 dns_ip_assert_history
+,string dns_ip_attributes {blob,maxlength(249)}
+,string dns_ip_activities {blob,maxlength(180)}
+,string11 primary_industry
+,string22 secondary_industry
+,boolean ship_address_is_bill_address
+,integer2 merchant_category_code
+,string merchant_country_code {blob,maxlength(396)}
+,string merchant_name {blob,maxlength(396)}
+,string merchant_id {blob,maxlength(352)}
+,string41 auth_methods
+,string device_health_reasons {blob,maxlength(150)}
+,string local_attrib_1_activities {blob,maxlength(517)}
+,string local_attrib_2_activities {blob,maxlength(205)}
+,string100 local_attrib_3_activities
+,string local_attrib_4_activities {blob,maxlength(278)}
+,string62 local_attrib_5_activities
+,string102 local_attrib_6_activities
+,string58 local_attrib_7_activities
+,string58 local_attrib_8_activities
+,string58 local_attrib_9_activities
+,string74 local_attrib_10_activities
+,string56 local_attrib_11_activities
+,string74 local_attrib_12_activities
+,string56 local_attrib_13_activities
+,string56 local_attrib_14_activities
+,string56 local_attrib_15_activities
+,string10 local_attrib_1_first_seen
+,string10 local_attrib_2_first_seen
+,string10 local_attrib_3_first_seen
+,string10 local_attrib_4_first_seen
+,string10 local_attrib_5_first_seen
+,string10 local_attrib_6_first_seen
+,string10 local_attrib_7_first_seen
+,string10 local_attrib_8_first_seen
+,string10 local_attrib_9_first_seen
+,string10 local_attrib_10_first_seen
+,string10 local_attrib_11_first_seen
+,string10 local_attrib_12_first_seen
+,string10 local_attrib_13_first_seen
+,string10 local_attrib_14_first_seen
+,string10 local_attrib_15_first_seen
+,string experiment_mobile_array {blob,maxlength(1981)}
+,string experiment_array
+,string70 web_session_id
+,string122 web_session_id_activities
+,string web_session_id_attributes
+,string10 web_session_id_first_seen
+,string10 web_session_id_last_event
+,string10 web_session_id_last_update
+,string10 web_session_id_result
+,integer4 web_session_id_score
+,string wurfl_info {blob,maxlength(688)}
+,string collected_ip_addresses {blob,maxlength(2080)}
+,string139 exact_id_health
+,boolean use_test_apn
+,string41 challenger_policy
+,integer2 challenger_policy_score
+,string challenger_reason_code {blob,maxlength(3862)}
+,string8 challenger_risk_rating
+,string124 challenger_summary_reason_code
+,string7 challenger_review_status
+,string10 digital_id_confidence_rating
+,string digital_id_trust_score_reason_code {blob,maxlength(827)}
+,string57 digital_id_trust_score_summary_reason_code
+,real4 digital_id_trust_score
+,string10 digital_id_trust_score_rating
+,string digital_id_trust_score_variables {blob,maxlength(2421)}
+,string rules {blob,maxlength(396)}
+,string35 external_guid
+,string global_third_party_cookie
+,string national_id_type
+,string national_id_number
+,string threeds_comp_ind
+,string targeted_storage {blob,maxlength(211)}
+,string3 turn_os_sig_raw
+,integer2 turn_os_sig_ttl
+,string11 turn_os_signature
+,integer4 turn_system_state
+,integer4 turn_tcp_tstmp_rate
+,string org_group_id
+,string ssl_fp_client
+,string ssl_fp_category
+end;
+
+export key_payload:=record
+  string8 org_id;
+  unsigned3 tx_date;
+  unsigned1 tx_time_hh;
+  unsigned1 tx_time_mm;
+  unsigned1 tx_time_ss;
+  unsigned2 tx_time_ms;
+  string23 date_time;
+  string30 api_type;
+  string30 event_type;
+  string32 request_id;
+  boolean unknown_session;
+  string50 policy;
+  string8 request_result;
+  string15 risk_rating;
+  string15 review_status;
+  integer2 policy_score;
+  string35 account_login;
+  string32 fuzzy_device_id;
+  string35 account_email;
+  string true_ip;
+  string device_id;
+  string account_number;
+  string digital_id;
+  string transaction_id;
+  string35 account_telephone;
+  string session_id;
+  string input_ip_address;
+  string true_ip_geo;
+  string account_name;
+  string password_hash;
+  string ssn_hash;
+  string browser_language;
+  string headers_order_string_hash;
+  string account_email_domain;
+  string canvas_hash;
+  string webgl_hash;
+  string ua_browser;
+  string account_address_country;
+  string line_of_business;
+  string ua_os;
+  string os;
+  string account_address_zip;
+  string input_ip_isp;
+  string cc_bin_number;
+  string agent_type;
+  string proxy_ip;
+  string true_ip_isp;
+  string cc_number_hash;
+  string browser_string_hash;
+  string local_attrib_12;
+  string time_zone;
+  string browser;
+  string account_address_city;
+  string35 local_attrib_1;
+  string35 local_attrib_2;
+  string35 local_attrib_3;
+  string35 local_attrib_4;
+  string35 local_attrib_5;
+  string35 local_attrib_6;
+  string35 local_attrib_7;
+  string35 local_attrib_10;
+  string condition_attrib_3;
+  string condition_attrib_4;
+  integer8 yyyymm;
+end;
+
+end;

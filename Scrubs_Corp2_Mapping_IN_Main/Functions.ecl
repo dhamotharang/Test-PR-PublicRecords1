@@ -23,7 +23,8 @@ EXPORT Functions := MODULE
 		
 		//Below table needs to be updated when we see new Org_Struc codes in Raw updates!
 		EXPORT set_valid_org_cd := ['2','3','4','5','6','7','8','9','10','11','14','15','16','17','18','19','20',
-																'21','22','23','30','31','32','33','34','35','36','37','39','40','41','42',''];
+																'21','22','23','30','31','32','33','34','35','36','37','39','40','41','42',
+																'45','46',''];
 																
 		//Below table needs to be updated when we see new status codes in Raw updates!
 		EXPORT set_valid_status_cd:= ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16',

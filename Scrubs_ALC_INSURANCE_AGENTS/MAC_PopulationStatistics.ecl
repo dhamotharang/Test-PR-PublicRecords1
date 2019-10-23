@@ -1,9 +1,9 @@
- 
+﻿ 
 EXPORT MAC_PopulationStatistics(infile,Ref='',Input_fname = '',Input_lname = '',Input_title = '',Input_company = '',Input_address1 = '',Input_address2 = '',Input_city = '',Input_state = '',Input_zip = '',Input_zip4 = '',Input_cart = '',Input_bar = '',Input_gender = '',Input_country = '',Input_postal_cd = '',Input_dpv = '',Input_addr_type = '',Input_county_cd = '',Input_insurance_type = '',Input_license_type = '',Input_msa = '',Input_nielsen_county_cd = '',Input_list_id = '',Input_scno = '',Input_keycode = '',Input_custno = '',OutFile) := MACRO
-  IMPORT SALT32,Scrubs_ALC_INSURANCE_AGENTS;
+  IMPORT SALT37,Scrubs_ALC_INSURANCE_AGENTS;
   #uniquename(of)
   %of% := RECORD
-    SALT32.Str512Type fields;
+    SALT37.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

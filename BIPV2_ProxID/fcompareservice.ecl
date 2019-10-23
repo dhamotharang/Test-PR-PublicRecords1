@@ -1,4 +1,4 @@
-IMPORT SALT24,BIPV2_ProxID,ut,tools;
+﻿IMPORT SALT24,BIPV2_ProxID,ut,tools;
 export fcompareservice(
    string proxid1 
   ,string proxid2

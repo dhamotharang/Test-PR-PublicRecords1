@@ -1,4 +1,4 @@
-//so take iteration 24 from BIPV2_ProxID 
+﻿//so take iteration 24 from BIPV2_ProxID 
 //then do the corpkey unhack in in_dot_base when it pulls it in.
 //matches: hack cnp_number_score to make sure an exact match qualifies even if the values are considered null.
 //         hack prim_range_score the same way as cnp_number_score

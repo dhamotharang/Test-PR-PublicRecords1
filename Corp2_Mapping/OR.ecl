@@ -1,4 +1,4 @@
-import corp2, corp2_mapping, corp2_raw_or, scrubs_corp2_mapping_or_ar, scrubs, scrubs_corp2_mapping_or_event,
+﻿import corp2, corp2_mapping, corp2_raw_or, scrubs_corp2_mapping_or_ar, scrubs, scrubs_corp2_mapping_or_event,
 			 scrubs_corp2_mapping_or_main, std, tools, ut, versioncontrol;
 			 
 export OR := MODULE; 
@@ -21,7 +21,7 @@ export OR := MODULE;
 		BusinessTypesList						:= ['MAILING ADDRESS','PRINCIPAL PLACE OF BUSINESS','RECORDS OFFICE','RESERVED NAME','REGISTERED NAME','VALID RECORD'];
 		RATypesList									:= ['AUTHORIZED REPRESENTATIVE','REGISTERED AGENT'];
 		BusinessRAList							:= BusinessTypesList + RATypesList;
-		ContactTypesList						:= ['APPLICANT','CORRESPONDENT','GENERAL PARTNER','MANAGER','MANAGING PARTNER','MEMBER','NONFILEABLE CORRESPONDENT','PARTNER','PRESIDENT','REGISTRANT','SECRETARY','TRUSTEE'];
+		ContactTypesList						:= ['APPLICANT','CORRESPONDENT','GENERAL PARTNER','INDIVIDUAL WITH DIRECT KNOWLEDGE','MANAGER','MANAGING PARTNER','MEMBER','NONFILEABLE CORRESPONDENT','PARTNER','PRESIDENT','REGISTRANT','SECRETARY','TRUSTEE'];
 		AllTypesList								:= AnnualReportTypeList + BusinessTypesList + RATypesList + ContactTypesList;
 
 		//********************************************************************
@@ -723,15 +723,13 @@ export OR := MODULE;
 
 		AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
-		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																															,'Scrubs CorpAR_OR Report' //subject
 																															,'Scrubs CorpAR_OR Report' //body
 																															,(data)AR_ScrubsAttachment
 																															,'text/csv'
 																															,'Corp'+state_origin+'ARScrubsReport.csv'																															
-																															,
-																															,
-																															,corp2.Email_Notification_Lists.spray);
+																														);
 
 		AR_BadRecords				 := AR_N.ExpandedInFile(	
 																								corp_key_Invalid							  			<> 0 or
@@ -770,7 +768,7 @@ export OR := MODULE;
 																							,AR_ErrorSummary
 																							,AR_ScrubErrorReport
 																							,AR_SomeErrorValues	
-																							,AR_SubmitStats
+																						  ,AR_SubmitStats
 																					);
 
 		//********************************************************************
@@ -802,15 +800,13 @@ export OR := MODULE;
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
 
-		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpEvent_OR Report' //subject
 																																 ,'Scrubs CorpEvent_OR Report' //body
 																																 ,(data)Event_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'Corp'+state_origin+'EventScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 
 		Event_BadRecords				 	:= Event_N.ExpandedInFile(	
 																												corp_key_Invalid							  			<> 0 or
@@ -883,15 +879,13 @@ export OR := MODULE;
 
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpMain_OR Report' //subject
 																																 ,'Scrubs CorpMain_OR Report' //body
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'Corp'+state_origin+'MainScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 
 		Main_BadRecords						:= Main_N.ExpandedInFile(	
 																											 dt_vendor_first_reported_Invalid 			<> 0 or

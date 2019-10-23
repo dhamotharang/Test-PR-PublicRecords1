@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="MEOW_xIDL_Service">
 <part name="SNAME" type="xsd:string"/>
 <part name="FNAME" type="xsd:string"/>
@@ -45,6 +45,7 @@
 <p>SSN5:SSN4</p>
 <p>SSN4:FNAME:LNAME(NOFUZZY)</p>
 <p>DOB:LNAME</p>
+<p>DOB:FNAME</p>
 <p>ZIP:PRIM_RANGE</p>
 <p>SRC:SOURCE_RID</p>
 <p>DL_NBR:DL_STATE</p>
@@ -53,16 +54,15 @@
 <p>fname2:lname2</p>
 */
 EXPORT MEOW_xIDL_Service := MACRO
-	#WEBSERVICE(FIELDS(
+  #WEBSERVICE(FIELDS(
 	'SNAME', 'FNAME', 'MNAME', 'LNAME', 'NAME', 'DERIVED_GENDER',
 	'ADDRESS1', 'ADDRESS2', 'PRIM_RANGE', 'PRIM_NAME', 'SEC_RANGE', 'CITY',
 	'ST', 'ZIP', 'SSN', 'DOB', 'PHONE', 'DL_STATE', 'DL_NBR', 'fname2', 'lname2', 'SRC', 'SOURCE_RID', 'RID',
 	'disableForce','MaxIds', 'LeadThreshold', 'UniqueID'
 	),
-	DESCRIPTION('SALT V3.7 <p/>'));/*HACK*/
+	DESCRIPTION('SALT V3.7 <p/>'));/*HACK19*/
   IMPORT SALT37,InsuranceHeader_xLink;
-	
-	STRING Input_NAME := '' : STORED('NAME');
+  STRING Input_NAME := '' : STORED('NAME'); /*HACK20*/ 
 	clean_n := address.CleanPersonFML73(Input_NAME);
 	clean_n_parsed := Address.CleanNameFields(clean_n);
 	nameLine := Input_name != '';
@@ -78,7 +78,7 @@ EXPORT MEOW_xIDL_Service := MACRO
   STRING addressLine1 := '' : STORED('ADDRESS1');
 	STRING addressLine2 := '' : STORED('ADDRESS2');
 	CleanedAddress		:= Address.CleanAddressFieldsFips(Address.CleanAddress182(AddressLine1, AddressLine2)).addressrecord;
-	addressLine 			:= addressLine1 != '' and addressLine2 != '';
+	addressLine 		:= addressLine1 != '' and addressLine2 != '';
 	STRING sPrim_range := '' : STORED('PRIM_RANGE');
 	SALT37.StrType Input_PRIM_RANGE := IF(addressLine,  CleanedAddress.prim_range, sPrim_range);
 	STRING sPrim_name :=  '' : STORED('PRIM_NAME');
@@ -94,7 +94,7 @@ EXPORT MEOW_xIDL_Service := MACRO
 	SALT37.StrType Input_SSN := '' : STORED('SSN');
 	INTEGER ssnInt := (INTEGER)Input_SSN;
 	SALT37.StrType Input_SSN5 := IF(ssnInt<>0, InsuranceHeader_xLink.mod_SSNParse(Input_SSN).SSN5, '');/* HACK SSN5 */
-  SALT37.StrType Input_SSN4 := IF(ssnInt<>0, InsuranceHeader_xLink.mod_SSNParse(Input_SSN).SSN4, ''); /* HACK SSN4 */
+ 	SALT37.StrType Input_SSN4 := IF(ssnInt<>0, InsuranceHeader_xLink.mod_SSNParse(Input_SSN).SSN4, ''); /* HACK SSN4 */
 	SALT37.StrType Input_DOB := '' : STORED('DOB');
   SALT37.StrType Input_PHONE := '' : STORED('PHONE');
   SALT37.StrType Input_DL_STATE := '' : STORED('DL_STATE');
@@ -118,28 +118,28 @@ EXPORT MEOW_xIDL_Service := MACRO
   UNSIGNED Input_LeadThreshold := 0 : STORED('LeadThreshold');	
   UNSIGNED e_DID := 0 : STORED('DID');
   UNSIGNED e_RID := 0 : STORED('RID');
-  BOOLEAN Input_disableForce := InsuranceHeader_xLink.Config.DOB_NotUseForce : STORED('disableForce');
+  BOOLEAN Input_disableForce := InsuranceHeader_xLink.Config.DOB_NotUseForce : STORED('disableForce');/*HACK18*/
  
   Template := DATASET([],InsuranceHeader_xLink.Process_xIDL_Layouts().InputLayout);
-	ToUpperCase(STRING aString) := STD.Str.ToUpperCase(aString);
+	ToUpperCase(STRING aString) := STD.Str.ToUpperCase(aString); /*HACK21a*/
   Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold,Input_disableForce
-  ,(TYPEOF(Template.SNAME))InsuranceHeader_xLink.Fields.Make_SNAME(ToUpperCase((SALT37.StrType)Input_SNAME))
-  ,(TYPEOF(Template.FNAME))InsuranceHeader_xLink.Fields.Make_FNAME(ToUpperCase((SALT37.StrType)Input_FNAME))
-  ,(TYPEOF(Template.MNAME))InsuranceHeader_xLink.Fields.Make_MNAME(ToUpperCase((SALT37.StrType)Input_MNAME))
-  ,(TYPEOF(Template.LNAME))InsuranceHeader_xLink.Fields.Make_LNAME(ToUpperCase((SALT37.StrType)Input_LNAME))
-  ,(TYPEOF(Template.DERIVED_GENDER))InsuranceHeader_xLink.Fields.Make_DERIVED_GENDER(ToUpperCase((SALT37.StrType)Input_DERIVED_GENDER))
-  ,(TYPEOF(Template.PRIM_RANGE))InsuranceHeader_xLink.Fields.Make_PRIM_RANGE(ToUpperCase((SALT37.StrType)Input_PRIM_RANGE))
-  ,(TYPEOF(Template.PRIM_NAME))InsuranceHeader_xLink.Fields.Make_PRIM_NAME(ToUpperCase((SALT37.StrType)Input_PRIM_NAME))
-  ,(TYPEOF(Template.SEC_RANGE))InsuranceHeader_xLink.Fields.Make_SEC_RANGE(ToUpperCase((SALT37.StrType)Input_SEC_RANGE))
-  ,(TYPEOF(Template.CITY))InsuranceHeader_xLink.Fields.Make_CITY(ToUpperCase((SALT37.StrType)Input_CITY))
-  ,(TYPEOF(Template.ST))InsuranceHeader_xLink.Fields.Make_ST(ToUpperCase((SALT37.StrType)Input_ST))
+  ,(TYPEOF(Template.SNAME))InsuranceHeader_xLink.Fields.Make_SNAME(ToUpperCase((SALT37.StrType)Input_SNAME)) /*HACK21b*/
+  ,(TYPEOF(Template.FNAME))InsuranceHeader_xLink.Fields.Make_FNAME(ToUpperCase((SALT37.StrType)Input_FNAME)) /*HACK21b*/
+  ,(TYPEOF(Template.MNAME))InsuranceHeader_xLink.Fields.Make_MNAME(ToUpperCase((SALT37.StrType)Input_MNAME)) /*HACK21b*/
+  ,(TYPEOF(Template.LNAME))InsuranceHeader_xLink.Fields.Make_LNAME(ToUpperCase((SALT37.StrType)Input_LNAME)) /*HACK21b*/
+  ,(TYPEOF(Template.DERIVED_GENDER))InsuranceHeader_xLink.Fields.Make_DERIVED_GENDER(ToUpperCase((SALT37.StrType)Input_DERIVED_GENDER)) /*HACK21b*/
+  ,(TYPEOF(Template.PRIM_RANGE))InsuranceHeader_xLink.Fields.Make_PRIM_RANGE(ToUpperCase((SALT37.StrType)Input_PRIM_RANGE)) /*HACK21b*/
+  ,(TYPEOF(Template.PRIM_NAME))InsuranceHeader_xLink.Fields.Make_PRIM_NAME(ToUpperCase((SALT37.StrType)Input_PRIM_NAME)) /*HACK21b*/
+  ,(TYPEOF(Template.SEC_RANGE))InsuranceHeader_xLink.Fields.Make_SEC_RANGE(ToUpperCase((SALT37.StrType)Input_SEC_RANGE)) /*HACK21b*/
+  ,(TYPEOF(Template.CITY))InsuranceHeader_xLink.Fields.Make_CITY(ToUpperCase((SALT37.StrType)Input_CITY)) /*HACK21b*/
+  ,(TYPEOF(Template.ST))InsuranceHeader_xLink.Fields.Make_ST(ToUpperCase((SALT37.StrType)Input_ST)) /*HACK21b*/
   ,(TYPEOF(Template.ZIP))Input_ZIP
   ,(TYPEOF(Template.SSN5))InsuranceHeader_xLink.Fields.Make_SSN5((SALT37.StrType)Input_SSN5)
   ,(TYPEOF(Template.SSN4))InsuranceHeader_xLink.Fields.Make_SSN4((SALT37.StrType)Input_SSN4)
   ,(TYPEOF(Template.DOB))InsuranceHeader_xLink.Fields.Make_DOB((SALT37.StrType)Input_DOB)
   ,(TYPEOF(Template.PHONE))Input_PHONE
-  ,(TYPEOF(Template.DL_STATE))InsuranceHeader_xLink.Fields.Make_DL_STATE(ToUpperCase((SALT37.StrType)Input_DL_STATE))
-  ,(TYPEOF(Template.DL_NBR))InsuranceHeader_xLink.Fields.Make_DL_NBR(ToUpperCase((SALT37.StrType)Input_DL_NBR))
+  ,(TYPEOF(Template.DL_STATE))InsuranceHeader_xLink.Fields.Make_DL_STATE(ToUpperCase((SALT37.StrType)Input_DL_STATE)) /*HACK21b*/
+  ,(TYPEOF(Template.DL_NBR))InsuranceHeader_xLink.Fields.Make_DL_NBR(ToUpperCase((SALT37.StrType)Input_DL_NBR)) /*HACK21b*/
   ,(TYPEOF(Template.SRC))InsuranceHeader_xLink.Fields.Make_SRC((SALT37.StrType)Input_SRC)
   ,(TYPEOF(Template.SOURCE_RID))InsuranceHeader_xLink.Fields.Make_SOURCE_RID((SALT37.StrType)Input_SOURCE_RID)
   ,(TYPEOF(Template.DT_FIRST_SEEN))InsuranceHeader_xLink.Fields.Make_DT_FIRST_SEEN((SALT37.StrType)Input_DT_FIRST_SEEN)
@@ -151,12 +151,12 @@ EXPORT MEOW_xIDL_Service := MACRO
   ,(TYPEOF(Template.ADDR1))InsuranceHeader_xLink.Fields.Make_ADDR1((SALT37.StrType)Input_ADDR1)
   ,(TYPEOF(Template.LOCALE))InsuranceHeader_xLink.Fields.Make_LOCALE((SALT37.StrType)Input_LOCALE)
   ,(TYPEOF(Template.ADDRESS))InsuranceHeader_xLink.Fields.Make_ADDRESS((SALT37.StrType)Input_ADDRESS)
-  ,(TYPEOF(Template.fname2))ToUpperCase(Input_fname2)
-  ,(TYPEOF(Template.lname2))ToUpperCase(Input_lname2)
+  ,(TYPEOF(Template.fname2))ToUpperCase(Input_fname2)/*HACK21c*/
+  ,(TYPEOF(Template.lname2))ToUpperCase(Input_lname2)/*HACK21c*/
   ,false,false,0,0}],InsuranceHeader_xLink.Process_xIDL_Layouts().InputLayout);
  
   pm := InsuranceHeader_xLink.MEOW_xIDL(Input_Data); // This module performs regular xDID functions
-	outputResults := pm.Raw_Results;
+  outputResults := pm.Raw_Results;
 	OUTPUT(outputResults,NAMED('Results'));
 	// add segmentation and keys_used description
 	segKey := InsuranceHeader_PostProcess.segmentation_keys.key_did;
@@ -187,5 +187,5 @@ EXPORT MEOW_xIDL_Service := MACRO
 				self.Keys_tried_desc := InsuranceHeader_xLink.Process_xIDL_Layouts().KeysUsedToText(left.Keys_tried);
 				self.results := res;
 			self := left));
-	output(resultsFormatted, named('FormattedResults'));
+	output(resultsFormatted, named('FormattedResults'));/*MXIDLHACK01*/
 ENDMACRO;

@@ -1,4 +1,4 @@
-Import Data_Services, doxie,FLAccidents;
+﻿Import Data_Services, doxie,FLAccidents;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -148,7 +148,8 @@ self.carrier_name					:= '';
 self.client_type_id					:= '';
 self.accident_nbr := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');  
 self.orig_accnbr := l.accident_nbr; 
-self.driver_dob  := l.driver_dob[5..8]+l.driver_dob[1..4] ;
+tdriver_dob := TRIM(l.driver_dob, LEFT, RIGHT);
+self.driver_dob  := TRIM(TRIM(tdriver_dob[1..4], LEFT, RIGHT) + TRIM(tdriver_dob[5..8], LEFT, RIGHT), LEFT, RIGHT);
 self.driver_race_desc :='';
 self.driver_sex_desc :='';
 self.driver_residence_desc  :='';
@@ -199,7 +200,7 @@ self.driver_st_city			:= if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAM
 									
 self.driver_resident_state 	:= if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.state,'');
 self.driver_zip  			:= if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.zip5,'');
-self.driver_dob    			:= L.dob;
+self.driver_dob    			:= TRIM(L.dob, LEFT, RIGHT);
 self.driver_dl_nbr			:= if(L.pty_drivers_license !=''
 										,L.pty_drivers_license
 										,if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.drivers_license,''));
@@ -256,7 +257,7 @@ self.driver_st_city			    := L.city;
 									
 self.driver_resident_state 	:= L.state;
 self.driver_zip  			  := L.zip5;
-self.driver_dob    			:= L.dob_1;
+self.driver_dob    			:= TRIM(L.dob_1, LEFT, RIGHT);
 self.driver_dl_nbr			:= L.drivers_license;
 self.driver_lic_st			:= L.drivers_license_st;
 self.driver_sex				:= L.gender_1[1];
@@ -317,7 +318,7 @@ self.driver_name_suffix := if(l.name_suffx ='N', '',l.name_suffx) ;
 self.driver_st_city := trim(l.address,left,right) +' '+trim( l.city,left,right); 
 self.driver_resident_state := l.state ;
 self.driver_zip := l.zip_code; 
-self.driver_dob := l.date_of_birth;
+self.driver_dob := TRIM(l.date_of_birth, LEFT, RIGHT);
 self.driver_dl_force_asterisk := ''; 
 self.driver_dl_nbr := l.drivers_license_number;
 self.driver_lic_st := L.drivers_license_jurisdiction; 

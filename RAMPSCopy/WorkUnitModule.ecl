@@ -1,4 +1,4 @@
-import _Control;
+﻿import _Control,ut;
 
 EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
 	
@@ -31,6 +31,7 @@ EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
 																						 rWUCreateAndUpdateRequest,
 																						 rWUCreateAndUpdateResponse,
 																						 xpath('WUUpdateResponse')
+																						 ,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 																						);
 
 			return	dWUCreateAndUpdateResult.WUID;
@@ -62,6 +63,7 @@ EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
 																	 rWUSubmitRequest,
 																	 rWUSubmitResponse,
 																	 xpath('WUSubmitResponse/Exceptions/Exception')
+																	 ,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 																	);
 
 			return	dWUSubmitResult;

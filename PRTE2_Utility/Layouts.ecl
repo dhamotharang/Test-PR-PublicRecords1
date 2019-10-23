@@ -1,6 +1,9 @@
-import UtilFile, Address, AID;
+﻿import UtilFile, Address, AID;
 
 EXPORT Layouts := module
+
+
+
 
 	export incoming := record
 			string15  id;
@@ -32,6 +35,17 @@ EXPORT Layouts := module
 			string22  drivers_license;
 	    string10 	cust_num;
 			string10	bug_num;
+		  string8	  link_dob;
+      string9   link_ssn;
+      string9   link_fein;
+      string9   link_inc_date;
+      string100 company_name;
+      string50  orig_addr1;
+      string50  orig_add2;
+      string20  orig_city;
+      string2   orig_st;
+      string10  orig_zip;
+
 			end;
 
 	export base := record

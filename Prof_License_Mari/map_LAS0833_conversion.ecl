@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take LA Appraisers License raw file and convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //  The new appraiser file has the same format as the broker/salesperson layout. Use the code from map_LAS0832_conversion
@@ -29,7 +29,7 @@ EXPORT map_LAS0833_conversion(STRING pVersion) := FUNCTION
 									 AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(ORG_NAME)));
   ut.CleanFields(ValidFile, clnValidFile);
 	maribase_plus_dbas := RECORD,MAXLENGTH(5200)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba;
 		STRING60 dba1;
 		STRING60 dba2;
@@ -501,7 +501,7 @@ EXPORT map_LAS0833_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 		SELF.NAME_ORG_SUFX	:= StringLib.StringFilterOut(L.NAME_ORG_SUFX, '.');
 		TrimDBASufx		   	:= MAP(REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => StringLib.StringFindReplace(L.TMP_DBA,'CO',''),
 										  	 NOT REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => Prof_License_Mari.mod_clean_name_addr.cleanFName(L.TMP_DBA), 
@@ -521,7 +521,7 @@ EXPORT map_LAS0833_conversion(STRING pVersion) := FUNCTION
 	//Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 	company_only_lookup := ds_map_base(affil_type_cd='CO');
 
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;
@@ -531,7 +531,7 @@ EXPORT map_LAS0833_conversion(STRING pVersion) := FUNCTION
 									 AND LEFT.AFFIL_TYPE_CD in ['IN', 'BR'],
 									 assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);																		
 
-	Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 		SELF.provnote_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
 								TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'This is not a main office.  It is a branch office without an associated main office from this source.',
 								 L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 

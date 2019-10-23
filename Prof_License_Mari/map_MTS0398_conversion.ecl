@@ -1,5 +1,6 @@
-// MTS0398 / Montana Department of Labor and Industry /	Multiple Professions / raw data to common layout for MARI and PL use
+﻿// MTS0398 / Montana Department of Labor and Industry /	Multiple Professions / raw data to common layout for MARI and PL use
 import Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
+#workunit('name','Yogurt: map_MTS0398_conversion'); 
 
 EXPORT map_MTS0398_conversion(STRING pVersion) := FUNCTION
 
@@ -29,7 +30,7 @@ EXPORT map_MTS0398_conversion(STRING pVersion) := FUNCTION
 	Sufx_Pattern      := '( SR.| SR| JR.| JR| III| II| IV| VII| VI)';
 	
 	maribase_plus_dbas := RECORD,MAXLENGTH(5200)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba;
 		STRING60 dba1;
 		STRING60 dba2;
@@ -222,13 +223,13 @@ EXPORT map_MTS0398_conversion(STRING pVersion) := FUNCTION
 														 'ROBERT STOLZENBACH BROKER| SKY PROPERTES$| STATE ACQUISITIONS$)';
 
 		//Use address cleaner to clean address
-		CoPattern								:= '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
+		CoPattern								:= '(^.* LLC$|^.* LLC\\.$|^.*,LLC$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 															 '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +
 															 '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|' +
 															 '^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|' +
 															 '^C-21 .*$|^PRUDENTIAL .*$|^.* REALTORS$|^.* PROPERTIES$' +
 															 ')';
-		RemovePattern						:= '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
+		RemovePattern						:= '(^.* LLC$|^.* LLC\\.$|^.*,LLC$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 															 '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +
 															 '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|' +
 															 '^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|' +
@@ -470,7 +471,7 @@ EXPORT map_MTS0398_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 			SELF.NAME_ORG_SUFX	:= StringLib.StringFilterOut(L.NAME_ORG_SUFX, '.');
 			TrimDBASufx			:=MAP(REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => StringLib.StringFindReplace(L.TMP_DBA,'CO',''),
 												 NOT REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => Prof_License_Mari.mod_clean_name_addr.cleanFName(L.TMP_DBA), 
@@ -490,7 +491,7 @@ EXPORT map_MTS0398_conversion(STRING pVersion) := FUNCTION
 	//Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 	company_only_lookup := ds_map_base(affil_type_cd='CO');
 
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;
@@ -500,7 +501,7 @@ EXPORT map_MTS0398_conversion(STRING pVersion) := FUNCTION
 										AND LEFT.AFFIL_TYPE_CD in ['IN', 'BR'],
 										 assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);																		
 
-	Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 		SELF.provnote_1 :=MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
 								TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'This is not a main office.  It is a branch office without an associated main office from this source.',
 								 L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 

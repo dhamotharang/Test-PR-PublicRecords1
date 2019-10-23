@@ -1,4 +1,4 @@
-import RoxieKeyBuild,PRTE, _control, STD,prte2,tools;
+﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools;
 
 EXPORT proc_build_keys(string filedate) := function
 
@@ -85,7 +85,7 @@ buildKey	:=	sequential(
 												,to_qa
 												,build_autokeys_foreclosure
 												,build_autokeys_nod
-												,updatedops
+												// ,updatedops
 												);	
 
 return	buildKey;

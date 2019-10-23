@@ -1,5 +1,5 @@
-import corp2,corp2_mapping,corp2_raw_al,Corp2_Raw_ar,corp2_raw_co,corp2_raw_ga,corp2_raw_hi,corp2_raw_ia,corp2_raw_il,corp2_raw_ks,corp2_raw_ky,corp2_raw_la,corp2_raw_ma,
-			 corp2_raw_me,corp2_raw_mi,corp2_raw_mn,corp2_raw_mo,corp2_raw_mt,corp2_raw_nd,corp2_raw_nh,corp2_raw_nm,corp2_raw_nv,corp2_raw_or,corp2_raw_sc,corp2_raw_tn,
+﻿import corp2,corp2_mapping,corp2_raw_al,Corp2_Raw_ar,corp2_raw_co,corp2_raw_ga,corp2_raw_hi,corp2_raw_ia,corp2_raw_il,corp2_raw_ks,corp2_raw_ky,corp2_raw_la,corp2_raw_ma,
+			 corp2_raw_me,corp2_raw_mi,corp2_raw_mn,corp2_raw_mo,corp2_raw_mt,corp2_raw_nh,corp2_raw_nm,corp2_raw_nv,corp2_raw_or,corp2_raw_sc,corp2_raw_tn,
 			 corp2_raw_tx,corp2_raw_va,corp2_raw_vt,corp2_raw_wa,corp2_raw_wy,ut;
 			 
 export fCleanPersonName(string pStateOrigin,string pStateOriginDesc,string pfName='',string pmName='',string plName='') := module
@@ -19,11 +19,11 @@ export fCleanPersonName(string pStateOrigin,string pStateOriginDesc,string pfNam
 	//	 and "AS" exists in the middle name and "ABOVE" exists is the last name
 	//   or all these words exists in one of the parameter fields.
 	//********************************************************************                       
-		shared UC_StateOrigin			:= ut.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
-		shared UC_StateOriginDesc	:= ut.fn_RemoveSpecialChars(corp2.t2u(pStateOriginDesc));		
-		shared UC_FName 					:= ut.fn_RemoveSpecialChars(corp2.t2u(pfName));
-		shared UC_MName						:= ut.fn_RemoveSpecialChars(corp2.t2u(pmName));
-		shared UC_LName		 				:= ut.fn_RemoveSpecialChars(corp2.t2u(plName));
+		shared UC_StateOrigin			:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
+		shared UC_StateOriginDesc	:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOriginDesc));		
+		shared UC_FName 					:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pfName));
+		shared UC_MName						:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pmName));
+		shared UC_LName		 				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(plName));
 
 		export CleanCharsFName  	:= Map(pStateOrigin = 'AL' => regexreplace(corp2_raw_al.fGetRegExPattern.FirstName.InvalidChars,UC_FName,''),
 																		 pStateOrigin = 'AR' => regexreplace(corp2_raw_ar.fGetRegExPattern.FirstName.InvalidChars,UC_FName,''),
@@ -41,7 +41,6 @@ export fCleanPersonName(string pStateOrigin,string pStateOriginDesc,string pfNam
 																		 pStateOrigin = 'MN' => regexreplace(corp2_raw_mn.fGetRegExPattern.FirstName.InvalidChars,UC_FName,''),
 																		 pStateOrigin = 'MO' => regexreplace(corp2_raw_mo.fGetRegExPattern.FirstName.InvalidChars,UC_FName,''),
 																		 pStateOrigin = 'MT' => regexreplace(corp2_raw_mt.fGetRegExPattern.FirstName.InvalidChars,UC_FName,''),																		 
-																		 pStateOrigin = 'ND' => regexreplace(corp2_raw_nd.fGetRegExPattern.FirstName.InvalidChars,UC_FName,''),																		 
 																		 pStateOrigin = 'NH' => regexreplace(corp2_raw_nh.fGetRegExPattern.FirstName.InvalidChars,UC_FName,''),
 																		 pStateOrigin = 'NM' => regexreplace(corp2_raw_nm.fGetRegExPattern.FirstName.InvalidChars,UC_FName,''),
 																		 pStateOrigin = 'NV' => regexreplace(corp2_raw_nv.fGetRegExPattern.FirstName.InvalidChars,UC_FName,''),
@@ -71,7 +70,6 @@ export fCleanPersonName(string pStateOrigin,string pStateOriginDesc,string pfNam
 																		 pStateOrigin = 'MN' => regexreplace(corp2_raw_mn.fGetRegExPattern.FirstName.InvalidWords,CleanCharsFName,''),
 																		 pStateOrigin = 'MO' => regexreplace(corp2_raw_mo.fGetRegExPattern.FirstName.InvalidWords,CleanCharsFName,''),
 																		 pStateOrigin = 'MT' => regexreplace(corp2_raw_mt.fGetRegExPattern.FirstName.InvalidWords,CleanCharsFName,''),
-																		 pStateOrigin = 'ND' => regexreplace(corp2_raw_nd.fGetRegExPattern.FirstName.InvalidWords,CleanCharsFName,''),
 																		 pStateOrigin = 'NH' => regexreplace(corp2_raw_nh.fGetRegExPattern.FirstName.InvalidWords,CleanCharsFName,''),
 																		 pStateOrigin = 'NM' => regexreplace(corp2_raw_nm.fGetRegExPattern.FirstName.InvalidWords,CleanCharsFName,''),
 																		 pStateOrigin = 'NV' => regexreplace(corp2_raw_nv.fGetRegExPattern.FirstName.InvalidWords,CleanCharsFName,''),
@@ -101,7 +99,6 @@ export fCleanPersonName(string pStateOrigin,string pStateOriginDesc,string pfNam
 																		 pStateOrigin = 'MN' => regexreplace(corp2_raw_mn.fGetRegExPattern.MiddleName.InvalidChars,UC_MName,''),
 																		 pStateOrigin = 'MO' => regexreplace(corp2_raw_mo.fGetRegExPattern.MiddleName.InvalidChars,UC_MName,''),
 																		 pStateOrigin = 'MT' => regexreplace(corp2_raw_mt.fGetRegExPattern.MiddleName.InvalidChars,UC_MName,''),																		 
-																		 pStateOrigin = 'ND' => regexreplace(corp2_raw_nd.fGetRegExPattern.MiddleName.InvalidChars,UC_MName,''),
 																		 pStateOrigin = 'NH' => regexreplace(corp2_raw_nh.fGetRegExPattern.MiddleName.InvalidChars,UC_MName,''),
 																		 pStateOrigin = 'NM' => regexreplace(corp2_raw_nm.fGetRegExPattern.MiddleName.InvalidChars,UC_MName,''),
 																		 pStateOrigin = 'NV' => regexreplace(corp2_raw_nv.fGetRegExPattern.MiddleName.InvalidChars,UC_MName,''),
@@ -131,7 +128,6 @@ export fCleanPersonName(string pStateOrigin,string pStateOriginDesc,string pfNam
 																		 pStateOrigin = 'MN' => regexreplace(corp2_raw_mn.fGetRegExPattern.MiddleName.InvalidWords,CleanCharsMName,''),
 																		 pStateOrigin = 'MO' => regexreplace(corp2_raw_mo.fGetRegExPattern.MiddleName.InvalidWords,CleanCharsMName,''),
 																		 pStateOrigin = 'MT' => regexreplace(corp2_raw_mt.fGetRegExPattern.MiddleName.InvalidWords,CleanCharsMName,''),
-																		 pStateOrigin = 'ND' => regexreplace(corp2_raw_nd.fGetRegExPattern.MiddleName.InvalidWords,CleanCharsMName,''),
 																		 pStateOrigin = 'NH' => regexreplace(corp2_raw_nh.fGetRegExPattern.MiddleName.InvalidWords,CleanCharsMName,''),
 																		 pStateOrigin = 'NM' => regexreplace(corp2_raw_nm.fGetRegExPattern.MiddleName.InvalidWords,CleanCharsMName,''),
 																		 pStateOrigin = 'NV' => regexreplace(corp2_raw_nv.fGetRegExPattern.MiddleName.InvalidWords,CleanCharsMName,''),
@@ -162,7 +158,6 @@ export fCleanPersonName(string pStateOrigin,string pStateOriginDesc,string pfNam
 																		 pStateOrigin = 'MN' => regexreplace(corp2_raw_mn.fGetRegExPattern.LastName.InvalidChars,UC_LName,''),
 																		 pStateOrigin = 'MO' => regexreplace(corp2_raw_mo.fGetRegExPattern.LastName.InvalidChars,UC_LName,''),
 																		 pStateOrigin = 'MT' => regexreplace(corp2_raw_mt.fGetRegExPattern.LastName.InvalidChars,UC_LName,''),
-																		 pStateOrigin = 'ND' => regexreplace(corp2_raw_nd.fGetRegExPattern.LastName.InvalidChars,UC_LName,''),
 																		 pStateOrigin = 'NH' => regexreplace(corp2_raw_nh.fGetRegExPattern.LastName.InvalidChars,UC_LName,''),
 																		 pStateOrigin = 'NM' => regexreplace(corp2_raw_nm.fGetRegExPattern.LastName.InvalidChars,UC_LName,''),
 																		 pStateOrigin = 'NV' => regexreplace(corp2_raw_nv.fGetRegExPattern.LastName.InvalidChars,UC_LName,''),
@@ -193,7 +188,6 @@ export fCleanPersonName(string pStateOrigin,string pStateOriginDesc,string pfNam
 																		 pStateOrigin = 'MN' => regexreplace(corp2_raw_mn.fGetRegExPattern.LastName.InvalidWords,CleanCharsLName,''),
 																		 pStateOrigin = 'MO' => regexreplace(corp2_raw_mo.fGetRegExPattern.LastName.InvalidWords,CleanCharsLName,''),
 																		 pStateOrigin = 'MT' => regexreplace(corp2_raw_mt.fGetRegExPattern.LastName.InvalidWords,CleanCharsLName,''),
-																		 pStateOrigin = 'ND' => regexreplace(corp2_raw_nd.fGetRegExPattern.LastName.InvalidWords,CleanCharsLName,''),
 																		 pStateOrigin = 'NH' => regexreplace(corp2_raw_nh.fGetRegExPattern.LastName.InvalidWords,CleanCharsLName,''),
 																		 pStateOrigin = 'NM' => regexreplace(corp2_raw_nm.fGetRegExPattern.LastName.InvalidWords,CleanCharsLName,''),
 																		 pStateOrigin = 'NV' => regexreplace(corp2_raw_nv.fGetRegExPattern.LastName.InvalidWords,CleanCharsLName,''),

@@ -1,10 +1,10 @@
-import ut, STD;
+﻿import ut, STD;
 
 export	Mac_Setup_Latest_VehFlag	:=
 module
 
 	// setup owner flag fields
-	export owner_latest_vehflag(dataset(VehicleV2.Layout_Base.Party_BIP)	owner_seq,boolean	set_historyflag) :=
+	export owner_latest_vehflag(dataset(VehicleV2.Layout_Base.Party_CCPA)	owner_seq,boolean	set_historyflag) :=
 	function
 		owner_seq_dist				:= distribute(owner_seq,hash(vehicle_key,iteration_key));
 		owner_seq_dedup				:= dedup(sort(owner_seq_dist,vehicle_key,iteration_key,-sequence_key,local),vehicle_key,iteration_key,local);
@@ -31,7 +31,7 @@ module
 	end;
 
 	// setup EXP reg flag fields
-	export reg_latest_vehflag(dataset(VehicleV2.Layout_Base.Party_BIP)	reg_seq,boolean	set_historyflag) :=
+	export reg_latest_vehflag(dataset(VehicleV2.Layout_Base.Party_CCPA)	reg_seq,boolean	set_historyflag) :=
 	function
 		reg_seq_dist				:= distribute(reg_seq,hash(vehicle_key,iteration_key));
 		reg_seq_dedup				:= dedup(sort(reg_seq_dist,vehicle_key,iteration_key,-sequence_key,local),vehicle_key,iteration_key,local);
@@ -67,7 +67,7 @@ module
 	end;
 
 	//setup NC reg flag fields
-	export NC_reg_latest_vehflag(dataset(VehicleV2.Layout_Base.Party_BIP) reg_seq,boolean set_historyflag) :=
+	export NC_reg_latest_vehflag(dataset(VehicleV2.Layout_Base.Party_CCPA) reg_seq,boolean set_historyflag) :=
 	function
 
 		reg_seq_dist				:= distribute(reg_seq,hash(vehicle_key,iteration_key));
@@ -103,7 +103,7 @@ module
 	end;
 
 	//setup OH reg flag fields
-	export	OH_reg_latest_vehflag(dataset(VehicleV2.Layout_Base.Party_BIP)	reg_seq,boolean	set_historyflag) :=
+	export	OH_reg_latest_vehflag(dataset(VehicleV2.Layout_Base.Party_CCPA)	reg_seq,boolean	set_historyflag) :=
 	function
 
 		reg_seq_dist				:= distribute(reg_seq,hash(vehicle_key,iteration_key));
@@ -136,7 +136,7 @@ module
 	end;
 	
 	//setup MA reg flag fields
-	export	MA_reg_latest_vehflag(dataset(VehicleV2.Layout_Base.Party_BIP)	reg_seq,boolean	set_historyflag) :=
+	export	MA_reg_latest_vehflag(dataset(VehicleV2.Layout_Base.Party_CCPA)	reg_seq,boolean	set_historyflag) :=
 	function
 
 		reg_seq_dist				:= distribute(reg_seq,hash(vehicle_key,iteration_key));

@@ -1,4 +1,4 @@
-IMPORT Death_Master, Header, ut, PromoteSupers;
+﻿IMPORT Death_Master, Header, ut, PromoteSupers;
 
 EXPORT Proc_Build_Base_Supp_Plus(STRING	VersionDate) := FUNCTION
 
@@ -62,10 +62,10 @@ EXPORT Proc_Build_Base_Supp_Plus(STRING	VersionDate) := FUNCTION
 												TRANSFORM({dStateRecords}, SELF	:= LEFT), 
 												LOCAL);
 									
-	PromoteSupers.MAC_SF_BuildProcess(dPlusOut_SSA,plusSuperFileName_SSA,plusResult_SSA,3);
-	PromoteSupers.MAC_SF_BuildProcess(dPlusOut,plusSuperFileName,plusResult,3);
-	PromoteSupers.MAC_SF_BuildProcess(dSuppOut_SSA,suppSuperFileName_SSA,suppResult_SSA,3);
-	PromoteSupers.MAC_SF_BuildProcess(dSuppOut_SSA,suppSuperFileName,suppResult,3);
+	PromoteSupers.MAC_SF_BuildProcess(dPlusOut_SSA,plusSuperFileName_SSA,plusResult_SSA,3,,TRUE);
+	PromoteSupers.MAC_SF_BuildProcess(dPlusOut,plusSuperFileName,plusResult,3,,TRUE);
+	PromoteSupers.MAC_SF_BuildProcess(dSuppOut_SSA,suppSuperFileName_SSA,suppResult_SSA,3,,TRUE);
+	PromoteSupers.MAC_SF_BuildProcess(dSuppOut_SSA,suppSuperFileName,suppResult,3,,TRUE);
 
 	RETURN SEQUENTIAL (
 		process_SSA(VersionDate),

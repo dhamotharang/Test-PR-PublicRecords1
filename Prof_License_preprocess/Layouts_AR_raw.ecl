@@ -1,4 +1,4 @@
-EXPORT Layouts_AR_raw := module
+﻿EXPORT Layouts_AR_raw := module
 
 export DDS := record
    string  First_Name;                   
@@ -104,8 +104,10 @@ record
 end;                        
 
 export pharmacy := 
- record                         
-    string  Name;               
+ record
+   string First_Name;
+   string Middle_Name;
+   string Last_Name;
     string Gender;              
     string  Mail_Street;        
     string  Mail_City;          

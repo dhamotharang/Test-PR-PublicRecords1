@@ -1,11 +1,13 @@
-import AutoKeyB2, liensv2; 
+﻿import AutoKeyB2, liensv2; 
 EXPORT Proc_build_autokeys_fcra (string filedate) := function
 
 ds := LiensV2.file_liens_party_keybuild_fcra;
 
 Liensv2.layout_liens_party proj_rec(ds L) := transform
 		self.ssn		:=	IF((UNSIGNED6)L.ssn <> 0, IF(L.ssn[1..5] = '00000', L.ssn[6..9], L.ssn), '');
-		self.tax_id	:=	IF(L.tax_id <> '', IF(L.tax_id[1..5] = '00000', L.tax_id[6..9], L.tax_id), '');
+		// self.tax_id	:=	IF(L.tax_id <> '', IF(L.tax_id[1..5] = '00000', L.tax_id[6..9], L.tax_id), '');
+		//DF-22188 clear tax_id field in thor_data400::key::liensv2::fcra::qa::autokey_payload
+		self.tax_id	:=	'';
 		self := L;
 	end;
 

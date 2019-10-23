@@ -1,12 +1,10 @@
-import tools;
+﻿import tools;
 EXPORT filenames(
-
    string   pversion              = ''
 	,boolean	pUseOtherEnvironment	= false
   
 ) :=
 module
-
 	shared lfileprefix		  := _Constants(pUseOtherEnvironment).prefix	;
 	export base             := tools.mod_FilenamesBuild(lfileprefix + 'BIPV2_LGID3::base::@version@::data'	    ,pversion);
 	export init             := tools.mod_FilenamesBuild(lfileprefix + 'BIPV2_LGID3::init::@version@'	          ,pversion);

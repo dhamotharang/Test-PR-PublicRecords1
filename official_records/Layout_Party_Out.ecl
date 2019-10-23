@@ -1,4 +1,4 @@
-export Layout_Party_Out := record
+﻿export Layout_Party_Out := record
 	layout_in_party;
 	unsigned6	did;
 	unsigned6	bdid;

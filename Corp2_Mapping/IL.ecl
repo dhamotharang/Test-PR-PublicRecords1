@@ -1,4 +1,4 @@
-import address,corp2,corp2_mapping,corp2_raw_il,lib_stringlib,scrubs,scrubs_corp2_mapping_il_ar,
+﻿import address,corp2,corp2_mapping,corp2_raw_il,lib_stringlib,scrubs,scrubs_corp2_mapping_il_ar,
 			 scrubs_corp2_mapping_il_event,scrubs_corp2_mapping_il_main,scrubs_corp2_mapping_il_stock,
 			 std,tools,ut,versioncontrol; 			 
 			 
@@ -420,15 +420,13 @@ export IL := MODULE;
 
 		AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
-		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																															,'Scrubs CorpAR_'+uc_runtype+'_IL Report' //subject
 																															,'Scrubs CorpAR_'+uc_runtype+'_IL Report' //body
 																															,(data)AR_ScrubsAttachment
 																															,'text/csv'
 																															,'Corp'+uc_runtype+'ILARScrubsReport.csv'																															
-																															,
-																															,
-																															,corp2.Email_Notification_Lists.spray);
+																															);
 
 		AR_BadRecords				 := AR_N.ExpandedInFile(	
 																								corp_key_Invalid							  			<> 0 or
@@ -511,15 +509,13 @@ export IL := MODULE;
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
 
-		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpEvent_'+uc_runtype+'_IL Report' //subject
 																																 ,'Scrubs CorpEvent_'+uc_runtype+'_IL Report' //body
 																																 ,(data)Event_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'Corp'+uc_runtype+'ILEventScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 
 		Event_BadRecords				 	:= Event_N.ExpandedInFile(	
 																												corp_key_Invalid							  			<> 0 or
@@ -588,17 +584,15 @@ export IL := MODULE;
 
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpMain_'+uc_runtype+'_IL Report' //subject
 																																 ,'Scrubs CorpMain_'+uc_runtype+'_IL Report' //body
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'Corp'+uc_runtype+'ILMainScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 																																 
-		Main_BadRecords						:= Main_N.ExpandedInFile(	
+		Main_BadRecords						:= Main_N.ExpandedInFile(	 
 																											 dt_vendor_first_reported_Invalid 			<> 0 or
 																											 dt_vendor_last_reported_Invalid 				<> 0 or
 																											 dt_first_seen_Invalid 									<> 0 or
@@ -726,15 +720,13 @@ export IL := MODULE;
 
 		Stock_ScrubsAlert					:= Stock_ScrubsWithExamples(RejectWarning = 'Y');
 		Stock_ScrubsAttachment		:= Scrubs.fn_email_attachment(Stock_ScrubsAlert);
-		Stock_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Stock_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpStock_'+uc_runtype+'_IL Report' //subject
 																																 ,'Scrubs CorpStock_'+uc_runtype+'_IL Report' //body
 																																 ,(data)Stock_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'Corp'+uc_runtype+'ILStockScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 																																 
 		Stock_BadRecords					:= Stock_N.ExpandedInFile(	
 																												corp_key_Invalid							  			<> 0 or

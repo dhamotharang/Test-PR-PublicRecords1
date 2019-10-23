@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take KY Appraisers License raw files and convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
@@ -10,7 +10,7 @@ EXPORT map_KYS0809_conversion(STRING pVersion) := FUNCTION
 	src_cd									:= code[3..7];
 	src_st									:= code[1..2];	//License state
 	mari_dest								:= '~thor_data400::in::proflic_mari::';	
-	#workunit('name','Prof License MARI- '+code);
+	#workunit('name','Yogurt: Prof License MARI- '+code);
 	AddrExceptions := '(DRIVE|CENTER|BUILDING)';
 	Valid_License_Type := ['CG','CR','SL','SR'];
 	//Credentials
@@ -34,7 +34,7 @@ EXPORT map_KYS0809_conversion(STRING pVersion) := FUNCTION
 	oFile										:= OUTPUT(ClnNameRec);
 	
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(GoodNameRec pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(GoodNameRec pInput) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];  //yyyymmdd
@@ -53,17 +53,17 @@ EXPORT map_KYS0809_conversion(STRING pVersion) := FUNCTION
 		SELF.TYPE_CD					:= 'MD';
 
 		//Standardize Fields
-		TrimNAME_FIRST				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.FIRST_NAME);
-		TrimNAME_LAST					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LAST_NAME);
-		TrimNAME_OFFICE				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.OFFICENAME);
-		TrimAddress1					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS1_1);
-		TrimCity							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY_1);
-		TrimState							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE_1);
-		TrimZip								:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZIP);	
-		TrimCounty						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.COUNTY);	
+		TrimNAME_FIRST				:= ut.CleanSpacesAndUpper(pInput.FIRST_NAME);
+		TrimNAME_LAST					:= ut.CleanSpacesAndUpper(pInput.LAST_NAME);
+		TrimNAME_OFFICE				:= ut.CleanSpacesAndUpper(pInput.OFFICENAME);
+		TrimAddress1					:= ut.CleanSpacesAndUpper(pInput.ADDRESS1_1);
+		TrimCity							:= ut.CleanSpacesAndUpper(pInput.CITY_1);
+		TrimState							:= ut.CleanSpacesAndUpper(pInput.STATE_1);
+		TrimZip								:= ut.CleanSpacesAndUpper(pInput.ZIP);	
+		TrimCounty						:= ut.CleanSpacesAndUpper(pInput.COUNTY);	
 
 		//map license type to be used as reference for prof_cd logic
-		SELF.RAW_LICENSE_TYPE	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LICTYPE);
+		SELF.RAW_LICENSE_TYPE	:= ut.CleanSpacesAndUpper(pInput.LICTYPE);
 		SELF.STD_LICENSE_TYPE	:= map(TRIM(SELF.RAW_LICENSE_TYPE)='ASSOCIATE' => 'A',
 																 TRIM(SELF.RAW_LICENSE_TYPE)='CERTIFIED GENERAL' => 'CG',
 																 TRIM(SELF.RAW_LICENSE_TYPE)='CERTIFIED RESIDENTIAL' => 'CR',
@@ -180,7 +180,7 @@ EXPORT map_KYS0809_conversion(STRING pVersion) := FUNCTION
 	ds_map := PROJECT(ClnNameRec, xformToCommon(LEFT));
 
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;

@@ -1,4 +1,4 @@
-import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
+﻿import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, DID_Add,Business_Header_SS, NID, AID, watchdog,
 VersionControl,lib_fileservices,Health_Provider_Services,Health_Facility_Services,
 BIPV2_Company_Names, HealthCareFacility,HMS_CSR,Scrubs;
@@ -59,9 +59,7 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 			hist_base	:= Mark_history(HMS_CSR.Files(filedate,pUseProd).csrcredential_Base.built, HMS_CSR.Layouts.csrcredential_base);
 			
 			std_input := HMS_CSR.StandardizeInputFile(filedate, pUseProd).CsrCredential;
-			
-			// std_input := dataset('~thor400_data::base::hms_stl::hms_csrcredential::20151119',HMS_CSR.Layouts.csrcredential_base,Thor);
-		  		
+					  		
 			cleanNames := Clean_name(std_input,HMS_CSR.Layouts.csrcredential_base,1)
 									:PERSIST('~thor400_data::persist::hms_csr::csrcred_names');
 			

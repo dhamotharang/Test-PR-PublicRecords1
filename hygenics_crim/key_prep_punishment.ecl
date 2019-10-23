@@ -1,4 +1,4 @@
-import doxie, doxie_build, corrections, hygenics_search;
+﻿import doxie, doxie_build, corrections, hygenics_search, ut;
 
 export key_prep_punishment (boolean IsFCRA = false) := function
 
@@ -63,6 +63,9 @@ s_df_all := dedup(sort(df_all(sent_length <> ''   or sent_length_desc<> '' or
 									parole_active_flag <> '' or casepull_date <> '' ) ,record), except punishment_persistent_id);
 
 df2 := s_df_all(Vendor not in hygenics_search.sCourt_Vendors_To_Omit);
+//DF-21868 Deprecate specified fields in thor_200::key::criminal_punishment::fcra::qa::offender_key.punishment_type
+ut.MAC_CLEAR_FIELDS(df2, df2_cleared, hygenics_crim.constants('').fields_to_clear_punishment_type);
+
 df 	:= s_df_all;
 
 string file_name := if(IsFCRA, 
@@ -70,7 +73,7 @@ string file_name := if(IsFCRA,
 					 '~thor_data400::key::corrections_punishment_'+doxie_build.buildstate + thorlib.wuid());
 
 return if (IsFCRA,
-           index(df2,{ok := df2.offender_key, pt := df2.punishment_type},{df2}, file_name, OPT),
+           index(df2_cleared,{ok := df2_cleared.offender_key, pt := df2_cleared.punishment_type},{df2_cleared}, file_name, OPT),
            index(df,{ok := df.offender_key, pt := df.punishment_type},{df}, file_name));
 
 end;

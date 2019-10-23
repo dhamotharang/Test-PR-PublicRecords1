@@ -40,7 +40,7 @@ end;
 o1 					:= normalize(df,5,normIt(LEFT,COUNTER));
 
 // Add offense_persistent_id
-
+// output(o1(seisint_primary_key ='C2COSOR6270924709894374124' ));
 	o1 addOPID(o1 l):= transform
 			
 		String 	filterField(String s) := FUNCTION
@@ -56,14 +56,23 @@ o1 					:= normalize(df,5,normIt(LEFT,COUNTER));
 		Voffense_description 				:= filterField(l.offense_description);
 		Vsentence_description 			:= filterField(l.sentence_description);
 		
-		self.offense_persistent_id 	:= hash64(trim(l.seisint_primary_key, left, right) + Vconviction_date + Voffense_date + Voffense_code_or_statute + Vcourt_case_number + Vvictim_gender + Vvictim_age + Voffense_description + Vsentence_description);	
+		Vconviction_jurisdiction    := filterField(l.conviction_jurisdiction);
+		VCourt                			:= filterField(l.Court);
+		VOffense_category           := filterField(l.Offense_category);
+		VArrest_date                := filterField(l.Arrest_date);
 		
-		//self.offense_persistent_id := hash64(trim(trim(trim(trim(trim(trim(trim(l.seisint_primary_key, left, right) + trim(l.conviction_date, left, right), left, right) + trim(l.offense_date, left, right), left, right) + trim(l.offense_code_or_statute, left, right), left, right) + trim(l.court_case_number, left, right), left, right) + trim(l.victim_gender, left, right), left, right) + trim(l.victim_age, left, right), left, right));
+		self.offense_persistent_id 	:= hash64(
+		                                      trim(l.seisint_primary_key, left, right) + Vconviction_date + Voffense_date + Voffense_code_or_statute + Vcourt_case_number +'X'+ Vvictim_gender + Vvictim_age + Voffense_description + Vsentence_description +
+		                                      Vconviction_jurisdiction + VCourt + VOffense_category + VArrest_date
+		                                     ); 
+		// self.offense_persistent_id 	:= hash64(trim(l.seisint_primary_key, left, right) + Vconviction_date + Voffense_date + Voffense_code_or_statute + Vcourt_case_number + Vvictim_gender + Vvictim_age + Voffense_description + Vsentence_description);	
+		
 		self := l;
 	end;
 
 oPId_Added := project(o1, addOPID(left));
 
+// output(oPId_Added(seisint_primary_key ='C2COSOR6270924709894374124' ));
 /*
 // Add offense_persistent_id
 
@@ -75,8 +84,9 @@ oPId_Added := project(o1, addOPID(left));
 oPId_Added := project(o1, addOPID(left));
 */
 // Added dedup to the enture record to get rid of duplicate records
+// output(count(oPId_Added),named('Before'));
 o2 := dedup(oPId_Added(offense_description != ''),hash):persist('~thor40_241::persist::sex_offender_offenses_dedup');
-
+// output(count(o2),named('after'));
 // Classify offense categories
 //Find First Offense
 o2 defCategory(o2 l):= transform
@@ -98,10 +108,15 @@ o2 defCategory(o2 l):= transform
 						'750.356A3 - BREAKING & ENTERING - A VEHICLE WITH DAMAGE TO VEHICLE|'+
 						'ENTRY INTO/ONTO BLDG/CONSTRUC.SITE/ROOM|'+
             'TRESSPASS 1-AUTO-W/INTENT TO COMMIT CRIME|'+
+
+						'CRIMINAL TREPASS|'+
+						'CRIMINAL TRSPSS 1ST/PRPS SXL MTVTN|'+
+						'CRIMINAL TREPASS|'+
+						'CRIMINAL TREPSASS|'+
+
 						'CRIMINAL TRESSPASS'
-
-
-						,
+						
+  					,
 						trim(l.offense_description, left, right),
 						0)<>'' => 'BUR',//BURGLARY
 
@@ -362,7 +377,8 @@ o2 defCategory(o2 l):= transform
 						'FALSE SWEARING|'+
 						'FALSE PRETENSES \\(ATTEMPT\\)|'+
 						'RESISTING ARREST|'+
-						
+						', FALSE PRETENSES|'+
+
 						
 						'WITHIN 500\'',
 						trim(l.offense_description, left, right),
@@ -1663,6 +1679,10 @@ o2 defCategory(o2 l):= transform
 						'MLESTATIN F A MINR|'+
 						'ATTEMPTED USE F MINRS FR BSENE PURPSES|'+
 						'INDESCENT LIBERTIES WITH A MINR|'+
+						'UNDER/16 MIAMI DADE FL;|'+
+						
+						'INDICENT LIBERTIES|'+
+            'ATT_INDEC_LIBERTIES|'+
 
 						'WITH A 10, 13 AND 14 Y/O FEMALE' 											
 						,
@@ -2041,6 +2061,11 @@ o2 defCategory(o2 l):= transform
 						'SDMY I|'+
 						'AGG. SDMY|'+
 						'SDMY-K|'+
+
+            'RAPR|'+
+          
+					  'ARMED S0D0MY \\(\\)|'+
+
 
             'RAP-1129-F9'  
 						
@@ -2578,9 +2603,32 @@ o2 defCategory(o2 l):= transform
 						'SAC 18-3-405|'+
 						'SAC / ATTEMPT|'+
 						'SAC - ATTEMPT|'+
+						
+						'SAC; 03CR2964|'+
+						'SAC; 99CR2887|'+
+						'SAC 2005CR4365|'+
+						'SAC; 94CR699|'+
+						'SAC; 1993CR001300|'+
+						'ADULTRY|'+
+						'INDECENT A &AMP; B|'+
+						'1ST DEG SAC|'+
+						'SAC; 95CR2792|'+
+						'ATT SAC; 2015CR540|'+
+						'SAC|'+
+						'ATT SAC|'+
+						'SAC; 92CR2913|'+
+						'SAC; 08CR2707|'+
+						'SAC; 12CR2998|'+
+						'SAC; 05CR480|'+
+						'SAC; 2012CR809|'+
+            'RCW 9A 44 100 ATTEMPTED INCDECENT LIBERTIES|'+
+					          
+						'PRED CRM SX ASSL|'+
+						
+						'DEPENDENT ADULT ABUSE|'+
+            'ASSULT SIMPLE|'+
+						
 						'SAC-ATTEMPT'
-
-
 						,				
 						
 						trim(l.offense_description, left, right),
@@ -3126,7 +3174,95 @@ o2 defCategory(o2 l):= transform
 						'DUI - IMPAIRMENT|'+
 						'UCMJ ART 134|'+
 
-
+						'ENTERED BY MISTAKE|'+
+						'D0622012CR000238|'+
+						'D0622015CR001097|'+
+						'D0622015CR001339|'+
+						'DE1111110000FF\\(\\)|'+
+						'TIME.|'+
+						'D0222007CR000271|'+
+						'D0392016CR005553|'+						
+					
+						'LCD_DS|'+		
+						'750.520E1|'+		
+						'18-3-405 CSA|'+		
+						'18-3-405 CSA|'+		
+						'INDECENT A&AMP;B|'+		
+						'DELETE|'+		
+						'16-6-3\\(B\\)|'+		
+						'CRG READS: 18-2-101 & 18-3-405 CRIM ATTE|'+		
+						'D0301996M 004635|'+		
+						'D0302005CR004409|'+		
+						'ART UCMJ 120B DIBRS 120BB3|'+		
+						'D0621999CR000953|'+		
+						'18-6-401\\(1\\),\\(7\\)\\(B\\)\\(I\\)|'+		
+						'D0622005CR001337|'+		
+            'T17-A 253\\(1\\) \\(B\\)|'+		
+            'TENN STING|'+		
+						
+            'NEW JERSEY;|'+
+						'ATTEMPT;|'+
+						'AGRAVETED;|'+
+						'38-12-14-A|'+
+						'NEW HAMPSHIRE|'+
+						'13A-6-64|'+
+						'22 021 A1 B\\(\\)|'+
+						'ATTEMPT;|'+
+						'632-A:2 II|'+
+						'INDICTMENT NUMBER CP870011443;|'+
+						
+						'FRAUD|'+
+						'18USC2252A\\(A\\)\\(5\\)\\(B\\);|'+
+						'130.50 SUB 01;|'+
+						'MAINE|'+
+						'LIFETIME|'+
+						'MANUF/DELIVER AMPHETAMINE \\(<=3G\\)|'+
+						'ATTEMPTED \\(ATTEMPTED\\)|'+
+						
+						'03-095-FTA|'+
+						'21 11 A 2 \\(\\)|'+
+						'22 021 A1 B \\(\\)|'+
+						'318-B:26,III\\(A\\), CNTRL DRUG:CNTRL PREMISES WHERE DRUGS KEPT|'+
+						'794.0118C|'+
+						'ASSAU LT DV|'+
+						'ATTACHMENT|'+
+						'BAD CHECK \\(1000.00 -10000.00\\)|'+
+						'D U I|'+
+						'DE1111110000FF \\(\\)|'+
+						'DELIVER/SELL MARIJUANA|'+
+						'DISTRIBUTE CERTAIN SUBSTANCES IN 65-4105\\(H\\)|'+
+						'DRAG RACING|'+
+						'DRIVNG UNDER INFLUENCE|'+
+						'DRUG PARA|'+
+						'DRUG PARAPHANALIA|'+
+						'DRUGS- SCHE IV \\(MFG, SELL, DELIVER, ETC\\) DEPRESS|'+						
+						'DUI 1ST|'+
+						'DUI 2ND|'+
+						'DUI 2ND 31390-11|'+
+						'DUI 4TH|'+
+						'DUI--2ND|'+
+						'DUI-DRUGS|'+
+						'DWL S/R/C|'+
+						'DWLS|'+
+						'DWLSCR|'+
+						'DWSRC|'+
+						'FTA TR17-02173 FTA|'+
+						'FTV 18-3-412.6|'+
+						'INV PRSNL PRIV 1|'+
+						'KNIFE \\(KNIFE\\)|'+
+						'LICENSE REQUIRED|'+
+						'LICENSE REQUIRED 55-50-301 C/M|'+
+						'LICENSE, DRIVERS LICENSE REQUIRED|'+
+						'MITTIMUS\\(DRIV SUSP LIC\\)|'+
+						'MN 609-343-1\\(C\\) MN|'+
+						'NEW JERSEY|'+
+						'PASSING BAD CHECKS 500/LESS|'+
+						'PRESENTMENT|'+
+						'RECKLESS BURNING|'+
+						'SELL AND DELIVERY SCH 3|'+
+						'SELL SCH II X2|'+
+						'SPEEDING|'+
+						'TRAFFIC - SPEEDING|'+						
 						
 						'16-6-4-\\(B\\)'						
 						,						
@@ -3168,6 +3304,39 @@ o2 defCategory(o2 l):= transform
 					trim(l.offense_description, left, right) = 'TRANSPORT OR SHIP' 				=> 'OTH',
 					trim(l.offense_description, left, right) = 'UNKNOWN' 									=> 'OTH',
 					trim(l.offense_description, left, right) = 'WYOMING' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'A'     => 'OTH',					
+
+          trim(l.offense_description, left, right) = 'AK' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'AR' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'AZ' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'CT' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'FL' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'FTA' 									=> 'OTH',						
+          trim(l.offense_description, left, right) = 'FTD' 									=> 'OTH',						
+          trim(l.offense_description, left, right) = 'IA' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'ID' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'IL' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'IN' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'KS' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'KY' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'MI' 									=> 'OTH',						
+          trim(l.offense_description, left, right) = 'MN' 									=> 'OTH',						
+          trim(l.offense_description, left, right) = 'MT' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'NB' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'NC' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'ND' 									=> 'OTH',	
+          trim(l.offense_description, left, right) = 'NM' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'NV' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'NY' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'PA' 									=> 'OTH',		
+          trim(l.offense_description, left, right) = 'PI' 									=> 'OTH',	
+          trim(l.offense_description, left, right) = 'TX' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'UT' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'VT' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'WA' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'WI' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'WY' 									=> 'OTH',	
+          trim(l.offense_description, left, right) = 'DUI' 									=> 'OTH',						
 					
 					trim(l.offense_description, left, right) in ['ARRALC196360022020121115','ATTEMPT 1ST DEGREE','BARKIM196660118920131111','BARSAM196851116020120808','BEADAN197550719520130828','BLADAV196750822320130712','BLADAV196750823020130712','BONALB198460015420130101','BONALB198460016420130101',
 						'BONALP197550716020130225','BROCHR199250917020121214','BROCHR199250917220121214','BROKEN196750916320121114','BROMAR197351015020000717',
@@ -3253,9 +3422,9 @@ o2 defCategory(o2 l):= transform
 						'USE OF COMMUNICATION SYSTEMS TO FACILITATE CERTAIN OFFENSES INVOLVING CHILDREN|'+
 						'W-CHILD|'+
 						'CALIFORNIA CONVICTION INVOLVING A 5 YR OLD FEMALE|'+
+            'UNDER/16 MIAMI DADE FL;|'+				
+						
 						'CONVICTED IN THE STATE OF IOWA FOR SEXUALLY ABUSING THREE MALE VICTIMS, AGES 5, 11, AND 15. SUBJECT'
-						
-						
 						
 						,
 						trim(l.offense_description, left, right),

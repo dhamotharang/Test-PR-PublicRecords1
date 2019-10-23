@@ -1,6 +1,6 @@
-import dops,data_services;
+﻿import dops,data_services;
 export GetPackageKeys(string dsname,string buildversion='',string envment = 'N', string bool = 'N') := function
-	string replacestring := dsname + '_DATE';
+	string replacestring := dsname + '_DATE::';
 	ds := dops.GetRoxieKeys(dsname,'B',envment,bool);
 
 	string_rec := record
@@ -20,3 +20,4 @@ export GetPackageKeys(string dsname,string buildversion='',string envment = 'N',
 	return project(ds,prct_recs(left));
 	
 end;
+

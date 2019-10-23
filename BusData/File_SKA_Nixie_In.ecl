@@ -1,1 +1,2 @@
-export File_SKA_Nixie_In := dataset('~thor_data400::base::ska_b', Layout_SKA_Nixie_In, flat);
+﻿// export File_SKA_Nixie_In := dataset('~thor_data400::base::ska_b', Layout_SKA_Nixie_In, flat);
+EXPORT File_SKA_Nixie_In := dataset('~thor_data400::in::ska::ska_b', BusData.Layouts_ska.raw_b, CSV(HEADING(1)));

@@ -1,4 +1,4 @@
-﻿import ut, RoxieKeybuild, data_services;
+﻿import ut, RoxieKeybuild, data_services, orbit3;
 
 export Proc_BuildAll := function
 
@@ -37,7 +37,7 @@ super_keybuilding :=
 	sequential(
 		accurint_acclogs.Proc_BuildKeys,
 		Accurint_AccLogs.Proc_AutokeyBuild,
-		RoxieKeybuild.updateversion('CaseConnectKeys',trim(version, all),'john.freibaum@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com',,'N'));
+		RoxieKeybuild.updateversion('CaseConnectKeys',trim(version, all),'jason.allerdings@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com',,'N'));
 
 //// Clear Supers
 
@@ -49,7 +49,7 @@ processed_filenames := nothor(table(WorkunitServices.WorkunitFilesRead(workunit)
 
 //// Send Email
 
-sendEmail := fileservices.sendemail('john.freibaum@lexisnexis.com', 'Case Connect: Accurint Acc Logs Complete', workunit);
+sendEmail := fileservices.sendemail('jason.allerdings@lexisnexis.com', 'Case Connect: Accurint Acc Logs Complete', workunit);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,6 +77,9 @@ return parallel(output(choosen(DIDSamples, 100), named('DID_Samples')), output(c
 
 end;
 
+///////////////////////////////////////////////////////////////////////////////////
+orbit_update := if ( ut.Weekday((integer) version)  not in [ 'SATURDAY','SUNDAY']  , Orbit3.proc_Orbit3_CreateBuild ('Case Connect',version) , Output('No_Orbit_Entry_needed') );
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -90,14 +93,15 @@ build_acclogs :=
 					if(~newfiles, output('No New Files'),
 						sequential(
 									output(version, named('Building_Version'));
-									output(nothor(FileServices.SuperFileContents(data_services.foreign_logs + 'thor100_21::in::accurint_acclogs_cc')), named('Input_Files'));
-									output(nothor(FileServices.SuperFileContents(data_services.foreign_logs + 'thor100_21::in::accurint_acclogs_cc_preprocess')), named('Upcoming_Files'));
+									output(nothor(FileServices.SuperFileContents('~thor_data400::in::accurint_acclogs_cc')), named('Input_Files'));
+									// output(nothor(FileServices.SuperFileContents('~thor_data400::in::accurint_acclogs_cc_preprocess')), named('Upcoming_Files'));
 									ACCURINT_acclogs.File_Deconfliction.buildfile;
 									update_base; update_trans;
 									nothor(base_super); nothor(trans_super);
 	/*                 // if(HeaderVer_New, HeaderVer_Update); // removed because the build kept failing */
 	/*                 // if(BHeaderVer_New, BHeaderVer_Update); */
 									super_keybuilding;
+									orbit_update;
 									Accurint_AccLogs.STRATA_CaseConnect(trim(version, all));
 									output('Output Processed Files List for Logs Thor');								
 									output(processed_filenames,,'~thor_data400::in::accurint_acclogs::processed',overwrite);

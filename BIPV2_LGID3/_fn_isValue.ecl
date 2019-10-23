@@ -1,7 +1,5 @@
-// Determine whether the specified STRING is any of up to 10 specified non-null values
-
+﻿// Determine whether the specified STRING is any of up to 10 specified non-null values
 // Invoked with FIELDTYPE:name:CUSTOM(fn_isValue,'term1'[...,termN]):ONFAIL(action)
-
 EXPORT BOOLEAN _fn_isValue(
 	STRING s, STRING v1,
 	STRING v2='', STRING v3='', STRING v4='',

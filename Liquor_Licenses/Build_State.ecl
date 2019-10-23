@@ -1,4 +1,4 @@
-import _control;
+﻿import _control;
 
 export Build_State(
 
@@ -8,7 +8,8 @@ export Build_State(
 	,pDirectory			
 	,pOutput
 	//,pServerIP			= '\'bctlpedata11\''
-	,pServerIP			= '\'bctlpedata11.risk.regn.net\''
+	//,pServerIP			= '\'bctlpedata11.risk.regn.net\''
+	,pServerIP			= _Control.IPAddress.bctlpedata11
 	,pFilename			= '\'liquor_licenses*d00\''
 	,pGroupName			= Liquor_Licenses._dataset.groupname																		
 	,pIsTesting			= 'false'

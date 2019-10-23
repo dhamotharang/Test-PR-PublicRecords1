@@ -1,4 +1,4 @@
-import std;
+﻿import std;
 IsUSA(unicode countryName) := CountryName in 
 	['U.S.A.', 'United States of America','United states of America','United States',
 		'USA'];
@@ -22,7 +22,7 @@ region);
 BrazilianRegions(unicode region) := CASE(region,
 'BA' => 'Bahia',
 'RJ' => 'Rio de Janeiro',
-'SP' => U'SÃ£o Paulo',
+'SP' => U'São Paulo',
 region);
 
 CanadianRegions(unicode region) := CASE(STD.Uni.FilterOut(region,'.'),

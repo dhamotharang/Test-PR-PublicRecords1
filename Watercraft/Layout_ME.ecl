@@ -1,6 +1,6 @@
-export Layout_ME :=
+﻿export Layout_ME :=
 
-record		
+record
 string3		STATEABREV;		
 string22	REG_NUM;		
 string23	HULL_ID;		
@@ -58,7 +58,7 @@ string5		GEOCODE;
 string51	SECONDARY_OWNER;		
 string5		AGENT_ID;		
 string43	AGENT_NAME;		
-string2		lf;		
+string2		lf;
 end;		
 
 

@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 EXPORT _Filters :=
 module
   export Explode(

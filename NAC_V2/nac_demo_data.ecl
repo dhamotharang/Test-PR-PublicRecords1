@@ -1,4 +1,4 @@
-IMPORT NAC_V2;
+﻿IMPORT NAC_V2;
 demo_data :=
 //st, prog, caseID,   clientID,   startdt, enddt,   startraw, endraw, last,    first,                              ssn,  ssntype,   dob                                                                                                                                                                                                                                                                                                                                   did, didscore, processDt                                                                                                     
   dataset([
@@ -473,7 +473,7 @@ dataset([
 export nac_demo_data := groupidRECS + gid_pop(latest_match_data) + gid_pop(demo_data) + outdata_greg + outdata_joe + outdata_jane;
 
 /*
-[â€Ž5/â€Ž9/â€Ž2016 11:40 AM] Abittan, Dan (RIS-BCT): 
+[‎5/‎9/‎2016 11:40 AM] Abittan, Dan (RIS-BCT): 
 also please add some minors
 68487525105
 41273830723
@@ -481,9 +481,9 @@ also please add some minors
 148637934961
 53714854972 
 these are minor DIDs
-[â€Ž5/â€Ž9/â€Ž2016 11:42 AM] Abittan, Dan (RIS-BCT): 
+[‎5/‎9/‎2016 11:42 AM] Abittan, Dan (RIS-BCT): 
 and here is a suppression DID - 482769028 
-[â€Ž5/â€Ž9/â€Ž2016 1:26 PM] Abittan, Dan (RIS-BCT): 
+[‎5/‎9/‎2016 1:26 PM] Abittan, Dan (RIS-BCT): 
 so the current service does return minors
 
 Need to make some record with DD in raw dates.

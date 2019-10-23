@@ -1,4 +1,4 @@
-EXPORT layout_death_master_supplemental := RECORD
+﻿EXPORT layout_death_master_supplemental := RECORD
 
 	STRING8		PROCESS_DATE;
 	STRING2		SOURCE_STATE;
@@ -104,4 +104,7 @@ EXPORT layout_death_master_supplemental := RECORD
 	UNSIGNED8	ScrubsBits1		:=	0;
 	UNSIGNED8	ScrubsBits2		:=	0;
 	UNSIGNED8	ScrubsBits3		:=	0;
+	//CCPA-17 
+	UNSIGNED4			global_sid := 0;
+	UNSIGNED8			record_sid := 0;
 END;

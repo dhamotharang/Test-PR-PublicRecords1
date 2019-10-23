@@ -1,11 +1,11 @@
-EXPORT Spray_AL_Medical(string filedate) := module
+﻿EXPORT Spray_AL_Medical(string filedate) := module
 
-import VersionControl,_Control;
+import VersionControl,_Control,lib_thorlib;
 
 
 	string		pServer			:= _Control.IPAddress.bctlpedata11  ;
 	string		pDir				:= '/data/hds_4/prolic/al/medical_exam/'+filedate;
-	string		pGroupName	:= if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' ,'thor400_dev01','thor400_60');
+	string		pGroupName	:= thorlib.group();
 	boolean    pIsTesting  := false;
 
 

@@ -1,0 +1,22 @@
+﻿EXPORT Layout_LeadIntegrity_Service_Input := RECORD
+  unsigned4 seq;
+  unsigned8 lexid;
+  string9 ssn;
+  string30 name_first;
+  string30 name_middle;
+  string30 name_last;
+  string5 name_suffix;
+  string8 dob;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 p_city_name;
+  string2 st;
+  string5 z5;
+  string20 dl_number;
+  string2 dl_state;
+END;

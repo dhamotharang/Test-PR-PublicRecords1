@@ -1,4 +1,4 @@
-IMPORT doxie, LN_PropertyV2, ut, Codes, suppress, fcra , FFD, LN_PropertyV2_Services;
+﻿IMPORT doxie, LN_PropertyV2, ut, Codes, suppress, fcra , FFD, LN_PropertyV2_Services;
 
 l_sid		:= LN_PropertyV2_Services.layouts.search_fid;
 l_fid		:= LN_PropertyV2_Services.layouts.fid;
@@ -42,7 +42,7 @@ export dataset(l_out) fn_get_report(
 		-sortby_date,ln_fares_id),recordof(fids2a)),fids2a);
 	
 	// Get raw parties based on fid suppression so far
-	parties_extraRaw := LN_PropertyV2_Services.fn_get_parties_raw(fids2,nonSS,isFCRA,ds_flags,,slim_pc_recs,inFFDOptionsMask);
+	parties_extraRaw := LN_PropertyV2_Services.fn_get_parties_raw(fids2,nonSS,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask);
 	
 	// Pull records (fids) and parties based on DID/SSN
 	Suppress.MAC_Suppress_Child.keyLinked(fids2,parties_extraRaw,fids2RemoveDID, application_type_value,

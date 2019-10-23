@@ -17,8 +17,8 @@ fieldstats.mac_stat_file(inf2,stat2,'sexoffender_offenses',50,4,false,
 					court_case_number,'string','M')
 
 
-PromoteSupers.MAC_SF_BuildProcess(Hygenics_SOff.MainFile,'~thor_data400::base::sex_offender_main'+ doxie_build.buildstate,out1)
-PromoteSupers.MAC_SF_BuildProcess(Hygenics_SOff.OffenseFile,'~thor_data400::base::sex_offender_Offenses'+ doxie_build.buildstate,out2)
+PromoteSupers.MAC_SF_BuildProcess(Hygenics_SOff.MainFile,'~thor_data400::base::sex_offender_main'+ doxie_build.buildstate,out1,,,true)
+PromoteSupers.MAC_SF_BuildProcess(Hygenics_SOff.OffenseFile,'~thor_data400::base::sex_offender_Offenses'+ doxie_build.buildstate,out2,,,true)
 
 
 // Run scrubs stats and email scrubs reports

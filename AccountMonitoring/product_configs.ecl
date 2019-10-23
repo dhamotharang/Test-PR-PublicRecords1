@@ -1,4 +1,4 @@
-
+﻿
 
 IMPORT AccountMonitoring;
 
@@ -88,5 +88,6 @@ EXPORT product_configs(
 	define_product_type_config(mvr,fn_cgm_mvr,product_mask,pseudo_environment);
 	define_product_type_config(aircraft,fn_cgm_aircraft,product_mask,pseudo_environment);
 	define_product_type_config(watercraft,fn_cgm_watercraft,product_mask,pseudo_environment);
+	define_product_type_config(personheader,fn_cgm_personheader,product_mask,pseudo_environment);
 	
 END;

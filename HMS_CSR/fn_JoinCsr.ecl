@@ -1,4 +1,4 @@
-IMPORT Ut, HMS_CSR;
+﻿IMPORT Ut, HMS_CSR;
 
 EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
 				
@@ -15,10 +15,7 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
 			AddDeaFile := distribute(HMS_CSR.Files(pversion,pUseProd).dea_input, HASH(ln_key,entityid,hms_src,id));
 			AddMedFile := distribute(HMS_CSR.Files(pversion,pUseProd).medicaid_input, HASH(ln_key,entityid,hms_src,id));
 			AddTaxFile := distribute(HMS_CSR.Files(pversion,pUseProd).taxonomy_input, HASH(ln_key,entityid,hms_src,id));
-			
-			// AddlicFile	:= distribute(HMS_CSR.Files(pversion,pUseProd).license_input, HASH(ln_key,entityid,hms_src,id));
-			// AddEntFile	:= distribute(HMS_CSR.Files(pversion,pUseProd).entity_input, HASH(ln_key,entityid,hms_src,id));
-			
+						
 			t1_layout := RECORD
 				HMS_CSR.layouts.license_layout;
 				HMS_CSR.layouts.entity_layout;
@@ -42,9 +39,6 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
    										,LOCAL
    										);
    
- 	  
-			
-   		// AddAddrFile	:= distribute(HMS_CSR.Files(pversion,pUseProd).address_input, HASH(ln_key,entityid,hms_src,id));
    		
 			t2_layout := RECORD
 				t1_layout;
@@ -69,8 +63,6 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
    										,LOCAL
    										);
 			
-			// AddSpecFile	:= distribute(HMS_CSR.Files(pversion,pUseProd).specialty_input, HASH(ln_key,entityid,hms_src,id));
-			
 			t3_layout := RECORD
 				t2_layout;
 				HMS_CSR.layouts.specialty_layout;
@@ -89,8 +81,6 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
    										,LEFT OUTER
    										,LOCAL
    										);
-   										
-   		// AddPhoFile	:= distribute(HMS_CSR.Files(pversion,pUseProd).phone_input, HASH(ln_key,entityid,hms_src,id));
 			
 			t4_layout := RECORD
 				t3_layout;
@@ -112,8 +102,6 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
    										,LEFT OUTER
    										,LOCAL
    										);
-   		
-   		// AddLangFile	:= distribute(HMS_CSR.Files(pversion,pUseProd).language_input, HASH(ln_key,entityid,hms_src,id));
 			
 			t5_layout := RECORD
 				t4_layout;
@@ -131,8 +119,6 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
    										,LEFT OUTER
    										,LOCAL
    										);
-   		
-   		// AddEduFile	:= distribute(HMS_CSR.Files(pversion,pUseProd).education_input, HASH(ln_key,entityid,hms_src,id));
 			
 			t6_layout := RECORD
 				t5_layout;
@@ -150,8 +136,6 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
    										,LEFT OUTER
    										,LOCAL
    										);
-   										
-   		// AddDiscFile	:= distribute(HMS_CSR.Files(pversion,pUseProd).disciplinaryact_input, HASH(ln_key,entityid,hms_src,id));
 			
 			t7_layout := RECORD
 				t6_layout;
@@ -169,9 +153,6 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
    										,LEFT OUTER
    										,LOCAL
    										);
-   	
-   			
-			// AddNpiFile	:= distribute(HMS_CSR.Files(pversion,pUseProd).npi_input, HASH(ln_key,entityid,hms_src,id));
 
 			t8_layout := RECORD
 				t7_layout;
@@ -189,8 +170,6 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
    										,LEFT OUTER
    										,LOCAL
    										);
-											
-			// AddCsrFile := distribute(HMS_CSR.Files(pversion,pUseProd).csr_input, HASH(ln_key,entityid,hms_src,id));
 			
 			t9_layout := RECORD
 				t8_layout;
@@ -216,8 +195,6 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
    										,LEFT OUTER
    										,LOCAL
    										);
-   		
-   		// AddDeaFile := distribute(HMS_CSR.Files(pversion,pUseProd).dea_input, HASH(ln_key,entityid,hms_src,id));
 			
 			t10_layout := RECORD
 				t9_layout;
@@ -238,13 +215,13 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
    										,LOCAL
    										);
 			
-			// AddMedFile := distribute(HMS_CSR.Files(pversion,pUseProd).medicaid_input, HASH(ln_key,entityid,hms_src,id));
-			
 			t11_layout := RECORD
 				t10_layout;
 				HMS_CSR.layouts.medicaid_layout;
 				string medicaid_Status:='';
 				string medicaid_State:='';
+				HMS_CSR.layouts.taxonomy_layout;
+				string taxonomy_npi_number:='';				
 			END;
 			
 			t11_layout Join11(base_10 L,AddMedFile R) := TRANSFORM
@@ -252,6 +229,7 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
 				SELF.medicaid_State := R.state;
 				SELF := L;
 				SELF := R;
+				SELF := [];
 			END;
 			
    		base_11	:= JOIN(base_10, AddMedFile
@@ -260,87 +238,8 @@ EXPORT fn_JoinCsr (string pVersion, boolean pUseProd):= function
    										,LEFT OUTER
    										,LOCAL
    										);
-			
-			// AddTaxFile := distribute(HMS_CSR.Files(pversion,pUseProd).taxonomy_input, HASH(ln_key,entityid,hms_src,id));
-			
-			t12_layout := RECORD
-				t11_layout;
-				HMS_CSR.layouts.taxonomy_layout;
-				string taxonomy_npi_number:='';
-			END;
-			
-			t12_layout Join12(base_11 L,AddTaxFile R) := TRANSFORM
-				SELF.taxonomy_npi_number := R.npi_number;
-				SELF := L;
-				SELF := R;
-			END;
-			
-   		base_12	:= JOIN(base_11, AddTaxFile
-   										,LEFT.ln_key = RIGHT.ln_key And LEFT.entityid = RIGHT.entityid And LEFT.hms_src = RIGHT.hms_src And LEFT.id = RIGHT.id
-   										,Join12(LEFT,RIGHT)
-   										,LEFT OUTER
-   										,LOCAL
-   										);
-			
-/* 			AddQualFile := HMS_CSR.Files(pversion,pUseProd).stliclookup_input;
-   			
-   			t13_layout := RECORD
-   				t12_layout;
-   				HMS_CSR.layouts.stliclookup_layout;
-   			END;
-   			
-   			t13_layout Join13(base_12 L,AddQualFile R) := TRANSFORM
-   				SELF := L;
-   				SELF := R;
-   			END;
-   			
-   		 base_13 := JOIN(base_12, AddQualFile
-      										,Stringlib.StringToUpperCase(LEFT.license_state) = Stringlib.StringToUpperCase(RIGHT.State) 
-   													And Stringlib.StringToUpperCase(LEFT.license_class_type) = Stringlib.StringToUpperCase(RIGHT.stlicclass) 
-   													And Stringlib.StringToUpperCase(LEFT.Status) = Stringlib.StringToUpperCase(RIGHT.Status) 
-   													And Stringlib.StringToUpperCase(LEFT.Qualifier1) = Stringlib.StringToUpperCase(RIGHT.Qualifier1)
-   													And Stringlib.StringToUpperCase(LEFT.Qualifier2) = Stringlib.StringToUpperCase(RIGHT.Qualifier2)
-      										,Join13(LEFT,RIGHT)
-      										,LEFT OUTER
-      										,LOOKUP
-      										);
-*/
-   		 
-/*    		SrcLookup := HMS_CSR.LookupTables.StLicSrcLookup;
-      		
-      		t12_layout Join13(base_12 L,SrcLookup R) := TRANSFORM
-      				SELF := L;
-      		END;
-      			
-      		base_13 := JOIN(base_12, SrcLookup
-         										,LEFT.hms_src = RIGHT.vsid 
-   													,Join13(LEFT,RIGHT)
-         										,INNER
-         										,LOOKUP
-         										);
-*/
- /*  
-   		TaxonomyLookup := HMS_CSR.LookupTables.TaxonomyLookup;
-   		
-   		t14_layout := RECORD
-   				t13_layout;
-   				// string15 taxonomy_code := '';
-   		END;
-   			
-   		t14_layout Join15(base_14 L,TaxonomyLookup R) := TRANSFORM
-   				SELF.taxonomy_code := R.taxonomy_code;
-   				SELF := L;
-   		END;
-   		
-   		base_15 := JOIN(base_14, TaxonomyLookup
-      										,LEFT.mapped_class = RIGHT.hms_stlic_type_code
-      										,Join15(LEFT,RIGHT)
-      										,LEFT OUTER
-      										,LOOKUP
-      										);
-*/
-		
-		base_d := distribute(base_12,hash(ln_key,entityid,hms_src,id));
+			   			
+		base_d := distribute(base_11,hash(ln_key,entityid,hms_src,id));
 		
 		base_final := project(base_d,HMS_CSR.Layouts.csrcredential_layout);
 		

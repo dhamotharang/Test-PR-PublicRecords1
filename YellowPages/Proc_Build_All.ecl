@@ -1,9 +1,9 @@
-import tools, _control;
+﻿import tools, _control;
 
 export Proc_Build_All(
 
 	 string																		pversion
-	,string																		pDirectory	= '/data/hds_180/targus/pure_business_iyp_cp/' + pversion + '/'
+	,string																		pDirectory	= '/data/hds_180/targus/pure_business_iyp_cp/data/' + pversion  + '/'
 	,string																		pServerIP		= _control.IPAddress.bctlpedata11
 	,string																		pFilename		= 'IYP_*.dat*'
 	,string																		pGroupName	= constants().groupname																		

@@ -1,0 +1,140 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Inql_fcra_Batch
+FILENAME:FILE
+
+FIELDTYPE:DEFAULT:LEFTTRIM:NOQUOTES("')
+FIELDTYPE:ALPHA:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):
+FIELDTYPE:NAME:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,'.):
+FIELDTYPE:NUMBER:ALLOW(0123456789):
+FIELDTYPE:ALPHANUM:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_):
+FIELDTYPE:WORDBAG:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789<>{}[]-^=!+&,./:|#_@$;):SPACES( ):ONFAIL(CLEAN):
+
+FIELDTYPE:orig_datetime_stamp:SPACES( ):LIKE(NUMBER):LEFTTRIM:WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_global_company_id:SPACES( ):LIKE(NUMBER):LEFTTRIM:WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_company_id:SPACES( ):LIKE(NUMBER):LEFTTRIM:WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_product_cd:SPACES( ):ALLOW(CDOPRTU_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_method:SPACES( ):ALLOW(Bacht):LEFTTRIM:LENGTHS(5):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_vertical:SPACES( ):ALLOW(ACEILRTV):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_function_name:SPACES( ):LIKE(ALPHANUM):LEFTTRIM:WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_transaction_type:SPACES( ):ALLOW(ACEINOPRSTY_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_login_history_id:SPACES( ):ALLOW(DGHILNORSTY_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_job_id:SPACES( ):LIKE(NUMBER):LEFTTRIM:WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_sequence_number:SPACES( ):LIKE(NUMBER):LEFTTRIM:WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_first_name:SPACES( ):LIKE(NAME):WORDS(1,2,0):ONFAIL(CLEAN)
+FIELDTYPE:orig_middle_name:SPACES( ):LIKE(NAME):WORDS(0,1,2):ONFAIL(CLEAN)
+FIELDTYPE:orig_last_name:SPACES( ):LIKE(NAME):WORDS(1,0,2,3):ONFAIL(CLEAN)
+FIELDTYPE:orig_ssn:SPACES( ):LIKE(NUMBER):LEFTTRIM:LENGTHS(9,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:orig_dob:SPACES( ):ALLOW(0123456789BO):LEFTTRIM:LENGTHS(0,8):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:orig_dl_num:SPACES( ):ALLOW(DLMNU_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_dl_state:SPACES( ):ALLOW(ADELST_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_addressline1:SPACES( ):LIKE(WORDBAG):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_addressline2:SPACES( ):LIKE(WORDBAG):LEFTTRIM:ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_prim_range:SPACES( ):LIKE(ALPHANUM):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_predir:SPACES( ):ALLOW(1DEINRSW_):LEFTTRIM:LENGTHS(0,1,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_prim_name:SPACES( ):LIKE(ALPHANUM):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_suffix:SPACES( ):LIKE(ALPHA):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_postdir:SPACES( ):LIKE(ALPHANUM):LEFTTRIM:WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_unit_desig:SPACES( ):LIKE(ALPHANUM):LEFTTRIM:WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_sec_range:SPACES( ):LIKE(ALPHANUM):LEFTTRIM:WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_city:SPACES( ):LIKE(ALPHA):LEFTTRIM:WORDS(1,2,0,3):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_st:SPACES( ):LIKE(ALPHA):LEFTTRIM:LENGTHS(2,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_z5:SPACES( ):LIKE(NUMBER):LEFTTRIM:LENGTHS(5,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address1_z4:SPACES( ):LIKE(NUMBER):LEFTTRIM:LENGTHS(4,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_addressline1:SPACES( ):ALLOW(12ADEILNRS_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_addressline2:SPACES( ):ALLOW(2ADEILNRS_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_prim_range:SPACES( ):ALLOW(2ADEGIMNPRS_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_predir:SPACES( ):ALLOW(2ADEIPRS_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_prim_name:SPACES( ):ALLOW(2ADEIMNPRS_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_suffix:SPACES( ):ALLOW(2ADEFIRSUX_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_postdir:SPACES( ):ALLOW(2ADEIOPRST_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_unit_desig:SPACES( ):ALLOW(2ADEGINRSTU_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_sec_range:SPACES( ):ALLOW(2ACDEGNRS_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_city:SPACES( ):ALLOW(2ACDEIRSTY_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_st:SPACES( ):ALLOW(2ADERST_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_z5:SPACES( ):ALLOW(25ADERSZ_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_address2_z4:SPACES( ):ALLOW(24ADERSZ_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_bdid:SPACES( ):ALLOW(04):LEFTTRIM:LENGTHS(3,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:orig_bdl:SPACES( ):ALLOW(BDL):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_did:SPACES( ):LIKE(NUMBER):LEFTTRIM:LENGTHS(12,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:orig_company_name:SPACES( ):LIKE(NAME):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_fein:SPACES( ):LIKE(NUMBER):LEFTTRIM:LENGTHS(9,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:orig_phone:SPACES( ):ALLOW(0123456789HNOP):LEFTTRIM:LENGTHS(0,10):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:orig_work_phone:SPACES( ):ALLOW(EHKNOPRW_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_company_phone:SPACES( ):ALLOW(ACEHMNOPY_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_reference_code:SPACES( ):ALLOW(CDEFNOR_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_ip_address_initiated:SPACES( ):ALLOW(ADEINPRST_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_ip_address_executed:SPACES( ):TYPE(NUMBERFIELD):LEFTTRIM:WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_charter_number:SPACES( ):ALLOW(ABCEHMNRTU_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_ucc_original_filing_number:SPACES( ):LIKE(NAME):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_email_address:SPACES( ):ALLOW(ADEILMRS_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_domain_name:SPACES( ):ALLOW(ADEIMNO_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_full_name:SPACES( ):ALLOW(AEFLMNU_):LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+FIELDTYPE:orig_dl_purpose:SPACES( ):LIKE(NUMBER):LEFTTRIM:LENGTHS(1):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_glb_purpose:SPACES( ):LIKE(NUMBER):LEFTTRIM:LENGTHS(1,2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_fcra_purpose:SPACES( ):ALLOW(012R):LEFTTRIM:LENGTHS(1):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_process_id:SPACES( ):LIKE(NUMBER):LEFTTRIM:WORDS(1):ONFAIL(CLEAN)
+
+FIELD:orig_datetime_stamp:LIKE(orig_datetime_stamp):TYPE(STRING):0,0
+FIELD:orig_global_company_id:LIKE(orig_global_company_id):TYPE(STRING):0,0
+FIELD:orig_company_id:LIKE(orig_company_id):TYPE(STRING):0,0
+FIELD:orig_product_cd:LIKE(orig_product_cd):TYPE(STRING):0,0
+FIELD:orig_method:LIKE(orig_method):TYPE(STRING):0,0
+FIELD:orig_vertical:LIKE(orig_vertical):TYPE(STRING):0,0
+FIELD:orig_function_name:LIKE(orig_function_name):TYPE(STRING):0,0
+FIELD:orig_transaction_type:LIKE(orig_transaction_type):TYPE(STRING):0,0
+FIELD:orig_login_history_id:LIKE(orig_login_history_id):TYPE(STRING):0,0
+FIELD:orig_job_id:LIKE(orig_job_id):TYPE(STRING20):0,0
+FIELD:orig_sequence_number:LIKE(orig_sequence_number):TYPE(STRING):0,0
+FIELD:orig_first_name:LIKE(orig_first_name):TYPE(STRING):0,0
+FIELD:orig_middle_name:LIKE(orig_middle_name):TYPE(STRING):0,0
+FIELD:orig_last_name:LIKE(orig_last_name):TYPE(STRING):0,0
+FIELD:orig_ssn:LIKE(orig_ssn):TYPE(STRING):0,0
+FIELD:orig_dob:LIKE(orig_dob):TYPE(STRING):0,0
+FIELD:orig_dl_num:LIKE(orig_dl_num):TYPE(STRING):0,0
+FIELD:orig_dl_state:LIKE(orig_dl_state):TYPE(STRING):0,0
+FIELD:orig_address1_addressline1:LIKE(orig_address1_addressline1):TYPE(STRING):0,0
+FIELD:orig_address1_addressline2:LIKE(orig_address1_addressline2):TYPE(STRING):0,0
+FIELD:orig_address1_prim_range:LIKE(orig_address1_prim_range):TYPE(STRING):0,0
+FIELD:orig_address1_predir:LIKE(orig_address1_predir):TYPE(STRING):0,0
+FIELD:orig_address1_prim_name:LIKE(orig_address1_prim_name):TYPE(STRING):0,0
+FIELD:orig_address1_suffix:LIKE(orig_address1_suffix):TYPE(STRING):0,0
+FIELD:orig_address1_postdir:LIKE(orig_address1_postdir):TYPE(STRING):0,0
+FIELD:orig_address1_unit_desig:LIKE(orig_address1_unit_desig):TYPE(STRING):0,0
+FIELD:orig_address1_sec_range:LIKE(orig_address1_sec_range):TYPE(STRING):0,0
+FIELD:orig_address1_city:LIKE(orig_address1_city):TYPE(STRING):0,0
+FIELD:orig_address1_st:LIKE(orig_address1_st):TYPE(STRING):0,0
+FIELD:orig_address1_z5:LIKE(orig_address1_z5):TYPE(STRING):0,0
+FIELD:orig_address1_z4:LIKE(orig_address1_z4):TYPE(STRING):0,0
+FIELD:orig_address2_addressline1:LIKE(orig_address2_addressline1):TYPE(STRING):0,0
+FIELD:orig_address2_addressline2:LIKE(orig_address2_addressline2):TYPE(STRING):0,0
+FIELD:orig_address2_prim_range:LIKE(orig_address2_prim_range):TYPE(STRING):0,0
+FIELD:orig_address2_predir:LIKE(orig_address2_predir):TYPE(STRING):0,0
+FIELD:orig_address2_prim_name:LIKE(orig_address2_prim_name):TYPE(STRING):0,0
+FIELD:orig_address2_suffix:LIKE(orig_address2_suffix):TYPE(STRING):0,0
+FIELD:orig_address2_postdir:LIKE(orig_address2_postdir):TYPE(STRING):0,0
+FIELD:orig_address2_unit_desig:LIKE(orig_address2_unit_desig):TYPE(STRING):0,0
+FIELD:orig_address2_sec_range:LIKE(orig_address2_sec_range):TYPE(STRING):0,0
+FIELD:orig_address2_city:LIKE(orig_address2_city):TYPE(STRING):0,0
+FIELD:orig_address2_st:LIKE(orig_address2_st):TYPE(STRING):0,0
+FIELD:orig_address2_z5:LIKE(orig_address2_z5):TYPE(STRING):0,0
+FIELD:orig_address2_z4:LIKE(orig_address2_z4):TYPE(STRING):0,0
+FIELD:orig_bdid:LIKE(orig_bdid):TYPE(STRING):0,0
+FIELD:orig_bdl:LIKE(orig_bdl):TYPE(STRING):0,0
+FIELD:orig_did:LIKE(orig_did):TYPE(STRING):0,0
+FIELD:orig_company_name:LIKE(orig_company_name):TYPE(STRING):0,0
+FIELD:orig_fein:LIKE(orig_fein):TYPE(STRING):0,0
+FIELD:orig_phone:LIKE(orig_phone):TYPE(STRING):0,0
+FIELD:orig_work_phone:LIKE(orig_work_phone):TYPE(STRING):0,0
+FIELD:orig_company_phone:LIKE(orig_company_phone):TYPE(STRING):0,0
+FIELD:orig_reference_code:LIKE(orig_reference_code):TYPE(STRING):0,0
+FIELD:orig_ip_address_initiated:LIKE(orig_ip_address_initiated):TYPE(STRING):0,0
+FIELD:orig_ip_address_executed:LIKE(orig_ip_address_executed):TYPE(STRING):0,0
+FIELD:orig_charter_number:LIKE(orig_charter_number):TYPE(STRING):0,0
+FIELD:orig_ucc_original_filing_number:LIKE(orig_ucc_original_filing_number):TYPE(STRING):0,0
+FIELD:orig_email_address:LIKE(orig_email_address):TYPE(STRING):0,0
+FIELD:orig_domain_name:LIKE(orig_domain_name):TYPE(STRING):0,0
+FIELD:orig_full_name:LIKE(orig_full_name):TYPE(STRING):0,0
+FIELD:orig_dl_purpose:LIKE(orig_dl_purpose):TYPE(STRING):0,0
+FIELD:orig_glb_purpose:LIKE(orig_glb_purpose):TYPE(STRING):0,0
+FIELD:orig_fcra_purpose:LIKE(orig_fcra_purpose):TYPE(STRING):0,0
+FIELD:orig_process_id:LIKE(orig_process_id):TYPE(STRING):0,0

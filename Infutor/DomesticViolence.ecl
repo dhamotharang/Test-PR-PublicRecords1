@@ -1,4 +1,4 @@
-/***
+﻿/***
 
 Manage domestic violence shelters
 The followint processes are required
@@ -142,6 +142,9 @@ rHeader := RECORD
   string1 jflag3;
   unsigned8 rawaid;
   unsigned8 persistent_record_id;
+	//CCPA-17 new fields for CCPA
+	 unsigned4 global_sid:=0;
+  unsigned8 record_sid:=0;
   string1 valid_dob;
   unsigned6 hhid;
   string18 county_name;

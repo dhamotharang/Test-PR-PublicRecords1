@@ -1,4 +1,4 @@
-import AID,standard,BIPV2;
+﻿import AID,standard,BIPV2;
 
 export layouts := MODULE
 	export Mari_in := RECORD
@@ -332,6 +332,10 @@ export base :=  RECORD,maxlength(8000)
 				STRING3			is_Authorized_License,					// Populated by NMLS
 				STRING3			is_Authorized_Conduct,					// Populated by NMLS
 				STRING150		FEDERAL_REGULATOR,							// Populated by NMLS
+				//CCPA-110 Add 2 CCPA fields
+				UNSIGNED4	global_sid;
+				UNSIGNED8	record_sid;
+				
       END;  
 
 
@@ -510,6 +514,9 @@ export base :=  RECORD,maxlength(8000)
 				
 //BIP Section
 				BIPV2.IDlayouts.l_xlink_ids; 
+				//CCPA-110 Add 2 CCPA fields
+				UNSIGNED4	global_sid;
+				UNSIGNED8	record_sid;
 			END;  
 			
 	export clean :=	RECORD
@@ -534,7 +541,7 @@ export base :=  RECORD,maxlength(8000)
 		END;
 		
 	export final := RECORD
-				clean;
+				clean -[global_sid,record_sid];
 				string10	BUS_PRIM_RANGE;
 				string2   BUS_PREDIR;
 				string28	BUS_PRIM_NAME;
@@ -591,6 +598,9 @@ export base :=  RECORD,maxlength(8000)
 				string5   MAIL_ERR_STAT;  			// increase length to accommodate Canadian err_stat
 				STRING30	CLN_LICENSE_NBR;
 				STRING1		enh_did_src:='';					//Ehanced did source; M for Mari, S for SANCTN, N for SANCTN Non-public
+				//CCPA-110 Add 2 CCPA fields
+				UNSIGNED4	global_sid;
+				UNSIGNED8	record_sid;
 			END;  		
 
 	export Srch_DBA  := record
@@ -650,6 +660,9 @@ export base :=  RECORD,maxlength(8000)
 				unsigned8	foreign_nmls_id;
 				STRING150 regulator;
 				STRING150 federal_regulator;
+		 //CCPA-110 Add 2 CCPA fields
+		 UNSIGNED4	global_sid;
+		 UNSIGNED8	record_sid;
 		end;
 
 // NMLS Supported File

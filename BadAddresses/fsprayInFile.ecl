@@ -1,7 +1,7 @@
-Import _control, ut;
+﻿Import _control, ut;
 
 Export fsprayInFile(String FileName, String Filedate) := Function
-Groupname := 'thor400_60';//Prod
+Groupname := 'thor400_36';//Prod
 // Groupname := 'thor40_241';//Dataland
 Result := Sequential(
 		 FileServices.SprayVariable(_control.IPAddress.bctlpedata10,

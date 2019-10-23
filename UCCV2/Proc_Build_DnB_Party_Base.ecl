@@ -1,10 +1,10 @@
-IMPORT Address, NID, UCCV2, ut;
+﻿IMPORT Address, NID, UCCV2, ut; 
 
-person_flags := ['P', 'D'];
-// An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.
-business_flags := ['B', 'U', 'I'];
+person_flags   := ['P', 'D'];
+// V2 replaced the Unclassified('U') category with the Trust ('T') category, what used to be a U should become a T or I with V2.
+business_flags := ['B', 'I', 'T'];
 
-NID.Mac_CleanFullNames(UCCV2.File_DnB_debtor_in, dCleanName, filg_nme);
+NID.Mac_CleanFullNames(UCCV2.File_DnB_debtor_in, dCleanName, filg_nme, useV2:=true);
 
 UCCV2.Layout_File_DnB_Debtor_in CleanName(dCleanName L) := TRANSFORM
 	SELF.Personal_name1	:= MAP(L.nametype IN person_flags => L.cln_title + 
@@ -26,7 +26,7 @@ END;
 
 cleanDebtor := PROJECT(dCleanName, CleanName(LEFT));
 
-NID.Mac_CleanFullNames(UCCV2.File_DnB_SecuredParty_in, dCleanName_sec, filg_nme);
+NID.Mac_CleanFullNames(UCCV2.File_DnB_SecuredParty_in, dCleanName_sec, filg_nme, useV2:=true);
 
 UCCV2.Layout_File_DnB_SecuredParty_in CleanName_sec(dCleanName_sec L) := TRANSFORM
 	SELF.Personal_name1	:= MAP(L.nametype IN person_flags => L.cln_title + 
@@ -164,8 +164,8 @@ UCCV2.Layout_UCC_Common.Layout_Party_with_AID project_Name_address(dName_Address
    
 	self.dt_first_seen						:=   (unsigned6)(pInput.process_date[1..6]);
 	self.dt_last_seen							:=   (unsigned6)(pInput.process_date[1..6]);
-	self.dt_vendor_first_reported	:=   (unsigned6)(pInput.process_date[1..6]);
-	self.dt_vendor_last_reported	:=   (unsigned6)(pInput.process_date[1..6]);
+	self.dt_vendor_first_reported	:=   (unsigned6) pInput.process_date;
+	self.dt_vendor_last_reported	:=   (unsigned6) pInput.process_date;
 	self.tmsid										:=  	'';
 	self													:=		pInput;
 	self													:=		[];
@@ -233,7 +233,10 @@ dPartyBase              :=  dedup(dAppendRmsid  ,except dt_first_seen,
 														   dt_vendor_first_reported, All);
 														   
 														   
-OutParty                :=  output(dPartyBase  ,,UCCV2.cluster.cluster_out+'base::UCC::Party::dnb',overwrite,__compressed__);
+dPartyBaseFilt					:=	dPartyBase(tmsid <> 'DNB11538536120180807'	or (tmsid='DNB11538536120180807' and ut.CleanSpacesAndUpper(orig_name)<>'HOWARD STATE BANK'));
+														   
+														   
+OutParty                :=  output(dPartyBaseFilt  ,,UCCV2.cluster.cluster_out+'base::UCC::Party::dnb',overwrite,__compressed__);
 AddSuperfile            :=  FileServices.AddSuperFile(UCCV2.cluster.cluster_out+'base::UCC::Party_Name',UCCV2.cluster.cluster_out+'base::UCC::Party::dnb');
 
 export proc_build_dnb_party_base    :=sequential(OutParty,AddSuperfile); 

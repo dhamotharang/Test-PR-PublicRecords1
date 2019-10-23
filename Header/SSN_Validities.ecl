@@ -5,7 +5,7 @@ h := distribute(header.apt_patch(ssn <>''),hash(did)); // This will change
 ofile := watchdog.fn_best_ssn(h).concat_them;
 
 
-rels := header.file_relatives(number_cohabits>5);
+rels := header.File_Relatives_v3(number_cohabits>5);
 
 r_ssn := record
   unsigned6 did1;

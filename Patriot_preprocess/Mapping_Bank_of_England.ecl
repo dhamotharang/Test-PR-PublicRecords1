@@ -1,4 +1,4 @@
-
+﻿
 #OPTION('multiplePersistInstances',false);
 
 BankOfEngland	:= 	DATASET('~thor::in::globalwatchlists::bank_of_england', 
@@ -204,6 +204,7 @@ self.remarks_18 := remarks18;
 self.remarks_19 := remarks19;
 self.remarks_20 := remarks20;	
 self.entity_flag := map(l.Group_Type = 'Entity' => 'Y', '');
+
 self := []
 end;
 

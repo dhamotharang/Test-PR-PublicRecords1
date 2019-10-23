@@ -1,19 +1,19 @@
-import FBNV2 ;
+﻿import FBNV2 ;
 
-export Get_Update_SupperFilename(string updatetype)  := 
+export Get_Update_SupperFilename(string source)  := 
 
 
-	map(updatetype='San_Diego'=>Filenames().San_diego_newupdate,
-	updatetype='Ventura'=>Filenames().Ventura_newupdate,
-	updatetype='Orange'=>Filenames().orange_newupdate,
-	updatetype='San_Bernardino'=>Filenames().San_Bernardinoupdate,
-	updatetype='Santa_Clara'=>Filenames().Santa_Clara_newupdate,
-	updatetype='Dallas'=>Filenames().Dallasupdate,
-	updatetype='Harris'=>Filenames().Harris_newupdate,
-	updatetype='Filing'=>Filenames().Filing_newupdate,
-	updatetype='Event'=>Filenames().Event_newupdate,
-	updatetype='NYC'=>Filenames().NYCupdate,
-	updatetype='InfoUSA'=>Filenames().infoUSAupdate,						
+	map(source='SAN_DIEGO'=>cluster.Cluster_In + 'in::FBNV2::CA::San_diego::Cleaned',
+	source='VENTURA'=>cluster.Cluster_In + 'in::FBNV2::CA::Ventura::Cleaned',
+	source='ORANGE'=>cluster.Cluster_In + 'in::FBNV2::CA::orange::Cleaned',
+	source='SAN_BERNARDINO'=>cluster.Cluster_In + 'in::FBNV2::CA::San_Bernardino',
+	source='SANTA_CLARA'=>cluster.Cluster_In + 'in::FBNV2::CA::Santa_Clara::Cleaned',
+	source='DALLAS'=>cluster.Cluster_In + 'in::FBNV2::TX::Dallas',
+	source='HARRIS'=>cluster.Cluster_In + 'in::FBNV2::TX::Harris::Cleaned',
+	source='FILING'=>cluster.Cluster_In + 'in::FBNV2::FL::Filing::Cleaned',
+	source='EVENT'=>cluster.Cluster_In + 'in::FBNV2::FL::Event::Cleaned',
+	source='NYC'=>cluster.Cluster_In + 'in::FBNV2::NYC',
+	source='INFOSA'=>cluster.Cluster_In + 'in::FBNV2::InfoUSA',						
 	'');
 	
 	

@@ -108,7 +108,8 @@ functionmacro
 
   clickableWatcher_wuid   := '<a href="/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + Child_watcher_Wuid + '">' + Child_watcher_Wuid + '</a>';
 
-  StartDataset          := dataset([{'',Child_Wuid,'','','',piteration,pversion,'',''}],wk_ut.layouts.wks_slim);
+  StartDataset          := dataset([{'','',Child_Wuid,'',''  ,'','',piteration,pversion,'',''}],wk_ut.layouts.wks_slim);
+  // StartDataset          := dataset([{'',Child_Wuid,'','','',piteration,pversion,'',''}],wk_ut.layouts.wks_slim);
   
   kick_Off_Child := sequential(
        output(try_Number                                        ,named('Try_Number'                                                           ),overwrite)
@@ -140,7 +141,8 @@ functionmacro
 
   //name, wuid, iteration#, version, thor time, etc
 
-  dWUDetails  := dataset([{jobname ,Child_Wuid ,localesp,wk_ut._Constants.LocalENV,getstate ,piteration ,pversion ,thor_time,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0.0,wk_ut.getTimeDate(),Errors}] ,wk_ut.layouts.wks_slim);
+  dWUDetails   := dataset([{jobname ,'',Child_Wuid ,'',localesp,wk_ut._Constants.LocalENV,getstate ,piteration ,pversion ,thor_time,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0.0,wk_ut.getTimeDate(),'','','','',false,dataset([],wk_ut.layouts.lay_results),'',Errors}] ,wk_ut.layouts.wks_slim);
+  // dWUDetails:= dataset([{jobname ,Child_Wuid ,localesp,wk_ut._Constants.LocalENV,getstate ,piteration ,pversion ,thor_time,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0.0,wk_ut.getTimeDate(),Errors}] ,wk_ut.layouts.wks_slim);
   jobname2    := if(jobname != '' ,jobname ,Child_Wuid);
   sendemail   := wk_ut.Send_Email(
                              pNotifyEmails
@@ -155,7 +157,7 @@ functionmacro
                             + 'Version         : ' + pversion                                                                           + '\n'
                             + 'Runner Wuid link: ' + 'http://' + localesp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit   + '#/stub/Summary\n' 
                             + if(trim(Errors) != '' ,'FailMessage(s): \n' + Errors + '\n','')
-                            + iff(getstate in ['failed','aborted']
+                            + iff(getstate in ['failed','aborted','unknown']
                                 , '\nThis workunit ' + getstate + '.  I am awaiting your advice on what to do next.\n'
                                 + 'Here are your options(Simply click the link beside your choice to advise the process.):\n\n'
                                 + 'Rerun iteration              : ' + wk_ut.Push_Event_Result_Link(pWaitEvent,'Rerun',localesp) + '\n'
@@ -290,6 +292,7 @@ functionmacro
         ,blank_reruns
       );//default  send an email 
 
+  child_status_result := trim(wk_ut.get_Scalar_Result(workunit ,'ChildStatus'));
 
   doit := sequential(
      output(wk_ut.getTimeDate()                             ,named('DateTime'         ),overwrite)
@@ -299,10 +302,11 @@ functionmacro
     ,output(if(pForceSkip = false,Advice,'skip')            ,named('Advice'           ),overwrite) // master will get this result to see what happened with the child
     ,output(if((unsigned)TimesCalled + 1 > 1, childstate,''),named('ChildStatus'      ),overwrite)
     ,map(
-       (LastWork in ['Get Iteration Info','Sending email--default'] and regexfind('run'       ,Advice,nocase)) or LastWork in ['','[undefined]']      => kickWuid           //Kick off new wuid(first time or rerun)
-      , LastWork =   'Kicked Off Iteration'                         or  trim(wk_ut.get_Scalar_Result(workunit ,'ChildStatus')) = 'completed'          => Gather_Child_Info  //Gather info on wuid after completed/failed/aborted.  if completed, fail this wuid and notify parent.
-      , LastWork =   'Get Iteration Info'                           and regexfind('fail|skip' ,Advice,nocase)                                         => failOrSkip         //if advice to skip or fail, notify parent.
-      ,                                                                                                                                                  default            //send default email.  shouldn't happen, but if does no biggie.
+       (trim(LastWork) in ['Get Iteration Info'  ,'Sending email--default'] and regexfind('run'       ,Advice,nocase) and child_status_result in ['failed','aborted','unknown']) or trim(LastWork) in ['','[undefined]']  => kickWuid                         //Kick off new wuid(first time or rerun)
+      , trim(LastWork) in ['Get Iteration Info'  ,'Sending email--default'] and regexfind('fail|skip' ,Advice,nocase) and child_status_result in ['failed','aborted','unknown']                                           => failOrSkip                       //if advice to skip or fail, notify parent.
+      , child_status_result     in ['completed','failed','aborted','unknown']                                                                                                                                             => Gather_Child_Info                //Gather info on wuid after completed/failed/aborted.  if completed, fail this wuid and notify parent.
+      , child_status_result not in ['completed','failed','aborted','unknown']                                                                                                                                             => default //STD.System.Debug.Sleep ( 1000 )  //if it gets notified before the iteration is finished, sleep for a second, then go back in the scheduler.  No biggie.
+      ,                                                                                                                                                                                                                      default                          //send default email.  shouldn't happen, but if does no biggie.
     )  
   );
 

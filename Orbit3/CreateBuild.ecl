@@ -1,4 +1,4 @@
-import ut;
+import std;
 
 EXPORT CreateBuild(
 				string MasterBuildName,
@@ -15,9 +15,9 @@ EXPORT CreateBuild(
 
 
 //Create Build instance
-
+GetTimeDate := Std.Date.SecondsToString(Std.Date.CurrentSeconds(TRUE), '%F%H%M%S%u');
 Inputrec := record
-string ActualStartDate { xpath('ActualStartDate' )} := ut.GetTimeDate()[1..10]+'T'+ut.GetTimeDate()[11..12]+':'+ut.GetTimeDate()[13..14]+':'+ut.GetTimeDate()[15..16]+'Z';
+string ActualStartDate { xpath('ActualStartDate' )} := GetTimeDate[1..10]+'T'+GetTimeDate[11..12]+':'+GetTimeDate[13..14]+':'+GetTimeDate[15..16]+'Z';
 string BuildName { xpath('BuildName')} := MasterBuildName ;
 string BuildVersion { xpath('BuildVersion')} := BuildVersion;
 string ExcludefromScorecard { xpath('ExcludeFromScorecard' )} := Excludefrom_Scorecard;

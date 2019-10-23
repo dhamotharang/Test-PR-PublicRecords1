@@ -1,6 +1,6 @@
-﻿IMPORT UT,_Control,doxie; 
+﻿IMPORT UT,_Control,doxie,header; 
 
-rm_score0  := doxie.header_pre_keybuild ; 
+rm_score0  := header.fn_persistent_record_ID(doxie.header_pre_keybuild) ; 
 
 rm_score := PROJECT(rm_score0, TRANSFORM({rm_score0 , UNSIGNED4 DT_EFFECTIVE_FIRST, UNSIGNED4	DT_EFFECTIVE_LAST := 0}, 
                                  SELF.DT_EFFECTIVE_FIRST := 20160101, 

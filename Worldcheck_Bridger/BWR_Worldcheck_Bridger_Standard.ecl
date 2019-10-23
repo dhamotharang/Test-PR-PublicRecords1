@@ -1,6 +1,6 @@
-export BWR_Worldcheck_Bridger_Standard(file_date) := macro
+﻿export BWR_Worldcheck_Bridger_Standard(file_date) := macro
 #OPTION('multiplePersistInstances',FALSE);
-#workunit('name','WorldCheck Bridger Standard - '+ file_date)
+
 #workunit('priority','high')
 //Inputs
 standard          := 'world-check.csv';

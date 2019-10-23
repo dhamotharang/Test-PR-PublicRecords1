@@ -1,4 +1,4 @@
-IMPORT AID, BIPV2;
+﻿IMPORT AID, BIPV2;
 
 export Layout_Fares_Foreclosure_v2 := record
 	string70	foreclosure_id;
@@ -8,7 +8,7 @@ export Layout_Fares_Foreclosure_v2 := record
 	string3		deed_category;
 	string55	deed_desc;
 	string3		document_type;
-	string40	document_desc;
+	string55	document_desc;
 	string8		recording_date;
 	string4		document_year;
 	string12	document_nbr;
@@ -345,4 +345,12 @@ export Layout_Fares_Foreclosure_v2 := record
 	string8   process_date;
 	string2		crlf;
 	unsigned8 source_rec_id := 0; //Added for BIP project
+	string1		lender_type := '';
+	string55	lender_type_desc	:= '';
+	string10	loan_amount	:= '';
+	string1		loan_type	:= '';
+	string60	loan_type_desc	:= '';
+	string2		source	:= '';	//FR = CL, 'B7' = BK_NOD, 'I5' = BK_REO
+	unsigned4 global_sid	:= 0;	//CCPA field
+	unsigned8 record_sid	:= 0;	//CCPA field
 end;

@@ -1,4 +1,4 @@
-// The following attribute sprays a portfolio update to disk.
+﻿// The following attribute sprays a portfolio update to disk.
 EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
                                     STRING    spray_ip_address, 
                                     STRING    spray_path,
@@ -37,7 +37,7 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 					'|',                                  // srcCSVseparator
 					,                                     // srcCSVterminator
 					',',                                  // srcCSVquote
-					if(AccountMonitoring.constants.spray_groupname = 'thor400_dev', 'thor400_dev01', AccountMonitoring.constants.spray_groupname),            // destinationgroup
+					AccountMonitoring.constants.spray_groupname,   // destinationgroup
 					logical_file_name,                    // destination logical filename
 					,,,,,COMPRESS)));
 			END;
@@ -80,6 +80,7 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 		process_documents_mvr								:= process_input_file(fnms.documents.mvr.remote    				 	 ,fnms.documents.mvr.update);
 		process_documents_aircraft					:= process_input_file(fnms.documents.aircraft.remote			 	 ,fnms.documents.aircraft.update);
 		process_documents_watercraft				:= process_input_file(fnms.documents.watercraft.remote   	 	 ,fnms.documents.watercraft.update);
+		process_documents_personheader				:= process_input_file(fnms.documents.personheader.remote   	 	 ,fnms.documents.personheader.update);
 
 
 		spray_all_files := PARALLEL(
@@ -108,7 +109,8 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 			process_documents_corp.spray,
 			process_documents_mvr.spray,
 			process_documents_aircraft.spray,
-			process_documents_watercraft.spray
+			process_documents_watercraft.spray,
+			process_documents_personheader.spray
 		);
 		
 		update_all_superfiles := PARALLEL(
@@ -137,7 +139,8 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 			process_documents_corp.update,
 			process_documents_mvr.update,
 			process_documents_aircraft.update,
-			process_documents_watercraft.update
+			process_documents_watercraft.update,
+			process_documents_personheader.update
 		);
 			
 		RETURN SEQUENTIAL( IF( NOT valid_spray_criteria, 

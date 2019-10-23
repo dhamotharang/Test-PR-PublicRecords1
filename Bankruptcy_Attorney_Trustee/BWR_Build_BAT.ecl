@@ -2,7 +2,7 @@
 
 export BWR_Build_BAT (filedate) := MACRO
 
-#workunit('name','Bankruptcy Attorney Trustee ' + filedate);
+#workunit('name','Yogurt:Bankruptcy Attorney Trustee ' + filedate);
 
 DoBuild := Bankruptcy_Attorney_Trustee.Build_All(filedate);
 

@@ -1,4 +1,4 @@
-import ut,fbnv2,address, lib_stringlib, VersionControl;
+﻿import ut,fbnv2,address, lib_stringlib, VersionControl;
 
 export Standardize_FBN_TX_Harris(	 
 	string									pversion
@@ -158,7 +158,7 @@ function
 	VersionControl.macBuildNewLogicalFile(logicalfile	,Clean_Filings_Names2	,filing_out		,,,pOverwrite);		
 	
 	mapped_Filing 	:= 	filing_out;
-	source					:= 'Harris';
+	source					:= 'HARRIS';
 	superfilename 	:= FBNV2.Get_Update_SupperFilename(source);
 	Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 	
@@ -166,6 +166,7 @@ function
 		sequential(
 			mapped_Filing
 			,if(~FileServices.FileExists(superfilename), Create_Super)
+			,fileservices.clearSuperFile( superfilename)
 			,fileservices.addsuperfile( superfilename,logicalfile)								  
 		);	
 

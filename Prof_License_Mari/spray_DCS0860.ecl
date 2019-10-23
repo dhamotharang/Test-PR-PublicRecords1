@@ -1,8 +1,8 @@
-IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib,Lib_date;
+﻿IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib,Lib_date;
 	   
 EXPORT spray_DCS0860(string filedate) := MODULE
 	
-	#workunit('name','Spray DCS0860');
+	#workunit('name','Yogurt:Spray DCS0860 ' + filedate);
 	SHARED code						:= 'DCS0860';
 	SHARED destination 						:= Common_Prof_Lic_Mari.SourcesFolder + code + '::';
   SHARED superfile_rel 					:= destination + 'using::' + 'rle_license';
@@ -41,15 +41,16 @@ END;
 //  Spray All Files
 spray_all	:=
 	PARALLEL(
-		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Real Estate Listing Current.csv','comma');
-		
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Real Estate Broker.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Real Estate saleperson.csv','comma');
 	);
 
 
 //  Transform All Files
 xform_all
 	:= PARALLEL(
-							OUTPUT(TransformFile_rel('Real Estate Listing Current.csv'),, 	destination + filedate + '::Real Estate Listing Current.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('Real Estate Broker.csv'),, 	destination + filedate + '::Real Estate Broker.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('Real Estate saleperson.csv'),, 	destination + filedate + '::Real Estate saleperson.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
 					 	);	
 
 
@@ -58,7 +59,8 @@ super_all
 	:=	
 	SEQUENTIAL(
 		FileServices.StartSuperFileTransaction(),
-		AddToSuperfile_rel('Real Estate Listing Current.csv'),
+		AddToSuperfile_rel('Real Estate Broker.csv'),
+		AddToSuperfile_rel('Real Estate saleperson.csv'),
 		FileServices.FinishSuperFileTransaction()
 	);
 
@@ -66,7 +68,8 @@ super_all
 remove_raw 
 	:= 
 		SEQUENTIAL(
-							 FileServices.DeleteLogicalFile(destination + filedate + '::Real Estate Listing Current.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::Real Estate Broker.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::Real Estate saleperson.raw'),
 							 );
 
 

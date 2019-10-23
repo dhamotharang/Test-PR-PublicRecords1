@@ -1,4 +1,4 @@
-import WorldCheck, doxie_build, Roxiekeybuild, Orbit3;
+﻿import WorldCheck, doxie_build, Roxiekeybuild, Orbit3;
 
 export MAC_WC_Spray_Build(filename
 						 ,filedate) := macro
@@ -11,7 +11,7 @@ WorldCheck.Out_File_Main_Stats_Population(WorldCheck.File_Main
 										 ,strata_output)
 									
 dops_update := RoxieKeybuild.updateversion('WorldCheckKeys',filedate,'randy.reyes@lexisnexis.com; manuel.tarectecan@lexisnexis.com; Abednego.Escobal@lexisnexis.com',,'N|B');
-orbit_update := Orbit3.proc_Orbit3_CreateBuild ('WorldCheck',filedate,'N');
+orbit_update := Orbit3.proc_Orbit3_CreateBuild ('WorldCheck',filedate,'N|B');
 										 
 sequential(WorldCheck.proc_WorldCheck_Spray(filename
                                             ,filedate)

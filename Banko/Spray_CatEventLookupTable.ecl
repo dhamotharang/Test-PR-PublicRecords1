@@ -1,4 +1,4 @@
-/*import _control;
+﻿/*import _control;
 
 sourceIP					:=	_Control.IPAddress.edata12;
 sourcepath1					:=	'/export/home/gwitz/Banko.txt';
@@ -65,8 +65,8 @@ super_banko := sequential(FileServices.StartSuperFileTransaction(),
 				FileServices.ClearSuperFile('~thor_data400::in::banko::categoryevent_delete',true));
 
  ret := sequential(spray_banko,super_banko,notify('BK EVENT SPRAY COMPLETE','*'))
- : success(FileServices.sendemail(if(email_target<>' ',email_target,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com,Michael.Gould@lexisnexisrisk.com,Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com'),'banko Spray Succeeded','banko Spray Succeeded')),
-   failure(FileServices.sendemail(if(email_target<>' ',email_target,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com,Michael.Gould@lexisnexisrisk.com,Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com'),'banko Spray Failure','banko Spray Failure'))
+ : success(FileServices.sendemail(if(email_target<>' ',email_target,'Christopher.Brodeur@lexisnexisrisk.com,Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com'),'banko Spray Succeeded','banko Spray Succeeded')),
+   failure(FileServices.sendemail(if(email_target<>' ',email_target,'Christopher.Brodeur@lexisnexisrisk.com,Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com'),'banko Spray Failure','banko Spray Failure'))
  ;
 
 return ret;

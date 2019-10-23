@@ -1,9 +1,9 @@
-import Address, Ut, lib_stringlib, _Control, business_header,_Validate,
+﻿import Address, Ut, lib_stringlib, _Control, business_header,_Validate,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS,watchdog,Business_HeaderV2;
 
 export Append_DID(
 
-	 dataset(Layouts.Base) pDataset
+	 dataset(Layouts.Base_new) pDataset
 	,string													pPersistname	= persistnames().appendDID
 	
 ) :=
@@ -12,7 +12,7 @@ function
 	//////////////////////////////////////////////////////////////////////////////////////
 	// -- Slim record for Diding
 	//////////////////////////////////////////////////////////////////////////////////////
-	Layouts.Temporary.DidSlim tSlimForDiding(Layouts.Base l) :=
+	Layouts.Temporary.DidSlim tSlimForDiding(Layouts.Base_new l) :=
 	transform
 		self.unique_id		:= l.rid															;
 		self.fname				:= l.clean_name.fname		    					;
@@ -34,11 +34,13 @@ function
 		
 	dSlimForDiding	:= project(pDataset,tSlimForDiding(left));
 	
+	ut.mac_flipnames(dSlimForDiding, fname, mname, lname, dStandardizedName_flipnames)
+	
 	// Match to Headers by subject Name and Address and phone
 	Did_Matchset := ['A','P'];
 
 	DID_Add.MAC_Match_Flex(
-		 dSlimForDiding															// Input Dataset
+		 dStandardizedName_flipnames								// Input Dataset
 		,Did_Matchset             									// Did_Matchset  what fields to match on
 		,ssn                	    									// ssn
 		,dob                 												// dob
@@ -78,7 +80,7 @@ function
 	
 	dAddUniqueId_dist := distribute	(pDataset						,rid	);
 		 
-	Layouts.Base tAssignDIDs(Layouts.Base l, Layouts.Temporary.DidSlim r) :=
+	Layouts.Base_new tAssignDIDs(Layouts.Base_new l, Layouts.Temporary.DidSlim r) :=
 	transform
 
 		self.did				:= if(r.did				<> 0	,r.did				,0);

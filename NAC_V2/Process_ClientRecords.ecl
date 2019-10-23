@@ -1,16 +1,16 @@
-/*
+﻿/*
 
 Update Logic
 In the original NAC NCF, for which a record per Client per month could be expected, 
   update logic was straightforward because of the one-record/ one-month nature of the data.  
-Typically, provided to the NAC would be Clients with a Client Eligibility Indicator of â€œEâ€ (Eligible) 
- along with those of â€œIâ€ (Ineligible Alien) especially for the purpose of including an ineligible Head of Household
+Typically, provided to the NAC would be Clients with a Client Eligibility Indicator of “E” (Eligible) 
+ along with those of “I” (Ineligible Alien) especially for the purpose of including an ineligible Head of Household
  in the case along with eligible dependent children.
 
 The typical update for NCF, if any, was an update to the address/phone/email, 
  or to send corrected/updated Client DOB and Client SSN values when the actual values were not initially available (i.e. Pseudo).  
-Additional updates would be provided to reverse eligibility from â€œEâ€ to â€œNâ€ (Not Eligible) 
-  for a specific benefit month if such a correction was needed after the â€œEâ€ record was already contributed to the NAC.
+Additional updates would be provided to reverse eligibility from “E” to “N” (Not Eligible) 
+  for a specific benefit month if such a correction was needed after the “E” record was already contributed to the NAC.
 
 The NC2NCF2 must accommodate different types of updates to accomplish two of the goals of its layout versus the NCF:
 
@@ -45,7 +45,7 @@ Consider the NAC has received and processed a record with the following values:
 	EndDate										201506
 
 Indirect Update/Overwrite
-Letâ€™s say that in March of 2015 it is determined that eligibility should end that month.
+Let’s say that in March of 2015 it is determined that eligibility should end that month.
   One option is to actively submit a change to the Client Eligibility Indicator for the months that need to be changed:
 	Eligibility Indicator			N
 	StartDate									201504
@@ -66,9 +66,9 @@ Another option would be to send an update to the original record.
 	EndDate										201503
 
 What if the Fields Do Not Match?
-If all values are the same but the start/end dates are different, itâ€™s considered new and not an update to the previous data.
-Consider we start with the original one from above, with 201501 â€“ 201506 presented as the start/end month.
-Letâ€™s say thereâ€™s some case reorganization or something else that causes a new period or recertification,
+If all values are the same but the start/end dates are different, it’s considered new and not an update to the previous data.
+Consider we start with the original one from above, with 201501 – 201506 presented as the start/end month.
+Let’s say there’s some case reorganization or something else that causes a new period or recertification,
  generating a new record for a new eligibility period that does not undo the original.
 	Eligibility Indicator			E
 	StartDate									201505			// notice the overlap

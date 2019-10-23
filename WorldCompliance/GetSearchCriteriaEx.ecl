@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 PrepForXML(unicode s) := 
 				STD.Uni.FindReplace(
 					STD.Uni.FindReplace(s,'&','&amp;'),
@@ -49,11 +49,24 @@ CategoryCriteria(dataset(Layouts.rEntity) infile) := FUNCTION
 						name);
 END;
 
-EXPORT GetSearchCriteriaEx(dataset(Layouts.rEntity) infile) := 
+ConsolidatedCriteria := FUNCTION
+		sources := SORT($.GetSanctionsCriteria, SourceName);
+											
+		return PROJECT(sources,
+									TRANSFORM(WorldCompliance.rCriteria,
+														self.valueid := left.SourceId;
+														self.name := PrepForXML(left.SourceName);)
+					);
+END;
+
+EXPORT GetSearchCriteriaEx(dataset(Layouts.rEntity) infile, boolean IncludeSanctionsCriteria) := 
 															
 		MakeGroupHeader(SORT(CountryCriteria(infile),name), 1, 'Country')
 		+MakeGroupHeader(dsRegion, 2, 'Regional Level')
 		+MakeGroupHeader(CategoryCriteria(infile), 3, 'Category')
 		+MakeGroupHeader(dsDeceased, 4, 'Deceased State')
 		+MakeGroupHeader(SourceCriteria(infile), 5, 'Source')
+		+IF(IncludeSanctionsCriteria, 
+			MakeGroupHeader(ConsolidatedCriteria, 6, 'Consolidated Sanctions'),
+			'')
 		;

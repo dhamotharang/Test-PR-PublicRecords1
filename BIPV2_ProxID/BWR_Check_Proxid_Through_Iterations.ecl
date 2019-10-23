@@ -1,4 +1,4 @@
-import BIPV2;
+﻿import BIPV2;
 dbase35 := BIPV2_ProxID.files().base.qa(proxid in [5705425,5532372]) : global;
 setdots := set(dbase35,dotid);
 dbase34 := BIPV2_ProxID.files(BIPV2.KeySuffix + '_34').base.logical(dotid in setdots) : global;

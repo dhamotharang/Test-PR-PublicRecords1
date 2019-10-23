@@ -1,6 +1,8 @@
-import infutor, RoxieKeyBuild, ut, header;
+﻿import infutor, RoxieKeyBuild, ut, header;
 
-filedate := infutor.version_dev;
+export proc_build_best(string9 cversion_dev):=module
+
+string9 filedate := trim(cversion_dev,left,right);
 //build best base
 build_best := infutor.infutor_best();
 
@@ -11,4 +13,5 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::infutor::best.did','~
 //move to QA 
 RoxieKeyBuild.MAC_SK_Move_V2('~thor_data400::key::infutor::best.did','Q',mv_best_qa);
 
-export proc_build_best := sequential(build_best, key_best, mv_best, mv_best_qa);
+export all := sequential(build_best, key_best, mv_best, mv_best_qa);
+end;

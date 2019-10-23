@@ -1,4 +1,4 @@
-import doxie_build, header, mdr, header_quick, doxie, gong, InfutorCID, Targus, utilfile, UT, Data_Services;
+﻿import doxie_build, header, mdr, header_quick, doxie, gong, InfutorCID, Targus, utilfile, UT, Data_Services;
 
 // this module specifically for counting # of sources where 2 input PII elements are found together on our database
 // to be used in fraud attributes products and fraud modeling
@@ -14,9 +14,10 @@ shared common_layout := record
 end;
 shared max_source_summary := 50;
 shared default_max_date := 999999;
+shared BSVersion	:= 50;
 
-shared h_full := doxie_build.file_header_building(~risk_indicators.iid_constants.filtered_source(src, st));
-shared h_quick := project(header_quick.file_header_quick(~risk_indicators.iid_constants.filtered_source(src, st)), transform(header.Layout_Header, self.src := IF(left.src in ['QH', 'WH'], MDR.sourceTools.src_Equifax, left.src), self := left));
+shared h_full := doxie_build.file_header_building(~risk_indicators.iid_constants.filtered_source(src, st, BSVersion));
+shared h_quick := project(header_quick.file_header_quick(~risk_indicators.iid_constants.filtered_source(src, st, BSVersion)), transform(header.Layout_Header, self.src := IF(left.src in ['QH', 'WH'], MDR.sourceTools.src_Equifax, left.src), self := left));
 shared header_base := ungroup(h_full + h_quick);
 shared gh := gong.File_Gong_History_Full;
 shared wp := Targus.File_targus_key_building;

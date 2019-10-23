@@ -1,4 +1,4 @@
-/*
+﻿/*
 
 These are the various filters used to paritition the files
 
@@ -28,7 +28,8 @@ export usaCountries 						:= ['United States','Puerto Rico','Guam','United State
 
 export fSanctions 							:= ['Sanction List'];
 
-export fSanctionsAndEnforcement := ['Sanction List','Enforcement','Excluded Party','End-Use Controls'];
+				//BD-108 - Addition of Associated Entity into the Sanctions and Enforement xml file - 3/19/2018
+export fSanctionsAndEnforcement := ['Sanction List','Enforcement','Excluded Party','End-Use Controls','Associated Entity'];
 
 export fFull 										:= ['Adverse Media','Investigation','SOE','PEP','Associated Entity','Company of Interest','Influential Person',
 														'Shareholder','Sanction List','End-Use Controls','Enforcement','Excluded Party'];

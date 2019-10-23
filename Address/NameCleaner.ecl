@@ -1,6 +1,6 @@
-export NameCleaner := MODULE
+﻿export NameCleaner := MODULE
 
-import STD, lib_stringlib;
+import STD, lib_stringlib, Nid;
 
 /****
 
@@ -29,30 +29,18 @@ export string73 CleanPersonParsed73(string fname, string mname, string lname, st
 		cln_lname		:= [46..65];
 		cln_suffix	    := [66..70];
 		name_score		:= [71..73];
-*/
+*/                                                                                                                       
 
-set of string TrustWords := ['AGREEMENT','ANNUITY','ANTI',
-	'ASSIGNEE','AWARD','BANKERS','BENEFIT','BLIND','BOAT','BOOK','BYPASS','CAPITAL',
-	'CHARITY','CHARITABLE','CHILDREN','CHILDRENS','CIVIC','CREDIT',
-	'DECD','DECEDENTS','DEDUCTION','DESCENDANTS','DEV','DEVELOPMENT','DISCRETIONARY','DR',
-	'ENDOWMENT','ESTATE','EXCHANGE','EXEMPT','EXEMPTION',
-	'FAM','FMLY','FAMILY','FAMILYE','FARM','GENERAL','GENERATIONAL','GRANDCHILDREN','GRANDCHILDRENS','GRANTOR','GRANTORS',
-	'HERITAGE','HOLDING','HOLDINGS','HOMESTEAD','HOUSING',
-	'IN','INCOME','INDENTURE','INHERITANCE','INTER VIVOS','INTERVIVOS','INVESTMENT','INVSTM','IRREV','IRREVOCABL',
-	'IRREVOCABLE','JD', 'JOINT','LAND','LEASE','LEGACY','LIFE','LIFETIME',
-	'LIV','LIVING','LIVG','LIVN','LVG','LVNG','LOAN','LOVING','MARITAL','MASTER','MD','MS',
-	'NEEDS','NONEXEMPT','PENSION','PROPERTY','PROTECTION','PROTECTIVE','PROXY','QUALIFIED','REMAINDER',
-	'RE','RESIDENCE','RESIDUARY','RESTATED','REV','REVOC','REVOCABLE','RVC','RVCBLE','REVOCALBE','SECOND',
-	'STATUTORY','SUCCESSOR','SUCC','SUPPLEMENTAL','SURVIVING','SURVIVOR','SURVIVORS','TESTAMENTARY','TESTAMENTORY','THIRD','TRUST','VIVOS',
-	// common geo terms
-	'AVE','AVENUE','CIRCLE','RD', 'ROAD', 'ST', 'STREET','WAY'
-	];
+TrustWords := Nid.Trusts.TrustWords;                                                                                                               
+
 set of string Trust2Words := ['CHARITABLE REMAINDER','COUNTY TAX',
 							'IRREVOCABLE GST','IRREVOCABLE LIVING','INTER VIVOS','JOINT LIVING',
 							'FAMILY LIVING', 'FAMILY PROTECTIVE','FAMILY PROTECTION', 'FAMILY REVOCABLE','LF EST','LIFE ESTATE',
-							'LIVING FAMILY',
+							'LIFE TENANT', 'LIVING FAMILY',
 							'LIVING SURVIVORS','LIVING WILL','REVOCABLE LIVING','REV LIVING','REV LIV','REVOC LIV','REVOC LVG',
-									'LVG REV', 'LIVING REVOCABLE','REAL ESTATE',
+									'LVG REV', 'LIVING REVOCABLE',
+									'NONEXEMPT DESCENDANTS','NONEXEMPT FAMILY','NONEXEMPT LIFETIME', 'NONEXEMPT MARITAL',
+									'REAL ESTATE',
 									'SEPARATE PROPERTY','SPECIAL NEEDS','SUPP NEEDS'];
 
 /*
@@ -61,9 +49,6 @@ OMORI YURIKO L TRUSTEE OF Y L OMORI 1993 FAMILY TRUST     (include date 1993)
 
 
 */
-	
-	
-set of string BusTrustWords := ['NATIONAL', 'INVESTMENT', 'LAND'];
 
 TrustAbbreviations := '(TRUST|TRUS|TRU|TRST|TR|TST|TRUSTS|TST|TRS)';
 MaritalTrusts := '\\b(TRUST (A|B|I|II|1|2|3|4|5|6|7|8|9))\\b';
@@ -74,12 +59,15 @@ RunOnTrust := '\\b((FAMILY|LIVING)TRUST)\\b';
 rgxDate := '(\\(?\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4}\\)?)';
 rgxDated := '\\(?(DATED|DTD|UTD) +\\d{1,2}[/-] *\\d{1,2} *[/-] *\\d{2,4}\\)?';
 rgxMisc := '\\b(TRUST +(& PT|(1|2|3|4|5) PT|COC|ETAL|ET AL|DTD|/TR|\\(?TR\\)?)|\\(?TRUSTEES\\)?)$';
+rgxDateAbbr := '\\b(DATED|DTD|UTD)\\b';
+rgxRevLiving := '\\b(REVOCABLE|REVOCABL|REVOCAB|REVOCA|REVOC|REV)( (LIVING|LIVI|LIVIN|LIV|LI|L|T))?$';
 
 rgxSlice := '(\\(\\d{1,2}/\\d{1,2}\\))$';
 string RemoveDates(string s) := TRIM(MAP(
 					REGEXFIND(rgxDated, s) => REGEXREPLACE(rgxDated,s,' '),
 					REGEXFIND(rgxDate, s) => REGEXREPLACE(rgxDate,s,' '),
 					REGEXFIND(rgxSlice, s) => REGEXREPLACE(rgxSlice,s,' '),
+					REGEXFIND(rgxDateAbbr, s) => REGEXREPLACE(rgxDateAbbr,s,' '),
 					s),LEFT,RIGHT);
 					
 string RemoveThe(string s) :=  TRIM(MAP(
@@ -140,7 +128,9 @@ export string RemoveTrust(string s1) := FUNCTION
 				REGEXFIND('^'+TrustAbbreviations, s) => TRIM(StripTrust(s, 11),LEFT,RIGHT),
 				s
 				),
-			IF(REGEXFIND(TrustMissing, s), StripTrust(s, 8),
+			MAP(
+				REGEXFIND(TrustMissing, s) => StripTrust(s, 8),
+				REGEXFIND(rgxRevLiving, s) => REGEXREPLACE(rgxRevLiving, s, ''),
 				s));
 	return MAP(
 			REGEXFIND('^'+TrustAbbreviations, t) => TRIM(StripTrust(t, 11),LEFT,RIGHT),
@@ -148,19 +138,6 @@ export string RemoveTrust(string s1) := FUNCTION
 			REGEXFIND('\\b'+TrustAbbreviations+'\\b', t) => TRIM(REGEXREPLACE('\\b'+TrustAbbreviations+'\\b', t, ''),LEFT,RIGHT),
 		t);
 END;
-
-KnownTrusts := [
-'KHI POST-CONSUMMATION TRUST',                                                     
-'LEHMAN BROTHERS TRUST',                                                           
-'MORGAN STANLEY TRUST',
-'MERRYL LYNCH TRUST',
-'PROTIUM MASTER GRANTOR TRUST',                                                    
-'PROTIUM MASTER GRANTOR TRUST,',                                                    
-'SABINE ROYALTY TRUST',                                                            
-'USA IN TRUST-QUINAULT NATION'                                                    
-];
-
-shared IsKnownTrust(string s) := s in KnownTrusts OR Std.Str.StartsWith(s, 'USA IN TRUST');
 
 shared string73 BuildName(string5 title, string20 fname, string20 mname, string20 lname, string5 suffix, integer2 score=85) :=
 	title+fname+mname+lname+suffix+Intformat(score,3,1);
@@ -203,7 +180,7 @@ export string140 CleanNameEx(string name, string1 hint='U', boolean bSkipTrust =
 								'P' => 'YES',
 								'D' => 'DUL',
 								'' => if(Persons.IsNameFormatDual(n), 'DUL', 'MAY'),	//validPersonNameFormat
-								'T' => IF(IsBusiness(s) Or IsKnownTrust(t), 'NO', Persons.NameQualityText(s)),
+								'T' => IF(IsBusiness(s) Or Nid.Trusts.IsKnownTrust(t), 'NO', Persons.NameQualityText(s)),
 								'NO');
 
 	return MAP(
@@ -223,8 +200,7 @@ export string73 CleanPerson73(string name, string1 hint='U') := FUNCTION
 END;
 
 export string PersonNameFormat(string name) := FUNCTION
-	t := TRIM(StringLib.StringToUpperCase(removewhitespace(name)),LEFT,RIGHT);
-	s := PrecleanName(t);
+	s := PrecleanName(name);
 	n := Persons.PersonalNameFormat(s);
 
 	RETURN IF(n=0,'***',Persons.WhichFormat(n));

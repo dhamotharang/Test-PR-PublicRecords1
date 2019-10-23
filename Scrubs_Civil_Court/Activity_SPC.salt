@@ -1,0 +1,30 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Civil_Court
+FILENAME:Civil_Court
+NAMESCOPE:Activity
+
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)
+FIELDTYPE:Invalid_Future_Date:CUSTOM(Scrubs.fn_valid_date>0,'future')
+FIELDTYPE:Invalid_Num:ALLOW(0123456789 -)
+FIELDTYPE:Invalid_CapLetter:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ -)
+FIELDTYPE:Invalid_SourceFile:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ -\(\))
+FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -)
+
+FIELD:dt_first_reported:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:dt_last_reported:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:process_date:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:vendor:LIKE(Invalid_Num):TYPE(STRING2):0,0
+FIELD:state_origin:LIKE(Invalid_CapLetter):TYPE(STRING2):0,0
+FIELD:source_file:TYPE(STRING20):0,0
+FIELD:case_key:LIKE(Invalid_Char):TYPE(STRING60):0,0
+FIELD:court_code:LIKE(Invalid_Char):TYPE(STRING10):0,0
+FIELD:court:TYPE(STRING60):0,0
+FIELD:case_number:LIKE(Invalid_Char):TYPE(STRING35):0,0
+FIELD:event_date:LIKE(Invalid_Future_Date):TYPE(STRING8):0,0
+FIELD:event_type_code:LIKE(Invalid_Char):TYPE(STRING10):0,0
+FIELD:event_type_description_1:TYPE(STRING65):0,0
+FIELD:event_type_description_2:TYPE(STRING65):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

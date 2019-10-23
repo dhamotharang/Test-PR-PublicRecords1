@@ -84,6 +84,8 @@ FIELD:middlename:0,0
 FIELD:lastname:0,0
 FIELD:suffix:0,0
 FIELD:major:0,0
+FIELD:COLLEGE_MAJOR:LIKE():0,0
+FIELD:NEW_COLLEGE_MAJOR:LIKE():0,0
 FIELD:grade:0,0
 FIELD:email:0,0
 FIELD:dateofbirth:TYPE(STRING8):LIKE(invalid_date):0,0

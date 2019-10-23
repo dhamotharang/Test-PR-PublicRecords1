@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 export _Constants(
 	 boolean	pUseOtherEnvironment	= false
 	,string		pDatasetname					= 'BIPV2_LGID3'

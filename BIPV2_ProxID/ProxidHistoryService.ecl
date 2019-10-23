@@ -5,14 +5,14 @@
 */
 /*--INFO-- Find the history of a given Proxid. Enter the current ID and it will walk backwards and find what went into it*/
 EXPORT ProxidHistoryService := MACRO
-  IMPORT SALT37,BIPV2_ProxID;
+  IMPORT SALT311,BIPV2_ProxID;
   STRING50 Proxidstr := ''  : STORED('Proxid');
   UNSIGNED8 Proxid0 := (UNSIGNED8)Proxidstr; 
   K := BIPV2_ProxID.MatchHistory.MatchHistoryKey;
   rec := RECORD
-    SALT37.UIDType Proxid_before;
-    SALT37.UIDType Proxid_after;
-    SALT37.UIDType rcid;
+    SALT311.UIDType Proxid_before;
+    SALT311.UIDType Proxid_after;
+    SALT311.UIDType rcid;
     UNSIGNED6 change_date;
     UNSIGNED2 Depth; // The depth down the tree, 0 is the top node
   END;

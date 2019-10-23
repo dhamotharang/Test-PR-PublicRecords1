@@ -1,4 +1,4 @@
-import EBR, ut, address;
+﻿import EBR, ut, address;
 
 export mapping_5610_demographic_data(string filedate) := function
 
@@ -53,7 +53,13 @@ end;
 
 ebr_5610_prj := project(File_5610_demographic_data,ebr_5610(LEFT));
 
-Layout_5610_trade_payment_tmp ebr_5610_trans(ebr_5610_prj le) := transform
+//JIRA - DF-19305 Jon Dawson keeps coming in as a officer for Jon's Tree Service. 
+// He is not associated with this company. Adding a filter to keep him from being added as an officer.
+Layout_5610_trade_payment_tmp ebr_5610_trans(ebr_5610_prj le) := transform,
+	skip(le.allcat[1..10] = '940772280' and 
+			((ut.CleanSpacesAndUpper(le.allcat[227..236]) = 'JON' and ut.CleanSpacesAndUpper(le.allcat[238..257]) = 'DAWSON') or
+			 (ut.CleanSpacesAndUpper(le.allcat[268..277]) = 'JON' and ut.CleanSpacesAndUpper(le.allcat[279..298]) = 'DAWSON') or
+			 (ut.CleanSpacesAndUpper(le.allcat[309..318]) = 'JON' and ut.CleanSpacesAndUpper(le.allcat[320..339]) = 'DAWSON')))			 
 	self.FILE_NUMBER						:= le.allcat[1..10];                                                                                                                                                                                                                        
 	self.SEGMENT_CODE						:= le.allcat[11..14];                                                                                                                                                                                                                        
 	self.SEQUENCE_NUMBER				:= le.allcat[15..19];

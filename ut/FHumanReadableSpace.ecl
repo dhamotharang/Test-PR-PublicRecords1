@@ -1,6 +1,6 @@
-import std;
+﻿import std;
 
-EXPORT FHumanReadableSpace(unsigned8 pint) :=
+EXPORT FHumanReadableSpace(integer8 pint) :=
 function
 
   insertcommas := fIntWithCommas(pint);

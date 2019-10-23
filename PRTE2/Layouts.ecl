@@ -1,8 +1,14 @@
-//* PRT2.Layouts 
+﻿//* PRT2.Layouts 
 //* PROJECT:  PRCT-PII build Property Key Files from Matt's Input File *//
 
 import PRTE_CSV;
 export	Layouts	:= module
+
+EXPORT DEFLT_CPA := RECORD
+ unsigned4 global_sid;
+ unsigned8 record_sid;
+ end;
+
 //*  Layout for Foreclosures on LZ:    
 		
   EXPORT ERC_Record := RECORD
@@ -2562,6 +2568,137 @@ end;
 		unsigned6 New_Seq_no;
 		foreclosure_batch_in;	
 	end;
-			
+	
+Export Norm:=Record
+ string40 Company_Name;
+ string9 Link_Fein;
+ string8 Link_Inc_date;
+ string10 Cust_Name;
+ unsigned6 seleid;
+ unsigned6 orgid;
+ unsigned6 ultid;
+ string6 relation;
+ integer6 Parent_outcome;
+ End;
+ 
+Export Linkid_Rec:=Record
+ string40 Parent_Company_Name;
+ string9 Parent_Link_FEIN;
+ string8 Parent_Link_Inc_Date;
+ unsigned6 Parent_seleid;
+ unsigned6 Parent_orgid;
+ unsigned6 Parent_ultid;
+ string40 Child_company_name;
+ string9 Child_Link_Fein;
+ string8 Child_Link_Inc_Date;
+ unsigned6 Child_seleid;
+ unsigned6 Child_orgid;
+ unsigned6 Child_ultid;
+ string10 Parent_Cust_Name;
+ string10 Child_Cust_Name;
+ integer6 Parent_outcome; 
+ end; 
+ 
+	EXPORT AID_Clean_Layout := Record
+			string city_st_zip_field_name := '';
+			string street_field_name := '';
+			string city_field_name := '';
+			string state_field_name := '';
+			string zip_field_name := '';
+			string clean_addr_field_name := '';
+			string raw_AID_field_name := '';
+	End;
+	
+	// export AID_Address := record
+		// string addr1_fieldname;
+		// string addr2_fieldname;
+		// string rawaid := '';
+		// string prim_range := '';
+		// string predir := '';
+		// string prim_name := '';
+		// string addr_suffix := '';
+		// string postdir := '';
+		// string unit_desig := '';
+		// string sec_range := '';
+		// string p_city_name := '';
+		// string v_city_name := '';
+		// string st := '';
+		// string zip := '';
+		// string zip4 := '';
+		// string cart := '';
+		// string cr_sort_sz := '';
+		// string lot := '';
+		// string lot_order := '';
+		// string dbpc := '';
+		// string chk_digit := '';
+		// string rec_type := '';
+		// string fips_state := '';
+		// string fips_county := '';
+		// string geo_lat := '';
+		// string geo_long := '';
+		// string msa := '';
+		// string geo_blk := '';
+		// string geo_match := '';
+		// string err_stat := '';
+// End;
 		
+	export ccpa_global_sid := record
+		unsigned4 DatasetId;	
+		string100 DatasetName;	
+		string10 	SourceCodes;	
+		string100 CompanyName;	
+		unsigned4 UniqueSourceIdentifier;
+		string60	BuildTemplateName;
+		string10 	MaxLevel;	
+		string60	RoxiePackages;
+	end;
+	
+	Export DBA_In_Rec:=Record
+string40 Primary_Company_Name;
+string9 Primary_link_fein;
+string8 Primary_Link_Inc_Date;
+unsigned6 Primary_seleid;
+unsigned6 Primary_orgid;
+unsigned6 Primary_ultid;
+string40 DBA_Company_Name;
+string9 DBA_link_fein;
+string8 DBA_link_inc_date;
+unsigned6 DBA_seleid;
+unsigned6 DBA_orgid;
+unsigned6 DBA_ultid;
+string10 Primary_cust_name;
+string10 DBA_cust_name;
+integer6 Primary_outcome;
+end;
+
+Export Linkid_DBA_Rec:=Record
+ string40 Primary_Company_Name;
+ string9 Primary_Link_FEIN;
+ string8 Primary_Link_Inc_Date;
+ unsigned6 Primary_seleid;
+ unsigned6 Primary_orgid;
+ unsigned6 Primary_ultid;
+ string40 DBA_company_name;
+ string9 DBA_Link_Fein;
+ string8 DBA_Link_Inc_Date;
+ unsigned6 DBA_seleid;
+ unsigned6 DBA_orgid;
+ unsigned6 DBA_ultid;
+ string10 Primary_Cust_Name;
+ string10 DBA_Cust_Name;
+ integer6 Primary_outcome; 
+ end; 
+ 
+ Export DBA_Norm:=Record
+ string40 Company_Name;
+ string9 Link_Fein;
+ string8 Link_Inc_date;
+ string10 Cust_Name;
+ unsigned6 seleid;
+ unsigned6 orgid;
+ unsigned6 ultid;
+ string6 relation;
+ integer6 Primary_outcome;
+ End;
+	
 END;

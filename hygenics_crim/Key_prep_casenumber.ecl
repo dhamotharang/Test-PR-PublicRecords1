@@ -1,4 +1,4 @@
-import doxie, doxie_build, ut, hygenics_search;
+﻿import doxie, doxie_build, ut, hygenics_search;
 
 export Key_prep_casenumber(boolean IsFCRA = false) := function
 
@@ -8,8 +8,10 @@ hygenics_crim.file_offenders_keybuilding.offender_key;
 string1 file_indicator;
 END;
 
-doc_offense 	:= dataset('~thor_data400::base::corrections_offenses_' + doxie_build.buildstate,hygenics_crim.Layout_Base_Offenses_with_OffenseCategory,flat);
-court_offense := dataset('~thor_Data400::base::corrections_court_offenses_' + doxie_build.buildstate,hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory,flat);
+doc_offense_ds 	:= dataset('~thor_data400::base::corrections_offenses_' + doxie_build.buildstate,hygenics_crim.Layout_Base_Offenses_with_OffenseCategory,flat);
+Doc_Offense := Prep_Build.PB_File_Offenses(Doc_offense_ds);
+court_offense_ds := dataset('~thor_Data400::base::corrections_court_offenses_' + doxie_build.buildstate,hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory,flat);
+court_offense := Prep_Build.PB_File_CourtOffenses(court_offense_ds);
 
 invalid_case_nums := ['&nbsp;'];
 offender   := dedup(sort(distribute(hygenics_crim.file_offenders_keybuilding( ),HASH64(offender_key)),offender_key,case_num,local),offender_key,case_num,local);

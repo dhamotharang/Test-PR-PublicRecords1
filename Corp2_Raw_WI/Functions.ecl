@@ -1,4 +1,4 @@
-IMPORT Corp2, Corp2_Mapping, lib_stringlib;
+﻿IMPORT Corp2, Corp2_Mapping, lib_stringlib;
 EXPORT Functions := Module;                                                                                  
 
 	//********************************************************************
@@ -173,7 +173,11 @@ EXPORT Functions := Module;
 								'13' =>'FOREIGN LIMITED LIABILITY COMPANY',
 								'14' =>'DOMESTIC LIMITED LIABILITY PARTNERSHIP',	
 								'15' =>'FOREIGN LIMITED LIABILITY PARTNERSHIP',	
-								'16' =>'FOREIGN NONSTOCK CORPORATION', //'96' =>'SHORT TERM NAME RESERVATION' -Name Type
+								'16' =>'FOREIGN NONSTOCK CORPORATION', 				//'96' =>'SHORT TERM NAME RESERVATION' -Name Type 
+								'17' =>'DOMESTIC GENERAL PARTNERSHIP',
+								'18' =>'FOREIGN GENERAL PARTNERSHIP',
+								'24' =>'DOMESTIC LIMITED LIABILITY PARTNERSHIP - EXEMPT',
+								'25' =>'DOMESTIC LIMITED LIABILITY PARTNERSHIP - EXAMPLE',
 								'');
 		end;	
 		

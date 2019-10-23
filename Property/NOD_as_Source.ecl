@@ -1,4 +1,4 @@
-import property, header;
+﻿import property, header;
 
 export NOD_as_Source(
        dataset(Property.Layout_Fares_Foreclosure_v2) pNoticeOfDefault=dataset([],Property.Layout_Fares_Foreclosure_v2),
@@ -10,9 +10,16 @@ export NOD_as_Source(
 
   src_rec := header.layouts_SeqdSrc.ND_src_rec;
 
-  header.Mac_Set_Header_Source(dSrcData(trim(deed_category)='N'),
+//Core Logic Records
+  header.Mac_Set_Header_Source(dSrcData(trim(deed_category)='N' and source = 'FR'),
                                Property.Layout_Fares_Foreclosure,
-                               src_rec,'NT',withUID);
+                               src_rec,'NT',withUID1);
+//BlackKnight Records                                
+  header.Mac_Set_Header_Source(dSrcData(trim(deed_category)='N' and source = 'B7'),
+                               Property.Layout_Fares_Foreclosure,
+                               src_rec,'B7',withUID2);
+
+  withUID := withUID1 + withUID2;                               
 
   return withUID;
 

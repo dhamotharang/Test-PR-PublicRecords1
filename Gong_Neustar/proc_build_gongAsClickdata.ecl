@@ -1,4 +1,4 @@
-import marketing_best, doxie, dma;
+﻿import marketing_best, doxie, dma, _Control;
 
 dIn	:= File_Gong_Base; 
 
@@ -55,7 +55,7 @@ export proc_build_gongAsClickdata :=
 sequential(
 output(DEDUP(PROJECT(d_supp_addr,t(LEFT)),all),,'~thor::out::gong_ForClickdataSuppression',csv(terminator('\n'), separator(','), quote('"')),overwrite),
 
-fileservices.Despray('~thor::out::gong_ForClickdataSuppression','bctlpedata10.risk.regn.net', 
+fileservices.Despray('~thor::out::gong_ForClickdataSuppression',_Control.IPAddress.bctlpedata10, 
 
            '/data/data_build_5_2/gongneustar/newmovers/gong_ForClickdataSuppression.csv',,,,true),
 

@@ -1,9 +1,9 @@
- 
+﻿ 
 EXPORT MAC_PopulationStatistics(infile,Ref='',Input_corp_key = '',Input_corp_vendor = '',Input_corp_vendor_county = '',Input_corp_vendor_subcode = '',Input_corp_state_origin = '',Input_corp_process_date = '',Input_corp_sos_charter_nbr = '',Input_stock_ticker_symbol = '',Input_stock_exchange = '',Input_stock_type = '',Input_stock_class = '',Input_stock_shares_issued = '',Input_stock_authorized_nbr = '',Input_stock_par_value = '',Input_stock_nbr_par_shares = '',Input_stock_change_ind = '',Input_stock_change_date = '',Input_stock_voting_rights_ind = '',Input_stock_convert_ind = '',Input_stock_convert_date = '',Input_stock_change_in_cap = '',Input_stock_tax_capital = '',Input_stock_total_capital = '',Input_stock_addl_info = '',Input_stock_stock_description = '',Input_stock_stock_series = '',Input_stock_non_par_value_flag = '',Input_stock_additional_stock = '',Input_stock_shares_proportion_to_ohio_for_foreign_license = '',Input_stock_share_credits = '',Input_stock_authorized_capital = '',Input_stock_stock_paid_in_capital = '',Input_stock_pay_higher_stock_fees = '',Input_stock_actual_amt_invested_in_state = '',Input_stock_share_exchange_during_merger = '',Input_stock_date_stock_limit_approved = '',Input_stock_number_of_shares_paid_for = '',Input_stock_total_value_of_shares_paid_for = '',Input_stock_sharesofbeneficialinterest = '',Input_stock_beneficialsharevalue = '',OutFile) := MACRO
-  IMPORT SALT30,Scrubs_Corp2_Mapping_MI_Stock;
+  IMPORT SALT311,Scrubs_Corp2_Mapping_MI_Stock;
   #uniquename(of)
   %of% := RECORD
-    SALT30.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

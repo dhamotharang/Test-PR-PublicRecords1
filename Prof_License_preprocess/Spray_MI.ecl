@@ -1,17 +1,19 @@
 ﻿EXPORT Spray_MI(dataset({string ftype,string fdate})infile) := module
 
-import VersionControl,_control;
+import VersionControl,_control,lib_thorlib;
 
 	string pServer			:=  _Control.IPAddress.bctlpedata11 ;
 	string		pDir(string lictype)		:=  map ( lictype = 'TradeLic'  => '/data/hds_4/prolic/mi/trade/'+infile(ftype = 'Tradelic')[1].fdate,
 	                                                                      '/data/hds_4/prolic/mi/all_available/'+infile(ftype = 'Health')[1].fdate
 																						);
-	string		pGroupName	:= if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' ,'thor400_dev01','thor400_60');
+	string		pGroupName	:= thorlib.group();
 	boolean    pIsTesting  := false;
 		         
 	
 	lfile(string pkeyword) := '~thor_data400::in::prolic::mi::' + pkeyword + '.@version@.csv';
 	sfile(string pkeyword) := '~thor_data400::in::prolic::mi::' + pkeyword+ '::raw';
+	
+	
 
 	spry_trade_raw:=DATASET([
 
@@ -19,17 +21,23 @@ import VersionControl,_control;
 		
 		 	], VersionControl.Layout_Sprays.Info);
 	
-	 dospraytl :=  VersionControl.fSprayInputFiles(spry_trade_raw,pIsTesting := pIsTesting,pShouldClearSuperfileFirst	:= true);
+	 dospraytl :=  VersionControl.fSprayInputFiles(spry_trade_raw,pIsTesting := pIsTesting);
 	 
 	 
 	 spry_health_raw:=DATASET([
 
-		 {pServer,pDir('Health'),'*act.txt' 			,0 ,lfile('health'				),[{sfile('health'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\t','\\n,\\r\\n','"'}
+		 {pServer,pDir('Health'),'597288.csv' 			,0 ,lfile('health'				),[{sfile('health'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,',','\\n,\\r\\n','"'},
+		  {pServer,pDir('Health'),'577921.csv' 			,0 ,lfile('health_1'				),[{sfile('health'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,',','\\n,\\r\\n','"'},
+		 {pServer,pDir('Health'),'577919.csv' 			,0 ,lfile('occup'				),[{sfile('occup'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,',','\\n,\\r\\n','"'},
+		  {pServer,pDir('Health'),'597287.csv' 			,0 ,lfile('occup_1'				),[{sfile('occup'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,',','\\n,\\r\\n','"'}
+
+	
+
 
 		
 		 	], VersionControl.Layout_Sprays.Info);
 	
-		 dosprayhlt :=  VersionControl.fSprayInputFiles(spry_health_raw,pIsTesting := pIsTesting,pShouldClearSuperfileFirst	:= true);
+		 dosprayhlt :=  VersionControl.fSprayInputFiles(spry_health_raw,pIsTesting := pIsTesting);
 	
 	
 	

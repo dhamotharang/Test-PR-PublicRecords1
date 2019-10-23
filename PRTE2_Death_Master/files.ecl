@@ -1,4 +1,4 @@
-IMPORT PRTE2_Death_Master,VersionControl, _control, LIB_DATE,codes,
+﻿IMPORT PRTE2_Death_Master,VersionControl, _control, LIB_DATE,codes,
 _Validate,header, NID,census_data, mdr,standard, ut, address;
 EXPORT files := module
 
@@ -14,6 +14,7 @@ EXPORT files := module
 	EXPORT Death_Master_SUPPLEMENTAL_SSA := PROJECT (Death_Master, LAYOUTS.layout_Death_Master_slim_supplemental);
 	
 	EXPORT File_DeathMaster_Building		:=	PROJECT(Death_Master,  Header.Layout_Did_Death_MasterV3);
+	EXPORT File_DeathMaster_Building_2		:=	PROJECT(Death_Master,  Header.Layout_Did_Death_MasterV3-[global_sid,record_sid]);
 
 	EXPORT Death_Master_Header := project(File_DeathMaster_Building,layouts.Layout_Did_Death_MasterV2);
 	
@@ -29,13 +30,33 @@ EXPORT files := module
 					IF (~SSA,
 					 PROJECT(Death_Master(SRC<>'D$'), Layouts.Layout_Death_Record_Building),
 					 PROJECT(Death_Master, Layouts.Layout_Death_Record_Building));
+					 
+	EXPORT Building_Dead_With_County_2(Boolean SSA = FALSE) :=  
+					IF (~SSA,
+					 PROJECT(Death_Master(SRC<>'D$'), Layouts.Layout_Death_Record_Building-[Global_SID,Record_SID]),
+					 PROJECT(Death_Master, Layouts.Layout_Death_Record_Building-[Global_SID,Record_SID]));
 	
+
 	EXPORT Bldg_Dead_With_County_FCRA(Boolean SSA = false) := 
+			Building_Dead_With_County_2(SSA)(
+			(unsigned6)did != 0  and 
+			(src in mdr.sourceTools.set_scoring_FCRA) and 
+			(src not in mdr.sourceTools.set_scoring_FCRA_retro_test));	
+			
+	EXPORT Bldg_Dead_With_County_FCRA_SSA(Boolean SSA = true) := 
 			Building_Dead_With_County(SSA)(
 			(unsigned6)did != 0  and 
 			(src in mdr.sourceTools.set_scoring_FCRA) and 
-			(src not in mdr.sourceTools.set_scoring_FCRA_retro_test));		
+			(src not in mdr.sourceTools.set_scoring_FCRA_retro_test));	
+	
+		// EXPORT Bldg_Dead_With_County_FCRA(Boolean SSA = false) := 
+			// Building_Dead_With_County(SSA)(
+			// (unsigned6)did != 0  and 
+			// (src in mdr.sourceTools.set_scoring_FCRA) and 
+			// (src not in mdr.sourceTools.set_scoring_FCRA_retro_test));		
+	
 			
+	
 	fdeath_ssa := File_DeathMaster_Building;
 	fsupp_ssa  := Death_Master_SUPPLEMENTAL_SSA;
 
@@ -52,6 +73,8 @@ EXPORT files := module
 		self.did							:=	(unsigned6)L.did;
 		self.src							:=	l.src;
 		self.glb_flag					:=	l.glb_flag;
+		self.global_sid       :=  l.global_sid;
+	  self.record_sid       :=  l.record_sid;    
 		self									:=	l;
 	end;
 

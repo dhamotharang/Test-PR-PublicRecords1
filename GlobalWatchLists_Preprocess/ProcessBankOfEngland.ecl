@@ -1,4 +1,4 @@
-import std, address, bo_address;
+﻿import std, address, bo_address;
 
 ReformatDOB := FUNCTION
 
@@ -331,7 +331,7 @@ ReformatToCommonlayout(DATASET(GlobalWatchlists_Preprocess.IntermediaryLayoutBan
 		self.orig_address_line_3 			:= TRIM(TRIM(L.Address_5, left, right) + ' ' + TRIM(L.Address_6, left, right), left, right);
 		self.orig_address_postal_code := L.Post_Zip_Code;
 		self.orig_address_country 		:= TRIM(L.Country[1..60]);
-		self.orig_remarks 						:= (string)L.address_addl_info;
+		self.orig_remarks 						:= STD.Str.CleanSpaces(REGEXREPLACE('(\\[|\\])',(string)L.address_addl_info,' '));
 		self.orig_passport_details 		:= if(length(TRIM(L.Passport_Details, left, right)) > 350
 																					,TRIM(STD.Str.FindReplace(L.Passport_Details,'IVORIAN PASSPORT - NO DETAILS',''), left, right)[1..350]
                                           ,TRIM(L.Passport_Details, left, right));

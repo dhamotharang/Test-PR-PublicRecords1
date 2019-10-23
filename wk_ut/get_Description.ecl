@@ -1,1 +1,2 @@
-EXPORT get_Description(string wuid,string pesp = _constants.LocalEsp) := wk_ut.get_WUInfo(wuid,pesp).Description;
+﻿import Workman;
+EXPORT get_Description := Workman.get_Description;

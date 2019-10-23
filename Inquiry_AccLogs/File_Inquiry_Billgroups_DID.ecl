@@ -1,9 +1,11 @@
-import doxie, Data_Services, risk_indicators;
+﻿import doxie, Data_Services, risk_indicators;
 
 EXPORT File_Inquiry_Billgroups_DID() := MODULE
 
 // same base file filtering as the Inquiry_AccLogs.Key_Inquiry_DID
-df := inquiry_acclogs.File_inquiry_mbs(bus_intel.industry <> '' and person_q.Appended_ADL > 0 and 
+
+File_Inquiry_MBS_USA := Inquiry_AccLogs.fn_NonFCRABaseUSAfilter('history');
+df := File_Inquiry_MBS_USA(bus_intel.industry <> '' and person_q.Appended_ADL > 0 and 
 						StringLib.StringToUpperCase(trim(search_info.function_description)) not in ['MODELS.ITA_BATCH_SERVICE', 'RISKWISE IP SEARCH (NA99)'] and
 						~(mbs.company_id = '1446154' and search_info.product_code = '1' and search_info.function_description = 'RISKINDICATORS.FLEXIDBATCHSERVICE' and search_info.datetime[..6] between '201303' and '201304') and //TEMPORARY
 											 ~(mbs.company_id = '1590195' and search_info.product_code = '1' and search_info.function_description = 'RISKINDICATORS.FLEXIDBATCHSERVICE' and search_info.datetime[..6] between '201304' and '201304') and //TEMPORARY
@@ -100,6 +102,6 @@ did_table := table(did_billgroups_table, {
 
 EXPORT create_file := did_table;
 
-EXPORT file := DATASET(Data_Services.foreign_logs+'thor100_21::out::inquiry_acclogs::inquiry_billgroups_did', RECORDOF(create_file), THOR);
-
+EXPORT file := //DATASET(Data_Services.foreign_logs+'thor100_21::out::inquiry_acclogs::inquiry_billgroups_did', RECORDOF(create_file), THOR);
+DATASET(Data_Services.foreign_logs+'thor_data::base::inql::nonfcra::weekly::qa::billgroups_did', RECORDOF(create_file), THOR);
 END;

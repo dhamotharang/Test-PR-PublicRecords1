@@ -1,4 +1,4 @@
-Official_Records.Macro_Input_File_List('_document',Official_Records.Layout_In_Document,dTempDataset)
+﻿Official_Records.Macro_Input_File_List('_document',Official_Records.Layout_In_Document,dTempDataset)
 
 dFilterDataset := dTempDataset(
 									// Requested February 23, 2005

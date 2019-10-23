@@ -1,5 +1,5 @@
-IMPORT	Business_Credit_Scoring,	BusinessCredit_Services,	Business_Credit,	BIPV2,	ut;
-EXPORT	fn_GetDBTAverage(	STRING pVersion	=	ut.GetDate,
+﻿IMPORT	Business_Credit_Scoring,	BusinessCredit_Services,	Business_Credit,	BIPV2,	doxie, STD;
+EXPORT	fn_GetDBTAverage(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 													DATASET(RECORDOF(Business_Credit.Layouts.SBFEAccountLayout)) pInput) := FUNCTION 
 
 	//	Calculate the DBT for all records 
@@ -96,7 +96,12 @@ EXPORT	fn_GetDBTAverage(	STRING pVersion	=	ut.GetDate,
 															HASH(	UltID, OrgID, SeleID)),
 																		UltID, OrgID, SeleID,LOCAL),
 																		UltID, OrgID, SeleID,LOCAL);
-	dGetClassificationCodes	:=	BusinessCredit_Services.fn_getPrimaryIndustry(dGetSlimLinkIdsDedup,'000000000001',TRUE).bestIndustryCode;
+                                    
+  mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+	  EXPORT STRING DataPermissionMask := '000000000001';
+  END;
+  
+  dGetClassificationCodes	:=	BusinessCredit_Services.fn_getPrimaryIndustry(dGetSlimLinkIdsDedup,mod_access,TRUE).bestIndustryCode;
 
 	dDBTAverage	:=	JOIN(
 										SORT(DISTRIBUTE(dGetDBTAverage,

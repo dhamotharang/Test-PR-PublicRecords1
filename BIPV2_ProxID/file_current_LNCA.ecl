@@ -1,4 +1,4 @@
-import dcav2;
+﻿import dcav2;
 EXPORT file_current_LNCA(
 	 dataset(dcav2.Layouts.base.companies	)	pFile_LNCA_Base	= dcav2.files().base.companies.qa
 	,string														      pPersistname		= '~thor_data400::persist::BIPV2_ProxID::file_current_LNCA'													

@@ -1,5 +1,6 @@
-import bankrupt,did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header, Business_Header_SS;
+﻿import bankrupt,did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header, Business_Header_SS;
 
+export Qsent_DID (string pversion) :=  function
 	
 df := Phonesplus.proc_Qsent_asPhonesplus;
 
@@ -34,4 +35,6 @@ end;
 out4 := project(out2,into(LEFT));
 
 
-export Qsent_DID := output(out4,,'~thor_data400::out::qsent_did_' + Phonesplus.version,overwrite,__compressed__);
+return output(out4,,'~thor_data400::out::qsent_did_' + pversion ,overwrite,__compressed__);
+
+end;

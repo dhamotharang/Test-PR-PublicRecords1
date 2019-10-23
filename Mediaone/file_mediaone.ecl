@@ -1,4 +1,4 @@
-EXPORT file_mediaone:=MODULE
+﻿EXPORT file_mediaone:=MODULE
   EXPORT layout:=RECORD
     STRING email;
     STRING fname;
@@ -17,7 +17,7 @@ EXPORT file_mediaone:=MODULE
     STRING incentivized_opt_in;
   END;
 	
-	EXPORT file:=DATASET('~thor::in::mediaone',layout,CSV(terminator('\n'),separator(','),quote('')))(email!='EMail');
+	EXPORT file:=DATASET('~thor::in::mediaone',layout,CSV(terminator('\n'),separator(','),quote('"')))(email!='EMail');
 	
 	EXPORT file_test:=DATASET('~thor::tmp::mediaone::infile_test',layout,THOR);
 END;

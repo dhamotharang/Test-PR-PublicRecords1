@@ -1,7 +1,7 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_UCCV2.MA_Party_BWR_DataUpdateStandardStats - Data Update Standard Stats - SALT V3.8.0');
-IMPORT Scrubs_UCCV2,SALT38;
+#workunit('name','Scrubs_UCCV2.MA_Party_BWR_DataUpdateStandardStats - Data Update Standard Stats - SALT V3.9.0');
+IMPORT Scrubs_UCCV2,SALT39;
 mynewfile := ''; // THOR file containing new data
 myprevfile := ''; // THOR file containing previous data (can be empty)
 mystatsfile := ''; // output file name

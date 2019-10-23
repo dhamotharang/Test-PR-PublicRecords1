@@ -1,5 +1,5 @@
-export QA_Records(
-	dataset(layouts.base)	pBaseFile = files().base.qa
+﻿export QA_Records(
+	dataset(layouts.base_new)	pBaseFile = files().base.qa
 ) :=
 function
 	//get new records for QA

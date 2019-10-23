@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, crim_common, ut, Address; 
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, Address; 
 
 #option('multiplePersistInstances',FALSE);
 
@@ -73,31 +73,31 @@ self.entity_1						:= input.PartyName;
 self.entity_nm_format_1	:= 'F';
 self.entity_type_code_1_orig := '';
 self.entity_type_description_1_orig := stringlib.StringToUpperCase(input.PartyType);
-self.entity_type_code_1_master := map(self.entity_type_code_1_orig = 'Arbitrator' => '60',
-																			self.entity_type_code_1_orig = 'Assignee of Record' => '70', 
-																			self.entity_type_code_1_orig = 'Beneficiary' => '70', 
-																			self.entity_type_code_1_orig = 'Claimant' => '10', 
-																			self.entity_type_code_1_orig = 'Conservator' => '60', 
-																			self.entity_type_code_1_orig = 'Cross Complainant' => '70', 
-																			self.entity_type_code_1_orig = 'Cross Defendant' => '70', 
-																			self.entity_type_code_1_orig = 'Deceased' => '70', 
-																			self.entity_type_code_1_orig = 'Defendant' => '30', 
-																			self.entity_type_code_1_orig = 'Employee' => '70', 
-																			self.entity_type_code_1_orig = 'Guardian' => '70', 
-																			self.entity_type_code_1_orig = 'Guardian Ad Litem' => '70', 
-																			self.entity_type_code_1_orig = 'Incompetent-PL' => '70', 
-																			self.entity_type_code_1_orig = 'Intervenor-PL' => '70', 
-																			self.entity_type_code_1_orig = 'Lien Claimant' => '70', 
-																			self.entity_type_code_1_orig = 'Objector' => '70', 
-																			self.entity_type_code_1_orig = 'Other Parent' => '70', 
-																			self.entity_type_code_1_orig = 'Petitioner' => '10', 
-																			self.entity_type_code_1_orig = 'Petitioner 1' => '10', 
-																			self.entity_type_code_1_orig = 'Petitioner 2' => '10', 
-																			self.entity_type_code_1_orig = 'Plaintiff' => '10', 
-																			self.entity_type_code_1_orig = 'Real Party Interest' => '10', 
-																			self.entity_type_code_1_orig = 'Receiver' => '60', 
-																		  self.entity_type_code_1_orig = 'Respondent' => '30',
-																			self.entity_type_code_1_orig = 'Settlor' => '70',  '70');
+self.entity_type_code_1_master := map(input.PartyType = 'Arbitrator' => '60',
+																			input.PartyType = 'Assignee of Record' => '70', 
+																			input.PartyType = 'Beneficiary' => '70', 
+																			input.PartyType = 'Claimant' => '10', 
+																			input.PartyType = 'Conservator' => '60', 
+																			input.PartyType = 'Cross Complainant' => '70', 
+																			input.PartyType = 'Cross Defendant' => '70', 
+																			input.PartyType = 'Deceased' => '70', 
+																			input.PartyType = 'Defendant' => '30', 
+																			input.PartyType = 'Employee' => '70', 
+																			input.PartyType = 'Guardian' => '70', 
+																			input.PartyType = 'Guardian Ad Litem' => '70', 
+																			input.PartyType = 'Incompetent-PL' => '70', 
+																			input.PartyType = 'Intervenor-PL' => '70', 
+																			input.PartyType = 'Lien Claimant' => '70', 
+																			input.PartyType = 'Objector' => '70', 
+																			input.PartyType = 'Other Parent' => '70', 
+																			input.PartyType = 'Petitioner' => '10', 
+																			input.PartyType = 'Petitioner 1' => '10', 
+																			input.PartyType = 'Petitioner 2' => '10', 
+																			input.PartyType = 'Plaintiff' => '10', 
+																			input.PartyType = 'Real Party Interest' => '10', 
+																			input.PartyType = 'Receiver' => '60', 
+																		 input.PartyType = 'Respondent' => '30',
+																			input.PartyType = 'Settlor' => '70',  '70');
 
 self := [];
 END;

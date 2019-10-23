@@ -1,4 +1,4 @@
-export BWR_build_FCRA_EN (version) := MACRO
+﻿export BWR_build_FCRA_EN (version) := MACRO
 
 #stored ('_Validate_Year_Range_Low', '1800'); 
 #stored ('_Validate_Year_Range_high', ut.GetDate[1..4]); 
@@ -13,7 +13,8 @@ export BWR_build_FCRA_EN (version) := MACRO
 #OPTION('AllowAutoQueueSwitch',TRUE);
 #OPTION('multiplePersistInstances',FALSE);
 
-DoBuild := FCRA_ExperianCred.Build_All(version);
+IsFullUpdate := false;// need to determine the build type
+DoBuild := FCRA_ExperianCred.Build_All(version, IsFullUpdate);
 
 SampleRecs := choosen(sample(FCRA_ExperianCred.Files.Base,1000,1),1000);
 					

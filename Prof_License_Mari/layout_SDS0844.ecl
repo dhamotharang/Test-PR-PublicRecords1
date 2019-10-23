@@ -1,4 +1,4 @@
-// SDS0844 / South Dakota Real Estate Commission / Real Estate //
+﻿// SDS0844 / South Dakota Real Estate Commission / Real Estate //
 
 export layout_SDS0844 := MODULE
 	export raw := RECORD
@@ -14,6 +14,7 @@ export layout_SDS0844 := MODULE
 	string10   STATE;
 	string10   ZIP;
 	string10   RENEWAL;
+	string100  Email;
 END;
 
 export src := RECORD

@@ -1,10 +1,12 @@
-import Address,ut,did_add,business_header_ss,header_slimsort,VehLic,didville,driversv2,idl_header,flaccidents;
+﻿import Address,ut,did_add,business_header_ss,header_slimsort,VehLic,didville,driversv2,idl_header,flaccidents;
 
 export map_basefile_inquiry(string filedate) := function
 
 d 		:= FLAccidents.InFile_NtlAccidents_Alpharetta.cmbnd_inq(first_name_1+middle_name_1+last_name_1+vin !='');
-dvina	:= VehLic.File_VINA;
 
+vina	:= VehLic.File_VINA;
+dvina := distribute(vina,hash(vin_input));
+uvina := dedup(sort(dvina, vin_input, -((unsigned) model_year), local), vin_input, local):persist('~thor_data400::persist::natAcc_inq_vina');
 
 ////////////////////////////////////////////////////////////////////////////
 //Clean names and addresses then append vina info
@@ -32,7 +34,7 @@ Address.MAC_Address_Clean(PrecsNBlankAddr,temp_addr1,temp_addr2,true,appndAddr);
 cleanAddr := appndAddr +project(PrecsBlankAddr, transform({appndAddr}, self.clean :='', self := left));	
 
 //Parse appended 182 byte clean address field
-FLAccidents_Ecrash.Layout_CRU_inquiries trecs2(cleanAddr L, dvina R) := transform
+FLAccidents_Ecrash.Layout_CRU_inquiries trecs2(cleanAddr L, uvina R) := transform
 
 string8     fSlashedMDYtoCYMD(string pDateIn) :=
 intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
@@ -209,7 +211,7 @@ self := L;
 end;
 
 
-jrecs := join(distribute(cleanAddr(vin!=''),hash(vin)),distribute(dvina,hash(vin_input)),
+jrecs := join(distribute(cleanAddr(vin!=''),hash(vin)), uvina,
 				left.vin = right.vin_input,
 				trecs2(left,right),left outer,local);
 

@@ -1,4 +1,4 @@
-import ut, advo, VersionControl,RoxieKeybuild,uspis_hotlist,scrubs,_Control, Orbit3, tools, std;
+﻿import ut, advo, VersionControl,RoxieKeybuild,uspis_hotlist,scrubs,_Control, Orbit3, tools, std, strata;
 export Build_all(
 
 	 string 		pversion
@@ -28,6 +28,12 @@ function
 	// BuildAdvoBase:=output(dbuildbase,,'~thor_data400::base::ADVO::ScrubsTest::20170215',thor,overwrite);
 //*****************************************************************************************************	
 
+  // DF-21511 Show counts of blanked out fields in thor_data400::key::avm_v2::fcra::@version@::address
+  cnt_advo_addr_history_fcra := OUTPUT(strata.macf_pops(ADVO.Key_Addr1_FCRA_history,,,,,,FALSE,['college_end_suppression_date','college_start_suppression_date', 
+																																													                        'seasonal_end_suppression_date','seasonal_start_suppression_date']));
+  cnt_advo_addr_fcra 					:= OUTPUT(strata.macf_pops(ADVO.Key_Addr1_FCRA,,,,,,FALSE,['college_end_suppression_date','college_start_suppression_date', 
+																																													                        'seasonal_end_suppression_date','seasonal_start_suppression_date']));
+
 	build_Advo :=
 	sequential(
 		 Create_Supers()
@@ -41,6 +47,8 @@ function
 		,Strata_Stat_Advo(pversion,files().base.built)
 		,Promote().using2used
 		,Promote().built2qa
+		,cnt_advo_addr_history_fcra, cnt_advo_addr_fcra
+
 	);
 	
 	return sequential(

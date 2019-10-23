@@ -1,4 +1,4 @@
-/* Converting Nationwide Mortgage Licensing System and Registry File to MARI common layout
+﻿/* Converting Nationwide Mortgage Licensing System and Registry File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 
@@ -7,7 +7,7 @@ IMPORT ut, Address, Standard, Prof_License_Mari, lib_stringlib ,Lib_FileServices
 
 EXPORT map_NLMS123_conversion(STRING process_dte) := FUNCTION		
 
-#workunit('name','Prof License NLMS MARI Build ' + process_dte);		
+#workunit('name','Yogurt:Prof License NLMS MARI Build ' + process_dte);		
 
 src_cd	:= 'S0900'; //Vendor code
 src_st	:= 'US';	//License state
@@ -33,11 +33,13 @@ SprayFiles := Prof_License_Mari.spray_NMLS(process_dte).NMLS_SprayFiles;
 
 // Branch ***********************************************************
 temp_branch := Prof_License_Mari.files_NMLS0900.branch(branch_nmls_id != 0);
-branch := temp_branch;
+ut.CleanFields(temp_branch,cln_branch);
+branch := cln_branch;
 
 // Branch DBA *******************************************************
 temp_dba_branch := Prof_License_Mari.files_NMLS0900.branch_dba;
-dba_branch := temp_dba_branch;
+ut.CleanFields(temp_dba_branch,cln_dba_branch);
+dba_branch := cln_dba_branch;
 
 // Branch License ***************************************************
 temp_branch_lic := Prof_License_Mari.files_NMLS0900.branch_lic;
@@ -61,16 +63,18 @@ temp_branlic_dedup_2 := DEDUP(temp_branlic_sorted_1,LEFT.BRANCH_NMLS_ID = RIGHT.
 																						LEFT.LICENSE_NBR = RIGHT.LICENSE_NBR AND
 																						LEFT.LICENSE_TYPE = RIGHT.LICENSE_TYPE,
 													   RIGHT);
-														 
-branch_lic := temp_branlic_dedup_2;
+ut.CleanFields(temp_branlic_dedup_2,cln_branlic_dedup_2);														 
+branch_lic := cln_branlic_dedup_2;
 
 // Business *********************************************************
 temp_business := Prof_License_Mari.files_NMLS0900.business(COMPANY_NMLS_ID != 0);
-business := temp_business;
+ut.CleanFields(temp_business, clean_business);
+business := clean_business;
 
 // Business DBA *****************************************************
 temp_dba_business := Prof_License_Mari.files_NMLS0900.business_dba;
-dba_business := temp_dba_business;
+ut.CleanFields(temp_dba_business, clean_business_dba);
+dba_business := clean_business_dba;
 
 // Business License *************************************************
 temp_business_lic := Prof_License_Mari.files_NMLS0900.business_lic;
@@ -93,8 +97,9 @@ temp_buslic_dedup_2 := DEDUP(temp_buslic_sorted_1,LEFT.COMPANY_NMLS_ID = RIGHT.C
 																						LEFT.LICENSE_NBR = RIGHT.LICENSE_NBR AND
 																						LEFT.LICENSE_TYPE = RIGHT.LICENSE_TYPE,
 													   RIGHT);
-														 
-business_lic := temp_buslic_dedup_2;
+
+ut.CleanFields(temp_buslic_dedup_2,cln_buslic_dedup_2);														 
+business_lic := cln_buslic_dedup_2;
 
 
 // Individual *******************************************************
@@ -293,6 +298,10 @@ rRaw_Common_layout := RECORD
 	STRING20	FEDSTATUS;
 	STRING50	BUSINESS_STRUCTURE;
 	STRING60	SITE_LOCATION;
+	STRING10 FISCALYEAREND,     //NEW FIELD
+	STRING50 FORMEDIN,         //NEW FIELD 
+	STRING10 DATEFORMED,         //NEW FIELD
+	STRING4 STOCKSYMBOL,       //DF-12096
 END;
 
 //TRANSFORM Company file to common layout
@@ -306,7 +315,7 @@ rRaw_Common_layout 	trans_Comp_Common(ds_company_dba L) := TRANSFORM
 	SELF := [];	
 END;
 
-ds_Comp_Common := PROJECT(ds_company_dba, trans_comp_Common(LEFT)) : PERSIST('~thor_data400::persist::nmls::co_intermediate');;
+ds_Comp_Common := PROJECT(ds_company_dba, trans_comp_Common(LEFT)) : PERSIST('~thor_data400::persist::nmls::co_intermediate');
 
 //TRANSFORM Branch file to common layout
 rRaw_Common_layout 	trans_Branch_Common(ds_branch_dba L) := TRANSFORM
@@ -453,7 +462,7 @@ Datepattern := '^(.*)/(.*)/(.*)$';
 
 
 maribase_plus_dbas := RECORD,MAXLENGTH(8000)
-  Prof_License_Mari.layouts.base;
+  Prof_License_Mari.layout_base_in;
   STRING60 dba1;
   STRING60 dba2;
   STRING60 dba3;
@@ -518,7 +527,7 @@ maribase_plus_dbas	transformToCommon_CO(Layout_clean_name pInput) := TRANSFORM
 															Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',tmpNameOrg,' CO')))));  //Without punct. and Sufx removed
 	SELF.NAME_ORG_PREFX	:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(tmpNameOrg);
 	SELF.NAME_ORG				:= REGEXREPLACE('/',clnOrgName,' ');
-	SELF.NAME_ORG_SUFX 	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
+	SELF.NAME_ORG_SUFX 	:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
 	
 	SELF.NAME_PREFX   	:= IF(tempTypeCd ='MD',TRIM(pInput.title,LEFT,RIGHT),'');
 	SELF.NAME_FIRST			:= IF(tempTypeCd ='MD',TRIM(pInput.fname,LEFT,RIGHT),'');
@@ -546,7 +555,7 @@ maribase_plus_dbas	transformToCommon_CO(Layout_clean_name pInput) := TRANSFORM
 	SELF.ORIG_ISSUE_DTE  := Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.ORIG_ISSUE_DATE);
 	SELF.CURR_ISSUE_DTE  := Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.EFFECTIVE_DATE);
 	SELF.RENEWAL_DTE		 := ut.CleanSpacesAndUpper(pInput.RENEW_THRU);
-	
+	SELF.INST_BEG_DTE  := IF(TRIM(pInput.DATEFORMED) <> '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.DATEFORMED),'17530101');
 //initialize raw_license_status from raw data
 	tempRawStatus 					:= ut.CleanSpacesAndUpper(pInput.STATUS);
 	SELF.RAW_LICENSE_STATUS := tempRawStatus;
@@ -571,9 +580,9 @@ maribase_plus_dbas	transformToCommon_CO(Layout_clean_name pInput) := TRANSFORM
 			
 	
   prepAddr_Line_11			:= tempAdd1_1_1 + ' ' + tempAdd2_1_1;
-	prepAddr_Line_21			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.City) + ' ' +
-	                         Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE) + ' ' +
-													 Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZipCode);
+	prepAddr_Line_21			:= ut.CleanSpacesAndUpper(pInput.City) + ' ' +
+	                         ut.CleanSpacesAndUpper(pInput.STATE) + ' ' +
+													 ut.CleanSpacesAndUpper(pInput.ZipCode);
 	clnAddrAddr1					:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(prepAddr_Line_11,prepAddr_Line_21);
 	tmpADDR_ADDR1_1				:= TRIM(clnAddrAddr1[1..10],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[11..12],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[13..40],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[41..44],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[45..46],LEFT,RIGHT);																	
 	tmpADDR_ADDR2_1				:= TRIM(clnAddrAddr1[47..56],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[57..64],LEFT,RIGHT);
@@ -658,7 +667,8 @@ maribase_plus_dbas	transformToCommon_CO(Layout_clean_name pInput) := TRANSFORM
 	ClnSpaceDBA		:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(prepDBA));
   tmpDBA				:= IF(trimDBA2 != ' ' AND TRIM(trimDBA2,LEFT,RIGHT) != TRIM(ClnNameDBA,LEFT,RIGHT), trimDBA2,' ');	
 	SELF.NAME_DBA_ORIG		:= UpperDBAName;
-	SELF.NAME_TYPE				:= stringlib.stringfindreplace(ut.CleanSpacesAndUpper(pInput.NAME_TYPE),'"','');
+	TmpName_Type      := stringlib.stringfindreplace(ut.CleanSpacesAndUpper(pInput.NAME_TYPE),'"','');
+	SELF.NAME_TYPE    := IF(TmpName_Type = 'PRIORINSTITUTIONLEGAL','PRINSTLEGL',TmpName_Type);
 	SELF.DBA1			:=  MAP(tmpDBA != ' ' => tmpDBA,
 											StringLib.stringfind(ClnSpaceDBA,'/',1) = 0	=> ClnSpaceDBA,
 											StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,',',1) > 0 => REGEXFIND('^([\\/]?)([A-Za-z ][^\\/]+)',ClnSpaceDBA,2),
@@ -724,7 +734,15 @@ maribase_plus_dbas	transformToCommon_CO(Layout_clean_name pInput) := TRANSFORM
 	//Federal Regulating Agency			
 	SELF.AGENCY_STATUS	:= ut.CleanSpacesAndUpper(pInput.fedstatus);
 	SELF.FEDERAL_REGULATOR := ut.CleanSpacesAndUpper(pInput.FEDREGULATOR); 
+	TrimStockSymbol := StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.StockSymbol),'"');
+ ValidStockSymbol := MAP(TrimStockSymbol = 'NONE' => '',
+                         TrimStockSymbol = 'N/A' => '',
+												             TrimStockSymbol = 'NA' => '',
+                         TrimStockSymbol);	
 	
+	SELF.PROVNOTE_2 := IF(TRIM(pInput.FiscalYearEnd) <> '','FISCAL YEAR END: ' + ut.CleanSpacesAndUpper(pInput.FiscalYearEnd) + ';','')  + 
+	                   IF(TRIM(pInput.FormedIn) <> '','FORMED IN: ' + ut.CleanSpacesAndUpper(pInput.FormedIn) + ';','') + 
+										          IF(ValidStockSymbol <> '','STOCK SYMBOL: ' + TrimStockSymbol,'');
 		
 /* fields used to create mltreckey key ato handke multiple dba's:
 	license number
@@ -1044,9 +1062,9 @@ maribase_plus_dbas		transformToCommon_Indv(rRawIndividual_layout pInput) := TRAN
 		
 	
   prepAddr_Line_11	  := tempAdd1_1_1 ;
-	prepAddr_Line_21		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.City) + ' ' +
-	                        Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE) + ' ' +
-												 Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZipCode);
+	prepAddr_Line_21		:= ut.CleanSpacesAndUpper(pInput.City) + ' ' +
+	                        ut.CleanSpacesAndUpper(pInput.STATE) + ' ' +
+												 ut.CleanSpacesAndUpper(pInput.ZipCode);
 													 
 	clnAddrAddr1				:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(prepAddr_Line_11,prepAddr_Line_21);
 	tmpADDR_ADDR1_1			:= TRIM(clnAddrAddr1[1..10],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[11..12],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[13..40],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[41..44],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[45..46],LEFT,RIGHT);																	
@@ -1224,7 +1242,7 @@ DBARecs 	:= NormDBAs(TMP_DBA != '');
 
 FilteredRecs  := DBARecs + NoDBARecs;
 
-Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 	RmvDBA							:= IF(TRIM(L.TMP_DBA,LEFT,RIGHT) = 'DBA','',L.TMP_DBA);
   StdNAME_DBA					:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(RmvDBA);
   DBA_SUFX						:= Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(StdNAME_DBA);		   
@@ -1233,7 +1251,7 @@ Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
 	SELF.NAME_DBA_PREFX	:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(StdNAME_DBA);
 	SELF.NAME_DBA				:= IF(TRIM(ClnDBA,LEFT,RIGHT) != TRIM(L.NAME_ORG,LEFT,RIGHT), stringlib.stringfindreplace(ClnDBA,'"',''),'');
 	SELF.DBA_FLAG       := IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',1,0); // 1: true  0: FALSE
-	SELF.NAME_DBA_SUFX	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')),''); 
+	SELF.NAME_DBA_SUFX	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')),''); 
 	SELF.NAME_DBA_ORIG	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',L.NAME_DBA_ORIG,'');
 	SELF.NAME_MARI_DBA	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',TRIM(StdNAME_DBA,LEFT,RIGHT),'');
 	SELF.MLTRECKEY 		  := IF(TRIM(SELF.NAME_DBA,LEFT,RIGHT) = '',0,L.MLTRECKEY);
@@ -1247,7 +1265,7 @@ ds_map_base := PROJECT(FilteredRecs, xTransToBase(LEFT));
 company_only_lookup := ds_map_base(affil_type_cd='CO');
 
 //assign pcmc_slpk for linked records and remove temporary place holder for COMPANY_NMLS_ID used for linking
-Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
+Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
 	SELF.pcmc_slpk := R.cmc_slpk;
 	SELF := L;
 END;
@@ -1258,7 +1276,7 @@ ds_map_affil := JOIN(ds_map_base, company_only_lookup,
 						      assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);																		
 
 
-Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 	SELF.provnote_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
 							TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'This is not a main office.  It is a branch office without an associated main office from this source.',
 						   L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 

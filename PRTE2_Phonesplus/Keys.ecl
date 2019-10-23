@@ -1,4 +1,4 @@
-IMPORT	PRTE2_PhonesPlus, Phonesplus_v2, doxie, ut;
+﻿IMPORT	PRTE2_PhonesPlus, Phonesplus_v2, doxie, ut;
 
 EXPORT Keys := MODULE
 
@@ -19,7 +19,7 @@ EXPORT Keys := MODULE
 	EXPORT key_phonesplus_fdids := index(Files.dist_DSphonesplus_slim,{fdid},{Files.dist_DSphonesplus_slim},
 																			Constants.KEY_PREFIX + 'phonesplusv2::' + doxie.Version_SuperKey + '::fdids');
 												
-	EXPORT key_phonesplus_fdids_roy := index(choosen(Files.dist_DSphonesplus_slim,0),{Files.dist_DSphonesplus_slim},
+	EXPORT key_phonesplus_fdids_roy := index(choosen(Files.dist_DSphonesplus_slim,ALL),{Files.dist_DSphonesplus_slim},
 																						Constants.KEY_PREFIX + 'phonesplusv2_royalty::' + doxie.Version_SuperKey + '::fdids');
 						
 	EXPORT key_iverification_phone := index(Files.iverification(phone <> ''),{phone},{Files.iverification},

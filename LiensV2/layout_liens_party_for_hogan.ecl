@@ -1,4 +1,4 @@
-import liensv2, address;
+﻿import liensv2, address;
 
 export layout_liens_party_for_hogan := record
 
@@ -13,6 +13,7 @@ string orig_lname := '';
 string orig_fname := '';
 string orig_mname := '';
 string orig_suffix := '';
+STRING8	DOB	:=	'';
 string9 tax_id := '';
 string9 ssn := '';
 address.Layout_Clean_Name;
@@ -35,4 +36,10 @@ string8  date_last_seen := '';
 string8  date_vendor_first_reported := '';
 string8  date_vendor_last_reported := '';
 unsigned8 persistent_record_id := 0 ; 
+string50 TMSID_old;
+string50 RMSID_old;
+// DF-24061 VC
+unsigned4 global_sid;
+unsigned8 record_sid; 
+
 end;

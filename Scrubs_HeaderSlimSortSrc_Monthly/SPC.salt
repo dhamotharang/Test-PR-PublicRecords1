@@ -1,0 +1,71 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_HeaderSlimSortSrc_Monthly
+FILENAME:File
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+
+FIELDTYPE:Invalid_AlphaNum:ALLOW(0123456789ABCDEFGHIJKLMNOPRSTUVWXYZ)
+FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:Invalid_Num:ALLOW(0123456789)
+
+FIELDTYPE:src:SPACES( ):LIKE(Invalid_AlphaNum):LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:did:SPACES( ):LIKE(Invalid_Num):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:fname:SPACES( ):LIKE(Invalid_Alpha):ONFAIL(CLEAN)
+FIELDTYPE:lname:SPACES( ):LIKE(Invalid_Alpha):ONFAIL(CLEAN)
+FIELDTYPE:prim_range:SPACES( ):ALLOW(-/0123456789ABNW):ONFAIL(CLEAN)
+FIELDTYPE:prim_name:SPACES( ):LIKE(Invalid_AlphaNum):ONFAIL(CLEAN)
+FIELDTYPE:zip:SPACES( ):LIKE(Invalid_Num):LENGTHS(5,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:mname:SPACES( ):LIKE(Invalid_Alpha):ONFAIL(CLEAN)
+FIELDTYPE:sec_range:SPACES( ):ALLOW(-0123456789ABCDEFGHIJKLMNOPQRSTUVW):LENGTHS(0,3,1,2,4,5,6):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:name_suffix:SPACES( ):ALLOW(12345JRS):LENGTHS(0,2,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:ssn:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:dob:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:dids_with_this_nm_addr:SPACES( ):ALLOW(123):LENGTHS(1,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:suffix_cnt_with_this_nm_addr:SPACES( ):ALLOW(123):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:sec_range_cnt_with_this_nm_addr:SPACES( ):ALLOW(12345):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:ssn_cnt_with_this_nm_addr:SPACES( ):ALLOW(123):LENGTHS(1,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:dob_cnt_with_this_nm_addr:SPACES( ):ALLOW(1234):LENGTHS(1,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:mname_cnt_with_this_nm_addr:SPACES( ):ALLOW(123):LENGTHS(1,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:dids_with_this_nm_ssn:SPACES( ):ALLOW(1):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:dob_cnt_with_this_nm_ssn:SPACES( ):ALLOW(12):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:dids_with_this_nm_dob:SPACES( ):ALLOW(123):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:zip_cnt_with_this_nm_dob:SPACES( ):ALLOW(123):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+
+FIELD:src:TYPE(STRING2):0,0
+FIELD:did:TYPE(UNSIGNED6):0,0
+FIELD:fname:TYPE(STRING20):0,0
+FIELD:lname:TYPE(STRING20):0,0
+FIELD:prim_range:TYPE(STRING10):0,0
+FIELD:prim_name:TYPE(STRING28):0,0
+FIELD:zip:TYPE(STRING5):0,0
+FIELD:mname:TYPE(STRING1):0,0
+FIELD:sec_range:TYPE(STRING8):0,0
+FIELD:name_suffix:TYPE(STRING5):0,0
+FIELD:ssn:TYPE(STRING9):0,0
+FIELD:dob:TYPE(UNSIGNED4):0,0
+FIELD:dids_with_this_nm_addr:TYPE(UNSIGNED2):0,0
+FIELD:suffix_cnt_with_this_nm_addr:TYPE(UNSIGNED2):0,0
+FIELD:sec_range_cnt_with_this_nm_addr:TYPE(UNSIGNED2):0,0
+FIELD:ssn_cnt_with_this_nm_addr:TYPE(UNSIGNED2):0,0
+FIELD:dob_cnt_with_this_nm_addr:TYPE(UNSIGNED2):0,0
+FIELD:mname_cnt_with_this_nm_addr:TYPE(UNSIGNED2):0,0
+FIELD:dids_with_this_nm_ssn:TYPE(UNSIGNED2):0,0
+FIELD:dob_cnt_with_this_nm_ssn:TYPE(UNSIGNED2):0,0
+FIELD:dids_with_this_nm_dob:TYPE(UNSIGNED2):0,0
+FIELD:zip_cnt_with_this_nm_dob:TYPE(UNSIGNED2):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

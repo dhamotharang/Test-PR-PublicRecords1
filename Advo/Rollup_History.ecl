@@ -62,9 +62,9 @@ local);
 
 Advo.Layouts.Layout_Common_Out t_rollup (advo_all_s le, advo_all_s ri) := transform
  self.date_first_seen := (string8) ut.min2((unsigned)le.date_first_seen, (unsigned)ri.date_first_seen);
- self.date_last_seen :=  (string8)ut.max2((unsigned)le.date_last_seen, (unsigned)ri.date_last_seen);
+ self.date_last_seen :=  (string8)max((unsigned)le.date_last_seen, (unsigned)ri.date_last_seen);
  self.date_vendor_first_reported := (string8)ut.min2((unsigned)le.date_vendor_first_reported, (unsigned)ri.date_vendor_first_reported);
- self.date_vendor_last_reported := (string8) ut.max2((unsigned)le.date_vendor_last_reported, (unsigned)ri.date_vendor_last_reported);
+ self.date_vendor_last_reported := (string8) max((unsigned)le.date_vendor_last_reported, (unsigned)ri.date_vendor_last_reported);
  self.active_flag := if(le.active_flag > ri.active_flag, le.active_flag, ri.active_flag);
  self := le;
   

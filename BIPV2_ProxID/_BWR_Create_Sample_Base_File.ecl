@@ -1,4 +1,4 @@
-import BIPV2_ProxID,tools;
+﻿import BIPV2_ProxID,tools;
 pversion := '20131025_47';
 dbase := BIPV2_ProxID.files(,true).base.qa(TRIM(v_city_name) in ['MICHIGAN CITY','DAYTON','MIAMISBURG','BOCA RATON','WESTON'],TRIM(st) in ['IN','OH','FL']);
 writefile := tools.macf_WriteFile(BIPV2_ProxID.filenames(pversion).base.logical,dbase);

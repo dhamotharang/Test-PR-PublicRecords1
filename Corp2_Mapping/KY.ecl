@@ -1,4 +1,4 @@
-import corp2, corp2_raw_ky, scrubs, scrubs_corp2_mapping_ky_main,scrubs_corp2_mapping_ky_stock, std, tools, ut, versioncontrol;
+﻿import corp2, corp2_raw_ky, scrubs, scrubs_corp2_mapping_ky_main,scrubs_corp2_mapping_ky_stock, std, tools, ut, versioncontrol;
 
 export KY := MODULE; 
 
@@ -294,15 +294,13 @@ export KY := MODULE;
 
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpMain_KY Report' //subject
 																																 ,'Scrubs CorpMain_KY Report' //body
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpKYMainScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 
 		Main_BadRecords						:= Main_N.ExpandedInFile(	
 																											 dt_vendor_first_reported_Invalid 			<> 0 or

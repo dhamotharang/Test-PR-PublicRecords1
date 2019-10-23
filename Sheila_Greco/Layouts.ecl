@@ -1,4 +1,4 @@
-import address,bipv2;
+﻿import address,bipv2;
 export Layouts :=
 module
 
@@ -181,6 +181,14 @@ module
 	export Base :=
 	module
 	
+		export CCPA_fields := 
+		record
+			// The below 2 fields are added for CCPA (California Consumer Protection Act) project.
+			// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+			unsigned4 											global_sid 									:= 0;
+			unsigned8 											record_sid 									:= 0;
+		end;
+	
 		export Companies :=
 		record, maxlength(max_size)
       bipv2.IDlayouts.l_xlink_ids;	//Added for BIP project
@@ -200,6 +208,8 @@ module
 
 			Miscellaneous.Companies.Cleaned_Dates				clean_dates											;
 			Miscellaneous.Companies.Cleaned_Phones			clean_phones										;
+			//*** Adding CCPA project fields as per Jira# CCPA-16
+			CCPA_fields																																	;
 		end;
 		
 
@@ -223,7 +233,8 @@ module
 
 			Miscellaneous.Contacts.Cleaned_Dates				clean_dates											;	
 			Miscellaneous.Contacts.Cleaned_Phones				clean_phones										;
-
+			//*** Adding CCPA project fields as per Jira# CCPA-16
+			CCPA_fields																																	;
 		end;
 
 	end;
@@ -253,6 +264,8 @@ module
 
 			Miscellaneous.Companies.Cleaned_Dates				clean_dates											;
 			Miscellaneous.Companies.Cleaned_Phones			clean_phones										;
+			//*** Adding CCPA project fields as per Jira# CCPA-16
+			base.CCPA_fields																														;
 		end;
 	
 		export Slim_Contacts := record

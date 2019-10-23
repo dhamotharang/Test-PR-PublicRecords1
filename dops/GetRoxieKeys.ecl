@@ -1,4 +1,4 @@
-// Function to getroxie keys from dops database
+﻿// Function to getroxie keys from dops database
 // Function will return a dataset with superkey name and logical key name
 // The logical key name is a template for example
 		// ~thor_data400::key::lnproperty::LNPropertyV2Keys_DATE::did
@@ -12,7 +12,8 @@
 // bool - Y to get the boolean keys in addition to nonfcra keys, N to get only nonfcra keys
 import dops;
 export GetRoxieKeys(string datasetname,string location,string eflag, string bool = 'N',string template = 'Y'
-											,string dopsenv = dops.constants.dopsenvironment) := function
+											,string dopsenv = dops.constants.dopsenvironment
+											,string l_testenv = 'NA') := function
 	InputRec := record
 		string datasetname{xpath('datasetname')} := datasetname;
 		string location{xpath('location')} := location;
@@ -28,7 +29,7 @@ export GetRoxieKeys(string datasetname,string location,string eflag, string bool
 	end;
 	
 	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,eflag),
+				dops.constants.prboca.serviceurl(dopsenv,eflag,location,l_testenv),
 				'GetRoxieKeys',
 				InputRec,
 				dataset(outrec),

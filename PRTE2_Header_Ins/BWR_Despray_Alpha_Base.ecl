@@ -1,15 +1,21 @@
-// PRTE2_Header_Ins.BWR_Despray_Base := 'todo';
-//  - despray the Header Info base file for editing.
+﻿
+/* ********************************************************************************************
+PRTE2_Header_Ins.BWR_Despray_Alpha_Base
+Need some re-write to use new LZ
+Nov 2017, altered Constants for new LZ and this worked.
+*********************************************************************************************** */
 
 IMPORT PRTE2_Header_Ins, ut, PRTE2_Common;
 #workunit('name', 'Boca CT Header Despray');
 
-xdate	:= ut.GetDate;
+fileVersion	:= PRTE2_Common.Constants.TodayString+'';
 
-CSV_NAME := 'PersonHeader_Alpha_Base_DEV_'+xdate+'.csv';
-Alpha_Base_DS := PRTE2_Header_Ins.Files.HDR_BASE_ALPHA_DS;
-// CSV_NAME := 'PersonHeader_Alpha_Base_PROD_'+xdate+'.csv';
-// Alpha_Base_DS := PRTE2_Header_Ins.Files.HDR_BASE_ALPHA_DS_PROD;
+//-----------------------------------------------------------------
+// CSV_NAME := 'PersonHeader_Alpha_DEV_AfterAdds_'+fileVersion+'.csv';
+// Alpha_Base_DS := PRTE2_Header_Ins.Files.HDR_BASE_ALPHA_DS;
+CSV_NAME := 'PersonHeader_Alpha_Base_PROD_'+fileVersion+'.csv';
+Alpha_Base_DS := PRTE2_Header_Ins.Files.HDR_BASE_ALPHA_DS_PROD;
+//-----------------------------------------------------------------
 
 lzFilePathGatewayFile	:= PRTE2_Header_Ins.Constants.SourcePathForHDRCSV + CSV_NAME;
 TempCSV								:= PRTE2_Header_Ins.Files.HDR_CSV_FILE + '::' +  WORKUNIT;

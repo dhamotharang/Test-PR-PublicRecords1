@@ -1,4 +1,4 @@
-infile:=File_certegy_in;
+﻿infile:=File_certegy_in;
        reformatDate(string rDate) := function
 	        valid_date:= if(trim(rDate,left,right)<>'2099-12-31',stringlib.stringfindreplace(trim(rdate,left,right),'-',''),'');
 		   return valid_date;
@@ -26,7 +26,7 @@ DriversV2.Layout_DL_Extended lTransform_CertegyTo_Common(infile l):= transform
 	self.zip 					  := trim(l.orig_zip,left,right);		                             
 	self.dob 					  := (unsigned4)l.clean_DOB;
 	self.dod                      := reformatDate(l.orig_Deceased_Dte);
-	self.ssn                      := l.clean_ssn;
+	self.ssn_safe                 := l.clean_ssn;
 	self.expiration_date		  := (unsigned4)reformatDate(l.orig_DL_Expire_Dte);
 	self.lic_issue_date 		  := (unsigned4)reformatDate(l.orig_DL_Issue_Dte);
 	self.dl_number 				  := trim(l.orig_DL_Num,left,right);

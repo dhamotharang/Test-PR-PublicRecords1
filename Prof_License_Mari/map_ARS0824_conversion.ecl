@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take ARS08324 Professional License raw files and convert them to a common
 //  professional license (BASE) layout to be used for MARI and PL_BASE development.
 //	01/08/2013 Cathy Tio - Modified to populate fields like DATE_FIRST_SEEN and for new work flow
@@ -48,7 +48,7 @@ EXPORT map_ARS0824_conversion(STRING pVersion) := FUNCTION
 	
 
 	maribase_plus_dbas := RECORD, maxsize(5000)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba1;
 		STRING60 dba2;
 		STRING60 dba3;
@@ -230,7 +230,7 @@ company_only_lookup := ds_map_lic_prof(affil_type_cd='CO');
 						
 	maribase_plus_dbas	 xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 		SELF.provnote_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
-											TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'This is not a main office.  It is a branch office without an associated main office from this source.',
+											      TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'This is not a main office.  It is a branch office without an associated main office from this source.',
 													 L.provnote_1 = '' and L.pcmc_slpk = 0 and L.affil_type_cd = 'BR' => 
 													 'This is not a main office.  It is a branch office without an associated main office from this source.',L.PROVNOTE_1);
 
@@ -259,7 +259,7 @@ company_only_lookup := ds_map_lic_prof(affil_type_cd='CO');
 	AllRecs  := DBARecs + NoDBARecs;
 
 	// transform expanded dataset to MARIBASE layout
-	Prof_License_Mari.layouts.base trans_to_base(AllRecs L) := transform
+	Prof_License_Mari.layout_base_in trans_to_base(AllRecs L) := transform
 		SELF := L;
 	END;
 

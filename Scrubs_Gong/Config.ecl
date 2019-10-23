@@ -1,4 +1,4 @@
-IMPORT SALT33;
+﻿IMPORT SALT33;
 EXPORT Config := MODULE,VIRTUAL
 EXPORT DoSliceouts := TRUE; // If set to false slice-outs do not occur (saves time)
 EXPORT CorrelateSampleSize := 100000000; // Size of sample used in hygiene.corelations
@@ -10,4 +10,3 @@ EXPORT JoinLimit := 10000;
 // Configuration of individual fields
 // Configuration of external files
 END;
-

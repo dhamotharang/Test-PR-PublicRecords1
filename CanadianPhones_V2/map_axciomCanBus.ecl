@@ -1,4 +1,4 @@
-IMPORT CanadianPhones,Address,VersionControl, ut;
+﻿IMPORT _Control, Address, CanadianPhones, MDR, VersionControl, Std, ut;
 
 EXPORT map_axciomCanBus(string8 abusFileDate) := FUNCTION
 
@@ -59,17 +59,19 @@ EXPORT map_axciomCanBus(string8 abusFileDate) := FUNCTION
 		SELF.rec_type   						:= CleanAddress[101..102];
 		SELF.language 							:= CleanAddress[103];
 		SELF.errstat 								:= CleanAddress[104..109];
-
 		SELF												:= input; 
 		SELF			   								 :=[];
 		
 	END;
 
 	pacb := PROJECT(dacb,tacb(left));
+	
+	//Add Global_SID
+	addGlobalSID	:= MDR.macGetGlobalSID(pacb, 'CanadianPhones', 'source_file', 'global_sid'); //DF-25404
 
 	RETURN SEQUENTIAL(
 						fileservices.removeOwnedSubFiles(CanadianPhones.thor_cluster + 'in::axciomBus_v2');
-						OUTPUT(pacb,,CanadianPhones.thor_cluster + 'in::axciomBus::'+abusFileDate+ '::canada_clean_v2',overwrite);
+						OUTPUT(addGlobalSID,,CanadianPhones.thor_cluster + 'in::axciomBus::'+abusFileDate+ '::canada_clean_v2',overwrite);
 						fileservices.addsuperfile(CanadianPhones.thor_cluster + 'in::axciomBus_v2',CanadianPhones.thor_cluster + 'in::axciomBus::'+abusFileDate+ '::canada_clean_v2')
 						);
 

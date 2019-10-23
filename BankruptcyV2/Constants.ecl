@@ -1,9 +1,9 @@
-IMPORT	_control;
+﻿IMPORT	_control;
 export Constants(string filedate, boolean isFCRA = false) := module
 	//	Server IP to Spray from
 	EXPORT	serverIP	:=	IF(	_control.thisenvironment.name='Dataland',
-														'bctlpedata12.risk.regn.net',
-														'bctlpedata10.risk.regn.net');
+														_Control.IPAddress.bctlpedata12,
+														_Control.IPAddress.bctlpedata10);
 	
 	//	Directory to Spray from
 	EXPORT	Directory	:=	IF(	_control.thisenvironment.name='Dataland',

@@ -25,9 +25,11 @@ EXPORT NonFCRAseed
 
 ,{999999001012,999999001012,'','','','DU',199910,today_in_ym,today_in_ym,200101,200107,'','DU001002','','263124378',19750712,'',  'MARTIN','','MARSUPIAL','','401','N','LAZY LAKE','RD','','','','ANN ARBOR','MI','48104','','161','','','Y','G','','',''}
 ,{999999001012,999999001013,'','','','8F',199910,today_in_ym,today_in_ym,200101,200107,'','DU001002','','263124378',19750712,'',  'MARTIN','','MARSUPIAL','','401','N','LAZY LAKE','RD','','','','ANN ARBOR','MI','48104','','161','','','Y','G','','',''}
+,{999999001013,999999001014,'','','','EN',199910,today_in_ym,today_in_ym,200101,200107,'','DU001003','','999999990',19510110,'',  'JONATHAN','','CONSUMER','','10655','N','BIRCH','ST','','','','BURBANK','CA','91502','','037','','','Y','G','','',''}
 	],header.Layout_Header);
 
 // EN/EQ test seed
+EXPORT UpdateNonFCRASeedFile:=output(NonFCRAseed,,'~thor_data400::base::header::dummy',overwrite);
 EXPORT FCRAseed
 	:= DATASET([
  {999999000001,999999000001,'','','','EN',199701,today_in_ym,today_in_ym,199901,200107,'','DU000001','','263124372',19600112,'MR','JOHN','','AARDVARK','','123','','MAIN','ST','','','','NEW YORK','NY','12345','1234','061','','','Y','G','','',''}
@@ -43,4 +45,6 @@ EXPORT FCRAseed
 ,{999999001012,999999001012,'','','','EN',199910,today_in_ym,today_in_ym,200101,200107,'','DU001002','','263124378',19750712,'',  'MARTIN','','MARSUPIAL','','401','N','LAZY LAKE','RD','','','','ANN ARBOR','MI','48104','','161','','','Y','G','','',''}
 	],header.Layout_Header);
 
+EXPORT UpdateFCRASeedFile:=output(NonFCRAseed,,'~thor_data400::base::fcra_header::dummy',overwrite);
+EXPORT MAIN:=SEQUENTIAL(output(NonFCRAseed),output(FCRAseed)/*);//*/,UpdateNonFCRASeedFile,UpdateFCRASeedFile); // */
 END;

@@ -1,7 +1,13 @@
-import ut;
+﻿import ut;
+
+original_Layout_Base_With_Tiers := RECORD
+  Prof_LicenseV2.Layouts_ProfLic.Layout_Base_With_Tiers - [xadl2_weight, xadl2_score, xadl2_distance,
+	                                                         xadl2_keys_used, xadl2_keys_desc, xadl2_matches,
+																													 xadl2_matches_desc];
+END;
 
 tempLayout := RECORD
-	Prof_LicenseV2.Layouts_ProfLic.Layout_Base_With_Tiers - lnpid;
+	original_Layout_Base_With_Tiers - lnpid;
 	unsigned6	temp_DID;
 end;
 
@@ -18,7 +24,7 @@ tempBase	:= project(Prof_LicenseV2.File_Proflic_Base_Tiers, trfTempLayout(left))
 ut.mac_suppress_by_phonetype(tempbase,Phone,St,phone_suppression,true,temp_did);	
 
 	
-{Prof_LicenseV2.Layouts_ProfLic.Layout_Base_With_Tiers - lnpid}  trfBaseLayout(tempLayout input)	:= transform
+{original_Layout_Base_With_Tiers - lnpid}  trfBaseLayout(tempLayout input)	:= transform
 	self								:= input;
 end;
  

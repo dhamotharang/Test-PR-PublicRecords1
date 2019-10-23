@@ -1,4 +1,4 @@
-import BIPV2_Files,STD,BIPV2; 
+﻿import BIPV2_Files,STD,BIPV2; 
 l_base    := BIPV2_Files.files_lgid3.Layout_LGID3;
 l_common  := BIPV2.CommonBase.Layout;
 EXPORT _ManageLgid3Indexes(dataset(l_base) beforeRestoreDS , dataset(l_common) afterRestoreDS, string version_in):=module
@@ -21,27 +21,26 @@ end;
 		shared ds_r:= ds_c(lgid3_before <> lgid3_after or seleid_before <> seleid_after);
 		shared ds_r1:=dedup(ds_r,version,iterNumber,lgid3_before,lgid3_after,seleid_before,seleid_after,all);
 		
-		shared ppPath:='~thor_data400::bipv2_lgid3::lgid3_changes::P' + version_in;
+		shared ppPath:='~thor_data400::BIPV2_LGID3::lgid3_changes::P' + version_in;
 		shared act_post:=output(ds_r1,,ppPath,COMPRESSED,OVERWRITE);
-		shared superChange:='~thor_data400::bipv2_lgid3::lgid3_changes::super' + version_in;
+		shared superChange:='~thor_data400::BIPV2_LGID3::lgid3_changes::super' + version_in;
 		shared act2:=STD.File.AddSuperFile(superChange,ppPath);
 		
 		shared ds:=dataset(superChange,{Change_rec,UNSIGNED8 RecPtr {virtual(fileposition)}}, FLAT);
 		
-		shared superInit:='~thor_data400::bipv2_lgid3::init_super::lgid3prox' + version_in;
+		shared superInit:='~thor_data400::BIPV2_LGID3::init_super::lgid3prox' + version_in;
 		shared ds_init_lgid3prox:=dataset(superInit,
 		             {string20 version, unsigned6 proxid,unsigned6 lgid3,UNSIGNED8 RecPtr {virtual(fileposition)}}, FLAT);
-		shared keyLgid3ProxInit:='~key::bipv2_lgid3::init_super::lgid3prox' + version_in;
+		shared keyLgid3ProxInit:='~key::BIPV2_LGID3::init_super::lgid3prox' + version_in;
 		export PayloadInitLgid3ProxKey := INDEX(ds_init_lgid3prox,{version,lgid3},{proxid},
 		                                    keyLgid3ProxInit);
 		
 		export BldInitLgid3ProxKey := BUILDINDEX(PayloadInitLgid3ProxKey,OVERWRITE);
 		
-		shared keyRcidLgid3Change:='~key::bipv2_lgid3::lgid3_changes::rcid_lgid3' + version_in;
+		shared keyRcidLgid3Change:='~key::BIPV2_LGID3::lgid3_changes::rcid_lgid3' + version_in;
 		export PayloadRcidLgid3Key := INDEX(ds,{version,iternumber,lgid3_after,lgid3_before},{seleid_before,seleid_after},
 		                                    keyRcidLgid3Change);  
 		export BldRcidLgid3Key := BUILDINDEX(PayloadRcidLgid3Key,OVERWRITE);
-
 /*  		ds_iter:=dataset('~thor_data400::bipv2_proxid_mj6::final_iter',{string ss},thor);//borrow value from mj6
           siter:=ds_iter[1].ss;
    			 iter1:=(integer)siter + 1;
@@ -70,19 +69,19 @@ end;
 		integer2 cnp_btype_score;
 	 END;
 	 
-		shared superMatch:='~thor_data400::bipv2_lgid3::lgid3_match_sample_debug::super' + version_in;
+		shared superMatch:='~thor_data400::BIPV2_LGID3::lgid3_match_sample_debug::super' + version_in;
 		shared ds2:=dataset(superMatch,
 				 {rr,UNSIGNED8 RecPtr {virtual(fileposition)}}, FLAT); //OVERWRITE;  Maybe also need a sort here.....
-		shared keyMatchSamplelgid31lgid32Path:='~key::bipv2_lgid3::lgid3_changes::lgid31lgid32_MatchSample' + version_in;
+		shared keyMatchSamplelgid31lgid32Path:='~key::BIPV2_LGID3::lgid3_changes::lgid31lgid32_MatchSample' + version_in;
 		export MatchSamplelgid31lgid32Key := INDEX(ds2,{version,iterNumber,lgid31,lgid32,RecPtr},
 																							 {ds2},keyMatchSamplelgid31lgid32Path);
 		export BldLgid31Lgid32Key := BUILDINDEX(MatchSamplelgid31lgid32Key,OVERWRITE);
 		
 export addToSuper :=SEQUENTIAL(
  STD.File.StartSuperFileTransaction(),
- STD.File.AddSuperFile('~key::bipv2_lgid3::lgid3_changes::super',keyRcidLgid3Change),
- STD.File.AddSuperFile('~key::bipv2_lgid3::lgid3_changes::lgid31lgid32_matchsample::super',keyMatchSamplelgid31lgid32Path),
- STD.File.AddSuperFile('~key::bipv2_lgid3::init_super::lgid3prox::super',keyLgid3ProxInit),
+ STD.File.AddSuperFile('~key::BIPV2_LGID3::lgid3_changes::super',keyRcidLgid3Change),
+ STD.File.AddSuperFile('~key::BIPV2_LGID3::lgid3_changes::lgid31lgid32_matchsample::super',keyMatchSamplelgid31lgid32Path),
+ STD.File.AddSuperFile('~key::BIPV2_LGID3::init_super::lgid3prox::super',keyLgid3ProxInit),
  STD.File.FinishSuperFileTransaction()
 );
 		export out:=sequential(act_post,act2,BldRcidLgid3Key,BldLgid31Lgid32Key,BldInitLgid3ProxKey,addToSuper);

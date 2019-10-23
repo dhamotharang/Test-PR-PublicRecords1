@@ -1,4 +1,4 @@
-import _validate,corp2,corp2_raw_ma,scrubs,scrubs_corp2_mapping_ma_ar,scrubs_corp2_mapping_ma_event,
+﻿import _validate,corp2,corp2_raw_ma,scrubs,scrubs_corp2_mapping_ma_ar,scrubs_corp2_mapping_ma_event,
 			 scrubs_corp2_mapping_ma_main,scrubs_corp2_mapping_ma_stock,ut,std,tools,versioncontrol;	
 
 export MA := MODULE 
@@ -227,13 +227,13 @@ export MA := MODULE
 		skip(cnt = 1 and corp2.t2u(l.busaddr1+l.buscity+l.busstate+l.buspostalcode) = '' or
 				 cnt = 2 and corp2.t2u(l.resaddr1+l.rescity+l.resstate+l.respostalcode) = ''
 				)
-			self.address1			:= choose(cnt,corp2.t2u(l.busaddr1),corp2.t2u(l.resaddr1));
-			self.city					:= choose(cnt,corp2.t2u(l.buscity),corp2.t2u(l.rescity));
-			self.state				:= choose(cnt,corp2.t2u(l.busstate),corp2.t2u(l.resstate));		
-			self.zip					:= choose(cnt,corp2.t2u(l.buspostalcode),corp2.t2u(l.respostalcode));
-			self.country			:= choose(cnt,corp2.t2u(l.buscountrycode),corp2.t2u(l.rescountrycode));
-			self.addrtype			:= choose(cnt,'B','T');
-			self.addrdesc			:= choose(cnt,'BUSINESS','CONTACT');
+			self.c_address1			:= choose(cnt,corp2.t2u(l.busaddr1),corp2.t2u(l.resaddr1));
+			self.c_city					:= choose(cnt,corp2.t2u(l.buscity),corp2.t2u(l.rescity));
+			self.c_state				:= choose(cnt,corp2.t2u(l.busstate),corp2.t2u(l.resstate));		
+			self.c_zip					:= choose(cnt,corp2.t2u(l.buspostalcode),corp2.t2u(l.respostalcode));
+			self.c_country			:= choose(cnt,corp2.t2u(l.buscountrycode),corp2.t2u(l.rescountrycode));
+			self.c_addrtype			:= choose(cnt,'B','T');
+			self.c_addrdesc			:= choose(cnt,'BUSINESS','CONTACT');
 			self 							:= l;
 		end;
 
@@ -272,13 +272,13 @@ export MA := MODULE
 			self.cont_suffix													:= if(corp2.t2u(self.cont_fname+self.cont_mname+self.cont_lname)<>'',Corp2_Raw_MA.Functions.CleanText(l.suffix),'');
 			self.cont_title1_desc											:= Corp2_Raw_MA.Functions.CleanText(l.individualtitle);
 			self.cont_addl_info												:= if(Corp2_Raw_MA.Functions.CleanText(l.termexpiration)<>'','TERMS: '+Corp2_Raw_MA.Functions.CleanText(l.termexpiration),'');
-			self.cont_address_type_cd									:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.address1,'',l.city,l.state,l.zip).ifAddressExists,corp2.t2u(l.addrtype), '');
-			self.cont_address_type_desc								:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.address1,'',l.city,l.state,l.zip).ifAddressExists,corp2.t2u(l.addrdesc), '');
-			self.cont_address_line1										:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,,l.city,l.state,l.zip,l.country).AddressLine1;
-			self.cont_address_line2										:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,,l.city,l.state,l.zip,l.country).AddressLine2;
-			self.cont_address_line3										:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,,l.city,l.state,l.zip,l.country).AddressLine3;
-			self.cont_prep_addr_line1									:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,,l.city,l.state,l.zip,l.country).PrepAddrLine1;
-			self.cont_prep_addr_last_line							:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,,l.city,l.state,l.zip,l.country).PrepAddrLastLine;
+			self.cont_address_type_cd									:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.c_address1,'',l.c_city,l.c_state,l.c_zip).ifAddressExists,corp2.t2u(l.c_addrtype), '');
+			self.cont_address_type_desc								:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.c_address1,'',l.c_city,l.c_state,l.c_zip).ifAddressExists,corp2.t2u(l.c_addrdesc), '');
+			self.cont_address_line1										:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.c_address1,,l.c_city,l.c_state,l.c_zip,l.c_country).AddressLine1;
+			self.cont_address_line2										:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.c_address1,,l.c_city,l.c_state,l.c_zip,l.c_country).AddressLine2;
+			self.cont_address_line3										:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.c_address1,,l.c_city,l.c_state,l.c_zip,l.c_country).AddressLine3;
+			self.cont_prep_addr_line1									:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.c_address1,,l.c_city,l.c_state,l.c_zip,l.c_country).PrepAddrLine1;
+			self.cont_prep_addr_last_line							:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.c_address1,,l.c_city,l.c_state,l.c_zip,l.c_country).PrepAddrLastLine;
 			self.recordorigin													:= 'T';			
 			self																			:= [];																						
 		end;
@@ -450,15 +450,13 @@ export MA := MODULE
 
 		AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
-		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																															,'Scrubs CorpAR_MA Report' //subject
 																															,'Scrubs CorpAR_MA Report' //body
 																															,(data)AR_ScrubsAttachment
 																															,'text/csv'
 																															,'CorpMAARScrubsReport.csv'
-																															,
-																															,
-																															,corp2.Email_Notification_Lists.spray);
+																															);
 
 		AR_BadRecords				 := AR_N.ExpandedInFile(	
 																								corp_key_Invalid							  			<> 0 or
@@ -529,15 +527,13 @@ export MA := MODULE
 
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
-		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpEvent_MA Report' //subject
 																																 ,'Scrubs CorpEvent_MA Report' //body
 																																 ,(data)Event_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpMAEventScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 
 		Event_BadRecords				 	:= Event_N.ExpandedInFile(	
 																												corp_key_Invalid							  			<> 0 or
@@ -609,15 +605,13 @@ export MA := MODULE
 
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpMain_MA Report' //subject
 																																 ,'Scrubs CorpMain_MA Report' //body
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpMAMainScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 		Main_BadRecords						:= Main_N.ExpandedInFile(	
 																											 dt_vendor_first_reported_Invalid 			<> 0 or
 																											 dt_vendor_last_reported_Invalid 				<> 0 or
@@ -729,15 +723,13 @@ export MA := MODULE
 
 		Stock_ScrubsAlert					:= Stock_ScrubsWithExamples(RejectWarning = 'Y');
 		Stock_ScrubsAttachment		:= Scrubs.fn_email_attachment(Stock_ScrubsAlert);
-		Stock_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Stock_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpStock_MA Report' //subject
 																																 ,'Scrubs CorpStock_MA Report' //body
 																																 ,(data)Stock_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpMAEventScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																															);
 
 		Stock_BadRecords					:= Stock_N.ExpandedInFile(	
 																												corp_key_Invalid							  			<> 0 or

@@ -729,7 +729,7 @@ export InterfaceTranslator := module
       ssn_filt := ssn_filtered_value.val(in_mod);
 			app_type := application_type_val.val (in_mod);
 			Suppress.MAC_Suppress_Set(app_type,supp_set);
-			supp_key := suppress.Key_New_Suppression (
+			supp_key := suppress.Key_New_Suppression() (
 				keyed (product in supp_set),
 				keyed (linking_type=Suppress.Constants.LinkTypes.SSN),
 				keyed (Linking_ID=ssn_filt));
@@ -1678,5 +1678,17 @@ export InterfaceTranslator := module
 			export string20 DemoCustomerName;
 		end;
 		export string20 val(params in_mod) :=  STD.Str.ToUpperCase(in_mod.DemoCustomerName);
+	end;
+	export intended_use_value := module
+		export params := interface
+			export unsigned1 IntendedUse;
+		end;
+		export unsigned1 val(params in_mod) := in_mod.IntendedUse;
+	end;
+	export reseller_type_value := module
+		export params := interface
+			export unsigned1 ResellerType;
+		end;
+		export unsigned1 val(params in_mod) := in_mod.ResellerType;
 	end;
 end;

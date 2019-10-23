@@ -1,4 +1,4 @@
-IMPORT AID,address,BIPV2;
+﻿IMPORT AID,address,BIPV2;
 
 EXPORT Layouts :=
 MODULE
@@ -42,9 +42,17 @@ MODULE
 		input																rawfields										;
 		Address.Layout_Clean_Name						clean_name									;
 		Address.Layout_Clean182_fips				clean_address								;
+		//DF-24282 Add CCPA fields
+   unsigned4 global_sid;
+   unsigned8 record_sid;
+	END;
+	
+	EXPORT base_new := RECORD
+		base;
+		boolean															current_rec									;
 	END;
 
-	export keybuild := base - BIPV2.IDlayouts.l_xlink_ids;
+	EXPORT keybuild := base - BIPV2.IDlayouts.l_xlink_ids;
 
 	EXPORT strata_base :=
 	RECORD
@@ -64,6 +72,9 @@ MODULE
 		input																rawfields										;
 		Address.Layout_Clean_Name						clean_name									;
 		Address.Layout_Clean182_fips				clean_address								;
+		//DF-24282 Add CCPA fields
+   unsigned4 global_sid;
+   unsigned8 record_sid;
 	END;
 	////////////////////////////////////////////////////////////////////////
 	// -- Temporary Layouts for processing
@@ -115,7 +126,7 @@ MODULE
 	  export UniqueId := 
 		record
  		  unsigned8		unique_id	;
-		  Base									;
+		  Base_new							;
 		end;
 
 		export aid_prep :=
@@ -123,7 +134,7 @@ MODULE
 		
 			string			address1				;
 			string			address2				;
-			Base												;
+			Base_new										;
 		
 		end;
 		

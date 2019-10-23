@@ -1,4 +1,4 @@
-import versioncontrol;
+﻿import versioncontrol,_Control;
 
 export DesprayCorpLogs(
 
@@ -34,14 +34,14 @@ function
 	VersionControl.macBuildNewLogicalFile('~thor_data400::dump::corp2::used::events' 	+ pDateVersion,fConvert4Despray(events	),eventsout	,,,pOverwrite);
 	VersionControl.macBuildNewLogicalFile('~thor_data400::dump::corp2::used::stock' 	+ pDateVersion,fConvert4Despray(stock		),stockout	,,,pOverwrite);
 	VersionControl.macBuildNewLogicalFile('~thor_data400::dump::corp2::used::ar'		 	+ pDateVersion,fConvert4Despray(ar			),arout			,,,pOverwrite);
-
+	string landing_zone := _Control.IPAddress.bctlpedata10;
 
 	myfilestodespray := dataset([
 		
-		 {	 '~thor_data400::dump::corp2::used::main'	 	 + pDateVersion	,'bctlpedata10.risk.regn.net','/data/data_build_4/corporate_filings/logs/spray_logs/sprayed_main_' 		+ pDateVersion + '.log' }
-		,{	 '~thor_data400::dump::corp2::used::events'	 + pDateVersion	,'bctlpedata10.risk.regn.net','/data/data_build_4/corporate_filings/logs/spray_logs/sprayed_events_' 	+ pDateVersion + '.log' }
-		,{	 '~thor_data400::dump::corp2::used::stock'	 + pDateVersion	,'bctlpedata10.risk.regn.net','/data/data_build_4/corporate_filings/logs/spray_logs/sprayed_stock_' 	+ pDateVersion + '.log' }
-		,{	 '~thor_data400::dump::corp2::used::ar'			 + pDateVersion	,'bctlpedata10.risk.regn.net','/data/data_build_4/corporate_filings/logs/spray_logs/sprayed_ar_' 			+ pDateVersion + '.log' }
+		 {	 '~thor_data400::dump::corp2::used::main'	 	 + pDateVersion	,landing_zone,'/data/data_build_4/corporate_filings/logs/spray_logs/sprayed_main_' 		+ pDateVersion + '.log' }
+		,{	 '~thor_data400::dump::corp2::used::events'	 + pDateVersion	,landing_zone,'/data/data_build_4/corporate_filings/logs/spray_logs/sprayed_events_' 	+ pDateVersion + '.log' }
+		,{	 '~thor_data400::dump::corp2::used::stock'	 + pDateVersion	,landing_zone,'/data/data_build_4/corporate_filings/logs/spray_logs/sprayed_stock_' 	+ pDateVersion + '.log' }
+		,{	 '~thor_data400::dump::corp2::used::ar'			 + pDateVersion	,landing_zone,'/data/data_build_4/corporate_filings/logs/spray_logs/sprayed_ar_' 			+ pDateVersion + '.log' }
                                                                                                                            
 	], versioncontrol.Layout_DKCs.Input);
 

@@ -1,4 +1,4 @@
-IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE,_control, PRTE2_DCA, PRTE2_Common;
+﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE,_control, PRTE2_DCA, PRTE2_Common;
 
 EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 	//flags for DOPS notification
@@ -176,7 +176,7 @@ EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='
 												move_qa_key_hierarchy_parent_to_child_root_sub, 
 												move_qa_key_hierarchy_root_sub, 
 												move_qa_key_root_sub, 
-												retval, 
+												retval,
 												PerformUpdateOrNot
 											);
 

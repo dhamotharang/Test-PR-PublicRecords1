@@ -1,4 +1,4 @@
-import crim_common, hygenics_crim, STD;
+﻿import crim_common, hygenics_crim, STD;
 
 
 Printable := ' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~`!@#$%^&*()_-+={[}]|:;",<.>/?\'\\'; 
@@ -10,6 +10,7 @@ off := distribute(hygenics_crim.file_in_offense_doc,HASH32(recordid,statecode));
 sen := distribute(hygenics_crim.file_in_sentence_doc,HASH32(recordid,statecode));
 pri := distribute(hygenics_crim.file_in_priors_doc,HASH32(recordid,statecode));
 cha := distribute(hygenics_crim.file_in_charge_doc,hash32(recordid,statecode));
+
 
 layout_j_final := record
 
@@ -24,6 +25,7 @@ layout_j_final := record
 	string20		SourceType;
 	string2			StateCode;
 	string20		RecordType;
+	string8		  RecordUploadDate;
 	string115		Name;
 	string100		DefendantStatus;
 	string20		DOCNumber;
@@ -48,7 +50,7 @@ layout_j_final := record
 	//string100	SourceName;
 	//string20	SourceType;
 	//string2		StateCode;
-	string40 		CaseID 								:= '';
+	string100 		CaseID 								:= '';
 	string50		CaseNumber						:= '';
 	//string100	CaseTitle							:= '';
 	//string20	CaseType							:= '';
@@ -145,6 +147,7 @@ layout_j_final to_j1(off l,def r) := transform
  		self.RecordID 		      		:= r.RecordID;
 		self.SourceName 		    		:= r.SourceName;
 		self.SourceType 		    		:= r.SourceType;
+		self.RecordUploadDate       := r.RecordUploadDate;
 		self.StateCode 		      		:= r.StateCode;
 		self.DefendantStatus 				:= r.DefendantStatus;
 		self.InmateNumber 		  		:= r.InmateNumber;	
@@ -180,13 +183,14 @@ layout_j_final to_j3(j1 l, sen r) := transform
  		self.RecordID 		   := l.RecordID;
 		self.SourceName      := l.SourceName;
 		self.SourceType 	   := l.SourceType;
+		self.RecordUploadDate:= l.RecordUploadDate;
 		self.StateCode 		   := l.StateCode;
 		self.DefendantStatus := l.DefendantStatus;
 		self.InmateNumber    := l.InmateNumber;	
 		self.InstitutionName := l.InstitutionName; 
 		self.dob             := l.dob;
-		self.gender			 := l.gender;
-		self.race			 := l.race;
+		self.gender			     := l.gender;
+		self.race			       := l.race;
 		self.recordtype      := l.recordtype;
 		self.name            := l.name;
 		self.InstitutionDetails     := l.InstitutionDetails;
@@ -254,6 +258,7 @@ j3 := join(j1,sen,
 								left.recordid=right.recordid and 
 								left.caseid=right.caseid, 
 								to_j3(left,right), left outer, local);
+
 								
 layout_j_final addField(j3 l, cha r):= transform
 	self.bookingdate := r.bookingdate;
@@ -333,8 +338,8 @@ ds_concat_def_off_sent_priors	:= ds_concat_def_off_sent_prior(trim(ln_vendor, ri
 	////		
   pos7:= stringlib.stringfind(s1,'CONDITIONAL RELEASE DATE',1);
 	ConditionalReleaseDt := 	Map(REGEXFIND('CONDITIONAL RELEASE DATE',s1,NOCASE) =>s1[ pos7+26..pos7+33],'');	
-	///
 	
+	///	
 	pos10:= stringlib.stringfind(s1,'SECURITY STATUS',1);
 	sec_status_string := 	Map(REGEXFIND('SECURITY STATUS',s1,NOCASE) =>s1[ pos10 ..],'');	
   pos11 :=stringlib.stringfind(sec_status_string,',',1);
@@ -345,11 +350,8 @@ ds_concat_def_off_sent_priors	:= ds_concat_def_off_sent_prior(trim(ln_vendor, ri
 	sent_jail_string := 	Map(REGEXFIND('SENTENCE JAIL DAYS',s1,NOCASE) =>s1[ pos14 ..],'');	
   pos15 :=stringlib.stringfind(sent_jail_string,',',1);
 	sent_jail := Map(REGEXFIND('SENTENCE JAIL DAYS',s1,NOCASE) =>s1[ pos14 .. pos14 +pos15],'');	
-	
-	
-	
-	/////////
-	
+		
+	/////////	
 	s2 := l.sentencestatus;
 	pos12:= stringlib.stringfind(s2,'SENTENCED TO',1);	
 	sent_to_string := 	Map(REGEXFIND('SENTENCED TO',s2,NOCASE) =>s2[ pos12 ..],'');		
@@ -427,22 +429,19 @@ ds_concat_def_off_sent_priors	:= ds_concat_def_off_sent_prior(trim(ln_vendor, ri
 		v_inm_num               := IF(v_inm_num1  in _functions.Filterlist,'',v_inm_num1);
 		v_stid_num              := IF(v_stid_num1 in _functions.Filterlist,'',v_stid_num1);	
 	
-self.offender_key		:= MAP(vVendor in [
-																	'DA','DB','DH','DJ','DI',
-																	'DP','DM','DQ','DN','SB',
-																	'DS','DU','EU','DY','DV',
-																	'DX','EV','WG','EW','EX',
-																	'EF','WH','WK','EP','ER',
-																	'ET','DF','6X','ZB','6W'] and v_doc_num <> ''  => trim(vVendor) + v_doc_num, 
+self.offender_key		:= MAP(     vVendor in [
+																	'DA','DB','DH','DJ','DI','DP','DM','DQ','DN','SB',
+																	'DS','DU','EU','DY','DV','DX','EV','WG','EW','EX',
+																	'EF','WH','WK','EP','ER','ET','DF','6X','ZB','6W',
+																	'I0050','I0052'] and v_doc_num <> ''  => trim(vVendor) + v_doc_num, 
 																	
 																vVendor in [
-																	'DD','DG','WL','DD','VE',
-																	'WD','EA','WC','ED','WF',
-																	'EE','EG','EI','EJ','EO',
-																	'EQ'] and v_inm_num <> ''	=> trim(vVendor) + v_inm_num,
+																	'DD','DG','WL','DD','VE','WD','EA','WC','ED','WF',
+																	'EE','EG','EI','EJ','EO','EQ',
+																	'I0046','I0047','I0051'] and v_inm_num <> ''	=> trim(vVendor) + v_inm_num,
 																
 																vVendor in [
-																	'EL','DW','6H','6Z'] and v_stid_num <> ''	=> trim(vVendor) + v_stid_num +trim(l.dob, all),
+																	'EL','DW','6H','6Z','I0048','I0049'] and v_stid_num <> ''	=> trim(vVendor) + v_stid_num +trim(l.dob, all),
 																	
 																vVendor in [
 																	'DR','DZ','WE','EK','ES','EM'] and v_stid_num <> ''	=> trim(vVendor) + v_stid_num,
@@ -466,11 +465,12 @@ self.offender_key		:= MAP(vVendor in [
 																//l.stateidnumber, l.fbinumber, temp_case_number, r.fileddate, vcase_type)
 																//);		
 
-    self.vendor			   := trim(l.ln_vendor);	
-	self.source_file 	 := trim(ls_source);//VC
-	self.offense_key 	 := ''; //  hygenics_crim._functions.fn_offender_key( l.ln_vendor, l.caseid,'', l.fileddate );
+    self.vendor			    := trim(l.ln_vendor);	
+	self.source_file 	    := trim(ls_source);//VC
+	self.offense_key 	    := ''; //  hygenics_crim._functions.fn_offender_key( l.ln_vendor, l.caseid,'', l.fileddate );
 	
-	self.event_dt 	   := event_date;	
+	self.event_dt 	      := MAP(l.ln_vendor[1..2] ='I0' => l.recorduploaddate  , event_date);	
+	
 	self.punishment_type 	:= Map(  event_date =''  => 'I',
 	                               event_date = l.parolebegindate  => 'P',
 	                               event_date = l.probationbegindate => 'P' ,
@@ -647,10 +647,10 @@ self.offender_key		:= MAP(vVendor in [
 																	
 																	
 																	l.sourcename = 'WEST_VIRGINIA_DEPARTMENT_OF_CORRECTIONS'  => Trim(l.defendantstatus),
-																	l.sourcename = 'LOUISIANA_JAIL_ROSTERS'  => Trim(l.sentencestatus)                                                                         
+																	l.sourcename = 'LOUISIANA_JAIL_ROSTERS'  => Trim(l.sentencestatus),                                                                         
 
-                                              
-																										 //WVDOC, LN Crim miss mapping, hygenics no mapping.  		
+                                  l.ln_vendor = 'I0046' and  regexfind('(SPECIAL PROVISIONS: )(.*)',l.sentenceadditionalinfo ) => regexreplace('(SPECIAL PROVISIONS: )(.*)',l.sentenceadditionalinfo,'$2' )
+                                                                                   
 																	,''); 																										                           
 																								 
 	self.cur_loc_inm_cd 		:= '';
@@ -681,14 +681,15 @@ self.offender_key		:= MAP(vVendor in [
 	                                                    if(trim(sch_rel_dt)[1..2] between '19' and '20', trim(sch_rel_dt),'')
 																							           ,''),''),''),'');		
 	
-	self.sch_rel_dt         := MAP( l.sourcename = 'MISSISSIPPI_DEPARTMENT_OF_CORRECTIONS' and  l.sentencestatus IN ['PAROLE','PROBATION']  => '',                                                                                         
-																	 sch_rel_dt_2); 
+	self.sch_rel_dt         := MAP( l.sourcename = 'MISSISSIPPI_DEPARTMENT_OF_CORRECTIONS' and  l.sentencestatus IN ['PAROLE','PROBATION']  => '', 
+	                                l.ln_vendor IN ['I0048','I0049'] => '',
+																	sch_rel_dt_2); 
   	
 	
 	act_rel_dt              :=  MAP( l.sourcename = 'CONNECTICUT_DEPARTMENT_OF_CORRECTIONS'  and l.ActualReleaseDate <> '' => l.ActualReleaseDate,
 	                                 l.sourcename = 'CONNECTICUT_DEPARTMENT_OF_CORRECTIONS'  and l.InstitutionName = 'DISCHARGE' => l.defendantstatus[17 ..],
 																	 l.sourcename = 'MISSISSIPPI_DEPARTMENT_OF_CORRECTIONS' and  l.sentencestatus IN ['PAROLE','PROBATION']  => '',                                                                                         
-
+                                   l.ln_vendor IN ['I0048','I0049'] => '',
 																	 l.ActualReleaseDate); 
 																								
 	self.act_rel_dt         := 	REGEXREPLACE('19888888',
@@ -724,13 +725,16 @@ self.offender_key		:= MAP(vVendor in [
 	
 	/////
 	self.par_sch_end_dt			:= MAP(l.sourcename = 'MISSISSIPPI_DEPARTMENT_OF_CORRECTIONS' and 
-	                               l.sentencestatus = 'PAROLE' => l.ScheduledReleaseDate,'');
+	                               l.sentencestatus = 'PAROLE' => l.ScheduledReleaseDate,
+																 l.ln_vendor = 'I0048' => l.ScheduledReleaseDate,
+																 '');
 	
 	
 	
 	self.par_act_end_dt 		:=   MAP(l.sourcename = 'KENTUCKY_DEPARTMENT_OF_CORRECTIONS'  =>trim(DischargeFromParole),
                                    l.sourcename = 'MISSISSIPPI_DEPARTMENT_OF_CORRECTIONS' and 
 	  															 l.sentencestatus = 'PAROLE' => l.ActualReleaseDate,
+																	 l.ln_vendor = 'I0048' => l.ActualReleaseDate,
 	                                                                     l.ParoleEndDate);
 																								
 																								
@@ -745,10 +749,10 @@ self.offender_key		:= MAP(vVendor in [
 	self.pro_end_dt         := MAP(l.sourcename = 'MISSISSIPPI_DEPARTMENT_OF_CORRECTIONS' and l.sentencestatus = 'PROBATION' and 
 	                               l.ActualReleaseDate <> '' => l.ActualReleaseDate,
                                  l.sourcename = 'MISSISSIPPI_DEPARTMENT_OF_CORRECTIONS' and l.sentencestatus = 'PROBATION' and 
-																 l.ScheduledReleaseDate <> '' => l.ScheduledReleaseDate,                   	                               
-																 l.ProbationEndDate   <> '' => l.ProbationEndDate,SuperVisionEndDt);	     
-	
-	
+																 l.ScheduledReleaseDate <> '' => l.ScheduledReleaseDate,    
+																 l.ln_vendor = 'I0049' => l.ScheduledReleaseDate,
+																 l.ProbationEndDate   <> '' => l.ProbationEndDate,
+																 SuperVisionEndDt);	  
 	
 	////
 	self.pro_status         := MAP(l.sourcename = 'IOWA_DEPARTMENT_OF_CORRECTIONS'     and trim(l.sentencetype) = 'PROBATION' => l.sentencetype,

@@ -1,9 +1,9 @@
- 
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_corp_ra_dt_first_seen = '',Input_corp_ra_dt_last_seen = '',Input_corp_process_date = '',Input_corp_key = '',Input_corp_orig_sos_charter_nbr = '',Input_corp_vendor = '',Input_corp_state_origin = '',Input_corp_inc_state = '',Input_corp_legal_name = '',Input_corp_ln_name_type_cd = '',Input_corp_filing_date = '',Input_corp_inc_date = '',Input_corp_forgn_date = '',Input_corp_foreign_domestic_ind = '',Input_corp_forgn_state_desc = '',Input_corp_trademark_class_desc1 = '',Input_corp_trademark_class_desc2 = '',Input_corp_trademark_class_desc3 = '',Input_corp_trademark_class_desc4 = '',Input_corp_trademark_class_desc5 = '',Input_corp_trademark_class_desc6 = '',Input_corp_term_exist_cd = '',Input_corp_term_exist_exp = '',Input_corp_orig_org_structure_cd = '',Input_corp_orig_bus_type_cd = '',Input_corp_status_desc = '',Input_corp_status_comment = '',Input_corp_purpose = '',Input_corp_ra_resign_date = '',Input_corp_dissolved_date = '',Input_corp_name_effective_date = '',Input_corp_ra_addl_info = '',Input_corp_agent_status_cd = '',Input_corp_trademark_first_use_date = '',Input_corp_trademark_first_use_date_in_state = '',Input_corp_trademark_renewal_date = '',Input_corp_registered_counties = '',Input_cont_status_cd = '',Input_cont_title1_desc = '',Input_recordorigin = '',OutFile) := MACRO
-  IMPORT SALT34,Scrubs_Corp2_Mapping_MT_Main;
+﻿ 
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_corp_ra_dt_first_seen = '',Input_corp_ra_dt_last_seen = '',Input_corp_process_date = '',Input_corp_key = '',Input_corp_orig_sos_charter_nbr = '',Input_corp_vendor = '',Input_corp_state_origin = '',Input_corp_inc_state = '',Input_corp_legal_name = '',Input_corp_ln_name_type_cd = '',Input_corp_filing_date = '',Input_corp_inc_date = '',Input_corp_forgn_date = '',Input_corp_foreign_domestic_ind = '',Input_corp_forgn_state_desc = '',Input_corp_trademark_class_desc1 = '',Input_corp_trademark_class_desc2 = '',Input_corp_trademark_class_desc3 = '',Input_corp_trademark_class_desc4 = '',Input_corp_trademark_class_desc5 = '',Input_corp_trademark_class_desc6 = '',Input_corp_term_exist_cd = '',Input_corp_term_exist_exp = '',Input_corp_status_desc = '',Input_corp_status_comment = '',Input_corp_trademark_first_use_date = '',Input_corp_trademark_first_use_date_in_state = '',Input_corp_trademark_renewal_date = '',Input_cont_title1_desc = '',Input_recordorigin = '',OutFile) := MACRO
+  IMPORT SALT38,Scrubs_Corp2_Mapping_MT_Main;
   #uniquename(of)
   %of% := RECORD
-    SALT34.Str512Type fields;
+    SALT38.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
@@ -11,43 +11,43 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
     #IF( #TEXT(Input_dt_vendor_first_reported)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_dt_vendor_first_reported = 0,'', ':dt_vendor_first_reported(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_dt_vendor_first_reported) + ')' )
+        IF( (unsigned)le.Input_dt_vendor_first_reported = 0,'', ':dt_vendor_first_reported(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_dt_vendor_first_reported) + ')' )
     #END
  
 +    #IF( #TEXT(Input_dt_vendor_last_reported)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_dt_vendor_last_reported = 0,'', ':dt_vendor_last_reported(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_dt_vendor_last_reported) + ')' )
+        IF( (unsigned)le.Input_dt_vendor_last_reported = 0,'', ':dt_vendor_last_reported(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_dt_vendor_last_reported) + ')' )
     #END
  
 +    #IF( #TEXT(Input_dt_first_seen)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_dt_first_seen = 0,'', ':dt_first_seen(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_dt_first_seen) + ')' )
+        IF( (unsigned)le.Input_dt_first_seen = 0,'', ':dt_first_seen(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_dt_first_seen) + ')' )
     #END
  
 +    #IF( #TEXT(Input_dt_last_seen)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_dt_last_seen = 0,'', ':dt_last_seen(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_dt_last_seen) + ')' )
+        IF( (unsigned)le.Input_dt_last_seen = 0,'', ':dt_last_seen(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_dt_last_seen) + ')' )
     #END
  
 +    #IF( #TEXT(Input_corp_ra_dt_first_seen)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_corp_ra_dt_first_seen = 0,'', ':corp_ra_dt_first_seen(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_ra_dt_first_seen) + ')' )
+        IF( (unsigned)le.Input_corp_ra_dt_first_seen = 0,'', ':corp_ra_dt_first_seen(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_corp_ra_dt_first_seen) + ')' )
     #END
  
 +    #IF( #TEXT(Input_corp_ra_dt_last_seen)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_corp_ra_dt_last_seen = 0,'', ':corp_ra_dt_last_seen(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_ra_dt_last_seen) + ')' )
+        IF( (unsigned)le.Input_corp_ra_dt_last_seen = 0,'', ':corp_ra_dt_last_seen(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_corp_ra_dt_last_seen) + ')' )
     #END
  
 +    #IF( #TEXT(Input_corp_process_date)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_corp_process_date = 0,'', ':corp_process_date(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_process_date) + ')' )
+        IF( (unsigned)le.Input_corp_process_date = 0,'', ':corp_process_date(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_corp_process_date) + ')' )
     #END
  
 +    #IF( #TEXT(Input_corp_key)='' )
@@ -95,19 +95,19 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
 +    #IF( #TEXT(Input_corp_filing_date)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_corp_filing_date = 0,'', ':corp_filing_date(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_filing_date) + ')' )
+        IF( (unsigned)le.Input_corp_filing_date = 0,'', ':corp_filing_date(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_corp_filing_date) + ')' )
     #END
  
 +    #IF( #TEXT(Input_corp_inc_date)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_corp_inc_date = 0,'', ':corp_inc_date(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_inc_date) + ')' )
+        IF( (unsigned)le.Input_corp_inc_date = 0,'', ':corp_inc_date(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_corp_inc_date) + ')' )
     #END
  
 +    #IF( #TEXT(Input_corp_forgn_date)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_corp_forgn_date = 0,'', ':corp_forgn_date(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_forgn_date) + ')' )
+        IF( (unsigned)le.Input_corp_forgn_date = 0,'', ':corp_forgn_date(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_corp_forgn_date) + ')' )
     #END
  
 +    #IF( #TEXT(Input_corp_foreign_domestic_ind)='' )
@@ -167,19 +167,7 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
 +    #IF( #TEXT(Input_corp_term_exist_exp)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_corp_term_exist_exp = 0,'', ':corp_term_exist_exp(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_term_exist_exp) + ')' )
-    #END
- 
-+    #IF( #TEXT(Input_corp_orig_org_structure_cd)='' )
-      '' 
-    #ELSE
-        IF( le.Input_corp_orig_org_structure_cd = (TYPEOF(le.Input_corp_orig_org_structure_cd))'','',':corp_orig_org_structure_cd')
-    #END
- 
-+    #IF( #TEXT(Input_corp_orig_bus_type_cd)='' )
-      '' 
-    #ELSE
-        IF( le.Input_corp_orig_bus_type_cd = (TYPEOF(le.Input_corp_orig_bus_type_cd))'','',':corp_orig_bus_type_cd')
+        IF( (unsigned)le.Input_corp_term_exist_exp = 0,'', ':corp_term_exist_exp(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_corp_term_exist_exp) + ')' )
     #END
  
 +    #IF( #TEXT(Input_corp_status_desc)='' )
@@ -194,70 +182,22 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
         IF( le.Input_corp_status_comment = (TYPEOF(le.Input_corp_status_comment))'','',':corp_status_comment')
     #END
  
-+    #IF( #TEXT(Input_corp_purpose)='' )
-      '' 
-    #ELSE
-        IF( le.Input_corp_purpose = (TYPEOF(le.Input_corp_purpose))'','',':corp_purpose')
-    #END
- 
-+    #IF( #TEXT(Input_corp_ra_resign_date)='' )
-      '' 
-    #ELSE
-        IF( (unsigned)le.Input_corp_ra_resign_date = 0,'', ':corp_ra_resign_date(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_ra_resign_date) + ')' )
-    #END
- 
-+    #IF( #TEXT(Input_corp_dissolved_date)='' )
-      '' 
-    #ELSE
-        IF( (unsigned)le.Input_corp_dissolved_date = 0,'', ':corp_dissolved_date(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_dissolved_date) + ')' )
-    #END
- 
-+    #IF( #TEXT(Input_corp_name_effective_date)='' )
-      '' 
-    #ELSE
-        IF( (unsigned)le.Input_corp_name_effective_date = 0,'', ':corp_name_effective_date(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_name_effective_date) + ')' )
-    #END
- 
-+    #IF( #TEXT(Input_corp_ra_addl_info)='' )
-      '' 
-    #ELSE
-        IF( le.Input_corp_ra_addl_info = (TYPEOF(le.Input_corp_ra_addl_info))'','',':corp_ra_addl_info')
-    #END
- 
-+    #IF( #TEXT(Input_corp_agent_status_cd)='' )
-      '' 
-    #ELSE
-        IF( le.Input_corp_agent_status_cd = (TYPEOF(le.Input_corp_agent_status_cd))'','',':corp_agent_status_cd')
-    #END
- 
 +    #IF( #TEXT(Input_corp_trademark_first_use_date)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_corp_trademark_first_use_date = 0,'', ':corp_trademark_first_use_date(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_trademark_first_use_date) + ')' )
+        IF( (unsigned)le.Input_corp_trademark_first_use_date = 0,'', ':corp_trademark_first_use_date(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_corp_trademark_first_use_date) + ')' )
     #END
  
 +    #IF( #TEXT(Input_corp_trademark_first_use_date_in_state)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_corp_trademark_first_use_date_in_state = 0,'', ':corp_trademark_first_use_date_in_state(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_trademark_first_use_date_in_state) + ')' )
+        IF( (unsigned)le.Input_corp_trademark_first_use_date_in_state = 0,'', ':corp_trademark_first_use_date_in_state(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_corp_trademark_first_use_date_in_state) + ')' )
     #END
  
 +    #IF( #TEXT(Input_corp_trademark_renewal_date)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_corp_trademark_renewal_date = 0,'', ':corp_trademark_renewal_date(' + SALT34.fn_date_valid_as_text((unsigned)le.Input_corp_trademark_renewal_date) + ')' )
-    #END
- 
-+    #IF( #TEXT(Input_corp_registered_counties)='' )
-      '' 
-    #ELSE
-        IF( le.Input_corp_registered_counties = (TYPEOF(le.Input_corp_registered_counties))'','',':corp_registered_counties')
-    #END
- 
-+    #IF( #TEXT(Input_cont_status_cd)='' )
-      '' 
-    #ELSE
-        IF( le.Input_cont_status_cd = (TYPEOF(le.Input_cont_status_cd))'','',':cont_status_cd')
+        IF( (unsigned)le.Input_corp_trademark_renewal_date = 0,'', ':corp_trademark_renewal_date(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_corp_trademark_renewal_date) + ')' )
     #END
  
 +    #IF( #TEXT(Input_cont_title1_desc)='' )

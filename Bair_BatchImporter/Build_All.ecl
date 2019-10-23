@@ -1,4 +1,4 @@
-IMPORT versioncontrol, _control,Bair,wk_ut;
+﻿IMPORT versioncontrol, _control,Bair,wk_ut;
 EXPORT Build_all(		
 										STRING pBuildVersion  = '',
 										STRING pDaliServer  = Bair._constant.bair_batchlz,
@@ -31,15 +31,11 @@ EXPORT Build_all(
 									build_inputs.build_crash(pVersion),
 									build_inputs.build_lpr(pVersion),
 									build_inputs.build_offenders(pVersion)),
-								build_inputs.build_commons(pVersion),											
-								Bair.Orbit_update.SetOrbitForPrepBatch(pVersion,filenames().lInputTemplateManifest+'::'+pVersion,'built'),								
+								build_inputs.build_commons(pVersion),	
 								Bair.Orbit_Update.pushLastBuildManifest('batch_importer_input_prep', pVersion, pVersion),
 								fFileMoves(pVersion).MoveSprayingToDone,
 								CleanUp.MoveInputFilesToHistory(pVersion),
-								// NOTIFY('Update_Orbit_For_BatchFiles','<Event><returnTo>'+pVersion+'</returnTo></Event>'),
-								// wk_ut.CreateWuid(ECL_OrbitUpdate,'hthor',Bair._ESP),
 							):FAILURE( PARALLEL(
-									Bair.Orbit_update.SetOrbitForPrepBatch(pVersion,filenames().lInputTemplateManifest+'::'+pVersion,'failed'),
 									Send_Email(FAILMESSAGE).BuildFailure,
 									fFileMoves(pVersion).MoveSprayingToError,
 									CleanUp.MoveInputFilesToHistory(pVersion),				

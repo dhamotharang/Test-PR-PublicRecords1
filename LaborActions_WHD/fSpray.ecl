@@ -1,4 +1,4 @@
-import lib_fileservices,_control,lib_stringlib;
+﻿import lib_fileservices,_control,lib_stringlib;
 
 export fSpray(string filedate)	:=	function
 	CreateSuper		:=	FileServices.CreateSuperFile(Filenames().Input.Sprayed,false);
@@ -9,7 +9,7 @@ export fSpray(string filedate)	:=	function
 												'/data/hds_180/SIM/LaborActions_WHD/'+filedate+'/','US_WHD.txt')(size>0)) >0,
 												FileServices.SprayVariable(_control.IPAddress.bctlpedata11,
 										 		'/data/hds_180/SIM/LaborActions_WHD/'+filedate+'/'+'US_WHD.txt',
-												,'|',,,'thor400_60',cluster+'in::'+ _Dataset().name + '::'+filedate,-1,,,true,true));
+												,'|',,,'thor400_36',cluster+'in::'+ _Dataset().name + '::'+filedate,-1,,,true,true));
 																			
 	addSuper			:=	if (COUNT(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata11,
 												'/data/hds_180/SIM/LaborActions_WHD/'+filedate+'/','US_WHD.txt')(size>0)) >0,

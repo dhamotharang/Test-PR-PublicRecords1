@@ -1,4 +1,4 @@
-/*
+﻿/*
   This will take a superfile and clean up all subfiles except the ones that have the current version in them.
   Cleaning up means putting all those subfiles into one subfile.
   this is to prevent very large numbers of subfiles in a superfile.
@@ -21,22 +21,13 @@ EXPORT Cleanup_Super(
 ) :=
 functionmacro
 
-  sc_contents := STD.File.superfilecontents(pSuperFile_Name);
-
-  return 
-  sequential(
-     tools.macf_writefile(pSummary_Filename,pSuperFile_Dataset(version != pCurrent_Version),false,false)
-    ,STD.File.startsuperfiletransaction()
-    ,nothor(apply(sc_contents(not regexfind(pCurrent_Version,name)) 
-      ,sequential(
-         STD.File.removesuperfile(pSuperFile_Name,'~' + name)
-        ,STD.File.deletelogicalfile('~' + name)
-      )
-    ))
-    ,STD.File.finishsuperfiletransaction()
-    ,if(STD.File.FindSuperFileSubName( pSuperFile_Name,pSummary_Filename) = 0 ,STD.File.addsuperfile(pSuperFile_Name,pSummary_Filename))
+  import Workman;
+  return Workman.Cleanup_Super(
+     pSuperFile_Dataset  
+    ,pSuperFile_Name     
+    ,pCurrent_Version    
+    ,pSummary_Filename   
   );
-
 
 
 endmacro;

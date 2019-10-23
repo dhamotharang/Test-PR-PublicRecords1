@@ -1,4 +1,4 @@
-import BIPV2_LGID3,tools;
+﻿import BIPV2_LGID3,tools;
 EXPORT _AggLgid3s(
 	 pDataset
    ,pBIP_ID = 'lgid3'

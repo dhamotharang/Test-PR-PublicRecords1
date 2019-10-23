@@ -1,12 +1,11 @@
-//Iowa Real Estate Professionals License File
+﻿//Iowa Real Estate Professionals License File
 IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib,Lib_date;
 
 EXPORT spray_IAS0887(string filedate) := MODULE
 
 	SHARED STRING7 code						:= 'IAS0887';
 	SHARED destination 						:= Common_Prof_Lic_Mari.SourcesFolder + code + '::';
-  SHARED superfile_rel 					:= destination + 'sprayed::' + 'rle';
-	
+	SHARED superfile_rel 					:= destination + 'sprayed::' + 'rle';
 
 clear_super
 	:=
@@ -22,7 +21,7 @@ TransformFile_rel(string filename) := FUNCTION
 	sprayed_file	:= destination + filedate + '::' + StringLib.StringToLowerCase(newname)+ '.raw';
 	
 	dsraw := dataset(sprayed_file,
-										Prof_License_Mari.Layout_IAS0887.real_estate,CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR(['\r','\r\n'])));
+										Prof_License_Mari.Layout_IAS0887.real_estate,CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR(['\n','\r\n'])));
 					
 	ds := PROJECT(dsraw,TRANSFORM(Prof_License_Mari.Layout_IAS0887.Common,SELF.ln_filedate := filedate; 
 																																				 SELF := LEFT; 
@@ -45,14 +44,16 @@ END;
 //  Spray All Files
 spray_all	:=
 	PARALLEL(
-		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'choicepoint_RE_mailing_list.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'choicepoint_RE_mailing_list1.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'choicepoint_RE_mailing_list2.csv','comma');
 	);
 
 
 //  Transform All Files
 xform_all
 	:= PARALLEL(
-							OUTPUT(TransformFile_rel('choicepoint_RE_mailing_list.csv'),, 	destination + filedate + '::choicepoint_RE_mailing_list.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('choicepoint_RE_mailing_list1.csv'),, 	destination + filedate + '::choicepoint_RE_mailing_list1.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('choicepoint_RE_mailing_list2.csv'),, 	destination + filedate + '::choicepoint_RE_mailing_list2.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
 					 	);	
 
 
@@ -61,7 +62,8 @@ super_all
 	:=	
 	SEQUENTIAL(
 		FileServices.StartSuperFileTransaction(),
-		AddToSuperfile_rel('choicepoint_RE_mailing_list.csv'),
+		AddToSuperfile_rel('choicepoint_RE_mailing_list1.csv'),
+		AddToSuperfile_rel('choicepoint_RE_mailing_list2.csv'),
 		FileServices.FinishSuperFileTransaction()
 	);
 
@@ -69,7 +71,8 @@ super_all
 remove_raw 
 	:= 
 		SEQUENTIAL(
-							 FileServices.DeleteLogicalFile(destination + filedate + '::choicepoint_RE_mailing_list.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::choicepoint_RE_mailing_list1.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::choicepoint_RE_mailing_list2.raw'),
 							 );
 
 

@@ -1,4 +1,4 @@
-//Compile all keys in this package in one place
+﻿//Compile all keys in this package in one place
 //easy to output this module to see if keys exist/are correct layout/etc
 import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3;
 
@@ -41,8 +41,8 @@ module
   // export relative_assoc                 := tools.macf_FilesIndex('BIPv2_Relative.keys(relbase).ASSOC             ' ,relknames.assoc                   );
   export Seleid_relative_assoc          := tools.macf_FilesIndex('BIPV2_Seleid_Relative.keys(Seleidrelbase).ASSOC' ,Seleidrelknames.assoc             );
   export Xlinkmeow                      := tools.macf_FilesIndex('BizLinkFull.Process_Biz_Layouts.Key            ' ,bizknames.meow                    );
-  export Xlinkrefs                      := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.Key                   ' ,bizknames.refs                    );
-  export Xlinkwords                     := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.ValueKey              ' ,bizknames.words                   );
+  // export Xlinkrefs                      := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.Key                   ' ,bizknames.refs                    );
+  // export Xlinkwords                     := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.ValueKey              ' ,bizknames.words                   );
   export Xlinkrefs_l_cnpname            := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME.Key          ' ,bizknames.refs_l_cnpname          );
   export Xlinkrefs_l_cnpname_st         := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME_ST.Key       ' ,bizknames.refs_l_cnpname_st       );
   export Xlinkrefs_l_cnpname_zip        := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.Key      ' ,bizknames.refs_l_cnpname_zip      );
@@ -88,8 +88,8 @@ module
     // ,output(choosen(relative_assoc               .logical ,100),named('relative_assoc'                ))
     ,output(choosen(Seleid_relative_assoc        .logical ,100),named('Seleid_relative_assoc'         ))
     ,output(choosen(Xlinkmeow                    .logical ,100),named('Xlinkmeow'                     ))
-    ,output(choosen(Xlinkrefs                    .logical ,100),named('Xlinkrefs'                     ))
-    ,output(choosen(Xlinkwords                   .logical ,100),named('Xlinkwords'                    ))
+    // ,output(choosen(Xlinkrefs                    .logical ,100),named('Xlinkrefs'                     ))
+    // ,output(choosen(Xlinkwords                   .logical ,100),named('Xlinkwords'                    ))
     ,output(choosen(Xlinkrefs_l_cnpname          .logical ,100),named('Xlinkrefs_l_cnpname'           ))
     ,output(choosen(Xlinkrefs_l_cnpname_st       .logical ,100),named('Xlinkrefs_l_cnpname_st'        ))
     ,output(choosen(Xlinkrefs_l_cnpname_zip      .logical ,100),named('Xlinkrefs_l_cnpname_zip'       ))

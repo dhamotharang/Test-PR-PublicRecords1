@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 
@@ -12,7 +12,7 @@ Export Send_Emails(  string								pversion
 										,string								pPackageName						= 'ExperianCRDBKeys'
 										,string								pBuildMessage						= 'Base file has finished'
 										,string							  pUseVersion							= 'qa'
-										,string							  pEnvironment						= 'N|BN'		//	'B' - OSS Roxie, 'N' - nonfcra, 'F' - FCRA
+										,string							  pEnvironment						= 'N'		//	'B' - OSS Roxie, 'N' - nonfcra, 'F' - FCRA
 								  ) := tools.mod_SendEmails( pversion
 																						,pBuildFilenames					
 																						,pEmailList							

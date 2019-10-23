@@ -1,10 +1,10 @@
 import ut, mdr, watchdog, lib_datalib;
 
-export fn_DOB_Validities (boolean isEN=false) := function
+export fn_DOB_Validities (boolean isEN=false,string filedate) := function
 
-h := distribute(fn_Apt_Patch(isEN)(dob>0),hash(did));
+h := distribute(header.fn_Apt_Patch(isEN,filedate)(dob>0),hash(did));
 
-mac_best_dob(h,did,dob,best_dob)
+mac_best_dob(h,did,dob,best_dob);
 
 //Join all DOB records to best to determine jflag1
 dob_rec := record

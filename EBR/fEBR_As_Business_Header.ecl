@@ -1,8 +1,8 @@
-IMPORT Business_Header, ut,mdr;
+﻿IMPORT Business_Header, ut,mdr;
 
 export fEBR_As_Business_Header(dataset(layout_0010_header_base) pInput, boolean IsPRCT = false) :=
 function
-
+	//*** Removed the filters that had in place to filert out the quartely unload records - as per Jira DF-23116.
 	EBR_base := pInput;
 
 	//////////////////////////////////////////////////////////////////////////////////////////////

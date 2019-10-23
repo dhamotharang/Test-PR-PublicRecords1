@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 /*
 
 Update Logic
@@ -28,9 +28,9 @@ import	STD, ut;
 
 boolean nonblank(string s1, string s2) := (TRIM(s1)<>'') and (TRIM(s2)<>'');
 
-EXPORT Process_ContactRecords(DATASET(Layouts2.rStateContactEx) inrec) := FUNCTION
+EXPORT Process_ContactRecords(DATASET($.Layouts2.rStateContactEx) inrec) := FUNCTION
 
-	contacts := DISTRIBUTE(Files('').dsContactRecords); 
+	contacts := DISTRIBUTE($.Files2.dsContactRecords); 
 
 	deletions := inrec(UpdateType='D');
 	j1 := IF(EXISTS(deletions),
@@ -98,7 +98,7 @@ EXPORT Process_ContactRecords(DATASET(Layouts2.rStateContactEx) inrec) := FUNCTI
 								self.Errors := IF(RIGHT.ProgramState='',LEFT.Errors,RIGHT.Errors);
 								self.Warnings := IF(RIGHT.ProgramState='',LEFT.Warnings,RIGHT.Warnings);
 									
-								//self := LEFT;
+								self := LEFT;
 							),
 							LEFT OUTER, KEEP(1), MANY LOOKUP),
 						c2);

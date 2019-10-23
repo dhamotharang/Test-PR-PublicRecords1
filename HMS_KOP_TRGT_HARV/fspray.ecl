@@ -4,9 +4,9 @@ export fSpray(
 								//string version, boolean pUseProd = false
 								STRING		pVersion              = '',
 								BOOLEAN   pUseProd              = false,
-								STRING		pServerIP							= _control.IPAddress.bctlpedata10, //'bctlpedata10.risk.regn.net'
+								STRING		pServerIP							= _control.IPAddress.bctlpedata12, //'bctlpedata10.risk.regn.net'
 								STRING		pTrgtFilename			= '*trgt_harv_results*.tab',
-								STRING		pDirectory						= '/data/hms/hms_audit/in/'  ,
+								STRING		pDirectory						= '/data/hms/hms_audit/in'  ,
 								STRING		pGroupName						=  STD.System.Thorlib.Group(),
 								BOOLEAN		pIsTesting						= false,
 								BOOLEAN		pOverwrite						= true,

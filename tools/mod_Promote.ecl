@@ -1,4 +1,4 @@
-import ut,std;
+﻿import ut,std;
 
 export mod_Promote :=
 module
@@ -13,6 +13,7 @@ module
 				,boolean	pDelete				      = false
         ,boolean  pIncludeBuiltDelete = false
         ,string   pFilter             = ''
+				,boolean	pForceGenPromotion	= false
 			) :=
 			function
 				pversions			:= Tools.mod_FilenamesBuild(pTemplateName);
@@ -34,8 +35,8 @@ module
 						
 						if(	Tools.mod_Utilities.compare_supers(pVersions.Father, pVersions.Built) or
 							Tools.mod_Utilities.compare_supers(pVersions.Father, pVersions.Qa) or
-							Tools.mod_Utilities.compare_supers(pVersions.Father, pVersions.Prod),
-								parallel(
+						 (Tools.mod_Utilities.compare_supers(pVersions.Father, pVersions.Prod) and pForceGenPromotion = false),								
+						   parallel(
 									 loutput('_fVersionIntegrityCheck(): ' + pVersions.Father + ' superfile = built, qa or prod, clearing Father')
 									,fileservices.clearsuperfile(pVersions.Father)
 								)
@@ -470,6 +471,7 @@ module
 		,boolean		pCheckVersionIntegrity	= false
 		,boolean		pIsNewNamingConvention	= false
 		,boolean		pIsDeltaBuild	          = false
+		,boolean		pForceGenPromotion	    = false
 	) :=
 	function
 	
@@ -507,7 +509,7 @@ module
 					sequential(
             if(pIsDeltaBuild = false ,
               sequential(
-                if(Tools.mod_Utilities.compare_supers(lVersions.qa, lVersions.prod) = false
+                if(Tools.mod_Utilities.compare_supers(lVersions.qa, lVersions.prod) = false or pForceGenPromotion = true
                   ,lTodo
                 )
                 ,Tools.mod_Utilities.clear_add(lVersions.qa		, lVersions.built)

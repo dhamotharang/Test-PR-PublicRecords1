@@ -1,8 +1,8 @@
-import _control,RoxieKeyBuild;
+﻿import _control,RoxieKeyBuild;
 export Email_Notification_Lists :=
 module
 	
-	export all_hands := 'lbentley@seisint.com;' + 
+	export all_hands := 'jason.allerdings@lexisnexisrisk.com;lbentley@seisint.com;' + 
 											_control.MyInfo.EmailAddressNotify
 											;
 											
@@ -20,8 +20,8 @@ module
 
 	export Roxie :=
 		if(_Flags.IsTesting
-			,'lbentley@seisint.com;' + _control.MyInfo.EmailAddressNotify
-			,RoxieKeyBuild.Email_Notification_List + ';avenkata@seisint.com;vniemela@seisint.com;' + all_hands
+			,'jason.allerdings@lexisnexisrisk.com;lbentley@seisint.com;' + _control.MyInfo.EmailAddressNotify
+			,RoxieKeyBuild.Email_Notification_List + ';jason.allerdings@lexisnexisrisk.com;avenkata@seisint.com;vniemela@seisint.com;' + all_hands
 		);
 	
 	

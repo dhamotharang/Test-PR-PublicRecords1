@@ -1,106 +1,64 @@
-import tools, _control, FraudShared, Orbit3, Scrubs_MBS;
+﻿/**************************************************************************************************************************************************/
+/* PROJECT: RISK INTELLIGENCE NETWORK - AKA: RIN, OTTO, FraudGov
+/* DOCUMENTATION: https://confluence.rsi.lexisnexis.com/display/GTG/OTTO+-+Data+Build
+/* AUTHORS: DATA ENGINEERING (SESHA NOOKALA, OSCAR BARRIENTOS)
+/**************************************************************************************************************************************************/
+import tools, FraudShared, FraudGovPlatform_Validation, STD,_control;
 
 export Build_All(
-
-	 string																				pversion
-	,string																				pServerIP		                   	= _control.IPAddress.bair_batchlz01
-	,string																				pDirectory	                   	= '/data/otto/in/'	 
-	// All sources are not updated each build if no updates to particular source skip that source base 
-  ,boolean                                      PSkipIdentityDataBase           = false 
-  ,boolean                                      PSkipKnownFraudBase           	= false 
-	,dataset(FraudShared.Layouts.Base.Main)				pBaseMainFile										=	IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
-	,dataset(Layouts.Base.IdentityData)						pBaseIdentityDataFile						=	IF(_Flags.Update.IdentityData, Files().Base.IdentityData.QA, DATASET([], Layouts.Base.IdentityData))
-	,dataset(Layouts.Base.KnownFraud)							pBaseKnownFraudFile							=	IF(_Flags.Update.KnownFraud, Files().Base.KnownFraud.QA, DATASET([], Layouts.Base.KnownFraud))
-	,dataset(Layouts.Input.IdentityData)	        pUpdateIdentityDataFile	        =	Files().Input.IdentityData.Sprayed
-	,dataset(Layouts.Input.KnownFraud)	        	pUpdateKnownFraudFile	        	=	Files().Input.KnownFraud.Sprayed
-  ,dataset(FraudShared.Layouts.Base.Main)				pBaseMainBuilt									= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
-	// This below flag is to run full file or update append if pUpdateIdentityDataflag = false full file run and true runs update append of the base file
-	,boolean                                      pUpdateIdentityDataFlag         = _Flags.Update.IdentityData
-	,boolean                                      pUpdateKnownFraudFlag         	= _Flags.Update.KnownFraud
-         
+	 string version 	
 ) :=
 module
 
-//	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
-	shared base_portion := sequential(
-		 Create_Supers
-			,Build_Input(
-				 pversion
-				,PSkipIdentityDataBase
-				,PSkipKnownFraudBase
-			 ).All
-		  ,FraudShared.SprayMBSFiles(pServerIP,pDirectory, pversion := pversion)
-		  ,Build_Base(
-				 pversion
-				,PSkipIdentityDataBase
-				,PSkipKnownFraudBase
-				//Base
-				,pBaseMainFile	
-				//IdentityData
-				,pBaseIdentityDataFile
-				,pUpdateIdentityDataFile	
-				,pUpdateIdentityDataFlag
-				//KnownFraud
-				,pBaseKnownFraudFile				
-				,pUpdateKnownFraudFile	
-				,pUpdateKnownFraudFlag
-			).All
-			,notify('BASE FILES COMPLETE','*');
-			
-	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
-	
+ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.hthor_Dev,	FraudGovPlatform_Validation.Constants.hthor_Prod);
+ECLThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
 
-	shared keys_portion := sequential(
-		  FraudShared.Build_Keys(
-			 pversion
-			,pBaseMainBuilt
-			).All
-		  ,FraudShared.Build_AutoKeys(
-			 pversion
-			,pBaseMainBuilt)
-	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);	
-	
-	
-	export full_build := sequential(
-		 base_portion
-		,keys_portion
-		// Promote Contributory Files	
-		,Promote().buildfiles.Built2QA
-		// Promote Shared Files
-		,FraudShared.Promote().Inputfiles.Sprayed2Using
-		,FraudShared.Promote().buildfiles.Built2QA			
-		,FraudShared.Promote().Inputfiles.Using2Used
-		// Clean Up Shared Files	
-		,FraudShared.Promote().buildfiles.cleanup		
-	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
-	
-	export Build_Base_Files :=
-	if(tools.fun_IsValidVersion(pversion)
-		,base_portion
-		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_All')
-	);
+Build_Kel_Ecl := 
+ 'import tools, FraudGovPlatform, FraudShared, Orbit3, FraudGovPlatform_Validation, STD, FraudGovPlatform_Analytics;\n'
++'#CONSTANT(\'RunKelDemo\',false);\n'
++'#CONSTANT(\'Platform\',\'FraudGov\');\n'
++'#OPTION(\'multiplePersistInstances\',FALSE);\n'
++'#OPTION(\'defaultSkewError\', 1);\n'
++'wuname := \'FraudGov Kel Build\';\n'
++'#WORKUNIT(\'protect\', true);\n'
++'#WORKUNIT(\'name\', wuname);\n'
++'#WORKUNIT(\'priority\',\'high\');\n'
++'#WORKUNIT(\'priority\',11);\n'
++'email(string msg):=fileservices.sendemail(\n'
++'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
++' 	 ,\'FraudGov Kel Build\'\n'
++' 	 ,msg\n'
++' 	 +\'Build wuid \'+workunit\n'
++' 	 );\n\n'
++'valid_state := [\'blocked\',\'compiled\',\'submitted\',\'running\',\'wait\',\'compiling\'];\n'
++'d := sort(nothor(WorkunitServices.WorkunitList(\'\',,,wuname,\'\'))(wuid <> thorlib.wuid() and job = wuname and state in valid_state), -wuid);\n'
++'d_wu := d[1].wuid;\n'
++'active_workunit :=  exists(d);\n'
++'if(active_workunit\n'
++'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
++'		,FraudGovPlatform.Build_Kel(\''+version+'\').All\n'
++'	):failure(email(\'FraudGov Kel Build failed\'));\n'
+;
 
-	export Build_Key_Files :=
-	if(tools.fun_IsValidVersion(pversion)
-		,keys_portion
-		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_All')
-	);
+	export build_all := sequential(
+		FraudGovPlatform.Build_Input(version).ALL,
+		FraudGovPlatform.Build_Base(version).ALL,
+		if ( FraudGovPlatform.Mac_TestRecordID(version) = 'Passed' and FraudGovPlatform.Mac_TestRinID(version) = 'Passed', 
+				sequential(
+					FraudGovPlatform.Promote(version).promote_base,
+					FraudGovPlatform.promote(version).promote_sprayed_files,
+					FraudShared.Build_Keys(version).All,
+					FraudGovPlatform.Append_DemoData(version),
+					FraudShared.Build_AutoKeys(version),
+					FraudGovPlatform.Promote().Clear_DemoData,
+					FraudGovPlatform.Build_Base_Pii(version).All,
+					_Control.fSubmitNewWorkunit(Build_Kel_Ecl,ECLThorName)
+				),
+				FAIL('Unit Test Failed'))
+	): success(FraudGovPlatform.Send_Emails(version).BuildSuccess), failure(FraudGovPlatform.Send_Emails(version).BuildFailure);
 
 	export All :=
-	if(tools.fun_IsValidVersion(pversion)
-		,full_build
-		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_All')
-	);
-
-	//	Scrubs (Which require ORBIT)
-	EXPORT	ScrubsReports	:=	
-	IF(tools.fun_IsValidVersion(pversion)
-		,Scrubs_MBS.BuildSCRUBSReport(pversion)
-		,OUTPUT('No Valid version parameter passed, skipping FraudGovPlatform.Build_All().ScrubsReports')
-	) : SUCCESS(Send_Emails(pversion,pBuildMessage:='MBS Scrubs are complete').BuildMessage),
-			FAILURE(Send_Emails(pversion).BuildFailure);
-			
-	//Create Orbit Builds
-	export	create_build := Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion);
-	
-end;
+	if(tools.fun_IsValidVersion(version),
+		 build_all
+		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_All'));	
+end;	

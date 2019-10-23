@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 
 punctAtEnd := '[ .,+;?_*:#%"/\\x00-]$';		// random punctuation at end
 
@@ -36,7 +36,8 @@ string ReconstructFName(string name) := MAP(
 string ReconstructMName(string name) := MAP(
 					name = '(' => '',
 					name = '\'' => '',
-					TRIM(name) in ['NMN','NMI'] => '',
+					name = '0' => 'O',
+					TRIM(name) in ['NMN','NMI', 'TR', 'RD'] => '',
 					Std.Str.FindCount(name, '/') > 0 =>
 						Std.Str.FindReplace(name, '/', ' '),
 					name
@@ -51,7 +52,7 @@ export string ReconstructName(string fname, string mname, string lname, string s
 		gen := CASE(sfx,
 			//'1' => 'SR',
 			//'2' => 'JR',
-			//'3' => 'III',
+			'3' => 'III',
 			//'4' => 'IV',
 			//'5' => 'V',
 			//'6' => '',
@@ -62,6 +63,7 @@ export string ReconstructName(string fname, string mname, string lname, string s
 			'JR JR' => 'JR',
 			'JR II' => 'JR',
 			'JR,' => suffix[1..2],
+			'JNR' => 'JR',
 			'SR' => suffix,
 			'SR SR' => 'SR',
 			'I' => 'I',
@@ -77,7 +79,7 @@ export string ReconstructName(string fname, string mname, string lname, string s
 			'ND' => 'II',
 			'3D' => 'III',
 			'3RD' => 'III',
-			'RD' => 'III',
+			//'RD' => 'III',	Registered Dietician
 			'3 D' => 'III',
 			'3 I' => '',
 			'4TH' => 'IV',

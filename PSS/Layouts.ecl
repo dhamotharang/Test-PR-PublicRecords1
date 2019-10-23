@@ -1,4 +1,4 @@
-EXPORT Layouts := module
+﻿EXPORT Layouts := module
 export request_input := record
 string acctno;
 string did;
@@ -307,6 +307,9 @@ unsigned4 dt_vendor_last_reported;
 unsigned4 dt_vendor_first_reported;
 string120 response_file_name;
 unsigned jobid;
+	//CCPA-22 CCPA new fields
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 
 end;
 

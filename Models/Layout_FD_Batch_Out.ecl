@@ -1,4 +1,4 @@
-import riskwise;
+﻿import riskwise;
 
 export Layout_FD_Batch_Out := RECORD
 	string20 acctno;
@@ -30,4 +30,5 @@ export Layout_FD_Batch_Out := RECORD
 	string1 VulnerableVictimIndex; 
 	string1 FriendlyFraudIndex; 
 	string1 SuspiciousActivityIndex;
+  riskwise.layouts.Paro_IT1O_layout;
 END;

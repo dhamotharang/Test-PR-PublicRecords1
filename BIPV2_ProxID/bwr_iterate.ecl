@@ -1,7 +1,7 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BIPV2_ProxID.BWR_Iterate - Internal Linking - SALT V3.7.0');
-IMPORT BIPV2_ProxID,SALT37;
+#workunit('name','BIPV2_ProxID.BWR_Iterate - Internal Linking - SALT V3.11.3');
+IMPORT BIPV2_ProxID,SALT311;
 //BIPV2_ProxID.Specificities(BIPV2_ProxID.In_DOT_Base).Build; // Used to create calibration keys
 // Proc_Iterate also supports a dataset parameter to allow an arbitrary file as starting point.
 // Proc_Iterate also supports a threshold parameter to override the default threshold.
@@ -16,7 +16,7 @@ P.DoAll; // Use this version to run an iteration
 // MAC_MatchSamplePatterns is a tool that generates match/mismatch patterns based on the content of the Keys.MatchSample file.
 // Patterns consist of field names, with or without minus sign, where the minus sign identifies mismatch fields.
 // NOTE: It must run after Proc_Iterate.DoAll completes, so use SEQUENTIAL or a separate workunit.
-// SALT37.MAC_MatchSamplePatterns(BIPV2_ProxID.Keys(BIPV2_ProxID.In_DOT_Base).MatchSample,MatchPatterns,Proxid1,Proxid2,8,27-33);
+// SALT311.MAC_MatchSamplePatterns(BIPV2_ProxID.Keys(BIPV2_ProxID.In_DOT_Base).MatchSample,MatchPatterns,Proxid1,Proxid2,8,27-33);
 // OutMatchPatterns := OUTPUT(MatchPatterns,named('match_patterns'));
 // OutMatchPatterns;
  

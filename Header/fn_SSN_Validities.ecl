@@ -1,13 +1,13 @@
 import ut, mdr, watchdog;
 
-export fn_SSN_Validities (boolean isEN=false) := function
+export fn_SSN_Validities (boolean isEN=false,string filedate) := function
 
-h := distribute(header.fn_apt_patch(isEN)(ssn <>''),hash(did)); // This will change
+h := distribute(header.fn_apt_patch(isEN,filedate)(ssn <>''),hash(did)); // This will change
 
 ofile := watchdog.fn_best_ssn(h).concat_them;
 
 
-rels := header.file_relatives(number_cohabits>5);
+rels := header.File_Relatives_v3(number_cohabits>5);
 
 r_ssn := record
   unsigned6 did1;

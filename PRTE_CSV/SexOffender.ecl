@@ -1,4 +1,4 @@
-export SexOffender := 
+﻿export SexOffender := 
 
 module
 
@@ -832,4 +832,4 @@ export dthor_data400__key__sexoffender__publicstname 								:= dataset(lCSVFile
 export dthor_data400__key__sexoffender__publiczip 									:= dataset(lCSVFileNamePrefix1 + 'thor_data400__key__sexoffender__' + lCSVVersion1 + '__publiczip.csv', rthor_data400__key__sexoffender__publiczip, csv(separator('\t'), terminator('\r\n'), quote(''), heading(single)));
 export dthor_data400__key__sexoffender__spkpublic 									:= dataset(lCSVFileNamePrefix1 + 'thor_data400__key__sexoffender__' + lCSVVersion1 + '__spkpublic.csv', rthor_data400__key__sexoffender__spkpublic, csv(separator('\t'), terminator('\r\n'), quote(''), heading(single)));
 export dthor_data400__key__sexoffender__zip_type_public 						:= dataset(lCSVFileNamePrefix1 + 'thor_data400__key__sexoffender__' + lCSVVersion1 + '__zip_type_public.csv', rthor_data400__key__sexoffender__zip_type_public, csv(separator('\t'), terminator('\r\n'), quote(''), heading(single)));
-end;
+end :DEPRECATED('Use PRTE2_SEXOFEENDER.FILES');

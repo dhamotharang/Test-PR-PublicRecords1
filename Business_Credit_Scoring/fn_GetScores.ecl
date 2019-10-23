@@ -1,5 +1,5 @@
-IMPORT	Business_Credit_Scoring,	Business_Risk_BIP,	LNSmallBusiness,	iesp,	ut;
-EXPORT	fn_GetScores(	STRING	pVersion	=	ut.GetDate,
+﻿IMPORT	Business_Credit_Scoring,	Business_Risk_BIP,	LNSmallBusiness,	iesp,	ut, STD;
+EXPORT	fn_GetScores(	STRING	pVersion	=	(STRING8)Std.Date.Today(),
 											DATASET(RECORDOF(Business_Risk_BIP.Layouts.Input)) pInput,
 											INTEGER	pThreads	=	Constants().threads,
 											STRING	pRoxieIP	=	Constants().RoxieIP
@@ -26,7 +26,8 @@ EXPORT	fn_GetScores(	STRING	pVersion	=	ut.GetDate,
 	
 	//	If version equals this month return zero.
 	//	If this is a previous month return the date for the first day of that month.
-	pHistoryDate	:=	IF(pVersion[1..6]	=	ut.GetDate[1..6],0,(UNSIGNED4)(pVersion[1..6]+'01'));
+	pToday							:=	(STRING8)Std.Date.Today();
+	pHistoryDate	:=	IF(pVersion[1..6]	=	pToday[1..6],0,(UNSIGNED4)(pVersion[1..6]+'01'));
 	dFillScores		:=	LNSmallBusiness.soap_SmallBusiness_getScores(	pInput,	//	SBFE Unique SeleIDs
 																																	pOptions,										//	Business Shell Options
 																																	Constants().SET_BUSINESS_ONLY_MODEL,	//	Names of Models to use

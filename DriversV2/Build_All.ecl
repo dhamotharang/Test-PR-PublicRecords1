@@ -4,7 +4,7 @@ export Build_All(
 
 	 string															pversion
 	,string															pDirectory			= '/data/dl_data/drvlic/logs/isBuildRunning.lck'
-	,string															pServerIP				= 'bctlpedata10.risk.regn.net'
+	,string															pServerIP			= _control.IPAddress.bctlpedata10
 ) :=
 function
 
@@ -12,7 +12,8 @@ function
 	sequential(DriversV2.Proc_Build_DL_Base(pversion), 
 						 DriversV2.Proc_Build_DL_Search(pversion),
 						 DriversV2.Proc_DL2_QA_Samples,
-						 FileServices.DeleteExternalFile(pServerIP, pDirectory)
+						 FileServices.DeleteExternalFile(pServerIP, pDirectory),
+						 DriversV2.Promote_As_DL_Superfiles
 						);
 	
 	return

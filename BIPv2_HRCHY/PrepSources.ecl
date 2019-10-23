@@ -1,4 +1,4 @@
-EXPORT PrepSources := 
+﻿EXPORT PrepSources := 
 MODULE
 
 import BIPV2_Files, dcav2, Frandx, mdr;
@@ -178,7 +178,7 @@ FUNCTION
 			self.name := if(isHQ , left.company_name, left.brand_name);
 			self.dt_last_seen := left.dt_last_seen;
 			self.biz_type := constants.fran.get_itype(left.unit_flag);
-			self.is_SELE_level := constants.fran.ctype_code_is_SELE_level(self.biz_type);
+			self.is_SELE_level := isHQ;
 			self.src := 'F';
 			
 			self.derived_ultid := 0;

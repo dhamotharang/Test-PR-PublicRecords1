@@ -1,32 +1,38 @@
-export Send_Email(string filedate='',string st='',string fn=''):= module
+﻿IMPORT Std;
 
-	shared UpSt:=stringlib.stringtouppercase(st);
-	shared nacfilesupport:='nacfilesupport@lexisnexis.com';
+EXPORT Send_Email(string filedate='',string fn='', string groupid='') := MODULE
+	
+	
+ 
 
-	export build_success
-						:= fileservices.sendemail(
-								NAC_V2.Mailing_List(UpSt).BocaOps
-								,'NAC Build Succeeded ' + filedate
+
+//SHARED NotificationList := NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid);
+ 
+ 
+ 
+	 
+	SHARED SendMail(string sendto, string subject, string body) := 
+						STD.System.Email.SendEmail(sendto, subject, body);
+
+	EXPORT build_success :=
+						SendMail(
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('Success', '')
+								,'NAC2 Build Succeeded ' + filedate
 								,'Sample records are in WUID:' + workunit
-								,
-								,
-								,nacfilesupport
 								);
 
-	export build_failure
-						:= fileservices.sendemail(
-								NAC_V2.Mailing_List(UpSt).BocaOps
-								,'NAC '+filedate+' Build FAILED'
+	EXPORT build_failure
+						:= SendMail(
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('Failure', '')
+								,'NAC2 '+filedate+' Build FAILED'
 								,workunit+ ' ' + FAILMESSAGE
-								,
-								,
-								,nacfilesupport
 								);
 
-	export NAC_Input_Prep_failure
-						:= fileservices.sendemail(
-								NAC_V2.Mailing_List(UpSt).Dev1a
-								,'*** ALERT **** NAC Contributory File Prep FAILURE'
+
+	EXPORT NAC_Input_Prep_failure
+						:= SendMail(
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
+								,'*** ALERT **** NCF2 Contributory File Prep FAILURE'
 								,'File will not be processed.  Please review and re-submit -> '+fn+'\n'
 								+'\n\n'
 								+FAILMESSAGE
@@ -34,67 +40,48 @@ export Send_Email(string filedate='',string st='',string fn=''):= module
 								+'********   IMMEDIATE ATTENTION REQUIRED   **********   IMMEDIATE ATTENTION REQUIRED   **********   IMMEDIATE ATTENTION REQUIRED   **********\n'
 								+'********   SLA IN JEOPARDY   **********   SLA IN JEOPARDY   **********   SLA IN JEOPARDY   **********\n'
 								+'********   IMMEDIATE ATTENTION REQUIRED   **********   IMMEDIATE ATTENTION REQUIRED   **********   IMMEDIATE ATTENTION REQUIRED   **********\n'
-								,
-								,
-								,nacfilesupport
-								);
+							);
 
-	export FileEmptyErrorAlert
-						:= fileservices.sendemail(
-								NAC_V2.Mailing_List(UpSt).Alert
-								,'*** ALERT **** NAC Contributory File Validation FAILURE'
+	EXPORT FileEmptyErrorAlert
+						:= SendMail(
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
+								,'*** ALERT **** NCF2 Contributory File Validation FAILURE'
 								,'File will not be processed.  Please review and re-submit -> '+fn+'\n'
 								+'********   FILE IS EMPTY   **********   FILE IS EMPTY   **********   FILE IS EMPTY   **********\n'
 								+'********   FILE IS EMPTY   **********   FILE IS EMPTY   **********   FILE IS EMPTY   **********\n'
 								+'********   FILE IS EMPTY   **********   FILE IS EMPTY   **********   FILE IS EMPTY   **********\n'
 								+'********   FILE IS EMPTY   **********   FILE IS EMPTY   **********   FILE IS EMPTY   **********\n'
-								,
-								,
-								,nacfilesupport
-								);
+							);
 
-	export FileRecorLengthErrorAlert
-						:= fileservices.sendemail(
-								NAC_V2.Mailing_List(UpSt).Alert
-								,'*** ALERT **** NAC Contributory File Validation FAILURE'
+	EXPORT FileRecorLengthErrorAlert
+						:= SendMail(
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
+								,'*** ALERT **** NCF2 Contributory File Validation FAILURE'
 								,'File will not be processed.  Please review and re-submit -> '+fn+'\n'
 								+'********   FILE CONTAINS RECORDS OF INVALID LENGTH   ********** \n'
 								+'********   FILE CONTAINS RECORDS OF INVALID LENGTH   ********** \n'
 								+'********   FILE CONTAINS RECORDS OF INVALID LENGTH   ********** \n'
 								+'********   FILE CONTAINS RECORDS OF INVALID LENGTH   ********** \n'
-								,
-								,
-								,nacfilesupport
-								);
+							);
 
-	export FileErrorAlert
-						:= fileservices.sendemail(
-								NAC_V2.Mailing_List(UpSt).BocaOps
+	EXPORT FileErrorAlert
+						:= SendMail(
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', '')
 								,'*** ALERT **** NAC Contributory File Validation FAILURE'
 								,'File not found -> '+fn
-								,
-								,
-								,nacfilesupport
-								);
+							);
 
-	export FileValidationReport
-						:= fileservices.sendemail(
-								NAC_V2.Mailing_List(UpSt).Validation
-								,'NAC Contributory File Validation Report'
-								,InputFileValidationReport(fn).NCR1
-								,
-								,
-								,nacfilesupport
-								);
+	EXPORT FileValidationReport
+						:= SendMail(
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
+								,'NCF2 Contributory File Validation Report'
+								,$.Print.NCR2_to_Text(fn)
+							);
 
-	export Drupal
-						:= fileservices.sendemail(
-								NAC_V2.Mailing_List(UpSt).Drupal
-								,'No NAC Contributory Files Received'
-								,'No NAC Contributory Files Received.  No Collisions report will be produced.'
-								,
-								,
-								,nacfilesupport
-								);
 
-end;
+END; 
+
+
+
+
+

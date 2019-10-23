@@ -1,10 +1,10 @@
-import tools, _control;
+﻿import tools, _control;
 
 export Spray(
 	 string		pversion			= ''
 	,string		pServerIP			= _control.IPAddress.bctlpedata11
 	,string		pDirectory		= '/data/hds_180/CrashCarrier/data/'+ pversion
-	,string		pFilename			= _Dataset().Name+'*txt'
+	,string		pFilename			= _Dataset().pName+'*txt'
 	,string		pGroupName		= _Constants().groupname																		
 	,boolean	pIsTesting		= false
 	,boolean	pOverwrite		= false

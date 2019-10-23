@@ -1,4 +1,4 @@
-/*
+﻿/* 
 	Source:  					Washington Secretary of State				 									
 	Update Frequency: Weekly													
 	Update Type:			Full Append													
@@ -8,7 +8,8 @@
 										include for profit and nonprofit corporations, well as limited liability companies, 
 										limited partnerships, cooperatives and some unique business types.
 
-	Source Notes:  		The vendor data consists one data file with 24 fields
-
-														
+	Source Notes:  		The vendor data consists of 3 separate files: 
+											~ corporations, 
+											~ governingpersons (contacts), 
+											~ documents (annual reports and events)														
 */

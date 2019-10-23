@@ -1,4 +1,4 @@
-
+﻿
 r := RECORD
 		string	id;
 		string	criteriaClass;
@@ -63,7 +63,30 @@ GetDeceased := FUNCTION
 			return dead + alive + entities;
 
 	END;
-	
+GetActive := FUNCTION
+
+APerson:= PROJECT(File_Person, TRANSFORM(r,
+                                self.id := LEFT.id;
+                                self.criteriaClass := '3';
+                                self.criteriaValue  :=  CASE(left.ActiveStatus,
+                                                'Active' => '1',
+                                                'Inactive' => '2',
+                                                '9')
+));
+
+AEntity:= PROJECT(File_Entity, TRANSFORM(r,
+                                self.id := LEFT.id;
+                                self.criteriaClass := '3';
+                                self.criteriaValue  :=  CASE(left.ActiveStatus,
+                                                'Active' => '1',
+                                                'Inactive' => '2',
+                                                '9')
+));
+
+return APerson + AEntity;
+
+	END;
+
 string TypeToValue(string entityType) := CASE(entityType,
 				'Politically Exposed Person (PEP)' => '1',
 				'Politically Exposed Person' => '1',
@@ -239,9 +262,17 @@ GetCountries(SET of STRING omitcountries) := FUNCTION
 
 END;
 
+GetOwnership := 
+		 PROJECT($.SearchCriteria3.Ownership, TRANSFORM(r,
+						self.id := LEFT.id;
+						self.criteriaClass := '5';
+						self.criteriaValue := (string)left.Description3;
+		));
+
+
 EXPORT GetSearchCriteria(SET of STRING omitcountries=[]) := FUNCTION
 
-	ds := SanctionCriteria & GetDeceased & GetTypes & GetSpecialInterestTypes & GetCountries(omitcountries) & GetRoles;
+	ds := SanctionCriteria & GetDeceased & GetActive & GetTypes & GetSpecialInterestTypes & GetOwnership & GetCountries(omitcountries) & GetRoles;
 	ds1 := PROJECT(
 						SORT(DEDUP(SORT(DISTRIBUTE(ds,(integer)id),
 										id, criteriaClass, criteriaValue, LOCAL),id, criteriaClass, criteriaValue, LOCAL),

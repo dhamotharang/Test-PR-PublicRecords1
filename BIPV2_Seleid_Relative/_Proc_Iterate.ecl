@@ -1,4 +1,4 @@
-import BIPV2_Files,tools,BIPV2,BIPV2_ProxID_mj6,BIPV2_ProxID,bipv2_build;
+﻿import BIPV2_Files,tools,BIPV2,BIPV2_ProxID_mj6,BIPV2_ProxID,bipv2_build;
 EXPORT _Proc_Iterate(
    pversion         = 'BIPV2.KeySuffix'
   ,pdoSpecs         = 'true'
@@ -28,7 +28,7 @@ functionmacro
                     + '\n\n#workunit(\'name\',\'BIPV2_Seleid_Relative._Proc_Iterate \' + pversion);\n'
                     + '#workunit(\'protect\' ,true);\n\n' 
                     + 'sequential(\n'
-                    + '  BIPV2_Seleid_Relative.Proc_Iterate(\'1\',ds_CommonBase).DoAll\n'
+                    + '  BIPV2_Seleid_Relative.Proc_Iterate(\'1\',ds_CommonBase,pversion).DoAll\n'
                     + ' ,BIPV2_Seleid_Relative.Promote(pversion).New2Built\n'
                     + '// ,if(pPromote2QA = true  ,BIPV2_Seleid_Relative.Promote(pversion).Built2QA)\n'
                     + ');'

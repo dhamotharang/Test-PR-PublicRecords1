@@ -22,5 +22,5 @@ dKeyHeader__relatives3 := project(payload,transform(rl,
 ));
 export file_relative := dedup(sort(dKeyHeader__relatives3,record),except title, all)(did1>0,did2>0,did1<>did2);
 #ELSE
-export file_relative :=dataset('~foreign::' + fileservices.ResolveHostName('alpha_prod_thor_dali.risk.regn.net') + '::thor_data400::base::insurance_header::relative',rl,flat);
+export file_relative :=dataset('~thor_data400::base::insuranceheader::qa::relatives_v3',rl,flat);
 #END

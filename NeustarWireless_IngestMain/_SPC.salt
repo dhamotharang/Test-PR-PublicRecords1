@@ -1,0 +1,21 @@
+﻿//If a change is made to this file, modify the ingest.ecl generated as follows to avoid output name conflict
+//replace NAMED('UpdateStats') with NAMED('MainUpdateStats')
+//replace NAMED('ValidityStatistics') with NAMED('MainValidityStatistics')
+OPTIONS:-gn
+MODULE:NeustarWireless_IngestMain
+RIDFIELD:RCID:GENERATE
+FILENAME:Main
+
+FIELD:phone:TYPE(STRING10):0,0
+FIELD:fname:TYPE(STRING15):0,0
+FIELD:lname:TYPE(STRING20):0,0
+FIELD:apt_nbr:TYPE(STRING8):0,0
+FIELD:latitude:TYPE(STRING11):0,0
+FIELD:longitude:TYPE(STRING11):0,0
+FIELD:nid:TYPE(UNSIGNED8):0,0
+FIELD:date_vendor_first_reported:RECORDDATE(FIRST):0,0
+FIELD:date_vendor_last_reported:RECORDDATE(LAST):0,0
+
+SOURCERIDFIELD:phone
+
+INGESTFILE:NeustarWirelessMain:NAMED(Prep_Main_Ingest)

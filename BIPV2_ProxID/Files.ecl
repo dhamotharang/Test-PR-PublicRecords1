@@ -1,4 +1,4 @@
-import tools,BIPV2_Files,Business_DOT,bipv2; 
+﻿import tools,BIPV2_Files,Business_DOT,bipv2; 
 export Files(
 	 string   pversion              = ''
 	,boolean	pUseOtherEnvironment	= false

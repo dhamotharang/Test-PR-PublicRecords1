@@ -1,4 +1,4 @@
-//********************************************************************************
+﻿//********************************************************************************
 // Converting Connecticut Dept of Consumer Protection / Multiple Licenses/Real Estate Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 //Source file location: \\Tapeload02b\k\professional_licenses\mari\ct\connecticut_real_estate_professionals_(en)
@@ -63,7 +63,7 @@ EXPORT map_CTS0850_conversion(STRING pVersion) := FUNCTION
 	GoodFilterRec 	:= inFileComb(StringLib.StringCleanSpaces(LAST_NAME + FIRST_NAME + BUSINESS_NAME) <> '');
   ut.CleanFields(GoodFilterRec,clnGoodFilterRec);
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(rLayout_License pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(rLayout_License pInput) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -82,31 +82,31 @@ EXPORT map_CTS0850_conversion(STRING pVersion) := FUNCTION
 		SELF.PROCESS_DATE			:= thorlib.wuid()[2..9];
 		
 		//Standardize Fields
-		TrimNAME_LAST 				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LAST_NAME);		
+		TrimNAME_LAST 				:= ut.CleanSpacesAndUpper(pInput.LAST_NAME);		
 		TmpNAME_LAST	        := IF(REGEXFIND(Sufx_Pattern,TrimNAME_LAST),REGEXREPLACE(Sufx_Pattern,TrimNAME_LAST,''),
 		                             TrimNAME_LAST);
 		TmpSuffix_Last        := TRIM(REGEXFIND(Sufx_Pattern,TrimNAME_LAST,0),LEFT,RIGHT);				
-		TrimNAME_FIRST 				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.FIRST_NAME);
-		TrimNAME_ORG					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUSINESS_NAME);
-		TrimLIC_TYPE 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_NUMBER[1..3]);
-		TrimLIC_STATUS 				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_STATUS);
-		TrimAddress1 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS);
-		TrimCity 							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY);
-		TrimState 						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE);
+		TrimNAME_FIRST 				:= ut.CleanSpacesAndUpper(pInput.FIRST_NAME);
+		TrimNAME_ORG					:= ut.CleanSpacesAndUpper(pInput.BUSINESS_NAME);
+		TrimLIC_TYPE 					:= ut.CleanSpacesAndUpper(pInput.LIC_NUMBER[1..3]);
+		TrimLIC_STATUS 				:= ut.CleanSpacesAndUpper(pInput.LIC_STATUS);
+		TrimAddress1 					:= ut.CleanSpacesAndUpper(pInput.ADDRESS);
+		TrimCity 							:= ut.CleanSpacesAndUpper(pInput.CITY);
+		TrimState 						:= ut.CleanSpacesAndUpper(pInput.STATE);
 		TrimZIP 							:= MAP(pInput.STATE IN ['CT','NH','RI','VT','NJ','MA','ME'] AND LENGTH(TRIM(pInput.ZIP,LEFT,RIGHT))=4
 		                               => '0'+pInput.ZIP,
 																 pInput.STATE IN ['CT','NH','RI','VT','NJ','MA','ME'] AND LENGTH(TRIM(pInput.ZIP,LEFT,RIGHT))=3
 		                               => '00'+pInput.ZIP,
 															 pInput.ZIP);													
-		TrimNAME_OFFICE 			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SUPERVISOR);
+		TrimNAME_OFFICE 			:= ut.CleanSpacesAndUpper(pInput.SUPERVISOR);
 
 		// License Information
 		SELF.TYPE_CD					:= MAP(TrimNAME_LAST != '' AND TrimNAME_ORG = '' => 'MD',
 																 TrimNAME_ORG != '' AND TrimNAME_LAST = '' => 'GR',
 																 TrimNAME_LAST != '' AND TrimNAME_ORG != '' => 'MD',
 													 			 '');		
-		SELF.LICENSE_NBR	  	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_NUMBER);
-		SELF.OFF_LICENSE_NBR	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SUPERVISOR_NUM);
+		SELF.LICENSE_NBR	  	:= ut.CleanSpacesAndUpper(pInput.LIC_NUMBER);
+		SELF.OFF_LICENSE_NBR	:= ut.CleanSpacesAndUpper(pInput.SUPERVISOR_NUM);
 		SELF.LICENSE_STATE	 	:= src_st;
 		SELF.RAW_LICENSE_TYPE	:= TrimLIC_TYPE;
 		SELF.STD_LICENSE_TYPE := MAP(SELF.TYPE_CD = 'GR' AND SELF.RAW_LICENSE_TYPE = 'REB' => 'REBC',
@@ -344,7 +344,7 @@ EXPORT map_CTS0850_conversion(STRING pVersion) := FUNCTION
 	newFileLic:= inFileLic(NAME_ORG_ORIG != '');
 
 	// Populate STD_STATUS_CD field via translation on statu field
-	Prof_License_Mari.layouts.base 	trans_lic_status(newFileLic L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_status(newFileLic L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS :=  IF(L.STD_LICENSE_STATUS = '',StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT)),
 																			L.STD_LICENSE_STATUS);
 		SELF := L;
@@ -356,7 +356,7 @@ EXPORT map_CTS0850_conversion(STRING pVersion) := FUNCTION
 							trans_lic_status(LEFT,RIGHT),left outer,lookup);
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_status_trans L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_status_trans L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));
 		SELF := L;
 	END;
@@ -369,8 +369,8 @@ EXPORT map_CTS0850_conversion(STRING pVersion) := FUNCTION
 																		
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	//Prof_License_Mari.layouts.base xTransToBase(newFileLic L) := transform
-	Prof_License_Mari.layouts.base xTransToBase(ds_map_lic_trans L) := TRANSFORM
+	//Prof_License_Mari.layout_base_in xTransToBase(newFileLic L) := transform
+	Prof_License_Mari.layout_base_in xTransToBase(ds_map_lic_trans L) := TRANSFORM
 		SELF.NAME_OFFICE			:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_OFFICE,'/',' '));
 		SELF.NAME_MARI_ORG		:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_ORG,'/',' '));
 		SELF.NAME_MARI_DBA	  := StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_DBA,'/',' '));

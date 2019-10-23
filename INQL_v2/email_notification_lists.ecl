@@ -1,12 +1,14 @@
-IMPORT _control,RoxieKeyBuild;
+﻿EXPORT Email_Notification_Lists := MODULE
 
-EXPORT Email_Notification_Lists := MODULE
-   developer := 'angela.herzberg@lexisnexis.com;';
-   tester := _Control.MyInfo.EmailAddressNotify;
-	 //quality_assurance := 'qualityassurance@seisint.com;';
-	 quality_assurance := 'angela.herzberg@lexisnexis.com;';
-   all_hands := developer + tester + ';' + quality_assurance;
+   shared developer 	:= 'Fernando.Incarnacao@lexisnexisrisk.com;';
+	 shared manager    := 'jose.bello@lexisnexisrisk.com;'; 
+   shared tester 		:= 'debendra.kumar@lexisnexisrisk.com;';
+	 shared data_ops   := 'Charles.Pettola@lexisnexisrisk.com;';
 	 
-   EXPORT BuildSuccess :=	IF(_Flags().IsTesting, developer + tester, all_hands);
-   EXPORT BuildFailure := BuildSuccess;
+	 shared quality_assurance := developer + data_ops;
+   shared all_hands := developer + data_ops + manager;
+	 
+   EXPORT BuildSuccess :=	quality_assurance;
+   EXPORT BuildFailure := all_hands;
+	 
 END;

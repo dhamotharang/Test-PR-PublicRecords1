@@ -1,4 +1,4 @@
-#workunit('name','BIPV2 proxid Relationships micro lowlevel');
+﻿#workunit('name','BIPV2 proxid Relationships micro lowlevel');
 import bipv2,BIPV2_ProxID,Business_DOT_SALT_micro12,BIPV2_Tools;
 dinput 						:= BIPV2_ProxID.In_DOT_Base;
 dlegalentityrels 	:= BIPV2_ProxID.relationships(dinput).SAMELEGALENTITY_links	;

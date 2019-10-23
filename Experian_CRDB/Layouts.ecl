@@ -1,4 +1,4 @@
-import Address, BIPV2;
+﻿import Address, BIPV2;
 
 export Layouts := module
 
@@ -190,6 +190,15 @@ export Layouts := module
 
   end;
 	
+	export CCPA_fields := 
+		record
+			// Jira# CCPA-99, Experian CRDB
+			// The below 2 fields are added for CCPA (California Consumer Protection Act) project.
+			// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+			unsigned4 											global_sid 									:= 0;
+			unsigned8 											record_sid 									:= 0;
+		end;
+	
 	
 	////////////////////////////////////////////////////////////////////////
 	// -- Base Layouts
@@ -237,6 +246,8 @@ export Layouts := module
 		string100												prep_addr_line1						 	:='';
 		string50												prep_addr_line_last				 	:='';
 		unsigned8												source_rec_id								:= 0;
+		//** Added CCPA fields as per Jira# CCPA-99
+		CCPA_fields;
 	end;
 	
 	////////////////////////////////////////////////////////////////////////
@@ -279,6 +290,8 @@ export Layouts := module
 		string100												prep_addr_line1						 	:='';
 		string50												prep_addr_line_last				 	:='';
 		unsigned8												source_rec_id								:= 0;
+		//** Added CCPA fields as per Jira# CCPA-99
+		CCPA_fields;
 	end;
 	////////////////////////////////////////////////////////////////////////
 	// -- Temporary Layouts for processing
@@ -322,6 +335,7 @@ export Layouts := module
 		  string20  	mname;
 		  string20  	lname;
 			string2 		source				:='';
+			string50		url						:='';
 			unsigned8   source_rec_id := 0;
 			BIPV2.IDlayouts.l_xlink_ids		;
 	  end;

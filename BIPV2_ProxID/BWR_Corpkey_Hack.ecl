@@ -1,4 +1,4 @@
-#workunit('name','BIPV2 Proxid Corpkey Patch');
+﻿#workunit('name','BIPV2 Proxid Corpkey Patch');
 dbase14 := BIPV2_ProxID.files(BIPV2.KeySuffix + '_14').base.logical : global;
 //reset active domestic corpkey
 dsetsos := BIPV2_Files.tools_dotid.SetSOS(dbase14);

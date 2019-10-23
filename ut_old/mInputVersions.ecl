@@ -1,8 +1,8 @@
 export mInputVersions(string ptemplatename) :=
 module
 
-	shared fVersion(string pversion) := regexreplace('@version@', ptemplatename, pversion); 
-	
+	shared fVersion(string pversion) := regexreplace('@version@', ptemplatename, pversion);+ test create the conflict  
+	conflict creation for ThorDev 
 	shared lsprayed		:= 'sprayed';
 	shared lusing		:= 'using';
 	shared lused		:= 'used';

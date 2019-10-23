@@ -1,4 +1,4 @@
-IMPORT tools,ut, _control;
+﻿IMPORT tools,ut, _control, Death_Master;
 
 
 export	Constants	:=
@@ -44,5 +44,6 @@ module
 			 pIsTesting						:= Tools._Constants.IsDataland
 		);
 
-	
+ //DF-22303: FCRA Consumer Data Field Depreciation:FCRA_DeathMasterSSAKeys
+ EXPORT fields_to_clear := Death_Master.Constants('').fields_to_clear;	
 end;

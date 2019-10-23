@@ -1,7 +1,7 @@
-import addresscleaner_monthly_testing;
+﻿import addresscleaner_monthly_testing;
 
 #workunit('protect',true);
-#workunit('name','Standard AddressCleaner Process QA Data ' +  addresscleaner_monthly_testing.version);
+#workunit('name','Yogurt:Standard AddressCleaner Process QA Data ' +  addresscleaner_monthly_testing.version);
 #OPTION('multiplePersistInstances',FALSE);
 
 inRec :=RECORD

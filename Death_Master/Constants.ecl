@@ -1,4 +1,4 @@
-import	ut, Data_Services;
+﻿import	ut, Data_Services;
 
 export	Constants(string	pFileDate)	:=
 module
@@ -29,5 +29,8 @@ module
 	
 	//for regular old search
 	export	set_EmptySuppStates	:=	['CT','ME','OH','NV','MT','GA','VA'];
+
+	//DF-21696 - list of fields to be deprecated in thor_data400::key::fcra::did_death_masterv2_ssa_qa and thor_data400::key::fcra::death_master_ssa::ssn_qa
+	EXPORT fields_to_clear := 'st_country_code,zip_lastpayment';
 	
 end;

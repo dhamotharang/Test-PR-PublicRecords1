@@ -1,5 +1,5 @@
-import ut;
-export BWR_Run_Watchdog := function
+﻿import ut;
+export BWR_Run_Watchdog(string build_type) := function
 /*Change the second parameter in the stored function to run 
 '' -- Complete file
 'nonglb' -- Nonglb with Utility
@@ -29,6 +29,6 @@ set_inputs := output('Setting input files...') : success(watchdog.Input_set);
 
 send_bad_email := fileservices.SendEmail('michael.gould@lexisnexisrisk.com,sudhir.kasavajjala@lexisnexis.com','Watchdog Build Failed',thorlib.wuid());
 
-out_all :=  sequential(verify_hdr,wchk,set_inputs,watchdog.BWR_Best(isnewheader)) : FAILURE(send_bad_email);
+out_all :=  sequential(verify_hdr,wchk,set_inputs,watchdog.BWR_Best(isnewheader,build_type)) : FAILURE(send_bad_email);
 return out_all;
 end;

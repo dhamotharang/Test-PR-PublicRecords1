@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_mapping, corp2_raw_wy;
+﻿IMPORT corp2, corp2_mapping, corp2_raw_wy, std, ut;
 
 EXPORT Functions := MODULE
 
@@ -444,5 +444,68 @@ EXPORT Functions := MODULE
 									uc_s
 								);
 		END;
+		
+		//"find_SpecialChars" function returns "FOUND" verbiage when corp legal names consists foreign characters
+		EXPORT find_SpecialChars(string C) := function
+		
+     S            := corp2.t2u(c);  
+		 ForeignChars	:= if(REGEXFIND('Ý', S) OR REGEXFIND('Ü', S) OR REGEXFIND('Û', S) OR REGEXFIND('Ú', S) OR 
+												REGEXFIND('Ù', S) OR REGEXFIND('Ö',	S) OR REGEXFIND('Õ', S) OR REGEXFIND('Ô', S) OR
+												REGEXFIND('Ó', S) OR REGEXFIND('Ò',	S) OR REGEXFIND('Ñ', S) OR REGEXFIND('Ï', S) OR
+												REGEXFIND('Î', S) OR REGEXFIND('Í',	S) OR REGEXFIND('Ì', S) OR REGEXFIND('Ë', S) OR
+												REGEXFIND('Ê', S) OR REGEXFIND('É',	S) OR REGEXFIND('È', S) OR REGEXFIND('Å', S) OR
+												REGEXFIND('Ä', S) OR REGEXFIND('Ã',	S) OR REGEXFIND('Â', S) OR REGEXFIND('Á', S) OR
+												REGEXFIND('À', S) OR REGEXFIND('À', S) OR REGEXFIND('Á', S) OR REGEXFIND('Â', S) OR				
+												REGEXFIND('Ã', S) OR REGEXFIND('Ä', S) OR REGEXFIND('Å', S) OR REGEXFIND('È', S) OR 
+												REGEXFIND('É', S) OR REGEXFIND('Ê', S) OR REGEXFIND('Ë', S) OR REGEXFIND('Ì', S) OR 
+												REGEXFIND('Í', S) OR REGEXFIND('Î', S) OR REGEXFIND('Ï', S) OR REGEXFIND('Ñ', S) OR 
+												REGEXFIND('Ò', S) OR REGEXFIND('Ó', S) OR REGEXFIND('Ô', S) OR REGEXFIND('Õ', S) OR 
+												REGEXFIND('Ö', S) OR REGEXFIND('Ù', S) OR REGEXFIND('Ú', S) OR REGEXFIND('Û', S) OR 
+												REGEXFIND('Ü', S) OR REGEXFIND('Ý', S), 'FOUND', 'NOTFOUND'
+											 );
+			
+	    return ForeignChars;
+																	
+		end;
+		
+		//"fix_ForeignChar" function returns WY state-site matching leagal name after replacing "foreign character patterns" with match "sate site character patterns"
+		//Ex: From raw vendor input "PAPÃ© D.W., INC." TO	'PAPÉ D.W., INC.'
+		EXPORT fix_ForeignChar(STRING s) := FUNCTION
 
+		  uc_s  := corp2.t2u(s);
+		  l_name:= map( regexfind('ÃŒ', uc_s, 0)      <> ''=>regexreplace('ÃŒ', uc_s, 'Ü'),
+										regexfind('Â©', uc_s, 0)      <> ''=>regexreplace('Â©', uc_s, 'É'),
+										regexfind('Ã¤', uc_s, 0)      <> ''=>regexreplace('Ã¤', uc_s, 'Ä'),
+										regexfind('Ã¨', uc_s, 0) 		  <> ''=>regexreplace('Ã¨', uc_s, 'È'),
+										regexfind('Ã£O', uc_s, 0)     <> ''=>regexreplace('Ã£O', uc_s, 'Ã'),
+										regexfind('Ã§Ã£O', uc_s, 0)   <> ''=>regexreplace('Ã§Ã£O', uc_s, 'Ã'),
+										regexfind('Ã¶', uc_s, 0) 		  <> ''=>regexreplace('Ã¶', uc_s, 'Ö'),																
+										regexfind('Ã³', uc_s, 0) 		  <> ''=>regexreplace('Ã³', uc_s, 'Ó'),																
+										regexfind('Ã©', uc_s, 0) 		  <> ''=>regexreplace('Ã©', uc_s, 'É'),	
+										regexfind('Ã‰', uc_s, 0) 		  <> ''=>regexreplace('Ã‰', uc_s, 'É'),	
+										regexfind('Ã±', uc_s, 0) 		  <> ''=>regexreplace('Ã±', uc_s, 'Ñ'),
+										regexfind('Ã³', uc_s, 0) 		  <> ''=>regexreplace('Ã³', uc_s, 'Ó'),
+										regexfind('Ä', uc_s, 0) 		  <> ''=>regexreplace('Ä', uc_s, '?'),
+										regexfind('Ã£', uc_s, 0) 		  <> ''=>regexreplace('Ã£', uc_s, 'Ã'),
+										regexfind('Ã¼', uc_s, 0) 		  <> ''=>regexreplace('Ã¼', uc_s, 'Ü'),
+										regexfind('Ã–', uc_s, 0) 		  <> ''=>regexreplace('Ã–', uc_s, 'Ö'),
+										regexfind('Ã', uc_s, 0) 		  <> ''=>regexreplace('Ã', uc_s, 'Á'),
+										regexfind('Ãª', uc_s, 0) 		  <> ''=>regexreplace('Ãª'	, uc_s, 'Ê'),
+										regexfind('Ãº', uc_s, 0) 		  <> ''=>regexreplace('Ãº', uc_s, 'Ú'),
+										regexfind('Ã“', uc_s, 0) 		  <> ''=>regexreplace('Ã“', uc_s, 'Ó'),
+										regexfind('Ã‰', uc_s, 0) 		  <> ''=>regexreplace('Ã‰', uc_s, 'É'),
+										regexfind('Â”Œ', uc_s, 0) 	  <> ''=>regexreplace('Â”Œ', uc_s, '?'),
+										regexfind('Ã«', uc_s, 0) 		  <> ''=>regexreplace('Ã«', uc_s, 'Ë'),
+										regexfind('Â¡', uc_s, 0)      <> ''=>regexreplace('Â¡', uc_s, ''),
+										regexfind('Â¢', uc_s, 0)      <> ''=>regexreplace('Â¢', uc_s, ''),
+										regexfind('Â€¢', uc_s, 0) 	  <> ''=>regexreplace('Â€¢', uc_s, ''),
+										regexfind('Â', uc_s, 0)       <> ''=>regexreplace('Â', uc_s, ''), 
+										regexfind('©', uc_s, 0)   	  <> ''=>regexreplace('©', uc_s, ''),
+										regexfind('Â€™S', uc_s, 0)    <> ''=>regexreplace('Â€™S', uc_s, ''),
+										uc_s);
+									
+				return ut.fn_RemoveSpecialChars((string)Std.Uni.CleanAccents(l_name))	;
+				
+   	END;
+		
 END;

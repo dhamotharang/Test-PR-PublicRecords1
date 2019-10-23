@@ -1,4 +1,4 @@
-// Bair._CRON_Build_Boolean_Delta
+﻿// Bair._CRON_Build_Boolean_Delta
 // scheduler job nane -> Bair Boolean Delta Build Scheduler
 // queued job nane -> Bair BOOLEAN Delta Build and Deploy:
 // ON_DEMAND:
@@ -22,7 +22,7 @@ ECL:=
 +'\n'
 +'wuname := \'Bair BOOLEAN Delta Build and Deploy: ' + version + '\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
-+'seq := sequential(Bair.Orbit_Update.UpdateSplitBuildOrbitStatus (\'' + buildName + '\',\'' + version + '\', \'Built\'),\n'
++'seq := sequential(Bair.Manage_Builds.BuildManifest (\'' + buildName + '\',\'' + version + '\', \'Built\'),\n'
 +'									bair_boolean.proc_build_boolean_keys(\'' + version + '\', true),\n'
 +'									Bair.proc_pkgDelpoy(\'bair-qa\',\'' + version + '\', false, true).BooleanKeys,\n'
 +'									Bair.proc_pkgDelpoy(\'bair-prod\',\'' + version + '\', true, true).BooleanKeys,\n'								  

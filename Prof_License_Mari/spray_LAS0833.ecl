@@ -1,9 +1,9 @@
-// spray LAS0833 Professional Licenses Files for MARI	   
+﻿// spray LAS0833 Professional Licenses Files for MARI	   
 IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib,Lib_date;
 
 EXPORT spray_LAS0833 := MODULE
 
-	#workunit('name','Spray LAS0833');
+	#workunit('name','Yogurt: Spray LAS0833');
 	SHARED STRING7 code						:= 'LAS0833';
 
 	//  Spray All Files

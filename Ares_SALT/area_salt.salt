@@ -1,0 +1,33 @@
+﻿OPTIONS:-gh
+MODULE:Ares_SALT
+FILENAME:area
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+FIELD:deleted:TYPE(STRING):0,0
+FIELD:fid:TYPE(STRING):0,0
+FIELD:id:TYPE(STRING):0,0
+FIELD:resource:TYPE(STRING):0,0
+FIELD:source:TYPE(STRING):0,0
+FIELD:summary.type:TYPE(STRING):0,0
+FIELD:type:MULTIPLE(LIST(names),ANY):KEEP(2):TYPE(STRING):0,0
+FIELD:value:MULTIPLE(LIST(names),ANY):KEEP(2):TYPE(STRING):0,0
+FIELD:status:TYPE(STRING):0,0
+FIELD:useinaddress:TYPE(STRING):0,0
+FIELD:link_href:MULTIPLE(LIST(place),ANY):KEEP(2):TYPE(STRING):0,0
+FIELD:link_rel:MULTIPLE(LIST(place),ANY):KEEP(2):TYPE(STRING):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

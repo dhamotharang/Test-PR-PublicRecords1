@@ -1,4 +1,4 @@
-import address, LiensV2, bipv2;
+﻿import address, LiensV2, bipv2;
 export Layouts :=
 module
 
@@ -103,6 +103,14 @@ module
 		end;
 	end;
 	
+	// Jira# CCPA-358, The below layout with 2 new fields are added for CCPA (California Consumer Protection Act) project.
+	// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+	export CCPA_fields := 
+		record
+			unsigned4 													global_sid 		:= 0;
+			unsigned8 													record_sid 		:= 0;
+		end;
+		
 	////////////////////////////////////////////////////////////////////////
 	// -- Base Layouts
 	////////////////////////////////////////////////////////////////////////
@@ -122,6 +130,7 @@ module
 		Address.Layout_Clean_Name						clean_attorney_name					;
 		Address.Layout_Clean182_fips		    clean_address								;
 		Miscellaneous.Cleaned_Phones				clean_phones								;
+		CCPA_fields;  // Jira# CCPA-358, Added for CCPA project
 	end;
 
 	////////////////////////////////////////////////////////////////////////
@@ -142,6 +151,7 @@ module
 		Address.Layout_Clean_Name						clean_attorney_name					;
 		Address.Layout_Clean182_fips		    Clean_address								;
 		Miscellaneous.Cleaned_Phones				clean_phones								;
+		CCPA_fields;  // Jira# CCPA-358, Added for CCPA project
 	end;
 
 	////////////////////////////////////////////////////////////////////////

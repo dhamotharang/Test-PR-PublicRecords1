@@ -1,4 +1,4 @@
-import _control, tools, versioncontrol;
+﻿import _control, tools, versioncontrol;
 
 export Filenames(string  pname    		= '',
 								 string  pversion 		= '',

@@ -102,7 +102,7 @@ r from_fi(fire le) := transform
   
 fis := project(fire,from_fi(left));  
 
-rel := header.File_Relatives;
+rel := header.File_Relatives_v3;
 
 r from_r(rel le, unsigned1 cnt) := transform
   self.did := if(cnt=1,le.person1,le.person2);

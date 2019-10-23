@@ -1,4 +1,4 @@
-import corp2, corp2_mapping, corp2_raw_co, scrubs, scrubs_corp2_mapping_co_ar,
+﻿import corp2, corp2_mapping, corp2_raw_co, scrubs, scrubs_corp2_mapping_co_ar,
 			 scrubs_corp2_mapping_co_event, scrubs_corp2_mapping_co_main, std, tools,
 			 ut, versioncontrol;
 
@@ -687,15 +687,13 @@ export CO := MODULE;
 
 		AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
-		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																															,'Scrubs CorpAR_CO Report' //subject
 																															,'Scrubs CorpAR_CO Report' //body
 																															,(data)AR_ScrubsAttachment
 																															,'text/csv'
 																															,'CorpCOARScrubsReport.csv'
-																															,
-																															,
-																															,corp2.Email_Notification_Lists.spray);
+																															);
 
 		AR_BadRecords				 	 := AR_N.ExpandedInFile(																					
 																									corp_key_Invalid							  			<> 0 or

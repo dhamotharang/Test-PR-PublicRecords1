@@ -11,7 +11,7 @@ import business_header,mdr;
 export Relatives := module
 
 shared h := (header.File_Headers + Header.File_Transunion_did + Header.file_TUCS_did + Header.File_TN_did)(mdr.sourceTools.SourceIsOnProbation(src)=false);
-shared oldr	:= header.File_Relatives;
+shared oldr	:= header.File_Relatives_v3;
 
 newr := header.fn_Relatives(h, oldr, IncludeOutsideMatches := true);
 

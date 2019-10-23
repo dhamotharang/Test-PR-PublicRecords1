@@ -1,4 +1,4 @@
-import BIPV2,BIPV2_Build,BIPV2_ProxID,tools;
+﻿import BIPV2,BIPV2_Build,BIPV2_ProxID,tools;
 lbegin    := true;
 iteration := '1';
 pversion  := BIPV2.KeySuffix;

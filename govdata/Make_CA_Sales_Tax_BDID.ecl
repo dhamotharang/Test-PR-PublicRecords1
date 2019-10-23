@@ -1,4 +1,4 @@
-import business_header,business_header_ss,did_add,PromoteSupers,mdr;
+﻿import business_header,business_header_ss,did_add,PromoteSupers,mdr;
 
 df := govdata.file_ca_sales_tax_in;
 
@@ -8,10 +8,16 @@ local_layout_ca_sales_tax := record
 end;
 
 local_layout_ca_sales_tax into_fullrec(df L) := transform
-	self 							 := L;
-	self.bdid 				 := 0;
+	self.name_prefix   := '';
+	self.name_first	   := '';
+	self.name_middle   := '';
+	self.name_last	   := '';
+	self.name_suffix   := '';
+	self.score	       := '';	
+	self.bdid 		   := 0;
 	self.source_rec_id := (unsigned8) (hash64(l.account_number, l.sub_account_number));			
 	self.source   	   := MDR.sourceTools.src_CA_Sales_Tax;	
+	self 			   := L;
 end;
 
 df2 := project(df,into_fullrec(LEFT));
@@ -27,9 +33,9 @@ Business_Header.MAC_Source_Match(
 		,dSourceMatchOut								// outfile
 		,false													// bool_bdid_field_is_string12
 		,bdid														// bdid_field
-    ,false													// bool_infile_has_source_field
+		,false													// bool_infile_has_source_field
 		,MDR.sourceTools.src_CA_Sales_Tax	// source_type_or_field
-    ,false													// bool_infile_has_source_group
+		,false													// bool_infile_has_source_group
 		,foo														// source_group_field
 		,firm_name											// company_name_field
 		,prim_range											// prim_range_field

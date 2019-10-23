@@ -1,20 +1,23 @@
-﻿IMPORT SALT37;
+﻿IMPORT SALT39,STD;
 EXPORT CCID_hygiene(dataset(CCID_layout_CCID) h) := MODULE
  
 //A simple summary record
-EXPORT Summary(SALT37.Str30Type txt) := FUNCTION
+EXPORT Summary(SALT39.Str30Type  txt) := FUNCTION
   SummaryLayout := RECORD
     txt;
     NumberOfRecords := COUNT(GROUP);
+    populated_cc_id_cnt := COUNT(GROUP,h.cc_id <> (TYPEOF(h.cc_id))'');
     populated_cc_id_pcnt := AVE(GROUP,IF(h.cc_id = (TYPEOF(h.cc_id))'',0,100));
-    maxlength_cc_id := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.cc_id)));
-    avelength_cc_id := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.cc_id)),h.cc_id<>(typeof(h.cc_id))'');
+    maxlength_cc_id := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.cc_id)));
+    avelength_cc_id := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.cc_id)),h.cc_id<>(typeof(h.cc_id))'');
+    populated_gc_id_cnt := COUNT(GROUP,h.gc_id <> (TYPEOF(h.gc_id))'');
     populated_gc_id_pcnt := AVE(GROUP,IF(h.gc_id = (TYPEOF(h.gc_id))'',0,100));
-    maxlength_gc_id := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.gc_id)));
-    avelength_gc_id := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.gc_id)),h.gc_id<>(typeof(h.gc_id))'');
+    maxlength_gc_id := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.gc_id)));
+    avelength_gc_id := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.gc_id)),h.gc_id<>(typeof(h.gc_id))'');
+    populated_account_id_cnt := COUNT(GROUP,h.account_id <> (TYPEOF(h.account_id))'');
     populated_account_id_pcnt := AVE(GROUP,IF(h.account_id = (TYPEOF(h.account_id))'',0,100));
-    maxlength_account_id := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.account_id)));
-    avelength_account_id := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.account_id)),h.account_id<>(typeof(h.account_id))'');
+    maxlength_account_id := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.account_id)));
+    avelength_account_id := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.account_id)),h.account_id<>(typeof(h.account_id))'');
   END;
     T := TABLE(h,SummaryLayout);
   R1 := RECORD
@@ -25,9 +28,9 @@ EXPORT Summary(SALT37.Str30Type txt) := FUNCTION
 END;
  
 summary0 := Summary('Summary');
-invRec := RECORD
+  invRec := RECORD
   UNSIGNED  FldNo;
-  SALT37.StrType FieldName;
+  SALT39.StrType FieldName;
   UNSIGNED NumberOfRecords;
   REAL8  populated_pcnt;
   UNSIGNED  maxlength;
@@ -44,27 +47,27 @@ END;
 EXPORT invSummary := NORMALIZE(summary0, 3, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
-SALT37.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
-  SELF.Fld := TRIM(CHOOSE(C,IF (le.cc_id <> 0,TRIM((SALT37.StrType)le.cc_id), ''),IF (le.gc_id <> 0,TRIM((SALT37.StrType)le.gc_id), ''),TRIM((SALT37.StrType)le.account_id)));
+SALT39.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
+  SELF.Fld := TRIM(CHOOSE(C,IF (le.cc_id <> 0,TRIM((SALT39.StrType)le.cc_id), ''),IF (le.gc_id <> 0,TRIM((SALT39.StrType)le.gc_id), ''),TRIM((SALT39.StrType)le.account_id)));
   SELF.FldNo := C;
 END;
 SHARED FldInv0 := NORMALIZE(h,3,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
-SALT37.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
+SALT39.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
   SELF.FldNo1 := 1 + (C / 3);
   SELF.FldNo2 := 1 + (C % 3);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,IF (le.cc_id <> 0,TRIM((SALT37.StrType)le.cc_id), ''),IF (le.gc_id <> 0,TRIM((SALT37.StrType)le.gc_id), ''),TRIM((SALT37.StrType)le.account_id)));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,IF (le.cc_id <> 0,TRIM((SALT37.StrType)le.cc_id), ''),IF (le.gc_id <> 0,TRIM((SALT37.StrType)le.gc_id), ''),TRIM((SALT37.StrType)le.account_id)));
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,IF (le.cc_id <> 0,TRIM((SALT39.StrType)le.cc_id), ''),IF (le.gc_id <> 0,TRIM((SALT39.StrType)le.gc_id), ''),TRIM((SALT39.StrType)le.account_id)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,IF (le.cc_id <> 0,TRIM((SALT39.StrType)le.cc_id), ''),IF (le.gc_id <> 0,TRIM((SALT39.StrType)le.gc_id), ''),TRIM((SALT39.StrType)le.account_id)));
   END;
 SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),3*3,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'cc_id'}
       ,{2,'gc_id'}
-      ,{3,'account_id'}],SALT37.MAC_Character_Counts.Field_Identification);
-EXPORT AllProfiles := SALT37.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
+      ,{3,'account_id'}],SALT39.MAC_Character_Counts.Field_Identification);
+EXPORT AllProfiles := SALT39.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
  
-EXPORT SrcProfiles := SALT37.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
+EXPORT SrcProfiles := SALT39.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
  
-EXPORT Correlations := SALT37.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+EXPORT Correlations := SALT39.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
  
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
@@ -72,9 +75,9 @@ ErrorRecord := RECORD
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    CCID_Fields.InValid_cc_id((SALT37.StrType)le.cc_id),
-    CCID_Fields.InValid_gc_id((SALT37.StrType)le.gc_id),
-    CCID_Fields.InValid_account_id((SALT37.StrType)le.account_id),
+    CCID_Fields.InValid_cc_id((SALT39.StrType)le.cc_id),
+    CCID_Fields.InValid_gc_id((SALT39.StrType)le.gc_id),
+    CCID_Fields.InValid_account_id((SALT39.StrType)le.account_id),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
@@ -93,4 +96,16 @@ PrettyErrorTotals := RECORD
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);
 EXPORT ValidityErrors := ValErr;
+EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRUE) := FUNCTION
+  myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  fieldPopulationOverall := Summary('');
+ 
+  SALT39.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_MBS, CCID_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
+ 
+  fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
+  fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT39.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
+  allProfiles_Standard := IF(doAllProfiles, SALT39.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
+ 
+  RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & allProfiles_Standard;
+END;
 END;

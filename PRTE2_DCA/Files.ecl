@@ -1,9 +1,12 @@
-﻿IMPORT PRTE2_DCA, PRTE2;
+﻿IMPORT PRTE2_DCA, PRTE2,ut,std;
 
 EXPORT Files := MODULE
 
-	EXPORT file_in := DATASET(Constants.in_dca, Layouts.layout_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
-
+ file_in_a := DATASET(Constants.in_dca, Layouts.layout_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+  
+	PRTE2.CleanFields(file_in_a,file_in_b);  
+	Export file_in:=file_in_b;
+	
 	EXPORT file_base := DATASET(Constants.base_dca, Layouts.layout_base, FLAT );
 
 	Layouts.layout_base PhysicalAddress(Layouts.layout_in L, INTEGER C) :=	TRANSFORM
@@ -117,7 +120,7 @@ EXPORT Files := MODULE
 											SELF.county		:= [];											
 											SELF.countya	:= [];	
 											SELF.lf						:= [];	
-											SELF.__internal_fpos__ := [];											
+											//SELF.__internal_fpos__ := [];											
 											SELF.parent_enterprise_number := [];											
 											SELF.ultimate_enterprise_number  := [];	
 											)

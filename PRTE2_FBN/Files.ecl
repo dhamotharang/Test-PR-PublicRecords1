@@ -1,11 +1,17 @@
-Import FBNV2;
+﻿Import FBNV2;
 EXPORT files := module
 
-EXPORT fbnv2_business_IN := DATASET(constants.In_fbnv2_Business, Layouts.Business_Base, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
-EXPORT fbnv2_business_base := DATASET(constants.Base_fbnv2_Business, Layouts.Combined_Business_Base, FLAT );
+// Business File
+EXPORT fbnv2_business_IN        := DATASET(constants.In_fbnv2_Business, Layouts.Business_Base, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+EXPORT fbnv2_business_base_ext  := DATASET(constants.Base_fbnv2_Business, Layouts.Combined_Business_Base_ext, FLAT );
 
-EXPORT fbnv2_contact_IN := DATASET(constants.In_fbnv2_contact, Layouts.Contact_Base, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
-EXPORT fbnv2_contact_base := DATASET(constants.Base_fbnv2_contact, Layouts.Combined_Contact_Base, FLAT );
+EXPORT fbnv2_business_base := project(fbnv2_business_base_ext, Layouts.Combined_Business_Base);
+
+// Contact File
+EXPORT fbnv2_contact_IN   := DATASET(constants.In_fbnv2_contact, Layouts.Contact_Base, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+EXPORT fbnv2_contact_base_ext := DATASET(constants.Base_fbnv2_contact, Layouts.Combined_Contact_Base_ext, FLAT );
+
+EXPORT fbnv2_contact_base := project(fbnv2_contact_base_ext, Layouts.Combined_Contact_Base);
 	 
 Export Business_Base_1 := project(fbnv2_business_base,Layouts.Business_AID);
   

@@ -1,4 +1,4 @@
-import lib_FileServices;
+﻿import lib_FileServices;
 
 export	dataset(Layouts.rRawSlimSeqRawCacheStdCacheACECache)	fOutputNewCacheFiles(dataset(Layouts.rRawSlimSeqRawCacheStdCacheACECache) pCacheCandidates, AID.Common.xFlags pReturnValues)
  :=
@@ -91,9 +91,9 @@ export	dataset(Layouts.rRawSlimSeqRawCacheStdCacheACECache)	fOutputNewCacheFiles
 		zOutputUpdateClean			:=	output(dACECacheUpdateRecords,				,'~' + Common.eFileName.fConstruct(Common.eAddressType.ACE,	Common.eFileName.ActivityType.Update,	dCommonUniqueSignature[1].UniqueSignature),__compressed__);
 
 		/**************************************************************************************/
-		zOutputNewRawCount			:=	output(count(dRawCacheNewRecords(aid<>0)), named('NewRawCount'));
-		zOutputNewStdCount			:=	output(count(dStdCacheNewRecords(aid<>0)), named('NewStdCount'));
-		zOutputNewCleanCount		:=	output(count(dACECacheNewRecords(aid<>0)), named('NewACECount'));
+		zOutputNewRawCount			:=	output(count(dRawCacheNewRecords(aid<>0)), named('NewRawCount'),OVERWRITE);
+		zOutputNewStdCount			:=	output(count(dStdCacheNewRecords(aid<>0)), named('NewStdCount'),OVERWRITE);
+		zOutputNewCleanCount		:=	output(count(dACECacheNewRecords(aid<>0)), named('NewACECount'),OVERWRITE);
 
 		/**************************************************************************************
 		** This is the side-effect we need

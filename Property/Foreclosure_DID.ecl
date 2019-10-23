@@ -1,10 +1,12 @@
-import bipv2, ut;
+﻿import _control, bipv2, MDR, ut, MDR, BKForeclosure, Std;
 
-foreclosureIn := property.File_Foreclosure_In;  //contains both new and base file data
-layout_foreclosureIn := recordof(foreclosureIn);
-normalizeDIDLayout := recordof (Property.File_Foreclosure_Normalized);
+foreclosureIn 				:= property.File_Foreclosure_In;  //contains both new and base file data
+addGSForeclosureIn		:= MDR.macGetGlobalSid(foreclosureIn,'Foreclosure','','global_sid'); //DF-25926: Add Global_SID
 
-layout_foreclosureIn denormalizeRecords(foreclosureIn l, normalizeDIDLayout r) := transform
+layout_foreclosureIn 	:= recordof(addGSForeclosureIn);
+normalizeDIDLayout 		:= recordof(Property.File_Foreclosure_Normalized);
+
+layout_foreclosureIn denormalizeRecords(addGSForeclosureIn l, normalizeDIDLayout r) := transform
 	self.name1_did 				:= if(r.name_indicator=1, intformat(r.did,12,1), l.name1_did);
 	self.name1_did_score 	:= if(r.name_indicator=1, (string)r.did_score, l.name1_did_score);
 	self.name1_ssn 				:= if(r.name_indicator=1, r.ssn, l.name1_ssn);
@@ -225,21 +227,25 @@ layout_foreclosureIn denormalizeRecords(foreclosureIn l, normalizeDIDLayout r) :
 	self := l;
 end;
 
-// foreclosureBaseSeq := project(foreclosureIn, property.Layout_Fares_Foreclosure);
-
 //Distribute the data before denormalize to avoid skewing
-foreclosureInDist					:=	DISTRIBUTE(foreclosureIn, HASH32(sequence));
-foreclosureNormalizedDist	:=	DISTRIBUTE(Property.foreclosure_normalized, HASH32(sequence));
+foreclosureInDist					:=	DISTRIBUTE(addGSForeclosureIn, HASH32(sequence));
+foreclosureNormalizedDist	:=	DISTRIBUTE(Property.foreclosure_normalized(source = 'FR'), HASH32(sequence)); //only want CL data as BK is appended at the end
 
 foreclosureBase := denormalize(foreclosureInDist, foreclosureNormalizedDist,
 									left.sequence = right.sequence,
 									denormalizeRecords(left,right), LOCAL);
 
-// output(choosen(denormalizeForeclosure,100), named('DenormalizedForeclosureOutput'));
-// output(count(denormalizeForeclosure), named('DenormalizedForeclosureCount'));
 
+//Combine BlackKnight base files, mapped to Foreclosure_base layout, with Core Logic base file. Project CL into base and add source code
+ForceclosureBaseV2 := PROJECT(foreclosureBase,TRANSFORM(Property.Layout_Fares_Foreclosure_v2, 
+																												SELF.SOURCE := IF(TRIM(LEFT.SOURCE) IN ['B7','I5'],LEFT.SOURCE,MDR.sourceTools.src_Foreclosures); //make sure not overwritting BK records although there shouldn't be any
+																												SELF := LEFT; SELF := [])); //To combine BK and CL
 
-ut.mac_suppress_by_phonetype(foreclosureBase,attorney_phone_nbr,state,                   phone_out1);
+BKforeclosureBase	:= BKForeclosure.Fn_Map_BK2Foreclosure;
+
+CombineAll	:= DEDUP(SORT(ForceclosureBaseV2 + BKforeclosureBase,foreclosure_id,-process_date),ALL);
+
+ut.mac_suppress_by_phonetype(CombineAll,		attorney_phone_nbr,state,                   phone_out1);
 ut.mac_suppress_by_phonetype(phone_out1,     lender_phone,      lender_beneficiary_state,phone_out2);
 ut.mac_suppress_by_phonetype(phone_out2,     trustee_phone,     trustee_state,           phone_out3);
 
@@ -268,6 +274,6 @@ j1 := join(ta1,phone_out3_dist,left.foreclosure_id=right.foreclosure_id and
 							   
 output(choosen(j1,100),named('phones_that_should_be_suppressed_in_the_output'));
 
-FC_proj := project(phone_out3,Property.Layout_Fares_Foreclosure_v2);
+FC_proj := phone_out3;
 
 export Foreclosure_DID := FC_proj; // : persist('~thor_data400::persist::foreclosure_did');

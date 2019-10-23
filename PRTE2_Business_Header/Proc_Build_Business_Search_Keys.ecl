@@ -1,4 +1,4 @@
-IMPORT Business_Header, Business_Header_SS, Text, ut, versioncontrol;
+﻿IMPORT Business_Header, Business_Header_SS, Text, ut, versioncontrol;
 
 export Proc_Build_Business_Search_Keys(
 
@@ -74,7 +74,7 @@ module
 				,buildkey4
 			)
 		)
-		,business_header.promote(pversion,'^(.*?)key(.*?)$').new2built
+		,PRTE2_business_header.promote(pversion,'^(.*?)key(.*?)$').new2built
 	);
 
 end;

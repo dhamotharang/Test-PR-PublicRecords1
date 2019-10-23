@@ -51,6 +51,7 @@ EXPORT proc_merge_hdr(dataset(Cortera.Layout_Header_Out) allcurrent, dataset(Cor
 										self.dt_vendor_first_reported := (unsigned4)version;
 										self.dt_first_seen := ut.Min2(left.dt_first_seen, right.dt_first_seen);
 										self.dt_last_seen := Max(left.dt_last_seen, right.dt_last_seen);
+										self.persistent_record_id := (left.link_id << 32) + self.dt_vendor_first_reported;
 										self := left;), INNER, LOCAL);
 	// for unchanged update the date first seen
 	unchanged_prev := JOIN(previous, delta(n_diff=false), left.link_id=right.link_id,
@@ -63,6 +64,7 @@ EXPORT proc_merge_hdr(dataset(Cortera.Layout_Header_Out) allcurrent, dataset(Cor
 																				ut.min2(left.dt_vendor_first_reported, right.dt_vendor_first_reported));
 										self.dt_first_seen := ut.Min2(left.dt_first_seen, right.dt_first_seen);
 										self.dt_last_seen := Max(left.dt_last_seen, right.dt_last_seen);
+										self.persistent_record_id := (left.link_id << 32) + self.dt_vendor_first_reported;
 										self := left;), INNER, LOCAL);	
 										
 	result := new + lost + changed + unchanged + archived + not_curr;

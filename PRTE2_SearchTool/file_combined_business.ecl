@@ -1,5 +1,6 @@
-Import data_services, prte2_bankruptcy,prte2_busreg,prte2_corp,prte2_gong,prte2_faa,prte2_fbn,prte2_foreclosure,prte2_globalwatchlists,
-prte2_domains, prte2_liens, LiensV2, std, prte2_vehicle, prte2_lnproperty, prte2_ucc, prte2_watercraft,BIPV2, _control,doxie_cbrs;
+﻿Import data_services, prte2_bankruptcy,prte2_busreg,prte2_corp,prte2_gong,prte2_faa,prte2_fbn,prte2_foreclosure,prte2_globalwatchlists,
+prte2_domains, prte2_liens, LiensV2, std, prte2_vehicle, prte2_lnproperty, prte2_ucc, prte2_watercraft,prte2_prof_License_MARI, 
+prte2_sanctn, prte2_sanctn_np, BIPV2, _control,doxie_cbrs;
 
 Export file_combined_business(Boolean FCRA = false, Boolean legacy = true) := Function
 
@@ -243,11 +244,50 @@ Export file_combined_business(Boolean FCRA = false, Boolean legacy = true) := Fu
 																		transform({unsigned6 id, integer Watercraft_cnt := 1, unsigned6 ultid, unsigned6 orgid}, self.id := left.seleid, self.ultid := left.ultid, self.orgid := left.orgid)));			
 		wtrcs := if(FCRA, Dataset([],Layouts.Layout_Businesses),project(wtrc,Layouts.Layout_Businesses));
 		
+		
+//Integer MARI_License	
+		mari := if(	legacy,
+														project(prte2_prof_license_mari.keys.key_bdid,
+																		transform({unsigned6 id, integer MARI_License_cnt := 1, unsigned6 ultid :=0, unsigned6 orgid:=0}, self.id := left.bdid)),
+														project(prte2_prof_license_mari.keys.Key_LinkIds.key,
+																		transform({unsigned6 id, integer MARI_License_cnt := 1, unsigned6 ultid, unsigned6 orgid}, self.id := left.seleid, self.ultid := left.ultid, self.orgid := left.orgid)));			
+		maris := if(FCRA, Dataset([],Layouts.Layout_Businesses),project(mari,Layouts.Layout_Businesses));
+				
+
+//Integer Public Sanctn	
+		sanctn := if(	legacy,
+														project(prte2_sanctn.keys.midex_rpt_nbr(bdid != 0),
+																		transform({unsigned6 id, integer Public_Sanctn_cnt := 1, unsigned6 ultid :=0, unsigned6 orgid:=0}, self.id := left.bdid)),
+														project(prte2_sanctn.keys.LinkIds.key,
+																		transform({unsigned6 id, integer Public_Sanctn_cnt := 1, unsigned6 ultid, unsigned6 orgid}, self.id := left.seleid, self.ultid := left.ultid, self.orgid := left.orgid)));			
+		sanctns := if(FCRA, Dataset([],Layouts.Layout_Businesses),project(sanctn,Layouts.Layout_Businesses));
+
+
+//Integer NonPublic Sanctn
+ 	sanctn_np := if(	legacy,
+														project(prte2_sanctn_np.keys.midex_rpt_nbr(bdid != 0, dbcode = 'N'),
+																		transform({unsigned6 id, integer NonPublic_Sanctn_cnt := 1, unsigned6 ultid :=0, unsigned6 orgid:=0}, self.id := left.bdid)),
+														project(prte2_sanctn_np.keys.party_LinkIds.key(dbcode = 'N'),
+																		transform({unsigned6 id, integer NonPublic_Sanctn_cnt := 1, unsigned6 ultid, unsigned6 orgid}, self.id := left.seleid, self.ultid := left.ultid, self.orgid := left.orgid)));			
+		sanctn_nps := if(FCRA, Dataset([],Layouts.Layout_Businesses),project(sanctn_np,Layouts.Layout_Businesses));
+
+
+//Integer FreddieMac	
+		freddie_mac := if(	legacy,
+														project(prte2_sanctn_np.keys.midex_rpt_nbr(bdid != 0, dbcode = 'F'),
+																		transform({unsigned6 id, integer FreddieMac_Sanctn_cnt := 1, unsigned6 ultid :=0, unsigned6 orgid:=0}, self.id := left.bdid)),
+														project(prte2_sanctn_np.keys.party_LinkIds.key(dbcode = 'F'),
+																		transform({unsigned6 id, integer FreddieMac_Sanctn_cnt := 1, unsigned6 ultid, unsigned6 orgid}, self.id := left.seleid, self.ultid := left.ultid, self.orgid := left.orgid)));			
+		freddie_macs := if(FCRA, Dataset([],Layouts.Layout_Businesses),project(freddie_mac,Layouts.Layout_Businesses));
+
+		
 combined_business := (bks + busregs + corpsoss + gongs + faas + fbns + fcls + gwls + gwlos + doms +
 																						liens + jdgs + evcs + vs + props + regas + uccs + wtrcs + busads + execs + 
-																						bhs + bas + bins + name_vs)(id<>0);
+																						bhs + bas + bins + name_vs + maris + sanctns + sanctn_nps + freddie_macs)(id<>0);
 
 		comb_cnts_d := distribute(combined_business, hash(id));
+		
+	
 
 		business_grouped_layout := record
 				Unsigned6 ID := comb_cnts_d.id;
@@ -277,15 +317,19 @@ combined_business := (bks + busregs + corpsoss + gongs + faas + fbns + fcls + gw
 				Integer Registered_Agent_cnt := sum(group,comb_cnts_d.Registered_Agent_cnt   );
 				Integer UCC_cnt := sum(group,comb_cnts_d.UCC_cnt   );
 				Integer Watercraft_cnt := sum(group,comb_cnts_d.Watercraft_cnt   );
+				Integer MARI_License_cnt := sum(group,comb_cnts_d.Mari_License_cnt );
+				Integer Public_Sanctn_cnt := sum(group,comb_cnts_d.Public_Sanctn_cnt );
+				Integer NonPublic_Sanctn_cnt := sum(group,comb_cnts_d.NonPublic_Sanctn_cnt );
+				Integer FreddieMac_Sanctn_cnt := sum(group,comb_cnts_d.FreddieMac_Sanctn_cnt );
 		end;      
 							 
 
 		business_grouped := table(comb_cnts_d,business_grouped_layout,id, local);
 
 		ds_businesses 	:= dataset([	
-									{1,1,1,1,1,true,1,1,1,1,1,1,1,1,1,1,1,false,1,1,1,1,1,1,1,1,1},
-									{2,2,2,2,2,true,2,2,2,2,2,2,2,2,2,2,2,false,2,2,2,2,2,2,2,2,2},
-									{3,3,3,3,3,true,3,3,3,3,3,3,3,3,3,3,3,true,3,3,3,3,3,3,3,3,3}], 
+									{1,1,1,1,1,true,1,1,1,1,1,1,1,1,1,1,1,false,1,1,1,1,1,1,1,1,1,1,1,1,1},
+									{2,2,2,2,2,true,2,2,2,2,2,2,2,2,2,2,2,false,2,2,2,2,2,2,2,2,2,2,2,2,2},
+									{3,3,3,3,3,true,3,3,3,3,3,3,3,3,3,3,3,true,3,3,3,3,3,3,3,3,3,3,3,3,3}], 
 									business_grouped_layout)
 									+ 
 									business_grouped;

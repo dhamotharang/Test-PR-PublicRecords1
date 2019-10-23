@@ -1,4 +1,4 @@
-EXPORT layout_ProfileBooster := RECORD
+﻿EXPORT layout_ProfileBooster := RECORD
 	string20 	dataset_name;
 	string30 	acctNo;
 	string20 	fname;
@@ -183,6 +183,13 @@ EXPORT layout_ProfileBooster := RECORD
 	String3		RaAOccProfLicMmbrCnt;
 	String3		RaAOccBusinessAssocMmbrCnt;
 	String3		RaAInterestSportPersonMmbrCnt;
+		// new attributes added for bug RQ-13721
+	string25 PPCurrOwnedAutoVIN;
+	string4 PPCurrOwnedAutoYear;
+	string36 PPCurrOwnedAutoMake;
+	string30 PPCurrOwnedAutoModel;
+	string20 PPCurrOwnedAutoSeries;
+	string25 PPCurrOwnedAutoType;
 // for future use, possible custom model return
 	String3 	score1 := '';
 	string15 	scorename1 := '';

@@ -180,7 +180,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.license_no_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.dob_Invalid,'ALLOW','CUSTOM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'fname','lname','title','state','zip','zip4','cart','bar','gender','dpv','addr_type','age','county_cd','orig_date','exp_date','license_state','license_type','msa','nielsen_county_cd','specialty_code','phone','list_id','scno','custno','license_no','dob','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_alphaspacequote','invalid_alphaspacequote','invalid_alphaspace','invalid_alpha','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_numeric','invalid_gender','invalid_alpha','invalid_addr_type','invalid_numeric','invalid_alphanumeric','invalid_slash_date','invalid_slash_date','invalid_alpha','invalid_alphapound','invalid_numeric','invalid_alphanumeric','invalid_numericpound','invalid_numeric','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_license_number','invalid_date','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_alphaspacequote','invalid_alphaspacequote','invalid_alphaspace','invalid_alpha','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_numeric','invalid_gender','invalid_alpha','invalid_addr_type','invalid_numeric','invalid_alphanumeric','invalid_slashO_date','invalid_slashO_date','invalid_alpha','invalid_alphapound','invalid_numeric','invalid_alphanumeric','invalid_numericpound','invalid_numeric','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_license_number','invalid_date','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.fname,(SALT37.StrType)le.lname,(SALT37.StrType)le.title,(SALT37.StrType)le.state,(SALT37.StrType)le.zip,(SALT37.StrType)le.zip4,(SALT37.StrType)le.cart,(SALT37.StrType)le.bar,(SALT37.StrType)le.gender,(SALT37.StrType)le.dpv,(SALT37.StrType)le.addr_type,(SALT37.StrType)le.age,(SALT37.StrType)le.county_cd,(SALT37.StrType)le.orig_date,(SALT37.StrType)le.exp_date,(SALT37.StrType)le.license_state,(SALT37.StrType)le.license_type,(SALT37.StrType)le.msa,(SALT37.StrType)le.nielsen_county_cd,(SALT37.StrType)le.specialty_code,(SALT37.StrType)le.phone,(SALT37.StrType)le.list_id,(SALT37.StrType)le.scno,(SALT37.StrType)le.custno,(SALT37.StrType)le.license_no,(SALT37.StrType)le.dob,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,26,Into(LEFT,COUNTER));
@@ -206,8 +206,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'addr_type:invalid_addr_type:ALLOW'
           ,'age:invalid_numeric:ALLOW'
           ,'county_cd:invalid_alphanumeric:ALLOW'
-          ,'orig_date:invalid_slash_date:ALLOW'
-          ,'exp_date:invalid_slash_date:ALLOW'
+          ,'orig_date:invalid_slashO_date:ALLOW'
+          ,'exp_date:invalid_slashO_date:ALLOW'
           ,'license_state:invalid_alpha:ALLOW'
           ,'license_type:invalid_alphapound:ALLOW'
           ,'msa:invalid_numeric:ALLOW'

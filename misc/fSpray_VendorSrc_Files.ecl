@@ -1,4 +1,4 @@
-IMPORT VersionControl,_Control, ut, lib_fileservices,misc, tools;
+﻿IMPORT VersionControl,_Control, ut, lib_fileservices,misc, tools;
 
 EXPORT fSpray_VendorSrc_Files(
 	STRING		pVersion,
@@ -8,7 +8,7 @@ EXPORT fSpray_VendorSrc_Files(
 	STRING		pFile2Name						= 'Court*SLJ*.csv',
 	STRING		pFile3Name						= 'RiskView*.csv',
 	STRING		pFile4Name						= 'Vendor*Source*.csv',
-	STRING    pFile5Name    = 'CollegeLocator*.csv',
+	STRING    pFile5Name    = 'CollegeLocator*.txt',
 	STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor40_241','thor400_44'),
 	BOOLEAN		pIsTesting						= false,
 	BOOLEAN		pOverwrite						= true,
@@ -52,8 +52,8 @@ FUNCTION
 		,pDirectory                             
 		,pFile5Name                                          
 		,0                                                             
-		,'~thor_data400::in::vendor_src::college_locatorcourt_' + pVersion   
-		,[{'~thor::in::vendor_src::MasterList'}]    
+		,'~thor_data400::in::vendor_src::college_locator_' + pVersion   
+		,[{'~thor::in::vendor_src::collegelocator'}]    
 		,pGroupName                                                
 		,pVersion                                                   
 		,''                                                            

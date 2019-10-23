@@ -1,8 +1,8 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take IN Mortgage License raw file and convert it to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
-#workunit('name','map_INS0610_conversion');
+#workunit('name','Yogurt: map_INS0610_conversion');
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
 EXPORT map_INS0610_conversion(STRING pVersion) := FUNCTION
@@ -50,7 +50,7 @@ EXPORT map_INS0610_conversion(STRING pVersion) := FUNCTION
 	//Remove bad records before processing
 	ValidINFile	:= brCommon(TRIM(COMPANYID,LEFT,RIGHT) != 'Company Id' AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(ORG_NAME)));
 										
-	Prof_License_Mari.layouts.base	TransformToCommon(Prof_License_Mari.layout_INS0610.common L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	TransformToCommon(Prof_License_Mari.layout_INS0610.common L) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -71,7 +71,7 @@ EXPORT map_INS0610_conversion(STRING pVersion) := FUNCTION
 		SELF.PROCESS_DATE			:= thorlib.wuid()[2..9];
 
 		//Clean and parse Org_name
-		trim_org_name			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.ORG_NAME);
+		trim_org_name			:= ut.CleanSpacesAndUpper(L.ORG_NAME);
 		StdOrgDBA					:= REGEXREPLACE('(D[.]*B[.]*A[.]*) ',trim_org_name,'DBA ');
 		tmpNameOrg				:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(StdOrgDBA); //business name with standard corp abbr.
 		getCorpOnly				:= IF(REGEXFIND(DBApattern, tmpNameOrg), Prof_License_Mari.mod_clean_name_addr.GetCorpName(tmpNameOrg)
@@ -81,7 +81,7 @@ EXPORT map_INS0610_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_ORG				:= IF(REGEXFIND(IPpattern,getCorpOnly),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',getCorpOnly,' CO')),
 														Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',getCorpOnly,' CO')));   //Without punct. and Sufx removed
 		SELF.NAME_FORMAT		:= 'F';
-		SELF.NAME_ORG_SUFX 	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
+		SELF.NAME_ORG_SUFX 	:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
 	
 	 //get names with DBA prefix
 		temp_dba_name				:= Prof_License_Mari.mod_clean_name_addr.GetDBAName(tmpNameOrg);
@@ -90,11 +90,11 @@ EXPORT map_INS0610_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_DBA_PREFX	:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(tmpNameDBA); //split corporation prefix from name
 		SELF.NAME_DBA				:= IF(REGEXFIND(IPpattern,tmpNameDBA),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',tmpNameDBA,' CO')),
 														Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',tmpNameDBA,' CO')));
-		SELF.NAME_DBA_SUFX	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
+		SELF.NAME_DBA_SUFX	:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
 		SELF.DBA_FLAG				:= IF(TRIM(SELF.NAME_DBA) != ' ', 1, 0); // 1: true  0: false
 	
 		//SLNUM is no longer provided 2/6/13 Cathy Tio
-		/*tempLicNum					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.SLNUM);
+		/*tempLicNum					:= ut.CleanSpacesAndUpper(L.SLNUM);
 		SELF.LICENSE_NBR		:= tempLicNum; */
 		
 		SELF.LICENSE_STATE	:= src_st;
@@ -122,19 +122,19 @@ EXPORT map_INS0610_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_MARI_ORG		:= IF(TRIM(getCorpOnly) != ' ',TRIM(getCorpOnly,LEFT,RIGHT),' ');
 		SELF.NAME_MARI_DBA		:= tmpNameDBA;
 	
-		SELF.ADDR_ADDR1_1			:= IF(L.ADDRESS1 != '' ,Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS1),'');
-		SELF.ADDR_CITY_1		  := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.CITY);
-		SELF.ADDR_STATE_1			:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.STATE);
+		SELF.ADDR_ADDR1_1			:= IF(L.ADDRESS1 != '' ,ut.CleanSpacesAndUpper(L.ADDRESS1),'');
+		SELF.ADDR_CITY_1		  := ut.CleanSpacesAndUpper(L.CITY);
+		SELF.ADDR_STATE_1			:= ut.CleanSpacesAndUpper(L.STATE);
 		tmpZip	              := MAP(LENGTH(TRIM(L.ZIP))=3 => '00'+TRIM(L.ZIP),
 		                             LENGTH(TRIM(L.ZIP))=4 => '0'+TRIM(L.ZIP),
 						                     TRIM(L.ZIP));
 		SELF.ADDR_ZIP5_1		  := tmpZip[1..5];
 		SELF.ADDR_ZIP4_1		  := IF(StringLib.StringFind(L.ZIP,'-',1)>0,TRIM(L.ZIP,LEFT,RIGHT)[7..11],
 																 TRIM(L.ZIP,LEFT,RIGHT)[6..10]);
-		SELF.ADDR_CNTRY_1     := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.COUNTRY);
+		SELF.ADDR_CNTRY_1     := ut.CleanSpacesAndUpper(L.COUNTRY);
 		
 		//If BRANCH_MGR is populated, move to contact name
-		ClnUpperContact					:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.BRANCH_MGR);
+		ClnUpperContact					:= ut.CleanSpacesAndUpper(L.BRANCH_MGR);
 		ParseName								:= Address.CleanPersonFML73(ClnUpperContact);
 		SELF.NAME_CONTACT_FIRST	:= IF(ClnUpperContact != ' ',ParseName[6..25],' ');
 		SELF.NAME_CONTACT_MID		:= IF(ClnUpperContact != ' ',ParseName[26..45],' ');
@@ -176,10 +176,10 @@ EXPORT map_INS0610_conversion(STRING pVersion) := FUNCTION
 		SELF.cmc_slpk  := HASH64(TRIM(tempLicNum,LEFT,RIGHT) 
 		                       +TRIM(SELF.STD_LICENSE_TYPE,LEFT,RIGHT)
 										       +TRIM(src_cd,LEFT,RIGHT)
-				                   +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ORG_NAME)
-										       +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS1)
-													 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.CITY)
-													 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ZIP));										 
+				                   +ut.CleanSpacesAndUpper(L.ORG_NAME)
+										       +ut.CleanSpacesAndUpper(L.ADDRESS1)
+													 +ut.CleanSpacesAndUpper(L.CITY)
+													 +ut.CleanSpacesAndUpper(L.ZIP));										 
 
 		SELF := [];		   		   
 		
@@ -188,7 +188,7 @@ EXPORT map_INS0610_conversion(STRING pVersion) := FUNCTION
 	ds_map := PROJECT(ValidINFile, TransformToCommon(LEFT));
 
 	// Populate STD_LICENSE_STATUS field via translation on RAW_LICENSE_STATUS field
-	Prof_License_Mari.layouts.base trans_lic_status(ds_map L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_status(ds_map L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -199,7 +199,7 @@ EXPORT map_INS0610_conversion(STRING pVersion) := FUNCTION
 								trans_lic_status(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 								
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map_stat_trans L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_stat_trans L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -211,7 +211,7 @@ EXPORT map_INS0610_conversion(STRING pVersion) := FUNCTION
 	// company only table for affiliation code
 	company_only_lookup := ds_map_lic_trans(affil_type_cd='CO');																		
 																			
-	Prof_License_Mari.layouts.base	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in	assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;

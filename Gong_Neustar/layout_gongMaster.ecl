@@ -1,4 +1,4 @@
-import Gong_v2, BIPV2;
+﻿import Gong_v2, BIPV2;
 
 EXPORT layout_gongMaster := record
 	Layout_Neustar - filename;
@@ -21,4 +21,7 @@ EXPORT layout_gongMaster := record
   unsigned2 name_ind := 0;
   unsigned8 persistent_record_id := 0;
 	BIPV2.IDlayouts.l_xlink_ids;	
+  //CCPA-22 CCPA new fields
+  UNSIGNED4 global_sid := 0;
+  UNSIGNED8 record_sid := 0;
 end;

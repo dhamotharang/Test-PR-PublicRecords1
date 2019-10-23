@@ -1,4 +1,4 @@
-import _control;
+﻿import _control;
 /*
 	Check the following:
 	
@@ -13,7 +13,7 @@ pShouldPromote2QA 			:= true													;
 pShouldRollbackSources	:= true													;
 pShouldSendToStrata			:= true													;
 
-#workunit ('name', 'Build Business Header ' + pversion);
+#workunit ('name', 'Yogurt:Build Business Header ' + pversion);
 #workunit ('protect', true);
 #OPTION('multiplePersistInstances',FALSE);
 

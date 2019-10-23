@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 EXPORT SendReport := module
 
 	 rundatetime := ut.GetTimeDate();
@@ -19,8 +19,15 @@ ofaclayout := RECORD
   string1 add_delflag;
  END;
 
+joinrec := record
+ GlobalWatchLists.Layout_GlobalWatchLists;
+ 	  STRING10 date_updated;
+		STRING1 add_delflag;
+end;
 
-dIn_OFAC := dataset('~thor_200::in::globalwatchlists_updates', ofaclayout ,flat);
+dIn := dataset('~thor_200::in::globalwatchlists_updates', joinrec ,flat);
+
+dIn_OFAC := project ( dIn ,transform ( ofaclayout,self := left , self := []));
 
 ofaclayout commatr( dIn_OFAC l ) := transform
 self.orig_pty_name := regexreplace(',',l.orig_pty_name,'');
@@ -85,5 +92,5 @@ linestring := RECORD
 																						,
 																						,senderemail);
 		
-		EXPORT  out := Sequential ( Output( 'Send OFAC Monthly Report'),mail_mthly);
+		EXPORT  out := if ( count( dout_OFAC ) > 0, Sequential ( Output( 'Send OFAC Monthly Report'),mail_mthly),Output('No_OFAC_Updates_Received'));
 		end;

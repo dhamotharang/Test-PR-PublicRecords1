@@ -1,5 +1,5 @@
-import Address, ut;
-
+﻿import Address, ut, AID;
+//Added AID to the build
 in_file := VotersV2.Cleaned_Voters_DID;
 
 out_layout := record
@@ -76,10 +76,13 @@ Clean_Addr_Norn_file  := NORMALIZE(in_file,
 								       trim(left.zip4,left,right)        = trim(left.mail_zip4,left,right)),1,2)								      
 								   ,trfNormMailAddr(left,counter));
 
+//Added AID fields
 layout_voters_for_cache := record
 	out_layout;
-	string70 addr1_for_clean;
-	string40 addr2_for_clean;
+	string70 addr1_for_clean := '';
+	string40 addr2_for_clean := '';	
+	unsigned8	raw_aid	:= 0;													
+	unsigned8	ace_aid	:= 0;
 end;
 
 Clean_File_filt := Clean_Addr_Norn_file(trim(p_city_name,left,right) <> '' and
@@ -95,7 +98,7 @@ layout_voters_for_cache trfForAddrCache(Clean_File_filt l):= transform
 	self.addr1_for_clean := Address.Addr1FromComponents(l.prim_range, l.predir, l.prim_name, 
 												        l.addr_suffix, l.postdir, l.unit_desig,
 												        l.sec_range); 
-	self.addr2_for_clean := Address.Addr2FromComponents(l.p_city_name, l.st, l.zip);	
+	self.addr2_for_clean := Address.Addr2FromComponents(l.p_city_name, l.st, l.zip);
 end;
 
 clean_file_for_cache := project(Clean_File_filt, trfForAddrCache(left));
@@ -104,47 +107,57 @@ Address.MAC_Address_Clean(clean_file_for_cache,  //input file
 				          addr1_for_clean,       //addr1
 				          addr2_for_clean,       //addr2
 				          true,                  //'clean_misses'?
-				          Clean_Addr_File)       //output file
+				          Clean_Addr_File)       //output file					
 
-out_layout getAddrCache(Clean_Addr_File l) := transform
-	self.prim_range    				:= l.clean[1..10];
-	self.predir 	      			:= l.clean[11..12];
-	self.prim_name 	  				:= l.clean[13..40];
-	self.addr_suffix   				:= l.clean[41..44];
-	self.postdir 	    			:= l.clean[45..46];
-	self.unit_desig 	  			:= l.clean[47..56];
-	self.sec_range 	  				:= l.clean[57..64];
-	self.p_city_name	  			:= l.clean[65..89];
-	self.v_city_name	  			:= l.clean[90..114];
-	self.st 			      		:= if(l.clean[115..116] = '',
-					                      ziplib.ZipToState2(l.clean[117..121]),
-					                      l.clean[115..116]);
-	self.zip 		      			:= l.clean[117..121];
-	self.zip4 		      			:= l.clean[122..125];
-	self.cart 		      			:= l.clean[126..129];
-	self.cr_sort_sz 	 		 	:= l.clean[130];
-	self.lot 		      			:= l.clean[131..134];
-	self.lot_order 	  				:= l.clean[135];
-	self.dpbc 		      			:= l.clean[136..137];
-	self.chk_digit 	  				:= l.clean[138];
-	self.rec_type		  			:= l.clean[139..140];
-	self.ace_fips_st	  			:= l.clean[141..142];
-	self.fips_county 	  			:= l.clean[143..145];
-	self.geo_lat 	    			:= l.clean[146..155];
-	self.geo_long 	    			:= l.clean[156..166];
-	self.msa 		      			:= l.clean[167..170];
-	self.geo_blk                    := l.clean[171..177];
-	self.geo_match 	  				:= l.clean[178];
-	self.err_stat 	    			:= l.clean[179..182];
-	self := l;
-end;
+unsigned4	lFlags 	:= AID.Common.eReturnValues.ACEAIDs | AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;	
 
-clean_cache_addr_file := project(Clean_Addr_File, getAddrCache(left));
+//Added AID
+AID.MacAppendFromRaw_2Line(clean_file_for_cache, addr1_for_clean, addr2_for_clean, raw_aid, dwithAID, lFlags);
 
-clean_cache_file      := clean_cache_addr_file + Clean_file_emty;
+clean_cache_addr_file := project(dwithAID
+			,transform(layout_voters_for_cache,			
+			 self.ace_aid	      := left.aidwork_acecache.aid					;
+				self.raw_aid        := left.aidwork_rawaid								;
+				self.prim_range			:= left.aidwork_acecache.prim_range		;
+				self.predir					:= left.aidwork_acecache.predir				;
+				self.prim_name			:= left.aidwork_acecache.prim_name		;
+				self.addr_suffix		:= left.aidwork_acecache.addr_suffix	;
+				self.postdir				:= left.aidwork_acecache.postdir			;
+				self.unit_desig			:= left.aidwork_acecache.unit_desig		;
+				self.sec_range			:= left.aidwork_acecache.sec_range		;
+				self.p_city_name		:= left.aidwork_acecache.p_city_name	;
+				self.v_city_name		:= left.aidwork_acecache.v_city_name	;
+				self.st							:= left.aidwork_acecache.st						;
+				self.zip						:= left.aidwork_acecache.zip5					;
+				self.zip4						:= left.aidwork_acecache.zip4					;
+				self.cart						:= left.aidwork_acecache.cart					;
+				self.cr_sort_sz			:= left.aidwork_acecache.cr_sort_sz		;
+				self.lot						:= left.aidwork_acecache.lot					;
+				self.lot_order			:= left.aidwork_acecache.lot_order		;
+				self.dpbc						:= left.aidwork_acecache.dbpc					;
+				self.chk_digit			:= left.aidwork_acecache.chk_digit		;
+				self.rec_type				:= left.aidwork_acecache.rec_type			;
+				self.ace_fips_st    := left.aidwork_acecache.county[1..2]	;
+				self.fips_county		:= left.aidwork_acecache.county[3..]	;
+				self.geo_lat				:= left.aidwork_acecache.geo_lat			;
+				self.geo_long				:= left.aidwork_acecache.geo_long			;
+				self.msa						:= left.aidwork_acecache.msa					;
+				self.geo_blk				:= left.aidwork_acecache.geo_blk			;
+				self.geo_match			:= left.aidwork_acecache.geo_match		;
+				self.err_stat				:= left.aidwork_acecache.err_stat			;
+				self.addr1_for_clean := left.addr1_for_clean;
+				self.addr2_for_clean := left.addr2_for_clean;
+				self								                      := left																;
+			)
+		)
+		+ project(Clean_file_emty,transform(layout_voters_for_cache, 
+		self := left
+		,self := []));
+
+clean_cache_file      := clean_cache_addr_file;
 
 clean_cache_file_dist := distribute(clean_cache_file, vtid);
 
 full_norm_file := sort(clean_cache_file_dist, vtid, -process_date, -date_first_seen, addr_type, local);
 
-export Cleaned_Addr_Cache_Base :=  full_norm_file: persist(VotersV2.Cluster+'persist::voters::cache_Addr_base');
+export Cleaned_Addr_Cache_Base :=  full_norm_file: persist(VotersV2.Cluster+'persist::voters::cache_Addr_base',SINGLE);

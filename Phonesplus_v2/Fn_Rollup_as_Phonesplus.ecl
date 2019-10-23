@@ -1,4 +1,4 @@
-//****************Function to rollup records with the same CellPhoneIDKey********************
+﻿//****************Function to rollup records with the same CellPhoneIDKey********************
 import ut, mdr;
 export Fn_Rollup_as_Phonesplus(dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in) := function
 
@@ -56,6 +56,7 @@ recordof(phplus_in) t_rollup(phplus_in_s le, phplus_in ri) := transform
 	self.cur_orig_conf_score			:= ut.Max2(le.cur_orig_conf_score, ri.cur_orig_conf_score);
 	self.append_min_source_conf			:= ut.Min2(le.append_min_source_conf, ri.append_min_source_conf);
 	self.append_max_source_conf 		:= ut.Max2(le.append_max_source_conf , ri.append_max_source_conf );
+	self.rules := le.rules | ri.rules;
 	self := le;
 end;
 

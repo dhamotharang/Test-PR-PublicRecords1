@@ -1,4 +1,4 @@
-import address, BIPV2;
+﻿import address, BIPV2;
 export Layouts :=
 module
 
@@ -318,6 +318,10 @@ module
     string8			                    clean_ref_valid_date					  ;
 		string8			                    clean_valid_date								;
 		string10		                    cleaned_phone										;
+		// The below 2 fields are added for CCPA (California Consumer Protection Act) - JIRA# CCPA-14
+		// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+		unsigned4 											global_sid 									:= 0;
+		unsigned8 											record_sid 									:= 0;
 	end;
 	
 	////////////////////////////////////////////////////////////////////////
@@ -344,6 +348,10 @@ module
     BaseXML.clean_ref_valid_date					  ;
 		BaseXML.clean_valid_date								;
 		BaseXML.cleaned_phone										;
+		// The below 2 fields are added for CCPA (California Consumer Protection Act) - JIRA# CCPA-14
+		// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+		BaseXML.global_sid											;
+		BaseXML.record_sid											;
 	end;
 
 
@@ -376,6 +384,10 @@ module
 		Miscellaneous.Cleaned_Phones		clean_phones										;
 		unsigned8												source_rec_id								:= 0;
 		BIPV2.IDlayouts.l_xlink_ids 																		;
+		// The below 2 fields are added for CCPA (California Consumer Protection Act) - JIRA# CCPA-14
+		// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+		unsigned4 											global_sid 									:= 0;
+		unsigned8 											record_sid 									:= 0;
 	end;
 
 	export Keybuild :=
@@ -399,6 +411,10 @@ module
 
 		Miscellaneous.Cleaned_Dates			clean_dates											;
 		Miscellaneous.Cleaned_Phones		clean_phones										;
+		// The below 2 fields are added for CCPA (California Consumer Protection Act) - JIRA# CCPA-14
+		// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+		unsigned4 											global_sid 									:= 0;
+		unsigned8 											record_sid 									:= 0;
 	end;
 	
 	export Keybuild_BIP :=

@@ -35,13 +35,13 @@ EXPORT _ConstructTracebackFiles(string version_in, string iter_in) := Module
         integer2 company_address_score;
        END;
 	shared combo:=version_in + '_' + iter_in;
-	shared dotbase   := BIPV2_PROXID.In_DOT_Base;
-  shared ds:=BIPV2_PROXID.Keys(dotbase,combo).MatchSample(Conf>=BIPV2_PROXID.Config.MatchThreshold);
+	shared dotbase   := BIPV2_ProxID.In_DOT_Base;
+  shared ds:=BIPV2_ProxID.Keys(dotbase,combo).MatchSample(Conf>=BIPV2_ProxID.Config.MatchThreshold);
   shared js:= project(ds, transform(rec_m, self.version:=version_in; self.iternumber:=iter_in; self:=left));
   shared fpath:='~thor_data400::key::proxid::match_sample::shortform::_' + iter_in + '_' + version_in;// '_279_20160617';
   export k1:=output(js,,fpath,COMPRESSED,OVERWRITE);
 	
-	shared MatchSampleSuperPath:='~thor_data400::key::BIPV2_PROXID::proxMatchSample::super'+version_in;
+	shared MatchSampleSuperPath:='~thor_data400::key::BIPV2_ProxID::proxMatchSample::super'+version_in;
 	
 	shared	b0:=if(STD.File.SuperFileExists(MatchSampleSuperPath)=false,
 			       STD.File.CreateSuperFile(MatchSampleSuperPath));
@@ -71,16 +71,16 @@ EXPORT _ConstructTracebackFiles(string version_in, string iter_in) := Module
       end;
   
 	
-      //ds:=dataset('~temp::proxid::BIPV2_PROXID::changes_it20160617_273',rec,thor);
-	shared		dsf:=dataset('~temp::proxid::BIPV2_PROXID::changes_it' + combo,rec,thor);
+      //ds:=dataset('~temp::proxid::BIPV2_ProxID::changes_it20160617_273',rec,thor);
+	shared		dsf:=dataset('~temp::proxid::BIPV2_ProxID::changes_it' + combo,rec,thor);
   shared    dsf1:=table(dsf,{proxid_before,proxid_after});
   shared    dsf2:=dedup(dsf1,proxid_before,proxid_after,all);
   shared    dsf3:=dsf2(proxid_before<>proxid_after);
   shared    dsf4:=project(dsf3,transform(rec1, self.version:=version_in; self.iternumber:=iter_in; self:=left));
 			
-	shared		pth:='~temp::proxid::BIPV2_PROXID::changes::shortform::it' + combo;
-      //output(dsf4,,'~temp::proxid::BIPV2_PROXID::changes::shortform::it20160617_273',compressed,overwrite);
-	shared fpath5:='~thor_data400::keep::BIPV2_PROXID::proxChange::super' + version_in;
+	shared		pth:='~temp::proxid::BIPV2_ProxID::changes::shortform::it' + combo;
+      //output(dsf4,,'~temp::proxid::BIPV2_ProxID::changes::shortform::it20160617_273',compressed,overwrite);
+	shared fpath5:='~thor_data400::keep::BIPV2_ProxID::proxChange::super' + version_in;
 	export t1:=output(dsf4,,pth,compressed,overwrite);
 	
 	shared	b1:=if(STD.File.SuperFileExists(fpath5)=false,

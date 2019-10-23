@@ -2,17 +2,17 @@
 C:\Users\dittda01\AppData\Roaming\HPCC Systems\eclide\ddittman_prod\Dataland\Scrubs\ScrubsPlus\2017-08-30T13_57_38Z.ecl
 */
 
-IMPORT tools,std,ut;
 
-EXPORT ScrubsPlus(DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',filedate,emailList='', UseOnFail=false)	:=	FUNCTIONMACRO 
 
+EXPORT ScrubsPlus(DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',filedate,emailList='', UseOnFail=false, SubmitInWu=false)	:=	FUNCTIONMACRO 
+IMPORT tools,std,ut,SALT311;
 	folder						:=	#EXPAND(ScrubsModule);
 	inName						:=	IF(TRIM(ScopeName,ALL)<>'',TRIM(ScopeName,ALL)+'_In_'+DatasetName,'In_'+DatasetName);
 	inFile						:=	folder.#EXPAND(inName);
 	scrubs_name				:=	IF(TRIM(scopename,ALL)<>'',TRIM(scopename,ALL)+'_Scrubs','Scrubs');
 	scope_datasetName	:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+DatasetName,ScrubsProfileName);
 	profilename				:=	ScrubsProfileName;
-	Prefix						:=	IF(TRIM(scopename,ALL)<>'',scopename,ScrubsProfileName);
+	Prefix						:=	IF(TRIM(scopename,ALL)<>'',scopename,ScrubsProfileName+'_'+filedate);
 	
 	
 	
@@ -21,16 +21,14 @@ EXPORT ScrubsPlus(DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',fileda
 	S	:=	folder.#EXPAND(scrubs_name);									//	My scrubs module
 	N	:=	S.FromNone(F);																//	Generate the error flags
 	U :=	S.FromExpanded(N.ExpandedInFile);							//	Pass the expanded error flags into the Expanded module
-	ErrorSummary			:=	OUTPUT(U.SummaryStats, NAMED(Prefix+'_ErrorSummary'+filedate));										//	Show errors by field and type
-	EyeballSomeErrors	:=	OUTPUT(CHOOSEN(U.AllErrors, 1000), NAMED(Prefix+'_EyeballSomeErrors'+filedate));		//	Just eyeball some errors
-	SomeErrorValues		:=	OUTPUT(CHOOSEN(U.BadValues, 1000), NAMED(Prefix+'_SomeErrorValues'+filedate));			//	See my error field values
+	ErrorSummary			:=	OUTPUT(U.SummaryStats, NAMED(Prefix+'_ErrorSummary'));										//	Show errors by field and type
+	EyeballSomeErrors	:=	OUTPUT(CHOOSEN(U.AllErrors, 1000), NAMED(Prefix+'_EyeballSomeErrors'));		//	Just eyeball some errors
+	SomeErrorValues		:=	OUTPUT(CHOOSEN(U.BadValues, 1000), NAMED(Prefix+'_SomeErrorValues'));			//	See my error field values
 	
-	if(count(infile)=0,sequential(output('No Records Found in '+scopename,named('No_Record_Alert_'+Prefix)),
-																if(EmailList<>'',fileservices.sendEmail(emailList,'No Records Found in '+scopename,'No Records Found in '+scopename))));
-	
-	Orbit_stats					:=	U.OrbitStats(); 
-	OrbitReport					:=	output(Orbit_stats,,'~thor_data400::'+ScrubsProfileName+'_orbit_stats',all,thor,overwrite,expire(10),NAMED(Prefix+'_OrbitReport'+filedate));
-	OrbitReportSummary	:=	output(Scrubs.OrbitProfileStats(,,Orbit_stats).SummaryStats,,'~thor_data400::'+ScrubsProfileName+'_orbit_stats_summary',all,thor,overwrite,expire(10),NAMED(Prefix+'_OrbitReportSummary'+filedate));
+	LoadStats					:=	U.OrbitStats(); 
+	Orbit_stats			:=project(LoadStats,transform(Salt311.ScrubsOrbitLayout,self.RulePcnt := (decimal5_2) (((real)left.Rulecnt/(real)left.RecordsTotal) * 100.00);self:=left;));
+	OrbitReport					:=	output(Orbit_stats,,'~thor_data400::'+ScrubsProfileName+'_orbit_stats',all,thor,overwrite,expire(10),NAMED(Prefix+'_OrbitReport'));
+	OrbitReportSummary	:=	output(Scrubs.OrbitProfileStatsPost310(,,Orbit_stats).SummaryStats,,'~thor_data400::'+ScrubsProfileName+'_orbit_stats_summary',all,thor,overwrite,expire(10),NAMED(Prefix+'_OrbitReportSummary'));
 	NumRules						:=	Count(Orbit_stats);
 	NumFailedRules			:=	Count(Orbit_Stats(rulecnt>0));
 	TotalRecs						:=	Count(N.ExpandedInFile);
@@ -113,9 +111,9 @@ EXPORT ScrubsPlus(DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',fileda
 	//This will output a file with bitmap(s) and a processed file with all on fail flags activated for the rules
 	bitfile_name		:=	'~thor_data::'+scope_datasetName+'::Scrubs_Bits';
 	processedfile_name		:=	'~thor_data::'+scope_datasetName+'::Processed_File';
-	CreateBitmaps		:=	OUTPUT( N.BitmapInfile,,bitfile_name, OVERWRITE, compressed, named(scope_datasetName+'_BitFile_'+filedate)); // long term storage
+	CreateBitmaps		:=	OUTPUT( N.BitmapInfile,,bitfile_name, OVERWRITE, compressed, named(scope_datasetName+'_BitFile_')); // long term storage
 	#if(UseOnFail)
-	CreateProcessed		:=	OUTPUT( N.ProcessedInfile,,processedfile_name, OVERWRITE, compressed, named(scope_datasetName+'_ProcessedInfile_'+filedate)); // long term storage	
+	CreateProcessed		:=	OUTPUT( N.ProcessedInfile,,processedfile_name, OVERWRITE, compressed, named(scope_datasetName+'_ProcessedInfile_')); // long term storage	
 	#end
 	DS := DATASET(bitfile_name,S.Bitmap_Layout,FLAT); // Read in my data (which has bitmap appended
 	//This will translate the bitmap(s)
@@ -125,7 +123,9 @@ EXPORT ScrubsPlus(DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',fileda
 	new_entry:=dataset([{DatasetName,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,NumExceedThreshold,NumExceedSevere,ErroredRecords,TotalRemovedRecs,PcntErroredRec,workunit}],Scrubs.Layouts.LogRecord);
 	outnew:=output(new_entry);
 
-	EmailReport:=if(emailList <>'' , fileservices.sendEmail(emailList,
+	EmailReport:=if(count(infile)=0,sequential(output('No Records Found in '+profilename,named('No_Record_Alert_'+Prefix)),
+																			if(emailList <>'' ,fileservices.sendEmail(emailList,'No Records Found in '+profilename,'No Records Found in '+profilename)))
+																			,if(emailList <>'' ,fileservices.sendEmail(emailList,
 																			'Scrubs Plus Reporting '+ProfileName,
 																			'Scrubs Plus Reporting\n\n'+
 																			'DatasetName:'+DatasetName+'\n'+
@@ -140,13 +140,16 @@ EXPORT ScrubsPlus(DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',fileda
 																			'Total Number of Errored Records:'+ErroredRecords+'\n'+
 																			'Percent Errored Records:'+PcntErroredRec+'\n'+
 																			'Total Number of Removed Recs:'+TotalRemovedRecs+'\n'+
-																			'Workunit:'+tools.fun_GetWUBrowserString()+'\n'));
-	
-	SubmitStats						:=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStats;
+																			'Workunit:'+tools.fun_GetWUBrowserString()+'\n')));
+	#IF(SubmitInWu = true)
+	SubmitStats						:=	Scrubs.OrbitProfileStatsPost310(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStatsInWU;
+	#ELSE
+	SubmitStats						:=	Scrubs.OrbitProfileStatsPost310(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStats;
+	#END
 	SuperFile:='~thor_data400::ScrubsPlus::log';
-	Super_Log_File:='~thor_data400::ScrubsPlus::'+ScrubsModule+'::Log::'+workunit+'::'+ScrubsProfileName;
+	Super_Log_File:='~thor_data400::ScrubsPlus::'+ScrubsModule+'::Log::'+workunit+'::'+Prefix;
 	
-	Create_New_File	:=	output(new_entry,,Super_Log_File,thor,overwrite,named(scope_datasetName+'_LogEntryFull'));
+	Create_New_File	:=	output(new_entry,,Super_Log_File,thor,overwrite,named(Prefix+'_LogEntryFull'));
 
 
 

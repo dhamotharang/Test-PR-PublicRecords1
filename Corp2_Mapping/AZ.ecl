@@ -1,4 +1,4 @@
-import  tools, ut, std, versioncontrol, Corp2, Corp2_Raw_AZ, Scrubs_Corp2_Mapping_AZ_Main, Scrubs_Corp2_Mapping_AZ_Event, Scrubs;
+﻿import  tools, ut, std, versioncontrol, Corp2, Corp2_Raw_AZ, Scrubs_Corp2_Mapping_AZ_Main, Scrubs_Corp2_Mapping_AZ_Event, Scrubs;
 
 Export AZ := MODULE; 
  
@@ -403,16 +403,13 @@ Export AZ := MODULE;
 		
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_AZ Report' //subject
 																																	 ,'Scrubs CorpMain_AZ Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpAZMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );		
+																																	);		
 																																 
 		Main_BadRecords := Main_T.ExpandedInFile(	dt_vendor_first_reported_invalid 			 <> 0 or
 																							dt_vendor_last_reported_invalid 			 <> 0 or

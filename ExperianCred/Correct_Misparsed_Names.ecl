@@ -1,9 +1,8 @@
+﻿export Correct_Misparsed_Names(string ver) := module
+
 input_files := Files.File_In ;
+
 corrected_misparsed_names := experiancred.fn_correct_misparsed_names(input_files);
-SEQUENTIAL(OUTPUT(corrected_misparsed_names,,Superfile_List.Source_File_After_Name_Flip + version ,overwrite,__compressed__);
-		   FileServices.StartSuperFileTransaction(),				
-		   FileServices.AddSuperFile(Superfile_List.Source_File_After_Name_Flip,Superfile_List.Source_File_After_Name_Flip + version),
-		   FileServices.FinishSuperFileTransaction());
 
 Layouts.Layout_In t_reset_orig_names (corrected_misparsed_names le) := transform
 	self.Surname          := le.reparsed_surname;
@@ -30,4 +29,6 @@ end;
 
 reset_orig_names := project(corrected_misparsed_names, t_reset_orig_names(left));
 
-export Correct_Misparsed_Names := reset_orig_names;
+export ALL := reset_orig_names;
+
+END;

@@ -1,86 +1,22 @@
-IMPORT ut,strata, BKForeclosure;
+﻿IMPORT ut,strata, BKForeclosure;
 
 EXPORT Strata_Population_Stats_Nod(STRING filedate) := FUNCTION
 basefile_nod := File_BK_Foreclosure.fNod;
 rPopulationStats_NOD := RECORD
-      basefile_nod.st;
-      CountGroup     := COUNT(GROUP); 
-      create_dte_CountNonBlank        := SUM(GROUP,IF(basefile_nod.create_dte<>'',1,0));       
-	    last_upd_dte_CountNonBlank      := SUM(GROUP,IF(basefile_nod.last_upd_dte<>'',1,0));   
- 	    stamp_dte_CountNonBlank         := SUM(GROUP,IF(basefile_nod.stamp_dte<>'',1,0));   
-	    date_first_seen_CountNonBlank   := SUM(GROUP,IF(basefile_nod.date_first_seen<>'',1,0));   
-	    date_last_seen_CountNonBlank    := SUM(GROUP,IF(basefile_nod.date_last_seen<>'',1,0));  
+      basefile_nod.src_state;
+      CountGroup     := COUNT(GROUP);
+			record_id_CountNonBlank         	:= SUM(GROUP,IF(basefile_nod.record_id<>0,1,0));   
+	    date_first_seen_CountNonBlank   	:= SUM(GROUP,IF(basefile_nod.date_first_seen<>'',1,0));   
+	    date_last_seen_CountNonBlank    	:= SUM(GROUP,IF(basefile_nod.date_last_seen<>'',1,0));  
 	    date_vendor_first_reported_CountNonBlank   := SUM(GROUP,IF(basefile_nod.date_vendor_first_reported<>'',1,0));   
 	    date_vendor_last_reported_CountNonBlank    := SUM(GROUP,IF(basefile_nod.date_vendor_last_reported<>'',1,0));   
-	    process_date_CountNonBlank      := SUM(GROUP,IF(basefile_nod.process_date<>'',1,0));   
-      src_CountNonBlank               := SUM(GROUP,IF(basefile_nod.src<>'',1,0));  
-	    record_id_CountNonBlank         := SUM(GROUP,IF(basefile_nod.record_id<>'',1,0));   
-      did_CountNonZero                := SUM(GROUP,IF(basefile_nod.did<>0,1,0));   
-	    rawaidin_CountNonZero           := SUM(GROUP,IF(basefile_nod.rawaidin<>0,1,0));
-      cleanaid_CountNonZero           := SUM(GROUP,IF(basefile_nod.cleanaid<>0,1,0));  
-   		addresstype_CountNonBlank       := SUM(GROUP,IF(basefile_nod.addresstype<>'',1,0));  
-   		prim_range_CountNonBlank        := SUM(GROUP,IF(basefile_nod.prim_range<>'',1,0));  
-   		predir_CountNonBlank            := SUM(GROUP,IF(basefile_nod.predir<>'',1,0));
-      prim_name_CountNonBlank         := SUM(GROUP,IF(basefile_nod.prim_name<>'',1,0));
-   		addr_suffix_CountNonBlank       := SUM(GROUP,IF(basefile_nod.addr_suffix<>'',1,0));
-   		postdir_CountNonBlank           := SUM(GROUP,IF(basefile_nod.postdir<>'',1,0));
-   		unit_desig_CountNonBlank        := SUM(GROUP,IF(basefile_nod.unit_desig<>'',1,0));
-   		sec_range_CountNonBlank         := SUM(GROUP,IF(basefile_nod.sec_range<>'',1,0));
-   		p_city_name_CountNonBlank       := SUM(GROUP,IF(basefile_nod.p_city_name<>'',1,0));
-   		v_city_name_CountNonBlank       := SUM(GROUP,IF(basefile_nod.v_city_name<>'',1,0));
-   		// st_CountNonBlank                := SUM(GROUP,IF(basefile_nod.st<>'',1,0));
-   		zip_CountNonBlank               := SUM(GROUP,IF(basefile_nod.zip<>'',1,0));
-   		zip4_CountNonBlank              := SUM(GROUP,IF(basefile_nod.zip4<>'',1,0));
-   		cart_CountNonBlank              := SUM(GROUP,IF(basefile_nod.cart<>'',1,0));
-   		cr_sort_sz_CountNonBlank        := SUM(GROUP,IF(basefile_nod.cr_sort_sz<>'',1,0));
-   		lot_CountNonBlank               := SUM(GROUP,IF(basefile_nod.lot<>'',1,0));
-   		lot_order_CountNonBlank         := SUM(GROUP,IF(basefile_nod.lot_order<>'',1,0));
-   		dbpc_CountNonBlank              := SUM(GROUP,IF(basefile_nod.dbpc<>'',1,0));
-   		chk_digit_CountNonBlank    := SUM(GROUP,IF(basefile_nod.chk_digit<>'',1,0));
-   		rec_type_CountNonBlank     := SUM(GROUP,IF(basefile_nod.rec_type<>'',1,0));
-   		county_CountNonBlank       := SUM(GROUP,IF(basefile_nod.county<>'',1,0));
-   		geo_lat_CountNonBlank      := SUM(GROUP,IF(basefile_nod.geo_lat<>'',1,0));
-   		geo_long_CountNonBlank     := SUM(GROUP,IF(basefile_nod.geo_long<>'',1,0));
-   		msa_CountNonBlank          := SUM(GROUP,IF(basefile_nod.msa<>'',1,0));
-   		geo_blk_CountNonBlank      := SUM(GROUP,IF(basefile_nod.geo_blk<>'',1,0));
-   		geo_match_CountNonBlank    := SUM(GROUP,IF(basefile_nod.geo_match<>'',1,0));
-   		err_stat_CountNonBlank     := SUM(GROUP,IF(basefile_nod.err_stat<>'',1,0));
-	    pdid_CountNonBlank         := SUM(GROUP,IF(basefile_nod.pdid<>'',1,0));
-	    pfrd_address_ind_CountNonBlank   := SUM(GROUP,IF(basefile_nod.pfrd_address_ind<>'',1,0));
-	    rawAid_CountNonZero             := SUM(GROUP,IF(basefile_nod.rawAid<>0,1,0));
-      nid_CountNonZero                := SUM(GROUP,IF(basefile_nod.nid<>0,1,0));
-	 		cln_title_CountNonBlank    := SUM(GROUP,IF(basefile_nod.cln_title<>'',1,0));
-	  	cln_fname_CountNonBlank    := SUM(GROUP,IF(basefile_nod.cln_fname<>'',1,0));
-	  	cln_mname_CountNonBlank    := SUM(GROUP,IF(basefile_nod.cln_mname<>'',1,0));
-	  	cln_lname_CountNonBlank    := SUM(GROUP,IF(basefile_nod.cln_lname<>'',1,0));
-	 		cln_suffix_CountNonBlank   := SUM(GROUP,IF(basefile_nod.cln_suffix<>'',1,0));
-			cln_title2_CountNonBlank   := SUM(GROUP,IF(basefile_nod.cln_title2<>'',1,0));
-	  	cln_fname2_CountNonBlank   := SUM(GROUP,IF(basefile_nod.cln_fname2<>'',1,0));
-	  	cln_mname2_CountNonBlank   := SUM(GROUP,IF(basefile_nod.cln_mname2<>'',1,0));
-	  	cln_lname2_CountNonBlank   := SUM(GROUP,IF(basefile_nod.cln_lname2<>'',1,0));
-	   	cln_suffix2_CountNonBlank  := SUM(GROUP,IF(basefile_nod.cln_suffix2<>'',1,0));
-      name_ind_CountNonZero      := SUM(GROUP,IF(basefile_nod.name_ind<>0,1,0));
-      persistent_record_id_CountNonZero := SUM(GROUP,IF(basefile_nod.persistent_record_id<>0,1,0));
-	    cname_CountNonBlank               := SUM(GROUP,IF(basefile_nod.cname<>'',1,0));
-	    Orig_Address_CountNonBlank        := SUM(GROUP,IF(basefile_nod.Orig_Address<>'',1,0));
-	    Orig_Unit_CountNonBlank           := SUM(GROUP,IF(basefile_nod.Orig_Unit<>'',1,0));
-	    Orig_City_CountNonBlank           := SUM(GROUP,IF(basefile_nod.Orig_City<>'',1,0));
-	    Orig_State_CountNonBlank          := SUM(GROUP,IF(basefile_nod.Orig_State<>'',1,0));
-	    Orig_Zip5_CountNonBlank           := SUM(GROUP,IF(basefile_nod.Orig_Zip5<>'',1,0));
-	    Orig_Zip4_CountNonBlank           := SUM(GROUP,IF(basefile_nod.Orig_Zip4<>'',1,0));
-      AddrType_CountNonBlank            := SUM(GROUP,IF(basefile_nod.AddrType<>'',1,0));
-      NAME_FULL_CountNonBlank           := SUM(GROUP,IF(basefile_nod.NAME_FULL<>'',1,0));
-	    Name_First_CountNonBlank          := SUM(GROUP,IF(basefile_nod.Name_First<>'',1,0));
-	    Name_Last_CountNonBlank           := SUM(GROUP,IF(basefile_nod.Name_Last<>'',1,0));
-	    Name_Type_CountNonBlank           := SUM(GROUP,IF(basefile_nod.Name_Type<>'',1,0)); 
-	    TYPE_CODE_CountNonBlank           := SUM(GROUP,IF(basefile_nod.TYPE_CODE<>'',1,0));
-	    Company_Name_CountNonBlank        := SUM(GROUP,IF(basefile_nod.Company_Name<>'',1,0));
-      // append_row_ID_CountNonZero        := SUM(GROUP,IF(basefile_nod.append_row_ID<>0,1,0));
-	    ln_filedate_CountNonBlank         := SUM(GROUP,IF(basefile_nod.ln_filedate<>'',1,0));
+	    process_date_CountNonBlank      	:= SUM(GROUP,IF(basefile_nod.process_date<>'',1,0));   
+      src_CountNonBlank               	:= SUM(GROUP,IF(basefile_nod.src<>'',1,0));  
 	    Delete_Flag_CountNonBlank         := SUM(GROUP,IF(basefile_nod.Delete_Flag<>'',1,0));
+			foreclosure_id_CountNonBlank			:= SUM(GROUP,IF(basefile_nod.foreclosure_id<>'',1,0));
+			ln_filedate_CountNonBlank         := SUM(GROUP,IF(basefile_nod.ln_filedate<>'',1,0));
 	    bk_infile_type_CountNonBlank      := SUM(GROUP,IF(basefile_nod.bk_infile_type<>'',1,0));	
 	    src_county_CountNonBlank          := SUM(GROUP,IF(basefile_nod.src_county<>'',1,0));
-	    src_state_CountNonBlank           := SUM(GROUP,IF(basefile_nod.src_state<>'',1,0));
 	    fips_cd_CountNonBlank             := SUM(GROUP,IF(basefile_nod.fips_cd<>'',1,0));
 	    doc_type_CountNonBlank            := SUM(GROUP,IF(basefile_nod.doc_type<>'',1,0));
 	    recording_dt_CountNonBlank        := SUM(GROUP,IF(basefile_nod.recording_dt<>'',1,0));
@@ -158,17 +94,13 @@ rPopulationStats_NOD := RECORD
 	    deed_pid_CountNonBlank            := SUM(GROUP,IF(basefile_nod.deed_pid<>'',1,0));
 	    lps_internal_pid_CountNonBlank    := SUM(GROUP,IF(basefile_nod.lps_internal_pid<>'',1,0));
 	    nod_source_CountNonBlank          := SUM(GROUP,IF(basefile_nod.nod_source<>'',1,0));
+			document_desc_CountNonBlank				:= SUM(GROUP,IF(basefile_nod.document_desc<>'',1,0));
 END;
 
   
-basestrata_nod := SORT(TABLE(basefile_nod,rPopulationStats_NOD,st,few),st);
+	basestrata := SORT(TABLE(basefile_nod,rPopulationStats_NOD,src_state,few),src_state);
 
-STRATA.createXMLStats(basestrata_nod,
-                      'BKForeclosure_Nod Stats',
-					            'data',
-					            filedate,
-					            'Xia.Sheng@LexisNexis.com',
-					            strataresults
-					           );
-return strataresults;
+	strata.createXMLStats(basestrata,'BKForeclosure_Nod','data',filedate,'',strataResults);
+	
+RETURN strataresults;
 END;							 

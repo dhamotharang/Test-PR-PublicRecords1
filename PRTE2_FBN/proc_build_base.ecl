@@ -1,19 +1,24 @@
-IMPORT  PromoteSupers, ut, NID, Address, BIPV2, STD,PRTE2;
+﻿IMPORT  PromoteSupers, ut, NID, Address, BIPV2, STD,PRTE2;
 
 EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 
-dMain := files.fbnv2_business_IN;
+// dMain := files.fbnv2_business_IN;
+// dMain_2 := files.fbnv2_contact_IN;
 
-Layouts.Combined_Business_Base ClnMain(dMain L) := TRANSFORM
-		string73 tempname 		 					 := if(trim(L.Bus_name) = '', '',Address.CleanPersonFML73(L.bus_name));
-		pname 							 	 					 := Address.CleanNameFields(tempName);
-		self.title						 					 := pname.title;
-		self.fname 						 					 := pname.fname;        
-		self.mname 						 					 := pname.mname;
-		self.lname 						 					 := pname.lname;		  
-		self.name_suffix 			 					 := pname.name_suffix;
-		self.name_score			   					 := pname.name_score;
-																				
+PRTE2.CleanFields(files.fbnv2_business_IN,BusinessCln);
+PRTE2.CleanFields(files.fbnv2_contact_IN,ContactCln);
+
+
+Layouts.Combined_Business_Base_ext ClnMain(BusinessCln L) := TRANSFORM
+		// string73 tempname 		 					 := if(trim(L.Bus_name) = '', '',Address.CleanPersonFML73(L.bus_name));
+		// pname 							 	 					 := Address.CleanNameFields(tempName);
+		// self.title						 					 := pname.title;
+		// self.fname 						 					 := pname.fname;        
+		// self.mname 						 					 := pname.mname;
+		// self.lname 						 					 := pname.lname;		  
+		// self.name_suffix 			 					 := pname.name_suffix;
+		// self.name_score			   					 := pname.name_score;
+		self.bus_name			:= L.bus_name;																		
 		TempPAddr					:= Address.CleanAddress182(TRIM(L.BUS_ADDRESS1,left,right),TRIM(L.Bus_city,left,right) + ', '+
 																								TRIM(L.Bus_state,left,right) +' '+ TRIM((string)L.Bus_zip,left,right));
 
@@ -48,17 +53,30 @@ Layouts.Combined_Business_Base ClnMain(dMain L) := TRANSFORM
 		self.err_stat				:= TempPAddr[179..182];
 		self.prep_addr_line1			:= Address.Addr1FromComponents(ut.CleanSpacesAndUpper(L.Bus_address1),'','','','','',''); 
 		self.prep_addr_line_last	:= Address.Addr2FromComponents(ut.CleanSpacesAndUpper(L.Bus_city),ut.CleanSpacesAndUpper(L.Bus_State),TRIM((string)L.Bus_ZIP,left,right));
-    self.bdid := 0;		
-		//self.bdid := Prte2. fn_AppendFakeID.bdid((string)l.ORIG_FEIN, (string)l.INC_DATE, l.cust_name);		
+    self.bdid                 := prte2.fn_AppendFakeID.bdid(L.link_bus_name, self.prim_range,  self.prim_name,  self.v_city_name,  self.st,  self.zip,  L.cust_name);
+		self.global_sid := 0;
+    self.record_sid := 0;
 		self := L;
 		SELF := [];
 	END;
 	
-df_business	:= PROJECT(dMain, ClnMain(left));
+df_business	:= PROJECT(BusinessCln, ClnMain(left));
 
-dMain_2 := files.fbnv2_contact_IN;
+ds_business_linkids := project(df_business, transform(layouts.Combined_Business_Base_ext,
+																													  self.bdid := prte2.fn_AppendFakeID.bdid(left.link_bus_name, left.prim_range,  left.prim_name,  left.v_city_name,  left.st,  left.zip,  left.cust_name);
+		
+																															vLinkingIds := Prte2.fn_AppendFakeID.LinkIds(left.link_bus_name, left.link_fein, left.link_inc_date, left.prim_range, left.prim_name, left.sec_range, 
+																																																																													left.v_city_name, left.st, left.zip, left.cust_name);
+																															self.powid				:= vLinkingIds.powid;
+																															self.proxid			:= vLinkingIds.proxid;
+																															self.seleid			:= vLinkingIds.seleid;
+																															self.orgid				:= vLinkingIds.orgid;
+																															self.ultid				:= vLinkingIds.ultid;
+																															self := left;
+																															self	:= [];
+																															));
 
-Layouts.Combined_Contact_Base ClnMain_2(dMain_2 L) := TRANSFORM
+Layouts.Combined_Contact_Base_Ext	 ClnMain_2(ContactCln L) := TRANSFORM
 		string73 tempname 		 					 := if(trim(L.Contact_name) = '', '',Address.CleanPersonFML73(L.contact_name));
 		pname 							 	 					 := Address.CleanNameFields(tempName);
 		self.title						 					 := pname.title;
@@ -102,15 +120,17 @@ Layouts.Combined_Contact_Base ClnMain_2(dMain_2 L) := TRANSFORM
 		self.err_stat				:= TempPAddr[179..182];
 		self.prep_addr_line1			:= Address.Addr1FromComponents(ut.CleanSpacesAndUpper(L.CONTACT_ADDR),'','','','','',''); 
 		self.prep_addr_line_last	:= Address.Addr2FromComponents(ut.CleanSpacesAndUpper(L.Contact_city),ut.CleanSpacesAndUpper(L.Contact_State),TRIM((string)L.Contact_ZIP,left,right));
-    self.bdid := 0;    
+    // self.bdid := 0;    
 		self.Did:=Prte2.fn_AppendFakeID.did(self.fname, self.lname, l.ssn, (string)l.dob, l.cust_name);		
+    self.global_sid := 0;
+    self.record_sid := 0;
     self := L;   
 	 SELF := [];
 	END;
 
-df_contact	:= PROJECT(dMain_2, ClnMain_2(left));
+df_contact	:= PROJECT(ContactCln, ClnMain_2(left));
 
-PromoteSupers.MAC_SF_BuildProcess(df_business,constants.Base_fbnv2_Business, writefile_business);
+PromoteSupers.MAC_SF_BuildProcess(ds_business_linkids,constants.Base_fbnv2_Business, writefile_business);
 
 PromoteSupers.MAC_SF_BuildProcess(df_contact,constants.Base_fbnv2_Contact, writefile_contact);
 

@@ -1,4 +1,4 @@
-// Begin code to append flags to the file
+﻿// Begin code to append flags to the file
 IMPORT SALT30,ut;
 EXPORT Flags(DATASET(layout_Base) ih,layout_specificities.R s = Specificities(ih).specificities[1],BOOLEAN RoxieService=FALSE) := MODULE
   h00 := BasicMatch(ih).input_file;
@@ -37,6 +37,10 @@ SHARED b := Best(ih);
     SELF.company_naics_code1_flag := MAP ( ri.company_naics_code1  IN SET(s.nulls_company_naics_code1,company_naics_code1) => SALT30.Flags.Null,
       le.company_naics_code1  IN SET(s.nulls_company_naics_code1,company_naics_code1) => SALT30.Flags.Missing,
       le.company_naics_code1 = ri.company_naics_code1 => SALT30.Flags.Equal,
+      SALT30.Flags.Bad);
+    SELF.dba_name_flag := MAP ( ri.dba_name  IN SET(s.nulls_dba_name,dba_name) => SALT30.Flags.Null,
+      le.dba_name  IN SET(s.nulls_dba_name,dba_name) => SALT30.Flags.Missing,
+      le.dba_name = ri.dba_name => SALT30.Flags.Equal,
       SALT30.Flags.Bad);
     SELF.address_flag := MAP ( (ri.address_prim_range  IN SET(s.nulls_prim_range,prim_range) AND ri.address_predir  IN SET(s.nulls_predir,predir) AND ri.address_prim_name  IN SET(s.nulls_prim_name,prim_name) AND ri.address_addr_suffix  IN SET(s.nulls_addr_suffix,addr_suffix) AND ri.address_postdir  IN SET(s.nulls_postdir,postdir) AND ri.address_unit_desig  IN SET(s.nulls_unit_desig,unit_desig) AND ri.address_sec_range  IN SET(s.nulls_sec_range,sec_range) AND ri.address_st  IN SET(s.nulls_st,st) AND ri.address_zip  IN SET(s.nulls_zip,zip)) => SALT30.Flags.Null,
       (le.prim_range  IN SET(s.nulls_prim_range,prim_range) AND le.predir  IN SET(s.nulls_predir,predir) AND le.prim_name  IN SET(s.nulls_prim_name,prim_name) AND le.addr_suffix  IN SET(s.nulls_addr_suffix,addr_suffix) AND le.postdir  IN SET(s.nulls_postdir,postdir) AND le.unit_desig  IN SET(s.nulls_unit_desig,unit_desig) AND le.sec_range  IN SET(s.nulls_sec_range,sec_range) AND le.st  IN SET(s.nulls_st,st) AND le.zip  IN SET(s.nulls_zip,zip)) => SALT30.Flags.Missing,
@@ -107,6 +111,14 @@ EXPORT In_Flagged := In_Flagged0;
     REAL4 company_naics_code1_Relative_pcnt := AVE(GROUP,IF(In_Flagged.company_naics_code1_Flag = SALT30.Flags.Relative,100,0));
     REAL4 company_naics_code1_Relative_Possible_pcnt := AVE(GROUP,IF(In_Flagged.company_naics_code1_Flag = SALT30.Flags.Relative_Possible,100,0));
     REAL4 company_naics_code1_Relative_Fuzzy_pcnt := AVE(GROUP,IF(In_Flagged.company_naics_code1_Flag = SALT30.Flags.Relative_Fuzzy,100,0));
+    REAL4 dba_name_Null_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Null,100,0));
+    REAL4 dba_name_Equal_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Equal,100,0));
+    REAL4 dba_name_Fuzzy_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Fuzzy,100,0));
+    REAL4 dba_name_Bad_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Bad,100,0));
+    REAL4 dba_name_Missing_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Missing,100,0));
+    REAL4 dba_name_Relative_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Relative,100,0));
+    REAL4 dba_name_Relative_Possible_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Relative_Possible,100,0));
+    REAL4 dba_name_Relative_Fuzzy_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Relative_Fuzzy,100,0));
     REAL4 address_Null_pcnt := AVE(GROUP,IF(In_Flagged.address_Flag = SALT30.Flags.Null,100,0));
     REAL4 address_Equal_pcnt := AVE(GROUP,IF(In_Flagged.address_Flag = SALT30.Flags.Equal,100,0));
     REAL4 address_Fuzzy_pcnt := AVE(GROUP,IF(In_Flagged.address_Flag = SALT30.Flags.Fuzzy,100,0));
@@ -176,6 +188,14 @@ EXPORT In_Flagged_Summary := TABLE(In_Flagged,FlagTots); // Global summary
     REAL4 company_naics_code1_Relative_pcnt := AVE(GROUP,IF(In_Flagged.company_naics_code1_Flag = SALT30.Flags.Relative,100,0));
     REAL4 company_naics_code1_Relative_Possible_pcnt := AVE(GROUP,IF(In_Flagged.company_naics_code1_Flag = SALT30.Flags.Relative_Possible,100,0));
     REAL4 company_naics_code1_Relative_Fuzzy_pcnt := AVE(GROUP,IF(In_Flagged.company_naics_code1_Flag = SALT30.Flags.Relative_Fuzzy,100,0));
+    REAL4 dba_name_Null_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Null,100,0));
+    REAL4 dba_name_Equal_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Equal,100,0));
+    REAL4 dba_name_Fuzzy_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Fuzzy,100,0));
+    REAL4 dba_name_Bad_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Bad,100,0));
+    REAL4 dba_name_Missing_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Missing,100,0));
+    REAL4 dba_name_Relative_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Relative,100,0));
+    REAL4 dba_name_Relative_Possible_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Relative_Possible,100,0));
+    REAL4 dba_name_Relative_Fuzzy_pcnt := AVE(GROUP,IF(In_Flagged.dba_name_Flag = SALT30.Flags.Relative_Fuzzy,100,0));
     REAL4 address_Null_pcnt := AVE(GROUP,IF(In_Flagged.address_Flag = SALT30.Flags.Null,100,0));
     REAL4 address_Equal_pcnt := AVE(GROUP,IF(In_Flagged.address_Flag = SALT30.Flags.Equal,100,0));
     REAL4 address_Fuzzy_pcnt := AVE(GROUP,IF(In_Flagged.address_Flag = SALT30.Flags.Fuzzy,100,0));
@@ -219,6 +239,10 @@ EXPORT In_Flagged_Summary_BySrc := TABLE(In_Flagged,FlagTots,source_for_votes,FE
     SELF.company_naics_code1_flag := MAP ( ri.company_naics_code1  IN SET(s.nulls_company_naics_code1,company_naics_code1) => SALT30.Flags.Null,
       le.company_naics_code1  IN SET(s.nulls_company_naics_code1,company_naics_code1) => SALT30.Flags.Missing,
       le.company_naics_code1 = ri.company_naics_code1 => SALT30.Flags.Equal,
+      SALT30.Flags.Bad);
+    SELF.dba_name_flag := MAP ( ri.dba_name  IN SET(s.nulls_dba_name,dba_name) => SALT30.Flags.Null,
+      le.dba_name  IN SET(s.nulls_dba_name,dba_name) => SALT30.Flags.Missing,
+      le.dba_name = ri.dba_name => SALT30.Flags.Equal,
       SALT30.Flags.Bad);
     SELF.address_flag := MAP ( (ri.address_prim_range  IN SET(s.nulls_prim_range,prim_range) AND ri.address_predir  IN SET(s.nulls_predir,predir) AND ri.address_prim_name  IN SET(s.nulls_prim_name,prim_name) AND ri.address_addr_suffix  IN SET(s.nulls_addr_suffix,addr_suffix) AND ri.address_postdir  IN SET(s.nulls_postdir,postdir) AND ri.address_unit_desig  IN SET(s.nulls_unit_desig,unit_desig) AND ri.address_sec_range  IN SET(s.nulls_sec_range,sec_range) AND ri.address_st  IN SET(s.nulls_st,st) AND ri.address_zip  IN SET(s.nulls_zip,zip)) => SALT30.Flags.Null,
       (le.prim_range  IN SET(s.nulls_prim_range,prim_range) AND le.predir  IN SET(s.nulls_predir,predir) AND le.prim_name  IN SET(s.nulls_prim_name,prim_name) AND le.addr_suffix  IN SET(s.nulls_addr_suffix,addr_suffix) AND le.postdir  IN SET(s.nulls_postdir,postdir) AND le.unit_desig  IN SET(s.nulls_unit_desig,unit_desig) AND le.sec_range  IN SET(s.nulls_sec_range,sec_range) AND le.st  IN SET(s.nulls_st,st) AND le.zip  IN SET(s.nulls_zip,zip)) => SALT30.Flags.Missing,

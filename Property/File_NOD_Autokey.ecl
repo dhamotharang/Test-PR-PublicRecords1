@@ -1,7 +1,7 @@
-// Suppressing 4 Foreclosure IDs as part of dispute database Bug#: 60282 and bugzilla bug#: 170863
+﻿// Suppressing 4 Foreclosure IDs as part of dispute database Bug#: 60282 and bugzilla bug#: 170863
 FC_ids := ['058118BANKOFAMERICA', '058118ESCOBARCARLOSG', '1079290090820TRUCAPREOCORP', '1079290090820TRUCAPGRANTORTRUST2010-1','14944559950000SOUTHERNBK&TRUST', '14944559950000RABIMIKE'];
 file_in := Property.File_Foreclosure_Normalized(trim(deed_category)='N' and Trim(foreclosure_id, left, right) not in FC_ids);
-// file_in := Property.File_Foreclosure_Normalized(trim(deed_category)='N');
+
 Autokey_layout:=
 record
 	string70	foreclosure_id;
@@ -27,6 +27,7 @@ record
 	string2		site_st;
 	string5		site_zip;
 	string4		site_zip4;
+	string2		source;
 	unsigned 	zero :=0;
 	string1		blank :='';
 end;

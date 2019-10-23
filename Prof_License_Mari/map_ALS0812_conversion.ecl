@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take AL Real Estate License raw files and convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
@@ -38,7 +38,7 @@ sufx_set := ['SR.','SR','JR','JR.','I', 'II','III','IV','V','VI', 'VII', 'VIII',
 prefx_set :=['MR','MR.','MRS','MRS.','MS','MS.','MISS','MISS.'];
  
 //AL Real Estate Company Personnel layout to Common
-Prof_License_Mari.layouts.base	transformPrsnlToCommon(Prof_License_Mari.layout_ALS0812.Comp_Personnel_src L) := TRANSFORM
+Prof_License_Mari.layout_base_in	transformPrsnlToCommon(Prof_License_Mari.layout_ALS0812.Comp_Personnel_src L) := TRANSFORM
 	SELF.PRIMARY_KEY	:= 0;
 	SELF.DATE_FIRST_SEEN	:= pVersion;
 	SELF.DATE_LAST_SEEN		:= pVersion;
@@ -202,7 +202,7 @@ ds_map_cmpny := PROJECT(ds_AL_Personnel, transformPrsnlToCommon(LEFT));
 
 
 //AL Real Estate Agents layout to Common
-Prof_License_Mari.layouts.base	transformAgentToCommon(Prof_License_Mari.layout_ALS0812.Agents_src L) := TRANSFORM
+Prof_License_Mari.layout_base_in	transformAgentToCommon(Prof_License_Mari.layout_ALS0812.Agents_src L) := TRANSFORM
 	SELF.PRIMARY_KEY	:= 0;
 	SELF.DATE_FIRST_SEEN	:= pVersion;
 	SELF.DATE_LAST_SEEN		:= pVersion;
@@ -291,7 +291,7 @@ ds_map	:= ds_map_agents + ds_map_cmpny;
 
 
 // populate std_license_status field via translation on raw_license_status field
-Prof_License_Mari.layouts.base		 trans_lic_status(ds_map L, ds_Cmvtranslation R) := TRANSFORM
+Prof_License_Mari.layout_base_in		 trans_lic_status(ds_map L, ds_Cmvtranslation R) := TRANSFORM
   SELF.STD_LICENSE_STATUS := IF(L.STD_LICENSE_STATUS = '', R.DM_VALUE1, L.STD_LICENSE_STATUS);
 	SELF := L;
 END;
@@ -302,7 +302,7 @@ ds_map_stat_trans := JOIN(ds_map, ds_Cmvtranslation,
 
 
 // populate prof code field via translation on license type field
-Prof_License_Mari.layouts.base trans_lic_type(ds_map L, ds_Cmvtranslation R) := TRANSFORM
+Prof_License_Mari.layout_base_in trans_lic_type(ds_map L, ds_Cmvtranslation R) := TRANSFORM
   SELF.STD_PROF_CD := IF(L.STD_PROF_CD = '', R.DM_VALUE1, L.STD_PROF_CD);
 	SELF := L;
 END;
@@ -315,7 +315,7 @@ ds_map_lic_trans := JOIN(ds_map_stat_trans, ds_Cmvtranslation,
 company_only_lookup := ds_MAP(ds_map.affil_type_cd='CO');
 
 //perform lookup to join children to parents and assign cmc_slpk field value of parent to pcmc_slpk field of child  
-Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
+Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
   SELF.pcmc_slpk := R.cmc_slpk;
 	SELF.provnote_1 := MAP(L.provnote_1 != '' AND SELF.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => TRIM(L.provnote_1,LEFT,RIGHT)+' | '+'This is not a main office.  It is a branch office without an associated main office from this source.',
                          L.provnote_1 = '' AND SELF.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' =>	'This is not a main office.  It is a branch office without an associated main office from this source.',

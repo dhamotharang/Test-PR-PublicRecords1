@@ -1,6 +1,7 @@
-// spray MOS0634 Professional Licenses Files for MARI	   
+﻿// spray MOS0634 Professional Licenses Files for MARI	   
 IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib,Lib_date;  
 EXPORT spray_MOS0634(STRING filedate) := MODULE
+#workunit('name','Yogurt: Spray MOS0634');
 
 	SHARED code 									:= 'MOS0634';
 	SHARED destination 						:= Common_Prof_Lic_Mari.SourcesFolder + code + '::';

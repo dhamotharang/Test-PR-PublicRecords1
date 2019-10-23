@@ -1,4 +1,4 @@
-import wk_ut, STD, lib_fileservices;
+﻿import wk_ut, STD, lib_fileservices;
 EXPORT CopyFiles(string srcesp
 								,string destesp
 								,string srcdali
@@ -10,9 +10,13 @@ EXPORT CopyFiles(string srcesp
 								,string dstSubNameSuffix = ''
 								,string uniquearbitrarystring = 'uniquenameforthisjob' // this string will be used in filename
 																																	// to uniquely represent the filename CopyFileList_FileName
+								,boolean copywithsoap = false
+								,boolean usecredentials = false
 								):= module
 
-	// File names 
+	// File names
+	shared dUserCreds := dataset('~hpccinternal::'+STD.System.Job.User()+'::userinfo'
+																,{string username, string password},thor);
 	export mFileList_LogicalNames := '~copyfiles::'+thorlib.jobowner()+'::missinglogicals::'+uniquearbitrarystring;
 	export cFileList_LogicalNames := '~copyfiles::'+thorlib.jobowner()+'::copiedlogicals::'+uniquearbitrarystring;
 	export aFileList_LogicalNames := '~copyfiles::'+thorlib.jobowner()+'::alllogicals::'+uniquearbitrarystring;
@@ -113,8 +117,8 @@ EXPORT CopyFiles(string srcesp
 		rFileList proj_recs(srclist l) := transform
 			self.name := l.name;
 			self.newlogicalname := if ( dstSubNameSuffix = ''
-											,if (srcdali = destdali,'dstname=~'+l.name+'::copyfrom'+l.ClusterName, 'dstname=~'+l.name)
-											,'dstname=~'+l.name+'_'+dstSubNameSuffix
+											,if (srcdali = destdali,l.name+'::copyfrom'+l.ClusterName, l.name)
+											,l.name+'_'+dstSubNameSuffix
 											);
 			self.cmd := 'server=http://'+ destesp + ':8010 ' 
 									+ 'overwrite=1 ' 
@@ -130,7 +134,11 @@ EXPORT CopyFiles(string srcesp
 									+ ' nosplit=1 '
 									+ 'wrap=1 '
 									+ 'srcdali=' + srcdali + ' '
-									+ if (l.iscompressed,' compress=1',' compress=0');
+									+ if (l.iscompressed,' compress=1',' compress=0')
+									+ if (usecredentials
+											,' username=' + dUserCreds[1].username + ' password='+ dUserCreds[1].password
+											,''
+											);
 
 			self := l;
 		end;
@@ -146,7 +154,7 @@ EXPORT CopyFiles(string srcesp
 	
 		preplist := sort(GetSourceList, name);
 	
-		// Get file list in destination cluster/esp
+	/*	// Get file list in destination cluster/esp
 		indest_full := if (filepattern <> '',
 									wk_ut.get_DFUQuery(,destcluster,,,,,,,,,,,,,,,,,destesp).dnorm(regexfind(filepattern,name,nocase)),
 									wk_ut.get_DFUQuery(,destcluster,,,,,,,,,,,,,,,,,destesp).dnorm
@@ -156,15 +164,18 @@ EXPORT CopyFiles(string srcesp
 		indest_slim :=  if (srcdali = destdali,
 													sort(indest_full(regexfind('::copyfrom[0-9a-zA-Z]+',name,nocase)),name),
 													sort(indest_full,name)
-												);
+												);*/
 
-		rCopyFiles get_recs(preplist l, indest_slim r) := transform
-			self.existsondest := if (r.name <> '', true, false);
+		rCopyFiles get_recs(preplist l) := transform
+			self.existsondest := if (srcdali = destdali
+																	,if (STD.File.FileExists('~'+l.newlogicalname), true, false)
+																	,if (STD.File.FileExists('~foreign::'+destdali+'::'+l.newlogicalname),true, false)
+																	);
 			self := l;
 		end;
 
 		
-		noncopiedrecs := if (srcdali = destdali,
+		noncopiedrecs := projecT(preplist,get_recs(left));/*if (srcdali = destdali,
 												// use join based on parameters passed
 												join(preplist, indest_slim,
 														if ( dstSubNameSuffix = ''
@@ -181,7 +192,7 @@ EXPORT CopyFiles(string srcesp
 														get_recs(left,right),
 														left outer)
 														
-												);
+												);*/
 														
 		
 		return noncopiedrecs;
@@ -291,12 +302,28 @@ EXPORT CopyFiles(string srcesp
 										WriteAllFiles
 										// copy only missing files in dest
 										,if (GetCount('missing') > 0
-											,apply(GetFilesDataset('missing')
-												,sequential(
+											,if ( (GetCount('missing') < 6 and copywithsoap) or ~copywithsoap
+												,apply(GetFilesDataset('missing')
+													,sequential(
 														output('Copying file ' + (string)cnt + ' of ' + (string)GetCount('missing') + ' from ' + srcdali + ' to ' + destdali + ':' + destcluster,named('Copy_Status'))
-														,STD.File.DfuPlusExec(cmd)
+														,if (~copywithsoap
+																,STD.File.DfuPlusExec(cmd)
+																,output(dops.FileModule(destesp,'8010').fSoapCopy(
+																					pSourceLogical := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,7),'=')[2]
+																					,pDestGroup := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,5),'=')[2]
+																					,pDestLogical := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,6),'=')[2]
+																					,pSourceDali := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,10),'=')[2]
+																					,pOverwrite := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,2),'=')[2]
+																					,pReplicate := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,3),'=')[2]
+																					,pNoSplit := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,8),'=')[2]
+																					,pNoWrap := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,9),'=')[2]
+																					,pCompress := STD.Str.SplitWords(STD.Str.GetNthWord(cmd,11),'=')[2]
+																					))
+																	)
 															)
-													)
+														)
+													,fail('File to copy file count is > 6, cannot copy with soapcall, usecredentials')
+												)
 												,output('nothing to copy')
 												)
 											)

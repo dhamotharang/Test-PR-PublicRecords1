@@ -1,4 +1,4 @@
-Layout_raw := record
+﻿Layout_raw := record
   string RecordingDate;
   string Grantor;
   string Grantee;
@@ -9,7 +9,7 @@ Layout_raw := record
 	string field8;
 end;
 
-File_in_riverside := dataset('~thor_200::in::official_records::ca::riverside',Layout_raw,CSV(heading(1),separator(','),Terminator(['\n','\r\n']),QUOTE('"')))(Grantor <> 'Ã¿Ã¿' or Grantee <> 'Ã¿Ã¿');
+File_in_riverside := dataset('~thor_200::in::official_records::ca::riverside',Layout_raw,CSV(heading(1),separator(','),Terminator(['\n','\r\n']),QUOTE('"')))(Grantor <> 'ÿÿ' or Grantee <> 'ÿÿ');
 
 Layout_fixed := record
   string18 RecordingDate;

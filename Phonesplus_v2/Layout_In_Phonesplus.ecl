@@ -1,4 +1,4 @@
-export Layout_In_Phonesplus := module
+﻿export Layout_In_Phonesplus := module
 //Additional fields
 export layout_additional := record
 	boolean		   in_flag:= false;
@@ -220,5 +220,8 @@ export layout_in_common := record
 	boolean     current_rec := 0;
 	unsigned4   first_build_date := 0;
 	unsigned4   last_build_date := 0;
+	//CCPA-718 - new fields for CCPA opt out
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 end;
 end;

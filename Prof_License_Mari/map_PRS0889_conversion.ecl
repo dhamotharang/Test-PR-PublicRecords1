@@ -1,4 +1,4 @@
-/* Converting Commissioner of Financial Inst of Puerto Rico Mulitple Licenses File to MARI common layout
+﻿/* Converting Commissioner of Financial Inst of Puerto Rico Mulitple Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 #workunit('name','Prof License MARI- PRS0889')
@@ -36,12 +36,12 @@ EXPORT map_PRS0889_conversion(STRING pVersion) := FUNCTION
 	oFile								:= OUTPUT(ClnUnprintable);
 	
 	//Filtering out BAD RECORDS
-	TITLE_LINE_NAMES 		:= '(NOMBRE INSTITUCIÃ“N|INSTITUCIONES HIPOTECARIAS|INTERMEDIARIOS FINANCIEROS|PRESTAMOS PERSONALES PEQUEÃ‘OS|TOTAL:)';
+	TITLE_LINE_NAMES 		:= '(NOMBRE INSTITUCIÓN|INSTITUCIONES HIPOTECARIAS|INTERMEDIARIOS FINANCIEROS|PRESTAMOS PERSONALES PEQUEÑOS|TOTAL:)';
 	NonBlankRec					:= ClnUnprintable(SLNUM<>'' AND NOT REGEXFIND('(NUM\\.|[0-9]+/[0-9]+)',SLNUM));
 	GoodFilterRec 			:= NonBlankRec(ORG_NAME != '' AND ADDRESS1 != '' AND NOT REGEXFIND(TITLE_LINE_NAMES,ORG_NAME,NOCASE));                                                                                      
                                                                                                                                        
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base 		xformToCommon(Prof_License_Mari.layout_PRS0889.other_bank pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in 		xformToCommon(Prof_License_Mari.layout_PRS0889.other_bank pInput) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -168,7 +168,7 @@ EXPORT map_PRS0889_conversion(STRING pVersion) := FUNCTION
 	inFileLic	:= project(GoodFilterRec,xformToCommon(left));
 
 	// Populate STD_STATUS_CD field via translation on statu field
-	Prof_License_Mari.layouts.base 	trans_lic_status(inFileLic L, cmvTranslation R) := transform
+	Prof_License_Mari.layout_base_in 	trans_lic_status(inFileLic L, cmvTranslation R) := transform
 		self.STD_LICENSE_STATUS :=  IF(L.STD_LICENSE_STATUS = '',StringLib.stringtouppercase(trim(R.DM_VALUE1,left,right)),
 																			L.STD_LICENSE_STATUS);
 		self := L;
@@ -180,7 +180,7 @@ EXPORT map_PRS0889_conversion(STRING pVersion) := FUNCTION
 							trans_lic_status(left,right),left outer,lookup);
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_status_trans L, cmvTranslation R) := transform
+	Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_status_trans L, cmvTranslation R) := transform
 		self.STD_PROF_CD := StringLib.stringtouppercase(trim(R.DM_VALUE1,LEFT,RIGHT));
 		self := L;
 	end;

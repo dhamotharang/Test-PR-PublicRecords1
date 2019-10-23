@@ -1,8 +1,8 @@
-Import ArrestLogs, Crim, ut;
+Import ArrestLogs, Crim, data_services;
 
-EXPORT File_WA_Okanogan := MODULE
+EXPORT File_WA_Okanogan :=  MODULE
 
-	EXPORT	raw		:=	dataset('~thor_data400::in::arrlog::wa::okanogan',ArrestLogs.layout_WA_Okanogan.raw_in, CSV(SEPARATOR(','),heading(1),quote('"')));
+	EXPORT	raw		:=	dataset(data_services.foreign_prod+'thor_data400::in::arrlog::wa::okanogan',ArrestLogs.layout_WA_Okanogan.raw_in, CSV(SEPARATOR(','),heading(1),quote('"')));
 	
 //Remove unnecessary fields at the end of file and headers throughout file
 filter_raw := raw(trim(booking_date,ALL) <> 'DATE' AND TRIM(booking_time,ALL)<> 'Year');

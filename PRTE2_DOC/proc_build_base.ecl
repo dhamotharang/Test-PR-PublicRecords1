@@ -39,7 +39,8 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 			self.name_suffix := Address.CleanNameFields(clean_name).name_suffix;
 			SELF.DOB := INTFORMAT(l.DOB,8,1); 
 			self.did := (string12)prte2.fn_AppendFakeID.did(self.fname, self.lname, l.link_ssn, l.link_dob, l.cust_name);
-			SELF.ZIP5 := l.ZIP5;
+		//	SELF.ZIP5 := l.ZIP5;
+			SELF.ZIP5  :=  l.clean_address.ZIP; 	
 			self.ssn_appended := l.ssn;
 			self.ace_fips_st := l.clean_address.fips_state;
 			self.ace_fips_county := l.clean_address.fips_county;
@@ -89,7 +90,6 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 
 		PromoteSupers.MAC_SF_BuildProcess(df_activity,'~PRTE::BASE::corrections::activity', writefile_activity,,,,filedate);
 
-		sequential(writefile_court_offenses,writefile_offenses,writefile_offenders,writefile_punishment,writefile_activity);
-
-		Return 'success';
+		return sequential(writefile_court_offenses,writefile_offenses,writefile_offenders,writefile_punishment,writefile_activity);
+		
 END;

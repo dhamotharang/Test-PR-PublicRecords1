@@ -1,4 +1,4 @@
-EXPORT output_bug_tests(
+﻿EXPORT output_bug_tests(
 //	 dataset(layout_DOT_Base)	pDataset
 	 string										pCombo 		= ''		
 	,string										pConst		= ''		

@@ -189,13 +189,13 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 	shared FiltUnlinkable(dataset(l_dot) ds_in) := module
 		shared pnExcluded := ['MOVED NO FORWARDING ADDRESS']; // Excluded prim_name values
 		export result		:= ds_in(
-			cnp_name<>'',
+			trim(cnp_name) NOT IN ['','ACCOUNTS PAYABLE'],
 			prim_name<>'' or active_duns_number<>'' or active_enterprise_number<>'' or mdr.sourcetools.SourceIsBusiness_Credit(source),
 			prim_name not in pnExcluded,
 			source_record_id<>0);
 		export err_rec	:= project(ds_in, transform(l_err_rec, 
 			self.remedy:='REJECT', self.reason:=map(
-				left.cnp_name=''																														=> 'cnp_name is blank',
+				trim(left.cnp_name) NOT IN ['','ACCOUNTS PAYABLE']																														=> 'cnp_name is blank',
 				left.prim_name='' and left.active_duns_number='' and left.active_enterprise_number=''	and not mdr.sourcetools.SourceIsBusiness_Credit(left.source)=> 'prim_name is blank',
 				left.prim_name in pnExcluded																								=> 'prim_name is excluded',
 				left.source_record_id=0																											=> 'source_record_id is blank',

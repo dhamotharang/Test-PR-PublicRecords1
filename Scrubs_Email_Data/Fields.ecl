@@ -1,15 +1,15 @@
-IMPORT ut,SALT30;
+﻿IMPORT ut,SALT30;
 EXPORT Fields := MODULE
 // Processing for each FieldType
 EXPORT SALT30.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_alpha','invalid_alnum','invalid_name','invalid_numeric','invalid_address','invalid_dir','invalid_state','invalid_zip','invalid_date','invalid_dob','invalid_ssn','invalid_activecode','invalid_source','invalid_email','invalid_blank');
 EXPORT FieldTypeNum(SALT30.StrType fn) := CASE(fn,'invalid_alpha' => 1,'invalid_alnum' => 2,'invalid_name' => 3,'invalid_numeric' => 4,'invalid_address' => 5,'invalid_dir' => 6,'invalid_state' => 7,'invalid_zip' => 8,'invalid_date' => 9,'invalid_dob' => 10,'invalid_ssn' => 11,'invalid_activecode' => 12,'invalid_source' => 13,'invalid_email' => 14,'invalid_blank' => 15,0);
 EXPORT MakeFT_invalid_alpha(SALT30.StrType s0) := FUNCTION
-  s1 := SALT30.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ã˜Ã‹ÃˆÃ‰Ã¢Ã£Ã¡Ã¥Ã¤Ã¯Ã¶Ã¸Ã©Ã¼ -\'/.'); // Only allow valid symbols
+  s1 := SALT30.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓØËÈÉâãáåäïöøéü -\'/.'); // Only allow valid symbols
   s2 := SALT30.stringcleanspaces( SALT30.stringsubstituteout(s1,' -\'/.',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_alpha(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ã˜Ã‹ÃˆÃ‰Ã¢Ã£Ã¡Ã¥Ã¤Ã¯Ã¶Ã¸Ã©Ã¼ -\'/.'))),~(LENGTH(TRIM(s)) >= 0));
-EXPORT InValidMessageFT_invalid_alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ã˜Ã‹ÃˆÃ‰Ã¢Ã£Ã¡Ã¥Ã¤Ã¯Ã¶Ã¸Ã©Ã¼ -\'/.'),SALT30.HygieneErrors.NotLength('0..'),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_alpha(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓØËÈÉâãáåäïöøéü -\'/.'))),~(LENGTH(TRIM(s)) >= 0));
+EXPORT InValidMessageFT_invalid_alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓØËÈÉâãáåäïöøéü -\'/.'),SALT30.HygieneErrors.NotLength('0..'),SALT30.HygieneErrors.Good);
 EXPORT MakeFT_invalid_alnum(SALT30.StrType s0) := FUNCTION
   s1 := SALT30.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -/'); // Only allow valid symbols
   s2 := SALT30.stringcleanspaces( SALT30.stringsubstituteout(s1,' -/',' ') ); // Insert spaces but avoid doubles
@@ -18,12 +18,12 @@ END;
 EXPORT InValidFT_invalid_alnum(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -/'))),~(LENGTH(TRIM(s)) >= 0));
 EXPORT InValidMessageFT_invalid_alnum(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -/'),SALT30.HygieneErrors.NotLength('0..'),SALT30.HygieneErrors.Good);
 EXPORT MakeFT_invalid_name(SALT30.StrType s0) := FUNCTION
-  s1 := SALT30.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ã˜Ã‹ÃˆÃ‰Ã¢Ã£Ã¡Ã¥Ã¤Ã¯Ã¶Ã¸Ã©Ã¼0123456789\' -`,&\\/.:;_+'); // Only allow valid symbols
+  s1 := SALT30.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓØËÈÉâãáåäïöøéü0123456789\' -`,&\\/.:;_+'); // Only allow valid symbols
   s2 := SALT30.stringcleanspaces( SALT30.stringsubstituteout(s1,' -`,&\\/.:;_+',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_name(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ã˜Ã‹ÃˆÃ‰Ã¢Ã£Ã¡Ã¥Ã¤Ã¯Ã¶Ã¸Ã©Ã¼0123456789\' -`,&\\/.:;_+'))),~(LENGTH(TRIM(s)) >= 0));
-EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ã˜Ã‹ÃˆÃ‰Ã¢Ã£Ã¡Ã¥Ã¤Ã¯Ã¶Ã¸Ã©Ã¼0123456789\' -`,&\\/.:;_+'),SALT30.HygieneErrors.NotLength('0..'),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_name(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓØËÈÉâãáåäïöøéü0123456789\' -`,&\\/.:;_+'))),~(LENGTH(TRIM(s)) >= 0));
+EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓØËÈÉâãáåäïöøéü0123456789\' -`,&\\/.:;_+'),SALT30.HygieneErrors.NotLength('0..'),SALT30.HygieneErrors.Good);
 EXPORT MakeFT_invalid_numeric(SALT30.StrType s0) := FUNCTION
   s1 := SALT30.stringfilter(s0,'0123456789 -'); // Only allow valid symbols
   s2 := SALT30.stringcleanspaces( SALT30.stringsubstituteout(s1,' -',' ') ); // Insert spaces but avoid doubles
@@ -32,12 +32,12 @@ END;
 EXPORT InValidFT_invalid_numeric(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'0123456789 -'))),~(LENGTH(TRIM(s)) >= 0));
 EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('0123456789 -'),SALT30.HygieneErrors.NotLength('0..'),SALT30.HygieneErrors.Good);
 EXPORT MakeFT_invalid_address(SALT30.StrType s0) := FUNCTION
-  s1 := SALT30.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ã¸Ã˜Ã‹ÃˆÃ‰Ã¤Ã¯Ã¶Ã©Ã¼0123456789\' -&/\\#.;,'); // Only allow valid symbols
+  s1 := SALT30.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓøØËÈÉäïöéü0123456789\' -&/\\#.;,'); // Only allow valid symbols
   s2 := SALT30.stringcleanspaces( SALT30.stringsubstituteout(s1,' -&/\\#.;,',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_address(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ã¸Ã˜Ã‹ÃˆÃ‰Ã¤Ã¯Ã¶Ã©Ã¼0123456789\' -&/\\#.;,'))),~(LENGTH(TRIM(s)) >= 0));
-EXPORT InValidMessageFT_invalid_address(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ã¸Ã˜Ã‹ÃˆÃ‰Ã¤Ã¯Ã¶Ã©Ã¼0123456789\' -&/\\#.;,'),SALT30.HygieneErrors.NotLength('0..'),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_address(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓøØËÈÉäïöéü0123456789\' -&/\\#.;,'))),~(LENGTH(TRIM(s)) >= 0));
+EXPORT InValidMessageFT_invalid_address(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓøØËÈÉäïöéü0123456789\' -&/\\#.;,'),SALT30.HygieneErrors.NotLength('0..'),SALT30.HygieneErrors.Good);
 EXPORT MakeFT_invalid_dir(SALT30.StrType s0) := FUNCTION
   RETURN  s0;
 END;
@@ -84,8 +84,8 @@ EXPORT InValidMessageFT_invalid_activecode(UNSIGNED1 wh) := CHOOSE(wh,SALT30.Hyg
 EXPORT MakeFT_invalid_source(SALT30.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_source(SALT30.StrType s) := WHICH(((SALT30.StrType) s) NOT IN ['T$','TM','SC','IB','M1','IM','!I','DG','W@','AW','AO','ET']);
-EXPORT InValidMessageFT_invalid_source(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInEnum('T$|TM|SC|IB|M1|IM|!I|DG|W@|AW|AO|ET'),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_source(SALT30.StrType s) := WHICH(((SALT30.StrType) s) NOT IN ['T$','TM','SC','IB','M1','IM','!I','DG','W@','AW','AO','ET','AN','RS','AP']);
+EXPORT InValidMessageFT_invalid_source(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInEnum('T$|TM|SC|IB|M1|IM|!I|DG|W@|AW|AO|ET|AN|RS|AP'),SALT30.HygieneErrors.Good);
 EXPORT MakeFT_invalid_email(SALT30.StrType s0) := FUNCTION
   s1 := SALT30.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -@&._!?/'); // Only allow valid symbols
   s2 := SALT30.stringcleanspaces( SALT30.stringsubstituteout(s1,' -@&._!?/',' ') ); // Insert spaces but avoid doubles

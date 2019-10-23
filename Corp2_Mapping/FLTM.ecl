@@ -257,16 +257,13 @@ export FLTM := MODULE;
 		
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_FLTM Report' //subject
 																																	 ,'Scrubs CorpMain_FLTM Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpFLTMMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );		
+																																	);		
 																																 
 		Main_BadRecords := Main_T.ExpandedInFile(	corp_key_invalid 			             						 <> 0 or
 																							corp_orig_sos_charter_nbr_invalid  						 <> 0 or

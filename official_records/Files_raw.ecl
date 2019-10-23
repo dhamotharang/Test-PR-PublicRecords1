@@ -1,4 +1,4 @@
-EXPORT Files_raw := module
+﻿EXPORT Files_raw := module
 
   export Alachua := module
 	
@@ -8,9 +8,9 @@ EXPORT Files_raw := module
 	
 	export Baker := module
 	 
-	  export  File_In_raw_document := dataset('~thor_200::in::official_records::fl::baker_d',Layouts_Baker.document.raw,csv(separator('|'),terminator(['\n','\r\n']),quote('')));
-    export File_In_raw_Prior    := dataset('~thor_200::in::official_records::fl::baker_l',Layouts_Baker.prior.raw,csv(separator('|'),terminator(['\n','\r\n']),quote('')));
-     export File_In_raw_Party    := dataset('~thor_200::in::official_records::fl::baker_p',Layouts_Baker.party.raw,csv(separator('|'),terminator(['\n','\r\n']),quote('')));
+	  export  File_In_raw_document := dataset('~thor_200::in::official_records::fl::baker_document',Layouts_Baker.document.raw,csv(separator('|'),terminator(['\n','\r\n']),quote('')));
+    export File_In_raw_Prior    := dataset('~thor_200::in::official_records::fl::baker_prior',Layouts_Baker.prior.raw,csv(separator('|'),terminator(['\n','\r\n']),quote('')));
+     export File_In_raw_Party    := dataset('~thor_200::in::official_records::fl::baker_party',Layouts_Baker.party.raw,csv(separator('|'),terminator(['\n','\r\n']),quote('')));
 end;
 
   export Brevard := module

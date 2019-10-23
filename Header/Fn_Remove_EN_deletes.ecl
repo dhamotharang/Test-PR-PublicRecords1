@@ -1,11 +1,11 @@
-import  ExperianCred ; 
+﻿import  ExperianCred ; 
 
 export Fn_Remove_EN_deletes ( dataset(header.Layout_Header) h ) := FUNCTION
 
 	headerEN   :=distribute(h(src='EN')                     ,hash((string)vendor_id));
 	baseEN     :=distribute(ExperianCred.Files.Base_File_Out,hash(Encrypted_Experian_PIN));
-  EN_del     :=ExperianCred.Files.File_Delete_In;
-  EN_del_dedp:=dedup(sort(distribute(EN_del, hash(Encrypted_Experian_PIN)),Encrypted_Experian_PIN, -Delete_Date, local) ,Encrypted_Experian_PIN, local) ;
+  EN_del     :=Header.Mod_CreditBureau_address.files.prepped_nlr;
+  EN_del_dedp:=dedup(sort(distribute(EN_del, hash(vendor_id)),vendor_id, local) ,vendor_id, local) ;
 	
 	//find, in header, EN records removed from ExperianCred
 	del_rids_:=join(headerEN, baseEN
@@ -15,8 +15,8 @@ export Fn_Remove_EN_deletes ( dataset(header.Layout_Header) h ) := FUNCTION
 											,local);
 	//append delete code and date
 	del_rids:=join(del_rids_, EN_del_dedp
-											,left.vendor_id = right.Encrypted_Experian_PIN
-											,transform({h, EN_del.Delete_Date, EN_del.Suppression_Code},self:=left,self:=right)
+											,left.vendor_id = right.vendor_id
+											,transform({h, string8 delete_date, string2 suppression_code},self:=left,self:=right,self:=[])
 											,left outer
 											,local);
 
@@ -37,8 +37,8 @@ export Fn_Remove_EN_deletes ( dataset(header.Layout_Header) h ) := FUNCTION
 
 	//save a copy of records from other sources that are equal to those deleted by EN - see bug for reason why
 	bName        :='~thor_data400::base::Experian_deletes_flagged_entities';
-	saveClusters :=output(OtherSrcMatch,,bName+'_'+workunit[2..9],__compressed__,overwrite);
-	move2Super   :=fileservices.addsuperfile(bName,bName+'_'+workunit[2..9]);
+	saveClusters :=output(OtherSrcMatch,,bName+'_'+workunit,__compressed__,overwrite);
+	move2Super   :=fileservices.addsuperfile(bName,bName+'_'+workunit);
 	sequential(saveClusters, move2Super);
 
 	//left only to keep header minus EN deleted rids

@@ -1,20 +1,20 @@
-MODULE:Scrubs_VehicleV2
+﻿MODULE:Scrubs_VehicleV2
 FILENAME:VehicleV2
 NAMESCOPE:Experian
 SOURCEFIELD:append_state_origin
 
 FIELDTYPE:invalid_year:ALLOW(0123456789):LENGTHS(4,0)
-FIELDTYPE:invalid_alpha:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~@&'"`$*-_?):SPACES( <>{}[]^=!+,.;:/#()\|)
+FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~@&'"`$*-_?%):SPACES( <>{}[]^=!+,.;:/#()\|)
 FIELDTYPE:invalid_only_alpha:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):SPACES( -,.)
 FIELDTYPE:invalid_number:ALLOW(0123456789 )
 FIELDTYPE:invalid_weight:ALLOW(0123456789 N/A)
-FIELDTYPE:invalid_alphanumeric:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):SPACES( -,.)
+FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( -,.)
 FIELDTYPE:invalid_date:ALLOW(0123456789):LENGTHS(8,0)
 FIELDTYPE:invalid_date1:ALLOW(0123456789/):LENGTHS(6..10,0)
 FIELDTYPE:invalid_state:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(2,0)
 FIELDTYPE:invalid_file_typ:ENUM(R|T|C|S|I|L|B|U):LENGTHS(1)
-FIELDTYPE:invalid_vin:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):SPACES( -:;):LENGTHS(0..)
-FIELDTYPE:invalid_vehicle_typ:ENUM(P|M|U|X):LENGTHS(1)
+FIELDTYPE:invalid_vin:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( -:;):LENGTHS(0..)
+FIELDTYPE:invalid_vehicle_typ:ENUM(P|M|U|X|T|):LENGTHS(1,0)
 FIELDTYPE:invalid_model_yr_ind:ENUM(V|R):LENGTHS(1)
 FIELDTYPE:invalid_name_typ_cd:ENUM(1|2|4|5|7|):LENGTHS(1,0)
 FIELDTYPE:invalid_owner_typ_cd:ENUM(1|2|):LENGTHS(1,0)                 
@@ -22,7 +22,7 @@ FIELDTYPE:invalid_ssn:ALLOW(0123456789):LENGTHS(9,4,0)
 FIELDTYPE:invalid_zip5:ALLOW(0123456789):LENGTHS(5,0)
 FIELDTYPE:invalid_zip4:ALLOW(0123456789):LENGTHS(4,0)
 FIELDTYPE:invalid_cc:ENUM(0|1|  0|  1|):LENGTHS(0..3)
-FIELDTYPE:invalid_opt_out_cd:ENUM(B|I|M|N|U|):LENGTHS(1)
+FIELDTYPE:invalid_opt_out_cd:ENUM(B|I|M|N|U|X|Y|):LENGTHS(1,0)
 FIELDTYPE:invalid_yes_no:ENUM(Y|N|):LENGTHS(1)
 FIELDTYPE:invalid_min_door_count:ALLOW(2345D):LENGTHS(2,0)
 //Fields
@@ -43,7 +43,7 @@ FIELD:body_style:LIKE(invalid_alpha):TYPE(STRING25):0,0
 FIELD:body_style_ind:LIKE(invalid_model_yr_ind):TYPE(STRING1):0,0
 FIELD:model:LIKE(invalid_alpha):TYPE(STRING30):0,0
 FIELD:model_ind:LIKE(invalid_model_yr_ind):TYPE(STRING1):0,0
-FIELD:weight:LIKE(invalid_number):TYPE(STRING10):0,0
+FIELD:weight:LIKE(invalid_weight):TYPE(STRING10):0,0
 FIELD:lengt:LIKE(invalid_number):TYPE(STRING5):0,0
 FIELD:axle_cnt:LIKE(invalid_number):TYPE(STRING3):0,0
 FIELD:plate_nbr:LIKE(invalid_alpha):TYPE(STRING11):0,0

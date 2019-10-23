@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_GA_Event
 FILENAME:in_file
 //Uncomment up to NINES for internal or external adl
@@ -14,7 +14,7 @@ FILENAME:in_file
 //FUZZY can be used to create new types of FUZZY linking
 FIELDTYPE:invalid_date:ALLOW(0123456789):LENGTHS(0..8):CUSTOM(Scrubs.fn_valid_pastDate>0)
 FIELDTYPE:invalid_corp_key:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-):LENGTHS(4..)
-FIELDTYPE:invalid_charter:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):LENGTHS(1..)
+FIELDTYPE:invalid_charter:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-):LENGTHS(1..)
 FIELDTYPE:invalid_corp_vendor:ENUM(13)
 FIELDTYPE:invalid_state_origin:ENUM(GA)
 FIELDTYPE:invalid_reference_nbr:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789- )
@@ -45,9 +45,9 @@ FIELD:event_microfilm_nbr:TYPE(STRING10):0,0
 FIELD:event_desc:TYPE(STRING500):0,0
 FIELD:event_revocation_comment1:TYPE(STRING250):0,0
 FIELD:event_revocation_comment2:TYPE(STRING250):0,0
-FIELD:event_book_number:TYPE(STRING9):0,0
-FIELD:event_page_number:TYPE(STRING9):0,0
-FIELD:event_certification_number:TYPE(STRING9):0,0
+FIELD:event_book_nbr:TYPE(STRING9):0,0
+FIELD:event_page_nbr:TYPE(STRING9):0,0
+FIELD:event_certification_nbr:TYPE(STRING9):0,0
 //CONCEPT statements should be used to group together interellated fields; such as address
 //RELATIONSHIP is used to find non-obvious relationships between the clusters
 //SOURCEFIELD is used if a field of the file denotes a source of the records in that file

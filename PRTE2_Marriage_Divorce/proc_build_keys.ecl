@@ -1,4 +1,4 @@
-IMPORT PRTE2_Marriage_Divorce, PRTE, PRTE2_Common, roxiekeybuild, ut, promotesupers, _control, AutoKeyB2;
+﻿IMPORT PRTE2_Marriage_Divorce, PRTE, PRTE2_Common, roxiekeybuild, ut, promotesupers, _control, AutoKeyB2,strata;
 
 EXPORT proc_build_keys (string filedate) := FUNCTION
 
@@ -31,6 +31,18 @@ Roxiekeybuild.MAC_SK_Move_v2(Constants.KEY_PREFIX + '@version@::id_search', 'Q',
 Roxiekeybuild.MAC_SK_Move_v2(Constants.KEY_PREFIX + 'fcra::' + '@version@::did',       'Q',mv_mar_div_did_key_qa_fcra);
 Roxiekeybuild.MAC_SK_Move_v2(Constants.KEY_PREFIX + 'fcra::' + '@version@::id_main',   'Q',mv_mar_div_main_key_qa_fcra);
 Roxiekeybuild.MAC_SK_Move_v2(Constants.KEY_PREFIX + 'fcra::' + '@version@::id_search', 'Q',mv_mar_div_search_key_qa_fcra);
+
+//DF-21803:FCRA Consumer Data Fields Depreciation
+cnt_mdv2_id_main_fcra := OUTPUT(strata.macf_pops(Keys.key_mar_div_id_main(true),,,,,,FALSE,
+																																['divorce_docket_volume','divorce_filing_dt',
+																																	'filing_subtype','grounds_for_divorce','marriage_docket_volume','marriage_duration','marriage_duration_cd',
+																																	'marriage_filing_dt','number_of_children','place_of_marriage','type_of_ceremony'
+																																	]
+																																	));
+cnt_mdv2_id_search_fcra := OUTPUT(strata.macf_pops(Keys.key_mar_div_id_search(true),,,,,,FALSE,
+																																		['age','birth_state','how_marriage_ended','last_marriage_end_dt','party_county','previous_marital_status','race','times_married','title']
+																																		));
+
 
 build_keys := sequential(											
 													parallel(mar_div_did_key, mar_div_filing_key,	mar_div_main_key,	mar_div_search_key),
@@ -71,13 +83,15 @@ build_keys := sequential(
 //---------- making DOPS optional and only in PROD build -------------------------------
 	is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
-	updatedops   		 		:= PRTE.UpdateVersion('MDV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
-	updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_MDV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+	updatedops   		 		:= PRTE.UpdateVersion('MDV2Keys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean :='N');
+	updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_MDV2Keys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='F',l_includeboolean :='N');
 	PerformUpdateOrNot	:= IF(is_running_in_prod,parallel(updatedops,updatedops_fcra),NoUpdate);
+
 
 RETURN sequential(build_keys
 									,build_autokeys
 									,PerformUpdateOrNot
+									,parallel(cnt_mdv2_id_main_fcra,cnt_mdv2_id_search_fcra)
 									);
 
 END;

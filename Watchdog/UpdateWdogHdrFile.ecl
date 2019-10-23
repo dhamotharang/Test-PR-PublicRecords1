@@ -1,4 +1,4 @@
-import ut;
+﻿import ut,std;
 EXPORT UpdateWdogHdrFile(string watchdogtype ,boolean ishdrnew) := function
 
 string8 build_date := (string) Watchdog.proc_get_wdogdate(ishdrnew).fdate : independent;
@@ -23,24 +23,27 @@ ds := dataset(set_wdog_lfile,wdog_hr_rec,thor,opt);
 
 wdog_hr_rec updatefile( ds l) := transform
 
-self.issubmitted := if ( l.wtype = watchdogtype , 'Y','N');
-self.iscompleted := if ( l.wtype = watchdogtype , 'Y','N');
+self.issubmitted := if ( l.wtype = watchdogtype , 'Y',l.issubmitted);
+self.iscompleted := if ( l.wtype = watchdogtype , 'Y',l.iscompleted);
 self := l;
 end;
 
 ds1 := project(ds,updatefile(left));
 
-return Sequential( output(ds1,,set_wdog_tempfile+'_'+watchdogtype+'_'+build_date,overwrite),
-                
-                FileServices.StartSuperfiletransaction(),
-								 FileServices.RemoveSuperfile(set_wdog_sfile,set_wdog_lfile),
-								FileServices.FinishSuperfiletransaction(),
+return Sequential(    								
+                               output(ds1,,set_wdog_tempfile+'_'+watchdogtype+'_updated_'+build_date,overwrite),
 
-                 FileServices.Renamelogicalfile(set_wdog_lfile,set_wdog_lfile+watchdogtype+'_old'+build_date),
-								FileServices.Renamelogicalfile(set_wdog_tempfile+'_'+watchdogtype+'_'+build_date,set_wdog_lfile),
-                FileServices.StartSuperfiletransaction(),
 
-								 FileServices.AddSuperfile( set_wdog_sfile, set_wdog_lfile),
-								 FileServices.FinishSuperfiletransaction()
-								 );
+                                    FileServices.StartSuperfiletransaction(),
+							    FileServices.RemoveSuperfile(set_wdog_sfile,set_wdog_lfile),
+							FileServices.FinishSuperfiletransaction(),
+								
+            
+                                         FileServices.Renamelogicalfile(set_wdog_lfile,set_wdog_lfile+watchdogtype+'_old'+build_date),
+							    FileServices.Renamelogicalfile(set_wdog_tempfile+'_'+watchdogtype+'_updated_'+build_date,set_wdog_lfile),
+                                           
+							     FileServices.StartSuperfiletransaction(),
+								         FileServices.AddSuperfile( set_wdog_sfile, set_wdog_lfile),
+								FileServices.FinishSuperfiletransaction()
+					 );
 end;

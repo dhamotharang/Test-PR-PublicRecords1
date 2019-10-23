@@ -10,8 +10,9 @@ EXPORT Proc_Build_VendorSrc(STRING pVersion) := FUNCTION
 	OldVendorSrc				:= Misc.Files_VendorSrc(pVersion).OldVendorSrc;
 	Market_Restrict			:= Misc.Files_VendorSrc(pVersion).Market_restrict;
 	Court_Locations 		:= Misc.Files_VendorSrc('').Court_Locations;
-	MasterList      		:= Misc.Files_VendorSrc('').MasterList;;
-	
+	MasterList      		:= Misc.Files_VendorSrc('').MasterList;
+	CollegeLocator     		:= Misc.Files_VendorSrc('').CollegeLocator;
+
 	invalid_prim_name := ['NONE','UNKNOWN','UNKNWN','UNKNOWEN','UNKNONW','UNKNON','UNKNWON','UNKONWN','UNEKNOWN','UN KNOWN','GENERAL DELIVERY'];
 			
 	Layout_VendorSrc.MergedSrc_Base CleanAddr(NewBank L) := TRANSFORM
@@ -431,11 +432,13 @@ EXPORT Proc_Build_VendorSrc(STRING pVersion) := FUNCTION
 	END;
 
 	pMasterList := PROJECT(MasterList(LNfileCategory<>'',LNsourcetCode<>'',vendorName<>'',address1<>'',city<>'',state<>'',zipcode<>''), CleanMasterList(LEFT));
+	pCollegeLocator := PROJECT(CollegeLocator(LNfileCategory<>'',LNsourcetCode<>'',vendorName<>'',address1<>'',city<>'',state<>'',zipcode<>''), CleanMasterList(LEFT));
 
 // ******
 	
 	NewBaseData	:= CleanBankFile + CleanLienFile + FixedRiskViewFile + CleanOldFormat_w_flag 
-										+ CleanCourt_LocationsFile + CrimSourceData + pMasterList;
+										+ CleanCourt_LocationsFile + CrimSourceData + pMasterList
+										+ pCollegeLocator;
 	
 	MarkCurrent	:= project (NewBaseData,
 														transform({temp_layout},

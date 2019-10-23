@@ -1,5 +1,5 @@
-// Process to build the PhonesFeedback files
-import Lib_FileServices, STRATA, PromoteSupers, Roxiekeybuild;
+﻿// Process to build the PhonesFeedback files
+import Lib_FileServices, STRATA, PromoteSupers, dops,Scrubs_PhonesFeedback;
 export BWR_Build_PhonesFeedback(string filedate,string onlinefilename) := function
 #workunit('name','Yogurt: PhonesFeedback Daily Build - ' + filedate);
 #workunit('priority','high');
@@ -49,8 +49,8 @@ build_keys  := phonesFeedback.proc_build_phonesFeedback_keys(version) :
 
 build_stats 	:= phonesFeedback.Out_Base_Stats_Population(version);
 build_samples := PhonesFeedback.Out_qa_samples;
-dops_update 	:= Roxiekeybuild.updateversion('PhoneFeedbackKeys',version,'kevin.reeder@lexisnexis.com;Harry.Gist@lexisnexis.com',,'N');
-idops_update 	:= RoxieKeyBuild.updateversion('PhoneFeedbackKeys',version,'kevin.reeder@lexisnexis.com;Harry.Gist@lexisnexis.com',,'N',,,'A');
+dops_update 	:= dops.updateversion('PhoneFeedbackKeys',version,'kevin.reeder@lexisnexis.com;Harry.Gist@lexisnexis.com',,'N');
+idops_update 	:= dops.updateversion('PhoneFeedbackKeys',version,'kevin.reeder@lexisnexis.com;Harry.Gist@lexisnexis.com',,'N',,,'A');
 ORBITi 				:= PhonesFeedback.Proc_OrbitI_CreateBuild(version,'nonfcra');
  
 build_all 		:=
@@ -62,6 +62,7 @@ sequential (fSprayFilesOnline(onlinefilename),
 		   parallel(build_keys, build_stats),
 			 build_samples,
 		   dops_update,
+			 Scrubs_PhonesFeedback.fn_RunScrubs(filedate,''),
 			 // idops_update,
 			 // ORBITi,
        send_mail('PhonesFeedback Build Completed',

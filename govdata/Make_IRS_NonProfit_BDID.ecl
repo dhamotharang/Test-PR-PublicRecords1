@@ -1,4 +1,4 @@
-import business_header,business_header_ss,did_add,PromoteSupers,mdr;
+﻿import business_header,business_header_ss,did_add,PromoteSupers,mdr;
 
 export Make_IRS_NonProfit_BDID(string filedate) :=  function
 
@@ -80,7 +80,7 @@ end;
 
 	dPostFlex_reformat:=project(dPostFlex,transform(govdata.Layouts_IRS_NonProfit.Base_AID,self:=left;));
 
-	PromoteSupers.MAC_SF_BuildProcess(dPostFlex_reformat, '~thor_data400::base::IRS_NonProfit',do1,2);
+	PromoteSupers.MAC_SF_BuildProcess(dPostFlex_reformat, '~thor_data400::base::IRS_NonProfit',do1,2,pCompress:=true);
 
 	return do1;
 end;		

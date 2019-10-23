@@ -1,0 +1,202 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_FileRelative_Monthly
+FILENAME:File
+//Uncomment up to NINES for internal or external adl
+//IDFIELD:EXISTS:<NameOfIDField>
+//RIDFIELD:<NameOfRidField>
+//RECORDS:<NumberOfRecordsInDataFile>
+//POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+//NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+//Uncomment Process if doing external adl
+//PROCESS:<ProcessName>
+//FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+//BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+//FUZZY can be used to create new types of FUZZY linking
+
+FIELDTYPE:DEFAULT:LEFTTRIM:NOQUOTES("')
+FIELDTYPE:ALPHA:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:NUMBER:ALLOW(0123456789)
+FIELDTYPE:WORDBAG:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):SPACES( <>{}[]-^=!+&,./):ONFAIL(CLEAN)
+
+FIELDTYPE:type:SPACES( ):LIKE(Invalid_Alpha):ONFAIL(CLEAN)
+FIELDTYPE:confidence:SPACES( ):LIKE(Invalid_Alpha):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:did1:SPACES( ):LIKE(Invalid_Num):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:did2:SPACES( ):LIKE(Invalid_Num):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:cohabit_score:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:cohabit_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coapt_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,3):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coapt_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:copobox_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:copobox_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:cossn_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:cossn_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:copolicy_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,3):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:copolicy_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coclaim_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,3):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coclaim_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coproperty_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,3):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coproperty_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:bcoproperty_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:bcoproperty_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coforeclosure_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:coforeclosure_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:bcoforeclosure_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:bcoforeclosure_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:colien_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:colien_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:bcolien_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:bcolien_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:cobankruptcy_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:cobankruptcy_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:bcobankruptcy_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:bcobankruptcy_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:covehicle_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,3):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:covehicle_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coexperian_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coexperian_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:cotransunion_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:cotransunion_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coenclarity_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:coenclarity_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:coecrash_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coecrash_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:bcoecrash_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:bcoecrash_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:cowatercraft_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:cowatercraft_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:coaircraft_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:coaircraft_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:comarriagedivorce_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:comarriagedivorce_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)
+FIELDTYPE:coucc_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:coucc_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:lname_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,1,3):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:phone_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:dl_nbr_score:SPACES( ):ALLOW(-0123456789):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:total_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(1,2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:total_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(2,3,4):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:cluster:SPACES( ):ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ_):LENGTHS(4,8,6,7):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:generation:SPACES( ):ALLOW( OSY):LENGTHS(1,2,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:gender:SPACES( ):ALLOW( FM):LENGTHS(1,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:lname_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(1,0,2):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:rel_dt_first_seen:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,8):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:rel_dt_last_seen:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,8):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:overlap_months:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:hdr_dt_first_seen:SPACES( ):LIKE(Invalid_Num):LENGTHS(8):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:hdr_dt_last_seen:SPACES( ):LIKE(Invalid_Num):LENGTHS(8):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:age_first_seen:SPACES( ):LIKE(Invalid_Num):LENGTHS(2,0,1):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:isanylnamematch:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:isanyphonematch:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:isearlylnamematch:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:iscurrlnamematch:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:ismixedlnamematch:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:ssn1:SPACES( ):LIKE(Invalid_Num):LENGTHS(9,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:ssn2:SPACES( ):LIKE(Invalid_Num):LENGTHS(9,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:dob1:SPACES( ):LIKE(Invalid_Num):LENGTHS(8,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:dob2:SPACES( ):LIKE(Invalid_Num):LENGTHS(8,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:current_lname1:SPACES( ):ALLOW(-ABCDEFGHIJKLMNOPQRSTUVWXYZ):WORDS(1,2):ONFAIL(CLEAN)
+FIELDTYPE:current_lname2:SPACES( ):ALLOW(-ABCDEFGHIJKLMNOPQRSTUVWXYZ):WORDS(1,2):ONFAIL(CLEAN)
+FIELDTYPE:early_lname1:SPACES( ):LIKE(Invalid_Alpha):WORDS(1,2):ONFAIL(CLEAN)
+FIELDTYPE:early_lname2:SPACES( ):LIKE(Invalid_Alpha):WORDS(1,2):ONFAIL(CLEAN)
+FIELDTYPE:addr_ind1:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:addr_ind2:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:r2rdid:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:r2cnt:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:personal:SPACES( ):ALLOW( 01):LENGTHS(1,0):WORDS(1,0):ONFAIL(CLEAN)
+FIELDTYPE:business:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:other:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)
+FIELDTYPE:title:SPACES( ):LIKE(Invalid_Num):LENGTHS(2,1):WORDS(1):ONFAIL(CLEAN)
+
+
+FIELD:type:LIKE(type):TYPE(STRING15):0,0
+FIELD:confidence:LIKE(confidence):TYPE(STRING10):0,0
+FIELD:did1:LIKE(did1):TYPE(UNSIGNED6):0,0
+FIELD:did2:LIKE(did2):TYPE(UNSIGNED6):0,0
+FIELD:cohabit_score:LIKE(cohabit_score):TYPE(INTEGER2):0,0
+FIELD:cohabit_cnt:LIKE(cohabit_cnt):TYPE(INTEGER2):0,0
+FIELD:coapt_score:LIKE(coapt_score):TYPE(INTEGER2):0,0
+FIELD:coapt_cnt:LIKE(coapt_cnt):TYPE(INTEGER2):0,0
+FIELD:copobox_score:LIKE(copobox_score):TYPE(INTEGER2):0,0
+FIELD:copobox_cnt:LIKE(copobox_cnt):TYPE(INTEGER2):0,0
+FIELD:cossn_score:LIKE(cossn_score):TYPE(INTEGER2):0,0
+FIELD:cossn_cnt:LIKE(cossn_cnt):TYPE(INTEGER2):0,0
+FIELD:copolicy_score:LIKE(copolicy_score):TYPE(INTEGER2):0,0
+FIELD:copolicy_cnt:LIKE(copolicy_cnt):TYPE(INTEGER2):0,0
+FIELD:coclaim_score:LIKE(coclaim_score):TYPE(INTEGER2):0,0
+FIELD:coclaim_cnt:LIKE(coclaim_cnt):TYPE(INTEGER2):0,0
+FIELD:coproperty_score:LIKE(coproperty_score):TYPE(INTEGER2):0,0
+FIELD:coproperty_cnt:LIKE(coproperty_cnt):TYPE(INTEGER2):0,0
+FIELD:bcoproperty_score:LIKE(bcoproperty_score):TYPE(INTEGER2):0,0
+FIELD:bcoproperty_cnt:LIKE(bcoproperty_cnt):TYPE(INTEGER2):0,0
+FIELD:coforeclosure_score:LIKE(coforeclosure_score):TYPE(INTEGER2):0,0
+FIELD:coforeclosure_cnt:LIKE(coforeclosure_cnt):TYPE(INTEGER2):0,0
+FIELD:bcoforeclosure_score:LIKE(bcoforeclosure_score):TYPE(INTEGER2):0,0
+FIELD:bcoforeclosure_cnt:LIKE(bcoforeclosure_cnt):TYPE(INTEGER2):0,0
+FIELD:colien_score:LIKE(colien_score):TYPE(INTEGER2):0,0
+FIELD:colien_cnt:LIKE(colien_cnt):TYPE(INTEGER2):0,0
+FIELD:bcolien_score:LIKE(bcolien_score):TYPE(INTEGER2):0,0
+FIELD:bcolien_cnt:LIKE(bcolien_cnt):TYPE(INTEGER2):0,0
+FIELD:cobankruptcy_score:LIKE(cobankruptcy_score):TYPE(INTEGER2):0,0
+FIELD:cobankruptcy_cnt:LIKE(cobankruptcy_cnt):TYPE(INTEGER2):0,0
+FIELD:bcobankruptcy_score:LIKE(bcobankruptcy_score):TYPE(INTEGER2):0,0
+FIELD:bcobankruptcy_cnt:LIKE(bcobankruptcy_cnt):TYPE(INTEGER2):0,0
+FIELD:covehicle_score:LIKE(covehicle_score):TYPE(INTEGER2):0,0
+FIELD:covehicle_cnt:LIKE(covehicle_cnt):TYPE(INTEGER2):0,0
+FIELD:coexperian_score:LIKE(coexperian_score):TYPE(INTEGER2):0,0
+FIELD:coexperian_cnt:LIKE(coexperian_cnt):TYPE(INTEGER2):0,0
+FIELD:cotransunion_score:LIKE(cotransunion_score):TYPE(INTEGER2):0,0
+FIELD:cotransunion_cnt:LIKE(cotransunion_cnt):TYPE(INTEGER2):0,0
+FIELD:coenclarity_score:LIKE(coenclarity_score):TYPE(INTEGER2):0,0
+FIELD:coenclarity_cnt:LIKE(coenclarity_cnt):TYPE(INTEGER2):0,0
+FIELD:coecrash_score:LIKE(coecrash_score):TYPE(INTEGER2):0,0
+FIELD:coecrash_cnt:LIKE(coecrash_cnt):TYPE(INTEGER2):0,0
+FIELD:bcoecrash_score:LIKE(bcoecrash_score):TYPE(INTEGER2):0,0
+FIELD:bcoecrash_cnt:LIKE(bcoecrash_cnt):TYPE(INTEGER2):0,0
+FIELD:cowatercraft_score:LIKE(cowatercraft_score):TYPE(INTEGER2):0,0
+FIELD:cowatercraft_cnt:LIKE(cowatercraft_cnt):TYPE(INTEGER2):0,0
+FIELD:coaircraft_score:LIKE(coaircraft_score):TYPE(INTEGER2):0,0
+FIELD:coaircraft_cnt:LIKE(coaircraft_cnt):TYPE(INTEGER2):0,0
+FIELD:comarriagedivorce_score:LIKE(comarriagedivorce_score):TYPE(INTEGER2):0,0
+FIELD:comarriagedivorce_cnt:LIKE(comarriagedivorce_cnt):TYPE(INTEGER2):0,0
+FIELD:coucc_score:LIKE(coucc_score):TYPE(INTEGER2):0,0
+FIELD:coucc_cnt:LIKE(coucc_cnt):TYPE(INTEGER2):0,0
+FIELD:lname_score:LIKE(lname_score):TYPE(INTEGER2):0,0
+FIELD:phone_score:LIKE(phone_score):TYPE(INTEGER2):0,0
+FIELD:dl_nbr_score:LIKE(dl_nbr_score):TYPE(INTEGER2):0,0
+FIELD:total_cnt:LIKE(total_cnt):TYPE(UNSIGNED2):0,0
+FIELD:total_score:LIKE(total_score):TYPE(INTEGER2):0,0
+FIELD:cluster:LIKE(cluster):TYPE(STRING10):0,0
+FIELD:generation:LIKE(generation):TYPE(STRING2):0,0
+FIELD:gender:LIKE(gender):TYPE(STRING1):0,0
+FIELD:lname_cnt:LIKE(lname_cnt):TYPE(UNSIGNED4):0,0
+FIELD:rel_dt_first_seen:LIKE(rel_dt_first_seen):TYPE(UNSIGNED4):0,0
+FIELD:rel_dt_last_seen:LIKE(rel_dt_last_seen):TYPE(UNSIGNED4):0,0
+FIELD:overlap_months:LIKE(overlap_months):TYPE(UNSIGNED2):0,0
+FIELD:hdr_dt_first_seen:LIKE(hdr_dt_first_seen):TYPE(UNSIGNED4):0,0
+FIELD:hdr_dt_last_seen:LIKE(hdr_dt_last_seen):TYPE(UNSIGNED4):0,0
+FIELD:age_first_seen:LIKE(age_first_seen):TYPE(UNSIGNED2):0,0
+FIELD:isanylnamematch:LIKE(isanylnamematch):TYPE(BOOLEAN1):0,0
+FIELD:isanyphonematch:LIKE(isanyphonematch):TYPE(BOOLEAN1):0,0
+FIELD:isearlylnamematch:LIKE(isearlylnamematch):TYPE(BOOLEAN1):0,0
+FIELD:iscurrlnamematch:LIKE(iscurrlnamematch):TYPE(BOOLEAN1):0,0
+FIELD:ismixedlnamematch:LIKE(ismixedlnamematch):TYPE(BOOLEAN1):0,0
+FIELD:ssn1:LIKE(ssn1):TYPE(STRING9):0,0
+FIELD:ssn2:LIKE(ssn2):TYPE(STRING9):0,0
+FIELD:dob1:LIKE(dob1):TYPE(UNSIGNED4):0,0
+FIELD:dob2:LIKE(dob2):TYPE(UNSIGNED4):0,0
+FIELD:current_lname1:LIKE(current_lname1):TYPE(STRING28):0,0
+FIELD:current_lname2:LIKE(current_lname2):TYPE(STRING28):0,0
+FIELD:early_lname1:LIKE(early_lname1):TYPE(STRING28):0,0
+FIELD:early_lname2:LIKE(early_lname2):TYPE(STRING28):0,0
+FIELD:addr_ind1:LIKE(addr_ind1):TYPE(STRING2):0,0
+FIELD:addr_ind2:LIKE(addr_ind2):TYPE(STRING2):0,0
+FIELD:r2rdid:LIKE(r2rdid):TYPE(UNSIGNED6):0,0
+FIELD:r2cnt:LIKE(r2cnt):TYPE(UNSIGNED6):0,0
+FIELD:personal:LIKE(personal):TYPE(BOOLEAN1):0,0
+FIELD:business:LIKE(business):TYPE(BOOLEAN1):0,0
+FIELD:other:LIKE(other):TYPE(BOOLEAN1):0,0
+FIELD:title:LIKE(title):TYPE(UNSIGNED1):0,0
+//CONCEPT statements should be used to group together interellated fields; such as address
+//RELATIONSHIP is used to find non-obvious relationships between the clusters
+//SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+//LINKPATH is used to define access paths for external linking

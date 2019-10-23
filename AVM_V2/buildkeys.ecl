@@ -1,4 +1,4 @@
-import avm_v2, versioncontrol, roxiekeybuild, ut;
+﻿import avm_v2, versioncontrol, roxiekeybuild, ut, strata;
 
 export buildkeys(string filedate) := function
 
@@ -26,9 +26,13 @@ Roxiekeybuild.MAC_SK_Move_v2('~thor_data400::key::avm_v2::@version@::medians','Q
 Roxiekeybuild.MAC_SK_Move_v2('~thor_data400::key::avm_v2::fcra::@version@::address','Q',mv_avm_address_fcra_to_qa);
 Roxiekeybuild.MAC_SK_Move_v2('~thor_data400::key::avm_v2::fcra::@version@::medians','Q',mv_avm_medians_fcra_to_qa);
 
+// DF-21487 Show counts of blanked out fields in thor_data400::key::avm_v2::fcra::qa::address
+cnt_avm_address_key_fcra := OUTPUT(strata.macf_pops(AVM_V2.Key_AVM_Address_FCRA,,,,,,FALSE,['fips_code']));
+
 build_key := sequential(avm_address_key,avm_apn_key,avm_comp_fid_key,avm_medians_key,avm_address_key_fcra,avm_medians_key_fcra,
-            mv_avm_address_key,mv_avm_apn_key,mv_avm_comp_fid_key,mv_avm_medians_key,mv_avm_address_key_fcra,mv_avm_medians_key_fcra,
-			mv_avm_address_to_qa,mv_avm_apn_to_qa,mv_avm_comp_fid_to_qa,mv_avm_medians_to_qa,mv_avm_address_fcra_to_qa,mv_avm_medians_fcra_to_qa);
+												mv_avm_address_key,mv_avm_apn_key,mv_avm_comp_fid_key,mv_avm_medians_key,mv_avm_address_key_fcra,mv_avm_medians_key_fcra,
+												mv_avm_address_to_qa,mv_avm_apn_to_qa,mv_avm_comp_fid_to_qa,mv_avm_medians_to_qa,mv_avm_address_fcra_to_qa,mv_avm_medians_fcra_to_qa,
+												cnt_avm_address_key_fcra);
 
 return build_key;
 

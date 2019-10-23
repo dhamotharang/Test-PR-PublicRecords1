@@ -1,9 +1,11 @@
-import address,autokey,ut,doxie;
+﻿import address,autokey,ut,doxie;
 
 Qsentd   := _keybuild_qsent_base;//Phonesplus.file_qsent_base;
 Address.MAC_Multi_City(Qsentd,p_city_name,zip5,multiCityPhonesplus);
 
 xl_qsent := RECORD
+	// Phonesplus.layoutCommonKeys;
+	// CCPA-5 include 2 new CCPA fields, global_sid and record_sid
 	Phonesplus.layoutCommonKeys;
 	unsigned6 fdid;
 	zero := 0;

@@ -1,4 +1,4 @@
-// Begin code to BEST data for each basis
+﻿// Begin code to BEST data for each basis
 import SALT30,ut;
 EXPORT Best(DATASET(layout_DOT_Base) ih,layout_specificities.R s = Specificities(ih).specificities[1],BOOLEAN RoxieService=FALSE) := MODULE
   h00 := Cleave(ih,s,RoxieService).input_file;

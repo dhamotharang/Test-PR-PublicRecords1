@@ -1,0 +1,1 @@
+﻿EXPORT layout_File := recordof(Scrubs_Headers_Monthly.In_File);

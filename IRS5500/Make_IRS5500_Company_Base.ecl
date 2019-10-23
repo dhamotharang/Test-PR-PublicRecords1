@@ -1,4 +1,4 @@
-IMPORT Address, AID, Business_Header, Business_Header_SS, MDR, NID, ut, PromoteSupers;
+﻿IMPORT Address, AID, Business_Header, Business_Header_SS, MDR, NID, ut, PromoteSupers;
 
 export make_irs5500_Company_base (string pFileDate, string pFormYear) := function 
 
@@ -229,7 +229,7 @@ Business_Header_SS.MAC_Add_BDID_Flex(IRS5500_Base_BDID_Init,
 																	spons_p_city_name,spons_sign_fname,
 																	spons_sign_mname,spons_sign_lname
 														      ,									// Contact_SSN
-																	,source						// Source Â– MDR.sourceTools
+																	,source						// Source  MDR.sourceTools
 																	,source_rec_id		//Source_Reccord_Id
 																	,true							//Src_Matching_is_priorty
 																	);
@@ -253,7 +253,7 @@ NewBase := ROLLUP(IRS5500_Base_BDID_All_sort,
 ut.MAC_Append_Rcid(NewBase,Source_rec_id,out_file);
 
 //OUTPUT(IRS5500_Base_BDID_All,, '~thor_data400::BASE::IRS5500_' + IRS5500.Version, OVERWRITE);
-PromoteSupers.MAC_SF_BuildProcess(out_file,'~thor_data400::base::irs5500',do1,3);
+PromoteSupers.MAC_SF_BuildProcess(out_file,'~thor_data400::base::irs5500',do1,3,,true);
 
 return do1;
 

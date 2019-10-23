@@ -1,4 +1,4 @@
-IMPORT Corp2, BIPV2;
+﻿IMPORT Corp2, BIPV2;
 
   EXPORT Layouts := MODULE
  
@@ -39,6 +39,8 @@ IMPORT Corp2, BIPV2;
     STRING bug_num;
     INTEGER8 append_row_id;
     STRING10 cust_name;
+  	String9 link_Fein;
+		String8 link_Inc_Date;
   END;
 
   EXPORT Stock_Base_Layout:=RECORD
@@ -69,9 +71,7 @@ IMPORT Corp2, BIPV2;
     STRING10  bug_num;
     UNSIGNED8 append_row_id;
     STRING10  cust_name;
-    STRING9   link_fein;
-    STRING8   link_inc_date;
-  END;
+    END;
 
   EXPORT Event_Out_Layout :=RECORD
     STRING30 corp_key;
@@ -100,7 +100,8 @@ IMPORT Corp2, BIPV2;
     STRING    bug_num;
     INTEGER8  append_row_id;
     STRING10  cust_name;
-    STRING8   link_inc_date;    
+    String9 link_ssn;
+		String8 link_DOB;
   END;
 
    EXPORT Corp_bdid_Layout:=RECORD

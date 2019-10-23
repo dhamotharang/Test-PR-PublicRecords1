@@ -1,0 +1,5 @@
+﻿export JPEG(INTEGER len) := TYPE
+	EXPORT DATA LOAD(DATA Dd) := Dd[1..len];
+	EXPORT DATA STORE(DATA Dd) := Dd[1..len];
+	EXPORT INTEGER PHYSICALLENGTH(DATA Dd) := len;
+END;

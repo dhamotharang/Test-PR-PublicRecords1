@@ -1,8 +1,8 @@
-import tools,strata;
+﻿import tools,strata;
 export proc_build_strata(
 	 string															pversion
 	,boolean														pOverwrite				= false
-	,dataset(Layouts.Base							)	pBaseFile   			= Files().Base.built		
+	,dataset(Layouts.Base_new						)	pBaseFile   			= Files().Base.built		
 	,boolean														pIsTesting				= tools._Constants.IsDataland
 ) :=
 function

@@ -1,0 +1,7 @@
+﻿//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_Civil_Court.Matter_BWR_PopulationStatistics - Population Statistics - SALT V3.9.0');
+IMPORT Scrubs_Civil_Court,SALT39;
+// In the line below substitute the file you want statistics for; and substitute any field names you can
+  Scrubs_Civil_Court.Matter_MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* dt_first_reported_field */,/* dt_last_reported_field */,/* process_date_field */,/* vendor_field */,/* state_origin_field */,/* source_file_field */,/* case_key_field */,/* parent_case_key_field */,/* court_code_field */,/* court_field */,/* case_number_field */,/* case_type_code_field */,/* case_type_field */,/* case_title_field */,/* case_cause_code_field */,/* case_cause_field */,/* manner_of_filing_code_field */,/* manner_of_filing_field */,/* filing_date_field */,/* manner_of_judgmt_code_field */,/* manner_of_judgmt_field */,/* judgmt_date_field */,/* ruled_for_against_code_field */,/* ruled_for_against_field */,/* judgmt_type_code_field */,/* judgmt_type_field */,/* judgmt_disposition_date_field */,/* judgmt_disposition_code_field */,/* judgmt_disposition_field */,/* disposition_code_field */,/* disposition_description_field */,/* disposition_date_field */,/* suit_amount_field */,/* award_amount_field */,outfile);
+  OUTPUT(outfile,NAMED('PopulationStatistics'));

@@ -1,19 +1,19 @@
-/*******************************************************************************************************************
- Spray 19 test seed data files onto THOR from bctlpedata12 /data/hds_2/credit_report_test_seed/filedate
+﻿/*******************************************************************************************************************
+ Spray 20 test seed data files onto THOR from bctlpedata12 /data/hds_2/credit_report_test_seed/filedate
 ********************************************************************************************************************/
-IMPORT Versioncontrol, _Control, tools;
+IMPORT Versioncontrol, _Control, tools, STD;
 EXPORT BusinessCreditReport_Spray(
 	 string		filedate
 	,boolean	pIsTesting	= false
 	,string		pServer			= _Control.IPAddress.bctlpedata12
-	,string		pDir				= '/data/hds_2/credit_report_test_seed/'+filedate+'/CSV/' 
-	,string		pGroupName	= IF(_Control.ThisEnvironment.Name='Dataland','thor400_dev01','thor400_30') 
+	,string		pDir				= '/data/hds_2/credit_report_test_seed/'+filedate+'/' 
+	,string 	pGroupName 	= STD.System.Thorlib.Group()
 ) :=
 FUNCTION
 
 	setupSuperFiles(STRING keyname) := FUNCTION
 
-		sfile := '~thor_data400::in::testseed::businesscreditreport::'+keyname;
+		sfile := '~thor_data400::base::testseed_'+keyname;
 		RETURN SEQUENTIAL(
 							FileServices.StartSuperFileTransaction(),
 							IF(FileServices.FileExists(sfile),FileServices.ClearSuperFile(sfile,true),FileServices.CreateSuperFile(sfile)),
@@ -22,7 +22,7 @@ FUNCTION
 	END;
 	
 	flfile(string pkeyword) := '~thor_data400::in::testseed::'+filedate+'::businesscreditreport::'+pkeyword;
-  fsfile(string pkeyword) := '~thor_data400::in::testseed::businesscreditreport::'+pkeyword;
+  fsfile(string pkeyword) := '~thor_data400::base::testseed_'+pkeyword;
 	
 	spry_raw:=DATASET([
 		 {pServer,pDir,'BusinessCreditReport_testseeds_1Echo.csv'									,0 ,flfile('inputecho'			),[{fsfile('inputecho'			)}],pGroupName,filedate,'','VARIABLE'}
@@ -42,8 +42,9 @@ FUNCTION
 		,{pServer,pDir,'BusinessCreditReport_testseeds_15TopBusOperations.csv' 		,0 ,flfile('topbusoper'			),[{fsfile('topbusoper'			)}],pGroupName,filedate,'','VARIABLE'}
 		,{pServer,pDir,'BusinessCreditReport_testseeds_16TopBusParent.csv'			 	,0 ,flfile('topbusparent'		),[{fsfile('topbusparent'		)}],pGroupName,filedate,'','VARIABLE'}
 		,{pServer,pDir,'BusinessCreditReport_testseeds_17TopBusConnectedBus.csv' 	,0 ,flfile('topbusconnect'	),[{fsfile('topbusconnect'	)}],pGroupName,filedate,'','VARIABLE'}
-		,{pServer,pDir,'BusinessCreditReport_testseeds_18TopBusContacts.csv' 		 	,0 ,flfile('topbuscontact'	),[{fsfile('topbuscontact'	)}],pGroupName,filedate,'','VARIABLE'}
+		,{pServer,pDir,'BusinessCreditReport_testseeds_18TopBusContacts.csv' 		 	,0 ,flfile('topbuscontacts'	),[{fsfile('topbuscontacts'	)}],pGroupName,filedate,'','VARIABLE'}
 		,{pServer,pDir,'BusinessCreditReport_testseeds_19Activity.csv' 						,0 ,flfile('topbusactivity'	),[{fsfile('topbusactivity'	)}],pGroupName,filedate,'','VARIABLE'}
+		,{pServer,pDir,'BusinessCreditReport_testseeds_20CRMatch.csv' 						,0 ,flfile('crmatch'				),[{fsfile('crmatch'				)}],pGroupName,filedate,'','VARIABLE'}
 	], VersionControl.Layout_Sprays.Info);
 		
 		RETURN SEQUENTIAL( 
@@ -66,6 +67,7 @@ FUNCTION
 				setupSuperFiles('topbusconnect'),
 				setupSuperFiles('topbuscontact'),
 				setupSuperFiles('topbusactivity'),
+				setupSuperFiles('crmatch'),
 				tools.fun_Spray
 						( 
 							spry_raw,																// pSprayInformation

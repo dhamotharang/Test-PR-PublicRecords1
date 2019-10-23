@@ -1,4 +1,4 @@
- import corp2,corp2_raw_tn,scrubs,scrubs_corp2_mapping_tn_ar,scrubs_corp2_mapping_tn_main,
+﻿ import corp2,corp2_raw_tn,scrubs,scrubs_corp2_mapping_tn_ar,scrubs_corp2_mapping_tn_main,
 				scrubs_corp2_mapping_tn_stock,std,tools,ut,versioncontrol;
  
  export TN := module;  
@@ -219,7 +219,7 @@
 			self.corp_state_origin								:= state_origin;			
 			self.corp_process_date								:= fileDate;
 			self.corp_sos_charter_nbr							:= corp2.t2u(l.control_no);
-			self.stock_shares_issued              := corp2.t2u(l.common_shares);
+			self.stock_shares_issued              := if(corp2.t2u(l.common_shares) not in ['02/06/2001', '08/19/2010'],corp2.t2u(l.common_shares),''); //per CI :dates for shares are errors
 			self.stock_type												:= 'COMMON';
       self                                  := [];
 		end;
@@ -255,15 +255,13 @@
 		AR_ScrubsWithExamples 	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_TN_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_TN_AR').CompareToProfile_with_Examples;
 		AR_ScrubsAlert				 	:= AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	 		:= Scrubs.fn_email_attachment(AR_ScrubsAlert);
-		AR_MailFile					 		:= FileServices.SendEmailAttachData(Corp2.Email_Notification_Lists.spray
+		AR_MailFile					 		:= FileServices.SendEmailAttachData(Corp2.Email_Notification_Lists.AttachedList
 																															 ,'Scrubs CorpAR_TN Report' //subject
 																															 ,'Scrubs CorpAR_TN Report' //body
 																															 ,(data)AR_ScrubsAttachment
 																															 ,'text/csv'
 																															 ,'CorpTNARScrubsReport.csv'
-																															 ,
-																															 ,
-																															 ,Corp2.Email_Notification_Lists.spray);
+																													);
 
 		AR_Badrecords				 		:= AR_N.ExpandedInFile(	
 																									 corp_key_Invalid							  			<> 0 or
@@ -338,15 +336,13 @@
 		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_TN_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_TN_Main').CompareToProfile_with_Examples;
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_MailFile							:= FileServices.SendEmailAttachData(Corp2.Email_Notification_Lists.spray
+		Main_MailFile							:= FileServices.SendEmailAttachData(Corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpMain_TN Report' //subject
 																																 ,'Scrubs CorpMain_TN Report' //body
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpTNMainScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,Corp2.Email_Notification_Lists.spray);
+																																);
 
 		Main_Badrecords					:= Main_N.ExpandedInFile(	
 																										 dt_vendor_first_reported_Invalid 			<> 0 or
@@ -470,15 +466,13 @@
 		Stock_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_TN_Stock','ScrubsAlerts', Stock_OrbitStats, version,'Corp_TN_Stock').CompareToProfile_with_Examples;
 		Stock_ScrubsAlert						:= Stock_ScrubsWithExamples(RejectWarning = 'Y');
 		Stock_ScrubsAttachment			:= Scrubs.fn_email_attachment(Stock_ScrubsAlert);
-		Stock_MailFile							:= FileServices.SendEmailAttachData(Corp2.Email_Notification_Lists.spray
+		Stock_MailFile							:= FileServices.SendEmailAttachData(Corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpStock_TN Report' //subject
 																																	 ,'Scrubs CorpStock_TN Report' //body
 																																	 ,(data)Stock_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpTNEventScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,Corp2.Email_Notification_Lists.spray);
+																																	);
 
 		Stock_Badrecords						:= Stock_N.ExpandedInFile(	
 																													corp_key_Invalid							  			<> 0 or
