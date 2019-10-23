@@ -120,7 +120,7 @@ county_reg(string2 code)
 '99' => 'WRIGHT',
 '' );  
 				
-boat_desc ( string1 bt_type) 
+boat_desc ( string bt_type) 
 := case(bt_type,
 '1' => 'CABIN CRUISER',       
 '2'	=> 'CANOE',               
@@ -137,7 +137,7 @@ boat_desc ( string1 bt_type)
 '');
 
 
-reg_status_desc( string1 code) 
+reg_status_desc( string code) 
 := case(code,
 '5'	=> 'NEW',                   
 '10'	=> 'RENEWED',        
@@ -200,18 +200,18 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := t
 	IsValidExpireDate									:=	STD.DATE.IsValidDate((integer)L.EXPIRATION_Date);
 	self.registration_expiration_date	:=	If(IsValidExpireDate,L.EXPIRATION_Date,'');
 	self.registration_status_code			:=	L.REG_STATUS;
-	self.registration_status_description	:=	reg_status_desc(L.REG_STATUS);
+	self.registration_status_description	:=	reg_status_desc(trim(L.REG_STATUS));
 	self.title_number							:=	IF(L.TITLE_NUMBER <> '000000000', L.TITLE_NUMBER,'');
 	IsValidTitleDate							:=	STD.DATE.IsValidDate((integer)L.ISSUE_DATE);
 	self.title_issue_date					:=	If(IsValidTitleDate,L.ISSUE_DATE,'');
 	self.title_type_code					:=	L.REG_TYPE;
-	self.title_type_description		:=	case(L.REG_TYPE,
+	self.title_type_description		:=	case(trim(L.REG_TYPE),
 	                                                                                                    '5' => 'REGISTRATION',
 																				'10' => 'TITLE AND REGISTRATION',
 																				'32' => 'DOCUMENTED',
 																				'');
 	self.watercraft_status_code      := L.RECORD_STATUS;
-	self.watercraft_status_description := case(L.RECORD_STATUS,
+	self.watercraft_status_description := case(trim(L.RECORD_STATUS),
 	                                                                                                                 '4' => 'COMPLETE',
 																						'');
 	self := L;

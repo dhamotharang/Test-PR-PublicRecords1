@@ -2,7 +2,7 @@
 
 // translates mi_phase01_update.mp Ab intio graph into ECL
 
-county_reg(string2 code)
+county_reg(string code)
 := case(code, 	
 'MI000'=>'FOREIGN    ',
 'MI001'=>'ALCONA     ',
@@ -90,7 +90,7 @@ county_reg(string2 code)
 'MI165'=>'WEXFORD    ','' );   
 
 
-trans_type_desc(string1 code)
+trans_type_desc(string code)
 := case(code, 
 'ORG' => 'ORIGINAL',
 'RNW' => 'RENEWAL',
@@ -129,7 +129,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := t
 	IsValidRegDate										:=	STD.DATE.IsValidDate((integer)L.REG_DATE);
 	self.registration_date		        :=	If(IsValidRegDate,L.REG_DATE,'');
 	self.transaction_type_code				:=	L.TRANS_CODE;
-	self.transaction_type_description	:=	trans_type_desc(L.TRANS_CODE);
+	self.transaction_type_description	:=	trans_type_desc(trim(L.TRANS_CODE));
 	IsValidTitleDate									:=	STD.DATE.IsValidDate((integer)L.TITLE_DATE);
 	self.title_issue_date					    :=	If(IsValidTitleDate,L.TITLE_DATE,'');
 	self															:= L;
