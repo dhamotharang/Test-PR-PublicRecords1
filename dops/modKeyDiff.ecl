@@ -23,6 +23,20 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 		
 	end;
 	
+	export rList := record
+			rListToProcess;
+			string originalsuper := '';
+			string keydifffile := '';
+			string keypatchfile := '';
+			boolean iskeydiffexist := false;
+			boolean iskeypatchexist := false;
+			boolean iskeydiff := false;
+			boolean iskeypatch := false;
+			boolean newfile := false;
+			boolean previousfile := false;
+			boolean previousfileinsuper := true;
+			dataset(STD.File.FsLogicalFileNameRecord) dSuperFileList;
+		end;
 	// Action: aCreateSupers
 	// Purpose: create keydiff super, father, grandfather
 	// Used in: fSuperFileTransaction
@@ -46,19 +60,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																				,p_esp).LayoutDetails();
 
 	EXPORT fGetFileStatus(dataset(rListToProcess) dListToProcess) := function
-		rList := record
-			rListToProcess;
-			string originalsuper := '';
-			string keydifffile := '';
-			string keypatchfile := '';
-			boolean iskeydiffexist := false;
-			boolean iskeypatchexist := false;
-			boolean iskeydiff := false;
-			boolean iskeypatch := false;
-			boolean newfile := false;
-			boolean previousfile := false;
-		end;
-
+		
 		rlist xGetFileStatus(dListToProcess l) := transform
 			isFileExists := STD.File.FileExists(l.newlogicalfile + '_keydiff');
 			patchFilename := if (STD.File.FileExists(l.newlogicalfile)
@@ -68,8 +70,6 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 			isKdiff := if (~isFileExists
 																and (STD.File.FileExists(l.newlogicalfile)
 																		and STD.File.FileExists(l.previouslogicalfile))
-																and ~(STD.File.SuperFileExists(l.newlogicalfile)
-																		and STD.File.SuperFileExists(l.previouslogicalfile))
 															,true
 															,false);
 			isPatchFileExists := STD.File.FileExists(patchFilename);
@@ -85,8 +85,10 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 			self.iskeydiffexist := isFileExists;
 			self.iskeypatch := isKPatch;
 			self.iskeypatchexist := isPatchFileExists;
-			self.newfile := STD.File.FileExists(l.newlogicalfile) and ~STD.File.SuperFileExists(l.newlogicalfile);
-			self.previousfile := STD.File.FileExists(l.previouslogicalfile) and ~STD.File.SuperFileExists(l.previouslogicalfile);
+			self.newfile := STD.File.FileExists(l.newlogicalfile);
+			self.previousfile := STD.File.FileExists(l.previouslogicalfile);
+			self.dSuperFileList := STD.File.LogicalFileSuperOwners(l.previouslogicalfile);
+																	
 			self := l;
 		end;
 		
@@ -100,11 +102,17 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																	,false
 																	,l.iskeydiff
 													);
+			self.previousfileinsuper := if (STD.File.FileExists(l.previouslogicalfile) 
+																		,if(count(l.dSuperFileList(~regexfind('forkeydiff',name))) > 0
+																				,true
+																				,false)
+																		,false
+																		);
 			self := l;
 									
 		end;
 		
-		disKeyDiff := project(dGetFileStatus,xIsKeyDiff(left));
+		disKeyDiff := nothor(project(global(dGetFileStatus,few),xIsKeyDiff(left)));
 		
 		return disKeyDiff;
 		
@@ -146,10 +154,8 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																IF (~STD.File.SuperFileExists(originalsuper)
 																	,STD.File.CreateSuperFile(originalsuper))
 																,IF (STD.File.FindSuperFileSubName(originalsuper,previouslogicalfile) = 0
-																	,sequential
-																		(STD.File.ClearSuperFile(originalsuper)
-																		,STD.File.AddSuperFile(originalsuper,previouslogicalfile)
-																		)
+																	,STD.File.AddSuperFile(originalsuper,previouslogicalfile)
+																		
 																	)
 															)
 														)
@@ -217,8 +223,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 						,sequential
 								(
 									// add to super to hold the previous key so it is not deleted
-									if (holdpreviousforkeydiff
-											,fHoldPreviousLogical(dListToProcess))
+									fHoldPreviousLogical(dListToProcess)
 									,apply(dStatus(iskeydiff)
 										,fKeyDiff(attributename
 															,superfile
@@ -231,10 +236,11 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 											,sequential
 													(
 														fSuperFileTransaction(superfile,keydifffile,'keydiff')
-														,IF (iskeydiff and holdpreviousforkeydiff
+														,IF (holdpreviousforkeydiff
 																,sequential
 																		(
-																			STD.File.RemoveOwnedSubFiles(originalsuper,true)
+																			if (previousfileinsuper
+																					,STD.File.RemoveOwnedSubFiles(originalsuper,true))
 																			,STD.File.ClearSuperFile(originalsuper)
 																		)
 																)
@@ -282,15 +288,14 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 						,sequential
 							(
 								output(p_dListToProcess,,vKeyDiffFileListPrefix+p_dopsdatasetname,overwrite)
-								,if(holdpreviousforkeydiff
-										,fHoldPreviousLogical(p_dListToProcess))
+								,fHoldPreviousLogical(p_dListToProcess)
 								,output(WsWorkunits.soapcall_WUWaitComplete
 																(WsWorkunits.Create_Wuid_Raw
 																		(
 																		'#workunit(\'name\',\'[KEYDIFF]: '+ p_dopsdatasetname +'\');\r\n'
 																		+ '#workunit(\'priority\',\'high\');\r\n'
 																		+ 'ds := dataset(\''+vKeyDiffFileListPrefix+p_dopsdatasetname+'\',dops.modKeydiff().rListToProcess,thor);\r\n'
-																			+ 'dops.modKeydiff(\''+p_esp+'\',\''+p_location+'\',\''+p_environment+'\').fRunKDiff(ds,false)'
+																			+ 'dops.modKeydiff(\''+p_esp+'\',\''+p_location+'\',\''+p_environment+'\').fRunKDiff(ds,'+if (holdpreviousforkeydiff,'true','false')+')'
 																			,STD.System.Job.Target()
 																			,p_esp
 																			,'8010'
