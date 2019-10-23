@@ -87,11 +87,11 @@ shared isTx   :=  txflag.VehicleFlag OR
                   txflag.CCFlag OR
                   txflag.CLUEFlag;
 
-shared relationship_key_qa        := Relationship.key_relatives_v3;
-shared dWatchdogUniversalKey      := Watchdog_V2.fn_UniversalKeySearch.basekey;
-shared relationship_key_Marketing := dWatchdogUniversalKey(permissions & dx_BestRecords.Constants.PERM_TYPE.marketing > 0);
-shared relationship_key_D2C       := dWatchdogUniversalKey(permissions & dx_BestRecords.Constants.PERM_TYPE.glb_d2c_filtered > 0);
-shared DID_ds_dist                := distribute(DID_ds,hash(did));
+shared relationship_key_qa           := Relationship.key_relatives_v3;
+shared dWatchdogUniversalKey         := Watchdog_V2.fn_UniversalKeySearch.basekey;
+shared relationship_Marketing_Filter := dWatchdogUniversalKey.permissions & dx_BestRecords.Constants.PERM_TYPE.marketing > 0;
+shared relationship_D2C_Filter       := dWatchdogUniversalKey.permissions & dx_BestRecords.Constants.PERM_TYPE.glb_d2c_filtered > 0;
+shared DID_ds_dist                   := distribute(DID_ds,hash(did));
 
 shared layout_GetRelationship.interfaceOutputNeutral xform(DID_ds l, relationship_key_qa r) := TRANSFORM
   self.title_type  := MAP(r.title between 1 and 43 => 'R',
@@ -132,15 +132,17 @@ doJoinThor(relKey, joinOptions) := functionmacro
   return out;
 endmacro;
 
-doFilteredJoin(relKey, joinOptions) := functionmacro
-  filteredOut := join(relationship_key_qa, relKey, keyed(left.did1=right.did), TRANSFORM(LEFT));
-  return doJoin(filteredOut,joinOptions);
+doFilteredJoin(relFilter, joinOptions) := functionmacro
+  filteredOut := join(dWatchdogUniversalKey(relFilter), DID_ds, left.did=right.did, TRANSFORM(RIGHT));
+  out := join(filteredOut, relationship_key_qa, keyed(left.did=right.did1), xform(left,right),#EXPAND(joinOptions));
+  return out;
 endmacro;
-doFilteredJoinThor(relKey, joinOptions) := functionmacro
-  relFilteredKeyJ := distribute(pull(relKey),hash(did));
+doFilteredJoinThor(relFilter, joinOptions) := functionmacro
+  relFilteredKeyJ := distribute(pull(dWatchdogUniversalKey)(relFilter),hash(did));
+  filteredOut := join(relFilteredKeyJ, DID_ds_dist, left.did=right.did, TRANSFORM(RIGHT), local);
   fullFilteredKey := distribute(pull(relationship_key_qa),hash(did1));
-  filteredOut := join(fullFilteredKey, relFilteredKeyJ, left.did1=right.did, TRANSFORM(LEFT), local);
-  return doJoinThor(filteredOut,joinOptions);
+  out := join(filteredOut, fullFilteredKey, left.did=right.did1, xform(left,right),#EXPAND(joinOptions), local);
+  return out;
 endmacro;
 
 skipOption   := 'LIMIT(MaxCount,SKIP)';
@@ -148,21 +150,21 @@ failOption   := 'LIMIT(MaxCount)';
 atmostOption := 'ATMOST(MaxCount)';
 allOption    := 'KEEP(20000),LIMIT(0)';
 thorOption   := atmostOption;
-relsSkip         := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_key_D2C, skipOption),
-                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_key_Marketing, skipOption),
+relsSkip         := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_D2C_Filter, skipOption),
+                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_Marketing_Filter, skipOption),
                         doJoin(relationship_key_qa, skipOption));
-relsFail         := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_key_D2C, failOption),
-                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_key_Marketing, failOption),
+relsFail         := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_D2C_Filter, failOption),
+                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_Marketing_Filter, failOption),
                         doJoin(relationship_key_qa, failOption));
-relsAtmost       := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_key_D2C, atmostOption),
-                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_key_Marketing, atmostOption),
+relsAtmost       := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_D2C_Filter, atmostOption),
+                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_Marketing_Filter, atmostOption),
                         doJoin(relationship_key_qa, atmostOption));
-relsAll0         := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_key_D2C, allOption),
-                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_key_Marketing, allOption),
+relsAll0         := MAP(RelKeyFlag='D2C'       => doFilteredJoin(relationship_D2C_Filter, allOption),
+                        RelKeyFlag='MARKETING' => doFilteredJoin(relationship_Marketing_Filter, allOption),
                         doJoin(relationship_key_qa, allOption));
 relsAll          := TOPN(relsAll0, 10000, -total_score, -total_cnt);
-relsTHOR         := MAP(RelKeyFlag='D2C'       => doFilteredJoinThor(relationship_key_D2C, thorOption),
-                        RelKeyFlag='MARKETING' => doFilteredJoinThor(relationship_key_Marketing, thorOption),
+relsTHOR         := MAP(RelKeyFlag='D2C'       => doFilteredJoinThor(relationship_D2C_Filter, thorOption),
+                        RelKeyFlag='MARKETING' => doFilteredJoinThor(relationship_Marketing_Filter, thorOption),
                         doJoinThor(relationship_key_qa, thorOption));
 
 shared rels      := MAP(doThor                       => relsThor,
