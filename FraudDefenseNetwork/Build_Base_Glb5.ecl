@@ -1,4 +1,4 @@
-﻿Import ut, tools, inquiry_acclogs, Address, did_Add, didville, FraudShared;
+﻿Import ut, std, tools, inquiry_acclogs, Address, did_Add, didville, FraudShared, mdr;
 
 export Build_Base_Glb5 (
                          string pversion
@@ -54,7 +54,7 @@ export Build_Base_Glb5 (
    Standardize_Phone(GLB5WrkPhCleaned, phone_number, GLB5PhoneCleaned, clean_phones.phone_number,, true);
 
    Mac_LexidAppend(GLB5PhoneCleaned, GLB5WithIDL);
-
+	 
   // Rollup Update and previous base
    Pcombined := if(UpdateGlb5, inBaseGlb5 + GLB5WithIDL, GLB5WithIDL);
    pDataset_Dist := distribute(Pcombined, hash32(transaction_id));
@@ -141,9 +141,11 @@ export Build_Base_Glb5 (
                                                         RecordID := Constants().GLB5RecIDSeries + left.source_rec_id;
                                                         self.record_sid := RecordID;
                                                         self := left;
-                                                       ));     
+                                                       ));   
+	 
+   dBase_GlobalSID := mdr.macGetGlobalSID(dBase_RecordID, 'FDN', 'source', 'global_sid');
 
-   tools.mac_WriteFile(Filenames(pversion).Base.Glb5.New, dBase_RecordID, Build_Base_File);
+   tools.mac_WriteFile(Filenames(pversion).Base.Glb5.New, dBase_GlobalSID, Build_Base_File);
   
 // Return
    export full_build := sequential(

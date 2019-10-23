@@ -1,9 +1,11 @@
-﻿import BIPV2_Build;
+﻿ 
+import BIPV2_Contacts;
+import BIPV2_Build;
+import STD;
 
-export BestContactTitles := function
+export BestContactTitles(string pVersion=(string) STD.Date.Today()) := function
   contact_title_layout := RECORD
     unsigned8 contact_title_rank;
-    string contact_job_title_derived;
     unsigned6 contact_did;
   END;
 
@@ -15,7 +17,12 @@ export BestContactTitles := function
     contact_title_layout;
   END;
 
-  contactTitles     := pull(BIPV2_Build.key_contact_title_linkids().keyvs(,false).qa);
+  contactKey := project(pull(BIPV2_Contacts.key_contact_linkids.keyvs(,false).built), BIPV2_Contacts.layouts.contact_linkids.layoutOrigFile);
+
+   
+  build_date        := (unsigned) STD.Str.Filter(pversion,'0123456789');	 
+  contactTitles     := BIPV2_Build.BestContactTitle(contactKey, build_date).contact_title;
+  
   flatContactTitles := normalize(contactTitles, left.contact_title,transform(flatContactTitleRec,self := left, self := right));
 
   return flatContactTitles(proxid=0);
