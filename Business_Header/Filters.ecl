@@ -1188,6 +1188,10 @@ module
 				filterbugDF23188 := trimids(l.vendor_id) = '54-193346' and l.did = 553167526
 														and l.bdid = 4495136182	and trim(l.lname) = 'CUNNINGHAM' and trim(l.fname) = 'BECKY';
 														
+				// -- JIRA - DF-23549, FCRA Overlinking of PAW Record to LexID 591453905 - Day
+				filterbugDF23549 := trimids(l.vendor_id) = '39-1125236' and l.did = 591453905
+														and l.bdid = 419590666 and trim(l.lname) = 'DAY' and trim(l.fname) = 'JOHN';
+														
 				phone 				:= (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				company_phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.company_phone));  // Zero the companyphone if more than 10-digits
 				
@@ -1212,10 +1216,10 @@ module
 				self.company_source_group	:= trimids(l.company_source_group);
 				self.DID									:= if(filterbug30402 or filterbug114192 or filterbugLNK563 or filterbugLNK1267 or
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or filterbugDF23926 or
-																				filterbugDF23188, 0, l.did);
+																				filterbugDF23188 or filterbugDF23549, 0, l.did);
 				self.ssn									:= if(filterbug30402 or filterbug114192 or filterbugLNK563 or filterbugLNK1267 or  
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or filterbugDF23926 or
-																				filterbugDF23188, 0, l.ssn);
+																				filterbugDF23188 or filterbugDF23549, 0, l.ssn);
 				//for bug 30494 & 30519.  20080424
 				self.dt_first_seen				:= (unsigned4)validatedate((string8)l.dt_first_seen						,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1));
 				self.dt_last_seen					:= (unsigned4)validatedate((string8)l.dt_last_seen						,if(length(trim((string8)l.dt_last_seen							)) = 8,0,1));
@@ -1439,6 +1443,9 @@ module
 				// -- JIRA - DF- 23188, PAW Over Linking to LexID 553167526 - Rebecca Gregory
 				filterbugDF23188 := trimids(l.vendor_id) = '54-193346' and l.did = 553167526
 														and l.bdid = 4495136182	and trim(l.lname) = 'CUNNINGHAM' and trim(l.fname) = 'BECKY';
+				// -- JIRA - DF-23549, FCRA Overlinking of PAW Record to LexID 591453905 - Day
+				filterbugDF23549 := trimids(l.vendor_id) = '39-1125236' and l.did = 591453905
+														and l.bdid = 419590666 and trim(l.lname) = 'DAY' and trim(l.fname) = 'JOHN';
 				// --- Bug#35653 -  For the "Eq_employer" source first & last seen dates are set to zero/blank as the 
 				// dates coming in from the base file are harded coded.
 				ZeroEq_EmployerDate :=  (MDR.sourceTools.SourceIsEq_Employer(l.source));
@@ -1453,10 +1460,10 @@ module
 				
 				self.DID									:= if(filterbug30402 or filterbugLNK563 or filterbugLNK1267 or 
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or
-																				filterbugDF23926 or filterbugDF23188, 0, l.did)	;
+																				filterbugDF23926 or filterbugDF23188 or filterbugDF23549, 0, l.did)	;
 				self.ssn									:= if(filterbug30402 or filterbugLNK563 or filterbugLNK1267 or 
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or
-																				filterbugDF23926 or filterbugDF23188, 0, l.ssn)	;
+																				filterbugDF23926 or filterbugDF23188 or filterbugDF23549, 0, l.ssn)	;
 				self											:= l														;                              
 			end;
 			

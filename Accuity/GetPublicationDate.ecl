@@ -1,4 +1,4 @@
-import ut;
+﻿import ut, std;
 
 lines := RECORD
 	string	line{MAXLENGTH(2056)};
@@ -52,9 +52,11 @@ GetDefaultDate(string id) :=
 	
 export string GetPublicationDate(string source) := FUNCTION
 	id := REGEXFIND(' (\\d+)$', source, 1);
-	pubdate := IF(EXISTS(dsPubdates(listid=id)),
-			TRIM(dsPubdates(listid=id)[1].pubdate),
-			GetDefaultDate(id));
+	pubdate := MAP(
+							EXISTS(dsPubdates(listid=id)) => TRIM(dsPubdates(listid=id)[1].pubdate),
+							source='GWL' => FormatDate((string)Std.date.Today() + '0000'),
+							GetDefaultDate(id)
+						);
 	ASSERT(pubdate <> '',
 			'The following list failed to build with listissuerdate=000000000000: '+source, FAIL);
 	return pubdate;

@@ -14,6 +14,8 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		spraying := maintenance+'spraying/';
 		outgoing := dataDir+'outgoing/';
 		
+		
+		
 		ilfn := '~nac::uber::in::'+lfn;
 
 		MoveReadyToSpraying := nothor(STD.File.MoveExternalFile(ip, ready+lfn, spraying+lfn));
@@ -47,9 +49,10 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		ExcessiveInvalidRecordsFound :=	err_rate	> treshld_;
 		
 		MoveToTempOrReject := 	if(ExcessiveInvalidRecordsFound
-																,MoveSprayingToError
-																,MoveSprayingToDone
-															);
+												,MoveSprayingToError
+												,MoveSprayingToDone
+											);
+
 		
 		out_NCF_reports := PARALLEL(
 					OUTPUT(reports.dsNcr2,,ModifyFileName(ilfn, 'ncr2'), COMPRESSED, OVERWRITE, named('ncr2')),
@@ -64,25 +67,24 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		end;		
 		
 		doit := sequential(
-											MoveReadyToSpraying
-											,SprayIt										
-											,OUTPUT(processed,,ModifyFileName(ilfn, 'nac2'), COMPRESSED, OVERWRITE)
-											,OUTPUT(reports.TotalRecords, named('total_records'))
-											,OUTPUT(reports.ErrorCount, named('Error_Count'))
-											//,Std.File.AddSuperFile('~nac::uber::in::pending', ModifyFileName(ilfn, 'xxx2')
-											//,OUTPUT(err_rate, named('err_rate'))
-											,MoveToTempOrReject
-											,out_NCF_reports
-											,IF(EXISTS(reports.dsContacts), fn_ProcessContactRecord(reports.dsContacts))
-											,IF(EXISTS(reports.dsExceptions), fn_ProcessExceptionRecord(reports.dsExceptions))
-											,OUTPUT(base2,,ModifyFileName(ilfn, 'bas2'), COMPRESSED, OVERWRITE)
-											,NOTHOR(Std.File.AddSuperFIle($.Superfile_List.sfReady, ModifyFileName(ilfn, 'bas2')))
-											,despray_NCF_reports('ncx2')
-											,despray_NCF_reports('ncd2')
-											,despray_NCF_reports('ncr2')
-											,$.Send_Email(st := lfn[6..7], fn := ModifyFileName(ilfn, 'ncr2')).FileValidationReport
-
-						);
+				MoveReadyToSpraying
+				,SprayIt										
+				,OUTPUT(processed,,ModifyFileName(ilfn, 'nac2'), COMPRESSED, OVERWRITE)
+				,OUTPUT(reports.TotalRecords, named('total_records'))
+				,OUTPUT(reports.ErrorCount, named('Error_Count'))
+				//,Std.File.AddSuperFile('~nac::uber::in::pending', ModifyFileName(ilfn, 'xxx2')
+				//,OUTPUT(err_rate, named('err_rate'))
+				,MoveToTempOrReject
+				,out_NCF_reports
+				,IF(EXISTS(reports.dsContacts), fn_ProcessContactRecord(reports.dsContacts))
+				,IF(EXISTS(reports.dsExceptions), fn_ProcessExceptionRecord(reports.dsExceptions))
+				,OUTPUT(base2,,ModifyFileName(ilfn, 'bas2'), COMPRESSED, OVERWRITE)
+				,NOTHOR(Std.File.AddSuperFIle($.Superfile_List.sfReady, ModifyFileName(ilfn, 'bas2')))
+				,despray_NCF_reports('ncx2')
+				,despray_NCF_reports('ncd2')
+				,despray_NCF_reports('ncr2')
+				,$.Send_Email(fn := ModifyFileName(ilfn, 'ncr2'), groupid := lfn[6..9]).FileValidationReport
+				 );
 
 	return doit;
 END;

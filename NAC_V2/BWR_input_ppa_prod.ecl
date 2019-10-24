@@ -5,7 +5,7 @@ envVars :=
  '#WORKUNIT(\'protect\',true);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
-+'#OPTION(\'AllowedClusters\',\'thor400_44_sla_eclcc,thor400_44_eclcc\');\n'
++'#OPTION(\'AllowedClusters\',\'thor400_sta_eclcc,thor400_deva_eclcc\');\n'
 +'#OPTION(\'AllowAutoQueueSwitch\',\'1\');\n'
 +'#OPTION(\'MultiplePersistInstances\',\'false\');\n'
 +'#STORED (\'_Validate_Year_Range_Low\', \'1800\');\n'
@@ -13,6 +13,7 @@ envVars :=
 +'wuname := \'NAC2 PPA Contributory File Processor\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 ;
+
 
 
 ip := _Control.IPAddress.bctlpedata10;

@@ -1,4 +1,4 @@
-import header, ut, avm_v2, fcra, header_quick, doxie_build, mdr;
+﻿import header, ut, avm_v2, fcra, header_quick, doxie_build, mdr;
 
 export Address_Table_v4(boolean isFCRA) := function
 	
@@ -62,6 +62,9 @@ layout_addr_risk := record
 	layout_counts en;
 	layout_counts tn;
 	layout_avm;
+	//CCPA-768
+	UNSIGNED4	global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 end;
 
 // join combo to eq

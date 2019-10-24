@@ -14,16 +14,34 @@ module
 
 	export lLexidTemplate					:= lPrefix + '::@version@::lexid';
 	export Lexid									:= tools.mod_FilenamesBuild(lLexidTemplate ,pVersion);
+	
+	export lLexidTemplateFull			:= lPrefix + '::@version@::lexid_full';
+	export Lexid_full							:= tools.mod_FilenamesBuild(lLexidTemplateFull ,pVersion);
+	
+	export lLexidTemplateDelta		:= lPrefix + '::@version@::lexid_delta';
+	export Lexid_delta						:= tools.mod_FilenamesBuild(lLexidTemplateDelta ,pVersion);
 
-	export lGroupRIDTemplate			:= lPrefix + '::@version@::grouprid';
+	export lGroupRIDTemplate			:= lPrefix + '::@version@::group_rid';
 	export GroupRID								:= tools.mod_FilenamesBuild(lGroupRIDTemplate ,pVersion);
-
-
+	
+	export lGroupRIDTemplateFull	:= lPrefix + '::@version@::group_rid_full';
+	export GroupRID_full					:= tools.mod_FilenamesBuild(lGroupRIDTemplateFull ,pVersion);
+	
+	export lGroupRIDTemplateDelta	:= lPrefix + '::@version@::group_rid_delta';
+	export GroupRID_delta					:= tools.mod_FilenamesBuild(lGroupRIDTemplateDelta ,pVersion);
 
 	export dAll_filenames := 
 
 		Lexid.dAll_filenames +
-		GroupRID.dAll_filenames		
+		GroupRID.dAll_filenames	+
+
+		Lexid_full.dAll_filenames +
+		GroupRID_full.dAll_filenames +
+		
+		Lexid_delta.dAll_filenames +
+		GroupRID_delta.dAll_filenames		
+
+
 		
 		;
 
