@@ -196,8 +196,8 @@ EXPORT SmartLinxReportService () := MACRO
   #stored ('KeepOldSsns', ~first_row.options.PruneAgedSSNs);
 	  // set up defaults: comp report options are the most detailed, so they can be used here
   options_esdl := module (project (options_in, PersonReports.IParam._compoptions, OPT))
-    export boolean include_bpsaddress := TRUE;
-    export unsigned1 max_relatives := 11;
+    export boolean include_bpsaddress := TRUE;   
+    export unsigned1 max_relatives := 20; // changing this constant for max # of relatives to be returned
   end;
 
   // store XML options for subsequent legacy-style reading
@@ -291,7 +291,6 @@ EXPORT SmartLinxReportService () := MACRO
 	Royalty.RoyaltyFares.MAC_SetD(recs.Foreclosures, royalties_fares);
 	Royalty.MAC_RoyaltyEmail(recs.Emailaddresses, royalties_email, source);	
  	royalties := if (not ut.IndustryClass.is_knowx, royalties_fares) + royalties_email;
-
   output (results, named ('Results'));
   output (royalties, named ('RoyaltySet'));
 
