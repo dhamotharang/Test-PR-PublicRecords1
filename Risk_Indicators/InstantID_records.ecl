@@ -278,7 +278,7 @@ ischase := if(CustomCVIModelName = 'CCVI1810_1', TRUE,FALSE);
 // JRP 02/12/2008 - Dataset of actioncode and reasoncode settings which are passed to the getactioncodes and reasoncodes functions.
 boolean IsInstantID := true;
 
-reasoncode_settings := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, IsIdentifier2, ischase}],riskwise.layouts.reasoncode_settings);
+reasoncode_settings := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, IsIdentifier2, ischase,false,false,false,IncludeEmailVerification}],riskwise.layouts.reasoncode_settings);
 actioncode_settings := dataset([{IsPOBoxCompliant, IsInstantID}],riskwise.layouts.actioncode_settings);
 
 // Check to see if Red Flags or Fraud Advisor Requested
@@ -747,7 +747,7 @@ vermiddle := Map(ischase AND isMiddleExpressionFound => '',
   
 	// add a sequence number to the reason codes for sorting in XML
 	
-	reasoncode_settings_chase := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, IsIdentifier2, ischase, isFirstExpressionFound, isLastExpressionFound, isAddrExpressionFound,includeemailverification}],riskwise.layouts.reasoncode_settings);
+	reasoncode_settings_chase := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, IsIdentifier2, ischase, isFirstExpressionFound, isLastExpressionFound, isAddrExpressionFound,IncludeEmailverification}],riskwise.layouts.reasoncode_settings);
   
 	
 	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings), original_reasons_with_seq);
@@ -839,7 +839,7 @@ vermiddle := Map(ischase AND isMiddleExpressionFound => '',
 	SELF := [];  // default models and red flags datasets to empty
 END;
 
-  ret_temp2 := ungroup(PROJECT(retplus_tmx, format_out(LEFT)));
+  ret_temp2 := ungroup(PROJECT(retplus_tmx, format_out(LEFT))); 
 /*---------use it to call the emailage gateway which will be going to use in future--------*/
 /*
   ret_temp2_temp := ungroup(PROJECT(retplus_tmx, format_out(LEFT)));
@@ -863,7 +863,6 @@ END;
 
  ret_temp2:= if(makegatewaycall,ret_temp2_gw,ret_temp2_temp);
 */
-
 ret_royalty := project(ret_temp2, transform(Risk_Indicators.Layout_InstantID_NuGenPlus,
 																																																				self.royalty_type_code_targus := targus[1].royalty_type_code,
                                                     self.royalty_type_code_insurance := insurance[1].royalty_type_code,
