@@ -102,7 +102,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																	,false
 																	,l.iskeydiff
 													);
-			self.previousfileinsuper := if (STD.File.FileExists(l.previouslogicalfile) 
+			self.previousfileinsuper := if (l.previousfile 
 																		,if(count(l.dSuperFileList(~regexfind('forkeydiff',name))) > 0
 																				,true
 																				,false)
@@ -112,7 +112,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 									
 		end;
 		
-		disKeyDiff := nothor(project(global(dGetFileStatus,few),xIsKeyDiff(left)));
+		disKeyDiff := project(dGetFileStatus,xIsKeyDiff(left));
 		
 		return disKeyDiff;
 		
@@ -289,7 +289,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 							(
 								output(p_dListToProcess,,vKeyDiffFileListPrefix+p_dopsdatasetname,overwrite)
 								,fHoldPreviousLogical(p_dListToProcess)
-								,output(WsWorkunits.soapcall_WUWaitComplete
+								/*,output(WsWorkunits.soapcall_WUWaitComplete
 																(WsWorkunits.Create_Wuid_Raw
 																		(
 																		'#workunit(\'name\',\'[KEYDIFF]: '+ p_dopsdatasetname +'\');\r\n'
@@ -303,7 +303,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																		,pWait := 180
 																		,pReturnOnWait := true
 																		,pesp := p_esp
-																	))
+																	))*/
 							)
 						,fail('**** RUN ON *THOR (NOT HTHOR)* CLUSTER *****')
 						);
