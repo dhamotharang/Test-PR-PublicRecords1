@@ -37,6 +37,9 @@ d_resp_did_optout := Suppress.MAC_FlagSuppressedSource(d_resp_did_append, mod_ac
 d_req_clean := dx_gateway.parser_targus.cleanRequest(req_formatted, mod_access, d_req_did_optout);
 d_resp_clean := dx_gateway.parser_targus.cleanResponse(resp_formatted, mod_access, d_resp_did_optout);	
 
+dfiltered_resp_did_optout := d_resp_did_optout(STD.Str.FilterOut(ssn+dob+phone10+fname+mname+lname+prim_range+predir+prim_name+
+                                               addr_suffix+postdir+unit_desig+sec_range+p_city_name+st+zip4+email,' ')<>'');
+
 /*** Put everything together to create a base record. Input + req and resp Common layout field + Decoded Json strin for request and response ***/
 gateway_collection_log.Layouts.Baselayout FullRecReq(infile_decoded L,d_req_did_optout R):=transform
    self.process_date          := (STRING8)Std.Date.Today();
@@ -66,8 +69,9 @@ gateway_collection_log.Layouts.Baselayout FullRecReq(infile_decoded L,d_req_did_
 	 self.time_added            := stringlib.stringfindreplace(L.date_added[12..19],':','');
 	 self.request_err_addr 	 	  := R.err_addr   ; // for address cleaner error messages ONLY 
 	 self.request_err_search 	  := R.err_search ;  // standard search errors; can contain ONLY standard error codes (or combination of thereof)
-	 self.request_error_code 	  := R.err_search ;
+	 self.request_error_code 	  := R.error_code ;
    self.requestis_suppressed  := R.is_suppressed;
+   self.lexid_in              := (integer)L.lexid_in;
    self := L;
 	 self.record_sid            := 0;
 	 self.cln_request_data      := '';
@@ -76,7 +80,7 @@ gateway_collection_log.Layouts.Baselayout FullRecReq(infile_decoded L,d_req_did_
 end;
 d_InputWithParsedReq := join(infile_decoded,d_req_did_optout,left.seq =right.seq,FullRecReq(left,right),left outer);
 
-gateway_collection_log.Layouts.Baselayout FullRecResp(d_InputWithParsedReq L,d_resp_did_optout R):=transform
+gateway_collection_log.Layouts.Baselayout FullRecResp(d_InputWithParsedReq L,dfiltered_resp_did_optout R):=transform
    self.response_section_id    := R.section_id ;
    self.response_did           := R.did        ;
    self.response_ssn           := R.ssn        ;
@@ -102,12 +106,12 @@ gateway_collection_log.Layouts.Baselayout FullRecResp(d_InputWithParsedReq L,d_r
 	 self.global_sid             := R.global_sid ;
 	 self.response_err_addr 	 	 := R.err_addr   ;  // for address cleaner error messages ONLY 
 	 self.response_err_search 	 := R.err_search ;  // standard search errors; can contain ONLY standard error codes (or combination of thereof)
-	 self.response_error_code 	 := R.err_search ;
+	 self.response_error_code 	 := R.error_code ;
    self.responseis_suppressed  := R.is_suppressed; 
    self := L;
    SELF := [];
 end;
-d_InputWithParsedReqResp := join(d_InputWithParsedReq,d_resp_did_optout,left.seq =right.seq,FullRecResp(left,right),left outer);
+d_InputWithParsedReqResp := join(d_InputWithParsedReq,dfiltered_resp_did_optout,left.seq =right.seq,FullRecResp(left,right),left outer);
 
 gateway_collection_log.Layouts.Baselayout FullRecReqcln(d_InputWithParsedReqResp L,d_req_clean R):=transform
 

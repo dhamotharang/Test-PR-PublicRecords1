@@ -5,7 +5,8 @@ EXPORT File_GatewayCollectionlogs_Keybuilding(STRING pVersion	=	(STRING8)Std.Dat
 dsLog := Files(,constants.useprod).File_GatewayCollectionlog_base;
 
 dx_gateway.Layouts.i_GatewayCollectionlog_DID intoKeylayout (dsLog L):= transform
-self.did := L.response_did;
+self.did           := Map(L.response_did = 0 => L.lexid_in,
+                          L.response_did );
 self.request_data  := L.cln_request_data; 
 self.response_data := L.cln_response_data; 
 self := L;

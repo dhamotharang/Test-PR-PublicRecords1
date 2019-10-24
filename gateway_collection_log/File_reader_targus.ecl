@@ -34,7 +34,7 @@ EXPORT File_reader_targus := module
     recs := project(infile,
 		                TRANSFORM(targus.Layout_Targus_out,       
 															SELF.Response.Header.QueryId := (STRING) LEFT.seq;
-															SELF := FROMXML(layout_response, '<Row>' + left.response_data + '</Row>').response
+															SELF := FROMXML(layout_response, '<Row>' + left.response_data + '</Row>').response;
 															SELF := []; 
 		               ));
     RETURN recs;

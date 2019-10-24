@@ -25,7 +25,7 @@ export mac_append_did(ds_in, ds_out, mod_access, append_did_local = TRUE,matchse
                         ,did                                                // DID_field,  //these will be set to zero before the linking                                            
                         ,%layout_append_did%                                // outrec, 
                         ,false,fake_DID_Score_field                         // bool_outrec_has_score, DID_Score_field,              //these should default to zero in definition
-                        ,$.Constants.DID_SCORE_THRESHOLD                    // low_score_threshold,    //dids with a score below here will be dropped 
+                        ,dx_gateway.Constants.DID_SCORE_THRESHOLD                    // low_score_threshold,    //dids with a score below here will be dropped 
                         ,%ds_in_append_local% );                            // outfile,
                         // ,true,src)                                       // bool_infile_has_name_source = 'false', src_field = '',
                                                                             // bool_all_scores ='false',  // will pass through even records with a 100 score// on to further match macros, to get further scores

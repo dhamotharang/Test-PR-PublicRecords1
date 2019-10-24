@@ -4,6 +4,7 @@ export layouts := MODULE
 
   export raw_xml_in := RECORD
     string date_added;
+    string Lexid_in;
     string transaction_id;
     string global_id;
     string esp_method;
@@ -16,6 +17,7 @@ export layouts := MODULE
   export decoded_xml_in := record
     integer seq;
     string date_added;
+    string Lexid_in;
     string transaction_id;
     string global_id;
     string esp_method;
@@ -29,67 +31,68 @@ export layouts := MODULE
 	   string8   process_date;
 	   unsigned4 seq;
 		 string    esp_method;
-		 STRING20  transaction_id;
+     unsigned6 lexid_in;
+		 string20  transaction_id;
 		 data      request_data;    // decoded
      string    request_format;
      data      response_data;   // decoded
      string    response_format;
      string8   date_added;      // YYYYMMDD
      string8   time_added;      // HHMMSS
-     UNSIGNED4 global_sid;
-     UNSIGNED8 record_sid;		 
+     unsigned4 global_sid;
+     unsigned8 record_sid;		 
 		 recordof(targus.Layout_Targus_out) temp_response_data1 {XPATH('TargusComprehensiveResponseEx')};
      string    cln_request_data; 
      string    cln_response_data; 		 
 		 //Request common layout
-		 UNSIGNED6 request_did;
-	   qSTRING9  request_ssn;
-	   qSTRING8  request_dob;
+		 unsigned6 request_did;
+	   qstring9  request_ssn;
+	   qstring8  request_dob;
 	   qstring10 request_phone10;
-	   qSTRING5  request_title;
-	   qSTRING20 request_fname;
-	   qSTRING20 request_mname;
-	   qSTRING20 request_lname;
-	   qSTRING5  request_suffix;
-	   qSTRING10 request_prim_range;
-	   qSTRING2  request_predir;
-	   qSTRING28 request_prim_name;
-	   qSTRING4  request_addr_suffix;
-	   qSTRING2  request_postdir;
-	   qSTRING10 request_unit_desig;
-	   qSTRING8  request_sec_range;
-	   qSTRING25 request_p_city_name;
-	   qSTRING2  request_st;
-	   qSTRING5  request_z5;
-	   qSTRING4  request_zip4;
-     QSTRING120 request_email:=''; 
+	   qstring5  request_title;
+	   qstring20 request_fname;
+	   qstring20 request_mname;
+	   qstring20 request_lname;
+	   qstring5  request_suffix;
+	   qstring10 request_prim_range;
+	   qstring2  request_predir;
+	   qstring28 request_prim_name;
+	   qstring4  request_addr_suffix;
+	   qstring2  request_postdir;
+	   qstring10 request_unit_desig;
+	   qstring8  request_sec_range;
+	   qstring25 request_p_city_name;
+	   qstring2  request_st;
+	   qstring5  request_z5;
+	   qstring4  request_zip4;
+     qstring120 request_email:=''; 
 		 string6 	 request_err_addr 	 	:= ''; // for address cleaner error messages ONLY 
 		 unsigned	 request_err_search 	:= 0;  // standard search errors; can contain ONLY standard error codes (or combination of thereof)
 		 integer	 request_error_code 	:= 0;
      boolean   requestis_suppressed := false;
 		 // response common layout
 		 unsigned1 response_section_id := 0;
-     UNSIGNED6 response_did;
-	   qSTRING9  response_ssn;
-	   qSTRING8  response_dob;
+     unsigned6 response_did;
+	   qstring9  response_ssn;
+	   qstring8  response_dob;
 	   qstring10 response_phone10;
-	   qSTRING5  response_title;
-	   qSTRING20 response_fname;
-	   qSTRING20 response_mname;
-	   qSTRING20 response_lname;
-	   qSTRING5  response_suffix;
-	   qSTRING10 response_prim_range;
-	   qSTRING2  response_predir;
-	   qSTRING28 response_prim_name;
-	   qSTRING4  response_addr_suffix;
-	   qSTRING2  response_postdir;
-	   qSTRING10 response_unit_desig;
-	   qSTRING8  response_sec_range;
-	   qSTRING25 response_p_city_name;
-	   qSTRING2  response_st;
-	   qSTRING5  response_z5;
-	   qSTRING4  response_zip4;
-     QSTRING120 response_email:='';
+	   qstring5  response_title;
+	   qstring20 response_fname;
+	   qstring20 response_mname;
+	   qstring20 response_lname;
+	   qstring5  response_suffix;
+	   qstring10 response_prim_range;
+	   qstring2  response_predir;
+	   qstring28 response_prim_name;
+	   qstring4  response_addr_suffix;
+	   qstring2  response_postdir;
+	   qstring10 response_unit_desig;
+	   qstring8  response_sec_range;
+	   qstring25 response_p_city_name;
+	   qstring2  response_st;
+	   qstring5  response_z5;
+	   qstring4  response_zip4;
+     qstring120 response_email:='';
 		 string6 	response_err_addr 	 	:= ''; // for address cleaner error messages ONLY 
 		 unsigned	response_err_search 	:= 0;  // standard search errors; can contain ONLY standard error codes (or combination of thereof)
 		 integer	response_error_code 	:= 0;
