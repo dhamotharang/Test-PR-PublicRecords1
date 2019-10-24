@@ -30,15 +30,7 @@ FUNCTION
 		lBatchIn batch_in;
 	END;
 	
-  mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
-    EXPORT unsigned1 glb := inMod.GLBPurpose;
-    EXPORT unsigned1 dppa := inMod.DPPAPurpose;
-    EXPORT string DataPermissionMask := inMod.DataPermissionMask;
-    EXPORT string DataRestrictionMask := inMod.DataRestrictionMask;
-    EXPORT string5 industry_class := inMod.industryclass;
-    EXPORT string32 application_type := inMod.applicationType;
-		EXPORT boolean show_minors := inMod.IncludeMinors OR (inMod.glbPurpose = 2);
-  END;
+  mod_access := PROJECT(inMod, doxie.IDataAccess);
 
 	rTargus_Layout tGetTargusData(dInReformat pInput) :=
 	TRANSFORM

@@ -320,5 +320,10 @@ end;
    	dataset(CommonPreLitigationReportIdentity) AKAs {xpath('AKAs/Identity'), MAXCOUNT(iesp.constants.BR.MaxAKA)};
    	
    end;
-
+	 
+	EXPORT header_recPlusSource  := record
+					recordof(doxie.Key_Header);					
+				      integer2 count := 0;
+				      string32 _type := '';					
+	end;
 end;

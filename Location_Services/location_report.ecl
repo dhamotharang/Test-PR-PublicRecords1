@@ -98,7 +98,7 @@ addrVarsAsInput := PROJECT(addrVars, doxie_raw.Layout_address_input);
 
 busMod := Location_Services.GetByBDID(addr_in, mod_access.application_type);
 
-busFids := IF(useBusinessIds, Location_Services.GetByBusinessIds(addr_in).GetPropFids(), 
+busFids := IF(useBusinessIds, Location_Services.GetByBusinessIds(addr_in, mod_access).GetPropFids(), 
 													    busMod.GetPropFids());
 
 deed_out := Location_Services.deed_records(addrVarsAsInput,busFids);
@@ -406,7 +406,7 @@ END;
 
 busAssocs := PROJECT(best_group, getBusAssoc(LEFT));
 
-busAssocsWithLinkIds := IF(useBusinessIds, Location_Services.GetByBusinessIds(addr_in).linkIdsInfoOut);
+busAssocsWithLinkIds := IF(useBusinessIds, Location_Services.GetByBusinessIds(addr_in, mod_access).linkIdsInfoOut);
 
 Location_Services.Layout_report.BusAssoc rollBusNames(busAssocs l, busAssocs R) := TRANSFORM
 	SELF.group_id := L.group_id;

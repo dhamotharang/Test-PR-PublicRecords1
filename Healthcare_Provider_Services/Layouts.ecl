@@ -1,4 +1,4 @@
-import doxie_files, doxie, doxie_cbrs, NPPES, ingenix_natlprof,standard,ams,Autokey_batch,iesp, dea,Prof_LicenseV2;
+﻿import doxie_files, doxie, doxie_cbrs, NPPES, ingenix_natlprof,standard,ams,Autokey_batch,iesp, dea,Prof_LicenseV2;
 
 export Layouts := MODULE
 
@@ -454,6 +454,8 @@ export Layouts := MODULE
 			String50 BoardCertifiedSubSpecialty5Verification := '';
 	end;
 	export autokeyInput := record
+	    unsigned4 global_sid:=0;
+			unsigned4 record_sid := 0; 
 			autokeyInput_base_validations;
 			boolean isReport := false;//Usage for Report rule set
 			boolean isBatchService := false;//Future use to allow batch rule set
@@ -479,7 +481,7 @@ export Layouts := MODULE
 			boolean includeSourceCLIA := false;//Usage for selecting which data to include in the results
 			boolean includeSourceABMS := false;//Usage for selecting which data to include in the results
 			boolean includeSourceNCPDP := false;//Usage for selecting which data to include in the results
-	end;
+				end;
 	export Layout_Autokeys_Prov := record
 		ingenix_natlprof.Basefile_Provider_Did.ProviderID;
 		ingenix_natlprof.Basefile_Provider_Did.AddressID;
@@ -3016,5 +3018,6 @@ export Layouts := MODULE
 		String5 	Verification_BoardCertifiedSubSpecialty4Valid := '';
 		String5 	Verification_BoardCertifiedSpecialty5Valid := '';
 		String5 	Verification_BoardCertifiedSubSpecialty5Valid := '';
+		boolean hasoptout:=false;
 	end;
 end;

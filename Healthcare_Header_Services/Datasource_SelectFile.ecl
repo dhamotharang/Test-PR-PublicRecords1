@@ -1,10 +1,7 @@
-﻿/*2018-02-01T01:11:27Z (HABBU, JAIDEEP (RIS-BCT))
-checkin changes as per RR-12063
-*/
-Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sanctions;
+﻿Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sanctions,Suppress;
 /*Changes for RR11959*/
- EXPORT Datasource_SelectFile := MODULE
- Export get_providers_base (dataset(Healthcare_Header_Services.Layouts.searchKeyResults_plus_input) input):= function
+EXPORT Datasource_SelectFile := MODULE
+	Export get_providers_base (dataset(Healthcare_Header_Services.Layouts.searchKeyResults_plus_input) input,dataset(Healthcare_Header_Services.layouts.common_runtime_config) cfg):= function
 			// rawdataIndividual:= join(dedup(sort(input(lnpid>0),record),record), Enclarity.Keys(,true).individual_lnpid.qa,
 											// keyed(left.lnpid = right.lnpid),
 											// transform(Layouts.selectfile_providers_base_with_input, 
@@ -83,27 +80,13 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 																		self.addr_conf_score := (integer)right.prac_addr_confidence_score;
 																		self:=left), left outer,
 											keep(Healthcare_Header_Services.Constants.IDS_PER_DID), limit(0)); 
-			// baseRecs := project(sort(rawdataIndividual+rawdataIndividualbyVendorid,acctno,-addr_conf_score,-clean_last_verify_date),Transforms.build_selectfile_Provider_base(left));
-			rawdataDeduped:=dedup(sort(rawdataIndividualwithAddrScores,acctno,lnpid,addr_conf_score,addr_rectype,bdid,best_dob,best_ssn,bill_addr_ind,bill1_fax_ind,bill1_phone_ind,birth_year,addr_suffix,clean_company_name,clean_last_verify_date,p_city_name,postdir,predir,prim_name,prim_range,sec_range,st,unit_desig,zip,date_of_death,dea_bus_act_ind,dea_num,dea_num_exp,did,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,fax1,fips_county,fips_st,first_name,gender,geo_lat,geo_long,group_key,last_name,lic_begin_date,lic_end_date,lic_num,lic_state,lic_status,lic_type,lnpid,middle_name,normed_addr_rec_type,npi_num,oig_flag,opm_flag,orig_fullname,phone1,prac_addr_ind,prac1_fax_ind,prac1_phone_ind,primary_location,provider_status,state_restrict_flag,suffix_name,suffix_other,title,upin,v_city_name,zip4),
+			   Supmacselectfile:=Suppress.MAC_FlagSuppressedSource(rawdataIndividualwithAddrScores, CFG[1]); 
+         setOptOutselectfile := project(Supmacselectfile, transform(Healthcare_Header_Services.Layouts.selectfile_providers_base_with_input,self.hasOptOut:= left.is_suppressed;self:=left;self:=[];))   ;                                                                                 
+				rawdataDeduped:=dedup(sort(setOptOutselectfile,acctno,lnpid,addr_conf_score,addr_rectype,bdid,best_dob,best_ssn,bill_addr_ind,bill1_fax_ind,bill1_phone_ind,birth_year,addr_suffix,clean_company_name,clean_last_verify_date,p_city_name,postdir,predir,prim_name,prim_range,sec_range,st,unit_desig,zip,date_of_death,dea_bus_act_ind,dea_num,dea_num_exp,did,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,fax1,fips_county,fips_st,first_name,gender,geo_lat,geo_long,group_key,last_name,lic_begin_date,lic_end_date,lic_num,lic_state,lic_status,lic_type,lnpid,middle_name,normed_addr_rec_type,npi_num,oig_flag,opm_flag,orig_fullname,phone1,prac_addr_ind,prac1_fax_ind,prac1_phone_ind,primary_location,provider_status,state_restrict_flag,suffix_name,suffix_other,title,upin,v_city_name,zip4),
 														acctno,lnpid,addr_conf_score,addr_rectype,bdid,best_dob,best_ssn,bill_addr_ind,bill1_fax_ind,bill1_phone_ind,birth_year,addr_suffix,clean_company_name,clean_last_verify_date,p_city_name,postdir,predir,prim_name,prim_range,sec_range,st,unit_desig,zip,date_of_death,dea_bus_act_ind,dea_num,dea_num_exp,did,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,fax1,fips_county,fips_st,first_name,gender,geo_lat,geo_long,group_key,last_name,lic_begin_date,lic_end_date,lic_num,lic_state,lic_status,lic_type,lnpid,middle_name,normed_addr_rec_type,npi_num,oig_flag,opm_flag,orig_fullname,phone1,prac_addr_ind,prac1_fax_ind,prac1_phone_ind,primary_location,provider_status,state_restrict_flag,suffix_name,suffix_other,title,upin,v_city_name,zip4);
-			// rawdataDeduped:=dedup(sort(rawdataIndividualbyVendorid,record),record);
 			baseRecs := project(sort(rawdataDeduped,acctno,-addr_conf_score,-clean_last_verify_date),Healthcare_Header_Services.Transforms.build_selectfile_Provider_base(left));
-			// rejoinLNPID := join(dedup(sort(input(vendorid<>''),acctno,lnpid,vendorid),acctno,lnpid,vendorid),providers_rolled,left.acctno=right.acctno and left.vendorid = right.vendorid,transform(Layouts.CombinedHeaderResults,self:=left;self:=right),keep(Healthcare_Header_Services.Constants.IDS_PER_DID), limit(0));
-			// output(noHits,named('noHits'),extend);
-			// output(nohitcheckHistory,named('nohitcheckHistory'),extend);
-			// output(rawdataIndividualbyVendorid,named('rawdataIndividualbyVendorid'),extend);
-			// output(rawdataIndividualbyVendorid2,named('rawdataIndividualbyVendorid2'),extend);
-			// output(rawdataDeduped,named('rawdataDeduped'));
-			// output(baseRecs);
-
-
-
-
-
-
-			// output(providers_rolled,named('providers_rolled'));
-			// output(rejoinLNPID,named('rejoinLNPID'));
-		return baseRecs;
+		  
+	return baseRecs;
 	end;
 
 	Export appendLicense(dataset(Healthcare_Header_Services.Layouts.CombinedHeaderResults) input, dataset(Layouts.GroupKey) searchby):= function
@@ -294,7 +277,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 																			transform(Healthcare_Header_Services.layouts.CombinedHeaderResults,
 																								self.Taxonomy := right.childinfo;
 																								self := left),left outer);
-			return results;
+    		return results;
 	end;
 
 	Shared appendSanctionGroup(dataset(Healthcare_Header_Services.layouts.layout_sanctions) input):= function
@@ -310,6 +293,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 			end;
 			setGrpSortOrder := project(finalSort,addSeq(left,counter));
 			final:=ungroup(sort(setGrpSortOrder,acctno,ProviderID,group_key,GroupSortOrder));
+	
 		return final;
 	end;
 
@@ -349,6 +333,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 																		self:=left;
 																		self:=[]),
 											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0), left outer);
+
 			return rawdatalookup4;
 	end;
 
@@ -398,12 +383,6 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 																								self.hasOIG := exists(SancRecs(stateorfederal='FEDERAL' and SancLevel = 'OIG'));
 																								self.hasOPM := exists(SancRecs(stateorfederal='FEDERAL' and SancLevel = 'OPM'));
 																								self := left),left outer);
-			 //output(rawdata,named('encsancrawdata'),extend);
-			// output(UpdateLicenseStatus);
-			// output(appendLookups);
-			// output(grpSanc);
-			// output(sanctions_rollup);
-			// output(results,named('encsancresults'),extend);
 			return results;
 	end;
 
@@ -426,7 +405,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 											// keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)); 
 			// noHits := join(input,rawdataFacilities,left.acctno=right.acctno,transform(Healthcare_Header_Services.layouts.searchKeyResults_plus_input, self:=left),left only);
 			noHits := input;
-			rawdataFacilitiesbyVendorid:= sort(join(dedup(sort(noHits(vendorid<>''),record),record), Enclarity.Keys(,true).facility_group_key.qa,
+				rawdataFacilitiesbyVendorid:= sort(join(dedup(sort(noHits(vendorid<>''),record),record), Enclarity.Keys(,true).facility_group_key.qa,
 											keyed(left.vendorid = right.group_key)  and right.record_type = 'C',
 											transform(Healthcare_Header_Services.layouts.selectfile_facilities_base_with_input,
 																		SELF.clean_prim_range:=right.prim_range;
@@ -468,12 +447,10 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 											// left.lnpid = right.lnfid and right.record_type='C',
 											Transforms.build_selectfile_Facility_sanctions(left,right),
 											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
-			// output(getSanctionRecords,named('getSanctionRecords'),extend);
+			
 			merge_facilities_sorted := sort(getSanctionRecords, acctno, SrcId, Src);
 			merge_facilities_grouped := group(merge_facilities_sorted, acctno, SrcId, Src);
 			merge_facilities_rolled := rollup(merge_facilities_grouped, group, Transforms.doSelectFileFacilitiesBaseRecordSrcIdRollup(left,rows(left)));			
-			// output(baseRecs,named('baseRecs'),extend);
-			// output(merge_facilities_rolled,named('merge_facilities_rolled'),extend);
 			mergewithBase := join(baseRecs,merge_facilities_rolled,left.acctno=right.acctno and left.lnpid = right.lnpid,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults,
 														self.names := dedup(sort(left.names+right.names,record),record);
 														self.Addresses := dedup(sort(left.Addresses+right.Addresses,record),record);
@@ -488,15 +465,14 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 														self:=right;), keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 			leftonlyRecs := join(baseRecs,mergewithBase,left.acctno=right.acctno and left.lnpid = right.lnpid,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults,self:=left),left only);
 			rightonlyRecs := join(merge_facilities_rolled,mergewithBase,left.acctno=right.acctno and left.lnpid = right.lnpid,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults,self:=left),left only);
-			mergedRecs := leftonlyRecs+mergewithBase+rightonlyRecs;
-			// output(mergedRecs,named('mergewithBase'),overwrite);
+			mergedRecs := leftonlyRecs+mergewithBase+rightonlyRecs;			
 			// updateFEIN := join(baseRecs(min(names,namepenalty) < Healthcare_Header_Services.Constants.BUS_NAME_MATCH_THRESHOLD),fein_rolled,left.acctno=right.acctno,transform(Layouts.CombinedHeaderResults, self.feins:=dedup(sort(left.feins+right.childinfo,record),record);self:=left;self:=[];),left outer,keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 			updateFEIN := join(mergedRecs,fein_rolled,left.acctno=right.acctno and left.lnpid=right.providerid,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults, self.feins:=dedup(sort(left.feins+right.childinfo,record),record);self:=left;self:=[];),left outer,keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 			updateSanctions := project(updateFEIN+getSanctionRecords,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults,
-																		               // sanctionLookup := appendSanctionLookup(left.Sanctions);
+																		                sanctionLookup := appendSanctionLookup(left.Sanctions);
 																										//FinalSanctions := appendSanctionGroup(sanctionLookup);
-																										//self.Sanctions := left.Sanctions;
-																										self.LegacySanctions := Functions.buildLegacySanctionRecord(left,left.sanctions);
+																										self.Sanctions := sanctionLookup;
+																										self.LegacySanctions := Functions.buildLegacySanctionRecord(left,sanctionLookup);
 																										self := Left));
 			getInput:= project(input,transform(Healthcare_Header_Services.layouts.autokeyInput,self.license_state:=left.UserLicenseState;self.license_number:=left.UserLicenseNumber;
 																															self.TaxID:=left.userTaxID; self.UPIN:=left.userUPIN;self.NPI:=left.userNPI;
@@ -506,11 +482,12 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 			facilities_final_sorted := sort(filterRec, acctno, SrcId, Src,vendorid);
 			facilities_final_grouped := group(facilities_final_sorted, acctno, SrcId, Src,vendorid);
 			facilities_rolled := rollup(facilities_final_grouped, group, Transforms.doSelectFileFacilitiesBaseRecordSrcIdRollup(left,rows(left)));			
-      return facilities_rolled;
+       return facilities_rolled;
+			
 	end;
 
 	Export get_selectfile_entity (dataset(Healthcare_Header_Services.layouts.searchKeyResults_plus_input) input,dataset(Healthcare_Header_Services.layouts.common_runtime_config) cfg):= function
-			providers_base := get_providers_base(input);
+			providers_base := get_providers_base(input,cfg);
 			getkeys := dedup(project(providers_base,transform(Healthcare_Header_Services.layouts.GroupKey, self.acctno := left.acctno;self.ProviderID:=left.srcid;self.group_key :=left.Vendorid;)),all,hash);
 			// Append Other data
 			appendLicenseData := appendLicense(providers_base,getkeys);
@@ -520,24 +497,12 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 			appendAssociationData := appendAssociation(appendHospitalData,getkeys);
 			appendTaxonomyData := appendTaxonomy(appendAssociationData,getkeys);
 			appendSanctionData := appendSanction(appendTaxonomyData,getkeys);
-			// output(input,named('EnclarityInput'));
-			// output(providers_base,named('providers_base'));
-			// output(getkeys,named('getkeys'));
-			// output(appendSpecialtyData,named('appendSpecialtyData'));
-			// output(appendMedSchoolData,named('appendMedSchoolData'));
-			// output(appendHospitalData,named('appendHospitalData'));
-			// output(appendAssociationData,named('appendAssociationData'));
-			// output(appendTaxonomyData,named('appendTaxonomyData'));
-			// output(appendSanctionData,named('appendSanctionData'));
 			facilities_base := get_facilities_base(input);
 			// output(facilities_base,named('facilities_base'));
 			providers_final_sorted := sort(appendSanctionData+facilities_base, acctno, SrcId, Src);
 			providers_final_grouped := group(providers_final_sorted, acctno, SrcId, Src);
 			// output(providers_final_grouped);
 			providers_rolled := rollup(providers_final_grouped, group, Transforms.doSelectFileProvidersBaseRecordSrcIdRollup(left,rows(left)));			
-			// output(providers_rolled);
-		
-			 
 			return providers_rolled;//Only one should ever get populated
 	end;
 
@@ -571,10 +536,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 																																						self.vendorid:=(string)right.billing_group_key;
 																																						self:=right;self:=left),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN),limit(0))(vendorid<>''),record),record);
 		rawdata := get_facilities_base(dedup(sort(searchKeyResults_w_input+possibleFEIN_input,record),record));
-		// output(ak,named('ak'));
-		// output(akFmt,named('akFmt'));
-		// output(searchKeyResults_w_input,named('searchKeyResults_w_input'));
-		// output(rawdata,named('rawdata'));
+		
 		return rawdata;
 	end;
 
@@ -625,19 +587,6 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 																																						self:=right;self:=left),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN),limit(0))(vendorid<>''),record),record);
 		//Get the raw data for the closest matches
 		rawdata := get_facilities_base(searchKeyResults_w_input+searchByFEIN_w_input);
-		// output(ak,named('get_selectfile_byBusAutokeys_ak'));
-		// output(akScore,named('get_selectfile_byBusAutokeys_akScore'));
-		// output(akCheckBestNpi,named('get_selectfile_byBusAutokeys_akCheckBestNpi'));
-		// output(keepOnlyBestNpi,named('get_selectfile_byBusAutokeys_keepOnlyBestNpi'));
-		// output(akCheckBestAddr,named('get_selectfile_byBusAutokeys_akCheckBestAddr'));
-		// output(keepOnlyBestAddr,named('get_selectfile_byBusAutokeys_keepOnlyBestAddr'));
-		// output(limitBest,named('get_selectfile_byBusAutokeys_limitBest'));
-		// output(akFilter,named('get_selectfile_byBusAutokeys_akFilter'));
-		// output(akFmt,named('get_selectfile_byBusAutokeys_akFmt'));
-		// output(searchKeyResults_w_input,named('get_selectfile_byBusAutokeys_searchKeyResults_w_input'));
-		// output(searchByFEIN,named('get_selectfile_byBusAutokeys_searchByFEIN'));
-		// output(searchByFEIN_w_input,named('get_selectfile_byBusAutokeys_searchByFEIN_w_input'));
-		// output(rawdata,named('rawdata'));
 		return rawdata;
 	end;
 	//Support Gap Sanctions common routine
@@ -719,7 +668,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 		//Handle Jr/Sr problems
 		sancs_by_sid_filtered:=join(input,dedup(sancs_by_sid_filter1,record,all),left.acctno=right.acctno,transform(Healthcare_Header_Services.layouts.layout_LegacySanctions,
 																										skipRec := (integer)left.dob > 0 and (integer)right.SANC_DOB > 0 and
-																																			(Max((integer)left.DOB[1..4],(integer)right.SANC_DOB[1..4]) - 
+																																			(max((integer)left.DOB[1..4],(integer)right.SANC_DOB[1..4]) - 
 																																			ut.EarliestDate((integer)left.DOB[1..4],(integer)right.SANC_DOB[1..4])) > 13;
 																										self.providerid:=if(skipRec or 
 																																				(left.providersrc = Healthcare_Header_Services.Constants.SRC_SANC and (integer)left.providerid <> (integer)right.sanc_id),
@@ -781,14 +730,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 																self.StateLicenses := dataset([{left.acctno,left.SANC_ID,0,left.sanc_sancst,left.sanc_licnbr,'',''}],Healthcare_Header_Services.layouts.layout_licenseinfo)(LicenseNumber<>'');
 																self:=left;self:=[];));
 		fullRecFinal := join(fullRec,results_rolled, left.acctno=right.acctno and left.LNPID=right.ProviderID, transform(Healthcare_Header_Services.layouts.CombinedHeaderResults,self.LegacySanctions:=right.childinfo;self:=left),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
-		// output(sanc_keyRec);
-		// output(input);
-		// output(sancs_by_sid);
-		// output(sancs_by_sid_filter1);
-		// output(sancs_by_sid_filtered);
-		// output(f_sancs_dep);
-		// output(fullRec);
-		// output(results_rolled);
+	
 		return fullRecFinal;
 	end;
 	//Support Gap Sanctions via Input Criteria
@@ -814,13 +756,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 		//Only return Sanction ID < 1000000 as those above that number are backfill keys Enclarity data not Gap data
 		recs := (sanc_keyRec+sanc_ids_byak)((integer)SANC_ID>0 and (integer)SANC_ID<10000000);
 		rawdata := getSanctionsCommon(input,recs,cfg);
-		// output(sanc_byUpin,named('getSanctions_sanc_byUpin'));
-		// output(sanc_byStLic,named('getSanctions_sanc_byStLic'));
-		// output(sanc_keyRec,named('getSanctions_sanc_keyRec'));
-		// output(NoHitsforAK,named('getSanctions_NoHitsforAK'));
-		// output(sanc_ids_byak,named('getSanctions_sanc_ids_byak'));
-		// output(recs,named('getSanctions_recs'));
-		// output(rawdata,named('getSanctions_rawdata'));
+		
 		return rawdata;
 	end;
 	//Support Gap Bus Sanctions via Input Criteria
@@ -845,15 +781,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 		recscombined := (bussanc_by_Bus_name+Bussanc_byfein+Bussanc_bytaxid);
 		recs := if (exists(recscombined),recscombined,sanc_ids_byak)(SANC_ID>0 and SANC_ID<10000000);
 		rawdata := getSanctionsCommon(input,recs,cfg);
-		// output(input);
-		// output(bussanc_by_Bus_name);
-		// output(Bussanc_bytaxid);
-		// output(Bussanc_byfein);
-		// output(NoHitsforAK,named('NoHitsforAK'),overwrite);
-		// output(sanc_ids_byak,named('sanc_ids_byak'),overwrite);
-		// output(recscombined,named('recscombined'),overwrite);
-		// output(recs);
-		// output(rawdata);
+		
 		return rawdata;
 	end;
 /* Need good test case to finish up
@@ -948,15 +876,6 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 			linkedRecs := prefill+appendRecs;
 			unlinkedRecs := join(recs,linkedRecs,left.acctno=right.acctno,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults, self:=left),left only);
 			final := linkedRecs+unlinkedRecs;
-			// output(Recs,named('Recs'));
-			// output(checklnpidkey,named('checklnpidkey'));
-			// output(rawRecsLinking,named('rawRecsLinking'));
-			// output(getLinkedSanctions,named('getLinkedSanctions'));
-			// output(prefill,named('prefill'));
-			// output(remainingRecs,named('remainingRecs'));
-			// output(getSanc,named('getSanc'));
-			// output(appendRecs,named('appendRecs'));
-			// output(final,named('final'));
-		return final;
+			return final;
 	end;
 end;

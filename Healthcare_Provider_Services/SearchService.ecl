@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
 	<!-- COMPLIANCE SETTINGS -->
 	<part name="HealthCareConsolidatedSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
@@ -128,8 +128,9 @@ export SearchService := MACRO
 	convertedInput := Healthcare_Header_Services.Records.convertInputtoDataset(tmpMod);
 	rawRec := Healthcare_Header_Services.Records.getSearchServiceRecords(convertedInput, cfgData);
 	returnThresholdExceeded:=rawRec[1].ProcessingMessage = 203;
+	hasoptout:=exists(rawRec(hasoptout = true));
 	recsFmt:= project(rawRec,Healthcare_Header_Services.Transforms.formatSearchServiceProviderOutput(left,convertedInput,cfgData));
-
+  		//marshall the output...
 	//marshall the output...
 	returnCnt := if((integer)ReturnCount=0,10,ReturnCount);
 	startRec := if((integer)StartingRecord=0,1,StartingRecord);
@@ -139,8 +140,11 @@ export SearchService := MACRO
 				string q_id := '' : stored ('_QueryId');
 				string t_id := '' : stored ('_TransactionId');
 				string msg	:= 'Too many subjects found.';
-				badheader := ROW ({203, msg, q_id, t_id, []}, iesp.share.t_ResponseHeader);
-				goodheader := ROW ({0, '', q_id, t_id, []}, iesp.share.t_ResponseHeader);
+				string optoutmsg	:= 'THIS SUBJECT CURRENTLY HAS A STATE OPT OUT ON FILE PREVENTING THE RETURN OF SOME OR ALL OF THE INFORMATION YOU REQUESTED. IF THE CONSUMER HAS ANY QUESTIONS ABOUT THIS, PLEASE INSTRUCT THEM TO CALL LEXISNEXIS RISK SOLUTIONS INC. AT 800-456-1244.';
+				optoutMessage := if(hasoptout,DATASET([{'700',optoutmsg}], iesp.share.t_ResultDisclaimer),DATASET([], iesp.share.t_ResultDisclaimer));
+				//optoutMessage := row({700,optoutmsg,q_id, t_id,[], []},iesp.share.t_ResponseHeader);
+				badheader := ROW ({203, msg, q_id, t_id, [],[]}, iesp.share.t_ResponseHeader);
+				goodheader := ROW ({0, '', q_id, t_id, [],optoutMessage}, iesp.share.t_ResponseHeader);
 				self._Header         := map(returnThresholdExceeded =>badheader,
 																		goodheader);
 				self.SearchBy				 := first_row.searchby;

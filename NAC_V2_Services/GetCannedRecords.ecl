@@ -42,7 +42,9 @@ EXPORT GetCannedRecords(iesp.nac2_search.t_NAC2SearchRequest in_req) := FUNCTION
 
     recs := if(~exists(canned_recs),default_recs,canned_recs);
 
-    out_recs := project(recs,iesp.nac2_search.t_NAC2SearchResponse);
+    out_recs := project(recs,TRANSFORM(iesp.nac2_search.t_NAC2SearchResponse, 
+                               SELF := LEFT,
+                               SELF := []));
 				
     return out_recs;
 

@@ -1,4 +1,4 @@
-
+﻿
 
 export phone_metadata(inData, inputPhone='') := functionmacro
 import CellPhone,risk_indicators,doxie,Doxie_Raw,Phones,MDR,Phonesplus_v2;
@@ -34,7 +34,13 @@ oneRec := record
            keyed(left.phone[1..3] = right.npa) 
            and keyed(left.phone[4..6] = right.nxx)  
            and left.phone[7] = right.tb, left outer, keep(1), limit(0)); 	
+					 
+		dsinData := g3(telcordia_only <> 'Y');
+		
+		dsTelOnlyfilter := g3(telcordia_only = 'Y' AND (ocn <>'' or state <>''));
+		
+		dsfinal := dsinData + dsTelOnlyfilter;
 
- return (g3);
+ return (dsfinal);
 	
 endmacro;

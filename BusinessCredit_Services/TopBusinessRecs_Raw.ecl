@@ -186,7 +186,7 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
 																					SELF.BusinessCreditIndicator := BusinessCredit_Services.Functions.fn_BuzCreditIndicator(LEFT.Parents[1].BusinessIds.UltId, 
 																																																																	LEFT.Parents[1].BusinessIds.OrgID,
 																																																																	LEFT.Parents[1].BusinessIds.SeleID,
-																																																																	inmod.DataPermissionMask,
+																																																																	mod_access,
 																																																																	buzCreditAccess))
 													);
 													
@@ -201,7 +201,7 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
                          SELF.BusinessCreditIndicator := BusinessCredit_Services.Functions.fn_BuzCreditIndicator2(LEFT.BusinessIds.UltId, 
                                                                                                                  LEFT.BusinessIds.OrgID,
                                                                                                                  LEFT.BusinessIds.SeleID,
-                                                                                                                 inmod.DataPermissionMask,
+                                                                                                                 mod_access,
                                                                                                                  buzCreditAccess)
                      )), iesp.constants.TOPBUSINESS.MAX_COUNT_CONNECTED_BUSINESSES),
     SELF.CountConnectedBusinesses := add_ConnectedBusinesses[1].CountConnectedBusinesses,

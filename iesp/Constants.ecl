@@ -1576,6 +1576,7 @@ EXPORT Constants := MODULE
 	export SLR := module    // Keep values in sync with GWBRIDGER to avoid data loss
 		export MaxList		:= 50;
 		export MaxItem 		:= 1024;
+		export MaxSourceTypes := 100;
 	end;
 	
   // Small Business 

@@ -17,7 +17,7 @@ MODULE
 	BatchShare.MAC_CapitalizeInput(dIn, SHARED dProcessInput);
 
   // Modify IsPrimarySearchPII depending on input if value not provided
-  SHARED tmpMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.SearchParams, OPT))
+  SHARED tmpMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.SearchParams))
       EXPORT BOOLEAN IsPrimarySearchPII := inMod.IsPrimarySearchPII OR vPhoneBlank;
   END;
 
@@ -58,13 +58,13 @@ MODULE
 	SHARED dPIISearch := dAppendDIDs(homephone = '' and did != 0 and ~IsPhoneRiskAssessment);
 
 	// Best information
-	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dPIISearch);
+	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dPIISearch, PROJECT (inMod, doxie.IDataAccess));
 
   SHARED dInBest := IF(verifyInputDID, dInDIDs, dInNoPhoneBestInfo);
 
-	// Primary identity
-	Suppress.MAC_Suppress(dInBest, SHARED dInBestInfo, tmpMod.ApplicationType, Suppress.Constants.LinkTypes.DID,did, '', '', FALSE, '', TRUE);
-
+	// Primary identity		
+	Suppress.MAC_Suppress(dInBest, SHARED dInBestInfo, tmpMod.application_type, Suppress.Constants.LinkTypes.DID,did, '', '', FALSE, '', TRUE);
+												
 	// Search inhouse phone sources and gateways when phone number is provided
 	dPhoneSearchResults := IF(EXISTS(dInPhone), PhoneFinder_Services.PhoneSearch(dInPhone,tmpMod,dGateways));
 
@@ -94,14 +94,14 @@ MODULE
     SELF.acctno               := L.acctno;
     SELF.seq                  := L.seq;
     SELF.phone                := L.phone;
-    SELF.phonestatus          := PhoneFinder_Services.Constants.PhoneStatus.NotAvailable;
-    BOOLEAN UseInternal_pvs   := L.typeflag = 'P';
-    SELF.coc_description      := IF(UseInternal_pvs, L.coc_description, '');
-    SELF.carrier_name         := IF(UseInternal_pvs, L.carrier_name, '');
-    SELF.phone_region_city    := IF(UseInternal_pvs, L.phone_region_city, '');
-    SELF.phone_region_st      := IF(UseInternal_pvs, L.phone_region_st, '');
-    SELF.RealTimePhone_Ext    := IF(UseInternal_pvs, L.RealTimePhone_Ext);
-    SELF.typeflag             := IF(UseInternal_pvs, L.typeflag, '');
+    SELF.phonestatus          := L.phonestatus;
+    BOOLEAN UsePVS            := L.typeflag = Phones.Constants.TypeFlag.DataSource_PV;
+    SELF.coc_description      := L.coc_description;
+    SELF.carrier_name         := L.carrier_name;
+    SELF.phone_region_city    := L.phone_region_city;
+    SELF.phone_region_st      := L.phone_region_st;
+    SELF.RealTimePhone_Ext    := L.RealTimePhone_Ext;
+    SELF.typeflag             := IF(UsePVS, L.typeflag, '');
     SELF                      := [];
   END;
 
@@ -175,13 +175,13 @@ MODULE
 
   //Deltabase Logging Dataset
   EXPORT	ReportingDataset := 	PhoneFinder_Services.Get_Reporting_Records(dFormat2IESP, tmpMod, InputEcho);
-
+ 
   // Royalties
   // filtering out inhouse phonmetadata records
-  dFilteringInHousePhoneData_typeflag := 	IF(tmpMod.UseInHousePhoneMetadata,
+  dFilteringInHousePhoneData_typeflag := 	IF(tmpMod.UseInHousePhoneMetadataOnly,
                                               PROJECT(dSearchRecs_pre,
                                                       TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
-                                                                SELF.typeflag :=  IF(LEFT.typeflag = 'P', '', LEFT.typeflag),
+                                                                SELF.typeflag :=  IF(LEFT.typeflag = Phones.Constants.TypeFlag.DataSource_PV, '', LEFT.typeflag),
                                                                 SELF.phone_source :=  IF(LEFT.phone_source = PhoneFinder_Services.Constants.PhoneSource.QSentGateway, 0, LEFT.phone_source),
                                                                 SELF := LEFT)),
                                               dSearchRecs_pre);

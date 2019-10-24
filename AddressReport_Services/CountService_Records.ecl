@@ -1,5 +1,5 @@
 IMPORT AutoStandardI,dx_header,Address,doxie_raw,iesp,
-			 LN_PropertyV2,gong,Location_Services,VehicleV2_Services,DriversV2_Services;
+			 LN_PropertyV2,gong,Location_Services,VehicleV2_Services,DriversV2_Services, doxie, Suppress;
 
 types := Gong.Constants.PTYPE;
 EXPORT CountService_Records ( input.params param,
@@ -9,7 +9,10 @@ EXPORT CountService_Records ( input.params param,
 		shared AI:=AutoStandardI.InterfaceTranslator;
 		shared clean_addr	:=ai.clean_address.val (project (param, AI.clean_address.params));
 		shared split_addr:=Address.CleanFields(clean_addr);
-		
+    shared  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+      EXPORT unsigned1 glb := param.glbPurpose;
+      EXPORT unsigned1 dppa := param.dppaPurpose;
+    end;
 		Layouts.slim_address into_srch() := transform
 			self.prim_range 	:= split_addr.prim_range;
 			self.predir     	:= split_addr.predir;
@@ -77,13 +80,13 @@ EXPORT CountService_Records ( input.params param,
 			SELF := R;
 		END;
 
-		Res_final := JOIN(srchrec,res_key,
+		Res_All := JOIN(srchrec,res_key,
 											  keyed(left.prim_name = right.prim_name) and
 												keyed(left.zip = right.zip) and
 												keyed(left.prim_range = right.prim_range) and
 												keyed(left.sec_range = right.sec_range),
 											 get_Res(LEFT,RIGHT),LIMIT(0),keep(10000));
-
+		Res_final := Suppress.MAC_SuppressSource(Res_All, mod_access);
 		shared Res_dedup:=dedup(sort(Res_final,did),did);
 		shared Res_cnt:=count(Res_dedup);
 

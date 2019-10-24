@@ -408,6 +408,10 @@ export functions := MODULE
 		RETURN FBIScore;
 	end;
 
+/* 
+	 *******Commenting out this function as this function is not used in RoxieDev and 
+     if this function is used anywhere please apply CCPA Source Suppressions to dx_header.key_header_address*********
+
 	EXPORT Dwell_Density ( dataset(Address_Attributes.Layouts.layout_dwell_addr_in) Address_in ) := FUNCTION
 		// in_data := dataset([{'102','','ARBOR','ST','','','','SAINT CLOUD','MN','56301'}], layout_in);
 		//Set up property key
@@ -541,7 +545,7 @@ export functions := MODULE
 
 		DwellingDensity := project(PropertyHedonics, CalcIndicators(Left));
 		Return DwellingDensity;
-	END;
+	END; */
 
 
 //Property Normalization - Garage Type Normalization

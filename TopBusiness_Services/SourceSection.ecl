@@ -575,7 +575,8 @@ EXPORT SourceSection := MODULE
 		 ds_in_ids_woacctno,
 		 ds_in_ids_srcrecs_inlayout,
 		 rs_options,
-		 ds_bh_keyrecs
+		 ds_bh_keyrecs,
+     mod_access
     );
 
   

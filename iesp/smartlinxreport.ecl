@@ -8,6 +8,7 @@ export smartlinxreport := MODULE
 export t_SmartLinxReportOption := record (iesp.bpsreport.t_BpsReportOption)
 	boolean IncludeKeyRiskIndicators {xpath('IncludeKeyRiskIndicators')};
 	boolean IncludeAMLProperty {xpath('IncludeAMLProperty')};
+	boolean IncludeAddressSourceInfo {xpath('IncludeAddressSourceInfo')};
 end;
 		
 export t_SmartLinxReportBy := record (iesp.bpsreport.t_BpsReportBy)
@@ -234,11 +235,21 @@ end;
 export t_SLRIdentity := record (iesp.bpsreport.t_BpsReportIdentitySlim)
 	t_SLRKRIIndicators KriIndicators {xpath('KriIndicators')};
 end;
+
+export t_SLRSources := record
+	string32 _Type {xpath('Type')};
+	integer Count {xpath('Count')};
+end;
+		
+export t_SLRAddressSourceInfo := record (iesp.share.t_AddressEx)
+	integer2 SourceCount {xpath('SourceCount')};
+	dataset(t_SLRSources) Sources {xpath('Sources/Source'), MAXCOUNT(iesp.Constants.SLR.MaxSourceTypes)};
+end;
 		
 export t_SLRAddress := record
 	dataset(iesp.bpsreport.t_BpsReportIdentitySlim) Residents {xpath('Residents/Identity'), MAXCOUNT(iesp.Constants.BR.MaxAddress_Residents)};
 	dataset(t_SLRIdentity) ResidentsAML {xpath('ResidentsAML/Identity'), MAXCOUNT(iesp.Constants.BR.MaxAddress_Residents)};
-	iesp.share.t_AddressEx Address {xpath('Address')};
+	t_SLRAddressSourceInfo Address {xpath('Address')};
 	string110 LocationId {xpath('LocationId')};
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};

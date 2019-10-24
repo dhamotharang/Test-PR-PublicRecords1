@@ -1,4 +1,4 @@
-IMPORT Doxie, topBusiness_services, iesp, AutoStandardI, ut;
+﻿IMPORT Doxie, topBusiness_services, iesp, AutoStandardI, ut;
 IMPORT $;
 
 EXPORT SourceCount(
@@ -21,7 +21,7 @@ EXPORT SourceCount(
 																												SELF := []));
 		sourceOptions := PROJECT(in_options,TRANSFORM(SourceService_Layouts.OptionsLayout, SELF := LEFT));
 
-		bus_recs := $.BusHeadSource_Records(sourcelinkids,sourceOptions,false).SourceDetailInfo;
+		bus_recs := $.BusHeadSource_Records(sourcelinkids, sourceOptions, mod_access, false).SourceDetailInfo;
 		bank_recs := $.BankruptcySource_Records(sourcelinkids,sourceOptions,false).SourceDetailInfo(in_options.IncludeBankruptcies);
 		corp_recs := $.CorporationSource_Records(sourcelinkids,sourceOptions,false).SourceDetailInfo(in_options.IncludeIncorporation);
 		ucc_recs := $.UCCSource_Records(sourcelinkids,sourceOptions,false).SourceDetailInfo(in_options.IncludeUCCFilings);

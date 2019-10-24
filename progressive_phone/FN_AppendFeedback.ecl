@@ -1,14 +1,15 @@
-IMPORT PhonesFeedback, ut;
+﻿IMPORT AutoStandardI, doxie, PhonesFeedback, suppress, ut;
 
 EXPORT FN_AppendFeedback(DATASET(layout_progressive_batch_out_with_did) wf_recs_in) := FUNCTION
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 	fbk := PhonesFeedback.Key_PhonesFeedback_phone;
 rec_with_seq:=record
 unsigned seq:=0;
-layout_progressive_batch_out_with_did;
+progressive_phone.layout_progressive_batch_out_with_did;
 end;
 wf_recs_tmp:=project(wf_recs_in,rec_with_seq);
 ut.MAC_Sequence_Records(wf_recs_tmp, seq, wf_recs);
-	TmpRec := RECORD(layout_progressive_batch_out_with_did)
+	TmpRec := RECORD(progressive_phone.layout_progressive_batch_out_with_did)
 		unsigned seq;
 		UNSIGNED1	phone_contact_type;
 		UNSIGNED4	date_added;
@@ -17,8 +18,10 @@ ut.MAC_Sequence_Records(wf_recs_tmp, seq, wf_recs);
 		STRING20	lname;
 		UNSIGNED4	last_connected_date;
 		UNSIGNED1	method;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
 	END;
-
+  
 	BOOLEAN cmpName(STRING lf, STRING lm, STRING ll, STRING rf, STRING rm, STRING rl) := FUNCTION
 		STRING lf_t := TRIM(lf);
 		STRING lm_t := TRIM(lm);
@@ -57,7 +60,7 @@ ut.MAC_Sequence_Records(wf_recs_tmp, seq, wf_recs);
 
 	dateToStr(UNSIGNED4 date) := IF(date <> 0, INTFORMAT(date, 8, 0), '');
 
-	layout_progressive_batch_out_with_fb toOutWithFB(TmpRec input) := TRANSFORM
+	progressive_phone.layout_progressive_batch_out_with_fb toOutWithFB(TmpRec input) := TRANSFORM
 		SELF.phone_feedback_date_1 := dateToStr(input.date_added);
 		SELF.phone_feedback_result_1 := input.phone_contact_type ;
 		SELF.phone_feedback_first_1 := input.fname;
@@ -74,8 +77,18 @@ ut.MAC_Sequence_Records(wf_recs_tmp, seq, wf_recs);
 									 cmpName(LEFT.subj_first, LEFT.subj_middle, LEFT.subj_last, RIGHT.fname, RIGHT.mname, RIGHT.lname)),
 									toTmpRec(LEFT, RIGHT),
 									LEFT OUTER, LIMIT(10000, SKIP));
-	matches_s := SORT(matches, acctno, subj_phone10, date_added, method);
-	m := ROLLUP(matches_s, updtRPC(LEFT, RIGHT), acctno, subj_phone10);
+  matches_flagged := suppress.MAC_FlagSuppressedSource(matches,mod_access);
+  matches_suppressed := project(matches_flagged,transform(recordof(matches_flagged),
+                              		SELF.phone_contact_type := IF(~left.is_suppressed,left.phone_contact_type,0),
+		                              SELF.date_added :=  IF(~left.is_suppressed,left.date_added,0),
+		                              SELF.fname := IF(~left.is_suppressed,left.fname,''),
+		                              SELF.mname :=  IF(~left.is_suppressed,left.mname,''),
+		                              SELF.lname :=  IF(~left.is_suppressed,left.lname,''),
+		                              SELF.last_connected_date := IF(~left.is_suppressed, left.last_connected_date, 0),
+                                  SELF.method := IF(~left.is_suppressed,left.method,0),
+                                  SELF := left));
+	matches_sorted := SORT(project(matches_suppressed,tmprec), acctno, subj_phone10, date_added, method);
+	m := ROLLUP(matches_sorted, updtRPC(LEFT, RIGHT), acctno, subj_phone10);
 	o := PROJECT(sort(m,seq), toOutWithFB(LEFT));
 	RETURN o;
 END;

@@ -85,6 +85,8 @@
 	&lt;IncludeDOB&gt;&lt;/IncludeDOB&gt;
 	&lt;IncludeDriverLicense&gt;&lt;/IncludeDriverLicense&gt;
 	&lt;DisableCustomerNetworkOption&gt;false&lt;/DisableCustomerNetworkOption&gt;
+	&lt;IncludeComplianceCap&gt;&lt;/IncludeComplianceCap&gt;
+	&lt;IncludeITIN&gt;&lt;/IncludeITIN&gt;
 &lt;/CVICalculationOptions&gt;
 	&lt;DisAllowInsurancePhoneHeaderGateway&gt;&lt;/DisAllowInsurancePhoneHeaderGateway&gt;
 	&lt;InstantIDVersion&gt;&lt;/InstantIDVersion&gt;
@@ -92,7 +94,11 @@
 	&lt;NameInputOrder&gt;&lt;/NameInputOrder&gt;
 	&lt;GlobalWatchlistThreshold&gt;0.84&lt;/GlobalWatchlistThreshold&gt;
 	&lt;OFACVersion&gt;2&lt;/OFACVersion&gt;
-  &lt;/Options&gt;
+	&lt;IncludeEmailVerification&gt;&lt;/IncludeEmailVerification&gt; 
+  &lt;disablenongovernmentdldata&gt;&lt;/disablenongovernmentdldata&gt;
+	&lt;IncludeDigitalIdentity&gt;&lt;/IncludeDigitalIdentity&gt;
+&lt;/Options&gt;
+
  &lt;SearchBy&gt;
  &lt;Seq&gt;&lt/Seq&gt;
  &lt;Name&gt;
@@ -145,7 +151,7 @@
 &lt;/FlexIDRequest&gt;
 </pre>
 */
-import address, iesp, identifier2, ut, risk_indicators, Risk_Reporting;
+import address, iesp, ut, risk_indicators, Risk_Reporting;
 
 export FlexID_Service := MACRO
 
@@ -163,7 +169,7 @@ export FlexID_Service := MACRO
 	user := global(first_row.User);
 	
 	// Code neccessary to support import custom model name. //string128 CustomCVIModelName {xpath('CustomCVIModelName')};  Andi mentioned these may need to be initialized to the same default value??
-	string128 modelName := trim(stringlib.StringToUpperCase(options.CustomCVIModelName));
+	string128 modelName := trim(STD.Str.ToUpperCase(options.CustomCVIModelName));
 	#stored ('CustomCVIModelName', modelName);
 
 /* **********************************************
@@ -302,14 +308,19 @@ export FlexID_Service := MACRO
 	boolean FromFlexID := TRUE;
 	#stored ('FromFlexID',FromFlexID);	// needed for the cmra and pobox fields.  they originally were in flexid but not ciid, so only available for ciid version 1 but all versions of flexid
 	#stored ('InbandTrackingOptOut',user.OutcomeTrackingOptOut);
-	
+  boolean IncludeEmailVerification:=Options.IncludeEmailVerification;
+  #stored ('IncludeEmailVerification',IncludeEmailVerification);  
+  #stored ('disablenongovernmentdldata',options.disablenongovernmentdldata);  //for nongovernmental source
+  #stored ('IncludeDigitalIdentity',options.IncludeDigitalIdentity); 
+  #stored ('IncludeITIN',options.CVICalculationOptions.IncludeITIN);  //ITIN CVI Override
+  #stored ('IncludeComplianceCap',options.CVICalculationOptions.IncludeComplianceCap);  
 	string DataRestriction := AutoStandardI.GlobalModule().DataRestrictionMask;
 	string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
 	model_url := dataset([],Models.Layout_Score_Chooser) : STORED('scores',few);
-	fa_params := model_url(StringLib.StringToLowerCase(name)='models.fraudadvisor_service')[1].parameters;
-	model_version := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='version')[1].value));
-	custom_modelname := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='custom')[1].value));
+	fa_params := model_url(STD.Str.ToLowerCase(name)='models.fraudadvisor_service')[1].parameters;
+	model_version := trim(STD.Str.ToUppercase(fa_params(STD.Str.ToLowerCase(name)='version')[1].value));
+	custom_modelname := trim(STD.Str.ToUppercase(fa_params(STD.Str.ToLowerCase(name)='custom')[1].value));
 	Custommodelname := if(model_version='', custom_modelname, model_version);
 
 
@@ -351,6 +362,7 @@ royalties4us := royalties4ustemp(royalty_type_code != 0);
 		
 		// Summary Verification flags
 		self.Result.VerifiedElementSummary.FirstName := if(IncludeSummaryFlags, if(le.verfirst<>'', '1', '0'), '');
+		self.Result.VerifiedElementSummary.MiddleName := (boolean)if(IncludeSummaryFlags, if(le.vermiddle<>'', '1', '0'), '');
 		self.Result.VerifiedElementSummary.LastName := if(IncludeSummaryFlags, if(le.verlast<>'', '1', '0'), '');
 		
 		addrScore := IF(modelName='CCVI1609_1', //should we be coding using the actual input source (the right dataset and esp related layouts?).
@@ -364,19 +376,20 @@ royalties4us := royalties4ustemp(royalty_type_code != 0);
 																														ut.nneq(le.combo_sec_range,le.sec_range), true);																		
 		self.Result.VerifiedElementSummary.StreetAddress := if(IncludeSummaryFlags, 	if(addrMatch, '1', '0'), 
 																												'');
-		CityA := stringlib.stringtouppercase(trim(le.combo_city));
-		CityB := stringlib.stringtouppercase(trim(ri.searchby.address.city));
+		CityA := STD.Str.touppercase(trim(le.combo_city));
+		CityB := STD.Str.touppercase(trim(ri.searchby.address.city));
 		CityScore := 100 - MAX(ut.StringSimilar100(CityA, CityB), ut.StringSimilar100(CityB, CityA));
 		CityMatch := (options.RequireExactMatch.Address and CityA=CityB and CityB<>'') or (~options.RequireExactMatch.Address and CityScore between 80 and 100 and CityB<>'');
 		
 		self.Result.VerifiedElementSummary.City := if(IncludeSummaryFlags, if(CityMatch, '1', '0'), '');
-		self.Result.VerifiedElementSummary.State := if(IncludeSummaryFlags, if(trim(le.combo_state)=trim(stringlib.stringtouppercase(ri.searchby.address.State)) and trim(ri.searchby.address.state)<>'', '1', '0'), '');
+		self.Result.VerifiedElementSummary.State := if(IncludeSummaryFlags, if(trim(le.combo_state)=trim(STD.Str.Touppercase(ri.searchby.address.State)) and trim(ri.searchby.address.state)<>'', '1', '0'), '');
 		self.Result.VerifiedElementSummary.Zip := if(IncludeSummaryFlags, if(trim(le.combo_zip)=trim(ri.searchby.address.zip5) and trim(ri.searchby.address.zip5)<>'', '1', '0'), '');
 		self.Result.VerifiedElementSummary.HomePhone := if(IncludeSummaryFlags, if(le.verhphone<>'', '1', '0'), '');
 		self.Result.VerifiedElementSummary.SSN := if(IncludeSummaryFlags, if(le.verssn<>'', '1', '0'), '');
 		self.Result.VerifiedElementSummary.DOB := le.verdob<>'';	// base price
 		self.Result.VerifiedElementSummary.DOBMatchLevel := le.dobmatchlevel;	// base price
 		self.Result.VerifiedElementSummary.DL := if(IncludeDLVerification, if(le.verdl<>'', '1', '0'), '');
+		self.Result.VerifiedElementSummary.Email := if(IncludeEmailVerification , if(le.VerifiedEmail <>'', true, false), false);
 		
 		self.Result.ValidElementSummary.SSNDeceased := le.SSNDeceased;
 		self.Result.ValidElementSummary.SSNValid := le.ssa_date_first <> '';
@@ -411,7 +424,12 @@ royalties4us := royalties4ustemp(royalty_type_code != 0);
 		
 		self.result.InstantIDVersion := le.InstantIDVersion;
 		self.result.EmergingID := le.EmergingID;
-		self.result.AddressSecondaryRangeMismatch := le.AddressSecondaryRangeMismatch;
+		self.result.VerifiedEmail  := le.VerifiedEmail ;
+		self.result.BureauDeleted  := le.BureauDeleted ;
+		self.result.ITINExpired  := le.ITINExpired ;
+		self.result.IsPhoneCurrent   := le.IsPhoneCurrent  ;
+		self.result.PhoneLineType   := le.PhoneLineType  ;
+		self.result.PhoneLineDescription    := le.PhoneLineDescription   ;
 		
 		self := le;
 		self._Header := [];

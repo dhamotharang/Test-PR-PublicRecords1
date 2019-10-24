@@ -15,19 +15,19 @@ export iid_base_function(DATASET(risk_indicators.layout_input) indata, dataset(G
 													boolean runChronoPhoneLookup=true,
 													boolean runAreaCodeSplitSearch=true,
 													boolean allowCellphones=false,
-													string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel,
-													string50 DataRestriction=iid_constants.default_DataRestriction,
+													string10 ExactMatchLevel=Risk_Indicators.iid_constants.default_ExactMatchLevel,
+													string50 DataRestriction=Risk_Indicators.iid_constants.default_DataRestriction,
 													string10 CustomDataFilter='',
 													boolean runDLverification=false,
 													dataset(iesp.share.t_StringArrayItem) watchlists_requested,
-													dataset(layouts.Layout_DOB_Match_Options) DOBMatchOptions,
+													dataset(Risk_Indicators.layouts.Layout_DOB_Match_Options) DOBMatchOptions,
 													unsigned2 EverOccupant_PastMonths,
 													unsigned4 EverOccupant_StartDate,
 													unsigned1 append_best=0,
 													unsigned8 BSOptions=0,
-													unsigned3 LastSeenThreshold = iid_constants.oneyear,
+													unsigned3 LastSeenThreshold = Risk_Indicators.iid_constants.oneyear,
 													string20 companyID='',
-													string50 DataPermission=iid_constants.default_DataPermission,
+													string50 DataPermission=Risk_Indicators.iid_constants.default_DataPermission,
 													boolean IncludeNAPData = false,
                           string100 IntendedPurpose = ''
 													) := FUNCTION
@@ -47,9 +47,9 @@ risk_indicators.layout_output add_flags(risk_indicators.Layout_output le) := TRA
 	// TODO: add a dob/name-near/ssn-near lookup
 	ssn_flags := CHOOSEN (fcra.key_override_flag_ssn (l_ssn=le.ssn, datalib.NameMatch (le.fname, le.mname, le.lname, fname, mname, lname)<3), iid_constants.MAX_OVERRIDE_LIMIT);
 	// TODO: get dids to be unsigned
-	did_flags := CHOOSEN (fcra.key_override_flag_did (keyed (l_did=(string)le.did)), iid_constants.MAX_OVERRIDE_LIMIT);
+	did_flags := CHOOSEN (fcra.key_override_flag_did (keyed (l_did=(string)le.did)), Risk_Indicators.iid_constants.MAX_OVERRIDE_LIMIT);
 	flags := PROJECT (did_flags, fcra.Layout_override_flag) + PROJECT (ssn_flags, fcra.Layout_override_flag);
-	flagrecs := CHOOSEN (dedup (flags, ALL), iid_constants.MAX_OVERRIDE_LIMIT);
+	flagrecs := CHOOSEN (dedup (flags, ALL), Risk_Indicators.iid_constants.MAX_OVERRIDE_LIMIT);
 	
 
 	SELF.veh_correct_vin                := SET(flagrecs(file_id = FCRA.FILE_ID.VEHICLE),record_id);
@@ -110,14 +110,11 @@ risk_indicators.layout_output add_flags(risk_indicators.Layout_output le) := TRA
 END;
 
 
-
-
 #IF(_Control.Environment.onVault)
 	with_overrides := with_did;  // when on Vault, we don't need to do corrections
 #ELSE
 	with_overrides := if( isFCRA, PROJECT(with_did, add_flags(LEFT)), with_did);
 #END
-
 
 
 with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, BSversion, IntendedPurpose), with_did);
@@ -127,7 +124,7 @@ commonstart := risk_indicators.iid_common_function(with_PersonContext, dppa, glb
 															runSSNCodes, runBestAddrCheck, ExactMatchLevel, DataRestriction, CustomDataFilter,
 															DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, BSOptions, 
 															LastSeenThreshold, DataPermission);
-
+                              
 common_transformed := risk_indicators.iid_transform_common(commonstart, BSOptions);
 
 // one of the optimization options in IID v2 is to allow this search to be skipped when not needed.

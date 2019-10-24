@@ -7,13 +7,11 @@ EXPORT getCitizenship(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData,
 
     
     //pull out the BS from each request                                                  
-    bsOnly := PROJECT(inData, TRANSFORM({DATASET(Risk_Indicators.Layout_Boca_Shell) clam},
-                                         SELF.clam := DATASET([TRANSFORM(Risk_Indicators.Layout_Boca_Shell,
-                                                                    SELF := LEFT.bs;)]);));
-                                                      
-                                                      
+    bsOnly := PROJECT(inData, TRANSFORM(Risk_Indicators.Layout_Boca_Shell, SELF := LEFT.bs;));
+    
+    
     //call model
-    modelResults := Models.cit1808_0_0(bsOnly.clam);    //expecting to return everything (basically running as debug TRUE, only care about seq and score
+    modelResults := Models.cit1808_0_0(bsOnly);    //expecting to return everything (basically running as debug TRUE, only care about seq and score
     
     
     citizenshipResults := JOIN(inData, modelResults, 

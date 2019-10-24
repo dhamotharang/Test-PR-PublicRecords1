@@ -1,7 +1,7 @@
 /*2014-09-22T23:41:04Z (Rati Naren)
 RR: 165319 - Adding BatchInput to the i/p parameters
 */
-IMPORT AutoStandardI, Autokey_batch,BatchServices,doxie,Prof_License,doxie_files,Ingenix_NatlProf;
+IMPORT AutoStandardI, Autokey_batch,BatchServices,doxie,Prof_License,Prof_LicenseV2,doxie_files,Ingenix_NatlProf;
 
 /* Moved almost all the coding from prof_LicenseV2_Services.PL_Batch_Service to this
    new function so this new function could be used by both the existing PL_Batch_Service
@@ -55,7 +55,39 @@ EXPORT PL_Batch_Service_Records(unsigned1 pt = 20,
 
   ds_batch_in := PROJECT(ds_batch_in_NPI, Autokey_batch.Layouts.rec_inBatchMaster);
 
-  outpl  := prof_LicenseV2_Services.Prof_Lic_Raw.Batch_View.get_ProfIds(ds_batch_in);
+  by_auto := prof_LicenseV2_Services.Prof_Lic_Raw.Batch_View.get_ProfIds(ds_batch_in);
+
+  proflic_recs := prof_LicenseV2_Services.Prof_Lic_Raw.get_Prolic_from_dids(
+    PROJECT(ds_batch_in(did>0),TRANSFORM(doxie.layout_references,SELF:=LEFT)),mod_access);
+
+	by_did:=JOIN(ds_batch_in,proflic_recs,LEFT.did=RIGHT.did,TRANSFORM(RECORDOF(by_auto),
+		SELF.acctno := LEFT.acctno,
+		SELF.addr.prim_range    := RIGHT.prim_range,
+		SELF.addr.predir        := RIGHT.predir,
+		SELF.addr.prim_name     := RIGHT.prim_name,
+		SELF.addr.addr_suffix   := RIGHT.suffix,
+		SELF.addr.postdir       := RIGHT.postdir,
+		SELF.addr.unit_desig    := RIGHT.unit_desig,
+		SELF.addr.sec_range     := RIGHT.sec_range,
+		SELF.addr.p_city_name   := RIGHT.p_city_name,
+		SELF.addr.v_city_name   := RIGHT.v_city_name,
+		SELF.addr.st            := RIGHT.st,
+		SELF.addr.zip5          := RIGHT.zip,
+		SELF.addr.zip4          := RIGHT.zip4,
+		SELF.addr.fips_state    := RIGHT.ace_fips_st,
+		SELF.addr.fips_county   := RIGHT.county,
+		SELF.addr.addr_rec_type := RIGHT.record_type,
+		SELF.name.title       := RIGHT.title,
+		SELF.name.fname       := RIGHT.fname,
+		SELF.name.mname       := RIGHT.mname,
+		SELF.name.lname       := RIGHT.lname,
+		SELF.name.name_suffix := RIGHT.name_suffix,
+		SELF.bdid:=(UNSIGNED)RIGHT.bdid,
+		SELF.isdid:=TRUE,
+		SELF:=RIGHT,
+		SELF:=[]));
+
+	outpl:= by_auto+by_did;
 
   ids_acctno_1 := PROJECT(outpl,TRANSFORM(prof_LicenseV2_Services.Assorted_Layouts.ProvId_dea
                                           ,SELF := LEFT,SELF := []));

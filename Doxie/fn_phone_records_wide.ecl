@@ -1,4 +1,4 @@
-IMPORT ut,doxie_raw,lib_date,PhonesFeedback_Services,PhonesFeedback, Gong;
+﻿IMPORT AutoStandardI, doxie, ut, doxie_raw, lib_date, PhonesFeedback_Services, PhonesFeedback, Gong, Suppress;
 
 export fn_phone_records_wide(
 	dataset(doxie.Layout_Comp_Addresses) ca,
@@ -8,6 +8,8 @@ export fn_phone_records_wide(
 FUNCTION
 
 doxie.MAC_Selection_Declare() // need it only for n_phones and IncludePhonesFeedback
+global_mod := AutoStandardI.GlobalModule();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 
 doxie_raw.mac_entrp_clean(ca,dt_last_seen,ca_entrp);
 ca_in := IF(ut.IndustryClass.is_entrp,ca_entrp,ca);
@@ -78,10 +80,12 @@ self.feedback:=[];
 self:=le;
 end;
 dd2_tmp_fb:=project(dd2_tmp,Add_FeedBack_ds(LEFT));
+
 PhonesFeedback_Services.Mac_Append_Feedback(dd2_tmp_fb
 																						,DID
 																						,Phone
 																						,dd2_feedback
+                                       ,mod_access     
 																						);
 
 dd3:=dd2_feedback;

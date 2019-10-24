@@ -25,7 +25,7 @@
   <part name="UseInHousePhoneMetadata" type="xsd:boolean" default="false"/>
   <part name="VerifyPhoneName" type="xsd:boolean" default="false"/>
   <part name="VerifyPhoneNameAddress" type="xsd:boolean" default="false"/>
-  <part name="SuppressBlankNameAddress" type="xsd:boolean" default="false"/>
+  <part name="SuppressNonRelevantRecs" type="xsd:boolean" default="false"/>
 	<separator/>
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 	<separator/>
@@ -57,10 +57,14 @@ MACRO
    	dPhones   	:= modBatchRecords.dBatchOut;
    	Zumigo_Log	:= modBatchRecords.Zumigo_History_Recs;
 
-		dNonblankNameAddr := dPhones(identity1_full != '' OR (identity1_first != '' AND identity1_last!= '')
-													OR (identity1_streetname != '' AND ((identity1_city != '' AND identity1_state != '' ) OR identity1_zip5 != '')));
+		// Suppress records that have blank identitty name, identity address and carrier name if option is set
+		// NOTE: Any changes to below non-blank logic will need to be communicated to the Batch team as well
+    dNonblankRelevantRecs := dPhones(identity1_full != '' OR (identity1_first != '' AND identity1_last!= '')
+													OR (identity1_streetname != '' AND ((identity1_city != '' AND identity1_state != '' ) OR identity1_zip5 != ''))
+													OR carrier <>'');
+													
 
-		results := if(reportMod.SuppressBlankNameAddress,dNonblankNameAddr,dPhones);
+		results := if(reportMod.SuppressNonRelevantRecs,dNonblankRelevantRecs,dPhones);
 
    OUTPUT(results,named('Results'));
    OUTPUT(royalties,named('RoyaltySet'));

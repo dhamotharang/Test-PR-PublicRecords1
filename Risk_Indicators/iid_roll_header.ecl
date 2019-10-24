@@ -48,6 +48,7 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 	
 	source_seen := r.src='XX' OR Stringlib.StringFind(l.sources,r.src+',',1)>0;
 	firstnamesource_seen := r.src='XX' OR Stringlib.StringFind(l.firstnamesources,r.src+',',1)>0;
+  middlenamesource_seen := r.src='XX' OR Stringlib.StringFind(l.middlenamesources,r.src+',',1)>0;
 	lastnamesource_seen := r.src='XX' OR Stringlib.StringFind(l.lastnamesources,r.src+',',1)>0;
 	addrsource_seen := r.src='XX' OR Stringlib.StringFind(l.addrsources,r.src+',',1)>0;
 	socssource_seen := r.src='XX' OR Stringlib.StringFind(l.socssources,r.src+',',1)>0;
@@ -57,15 +58,16 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 	cmpysource_seen := r.src='XX' OR Stringlib.StringFind(l.cmpysources,r.src+',',1)>0;
 	dobsource_seen := r.src='XX' OR Stringlib.StringFind(l.dobsources,r.src+',',1)>0;
 	
-	SELF.sources := IF(source_seen,l.sources,TRIM(l.sources)+r.src+',');
-	SELF.firstnamesources := IF(firstnamesource_seen OR r.firstcount=0,l.firstnamesources,TRIM(l.firstnamesources)+r.src+',');
-	SELF.lastnamesources := IF(lastnamesource_seen OR r.lastcount=0,l.lastnamesources,TRIM(l.lastnamesources)+r.src+',');
-	SELF.addrsources := IF(addrsource_seen OR r.addrcount=0,l.addrsources,TRIM(l.addrsources)+r.src+',');
-	SELF.socssources := IF(socssource_seen OR r.socscount=0,l.socssources,TRIM(l.socssources)+r.src+',');
-	SELF.hphonesources := IF(hphonesource_seen OR r.hphonecount=0,l.hphonesources,TRIM(l.hphonesources)+r.src+',');
-	SELF.wphonesources := IF(wphonesource_seen OR r.wphonecount=0,l.wphonesources,TRIM(l.wphonesources)+r.src+',');
-	SELF.cmpysources := IF(cmpysource_seen OR r.cmpycount=0,l.cmpysources,TRIM(l.cmpysources)+r.src+',');
-	SELF.dobsources := IF(dobsource_seen OR r.dobcount=0,l.dobsources,TRIM(l.dobsources)+r.src+',');
+  SELF.sources := IF(source_seen,l.sources,TRIM(l.sources)+r.src+',');
+  SELF.firstnamesources := IF(firstnamesource_seen OR r.firstcount=0,l.firstnamesources,TRIM(l.firstnamesources)+r.src+',');
+  SELF.middlenamesources := IF(middlenamesource_seen OR r.middlecount=0,l.middlenamesources,TRIM(l.middlenamesources)+r.src+',');	
+  SELF.lastnamesources := IF(lastnamesource_seen OR r.lastcount=0,l.lastnamesources,TRIM(l.lastnamesources)+r.src+',');
+  SELF.addrsources := IF(addrsource_seen OR r.addrcount=0,l.addrsources,TRIM(l.addrsources)+r.src+',');
+  SELF.socssources := IF(socssource_seen OR r.socscount=0,l.socssources,TRIM(l.socssources)+r.src+',');
+  SELF.hphonesources := IF(hphonesource_seen OR r.hphonecount=0,l.hphonesources,TRIM(l.hphonesources)+r.src+',');
+  SELF.wphonesources := IF(wphonesource_seen OR r.wphonecount=0,l.wphonesources,TRIM(l.wphonesources)+r.src+',');
+  SELF.cmpysources := IF(cmpysource_seen OR r.cmpycount=0,l.cmpysources,TRIM(l.cmpysources)+r.src+',');
+  SELF.dobsources := IF(dobsource_seen OR r.dobcount=0,l.dobsources,TRIM(l.dobsources)+r.src+',');
 	
 	em_only_sources_seen := Stringlib.StringFind(trim(l.em_only_sources),trim(r.em_only_sources),1)>0 or r.src not in ['EM','E1','E2','E3','E4'];
 	self.em_only_sources := if(em_only_sources_seen,l.em_only_sources,TRIM(l.em_only_sources)+r.em_only_sources);
@@ -83,10 +85,11 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 	
 	chooser(BOOLEAN seen, INTEGER i, INTEGER x) := IF(seen,i,i+x);
 
-	self.firstcount := chooser(firstnamesource_seen, l.firstcount, r.firstcount);
-	self.lastcount := chooser(lastnamesource_seen, l.lastcount, r.lastcount);
-	self.addrcount := chooser(addrsource_seen, l.addrcount, r.addrcount);
-	self.socscount := chooser(socssource_seen, l.socscount, r.socscount);
+  self.firstcount := chooser(firstnamesource_seen, l.firstcount, r.firstcount);
+  self.middlecount := chooser(middlenamesource_seen, l.middlecount, r.middlecount);
+  self.lastcount := chooser(lastnamesource_seen, l.lastcount, r.lastcount);
+  self.addrcount := chooser(addrsource_seen, l.addrcount, r.addrcount);
+  self.socscount := chooser(socssource_seen, l.socscount, r.socscount);
 	
 	self.hphonecount := chooser(hphonesource_seen, l.hphonecount, r.hphonecount);
 	self.wphonecount := chooser(wphonesource_seen, l.wphonecount, r.wphonecount);
@@ -244,7 +247,7 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 	self.chronoaddrscore3 := IF(howmany=3,r.chronoaddrscore,l.chronoaddrscore3);
   self.rawaid3 := IF(howmany=3,r.rawaid_orig,l.rawaid3);
 
-	ssn_by_score := iid_constants.tscore(l.socsscore)>=iid_constants.tscore(r.socsscore);
+	ssn_by_score := Risk_Indicators.iid_constants.tscore(l.socsscore)>=Risk_Indicators.iid_constants.tscore(r.socsscore);
 
 	
 // Add additional logic for Bug: 193838 
@@ -256,15 +259,15 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
   ssnbyscore     := IF(ssn_by_score,l.versocs,r.versocs);	
   bestbyscore    := IF(ssn_by_score,l.socsscore,r.socsscore);
   valbyscore     := IF(ssn_by_score,l.socsvalid,r.socsvalid); 
-  foundbetterssn := l.socsvalid <> iid_constants.good 
-	                  AND r.socsvalid = iid_constants.good
-										AND iid_constants.tscore(r.socsscore)>=iid_constants.tscore(l.socsscore);
+  foundbetterssn := l.socsvalid <> Risk_Indicators.iid_constants.good 
+	                  AND r.socsvalid = Risk_Indicators.iid_constants.good
+										AND Risk_Indicators.iid_constants.tscore(r.socsscore)>=Risk_Indicators.iid_constants.tscore(l.socsscore);
   self.versocs   := IF(foundbetterssn, r.versocs, ssnbyscore);
   self.socsscore := IF(foundbetterssn, r.socsscore, bestbyscore);
   socsvalid := IF(foundbetterssn, r.socsvalid, valbyscore);
 	// found during emerging identities testing that we want to keep a socsvalid that is populated over one that isn't.  
 	// quick header records are usually blank for socsvalid and show up first in the sort because of their dates
-	self.socsvalid := MAP(socsvalid not in risk_indicators.iid_constants.set_valid_ssn_codes and 
+	self.socsvalid := MAP(socsvalid not in Risk_Indicators.iid_constants.set_valid_ssn_codes and 
 											 r.socsvalid in risk_indicators.iid_constants.set_valid_ssn_codes and 
 											 r.ssn_from_did=l.ssn_from_did => r.socsvalid,
 											 socsvalid ='' and r.socsvalid<>'' and r.ssn_from_did=l.ssn_from_did => r.socsvalid,
@@ -275,7 +278,7 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
                   r.ssn, l.ssn); 
 	self.ssnLookupFlag       := IF(foundbetterssn, r.ssnLookupFlag, l.ssnLookupFlag);
 		
-	addr_lpicker := iid_constants.tscore(l.addrscore)>=iid_constants.tscore(r.addrscore) or (l.verprim_name<>'' and r.addrcount=0);
+	addr_lpicker := Risk_Indicators.iid_constants.tscore(l.addrscore)>=Risk_Indicators.iid_constants.tscore(r.addrscore) or (l.verprim_name<>'' and r.addrcount=0);
 	
 	self.verprim_range := IF(addr_lpicker,l.verprim_range,r.verprim_range);
 	self.verpredir := IF(addr_lpicker,l.verpredir,r.verpredir);
@@ -297,27 +300,30 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 	
 	self.addrmultiple := l.prim_name<>'' AND r.prim_name<>'';
 	
-	self.verlast := IF(iid_constants.tscore(l.lastscore)>=iid_constants.tscore(r.lastscore) or (l.verlast<>'' and r.lastcount=0),l.verlast,r.verlast);
-	self.lastscore := IF(iid_constants.tscore(l.lastscore)>=iid_constants.tscore(r.lastscore) or (l.verlast<>'' and r.lastcount=0),l.lastscore,r.lastscore);
+	self.verlast := IF(Risk_Indicators.iid_constants.tscore(l.lastscore)>=Risk_Indicators.iid_constants.tscore(r.lastscore) or (l.verlast<>'' and r.lastcount=0),l.verlast,r.verlast);
+	self.lastscore := IF(Risk_Indicators.iid_constants.tscore(l.lastscore)>=Risk_Indicators.iid_constants.tscore(r.lastscore) or (l.verlast<>'' and r.lastcount=0),l.lastscore,r.lastscore);
 	
-	self.verfirst := IF(iid_constants.tscore(l.firstscore)>=iid_constants.tscore(r.firstscore) or (l.verfirst<>'' and r.firstcount=0),l.verfirst,r.verfirst);
-	self.firstscore := IF(iid_constants.tscore(l.firstscore)>=iid_constants.tscore(r.firstscore) or (l.verfirst<>'' and r.firstcount=0),l.firstscore,r.firstscore);
+	self.verfirst := IF(Risk_Indicators.iid_constants.tscore(l.firstscore)>=Risk_Indicators.iid_constants.tscore(r.firstscore) or (l.verfirst<>'' and r.firstcount=0),l.verfirst,r.verfirst);
+	self.firstscore := IF(Risk_Indicators.iid_constants.tscore(l.firstscore)>=Risk_Indicators.iid_constants.tscore(r.firstscore) or (l.verfirst<>'' and r.firstcount=0),l.firstscore,r.firstscore);
 	
+  self.vermiddle := IF(Risk_Indicators.iid_constants.tscore(l.middlescore)>=Risk_Indicators.iid_constants.tscore(r.middlescore) or (l.vermiddle<>'' and r.middlecount=0),l.vermiddle,r.vermiddle);
+	self.middlescore := IF(Risk_Indicators.iid_constants.tscore(l.middlescore)>=Risk_Indicators.iid_constants.tscore(r.middlescore) or (l.vermiddle<>'' and r.middlecount=0),l.middlescore,r.middlescore);
+
 	take_left_dob := Map(
 		(l.dobscore = 90 and r.dobscore in [94, 95, 96] and (integer)l.verdob<>0) => true, /* dobscore 90=miskey - Return 90 when presented with choice of 90 or 95 */
 		(l.dobscore in [94, 95, 96] and r.dobscore = 90 and (integer)r.verdob<>0) => false,
-		(iid_constants.tscore(l.dobscore)>=iid_constants.tscore(r.dobscore) and (integer)l.verdob<>0) => true,
+		(Risk_Indicators.iid_constants.tscore(l.dobscore)>=Risk_Indicators.iid_constants.tscore(r.dobscore) and (integer)l.verdob<>0) => true,
 		((integer)l.verdob<>0 and r.dobcount=0) => true,
 		false
 	);
 	self.verdob := IF(take_left_dob,l.verdob,r.verdob);	
 	self.dobscore := if(take_left_dob,l.dobscore,r.dobscore);
 												
-	self.verhphone := IF(iid_constants.tscore(l.hphonescore)>=iid_constants.tscore(r.hphonescore) or (l.verhphone<>'' and r.hphonecount=0),l.verhphone,r.verhphone);
-	self.hphonescore := IF(iid_constants.tscore(l.hphonescore)>=iid_constants.tscore(r.hphonescore) or (l.verhphone<>'' and r.hphonecount=0),l.hphonescore,r.hphonescore);
+	self.verhphone := IF(Risk_Indicators.iid_constants.tscore(l.hphonescore)>=Risk_Indicators.iid_constants.tscore(r.hphonescore) or (l.verhphone<>'' and r.hphonecount=0),l.verhphone,r.verhphone);
+	self.hphonescore := IF(Risk_Indicators.iid_constants.tscore(l.hphonescore)>=Risk_Indicators.iid_constants.tscore(r.hphonescore) or (l.verhphone<>'' and r.hphonecount=0),l.hphonescore,r.hphonescore);
 	
-	self.verwphone := IF(iid_constants.tscore(l.wphonescore)>=iid_constants.tscore(r.wphonescore) or (l.verwphone<>'' and r.wphonecount=0),l.verwphone,r.verwphone);
-	self.wphonescore := IF(iid_constants.tscore(l.wphonescore)>=iid_constants.tscore(r.wphonescore) or (l.verwphone<>'' and r.wphonecount=0),l.wphonescore,r.wphonescore);
+	self.verwphone := IF(Risk_Indicators.iid_constants.tscore(l.wphonescore)>=Risk_Indicators.iid_constants.tscore(r.wphonescore) or (l.verwphone<>'' and r.wphonecount=0),l.verwphone,r.verwphone);
+	self.wphonescore := IF(Risk_Indicators.iid_constants.tscore(l.wphonescore)>=Risk_Indicators.iid_constants.tscore(r.wphonescore) or (l.verwphone<>'' and r.wphonecount=0),l.wphonescore,r.wphonescore);
 	
 
 	
@@ -328,7 +334,7 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 	self.address_history_summary.address_history_advo_college_hit := l.address_history_summary.address_history_advo_college_hit or r.address_history_summary.address_history_advo_college_hit;
 
 	chrono1_isPrison := if(howmany=1, r.isPrison, 
-								risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.Chrono1_isPrison, l.iid_flags ));
+								Risk_Indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.Chrono1_isPrison, l.iid_flags ));
 	chrono2_isPrison := if(howmany=2, r.isPrison, 
 								risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.Chrono2_isPrison, l.iid_flags ));
 	chrono3_isPrison := if(howmany=3, r.isPrison, 
@@ -349,8 +355,8 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 												risk_indicators.ga(l.chronoaddrscore) => l.addr_type,
 												risk_indicators.ga(r.chronoaddrscore) => r.addr_type,
 												l.addr_type);
-	self.dwelltype := map(risk_indicators.ga(l.chronoaddrscore) and trim(l.chrono_addr_flags.dwelltype)<>'' => iid_constants.dwelltype(l.chrono_addr_flags.dwelltype),
-												risk_indicators.ga(r.chronoaddrscore) and trim(r.chrono_addr_flags.dwelltype)<>'' => iid_constants.dwelltype(r.chrono_addr_flags.dwelltype),
+	self.dwelltype := map(risk_indicators.ga(l.chronoaddrscore) and trim(l.chrono_addr_flags.dwelltype)<>'' => Risk_Indicators.iid_constants.dwelltype(l.chrono_addr_flags.dwelltype),
+												risk_indicators.ga(r.chronoaddrscore) and trim(r.chrono_addr_flags.dwelltype)<>'' => Risk_Indicators.iid_constants.dwelltype(r.chrono_addr_flags.dwelltype),
 												risk_indicators.ga(l.chronoaddrscore) => l.dwelltype,
 												risk_indicators.ga(r.chronoaddrscore) => r.dwelltype,
 												l.dwelltype);
@@ -375,7 +381,7 @@ rollbestcount := rollup(sortedbest, countadd(left,right), seq, did);	// rollup b
 	
 // check to see if correction record or only 1 element verified then revert back to no DID found
 risk_indicators.layout_output removeHeader(risk_indicators.layout_output le) := TRANSFORM
-	isOnly1 := ((INTEGER)(BOOLEAN)le.firstcount+(INTEGER)(BOOLEAN)le.lastcount+(INTEGER)(BOOLEAN)le.addrcount+(INTEGER)(BOOLEAN)le.socscount+(INTEGER)(BOOLEAN)le.dobcount) = 1;
+	isOnly1 := ((INTEGER)(BOOLEAN)le.firstcount+(INTEGER)(BOOLEAN)le.middlecount+(INTEGER)(BOOLEAN)le.lastcount+(INTEGER)(BOOLEAN)le.addrcount+(INTEGER)(BOOLEAN)le.socscount+(INTEGER)(BOOLEAN)le.dobcount) = 1;
 				
 	blankOut := isOnly1 and StringLib.StringFind(le.src,'CO',1)=0;
 	
@@ -390,6 +396,7 @@ risk_indicators.layout_output removeHeader(risk_indicators.layout_output le) := 
 	self.dt_last_seen := if(blankOut, 0, le.dt_last_seen);			 
 	self.firstcount := if(blankOut, 0, le.firstcount);
 	self.lastcount := if(blankOut, 0, le.lastcount);
+ self.middlecount := if(blankOut, 0, le.middlecount);
 	self.addrcount := if(blankOut, 0, le.addrcount);
 	self.socscount := if(blankOut, 0, le.socscount);
 	self.hphonecount := if(blankOut, 0, le.hphonecount);
@@ -558,6 +565,10 @@ risk_indicators.layout_output removeHeader(risk_indicators.layout_output le) := 
 
 	self.firstscore := if(blankOut, 255, le.firstscore);
 	self.verfirst := if(blankOut, '', le.verfirst);
+  
+ self.middlescore := if(blankOut, 255, le.middlescore);
+	self.vermiddle := if(blankOut, '', le.vermiddle);
+ 
 	
 	self.dobscore := if(blankOut, 255, le.dobscore);
 	self.verdob := if(blankOut, '', le.verdob);
@@ -570,6 +581,7 @@ risk_indicators.layout_output removeHeader(risk_indicators.layout_output le) := 
 
 	SELF.sources := if(blankOut, '', le.sources);	
 	SELF.firstnamesources := if(blankOut, '', le.firstnamesources);
+ SELF.middlenamesources := if(blankOut, '', le.middlenamesources);
 	SELF.lastnamesources := if(blankOut, '', le.lastnamesources);
 	SELF.addrsources := if(blankOut, '', le.addrsources);
 	SELF.socssources := if(blankOut, '', le.socssources);

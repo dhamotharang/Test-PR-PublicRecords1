@@ -1,5 +1,5 @@
 ﻿export cviScoreV1(INTEGER1 p, INTEGER1 s, Layout_Output l, STRING9 corrected_ssn, STRING50 corrected_address, STRING10 corrected_phone, STRING5 inTweak, STRING50 veraddr, STRING20 verlast, 
-								BOOLEAN OFAC=TRUE, BOOLEAN IncludeDOBinCVI=FALSE, BOOLEAN IncludeDLinCVI=FALSE, STRING128 CustomCVIModelName='') := 
+								BOOLEAN OFAC=TRUE, BOOLEAN IncludeDOBinCVI=FALSE,BOOLEAN IncludeDLinCVI=FALSE, STRING128 CustomCVIModelName='',BOOLEAN IncludeITIN=FALSE, boolean includecompliancecap=false) := 
 FUNCTION
 
 BOOLEAN isPOTS := l.isPOTS;
@@ -81,10 +81,10 @@ cvi := __COMMON__(CASE(p,
 	override1 := __COMMON__(((	rcSet.isCode02(l.decsflag) OR 
 									rcSet.isCodeDI(l.DIDdeceased) OR
 									rcSet.isCode03(l.socsdobflag) OR 
-									((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
+									(((rcSet.isCode06(l.socsvalflag, l.ssn)and (~rcSet.isCodeIT(l.ssn) or ~IncludeITIN)) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
 									(rcSet.isCode08(l.phonetype,l.phone10) AND rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~rcSet.isCode30(l.addrmiskeyflag) AND ~rcSet.isCode31(l.hphonemiskeyflag)))) OR
 								(OFAC and rcSet.isCode32(l.watchlist_table, l.watchlist_record_number )));
-	
+  
 				
 	cviAdj2 := __COMMON__(IF(override1 and cvi>'10','10',cvi));
 			   
@@ -145,9 +145,14 @@ cvi := __COMMON__(CASE(p,
 	cviAdj8 := __COMMON__(MAP(	IncludeDOBinCVI AND DOBverified AND cviAdj7<'40' AND ~override1 AND ~override2 AND ~override3 => (STRING)((UNSIGNED)(cviAdj7)+10),	// add 10 to the score if DOB is verified
 									IncludeDLinCVI AND DLverified AND cviAdj7<'40' AND ~override1 AND ~override2 AND ~override3 => (STRING)((UNSIGNED)(cviAdj7)+10),	// add 10 to the score if DL is verified
 									cviAdj7));
-	
+                  
+  cviAdj9:= __COMMON__(MAP(	includecompliancecap and IncludeDOBinCVI AND DOBverified AND cviAdj7<'40' AND ~override1 AND ~override2 AND ~override3 => '20',	
+									includecompliancecap and IncludeDLinCVI AND DLverified AND cviAdj7<'40' AND ~override1 AND ~override2 AND ~override3 => '20',	
+									cviAdj8));
+                  
+  cviAdj10:= if(includecompliancecap and ( (p=8 and s=8) or (p=8 and s=11) or (p=8 and s=12) ),'30',cviAdj9);	
 	//Adjustment for Targets fp1403_2 model
-	target_Adj := __COMMON__(if(CustomCVIModelName = 'CCVI1501_1', if((s=7 and p=7) OR (s=9 and p=9), '20', cviAdj8), cviAdj8));
+	target_Adj := __COMMON__(if(CustomCVIModelName = 'CCVI1501_1', if((s=7 and p=7) OR (s=9 and p=9), '20', cviAdj10), cviAdj10));
 
 //CustomCVIModelName = 'CCVI1810_1' special logic for chase.  Depends on if verfirst,last and addr is blanked out in iid records transform, also chaning nas and nap. applied to normal and custom cvi.
 

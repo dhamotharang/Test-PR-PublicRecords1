@@ -1,4 +1,4 @@
-﻿IMPORT dx_Email, STD;
+IMPORT dx_Email, STD;
 
 EXPORT Constants := MODULE
 
@@ -11,30 +11,31 @@ EXPORT Constants := MODULE
     EXPORT BOOLEAN isEIC(STRING _type) := _type = EIC;
     EXPORT BOOLEAN isEAA(STRING _type) := _type = EAA;
   END;
-  
+
   EXPORT Defaults := MODULE
     EXPORT UNSIGNED PenaltThreshold      := 10;
-    EXPORT UNSIGNED MaxResults           := 25;  
-    EXPORT UNSIGNED MaxResultsPerAcct    := 10;  
+    EXPORT UNSIGNED MaxResults           := 25;
+    EXPORT UNSIGNED MaxResultsPerAcct    := 10;
     EXPORT UNSIGNED MaxEmailsToCheckDeliverable := 10;  //max number of result email addresses per account to send to gateway for delivery check
     EXPORT UNSIGNED MaxEmailsForTMXcheck := 5;  //max number of result email addresses per account to send to TrustDefender gateway for status check
     EXPORT UNSIGNED DID_SCORE_THRESHOLD  := 80;  // BatchShare.Constants.Defaults.didScoreThreshold
-    EXPORT UNSIGNED SSN_SEARCH_PENALTY   := 999;  // will be used to prevent name only match in case of blank ssn for name/ssn search 
+    EXPORT UNSIGNED SSN_SEARCH_PENALTY   := 999;  // will be used to prevent name only match in case of blank ssn for name/ssn search
     EXPORT UNSIGNED RELATIONSHIP_PENALTY   := 100;  // will be used for fuzzy relations match where only input lexid is available
     EXPORT STRING20 SingleSearchAccountNo := '0';
   END;
-  
+
   EXPORT UNSIGNED EmailQualityRulesForBVCall := 0
                                                | dx_Email.Translation_Codes.rules_bitmap_code('role_address')        // role address is valid email address for the purpose of email delivery check
                                                | dx_Email.Translation_Codes.rules_bitmap_code('disposable_address'); // disposable address is valid email address for the purpose of email delivery check
-  
+
   EXPORT UNSIGNED SEARCH_JOIN_LIMIT := 1000;
   EXPORT STRING EMAIL_SOURCES := 'EMAIL_SOURCES';
   EXPORT STRING STR_TRUE := 'true';
   EXPORT STRING STR_FALSE := 'false';
   EXPORT STRING Basic := 'basic';
   EXPORT STRING Premium := 'premium';
-  
+  EXPORT STRING LastVerified := 'last verified';
+
   STRING StatusInvalid := 'invalid';
   EXPORT BOOLEAN isUndeliverableEmail(STRING _status) := STD.Str.ToLowerCase(_status) = StatusInvalid;
   EXPORT STRING DomainAcceptAll := 'accept_all';
@@ -50,9 +51,11 @@ EXPORT Constants := MODULE
 
   EXPORT RestrictedUseCase := MODULE
     EXPORT STRING Standard           := 'STANDARD'; // or blank, no use case restrictions
-    EXPORT STRING Reseller           := 'RESELLER';  
-    EXPORT STRING DirectMarketing    := 'DIRECTMARKETING';  
-    
+    EXPORT STRING Reseller           := 'RESELLER';
+    EXPORT STRING DirectMarketing    := 'DIRECTMARKETING';
+    EXPORT STRING NoRoyaltySources   := 'NOROYALTY';  // for business cases when royalty sources are to be excluded per product requirements
+
+    EXPORT BOOLEAN skipRoyaltySources(STRING _usecase) := STD.Str.ToUpperCase(TRIM(_usecase, ALL)) = NoRoyaltySources;
     EXPORT BOOLEAN isReseller(STRING _usecase) := STD.Str.ToUpperCase(TRIM(_usecase, ALL)) = Reseller;
     EXPORT BOOLEAN isDirectMarketing(STRING _usecase) := STD.Str.ToUpperCase(TRIM(_usecase, ALL)) = DirectMarketing;
   END;
@@ -61,16 +64,17 @@ EXPORT Constants := MODULE
     EXPORT STRING5 ByEmail := 'EMAIL'; // email address to be used for search
     EXPORT STRING5 ByLexid := 'LEXID'; // only subject's Lexid to be used for search
     EXPORT STRING5 ByPII := 'BYPII'; // all subject's PII to be used for search
-  END; 
-  
+  END;
+
   EXPORT Relationship := MODULE
    EXPORT STRING NotFound        := 'No Relationship or Association Found';
    EXPORT STRING PossibleSubject := 'Possible Subject';
- 
+
   END;
-  
+
   EXPORT GatewayValues := MODULE
-    EXPORT UNSIGNED1 SQLSelectLimit  := 10;  // Limit SQL select GW history  recs for each email address
+    EXPORT UNSIGNED1 SQLSelectLimit  := 1000;  // Limit SQL select GW history  recs
+    EXPORT UNSIGNED  MaxSQLBindVariables := 10;
     EXPORT UNSIGNED1 requestTimeout  := 5;
     EXPORT UNSIGNED1 requestRetries  := 1;
     EXPORT STRING    SourceBriteVerifyEmail := 'BriteVerify_Email';
@@ -91,6 +95,6 @@ EXPORT Constants := MODULE
       {EMAIL_DOMAIN_INVALID  => 'Email Domain Invalid'}],
       {STRING error_code => STRING error_desc});
     EXPORT get_error_desc(STRING _code) := dict_email_address_invalid[_code].error_desc;
-    
+
   END;
 END;

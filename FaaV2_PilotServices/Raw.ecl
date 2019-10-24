@@ -5,14 +5,18 @@ rec_pilot := faav2_pilotServices.layouts.pilotRawRec;
 rec_cert := FaaV2_PilotServices.Layouts.PilotReportRawrec;
 
 export Raw := module
-		// called by: autokeys_ids, getbyID
-		export rec_slim byDIDs (dataset(doxie.layout_references) in_dids, boolean isFCRA = false) := function		
-			 deduped := dedup(sort(in_dids,did),did);
-			 joinup := join(deduped,faa.Key_airmen_did(isFCRA),keyed( left.did  = right.did), 
-			   transform(rec_slim, self := right),
-				  limit(ut.limits.AIRMAN_PER_DID, skip));
-			 return joinup;
-		end;
+
+	export byDIDs_raw (dataset(doxie.layout_references) in_dids, boolean isFCRA=false) := function
+	  deduped := dedup(sort(in_dids,did),did);
+	  joinup := join(deduped,faa.Key_airmen_did(isFCRA),keyed(left.did=right.did),
+	    transform(right),limit(ut.limits.AIRMAN_PER_DID,skip));
+	  return joinup;
+	end;
+
+	// called by: autokeys_ids, getbyID
+	export rec_slim byDIDs (dataset(doxie.layout_references) in_dids, boolean isFCRA=false) := function
+		 return project(byDIDs_raw(in_dids,isFCRA),transform(rec_slim,self:=left));
+	end;
 
   export rec_slim byUniqueID (dataset (rec_slim) in_uid, boolean isFCRA = false) := function		
     deduped := dedup (sort(in_uid,unique_id, record), unique_id, record);

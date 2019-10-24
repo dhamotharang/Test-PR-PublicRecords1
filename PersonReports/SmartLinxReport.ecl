@@ -1,4 +1,4 @@
-// Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
+﻿// Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
 IMPORT $, Foreclosure_Services, PersonReports, doxie, doxie_crs, ATF_Services, iesp,
       AutoStandardI, ut, American_Student_Services, dx_header,
 			SmartRollup, FCRA, LN_PropertyV2_Services;
@@ -115,10 +115,11 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_addresses_prior := s_addresses(verified=false);
 	s_addresses_current_count := count(s_addresses_current);
 	s_addresses_prior_count := count(s_addresses_prior);
-	tmp_addresses   := choosen (SmartRollup.fn_smart_getAddrMetadata.addresses(s_addressesSequence,doBadSecRange,mod_smartlinx),iesp.Constants.SMART.MaxAddress);
-	p_addresses      := choosen (SmartRollup.fn_smart_getPhonesPlusMetadata.byPhone(tmp_addresses),iesp.Constants.SMART.MaxAddress);
-	p_addresses_current := p_addresses(verified=true);
-	p_addresses_prior   := p_addresses(verified=false);
+	tmp_addresses   := choosen (SmartRollup.fn_smart_getAddrMetadata.addresses(s_addressesSequence,doBadSecRange,mod_smartlinx),iesp.Constants.SMART.MaxAddress);	
+	tmp_p_addresses      := choosen (SmartRollup.fn_smart_getPhonesPlusMetadata.byPhone(tmp_addresses),iesp.Constants.SMART.MaxAddress);
+	p_addressesWSourceCounts := choosen(SmartRollup.fn_smart_getAddrMetadata.AddAddressSourceCounts(subject_did,tmp_p_addresses,mod_smartlinx),iesp.Constants.Smart.MaxAddress);	
+	p_addresses_current := p_addressesWSourceCounts(verified=true);
+	p_addresses_prior   := p_addressesWSourceCounts(verified=false);
 	subject_imposters := IF (mod_smartlinx.include_imposters, pers.imposters,dataset([],iesp.bps_share.t_BpsReportImposter));
 	s_imposters        := SmartRollup.fn_smart_rollup_imposters(subject_imposters);
 	p_imposter_entities := choosen(SmartRollup.fn_smart_imposter_entities(subject_imposters),  iesp.Constants.SMART.MaxImposters);

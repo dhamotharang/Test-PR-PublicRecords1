@@ -1,7 +1,7 @@
 ﻿// ================================================================================
 // ===== RETURNS Spoke member Source Doc and Source Count Info
 // ================================================================================
-IMPORT BIPV2, Spoke, ut, iesp, MDR, doxie, AutoStandardI, Suppress;
+IMPORT BIPV2, Spoke, ut, iesp, MDR, doxie;
 
 EXPORT SpokeSource_Records (
   dataset(Layouts.rec_input_ids_wSrc) in_docids,
@@ -16,13 +16,11 @@ EXPORT SpokeSource_Records (
 																																		SELF := LEFT,
 																																		SELF := []));
 	// *** Key fetch to get bspoke data
-  spoke_recs_all := Spoke.Key_Spoke_Linkids.kfetch(DEDUP(in_docs_linkonly,ALL),inoptions.fetch_level,,
+  spoke_recs_all := Spoke.Key_Spoke_Linkids.kfetch(DEDUP(in_docs_linkonly,ALL), mod_access, inoptions.fetch_level,,
 	TopBusiness_Services.Constants.SpokeKfetchMaxLimit);
-	
-	ds_spoke_recs_suppressed := Suppress.MAC_SuppressSource(spoke_recs_all, mod_access);
-	
+		
 	// Spoke does not have a vl_id or source_rec_id to filter on.	
-	SHARED spoke_idValue := JOIN(ds_spoke_recs_suppressed,in_docids,
+	SHARED spoke_idValue := JOIN(spoke_recs_all,in_docids,
 										BIPV2.IDmacros.mac_JoinLinkids(inoptions.fetch_level),
 										TRANSFORM(LEFT));
 										

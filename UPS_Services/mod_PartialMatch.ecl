@@ -416,7 +416,10 @@ export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 
 	export StreetZip := MODULE
 	// key has: prim_name, zip, prim_range, sec_range....lname
-		idx := dx_header.key_header_address();
+		idx := dx_header.key_header_address();// CCPA Source Suppressions are not applied here as this key is used only to fetch dids
+																					// dids fetched from this key are used only in doxie.mod_header_records where CCPA suppressions are applied
+																					// Any changes to StreetZip.Records output CCPA suppression should be applied here
+
 		raw_recs := idx(KEYED(prim_name = inPrimName) AND
 										KEYED(zip = (QSTRING) inZip5) AND
 										KEYED(prim_range = inPrimRange) AND
@@ -470,7 +473,9 @@ export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 	
 	export StreetZipName := MODULE
 		idx_name := dx_header.key_StreetZipName();
-		idx_noname := dx_header.key_header_address();
+		idx_noname := dx_header.key_header_address(); // CCPA Source Suppressions are not applied here as this key is used only to fetch dids
+																									// dids fetched from this key are used only in doxie.mod_header_records where CCPA suppressions are applied
+																									// Any changes to StreetZipName.Records output CCPA suppressions should be applied here
 
 		// if we have city and state inputs, we can build a set of zip codes for
 		// that city/state.  This set should be a superset of what is already in
