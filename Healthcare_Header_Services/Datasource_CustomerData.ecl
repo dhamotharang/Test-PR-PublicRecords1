@@ -1,4 +1,4 @@
-Import Healthcare_Services,iesp;
+﻿Import Healthcare_Services,iesp,suppress;
 EXPORT Datasource_CustomerData := MODULE
 		Export getCustomerLicenseData(dataset(layouts.autokeyInput) input,dataset(Layouts.common_runtime_config) cfg) := function
 			myCustomerRecords := Healthcare_Services.Customer_License_Search_Records;
@@ -21,6 +21,7 @@ EXPORT Datasource_CustomerData := MODULE
 				self.Name := iesp.ECL2ESP.SetName (l.clean_name.fname, l.clean_name.mname, l.clean_name.lname,
 																					 l.clean_name.name_suffix, l.clean_name.title, l.full_name);
 				self.LicenseNumber := l.license_number;
+				self.hasoptout:=l.hasoptout;
 				self.LicenseType := l.bull_license_type;
 				self.LicenseTypeDesc := l.bull_lic_type_desc;
 				self.LicenseBoardCd := l.license_number[1..2];
@@ -31,12 +32,17 @@ EXPORT Datasource_CustomerData := MODULE
 				self.ExpirationDate := iesp.ECL2ESP.toDate((integer)l.expiration_date);
 				self := [];
 			end;
-			CustomerLicenseData := project(myCustomerRecords.records(covertedInput(license_number<>''),10),
+			mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);
+			test_mac:=Suppress.MAC_FlagSuppressedSource(covertedInput,mod_access); 
+			setOptOut := project(test_mac, transform(myCustomerLayout.autokeyInput,self.hasOptOut:= left.is_suppressed;self:=left;self:=[];));              			
+												 
+			CustomerLicenseData := project(myCustomerRecords.records(setOptOut(license_number<>''),10),
 																			get_CustomerLicenseData(left));
 
 			layouts.layout_fullchild_customerLicense doRollup(layouts.layout_customerLicense l, dataset(layouts.layout_customerLicense) r) := TRANSFORM
 				SELF.acctno := l.acctno;
 				self.ProviderID := l.ProviderID;
+				self.hasoptout:=l.hasoptout;
 				self.childinfo := project(r,iesp.healthcare.t_StateLicenseRecord);
 			END;
 			results_rolled := rollup(group(CustomerLicenseData,acctno),group,doRollup(left,rows(left)));
@@ -68,12 +74,16 @@ EXPORT Datasource_CustomerData := MODULE
 				self.IsMatchDOB := l.isDOBMatch;
 			end;
 			DeathInputRecords := project(input,transform(Healthcare_Services.Customer_Death_Search_Layouts.autokeyInput,self.CustomerID:=cfg[1].CustomerID;self:=left));
-			CustomerDeathData := project(Healthcare_Services.Customer_Death_Search_Records.records(DeathInputRecords),
+      suppressionmac:=Suppress.MAC_FlagSuppressedSource(DeathInputRecords,CFG[1]); 
+			setoptoutCustomerdata := project(suppressionmac, transform(Healthcare_Services.Customer_Death_Search_Layouts.autokeyInput,self.hasOptOut:= left.is_suppressed;self:=left;self:=[];));          
+			
+			CustomerDeathData := project(Healthcare_Services.Customer_Death_Search_Records.records(setoptoutCustomerdata),
 																			get_CustomerDeathData(left));
 
 			layouts.layout_fullchild_customerDeath doRollup(layouts.layout_customerDeath l, dataset(layouts.layout_customerDeath) r) := TRANSFORM
 				SELF.acctno := l.acctno;
 				self.ProviderID := l.ProviderID;
+				self.hasoptout:=l.hasoptout;
 				self.childinfo := project(r,iesp.healthcare.t_StateVitalRecord);
 			END;
 			// output(DeathInputRecords,named('DeathInputRecords'));

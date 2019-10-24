@@ -127,8 +127,12 @@ export getHRIDesc(string5 rc) := CASE(TRIM(rc),
 '9W' => 'Bankruptcy record on file',
 '9X' => 'Insufficient information on file',
 '9Y' => 'Insufficient purchase activity reported',
-
+'AM' => 'The input applicant record is a minor',
 'EA' => 'Unable to verify email address',
+'EU' => 'The input email address is not verified',
+'EM' => 'The input email adress may have been miskeyed',
+'ER' => 'The input email address appears as high risk in the Digital Identity Network',
+'PR' => 'The input phone appears as high risk in the Digital Identity Network',
 
 'A0' => 'The input TIN is associated with a different business name and address',
 'A1' => 'Unable to find current public records related to the subject business',

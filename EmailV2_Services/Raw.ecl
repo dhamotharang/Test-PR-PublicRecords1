@@ -117,12 +117,10 @@ EXPORT Raw := MODULE
   END;
   
 EXPORT GetEventHistory(DATASET($.Layouts.Gateway_Data.batch_in_bv_rec) in_emails,
-                          STRING in_source='') := FUNCTION 
+                          STRING in_source='', STRING8 prior_year_date='') := FUNCTION 
 
-    prior_year_date := (STRING8) STD.Date.AdjustDate(STD.Date.Today(), -1,0,0);
-    //email_events := DATASET([],$.Layouts.event_history_rec);
      
-    email_events := PROJECT(dx_Email.Raw.get_event(in_emails(email!=''), email, prior_year_date, in_source), 
+    email_events := PROJECT(dx_Email.Raw.get_event(in_emails(email!=''), email, prior_year_date, in_source, TRUE), 
                           TRANSFORM($.Layouts.event_history_rec,
                               SELF.email := LEFT.email_address,                                
                               SELF.date_added := LEFT.date_added,                                

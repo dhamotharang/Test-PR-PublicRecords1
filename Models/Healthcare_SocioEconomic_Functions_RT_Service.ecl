@@ -108,6 +108,14 @@ EXPORT getBooleanFlagValueForKeyFromIESP(dataset(iesp.healthcare_account_info.t_
 	RETURN iff(tagExists and getVal = 'TRUE', true, false);
 END;
 
+EXPORT getBooleanFlagValueForKeyFromIESP_DefaultTrue(dataset(iesp.healthcare_account_info.t_HCConfigParsedValue) EspValues, String MatchString) := FUNCTION
+	getTag := EspValues(STD.Str.ToUpperCase(Key)=STD.Str.ToUpperCase(MatchString));
+		// and Active = Healthcare_Constants_RT_Service.Constants.CFG_MBS_ACTIVE); //Active field will not be used by socio for suppression
+	tagExists:= exists(getTag);
+	getVal:=if( tagExists, STD.Str.ToUpperCase(trim(getTag[1].Value,left,right)), 'TRUE');
+	RETURN iff(tagExists and getVal = 'FALSE', false, true);
+END;
+
 EXPORT getCatThresholdValueForKeyFromIESP(dataset(iesp.healthcare_account_info.t_HCConfigParsedValue) EspValues, String MatchString) := FUNCTION
 	getTag := EspValues(STD.Str.ToUpperCase(Key)=STD.Str.ToUpperCase(MatchString));
 		// and Active = Healthcare_Constants_RT_Service.Constants.CFG_MBS_ACTIVE); //Active field will not be used by socio for suppression

@@ -1,4 +1,4 @@
-import header, ut, doxie_crs, PhonesFeedback_Services, doxie, PhonesFeedback;
+﻿import AutoStandardI, header, ut, doxie_crs, PhonesFeedback_Services, doxie, PhonesFeedback, suppress;
 
 doxie.MAC_Header_Field_Declare()
 doxie.MAC_Selection_Declare()
@@ -54,10 +54,13 @@ end;
 Main_tmp :=project(Main_tmp_a,add_sub_Ind(LEFT));
 // Main is for the subj add here
 
+global_mod := AutoStandardI.GlobalModule();
+mod_access := doxie.compliance.GetGlobalDataAccessModule();
 PhonesFeedback_Services.Mac_Append_Feedback(Main_tmp
 																						,did
 																						,Phone
-																						,Main_all);
+																						,Main_all
+                                       ,mod_access);
 
 
 Main_all select_fb_subj (Main_all le):=transform

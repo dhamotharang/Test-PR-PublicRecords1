@@ -62,6 +62,20 @@ EXPORT Healthcare_SocioEconomic_Functions_Core := Module
 		outAge_trunc := TRUNCATE(outAge*100)/100;
 		return if(inDOB='',0,(DECIMAL5_2)outAge_trunc);
 	end;
+
+	export SeTCcalcAgeInYears(STRING8 inDOB, STRING8 AgeRefYYYYMMDD) := function
+		inDOBYear := (INTEGER2)inDOB[1..4];
+		inDOBMonth := (UNSIGNED1)inDOB[5..6];
+		inDOBDay := (UNSIGNED1)inDOB[7..8];
+		AgeRefYear := (INTEGER2)AgeRefYYYYMMDD[1..4];
+		AgeRefMonth := (UNSIGNED1)AgeRefYYYYMMDD[5..6];
+		AgeRefDay := (UNSIGNED1)AgeRefYYYYMMDD[7..8];
+		finalAge := ( STD.Date.FromGregorianYMD(AgeRefYear,AgeRefMonth,AgeRefDay)-STD.Date.FromGregorianYMD(inDOBYear,inDOBMonth,inDOBDay) )/365.24;
+		outAge := ROUND(finalAge,1);
+		outAge_trunc := TRUNCATE(outAge*10)/10;
+		return if(inDOB='',0,(DECIMAL4_1)outAge_trunc);
+	end;
+
 	export calc_Age_Gender_PDC_Rate(REAL8 age_in, STRING1 gender_in) := function
 	age := if(age_in > 80, 80, age_in);
 	Age_Gender_PDC_Rate := if(gender_in = 'F', 
@@ -80,7 +94,75 @@ EXPORT Healthcare_SocioEconomic_Functions_Core := Module
 								));
 	return AG_Pred_Mot;
 	end;
-	
+
+	export calc_SeTC_AG_Pred_10k(REAL8 age_in_years, INTEGER female) := function
+	REAL8	AG_Pred_10K := MAX(0, MIN(10000, (10028.99 + 69.39857*FEMALE + 
+								2.880727*POWER(AGE_IN_YEARS,2) + 
+								-0.02805309*POWER(AGE_IN_YEARS,3) + 
+								0.00008291381*POWER(AGE_IN_YEARS,4)+ 
+								-59841.5*POWER((1+ AGE_IN_YEARS),-1) + 
+								-1781.267*(sqrt(AGE_IN_YEARS)))
+								));
+	return AG_Pred_10K;
+	end;
+
+	export calc_SeTC_AG_Pred_10k_LOB(REAL8 age_in_years, INTEGER female, INTEGER Payor_LOB) := function
+	REAL8	AG_Pred_10K_LOB := If(Payor_LOB < 20,
+									Max(0, Min(10000, 7.803537 +  92.60866*(FEMALE) +  0.1449893*(POWER(AGE_IN_YEARS,2)) + 
+												2486.766*POWER((1+AGE_IN_YEARS),(-1)))),
+								If(Payor_LOB < 30,
+									Max(0, Min(10000, 1101555 +  49512.7*(AGE_IN_YEARS) +  -353.0968*POWER(AGE_IN_YEARS,2) + 
+												2.128741*POWER(AGE_IN_YEARS,3) +  -5.757086E-03*POWER(AGE_IN_YEARS,4) + 
+												-404166.1*(sqrt(AGE_IN_YEARS)) +  -3330422*POWER((1+AGE_IN_YEARS),(-1)))),
+								If(Payor_LOB < 40,
+									Max(0, Min(10000, 11950.31 +  64.33316*(FEMALE) +  3.611546*POWER(AGE_IN_YEARS,2) + 
+												-3.775484E-02*POWER(AGE_IN_YEARS,3) +  1.302741E-04*POWER(AGE_IN_YEARS,4) + 
+												-2149.012*(sqrt(AGE_IN_YEARS)) +  -70581.05*POWER((1+AGE_IN_YEARS),(-1)))),
+								Max(0, Min(10000, 132.7687 +  52.59453*(FEMALE) +  1.046966E-03*POWER(AGE_IN_YEARS,3) +
+											1.365149E-06*POWER(AGE_IN_YEARS,4))))));
+	return AG_Pred_10K_LOB;
+	end;
+
+	export calc_SeTC_AG_Pred_10k_LOB_EXT(REAL8 age_in_years, INTEGER female, INTEGER Payor_LOB) := function
+	REAL8	AG_Pred_10K_LOB_EXT := If(Payor_LOB < 20, 
+										MAX(0,MIN(10000, 10.81445 +  92.47696*(FEMALE) +  0.1448327*POWER(AGE_IN_YEARS,2) + 
+														2431.844*(POWER((1+AGE_IN_YEARS),(-1))))),
+									IF(Payor_LOB < 22,
+										MAX(0,MIN(10000, 562285.1 +  -24.31018*(FEMALE) +  28569.09*(AGE_IN_YEARS) + 
+														-223.6408*POWER(AGE_IN_YEARS,2) +  1.444131*POWER(AGE_IN_YEARS,3) +
+														-4.11206E-03*POWER(AGE_IN_YEARS,4) +  -220092.4*(sqrt(AGE_IN_YEARS)) + 
+														-1469675*(POWER((1+AGE_IN_YEARS),(-1))))),
+									IF(Payor_LOB < 23,
+										MAX(0,MIN(10000, 1767721 +  122.6175*(FEMALE) + 
+														72658.84*(AGE_IN_YEARS) +  -476.7107*POWER(AGE_IN_YEARS,2) +
+														2.669091*POWER(AGE_IN_YEARS,3) +  -6.765313E-03*POWER(AGE_IN_YEARS,4) + 
+														-620078.2*(sqrt(AGE_IN_YEARS)) +  -5826278*(POWER((1+AGE_IN_YEARS),(-1))))),
+									IF(Payor_LOB < 32,
+										MAX(0,MIN(10000, 206596.4 +  114.9741*(FEMALE) +  7873.39*(AGE_IN_YEARS) + 
+													-41.93082*POWER(AGE_IN_YEARS,2) +  0.1407952*POWER(AGE_IN_YEARS,3) + 
+													-70510.37*(sqrt(AGE_IN_YEARS)) +  -686168.4*(POWER((1+AGE_IN_YEARS),(-1))))),
+									IF(Payor_LOB < 33,
+										MAX(0,MIN(10000, 26668.77 +  114.8778*(FEMALE) +  680.7947*(AGE_IN_YEARS) + 
+													-1.80077*POWER(AGE_IN_YEARS,2) +  -7589.995*(sqrt(AGE_IN_YEARS)) + 
+													-115591.5*(POWER((1+AGE_IN_YEARS),(-1))))),
+									IF(Payor_LOB < 34,
+										MAX(0,MIN(10000, 24561.42 +  57.61723*(FEMALE) +  856.1453*(AGE_IN_YEARS) + 
+													-3.951045*POWER(AGE_IN_YEARS,2) +  -8019.504*(sqrt(AGE_IN_YEARS)) + 
+													-88679.95*(POWER((1+AGE_IN_YEARS),(-1))) +  1.094737E-02*POWER(AGE_IN_YEARS,3))),
+									IF(Payor_LOB < 41,
+										MAX(0,MIN(10000, 1767721 +  122.6175*(FEMALE) +  72658.84*(AGE_IN_YEARS) + 
+													-476.7107*POWER(AGE_IN_YEARS,2) +  -620078.2*(sqrt(AGE_IN_YEARS)) + 
+													-5826278*(POWER((1+AGE_IN_YEARS),(-1))) +  2.669091*POWER(AGE_IN_YEARS,3) + 
+													-6.765313E-03*POWER(AGE_IN_YEARS,4))),
+									IF(Payor_LOB < 42,
+										MAX(0,MIN(10000, 1558.39 +  96.94733*(FEMALE) +  -1.933813*POWER(AGE_IN_YEARS,2) + 
+														-21010.53*(POWER((1+AGE_IN_YEARS),(-1))) +  0.0483306*POWER(AGE_IN_YEARS,3) + 
+														-3.267998E-04*POWER(AGE_IN_YEARS,4))),
+									MAX(0,MIN(10000, 133.8843 +  49.25814*(FEMALE) +  9.52432E-04*POWER(AGE_IN_YEARS,3) + 
+													2.407781E-06*POWER(AGE_IN_YEARS,4)))))))))));
+	return AG_Pred_10K_LOB_EXT;
+	end;
+
 	export crosswalkState(String inState) := function
 		clnState := trim(STD.Str.ToUpperCase(inState),left,right);
 		return map(clnState = 'AK' => 1,
@@ -376,6 +458,15 @@ EXPORT Healthcare_SocioEconomic_Functions_Core := Module
 		return map(clnVal = '0' => 0,
 								clnVal = '-1' => -1,
 								clnVal = 'M' => 1,
+								-1);
+	end;
+	
+	export Crosswalkv1_ProspectGender(String inVal) := function
+		clnVal := trim(STD.Str.ToUpperCase(inVal),left,right);
+		return map(clnVal = '0' => 0,
+								clnVal = '-1' => -1,
+								clnVal = 'M' => 1,
+								clnVal = 'F' => 2,
 								-1);
 	end;
 	

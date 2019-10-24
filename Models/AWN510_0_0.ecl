@@ -1,4 +1,4 @@
-import ut, risk_indicators, address, RiskWise, std;
+﻿import risk_indicators, ut, RiskWise, std;
 
 export AWN510_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC=true) := 
 
@@ -344,6 +344,8 @@ Risk_Indicators.Layout_Output into_layout_output(clam le) := transform
 	self := le.iid;
 	self := le.shell_input;
 	self := le;
+	self := [];
+
 end;
 iid := project(clam, into_layout_output(left));
 

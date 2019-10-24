@@ -12,7 +12,7 @@
 */
 /*--INFO-- Contains RiskView Alerts, Scores, Attributes, Report version 5.0 and higher */
 
-IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, ut, ffd, Inquiry_AccLogs, Risk_Reporting;
+IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView;
 
 export Search_Service := MACRO
 
@@ -101,28 +101,28 @@ export Search_Service := MACRO
    *************************************** */
 	boolean OutputConsumerStatements := option.FFDOptionsMask[1] = '1';// this is coming from options tag now instead of out-of-band boolean option we had originally
 
-	STRING auto_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value[1..9])='rva1503_0')[1].value);
-	STRING bankcard_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value[1..9])='rvb1503_0')[1].value);
-	STRING Short_term_lending_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value[1..9])='rvg1502_0')[1].value);
-	STRING Telecommunications_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value[1..9])='rvt1503_0')[1].value);	
-	STRING Crossindustry_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value[1..9])='rvs1706_0')[1].value);	
+	STRING auto_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rva1503_0')[1].value);
+	STRING bankcard_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rvb1503_0')[1].value);
+	STRING Short_term_lending_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rvg1502_0')[1].value);
+	STRING Telecommunications_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rvt1503_0')[1].value);	
+	STRING Crossindustry_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value[1..9])='rvs1706_0')[1].value);	
 	
 	ds_flagship_models := dataset([{auto_model_name}, {bankcard_model_name}, {short_term_lending_model_name}, {telecommunications_model_name}, {Crossindustry_model_name}], {string flagship_names}) : global;
-	STRING custom_model_name 	:= StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value) not in set(ds_flagship_models, flagship_names) )[1].value);
+	STRING custom_model_name 	:= STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value) not in set(ds_flagship_models, flagship_names) )[1].value);
 	ds_flagship_plus_custom   := ds_flagship_models + dataset([{custom_model_name}], {string flagship_names}) : global;
-	STRING custom2_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value) not in set(ds_flagship_plus_custom, flagship_names) )[1].value);
+	STRING custom2_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value) not in set(ds_flagship_plus_custom, flagship_names) )[1].value);
 	ds_flagship_plus_custom2  := ds_flagship_plus_custom + dataset([{custom2_model_name}], {string flagship_names}) : global;
-	STRING custom3_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value) not in set(ds_flagship_plus_custom2, flagship_names) )[1].value);
+	STRING custom3_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value) not in set(ds_flagship_plus_custom2, flagship_names) )[1].value);
 	ds_flagship_plus_custom3  := ds_flagship_plus_custom2 + dataset([{custom3_model_name}], {string flagship_names}) : global;
-	STRING custom4_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value) not in set(ds_flagship_plus_custom3, flagship_names) )[1].value);
+	STRING custom4_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value) not in set(ds_flagship_plus_custom3, flagship_names) )[1].value);
 	ds_flagship_plus_custom4  := ds_flagship_plus_custom3 + dataset([{custom4_model_name}], {string flagship_names}) : global;
-	STRING custom5_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value) not in set(ds_flagship_plus_custom4, flagship_names) )[1].value);
+	STRING custom5_model_name := STD.Str.ToLowerCase(option.IncludeModels.Names(STD.Str.ToLowerCase(value) not in set(ds_flagship_plus_custom4, flagship_names) )[1].value);
 	
 	string intended_purpose := trim(option.IntendedPurpose);
 	string	AttributesVersionRequest := trim(option.AttributesVersionRequest);
-	string prescreen_score_threshold := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(OptionName)='prescreen_score_threshold')[1].OptionValue;
-	boolean exception_score_reason := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(OptionName)='exception_score_reason')[1].OptionValue='1'; // T-Mobile option only - default to false
-	boolean isCalifornia_in_person := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(OptionName)='inpersonapplicant')[1].OptionValue='1';  // defaults to false unless there is an option passed in to turn it on
+	string prescreen_score_threshold := option.IncludeModels.ModelOptions(STD.Str.ToLowerCase(OptionName)='prescreen_score_threshold')[1].OptionValue;
+	boolean exception_score_reason := option.IncludeModels.ModelOptions(STD.Str.ToLowerCase(OptionName)='exception_score_reason')[1].OptionValue='1'; // T-Mobile option only - default to false
+	boolean isCalifornia_in_person := option.IncludeModels.ModelOptions(STD.Str.ToLowerCase(OptionName)='inpersonapplicant')[1].OptionValue='1';  // defaults to false unless there is an option passed in to turn it on
 	boolean run_riskview_report := option.IncludeReport;
 	string20 HistoryDateTimeStamp := '' : STORED('HistoryDateTimeStamp');
 	
@@ -194,7 +194,7 @@ export Search_Service := MACRO
 
   STRING20 AccountNumber := users.AccountNumber;
   BOOLEAN TestDataEnabled := users.TestDataEnabled;
-	STRING32 TestDataTableName := StringLib.StringToUpperCase(TRIM(users.TestDataTableName, LEFT, RIGHT));
+	STRING32 TestDataTableName := STD.Str.ToUpperCase(TRIM(users.TestDataTableName, LEFT, RIGHT));
 	
   //Used only by MLA
   STRING20 EndUserCompanyName 		:= context.MLAGatewayInfo.EndUserCompanyName;
@@ -236,8 +236,8 @@ export Search_Service := MACRO
 	
 	Risk_Indicators.Layout_Input intoLayoutInput(emptyRecord le) := TRANSFORM
 		SELF.seq := (integer)search.seq;	// Sequence - This is to be used by the ECL Developers for testing purposes	
-		SELF.fname := StringLib.StringToUpperCase(search.Name.First);
-		SELF.lname := StringLib.StringToUpperCase(search.Name.Last);
+		SELF.fname := STD.Str.ToUpperCase(search.Name.First);
+		SELF.lname := STD.Str.ToUpperCase(search.Name.Last);
 		SELF.ssn := SSN;
 		SELF.in_zipCode := Zip;
 		SELF.phone10 := HomePhone;
@@ -333,7 +333,7 @@ input_ok := map(((
 
 		) 
 	);
-	
+  
 	#if(Models.LIB_RiskView_Models().TurnOnValidation) // If TRUE, output the model results directly
 		output(search_results_temp, named('Results'));
 	#else // Else, this is a normal transaction and should be formatted for output appropriately
@@ -1009,6 +1009,11 @@ input_ok := map(((
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
+      self.DefendantAddress.StreetAddress1 := left.StreetAddress1;
+      self.DefendantAddress.StreetAddress2 := left.StreetAddress2;
+      self.DefendantAddress.City := left.City;
+      self.DefendantAddress.State := left.State;
+      self.DefendantAddress.Zip5 := left.Zip5;
 			self := left;
 			self := [];
 		));
@@ -1018,6 +1023,11 @@ input_ok := map(((
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
+      self.DefendantAddress.StreetAddress1 := left.StreetAddress1;
+      self.DefendantAddress.StreetAddress2 := left.StreetAddress2;
+      self.DefendantAddress.City := left.City;
+      self.DefendantAddress.State := left.State;
+      self.DefendantAddress.Zip5 := left.Zip5;
 			self := left;
 			self := [];
 		));
@@ -1027,7 +1037,7 @@ input_ok := map(((
 				self.Result.UniqueId := LEFT.LexID;
 				self.Result.InputEcho := search;
 				self.Result.Models := modelResults;
-			  self.Result.AttributesGroup.name := StringLib.StringToUpperCase(AttributesVersionRequest);
+			  self.Result.AttributesGroup.name := STD.Str.ToUpperCase(AttributesVersionRequest);
 			  self.Result.AttributesGroup.attributes := nameValuePairsVersion5;
 				self.Result.Alerts := nameValuePairsAlerts;
 				// self.Result.Report.ConsumerStatement := left.ConsumerStatementText;

@@ -1,4 +1,4 @@
-﻿EXPORT GetPhonesMetadata(dInRecs,
+EXPORT GetPhonesMetadata(dInRecs,
                          inMod,
                          dGateways,
                          dInBestInfo,
@@ -7,17 +7,7 @@ FUNCTIONMACRO
   IMPORT Advo, AutoStandardI, Doxie, DID_Add, Gateway, Inquiry_AccLogs, PhoneFinder_Services, PhoneFraud,
         Phones, Risk_Indicators, Suppress, std, ut;
 
-  SHARED mod_access := MODULE(doxie.IDataAccess)
-    EXPORT glb := inMod.GLBPurpose;
-    EXPORT dppa := inMod.DPPAPurpose;
-    EXPORT Industry_Class := inMod.IndustryClass;
-    EXPORT Application_Type := inMod.ApplicationType;
-    EXPORT DataPermissionMask := inMod.DataPermissionMask;
-    EXPORT DataRestrictionMask := inMod.DataRestrictionMask;
-    EXPORT ssn_mask := inMod.DOBMask;
-    EXPORT dob_mask := Suppress.date_mask_math.MaskIndicator(inMod.DOBMask);
-    EXPORT show_minors := inMod.includeMinors;
-  END;
+  mod_access := PROJECT(inMod, doxie.IDataAccess);
 
   // ---------------------------------------------------------------------------------------------------------
   // ****************************************Process Phone Inquiry********************************************

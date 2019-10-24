@@ -12,26 +12,26 @@ as well as samples of the records up to a max of 500. */
 export EDASurnameSearchService := MACRO
 
 doxie.MAC_Header_Field_Declare();
-
+mod_access := Doxie.compliance.GetGlobalDataAccessModule();
 surname_layout := Gong.Layout_HistorySurname;
 
 key_surname := Gong.Key_History_Surname;
-listings := Gong_Services.SurnameSearch;
-listings_slim := PROJECT(listings,surname_layout); 
+listings := Gong_Services.SurnameSearch(mod_access);
+listings_slim := PROJECT(listings,surname_layout);
 
 // check the surname key first
 // key only contains combinations that exceed 5000 instances (plus a sample of 500 results for each)
 // if found in the key, use the sample and the total count;
 // if not found in the key, look them up in Gong History, count them, and pick a sample of up to 500
 
-surname_res := CHOOSEN (key_surname(keyed(lname_value = k_name_last and 
+surname_res := CHOOSEN (key_surname(keyed(lname_value = k_name_last and
                         fname_value = k_name_first and
                         state_value = k_st)), 500);
-																 
+
 surname_cnt := surname_res[1].cnt; // all records in the sample have the same count
 listing_cnt := table(listings, {unsigned8 cnt := count(group)})[1].cnt;
 final_cnt := IF(EXISTS(surname_res), surname_cnt, listing_cnt);
-										 
+
 surname_slim := PROJECT(surname_res,surname_layout);
 
 // Note: surname_slim never has more than 500 records, whereas listings_slim may have up to 5 thousand

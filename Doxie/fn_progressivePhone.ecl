@@ -1,4 +1,4 @@
-﻿IMPORT progressive_phone, addrBest, PhonesFeedback_Services, ut, PhonesFeedback, phone_shell, doxie, doxie_crs, iesp, suppress;
+﻿IMPORT  AutoStandardI, progressive_phone, addrBest, PhonesFeedback_Services, ut, PhonesFeedback, phone_shell, doxie, doxie_crs, iesp, suppress;
 
 // function that returns waterfall phone data
 
@@ -7,7 +7,10 @@ EXPORT fn_progressivePhone := MODULE
 	EXPORT byDIDonly(DATASET(doxie.layout_references) inDids,
 										doxie.iParam.ProgressivePhoneParams progphone_mod = module(doxie.iParam.ProgressivePhoneParams)end
 									) := FUNCTION
-	
+                  
+     global_mod := AutoStandardI.GlobalModule();
+     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+
 			f_in_progressive_phone := PROJECT(inDids,TRANSFORM(progressive_phone.layout_progressive_batch_in,
 																		SELF.Acctno := (STRING) LEFT.did, // Assign did to acctno to tie back to correct input records
 																		SELF.did := LEFT.did,    
@@ -36,7 +39,7 @@ EXPORT fn_progressivePhone := MODULE
 
 		ProgPhoneFilter := UNGROUP(progressive_phone.HelperFunctions.FN_FilterPerScore(ProgPhones));
 
-		PhonesFeedback_Services.Mac_Append_Feedback(ProgPhoneFilter,did,subj_phone10,ProgPhoneFilter_w_fb);
+		PhonesFeedback_Services.Mac_Append_Feedback(ProgPhoneFilter,did,subj_phone10,ProgPhoneFilter_w_fb,mod_access);
 		ProgPhoneFeedback := if(progphone_mod.IncludePhonesFeedback,ProgPhoneFilter_w_fb,ProgPhoneFilter);
 		ut.getTimeZone(ProgPhoneFeedback,subj_phone10,timeZone,ProgfinalOut);
 		

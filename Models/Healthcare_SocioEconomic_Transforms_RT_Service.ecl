@@ -31,6 +31,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		SELF.ADMIT_DIAGNOSIS_CODE := TRIM(le.ADMIT_DIAGNOSIS_CODE,left,right);
 		SELF.FINANCIAL_CLASS := TRIM(le.FINANCIAL_CLASS,left,right);
 		SELF.PATIENT_TYPE := TRIM(le.PATIENT_TYPE,left,right);
+		SELF.LOB := TRIM(le.LOB,left,right);
 		// SELF.HistorydateYYYYMM := TRIM(le.HistorydateYYYYMM,left,right);
 		SELF := le;
 	END;
@@ -60,7 +61,8 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 	END;
 
 	//Modeled after HC Profile Search
-	EXPORT Models.Layouts_Healthcare_RT_Service.transactionLog SocioTransactionLog(iesp.healthcare_socio_indicators.t_SocioeconomicIndicatorsRequest L, Boolean isAttributesRequested, Boolean isReadmissionRequested, Boolean isMedicationAdherenceRequested, Boolean isMotivationRequested) := TRANSFORM
+	EXPORT Models.Layouts_Healthcare_RT_Service.transactionLog SocioTransactionLog(iesp.healthcare_socio_indicators.t_SocioeconomicIndicatorsRequest L, Boolean isAttributesRequested, Boolean isReadmissionRequested, Boolean isMedicationAdherenceRequested, Boolean isMotivationRequested, Boolean isTotalCostRiskScoreRequested, 
+																				 	Boolean isAttributesSubscribed, Boolean isReadmissionSubscribed, Boolean isMedicationAdherenceSubscribed, Boolean isMotivationSubscribed, Boolean isTotalCostRiskScoreSubscribed ) := TRANSFORM
 		SELF.transaction_id	:= L.AccountContext.Common.TransactionID;
 		SELF.billing_code	:= L.User.BillingCode;
 		SELF.gc_id	:= (integer) L.AccountContext.Common.GlobalCompanyId;
@@ -83,8 +85,9 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
  		report_options_bit_1 := IF(isAttributesRequested, '1', '0');
  		report_options_bit_2 := IF(isReadmissionRequested, '1', '0');
  		report_options_bit_3 := IF(isMedicationAdherenceRequested, '1', '0');
- 		report_options_bit_4 := IF(isMotivationRequested, '1', '0');		
-		SELF.report_options	:= report_options_bit_1 + report_options_bit_2 + report_options_bit_3 + report_options_bit_4;
+ 		report_options_bit_4 := IF(isMotivationRequested, '1', '0');
+ 		report_options_bit_5 := IF(isTotalCostRiskScoreRequested, '1', '0');
+		SELF.report_options	:= report_options_bit_1 + report_options_bit_2 + report_options_bit_3 + report_options_bit_4 + report_options_bit_5;
 		SELF.login_history_id	:= (integer)L.User.LoginHistoryId;
     	SELF.ip_address	:= L.User.IP;
     	SELF.end_user_name := L.User.EndUser.CompanyName;
@@ -93,6 +96,12 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
     	SELF.end_user_state := L.User.EndUser.State;
     	SELF.end_user_zip := L.User.EndUser.Zip5;
     	SELF.end_user_phone := L.User.EndUser.Phone;
+		subscription_options_bit_1 := IF(isAttributesSubscribed, '1', '0');
+ 		subscription_options_bit_2 := IF(isReadmissionSubscribed, '1', '0');
+ 		subscription_options_bit_3 := IF(isMedicationAdherenceSubscribed, '1', '0');
+ 		subscription_options_bit_4 := IF(isMotivationSubscribed, '1', '0');
+ 		subscription_options_bit_5 := IF(isTotalCostRiskScoreSubscribed, '1', '0');
+		SELF.i_provider_id := subscription_options_bit_1 + subscription_options_bit_2 + subscription_options_bit_3 + subscription_options_bit_4 + subscription_options_bit_5; // Reusing the i_provider_id field to log subscription options to the database.
 		SELF := [];	
 	END; // Transaction Log TRANSFORM
 
@@ -565,6 +574,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 			SELF.CareDrivers.Low1  := CoreResults[1].RAR_Driver_Lo1;
 			SELF.CareDrivers.Low2  := CoreResults[1].RAR_Driver_Lo2;
 			SELF.CareDrivers.Low3  := CoreResults[1].RAR_Driver_Lo3;
+			SELF := [];
 		END;
 		ReadmissionScoreDS := dataset([formatRS()]);
 
@@ -585,6 +595,8 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 			SELF.CareDrivers.Low1  := CoreResults[1].MA_Driver_Lo1;
 			SELF.CareDrivers.Low2  := CoreResults[1].MA_Driver_Lo2;
 			SELF.CareDrivers.Low3  := CoreResults[1].MA_Driver_Lo3;
+			SELF := [];
+
 		END;
 		MedicationScoreDS := dataset([formatMA()]);
 		
@@ -605,14 +617,143 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 			SELF.CareDrivers.Low1  := CoreResults[1].MO_Driver_Lo1;
 			SELF.CareDrivers.Low2  := CoreResults[1].MO_Driver_Lo2;
 			SELF.CareDrivers.Low3  := CoreResults[1].MO_Driver_Lo3;
+			SELF := [];
 		END;
 		MotivationScoreDS := dataset([formatMO()]);
 		
-		ScoresDS := ReadmissionScoreDS + MedicationScoreDS + MotivationScoreDS;
+		iesp.healthcare_socio_indicators.t_SocioScore formatTC() := TRANSFORM
+			SELF.Name := IF(isTotalCostRiskScoreRequested, 'TotalCostRiskScore', _blank);
+			SeTC_Score := (DECIMAL32_16)CoreResults[1].Score;
+			SeTC_Score_Str := trim(CoreResults[1].Score, left, right);
+			DECIMAL5_4 Socio_Index_Value := (DECIMAL5_4)(SeTC_Score/Config[1].TotalCostRiskScore_Index_Denominator);
+			SELF.Index := IF(isTotalCostRiskScoreRequested, MAP(SeTC_Score_Str = 'N/A' => 'N/A', SeTC_Score_Str = _blank => _blank,(string)Socio_Index_Value), 'N/A');
+			SELF.Rank := (string) MAP(
+								SeTC_Score_Str = 'N/A' => 'N/A',
+								SeTC_Score_Str = _blank => _blank,
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_1_Max  => '1',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_2_Max  => '2',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_3_Max  => '3',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_4_Max  => '4',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_5_Max  => '5',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_6_Max  => '6',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_7_Max  => '7',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_8_Max  => '8',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_9_Max  => '9',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_10_Max => '10',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_11_Max => '11',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_12_Max => '12',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_13_Max => '13',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_14_Max => '14',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_15_Max => '15',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_16_Max => '16',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_17_Max => '17',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_18_Max => '18',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_19_Max => '19',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_20_Max => '20',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_21_Max => '21',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_22_Max => '22',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_23_Max => '23',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_24_Max => '24',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_25_Max => '25',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_26_Max => '26',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_27_Max => '27',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_28_Max => '28',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_29_Max => '29',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_30_Max => '30',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_31_Max => '31',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_32_Max => '32',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_33_Max => '33',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_34_Max => '34',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_35_Max => '35',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_36_Max => '36',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_37_Max => '37',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_38_Max => '38',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_39_Max => '39',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_40_Max => '40',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_41_Max => '41',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_42_Max => '42',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_43_Max => '43',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_44_Max => '44',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_45_Max => '45',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_46_Max => '46',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_47_Max => '47',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_48_Max => '48',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_49_Max => '49',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_50_Max => '50',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_51_Max => '51',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_52_Max => '52',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_53_Max => '53',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_54_Max => '54',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_55_Max => '55',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_56_Max => '56',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_57_Max => '57',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_58_Max => '58',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_59_Max => '59',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_60_Max => '60',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_61_Max => '61',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_62_Max => '62',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_63_Max => '63',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_64_Max => '64',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_65_Max => '65',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_66_Max => '66',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_67_Max => '67',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_68_Max => '68',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_69_Max => '69',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_70_Max => '70',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_71_Max => '71',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_72_Max => '72',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_73_Max => '73',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_74_Max => '74',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_75_Max => '75',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_76_Max => '76',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_77_Max => '77',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_78_Max => '78',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_79_Max => '79',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_80_Max => '80',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_81_Max => '81',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_82_Max => '82',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_83_Max => '83',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_84_Max => '84',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_85_Max => '85',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_86_Max => '86',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_87_Max => '87',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_88_Max => '88',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_89_Max => '89',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_90_Max => '90',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_91_Max => '91',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_92_Max => '92',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_93_Max => '93',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_94_Max => '94',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_95_Max => '95',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_96_Max => '96',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_97_Max => '97',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_98_Max => '98',
+								SeTC_Score < Config[1].TotalCostRiskScore_Rank_99_Max => '99',
+								SeTC_Score >= Config[1].TotalCostRiskScore_Rank_99_Max => '100',
+								'N/A');
+			SELF.Category := MAP(SeTC_Score_Str = 'N/A' => 'N/A',
+								SeTC_Score_Str = _blank => _blank,
+   								SeTC_Score  < Config[1].TotalCostRiskScore_Category_2_Low => '1',
+   								SeTC_Score  < Config[1].TotalCostRiskScore_Category_3_Low => '2',
+   								SeTC_Score  < Config[1].TotalCostRiskScore_Category_4_Low => '3',
+   								SeTC_Score  < Config[1].TotalCostRiskScore_Category_5_Low => '4',
+   								SeTC_Score >= Config[1].TotalCostRiskScore_Category_5_Low => '5',
+								'N/A');
+			SELF.CareDrivers.High1 := CoreResults[1].TC_Driver_Hi1;
+			SELF.CareDrivers.High2 := CoreResults[1].TC_Driver_Hi2;
+			SELF.CareDrivers.High3 := CoreResults[1].TC_Driver_Hi3;
+			SELF.CareDrivers.Low1  := CoreResults[1].TC_Driver_Lo1;
+			SELF.CareDrivers.Low2  := CoreResults[1].TC_Driver_Lo2;
+			SELF.CareDrivers.Low3  := CoreResults[1].TC_Driver_Lo3;
+			SELF := [];
+		END;
+		TotalCostRiskScoreDS := dataset([formatTC()]);
+		
+		ScoresDS := ReadmissionScoreDS + MedicationScoreDS + MotivationScoreDS + TotalCostRiskScoreDS;
 		return ScoresDS(Name<>_blank);
 	ENDMACRO;
 
-	Export PopulateInvalidsDS(coreResults, Admit_date_cln, isReadmissionRequested) := FUNCTIONMACRO
+	Export PopulateInvalidsDS(coreResults, Admit_date_cln, isReadmissionRequested, isTotalCostRiskScoreRequested) := FUNCTIONMACRO
 		InvalidsEmptyDS := DATASET([{_blank, _blank, _blank}], iesp.healthcare_socio_indicators.t_SocioInvalidField);
 		_EmptyRow := ROW({_blank, _blank, _blank}, iesp.healthcare_socio_indicators.t_SocioInvalidField);
 		InvalidAdmitDate := IF(Admit_date_cln = _blank, ROW({Models.Healthcare_Constants_RT_Service.InvalidAdmitDate_FieldName, Models.Healthcare_Constants_RT_Service.InvalidAdmitDate_Code, Models.Healthcare_Constants_RT_Service.InvalidAdmitDate_Message}, iesp.healthcare_socio_indicators.t_SocioInvalidField), _EmptyRow);
@@ -620,7 +761,9 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		InvalidFinancialClass := IF((INTEGER)CoreResults[1].isSeRsInvalidFinancialClass = 1, ROW({Models.Healthcare_Constants_RT_Service.InvalidFinancialClass_FieldName, Models.Healthcare_Constants_RT_Service.InvalidFinancialClass_Code, Models.Healthcare_Constants_RT_Service.InvalidFinancialClass_Message}, iesp.healthcare_socio_indicators.t_SocioInvalidField), _EmptyRow);
 		InvalidDiagnosisCode := IF((INTEGER)CoreResults[1].isSeRsInvalidDiag = 1, ROW({Models.Healthcare_Constants_RT_Service.InvalidDiagnosisCode_FieldName, Models.Healthcare_Constants_RT_Service.InvalidDiagnosisCode_Code, Models.Healthcare_Constants_RT_Service.InvalidDiagnosisCode_Message}, iesp.healthcare_socio_indicators.t_SocioInvalidField), _EmptyRow);
 		InvalidsDS := InvalidsEmptyDS + InvalidAdmitDate + InvalidPatientType + InvalidFinancialClass + InvalidDiagnosisCode;
-		resultDS := IF(isReadmissionRequested,InvalidsDS, InvalidsEmptyDS);
+		readmission_resultDS := IF(isReadmissionRequested,InvalidsDS, InvalidsEmptyDS);
+		InvalidLOB := IF( isTotalCostRiskScoreRequested AND ((INTEGER)CoreResults[1].isSeTCInvalidLOB = 1), ROW({Models.Healthcare_Constants_RT_Service.InvalidLOB_FieldName, Models.Healthcare_Constants_RT_Service.InvalidLOB_Code, Models.Healthcare_Constants_RT_Service.InvalidLOB_Message}, iesp.healthcare_socio_indicators.t_SocioInvalidField), _EmptyRow);
+		resultDS := readmission_resultDS + InvalidLOB;
 		return resultDS(FieldName<>_blank);
 	ENDMACRO;
 

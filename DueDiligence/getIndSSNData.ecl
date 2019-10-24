@@ -1,45 +1,19 @@
 ﻿IMPORT DueDiligence, risk_indicators;
 
 EXPORT getIndSSNData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
-																					STRING dataRestrictionMask,
-																					UNSIGNED1 dppa,
-																					UNSIGNED1 glba,
-																					INTEGER bsVersion,
-																					UNSIGNED8 bsOptions,
-																					BOOLEAN isFCRA,
-																					BOOLEAN includeReport) := FUNCTION
+                      STRING dataRestrictionMask,
+                      UNSIGNED1 dppa,
+                      UNSIGNED1 glba,
+                      INTEGER bsVersion,
+                      UNSIGNED8 bsOptions) := FUNCTION
 																							
 		
-		
-		exactMatchLevel := risk_indicators.iid_constants.default_ExactMatchLevel;
-		runSSNCodes := TRUE;
+	
 		
 		parents := DueDiligence.CommonIndividual.getRelationship(inData, parents, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);																																																		
 		allInd := parents + inData;
 
-		ssnFlagsPrepSeq := PROJECT(allInd, TRANSFORM(risk_indicators.Layout_output,
-																																															stringDate := (STRING)LEFT.historyDate;
-																																															SELF.seq := COUNTER;
-																																															SELF.account := (STRING)LEFT.seq;
-																																															SELF.historyDate := (UNSIGNED)stringDate[1..6];
-																																															SELF.did := LEFT.individual.did;
-																																															SELF.fname := LEFT.individual.firstName;
-																																															SELF.mname := LEFT.individual.middleName;
-																																															SELF.lname := LEFT.individual.lastName;
-																																															SELF.suffix := LEFT.individual.suffix;
-																																															SELF.dob := (STRING)LEFT.individual.dob;
-																																															SELF.phone10 := LEFT.individual.phone;
-																																															SELF.p_city_name := LEFT.individual.city;
-																																															SELF.st := LEFT.individual.state;
-																																															SELF.z5 := LEFT.individual.zip5;
-																																															SELF.lat := LEFT.individual.geo_lat;
-																																															SELF.long := LEFT.individual.geo_long;
-																																															SELF.addr_type := LEFT.individual.rec_type;
-																																															SELF.addr_status := LEFT.individual.err_stat;
-																																															SELF := LEFT.individual;
-																																															SELF := [];));	
-
-		withSSNFlags := risk_indicators.iid_getSSNFlags(GROUP(ssnFlagsPrepseq, seq), dppa, glba, isFCRA, runSSNCodes, exactMatchLevel, dataRestrictionMask, bsVersion, bsOptions);	
+		withSSNFlags := DueDiligence.CommonIndividual.GetIIDSSNFlags(allInd, dataRestrictionMask, dppa, glba, bsVersion, bsOptions);
 		
 		validateSSN := JOIN(allInd, withSSNFlags,
 																						LEFT.seq = (UNSIGNED)RIGHT.account AND

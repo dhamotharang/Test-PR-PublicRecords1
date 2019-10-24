@@ -1,4 +1,4 @@
-﻿﻿IMPORT Gateway, Iesp, Phones, Royalty, STD;
+IMPORT Gateway, Iesp, Phones, Royalty, STD;
 
 EXPORT Soapcall_ZumigoIdentity(DATASET(iesp.zumigo_identity.t_ZIdIdentitySearch) inf, 
 																Phones.IParam.inZumigoParams inMod,

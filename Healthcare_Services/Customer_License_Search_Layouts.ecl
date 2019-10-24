@@ -1,7 +1,10 @@
-Import Healthcare_Provider_Services,MMCP;
+﻿Import Healthcare_Provider_Services,MMCP;
 EXPORT Customer_License_Search_Layouts := MODULE
 
 	export autokeyInput := record
+	boolean hasOptOut:=false;
+	unsigned4 global_sid:=0;
+	unsigned4 record_sid:=0;
 	    Healthcare_Provider_Services.Layouts.autokeyInput-[ssn,dob,homephone,workphone,dl,dlstate,vin,Plate,PlateState,searchType,max_results,score,MatchCode,
 																												date,sic_code,filing_number,apn,fips_code,score_bdid,TaxID,UPIN,NPI,DEA,ProviderID,ProviderSrc,isReport,
 																												isBatchService,isExactAddressMatch,BestOnly,ShowComplete,includeSanctions,doDeepDive,includeCustomerData];
@@ -14,6 +17,8 @@ EXPORT Customer_License_Search_Layouts := MODULE
 			boolean isAutoKeyResults := false;	
 			unsigned2 penalt := 0;
 			unsigned2 sortid := 0;
+			boolean hasoptout:=false;
+			unsigned4	global_sid :=0;
 			MMCP.Layouts.Base;
 	end;
 

@@ -26,6 +26,7 @@ EXPORT Layouts_Healthcare_Core := module
 		STRING2 FINANCIAL_CLASS;
 		STRING1 PATIENT_TYPE;
 		unsigned3 HistorydateYYYYMM := 999999;
+		STRING2 LOB;
 	END;
 	EXPORT Layout_SocioEconomic_Batch := RECORD 
 		Layout_SocioEconomic_Batch_In;
@@ -85,6 +86,24 @@ EXPORT Layouts_Healthcare_Core := module
 		string10 MO_Driver_Lo1 := 'N/A';
 		string10 MO_Driver_Lo2 := 'N/A';
 		string10 MO_Driver_Lo3 := 'N/A';
+		INTEGER2 Payor_LOB := 0;
+		// Total Cost Risk Score 3.0 related fields
+		String20 SeTC_Score  := 'N/A'; // Re-use the 'Score' instead?
+		String20 SeTC_Raw_Score  := 'N/A';
+		integer1 isSeTCInvalidLOB := 0;
+		integer1 SeTCModelUsed	  := 0;
+		string10 TC_Driver_Hi1 := 'N/A';
+		string30 TC_Driver_Hi1_value := 'N/A';
+		string10 TC_Driver_Hi2 := 'N/A';
+		string30 TC_Driver_Hi2_value := 'N/A';
+		string10 TC_Driver_Hi3 := 'N/A';
+		string30 TC_Driver_Hi3_value := 'N/A';
+		string10 TC_Driver_Lo1 := 'N/A';
+		string30 TC_Driver_Lo1_value := 'N/A';
+		string10 TC_Driver_Lo2 := 'N/A';
+		string30 TC_Driver_Lo2_value := 'N/A';
+		string10 TC_Driver_Lo3 := 'N/A';
+		string30 TC_Driver_Lo3_value := 'N/A';
 
 	END;
 	EXPORT layout_SocioEconomic_custom_v4_attributes := RECORD 
@@ -721,7 +740,7 @@ EXPORT Layouts_Healthcare_Core := module
 		INTEGER4 v1_ProspectTimeLastUpdate;
 		INTEGER4 v1_ProspectLastUpdate12Mo;
 		INTEGER4 v1_ProspectAge;
-		VARSTRING v1_ProspectGENDer;
+		INTEGER4 v1_ProspectGENDer;
 		INTEGER4 v1_ProspectMaritalStatus;
 		INTEGER4 v1_ProspectEstimatedIncomeRange;
 		INTEGER4 v1_ProspectDeceased;
@@ -766,7 +785,7 @@ EXPORT Layouts_Healthcare_Core := module
 		REAL8 v1_ResCurrAVMCntyRatio;
 		REAL8 v1_ResCurrAVMTractRatio;
 		REAL8 v1_ResCurrAVMBlockRatio;
-		VARSTRING v1_ResCurrDwellType;
+		INTEGER4 v1_ResCurrDwellType;
 		INTEGER4 v1_ResCurrDwellTypeIndex;
 		INTEGER4 v1_ResCurrMortgageType;
 		INTEGER4 v1_ResCurrMortgageAmount;
@@ -780,7 +799,7 @@ EXPORT Layouts_Healthcare_Core := module
 		REAL8 v1_ResInputAVMCntyRatio;
 		REAL8 v1_ResInputAVMTractRatio;
 		REAL8 v1_ResInputAVMBlockRatio;
-		VARSTRING v1_ResInputDwellType;
+		INTEGER4 v1_ResInputDwellType;
 		INTEGER4 v1_ResInputDwellTypeIndex;
 		INTEGER4 v1_ResInputMortgageType;
 		INTEGER4 v1_ResInputMortgageAmount;
@@ -918,6 +937,9 @@ EXPORT Layouts_Healthcare_Core := module
 		REAL8 PMPM_13_05K_AGPred            := []; //For GE_18 Model
 		REAL8 AG_Pred_5K_under18            := []; //For LT_18 Model
 		INTEGER4 AVGSTATECOST               := [];
+		REAL8 AG_Pred_10K					:= [];
+		REAL8 AG_Pred_10K_LOB				:= [];
+		REAL8 AG_Pred_10K_LOB_EXT			:= [];
 		//Pattern variables for socio cost models
 		INTEGER4 P1   := [];
 		REAL8 PV1     := [];
@@ -1315,7 +1337,170 @@ EXPORT Layouts_Healthcare_Core := module
 		SeMO_V1_Model_Typed_Input_Layout;
 		REAL8 SeMO_Raw_Score;
 	END;
+
+	//TODO: Start here
+	EXPORT SeTC_Combined_Model_Typed_Input_Layout := RECORD
+	  	unsigned4 	seq;
+		STRING30 	AcctNo;
+		string 		DOB := '';
+		unsigned8 	LexID;
+		INTEGER4	ST;
+		REAL8		AGE_IN_YEARS;
+		INTEGER4	FEMALE;
+		INTEGER4	AgeOldestRecord;
+		INTEGER4	SubjectSSNCount;
+		INTEGER4	SrcsConfirmIDAddrCount;
+		INTEGER4	SubjectAddrCount;
+		INTEGER4	SSNAddrCount;
+		INTEGER4	InputAddrPhoneCount;
+		INTEGER4	SubjectLastNameCount;
+		INTEGER4	LastNameChangeAge;
+		INTEGER4	SFDUAddrIdentitiesCount;
+		INTEGER4	SFDUAddrIdentitiesCount_12;
+		INTEGER4	SFDUAddrIdentitiesCount_24;
+		INTEGER4	SFDUAddrSSNCount;
+		INTEGER4	SSNLowIssueAge;
+		INTEGER4	SSNHighIssueAge;
+		INTEGER4	SSNIssueState;
+		INTEGER4	RelativesCount;
+		INTEGER4	RelativesPropOwnedTaxTotal;
+		INTEGER4	InputAddrAgeOldestRecord;
+		INTEGER4	InputAddrLenOfRes;
+		INTEGER4	InputAddrAgeLastSale;
+		INTEGER4	InputAddrTaxValue;
+		INTEGER4	InputAddrTaxMarketValue;
+		INTEGER4	InputAddrMedianIncome;
+		INTEGER4	InputAddrMedianValue;
+		INTEGER4	InputAddrMurderIndex;
+		INTEGER4	InputAddrCarTheftIndex;
+		INTEGER4	InputAddrBurglaryIndex;
+		INTEGER4	InputAddrCrimeIndex;
+		REAL8		InputAddrMobilityIndex;
+		INTEGER4	InputAddrVacantPropCount;
+		INTEGER4	InputAddrBusinessCount;
+		INTEGER4	InputAddrSingleFamilyCount;
+		INTEGER4	InputAddrMultiFamilyCount;
+		INTEGER4	CurrAddrAgeOldestRecord;
+		INTEGER4	CurrAddrLenOfRes;
+		INTEGER4	CurrAddrAgeLastSale;
+		INTEGER4	CurrAddrTaxMarketValue;
+		REAL8		CurrAddrTractIndex;
+		INTEGER4	CurrAddrMedianIncome;
+		INTEGER4	CurrAddrMedianValue;
+		INTEGER4	CurrAddrMurderIndex;
+		INTEGER4	CurrAddrCarTheftIndex;
+		INTEGER4	CurrAddrBurglaryIndex;
+		INTEGER4	CurrAddrBurglaryIndex_12;
+		INTEGER4	CurrAddrBurglaryIndex_24;
+		INTEGER4	CurrAddrCrimeIndex;
+		INTEGER4	PrevAddrAgeOldestRecord;
+		INTEGER4	PrevAddrAgeNewestRecord;
+		INTEGER4	PrevAddrLenOfRes;
+		INTEGER4	PrevAddrAgeLastSale;
+		INTEGER4	PrevAddrMedianIncome;
+		INTEGER4	PrevAddrMedianValue;
+		INTEGER4	PrevAddrMurderIndex;
+		INTEGER4	PrevAddrCarTheftIndex;
+		INTEGER4	PrevAddrBurglaryIndex;
+		INTEGER4	PrevAddrCrimeIndex;
+		INTEGER4	AddrMostRecentDistance;
+		INTEGER4	AddrMostRecentMoveAge;
+		INTEGER4	AddrMostRecentIncomeDiff;
+		INTEGER4	AddrMostRecentValueDIff;
+		INTEGER4	AddrMostRecentCrimeDiff;
+		INTEGER4	AddrRecentEconTrajectory;
+		INTEGER4	EstimatedAnnualIncome;
+		INTEGER4	EstimatedAnnualIncome_12;
+		INTEGER4	EstimatedAnnualIncome_24;
+		INTEGER4	PropAgeOldestPurchase;
+		INTEGER4	PropAgeNewestPurchase;
+		INTEGER4	BusinessInputAddrCount;
+		INTEGER4	DerogSeverityIndex;
+		INTEGER4	DerogCount;
+		INTEGER4	DerogAge;
+		INTEGER4	FelonyAge;
+		INTEGER4	LienFiledAge;
+		INTEGER4	LienReleasedAge;
+		INTEGER4	BankruptcyAge;
+		INTEGER4	AccidentCount;
+		INTEGER4	AccidentAge;
+		INTEGER4	NonDerogCount;
+		INTEGER4	VoterRegistrationRecord;
+		INTEGER4	PRSearchLocateCount;
+		INTEGER4	PRSearchLocateCount12;
+		INTEGER4	PRSearchLocateCount24;
+		INTEGER4	PRSearchOtherCount;
+		INTEGER4	PhoneEDAAgeOldestRecord;
+		INTEGER4	PhoneEDAAgeNewestRecord;
+		INTEGER4	PhoneOtherAgeOldestRecord;
+		INTEGER4	PhoneOtherAgeNewestRecord;
+		INTEGER4	InputAddrSICCode;
+		REAL8		InputAddrErrorCode;
+		INTEGER4	InputAddrHighRisk;
+		INTEGER4	IDVerAddressAssocCount;
+		INTEGER4	SourceOrderSourceCount;
+		INTEGER4	SourceOrderAgeLastOrder;
+		INTEGER4	CorrelationRiskLevel;
+		INTEGER4	DivSSNAddrMSourceCount;
+		INTEGER4	DivAddrIdentityCount;
+		INTEGER4	DivAddrIdentityMSourceCount;
+		INTEGER4	DivAddrSSNCount;
+		INTEGER4	DivAddrSSNMSourceCount;
+		INTEGER4	SearchSSNSearchCount;
+		INTEGER4	SearchAddrSearchCount;
+		INTEGER4	v1_ProspectTimeOnRecord;
+		INTEGER4	v1_ProspectTimeLastUpdate;
+		INTEGER4	v1_ProspectAge;
+		INTEGER4	v1_ProspectEstimatedIncomeRange;
+		INTEGER4	v1_LifeEvTimeLastMove;
+		INTEGER4	v1_LifeEvTimeFirstAssetPurchase;
+		INTEGER4	v1_LifeEvTimeLastAssetPurchase;
+		INTEGER4	v1_ResInputBusinessCnt;
+		INTEGER4	v1_CrtRecCnt;
+		INTEGER4	v1_CrtRecTimeNewest;
+		INTEGER4	v1_CrtRecFelonyTimeNewest;
+		INTEGER4	v1_CrtRecMsdmeanCnt;
+		INTEGER4	v1_CrtRecMsdmeanTimeNewest;
+		INTEGER4	v1_CrtRecLienJudgCnt;
+		INTEGER4	v1_CrtRecLienJudgTimeNewest;
+		INTEGER4	v1_CrtRecLienJudgAmtTtl;
+		INTEGER4	v1_CrtRecBkrptTimeNewest;
+		INTEGER4	v1_HHEstimatedIncomeRange;
+		INTEGER4	v1_RaAMiddleAgeMmbrCnt;
+		INTEGER4	v1_RaAMmbrCnt;
+		INTEGER4	v1_RaAPropOwnerAVMHighest;
+		INTEGER4	v1_RaAPropOwnerAVMMed;
+		INTEGER4	v1_RaACrtRecMmbrCnt;
+		INTEGER4	v1_RaACrtRecMsdmeanMmbrCnt;
+		INTEGER4	v1_RaACrtRecEvictionMmbrCnt;
+		INTEGER4	v1_RaACrtRecLienJudgMmbrCnt;
+		REAL8		P_EstimatedHHIncomePerCapita; //Pre Processing Zero
+		REAL8		PropTaxPerRelative; //Pre Processing Zero
+		REAL8		AG_Pred_10K; //Pre Processing Zero
+		INTEGER4	AVGSTATECOST; //Pre Processing Zero
+		INTEGER4	P2; // Patterns Zero
+		REAL8		PV2;// Patterns Zero
+		INTEGER4	BP2;// Patterns Zero
+		REAL8		BPV2;// Patterns Zero
+		INTEGER4	Payor_LOB;
+		REAL8		AG_Pred_10K_LOB;
+		REAL8		AG_Pred_10K_LOB_EXT;
+		REAL8		EstIncome0_2_Pcnt;
+		INTEGER4	BP1;
+		REAL8		BPV1;
+		INTEGER4	BP3;
+		INTEGER4  	SeTCModelUsed;
+		INTEGER1 	isSeTCInvalidLOB;
+		STRING20 	TransactionID; //Needed for LUCI
+		BOOLEAN 	do_Model1;      //Needed for LUCI
+	END;
 	
+	EXPORT SeTC_Combined_Model_Typed_Input_And_Score_Layout := RECORD //Used for Risk Drivers Norm
+		SeTC_Combined_Model_Typed_Input_Layout;
+		STRING20 SeTC_Raw_Score;
+		STRING10 SeTC_Score;
+	END;
+
 	EXPORT Final_Output_Layout := RECORD //Layout for Requirements doc Version 1.6 
 		string10 seq;
 		string10 acctno;
@@ -1812,6 +1997,23 @@ EXPORT Layouts_Healthcare_Core := module
 		string10 MO_Driver_Lo1 := 'N/A';
 		string10 MO_Driver_Lo2 := 'N/A';
 		string10 MO_Driver_Lo3 := 'N/A';
+		// Total Cost Risk Score 3.0 related fields
+		// String20 SeTC_Score  := 'N/A'; // Re-use the 'Score' field instead.
+		String20 SeTC_Raw_Score  := 'N/A';
+		integer1 isSeTCInvalidLOB := 0;
+		integer1 SeTCModelUsed	  := 0;
+		string10 TC_Driver_Hi1 := 'N/A';
+		string30 TC_Driver_Hi1_value := 'N/A';
+		string10 TC_Driver_Hi2 := 'N/A';
+		string30 TC_Driver_Hi2_value := 'N/A';
+		string10 TC_Driver_Hi3 := 'N/A';
+		string30 TC_Driver_Hi3_value := 'N/A';
+		string10 TC_Driver_Lo1 := 'N/A';
+		string30 TC_Driver_Lo1_value := 'N/A';
+		string10 TC_Driver_Lo2 := 'N/A';
+		string30 TC_Driver_Lo2_value := 'N/A';
+		string10 TC_Driver_Lo3 := 'N/A';
+		string30 TC_Driver_Lo3_value := 'N/A';
 		//Debug fields that form as additional model inputs for Readmission.
 		string3 ADDRCHANGECOUNT24;
 		string3 ARRESTCOUNT24;
@@ -2175,6 +2377,35 @@ EXPORT Layouts_Healthcare_Core := module
 	EXPORT SeMO_Debug_Layout := RECORD
 		SeMO_V1_Model_Typed_Input_Layout;
 		SeMO_Post_Procs_Risk_Drivers_Layout - [seq];
+	END;
+
+	EXPORT SeTC_Risk_Drivers_Only_Layout := RECORD
+		unsigned4 seq;
+		string10 TC_Driver_Hi1 := 'N/A';
+		string30 TC_Driver_Hi1_value := 'N/A';
+		string10 TC_Driver_Hi2 := 'N/A';
+		string30 TC_Driver_Hi2_value := 'N/A';
+		string10 TC_Driver_Hi3 := 'N/A';
+		string30 TC_Driver_Hi3_value := 'N/A';
+		string10 TC_Driver_Lo1 := 'N/A';
+		string30 TC_Driver_Lo1_value := 'N/A';
+		string10 TC_Driver_Lo2 := 'N/A';
+		string30 TC_Driver_Lo2_value := 'N/A';
+		string10 TC_Driver_Lo3 := 'N/A';
+		string30 TC_Driver_Lo3_value := 'N/A';
+	END;
+	EXPORT SeTC_Post_Procs_Risk_Drivers_Layout := RECORD
+		//AcctNo ?
+		SeTC_Risk_Drivers_Only_Layout;
+		INTEGER1 SeTCModelUsed;
+		INTEGER1 isSeTCInvalidLOB;
+		STRING20 SeTC_Raw_Score;
+		STRING10 SeTC_Score;
+	END;
+
+	EXPORT SeTC3_Debug_Layout := RECORD
+		SeTC_Combined_Model_Typed_Input_And_Score_Layout;
+		SeTC_Risk_Drivers_Only_Layout - [seq];
 	END;
 
 END;

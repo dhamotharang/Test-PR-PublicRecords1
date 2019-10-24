@@ -1,4 +1,4 @@
-import risk_indicators, easi, riskwise, ut, std;
+﻿import risk_indicators, easi, riskwise,ut, std;
 
 export CDN908_1_0(
 	grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
@@ -441,7 +441,7 @@ export CDN908_1_0(
 	NULL := -999999999;
 
 
-	INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
+	INTEGER contains_i( string haystack, string needle ) := (INTEGER)(STD.Str.Find(haystack, needle, 1) > 0);
 
 	cus_ORDAMT := ord_tot;
 	cus_pmttype := pay_type;
@@ -465,9 +465,9 @@ export CDN908_1_0(
 	billto_population_rate := (4238 / 1891639);
 	billto_sample_rate := (4238 / 98609);
 	billto_offset := ln((((1 - billto_population_rate) * billto_sample_rate) / (billto_population_rate * (1 - billto_sample_rate))));
-	v_in_avs_x := StringLib.StringToUpperCase(trim(trim((string)cus_avs, LEFT), LEFT, RIGHT));
-	v_in_pmt := StringLib.StringToUpperCase(trim(trim((string)cus_pmttype, LEFT), LEFT, RIGHT));
-	v_in_avs := StringLib.StringToUpperCase(trim(trim((string)cus_avs, LEFT), LEFT, RIGHT));
+	v_in_avs_x := STD.Str.ToUpperCase(trim(trim((string)cus_avs, LEFT), LEFT, RIGHT));
+	v_in_pmt := STD.Str.ToUpperCase(trim(trim((string)cus_pmttype, LEFT), LEFT, RIGHT));
+	v_in_avs := STD.Str.ToUpperCase(trim(trim((string)cus_avs, LEFT), LEFT, RIGHT));
 	amex_lst := 0;
 	amex_add := 0;
 	amex_zip := 0;
@@ -589,7 +589,7 @@ export CDN908_1_0(
 													 v_in_cid_match = 0  => 0.0132013201,
 																									0.0047513722);
 
-	v_in_shipmode := StringLib.StringToUpperCase(trim(trim(cus_shipmode_2, LEFT), LEFT, RIGHT));
+	v_in_shipmode := STD.Str.ToUpperCase(trim(trim(cus_shipmode_2, LEFT), LEFT, RIGHT));
 
 	vs_in_shipmode_m :=  map(v_in_shipmode = '2' => 0.7408604322,
 													 v_in_shipmode = '7' => 0.3924901186,
@@ -852,9 +852,9 @@ export CDN908_1_0(
 												 vs_combo_age = 12 => 0.086649312,
 																							0.065917603);
 
-	add_apt := ((StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A') or ((StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H') or ((out_unit_desig != ' ') or (out_sec_range != ' '))));
+	add_apt := ((STD.Str.ToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A') or ((STD.Str.ToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H') or ((out_unit_desig != ' ') or (out_sec_range != ' '))));
 
-	add_apt_s := ((StringLib.StringToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'A') or ((StringLib.StringToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'H') or (((string)out_unit_desig_s != ' ') or ((string)out_sec_range_s != ' '))));
+	add_apt_s := ((STD.Str.ToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'A') or ((STD.Str.ToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'H') or (((string)out_unit_desig_s != ' ') or ((string)out_sec_range_s != ' '))));
 
 	ssns_per_addr_c6_5_s := min(if(ssns_per_addr_c6_s = NULL, -NULL, ssns_per_addr_c6_s), 5);
 
@@ -921,15 +921,15 @@ export CDN908_1_0(
 														 vb_adls_per_addr = 7 => 0.1264655513,
 																										 0.2911931818);
 
-	v_ip_topDomain := StringLib.StringToUpperCase(trim(trim((string)ip_topleveldomain, LEFT), LEFT, RIGHT));
+	v_ip_topDomain := STD.Str.ToUpperCase(trim(trim((string)ip_topleveldomain, LEFT), LEFT, RIGHT));
 
 	v_in_AcqChannel := trim(trim((string)cus_ACQ_CHANNE, LEFT), LEFT, RIGHT);
 
 	v_ip_continent := trim(ip_continent, LEFT, RIGHT);
 
-	v_ip_countrycode := StringLib.StringToUpperCase(trim(ip_countrycode, LEFT, RIGHT));
+	v_ip_countrycode := STD.Str.ToUpperCase(trim(ip_countrycode, LEFT, RIGHT));
 
-	v_ip_state := StringLib.StringToUpperCase(trim(ip_state, LEFT, RIGHT));
+	v_ip_state := STD.Str.ToUpperCase(trim(ip_state, LEFT, RIGHT));
 
 	vs_ipmatchcode_b1 := if(in_state = in_state_s, 's11-telstatematch', 's12-telstatediff');
 
@@ -1003,12 +1003,12 @@ export CDN908_1_0(
 												 vb_ip_domain = 'telorder'     => 0.0886627907,
 																													0.2449712644);
 
-	email_provider :=  if(StringLib.StringFind(in_email_address, '@', 1 ) > 0,
-		StringLib.StringToUpperCase(in_email_address[ 1+StringLib.StringFind(in_email_address, '@', 1 ).. ]),
+	email_provider :=  if(STD.Str.Find(in_email_address, '@', 1 ) > 0,
+		STD.Str.ToUpperCase(in_email_address[ 1+STD.Str.Find(in_email_address, '@', 1 ).. ]),
 		'');
 
 	// get "GMAIL" from "GMAIL.COM", etc
-	tld := if(StringLib.StringFind(email_provider, '.', 1) > 0, email_provider[ 1..StringLib.StringFind(email_provider,'.',1)-1 ], '' );
+	tld := if(STD.Str.Find(email_provider, '.', 1) > 0, email_provider[ 1..STD.Str.Find(email_provider,'.',1)-1 ], '' );
 	
 	email_provider2 := map(
 		tld in ['HOTMAIL', 'GMAIL', 'AOL', 'YAHOO', 'VERIZON', 'SBCGLOBAL', 'MSN', 'COMCAST'] => tld,
@@ -1578,6 +1578,7 @@ export CDN908_1_0(
 		self := le.Bill_To_Out.iid;
 		self := le.Bill_To_Out.shell_input;
 		self := le.bill_to_out;
+		self :=[];
 	END;
 	iidBT := project(clam, into_layout_output(left));
 
@@ -1617,6 +1618,7 @@ export CDN908_1_0(
 		self := le.Ship_To_Out.iid;
 		self := le.Ship_To_Out.shell_input;
 		self := le.ship_to_out;
+		self :=[];
 	END;
 	iidST := project(clam, into_layout_output2(left));
 

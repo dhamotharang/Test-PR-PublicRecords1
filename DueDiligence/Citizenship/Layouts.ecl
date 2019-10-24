@@ -57,6 +57,10 @@
       UNSIGNED4 inputSeq;
       STRING30 acctNo;
       Indicators;
+      UNSIGNED4 lastReportedByAnySource;
+      UNSIGNED4 lastReportedByBureauSource;
+      INTEGER2 nonBureauSourceCount;
+      INTEGER2 bureauSourceCount;
     END;
     
 END;

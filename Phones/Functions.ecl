@@ -112,15 +112,8 @@ MODULE
 
 		modpenalty := Phones.GetPenalty;
     
-    mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
-        EXPORT UNSIGNED1 dppa := inAKMod.DPPAPurpose;
-		    EXPORT UNSIGNED1 glb :=  inAKMod.GLBPurpose;
-		    EXPORT STRING5   industry_class := inAKMod.IndustryClass;
-		    EXPORT STRING32  application_type := inAKMod.ApplicationType;
-		    EXPORT STRING    ssn_mask := inAKMod.SSNMask;
-		    EXPORT UNSIGNED1 dob_mask := (UNSIGNED)inAKMod.DOBMask;
+    mod_access := MODULE(PROJECT(inAKMod, doxie.IDataAccess))
 		    EXPORT STRING    transaction_id := inAKMod.TransactionID;
-    
     END;
      
  	// BOOLEAN variables for phone sources
@@ -172,9 +165,9 @@ MODULE
 				SELF.glb_dppa_flag :=
 				                   #IF(isPhonesPlus or isLastResort)
 				                      IF( Phones.Functions.isPhoneRestricted(ri.origstate,
-																																		 inAKMod.GLBPurpose,
-																																		 inAKMod.DPPAPurpose,
-																																		 inAKMod.IndustryClass,
+																																		 inAKMod.glb,
+																																		 inAKMod.dppa,
+																																		 inAKMod.industry_class,
 																																		 , //checkRNA
 																																		 ri.datefirstseen,
 																																		 ri.dt_nonglb_last_seen,
@@ -242,9 +235,9 @@ MODULE
 			SELF.glb_dppa_flag   :=
 			                     #IF(isPhonesPlus or isLastResort)
 				                      IF( Phones.Functions.isPhoneRestricted(ri.origstate,
-																																		 inAKMod.GLBPurpose,
-																																		 inAKMod.DPPAPurpose,
-																																		 inAKMod.IndustryClass,
+																																		 inAKMod.glb,
+																																		 inAKMod.dppa,
+																																		 inAKMod.industry_class,
 																																		 , //checkRNA
 																																		 ri.datefirstseen,
 																																		 ri.dt_nonglb_last_seen,
@@ -430,9 +423,9 @@ MODULE
 		2 => Phones.Constants.PhoneServiceType.VoIP,
 		Phones.Constants.PhoneServiceType.Other);
 
-	EXPORT GetDIDs(DATASET(DidVille.Layout_Did_OutBatch) dBatchIn, STRING32 ApplicationType='',UNSIGNED1 GLBPurpose,UNSIGNED1 DPPAPurpose) := FUNCTION
+	EXPORT GetDIDs(DATASET(DidVille.Layout_Did_OutBatch) dBatchIn, doxie.IDataAccess mod_access) := FUNCTION
 
-		dDIDsbyAcctno	:= didville.did_service_common_function(dBatchIn,appType := ApplicationType,glb_purpose_value:=GLBPurpose,dppa_purpose_value:=DPPAPurpose);
+		dDIDsbyAcctno	:= didville.did_service_common_function(dBatchIn, appType := mod_access.application_type, glb_purpose_value:=mod_access.glb, dppa_purpose_value:=mod_access.dppa);
 
 		dBatchInwDID	:= JOIN(dBatchIn, dDIDsbyAcctno,
 								LEFT.seq = RIGHT.seq,

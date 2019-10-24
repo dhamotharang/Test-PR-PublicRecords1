@@ -101,10 +101,16 @@
 	<part name="AllowEmergingID" type="xsd:boolean"/>
 	<part name="NameInputOrder" type="xsd:string"/>
 	<part name="outcometrackingoptout" type="xsd:boolean"/>
+	<part name="disablenongovernmentdldata" type="xsd:boolean"/>
+	<part name="IncludeEmailVerification" type="xsd:boolean"/>
+ <part name="IncludeITIN" type="xsd:boolean"/>
+	<part name="ExcludeMinors" type="xsd:boolean"/>
+	<part name="IncludeComplianceCap" type="xsd:boolean"/>
+	<part name="IncludeDigitalIdentity" type="xsd:boolean"/>
  </message>
 */
 
-import ut, codes, address, models, riskwise, suppress, seed_files, Royalty;
+import address, models, riskwise, suppress, Royalty,STD, Risk_Indicators, Inquiry_Acclogs, Risk_Reporting, AutoStandardI;
 
 export InstantID := MACRO
 
@@ -215,7 +221,13 @@ export InstantID := MACRO
     'LexIdSourceOptout',
 	'_TransactionId',
 	'_BatchUID',
-	'_GCID'
+	'_GCID',
+   'disablenongovernmentdldata',
+   'IncludeEmailVerification',
+   'IncludeITIN',
+   'IncludeComplianceCap',
+   'ExcludeMinors',
+   'IncludeDigitalIdentity'
 	));
 
 Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
@@ -280,13 +292,13 @@ string DataRestriction := AutoStandardI.GlobalModule().DataRestrictionMask;
 string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
 model_url := dataset([],Models.Layout_Score_Chooser) : STORED('scores',few);
-fa_params := model_url(StringLib.StringToLowerCase(name)='models.fraudadvisor_service')[1].parameters;
-model_version := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='version')[1].value));
-custom_modelname := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='custom')[1].value));
+fa_params := model_url(STD.Str.ToLowerCase(name)='models.fraudadvisor_service')[1].parameters;
+model_version := trim(STD.Str.ToUppercase(fa_params(STD.Str.ToLowerCase(name)='version')[1].value));
+custom_modelname := trim(STD.Str.ToUppercase(fa_params(STD.Str.ToLowerCase(name)='custom')[1].value));
 modelname := if(model_version='', custom_modelname, model_version);
 
 string128 In_CustomCVIModelName := '' : STORED('CustomCVIModelName');
-LoggedCCVI := StringLib.StringToUppercase(In_CustomCVIModelName);
+LoggedCCVI := STD.Str.ToUppercase(In_CustomCVIModelName);
 
 
 iid := Risk_Indicators.InstantID_records;
@@ -382,4 +394,5 @@ IF(~DisableOutcomeTracking and not Test_Data_Enabled, OUTPUT(Deltabase_Logging, 
 dRoyalties := royalties4us;
 output(dRoyalties, named('RoyaltySet'));
 
+// output(iid,named('Results'));
 ENDMACRO;

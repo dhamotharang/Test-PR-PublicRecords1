@@ -141,7 +141,8 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		INTEGER1 AR2BRep3AddrAssociateCHeader;
 		INTEGER1 AR2BRep4AddrAssociateCHeader;
 		INTEGER1 AR2BRep5AddrAssociateCHeader;
-		
+    UNSIGNED4 Global_sid;
+    UNSIGNED8 Record_sid;
 		DATASET({UNSIGNED6 LexID}) LexIDs;
 		DATASET({UNSIGNED4 Seq, BOOLEAN Rep1AddrMatched, BOOLEAN Rep2AddrMatched, BOOLEAN Rep3AddrMatched, BOOLEAN Rep4AddrMatched, BOOLEAN Rep5AddrMatched, STRING20 FName, STRING20 LName}) RepNames;
 	END;
@@ -209,11 +210,13 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 												DATASET([{le.Seq, Rep1AddrMatch, Rep2AddrMatch, Rep3AddrMatch, Rep4AddrMatch, Rep5AddrMatch, ri.fname, ri.lname}], 
 															{UNSIGNED4 Seq, BOOLEAN Rep1AddrMatched, BOOLEAN Rep2AddrMatched, BOOLEAN Rep3AddrMatched, BOOLEAN Rep4AddrMatched, BOOLEAN Rep5AddrMatched, STRING20 FName, STRING20 LName}),
 												DATASET([], {UNSIGNED4 Seq, BOOLEAN Rep1AddrMatched, BOOLEAN Rep2AddrMatched, BOOLEAN Rep3AddrMatched,  BOOLEAN Rep4AddrMatched, BOOLEAN Rep5AddrMatched, STRING20 FName, STRING20 LName}));		
+    SELF.global_sid := ri.global_sid;
+    SELF.record_sid := ri.record_sid;
 		SELF := []													
 	END;
 	
 	
-	ConsumerHeaderAddrRaw := JOIN(ShellSearchRecords, key_header_address, 
+	ConsumerHeaderAddrRaw_all := JOIN(ShellSearchRecords, key_header_address, 
 																		(TRIM(LEFT.Prim_Name) <> '' AND TRIM(LEFT.Zip5) <> '' AND
 																		KEYED(LEFT.Prim_Name = RIGHT.prim_name AND LEFT.Zip5 = RIGHT.zip AND LEFT.Prim_Range = RIGHT.prim_range) AND
 																		LEFT.PreDir = RIGHT.predir AND LEFT.PostDir = RIGHT.postdir AND
@@ -225,7 +228,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																			(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(dx_header.functions.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
 																		Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
 																	getConsumerHeaderAddrAttributes(LEFT, RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
-	
+	ConsumerHeaderAddrRaw:= Suppress.MAC_SuppressSource(ConsumerHeaderAddrRaw_all, mod_access, LexIDs[1].LexID); // There’s no more than one LexId here //
 	// Filter out records after our history date
 	ConsumerHeaderAddr := Business_Risk_BIP.Common.FilterRecords(ConsumerHeaderAddrRaw, Dt_First_Seen, (UNSIGNED)Business_Risk_BIP.Constants.MissingDate, '', AllowedSourcesSet);
 	

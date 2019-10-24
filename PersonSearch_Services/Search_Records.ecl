@@ -1,4 +1,4 @@
-import AutoStandardI, ut, doxie, CriminalRecords_Services, PhonesFeedback, AddressFeedback, PhonesFeedback_Services, AddressFeedback_Services;
+﻿import AutoStandardI, ut, doxie, CriminalRecords_Services, PhonesFeedback, AddressFeedback, PhonesFeedback_Services, AddressFeedback_Services, Suppress;
 
 export Search_Records := module
   export params := interface(
@@ -235,13 +235,7 @@ export Search_Records := module
                                                SELF:=LEFT,SELF:=[]));
     CriminalRecords_Services.MAC_Indicators(recsIn,recsCrim);
     recs_plus_crim := IF(in_mod.IncludeCriminalIndicators,recsCrim,recsIn);
-
-    PhonesFeedback_Services.Mac_Append_Feedback(recs_plus_crim
-                                              ,UniqueId
-                                              ,phone_fb
-                                              ,recs_phnFB
-                                              ,phone_feedback
-                                              );
+    PhonesFeedback_Services.Mac_Append_Feedback(recs_plus_crim, UniqueId, phone_fb, recs_phnFB, mod_access, phone_feedback);
     recs_plus_phnFB := if(in_mod.IncludePhonesFeedback, recs_phnFB, recs_plus_crim);
 
     AddressFeedback_Services.MAC_Append_Feedback(recs_plus_phnFB,

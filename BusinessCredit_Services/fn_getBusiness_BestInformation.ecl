@@ -10,6 +10,7 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 																				,dataset(bipv2_best.Key_LinkIds.kfetchoutrec) bipv2BestRecs
 																			 ):= FUNCTION
 
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
     topBusiness_bestrecs_bip := PROJECT(topBusinessRecs, BusinessCredit_Services.Layouts.TopBusiness_BestSection)[1].BestSection;
     topBusiness_bestrecs_sbfe := IF(buzCreditAccess,
                                     BIPV2_Best_SBFE.Key_LinkIds().kFetch2(inmod.BusinessIds, inmod.FetchLevel, , inmod.DataPermissionMask,
@@ -175,15 +176,15 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 																            '');
 																		
 			SELF.PrimaryIndustryCode				:= IndustryCode,																			
-			SELF.PrimaryIndustryDescription          :=  IndustryDesc,																					
+			SELF.PrimaryIndustryDescription := IndustryDesc,																					
 			SELF.BusinessType								:= IF (buzCreditAccess, business_structure_desc, '');
-			SELF.ParentCompanyName 					:=   ParentInfoCname.CompanyName; 	
+			SELF.ParentCompanyName 					:= ParentInfoCname.CompanyName; 	
 			SELF.sosActiveIndicator 				:= corp_status;
-			SELF.BusinessCreditIndicator 		:= 	 BusinessCredit_Services.Functions.fn_BuzCreditIndicator(	topBusiness_bestrecs.BusinessIds.UltID, 
-																																				topBusiness_bestrecs.BusinessIds.OrgID,
-																																				topBusiness_bestrecs.BusinessIds.SeleID,
-																																			      inmod.DataPermissionMask,
-																																				buzCreditAccess);
+			SELF.BusinessCreditIndicator 		:= BusinessCredit_Services.Functions.fn_BuzCreditIndicator(	topBusiness_bestrecs.BusinessIds.UltID, 
+                                                                                                  topBusiness_bestrecs.BusinessIds.OrgID,
+                                                                                                  topBusiness_bestrecs.BusinessIds.SeleID,
+                                                                                                  mod_access,
+                                                                                                  buzCreditAccess);
 		END;
 
 		Business_BestInformation := DATASET([transform_t_BusinessCreditBestSection()]);

@@ -1,4 +1,4 @@
-﻿import Seed_Files, Models;
+﻿import Seed_Files, Models,Risk_Indicators,STD;
 
 export InstantID_Test_Function(string20 TestDataTableName,string30 fname_val,string30 lname_val,string9 ssn_value,
 				string5 zip_value,string10 phone_value,string30 Account_Value, unsigned1 NumReturnCodes) := 
@@ -77,6 +77,7 @@ export InstantID_Test_Function(string20 TestDataTableName,string30 fname_val,str
 		self.lname_prev	:=	le.outlname_prev;
 		self.transaction_id	:=	(unsigned6) le.outtransaction_id;
 		self.verfirst	:=	le.outverfirst;
+		self.vermiddle	:=	le.outvermiddle;
 		self.verlast	:=	le.outverlast;
 		self.veraddr	:=	le.outveraddr;
 		self.VerPrimRange :=	le.outverprimrange;
@@ -98,6 +99,7 @@ export InstantID_Test_Function(string20 TestDataTableName,string30 fname_val,str
 		self.verify_addr	:=	le.outverify_addr;
 		self.verify_dob	:=	le.outverify_dob;
 		self.valid_ssn	:=	le.outvalid_ssn;
+		self.VerifiedEmail	:=	le.outverified_Email;
 		self.NAS_Summary	:=	(INTEGER1) le.outNAS_Summary;
 		self.NAP_Summary	:=	(INTEGER1) le.outNAP_Summary;
 		self.NAP_Type	:=	le.outNAP_Type;
@@ -117,6 +119,7 @@ export InstantID_Test_Function(string20 TestDataTableName,string30 fname_val,str
 		self.correctedPostDir :=	le.outcorrectedpostdir;
 		self.correctedUnitDesignation :=	le.outcorrectedunitdesignation;
 		self.correctedSecRange :=	le.outcorrectedsecrange;
+		self.corrected_dl :=	le.outCorrecteddl;
 		self.area_code_split	:=	le.outarea_code_split;
 		self.area_code_split_date	:=	le.outarea_code_split_date;
 		self.phone_fname	:=	le.outphone_fname;
@@ -138,6 +141,7 @@ export InstantID_Test_Function(string20 TestDataTableName,string30 fname_val,str
 		self.ssa_state	:=	le.outssa_state;
 		self.ssa_state_name	:=	le.outssa_state_name;
 		self.current_fname	:=	le.outcurrent_fname;
+		self.current_mname	:=	le.outcurrent_mname;
 		self.current_lname	:=	le.outcurrent_lname;
 		self.Watchlist_Table :=		le.outWatchlist_Table;
 		self.Watchlist_Program	:=	le.outWatchlist_Program;
@@ -199,14 +203,18 @@ export InstantID_Test_Function(string20 TestDataTableName,string30 fname_val,str
 		self.SSNFoundForLexID := (BOOLEAN)le.SSNFoundForLexID;
 		self.cviCustomScore := le.cviCustomScore;
     self.AddressSecondaryRangeMismatch := le.AddressSecondaryRangeMismatch;
-		
+		self.BureauDeleted:=le.BureauDeleted;
+		self.ITINExpired :=le.ITINExpired ;
+		self.IsPhoneCurrent :=le.IsPhoneCurrent ;
+		self.PhoneLineDescription  :=le.PhoneLineDescription  ;
+		self.PhoneLineType  :=le.PhoneLineType  ;
 		self := le;
 		self := [];  // blank out sections which have now been broken out into their own testseed files, like red flags and models for example
 	END;
 	
-	fname_value :=stringlib.stringtouppercase(fname_val);
-	lname_value :=stringlib.stringtouppercase(lname_val);
-	Test_Data_Table_Name :=stringlib.stringtouppercase(TestDataTableName);
+	fname_value :=STD.Str.ToUpperCase(fname_val);
+	lname_value :=STD.Str.ToUpperCase(lname_val);
+	Test_Data_Table_Name :=STD.Str.ToUpperCase(TestDataTableName);
 	
 	hash_from_input :=Seed_Files.Hash_InstantID((string20)fname_value,(string20)lname_value,(string9)ssn_value,Risk_Indicators.nullstring
 						,(string5)zip_value,(string10)phone_value,Risk_Indicators.nullstring);

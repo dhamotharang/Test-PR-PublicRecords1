@@ -70,7 +70,7 @@ EXPORT Records := Module
 		newkey := watchdog.Key_watchdog_glb();
 		
 		didvilleJoin := join(didville, newkey, keyed(left.did=right.did), transform(recordof(didville),
-																								self.dob := (string)right.dob;
+																								self.dob := if((string)right.dob <> '0',(string)right.dob, (string)left.dob);
 																								self := left), left outer,keep(Healthcare_Header_Services.Constants.MAX_SEARCH_RECS),limit(0));
 
 		NewKeyJoin := join(final, didvilleJoin, left.acctno=(string)right.seq, transform(recordof(final),

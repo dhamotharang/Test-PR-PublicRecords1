@@ -1,4 +1,4 @@
-﻿IMPORT DueDiligence, iesp, STD, ut;
+﻿IMPORT DueDiligence, iesp, Risk_Indicators, STD, ut;
 
 EXPORT CommonIndividual := MODULE
 
@@ -37,7 +37,7 @@ EXPORT CommonIndividual := MODULE
   ENDMACRO;
 
   EXPORT CreateRelatedPartyDataset(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := FUNCTION
-  //Need to convert the inquuired individual into a dataset in order to re-use modules created for indivuals and Business executives
+    //Need to convert the inquuired individual into a dataset in order to re-use modules created for indivuals and Business executives
     indivRelatedParty := PROJECT(inData, TRANSFORM({DATASET(DueDiligence.LayoutsInternal.RelatedParty) inquiredDS},
                                                     SELF.inquiredDS := PROJECT(LEFT, TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty, 
                                                                                              SELF.seq := LEFT.seq;
@@ -47,8 +47,40 @@ EXPORT CommonIndividual := MODULE
                                                                                              SELF := [];));
                                                     SELF := [];));
 
-  RETURN indivRelatedParty.inquiredDS;
+    RETURN indivRelatedParty.inquiredDS;
+  END;
+  
+  EXPORT GetIIDSSNFlags(DATASET(DueDiligence.Layouts.Indv_Internal) inData, STRING dataRestrictionMask,
+                        UNSIGNED1 dppa, UNSIGNED1 glba, INTEGER bsVersion, UNSIGNED8 bsOptions) := FUNCTION
+      
+      
+      exactMatchLevel := risk_indicators.iid_constants.default_ExactMatchLevel;
+      
+      ssnFlagsPrepSeq := PROJECT(inData, TRANSFORM(Risk_Indicators.Layout_output,
+                                                    stringDate := (STRING)LEFT.historyDate;
+                                                    SELF.seq := COUNTER;
+                                                    SELF.account := (STRING)LEFT.seq;
+                                                    SELF.historyDate := (UNSIGNED)stringDate[1..6];
+                                                    SELF.did := LEFT.individual.did;
+                                                    SELF.fname := LEFT.individual.firstName;
+                                                    SELF.mname := LEFT.individual.middleName;
+                                                    SELF.lname := LEFT.individual.lastName;
+                                                    SELF.suffix := LEFT.individual.suffix;
+                                                    SELF.dob := (STRING)LEFT.individual.dob;
+                                                    SELF.phone10 := LEFT.individual.phone;
+                                                    SELF.p_city_name := LEFT.individual.city;
+                                                    SELF.st := LEFT.individual.state;
+                                                    SELF.z5 := LEFT.individual.zip5;
+                                                    SELF.lat := LEFT.individual.geo_lat;
+                                                    SELF.long := LEFT.individual.geo_long;
+                                                    SELF.addr_type := LEFT.individual.rec_type;
+                                                    SELF.addr_status := LEFT.individual.err_stat;
+                                                    SELF := LEFT.individual;
+                                                    SELF := [];));	
 
-  END;  //END OF FUNCTION
+      withSSNFlags := risk_indicators.iid_getSSNFlags(GROUP(ssnFlagsPrepseq, seq), dppa, glba, FALSE, TRUE, exactMatchLevel, dataRestrictionMask, bsVersion, bsOptions);	
+		
+      RETURN withSSNFlags;
+  END;
 
 END;  //END OF MODULE

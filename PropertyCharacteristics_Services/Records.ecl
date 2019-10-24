@@ -96,7 +96,7 @@ module
 	export dsReport := sort(project (ds_noacctno, ModPropInfo.Convert2PropDataItem(left)), DataSource); 
 
 	iesp.property_info.t_PropertyInformation	tCombineReportSections()	:= transform
-		self._Header													:=	row({0,'',pRequest.User.QueryId,pInsContext.Common.TransactionId,[]},iesp.share.t_ResponseHeader);
+		self._Header													:=	row({0,'',pRequest.User.QueryId,pInsContext.Common.TransactionId,[],[]},iesp.share.t_ResponseHeader);
 		self.ReportBy													:=	ModPropInfo.SetReportBy(clean_addr);
 		self.Report.ReportIdSection						:=	ModPropInfo.SetReportID(pInsContext
 																																			// ,dPropGatewayResponse

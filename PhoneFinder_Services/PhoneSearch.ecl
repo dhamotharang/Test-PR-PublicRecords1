@@ -10,23 +10,15 @@ EXPORT PhoneSearch( DATASET(lBatchIn)                        dIn,
                     PhoneFinder_Services.iParam.SearchParams inMod,
                     DATASET(Gateway.Layouts.Config)          dGateways) :=
 FUNCTION
-  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
-    EXPORT unsigned1 glb := inMod.GLBPurpose;
-    EXPORT unsigned1 dppa := inMod.DPPAPurpose;
-    EXPORT string DataPermissionMask := inMod.DataPermissionMask;
-    EXPORT string DataRestrictionMask := inMod.DataRestrictionMask;
-    EXPORT string5 industry_class := inMod.IndustryClass;
-    EXPORT string32 application_type := inMod.ApplicationType;
-    EXPORT boolean show_minors := inMod.IncludeMinors OR (inMod.GLBPurpose = 2);
-    EXPORT string ssn_mask := inMod.SSNMask;
-  END;
+  mod_access := PROJECT (inMod, doxie.IDataAccess);
 
   dResultsByPhone := PhoneFinder_Services.GetPhones(dIn,inMod,dGateways);
 
   // Search by PII - Don't use royalty based sources when searching on PII when phone is also sent in
   // Experian File One and Waterfall process
-  wfMod := MODULE(PROJECT(inMod,PhoneFinder_Services.iParam.SearchParams,OPT))
-    EXPORT BOOLEAN UseQSent      := FALSE;
+  wfMod := MODULE(PROJECT(inMod,PhoneFinder_Services.iParam.SearchParams))
+    EXPORT BOOLEAN UseTransUnionIQ411      := FALSE;
+    EXPORT BOOLEAN UseTransUnionPVS        := FALSE;
     EXPORT BOOLEAN UseLastResort := FALSE;
     EXPORT BOOLEAN UseInHousePhoneMetadata := FALSE;
   END;

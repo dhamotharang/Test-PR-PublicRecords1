@@ -1,4 +1,4 @@
-IMPORT BIPV2, Doxie, Data_Services, Suppress;
+﻿IMPORT BIPV2, Doxie, Data_Services;
 
 EXPORT Key_Proflic_LinkIDs := MODULE
 
@@ -13,7 +13,7 @@ EXPORT Key_Proflic_LinkIDs := MODULE
   //DEFINE THE INDEX ACCESS
   export KeyFetch(
 	  dataset(BIPV2.IDlayouts.l_xlink_ids) in_ds_withids,
-    Doxie.IDataAccess mod_access,
+		Doxie.IDataAccess mod_access = MODULE(Doxie.IDataAccess) END,
 		string1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
 																												 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
 																												//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
@@ -21,9 +21,9 @@ EXPORT Key_Proflic_LinkIDs := MODULE
 		JoinLimit = 25000
 								) :=FUNCTION
 
-		BIPV2.IDmacros.mac_IndexFetch(in_ds_withids, Key, out_fetch, Level, JoinLimit)
-    out_fetch_suppressed := Suppress.MAC_SuppressSource(out_fetch, mod_access);
-	  return out_fetch_suppressed;
+		BIPV2.IDmacros.mac_IndexFetch(in_ds_withids, Key, fetched, Level, JoinLimit)
+		Prof_LicenseV2.MAC_Check_Access(fetched, out_fetch, mod_access);					// Jira# CCPA-816, Function created for CCPA suppressions at key fetches.
+	  return out_fetch;
 
   END;
 

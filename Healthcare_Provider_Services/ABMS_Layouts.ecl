@@ -1,4 +1,4 @@
-Import ABMS,iesp;
+﻿Import ABMS,iesp;
 EXPORT ABMS_Layouts := MODULE
 
 	export batchInterface := record
@@ -17,6 +17,9 @@ EXPORT ABMS_Layouts := MODULE
 	end;
 	export autokeyInput := record
 			batchInterface;
+			unsigned8 	global_sid :=0;
+			unsigned4 record_sid:=0;
+			boolean hasOptout := false;
 			boolean includeCareer := false;
 			boolean includeEducation := false;
 			boolean includeProfessionalAssociations := false;
@@ -25,8 +28,12 @@ EXPORT ABMS_Layouts := MODULE
 
 	export searchKeyResults := record
 		string20	acctno := '';
+		unsigned4 	global_sid :=0;
+		unsigned4 record_sid:=0;
+		unsigned6   DID := 0;
 		STRING8   biog_number := '';
 		boolean 	isAutokeysResult := false;
+		boolean hasOptout := false;
 		string20	name_first := '';
 		string20	name_middle := '';
 		string20	name_last := '';
@@ -165,6 +172,7 @@ EXPORT ABMS_Layouts := MODULE
 
 	Export LayoutOutput := Record
 			iesp.abms.t_ABMSResults;
+			boolean hasoptout:=false;
 			boolean isAutoKeyResults := false;	
 			string Board_Name := '';	
 			string MOC_Cert_Name := '';	

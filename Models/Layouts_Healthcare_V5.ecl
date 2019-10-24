@@ -498,6 +498,22 @@ EXPORT Core_Results_Layout := RECORD //Layout of core results after adding Motiv
 	string10 MO_Driver_Lo1 := 'N/A';
 	string10 MO_Driver_Lo2 := 'N/A';
 	string10 MO_Driver_Lo3 := 'N/A';
+	// Total Cost Risk Score 3.0 related fields
+	String20 SeTC_Raw_Score  := 'N/A';
+	integer1 isSeTCInvalidLOB := 0;
+	integer1 SeTCModelUsed	  := 0;
+	string10 TC_Driver_Hi1 := 'N/A';
+	string30 TC_Driver_Hi1_value:= 'N/A';
+	string10 TC_Driver_Hi2 := 'N/A';
+	string30 TC_Driver_Hi2_value := 'N/A';
+	string10 TC_Driver_Hi3 := 'N/A';
+	string30 TC_Driver_Hi3_value := 'N/A';
+	string10 TC_Driver_Lo1 := 'N/A';
+	string30 TC_Driver_Lo1_value := 'N/A';
+	string10 TC_Driver_Lo2 := 'N/A';
+	string30 TC_Driver_Lo2_value := 'N/A';
+	string10 TC_Driver_Lo3 := 'N/A';
+	string30 TC_Driver_Lo3_value := 'N/A';
 	//Debug fields that form as additional model inputs for Readmission.
 	string3 ADDRCHANGECOUNT24;
 	string3 ARRESTCOUNT24;
@@ -525,6 +541,9 @@ EXPORT Output_Layout := RECORD
 	string10 MedicationAdherenceScore_Category;
 	string10 MotivationScore_Category;
 	boolean isLexIdInOptOut;
+	string8 Socio_Index  := 'N/A'; //In the Batch Query
+	string5 Socio_Rank  := 'N/A'; //In the Batch Query
+	string5 Socio_Category  := 'N/A'; //In the Batch Query
 END;
 	
 END;

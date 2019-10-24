@@ -1,4 +1,4 @@
-﻿IMPORT Gateway, Phones, Suppress;
+﻿IMPORT PhoneFinder_Services, Gateway, Suppress;
 
 lBatchIn := PhoneFinder_Services.Layouts.BatchInAppendDID;
 lFinal   := PhoneFinder_Services.Layouts.PhoneFinder.Final;
@@ -29,8 +29,9 @@ FUNCTION
 
 	dFormat2BatchIn := PROJECT(dPhoneHistIn, TRANSFORM(lBatchIn, SELF.homephone := LEFT.phone, SELF.acctno := LEFT.acctno, SELF := []));
 
-	psMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.SearchParams, OPT))
-		EXPORT BOOLEAN UseQSent                := FALSE;
+	psMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.SearchParams))
+	    EXPORT BOOLEAN UseTransUnionIQ411      := FALSE;
+		EXPORT BOOLEAN UseTransUnionPVS        := FALSE;
 		EXPORT BOOLEAN UseTargus               := FALSE;
 		EXPORT BOOLEAN UseLastResort           := FALSE;
 		EXPORT BOOLEAN UseInHousePhoneMetadata := FALSE;
@@ -48,7 +49,7 @@ FUNCTION
   // Combine waterfall and phones history
   dWFAllIdentities := dPhonesWaterfall + dPhoneHistPrimaryFlag;
 
-  Suppress.MAC_Suppress(dWFAllIdentities, dWFSuppressIdentities, inMod.ApplicationType, Suppress.Constants.LinkTypes.DID, did, '', '', TRUE, '', TRUE);
+  Suppress.MAC_Suppress(dWFAllIdentities, dWFSuppressIdentities, inMod.application_type, Suppress.Constants.LinkTypes.DID, did, '', '', TRUE, '', TRUE);
 
 	#IF(PhoneFinder_Services.Constants.Debug.PIISearch)
 		OUTPUT(dIn, NAMED('dWaterfallSearchIn'));

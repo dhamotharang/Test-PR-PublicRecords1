@@ -247,8 +247,8 @@ EXPORT ReportService_Records(Healthcare_Header_Services.IParams.ReportParams inp
 				string q_id := '' : stored ('_QueryId');
 				string t_id := '' : stored ('_TransactionId');
 				string msg	:= 'Your subject cannot be uniquely identified.  Please include additional identifying information such as Name, Address, SSN, DOB or Provider ID Number.';
-				badheader := ROW ({203, msg, q_id, t_id, []}, iesp.share.t_ResponseHeader);
-				goodheader := ROW ({0, '', q_id, t_id, []}, iesp.share.t_ResponseHeader);
+				badheader := ROW ({203, msg, q_id, t_id, [], []}, iesp.share.t_ResponseHeader);
+				goodheader := ROW ({0, '', q_id, t_id, [], []}, iesp.share.t_ResponseHeader);
 				self._Header         := map(hasSomething2Report or noHit =>goodheader,
 																		badheader);
 				self.reportby				 := srcRptBy;

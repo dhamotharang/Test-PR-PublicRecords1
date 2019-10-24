@@ -1,1 +1,0 @@
-export All_States := dataset([{'', '  '}], EDA_VIA_XML.Layout_City_List) + EDA_VIA_XML.Valid_States;

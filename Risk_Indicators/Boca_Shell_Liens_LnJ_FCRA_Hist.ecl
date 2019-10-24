@@ -1,4 +1,4 @@
-﻿import _Control, FCRA, ut, liensv2, riskwise, Risk_Indicators;
+﻿import _Control, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD;
  onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0, 
@@ -56,6 +56,11 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		self.name_type := ri.name_type;
 		//orig_name is not parsed/cleaned...so need to use the cleaned name fields
 		self.orig_name := Risk_Indicators.iid_constants.CreateFullName(ri.title, ri.fname, ri.mname, ri.lname, ri.name_suffix);
+    self.StreetAddress1 := ri.orig_address1;
+    self.StreetAddress2 := ri.orig_address2;
+    self.City := ri.orig_city;
+    self.State := ri.orig_state;
+    self.Zip5 := ri.orig_zip5;
 		SELF := le;
 		SELF := [];
 
@@ -165,7 +170,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.lnj_last_eviction_date := if(isEviction, (unsigned)OrigDateFiled, 0);
 
 		// they want liens seperated by type and released or unreleased for modeling shell 3.0
-		ftd := trim(stringlib.stringtouppercase(ri.filing_type_desc));
+		ftd := trim(STD.Str.ToUpperCase(ri.filing_type_desc));
 		goodResult := ri.rmsid<>'';
 		unreleased := (integer) releasedDate > (integer) myGetDate or (integer) releasedDate=0;
 		released := (integer) releasedDate <= (integer) myGetDate and (integer) releasedDate <>0;
@@ -261,7 +266,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.DateFiled := OrigDateFiled;
 		SELF.Amount := (string) (integer) ri.Amount; //attributes make this a real and store in an integer so making integer then string
 		SELF.ReleaseDate := releasedDate;
-		SELF.FileTypeDesc := trim(stringlib.stringtouppercase(ri.filing_type_desc));
+		SELF.FileTypeDesc := trim(STD.Str.ToUpperCase(ri.filing_type_desc));
 		SELF.Filingnumber := ri.Filing_number;
 		SELF.Filingbook := ri.Filing_book;
 		SELF.Filingpage := ri.Filing_page;
@@ -271,6 +276,11 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.Agencycounty := ri.Agency_County;
 		SELF.Agencystate := ri.Agency_state;
 		SELF.Defendant := if(trim(le.name_type) = 'D', trim(le.orig_name), '');
+    SELF.StreetAddress1 := if(trim(le.name_type) = 'D', trim(le.StreetAddress1), '');
+    SELF.StreetAddress2 := if(trim(le.name_type) = 'D', trim(le.StreetAddress2), '');
+    SELF.City := if(trim(le.name_type) = 'D', trim(le.City), '');
+    SELF.State := if(trim(le.name_type) = 'D', trim(le.State), '');
+    self.Zip5 := if(trim(le.name_type) = 'D', trim(le.Zip5), '');
 		SELF.Plaintiff := '';
 		SELF.Eviction := if(isEviction, 'Y', 'N');
 		SELF.FilingDescription := if(TRIM((String) releasedDate)<>'0', 'RELEASED', '');

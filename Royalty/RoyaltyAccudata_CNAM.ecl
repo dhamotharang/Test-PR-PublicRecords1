@@ -1,8 +1,9 @@
-﻿IMPORT MDR,Royalty;
-EXPORT RoyaltyAccudata_CNAM := MODULE
+﻿EXPORT RoyaltyAccudata_CNAM := MODULE
 
   EXPORT GetOnlineRoyalties(inp, type_flag='source') := 
   FUNCTIONMACRO
+		IMPORT MDR;
+
 			dRoyalOut :=
 					DATASET(
 						[{
@@ -16,8 +17,9 @@ EXPORT RoyaltyAccudata_CNAM := MODULE
 			RETURN dRoyalOut;		
   ENDMACRO;
  
-	  EXPORT GetBatchRoyaltiesByAcctno(dInP, fSource='source', fPhone='phone', fAcctno='acctno') := 
+  EXPORT GetBatchRoyaltiesByAcctno(dInP, fSource='source', fPhone='phone', fAcctno='acctno') := 
 	FUNCTIONMACRO
+		IMPORT MDR;
 
 		// we're counting hits by phone
 		dDupRecs := DEDUP(SORT(dInP(fSource = MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2), fPhone, fAcctno), fPhone);
@@ -36,4 +38,3 @@ EXPORT RoyaltyAccudata_CNAM := MODULE
 		
   ENDMACRO;
 END;
-

@@ -28,7 +28,7 @@ export Specialty_Lookup_Service := MACRO
 	iesp.abms.t_ABMSSpecialtyLookupResponse format() := transform
 				string q_id := '' 	 : stored ('_QueryId');
 				string t_id := '' 	 : stored ('_TransactionId');
-				self._Header         := ROW ({0, '', q_id, t_id, []}, iesp.share.t_ResponseHeader);
+				self._Header         := ROW ({0, '', q_id, t_id, [], []}, iesp.share.t_ResponseHeader);
 				self.RecordCount 		 := count(recs);
 				self.Records := choosen(recs,iesp.Constants.HPR.Max_Cnt_Search);
 	end;

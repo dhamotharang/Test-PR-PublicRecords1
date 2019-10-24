@@ -1,6 +1,9 @@
-﻿IMPORT DidVille,BatchServices,Gateway,MDR,Phones,PhoneOwnership, Risk_Indicators,Royalty, STD, Suppress, ut;
+﻿IMPORT doxie, DidVille, BatchServices, Gateway, Phones, PhoneOwnership, Risk_Indicators, Royalty, STD, Suppress, ut;
+
 EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 							PhoneOwnership.IParams.BatchParams inMod) := FUNCTION
+
+  mod_access := PROJECT(inMod, doxie.IDataAccess);
 
 	// 1. Resolved DIDs
 	// 2. GetBestInfo and keep input name if best lastname differs
@@ -26,7 +29,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 													SELF.phone10 := LEFT.phone_number,
 													SELF.z5 := LEFT.zip,
 													SELF:=LEFT,SELF:=[]));
-	dsBatchwDIDs := Phones.Functions.GetDIDs(dsBatch,inMod.application_type,inMod.glb,inMod.dppa);
+	dsBatchwDIDs := Phones.Functions.GetDIDs(dsBatch,mod_access);
 	dsBatchwInput := JOIN(ds_batch_in,dsBatchwDIDs, 
 							LEFT.acctno = (STRING)RIGHT.seq,
 							TRANSFORM(PhoneOwnership.Layouts.PhonesCommon,
@@ -43,7 +46,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 												SELF := LEFT,
 												SELF :=[]),
 							LEFT OUTER, LIMIT(0),KEEP(1));
-	Suppress.MAC_Suppress(dsBatchwInput,dsBatchUnrestricted,inMod.application_type,Suppress.Constants.LinkTypes.DID,DID);
+	Suppress.MAC_Suppress(dsBatchwInput,dsBatchUnrestricted,mod_access.application_type,Suppress.Constants.LinkTypes.DID,DID);
 	dsBatchwBestInfo := Functions.GetBestInfo(dsBatchUnrestricted);//Get bestinfo for name variations.
 
 	//*******************Get Phone Metadata - ATT LIDB(Carrier data) and porting info - reuse PhoneAttributes code***************************
@@ -194,7 +197,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 	//Send unique phones avoid sending identified invalid numbers											
 	dsAccudataRequest := DEDUP(SORT(dsCallerIDRequest(LexisNexisMatchCode != Constants.LNMatch.INVALID),phone),phone);
 	dsPhones:= PROJECT(dsAccudataRequest(NOT validatedRecord),TRANSFORM(Phones.Layouts.PhoneAcctno, SELF.acctno:=LEFT.acctno, SELF.phone:=LEFT.phone));// only get CallerName for phones not validated.
-	dsAccuData := IF(EXISTS(dsPhones) AND inMod.useAccudataCNAM,Phones.GetAccuData_CallerName(dsPhones,inMod.gateways,inMod.application_type,inMod.glb,inMod.dppa),
+	dsAccuData := IF(EXISTS(dsPhones) AND inMod.useAccudataCNAM,Phones.GetAccuData_CallerName(dsPhones,inMod.gateways,mod_access),
 													DATASET([],Phones.Layouts.AccuDataCNAM));	
 	dsPhoneswCallerName := IF(inMod.useAccudataCNAM,PhoneOwnership.AppendCallerName(dsAccuData, dsCallerIDRequest),dsCallerIDRequest);
 	// selecting by account since accudata phone results were appended to acctno and returned relatives is based on input subject

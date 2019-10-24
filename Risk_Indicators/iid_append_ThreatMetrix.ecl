@@ -1,4 +1,4 @@
-﻿Import risk_indicators, PublicRecords_KEL, doxie, gateway, STD;
+﻿Import risk_indicators, PublicRecords_KEL, gateway, STD;
 
 // this function needs the original input (indata)
 // and appends the TMX gateway results to the end of Layout_Output

@@ -23,54 +23,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
 
     //convert the incoming data to the DueDiligence.Layouts.Indv_Internal used
     //for processing an individual
-    inquiredInd := PROJECT(inData, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
-    
-                                              historyDate := IF(LEFT.cleanedinput.historyDateYYYYMMDD = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.cleanedinput.historyDateYYYYMMDD);
-                                              
-                                              SELF.seq := LEFT.cleanedInput.seq;
-                                              SELF.indvRawInput.lexID := LEFT.inputEcho.individual.lexID;
-                                              SELF.indvRawInput.accountNumber := LEFT.inputEcho.individual.accountNumber;
-                                              SELF.indvRawInput.address := LEFT.inputEcho.individual.address;
-                                              SELF.indvRawInput.phone := LEFT.inputEcho.individual.phone;
-                                              SELF.indvRawInput.inputSeq := LEFT.inputEcho.individual.inputSeq;
-                                              SELF.indvRawInput.nameInputOrder := LEFT.inputEcho.individual.nameInputOrder;
-                                              SELF.indvRawInput.name := LEFT.inputEcho.individual.name;
-                                              SELF.indvRawInput.ssn := LEFT.inputEcho.individual.ssn;
-                                              SELF.indvRawInput.dob := LEFT.inputEcho.individual.dob;
-                                              SELF.indvRawInput.cleanAddress := LEFT.cleanedInput.individual.address;
-                                              
-                                              SELF.historyDateRaw := LEFT.cleanedinput.historyDateYYYYMMDD;
-                                              SELF.historyDate := historyDate;
-                                              SELF.indvType := DueDiligence.Constants.INQUIRED_INDIVIDUAL;
-                                              
-                                              SELF.inquiredDID := LEFT.dataToUse.did;
-                                              SELF.individual.did := LEFT.dataToUse.did;
-                                              SELF.individual.score := LEFT.dataToUse.lexIDScore;
-                                              SELF.individual.ssn := LEFT.dataToUse.ssn;
-                                              SELF.individual.dob := (UNSIGNED4)LEFT.dataToUse.dob;
-                                              SELF.individual.phone := LEFT.dataToUse.phone;
-                                              
-                                              SELF.individual := LEFT.dataToUse.name;
-                                              SELF.individual := LEFT.dataToUse.address;
-                                              
-                                              SELF.inputaddressprovided := LEFT.cleanedInput.addressProvided;
-                                              SELF.fullinputaddressprovided := LEFT.cleanedInput.fullCleanAddressExists;
-                                              
-                                              SELF.bestSSN := LEFT.dataToUse.ssn;
-                                              SELF.bestPhone := LEFT.dataToUse.phone;
-                                              SELF.bestDOB := (UNSIGNED4)LEFT.dataToUse.dob;
-                                              
-                                              SELF.bestName := LEFT.dataToUse.name;
-                                              SELF.bestAddress := LEFT.dataToUse.bestAddress;
-                                              
-                                              
-                                              validDOB := DueDiligence.Common.IsValidDOB((UNSIGNED4)LEFT.dataToUse.dob);
-                                              validHistDate := STD.Date.IsValidDate(historyDate);
-                                              
-                                              SELF.estimatedAge := IF(validDOB AND validHistDate, ut.Age((UNSIGNED4)LEFT.dataToUse.dob, historyDate), 0);
-
-                                              SELF := [];));
-
+    inquiredInd := DueDiligence.getInd(inData);
 
 
     didFound := inquiredInd(inquiredDID <> 0);
@@ -93,7 +46,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     indHeader := DueDiligence.getIndHeader(indRelatives, dataRestrictionMask, dppa, glba, isFCRA, includeReport);
 
     //get information pertaining to SSN
-    indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, isFCRA, includeReport);
+    indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, bsVersion, bsOptions);
 
     //get property information
     indProperty := DueDiligence.getIndProperty(indSSNData, dataRestrictionMask);
@@ -112,9 +65,12 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
 
     //get business associations
     indBusAssoc := DueDiligence.getIndBusAssoc(indCriminalData, options, linkingOptions);
+    
+    //get identity risk
+    indIDRisk := DueDiligence.getIndIdentityRisk(indBusAssoc, dataRestrictionMask, dppa, glba, bsVersion, bsOptions);
 
     //if a person report is being requested, populate the report
-    indReportData :=  IF(includeReport, DueDiligence.getIndReport(indBusAssoc, options, linkingOptions, ssnMask), indBusAssoc);
+    indReportData :=  IF(includeReport, DueDiligence.getIndReport(indIDRisk, options, linkingOptions, ssnMask), indIDRisk);
 
 
     //populate the attributes and flags
@@ -138,6 +94,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     IF(debugMode, OUTPUT(indAircraft, NAMED('indAircraft')));
     IF(debugMode, OUTPUT(indCriminalData, NAMED('indCriminalData')));
     IF(debugMode, OUTPUT(indBusAssoc, NAMED('indBusAssoc')));
+    IF(debugMode, OUTPUT(indIDRisk, NAMED('indIDRisk')));
     IF(debugMode, OUTPUT(indReportData, NAMED('indReportData')));
     IF(debugMode, OUTPUT(indKRI, NAMED('indKRI')));
 

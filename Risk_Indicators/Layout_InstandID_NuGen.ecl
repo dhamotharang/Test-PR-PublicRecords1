@@ -1,7 +1,4 @@
-﻿/*2016-05-21T00:42:10Z (Kevin Huls)
-Automated reinstate from 2016-05-19T17:50:17Z
-*/
-import models, riskwise, iesp;
+﻿import models, riskwise, iesp,risk_indicators;
 
 r	:= risk_indicators.Layout_Desc;
 
@@ -15,9 +12,10 @@ RECORD, MAXLENGTH(24100)
 // field 2: transaction id assigned by us
 	unsigned6 transaction_id;
 // field 3-8: consumer id verification
-	STRING20 verfirst;
-	STRING20 verlast;
-	STRING65 veraddr;
+  STRING20 verfirst;
+  STRING20 vermiddle;
+  STRING20 verlast;
+  STRING65 veraddr;
 	// parsed verified address
 	STRING10 VerPrimRange;
 	STRING2  VerPreDir;
@@ -39,6 +37,9 @@ RECORD, MAXLENGTH(24100)
 	STRING1 verify_addr;
 	STRING1 verify_dob;
 	STRING1 valid_ssn;
+	STRING50 VerifiedEmail;
+
+
 // field 9
 	INTEGER1 NAS_Summary;
 // field 10
@@ -50,7 +51,7 @@ RECORD, MAXLENGTH(24100)
 	INTEGER1 additional_score1;
 	INTEGER1 additional_score2;
 // field 14-19: risk indicators
-	DATASET(layouts.layout_desc_plus_seq) ri {MAXCOUNT(iesp.Constants.FI.MaxCVIRiskIndicators)};												
+	DATASET(Risk_Indicators.layouts.layout_desc_plus_seq) ri {MAXCOUNT(iesp.Constants.FI.MaxCVIRiskIndicators)};												
 // field 19-22: potential follow-up actions
 	DATASET(r) fua {maxcount(4)};
 // field 23-27
@@ -67,6 +68,7 @@ RECORD, MAXLENGTH(24100)
 	STRING2  CorrectedPostDir;
 	STRING10 CorrectedUnitDesignation;
 	STRING8  CorrectedSecRange;
+	STRING20 corrected_dl;
 // field 27-28: area code split
 	STRING3 area_code_split;			
 	STRING8 area_code_split_date;
@@ -95,10 +97,11 @@ RECORD, MAXLENGTH(24100)
 // field 38-54: chronological address history
 	// 38-44: current info
 	STRING20 current_fname;
+	STRING20 current_mname;
 	STRING20 current_lname;
-	DATASET(Layout_AddressHistory) Chronology {maxcount(3)};
+	DATASET(Risk_Indicators.Layout_AddressHistory) Chronology {maxcount(3)};
 // field 55-60: additional last names
-	DATASET(Layout_LastNames) Additional_Lname  {maxcount(3)};
+	DATASET(Risk_Indicators.Layout_LastNames) Additional_Lname  {maxcount(3)};
 // field 61-59 watchlists
 	STRING60 Watchlist_Table;
 	STRING120 Watchlist_Program;
@@ -129,7 +132,7 @@ RECORD, MAXLENGTH(24100)
 	string8 deceasedDOB := '';
 	string15 deceasedFirst := '';
 	string20 deceasedLast := '';
-	dataset(layouts.layout_watchlists_plus_seq) watchlists {maxcount(7)};	
+	dataset(Risk_Indicators.layouts.layout_watchlists_plus_seq) watchlists {maxcount(7)};	
 	string1 passportValidated := '';
 	string44 PassportUpperLine := '' ;
 	string44 PassportLowerLine := '' ;
@@ -146,7 +149,7 @@ RECORD, MAXLENGTH(24100)
 	STRING1 InstantIDVersion := '';
 	
 	STRING128 cviCustomScore_name := '';
-  DATASET(layouts.layout_desc_plus_seq) cviCustomScore_ri {MAXCOUNT(iesp.Constants.FI.MaxCVIRiskIndicators)};                                                                                                                                                                                     
+  DATASET(Risk_Indicators.layouts.layout_desc_plus_seq) cviCustomScore_ri {MAXCOUNT(iesp.Constants.FI.MaxCVIRiskIndicators)};                                                                                                                                                                                     
   DATASET(r) cviCustomScore_fua {maxcount(4)};
 
 	//new for Emerging Identities
@@ -168,5 +171,11 @@ RECORD, MAXLENGTH(24100)
    	unsigned2 	royalty_count_insurance; 			
    	unsigned2 	non_royalty_count_insurance;  
 		string20 		count_entity_insurance := ''; 
+   
+  BOOLEAN  BureauDeleted:=false ;
+  BOOLEAN  ITINExpired := false;
+  BOOLEAN  IsPhoneCurrent := false;
+  STRING2 PhoneLineDescription  := '';
+  STRING2 PhoneLineType  := '';
 
 END;

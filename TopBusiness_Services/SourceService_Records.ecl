@@ -1,11 +1,11 @@
 ﻿//NOTE: The coding in this attribute needs to be kept in sync with the datasets in
 //      iesp.topbusinesssourcedoc.t_TopBusinessSourceDocRecord
 
-import BIPV2, iesp, doxie;
+import BIPV2, Iesp, doxie;
 
 export SourceService_Records(
 	dataset(TopBusiness_Services.SourceService_Layouts.InputLayout) indata,
-	doxie.IDataAccess mod_access,
+	Doxie.IDataAccess mod_access,
 	TopBusiness_Services.SourceService_Layouts.OptionsLayout inoptions) := function
 
 	FETCH_LEVEL := inoptions.fetch_Level;
@@ -41,14 +41,16 @@ export SourceService_Records(
 	//
 	ds_empty_bhKfetchCall := dataset([],BIPV2.Key_BH_Linking_Ids.kfetchOutRec);
 	other_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptOther(source));
-	ds_linkids_only := PROJECT(other_source_docids,TRANSFORM(BIPV2.IDlayouts.l_xlink_ids,
+	ds_linkids_only := PROJECT(other_source_docids,TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
 																		SELF := LEFT,
 																		SELF := []));
-	bhRecs := IF (EXISTS(ds_linkids_only),
-	             BIPV2.Key_BH_Linking_Ids.kfetch(ds_linkids_only,FETCH_LEVEL,
-	                      ,,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit,TRUE)
-								,ds_empty_bhKfetchCall);
-	other_docs := CHOOSEN(TopBusiness_Services.OtherSource_Records(other_source_docids,inoptions,TRUE,bhRecs)
+	
+  bhrecs_kfetch := BIPV2.Key_BH_Linking_Ids.kfetch2(ds_linkids_only, FETCH_LEVEL,
+	                      ,,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit, TRUE,,,, mod_access);
+  bhRecs := IF (EXISTS(ds_linkids_only)
+	              , PROJECT(bhrecs_kfetch, BIPV2.Key_BH_Linking_Ids.kfetchOutRec)
+								, ds_empty_bhKfetchCall);
+	other_docs := CHOOSEN(TopBusiness_Services.OtherSource_Records(other_source_docids, inoptions, TRUE, bhRecs, mod_access)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_OTHER_GROUP);
   other_prepared := PROJECT(other_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),

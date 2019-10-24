@@ -1,21 +1,20 @@
 ﻿//Risk_Indicators.iid_common_function
 
-import didville,doxie,FCRA,header,header_quick,header_SlimSort,watchdog,ut,DID_Add,address,
-       gong,drivers,mdr,riskwise,suppress;
+import emailv2_services,gateway,email_data,risk_indicators;
 
 export iid_common_function(grouped DATASET(risk_indicators.Layout_Output) with_did, unsigned1 dppa, unsigned1 glb, boolean isUtility=false, 
 							boolean ln_branded, boolean suppressNearDups=false, 
 							boolean isFCRA=false, unsigned1 BSversion=1, 
 							boolean runSSNCodes=true, boolean runBestAddrCheck=true,
-							string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel,
-							string50 DataRestriction=iid_constants.default_DataRestriction, 
+							string10 ExactMatchLevel=risk_indicators.iid_constants.default_ExactMatchLevel,
+							string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction, 
 							string10 CustomDataFilter='',
-							dataset(layouts.Layout_DOB_Match_Options) DOBMatchOptions,
+							dataset(risk_indicators.layouts.Layout_DOB_Match_Options) DOBMatchOptions,
 							unsigned2 EverOccupant_PastMonths,
 							unsigned4 EverOccupant_StartDate,
 							unsigned8 BSOptions, 
-							unsigned3 LastSeenThreshold = iid_constants.oneyear,
-							string50 DataPermission=iid_constants.default_DataPermission
+							unsigned3 LastSeenThreshold = risk_indicators.iid_constants.oneyear,
+							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission
 							) :=
 FUNCTION
 
@@ -77,6 +76,68 @@ with_best_addr := risk_indicators.iid_check_best(with_hhid_summary, with_ssn_fla
 
 common := if(runBestAddrCheck or bsversion >=50, with_best_addr, with_ssn_flags);
 
-RETURN common;
+valid_email_inputs := if(~isFCRA,common(did<>0 and trim(email_address)<>''));  // only send the transactions with a populated email address and populated DID
+ret_email := Ungroup(project(valid_email_inputs, transform(risk_indicators.Layout_Input, self.did := left.did, 
+             self.email_address := left.email_address, self.seq := left.seq, self := [])));
+email_in:= Project(ret_email,transform(EmailV2_Services.Layouts.batch_in_rec,
+                                      self.email:=trim(StringLib.StringToUpperCase(left.email_address)),
+                                      self.email_username:=email_data.Fn_Clean_Email_Username(left.email_address),
+                                      self.email_domain:=email_data.Fn_Clean_Email_Domain(left.email_address),
+                                      self:=left));
+
+in_email_mod := Module(EmailV2_Services.IParams.EmailParams);
+    EXPORT UNSIGNED2  PenaltThreshold      := EmailV2_Services.Constants.Defaults.PenaltThreshold;  
+    EXPORT UNSIGNED  MaxResultsPerAcct    := EmailV2_Services.Constants.Defaults.MaxResultsPerAcct;  
+    EXPORT BOOLEAN   IncludeHistoricData  := TRUE; 
+    EXPORT BOOLEAN   RequireLexidMatch    := FALSE;  
+    EXPORT UNSIGNED1  EmailQualityRulesMask := 0;
+    EXPORT BOOLEAN   RunDeepDive          := FALSE;  
+    EXPORT STRING    SearchType :='EIA';
+    EXPORT STRING    RestrictedUseCase := EmailV2_Services.Constants.RestrictedUseCase.Standard; // for the purpose of email filtering by source as needed
+    EXPORT STRING    BVAPIkey := '';   
+    EXPORT UNSIGNED  MaxEmailsForDeliveryCheck := EmailV2_Services.Constants.Defaults.MaxEmailsToCheckDeliverable;   //max number of result email addresses per account to send to gateway for delivery check
+    EXPORT BOOLEAN   CheckEmailDeliverable := FALSE;  // option  for whether to use external gateway call to check if email address deliverable
+    EXPORT BOOLEAN   KeepUndeliverableEmail := TRUE;
+    EXPORT DATASET (Gateway.Layouts.Config) gateways := DATASET ([], Gateway.Layouts.Config);  // to check delivery status
+END;	
+	
+email_search_results := EmailV2_Services.Functions.getEmaildata(email_in,in_email_mod,EmailV2_Services.Constants.SearchBy.ByEmail);
+
+mylayout_output := record
+    unsigned seq;
+    unsigned did;
+    string email_address;
+    string VerifiedEmail;  
+end;
+
+with_email_verification := join(ret_email, email_search_results, left.seq=right.seq,
+      transform(mylayout_output,
+      self.seq := left.seq;
+      self.did := left.did; 
+      self.email_address:=left.email_address;
+      self.VerifiedEmail := if(left.did=right.did, left.email_address, '');  
+	     ),left outer);
+  
+mylayout_output emailroll (mylayout_output l,mylayout_output r):=TRANSFORM
+    self:=l;
+END;
+
+sorted_email:= group(sort(with_email_verification,seq,-VerifiedEmail),seq);		
+rolled_email:= rollup(sorted_email, left.seq=right.seq, emailroll(left,right));
+ 
+ Risk_indicators.layout_output cleanemail(common l, rolled_email r):=transform
+  self.VerifiedEmail:=r.VerifiedEmail;
+  self:=l;
+END;
+ 
+join_rolled_email:=join(common, rolled_email,left.seq=right.seq,cleanemail(left,right),left outer);
+output_common:= group(join_rolled_email,seq);
+// output(common,named('common'));
+// output(ret_email,named('ret_email'));
+// output(email_in,named('email_in'));
+// output(email_search_results,named('email_search_results'));
+// output(with_email_verification,named('with_email_verification'));
+// output(output_common,named('output_common'));
+return output_common;
 
 END;

@@ -1,4 +1,4 @@
-import ut, risk_indicators, address, RiskWise, RiskWiseFCRA, std;
+﻿import ut, risk_indicators, RiskWise, RiskWiseFCRA, std;
 
 export FD5609_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean inCalif) := 
 
@@ -243,7 +243,9 @@ Risk_Indicators.Layout_Output into_layout_output(clam le) := transform
 	self.nxx_type := le.phone_verification.telcordia_type;
 	self := le.iid;
 	self := le.shell_input;
-	self := le;
+	self := le;	
+	self := [];
+
 end;
 iid := project(clam, into_layout_output(left));
 
