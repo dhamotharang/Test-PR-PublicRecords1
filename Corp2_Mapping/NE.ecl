@@ -432,7 +432,8 @@ EXPORT NE  := MODULE;
 																									corp_vendor_Invalid 														<> 0 or
 																									corp_state_origin_Invalid 											<> 0 or
 																									corp_process_date_Invalid 											<> 0 or
-																									corp_orig_sos_charter_nbr_Invalid 								<> 0 or
+																									corp_orig_sos_charter_nbr_Invalid 						  <> 0 or
+																									corp_legal_name_Invalid 												<> 0 or
 																									corp_ln_name_type_cd_Invalid 										<> 0 or
 																									corp_filing_date_Invalid 												<> 0 or
 																									corp_status_cd_Invalid 													<> 0 or
@@ -461,6 +462,7 @@ EXPORT NE  := MODULE;
 																									corp_state_origin_Invalid 											= 0 and
 																									corp_process_date_Invalid 											= 0 and
 																									corp_orig_sos_charter_nbr_Invalid								= 0 and
+																									corp_legal_name_Invalid 												= 0 and
 																									corp_ln_name_type_cd_Invalid 									  = 0 and
 																									corp_filing_date_Invalid 												= 0 and
 																									corp_status_cd_Invalid 													= 0 and
@@ -481,6 +483,7 @@ EXPORT NE  := MODULE;
 
 		Main_FailBuild	:= map( corp2_mapping.fCalcPercent(count(Main_N.ExpandedInFile(corp_key_invalid<>0)),count(Main_N.ExpandedInFile),false) 										> Scrubs_corp2_mapping_NE_Main.Threshold_Percent.CORP_KEY										   => true,
 														corp2_mapping.fCalcPercent(count(Main_N.ExpandedInFile(corp_orig_sos_charter_nbr_invalid<>0)),count(Main_N.ExpandedInFile),false) 	> Scrubs_corp2_mapping_NE_Main.Threshold_Percent.CORP_ORIG_SOS_CHARTER_NBR 	   => true,
+														corp2_mapping.fCalcPercent(count(Main_N.ExpandedInFile(corp_legal_name_invalid<>0)),count(Main_N.ExpandedInFile),false) 						> Scrubs_corp2_mapping_NE_Main.Threshold_Percent.CORP_LEGAL_NAME 						   => true,
 														false
 													);
 						
@@ -544,7 +547,6 @@ EXPORT NE  := MODULE;
 																									corp_process_date_Invalid		    <> 0 or
 																									corp_sos_charter_nbr_Invalid    <> 0 or
 																									event_filing_cd_Invalid 			  <> 0 or
-																									corp_legal_name_Invalid 			  <> 0 or
 																									InternalField1_Invalid          <> 0 
 																									);
 																																						
@@ -554,7 +556,6 @@ EXPORT NE  := MODULE;
 																									corp_process_date_Invalid				= 0 and
 																									corp_sos_charter_nbr_Invalid 		= 0 and
 																									event_filing_cd_Invalid 				= 0 and 
-																									corp_legal_name_Invalid 			  = 0 or
 																									InternalField1_Invalid          = 0	
 																									);
    
