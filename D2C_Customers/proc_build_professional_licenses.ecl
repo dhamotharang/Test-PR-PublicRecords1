@@ -1,13 +1,11 @@
 ﻿import std, PromoteSupers, prof_licensev2, Watchdog, D2C;
 
 /********* PROFESSIONAL_LICENSES **********/
-
-Wdog := distribute(Watchdog.File_Best_nonglb(adl_ind = 'CORE'), hash(did));
-pl := prof_licensev2.File_ProfLic_Base((unsigned6)did > 0);//Unrestricted
+pl := prof_licensev2.File_ProfLic_Base((unsigned6)did > 0, D2C_Customers.SRC_Allowed(17, Vendor));//Unrestricted
 
 EXPORT proc_build_professional_licenses(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   ds := project(pl, transform(layouts.professional_licenses,
+   ds := project(pl, transform(D2C_Customers.layouts.rProfessional_Licenses,
             self.LexID            := (unsigned6)left.did;
             self.License_Number   := left.orig_license_number;
             self.License_State    := left.Source_St;
@@ -19,22 +17,15 @@ EXPORT proc_build_professional_licenses(unsigned1 mode, string8 ver, string20 cu
             ));
    
    fullDS := ds;
-   coreDS := join(distribute(ds, hash(LexID)), Wdog, left.LexID = right.did, transform(left), local);
+   coreDS := join(distribute(ds, hash(LexID)), distribute(D2C_Customers.Files.coresDS, hash(did)), left.LexID = right.did, transform(left), local);
    coreDerogatoryDS := join(coreDS, distribute(Files.derogatoryDS, did), left.LexID = right.did, transform(left), local);
    
-   outDS := map( mode = 1 => fullDS,          //FULL
-                 mode = 2 => coreDS,          //QUARTERLY
-                 mode = 3 => coreDerogatoryDS //MONTHLY
+   inDS := map(mode = 1 => fullDS,          //FULL
+               mode = 2 => coreDS,          //QUARTERLY
+               mode = 3 => coreDerogatoryDS //MONTHLY
                );
    
-   sMode := map(Mode = 1 => 'full',
-                Mode = 2 => 'core',
-                Mode = 3 => 'derogatory',
-                ''
-                );
-                
-   PromoteSupers.MAC_SF_BuildProcess(outDS,'~thor_data400::output::d2c::' + sMode + '::professional_licenses',doit,2,,true,ver);
-   return if(Mode not in [1,2,3], output('professional_licenses - INVALID MODE - ' + Mode), doit);
-
+   res := MAC_WriteCSVFile(inDS, mode, ver, 'professional_licenses');
+   return res;
 
 END;
