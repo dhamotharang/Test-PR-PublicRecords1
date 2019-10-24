@@ -17,6 +17,7 @@ export CollectionReportTier2Service() := macro
     self._Header.Status := 0;
     self._Header.Message := '';
     self._Header.Exceptions := dataset([], iesp.share.t_WsException);
+    self._Header.Disclaimers := service_header.Disclaimers;
     self.Result.InputEcho := reportby;
     self.Result.LexID := (STRING) lexID;
     self.Result.LNPID := ''; //??
