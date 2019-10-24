@@ -1,7 +1,7 @@
 ﻿/*2014-10-03T23:55:34Z (ananth_p venkatachalam)
 Move to new module
 */
-import lib_workunitservices,STD,ut, dops;
+import lib_workunitservices,STD,ut, dops,_Control;
 EXPORT PrepForYogurt(string location, string environment, string last_wuid = '') := module
 
 	shared filedate := thorbackup.constants.yogurt().enddate+thorbackup.constants.yogurt().l_time : independent;
@@ -122,12 +122,13 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 	export GetYogurtWUIDs := function
 	
 		wulist := lib_workunitservices.WorkunitServices.workunitlist
-														(lowwuid := getMaxWU // get the WU that is 20 days old from now (OR)
+														(lowwuid := trim(getMaxWU) // get the WU that is 20 days old from now (OR)
 																									// if the WU in the list from file is older than 20 days
 																									// whichever is older
 															, highwuid := thorbackup.constants.yogurt().endwu)
 															(regexfind('yogurt',stringlib.StringToLowerCase(job)) and 
-																~( job = 'Prep Yogurt Copy' 
+																~( job = STD.System.Job.Name() 
+																	
 																	//or wuid = maxWU 
 																	or state in ['running','blocked'] ));
 																	/*and
@@ -139,7 +140,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 	
 	
 		lib_workunitservices.wsworkunitrecord getmodified(wulist l) := transform
-			self.modified := thorbackup.GetWUModified(thorbackup.Constants.esp.bocaprodthor,l.wuid);
+			self.modified := regexreplace('[-:ZT]',STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right))(trim(id,left,right) = 'Finished' and application = '')[1].time,'');
 			self := l;
 		end;
 		
@@ -366,8 +367,8 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																	);
 																
 	export SendFileListToYogurtThor := sequential(
-																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestoprocess).copyfilecmd),
-																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestodelete).copyfilecmd)
+																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestoprocess,true).copyfilecmd),
+																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestodelete,true).copyfilecmd)
 																					);
 	
 	export ReSubmit() := function
@@ -410,7 +411,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 													fileservices.deletelogicalfile('~yogurt::job::running'),
 													ReSubmit(),
 													fileservices.sendemail(thorbackup.constants.yogurt().emailerrors,
-			environment + ' ' + location + ' Yogurt Prep Process failed on http://prod_esp:8010 - ' + filedate,
+			environment + ' ' + location + ' Yogurt Prep Process failed on http://'+_Control.Config.LocalEsp+':8010 - ' + filedate,
 			'workunit: ' + workunit + '\n re-scheduled'+ '\r\n' + failmessage
 																	,
 																	,

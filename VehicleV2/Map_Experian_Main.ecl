@@ -47,10 +47,6 @@ transform
 																					pInput.vina_body_style_desc,
 																					pInput.orig_body_desc
 																				);
-	
-	//Added for CCPA-103
-	// self.global_sid                 := 0;
-	// self.record_sid                 := 0;
 	self														:=	pInput;
 end;
  

@@ -276,9 +276,9 @@ end;
 soapReturn := soapcall(
 		Orbit3SOA.EnvironmentVariables.serviceurlprod,
 		'GetDataViewData',
-		layouts.InputRecord,
+		layouts.rRequestCapsule,
 		dataset(layouts.Orbit),
-		xpath('GetDataViewDataResponse/GetDataViewDataResult/DataRows/DataRow/RowData'),
+		xpath('GetDataViewDataResponse/GetDataViewDataResult/Result/RecordResponseGetDataViewData/Result/DataRows/DataRow/RowData'),//Result/RecordResponseGetDataViewData/Result/DataRows/DataRow/RowData'),
 		namespace(Orbit3SOA.EnvironmentVariables.namespace),
 		literal,
 		soapaction(Orbit3SOA.EnvironmentVariables.soapactionprefix + 'GetDataViewData')

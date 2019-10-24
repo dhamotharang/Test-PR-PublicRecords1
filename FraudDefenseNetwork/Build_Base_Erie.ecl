@@ -82,7 +82,7 @@ export Build_Base_Erie (
             end;
 
           ErieCleanName_Indiv := project(ErieCleanName_cp, CName(LEFT));
-          ErieCleanName_Indiv_dist := distribute(ErieCleanName_Indiv, hash(claimnumber, cleaned_name.fname, cleaned_name.lname, 
+          ErieCleanName_Indiv_dist := distribute(ErieCleanName_Indiv, hash32(claimnumber, cleaned_name.fname, cleaned_name.lname, 
                                       typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, 
                                       cleaned_name_cp.lname));
           ErieCleanName_Indiv_rmDup := dedup(sort(ErieCleanName_Indiv_dist, claimnumber, cleaned_name.fname, cleaned_name.lname, 
@@ -98,7 +98,7 @@ export Build_Base_Erie (
           self.cleaned_name_cp.lname := ut.cleancompany(left.name_last);
           self := left));
                                         
-          ErieCleanName_Business_dist := distribute(ErieCleanName_Business, hash(claimnumber, cleaned_name.lname, typeofloss, dateofloss, 
+          ErieCleanName_Business_dist := distribute(ErieCleanName_Business, hash32(claimnumber, cleaned_name.lname, typeofloss, dateofloss, 
                                          dateio, findings, responsibleparty, policynumber, cleaned_name_cp.lname));
           ErieCleanName_Busi_rmDup := dedup(sort(ErieCleanName_Business_dist, claimnumber, cleaned_name.lname, typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.lname, -ffid, local),
                                       claimnumber, cleaned_name.lname, typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.lname, local);
@@ -132,8 +132,8 @@ export Build_Base_Erie (
           Mac_BusinessIDAppend(ErieWithIDL, ErieWithBDID);
 
   //updates
-    ErieUpdate := distribute(ErieWithBDID, hash(claimnumber, cleaned_name.fname, cleaned_name.lname, typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname, clean_business_name));
-    ErieBase := distribute(inBaseERIE, hash(claimnumber, cleaned_name.fname, cleaned_name.lname, typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname, clean_business_name));
+    ErieUpdate := distribute(ErieWithBDID, hash32(claimnumber, cleaned_name.fname, cleaned_name.lname, typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname, clean_business_name));
+    ErieBase := distribute(inBaseERIE, hash32(claimnumber, cleaned_name.fname, cleaned_name.lname, typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname, clean_business_name));
 
   //Change Capture
     FraudDefenseNetwork.Layouts.Base.Erie getSrcRid(ErieUpdate l, ErieBase r) := 
@@ -167,7 +167,14 @@ export Build_Base_Erie (
                       local);
 
      ut.MAC_Append_Rcid (dBase_with_rids, source_rec_id, pDataset_rollup);
-     tools.mac_WriteFile(Filenames(pversion).Base.Erie.New, pDataset_rollup, Build_Base_File);
+     
+     dBase_RecordID := Project(pDataset_rollup, transform(recordof(pDataset_rollup),
+                                                          RecordID := Constants().ErieRecIDSeries + left.source_rec_id;
+                                                          self.record_sid := RecordID;
+                                                          self := left;
+                                                          )); 
+     
+     tools.mac_WriteFile(Filenames(pversion).Base.Erie.New, dBase_RecordID, Build_Base_File);
 
   //Return
     export full_build := sequential(

@@ -43,7 +43,7 @@ export Build_Base_CFNA (
 
   //Rollup Update and previous base
     Pcombined := if(UpdateCFNA, inBaseCFNA + CFNAWithIDL, CFNAWithIDL);
-    pDataset_Dist := distribute(Pcombined, hash(Application_ID));
+    pDataset_Dist := distribute(Pcombined, hash32(Application_ID));
     pDataset_sort := sort(
                             pDataset_Dist,
                             customer_ID,
@@ -150,9 +150,16 @@ export Build_Base_CFNA (
                                 RollupUpdate(left, right), local
                              );
 
-    tools.mac_WriteFile(Filenames(pversion).Base.CFNA.New, pDataset_rollup, Build_Base_File);
+    dBase_RecordID := Project(pDataset_rollup, transform(recordof(pDataset_rollup),
+                                                         RecordID := Constants().CFNARecIDSeries + left.source_rec_id;
+                                                         self.record_sid := RecordID;
+                                                         self := left;
+                                                        ));                          
 
-  //Return
+    tools.mac_WriteFile(Filenames(pversion).Base.CFNA.New, dBase_RecordID, Build_Base_File);
+
+
+   //Return
     export full_build := sequential(
                                      Build_Base_File, Promote(pversion).buildfiles.New2Built
                                    );

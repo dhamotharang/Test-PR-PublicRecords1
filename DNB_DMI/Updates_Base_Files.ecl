@@ -1,4 +1,4 @@
-﻿import _control, CCPA, std, tools;
+﻿import _control, MDR, std, tools;
 
 export Updates_Base_Files(
 
@@ -28,7 +28,7 @@ function
 
 	dIngest_Companies					:= Ingest_Companies				(dActives							,pBaseCompaniesFile	).AllRecords_NoTag;
 	dProcess_Deletes					:= Process_Deletes				(dDeletes							,dIngest_Companies		);
-	addGlobalSID							:= CCPA.macGetGlobalSID(dProcess_Deletes, 'DNB', '', 'global_sid'); //DF-25978: Add Global_SID to Companies
+	addGlobalSID							:= MDR.macGetGlobalSid(dProcess_Deletes, 'DNB', '', 'global_sid'); //DF-25978: Add Global_SID to Companies
 	
 	dAppend_AID								:= Append_AID.fall				(addGlobalSID														);
 		
@@ -59,7 +59,7 @@ function
 																		right outer
 																		);			
 																		
-	addGlobalSID2							:= CCPA.macGetGlobalSID(dPropagatedBDID, 'DNB', '', 'global_sid'); //DF-25978: Add Global_SID to Contacts
+	addGlobalSID2							:= MDR.macGetGlobalSid(dPropagatedBDID, 'DNB', '', 'global_sid'); //DF-25978: Add Global_SID to Contacts
 	
 	tools.mac_WriteFile(Filenames(pversion).base.Companies.new	,dAppendBdids			,Build_Companies_File	,pShouldExport := false);
 	tools.mac_WriteFile(Filenames(pversion).base.Contacts.new		,addGlobalSID2	,Build_Contacts_File	,pShouldExport := false);

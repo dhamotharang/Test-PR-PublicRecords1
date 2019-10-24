@@ -1,5 +1,5 @@
 ﻿Import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
-	Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID, STD, CCPA;
+	Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID, STD, MDR;
 	
 	EXPORT Update_Base (string filedate, boolean pUseProd = false) := function
 	//standardize input
@@ -37,7 +37,7 @@
 
 	std_input := project(input, tMapping(LEFT));
 	
-	gStd_input:= CCPA.macGetGlobalSID(std_input, 'InfutorNARC', '', 'global_sid');
+	gStd_input:= MDR.macGetGlobalSid(std_input, 'InfutorNARC', '', 'global_sid');
 
 	NID.Mac_CleanParsedNames(gStd_input, cleanNames0
 												, firstname:=orig_FNAME,middlename:=orig_mname,lastname:=orig_LNAME,namesuffix:=orig_SUFFIX

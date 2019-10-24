@@ -1,4 +1,4 @@
-﻿import _control, CCPA, Std, ut;
+﻿import _control, MDR, Std, ut;
 
 iu_infiles := PROJECT(			
                       dataset(CanadianPhones.thor_cluster +'base::canadianWP',
@@ -54,7 +54,7 @@ dd_infiles:= dedup(sort(distribute(iu_infiles+dd_ax,hash(phonenumber))
 cmbnd_files := dd_infiles + ax_infiles;
 
 //Add Global_SID
-addGlobalSID:= CCPA.macGetGlobalSID(cmbnd_files,'CanadianPhones', 'source_file', 'global_sid'); //DF-25404
+addGlobalSID:= MDR.macGetGlobalSID(cmbnd_files,'CanadianPhones', 'source_file', 'global_sid'); //DF-25404
 
 //additional axciom records are added back in and later rolled up.
 

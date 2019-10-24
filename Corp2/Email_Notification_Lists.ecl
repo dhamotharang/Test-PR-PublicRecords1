@@ -11,6 +11,7 @@ module
 											+ emailaddressep +  'saritha.myana@lexisnexisrisk.com'
 											+ emailaddressep +  'rosemary.murphy@lexisnexisrisk.com'
 											+ emailaddressep +  'lucinda.sibille@lexisnexisrisk.com'
+											+ emailaddressep +  'lindsey.decot@lexisnexisrisk.com'
 											+ emailaddressep +	_control.MyInfo.EmailAddressNotify
 											;
 											
@@ -18,7 +19,8 @@ module
 											+ emailaddressep +  'kevin.reeder@lexisnexisrisk.com'
 											+ emailaddressep +	'gregory.rose@lexisnexisrisk.com'
 											+ emailaddressep +	'julie.ellison@lexisnexisrisk.com' 		
-											+ emailaddressep +	'rosemary.murphy@lexisnexisrisk.com' 
+											+ emailaddressep +	'rosemary.murphy@lexisnexisrisk.com'
+											+ emailaddressep +  'lindsey.decot@lexisnexisrisk.com'
 											+ emailaddressep +	_control.MyInfo.EmailAddressNotify
 											;
 											

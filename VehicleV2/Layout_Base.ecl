@@ -263,7 +263,7 @@ export	Party_CCPA	:=record
 		unsigned4 global_sid := 0;
 		unsigned8 record_sid := 0;
 		//Added for DF-25578
-		string30 raw_name := '';
+		string30 raw_name;
    end;
 	 
 	export	Party_AID	:=
@@ -273,6 +273,7 @@ export	Party_CCPA	:=record
 		string1					Append_AddressInd;
 		string150				Append_PrepAddr1;
 		string100				Append_PrepAddr2;
+		string30        raw_name;
 		AID.Common.xAID	Append_RawAID	:=	0;
 		
 		// Clean mail and physical addresses

@@ -43,8 +43,9 @@ functionmacro
        if(pShouldCheckfullKeys    = true ,outputBIPV2Fullkeys   )
       ,if(pShouldCheckWeeklyKeys  = true ,outputBIPV2Weeklykeys )
        // BIPV2.CommonBase.updateSuperfiles(f_out) //update base file
-      ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).new2base  //update commonbase file
+      // ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).new2base  //update commonbase file
       ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).built2qa  //update commonbase file
+      ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Clean_Common_Base.dall_filenames,pnGenerations := 1).built2qa  //update clean commonbase file
       ,BIPV2_Build.Promote().Built2QA //this includes everything
       ,UpdateFullKeysDops
       ,UpdateWeeklyKeysDops
@@ -55,6 +56,7 @@ functionmacro
       ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster44,pDelete := true).Cleanup  )
       ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster36,pDelete := true).Cleanup  )
       ,iff(pPerformCleanup        = true                            ,BIPV2_Build.Promote(,'^(?!.*?(wkhistory|precision|space|dashboard).*).*$',pDelete := true).Cleanup )
+      ,iff(pPerformCleanup        = true                            ,BIPV2_Build.Promote(,,,false,BIPV2.Filenames(pversion).Clean_Common_Base.dall_filenames,pnGenerations := 1,pDelete := true).Cleanup )
       // ,BIPV2_Build.Build_Space_Usage(pversion,pType := 3)
     )
     ,sequential(
