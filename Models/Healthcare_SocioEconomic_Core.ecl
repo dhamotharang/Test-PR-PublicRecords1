@@ -485,7 +485,7 @@ export Healthcare_SocioEconomic_Core(Socio_TC_Model_Version_in, SuppressResultsF
 	// output(Results_OPTION_1M, NAMED('Results_OPTION_1M'));
 	Results_OPTION_2M := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMA_Score_RD(Results_OPTION_2_SE_RS_ADL, M0_SeMA_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
 	// output(Results_OPTION_2M, NAMED('Results_OPTION_2M'));
-	Results_OPTION_3M := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMA_Score_RD(Results_OPTION_3_SE_HS_ADL, M0_SeMA_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
+	Results_OPTION_3M := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMA_Score_RD(Results_OPTION_3_SE_TC_FINAL, M0_SeMA_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
 	// output(Results_OPTION_3M, NAMED('Results_OPTION_3M'));
 	Results_OPTION_4M := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMA_Score_RD(Results_OPTION_4_SE_HS_RS_ADL, M0_SeMA_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
 	// output(Results_OPTION_4M, NAMED('Results_OPTION_4M'));
@@ -501,7 +501,7 @@ export Healthcare_SocioEconomic_Core(Socio_TC_Model_Version_in, SuppressResultsF
 	Results_OPTION_O := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMO_Score_RD(Batch_Inp_LexID_ADLScore, SeMO_V1_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
 	Results_OPTION_1O := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMO_Score_RD(Results_Attributes_Only_ADL, SeMO_V1_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
 	Results_OPTION_2O := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMO_Score_RD(Results_OPTION_2_SE_RS_ADL, SeMO_V1_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
-	Results_OPTION_3O := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMO_Score_RD(Results_OPTION_3_SE_HS_ADL, SeMO_V1_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
+	Results_OPTION_3O := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMO_Score_RD(Results_OPTION_3_SE_TC_FINAL, SeMO_V1_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
 	Results_OPTION_4O := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMO_Score_RD(Results_OPTION_4_SE_HS_RS_ADL, SeMO_V1_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
 	Results_OPTION_5O := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMO_Score_RD(Results_OPTION_5_SE_A_RS_ADL, SeMO_V1_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
 	Results_OPTION_6O := Models.Healthcare_SocioEconomic_Transforms_Core.Add_SEMO_Score_RD(Results_OPTION_6_SE_A_HS_ADL, SeMO_V1_Results_RD,Models.Layouts_Healthcare_Core.Final_Output_Layout);
@@ -520,7 +520,7 @@ export Healthcare_SocioEconomic_Core(Socio_TC_Model_Version_in, SuppressResultsF
 	/*----------  Mapping Options to various Results  ----------*/
 	validCoreResults := MAP(Options = '1' => Results_Attributes_Only_ADL,
 					Options = '2' => Results_OPTION_2_SE_RS_ADL,
-					Options = '3' => Results_OPTION_3_SE_HS_ADL,
+					Options = '3' => Results_OPTION_3_SE_TC_FINAL,
 					Options = '4' => Results_OPTION_4_SE_HS_RS_ADL,
 					Options = '5' => Results_OPTION_5_SE_A_RS_ADL,
 					Options = '6' => Results_OPTION_6_SE_A_HS_ADL,
