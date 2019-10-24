@@ -21,7 +21,7 @@ dsMajor := DATASET([
 {'R','MARKETING'},
 {'S','FINANCE'},
 {'T','MEDICINE'},
-{'U',''},		//UNCLASSIFIED
+{'U','UNCLASSIFIED'},
 {'V','CHIROPRACTIC'},
 {'W','ART'},
 {'X',''},
@@ -29,8 +29,6 @@ dsMajor := DATASET([
 {'Z','MANAGEMENT'}
 ], {STRING1 abbreviation, string18 major});
 dictMajor := DICTIONARY(dsMajor, {abbreviation => major});
-
-Wdog := distribute(Watchdog.File_Best_nonglb(adl_ind = 'CORE'), hash(did));
 
 EXPORT proc_build_students(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
@@ -47,21 +45,15 @@ EXPORT proc_build_students(unsigned1 mode, string8 ver, string20 customer_name) 
     ds := project(students_s, AddStudent(left))(COLLEGE_NAME<>'');	
 
     fullDS := ds;
-    coreDS := join(distribute(ds, hash(LexID)), Wdog, left.LexID = right.did, transform(left), local);
-    coreDerogatoryDS := join(coreDS, distribute(Files.derogatoryDS, did), left.LexID = right.did, transform(left), local);
+    coreDS := join(distribute(ds, hash(LexID)), distribute(D2C_Customers.Files.coresDS, hash(did)), left.LexID = right.did, transform(left), local);
+    coreDerogatoryDS := join(coreDS, distribute(D2C_Customers.Files.derogatoryDS, did), left.LexID = right.did, transform(left), local);
    
-    outDS := map( mode = 1 => fullDS,          //FULL
+    inDS := map( mode = 1 => fullDS,          //FULL
                  mode = 2 => coreDS,          //QUARTERLY
                  mode = 3 => coreDerogatoryDS //MONTHLY
                );
-   
-   sMode := map(Mode = 1 => 'full',
-                Mode = 2 => 'core',
-                Mode = 3 => 'derogatory',
-                ''
-                );
                 
-   PromoteSupers.MAC_SF_BuildProcess(outDS,'~thor_data400::output::d2c::' + sMode + '::students',doit,2,,true,ver);
-   return if(Mode not in [1,2,3], output('phones - INVALID MODE - ' + Mode), doit);
+   res := MAC_WriteCSVFile(inDS, mode, ver, 'students');
+   return res;
 
 END;
