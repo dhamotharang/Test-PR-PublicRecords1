@@ -2,7 +2,6 @@
 
 /********* RELATIVES **********/
 
-Wdog      := distribute(Watchdog.File_Best_nonglb, hash(did))(adl_ind = 'CORE');
 relatives := distribute(Relationship.key_relatives_v3(not(confidence IN ['NOISE','LOW'])), hash(did1));
 inf       := distribute(Infutor.file_infutor_best, hash(did));
 
@@ -18,7 +17,7 @@ fullDS := project(d2c_rel2, transform(lexid_pairs, self.lexid1 := left.did1, sel
          
 coreDS := join(
       distribute(d2c_rel2, hash(did1)),
-      Wdog,
+      distribute(D2C_Customers.Files.coresDS, hash(did)),
       left.did1 = right.did,
       transform(lexid_pairs, self.lexid1 := left.did1, self.lexid2 := left.did2),
       local) : INDEPENDENT;
@@ -115,6 +114,5 @@ EXPORT proc_build_relatives(unsigned1 mode, string8 ver, string20 customer_name)
    MAC_LINK_DIDs(doit, ds, sMode, ver);
    
    return if(Mode not in [1,2,3], output('relatives - INVALID MODE - ' + Mode), doit);
-
 
 END;

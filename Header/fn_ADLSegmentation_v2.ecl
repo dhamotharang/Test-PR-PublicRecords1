@@ -1,11 +1,12 @@
-import ut,doxie,header,mdr, header_services,PRTE2_Header;
+﻿// changed 10-4-19
+
+import ut,doxie,header,mdr, header_services,PRTE2_Header, suppress;
 
 export fn_ADLSegmentation_v2(dataset(header.Layout_Header) hdr_in, boolean filter_utility_z_recs=false)  := module
 
-
-  header_services.Supplemental_Data.mac_verify('adl_segment_inj.txt',header.Layout_Header, adl_in); // 
-  hdr_adl_in := adl_in();
-	hdr_full := distribute(hdr_in + hdr_adl_in,hash(did)) ; 
+	hdr_adl_in := header.regulatory.apply_ADL_Segment(hdr_in); 
+		
+	hdr_full := distribute(hdr_adl_in, hash(did)); 
  
   f_ := if(filter_utility_z_recs,hdr_full(src not in [mdr.sourceTools.src_ZUtilities,mdr.sourceTools.src_ZUtil_Work_Phone]),hdr_full);
 
