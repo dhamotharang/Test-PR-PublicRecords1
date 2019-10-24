@@ -1,41 +1,31 @@
-﻿import doxie_build, mdr, d2c, Watchdog, Infutor, SexOffender, doxie_files, BankruptcyV2, LiensV2, header, death_master;
+﻿import doxie_build, mdr, d2c, Watchdog, Infutor, SexOffender, doxie_files, BankruptcyV2, LiensV2, header, death_master, AutoStandardI,Suppress;
 
 EXPORT Files := MODULE
-
-    death := Header.File_DID_Death_MasterV2 ((integer)did <>0 and state_death_id=death_master.fn_fake_state_death_id(ssn,lname,dod8)) ; 
-    //crlf='SA' flags Direct records where the SSN was overlaid w/ one from the SSA
-    dist_death := distribute(death(crlf<>'SA'), hash(did));
-    shared dsDeath := dedup(sort(dist_death, did, -filedate, local), did, filedate, local);
- 
-    EXPORT coresDS := Header.key_ADL_segmentation(ind1 = 'CORE');
-    shared inf     := Infutor.file_infutor_best;
-    shared hdr     := Infutor.infutor_header;
     
-    EXPORT FullInfutorDS := join(
-      distribute(inf, hash(did)),
-      distribute(dsDeath, hash((unsigned6)did)),
-      left.did = (unsigned6)right.did,
-      transform({inf, unsigned4 Date_of_Death}, self.Date_of_Death := (unsigned4)right.dod8; self := left;),
-      local);
-    
-    EXPORT FullHdrDS := hdr;
+    infutor_best := Infutor.file_infutor_best;
 
-    shared core_and_infutor := join(
-      distribute(inf, hash(did)),
+    appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
+    Suppress.MAC_Suppress(infutor_best,pulled_ssn_infutor,appType,Suppress.Constants.LinkTypes.SSN,ssn);
+    Suppress.MAC_Suppress(pulled_ssn_infutor,cleaned_best_infutor,appType,Suppress.Constants.LinkTypes.DID,did);
+    EXPORT fullInfutorDS := cleaned_best_infutor;
+
+    infutor_hdr := Infutor.infutor_header;
+
+    appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
+    Suppress.MAC_Suppress(infutor_hdr,pulled_ssn_hdr,appType,Suppress.Constants.LinkTypes.SSN,ssn);
+    Suppress.MAC_Suppress(pulled_ssn_hdr,cleaned_best_hdr,appType,Suppress.Constants.LinkTypes.DID,did);    
+    EXPORT fullHdrDS     := cleaned_best_hdr;
+
+    EXPORT coresDS       := Header.key_ADL_segmentation(ind1 = 'CORE');  
+
+    EXPORT coreInfutorDS := join(
+      distribute(fullInfutorDS, hash(did)),
       distribute(coresDS, hash(did)),  // CORE - 248,957,730
       left.did = right.did,
       transform(left),
-      local);
-
-    EXPORT coreInfutorDS := join(
-      distribute(core_and_infutor, hash(did)),
-      distribute(dsDeath, hash((unsigned6)did)),
-      left.did = (unsigned6)right.did,
-      transform({core_and_infutor, unsigned4 Date_of_Death}, self.Date_of_Death := (unsigned4)right.dod8; self := left;),
-      local);
-   
+      local);   
     EXPORT coreHdrDS := join(
-      distribute(hdr, hash(did)),
+      distribute(fullHdrDS, hash(did)),
       distribute(coresDS, hash(did)),  // CORE - 248,957,730
       left.did = right.did,
       transform(left),
@@ -47,19 +37,9 @@ EXPORT Files := MODULE
     li    := LiensV2.key_liens_DID(did > 0);//Unrestricted
     
     EXPORT derogatoryDS := dedup(table(so, {(unsigned6)did}) + table(crims, {(unsigned6)did}) + table(bk, {did}) + table(li, {did}), all);
+    shared SetofderogatoryDS := set(derogatoryDS, did);
            
-    EXPORT coreInfutorDerogatoryDS := join(
-      distribute(coreInfutorDS, hash(did)),
-      distribute(derogatoryDS, hash(did)),
-      left.did = right.did,
-      transform(left),
-      local);
-   
-    EXPORT coreHdrDerogatoryDS := join(
-      distribute(coreHdrDS, hash(did)),
-      distribute(derogatoryDS, hash(did)),
-      left.did = right.did,
-      transform(left),
-      local);
+    EXPORT coreInfutorDerogatoryDS := coreInfutorDS(did in SetofderogatoryDS);
+    EXPORT coreHdrDerogatoryDS     := coreHdrDS(did in SetofderogatoryDS);
 
 END;

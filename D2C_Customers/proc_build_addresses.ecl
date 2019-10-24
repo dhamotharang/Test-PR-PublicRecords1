@@ -17,7 +17,7 @@ EXPORT proc_build_addresses(unsigned1 mode, string8 ver, string20 customer_name)
    end; 
 
    inDS  := project(ds, xf(left));
-   res   := MAC_WriteCSVFile(inDS, mode, ver, 'address_history');
+   res   := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 'address_history');
    return res;
 
 END;                                         
