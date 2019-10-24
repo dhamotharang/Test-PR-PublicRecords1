@@ -7,13 +7,13 @@ aircraft_reg  := faa.file_aircraft_registration_out((unsigned6)did_out > 0);
 aircraft_info := dataset('~thor_data400::base::faa_aircraft_info_built',FAA.layout_aircraft_info,flat);
 
 DESC_FIELDS := ['AIRCRAFT_CATEGORY_CODE', 'TYPE_AIRCRAFT', 'AIRCRAFT_WEIGHT'];
-codes := Codes.File_Codes_V3_In(field_name in DESC_FIELDS);
+sCodes := Codes.File_Codes_V3_In(field_name in DESC_FIELDS);
 
-GetDesc(string fld_name, string cd) := codes(field_name = fld_name and code = cd)[1].long_desc;
+GetDesc(string fld_name, string cd) := sCodes(field_name = fld_name and code = cd)[1].long_desc;
 
 EXPORT proc_build_aircraft(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   layouts.faa_aircraft AddAirCraftInfo(aircraft_reg L, aircraft_info R) := transform
+   D2C_Customers.layouts.rAircraft AddAirCraftInfo(aircraft_reg L, aircraft_info R) := transform
     self.LexID             := (unsigned6)L.did_out;
     self.Name              := L.fname + ' ' + L.mname + ' ' + L.lname;
     self.Address := L.street + ', ' + L.street2 + if(L.street2 <> '', ', ', '')

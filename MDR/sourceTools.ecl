@@ -1348,10 +1348,11 @@ export set_NonDerog_FCRA_sources_v50 := [
 
 	//Jira DF-24336 - added src_NeustarWireless
 	export set_Phonesplus := [
-	 src_InfutorCID									, src_Cellphones_Kroll					,src_Cellphones_Traffix				,src_Cellphones_Nextones
-	,src_Intrado										,src_Pcnsr											,src_Wired_Assets_Owned 			,src_Wired_Assets_Royalty
-	,src_Targus_White_pages					,src_Gong_History,src_Gong_Neustar								,src_InquiryAcclogs						,src_Ibehavior
-	,src_thrive_lt									, src_thrive_pd									,src_AlloyMedia_student_list	,src_Link2tek, src_NeustarWireless 
+	 src_InfutorCID									,src_Cellphones_Kroll								,src_Cellphones_Traffix				,src_Cellphones_Nextones
+	,src_Intrado										,src_Pcnsr													,src_Wired_Assets_Owned 			,src_Wired_Assets_Royalty
+	,src_Targus_White_pages					,src_Gong_History,src_Gong_Neustar	,src_InquiryAcclogs						,src_Ibehavior
+	,src_thrive_lt									,src_thrive_pd											,src_AlloyMedia_student_list	,src_Link2tek, src_NeustarWireless 
+	,src_Utilities									,src_Util_Work_Phone								,src_ZUtil_Work_Phone					,src_ZUtilities
 	]; 
 	
 	//DF-22944

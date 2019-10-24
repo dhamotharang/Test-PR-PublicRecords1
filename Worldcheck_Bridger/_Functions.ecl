@@ -1258,6 +1258,10 @@
 				trim(kword, left, right) = 'CNCBIRC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNCBIRC,
 				trim(kword, left, right) = 'CAQCMELCC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CAQCMELCC,
 				trim(kword, left, right) = 'OFAC-EO13848' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13848,
+				trim(kword, left, right) = 'NFSRC' =>SubGroup_Constants.numKeywordsID.KEYWORD_NFSRC,
+				trim(kword, left, right) = 'SKFSRC' =>SubGroup_Constants.numKeywordsID.KEYWORD_SKFSRC,
+				trim(kword, left, right) = 'TTFIU-TTPS' =>SubGroup_Constants.numKeywordsID.KEYWORD_TTFIU_TTPS,
+				trim(kword, left, right) = 'OFAC-SYR-EO' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_SYR_EO,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

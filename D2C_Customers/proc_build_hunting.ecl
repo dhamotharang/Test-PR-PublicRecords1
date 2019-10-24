@@ -7,7 +7,7 @@ hf	 := eMerges.file_hunters_out((unsigned6)did_out > 0, Source_Code not in D2C.C
 
 EXPORT proc_build_hunting(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   ds := project(hf, transform(layouts.hf,
+   ds := project(hf, transform(D2C_Customers.layouts.rHunting,
             self.LexID         := (unsigned6)left.did_out;
             self.Name          := left.fname_in + ' ' + left.mname_in + ' ' + left.lname_in;  //lfm format, contains junk
             self.Address       := left.prim_range + ' ' + left.predir + ' ' + left.prim_name + ' ' + left.suffix + ' ' + left.postdir + ', '
@@ -15,7 +15,6 @@ EXPORT proc_build_hunting(unsigned1 mode, string8 ver, string20 customer_name) :
                         + left.p_city_name + ', ' + left.st + ' ' + left.zip;
             self.Gender         := left.Gender;
             self.License_Date   := (unsigned4)left.datelicense;
-            self.License_Number := ''; //can't find
             self.License_Type   := left.License_Type_mapped;
             self.Home_State     := left.homestate;   
             self.License_State  := left.res_state;

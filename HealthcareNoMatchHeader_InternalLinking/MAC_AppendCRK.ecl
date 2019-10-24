@@ -6,7 +6,7 @@ EXPORT  MAC_AppendCRK(
     , pAsHeader       //  New AsHeader file to be ingested and linked
     
     // Email List for Workman Notifications
-    , pWorkmanEmailTo = HealthcareNoMatchHeader_InternalLinking.proc_Constants.emailNotify
+    , pWorkmanEmailTo = 'HealthcareNoMatchHeader_InternalLinking.proc_Constants.emailNotify'
 
     // Ingest
     , doIngest    = TRUE // perform full ingest process (ingest incremental and non-incremental sources into existing base file)

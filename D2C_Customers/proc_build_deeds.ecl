@@ -4,8 +4,8 @@
 
 Wdog := distribute(Watchdog.File_Best_nonglb(adl_ind = 'CORE'), hash(did));
 
-dLNPropertyDeed	    := dataset('~thor_data400::base::ln_propertyv2::deed',ln_propertyv2.layouts.layout_deed_mortgage_common_model_base_scrubs,flat);
-dLNPropertySearch   := dataset('~thor_data400::base::ln_propertyv2::search',ln_propertyv2.Layout_DID_Out,flat)(did > 0);
+dLNPropertyDeed   := dataset('~thor_data400::base::ln_propertyv2::deed',ln_propertyv2.layouts.layout_deed_mortgage_common_model_base_scrubs,flat);
+dLNPropertySearch := dataset('~thor_data400::base::ln_propertyv2::search',ln_propertyv2.Layout_DID_Out,flat)(did > 0);
 
 //Will include up to 10 years of deed & mortgage data
 Property_for_10yrs := dLNPropertySearch(Std.Date.YearsBetween((unsigned4)process_date ,Std.Date.Today()) < 10 and source_code = 'OP' and ln_fares_id[1..2] <> 'OM');
@@ -15,7 +15,7 @@ dPS  :=	distribute(Property_for_10yrs,hash(ln_fares_id));
 
 EXPORT proc_build_deeds(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   {layouts.deeds_mortgages, string12 ln_fares_id} AddDeed(dPS L, dPD R) := transform
+   {D2C_Customers.layouts.rDeeds_Mortgages, string12 ln_fares_id} AddDeed(dPS L, dPD R) := transform
         self.LexID             := (unsigned6)L.did;
         self.ln_fares_id       := L.ln_fares_id;
         self.State             := R.State;
@@ -36,7 +36,6 @@ EXPORT proc_build_deeds(unsigned1 mode, string8 ver, string20 customer_name) := 
         self.Loan_Type         := R.first_td_loan_type_code;   
         self.Interest_Rate     := R.first_td_interest_rate;
         self.Term              := R.loan_term_years;
-        self.Term_Indicator    := '';
         self.Due_Date          := (unsigned4)R.first_td_due_date;
         self.Lender            := R.lender_name; 
         self.Lender_Type       := R.first_td_lender_type_code; 

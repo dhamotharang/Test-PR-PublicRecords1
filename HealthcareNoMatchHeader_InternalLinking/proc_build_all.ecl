@@ -18,9 +18,6 @@ EXPORT proc_build_all(
 	
     // Append CRK
     , BOOLEAN doAppendCRK       = FALSE // Append CRK to Internal Linking Base File
-	
-    // Consumer Header
-    , BOOLEAN pUseConsumerHeader  = FALSE // Use Consumer Header Specificity Keys
 )	:=	MODULE
 
   ingestFileExist         :=  STD.File.FileExists(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Base.AllRecords.new);
@@ -51,7 +48,7 @@ EXPORT proc_build_all(
                           );
 
   //  Run Internal Linking Iteration
-  runInternalLinkingIteration  := HealthcareNoMatchHeader_InternalLinking.Proc_Iterate_Master(pSrc,pVersion,pIter,,pUseConsumerHeader);
+  runInternalLinkingIteration  := HealthcareNoMatchHeader_InternalLinking.Proc_Iterate_Master(pSrc,pVersion,pIter);
 
   //  Append Customer Record Keys to Internal Linking File
   runAppendCRK  :=  IFF(~appendCRKFileExists,
