@@ -142,6 +142,7 @@ module
 		export kel_CustomerStatsPivot				:= tools.mod_FilenamesBuild(Template('kel::CustomerStatsPivot'),pversion);
 		export kel_CustomerDashTopEntityStats				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopEntityStats'),pversion);
 		export kel_CustomerDashTopClustersAndElements				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClustersAndElements'),pversion);
+		export kel_CustomerDashTopClusters				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClusters'),pversion);
 		
 		//Kel files demo
 		export kel_customeraddress_Demo	:= tools.mod_FilenamesBuild(Template('kel::customeraddress_Demo'),pversion);
@@ -156,6 +157,7 @@ module
 		export kel_CustomerStatsPivot_Demo				:= tools.mod_FilenamesBuild(Template('kel::CustomerStatsPivot_Demo'),pversion);
 		export kel_CustomerDashTopEntityStats_Demo				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopEntityStats_Demo'),pversion);
 		export kel_CustomerDashTopClustersAndElements_Demo				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClustersAndElements_Demo'),pversion);
+		export kel_CustomerDashTopClusters_Demo				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClusters_Demo'),pversion);
 		
 		//kel files delta
 		export kel_customeraddress_Delta	:= tools.mod_FilenamesBuild(Template('kel::customeraddress_Delta'),pversion);
@@ -170,6 +172,7 @@ module
 		export kel_CustomerStatsPivot_Delta				:= tools.mod_FilenamesBuild(Template('kel::CustomerStatsPivot_Delta'),pversion);
 		export kel_CustomerDashTopEntityStats_Delta				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopEntityStats_Delta'),pversion);
 		export kel_CustomerDashTopClustersAndElements_Delta				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClustersAndElements_Delta'),pversion);
+		export kel_CustomerDashTopClusters_Delta				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClusters_Delta'),pversion);
 		
 		export Main_Orig	:= tools.mod_FilenamesBuild(Template('Main_Orig'),pversion);
 		export Main_Anon	:= tools.mod_FilenamesBuild(Template('Main_anon'),pversion);
@@ -209,6 +212,7 @@ module
 			kel_CustomerStatsPivot.dAll_filenames + 
 			kel_CustomerDashTopEntityStats.dAll_filenames + 
 			kel_CustomerDashTopClustersAndElements.dAll_filenames + 
+			kel_CustomerDashTopClusters.dAll_filenames + 
 			//kel demo files
 			kel_customeraddress_Demo.dAll_filenames +
 			kel_personstats_Demo.dAll_filenames +
@@ -222,6 +226,7 @@ module
 			kel_CustomerStatsPivot_Demo.dAll_filenames + 
 			kel_CustomerDashTopEntityStats_Demo.dAll_filenames + 
 			kel_CustomerDashTopClustersAndElements_Demo.dAll_filenames + 
+			kel_CustomerDashTopClusters_Demo.dAll_filenames + 
 			//kel delta files			
 			kel_customeraddress_Delta.dAll_filenames +
 			kel_personstats_Delta.dAll_filenames +
@@ -235,6 +240,7 @@ module
 			kel_CustomerStatsPivot_Delta.dAll_filenames + 
 			kel_CustomerDashTopEntityStats_Delta.dAll_filenames + 
 			kel_CustomerDashTopClustersAndElements_Delta.dAll_filenames + 
+			kel_CustomerDashTopClusters_Delta.dAll_filenames + 
  			Main_Orig.dAll_filenames + 
 			Main_Anon.dAll_filenames + 
 			Pii_Demo.dAll_filenames + 
