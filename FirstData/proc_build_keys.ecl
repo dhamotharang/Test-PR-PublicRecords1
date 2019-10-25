@@ -14,7 +14,6 @@ EXPORT proc_build_keys (STRING	pVersion):=function
 	RoxieKeyBuild.Mac_SK_Move_v3('~thor_data400::key::FirstData::FCRA::@version@::did','D',ma_fcra_first_data_key_to_qa,pVersion,2);
 	RoxieKeyBuild.Mac_SK_Move_v3('~thor_data400::key::FirstData::@version@::driverslicense','D',ma_first_data_driverslicense_key_to_qa,pVersion,2);
 
-	create_build := Orbit3.proc_Orbit3_CreateBuild ('First Data',pVersion,'F');
 	
 	build_keys := sequential(
 																fcra_first_data_key,
