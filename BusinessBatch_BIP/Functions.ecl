@@ -1324,7 +1324,7 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
   EXPORT GetDCAInfo(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
                     DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
   FUNCTION
-    dDCAInfoRaw := DCAV2.Key_LinkIds.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);
+    dDCAInfoRaw := DCAV2.Key_LinkIds.kFetch(dLinkIds, mod_access, BIPV2.IDconstants.Fetch_Level_SELEID);
     RawRecordType := RECORDOF(dDCAInfoRaw);
 
     // currently, all DCA records are marketing-allowed for the BRM rollup service

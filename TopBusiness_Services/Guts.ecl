@@ -247,7 +247,7 @@ export Guts := MODULE
 				DunBradStreetSection := if (section_DNB,  TopBusiness_Services.DNBSection.fn_fullView(
 						project(ds_input_data, transform(TopBusiness_Services.Layouts.rec_input_ids, self := left)),
 						project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1],
-						in_mod)
+						mod_access)
 				);
 				
 				source_mod_access := module(mod_access)

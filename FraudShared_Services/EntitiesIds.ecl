@@ -43,7 +43,7 @@ EXPORT EntitiesIds(
 
   EXPORT GetLinkIds() := FUNCTION
     fetchIn := PROJECT(ds_valid_in(hasBusiness), BIPV2.IDlayouts.l_xlink_ids);
-    fetchedRecs := FraudShared.Key_Linkids_kFetch(fetchIn, fraud_platform, BIPV2.IDconstants.Fetch_Level_SELEID);
+    fetchedRecs := FraudShared.Key_Linkids_kFetch(fetchIn, fraud_platform, ,BIPV2.IDconstants.Fetch_Level_SELEID);
     results := JOIN(
       ds_valid_in(hasBusiness), fetchedRecs,
       BIPV2.IDmacros.mac_JoinTop3Linkids(),

@@ -55,7 +55,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 
 	// ---------------- DCA - Directory of Corporate Affiliations AKA LNCA ------------------
-	dcaRaw := DCAV2.Key_LinkIds.kFetch2(linkIDs,
+	dcaRaw := DCAV2.Key_LinkIds.kFetch2(linkIDs, ,
 																			 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																			 0, //ScoreThreshold --> 0 = Give me everything
 																			 Business_Risk_BIP.Constants.Limit_Default,
