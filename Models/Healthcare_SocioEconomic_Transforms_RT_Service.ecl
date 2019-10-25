@@ -555,7 +555,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		SELF := [];
 	END;
 
-	Export PopulateScoresDS(CoreResults, Config, isReadmissionRequested, isMedicationAdherenceRequested, isMotivationRequested) := FUNCTIONMACRO
+	Export PopulateScoresDS(CoreResults, Config, isReadmissionRequested, isMedicationAdherenceRequested, isMotivationRequested, isTotalCostRiskScoreRequested) := FUNCTIONMACRO
 		
 		iesp.healthcare_socio_indicators.t_SocioScore formatRS() := TRANSFORM
 			SELF.Name := IF(isReadmissionRequested, 'ReadmissionProbability', _blank);
