@@ -1298,6 +1298,8 @@ EXPORT fullgraph	:= RECORD
   integer8 in_customer_population__1_;
   integer8 contributor_safe_flag__1_;
   integer8 safe_flag__1_;
+  unsigned8 cl_hr_identity_count_;
+  unsigned8 cl_hr_element_count_;
   unsigned8 event_count_;
   unsigned8 identity_count_;
   unsigned1 cl_adjacent_safe_flag_;
@@ -1953,6 +1955,8 @@ EXPORT fullgraph	:= RECORD
   integer8 cl_nap3_identity_count_;
   integer8 kr_high_risk_flag_;
   integer8 kr_medium_risk_flag_;
+  integer8 kr_event_after_last_known_risk_flag_;
+  integer8 vl_event30_active_flag_;
   integer8 cl_identity_count_decile_;
   integer8 cl_p_r_identity_match_count_;
   real8 cl_p_r_identity_match_percent_;
@@ -1960,7 +1964,7 @@ EXPORT fullgraph	:= RECORD
   integer8 cl_active7_identity_count_;
   integer8 cl_active30_identity_count_;
   integer8 cl_address_count_;
-  real8 cl_identity_event_avg_;
+  string cl_identity_event_avg_;
   integer8 cl_high_risk_pattern1_flag_;
   integer8 cl_high_risk_pattern2_flag_;
   integer8 cl_high_risk_pattern3_flag_;
@@ -2170,6 +2174,8 @@ EXPORT fullgraph	:= RECORD
   integer8 in_customer_population__1_;
   integer8 contributor_safe_flag__1_;
   integer8 safe_flag__1_;
+  unsigned8 cl_hr_identity_count_;
+  unsigned8 cl_hr_element_count_;
   unsigned8 event_count_;
   unsigned8 identity_count_;
   unsigned1 cl_adjacent_safe_flag_;
