@@ -116,6 +116,7 @@ export Key_ConsumerToBip := module
           
      export getDataFiltered(
                     dataset(l_lexid_links) inputs,
+										string1 Level = BIPV2.IDconstants.Fetch_Level_ProxID, 
                     BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
                     boolean IncludeStatus = true,
                     JoinLimit=25000,
@@ -128,7 +129,21 @@ export Key_ConsumerToBip := module
                               
            remove_restricted := kfetch(inputs, in_mod, JoinLimit, JoinType, applyMarketingRestrictions, mod_access);
 
-           addSourceRecInfo       := project(remove_restricted, Layouts.ConsumerToBipWorkRec0);           
+           proxIdLevelSet := [BIPV2.IDconstants.Fetch_Level_ProxID];
+           seleIdLevelSet := [BIPV2.IDconstants.Fetch_Level_ProxID
+					                   ,BIPV2.IDconstants.Fetch_Level_SeleID];
+           orgIdLevelSet  := [BIPV2.IDconstants.Fetch_Level_ProxID
+					                   ,BIPV2.IDconstants.Fetch_Level_SeleID
+														 ,BIPV2.IDconstants.Fetch_Level_OrgID];
+					 
+           addSourceRecInfo       := project(remove_restricted, 
+					                                   transform(Layouts.ConsumerToBipWorkRec0,
+																						           self.proxid := if(level in proxIdLevelSet,left.proxid,0);
+																						           self.seleid := if(level in seleIdLevelSet,left.seleid,0);
+																						           self.orgid  := if(level in orgIdLevelSet ,left.orgid ,0);
+																						           self        := left;
+																						          )
+																						 );           
            normalizeJobTitles     := normalize_mac(addSourceRecInfo, jobTitles, Layouts.ConsumerToBipWorkRec1,sourcesToInclude,sourceGroupsToInclude);
            normalizeContactNames  := normalize_mac(normalizeJobTitles, contactNames, Layouts.ConsumerToBipWorkRec2,sourcesToInclude,sourceGroupsToInclude);
            
@@ -137,17 +152,18 @@ export Key_ConsumerToBip := module
                                                          self := right,
                                                          self := left));                                                        
            
-           dedupSourceInfoRecs    := dedup(normSourceInfoRecs, UniqueID, ultid, orgid, seleid, contact_did, source, source_record_id,  all);
+           dedupSourceInfoRecs    := dedup(normSourceInfoRecs, UniqueID, ultid, orgid, seleid, proxid, contact_did, source, source_record_id,  all);
            createChildDatasets    := project(dedupSourceInfoRecs,
                                              transform(Layouts.SourceInfoWorkRec4,
                                                        self            := left,
                                                        self.sourceInfo := dataset([{left.source,left.source_record_id}],Layouts.SourceInfoRec)));
 
-           rollSourceInfo   := rollup(sort(createChildDatasets, uniqueID, ultid, orgid, seleid, contact_did), 
+           rollSourceInfo   := rollup(sort(createChildDatasets, uniqueID, ultid, orgid, seleid, proxid, contact_did), 
                                             left.uniqueID    = right.uniqueID and
                                             left.ultid       = right.ultid and
                                             left.orgid       = right.orgid and
                                             left.seleid      = right.seleid and
+                                            left.proxid      = right.proxid and
                                             left.contact_did = right.contact_did, 
                                             transform(Layouts.SourceInfoWorkRec4,
                                                       self.sourceInfo := left.sourceInfo + right.sourceInfo,
@@ -161,13 +177,14 @@ export Key_ConsumerToBip := module
                                                        self.job_title2 := '',
                                                        self.job_title3 := ''));
      
-           sortFinalForm     := sort(changeToWorkForm(contact_did>0), uniqueID, ultid, orgid, seleid, contact_did, jobTitleOrder, executive_ind_order, -dt_title_last_seen);
+           sortFinalForm     := sort(changeToWorkForm(contact_did>0), uniqueID, ultid, orgid, seleid, proxid, contact_did, jobTitleOrder, executive_ind_order, -dt_title_last_seen);
            
            rolljobTitle      := rollup(sortFinalForm, 
                                         left.uniqueID = right.uniqueID and
                                         left.ultid    = right.ultid and
                                         left.orgid    = right.orgid and
                                         left.seleid   = right.seleid and
+                                        left.proxid   = right.proxid and
                                         left.contact_did = right.contact_did, 
                                         transform(Layouts.ConsumerToBipWorkRec3,
                                                   self.dt_first_seen_at_business := if(right.dt_first_seen_at_business > 0 and right.dt_first_seen_at_business < left.dt_first_seen_at_business,
@@ -187,10 +204,11 @@ export Key_ConsumerToBip := module
                                  left.ultid       = right.ultid and
                                  left.orgid       = right.orgid and
                                  left.seleid      = right.seleid and
+                                 left.proxid      = right.proxid and
                                  left.contact_did = right.contact_did,            
                                  transform(Layouts.ConsumerToBipFinalRec,
                                            self.sourceInfo := right.sourceInfo,
-                                           self            := left));
+                                           self            := left),left outer);
                                                 
            adjustDates       := project(addSourceInfo, 
                                         transform(Layouts.ConsumerToBipFinalRec,
@@ -206,7 +224,14 @@ export Key_ConsumerToBip := module
                                                                                         );
                                                   self := left));
       
-           return adjustDates;
+ 
+           filterOutNoIDRecs := map(
+					                           level in proxIdLevelSet => adjustDates(proxId>0),
+					                           level in seleIdLevelSet => adjustDates(seleId>0),
+					                           level in orgIdLevelSet  => adjustDates(orgId>0),
+					                           adjustDates(ultId>0));
+					 
+           return filterOutNoIDRecs;
      end;
      
 end;
