@@ -65,7 +65,7 @@ h_targus := if(~call_PVS,doxie.MAC_Get_GLB_DPPA_Targus(phoneOnlySearch,
   inMod.Phone, inMod.FirstName, inMod.MiddleName, inMod.LastName,
   inMod.PrimRange, inMod.PreDir, inMod.PrimName, inMod.Suffix,
   inMod.PostDir, '', inMod.SecRange, inMod.City, inMod.State, inMod.Zip, '', 
-  mod_access, score_threshold_value, targus_cfg, inMod.CompanyName,,TRUE)
+  mod_access, score_threshold_value, targus_cfg, inMod.CompanyName)
   (phone<>'',penalt<score_threshold_value));
 
 //In house QSent
