@@ -2,7 +2,7 @@
 
 EXPORT Files := MODULE
     
-    infutor_best := Infutor.file_infutor_best;
+    infutor_best := Infutor.file_infutor_best;  //705,593,920
 
     appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
     Suppress.MAC_Suppress(infutor_best,pulled_ssn_infutor,appType,Suppress.Constants.LinkTypes.SSN,ssn);

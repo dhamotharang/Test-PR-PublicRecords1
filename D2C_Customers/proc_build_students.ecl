@@ -53,7 +53,7 @@ EXPORT proc_build_students(unsigned1 mode, string8 ver, string20 customer_name) 
                  mode = 3 => coreDerogatoryDS //MONTHLY
                );
                 
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'students');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 22);
    return res;
 
 END;
