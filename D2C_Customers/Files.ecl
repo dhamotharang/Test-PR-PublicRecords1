@@ -9,14 +9,14 @@ EXPORT Files := MODULE
     Suppress.MAC_Suppress(pulled_ssn_infutor,cleaned_best_infutor,appType,Suppress.Constants.LinkTypes.DID,did);
     EXPORT fullInfutorDS := cleaned_best_infutor;
 
-    infutor_hdr := Infutor.infutor_header;
+    infutor_hdr := Infutor.infutor_header(src <> 'D$');  //9,317,898,981
 
     appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
     Suppress.MAC_Suppress(infutor_hdr,pulled_ssn_hdr,appType,Suppress.Constants.LinkTypes.SSN,ssn);
     Suppress.MAC_Suppress(pulled_ssn_hdr,cleaned_best_hdr,appType,Suppress.Constants.LinkTypes.DID,did);    
     EXPORT fullHdrDS     := cleaned_best_hdr;
 
-    EXPORT coresDS       := Header.key_ADL_segmentation(ind1 = 'CORE');  
+    EXPORT coresDS       := Header.key_ADL_segmentation(ind1 = 'CORE'); //257,216,208 
 
     EXPORT coreInfutorDS := join(
       distribute(fullInfutorDS, hash(did)),
