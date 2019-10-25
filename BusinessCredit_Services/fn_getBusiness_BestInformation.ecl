@@ -52,7 +52,7 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 		topBusiness_bestrecs := IF(topBusiness_bestrecs_bip.CompanyName != '', topBusiness_bestrecs_bip, topBusiness_bestrecs_sbfe_format);
     
 		//getting LNCA/DCA records
-		ds_lnca_keyrecs := DCAV2.Key_Linkids.kFetch2(inmod.BusinessIds, inmod.FetchLevel,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
+		ds_lnca_keyrecs := DCAV2.Key_Linkids.kFetch2(inmod.BusinessIds, mod_access, inmod.FetchLevel,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
 		
 		ds_lnca_slimmed := PROJECT(ds_lnca_keyrecs, TRANSFORM(BusinessCredit_Services.Layouts.rec_lnca,
 																														SELF.source_docid 				:= LEFT.rawfields.enterprise_num, 

@@ -1692,7 +1692,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF := []));
 
 	InfoUSA_Key_LinkIds_DEADCO := IF(Common.DoFDCJoin_InfoUSA__Key_DEADCO_LinkIds = TRUE,
-																	InfoUSA.Key_DEADCO_LinkIds.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
+																	InfoUSA.Key_DEADCO_LinkIds.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC), mod_access,
 																	PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
 																	0, /*ScoreThreshold --> 0 = Give me everything*/
 																	PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT,
@@ -2071,7 +2071,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF := []));				
 					
 	DCAV2__kfetch_LinkIds := IF(Common.DoFDCJoin_DCAV2__kfetch_LinkIds = TRUE, 
-																						DCAV2.Key_LinkIds.kfetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
+																						DCAV2.Key_LinkIds.kfetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC), ,
 																								PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
 																								0, /*ScoreThreshold --> 0 = Give me everything*/
 																								PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT,

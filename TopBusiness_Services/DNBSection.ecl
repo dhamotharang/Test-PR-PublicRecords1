@@ -1,7 +1,7 @@
 /* TBD:
      1. Research/resolve open issues (search for '???') and removed commented out coding.
 */
-IMPORT AutoStandardI, BIPV2, Codes, DNB_DMI, iesp, MDR;
+IMPORT BIPV2, Codes, DNB_DMI, iesp, MDR, Doxie;
 
 EXPORT DNBSection := MODULE;
 
@@ -9,7 +9,7 @@ EXPORT DNBSection := MODULE;
  export fn_FullView(
  	dataset(TopBusiness_Services.Layouts.rec_input_ids) ds_in_ids_wacctno
 	,Layouts.rec_input_options  in_options
-	,AutoStandardI.DataRestrictionI.params in_mod
+	,doxie.IDataAccess mod_access
 	                 ):= function
 
   FETCH_LEVEL := in_options.BusinessReportFetchLevel;											
@@ -28,7 +28,7 @@ EXPORT DNBSection := MODULE;
 
   // *** Key fetch to get DNB DMI data.
   ds_dnb_keyrecs := DNB_DMI.Key_Linkids.kFetch(
-	                          ds_in_ids_only, // input file to join key with
+	                          ds_in_ids_only, mod_access, // input file to join key with
 	      										FETCH_LEVEL); // level of ids to join with
 														// 3rd parm is ScoreThreshold, take default of 0
 														
