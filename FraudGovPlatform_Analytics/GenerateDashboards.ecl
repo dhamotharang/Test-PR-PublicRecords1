@@ -15,26 +15,33 @@
 	//risk this running multiple times
 
 	CustSuperFileName 				:= FraudGovPlatform.Filenames().CustomerDashboard;
+	Cust1_1SuperFileName 			:= FraudGovPlatform.Filenames().CustomerDashboard1_1;
 	ClusterSuperFileName			:= FraudGovPlatform.Filenames().ClusterDetails;
 	custLogicalfilename				:= CustSuperFileName +'::'+(STRING8)STD.Date.Today();
+	cust1_1Logicalfilename		:= Cust1_1SuperFileName +'::'+(STRING8)STD.Date.Today();
 	clusterLogicalfilename		:= ClusterSuperFileName +'::'+(STRING8)STD.Date.Today();
 
 	dRunCustDashboard							:= DATASET(FraudGovPlatform_Analytics.fnRunCustomerDashboard(runProd, useProdData, newVersion, updateROSE));
+	dRunCustDashboard1_1					:= DATASET(FraudGovPlatform_Analytics.fnRunCustomerDashboard1_1(runProd, useProdData, newVersion, updateROSE));
 	dRunClusDetailsDashboard			:= DATASET(FraudGovPlatform_Analytics.fnRunClusterDetailsDashboard(runProd, useProdData, newVersion, updateROSE));
 	
 	//Dashboards for Non Prod environment
 	RunCustDashboard 					:= OUTPUT(dRunCustDashboard);
+	RunCustDashboard1_1				:= OUTPUT(dRunCustDashboard1_1);
 	RunClusDetailsDashboard 	:= OUTPUT(dRunClusDetailsDashboard);
 	
 	//PROD Dashboards Code Begin
 	//Dashboards for Prod environment to create dashboard output files
 	RunCustDashboard_Prod					:= OUTPUT(dRunCustDashboard,,custLogicalfilename,  cluster(ThorName),compressed,overwrite);
+	RunCustDashboard1_1_Prod			:= OUTPUT(RunCustDashboard1_1,,cust1_1Logicalfilename,  cluster(ThorName),compressed,overwrite);
 	RunClusDetailsDashboard_Prod	:= OUTPUT(dRunClusDetailsDashboard,,clusterLogicalfilename,cluster(ThorName),compressed, overwrite);
 
 	CreateSuper := Sequential(IF(~(STD.File.SuperFileExists(CustSuperFileName)), STD.File.CreateSuperFile(CustSuperFileName),output('CustomerDash Superfile already exists. Skipping creating superfile.')),
+															IF(~(STD.File.SuperFileExists(Cust1_1SuperFileName)), STD.File.CreateSuperFile(Cust1_1SuperFileName),output('CustomerDash 1_1 Superfile already exists. Skipping creating superfile.')),
 															IF(~(STD.File.SuperFileExists(ClusterSuperFileName)), STD.File.CreateSuperFile(ClusterSuperFileName),output('ClusterDetails Superfile already exists. Skipping creating superfile.')),
 															STD.File.StartSuperFileTransaction(),
 															STD.File.ClearSuperfile(CustSuperFileName,true),
+															STD.File.ClearSuperfile(Cust1_1SuperFileName,true),
 															STD.File.ClearSuperfile(ClusterSuperFileName,true),
 															STD.File.FinishSuperFileTransaction();
 														);
@@ -42,6 +49,7 @@
 	AddFileToSuper := SEQUENTIAL(
 		STD.File.StartSuperFileTransaction(),
 		STD.File.AddSuperFile(CustSuperFileName, custLogicalfilename),
+		STD.File.AddSuperFile(CustSuperFileName, cust1_1Logicalfilename),
 		STD.File.AddSuperFile(ClusterSuperFileName, clusterLogicalfilename),
 		STD.File.FinishSuperFileTransaction());
 		
@@ -56,8 +64,8 @@
 	RunPersonStatsDeltaDashboard		:= OUTPUT(dRunPersonStatsDeltaDashboard);
 	RunNewClusterRecordsDashboard 	:= OUTPUT(dRunNewClusterRecordsDashboard);
 	RETURN PARALLEL(If(runProd,
-											SEQUENTIAL(CreateSuper,RunCustDashboard_Prod,RunClusDetailsDashboard_Prod,AddFileToSuper),
-											SEQUENTIAL(RunCustDashboard, RunClusDetailsDashboard)
+											SEQUENTIAL(CreateSuper,RunCustDashboard_Prod,RunCust1_1Dashboard_Prod,RunClusDetailsDashboard_Prod,AddFileToSuper),
+											SEQUENTIAL(RunCustDashboard, RunCust1_1Dashboard, RunClusDetailsDashboard)
 											)
 								, IF(~runProd AND ~updateROSE, SEQUENTIAL(RunPersonStatsDeltaDashboard, RunNewClusterRecordsDashboard))
 									);

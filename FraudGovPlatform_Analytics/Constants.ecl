@@ -76,10 +76,10 @@
 			END;
 		END;
 		EXPORT CustomerDashboard1_1		:= MODULE
-			EXPORT VizServiceVersion								:= '1';
+			EXPORT VizServiceVersion								:= '2';
 			EXPORT CompositionUuid									:= '4dbbbb5c-e1d6-40ef-a8f9-51a33b35260a'; 	//Customer Dashboard 1.1 Composition ID
 			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
-				EXPORT InputLogicalCluster								:= fileLocation(useProdData) + 'gov::otto::' + 'customerdashboardtopclusters';
+				EXPORT InputLogicalCluster								:= fileLocation(useProdData) + fileScope + 'customerdashtopclusters';
 				EXPORT InputLogicalIdentitiesAndElements	:= fileLocation(useProdData) + fileScope + 'customerdashtopclustersandelements';
 				EXPORT InputLogicalEntityStats						:= fileLocation(useProdData) + fileScope + 'entitystats';
 			END;
