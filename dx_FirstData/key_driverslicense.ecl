@@ -12,8 +12,8 @@ payload := RECORD
 	$.layouts.i_driverslicense.ACTION_CODE;
 	$.layouts.i_driverslicense.CONS_ID;
 	$.layouts.i_driverslicense.LEX_ID;
-	$.layouts.i_driverslicense.FIRST_SEEN_DATE_TRUE;
-	$.layouts.i_driverslicense.LAST_SEEN_DATE;
+	$.layouts.i_did.DATE_FIRST_SEEN;
+	$.layouts.i_did.DATE_LAST_SEEN;
 	$.layouts.i_driverslicense.DISPUTE_STATUS;
 END;
 
