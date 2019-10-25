@@ -292,10 +292,8 @@ export ReportService_Records := module
 		// 18. Get some additional detailed POE data for specific sources from the 
 		//     individual sources' did key file.
 		//     As of 01/04/11, we only need to get:
-		temp_best_cand_walldetail:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best_cand_wcorpstat, mod_access);
-		
-		ds_best_cand_walldetail:= DEDUP(SORT(temp_best_cand_walldetail, did), did);
-		
+		ds_best_cand_walldetail:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best_cand_wcorpstat, mod_access);
+				
 		WorkPlace_Services.Layouts.Email_Layout normXform(ds_best_cand_walldetail le ,integer c ) := TRANSFORM
 				temp_email:= choose(c ,le.email1, le.email2, le.email3);
 				self.EmailAddress :=  IF(temp_email<>'', temp_email, SKIP);																
