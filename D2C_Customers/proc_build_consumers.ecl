@@ -44,7 +44,7 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
             self.Report_Candidate := if(left.did in Associations_ONLY_dids, 'N', 'Y');
             ));
    
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'consumers');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 1);
    return res;
 
 END;

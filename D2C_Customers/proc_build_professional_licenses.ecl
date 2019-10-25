@@ -25,7 +25,7 @@ EXPORT proc_build_professional_licenses(unsigned1 mode, string8 ver, string20 cu
                mode = 3 => coreDerogatoryDS //MONTHLY
                );
    
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'professional_licenses');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 17);
    return res;
 
 END;

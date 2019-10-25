@@ -27,7 +27,7 @@ EXPORT proc_build_addresses(unsigned1 mode, string8 ver, string20 customer_name)
 
    inDS := rollup(sort(distribute(addr, hash(LexID)), LexID, Date_First_Seen, -Date_Last_Seen, local), rollUpDates(left,right), left.LexID = right.LexID and left.Date_First_Seen <= right.Date_First_Seen and left.Date_Last_Seen >= right.Date_Last_Seen, local);
 
-   res   := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 'address_history');
+   res   := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 2);
    return res;
 
 END;                                         

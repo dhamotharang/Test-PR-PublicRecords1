@@ -34,7 +34,7 @@ EXPORT proc_build_airmen(unsigned1 mode, string8 ver, string20 customer_name) :=
                mode = 3 => coreDerogatoryDS  //MONTHLY
                );
    
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'airmen');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 11);
    return res;
 
 END;
