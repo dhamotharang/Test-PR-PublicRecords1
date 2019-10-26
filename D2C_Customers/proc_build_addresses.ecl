@@ -1,4 +1,4 @@
-﻿import PromoteSupers, header;
+﻿import PromoteSupers, header, ut;
 
 /********* ADDRESS_HISTORY **********/     
 EXPORT proc_build_addresses(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
@@ -20,10 +20,12 @@ EXPORT proc_build_addresses(unsigned1 mode, string8 ver, string20 customer_name)
 
    // Rolling up all sub set date ranges within the super set date range
    addr rollUpDates(addr l, addr r) := TRANSFORM
-	   SELF.Date_First_Seen := if(l.Date_First_Seen <= r.Date_First_Seen, l.Date_First_Seen, r.Date_First_Seen);
+	   SELF.Date_First_Seen := ut.Min2(l.Date_First_Seen, r.Date_First_Seen);//if(l.Date_First_Seen <= r.Date_First_Seen, l.Date_First_Seen, r.Date_First_Seen);
 	   SELF.Date_Last_Seen  := if(l.Date_Last_Seen >= r.Date_Last_Seen, l.Date_Last_Seen, r.Date_Last_Seen);
 	   self := l;
    END;
+
+   // ut.Min2()
 
    inDS := rollup(sort(distribute(addr, hash(LexID)), LexID, Date_First_Seen, -Date_Last_Seen, local), rollUpDates(left,right), left.LexID = right.LexID and left.Date_First_Seen <= right.Date_First_Seen and left.Date_Last_Seen >= right.Date_Last_Seen, local);
 

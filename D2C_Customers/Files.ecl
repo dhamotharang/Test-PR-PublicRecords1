@@ -2,14 +2,16 @@
 
 EXPORT Files := MODULE
     
-    infutor_best := Infutor.file_infutor_best;  //705,593,920
+    infutor_best := Infutor.file_infutor_best : independent;  //705,593,920
+
+    //pass thorugh ccpa supprerssion
 
     appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
     Suppress.MAC_Suppress(infutor_best,pulled_ssn_infutor,appType,Suppress.Constants.LinkTypes.SSN,ssn);
     Suppress.MAC_Suppress(pulled_ssn_infutor,cleaned_best_infutor,appType,Suppress.Constants.LinkTypes.DID,did);
     EXPORT fullInfutorDS := cleaned_best_infutor;
 
-    infutor_hdr := Infutor.infutor_header(src <> 'D$');  //9,317,898,981
+    infutor_hdr := Infutor.infutor_header(src <> 'D$') : independent;  //9,317,898,981
 
     appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
     Suppress.MAC_Suppress(infutor_hdr,pulled_ssn_hdr,appType,Suppress.Constants.LinkTypes.SSN,ssn);
@@ -35,10 +37,12 @@ EXPORT Files := MODULE
     crims := doxie_files.File_Offenders((unsigned6)did > 0, data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
     bk    := BankruptcyV2.key_bankruptcy_did(false)(did > 0); //Unrestricted
     li    := LiensV2.key_liens_DID(did > 0);//Unrestricted
+    //include deceased dids
     
     EXPORT derogatoryDS := dedup(table(so, {(unsigned6)did}) + table(crims, {(unsigned6)did}) + table(bk, {did}) + table(li, {did}), all);
     shared SetofderogatoryDS := set(derogatoryDS, did);
-           
+
+    //use join instead set       
     EXPORT coreInfutorDerogatoryDS := coreInfutorDS(did in SetofderogatoryDS);
     EXPORT coreHdrDerogatoryDS     := coreHdrDS(did in SetofderogatoryDS);
 

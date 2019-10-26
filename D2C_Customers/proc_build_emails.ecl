@@ -2,7 +2,6 @@
 
 /********* EMAIL_ADDRESSES **********/
 
-Wdog := distribute(Watchdog.File_Best_nonglb(adl_ind = 'CORE'), hash(did));
 em  := Email_Data.File_Email_Base(did > 0, current_rec=true, Clean_Email<>'', email_src not in D2C.Constants.EmailRestrictedSources);
 
 //keeping ONLY 3 email address per did based on latest date_last_seen
