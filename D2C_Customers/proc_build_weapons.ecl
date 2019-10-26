@@ -29,7 +29,7 @@ EXPORT proc_build_weapons(unsigned1 mode, string8 ver, string20 customer_name) :
                mode = 3 => coreDerogatoryDS //MONTHLY
                );
 
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'weapons');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 6);
    return res;
 
 END;

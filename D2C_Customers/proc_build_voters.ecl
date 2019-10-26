@@ -27,7 +27,7 @@ EXPORT proc_build_voters(unsigned1 mode, string8 ver, string20 customer_name) :=
                mode = 3 => coreDerogatoryDS //MONTHLY
                );
    
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'voters');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 19);
    return res;
 
 END;
