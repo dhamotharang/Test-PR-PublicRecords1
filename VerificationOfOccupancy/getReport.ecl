@@ -1,7 +1,7 @@
-// THIS REPORT IS XML ONLY - NOT BATCH  
+﻿			// THIS REPORT IS XML ONLY - NOT BATCH  
 // Several assumptions are made to simplify the code that requires this function to only be called for XML transactions.
 
-IMPORT Address, ADVO, AutoStandardI, Codes, DeathV2_Services, Drivers, Doxie, Email_Data, Gong, Header,dx_header,  Header_Quick, 
+IMPORT Address, ADVO, AutoStandardI, Codes,suppress, DeathV2_Services, Drivers, Doxie, Email_Data, Gong, Header,dx_header,  Header_Quick, 
 			 IESP, MDR, PersonReports, Risk_Indicators, RiskWise, SmartRollup, Targus, UT, Utilfile, 
 			 VerificationOfOccupancy, census_data, Relationship, std;
 
@@ -12,16 +12,22 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 									UNSIGNED1 DPPAPurpose,
 									BOOLEAN isUtility,
 									BOOLEAN isXML = FALSE,
-									BOOLEAN fares_ok = true) := FUNCTION
+									BOOLEAN fares_ok = true,
+                  doxie.IDataAccess CCPA_mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	
 	isFCRA := FALSE;
 	GLB_OK := Risk_Indicators.iid_constants.glb_ok(GLBPurpose, isFCRA);
 	DPPA_OK := Risk_Indicators.iid_constants.dppa_ok(DPPAPurpose, isFCRA);
+   
 	deathparams := MODULE(DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule()))
 		EXPORT STRING DataRestrictionMask := ^.DataRestrictionMask;
 		EXPORT unsigned1 glb := GLBPurpose;
 		EXPORT unsigned1 dppa := DPPAPurpose;
 		EXPORT string ssn_mask := 'NONE'; //for use in mod_access later on.
+    EXPORT unsigned1 lexid_source_optout := CCPA_Mod_Access.LexId_Source_Optout;
+    EXPORT string transaction_id := CCPA_Mod_Access.Transaction_ID; // esp transaction id or batch uid
+    EXPORT unsigned6 global_company_id := CCPA_Mod_Access.Global_Company_Id; // mbs gci
+    
 	END;		
 	mod_access := PROJECT(deathparams, doxie.IDataAccess);
 	Experian_Permitted := DataRestrictionMask[Risk_Indicators.iid_constants.posExperianRestriction] <> Risk_Indicators.iid_constants.sTrue;
@@ -83,11 +89,12 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 	best_rec_input := PROJECT(ShellResults, getBestRec(LEFT));
 
 	// Get the Date of Death (DOD) - This uses the same logic found in PersonReports.Person_records (SmartLinx)
-	Doxie.Layout_Best GetDeathRecords(Doxie.Layout_Best le, Doxie.Key_Death_MasterV2_DID ri) := TRANSFORM
+	 
+  Doxie.Layout_Best GetDeathRecords(Doxie.Layout_Best le, Doxie.key_death_masterv2_ssa_DID  ri) := TRANSFORM
 		SELF.DOD := (STRING)ri.DOD8; // Get all Dates of Death.  We will SORT/Dedup below to keep the oldest DOD
 		SELF := le;
 	END;
-	with_DODs := JOIN(best_rec_input, Doxie.Key_Death_MasterV2_DID, isXML AND
+	with_DODs := JOIN(best_rec_input, Doxie.key_death_masterv2_ssa_DID , isXML AND
 								LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.l_DID) 
 									AND NOT DeathV2_Services.Functions.Restricted(RIGHT.src, RIGHT.glb_flag, Risk_Indicators.iid_constants.GLB_OK(GLBPurpose, IsFCRA := FALSE), deathparams),
 								GetDeathRecords(LEFT, RIGHT),
@@ -298,10 +305,17 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 		STRING8 DateLastSeen := '';
 		INTEGER2 SourceCount := 0;
 	END;
-	
+	 VerificationOfOccupancy_CCPA_a := RECORD
+	 	 SourceCountsTemp;
+     Unsigned4 Global_sid; 
+     unsigned6 did;
+     end;
 	HeaderReportMacro (transformName, keyName) := MACRO
-		SourceCountsTemp transformName(ShellResults le, keyName ri) := TRANSFORM
-			SELF.SourceType := MAP(ri.Src IN [MDR.SourceTools.src_Equifax, MDR.SourceTools.src_Equifax_Quick, MDR.SourceTools.src_Equifax_Weekly]	=> 'Consumer Reporting Agency 1', // Equifax Credit Header
+ 
+		VerificationOfOccupancy_CCPA_a transformName(ShellResults le, keyName ri) := TRANSFORM
+    SELF.Global_Sid := ri.Global_Sid;
+    Self.did := ri.did;
+		SELF.SourceType := MAP(ri.Src IN [MDR.SourceTools.src_Equifax, MDR.SourceTools.src_Equifax_Quick, MDR.SourceTools.src_Equifax_Weekly]	=> 'Consumer Reporting Agency 1', // Equifax Credit Header
 														 ri.Src IN MDR.SourceTools.set_Experian_Credit_Header																														=> 'Consumer Reporting Agency 2', // Experian Credit Header
 														 ri.Src IN MDR.SourceTools.set_TransUnion_Credit_Header																													=> 'Consumer Reporting Agency 3', // TransUnion Credit Header
 														 ri.Src IN MDR.SourceTools.set_Professional_License																															=> 'Professional License', // Professional License Registration
@@ -347,6 +361,7 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 									(~MDR.Source_is_DPPA(RIGHT.src) OR 
 										(DPPA_Ok AND Drivers.State_DPPA_Ok(dx_header.functions.translateSource(RIGHT.src), DPPAPurpose, RIGHT.src))), 
 									getReportHeader(LEFT, RIGHT), KEEP(200), ATMOST(RiskWise.max_atmost));
+  	  	 getReportHeader_VerificationOfOccupancy_CCPA_a := Suppress.Suppress_ReturnOldLayout(reportHeader, mod_access,SourceCountsTemp);
 
 	reportQHeader := JOIN(ShellResults, PersonQuickHeaderKey,		
 									LEFT.DID <> 0 AND
@@ -368,8 +383,9 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 									(	~MDR.Source_is_DPPA(RIGHT.src) OR 
 										(DPPA_Ok AND Drivers.State_DPPA_Ok(dx_header.functions.translateSource(RIGHT.src), DPPAPurpose, RIGHT.src))), 
 									getReportQuickHeader(LEFT, RIGHT), KEEP(200), ATMOST(RiskWise.max_atmost));
-	
-	combinedReportHeader := SORT(UNGROUP(reportHeader + reportQHeader), SourceType, -DateLastSeen, DateFirstSeen) ((INTEGER)DateFirstSeen > 0 AND (INTEGER)DateLastSeen > 0);
+	  	  	 getReportQuickHeader_VerificationOfOccupancy_CCPA_a := Suppress.Suppress_ReturnOldLayout(reportQHeader, mod_access,SourceCountsTemp);
+
+	combinedReportHeader := SORT(UNGROUP(getReportHeader_VerificationOfOccupancy_CCPA_a + getReportQuickHeader_VerificationOfOccupancy_CCPA_a), SourceType, -DateLastSeen, DateFirstSeen) ((INTEGER)DateFirstSeen > 0 AND (INTEGER)DateLastSeen > 0);
 	
 	SourceCountsTemp rollReportHeader(SourceCountsTemp le, SourceCountsTemp ri) := TRANSFORM
 		SELF.SourceType := le.SourceType;
@@ -475,9 +491,16 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 	GongDIDKey := Gong.Key_History_DID;
 	UtilityDIDKey := Utilfile.Key_DID;
 	TargusDIDKey := Targus.Key_Targus_DID;
-	
-	VerificationOfOccupancy.Layouts.SupportingRecords getGongAddress(ShellResults le, GongAddressKey ri) := TRANSFORM
-		SELF.ServiceType := 'Phone';
+  
+	   VerificationOfOccupancy_CCPA_E := RECORD
+	 	 VerificationOfOccupancy.Layouts.SupportingRecords;
+     Unsigned4 Global_sid; 
+     unsigned6 did;
+     end;
+	VerificationOfOccupancy_CCPA_E getGongAddress(ShellResults le, GongAddressKey ri) := TRANSFORM
+		SELF.Global_Sid := ri.Global_Sid;
+    self.did := (unsigned6)ri.did;
+    SELF.ServiceType := 'Phone';
 		SELF.PropertySearch := TRUE;
 		SELF.DateFirstSeen := ri.DT_First_Seen[1..6];
 		SELF.DateLastSeen := ri.DT_Last_Seen[1..6];
@@ -486,7 +509,8 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 		SELF.ReportedMName := ri.Name_Middle;
 		SELF.ReportedLName := ri.Name_Last;
 		SELF.LexID := (unsigned8)ri.did;
-		SELF := [];
+
+    SELF := [];
 	END;
 	gongAddr := JOIN(ShellResults, GongAddressKey, isXML AND LEFT.Prim_Name <> '' AND LEFT.Z5 <> '' AND
 													KEYED(LEFT.Prim_Name = RIGHT.Prim_Name AND LEFT.St = RIGHT.St AND LEFT.Z5 = RIGHT.Z5 AND
@@ -494,8 +518,9 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 													RIGHT.Current_Flag = TRUE AND
 													(INTEGER)RIGHT.Dt_First_seen > 0 AND (INTEGER)(RIGHT.Dt_First_Seen[1..6]) <= LEFT.historydate,
 											getGongAddress(LEFT, RIGHT), KEEP(100), ATMOST(RiskWise.max_atmost));
-	
-	VerificationOfOccupancy.Layouts.SupportingRecords getUtilityAddress(ShellResults le, UtilityAddressKey ri) := TRANSFORM
+	  	 getGongAddress_VerificationOfOccupancy_CCPA_E := Suppress.Suppress_ReturnOldLayout(gongAddr, mod_access,VerificationOfOccupancy.Layouts.SupportingRecords);
+
+	 VerificationOfOccupancy.Layouts.SupportingRecords getUtilityAddress(ShellResults le, UtilityAddressKey ri) := TRANSFORM
 		SELF.ServiceType := 'Utility';
 		SELF.PropertySearch := TRUE;
 		SELF.DateFirstSeen := ri.Date_First_Seen[1..6];
@@ -515,9 +540,12 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 													~isUtility AND RIGHT.util_type <> 'Z' AND RIGHT.addr_type <> 'B' AND  //don't include billing addresses
 													(INTEGER)(RIGHT.Date_First_Seen[1..6]) <= LEFT.historydate AND (INTEGER)RIGHT.Date_First_Seen > 0,
 											getUtilityAddress(LEFT, RIGHT), KEEP(100), ATMOST(RiskWise.max_atmost));
-	
-	VerificationOfOccupancy.Layouts.SupportingRecords getTargusAddress(ShellResults le, TargusAddressKey ri) := TRANSFORM
-		SELF.ServiceType := 'Phone';
+
+
+	VerificationOfOccupancy_CCPA_E getTargusAddress(ShellResults le, TargusAddressKey ri) := TRANSFORM		
+    SELF.Global_Sid := ri.Global_Sid;
+    self.did := (unsigned6)ri.did;
+    SELF.ServiceType := 'Phone';
 		SELF.PropertySearch := TRUE;
 		SELF.DateFirstSeen := ((STRING)ri.DT_First_Seen)[1..6];
 		SELF.DateLastSeen := ((STRING)ri.DT_Last_Seen)[1..6];
@@ -540,7 +568,8 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 															RiskWise.max_atmost
 														),
 														KEEP(100));
-																
+					  	 getTargusAddress_VerificationOfOccupancy_CCPA_E := Suppress.Suppress_ReturnOldLayout(targusAddr, mod_access,VerificationOfOccupancy.Layouts.SupportingRecords);
+													
 	VerificationOfOccupancy.Layouts.SupportingRecords rollAddr(VerificationOfOccupancy.Layouts.SupportingRecords le, VerificationOfOccupancy.Layouts.SupportingRecords ri) := TRANSFORM
 		// Get the earliest date first seen and oldest date last seen for this First/Middle/Last combination
 		SELF.DateFirstSeen := MAP((INTEGER)le.DateFirstSeen <= 0 OR le.DateFirstSeen[5..6] = '00' => ri.DateFirstSeen,
@@ -552,7 +581,7 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 		SELF := le;
 	END;
 	// Rollup by the names that get discovered for our target address
-	sortedPhoneAddr := SORT(UNGROUP((gongAddr + targusAddr) (PropertySearch = TRUE)), ReportedFName, ReportedMName, ReportedLName);
+	sortedPhoneAddr := SORT(UNGROUP((getGongAddress_VerificationOfOccupancy_CCPA_E + getTargusAddress_VerificationOfOccupancy_CCPA_E) (PropertySearch = TRUE)), ReportedFName, ReportedMName, ReportedLName);
 	sortedUtilAddr := SORT(UNGROUP(utilityAddr (PropertySearch = TRUE)), ReportedFName, ReportedMName, ReportedLName);
 	
 	phoneAddr := ROLLUP(sortedPhoneAddr, LEFT.ReportedFName = RIGHT.ReportedFName AND LEFT.ReportedMName = RIGHT.ReportedMName AND LEFT.ReportedLName = RIGHT.ReportedLName, rollAddr(LEFT, RIGHT));
@@ -560,8 +589,15 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 	
 	combinedAddr := phoneAddr + utilAddr;
 	
-	VerificationOfOccupancy.Layouts.SupportingRecords getGongDID(ShellResults le, GongDIDKey ri) := TRANSFORM
-		SELF.ServiceType := 'Phone';
+  VerificationOfOccupancy_CCPA_f := RECORD
+	 	 VerificationOfOccupancy.Layouts.SupportingRecords;
+     Unsigned4 Global_sid; 
+     unsigned6 did;
+     end;
+	VerificationOfOccupancy_CCPA_f getGongDID(ShellResults le, GongDIDKey ri) := TRANSFORM
+		SELF.Global_Sid := ri.Global_Sid;
+    self.did := (unsigned6)ri.did;
+    SELF.ServiceType := 'Phone';
 		SELF.SubjectSearch := TRUE;
 		SELF.DateFirstSeen := ri.DT_First_Seen[1..6];
 		SELF.DateLastSeen := ri.DT_Last_Seen[1..6];
@@ -587,7 +623,8 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 												KEYED(LEFT.DID = RIGHT.l_DID) AND RIGHT.Current_Flag = TRUE AND
 												(INTEGER)RIGHT.DT_First_Seen > 0 AND (INTEGER)(RIGHT.DT_First_Seen[1..6]) <= LEFT.historydate,
 										getGongDID(LEFT, RIGHT), KEEP(100), ATMOST(RiskWise.max_atmost));
-	
+		  	 getGongDID_VerificationOfOccupancy_CCPA_F := Suppress.Suppress_ReturnOldLayout(gongDID, mod_access,VerificationOfOccupancy.Layouts.SupportingRecords);
+
 	VerificationOfOccupancy.Layouts.SupportingRecords getUtilityDID(ShellResults le, UtilityDIDKey ri) := TRANSFORM
 		SELF.ServiceType := 'Utility';
 		SELF.SubjectSearch := TRUE;
@@ -617,8 +654,10 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 													(INTEGER)(RIGHT.Date_First_Seen[1..6]) <= LEFT.historydate AND (INTEGER)RIGHT.Date_First_Seen > 0,
 												getUtilityDID(LEFT, RIGHT), KEEP(100), ATMOST(RiskWise.max_atmost));
 	
-	VerificationOfOccupancy.Layouts.SupportingRecords getTargusDID(ShellResults le, TargusDIDKey ri) := TRANSFORM
-		SELF.ServiceType := 'Phone';
+	VerificationOfOccupancy_CCPA_f getTargusDID(ShellResults le, TargusDIDKey ri) := TRANSFORM
+		SELF.Global_Sid := ri.Global_Sid;
+    self.did := (unsigned6)ri.did;
+    SELF.ServiceType := 'Phone';
 		SELF.SubjectSearch := TRUE;
 		SELF.DateFirstSeen := ((STRING)ri.DT_First_Seen)[1..6];
 		SELF.DateLastSeen := ((STRING)ri.DT_Last_Seen)[1..6];
@@ -644,7 +683,8 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 												KEYED(LEFT.DID = RIGHT.DID) AND
 												RIGHT.DT_First_Seen > 0 AND (INTEGER)(((STRING)RIGHT.DT_First_Seen)[1..6]) <= LEFT.historydate,
 											getTargusDID(LEFT, RIGHT), KEEP(100), ATMOST(RiskWise.max_atmost));
-											
+	 getTargusDID_VerificationOfOccupancy_CCPA_F := Suppress.Suppress_ReturnOldLayout(targusDID, mod_access,VerificationOfOccupancy.Layouts.SupportingRecords);
+										
 	VerificationOfOccupancy.Layouts.SupportingRecords rollSubject(VerificationOfOccupancy.Layouts.SupportingRecords le, VerificationOfOccupancy.Layouts.SupportingRecords ri) := TRANSFORM
 		// Get the earliest date first seen and oldest date last seen for this First/Middle/Last combination
 		SELF.DateFirstSeen := MAP((INTEGER)le.DateFirstSeen <= 0 OR le.DateFirstSeen[5..6] = '00' => ri.DateFirstSeen,
@@ -656,7 +696,7 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 		SELF := le;
 	END;
 	// Rollup by the names that get discovered for our target address
-	sortedPhoneSubject := SORT(UNGROUP((gongDID + targusDID) (SubjectSearch = TRUE)), ReportedStreetAddress, ReportedCity, ReportedZIP);
+	sortedPhoneSubject := SORT(UNGROUP((getGongDID_VerificationOfOccupancy_CCPA_F + getTargusDID_VerificationOfOccupancy_CCPA_F) (SubjectSearch = TRUE)), ReportedStreetAddress, ReportedCity, ReportedZIP);
 	sortedUtilSubject := SORT(UNGROUP(utilityDID (SubjectSearch = TRUE)), ReportedStreetAddress, ReportedCity, ReportedZIP);
 	
 	phoneSubject := ROLLUP(sortedPhoneSubject, LEFT.ReportedStreetAddress = RIGHT.ReportedStreetAddress AND LEFT.ReportedCity = RIGHT.ReportedCity AND LEFT.ReportedZIP = RIGHT.ReportedZIP, rollSubject(LEFT, RIGHT));
@@ -669,10 +709,16 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 	// * (Target) Property.                                           *
 	// ****************************************************************
 	HeaderAddressKey := dx_header.key_header_address();
-	
-	VerificationOfOccupancy.Layouts.SupportingRecordsAddr getSupportingAddr(ShellResults le, HeaderAddressKey ri) := TRANSFORM
+	 VerificationOfOccupancy_CCPA := RECORD
+	 VerificationOfOccupancy.Layouts.SupportingRecordsAddr;
+	 Unsigned4 Global_sid;
+   Unsigned6 did;
+   end;
+	VerificationOfOccupancy_CCPA getSupportingAddr(ShellResults le, HeaderAddressKey ri) := TRANSFORM
 		SELF.FName := ri.FName;
-		SELF.LName := ri.LName;
+		SELF.Global_Sid := ri.Global_Sid;
+    Self.did := ri.did;
+    SELF.LName := ri.LName;
 		SELF.LexID := ri.DID;
 		SELF.DateFirstSeen := ((STRING)ri.DT_First_Seen)[1..6];
 		SELF.DateLastSeen := ((STRING)ri.DT_Last_Seen)[1..6];
@@ -689,8 +735,11 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 																			(	~mdr.Source_is_DPPA(RIGHT.src) OR 
 																			(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src), DPPAPurpose ,RIGHT.src))), 
 															getSupportingAddr(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(RiskWise.max_atmost));
+  
+  	 getSupportingAddr_VerificationOfOccupancy_CCPA := Suppress.Suppress_ReturnOldLayout(supportingAddrTemp, mod_access, VerificationOfOccupancy.Layouts.SupportingRecordsAddr);
+                                                
 															
-	SupportingAddrSorted := SORT(UNGROUP(supportingAddrTemp), FName, LName, LexID, DateFirstSeen, -DateLastSeen);
+	SupportingAddrSorted := SORT(UNGROUP(getSupportingAddr_VerificationOfOccupancy_CCPA ), FName, LName, LexID, DateFirstSeen, -DateLastSeen);
 	
 	VerificationOfOccupancy.Layouts.SupportingRecordsAddr rollSupportingAddr(VerificationOfOccupancy.Layouts.SupportingRecordsAddr le, VerificationOfOccupancy.Layouts.SupportingRecordsAddr ri) := TRANSFORM
 		SELF.FName := le.FName;
@@ -775,7 +824,12 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 	// *         Get Emails for the DID Prior to History Date         *
 	// ****************************************************************
 	emailKey := Email_Data.Key_DID;
-	
+	iesp_VerificationOfOccupancy_CCPA := RECORD
+	 iesp.verificationofoccupancy.t_VOOEmail;
+	 Unsigned4 Global_sid;
+   Unsigned6 DID;
+   end;
+  
 	allowedEmailSources := [mdr.sourceTools.src_Acquiredweb,
 										mdr.sourceTools.src_Entiera, 
 										mdr.sourceTools.src_Impulse, 
@@ -784,15 +838,25 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 										mdr.sourceTools.src_Ibehavior,
 										mdr.sourceTools.src_SalesChannel,
 										mdr.sourceTools.src_Datagence];
+                    
 	
-	iesp.verificationofoccupancy.t_VOOEmail getEmails(ShellResults le, EmailKey ri) := TRANSFORM
-		SELF.Address := ri.Clean_Email;
+	iesp_VerificationOfOccupancy_CCPA getEmails(ShellResults le, EmailKey ri) := TRANSFORM
+	
+	SELF.GLOBAL_Sid := ri.Global_sid;
+  self.did := ri.did;
+   
+    SELF.Address := ri.Clean_Email;
 	END;
 	
 	emailData := JOIN(ShellResults, emailKey, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID) AND
 													RIGHT.Email_Src IN allowedEmailSources AND 
 													(UNSIGNED)(RIGHT.Date_First_Seen[1..6]) <= (UNSIGNED)(TodaysDate[1..6]) AND (UNSIGNED)RIGHT.Date_First_Seen > 0,
 											getEmails(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(RiskWise.max_atmost));
+                      // GetEmails_suppressed := Suppress.Mac_SuppressSource(emailData, mod_access);	
+
+	 iesp_VerificationOfOccupancy_CCPA_emaildata := Suppress.Suppress_ReturnOldLayout(emailData, mod_access, iesp.verificationofoccupancy.t_VOOEmail);
+                                                  
+                                                  
 	
 	// ****************************************************************
 	// *             Combine The Results into One Report!             *
@@ -868,7 +932,7 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 													
 													SELF := []))[1];
 		// Comes from the "Get Emails for the DID" section above
-		Emails := DEDUP(SORT(emailData, Address), Address);
+		Emails := DEDUP(SORT(iesp_VerificationOfOccupancy_CCPA_emaildata, Address), Address);
 		
 		Summary := PROJECT(dataset([{1}], {unsigned a}), TRANSFORM(iesp.verificationofoccupancy.t_VOOSummary, 
 													SELF.UniqueID := (STRING)ShellResults[1].DID;

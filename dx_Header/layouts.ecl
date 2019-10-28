@@ -1,4 +1,4 @@
-// shared for a lot of different keys:
+﻿// shared for a lot of different keys:
 prepped := $.layout_prep_for_keys;
 head := $.layout_header;
 
