@@ -33,27 +33,45 @@ EXPORT E_Education(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_Trim := PROJECT(__in,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.Sequence) + '|' + TRIM((STRING)LEFT.Key) + '|' + TRIM((STRING)LEFT.RawAID)));
-  EXPORT __All_Trim := __d0_Trim;
+  SHARED __d0_Trim := PROJECT(__in.Dataset_American_student_list__key_DID,TRANSFORM(__Trimmed,SELF.KeyVal:='' + '|' + TRIM((STRING)LEFT.Key) + '|' + ''));
+  SHARED __d1_Trim := PROJECT(__in.Dataset_AlloyMedia_student_list__Key_DID,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.Sequence_Number) + '|' + TRIM((STRING)LEFT.key_code) + '|' + TRIM((STRING)LEFT.rawaid)));
+  EXPORT __All_Trim := __d0_Trim + __d1_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
     KEL.typ.uid UID := 0;
   END;
-  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)'') + '|' + TRIM((STRING)'');
+  EXPORT NullKeyVal := '' + '|' + TRIM((STRING)'') + '|' + '';
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
   SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),key(OVERRIDE:Key_:\'\'),date_vendor_first_reported(OVERRIDE:Student_Date_Vendor_First_Reported_:DATE),date_vendor_last_reported(OVERRIDE:Student_Date_Vendor_Last_Reported_:DATE),college_name(OVERRIDE:College_Name_:\'\'),ln_college_name(OVERRIDE:L_N_College_Name_:\'\'),college_code(OVERRIDE:College_Code_:\'\'),college_type(OVERRIDE:College_Type_:\'\'),file_type(OVERRIDE:File_Type_:\'\'),school_size_code(OVERRIDE:School_Size_Code_:\'\'),competitive_code(OVERRIDE:Competitive_Code_:\'\'),tuition_code(OVERRIDE:Tuition_Code_:\'\'),tier(OVERRIDE:Tier_:\'\'),tier2(OVERRIDE:Tier2_:\'\'),source(OVERRIDE:Source_:\'\'),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
+    SELF.Sequence_ := __CN('');
+    SELF.Raw_A_I_D_ := __CN('');
+    SELF := __r;
+  END;
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_American_student_list__key_DID,TRANSFORM(RECORDOF(__in.Dataset_American_student_list__key_DID),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_American_student_list__key_DID);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(__in,Lookup,TRIM((STRING)LEFT.Sequence) + '|' + TRIM((STRING)LEFT.Key) + '|' + TRIM((STRING)LEFT.RawAID) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid := __d0_UID_Mapped(UID = 0);
+  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,'' + '|' + TRIM((STRING)LEFT.Key) + '|' + '' = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_American_student_list__key_DID_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  EXPORT InData := __d0;
+  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping0_Transform(LEFT)));
+  SHARED __Mapping1 := 'UID(DEFAULT:UID),sequence_number(OVERRIDE:Sequence_:\'\'),key_code(OVERRIDE:Key_:\'\'),rawaid(OVERRIDE:Raw_A_I_D_:\'\'),date_vendor_first_reported(OVERRIDE:Student_Date_Vendor_First_Reported_:DATE),date_vendor_last_reported(OVERRIDE:Student_Date_Vendor_Last_Reported_:DATE),school_name(OVERRIDE:College_Name_:\'\'),ln_college_name(OVERRIDE:L_N_College_Name_:\'\'),public_private_code(OVERRIDE:College_Code_:\'\'|OVERRIDE:College_Type_:\'\'),file_type(OVERRIDE:File_Type_:\'\'),school_size_code(OVERRIDE:School_Size_Code_:\'\'),competitive_code(OVERRIDE:Competitive_Code_:\'\'),tuition_code(OVERRIDE:Tuition_Code_:\'\'),tier(OVERRIDE:Tier_:\'\'),tier2(OVERRIDE:Tier2_:\'\'),source(OVERRIDE:Source_:\'\'),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_AlloyMedia_student_list__Key_DID,TRANSFORM(RECORDOF(__in.Dataset_AlloyMedia_student_list__Key_DID),SELF:=RIGHT));
+  SHARED __d1_Out := RECORD
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_AlloyMedia_student_list__Key_DID);
+    KEL.typ.uid UID := 0;
+  END;
+  SHARED __d1_UID_Mapped := JOIN(__d1_Norm,Lookup,TRIM((STRING)LEFT.Sequence_Number) + '|' + TRIM((STRING)LEFT.key_code) + '|' + TRIM((STRING)LEFT.rawaid) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_AlloyMedia_student_list__Key_DID_Invalid := __d1_UID_Mapped(UID = 0);
+  SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  EXPORT InData := __d0 + __d1;
   EXPORT College_Characteristics_Layout := RECORD
     KEL.typ.nstr College_Code_;
     KEL.typ.nstr College_Type_;
@@ -123,26 +141,43 @@ EXPORT E_Education(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
   EXPORT Raw_A_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Raw_A_I_D_);
   EXPORT Student_Date_Vendor_First_Reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Student_Date_Vendor_First_Reported_);
   EXPORT Student_Date_Vendor_Last_Reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Student_Date_Vendor_Last_Reported_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid),COUNT(College_Name__SingleValue_Invalid),COUNT(L_N_College_Name__SingleValue_Invalid),COUNT(Sequence__SingleValue_Invalid),COUNT(Key__SingleValue_Invalid),COUNT(Raw_A_I_D__SingleValue_Invalid),COUNT(Student_Date_Vendor_First_Reported__SingleValue_Invalid),COUNT(Student_Date_Vendor_Last_Reported__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid,KEL.typ.int College_Name__SingleValue_Invalid,KEL.typ.int L_N_College_Name__SingleValue_Invalid,KEL.typ.int Sequence__SingleValue_Invalid,KEL.typ.int Key__SingleValue_Invalid,KEL.typ.int Raw_A_I_D__SingleValue_Invalid,KEL.typ.int Student_Date_Vendor_First_Reported__SingleValue_Invalid,KEL.typ.int Student_Date_Vendor_Last_Reported__SingleValue_Invalid});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_American_student_list__key_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_AlloyMedia_student_list__Key_DID_Invalid),COUNT(College_Name__SingleValue_Invalid),COUNT(L_N_College_Name__SingleValue_Invalid),COUNT(Sequence__SingleValue_Invalid),COUNT(Key__SingleValue_Invalid),COUNT(Raw_A_I_D__SingleValue_Invalid),COUNT(Student_Date_Vendor_First_Reported__SingleValue_Invalid),COUNT(Student_Date_Vendor_Last_Reported__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_American_student_list__key_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_AlloyMedia_student_list__Key_DID_Invalid,KEL.typ.int College_Name__SingleValue_Invalid,KEL.typ.int L_N_College_Name__SingleValue_Invalid,KEL.typ.int Sequence__SingleValue_Invalid,KEL.typ.int Key__SingleValue_Invalid,KEL.typ.int Raw_A_I_D__SingleValue_Invalid,KEL.typ.int Student_Date_Vendor_First_Reported__SingleValue_Invalid,KEL.typ.int Student_Date_Vendor_Last_Reported__SingleValue_Invalid});
   EXPORT NullCounts := DATASET([
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid),COUNT(__d0)},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Sequence',COUNT(__d0(__NL(Sequence_))),COUNT(__d0(__NN(Sequence_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_American_student_list__key_DID_Invalid),COUNT(__d0)},
     {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Key',COUNT(__d0(__NL(Key_))),COUNT(__d0(__NN(Key_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RawAID',COUNT(__d0(__NL(Raw_A_I_D_))),COUNT(__d0(__NN(Raw_A_I_D_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StudentDateVendorFirstReported',COUNT(__d0(__NL(Student_Date_Vendor_First_Reported_))),COUNT(__d0(__NN(Student_Date_Vendor_First_Reported_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StudentDateVendorLastReported',COUNT(__d0(__NL(Student_Date_Vendor_Last_Reported_))),COUNT(__d0(__NN(Student_Date_Vendor_Last_Reported_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CollegeName',COUNT(__d0(__NL(College_Name_))),COUNT(__d0(__NN(College_Name_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LNCollegeName',COUNT(__d0(__NL(L_N_College_Name_))),COUNT(__d0(__NN(L_N_College_Name_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CollegeCode',COUNT(__d0(__NL(College_Code_))),COUNT(__d0(__NN(College_Code_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CollegeType',COUNT(__d0(__NL(College_Type_))),COUNT(__d0(__NN(College_Type_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FileType',COUNT(__d0(__NL(File_Type_))),COUNT(__d0(__NN(File_Type_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SchoolSizeCode',COUNT(__d0(__NL(School_Size_Code_))),COUNT(__d0(__NN(School_Size_Code_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CompetitiveCode',COUNT(__d0(__NL(Competitive_Code_))),COUNT(__d0(__NN(Competitive_Code_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TuitionCode',COUNT(__d0(__NL(Tuition_Code_))),COUNT(__d0(__NN(Tuition_Code_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Tier',COUNT(__d0(__NL(Tier_))),COUNT(__d0(__NN(Tier_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Tier2',COUNT(__d0(__NL(Tier2_))),COUNT(__d0(__NN(Tier2_)))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','date_vendor_first_reported',COUNT(__d0(__NL(Student_Date_Vendor_First_Reported_))),COUNT(__d0(__NN(Student_Date_Vendor_First_Reported_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','date_vendor_last_reported',COUNT(__d0(__NL(Student_Date_Vendor_Last_Reported_))),COUNT(__d0(__NN(Student_Date_Vendor_Last_Reported_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','college_name',COUNT(__d0(__NL(College_Name_))),COUNT(__d0(__NN(College_Name_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ln_college_name',COUNT(__d0(__NL(L_N_College_Name_))),COUNT(__d0(__NN(L_N_College_Name_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','college_code',COUNT(__d0(__NL(College_Code_))),COUNT(__d0(__NN(College_Code_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','college_type',COUNT(__d0(__NL(College_Type_))),COUNT(__d0(__NN(College_Type_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','file_type',COUNT(__d0(__NL(File_Type_))),COUNT(__d0(__NN(File_Type_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','school_size_code',COUNT(__d0(__NL(School_Size_Code_))),COUNT(__d0(__NN(School_Size_Code_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','competitive_code',COUNT(__d0(__NL(Competitive_Code_))),COUNT(__d0(__NN(Competitive_Code_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tuition_code',COUNT(__d0(__NL(Tuition_Code_))),COUNT(__d0(__NN(Tuition_Code_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tier',COUNT(__d0(__NL(Tier_))),COUNT(__d0(__NN(Tier_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tier2',COUNT(__d0(__NL(Tier2_))),COUNT(__d0(__NN(Tier2_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
     {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_AlloyMedia_student_list__Key_DID_Invalid),COUNT(__d1)},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Sequence_Number',COUNT(__d1(__NL(Sequence_))),COUNT(__d1(__NN(Sequence_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','key_code',COUNT(__d1(__NL(Key_))),COUNT(__d1(__NN(Key_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','rawaid',COUNT(__d1(__NL(Raw_A_I_D_))),COUNT(__d1(__NN(Raw_A_I_D_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','date_vendor_first_reported',COUNT(__d1(__NL(Student_Date_Vendor_First_Reported_))),COUNT(__d1(__NN(Student_Date_Vendor_First_Reported_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','date_vendor_last_reported',COUNT(__d1(__NL(Student_Date_Vendor_Last_Reported_))),COUNT(__d1(__NN(Student_Date_Vendor_Last_Reported_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','school_name',COUNT(__d1(__NL(College_Name_))),COUNT(__d1(__NN(College_Name_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ln_college_name',COUNT(__d1(__NL(L_N_College_Name_))),COUNT(__d1(__NN(L_N_College_Name_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','public_private_code',COUNT(__d1(__NL(College_Code_))),COUNT(__d1(__NN(College_Code_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','public_private_code',COUNT(__d1(__NL(College_Type_))),COUNT(__d1(__NN(College_Type_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','file_type',COUNT(__d1(__NL(File_Type_))),COUNT(__d1(__NN(File_Type_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','school_size_code',COUNT(__d1(__NL(School_Size_Code_))),COUNT(__d1(__NN(School_Size_Code_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','competitive_code',COUNT(__d1(__NL(Competitive_Code_))),COUNT(__d1(__NN(Competitive_Code_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tuition_code',COUNT(__d1(__NL(Tuition_Code_))),COUNT(__d1(__NN(Tuition_Code_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tier',COUNT(__d1(__NL(Tier_))),COUNT(__d1(__NN(Tier_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tier2',COUNT(__d1(__NL(Tier2_))),COUNT(__d1(__NN(Tier2_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'Education','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

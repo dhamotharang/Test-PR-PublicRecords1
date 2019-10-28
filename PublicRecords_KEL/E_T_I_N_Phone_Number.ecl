@@ -38,6 +38,14 @@ EXPORT E_T_I_N_Phone_Number(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
   SHARED __d1_Prefiltered := __d1_KELfiltered;
   SHARED __d1 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping1_Transform(LEFT)));
   EXPORT InData := __d0 + __d1;
+  EXPORT Contact_Phone_Flag_Layout := RECORD
+    KEL.typ.nbool Is_Contact_Phone_;
+    KEL.typ.nkdate Date_Vendor_First_Reported_;
+    KEL.typ.nkdate Date_Vendor_Last_Reported_;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -47,17 +55,16 @@ EXPORT E_T_I_N_Phone_Number(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
   EXPORT Layout := RECORD
     KEL.typ.ntyp(E_Phone().Typ) Phone_Number_;
     KEL.typ.ntyp(E_T_I_N().Typ) Tax_I_D_;
-    KEL.typ.nbool Is_Contact_Phone_;
-    KEL.typ.nkdate Date_Vendor_Last_Reported_;
-    KEL.typ.nkdate Date_Vendor_First_Reported_;
+    KEL.typ.ndataset(Contact_Phone_Flag_Layout) Contact_Phone_Flag_;
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Phone_Number_,Tax_I_D_,Is_Contact_Phone_,Date_Vendor_Last_Reported_,Date_Vendor_First_Reported_,ALL));
+  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Phone_Number_,Tax_I_D_,ALL));
   T_I_N_Phone_Number_Group := __PostFilter;
   Layout T_I_N_Phone_Number__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
+    SELF.Contact_Phone_Flag_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Is_Contact_Phone_,Date_Vendor_First_Reported_,Date_Vendor_Last_Reported_},Is_Contact_Phone_,Date_Vendor_First_Reported_,Date_Vendor_Last_Reported_),Contact_Phone_Flag_Layout)(__NN(Is_Contact_Phone_) OR __NN(Date_Vendor_First_Reported_) OR __NN(Date_Vendor_Last_Reported_)));
     SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
@@ -65,6 +72,7 @@ EXPORT E_T_I_N_Phone_Number(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     SELF := __r;
   END;
   Layout T_I_N_Phone_Number__Single_Rollup(InLayout __r) := TRANSFORM
+    SELF.Contact_Phone_Flag_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Contact_Phone_Flag_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Is_Contact_Phone_) OR __NN(Date_Vendor_First_Reported_) OR __NN(Date_Vendor_Last_Reported_)));
     SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
     SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);

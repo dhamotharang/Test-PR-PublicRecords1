@@ -1,4 +1,4 @@
-﻿IMPORT $.^.^.Business_Risk_BIP, $.^.^.MDR, PublicRecords_KEL, BIPV2;
+﻿IMPORT $.^.^.Business_Risk_BIP, $.^.^.MDR, $.^.^.ut, PublicRecords_KEL, BIPV2;
 
 EXPORT Common_Functions := MODULE;
 	
@@ -13,6 +13,9 @@ EXPORT Common_Functions := MODULE;
 		
 		RETURN result[1].roll_field;
 	ENDMACRO;
+	
+	EXPORT IsBadPhone(STRING InputPhone):=InputPhone IN ut.Set_BadPhones;
+	EXPORT IsBadSSN(STRING InputSSN):=InputSSN IN ut.Set_BadSSN ;	
 
 	// This is an adaption of Business_Risk_BIP.Common.GroupSources to take a STRING instead of a DATASET as input so the logic can be used in KEL. 
 	// This function converts the raw business source codes into modeling friendly codes as specified by our modeling team.

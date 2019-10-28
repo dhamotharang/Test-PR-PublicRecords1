@@ -1,5 +1,6 @@
-﻿IMPORT $.^.Risk_Indicators;
+﻿IMPORT $.^.Risk_Indicators, $.^.PublicRecords_KEL;
 IMPORT KEL11 AS KEL;
+
 EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) InputData,
 			DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC().Layout_FDC) FDCDataset,
 			PublicRecords_KEL.Interface_Options Options) := FUNCTION
@@ -8,32 +9,10 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 
 	RecordsWithSeleID := InputData(B_LexIDLegal > 0);
 	RecordsWithoutSeleID := InputData(B_LexIDLegal <= 0);
-
-	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(0,0,0,0,0).res0);
-	LayoutBusinessSeleIDNoDatesAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(0,0,0,0).res0);
 	
-	BusinessSeleIDAttributesRaw := KEL.Clean(PROJECT(RecordsWithSeleID, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
-		SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
-		NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
-				LEFT.B_LexIDUlt,
-				LEFT.B_LexIDOrg,
-				LEFT.B_LexIDLegal,
-				(INTEGER)LEFT.B_InpClnArchDt[1..8],
-				Options.KEL_Permissions_Mask, 
-				FDCDataset).res0;
-		SELF := NonFCRABusinessSeleIDResults[1])), TRUE, TRUE, TRUE);
+	BusinessSeleIDAttributesRaw := KEL.Clean(PublicRecords_KEL.Library.LIB_NonFCRA_BusinessSeleAttributes_Function(RecordsWithSeleID, FDCDataset, Options), TRUE, TRUE, TRUE);
 
-	BusinessSeleIDNoDatesAttributesRaw := KEL.Clean(IF(Options.OutputMasterResults,
-		PROJECT(RecordsWithSeleID, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes},
-			SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
-			NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(
-				LEFT.B_LexIDUlt,
-				LEFT.B_LexIDOrg,
-				LEFT.B_LexIDLegal,
-				Options.KEL_Permissions_Mask, 
-				FDCDataset).res0;
-			SELF := NonFCRABusinessSeleIDResults[1])),
-		DATASET([],{INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes})), TRUE, TRUE, TRUE);
+	BusinessSeleIDNoDatesAttributesRaw := KEL.Clean(PublicRecords_KEL.Library.LIB_NonFCRA_BusinessSeleAttributes_NoDates_Function(RecordsWithSeleID, FDCDataset, Options), TRUE, TRUE, TRUE);
 	
 	BusinessAttributesWithSeleID := JOIN(RecordsWithSeleID, BusinessSeleIDAttributesRaw, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID,
@@ -218,7 +197,17 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_B2BFltBalVol24Mc := IF(ResultsFound, ROUND(RIGHT.BE_B2BFltBalVol24Mc, 2), PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT); 
 			SELF.BE_B2BMatBalVol24Mc := IF(ResultsFound, ROUND(RIGHT.BE_B2BMatBalVol24Mc, 2), PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT); 
 			SELF.BE_B2BOpsBalVol24Mc := IF(ResultsFound, ROUND(RIGHT.BE_B2BOpsBalVol24Mc, 2), PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT); 
-			SELF.BE_B2BOthBalVol24Mc := IF(ResultsFound, ROUND(RIGHT.BE_B2BOthBalVol24Mc, 2), PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT); 		
+			SELF.BE_B2BOthBalVol24Mc := IF(ResultsFound, ROUND(RIGHT.BE_B2BOthBalVol24Mc, 2), PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT); 
+			SELF.BE_AstVehAirCntEv := IF(ResultsFound, RIGHT.BE_AstVehAirCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_AstVehWtrCntEv := IF(ResultsFound, RIGHT.BE_AstVehWtrCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_AstVehAutoCntEv := IF(ResultsFound, RIGHT.BE_AstVehAutoCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_AstVehAutoCnt2Y := IF(ResultsFound, RIGHT.BE_AstVehAutoCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_AstVehAutoPersCnt2Y := IF(ResultsFound, RIGHT.BE_AstVehAutoPersCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_AstVehAutoCommCnt2Y := IF(ResultsFound, RIGHT.BE_AstVehAutoCommCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_AstVehAutoOtherCnt2Y := IF(ResultsFound, RIGHT.BE_AstVehAutoOtherCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_AstVehAutoValTot2Y := IF(ResultsFound, RIGHT.BE_AstVehAutoValTot2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_AstVehAutoEmrgNewMsncEv := IF(ResultsFound, RIGHT.BE_AstVehAutoEmrgNewMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_AstVehAutoEmrgNewDtEv := IF(ResultsFound, RIGHT.BE_AstVehAutoEmrgNewDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			
 			
 			SELF := LEFT,
@@ -418,7 +407,18 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_B2BFltBalVol24Mc := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_B2BMatBalVol24Mc := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_B2BOpsBalVol24Mc := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF.BE_B2BOthBalVol24Mc := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;		
+			SELF.BE_B2BOthBalVol24Mc := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_AstVehAirCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_AstVehWtrCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_AstVehAutoCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_AstVehAutoCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_AstVehAutoPersCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_AstVehAutoCommCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_AstVehAutoOtherCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_AstVehAutoValTot2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_AstVehAutoEmrgNewMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_AstVehAutoEmrgNewDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+
 			
 			// Attribute from NonFCRABusinessSeleIDNoDatesAttributesV1 KEL query
 			SELF.B_LexIDLegalRstdOnlyFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
