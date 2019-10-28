@@ -62,7 +62,8 @@ EXPORT MacComputeDashboardDatasets(
  ,InLNPIDImpactClaimCount = ''
  ,InLNPIDImpactAmount = ''
  ,InScoreReasons = ''
-  
+ ,InOptOutIndicator = '' 
+ ,UseOptOutIndicator = FALSE
 ) := FUNCTIONMACRO
 
     IMPORT STD; 
@@ -107,9 +108,10 @@ EXPORT MacComputeDashboardDatasets(
     );
 
     MaxAddressScore := MAX (InDataset, InAddressScore) : INDEPENDENT;
-
+		
+		LOCAL ScoredRec := #IF((BOOLEAN)UseOptOutIndicator) SuspectAddressVisualization.Layouts.ScoredCCPARec #ELSE SuspectAddressVisualization.Layouts.ScoredRec #END;
     TrimScoredOutDs := PROJECT(InDataset, 
-        TRANSFORM(SuspectAddressVisualization.Layouts.ScoredRec,
+        TRANSFORM(ScoredRec,
             SELF.ProviderKey        :=  LEFT.InProviderKey;
             SELF.ProviderNpi        :=  LEFT.InClientNpi;
             SELF.FacilityName       :=  LEFT.InFacilityName;
@@ -207,6 +209,7 @@ EXPORT MacComputeDashboardDatasets(
             SELF.LNPIDImpactAmount              :=  LEFT.InLNPIDImpactAmount;
 						SELF.HeaderNPI											:=	MAP(LEFT.InClientNpi <> '' AND LEFT.InProviderNpi <> '' AND LEFT.InClientNpi = LEFT.InProviderNpi => '',
 																												LEFT.InProviderNpi);
+						#IF((BOOLEAN)UseOptOutIndicator) SELF.OptOutInd											:=	LEFT.InOptOutIndicator; #END
             SELF := LEFT;
             SELF := [];
         )
@@ -222,7 +225,7 @@ EXPORT MacComputeDashboardDatasets(
     );
     
     ScoredOutDs := JOIN(TrimScoredOutDs, AddressScoreRangeCount, LEFT.State = RIGHT.State AND LEFT.AddressScoreRange = RIGHT.AddressScoreRange, 
-        TRANSFORM(SuspectAddressVisualization.Layouts.ScoredRec, 
+        TRANSFORM(ScoredRec, 
             SELF.AddressScoreRangeAddressCount := RIGHT.AddressRangeCount;
             SELF := LEFT;
         ), LEFT OUTER, HASH
@@ -234,7 +237,7 @@ EXPORT MacComputeDashboardDatasets(
     );
     TopAddrTable := TABLE(TopAddrDs(State <> ''), {State, StateCounts := COUNT(GROUP)}, State, MERGE);
     ScoredDsWithStateCount := JOIN(ScoredOutDs, TopAddrTable, LEFT.State = RIGHT.State, 
-        TRANSFORM(SuspectAddressVisualization.Layouts.ScoredRec,
+        TRANSFORM(ScoredRec,
             SELF.StateCount := RIGHT.StateCounts;
             SELF := LEFT;
         ), LEFT OUTER, HASH
@@ -243,20 +246,21 @@ EXPORT MacComputeDashboardDatasets(
     SortLNPIDDs := SORT(DISTRIBUTE(ScoredOutDs(LNPID > 0), HASH32(LNPID)), LNPID, LOCAL);
     GroupLNPIDDs := GROUP(SortLNPIDDs, LNPID, LOCAL);   
     
-    SuspectAddressVisualization.Layouts.ScoredRec LnpidRollUp(SuspectAddressVisualization.Layouts.ScoredRec L, DATASET (SuspectAddressVisualization.Layouts.ScoredRec) R) := TRANSFORM
+    ScoredRec LnpidRollUp(ScoredRec L, DATASET (ScoredRec) R) := TRANSFORM
         SELF.ProviderScoreByLnpid := MAX(r,ProfessionalScore);
         SELF := L;
     END;
     RollupLnpidTrimDs := ROLLUP(GroupLNPIDDs, GROUP, LnpidRollUp(LEFT, ROWS(LEFT)));
    
     JoinLNPIDDs := JOIN(ScoredDsWithStateCount, RollupLnpidTrimDs, LEFT.LNPID = RIGHT.LNPID, 
-        TRANSFORM(SuspectAddressVisualization.Layouts.ScoredRec,
+        TRANSFORM(ScoredRec,
             SELF.ProviderScoreByLnpid := RIGHT.ProviderScoreByLnpid;
             SELF := LEFT;
         ), LEFT OUTER,HASH
     );
-
-    TrimScoredDs:= PROJECT(JoinLNPIDDs, TRANSFORM(SuspectAddressVisualization.Layouts.ScoredOutRec, SELF := LEFT;));
+		
+		LOCAL ScoredOutRec := #IF((BOOLEAN)UseOptOutIndicator) SuspectAddressVisualization.Layouts.ScoredCCPAOutRec #ELSE SuspectAddressVisualization.Layouts.ScoredOutRec #END;
+    TrimScoredDs:= PROJECT(JoinLNPIDDs, TRANSFORM(ScoredOutRec, SELF := LEFT;));
 
     TopScoredProvider := DEDUP(
         SORT(
@@ -394,9 +398,10 @@ EXPORT MacComputeDashboardDatasets(
         SORT(DISTRIBUTE(AddressReasonAttrDs(Reason <> ''), HASH32(Reason,AddressLine)), Reason, AddressLine, LOCAL),
         Reason, AddressLine, LOCAL
     );
-
+		
+		LOCAL TopSuspectAddressProviderRecord := #IF((BOOLEAN)UseOptOutIndicator) SuspectAddressVisualization.Layouts.TopSuspectAddressProviderCCPARecord #ELSE SuspectAddressVisualization.Layouts.TopSuspectAddressProviderRecord #END;
     ProviderDataDs := PROJECT(ScoredOutDs(PrimaryName <> '' AND Zip5 <> ''), 
-        TRANSFORM(SuspectAddressVisualization.Layouts.TopSuspectAddressProviderRecord, 
+        TRANSFORM(TopSuspectAddressProviderRecord, 
             SELF.TotalCharge    := LEFT.LNPIDHighChargeAmount;
             SELF.TotalPaid      := LEFT.LNPIDHighPaidAmount;
             SELF.PaidPercent    := ROUND((LEFT.ProviderHighPaidAmount / LEFT.ProviderHighChargeAmount) * 100);
@@ -410,8 +415,9 @@ EXPORT MacComputeDashboardDatasets(
         )
     );
 
+		LOCAL TopSuspectProviderReasonRecord := #IF((BOOLEAN)UseOptOutIndicator) SuspectAddressVisualization.Layouts.TopSuspectProviderReasonCCPARecord #ELSE SuspectAddressVisualization.Layouts.TopSuspectProviderReasonRecord #END;
     ReasonAttrDs := NORMALIZE (ProviderDataDs, COUNT(LEFT.ScoreReasons), 
-        TRANSFORM(SuspectAddressVisualization.Layouts.TopSuspectProviderReasonRecord, 
+        TRANSFORM(TopSuspectProviderReasonRecord, 
             SELF.ReasonCode             :=  LEFT.ScoreReasons[counter].Reason [1..1]; 
             SELF.Reason                 :=  LEFT.ScoreReasons[counter].Reason; 
             SELF.ReasonCodeDescription  :=  MAP(
@@ -449,7 +455,9 @@ EXPORT MacComputeDashboardDatasets(
             
     ProviderAttrsDs := DEDUP(SORT(DISTRIBUTE(ReasonAttrDs(Reason <> ''), HASH32(Reason, ProviderKey)), Reason, ProviderKey, LOCAL), Reason, ProviderKey, LOCAL);
 		ProviderSpecialtyDs	:= DEDUP(SORT(DISTRIBUTE(ReasonAttrDs(ClientSpecialtyCode <> ''), HASH32(ProviderKey)), ProviderKey, LOCAL), ProviderKey, LOCAL);
-		AllSpecialtyDs	:= PROJECT (ProviderSpecialtyDs (FirstName <> '' AND LastName <> ''), TRANSFORM(SuspectAddressVisualization.Layouts.TopSuspectProviderReasonRecord, SELF.ClientSpecialtyCode := 'All Codes'; SELF := LEFT;)) + ProviderSpecialtyDs  (FirstName <> '' AND LastName <> '');
+
+		AllSpecialtyDs	:= PROJECT (ProviderSpecialtyDs (FirstName <> '' AND LastName <> ''), TRANSFORM(SuspectAddressVisualization.Layouts.TopSuspectProviderReasonRecord, SELF.ClientSpecialtyCode := 'All Codes'; SELF := LEFT;)) + PROJECT(ProviderSpecialtyDs  (FirstName <> '' AND LastName <> ''),SuspectAddressVisualization.Layouts.TopSuspectProviderReasonRecord);
+		AllSpecialtyCCPADs := PROJECT (ProviderSpecialtyDs (FirstName <> '' AND LastName <> ''), TRANSFORM(SuspectAddressVisualization.Layouts.TopSuspectProviderReasonCCPARecord, SELF.ClientSpecialtyCode := 'All Codes'; SELF := LEFT;)) + PROJECT(ProviderSpecialtyDs  (FirstName <> '' AND LastName <> ''),SuspectAddressVisualization.Layouts.TopSuspectProviderReasonCCPARecord);
 		
     AttrTable := TABLE(ProviderAttrsDs, {ReasonCode, Reason, ReasonCodeDescription, ReasonCount := COUNT(GROUP)}, ReasonCode, MERGE);
 
@@ -501,19 +509,25 @@ EXPORT MacComputeDashboardDatasets(
 				SELF := LEFT;
 		));
 		
-    ScoredDs := TrimScoredDs;
-    ProviderDs := ProviderAttrsDs;
-  
-  ScoredWithEmptyFlagFilter := PROJECT(ScoredDs, TRANSFORM(SuspectAddressVisualization.Layouts.ScoredWithFlagFilterLayout, SELF.FlagFilter := ''; SELF := LEFT;));
-    SuspectAddressVisualization.Layouts.ScoredWithFlagFilterLayout FlagFilterXform(RECORDOF(ScoredDs) L, RECORDOF(ProviderDs) R) := TRANSFORM
+    ScoredDs := PROJECT(TrimScoredDs, SuspectAddressVisualization.Layouts.ScoredOutRec);
+    ScoredDsCCPA := PROJECT(TrimScoredDs, SuspectAddressVisualization.Layouts.ScoredCCPAOutRec);
+    ProviderDs := PROJECT(ProviderAttrsDs, SuspectAddressVisualization.Layouts.TopSuspectProviderReasonRecord);
+    ProviderDsCCPA := PROJECT(ProviderAttrsDs, SuspectAddressVisualization.Layouts.TopSuspectProviderReasonCCPARecord);
+
+		LOCAL ScoredWithFlagFilterLayout := #IF((BOOLEAN)UseOptOutIndicator) SuspectAddressVisualization.Layouts.ScoredWithFlagFilterCCPALayout #ELSE SuspectAddressVisualization.Layouts.ScoredWithFlagFilterLayout #END;  
+  ScoredWithEmptyFlagFilter := PROJECT(TrimScoredDs, TRANSFORM(ScoredWithFlagFilterLayout, SELF.FlagFilter := ''; SELF := LEFT));
+    ScoredWithFlagFilterLayout FlagFilterXform(RECORDOF(TrimScoredDs) L, RECORDOF(ProviderAttrsDs) R) := TRANSFORM
         SELF.FlagFilter := R.Description;
         SELF := L;
+				SELF := [];
     END; 
-    ScoredWithFlagFilter := JOIN(ScoredDs, ProviderDs, LEFT.ProviderKey = RIGHT.ProviderKey AND RIGHT.Description <> '', 
+    ScoredWithFlagFilter := JOIN(TrimScoredDs, ProviderAttrsDs, LEFT.ProviderKey = RIGHT.ProviderKey AND RIGHT.Description <> '', 
         FlagFilterXform(LEFT, RIGHT)
     );
-    ScoredWithAllFlagFilterDs := ScoredWithFlagFilter + ScoredWithEmptyFlagFilter;
-
+    ScoredWithAllFlagFilterDs_ := ScoredWithFlagFilter + ScoredWithEmptyFlagFilter;
+		ScoredWithAllFlagFilterDs := PROJECT(ScoredWithAllFlagFilterDs_, SuspectAddressVisualization.Layouts.ScoredWithFlagFilterLayout);
+		ScoredWithAllFlagFilterDsCCPA := PROJECT(ScoredWithAllFlagFilterDs_, SuspectAddressVisualization.Layouts.ScoredWithFlagFilterCCPALayout);
+		
 		TrimSpecialtyDs := PROJECT (InDataset, TRANSFORM(SuspectAddressVisualization.Layouts.TrimSpecialtyLayout, 
 			SELF.LNPID					:=	LEFT.InLNPID;
 			SELF.ProviderSocre	:=	(INTEGER)LEFT.InProfessionalScore;
@@ -563,7 +577,8 @@ EXPORT MacComputeDashboardDatasets(
 		END;
 
 		SummaryDS := TABLE (InDataset (InLNPID > 0),SummaryLayout);
-
-    Resultset := SuspectAddressVisualization.Results(ScoredDs, ProviderDs, FinalAddressDataset, TrimFacilityDs, ScoredWithAllFlagFilterDs, SpecialtyStatsDs, AllSpecialtyDs, ProviderFlagDs, AddressFlagDs, SummaryDS);
+		
+		
+    Resultset := SuspectAddressVisualization.Results(ScoredDs, ProviderDs, FinalAddressDataset, TrimFacilityDs, ScoredWithAllFlagFilterDs, SpecialtyStatsDs, AllSpecialtyDs, ProviderFlagDs, AddressFlagDs, SummaryDS, ScoredDsCCPA, ProviderDsCCPA, ScoredWithAllFlagFilterDsCCPA, AllSpecialtyCCPADs);
     RETURN Resultset;
 ENDMACRO;
