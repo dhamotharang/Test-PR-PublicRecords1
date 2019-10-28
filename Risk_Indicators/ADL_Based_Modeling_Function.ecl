@@ -1,4 +1,4 @@
-﻿import Gateway, risk_indicators;
+﻿import Gateway,doxie, risk_indicators;
 
 export ADL_Based_Modeling_Function(DATASET (risk_indicators.layout_input) indata,
 																		DATASET (Gateway.Layouts.Config) gateways,
@@ -28,10 +28,10 @@ export ADL_Based_Modeling_Function(DATASET (risk_indicators.layout_input) indata
 																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
 																		string100 IntendedPurpose='',
 																		unsigned8 BSOptions = 0,
-                                                                        unsigned1 LexIdSourceOptout = 1,
-                                                                        string TransactionID = '',
-                                                                        string BatchUID = '',
-                                                                        unsigned6 GlobalCompanyId = 0
+                                    unsigned1 LexIdSourceOptout = 1,
+                                    string TransactionID = '',
+                                    string BatchUID = '',
+                                    unsigned6 GlobalCompanyId = 0
 																		) := function										
 										
 
@@ -60,7 +60,12 @@ iid_results_with_flags := risk_indicators.ADL_Based_Modeling_IID_function(indata
 																		DataRestriction,
 																		BSOptions,
 																		DataPermission,
-                                    IntendedPurpose);
+                                    IntendedPurpose,
+                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                    TransactionID := TransactionID, 
+                                    BatchUID := BatchUID, 
+                                    GlobalCompanyID := GlobalCompanyID
+                                    );
 
 // ====================================================================
 // step 2.  trim off the flags to pass just layout output into shell
@@ -87,7 +92,10 @@ bs_ret := risk_indicators.Boca_Shell_Function(iid_results,
 																						nugen,
 																						datarestriction:=datarestriction,
 																						BSOptions:=BSOptions,
-																						datapermission:=datapermission);
+																						datapermission:=datapermission,LexIdSourceOptout := LexIdSourceOptout, 
+                                            TransactionID := TransactionID, 
+                                            BatchUID := BatchUID, 
+                                            GlobalCompanyID := GlobalCompanyID);
 
 // ====================================================================
 // step 4.  append adl_based_modeling fields to bocashell results

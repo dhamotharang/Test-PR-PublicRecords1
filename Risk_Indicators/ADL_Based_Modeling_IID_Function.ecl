@@ -1,4 +1,4 @@
-﻿import _Control, gong, riskwise, address, ut, FCRA,gateway, risk_indicators;
+﻿import _Control, gong,suppress, riskwise, address, ut,doxie, FCRA,gateway, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
 // this function will be used on Neutral roxie only
@@ -23,10 +23,19 @@ export ADL_Based_Modeling_IID_Function(DATASET (risk_indicators.layout_input) in
 																		string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 																		unsigned8 BSOptions=0,
 																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
-                                    string100 IntendedPurpose=''
-																		) := function		
-
-
+                                    string100 IntendedPurpose='',
+                                     unsigned1 LexIdSourceOptout = 1,
+                                    string TransactionID = '',
+                                    string BatchUID = '',
+                                    unsigned6 GlobalCompanyId = 0
+																		 ) := function		
+SHARED MOD_Access := MODULE(Doxie.IDataAccess)
+		 
+		EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+		EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+		EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+		END;
+    
 // ====================================================================
 // step 1.  Get the DID
 // ====================================================================
@@ -280,8 +289,14 @@ gong_correct_thor := join(best_of_header(gong_correct_ffid<>[]), pull(FCRA.Key_O
 #END
 
 // search gong file for phones we may not have found on header search
-temp add_gong(temp le, gong.Key_History_did rt) := transform
-	self.gong_phone10 := rt.phone10;
+risk_indicators_iid_getHeader_ccpa_c := Record
+	temp;
+	Unsigned4 Global_sid;
+	end;
+risk_indicators_iid_getHeader_ccpa_c add_gong(temp le, gong.Key_History_did rt) := transform
+	self.Global_Sid := rt.Global_Sid;
+	self.did := rt.did;
+  self.gong_phone10 := rt.phone10;
 	self.gong_current_flag := rt.current_flag;
 	gong_phonescore := risk_indicators.PhoneScore(le.phone10, rt.phone10);
 	self.gong_phonescore := gong_phonescore;
@@ -308,7 +323,7 @@ with_gong_did1_roxie := join(best_of_header, gong_key,
 									trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in left.gong_correct_record_id	// old way - prior to 11/13/2012
 									and trim((string)right.persistent_record_id) not in left.gong_correct_record_id, // new way - using persistent_record_id
 									add_gong(left, right), left outer, atmost(riskwise.max_atmost), keep(100));
-
+add_gong_risk_indicators_iid_getHeader_ccpa_c := Suppress.Suppress_ReturnOldLayout(with_gong_did1_roxie, mod_access,temp);
 
 with_gong_did1_thor := join(distribute(best_of_header, hash64(did)), 
 									distribute(pull(gong_key), hash64(did)), 
@@ -318,11 +333,12 @@ with_gong_did1_thor := join(distribute(best_of_header, hash64(did)),
 									trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in left.gong_correct_record_id	// old way - prior to 11/13/2012
 									and trim((string)right.persistent_record_id) not in left.gong_correct_record_id, // new way - using persistent_record_id
 									add_gong(left, right), left outer, atmost(right.l_did=left.did, riskwise.max_atmost), keep(100), LOCAL);
+add_gong_risk_indicators_iid_getHeader_ccpa := Suppress.Suppress_ReturnOldLayout(with_gong_did1_thor, mod_access,temp);
 
 #IF(onThor)
-	with_gong_did1 := with_gong_did1_thor;
+	with_gong_did1 := add_gong_risk_indicators_iid_getHeader_ccpa;
 #ELSE
-	with_gong_did1 := with_gong_did1_roxie;
+	with_gong_did1 := add_gong_risk_indicators_iid_getHeader_ccpa_c;
 #END
 
 with_gong_did := if(isFCRA, gong_correct + with_gong_did1, with_gong_did1);
@@ -427,7 +443,10 @@ iid_results := risk_indicators.InstantID_Function(iid_prep,
 										bsversion,
 										in_DataRestriction := DataRestriction,
 										in_BSOptions := BSOptions,
-                    in_IntendedPurpose := IntendedPurpose);
+                    in_IntendedPurpose := IntendedPurpose,LexIdSourceOptout := LexIdSourceOptout, 
+                    TransactionID := TransactionID, 
+                    BatchUID := BatchUID, 
+                    GlobalCompanyID := GlobalCompanyID);
 
 
 iid_results_with_flags := group( sort(

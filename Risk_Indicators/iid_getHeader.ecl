@@ -1,4 +1,4 @@
-﻿import _Control, risk_indicators, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address,data_services,dx_header,STD, dx_header;
+﻿import _Control, risk_indicators, header, mdr, did_add,Doxie, ut, drivers,suppress, FCRA, header_quick, riskwise, NID, address,data_services,dx_header,STD;
 onThor := _Control.Environment.OnThor;
 
 export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
@@ -10,9 +10,17 @@ export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsig
 							unsigned2 EverOccupant_PastMonths=0,
 							unsigned4 EverOccupant_StartDate = risk_indicators.iid_constants.default_history_date,
 							unsigned3 LastSeenThreshold = risk_indicators.iid_constants.oneyear,
-							unsigned8 BSOptions=0
-	) := function
-
+							unsigned8 BSOptions=0,
+              unsigned1 LexIdSourceOptout = 1,
+              string TransactionID = '',
+              string BatchUID = '',
+              unsigned6 GlobalCompanyId = 0) := function
+SHARED MOD_Access := MODULE(Doxie.IDataAccess)
+		 
+		EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+		EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+		EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+		END;
 unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
 
@@ -161,9 +169,14 @@ header_corr_thor := if(isFCRA,group( JOIN(distribute(g_inrec(did<>0), hash64(did
 																		
 // get full header
 header_key := dx_header.key_header(iType);
-
-Layout_Header_Data get_j_pre(g_inrec le, header_key ri) := TRANSFORM
-	self.seq := le.seq; 
+risk_indicators_iid_getHeader_ccpa := Record
+Layout_Header_Data;
+Unsigned4 Global_sid; 
+end;
+risk_indicators_iid_getHeader_ccpa get_j_pre(g_inrec le, header_key ri) := TRANSFORM
+	SELF.Global_Sid := ri.Global_Sid;
+  self.did := ri.did;
+  self.seq := le.seq; 
 	self.h := ri; 
 	self.valid_dob := ri.valid_dob, 
 	self.hhid_summary.hhid := if(isFCRA, 0, ri.hhid);
@@ -202,6 +215,7 @@ j_pre_roxie := join (g_inrec, header_key,
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(ut.limits.HEADER_PER_DID));
+		  	 get_j_pre_risk_indicators_iid_getHeader_ccpa := Suppress.Suppress_ReturnOldLayout(j_pre_roxie, mod_access,Layout_Header_Data);
 
 j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)), 
 										distribute(pull(header_key(s_did<>0)), hash64(s_did)), 
@@ -236,20 +250,26 @@ j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(left.did=right.s_did, ut.limits.HEADER_PER_DID), LOCAL);
+		  	 get_j_pre_risk_indicators_iid_getHeader_ccpa_a := Suppress.Suppress_ReturnOldLayout(j_pre_thor, mod_access,Layout_Header_Data);
 
 j_pre_thor_nodid := project(g_inrec(did=0), transform(Layout_Header_Data, self := left, self := []));
 
 #IF(onThor)
-	j_pre := j_pre_thor+j_pre_thor_nodid;
+	j_pre := get_j_pre_risk_indicators_iid_getHeader_ccpa_a+j_pre_thor_nodid;
 #ELSE
-	j_pre := j_pre_roxie;
+	j_pre := get_j_pre_risk_indicators_iid_getHeader_ccpa;
 #END
 
 // get quick header
 header_quick_key := if(isFCRA, header_quick.key_did_fcra, header_quick.key_DID);
-
-Layout_Header_Data get_j_quickpre(g_inrec le, header_quick_key ri) := TRANSFORM
-	self.seq := le.seq, 
+risk_indicators_iid_getHeader_ccpa_b := Record
+Layout_Header_Data;
+Unsigned4 Global_sid; 
+end;
+risk_indicators_iid_getHeader_ccpa_b get_j_quickpre(g_inrec le, header_quick_key ri) := TRANSFORM
+	SELF.Global_Sid := ri.Global_Sid;
+  self.did := ri.did;
+  self.seq := le.seq, 
 	self.came_from_fastheader := true, 
 	self.h := ri, 
 	self := le, 
@@ -287,6 +307,7 @@ j_quickpre_roxie := join (g_inrec, header_quick_key,
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_quickpre(LEFT,RIGHT), 
 													 atmost(ut.limits.HEADER_PER_DID));
+		  	 get_j_quickpre_risk_indicators_iid_getHeader_ccpa_b := Suppress.Suppress_ReturnOldLayout(j_quickpre_roxie, mod_access,Layout_Header_Data);
 
 j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)), 
 												 distribute(pull(header_quick_key(did<>0)), hash64(did)),
@@ -321,11 +342,12 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_quickpre(LEFT,RIGHT), 
 													 atmost(LEFT.did = RIGHT.did, ut.limits.HEADER_PER_DID), LOCAL);
-													 
+				  	 get_j_quickpre_risk_indicators_iid_getHeader_ccpa_bi := Suppress.Suppress_ReturnOldLayout(j_quickpre_thor, mod_access,Layout_Header_Data);
+											 
 #IF(onThor)
-	j_quickpre := j_quickpre_thor;
+	j_quickpre := get_j_quickpre_risk_indicators_iid_getHeader_ccpa_bi;
 #ELSE
-	j_quickpre := j_quickpre_roxie;
+	j_quickpre := get_j_quickpre_risk_indicators_iid_getHeader_ccpa_b;
 #END
 
 header_recs_combined := j_pre + j_quickpre;  
@@ -1374,6 +1396,7 @@ tranHeader := project(header_recs, getHeader(LEFT));
 
 // search ADL record history for match to prison address for bs 3.0
 prison_key := if(isFCRA, risk_indicators.key_HRI_Address_To_SIC_filtered_FCRA, risk_indicators.key_HRI_Address_To_SIC);
+
 
 Risk_Indicators.iid_constants.layout_outx getPrison(tranHeader le, prison_key ri) := transform
 	self.isPrison := if(trim(le.chrono_addr_flags.prisonAddr)<>'', (boolean)le.chrono_addr_flags.prisonAddr, ri.sic_code='2225');
