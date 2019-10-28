@@ -1,20 +1,8 @@
 import $, std;
 export build_census_surnames(string data_source) := function
-    OriginalLayout := RECORD
-        STRING field1;
-        STRING field2;
-        STRING field3;
-        STRING field4;
-        STRING field5;
-        STRING field6;
-        STRING field7;
-        STRING field8;
-        STRING field9;
-        STRING field10;
-        STRING field11;
-    END;
+    OriginalLayout := $.layouts.original_namecensus;
     RawData := dataset(data_source, OriginalLayout, CSV(Heading(1)));
-    $.layouts.namecensus CFPB_convert(originalLayout L, unsigned4 rsid, unsigned4 date) := TRANSFORM
+    $.layouts.namecensus CFPB_convert(OriginalLayout L, unsigned4 rsid, unsigned4 date) := TRANSFORM
         self.name := L.field1;
         self.name_rank := (UNSIGNED3) L.field2;
         self.name_count := (UNSIGNED3) L.field3;

@@ -6,13 +6,13 @@ B_BaseBLKGRP_attr_over18 := output($.sources.BaseBLKGRP_attr_over18,, $.Filename
 B_BaseCensus_surnames := output($.sources.BaseCensus_surnames,, $.Filenames().BaseCensus_surnames, overwrite);  */
 
 index_BLKGRP := buildindex($.key_BLKGRP( $.Filenames(pversion, pUseProd, isfcra).keyBLKGRP),
-                            $.sources.BaseBLKGRP, overwrite); 
+                            $.Filenames(pversion, pUseProd, isfcra).BaseBLKGRP_in, overwrite); 
                             
 index_BLKGRP_attr_over18 := buildindex($.key_BLKGRP_attr_over18($.Filenames(pversion, pUseProd, isfcra).keyBLKGRP_attr_over18),
-                                        $.sources.BaseBLKGRP_attr_over18, overwrite);
+                                        $.Filenames(pversion, pUseProd, isfcra).BaseBLKGRP_attr_over18_in, overwrite);
 
 index_census_surnames := buildindex($.key_census_surnames($.Filenames(pversion, pUseProd, isfcra).keyCensus_surnames), 
-                                    $.sources.BaseCensus_surnames,overwrite); 
+                                    $.Filenames(pversion, pUseProd, isfcra).BaseCensus_surnames_in,overwrite); 
 //sequential(B_BaseBLKGRP,B_BaseBLKGRP_attr_over18,B_BaseCensus_surnames,index_blkgrp);
 
 /* Do_BLKGRP := sequential(B_BaseBLKGRP, index_BLKGRP);

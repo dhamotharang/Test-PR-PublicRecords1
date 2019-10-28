@@ -1,22 +1,7 @@
 import $, std;
 export Build_BLKGRP_attr_over18(string data_source) := function
-    OriginalLayout := RECORD
-        STRING field1;
-        STRING field2;
-        STRING field3;
-        STRING field4;
-        STRING field5;
-        STRING field6;
-        STRING field7;
-        STRING field8;
-        STRING field9;
-        STRING field10;
-        STRING field11;
-        STRING field12;
-        STRING field13;
-        STRING field14;
-    END;
-    RawData := dataset(data_source, OriginalLayout, CSV(Heading(1)));
+    OriginalLayout :=  $.layouts.original_geoidOver18;
+    RawData := dataset(data_source, originalLayout, CSV(Heading(1)));
     $.layouts.geoidOver18 CFPB_convert(originalLayout L,  unsigned4 rsid, unsigned4 date) := TRANSFORM
         self.GeoInd := L.field1;
         self.geo_pr_White := (REAL4) L.field2;
