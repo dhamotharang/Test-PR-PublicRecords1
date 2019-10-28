@@ -1,4 +1,4 @@
-﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE,  Business_Credit, BusinessCredit_Services, Doxie, iesp, ut, std, suppress;
+﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE,  Business_Credit, BusinessCredit_Services, Doxie, iesp, std, suppress, ut;
 
 EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inmod, 
 																DATASET(doxie.layout_references) ds_individualOwnerOnlyDids,
@@ -87,12 +87,13 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 	ds_IndOwnrGuarRecs_raw_slim	:= PROJECT(OwnrGuarRecs_raw_IS_recs, Doxie.layout_references);
 	ds_combIndOwnrRecs					:= ds_IndOwnrGuarRecs_raw_slim + ds_individualOwnerOnlyDids;
 	ds_IndOwnrGuarRecs_raw_dedup:= DEDUP(SORT(ds_combIndOwnrRecs, DID), DID);
-	ds_IndOwnerGuarRecs_raw			:= JOIN(ds_IndOwnrGuarRecs_raw_dedup , Business_Credit.Key_IndividualOwnerInformation(),
+	ds_IndOwnerGuarRecs_raw_org := JOIN(ds_IndOwnrGuarRecs_raw_dedup , Business_Credit.Key_IndividualOwnerInformation(),
 																			KEYED(LEFT.DID = RIGHT.DID),
 																			TRANSFORM(RIGHT) , 
 																			LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT, SKIP));
-
-	ds_IndOwnerGuar_Best 	:= IF(EXISTS(ds_IndOwnrGuarRecs_raw_dedup), doxie.best_records(ds_IndOwnrGuarRecs_raw_dedup, modAccess := mod_access));
+	ds_IndOwnerGuarRecs_raw := Suppress.MAC_SuppressSource(ds_IndOwnerGuarRecs_raw_org, mod_access, did);
+  
+  ds_IndOwnerGuar_Best 	:= IF(EXISTS(ds_IndOwnrGuarRecs_raw_dedup), doxie.best_records(ds_IndOwnrGuarRecs_raw_dedup, modAccess := mod_access));
 
 	iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor trans_preFinalIndi(ds_IndOwnerGuarRecs_raw L , doxie.layout_best R) := TRANSFORM
     street_addr := Address.Addr1FromComponents(R.prim_range, R.predir, R.prim_name, R.suffix,
@@ -146,15 +147,17 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 																#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts())),
 													#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
 
-	y_individual_owner 	:= JOIN(x_owners_dids, Business_Credit.Key_IndividualOwnerInformation(),
-															KEYED(LEFT.DID = RIGHT.DID), 
-															TRANSFORM(RIGHT), 
-															LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT, SKIP))(Guarantor_Owner_Indicator IN ['001' , '003']);
-
-	y_individual_owner_dedup 	:= DEDUP(SORT(y_individual_owner, 
-																		 DID, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts())),
-															 DID, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
-	
+	y_individual_owner_org := JOIN( x_owners_dids, Business_Credit.Key_IndividualOwnerInformation(),
+                                  KEYED(LEFT.DID = RIGHT.DID), 
+                                  TRANSFORM(RIGHT), 
+                                  LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT, SKIP))(Guarantor_Owner_Indicator IN ['001' , '003']);
+  y_individual_owner := Suppress.MAC_SuppressSource(y_individual_owner_org, mod_access, did);
+  
+	y_individual_owner_dedup_org := DEDUP(SORT(y_individual_owner, 
+                                             DID, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts())),
+                                       DID, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
+	y_individual_owner_dedup := Suppress.MAC_SuppressSource(y_individual_owner_dedup_org, mod_access, did);
+  
 	y_slim_rec := RECORD
 		UNSIGNED6 UltID;
 		UNSIGNED6 OrgID;
@@ -273,15 +276,20 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 		STRING30 Sbfe_Contributor_Number;
 		STRING50 Contract_Account_Number;
 		STRING3 Account_Type_Reported;
+    UNSIGNED4 global_sid;
+    UNSIGNED8 record_sid;
+    UNSIGNED6 DID;
+
 	END;
 
-	z_guarantors_recs_slim := JOIN (z_guarantors_recs, Business_Credit.Key_BusinessInformation(),
+	z_guarantors_recs_slim_org := JOIN (z_guarantors_recs, Business_Credit.Key_BusinessInformation(),
 																			BusinessCredit_Services.Macros.mac_JoinBusAccounts() AND
 																			RIGHT.Record_Type = Business_Credit.Constants().AccountBase,
 																			TRANSFORM(z_slim_rec , SELF := RIGHT),
 																			LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT, SKIP));
+	z_guarantors_recs_slim := Suppress.MAC_SuppressSource(z_guarantors_recs_slim_org, mod_access, did);
 
-	Z_linkids_accno_dedup := DEDUP(SORT(z_guarantors_recs_slim , 
+  Z_linkids_accno_dedup := DEDUP(SORT(z_guarantors_recs_slim , 
 																 #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts())), 
 													 #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
 														

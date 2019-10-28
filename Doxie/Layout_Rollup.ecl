@@ -302,9 +302,14 @@ export KeyRec_feedback := RECORD
 	DATASET(iesp.ContactPlus.t_ContactPlusProgPhoneRecord) progressive_phones {MAXCOUNT(doxie.rollup_limits.progressivePhone)};
 	unsigned2 output_seq_no;
   BOOLEAN BusinessCreditMatch  := FALSE; // added for SBFE project 
-	
   END;
 
+export KeyRec_feedback_sids := RECORD
+  KeyRec_feedback;
+  UNSIGNED4 global_sid := 0;  // added for CCPA suppression
+  UNSIGNED8 record_sid := 0;  // added for CCPA suppression
+  END;
+  
 // special record structure to support flattened results for batch requests.
 export KeyRec_feedback_batch := RECORD
   string20	acctno := '';
