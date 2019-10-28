@@ -1,4 +1,4 @@
-﻿IMPORT Inql_FFD, Doxie, ut, dx_InquiryHistory, std, data_services;
+﻿IMPORT Inql_FFD, Doxie, ut, dx_InquiryHistory, std, data_services, MDR, _control;
 
 EXPORT Data_Keys (boolean pDaily = true, boolean pFCRA = true, string pVersion = '') := Module
 
@@ -95,13 +95,16 @@ shared appd_group_rid := project(get_recs,
 
 shared dd_appd_group_rid := dedup(sort(appd_group_rid,transaction_id,filedate,local),record,local, except filedate, version);
 
-EXPORT group_rid := project(dd_appd_group_rid,
+shared group_rid_ 	:= project(dd_appd_group_rid,
                                 Transform(dx_InquiryHistory.Layouts.i_grouprid
 																				 ,self := left
 																				 ,self := []
 																			));
 																			
-EXPORT lexid := project(dd_appd_group_rid,
+EXPORT group_rid 		:= MDR.macGetGlobalSid(group_rid_,'InquiryTracking_Virtual','', 'global_sid');
+
+
+EXPORT lexid 				:= project(dd_appd_group_rid,
                                 Transform(dx_InquiryHistory.Layouts.i_lexid
 																				 ,self := left
 																				 ,self := []

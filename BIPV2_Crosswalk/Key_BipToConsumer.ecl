@@ -5,7 +5,8 @@ import doxie;
 
 export Key_BipToConsumer := module
      export Key := BIPV2_Crosswalk.Keys().BipToConsumerKey();
-
+     export Keyvs(string pversion = '',boolean pUseOtherEnvironment = false) := BIPV2_Crosswalk.Keys(pversion,pUseOtherEnvironment).bipToConsumer;
+     
      shared restrict(ds, in_mod, permits, ds_src='', dnbWillMask=false, isDateFirstSeenExists=false) := functionmacro
           ds_filt := ds(BIPV2.mod_sources.isPermitted(in_mod,dnbWillMask).byBmap(permits));
           #IF(#TEXT(ds_src)='')
@@ -257,14 +258,17 @@ export Key_BipToConsumer := module
      end;
 					
      export kFetch_thor(
-                    string1 Level = BIPV2.IDconstants.Fetch_Level_ProxID, 
-                    BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
-                    boolean applyMarketingRestrictions = false,
-                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
-
+         string1                    Level                       = BIPV2.IDconstants.Fetch_Level_ProxID 
+        ,BIPV2.mod_sources.iParams  in_mod                      = PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt)
+        ,boolean                    applyMarketingRestrictions  = false
+        ,doxie.IDataAccess          mod_access                  = MODULE (doxie.IDataAccess) END
+        ,string                     pKeyVersion                 = 'qa'
+        ,boolean                    pUseOtherEnvironment        = false
      ) := function
-					
-					bip2Consumer  := pull(Key);
+
+          keyversion := Keyvs(pKeyVersion,pUseOtherEnvironment).logical;
+          
+					bip2Consumer  := pull(keyversion);
           allowCodeBmap := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
 
           bip2Consumer apply_restrict(bip2Consumer L) := transform

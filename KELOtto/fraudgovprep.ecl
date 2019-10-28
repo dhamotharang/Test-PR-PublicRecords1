@@ -1,6 +1,7 @@
 ﻿IMPORT KELOtto;
 IMPORT AppendBankDetails;
 IMPORT FraudGovPlatform;
+IMPORT AppendDisposableEmailDomainFlag;
 
 /*
   This is specifically for prepping transactions for KEL. 
@@ -33,4 +34,11 @@ FraudGovWithIPMetadata := JOIN(FraudGovWithFraudpoint, KELOtto.PersonIPMetadata,
 // Crim
 FraudGovWithCrim := JOIN(FraudGovWithIPMetadata, KELOtto.PersonCrim, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
 
-EXPORT FraudGovPrep := PROJECT(FraudGovWithCrim, TRANSFORM({RECORDOF(LEFT) - UID}, SELF := LEFT));
+// Advo
+FraudGovWithAdvo := JOIN(FraudGovWithCrim, KELOtto.PersonAdvo, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+
+// Dispoable emails
+
+FraudGovWithDispoableEmailFlag := AppendDisposableEmailDomainFlag.macAppendDisposableEmailDomainFlag(FraudGovWithAdvo, email_address);
+
+EXPORT FraudGovPrep := PROJECT(FraudGovWithDispoableEmailFlag, TRANSFORM({RECORDOF(LEFT) - UID}, SELF := LEFT));
