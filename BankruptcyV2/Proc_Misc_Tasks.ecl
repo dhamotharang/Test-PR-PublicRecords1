@@ -76,26 +76,30 @@ send_withdrawnstatus_email := IF(COUNT(BankruptcyV3.Key_BankruptcyV3_WithdrawnSt
                                +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[9].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[9].did+'\n','')
                                +IF((UNSIGNED)BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[10].did>0,'LexID = '+BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()[10].did+'\n','')
                               ));
-	
-File_Check:=  
-output('');
-output('Starting file consolidation check -');
+															
+// DF-26343 - A check to ensure the BK consolidated files below have been properly built.												
+rFileCheck := record
+	string name;
+	string status;
+end;
 
-output('thor_data400::in::bankruptcyv3::case_full');
-output('thor_data400::in::bankruptcyv3::defendants_full');
-output('thor_data400::in::bankruptcyv3::main_full');
-output('thor_data400::in::bankruptcyv3::search_full');
 
-DFS := 
-STD.File.VerifyFile('~thor_data400::in::bankruptcyv3::case_full',true);
-STD.File.VerifyFile('~thor_data400::in::bankruptcyv3::defendants_full',true);
-STD.File.VerifyFile('~thor_data400::in::bankruptcyv3::main_full',true);
-STD.File.VerifyFile('~thor_data400::in::bankruptcyv3::search_full',true);
+dFileCheck := dataset([
+											{'~thor_data400::in::bankruptcyv3::case_full'}
+											,{'~thor_data400::in::bankruptcyv3::defendants_full'}
+											,{'~thor_data400::in::bankruptcyv3::main_full'}
+											,{'~thor_data400::in::bankruptcyv3::search_full'}
+											],{string name});
 
-output(DFS);
-IF(DFS = 'OK',
-output('The BK consolidated files were verified to be intact'), 
-FileServices.SendEmail('Christopher.Brodeur@LexisNexisrisk.com; Manuel.Tarectecan@lexisnexisrisk.com', 'BK stats file verification Failure',WORKUNIT + '\n' + '\n' + 'Please check above WUID to see which file failed verification'));
+rFileCheck xFileCheck(dFileCheck l) := transform
+	self.status := if (STD.File.FileExists('~'+l.name)
+											,STD.File.VerifyFile(l.name,true)
+											,'DOESNT EXIST'
+										);
+	self := l;
+end;
+
+dFileStatus := projecT(dFileCheck,xFileCheck(left));
 
 sequential(/*dops_update
 		,*/build_relationships
@@ -112,7 +116,11 @@ sequential(/*dops_update
 		,addfullfilestosuper
 		,BIP_dops_update
 		,parallel(caseret,defret,mainret,searchret)
-		,File_Check
+		,output(dFileStatus)
+		,if (count(dFileStatus(status <> 'OK')) > 0
+				,FileServices.SendEmail('Christopher.Brodeur@LexisNexisrisk.com; Manuel.Tarectecan@lexisnexisrisk.com'
+				,'BK stats file verification Failure'
+				,WORKUNIT + '\n' + '\n' + 'Please check above WUID to see which file failed verification'))
   ,send_withdrawnstatus_email
 		) : WHEN(event('Yogurt:BANKRUPTCY ROXIE KEY BUILD COMPLETE','*'), count(1));
 
