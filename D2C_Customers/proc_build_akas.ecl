@@ -16,7 +16,7 @@ EXPORT proc_build_akas(unsigned1 mode, string8 ver, string20 customer_name) := F
 
    inDS  := project(ds, xf(left));
 
-   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 'akas');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 3);
    return res;
 
 END;

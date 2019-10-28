@@ -4,7 +4,7 @@
 
 EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   death := Header.File_DID_Death_MasterV2 ((integer)did <>0 and state_death_id=death_master.fn_fake_state_death_id(ssn,lname,dod8)) ; 
+   death := Header.File_DID_Death_MasterV2 ((integer)did >0 and state_death_id=death_master.fn_fake_state_death_id(ssn,lname,dod8)) ; 
    //crlf='SA' flags Direct records where the SSN was overlaid w/ one from the SSA
    dist_death := distribute(death(crlf<>'SA'), hash(did));
    dsDeath := dedup(sort(dist_death, did, -filedate, local), did, filedate, local);
@@ -44,7 +44,7 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
             self.Report_Candidate := if(left.did in Associations_ONLY_dids, 'N', 'Y');
             ));
    
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'consumers');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 1);
    return res;
 
 END;
