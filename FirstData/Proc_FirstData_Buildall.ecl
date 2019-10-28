@@ -1,4 +1,4 @@
-﻿IMPORT FirstData, BuildLogger, VersionControl, STD, Orbit3, RoxieKeyBuild;
+﻿IMPORT FirstData, BuildLogger, VersionControl, STD, Orbit3, RoxieKeyBuild, dops;
 
 EXPORT Proc_FirstData_buildall(
 	STRING  pVersion   = (STRING)STD.Date.Today(),
@@ -23,7 +23,7 @@ EXPORT Proc_FirstData_buildall(
 		)
 	);
 	shared create_build 	:= Orbit3.proc_Orbit3_CreateBuild ('First Data',pVersion,'N');
-	shared dops_update		:=	RoxieKeyBuild.updateversion('FirstDataKeys', pVersion); 															
+	shared dops_update		:=	dops.updateversion('FirstDataKeys', pVersion, 'david.dittman@lexisnexisrisk.com',,'N'); 															
 	
 	// All filenames associated with this Dataset
 	SHARED dAll_filenames := Filenames().dAll_filenames;
@@ -43,6 +43,8 @@ EXPORT Proc_FirstData_buildall(
 		BuildLogger.KeyEnd(false),
 		BuildLogger.PostStart(False),
 		FirstData.QA_Records(),
+		create_build,
+		dops_update,
 		// FirstData.Strata_Population_Stats(pversion,pIsTesting).All,
 		BuildLogger.PostEnd(False),
 		BuildLogger.BuildEnd(false)
