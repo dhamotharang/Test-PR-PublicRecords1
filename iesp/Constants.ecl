@@ -1773,6 +1773,11 @@ EXPORT Constants := MODULE
 		export unsigned  MAX_COUNT_BIZRPT_TRADELINES := 50;
 		export unsigned  MAX_COUNT_BIZRPT_TRADELINE_SUMMARIES  := 50;
 
+		// cortera tradelines
+		// NOTE: this is currently not used in top business report - at present it is only used for combined bip service 
+		export unsigned MAX_COUNT_BIZRPT_CTL_SEGMENTS := 50;
+		export unsigned MAX_COUNT_BIZRPT_CTL_ACCTS := 100;
+
 		// Real Property section limits	
 		// ensure that this is 1/2 of MAX_COUNT_BIZRPT_PROPERTY_TOTAL_RECS 
 		export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_RECORDS        := 100; 
