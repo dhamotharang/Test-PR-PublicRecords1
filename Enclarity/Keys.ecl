@@ -1,5 +1,5 @@
 ﻿import doxie, tools;
-
+//this attribute strips out base file fields for the keys
 export Keys(string		pversion							= '',boolean pUseProd = false) := module
 
 	shared facility_Base						:= Files(pversion,pUseProd).facility_Base.Built;
