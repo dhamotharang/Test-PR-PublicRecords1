@@ -1,4 +1,4 @@
-import easi, ut, address, riskwise, risk_indicators;
+﻿import easi, riskwise, risk_indicators,STD;
 
 CDN_DEBUG := false;
 
@@ -314,7 +314,7 @@ export CDN712_0_0(
 
 		// Bt/St
 		in_state                 := le.Bill_to_Out.shell_input.in_state;
-		in_email_address         := StringLib.StringToUppercase(trim(le.Bill_to_Out.shell_input.email_address));
+		in_email_address         := STD.Str.ToUpperCase(trim(le.Bill_to_Out.shell_input.email_address));
 		ipaddrpop                := le.Bill_to_Out.shell_input.ip_address <> '';
 		emailpop                 := le.Bill_to_Out.shell_input.email_address <> '';
 		nas_summary              := le.Bill_to_Out.iid.nas_summary;
@@ -326,10 +326,10 @@ export CDN712_0_0(
 		rc_hriskphoneflag        := (INTEGER)le.Bill_to_Out.iid.hriskphoneflag;
 		rc_phonezipflag          := (INTEGER)le.Bill_to_Out.iid.phonezipflag;
 		rc_hrisksic              := (INTEGER)le.Bill_to_Out.iid.hrisksic;
-		rc_sources               := StringLib.StringToUppercase(trim(le.Bill_to_Out.iid.sources));
+		rc_sources               := STD.Str.ToUpperCase(trim(le.Bill_to_Out.iid.sources));
 
-		lname_sources            := StringLib.StringToUppercase(trim(le.Bill_to_Out.Source_Verification.lastnamesources));
-		addr_sources             := StringLib.StringToUppercase(trim(le.Bill_to_Out.Source_Verification.addrsources));
+		lname_sources            := STD.Str.ToUpperCase(trim(le.Bill_to_Out.Source_Verification.lastnamesources));
+		addr_sources             := STD.Str.ToUpperCase(trim(le.Bill_to_Out.Source_Verification.addrsources));
 		lname_credit_sourced     := le.Bill_to_Out.name_verification.lname_credit_sourced;
 		lname_tu_sourced         := le.Bill_to_Out.name_verification.lname_tu_sourced;
 		lname_eda_sourced        := le.Bill_to_Out.name_verification.lname_eda_sourced;
@@ -362,9 +362,9 @@ export CDN712_0_0(
 		rc_hriskaddrflag_s       := (INTEGER)le.Ship_to_Out.iid.hriskaddrflag;
 		rc_phonezipflag_s        := (INTEGER)le.Ship_to_Out.iid.phonezipflag;
 		rc_hrisksic_s            := (INTEGER)le.Ship_to_Out.iid.hrisksic;
-		rc_sources_s             := StringLib.StringToUppercase(trim(le.Ship_to_Out.iid.sources));
-		lname_sources_s          := StringLib.StringToUppercase(trim(le.Ship_to_Out.Source_Verification.lastnamesources));
-		addr_sources_s           := StringLib.StringToUppercase(trim(le.Ship_to_Out.Source_Verification.addrsources));
+		rc_sources_s             := STD.Str.ToUpperCase(trim(le.Ship_to_Out.iid.sources));
+		lname_sources_s          := STD.Str.ToUpperCase(trim(le.Ship_to_Out.Source_Verification.lastnamesources));
+		addr_sources_s           := STD.Str.ToUpperCase(trim(le.Ship_to_Out.Source_Verification.addrsources));
 		voter_avail_s            := le.Ship_to_Out.Available_Sources.voter;
 		lname_credit_sourced_s   := le.Ship_to_Out.name_verification.lname_credit_sourced;
 		lname_tu_sourced_s       := le.Ship_to_Out.name_verification.lname_tu_sourced;
@@ -540,9 +540,9 @@ export CDN712_0_0(
 		 
 		 // *************** FP - address: addr type,apartment, high risk, zip type, areacode split, miskey***************;     
 
-		vsb_addr_apt := StringLib.StringToUppercase(rc_dwelltype)='A';
+		vsb_addr_apt := STD.Str.ToUpperCase(rc_dwelltype)='A';
 		vsb_addr_mil := (rc_ziptypeflag=3);
-		vsb_addr_deliverable := StringLib.StringToUppercase(rc_addrvalflag)='V';
+		vsb_addr_deliverable := STD.Str.ToUpperCase(rc_addrvalflag)='V';
 		vsb_addr_hr := (rc_hriskaddrflag=4);
 
 		vsb_addr_risk := map(
@@ -553,9 +553,9 @@ export CDN712_0_0(
 		);
 
 
-		vss_addr_apt := StringLib.StringToUppercase(rc_dwelltype_s)='A';
+		vss_addr_apt := STD.Str.ToUpperCase(rc_dwelltype_s)='A';
 		vss_addr_mil := (rc_ziptypeflag_s=3);
-		vss_addr_deliverable := StringLib.StringToUppercase(rc_addrvalflag_s)='V';
+		vss_addr_deliverable := STD.Str.ToUpperCase(rc_addrvalflag_s)='V';
 		vss_addr_hr := (rc_hriskaddrflag_s=4);
 		
 		vss_addr_risk := map(
@@ -815,14 +815,14 @@ export CDN712_0_0(
 
 		vs_ip_nonUS := map(
 			~ipaddrpop => -1,
-			StringLib.StringToUpperCase(IP_Countrycode) != 'US' => 1,
+			STD.Str.ToUpperCase(IP_Countrycode) != 'US' => 1,
 			0
 		);
 
 		vs_ip_domainRisk := map(
 			~ipaddrpop => -1, 
-			StringLib.StringToUppercase(IP_topleveldomain) in ['GOV','MIL'] => 1,
-			StringLib.StringToUppercase(IP_topleveldomain) in ['NET','COM','EDU','ORG','US'] => 2,
+			STD.Str.ToUpperCase(IP_topleveldomain) in ['GOV','MIL'] => 1,
+			STD.Str.ToUpperCase(IP_topleveldomain) in ['NET','COM','EDU','ORG','US'] => 2,
 			3
 		);
 
@@ -834,14 +834,14 @@ export CDN712_0_0(
 
 		vs_ip_regionDetectRisk := map(
 			~ipaddrpop => -1,
-			StringLib.StringToUppercase(IP_region)='NO REGION' => 2,
+			STD.Str.ToUpperCase(IP_region)='NO REGION' => 2,
 			1
 		);
 
 
-		_ip_state   := StringLib.StringToUppercase(ip_state);
-		_in_state   := StringLib.StringToUppercase(in_state);
-		_in_state_s := StringLib.StringToUppercase(in_state_s);
+		_ip_state   := STD.Str.ToUpperCase(ip_state);
+		_in_state   := STD.Str.ToUpperCase(in_state);
+		_in_state_s := STD.Str.ToUpperCase(in_state_s);
 
 		vs_IP_stateMatchRisk := map(
 			~ipaddrpop                                           => -1,
@@ -882,7 +882,7 @@ export CDN712_0_0(
 		lenEmail := length(in_email_address);
 
 		vs_email_domain := if(contains('@',in_email_address),
-			StringLib.StringToUpperCase(in_email_address[atPos+1..lenEmail]),
+			STD.Str.ToUpperCase(in_email_address[atPos+1..lenEmail]),
 			''
 		);
 		
@@ -1898,6 +1898,8 @@ export CDN712_0_0(
 		self := le.Bill_To_Out.iid;
 		self := le.Bill_To_Out.shell_input;
 		self := le.bill_to_out;
+		self := [];
+
 	END;
 	iidBT := project(clam, into_layout_output(left));
 
@@ -1932,6 +1934,8 @@ export CDN712_0_0(
 		self := le.Ship_To_Out.iid;
 		self := le.Ship_To_Out.shell_input;
 		self := le.ship_to_out;
+		self := [];
+
 	END;
 	iidST := project(clam, into_layout_output2(left));
 

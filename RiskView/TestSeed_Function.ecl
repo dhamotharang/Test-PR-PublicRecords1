@@ -1,4 +1,4 @@
-﻿import Models, Risk_Indicators, RiskView, Seed_Files, iesp;
+﻿import Models, Risk_Indicators, RiskView, Seed_Files, iesp, STD;
 
 export TestSeed_Function(DATASET(Risk_Indicators.Layout_Input) inData, 
 												STRING32 TestDataTableName_in, 
@@ -23,8 +23,8 @@ export TestSeed_Function(DATASET(Risk_Indicators.Layout_Input) inData,
 	valid_model_names := SET(model_info, Model_Name);
 	valid_attributes := RiskView.Constants.valid_attributes;
 	
-	isPreScreenPurpose := StringLib.StringToUpperCase(Intended_Purpose) = 'PRESCREENING';
-	isCollectionsPurpose := StringLib.StringToUpperCase(Intended_Purpose) = 'COLLECTIONS';
+	isPreScreenPurpose := STD.Str.ToUpperCase(Intended_Purpose) = 'PRESCREENING';
+	isCollectionsPurpose := STD.Str.ToUpperCase(Intended_Purpose) = 'COLLECTIONS';
 	
 // Get TestSeed Results
 RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_Input le, SeedKey ri) := TRANSFORM
@@ -32,8 +32,8 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		
 		SELF.LexID := ri.LexID;
 		
-		auto_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Auto_Model_Name, LEFT, RIGHT)))[1];
-		valid_auto := Auto_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Auto_Model_Name, LEFT, RIGHT)) IN valid_model_names;
+		auto_info := model_info(Model_Name = STD.Str.ToUpperCase(TRIM(Auto_Model_Name, LEFT, RIGHT)))[1];
+		valid_auto := Auto_Model_Name <> '' AND STD.Str.ToUpperCase(TRIM(Auto_Model_Name, LEFT, RIGHT)) IN valid_model_names;
 		SELF.Auto_Index := if(valid_auto, (STRING)auto_info.Billing_Index, '');
 		SELF.Auto_Score_Name := if(valid_auto, auto_info.Output_Model_Name, '');
 		SELF.Auto_Type := if(valid_auto, auto_info.Model_Type, '');
@@ -44,8 +44,8 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF.Auto_reason4 := if(valid_auto AND NOT isPreScreenPurpose AND ri.auto_reason4 <> '00', ri.auto_reason4, '');
 		SELF.Auto_reason5 := if(valid_auto AND NOT isPreScreenPurpose AND ri.auto_reason5 <> '00', ri.auto_reason5, '');
 		
-		Bankcard_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Bankcard_Model_Name, LEFT, RIGHT)))[1];
-		valid_Bankcard := Bankcard_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Bankcard_Model_Name, LEFT, RIGHT)) IN valid_model_names;
+		Bankcard_info := model_info(Model_Name = STD.Str.ToUpperCase(TRIM(Bankcard_Model_Name, LEFT, RIGHT)))[1];
+		valid_Bankcard := Bankcard_Model_Name <> '' AND STD.Str.ToUpperCase(TRIM(Bankcard_Model_Name, LEFT, RIGHT)) IN valid_model_names;
 		SELF.Bankcard_Index := if(valid_Bankcard, (STRING)Bankcard_info.Billing_Index, '');
 		SELF.Bankcard_Score_Name := if(valid_Bankcard, Bankcard_info.Output_Model_Name, '');
 		SELF.Bankcard_Type := if(valid_Bankcard, Bankcard_info.Model_Type, '');
@@ -56,8 +56,8 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF.Bankcard_reason4 := if(valid_Bankcard AND NOT isPreScreenPurpose AND ri.Bankcard_reason4 <> '00', ri.Bankcard_reason4, '');
 		SELF.Bankcard_reason5 := if(valid_Bankcard AND NOT isPreScreenPurpose AND ri.Bankcard_reason5 <> '00', ri.Bankcard_reason5, '');
 
-		Short_Term_Lending_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Short_Term_Lending_Model_Name, LEFT, RIGHT)))[1];
-		valid_Short_Term_Lending := Short_Term_Lending_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Short_Term_Lending_Model_Name, LEFT, RIGHT)) IN valid_model_names;
+		Short_Term_Lending_info := model_info(Model_Name = STD.Str.ToUpperCase(TRIM(Short_Term_Lending_Model_Name, LEFT, RIGHT)))[1];
+		valid_Short_Term_Lending := Short_Term_Lending_Model_Name <> '' AND STD.Str.ToUpperCase(TRIM(Short_Term_Lending_Model_Name, LEFT, RIGHT)) IN valid_model_names;
 		SELF.Short_term_lending_Index := if(valid_Short_Term_Lending, (STRING)Short_Term_Lending_info.Billing_Index, '');
 		SELF.Short_Term_Lending_Score_Name := if(valid_Short_Term_Lending, Short_Term_Lending_info.Output_Model_Name, '');
 		SELF.Short_Term_Lending_Type := if(valid_Short_Term_Lending, Short_Term_Lending_info.Model_Type, '');
@@ -68,8 +68,8 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF.Short_Term_Lending_reason4 := if(valid_Short_Term_Lending AND NOT isPreScreenPurpose AND ri.short_term_lending_reason4 <> '00', ri.short_term_lending_reason4, '');
 		SELF.Short_Term_Lending_reason5 := if(valid_Short_Term_Lending AND NOT isPreScreenPurpose AND ri.short_term_lending_reason5 <> '00', ri.short_term_lending_reason5, '');
 
-		Telecommunications_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Telecommunications_Model_Name, LEFT, RIGHT)))[1];
-		valid_Telecommunications := Telecommunications_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Telecommunications_Model_Name, LEFT, RIGHT)) IN valid_model_names;
+		Telecommunications_info := model_info(Model_Name = STD.Str.ToUpperCase(TRIM(Telecommunications_Model_Name, LEFT, RIGHT)))[1];
+		valid_Telecommunications := Telecommunications_Model_Name <> '' AND STD.Str.ToUpperCase(TRIM(Telecommunications_Model_Name, LEFT, RIGHT)) IN valid_model_names;
 		SELF.Telecommunications_Index := if(valid_Telecommunications, (STRING)Telecommunications_info.Billing_Index, '');
 		SELF.Telecommunications_Score_Name := if(valid_Telecommunications, Telecommunications_info.Output_Model_Name, '');
 		SELF.Telecommunications_Type := if(valid_Telecommunications, Telecommunications_info.Model_Type, '');
@@ -80,8 +80,8 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF.Telecommunications_reason4 := if(valid_Telecommunications AND NOT isPreScreenPurpose AND ri.telecommunications_reason4 <> '00', ri.telecommunications_reason4, '');
 		SELF.Telecommunications_reason5 := if(valid_Telecommunications AND NOT isPreScreenPurpose AND ri.telecommunications_reason5 <> '00', ri.telecommunications_reason5, '');
 
-  Crossindustry_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Crossindustry_Model_Name, LEFT, RIGHT)))[1];
-		valid_Crossindustry := Crossindustry_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Crossindustry_Model_Name, LEFT, RIGHT)) IN valid_model_names;
+  Crossindustry_info := model_info(Model_Name = STD.Str.ToUpperCase(TRIM(Crossindustry_Model_Name, LEFT, RIGHT)))[1];
+		valid_Crossindustry := Crossindustry_Model_Name <> '' AND STD.Str.ToUpperCase(TRIM(Crossindustry_Model_Name, LEFT, RIGHT)) IN valid_model_names;
 		SELF.Crossindustry_Index := if(valid_Crossindustry, (STRING)Crossindustry_info.Billing_Index, '');
 		SELF.Crossindustry_Score_Name := if(valid_Crossindustry, Crossindustry_info.Output_Model_Name, '');
 		SELF.Crossindustry_Type := if(valid_Crossindustry, Crossindustry_info.Model_Type, '');
@@ -92,8 +92,8 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF.Crossindustry_reason4 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND ri.Crossindustry_reason4 <> '00', ri.Crossindustry_reason4, '');
 		SELF.Crossindustry_reason5 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND ri.Crossindustry_reason5 <> '00', ri.Crossindustry_reason5, '');
 
-		Custom_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Custom_Model_Name, LEFT, RIGHT)))[1];
-		valid_Custom := Custom_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Custom_Model_Name, LEFT, RIGHT)) IN valid_model_names;
+		Custom_info := model_info(Model_Name = STD.Str.ToUpperCase(TRIM(Custom_Model_Name, LEFT, RIGHT)))[1];
+		valid_Custom := Custom_Model_Name <> '' AND STD.Str.ToUpperCase(TRIM(Custom_Model_Name, LEFT, RIGHT)) IN valid_model_names;
 		SELF.Custom_Index := if(valid_Custom, (STRING)Custom_info.Billing_Index, '');
 		SELF.Custom_Score_Name := if(valid_Custom, Custom_info.Output_Model_Name, '');
 		SELF.Custom_Type := if(valid_Custom, Custom_info.Model_Type, '');
@@ -104,8 +104,8 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF.Custom_reason4 := if(valid_Custom AND NOT isPreScreenPurpose AND ri.custom_reason4 <> '00', ri.custom_reason4, '');
 		SELF.Custom_reason5 := if(valid_Custom AND NOT isPreScreenPurpose AND ri.custom_reason5 <> '00', ri.custom_reason5, '');
 
-		Custom2_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Custom2_Model_Name, LEFT, RIGHT)))[1];
-		valid_Custom2 := Custom2_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Custom2_Model_Name, LEFT, RIGHT)) IN valid_model_names;
+		Custom2_info := model_info(Model_Name = STD.Str.ToUpperCase(TRIM(Custom2_Model_Name, LEFT, RIGHT)))[1];
+		valid_Custom2 := Custom2_Model_Name <> '' AND STD.Str.ToUpperCase(TRIM(Custom2_Model_Name, LEFT, RIGHT)) IN valid_model_names;
 		SELF.Custom2_Index := if(valid_Custom2, (STRING)Custom2_info.Billing_Index, '');
 		SELF.Custom2_Score_Name := if(valid_Custom2, Custom2_info.Output_Model_Name, '');
 		SELF.Custom2_Type := if(valid_Custom2, Custom2_info.Model_Type, '');
@@ -116,8 +116,8 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF.Custom2_reason4 := if(valid_Custom2 AND NOT isPreScreenPurpose AND ri.custom2_reason4 <> '00', ri.custom2_reason4, '');
 		SELF.Custom2_reason5 := if(valid_Custom2 AND NOT isPreScreenPurpose AND ri.custom2_reason5 <> '00', ri.custom2_reason5, '');
 
-		Custom3_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Custom3_Model_Name, LEFT, RIGHT)))[1];
-		valid_Custom3 := Custom3_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Custom3_Model_Name, LEFT, RIGHT)) IN valid_model_names;
+		Custom3_info := model_info(Model_Name = STD.Str.ToUpperCase(TRIM(Custom3_Model_Name, LEFT, RIGHT)))[1];
+		valid_Custom3 := Custom3_Model_Name <> '' AND STD.Str.ToUpperCase(TRIM(Custom3_Model_Name, LEFT, RIGHT)) IN valid_model_names;
 		SELF.Custom3_Index := if(valid_Custom3, (STRING)Custom3_info.Billing_Index, '');
 		SELF.Custom3_Score_Name := if(valid_Custom3, Custom3_info.Output_Model_Name, '');
 		SELF.Custom3_Type := if(valid_Custom3, Custom3_info.Model_Type, '');
@@ -128,8 +128,8 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF.Custom3_reason4 := if(valid_Custom3 AND NOT isPreScreenPurpose AND ri.custom3_reason4 <> '00', ri.custom3_reason4, '');
 		SELF.Custom3_reason5 := if(valid_Custom3 AND NOT isPreScreenPurpose AND ri.custom3_reason5 <> '00', ri.custom3_reason5, '');
 
-		Custom4_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Custom4_Model_Name, LEFT, RIGHT)))[1];
-		valid_Custom4 := Custom4_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Custom4_Model_Name, LEFT, RIGHT)) IN valid_model_names;
+		Custom4_info := model_info(Model_Name = STD.Str.ToUpperCase(TRIM(Custom4_Model_Name, LEFT, RIGHT)))[1];
+		valid_Custom4 := Custom4_Model_Name <> '' AND STD.Str.ToUpperCase(TRIM(Custom4_Model_Name, LEFT, RIGHT)) IN valid_model_names;
 		SELF.Custom4_Index := if(valid_Custom4, (STRING)Custom4_info.Billing_Index, '');
 		SELF.Custom4_Score_Name := if(valid_Custom4, Custom4_info.Output_Model_Name, '');
 		SELF.Custom4_Type := if(valid_Custom4, Custom4_info.Model_Type, '');
@@ -140,8 +140,8 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF.Custom4_reason4 := if(valid_Custom4 AND NOT isPreScreenPurpose AND ri.custom4_reason4 <> '00', ri.custom4_reason4, '');
 		SELF.Custom4_reason5 := if(valid_Custom4 AND NOT isPreScreenPurpose AND ri.custom4_reason5 <> '00', ri.custom4_reason5, '');
 
-		Custom5_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Custom5_Model_Name, LEFT, RIGHT)))[1];
-		valid_Custom5 := Custom5_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Custom5_Model_Name, LEFT, RIGHT)) IN valid_model_names;
+		Custom5_info := model_info(Model_Name = STD.Str.ToUpperCase(TRIM(Custom5_Model_Name, LEFT, RIGHT)))[1];
+		valid_Custom5 := Custom5_Model_Name <> '' AND STD.Str.ToUpperCase(TRIM(Custom5_Model_Name, LEFT, RIGHT)) IN valid_model_names;
 		SELF.Custom5_Index := if(valid_Custom5, (STRING)Custom5_info.Billing_Index, '');
 		SELF.Custom5_Score_Name := if(valid_Custom5, Custom5_info.Output_Model_Name, '');
 		SELF.Custom5_Type := if(valid_Custom5, Custom5_info.Model_Type, '');
@@ -164,7 +164,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF.Alert10 := ri.Alert10;
 		
 		valid_attributes := RiskView.Constants.valid_attributes;
-		valid_attributes_requested := stringlib.stringtolowercase(AttributesVersionRequest) in valid_attributes;
+		valid_attributes_requested := STD.Str.ToLowerCase(AttributesVersionRequest) in valid_attributes;
 
 		self.Attribute_Index 	:= if(valid_attributes_requested, ri.Attribute_Index 	, '');
 		self.InputProvidedFirstName	:= if(valid_attributes_requested, ri.InputProvidedFirstName	, '');
@@ -393,33 +393,67 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	
 		 A:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Liens,
-		self.seq 												     	:= ri.liens1_seq;
-	 self.DateFiled      							:= ri.liens1_DateFiled;
-  self.LienTypeID            := ri.Liens1_LienTypeID;
-		self.LienType       							:= ri.Liens1_LienType;
-		self.Amount         							:= ri.Liens1_Amount;
-		self.ReleaseDate    							:= ri.Liens1_ReleaseDate;
-		self.DateLastSeen   							:= ri.Liens1_DateLastSeen;
-		self.FilingNumber   							:= ri.Liens1_FilingNumber;
-		self.FilingBook     							:= ri.Liens1_FilingBook;
-		self.FilingPage     							:= ri.Liens1_FilingPage;
-		self.AgencyID       							:= ri.Liens1_AgencyID;
-		self.Agency         							:= ri.Liens1_Agency;
-		self.AgencyCounty   							:= ri.Liens1_AgencyCounty;
-		self.AgencyState	   							:= ri.Liens1_AgencyState;
-  self.ConsumerStatementID   := ri.Liens1_ConsumerStatementID;
+		self.seq 												 := ri.liens1_seq;
+    self.DateFiled      						 := ri.liens1_DateFiled;
+    self.LienTypeID                  := ri.Liens1_LienTypeID;
+		self.LienType       						 := ri.Liens1_LienType;
+		self.Amount         						 := ri.Liens1_Amount;
+		self.ReleaseDate    						 := ri.Liens1_ReleaseDate;
+		self.DateLastSeen   						 := ri.Liens1_DateLastSeen;
+    self.Defendant   			           := ri.Liens1_Defendant;
+    self.StreetNumber    			       := ri.Liens1_StreetNumber;
+    self.StreetPreDirection    			 := ri.Liens1_StreetPreDirection;
+    self.StreetName    			         := ri.Liens1_StreetName;
+    self.StreetSuffix    			       := ri.Liens1_StreetSuffix;
+    self.StreetPostDirection    		 := ri.Liens1_StreetPostDirection;
+    self.UnitDesignation   			     := ri.Liens1_UnitDesignation;
+    self.UnitNumber    			         := ri.Liens1_UnitNumber;
+    self.StreetAddress1 			       := ri.Liens1_StreetAddress1;
+    self.StreetAddress2 			       := ri.Liens1_StreetAddress2;
+    self.City 				               := ri.Liens1_City;
+    self.State 				               := ri.Liens1_State;
+    self.Zip5 				               := ri.Liens1_Zip5;
+    self.Zip4 				               := ri.Liens1_Zip4;
+    self.County  				             := ri.Liens1_County;
+    self.PostalCode 				         := ri.Liens1_PostalCode ;
+    self.StateCityZip 				       := ri.Liens1_StateCityZip;
+		self.FilingNumber   						 := ri.Liens1_FilingNumber;
+		self.FilingBook     						 := ri.Liens1_FilingBook;
+		self.FilingPage     						 := ri.Liens1_FilingPage;
+		self.AgencyID       						 := ri.Liens1_AgencyID;
+		self.Agency         						 := ri.Liens1_Agency;
+		self.AgencyCounty   						 := ri.Liens1_AgencyCounty;
+		self.AgencyState	   						 := ri.Liens1_AgencyState;
+    self.ConsumerStatementID         := ri.Liens1_ConsumerStatementID;
 		SELF := [];
 	)]);
 	
 	B:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Liens,
-		self.seq 										     		:= ri.liens2_seq;
+		self.seq 										    := ri.liens2_seq;
 		self.DateFiled      						:= ri.Liens2_DateFiled;
-  self.LienTypeID           := ri.Liens2_LienTypeID;
+    self.LienTypeID                 := ri.Liens2_LienTypeID;
 		self.LienType      							:= ri.Liens2_LienType;
 		self.Amount        							:= ri.Liens2_Amount;
 		self.ReleaseDate    						:= ri.Liens2_ReleaseDate;
 		self.DateLastSeen   						:= ri.Liens2_DateLastSeen;
+    self.Defendant   			          := ri.Liens2_Defendant;
+    self.StreetNumber    			       := ri.Liens2_StreetNumber;
+    self.StreetPreDirection    			 := ri.Liens2_StreetPreDirection;
+    self.StreetName    			         := ri.Liens2_StreetName;
+    self.StreetSuffix    			       := ri.Liens2_StreetSuffix;
+    self.StreetPostDirection    		 := ri.Liens2_StreetPostDirection;
+    self.UnitDesignation   			     := ri.Liens2_UnitDesignation;
+    self.UnitNumber    			         := ri.Liens2_UnitNumber;
+    self.StreetAddress1 			       := ri.Liens2_StreetAddress1;
+    self.StreetAddress2 			       := ri.Liens2_StreetAddress2;
+    self.City 				               := ri.Liens2_City;
+    self.State 				               := ri.Liens2_State;
+    self.Zip5 				               := ri.Liens2_Zip5;
+    self.Zip4 				               := ri.Liens2_Zip4;
+    self.County  				             := ri.Liens2_County;
+    self.PostalCode 				         := ri.Liens2_PostalCode ;
+    self.StateCityZip 				       := ri.Liens2_StateCityZip;
 		self.FilingNumber   						:= ri.Liens2_FilingNumber;
 		self.FilingBook     						:= ri.Liens2_FilingBook;
 		self.FilingPage     						:= ri.Liens2_FilingPage;
@@ -427,7 +461,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.Agency         						:= ri.Liens2_Agency;
 		self.AgencyCounty   						:= ri.Liens2_AgencyCounty;
 		self.AgencyState	   						:= ri.Liens2_AgencyState;
-  self.ConsumerStatementID  := ri.Liens2_ConsumerStatementID;
+  self.ConsumerStatementID          := ri.Liens2_ConsumerStatementID;
 		SELF := [];
 		)]);
 	
@@ -437,50 +471,82 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	// Judgments 1&2
 	C:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Judgments,
-		self.seq 							     					:= ri.Jgmts1_seq;
+		self.seq 										    := ri.Jgmts1_seq;
 		self.DateFiled      						:= ri.Jgmts1_DateFiled;
-  self.JudgmentTypeID       := ri.Jgmts1_JudgmentTypeID;
-		self.JudgmentType      			:= ri.Jgmts1_JudgmentType;
+    self.JudgmentTypeID             := ri.Jgmts1_JudgmentTypeID;
+		self.JudgmentType      			    := ri.Jgmts1_JudgmentType;
 		self.Amount        							:= ri.Jgmts1_Amount;
 		self.ReleaseDate    						:= ri.Jgmts1_ReleaseDate;
-		self.FilingDescription    := ri.Jgmts1_FilingDescription;
+    self.FilingDescription          := ri.Jgmts1_FilingDescription;
 		self.DateLastSeen   						:= ri.Jgmts1_DateLastSeen;
-		self.Defendant   			      := ri.Jgmts1_Defendant;
-		self.Plaintiff    			     := ri.Jgmts1_Plaintiff ;
+    self.Defendant   			          := ri.Jgmts1_Defendant;
+    self.StreetNumber    			      := ri.Jgmts1_StreetNumber;
+    self.StreetPreDirection    			:= ri.Jgmts1_StreetPreDirection;
+    self.StreetName    			        := ri.Jgmts1_StreetName;
+    self.StreetSuffix    			      := ri.Jgmts1_StreetSuffix;
+    self.StreetPostDirection    		:= ri.Jgmts1_StreetPostDirection;
+    self.UnitDesignation   			    := ri.Jgmts1_UnitDesignation;
+    self.UnitNumber    			        := ri.Jgmts1_UnitNumber;
+    self.StreetAddress1 			      := ri.Jgmts1_StreetAddress1;
+    self.StreetAddress2 			      := ri.Jgmts1_StreetAddress2;
+    self.City 				              := ri.Jgmts1_City;
+    self.State 				              := ri.Jgmts1_State;
+    self.Zip5 				              := ri.Jgmts1_Zip5;
+    self.Zip4 				              := ri.Jgmts1_Zip4;
+    self.County  				            := ri.Jgmts1_County;
+    self.PostalCode 				        := ri.Jgmts1_PostalCode ;
+    self.StateCityZip 				      := ri.Jgmts1_StateCityZip;
+    self.Plaintiff    			        := ri.Jgmts1_Plaintiff ;
 		self.FilingNumber   						:= ri.Jgmts1_FilingNumber;
 		self.FilingBook     						:= ri.Jgmts1_FilingBook;
 		self.FilingPage     						:= ri.Jgmts1_FilingPage;
-		self.Eviction             := ri.Jgmts1_Eviction;
+		self.Eviction                   := ri.Jgmts1_Eviction;
 		self.AgencyID        						:= ri.Jgmts1_AgencyID;
 		self.Agency         						:= ri.Jgmts1_Agency;
 		self.AgencyCounty   						:= ri.Jgmts1_AgencyCounty;
 		self.AgencyState	   						:= ri.Jgmts1_AgencyState;
-  self.ConsumerStatementID  := ri.Jgmts1_ConsumerStatementID;
+  self.ConsumerStatementID          := ri.Jgmts1_ConsumerStatementID;
 		SELF := [];
 		)]);
 		
 		
 	D:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Judgments,
-		self.seq 											     	:= ri.Jgmts2_seq;
+		self.seq 										    := ri.Jgmts2_seq;
 		self.DateFiled      						:= ri.Jgmts2_DateFiled;
-  self.JudgmentTypeID       := ri.Jgmts2_JudgmentTypeID;
-		self.JudgmentType       		:= ri.Jgmts2_JudgmentType;
+    self.JudgmentTypeID             := ri.Jgmts2_JudgmentTypeID;
+		self.JudgmentType       		    := ri.Jgmts2_JudgmentType;
 		self.Amount        							:= ri.Jgmts2_Amount;
 		self.ReleaseDate    						:= ri.Jgmts2_ReleaseDate;
-		self.FilingDescription    := ri.Jgmts2_FilingDescription;
+		self.FilingDescription          := ri.Jgmts2_FilingDescription;
 		self.DateLastSeen   						:= ri.Jgmts2_DateLastSeen;
-		self.Defendant   			      := ri.Jgmts2_Defendant;
-		self.Plaintiff    			     := ri.Jgmts2_Plaintiff ;
+    self.Defendant   			          := ri.Jgmts2_Defendant;
+    self.StreetNumber    			      := ri.Jgmts2_StreetNumber;
+    self.StreetPreDirection    			:= ri.Jgmts2_StreetPreDirection;
+    self.StreetName    			        := ri.Jgmts2_StreetName;
+    self.StreetSuffix    			      := ri.Jgmts2_StreetSuffix;
+    self.StreetPostDirection    		:= ri.Jgmts2_StreetPostDirection;
+    self.UnitDesignation   			    := ri.Jgmts2_UnitDesignation;
+    self.UnitNumber    			        := ri.Jgmts2_UnitNumber;
+    self.StreetAddress1 			      := ri.Jgmts2_StreetAddress1;
+    self.StreetAddress2 			      := ri.Jgmts2_StreetAddress2;
+    self.City 				              := ri.Jgmts2_City;
+    self.State 				              := ri.Jgmts2_State;
+    self.Zip5 				              := ri.Jgmts2_Zip5;
+    self.Zip4 				              := ri.Jgmts2_Zip4;
+    self.County  				            := ri.Jgmts2_County;
+    self.PostalCode 				        := ri.Jgmts2_PostalCode ;
+    self.StateCityZip 				      := ri.Jgmts2_StateCityZip;
+    self.Plaintiff    			        := ri.Jgmts2_Plaintiff ;
 		self.FilingNumber   						:= ri.Jgmts2_FilingNumber;
 		self.FilingBook     						:= ri.Jgmts2_FilingBook;
 		self.FilingPage     						:= ri.Jgmts2_FilingPage;
-		self.Eviction             := ri.Jgmts2_Eviction;
+    self.Eviction                   := ri.Jgmts2_Eviction;
 		self.AgencyID        						:= ri.Jgmts2_AgencyID;
 		self.Agency         						:= ri.Jgmts2_Agency;
 		self.AgencyCounty   						:= ri.Jgmts2_AgencyCounty;
 		self.AgencyState	   						:= ri.Jgmts2_AgencyState;
-  self.ConsumerStatementID  := ri.Jgmts2_ConsumerStatementID;
+  self.ConsumerStatementID          := ri.Jgmts2_ConsumerStatementID;
 		SELF := [];
 		)]);	
 		
@@ -529,7 +595,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF := [];
 	END;
 	seedResults := JOIN(inData, SeedKey, KEYED(RIGHT.TestDataTableName = TestDataTableName_in) AND
-																																 KEYED(RIGHT.HashValue = Seed_Files.Hash_InstantID(StringLib.StringToUpperCase(TRIM(LEFT.FName, LEFT, RIGHT)), StringLib.StringToUpperCase(TRIM(LEFT.LName, LEFT, RIGHT)), TRIM(LEFT.SSN, LEFT, RIGHT), Risk_Indicators.nullstring, TRIM(LEFT.in_Zipcode[1..5], LEFT, RIGHT), TRIM(LEFT.Phone10, LEFT, RIGHT), Risk_Indicators.nullstring)),
+																																 KEYED(RIGHT.HashValue = Seed_Files.Hash_InstantID(STD.Str.ToUpperCase(TRIM(LEFT.FName, LEFT, RIGHT)), STD.Str.ToUpperCase(TRIM(LEFT.LName, LEFT, RIGHT)), TRIM(LEFT.SSN, LEFT, RIGHT), Risk_Indicators.nullstring, TRIM(LEFT.in_Zipcode[1..5], LEFT, RIGHT), TRIM(LEFT.Phone10, LEFT, RIGHT), Risk_Indicators.nullstring)),
 															getSeed(LEFT, RIGHT), LEFT OUTER, KEEP(1), ATMOST(100));
 	
 	returnLayout := RECORD
@@ -546,7 +612,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	// ------------------ DEBUGGING SECTION --------------------
 	// OUTPUT(SeedKey, NAMED('TS_SeedKey'));
 	// OUTPUT(inData, NAMED('TS_inData'));
-	// OUTPUT(Seed_Files.Hash_InstantID(StringLib.StringToUpperCase(TRIM(inData[1].FName, LEFT, RIGHT)), StringLib.StringToUpperCase(TRIM(inData[1].LName, LEFT, RIGHT)), TRIM(inData[1].SSN, LEFT, RIGHT), Risk_Indicators.nullstring, TRIM(inData[1].in_Zipcode[1..5], LEFT, RIGHT), TRIM(inData[1].Phone10, LEFT, RIGHT), Risk_Indicators.nullstring), NAMED('TS_Hashdata'));
+	// OUTPUT(Seed_Files.Hash_InstantID(STD.Str.ToUpperCase(TRIM(inData[1].FName, LEFT, RIGHT)), STD.Str.ToUpperCase(TRIM(inData[1].LName, LEFT, RIGHT)), TRIM(inData[1].SSN, LEFT, RIGHT), Risk_Indicators.nullstring, TRIM(inData[1].in_Zipcode[1..5], LEFT, RIGHT), TRIM(inData[1].Phone10, LEFT, RIGHT), Risk_Indicators.nullstring), NAMED('TS_Hashdata'));
 	// OUTPUT(TestDataTableName_in, NAMED('TS_TestDataTableName'));
 	// OUTPUT(AttributesVersionRequest, NAMED('TS_AttributesVersionRequest'));
 	// OUTPUT(Auto_Model_Name, NAMED('TS_Auto_Model_Name'));
@@ -556,6 +622,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	// OUTPUT(Crossindustry_Model_Name, NAMED('TS_Crossindustry_Model_Name'));
 	// OUTPUT(Custom_Model_Name, NAMED('TS_Custom_Model_Name'));
 	// OUTPUT(seedResults, NAMED('seedResults'));
+	// OUTPUT(report_results, NAMED('report_results'));
 	// ---------------------------------------------------------
 	
 	RETURN FinalSeed;

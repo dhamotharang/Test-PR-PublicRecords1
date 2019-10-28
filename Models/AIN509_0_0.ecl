@@ -1,4 +1,4 @@
-import ut, risk_indicators, RiskWise, std;
+﻿import ut, risk_indicators, RiskWise, std;
 
 export AIN509_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC=true, boolean useTweak=true) := 
 
@@ -116,7 +116,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 	/* Bk Flag */
 	
 	bkflagm := map(le.bjl.filing_count >= 2 => 0.0566298,
-				le.bjl.bankrupt and (trim(Stringlib.stringtouppercase(le.bjl.disposition))) in ['DISMISSED','CASE DISMISSED'] => 0.0477612,
+				le.bjl.bankrupt and (trim(STD.Str.ToUppercase(le.bjl.disposition))) in ['DISMISSED','CASE DISMISSED'] => 0.0477612,
 				le.bjl.bankrupt => 0.0308811,
 				0.0188952);
 	
@@ -261,6 +261,7 @@ Risk_Indicators.Layout_Output into_layout_output(clam le) := TRANSFORM
 	self := le.iid;
 	self := le.shell_input;
 	self := le;
+	self := [];
 END;
 iid := project(clam, into_layout_output(left));
 

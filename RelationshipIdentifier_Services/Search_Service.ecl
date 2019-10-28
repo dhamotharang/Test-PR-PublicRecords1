@@ -29,15 +29,15 @@ MACRO
 	
 	num_searchesLimit := Choosen(first_row.searchBy, iesp.constants.RelationshipIdentifier.MAX_COUNT_SEARCH_MATCH_RECORDS);
 	search_row := PROJECT(num_searchesLimit,TRANSFORM(
-										RelationshipIdentifier_Services.Layouts.Local_tRelationshipIdentifierSearch,	         
-					        self.SearchBy := LEFT));								
+               RelationshipIdentifier_Services.Layouts.Local_tRelationshipIdentifierSearch,	         
+ self.SearchBy := LEFT));								
   
 	 options_row := PROJECT(first_row.options, TRANSFORM( 
-	         iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchOption,
-					        SELF.includeNeighbors := LEFT.includeNeighbors;
-									SELF.AsOfDate := LEFT.AsOfDate;
-									//self.PDF := LEFT.PDF;
-					        SELF := LEFT));					
+                 iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchOption,
+		SELF.includeNeighbors := LEFT.includeNeighbors;
+		SELF.AsOfDate := LEFT.AsOfDate;
+		//self.PDF := LEFT.PDF;
+		SELF := LEFT));					
 									  								
 	// Set some base options
 	iesp.ECL2ESP.SetInputBaseRequest (first_row);
@@ -48,7 +48,7 @@ MACRO
 	
 	#stored('LnBranded',user_options.LnBranded);
 	#stored('IncludeNeighbors',options_row.IncludeNeighbors);	
-  #stored('AsOfDate',AsOfDateString8);
+ #stored('AsOfDate',AsOfDateString8);
 	
 	integer ReturnCnt := 0 : stored('ReturnCount');
 		
@@ -60,23 +60,21 @@ MACRO
 	boolean stored_lnbranded := FALSE : stored('LnBranded');
 	string8 stored_asOfDate := '' : stored('AsOfDate');
 
-  batchParams := RelationshipIdentifier_Services.iParam.getBatchParams();
+	batchParams := RelationshipIdentifier_Services.iParam.getBatchParams();
 
-	dppa_ok := batchParams.isValidDppa();
 	glb_ok :=  batchParams.isValidGlb();
 	
 	// ***************************************
 	//4 lines coded per requirement 3.30 Relationship identifier Project.
 	//
-	PermissionsFlagdppa := batchParams.dppa = 0;
 	PermissionsFlagGLB  := batchParams.glb = 0;
 	
   // END REl ident requirement
 	
 	RelationshipIdentifier_Services.Layouts.OptionsLayout search_options() := TRANSFORM	
-	  self.lnbranded := stored_lnbranded;				
+	 self.lnbranded       := stored_lnbranded;				
 		self.IncludeNeighbors:= stored_IncludeNeighbors;
-		self.AsOfDate := stored_asOfDate;
+		self.AsOfDate        := stored_asOfDate;
 		//self.pdf := options_row.PDF;
 	end;
 	
@@ -89,26 +87,26 @@ MACRO
                                                                 ds_empty_batch,batchParams).ds_results; 
    				
 	 iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchResponse
-		 Format_out() := TRANSFORM
-			 self._Header := iesp.ECL2ESP.getHeaderRow();
-		   self.records := SearchRecs;
+		 Format_out()      := TRANSFORM
+			 self._Header     := iesp.ECL2ESP.getHeaderRow();
+		  self.records     := SearchRecs;
 			 self.RecordCount := count(SearchRecs);			
 			 // pls note this particular XML tag <SearchBy> is an echo of the input searches
 			 // and ESP automatically renames this tag to be <InputEcho> so that it compplies with standard
 			 // naming configuration on XML API functions for this service.
-			 SELF.SearchBy := PROJECT(Search_Row.SearchBy,
-			                           TRANSFORM(iesp.relationshipidentifiersearch.t_RelationshipIdentifierSearchBy,
-																   SELF := LEFT));
-																 // needed here to echo the input on the output
-			                                     // also options IncludeNeighbor, AsOfDate within this structure
-																					 // so that GUI can call report service ESP with these options.
-																					 // if everything resolves 1st time without user interaction
-																					 // 
-      self.optionsEcho := PROJECT(options,
-			 TRANSFORM(iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchOption, 
-			          self.asOfdate := iesp.ecl2esp.toDatestring8(LEFT.asOfDate);
-								SELF := LEFT;
-								self := []));
+			 SELF.SearchBy    := PROJECT(Search_Row.SearchBy,
+                        TRANSFORM(iesp.relationshipidentifiersearch.t_RelationshipIdentifierSearchBy,
+                        SELF := LEFT));
+                        // needed here to echo the input on the output
+			                     // also options IncludeNeighbor, AsOfDate within this structure
+																					   // so that GUI can call report service ESP with these options.
+																					   // if everything resolves 1st time without user interaction
+																					   // 
+    self.optionsEcho := PROJECT(options,
+                        TRANSFORM(iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchOption, 
+                        self.asOfdate := iesp.ecl2esp.toDatestring8(LEFT.asOfDate);
+                        SELF := LEFT;
+                        self := []));
 		  END;			 
 			Results := dataset( [format_out()]);
 			// ^^^^^ this line is the final results of the search service.
@@ -121,12 +119,10 @@ MACRO
     	
 	 Map(
 			 Num_searches <= RelationshipIdentifier_Services.Constants.ONE  OR 
-		   Num_searches >  iesp.constants.RelationshipIdentifier.MAX_COUNT_SEARCH_MATCH_RECORDS 
-			                        => FAIL(301,doxie.ErrorCodes(301)),
-					PermissionsFlagDPPA => FAIL(100, 'DPPA permissible purpose is required'),
+		  Num_searches >  iesp.constants.RelationshipIdentifier.MAX_COUNT_SEARCH_MATCH_RECORDS 
+			                      => FAIL(301,doxie.ErrorCodes(301)),
 					PermissionsFlagGlb  => FAIL(100, 'GLB permissible purpose is required.'),
-					(~(dppa_ok))        => FAIL(2, 'Invalid DPPA permissible purpose'),
 					(~(glb_ok))         => FAIL(2, 'Invalid GLB permissible purpose'),
-					 output(Results, named('Results'))
+					output(Results, named('Results'))
 			);																																																															
 ENDMACRO;

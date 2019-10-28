@@ -60,7 +60,7 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
     // --------------------------------------------------------------------------------------------------------------
     ds_pubDidRecs  			:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnDidData( in_did );
     ds_pubBdidRecs 			:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnBdidData( in_bdid );
-    ds_pubLinkIdRecs 		:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnLinkIdData( in_linkids,FetchLevel);
+    ds_pubLinkIdRecs 		:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnLinkIdData( in_linkids, mod_access, FetchLevel);
 		ds_pubBusinessRecs	:= if(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT, ds_pubLinkIdRecs, ds_pubBdidRecs);
 		
     ds_PubMidexReportNumbers := ds_PubDidRecs + ds_pubBusinessRecs + ds_midexReportNumberIn;
@@ -76,7 +76,7 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
     ds_publicAndNonpublicMidexNumbers := DEDUP( SORT((ds_nonPubMidexReportNumbers + ds_pubMidexReportNumbers + ds_midexReportNumberIn), midex_rpt_nbr), midex_rpt_nbr);
     ds_mari_rids := CASE( MidexReportSearchType, MIDEX_SERVICES.Constants.PERSON_REPORT   		=> MIDEX_Services.Raw_ProfessionalLicenses.fn_get_ProfLicMari_DidData  ( in_did ),
                                                  MIDEX_SERVICES.Constants.BUSINESS_REPORT 		=> MIDEX_Services.Raw_ProfessionalLicenses.fn_get_ProfLicMari_BdidData ( in_bdid ), 
-                                                 MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT => MIDEX_Services.Raw_ProfessionalLicenses.fn_get_ProfLicMari_LinkIdData ( in_linkids, fetchLevel ), 
+                                                 MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT => MIDEX_Services.Raw_ProfessionalLicenses.fn_get_ProfLicMari_LinkIdData ( in_linkids, mod_access, fetchLevel ), 
                                                                                		 DATASET( [], MIDEX_Services.Layouts.rec_profLicMari_payloadKeyField )
                         );
     

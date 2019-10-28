@@ -1,5 +1,4 @@
-﻿import _Control, risk_indicators, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address,
-       dx_header, data_services;
+﻿import _Control, risk_indicators, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address,data_services,dx_header,STD;
 onThor := _Control.Environment.OnThor;
 
 export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
@@ -28,7 +27,7 @@ ExactAddrZip5andPrimRange := ExactMatchLevel[risk_indicators.iid_constants.posEx
 
 
 // "FuzzyCCYYMMDD","FuzzyCCYYMM","RadiusCCYY","ExactCCYYMMDD","ExactCCYYMM"
-DOBMatchOption := stringlib.stringtouppercase(DOBMatchOptions[1].DOBMatch);
+DOBMatchOption := STD.Str.ToUpperCase(DOBMatchOptions[1].DOBMatch);
 DOBMatchYearRadius := if(DOBMatchOptions[1].DOBMatchYearRadius>3, 3, DOBMatchOptions[1].DOBMatchYearRadius);	// cap at 3 years
 
 glb_ok := Risk_Indicators.iid_constants.glb_ok(glb, isFCRA);
@@ -858,7 +857,10 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 							  if(ExactFirstNameRequiredAllowNickname, le.fname=le.h.fname or n1=n2, true);
 	lastmatch_score := Risk_Indicators.LnameScore(le.lname, le.h.lname);
 	lastmatch1 := risk_indicators.iid_constants.g(lastmatch_score) and if(ExactLastNameRequired, le.lname=le.h.lname, true);
-	
+	//for middle name
+	middlematch_score := Risk_Indicators.FnameScore(le.mname,le.h.mname);
+	middlematch1 := Risk_Indicators.iid_constants.g(middlematch_score);
+
 	zip_score1 := Risk_Indicators.AddrScore.zip_score(le.in_zipcode, le.h.zip);
 	cityst_score1 := Risk_Indicators.AddrScore.citystate_score(le.in_city, le.in_state, le.h.city_name, le.h.st, le.cityzipflag);
 	// addrmatchscore := Risk_Indicators.AddrScore.AddressScore(le.prim_range, le.prim_name, le.sec_range, 
@@ -888,6 +890,7 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 	// continue to ignore utility records in the NAS verification.  UtilityRecord can only be set to true in shell versions 50 and higher
 	utilityRecord := bsversion>=50 and mdr.Source_is_Utility(le.h.src);
 	firstmatch := if(utilityRecord, false, firstmatch1);
+  middlematch:= if(utilityRecord, false, middlematch1);
 	lastmatch := if(utilityRecord, false, lastmatch1);
 	addrmatch := if(utilityRecord, false, addrmatch1);
 	hphonematch := if(utilityRecord, false, hphonematch1);
@@ -901,10 +904,10 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 																						100, 100);
 
 	CIVaddrmatchscore2 := Risk_Indicators.AddrScore.AddressScore('', '1', '', '', '2', '',
-																						100, 100, StringLib.StringToUpperCase(trim(le.in_streetAddress)), Risk_Indicators.MOD_AddressClean.street_address('', le.h.prim_range, le.h.predir, le.h.prim_name, le.h.suffix, le.h.postdir, le.h.unit_desig, le.h.sec_range));
+																						100, 100, STD.Str.ToUpperCase(trim(le.in_streetAddress)), Risk_Indicators.MOD_AddressClean.street_address('', le.h.prim_range, le.h.predir, le.h.prim_name, le.h.suffix, le.h.postdir, le.h.unit_desig, le.h.sec_range));
 
 	CIVaddrmatchscore3 := Risk_Indicators.AddrScore.AddressScore('', '1', '', '', '2', '',
-																						100, 100, StringLib.StringToUpperCase(trim(le.in_streetAddress)), Risk_Indicators.MOD_AddressClean.street_address('', le.h.prim_range, le.h.predir, le.h.prim_name, le.h.suffix, le.h.postdir, '', ''));
+																						100, 100, STD.Str.ToUpperCase(trim(le.in_streetAddress)), Risk_Indicators.MOD_AddressClean.street_address('', le.h.prim_range, le.h.predir, le.h.prim_name, le.h.suffix, le.h.postdir, '', ''));
 	
 	CIVaddrmatchcap1 := risk_indicators.iid_constants.tscore(CIVaddrmatchscore1);
 	CIVaddrmatchcap2 := risk_indicators.iid_constants.tscore(CIVaddrmatchscore2);
@@ -1032,6 +1035,7 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 	self.addrs_last_15years := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last_15years, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.fifteenyears, le.historydate), 1, 0));
 					 
 	self.firstcount := IF(firstmatch,1,0);
+ self.middlecount := IF(middlematch,1,0);
 	self.lastcount := IF(lastmatch,1,0);
 	self.addrcount := IF(isrecent and addrmatch,1,0);
 	self.socscount := IF(socsmatch,1,0);
@@ -1190,6 +1194,9 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 	self.firstscore := firstmatch_score;
 	self.verfirst := le.h.fname;
 	
+  self.middlescore := middlematch_score;
+  self.vermiddle := le.h.mname;
+
 	self.dobscore := dobmatch_score;
 	self.verdob := (STRING)le.h.dob;
 	
@@ -1201,6 +1208,7 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 
 	SELF.sources := SELF.src+',';	
 	SELF.firstnamesources := IF(SELF.firstcount=0,le.firstnamesources,SELF.src+',');
+  SELF.middlenamesources := IF(SELF.middlecount=0,le.middlenamesources,SELF.src+',');
 	SELF.lastnamesources := IF(SELF.lastcount=0,le.lastnamesources,SELF.src+',');
 	SELF.addrsources := IF(SELF.addrcount=0,le.addrsources,SELF.src+',');
 	SELF.socssources := IF(SELF.socscount=0,le.socssources,SELF.src+',');
@@ -1311,8 +1319,8 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 																												 
 	self.NameCityStateMatch := map(le.DIDcount <> 1																																																													=> 0,
 																 le.in_city = '' or le.in_state = ''																																																			=> 1,
-																 StringLib.StringToUpperCase(trim(le.in_city)) = trim(le.h.city_name) and StringLib.StringToUpperCase(trim(le.in_state)) = trim(le.h.st)	=> 2,
-																 StringLib.StringToUpperCase(trim(le.in_city)) <> trim(le.h.city_name) or StringLib.StringToUpperCase(trim(le.in_state)) <> trim(le.h.st)	=> 3,
+																 STD.Str.ToUpperCase(trim(le.in_city)) = trim(le.h.city_name) and STD.Str.ToUpperCase(trim(le.in_state)) = trim(le.h.st)	=> 2,
+																 STD.Str.ToUpperCase(trim(le.in_city)) <> trim(le.h.city_name) or STD.Str.ToUpperCase(trim(le.in_state)) <> trim(le.h.st)	=> 3,
 																																																																																						 0);
 																																																									 
 	self.NameZipMatch := map(le.DIDcount <> 1						=> 0,

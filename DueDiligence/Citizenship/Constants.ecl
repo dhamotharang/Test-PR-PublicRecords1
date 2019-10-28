@@ -16,25 +16,27 @@ EXPORT Constants := MODULE
   EXPORT P_SOURCE  := 'P ';
   EXPORT DL_SOURCE := 'DL';
   
-  EXPORT SOURCE_IS_CREDENTIALED := [MDR.SourceTools.src_Airmen, 
-                                    MDR.SourceTools.src_Aircrafts, 
-                                    MDR.SourceTools.src_Bankruptcy,
-                                    MDR.SourceTools.src_US_Coastguard,
-                                    MDR.SourceTools.src_DEA,
-                                    MDR.SourceTools.src_Dunn_Bradstreet,
-                                    DL_SOURCE,
-                                    MDR.SourceTools.src_EMerge_Boat,
-                                    MDR.SourceTools.src_EMerge_Hunt,
-                                    MDR.SourceTools.src_EMerge_Fish,
-                                    MDR.SourceTools.src_EMerge_CCW,
-                                    MDR.SourceTools.src_Federal_Explosives,
-                                    MDR.SourceTools.src_Federal_Firearms,
-                                    P_SOURCE,
-                                    MDR.SourceTools.src_Professional_License,
-                                    MDR.SourceTools.src_American_Students_List,
-                                    MDR.SourceTools.src_Vickers,
-                                    MDR.SourceTools.src_Voters_v2,
-                                    MDR.SourceTools.src_Whois_domains];
+  EXPORT SOURCE_BUREAU := [MDR.SourceTools.src_TU_CreditHeader, MDR.SourceTools.src_Experian_Credit_Header, MDR.SourceTools.src_Equifax];
+  
+  EXPORT SOURCE_CREDENTIALED := [MDR.SourceTools.src_Airmen, 
+                                 MDR.SourceTools.src_Aircrafts, 
+                                 MDR.SourceTools.src_Bankruptcy,
+                                 MDR.SourceTools.src_US_Coastguard,
+                                 MDR.SourceTools.src_DEA,
+                                 MDR.SourceTools.src_Dunn_Bradstreet,
+                                 DL_SOURCE,
+                                 MDR.SourceTools.src_EMerge_Boat,
+                                 MDR.SourceTools.src_EMerge_Hunt,
+                                 MDR.SourceTools.src_EMerge_Fish,
+                                 MDR.SourceTools.src_EMerge_CCW,
+                                 MDR.SourceTools.src_Federal_Explosives,
+                                 MDR.SourceTools.src_Federal_Firearms,
+                                 P_SOURCE,
+                                 MDR.SourceTools.src_Professional_License,
+                                 MDR.SourceTools.src_American_Students_List,
+                                 MDR.SourceTools.src_Vickers,
+                                 MDR.SourceTools.src_Voters_v2,
+                                 MDR.SourceTools.src_Whois_domains];
  
 
 END;

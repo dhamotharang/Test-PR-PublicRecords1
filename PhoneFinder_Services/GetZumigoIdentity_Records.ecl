@@ -1,10 +1,14 @@
-﻿IMPORT Gateway, Phones, PhoneFinder_Services, STD, ut;
+IMPORT doxie, Gateway, Phones, PhoneFinder_Services, STD, ut;
+
 EXPORT GetZumigoIdentity_Records(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)  dPhoneRecs,
                                  DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
                                  PhoneFinder_Services.iParam.SearchParams         inMod,
                                  DATASET(Gateway.Layouts.Config) dGateways) :=
 
 MODULE
+
+  SHARED mod_access := PROJECT(inMod, doxie.IDataAccess);
+
   SHARED Ph_Wireless := dPhoneRecs(phone <> '' AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
 
   Ph_Wireless_Ddp := DEDUP(SORT(Ph_Wireless, acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip),
@@ -92,48 +96,10 @@ MODULE
     EXPORT DATASET(Gateway.Layouts.Config) gateways := dGateways(Gateway.Configuration.IsZumigoIdentity(servicename));
   END;
 
-  Zumigo_Response := Phones.GetZumigoIdentity(Zum_inrecs, Zum_inMod, inMod.GLBPurpose, inMod.DPPAPurpose,,,,FALSE,FALSE);
+  Zumigo_Response := Phones.GetZumigoIdentity(Zum_inrecs, Zum_inMod, mod_access, FALSE, FALSE);
 
   // getting zumigo error-free response
   EXPORT Zumigo_Hist := Zumigo_Response(source = Phones.Constants.GatewayValues.ZumigoIdentity AND device_mgmt_status = '');
-  SHARED today := STD.Date.Today();
-  // identity resolved from zumigo nameaddrinfo option & not resolved in PF search logic
-  Zum_PhoneOwner := JOIN(dPhoneRecs, DEDUP(SORT(Zumigo_Hist,acctno),acctno),
-                          LEFT.acctno = RIGHT.acctno AND
-                          LEFT.DID = RIGHT.LEXID,
-                          TRANSFORM(Phones.Layouts.ZumigoIdentity.zOut, SELF := RIGHT),
-                          RIGHT ONLY);
-
-
-  PhoneFinder_Services.Layouts.PhoneFinder.Final addZum(Phones.Layouts.ZumigoIdentity.zOut l) :=
-  TRANSFORM
-    Acct_tenure := l.acct_tenure_min * $.Constants.ZumigoConstants.MonthlyDays;
-    SELF.acctno := l.acctno;
-    SELF.phone := l.submitted_phonenumber;
-    SELF.did := l.lexid;
-    SELF.fname := l.first_name;
-    SELF.mname := l.middle_name;
-    SELF.lname := l.last_name;
-    SELF.prim_range  :=l.prim_range;
-    SELF.predir      :=l.predir;
-    SELF.prim_name   :=l.prim_name;
-    SELF.suffix :=l.addr_suffix;
-    SELF.postdir     :=l.postdir;
-    SELF.unit_desig  :=l.unit_desig;
-    SELF.sec_range   :=l.sec_range;
-    SELF.city_name        :=l.city;
-    SELF.st       :=l.state;
-    SELF.zip         :=l.zip;
-    SELF.PhoneOwnershipIndicator := TRUE; // identity returned from gateway is verified
-    SELF.dt_first_seen := ut.date_math((STRING)today, -Acct_tenure);
-    SELF.dt_last_seen := (STRING)today;
-    SELF.CallForwardingIndicator   := IF(Zum_inMod.CallHandlingInfo, PhoneFinder_Services.Functions.CallForwardingDesc(l.call_forwarding),''); //get call forwarded value only when CallHandlingInfo is selected
-    SELF.rec_source    := l.source;
-    SELF := [];
-  END;
-
-  SHARED ZumIdentified_Owners := IF(Zum_inMod.NameAddressInfo, PROJECT(Zum_PhoneOwner, addZum(LEFT)));
-
 
   PhoneFinder_Services.Layouts.PhoneFinder.Final toZumValidated(PhoneFinder_Services.Layouts.PhoneFinder.Final l, Phones.Layouts.ZumigoIdentity.zOut r) :=
   TRANSFORM
@@ -164,13 +130,11 @@ MODULE
     SELF := l;
   END;
 
-  PFIdentified_Owners := JOIN(dPhoneRecs, Zumigo_Hist,
+  EXPORT Zumigo_GLI := JOIN(dPhoneRecs, Zumigo_Hist,
                               LEFT.acctno = RIGHT.acctno AND
                               LEFT.seq    = RIGHT.sequence_number AND
                               LEFT.phone  = RIGHT.submitted_phonenumber,
                               toZumValidated(LEFT, RIGHT),
                               LEFT OUTER, KEEP(1),
                               LIMIT(0));
-
-  EXPORT Zumigo_GLI := UNGROUP(PFIdentified_Owners);
 END;

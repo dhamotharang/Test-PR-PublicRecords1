@@ -5,7 +5,17 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
-	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+	mod_access :=
+    MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+      EXPORT STRING DataRestrictionMask := linkingOptions.DataRestrictionMask;
+      EXPORT UNSIGNED1 glb := linkingOptions.GLBPurpose;
+      EXPORT UNSIGNED1 dppa := linkingOptions.DPPAPurpose;
+      EXPORT BOOLEAN show_minors := linkingOptions.IncludeMinors;
+      EXPORT UNSIGNED1 unrestricted := (UNSIGNED1)linkingOptions.AllowAll;
+      EXPORT BOOLEAN isPreGLBRestricted() := linkingOptions.restrictPreGLB;
+      EXPORT BOOLEAN ln_branded :=  linkingOptions.lnbranded;
+    END;
+
   // Add fifteen minutes to the historydatetime to accommodate for delays in 
 	// the real time database information being available in production runs
 	Shell := 
@@ -21,7 +31,6 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																		mod_access,
                                     Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																		0, /*ScoreThreshold --> 0 = Give me everything*/
-																		Options.DataPermissionMask,
 																		Business_Risk_BIP.Constants.Limit_SBFE_LinkIds,
 																		Options.KeepLargeBusinesses
 																		);

@@ -291,6 +291,8 @@ export t_RiskView2LiensJudgmentsReportForLien := record
 	string15 Amount {xpath('Amount')};
 	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
+	string120 Defendant {xpath('Defendant')};
+	iesp.share.t_Address DefendantAddress {xpath('DefendantAddress')};
 	string2 LienTypeID {xpath('LienTypeID')};
 	string20 FilingNumber {xpath('FilingNumber')};
 	string10 FilingBook {xpath('FilingBook')};
@@ -312,6 +314,7 @@ export t_RiskView2LiensJudgmentsReportForJudgement := record
 	string16 FilingDescription {xpath('FilingDescription')};
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	string120 Defendant {xpath('Defendant')};
+	iesp.share.t_Address DefendantAddress {xpath('DefendantAddress')};
 	string120 Plaintiff {xpath('Plaintiff')};
 	string20 FilingNumber {xpath('FilingNumber')};
 	string10 FilingBook {xpath('FilingBook')};

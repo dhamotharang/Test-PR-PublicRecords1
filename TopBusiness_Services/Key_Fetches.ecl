@@ -18,7 +18,7 @@
 
   // 2. Add other common BIP linkids keys, i.e. BusHdr, Directories, Best, others???
 
-IMPORT AMS, ATF, AutoStandardI, BankruptcyV3, BIPV2, BIPV2_Build, BusReg, Corp2, Cortera, DCAV2, DEA, DNB_FEINV2,
+IMPORT AMS, ATF, AutoStandardI, BankruptcyV3, BIPV2, BIPV2_Contacts, BusReg, Corp2, Cortera, DCAV2, DEA, DNB_FEINV2,
       Doxie, dx_Equifax_business_data, dx_Infutor_NARB,
 			EBR, Experian_CRDB, Experian_FEIN, faa, FBNV2, FCC, Frandx, Gong, LiensV2,
 			 LN_PropertyV2, OSHAIR, Prof_LicenseV2, Property, Sheila_Greco, TopBusiness_BIPV2, UCCV2, VehicleV2,
@@ -41,8 +41,8 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
 
  	// *** Key fetch to get BIP "Contact" linkids key records
 	// NOTE: This one will need to use a passed in fetch limit
-  EXPORT ds_contact_linkidskey_recs := BIPV2_Build.key_contact_linkids.kFetch(
-	                                       ds_in_linkids,FETCH_LEVEL,,,FETCH_LIMIT);
+  EXPORT ds_contact_linkidskey_recs := BIPV2_Contacts.key_contact_linkids.kFetch(
+	                                       ds_in_linkids,FETCH_LEVEL,,,FETCH_LIMIT,,mod_access);
 
  	// *** Key fetch to get BIP (other) "Directories" linkids key records   //MAY NOT BE NEEDED???
   //EXPORT ds_directories_linkidskey_recs := BIPV2_Build.key_directories_linkids.kFetch(

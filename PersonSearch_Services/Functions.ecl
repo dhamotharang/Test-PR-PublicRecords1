@@ -1,4 +1,4 @@
-import iesp, ut, AutoStandardI, AutoHeaderI, doxie, dx_header, suppress, codes, NID, BankruptcyV3, FCRA, STD,
+﻿import iesp, ut, AutoStandardI, AutoHeaderI, doxie, dx_header, suppress, codes, NID, BankruptcyV3, FCRA, STD,
        BankruptcyV3_Services, PhonesFeedback_Services, PhonesFeedback, AddressFeedback_Services, FraudDefenseNetwork_Services;
 export Functions := MODULE
 	
@@ -26,6 +26,9 @@ export Functions := MODULE
 												 boolean IncludePhonesPlus = false,
 												 boolean IncludePhonesFeedback = false,
 												 unsigned SourceDocFilter = 0) := FUNCTION
+
+    global_mod := AutoStandardI.GlobalModule();
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 
 		tmp_layout := RECORD(Layouts.headerRecordExt)
 			string10 subjectSSNIndicator := '';
@@ -143,7 +146,8 @@ export Functions := MODULE
 																									,did
 																									,phone10
 																									,phones2useFB
-																									,feedback
+																									,mod_access 
+                                             ,feedback     
 																									);
 			 phones2useWithFB := if(IncludePhonesFeedback,phones2useFB,phones2use);			 
 			 self.Phones := project(phones2useWithFB, xformPhones1(LEFT));
@@ -219,7 +223,10 @@ export Functions := MODULE
 												 boolean IncludeAlternatePhonesCount = false, 
 												 boolean IncludePhonesFeedback = false, 
 												 unsigned SourceDocFilter = 0) := FUNCTION
-	
+    
+    global_mod := AutoStandardI.GlobalModule();
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+
 		iesp.share.t_NameWithGender xformNames(Layouts.NameRec l) := TRANSFORM
 			self := Row({'',l.fname, l.mname, l.lname, l.name_suffix, l.title, gender(l.fname, l.title)}, 
 										iesp.share.t_NameWithGender);
@@ -307,7 +314,8 @@ export Functions := MODULE
 																									,did
 																									,phone10
 																									,phones2useFB
-																									,feedback
+																									,mod_access
+                                             ,feedback
 																									);
 			 phones2useWithFB := if(IncludePhonesFeedback,phones2useFB,phones2use);			 
 			 self.Phones := project(phones2useWithFB, xformPhones(LEFT));			 			 

@@ -1,4 +1,4 @@
-import ut, risk_indicators, Business_Risk, Easi, RiskWise, address, std;
+﻿import ut, risk_indicators, Business_Risk, Easi, RiskWise, std;
 
 export BD9605_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(Business_Risk.Layout_Output) biid, dataset(riskwise.Layout_BusReasons_Input) orig_input,  
 			 boolean OFAC, string tribcode='', boolean nugen=false, boolean other_watchlists = false) := FUNCTION
@@ -721,6 +721,8 @@ layout_iid_and_orig_input into_iid_orig(working_layout le) := TRANSFORM
 	self.iid := le.bs;
 
 	self.orig := le.orig_input;
+	self := [];
+
 END;
 
 iid_orig := project(with_score, into_iid_orig(left));

@@ -46,7 +46,7 @@
   <part name="UseDeltabase" type="xsd:boolean" default="false"/>
   <part name="IncludePhoneMetadata" type="xsd:boolean" default="true"/>
   <part name="SubjectMetadataOnly" type="xsd:boolean" default="false"/>
-  <part name="SuppressBlankNameAddress" type="xsd:boolean" default="false"/>
+  <part name="SuppressNonRelevantRecs" type="xsd:boolean" default="false"/>
   <separator />
 	<part name="Gateways" type="tns:XmlDataSet" cols="80" rows="15" />
 	<part name="PhoneFinderSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
@@ -176,8 +176,11 @@ IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie, A
 
   dPhoneFinder := DATASET([tFormat2IespResponse()]);
 
-  // return blank  dataset when identities child dataset is blank
-  results := if(~reportMod.SuppressBlankNameAddress or (reportMod.SuppressBlankNameAddress and exists(dPhoneFinder.records.identities)),
+ // return blank  dataset when identities child dataset is blank and carrier name is blank
+	IsIdentitiesExist := EXISTS(dPhoneFinder.records[1].identities);
+	IsCarrierInfoExist := dPhoneFinder.records[1].PrimaryPhoneDetails.OperatingCompany.name <> '';
+	 
+  results := if(~reportMod.SuppressNonRelevantRecs or (reportMod.SuppressNonRelevantRecs and (IsIdentitiesExist or IsCarrierInfoExist)),
                         dPhoneFinder);
 
   royalties	:= modRecords.dRoyalties;

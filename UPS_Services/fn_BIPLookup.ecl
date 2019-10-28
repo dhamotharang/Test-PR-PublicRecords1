@@ -1,9 +1,16 @@
-﻿Import BIPV2,AutoStandardI,TopBusiness_Services,MDR,STD;
+﻿Import BIPV2, AutoStandardI, TopBusiness_Services, MDR, STD, Doxie;
 EXPORT fn_BIPLookup( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Format2SearchInput,
 												AutoStandardI.DataRestrictionI.params in_mod2   
 											) := FUNCTION
 	
-
+    
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+    EXPORT UNSIGNED1 glb              := in_mod2.glbPurpose;
+    EXPORT UNSIGNED1 dppa             := in_mod2.dppapurpose;
+    EXPORT STRING DataRestrictionMask := in_mod2.DataRestrictionMask;
+    EXPORT BOOLEAN show_minors        := in_mod2.IncludeMinors;
+  END;
+  
 	ds_Format2SearchInput_Hsort := project(ds_Format2SearchInput,
 																		 transform(BIPV2.IDfunctions.rec_SearchInput,
                                    self.hsort := true,
@@ -32,7 +39,8 @@ EXPORT fn_BIPLookup( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Format2Search
 																												PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
 																												5, //JoinLimit
 																												true, //dnbFullRemove
-																												); 						 
+                                                        , , , 
+                                                        mod_access); //doxie.IDataAccess mod_access					 
 	
   topResults_with_status := 
 														join(topResults,status_coded, 

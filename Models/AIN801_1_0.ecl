@@ -1,4 +1,4 @@
-// WFS4 Model
+﻿// WFS4 Model
 import Risk_Indicators, easi, riskwise, ut, std;
 
 export AIN801_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, string5 grade) := function
@@ -20,7 +20,7 @@ Layout_ModelOut doModel(clam le, Easi.Key_Easi_Census rt ) := transform
 	string ab_av_edu := rt.ab_av_edu;
 	integer combo_dobscore := le.iid.combo_dobscore;
 	integer criminal_count := le.bjl.criminal_count;
-	string disposition := trim(Stringlib.StringToUpperCase(le.bjl.disposition));
+	string disposition := trim(STD.Str.ToUpperCase(le.bjl.disposition));
 	integer hphnpop := if(le.input_validation.homephone, 1, 0);
 	string in_dob := le.shell_input.dob;
 	integer liens_historical_released_count := le.bjl.liens_historical_released_count;
@@ -76,7 +76,7 @@ Layout_ModelOut doModel(clam le, Easi.Key_Easi_Census rt ) := transform
 																	round((today1900 - adl_EQ_first_seen_days_since1900)/365));
 		
 	integer source_exists( string sources, string source ) := 
-												if(StringLib.StringFind(sources, source, 1) > 0, 1, 0);
+												if(STD.Str.Find(sources, source, 1) > 0, 1, 0);
 
 	_source_addr_AM := source_exists(addr_sources, 'AM'); //)>0); label _source_addr_AM := "addr-Airmen                    ";
 	_source_addr_AR := source_exists(addr_sources, 'AR'); //)>0); label _source_addr_AR := "addr-Aircrafts                 ";
@@ -336,14 +336,15 @@ out := join(clam, Easi.Key_Easi_Census,
 			     ,keep(1) );
 					 
 Risk_Indicators.Layout_Output into_layout_output(clam le) := TRANSFORM
-	self.seq := le.seq;
-	self.socllowissue := (string)le.SSN_Verification.Validation.low_issue_date;
-	self.soclhighissue := (string)le.SSN_Verification.Validation.high_issue_date;
-	self.socsverlevel := le.iid.NAS_summary;
-	self.nxx_type := le.phone_verification.telcordia_type;
-	self := le.iid;
-	self := le.shell_input;
-	self := le;
+  self.seq := le.seq;
+  self.socllowissue := (string)le.SSN_Verification.Validation.low_issue_date;
+  self.soclhighissue := (string)le.SSN_Verification.Validation.high_issue_date;
+  self.socsverlevel := le.iid.NAS_summary;
+  self.nxx_type := le.phone_verification.telcordia_type;
+  self := le.iid;
+  self := le.shell_input;
+  self := le; 
+  self := [];
 END;
 iid := project(clam, into_layout_output(left));
 

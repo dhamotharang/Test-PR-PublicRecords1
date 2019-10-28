@@ -1,4 +1,4 @@
-﻿IMPORT AddressFeedback, AddressFeedback_Services, BusinessCredit_Services, DriversV2,  
+﻿IMPORT  AutoStandardI, doxie, AddressFeedback, AddressFeedback_Services, BusinessCredit_Services, DriversV2,  
        PhonesFeedback, PhonesFeedback_Services, Suppress, ut, iesp, doxie;
 
 EXPORT HeaderFileRollupService_Records := 
@@ -59,6 +59,12 @@ EXPORT HeaderFileRollupService_Records :=
 			FUNCTION
 
         useBusinessCreditSorting := BusinessCredit_Services.Functions.fn_useBusinessCredit( ta2_iparam_mod.dataPermissionMask, ta2_iparam_mod.Include_BusinessCredit );
+        global_mod := AutoStandardI.GlobalModule();
+        mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(global_mod))
+         EXPORT string32 application_type := ta2_iparam_mod.application_type_val; 
+         EXPORT string DataPermissionMask := ta2_iparam_mod.dataPermissionMask;
+        END;
+
 
         // ----------------------------------------------------------------------
         // Addr/Phone feedback section
@@ -71,6 +77,7 @@ EXPORT HeaderFileRollupService_Records :=
                                                         ,did
                                                         ,Phone
                                                         ,phnRecsWithFeedback
+                                                        ,mod_access
                                                         );
             SELF.PhoneRecs        := IF(ta2_iparam_mod.Include_PhonesFeedback,phnRecsWithFeedback,_phoneRecs);
             SELF.address_feedback := [];

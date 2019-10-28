@@ -35,10 +35,10 @@ EXPORT SearchService := MACRO
 	addr_in := if(SearchBy <> row([], iesp.Addresssearch.t_AddressSearchBy), dataset(SearchBy), StoredInput);
 	BOOLEAN streetNotBlank := ( addr_in[1].Address.StreetNumber <> '' and  addr_in[1].Address.StreetName <> '') OR addr_in[1].Address.StreetAddress1 <> '';
 	BOOLEAN isEnoughInput := streetNotBlank and ((addr_in[1].Address.City <> '' and addr_in[1].Address.State <> '') or addr_in[1].Address.Zip5 <> '');
-	addr_mod := MODULE(PROJECT(AutoStandardI.GlobalModule(), Address_Services.IParams.address_search, opt))								
-	END;
+  input_params := AutoStandardI.GlobalModule();
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 
-	recs							:= Address_Services.SearchRecords (addr_in, addr_mod);
+	recs							:= Address_Services.SearchRecords (addr_in, mod_access);
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(recs, results, iesp.addresssearch.t_AddressSearchResponse, Addresses);
 	
 	if(~isEnoughInput,

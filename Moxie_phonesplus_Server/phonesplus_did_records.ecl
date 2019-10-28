@@ -1,5 +1,5 @@
-//  Get header records along with attached gong details
-import doxie, ut, risk_indicators, PhonesFeedback_Services, doxie_raw, PhonesFeedback;
+﻿//  Get header records along with attached gong details
+import AutostandardI, doxie, ut, risk_indicators, PhonesFeedback_Services, doxie_raw, PhonesFeedback, suppress;
 
 
 export phonesplus_did_records(
@@ -128,10 +128,9 @@ END;
 
 in_batch_layout_w_timezone_nfb := PROJECT(h4,final_format(LEFT));
 
-PhonesFeedback_Services.Mac_Append_Feedback(in_batch_layout_w_timezone_nfb
-											,did
-											,Phoneno
-											,in_batch_layout_w_timezone_fb);
+global_mod := AutoStandardI.GlobalModule();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+PhonesFeedback_Services.Mac_Append_Feedback(in_batch_layout_w_timezone_nfb, did, Phoneno, in_batch_layout_w_timezone_fb, mod_access  );
 
 in_batch_layout_w_timezone:=if(IncludePhonesFeedback
 							,in_batch_layout_w_timezone_fb

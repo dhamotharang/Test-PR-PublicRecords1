@@ -1,4 +1,4 @@
-﻿IMPORT _Control, doxie, LN_PropertyV2, ut, Codes, suppress, fcra;
+﻿IMPORT _Control, doxie, LN_PropertyV2, ut, Codes, suppress, fcra, LN_propertyV2_Services, STD;
 onThor := _Control.Environment.OnThor;
 
 l_sid		:= LN_PropertyV2_Services.layouts.search_fid;
@@ -30,7 +30,7 @@ export dataset(l_out) fn_get_report_2(
 		);
 
 	FormatID(STRING str_ID, STRING _type) := 
-		CASE( stringlib.StringToUppercase(_type),
+		CASE( STD.str.ToUppercase(_type),
 			Suppress.Constants.LinkTypes.DID => INTFORMAT( (INTEGER)str_ID, 12, 1 ),
 			Suppress.Constants.LinkTypes.SSN => INTFORMAT( (INTEGER)str_ID, 9, 1 ),
 			str_ID
@@ -44,7 +44,7 @@ export dataset(l_out) fn_get_report_2(
  	did_rec := if(isFCRA, project(in_fids, transform(doxie.layout_best, self.did:=left.search_did,self:=left,self:=[])));
 	// adding a dedup of the DID and SSN so we don't end up with so many records coming out of GetFlagFile for same person
 	did_rec_deduped := if(isFCRA, dedup(sort(did_rec, did, ssn), did, ssn));
-	ds_flags := if (IsFCRA, FCRA.GetFlagFile(did_rec_deduped), fcra.compliance.blank_flagfile);
+	ds_flags := if (IsFCRA and ~OnThor, FCRA.GetFlagFile(did_rec_deduped), fcra.compliance.blank_flagfile);
 
 	// Apply FaresID-based restrictions
 	fids1 := in_fids(ln_fares_id[1] not in in_mod.srcRestrict);	// blacklist FARES, Fidelity, or LnBranded as needed
@@ -199,7 +199,7 @@ needed to put this code back in for the roxie query to work within bocashell for
 																					or ~in_mod.DisplayMatchedParty_val);
 
 	// If CurrentByVendor is set, only keep APNs if _all_ of their records have a perfect sec_range match in the property address
-	sec_clean(string s) := StringLib.StringFilter(Stringlib.StringToUpperCase(s),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+	sec_clean(string s) := STD.str.Filter(STD.str.ToUpperCase(s),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 	apns_bad := project(partied_xadl2_thresh(sec_clean(parties(party_type='P')[1].sec_range)<>sec_clean(in_mod.entity1.sec_range)), transform({partied_xadl2_thresh.apn},self.apn:=LN_PropertyV2.fn_strip_pnum(left.apn)));
 	apns_set := set(table(apns_bad, {apn}, apn), apn);
 	partied_out := if(in_mod.currentVend, partied_xadl2_thresh(LN_PropertyV2.fn_strip_pnum(apn) not in apns_set), partied_xadl2_thresh);

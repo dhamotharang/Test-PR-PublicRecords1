@@ -1,7 +1,10 @@
-Import Healthcare_Provider_Services,DEATH_MI;
+﻿Import Healthcare_Provider_Services,DEATH_MI;
 EXPORT Customer_Death_Search_Layouts := MODULE
 
 	export autokeyInput := record
+	unsigned4 global_sid:=0;
+	unsigned4 record_sid:=0;
+	boolean hasoptout:=false;
 	    Healthcare_Provider_Services.Layouts.autokeyInput-[prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,st,z5,zip4,fein,comp_name,
 																												bdid,license_number,license_state,clianumber,homephone,workphone,dl,dlstate,vin,Plate,PlateState,searchType,max_results,score,MatchCode,
 																												date,sic_code,filing_number,apn,fips_code,score_bdid,TaxID,UPIN,NPI,DEA,ProviderID,ProviderSrc,isReport,
@@ -21,6 +24,7 @@ EXPORT Customer_Death_Search_Layouts := MODULE
 
 	Export LayoutOutputBatch := Record
 			string20 acctno := '';
+			boolean hasOptout := false;
 			DEATH_MI.Layouts.Base -[clean_address,clean_name,dt_vendor_first_reported,dt_vendor_last_reported,raw_aid,ace_aid,did,bdid,customer_id];
 			string25 customer_id;
 			string8  dt_vendor_first_reported:= '';

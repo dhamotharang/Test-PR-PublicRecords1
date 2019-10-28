@@ -1,4 +1,4 @@
-﻿IMPORT $, Advo, DID_Add, iesp, Phones, STD, ut, SSNBest_Services;
+IMPORT $, Advo, DID_Add, iesp, Phones, STD, ut, SSNBest_Services;
 
 EXPORT GetIdentitiesFinal(DATASET($.Layouts.PhoneFinder.Final) dSearchResults,
                           DATASET($.Layouts.BatchInAppendDID)  dInBestInfo,
@@ -164,11 +164,6 @@ FUNCTION
 
   //Append gov best SSN, SSN (Gov best) is returned only for Gov searches. If any other verticals need SSN we need to start using'getSSNBest' flag
   ssnBestParams := MODULE (PROJECT (inmod, SSNBest_Services.IParams.BatchParams, OPT))
-    EXPORT STRING ssn_mask := inmod.ssnmask; // These  assignmnets will not be needed once IDataAccess changes are made in PhoneFinder
-    EXPORT unsigned1 glb := inmod.GLBPurpose;
-    EXPORT unsigned1 dppa := inmod.DPPAPurpose;
-    EXPORT string32 application_type := inmod.ApplicationType;
-    EXPORT string5 industry_class := inmod.IndustryClass;
   END;
 
   withGovBestSSN := SSNBest_Services.Functions.fetchSSNs_generic(dSearchRecswAddrType, ssnBestParams, ssn, did, false);

@@ -4429,4 +4429,28 @@ EXPORT SeRs_Derived_Vars := DATASET([
 
 EXPORT SeRs_Derived_Vars_DCT := DICTIONARY(SeRs_Derived_Vars, {GENDER,AGE_GROUP,ADMIT_DIAG_CODE => ADMIT_DIAG,READMIT_DIAG,READMIT_LIFT});
 
+EXPORT SeTC_LOB_Ref_Layout := RECORD
+STRING2 LOB_Value;
+STRING100 LOB_Desc;
+END;
+
+EXPORT SeTC_LOB_Ref := DATASET([
+{'','Blank is valid'},
+{'10','Commercial'},
+{'20','Medicare'},
+{'30','Medicaid'},
+{'40','Exchange'},
+{'11','Commercial Only'},
+{'21','Medicare Only'},
+{'22','Medicare Dual'},
+{'31','Medicaid ABAD'},
+{'32','Medicaid AFDC'},
+{'33','Medicaid NEC'},
+{'34','Medicaid DUAL'},
+{'41','Exchange Commercia'},
+{'42','Exchange Medicaid'}
+],SeTC_LOB_Ref_Layout);
+
+EXPORT SeRs_LOB_Ref_SET := SET(SeTC_LOB_Ref, LOB_Value);
+
 END;

@@ -1,4 +1,4 @@
-﻿  IMPORT AddrBest, Doxie_Raw, Gateway, MDR, Phones, PhoneFinder_Services, Progressive_phone;
+﻿IMPORT AddrBest, Doxie_Raw, Gateway, MDR, Phones, PhoneFinder_Services, Progressive_phone;
 
   // Layouts
   lBatchIn       := PhoneFinder_Services.Layouts.BatchInAppendDID;
@@ -31,14 +31,12 @@
     EXPORT BOOLEAN IncludeLastResort     := ~isPhoneExists;
   END;
 
-  qSentPVSV2Gateway := dGateways(inMod.UseTransUnionPVS AND Gateway.Configuration.isQsentV2(servicename))[1];
-  qSentIQ411V2Gateway := dGateways(inMod.UseTransUnionIQ411 AND Gateway.Configuration.isQsentV2(servicename))[1];
+  qSentGateway := dGateways(inMod.UseQSent AND Gateway.Configuration.isQsentV2(servicename))[1];
 
   BOOLEAN isWaterfallphonesearch := inMod.useWaterfallv6 OR isPhoneExists;
 
   Progressive_phone.layout_progressive_batch_in tFormat2ProgressivePhone(dIn pInput) :=
   TRANSFORM
-
     SELF.acctno  := pInput.acctno;
     SELF.did     := pInput.did;
     SELF.phoneno := IF(isWaterfallphonesearch, pInput.homephone, '');
@@ -109,7 +107,8 @@
 
   dWaterfallPhones2Common := PROJECT(dWaterfallPhones, tWaterfall2Common(LEFT));
 
-  // Get the primary phone per acctno
+
+	// Get the primary phone per acctno
   dWaterfallPhones2CommonGrp := GROUP(SORT(dWaterfallPhones2Common, acctno, -phone_score, -dt_last_seen, RECORD), acctno);
 
   lFinal tAssignPrimary(lFinal le, lFinal ri, INTEGER cnt) :=
@@ -131,7 +130,7 @@
 
   // QSent gateway data - iQ411
   dWFQSentIQ411 := IF(EXISTS(dIn) AND EXISTS(dInBestInfo) AND inMod.UseTransUnionIQ411,
-                      PhoneFinder_Services.GetQSentPhones.GetQSentIQ411Data(dInBestInfo, dExcludePhones, inMod, qSentIQ411V2Gateway));
+                      PhoneFinder_Services.GetQSentPhones.GetQSentIQ411Data(dInBestInfo, dExcludePhones, inMod, qSentGateway));
 
   // Grab records from QSent where we didn't get a hit from waterfall
   dWFQSentOnly := JOIN( dWFQSentIQ411,
@@ -158,30 +157,62 @@
   dWFQSentPrimaryPhoneDetail := IF(EXISTS(dPrimaryPhones) AND inMod.UseTransUnionPVS,
                                     PhoneFinder_Services.GetQSentPhones.GetQSentPVSData(dPrimaryPhones,
                                                                                         inMod, phone, acctno,
-                                                                                        TRUE, qSentPVSV2Gateway));
-
-  dInhousePhoneDetail	:= IF(EXISTS(dPrimaryPhones),
-                            PhoneFinder_Services.GetPhoneDetails(PROJECT(dPrimaryPhones,
-                                                                          TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
-                                                                                    SELF.acctno := LEFT.acctno, SELF.phoneno := LEFT.phone, SELF := [])),
-                                                                  dGateways, inMod));
-
-  dInhousePhoneDetailWBatchIn := PROJECT(dInhousePhoneDetail, TRANSFORM(lFinal, SELF.isPrimaryPhone := TRUE, SELF := LEFT));
-
-  dPrimaryPhoneDetail := IF(inMod.UseInHousePhoneMetadata, dInhousePhoneDetailWBatchIn, dWFQSentPrimaryPhoneDetail);
-
+                                                                                        TRUE, qSentGateway));
   // dPrimaryPhones + dPrimaryPhoneDetail - Primary phones including Qsent if no Waterfall phones found
   // dWFQSentOtherPhones - If no phones found in waterfall, Qsent other phones
-  // dWFQSentMatches - If phones found in waterfall, all Qsent phones
+  // dWFQSentMatches - If phones found in waterfall, all Qsent phones other than Primary
+  dOtherPhones := dWaterfallOtherPhones + dWFQSentOtherPhones + dWFQSentMatches;
+
+  dInhouseMetadataPhones := dPrimaryPhones + dOtherPhones;
+
+  dInhousePhoneDetail	:= IF(EXISTS(dInhouseMetadataPhones),
+                            PhoneFinder_Services.GetPhoneDetails(PROJECT(dInhouseMetadataPhones,
+                                                                          TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
+                                                                                      SELF.acctno:= LEFT.acctno, SELF.phoneno:= LEFT.phone, SELF:= [])),
+                                                                  dGateways, inMod));
+ 
+  lFinal tAppendCarrierInfo (lFinal le, lFinal ri, BOOLEAN isPrimaryPhone) :=
+  TRANSFORM
+    SELF.carrier_name      := ri.carrier_name;
+    SELF.phone_region_city := ri.phone_region_city;
+    SELF.phone_region_st   := ri.phone_region_st;
+    SELF.coc_description   := ri.coc_description;
+    SELF.phonestatus       := ri.phonestatus;
+    SELF.servicetype       := ri.servicetype;
+    SELF.prepaid           := ri.prepaid;
+    SELF.RealTimePhone_Ext := ri.RealTimePhone_Ext;
+    SELF.typeflag          := IF(isPrimaryPhone, ri.typeflag, le.typeflag);
+    SELF.phone_source      := ri.phone_source;
+    SELF.dt_last_seen      := ri.dt_last_seen;
+    SELF.isPrimaryPhone    := isPrimaryPhone;
+    SELF                   := le;
+  END;
+
+  dPrimaryInhousePhoneDetail := JOIN(dPrimaryPhones, dInhousePhoneDetail,
+                                      LEFT.acctno = RIGHT.acctno AND
+                                      LEFT.phone  = RIGHT.phone,
+                                      tAppendCarrierInfo(LEFT, RIGHT, TRUE),
+                                      LIMIT(0), KEEP(1));
+
+  dOtherPhonesInHouseDetail := JOIN(dOtherPhones, dInhousePhoneDetail,
+                                    LEFT.acctno = RIGHT.acctno AND
+                                    LEFT.phone  = RIGHT.phone,
+                                    tAppendCarrierInfo(LEFT, RIGHT, FALSE),
+                                    LEFT OUTER,
+                                    LIMIT(0), KEEP(1));
+
+  dPrimaryPhoneDetail := IF(inMod.UseInHousePhoneMetadataOnly, dPrimaryInhousePhoneDetail, dWFQSentPrimaryPhoneDetail);
 
   dWaterfallCombined := IF(isPhoneExists,
                             dWaterfallAssignPrimary,
-                            dPrimaryPhones + dPrimaryPhoneDetail + dWaterfallOtherPhones + dWFQSentOtherPhones + dWFQSentMatches);
+                            dPrimaryPhones + dPrimaryPhoneDetail + dOtherPhonesInHouseDetail);
 
   dDidRecs := PROJECT(PhoneFinder_Services.Functions.AppendDIDs(dWaterfallCombined, TRUE),
                       TRANSFORM(lFinal,
-                                SELF.phonestatus := PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode),
-                                SELF := LEFT));
+                                SELF.phonestatus := IF(inMod.UseInHousePhoneMetadataOnly,
+                                                        LEFT.phonestatus,
+                                                        PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode)),
+                                SELF             := LEFT));
 
   // Debug
   #IF(PhoneFinder_Services.Constants.Debug.Waterfall)
@@ -199,6 +230,10 @@
                                 OUTPUT(dWaterfallPrimaryPhone, NAMED('dWaterfallPrimaryPhone'), EXTEND),
                                 OUTPUT(dWaterfallOtherPhones, NAMED('dWaterfallOtherPhones'), EXTEND),
                                 OUTPUT(dExcludePhones, NAMED('dExcludePhones'), EXTEND),
+                                OUTPUT(dInhousePhoneDetail, NAMED('dInhousePhoneDetail_WF'), EXTEND),
+                                OUTPUT(dPrimaryInhousePhoneDetail, NAMED('dPrimaryInhousePhoneDetail'), EXTEND),
+                                OUTPUT(dOtherPhonesInHouseDetail, NAMED('dOtherPhonesInHouseDetail'), EXTEND),
+                                OUTPUT(dPrimaryPhoneDetail, NAMED('dPrimaryPhoneDetail_WF'), EXTEND),
                                 #IF(PhoneFinder_Services.Constants.Debug.QSent)
                                   SEQUENTIAL( OUTPUT(dWFQSentIQ411, NAMED('dWFQSentIQ411'), EXTEND),
                                               OUTPUT(dWFQSentOnly, NAMED('dWFQSentOnly'), EXTEND),
@@ -207,10 +242,8 @@
                                               OUTPUT(dWFQSentMatches, NAMED('dWFQSentMatches'), EXTEND),
                                               OUTPUT(dPrimaryPhones, NAMED('dPrimaryPhones'), EXTEND),
                                               OUTPUT(dWFQSentPrimaryPhoneDetail, NAMED('dWFQSentPrimaryPhoneDetail'), EXTEND),
-                                              OUTPUT(dInhousePhoneDetail, NAMED('dInhousePhoneDetail_WF'), EXTEND),
-                                              OUTPUT(dPrimaryPhoneDetail, NAMED('dPrimaryPhoneDetail_WF'), EXTEND),
-                                              OUTPUT(dWaterfallCombined, NAMED('dWaterfallCombined_WF'), EXTEND)),
                                 #END
+                                OUTPUT(dWaterfallCombined, NAMED('dWaterfallCombined_WF'), EXTEND),
                                 OUTPUT(DATASET([], {STRING1 Dummy}), NAMED('DummyDS'), EXTEND));
 
     IF(isPhoneExists, wfWithPhone, wfWithNoPhone);

@@ -18,7 +18,7 @@ EXPORT Get := MODULE
     END;
     LOCAL out_recs := PROJECT(recs_death_appended, TRANSFORM(layout_out_rec, SELF := LEFT));
 
-    RETURN out_recs;
+    RETURN out_recs; 
 
   ENDMACRO;
 
@@ -51,9 +51,7 @@ EXPORT Get := MODULE
       getDeceased(left, right), 
       KEEP(recs_per_id), LIMIT(0));
 
-    // TODO: uncomment below to enable ccpa suppression.    
-    // RETURN suppress.MAC_SuppressSource(out_recs, death_params, death.did, death.global_sid, data_env := _data_env); 
-    RETURN out_recs;
+    RETURN suppress.MAC_SuppressSource(out_recs, death_params, death.did, death.global_sid, data_env := _data_env); 
 
   ENDMACRO;
 

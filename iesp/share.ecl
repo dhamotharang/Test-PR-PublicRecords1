@@ -228,6 +228,8 @@ export t_OptionsForCVICalculation := record
 	boolean IncludeDOB {xpath('IncludeDOB')};
 	boolean IncludeDriverLicense {xpath('IncludeDriverLicense')};
 	boolean DisableCustomerNetworkOption {xpath('DisableCustomerNetworkOption')};
+  boolean IncludeITIN {xpath('IncludeITIN')};
+  boolean IncludeComplianceCap {xpath('IncludeComplianceCap')};
 end;
 		
 export t_AddressEx := record (t_Address)

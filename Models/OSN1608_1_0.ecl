@@ -1,4 +1,4 @@
-IMPORT EASI, Std, RiskWise, Risk_Indicators, Models, Ut;
+﻿IMPORT Std, RiskWise, Risk_Indicators, Models;
 
 
 
@@ -1969,7 +1969,7 @@ EXPORT osn1608_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) b
 	NULL := -999999999;
 	
 	
-	INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
+	INTEGER contains_i( string haystack, string needle ) := (INTEGER)(STD.Str.Find(haystack, needle, 1) > 0);
 	
 	
 	
@@ -2473,12 +2473,12 @@ EXPORT osn1608_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) b
 	                        (integer)_ver_src_en_s, (integer)_ver_src_tn_s, (integer)_ver_src_tu));
 	
 	_ver_src_cnt   := Models.Common.countw((string)(ver_sources));
-	_ver_src_cnt_s := Models.Common.countw((string)(StringLib.StringToUpperCase(trim(ver_sources_s, ALL))), ',');	 
+	_ver_src_cnt_s := Models.Common.countw((string)(STD.Str.ToUpperCase(trim(ver_sources_s, ALL))), ',');	 
 	
 	_bureauonly   := _credit_source_cnt > 0   AND _credit_source_cnt   = _ver_src_cnt   AND 
-	                (StringLib.StringToUpperCase(nap_type)   = 'U' or (nap_summary   in [0, 1, 2, 3, 4, 6]));
+	                (STD.Str.ToUpperCase(nap_type)   = 'U' or (nap_summary   in [0, 1, 2, 3, 4, 6]));
   _bureauonly_s := _credit_source_cnt_s > 0 AND _credit_source_cnt_s = _ver_src_cnt_s AND 
-	                (StringLib.StringToUpperCase(nap_type_s) = 'U' or (nap_summary_s in [0, 1, 2, 3, 4, 6]));
+	                (STD.Str.ToUpperCase(nap_type_s) = 'U' or (nap_summary_s in [0, 1, 2, 3, 4, 6]));
 	
 	_derog   := felony_count   > 0 OR addrs_prison_history   OR 
 	            attr_num_unrel_liens60   > 0 OR attr_eviction_count   > 0 OR stl_inq_count   > 0 OR 
@@ -2550,7 +2550,7 @@ EXPORT osn1608_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) b
 	
 	s_l77_add_po_box_i := map(
 	    not(addrpop_s or not(out_z5_s = ''))                                                                                                                                                                                                                                       => NULL,
-	    (integer)rc_hriskaddrflag_s = 1 or (Integer)rc_ziptypeflag_s = 1 or StringLib.StringToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'E' or StringLib.StringToUpperCase(trim((string)rc_zipclass_s, LEFT, RIGHT)) = 'P' or StringLib.StringToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'P' => 1,
+	    (integer)rc_hriskaddrflag_s = 1 or (Integer)rc_ziptypeflag_s = 1 or STD.Str.ToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'E' or STD.Str.ToUpperCase(trim((string)rc_zipclass_s, LEFT, RIGHT)) = 'P' or STD.Str.ToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'P' => 1,
 	                                                                                                                                                                                                                                                                                                      0);
 	
 	s_f01_inp_addr_address_score_d := if(not((boolean)(integer)truedid_s and (boolean)(integer)add_input_pop_s) or add_input_address_score_s = 255, NULL, min(if(add_input_address_score_s = NULL, -NULL, add_input_address_score_s), 999));
@@ -2674,7 +2674,7 @@ EXPORT osn1608_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) b
 	    (boolean)inq_communications_count_s       => 99,
 	                                                 999);
 	
-	s_adl_util_misc_n := if(contains_i(StringLib.StringToUpperCase(util_adl_type_list_s), 'Z') > 0, 1, 0);
+	s_adl_util_misc_n := if(contains_i(STD.Str.ToUpperCase(util_adl_type_list_s), 'Z') > 0, 1, 0);
 	
 	s_add_input_mobility_index_i := map(
 	    not((boolean)(integer)addrpop_s) => NULL,
@@ -2886,10 +2886,10 @@ EXPORT osn1608_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) b
 	
 	btst_addr_match_d := (Integer)addrscore = 100 or not((boolean)(integer)addrpop_s);
 	
-	num_inp_lat  := (Real)StringLib.StringFilterOut(out_lat, '<>');
-	num_inp_long := (Real)StringLib.StringFilterOut(out_long, '<>');
-	num_ip_lat   := (REAL)StringLib.StringFilterOut((string)latitude, '<>');
-	num_ip_long  := (REAL)StringLib.StringFilterOut((string)longitude, '<>');
+	num_inp_lat  := (Real)STD.Str.FilterOut(out_lat, '<>');
+	num_inp_long := (Real)STD.Str.FilterOut(out_long, '<>');
+	num_ip_lat   := (REAL)STD.Str.FilterOut((string)latitude, '<>');
+	num_ip_long  := (REAL)STD.Str.FilterOut((string)longitude, '<>');
 	
   d_lat  := if(num_inp_lat=NULL or num_ip_lat=NULL, NULL, if(num_inp_lat=0 or num_ip_lat=0, null, num_inp_lat - num_ip_lat));
 	
@@ -2914,8 +2914,8 @@ EXPORT osn1608_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) b
 	
 	btst_distaddraddr2_i := if((not(addrpop) and not(addrpop_s)) or distaddraddr2 = '', NULL, (integer)distaddraddr2);
 	
-	email_domain := TRIM(StringLib.StringToUpperCase(in_email_address [(StringLib.StringFind(in_email_address, '@', StringLib.StringFindCount(in_email_address, '@')) + 1)..]));
-	email_topleveldomain :=TRIM(email_domain [(StringLib.StringFind(email_domain, '.', StringLib.StringFindCount(email_domain, '.')) + 1)..]);
+	email_domain := TRIM(STD.Str.ToUpperCase(in_email_address [(STD.Str.Find(in_email_address, '@', STD.Str.FindCount(in_email_address, '@')) + 1)..]));
+	email_topleveldomain :=TRIM(email_domain [(STD.Str.Find(email_domain, '.', STD.Str.FindCount(email_domain, '.')) + 1)..]);
 	
 	btst_email_topleveldomain_n := map(
 	    in_email_address = ''                                                             => ' ',
@@ -9228,6 +9228,7 @@ final_score_tree_0 := -2.2154089891;
 		SELF.lastscore               := 0;  
 		SELF.addrscore               := 0;  
 		SELF                         := mob;
+		SELF :=[];
 	END;
 	
 	iidBT := JOIN(clam_with_easi, model,
@@ -9304,6 +9305,7 @@ final_score_tree_0 := -2.2154089891;
 		SELF.addrscore                 := 0;
 		SELF.email_verification        := (integer)le.bs.Ship_To_Out.email_summary.identity_email_verification_level;
 		SELF                           := mos;
+		SELF :=[];
 	END;
 
 	iidST := JOIN(clam_with_easi, model,

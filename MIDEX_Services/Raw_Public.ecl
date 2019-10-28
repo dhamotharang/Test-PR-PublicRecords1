@@ -40,11 +40,11 @@ EXPORT Raw_Public :=
 						RETURN ds_outDataSet;
 					END; // get_PublicBdidData
 				
-				EXPORT fn_get_PublicSanctnLinkIdData ( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid, STRING1 FetchLevel ):=
+				EXPORT fn_get_PublicSanctnLinkIdData ( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid, doxie.IDataAccess mod_access, STRING1 FetchLevel ):=
 					FUNCTION
 						// CCPA - Suppression takes place with the payload join in the funtions below 
 						//        We are only keeping the midex report number and it's components from the key
-            ds_SANCTN_linkid_recs := CHOOSEN(SANCTN.Key_SANCTN_LinkIds.kFetch(in_linkid, FetchLevel),MIDEX_Services.Constants.JOIN_LIMIT);
+            ds_SANCTN_linkid_recs := CHOOSEN(SANCTN.Key_SANCTN_LinkIds.kFetch(in_linkid, mod_access, FetchLevel),MIDEX_Services.Constants.JOIN_LIMIT);
 						
             MIDEX_Services.Macros.MAC_midexPayloadKeyField(ds_SANCTN_linkid_recs, ds_outDataSet, BATCH_NUMBER, INCIDENT_NUMBER, PARTY_NUMBER, MIDEX_PRT_NBR );
 						

@@ -1,4 +1,4 @@
-﻿IMPORT ADVO, BIPV2, BIPV2_BEST, Business_Risk_BIP, Census_Data, MDR, STD, ut;
+﻿IMPORT ADVO, BIPV2, BIPV2_BEST, Business_Risk_BIP, Census_Data, MDR, STD, ut, doxie;
 
 EXPORT Best := MODULE
 
@@ -550,7 +550,7 @@ END;
   DS_SELEBestRecsAcctnoBHSlim := DEDUP(DS_SELEBestRecsAcctnoBH, ALL);																							 
   FETCH_LEVEL := BIPV2.IDconstants.Fetch_Level_SELEID;
   linkidsOnly := DEDUP(SORT(PROJECT(DS_SELEBestRecsAcctnoBH, TRANSFORM(
-                  BIPV2.IDlayouts.l_xlink_ids, 
+                  BIPV2.IDlayouts.l_xlink_ids2, 
                       SELF.ultid := LEFT.ultid;
                       SELF.orgid := LEFT.orgid; 
                       SELF.seleid := LEFT.seleid;
@@ -560,8 +560,10 @@ END;
   // get recs from bus header cap at MaxBHLinkidsBest constant.			
   // TRUE means don't return any SOURCE = D recs (Dun and Bradstreet).
   // JIRA RR-10621 - conditionally filter out Experian records based on inMod.ExcludeExperian boolean
-  ds_busHeaderRecsRaw := BIPV2.Key_BH_Linking_Ids.kfetch(linkidsOnly,FETCH_LEVEL,,,BusinessBatch_BIP.Constants.DEFAULTS.MaxBHLinkidsBest
-                                                ,TRUE)(source <> MDR.sourceTools.src_Dunn_Bradstreet AND
+  
+  mod_access := PROJECT(inMod, doxie.IDataAccess);
+  ds_busHeaderRecsRaw := BIPV2.Key_BH_Linking_Ids.kfetch2(linkidsOnly, FETCH_LEVEL,,, BusinessBatch_BIP.Constants.DEFAULTS.MaxBHLinkidsBest
+                                                , TRUE,,,, mod_access)(source <> MDR.sourceTools.src_Dunn_Bradstreet AND
                                                         source <> '' AND
                                                         ( IF(inMod.ExcludeExperian, source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source), TRUE)));
 

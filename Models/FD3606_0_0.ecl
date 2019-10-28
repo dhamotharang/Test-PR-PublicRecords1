@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, easi, std;
+﻿import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, easi, std;
 
 export FD3606_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(easi.layout_census) easi_census, 
 			  boolean OFAC=true, boolean isFCRA=false, boolean inCalif=false, boolean fdReasonsWith38=false, boolean nugen=false) := FUNCTION
@@ -392,8 +392,8 @@ export FD3606_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, datas
 		self.nxx_type := le.phone_verification.telcordia_type;
 		self := le.iid;
 		self := le.shell_input;
-		// self := [];
 		self := le;
+   self := [];
 	end;
 	iid := project(clam, into_layout_output(left));
 

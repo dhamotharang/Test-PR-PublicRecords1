@@ -747,7 +747,7 @@ export Functions := module
 		// *** First use the appropriate current address parts to get all the key header 
 		// address records for the current address from the 
 		// thor_data400::key::header_address_qa file.
-		key_hdr_addr_recs := dx_header.Key_Header_Address()(
+		key_hdr_addr_recs_all := dx_header.Key_Header_Address()(
 		                                      keyed(current_prim_name = prim_name and
 		                                            current_zip = zip and 
 		                                            current_prim_range = prim_range and
@@ -755,15 +755,15 @@ export Functions := module
 	  
 		// *** Sort by did and then dedup by did since key file above can contain multiple 
 		// records for each did.
-		key_hdr_addr_recs_deduped := dedup(sort(key_hdr_addr_recs,did),did);
+		key_hdr_addr_recs_deduped := dedup(sort(key_hdr_addr_recs_all,did),did);
 	
-		
+		key_hdr_addr_recs := suppress.MAC_SuppressSource(key_hdr_addr_recs_deduped,mod_access);
 		// *** Next join the dids from the records above to "Watchdog" files to 
 		// determine which dids currently still reside at that address.		
-		doxie.mac_best_records(key_hdr_addr_recs_deduped, did, curr_addr_best_recs, true, ut.glb_ok(gm.GLBPurpose), , doxie.DataRestriction.fixed_DRM);
+		doxie.mac_best_records(key_hdr_addr_recs, did, curr_addr_best_recs, true, ut.glb_ok(gm.GLBPurpose), , doxie.DataRestriction.fixed_DRM);
 
 		all_curr_addr_best_recs :=
-			join(key_hdr_addr_recs_deduped, curr_addr_best_recs,
+			join(key_hdr_addr_recs, curr_addr_best_recs,
 				left.did = right.did and
 				left.prim_name  = right.prim_name and
 				left.zip        = right.zip and

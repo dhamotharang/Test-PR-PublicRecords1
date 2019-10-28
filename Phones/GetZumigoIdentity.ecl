@@ -21,13 +21,10 @@ AccountStatusInfo: Returns ServiceStatus - active/cancelled/suspended
 After obtaining Zumigo, we process results to populate what we are legally allowed to store.
 */
 IMPORT Address,Codes, Doxie,DidVille,Email_Data, Gateway, iesp, Phones, PhoneFinder_Services, Risk_Indicators,STD, ut;
+
 EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificationRequest) inRecs,
 						Phones.IParam.inZumigoParams inMod,
-						UNSIGNED1 GLBPurpose = 0,
-						UNSIGNED1 DPPAPurpose = 0,
-						STRING DataRestrictionMask = '',
-						STRING IndustryClass = '',
-						STRING32 ApplicationType='',
+						doxie.IDataAccess mod_access,
             BOOLEAN IncludeEmailInfo = TRUE,
             BOOLEAN IncludeCallForwardedPhonesInfo = TRUE) := FUNCTION
 
@@ -103,7 +100,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 	zForwardedPhones := zumOut(response.LineIdentityResponse.Subscriber.CallHandlingInfo.CallForwarding AND response.LineIdentityResponse.Subscriber.CallHandlingInfo.CallForwardedNumber<>'');
 	dsForwardedPhones := PROJECT(zForwardedPhones,TRANSFORM(Phones.Layouts.PhoneIdentity,SELF.phone:=LEFT.response.LineIdentityResponse.Subscriber.CallHandlingInfo.CallForwardedNumber, SELF:=[]));
 	dsForwardedPhoneswIdentity := IF(IncludeCallForwardedPhonesInfo,
-                                  Phones.getLNIdentity_byPhone(dsForwardedPhones,GLBPurpose,DPPAPurpose,DataRestrictionMask));
+                                  Phones.getLNIdentity_byPhone(dsForwardedPhones,mod_access.glb,mod_access.dppa,mod_access.DataRestrictionMask));
 
 	//***flatten by creating a record for each name/address validation pair
 	iesp.zumigo_identity.t_ZumigoIdentityResponseEx normZumigo (iesp.zumigo_identity.t_ZumigoIdentityResponseEx l,  INTEGER c) := TRANSFORM
@@ -334,7 +331,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 																SELF := LEFT,
 																SELF := [])),
 			DATASET([],Didville.Layout_Did_OutBatch));
-  zPhoneOwners_wDIDs := Phones.Functions.GetDIDs(zPhoneOwners,ApplicationType,GLBPurpose,DPPAPurpose);
+  zPhoneOwners_wDIDs := Phones.Functions.GetDIDs(zPhoneOwners,mod_access);			
 	zHistoryRecs_wDIDs := JOIN(zHistoryRecs,zPhoneOwners_wDIDs,
 								LEFT.submitted_phonenumber = RIGHT.phone10,
 								TRANSFORM(Phones.Layouts.ZumigoIdentity.zOut,SELF.lexid:=RIGHT.did,SELF:=LEFT,SELF:=[]),
@@ -398,14 +395,16 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
    									LEFT OUTER,LIMIT(Phones.Constants.MAX_RECORDS,SKIP));
 
 
-  // get the best name/addr for zumigo name/addr lexid
-  zPhoneOwners_bestInfo := PhoneFinder_Services.Functions.GetBestInfo(PROJECT(zPhoneOwners_wDIDs(did  > 0),
-                                                                     TRANSFORM(PhoneFinder_Services.Layouts.BatchInAppendDID,
-                                                                             SELF.seq := LEFT.seq,
-                                                                             SELF.did := LEFT.did,
-                                                                             SELF.homephone := LEFT.phone10,
-                                                                             SELF := [])));
+	
+  // get the best name/addr for zumigo name/addr lexid 
+  z_owners := PROJECT(zPhoneOwners_wDIDs(did  > 0), TRANSFORM(PhoneFinder_Services.Layouts.BatchInAppendDID,
+                                                              SELF.seq := LEFT.seq,
+                                                              SELF.did := LEFT.did,
+                                                              SELF.homephone := LEFT.phone10,
+                                                              SELF := []));
 
+  zPhoneOwners_bestInfo := PhoneFinder_Services.Functions.GetBestInfo(z_owners, mod_access); 
+                                                                             
   Phones.Layouts.ZumigoIdentity.zOut addBestInfo(Phones.Layouts.ZumigoIdentity.zOut l, PhoneFinder_Services.Layouts.BatchInAppendDID r)
                                           := TRANSFORM
 

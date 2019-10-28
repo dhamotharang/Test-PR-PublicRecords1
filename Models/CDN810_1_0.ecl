@@ -1,4 +1,4 @@
-/************************************************************************************
+﻿/************************************************************************************
  * DELL CBD SCORE                    DELL810                                 by EG  *
  *                                                                        10/01/2008*
  ************************************************************************************
@@ -9,7 +9,7 @@
  * Return Shipto_Score                                                              *
  ************************************************************************************/
 
-import easi, ut, address, riskwise, business_risk, risk_indicators, std;
+import easi, ut, riskwise, business_risk, risk_indicators, std;
 
 export CDN810_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
 									dataset(RiskWise.Layout_CD2I) indata,
@@ -109,7 +109,7 @@ FUNCTION
 			self.census.cd2i.shipmode   := left.shipmode,
 			self := right), right outer);
 	
-	Layout_ModelOut doModel( clam_with_easi le ) := TRANSFORM
+	Models.Layout_Modelout doModel( clam_with_easi le ) := TRANSFORM
 		
 
 	 /************************************************************************************
@@ -327,32 +327,32 @@ FUNCTION
 																												 3);
 			
 		//*SHIPTO;
-		 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
+		 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(STD.Str.Find(haystack, needle, 1) > 0);
 		
-				 _source_tot_AK_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'AK,') > 0);
-				 _source_tot_AM_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'AM,') > 0);
-				 _source_tot_AR_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'AR,') > 0);
-				 _source_tot_BA_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'BA,') > 0);
-				 _source_tot_CG_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'CG,') > 0);
-				 _source_tot_CO_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'CO,') > 0);
-				 _source_tot_DA_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'DA,') > 0);
-				 _source_tot_D_s  := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'D ,') > 0);
-				 _source_tot_DS_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'DS,') > 0);
-				 _source_tot_EB_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'EB,') > 0);
-				 _source_tot_EM_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'EM,') > 0);
-				 _source_tot_EQ_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'EQ,') > 0);
-				 _source_tot_FF_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'FF,') > 0);
-				 _source_tot_FR_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'FR,') > 0);
-				 _source_tot_L2_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'L2,') > 0);
-				 _source_tot_LI_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'LI,') > 0);
-				 _source_tot_MW_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'MW,') > 0);
-				 _source_tot_P_s  := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'P ,') > 0);
-				 _source_tot_PL_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'PL,') > 0);
-				 _source_tot_TU_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'TU,') > 0);
-				 _source_tot_V_s  := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'V ,') > 0);
-				 _source_tot_W_s  := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'W ,') > 0);
-				 _source_tot_WP_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'WP,') > 0);
-				 _source_tot_VO_s := (integer)(contains_i(StringLib.StringToUpperCase(rc_sources_s), 'VO,') > 0);
+				 _source_tot_AK_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'AK,') > 0);
+				 _source_tot_AM_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'AM,') > 0);
+				 _source_tot_AR_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'AR,') > 0);
+				 _source_tot_BA_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'BA,') > 0);
+				 _source_tot_CG_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'CG,') > 0);
+				 _source_tot_CO_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'CO,') > 0);
+				 _source_tot_DA_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'DA,') > 0);
+				 _source_tot_D_s  := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'D ,') > 0);
+				 _source_tot_DS_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'DS,') > 0);
+				 _source_tot_EB_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'EB,') > 0);
+				 _source_tot_EM_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'EM,') > 0);
+				 _source_tot_EQ_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'EQ,') > 0);
+				 _source_tot_FF_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'FF,') > 0);
+				 _source_tot_FR_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'FR,') > 0);
+				 _source_tot_L2_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'L2,') > 0);
+				 _source_tot_LI_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'LI,') > 0);
+				 _source_tot_MW_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'MW,') > 0);
+				 _source_tot_P_s  := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'P ,') > 0);
+				 _source_tot_PL_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'PL,') > 0);
+				 _source_tot_TU_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'TU,') > 0);
+				 _source_tot_V_s  := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'V ,') > 0);
+				 _source_tot_W_s  := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'W ,') > 0);
+				 _source_tot_WP_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'WP,') > 0);
+				 _source_tot_VO_s := (integer)(contains_i(STD.Str.ToUpperCase(rc_sources_s), 'VO,') > 0);
      	
 				 _source_tot_EM_VO_s   := if(_source_tot_EM_s=1 or _source_tot_VO_s=1, 1, 0);			/* Combine EM and VO sources */
 			
@@ -451,31 +451,31 @@ FUNCTION
 		//*SHARED VARS;
 		
 			na_flag := (IP_continent = '5');
-			us_flag := (StringLib.StringToUpperCase(trim(IP_countrycode)) = 'US'); 
-			state_match_flag := (StringLib.StringToUpperCase(trim(ip_state)) = StringLib.StringToUpperCase(trim(in_state)));
+			us_flag := (STD.Str.ToUpperCase(trim(IP_countrycode)) = 'US'); 
+			state_match_flag := (STD.Str.ToUpperCase(trim(ip_state)) = STD.Str.ToUpperCase(trim(in_state)));
 			
 			ip_state_match := (na_flag and us_flag and state_match_flag);
 			
-			ip_mil_gov := (StringLib.StringToUpperCase(trim(IP_topleveldomain)) in ['MIL','GOV']);
-			aol_domain := (StringLib.StringToUpperCase(trim(IP_secondleveldomain)) = 'AOL');		
+			ip_mil_gov := (STD.Str.ToUpperCase(trim(IP_topleveldomain)) in ['MIL','GOV']);
+			aol_domain := (STD.Str.ToUpperCase(trim(IP_secondleveldomain)) = 'AOL');		
 			
-			state_match_s := (StringLib.StringToUpperCase(trim(ip_state)) = StringLib.StringToUpperCase(trim(in_state_s)));
-			state_match_st := (StringLib.StringToUpperCase(trim(in_state)) = StringLib.StringToUpperCase(trim(in_state_s)));
+			state_match_s := (STD.Str.ToUpperCase(trim(ip_state)) = STD.Str.ToUpperCase(trim(in_state_s)));
+			state_match_st := (STD.Str.ToUpperCase(trim(in_state)) = STD.Str.ToUpperCase(trim(in_state_s)));
 			
-			dot_mil := (StringLib.StringToUpperCase(trim(IP_topleveldomain)) = 'MIL');
-			dot_gov := (StringLib.StringToUpperCase(trim(IP_topleveldomain)) = 'GOV');
+			dot_mil := (STD.Str.ToUpperCase(trim(IP_topleveldomain)) = 'MIL');
+			dot_gov := (STD.Str.ToUpperCase(trim(IP_topleveldomain)) = 'GOV');
 		
 			ip_domain_dot := (contains_i(ip_toplevelDomain, '.') > 0);
 			
 			// get the domain suffix
-			IP_domain_1_rev := Stringlib.StringReverse(IP_domain_1);
-			dot_position := Stringlib.StringFind(IP_domain_1_rev, '.', 1);
+			IP_domain_1_rev := STD.Str.Reverse(IP_domain_1);
+			dot_position := STD.Str.Find(IP_domain_1_rev, '.', 1);
 			suffix_rev := IP_domain_1_rev[1..dot_position-1];
-			ip_suffix := Stringlib.StringReverse(suffix_rev);		
+			ip_suffix := STD.Str.Reverse(suffix_rev);		
 			
 			
-			IP_domain := if( StringLib.StringToUpperCase(ip_suffix) not in ['COM','NET','GOV','MIL','EDU',' '], 
-												'OTHER', StringLib.StringToUpperCase(ip_suffix));
+			IP_domain := if( STD.Str.ToUpperCase(ip_suffix) not in ['COM','NET','GOV','MIL','EDU',' '], 
+												'OTHER', STD.Str.ToUpperCase(ip_suffix));
 		
 		//*BILLTO;
 			
@@ -558,13 +558,13 @@ FUNCTION
 		//*SHARED VARS;
 		
 			email_has_dot := (contains_i(in_email_address, '.') > 0);
-			prov_start := StringLib.StringFind(in_email_address, '@', 1)+1;
+			prov_start := STD.Str.Find(in_email_address, '@', 1)+1;
 			prov_end   := length(trim(in_email_address)); 
 		
-			email_provider := if( email_has_dot, StringLib.StringToUpperCase(in_email_address[prov_start..prov_end]), '');
+			email_provider := if( email_has_dot, STD.Str.ToUpperCase(in_email_address[prov_start..prov_end]), '');
 			
 			// get email_provider_without_suffix
-			email_dot_position := Stringlib.StringFind(email_provider, '.', 1);
+			email_dot_position := STD.Str.Find(email_provider, '.', 1);
 			email_provider_without_suffix := email_provider[1..email_dot_position-1];
 			
 			email_provider2 := Map(length(trim(in_email_address)) > 0 and 
@@ -1791,6 +1791,7 @@ Risk_Indicators.Layout_Output into_layout_output(clam_with_easi le, iid_results 
 	self := le.bs.Bill_To_Out.iid;
 	self := le.bs.Bill_To_Out.shell_input;
 	self := le.bs.Bill_To_out;
+	self := [];
 END;
 iidBT := JOIN(clam_with_easi, iid_results, 
 					LEFT.bs.Bill_To_Out.seq = RIGHT.Bill_To_Output.seq, 
@@ -1814,7 +1815,7 @@ ipInfo := JOIN(clam_with_easi, biid,
 left.bs.bill_to_out.seq = right.bill_to_output.seq, fill_ip(left, right), left outer);
 
 
-Layout_ModelOut addBTReasons(iidBT le, ipInfo rt) := TRANSFORM
+Models.Layout_Modelout addBTReasons(iidBT le, ipInfo rt) := TRANSFORM
 	self.seq := le.seq;
 	self.ri := if( isBusiness,
 			MAP(reasonCodeVersion = 2 => RiskWise.cdReasonCodesBus2(le, 6, rt, true, IBICID, rt.biid.Bill_to_output),
@@ -1828,7 +1829,7 @@ Layout_ModelOut addBTReasons(iidBT le, ipInfo rt) := TRANSFORM
 END;
 BTReasons := join(iidBT, ipInfo, left.seq = right.ip.seq, addBTReasons(left, right), left outer);
 
-Layout_ModelOut fillReasons(Layout_ModelOut le, BTreasons rt) := TRANSFORM
+Models.Layout_Modelout fillReasons(Models.Layout_Modelout le, BTreasons rt) := TRANSFORM
 	self.ri := rt.ri;
 	self := le;
 END;
@@ -1849,13 +1850,14 @@ Risk_Indicators.Layout_Output into_layout_output2(clam_with_easi le, iid_results
 	self := le.bs.Ship_To_Out.iid;
 	self := le.bs.Ship_To_Out.shell_input;
 	self := le.bs.Ship_To_Out;
+	self := [];
 END;
 iidST := JOIN(clam_with_easi, iid_results, 
 					LEFT.bs.Ship_To_Out.seq = RIGHT.Ship_To_Output.seq, 
 					into_layout_output2(LEFT, RIGHT), LEFT OUTER, KEEP(1));
 
 
-Layout_ModelOut addSTReasons(iidST le, ipInfo rt ) := TRANSFORM
+Models.Layout_Modelout addSTReasons(iidST le, ipInfo rt ) := TRANSFORM
 	self.seq := le.seq;
 	self.ri := if( isBusiness,
 			MAP(reasonCodeVersion = 2 => RiskWise.cdReasonCodesBus2(le, 6, rt, false, IBICID, rt.biid.Ship_to_output),
@@ -1871,7 +1873,7 @@ END;
 STReasons := join(iidST, ipInfo, left.seq=((right.ip.seq*2)-1), addSTReasons(left, right), left outer);
 
 
-Layout_ModelOut fillReasons2(Layout_ModelOut le, STreasons rt) := TRANSFORM
+Models.Layout_Modelout fillReasons2(Models.Layout_Modelout le, STreasons rt) := TRANSFORM
 	self.ri := le.ri + rt.ri;
 	self := le;
 END;

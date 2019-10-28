@@ -1,4 +1,4 @@
-import ut, risk_indicators, address, RiskWise, RiskwiseFCRA, std;
+﻿import ut, risk_indicators, RiskWise, RiskwiseFCRA, std;
 
 export AID607_2_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) inputclam, boolean OFAC, boolean inCalif) := 
 
@@ -73,7 +73,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 	/* Bk Flag */
 
      bkflag := map(le.bjl.filing_count >= 2 => 3,
-			    le.bjl.bankrupt and trim(StringLib.StringToUpperCase(le.bjl.disposition)) in ['DISMISSED','CASE DISMISSED'] => 2,
+			    le.bjl.bankrupt and trim(STD.Str.ToUpperCase(le.bjl.disposition)) in ['DISMISSED','CASE DISMISSED'] => 2,
 			    le.bjl.bankrupt => 1,
 			    0);
 
@@ -257,6 +257,7 @@ Risk_Indicators.Layout_Output into_layout_output(clam le) := TRANSFORM
 	self := le.iid;
 	self := le.shell_input;
 	self := le;
+	self :=[];
 END;
 iid := project(clam, into_layout_output(left));
 

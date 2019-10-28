@@ -2,29 +2,17 @@
 
 EXPORT iParam :=
 MODULE
-
 	EXPORT DIDParams :=
 	  INTERFACE(AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full)
   END;
 
 	EXPORT SearchParams :=
-	INTERFACE(AutoStandardI.PermissionI_Tools.params,AutoStandardI.DataPermissionI.params,AutoStandardI.DataRestrictionI.params)
+	INTERFACE (doxie.IDataAccess)
 		EXPORT UNSIGNED1 TransactionType     := 255;
-		EXPORT BOOLEAN   AllowAll            := FALSE;
-		EXPORT BOOLEAN   AllowGLB            := FALSE;
-		EXPORT BOOLEAN   AllowDPPA           := FALSE;
-		EXPORT UNSIGNED1 GLBPurpose          := 0;
-		EXPORT UNSIGNED1 DPPAPurpose         := 0;
-		EXPORT BOOLEAN   IncludeMinors       := FALSE;
     EXPORT STRING6   PrimarySearch       := '';
 		EXPORT BOOLEAN   IsPrimarySearchPII  := FALSE;
-		EXPORT STRING    DataRestrictionMask := '00000000000000';
 		EXPORT BOOLEAN   ignoreFares         := FALSE;
 		EXPORT BOOLEAN   ignoreFidelity      := FALSE;
-		EXPORT STRING6   SSNMask             := '';
-		EXPORT STRING6   DOBMask             := '';
-		EXPORT STRING5   IndustryClass       := '';
-		EXPORT STRING32  ApplicationType     := '';
 		EXPORT BOOLEAN   StrictMatch         := FALSE;
 		EXPORT BOOLEAN   PhoneticMatch       := FALSE;
 		EXPORT UNSIGNED  PenaltyThreshold    := 10;
@@ -42,7 +30,7 @@ MODULE
 		EXPORT BOOLEAN   UseDeltabase 			 := FALSE;
     EXPORT BOOLEAN   SubjectMetadataOnly := FALSE;
 		EXPORT BOOLEAN 	 DetailedRoyalties 	 := FALSE;
-    EXPORT BOOLEAN   SuppressBlankNameAddress := FALSE;
+    EXPORT BOOLEAN   SuppressNonRelevantRecs := FALSE;
 		// Options for phone verification
 		EXPORT BOOLEAN   VerifyPhoneName      	:= FALSE;
 		EXPORT BOOLEAN	 VerifyPhoneNameAddress	:= FALSE;
@@ -122,6 +110,7 @@ MODULE
     EXPORT BOOLEAN hasActiveIdentitycountRules        := FALSE;
     EXPORT BOOLEAN hasActivePhoneTransactionCountRule := FALSE;
     EXPORT BOOLEAN IsGovSearch := FALSE;
+    EXPORT BOOLEAN UseInHousePhoneMetadataOnly := FALSE;
   END;
 
   EXPORT PhoneVerificationParams :=
@@ -149,7 +138,11 @@ MODULE
     // Search module
     searchMod := PROJECT(globalMod,DIDParams,OPT);
 
-    in_params := MODULE(SearchParams)
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalMod);
+    drm := mod_access.DataRestrictionMask;
+    dpm := mod_access.DataPermissionMask;
+
+    in_params := MODULE(PROJECT(mod_access, SearchParams, OPT))
       STRING vTransactionType            := pfOptions._Type;
       EXPORT UNSIGNED1 TransactionType   := IF(vTransactionType <> '',$.Constants.MapTransType2Code(vTransactionType), $.Constants.TransType.Blank); // BASIC cannot be default
       STRING6 PrimarySearchCriteria      := STD.Str.ToUpperCase(pfOptions.PrimarySearchCriteria);
@@ -158,21 +151,13 @@ MODULE
       EXPORT BOOLEAN   IsPrimarySearchPII   := PrimarySearch = $.Constants.PrimarySearchCriteria;
       EXPORT BOOLEAN   StrictMatch          := AutoStandardI.InterfaceTranslator.StrictMatch_value.val(searchMod);
       EXPORT BOOLEAN   PhoneticMatch        := AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
-      EXPORT STRING32  ApplicationType      := AutoStandardI.InterfaceTranslator.application_type_val.val(searchMod);
-      EXPORT STRING5   IndustryClass        := AutoStandardI.InterfaceTranslator.industry_class_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.industry_class_val.params));
-      EXPORT UNSIGNED1 GLBPurpose           := AutoStandardI.InterfaceTranslator.glb_purpose.val(searchMod);
-      EXPORT UNSIGNED1 DPPAPurpose          := AutoStandardI.InterfaceTranslator.dppa_purpose.val(searchMod);
       EXPORT UNSIGNED  ScoreThreshold       := AutoStandardI.InterfaceTranslator.score_threshold_value.val(searchMod);
       EXPORT UNSIGNED  PenaltyThreshold     := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.penalt_threshold_value.params));
-      EXPORT STRING    DataRestrictionMask  := globalMod.DataRestrictionMask;
-      EXPORT STRING    DataPermissionMask   := globalMod.DataPermissionMask;
-      EXPORT STRING6   DOBMask              := AutoStandardI.InterfaceTranslator.dob_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.dob_mask_val.params));
-      EXPORT STRING6   SSNMask              := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
       EXPORT BOOLEAN   useWaterfallv6	      := FALSE : STORED('useWaterfallv6');	// internal
       EXPORT BOOLEAN   IncludePhoneMetadata := pfOptions.IncludePhoneMetadata;
       BOOLEAN          SubjectMetadata      := pfOptions.SubjectMetadataOnly;
       EXPORT BOOLEAN   SubjectMetadataOnly  := IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
-      EXPORT BOOLEAN   SuppressBlankNameAddress := pfOptions.SuppressBlankNameAddress;
+      EXPORT BOOLEAN   SuppressNonRelevantRecs := pfOptions.SuppressNonRelevantRecs;
 
       // Options for phone verification
       EXPORT BOOLEAN   VerifyPhoneName				:= pfOptions.VerificationOptions.VerifyPhoneName;
@@ -229,27 +214,28 @@ MODULE
       EXPORT BOOLEAN UseDeltabase 					 := IF(IsGetMetaData, RealTimedata, FALSE);
 
       EXPORT BOOLEAN IncludeAccudataOCN      := pfOptions.IncludeAccudataOCN;
-      EXPORT BOOLEAN UseAccuData_OCN         := ((IncludePhoneMetadata AND displayAll) OR IncludeAccudataOCN) AND ~Doxie.DataRestriction.AccuData;
+      EXPORT BOOLEAN UseAccuData_OCN         := ((IncludePhoneMetadata AND displayAll) OR IncludeAccudataOCN) AND ~doxie.compliance.isAccuDataRestricted(drm);
 
       EXPORT BOOLEAN IncludeTargus           := pfOptions.IncludeTargus;
-      EXPORT BOOLEAN UseTargus          		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeTargus) AND ~doxie.DataRestriction.PhoneFinderTargus;
+      EXPORT BOOLEAN UseTargus          		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeTargus) AND ~doxie.compliance.isPhoneFinderTargusRestricted(drm);
 
       EXPORT BOOLEAN IncludeEquifax          := pfOptions.IncludeEquifax;
-      EXPORT BOOLEAN UseEquifax         		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeEquifax) AND ~doxie.DataRestriction.EquifaxPhoneMart;
+      EXPORT BOOLEAN UseEquifax         		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeEquifax) AND ~doxie.compliance.isPhoneMartRestricted(drm);
 
       EXPORT BOOLEAN IncludeTransUnionIQ411  := pfOptions.IncludeTransUnionIQ411;
       EXPORT BOOLEAN IncludeTransUnionPVS    := pfOptions.IncludeTransUnionPVS;
 
-      EXPORT BOOLEAN UseTransUnionIQ411      := (TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate] OR IncludeTransUnionIQ411) AND ~doxie.DataRestriction.QSent;
-      EXPORT BOOLEAN UseTransUnionPVS        := (TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate] OR IncludeTransUnionPVS) AND ~doxie.DataRestriction.QSent;
+      EXPORT BOOLEAN UseTransUnionIQ411      := (TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate] OR IncludeTransUnionIQ411) AND ~doxie.compliance.isQSentRestricted(drm);
+      EXPORT BOOLEAN UseTransUnionPVS        := (TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate] OR IncludeTransUnionPVS) AND ~doxie.compliance.isQSentRestricted(drm);
       EXPORT BOOLEAN UseQSent           	   := UseTransUnionIQ411 OR UseTransUnionPVS;
       EXPORT BOOLEAN UseInHousePhoneMetadata := pfOptions.UseInHousePhoneMetadata : STORED('UseInHousePhoneMetadata'); // Need to read from stored for options defined in MBS for API transactions as they would come under the root tag
-      EXPORT BOOLEAN UseAccuData_CNAM        := UseInHousePhoneMetadata AND ~Doxie.DataRestriction.AccuData;
+      EXPORT BOOLEAN UseInHousePhoneMetadataOnly := UseInHousePhoneMetadata OR ~UseTransUnionPVS;
+      EXPORT BOOLEAN UseAccuData_CNAM        := UseInHousePhoneMetadata AND ~doxie.compliance.isAccuDataRestricted(drm) AND TransactionType != $.Constants.TransType.PhoneRiskAssessment;
 
       EXPORT BOOLEAN IncludeInhousePhones    := pfOptions.IncludeInhousePhones;
       EXPORT BOOLEAN UseInhousePhones        := IncludeInhousePhones OR (displayAll OR TransactionType = $.Constants.TransType.BASIC);
-      EXPORT BOOLEAN UseLastResort      		 := (IncludeInhousePhones OR TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT) AND doxie.DataPermission.use_LastResort;
-      EXPORT BOOLEAN UseInHouseQSent    	   := (IncludeInhousePhones OR TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT) AND doxie.DataPermission.use_QSent;
+      EXPORT BOOLEAN UseLastResort      		 := (IncludeInhousePhones OR TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT) AND doxie.compliance.use_LastResort(dpm);
+      EXPORT BOOLEAN UseInHouseQSent    	   := (IncludeInhousePhones OR TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT) AND doxie.compliance.use_QSent(dpm);
 
       SHARED BOOLEAN full_consent   := LineIdentityConsentLevel = $.Constants.ConsentLevels.FullConsumer;
       SHARED BOOLEAN single_consent := LineIdentityConsentLevel = $.Constants.ConsentLevels.SingleConsumer;
@@ -277,10 +263,10 @@ MODULE
 
       // zumigo gateway is configured to turn deviceinfo to true when devicehistory is true
       EXPORT BOOLEAN DeviceHistory               := pfOptions.IncludeZumigoOptions.DeviceHistory;
-      EXPORT BOOLEAN IncludeDeviceHistory        :=(TransactionType = $.Constants.TransType.Ultimate OR DeviceHistory) AND ValidDeviceConsentInquiry;
+      EXPORT BOOLEAN IncludeDeviceHistory        := FALSE;
 
       EXPORT BOOLEAN DeviceInfo                  := pfOptions.IncludeZumigoOptions.DeviceInfo;
-      EXPORT BOOLEAN IncludeDeviceInfo           :=(TransactionType = $.Constants.TransType.Ultimate OR DeviceHistory OR DeviceInfo) AND ValidDeviceConsentInquiry;
+      EXPORT BOOLEAN IncludeDeviceInfo           := FALSE;
 
       EXPORT BOOLEAN DeviceChangeInfo            := pfOptions.IncludeZumigoOptions.DeviceChangeInfo;
       EXPORT BOOLEAN IncludeDeviceChangeInfo     :=(TransactionType = $.Constants.TransType.Ultimate OR DeviceChangeInfo) AND ValidDeviceConsentInquiry;
@@ -288,14 +274,14 @@ MODULE
       EXPORT BOOLEAN IncludeZumigoOptions        := IncludeNameAddressValidation OR IncludeCallHandlingInfo OR IncludeDeviceHistory
                                                     OR IncludeDeviceInfo OR IncludeDeviceChangeInfo;
 
-      EXPORT BOOLEAN UseZumigoIdentity	         := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity;
+      EXPORT BOOLEAN UseZumigoIdentity	         := IncludeZumigoOptions AND BillingId <>'' AND doxie.compliance.use_ZumigoIdentity(dpm);
 
       EXPORT BOOLEAN InputZumigoOptions          := NameAddressValidation OR CallHandlingInfo OR DeviceInfo OR DeviceChangeInfo OR DeviceHistory;
       EXPORT BOOLEAN UseThreatMetrixRules        := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId  IN $.Constants.AllThreatMetrixRules) AND Active));
 
       EXPORT BOOLEAN hasActiveIdentityCountRules        := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId = $.Constants.RiskRules.IdentityCount AND Active)));
       EXPORT BOOLEAN hasActivePhoneTransactionCountRule := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount AND ACTIVE));
-      EXPORT BOOLEAN IsGovsearch := ApplicationType in AutoStandardI.Constants.GOV_TYPES;
+      EXPORT BOOLEAN IsGovsearch := application_type in AutoStandardI.Constants.GOV_TYPES;
     END;
 
     RETURN in_params;
@@ -314,37 +300,34 @@ MODULE
     // Search module
     searchMod := PROJECT(globalMod,DIDParams,OPT);
 
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalMod);
+    drm := mod_access.DataRestrictionMask;
+    dpm := mod_access.DataPermissionMask;
+
 	  // Report module
-    input_Mod := MODULE(SearchParams)
+    input_Mod := MODULE(PROJECT(mod_access, SearchParams, OPT))
       EXPORT UNSIGNED1 TransactionType     := $.Constants.TransType.Blank : STORED('TransactionType'); // BASIC cannot be default
       EXPORT BOOLEAN   StrictMatch         := AutoStandardI.InterfaceTranslator.StrictMatch_value.val(searchMod);
       EXPORT BOOLEAN   PhoneticMatch       := AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
-      EXPORT STRING32  ApplicationType     := AutoStandardI.InterfaceTranslator.application_type_val.val(searchMod);
-      EXPORT STRING5   IndustryClass       := AutoStandardI.InterfaceTranslator.industry_class_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.industry_class_val.params));
-      EXPORT UNSIGNED1 GLBPurpose          := AutoStandardI.InterfaceTranslator.glb_purpose.val(searchMod);
-      EXPORT UNSIGNED1 DPPAPurpose         := AutoStandardI.InterfaceTranslator.dppa_purpose.val(searchMod);
       EXPORT UNSIGNED  ScoreThreshold      := AutoStandardI.InterfaceTranslator.score_threshold_value.val(searchMod);
       EXPORT UNSIGNED  PenaltyThreshold    := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.penalt_threshold_value.params));
-      EXPORT STRING    DataRestrictionMask := globalMod.DataRestrictionMask;
-      EXPORT STRING    DataPermissionMask  := globalMod.DataPermissionMask;
-      EXPORT STRING6   DOBMask             := AutoStandardI.InterfaceTranslator.dob_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.dob_mask_val.params));
-      EXPORT STRING6   SSNMask             := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
-      EXPORT BOOLEAN   UseLastResort       := doxie.DataPermission.use_LastResort AND TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT;
-      EXPORT BOOLEAN   UseInHouseQSent     := doxie.DataPermission.use_QSent AND TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT;
-      EXPORT BOOLEAN   UseQSent            := ~doxie.DataRestriction.QSent AND TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate];
-      EXPORT BOOLEAN   UseTargus           := ~doxie.DataRestriction.PhoneFinderTargus AND TransactionType = $.Constants.TransType.Ultimate;
-      EXPORT BOOLEAN   UseEquifax          := ~doxie.DataRestriction.EquifaxPhoneMart AND TransactionType = $.Constants.TransType.Ultimate;
+      EXPORT BOOLEAN   UseLastResort       := doxie.compliance.use_LastResort(dpm) AND TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT;
+      EXPORT BOOLEAN   UseInHouseQSent     := doxie.compliance.use_QSent(dpm) AND TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT;
+      EXPORT BOOLEAN   UseQSent            := ~doxie.compliance.isQSentRestricted(drm) AND TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate];
+      EXPORT BOOLEAN   UseTargus           := ~doxie.compliance.isPhoneFinderTargusRestricted(drm) AND TransactionType = $.Constants.TransType.Ultimate;
+      EXPORT BOOLEAN   UseEquifax          := ~doxie.compliance.isPhoneMartRestricted(drm) AND TransactionType = $.Constants.TransType.Ultimate;
       EXPORT BOOLEAN   useWaterfallv6			 := FALSE : STORED('useWaterfallv6');//internal
       EXPORT BOOLEAN   IncludePhoneMetadata:= FALSE : STORED('IncludePhoneMetadata');
 
       EXPORT BOOLEAN   UseAccudata_ocn     := IncludePhoneMetadata AND
-                                              ~Doxie.DataRestriction.AccuData AND
+                                              ~doxie.compliance.isAccuDataRestricted(drm) AND
                                               TransactionType IN [$.Constants.TransType.Premium,
                                                                   $.Constants.TransType.Ultimate,
                                                                   $.Constants.TransType.PHONERISKASSESSMENT]; // accudata_ocn gateway call
+
              BOOLEAN   SubjectMetadata 		 := FALSE : STORED('SubjectMetadataOnly');
       EXPORT BOOLEAN   SubjectMetadataOnly := IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
-      EXPORT BOOLEAN   SuppressBlankNameAddress := FALSE : STORED('SuppressBlankNameAddress');
+      EXPORT BOOLEAN   SuppressNonRelevantRecs := FALSE : STORED('SuppressNonRelevantRecs');
 
       EXPORT BOOLEAN 	 DetailedRoyalties 	            := FALSE : STORED('ReturnDetailedRoyalties');
       EXPORT UNSIGNED1 LineIdentityConsentLevel       := 0 : STORED('LineIdentityConsentLevel');
@@ -356,7 +339,8 @@ MODULE
       EXPORT INTEGER   MaxOtherPhones		              := iesp.Constants.Phone_Finder.MaxOtherPhones;// TO LIMIT OTHER PHONES
 
       EXPORT BOOLEAN   UseInHousePhoneMetadata	:= FALSE : STORED('UseInHousePhoneMetadata');
-      EXPORT BOOLEAN   UseAccuData_CNAM         := UseInHousePhoneMetadata AND ~Doxie.DataRestriction.AccuData;
+      EXPORT BOOLEAN UseInHousePhoneMetadataOnly := UseInHousePhoneMetadata OR ~UseTransUnionPVS;;
+      EXPORT BOOLEAN   UseAccuData_CNAM         := UseInHousePhoneMetadata AND ~doxie.compliance.isAccuDataRestricted(drm) AND TransactionType != $.Constants.TransType.PhoneRiskAssessment;
 
 
       EXPORT BOOLEAN   VerifyPhoneName        :=  FALSE : STORED('VerifyPhoneName');
@@ -408,8 +392,8 @@ MODULE
       EXPORT BOOLEAN IncludeDeviceChangeInfo      := TransactionType = $.Constants.TransType.Ultimate AND ValidDeviceConsentInquiry;
       EXPORT BOOLEAN IncludeZumigoOptions         :=  IncludeNameAddressValidation OR IncludeCallHandlingInfo OR IncludeDeviceHistory OR
                                                       IncludeDeviceInfo OR IncludeDeviceChangeInfo;
-      EXPORT BOOLEAN UseZumigoIdentity	          := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity;
-      EXPORT BOOLEAN IsGovsearch := ApplicationType in AutoStandardI.Constants.GOV_TYPES;
+      EXPORT BOOLEAN UseZumigoIdentity	          := IncludeZumigoOptions AND BillingId <>'' AND doxie.compliance.use_ZumigoIdentity(dpm);
+      EXPORT BOOLEAN IsGovsearch := mod_access.application_type in AutoStandardI.Constants.GOV_TYPES;
     END;
 
     RETURN input_Mod;

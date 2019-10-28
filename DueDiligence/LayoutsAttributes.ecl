@@ -179,6 +179,18 @@
     UNSIGNED6  	VehicleBaseValue;
     //PerAgeRange
     UNSIGNED2    estimatedAge;
+    //PerIdentityRisk
+    UNSIGNED4 lastSeenBySource;
+    BOOLEAN ssnReportedDeceased;
+    BOOLEAN lexIDReportedDeceased;
+    BOOLEAN redFlagSSNInvalid;
+    BOOLEAN redFlagSSNIssuedPriorDOB;
+    BOOLEAN redFlagSSNRandomIssuedInvalid;
+    BOOLEAN redFlagLexIDContainsMultiSSNs;
+    BOOLEAN redFlagInputSSNAssocAtleast3LexIDs;
+    BOOLEAN redFlagInputSSNIsITIN;
+    BOOLEAN bestDOBExists;
+    BOOLEAN bestAddressExists;
   END;
 
 END;

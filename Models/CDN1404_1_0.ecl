@@ -1,4 +1,4 @@
-IMPORT EASI, Business_Risk, ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
+﻿IMPORT EASI, Business_Risk, ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 EXPORT cdn1404_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
 										DATASET(Models.Layout_CD_CustomModelInputs) customInputs,
@@ -384,15 +384,15 @@ avg_pmt_amt := max(pf_order_amount, (real)0) / max((integer)pf_num_items, 1);
 pf_pmt_type := map(
     // bb_CC_Type_ = (String)NULL                                   => 'GIFT CARD',
     bb_CC_Type_ = ''                                             => 'GIFT CARD',
-    StringLib.StringToUpperCase(bb_CC_Type_) = 'AMERICANEXPRESS' => 'AMERICANEXPRESS',
-    StringLib.StringToUpperCase(bb_CC_Type_) = 'CHASECONSUMER'   => 'CHASECONSUMER',
-    StringLib.StringToUpperCase(bb_CC_Type_) = 'DINERS'          => 'DINERS',
-    StringLib.StringToUpperCase(bb_CC_Type_) = 'DISCOVER'        => 'DISCOVER',
-    StringLib.StringToUpperCase(bb_CC_Type_) = 'HRS'             => 'HRS',
-    StringLib.StringToUpperCase(bb_CC_Type_) = 'MASTERCARD'      => 'MASTERCARD',
-    StringLib.StringToUpperCase(bb_CC_Type_) = 'PAYPAL'          => 'PAYPAL',
-    StringLib.StringToUpperCase(bb_CC_Type_) = 'VISA'            => 'VISA',
-    StringLib.StringToUpperCase(bb_CC_Type_) = 'JCB'             => 'JCB',
+    STD.Str.ToUpperCase(bb_CC_Type_) = 'AMERICANEXPRESS' => 'AMERICANEXPRESS',
+    STD.Str.ToUpperCase(bb_CC_Type_) = 'CHASECONSUMER'   => 'CHASECONSUMER',
+    STD.Str.ToUpperCase(bb_CC_Type_) = 'DINERS'          => 'DINERS',
+    STD.Str.ToUpperCase(bb_CC_Type_) = 'DISCOVER'        => 'DISCOVER',
+    STD.Str.ToUpperCase(bb_CC_Type_) = 'HRS'             => 'HRS',
+    STD.Str.ToUpperCase(bb_CC_Type_) = 'MASTERCARD'      => 'MASTERCARD',
+    STD.Str.ToUpperCase(bb_CC_Type_) = 'PAYPAL'          => 'PAYPAL',
+    STD.Str.ToUpperCase(bb_CC_Type_) = 'VISA'            => 'VISA',
+    STD.Str.ToUpperCase(bb_CC_Type_) = 'JCB'             => 'JCB',
                                                                     'OTHER');
 
 avs_name_ver_1 := 0;
@@ -462,8 +462,8 @@ pf_avs_ver_lvl := map(
                                                                  '4XX');
 																 
 pf_cid_match := map(
-    trim(StringLib.StringToUpperCase(bb_CVV_Description_)) = 'MATCH'    => 1,
-    trim(StringLib.StringToUpperCase(bb_CVV_Description_)) = 'NO MATCH' => 0,
+    trim(STD.Str.ToUpperCase(bb_CVV_Description_)) = 'MATCH'    => 1,
+    trim(STD.Str.ToUpperCase(bb_CVV_Description_)) = 'NO MATCH' => 0,
                                                                            -1);
 										
 valid_tm_account := bb_Entry_Type_ = 'WEB' and not(TM_Device_Result_ = '');
@@ -478,60 +478,60 @@ tm_bad_reason_code_lvl := map(
 tm_bad_reason_code_f := valid_tm_account and (trim(TM_Reason_Code_) in ['CC RISKY PERSONA - GLOBAL/DAY', 'GEO LANG MISMATCH', 'SMARTID INVOLVED IN REJECTED TRANSACTION- MONTH', 'SMARTID USED 5 CCS IN WEEK', 'TIME ZONE/TRUE GEO MISMATCH', 'TRUE IP ADDRESS IN GLOBAL BLACK LIST']) and not(TM_Reason_Code_ = '');        
 
 ip_state := map(
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'ALABAMA'        => 'AL',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'ALASKA'         => 'AK',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'ARIZONA'        => 'AZ',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'ARKANSAS'       => 'AR',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'CALIFORNIA'     => 'CA',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'COLORADO'       => 'CO',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'CONNECTICUT'    => 'CT',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'DELAWARE'       => 'DE',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'FLORIDA'        => 'FL',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'GEORGIA'        => 'GA',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'HAWAII'         => 'HI',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'IDAHO'          => 'ID',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'ILLINOIS'       => 'IL',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'INDIANA'        => 'IN',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'IOWA'           => 'IA',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'KANSAS'         => 'KS',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'KENTUCKY'       => 'KY',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'LOUISIANA'      => 'LA',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'MAINE'          => 'ME',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'MARYLAND'       => 'MD',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'MASSACHUSETTS'  => 'MA',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'MICHIGAN'       => 'MI',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'MINNESOTA'      => 'MN',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'MISSISSIPPI'    => 'MS',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'MISSOURI'       => 'MO',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'MONTANA'        => 'MT',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'NEBRASKA'       => 'NE',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'NEVADA'         => 'NV',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'NEW HAMPSHIRE'  => 'NH',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'NEW JERSEY'     => 'NJ',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'NEW MEXICO'     => 'NM',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'NEW YORK'       => 'NY',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'NORTH CAROLINA' => 'NC',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'NORTH DAKOTA'   => 'ND',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'OHIO'           => 'OH',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'OKLAHOMA'       => 'OK',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'OREGON'         => 'OR',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'PENNSYLVANIA'   => 'PA',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'RHODE ISLAND'   => 'RI',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'SOUTH CAROLINA' => 'SC',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'SOUTH DAKOTA'   => 'SD',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'TENNESSEE'      => 'TN',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'TEXAS'          => 'TX',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'UTAH'           => 'UT',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'VERMONT'        => 'VT',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'VIRGINIA'       => 'VA',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'WASHINGTON'     => 'WA',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'WEST VIRGINIA'  => 'WV',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'WISCONSIN'      => 'WI',
-    StringLib.StringToUpperCase(TM_True_IP_Region_) = 'WYOMING'        => 'WY',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'ALABAMA'        => 'AL',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'ALASKA'         => 'AK',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'ARIZONA'        => 'AZ',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'ARKANSAS'       => 'AR',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'CALIFORNIA'     => 'CA',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'COLORADO'       => 'CO',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'CONNECTICUT'    => 'CT',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'DELAWARE'       => 'DE',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'FLORIDA'        => 'FL',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'GEORGIA'        => 'GA',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'HAWAII'         => 'HI',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'IDAHO'          => 'ID',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'ILLINOIS'       => 'IL',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'INDIANA'        => 'IN',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'IOWA'           => 'IA',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'KANSAS'         => 'KS',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'KENTUCKY'       => 'KY',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'LOUISIANA'      => 'LA',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'MAINE'          => 'ME',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'MARYLAND'       => 'MD',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'MASSACHUSETTS'  => 'MA',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'MICHIGAN'       => 'MI',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'MINNESOTA'      => 'MN',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'MISSISSIPPI'    => 'MS',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'MISSOURI'       => 'MO',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'MONTANA'        => 'MT',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'NEBRASKA'       => 'NE',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'NEVADA'         => 'NV',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'NEW HAMPSHIRE'  => 'NH',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'NEW JERSEY'     => 'NJ',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'NEW MEXICO'     => 'NM',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'NEW YORK'       => 'NY',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'NORTH CAROLINA' => 'NC',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'NORTH DAKOTA'   => 'ND',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'OHIO'           => 'OH',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'OKLAHOMA'       => 'OK',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'OREGON'         => 'OR',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'PENNSYLVANIA'   => 'PA',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'RHODE ISLAND'   => 'RI',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'SOUTH CAROLINA' => 'SC',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'SOUTH DAKOTA'   => 'SD',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'TENNESSEE'      => 'TN',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'TEXAS'          => 'TX',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'UTAH'           => 'UT',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'VERMONT'        => 'VT',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'VIRGINIA'       => 'VA',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'WASHINGTON'     => 'WA',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'WEST VIRGINIA'  => 'WV',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'WISCONSIN'      => 'WI',
+    STD.Str.ToUpperCase(TM_True_IP_Region_) = 'WYOMING'        => 'WY',
                                                                           '  ');
 
 state_match_lvl := map(
-    valid_tm_account and not(trim(ip_state) = '') and not(trim(in_state) = '') and StringLib.StringToUpperCase(in_state) = ip_state => 1,
+    valid_tm_account and not(trim(ip_state) = '') and not(trim(in_state) = '') and STD.Str.ToUpperCase(in_state) = ip_state => 1,
     valid_tm_account and not(trim(ip_state) = '') and not(trim(in_state) = '')                                                      => 0,
     valid_tm_account and (trim(ip_state) = '' or trim(in_state) = '')                                                               => -1,
                                                                                                                                        -2);
@@ -2008,6 +2008,7 @@ cdn1404_1_0 := round(max((real)250, min(999, if(base + pts * (final_score - bb_o
 		SELF := le.bs.Bill_To_Out.iid;
 		SELF := le.bs.Bill_To_Out.shell_input;
 		SELF := le.bs.bill_to_out;
+		SELF :=[];
 	END;
 	iidBT := PROJECT(clam_with_easi, into_layout_output(LEFT));
 
@@ -2051,6 +2052,7 @@ cdn1404_1_0 := round(max((real)250, min(999, if(base + pts * (final_score - bb_o
 		SELF := le.bs.Ship_To_Out.iid;
 		SELF := le.bs.Ship_To_Out.shell_input;
 		SELF := le.bs.ship_to_out;
+		SELF :=[];
 	END;
 	iidST := PROJECT(clam_with_easi, into_layout_output2(LEFT));
 

@@ -1,4 +1,4 @@
-import easi, ut, address, riskwise, risk_indicators, std;
+﻿import easi, riskwise, risk_indicators, std;
 
 export CDN806_1_0(
 	grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
@@ -139,7 +139,7 @@ export CDN806_1_0(
 		IP_countrycode         := le.ip2o.countrycode;
 		IP_state               := le.ip2o.state;
 		IP_region              := le.ip2o.ipregion;
-		IP_connection          := StringLib.StringtoUppercase(trim(le.ip2o.ipconnection));
+		IP_connection          := STD.Str.ToUpperCase(trim(le.ip2o.ipconnection));
 
 		IST_addrscore          := (INTEGER)le.eddo.addrscore;
 		IST_firstscore        := (INTEGER)le.eddo.firstscore;
@@ -158,12 +158,12 @@ export CDN806_1_0(
 
 
 
-		INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
+		INTEGER contains_i( string haystack, string needle ) := (INTEGER)(STD.Str.Find(haystack, needle, 1) > 0);
 
 		scoring_year := (real)((string)trim(archive_date, LEFT))[1..4];
 		scoring_year_s := (real)((string)trim(archive_date_s, LEFT))[1..4];
 		uv_billto := (ist_addrscore = 100);
-		shp_mode := stringlib.stringtouppercase(cus_SHIPMODE);
+		shp_mode := STD.Str.ToUpperCase(cus_SHIPMODE);
 		
 		uv_instore := (trim(trim(shp_mode, LEFT), LEFT, RIGHT) = '');
 		uv_dataset :=  map(uv_instore => 'instore',
@@ -173,8 +173,8 @@ export CDN806_1_0(
 		vs_offset := ln((((1 - .0157150) * .1377) / (.0157150 * (1 - .1377))));
 		vb_offset := ln((((1 - .0037024) * .03582) / (.0037024 * (1 - .03582))));
 		vi_offset := ln((((1 - .000786) * .0078) / (.000786 * (1 - .0078))));
-		v_in_avs_x := StringLib.StringToUpperCase(trim(trim(cus_avs, LEFT), LEFT, RIGHT));
-		v_in_pmt := StringLib.StringToUpperCase(trim(trim(cus_pmttype, LEFT), LEFT, RIGHT));
+		v_in_avs_x := STD.Str.ToUpperCase(trim(trim(cus_avs, LEFT), LEFT, RIGHT));
+		v_in_pmt := STD.Str.ToUpperCase(trim(trim(cus_pmttype, LEFT), LEFT, RIGHT));
 
 
 		amex_lst_b1 := (integer)(v_in_avs_x in ['1', '2', '3', '4']);
@@ -265,7 +265,7 @@ export CDN806_1_0(
 						  vi_avsx_2 = 11  => 0.0039405881,
 											 0.0030541142);
 
-		v_in_avs := StringLib.StringToUpperCase(trim(trim(cus_avs, LEFT), LEFT, RIGHT));
+		v_in_avs := STD.Str.ToUpperCase(trim(trim(cus_avs, LEFT), LEFT, RIGHT));
 
 		v_in_avs_2 :=  map(v_in_avs = '0'  => 'N',
 						   v_in_avs = '1'  => 'Z',
@@ -303,7 +303,7 @@ export CDN806_1_0(
 								  v_in_cid_match_2 = 0  => 0.0101309227,
 														   0.0068462058);
 
-		v_in_shipmode := StringLib.StringToUpperCase(trim(trim(cus_shipmode, LEFT), LEFT, RIGHT));
+		v_in_shipmode := STD.Str.ToUpperCase(trim(trim(cus_shipmode, LEFT), LEFT, RIGHT));
 		vs_in_shipmode_m :=  map(v_in_shipmode = '2' => 0.5447418221,
 								 v_in_shipmode = '7' => 0.2112449799,
 								 v_in_shipmode = 'G' => 0.0663542082,
@@ -462,7 +462,7 @@ export CDN806_1_0(
 							vb_lres_i = 3 => 0.007329129,
 											 0.004870652);
 
-		v_add_apt_f := (StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A');
+		v_add_apt_f := (STD.Str.ToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A');
 		v_add_mil_f := (rc_ziptypeflag = 3);
 
 		v_addval_b1 := map((rc_hriskaddrflag != 4) and  v_add_mil_f => '1 LR-NONAPT-MIL',
@@ -516,11 +516,11 @@ export CDN806_1_0(
 								v_phn_probx2 = 'POTS-ZIPMATCH'      => 0.0047048163,
 																	   0.0302457467);
 
-		v_ip_topDomain := StringLib.StringToUpperCase(trim(trim(ip_topleveldomain, LEFT), LEFT, RIGHT));
+		v_ip_topDomain := STD.Str.ToUpperCase(trim(trim(ip_topleveldomain, LEFT), LEFT, RIGHT));
 		v_in_AcqChannel := trim(trim(cus_acq_channe, LEFT), LEFT, RIGHT);
 		v_ip_continent := trim(ip_continent, LEFT, RIGHT);
-		v_ip_countrycode := StringLib.StringToUpperCase(trim(ip_countrycode, LEFT, RIGHT));
-		v_ip_state := StringLib.StringToUpperCase(trim(ip_state, LEFT, RIGHT));
+		v_ip_countrycode := STD.Str.ToUpperCase(trim(ip_countrycode, LEFT, RIGHT));
+		v_ip_state := STD.Str.ToUpperCase(trim(ip_state, LEFT, RIGHT));
 		vs_ip_domain_GovMil := (v_ip_topdomain in ['GOV', 'MIL']);
 		vs_ip_domain_govmil_m :=  map(~vs_ip_domain_govmil => 0.1390298134,
 																 0.0294840295);
@@ -598,7 +598,7 @@ export CDN806_1_0(
 							   vb_ip_domain = 'telorder'     => 0.1033548656,
 																0.1537728493);
 
-		vb_ip_connection_i_b1 := if(StringLib.StringToUpperCase(trim(trim(ip_connection, LEFT), LEFT, RIGHT)) in ['SATELLITE', 'WIRELESS'], 1, 2);
+		vb_ip_connection_i_b1 := if(STD.Str.ToUpperCase(trim(trim(ip_connection, LEFT), LEFT, RIGHT)) in ['SATELLITE', 'WIRELESS'], 1, 2);
 		vb_ip_connection_i := map(v_in_acqchannel = '01' => vb_ip_connection_i_b1,
 								  v_in_acqchannel = '02' => 0,
 															3);
@@ -607,7 +607,7 @@ export CDN806_1_0(
 									 vb_ip_connection_i = 2 => 0.0357832047,
 															   0.0021224985);
 
-		uc_ip_connection := StringLib.StringToUpperCase(trim(trim(ip_connection, LEFT), LEFT, RIGHT));
+		uc_ip_connection := STD.Str.ToUpperCase(trim(trim(ip_connection, LEFT), LEFT, RIGHT));
 		vi_ip_connection_i_b1 := map(uc_ip_connection in ['SATELLITE', 'WIRELESS']      => 1,
 									 uc_ip_connection in ['DIALUP']                     => 2,
 									 uc_ip_connection in ['BROADBAND', 'CABLE', 'XDSL'] => 3,
@@ -775,8 +775,8 @@ export CDN806_1_0(
 								   wealth_index_s_5 = 4 => 0.1204931139,
 														   0.0663885684);
 
-		sources_upcase := StringLib.StringToUpperCase(rc_sources);
-		sources_s_upcase := StringLib.StringToUpperCase(rc_sources_s);
+		sources_upcase := STD.Str.ToUpperCase(rc_sources);
+		sources_s_upcase := STD.Str.ToUpperCase(rc_sources_s);
 		_source_tot_AM   := contains_i(sources_upcase, 'AM');
 		_source_tot_AR   := contains_i(sources_upcase, 'AR');
 		_source_tot_CG   := contains_i(sources_upcase, 'CG');
@@ -985,6 +985,7 @@ export CDN806_1_0(
 		self := le.Bill_To_Out.iid;
 		self := le.Bill_To_Out.shell_input;
 		self := le.bill_to_out;
+		SELF :=[];
 	END;
 	iidBT := project(clam, into_layout_output(left));
 
@@ -1018,6 +1019,7 @@ export CDN806_1_0(
 		self := le.Ship_To_Out.iid;
 		self := le.Ship_To_Out.shell_input;
 		self := le.ship_to_out;
+		SELF :=[];
 	END;
 	iidST := project(clam, into_layout_output2(left));
 

@@ -1,4 +1,4 @@
-IMPORT doxie, iesp, PersonReports;
+﻿IMPORT doxie, iesp, PersonReports;
 doxie.MAC_Selection_Declare ();
 doxie.MAC_Header_Field_Declare (); // only for versions
 
@@ -117,6 +117,7 @@ export StoredReader := MODULE
     // export boolean Exclude_ResidentsForAssociatesAddresses_val 			:= false : stored('ExcludeResidentsForAssociatesAddresses');
     boolean Exclude_Sources_val := false : stored('ExcludeSources');
     export boolean include_sources := Include_Them_All or ~Exclude_Sources_val;
+    export boolean Include_AddressSourceInfo := false : stored('IncludeAddressSourceInfo');   // defined outside of mac_selection
   end;
 
   export versions := MODULE (PersonReports.IParam.versions)
