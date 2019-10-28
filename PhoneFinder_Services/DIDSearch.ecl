@@ -34,7 +34,7 @@ FUNCTION
 		EXPORT BOOLEAN UseTransUnionPVS        := FALSE;
 		EXPORT BOOLEAN UseTargus               := FALSE;
 		EXPORT BOOLEAN UseLastResort           := FALSE;
-		EXPORT BOOLEAN UseInHousePhoneMetadata := FALSE;
+		EXPORT BOOLEAN UseInHousePhoneMetadataOnly := FALSE;
 	END;
 
 	dPhoneHist := PhoneFinder_Services.GetPhones(dFormat2BatchIn, psMod);
