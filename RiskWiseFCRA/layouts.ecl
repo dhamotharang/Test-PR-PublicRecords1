@@ -30,6 +30,8 @@ EXPORT layouts := MODULE
 
   export working := RECORD
     Riskwise.layouts_vru.Layout_Header_Data;
+    string5 oldTitle;
+    string5 newTitle;
     string20 oldFname;
     string20 newFname;
     string20 oldMname;
@@ -64,6 +66,8 @@ EXPORT layouts := MODULE
     string9 newSSN;
     string8 oldDOB;
     string8 newDOB;
+    string8 oldDOD;
+    string8 newDOD;
     string1 oldDwellType;
     string1 newDwellType;
     string1 oldValid;
