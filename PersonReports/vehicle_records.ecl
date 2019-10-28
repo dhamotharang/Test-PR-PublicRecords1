@@ -2,7 +2,7 @@ IMPORT iesp, doxie, VehicleV2_Services;
 
 EXPORT  vehicle_records (
   dataset (doxie.layout_references) dids,
-  input.vehicles in_params = module (input.vehicles) end,
+  $.IParam.vehicles in_params = module ($.IParam.vehicles) end,
   boolean IsFCRA = false
 ) := MODULE
 

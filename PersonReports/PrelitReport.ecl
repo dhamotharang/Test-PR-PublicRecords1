@@ -9,11 +9,7 @@ EXPORT PrelitReport (
   PersonReports.IParam._prelitreport mod_prelit,
   boolean IsFCRA = false) := FUNCTION
 
-  //Convert to the old _report style module: $.input._prelitreport
   mod_access := PROJECT (mod_prelit, doxie.IDataAccess);
-  param := MODULE (PROJECT (mod_prelit, $.IParam.old_prelitreport))
-    $.input.mac_copy_report_fields(mod_prelit);
-  END;
 
   // DID should be atmost one (do we keep layout_references for legacyt reasons?)
   did := dids[1].did;
@@ -76,7 +72,7 @@ EXPORT PrelitReport (
   p_bankruptcy_v3  := if (mod_prelit.bankruptcy_version = 3, choosen (bankrpt.bankruptcy_v3, iesp.Constants.BR.MaxBankruptcies));
 
   p_liens := PersonReports.lienjudgment_records (dids, 
-                                                module (project (param, PersonReports.input.liens, opt)) end, 
+                                                PROJECT (mod_prelit, $.IParam.liens, OPT), 
                                                 IsFCRA, 
                                                 ds_flags, 
                                                 slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Liens));
@@ -102,21 +98,22 @@ EXPORT PrelitReport (
                                                                   FFD.Constants.DataGroups.PROPERTY_SEARCH]
                       )).prop_deeds_all, iesp.Constants.BR.MaxDeeds);
 
-  uccs := PersonReports.ucc_records(dids, module (project (param, PersonReports.input.ucc, opt)) end, IsFCRA);
+  uccs := PersonReports.ucc_records(dids, PROJECT (mod_prelit, PersonReports.IParam.ucc, OPT), IsFCRA);
   p_uccs        := choosen (uccs.ucc_v2, iesp.Constants.BR.MaxUCCFilings);
 
-  vehs := PersonReports.vehicle_records(dids, module (project (param, input.vehicles)) end, IsFCRA);
+  vehs := PersonReports.vehicle_records (dids, PROJECT (mod_prelit, $.IParam.vehicles), IsFCRA);
+
   p_vehicles    := choosen (vehs.vehicles, iesp.Constants.BR.MaxVehicles);
 
   p_watercrafts := choosen(PersonReports.watercraft_records(dids, 
-                          module (project (param, PersonReports.input.watercrafts)) end, 
+                          PROJECT (mod_prelit, $.IParam.watercrafts),
                           IsFCRA,
                           true,
                           ds_flags, 
                           slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Watercraft
                           )).wtr_recs, iesp.Constants.BR.MaxWatercrafts);
 
-  p_at_work     := choosen (PersonReports.peopleatwork_records (dids, PROJECT (mod_prelit, $.IParam.peopleatwork, OPT), IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
+  p_at_work     := choosen (PersonReports.peopleatwork_records (dids, PROJECT (mod_prelit, $.IParam.peopleatwork), IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
 
   // -----------------------------------------------------------------------
   // COUNTS (cannot use doxie.key_did_lookups_v2 -- not always in sync);

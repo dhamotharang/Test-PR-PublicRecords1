@@ -58,15 +58,7 @@ EXPORT input := MODULE
     export boolean IncludeSexualOffenses := false;
   end;
 
-  export faacerts := INTERFACE (_report)
-  end;
-	
   export huntingfishing := INTERFACE (Hunting_Fishing_Services.Search_Records.params)
-  end;
-
-  export liens := INTERFACE (_report)
-    export string1 liens_party_type := '';
-    export string50 tmsid_value := ''; // reserved for future needs if any
   end;
 
   export internetdomains := INTERFACE (InternetDomain_Services.SearchService_Records.params)
@@ -75,27 +67,6 @@ EXPORT input := MODULE
   export sexoffenses := INTERFACE (_report)
   end;
 	
-  export ucc := INTERFACE (_report)
-    export boolean includemultiplesecured := false;
-    export boolean returnrolleddebtors := false;
-    export string1 ucc_party_type := '';
-  end;
-
-  export vehicles := INTERFACE (_report)
-    export boolean   Use_CurrentlyOwnedVehicles := FALSE;
-  end;
-
-  export voters := INTERFACE (_report)
-  end;
-
-  export watercrafts := INTERFACE (_report)
-		export boolean include_NonRegulated_WatercraftSources:= FALSE;
-  end;
-
-  // =========================================================================
-  // ================= Central Records, Comprehensive Report ================= 
-  // =========================================================================
-
 
   // Until we switch all reports to the $.IParam._report interface: an utility macro to copy report's fields 
   EXPORT mac_copy_report_fields (mod_new) := MACRO
