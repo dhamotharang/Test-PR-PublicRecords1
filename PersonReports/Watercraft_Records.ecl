@@ -1,11 +1,11 @@
-import iesp, WatercraftV2_Services, doxie, Census_data, fcra, FFD;
+import $, iesp, WatercraftV2_Services, doxie, Census_data, fcra, FFD;
 
 iesp.watercraft.t_WaterCraftAddress FormatWAddresses (string City, string State, string Province, string Country) :=
   ROW ({City, State, Province, Country}, iesp.watercraft.t_WaterCraftAddress);
 
 export Watercraft_Records(
   dataset (doxie.layout_references) dids,
-  input.watercrafts in_params = module (input.watercrafts) end,
+  $.IParam.watercrafts in_params = module ($.IParam.watercrafts) end,
   boolean IsFCRA = false,
 	boolean IsReport = false,
 	dataset (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
@@ -14,7 +14,7 @@ export Watercraft_Records(
 ) := MODULE
 
 raw_recs := WatercraftV2_Services.WatercraftV2_raw.Report_View.by_did (
-                     dids,in_params.ssn_mask,IsReport, isFCRA, flagfile, in_params.non_subject_suppression,
+                     dids, in_params.ssn_mask, IsReport, isFCRA, flagfile, in_params.non_subject_suppression,
 										 in_params.include_NonRegulated_WatercraftSources, slim_pc_recs, in_params.FFDOptionsMask);
 //returns WatercraftV2_Services.Layouts.report_out
 
