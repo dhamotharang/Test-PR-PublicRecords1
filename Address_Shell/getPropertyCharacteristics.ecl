@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * getPropertyCharacteristics: This function takes in the input and calls out to
  * PropertyCharacteristics_Services.ReportService() to acquire Property Characteristic
  * information.  It then formats the result in a flat layout with the best possible
@@ -7,7 +7,9 @@
 
 IMPORT iesp, InsuranceContext_iesp, ut, Gateway;
 
-EXPORT Address_Shell.layoutPropertyCharacteristics getPropertyCharacteristics (DATASET(Address_Shell.layoutInput) input, UNSIGNED1 propertyInformationAttributesVersion, UNSIGNED1 ercAttributesVersion, DATASET(Gateway.Layouts.Config) gateway_cfg) := FUNCTION
+EXPORT Address_Shell.layoutPropertyCharacteristics getPropertyCharacteristics (DATASET(Address_Shell.layoutInput) input, UNSIGNED1 propertyInformationAttributesVersion, UNSIGNED1 ercAttributesVersion,
+           DATASET(Gateway.Layouts.Config) gateway_cfg) := FUNCTION
+ 
 /* ************************************************************
 	 *        Place the input into the working layout:          *
 	 ************************************************************ */											
@@ -403,9 +405,12 @@ EXPORT Address_Shell.layoutPropertyCharacteristics getPropertyCharacteristics (D
 /* ************************************************************
 	 *         Join back ERC Data for the Address:              *
 	 ************************************************************ */
-	iesp.property_info.t_PropertyInformationReport combineWithERC (iesp.property_info.t_PropertyInformationReport le, iesp.property_info.t_PropertyDataItem ri) := TRANSFORM
-		SELF.estimatedreplacementcost := le.estimatedreplacementcost;
-		SELF.propertydata := ri;
+	 iesp.property_info.t_PropertyInformationReport combineWithERC (iesp.property_info.t_PropertyInformationReport le, iesp.property_info.t_PropertyDataItem ri) := TRANSFORM
+		
+    SELF.estimatedreplacementcost := le.estimatedreplacementcost;
+		 
+	
+    SELF.propertydata := ri;
 		
 		// Fill in the remaining with the stuff on the left
 		SELF := le;
@@ -426,6 +431,8 @@ EXPORT Address_Shell.layoutPropertyCharacteristics getPropertyCharacteristics (D
 																						LEFT.PropertyData[1].RiskAddress.county = RIGHT.RiskAddress.county AND 
 																						LEFT.PropertyData[1].RiskAddress.postalcode = RIGHT.RiskAddress.postalcode,
 																					combineWithERC(LEFT, RIGHT), LEFT OUTER, KEEP(1), ATMOST(1000));
+  
+
 														
 /* ************************************************************
 	 *      Flatten the Property Information for Return:        *

@@ -1,4 +1,4 @@
-import Risk_Indicators, ut, RiskWise, header_quick, MDR, drivers, dx_header, inquiry_acclogs;
+﻿import Risk_Indicators, ut, RiskWise, header_quick, MDR,suppress, drivers,std,VerificationOfOccupancy, dx_header, inquiry_acclogs,Doxie;
 
 EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOShell, 
 																		string50 DataRestrictionMask, 
@@ -6,7 +6,8 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 																		integer dppa,
 																		boolean isUtility,
 																		boolean dppa_ok,
-																		boolean fares_ok = true) := FUNCTION
+																		boolean fares_ok = true,
+                                    Doxie.IDataAccess mod_access = MODULE(Doxie.IDataAccess)end) := FUNCTION
 
 	isFCRA := false;
 
@@ -16,15 +17,19 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 
 //get all DIDs associated with our target input address
   Key_Header_Address := dx_header.key_header_address();
-
-	VerificationOfOccupancy.Layouts.Layout_VOOShell getDIDs(VOOShell le, Key_Header_Address ri) := TRANSFORM
-		SELF.prior_res_DID 							:= ri.DID;
-		SELF.prior_res_dt_first_seen 		:= ri.dt_first_seen;
-		SELF.prior_res_dt_last_seen 		:= ri.dt_last_seen;
-		SELF.prior_res_fname 						:= ri.fname;
-		SELF.prior_res_lname 						:= ri.lname;
-		SELF.prior_res_target_addrmatch := le.DID = ri.DID;  //flag records that match our input subject's DID  
-		SELF 														:= le;
+  VerificationOfOccupancy_CCPA := RECORD
+  VerificationOfOccupancy.Layouts.Layout_VOOShell;
+  Unsigned4 Global_sid;
+  end;
+	VerificationOfOccupancy_CCPA getDIDs(VOOShell le, Key_Header_Address ri) := TRANSFORM
+  self.Global_sid := ri.global_sid;  
+  SELF.prior_res_DID 							:= ri.DID;
+  SELF.prior_res_dt_first_seen 		:= ri.dt_first_seen;
+  SELF.prior_res_dt_last_seen 		:= ri.dt_last_seen;
+  SELF.prior_res_fname 						:= ri.fname;
+  SELF.prior_res_lname 						:= ri.lname;
+  SELF.prior_res_target_addrmatch := le.DID = ri.DID;  //flag records that match our input subject's DID  
+  SELF 														:= le;
 	END;
 	
 	resDIDs := join(VOOShell, Key_Header_Address,
@@ -39,15 +44,22 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 													(~mdr.Source_is_DPPA(RIGHT.src) OR 
 														(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))),
 									getDIDs(LEFT,RIGHT), left outer, ATMOST(5000));
+   VerificationOfOccupancy_suppressed := Suppress.Mac_SuppressSource(resDIDs, mod_access);   
+   VerificationOfOccupancy_Transform := PROJECT(VerificationOfOccupancy_suppressed, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell,
+                                                  SELF := LEFT));                
 
 //no need to keep all records, keep only the most recent for each "prior resident" DID
-	dedupDIDs := dedup(sort(resDIDs, seq, prior_res_DID, -prior_res_dt_last_seen, -prior_res_dt_first_seen), seq, prior_res_DID);
+	dedupDIDs := dedup(sort(VerificationOfOccupancy_Transform, seq, prior_res_DID, -prior_res_dt_last_seen, -prior_res_dt_first_seen), seq, prior_res_DID);
 
 //apply HouseHold ID (HHID) to each of the header records we found above so we can link household members
 	key_header := dx_header.key_header();
-	VerificationOfOccupancy.Layouts.Layout_VOOShell getHHIDs(dedupDIDs le, key_header ri) := TRANSFORM
+	 VerificationOfOccupancy_CCPA getHHIDs(dedupDIDs le, key_header ri) := TRANSFORM
 		SELF.prior_res_HHID 	:= ri.HHID;
-		SELF 										:= le;
+    self.Global_sid := ri.global_sid;		
+    SELF 										:= le;
+    
+    
+  
 	END;
 	
 	resHHIDs := join(dedupDIDs, key_header,
@@ -64,16 +76,18 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 									(~mdr.Source_is_DPPA(RIGHT.src) OR 
 										(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))),
 									getHHIDs(LEFT,RIGHT), left outer, KEEP(1), ATMOST(riskwise.max_atmost));  //just apply HHID to the 1 record we are joining
-
+resHHIDs_VerificationOfOccupancy_suppressed := Suppress.Mac_SuppressSource(resHHIDs, mod_access);   
+   resHHIDs_VerificationOfOccupancy_Transform := PROJECT(resHHIDs_VerificationOfOccupancy_suppressed, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell,
+                                                  SELF := LEFT));  
 //of all prior residents at this address, keep just the most recent
-	dedupHHIDs := dedup(sort(resHHIDs, seq, -prior_res_dt_last_seen, -prior_res_dt_first_seen), seq);
+	dedupHHIDs := dedup(sort(resHHIDs_VerificationOfOccupancy_Transform, seq, -prior_res_dt_last_seen, -prior_res_dt_first_seen), seq);
 
 //join most recent prior resident to all prior residents by HHID.  This will be our prior resident's household members.
-	VerificationOfOccupancy.Layouts.Layout_VOOShell getPriorHH(dedupHHIDs le, resHHIDs ri) := TRANSFORM
+	VerificationOfOccupancy.Layouts.Layout_VOOShell getPriorHH(dedupHHIDs le, resHHIDs_VerificationOfOccupancy_Transform ri) := TRANSFORM
 		SELF 									:= ri;
 	END;
 	
-	priorHH := join(dedupHHIDs, resHHIDs,
+	priorHH := join(dedupHHIDs, resHHIDs_VerificationOfOccupancy_Transform,
 									left.seq = right.seq and left.prior_res_HHID = right.prior_res_HHID,
 									getPriorHH(LEFT,RIGHT), left outer);  
 
@@ -141,8 +155,9 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 	hdrBuildDate01 := dk[1].max_date_last_seen[1..6];
 	
 headerMacro(transformName, keyName) := MACRO
-	VerificationOfOccupancy.Layouts.Layout_VOOShell transformName(VerificationOfOccupancy.Layouts.Layout_VOOShell l, keyName r) := transform
-		self.prior_res_new_addr 	:= r.DID <> 0; //we found a header record for this DID that has a newer address than the target address
+	VerificationOfOccupancy_CCPA transformName(VerificationOfOccupancy.Layouts.Layout_VOOShell l, keyName r) := transform
+		self.Global_sid := r.global_sid;
+    self.prior_res_new_addr 	:= r.DID <> 0; //we found a header record for this DID that has a newer address than the target address
 		self											:= l;
 	end;
 endmacro;
@@ -170,6 +185,7 @@ endmacro;
 									 left.addr_suffix <> right.suffix or 
 									 left.postdir <> right.postdir), 
 									getHeader(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));
+	 getHeader_VerificationOfOccupancy_CCPA := Suppress.Suppress_ReturnOldLayout(newerHeader, mod_access, VerificationOfOccupancy.Layouts.Layout_VOOShell);
 
 	newerQHeader := join(rolled_Property, header_quick.key_DID,		
 									LEFT.prior_res_DID <> 0 AND
@@ -192,6 +208,7 @@ endmacro;
 									 left.addr_suffix <> right.suffix or 
 									 left.postdir <> right.postdir),  
 									getQHeader(left, right), keep(200), ATMOST(RiskWise.max_atmost));
+	 getQHeader_VerificationOfOccupancy_CCPA := Suppress.Suppress_ReturnOldLayout(newerQHeader, mod_access, VerificationOfOccupancy.Layouts.Layout_VOOShell);
 
 //rollup by sequence to set the ownership flags for all prior residents as though they are one entity.  I.E. - if any DID within the 
 //	prior resident "household" has any of the owned/sold/new_addr/acct_open flags set, set it on for the record being returned.
@@ -213,17 +230,26 @@ endmacro;
 		self														:= l;
 	end;
 	
-  rolledHeader := rollup(sort(ungroup(newerHeader) & ungroup(newerQHeader), seq), rollHeader(left,right), seq);
+  rolledHeader := rollup(sort(ungroup(getHeader_VerificationOfOccupancy_CCPA) & ungroup(getQHeader_VerificationOfOccupancy_CCPA), seq), rollHeader(left,right), seq);
 
 // Join prior resident DIDs to inquiries to see if any account opening searches exist within the last year for an address other than the target address
 	layout_inq := record
 		unsigned4 seq;
 		unsigned6 s_did;
+    
+    
 		inquiry_acclogs.Layout.common_indexes;
 	end;
-	
-	layout_inq get_inquiry(rolled_Property le, Inquiry_AccLogs.Key_Inquiry_DID ri) := TRANSFORM
-		self.seq 	:= le.seq;
+
+  VerificationOfOccupancy_CCPA_E := RECORD
+	 layout_inq;
+   Unsigned4 Global_sid;
+   Unsigned6 did;  
+     end;
+		VerificationOfOccupancy_CCPA_E get_inquiry(rolled_Property le, Inquiry_AccLogs.Key_Inquiry_DID ri) := TRANSFORM
+		SELF.Global_Sid := ri.ccpa.Global_Sid;
+		Self.did := ri.s_did;
+    self.seq 	:= le.seq;
 		self 			:= ri;
 	END;	
 
@@ -236,16 +262,21 @@ endmacro;
 						trim(right.search_info.product_code) in Inquiry_AccLogs.shell_constants.valid_product_codes and   
 						trim(right.search_info.function_description) in Inquiry_AccLogs.shell_constants.VOO_search_functions and
 						//filter out 'collections' to coincide with Shell 5 (mimic Risk_Indicators.Boca_Shell_Inquiries.isCollection)
-						trim(StringLib.StringToUpperCase(right.bus_intel.vertical)) not IN Inquiry_AccLogs.shell_constants.collections_vertical_set and 
-						trim(StringLib.StringToUpperCase(right.bus_intel.industry)) not IN Inquiry_AccLogs.shell_constants.collection_industry and
-						StringLib.StringFind(StringLib.StringToUpperCase(trim(StringLib.StringToUpperCase(right.bus_intel.sub_market))),'FIRST PARTY', 1) < 1 and 
+						trim(STD.Str.ToUpperCase(right.bus_intel.vertical)) not IN Inquiry_AccLogs.shell_constants.collections_vertical_set and 
+						trim(STD.Str.ToUpperCase(right.bus_intel.industry)) not IN Inquiry_AccLogs.shell_constants.collection_industry and
+						STD.Str.Find(STD.Str.ToUpperCase(trim(STD.Str.ToUpperCase(right.bus_intel.sub_market))),'FIRST PARTY', 1) < 1 and 
 						//filter out 'highriskcredit' to coincide with Shell 5 (mimic Risk_Indicators.Boca_Shell_Inquiries.isHighRiskCredit)
-						trim(StringLib.StringToUpperCase(right.bus_intel.industry)) not IN Inquiry_AccLogs.shell_constants.HighRiskCredit_industry5,
+						trim(STD.Str.ToUpperCase(right.bus_intel.industry)) not IN Inquiry_AccLogs.shell_constants.HighRiskCredit_industry5,
 						get_inquiry(left, right),
 						inner, atmost(riskwise.max_atmost * 5));	
+	 get_inquiry_VerificationOfOccupancy_CCPA_E := Suppress.Suppress_ReturnOldLayout(inquiry_Recs, mod_access, layout_inq);
 
-	layout_inq get_inquiry_update(rolled_Property le, Inquiry_AccLogs.Key_Inquiry_DID_Update ri) := TRANSFORM
-		self.seq 	:= le.seq;
+
+	VerificationOfOccupancy_CCPA_E get_inquiry_update(rolled_Property le, Inquiry_AccLogs.Key_Inquiry_DID_Update ri) := TRANSFORM
+		
+    self.seq 	:= le.seq; 
+    SELF.Global_Sid := ri.ccpa.Global_Sid;
+		Self.did := ri.s_did;
 		self 			:= ri;
 	END;
 						
@@ -258,16 +289,17 @@ endmacro;
 						trim(right.search_info.product_code) in Inquiry_AccLogs.shell_constants.valid_product_codes and   
 						trim(right.search_info.function_description) in Inquiry_AccLogs.shell_constants.VOO_search_functions and
 						// filter out 'collections' to coincide with Shell 5 (mimic Risk_Indicators.Boca_Shell_Inquiries.isCollection)
-						trim(StringLib.StringToUpperCase(right.bus_intel.vertical)) not in Inquiry_AccLogs.shell_constants.collections_vertical_set and 
-						trim(StringLib.StringToUpperCase(right.bus_intel.industry)) not IN Inquiry_AccLogs.shell_constants.collection_industry and
-						StringLib.StringFind(StringLib.StringToUpperCase(trim(StringLib.StringToUpperCase(right.bus_intel.sub_market))),'FIRST PARTY', 1) < 1 and 
+						trim(STD.Str.ToUpperCase(right.bus_intel.vertical)) not in Inquiry_AccLogs.shell_constants.collections_vertical_set and 
+						trim(STD.Str.ToUpperCase(right.bus_intel.industry)) not IN Inquiry_AccLogs.shell_constants.collection_industry and
+						STD.Str.Find(STD.Str.ToUpperCase(trim(STD.Str.ToUpperCase(right.bus_intel.sub_market))),'FIRST PARTY', 1) < 1 and 
 						// filter out 'highriskcredit' to coincide with Shell 5 (mimic Risk_Indicators.Boca_Shell_Inquiries.isHighRiskCredit)
-						trim(StringLib.StringToUpperCase(right.bus_intel.industry)) not IN Inquiry_AccLogs.shell_constants.HighRiskCredit_industry5,
+						trim(STD.Str.ToUpperCase(right.bus_intel.industry)) not IN Inquiry_AccLogs.shell_constants.HighRiskCredit_industry5,
 						get_inquiry_update(left, right),
 						inner, atmost(riskwise.max_atmost * 5));	
+	 get_inquiry__update_VerificationOfOccupancy_CCPA_E := Suppress.Suppress_ReturnOldLayout(inquiry_update_Recs, mod_access, layout_inq);
 
 //keep only one inquiry record per unique address
-	dedup_inquiries := dedup(sort(ungroup(inquiry_recs) & ungroup(inquiry_update_Recs), seq, s_did, person_q.zip5, person_q.prim_range, person_q.sec_range, person_q.prim_name, person_q.addr_suffix, person_q.predir, person_q.postdir), 
+	dedup_inquiries := dedup(sort(ungroup(get_inquiry_VerificationOfOccupancy_CCPA_E) & ungroup(get_inquiry__update_VerificationOfOccupancy_CCPA_E), seq, s_did, person_q.zip5, person_q.prim_range, person_q.sec_range, person_q.prim_name, person_q.addr_suffix, person_q.predir, person_q.postdir), 
 																																											seq, s_did, person_q.zip5, person_q.prim_range, person_q.sec_range, person_q.prim_name, person_q.addr_suffix, person_q.predir, person_q.postdir
 													 ); 
 

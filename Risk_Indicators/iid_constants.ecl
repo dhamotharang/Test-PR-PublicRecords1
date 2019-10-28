@@ -599,7 +599,9 @@ export GoodSSNLength(string9 inSSN) :=  inSSN != '' and
 													AddressType, 		// 25
 													DropIndicator,	// 26
 													Unit_count,			// 27
-													Mail_usage);		// 28
+													Mail_usage,		// 28
+													title, // 29
+													dod); // 30
 	
 	export unsigned1 capVelocity(unsigned vcounter) := min(255, vcounter);
 											

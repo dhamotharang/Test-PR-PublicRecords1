@@ -14,8 +14,11 @@ EXPORT Constants :=
     EXPORT CURRENT_FLAG       := 'C';
     EXPORT HISTORICAL_FLAG    := 'H';
 		
-	EXPORT STRING1        SBFEDataBusinessCreditReport := '1'; // default
-	EXPORT STRING1        LNOnlyBusinessCreditReport := '2';
+    EXPORT STRING1        SBFEDataBusinessCreditReport := '1'; // default
+    EXPORT STRING1        LNOnlyBusinessCreditReport := '2';
+    EXPORT STRING1        LNOnlyB2BTradeReport := '3';
+    EXPORT STRING1        LNOnlyB2BCombinedCreditReport := '4';
+    EXPORT SET OF STRING1 LNOnlyCreditSet := ['2', '3', '4'];
 
     EXPORT SMALL_BIZ_ATTR_V1_NAME   	:= 'SmallBusinessAttrV1';
     EXPORT SMALL_BIZ_ATTR_V2_NAME   	:= 'SmallBusinessAttrV2';
@@ -106,5 +109,24 @@ EXPORT Constants :=
 			'targus',
 			'targuse3220'
 		];
+
+  EXPORT IndustrySegment := MODULE
+    EXPORT string Material := 'MATERIAL';
+    EXPORT string Operations := 'OPERATIONS';
+    EXPORT string Carrier := 'CARRIER';
+    EXPORT string Fleet := 'FLEET';
+    EXPORT string Other := 'OTHER';
+
+    EXPORT Set_Material := [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
+    EXPORT Set_Operations := [26, 27, 28, 29, 30, 31, 32, 33, 34, 35];
+    EXPORT Set_Carrier := [1, 4, 5, 6, 8];
+    EXPORT Set_Fleet := [2, 3, 9];
+  END;
+
+  EXPORT B2BAccountStatus := MODULE
+    EXPORT string Inactive := 'INACTIVE';
+    EXPORT string Current := 'CURRENT';
+    EXPORT string Overdue := 'OVERDUE';
+  END;
 
   END;

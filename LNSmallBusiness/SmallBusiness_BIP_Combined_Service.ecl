@@ -33,7 +33,7 @@
 /*--INFO-- Small Business BIP Combined XML Service - This service returns Small Business Attributes and Scores as well as the SBFE Credit Report */
 
 // #OPTION('expandSelectCreateRow', TRUE);
-IMPORT Address, AutoStandardI, BIPV2, Business_Risk_BIP, BusinessCredit_Services, 
+IMPORT $, Address, AutoStandardI, BIPV2, Business_Risk_BIP, BusinessCredit_Services, 
        Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, Inquiry_AccLogs, Risk_Reporting, STD;
 
 EXPORT SmallBusiness_BIP_Combined_Service := 
@@ -166,15 +166,18 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
                                           search.AuthorizedRep3.Address.StreetAddress1);
 
     // Option Fields
-    busCreditReportTypeValue := if (Option.BusinessCreditReportType = '0' OR
-		                                                   Option.BusinessCreditReportType = '', LNSmallBusiness.Constants.SBFEDataBusinessCreditReport,  
-													Option.BusinessCreditReportType);
-													// the default for  option.businessCreditReportType now is blank  - since esp not passing that in
-													// but later  when esp does pass that in we'll have either '0' , '1', or '2' (string1 values)
-													// which are defined as
-													// '0' being default from ESP side -  we have to check for 0 here and keep it being true (default) as it was in the code previously.
-													// '1' being SBFE report
-													// '2' Ln Only credit report (no SBFE data allowed).
+    busCreditReportTypeValue := if (Option.BusinessCreditReportType = '0' OR Option.BusinessCreditReportType = '', 
+      LNSmallBusiness.Constants.SBFEDataBusinessCreditReport,  
+      Option.BusinessCreditReportType
+    );
+      // the default for  option.businessCreditReportType now is blank  - since esp not passing that in
+      // but later  when esp does pass that in we'll have either '0' , '1', '2', '3', or '4' (string1 values)
+      // which are defined as
+      // '0' being default from ESP side -  we have to check for 0 here and keep it being true (default) as it was in the code previously.
+      // '1' being SBFE report
+      // '2' Ln Only credit report (no SBFE data allowed).
+      // '3' Ln Only B2B trade data (no SBFE data or credit report)
+      // '4' Ln Only combined report (no SBFE data, LN-Only B2B trade and credit report)
     #STORED('BusinessCreditReportType',busCreditReportTypeValue); //  CreditReportOption requirement 1.3.3													
     #STORED('LimitPaymentHistory24Months',Option.LimitPaymentHistory24Months); //  busines credit	report w SBFE data project additions	
     BOOLEAN LimitPaymentHistory24MonthsVal := FALSE : STORED('LimitPaymentHistory24Months');
@@ -416,8 +419,19 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
    /* ************************************************************************
     *                    Cortera Royalties                                    *
     **************************************************************************/
-    ds_Cortera_royalties := IF( TestData_Enabled, Royalty.RoyaltyCortera.InHouse.GetNoRoyalties(), Royalty.RoyaltyCortera.InHouse.GetCombinedServiceRoyalties(ds_Results) );
-    
+    // a status code of '0' indicates a hit on cortera trade data
+    cortera_trade_data_hit := ds_Results[1].CreditReportRecords[1].B2BTradeData.StatusCode = '0';
+    ds_Cortera_royalties_pre := IF( TestData_Enabled, Royalty.RoyaltyCortera.InHouse.GetNoRoyalties(), Royalty.RoyaltyCortera.InHouse.GetCombinedServiceRoyalties(ds_Results) );
+    ds_Cortera_royalties := PROJECT(ds_Cortera_royalties_pre, 
+      TRANSFORM(Royalty.Layouts.Royalty, 
+        SELF.royalty_count := IF(cortera_trade_data_hit AND NOT TestData_Enabled, 
+          LEFT.royalty_count + 1, 
+          LEFT.royalty_count
+        ), 
+        SELF := LEFT;
+      )
+    );
+
     // Combine Royalties  
     ds_Royalties := DATASET([], Royalty.Layouts.Royalty) + 
                     ds_combinedSBFE_royalties + 

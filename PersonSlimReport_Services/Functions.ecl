@@ -233,7 +233,9 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 
 	EXPORT vehicleRecsByDid(Ioptions in_mod,
 	                        DATASET(doxie.layout_best) bestRecs = DATASET([],doxie.layout_best)):= FUNCTION											
-      vehicles_mod := module (project (in_mod, PersonReports.input.vehicles, opt)) end;
+      vehicles_mod  := module (PersonReports.IParam.vehicles)
+        $.IParams.MAC_copy_old_report_fields(in_mod);
+      end;
       vehicles_v2  := PersonReports.vehicle_records(in_did,vehicles_mod).vehicles_v2;
       //hit RTV GW - experian
       rtv := if(in_mod.IncludeRealTimeVehicles,getRealTimeVehicles(in_mod, bestRecs));				
@@ -266,7 +268,9 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 	END;
 	
 	EXPORT wcRecsByDid(Ioptions in_mod):= FUNCTION
-      wc_mod  := module (project (in_mod, PersonReports.input.watercrafts, opt)) end;
+      wc_mod  := module (PersonReports.IParam.watercrafts)
+        $.IParams.MAC_copy_old_report_fields(in_mod);
+      end;
       wc_raw  := PersonReports.watercraft_records(in_did,wc_mod).wtr_recs;
       wc_sorted := sort(wc_raw, hullnumber, stateoforigin, -d2i(datelastseen));
       wc_duped  := dedup(wc_sorted, hullnumber, stateoforigin);
@@ -276,7 +280,10 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 	END;
 	
 	EXPORT uccRecsByDid(Ioptions in_mod):= FUNCTION
-      ucc_mod  := module (project (in_mod, PersonReports.input.ucc, opt)) end;
+      ucc_mod  := module (PersonReports.IParam.ucc)
+        $.IParams.MAC_copy_old_report_fields(in_mod);
+        EXPORT string1 ucc_party_type := in_mod.ucc_party_type;
+      end;
       ucc_raw  := PersonReports.ucc_records(in_did,ucc_mod).ucc_v2;
       //SmartRollup.fn_smart_rollup_ucc
       ucc_sorted := sort(ucc_raw, filingJurisdiction, originFilingNumber, -d2i(OriginFilingDate));
@@ -318,7 +325,8 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 	END;
   
   EXPORT liensRecsByDid(Ioptions in_mod):= FUNCTION
-      liens_mod := module (project(in_mod, PersonReports.input.liens, opt))
+      liens_mod := module (PersonReports.IParam.liens)
+         $.IParams.MAC_copy_old_report_fields(in_mod);
          export string1 leins_party_type := PersonSlimReport_Services.Constants.DEBTOR;
       end;
       liens_raw := project(PersonReports.lienjudgment_records(in_did, liens_mod).liensjudgment_v2,
@@ -425,7 +433,9 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
     END;
 	
     EXPORT pilotCertRecsByDid(Ioptions in_mod):= FUNCTION
-      pil_mod  := module (project (in_mod, PersonReports.input.faacerts, opt)) end;
+      pil_mod  := module (PersonReports.IParam.faacerts)
+        $.IParams.MAC_copy_old_report_fields(in_mod); //only report part is present in the input
+      end;  
       pil_raw  := PersonReports.faacert_records(in_did,pil_mod).bps_view;
       //one certification for each STATE/COUNTY
       //similar logic to - SmartRollup.fn_smart_rollup_faa_cert
@@ -472,7 +482,9 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 	END;
 	
   EXPORT voterRecsByDid(Ioptions in_mod):= FUNCTION
-      vote_mod     := module (project (in_mod, PersonReports.input.voters, opt)) end;
+      vote_mod := module (PersonReports.IParam.voters)
+         $.IParams.MAC_copy_old_report_fields(in_mod);
+       end;
       voter_raw    := PersonReports.voter_records(in_did,vote_mod).voters_v2;
       voter_sorted := sort(voter_raw, RegistrateState, ResidentAddress.county, -d2i(LastVoteDate));
       voter_rolled := rollup(voter_sorted, //SmartRollup.fn_smart_rollup_voter

@@ -20,7 +20,7 @@ EXPORT iid_append_ThreatMetrix( DATASET(risk_indicators.layout_input) indata,
                                       self.LastName:= left.lname;
                                       self.email:= left.email_address;
                                       self.homephone:= left.phone10;
-                                      self.StreetAddress:= left.in_streetAddress;
+                                      self.StreetAddressLine1:= left.in_streetAddress;
                                       self.City := left.in_city;
                                       self.State:= left.in_state;
                                       self.Zip := left.in_zipcode;

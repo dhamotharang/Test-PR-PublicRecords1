@@ -25,7 +25,8 @@ EXPORT SmallBusiness_BIP_Function (
 											UNSIGNED2 BIPIDWeightThreshold = LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.DEFAULT_VALUE,
                       BOOLEAN CorteraRetrotest = FALSE,
 											DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw),
-           BOOLEAN AppendBestsFromLexIDs = FALSE           
+											BOOLEAN AppendBestsFromLexIDs = FALSE, 
+											BOOLEAN DisableSBFE = FALSE           
 																							) := FUNCTION
 
 	RESTRICTED_SET := ['0', ''];
@@ -37,7 +38,7 @@ EXPORT SmallBusiness_BIP_Function (
 	Gateways := PROJECT(Gateways_in, gw_switch(left));
 
 	// Use the SBFE restriction to return Scores or not.
-	allow_SBFE_scores := DataPermissionMask[12] NOT IN RESTRICTED_SET;
+	allow_SBFE_scores := DataPermissionMask[12] NOT IN RESTRICTED_SET AND NOT DisableSBFE;
   SBFE_models_requested        := EXISTS(ModelsRequested(ModelName IN LNSmallBusiness.Constants.set_SBFE_models));
   BusShellv22_scores_requested := EXISTS(ModelsRequested(ModelName IN LNSmallBusiness.Constants.set_BusShellv22_models));
    
@@ -240,8 +241,13 @@ EXPORT SmallBusiness_BIP_Function (
 																																 OverrideExperianRestriction,
 																																 FALSE,
 																																 FALSE,
-                                 CorteraRetrotest,
+																																 CorteraRetrotest,
 																																 ds_CorteraRetrotestRecsRaw);
+
+  Shell_Results_nosbfe := 
+	  PROJECT(Shell_Results_pre, TRANSFORM(Business_Risk_BIP.Layouts.Shell, SELF.SBFE := [], SELF := LEFT));
+
+  Shell_Results_pre_2 := IF(allow_SBFE_scores, Shell_Results_pre, Shell_Results_nosbfe);
 
 	Business_Risk_BIP.Layouts.Shell fn_transformToNoHit( Business_Risk_BIP.Layouts.Shell shell_results ) :=
 		FUNCTION
@@ -267,7 +273,7 @@ EXPORT SmallBusiness_BIP_Function (
 	// results that fall below the threshold value shall be output as a no-hit.
 	Shell_Results := 
 		PROJECT( 
-			Shell_Results_pre,
+			Shell_Results_pre_2,
 			TRANSFORM( Business_Risk_BIP.Layouts.Shell,
 				SELF := IF( (UNSIGNED2)LEFT.Verification.InputIDMatchConfidence >= BIPIDWeightThreshold, LEFT, fn_transformToNoHit(LEFT) ),
 				SELF := []
@@ -676,6 +682,7 @@ unsigned8 BSOptions :=
 	// OUTPUT(withAttributes, NAMED('withAttributes'));
 	// OUTPUT(withScores, NAMED('withScores'));
 	// OUTPUT(Final, NAMED('Final'));	
+  // output(allow_SBFE_scores, named('allow_SBFE_scores'));
 	
 	// Weight_SBA := Shell_Results_pre[1].Verification.InputIDMatchConfidence;
 	// OUTPUT( Weight_SBA, NAMED('MatchWeight_SBA') );

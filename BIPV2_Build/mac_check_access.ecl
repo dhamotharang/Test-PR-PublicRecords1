@@ -1,14 +1,14 @@
-﻿EXPORT mac_check_access (ds_in, ds_out, mod_access, retain) := MACRO
+﻿EXPORT mac_check_access (ds_in, ds_out, mod_access, retain, contact_did_fieldname) := MACRO
+IMPORT Suppress;
 
-  #IF(retain)
-  #UNIQUENAME(newLayout)
-  %newLayout% := record
-    ds_in;
-    boolean is_suppressed := false;
-  end;
-  ds_out := project(ds_in, %newLayout%);
-  #ELSE
-  ds_out := ds_in;
-  #END
+   #UNIQUENAME(suppressRecs)
+   %suppressRecs% := Suppress.MAC_FlagSuppressedSource(ds_in, mod_access, contact_did_fieldname);
+	 
+	 #IF(retain)
+	 ds_out := %suppressRecs%;
+	 #ELSE
+	 ds_out := project(%suppressRecs%(not is_suppressed), recordof(ds_in));
+	 #END
+	   
 
-ENDMACRO;  
+ENDMACRO;

@@ -8,11 +8,6 @@ EXPORT out_rec FinderReport (
   $.IParam._finderreport mod_finder,
   boolean IsFCRA = false) := FUNCTION
 
-  //Convert to the old _report style module: $.input._finderreport
-  param := MODULE (PROJECT (mod_finder, $.IParam.old_finderreport))
-    $.input.mac_copy_report_fields(mod_finder);
-  END;
-
   mod_access := PROJECT (mod_finder, doxie.IDataAccess);
 
   // DID should be atmost one (do we keep layout_references for legacyt reasons?)
@@ -35,7 +30,7 @@ EXPORT out_rec FinderReport (
   p_hist_2     := choosen (old_phones.oldphones_2, iesp.constants.BR.MaxPhonesHistorical);
 
   // "single source" person's data
-  vehs := if(~isCNSMR, vehicle_records (dids, module (project (param, input.vehicles)) end, IsFCRA).vehicles);
+  vehs := if(~isCNSMR, $.vehicle_records (dids, PROJECT (mod_finder, $.IParam.vehicles), IsFCRA).vehicles);
   p_vehicles   := choosen (vehs, iesp.Constants.BR.MaxVehicles);
   proflic := $.proflic_records (dids, PROJECT (mod_finder, $.IParam.proflic), IsFCRA);
 

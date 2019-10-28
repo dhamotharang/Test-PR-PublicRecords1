@@ -147,7 +147,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_dls_count := count(s_dls);
   p_dls    := choosen(if (mod_smartlinx.Smart_rollup,s_dls, dl), iesp.Constants.SMART.MaxDLs);
 
- 	voters   := IF (mod_smartlinx.include_voters, $.voter_records (dids,   module(project (old_param, $.input.voters)) end, IsFCRA).voters_v2,dataset([],iesp.voter.t_VoterReport2Record));
+ 	voters   := IF (mod_smartlinx.include_voters, $.voter_records (dids, PROJECT (mod_smartlinx, $.IParam.voters), IsFCRA).voters_v2,dataset([],iesp.voter.t_VoterReport2Record));
  	s_voters := SmartRollup.fn_smart_rollup_voter(voters);
 	s_voters_count := count(s_voters);
   p_voters := choosen (if (mod_smartlinx.Smart_Rollup, s_voters, voters), iesp.Constants.SMART.MaxVoter);
@@ -188,7 +188,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_hunting      := SmartRollup.fn_smart_rollup_hunting(huntfishing);
 	s_hunting_count := count(s_hunting);
 	p_hunting      := choosen (if (mod_smartlinx.Smart_rollup, s_hunting, huntfishing),iesp.Constants.SMART.MaxHuntFish);
-	faacertMod     := PersonReports.faacert_records (dids, module (project (old_param, $.input.faacerts)) end, IsFCRA);
+	faacertMod     := PersonReports.faacert_records (dids, PROJECT (mod_smartlinx, $.IParam.faacerts), IsFCRA);
   faa_cert       := IF (mod_smartlinx.include_faacertificates, project(faacertMod.bps_view,iesp.bpsreport.t_BpsFAACertification),DATASET([],iesp.bpsreport.t_BpsFAACertification));
   s_faa_cert     := SmartRollup.fn_smart_rollup_faa_cert(faa_cert);
 	s_faa_cert_count := count(s_faa_cert);
@@ -230,7 +230,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_emails_count := count(s_emails);
 	p_emails      := choosen (s_emails, iesp.Constants.SMART.MaxEmails);
 
-  vehiclesMod   := PersonReports.vehicle_records (dids, module (project (old_param, $.input.vehicles, opt)) end, IsFCRA);
+  vehiclesMod   := PersonReports.vehicle_records (dids, PROJECT (mod_smartlinx, $.IParam.vehicles, OPT), IsFCRA);
 	vehicles      := IF (mod_smartlinx.include_motorvehicles and count(vehiclesMod.vehicles_v2) < iesp.constants.SMART.MaxUnRolledRecords, vehiclesMod.vehicles_v2,dataset([],iesp.motorvehicle.t_MotorVehicleReport2Record)); //using vehicles instead of vehicles_v2 because the v2 version doesn't contain historyFlag.
 	s_vehicles    := SmartRollup.fn_smart_rollup_veh(vehicles, subject_did);
   s_vehicles_current := s_vehicles(CurrentPrior=iesp.Constants.SMART.CURRENT);
@@ -244,7 +244,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	                              project(vehicles,transform(iesp.smartlinxreport.t_SLRVehicle, self := left, self.LengthOfOwnership := '', self.currentPrior := If (Left.isCurrent,iesp.Constants.SMART.CURRENT,iesp.Constants.SMART.PRIOR)))),
 														iesp.Constants.SMART.MaxVehicles);
 
-	watercraftMod := PersonReports.watercraft_records (dids, module (project (old_param, $.input.watercrafts)) end, IsFCRA,true, ds_flags);
+	watercraftMod := PersonReports.watercraft_records (dids, PROJECT (mod_smartlinx, $.IParam.watercrafts), IsFCRA,true, ds_flags);
 	//watercrafts   := watercraftMod.wtr_recs;
 	watercrafts   := IF (mod_smartlinx.include_watercrafts, watercraftMod.watercrafts_v2,dataset([],iesp.watercraft.t_WaterCraftReport2Record));
 	s_watercrafts := SmartRollup.fn_smart_rollup_watercraft(watercrafts);
@@ -291,7 +291,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   // This is not currently a problem as SmartLinx does not use FCRA overrides.
   // If FCRA is added to SmartLinx - the case link reduction needs to be reworked
   //  to properly account for overrides.
-  liensMod      := PersonReports.lienjudgment_records (dids,MODULE (project (old_param, $.input.liens)) END , IsFCRA, rollup_by_case_link := true);
+  liensMod      := PersonReports.lienjudgment_records (dids, PROJECT (mod_smartlinx, $.IParam.liens), IsFCRA, rollup_by_case_link := true);
 	liens         := IF (mod_smartlinx.include_liensjudgments,   project(liensMod.liensjudgment_v2(),iesp.lienjudgement.t_LienJudgmentReportRecord), dataset([],iesp.lienjudgement.t_LienJudgmentReportRecord));
   s_liens       := SmartRollup.fn_smart_rollup_liens(liens);
 	s_liens_active := s_liens(ActiveClosed=iesp.Constants.SMART.ACTIVE);
@@ -305,7 +305,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	                              project(liens,transform(iesp.smartlinxreport.t_SLRLienJudgment, self := left, self := []))),
 	                          iesp.Constants.SMART.MaxLiens);
 
-	uccsMod       := PersonReports.ucc_records (dids, module (project (old_param, $.input.ucc, opt)) end, IsFCRA);
+	uccsMod       := PersonReports.ucc_records (dids, PROJECT (mod_smartlinx, $.IParam.ucc, OPT), IsFCRA);
 	uccsRecs      := uccsMod.ucc_v2;
 	uccs          := IF (mod_smartlinx.include_uccfilings and count(uccsRecs) < iesp.constants.SMART.MaxUnRolledRecords,  uccsRecs,dataset([],iesp.ucc.t_UCCReport2Record));
 	s_uccs        := SmartRollup.fn_smart_rollup_ucc(uccs,subject_did);

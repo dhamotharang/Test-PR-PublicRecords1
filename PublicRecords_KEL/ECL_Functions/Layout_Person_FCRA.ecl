@@ -4,6 +4,7 @@
 	INTEGER7 P_InpLexID;
 	STRING78 P_InpNameFirst;
 	STRING120 P_InpAddrLine1;
+	STRING120 P_InpAddrLine2;
 	STRING50 P_InpAddrCity;
 	STRING25 P_InpAddrState;
 	STRING10 P_InpAddrZip;
@@ -16,7 +17,7 @@
 	STRING1 P_InpNameFirstFlag;
 	STRING1 P_InpNameMidFlag;
 	STRING1 P_InpNameLastFlag;
-	STRING1 P_InpAddrLine1Flag;
+	STRING1 P_InpAddrStFlag;
 	STRING1 P_InpAddrCityFlag;
 	STRING1 P_InpAddrStateFlag;
 	STRING1 P_InpAddrZipFlag;

@@ -1,6 +1,6 @@
 ﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
 IMPORT KEL11 AS KEL;
-IMPORT PublicRecords_KEL,Risk_Indicators,STD;
+IMPORT $,Email_Data,PublicRecords_KEL,Risk_Indicators,STD;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL11.Null;
 EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
@@ -56,5 +56,63 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __IsNull := __NL(__PRawSource);
     __Value := PublicRecords_KEL.ECL_Functions.Common_Functions.SourceGroup(RawSource);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nstr FN_Filter(KEL.typ.nstr __PSource, KEL.typ.nstr __PFilterString) := FUNCTION
+    Source := __T(__PSource);
+    FilterString := __T(__PFilterString);
+    __IsNull := __NL(__PSource) OR __NL(__PFilterString);
+    __Value := STD.Str.Filter(Source, FilterString);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nstr FN_Filter_Out(KEL.typ.nstr __Psource, KEL.typ.nstr __Pfilter) := FUNCTION
+    source := __T(__Psource);
+    filter := __T(__Pfilter);
+    __IsNull := __NL(__Psource) OR __NL(__Pfilter);
+    __Value := STD.Str.FilterOut(source, filter);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Bad_Phone(KEL.typ.nstr __PPhone) := FUNCTION
+    Phone := __T(__PPhone);
+    __IsNull := __NL(__PPhone);
+    __Value := PublicRecords_KEL.ECL_Functions.Common_Functions.IsBadPhone(Phone);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Is_Bad_S_S_N(KEL.typ.nstr __PSSN) := FUNCTION
+    SSN := __T(__PSSN);
+    __IsNull := __NL(__PSSN);
+    __Value := PublicRecords_KEL.ECL_Functions.Common_Functions.IsBadSSN(SSN);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nstr FN_Fn___Clean___State(KEL.typ.nstr __PState) := FUNCTION
+    State := __T(__PState);
+    __IsNull := __NL(__PState);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_Clean_DLState(State);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nstr FN_Get_Clean_Email_Domain(KEL.typ.nstr __Pemail) := FUNCTION
+    email := __T(__Pemail);
+    __IsNull := __NL(__Pemail);
+    __Value := Email_Data.Fn_Clean_Email_Domain(email);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nstr FN_Get_Clean_Email_Username(KEL.typ.nstr __Pemail) := FUNCTION
+    email := __T(__Pemail);
+    __IsNull := __NL(__Pemail);
+    __Value := Email_Data.Fn_Clean_Email_Username(email);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nint FN_Find_Last_String_Instance(KEL.typ.nstr __Psource, KEL.typ.nstr __PsearchString) := FUNCTION
+    source := __T(__Psource);
+    searchString := __T(__PsearchString);
+    __IsNull := __NL(__Psource) OR __NL(__PsearchString);
+    __Value := StringLib.StringFind(source, searchString,StringLib.StringFindCount(source, searchString));
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
+  END;
+  EXPORT KEL.typ.nint FN_Bad_Email_Check(KEL.typ.nstr __Pemail, KEL.typ.nstr __Pdomain) := FUNCTION
+    email := __T(__Pemail);
+    domain := __T(__Pdomain);
+    __IsNull := __NL(__Pemail) OR __NL(__Pdomain);
+    __Value := Email_Data.Fn_InvalidEmail(email,domain);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
   END;
 END;

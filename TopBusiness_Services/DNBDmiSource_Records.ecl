@@ -8,6 +8,7 @@ IMPORT iesp, doxie, DNB, DNB_DMI, BIPV2, ut;
 EXPORT DNBDmiSource_Records ( 
   dataset(Layouts.rec_input_ids_wSrc) in_docids,
 	SourceService_Layouts.OptionsLayout inoptions,
+	doxie.IDataAccess mod_access,
   boolean IsFCRA = false
 ) := MODULE
 	
@@ -23,7 +24,7 @@ EXPORT DNBDmiSource_Records (
 																																		SELF := []));
 	
 	// *** Key fetch to get dunsnumber keys
-  SHARED ds_dmikeys := PROJECT(DNB_DMI.Key_LinkIds.kFetch(in_docs_linkonly,inoptions.fetch_level),
+  SHARED ds_dmikeys := PROJECT(DNB_DMI.Key_LinkIds.kFetch(in_docs_linkonly, mod_access, inoptions.fetch_level),
 																TRANSFORM(Layouts.rec_input_ids_wSrc,
 																					SELF.IdValue := LEFT.rawfields.duns_number,
 																					SELF := LEFT,

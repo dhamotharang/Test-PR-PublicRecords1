@@ -1131,7 +1131,7 @@ export set_Marketing_Sources           := [
     // additional items
     ,src_Edgar                     ,src_Bankruptcy_Trustee        ,src_Infutor_Veh               ,src_MS_Worker_Comp
     ,src_Liens_v2_Chicago_Law      ,src_Liens_v2_ILFDLN           ,src_Liens_v2_Hogan            ,src_Liens_v2_MA
-    ,src_Liens_v2_NYC              ,src_Liens_v2_NYFDLN
+    ,src_Liens_v2_NYC              ,src_Liens_v2_NYFDLN           ,src_LnPropV2_Lexis_Asrs       ,src_LnPropV2_Fares_Deeds
 	]; 
 	
 export set_Marketing_Restricted := [

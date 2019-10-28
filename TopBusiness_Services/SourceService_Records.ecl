@@ -337,7 +337,7 @@ export SourceService_Records(
 
 	// InfoUSA_Deadco
 	infoUSA_deadco_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptInfoUSA_deadco(source,section));
-	infoUSA_deadco_docs := CHOOSEN(TopBusiness_Services.InfoUSA_DeadcoSource_Records(infoUSA_deadco_source_docids,inoptions,false)
+	infoUSA_deadco_docs := CHOOSEN(TopBusiness_Services.InfoUSA_DeadcoSource_Records(infoUSA_deadco_source_docids,inoptions, mod_access,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_DEADCO_RECORD);
   infoUSA_deadco_prepared := PROJECT(infousa_deadco_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),
@@ -496,7 +496,7 @@ export SourceService_Records(
 
 	// SHEILA GRECO
 	sgreco_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptSheilaGreco(source,section));
-	sgreco_docs := CHOOSEN(TopBusiness_Services.SheilaGrecoSource_Records(sgreco_source_docids,inoptions,false)
+	sgreco_docs := CHOOSEN(TopBusiness_Services.SheilaGrecoSource_Records(sgreco_source_docids,inoptions, mod_access, false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_SHEILA_RECORD);
 	sgreco_prepared := PROJECT(sgreco_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.SheilaGrecoRecords := dataset(left),
