@@ -104,6 +104,11 @@ EXPORT i_DID	:= RECORD
 	unsigned	email_rec_key;
 END;
 
+EXPORT i_LinkIDs	:= RECORD
+	BIPV2.IDlayouts.l_xlink_ids;
+	unsigned	email_rec_key;
+END;
+
 EXPORT i_Email_Address := RECORD
 	string200 clean_email;
 	unsigned	email_rec_key;
