@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * getPropertyCharacteristics_batch: This function takes in the input and calls out to
  * PropertyCharacteristics_Services.BatchService() to acquire Property Characteristic
  * information.  It then formats the result in a flat layout with the best possible
@@ -7,7 +7,9 @@
 
 IMPORT iesp, InsuranceContext_iesp, ut,Address_Shell, Gateway;
 
-EXPORT Address_Shell.layoutPropertyCharacteristics_batch.PropertyCharacteristics_batch getPropertyCharacteristics_batch (DATASET(Address_Shell.Layouts.address_shell_input) input, UNSIGNED1 propertyInformationAttributesVersion, DATASET(Gateway.Layouts.Config) gateway_cfg) := FUNCTION
+EXPORT Address_Shell.layoutPropertyCharacteristics_batch.PropertyCharacteristics_batch getPropertyCharacteristics_batch
+ (DATASET(Address_Shell.Layouts.address_shell_input) input, UNSIGNED1 propertyInformationAttributesVersion,
+ DATASET(Gateway.Layouts.Config) gateway_cfg) := FUNCTION
 /* ************************************************************
 	 *        Place the input into the working layout:          *
 	 ************************************************************ */											

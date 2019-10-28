@@ -1,11 +1,13 @@
-/* 
+﻿/* 
  * AddressAttributesFunction: This function takes in the input and gathers all the
  * requested attributes and returns it in the flat layout.  This function should be able
  * to generate a layout to be used in a batch service, or to pass into a possible future model.
  */
 import Gateway;
 
-EXPORT AddressAttributesFunction (DATASET(Address_Shell.layoutInput) cleanedInput, UNSIGNED1 publicRecordsAttributesVersion, UNSIGNED1 propertyInformationAttributesVersion, UNSIGNED1 ercAttributesVersion, DATASET(Gateway.Layouts.Config) gateway_cfg) := FUNCTION
+EXPORT AddressAttributesFunction (DATASET(Address_Shell.layoutInput) cleanedInput, UNSIGNED1 publicRecordsAttributesVersion,
+       UNSIGNED1 propertyInformationAttributesVersion, UNSIGNED1 ercAttributesVersion,
+       DATASET(Gateway.Layouts.Config) gateway_cfg) := FUNCTION
 	pubRecs := Address_Shell.getPropertyAttributes(cleanedInput, publicRecordsAttributesVersion);
 	
 	propertyRecs := Address_Shell.getPropertyCharacteristics(cleanedInput, propertyInformationAttributesVersion, ercAttributesVersion, gateway_cfg);
