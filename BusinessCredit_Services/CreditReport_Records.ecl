@@ -98,9 +98,9 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
 	                                  DATASET([],iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor));
 	
    // efficiency reduce what is passed into function 
-  BusAdditionalInfo			:= BusinessCredit_Services.fn_getAdditionalInfo(inmod, 
-                                                                        topBusiness_recs_raw,
-                                                                        buzCreditHeader_recs);
+  BusAdditionalInfo			:= BusinessCredit_Services.fn_getAdditionalInfo(topBusiness_recs_raw,
+                                                                        buzCreditHeader_recs,
+                                                                        mod_access);
 
   buzCreditScoreMod			:= BusinessCredit_Services.fn_getBusiness_CreditScore(inmod, 	                                                                                                                                                     
                                                                               BipOrSBFEBestInfo,																																															
