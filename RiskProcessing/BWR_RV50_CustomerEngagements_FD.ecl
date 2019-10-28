@@ -1,4 +1,4 @@
-﻿Import Riskview, Doxie, Risk_Indicators, dx_FirstData_Temp;
+﻿Import Riskview, Doxie, Risk_Indicators, dx_FirstData;
 // BWR to read in RV5 files and append Best SSN.  Then join to the FD file to append DL/DL state
 
 
@@ -108,7 +108,7 @@ bestSSNappended := join(distribute(AppendPII, hash64(LexID)),
  output(Count(bestSSNappended), named('RecCountAfterSSNappended'));
  
 // First Data key used to append DL Number/State based on LexID 
-FDKey :=  dx_FirstData_Temp.key_DID();
+FDKey :=  dx_FirstData.key_DID();
 
 
 
