@@ -1,4 +1,4 @@
-﻿import _Control, risk_indicators, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address,data_services,dx_header,STD;
+﻿import _Control, risk_indicators, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address,data_services,dx_header,STD, dx_header;
 onThor := _Control.Environment.OnThor;
 
 export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
@@ -43,9 +43,10 @@ max_last_seen := (string) dk[1].max_date_last_seen;
 hdrBuildDate01 := max_last_seen[1..6]+'01';
 header_build_date := (unsigned)(max_last_seen[1..6]);
 
-
 Layout_Header_Data := RECORD
-	Risk_Indicators.iid_constants.layout_outx;
+	// Risk_Indicators.iid_constants.layout_outx; -- this can be reverted back if title and dod ever need to be exposed by iid_getHeader.
+  risk_indicators.layout_output;
+  dx_header.layout_key_header h;
 	string1 valid_dob := '';	// on the header key but not in layout_outx, so we need to keep it
 	Risk_Indicators.Layouts.Layout_Addr_Flags Addr_Flags;
 	boolean came_from_fastheader;
@@ -53,6 +54,8 @@ END;
 
 Layout_working := RECORD
 	Layout_Header_Data;
+	string5 oldTitle;
+	string5 newTitle;
 	string20 oldFname;
 	string20 newFname;
 	string20 oldMname;
@@ -87,6 +90,8 @@ Layout_working := RECORD
 	string9 newSSN;
 	string8 oldDOB;
 	string8 newDOB;
+	string8 oldDOD;
+	string8 newDOD;
 	string1 oldDwellType;	
 	string1 newDwellType;
 	string1 oldValid;
@@ -336,6 +341,7 @@ real_header := if(DataRestriction[risk_indicators.iid_constants.posEquifaxRestri
 Layout_working combineHeaderCorrections(real_header le, header_corr ri) := transform
 	ssnToUse := IF(le.h.valid_ssn<>'M', le.h.ssn, '');	// if manufactured, then blank out
 	
+  self.h.title := if(trim(ri.head.title)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Title]='1', ri.head.title, le.h.title);
 	self.h.fname := if(trim(ri.head.fname)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Fname]='1', ri.head.fname, le.h.fname);
 	self.h.mname := if(trim(ri.head.mname)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Mname]='1', ri.head.mname, le.h.mname);
 	self.h.lname := if(trim(ri.head.lname)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Lname]='1', ri.head.lname, le.h.lname);
@@ -353,9 +359,14 @@ Layout_working combineHeaderCorrections(real_header le, header_corr ri) := trans
 	self.h.zip4 := if(trim(ri.head.zip4)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Zip4]='1', ri.head.zip4, le.h.zip4);
 	self.h.ssn := if(trim(ri.head.ssn)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.SSN]='1', ri.head.ssn, ssnToUse);
 	self.h.dob := if(ri.head.dob<>0  or ri.blankout[Risk_Indicators.iid_constants.suppress.DOB]='1', ri.head.dob, le.h.dob);
+	self.h.dod := if(ri.head.dod<>0  or ri.blankout[Risk_Indicators.iid_constants.suppress.DOD]='1', ri.head.dod, le.h.dod);
 
 	
 	// check to see what was changed to what and if changed, then populate the fields for the next project
+  titleCorrected := trim(ri.head.title)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Title]='1';	// correction field will only be populated if a correction was done
+	self.oldTitle := if(titleCorrected, le.h.title, '');			// only populate the old if there is a new
+	self.newTitle := if(titleCorrected, ri.head.title, '');	// only populate the old if there is a new
+
 	fnameCorrected := trim(ri.head.fname)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Fname]='1';	// correction field will only be populated if a correction was done
 	self.oldFname := if(fnameCorrected, le.h.fname, '');			// only populate the old if there is a new
 	self.newFname := if(fnameCorrected, ri.head.fname, '');	// only populate the old if there is a new
@@ -454,6 +465,10 @@ Layout_working combineHeaderCorrections(real_header le, header_corr ri) := trans
 	self.oldDOB := if(dobCorrected, (string)le.h.dob, '');			// only populate the old if there is a new
 	self.newDOB := if(dobCorrected, (string)ri.head.dob, '');	// only populate the old if there is a new
 
+  dodCorrected := ri.head.dod<>0  or ri.blankout[Risk_Indicators.iid_constants.suppress.DOD]='1';	// correction field will only be populated if a correction was done
+	self.oldDOD := if(dodCorrected, (string)le.h.dod, '');			// only populate the old if there is a new
+	self.newDOD := if(dodCorrected, (string)ri.head.dod, '');	// only populate the old if there is a new
+
 	// set the flags - only if there is a correction, so that if it is populated, we know that it should be overwritten later
 	self.addr_flags.dwelltype := if(trim(ri.addr_flags.dwelltype)<>'' or ri.blankout[Risk_Indicators.iid_constants.suppress.DwellType]='1', ri.addr_flags.dwelltype, '');
 	self.addr_flags.valid := if(trim(ri.addr_flags.valid)<>'' or ri.blankout[Risk_Indicators.iid_constants.suppress.Valid]='1', ri.addr_flags.valid, '');
@@ -526,6 +541,7 @@ unCorrOnly := corrPlusHeader(~isCorrected);
 
 
 Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
+	self.h.title := if((trim(ri.oldTitle)<>'' or trim(ri.newTitle)<>'') and ri.oldTitle=le.h.title, ri.newTitle, le.h.title);
 	self.h.fname := if((trim(ri.oldFname)<>'' or trim(ri.newFname)<>'') and ri.oldFname=le.h.fname, ri.newFname, le.h.fname);
 	self.h.mname := if((trim(ri.oldMname)<>'' or trim(ri.newMname)<>'') and ri.oldMname=le.h.mname, ri.newMname, le.h.mname);
 	self.h.lname := if((trim(ri.oldLname)<>'' or trim(ri.newLname)<>'') and ri.oldLname=le.h.lname, ri.newLname, le.h.lname);
@@ -550,6 +566,7 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
 		
 	self.h.ssn := if((trim(ri.oldSSN)<>'' or trim(ri.newDOB)<>'') and ri.oldSSN=le.ssn, ri.newSSN, le.h.ssn);
 	self.h.dob := if((trim(ri.oldDOB)<>'' or trim(ri.newDOB)<>'') and ri.oldDOB=(string)le.h.dob, (unsigned)ri.newDOB, le.h.dob);
+	self.h.dod := if((trim(ri.oldDOD)<>'' or trim(ri.newDOD)<>'') and ri.oldDOD=(string)le.h.dod, (unsigned)ri.newDOD, le.h.dod);
 	
 	self.addr_flags.dwellType := if((trim(ri.oldDwellType)<>'' or trim(ri.newDwellType)<>'') and sameAddr, ri.newDwellType, le.addr_flags.dwellType);
 	self.addr_flags.valid := if((trim(ri.oldValid)<>'' or trim(ri.newValid)<>'') and sameAddr, ri.newValid, le.addr_flags.Valid);
@@ -621,12 +638,14 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
 end;
 finalCorr := join(unCorrOnly, CorrOnly, 
 									left.seq=right.seq and left.h.did=right.h.did and 
-									((trim(right.oldFname)<>'' or trim(right.newFname)<>'') and right.oldFname=left.h.fname OR	
+									((trim(right.oldTitle)<>'' or trim(right.newTitle)<>'') and right.oldTitle=left.h.title OR	
+									(trim(right.oldFname)<>'' or trim(right.newFname)<>'') and right.oldFname=left.h.fname  OR
 									(trim(right.oldMname)<>'' or trim(right.newMname)<>'') and right.oldMname=left.h.mname  OR
 									(trim(right.oldLname)<>'' or trim(right.newLname)<>'') and right.oldLname=left.h.lname OR
 									(trim(right.oldNameSuffix)<>'' or trim(right.newNameSuffix)<>'') and right.oldNameSuffix=left.h.name_suffix  OR
 									(trim(right.oldSSN)<>'' or trim(right.newSSN)<>'') and right.oldSSN=left.h.ssn OR
 									(trim(right.oldDOB)<>'' or trim(right.newDOB)<>'') and right.oldDOB=(string)left.h.dob OR
+									(trim(right.oldDOD)<>'' or trim(right.newDOD)<>'') and right.oldDOD=(string)left.h.dod OR
 									// same address and an address field is different
 									address.Addr1FromComponents(right.oldPrimRange,right.oldPredir,right.oldPrimName,right.oldSuffix,right.oldPostDir,right.oldUnitDesig,right.oldSecRange) = 
 									address.Addr1FromComponents(left.h.Prim_Range,left.h.PreDir,left.h.Prim_Name,left.h.Suffix,left.h.PostDir,left.h.Unit_Desig,left.h.Sec_Range) OR
@@ -650,6 +669,11 @@ finalCorr := join(unCorrOnly, CorrOnly,
 // doing the above join results in too many records per rid (potentially), we need to rollup by rid and figure out which field to keep from the multiple choices
 layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
 	
+	self.h.title := map(trim(le.h.title)=trim(ri.h.title) => le.h.title,	// same on both, keep left
+										(trim(le.oldTitle)<>'' or trim(le.newTitle)<>'') and trim(le.newTitle)=trim(le.h.title) => le.h.title,	// correction on this rid and left matches new, so keep left
+										(trim(le.oldTitle)<>'' or trim(le.newTitle)<>'') => ri.h.title, // correction on this rid and left doesnt match new, so keep right
+										(trim(ri.oldTitle)<>'' or trim(ri.newTitle)<>'') => ri.h.title,	// correction on this rid and right had the correction, so keep right?
+										le.h.title);	// default to keep left
 	self.h.fname := map(trim(le.h.fname)=trim(ri.h.fname) => le.h.fname,	// same on both, keep left
 										(trim(le.oldFname)<>'' or trim(le.newFname)<>'') and trim(le.newFname)=trim(le.h.fname) => le.h.fname,	// correction on this rid and left matches new, so keep left
 										(trim(le.oldFname)<>'' or trim(le.newFname)<>'') => ri.h.fname, // correction on this rid and left doesnt match new, so keep right
@@ -738,7 +762,12 @@ layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
 									(trim(le.olddob)<>'' or trim(le.newdob)<>'') => ri.h.dob, // correction on this rid and left doesnt match new, so keep right
 									(trim(ri.oldDOB)<>'' or trim(ri.newDOB)<>'') => ri.h.dob,	// correction on this rid and right had the correction, so keep right?
 									le.h.dob);	// default to keep left
-									
+	self.h.dod := map((le.h.dod)=(ri.h.dod) => le.h.dod,	// same on both, keep left
+									(trim(le.oldDOD)<>'' or trim(le.newDOD)<>'') and trim(le.newDOD)=(string)le.h.dod => le.h.dod,	// correction on this rid and left matches new, so keep left
+									(trim(le.oldDOD)<>'' or trim(le.newDOD)<>'') => ri.h.dod, // correction on this rid and left doesnt match new, so keep right
+									(trim(ri.oldDOD)<>'' or trim(ri.newDOD)<>'') => ri.h.dod,	// correction on this rid and right had the correction, so keep right?
+									le.h.dod);	// default to keep left
+
 	self.addr_flags.dwellType := map(	(le.addr_flags.dwellType)=(ri.addr_flags.dwellType) => le.addr_flags.dwellType,	// same on both, keep left
 																		(trim(le.oldDwellType)<>'' or trim(le.newDwellType)<>'') and trim(le.newDwellType)=(string)le.addr_flags.dwellType => le.addr_flags.dwellType,	// correction on this rid and left matches new, so keep left
 																		(trim(le.oldDwellType)<>'' or trim(le.newDwellType)<>'') => ri.addr_flags.dwellType, // correction on this rid and left doesnt match new, so keep right
@@ -788,8 +817,8 @@ layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
 	self := le;	// keep the remaining left fields
 end;
  
-finalCorr2 := rollup (sort(finalCorr(isCorrected),	seq, h.persistent_record_id,-h.Fname,-h.Mname,-h.Lname,-h.Name_Suffix,-h.Prim_Range,-h.Predir,-h.Prim_Name,-h.Suffix,-h.Postdir,-h.Unit_Desig,-h.Sec_Range,-h.City_Name,
-																			-h.St,-h.Zip,-h.Zip4,-h.SSN,-h.DOB,
+finalCorr2 := rollup (sort(finalCorr(isCorrected),	seq, h.persistent_record_id,-h.Title,-h.Fname,-h.Mname,-h.Lname,-h.Name_Suffix,-h.Prim_Range,-h.Predir,-h.Prim_Name,-h.Suffix,-h.Postdir,-h.Unit_Desig,-h.Sec_Range,-h.City_Name,
+																			-h.St,-h.Zip,-h.Zip4,-h.SSN,-h.DOB,-h.DOD,
 																			-addr_flags.DwellType,-addr_flags.Valid,-addr_flags.PrisonAddr,-addr_flags.HighRisk,-addr_flags.CorpMil,-addr_flags.DoNotDeliver,
 																			-addr_flags.DeliveryStatus,-addr_flags.AddressType,-addr_flags.DropIndicator,came_from_fastheader, h.RID), left.h.persistent_record_id=right.h.persistent_record_id and left.seq=right.seq, getCorrectCorrections(left,right));
 
