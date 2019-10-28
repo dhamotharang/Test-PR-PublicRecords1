@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Vehicle,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL11.Null;
 EXPORT B_Vehicle(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Vehicle(__in,__cfg).__Result) __E_Vehicle := E_Vehicle(__in,__cfg).__Result;
-  SHARED __EE1423903 := __E_Vehicle;
-  EXPORT __ST60491_Layout := RECORD
+  SHARED __EE1698608 := __E_Vehicle;
+  EXPORT __ST65174_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Vehicle_Key_;
     KEL.typ.nstr State_Of_Origin_;
@@ -120,9 +120,9 @@ EXPORT B_Vehicle(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST60491_Layout __ND1424137__Project(E_Vehicle(__in,__cfg).Layout __PP1423334) := TRANSFORM
+  SHARED __ST65174_Layout __ND1698842__Project(E_Vehicle(__in,__cfg).Layout __PP1698039) := TRANSFORM
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('vehicle_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP1423334;
+    SELF := __PP1698039;
   END;
-  EXPORT __ENH_Vehicle := PROJECT(__EE1423903,__ND1424137__Project(LEFT));
+  EXPORT __ENH_Vehicle := PROJECT(__EE1698608,__ND1698842__Project(LEFT));
 END;

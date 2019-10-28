@@ -1,9 +1,10 @@
-﻿IMPORT ADVO, AutoKey, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Corp2, 
+﻿IMPORT ADVO, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Corp2, 
 		Cortera, Cortera_Tradeline, Data_Services, DCAV2, DMA, Doxie, Doxie_Files, DriversV2, DX_Email, 
 		dx_Equifax_Business_Data, dx_Header, dx_Infutor_NARB, EBR, Email_Data, FAA, FBNv2, Fraudpoint3, Gong, 
-		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, MDR, OSHAIR, Phonesplus_v2, Prof_License_Mari, 
+		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, Prof_License_Mari, 
 		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, SAM, STD, Suppress, Targus, USPIS_HotList, UtilFile, 
-		VehicleV2, Watercraft, UCCV2, YellowPages , dx_header;
+		VehicleV2, Watercraft, UCCV2, YellowPages , dx_header,
+		American_student_list,AlloyMedia_student_list;
 		
 /*
 		[4:08 PM] Nicla, Laura (RIS-MIN)
@@ -85,6 +86,9 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 	
 	DPPARegulatedWaterCraftRecord(STRING dppa_flag) := IF(TRIM(dppa_flag, LEFT, RIGHT) = 'Y', TRUE, FALSE);	
 
+	// Property Source 
+	LN_PropertyV2_Src(STRING ln_fares_id) := MDR.sourceTools.fProperty(ln_fares_id);
+	
 	// Data cleaning functions needed to get raw data ready for KEL
 	Doxie_Files__Key_Offenders_Src(STRING data_type) := CASE(data_type,
 				'1' => 'DC',
@@ -993,6 +997,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
 					SELF.Src := RIGHT.Source_Code,
+					SELF.dl_number := IF(STD.Str.FilterOut(RIGHT.dl_number, '1') = '', '', RIGHT.dl_number); // Filter any repeating 1's to be blank, bad data
 					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.Source_Code, FCRA_Restricted := FALSE, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := RIGHT.st, KELPermissions := CFG_File),
 					SELF := RIGHT, 
 					SELF := LEFT,
@@ -1017,6 +1022,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
 					SELF.Src := RIGHT.Source_Code,
+					SELF.dl_number := IF(STD.Str.FilterOut(RIGHT.dl_number, '1') = '', '', RIGHT.dl_number); // Filter any repeating 1's to be blank, bad data
 					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.Source_Code, FCRA_Restricted := FALSE, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := RIGHT.st, KELPermissions := CFG_File),
 					SELF := RIGHT, 
 					SELF := LEFT,
@@ -1061,167 +1067,6 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF := LEFT,
 					SELF := []));	
 
-	Key_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered := // "Filtered" = FCRA
-			JOIN(Input_FDC, Risk_Indicators.Key_FCRA_ADL_Risk_Table_v4_Filtered, 
-				Common.DoFDCJoin_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered = TRUE AND
-				LEFT.P_LexID > 0 AND
-				KEYED(LEFT.P_LexID = RIGHT.did),
-				TRANSFORM(Layouts_FDC.Layout_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered,
-					SELF.UIDAppend := LEFT.UIDAppend,
-					SELF.G_ProcUID := LEFT.G_ProcUID,
-					SELF.P_LexID := LEFT.P_LexID,
-					SELF := RIGHT, 
-					SELF := LEFT,
-					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
-
-	Key_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Combo := 
-			PROJECT( 
-				Key_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered,
-				TRANSFORM( Layouts_FDC.Layout_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Expanded,
-					_src := MDR.sourceTools.src_Experian_Credit_Header + ',' + MDR.sourceTools.src_TU_CreditHeader + ',' + MDR.sourceTools.src_Equifax;
-					SELF.Src := _src,
-					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := TRUE, GLBA_Restricted := Regulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					SELF := LEFT.combo,
-					SELF := LEFT
-				));
-
-	Key_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Experian := 
-			PROJECT( 
-				Key_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered,
-				TRANSFORM( Layouts_FDC.Layout_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Expanded,
-					_src := MDR.sourceTools.src_Experian_Credit_Header;
-					SELF.Src := _src,
-					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := TRUE, GLBA_Restricted := Regulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					SELF := LEFT.en,
-					SELF := LEFT
-				));
-
-	Key_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Equifax := 
-			PROJECT( 
-				Key_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered,
-				TRANSFORM( Layouts_FDC.Layout_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Expanded,
-					_src := MDR.sourceTools.src_Equifax;
-					SELF.Src := _src,
-					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := TRUE, GLBA_Restricted := Regulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					SELF := LEFT.eq,
-					SELF := LEFT
-				));
-
-	With_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Combo := 
-		DENORMALIZE(With_Doxie__Header_Address_Records, Key_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Combo,
-			LEFT.UIDAppend = RIGHT.UIDAppend AND LEFT.P_LexID = RIGHT.P_LexID, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Combo := ROWS(RIGHT),
-					SELF := LEFT,
-					SELF := []));	
-
-	With_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Experian := 
-		DENORMALIZE(With_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Combo, Key_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Experian,
-			LEFT.UIDAppend = RIGHT.UIDAppend AND LEFT.P_LexID = RIGHT.P_LexID, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Experian := ROWS(RIGHT),
-					SELF := LEFT,
-					SELF := []));	
-
-	With_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Equifax := 
-		DENORMALIZE(With_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Experian, Key_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Equifax,
-			LEFT.UIDAppend = RIGHT.UIDAppend AND LEFT.P_LexID = RIGHT.P_LexID, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Equifax := ROWS(RIGHT),
-					SELF := LEFT,
-					SELF := []));	
-					
-	Key_Risk_Indicators__ADL_Risk_Table_v4 := // not "Filtered" = NonFCRA
-			JOIN(Input_FDC, Risk_Indicators.Key_ADL_Risk_Table_v4, 
-				Common.DoFDCJoin_Risk_Indicators__Key_ADL_Risk_Table_v4 = TRUE AND
-				LEFT.P_LexID > 0 AND
-				KEYED(LEFT.P_LexID = RIGHT.did),
-				TRANSFORM(Layouts_FDC.Layout_Risk_Indicators__Key_ADL_Risk_Table_v4,
-					SELF.UIDAppend := LEFT.UIDAppend,
-					SELF.G_ProcUID := LEFT.G_ProcUID,
-					SELF.P_LexID := LEFT.P_LexID,
-					SELF := RIGHT, 
-					SELF := LEFT,
-					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
-
-	Key_Risk_Indicators__ADL_Risk_Table_v4_Combo := 
-			PROJECT( 
-				Key_Risk_Indicators__ADL_Risk_Table_v4,
-				TRANSFORM( Layouts_FDC.Layout_Risk_Indicators__Key_ADL_Risk_Table_v4_Expanded,
-					_src := MDR.sourceTools.src_Experian_Credit_Header + ',' + MDR.sourceTools.src_TU_CreditHeader + ',' + MDR.sourceTools.src_Equifax;
-					SELF.Src := _src,
-					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := FALSE, GLBA_Restricted := Regulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					SELF := LEFT.combo,
-					SELF := LEFT
-				));
-
-	Key_Risk_Indicators__ADL_Risk_Table_v4_Experian := 
-			PROJECT( 
-				Key_Risk_Indicators__ADL_Risk_Table_v4,
-				TRANSFORM( Layouts_FDC.Layout_Risk_Indicators__Key_ADL_Risk_Table_v4_Expanded,
-					_src := MDR.sourceTools.src_Experian_Credit_Header;
-					SELF.Src := _src,
-					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := FALSE, GLBA_Restricted := Regulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					SELF := LEFT.en,
-					SELF := LEFT
-				));
-
-	Key_Risk_Indicators__ADL_Risk_Table_v4_Equifax := 
-			PROJECT( 
-				Key_Risk_Indicators__ADL_Risk_Table_v4,
-				TRANSFORM( Layouts_FDC.Layout_Risk_Indicators__Key_ADL_Risk_Table_v4_Expanded,
-					_src := MDR.sourceTools.src_Equifax;
-					SELF.Src := _src,
-					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := FALSE, GLBA_Restricted := Regulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					SELF := LEFT.eq,
-					SELF := LEFT
-				));
-
-	Key_Risk_Indicators__ADL_Risk_Table_v4_TransUnion := 
-			PROJECT( 
-				Key_Risk_Indicators__ADL_Risk_Table_v4,
-				TRANSFORM( Layouts_FDC.Layout_Risk_Indicators__Key_ADL_Risk_Table_v4_Expanded,
-					_src := MDR.sourceTools.src_TU_CreditHeader;
-					SELF.Src := _src,
-					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := FALSE, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					SELF := LEFT.tn,
-					SELF := LEFT
-				));
-
-	With_Risk_Indicators__ADL_Risk_Table_v4_Combo := 
-		DENORMALIZE(With_Risk_Indicators__FCRA_ADL_Risk_Table_v4_Filtered_Equifax, Key_Risk_Indicators__ADL_Risk_Table_v4_Combo,
-			LEFT.UIDAppend = RIGHT.UIDAppend AND LEFT.P_LexID = RIGHT.P_LexID, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_Risk_Indicators__Key_ADL_Risk_Table_v4_Combo := ROWS(RIGHT),
-					SELF := LEFT,
-					SELF := []));	
-
-	With_Risk_Indicators__ADL_Risk_Table_v4_Experian := 
-		DENORMALIZE(With_Risk_Indicators__ADL_Risk_Table_v4_Combo, Key_Risk_Indicators__ADL_Risk_Table_v4_Experian,
-			LEFT.UIDAppend = RIGHT.UIDAppend AND LEFT.P_LexID = RIGHT.P_LexID, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_Risk_Indicators__Key_ADL_Risk_Table_v4_Experian := ROWS(RIGHT),
-					SELF := LEFT,
-					SELF := []));	
-
-	With_Risk_Indicators__ADL_Risk_Table_v4_Equifax := 
-		DENORMALIZE(With_Risk_Indicators__ADL_Risk_Table_v4_Experian, Key_Risk_Indicators__ADL_Risk_Table_v4_Equifax,
-			LEFT.UIDAppend = RIGHT.UIDAppend AND LEFT.P_LexID = RIGHT.P_LexID, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_Risk_Indicators__Key_ADL_Risk_Table_v4_Equifax := ROWS(RIGHT),
-					SELF := LEFT,
-					SELF := []));	
-
-	With_Risk_Indicators__ADL_Risk_Table_v4_TransUnion := 
-		DENORMALIZE(With_Risk_Indicators__ADL_Risk_Table_v4_Equifax, Key_Risk_Indicators__ADL_Risk_Table_v4_TransUnion,
-			LEFT.UIDAppend = RIGHT.UIDAppend AND LEFT.P_LexID = RIGHT.P_LexID, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_Risk_Indicators__Key_ADL_Risk_Table_v4_TransUnion := ROWS(RIGHT),
-					SELF := LEFT,
-					SELF := []));	
-
 // Person - Relatives					
 	Key_Relatives__Key_Relatives_V3 := 
 			JOIN(Input_FDC, Relationship.key_relatives_v3, 
@@ -1237,7 +1082,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
 																						
 	With_Key_Relatives_V3_Records := 
-		DENORMALIZE(With_Risk_Indicators__ADL_Risk_Table_v4_TransUnion, Key_Relatives__Key_Relatives_V3,
+		DENORMALIZE(With_Doxie__Header_Address_Records, Key_Relatives__Key_Relatives_V3,
 			LEFT.UIDAppend = RIGHT.UIDAppend AND LEFT.P_LexID = RIGHT.P_LexID, GROUP,
 			TRANSFORM(Layouts_FDC.Layout_FDC,
 					SELF.Dataset_Relatives__Key_Relatives_V3 := ROWS(RIGHT),
@@ -1246,8 +1091,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 
 	// ----------[ Phone ]----------
 
-	// Gong__Key_History_DID := IF( Options.isFCRA, Gong.Key_History_DID, Gong.Key_FCRA_History_DID );
-	Gong__Key_History_DID := IF( Options.isFCRA, Gong.Key_FCRA_History_DID, Gong.Key_History_DID );
+	Gong__Key_History_DID := IF( Options.isFCRA,  Gong.Key_FCRA_History_DID, Gong.Key_History_DID );
 	Gong__Key_History_DID_Records_Unsuppressed := 
 		JOIN( Input_FDC, Gong__Key_History_DID, 
 			Common.DoFDCJoin_Gong__Key_History_DID AND
@@ -1277,7 +1121,6 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF := []));		
 
 
-	// Gong__Key_History_Address := IF( Options.isFCRA, Gong.Key_History_Address, Gong.Key_FCRA_History_Address );
 	Gong__Key_History_Address := IF( Options.isFCRA, Gong.Key_FCRA_History_Address, Gong.Key_History_Address );
 	Gong__Key_History_Address_Records_Unsuppressed := 
 		JOIN( Input_Address_All, Gong__Key_History_Address, 
@@ -1314,7 +1157,6 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF := []));		
 
 
-	// Gong__Key_History_Phone := IF( Options.isFCRA, Gong.Key_History_Phone, Gong.Key_FCRA_History_Phone );
 	Gong__Key_History_Phone := IF( Options.isFCRA, Gong.Key_FCRA_History_Phone, Gong.Key_History_Phone );
 	Gong__Key_History_Phone_Records_Unsuppressed := 
 		JOIN( Input_Phone_All, Gong__Key_History_Phone, 
@@ -1347,46 +1189,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF := LEFT,
 					SELF := []));		
 
-
-	// Targus__Key_History_Address := IF( Options.isFCRA, Targus.Key_Targus_Address, Targus.Key_Targus_FCRA_Address );
-	Targus__Key_History_Address := IF( Options.isFCRA, Targus.Key_Targus_FCRA_Address, Targus.Key_Targus_Address );
-	Targus__Key_History_Address_Records_Unsuppressed := 
-		JOIN( Input_Address_All, Targus__Key_History_Address, 
-			Common.DoFDCJoin_Targus__Key_Targus_Address AND
-			LEFT.PrimaryRange != '' AND LEFT.PrimaryName != '' AND LEFT.ZIP5 != '' AND 
-			KEYED(
-				LEFT.PrimaryName = RIGHT.prim_name AND 
-				LEFT.ZIP5 = RIGHT.zip AND 
-				LEFT.PrimaryRange = RIGHT.prim_range AND 
-				LEFT.SecondaryRange = RIGHT.sec_range AND
-				LEFT.Predirectional = RIGHT.predir AND
-				LEFT.AddrSuffix = RIGHT.suffix
-			),
-			TRANSFORM(Layouts_FDC.Layout_Targus__Key_Targus_Address,
-				SELF.UIDAppend := LEFT.UIDAppend,
-				SELF.G_ProcUID := LEFT.G_ProcUID,
-				SELF.P_LexID := LEFT.P_LexID,
-				SELF.Src := MDR.sourceTools.src_Targus_White_pages,
-				SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Targus_White_pages, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-				SELF := RIGHT, 
-				SELF := LEFT,
-				SELF := []), 
-			ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
-
-	Targus__Key_History_Address_Records := 
-		Suppress.MAC_SuppressSource(Targus__Key_History_Address_Records_Unsuppressed, mod_access, did_field := did, data_env := Environment);
-					
-	With_Targus_History_Address_Records := 
-		DENORMALIZE(With_Gong_History_Phone_Records, Targus__Key_History_Address_Records,
-			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_Targus__Key_Address := ROWS(RIGHT),
-					SELF := LEFT,
-					SELF := []));		
-
-
-	// Targus__Key_History_Phone := IF( Options.isFCRA, Targus.Key_Targus_Phone, Targus.Key_Targus_FCRA_Phone );
-	Targus__Key_History_Phone := IF( Options.isFCRA, Targus.Key_Targus_FCRA_Phone, Targus.Key_Targus_Phone );
+	Targus__Key_History_Phone :=  IF( Options.isFCRA, Targus.Key_Targus_FCRA_Phone, Targus.Key_Targus_Phone );
 	Targus__Key_History_Phone_Records_Unsuppressed := 
 		JOIN( Input_Phone_All, Targus__Key_History_Phone, 
 			Common.DoFDCJoin_Targus__Key_Targus_Phone AND
@@ -1410,7 +1213,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 		Suppress.MAC_SuppressSource(Targus__Key_History_Phone_Records_Unsuppressed, mod_access, did_field := did, data_env := Environment);
 					
 	With_Targus_History_Phone_Records := 
-		DENORMALIZE(With_Targus_History_Address_Records, Targus__Key_History_Phone_Records,
+		DENORMALIZE(With_Gong_History_Phone_Records, Targus__Key_History_Phone_Records,
 			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
 			TRANSFORM(Layouts_FDC.Layout_FDC,
 					SELF.Dataset_Targus__Key_Phone := ROWS(RIGHT),
@@ -1418,8 +1221,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF := []));		
 
 
-	// InfutorCID__Key_Phone := IF( Options.isFCRA, InfutorCID.Key_Infutor_Phone, InfutorCID.Key_Infutor_Phone_FCRA );
-	InfutorCID__Key_Phone := IF( Options.isFCRA, InfutorCID.Key_Infutor_Phone_FCRA, InfutorCID.Key_Infutor_Phone );
+	InfutorCID__Key_Phone := IF( Options.isFCRA,  InfutorCID.Key_Infutor_Phone_FCRA ,InfutorCID.Key_Infutor_Phone);
 	InfutorCID__Key_Phone_Records_Unsuppressed := 
 		JOIN( Input_Phone_All, InfutorCID__Key_Phone, 
 			Common.DoFDCJoin_InfutorCID__Key_Infutor_Phone AND
@@ -1469,35 +1271,6 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF.Dataset_Phone__PhonesPlus_v2_Keys_Scoring_Phone := ROWS(RIGHT),
 					SELF := LEFT,
 					SELF := []));	
-
-/* Phone Records - By Address*/			
-
-	Key_PhonesPlus_v2__Keys_ScoringAddress := 
-			JOIN(Input_Address_All, Phonesplus_v2.Keys_Scoring().address.qa, 
-				Common.DoFDCJoin_PhonePlus_V2__ScoringAddress = TRUE AND
-				LEFT.PrimaryRange != '' AND LEFT.PrimaryName != '' AND LEFT.ZIP5 != '' AND 
-				KEYED(LEFT.PrimaryName = RIGHT.prim_name AND
-					LEFT.ZIP5 = RIGHT.zip5 AND
-					LEFT.PrimaryRange = RIGHT.prim_range AND
-					LEFT.SecondaryRange = RIGHT.sec_range AND
-					LEFT.Predirectional = RIGHT.predir AND
-					LEFT.AddrSuffix = RIGHT.addr_suffix),
-				TRANSFORM(Layouts_FDC.Layout_Phone__PhonesPlus_v2_Keys_Scoring_Address,
-					SELF.UIDAppend := LEFT.UIDAppend,
-					SELF.G_ProcUID := LEFT.G_ProcUID,
-					SELF.Src := MDR.sourceTools.src_Phones_Plus,
-					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Phones_Plus, FCRA_Restricted := FALSE, GLBA_Restricted := GLBARegulatedPhonesPlusRecord(RIGHT.glb_dppa_flag), Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := RIGHT.state, KELPermissions := CFG_File),
-					SELF := RIGHT, 
-					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
-
-	With_PhonePlus_V2_ScoringAddress_Records := 
-		DENORMALIZE(With_PhonePlus_V2_ScoringPhone_Records, Key_PhonesPlus_v2__Keys_ScoringAddress,
-			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_Phone__PhonesPlus_v2_Keys_Scoring_Address := ROWS(RIGHT),
-					SELF := LEFT,
-					SELF := []));	
 					
 /* I Verification Records - By Phone*/			
 
@@ -1516,7 +1289,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
 
 	With_Key_Iverfication_phone_Records := 
-		DENORMALIZE(With_PhonePlus_V2_ScoringAddress_Records, Key_Iverification__Keys_Iverification_Phone, 
+		DENORMALIZE(With_PhonePlus_V2_ScoringPhone_Records, Key_Iverification__Keys_Iverification_Phone, 
 					LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,	
 					TRANSFORM(Layouts_FDC.Layout_FDC,
 					SELF.Dataset_Key_Iverification__Keys_Iverification_Phone := ROWS(RIGHT),
@@ -1611,6 +1384,56 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF := LEFT,
 					SELF := []));
 					
+					/*----------------------------------EDUCATION------------------------------------*/
+										
+	American_student_list__key_DID := IF( Options.isFCRA,  American_student_list.key_DID_FCRA, American_student_list.key_DID );
+	Key_American_student_list__key_DID_Records_unsupressed :=
+			JOIN(Input_FDC,American_student_list__key_DID,
+			Common.DoFDCJoin_American_student_list__key_DID = True AND
+			LEFT.P_LexID > 0 AND
+				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.L_did),
+				TRANSFORM(Layouts_FDC.Layout_American_student_list__key_DID,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.source, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :='', KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := LEFT,
+					SELF := []),
+					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
+
+	American_student_list__key_DID_Records := Suppress.MAC_SuppressSource(Key_American_student_list__key_DID_Records_unsupressed, mod_access, did_field := L_did, data_env := Environment);
+	With_American_student_list__key_DID := DENORMALIZE(With_PhonesPlus_v2__Key_PhonePlus_Fdid_Records, American_student_list__key_DID_Records,
+				LEFT.UIDAppend = RIGHT.UIDAppend AND LEFT.P_LexID = RIGHT.P_LexID, GROUP,
+				TRANSFORM(Layouts_FDC.Layout_FDC,
+						SELF.Dataset_American_student_list__key_DID := ROWS(RIGHT),
+						SELF := LEFT,
+						SELF := []));
+	AlloyMedia_student_list__key_DID := IF( Options.isFCRA,  AlloyMedia_student_list.key_DID_FCRA, AlloyMedia_student_list.key_DID );
+	Key_AlloyMedia_student_list__key_DID_Records_unsupressed :=
+			JOIN(Input_FDC,AlloyMedia_student_list__key_DID,
+			Common.DoFDCJoin_AlloyMedia_student_list__key_DID =True AND
+			LEFT.P_LexID > 0 AND
+				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.did),
+				TRANSFORM(Layouts_FDC.Layout_AlloyMedia_student_list__key_DID,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.source, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :='', KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := LEFT,
+					SELF := []),
+					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
+
+	AlloyMedia_student_list__key_DID_Records := Suppress.MAC_SuppressSource(Key_AlloyMedia_student_list__key_DID_Records_unsupressed, mod_access, did_field := did, data_env := Environment);
+	
+	With_AlloyMedia_student_list__key_DID := DENORMALIZE(With_American_student_list__key_DID, AlloyMedia_student_list__key_DID_Records,
+				LEFT.UIDAppend = RIGHT.UIDAppend AND LEFT.P_LexID = RIGHT.P_LexID, GROUP,
+				TRANSFORM(Layouts_FDC.Layout_FDC,
+						SELF.Dataset_AlloyMedia_student_list__key_DID := ROWS(RIGHT),
+						SELF := LEFT,
+						SELF := []));									
+					
 	/* **************************************************************************
 			
 	                             BUSINESS SECTION
@@ -1631,7 +1454,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 																									
 	Business_Header_Key_Linking := Suppress.MAC_SuppressSource(Business_Header_Key_Linking_unsuppressed, mod_access, did_field := contact_did, data_env := Environment);		
 	
-	With_Business_Header_Key_Linking := DENORMALIZE(With_PhonesPlus_v2__Key_PhonePlus_Fdid_Records, Business_Header_Key_Linking,	
+	With_Business_Header_Key_Linking := DENORMALIZE(With_AlloyMedia_student_list__key_DID, Business_Header_Key_Linking,	
 			LEFT.G_ProcBusUID = RIGHT.UniqueID AND 
 			LEFT.B_LexIDUlt = RIGHT.ULTID AND 
 			LEFT.B_LexIDOrg = RIGHT.ORGID AND 
@@ -1639,6 +1462,21 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 			TRANSFORM(Layouts_FDC.Layout_FDC,
 					SELF.Dataset_BIPV2__Key_BH_Linking_kfetch2 := project(ROWS(RIGHT),transform(Layouts_FDC.Layout_BIPV2__Key_BH_Linking_kfetch2, 
 																											SELF.DPMBitmap := SetDPMBitmap( Source := Left.Source, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := PreGLBRegulatedRecord(Left.Source, 0, Left.dt_first_seen), DPPA_Restricted := NotRegulated, DPPA_State := GetDPPAState(Left.source), KELPermissions := CFG_File),
+																											SELF.sele_gold_boolean := LEFT.sele_gold = 'G';
+																											SELF.is_sele_level_boolean := (BOOLEAN)LEFT.is_sele_level;
+																											SELF.is_org_level_boolean := (BOOLEAN)LEFT.is_org_level;
+																											SELF.is_ult_level_boolean := (BOOLEAN)LEFT.is_ult_level;
+																											SELF.iscorp_boolean := LEFT.iscorp = 'T';
+																											SELF.company_sic_code1 := CleanSIC(LEFT.company_sic_code1);
+																											SELF.company_sic_code2 := CleanSIC(LEFT.company_sic_code2);
+																											SELF.company_sic_code3 := CleanSIC(LEFT.company_sic_code3);
+																											SELF.company_sic_code4 := CleanSIC(LEFT.company_sic_code4);
+																											SELF.company_sic_code5 := CleanSIC(LEFT.company_sic_code5);
+																											SELF.company_naics_code1 := CleanNAIC(LEFT.company_naics_code1);
+																											SELF.company_naics_code2 := CleanNAIC(LEFT.company_naics_code2);
+																											SELF.company_naics_code3 := CleanNAIC(LEFT.company_naics_code3);
+																											SELF.company_naics_code4 := CleanNAIC(LEFT.company_naics_code4);
+																											SELF.company_naics_code5 := CleanNAIC(LEFT.company_naics_code5);																											
 																											self.src := Left.source, //many sources in business header
 																											self := left, 
 																											self := []));
@@ -1685,33 +1523,15 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 			TRANSFORM(Layouts_FDC.Layout_FDC,
 					SELF.Dataset_Corp2__Kfetch_LinkIDs_Corp := project(ROWS(RIGHT),transform(Layouts_FDC.Layout_Corp2__Kfetch_LinkIDs_Corp, 
 																				self.src := MDR.sourceTools.fCorpV2( Left.corp_key, Left.corp_state_origin), 
+																				self.corp_sic_code := CleanSIC(LEFT.corp_sic_code);
+																				self.corp_naic_code := CleanNAIC(LEFT.corp_naic_code);																				
 																				SELF.DPMBitmap := SetDPMBitmap( Source := self.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 																				self := left, 
 																				self := []));
 					SELF := LEFT,
 					SELF := []));
 
-	InfoUSA_Key_LinkIds_DEADCO := IF(Common.DoFDCJoin_InfoUSA__Key_DEADCO_LinkIds = TRUE,
-																	InfoUSA.Key_DEADCO_LinkIds.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC), mod_access,
-																	PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
-																	0, /*ScoreThreshold --> 0 = Give me everything*/
-																	PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT,
-																	BIPV2.IDconstants.JoinTypes.LimitTransformJoin));
 
-	With_InfoUSA_Key_LinkIds_DEADCO := DENORMALIZE(With_Corp2_Key_LinkIds_Corp, InfoUSA_Key_LinkIds_DEADCO,
-			LEFT.G_ProcBusUID = RIGHT.UniqueID AND 
-			LEFT.B_LexIDUlt = RIGHT.ULTID AND 
-			LEFT.B_LexIDOrg = RIGHT.ORGID AND 
-			LEFT.B_LexIDLegal = RIGHT.SELEID, GROUP,
-			TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.Dataset_InfoUSA__Key_DEADCO_LinkIds := project(ROWS(RIGHT),transform(Layouts_FDC.Layout_InfoUSA__Key_DEADCO_LinkIds, 
-									SELF.src := MDR.sourceTools.src_INFOUSA_DEAD_COMPANIES,
-									SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_INFOUSA_DEAD_COMPANIES, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-									SELF := LEFT, 
-									SELF := []));	
-					SELF := LEFT,
-					SELF := []));
-					
 	UtilFile_Kfetch2_LinkIds := IF(Common.DoFDCJoin_UtilFile__Key_LinkIds = TRUE, 
 																							UtilFile.Key_LinkIds.kfetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
 																									PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
@@ -1719,7 +1539,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 																									PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT,
 																									BIPV2.IDconstants.JoinTypes.LimitTransformJoin));						
 
-	With_UtilFile_Key_LinkIds := DENORMALIZE(With_InfoUSA_Key_LinkIds_DEADCO, UtilFile_Kfetch2_LinkIds,
+	With_UtilFile_Key_LinkIds := DENORMALIZE(With_Corp2_Key_LinkIds_Corp, UtilFile_Kfetch2_LinkIds,
 			LEFT.G_ProcBusUID = RIGHT.UniqueID AND 
 			LEFT.B_LexIDUlt = RIGHT.ULTID AND 
 			LEFT.B_LexIDOrg = RIGHT.ORGID AND 
@@ -2064,6 +1884,8 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 			TRANSFORM(Layouts_FDC.Layout_FDC,
 					SELF.Dataset_Cortera__kfetch_LinkID := project(ROWS(RIGHT),transform(Layouts_FDC.Layout_Cortera__kfetch_LinkID, 
 																		self.src := MDR.sourceTools.src_Cortera, 
+																		SELF.primary_sic := CleanSIC(LEFT.primary_sic);
+																		SELF.primary_naics := CleanNAIC(LEFT.primary_naics);																		
 																		SELF.DPMBitmap := SetDPMBitmap( Source := self.src, FCRA_Restricted := FALSE, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),																				
 																		self := left, 
 																		self := []));
@@ -2071,7 +1893,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF := []));				
 					
 	DCAV2__kfetch_LinkIds := IF(Common.DoFDCJoin_DCAV2__kfetch_LinkIds = TRUE, 
-																						DCAV2.Key_LinkIds.kfetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC), ,
+																						DCAV2.Key_LinkIds.kfetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),,
 																								PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
 																								0, /*ScoreThreshold --> 0 = Give me everything*/
 																								PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT,
@@ -2432,7 +2254,225 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF := []));
 	
 					
-	RETURN With_Gong_History_LinkID_Records;
+// Property 
+
+
+/* Lookup by did (both FCRA and NonFCRA)*/
+
+	PropertyV2__Key_Property_Did_Records :=	
+			JOIN(Input_FDC, LN_PropertyV2.key_Property_did(Options.isFCRA),
+				Common.DoFDCJoin_PropertyV2__Key_Property_Did = TRUE AND 
+				LEFT.P_LexID > 0 AND
+				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.s_did),
+				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Key_Property_Did_Records,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF := RIGHT, 
+					SELF := LEFT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
+
+/* Lookup by seleid NonFCRA)*/
+	
+	PropertyV2__Key_Property_Linkids_kFetch2_Records := IF(Common.DoFDCJoin_PropertyV2__Key_Linkids_Key = TRUE, 
+																											LN_PropertyV2.Key_LinkIds.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
+																											PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
+																											0, /*ScoreThreshold --> 0 = Give me everything*/
+																											linkingOptions,
+																											PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT,
+																											BIPV2.IDconstants.JoinTypes.LimitTransformJoin));
+	
+/* Lookup by address (both FCRA and NonFCRA)*/
+
+	PropertyV2__Key_Addr_Fid_Records :=	
+			JOIN(Input_Address_All, LN_PropertyV2.key_addr_fid(Options.isFCRA),
+				Common.DoFDCJoin_PropertyV2__Key_Addr_Fid = TRUE AND 
+				KEYED(LEFT.PrimaryName = RIGHT.prim_name AND
+					LEFT.PrimaryRange = RIGHT.prim_range AND
+					LEFT.ZIP5 = RIGHT.zip),
+				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Key_Addr_Fid_Records,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.Predirectional := LEFT.Predirectional, 
+					SELF.PrimaryName  := LEFT.PrimaryName,
+					SELF.AddrSuffix  := LEFT.AddrSuffix,
+					SELF.Postdirectional  := LEFT.Postdirectional,
+					SELF.City  := LEFT.City,
+					SELF.State  := LEFT.State,
+					SELF.ZIP5  := LEFT.ZIP5,
+					SELF.SecondaryRange := LEFT.SecondaryRange,
+					SELF := RIGHT, 
+					SELF := LEFT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
+
+/* transform property lookup records to a common temp layout */	
+  
+	Get_Property_Common_Lookup_Records(inDataset) := FUNCTIONMACRO
+			RETURN PROJECT(inDataset, TRANSFORM(Layouts_FDC.Layout_PropertyV2_Data_Temp, SELF := LEFT;SELF := [];));
+	ENDMACRO;
+	
+	Property_lookup_search_records := Get_Property_Common_Lookup_Records(PropertyV2__Key_Property_Did_Records) + 
+																		Get_Property_Common_Lookup_Records(PropertyV2__Key_Property_Linkids_kFetch2_Records) + 
+																		Get_Property_Common_Lookup_Records(PropertyV2__Key_Addr_Fid_Records);
+
+
+/* Consumer and Business */				
+
+	PropertyV2__Key_Assessor_Fid_Records :=	
+			JOIN(Property_lookup_search_records, LN_PropertyV2.key_assessor_fid(Options.isFCRA),
+				Common.DoFDCJoin_PropertyV2__Key_Assessor_Fid = TRUE AND
+				KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),
+				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Key_Assessor_Fid_Records,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.Predirectional := LEFT.Predirectional, 
+					SELF.PrimaryName  := LEFT.PrimaryName,
+					SELF.AddrSuffix  := LEFT.AddrSuffix,
+					SELF.Postdirectional  := LEFT.Postdirectional,
+					SELF.City  := LEFT.City,
+					SELF.State  := LEFT.State,
+					SELF.ZIP5  := LEFT.ZIP5,
+					SELF.SecondaryRange := LEFT.SecondaryRange,
+					SELF.Src := LN_PropertyV2_Src(LEFT.ln_fares_id),
+					SELF.DPMBitmap := SetDPMBitmap( Source := LN_PropertyV2_Src(LEFT.ln_fares_id), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := []), 
+					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));				
+				
+	With_PropertyV2__Key_Assessor_Fid_Records := DENORMALIZE(With_Gong_History_LinkID_Records, PropertyV2__Key_Assessor_Fid_Records,	
+			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
+			TRANSFORM(Layouts_FDC.Layout_FDC,
+					SELF.Dataset_PropertyV2__Key_Assessor_Fid := ROWS(RIGHT),
+					SELF := LEFT,
+					SELF := []));		
+	
+	PropertyV2__Key_Deed_Fid_Records :=	
+			JOIN(Property_lookup_search_records, LN_PropertyV2.key_deed_fid(Options.isFCRA),
+				Common.DoFDCJoin_PropertyV2__Key_Deed_Fid = TRUE AND
+				KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),
+				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Key_Deed_Fid_Records,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.Predirectional := LEFT.Predirectional, 
+					SELF.PrimaryName  := LEFT.PrimaryName,
+					SELF.AddrSuffix  := LEFT.AddrSuffix,
+					SELF.Postdirectional  := LEFT.Postdirectional,
+					SELF.City  := LEFT.City,
+					SELF.State  := IF(TRIM(RIGHT.State,ALL) != '' , RIGHT.State, LEFT.State),
+					SELF.ZIP5  := LEFT.ZIP5,
+					SELF.SecondaryRange := LEFT.SecondaryRange,
+					SELF.Src := LN_PropertyV2_Src(LEFT.ln_fares_id),
+					SELF.DPMBitmap := SetDPMBitmap( Source := LN_PropertyV2_Src(LEFT.ln_fares_id), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := []), 
+					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));				
+				
+	With_PropertyV2__Key_Deed_Fid_Records := DENORMALIZE(With_PropertyV2__Key_Assessor_Fid_Records, PropertyV2__Key_Deed_Fid_Records,	
+			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
+			TRANSFORM(Layouts_FDC.Layout_FDC,
+					SELF.Dataset_PropertyV2__Key_Deed_Fid_Fid := ROWS(RIGHT),
+					SELF := LEFT,
+					SELF := []));		
+	
+	PropertyV2__Key_Search_Fid_Records :=	
+			JOIN(Property_lookup_search_records, LN_PropertyV2.key_search_fid(Options.isFCRA),
+				Common.DoFDCJoin_PropertyV2__Key_Search_Fid = TRUE AND
+				KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),
+				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Key_Search_Fid_Records,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.G_ProcBusUID := LEFT.G_ProcBusUID, 
+					SELF.B_LexIDUlt := LEFT.B_LexIDUlt, 
+					SELF.B_LexIDOrg := LEFT.B_LexIDOrg, 
+					SELF.B_LexIDLegal := LEFT.B_LexIDLegal,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.Predirectional := LEFT.Predirectional, 
+					SELF.PrimaryName  := LEFT.PrimaryName,
+					SELF.AddrSuffix  := LEFT.AddrSuffix,
+					SELF.Postdirectional  := LEFT.Postdirectional,
+					SELF.City  := LEFT.City,
+					SELF.State  := LEFT.State,
+					SELF.ZIP5  := LEFT.ZIP5,
+					SELF.SecondaryRange := LEFT.SecondaryRange,
+					SELF.Src := LN_PropertyV2_Src(LEFT.ln_fares_id),
+					SELF.DPMBitmap := SetDPMBitmap( Source := LN_PropertyV2_Src(LEFT.ln_fares_id), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := []), 
+					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));				
+				
+	With_PropertyV2__Key_Search_Fid_Records := DENORMALIZE(With_PropertyV2__Key_Deed_Fid_Records, PropertyV2__Key_Search_Fid_Records,	
+			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
+			TRANSFORM(Layouts_FDC.Layout_FDC,
+					SELF.Dataset_PropertyV2__Key_Search_Fid := ROWS(RIGHT),
+					SELF := LEFT,
+					SELF := []));	
+	
+	PropertyV2__Key_Addl_Fares_Deed_Fid_Records :=	
+			JOIN(Property_lookup_search_records, LN_PropertyV2.key_addl_fares_deed_fid,
+				Common.DoFDCJoin_PropertyV2__Key_Addl_Fares_Deed_Fid = TRUE AND
+				KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),
+				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Key_Addl_Fares_Deed_Fid_Records,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.Predirectional := LEFT.Predirectional, 
+					SELF.PrimaryName  := LEFT.PrimaryName,
+					SELF.AddrSuffix  := LEFT.AddrSuffix,
+					SELF.Postdirectional  := LEFT.Postdirectional,
+					SELF.City  := LEFT.City,
+					SELF.State  := LEFT.State,
+					SELF.ZIP5  := LEFT.ZIP5,
+					SELF.SecondaryRange := LEFT.SecondaryRange,
+					SELF.Src := LN_PropertyV2_Src(LEFT.ln_fares_id),
+					SELF.DPMBitmap := SetDPMBitmap( Source := LN_PropertyV2_Src(LEFT.ln_fares_id), FCRA_Restricted := FALSE, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := []), 
+					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));				
+				
+	With_PropertyV2__Key_Addl_Fares_Deed_Fid_Records := DENORMALIZE(With_PropertyV2__Key_Search_Fid_Records, PropertyV2__Key_Addl_Fares_Deed_Fid_Records,	
+			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,
+			TRANSFORM(Layouts_FDC.Layout_FDC,
+					SELF.Dataset_PropertyV2__Key_Addl_Fares_Deed_Fid := ROWS(RIGHT),
+					SELF := LEFT,
+					SELF := []));	
+			
+	AVM_V2__Key_AVM_Address_Records :=	
+			JOIN(Input_Address_All, IF( Options.isFCRA, AVM_V2.Key_AVM_Address_FCRA, AVM_V2.Key_AVM_Address ),
+				Common.DoFDCJoin_AVM_V2__Key_AVM_Address = TRUE AND 
+				KEYED(LEFT.PrimaryName = RIGHT.prim_name AND
+					LEFT.State = RIGHT.st AND
+					LEFT.ZIP5 = RIGHT.zip AND
+					LEFT.PrimaryRange = RIGHT.prim_range AND
+					LEFT.SecondaryRange = RIGHT.sec_range),
+				TRANSFORM(Layouts_FDC.Layout_AVM_V2_Key_AVM_Address_Records,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.Predirectional := LEFT.Predirectional, 
+					SELF.PrimaryName  := LEFT.PrimaryName,
+					SELF.AddrSuffix  := LEFT.AddrSuffix,
+					SELF.Postdirectional  := LEFT.Postdirectional,
+					SELF.City  := LEFT.City,
+					SELF.State  := LEFT.State,
+					SELF.ZIP5  := LEFT.ZIP5,
+					SELF.SecondaryRange := LEFT.SecondaryRange,
+					SELF.Src := BlankString,
+					SELF.DPMBitmap := SetDPMBitmap( Source := BlankString, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := []), 
+					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
+
+	With_AVM_V2_Key_AVM_Records := DENORMALIZE(With_PropertyV2__Key_Addl_Fares_Deed_Fid_Records, AVM_V2__Key_AVM_Address_Records,
+			LEFT.G_ProcUID = RIGHT.G_ProcUID, GROUP,
+			TRANSFORM(Layouts_FDC.Layout_FDC,
+					SELF.Dataset_AVM_V2__Key_AVM_Address := ROWS(RIGHT),
+					SELF := LEFT,
+					SELF := []));
+					
+	RETURN With_AVM_V2_Key_AVM_Records;
 
 END;
 

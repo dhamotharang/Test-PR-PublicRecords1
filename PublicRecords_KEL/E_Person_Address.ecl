@@ -93,6 +93,19 @@ EXPORT E_Person_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
   SHARED __d3_Prefiltered := __d3_Location__Mapped;
   SHARED __d3 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d3_Prefiltered,InLayout,__Mapping3,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping3_Transform(LEFT)));
   EXPORT InData := __d0 + __d1 + __d2 + __d3;
+  EXPORT Address_Rank_Details_Layout := RECORD
+    KEL.typ.nint Address_Rank_;
+    KEL.typ.nint Insurance_Source_Count_;
+    KEL.typ.nint Property_Source_Count_;
+    KEL.typ.nint Utility_Source_Count_;
+    KEL.typ.nint Vehicle_Source_Count_;
+    KEL.typ.nint D_L_Source_Count_;
+    KEL.typ.nint Voter_Source_Count_;
+    KEL.typ.nstr Address_Type_;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
@@ -110,22 +123,16 @@ EXPORT E_Person_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.nstr Postdirectional_;
     KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
     KEL.typ.nstr Secondary_Range_;
-    KEL.typ.nint Address_Rank_;
-    KEL.typ.nint Insurance_Source_Count_;
-    KEL.typ.nint Property_Source_Count_;
-    KEL.typ.nint Utility_Source_Count_;
-    KEL.typ.nint Vehicle_Source_Count_;
-    KEL.typ.nint D_L_Source_Count_;
-    KEL.typ.nint Voter_Source_Count_;
-    KEL.typ.nstr Address_Type_;
+    KEL.typ.ndataset(Address_Rank_Details_Layout) Address_Rank_Details_;
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Subject_,Location_,Primary_Range_,Predirectional_,Primary_Name_,Suffix_,Postdirectional_,Z_I_P5_,Secondary_Range_,Address_Rank_,Insurance_Source_Count_,Property_Source_Count_,Utility_Source_Count_,Vehicle_Source_Count_,D_L_Source_Count_,Voter_Source_Count_,Address_Type_,ALL));
+  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Subject_,Location_,Primary_Range_,Predirectional_,Primary_Name_,Suffix_,Postdirectional_,Z_I_P5_,Secondary_Range_,ALL));
   Person_Address_Group := __PostFilter;
   Layout Person_Address__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
+    SELF.Address_Rank_Details_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Address_Rank_,Insurance_Source_Count_,Property_Source_Count_,Utility_Source_Count_,Vehicle_Source_Count_,D_L_Source_Count_,Voter_Source_Count_,Address_Type_},Address_Rank_,Insurance_Source_Count_,Property_Source_Count_,Utility_Source_Count_,Vehicle_Source_Count_,D_L_Source_Count_,Voter_Source_Count_,Address_Type_),Address_Rank_Details_Layout)(__NN(Address_Rank_) OR __NN(Insurance_Source_Count_) OR __NN(Property_Source_Count_) OR __NN(Utility_Source_Count_) OR __NN(Vehicle_Source_Count_) OR __NN(D_L_Source_Count_) OR __NN(Voter_Source_Count_) OR __NN(Address_Type_)));
     SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_,Header_Hit_Flag_},Source_,Header_Hit_Flag_),Data_Sources_Layout)(__NN(Source_) OR __NN(Header_Hit_Flag_)));
     SELF.__RecordCount := COUNT(__recs);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
@@ -133,6 +140,7 @@ EXPORT E_Person_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     SELF := __r;
   END;
   Layout Person_Address__Single_Rollup(InLayout __r) := TRANSFORM
+    SELF.Address_Rank_Details_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Address_Rank_Details_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Address_Rank_) OR __NN(Insurance_Source_Count_) OR __NN(Property_Source_Count_) OR __NN(Utility_Source_Count_) OR __NN(Vehicle_Source_Count_) OR __NN(D_L_Source_Count_) OR __NN(Voter_Source_Count_) OR __NN(Address_Type_)));
     SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_) OR __NN(Header_Hit_Flag_)));
     SELF.__RecordCount := 1;
     SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);

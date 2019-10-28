@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Property,E_Zip_Code,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL11.Null;
 EXPORT B_Property(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Property(__in,__cfg).__Result) __E_Property := E_Property(__in,__cfg).__Result;
-  SHARED __EE1420508 := __E_Property;
-  EXPORT __ST59941_Layout := RECORD
+  SHARED __EE1695213 := __E_Property;
+  EXPORT __ST64624_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -27,10 +27,10 @@ EXPORT B_Property(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST59941_Layout __ND1420668__Project(E_Property(__in,__cfg).Layout __PP1420341) := TRANSFORM
+  SHARED __ST64624_Layout __ND1695373__Project(E_Property(__in,__cfg).Layout __PP1695046) := TRANSFORM
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
     SELF.Current_Date_F_C_R_A_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('fcra_property_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP1420341;
+    SELF := __PP1695046;
   END;
-  EXPORT __ENH_Property := PROJECT(__EE1420508,__ND1420668__Project(LEFT));
+  EXPORT __ENH_Property := PROJECT(__EE1695213,__ND1695373__Project(LEFT));
 END;

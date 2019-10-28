@@ -1,9 +1,10 @@
 ﻿
-IMPORT ADVO, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BusReg,CalBus, CellPhone, Corp2, Cortera, Cortera_Tradeline, 
+IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BusReg,CalBus, CellPhone, Corp2, Cortera, Cortera_Tradeline, 
 	DMA, DCAV2, Doxie_Files, dx_Email, dx_Header,EBR,  FAA,FBNv2, Fraudpoint3, Gong, GovData, 
-	Header_Quick, InfoUSA, InfutorCID, Inquiry_AccLogs, IRS5500, Phonesplus_v2, Prof_License_Mari, Prof_LicenseV2,
+	Header_Quick, InfoUSA, InfutorCID, Inquiry_AccLogs, IRS5500, LN_PropertyV2, Phonesplus_v2, Prof_License_Mari, Prof_LicenseV2,
 	PublicRecords_KEL, OSHAIR, Targus, USPIS_HotList, UtilFile,SAM, VehicleV2, Watercraft,YellowPages, 
-	UCCV2, dx_Infutor_NARB, dx_Equifax_Business_Data, BIPV2_Build, DriversV2, Risk_Indicators, Relationship,dx_header, data_services, Doxie;
+	UCCV2, dx_Infutor_NARB, dx_Equifax_Business_Data, BIPV2_Build, DriversV2, Risk_Indicators, Relationship,dx_header, data_services, Doxie,
+	American_student_list,AlloyMedia_student_list;
 	
 	EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_KEL.Interface_Options) := MODULE 
 	
@@ -50,7 +51,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 	
   SHARED Doxie__Key_Header := dx_header.key_header(iType);
 	EXPORT Layout_Doxie__Key_Header := RECORD
-		LayoutIDs;
 		LayoutAddressGeneric;
 		RECORDOF(Doxie__Key_Header);
 		UNSIGNED8 DPMBitmap;
@@ -148,6 +148,11 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 			RECORDOF(BIPV2__Key_BH_Linking_Ids__kfetch2);
 			STRING2 src;
 			UNSIGNED8 DPMBitmap;
+			BOOLEAN sele_gold_boolean;
+			BOOLEAN is_sele_level_boolean; 
+			BOOLEAN is_org_level_boolean; 
+			BOOLEAN is_ult_level_boolean; 
+			BOOLEAN iscorp_boolean;
 	END;
 	// For Business and Address data
 
@@ -374,14 +379,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		UNSIGNED8 DPMBitmap;
 	END;
 
-	SHARED InfoUSA_Key_DEADCO_LinkIds := InfoUSA.Key_DEADCO_LinkIds.kFetch2;
-	EXPORT Layout_InfoUSA__Key_DEADCO_LinkIds := RECORD
-		LayoutIDs;
-		RECORDOF(InfoUSA_Key_DEADCO_LinkIds);
-		STRING2 src;
-		UNSIGNED8 DPMBitmap;
-	END;
-	
+
 	SHARED UtilFile__Kfetch2_LinkIds := UtilFile.Key_LinkIds.Kfetch2;
 	EXPORT Layout_UtilFile__Kfetch2_LinkIds := RECORD
 		LayoutIDs;
@@ -452,34 +450,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		UNSIGNED8 DPMBitmap;
 	END;
 
-	SHARED Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered := Risk_Indicators.Key_FCRA_ADL_Risk_Table_v4_Filtered;
-	EXPORT Layout_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered := RECORD // "Filtered" = FCRA
-		LayoutIDs;
-		RECORDOF(Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered);
-	END;	
 	
-	EXPORT Layout_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Expanded := RECORD // "Filtered" = FCRA
-		LayoutIDs;
-		RECORDOF(Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered) AND NOT [combo, eq, en, tn];
-		RECORDOF(Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered.combo);
-		STRING2 src;
-		UNSIGNED8 DPMBitmap;
-	END;
-
-	SHARED Risk_Indicators__Key_ADL_Risk_Table_v4 := Risk_Indicators.Key_ADL_Risk_Table_v4;
-	EXPORT Layout_Risk_Indicators__Key_ADL_Risk_Table_v4 := RECORD // no "Filtered" = NonFCRA
-		LayoutIDs;
-		RECORDOF(Risk_Indicators__Key_ADL_Risk_Table_v4);
-	END;
-	
-	EXPORT Layout_Risk_Indicators__Key_ADL_Risk_Table_v4_Expanded := RECORD // no "Filtered" = NonFCRA
-		LayoutIDs;
-		RECORDOF(Risk_Indicators__Key_ADL_Risk_Table_v4) AND NOT [combo, eq, en, tn];
-		RECORDOF(Risk_Indicators__Key_ADL_Risk_Table_v4.combo);
-		STRING2 src;
-		UNSIGNED8 DPMBitmap;
-	END;
-
 // --------------------[ Relatives ]--------------------
 	SHARED Relatives__Key_Relatives_V3 := Relationship.key_relatives_v3;
 	EXPORT Layout_Relatives__Key_Relatives_V3 := RECORD
@@ -631,27 +602,24 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 
 	// --------------------[ Phone ]--------------------
 
-	SHARED Gong__Key_History_DID := IF( Options.isFCRA, Gong.Key_History_DID, Gong.Key_FCRA_History_DID );
+	SHARED Gong__Key_History_DID := IF( Options.isFCRA, Gong.Key_FCRA_History_DID, Gong.Key_History_DID );
 	EXPORT Layout_Gong__Key_History_DID := RECORD
-		LayoutIDs;
 		LayoutAddressGeneric;
 		RECORDOF(Gong__Key_History_DID); // contains "src"
 		STRING3 Listing_Type;
 		UNSIGNED8 DPMBitmap;
 	END;	
 	
-	SHARED Gong__Key_History_Address := IF( Options.isFCRA, Gong.Key_History_Address, Gong.Key_FCRA_History_Address );
+	SHARED Gong__Key_History_Address := IF( Options.isFCRA, Gong.Key_FCRA_History_Address, Gong.Key_History_Address );
 	EXPORT Layout_Gong__Key_History_Address := RECORD
-		LayoutIDs;
 		LayoutAddressGeneric;
 		RECORDOF(Gong__Key_History_Address); // contains "src"
 		STRING3 Listing_Type;
 		UNSIGNED8 DPMBitmap;
 	END;	
 	
-	SHARED Gong__Key_History_Phone := IF( Options.isFCRA, Gong.Key_History_Phone, Gong.Key_FCRA_History_Phone );
+	SHARED Gong__Key_History_Phone := IF( Options.isFCRA, Gong.Key_FCRA_History_Phone, Gong.Key_History_Phone );
 	EXPORT Layout_Gong__Key_History_Phone := RECORD
-		LayoutIDs;
 		LayoutAddressGeneric;
 		RECORDOF(Gong__Key_History_Phone); // contains "src"
 		STRING3 Listing_Type;
@@ -660,7 +628,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 
 	SHARED Gong__Key_History_LinkIds := Gong.Key_History_LinkIds.kFetch2;
 	EXPORT Layout_Gong__Key_History_LinkIds := RECORD
-		LayoutIDs;
 		LayoutAddressGeneric;
 		RECORDOF(Gong__Key_History_LinkIds);
 		STRING3 Listing_Type;
@@ -668,27 +635,16 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		UNSIGNED8 DPMBitmap;
 	END;
 
-	SHARED Targus__Key_Targus_Address := IF( Options.isFCRA, Targus.Key_Targus_Address, Targus.Key_Targus_FCRA_Address );
-	EXPORT Layout_Targus__Key_Targus_Address := RECORD
-		LayoutIDs;
-		LayoutAddressGeneric;
-		RECORDOF(Targus__Key_Targus_Address);
-		STRING2 src;
-		UNSIGNED8 DPMBitmap;
-	END;	
-	
-	SHARED Targus__Key_Targus_Phone := IF( Options.isFCRA, Targus.Key_Targus_Phone, Targus.Key_Targus_FCRA_Phone );
+	SHARED Targus__Key_Targus_Phone := IF( Options.isFCRA, Targus.Key_Targus_FCRA_Phone, Targus.Key_Targus_Phone );
 	EXPORT Layout_Targus__Key_Targus_Phone := RECORD
-		LayoutIDs;
 		LayoutAddressGeneric;
 		RECORDOF(Targus__Key_Targus_Phone);
 		STRING2 src;
 		UNSIGNED8 DPMBitmap;
 	END;	
 	 
-	SHARED InfutorCID__Key_Infutor_Phone := IF( Options.isFCRA, InfutorCID.Key_Infutor_Phone, InfutorCID.Key_Infutor_Phone_FCRA );
+	SHARED InfutorCID__Key_Infutor_Phone := IF( Options.isFCRA, InfutorCID.Key_Infutor_Phone_FCRA, InfutorCID.Key_Infutor_Phone );
 	EXPORT Layout_InfutorCID__Key_Infutor_Phone := RECORD
-		LayoutIDs;
 		LayoutAddressGeneric;
 		RECORDOF(InfutorCID__Key_Infutor_Phone);
 		STRING2 src;
@@ -697,25 +653,14 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 	
 	SHARED PhonesPlus_v2_Keys_Scoring_Phone := Phonesplus_v2.Keys_Scoring().phone.qa;
 	EXPORT Layout_Phone__PhonesPlus_v2_Keys_Scoring_Phone := RECORD
-		LayoutIDs;
 		LayoutPhoneGeneric;
 		RECORDOF(PhonesPlus_v2_Keys_Scoring_Phone);
 		STRING2 src;
 		UNSIGNED8 DPMBitmap;
 	END;
 
-	SHARED PhonesPlus_v2_Keys_Scoring_Address := Phonesplus_v2.Keys_Scoring().address.qa;
-	EXPORT Layout_Phone__PhonesPlus_v2_Keys_Scoring_Address := RECORD
-		LayoutIDs;
-		LayoutAddressGeneric;
-		RECORDOF(PhonesPlus_v2_Keys_Scoring_Address);
-		STRING2 src;
-		UNSIGNED8 DPMBitmap;
-	END;
-
 	SHARED PhonesPlus_v2_Keys_Iverification_Phone := Phonesplus_v2.Keys_Iverification().phone.qa;
 	EXPORT Layout_Key_Iverification__Keys_Iverification_phone := RECORD
-		LayoutIDs;
 		LayoutPhoneGeneric;
 		RECORDOF(PhonesPlus_v2_Keys_Iverification_Phone);
 		STRING2 src;
@@ -724,7 +669,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 
 	SHARED PhonesPlus_v2_Keys_Iverification_Did_Phone := Phonesplus_v2.Keys_Iverification().did_phone.qa;
 	EXPORT Layout_Key_Iverification__Keys_Iverification_Did_Phone := RECORD
-		LayoutIDs;
 		LayoutPhoneGeneric;
 		RECORDOF(PhonesPlus_v2_Keys_Iverification_Did_Phone);
 		STRING2 src;
@@ -733,7 +677,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 
 	SHARED CellPhone__Key_Neustar_Phone := CellPhone.key_neustar_phone;
 	EXPORT Layout_Key_CellPhone__Key_Neustar_Phone := RECORD
-		LayoutIDs;
 		LayoutPhoneGeneric;
 		RECORDOF(CellPhone__Key_Neustar_Phone);
 		STRING2 src;
@@ -742,11 +685,97 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 
 	SHARED PhonesPlus_v2_Key_PhonePlus_Fdid_Records := Phonesplus_v2.Key_Phonesplus_Fdid;
 	EXPORT Layout_PhonesPlus_v2_Key_PhonePlus_Fdid_Records := RECORD
-		LayoutIDs;
 		LayoutPhoneGeneric;
 		RECORDOF(PhonesPlus_v2_Key_PhonePlus_Fdid_Records);
 		UNSIGNED8 DPMBitmap;
 		STRING2 Source;
+	END;
+	
+	
+		//====================[Education]============================
+	SHARED American_student_list__key_DID := IF( Options.isFCRA, American_student_list.key_DID_FCRA, American_student_list.key_DID);
+	EXPORT Layout_American_student_list__key_DID := RECORD
+		LayoutIDs;
+		RECORDOF(American_student_list__key_DID); // contains "src"
+		UNSIGNED8 DPMBitmap;
+	END;	
+	
+	SHARED AlloyMedia_student_list__Key_DID := IF( Options.isFCRA, AlloyMedia_student_list.Key_DID_FCRA, AlloyMedia_student_list.Key_DID);	
+	EXPORT Layout_AlloyMedia_student_list__Key_DID := RECORD
+		LayoutIDs;
+		RECORDOF(AlloyMedia_student_list__key_DID); // contains "src"
+		UNSIGNED8 DPMBitmap;
+	END;
+
+// --------------------[ Property - Consumer and Business]--------------------	
+
+	EXPORT Layout_PropertyV2_Data_Temp := RECORD
+		LayoutAddressGeneric;
+		STRING LN_FARES_ID;
+	END;	
+	
+	SHARED PropertyV2_Key_Assessor_Fid_Records := LN_PropertyV2.key_assessor_fid(Options.isFCRA);
+	EXPORT Layout_PropertyV2_Key_Assessor_Fid_Records := RECORD
+		LayoutAddressGeneric;
+		RECORDOF(PropertyV2_Key_Assessor_Fid_Records);
+		UNSIGNED8 DPMBitmap;
+		STRING2 src;
+	END;
+	
+	SHARED PropertyV2_Key_Deed_Fid_Records := LN_PropertyV2.key_deed_fid(Options.isFCRA);
+	EXPORT Layout_PropertyV2_Key_Deed_Fid_Records := RECORD
+		LayoutAddressGeneric;
+		RECORDOF(PropertyV2_Key_Deed_Fid_Records);
+		UNSIGNED8 DPMBitmap;
+		STRING2 src;
+	END;
+	
+	SHARED PropertyV2_Key_Property_Did_Records := LN_PropertyV2.key_Property_did(Options.isFCRA);
+	EXPORT Layout_PropertyV2_Key_Property_Did_Records := RECORD
+		LayoutIDs;
+		RECORDOF(PropertyV2_Key_Property_Did_Records);
+		UNSIGNED8 DPMBitmap;
+		STRING2 src;
+	END;
+	
+	SHARED PropertyV2_Key_Linkids_Records := LN_PropertyV2.Key_LinkIds.key;
+	EXPORT Layout_PropertyV2_Key_Linkids_Records := RECORD
+		LayoutIDs;
+		RECORDOF(PropertyV2_Key_Linkids_Records);
+		UNSIGNED8 DPMBitmap;
+		STRING2 src;
+	END;
+	
+	SHARED PropertyV2_Key_Addr_Fid_Records := LN_PropertyV2.key_addr_fid(Options.isFCRA);
+	EXPORT Layout_PropertyV2_Key_Addr_Fid_Records := RECORD
+		LayoutAddressGeneric;
+		RECORDOF(PropertyV2_Key_Addr_Fid_Records);
+		UNSIGNED8 DPMBitmap;
+		STRING2 src;
+	END;
+	
+	SHARED PropertyV2_Key_Search_Fid_Records := LN_PropertyV2.key_search_fid(Options.isFCRA);
+	EXPORT Layout_PropertyV2_Key_Search_Fid_Records := RECORD
+		LayoutAddressGeneric;
+		RECORDOF(PropertyV2_Key_Search_Fid_Records);
+		UNSIGNED8 DPMBitmap;
+		STRING2 src;
+	END;
+	
+	SHARED PropertyV2_Key_Addl_Fares_Deed_Fid_Records := LN_PropertyV2.key_addl_fares_deed_fid;
+	EXPORT Layout_PropertyV2_Key_Addl_Fares_Deed_Fid_Records := RECORD
+		LayoutAddressGeneric;
+		RECORDOF(PropertyV2_Key_Addl_Fares_Deed_Fid_Records);
+		UNSIGNED8 DPMBitmap;
+		STRING2 src;
+	END;
+	
+	SHARED AVM_V2_Key_AVM_Address_Records := IF( Options.isFCRA, AVM_V2.Key_AVM_Address_FCRA, AVM_V2.Key_AVM_Address );
+	EXPORT Layout_AVM_V2_Key_AVM_Address_Records := RECORD
+		LayoutAddressGeneric;
+		RECORDOF(AVM_V2_Key_AVM_Address_Records);
+		UNSIGNED8 DPMBitmap;
+		STRING2 src;
 	END;
 	
 	// ===================[ Composite Layout ]===================
@@ -793,27 +822,22 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		DATASET(Layout_Doxie__Key_Death_MasterV2_SSA_DID) Dataset_Doxie__Key_Death_MasterV2_SSA_DID; 
 		DATASET(Layout_DriversV2__Key_DL_DID) Dataset_DriversV2__Key_DL_DID; 
 		DATASET(Layout_DriversV2__Key_DL_Number) Dataset_DriversV2__Key_DL_Number; 
-		DATASET(Layout_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Expanded) Dataset_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Combo; 
-		DATASET(Layout_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Expanded) Dataset_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Experian; 
-		DATASET(Layout_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Expanded) Dataset_Risk_Indicators__Key_FCRA_ADL_Risk_Table_v4_Filtered_Equifax; 
-		DATASET(Layout_Risk_Indicators__Key_ADL_Risk_Table_v4_Expanded) Dataset_Risk_Indicators__Key_ADL_Risk_Table_v4_Combo; 
-		DATASET(Layout_Risk_Indicators__Key_ADL_Risk_Table_v4_Expanded) Dataset_Risk_Indicators__Key_ADL_Risk_Table_v4_Experian; 
-		DATASET(Layout_Risk_Indicators__Key_ADL_Risk_Table_v4_Expanded) Dataset_Risk_Indicators__Key_ADL_Risk_Table_v4_Equifax; 
-		DATASET(Layout_Risk_Indicators__Key_ADL_Risk_Table_v4_Expanded) Dataset_Risk_Indicators__Key_ADL_Risk_Table_v4_TransUnion; 
+
 		// Phone
 		DATASET(Layout_Gong__Key_History_DID) Dataset_Gong__Key_History_DID;
 		DATASET(Layout_Gong__Key_History_Address) Dataset_Gong__Key_History_Address;
 		DATASET(Layout_Gong__Key_History_Phone) Dataset_Gong__Key_History_Phone;
 		DATASET(Layout_Gong__Key_History_LinkIds) Dataset_Gong__Key_History_LinkIds;
-		DATASET(Layout_Targus__Key_Targus_Address) Dataset_Targus__Key_Address;
 		DATASET(Layout_Targus__Key_Targus_Phone) Dataset_Targus__Key_Phone;
 		DATASET(Layout_InfutorCID__Key_Infutor_Phone) Dataset_InfutorCID__Key_Phone;
 	  DATASET(Layout_Phone__PhonesPlus_v2_Keys_Scoring_Phone) Dataset_Phone__PhonesPlus_v2_Keys_Scoring_Phone;
-		DATASET(Layout_Phone__PhonesPlus_v2_Keys_Scoring_Address) Dataset_Phone__PhonesPlus_v2_Keys_Scoring_Address;
 		DATASET(Layout_Key_Iverification__Keys_Iverification_Phone) Dataset_Key_Iverification__Keys_Iverification_Phone;
 		DATASET(Layout_Key_Iverification__Keys_Iverification_Did_Phone) Dataset_Key_Iverification__Keys_Iverification_Did_Phone;
 		DATASET(Layout_Key_CellPhone__Key_Neustar_Phone) Dataset_Key_CellPhone__Key_Neustar_Phone;
 	  DATASET(Layout_PhonesPlus_v2_Key_PhonePlus_Fdid_Records) Dataset_PhonesPlus_v2_Key_PhonePlus_Fdid_Records;
+		// Education
+		DATASET(Layout_American_student_list__key_DID) Dataset_American_student_list__key_DID;
+		DATASET(Layout_AlloyMedia_student_list__Key_DID) Dataset_AlloyMedia_student_list__Key_DID;
 		// --------------------[ Business Section ]--------------------
 		// Business Header
 		DATASET(Layout_BIPV2__Key_BH_Linking_kfetch2) Dataset_BIPV2__Key_BH_Linking_kfetch2;
@@ -821,7 +845,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		DATASET(Layout_Cortera_Tradeline__Key_LinkIds) Dataset_Cortera_Tradeline__Key_LinkIds;
 		// Address
 		DATASET(Layout_Corp2__Kfetch_LinkIDs_Corp) Dataset_Corp2__Kfetch_LinkIDs_Corp;
-		DATASET(Layout_InfoUSA__Key_DEADCO_LinkIds) Dataset_InfoUSA__Key_DEADCO_LinkIds;
 		DATASET(Layout_UtilFile__Kfetch2_LinkIds) Dataset_UtilFile__Kfetch2_LinkIds;
 		//vehicle
 		DATASET(Layout_VehicleV2__Key_Vehicle_LinkID_Key) Dataset_VehicleV2__Key_Vehicle_LinkID_Key;
@@ -864,7 +887,14 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		// Relative V3
 		DATASET(Layout_Relatives__Key_Relatives_V3) Dataset_Relatives__Key_Relatives_V3;
 		
-	
+		// --------------------[ Property - Consumer and Business]--------------------
+
+		DATASET(Layout_PropertyV2_Key_Assessor_Fid_Records) Dataset_PropertyV2__Key_Assessor_Fid;
+		DATASET(Layout_PropertyV2_Key_Deed_Fid_Records) Dataset_PropertyV2__Key_Deed_Fid_Fid;
+		DATASET(Layout_PropertyV2_Key_Search_Fid_Records) Dataset_PropertyV2__Key_Search_Fid;
+		DATASET(Layout_PropertyV2_Key_Addl_Fares_Deed_Fid_Records) Dataset_PropertyV2__Key_Addl_Fares_Deed_Fid;
+		DATASET(Layout_AVM_V2_Key_AVM_Address_Records) Dataset_AVM_V2__Key_AVM_Address;
+
 	END;
 	
 END;

@@ -30,7 +30,7 @@ EXPORT E_Address_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Inquiry_;
   END;
-  SHARED __d0_Inquiry__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d0_KELfiltered,'search_info.transaction_id,SequenceNumber','__in'),E_Inquiry(__in,__cfg).Lookup,TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.SequenceNumber) = RIGHT.KeyVal,TRANSFORM(__d0_Inquiry__Layout,SELF.Inquiry_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Inquiry__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d0_KELfiltered,'search_info.transaction_id,search_info.sequence_number','__in'),E_Inquiry(__in,__cfg).Lookup,TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number) = RIGHT.KeyVal,TRANSFORM(__d0_Inquiry__Layout,SELF.Inquiry_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Location__Layout := RECORD
     RECORDOF(__d0_Inquiry__Mapped);
     KEL.typ.uid Location_;

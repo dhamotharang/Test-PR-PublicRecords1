@@ -16,6 +16,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpNameMid := le.P_InpNameMid;
 		SELF.P_InpNameLast := le.P_InpNameLast;			
 		SELF.P_InpAddrLine1 := le.P_InpAddrLine1;
+		SELF.P_InpAddrLine2 := le.P_InpAddrLine2;
 		SELF.P_InpAddrCity := le.P_InpAddrCity;
 		SELF.P_InpAddrState := le.P_InpAddrState; 
 		SELF.P_InpAddrZip := le.P_InpAddrZip;
@@ -29,7 +30,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpDLState := le.P_InpDLState;
 		// Clean input
 		cleaned_zip       := PublicRecords_KEL.ECL_Functions.Fn_Clean_Zip(le.P_InpAddrZip);
-		cleaned_Addr      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Address_Roxie(le.P_InpAddrLine1, le.P_InpAddrCity, le.P_InpAddrState, cleaned_zip);
+		cleaned_Addr      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Address_Roxie(le.P_InpAddrLine1 + ' ' + le.P_InpAddrLine2, le.P_InpAddrCity, le.P_InpAddrState, cleaned_zip);
 		cleaned_DL        := PublicRecords_KEL.ECL_Functions.Fn_Clean_DLNumber(le.P_InpDL);
 		cleaned_DLState   := PublicRecords_KEL.ECL_Functions.Fn_Clean_DLState(le.P_InpDLState);   //afa 2019026
 		cleaned_email     := PublicRecords_KEL.ECL_Functions.Fn_Clean_Email(le.P_InpEmail);
