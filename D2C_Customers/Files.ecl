@@ -37,13 +37,28 @@ EXPORT Files := MODULE
     crims := doxie_files.File_Offenders((unsigned6)did > 0, data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
     bk    := BankruptcyV2.key_bankruptcy_did(false)(did > 0); //Unrestricted
     li    := LiensV2.key_liens_DID(did > 0);//Unrestricted
-    //include deceased dids
-    
-    EXPORT derogatoryDS := dedup(table(so, {(unsigned6)did}) + table(crims, {(unsigned6)did}) + table(bk, {did}) + table(li, {did}), all);
+    death := Header.File_DID_Death_MasterV2 ((unsigned6)did >0 and state_death_id=death_master.fn_fake_state_death_id(ssn,lname,dod8)) ; 
+    //crlf='SA' flags Direct records where the SSN was overlaid w/ one from the SSA
+    dist_death := distribute(death(crlf<>'SA'), hash(did));
+        
+    EXPORT derogatoryDS := dedup(table(so, {(unsigned6)did})
+                               + table(crims, {(unsigned6)did})
+                               + table(bk, {did})
+                               + table(li, {did})
+                               + table(dist_death, {(unsigned6)did})
+                               ,all);
     shared SetofderogatoryDS := set(derogatoryDS, did);
 
     //use join instead set       
-    EXPORT coreInfutorDerogatoryDS := coreInfutorDS(did in SetofderogatoryDS);
-    EXPORT coreHdrDerogatoryDS     := coreHdrDS(did in SetofderogatoryDS);
+    EXPORT coreInfutorDerogatoryDS := join(distribute(coreInfutorDS, hash(did)),
+                                           distribute(derogatoryDS, hash(did)),
+                                           left.did = right.did,
+                                           transform(left),
+                                           local);
+    EXPORT coreHdrDerogatoryDS := join(distribute(coreHdrDS, hash(did)),
+                                           distribute(derogatoryDS, hash(did)),
+                                           left.did = right.did,
+                                           transform(left),
+                                           local);
 
 END;

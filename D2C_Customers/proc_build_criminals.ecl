@@ -39,7 +39,7 @@ EXPORT proc_build_criminals(unsigned1 mode, string8 ver, string20 customer_name)
                mode = 2 => coreDS,           //QUARTERLY
                mode = 3 => coreDerogatoryDS  //MONTHLY
                );
-
+   
    res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 7);
    return res;
 

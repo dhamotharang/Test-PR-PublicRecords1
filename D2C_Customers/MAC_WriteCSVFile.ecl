@@ -8,8 +8,11 @@ EXPORT MAC_WriteCSVFile(inDS, mode, ver, record_type) := FUNCTIONMACRO
     #uniquename(sFile)
 	%sFile% := D2C_Customers.Constants.sFile(record_type);
 
+    #uniquename(sortDS)
+	%sortDS% := inDS;//if(record_type <> 8, inDS, sort(distribute(inDS, hash(lexid)), lexid, local));
+
     #uniquename(outDS)
-	%outDS% := dedup(inDS, record, all);
+	%outDS% := dedup(%sortDS%, record, all);
 
     #uniquename(doit)
     //csv with separator(|) and terminator(\n)             
