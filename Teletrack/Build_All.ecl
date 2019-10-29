@@ -24,7 +24,8 @@ module
 
 	));
 	
-	updateorbit := Orbit3.proc_Orbit3_CreateBuild('Teletrack',(pversion),'N');
+	updateorbit := Orbit3.Proc_Orbit3_CreateBuild_npf('Teletrack',(pversion));
+	
 	
 	export full_build := sequential(
 		 create_supers
