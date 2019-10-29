@@ -666,39 +666,28 @@ module
   export nh_raw :=
 	module
 
-		export address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::address::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporation::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,1000,,'\\n',);
-		export name                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::name::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export officer                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::officer::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export stock                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::stock::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export AddressType_Table	       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::AddressType_Table::nh',landing_zone,,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);		
-		export OffPartyType_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::OffPartyType_Table::nh',landing_zone,,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export PartyType_Table           := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PartyType_Table::nh',landing_zone,,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export NameType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NameType_Table::nh',landing_zone,,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export StockClass_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StockClass_Table::nh',landing_zone,,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export StatusCode_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StatusCode_Table::nh',landing_zone,,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export CorpType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorpType_Table::nh',landing_zone,,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export DocumentTypeID_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentTypeID_Table::nh',landing_zone,,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::address::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192,'|','\\n',);
+		export corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporation::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192,'|','\\n',);
+		export prevnames                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::prev_names::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192,'|','\\n',);
+		export filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192,'|','\\n',);
+		export regagent                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::reg_agent::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192,'|','\\n',);
+		export principals                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::principals::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192,'|','\\n',);
+		export prinpurp                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::prin_purpose::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192,'|','\\n',);
+		export stock                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::stock::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,8192,'|','\\n',);
 
 		export dAll_filenames :=
 					 address.dall_filenames
 				 + corporation.dall_filenames
-				 + name.dall_filenames
-				 + statuscode_table.dall_filenames
-				 + corptype_table.dall_filenames
-				 + documenttypeid_table.dall_filenames
+				 + prevnames.dall_filenames
 				 + filing.dall_filenames
-				 + merger.dall_filenames
-				 + nametype_table.dall_filenames
-				 + officer.dall_filenames
-				 + addresstype_table.dall_filenames
-				 + offpartytype_table.dall_filenames
-				 + partytype_table.dall_filenames
+				 + regagent.dall_filenames
+				 + principals.dall_filenames
+				 + prinpurp.dall_filenames
 				 + stock.dall_filenames
-				 + stockclass_table.dall_filenames
 				;
+
+	end;
+
 
 	end;
 
