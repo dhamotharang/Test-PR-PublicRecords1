@@ -1127,6 +1127,16 @@ Export CIID := RECORD
   unsigned1 __customer_id__flags;
   integer8 industry_type_;
   unsigned1 __industry_type__flags;
+  DATASET(RECORD
+   string state_;
+   unsigned1 __state__flags;
+   integer8 state_count_;
+   unsigned1 __state_count__flags;
+   unsigned2 date_first_seen_;
+   unsigned2 date_last_seen_;
+   integer8 __recordcount;
+  END) states_;
+  unsigned1 __states__flags;
   integer8 address_count_;
   integer8 all_address_count_;
   real8 all_deceased_matched_percent_;
@@ -1142,6 +1152,14 @@ Export CIID := RECORD
   unsigned1 __event_date_max__flags;
   integer8 high_frequency_address_count_;
   real8 high_frequency_address_percent_;
+  string jurisdiction_state_;
+  unsigned1 __jurisdiction_state__flags;
+  RECORD
+   string state_;
+   unsigned1 __state__flags;
+   integer8 state_count_;
+   unsigned1 __state_count__flags;
+  END jurisdiction_state_top_;
   real8 person_address_count_average_;
   unsigned1 __person_address_count_average__flags;
   integer8 person_address_count_median_;
