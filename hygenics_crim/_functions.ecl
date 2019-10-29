@@ -1683,19 +1683,19 @@ map(
 	psourcename = 'CONNECTICUT_ADMINISTRATOR_OF_THE_COURTS' 		=> 'CP',
 	psourcename = 'FLORIDA_ADMINISTRATOR_OF_THE_COURTS' 				=> 'FV',
 	psourcename = 'GEORGIA_BUREAU_OF_INVESTIGATION' 					  => 'GD',
-	psourcename = 'HAWAII_STATE_JUDICIARY' 								      => 'HA',
-	psourcename = 'INDIANA_ADMINISTRATOR_OF_THE_COURTS' 				=> 'Z4', //replaced 'ID' with Z4,
-	psourcename = 'IOWA_ADMINISTRATOR_OF_THE_COURTS' 					  => 'IC',
+	//psourcename = 'HAWAII_STATE_JUDICIARY' 								      => 'HA', using IE HI STATE JUDICIARY ADMINISTRATIVE OFFICE OF COURTS 
+	//psourcename = 'INDIANA_ADMINISTRATOR_OF_THE_COURTS' 				=> 'Z4', //replaced 'ID' with Z4,  //replace with IE IN ADMINISTRATOR OF COURTS (WEB)
+	//psourcename = 'IOWA_ADMINISTRATOR_OF_THE_COURTS' 					  => 'IC', //Using IE IA ADMINISTRATIVE OFFICE OF COURTS
 	psourcename = 'MARYLAND_ADMINISTRATOR_OF_THE_COURTS' 				=> 'MF',
 	psourcename = 'MINNESOTA_DEPARTMENT_OF_PUBLIC_SAFETY' 			=> 'MH',
-	psourcename = 'MISSOURI_ADMINISTRATOR_OF_THE_COURTS' 				=> 'MG',
+	//psourcename = 'MISSOURI_ADMINISTRATOR_OF_THE_COURTS' 				=> 'MG', using IE MO ADMIN OFFICE OF COURTS
 	psourcename = 'NEW_JERSEY_ADMINISTRATOR_OF_THE_COURTS' 			=> 'NA',
 	psourcename = 'NEW_MEXICO_ADMINISTRATOR_OF_THE_COURTS' 			=> 'NB',
 	//psourcename = 'NORTH_CAROLINA_ADMINISTRATIVE_OFFICE_OF_THE_COURTS' 	=> 'NF', 			//removing vendor
 	psourcename = 'NORTH_CAROLINA_ADMINISTRATIVE_OFFICE_OF_THE_COURTS_DEMOGRAPHIC_INDEX' 	=> 'NF', //vc 20130917
 	psourcename = 'NORTH_DAKOTA_ADMINISTRATOR_OF_THE_COURTS' 		=> 'NG',
 	psourcename = 'OKLAHOMA_ADMINISTRATOR_OF_THE_COURTS' 				=> 'PS',
-	psourcename = 'OREGON_ADMINISTRATOR_OF_THE_COURTS' 					=> 'PT',
+	//psourcename = 'OREGON_ADMINISTRATOR_OF_THE_COURTS' 					=> 'PT', using IE OR ADMINISTRATIVE OFFICE OF COURTS (OECI)
 	psourcename = 'PENNSYLVANIA_ADMINISTRATOR_OF_THE_COURTS' 		=> 'PU',
 	psourcename = 'PENNSYLVANIA_ADMINISTRATOR_OF_THE_COURTS_COURT_OF_COMMON_PLEAS' => 'PV',
 	psourcename = 'RHODE_ISLAND_ADMINISTRATOR_OF_THE_COURTS' 		=> 'RA',
@@ -1711,7 +1711,7 @@ map(
 	psourcename = 'WASHINGTON_COURTS_OF_LIMITED_JURISDICTION_CRIMINAL_INDEX' 			=> 'Z9',
 	               
 //------------------------------------------AOC Phase2 ---------------------------------------------------------------------	               
-	psourcename = 'WISCONSIN_ADMINISTRATOR_OF_THE_COURTS_TRAFFIC' 			=> 'PY',
+//	psourcename = 'WISCONSIN_ADMINISTRATOR_OF_THE_COURTS_TRAFFIC' 			=> 'PY', using IE WI ADMIN OFFICE OF COURTS TRAFFIC
 //------------------------------------------AOC Phase3 sources. 07/13/2015 --------------------------------------------------
   psourcename = 'SOUTH_CAROLINA_ADMINISTRATOR_OF_THE_COURTS'           => '7A', 
 	psourcename = 'UTAH_JUSTICE_COURT_TRAFFIC'                           => '7B',
@@ -1846,7 +1846,7 @@ map(
 	psourcename = 'OHIO_MONTGOMERY_COUNTY_DAYTON_MUNICIPAL_COURT' 		=> 'OC',                                                        
 	psourcename = 'OHIO_WARREN_COUNTY_MASON_MUNICIPAL_COURT' 					=> 'OD',                                                             
 	psourcename = 'OHIO_FRANKLIN_COUNTY_MUNICIPAL_COURT' 							=> 'OE',                                                                 
-	psourcename = 'OHIO_WARREN_COUNTY' 																=> 'OF',                                                                                   
+	//psourcename = 'OHIO_WARREN_COUNTY' 																=> 'OF',   using IE OH WARREN COUNTY COURT                                                                               
 	psourcename = 'OHIO_CLINTON_COUNTY' 															=> 'OG',                                                                                  
 	psourcename = 'OHIO_COLUMBIANA_COUNTY' 														=> 'OI',                                                                               
 	psourcename = 'OHIO_LAWRENCE_COUNTY_MUNICIPAL_COURT' 							=> 'OJ',                                                                 
@@ -1868,7 +1868,7 @@ map(
 	psourcename = 'OHIO_BUTLER_COUNTY' 																=> 'PB',                                                                                   
 	psourcename = 'OHIO_MONTGOMERY_COUNTY_VANDALIA_MUNICIPAL_COURT' 	=> 'PC',                                                      
 	psourcename = 'OHIO_DELAWARE_COUNTY' 															=> 'PD',                                                                                 
-	psourcename = 'OHIO_WARREN_COUNTY_COURT' 													=> 'PE',                                                                             
+	//psourcename = 'OHIO_WARREN_COUNTY_COURT' 													=> 'PE',    Using IE OH WARREN COUNTY COURT                                                                        
 	psourcename = 'OHIO_SUMMIT_COUNTY_AKRON_MUNICIPAL_COURT' 					=> 'PF',                                                             
 	psourcename = 'OHIO_FRANKLIN_COUNTY' 															=> 'PG',                                                                                 
 	psourcename = 'OHIO_STARK_COUNTY_COMMON_PLEAS_COURT' 							=> 'PH',                                                                 
@@ -2138,7 +2138,7 @@ map(
 	psourcename = 'FLORIDA_PASCO_COUNTY_TRAFFIC'                         => '7S',
 //------------------------------------------County Phase3 20151028---------------------------------------------------------------------
 	psourcename = 'ARIZONA_MARICOPA_COUNTY_SUPERIOR_COURT_FILINGS'       => '7T',
-	psourcename = 'DISTRICT_OF_COLUMBIA_SUPERIOR_COURT'                  => '7U',
+//	psourcename = 'DISTRICT_OF_COLUMBIA_SUPERIOR_COURT'                  => '7U', using IE DISTRICT OF COLUMBIA SUPERIOR COURT
 	psourcename = 'FLORIDA_ESCAMBIA_COUNTY_CIRCUIT_COURT'                => '7V',
 	psourcename = 'FLORIDA_FLAGLER_COUNTY_CIRCUIT_COURT'                 => '7W',
 	psourcename = 'FLORIDA_MANATEE_CIRCUIT_AND_COUNTY_COURTS'            => '7X',
@@ -2568,7 +2568,7 @@ map(
 //------------------------------------------Hygenics Crimwise County Batch2.1 20160929---------------------------------------------- 
  psourcename = 'CALIFORNIA_TULARE_COUNTY_CW                                           ' => 'W0148',
  // psourcename = 'OHIO_GREENE_COUNTY_FAIRBORN_MUNICIPAL_COURT_CW                        ' => 'W0149', Using crim instead due to address and offense fields
- psourcename = 'OHIO_WARREN_COUNTY_LEBANON_MUNICIPAL_COURT_CW                         ' => 'W0150',          
+ //psourcename = 'OHIO_WARREN_COUNTY_LEBANON_MUNICIPAL_COURT_CW                         ' => 'W0150', using IE  OH WARREN LEBANON MUNICIPAL       
 
 //------------------------------------------Hygenics Crimwise County Batch3 20160929---------------------------------------------- 
  psourcename = 'ARIZONA_MARICOPA_WEBSITE_CW                                            ' =>'W0151',//??
@@ -2930,17 +2930,17 @@ export fn_vendorcode_sourcename(string5 vendor_code, string8 src_upload_date) :=
  vendor_code = 'CP' => 'CONNECTICUT ADMINISTRATOR OF THE COURTS',
  vendor_code = 'FV' => 'FLORIDA ADMINISTRATOR OF THE COURTS',
  vendor_code = 'GD' => 'GEORGIA BUREAU OF INVESTIGATION',
- vendor_code = 'HA' => 'HAWAII STATE JUDICIARY',
- vendor_code = 'Z4' => 'INDIANA ADMINISTRATOR OF THE COURTS',
- vendor_code = 'IC' => 'IOWA ADMINISTRATOR OF THE COURTS',
+ //vendor_code = 'HA' => 'HAWAII STATE JUDICIARY',
+ //vendor_code = 'Z4' => 'INDIANA ADMINISTRATOR OF THE COURTS',
+ //vendor_code = 'IC' => 'IOWA ADMINISTRATOR OF THE COURTS',
  vendor_code = 'MF' => 'MARYLAND ADMINISTRATOR OF THE COURTS',
  vendor_code = 'MH' => 'MINNESOTA DEPARTMENT OF PUBLIC SAFETY',
- vendor_code = 'MG' => 'MISSOURI ADMINISTRATOR OF THE COURTS',
+ //vendor_code = 'MG' => 'MISSOURI ADMINISTRATOR OF THE COURTS',
  vendor_code = 'NA' => 'NEW JERSEY ADMINISTRATOR OF THE COURTS',
  vendor_code = 'NB' => 'NEW MEXICO ADMINISTRATOR OF THE COURTS',
  vendor_code = 'NG' => 'NORTH DAKOTA ADMINISTRATOR OF THE COURTS',
  vendor_code = 'PS' => 'OKLAHOMA ADMINISTRATOR OF THE COURTS',
- vendor_code = 'PT' => 'OREGON ADMINISTRATOR OF THE COURTS',
+ //vendor_code = 'PT' => 'OREGON ADMINISTRATOR OF THE COURTS',
  vendor_code = 'PU' => 'PENNSYLVANIA ADMINISTRATOR OF THE COURTS',
  vendor_code = 'PV' => 'PENNSYLVANIA ADMINISTRATOR OF THE COURTS COURT OF COMMON PLEAS',
  vendor_code = 'RA' => 'RHODE ISLAND ADMINISTRATOR OF THE COURTS',
@@ -3068,7 +3068,7 @@ export fn_vendorcode_sourcename(string5 vendor_code, string8 src_upload_date) :=
  vendor_code = 'OC' => 'OHIO MONTGOMERY COUNTY DAYTON MUNICIPAL COURT',
  vendor_code = 'OD' => 'OHIO WARREN COUNTY MASON MUNICIPAL COURT',
  vendor_code = 'OE' => 'OHIO FRANKLIN COUNTY MUNICIPAL COURT',
- vendor_code = 'OF' => 'OHIO WARREN COUNTY',
+ //vendor_code = 'OF' => 'OHIO WARREN COUNTY',
  vendor_code = 'OG' => 'OHIO CLINTON COUNTY',
  vendor_code = 'OI' => 'OHIO COLUMBIANA COUNTY',
  vendor_code = 'OJ' => 'OHIO LAWRENCE COUNTY MUNICIPAL COURT',
@@ -3090,7 +3090,7 @@ export fn_vendorcode_sourcename(string5 vendor_code, string8 src_upload_date) :=
  vendor_code = 'PB' => 'OHIO BUTLER COUNTY',
  vendor_code = 'PC' => 'OHIO MONTGOMERY COUNTY VANDALIA MUNICIPAL COURT',
  vendor_code = 'PD' => 'OHIO DELAWARE COUNTY',
- vendor_code = 'PE' => 'OHIO WARREN COUNTY COURT',
+ //vendor_code = 'PE' => 'OHIO WARREN COUNTY COURT',
  vendor_code = 'PF' => 'OHIO SUMMIT COUNTY AKRON MUNICIPAL COURT',
  vendor_code = 'PG' => 'OHIO FRANKLIN COUNTY',
  vendor_code = 'PH' => 'OHIO STARK COUNTY COMMON PLEAS COURT',
@@ -3140,7 +3140,7 @@ export fn_vendorcode_sourcename(string5 vendor_code, string8 src_upload_date) :=
 	
   //VC 20151105	
 	vendor_code = '7T'=> 'ARIZONA_MARICOPA_COUNTY_SUPERIOR_COURT_FILINGS'       ,
-	vendor_code = '7U'=> 'DISTRICT_OF_COLUMBIA_SUPERIOR_COURT'                  ,
+	//vendor_code = '7U'=> 'DISTRICT_OF_COLUMBIA_SUPERIOR_COURT'                  ,
 	vendor_code = '7V'=> 'FLORIDA_ESCAMBIA_COUNTY_CIRCUIT_COURT'                ,
 	vendor_code = '7W'=> 'FLORIDA_FLAGLER_COUNTY_CIRCUIT_COURT'                 ,
 	vendor_code = '7X'=> 'FLORIDA_MANATEE_CIRCUIT_AND_COUNTY_COURTS'            ,
@@ -3457,7 +3457,7 @@ vendor_code = 'YK' => 'OHIO_MONTGOMERY_MIAMISBURG_MUNICIPAL_COURT',
 vendor_code = 'YL' => 'OHIO_MUSKINGUM_COUNTY_MUNICIPAL_COURT',
 vendor_code = 'YM' => 'OHIO_OTTAWA_COUNTY_MUNICIPAL_COURT',
 vendor_code = 'YN' => 'OHIO_PERRY_COUNTY_COURT',
-vendor_code = 'PY' => 'WISCONSIN_ADMINISTRATOR_OF_THE_COURTS_TRAFFIC',
+//vendor_code = 'PY' => 'WISCONSIN_ADMINISTRATOR_OF_THE_COURTS_TRAFFIC',
  
 //-----------------------------Batch3-----------------------------------------
 vendor_code = 'ZC' => 'SOUTH_CAROLINA_ABBEVILLE_COUNTY_CIRCUIT_COURTS' ,
@@ -3781,7 +3781,7 @@ vendor_code = '10G' => 'GEORGIA_PAROLE_RELEASED_INMATES'                      ,
  vendor_code = 'W0147' => 'TENNESSEE_HARDEMAN_COUNTY_ARRESTS               ',
  vendor_code = 'W0148' => 'CALIFORNIA_TULARE_COUNTY                        ',
  vendor_code = 'W0149' => 'OHIO_GREENE_COUNTY_FAIRBORN_MUNICIPAL_COURT     ',
- vendor_code = 'W0150' => 'OHIO_WARREN_COUNTY_LEBANON_MUNICIPAL_COURT      ',   
+ //vendor_code = 'W0150' => 'OHIO_WARREN_COUNTY_LEBANON_MUNICIPAL_COURT      ',   
  
  vendor_code = 'W0151' =>'ARIZONA_MARICOPA_WEBSITE                         ',//??
  vendor_code = 'W0152' =>'ARIZONA_PHOENIX                                  ',
