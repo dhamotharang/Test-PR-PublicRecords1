@@ -52,7 +52,7 @@
 		EXPORT fileLocation(BOOLEAN useProdData)	:= IF(useProdData, data_services.foreign_prod, data_services.foreign_dataland);
 		EXPORT fileScope						:= 'fraudgov::base::built::kel::';
 		// EXPORT fileScope						:= 'gov::otto::';
-		// EXPORT fileScope						:= 'fraudgov::base::20190928::kel::';
+		// EXPORT fileScope						:= 'fraudgov::base::20191025::kel::';
 		EXPORT fatherFileScope			:= 'fraudgov::base::father::kel::';
 		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrZWVJczQh';
 		EXPORT reqSource						:= 'batch';		
@@ -64,7 +64,7 @@
 		EXPORT HpccConnectionQa			:= 'ramps_cert_fraudgov';
 		EXPORT HpccConnectionQaDev	:= 'ramps_certthor_devroxie_fraudgov';
 		EXPORT HpccConnectionDev		:= 'ramps_dev_fraudgov';
-		EXPORT EclCompileStrategy		:= 'REMOTE';											
+		EXPORT EclCompileStrategy		:= 'LOCAL';											
 		EXPORT KeepEcl							:= 'FALSE';	
 		EXPORT ForceRun							:= 'FALSE';
 		EXPORT CustomerDashboard 		:= MODULE
