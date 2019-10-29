@@ -35,6 +35,7 @@ BuildStatusReport :=
 +'wuname := \'FraudGov Build Status Report\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'protect\', true);\n'
++'#OPTION(\'defaultSkewError\', 1);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
 +' 	 ,\'FraudGov Build Status Report\'\n'
