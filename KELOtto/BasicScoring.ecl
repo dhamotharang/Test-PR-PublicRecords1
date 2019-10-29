@@ -3,9 +3,8 @@ EXPORT BasicScoring := MODULE
 
   IMPORT KELOtto, FraudGovPlatform_Analytics, FraudGovPlatform, Data_services, Std;
 
-//	EXPORT WeightingChart := DATASET(IF(KELOtto.Constants.useProdData, Data_services.foreign_prod, data_services.foreign_dataland)+'fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
-	EXPORT WeightingChart := DATASET('~foreign::10.173.14.201::fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
-	EXPORT CustomWeightingChart := DATASET('~foreign::10.173.14.201::fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
+	EXPORT WeightingChart := DATASET(IF(KELOtto.Constants.useProdData, Data_services.foreign_prod, data_services.foreign_dataland)+'fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
+	EXPORT CustomWeightingChart := DATASET(IF(KELOtto.Constants.useProdData, Data_services.foreign_prod, data_services.foreign_dataland)+'fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
 
 // Add a column to tag that have {value} so the str.findreplace is only done for those rows that need it (for speed in the join).
 	EXPORT WeightingChartPrepped := PROJECT(WeightingChart, TRANSFORM({RECORDOF(WeightingChart), BOOLEAN HasValue}, SELF.HasValue := Std.Str.Find(LEFT.UiDescription, '{value}') > 0, SELF := LEFT));
