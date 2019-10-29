@@ -193,6 +193,7 @@ layout_soap := RECORD
   REAL Global_Watchlist_Threshold;
   BOOLEAN OutcomeTrackingOptOut;
   BOOLEAN CorteraRetrotest;
+	STRING DataPermissionMask;    
 END;
 
 layout_soap transform_input_request(f_with_seq le) := TRANSFORM
@@ -329,6 +330,7 @@ layout_soap transform_input_request(f_with_seq le) := TRANSFORM
 	SELF.MarketingMode := Marketing_Mode;
 	SELF.AllowedSources := '';
 	SELF.Global_Watchlist_Threshold := 0.84;
+	SELF.DataPermissionMask := dataPermissionMask_val;
 
 	SELF.Seq := (STRING)le.seq;
 	SELF.AccountNumber := le.accountnumber;

@@ -18,10 +18,10 @@ recordsToRun := 0;
 eyeball      := 10;
 threads      := 2;
 
-RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production
-// RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
+RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
+//RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production// RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
 // RoxieIP := RiskWise.shortcuts.Dev192;                  // Development Roxie 192
- // RoxieIP := RiskWise.shortcuts.Dev194;                  // Development Roxie 194
+// RoxieIP := RiskWise.shortcuts.Dev194;                  // Development Roxie 194
 
 inputFile          := '~tfuerstenberg::in::cortera_bac_records_2.csv';
 InputRetrotestFile := '~thor::cortera::retrotester::results::lnretro_linkid_20171016_163703_output.txt';
@@ -142,6 +142,8 @@ layout_soap := RECORD
   STRING50 AllowedSources;
   REAL Global_Watchlist_Threshold;
   boolean OutcomeTrackingOptOut;
+ 	STRING DataPermissionMask;  
+ 
 END;
 
 layout_soap transform_input_request(f_with_seq le) := TRANSFORM
@@ -282,6 +284,7 @@ layout_soap transform_input_request(f_with_seq le) := TRANSFORM
 	SELF.Seq := (STRING)le.seq;
 	SELF.AccountNumber := le.accountnumber;
 	SELF.OutcomeTrackingOptOut := TRUE;  // Turn off SCOUT logging
+	SELF.DataPermissionMask := dataPermissionMask_val;  
 	SELF := [];
 END;
 

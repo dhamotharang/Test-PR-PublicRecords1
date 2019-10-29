@@ -1,4 +1,4 @@
-/* RiskProcessing.BWR_Small_Business_Analytics_SBFE */
+﻿/* RiskProcessing.BWR_Small_Business_Analytics_SBFE */
 
 #workunit('name','Small Business Analytics SBFE');
 #option ('hthorMemoryLimit', 1000);
@@ -18,8 +18,8 @@ recordsToRun := 0;
 eyeball      := 10;
 threads      := 2;
 
-RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production
-// RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
+RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
+//RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production// RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
 // RoxieIP := RiskWise.shortcuts.Dev192;                  // Development Roxie 192
 // RoxieIP := RiskWise.shortcuts.Dev194;                  // Development Roxie 194
 
@@ -122,6 +122,7 @@ layout_soap := RECORD
 	STRING50 AllowedSources;
 	REAL Global_Watchlist_Threshold;
 	boolean OutcomeTrackingOptOut;
+	STRING DataPermissionMask;    
 END;
 
 layout_soap transform_input_request(f le, UNSIGNED8 ctr) := TRANSFORM
@@ -262,7 +263,8 @@ layout_soap transform_input_request(f le, UNSIGNED8 ctr) := TRANSFORM
 	SELF.Seq := (STRING)ctr;
 	SELF.AccountNumber := le.accountnumber;
 	SELF.OutcomeTrackingOptOut := TRUE;  // Turn off SCOUT logging
-	
+	SELF.DataPermissionMask := dataPermissionMask_val;
+
 	SELF := [];
 END;
 
