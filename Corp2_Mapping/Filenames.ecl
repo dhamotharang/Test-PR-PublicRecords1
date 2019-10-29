@@ -688,9 +688,6 @@ module
 
 	end;
 
-
-	end;
-
 	export nj_raw :=
 	module
 
