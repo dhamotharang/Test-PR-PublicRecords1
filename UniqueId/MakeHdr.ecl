@@ -91,7 +91,7 @@ export OutputDataXMLFile(dataset(recordof(Layout_Watchlist.routp)) infile
 
 	cnt := count(infile);
 	hdr := MakeXMLHdr(Watchlistname, cnt, 'Entity_List');
-	return OUTPUT(infile,,'~thor::uniqueid::'+filename,
+	return OUTPUT(Distribute(infile,0),,'~thor::uniqueid::'+filename,
 			xml('Entity', heading(hdr,Footer),trim, OPT), overwrite);
 END;
 
