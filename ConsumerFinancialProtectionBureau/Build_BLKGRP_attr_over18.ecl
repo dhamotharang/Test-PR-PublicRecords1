@@ -1,7 +1,11 @@
 import $, std;
-export Build_BLKGRP_attr_over18(string data_source) := function
+export Build_BLKGRP_attr_over18(boolean pUseProd = false, boolean isfcra = false) := function
+    data_source := $.Filenames(,pUseProd,isfcra).BaseBLKGRP_attr_over18_in;
     OriginalLayout :=  $.layouts.original_BLKGRP_attr_over18;
-    RawData := dataset(data_source, originalLayout, CSV(Heading(1)));
+    RawData := if( pUseProd,
+        dataset(data_source, originalLayout, CSV(Heading(1))),
+        choosen(dataset(data_source, originalLayout, CSV(Heading(1))),200) //debug faster
+    );
     $.layouts.BLKGRP_attr_over18 CFPB_convert(originalLayout L,  unsigned4 rsid, unsigned4 date) := TRANSFORM
         self.GeoInd := L.field1;
         self.geo_pr_White := (REAL4) L.field2;

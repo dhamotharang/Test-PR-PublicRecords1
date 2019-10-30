@@ -107,11 +107,11 @@ EXPORT layouts := module
         REAL4 here_given_hispanic;
     end;
 
-    BLKGRP_attr_over18_keyed_fields := RECORD
+    export BLKGRP_attr_over18_keyed_fields := RECORD
         BLKGRP_attr_over18.GeoInd;
     END;
 
-    BLKGRP_attr_over18_payload := RECORD
+    export BLKGRP_attr_over18_payload := RECORD
         BLKGRP_attr_over18;
     end;
 
@@ -129,11 +129,11 @@ EXPORT layouts := module
         UDECIMAL4_2 pct2prace;
         UDECIMAL4_2 pcthispanic;
     end;
-    census_surnames_keyed_fields := RECORD
+    export census_surnames_keyed_fields := RECORD
         census_surnames.name;
     END;
 
-    census_surnames_payload := RECORD
+    export census_surnames_payload := RECORD
         census_surnames;
     end;
 end;

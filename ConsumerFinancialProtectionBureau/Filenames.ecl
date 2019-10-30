@@ -1,7 +1,7 @@
 import versioncontrol, tools, Doxie;
 
 export Filenames(string filedate = '', boolean pUseProd = false, boolean isfcra = false) := module
-	shared version_suffix := if(filedate = '', '', '::' + filedate + '::');
+	shared version_suffix := if(filedate = '', '', '::' + filedate);
 	shared FCRA_extension := if(isfcra, '::fcra', '');
 
 	export BaseBLKGRP_in := '~thor::cfpb_race_proxy::blkgrp';
