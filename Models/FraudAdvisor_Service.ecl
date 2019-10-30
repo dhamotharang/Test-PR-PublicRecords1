@@ -847,14 +847,12 @@ All_models := Project(Valid_requested_models, transform(Models.layouts.Enhanced_
                                               self.model_name := custom_name, // piping model name through to keep track of what's what
                                               self := Models.FP_models.Execute_model(Model_params)));
 
-temp_fp_test_seed := Project(Valid_requested_models, Transform(Models.layouts.Enhanced_layout_fp1109,
+fp_test_seed := Project(Valid_requested_models, Transform(Models.layouts.Enhanced_layout_fp1109,
                                                 seed_custom_temp  := left.ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom');
                                                 seed_custom_name  := STD.STR.ToLowerCase(TRIM(seed_custom_temp[1].OptionValue));
                                                 
                                                 self := Risk_Indicators.FraudPoint_TestSeed_Function(test_prep, Test_Data_Table_Name, seed_custom_name)));
 
-//Filter out testseeds that don't have a score or reason codes as we didn't get a proper hit.
-fp_test_seed := temp_fp_test_seed(score != '' and ri[1].hri != '');
 
 models.Layout_Reason_Codes form_modelout_rc(Models.Layout_ModelOut le, unsigned1 cnt) :=
 TRANSFORM
