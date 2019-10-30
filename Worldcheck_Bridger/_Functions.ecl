@@ -1262,6 +1262,8 @@
 				trim(kword, left, right) = 'SKFSRC' =>SubGroup_Constants.numKeywordsID.KEYWORD_SKFSRC,
 				trim(kword, left, right) = 'TTFIU-TTPS' =>SubGroup_Constants.numKeywordsID.KEYWORD_TTFIU_TTPS,
 				trim(kword, left, right) = 'OFAC-SYR-EO' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_SYR_EO,
+				trim(kword, left, right) = 'FRDGCCRF-CP' =>SubGroup_Constants.numKeywordsID.KEYWORD_FRDGCCRF_CP,
+				trim(kword, left, right) = 'FRDGCCRF' =>SubGroup_Constants.numKeywordsID.KEYWORD_FRDGCCRF,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
