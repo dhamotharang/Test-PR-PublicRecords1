@@ -1,5 +1,6 @@
 ﻿import ut;
-EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget) := module
+EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget
+													,string roxieprocess = '*') := module
 
 	export rPackageFile := record, maxlength(5000000)
 			string packagemaps := '';
@@ -76,7 +77,7 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget) :=
 	export PackageFromXML() := function
 		InputRec := record
 			string datasetname{xpath('Target')} := roxietarget;
-			string location{xpath('Process')} := '*';
+			string location{xpath('Process')} := roxieprocess;
 		end;
 	
 		outrec := record,maxlength(5000000)
@@ -174,7 +175,7 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget) :=
 	export XMLPackageWithQueries() := function
 		InputRec := record
 			string datasetname{xpath('Target')} := roxietarget;
-			string location{xpath('Process')} := '*';
+			string location{xpath('Process')} := roxieprocess;
 		end;
 	
 		outrec := record,maxlength(5000000)
