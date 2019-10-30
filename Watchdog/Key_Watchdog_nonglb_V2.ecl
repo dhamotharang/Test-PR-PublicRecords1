@@ -1,13 +1,11 @@
-//Dataset does not exist.   Just a reference for the index statement.
-import doxie,ut,_Control,Data_Services;
-//See key_Prep_Watchdog...
-flags := dataset('Fake_Dataset',watchdog.Layout_best_flags,flat);
-export Key_Watchdog_nonglb_V2 
+﻿import doxie,ut,_Control,Data_Services,Watchdog_V2;
 
-					:= INDEX(flags
-					
-						,watchdog.Layout_best_flags
-						,Data_Services.Data_location.Prefix('Watchdog_Best')
-								
-								+'thor_data400::key::watchdog_nonglb_noneq.did_'+doxie.Version_SuperKey
-);
+
+Parms := Module(Watchdog_V2.UniversalKeyInterface)
+EXPORT Permissions := Watchdog_V2.fn_UniversalKeySearch.PermissionsType.nonglb_noneq;
+END;
+
+export Key_Watchdog_nonglb_V2 := Watchdog_V2.fn_UniversalKeySearch.FetchRecords(Parms);
+
+
+

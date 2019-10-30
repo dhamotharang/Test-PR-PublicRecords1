@@ -1,4 +1,4 @@
-﻿import address, did_add, didville,ut,header_slimsort,mdr,header, idl_header, PromoteSupers, Scrubs, Scrubs_Targus, _Control, lib_date, tools, std;
+﻿import address, MDR, did_add, didville,ut,header_slimsort,mdr,header, idl_header, PromoteSupers, Scrubs, Scrubs_Targus, _Control, lib_date, tools, std;
 export proc_build_base(string versionDate, string emailList='') := function
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Pull Input Data Sample
@@ -208,11 +208,11 @@ export proc_build_base(string versionDate, string emailList='') := function
 	END;
 	
 	dNewBase_Dedup	:=	rollup(new_base_s, tKeepFirstReportedDate(left, right),
-											left.phone_number = right.phone_number and
-											left.record_id = right.record_id and
-											left.rec_type = right.rec_type and
-											left.first_name = right.first_name and
-											left.last_name = right.last_name,
+											ut.CleanSpacesAndUpper(left.phone_number) = ut.CleanSpacesAndUpper(right.phone_number) and
+											ut.CleanSpacesAndUpper(left.record_id) = ut.CleanSpacesAndUpper(right.record_id) and
+											ut.CleanSpacesAndUpper(left.rec_type) = ut.CleanSpacesAndUpper(right.rec_type) and
+											ut.CleanSpacesAndUpper(left.first_name) = ut.CleanSpacesAndUpper(right.first_name) and
+											ut.CleanSpacesAndUpper(left.last_name) = ut.CleanSpacesAndUpper(right.last_name),
 									LOCAL
 								);
 
@@ -241,18 +241,18 @@ dt_tb_ly := record
 end;
 
  	dDatesFile	:=	project(dNewBase_Dedup, transform(dt_tb_ly, self := left));
-	dDatesFile_s := sort(distribute(dDatesFile, hash(phone_number)),  phone_number,
-																																	first_name,
-																																	last_name,
-																																	house_number,
-																																	pre_direction,
-																																	street_name,
-																																	street_type,
-																																	post_direction,
-																																	apt_number,
-																																	box_number,
-																																	state,
-																																	z5,
+	dDatesFile_s := sort(distribute(dDatesFile, hash(phone_number)),  ut.CleanSpacesAndUpper(phone_number),
+																																	ut.CleanSpacesAndUpper(first_name),
+																																	ut.CleanSpacesAndUpper(last_name),
+																																	ut.CleanSpacesAndUpper(house_number),
+																																	ut.CleanSpacesAndUpper(pre_direction),
+																																	ut.CleanSpacesAndUpper(street_name),
+																																	ut.CleanSpacesAndUpper(street_type),
+																																	ut.CleanSpacesAndUpper(post_direction),
+																																	ut.CleanSpacesAndUpper(apt_number),
+																																	ut.CleanSpacesAndUpper(box_number),
+																																	ut.CleanSpacesAndUpper(state),
+																																	ut.CleanSpacesAndUpper(z5),
 																																	active,
 																																	dt_vendor_first_reported,
 																																	dt_first_seen, 
@@ -271,18 +271,18 @@ dt_tb_ly	tRollforDate(	dDatesFile_s  pLeft, 	dDatesFile_s  pRight)	:=	TRANSFORM
 		
 	
 	dDatesFile_r := rollup(dDatesFile_s , tRollforDate(left, right),
-										LEFT.phone_number	=	RIGHT.phone_number	AND
-										LEFT.first_name	=	RIGHT.first_name	AND
-										LEFT.last_name	=	RIGHT.last_name	AND
-										LEFT.house_number	=	RIGHT.house_number	AND
-										LEFT.pre_direction	=	RIGHT.pre_direction	AND
-										LEFT.street_name	=	RIGHT.street_name	AND
-										LEFT.street_type	=	RIGHT.street_type	AND
-										LEFT.post_direction	=	RIGHT.post_direction	AND
-										LEFT.apt_number	=	RIGHT.apt_number		AND
-										LEFT.box_number	=	RIGHT.box_number	AND
-										LEFT.state	=	RIGHT.state	AND
-										LEFT.z5	=	RIGHT.z5, local);	
+										ut.CleanSpacesAndUpper(LEFT.phone_number)	=	ut.CleanSpacesAndUpper(RIGHT.phone_number)	AND
+										ut.CleanSpacesAndUpper(LEFT.first_name)	=	ut.CleanSpacesAndUpper(RIGHT.first_name)	AND
+										ut.CleanSpacesAndUpper(LEFT.last_name)	=	ut.CleanSpacesAndUpper(RIGHT.last_name)	AND
+										ut.CleanSpacesAndUpper(LEFT.house_number)	=	ut.CleanSpacesAndUpper(RIGHT.house_number)	AND
+										ut.CleanSpacesAndUpper(LEFT.pre_direction)	=	ut.CleanSpacesAndUpper(RIGHT.pre_direction)	AND
+										ut.CleanSpacesAndUpper(LEFT.street_name)	=	ut.CleanSpacesAndUpper(RIGHT.street_name)	AND
+										ut.CleanSpacesAndUpper(LEFT.street_type)	=	ut.CleanSpacesAndUpper(RIGHT.street_type)	AND
+										ut.CleanSpacesAndUpper(LEFT.post_direction)	=	ut.CleanSpacesAndUpper(RIGHT.post_direction)	AND
+										ut.CleanSpacesAndUpper(LEFT.apt_number)	=	ut.CleanSpacesAndUpper(RIGHT.apt_number)		AND
+										ut.CleanSpacesAndUpper(LEFT.box_number)	=	ut.CleanSpacesAndUpper(RIGHT.box_number)	AND
+										ut.CleanSpacesAndUpper(LEFT.state)	=	ut.CleanSpacesAndUpper(RIGHT.state)	AND
+										ut.CleanSpacesAndUpper(LEFT.z5)	=	ut.CleanSpacesAndUpper(RIGHT.z5), local);	
 										
 	//Append new dates to base file						
 	targus.Layout_Consumer_Out_Unfiltered tAssignDates (dNewBase_Dedup pLeft, 	dDatesFile_r pRight) := transform
@@ -294,18 +294,18 @@ dt_tb_ly	tRollforDate(	dDatesFile_s  pLeft, 	dDatesFile_s  pRight)	:=	TRANSFORM
 	end;
 	
 dNewBase_final := join(distribute(dNewBase_Dedup, hash(phone_number)), 	dDatesFile_r ,
-	                  LEFT.phone_number	=	RIGHT.phone_number	AND
-										LEFT.first_name	=	RIGHT.first_name	AND
-										LEFT.last_name	=	RIGHT.last_name	AND
-										LEFT.house_number	=	RIGHT.house_number	AND
-										LEFT.pre_direction	=	RIGHT.pre_direction	AND
-										LEFT.street_name	=	RIGHT.street_name	AND
-										LEFT.street_type	=	RIGHT.street_type	AND
-										LEFT.post_direction	=	RIGHT.post_direction	AND
-										LEFT.apt_number	=	RIGHT.apt_number		AND
-										LEFT.box_number	=	RIGHT.box_number	AND
-										LEFT.state	=	RIGHT.state	AND
-										LEFT.z5	=	RIGHT.z5,
+	                  ut.CleanSpacesAndUpper(LEFT.phone_number)	=	ut.CleanSpacesAndUpper(RIGHT.phone_number)	AND
+										ut.CleanSpacesAndUpper(LEFT.first_name)	=	ut.CleanSpacesAndUpper(RIGHT.first_name)	AND
+										ut.CleanSpacesAndUpper(LEFT.last_name)	=	ut.CleanSpacesAndUpper(RIGHT.last_name)	AND
+										ut.CleanSpacesAndUpper(LEFT.house_number)	=	ut.CleanSpacesAndUpper(RIGHT.house_number)	AND
+										ut.CleanSpacesAndUpper(LEFT.pre_direction)	=	ut.CleanSpacesAndUpper(RIGHT.pre_direction)	AND
+										ut.CleanSpacesAndUpper(LEFT.street_name)	=	ut.CleanSpacesAndUpper(RIGHT.street_name)	AND
+										ut.CleanSpacesAndUpper(LEFT.street_type)	=	ut.CleanSpacesAndUpper(RIGHT.street_type)	AND
+										ut.CleanSpacesAndUpper(LEFT.post_direction)	=	ut.CleanSpacesAndUpper(RIGHT.post_direction)	AND
+										ut.CleanSpacesAndUpper(LEFT.apt_number)	=	ut.CleanSpacesAndUpper(RIGHT.apt_number)		AND
+										ut.CleanSpacesAndUpper(LEFT.box_number)	=	ut.CleanSpacesAndUpper(RIGHT.box_number)	AND
+										ut.CleanSpacesAndUpper(LEFT.state)	=	ut.CleanSpacesAndUpper(RIGHT.state)	AND
+										ut.CleanSpacesAndUpper(LEFT.z5)	=	ut.CleanSpacesAndUpper(RIGHT.z5),
 										tAssignDates(left, right),
 										keep(1),
 										left outer,										
@@ -314,13 +314,15 @@ dNewBase_final := join(distribute(dNewBase_Dedup, hash(phone_number)), 	dDatesFi
 	
 	dNewBase_Dedup_ := dNewBase_Dedup;
 	dFilteredBase		:=	PROJECT(dNewBase_final(Active=TRUE),TRANSFORM(Targus.Layout_Consumer_out,                                                                  
-																																		SELF.global_sid := 23121;  //Added for CCPA-6 - Targus has a single source and sid retrieval function not yet available
+																																		SELF.global_sid := 0;  //Added for CCPA-6 - Targus has a single source and sid retrieval function not yet available
 																																		SELF.record_sid := 0;
 	                                                                  SELF            := LEFT)
 														 );
 	
+	addGSFiltered		:= MDR.macGetGlobalSid(dFilteredBase,'Targus','','global_sid'); //Add Global_SID
+	
 	PromoteSupers.MAC_SF_BuildProcess(dNewBase_Dedup_,'~thor_data400::base::consumer_targus_unfiltered',buildBase,3,,TRUE); // Compressed
-  PromoteSupers.MAC_SF_BuildProcess(dFilteredBase,'~thor_data400::base::consumer_targus',buildFilteredBase,3,,TRUE);
+  PromoteSupers.MAC_SF_BuildProcess(addGSFiltered,'~thor_data400::base::consumer_targus',buildFilteredBase,3,,TRUE);
 
 	RETURN SEQUENTIAL (
 		// OUTPUT(dScrubsWithExamples, ALL, NAMED('TargusScrubsReportWithExamples')),

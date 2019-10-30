@@ -9,11 +9,10 @@ EXPORT UpdateDops(STRING current_version, boolean skipDOPS=FALSE, string emailTo
 
  NoUpdate := OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
 
- updatedops  := PRTE.UpdateVersion('FraudGovKeys',current_version,notifyEmail,'B','F','N');
-		
+ updatedops  := PRTE.UpdateVersion('FraudGovKeys',current_version,notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean:='N');
+  	
  PerformUpdateOrNot := IF(doDOPS,updatedops,NoUpdate);
  
- 		
  RETURN PerformUpdateOrNot;
 	
 end;

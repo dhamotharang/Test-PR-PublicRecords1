@@ -1,4 +1,7 @@
-﻿import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
+﻿/*2019-06-19T17:12:03Z (Hennigar, Jennifer (RIS-BCT))
+CCPA-260
+*/
+import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, DID_Add,Business_Header_SS, NID, AID, watchdog,
 VersionControl,lib_fileservices,Health_Provider_Services,Health_Facility_Services,
 BIPV2_Company_Names, HealthCareFacility,HMS_STLIC,Scrubs_HMS_STLIC,Scrubs;
@@ -511,8 +514,18 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 					mo_apns_w_exp	:= project(mo_apns_only, add_exp(left));
 				
 					base_w_mo_apns_exp := base_no_mo_apns + mo_apns_w_exp;
-													
-			RETURN base_w_mo_apns_exp;						
+					
+			// *************************************** Add global_sid and record_sid for CCPA ************************************
+			
+					base_w_mo_apns_exp add_sids(base_w_mo_apns_exp L) := transform
+							self.global_sid					:=	26691; // Source ID for HMS State License - CCPA project 20190612 
+							self.record_sid					:=	L.source_rid;
+							self										:=	L;
+					end;
+					
+					with_ccpa := project(base_w_mo_apns_exp, add_sids(left));
+											
+			RETURN with_ccpa;						
 
    END;
 	 
@@ -736,8 +749,18 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 											,t_rollup(LEFT,RIGHT)
 											,LOCAL
 											);	
-																		
-				RETURN stlic_base_s;//stlic_base;						
+											
+			// *************************************** Add global_sid and record_sid for CCPA ************************************
+			
+					stlic_base_s add_sids(stlic_base_s L) := transform
+							self.global_sid					:=	26691; // Source ID for HMS State License - CCPA project 20190612 
+							self.record_sid					:=	L.source_rid;
+							self										:=	L;
+					end;
+					
+					base_with_ccpa := project(stlic_base_s, add_sids(left));
+																													
+				RETURN base_with_ccpa;						
 
    END;
 

@@ -1,4 +1,4 @@
-﻿import FraudShared, STD; 
+﻿import FraudShared, STD, doxie, Suppress,data_services; 
 EXPORT MapToCommon  (
 	 string pversion
   ,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = IF(_Flags.FileExists.Base.MainOrigQA, FraudGovPlatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
@@ -19,8 +19,6 @@ module
 		self.additional_address.State				:= left.Mailing_State;
 		self.additional_address.Zip					:= left.Mailing_Zip;
 		self.additional_address.Address_Type := 'Mailing';
-		self.additional_address.address_1		:= left.mailing_address_1;
-		self.additional_address.address_2		:= left.mailing_address_2;
 		self.dt_first_seen	:= left.Process_Date;
 		self.dt_last_seen		:= left.Process_Date;
 		self.dt_vendor_last_reported	:= left.FileDate;
@@ -28,9 +26,12 @@ module
 		self:= left; 
 		self:= [];
 	)); 
+	
+	extra_dedup_KnownFraud := fn_dedup_knownfraud(inKnownFraud); // remove duplicate records with different customer_event_id
  
-	Export KnownFraud := project (inKnownFraud , transform(FraudShared.Layouts.Base.Main , 
+	Export KnownFraud := project (extra_dedup_KnownFraud , transform(FraudShared.Layouts.Base.Main , 
 		self.ln_report_date := left.reported_date;
+		self.event_date			:= if(left.event_date = '', left.reported_date, left.event_date);
 		self.transaction_id := left.customer_event_id;
 		self.additional_address.Street_1	:= left.Mailing_Street_1; 
 		self.additional_address.Street_2	:= left.Mailing_Street_2;
@@ -38,8 +39,6 @@ module
 		self.additional_address.State			:= left.Mailing_State;
 		self.additional_address.Zip				:= left.Mailing_Zip;
 		self.additional_address.Address_Type := 'Mailing';
-		self.additional_address.address_1 := left.mailing_address_1;
-		self.additional_address.address_2 := left.mailing_address_2;	
 		self.dt_first_seen	:= left.Process_Date; 
 		self.dt_last_seen		:= left.Process_Date;
 		self.dt_vendor_last_reported	:= left.FileDate; 
@@ -71,13 +70,7 @@ module
 		self.additional_address.State			:= left.Mailing_State;
 		self.additional_address.Zip				:= left.Mailing_Zip;
 		self.additional_address.Address_Type := 'Mailing';
-		self.additional_address.address_1 := left.mailing_address_1;
-		self.additional_address.address_2 := left.mailing_address_2;
 		self.classification_Activity.Confidence_that_activity_was_deceitful_id	:= (unsigned2)left.deceitful_confidence;
-		self.dt_first_seen	:= left.Process_Date; 
-		self.dt_last_seen		:= left.Process_Date;
-		self.dt_vendor_last_reported	:= left.FileDate; 
-		self.dt_vendor_first_reported	:= left.FileDate; 	
 		self:= left; 
 		self:= [];
 	)); 
@@ -97,12 +90,22 @@ module
 	// Append Clean Address
 	EXPORT NewBaseCleanAddress := Append_CleanAddress(NewBasePreviousValues):independent;
 
+	// Append Clean Additional Address
+	EXPORT Append_CleanAdditionalAddress := Append_CleanAdditionalAddress(NewBaseCleanAddress):independent;
+	
 	// Append Lexid
-	EXPORT NewBaseLexid := Append_Lexid (NewBaseCleanAddress):independent;
+	EXPORT NewBaseLexid := Append_Lexid (Append_CleanAdditionalAddress):independent;
 
+	// Supress CCPA
+	mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
+	EXPORT Supress_CCPA := Suppress.MAC_SuppressSource(NewBaseLexid, mod_access, did, NULL,TRUE);
+	
 	// Append RinID
-	EXPORT NewBaseRinID := Append_RinID (NewBaseLexid):independent;
+	EXPORT NewBaseRinID := Append_RinID (Supress_CCPA):independent;
+	
+	//Validate Deltabase 
+	Export NewBaseDelta	:= fn_validate_delta(NewBaseRinID):independent;
 
-	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseRinID);
+	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseDelta);
 
 END;

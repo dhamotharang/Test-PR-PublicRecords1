@@ -1333,6 +1333,7 @@ MODULE
 			Address.Layout_Clean182_fips				mailing_address							;
 			clean_phones												clean_phones								;
 			clean_dates													clean_dates									;
+			Base.CCPA_Fields;
 		END;
 
 		export ContactsPrep := 

@@ -1,4 +1,4 @@
-IMPORT Header, Business_Header, PRTE2_Liens, LiensV2, MDR, ut, _Validate;
+﻿IMPORT Header, Business_Header, PRTE2_Liens, LiensV2, MDR, ut, _Validate;
 
 EXPORT as_headers := MODULE
 
@@ -39,13 +39,13 @@ EXPORT as_headers := MODULE
 	
 	//For Business Records
 	EXPORT business_header_liens := FUNCTION
-		lp_bip_flag	:= PROJECT(PRTE2_Liens.files.Party_out,TRANSFORM(LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags, SELF := LEFT));
+		lp_bip_flag	:= PROJECT(PRTE2_Liens.files.Party_out,TRANSFORM(LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags, SELF := LEFT, self := []));
 		RETURN LiensV2.fliensV2_As_Business_Header(lp_bip_flag, true)(bdid>0);
 	END;
 	
 		
 	EXPORT new_business_header_liens := FUNCTION
-		lp_bip	:= PROJECT(PRTE2_Liens.files.Party_out,TRANSFORM(LiensV2.layout_liens_party_ssn_BIPV2, SELF := LEFT));
+		lp_bip	:= PROJECT(PRTE2_Liens.files.Party_out,TRANSFORM(LiensV2.layout_liens_party_ssn_BIPV2, SELF := LEFT, self := []));
 		RETURN LiensV2.fLiensV2_As_Business_Linking(lp_bip);
 	END;
 	

@@ -48,8 +48,7 @@ build_version := if(status <> 0, ver, today); // 0 -> Completed
 incremental := if(isMonthly, 'false', 'true');
 ingestType := if(isMonthly, 'monthly', 'incremental');
 
-days := ut.DaysApart(today, ver);
-norun := days <= 5 and status = 0;
+norun := build_version = ver and status = 0;
 
 ECL := '\n'
 +'#WORKUNIT(\'protect\',true);\n'

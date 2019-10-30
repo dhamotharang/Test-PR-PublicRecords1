@@ -1,4 +1,4 @@
-IMPORT MDR;
+﻿IMPORT MDR;
 EXPORT Property_DM_UniqDocId(dataset(LN_PropertyV2.Layout_Property_DM_Extract) ds, Types.StateList st_list=ALL) := function
 	
 	Layout_Property_DM_Extract xd(LN_PropertyV2.Layout_Property_DM_Extract l) := TRANSFORM
@@ -7,7 +7,7 @@ EXPORT Property_DM_UniqDocId(dataset(LN_PropertyV2.Layout_Property_DM_Extract) d
 		SELF := l;
 		SELF := [];
 	END;
-	f0 := PROJECT(ds(state IN st_list), xd(LEFT));
+	f0 := DISTRIBUTE(PROJECT(ds(state IN st_list), xd(LEFT)),HASH(sid));
 	Layout_Property_DM_Extract en(Layout_Property_DM_Extract l, Layout_Property_DM_Extract r):= TRANSFORM
 		SELF.rid := IF(l.rid=0, ThorLib.Node()+1, l.rid+ThorLib.Nodes());
 		SELF := r;

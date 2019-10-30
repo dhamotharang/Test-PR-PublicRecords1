@@ -3,10 +3,10 @@
 EXPORT Constants := module
 
 Export In_Hunters := '~PRTE::In::CCW::hunting_fishing';
-EXPORT Base_Hunters := data_services.foreign_prod + 'PRTE::Base::CCW::hunting_fishing';
+EXPORT Base_Hunters := '~PRTE::Base::CCW::hunting_fishing';
 
 Export In_CCW := '~PRTE::In::CCW::CCW';
-EXPORT Base_CCW := data_services.foreign_prod +'PRTE::Base::CCW::CCW';
+EXPORT Base_CCW := '~PRTE::Base::CCW::CCW';
 
 EXPORT KeyName_CCW := 	'~prte::key::CCW::'; 
 EXPORT KeyName_Hunting := 	'~prte::key::hunting_fishing::'; 

@@ -27,6 +27,13 @@ EXPORT Functions := MODULE
     RETURN IF(LENGTH(TRIM(nmbr, ALL)) > 0 AND Stringlib.StringFilterOut(nmbr, '0123456789') = '',1,0);
   END;
 
+	//****************************************************************************
+  //fn_numeric_or_blank: 	returns true if only populated with numbers or blank
+  //****************************************************************************
+  EXPORT fn_numeric_or_blank(STRING nmbr) := FUNCTION
+    RETURN IF(Stringlib.StringFilterOut(nmbr, '0123456789') = '',1,0);
+  END;
+	
   //****************************************************************************
   //fn_non_empty_alphanum: 	returns true if only populated with alphanumeric
   //****************************************************************************

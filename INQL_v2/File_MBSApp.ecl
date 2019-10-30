@@ -45,11 +45,11 @@ company_id, product_id, -priority_flag, allowflags, local),company_id, product_i
 	%jnInFile1% := join(%infile%, 
 									    %mbs_outfile_dedup_cid%(product_id = %prod_id%), 
 									   trim(left.orig_company_id,all) = trim(right.company_id,all),
-										 left outer, lookup, local);					
+										 left outer, lookup);					
 	%jnInFile2% := join(project(%jnInFile1%(sub_acct_id = ''), recordof(%infile%)),
 									   %mbs_outfile_dedup_gcid%,  
 									   trim(left.orig_global_company_id,all) = trim(right.gc_id,all),
-											left outer, lookup, local);								
+											left outer, lookup);								
 	
 	%jnInFile% := %jnInFile1%(sub_acct_id <> '') + %jnInFile2%;
 	

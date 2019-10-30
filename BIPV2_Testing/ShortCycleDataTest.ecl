@@ -1,7 +1,36 @@
-//This is my own data, rather than QAs sensitive data
+﻿//This is my own data, rather than QAs sensitive data
+
+//
+corp_bug_137300 :=
+	dataset([
+    {'06-200726010045',37556480},
+    {'08-19971164910',37556480},
+    {'29-2985881',76249693},
+    {'42-957367',130178935}	
+		], {string ck, unsigned6 seleid});
 
 
+//bug_125269
+prop_Dataset_sele_37556480_bug_125269 :=
+  dataset([
+    {'OA0601831302'},
+    {'OA0746969447'},
+    {'OA0891468930'},
+    {'OA1053259861'}], {string ln_fares_id});
 
+prop_Dataset_sele_113471768_bug_125269 :=
+  dataset([
+    {'OA0322407945'},
+    {'OA0507700295'},
+    {'RA1013335609'}], {string ln_fares_id});
+
+prop_Dataset_sele_130178935_bug_125269 :=
+  dataset([
+    {'RA1990342762'},
+    {'OA0873954621'},
+    {'OA1049992326'}], {string ln_fares_id});
+		
+//bug_124584
 prop_Dataset_sele_28063_bug_124584 :=
   dataset([
     {'RD0757991670'}, 
@@ -203,6 +232,88 @@ mvr_bug_125285 :=
 		], {string vk, unsigned6 seleid});
 
 
+ucc_dataset_sele_14771_bug_126198 :=
+  dataset([
+    {'CA0016460606'}, 
+    {'CA057016206845'}, 
+    {'CA097215599401'}, 
+    {'CA137357520962'}, 
+    {'CA9504860279'}, 
+    {'CA9517260240'}, 
+    {'CA9934460109'}, 
+    {'CA9934460138'}, 
+    {'CA9934460148'}, 
+    {'CA087166816851'}, 
+    {'CA087166816851'}, 
+    {'CA087166816851'}, 
+    {'CA9531060733'}, 
+    {'CA9724060946'}], {string tmsid});
+
+
+lj_dataset_sele_25428_bug_123991 :=
+dataset([
+    {'SUDPAJC004009241988001000514400101'}, 
+    {'SUDPASC004009241988001000057529000'}, 
+    {'SUDPACC030200881998001007467390000'}, 
+    {'SUDPACC043032421998001007534460000'}, 
+    {'SUDPACC052930151997001007218829000'}, 
+    {'SUDPACC052930301998001008301313000'}, 
+    {'SUDPACC052930311998001008301312000'}, 
+    {'SUDPACC120303041999001010232503000'}, 
+    {'SUDPACV000000832006TM003014227514000'}, 
+    {'SUDPACV000001841998TG003008865881000'}, 
+    {'SUDPACV000002981999TM003009738002000'}, 
+    {'SUDPACV000004392006TM003014594528000'}, 
+    {'SUDPADJ000002981999TM003009773795000'}, 
+    {'SUDPAFL004033581992003005167329000'}, 
+    {'SUDPAJC000027821996003006029742000'}, 
+    {'SUDPAJC000027821996003006029742000'}, 
+    {'SUDPAJC000028161996003006029747000'}, 
+    {'SUDPAJC000120481997003007335330000'}, 
+    {'SUDPAJC000128571994003005711328000'}, 
+    {'SUDPAJC000153611994003005750541000'}, 
+    {'SUDPAJC000515441993003005532071000'}, 
+    {'SUDPAJC000516291993003005588279000'}, 
+    {'SUDPAJC000528011994003005742745000'}, 
+    {'SUDPAJC002004612005001014877334000'}, 
+    {'SUDPAJC010025241988001000527084100'}, 
+    {'SUDPAJC011023231996001007073567000'}, 
+    {'SUDPAJC012016871994001001239102100'}, 
+    {'SUDPAJC012020551994001001319225101'}, 
+    {'SUDPASC000034732000003010364955000'}, 
+    {'SUDPASC000072172000003010456196000'}, 
+    {'SUDPASC000072172000003010456196000'}, 
+    {'SUDPASC000210561998003009626631000'}, 
+    {'SUDPASC000507791994003005622163000'}, 
+    {'SUDPASC000515441993003005477153000'}, 
+    {'SUDPASC000519481993003005558080000'}, 
+    {'SUDPASC002004612005001013523835000'}, 
+    {'SUDPASC003018531999001009540247000'}, 
+    {'SUDPASC003018531999001009540247000'}, 
+    {'SUDPASC003028191993001000964887000'}, 
+    {'SUDPASC004005942001001010685158000'}, 
+    {'SUDPASC004008572006001014342353000'}, 
+    {'SUDPASC004008572006001014342353000'}, 
+    {'SUDPASC006008562002001011652160000'}, 
+    {'SUDPASC006008562002001011652160000'}, 
+    {'SUDPASC006015652001001010837050000'}, 
+    {'SUDPASC007024562005001013844459000'}, 
+    {'SUDPASC010028682001001011216859000'}, 
+    {'SUDPASC011023231996001007094111000'}, 
+    {'SUDPAJT000000121997TM003008343853000'}, 
+    {'SUDPASC005044211993001001011196000'}, 
+    {'SUDPAJC000060611993003005347586000'}, 
+    {'SUDPASC003018531999001009540247000'}], {string tmsid});
+
+
+bk_dataset_sele_97466557_bug_117358 :=
+dataset([
+    {'BKME0010810832'}], {string tmsid});
+
+bk_dataset_sele_109559559_bug_117358 :=
+dataset([
+    {'BKNC0029831272'}], {string tmsid});
+
 rec := record
 	string datasource_name;
 	string mtype;
@@ -300,6 +411,58 @@ project(
 +
 
 project(
+	prop_Dataset_sele_37556480_bug_125269,
+	transform(
+		rec,
+		self.datasource_name := 'Real Property';
+		self.mtype := 'B';
+		self.id1 := left.ln_fares_id,
+		self.id2 := '',
+		self.ultid := 37556480,
+		self.orgid := 37556480,
+		self.seleid := 37556480
+	)
+)
+
++
+
+project(
+	prop_Dataset_sele_113471768_bug_125269,
+	transform(
+		rec,
+		self.datasource_name := 'Real Property';
+		self.mtype := 'B';
+		self.id1 := left.ln_fares_id,
+		self.id2 := '',
+		self.ultid := 113471768,
+		self.orgid := 113471768,
+		self.seleid := 113471768
+	)
+)
+
++
+
+project(
+	prop_Dataset_sele_130178935_bug_125269,
+	transform(
+		rec,
+		self.datasource_name := 'Real Property';
+		self.mtype := 'B';
+		self.id1 := left.ln_fares_id,
+		self.id2 := '',
+		self.ultid := 130178935,
+		self.orgid := 130178935,
+		self.seleid := 130178935
+	)
+)
+
++
+
+
+
+
+//MVR
+project(
 	mvr_bug_125285,
 	transform(
 		rec,
@@ -309,6 +472,87 @@ project(
 		self.id2 := '',
 		self.ultid := left.seleid,
 		self.orgid := left.seleid,
+		self.seleid := left.seleid
+	)
+)	
+
++
+
+project(
+	lj_dataset_sele_25428_bug_123991,
+	transform(
+		rec,
+		self.datasource_name := 'Judgement';
+		self.mtype := 'B';
+		self.id1 := left.tmsid,
+		self.id2 := '',
+		self.ultid := 25428,
+		self.orgid := 25428,
+		self.seleid := 25428
+	)
+)		
+
++
+
+project(
+	ucc_dataset_sele_14771_bug_126198,
+	transform(
+		rec,
+		self.datasource_name := 'UCC';
+		self.mtype := 'B';
+		self.id1 := left.tmsid,
+		self.id2 := '',
+		self.ultid := 14771,
+		self.orgid := 14771,
+		self.seleid := 14771
+	)
+)	
+
+//Bankruptcy	
+
++
+
+project(
+	bk_dataset_sele_97466557_bug_117358,
+	transform(
+		rec,
+		self.datasource_name := 'Bankruptcy';
+		self.mtype := 'G';
+		self.id1 := left.tmsid,
+		self.id2 := '',
+		self.ultid := 97466557,
+		self.orgid := 97466557,
+		self.seleid := 97466557
+	)
+)	
+
++
+
+project(
+	bk_dataset_sele_109559559_bug_117358,
+	transform(
+		rec,
+		self.datasource_name := 'Bankruptcy';
+		self.mtype := 'G';
+		self.id1 := left.tmsid,
+		self.id2 := '',
+		self.ultid := 109559559,
+		self.orgid := 109559559,
+		self.seleid := 109559559
+	)
+)	
+
++
+project(
+	corp_bug_137300,
+	transform(
+		rec,
+		self.datasource_name := BIPV2_Testing.Constants.SC.DSNames.corp[1];
+		self.mtype := 'B';//precision bug
+		self.id1 := left.ck,
+		self.id2 := '',
+		self.ultid := 0,//not given
+		self.orgid := 0,
 		self.seleid := left.seleid
 	)
 )	

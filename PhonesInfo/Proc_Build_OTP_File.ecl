@@ -22,7 +22,7 @@ EXPORT Proc_Build_OTP_File(string version) := function
 	
 	emailTarget				:= _control.MyInfo.EmailAddressNotify + emailDev;
 	emailBuildNotice 	:= if(count(PhonesInfo.File_OTP.Main(phone<>'')) > 0
-																,fileservices.SendEmail(emailTarget, 'Phones Metadata: OTP Phone File', 'Phones Metadata: OTP File Is Now Available.  Please see: ' + 'http://prod_esp.br.seisint.com:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
+																,fileservices.SendEmail(emailTarget, 'Phones Metadata: OTP Phone File', 'Phones Metadata: OTP File Is Now Available.  Please see: ' + 'http://uspr-prod-thor-esp.risk.regn.net:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
 																,fileservices.SendEmail(emailTarget, 'Phones Metadata: No OTP Phone File', 'There Were No OTP Records In This Build')
 																);	
 	

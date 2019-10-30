@@ -30,9 +30,9 @@ EXPORT Proc_Build_All(
   NonMemberScrubReport  := Scrubs.ScrubsPlus('BBB2','Scrubs_BBB2','Scrubs_BBB2_Raw_NonMember','Raw_NonMember' ,pversion, Email_Notification_Lists.Scrubs,false);
 
   EXPORT full_build := sequential(
-	  MemberScrubReport,
-		NonMemberScrubReport,
-		spray_files,
+	  spray_files,
+		MemberScrubReport,
+		NonMemberScrubReport,		
 		Proc_Build_Base(pversion).all,
 		Proc_Build_Keys(pversion).all,
 		Promote().built2qa,

@@ -1,8 +1,8 @@
-IMPORT InsuranceHeader_Incremental,doxie,did_add,Std;
+IMPORT InsuranceHeader_Incremental,doxie,did_add,Std,dx_header;
 export fn_tn_corrections_ikb() := function
 
  	out_rec := RECORD 
-		header.layout_header,
+		dx_header.layout_header,
 		string1 valid_dob := '';
 		unsigned6 hhid := 0;
 		STRING18 county_name := '';

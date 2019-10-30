@@ -4,18 +4,19 @@ notifyList := _control.MyInfo.EmailAddressNormal;
 
 EXPORT Proc_build_update_dops(string fileVersion) :=
 sequential (    
-                 PRTE.UpdateVersion('PersonHeaderKeys'      ,fileVersion, notifyList,'B' /*1*/   ,'N' /*2*/  ,'N'/*3*/   )
-                // ,PRTE.UpdateVersion('FCRA_PersonHeaderKeys' ,fileVersion, notifyList,'B' /*1*/   ,'F' /*2*/  ,'N'/*3*/   )
-                ,PRTE.UpdateVersion('PersonLABKeys'         ,fileVersion, notifyList,'B' /*1*/   ,'N' /*2*/  ,'N'/*3*/   )
-                // ,PRTE.UpdateVersion('RelativeV3Keys'        ,fileVersion, notifyList,'B' /*1*/   ,'N' /*2*/  ,'N'/*3*/   )
-                // ,PRTE.UpdateVersion('WatchdogKeys'          ,fileVersion, notifyList,'B' /*1*/   ,'N' /*2*/  ,'N'/*3*/   )
-                ,PRTE.UpdateVersion('FCRA_WatchdogKeys'     ,fileVersion, notifyList,'B' /*1*/   ,'F' /*2*/  ,'N'/*3*/   )
-                ,PRTE.UpdateVersion('MarketingHeaderKeys '  ,fileVersion, notifyList,'B' /*1*/   ,'N' /*2*/  ,'N'/*3*/   )
-                ,PRTE.UpdateVersion('InfutorKeys'           ,fileVersion, notifyList,'B' /*1*/   ,'N' /*2*/  ,'N'/*3*/   )
-								,PRTE.UpdateVersion('PersonSlimSortKeys'	  ,fileVersion, notifyList,'B' /*1*/   ,'N' /*2*/  ,'N'/*3*/   )
-								,PRTE.UpdateVersion('PersonHeaderWeeklyKeys',fileVersion, notifyList,'B' /*1*/   ,'N' /*2*/  ,'N'/*3*/   )
-								,PRTE.UpdateVersion('AddressRawAIDKeys'			,fileVersion, notifyList,'B' /*1*/   ,'N' /*2*/  ,'N'/*3*/   ) 			
-								,PRTE.UpdateVersion('PersonAncillaryKeys'		,fileVersion, notifyList,'B' /*1*/   ,'N' /*2*/  ,'N'/*3*/   ) 			
+                 PRTE.UpdateVersion('PersonHeaderKeys'      ,fileVersion, notifyList, l_inloc:='B', l_inenvment:='N', l_includeboolean:= 'N')
+                ,PRTE.UpdateVersion('FCRA_PersonHeaderKeys' ,fileVersion, notifyList, l_inloc:='B', l_inenvment:='F', l_includeboolean:= 'N')
+                ,PRTE.UpdateVersion('PersonLABKeys'         ,fileVersion, notifyList, l_inloc:='B', l_inenvment:='N', l_includeboolean:= 'N')
+								
+                ,PRTE.UpdateVersion('RelativeV3Keys'        ,fileVersion, notifyList, l_inloc:='B', l_inenvment:='N', l_includeboolean:= 'N')
+                ,PRTE.UpdateVersion('WatchdogKeys'          ,fileVersion, notifyList, l_inloc:='B', l_inenvment:='N', l_includeboolean:= 'N')
+                ,PRTE.UpdateVersion('FCRA_WatchdogKeys'     ,fileVersion, notifyList, l_inloc:='B', l_inenvment:='F', l_includeboolean:= 'N')
+                ,PRTE.UpdateVersion('MarketingHeaderKeys '  ,fileVersion, notifyList, l_inloc:='B', l_inenvment:='N', l_includeboolean:= 'N')
+                ,PRTE.UpdateVersion('InfutorKeys'           ,fileVersion, notifyList, l_inloc:='B', l_inenvment:='N', l_includeboolean:= 'N')
+								,PRTE.UpdateVersion('PersonSlimSortKeys'	  ,fileVersion, notifyList, l_inloc:='B', l_inenvment:='N', l_includeboolean:= 'N')
+								,PRTE.UpdateVersion('PersonHeaderWeeklyKeys',fileVersion, notifyList, l_inloc:='B', l_inenvment:='N', l_includeboolean:= 'N')
+								,PRTE.UpdateVersion('AddressRawAIDKeys'			,fileVersion, notifyList, l_inloc:='B', l_inenvment:='N', l_includeboolean:= 'N') 			
+								,PRTE.UpdateVersion('PersonAncillaryKeys'		,fileVersion, notifyList, l_inloc:='B', l_inenvment:='N', l_includeboolean:= 'N') 			
 );
 
 // 1   B = Boca, A = Alpharetta

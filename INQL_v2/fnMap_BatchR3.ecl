@@ -1,7 +1,9 @@
 ﻿import ut, lib_word, Data_Services;
 
-File_PIDs := dataset(Data_Services.foreign_r3 + 'thor_10_219::base::account_monitoring::prod::inquirytracking::pidmapping',
+File_PIDs := dataset(Data_Services.foreign_prod+ 'batchr3::base::account_monitoring::prod::inquirytracking::pidmapping',
 			{string pid, string product_id, string company_id, string gcid, boolean isFcra}, csv(separator('|'))); // new layout, waiting on file
+
+// inquiry_acclogs.Proc_Prod_R3Monitoring.File_PIDs(~isFcra), left.orig_global_company_id = right.gcid, lookup);
 
 EXPORT fnMap_BatchR3(boolean fcra = false, unsigned logType = 0) := function
 	
@@ -12,7 +14,8 @@ EXPORT fnMap_BatchR3(boolean fcra = false, unsigned logType = 0) := function
 	INQL_v2.fncleanfunctions.cleanfields(InputFile, cleaned_fields);
 	INQL_v2.File_MBSApp(cleaned_fields, 'BATCHR3', '', outfileBatchR3); 
 
-	filter_out_fcra := join(outfileBatchR3, File_PIDs(~fcra), left.orig_global_company_id = right.gcid, lookup);
+//filter_out_fcra := join(outfileBatchR3, File_PIDs(fcra), left.orig_global_company_id = right.gcid, lookup);
+	filter_out_fcra := join(outfileBatchR3, File_PIDs, left.orig_global_company_id = right.gcid, lookup);
 
 	NormFiles := normalize(filter_out_fcra, 2, transform(recordof(filter_out_fcra),
 			self.orig_full_name 			:= choose(counter, left.orig_full_name, '');

@@ -1,4 +1,4 @@
-import HealthCareProvider;
+﻿import HealthCareProvider;
 export mac_append_provider_data  (Infile,Input_LNPID,
 																	Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_V_CITY_Name = '',Input_ST = '',Input_ZIP = '',
 																	Input_LIC_STATE = '',Input_LIC_NBR = '',
@@ -113,6 +113,7 @@ END;
 		STRING10  Header_Fax;
 		STRING6	  Header_UPIN;
 		STRING10  Header_NPINUMBER;
+		UNSIGNED4	Header_DateNPIDeactivated;
 		STRING1	  Header_DEABusinessActivityIndicator;		
 		STRING10  Header_DEANumber;
 		UNSIGNED4 Header_DateDEAExpired;
@@ -150,6 +151,8 @@ END;
 		STRING1	  Client_NPIFlag;
 		UNSIGNED4 Client_DateDEAExpired;		
 		STRING1	  Client_DEAFlag;		
+		STRING40	Group_Key;
+		STRING1		Practice_Address_Flag;
 end;
 
 outfile := join (%infile_seq%,%best_data%,left.uniqueid = right.uniqueid,transform(%layout_result%, 
@@ -172,6 +175,7 @@ outfile := join (%infile_seq%,%best_data%,left.uniqueid = right.uniqueid,transfo
 		SELF.Header_Fax														:=	RIGHT.HDR_FAX;
 		SELF.Header_UPIN													:=	RIGHT.HDR_UPIN;
 		SELF.Header_NPINUMBER											:=	RIGHT.HDR_NPI_NUMBER;
+		SELF.Header_DateNPIDeactivated						:=	RIGHT.HDR_DT_NPI_DEACTIVATED;
 		SELF.Header_DEABusinessActivityIndicator	:=	RIGHT.HDR_DEA_BUS_ACT_IND;		
 		SELF.Header_DEANumber											:=	RIGHT.HDR_DEA_NUMBER;
 		SELF.Header_DateDEAExpired								:=	RIGHT.HDR_DT_DEA_EXPIRATION;
@@ -209,5 +213,7 @@ outfile := join (%infile_seq%,%best_data%,left.uniqueid = right.uniqueid,transfo
 		SELF.Client_NPIFlag												:=	RIGHT.PROV_NPI_FLAG;
 		SELF.Client_DateDEAExpired								:=	RIGHT.PROV_DT_DEA_EXPIRATION;		
 		SELF.Client_DEAFlag												:=	RIGHT.PROV_DEA_FLAG;		
+		SELF.Group_Key														:=	RIGHT.Group_Key;
+		SELF.Practice_Address_Flag								:=	RIGHT.Practice_Address_Flag;
 		SELF := LEFT;),HASH);
 ENDMACRO;																			

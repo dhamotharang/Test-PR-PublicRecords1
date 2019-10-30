@@ -1,4 +1,4 @@
-﻿import ut,RoxieKeybuild,orbit_report,PromoteSupers,Orbit3,Scrubs_marriage_divorce_v2;
+﻿import ut,RoxieKeybuild,orbit_report,PromoteSupers,Orbit3,Scrubs_marriage_divorce_v2,dops;
 
 //Modified filedate as ut.getdate is failing to create version
 export proc_build_files_and_keys(string filedate) := function
@@ -67,8 +67,8 @@ fcraupdatedops                   := RoxieKeyBuild.updateversion('FCRA_MDV2Keys',
 orbit_report.MD_Stats(getretval);
 //added function call that will clear both div and mar superfiles after the build is finished.
 
-orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild ('Marriages & Divorces',filedate,'N'),
-								Orbit3.proc_Orbit3_CreateBuild ('FCRA Marriage & Divorces',filedate,'F'));
+orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild ('Marriages and Divorces',filedate,'N'),
+								Orbit3.proc_Orbit3_CreateBuild ('FCRA Marriage and Divorces',filedate,'F'));
 
 
  do_all := sequential(marriage_divorce_v2.File_In_FL_Validate,build_intermediate,parallel(build_base,build_search),

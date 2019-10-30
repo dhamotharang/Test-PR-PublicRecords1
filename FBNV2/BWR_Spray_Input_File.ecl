@@ -94,9 +94,8 @@ export BWR_Spray_Input_File(string filename,string filedate,string source, strin
 																				   ),
 																				if (psource='FILING',
 																							addExtractSuper
-																						)	
-																				//uncomment when scrubs is added		
-																				// ,RunScrubsOnInput(psource,filedate,leMailTarget)																				
+																						)		
+																				,RunScrubsOnInput(psource,filedate,leMailTarget)																				
 																				);
 		 return retval;
 		

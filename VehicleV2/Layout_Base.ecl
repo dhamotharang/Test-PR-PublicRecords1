@@ -1,4 +1,4 @@
-import	AID, BIPV2;
+﻿import	AID, BIPV2;
 
 export	Layout_Base	:=
 module
@@ -109,6 +109,9 @@ module
   string50 AIRBAG_FRONT_PASS	;
   string50 AIRBAG_FRONT_PASS_SIDE	;
   string50 AIRBAGS	;
+	//Added for CCPA-103
+	unsigned4 global_sid := 0;
+	unsigned8 record_sid := 0;
   end;
 	
 	export	Party	:=
@@ -252,6 +255,17 @@ export	Party_Bip	:=record
 		BIPV2.IDlayouts.l_xlink_ids;		 			//Added for BIP project
 		unsigned8				source_rec_id := 0;	 	//Added for BIP project
    end;
+	 
+//New layout added for CCPA-103	 
+export	Party_CCPA	:=record
+		Party_Bip;
+		//Added for CCPA-103
+		unsigned4 global_sid := 0;
+		unsigned8 record_sid := 0;
+		//Added for DF-25578
+		string30 raw_name;
+   end;
+	 
 	export	Party_AID	:=
 	record
 		Party_Bip;
@@ -259,6 +273,7 @@ export	Party_Bip	:=record
 		string1					Append_AddressInd;
 		string150				Append_PrepAddr1;
 		string100				Append_PrepAddr2;
+		string30        raw_name;
 		AID.Common.xAID	Append_RawAID	:=	0;
 		
 		// Clean mail and physical addresses

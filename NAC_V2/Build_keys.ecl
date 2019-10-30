@@ -1,20 +1,11 @@
 ﻿import AutoKeyB2, RoxieKeyBuild,ut,standard, promoteSupers, Std;
 
-base := NAC_V2.Files('').Base2;
 
+
+payload := Nac_V2.Files.Payload;
 
 
 export Build_keys(string filedate='dummy') := function
-
-payload := Nac_V2.To_Payload(base);
-
-lfn := nac_v2.Superfile_List().sfPayload + '::' + filedate;
-build_payload := IF(NOT Std.File.FileExists(lfn),
-	SEQUENTIAL(
-		OUTPUT(payload,,lfn, compressed),
-		nac_v2.Promote_Superfiles(nac_v2.Superfile_List('').sfPayload, lfn),
-	));
-
 
 RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(key_did,'~thor::NAC2::key::did','~thor::NAC2::key::'+filedate+'::did',B1);
 RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(key_CaseId,'~thor::NAC2::key::CaseId','~thor::NAC2::key::'+filedate+'::CaseId',B2);
@@ -76,7 +67,7 @@ AutoKeyB2.MAC_Build (ak_dataset
 AutoKeyB2.MAC_AcceptSK_to_QA(ak_keyname, MAK,, ak_skipSet);
 
 return sequential(
-									build_payload,
+									//build_payload,
 									parallel(B1,B2,B3,B5,B6,B7)							//
 									,parallel(M1,M2,M3,M5,M6,M7)						//
 									,parallel(MQ1,MQ2,MQ3,MQ5,MQ6,MQ7)				//

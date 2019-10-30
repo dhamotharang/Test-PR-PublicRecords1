@@ -163,6 +163,9 @@ END;
 			BIPV2.Layout_Business_Linking_Full;
 			boolean executive_ind := false;
 			integer executive_ind_order:=0;
+			unsigned4 global_sid:=0;
+      unsigned8 record_sid:=0;
+
 		end;
 
 		export Layout_Best := 

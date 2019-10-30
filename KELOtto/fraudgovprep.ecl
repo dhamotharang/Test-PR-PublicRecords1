@@ -1,6 +1,7 @@
 ﻿IMPORT KELOtto;
 IMPORT AppendBankDetails;
 IMPORT FraudGovPlatform;
+IMPORT AppendDisposableEmailDomainFlag;
 
 /*
   This is specifically for prepping transactions for KEL. 
@@ -10,7 +11,7 @@ IMPORT FraudGovPlatform;
 // Remove massively high frequency addresses.
 // At some point we need to think through taking this out.
 
-HighFreqAddrTable := TABLE(KELOtto.fraudgov, {clean_address.prim_range, clean_address.prim_name, clean_address.zip, clean_address.sec_range, recs := count(group)}, clean_address.prim_range, clean_address.prim_name, clean_address.zip, clean_address.sec_range, MERGE)(recs > 4000);
+HighFreqAddrTable := TABLE(KELOtto.fraudgov(clean_address.prim_range != '' AND clean_address.prim_name != '' AND clean_address.zip != '' AND clean_address.sec_range != ''), {clean_address.prim_range, clean_address.prim_name, clean_address.zip, clean_address.sec_range, recs := count(group)}, clean_address.prim_range, clean_address.prim_name, clean_address.zip, clean_address.sec_range, MERGE)(recs > 4000);
 HighFreqAddr := JOIN(KELOtto.fraudgov, HighFreqAddrTable, LEFT.clean_address.prim_range = RIGHT.prim_range AND LEFT.clean_address.prim_name = RIGHT.prim_name AND LEFT.clean_address.zip = RIGHT.zip, LEFT ONLY, LOOKUP);
 
 // Bank Append.
@@ -33,4 +34,11 @@ FraudGovWithIPMetadata := JOIN(FraudGovWithFraudpoint, KELOtto.PersonIPMetadata,
 // Crim
 FraudGovWithCrim := JOIN(FraudGovWithIPMetadata, KELOtto.PersonCrim, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
 
-EXPORT FraudGovPrep := PROJECT(FraudGovWithCrim, TRANSFORM({RECORDOF(LEFT) - UID}, SELF := LEFT));
+// Advo
+FraudGovWithAdvo := JOIN(FraudGovWithCrim, KELOtto.PersonAdvo, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+
+// Dispoable emails
+
+FraudGovWithDispoableEmailFlag := AppendDisposableEmailDomainFlag.macAppendDisposableEmailDomainFlag(FraudGovWithAdvo, email_address);
+
+EXPORT FraudGovPrep := PROJECT(FraudGovWithDispoableEmailFlag, TRANSFORM({RECORDOF(LEFT) - UID}, SELF := LEFT));

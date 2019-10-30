@@ -104,8 +104,10 @@ module
 					local);	
 										
 	Shared new_base := Original_QA + New_Records_Anonymized + New_Records_Not_Anonimized;
+	
+	Shared final_rec := join(pBaseFile, new_base, left.record_id = right.record_id, transform(FraudShared.Layouts.Base.Main, self := right));
 
-	tools.mac_WriteFile(Filenames(pversion).Base.Main_Anon.New,new_base,Build_Base_File_Anonymized);
+	tools.mac_WriteFile(Filenames(pversion).Base.Main_Anon.New,final_rec,Build_Base_File_Anonymized);
 
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)

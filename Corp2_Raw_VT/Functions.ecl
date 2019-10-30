@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_mapping, _validate;
+﻿IMPORT corp2, corp2_mapping, _validate, ut, std;
 
 EXPORT Functions := Module
 	 
@@ -136,5 +136,48 @@ EXPORT Functions := Module
       RETURN addl_info;
 
 		END; 
+		
+   //fix_ForeignChar-- returns VT state-site matching legal names!
+   //Cleaning up foreign characters & unprintables from legal names
+		EXPORT fix_ForeignChar(STRING s) := FUNCTION
 
-End;
+			uc_s  							 := corp2.t2u(s);				
+			fix_legal_name       := map(regexfind('LA MONTAÃA LLC',  uc_s,0)  <> ''                             =>'LA MONTAÑA LLC',
+																	regexfind('LULA-LÃ BOUTIQUE LLC',  uc_s,0)  <> ''                       =>'A&M BOUTIQUE LLC',
+																	regexfind('POZÃ CATERING LLC',  uc_s,0)  <> ''                          =>'POZE CATERING LLC',
+																	regexfind('PÃR\\\'S'+'SMOKED OF VERMONT, LLC',  uc_s,0)  <> ''          =>'PER\\\'S'+'SMOKED OF VERMONT, LLC',
+																	regexfind('SAVOURÃ LLC',  uc_s,0)  <> ''                                =>'SAVOURE LLC',
+																	regexfind('VERMONT COFFEE COMPANY CAFÃ, LLC',  uc_s,0)  <> ''           =>'VERMONT COFFEE COMPANY CAFE, LLC',
+																	regexfind('WINTERFÃLK LLC',  uc_s,0)  <> ''                             =>'WINTERFOLK LLC',
+																	regexfind('YVONNE\\\'S'+'BAKERY AND CAFÃ LLC',  uc_s,0)  <> ''          =>'YVONNE\\\'S'+ 'BAKERY AND CAFE LLC',
+																	regexfind('ÃBERDAS, LLC',  uc_s,0)  <> ''                                =>'UBERDAS, LLC',
+																	regexfind('BRÃT DESIGN L.L.C',  uc_s,0)  <> ''                           =>'BRUT DESIGN L.L.C',
+																	regexfind('GREEN STATE CAFÃ LTD. CO.',  uc_s,0)  <> ''                  =>'GREEN STATE CAFE LTD. CO.',
+																	regexfind('ALNÃBAIWI CO.',  uc_s,0)  <> ''                              =>'ALNOBAIWI CO.',
+																	regexfind('ALCOA TREASURY S.Ã R.L., LLC',  uc_s,0)  <> ''               =>'ALCOA TREASURY S.A R.L., LLC',
+																	regexfind('ARCONIC LUXEMBOURG S.Ã R.L., L.L.C.',  uc_s,0)  <> ''        =>'ARCONIC LUXEMBOURG S.A R.L., L.L.C.',
+																	regexfind('AÃRUS SOLUTIONS PROVIDER CORP',  uc_s,0)  <> '' 						  =>'AERUS SOLUTIONS PROVIDER CORP',
+																	regexfind('HOMESTYLE HOSTEL INN & CAFÃ',  uc_s,0)  <> '' 								=>'HOMESTYLE HOSTEL INN & CAFE',
+																	regexfind('MR MIKEÂ´S PROPERTY SERVICE',  uc_s,0)  <> '' 									  =>'MR MIKE\\\'S'+'PROPERTY SERVICE',
+																	regexfind('MÃSHKA AND ANNIKA\\\'S'+'WORLD OF WONDERS',  uc_s,0)  <> ''   =>'MASHKA AND ANNIKA\\\'S'+'WORLD OF WONDERS',
+																	regexfind('NORTH WOODS CAFÃ #446',  uc_s,0)  <> ''                       =>'NORTH WOODS CAFE #446',
+																	regexfind('NORTH WOODS CAFÃ #450',  uc_s,0)  <> ''                       =>'NORTH WOODS CAFE #450',
+																	regexfind('NORTH WOODS CAFÃ #437',  uc_s,0)  <> ''                       =>'NORTH WOODS CAFE #437',
+																	regexfind('NORTH WOODS CAFÃ #443',  uc_s,0)  <> ''                       =>'NORTH WOODS CAFE #443',
+																	regexfind('NORTH WOODS CAFÃ #445',  uc_s,0)  <> ''                       =>'NORTH WOODS CAFE #445',
+																	regexfind('NORTH WOODS CAFÃ #449',  uc_s,0)  <> ''                       =>'NORTH WOODS CAFE #449',
+																	regexfind('NORTH WOODS CAFÃ #454',  uc_s,0)  <> ''                       =>'NORTH WOODS CAFE #454',
+																	regexfind('PRÃT A MANGER',  uc_s,0)  <> ''                               =>'PRET A MANGER',
+																	regexfind('RÃPUBLIQUE DU COEUR PRODUCTIONS',  uc_s,0)  <> ''             =>'REPUBLIQUE DU COEUR PRODUCTIONS',
+																	regexfind('SUPERFRESH! ORGANIC CAFÃ',  uc_s,0)  <> ''                    =>'SUPERFRESH! ORGANIC CAFE',
+																	regexfind('TISÃNE PUBLISHING',  uc_s,0)  <> ''                           =>'TISANE PUBLISHING',
+																	regexfind('TRÃNORTH NATURALS',  uc_s,0)  <> ''                            =>'TRUNORTH NATURALS',
+																	regexfind('XFÃL',  uc_s,0)  <> '' 							    	                     =>'XFOL',
+																	regexfind('ÃLAN HAIR LOUNGE',  uc_s,0)  <> ''                            =>'ELAN HAIR LOUNGE',
+																	regexfind('GISÃLEâS STUDIO',  uc_s,0)  <> ''                    =>'GISELE’S STUDIO', uc_s);
+			R_unprintables       := regexreplace('|||||||||||||' ,fix_legal_name,'');  //unprintables noticed in the data & Cleaning them													
+			return ut.fn_RemoveSpecialChars((string)Std.Uni.CleanAccents(R_unprintables));		
+				
+			END;
+		
+END;

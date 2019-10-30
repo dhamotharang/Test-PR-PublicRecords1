@@ -1,4 +1,4 @@
-//Copied from Mapping_OH_Party
+﻿//Copied from Mapping_OH_Party
 import	header,ut;
 //---------------------------------------------------------------------------
 //-------ROLLUP OH PARTY FILE
@@ -6,7 +6,7 @@ import	header,ut;
 // OH temporary party file
 dInfutorVinTempParty			:=	VehicleV2.Mapping_Infutor_Vin_Temp_Party(orig_name	!=	'');
 //dInfutorVinTempParty			:= dataset('~thor_data400::persist::vehiclev2::oh_temp_party__p2912558677',
-//                          VehicleV2.Layout_Base.Party_BIP,THOR)(orig_name	!=	'');
+//                          VehicleV2.Layout_Base.Party_CCPA,THOR)(orig_name	!=	'');
 
 dInfutorVinTempPartyDist	:=	distribute(dInfutorVinTempParty,hash(vehicle_key,iteration_key));
 dInfutorVinTempPartySort	:=	sort(	dInfutorVinTempPartyDist,                                       
@@ -34,7 +34,7 @@ dInfutorVinTempPartySort	:=	sort(	dInfutorVinTempPartyDist,
 																		local
 																	);
 
-VehicleV2.Layout_Base.Party_BIP	trollup(dInfutorVinTempPartySort	le,dInfutorVinTempPartySort	ri)	:=
+VehicleV2.Layout_Base.Party_CCPA	trollup(dInfutorVinTempPartySort	le,dInfutorVinTempPartySort	ri)	:=
 transform
 	//self.Reg_Earliest_Effective_Date	:=	VehicleV2.validate_date.fEarliestNonZeroDate(le.REGISTRATION_EFFECTIVE_DATE,ri.REGISTRATION_EFFECTIVE_DATE);
 	//self.Reg_Latest_Effective_Date		:=	VehicleV2.validate_date.fLatestNonZeroDate(le.REGISTRATION_EFFECTIVE_DATE,ri.REGISTRATION_EFFECTIVE_DATE);
@@ -47,6 +47,11 @@ transform
 	//self.Reg_License_Plate						:=	if(le.Reg_License_Plate	<>	'',le.Reg_License_Plate,ri.Reg_License_Plate);
 	//self.Reg_True_License_Plate				:=	if(le.Reg_True_License_Plate	<>	'',le.Reg_True_License_Plate,ri.Reg_True_License_Plate);
 	self.source_rec_id								:=  if(le.source_rec_id<>0,if(le.source_rec_id<ri.source_rec_id,le.source_rec_id,ri.source_rec_id),0);
+	//Added for CCPA-103
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
+	//Added for DF-25578
+	// self.raw_name                     := '';
 	self															:=	le;
 
 
@@ -80,7 +85,7 @@ dInfutorVinPartyRollup		:=	rollup(	dInfutorVinTempPartySort,
 //-------GENERATE SEQUENCE KEY
 //---------------------------------------------------------------------------
 
-VehicleV2.Layout_Base.Party_BIP	tdate(dInfutorVinPartyRollup	pInput)	:=
+VehicleV2.Layout_Base.Party_CCPA	tdate(dInfutorVinPartyRollup	pInput)	:=
 transform
 	self.Ttl_Earliest_Issue_Date			:=	''; //pInput.TITLE_ISSUE_DATE;
 	self.Ttl_Latest_Issue_Date				:=	''; //pInput.TITLE_ISSUE_DATE;

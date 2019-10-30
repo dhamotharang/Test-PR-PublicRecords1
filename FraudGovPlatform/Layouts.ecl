@@ -234,6 +234,28 @@ EXPORT Layouts := MODULE
 			string30	event_type_1;
 			string30	event_entity_1;
 		END;
+
+		EXPORT RDP := record
+			string Transaction_ID;
+			string75 TransactionDate;
+			string100 FirstName;
+			string100 LastName;
+			string60 MiddleName;
+			string10 Suffix;
+			string10 BirthDate;
+			string10 SSN;
+			unsigned6 Lexid_Input;
+			string100 Street1;
+			string50 Street2;
+			string50 Suite;
+			string100 City;
+			string10 State;
+			string10 Zip5;
+			string12 Phone;
+			unsigned6 Lexid_Discovered;
+			string25 RemoteIPAddress;
+			string25 ConsumerIPAddress;
+		END;
 	
 		EXPORT validate_record := record
 			string	field1	:= '';
@@ -272,10 +294,6 @@ EXPORT Layouts := MODULE
 			string1			Customer_Program;
 			unsigned8		source_rec_id;
 			Address.Layout_Clean_Name				cleaned_name;
-			string100		address_1 := '';
-			string50		address_2 := '';
-			string100		mailing_address_1 := '';
-			string50		mailing_address_2 := '';
 			clean_phones	clean_phones;
 			string9			clean_SSN;
 			string9			clean_Zip;
@@ -294,10 +312,6 @@ EXPORT Layouts := MODULE
 			string1			customer_program_fn; // use this one
 			unsigned8		source_rec_id ;
 			Address.Layout_Clean_Name				cleaned_name;
-			string100		address_1 := '';   
-			string50		address_2 := '';
-			string100		mailing_address_1 := '';
-			string50		mailing_address_2 := '';
 			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;
@@ -312,10 +326,6 @@ EXPORT Layouts := MODULE
 			Sprayed.Deltabase;
 			unsigned8		source_rec_id ;
 			Address.Layout_Clean_Name				cleaned_name;
-			string100		address_1 := '';
-			string50		address_2 := '';
-			string100		mailing_address_1 := '';
-			string50		mailing_address_2 := '';
 			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;
@@ -396,6 +406,10 @@ EXPORT Layouts := MODULE
 		export SkipValidationByGCID	 := RECORD
 			string Gc_ID;
 		end;
+		
+		export RefreshProdDashVersion := Record
+		boolean RefreshVersion;
+		end;
 	end;
 
 export temp := module 
@@ -447,9 +461,13 @@ Export PII	:=RECORD
   string20 mname;
   string20 lname;
   string5 name_suffix;
-  string28 prim_name;
-  string10 prim_range;
-  string8 sec_range;
+	string10 prim_range;
+	string2 predir;
+	string28 prim_name;
+	string4 addr_suffix;
+	string2 postdir;
+	string10 unit_desig;
+	string8 sec_range;
   string2 st;
   string5 zip;
   string10 ssn;
@@ -769,7 +787,7 @@ Export CIID := RECORD
   unsigned1 ___addresspobox__flags;
   boolean _addresscmra_;
   unsigned1 ___addresscmra__flags;
-  integer8 otto_address_id_;
+  string otto_address_id_;
   unsigned1 __otto_address_id__flags;
   string primary_range_;
   unsigned1 __primary_range__flags;
@@ -825,6 +843,12 @@ Export CIID := RECORD
   unsigned1 __a_c_e_cleaner_error_code__flags;
   boolean _is_additional_;
   unsigned1 ___is_additional__flags;
+  integer8 address_is_cmra_;
+  unsigned1 __address_is_cmra__flags;
+  integer8 address_is_po_box_;
+  unsigned1 __address_is_po_box__flags;
+  integer8 address_is_vacant_;
+  unsigned1 __address_is_vacant__flags;
   integer8 all_deceased_match_person_count_;
   real8 all_deceased_match_person_percent_;
   integer8 all_deceased_person_count_;
@@ -840,15 +864,66 @@ Export CIID := RECORD
   integer8 cl_active7_identity_count_;
   integer8 cl_active7_identity_count_percentile_;
   unsigned1 __cl_active7_identity_count_percentile__flags;
+  integer8 cl_address_count_;
+  integer8 cl_adjacent_no_safe_flag_;
+  integer8 cl_adjacent_safe_flag_;
+  integer8 cl_adjacent_safe_identity_count_;
+  integer8 cl_bank_identity_count_gt2_count_;
+  integer8 cl_bank_identity_count_gt2_top10_;
+  integer8 cl_death_prior_to_all_events_identity_count_;
   integer8 cl_element_count_;
+  integer8 cl_email_count_;
   integer8 cl_event_count_;
   integer8 cl_event_count_percentile_;
   unsigned1 __cl_event_count_percentile__flags;
+  integer8 cl_high_kr_identity_count_;
+  real8 cl_high_kr_identity_percent_;
+  integer8 cl_high_kr_identity_top10_;
+  integer8 cl_high_risk_death_prior_to_all_events_identity_count_;
+  real8 cl_high_risk_death_prior_to_all_events_identity_percent_;
+  integer8 cl_high_risk_death_prior_to_all_events_identity_top10_;
+  integer8 cl_high_risk_email_count_;
+  integer8 cl_high_risk_email_top10_;
+  integer8 cl_high_risk_pattern1_flag_;
+  integer8 cl_high_risk_pattern2_flag_;
+  integer8 cl_high_risk_pattern3_flag_;
+  integer8 cl_high_risk_pattern4_flag_;
+  integer8 cl_high_risk_pattern5_flag_;
+  integer8 cl_high_risk_routing_count_;
   integer8 cl_identity_count_;
+  integer8 cl_identity_count_decile_;
+  unsigned1 __cl_identity_count_decile__flags;
   integer8 cl_identity_count_percentile_;
   unsigned1 __cl_identity_count_percentile__flags;
+  real8 cl_identity_event_avg_;
   real8 cl_impact_weight_;
   unsigned1 __cl_impact_weight__flags;
+  integer8 cl_ip_high_risk_city_event_count_;
+  integer8 cl_ip_high_risk_city_identity_count_;
+  integer8 cl_ip_high_risk_count_;
+  integer8 cl_ip_high_risk_identity_count_;
+  real8 cl_ip_high_risk_identity_percent_;
+  integer8 cl_ip_high_risk_identity_top10_;
+  integer8 cl_ip_hosted_event_count_;
+  integer8 cl_ip_hosted_identity_count_;
+  integer8 cl_ip_not_us_event_count_;
+  integer8 cl_ip_not_us_identity_count_;
+  integer8 cl_ip_tor_event_count_;
+  integer8 cl_ip_tor_identity_count_;
+  integer8 cl_ip_vpn_event_count_;
+  integer8 cl_ip_vpn_identity_count_;
+  integer8 cl_kr_event_after_known_risk_identity_count_;
+  integer8 cl_kr_not_known_risk_known_risk_element_identity_count_;
+  integer8 cl_nap3_identity_count_;
+  real8 cl_nas3_identity_percent_;
+  integer8 cl_nas3_top10_;
+  integer8 cl_nas9_identity_count_;
+  real8 cl_nas9_identity_percent_;
+  integer8 cl_nas9_top10_;
+  integer8 cl_no_lex_id_gt22_count_;
+  integer8 cl_p_r_identity_match_count_;
+  real8 cl_p_r_identity_match_percent_;
+  integer8 cl_p_r_identity_no_match_;
   integer8 cluster_score_;
   unsigned1 __cluster_score__flags;
   integer8 contributor_safe_flag_;
@@ -858,6 +933,10 @@ Export CIID := RECORD
   real8 deceased_match_person_percent_;
   integer8 deceased_person_count_;
   real8 deceased_person_percent_;
+  unsigned4 dt_first_seen_;
+  unsigned1 __dt_first_seen__flags;
+  unsigned4 dt_last_seen_;
+  unsigned1 __dt_last_seen__flags;
   string entity_context_uid_;
   unsigned1 __entity_context_uid__flags;
   integer8 entity_type_;
@@ -883,12 +962,20 @@ Export CIID := RECORD
   integer8 in_customer_population_;
   integer8 industry_type_;
   unsigned1 __industry_type__flags;
+  integer8 invalid_address_;
   integer8 kr_addr300_flag_;
   integer8 kr_addr301_flag_;
   integer8 kr_addr302_flag_;
   integer8 kr_addr303_flag_;
+  integer8 kr_event_after_last_known_risk_count_;
+  integer8 kr_event_after_last_known_risk_flag_;
   integer8 kr_high_risk_flag_;
+  unsigned4 kr_last_event_date_;
+  unsigned1 __kr_last_event_date__flags;
   integer8 kr_medium_risk_flag_;
+  unsigned4 last_event_date_;
+  unsigned1 __last_event_date__flags;
+  integer8 not_in_jurisdiction_state_;
   integer8 safe_flag_;
   integer8 score_;
   unsigned1 __score__flags;
@@ -913,6 +1000,7 @@ Export CIID := RECORD
   integer8 __recordcount;
  END;
 
+
  Export customerdashtopclustersandelements := RECORD
   unsigned8 source_customer_;
   unsigned1 __source_customer__flags;
@@ -927,6 +1015,7 @@ Export CIID := RECORD
   unsigned2 date_first_seen_;
   unsigned2 date_last_seen_;
   integer8 __recordcount;
+  boolean hf;
   integer8 entity_type_;
   string label_;
   unsigned1 __label__flags;
@@ -962,9 +1051,17 @@ Export CIID := RECORD
   integer8 death_prior_to_all_events_;
   integer8 nas9_flag_;
   integer8 nap3_flag_;
+  unsigned4 dt_first_seen_;
+  unsigned1 __dt_first_seen__flags;
+  unsigned4 dt_last_seen_;
+  unsigned1 __dt_last_seen__flags;
   DATASET(RECORD
    string entity_context_uid_;
    unsigned1 __entity_context_uid__flags;
+   unsigned4 dt_first_seen_;
+   unsigned1 __dt_first_seen__flags;
+   unsigned4 dt_last_seen_;
+   unsigned1 __dt_last_seen__flags;
    unsigned2 date_first_seen_;
    unsigned2 date_last_seen_;
    integer8 __recordcount;
@@ -982,6 +1079,8 @@ Export CIID := RECORD
   unsigned1 __state__flags;
   string zip_;
   unsigned1 __zip__flags;
+  integer8 cluster_score__1_;
+  unsigned1 __cluster_score__1__flags;
   integer8 person_count_;
   integer8 high_frequency_flag_;
   integer8 high_risk_death_prior_to_all_events_percent_flag_;
@@ -995,8 +1094,12 @@ Export CIID := RECORD
   unsigned1 __abbreviated_bankname__flags;
   string license_state_;
   unsigned1 __license_state__flags;
+  integer8 in_customer_population__1_;
+  integer8 contributor_safe_flag__1_;
+  integer8 safe_flag__1_;
   unsigned8 event_count_;
   unsigned8 identity_count_;
+  unsigned1 cl_adjacent_safe_flag_;
   DATASET(flagsrec) flags;
  END;
  
@@ -1024,6 +1127,16 @@ Export CIID := RECORD
   unsigned1 __customer_id__flags;
   integer8 industry_type_;
   unsigned1 __industry_type__flags;
+  DATASET(RECORD
+   string state_;
+   unsigned1 __state__flags;
+   integer8 state_count_;
+   unsigned1 __state_count__flags;
+   unsigned2 date_first_seen_;
+   unsigned2 date_last_seen_;
+   integer8 __recordcount;
+  END) states_;
+  unsigned1 __states__flags;
   integer8 address_count_;
   integer8 all_address_count_;
   real8 all_deceased_matched_percent_;
@@ -1039,7 +1152,23 @@ Export CIID := RECORD
   unsigned1 __event_date_max__flags;
   integer8 high_frequency_address_count_;
   real8 high_frequency_address_percent_;
+  string jurisdiction_state_;
+  unsigned1 __jurisdiction_state__flags;
+  RECORD
+   string state_;
+   unsigned1 __state__flags;
+   integer8 state_count_;
+   unsigned1 __state_count__flags;
+  END jurisdiction_state_top_;
+  real8 person_address_count_average_;
+  unsigned1 __person_address_count_average__flags;
+  integer8 person_address_count_median_;
+  unsigned1 __person_address_count_median__flags;
   integer8 person_count_;
+  real8 person_event_count_average_;
+  unsigned1 __person_event_count_average__flags;
+  integer8 person_event_count_median_;
+  unsigned1 __person_event_count_median__flags;
   unsigned2 date_first_seen_;
   unsigned2 date_last_seen_;
   integer8 __recordcount;
@@ -1074,7 +1203,7 @@ Export CIID := RECORD
   unsigned1 customerquartilerank;
  END;
  
- Export	entitystats	:=	RECORD
+ Export	entitystats	:= RECORD
   integer1 entitytype;
   string entityhash;
   string field;
@@ -1091,7 +1220,7 @@ Export CIID := RECORD
   integer8 weight;
  END;
  
- Export	fullgraph	:= RECORD
+EXPORT fullgraph	:= RECORD
   unsigned8 source_customer_;
   unsigned1 __source_customer__flags;
   integer8 customer_id_;
@@ -1105,6 +1234,7 @@ Export CIID := RECORD
   unsigned2 date_first_seen_;
   unsigned2 date_last_seen_;
   integer8 __recordcount;
+  boolean hf;
   integer8 entity_type_;
   string label_;
   unsigned1 __label__flags;
@@ -1140,9 +1270,17 @@ Export CIID := RECORD
   integer8 death_prior_to_all_events_;
   integer8 nas9_flag_;
   integer8 nap3_flag_;
+  unsigned4 dt_first_seen_;
+  unsigned1 __dt_first_seen__flags;
+  unsigned4 dt_last_seen_;
+  unsigned1 __dt_last_seen__flags;
   DATASET(RECORD
    string entity_context_uid_;
    unsigned1 __entity_context_uid__flags;
+   unsigned4 dt_first_seen_;
+   unsigned1 __dt_first_seen__flags;
+   unsigned4 dt_last_seen_;
+   unsigned1 __dt_last_seen__flags;
    unsigned2 date_first_seen_;
    unsigned2 date_last_seen_;
    integer8 __recordcount;
@@ -1160,6 +1298,8 @@ Export CIID := RECORD
   unsigned1 __state__flags;
   string zip_;
   unsigned1 __zip__flags;
+  integer8 cluster_score__1_;
+  unsigned1 __cluster_score__1__flags;
   integer8 person_count_;
   integer8 high_frequency_flag_;
   integer8 high_risk_death_prior_to_all_events_percent_flag_;
@@ -1173,16 +1313,22 @@ Export CIID := RECORD
   unsigned1 __abbreviated_bankname__flags;
   string license_state_;
   unsigned1 __license_state__flags;
+  integer8 in_customer_population__1_;
+  integer8 contributor_safe_flag__1_;
+  integer8 safe_flag__1_;
+  unsigned8 cl_hr_identity_count_;
+  unsigned8 cl_hr_element_count_;
   unsigned8 event_count_;
   unsigned8 identity_count_;
+  unsigned1 cl_adjacent_safe_flag_;
   DATASET(flagsrec) flags;
  END;
- 
+
+
  Export	personassociationsdetails	:=	RECORD
   unsigned8 associatedcustomerfileinfo;
   integer8 customer_id_;
   integer8 industry_type_;
-  unsigned8 addresshash;
   unsigned6 frompersonlexid;
   unsigned6 topersonlexid;
   unsigned1 highfrequencyaddressflag;
@@ -1192,6 +1338,11 @@ Export CIID := RECORD
   integer1 sameaddressmindistancedays;
   integer1 sameaddresssameday;
   integer1 highfrequencysameaddresssameday;
+  integer1 emailmatch;
+  integer1 ssnmatch;
+  integer1 phonenumbermatch;
+  integer1 ipaddressmatch;
+  integer1 bankaccountmatch;
   string frompersonentitycontextuid;
   string topersonentitycontextuid;
   string label;
@@ -1211,6 +1362,11 @@ Export CIID := RECORD
   unsigned2 nonhighfrequencyaddresscount;
   unsigned2 nonhighfrequencysameaddresssamedaycount;
   unsigned2 highfrequencysameaddresssamedaycount;
+  unsigned2 emailmatchcount;
+  unsigned2 ssnmatchcount;
+  unsigned2 phonenumbermatchcount;
+  unsigned2 ipaddressmatchcount;
+  unsigned2 bankaccountmatchcount;
   integer8 sharedaddresscount;
   string frompersonentitycontextuid;
   string topersonentitycontextuid;
@@ -1248,6 +1404,7 @@ Export CIID := RECORD
   integer8 recs;
   string topersonlabel;
  END;
+
  
  Export	personevents	:=	RECORD
   unsigned8 uid;
@@ -1278,7 +1435,7 @@ Export CIID := RECORD
    integer8 __recordcount;
   END) event_types_;
   unsigned1 __event_types__flags;
-  integer8 otto_address_id_;
+  string otto_address_id_;
   unsigned1 __otto_address_id__flags;
   unsigned4 date_of_birth_;
   unsigned1 __date_of_birth__flags;
@@ -1816,6 +1973,8 @@ Export CIID := RECORD
   integer8 cl_nap3_identity_count_;
   integer8 kr_high_risk_flag_;
   integer8 kr_medium_risk_flag_;
+  integer8 kr_event_after_last_known_risk_flag_;
+  integer8 vl_event30_active_flag_;
   integer8 cl_identity_count_decile_;
   integer8 cl_p_r_identity_match_count_;
   real8 cl_p_r_identity_match_percent_;
@@ -1823,7 +1982,7 @@ Export CIID := RECORD
   integer8 cl_active7_identity_count_;
   integer8 cl_active30_identity_count_;
   integer8 cl_address_count_;
-  real8 cl_identity_event_avg_;
+  string cl_identity_event_avg_;
   integer8 cl_high_risk_pattern1_flag_;
   integer8 cl_high_risk_pattern2_flag_;
   integer8 cl_high_risk_pattern3_flag_;
@@ -1854,5 +2013,246 @@ Export CIID := RECORD
   integer8 cl_active7_identity_count_percentile_;
   real8 cl_impact_weight_;
  END;
+ 
+//KEL Dashboards Response Layout
+ rresults := RECORD
+    string name{xpath('name')};
+    string value{xpath('value')};
+    string filename{xpath('filename')};
+    string total{xpath('total')};
+   END;
+
+ rappvalues := RECORD
+    string application{xpath('application')};
+    string name{xpath('name')};
+    string value{xpath('value')};
+   END;
+
+ rworkunit := RECORD
+   string wuid{xpath('wuid')};
+   string owner{xpath('owner')};
+   string cluster{xpath('cluster')};
+   string jobname{xpath('jobname')};
+   string stateid{xpath('stateID')};
+   string state{xpath('state')};
+   string totalthortime{xpath('totalThorTime')};
+   DATASET(rresults) results{xpath('results')};
+   DATASET(rappvalues) appvalues{xpath('applicationValues')};
+   integer8 errorcount{xpath('errorCount')};
+   integer8 warningcount{xpath('warningCount')};
+   integer8 infocount{xpath('infoCount')};
+   integer8 resultcount{xpath('resultCount')};
+  END;
+
+ rresponse	:= RECORD 
+  string uuid{xpath('uuid')};
+  string username{xpath('username')};
+  string workunitid{xpath('workunitId')};
+  rworkunit workunit{xpath('workunit')};
+  string failed{xpath('failed')};
+  string running{xpath('running')};
+  string connectionurl{xpath('connectionURL')};
+  string compositionuuid{xpath('compositionUuid')};
+  string paused{xpath('paused')};
+  string complete{xpath('complete')};
+  string compositionname{xpath('compositionName')};
+ END;
+ 
+ Export DashboardResponse :={ DATASET(rresponse) response{xpath('response')} END;
+ 
+ Export ProdDashboardVersion := Record
+  string version;
+ End; 
+ 
+ Export Advo	:= Record
+  unsigned8 record_id;
+  unsigned6 fdn_file_info_id;
+  string1 advo_hitflag;
+  string1 advo_vacancyindicator;
+  string1 advo_throwbackindicator;
+  string1 advo_seasonaldeliveryindicator;
+  string5 advo_seasonalsuppressionstartdate;
+  string5 advo_seasonalsuppressionenddate;
+  string1 advo_donotdeliverindicator;
+  string1 advo_collegeindicator;
+  string10 advo_collegesuppressionstartdate;
+  string10 advo_collegesuppressionenddate;
+  string1 advo_addressstyle;
+  string5 advo_simplifyaddresscount;
+  string1 advo_dropindicator;
+  string1 advo_residentialorbusinessindicator;
+  string1 advo_onlywaytogetmailindicator;
+  string1 advo_recordtypecode;
+  string1 advo_addresstype;
+  string1 advo_addressusagetype;
+  string8 advo_firstseendate;
+  string8 advo_lastseendate;
+  string8 advo_vendorfirstreporteddate;
+  string8 advo_vendorlastreporteddate;
+  string8 advo_vacationbegindate;
+  string8 advo_vacationenddate;
+  string8 advo_numberofcurrentvacationmonths;
+  string8 advo_maxvacationmonths;
+  string8 advo_vacationperiodscount;
+ End;
+ 
+ Export CustomerDashTopClusters :=Record
+  unsigned8 source_customer_;
+  unsigned1 __source_customer__flags;
+  integer8 customer_id_;
+  unsigned1 __customer_id__flags;
+  integer8 industry_type_;
+  unsigned1 __industry_type__flags;
+  string tree_uid_;
+  unsigned1 __tree_uid__flags;
+  string entity_context_uid_;
+  unsigned1 __entity_context_uid__flags;
+  unsigned2 date_first_seen_;
+  unsigned2 date_last_seen_;
+  integer8 __recordcount;
+  boolean hf;
+  integer8 entity_type_;
+  string label_;
+  unsigned1 __label__flags;
+  integer8 score_;
+  unsigned1 __score__flags;
+  integer8 cluster_score_;
+  unsigned1 __cluster_score__flags;
+  integer8 cl_event_count_;
+  integer8 cl_identity_count_;
+  integer8 cl_element_count_;
+  integer8 cl_address_count_;
+  integer8 cl_identity_count_percentile_;
+  unsigned1 __cl_identity_count_percentile__flags;
+  integer8 cl_event_count_percentile_;
+  unsigned1 __cl_event_count_percentile__flags;
+  real8 cl_impact_weight_;
+  unsigned1 __cl_impact_weight__flags;
+  integer8 in_customer_population_;
+  integer8 contributor_safe_flag_;
+  integer8 safe_flag_;
+  integer8 cl_high_risk_pattern1_flag_;
+  integer8 cl_high_risk_pattern2_flag_;
+  integer8 cl_high_risk_pattern3_flag_;
+  integer8 cl_high_risk_pattern4_flag_;
+  integer8 cl_high_risk_pattern5_flag_;
+  integer8 kr_high_risk_flag_;
+  integer8 kr_medium_risk_flag_;
+  integer8 currently_incarcerated_flag_;
+  integer8 fraud_offenses_flag_;
+  integer8 associated_with_incarcerated_flag_;
+  integer8 associated_with_fraud_offenses_flag_;
+  integer8 deceased_match_;
+  integer8 death_prior_to_all_events_;
+  integer8 nas9_flag_;
+  integer8 nap3_flag_;
+  unsigned4 dt_first_seen_;
+  unsigned1 __dt_first_seen__flags;
+  unsigned4 dt_last_seen_;
+  unsigned1 __dt_last_seen__flags;
+  DATASET(RECORD
+   string entity_context_uid_;
+   unsigned1 __entity_context_uid__flags;
+   unsigned4 dt_first_seen_;
+   unsigned1 __dt_first_seen__flags;
+   unsigned4 dt_last_seen_;
+   unsigned1 __dt_last_seen__flags;
+   unsigned2 date_first_seen_;
+   unsigned2 date_last_seen_;
+   integer8 __recordcount;
+  END) exp1_;
+  unsigned1 __exp1__flags;
+  real8 latitude_;
+  unsigned1 __latitude__flags;
+  real8 longitude_;
+  unsigned1 __longitude__flags;
+  string street_address_;
+  unsigned1 __street_address__flags;
+  string vanity_city_;
+  unsigned1 __vanity_city__flags;
+  string state_;
+  unsigned1 __state__flags;
+  string zip_;
+  unsigned1 __zip__flags;
+  integer8 cluster_score__1_;
+  unsigned1 __cluster_score__1__flags;
+  integer8 person_count_;
+  integer8 high_frequency_flag_;
+  integer8 high_risk_death_prior_to_all_events_percent_flag_;
+  integer8 all_high_risk_death_prior_to_all_events_person_percent_flag_;
+  integer8 deceased_person_count_;
+  string routing_number_;
+  unsigned1 __routing_number__flags;
+  string account_number_;
+  unsigned1 __account_number__flags;
+  string abbreviated_bankname_;
+  unsigned1 __abbreviated_bankname__flags;
+  string license_state_;
+  unsigned1 __license_state__flags;
+  integer8 in_customer_population__1_;
+  integer8 contributor_safe_flag__1_;
+  integer8 safe_flag__1_;
+  unsigned8 cl_hr_identity_count_;
+  unsigned8 cl_hr_element_count_;
+  unsigned8 event_count_;
+  unsigned8 identity_count_;
+  unsigned1 cl_adjacent_safe_flag_;
+  DATASET(flagsrec) flags;
+  integer1 high_risk_centroid;
+  integer1 known_risk_centroid;
+  integer8 cl_high_risk_routing_count_;
+  integer8 cl_no_lex_id_gt22_count_;
+  integer8 cl_death_prior_to_all_events_identity_count_;
+  integer8 cl_high_risk_death_prior_to_all_events_identity_count_;
+  integer8 cl_identity_count_decile_;
+  integer8 cl_nas9_identity_count_;
+  integer8 cl_nap3_identity_count_;
+  integer8 cl_high_kr_identity_count_;
+  integer8 cl_active7_identity_count_;
+  integer8 cl_active30_identity_count_;
+  string cl_identity_event_avg_;
+  integer8 cl_p_r_identity_match_count_;
+  real8 cl_p_r_identity_match_percent_;
+  integer8 cl_p_r_identity_no_match_;
+  real8 cl_nas9_identity_percent_;
+  integer8 cl_nas9_top10_;
+  real8 cl_nas3_identity_percent_;
+  integer8 cl_nas3_top10_;
+  real8 cl_high_risk_death_prior_to_all_events_identity_percent_;
+  integer8 cl_high_risk_death_prior_to_all_events_identity_top10_;
+  real8 cl_ip_high_risk_identity_percent_;
+  integer8 cl_ip_high_risk_identity_top10_;
+  real8 cl_high_kr_identity_percent_;
+  integer8 cl_high_kr_identity_top10_;
+  integer8 cl_ip_not_us_identity_count_;
+  integer8 cl_ip_vpn_identity_count_;
+  integer8 cl_ip_high_risk_city_identity_count_;
+  integer8 cl_ip_hosted_identity_count_;
+  integer8 cl_ip_tor_identity_count_;
+  integer8 cl_ip_high_risk_identity_count_;
+  integer8 cl_ip_not_us_event_count_;
+  integer8 cl_ip_vpn_event_count_;
+  integer8 cl_ip_high_risk_city_event_count_;
+  integer8 cl_ip_hosted_event_count_;
+  integer8 cl_ip_tor_event_count_;
+  integer8 cl_active30_identity_count_percentile_;
+  integer8 cl_active7_identity_count_percentile_;
+  integer8 cl_bank_identity_count_gt2_count_;
+  integer8 cl_bank_identity_count_gt2_top10_;
+  integer8 cl_adjacent_no_safe_flag_;
+  integer8 cl_high_risk_email_count_;
+  integer8 cl_high_risk_email_top10_;
+  integer8 cl_kr_event_after_known_risk_identity_count_;
+  unsigned1 cl_high_risk_pattern6_flag_;
+  unsigned1 cl_high_risk_pattern7_flag_;
+  unsigned1 cl_high_risk_pattern8_flag_;
+  unsigned1 cl_high_risk_pattern9_flag_;
+  unsigned1 cl_high_risk_pattern10_flag_;
+  unsigned1 cl_high_risk_pattern11_flag_;
+  unsigned1 cl_high_risk_pattern12_flag_;
+  unsigned1 cl_high_risk_pattern13_flag_;
+  unsigned1 cl_high_risk_pattern14_flag_;
+  unsigned1 cl_high_risk_pattern15_flag_;
+ End;
  
 END;

@@ -171,7 +171,8 @@ EXPORT map_IAS0826_conversion(STRING pVersion) := FUNCTION
 
 		//Prepare the input to address cleaner
 		temp_preaddr1 				:= IF(IsAddress <> '',IsAddress + ' ','') + StringLib.StringCleanSpaces(trimAddress); 
-		temp_preaddr2 				:= StringLib.StringCleanSpaces(pInput.CITY+' '+pInput.STATE +' '+pInput.ZIP); 
+		temp_preaddr2 				:= IF(ut.CleanSpacesAndUpper(pInput.CITYSTZIP)<> '', ut.CleanSpacesAndUpper(pInput.CITYSTZIP),
+		                            ut.CleanSpacesAndUpper(pInput.CITY+' '+pInput.STATE +' '+pInput.ZIP)); 
 		clnAddrAddr1				 	:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(temp_preaddr1,temp_preaddr2); //Address cleaner to remove 'c/o' and 'attn' from address
 		tmpADDR_ADDR1_1				:= TRIM(clnAddrAddr1[1..10],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[11..12],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[13..40],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[41..44],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[45..46],LEFT,RIGHT);																	
 		tmpADDR_ADDR2_1				:= TRIM(clnAddrAddr1[47..56],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[57..64],LEFT,RIGHT);
@@ -189,7 +190,7 @@ EXPORT map_IAS0826_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_CNTRY_1  := ut.CleanSpacesAndUpper(pInput.COUNTRY);
 
 		// assign business address indicator to true (B) if business address fields are not empty
-		SELF.ADDR_BUS_IND	:= IF(TRIM(pInput.ADDR_LINE1 + pInput.CITY + pInput.STATE + pInput.ZIP,LEFT,RIGHT) != '','B','');
+		SELF.ADDR_BUS_IND	:= IF(TRIM(pInput.ADDR_LINE1 + pInput.CITYSTZIP + pInput.CITY + pInput.STATE + pInput.ZIP,LEFT,RIGHT) != '','B','');
 
 		//populate phone field
 		SELF.PHN_PHONE_1    := IF(ut.CleanSpacesAndUpper(pInput.PHONE) = 'NULL',' ',

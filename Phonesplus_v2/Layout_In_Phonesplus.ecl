@@ -1,4 +1,4 @@
-export Layout_In_Phonesplus := module
+﻿export Layout_In_Phonesplus := module
 //Additional fields
 export layout_additional := record
 	boolean		   in_flag:= false;
@@ -15,7 +15,7 @@ export layout_additional := record
 	// set to 0 for records with a did, and > 0 when did is temp
 	unsigned6		 pdid := 0;
 	unsigned6 	 did := 0;
-	string3	 		 did_score := 0;
+	string3	 		 did_score := '0';
 	unsigned3    DateFirstSeen;
 	unsigned3    DateLastSeen;
 	unsigned3    DateVendorLastReported;
@@ -138,7 +138,7 @@ export layout_clean := record
 	string20     mname;
 	string20     lname;
 	string5      name_suffix;
-	string3      name_score := 0;
+	string3      name_score := '0';
 	unsigned6		 bdid:= 0;
 	unsigned1		 bdid_score := 0;
 end;
@@ -209,6 +209,17 @@ export layout_appended := record
 	boolean 		append_best_nm_match_flag:= false;
 end;
 
+
+export layout_unrolled := record //DF-25784 Unrolling of Data - V3
+	string2     source := '';
+	boolean	    household_flag := false;  
+	//nuestar flags
+	string2	    activity_status := '';
+	string1	    prepaid := '';
+	string1	    verified := '';
+	string1     cord_cutter:= '';
+end;
+
 //Combined Layout
 export layout_in_common := record
 	layout_additional;
@@ -220,5 +231,9 @@ export layout_in_common := record
 	boolean     current_rec := 0;
 	unsigned4   first_build_date := 0;
 	unsigned4   last_build_date := 0;
+	//CCPA-718 - new fields for CCPA opt out
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
+	layout_unrolled //DF-25784 Unrolling of Data - V3
 end;
 end;

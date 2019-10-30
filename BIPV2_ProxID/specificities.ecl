@@ -25,6 +25,7 @@ EXPORT input_layout := RECORD // project out required fields
   h.company_fein;
   UNSIGNED1 company_fein_len := 0;  // Place holder filled in by project
   h.company_name;
+  h.cnp_name_phonetic;
   TYPEOF(h.cnp_name) cnp_name := (TYPEOF(h.cnp_name))Fields.Make_cnp_name((SALT311.StrType)h.cnp_name ); // Cleans before using
   h.company_name_type_raw;
   h.company_name_type_derived;
@@ -189,6 +190,18 @@ EXPORT  company_fein_deduped := SALT311.MAC_Field_By_UID(input_file,Proxid,compa
   SALT311.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
   SALT311.mac_edit_distance_pairs(specs_added,company_fein,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
 EXPORT company_fein_values_persisted_temp := distance_computed : PERSIST('~temp::Proxid::BIPV2_ProxID::values::company_fein',EXPIRE(BIPV2_ProxID.Config.PersistExpire));
+ 
+EXPORT  cnp_name_phonetic_deduped := SALT311.MAC_Field_By_UID(input_file,Proxid,cnp_name_phonetic) : PERSIST('~temp::Proxid::BIPV2_ProxID::dedups::cnp_name_phonetic',EXPIRE(BIPV2_ProxID.Config.PersistExpire)); // Reduce to field values by UID
+  SALT311.Mac_Field_Count_UID(cnp_name_phonetic_deduped,cnp_name_phonetic,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
+  r1 := RECORD
+    counted;
+    UNSIGNED4 id := 0; // Used to identify value later
+  end;
+  with_id := table(counted,r1);
+  SALT311.utMAC_Sequence_Records(with_id,id,sequenced)
+  SALT311.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
+  SALT311.mac_edit_distance_pairs(specs_added,cnp_name_phonetic,cnt,0,true,distance_computed);//Computes specificities of fuzzy matches
+EXPORT cnp_name_phonetic_values_persisted_temp := distance_computed : PERSIST('~temp::Proxid::BIPV2_ProxID::values::cnp_name_phonetic',EXPIRE(BIPV2_ProxID.Config.PersistExpire));
  
 EXPORT  cnp_name_deduped := SALT311.MAC_Field_By_UID(input_file,Proxid,cnp_name) : PERSIST('~temp::Proxid::BIPV2_ProxID::dedups::cnp_name',EXPIRE(BIPV2_ProxID.Config.PersistExpire)); // Reduce to field values by UID
   expanded := SALT311.MAC_Field_Variants_Hyphen(cnp_name_deduped,Proxid,cnp_name,1); // expand out all variants when hyphenated
@@ -503,6 +516,18 @@ EXPORT company_fein_max := MAX(company_fein_values_persisted_temp,field_specific
 SALT311.MAC_Field_Specificity(company_fein_values_persisted_temp,company_fein,company_fein_nulls,ol) // Compute column level specificity
 EXPORT company_fein_specificity := ol;
  
+EXPORT cnp_name_phoneticValuesIndexKeyName := '~'+'key::BIPV2_ProxID::Proxid::Word::cnp_name_phonetic';
+ 
+EXPORT cnp_name_phonetic_values_index := INDEX(cnp_name_phonetic_values_persisted_temp,{cnp_name_phonetic},{cnp_name_phonetic_values_persisted_temp},cnp_name_phoneticValuesIndexKeyName);
+EXPORT cnp_name_phonetic_values_persisted := cnp_name_phonetic_values_index;
+SALT311.MAC_Field_Nulls(cnp_name_phonetic_values_persisted_temp,Layout_Specificities.cnp_name_phonetic_ChildRec,nv) // Use automated NULL spotting
+EXPORT cnp_name_phonetic_nulls := nv;
+SALT311.MAC_Field_Bfoul(cnp_name_phonetic_deduped,cnp_name_phonetic,Proxid,cnp_name_phonetic_nulls,ClusterSizes,false,false,bf) // Compute the chances of a field having 2 values for one entity
+EXPORT cnp_name_phonetic_switch := bf;
+EXPORT cnp_name_phonetic_max := MAX(cnp_name_phonetic_values_persisted_temp,field_specificity);
+SALT311.MAC_Field_Specificity(cnp_name_phonetic_values_persisted_temp,cnp_name_phonetic,cnp_name_phonetic_nulls,ol) // Compute column level specificity
+EXPORT cnp_name_phonetic_specificity := ol;
+ 
 EXPORT cnp_nameWBTokenSpecKeyName := '~'+'key::BIPV2_ProxID::Proxid::WordBag_specs::cnp_name';
  
 EXPORT cnp_name_wbtokenspec_index := INDEX(cnp_name_ad_temp,{cnp_name},{cnp_name_ad_temp},cnp_nameWBTokenSpecKeyName);
@@ -701,7 +726,7 @@ EXPORT dt_last_seen_max := MAX(dt_last_seen_values_persisted_temp,field_specific
 SALT311.MAC_Field_Specificity(dt_last_seen_values_persisted_temp,dt_last_seen,dt_last_seen_nulls,ol) // Compute column level specificity
 EXPORT dt_last_seen_specificity := ol;
  
-EXPORT BuildFields := PARALLEL(BUILDINDEX(active_duns_number_values_index, OVERWRITE),BUILDINDEX(active_enterprise_number_values_index, OVERWRITE),BUILDINDEX(active_domestic_corp_key_values_index, OVERWRITE),BUILDINDEX(hist_enterprise_number_values_index, OVERWRITE),BUILDINDEX(hist_duns_number_values_index, OVERWRITE),BUILDINDEX(hist_domestic_corp_key_values_index, OVERWRITE),BUILDINDEX(foreign_corp_key_values_index, OVERWRITE),BUILDINDEX(unk_corp_key_values_index, OVERWRITE),BUILDINDEX(ebr_file_number_values_index, OVERWRITE),BUILDINDEX(company_fein_values_index, OVERWRITE),BUILDINDEX(cnp_name_wbtokenspec_index, OVERWRITE),BUILDINDEX(cnp_name_values_index, OVERWRITE),BUILDINDEX(company_name_type_derived_values_index, OVERWRITE),BUILDINDEX(cnp_number_values_index, OVERWRITE),BUILDINDEX(cnp_btype_values_index, OVERWRITE),BUILDINDEX(company_phone_values_index, OVERWRITE),BUILDINDEX(prim_name_derived_wbtokenspec_index, OVERWRITE),BUILDINDEX(prim_name_derived_values_index, OVERWRITE),BUILDINDEX(sec_range_values_index, OVERWRITE),BUILDINDEX(v_city_name_values_index, OVERWRITE),BUILDINDEX(st_values_index, OVERWRITE),BUILDINDEX(zip_values_index, OVERWRITE),BUILDINDEX(prim_range_derived_values_index, OVERWRITE),BUILDINDEX(company_csz_values_index, OVERWRITE),BUILDINDEX(company_addr1_values_index, OVERWRITE),BUILDINDEX(company_address_values_index, OVERWRITE),BUILDINDEX(dt_first_seen_values_index, OVERWRITE),BUILDINDEX(dt_last_seen_values_index, OVERWRITE));
+EXPORT BuildFields := PARALLEL(BUILDINDEX(active_duns_number_values_index, OVERWRITE),BUILDINDEX(active_enterprise_number_values_index, OVERWRITE),BUILDINDEX(active_domestic_corp_key_values_index, OVERWRITE),BUILDINDEX(hist_enterprise_number_values_index, OVERWRITE),BUILDINDEX(hist_duns_number_values_index, OVERWRITE),BUILDINDEX(hist_domestic_corp_key_values_index, OVERWRITE),BUILDINDEX(foreign_corp_key_values_index, OVERWRITE),BUILDINDEX(unk_corp_key_values_index, OVERWRITE),BUILDINDEX(ebr_file_number_values_index, OVERWRITE),BUILDINDEX(company_fein_values_index, OVERWRITE),BUILDINDEX(cnp_name_phonetic_values_index, OVERWRITE),BUILDINDEX(cnp_name_wbtokenspec_index, OVERWRITE),BUILDINDEX(cnp_name_values_index, OVERWRITE),BUILDINDEX(company_name_type_derived_values_index, OVERWRITE),BUILDINDEX(cnp_number_values_index, OVERWRITE),BUILDINDEX(cnp_btype_values_index, OVERWRITE),BUILDINDEX(company_phone_values_index, OVERWRITE),BUILDINDEX(prim_name_derived_wbtokenspec_index, OVERWRITE),BUILDINDEX(prim_name_derived_values_index, OVERWRITE),BUILDINDEX(sec_range_values_index, OVERWRITE),BUILDINDEX(v_city_name_values_index, OVERWRITE),BUILDINDEX(st_values_index, OVERWRITE),BUILDINDEX(zip_values_index, OVERWRITE),BUILDINDEX(prim_range_derived_values_index, OVERWRITE),BUILDINDEX(company_csz_values_index, OVERWRITE),BUILDINDEX(company_addr1_values_index, OVERWRITE),BUILDINDEX(company_address_values_index, OVERWRITE),BUILDINDEX(dt_first_seen_values_index, OVERWRITE),BUILDINDEX(dt_last_seen_values_index, OVERWRITE));
  
   infile := file_SrcRidVlid;
  r := RECORD
@@ -856,32 +881,32 @@ SHARED Fn_Reduce_Uber_Local(DATASET(Layout_Uber_Plus) in_ds) := FUNCTION
   RETURN DEDUP(SORT(in_ds,uid,word,field,LOCAL),uid,word,field,LOCAL);
 END;
 Layout_Uber_Plus IntoInversion(input_file le,UNSIGNED2 c) := TRANSFORM
-  SELF.word := CHOOSE(c,(SALT311.StrType)le.active_duns_number,(SALT311.StrType)le.active_enterprise_number,(SALT311.StrType)le.active_domestic_corp_key,(SALT311.StrType)le.hist_enterprise_number,(SALT311.StrType)le.hist_duns_number,(SALT311.StrType)le.hist_domestic_corp_key,(SALT311.StrType)le.foreign_corp_key,(SALT311.StrType)le.unk_corp_key,(SALT311.StrType)le.ebr_file_number,(SALT311.StrType)le.company_fein,(SALT311.StrType)le.company_name,'',(SALT311.StrType)le.company_name_type_raw,(SALT311.StrType)le.company_name_type_derived,(SALT311.StrType)le.cnp_hasnumber,(SALT311.StrType)le.cnp_number,(SALT311.StrType)le.cnp_btype,(SALT311.StrType)le.cnp_lowv,(SALT311.StrType)le.cnp_translated,(SALT311.StrType)le.cnp_classid,(SALT311.StrType)le.company_foreign_domestic,(SALT311.StrType)le.company_bdid,(SALT311.StrType)le.company_phone,(SALT311.StrType)le.prim_name,'',(SALT311.StrType)le.sec_range,(SALT311.StrType)le.v_city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.prim_range,(SALT311.StrType)le.prim_range_derived,SKIP,SKIP,SKIP,'','',SKIP);
+  SELF.word := CHOOSE(c,(SALT311.StrType)le.active_duns_number,(SALT311.StrType)le.active_enterprise_number,(SALT311.StrType)le.active_domestic_corp_key,(SALT311.StrType)le.hist_enterprise_number,(SALT311.StrType)le.hist_duns_number,(SALT311.StrType)le.hist_domestic_corp_key,(SALT311.StrType)le.foreign_corp_key,(SALT311.StrType)le.unk_corp_key,(SALT311.StrType)le.ebr_file_number,(SALT311.StrType)le.company_fein,(SALT311.StrType)le.company_name,(SALT311.StrType)le.cnp_name_phonetic,'',(SALT311.StrType)le.company_name_type_raw,(SALT311.StrType)le.company_name_type_derived,(SALT311.StrType)le.cnp_hasnumber,(SALT311.StrType)le.cnp_number,(SALT311.StrType)le.cnp_btype,(SALT311.StrType)le.cnp_lowv,(SALT311.StrType)le.cnp_translated,(SALT311.StrType)le.cnp_classid,(SALT311.StrType)le.company_foreign_domestic,(SALT311.StrType)le.company_bdid,(SALT311.StrType)le.company_phone,(SALT311.StrType)le.prim_name,'',(SALT311.StrType)le.sec_range,(SALT311.StrType)le.v_city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.prim_range,(SALT311.StrType)le.prim_range_derived,SKIP,SKIP,SKIP,'','',SKIP);
   SELF.field := c;
   SELF.uid := le.Proxid;
   SELF := le;
 END;
-nfields_r := Fn_Reduce_UBER_Local(NORMALIZE(input_file,36,IntoInversion(LEFT,COUNTER))(word<>''));
-SALT311.MAC_Expand_Wordbag_Field(input_file,cnp_name,12,Proxid,layout_uber_plus,nfields12);
-SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,25,Proxid,layout_uber_plus,nfields25);
-SALT311.MAC_Expand_Normal_Field(input_file,v_city_name,32,Proxid,layout_uber_plus,nfields7456);
-SALT311.MAC_Expand_Normal_Field(input_file,st,32,Proxid,layout_uber_plus,nfields7457);
-SALT311.MAC_Expand_Normal_Field(input_file,zip,32,Proxid,layout_uber_plus,nfields7458);
-nfields32 := nfields7456+nfields7457+nfields7458;//Collect wordbags for parts of concept field
-SALT311.MAC_Expand_Normal_Field(input_file,prim_range_derived,33,Proxid,layout_uber_plus,nfields7689);
-SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,33,Proxid,layout_uber_plus,nfields7690);
-SALT311.MAC_Expand_Normal_Field(input_file,sec_range,33,Proxid,layout_uber_plus,nfields7691);
+nfields_r := Fn_Reduce_UBER_Local(NORMALIZE(input_file,37,IntoInversion(LEFT,COUNTER))(word<>''));
+SALT311.MAC_Expand_Wordbag_Field(input_file,cnp_name,13,Proxid,layout_uber_plus,nfields13);
+SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,26,Proxid,layout_uber_plus,nfields26);
+SALT311.MAC_Expand_Normal_Field(input_file,v_city_name,33,Proxid,layout_uber_plus,nfields7689);
+SALT311.MAC_Expand_Normal_Field(input_file,st,33,Proxid,layout_uber_plus,nfields7690);
+SALT311.MAC_Expand_Normal_Field(input_file,zip,33,Proxid,layout_uber_plus,nfields7691);
 nfields33 := nfields7689+nfields7690+nfields7691;//Collect wordbags for parts of concept field
-SALT311.MAC_Expand_Normal_Field(input_file,prim_range_derived,34,Proxid,layout_uber_plus,nfields1845826);
-SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,34,Proxid,layout_uber_plus,nfields1845827);
-SALT311.MAC_Expand_Normal_Field(input_file,sec_range,34,Proxid,layout_uber_plus,nfields1845828);
-nfields7922 := nfields1845826+nfields1845827+nfields1845828;//Collect wordbags for parts of concept field
-SALT311.MAC_Expand_Normal_Field(input_file,v_city_name,34,Proxid,layout_uber_plus,nfields1846059);
-SALT311.MAC_Expand_Normal_Field(input_file,st,34,Proxid,layout_uber_plus,nfields1846060);
-SALT311.MAC_Expand_Normal_Field(input_file,zip,34,Proxid,layout_uber_plus,nfields1846061);
-nfields7923 := nfields1846059+nfields1846060+nfields1846061;//Collect wordbags for parts of concept field
-nfields34 := nfields7922+nfields7923;//Collect wordbags for parts of concept field
-NumberBaseFields := 36;
+SALT311.MAC_Expand_Normal_Field(input_file,prim_range_derived,34,Proxid,layout_uber_plus,nfields7922);
+SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,34,Proxid,layout_uber_plus,nfields7923);
+SALT311.MAC_Expand_Normal_Field(input_file,sec_range,34,Proxid,layout_uber_plus,nfields7924);
+nfields34 := nfields7922+nfields7923+nfields7924;//Collect wordbags for parts of concept field
+SALT311.MAC_Expand_Normal_Field(input_file,prim_range_derived,35,Proxid,layout_uber_plus,nfields1900115);
+SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,35,Proxid,layout_uber_plus,nfields1900116);
+SALT311.MAC_Expand_Normal_Field(input_file,sec_range,35,Proxid,layout_uber_plus,nfields1900117);
+nfields8155 := nfields1900115+nfields1900116+nfields1900117;//Collect wordbags for parts of concept field
+SALT311.MAC_Expand_Normal_Field(input_file,v_city_name,35,Proxid,layout_uber_plus,nfields1900348);
+SALT311.MAC_Expand_Normal_Field(input_file,st,35,Proxid,layout_uber_plus,nfields1900349);
+SALT311.MAC_Expand_Normal_Field(input_file,zip,35,Proxid,layout_uber_plus,nfields1900350);
+nfields8156 := nfields1900348+nfields1900349+nfields1900350;//Collect wordbags for parts of concept field
+nfields35 := nfields8155+nfields8156;//Collect wordbags for parts of concept field
+NumberBaseFields := 37;
  
 infileSrcRidVlid := file_SrcRidVlid;
 Layout_Uber_Plus IntoInversion0(infileSrcRidVlid le,UNSIGNED2 c,UNSIGNED el=1) := TRANSFORM
@@ -927,7 +952,7 @@ Layout_Uber_Plus IntoInversion7(infileUnderLinks le,UNSIGNED2 c,UNSIGNED el=1) :
   SELF := le;
 END;
 afields7 := NORMALIZE(infileUnderLinks,1,IntoInversion7(LEFT,COUNTER))(word<>'');
-SHARED invert_records := nfields_r + nfields12 + nfields25 + afields0 + afields3 + afields5 + afields6 + afields7;
+SHARED invert_records := nfields_r + nfields13 + nfields26 + afields0 + afields3 + afields5 + afields6 + afields7;
 uber_values_deduped0 := Fn_Reduce_UBER_Local( DISTRIBUTE(invert_records,HASH(uid)));
 // minimize otherwise required changes to the macros used by uber and specificities!
 Layout_Uber_Plus_Spec := RECORD(Layout_Uber_Plus AND NOT uid)
@@ -951,7 +976,7 @@ EXPORT uber_specificity := ol;
 EXPORT BuildAll := PARALLEL(BuildFields, BuildAttributes, BuildUber);
  
 EXPORT SpecIndexKeyName := '~'+'key::BIPV2_ProxID::Proxid::Specificities';
-iSpecificities := DATASET([{0,active_duns_number_specificity,active_duns_number_switch,active_duns_number_max,active_duns_number_nulls,active_enterprise_number_specificity,active_enterprise_number_switch,active_enterprise_number_max,active_enterprise_number_nulls,active_domestic_corp_key_specificity,active_domestic_corp_key_switch,active_domestic_corp_key_max,active_domestic_corp_key_nulls,hist_enterprise_number_specificity,hist_enterprise_number_switch,hist_enterprise_number_max,hist_enterprise_number_nulls,hist_duns_number_specificity,hist_duns_number_switch,hist_duns_number_max,hist_duns_number_nulls,hist_domestic_corp_key_specificity,hist_domestic_corp_key_switch,hist_domestic_corp_key_max,hist_domestic_corp_key_nulls,foreign_corp_key_specificity,foreign_corp_key_switch,foreign_corp_key_max,foreign_corp_key_nulls,unk_corp_key_specificity,unk_corp_key_switch,unk_corp_key_max,unk_corp_key_nulls,ebr_file_number_specificity,ebr_file_number_switch,ebr_file_number_max,ebr_file_number_nulls,company_fein_specificity,company_fein_switch,company_fein_max,company_fein_nulls,cnp_name_specificity,cnp_name_switch,cnp_name_max,cnp_name_nulls,company_name_type_derived_specificity,company_name_type_derived_switch,company_name_type_derived_max,company_name_type_derived_nulls,cnp_number_specificity,cnp_number_switch,cnp_number_max,cnp_number_nulls,cnp_btype_specificity,cnp_btype_switch,cnp_btype_max,cnp_btype_nulls,company_phone_specificity,company_phone_switch,company_phone_max,company_phone_nulls,prim_name_derived_specificity,prim_name_derived_switch,prim_name_derived_max,prim_name_derived_nulls,sec_range_specificity,sec_range_switch,sec_range_max,sec_range_nulls,v_city_name_specificity,v_city_name_switch,v_city_name_max,v_city_name_nulls,st_specificity,st_switch,st_max,st_nulls,zip_specificity,zip_switch,zip_max,zip_nulls,prim_range_derived_specificity,prim_range_derived_switch,prim_range_derived_max,prim_range_derived_nulls,company_csz_specificity,company_csz_switch,company_csz_max,company_csz_nulls,company_addr1_specificity,company_addr1_switch,company_addr1_max,company_addr1_nulls,company_address_specificity,company_address_switch,company_address_max,company_address_nulls,dt_first_seen_specificity,dt_first_seen_switch,dt_first_seen_max,dt_first_seen_nulls,dt_last_seen_specificity,dt_last_seen_switch,dt_last_seen_max,dt_last_seen_nulls,SrcRidVlid_specificity,SrcRidVlid_switch,SrcRidVlid_max,SrcRidVlid_nulls,ForeignCorpkey_specificity,ForeignCorpkey_switch,ForeignCorpkey_max,ForeignCorpkey_nulls,RAAddresses_specificity,RAAddresses_switch,RAAddresses_max,RAAddresses_nulls,FilterPrimNames_specificity,FilterPrimNames_switch,FilterPrimNames_max,FilterPrimNames_nulls,UnderLinks_specificity,UnderLinks_switch,UnderLinks_max,UnderLinks_nulls,uber_specificity,uber_switch,uber_max,uber_nulls}],Layout_Specificities.R);
+iSpecificities := DATASET([{0,active_duns_number_specificity,active_duns_number_switch,active_duns_number_max,active_duns_number_nulls,active_enterprise_number_specificity,active_enterprise_number_switch,active_enterprise_number_max,active_enterprise_number_nulls,active_domestic_corp_key_specificity,active_domestic_corp_key_switch,active_domestic_corp_key_max,active_domestic_corp_key_nulls,hist_enterprise_number_specificity,hist_enterprise_number_switch,hist_enterprise_number_max,hist_enterprise_number_nulls,hist_duns_number_specificity,hist_duns_number_switch,hist_duns_number_max,hist_duns_number_nulls,hist_domestic_corp_key_specificity,hist_domestic_corp_key_switch,hist_domestic_corp_key_max,hist_domestic_corp_key_nulls,foreign_corp_key_specificity,foreign_corp_key_switch,foreign_corp_key_max,foreign_corp_key_nulls,unk_corp_key_specificity,unk_corp_key_switch,unk_corp_key_max,unk_corp_key_nulls,ebr_file_number_specificity,ebr_file_number_switch,ebr_file_number_max,ebr_file_number_nulls,company_fein_specificity,company_fein_switch,company_fein_max,company_fein_nulls,cnp_name_phonetic_specificity,cnp_name_phonetic_switch,cnp_name_phonetic_max,cnp_name_phonetic_nulls,cnp_name_specificity,cnp_name_switch,cnp_name_max,cnp_name_nulls,company_name_type_derived_specificity,company_name_type_derived_switch,company_name_type_derived_max,company_name_type_derived_nulls,cnp_number_specificity,cnp_number_switch,cnp_number_max,cnp_number_nulls,cnp_btype_specificity,cnp_btype_switch,cnp_btype_max,cnp_btype_nulls,company_phone_specificity,company_phone_switch,company_phone_max,company_phone_nulls,prim_name_derived_specificity,prim_name_derived_switch,prim_name_derived_max,prim_name_derived_nulls,sec_range_specificity,sec_range_switch,sec_range_max,sec_range_nulls,v_city_name_specificity,v_city_name_switch,v_city_name_max,v_city_name_nulls,st_specificity,st_switch,st_max,st_nulls,zip_specificity,zip_switch,zip_max,zip_nulls,prim_range_derived_specificity,prim_range_derived_switch,prim_range_derived_max,prim_range_derived_nulls,company_csz_specificity,company_csz_switch,company_csz_max,company_csz_nulls,company_addr1_specificity,company_addr1_switch,company_addr1_max,company_addr1_nulls,company_address_specificity,company_address_switch,company_address_max,company_address_nulls,dt_first_seen_specificity,dt_first_seen_switch,dt_first_seen_max,dt_first_seen_nulls,dt_last_seen_specificity,dt_last_seen_switch,dt_last_seen_max,dt_last_seen_nulls,SrcRidVlid_specificity,SrcRidVlid_switch,SrcRidVlid_max,SrcRidVlid_nulls,ForeignCorpkey_specificity,ForeignCorpkey_switch,ForeignCorpkey_max,ForeignCorpkey_nulls,RAAddresses_specificity,RAAddresses_switch,RAAddresses_max,RAAddresses_nulls,FilterPrimNames_specificity,FilterPrimNames_switch,FilterPrimNames_max,FilterPrimNames_nulls,UnderLinks_specificity,UnderLinks_switch,UnderLinks_max,UnderLinks_nulls,uber_specificity,uber_switch,uber_max,uber_nulls}],Layout_Specificities.R);
  
 EXPORT Specificities_Index := INDEX(iSpecificities,{1},{iSpecificities},SpecIndexKeyName);
 EXPORT BuildSpec := BUILDINDEX(Specificities_Index, OVERWRITE, FEW);
@@ -983,6 +1008,8 @@ SpcShiftR := RECORD
   integer2 ebr_file_number_switch_shift0 := ROUND(1000*Specificities[1].ebr_file_number_switch - 427);
   integer1 company_fein_shift0 := ROUND(Specificities[1].company_fein_specificity - 17);
   integer2 company_fein_switch_shift0 := ROUND(1000*Specificities[1].company_fein_switch - 227);
+  integer1 cnp_name_phonetic_shift0 := ROUND(Specificities[1].cnp_name_phonetic_specificity - 12);
+  integer2 cnp_name_phonetic_switch_shift0 := ROUND(1000*Specificities[1].cnp_name_phonetic_switch - 334);
   integer1 cnp_name_shift0 := ROUND(Specificities[1].cnp_name_specificity - 12);
   integer2 cnp_name_switch_shift0 := ROUND(1000*Specificities[1].cnp_name_switch - 334);
   integer1 company_name_type_derived_shift0 := ROUND(Specificities[1].company_name_type_derived_specificity - 1);
@@ -1039,6 +1066,7 @@ EXPORT SpcShift := TABLE(Specificities,SpcShiftR);
   SALT311.MAC_Specificity_Values(unk_corp_key_values_persisted,unk_corp_key,'unk_corp_key',unk_corp_key_specificity,unk_corp_key_specificity_profile);
   SALT311.MAC_Specificity_Values(ebr_file_number_values_persisted,ebr_file_number,'ebr_file_number',ebr_file_number_specificity,ebr_file_number_specificity_profile);
   SALT311.MAC_Specificity_Values(company_fein_values_persisted,company_fein,'company_fein',company_fein_specificity,company_fein_specificity_profile);
+  SALT311.MAC_Specificity_Values(cnp_name_phonetic_values_persisted,cnp_name_phonetic,'cnp_name_phonetic',cnp_name_phonetic_specificity,cnp_name_phonetic_specificity_profile);
   SALT311.MAC_Specificity_Values(cnp_name_values_persisted,cnp_name,'cnp_name',cnp_name_specificity,cnp_name_specificity_profile);
   SALT311.MAC_Specificity_Values(company_name_type_derived_values_persisted,company_name_type_derived,'company_name_type_derived',company_name_type_derived_specificity,company_name_type_derived_specificity_profile);
   SALT311.MAC_Specificity_Values(cnp_number_values_persisted,cnp_number,'cnp_number',cnp_number_specificity,cnp_number_specificity_profile);
@@ -1050,6 +1078,6 @@ EXPORT SpcShift := TABLE(Specificities,SpcShiftR);
   SALT311.MAC_Specificity_Values(st_values_persisted,st,'st',st_specificity,st_specificity_profile);
   SALT311.MAC_Specificity_Values(zip_values_persisted,zip,'zip',zip_specificity,zip_specificity_profile);
   SALT311.MAC_Specificity_Values(prim_range_derived_values_persisted,prim_range_derived,'prim_range_derived',prim_range_derived_specificity,prim_range_derived_specificity_profile);
-EXPORT AllProfiles := active_duns_number_specificity_profile + active_enterprise_number_specificity_profile + active_domestic_corp_key_specificity_profile + hist_enterprise_number_specificity_profile + hist_duns_number_specificity_profile + hist_domestic_corp_key_specificity_profile + foreign_corp_key_specificity_profile + unk_corp_key_specificity_profile + ebr_file_number_specificity_profile + company_fein_specificity_profile + cnp_name_specificity_profile + company_name_type_derived_specificity_profile + cnp_number_specificity_profile + cnp_btype_specificity_profile + company_phone_specificity_profile + prim_name_derived_specificity_profile + sec_range_specificity_profile + v_city_name_specificity_profile + st_specificity_profile + zip_specificity_profile + prim_range_derived_specificity_profile;
+EXPORT AllProfiles := active_duns_number_specificity_profile + active_enterprise_number_specificity_profile + active_domestic_corp_key_specificity_profile + hist_enterprise_number_specificity_profile + hist_duns_number_specificity_profile + hist_domestic_corp_key_specificity_profile + foreign_corp_key_specificity_profile + unk_corp_key_specificity_profile + ebr_file_number_specificity_profile + company_fein_specificity_profile + cnp_name_phonetic_specificity_profile + cnp_name_specificity_profile + company_name_type_derived_specificity_profile + cnp_number_specificity_profile + cnp_btype_specificity_profile + company_phone_specificity_profile + prim_name_derived_specificity_profile + sec_range_specificity_profile + v_city_name_specificity_profile + st_specificity_profile + zip_specificity_profile + prim_range_derived_specificity_profile;
 END;
  

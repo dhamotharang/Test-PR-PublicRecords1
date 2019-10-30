@@ -3,7 +3,6 @@
 EXPORT StandardizeInputFile(STRING filedate, BOOLEAN pUseProd = FALSE) := MODULE
 
 // Function clean_address
- // SHARED s:='01234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ~!@#$%^&*()_+=-`:;"\'?/>.<,{}|\\][';
 	SHARED invalid_prim_name := ['NONE','UNKNOWN','UNKNWN','UNKNOWEN','UNKNONW','UNKNON','UNKNWON','UNKONWN','UNEKNOWN','UN KNOWN','GENERAL DELIVERY'];
   SHARED BlankAddress			:= ['DS','DE','LA','BA','LP','L2','PL'];
 	SHARED SpecialNameChars	:= ['#','*','@','!'];
@@ -11,11 +10,9 @@ EXPORT StandardizeInputFile(STRING filedate, BOOLEAN pUseProd = FALSE) := MODULE
 	EXPORT Clean_Addr(DATASET(layouts.MergedSrc_Base) NewOldFormatFile) := FUNCTION
 
 
-	Vendor_Src.layouts.Base cleanAddr(NewOldFormatFile L) := TRANSFORM
+	Vendor_Src.layouts.MergedSrc_Base cleanAddr(NewOldFormatFile L) := TRANSFORM
 
-//s:='[^0-9a-z.\\- ]';
-//Clean_Address 						  := if(l.source_code NOT IN BlankAddress, address.CleanAddress182(regexreplace(s,l.prepped_addr1,'',nocase), regexreplace(s,l.prepped_addr2,'',nocase)), '');														
-	 
+
 	  Clean_Address 						:= if(l.source_code NOT IN BlankAddress, address.CleanAddress182(l.prepped_addr1, l.prepped_addr2),'');														
 		STRING28  v_prim_name 		:= if(l.source_code NOT IN BlankAddress, Clean_Address[13..40], '');
 		STRING5   v_zip       		:= if(l.source_code NOT IN BlankAddress, Clean_Address[117..121], '');
@@ -62,6 +59,7 @@ end;
 	layouts.Base MapBankInput(layouts.Bank_Court L) := TRANSFORM
 	
 		SELF.item_source					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_code), LEFT, RIGHT));
+		SELF.county_text        := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.county_text),LEFT, RIGHT));
 		SELF.source_code					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_code), LEFT, RIGHT));
 		SELF.display_name					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_name), LEFT, RIGHT));
 		SELF.description					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_name), LEFT, RIGHT));
@@ -90,6 +88,7 @@ end;
 	layouts.Base MapLienInput(layouts.Lien_Court L) := TRANSFORM	
 	
 		SELF.item_source					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_code), LEFT, RIGHT));
+		SELF.county_text        := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.county_text),LEFT, RIGHT));
 		SELF.source_code					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_code), LEFT, RIGHT));
 		SELF.display_name					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_name), LEFT, RIGHT));
 		SELF.description					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.court_name), LEFT, RIGHT));
@@ -118,7 +117,6 @@ end;
 	
 	OrbitFFD	:= Files(filedate,pUseProd).Orbit_input;  
 	layouts.Base MapRiskviewFFDInput(layouts.Orbit L) := TRANSFORM 
-	
 	
 		SELF.item_source					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.item_source_code), LEFT, RIGHT));
 		SELF.source_code					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.item_source_code), LEFT, RIGHT));
@@ -278,9 +276,9 @@ end;
 soapReturn := soapcall(
 		Orbit3SOA.EnvironmentVariables.serviceurlprod,
 		'GetDataViewData',
-		layouts.InputRecord,
+		layouts.rRequestCapsule,
 		dataset(layouts.Orbit),
-		xpath('GetDataViewDataResponse/GetDataViewDataResult/DataRows/DataRow/RowData'),
+		xpath('GetDataViewDataResponse/GetDataViewDataResult/Result/RecordResponseGetDataViewData/Result/DataRows/DataRow/RowData'),//Result/RecordResponseGetDataViewData/Result/DataRows/DataRow/RowData'),
 		namespace(Orbit3SOA.EnvironmentVariables.namespace),
 		literal,
 		soapaction(Orbit3SOA.EnvironmentVariables.soapactionprefix + 'GetDataViewData')

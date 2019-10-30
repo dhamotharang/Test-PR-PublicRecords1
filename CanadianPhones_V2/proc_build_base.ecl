@@ -26,10 +26,7 @@ EXPORT proc_build_base := FUNCTION
 	
 	//Mark all records in existing records  to be historical
 	base_hist := PROJECT(base, TRANSFORM({base}, 
-	                                     SELF.history_flag :=IF(LEFT.history_flag='U','U','H');
-       																 //Added for CCPA-90
-																		   SELF.global_sid   := 0;
-																		   SELF.record_sid   := 0;
+	                                     SELF.history_flag :=IF(LEFT.history_flag='U','U','H');;
 																			 SELF:=LEFT;));
 
 	//Combine updates with existing base

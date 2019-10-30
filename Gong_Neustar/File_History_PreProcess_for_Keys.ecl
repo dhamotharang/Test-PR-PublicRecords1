@@ -14,7 +14,7 @@ trSwapCityNames := project(histGong_out,
 
 
 layout_gong_inj := RECORD
- gong.Layout_history;
+ gong.Layout_history - [global_sid,record_sid];
  string2 eor ;
 END;
 

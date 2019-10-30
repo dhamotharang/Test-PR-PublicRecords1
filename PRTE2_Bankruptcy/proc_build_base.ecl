@@ -156,14 +156,14 @@ PRTE2_Bankruptcy.Layouts.Main_BaseV3_ext tClnMain(Layouts.Main_BaseV3_ext L) := 
 	SELF.name_score		:= IF(TRIM(L.name_score)<>'', L.name_score, tempTName.name_score);
 	
 //Link_SSN can not be used to populate app_ssn field if vendor did not provide SSNbut Link_SSN field should be used for DID'g
-	temp_ssn :=  IF(L.app_ssn = '' and L.link_ssn <> '', l.link_ssn, l.app_ssn);
+	// temp_ssn :=  IF(L.app_ssn = '' and L.link_ssn <> '', l.link_ssn, l.app_ssn);
 
 //Only valid for internal test records	
 self.app_ssn := if(L.cust_name <> '' and L.app_ssn = '' and L.link_ssn <> '', L.link_ssn, L.app_ssn);
 	
 //Linking ID
 	SELF.did					:= IF(trim(L.DID) != '',L.DID,
-													(string12)prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, temp_ssn, L.link_dob, L.cust_name));
+													(string12)prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, L.link_ssn, L.link_dob, L.cust_name));
 	SELF 	:= L;
 	SELF	:= [];
 END;
@@ -190,22 +190,22 @@ PRTE2_Bankruptcy.Layouts.Search_Base_ext tCleanNAddr(ded_jSearch L) := TRANSFORM
  SELF.cname    := if(L.orig_company <> '', ut.CleanSpacesAndUpper(L.orig_company), ut.CleanSpacesAndUpper(L.orig_name));  
 
 //Link_SSN can not be used to populate fields if vendor did not provide SSN	but Link_SSN field should be used for DID'g	
-	temp_ssn := IF(L.app_ssn = '' and L.ssn <> '', L.ssn, 
-									IF(L.app_ssn = '' and L.link_ssn <> '', L.link_ssn, L.app_ssn));
+	// temp_ssn := IF(L.app_ssn = '' and L.ssn <> '', L.ssn, 
+									// IF(L.app_ssn = '' and L.link_ssn <> '', L.link_ssn, L.app_ssn));
 
 //Only valid for internal test records										
 
 SELF.app_ssn := if(L.cust_name <> '' and  L.app_ssn = '' and L.ssn <> '', L.ssn,
-                                                                   if(L.cust_name <> '' and  L.app_ssn = '' and L.link_ssn <> '', L.link_ssn,
-                                                                        L.app_ssn));
+                   if(L.cust_name <> '' and  L.app_ssn = '' and L.link_ssn <> '', L.link_ssn,
+                       L.app_ssn));
 															
 SELF.app_tax_id := if(L.cust_name <> '' and  L.app_tax_id = '' and L.tax_id <> '', L.tax_id,
-                                                                                if(L.cust_name <> '' and  L.app_tax_id = '' and L.link_fein <> '', L.link_fein,
-                                                                                                L.app_tax_id));
+                      if(L.cust_name <> '' and  L.app_tax_id = '' and L.link_fein <> '', L.link_fein,
+                         L.app_tax_id));
 //
 	//Linking ID's
 	SELF.DID  				:= IF(trim(L.DID) != '',L.DID,
-													(string12)prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, temp_ssn, L.link_dob, L.cust_name)); 
+													(string12)prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, l.link_ssn, L.link_dob, L.cust_name)); 
 	SELF.BDID 				:= IF(trim(L.BDID) != '', L.BDID,
 													(string12)prte2.fn_AppendFakeID.bdid(SELF.cname, L.prim_range, L.prim_name, L.v_city_name, L.st, L.zip, L.cust_name));
 	

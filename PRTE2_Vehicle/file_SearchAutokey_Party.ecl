@@ -1,4 +1,4 @@
-import prte2_Vehicle, ut, standard;
+﻿import prte2_Vehicle, ut, standard,prte2;
 
 //Autokey Search File- make orig_ssn and append_ssn searchable; split the party file
 
@@ -101,9 +101,12 @@ dwr := record
 	standard.Name person_name;
 	dsParty.Orig_Name_Type;
 	dsParty.history;
+	dsParty.global_sid;
+	dsParty.record_sid;
 	unsigned4 Reg_Latest_Effective_Date;
 	unsigned4 Reg_Latest_Expiration_Date;
 	unsigned4 Ttl_Latest_Issue_Date;
+
 end;
 
 dwr mdw(p l, c r) := transform

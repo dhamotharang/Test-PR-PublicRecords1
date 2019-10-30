@@ -157,4 +157,11 @@ FUNCTION
 	
 END;
 export kFetchOutRec := recordof(kFetch(dataset([],BIPV2.IDlayouts.l_xlink_ids)));
+
+export kFetch_thor() :=
+FUNCTION
+  ds_key := pull(Key);
+  return ds_key;
+END;
+
 END;

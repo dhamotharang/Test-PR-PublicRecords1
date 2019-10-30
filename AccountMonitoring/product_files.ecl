@@ -2,7 +2,7 @@
 Add BK daily files.
 */
 IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
-			 Data_Services, Gong, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
+			 Data_Services, Gong, Gong_Neustar, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
 			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
 			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
 			 Business_Credit, Business_Credit_Scoring, UCCV2, SAM, Inquiry_AccLogs, Corp2,
@@ -675,8 +675,8 @@ EXPORT product_files := MODULE
 		EXPORT gong_filename_nocluster := 'base::gong_history';
 		EXPORT gong_filename_raw := 'thor_data400::' + gong_filename_nocluster;
 		EXPORT gong_filename := AccountMonitoring.constants.DATA_LOCATION + gong_filename_raw;	
-		
-		SHARED File_Gong_History_Full := DATASET(gong_filename, Gong.layout_historyaid, THOR, __COMPRESSED__);
+		//CCPA-22 use new gong history layout defined in Gong_Neustar
+		SHARED File_Gong_History_Full := DATASET(gong_filename, Gong_Neustar.Layout_History, THOR, __COMPRESSED__);
 		//SHARED File_Gong_History_Current := File_Gong_History_Full(current_record_flag = 'Y');
 		EXPORT File_Gong_History_Current := File_Gong_History_Full(current_record_flag = 'Y');
 
@@ -1723,5 +1723,58 @@ EXPORT product_files := MODULE
 					HASH64(seleid)
 					): INDEPENDENT; //PERSIST('acctmon::watercraft::key_linkid');
 		END;
+
+	EXPORT email := MODULE
+	 IMPORT dx_Email;
+   
+		EXPORT emailLexid_superfile := 'thor_200::key::email_datav2::' + doxie.Version_SuperKey + '::did'; // - a superfile name referenced in dx_Email.Key_Did, to be used as RoxieSuperFile in fn_UpdateSuperFiles() process
+		EXPORT emailLexid_for_superkey_monitor := 'monitor::email_datav2::did';
+		EXPORT emailLexid_superkeyname := AccountMonitoring.constants.filename_cluster + emailLexid_for_superkey_monitor + '_qa'; // superfile used by monitoring process
+
+		emaillexid_key_undist := 
+			PULL(INDEX( 
+          dx_Email.Key_Did()  
+				, emailLexid_superkeyname)
+        );
+  
+		EXPORT lexid_key :=
+			DISTRIBUTE(
+				emaillexid_key_undist, 
+				HASH64(did)
+				): INDEPENDENT; //PERSIST?
+   
+		EXPORT emailaddr_superfile := 'thor_200::key::email_datav2::' + doxie.Version_SuperKey + '::email_addresses'; // - a superfile name referenced in dx_Email.Key_Email_Address, to be used as RoxieSuperFile in fn_UpdateSuperFiles() process
+		EXPORT emailaddr_for_superkey_monitor := 'monitor::email_datav2::email_addresses';
+		EXPORT emailaddr_superkeyname := AccountMonitoring.constants.filename_cluster + emailaddr_for_superkey_monitor + '_qa'; // superfile used by monitoring process
+
+		emailaddr_key_undist := 
+			PULL(INDEX( 
+          dx_Email.Key_Email_Address()  
+				, emailaddr_superkeyname)
+        );
+  
+		EXPORT emailaddr_key :=
+			DISTRIBUTE(
+				emailaddr_key_undist, 
+				HASH64(clean_email)
+				): INDEPENDENT; //PERSIST?
+   
+		EXPORT emailmain_superfile := 'thor_200::key::email_datav2::' + doxie.Version_SuperKey + '::payload'; // - a superfile name referenced in dx_Email.Key_email_payload, to be used as RoxieSuperFile in fn_UpdateSuperFiles() process
+		EXPORT emailmain_for_superkey_monitor := 'monitor::email_datav2::payload';
+		EXPORT emailmain_superkeyname := AccountMonitoring.constants.filename_cluster + emailmain_for_superkey_monitor + '_qa'; // superfile used by monitoring process
+
+		payload_key_undist := 
+			PULL(INDEX( 
+          dx_Email.Key_email_payload()  
+				, emailmain_superkeyname)
+        );
+  
+		EXPORT main_key :=
+			DISTRIBUTE(
+				payload_key_undist, 
+				HASH64(email_rec_key)
+				): INDEPENDENT; //PERSIST?
+   
+  END;
 		
 END;

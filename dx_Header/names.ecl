@@ -123,6 +123,11 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
 
   EXPORT i_CityStChance := prefix + 'hdr_city_name.st.percent_chance' + postfix;
 
+         sf_addr_unique_expanded := 'header::@version@::addr_unique_expanded';    // different superfile name pattern
+  SHARED sf_addr_unique_expanded_p2 := IF (file_version = '', sf_addr_unique_expanded, ChangeFileVersion (sf_addr_unique_expanded, file_version));
+  EXPORT i_addr_unique_expanded      := prefix          + sf_addr_unique_expanded_p2;
+  EXPORT i_addr_unique_expanded_fcra := prefix + 'fcra::' + sf_addr_unique_expanded_p2;
+ 
   // do not want to define a name for index which is located in a different folder
   //  EXPORT i_geolink := prefix + 'addrrisk_geolink' + postfix;
 END;

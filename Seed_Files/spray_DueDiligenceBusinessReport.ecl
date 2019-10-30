@@ -1,14 +1,14 @@
 ﻿/*******************************************************************************************************************
- Spray 20 test seed data files onto THOR from bctlpedata12 /data/hds_2/duediligence_report_test_seed/filedate
+ Spray 20 test seed data files onto THOR from CargoDayton /data/testseed_prod/filedate
 ********************************************************************************************************************/
 IMPORT _Control, STD, tools, Versioncontrol;
 
 
-EXPORT spray_DueDiligenceBusinessReport(string filedate,
-                                        boolean	pIsTesting = false,
-                                        string pServer = _Control.IPAddress.bctlpedata12,
-                                        string pDir = '/data/hds_2/duediligence_business_report_test_seed/'+filedate+'/',
-                                        string pGroupName = STD.System.Thorlib.Group()) := FUNCTION
+EXPORT spray_DueDiligenceBusinessReport(STRING filedate,
+                                        BOOLEAN	pIsTesting = FALSE,
+                                        STRING pServer = _Control.IPAddress.CargoDayton,
+                                        STRING pDir = '/data/testseed_prod/'+filedate+'/',
+                                        STRING pGroupName = STD.System.Thorlib.Group()) := FUNCTION
                                       
                                       
   SHARED baseFileLocation := '~thor_data400::base::dueDiligenceBusinessReport_testseed_';
@@ -28,7 +28,7 @@ EXPORT spray_DueDiligenceBusinessReport(string filedate,
   
   
 	
-	flfile(string pkeyword) := '~thor_data400::in::testseed::' + filedate + '::duediligencebusinessreport::' + pkeyword;
+  flfile(string pkeyword) := '~thor_data400::in::testseed::' + filedate + '::duediligencebusinessreport::' + pkeyword;
   fsfile(string pkeyword) := baseFileLocation + pkeyword;
 	
 	spry_raw:=DATASET([

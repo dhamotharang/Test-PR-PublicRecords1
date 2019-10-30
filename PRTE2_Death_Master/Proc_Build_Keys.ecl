@@ -82,6 +82,10 @@ proc_deathmaster_buildkey_ssa(string filedate) := function
 	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(keys.key_death_masterV2_ssa_DID_fcra, 
 											constants.KeyName_death_master + 'fcra::did_death_masterV2_ssa',
 											constants.KeyName_death_master + 'fcra::death_masterV2_ssa::'+%version_date%+'::did',a9);
+											
+	// RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(keys.key_death_masterV2_ssa_DID_fcra_SSA, 
+											// constants.KeyName_death_master + 'fcra::did_death_masterV2_ssa',
+											// constants.KeyName_death_master + 'fcra::death_masterV2_ssa::'+%version_date%+'::did',a9);
 
 
 

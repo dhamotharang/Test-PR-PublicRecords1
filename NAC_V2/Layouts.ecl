@@ -1,5 +1,40 @@
-import header,address,AID,Tools, STD;
-export Layouts := MODULE
+﻿IMPORT header,address,AID,Tools, STD;
+
+
+EXPORT Layouts := MODULE
+ 
+ 
+ 
+
+
+   
+EXPORT	rlExternalEmail:= RECORD
+    INTEGER2    RecordID;
+		STRING10    GroupID;
+		STRING100	 EventType;		
+		STRING      EmailAddress;		
+		STRING1     IsRecipientInactive;
+		STRING8     CreateDate;    
+	 END;   
+
+
+
+EXPORT rlInternalEmailFile := RECORD
+  INTEGER2    RecordID;
+	STRING100   EventType;
+	STRING50    GroupID;
+	STRING      EmailAddress;
+	STRING1     IsRecipientInactive;
+	STRING8     CreateDate
+END;
+
+
+EXPORT rlEmailValidation := RECORD
+	STRING EmailAddress;
+END;
+
+
+
 
 	export load := RECORD
 		string2	Case_State_Abbreviation
@@ -149,6 +184,7 @@ export Layouts := MODULE
 		String45  Phys_addr2:='';
 		String60  mail_addr1:='';
 		String45  mail_addr2:='';
+		string1		AddressType := '';
 		base - [case_id];
 		string4	GroupId;
 	END;
@@ -477,6 +513,127 @@ export MSH:=record
 		string4		SequenceNumber;
 		string1		LF;
 	end;
+	
+	export	MRR2 :=
+	record
+		string1		ActivityType;								// =2 for NAC processes internal use
+		string10	BatchJobId;
+		string40	BatchFileName;
+		string10	BatchRecordNumber;					// numeric
+		string20	RequestRecordID;
+		string20	SearchCaseID;
+		string20	SearchClientID;
+		string1		SearchProgramCode;
+		string1		SearchRangeType;						// M=Month, D=Date
+		string8		SearchEligibilityStart;			// CCYYMMDD	
+		string8		SearchEligibilityEnd;			// CCYYMMDD	
+		
+		string60	SearchFullName;
+		string30	SearchLastName;
+		string25	SearchFirstName;
+		string25	SearchMiddleName;
+		string5		SearchSuffixName;
+		
+		string9		SearchSSN;
+		string8		SearchDOB;
+		
+		string70	SearchAddress1StreetAddress1;
+		string70	SearchAddress1StreetAddress2;
+		string30	SearchAddress1City;
+		string2		SearchAddress1State;
+		string9		SearchAddress1Zip;
+		
+		string70	SearchAddress2StreetAddress1;
+		string70	SearchAddress2StreetAddress2;
+		string30	SearchAddress2City;
+		string2		SearchAddress2State;
+		string9		SearchAddress2Zip;
+		
+		string1		IncludeEligibilityHistory;
+		string1		IncludeInterstateAllPrograms;
+
+		string4		QueryStatus;
+		string70	QueryStatusMessage;
+		
+		string4		NacGroupId;
+		string2		ProgramState;
+		string1		ProgramCode;
+		
+		string20	CaseID;
+		string30	CaseLastName;
+		string25	CaseFirstName;
+		string25	CaseMiddleName;
+		string25	CaseSuffixName;
+		
+		string10	CaseMonthlyAllotment;
+		string3		RegiondCode;
+		string3		CaseCountParishCode;		// FIPS code
+		string25	CaseCountyParishName;
+		
+		string10	CasePhone1;
+		string10	CasePhone2;
+		string256	CaseEmail;
+		
+		string1		AddressPhysicalCategory;
+		string70	AddressPhysicalStreet1;
+		string70	AddressPhysicalStreet2;
+		string30	AddressPhysicalCity;
+		string2		AddressPhysicalState;
+		string9		AddressPhysicalZip;
+		
+		string1		AddressMailCategory;
+		string70	AddressMailStreet1;
+		string70	AddressMailStreet2;
+		string30	AddressMailCity;
+		string2		AddressMailState;
+		string9		AddressMailZip;
+		
+		string20	ClientID;									// or individual ID
+		string1		HOHIndicator;
+		string1		ABAWDIndicator;
+		string1		RelationshipIndicator;
+		
+		string30	ClientLastName;
+		string25	ClientFirstName;
+		string25	ClientMiddleName;
+		string5		ClientSuffixName;
+
+		string1		ClientGender;
+		string1		ClientRace;
+		string1		ClientEthnicity;
+		string9		ClientSSN;
+		string1		ClientSSNType;
+		string8		ClientDOB;						//YYYYMMDD
+		string1		ClientDOBType;
+		
+		string20	ClientCertificateType;
+		string10	ClientMonthlyAllotment;
+		
+		string1		ClientEligibilityIndicator;
+		string8		ClientEligibilityEffectiveDate;		//YYYYMMDD
+		string8		ClientEligibilityStartDate;
+		string8		ClientEligibilityEndDate;
+		
+		string10	ClientPhone;
+		string256	ClientEmail;
+		
+		string50	StateContactName;
+		string10	StateContactPhone;
+		string10	StateContactPhoneExtension;
+		string256	StateContactEmail;
+		string3		LexIdScore;
+		string10	MatchCodes;
+		
+		string5		TotalEligiblePeriodsDays;
+		string4		TotalEligiblePeriodsMonths;
+		
+		string3		ExceptionReasonCode;
+		string50	ExceptionComments;
+		string84	EligibilityPeriodsHistory;
+		string4		SequenceNumber;
+		//string1		LF;
+	end;
+
 
 	export	SSE	:=
 	record
@@ -565,5 +722,123 @@ export MSH:=record
 		string1		SearchEligibilityStatus;
 		string1		LF;
 	end;
+	
+	export MRF2	:=
+	record
+		string20	RequestRecodrID;
+		string20	SearchCaseId;
+		string20	SearchClientId;
+		string1		SearchprogramCode;
+		string1		SearchRangeType;
+		string8		SearchEligibilityStart;
+		string8		SeachEligibilityEnd;
+		string60	SearchFullName;
+		string30	SearchLastName;
+		string25	SearchFirstName;
+		string25	SearchMiddleName;
+		string5		SearchSuffixName;
+		string9		SearchSSN;
+		string8		SearchDOB;
+		string70	SearchAddress1StreetAddress1;
+		string70	SearchAddress1StreetAddress2;
+		string30	SearchAddress1City;
+		string2		SearchAddress1State;
+		string9		SearchAddress1Zip;
+		string70	SearchAddress2StreetAddress1;
+		string70	SearchAddress2StreetAddress2;
+		string30	SearchAddress2City;
+		string2		SearchAddress2State;
+		string9		SearchAddress2Zip;
+		string1		SearchIncludeEligibilityHistory;
+		string1		SearchIncludeInterstateAllPrograms;
+	end;
+	
+	export MRX2 :=
+	record
+		string1		ActivityType;								// =2 for NAC processes internal use
+		string10	BatchJobId;
+		string40	BatchFileName;
+		string10	BatchRecordNumber;					// numeric
+		string20	RequestRecordID;
+		string20	SearchCaseID;
+		string20	SearchClientID;
+		string1		SearchProgramCode;
+		string1		SearchRangeType;						// M=Month, D=Date
+		string8		SearchEligibilityStart;			// CCYYMMDD	
+		string8		SearchEligibilityEnd;			// CCYYMMDD	
+		
+		string60	SearchFullName;
+		string30	SearchLastName;
+		string25	SearchFirstName;
+		string25	SearchMiddleName;
+		string5		SearchSuffixName;
+		
+		string9		SearchSSN;
+		string8		SearchDOB;
+		
+		string70	SearchAddress1StreetAddress1;
+		string70	SearchAddress1StreetAddress2;
+		string30	SearchAddress1City;
+		string2		SearchAddress1State;
+		string9		SearchAddress1Zip;
+		
+		string70	SearchAddress2StreetAddress1;
+		string70	SearchAddress2StreetAddress2;
+		string30	SearchAddress2City;
+		string2		SearchAddress2State;
+		string9		SearchAddress2Zip;
+		
+		string1		IncludeEligibilityHistory;
+		string1		IncludeInterstateAllPrograms;
+		string4		QueryStatus;
+		string70	QueryStatusMessage;
+	end;
+	
+	export MSX2 :=
+	record
+		string1		ActivityType;								// 1=single 2=batch
+		string40	ActivitySource;							// batch filename
+		string16	NACTransactionId;						// ESP Transaction ID or Batch Jodb ID
+		
+		string10	BatchRecordNumber;					// numeric
+		string20	RequestRecordID;
+		string20	NACUserId;
+		string15	NACUserIP;
+		string20	EndUserId;
+		string15	EndUserIP;
+		
+		string4		QueryStatus;
+		string70	QueryStatusMessage;
 
+		string20	SearchCaseID;
+		string20	SearchClientID;
+		string1		SearchProgramCode;
+		string1		SearchRangeType;						// M=Month, D=Date
+		string8		SearchEligibilityStart;			// CCYYMMDD	
+		string8		SearchEligibilityEnd;			// CCYYMMDD	
+
+		string60	SearchFullName;
+		string30	SearchLastName;
+		string25	SearchFirstName;
+		string25	SearchMiddleName;
+		string5		SearchSuffixName;
+		string9		SearchSSN;
+		string8		SearchDOB;
+		
+		string70	SearchAddress1StreetAddress1;
+		string70	SearchAddress1StreetAddress2;
+		string30	SearchAddress1City;
+		string2		SearchAddress1State;
+		string9		SearchAddress1Zip;
+		
+		string70	SearchAddress2StreetAddress1;
+		string70	SearchAddress2StreetAddress2;
+		string30	SearchAddress2City;
+		string2		SearchAddress2State;
+		string9		SearchAddress2Zip;
+		
+		string1		IncludeEligibilityHistory;
+		string1		IncludeInterstateAllPrograms;
+	end;
+		
 END;

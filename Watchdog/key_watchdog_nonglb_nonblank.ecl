@@ -1,12 +1,10 @@
-import watchdog,data_services,doxie;
+﻿import watchdog_V2,data_services,doxie;
 
-//See key_Prep_Watchdog...
-export key_watchdog_nonglb_nonblank
+Parms := Module(Watchdog_V2.UniversalKeyInterface)
+EXPORT Permissions := Watchdog_V2.fn_UniversalKeySearch.PermissionsType.nonglb_nonblank;
+END;
 
-				:= INDEX(dataset([],watchdog.Layout_best_flags)
+export key_watchdog_nonglb_nonblank := Watchdog_V2.fn_UniversalKeySearch.FetchRecords(Parms);
 
-					,watchdog.Layout_best_flags
-					,data_services.Data_Location.Watchdog_Best 
-							
-							+ 'thor_data400::key::watchdog_nonglb.did_nonblank_'+doxie.Version_SuperKey
-);
+
+

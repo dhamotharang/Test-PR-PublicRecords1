@@ -4,8 +4,8 @@ destinationIP := _Control.IPAddress.bctlpedata12;
 
 destination := '/data/projects/seo/';
 
-EXPORT DesprayFile(string lfn, string version) := 
+EXPORT DesprayFile(string lfn, string destfile, string version) := 
 		STD.file.Despray(lfn,
 			destinationIP,
-			destination + 'seo' + version + 'csv',
+			destination + destfile + '_' + version + '.csv',
 			allowoverwrite := true);

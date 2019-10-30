@@ -1,4 +1,4 @@
-import roxiekeybuild;
+﻿import roxiekeybuild;
 export Proc_Build_Boolean_Key (string filedate) := function
 							
 e_mail_fail := fileservices.sendemail(
@@ -14,7 +14,7 @@ boolean_key := bankruptcyv2.BWR_BKV2_Boolean(filedate) :
 
 retval :=  sequential(mdata
 							,boolean_key
-							,Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,christopher.brodeur@lexisnexis.com,manuel.tarectecan@lexisnexis.com,randy.reyes@lexisnexis.com,BocaRoxiePackageTeam@lexisnexis.com,Michael.Gould@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com','Y','B',,'Y',,,'Y')
+							,Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,christopher.brodeur@lexisnexis.com,manuel.tarectecan@lexisnexis.com,randy.reyes@lexisnexis.com,BocaRoxiePackageTeam@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com','Y','B',,'Y',,,'Y')
 							,notify('BANKRUPTCY BOOLEAN BUILD COMPLETE','*'));
 
 return retval;

@@ -22,6 +22,7 @@ EXPORT Filename_Keys := module
   EXPORT L_ADDRESS2                := basename+'refs::l_address2';
   EXPORT L_ADDRESS3                := basename+'refs::l_address3';
   EXPORT L_CNPNAME                 := basename+'refs::l_cnpname';
+  EXPORT L_CNPNAME_SLIM            := basename+'refs::l_cnpname_slim';
   EXPORT L_CNPNAME_FUZZY           := basename+'refs::l_cnpname_fuzzy';
   EXPORT L_CNPNAME_ST              := basename+'refs::l_cnpname_st';
   EXPORT L_CNPNAME_ZIP             := basename+'refs::l_cnpname_zip';

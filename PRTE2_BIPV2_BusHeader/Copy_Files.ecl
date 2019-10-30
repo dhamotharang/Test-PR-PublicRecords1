@@ -23,6 +23,9 @@ EXPORT fnCopyFromProd(STRING current_version, string dest_cluster) := FUNCTION
 
  CopyFiles1(data_services.foreign_prod + 'prte::key::bipv2::business_header::protected::contact_title_linkids','~prte::key::bipv2::business_header::' + current_version + '::contact_title_linkids',dest_cluster); 
  
+ CopyFiles1(data_services.foreign_prod + 'prte::key::bizlinkfull::protected::proxid::refs::l_cnpname_slim','~prte::key::bizlinkfull::' + current_version + '::proxid::refs::l_cnpname_slim',dest_cluster); 
+
+ 
  
 RETURN 'Success';	
 	END;

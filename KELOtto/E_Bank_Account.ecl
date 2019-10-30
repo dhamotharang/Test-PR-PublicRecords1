@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.0
+﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 IMPORT KEL011 AS KEL;
 IMPORT KELOtto;
 IMPORT E_Bank,E_Customer FROM KELOtto;
@@ -11,13 +11,13 @@ EXPORT E_Bank_Account := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
     KEL.typ.ntyp(E_Bank.Typ) _r_Bank_;
     KEL.typ.nstr Account_Number_;
-    KEL.typ.nint Otto_Bank_Account_Id_;
+    KEL.typ.nstr Otto_Bank_Account_Id_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),_r_Bank_(_r_Bank_:0),accountnumber(Account_Number_:\'\'),ottobankaccountid(Otto_Bank_Account_Id_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),_r_Bank_(_r_Bank_:0),accountnumber(Account_Number_:\'\'),ottobankaccountid(Otto_Bank_Account_Id_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -31,7 +31,7 @@ EXPORT E_Bank_Account := MODULE
     UNSIGNED4 Cnt := COUNT(GROUP);
     KEL.typ.uid UID := 0;
   END;
-  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)0);
+  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::KELOtto::Bank_Account::UidLookup',EXPIRE(7));
@@ -40,7 +40,7 @@ EXPORT E_Bank_Account := MODULE
   EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
   EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
   EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
-  SHARED __Mapping0 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),_r_Bank_(_r_Bank_:0),bank_account_number_1(Account_Number_:\'\'),ottobankaccountid(Otto_Bank_Account_Id_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),_r_Bank_(_r_Bank_:0),bank_account_number_1(Account_Number_:\'\'),ottobankaccountid(Otto_Bank_Account_Id_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __d0_Out := RECORD
     RECORDOF(KELOtto.fraudgovshared);
     KEL.typ.uid UID := 0;
@@ -54,7 +54,7 @@ EXPORT E_Bank_Account := MODULE
   EXPORT KELOtto_fraudgovshared_1_Invalid := __d0__r_Bank__Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0__r_Bank__Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
-  SHARED __Mapping1 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),_r_Bank_(_r_Bank_:0),bank_account_number_2(Account_Number_:\'\'),ottobankaccountid2(Otto_Bank_Account_Id_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping1 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),_r_Bank_(_r_Bank_:0),bank_account_number_2(Account_Number_:\'\'),ottobankaccountid2(Otto_Bank_Account_Id_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __d1_Out := RECORD
     RECORDOF(KELOtto.fraudgovshared);
     KEL.typ.uid UID := 0;
@@ -81,7 +81,7 @@ EXPORT E_Bank_Account := MODULE
     KEL.typ.ndataset(Source_Customers_Layout) Source_Customers_;
     KEL.typ.ntyp(E_Bank.Typ) _r_Bank_;
     KEL.typ.nstr Account_Number_;
-    KEL.typ.nint Otto_Bank_Account_Id_;
+    KEL.typ.nstr Otto_Bank_Account_Id_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;

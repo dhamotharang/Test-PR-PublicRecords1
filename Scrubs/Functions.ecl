@@ -313,6 +313,15 @@ EXPORT Functions := MODULE
   END;
 
   //****************************************************************************
+  //fn_verify_optional_phone:  returns true or false based upon whether it contains an
+  //                           empty or valid phone #
+  //****************************************************************************
+	EXPORT fn_verify_optional_phone(STRING phone) := function    
+    clean_phone := TRIM(phone, ALL);
+    RETURN IF(clean_phone = '' OR ut.CleanPhone(clean_phone) != '', 1, 0);
+  END;
+	
+  //****************************************************************************
   //fn_verify_cart: returns true or false based upon whether or not there is
   //                 an empty or valid cart value.
   //****************************************************************************

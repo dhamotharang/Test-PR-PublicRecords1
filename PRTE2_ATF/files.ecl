@@ -1,4 +1,4 @@
-IMPORT PRTE2_ATF, ATF, PRTE_CSV, MDR;
+﻿IMPORT PRTE2_ATF, ATF, PRTE_CSV, MDR;
 
 EXPORT files := MODULE
 
@@ -20,5 +20,7 @@ EXPORT files := MODULE
 	END;
 	
 	EXPORT ATF_firearms_autokey := project(SearchFile, xform(left));
+
+	EXPORT ATF_header := project(Base_out, layouts.Base);
 
 END;

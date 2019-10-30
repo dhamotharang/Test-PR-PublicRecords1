@@ -17,10 +17,8 @@ EXPORT map_CAS0681_conversion(STRING pVersion) := FUNCTION
 
 	//Dataset reference files for lookup joins
 	ds_Cmvtranslation		:= Prof_License_Mari.files_References.cmvtranslation(SOURCE_UPD =src_cd);
-
-	//Move file(s) from ::sprayed:: to ::using::
-	move_to_using       := Prof_License_Mari.func_move_file.MyMoveFile(code, 'real_estate', 'sprayed', 'using');
-
+  O_Cmvtranslation    := output(ds_Cmvtranslation);
+	
 	//CA input file
 	ds_CA_RealEstate		:= Prof_License_Mari.file_CAS0681.real_estate;
 
@@ -31,12 +29,13 @@ EXPORT map_CAS0681_conversion(STRING pVersion) := FUNCTION
 	
 	//Pattern for DBA
 	DBApattern					:= '^(.*)(DBA |C/O |D B A |D/B/A | AKA |^AKA |T/A )(.*)';
-
+	Sufx_Pattern        := '(,SR\\.|,SR| SR\\.| SR|, JR|, JR\\.| JR\\.| JR| III| II| IV| VI | VII)';	
+	
 	//Not a Foreign city pattern
 	NotForeign					:= ['USA','NO CITY'];
 	
 	//CA Real Estate layout to Common
-	Prof_License_Mari.layout_base_in	TransformToCommon(Prof_License_Mari.layout_CAS0681 L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	TransformToCommon(Prof_License_Mari.layout_CAS0681.common L) := TRANSFORM
 		
 			SELF.PRIMARY_KEY		:= 0;
 			SELF.CREATE_DTE			:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -80,29 +79,40 @@ EXPORT map_CAS0681_conversion(STRING pVersion) := FUNCTION
 			tmpFullName         := IF(SELF.TYPE_CD='MD',
 			                          TRIM(TrimFirstName + ' ' + TrimMidName + ' ' + TrimLastName,LEFT, RIGHT),
 																'');
-																
-			// Identify NICKNAME 
-			tempFNick						:= Prof_License_Mari.fGetNickname(TrimFirstName,'nick');
-			tempLNick						:= Prof_License_Mari.fGetNickname(TrimLastName,'nick');
-			tempMNick						:= Prof_License_Mari.fGetNickname(TrimMidName,'nick');
+			TmpLastName 			:= IF(REGEXFIND(Sufx_Pattern,TrimLastName),REGEXREPLACE(Sufx_Pattern,TrimLastName,''),TrimLastName);
+			TmpFirstName  		:= IF(REGEXFIND(Sufx_Pattern,TrimFirstName),REGEXREPLACE(Sufx_Pattern,TrimFirstName,''),TrimFirstName);
+			TmpMidName  			:= IF(REGEXFIND(Sufx_Pattern,TrimMidName),REGEXREPLACE(Sufx_Pattern,TrimMidName,''),TrimMidName);
+		
+			TmpSuffix         := MAP(REGEXFIND(Sufx_Pattern,TrimLastName)=>TRIM(REGEXFIND(Sufx_Pattern,TrimLastName,0),LEFT,RIGHT),
+			                         REGEXFIND(Sufx_Pattern,TrimMidName)=>TRIM(REGEXFIND(Sufx_Pattern,TrimMidName,0),LEFT,RIGHT),
+			                         REGEXFIND(Sufx_Pattern,TrimFirstName)=>TRIM(REGEXFIND(Sufx_Pattern,TrimFirstName,0),LEFT,RIGHT),
+															 TrimSuffixName);			
 			
-			removeFNick					:= Prof_License_Mari.fGetNickname(TrimFirstName,'strip_nick');
-			removeLNick					:= Prof_License_Mari.fGetNickname(TrimLastName,'strip_nick');
-			removeMNick					:= Prof_License_Mari.fGetNickname(TrimMidName,'strip_nick');
+			// Identify NICKNAME 
+			tempFNick						:= Prof_License_Mari.fGetNickname(TmpFirstName,'nick');
+			tempLNick						:= Prof_License_Mari.fGetNickname(TmpLastName,'nick');
+			tempMNick						:= Prof_License_Mari.fGetNickname(TmpMidName,'nick');
+			
+			removeFNick					:= Prof_License_Mari.fGetNickname(TmpFirstName,'strip_nick');
+			removeLNick					:= Prof_License_Mari.fGetNickname(TmpLastName,'strip_nick');
+			removeMNick					:= Prof_License_Mari.fGetNickname(TmpMidName,'strip_nick');
 
 			stripNickFName			:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeFNick));
 			stripNickLName			:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeLNick));
 			stripNickMName			:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeMNick));
 			
-			GoodFirstName       :=  IF(TrimFirstNAME != '' AND tempFNick != '',stripNickFName,TrimFirstName);
-			GoodMidName         :=  IF(TrimMidNAME   != '' AND tempMNick != '',stripNickMName,TrimMidName);
-			GoodLastName        :=  IF(TrimLastNAME  != '' AND tempLNick != '',stripNickLName,TrimLastName);
+			GoodFirstName       :=  IF(TmpFirstNAME != '' AND tempFNick != '',stripNickFName,TmpFirstName);
+			GoodMidName         :=  IF(TmpMidNAME   != '' AND tempMNick != '',stripNickMName,TmpMidName);
+			GoodLastName        :=  IF(TmpLastNAME  != '' AND tempLNick != '',stripNickLName,TmpLastName);
 	
 			SELF.NAME_FIRST 		:= IF(SELF.TYPE_CD = 'MD',GoodFirstName,'');
 			SELF.NAME_MID		  	:= IF(SELF.TYPE_CD = 'MD',GoodMidName,'');
 			SELF.NAME_LAST			:= IF(SELF.TYPE_CD = 'MD',GoodLastName,'');
-			SELF.NAME_SUFX			:= IF(SELF.TYPE_CD = 'MD',TrimSuffixName,'');	
-	
+			SELF.NAME_SUFX			:= IF(SELF.TYPE_CD = 'MD',TmpSuffix,'');	
+			SELF.NAME_NICK			:= MAP(tempFNick != '' => StringLib.StringCleanSpaces(tempFNick),
+																 tempLNick != '' => StringLib.StringCleanSpaces(tempLNick),
+																 tempMNick != '' => StringLib.StringCleanSpaces(tempMNick),
+																 '');
 	    //Clean Corporation Name		
 			tmpNameOrg					:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(REGEXREPLACE('(^DBA )',std_org_name,'')); //business name with standard corp abbr.
 			getCorpOnly			  	:= IF(REGEXFIND(DBApattern, tmpNameOrg), Prof_License_Mari.mod_clean_name_addr.GetCorpName(tmpNameOrg)
@@ -326,9 +336,9 @@ EXPORT map_CAS0681_conversion(STRING pVersion) := FUNCTION
 																'');
 			SELF.STD_LICENSE_STATUS	:= TmpLicStatus + TRIM(L.restricted_flag,LEFT,RIGHT) + TRIM(L.misc_indicator,LEFT,RIGHT);
 			
-			SELF.CURR_ISSUE_DTE	:= IF(L.license_effective_date = ' ','17530101',TRIM(L.license_effective_date));
+			SELF.CURR_ISSUE_DTE	:= IF(L.license_effective_date = ' ','17530101',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.license_effective_date));
 			SELF.ORIG_ISSUE_DTE	:= '17530101';
-			SELF.EXPIRE_DTE			:= IF(L.license_expiration_date = ' ','17530101',TRIM(L.license_expiration_date));
+			SELF.EXPIRE_DTE			:= IF(L.license_expiration_date = ' ','17530101',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.license_expiration_date));
 
 			//Concat address1 and address2 for 'IF address populated' statements
 			full_address				:= TRIM(L.address_1,LEFT,RIGHT)+TRIM(L.address_2,LEFT,RIGHT);
@@ -449,7 +459,7 @@ EXPORT map_CAS0681_conversion(STRING pVersion) := FUNCTION
 	notify_invalid_address := Prof_License_Mari.fNotifyError.NameInAddressFields(code,src_cd,pVersion,
 	                            Prof_License_Mari.Email_Notification_Lists.BaseFileConversion);
 	
-	RETURN SEQUENTIAL(move_to_using, oFile, d_final, add_super, move_to_used, notify_missing_codes, notify_invalid_address);
+	RETURN SEQUENTIAL(O_Cmvtranslation, oFile, d_final, add_super, move_to_used, notify_missing_codes, notify_invalid_address);
 	
 
 END;

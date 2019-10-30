@@ -1,27 +1,33 @@
 ﻿Import BIPV2, tools, AutoStandardI, InsuranceHeader_PostProcess, STD;
+import BIPV2_Contacts;
 
 YEARS2 := 2*365;
 YEARS7 := 7*365;
 
-export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = dataset([],recordof(BIPV2_Build.key_contact_linkids.dkeybuild)), 
+export BestContactTitle(dataset(BIPV2_Contacts.Layouts.contact_linkids.layoutOrigFile) contactKey = dataset([], BIPV2_Contacts.Layouts.contact_linkids.layoutOrigFile), 
                         unsigned TODAYS_DATE = STD.Date.Today()) := module
+
+	contactKeyLayout := BIPV2_Contacts.key_contact_linkids.kfetch_layout;
+	
     slim_layout := {
-                    BIPV2_Build.key_contact_linkids.Key.ultid,
-                    BIPV2_Build.key_contact_linkids.Key.orgid,
-                    BIPV2_Build.key_contact_linkids.Key.seleid,
-                    BIPV2_Build.key_contact_linkids.Key.proxid,
-                    BIPV2_Build.key_contact_linkids.Key.contact_did,
+                    contactKeyLayout.ultid,
+                    contactKeyLayout.orgid,
+                    contactKeyLayout.seleid,
+                    contactKeyLayout.proxid,
+                    contactKeyLayout.contact_did,
                     string10 seg_ind;
-                    BIPV2_Build.key_contact_linkids.Key.dt_first_seen_contact,
-                    BIPV2_Build.key_contact_linkids.Key.dt_last_seen_contact,
-                    BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
-                    BIPV2_Build.key_contact_linkids.Key.executive_ind;
-                    BIPV2_Build.key_contact_linkids.Key.executive_ind_order;										  
-                    typeof(BIPV2_Build.key_contact_linkids.Key.dt_first_seen_contact) dt_first_seen_title,
-                    typeof(BIPV2_Build.key_contact_linkids.Key.dt_last_seen_contact) dt_last_seen_title,
+                    contactKeyLayout.dt_first_seen_contact,
+                    contactKeyLayout.dt_last_seen_contact,
+                    contactKeyLayout.contact_job_title_derived;
+                    contactKeyLayout.executive_ind;
+                    contactKeyLayout.executive_ind_order;										  
+                    typeof(contactKeyLayout.dt_first_seen_contact) dt_first_seen_title,
+                    typeof(contactKeyLayout.dt_last_seen_contact) dt_last_seen_title,
                     unsigned4 days_old_title;
                     unsigned4 days_old_contact;
                     unsigned data_permits;
+																				unsigned4 global_sid;
+	                   unsigned8 record_sid;
                     };	
  				
     contacts_proj := project(contactKey, 
@@ -84,28 +90,31 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
     org_level_contacts  := project(contacts_with_lexid(orgid <>0), transform(slim_layout, self.proxid:=0; self.seleid:=0; self:=left));
     ult_level_contacts  := project(contacts_with_lexid(ultid <>0), transform(slim_layout, self.proxid:=0; self.seleid:=0; self.orgid:=0; self:=left));
  				
-    titles_prox_s := sort(prox_level_contacts,                                   ultid, orgid, seleid, proxid, contact_did, contact_job_title_derived);
-    titles_prox   := ROLLUP(titles_prox_s, contactTitleValueRollup(left, right), ultid, orgid, seleid, proxid, contact_did, contact_job_title_derived);	
+    titles_prox_s := sort(prox_level_contacts,                                   ultid, orgid, seleid, proxid, contact_did, contact_job_title_derived, global_sid, record_sid);
+    titles_prox   := ROLLUP(titles_prox_s, contactTitleValueRollup(left, right), ultid, orgid, seleid, proxid, contact_did, contact_job_title_derived, global_sid, record_sid);	
  
-    titles_sele_s := sort(sele_level_contacts,                                   ultid, orgid, seleid,         contact_did, contact_job_title_derived);
-    titles_sele   := ROLLUP(titles_sele_s, contactTitleValueRollup(left, right), ultid, orgid, seleid,         contact_did, contact_job_title_derived);	
+    titles_sele_s := sort(sele_level_contacts,                                   ultid, orgid, seleid,         contact_did, contact_job_title_derived, global_sid, record_sid);
+    titles_sele   := ROLLUP(titles_sele_s, contactTitleValueRollup(left, right), ultid, orgid, seleid,         contact_did, contact_job_title_derived, global_sid, record_sid);	
  
-    titles_org_s  := sort(org_level_contacts,                                    ultid, orgid,                 contact_did, contact_job_title_derived);
-    titles_org    := ROLLUP(titles_org_s,  contactTitleValueRollup(left, right), ultid, orgid,                 contact_did, contact_job_title_derived);	
+    titles_org_s  := sort(org_level_contacts,                                    ultid, orgid,                 contact_did, contact_job_title_derived, global_sid, record_sid);
+    titles_org    := ROLLUP(titles_org_s,  contactTitleValueRollup(left, right), ultid, orgid,                 contact_did, contact_job_title_derived, global_sid, record_sid);	
  
-    titles_ult_s  := sort(ult_level_contacts,                                    ultid,                        contact_did, contact_job_title_derived);
-    titles_ult    := ROLLUP(titles_ult_s,  contactTitleValueRollup(left, right), ultid,                        contact_did, contact_job_title_derived);	
+    titles_ult_s  := sort(ult_level_contacts,                                    ultid,                        contact_did, contact_job_title_derived, global_sid, record_sid);
+    titles_ult    := ROLLUP(titles_ult_s,  contactTitleValueRollup(left, right), ultid,                        contact_did, contact_job_title_derived, global_sid, record_sid);	
  
   
     agePrefTitle(unsigned days_old) := function
         return if(days_old<YEARS2, 1, if(days_old<YEARS7, 2, 3));
     end;
- 
+  
     title_layout := {
         unsigned title_rank;
         unsigned2 data_permits;
         unsigned2 accum_data_permits;
-        BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
+        // BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
+        contactKeyLayout.contact_job_title_derived;
+								unsigned4 global_sid;
+	       unsigned8 record_sid;
         };
 				
     slim_child_title_layout := {
@@ -120,7 +129,7 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         accum := iterate(allrows_p, transform(title_layout, 
                                               self.accum_data_permits := left.accum_data_permits | right.accum_data_permits; 
                                               self:=right));
-        accum_keepers := rollup(accum, accum_data_permits, transform(left)); // if accum_data_permits is same, then lower ranking title could never be useful                
+        accum_keepers := dedup(accum, accum_data_permits, global_sid, record_sid, all); // if accum_data_permits is same, then lower ranking title could never be useful                
         self.titles                := accum_keepers;
         self.data_permits          := accum[count(accum)].accum_data_permits;
         self.days_old_contact      := min(allRows, days_old_contact);
@@ -168,7 +177,10 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         unsigned contact_rank;
         unsigned2 data_permits;
         unsigned2 accum_data_permits;
-        BIPV2_Build.key_contact_linkids.Key.contact_did,
+								unsigned4 global_sid;
+	       unsigned8 record_sid;
+        // BIPV2_Build.key_contact_linkids.Key.contact_did,
+        contactKeyLayout.contact_did,
         dataset(title_layout) titles;
         };
  
@@ -184,7 +196,7 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         accum := iterate(allrows_p, transform(contact_layout, 
                                               self.accum_data_permits := left.accum_data_permits | right.accum_data_permits; 
                                               self:=right));
-        accum_keepers := rollup(accum, accum_data_permits, transform(left)); // if accum_data_permits is same, then lower ranking title could never be useful
+        accum_keepers := dedup(accum, accum_data_permits, global_sid, record_sid, all); // if accum_data_permits is same, then lower ranking title could never be useful
         self.contacts := accum_keepers;
         self := l;
         END;
@@ -211,9 +223,13 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         unsigned contact_title_rank;
         unsigned2 data_permits;
         unsigned2 accum_data_permits;
-        BIPV2_Build.key_contact_linkids.Key.contact_did,
-        BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
-        };
+        // BIPV2_Build.key_contact_linkids.Key.contact_did,
+        contactKeyLayout.contact_did,
+        // BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
+        contactKeyLayout.contact_job_title_derived;
+	       unsigned4 global_sid;
+	       unsigned8 record_sid;
+    };
 
     contact_title_layout := {
         flat_contact_title_layout - accum_data_permits
@@ -228,6 +244,8 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         flat_contact_title_layout flattenContactTitles(contact_layout l, title_layout r, unsigned cntr) :=transform
               self.contact_title_rank := cntr;
               self.data_permits := r.data_permits;
+														self.global_sid := r.global_sid;
+														self.record_sid := r.global_sid;
 	  																												self.accum_data_permits := r.data_permits;
                                self.contact_did := l.contact_did;
 	  																												self.contact_job_title_derived := r.contact_job_title_derived;
@@ -237,6 +255,8 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
 																																																						self.data_permits := right.data_permits;
 																																																						self.accum_data_permits := right.data_permits;
 																																																						self.contact_did := left.contact_did;
+																																																						self.global_sid := right.global_sid;
+														                                        self.record_sid := right.record_sid;
 																																																						self.contact_job_title_derived := right.contact_job_title_derived));
 																																					
 	  			accum := iterate(x, transform(flat_contact_title_layout, 

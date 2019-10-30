@@ -8,7 +8,7 @@ Nid.Mac_CleanFullNames(f, f_clean, OrigName);
 
 overrides := Gong_Neustar.Surname_overrides;
 //Map to Gong.File_History_Full_Prepped_for_Keys layout
-Gong.layout_historyaid map_common_layout(f_clean l) := transform
+Gong.layout_historyaid-[global_sid,record_sid] map_common_layout(f_clean l) := transform
 	self.filedate	:= (string)l.last_build_date;
 	self.listing_type_bus := IF(stringlib.StringFind(l.listingtype, 'B', 1) > 0 ,l.listingtype,'');
 	self.listing_type_res := IF(stringlib.StringFind(l.listingtype, 'R', 1) > 0 ,l.listingtype,'');
@@ -37,7 +37,7 @@ Gong.layout_historyaid map_common_layout(f_clean l) := transform
 f_Surname := project(f_clean(nametype='P',OrigName not in overrides,NOT REGEXFIND('\\b(FOR|UNLISTED|UNPUBLISHED|BLOCKED)\\b',OrigName)),map_common_layout(left));
 f_Surname_d := dedup(sort(f_Surname, record), all);
 
-ut.MAC_SF_BuildProcess(f_Surname_d,'~thor_data400::base::phonesplusv2_surname',surname_base,2,,true, pversion);
+ut.MAC_SF_BuildProcess(f_Surname_d,PhonesPlus_V2.Names.phonesplusv2_surname,surname_base,2,,true, pversion);
 
 
 

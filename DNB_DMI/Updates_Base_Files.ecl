@@ -1,4 +1,4 @@
-import tools;
+﻿import _control, MDR, std, tools;
 
 export Updates_Base_Files(
 
@@ -22,14 +22,16 @@ function
 	dScrub_Number_Fields			:= Scrub_Number_Fields		(pSprayedFile					,pversion							);
 	dFile_Companies_V1_Input	:= File_Companies_V1_Input(pInputCompaniesFile	,pversion							);
 	dwhichfile								:= if(pUseV1Inputs	,dFile_Companies_V1_Input		,dScrub_Number_Fields	);
-
+	
 	dDeletes									:= dwhichfile(rawfields.delete_record_indicator != '');
 	dActives									:= dwhichfile(rawfields.delete_record_indicator  = '');
 
 	dIngest_Companies					:= Ingest_Companies				(dActives							,pBaseCompaniesFile	).AllRecords_NoTag;
 	dProcess_Deletes					:= Process_Deletes				(dDeletes							,dIngest_Companies		);
-	dAppend_AID								:= Append_AID.fall				(dProcess_Deletes														);
+	addGlobalSID							:= MDR.macGetGlobalSid(dProcess_Deletes, 'DNB', '', 'global_sid'); //DF-25978: Add Global_SID to Companies
 	
+	dAppend_AID								:= Append_AID.fall				(addGlobalSID														);
+		
 	// contact information
 	dNorm_Contacts						:= Norm_Contacts					(pSprayedFile					,pversion							);
 	dFile_Contacts_V1_Input		:= File_Contacts_V1_Input	(pInputContactsFile		,pversion							);
@@ -55,10 +57,12 @@ function
 																		left.rid = right.rid,
 																		JoinForBDID(left,right),
 																		right outer
-																		);																		
-
+																		);			
+																		
+	addGlobalSID2							:= MDR.macGetGlobalSid(dPropagatedBDID, 'DNB', '', 'global_sid'); //DF-25978: Add Global_SID to Contacts
+	
 	tools.mac_WriteFile(Filenames(pversion).base.Companies.new	,dAppendBdids			,Build_Companies_File	,pShouldExport := false);
-	tools.mac_WriteFile(Filenames(pversion).base.Contacts.new		,dPropagatedBDID	,Build_Contacts_File	,pShouldExport := false);
+	tools.mac_WriteFile(Filenames(pversion).base.Contacts.new		,addGlobalSID2	,Build_Contacts_File	,pShouldExport := false);
 
 	return	sequential(
 											Build_Companies_File

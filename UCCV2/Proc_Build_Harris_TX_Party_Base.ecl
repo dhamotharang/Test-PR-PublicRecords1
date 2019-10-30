@@ -1,7 +1,7 @@
-// [12/11/2012] NOTE: Information hasn't been going through this attribute since 2008.  If we start
+﻿// [12/11/2012] NOTE: Information hasn't been going through this attribute since 2008.  If we start
 // getting input for this again, the code needs to undergo the AID changes and the NID name cleaner
 // changes.  Refer to the other attributes listed in Make_Party_Base, where this attribute is called,
-// for example code of how to go about this.
+// for example code of how to go about this. 
 import address, did_add, didville,ut,header_slimsort,UCCV2,business_header,Business_Header_SS,watchdog;
 
 dParty   := File_Harris_TX_in;
@@ -65,8 +65,8 @@ Layout_UCC_Common.Layout_Party tProjParty(dNormalize   pInput)
 	 self.foreign_indc				    := if(Foreign  <>'','Y','N');
 	 self.dt_first_seen					:=   (unsigned6)(pInput.process_date[1..6]);
      self.dt_last_seen					:=   (unsigned6)(pInput.process_date[1..6]);
-     self.dt_vendor_first_reported		:=   (unsigned6)(pInput.process_date[1..6]);
-     self.dt_vendor_last_reported		:=   (unsigned6)(pInput.process_date[1..6]);
+     self.dt_vendor_first_reported		:=   (unsigned6) pInput.process_date;
+     self.dt_vendor_last_reported		  :=   (unsigned6) pInput.process_date;
 	 self.orig_city                     :=  stringlib.stringfilterout(pInput.cityzip,'0123456789');  
 	 self.orig_state                    :=  if(pInput.statezip[3]='',pInput.statezip[1..2],
 	                                          if(REGEXFIND('TEXAS',pInput.statezip),'TX',''));

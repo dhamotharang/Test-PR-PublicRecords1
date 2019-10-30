@@ -5,10 +5,11 @@ export Build_all(string pVersion, boolean fcra = false, boolean pDaily = false) 
 	version := if(pVersion = '', pDate, pVersion);		
 	
 	seq := sequential(
-					 // INQL_v2.Build_Strata(version).all
 					 INQL_v2.proc_BuildBases(version, fcra, pDaily)					
 					);
 
+
+   
 	return seq;
 	
 end;

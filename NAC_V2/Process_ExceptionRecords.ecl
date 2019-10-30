@@ -7,19 +7,19 @@ Because of the match criteria for twins in different cases would treat them as p
 
 */
 import STD;
-EXPORT Process_ExceptionRecords(DATASET(Layouts2.rExceptionEx) inrec) := FUNCTION
+EXPORT Process_ExceptionRecords(DATASET(Layouts2.rExceptionRecord) inrec) := FUNCTION
 
   deletes := inrec(updateType='D');
 	updates := inrec(updateType='U');
 
-	exceptions := Files('').dsExceptionRecords; 
+	exceptions := $.Files2.dsExceptionRecords; 
 	j1 := IF(EXISTS(deletes),
 				JOIN(exceptions, deletes,
 						left.SourceProgramState=right.SourceProgramState and left.SourceProgramCode=right.SourceProgramCode 
 						and left.SourceClientId=right.SourceClientid
 						and left.MatchedState=right.MatchedState and left.MatchedProgramCode=right.MatchedProgramCode
 						and left.MatchedClientID=right.MatchedClientId,
-						TRANSFORM(Layouts2.rExceptionEx,
+						TRANSFORM(Layouts2.rExceptionRecord,
 							self.UpdateType := IF(right.UpdateType='D', 'D', left.UpdateType);		// mark as deleted
 							self.replaced := IF(right.UpdateType='D',Std.Date.Today(), 0);
 							self := LEFT;),
@@ -35,13 +35,15 @@ EXPORT Process_ExceptionRecords(DATASET(Layouts2.rExceptionEx) inrec) := FUNCTIO
 						and left.SourceClientId=right.SourceClientid
 						and left.MatchedState=right.MatchedState and left.MatchedProgramCode=right.MatchedProgramCode
 						and left.MatchedClientID=right.MatchedClientId,
-						TRANSFORM(Layouts2.rExceptionEx,
+						TRANSFORM(Layouts2.rExceptionRecord,
 								self.SourceProgramState := IF(RIGHT.SourceProgramState='',LEFT.SourceProgramState,RIGHT.SourceProgramState);
 								self.SourceProgramCode := IF(RIGHT.SourceProgramState='',LEFT.SourceProgramCode,RIGHT.SourceProgramCode);
 								self.SourceClientId := IF(RIGHT.SourceProgramState='',LEFT.SourceClientId,RIGHT.SourceClientId);
+								self.SourceGroupId := IF(RIGHT.SourceGroupId='',LEFT.SourceGroupId,RIGHT.SourceGroupId);
 								self.MatchedState := IF(RIGHT.SourceProgramState='',LEFT.MatchedState,RIGHT.MatchedState);
 								self.MatchedProgramCode := IF(RIGHT.SourceProgramState='',LEFT.MatchedProgramCode,RIGHT.MatchedProgramCode);
 								self.MatchedClientID := IF(RIGHT.SourceProgramState='',LEFT.MatchedClientID,RIGHT.MatchedClientID);
+								self.MatchedGroupId := IF(RIGHT.SourceProgramState='',LEFT.MatchedGroupId,RIGHT.MatchedGroupId);
 												
 								self.ReasonCode := IF(RIGHT.SourceProgramState='',LEFT.ReasonCode,RIGHT.ReasonCode);
 								self.Comments := IF(RIGHT.SourceProgramState='',LEFT.Comments,RIGHT.Comments);
@@ -51,9 +53,10 @@ EXPORT Process_ExceptionRecords(DATASET(Layouts2.rExceptionEx) inrec) := FUNCTIO
 								self.Created := IF(RIGHT.SourceProgramState='',LEFT.Created,
 																	IF(LEFT.SourceProgramState='',Std.Date.Today(), left.Created));
 								self.Updated := IF(RIGHT.SourceProgramState='',LEFT.Updated,Std.Date.Today());
+								self.Replaced := 0;
 								
-								self.Errors := IF(RIGHT.SourceProgramState='',LEFT.Errors,RIGHT.Errors);
-								self.Warnings := IF(RIGHT.SourceProgramState='',LEFT.Warnings,RIGHT.Warnings);
+								//self.Errors := IF(RIGHT.SourceProgramState='',LEFT.Errors,RIGHT.Errors);
+								//self.Warnings := IF(RIGHT.SourceProgramState='',LEFT.Warnings,RIGHT.Warnings);
 									
 							),
 							LEFT OUTER, KEEP(1), MANY LOOKUP),
@@ -66,7 +69,7 @@ EXPORT Process_ExceptionRecords(DATASET(Layouts2.rExceptionEx) inrec) := FUNCTIO
 						and left.SourceClientId=right.SourceClientid
 						and left.MatchedState=right.MatchedState and left.MatchedProgramCode=right.MatchedProgramCode
 						and left.MatchedClientID=right.MatchedClientId,
-						TRANSFORM(Layouts2.rExceptionEx,								
+						TRANSFORM(Layouts2.rExceptionRecord,								
 								self := RIGHT;
 						),
 						RIGHT ONLY),

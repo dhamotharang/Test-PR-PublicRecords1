@@ -1,4 +1,4 @@
-IMPORT Domains;
+﻿IMPORT Domains;
 
 EXPORT Layouts := MODULE
 
@@ -39,19 +39,21 @@ EXPORT Layouts := MODULE
   END;
   
   EXPORT layout_in := RECORD
-    layout_key_id;
+    layout_key_id - [global_sid, record_sid];
     layout_prte_extra;
   END;
 
   EXPORT layout_base := RECORD
-    layout_in;
-    UNSIGNED6 powid;
+    // layout_in;
+		layout_key_id;
+	  UNSIGNED6 powid;
     UNSIGNED6 proxid;
     UNSIGNED6 seleid;
     UNSIGNED6 orgid;
     UNSIGNED6 ultid;
     UNSIGNED8 source_rec_id :=  0;
-  END;
+		layout_prte_extra;		
+	END;
 
   EXPORT layout_key_bdid := RECORD
     UNSIGNED6 bdid; 
@@ -111,6 +113,33 @@ EXPORT Layouts := MODULE
     STRING1   blank:= '';
     STRING46  compname := '';  
   END;
-  
+ 
+ Export Layout_Searchfile := RECORD (domains.layout_whois_base_bip)
+	  unsigned6 internetservices_id;
+		string30 admin_fname;
+		string30 admin_mname;
+		string50 admin_lname;
+		string30 tech_fname;
+		string30 tech_mname;
+		string50 tech_lname;
+		string30 registrant_fname;
+		string30 registrant_mname;
+		string50 registrant_lname;
+		STRING10 registrant_prim_range;
+		STRING2  registrant_predir;
+		STRING28 registrant_prim_name;
+		STRING4  registrant_suffix;
+		STRING2  registrant_postdir;
+		STRING10 registrant_unit_desig;
+		STRING8  registrant_sec_range;
+		STRING25 registrant_p_city_name;
+		STRING25 registrant_v_city_name;
+		STRING2  registrant_state;
+		STRING5  registrant_zip;
+	END;
+	
+	Export Layout_Whois_Base_BIP:=Record
+	Domains.Layout_Whois_Base_BIP;
+	End;
   
 END;

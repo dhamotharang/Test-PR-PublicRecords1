@@ -1,4 +1,4 @@
-import bipv2_strata;
+﻿import bipv2_strata;
 
 EXPORT layouts := module
 	
@@ -51,5 +51,11 @@ EXPORT layouts := module
   export layout_demographics := BIPV2_Strata.layouts.layout_Demographics_Strata;
   
 //  export fieldstats := recordof(fieldstats_org.active_fieldStats);  //should be same for each id here
+
+  export Data_Fill_Rates :={
+     string100 t1   ,string40 t2  ,string40 t3  ,string40 t4  ,string40 t5  ,string40 t6  ,string40 t7 
+    ,string40  t8   ,string40 t9  ,string40 t10 ,string40 t11 ,string40 t12 ,string40 t13 ,string40 t14 
+    ,string40  t15  ,string40 t16 ,string40 t17 ,string40 t18 ,string40 t19 ,string40 t20 ,string40 t21
+  };
 
 end;

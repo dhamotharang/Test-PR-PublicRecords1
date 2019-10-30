@@ -1,4 +1,4 @@
-import address,ut,Prte2;
+﻿import address,ut,Prte2;
 
 EXPORT Files := module
 
@@ -12,17 +12,19 @@ EXPORT Files := module
 
   EXPORT file_key_domain  :=  PROJECT(file_base(domain_name!=''), TRANSFORM(Layouts.layout_key_domain, SELF:=LEFT; SELF:=[]));
   
-  EXPORT file_key_linkids  :=  PROJECT(file_base, TRANSFORM(Layouts.layout_key_linkids, SELF:=LEFT; SELF:=[]));
+  EXPORT file_key_linkids  :=  PROJECT(file_base, TRANSFORM(Layouts.Layout_Searchfile, SELF:=LEFT; SELF:=[]));
   
   EXPORT file_key_id  := PROJECT(file_base, TRANSFORM(Layouts.layout_key_id, SELF:=LEFT; SELF:=[]));
   
-  EXPORT file_whois_base := PROJECT(file_base, TRANSFORM(Layouts.layout_domains_base, SELF:=LEFT));
+  EXPORT file_whois_base := PROJECT(file_base, TRANSFORM(Layouts.layout_domains_base, SELF:=LEFT, self := []));
   
-  EXPORT file_key_whois_domain := PROJECT(file_base, TRANSFORM(Layouts.layout_key_whois_domain, SELF.dn:=LEFT.domain_name; SELF:=LEFT));
+  EXPORT file_key_whois_domain := PROJECT(file_base, TRANSFORM(Layouts.layout_key_whois_domain, SELF.dn:=LEFT.domain_name; SELF:=LEFT, self := []));
 
-  EXPORT file_key_whois_bdid  := PROJECT(file_base(bdid!=0), TRANSFORM(Layouts.layout_domains_base, SELF:=LEFT)); 
+  EXPORT file_key_whois_bdid  := PROJECT(file_base(bdid!=0), TRANSFORM(Layouts.layout_domains_base, SELF:=LEFT, self := [])); 
   
-  EXPORT file_key_whois_did   := PROJECT(file_base(did!=0), TRANSFORM(Layouts.layout_key_whois_did,  SELF.d := LEFT.did; SELF:=LEFT));
+  EXPORT file_key_whois_did   := PROJECT(file_base(did!=0), TRANSFORM(Layouts.layout_key_whois_did,  SELF.d := LEFT.did; SELF:=LEFT, self := []));
+	
+	EXPORT file_key_linkids_whois  :=  PROJECT(file_base, TRANSFORM(Layouts.Layout_Whois_Base_BIP, SELF:=LEFT; SELF:=[], self := []));
   
   Layouts.layout_key_autokey xform(file_base L, UNSIGNED1 C) := TRANSFORM
     SELF.fname        := CHOOSE(C, L.admin_fname, L.tech_fname, L.registrant_fname), 
@@ -43,6 +45,7 @@ EXPORT Files := module
     SELF.internetservices_id  := L.internetservices_id;
 
     SELF := L;
+		self := [];
    END;
 
   EXPORT file_whois_autokey  := NORMALIZE(file_base, 3, xform(LEFT, COUNTER));

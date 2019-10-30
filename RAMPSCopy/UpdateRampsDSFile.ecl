@@ -99,6 +99,7 @@
 ,{'thor::key::healthcarefacility::qa::header','','',''}
 ,{'thor::key::healthcarefacility::qa::header::refs','','',''}
 ,{'thor::key::healthcarefacility::qa::specificities::debug','','',''}
+,{'thor_data400::key::bizlinkfull::qa::proxid::refs::l_address1','','',''}
 
 																	]
 															,rampscopy.layouts.filestocopy),,'~'+rampscopy.constants(destenv).dslistfile,overwrite);

@@ -1,4 +1,4 @@
-import	AID,codes,header,ut,vehicleV2,VehicleCodes,vehlic,STD;
+﻿import	AID,codes,header,ut,vehicleV2,VehicleCodes,vehlic,STD;
 
 dExpPartyTmp	:=	vehicleV2.Map_Experian_Party_Temp;
 
@@ -203,7 +203,7 @@ dExpPartyDenorm	:=	denormalize(	dExpPartyAppendSeqNumDist,
 																);
 
 // Bring back to the temp base layout
-VehicleV2.Layout_Base.Party_BIP	tReformat2V2(dExpPartyDenorm	pInput)	:=
+VehicleV2.Layout_Base.Party_CCPA	tReformat2V2(dExpPartyDenorm	pInput)	:=
 transform
 	boolean	isMailCityNotBlank	:=	pInput.Ace1_v_city_name	!=	'';
 	
@@ -228,6 +228,11 @@ transform
 	self.ace_geo_blk				:=	if(isMailCityNotBlank,pInput.Ace1_geo_blk,pInput.Ace2_geo_blk);
 	self.ace_geo_match			:=	if(isMailCityNotBlank,pInput.Ace1_geo_match,pInput.Ace2_geo_match);
 	self.ace_err_stat				:=	if(isMailCityNotBlank,pInput.Ace1_err_stat,pInput.Ace2_err_stat);
+	//Added for CCPA-103
+	// self.global_sid         := 0;
+	// self.record_sid         := 0;
+	//Added for DF-25578
+	self.raw_name           := pInput.raw_name;
 	
 	self										:=	pInput;
 end;
@@ -266,7 +271,7 @@ dExperianOwnerSort :=	sort(	dExperianOwnerDist,
 														local
 													);
 
-VehicleV2.Layout_Base.Party_BIP tOwnerRollup(dExperianOwnerSort	le,dExperianOwnerSort	ri) :=
+VehicleV2.Layout_Base.Party_CCPA tOwnerRollup(dExperianOwnerSort	le,dExperianOwnerSort	ri) :=
 transform
 	self.ttl_earliest_issue_date		:=	vehiclev2.validate_date.fEarliestNonZeroDate(	le.title_issue_date,
 																																										ri.title_issue_date
@@ -316,7 +321,7 @@ dOwnersRollup :=	rollup(	dExperianOwnerSort,
 												);
 
 // Assign sequence key for owners
-VehicleV2.Layout_Base.Party_BIP	tOwnerSequenceKey(dOwnersRollup	pInput)	:=
+VehicleV2.Layout_Base.Party_CCPA	tOwnerSequenceKey(dOwnersRollup	pInput)	:=
 transform
 	self.ttl_earliest_issue_date	:=	if(pInput.ttl_rollup_count	=	1,pInput.title_issue_date,pInput.ttl_earliest_issue_date);
 	self.ttl_latest_issue_date		:=	if(pInput.ttl_rollup_count	=	1,pInput.title_issue_date,pInput.ttl_latest_issue_date);
@@ -363,7 +368,7 @@ dExperianRegSort :=	sort(	dExperianRegDist,
 													local
 												);
 
-VehicleV2.Layout_Base.Party_BIP	tRegRollup(dExperianRegSort	le,dExperianRegSort	ri)	:=
+VehicleV2.Layout_Base.Party_CCPA	tRegRollup(dExperianRegSort	le,dExperianRegSort	ri)	:=
 transform
 	self.reg_earliest_effective_date	:=	vehiclev2.validate_date.fEarliestNonZeroDate(le.registration_effective_date,ri.registration_effective_date);
 	self.reg_latest_effective_date		:=	vehiclev2.validate_date.fLatestNonZeroDate(le.registration_effective_date,ri.registration_effective_date);
@@ -414,7 +419,7 @@ dExperianRegRollup	:=	rollup(	dExperianRegSort,
 //DF-16772. Modified to remove warning messae substring applied to value of type integer.
 ConvertYYYYMMToNumberOfMonths(string	pInput)	:=	(integer) pInput[1..4]*12 + (integer) pInput[5..6];
 
-VehicleV2.Layout_Base.Party_BIP	tRegSequnceKey(dExperianRegRollup	pInput)	:=
+VehicleV2.Layout_Base.Party_CCPA	tRegSequnceKey(dExperianRegRollup	pInput)	:=
 transform
   // set-up to handle cases where the latest expiration date is way in the future
   // if the latest expiration date is 10 years in the future,don't use it (unless it's the only one)

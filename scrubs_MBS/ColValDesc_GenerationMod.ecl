@@ -1,10 +1,10 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-IMPORT SALT39;
-EXPORT ColValDesc_GenerationMod := MODULE(SALT39.iGenerationMod)
+IMPORT SALT311;
+EXPORT ColValDesc_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.9.0';
-  EXPORT salt_MODULE := 'SALT39'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.11.8';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
@@ -53,19 +53,31 @@ EXPORT ColValDesc_GenerationMod := MODULE(SALT39.iGenerationMod)
     + '// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields\n'
     + '// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking\n'
     + '// FUZZY can be used to create new types of FUZZY linking\n'
-    + 'FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LENGTHS(0,4..):ONFAIL(BLANK)\n'
-    + 'FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( <>{}[]-^=!+&,./#()_)\n'
-    + 'FIELDTYPE:invalid_date:ALLOW(0123456789):SPACES( -:) \n'
-    + 'FIELDTYPE:invalid_numeric:ALLOW(0123456789)\n'
+    + 'FIELDTYPE:invalid_text:ALLOW(\\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( <>{}[]-^=\'`!+&,./#()_:%,):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_alpha:ALLOW(\\NABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_alphanumeric:ALLOW(\\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( <>{}[]-^=\'`!+&,./#()_):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_email:ALLOW(\\-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_date:ALLOW(\\N0123456789):SPACES( ./:-):LEFTTRIM:ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_numeric:ALLOW(0123456789):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_numeric_string:ALLOW(\\N-0123456789):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_real:ALLOW(-.,0123456789):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_real_string:ALLOW(\\N-.,0123456789):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_zip:ALLOW(\\N-0123456789):SPACES( -):LEFTTRIM:LENGTHS(2,5,9,10):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_state:ALLOW(\\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:LENGTHS(2):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_ssn:ALLOW(\\N0123456789):SPACES( -):LEFTTRIM:LENGTHS(2,9..):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_phone:ALLOW(\\N0123456789):SPACES( +#()-):LEFTTRIM:LENGTHS(2,10..):ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_ip:ALLOW(\\N.x0123456789):SPACES( .):LEFTTRIM:ONFAIL(BLANK)\n'
+    + 'FIELDTYPE:invalid_name:ALLOW(\\NABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:SPACES( \'):ONFAIL(BLANK)\n'
+    + '\n'
     + '// Remember to generate specificities and upda\n'
     + '// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.\n'
     + '// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running\n'
     + '// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.\n'
     + 'FIELD:column_value_desc_id:TYPE(UNSIGNED3):LIKE(invalid_numeric):0,0\n'
     + 'FIELD:table_column_id:TYPE(UNSIGNED3):LIKE(invalid_numeric):0,0\n'
-    + 'FIELD:desc_value:TYPE(QSTRING192):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:desc_value:TYPE(QSTRING192):LIKE(invalid_text):0,0\n'
     + 'FIELD:status:TYPE(UNSIGNED2):LIKE(invalid_numeric):0,0\n'
-    + 'FIELD:description:TYPE(QSTRING225):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:description:TYPE(QSTRING225):LIKE(invalid_text):0,0\n'
     + '// CONCEPT statements should be used to group together interellated fields; such as address\n'
     + '// RELATIONSHIP is used to find non-obvious relationships between the clusters\n'
     + '// SOURCEFIELD is used if a field of the file denotes a source of the records in that file\n'

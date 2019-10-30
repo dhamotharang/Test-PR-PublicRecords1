@@ -1,7 +1,4 @@
-﻿/*2018-11-26T20:15:42Z (xsheng_prod)
-C:\Users\shenxi01\AppData\Roaming\HPCC Systems\eclide\xsheng_prod\New_Dataland\Prof_License_Mari\map_NVS0857_conversion\2018-11-26T20_15_42Z.ecl
-*/
-/* Converting Nevada Real Estate Division / Real Estate Appraisers Licenses File to MARI common layout
+﻿/* Converting Nevada Real Estate Division / Real Estate Appraisers Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 #workunit('name','map_NVS0857_conversion');
@@ -107,6 +104,8 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 		                    =>REGEXFIND('(^[A-z]+)[\\.]([0-9]+)[\\.](.+$)',ut.CleanSpacesAndUpper(pInput.SLNUM),1),
 											 REGEXFIND('(^[A-z]+)[\\.]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM)) //BS.0032399.PC MGR, BUSB.0000114.-BKR
 		                    =>REGEXFIND('(^[A-z]+)[\\.]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM),1),
+											 REGEXFIND('A[\\.]([0-9]+)[\\-][ ]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM)) //A.0206899-INTR
+		                    =>REGEXFIND('A[\\.]([0-9]+)[\\-][ ]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM),2),
 											 ut.CleanSpacesAndUpper(pInput.SLNUM)
 		                  );
 		SELF.RAW_LICENSE_TYPE	:= tmpLIC_TYPE;

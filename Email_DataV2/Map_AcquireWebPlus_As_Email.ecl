@@ -93,6 +93,7 @@ Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 	SELF.cln_CompanyName						:= input.clean_cname;
 	SELF.CompanyTitle								:= input.Title;
 	SELF.rules											:= 0;
+	SELF.global_sid                 := 24961;
 	SELF := input;
 	SELF := [];
 END;

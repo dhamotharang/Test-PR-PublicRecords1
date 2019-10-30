@@ -1,4 +1,4 @@
-import	Std,Address;
+﻿import	Std,Address;
 
 EXPORT Layout_Base2 := RECORD
 
@@ -47,6 +47,7 @@ EXPORT Layout_Base2 := RECORD
 	string10		case_Phone2;
 	string256		case_Email;
 	string10		case_Monthly_Allotment := '0';	// whole dollar
+	string4			OrigGroupId;
 	// address data
 	string1			Physical_AddressCategory;	
 	string65		Physical_Street1;
@@ -85,6 +86,8 @@ EXPORT Layout_Base2 := RECORD
 		,address.Layout_Clean_Name.mname
 		,address.Layout_Clean_Name.lname
 		,address.Layout_Clean_Name.name_suffix
+		
+		,string1	addressType := ''
 
 		,address.Layout_Clean182.prim_range
 		,address.Layout_Clean182.predir
@@ -112,8 +115,10 @@ EXPORT Layout_Base2 := RECORD
 		,address.Layout_Clean182.msa
 		,address.Layout_Clean182.geo_blk
 		,address.Layout_Clean182.geo_match
-		,address.Layout_Clean182.err_stat
-;
-
+		,address.Layout_Clean182.err_stat,
+		STD.Date.Date_t		created := 0;
+		STD.Date.Date_t		updated := 0;
+		STD.Date.Date_t		replaced := 0;
+		string32 					FileName := '';
 
 END;

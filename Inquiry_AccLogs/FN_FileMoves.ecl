@@ -278,17 +278,17 @@ EXPORT FN_FileMoves := MODULE
 						datetime 	:= stringlib.stringfilter(pDateTime, '0123456789');
 						prefix := if(isFCRA, '~thor10_231', '~thor100_21');
 						
-						baseR3_SF := data_services.foreign_R3 + 'thor_10_219::base::account_monitoring::prod::' + if(isFCRA, 'fcra', 'nonfcra') + '::inquirytracking';
+						baseR3_SF := data_services.foreign_prod + 'batchr3::base::account_monitoring::prod::' + if(isFCRA, 'fcra', 'nonfcra') + '::inquirytracking';
 						baseR3_SF_Content := nothor(FS.superfilecontents(baseR3_SF));
-
-						dsNonFcraR3 	:= dataset(baseR3_SF, inquiry_acclogs.LAYOUT_ProdR3, thor);
-						dsFcraR3 				:= inquiry_acclogs.Proc_Prod_R3Monitoring.File_Monitoring_FCRA;
+            
+						// dsNonFcraR3 	:= dataset(baseR3_SF, inquiry_acclogs.LAYOUT_ProdR3, thor);
+						// dsFcraR3 				:= inquiry_acclogs.Proc_Prod_R3Monitoring.File_Monitoring_FCRA;
 						
-						dsR3 := if(isFCRA
-																	,project(dsFcraR3, transform({inquiry_acclogs.LAYOUT_ProdR3, string source}, self.source := 'PROD', self := left;))
-																	,project(dsNonFcraR3, transform({inquiry_acclogs.LAYOUT_ProdR3, string source}, self.source := 'PROD', self := left;))
-																);
-
+						// dsR3 := if(isFCRA
+																	// ,project(dsFcraR3, transform({inquiry_acclogs.LAYOUT_ProdR3, string source}, self.source := 'PROD', self := left;))
+																	// ,project(dsNonFcraR3, transform({inquiry_acclogs.LAYOUT_ProdR3, string source}, self.source := 'PROD', self := left;))
+																// );
+						dsR3 := project(dataset(baseR3_SF, inquiry_acclogs.LAYOUT_ProdR3, thor), transform({inquiry_acclogs.LAYOUT_ProdR3, string source}, self.source := 'PROD', self := left;));
 						emailcontents := workunit + ' - ' + if(count(baseR3_SF_Content) > 0, 'PROD', '');
 						emailsubject  := if(isFCRA, 'FCRA ', 'NonFCRA ') + 'BatchR3 Logs Output (ProdR3 Monitoring) - ' + datetime;
 						

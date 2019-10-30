@@ -1,9 +1,9 @@
-import header,business_header,mdr,_Validate,ut;
+﻿import header,business_header,mdr,_Validate,ut;
 
 EXPORT as_headers := module
 IMPORT DEA;
 
-	EXPORT DEA_as_Header(dataset(Layouts.layout_DEA_Out_baseV2) pDEA = Files.File_DEAv2((unsigned6)DID!=0)) := FUNCTION
+	EXPORT DEA_as_Header(dataset(dea.Layout_DEA_OUT_baseV2) pDEA = Files.File_DEAv2((unsigned6)DID!=0)) := FUNCTION
 	  Header.Layout_New_Records map_to_person_header(files.File_DEAv2 le) := transform
 		self.src                      	:= MDR.sourceTools.src_DEA;
 		self.dt_first_seen 				:= if((integer)le.date_first_reported=0,0,(unsigned3)(le.date_first_reported[1..6]));

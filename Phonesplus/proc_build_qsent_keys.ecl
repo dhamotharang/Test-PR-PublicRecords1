@@ -9,8 +9,8 @@ sfShuffle := sequential(
 	//fileservices.addsuperfile('~thor_data400::base::qsent_grandfather','~thor_data400::base::qsent_father',0,true),
 	//fileservices.clearsuperfile('~thor_data400::base::qsent_father'),
 	//fileservices.addsuperfile('~thor_data400::base::qsent_father','~thor_data400::base::qsent',0,true),
-	fileservices.clearsuperfile('~thor_data400::base::qsent', true),
-	fileservices.addsuperfile('~thor_data400::base::qsent','~thor_data400::out::qsent_did_' + filedate),
+	// fileservices.clearsuperfile('~thor_data400::base::qsent', true),
+	// fileservices.addsuperfile('~thor_data400::base::qsent','~thor_data400::out::qsent_did_' + filedate),
 	fileservices.finishsuperfiletransaction()
 	);
 	
@@ -48,7 +48,7 @@ Phonesplus.MAC_Build_qsent(dist_DSqsent, filedate, fname,mname,lname,
 DS_qsent_rec := record
 	unsigned6 fdid;
 	// CCPA-5 Add CCPA fields
-	Phonesplus.layoutCommonKeys_CCPA;
+	Phonesplus.layoutCommonKeys;
 end;
 
 DS_qsent_rec slim_it(dist_DSqsent  l) := transform

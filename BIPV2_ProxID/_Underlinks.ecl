@@ -27,7 +27,7 @@ functionmacro
   // -- get MC key and input file ready
   ih        := pih;
   lay_cand  := BIPV2_ProxID.match_candidates(ih).layout_candidates;
-  ds_mc     := project(pKeyCandidates ,lay_cand);
+  ds_mc     := project(pKeyCandidates ,transform(lay_cand,self := left,self := []));
 
   // -- find rejected records
   ds_rejected_records   := BIPV2_ProxID.Specificities(ih).Rejected_file;
@@ -128,7 +128,7 @@ functionmacro
   ds_concat := distribute(/*ds_over1000_join + */ds_under1000_join)  : persist('~persist::BIPV2_ProxID::_Underlinks::ds_concat');
 
   key_spec        := pKeySpecs;
-  s               := project(key_spec ,BIPV2_ProxID.Layout_Specificities.R)[1];
+  s               := project(key_spec ,transform(BIPV2_ProxID.Layout_Specificities.R,self := left,self := []))[1];
 
   key_att         := pKeyAttMatches;
   ds_att          := project(key_att ,BIPV2_ProxID.Match_Candidates(ih).layout_attribute_matches);

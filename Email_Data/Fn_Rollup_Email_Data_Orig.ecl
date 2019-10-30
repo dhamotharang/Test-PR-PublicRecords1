@@ -1,4 +1,4 @@
-import ut, STD;
+﻿import ut, STD;
 export Fn_Rollup_Email_Data_Orig(dataset(recordof(Layout_Email.Base)) email_in) := function
 
 
@@ -26,6 +26,8 @@ email_rec_and_fix_dates := project(email_in, transform(Layout_Email.Base,
 															 self.date_vendor_last_reported := if(left.date_vendor_last_reported[..8] not between '197001' and (string8)STD.Date.Today(), '', left.date_vendor_last_reported),
 															 //DF-16472
 															 self.orig_email := REGEXREPLACE('[\n|\r]',left.orig_email,'');
+															 //EMAIL-152 - remove special characters
+															 SELF.orig_site := ut.fn_RemoveSpecialChars(left.orig_site);
 															 self := left));
 															 
 															 

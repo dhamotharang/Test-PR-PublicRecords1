@@ -1,4 +1,4 @@
-IMPORT HEADER,standard;
+﻿IMPORT HEADER,standard;
 EXPORT layouts := MODULE
 
 	EXPORT Layout_Did_Death_MasterV2 := HEADER.Layout_Did_Death_MasterV2;
@@ -132,6 +132,9 @@ EXPORT layouts := MODULE
 		STRING76	orig_address2	:=	'';
 		STRING16	statefn				:=	'';	// State File Number used to associate this record with a state
 		STRING1		lf;
+		//HERE
+		//UNSIGNED4			global_sid := 0;
+	  //UNSIGNED8			record_sid := 0;    
 		UNSIGNED8	ScrubsBits1		:=	0;
 		UNSIGNED8	ScrubsBits2		:=	0;
 		UNSIGNED8	ScrubsBits3		:=	0;
@@ -148,7 +151,10 @@ EXPORT layouts := MODULE
 			ScrubsBits2, 
 			ScrubsBits3
 		];
+   UNSIGNED4			global_sid := 0;
+	 UNSIGNED8			record_sid := 0;  	
 	END;
+	
 	EXPORT	layout_death_master_base := record
 		STRING12 did;
 		UNSIGNED1 did_score;
@@ -318,5 +324,9 @@ EXPORT layouts := MODULE
 		STRING1  blank:='';
 		STRING2 src := '';
 		STRING1 glb_flag := '';
+		UNSIGNED4			global_sid := 0;
+	  UNSIGNED8			record_sid := 0;    
 	end;
+	
+	
 END;

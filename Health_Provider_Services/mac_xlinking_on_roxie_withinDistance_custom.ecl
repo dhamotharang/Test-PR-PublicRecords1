@@ -1,4 +1,4 @@
-export mac_xlinking_on_roxie_withinDistance_custom (infile,Input_UniqueID,Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_SNAME = '',Input_GENDER = '',
+﻿export mac_xlinking_on_roxie_withinDistance_custom (infile,Input_UniqueID,Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_SNAME = '',Input_GENDER = '',
 																							Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_V_CITY_Name = '',
 																							Input_ST = '',Input_ZIP = '',Input_SSN = '',Input_DOB = '',Input_PHONE = '',Input_LIC_STATE = '',Input_C_LIC_NBR = '',
 																							Input_TAX_ID = '',Input_DEA_NUMBER = '',Input_VENDOR_ID = '',Input_NPI_NUMBER = '',
@@ -212,12 +212,15 @@ END;
 	boolean is_oig_sanction;
 	boolean is_opm_sanction;
 	unsigned4 KeysFailed;
+	unsigned4 global_sid;
 end;
 
 #uniquename(pr)
 %pr% := project(infile,%into%(left)); // Into roxie input format
 #uniquename(res_out)
-%res_out% := project(Health_Provider_Services.MEOW_xLNPID(%pr%,true).Data_,%c0%);
+// output (%pr%);
+%res_out% := project(Health_Provider_Services.MEOW_xLNPID(%pr%,true).Data_,transform(%c0%, self.global_sid := left.cnp_classid; self := left;));
+// output (%res_out%);
 #uniquename(res_out_trim)
 %res_out_trim% := sort(dedup(%res_out%, uniqueId, lnpid, weight), uniqueId, -weight);
 
@@ -263,9 +266,11 @@ end;
 %res1% := sort(normalize(%res%, count(left.dids), %xform1%(left, counter)), -weight);
 #uniquename(res2)
 %res2% := dedup(sort(join(%res_out%, %res1%, left.uniqueid = right.uniqueid and left.lnpid = right.lnpid and left.weight = right.weight),uniqueid,lnpid,src,vendor_id,-weight),uniqueid,lnpid,src,vendor_id);
+#uniquename(res4)
+%res4% := join(%res2%, AppendProviderAttributes.Key_Provider_Attributes_V3, KEYED(left.lnpid = right.lnpid),transform(recordof(%res2%), self.did := right.lexid; self := left;),left outer);
 // output (%res2%);
 #uniquename(res3)
 %res3% := %res_out% (lnpid = 0);
 // output (%res3%);
-outfile := if (exists(%res3%),sort(%res2% + %res3%,uniqueid,lnpid,src,vendor_id),%res2%);
+outfile := if (exists(%res3%),sort(%res4% + %res3%,uniqueid,lnpid,src,vendor_id),%res4%);
 endmacro;

@@ -1,4 +1,4 @@
-﻿IMPORT Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck;
+﻿IMPORT Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck,dx_header;
 
 EXPORT proc_build_quick_hdr(
 	STRING filedate, 
@@ -177,7 +177,7 @@ EXPORT proc_build_quick_hdr(
 	OnlyQuickHeader:=GetDops(datasetname='FCRA_QuickHeaderKeys ');
 	father_filedate := OnlyQuickHeader[1].buildversion;
 	SET OF STRING Key_QuickHeader_InputSet:=['fname','lname','name_suffix','prim_range','prim_name','sec_range','city_name','st','zip','dob','ssn','mname','phone','src'];
-	header_quick_index := header_quick.FN_key_DID(DATASET([],header.Layout_Header), '~thor_data400::key::headerquick::fcra::'+filedate+'::did');
+	header_quick_index := header_quick.FN_key_DID(DATASET([],dx_header.Layout_Header), '~thor_data400::key::headerquick::fcra::'+filedate+'::did');
 	DeltaCommands:= SEQUENTIAL(
 		DOPSGrowthCheck.CalculateStats(
 			'FCRA_QuickHeaderKeys ',
@@ -231,12 +231,12 @@ EXPORT proc_build_quick_hdr(
 	);
 
 	RETURN SEQUENTIAL(
-		weekly_handling,
-		roxie_keys,
-		Proc_Accept_SRC_toQA(filedate),
-		proc_build_ssn_suppression(filedate),
-		proc_build_current_wa_residents_file,
-		SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, weekly_handling, 610),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, roxie_keys, 620),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.Proc_Accept_SRC_toQA(filedate), 630),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.proc_build_ssn_suppression(filedate), 640),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.proc_build_current_wa_residents_file, 650),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs), 660),
 		//,SEQUENTIAL(/*dops_FCRA_QH,dops_QH,*/dops_SS)
 		DeltaCommands
 	);

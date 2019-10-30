@@ -1,8 +1,8 @@
-import std, prte2_ecrash;
+﻿import std, prte2_ecrash;
 
 layouts.search 	convert_file2(files.base_ecrash2v l) 
 	:= transform
-  self.accident_date 	:= '';
+  // self.accident_date 	:= L.accident_date;
 	self.name_suffix 		:= l.suffix;
 	self.record_type 		:= 'VEHICLE OWNER';
 	self.vin 						:= STD.Str.CleanSpaces(l.vehicle_id_nbr);
@@ -16,7 +16,7 @@ end;
 search_file2 := project(files.base_ecrash2v, convert_file2(left));
 
 layouts.search 	convert_file4(files.base_ecrash4 l) := transform
-  self.accident_date 			:= '';
+  // self.accident_date 			:= '';
 	self.name_suffix 				:= l.suffix;
 	self.record_type 				:= 'VEHICLE DRIVER';
 	self.vin 								:= '';

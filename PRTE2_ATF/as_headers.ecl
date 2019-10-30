@@ -1,20 +1,20 @@
-IMPORT header,business_header,mdr,_Validate,Address,PRTE2_ATF, ATF;
+﻿IMPORT header,business_header,mdr,_Validate,Address,PRTE2_ATF, ATF;
 
 EXPORT as_headers := MODULE
 
 	//For Person Records
 	EXPORT person_header_ATF := FUNCTION
-		RETURN ATF.ATF_as_header(PRTE2_ATF.files.Base_out,,true);
+		RETURN ATF.ATF_as_header(PRTE2_ATF.files.ATF_Header,,true);
 	END;
 																		
 	//For Business Records
 	EXPORT business_header_ATF := FUNCTION
-		RETURN ATF.fATF_as_Business_Header(PRTE2_ATF.files.Base_out, true);
+		RETURN ATF.fATF_as_Business_Header(PRTE2_ATF.files.ATF_Header, true);
 	END;
 	
 	//For Business records with contacts
 	EXPORT business_contacts_atf := FUNCTION
-		RETURN ATF.fATF_as_Business_Contact(PRTE2_ATF.files.Base_out, true);
+		RETURN ATF.fATF_as_Business_Contact(PRTE2_ATF.files.ATF_Header, true);
 	END;
 	
 	//New Business Header with Contacts
@@ -102,7 +102,7 @@ EXPORT as_headers := MODULE
 		SELF 																:= [];
 	END;
 
-  atf_for_new_bh        := normalize(files.Base_out,8,Translate_atf_to_BCF_new(left,counter));
+  atf_for_new_bh        := normalize(PRTE2_ATF.files.ATF_Header,8,Translate_atf_to_BCF_new(left,counter));
 	atf_for_new_bh_filter := atf_for_new_bh(company_address.prim_range<>'' and company_address.prim_name<>'' and company_address.zip<>'');
 
 export new_business_header_atf := atf_for_new_bh_filter(company_name != '' and company_bdid>0); 

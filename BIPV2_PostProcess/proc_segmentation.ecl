@@ -1,16 +1,15 @@
 ﻿import BIPv2_Files, ut, BIPv2_PostProcess, BIPV2_PROX_SALT_int_fullfile,tools,BIPv2_HRCHY,BIPV2,tools,BIPV2_Tools, BIPV2_Segmentation;
 EXPORT proc_segmentation(
    string                            pversion
-  ,dataset(BIPV2.CommonBase.layout ) pInputDirty          = BIPV2.CommonBase.DS_BUILT
+  ,dataset(BIPV2.CommonBase.layout ) pInputDirty          = BIPV2.CommonBase.DS_Clean
   ,boolean                           pPromote2QA          = false
   ,boolean                           pOverwrite           = false
   ,string                            pToday               = bipv2.KeySuffix_mod2.MostRecentWithIngestVersionDate//in case you want to run as of a date in the past.  default to date of newest data.
   ,boolean                           pTurnOffStrata       = false
   ,string                            pGoldOutputModifier  = ''
-  ,boolean                           pPopulateStatus      = false
+  ,boolean                           pPopulateStatus      = false //pass in the clean file if this is false for pInputDirty.  if this is true, then pass in ds_base(the whole file)
   ,boolean                           pUseClean2           = false //for testing so that persists will not have to be rebuilt each time(the regulatory suppression causes that to happen)
-  ,string                            pLgid3KeyVersion     = 'built'
-  
+  ,string                            pLgid3KeyVersion     = 'built'  
 ) := 
 module
     shared ds_Input_clean := if(pUseClean2 = false
@@ -73,7 +72,7 @@ module
       ) 
       ,keep(1),hash,left outer);
     export pInput := if(pPopulateStatus = true  ,ds_set_status_ultid_public
-                                                ,ds_Input_clean            
+                                                ,pInputDirty            
     ) : persist('~persist::BIPV2_PostProcess::proc_segmentation.pInput' + pGoldOutputModifier);
     
 ////// -- patch status fields on full dirty file for output
@@ -219,7 +218,7 @@ module
     export modgoldSELEV2      := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2'          + pGoldOutputModifier,pLgid3KeyVersion);
     export modgoldSELEV2P     := BIPV2_PostProcess.segmentation_gold(SeleProb,  'SELEID',pToday, 'V2Probation' + pGoldOutputModifier,pLgid3KeyVersion);    
 
-    export modgoldSELEV2_all  := BIPV2_PostProcess.segmentation_gold(pInput,  'SELEID',pToday, 'V2_all'          + pGoldOutputModifier,pLgid3KeyVersion);
+    export modgoldSELEV2_all  := BIPV2_PostProcess.segmentation_gold(pInput  ,  'SELEID',pToday, 'V2_all'      + pGoldOutputModifier,pLgid3KeyVersion);
     
     export goldSELEV2         := modgoldSELEV2.out;
     export goldSELEV2P        := modgoldSELEV2P.out;
@@ -591,38 +590,39 @@ module
         ,output(pversion                                    ,named('BuildDate'    ))
         ,output(BIPV2.KeySuffix_mod2.MostRecentSprintNumber ,named('SprintNumber' ))
         ,evaluate(build_seg_file(pversion))
-        , output_segs_fixed_filtered
-        , email_executive_dashboard
-        , goldSELEV2
-        , goldSELEV2P
+        ,output_segs_fixed_filtered
+        ,email_executive_dashboard
+        ,goldSELEV2
+        ,goldSELEV2P
         
-        , outputProxStatsV2 
-        , outputProxStatsV2P
-        , outputPowStatsV2  
-        , outputPowStatsV2P
-        , outputSeleStatsV2 
-        , outputSeleStatsV2P
-        , outputEmpStatsV2 
-        , outputEmpStatsV2P
+        ,outputProxStatsV2 
+        ,outputProxStatsV2P
+        ,outputPowStatsV2  
+        ,outputPowStatsV2P
+        ,outputSeleStatsV2 
+        ,outputSeleStatsV2P
+        ,outputEmpStatsV2 
+        ,outputEmpStatsV2P
         
-        , outputOrgStatsV2 
-        , outputOrgStatsV2P
+        ,outputOrgStatsV2 
+        ,outputOrgStatsV2P
         
-        , bipEntityCnt 
-        , HrchyGT1_IDCounts
-        , TotalRecCount
-        , activeStats_prox          ,inactiveStats_prox
-        , activeStats_pow           ,inactiveStats_pow
-        , activeStats_sele          ,inactiveStats_sele
-        , activeStats_org           ,inactiveStats_org
-        , activeStats_ult           ,inactiveStats_ult
-        , activeStats_sele_Gold     ,inactiveStats_sele_Gold
-        , activeStats_sele_notGold  ,inactiveStats_sele_notGold
-        , sicCount         ,naicsCount
-        , IDChange
-        , IDCountBuckets
-        , TotalProxIDsInLGID3,XTabProxIDsInLGID3
-        , TotalProxIDsInHrchy,XTabProxIDsInHrchy
+        ,bipEntityCnt 
+        ,HrchyGT1_IDCounts
+        ,TotalRecCount
+        ,activeStats_prox          ,inactiveStats_prox
+        ,activeStats_pow           ,inactiveStats_pow
+        ,activeStats_sele          ,inactiveStats_sele
+        ,activeStats_org           ,inactiveStats_org
+        ,activeStats_ult           ,inactiveStats_ult
+        ,activeStats_sele_Gold     ,inactiveStats_sele_Gold
+        ,activeStats_sele_notGold  ,inactiveStats_sele_notGold
+        ,sicCount         ,naicsCount
+        ,IDChange
+        ,IDCountBuckets
+        ,TotalProxIDsInLGID3,XTabProxIDsInLGID3
+        ,TotalProxIDsInHrchy,XTabProxIDsInHrchy
+        ,BIPV2_PostProcess.Build_Marketing_Stats(pversion,pToday)
         ,if(pTurnOffStrata  = false ,do_strata())
         // ,outputPatched
       )
