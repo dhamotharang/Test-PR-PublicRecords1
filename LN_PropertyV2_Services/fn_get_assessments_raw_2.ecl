@@ -19,22 +19,27 @@ export dataset(l_raw) fn_get_assessments_raw_2(
 
 	// join inputs to index to get raw data
 	ds_raw0_roxie := join( // ..................................this join is costly (7)
-		in_sids, k_assessor(isFCRA),
-	  keyed(left.ln_fares_id = right.ln_fares_id)
-		and ~((string)right.ln_fares_id in set(flags((unsigned6)did=left.search_did ),record_id) and isFCRA),
-		transform(l_raw,self:=left,self:=right,self:=[]),
-		atmost(max_raw)
-	);
+											in_sids, k_assessor(isFCRA),
+											keyed(left.ln_fares_id = right.ln_fares_id)
+												and ~((string)right.ln_fares_id in set(flags((unsigned6)did=left.search_did ),record_id) and isFCRA),
+												transform(l_raw,self:=left,self:=right,self:=[]),
+												atmost(max_raw)
+											);
 	
-	ds_raw0_thor := join( // ..................................this join is costly (7)
-		distribute(in_sids, hash64(ln_fares_id)), 
-		distribute(pull(k_assessor(isFCRA)), hash64(ln_fares_id)),
-	  left.ln_fares_id = right.ln_fares_id
-		and ~((string)right.ln_fares_id in set(flags((unsigned6)did=left.search_did ),record_id) and isFCRA),
-		transform(l_raw,self:=left,self:=right,self:=[]),
-		atmost(left.ln_fares_id = right.ln_fares_id, max_raw),
-		local
-	);
+	ds_raw0_thor := IF(isFCRA, 
+										join( // ..................................this join is costly (7)
+										distribute(in_sids, hash64(ln_fares_id)), 
+										distribute(pull(k_assessor(isFCRA)), hash64(ln_fares_id)),
+										left.ln_fares_id = right.ln_fares_id
+										and ~((string)right.ln_fares_id in set(flags((unsigned6)did=left.search_did ),record_id) and isFCRA),
+										transform(l_raw,self:=left,self:=right,self:=[]),
+										atmost(left.ln_fares_id = right.ln_fares_id, max_raw), local),
+										join( // ..................................this join is costly (7)
+										distribute(in_sids, hash64(ln_fares_id)), 
+										distribute(pull(k_assessor(isFCRA)), hash64(ln_fares_id)),
+										left.ln_fares_id = right.ln_fares_id,
+										transform(l_raw,self:=left,self:=right,self:=[]),
+										atmost(left.ln_fares_id = right.ln_fares_id, max_raw),local));
 	
 	#IF(onThor)
     ds_raw0 := ds_raw0_thor;
@@ -57,9 +62,11 @@ export dataset(l_raw) fn_get_assessments_raw_2(
     assess_over := assess_over_roxie;
   #END
 
-	ds_raw1 := ds_raw0 + join(in_sids,assess_over,left.ln_fares_id= right.ln_fares_id,transform(l_raw,self:=right,self:=left));										
+	// ds_raw1 := ds_raw0 + join(in_sids,assess_over,left.ln_fares_id= right.ln_fares_id,transform(l_raw,self:=right,self:=left));										
 	
-	results := if(isFCRA, ds_raw1, ds_raw0);
+	results := if(isFCRA, 
+								ds_raw0 + join(in_sids,assess_over,left.ln_fares_id= right.ln_fares_id,transform(l_raw,self:=right,self:=left)),
+								ds_raw0);
 	
 	// removed the addl fares join and the legal data join, we don't need that in the shell
 
