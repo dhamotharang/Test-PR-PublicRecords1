@@ -5,8 +5,19 @@ EXPORT Append_CleanAddress (
 
 	AddressCache := Files().Base.AddressCache.QA;
 	
-	dFileBase 		:= DISTRIBUTE(PULL(FileBase), HASH(clean_address.prim_range,clean_address.prim_name,clean_address.sec_range,clean_address.zip,clean_address.st));
-	dAddressCache	:= DISTRIBUTE(PULL(AddressCache), HASH(prim_range,prim_name,sec_range,zip,st));
+	pAddressCache	:= Project(AddressCache,Transform(recordof(left)
+													,self.prim_range	:= stringlib.stringfilterout(left.prim_range,'.?<&>*@!\\$=+%~\'')
+													,self.prim_name		:= stringlib.stringfilterout(left.prim_name,'.?<&>*@!\\$=+%~\'')
+													,self.sec_range		:= stringlib.stringfilterout(left.sec_range,'.?<&>*@!\\$=+%~\'')
+													,self:=left));	
+	pFileBase			:= PROJECT(FileBase,Transform(recordof(left)
+													,self.clean_address.prim_range	:= stringlib.stringfilterout(left.clean_address.prim_range,'.?<&>*@!\\$=+%~\'')
+													,self.clean_address.prim_name		:= stringlib.stringfilterout(left.clean_address.prim_name,'.?<&>*@!\\$=+%~\'')
+													,self.clean_address.sec_range		:= stringlib.stringfilterout(left.clean_address.sec_range,'.?<&>*@!\\$=+%~\'')
+													,self:=left));
+	
+	dFileBase 		:= DISTRIBUTE(PULL(pFileBase), HASH(clean_address.prim_range,clean_address.prim_name,clean_address.sec_range,clean_address.zip,clean_address.st));
+	dAddressCache	:= DISTRIBUTE(PULL(pAddressCache), HASH(prim_range,prim_name,sec_range,zip,st));
 	
 	FraudShared.Layouts.Base.Main T_Append_Main_Address_From_Cache(FraudShared.Layouts.Base.Main L, FraudGovPlatform.Layouts.Base.AddressCache R) := TRANSFORM
 	
@@ -70,7 +81,7 @@ EXPORT Append_CleanAddress (
 	FraudShared.Layouts.Base.Main T_Clean_Main_Address( FraudShared.Layouts.Base.Main L ) := TRANSFORM 
 
 	//*********************************************  CleanAddress182  **************************************************//
-				address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Street_1) + ' ' +  trim(l.Street_2));
+				address_1 := stringlib.stringfilterout(tools.AID_Helpers.fRawFixLine1( trim(l.Street_1) + ' ' +  trim(l.Street_2)),'.?<&>*@!\\$=+%~\'');
 				address_2 := tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(l.city) + if(l.state != '', ', ', '') + trim(l.state)  + ' ' + trim(l.zip)[1..5]));
 				Clean_Address_182 :=  if (trim(l.Street_1)!='' or trim(l.Street_2)!='' or trim(l.city)!='' or trim(l.state)!='' or trim(l.zip) != '', address.CleanAddress182(address_1, address_2), '');
 	//******************************************************************************************************************//

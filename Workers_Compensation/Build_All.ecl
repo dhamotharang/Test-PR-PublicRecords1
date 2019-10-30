@@ -32,7 +32,7 @@ EXPORT Build_All(STRING	pversion) := MODULE
 																						,NewBase
 																						,Build_Base_File );	
 																						
-    Copy2Alpha := sequential(output('Copying WorkerComp keybuild_full file to 10.194.112.105')
+    /*Copy2Alpha := sequential(output('Copying WorkerComp keybuild_full file to 10.194.112.105')
 		                                ,fileservices.Copy(filenames(pversion).keybuild_full.logical
 																		,'thor400_112'
 																		,filenames(pversion).keybuild_full.logical
@@ -44,7 +44,7 @@ EXPORT Build_All(STRING	pversion) := MODULE
 																		,true
 																		,
 																		,true));
-										
+		*/								
 		create_orbit := Orbit3.proc_Orbit3_CreateBuild ( 'Workers Compensation',pversion);
 				
 		full_build 	:= SEQUENTIAL(
@@ -60,7 +60,7 @@ EXPORT Build_All(STRING	pversion) := MODULE
 									,Promote().Input.Using2Used
 									,Promote(pversion).New2Built
 									,Promote().Built2QA
-									,Copy2Alpha
+									//,Copy2Alpha
 									,Proc_AutokeyBuild(pversion)      /* Build BDID AutoKeys */
 									,proc_build_keys(pversion).all    /* Build Roxie Keys */
 									,out_STRATApopulation_stats(pversion)

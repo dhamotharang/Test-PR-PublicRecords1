@@ -1,8 +1,10 @@
-import didville, inquiry_acclogs, ut, did_Add;
+﻿import didville, inquiry_acclogs, ut, did_Add, std;
+vToday := (STRING8)Std.Date.Today();
+
 inq_file  := pull(inquiry_acclogs.Key_Inquiry_DID
 				(person_q.fname <> '' and person_q.lname <> ''
 					and person_q.personal_phone <> '' 
-					and search_info.datetime[1..4] between ut.date_math(ut.GetDate, -365)[..4] and ut.GetDate[..4]
+					and search_info.datetime[1..4] between ut.date_math(vToday, -365)[..4] and vToday[..4]
 				    and regexreplace('[^A-Z]',stringlib.stringtouppercase(search_info.function_description),  '') in
 					['FRAUDPOINT','INSTANTID','INSTANTIDFRAUDDEFENDERSEARCH','INSTANTIDMODELSEARCH','RISKINDICATORSINSTANTIDBATCH']));
 
