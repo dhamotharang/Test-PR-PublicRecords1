@@ -1,24 +1,8 @@
-﻿import $;
-export Build_all(string pversion = '', boolean pUseProd = false, boolean isfcra = false) := function
+﻿import $, RoxieKeyBuild;
+export Build_all(string filedate, boolean pUseProd = false, boolean isfcra = false) := function
 
-/* B_BaseBLKGRP := output($.sources.BaseBLKGRP,, $.Filenames().BaseBLKGRP, overwrite);
-B_BaseBLKGRP_attr_over18 := output($.sources.BaseBLKGRP_attr_over18,, $.Filenames().BaseBLKGRP_attr_over18, overwrite);
-B_BaseCensus_surnames := output($.sources.BaseCensus_surnames,, $.Filenames().BaseCensus_surnames, overwrite);  */
-
-index_BLKGRP := buildindex($.key_BLKGRP( $.Filenames(pversion, pUseProd, isfcra).keyBLKGRP),
-                            $.Filenames(pversion, pUseProd, isfcra).BaseBLKGRP_in, overwrite); 
-                            
-index_BLKGRP_attr_over18 := buildindex($.key_BLKGRP_attr_over18($.Filenames(pversion, pUseProd, isfcra).keyBLKGRP_attr_over18),
-                                        $.Filenames(pversion, pUseProd, isfcra).BaseBLKGRP_attr_over18_in, overwrite);
-
-index_census_surnames := buildindex($.key_census_surnames($.Filenames(pversion, pUseProd, isfcra).keyCensus_surnames), 
-                                    $.Filenames(pversion, pUseProd, isfcra).BaseCensus_surnames_in,overwrite); 
-//sequential(B_BaseBLKGRP,B_BaseBLKGRP_attr_over18,B_BaseCensus_surnames,index_blkgrp);
-
-/* Do_BLKGRP := sequential(B_BaseBLKGRP, index_BLKGRP);
-Do_BLKGRP_attr_over18 := sequential(B_BaseBLKGRP_attr_over18, index_BLKGRP_attr_over18);
-Do_census_surnames := sequential(B_Basecensus_surnames, index_census_surnames); 
-built := parallel(Do_BLKGRP, Do_BLKGRP_attr_over18, Do_census_surnames); */
-built := parallel(index_BLKGRP, index_BLKGRP_attr_over18, index_census_surnames);
-return built;
+   // built := buildindex($.key_BLKGRP_ID(filedate, pUseProd, isfcra));
+    $.key_BLKGRP(filedate, pUseProd, isfcra, seq_build_blkgrp, seq_move_blkgrp);
+    build_keys := sequential(seq_build_blkgrp, seq_move_blkgrp);
+    return build_keys;
 end;

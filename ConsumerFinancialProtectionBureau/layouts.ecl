@@ -1,5 +1,5 @@
 EXPORT layouts := module
-	export original_geoid := record
+	export original_BLKGRP := record
         STRING field1;
         STRING field2;
         STRING field3;
@@ -22,7 +22,7 @@ EXPORT layouts := module
         STRING field20;
         STRING field21;
     END;
-    export original_geoidOver18 := RECORD
+    export original_BLKGRP_attr_over18 := RECORD
         STRING field1;
         STRING field2;
         STRING field3;
@@ -38,7 +38,7 @@ EXPORT layouts := module
         STRING field13;
         STRING field14;
     END;
-    export original_namecensus := RECORD
+    export original_census_surnames := RECORD
         STRING field1;
         STRING field2;
         STRING field3;
@@ -59,7 +59,7 @@ EXPORT layouts := module
         Boolean is_latest;
     END;
 
-    export geoid := record
+    export BLKGRP := record
         common;
         unsigned2 seqno;
         string12 GEOID10_BlkGrp; //key
@@ -83,7 +83,13 @@ EXPORT layouts := module
         unsigned2 NH_API_Other;
         unsigned2 NH_Asian_HPI_Other;	
     end;
-    export geoidOver18 := record
+    export BLKGRP_keyed_fields := RECORD
+        BLKGRP.GEOID10_BlkGrp;
+    END;
+    export BLKGRP_payload := RECORD
+        BLKGRP - BLKGRP_keyed_fields;
+    end;
+    export BLKGRP_attr_over18 := record
         common;
         string12 GeoInd; //key
         REAL4 geo_pr_White;
@@ -100,7 +106,16 @@ EXPORT layouts := module
         REAL4 here_given_mult_other;
         REAL4 here_given_hispanic;
     end;
-    export namecensus := record
+
+    BLKGRP_attr_over18_keyed_fields := RECORD
+        BLKGRP_attr_over18.GeoInd;
+    END;
+
+    BLKGRP_attr_over18_payload := RECORD
+        BLKGRP_attr_over18;
+    end;
+
+    export census_surnames := record
         common;
         STRING20 name; //key
         UNSIGNED3 name_rank;
@@ -113,5 +128,12 @@ EXPORT layouts := module
         UDECIMAL4_2 pctaian;
         UDECIMAL4_2 pct2prace;
         UDECIMAL4_2 pcthispanic;
+    end;
+    census_surnames_keyed_fields := RECORD
+        census_surnames.name;
+    END;
+
+    census_surnames_payload := RECORD
+        census_surnames;
     end;
 end;
