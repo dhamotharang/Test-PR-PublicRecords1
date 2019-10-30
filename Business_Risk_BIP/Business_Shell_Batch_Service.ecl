@@ -127,6 +127,7 @@ EXPORT Business_Shell_Batch_Service() := FUNCTION
 	UNSIGNED1	GLBA_Purpose         := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBA_Purpose');
 	STRING50	DataRestrictionMask  := Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('Data_Restriction_Mask');
 	STRING50	DataPermissionMask   := Business_Risk_BIP.Constants.Default_DataPermissionMask : STORED('Data_Permission_Mask');
+	#STORED('DataPermissionMask', DataPermissionMask); // Ensure our DataPermissionMask gets mapped in as AutostandardI DPM
 	STRING5	IndustryClass_In		   := Business_Risk_BIP.Constants.Default_IndustryClass : STORED('IndustryClass');
 	IndustryClass := StringLib.StringToUpperCase(TRIM(IndustryClass_In, LEFT, RIGHT));
 	UNSIGNED1	LinkSearchLevel      := Business_Risk_BIP.Constants.LinkSearch.Default : STORED('LinkSearchLevel');
