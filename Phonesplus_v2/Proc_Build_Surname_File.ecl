@@ -37,7 +37,7 @@ Gong.layout_historyaid-[global_sid,record_sid] map_common_layout(f_clean l) := t
 f_Surname := project(f_clean(nametype='P',OrigName not in overrides,NOT REGEXFIND('\\b(FOR|UNLISTED|UNPUBLISHED|BLOCKED)\\b',OrigName)),map_common_layout(left));
 f_Surname_d := dedup(sort(f_Surname, record), all);
 
-ut.MAC_SF_BuildProcess(f_Surname_d,'~thor_data400::base::phonesplusv2_surname',surname_base,2,,true, pversion);
+ut.MAC_SF_BuildProcess(f_Surname_d,PhonesPlus_V2.Names.phonesplusv2_surname,surname_base,2,,true, pversion);
 
 
 

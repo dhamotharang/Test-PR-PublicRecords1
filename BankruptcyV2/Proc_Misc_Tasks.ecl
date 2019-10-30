@@ -99,7 +99,7 @@ rFileCheck xFileCheck(dFileCheck l) := transform
 	self := l;
 end;
 
-dFileStatus := projecT(dFileCheck,xFileCheck(left));
+dFileStatus := nothor(projecT(global(dFileCheck,few),xFileCheck(left)));
 
 sequential(/*dops_update
 		,*/build_relationships

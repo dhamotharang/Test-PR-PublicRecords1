@@ -18,16 +18,16 @@ After the current process has determined what is above and below the line, match
 		o	Match insurance by DID and phone
 						?	There is a file with only the insurance phone records we are allowed to use ready to be pulled from Boca
 						?	If match is to a record above the line, update the rules field to indicate the record matched insurance.  
-						?	If match is to a record below the line, set it above the line, set dppa_glb_flag = G, and update the rules field to indicate the record matched insurance
+						?	If match is to a record below the line, set it above the line, set dppa_glb_flag = G, and update the rules field to indicate the record matched insurance
 		o	Match File One by DID and 3 digits
 						?	If match is to a record above the line, update the rules field to indicate the records matched File One
-						?	If match is to a record below the line, set it above the line, set dppa_glb_flag = G, and update the rules field to indicate the records matched File One
+						?	If match is to a record below the line, set it above the line, set dppa_glb_flag = G, and update the rules field to indicate the records matched File One
 
 -	For the records that were below the line and moved above, propagate above the line to other records for the same phone and household.
 ===============================================================================================================
 */
 import Experian_Phones, ut, PhoneMart,_control;
-EXPORT Fn_Phone_Verification(dataset(recordof(Layout_Phonesplus_Base)) phplus_in, string pversion) := function
+EXPORT Fn_Phone_Verification(dataset(recordof(Layout_In_Phonesplus.layout_in_common /*DF-25784*/)) phplus_in, string pversion) := function
 
 // remote insurance verification file
 iver_rec := RECORD
@@ -56,7 +56,7 @@ file1_ := pull(PhoneMart.key_phonemart_did);
 								
 file1 := file1_(did > 0);
 //Match to Insurance;
-Layout_Phonesplus_Base t_ins_match (phplus_in le, ins ri) := transform
+Layout_In_Phonesplus.layout_in_common /*DF-25784*/ t_ins_match (phplus_in le, ins ri) := transform
 is_match := le.cellphone = ri.phone and le.did = ri.did and 
 						//only use cellphones and non-cellphones when the date_last_seen is within 3 years
 						(le.append_phone_type in Phonesplus_v2.Translation_Codes.cellphone_types or
@@ -90,7 +90,7 @@ ins_match := join(distribute(phplus_in, hash(cellphone)),
 									left outer);
 
 //Match to File One
-Layout_Phonesplus_Base t_file1_match (ins_match le, file1 ri) := transform
+Layout_In_Phonesplus.layout_in_common /*DF-25784*/ t_file1_match (ins_match le, file1 ri) := transform
 /*is_match := le.cellphone = ri.phone and le.did = ri.did and
 						//only use cellphones and non-cellphones when the date_last_seen is within 1 year
 						(le.append_phone_type in Phonesplus_v2.Translation_Codes.cellphone_types or
@@ -142,7 +142,7 @@ match_bi (unsigned rules):= phonesplus_v2.Translation_Codes.fFlagIsOn(rules, pho
 match_b1 (unsigned rules):= phonesplus_v2.Translation_Codes.fFlagIsOn(rules, phonesplus_v2.Translation_Codes.rules_bitmap_code('FileOne-Verified-Below'));
 match_f (unsigned rules):= match_ai(rules) or match_a1(rules) or match_bi(rules) or match_b1(rules);
 
-set_confidence_score := project(file1_match, transform(Layout_Phonesplus_Base,
+set_confidence_score := project(file1_match, transform(Layout_In_Phonesplus.layout_in_common /*DF-25784*/,
 																						 self.glb_dppa_flag := if(match_f(left.rules) and
 																																			~left.in_flag and
 																																			left.glb_dppa_flag not in['G' ,'D', 'B'],
@@ -159,7 +159,7 @@ set_confidence_score := project(file1_match, transform(Layout_Phonesplus_Base,
 
 //propagate to household
 phplus_in_rules := dedup(sort(distribute(set_confidence_score(in_flag and match_f(rules)), hash(npa+phone7)), npa+phone7, if(pdid = 0,1,2), -confidencescore,local),npa+phone7,local) ;
-Layout_Phonesplus_Base t_propagate(set_confidence_score le, phplus_in_rules ri) := transform 
+Layout_In_Phonesplus.layout_in_common /*DF-25784*/ t_propagate(set_confidence_score le, phplus_in_rules ri) := transform 
 	
 	related_below := if(le.in_flag =  false and
 											 le.npa+le.phone7 = ri.npa+ri.phone7 and
