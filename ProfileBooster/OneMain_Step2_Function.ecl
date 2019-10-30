@@ -37,7 +37,7 @@ EXPORT OneMain_Step2_Function(DATASET(ProfileBooster.Layouts.LayoutPBInputThor) 
 																	self.Name_Title  := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
 																	street_address := risk_indicators.MOD_AddressClean.street_address(left.street_addr, left.streetnumber, left.streetpredirection, left.streetname, left.streetsuffix, left.streetpostdirection, left.unitdesignation, left.unitnumber);
 																	self.street_addr := street_address;
-																	self := left ) );
+																	self := left ) ) : PERSIST('~PROFILEBOOSTER::batchin_wseq_' + StepName, expire(3));  // use persist instead of independent;
 																		
 	attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest,false, '',  StepName);  
  

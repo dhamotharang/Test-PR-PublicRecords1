@@ -423,10 +423,15 @@ reducedInput := join(original_input, project_deduped, left.lexid=right.lexid, tr
 											self.zip := left.z5;
 											self.zip4 := left.z4));
 											
- output(original_input, NAMED('original_input'));
- Output(choosen(project_deduped,10), NAMED('dedup_original_output'));
- output(count(project_deduped), NAMED('count_dedup_original_output'));
- output(project_deduped,, '~thor400::profilebooster::LN_Output_springleaf_layout_ProfBooster.csv', csv(heading(single), quote('"'), terminator('\r\n')), overwrite);
+ reducedOutput := join(reducedInput, project_deduped, left.lexid=right.lexid, transform(batchout, self := right));  // reduce output if there is no Input record - don't ask
+ 
+ NewLexidCount := count(project_deduped) - count(reducedOutput);
+											
+ output(NewLexidCount, NAMED('NewLexidCount'));
+ output(choosen(original_input, 10), NAMED('original_input'));
+ Output(choosen(reducedOutput,10), NAMED('dedup_original_output'));
+ output(count(reducedOutput), NAMED('count_dedup_original_output'));
+ output(reducedOutput,, '~thor400::profilebooster::LN_Output_springleaf_layout_ProfBooster.csv', csv(heading(single), quote('"'), terminator('\r\n')), overwrite);
 											
  output(choosen(reducedInput, 10), NAMED('reduced_input'));
  output(count(reducedInput), NAMED('count_reduced_input'));
@@ -453,7 +458,7 @@ STD.File.DeSpray('~thor400::profilebooster::LN_Output_springleaf_layout_PII.csv'
 // email results of this bwr
 	
 	FileServices.SendEmail(EmailList, 'OneMain Step3 finished ' + WORKUNIT, 'Original Input count  ' + ded + '    Original Output count ' + ded2 +
-																																			' Duplicate LexID count ' + count(t(lexidcount>1)) + '  Reduced Input count ' + count(reducedInput) + '   Output count ' + count(project_deduped)):
+																																			' Duplicate LexID count ' + count(t(lexidcount>1)) + '  Reduced Input count ' + count(reducedInput) + '   Output count ' + count(reducedOutput) + '   New LexID Output count ' + NewLexidCount):
 	FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
 
 
