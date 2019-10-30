@@ -1,11 +1,12 @@
-import tools;
+﻿import tools;
 export Files(
 
-	string pversion = ''
+	 string   pversion              = ''
+	,boolean	pUseOtherEnvironment	= false
 
 ) :=
 module
 
-tools.mac_FilesBase	(filenames(pversion).base	,layouts.base		,base);
+  export base := tools.macf_FilesBase	(filenames(pversion,pUseOtherEnvironment).base	,layouts.base);
 
 END;

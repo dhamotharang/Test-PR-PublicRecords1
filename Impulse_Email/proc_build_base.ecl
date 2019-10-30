@@ -2,7 +2,6 @@
      , _control
 		 , address
 		 , AID
-		 , CCPA
 		 , DID_Add
 		 , header_slimsort
 		 , lib_stringlib
@@ -171,7 +170,7 @@ export proc_build_base(string file_date)
 
 	ruIERec	:=	PROJECT(rsImpulseEmailCleanNameDIDJoin, tImpulseEmailFinal(LEFT));
 	
-	addGlobalSID := CCPA.macGetGlobalSID(ruIERec,'ImpulseEmail','','global_sid'); //DF-25972: Add Global_SID
+	addGlobalSID := MDR.macGetGlobalSid(ruIERec,'ImpulseEmail','','global_sid'); //DF-25972: Add Global_SID
 
 	//Separate records without a did and flag them as 'I' (invalid for keys)											
 	Impulse_Email_No_DID	:=	addGlobalSID(DID = 0);

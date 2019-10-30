@@ -6,7 +6,7 @@ EXPORT Proc_PostProcess(
     , DATASET(HealthcareNoMatchHeader_InternalLinking.Layout_Header) pBase = HealthcareNoMatchHeader_Ingest.Files(pSrc).Linking().Iteration
   ) :=  FUNCTION
 
-  dAppendCRK    :=  HealthcareNoMatchHeader_InternalLinking.Proc_AppendCRK(pBase);
+  dAppendCRK    :=  HealthcareNoMatchHeader_InternalLinking.Proc_AppendCRK(pSrc,pBase);
   pCRKFilename  :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Append.CRK.new;
   OutputResults :=  OUTPUT(dAppendCRK,,pCRKFilename,COMPRESSED,OVERWRITE);
 
@@ -14,6 +14,7 @@ EXPORT Proc_PostProcess(
                       OutputResults
                       ,HealthcareNoMatchHeader_Ingest.Promote(pSrc, pVersion,,'CustomerRecordKey').buildfiles.New2Built
                       ,HealthcareNoMatchHeader_Ingest.Promote(pSrc, pVersion,,'CustomerRecordKey').buildfiles.Built2QA	
+                      ,HealthcareNoMatchHeader_InternalLinking.Proc_Stats(pSrc,,HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).CRK).NoMatchID_Stats
                     );
 
   RETURN  runPostProcess;

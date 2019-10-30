@@ -1,4 +1,4 @@
-﻿import _control, CCPA, Ut, address, lib_stringlib, _Control, idl_header,STD;
+﻿import _control, MDR, Ut, address, lib_stringlib, _Control, idl_header,STD;
 
 export Standardize_InputXML := module
 
@@ -72,7 +72,7 @@ export Standardize_InputXML := module
 		
 		dStandardizeFields := project(pRawFileInput, tStandardizeFields(left));
 		
-		addGlobalSID := CCPA.macGetGlobalSID(dStandardizeFields, 'Zoom', '', 'global_sid'); //DF-25333: Populate Global_SIDs
+		addGlobalSID := MDR.macGetGlobalSid(dStandardizeFields, 'Zoom', '', 'global_sid'); //DF-25333: Populate Global_SIDs
 		
 		//** Flipping the names that are wrongly cleaned by name cleaner.
 		ut.mac_flipnames(addGlobalSID, clean_contact_name.fname, clean_contact_name.mname, clean_contact_name.lname, dStandardizeFields_flipnames)

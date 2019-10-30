@@ -1,7 +1,7 @@
 ﻿#OPTION('multiplePersistInstances',FALSE);
 import ut, business_header, mdr, lib_stringlib, email_data, _validate;
 
-EXPORT As_Business_Linking (
+EXPORT As_Business_Linking (	
 	 boolean pUseOtherEnviron = _Constants().IsDataland
 	,dataset(Equifax_Business_Data.layouts.Base) pBase = files(,pUseOtherEnviron).base.qa
   ,boolean IsPersist = true	
@@ -83,12 +83,76 @@ EXPORT As_Business_Linking (
 				self.company_fein := '';
         self.duns_number := '';	
 				self.contact_ssn := '';
+				string temp_emp_count_range_org :=
+					MAP(		
+					trim(l.efx_corpempcd)='A' => '1-4',
+					trim(l.efx_corpempcd)='B' => '5-9',
+					trim(l.efx_corpempcd)='C' => '10-19',
+					trim(l.efx_corpempcd)='D' => '20-49',
+					trim(l.efx_corpempcd)='E' => '50-99',
+					trim(l.efx_corpempcd)='F' => '100-249',
+					trim(l.efx_corpempcd)='G' => '250-499',
+					trim(l.efx_corpempcd)='H' => '500-999',
+					trim(l.efx_corpempcd)='I' => '1000-4999',
+					trim(l.efx_corpempcd)='J' => '5000-9999',
+					trim(l.efx_corpempcd)='K' => '10000+',					
+					trim(l.efx_corpempcd)='' => '',
+					'');
+				string temp_emp_count_range_loc :=
+					MAP(		
+					trim(l.efx_locempcd)='A' => '1-4',
+					trim(l.efx_locempcd)='B' => '5-9',
+					trim(l.efx_locempcd)='C' => '10-19',
+					trim(l.efx_locempcd)='D' => '20-49',
+					trim(l.efx_locempcd)='E' => '50-99',
+					trim(l.efx_locempcd)='F' => '100-249',
+					trim(l.efx_locempcd)='G' => '250-499',
+					trim(l.efx_locempcd)='H' => '500-999',
+					trim(l.efx_locempcd)='I' => '1000-4999',
+					trim(l.efx_locempcd)='J' => '5000-9999',
+					trim(l.efx_locempcd)='K' => '10000+',					
+					trim(l.efx_locempcd)='' => '',
+					'');
+				string temp_rev_range_org :=
+					MAP(		
+					trim(l.efx_corpamountcd)='A' => '1000-499000',
+					trim(l.efx_corpamountcd)='B' => '500000-999000',
+					trim(l.efx_corpamountcd)='C' => '1000000-2499000',
+					trim(l.efx_corpamountcd)='D' => '2500000-4999000',
+					trim(l.efx_corpamountcd)='E' => '5000000-9999000',
+					trim(l.efx_corpamountcd)='F' => '10000000-19999000',
+					trim(l.efx_corpamountcd)='G' => '20000000-49999000',
+					trim(l.efx_corpamountcd)='H' => '50000000-99999000',
+					trim(l.efx_corpamountcd)='I' => '100000000-499999000',
+					trim(l.efx_corpamountcd)='J' => '500000000-999999000',
+					trim(l.efx_corpamountcd)='K' => '1000000000+',					
+					trim(l.efx_corpamountcd)='' => '',
+					'');
+				string temp_rev_range_loc :=
+					MAP(		
+					trim(l.efx_locamountcd)='A' => '1000-499000',
+					trim(l.efx_locamountcd)='B' => '500000-999000',
+					trim(l.efx_locamountcd)='C' => '1000000-2499000',
+					trim(l.efx_locamountcd)='D' => '2500000-4999000',
+					trim(l.efx_locamountcd)='E' => '5000000-9999000',
+					trim(l.efx_locamountcd)='F' => '10000000-19999000',
+					trim(l.efx_locamountcd)='G' => '20000000-49999000',
+					trim(l.efx_locamountcd)='H' => '50000000-99999000',
+					trim(l.efx_locamountcd)='I' => '100000000-499999000',
+					trim(l.efx_locamountcd)='J' => '500000000-999999000',
+					trim(l.efx_locamountcd)='K' => '1000000000+',					
+					trim(l.efx_locamountcd)='' => '',
+					'');	 						 						 						 					
+		    self.employee_count_org_raw      := if(trim(l.efx_corpempcnt) = '' OR trim(l.efx_corpempcnt) = '0',temp_emp_count_range_org,trim(l.efx_corpempcnt));
+        self.revenue_org_raw             := if(trim(l.efx_corpamount) = '' OR trim(l.efx_corpempcnt) = '0',temp_rev_range_org,trim(l.efx_corpamount));
+        self.employee_count_local_raw    := if(trim(l.efx_locempcnt) = '' OR trim(l.efx_corpempcnt) = '0',temp_emp_count_range_loc,trim(l.efx_locempcnt));
+		    self.revenue_local_raw           := if(trim(l.efx_locamount) = '' OR trim(l.efx_corpempcnt) = '0',temp_rev_range_loc,trim(l.efx_locamount));
 				self 							   						 := l;
 				self 							   						 := [];
 		end;
 		
 		from_base      := PROJECT(pBase, trfMapBLInterface(LEFT));
-
+		
  // Roll Up - to eliminate duplicates and keep the oldest (first) source_record_id
 	  from_base_Dist := DISTRIBUTE(from_base, HASH(vl_id));
 	  from_base_Sort := SORT(from_base_Dist 

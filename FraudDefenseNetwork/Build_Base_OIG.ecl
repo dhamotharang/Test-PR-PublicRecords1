@@ -73,8 +73,8 @@ AppendProviderAttributes, Health_Provider_Services, Health_Facility_Services, He
        self := left), left outer);
       
        oigUpdate := oigBDIDUpdUnq + project(oigDIDUpdLnpidNpi, Layouts.base.oig);
-       oigUpdate_dist := distribute(oigUpdate, hash64(did, bdid));
-       oigBase_dist := distribute(inBaseOIG, hash64(did, bdid));
+       oigUpdate_dist := distribute(oigUpdate, hash32(did, bdid));
+       oigBase_dist := distribute(inBaseOIG, hash32(did, bdid));
       
        FraudDefenseNetwork.Layouts.Base.OIG getSrcRid(oigUpdate_dist l, oigBase_dist r) :=
                transform
@@ -100,8 +100,16 @@ AppendProviderAttributes, Health_Provider_Services, Health_Facility_Services, He
                                 local
                               );
                     
-       ut.MAC_Append_Rcid (dBase_with_rids, source_rec_id, pDataset_rollup);
-       tools.mac_WriteFile(Filenames(pversion).Base.OIG.New, pDataset_rollup, Build_Base_File);
+      ut.MAC_Append_Rcid (dBase_with_rids, source_rec_id, pDataset_rollup);
+           
+      dBase_RecordID := Project(pDataset_rollup, transform(recordof(pDataset_rollup),
+                                                          RecordID := if(left.addr_type = 'P', Constants().OIGIndividualRecIDSeries + left.source_rec_id, 
+                                                                         Constants().OIGBusinessRecIDSeries + left.source_rec_id);
+                                                          self.Record_SID := RecordID;
+                                                          self := left;
+                                                          )); 
+       
+      tools.mac_WriteFile(Filenames(pversion).Base.OIG.New, dBase_RecordID, Build_Base_File);
 
   //Return
     export full_build := sequential(

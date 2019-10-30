@@ -240,8 +240,11 @@ slim := project(Foreclosure_Address, Layout_Foreclosure_In_Slim);
 cleaned := slim(situs1_zip !='' and 
 								situs1_prim_range !='' and 
 								situs1_prim_name !='');
+								
+//should prevent duplicate records within each source but may have duplicates across sources - DF-26073
+dedCleaned := DEDUP(SORT(cleaned,foreclosure_id,-process_date),ALL, EXCEPT process_date); 
 							
-export key_foreclosures_addr := index(cleaned,{
+export key_foreclosures_addr := index(dedCleaned,{
 																		situs1_zip, 
 																		situs1_prim_range, 
 																		situs1_prim_name, 

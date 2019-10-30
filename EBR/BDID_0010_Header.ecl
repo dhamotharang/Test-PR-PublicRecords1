@@ -1,4 +1,4 @@
-﻿import ut, Address, BIPV2, Business_Header, Business_Headerv2, Business_Header_SS, did_add,mdr, AID;
+﻿import _control, ut, Address, BIPV2, Business_Header, Business_Headerv2, Business_Header_SS, did_add,mdr, AID, Std;
 
 EBR_Header_In 		:= File_0010_Header_In;
 EBR_Header_Base 	:= File_0010_Header_Base_AID;
@@ -350,7 +350,9 @@ END;
 
 EBR_AddRecordType:= GROUP(ITERATE(EBR_Header_Grpd_Sort, SetRecordType(LEFT, RIGHT)));
 
+addGlobalSID := mdr.macGetGlobalSID(EBR_AddRecordType,'EBR','','global_sid'); //DF-26349: Populate Global_SID Field
+
 //Add the source_rec_id to the 0010 Header file
-UT.MAC_Append_Rcid(EBR_AddRecordType, source_rec_id, EBR_Header_Prop);
+UT.MAC_Append_Rcid(addGlobalSID, source_rec_id, EBR_Header_Prop);
 
 export BDID_0010_Header := EBR_Header_Prop; //: persist(EBR_thor + 'TEMP::BDID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code) + '_BDID_0010_Header2');

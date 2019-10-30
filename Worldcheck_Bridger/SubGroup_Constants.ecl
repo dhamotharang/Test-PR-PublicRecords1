@@ -1153,6 +1153,15 @@
 		export string KEYWORD_SEDPA									:= '839';
 		export string KEYWORD_LFSA_ALERT						:= '840';
 		export string KEYWORD_ESBDE									:= '841';
+		export string KEYWORD_CNCBIRC								:= '842';
+		export string KEYWORD_CAQCMELCC							:= '843';
+		export string KEYWORD_OFAC_EO13848					:= '844';
+		export string KEYWORD_NFSRC									:= '845';
+		export string KEYWORD_SKFSRC								:= '846';
+		export string KEYWORD_TTFIU_TTPS						:= '847';
+		export string KEYWORD_OFAC_SYR_EO						:= '848';
+		export string KEYWORD_FRDGCCRF_CP						:= '849';
+		export string KEYWORD_FRDGCCRF							:= '850';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

@@ -1,7 +1,13 @@
-IMPORT BIPV2, doxie;
+﻿IMPORT BIPV2, doxie; 
 
-EXPORT Key_LinkIds := MODULE
-		shared  base_recs 					:= UCCV2.File_UCC_Party_Base_AID;
+EXPORT Key_LinkIds := MODULE 
+		shared  base_recs 					:= project(UCCV2.File_UCC_Party_Base_AID,transform(Layout_UCC_Common.Layout_Party_With_AID,
+		                                                                               self.dt_vendor_last_reported  := (unsigned6)(string)left.dt_vendor_last_reported[1..6];
+			                                                                             self.dt_vendor_first_reported := (unsigned6)(string)left.dt_vendor_first_reported[1..6];
+																																									 self := left;
+																																									 self := [];
+																																									 ));
+		 
 		export  out_logicalKeyName  := cluster.cluster_out+'Key::ucc::linkids_'+ doxie.Version_SuperKey; // linkids Key Super FileName
 
 		BIPV2.IDmacros.mac_IndexWithXLinkIDs(base_recs, out_key, out_logicalKeyName);

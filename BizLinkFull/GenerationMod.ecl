@@ -115,10 +115,10 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'HACK:IMPROVE_EF_WEIGHTS\n'
     + 'HACK:SPLIT_COMBINEALLSCORES\n'
     + '\n'
-    + 'LINKPATH:L_CNPNAME_ZIP:cnp_name:zip:?:prim_name:st(HASBASE):city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
-    + 'LINKPATH:L_CNPNAME_ST:cnp_name:st:?:prim_name:zip(HASBASE):city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:REQUIRED(L_CNPNAME_ZIP)\n'
-    + 'LINKPATH:L_CNPNAME:cnp_name:?:prim_name:st:city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:zip(HASBASE):REQUIRED(L_CNPNAME_ST)\n'
-    + 'LINKPATH:L_CNPNAME_FUZZY:company_name_prefix:?:cnp_name(HASBASE):zip(HASBASE):city:st:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:NOFAIL\n'
+    + 'LINKPATH:L_CNPNAME_ZIP:cnp_name:zip:?:prim_name:st(HASBASE):+:city:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
+    + 'LINKPATH:L_CNPNAME_ST:cnp_name:st:?:prim_name:zip(HASBASE):+:city:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:REQUIRED(L_CNPNAME_ZIP)\n'
+    + 'LINKPATH:L_CNPNAME:cnp_name:?:prim_name:city:+:st:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:zip(HASBASE):REQUIRED(L_CNPNAME_ST)\n'
+    + 'LINKPATH:L_CNPNAME_FUZZY:company_name_prefix:?:cnp_name(HASBASE):st:zip(HASBASE):+:city:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:NOFAIL\n'
     + 'LINKPATH:L_ADDRESS1:prim_name:city:st:?:prim_range:cnp_name(HASBASE):+:zip:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_ADDRESS2:prim_name:zip:?:prim_range:cnp_name(HASBASE):st(HASBASE):+:city:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_ADDRESS3:prim_name:prim_range:zip:?:cnp_name(HASBASE):st:+:city:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:\n'
@@ -135,10 +135,10 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // Structured values
   EXPORT linkpaths := DATASET([
-    {'L_CNPNAME_ZIP','cnp_name,zip','prim_name,st(HASBASE),city','company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
-    ,{'L_CNPNAME_ST','cnp_name,st','prim_name,zip(HASBASE),city','company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','L_CNPNAME_ZIP',''}
-    ,{'L_CNPNAME','cnp_name','prim_name,st,city','company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,zip(HASBASE)','L_CNPNAME_ST',''}
-    ,{'L_CNPNAME_FUZZY','company_name_prefix','cnp_name(HASBASE),zip(HASBASE),city,st','company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
+    {'L_CNPNAME_ZIP','cnp_name,zip','prim_name,st(HASBASE)','city,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
+    ,{'L_CNPNAME_ST','cnp_name,st','prim_name,zip(HASBASE)','city,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','L_CNPNAME_ZIP',''}
+    ,{'L_CNPNAME','cnp_name','prim_name,city','st,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,zip(HASBASE)','L_CNPNAME_ST',''}
+    ,{'L_CNPNAME_FUZZY','company_name_prefix','cnp_name(HASBASE),st,zip(HASBASE)','city,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_ADDRESS1','prim_name,city,st','prim_range,cnp_name(HASBASE)','zip,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_ADDRESS2','prim_name,zip','prim_range,cnp_name(HASBASE),st(HASBASE)','city,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_ADDRESS3','prim_name,prim_range,zip','cnp_name(HASBASE),st','city,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
