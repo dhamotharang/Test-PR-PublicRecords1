@@ -2,7 +2,12 @@
 
 /********* EMAIL_ADDRESSES **********/
 
-em  := Email_Data.File_Email_Base(did > 0, current_rec=true, Clean_Email<>'', email_src not in D2C.Constants.EmailRestrictedSources);
+em  := Email_Data.File_Email_Base(
+         did > 0,
+         current_rec=true,
+         Clean_Email<>'',
+         email_src not in D2C.Constants.EmailRestrictedSources,
+         D2C_Customers.SRC_Allowed.Check(9, email_src));
 
 //keeping ONLY 3 email address per did based on latest date_last_seen
 em_d  := dedup(sort(distribute(em, hash(did)), did, clean_email, -date_last_seen, local), did, clean_email, all, local);  

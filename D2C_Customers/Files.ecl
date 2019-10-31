@@ -1,22 +1,23 @@
-﻿import doxie_build, mdr, d2c, Watchdog, Infutor, SexOffender, doxie_files, BankruptcyV2, LiensV2, header, death_master, AutoStandardI,Suppress;
+﻿import doxie_build, mdr, d2c, Watchdog, Infutor, SexOffender, doxie_files, BankruptcyV2, LiensV2, header, death_master, AutoStandardI,Suppress,doxie;
 
 EXPORT Files := MODULE
-    
-    infutor_best := Infutor.file_infutor_best : independent;  //705,593,920
 
     //pass thorugh ccpa supprerssion
+    // MDR.macGetGlobalSid(hdrIn,'PersonHeaderKeys','src','global_sid');
+    // mod_access                 := MODULE(doxie.IDataAccess) END; // default mod_access
+    // suppress_global_sid        := Suppress.MAC_SuppressSource (cleaned_best_infutor, mod_access, , , TRUE);
 
-    appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
-    Suppress.MAC_Suppress(infutor_best,pulled_ssn_infutor,appType,Suppress.Constants.LinkTypes.SSN,ssn);
-    Suppress.MAC_Suppress(pulled_ssn_infutor,cleaned_best_infutor,appType,Suppress.Constants.LinkTypes.DID,did);
-    EXPORT fullInfutorDS := cleaned_best_infutor;
-
-    infutor_hdr := Infutor.infutor_header(src <> 'D$') : independent;  //9,317,898,981
-
+    infutor_hdr := Infutor.infutor_header(D2C_Customers.SRC_Allowed.Check(1, src));  //7,491,686,415
     appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
     Suppress.MAC_Suppress(infutor_hdr,pulled_ssn_hdr,appType,Suppress.Constants.LinkTypes.SSN,ssn);
     Suppress.MAC_Suppress(pulled_ssn_hdr,cleaned_best_hdr,appType,Suppress.Constants.LinkTypes.DID,did);    
     EXPORT fullHdrDS     := cleaned_best_hdr;
+
+    infutor_best := Infutor.file_infutor_best : independent;  //705,593,920
+    appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
+    Suppress.MAC_Suppress(infutor_best,pulled_ssn_infutor,appType,Suppress.Constants.LinkTypes.SSN,ssn);
+    Suppress.MAC_Suppress(pulled_ssn_infutor,cleaned_best_infutor,appType,Suppress.Constants.LinkTypes.DID,did);    
+    EXPORT fullInfutorDS := cleaned_best_infutor;
 
     EXPORT coresDS       := Header.key_ADL_segmentation(ind1 = 'CORE'); //257,216,208 
 

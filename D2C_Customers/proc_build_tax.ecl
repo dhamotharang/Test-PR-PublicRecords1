@@ -2,8 +2,14 @@
 
 /********* TAX_ASSESSMENTS **********/
 
+//Recs filtered based on ln_fares_id[1..2]
 //Will include the latest tax record for each property owned over the last 10 years 
-Property_for_10yrs := ln_propertyv2.File_Search_DID(did > 0, Std.Date.YearsBetween((unsigned4)process_date ,Std.Date.Today()) < 10);
+Property_for_10yrs := ln_propertyv2.File_Search_DID(
+                       did > 0,
+                       Std.Date.YearsBetween((unsigned4)process_date,
+                       Std.Date.Today()) < 10,
+                       D2C_Customers.SRC_Allowed.Check(21, ln_fares_id));
+                       
 DedupFields := 'prim_range, zip, prim_name, sec_range';
 
 LatestProperty  := dedup(sort(distribute(Property_for_10yrs, hash(#EXPAND(DedupFields))), #EXPAND(DedupFields), -process_date, local), #EXPAND(DedupFields), local);

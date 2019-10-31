@@ -4,7 +4,7 @@
 
 // li := LiensV2.key_liens_DID(did > 0);//Unrestricted
 
-li_main  := dataset('~thor_data400::base::liens::main', liensv2.Layout_liens_main_module.layout_liens_main, thor);
+li_main  := dataset('~thor_data400::base::liens::main', liensv2.Layout_liens_main_module.layout_liens_main, thor)(D2C_Customers.SRC_Allowed.Check(13, filing_state));
 li_party := dataset('~thor_data400::base::liens::party', LiensV2.Layout_Liens_party_HeaderIngest, thor)((unsigned6)did > 0);
 li := join(distribute(li_party, hash(tmsid)), distribute(li_main, hash(tmsid)), left.rmsid = right.rmsid and left.tmsid = right.tmsid, left outer, local);
 

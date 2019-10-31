@@ -1,6 +1,7 @@
 ﻿import std;
+#stored('TestBuild', TRUE)
 
-version := std.date.today();
+version := (string8)std.date.today();
 
 #workunit('protect',true);
 #workunit('name','D2C Customers Build - ' + version);
@@ -8,6 +9,7 @@ version := std.date.today();
 #stored  ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com,jose.bello@lexisnexisrisk.com'); 
 #OPTION('multiplePersistInstances',FALSE);
 
-buildType := enum(UNSIGNED1, FULL, QUARTERLY, MONTHLY);
+unsigned mode := 1; //1 -> FULL, 2 -> QUARTERLY, 3 -> MONTHLY
+customer_name := 'My Life';
 
-D2C_Customers.proc_build_all(buildType.FULL, version);
+D2C_Customers.proc_build_all(mode, version, customer_name);
