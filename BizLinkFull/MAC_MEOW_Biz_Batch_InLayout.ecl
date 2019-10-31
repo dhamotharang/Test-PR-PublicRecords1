@@ -52,7 +52,7 @@ EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs 
   #IF(#TEXT(Input_cnp_name)<>'')
     #UNIQUENAME(HoldL_CNPNAME)
     %HoldL_CNPNAME% := %ToProcess%(~BizLinkFull.Key_BizHead_L_CNPNAME_ST.CanSearch(ROW(%ToProcess%)) AND ~BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.CanSearch(ROW(%ToProcess%)));
-    BizLinkFull.Key_BizHead_L_CNPNAME.MAC_ScoredFetch_Batch(%HoldL_CNPNAME%,UniqueId,cnp_name_wb,prim_name,st,city,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,zip_cases,%OutputL_CNPNAME%,AsIndex,In_disableForce)
+    BizLinkFull.Key_BizHead_L_CNPNAME.MAC_ScoredFetch_Batch(%HoldL_CNPNAME%,UniqueId,cnp_name_wb,prim_name,city,st,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,zip_cases,%OutputL_CNPNAME%,AsIndex,In_disableForce)
   #ELSE
     %OutputL_CNPNAME% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
   #END
@@ -60,7 +60,7 @@ EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs 
   #IF(#TEXT(Input_company_name_prefix)<>'')
     #UNIQUENAME(HoldL_CNPNAME_FUZZY)
     %HoldL_CNPNAME_FUZZY% := %ToProcess%;
-    BizLinkFull.Key_BizHead_L_CNPNAME_FUZZY.MAC_ScoredFetch_Batch(%HoldL_CNPNAME_FUZZY%,UniqueId,company_name_prefix,cnp_name_wb,zip_cases,city,st,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,%OutputL_CNPNAME_FUZZY%,AsIndex,In_disableForce)
+    BizLinkFull.Key_BizHead_L_CNPNAME_FUZZY.MAC_ScoredFetch_Batch(%HoldL_CNPNAME_FUZZY%,UniqueId,company_name_prefix,cnp_name_wb,st,zip_cases,city,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,%OutputL_CNPNAME_FUZZY%,AsIndex,In_disableForce)
   #ELSE
     %OutputL_CNPNAME_FUZZY% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
   #END

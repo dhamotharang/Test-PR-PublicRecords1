@@ -2652,8 +2652,21 @@ end;
 										LEFT.sanc1_desc			  = RIGHT.sanc1_desc,
 										last_rollup(LEFT,RIGHT)
 										,LOCAL);	
-
-		RETURN final_set;
+		
+		sort_final_set	:= sort(distribute(final_set, hash(group_key, sanc1_state, sanc1_lic_num)), group_key, sanc1_state,  sanc1_lic_num, local);
+		
+		exception_lu	  := sort(Enclarity.files().exceptions.qa, group_key, lic_state, lic_num, local);
+		
+		get_exceptions	:= join(sort_final_set, exception_lu, 
+							left.group_key				= right.group_key	
+					and left.sanc1_state			= right.lic_state
+					and left.sanc1_lic_num		= right.lic_num
+			,TRANSFORM(enclarity.Layouts.sanction_base,
+					 SELF.record_type			:= if(((left.group_key = right.group_key) and (left.sanc1_state = right.lic_state) and (left.sanc1_lic_num = right.lic_num)),'H', left.record_type)
+					,SELF									:= left)
+					,LEFT OUTER, LOOKUP);					
+					
+		RETURN get_exceptions;
 	END;
 	
 	EXPORT Collapse_Base := FUNCTION

@@ -1813,6 +1813,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'OFAC - Foreign Interference in a United States Election List','1800'},
 {'ATO (Australia) Disqualified Trustees Register List','1801'},
 {'Indian Home Affairs Ministry Unlawful Activities','1802'},
-{'OFAC - Executive Order on the Situation in Syria','1803'}
+{'OFAC - Executive Order on the Situation in Syria','1803'},
+{'EC 2019/1731 ISIL (Da\'esh) and Al-Qaida List','1804'},
+{'EC (CFSP) 2019/1788 Burundi List','1805'},
+{'EC 2019/1779 Burundi List','1806'}
 ],r);
 

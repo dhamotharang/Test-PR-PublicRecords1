@@ -2,7 +2,6 @@
 
 /********* SEX_OFFENDERS **********/
 
-Wdog := distribute(Watchdog.File_Best_nonglb(adl_ind = 'CORE'), hash(did));
 main     := sexoffender.file_Main;
 offenses := sexoffender.File_offenses_2;
 
@@ -20,11 +19,11 @@ r := {D2C_Customers.layouts.rSex_Offenders - [Offense, Adjudication_Date]; strin
 
 r xf(main L) := transform
     self.LexID         := (unsigned6)L.did;
-    self.Name          := if(L.name_type = '0', L.fname + ' ' + L.mname + ' ' + L.lname, '');
-    self.akas          := if(L.name_type <> '0', L.fname + ' ' + L.mname + ' ' + L.lname, '');
-    self.Address       := L.prim_range + ' ' + L.predir + ' ' + L.prim_name + ' ' + L.addr_suffix + ' ' + L.postdir + ', '
+    self.Name          := stringlib.stringcleanspaces(if(L.name_type = '0', L.fname + ' ' + L.mname + ' ' + L.lname + ' ' + L.name_suffix, ''));
+    self.akas          := stringlib.stringcleanspaces(if(L.name_type <> '0', L.fname + ' ' + L.mname + ' ' + L.lname + ' ' + L.name_suffix, ''));
+    self.Address       := stringlib.stringcleanspaces(L.prim_range + ' ' + L.predir + ' ' + L.prim_name + ' ' + L.addr_suffix + ' ' + L.postdir + ', '
                 + L.unit_desig + ' ' + L.sec_range + if(L.unit_desig <> '' or L.sec_range <> '', ', ', '')
-                + L.p_city_name + ', ' + L.st + ' ' + L.zip5;
+                + L.p_city_name + ', ' + L.st + ' ' + L.zip5);
     self.Height                   := L.Height;
     self.Weight                   := L.Weight;
     self.Race                     := L.Race;
@@ -59,21 +58,15 @@ EXPORT proc_build_sex_offenders(unsigned1 mode, string8 ver, string20 customer_n
    ds := join(main_r, offenses_d, left.Seisint_Primary_Key = right.Seisint_Primary_Key, AddOffense(left, right), left outer);
    
    fullDS := ds;
-   coreDS := join(distribute(ds, hash(LexID)), Wdog, left.LexID = right.did, transform(left), local);
+   coreDS := join(distribute(ds, hash(LexID)), distribute(D2C_Customers.Files.coresDS, hash(did)), left.LexID = right.did, transform(left), local);
    coreDerogatoryDS := join(coreDS, distribute(Files.derogatoryDS, did), left.LexID = right.did, transform(left), local);
    
-   outDS_ := map( mode = 1 => fullDS,          //FULL
-                  mode = 2 => coreDS,          //QUARTERLY
-                  mode = 3 => coreDerogatoryDS //MONTHLY                  
-                );
-   outDS := dedup(outDS_, record, all);
-   sMode := map(Mode = 1 => 'full',
-                Mode = 2 => 'core',
-                Mode = 3 => 'derogatory',
-                ''
-                );
-                
-   PromoteSupers.MAC_SF_BuildProcess(outDS,'~thor_data400::output::d2c::' + sMode + '::sex_offenders',doit,2,,true,ver);
-   return if(Mode not in [1,2,3], output('sex_offenders - INVALID MODE - ' + Mode), doit);
+   inDS := map(mode = 1 => fullDS,          //FULL
+               mode = 2 => coreDS,          //QUARTERLY
+               mode = 3 => coreDerogatoryDS //MONTHLY                  
+               );
+
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 18);
+   return res;
 
 END;

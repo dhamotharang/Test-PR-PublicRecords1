@@ -2,7 +2,6 @@
 
 /********* CIVIL_CRIMINAL_RECORDS **********/
 
-Wdog   := distribute(Watchdog.File_Best_nonglb(adl_ind = 'CORE'), hash(did));
 crims  := doxie_files.File_Offenders((unsigned6)did > 0, data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
 courts := doxie_files.file_court_offenses(data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
 
@@ -10,10 +9,10 @@ EXPORT proc_build_criminals(unsigned1 mode, string8 ver, string20 customer_name)
 
    D2C_Customers.layouts.rCrims AddCourt(crims L, courts R) := transform
     self.LexID             := (unsigned6)L.did;
-    self.Name              := L.fname + ' ' + L.mname + ' ' + L.lname;
-    self.Address           := L.prim_range + ' ' + L.predir + ' ' + L.prim_name + ' ' + L.addr_suffix + ' ' + L.postdir + ', '
+    self.Name              := stringlib.stringcleanspaces(L.fname + ' ' + L.mname + ' ' + L.lname + ' ' + L.name_suffix);
+    self.Address           := stringlib.stringcleanspaces(L.prim_range + ' ' + L.predir + ' ' + L.prim_name + ' ' + L.addr_suffix + ' ' + L.postdir + ', '
                             + L.unit_desig + ' ' + L.sec_range + if(L.unit_desig  <> '' or L.sec_range <> '', ', ', '')
-                            + L.p_city_name + ', ' + L.st + ' ' + L.zip5;
+                            + L.p_city_name + ', ' + L.st + ' ' + L.zip5);
     self.County_Of_Origin  := L.County_Of_Origin;
     self.Offense_State     := L.Orig_State;
     self.Source            := L.datasource;
@@ -33,22 +32,15 @@ EXPORT proc_build_criminals(unsigned1 mode, string8 ver, string20 customer_name)
    
    ds := join(distribute(crims, hash(offender_key)), distribute(courts, hash(offender_key)), left.offender_key = right.offender_key, AddCourt(left,right), left outer, local);
    fullDS := ds;
-   coreDS := join(distribute(ds, hash(LexID)), Wdog, left.LexID = right.did, transform(left), local);
+   coreDS := join(distribute(ds, hash(LexID)), distribute(D2C_Customers.Files.coresDS, hash(did)), left.LexID = right.did, transform(left), local);
    coreDerogatoryDS := coreDS;
    
-   outDS_ := map( mode = 1 => fullDS,           //FULL
-                  mode = 2 => coreDS,           //QUARTERLY
-                  mode = 3 => coreDerogatoryDS  //MONTHLY
-                 );
-   outDS := dedup(outDS_, record, all);
-   sMode := map(Mode = 1 => 'full',
-                Mode = 2 => 'core',
-                Mode = 3 => 'derogatory',
-                ''
-                );
-                
-   PromoteSupers.MAC_SF_BuildProcess(outDS,'~thor_data400::output::d2c::' + sMode + '::civil_criminal_records',doit,2,,true,ver);
-   return if(Mode not in [1,2,3], output('civil_criminal_records - INVALID MODE - ' + Mode), doit);
+   inDS := map(mode = 1 => fullDS,           //FULL
+               mode = 2 => coreDS,           //QUARTERLY
+               mode = 3 => coreDerogatoryDS  //MONTHLY
+               );
 
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 7);
+   return res;
 
 END;

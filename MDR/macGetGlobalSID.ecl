@@ -1,4 +1,4 @@
-﻿IMPORT MDR, STD;
+﻿IMPORT _control, MDR, STD;
 
 EXPORT macGetGlobalSid(dInFile, sdata_set, sFieldName='', sGlobalSid='global_sid') := FUNCTIONMACRO
 

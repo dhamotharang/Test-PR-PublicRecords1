@@ -1,3 +1,5 @@
+import _control, Mdr, Std;
+
 layout_0010_header_base	trfBaseToOrig(layout_0010_header_base_AID	l)	:=	transform
 	self.prim_range		:=	l.clean_Address.prim_range	;
 	self.predir				:=	l.clean_Address.predir	;
@@ -29,4 +31,8 @@ layout_0010_header_base	trfBaseToOrig(layout_0010_header_base_AID	l)	:=	transfor
 	self							:=	[];
 end;
 
-export File_0010_Header_Base := project(EBR.File_0010_Header_Base_AID, trfBaseToOrig(left));
+projectBase  := project(EBR.File_0010_Header_Base_AID, trfBaseToOrig(left));
+
+addGlobalSID := mdr.macGetGlobalSID(projectBase,'EBR','','global_sid'); //DF-26349: Populate Global_SID Field
+
+export File_0010_Header_Base := addGlobalSID;
