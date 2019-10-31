@@ -1,4 +1,4 @@
-﻿import tools, _control, ut, std, Scrubs, Scrubs_Equifax_Business_Data;
+﻿import tools, _control, ut, std, Scrubs, Scrubs_Equifax_Business_Data, dops;
 
 export Build_All(
 	 string															pversion	
@@ -22,10 +22,10 @@ function
 	  ,Equifax_Business_Data.Build_Keys	(pversion).all
 		,Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Base', 'Base', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false)
 		,Equifax_Business_Data.Build_Strata(pversion	,pOverwrite,,,	pIsTesting)
-		,
-		Equifax_Business_Data.Promote().Inputfiles.using2used
+		,Equifax_Business_Data.Promote().Inputfiles.using2used
 		,Equifax_Business_Data.Promote().Buildfiles.Built2QA
 		,Equifax_Business_Data.QA_Records()
+		,dops.updateversion('EquifaxBusDataKeys',pversion,Equifax_Business_Data.Email_Notification_Lists().BuildSuccess,,'N')
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	    failure(send_emails(pversion,,not pIsTesting).buildfailure);
 	

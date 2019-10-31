@@ -34,5 +34,5 @@ pplus.global_sid;
 pplus.record_sid;
 end;
 
-export base := dataset('~thor_data400::base::phonesplusv2_scoring', layout, thor);
+export base := dataset(Phonesplus_V2.Names.phonesplusv2_scoring, layout, thor);
 end;
