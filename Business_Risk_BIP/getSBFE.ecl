@@ -8,6 +8,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 	mod_access :=
     MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
       EXPORT STRING DataRestrictionMask := linkingOptions.DataRestrictionMask;
+      EXPORT STRING DataPermissionMask := Options.DataPermissionMask;
       EXPORT UNSIGNED1 glb := linkingOptions.GLBPurpose;
       EXPORT UNSIGNED1 dppa := linkingOptions.DPPAPurpose;
       EXPORT BOOLEAN show_minors := linkingOptions.IncludeMinors;

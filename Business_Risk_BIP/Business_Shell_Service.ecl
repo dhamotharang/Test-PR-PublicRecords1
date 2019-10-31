@@ -744,6 +744,7 @@ EXPORT Business_Shell_Service() := FUNCTION
 	IndustryClass := StringLib.StringToUpperCase(TRIM(IndustryClass_In, LEFT, RIGHT));
 	STRING50	DataRestrictionMask  := Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('Data_Restriction_Mask');
 	STRING50	DataPermissionMask   := Business_Risk_BIP.Constants.Default_DataPermissionMask : STORED('Data_Permission_Mask');
+	#STORED('DataPermissionMask', DataPermissionMask); // Ensure our DataPermissionMask gets mapped in as AutostandardI DPM	
 	UNSIGNED6	HistoryDate          := 0  : STORED('HistoryDate');
 	UNSIGNED1	LinkSearchLevel      := Business_Risk_BIP.Constants.LinkSearch.Default : STORED('LinkSearchLevel');
 	UNSIGNED1	MarketingMode        := Business_Risk_BIP.Constants.Default_MarketingMode : STORED('MarketingMode');
