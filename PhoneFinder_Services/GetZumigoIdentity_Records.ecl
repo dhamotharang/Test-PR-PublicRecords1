@@ -1,55 +1,65 @@
 IMPORT doxie, Gateway, Phones, PhoneFinder_Services, STD, ut;
 
-EXPORT GetZumigoIdentity_Records(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)  dPhoneRecs,
-                                 DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
-                                 PhoneFinder_Services.iParam.SearchParams         inMod,
-                                 DATASET(Gateway.Layouts.Config) dGateways) :=
+EXPORT GetZumigoIdentity_Records(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dPhoneRecs,
+                                 DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID)  dInBestInfo,
+                                 PhoneFinder_Services.iParam.SearchParams                inMod,
+                                 DATASET(Gateway.Layouts.Config)                         dGateways) :=
 
 MODULE
 
   SHARED mod_access := PROJECT(inMod, doxie.IDataAccess);
 
-  SHARED Ph_Wireless := dPhoneRecs(phone <> '' AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
+  SHARED dWirelessPhones := dPhoneRecs(phone <> '' AND isPrimaryPhone AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
 
-  Ph_Wireless_Ddp := DEDUP(SORT(Ph_Wireless, acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip),
+  // sending in best identities name/addr to first wireless phone
+  rPfSeardchtype_Layout :=
+  RECORD(PhoneFinder_Services.Layouts.PhoneFinder.Final)
+    BOOLEAN isPiiSearch;
+  END;
+
+  rPfSeardchtype_Layout in_addr(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
+                                PhoneFinder_Services.Layouts.BatchInAppendDID r) :=
+  TRANSFORM
+    BOOLEAN isBestInfoAvail := r.did != 0;
+
+    SELF.isPiiSearch := isBestInfoAvail;
+    SELF.phone       := l.phone;
+    SELF.fname       := IF(isBestInfoAvail, r.name_first, l.fname);
+    SELF.mname       := IF(isBestInfoAvail, r.name_middle, l.mname);
+    SELF.lname       := IF(isBestInfoAvail, r.name_last, l.lname);
+    SELF.prim_range  := IF(isBestInfoAvail, r.prim_range, l.prim_range);
+    SELF.predir      := IF(isBestInfoAvail, r.predir, l.predir);
+    SELF.prim_name   := IF(isBestInfoAvail, r.prim_name, l.prim_name);
+    SELF.suffix      := IF(isBestInfoAvail, r.addr_suffix, l.suffix);
+    SELF.postdir     := IF(isBestInfoAvail, r.postdir, l.postdir);
+    SELF.unit_desig  := IF(isBestInfoAvail, r.unit_desig, l.unit_desig);
+    SELF.sec_range   := IF(isBestInfoAvail, r.sec_range, l.sec_range);
+    SELF.city_name   := IF(isBestInfoAvail, r.p_city_name, l.city_name);
+    SELF.st          := IF(isBestInfoAvail, r.st, l.st);
+    SELF.zip         := IF(isBestInfoAvail, r.z5, l.zip);
+    SELF.zip4        := IF(isBestInfoAvail, r.zip4, l.zip4);
+    SELF             := l;
+  END;
+
+  SHARED dWirelessPhonesBestInfo := JOIN(dWirelessPhones, dInBestInfo, LEFT.acctno = RIGHT.acctno, in_addr(LEFT,RIGHT), LIMIT(0), KEEP(1), LEFT OUTER);
+
+  Ph_Wireless_Ddp := DEDUP(SORT(PROJECT(dWirelessPhonesBestInfo(~isPiiSearch), PhoneFinder_Services.Layouts.PhoneFinder.Final),
+                                acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip),
                             acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip);
 
   // for phone search, we are sending upto 10 different identities per acct, by picking recent ones.
-  SHARED PhoneSrch_wireless := TOPN(GROUP(SORT(Ph_Wireless_Ddp, acctno,  -dt_last_seen, dt_first_seen, seq), acctno), 10, acctno);
+  SHARED PhoneSrch_wireless := TOPN(GROUP(SORT(Ph_Wireless_Ddp, acctno, -dt_last_seen, dt_first_seen, seq), acctno), 10, acctno);
 
-  // for pii search, sending in one primary wireless phone , if available, else one other phone per acct
+  // for pii search, sending in one primary wireless phone, if available, else one other phone per acct
   // sorting other phones(non primary) by score and dates
-
-  PII_wireless_pre := DEDUP(SORT(Ph_Wireless(isPrimaryPhone), acctno, IF(isprimaryphone, 0, 1), -phone_score, -dt_last_seen, dt_first_seen), acctno);
-
-  // sending in best identities name/addr to first wireless phone
-  PhoneFinder_Services.Layouts.PhoneFinder.Final in_addr(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
-                                                          PhoneFinder_Services.Layouts.BatchInAppendDID r)
-  := TRANSFORM
-      SELF.phone :=  l.phone;
-      SELF.fname :=  r.name_first;
-      SELF.mname :=  r.name_middle;
-      SELF.lname := r.name_last;
-      SELF.prim_range := r.prim_range;
-      SELF.predir := r.predir;
-      SELF.prim_name := r.prim_name;
-      SELF.suffix := r.addr_suffix;
-      SELF.postdir := r.postdir;
-      SELF.unit_desig := r.unit_desig;
-      SELF.sec_range := r.sec_range;
-      SELF.city_name := r.p_city_name;
-      SELF.st :=  r.st;
-      SELF.zip :=  r.z5;
-      SELF.zip4 :=  r.zip4;
-      SELF := l;
-    END;
-
-  PII_wireless := JOIN(PII_wireless_pre, dInBestInfo, LEFT.acctno = RIGHT.acctno, in_addr(LEFT,RIGHT),LIMIT(0), KEEP(1));
+  PII_wireless := DEDUP(SORT(PROJECT(dWirelessPhonesBestInfo(isPiiSearch), PhoneFinder_Services.Layouts.PhoneFinder.Final),
+                              acctno, IF(isPrimaryPhone, 0, 1), -phone_score, -dt_last_seen, dt_first_seen),
+                        acctno);
 
   Phones_wireless := PII_wireless + PhoneSrch_wireless;
 
-  Phones.Layouts.ZumigoIdentity.subjectVerificationRequest toZin(PhoneFinder_Services.Layouts.PhoneFinder.Final l) := TRANSFORM
-
+  Phones.Layouts.ZumigoIdentity.subjectVerificationRequest toZin(PhoneFinder_Services.Layouts.PhoneFinder.Final l) :=
+  TRANSFORM
     SELF.acctno := l.acctno;
     SELF.sequence_number    := l.seq;
     SELF.phone  := l.phone;
@@ -74,7 +84,6 @@ MODULE
   END;
 
   SHARED Zum_inrecs := PROJECT(Phones_wireless, toZin(LEFT));
-
 
   SHARED Zum_inMod := MODULE(Phones.IParam.inZumigoParams)
     EXPORT STRING20  Usecase             := PhoneFinder_Services.Constants.ZumigoConstants.Usecase;
