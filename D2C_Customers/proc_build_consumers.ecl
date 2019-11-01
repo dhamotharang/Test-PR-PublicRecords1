@@ -77,7 +77,7 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
                transform(left),
                left outer,
                local);
-
+               
    res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 1);
    return res;
 

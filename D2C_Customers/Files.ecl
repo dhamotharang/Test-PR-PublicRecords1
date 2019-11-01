@@ -2,6 +2,7 @@
 
 EXPORT Files := MODULE
 
+    shared TestBuild := false : stored('TestBuild');
     //pass thorugh ccpa supprerssion
     // MDR.macGetGlobalSid(hdrIn,'PersonHeaderKeys','src','global_sid');
     // mod_access                 := MODULE(doxie.IDataAccess) END; // default mod_access
@@ -11,13 +12,13 @@ EXPORT Files := MODULE
     appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
     Suppress.MAC_Suppress(infutor_hdr,pulled_ssn_hdr,appType,Suppress.Constants.LinkTypes.SSN,ssn);
     Suppress.MAC_Suppress(pulled_ssn_hdr,cleaned_best_hdr,appType,Suppress.Constants.LinkTypes.DID,did);    
-    EXPORT fullHdrDS     := cleaned_best_hdr;
+    EXPORT fullHdrDS     := choosen(cleaned_best_hdr, if(TestBuild, 1000, CHOOSEN:ALL));
 
     infutor_best := Infutor.file_infutor_best : independent;  //705,593,920
     appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
     Suppress.MAC_Suppress(infutor_best,pulled_ssn_infutor,appType,Suppress.Constants.LinkTypes.SSN,ssn);
     Suppress.MAC_Suppress(pulled_ssn_infutor,cleaned_best_infutor,appType,Suppress.Constants.LinkTypes.DID,did);    
-    EXPORT fullInfutorDS := cleaned_best_infutor;
+    EXPORT fullInfutorDS := choosen(cleaned_best_infutor, if(TestBuild, 1000, CHOOSEN:ALL));
 
     EXPORT coresDS       := Header.key_ADL_segmentation(ind1 = 'CORE'); //257,216,208 
 

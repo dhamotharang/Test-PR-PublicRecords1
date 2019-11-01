@@ -1,12 +1,12 @@
 ﻿import std;
-#stored('TestBuild', TRUE)
 
-version := (string8)std.date.today();
+version := '20191030';
 
 #workunit('protect',true);
 #workunit('name','D2C Customers Build - ' + version);
 #workunit('priority','high');
-#stored  ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com,jose.bello@lexisnexisrisk.com'); 
+#stored ('TestBuild', TRUE) 
+#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com,jose.bello@lexisnexisrisk.com'); 
 #OPTION('multiplePersistInstances',FALSE);
 
 unsigned mode := 1; //1 -> FULL, 2 -> QUARTERLY, 3 -> MONTHLY
