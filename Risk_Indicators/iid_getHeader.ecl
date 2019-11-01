@@ -15,7 +15,7 @@ export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsig
               string TransactionID = '',
               string BatchUID = '',
               unsigned6 GlobalCompanyId = 0) := function
-SHARED MOD_Access := MODULE(Doxie.IDataAccess)
+    MOD_Access := MODULE(Doxie.IDataAccess)
 		 
 		EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
 		EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
@@ -175,7 +175,6 @@ Unsigned4 Global_sid;
 end;
 risk_indicators_iid_getHeader_ccpa get_j_pre(g_inrec le, header_key ri) := TRANSFORM
 	SELF.Global_Sid := ri.Global_Sid;
-  self.did := ri.did;
   self.seq := le.seq; 
 	self.h := ri; 
 	self.valid_dob := ri.valid_dob, 
@@ -268,7 +267,6 @@ Unsigned4 Global_sid;
 end;
 risk_indicators_iid_getHeader_ccpa_b get_j_quickpre(g_inrec le, header_quick_key ri) := TRANSFORM
 	SELF.Global_Sid := ri.Global_Sid;
-  self.did := ri.did;
   self.seq := le.seq, 
 	self.came_from_fastheader := true, 
 	self.h := ri, 

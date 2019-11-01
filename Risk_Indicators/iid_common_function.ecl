@@ -1,6 +1,6 @@
 ﻿//Risk_Indicators.iid_common_function
 
-import emailv2_services,gateway,email_data,risk_indicators;
+import emailv2_services,gateway,doxie,email_data,risk_indicators;
 
 export iid_common_function(grouped DATASET(risk_indicators.Layout_Output) with_did, unsigned1 dppa, unsigned1 glb, boolean isUtility=false, 
 							boolean ln_branded, boolean suppressNearDups=false, 
@@ -14,10 +14,15 @@ export iid_common_function(grouped DATASET(risk_indicators.Layout_Output) with_d
 							unsigned4 EverOccupant_StartDate,
 							unsigned8 BSOptions, 
 							unsigned3 LastSeenThreshold = risk_indicators.iid_constants.oneyear,
-							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission
+							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+              unsigned1 LexIdSourceOptout = 1,
+              string TransactionID = '',
+              string BatchUID = '',
+              unsigned6 GlobalCompanyId = 0
 							) :=
 FUNCTION
 
+    
 // check the first record in the batch to determine if this a realtime transaction or an archive test
 production_realtime_mode := with_did[1].historydate=risk_indicators.iid_constants.default_history_date
 														or with_did[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate)[1..6];
@@ -28,7 +33,10 @@ with_ADLVelocity := risk_indicators.Boca_Shell_ADL(with_DID, isFCRA, dppa, DataR
 adlRec := if(production_realtime_mode and BSversion between 2 and 49, with_ADLVelocity, with_did);	
 
 // returns the full list of raw header records for that did																								
-with_header := risk_indicators.iid_getHeader(adlRec, dppa, glb, isFCRA, ln_branded, ExactMatchLevel, DataRestriction, CustomDataFilter, BSversion, DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, LastSeenThreshold, BSOptions);
+with_header := risk_indicators.iid_getHeader(adlRec, dppa, glb, isFCRA, ln_branded, ExactMatchLevel, DataRestriction, CustomDataFilter, BSversion, DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, LastSeenThreshold, BSOptions,LexIdSourceOptout, 
+	TransactionID, 
+	BatchUID , 
+	GlobalCompanyID);
 
 // append address hierarchy seq # to the addresses from the header
 with_hierarchy := if(bsversion >= 50, Risk_Indicators.iid_append_address_hierarchy(with_header, isFCRA, bsversion) );
