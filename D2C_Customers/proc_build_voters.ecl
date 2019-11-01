@@ -2,7 +2,7 @@
 
 /********* VOTER_REGISTRATION **********/
 
-vo	:=	VotersV2.File_Voters_Base(did > 0);
+vo	:=	VotersV2.File_Voters_Base(did > 0, D2C_Customers.SRC_Allowed.Check(19, source));
 
 EXPORT proc_build_voters(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 

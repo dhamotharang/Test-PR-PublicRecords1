@@ -2,7 +2,8 @@
 
 /********* FAA_AIRCRAFT **********/
 
-aircraft_reg  := faa.file_aircraft_registration_out((unsigned6)did_out > 0);
+//SINGLE src(AR) - ALL allowed
+aircraft_reg  := faa.file_aircraft_registration_out((unsigned6)did_out > 0); 
 aircraft_info := faa.file_aircraft_info_in;
 
 DESC_FIELDS := ['AIRCRAFT_CATEGORY_CODE', 'TYPE_AIRCRAFT', 'AIRCRAFT_WEIGHT'];
