@@ -14,7 +14,6 @@ curr_date := req_date + '_101';
 prev_date := req_date + '_100';
 //curr_date := '20191029' + '_51';
 
-
 //previous = base
 //current  = test
 
