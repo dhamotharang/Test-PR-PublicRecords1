@@ -14488,7 +14488,7 @@ pbm1803_0_1 := map(
                     SELF.final_score_424                  := final_score_424;
                     SELF.final_score_425                  := final_score_425;
                     SELF.final_score                      := final_score;
-                    SELF.pbm1803_0_1                      := pbm1803_0_1;
+                    SELF.pbm1803_0_1                      := If(ProspectAge='0',-1,	pbm1803_0_1);
                     self.Lexid                            := le.lexid;
                     self.Acctno                           := le.Acctno;
                     SELF.pb.attributes.version1           := le.attributes.version1;
@@ -14497,7 +14497,7 @@ pbm1803_0_1 := map(
                     SELF                                  := [];
 
 		#ELSE
-      SELF.attributes.version1.score1	:= If(ProspectAge='0','',	(STRING)pbm1803_0_1);
+      SELF.attributes.version1.score1	:= If(ProspectAge='0','-1',	(STRING)pbm1803_0_1);
 
 		#END
 			SELF := le;
