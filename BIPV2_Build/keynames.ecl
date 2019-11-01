@@ -45,7 +45,7 @@ module
     + aml_addr                .dall_filenames
     + biz_preferred           .dall_filenames
     + BIPv2_HRCHY.keynames            (pversion,pUseOtherEnvironment).dall_filenames
-    + BIPV2_Crosswalk.filenames(pversion,pUseOtherEnvironment).dall_keynames
+    + BIPV2_Crosswalk.filenames(pversion,pUseOtherEnvironment).dall_filenames
  //   + bipv2_proxid.keynames(pversion).attribute_matches     .dall_filenames
     + bipv2_proxid.keynames           (pversion,pUseOtherEnvironment).match_candidates_debug.dall_filenames
     + bipv2_proxid.keynames           (pversion,pUseOtherEnvironment).specificities_debug   .dall_filenames
@@ -75,6 +75,9 @@ module
     // + BIPV2_Seleid_Relative.keynames  (pversion,pUseOtherEnvironment).dall_filenames
     // + BIPV2_Best.Keynames             (pversion,pUseOtherEnvironment).dall_filenames
       // ;
+  export BIPV2AlphaKeys := 
+      BizLinkFull.keynames            (pversion,pUseOtherEnvironment).dall_filenames
+      ;
 
 	export dall_filenames := 
       BIPV2FullKeys
