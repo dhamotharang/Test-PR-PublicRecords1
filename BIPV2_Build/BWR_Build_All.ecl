@@ -10,11 +10,11 @@ PowStartIteration     := 1                     ;
 EmpDownStartIteration := 1                     ;
 EmpStartIteration     := 1                     ;
 //Number of iterations
-DotNumIterations      := 3                     ;
+DotNumIterations      := 2                     ; //2 is minimum, max of 3, convergence threshold of 99.99
 ProxNumIterations     := 2                     ;
 ProxMj6NumIterations  := 3                     ;
-ProxPostNumIterations := 3                     ; //added 1 more iteration for more convergence 6/20/2017
-Lgid3NumIterations    := 15                    ;//For S47, use 15 and will back to 8 after S47!!! change from 4 to 10 after 2/16/2016 BIP meeting. changed to 15 according to Vern's email 4/20/2016; change to 8 on 20161215
+ProxPostNumIterations := 1                     ; //added 1 more iteration for more convergence 6/20/2017
+Lgid3NumIterations    := 7                     ;//for S76, lower to 7, but that is minimum.  max is still 15, convergence threshold 99.999.  For S47, use 15 and will back to 8 after S47!!! change from 4 to 10 after 2/16/2016 BIP meeting. changed to 15 according to Vern's email 4/20/2016; change to 8 on 20161215
 PowDownNumIterations  := 2                     ;
 PowNumIterations      := 2                     ;
 EmpDownNumIterations  := 6                     ;  //On 12/17/2015 BIP meeting, we agreed to +3 more iterations, so change from 3 to 6 
