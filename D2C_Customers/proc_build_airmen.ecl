@@ -2,6 +2,7 @@
 
 /********* FAA_AIRMEN **********/
 
+//SINGLE src(AM) - ALL allowed
 airmen := faa.file_airmen_data_out((unsigned6)did_out > 0 and current_flag = 'A'); //Select ONLY ACTIVE records
 cert   := faa.file_airmen_certificate_out;
 

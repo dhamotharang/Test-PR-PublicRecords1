@@ -70,27 +70,27 @@
     PROJECT(KELOtto.Q__show_Customer_Person.Res0(cl_event_count_ < 1000 AND event_count_ < 1000 and cl_identity_count_ < 50), 
 		  TRANSFORM(ClusterRecord, SELF := LEFT, 
 			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 => 1, 0), SELF := [])) + 
-    PROJECT(KELOtto.Q__show_Customer_Address.Res0/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
+    PROJECT(KELOtto.Q__show_Customer_Address.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
 			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELF.High_Risk_Centroid := MAP(LEFT.Invalid_Address_ + LEFT.Address_Is_Vacant_ + LEFT.Address_Is_Cmra_ + LEFT.Address_Is_Po_Box_ > 0 AND LEFT.Identity_Count_ > 1 => 1, 0), SELF := LEFT)) + 
-    PROJECT(KELOtto.Q__show_Customer_Social_Security_Number.Res0/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
+    PROJECT(KELOtto.Q__show_Customer_Social_Security_Number.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
 			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELF.High_Risk_Centroid := LEFT.Identity_Count_Gt2_, SELF := LEFT)) + 
-    PROJECT(KELOtto.Q__show_Customer_Email.Res0/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
+    PROJECT(KELOtto.Q__show_Customer_Email.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
 			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELF.High_Risk_Centroid := MAP(LEFT._isdisposableemail_ + LEFT.Not_Safe_Last_Domain_Gt2_ > 0 AND LEFT.Identity_Count_ > 1=> 1, 0),SELF := LEFT)) + 
-    PROJECT(KELOtto.Q__show_Customer_Phone.Res0/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
+    PROJECT(KELOtto.Q__show_Customer_Phone.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
 			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELF.High_Risk_Centroid := MAP(LEFT.Identity_Count_ > 1 => 1, 0), SELF := LEFT, SELF := [])) + 
-    PROJECT(KELOtto.Q__show_Customer_Bank_Account.Res0/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
+    PROJECT(KELOtto.Q__show_Customer_Bank_Account.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
 			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELF.High_Risk_Centroid := MAP((LEFT.High_Risk_Routing_ = 1 OR LEFT.Identity_Count_Gt2_ > 0 ) AND LEFT.Identity_Count_ > 1 => 1, 0), SELF := LEFT, SELF := [])) + 
-    PROJECT(KELOtto.Q__show_Customer_Internet_Protocol.Res0/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
+    PROJECT(KELOtto.Q__show_Customer_Internet_Protocol.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
 			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELf.High_Risk_Centroid := MAP((LEFT.Ip_Not_Us_ + LEFT.Ip_Vpn_ + LEFT.Ip_High_Risk_City_ + LEFT.Ip_Hosted_ + LEFT.Ip_Tor_ > 0) AND LEFT.Identity_Count_ > 1 => 1, 0),SELF := LEFT));

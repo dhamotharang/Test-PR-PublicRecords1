@@ -3,7 +3,7 @@
 /********* RELATIVES **********/
 
 relatives := distribute(Relationship.key_relatives_v3(not(confidence IN ['NOISE','LOW'])), hash(did1));
-inf       := distribute(Infutor.file_infutor_best, hash(did));
+inf       := distribute(D2C_Customers.Files.fullInfutorDS, hash(did));
 
 d2c_rel1 := join(relatives, inf, left.did1 = right.did, transform(left), inner, local) : INDEPENDENT;
 d2c_rel2 := join(distribute(d2c_rel1, hash(did2)), inf, left.did2 = right.did, transform(left), inner, local) : INDEPENDENT;
@@ -88,12 +88,22 @@ MAC_LINK_DIDs(res, ds, sMode, ver) := MACRO
     PromoteSupers.MAC_SF_BuildProcess(dsLevel2,'~thor_data400::output::d2c::' + sMode + '::relatives::level2',doLevel2,2,,true, ver);
     PromoteSupers.MAC_SF_BuildProcess(dsLevel3,'~thor_data400::output::d2c::' + sMode + '::relatives::level3',doLevel3,2,,true, ver);
     PromoteSupers.MAC_SF_BuildProcess(level_st,'~thor_data400::output::d2c::' + sMode + '::relatives::level_stats',doStat,2,,true, ver);
+
+    D2C_Customers.layouts.rRelatives xf(lexid_pairs l, unsigned1 type) := TRANSFORM
+        SELF.type := type;
+        self := l;
+    END;
     
-    res := sequential(
-      doStat,
-      doLevel2,
-      doLevel3      
-      );     
+    inDS := project(uniq_pairs_level1, xf(left, 1))  + project(dsLevel2, xf(left, 2)) + project(dsLevel3, xf(left, 3));
+    //PromoteSupers.MAC_SF_BuildProcess(rel,'~thor_data400::output::d2c::' + sMode + '::relatives::level_stats',doStat,2,,true, ver);
+    do := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 4);
+    
+    // res := sequential(assert(count(d2c_rel1) <= 1000, fail(1)), do);
+    res := sequential(do);
+    //   doStat,
+    //   doLevel2,
+    //   doLevel3      
+    //   );     
 
 ENDMACRO;
 

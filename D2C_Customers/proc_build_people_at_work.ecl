@@ -2,7 +2,11 @@
 
 /********* PEOPLE_AT_WORK **********/
 
-pawBase := paw.files().base.built((unsigned6)did > 0, score>'003');
+pawBase := paw.files().base.built(
+            (unsigned6)did > 0,
+            score>'003',
+            D2C_Customers.SRC_Allowed.Check(15, source)
+            );
 
 EXPORT proc_build_people_at_work(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 

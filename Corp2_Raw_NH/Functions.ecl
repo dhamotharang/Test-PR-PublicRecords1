@@ -1,53 +1,67 @@
-IMPORT corp2, corp2_mapping;
+﻿IMPORT corp2, corp2_mapping, ut;
 
 EXPORT Functions := Module
 
-		//****************************************************************************
+    //****************************************************************************
 		//CorpLNNameTypeCD: returns the "corp_ln_name_type_cd".
-		//Input: nt => nametypeid
-		//Input: ct => corporationtypeid		
+		//Input: cd => businesstype
 		//****************************************************************************
-		EXPORT CorpLNNameTypeCD(STRING nt, STRING ct) := FUNCTION
+		EXPORT CorpLNNameTypeCD(STRING cd) := FUNCTION
 
-				uc_nt := corp2.t2u(nt);
-				uc_ct := corp2.t2u(ct);
+				uc_cd:= corp2.t2u(cd);
 
-				is_Tradename_or_Reserved := if(uc_ct in ['63','75'] and uc_nt not in ['2','14'],true,false);
-
-				RETURN map(is_Tradename_or_Reserved and uc_ct in ['63'] => '04',
-									 is_Tradename_or_Reserved and uc_ct in ['75'] => '07',				
-									 uc_nt in ['1','13'] 													=> '01',
-									 uc_nt in ['2'] 															=> '03',
-									 uc_nt in ['14'] 															=> '07',
-									 uc_nt in ['3','15','18']											=> 'P',
-									 uc_nt
+				RETURN map(uc_cd in ['DOMESTIC LIMITED LIABILITY COMPANY','FOREIGN PROFIT CORPORATION',
+				                     'FOREIGN LIMITED LIABILITY COMPANY','DOMESTIC PROFIT CORPORATION',
+														 'DOMESTIC PROFESSIONAL LIMITED LIABILITY COMPANY',
+														 'DOMESTIC PROFESSIONAL PROFIT CORPORATION',
+														 'DOMESTIC NONPROFIT CORPORATION','DOMESTIC LIMITED LIABILITY PARTNERSHIP',
+														 'FOREIGN LIMITED PARTNERSHIP','FOREIGN PROFESSIONAL PROFIT CORPORATION',
+														 'FOREIGN NONPROFIT CORPORATION','FOREIGN LIMITED LIABILITY PARTNERSHIP',
+														 'DOMESTIC LIMITED PARTNERSHIP','DOMESTIC CONSUMER COOPERATIVE',
+														 'FOREIGN PROFESSIONAL LIMITED LIABILITY COMPANY',
+														 'DOMESTIC BENEFIT CORPORATION','CORRESPONDENCE'] 													  => '01',
+									 uc_cd = 'FORCED DBA'                                     															=> '03',
+									 uc_cd = 'TRADE NAME'                                     															=> '05',
+									 uc_cd = 'FOREIGN REGISTERED CORPORATE NAME'	                                          => '11',
+									 '**|'+uc_cd
 								  );
-		END;
-
+		 END;
+		 
+		 //****************************************************************************
+		//CorpForeignDomesticInd: returns the "corp_foreign_domestic_ind".
+		//Input: nt => businesstype
 		//****************************************************************************
-		//CorpLNNameTypeDesc: returns the "corp_ln_name_type_desc".
-		//Input: nt 	=> nametypeid
-		//Input: ct 	=> corporationtypeid
-		//Input: ntd 	=> nametypedesc				
-		//****************************************************************************
-		EXPORT CorpLNNameTypeDesc(STRING nt, STRING ct, STRING ntd) := FUNCTION
+		EXPORT CorpForeignDomesticInd(STRING ind) := FUNCTION
 
-				uc_nt  := corp2.t2u(nt);
-				uc_ct  := corp2.t2u(ct);
-				uc_ntd := corp2.t2u(ntd);
+				uc_ind := corp2.t2u(ind);
 
-				is_Tradename_or_Reserved := if(uc_ct in ['63','75'] and uc_nt not in ['2','14'],true,false);
-
-				RETURN map(is_Tradename_or_Reserved and uc_ct in ['63'] => 'TRADE NAME',
-									 is_Tradename_or_Reserved and uc_ct in ['75'] => 'RESERVED',				
-									 uc_nt in ['1','13'] 													=> uc_ntd,
-									 uc_nt in ['2'] 															=> uc_ntd,
-									 uc_nt in ['14'] 															=> uc_ntd,
-									 uc_nt in ['3','15','18']											=> uc_ntd,
-									 uc_ntd
+				RETURN map(uc_ind in ['DOMESTIC LIMITED LIABILITY COMPANY','DOMESTIC PROFIT CORPORATION',
+														  'TRADE NAME','DOMESTIC PROFESSIONAL LIMITED LIABILITY COMPANY',
+														  'DOMESTIC PROFESSIONAL PROFIT CORPORATION','DOMESTIC NONPROFIT CORPORATION',
+														  'DOMESTIC LIMITED LIABILITY PARTNERSHIP','FORCED DBA',
+														  'DOMESTIC LIMITED PARTNERSHIP','DOMESTIC CONSUMER COOPERATIVE',
+														 	'DOMESTIC BENEFIT CORPORATION','CORRESPONDENCE'] 													   => 'D',
+									 uc_ind in ['FOREIGN PROFIT CORPORATION','FOREIGN LIMITED LIABILITY COMPANY',
+															'FOREIGN LIMITED PARTNERSHIP','FOREIGN PROFESSIONAL PROFIT CORPORATION',
+															'FOREIGN NONPROFIT CORPORATION','FOREIGN LIMITED LIABILITY PARTNERSHIP',
+															'FOREIGN PROFESSIONAL LIMITED LIABILITY COMPANY',
+															'FOREIGN REGISTERED CORPORATE NAME'] 													               => 'F',
+									 uc_ind  = ''                                                                            => '',
+									 '**|'+uc_ind
 								  );
+		 END;
+    
+		//********************************************************************
+		//Phone_No: cleans phone numbers and Returns a hyphenated 7 or 10 digit number 
+		//********************************************************************	
+		EXPORT PhoneNo(STRING Phone) := FUNCTION
+      ph             := stringlib.stringfilterout(phone,')( - ');
+			phone_number   := (INTEGER)ut.CleanPhone(ph); // we have first 3 digits are zeros in phones EX:0003456789 ,0000000000
+			cln_phone_nmbr := if(phone_number <> 0, (string) phone_number, '');
+			RETURN cln_phone_nmbr;
+				
 		END;
-
+		
 		//****************************************************************************
 		//State_Description: returns whether the state is a valid us state.
 		//****************************************************************************
@@ -55,65 +69,64 @@ EXPORT Functions := Module
 
 					 uc_s := corp2.t2u(stringlib.stringfilter(corp2.t2u(s),' ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
 
-	         RETURN map(uc_s = 'AA' => 'ARMED FORCES AMERICAS EXCEPT CANADA',
-											uc_s = 'AE' => 'ARMED FORCES EUROPE',
-											uc_s = 'AP' => 'ARMED FORCES PACIFIC',
-											uc_s = 'AL' => 'ALABAMA',
-											uc_s = 'AK' => 'ALASKA', 
-											uc_s = 'AR' => 'ARKANSAS', 
-											uc_s = 'AS' => 'AMERICAN SAMOA', 
-											uc_s = 'AZ' => 'ARIZONA', 
-											uc_s = 'CA' => 'CALIFORNIA', 
-											uc_s = 'CO' => 'COLORADO', 
-											uc_s = 'CT' => 'CONNECTICUT', 
-											uc_s = 'DC' => 'DISTRICT OF COLUMBIA', 
-											uc_s = 'DE' => 'DELAWARE', 
-											uc_s = 'FL' => 'FLORIDA', 
-											uc_s = 'GA' => 'GEORGIA', 
-											uc_s = 'GU' => 'GUAM', 
-											uc_s = 'HI' => 'HAWAII', 
-											uc_s = 'IA' => 'IOWA', 
-											uc_s = 'ID' => 'IDAHO', 
-											uc_s = 'IL' => 'ILLINOIS', 
-											uc_s = 'IN' => 'INDIANA', 
-											uc_s = 'KS' => 'KANSAS', 
-											uc_s = 'KY' => 'KENTUCKY', 
-											uc_s = 'LA' => 'LOUISIANA', 
-											uc_s = 'MA' => 'MASSACHUSETTS', 
-											uc_s = 'MD' => 'MARYLAND', 
-											uc_s = 'ME' => 'MAINE' , 
-											uc_s = 'MI' => 'MICHIGAN', 
-											uc_s = 'MN' => 'MINNESOTA', 
-											uc_s = 'MO' => 'MISSOURI', 
-											uc_s = 'MS' => 'MISSISSIPPI', 
-											uc_s = 'MT' => 'MONTANA', 
-											uc_s = 'NC' => 'NORTH CAROLINA', 
-											uc_s = 'ND' => 'NORTH DAKOTA', 
-											uc_s = 'NE' => 'NEBRASKA', 
-											uc_s = 'NH' => 'NEW HAMPSHIRE', 
-											uc_s = 'NJ' => 'NEW JERSEY', 
-											uc_s = 'NM' => 'NEW MEXICO', 
-											uc_s = 'NV' => 'NEVADA', 
-											uc_s = 'NY' => 'NEW YORK', 
-											uc_s = 'OH' => 'OHIO', 
-											uc_s = 'OK' => 'OKLAHOMA', 
-											uc_s = 'OR' => 'OREGON', 
-											uc_s = 'PA' => 'PENNSYLVANIA', 
-											uc_s = 'PR' => 'PUERTO RICO', 
-											uc_s = 'RI' => 'RHODE ISLAND', 
-											uc_s = 'SC' => 'SOUTH CAROLINA', 
-											uc_s = 'SD' => 'SOUTH DAKOTA', 
-											uc_s = 'TN' => 'TENNESSEE', 
-											uc_s = 'TX' => 'TEXAS', 
-											uc_s = 'US' => 'UNITED STATES', 
-											uc_s = 'UT' => 'UTAH', 
-											uc_s = 'VA' => 'VIRGINIA', 
-											uc_s = 'VI' => 'VIRGIN ISLANDS', 
-											uc_s = 'VT' => 'VERMONT', 
-											uc_s = 'WA' => 'WASHINGTON', 
-											uc_s = 'WI' => 'WISCONSIN', 
-											uc_s = 'WV' => 'WEST VIRGINIA', 
-											uc_s = 'WY' => 'WYOMING',
+	         RETURN map(uc_s = 'ARMED FORCES AMERICAS EXCEPT CANADA' => 'AA', 
+											uc_s = 'ARMED FORCES EUROPE'                 => 'AE',
+											uc_s = 'ARMED FORCES PACIFIC'                => 'AP',
+											uc_s = 'ALABAMA'                             => 'AL',
+											uc_s = 'ALASKA'                              => 'AK', 
+											uc_s = 'ARKANSAS'                            => 'AR', 
+											uc_s = 'AMERICAN SAMOA'                      => 'AS', 
+											uc_s = 'ARIZONA'                             => 'AZ', 
+											uc_s = 'CALIFORNIA'                          => 'CA', 
+											uc_s = 'COLORADO'                            => 'CO', 
+											uc_s = 'CONNECTICUT'                         => 'CT',          
+											uc_s = 'DISTRICT OF COLUMBIA'                => 'DC', 
+											uc_s = 'DELAWARE'                            => 'DE', 
+											uc_s = 'FLORIDA'                             => 'FL', 
+											uc_s = 'GEORGIA'                             => 'GA', 
+											uc_s = 'GUAM'                                => 'GU', 
+											uc_s = 'HAWAII'                              => 'HI', 
+											uc_s = 'IOWA'                                => 'IA', 
+											uc_s = 'IDAHO'                               => 'ID', 
+											uc_s = 'ILLINOIS'                            => 'IL', 
+											uc_s = 'INDIANA'                             => 'IN', 
+											uc_s = 'KANSAS'                              => 'KS', 
+											uc_s = 'KENTUCKY'                            => 'KY', 
+											uc_s = 'LOUISIANA'                           => 'LA', 
+											uc_s = 'MASSACHUSETTS'                       => 'MA', 
+											uc_s = 'MARYLAND'                            => 'MD', 
+											uc_s = 'MAINE'                               => 'ME', 
+											uc_s = 'MICHIGAN'                            => 'MI', 
+											uc_s = 'MINNESOTA'                           => 'MN', 
+											uc_s = 'MISSOURI'                            => 'MO', 
+											uc_s = 'MISSISSIPPI'                         => 'MS', 
+											uc_s = 'MONTANA'                             => 'MT', 
+											uc_s = 'NORTH CAROLINA'                      => 'NC', 
+											uc_s = 'NORTH DAKOTA'                        => 'ND', 
+											uc_s = 'NEBRASKA'                            => 'NE', 
+											uc_s = 'NEW HAMPSHIRE'                       => 'NH', 
+											uc_s = 'NEW JERSEY'                          => 'NJ', 
+											uc_s = 'NEW MEXICO'                          => 'NM', 
+											uc_s = 'NEVADA'                              => 'NV', 
+											uc_s = 'NEW YORK'                            => 'NY', 
+											uc_s = 'OHIO'                                => 'OH', 
+											uc_s = 'OKLAHOMA'                            => 'OK', 
+											uc_s = 'OREGON'                              => 'OR', 
+											uc_s = 'PENNSYLVANIA'                        => 'PA', 
+											uc_s = 'PUERTO RICO'                         => 'PR', 
+											uc_s = 'RHODE ISLAND'                        => 'RI', 
+											uc_s = 'SOUTH CAROLINA'                      => 'SC', 
+											uc_s = 'SOUTH DAKOTA'                        => 'SD', 
+											uc_s = 'TENNESSEE'                           => 'TN', 
+											uc_s = 'TEXAS'                               => 'TX', 
+											uc_s = 'UTAH'                                => 'UT', 
+											uc_s = 'VIRGINIA'                            => 'VA', 
+											uc_s = 'VIRGIN ISLANDS'                      => 'VI', 
+											uc_s = 'VERMONT'                             => 'VT', 
+											uc_s = 'WASHINGTON'                          => 'WA', 
+											uc_s = 'WISCONSIN'                           => 'WI', 
+											uc_s = 'WEST VIRGINIA'                       => 'WV', 
+											uc_s = 'WYOMING'                             => 'WY',
 											uc_s = ''   => '',
 											'**|'+uc_s
 										 );
@@ -225,64 +238,7 @@ EXPORT Functions := Module
 										 );
 		END;
 		
-		//****************************************************************************
-		//CorpAddressTypeCD: returns the address type code.
-		//****************************************************************************
-		EXPORT CorpAddressTypeCD(STRING s) := FUNCTION
-		
-				RETURN map (corp2.t2u(s) = ''   => '',
-										corp2.t2u(s) = '1'	=> 'M',
-										corp2.t2u(s) = '6'	=> 'PM',
-										corp2.t2u(s) = '7'	=> 'L',
-										corp2.t2u(s) = '8'	=> 'B',
-										corp2.t2u(s) = '9'	=> 'PP',
-										corp2.t2u(s) = '10'	=> 'R',
-										corp2.t2u(s) = '11'	=> 'PR',
-										corp2.t2u(s) = '14'	=> 'PRM',
-										corp2.t2u(s) = '15'	=> 'O',
-										corp2.t2u(s) = '16'	=> 'Q',
-										corp2.t2u(s) = '17'	=> 'W',
-										corp2.t2u(s) = '18'	=> 'U',
-										corp2.t2u(s) = '19'	=> 'PU',
-										corp2.t2u(s) = '24'	=> 'A',
-										'**|'+corp2.t2u(s)
-									 );
-		END;
-
-		//****************************************************************************
-		//CorpAddressTypeCD: returns returns the address type description.
-		//****************************************************************************
-		EXPORT CorpAddressTypeDesc(STRING s) := FUNCTION
-		
-				RETURN map (corp2.t2u(s) = ''   => '',
-										corp2.t2u(s) = '1'	=> 'MAILING',
-										corp2.t2u(s) = '6'	=> 'PREVIOUS MAILING',
-										corp2.t2u(s) = '7'	=> 'LISTING',
-										corp2.t2u(s) = '8'	=> 'BUSINESS',
-										corp2.t2u(s) = '9'	=> 'PREVIOUS BUSINESS',
-										corp2.t2u(s) = '10'	=> 'REGISTERED OFFICE',
-										corp2.t2u(s) = '11'	=> 'PREVIOUS REGISTERED OFFICE',
-										corp2.t2u(s) = '14'	=> 'PREVIOUS REGISTERED MAILING',
-										corp2.t2u(s) = '15'	=> 'OTHER',
-										corp2.t2u(s) = '16'	=> 'QUICK ACCOUNT',
-										corp2.t2u(s) = '17'	=> 'WITHDRAWAL',
-										corp2.t2u(s) = '18'	=> 'UCC',
-										corp2.t2u(s) = '19'	=> 'PREVIOUS UCC',
-										corp2.t2u(s) = '24'	=> 'ANNUAL REPORT',
-										'**|'+corp2.t2u(s)
-									 );
-		END;
-
-		//****************************************************************************
-		//CorpOrigBusTypeDesc: returns corp_orig_bus_type_desc.
-		//Note: If only special characters and/or digits, blank out.
-		//****************************************************************************
-		EXPORT CorpOrigBusTypeDesc(STRING s) := FUNCTION
-					 uc_s := corp2.t2u(s);
-					 isValidDesc := if(corp2.t2u(stringlib.stringfilterout(uc_s,' .-`!@#$%^&*()-=+_0123456789')) <> '',true,false);
-					 RETURN if(isValidDesc,regexreplace('(\\.)*(\\@)*$',uc_s,''),'');
-		END;
-
+	
 		//****************************************************************************
 		//StockClass: returns the stock class. 
 		//Note: Since stock class is only 20 in length, the incoming vendor data is
@@ -313,16 +269,6 @@ EXPORT Functions := Module
 											uc_s = 'UNDECLARED'											=> 'UNDECLARED',
 											uc_s
 										 );
-		END;
-
-		//****************************************************************************
-		//ARComment: returns the "ar_comment". 
-		//Input:		 effectivedate
-		//****************************************************************************
-		EXPORT ARComment(STRING d) := FUNCTION
-				effectivedate 					:= Corp2_Mapping.fValidateDate(d,'CCYY-MM-DD').GeneralDate;
-				effectivedateformatted 	:= if(effectivedate<>'',effectivedate[5..6]+'/'+effectivedate[7..8]+'/'+effectivedate[1..4],'');
-				RETURN if(corp2.t2u(effectivedateformatted)<>'','EFFECTIVE DATE OF ANNUAL REPORT: '+effectivedateformatted,'');
 		END;
 
 END;

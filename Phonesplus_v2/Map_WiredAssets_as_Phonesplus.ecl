@@ -1,4 +1,4 @@
-/*2010-09-07T21:13:27Z (aherzberg)
+﻿/*2010-09-07T21:13:27Z (aherzberg)
 c:\SuperComputer\Dataland\QueryBuilder\workspace\aherzberg\dataland\Phonesplus_v2\Map_WiredAssets_as_Phonesplus\2010-09-07T21_13_27Z.ecl
 */
 import Gong, ut, _validate, Mdr,phonesplus_v2,OptinCellphones, mdr;
@@ -59,6 +59,10 @@ phonesplus_v2.Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_in
 	self.ace_fips_county					:= input.county;
 	self.did											:= (unsigned)input.did;
 	self.did_score								:= (string)input.did_score_field;
+	self.source										:= if(is_royalty_paid = true,
+																				mdr.sourceTools.src_wired_assets_owned,
+																				mdr.sourceTools.src_wired_assets_royalty); //DF-25784
+	self.cellphone 								:= self.npa + self.phone7; //DF-25784																					
 	self 													:= input; 
 	self.CellPhoneIDKey         	:= hashmd5((data)self.orig_phone [length(self.orig_phone) - 6 ..length(self.orig_phone)] + 
 																					 (data)self.prim_range + 

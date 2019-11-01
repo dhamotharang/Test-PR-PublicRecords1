@@ -2,7 +2,11 @@
 
 /********* PHONES **********/
 
-f_phonesplus := Phonesplus_v2.File_phonesplus_base(did > 0, current_rec);
+f_phonesplus := Phonesplus_v2.File_phonesplus_base(
+                 did > 0,
+                 current_rec,
+                 D2C_Customers.SRC_Allowed.Check(16, vendor)
+                 );
 ut.mac_suppress_by_phonetype(f_phonesplus,cellphone,state,_fphonesplus_cell,true,did);
 _keybuild_phonesplus_base := f_phonesplus(cellphone<>'');
 ph := _keybuild_phonesplus_base(vendor not in D2C.Constants.PhonesPlusV2RestrictedSources);
