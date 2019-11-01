@@ -1,6 +1,6 @@
-﻿IMPORT _control, MDR, STD;
+﻿EXPORT macGetGlobalSid(dInFile, sdata_set, sFieldName='', sGlobalSid='global_sid') := FUNCTIONMACRO
 
-EXPORT macGetGlobalSid(dInFile, sdata_set, sFieldName='', sGlobalSid='global_sid') := FUNCTIONMACRO
+IMPORT _control, MDR, STD;
 
   // Parameters to pass to this macro:
   // dInFile = The dataset to have it's Global_SID populated by this macro (dataset)
