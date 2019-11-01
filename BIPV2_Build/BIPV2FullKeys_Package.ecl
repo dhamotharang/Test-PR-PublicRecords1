@@ -1,6 +1,6 @@
 ﻿//Compile all keys in this package in one place
 //easy to output this module to see if keys exist/are correct layout/etc
-import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3,Address_Attributes,BIPv2_HRCHY,tools,BIPV2_Crosswalk;
+import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3,Address_Attributes,BIPv2_HRCHY,tools,BIPV2_Crosswalk,BIPV2_Segmentation;
 
 EXPORT BIPV2FullKeys_Package(
 
@@ -25,6 +25,7 @@ module
   shared bestknames       := BIPV2_Best.Keynames            (pversion,puseotherenvironment);
   // shared relknames        := BIPV2_Relative.keynames        (pversion,puseotherenvironment);
   shared Seleidrelknames  := BIPV2_Seleid_Relative.keynames (pversion,puseotherenvironment);
+  shared segknames        := BIPV2_Segmentation.keynames    (pversion,puseotherenvironment);
 
   //key definitions
   export strnbr                         := BIPV2_Company_Names.files.StrNbr_SF_DS;  //file, not key, but it is in the package file
@@ -82,10 +83,7 @@ module
 
   export bip2ConsumerKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).bipToConsumer;
   export consumer2BipKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).ConsumerToBip;
-  // export consumer2BipKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).ConsumerToBipKey();
-  // export AML_Addr                       := index(Address_Attributes.key_AML_addr                   ,keynames(pversion).aml_addr.logical     );
-  // export biz_preferred                  := index(BIPV2_Company_Names.key_preferred                 ,keynames(pversion).biz_preferred.logical     );
-  // export Xlinkrefs_l_sic                := index(BizLinkFull.Key_BizHead_L_SIC.Key                 ,bizknames.refs_l_sic             .logical);
+  export seg_linkids                    := tools.macf_FilesIndex('BIPV2_Segmentation.Key_LinkIds().key                   ' ,segknames.seg_linkids                    );
 
 
 
@@ -145,6 +143,7 @@ module
     ,if(pKey in [0 ,46] ,sequential(output(46 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_sic              .logical ,100),named('Xlinkrefs_l_sic'               ))))
     ,if(pKey in [0 ,47] ,sequential(output(47 ,named('KeyNumber'),overwrite) ,output(choosen(bip2ConsumerKey              .logical ,100),named('bip2ConsumerKey'               ))))
     ,if(pKey in [0 ,48] ,sequential(output(48 ,named('KeyNumber'),overwrite) ,output(choosen(consumer2BipKey              .logical ,100),named('consumer2BipKey'               ))))
+    ,if(pKey in [0 ,49] ,sequential(output(49 ,named('KeyNumber'),overwrite) ,output(choosen(seg_linkids                  .logical ,100),named('seg_linkids'                   ))))
   );       
 /*
   regexfilter := pRegexFieldFilter;
