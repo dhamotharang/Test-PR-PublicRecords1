@@ -71,8 +71,9 @@ export shortcuts := module
     //deltabase gateways for Inquiries
   export gw_delta_dev := dataset( [{'delta_inquiry','http://rw_score_dev:Password01@10.176.68.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
   export gw_delta_prod := dataset( [{'delta_inquiry','http://delta_iid_api_user:2rch%40p1$$@10.176.69.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
+	export gw_threatmetrix := dataset([{'threatmetrix_test', 'http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7426/WsGatewayEx/?ver_=2.28'}], Risk_Indicators.Layout_Gateways_In);
+	export gw_insurancephoneheader := dataset([{'insurancephoneheader','HTTP://api_prod_gw_roxie:g0h3%40t2x@gatewayprodesp.sc.seisint.com:7726/WsGatewayEx/?ver_=1.87'}], risk_indicators.Layout_Gateways_In);
 	
-// <gateways><row><servicename>insurancephoneheader</servicename><url>http://rw_score_dev:Password01@10.176.68.164:7526/WsPrism/?ver_=1.82</url></row></gateways>
 
 	// DATA
 	shared prii_layout := RECORD

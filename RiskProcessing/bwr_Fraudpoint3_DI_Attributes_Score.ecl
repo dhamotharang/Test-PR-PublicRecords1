@@ -1,7 +1,7 @@
 ﻿//This for requesting the Fraudpoint 202 + Digital Insights attribute group
 //Returns attributes counts of up to 538 (v202 + DI)
 
-import ut, risk_indicators, models, riskwise, iesp;
+import data_services, risk_indicators, models, riskwise, iesp;
 #workunit('name','Fraudpoint 3 Score and Attributes 202 + Digital Insights');
 
 //----------------
@@ -16,7 +16,7 @@ unsigned Threads        := 30;  //number of threads to use in the soapcall
 unsigned retrys         := 5 ;  //number of retrys in the soapcall
 
 //---------------- FILE NAMES -----------------
-filename := ut.foreign_prod + 'nmontpetit::out::chase_1139_apr_dev_sample_pii';
+filename := data_services.foreign_prod + 'nmontpetit::out::chase_1139_apr_dev_sample_pii';
 outputfile := '~tfuerstenberg::out::TMX_examples_' + thorlib.wuid();
 qa_outputfile := outputfile+'_QA';
 
@@ -204,7 +204,7 @@ layout_old_acct into_fdInput(f le, INTEGER c) := TRANSFORM
                         IF(Model2 != '', modelrequest2) +
                         IF(Model3 != '', modelrequest3); //Fraudpoint now accepts up to 3 models. To pass in more then 1 model use the request structures above
   
- 	self.gateways := dataset([{'threatmetrix_test', 'http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7426/WsGatewayEx/?ver_=2.28'}], Risk_Indicators.Layout_Gateways_In)
+ 	self.gateways := riskwise.shortcuts.gw_threatmetrix;
                    /* + riskwise.shortcuts.gw_netacuityv4 */
                    /* + riskwise.shortcuts.gw_targus */;     //Can uncomment targus gateway and/or watchlists if needed
                    
