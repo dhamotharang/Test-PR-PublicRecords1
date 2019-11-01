@@ -11,7 +11,8 @@ req_date := (integer) ut.GetDate;
 
 curr_date := req_date + '_1';
 prev_date := scoring_project_ks.get_past_date(req_date, 1) + '_1';
-//prev_date := req_date + '_1';
+//prev_date := req_date + '_5';
+//prev_date := '_1';
 //curr_date := '20191029' + '_51';
 
 
@@ -274,8 +275,8 @@ score_data2 := dataset('~scoringqa::bins::socio_ks::' + curr_date + '_data', dat
    											 
     	default_rec_ds_2:=  table(defalut_ds_2,default_rec_2,product,version,process1,customer,model1);
    	
-   		score_data1_project_SOCIO := score_data1_project(product='socioeconomic_v5_batch' and (decimal10_3)score  >= 0);
-   		score_data2_project_SOCIO := score_data2_project(product='socioeconomic_v5_batch' and (decimal10_3)score  >= 0);   
+   		score_data1_project_SOCIO := score_data1_project(product='socioeconomic_v5_batch');/* and (decimal10_3)score  >= 0);*/
+   		score_data2_project_SOCIO := score_data2_project(product='socioeconomic_v5_batch');/* and (decimal10_3)score  >= 0);*/   
  
 output(score_data1_project_SOCIO,named('line244'));
 output(score_data2_project_SOCIO,named('line245')); 
@@ -410,7 +411,7 @@ output(dataset_curr,named('line_248'));
    	dataset_curr.model1;
    	// dataset_curr.score;
    	// decimal19_2 curr_response_count := count(group,dataset_curr.score >'0');
-   	decimal19_2 curr_mean:= ave(group,(real)dataset_curr.score );
+   	decimal19_2 curr_mean      := ave(group,(real)dataset_curr.score );
    	decimal19_2	curr_std_dev   := sqrt(variance(group, (real) dataset_curr.score ));
    	decimal10_3 curr_max_value := max(group,(decimal10_3)dataset_curr.score );
    	decimal10_3 curr_min_value := min(group,(decimal10_3)dataset_curr.score );
@@ -507,7 +508,7 @@ output(dataset_curr,named('line_248'));
    end;
    		
    	final_rec_ds:=	join(avg_dataset_prev,avg_dataset_curr,left.product = right.product and
-   	                                                        left.version = right.version and
+   	                                                       left.version = right.version and
    			                                                   left.process1 = right.process1 and
    			                                                   left.customer = right.customer and
    																												 left.model1 = right.model1 ,
@@ -549,9 +550,9 @@ output(dataset_curr,named('line_248'));
       	
       		end;
       		
-      		dafault_layout_curr:= record
-      	 dataset_curr_default.product;
-      	 	 dataset_curr_default.version;
+      	dafault_layout_curr:= record
+      	dataset_curr_default.product;
+        dataset_curr_default.version;
       	dataset_curr_default.process1;
       	dataset_curr_default.customer;
         // dataset_prev.flagship;
@@ -572,8 +573,8 @@ output(dataset_curr,named('line_248'));
    
    
    final_rec_default:= record	
-     string30 acctno; 	  
-     string80 product;
+    string30 acctno; 	  
+    string80 product;
    	string80 version;
    	string80 process1;
    	string80 customer;
@@ -608,7 +609,7 @@ output(dataset_curr,named('line_248'));
    
    Default_Score_Chng_layout := record
    
-     final_rec_ds_default.product; 
+    final_rec_ds_default.product; 
    	final_rec_ds_default.version;
    	final_rec_ds_default.process1 ;
    	final_rec_ds_default.customer ;
@@ -656,7 +657,7 @@ output(dataset_curr,named('line_248'));
    
    final_result  :=
       join( result1, result2,
-         left.get_score_bin = right.get_score_bin and
+        left.get_score_bin = right.get_score_bin and
    			left.flagship = right.flagship and
    			left.model = right.model ,
    			transform(recordof(final_rec),
@@ -665,7 +666,7 @@ output(dataset_curr,named('line_248'));
    			self.bin := left.get_score_bin;
    			self.prev_frequency := left.cnt_grp;
    			self.prev_proportion := left.cnt_grp/left.file_count;
-         self.Prev_Mean := left.mean;
+        self.Prev_Mean := left.mean;
    			self.prev_std_dev := left.std_dev;
    			self.prev_max_value := left.max_value;
    			self.prev_min_value := left.min_value;
@@ -680,14 +681,14 @@ output(dataset_curr,named('line_248'));
    			self.prev_response_count := left.file_count;
    			self.curr_response_count := right.file_count;			
    
-         self.curr_mean := right.mean;
+        self.curr_mean := right.mean;
    			self.curr_std_dev := right.std_dev;
    			self.curr_max_value := right.max_value;
    			self.curr_min_value := right.min_value;
    			
    			self.curr_invalid := if( left.get_score_bin = 'UNDEFINED', right.cnt_grp, 0);
    			// self.curr_exceptions := if( left.get_score_bin in ['100','101','102','103','104','200','210','222'], right.cnt_grp, 0);
-         self.curr_default := if( left.get_score_bin in ['222'], right.cnt_grp, 0);
+        self.curr_default := if( left.get_score_bin in ['222'], right.cnt_grp, 0);
    			));
    			
    			
@@ -785,7 +786,7 @@ output(dataset_curr,named('line_248'));
    			self.prev_response_count := right.file_count;
    			self.curr_response_count := left.file_count;			
    
-         self.curr_mean := 0; // left.mean;
+        self.curr_mean := 0; // left.mean;
    			self.curr_std_dev := 0; // left.std_dev;
    			self.curr_max_value := 0; // left.max_value;
    			self.curr_min_value := 0; // left.min_value;
@@ -906,7 +907,7 @@ output(dataset_curr,named('line_248'));
    												 self.diverg_stat :=power((left.curr_mean - left.prev_mean) , 2.0 ) /
    												                         ( ( power(left.curr_std_dev, 2.0) + power(left.prev_std_dev, 2.0) ) / 2.0 ) ;
    																								 
-                            self.new_check_ks := 1.22 * sqrt(( ( left.curr_response_count + left.prev_response_count) / ( left.curr_response_count * left.prev_response_count)))  ; 																								 
+                           self.new_check_ks := 1.22 * sqrt(( ( left.curr_response_count + left.prev_response_count) / ( left.curr_response_count * left.prev_response_count)))  ; 																								 
    												 self := left));
    												 
          // output(choosen(final_tally, 10000), named('final_tally')) ;					
@@ -915,11 +916,11 @@ output(dataset_curr,named('line_248'));
          ks_rec := record
    
          final_tally.flagship;
-   			final_tally.model;
-   			//final_tally.prev_bin;
+   			 final_tally.model;
+   			 //final_tally.prev_bin;
    
          string80 ks_flag := '';	
-   			// string80 rule_based_str :='';
+   			 // string80 rule_based_str :='';
    			
    			final_tally.diverg_stat;
    			
@@ -978,7 +979,7 @@ output(dataset_curr,named('line_248'));
    			
    			
    			
-   			output(table_max_ks,NAMED('Line_922'));
+   			  output(table_max_ks,NAMED('Line_922'));
    			
    				table_max_ks_out := project (table_max_ks, transform({recordof(table_max_ks) - check_ks - max_diff_proportion - max_ks   },
    																	
@@ -1035,14 +1036,14 @@ output(dataset_curr,named('line_248'));
     output(table_max_ks_out_project,NAMED('Line980'));
      
        		final_rec_stats_join:= record		  
-          string30 acctno; 
+        string30 acctno; 
         string80 product; 
       	string80 version;
-      	string80 process1 ;
-      	string80 customer ;
-      	string80 model1 ;
+      	string80 process1;
+      	string80 customer;
+      	string80 model1;
       	string80 prev_dual_valid;
-      	string80 curr_dual_valid ;
+      	string80 curr_dual_valid;
       	decimal19_2 curr_dual_valid_prev_dual_valid;
       	
       	decimal19_2 prev_response_count;
@@ -1054,10 +1055,10 @@ output(dataset_curr,named('line_248'));
       
       end;
        final_rec_stats_join_ds:= join(table_max_ks_out_project,dual_rec_ds,left.product = right.product and
-                                                             	left.version = right.version and
+                                                             	 left.version  = right.version and
       			                                                   left.process1 = right.process1 and
       			                                                   left.customer = right.customer and
-      																												 left.model1 = right.model1 ,
+      																												 left.model1   = right.model1 ,
       			transform(recordof(final_rec_stats_join),
       			self.prev_response_count 	:= left.prev_response_count ;
       			self.curr_response_count := left.curr_response_count;	
@@ -1099,7 +1100,7 @@ output(dataset_curr,named('line_248'));
     
     Dual_Pos_Scr_ds_stats_layout:= record
     
-           Dual_Pos_Scr_ds.product; 
+          Dual_Pos_Scr_ds.product; 
          	Dual_Pos_Scr_ds.version;
          	Dual_Pos_Scr_ds.process1 ;
          	Dual_Pos_Scr_ds.customer ;
@@ -1112,7 +1113,7 @@ output(dataset_curr,named('line_248'));
     
      Dual_Neg_Scr_ds_stats_layout:= record
     
-           Dual_Neg_Scr_ds.product; 
+          Dual_Neg_Scr_ds.product; 
          	Dual_Neg_Scr_ds.version;
          	Dual_Neg_Scr_ds.process1 ;
          	Dual_Neg_Scr_ds.customer ;
@@ -1124,13 +1125,13 @@ output(dataset_curr,named('line_248'));
     // Dual_Neg_Scr_ds_stats;
     
     join1_layout:= record
-     string80 product;
+    string80 product;
    	string80 version;
    	string80 process1;
    	string80 customer;
    	string80 model1;
    	string80 ks_flag;
-     decimal19_4 diverg_stat;
+    decimal19_4 diverg_stat;
    	string30 ND_Stat_Flag_10;
    	string30 ND_Stat_Flag_05;
    	decimal19_2	z_score;
@@ -1156,11 +1157,11 @@ output(dataset_curr,named('line_248'));
     
     end;
     
-    join1:=join(table_max_ks_out_project,final_rec_ds,     left.product = right.product and
-                                                           left.version = right.version and
-   			                                                   left.process1 = right.process1 and
-   			                                                   left.customer = right.customer and
-   																												 left.model1 = right.model1 ,
+    join1:=join(table_max_ks_out_project,final_rec_ds,     left.product  =  right.product and
+                                                           left.version  =  right.version and
+   			                                                   left.process1 =  right.process1 and
+   			                                                   left.customer =  right.customer and
+   																												 left.model1   =  right.model1 ,
    			transform(recordof(join1_layout),
    			self.ks_flag 	:= left.ks_flag ;
    			self.diverg_stat := left.diverg_stat;
@@ -1178,10 +1179,10 @@ output(dataset_curr,named('line_248'));
    			self.prev_min_value 	:= right.prev_min_value ;
    			self.prev_invalid := left.prev_invalid;	
    			self.curr_response_count := left.curr_response_count;			
-         self.curr_mean := right.curr_mean;		 
+        self.curr_mean := right.curr_mean;		 
    			self.curr_std_dev := right.curr_std_dev;
    			self.curr_max_value := right.curr_max_value;
-   			self.curr_min_value := right.curr_min_value;
+   			self.curr_min_value := left.curr_min_value;
    			self.curr_invalid := left.curr_invalid;	
    			self.diff_response_count:=left.curr_response_count - left.prev_response_count;
    			self.diff_mean:=right.curr_mean - right.prev_mean;
@@ -1203,15 +1204,15 @@ output(dataset_curr,named('line_248'));
     end;
    
    
-   join2:=join(join1,dual_rec_ds_mean,                      left.product = right.product and
-                                                          	 left.version = right.version and
+   join2:=join(join1,dual_rec_ds_mean,                     left.product  = right.product and
+                                                           left.version  = right.version and
    			                                                   left.process1 = right.process1 and
    			                                                   left.customer = right.customer and
-   																												 left.model1 = right.model1 ,
+   																												 left.model1   = right.model1 ,
    			transform(recordof(join2_layout),
    			
    			self.Dual_Mean_Chg := right.Dual_Mean_Chg;	
-   					self.Dual_count := right.Dual_count;	
+   			self.Dual_count := right.Dual_count;	
    			self.Dual_Max_Chg := right.Dual_Max_Chg;	
    			
    			self:=left;
@@ -1227,15 +1228,15 @@ output(dataset_curr,named('line_248'));
         end;
    					
    					         
-             join3:=join(join2,final_rec_stats_join_ds_stats,       left.product = right.product and
-                                                                    left.version = right.version and
+             join3:=join(join2,final_rec_stats_join_ds_stats,        left.product = right.product and
+                                                                     left.version = right.version and
             			                                                   left.process1 = right.process1 and
             			                                                   left.customer = right.customer and
             																												 left.model1 = right.model1 ,
             			transform(recordof(join3_layout),
             			
             			self.Dual_Perc_Pos_chg 	:= (right.Dual_Perc_Pos/left.curr_response_count)*100 ;
-            			self.Dual_Perc_Neg_chg := (right.Dual_Perc_Neg/left.curr_response_count)*100 ;
+            			self.Dual_Perc_Neg_chg  := (right.Dual_Perc_Neg/left.curr_response_count)*100 ;
             			self:=left;
             	));
           output(join3,named('join_3'));
