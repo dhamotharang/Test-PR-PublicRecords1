@@ -2,7 +2,7 @@
 
 /********* SEX_OFFENDERS **********/
 
-main     := sexoffender.file_Main;
+main     := sexoffender.file_Main(D2C_Customers.SRC_Allowed.Check(18, source_file));
 offenses := sexoffender.File_offenses_2;
 
 offenses_d := project(dedup(offenses, seisint_primary_key, Offense_description, all)

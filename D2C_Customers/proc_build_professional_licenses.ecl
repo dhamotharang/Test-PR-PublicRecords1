@@ -1,7 +1,10 @@
 ﻿import std, PromoteSupers, prof_licensev2, Watchdog, D2C;
 
 /********* PROFESSIONAL_LICENSES **********/
-pl := prof_licensev2.File_ProfLic_Base((unsigned6)did > 0, D2C_Customers.SRC_Allowed(17, Vendor));
+pl := prof_licensev2.File_ProfLic_Base(
+          (unsigned6)did > 0,
+          D2C_Customers.SRC_Allowed.Check(17, vendor)
+          );
 
 EXPORT proc_build_professional_licenses(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
