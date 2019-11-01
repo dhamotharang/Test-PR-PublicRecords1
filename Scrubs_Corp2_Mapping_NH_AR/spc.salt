@@ -1,4 +1,4 @@
-OPTIONS:-gh 
+﻿OPTIONS:-gh 
 MODULE:Scrubs_Corp2_Mapping_NH_AR
 FILENAME:In_NH
 //Uncomment up to NINES for internal or external adl
@@ -14,7 +14,7 @@ FILENAME:In_NH
 //FUZZY can be used to create new types of FUZZY linking
 
 //FIELDTYPE DEFINITIONS
-FIELDTYPE:invalid_corp_key:ALLOW(-0123456789):LENGTHS(4..)
+FIELDTYPE:invalid_corp_key:ALLOW(-0123456789ABT):LENGTHS(4..)
 FIELDTYPE:invalid_corp_vendor:ENUM(33)
 FIELDTYPE:invalid_state_origin:ENUM(NH)
 FIELDTYPE:invalid_mandatory:LENGTHS(1..)
@@ -36,7 +36,7 @@ FIELD:corp_sos_charter_nbr:TYPE(STRING32):LIKE(invalid_charter_nbr):0,0
 FIELD:ar_year:TYPE(STRING4):LIKE(invalid_numeric):0,0
 FIELD:ar_mailed_dt:TYPE(STRING8):0,0
 FIELD:ar_due_dt:TYPE(STRING8):0,0
-FIELD:ar_filed_dt:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:ar_filed_dt:TYPE(STRING8):LIKE(invalid_numeric):0,0
 FIELD:ar_report_dt:TYPE(STRING8):LIKE(invalid_date):0,0
 FIELD:ar_report_nbr:TYPE(STRING30):LIKE(invalid_ar_report_nbr):0,0
 FIELD:ar_franchise_tax_paid_dt:TYPE(STRING8):0,0
