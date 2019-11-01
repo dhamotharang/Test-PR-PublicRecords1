@@ -9,10 +9,11 @@ req_date := (integer) ut.GetDate;
 //prev_date := '20191029' + '_50';
 //curr_date := '20191029' + '_51';
 
-curr_date := req_date + '_101';
-//prev_date := scoring_project_ks.get_past_date(req_date, 1) + '100';
-prev_date := req_date + '_100';
+curr_date := req_date + '_1';
+prev_date := scoring_project_ks.get_past_date(req_date, 1) + '_1';
+//prev_date := req_date + '_1';
 //curr_date := '20191029' + '_51';
+
 
 //previous = base
 //current  = test
