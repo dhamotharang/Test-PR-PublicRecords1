@@ -5,7 +5,7 @@ version := '20191030';
 #workunit('protect',true);
 #workunit('name','D2C Customers Build - ' + version);
 #workunit('priority','high');
-#stored ('TestBuild', TRUE) 
+#stored ('TestBuild', TRUE);
 #stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com,jose.bello@lexisnexisrisk.com'); 
 #OPTION('multiplePersistInstances',FALSE);
 

@@ -49,6 +49,6 @@ EXPORT proc_build_all(unsigned1 mode = 1, string8 version = (string8)std.Date.To
           D2C_Customers.proc_build_students(mode, version, customer_name),
           D2C_Customers.proc_build_civil(mode, version, customer_name)//,
           )
-          ))//,
-         //  D2C_Customers.proc_despray(mode, version)
+          )),
+          D2C_Customers.proc_despray(mode, version)
           );
