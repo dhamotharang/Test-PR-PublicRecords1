@@ -1,8 +1,7 @@
 
 EXPORT SRC_Allowed := MODULE
 //1
-EXPORT Consumers_allowed_and_extracted :=[ 
-
+EXPORT Consumers_allowed_and_extracted :=[
         
         // These sources are used in the bulk extract and will be sub-source-filtered based on the recornds found in the extract dataset file
 

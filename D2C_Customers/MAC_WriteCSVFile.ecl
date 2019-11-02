@@ -1,7 +1,5 @@
 import PromoteSupers;
 
-
-
 EXPORT MAC_WriteCSVFile(inDS, mode, ver, record_type) := FUNCTIONMACRO
 
     TestBuild := false : stored('TestBuild');
