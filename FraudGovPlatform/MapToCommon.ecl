@@ -71,6 +71,7 @@ module
 		self.additional_address.Zip				:= left.Mailing_Zip;
 		self.additional_address.Address_Type := 'Mailing';
 		self.classification_Activity.Confidence_that_activity_was_deceitful_id	:= (unsigned2)left.deceitful_confidence;
+		self.classification_Permissible_use_access.file_type := left.file_type;
 		self:= left; 
 		self:= [];
 	)); 
