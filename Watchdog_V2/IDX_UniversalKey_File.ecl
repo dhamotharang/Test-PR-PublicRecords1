@@ -7,7 +7,7 @@ EXPORT Layout := RECORD
 dx_BestRecords.layout_watchdog_merged;
 END;
 
-SHARED FileName  := data_services.foreign_prod+'thor_data400::key::watchdog_' + doxie.Version_SuperKey;
+SHARED FileName  := Data_Services.Data_Location.Watchdog_Best +'thor_data400::key::watchdog_' + doxie.Version_SuperKey;
 
 EXPORT File      := DATASET(FileName,Layout, FLAT);
 EXPORT IndexFile := INDEX({Layout.did}, {Layout-did}, FileName);

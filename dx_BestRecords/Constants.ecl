@@ -1,6 +1,7 @@
 ﻿EXPORT Constants := MODULE
 
   // defines permissions required for accessing individual best record or fields
+	//
   EXPORT PERM_TYPE := ENUM(unsigned4,
     glb                      = 1b,
     glb_nonblank             = 10b,
