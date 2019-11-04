@@ -1,15 +1,10 @@
-﻿import $, RoxieKeyBuild;
+﻿import ConsumerFinancialProtectionBureau, RoxieKeyBuild, PromoteSupers, std;
 export Build_all(string filedate, boolean pUseProd = false, boolean isfcra = false) := function
-    $.key_BLKGRP(filedate, pUseProd, isfcra, seq_build_blkgrp, seq_move_blkgrp);
-    $.key_BLKGRP_attr_over18(filedate, pUseProd, isfcra, seq_build_blkgrp_attr_over18, seq_move_blkgrp_attr_over18);
-    $.key_census_surnames(filedate, pUseProd, isfcra, seq_build_census_surnames, seq_move_census_surnames);
-    build_keys := sequential(
-        parallel(
-            seq_build_blkgrp,seq_build_blkgrp_attr_over18,seq_build_census_surnames
-            ),
-        parallel(
-            seq_move_blkgrp,seq_move_blkgrp_attr_over18,seq_move_census_surnames    
-            )
-        );
+    ConsumerFinancialProtectionBureau.MAC_keybuild('blkgrp',filedate, pUseProd, isfcra, seq_blkgrp);
+    ConsumerFinancialProtectionBureau.MAC_keybuild('blkgrp_attr_over18',filedate, pUseProd, isfcra, seq_blkgrp_attr_over18);
+    ConsumerFinancialProtectionBureau.MAC_keybuild('census_surnames',filedate, pUseProd, isfcra, seq_census_surnames);
+    build_keys := parallel(
+                seq_blkgrp,seq_blkgrp_attr_over18,seq_census_surnames
+            );
     return build_keys;
 end;

@@ -1,13 +1,13 @@
-import $, std;
+import ConsumerFinancialProtectionBureau, std;
 export build_BLKGRP(boolean pUseProd = false, boolean isfcra = false) := function
-    data_source := $.Filenames(, pUseProd, isfcra).BaseBLKGRP_in;
-    originalLayout := $.layouts.original_BLKGRP;
+    data_source := ConsumerFinancialProtectionBureau.Filenames(, pUseProd, isfcra).BaseBLKGRP_in;
+    originalLayout := ConsumerFinancialProtectionBureau.layouts.original_BLKGRP;
     RawData := if( pUseProd,
         dataset(data_source, originalLayout, CSV(Heading(1))),
         choosen(dataset(data_source, originalLayout, CSV(Heading(1))),200) //debug faster
     );
 
-    $.layouts.BLKGRP CFPB_convert(originalLayout L, unsigned4 rsid, unsigned4 date) := TRANSFORM
+    ConsumerFinancialProtectionBureau.layouts.BLKGRP CFPB_convert(originalLayout L, unsigned4 rsid, unsigned4 date) := TRANSFORM
         self.seqno := (unsigned2) L.field1;
         self.GEOID10_BlkGrp := L.field2;
         self.State_FIPS10 := L.field3;

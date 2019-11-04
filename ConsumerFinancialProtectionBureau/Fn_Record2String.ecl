@@ -1,3 +1,4 @@
+//turns record into comma delimited string of attributes
 export Fn_Record2String(target_rec) := functionmacro
     #uniquename(CommaString);
     #uniquename(FieldCount);

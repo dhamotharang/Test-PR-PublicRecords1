@@ -1,12 +1,12 @@
-import $, std;
+import ConsumerFinancialProtectionBureau, std;
 export build_census_surnames(boolean pUseProd = false, boolean isfcra = false) := function
-    data_source := $.Filenames(, pUseProd, isfcra).BaseCensus_surnames_in;
-    OriginalLayout := $.layouts.original_census_surnames;
+    data_source := ConsumerFinancialProtectionBureau.Filenames(, pUseProd, isfcra).BaseCensus_surnames_in;
+    OriginalLayout := ConsumerFinancialProtectionBureau.layouts.original_census_surnames;
     RawData := if( pUseProd,
         dataset(data_source, originalLayout, CSV(Heading(1))),
         choosen(dataset(data_source, originalLayout, CSV(Heading(1))),200) //debug faster
     );
-    $.layouts.census_surnames CFPB_convert(OriginalLayout L, unsigned4 rsid, unsigned4 date) := TRANSFORM
+    ConsumerFinancialProtectionBureau.layouts.census_surnames CFPB_convert(OriginalLayout L, unsigned4 rsid, unsigned4 date) := TRANSFORM
         self.name := L.field1;
         self.name_rank := (UNSIGNED3) L.field2;
         self.name_count := (UNSIGNED3) L.field3;
