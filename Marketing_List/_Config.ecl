@@ -11,6 +11,7 @@ module(
 		,pGroupname						:= '36'
 		,pMaxRecordSize				:= 4096
 		,pIsTesting						:= Tools._Constants.IsDataland
+    ,pAdd_Eclcc           := true
 	))
 	
   export EmailList                      := 'laverne.bentley@lexisnexisrisk.com';
