@@ -13,8 +13,8 @@ EXPORT mdComparePackages(
 													,boolean bCaptureQueryChanges = false
 													,set of string pDatasetsToUpdate = [] // used only when bCaptureDataChanges = true
 												) := module
-	export dComparePackage := sort(dops.GetRoxiePackage(pCompareESP,pComparePort,pCompareTarget,pCompareProcess).fXMLPackageAsDataset(),partid, packageid, baseid, superfile, subfile) ;
-	export dUpdatePackage := sort(dops.GetRoxiePackage(pUpdateESP,pUpdatePort,pUpdateTarget,pUpdateProcess).fXMLPackageAsDataset(),partid, packageid, baseid, superfile, subfile);
+	export dComparePackage := sort(dops.GetRoxiePackage(pCompareESP,pComparePort,pCompareTarget,pCompareProcess).fXMLPackageAsDataset(),partid, packageid, baseid, superfile, subfile) : independent;
+	export dUpdatePackage := sort(dops.GetRoxiePackage(pUpdateESP,pUpdatePort,pUpdateTarget,pUpdateProcess).fXMLPackageAsDataset(),partid, packageid, baseid, superfile, subfile) : independent;
 
 	export rCaptureChanges := record
 			recordof(dUpdatePackage);
@@ -24,7 +24,7 @@ EXPORT mdComparePackages(
 			string sourcebaseid;
 			boolean ischanged;
 	end;
-
+	
 	export fCaptureChanges() := function
 		rCaptureChanges xGetChanges(dUpdatePackage l, dComparePackage r) := transform
 			self.ischanged := MAP(
@@ -34,15 +34,26 @@ EXPORT mdComparePackages(
 																		(l.subfile <> r.subfile or l.superfile <> r.superfile) 
 																			and l.superfile <> '' and r.superfile <> ''
 																	) or 
+																	(l.superfile = '' and r.superfile <> '') or
 																	l.packageid <> r.packageid or
 																	(l.packageid <> r.packageid and l.baseid <> r.baseid)
-																,true
+																,if (count(pDatasetsToUpdate) > 0 
+																					,if (l.packageid in pDatasetsToUpdate
+																									or r.packageid in pDatasetsToUpdate
+																								,true
+																								,false)
+																					,true)
 																,false)
 															,bCaptureDataChanges =>
-																if ((l.subfile <> r.subfile or l.superfile <> r.superfile) 
-																			and l.superfile <> '' and r.superfile <> ''
+																if (
+																		(
+																			(l.subfile <> r.subfile or l.superfile <> r.superfile) 
+																				and l.superfile <> '' and r.superfile <> ''
+																		)
+																		or (l.superfile = '' and r.superfile <> '') // new key
 																		,if (count(pDatasetsToUpdate) > 0 
 																					,if (l.packageid in pDatasetsToUpdate
+																								or r.packageid in pDatasetsToUpdate
 																								,true
 																								,false)
 																					,true)
@@ -60,6 +71,7 @@ EXPORT mdComparePackages(
 			self.sourcepackageid := r.packageid;
 			self.sourcebaseid := r.baseid;
 			self := l;
+			
 		end;
 
 		dGetChanges := join(dUpdatePackage, dComparePackage
@@ -67,8 +79,10 @@ EXPORT mdComparePackages(
 												and */left.packageid = right.packageid
 												and left.baseid = right.baseid
 												and left.superfile = right.superfile
+											
 											,xGetChanges(left,right)
-											,left outer);
+											,full outer
+											);
 		return dedup(sort(dGetChanges,partid, packageid, baseid, superfile, subfile),record);
 	end;
 
@@ -81,14 +95,16 @@ EXPORT mdComparePackages(
 																	and l.ischanged, l.sourcesubfile, l.subfile);
 			self.superfile := if ((bCaptureAllChanges or bCaptureDataChanges)  
 																	and l.ischanged, l.sourcesuperfile, l.superfile);
-			self.packageid := if ((bCaptureAllChanges or bCaptureQueryChanges)  
+			self.packageid := if ((bCaptureAllChanges or bCaptureQueryChanges or bCaptureDataChanges)  
 																	and l.ischanged, l.sourcepackageid, l.packageid);
 			self.baseid := if ((bCaptureAllChanges or bCaptureQueryChanges) 
 																	and l.ischanged, l.sourcebaseid, l.baseid);
+			
 			self := l;
+			
 		end;
 
-		dConvertToPackageLayout := project(dChanges,xConvertToPackageLayout(left));
+		dConvertToPackageLayout := dedup(sort(project(dChanges,xConvertToPackageLayout(left)),partid, packageid, baseid, superfile, subfile),record);
 		
 		return dConvertToPackageLayout;
 	end;
