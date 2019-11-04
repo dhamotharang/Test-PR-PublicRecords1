@@ -23,7 +23,7 @@ functionmacro
     
   build_name := Marketing_List._Config().name;
   
-  ecl :=  '#workunit(\'name\', Marketing_List._Config().name + \'@version@ build\');\n\n#workunit(\'priority\',\'high\');\n'
+  ecl :=  '#workunit(\'name\', Marketing_List._Config().name + \' @version@ build\');\n\n#workunit(\'priority\',\'high\');\n'
                         + 'Marketing_List.Build_All('
                         + '\'@version@\'' + '\n'
                         + ',' + #TEXT(pDataset_Best          ) + '' + '\n'

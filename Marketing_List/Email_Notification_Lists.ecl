@@ -1,10 +1,10 @@
-﻿import roxiekeybuild, _control,tools;
+﻿import roxiekeybuild, _control,tools,BIPV2_Build;
 
 export Email_Notification_Lists( boolean	pIsTesting = _Config().IsTesting ) := 
 module
 	
 	export myInfo       := 'laverne.bentley@lexisnexisrisk.com';
-	export all_hands    := myInfo + '';
+	export all_hands    := myInfo + ',' + BIPV2_Build.mod_email.emailList;
 	// export all_hands    := myInfo + ';laverne.bentley@lexisnexisrisk.com;';
 	
 	export BuildSuccess := if(pIsTesting, myInfo, all_hands);
