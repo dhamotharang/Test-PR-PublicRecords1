@@ -5,8 +5,8 @@
 // -- only issue could be if the workunit manager failed and was not able to either put a file into BIPV2_Build.files().workunit_history_.qa
 // --   or it did not even output a particular file because of a failure.  This should be exceedingly rare.
 // ds_extra := dataset([
-   // {'~thor_data400::key::bizlinkfull::20181002a::proxid::meow'                       ,'prod_esp.br.seisint.com'}
-  // ,{'~thor_data400::key::bizlinkfull::20181002a::proxid::refs::l_address1'           ,'prod_esp.br.seisint.com'}
+   // {'~thor_data400::key::bizlinkfull::20181002a::proxid::meow'                       ,'uspr-prod-thor-esp.risk.regn.net'}
+  // ,{'~thor_data400::key::bizlinkfull::20181002a::proxid::refs::l_address1'           ,'uspr-prod-thor-esp.risk.regn.net'}
 // ],{string name,string esp});
 // to get the restore and/or delete working, you may have to add the output of this: ut.Credentials().fGetEncodedValues() as a constant to this: ut.Credentials().mac_add2Soapcall()
 // in your sandbox to prevent errors since it is stored in a file and that causes errors.

@@ -36,11 +36,6 @@ functionmacro
     ,self.proxid_level.state              := left.st                ;
     ,self.proxid_level.zip5               := left.zip               ; 
     ,self.proxid_level.county             := left.fips_state + left.fips_county ;
-    // ,self.proxid_level.msa                := left.msa               ; 
-    // ,self.proxid_level.err_stat           := left.err_stat          ;
-    // ,self.proxid_level.age_of_company     := left.age_of_company    ; 
-    // ,self.proxid_level.dt_first_seen      := left.dt_first_seen     ;
-    // ,self.proxid_level.dt_last_seen       := left.dt_last_seen      ; 
     ,self.proxid_level.business_phone     := left.business_phone    ;
                                             
     ,self.seleid_level.business_name      := right.business_name     ;     
@@ -49,11 +44,6 @@ functionmacro
     ,self.seleid_level.state              := right.st                ;
     ,self.seleid_level.zip5               := right.zip               ; 
     ,self.seleid_level.county             := right.fips_state + right.fips_county ;
-    // ,self.seleid_level.msa                := right.msa               ; 
-    // ,self.seleid_level.err_stat           := right.err_stat          ;
-    // ,self.seleid_level.age_of_company     := right.age_of_company    ; 
-    // ,self.seleid_level.dt_first_seen      := right.dt_first_seen     ;
-    // ,self.seleid_level.dt_last_seen       := right.dt_last_seen      ; 
     ,self.seleid_level.business_phone     := right.business_phone    ;
 
     ,self                 := left
@@ -121,61 +111,6 @@ functionmacro
     ,self                                   := left
   ) ,hash ,left outer);
   
-/*  
-  ds_industry_codes   := Marketing_List.Best_Industry_Codes (ds_base_best   ,ds_mrktg_list_best );
-  ds_best_emps_sales  := Marketing_List.Best_Sales_And_Employees(
-                           pdca_base        
-                          ,peq_biz_base     
-                          ,poshair_base     
-                          ,pcortera_base    
-                          ,pinfutor_base    
-                          ,paccutrend_base  
-                          ,pEmployees_Ranking
-                          ,pSales_Ranking    
-                        );
-                        
-  ds_both := join(ds_mrktg_list_best  ,ds_mrktg_list_base ,left.proxid = right.proxid ,transform(recordof(left)
-    ,self.msa             := right.msa
-    ,self.err_stat        := right.err_stat
-    ,self.age_of_company  := right.age_of_company
-    ,self.dt_first_seen   := right.dt_first_seen
-    ,self.dt_last_seen    := right.dt_last_seen
-    ,self.business_email  := right.business_email
-    ,self                 := left
-
-  ),hash);
-
-  ds_both_2 := join(ds_both ,ds_industry_codes  ,left.proxid = right.proxid ,transform(recordof(left)
-    ,self.sics    := right.sics
-    ,self.naicss  := right.naicss
-    ,self         := left
-  ) ,hash ,left outer);
-
-  ds_add_emp := join(ds_both_2 ,ds_best_emps_sales  ,left.proxid = right.proxid ,transform(recordof(left)
-    ,self.number_of_employees := right.number_of_employees
-    ,self.sales               := right.sales
-    ,self.src_sales           := right.source
-    ,self                     := left
-  ) ,hash ,left outer);
-
-  outputdebug := parallel(
-     output(choosen(ds_mrktg_list_base  ,300) ,named('ds_mrktg_list_base' ),all)
-    ,output(choosen(ds_mrktg_list_best  ,300) ,named('ds_mrktg_list_best' ),all)
-    ,output(choosen(ds_both             ,300) ,named('ds_both'            ),all)
-    ,output(choosen(ds_both_2           ,300) ,named('ds_both_2'          ),all)
-    ,output(choosen(ds_industry_codes   ,300) ,named('ds_industry_codes'  ),all)
-    ,output(choosen(ds_add_emp          ,300) ,named('ds_add_emp'         ),all)
-  );
-
-  ds_return_result := project(ds_add_emp ,Marketing_List.Layouts.base);
-
-  #IF(pDebug = true)
-    return when(ds_return_result  ,outputdebug);
-  #ELSE
-    return ds_return_result;
-  #END
-
-*/
   return ds_both_best_both_base_plus_Industry_and_sales;
   
 endmacro;

@@ -40,13 +40,12 @@ Sales_desc = Sales description (27% pop).  Sample values:  revenue, sales, inter
 
   ds_cortera_base_normexec := Cortera.proc_createExecutives(ds_cortera_base);
 
-  // go with 
   ds_dca_base_filt       := ds_dca_base                (pID != 0  ,(integer)trim(rawfields.emp_num           )  > 0 or  (trim(rawfields.Sales ) != '' and regexfind('(revenue|sales)',rawfields.Sales_Desc,nocase)));
   ds_eq_biz_base_filt    := ds_eq_biz_base             (pID != 0  ,(integer)trim(efx_corpempcnt              )  > 0 or  (trim(efx_corpamount  ) != '' and regexfind('(revenue|sales)',efx_corpamounttp     ,nocase)));
   ds_oshair_base_filt    := ds_oshair_base             (pID != 0  ,(integer)Number_In_Establishment             > 0 );
   ds_cortera_base_filt   := ds_cortera_base_normexec   (pID != 0  ,(integer)trim(TOTAL_EMPLOYEES             )  > 0 or   trim(TOTAL_SALES     ) != '');
   ds_infutor_base_filt   := ds_infutor_base            (pID != 0  ,         trim(employee_code               ) != '');
-  ds_accutrend_base_filt := ds_accutrend_base          (pID != 0  ,(integer)trim(rawfields.EMP_SIZE          )  > 0 );
+  ds_accutrend_base_filt := ds_accutrend_base          (pID != 0  ,(integer)trim(rawfields.EMP_SIZE          )  > 0 );                                                                                                      
 
 
   mapinfutoremp(string1 pempcode) := map(
@@ -105,8 +104,8 @@ Sales_desc = Sales description (27% pop).  Sample values:  revenue, sales, inter
     ,self.annual_revenue            := right.annual_revenue
     ,self.source                    := right.source
     ,self.annual_revenue_rank_order := right.annual_revenue_rank_order
-    ,self.pID                       := if(left.pID != 0  ,left.pID  ,right.pID)
-    ,self.dt_last_seen              := if(left.pID != 0  ,left.dt_last_seen  ,right.dt_last_seen)
+    ,self.pID                       := if(left.pID != 0  ,left.pID            ,right.pID          )
+    ,self.dt_last_seen              := if(left.pID != 0  ,left.dt_last_seen   ,right.dt_last_seen )
   )  ,hash ,full outer);
   
   ds_stats := dataset([
