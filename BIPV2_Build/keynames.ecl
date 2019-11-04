@@ -79,6 +79,10 @@ module
       BizLinkFull.keynames            (pversion,pUseOtherEnvironment).dall_filenames
       ;
 
+  export BIPV2AlphaKeys := 
+      BizLinkFull.keynames            (pversion,pUseOtherEnvironment).dall_filenames
+      ;
+
 	export dall_filenames := 
       BIPV2FullKeys
     + BIPV2WeeklyKeys
