@@ -28,8 +28,11 @@ FUNCTION
                            SELF := []));
   payoad_IH_recs := $.Functions.GetIHPayloadData(ValidSearchLexids, isFCRA);
   
+  all_recs := delta_IH_recs + payoad_IH_recs;
+  all_recs_filter := all_recs((integer)ppc not in [420,426]); // dropping banko transactions before release (11/04/19); to be removed once in place on data side.
+
   // now combine results and remove diplicates. 
-  all_IH_recs := DEDUP(SORT(delta_IH_recs + payoad_IH_recs,RECORD,EXCEPT UniqueId),
+  all_IH_recs := DEDUP(SORT(all_recs_filter,RECORD,EXCEPT UniqueId),
                        EXCEPT isDeltabaseSource,UniqueId); // we will keep only most recent records from deltabase, not available in index; in case of duplicates we will keep records pulled from index  
 
   recent_IH_recs := all_IH_recs(
@@ -37,6 +40,7 @@ FUNCTION
       OR (FCRA.FCRAPurpose.isEmploymentScreening((INTEGER) ppc) AND  
       ut.fn_date_is_ok(todaysdate, (STRING8)InquiryDate, 2))
     );
+
  
   recent_srtd_recs := CHOOSEN(SORT(recent_IH_recs, -InquiryDate,UniqueId,TransactionID),iesp.Constants.FCRAInqHist.MAX_RECORDS);
  
