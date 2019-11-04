@@ -9,8 +9,7 @@ EXPORT proc_build_all(
   ,pcortera_base                = 'Marketing_List.Source_Files().cortera'              
   ,pinfutor_base                = 'Marketing_List.Source_Files().infutor'              
   ,paccutrend_base              = 'Marketing_List.Source_Files().accutrend'            
-  ,pcontact_linkids_base        = 'Marketing_List.Source_Files().contacts_key'            
-  ,pcontact_title_linkids_base  = 'Marketing_List.Source_Files().contact_Titles_key'      
+  ,pDataset_Crosswalk           = 'Marketing_List.Source_Files().crosswalk'
   ,pEmployees_Ranking           = 'Marketing_List._Config().ds_sources_of_number_of_employees'
   ,pSales_Ranking               = 'Marketing_List._Config().ds_sources_of_sales_revenue'
   ,pMrktg_BitMap                = 'Marketing_List._Config().Marketing_Bitmap'
@@ -18,7 +17,8 @@ EXPORT proc_build_all(
   ,pDoSample                    = 'false'
   ,pDebug                       = 'false'
   ,pCompileTest                 = 'false'
-) :=
+  ,pRun_in_Background           = 'true'                                       
+  
 functionmacro
   
   import workman,tools;
@@ -28,22 +28,21 @@ functionmacro
   ecl :=  '#workunit(\'name\', Marketing_List._Config().name + \'@version@ build\');\n\n#workunit(\'priority\',\'high\');\n'
                         + 'Marketing_List.Build_All('
                         + '\'@version@\'' + '\n'
-                        + ',' + #TEXT(pDataset_Best              ) + '' + '\n'
-                        + ',' + #TEXT(pDataset_Base              ) + '' + '\n'
-                        + ',' + #TEXT(pdca_base                  ) + '' + '\n'
-                        + ',' + #TEXT(peq_biz_base               ) + '' + '\n'
-                        + ',' + #TEXT(poshair_base               ) + '' + '\n'
-                        + ',' + #TEXT(pcortera_base              ) + '' + '\n'
-                        + ',' + #TEXT(pinfutor_base              ) + '' + '\n'
-                        + ',' + #TEXT(paccutrend_base            ) + '' + '\n'
-                        + ',' + #TEXT(pcontact_linkids_base      ) + '' + '\n'
-                        + ',' + #TEXT(pcontact_title_linkids_base) + '' + '\n'
-                        + ',' + #TEXT(pEmployees_Ranking         ) + '' + '\n'
-                        + ',' + #TEXT(pSales_Ranking             ) + '' + '\n'
-                        + ',' + #TEXT(pMrktg_BitMap              ) + '' + '\n'
-                        + ',' + #TEXT(pMrktg_Approved_Sources    ) + '' + '\n'
-                        + ',' + #TEXT(pDoSample                  ) + '' + '\n'
-                        + ',' + #TEXT(pDebug                     ) + '' + '\n'
+                        + ',' + #TEXT(pDataset_Best          ) + '' + '\n'
+                        + ',' + #TEXT(pDataset_Base          ) + '' + '\n'
+                        + ',' + #TEXT(pdca_base              ) + '' + '\n'
+                        + ',' + #TEXT(peq_biz_base           ) + '' + '\n'
+                        + ',' + #TEXT(poshair_base           ) + '' + '\n'
+                        + ',' + #TEXT(pcortera_base          ) + '' + '\n'
+                        + ',' + #TEXT(pinfutor_base          ) + '' + '\n'
+                        + ',' + #TEXT(paccutrend_base        ) + '' + '\n'
+                        + ',' + #TEXT(pDataset_Crosswalk     ) + '' + '\n'
+                        + ',' + #TEXT(pEmployees_Ranking     ) + '' + '\n'
+                        + ',' + #TEXT(pSales_Ranking         ) + '' + '\n'
+                        + ',' + #TEXT(pMrktg_BitMap          ) + '' + '\n'
+                        + ',' + #TEXT(pMrktg_Approved_Sources) + '' + '\n'
+                        + ',' + #TEXT(pDoSample              ) + '' + '\n'
+                        + ',' + #TEXT(pDebug                 ) + '' + '\n'
                         + ');';
                         
   cluster := Marketing_List._Config().Groupname;
@@ -52,6 +51,7 @@ functionmacro
       ,pOutputFilename   := '~bipv2_build::' + pversion + '::workunit_history::Marketing_List'
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly      := pCompileTest
+      ,pDont_Wait        := pRun_in_Background
   );
 
   return Kick_Off_Build;

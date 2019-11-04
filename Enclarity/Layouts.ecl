@@ -476,8 +476,6 @@ export layouts:= Module
 			string9		clean_ssn;
 			string9		best_ssn;
 			BIPV2.IDlayouts.l_xlink_ids;
-			unsigned4 								global_sid					:= 24201; // Source ID for Enclarity - CCPA project 20190612 
-			unsigned8 								record_sid; 
 		end;
 		
 	export license_base	:= RECORD
@@ -707,8 +705,6 @@ export layouts:= Module
 			Sanction_input.sanc1_rein_date;
 
 			BIPV2.IDlayouts.l_xlink_ids;
-			unsigned4 								global_sid					:= 24201; // Source ID for Enclarity - CCPA project 20190612 
-			unsigned8 								record_sid; 
 	END;
 	
 	EXPORT individual_exception_base := record
@@ -717,7 +713,7 @@ export layouts:= Module
 			License_input.lic_num_in;
 			License_input.lic_num;
 	END;
-			
+
 	EXPORT autokey_common	:= RECORD
 			individual_base - 
 				[xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];
