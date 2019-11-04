@@ -1,4 +1,4 @@
-﻿IMPORT Address,BKForeclosure,codes,Property,STD;
+﻿IMPORT Address,BKForeclosure,codes,Property,STD,ut;
 #option('multiplePersistInstances',FALSE);
 
 EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
@@ -23,9 +23,17 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
     SELF.document_type := CHOOSE(uReoNod, lreo.doc_type_cd, lnod.doc_type );
     SELF.document_desc := CHOOSE(uReoNod, lreo.document_desc, lnod.document_desc );
     SELF.recording_date := CHOOSE(uReoNod, lreo.recording_date, lnod.recording_dt );
-    SELF.document_nbr := CHOOSE(uReoNod, lreo.recording_doc_num, lnod.recording_doc_num );
-    SELF.document_book := CHOOSE(uReoNod, lreo.recording_book_num, lnod.book_number );
-    SELF.document_pages := CHOOSE(uReoNod, lreo.recording_page_num, lnod.page_number );
+		SELF.document_year	:= Fn_get_document_date(CHOOSE(uReoNod, lreo.recording_doc_num, lnod.recording_doc_num ));
+		TempDocNbr				:= CHOOSE(uReoNod, lreo.recording_doc_num, lnod.recording_doc_num );
+    SELF.document_nbr := IF(LENGTH(STD.Str.Filter(TempDocNbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'))>12 AND REGEXFIND('[^0-9]',STD.Str.Filter(TempDocNbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')[1..2]),
+														STD.Str.Filter(TempDocNbr[7..],'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'),
+														IF(LENGTH(STD.Str.Filter(TempDocNbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'))>12 AND REGEXFIND('^[0-9]',STD.Str.Filter(TempDocNbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')[1..2]),
+															STD.Str.Filter(TempDocNbr[9..],'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'),
+															STD.Str.Filter(TempDocNbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')));
+		TempDocBook					:= STD.Str.Filter(CHOOSE(uReoNod, lreo.recording_book_num, lnod.book_number ),'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+    SELF.document_book	:= IF(LENGTH(TRIM(TempDocBook))>6 AND REGEXFIND('^[0]+',TempDocBook),ut.rmv_ld_zeros(TempDocBook),TempDocBook);
+		TempDocPages				:= STD.Str.Filter(CHOOSE(uReoNod, lreo.recording_page_num, lnod.page_number ),'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-');			 
+    SELF.document_pages := IF(LENGTH(TRIM(TempDocPages))>6 AND REGEXFIND('^[0]+',TempDocPages),ut.rmv_ld_zeros(TempDocPages),TempDocPages);
     SELF.title_company_name := CHOOSE(uReoNod, lreo.title_co_name, '' );
 		TempFirstBorrowerFirstName	:= CHOOSE(uReoNod, lreo.buyer1_fname, lnod.borrower1_fname );
 		TempFirstBorrowerLastName		:= CHOOSE(uReoNod, IF(lreo.name1_first = '', '',lreo.buyer1_lname),
