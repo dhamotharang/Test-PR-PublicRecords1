@@ -144,6 +144,10 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 		candidates_personheader      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.personheader, timestamp ) : INDEPENDENT;
 		update_history_file_personheader	:= AccountMonitoring.fn_update_history_file( candidates_personheader, product_config.personheader, timestamp );
 
+		// ***** Email *****
+		candidates_email      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.email, timestamp ) : INDEPENDENT;
+		update_history_file_email 	:= AccountMonitoring.fn_update_history_file( candidates_email, product_config.email, timestamp );
+
 
 
 		// Union all records, maintaining record order on each node ('&' -- ref. Lang. Guide, p. 26); then filter.
@@ -172,7 +176,8 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 										& IF(product_config.mvr.product_is_in_mask,candidates_mvr)
 										& IF(product_config.aircraft.product_is_in_mask,candidates_aircraft)
 										& IF(product_config.watercraft.product_is_in_mask,candidates_watercraft)
-										& IF(product_config.personheader.product_is_in_mask,candidates_personheader);
+										& IF(product_config.personheader.product_is_in_mask,candidates_personheader)
+										& IF(product_config.email.product_is_in_mask,candidates_email);
 		
 		// We check for 0 hashvalue here because we don't want to return history records that simply reflect
 		// a deleted portfolio record.
@@ -211,7 +216,8 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 													 IF(product_config.mvr.product_is_in_mask,update_history_file_mvr),
 													 IF(product_config.aircraft.product_is_in_mask,update_history_file_aircraft),
 													 IF(product_config.watercraft.product_is_in_mask,update_history_file_watercraft),
-													 IF(product_config.personheader.product_is_in_mask,update_history_file_personheader)
+													 IF(product_config.personheader.product_is_in_mask,update_history_file_personheader),
+													 IF(product_config.email.product_is_in_mask,update_history_file_email)
 													);
 		
 		RETURN SEQUENTIAL(UpdateRoxieLikeSuperfiles,

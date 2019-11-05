@@ -289,7 +289,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 							(
 								output(p_dListToProcess,,vKeyDiffFileListPrefix+p_dopsdatasetname,overwrite)
 								,fHoldPreviousLogical(p_dListToProcess)
-								/*,output(WsWorkunits.soapcall_WUWaitComplete
+								,output(WsWorkunits.soapcall_WUWaitComplete
 																(WsWorkunits.Create_Wuid_Raw
 																		(
 																		'#workunit(\'name\',\'[KEYDIFF]: '+ p_dopsdatasetname +'\');\r\n'
@@ -303,7 +303,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																		,pWait := 180
 																		,pReturnOnWait := true
 																		,pesp := p_esp
-																	))*/
+																	))
 							)
 						,fail('**** RUN ON *THOR (NOT HTHOR)* CLUSTER *****')
 						);

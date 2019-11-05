@@ -1139,7 +1139,7 @@ end;
 		c_base_d	:= new_base_d(record_type <> 'H' or (record_type = 'H' and clean_dob =''));
 		h_base_d	:= new_base_d(record_type = 'H' and clean_dob <> '');
 
-		dob_file	:= dedup(sort(distribute(Enclarity.Files().prov_birthdate_base.built(clean_date_of_birth<>'' and record_type <> 'H'), hash(group_key, dt_vendor_last_reported)), group_key, dt_vendor_last_reported, local), record, local);
+		dob_file	:= sort(distribute(Enclarity.Files().prov_birthdate_base.built(clean_date_of_birth<>'' and record_type <> 'H'), hash(group_key)), group_key, local);
 		c_dob_d		:= JOIN(sort(distribute(c_base_d, hash(group_key)), group_key, local), dob_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({new_base_d}
@@ -1163,7 +1163,7 @@ end;
 										);
 							
 		all_dob	:= c_dob_d + h_dob_d;
-		dedup_all_dob	:= dedup(sort(distribute(all_dob, hash(group_key, dt_vendor_last_reported, record_type)), group_key, dt_vendor_last_reported, record_type, local), record, local);
+		dedup_all_dob	:= dedup(all_dob, all);
 		sort_dob	:= fn_rollup(dedup_all_dob);
 		c_all_dob	:= sort_dob(record_type <> 'H' or (record_type = 'H' and clean_ssn = ''));
 		h_all_dob	:= sort_dob(record_type = 'H' and clean_ssn <> '');
@@ -1190,7 +1190,7 @@ end;
 										);
 										
 		all_ssn := c_base_s + h_base_s;
-		dedup_all_ssn := dedup(sort(distribute(all_ssn, hash(group_key, dt_vendor_last_reported, record_type)), group_key, dt_vendor_last_reported, local), record, local);
+		dedup_all_ssn := dedup(all_ssn, all);
 		sort_ssn	:= fn_rollup(dedup_all_ssn);
 	
 		fac_file	:= distribute(Enclarity.Files().facility_base.built, hash(group_key));
@@ -1206,7 +1206,7 @@ end;
 										,LOCAL
 										);
 		
-		dedup_base_f := dedup(sort(distribute(base_f, hash(sloc_group_key, group_key, dt_vendor_last_reported, record_type)), sloc_group_key, group_key, dt_vendor_last_reported, record_type, local), record, local);
+		dedup_base_f := dedup(base_f, all);
 		sort_sloc	:= fn_rollup(dedup_base_f);
 	
 		base_f1	:= JOIN(sort(distribute(sort_sloc, hash(billing_group_key)), billing_group_key, local), fac_file_dedup
@@ -1219,7 +1219,7 @@ end;
 										,LOCAL
 										);
 		
-		dedup_base_f1 := dedup(sort(distribute(base_f1, hash(billing_group_key, group_key, dt_vendor_last_reported, record_type)), billing_group_key, group_key, dt_vendor_last_reported, record_type, local), record, local);
+		dedup_base_f1 := dedup(base_f1, all);
 		sort_bill	:= fn_rollup(dedup_base_f1);
 		dist_bill	:= distribute(sort_bill, hash(group_key, prepped_name, addr_key, prepped_addr1, prepped_addr2, normed_name_rec_type, addr_phone, sloc_phone, sloc_group_key, billing_group_key));		
 		
@@ -1257,8 +1257,7 @@ end;
 		d_rid	:= PROJECT(dist_bill, GetSourceRID(left));
 		sort_rid	:= fn_rollup(d_rid);
 		// needs_did	:= sort_rid;	// Product wants to re-append with each build
-		// needs_did	:= dedup(sort_rid, all);	// Product wants to re-append with each build
-		needs_did	:= dedup(sort(distribute(sort_rid, hash(group_key, dt_vendor_last_reported, record_type)), group_key, dt_vendor_last_reported, record_type, local), record, local);	// Product wants to re-append with each build
+		needs_did	:= dedup(sort_rid, all);	// Product wants to re-append with each build
 		dedup_needs_did	:= dedup(sort(distribute(needs_did, hash(clean_ssn, clean_dob, fname, mname, lname, name_suffix, prim_range,
 									prim_name, sec_range, zip, st, clean_phone)), clean_ssn, clean_dob, fname, mname, lname, name_suffix, prim_range,
 									prim_name, sec_range, zip, st, clean_phone, local), clean_ssn, clean_dob, fname, mname, lname, name_suffix, prim_range,
@@ -1313,14 +1312,14 @@ end;
 					,LOCAL);		
 
 		all_did	:= rejoin_did;
-		dedup_all_did := dedup(sort(distribute(all_did, hash(group_key, dt_vendor_last_reported, record_type)), group_key, dt_vendor_last_reported, record_type, local), record, local);
+		dedup_all_did := dedup(all_did, all);
 		sort_did	:= fn_rollup(dedup_all_did);
 		has_best	:= sort_did(best_ssn <>'' and best_ssn <> '0');
 		needs_best	:= sort_did(best_ssn = '' or best_ssn = '0');
 		
 		did_add.MAC_Add_SSN_By_DID(needs_best,did,best_ssn,d_ssn);
 		all_best	:= has_best + d_ssn;
-		dedup_all_best := dedup(sort(distribute(all_best, hash(group_key, dt_vendor_last_reported, record_type)), group_key, dt_vendor_last_reported, record_type, local), record, local);
+		dedup_all_best := dedup(all_best, all);
 		has_bestbd	:= dedup_all_best(best_dob > 0);
 		needs_bestbd	:= dedup_all_best(best_dob = 0);
 
@@ -1482,7 +1481,7 @@ end;
 
 		endfile	:= rejoin_lnpid;
 		// rolled_end:=fn_rollup(endfile);
-		rolled_end:=dedup(sort(distribute(endfile, hash(group_key, dt_vendor_last_reported, record_type)), group_key, dt_vendor_last_reported, record_type, local), record, local);
+		rolled_end:=dedup(endfile, all);
 		RETURN rolled_end;
 	END;
 	
@@ -2653,8 +2652,21 @@ end;
 										LEFT.sanc1_desc			  = RIGHT.sanc1_desc,
 										last_rollup(LEFT,RIGHT)
 										,LOCAL);	
-
-		RETURN final_set;
+		
+		sort_final_set	:= sort(distribute(final_set, hash(group_key, sanc1_state, sanc1_lic_num)), group_key, sanc1_state,  sanc1_lic_num, local);
+		
+		exception_lu	  := sort(Enclarity.files().exceptions.qa, group_key, lic_state, lic_num, local);
+		
+		get_exceptions	:= join(sort_final_set, exception_lu, 
+							left.group_key				= right.group_key	
+					and left.sanc1_state			= right.lic_state
+					and left.sanc1_lic_num		= right.lic_num
+			,TRANSFORM(enclarity.Layouts.sanction_base,
+					 SELF.record_type			:= if(((left.group_key = right.group_key) and (left.sanc1_state = right.lic_state) and (left.sanc1_lic_num = right.lic_num)),'H', left.record_type)
+					,SELF									:= left)
+					,LEFT OUTER, LOOKUP);					
+					
+		RETURN get_exceptions;
 	END;
 	
 	EXPORT Collapse_Base := FUNCTION

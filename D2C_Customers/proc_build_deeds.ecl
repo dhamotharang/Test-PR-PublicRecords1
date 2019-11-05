@@ -2,11 +2,15 @@
 
 /********* DEEDS_MORTGAGES **********/
 
+//Recs filtered based on ln_fares_id[1..2]
 dLNPropertyDeed   := ln_propertyv2.File_Deed;
-dLNPropertySearch := ln_propertyv2.File_Search_DID(did > 0);
+dLNPropertySearch := ln_propertyv2.File_Search_DID(did > 0, D2C_Customers.SRC_Allowed.Check(20, ln_fares_id));
 
 //Will include up to 10 years of deed & mortgage data
-Property_for_10yrs := dLNPropertySearch(Std.Date.YearsBetween((unsigned4)process_date ,Std.Date.Today()) < 10 and source_code = 'OP' and ln_fares_id[1..2] <> 'OM');
+Property_for_10yrs := dLNPropertySearch(
+                        Std.Date.YearsBetween((unsigned4)process_date,
+                        Std.Date.Today()) < 10 and source_code = 'OP' and ln_fares_id[1..2] <> 'OM'
+                        );
 
 dPD  :=	distribute(dLNPropertyDeed,hash(ln_fares_id));
 dPS  :=	distribute(Property_for_10yrs,hash(ln_fares_id));
