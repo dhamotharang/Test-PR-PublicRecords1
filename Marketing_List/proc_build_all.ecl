@@ -1,4 +1,4 @@
-﻿import BIPV2_Files,tools,BIPV2,BIPV2_ProxID,bipv2_build;
+﻿import BIPV2,bipv2_build;
 EXPORT proc_build_all(
    pversion                     = 'BIPV2.KeySuffix'
   ,pDataset_Best                = 'Marketing_List.Source_Files().bip_best'
@@ -18,14 +18,12 @@ EXPORT proc_build_all(
   ,pDebug                       = 'false'
   ,pCompileTest                 = 'false'
   ,pRun_in_Background           = 'true'                                       
-  
+) :=   
 functionmacro
-  
-  import workman,tools;
-  
+    
   build_name := Marketing_List._Config().name;
   
-  ecl :=  '#workunit(\'name\', Marketing_List._Config().name + \'@version@ build\');\n\n#workunit(\'priority\',\'high\');\n'
+  ecl :=  '#workunit(\'name\', Marketing_List._Config().name + \' @version@ build\');\n\n#workunit(\'priority\',\'high\');\n'
                         + 'Marketing_List.Build_All('
                         + '\'@version@\'' + '\n'
                         + ',' + #TEXT(pDataset_Best          ) + '' + '\n'
@@ -47,6 +45,8 @@ functionmacro
                         
   cluster := Marketing_List._Config().Groupname;
   
+  import Workman;
+  
   Kick_Off_Build := Workman.mac_WorkMan(ecl ,pversion,cluster,1         ,1        ,pBuildName := build_name,pNotifyEmails := Marketing_List.Email_Notification_Lists().BuildSuccess
       ,pOutputFilename   := '~bipv2_build::' + pversion + '::workunit_history::Marketing_List'
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
@@ -55,6 +55,5 @@ functionmacro
   );
 
   return Kick_Off_Build;
-  
   
 endmacro;

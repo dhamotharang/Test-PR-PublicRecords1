@@ -83,12 +83,12 @@ module
   export LocalEsp               := if(IsDev  ,DevEsp  ,ProdEsp   );
   export LocalEsps              := if(IsDev  ,DevEsps ,ProdEsps  );
   
-  export Esp2Hthor(string pEsp) := map( pEsp in DevEsps       => dev_hthor  
+  export Esp2Hthor(string pEsp) := trim(map( pEsp in DevEsps       => dev_hthor  
                                   ,     pEsp in ProdEsps      => prod_hthor   
                                   ,     pEsp in AlphaProdEsps => alpha_prod_hthor   
                                   ,     pEsp in AlphaDevEsps  => alpha_dev_hthor   
                                   ,                              ''
-                                  );
+                                  ));
   export Esp2Name (string pEsp) := if(pEsp in DevEsps ,dev_name   ,prod_name    );
   
   export LocalHthor             := Esp2Hthor(LocalEsp);
