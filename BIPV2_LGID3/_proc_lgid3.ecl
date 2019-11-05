@@ -343,7 +343,7 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
       'BIPV2_LGID3 Controller ' + pversion + ' ' + (string)startiter + '-' + (string)(startiter + numiters - 1);
   export MultIter_run(
      startIter    = '\'\''  //leave it default blank to start where you left off.  pass in a number to start at that iteration #
-    ,numIters     = '15'
+    ,numIters     = '7'
     ,doInit       = 'true'
     ,doSpec       = 'true'
     ,doIter       = 'true'
@@ -369,8 +369,10 @@ functionmacro
                         ,'SlicesPerformed'
                         // ,'ProxidsCreatedByCleave'
                         ,'LinkBlockSplits'
+                        ,'recordsrejected0'
+                        ,'unlinkablerecords0'
                        ];
-    StopCondition   := '(PostClusterCount / PreClusterCount * 100.0) > (99.9)';
+    StopCondition   := '(PostClusterCount / PreClusterCount * 100.0) > (99.999)';
     SetNameCalculations := ['Convergence_PCT','Convergence_Threshold'];
 
     kickInit	:= Workman.mac_WorkMan(eclInit,version,cluster,1,1,pBuildName := 'LGID3Init',pNotifyEmails := BIPV2_Build.mod_email.emailList
@@ -383,13 +385,13 @@ functionmacro
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly      := pCompileTest
    );
-    kickiters := Workman.mac_WorkMan(eclIter,version,cluster,startIter,numiters + 1,numiters
+    kickiters := Workman.mac_WorkMan(eclIter,version,cluster,startIter,15,numiters
         ,pSetResults          := eclsetResults
         ,pStopCondition       := StopCondition
         ,pSetNameCalculations := SetNameCalculations
         ,pBuildName           := 'LGID3Iters'
         ,pNotifyEmails        := BIPV2_Build.mod_email.emailList
-        ,pOutputFilename      := '~bipv2_build::@version@_@iteration@::workunit_history::proc_lgid3.iterations'
+        ,pOutputFilename      := '~bipv2_build::@version@::workunit_history::proc_lgid3.iterations'
         ,pOutputSuperfile     := '~bipv2_build::qa::workunit_history' 
         ,pCompileOnly         := pCompileTest
     );
