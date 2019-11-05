@@ -105,7 +105,7 @@ EXPORT i_DID	:= RECORD
 END;
 
 EXPORT i_LinkIDs	:= RECORD
-	BIPV2.IDlayouts.l_xlink_ids;
+	BIPV2.IDlayouts.l_key_ids_bare;
 	unsigned	email_rec_key;
 END;
 

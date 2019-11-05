@@ -1,13 +1,14 @@
 ﻿﻿IMPORT $, Data_Services, Doxie, BIPV2;
 	   
 EXPORT Key_LinkIds := MODULE
+
   // DEFINE THE INDEX
-  export Key := INDEX(
+  export Key := INDEX(	   
      BIPV2.IDlayouts.l_key_ids_bare, //{UltID,OrgID,SELEID,ProxID,POWID,EmpID,DotID},    
-     $.Layouts.i_LinkIDs - BIPV2.IDlayouts.l_xlink_ids,    
+     $.Layouts.i_LinkIDs,    
      Data_Services.Data_location.Prefix('Email_Data')+'thor_200::key::email_dataV2::'+doxie.Version_SuperKey+'::LinkIDs');  
   
-	//DEFINE THE INDEX ACCESS
+	// DEFINE THE INDEX ACCESS
   export kFetch(
     dataset(BIPV2.IDlayouts.l_xlink_ids) inputs, 
     string1 Level = BIPV2.IDconstants.Fetch_Level_DotID,  //The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
@@ -17,7 +18,7 @@ EXPORT Key_LinkIds := MODULE
     ) :=
   FUNCTION
 
-    BIPV2.IDmacros.mac_IndexFetch(inputs, Key, out, Level)
+    BIPV2.IDmacros.mac_IndexFetch(inputs, Key, out, Level);
     return out;                                          
 
   END;
