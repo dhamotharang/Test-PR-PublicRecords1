@@ -1,4 +1,4 @@
-export layout_MA := 
+﻿export layout_MA := 
 record
 string3       STATEABREV;
 string22      REG_NUM;
@@ -22,9 +22,9 @@ string2       STATE;
 string10      ZIP;
 string50      COUNTY;
 string5       FIPS;
-string20      ID;
+//string20      ID;
 string50      DESCRIPTION;
-string10      STATUS;
+string15      STATUS;
 string8       EXPIRATION_DATE;
 string20      MODEL;
 string3       COLOR_TYP_CODE_PRIMARY;

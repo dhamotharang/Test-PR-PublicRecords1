@@ -13,8 +13,8 @@ EXPORT Copy2_Storage_Thor_Parallel(
   ,pWorkmanSuper     = '\'\''
   ,tempname          = '\'\''
   ,pCluster          = '\'thor400_24_store\''
-  ,pEclserver        = '\'prod_esp.br.seisint.com\''//10.241.20.202
-  ,pSourceDali       = '\'prod_dali.br.seisint.com\''
+  ,pEclserver        = '\'uspr-prod-thor-esp.risk.regn.net\''//10.241.20.202
+  ,pSourceDali       = '\'uspr-prod-thor-dali.risk.regn.net\''
   ,pOutputEcl        = 'false'
   
 ) := 

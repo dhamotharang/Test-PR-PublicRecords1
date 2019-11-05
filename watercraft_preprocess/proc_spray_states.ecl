@@ -205,7 +205,7 @@ function
 			pServerIP 															// SourceIP
 			,pDirectory + pFolderDate 							// SourceDirectory
 			,'IA*'+pInfolinkQtr+'.txt' 							// directory_filter
-			,766 																		// record_size
+			,678 																		// record_size
 			,'~thor_data400::in::watercraft_ia_'+pFolderDate+'_raw' // Thor_filename_template
 			,[ {'~thor_data400::in::watercraft_raw_ia'}	]	// dSuperfilenames
 			,pGroupName 														// fun_Groupname
@@ -271,7 +271,7 @@ function
 			pServerIP 															// SourceIP
 			,pDirectory + pFolderDate 							// SourceDirectory
 			,'MA*'+pInfolinkQtr+'.txt' 							// directory_filter
-			,782 																		// record_size
+			,767 																		// record_size
 			,'~thor_data400::in::watercraft_ma_'+pFolderDate+'_raw' // Thor_filename_template
 			,[ {'~thor_data400::in::watercraft_raw_ma'}	]	// dSuperfilenames
 			,pGroupName 														// fun_Groupname
@@ -315,7 +315,7 @@ function
 			pServerIP 															// SourceIP
 			,pDirectory + pFolderDate 							// SourceDirectory
 			,'MI*'+pInfolinkQtr+'.txt' 							// directory_filter
-			,563 																		// record_size
+			,813 																		// record_size
 			,'~thor_data400::in::watercraft_mi_'+pFolderDate+'_raw' // Thor_filename_template
 			,[ {'~thor_data400::in::watercraft_raw_mi'}	]	// dSuperfilenames
 			,pGroupName 														// fun_Groupname

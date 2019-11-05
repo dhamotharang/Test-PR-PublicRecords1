@@ -73,8 +73,9 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 															,true
 															,false);
 			isPatchFileExists := STD.File.FileExists(patchFilename);
-			isKPatch := if (~isPatchFileExists
-														and STD.File.FileExists(l.previouslogicalfile)
+			isKPatch := if (~isPatchFileExists // patch file doesn't exist
+														and isFileExists // keydiff file exists
+														and STD.File.FileExists(l.previouslogicalfile) // previous file exists
 													,true
 													,false
 											);
@@ -87,7 +88,9 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 			self.iskeypatchexist := isPatchFileExists;
 			self.newfile := STD.File.FileExists(l.newlogicalfile);
 			self.previousfile := STD.File.FileExists(l.previouslogicalfile);
-			self.dSuperFileList := STD.File.LogicalFileSuperOwners(l.previouslogicalfile);
+			self.dSuperFileList := if(STD.File.FileExists(l.previouslogicalfile)
+																,STD.File.LogicalFileSuperOwners(l.previouslogicalfile)
+																,dataset([],STD.File.FsLogicalFileNameRecord));
 																	
 			self := l;
 		end;
@@ -235,7 +238,9 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 									,nothor(apply(global(dStatus,few)
 											,sequential
 													(
-														fSuperFileTransaction(superfile,keydifffile,'keydiff')
+														if(STD.File.FileExists(keydifffile)
+															,STD.File.SetFileDescription(keydifffile,previouslogicalfile+'|'+newlogicalfile))
+														,fSuperFileTransaction(superfile,keydifffile,'keydiff')
 														,IF (holdpreviousforkeydiff
 																,sequential
 																		(
@@ -259,7 +264,6 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 		return if (~regexfind('hthor', STD.System.Job.Target())
 						,sequential
 								(
-									// add to super to hold the previous key so it is not deleted
 									output(choosen(dStatus,1000),named('keypatch_records'))
 									,apply(dStatus(iskeypatch)
 										,fKeyPatch(attributename
@@ -289,7 +293,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 							(
 								output(p_dListToProcess,,vKeyDiffFileListPrefix+p_dopsdatasetname,overwrite)
 								,fHoldPreviousLogical(p_dListToProcess)
-								/*,output(WsWorkunits.soapcall_WUWaitComplete
+								,output(WsWorkunits.soapcall_WUWaitComplete
 																(WsWorkunits.Create_Wuid_Raw
 																		(
 																		'#workunit(\'name\',\'[KEYDIFF]: '+ p_dopsdatasetname +'\');\r\n'
@@ -303,7 +307,35 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																		,pWait := 180
 																		,pReturnOnWait := true
 																		,pesp := p_esp
-																	))*/
+																	))
+							)
+						,fail('**** RUN ON *THOR (NOT HTHOR)* CLUSTER *****')
+						);
+	end;
+	
+	export fSpawnKeyPatchWrapper(dataset(rListToProcess) p_dListToProcess
+															,string p_dopsdatasetname = STD.System.Job.User()
+															,boolean holdpatchedinsuper = true) := function
+															
+		return if (~regexfind('hthor', STD.System.Job.Target())
+						,sequential
+							(
+								output(p_dListToProcess,,vKeyPatchFileListPrefix+p_dopsdatasetname,overwrite)
+								,output(WsWorkunits.soapcall_WUWaitComplete
+																(WsWorkunits.Create_Wuid_Raw
+																		(
+																		'#workunit(\'name\',\'[KEYPATCH]: '+ p_dopsdatasetname +'\');\r\n'
+																		+ '#workunit(\'priority\',\'high\');\r\n'
+																		+ 'ds := dataset(\''+vKeyPatchFileListPrefix+p_dopsdatasetname+'\',dops.modKeydiff().rListToProcess,thor);\r\n'
+																			+ 'dops.modKeydiff(\''+p_esp+'\',\''+p_location+'\',\''+p_environment+'\').fRunKPatch(ds,'+if (holdpatchedinsuper,'true','false')+')'
+																			,STD.System.Job.Target()
+																			,p_esp
+																			,'8010'
+																			)
+																		,pWait := 180
+																		,pReturnOnWait := true
+																		,pesp := p_esp
+																	))
 							)
 						,fail('**** RUN ON *THOR (NOT HTHOR)* CLUSTER *****')
 						);
