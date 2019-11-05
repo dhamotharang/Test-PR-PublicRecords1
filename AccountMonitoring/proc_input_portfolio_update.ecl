@@ -81,6 +81,7 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 		process_documents_aircraft					:= process_input_file(fnms.documents.aircraft.remote			 	 ,fnms.documents.aircraft.update);
 		process_documents_watercraft				:= process_input_file(fnms.documents.watercraft.remote   	 	 ,fnms.documents.watercraft.update);
 		process_documents_personheader				:= process_input_file(fnms.documents.personheader.remote   	 	 ,fnms.documents.personheader.update);
+		process_documents_email     				:= process_input_file(fnms.documents.email.remote   	 	    ,fnms.documents.email.update);
 
 
 		spray_all_files := PARALLEL(
@@ -110,7 +111,8 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 			process_documents_mvr.spray,
 			process_documents_aircraft.spray,
 			process_documents_watercraft.spray,
-			process_documents_personheader.spray
+			process_documents_personheader.spray,
+			process_documents_email.spray
 		);
 		
 		update_all_superfiles := PARALLEL(
@@ -140,7 +142,8 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 			process_documents_mvr.update,
 			process_documents_aircraft.update,
 			process_documents_watercraft.update,
-			process_documents_personheader.update
+			process_documents_personheader.update,
+			process_documents_email.update
 		);
 			
 		RETURN SEQUENTIAL( IF( NOT valid_spray_criteria, 

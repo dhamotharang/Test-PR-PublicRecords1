@@ -1,4 +1,4 @@
-﻿import tools,bipv2_proxid,bipv2_proxid_mj6,BizLinkFull,BIPV2_Best,BIPV2_Relative,TopBusiness_BIPV2,BIPV2_Seleid_Relative,bipv2_lgid3,BIPv2_HRCHY,BIPV2_Crosswalk;
+﻿import tools,bipv2_proxid,bipv2_proxid_mj6,BizLinkFull,BIPV2_Best,BIPV2_Relative,TopBusiness_BIPV2,BIPV2_Seleid_Relative,bipv2_lgid3,BIPv2_HRCHY,BIPV2_Crosswalk,BIPV2_Segmentation;
 
 EXPORT keynames(
 
@@ -59,6 +59,7 @@ module
     // + BIPV2_Relative.keynames         (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Seleid_Relative.keynames  (pversion,pUseOtherEnvironment).dall_filenames
     + TopBusiness_BIPV2.KeyNames      (pversion,pUseOtherEnvironment).dall_filenames
+    + BIPV2_Segmentation.keynames     (pversion,pUseOtherEnvironment).dall_filenames
     )
     (~regexfind('ext_data',logicalname,nocase)) //remove external xlink keys because they are not in this package
     ;
@@ -74,6 +75,9 @@ module
     // + BIPV2_Seleid_Relative.keynames  (pversion,pUseOtherEnvironment).dall_filenames
     // + BIPV2_Best.Keynames             (pversion,pUseOtherEnvironment).dall_filenames
       // ;
+  export BIPV2AlphaKeys := 
+      BizLinkFull.keynames            (pversion,pUseOtherEnvironment).dall_filenames
+      ;
 
 	export dall_filenames := 
       BIPV2FullKeys

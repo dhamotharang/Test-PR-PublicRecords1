@@ -2,7 +2,7 @@
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','Scrubs_Corp2_Mapping_NE_Main.BWR_Scrubs - Checking field validity in a file - SALT V3.11.4');
 IMPORT Scrubs_Corp2_Mapping_NE_Main,SALT311;
-infile := Scrubs_Corp2_Mapping_NE_Main.In_in_file;
+infile := Scrubs_Corp2_Mapping_NE_Main.in_file;
 mod_scrubs := Scrubs_Corp2_Mapping_NE_Main.Scrubs;
 expandedfile := mod_scrubs.FromNone(infile).ExpandedInfile;
 fromexpandedGlobal := mod_scrubs.FromExpanded(expandedfile);
