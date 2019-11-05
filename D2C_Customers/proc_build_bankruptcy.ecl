@@ -1,6 +1,9 @@
 ﻿import PromoteSupers, Watchdog, BankruptcyV2;
 
 /********* BANKRUPTCY **********/
+//SRC code - 'BA'
+//SOURCE IS NOT AVAILALBE IN THE DATASET
+//PACER is the only source indicated as bulk and consumer restricted by default (consult legal)
 
 BKSearchDS := bankruptcyV2.file_bankruptcy_search_v3(name_type='D' and lname!='' and prim_name!='');
 BKMainDS   :=	bankruptcyV2.file_bankruptcy_main_v3(case_number!='');

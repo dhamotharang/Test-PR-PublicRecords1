@@ -388,8 +388,8 @@ export NH := MODULE;
 		AR_TranslateBitMap		 := output(AR_T);
 
 		//Submits Profile's stats to Orbit
-		AR_SubmitStats 			   := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_NH_AR').SubmitStats;
-		AR_ScrubsWithExamples  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_NH_AR').CompareToProfile_with_Examples;
+		AR_SubmitStats 			   := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_NH_AR').SubmitStats;
+		AR_ScrubsWithExamples  := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_NH_AR').CompareToProfile_with_Examples;
 
 		AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
@@ -468,8 +468,8 @@ export NH := MODULE;
 		Event_TranslateBitMap		 	:= output(Event_T);
 
 		//Submits Profile's stats to Orbit
-		Event_SubmitStats 			 := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_NH_Event').SubmitStats;
-		Event_ScrubsWithExamples := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_NH_Event').CompareToProfile_with_Examples;
+		Event_SubmitStats 			 := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_NH_Event').SubmitStats;
+		Event_ScrubsWithExamples := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_NH_Event').CompareToProfile_with_Examples;
 
 		Event_ScrubsAlert				 	:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment	  := Scrubs.fn_email_attachment(Event_ScrubsAlert);
@@ -548,8 +548,8 @@ export NH := MODULE;
 		Main_TranslateBitMap			:= output(Main_T);
 
 		//Submits Profile's stats to Orbit
-		Main_SubmitStats 			    := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_NH_Main').SubmitStats;
-		Main_ScrubsWithExamples   := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_NH_Main').CompareToProfile_with_Examples;
+		Main_SubmitStats 			    := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_NH_Main').SubmitStats;
+		Main_ScrubsWithExamples   := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_NH_Main').CompareToProfile_with_Examples;
 
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
@@ -680,8 +680,8 @@ export NH := MODULE;
 		Stock_TranslateBitMap			:= output(Stock_T);
 
 		//Submits Profile's stats to Orbit
-		Stock_SubmitStats 			  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Stock','ScrubsAlerts', Stock_OrbitStats, version,'Corp_NH_Stock').SubmitStats;
-		Stock_ScrubsWithExamples  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Stock','ScrubsAlerts', Stock_OrbitStats, version,'Corp_NH_Stock').CompareToProfile_with_Examples;
+		Stock_SubmitStats 			  := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Stock','ScrubsAlerts', Stock_OrbitStats, version,'Corp_NH_Stock').SubmitStats;
+		Stock_ScrubsWithExamples  := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Stock','ScrubsAlerts', Stock_OrbitStats, version,'Corp_NH_Stock').CompareToProfile_with_Examples;
 
 		Stock_ScrubsAlert					:= Stock_ScrubsWithExamples(RejectWarning = 'Y');
 		Stock_ScrubsAttachment		:= Scrubs.fn_email_attachment(Stock_ScrubsAlert);
@@ -784,8 +784,7 @@ export NH := MODULE;
 												 )
 										);
 										
-//	isFileDateValid := if((string)std.date.today() between ut.date_math(filedate,-30) and ut.date_math(filedate,30),true,false);
-	isFileDateValid := if((string)std.date.today() between ut.date_math(filedate,-360) and ut.date_math(filedate,360),true,false);
+	isFileDateValid := if((string)std.date.today() between ut.date_math(filedate,-30) and ut.date_math(filedate,30),true,false);
 	return sequential (	 if(isFileDateValid
 													,mapNH
 													,sequential (Corp2_Mapping.Send_Email(state_origin,filedate).InvalidFileDateParm

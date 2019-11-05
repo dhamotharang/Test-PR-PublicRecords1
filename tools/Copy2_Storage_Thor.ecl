@@ -6,8 +6,8 @@ export  Copy2_Storage_Thor(
   ,string  tempname          = ''
   ,string  pCluster          = 'thor400_24_store'
   ,boolean pDeleteSourceFile = false
-  ,string  pEclserver        = 'prod_esp.br.seisint.com'//10.241.20.202
-  ,string  pSourceDali       = 'prod_dali.br.seisint.com'
+  ,string  pEclserver        = 'uspr-prod-thor-esp.risk.regn.net'//10.241.20.202
+  ,string  pSourceDali       = 'uspr-prod-thor-dali.risk.regn.net'
 ) := 
 Function
 
