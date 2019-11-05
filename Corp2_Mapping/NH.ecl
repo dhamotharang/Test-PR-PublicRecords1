@@ -5,223 +5,121 @@ export NH := MODULE;
 
 	export Update(string fileDate, string version, boolean pShouldSpray = Corp2_Mapping._Dataset().bShouldSpray, boolean pOverwrite = false, pUseProd = Tools._Constants.IsDataland) := Function
 	
-		state_origin			 				:= 'NH';
-		state_fips	 				 			:= '33';
-		state_desc	 			 				:= 'NEW HAMPSHIRE';
+		state_origin			 		:= 'NH';
+		state_fips	 				 	:= '33';
+		state_desc	 			 		:= 'NEW HAMPSHIRE';
 		
-		Corporation			 					:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.Corporation.Logical,hash(CorporationID)),record,local),record,local) : independent;
-		Address					 					:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.Address.Logical,hash(CorporationID)),record,local),record,local) : independent;
-		Filing					 					:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.Filing.Logical,hash(CorporationID)),record,local),record,local) : independent;
-		Merger										:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.Merger.Logical,hash(MergerID)),record,local),record,local) : independent;
-		MergerSurvivor						:= distribute(Merger,hash(SurvivorCorporationID));
-		MergerNonSurvivor					:= distribute(Merger,hash(MergedCorporationID));
-		CorporationName	 					:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.CorporationName.Logical,hash(CorporationID)),record,local),record,local) : independent;
-		Officer					 					:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.Officer.Logical,hash(CorporationID)),record,local),record,local) : independent;
-		Stock						 					:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.Stock.Logical,hash(CorporationID)),record,local),record,local) : independent;
+		export Corporation		:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.Corporation.Logical,hash(BusinessID)),record,local),record,local) : independent;
+		export Address				:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.Address.Logical,hash(BusinessID)),record,local),record,local) : independent;
+		export Filing				  := dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.Filing.Logical,hash(BusinessID)),record,local),record,local) : independent;
+		export RegAgent				:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.RegAgent.Logical,hash(BusinessID)),record,local),record,local) : independent;
+		export PrevNames			:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.PrevNames.Logical,hash(BusinessID)),record,local),record,local) : independent;
+		export Principals			:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.Principals.Logical,hash(BusinessID)),record,local),record,local) : independent;
+		export PrinPurp      	:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.PrinPurp.Logical,hash(BusinessID)),record,local),record,local) : independent;
+		export Stock					:= dedup(sort(distribute(Corp2_Raw_NH.Files(fileDate,puseprod).Input.Stock.Logical,hash(BusinessID)),record,local),record,local) : independent;
+		
+		//Normalize Business Name
+	  Corp2_Raw_NH.Layouts.TempCorporationLayoutIn NormBusName(Corp2_Raw_NH.Layouts.CorporationLayoutIn l, unsigned1 cnt) := transform,
+		  skip(cnt = 2 and corp2.t2u(l.HomeStateName) = '')
+		    self.NormBusinessName       := choose(cnt,l.BusinessName,l.HomeStateName);
+			  self.NormBusinessTypeCode   := choose(cnt,Corp2_Raw_NH.Functions.CorpLNNameTypeCD(l.BusinessType),'10');
+				self.NormFilingCode         := choose(cnt,'','H');
+				self.NormDateInJurisdiction := choose(cnt,'',l.DateInJurisdiction);
+			  self 							          := l;
+			  self                        := [];
+		end;
+		
+	  NormBusinessName := normalize(Corporation, 2, NormBusName(left, counter));
+		
+		//Normalize Registered Agent
+		Corp2_Raw_NH.Layouts.TempRALayoutIn NormalizeRA(Corp2_Raw_NH.Layouts.RegAgentLayoutIn l, unsigned1 cnt) := transform,
+			skip(cnt = 2 and corp2.t2u(l.RAMailingAddress + l.RAMailingAddress2 + l.RAMailingCity) = '' or
+					 corp2.t2u(l.RegAgentName) = 'NO REGISTERED AGENT ON FILE')
+				self.NormRAName         := l.RegAgentName;	 
+				self.NormRAType         := l.RegAgentType;
+				self.NormRAAddressType  := choose(cnt,'R','M');		
+				self.NormRAAddress      := choose(cnt,l.RAPrinOfficeAddress,l.RAMailingAddress);              
+				self.NormRAAddress2     := choose(cnt,l.RAPrinOfficeAddress2,l.RAMailingAddress2);                     
+				self.NormRACity         := choose(cnt,l.RAPrinOfficeCity,l.RAMailingCity);                         
+				self.NormRAState        := choose(cnt,l.RAPrinOfficeState,l.RAMailingState);                        
+				self.NormRAZip          := choose(cnt,l.RAPrinOfficeZip,l.RAMailingZip); 
+				self.NormRACounty       := choose(cnt,l.RAPrinOfficeCounty,l.RAMailingCounty); 
+				self.NormRACountry      := choose(cnt,l.RAPrinOfficeCountry,l.RAMailingCountry);
+				self.NormRAPrinCounty   := l.RAPrinOfficeCounty;
+				self.NormRAPrinCountry  := l.RAPrinOfficeCountry;
+				self 							      := l;
+				self                    := [];
+			end;
+		
+	  NormRA   := normalize(RegAgent, 2, NormalizeRA(left, counter));
+		dNormRA  := dedup(sort(distribute(NormRA, hash(BusinessID)),record,local),record,local) : independent;
+					 
+		// Corporation & Address
+	  Corp_Addr_File			:= join(NormBusinessName,Address,
+																corp2.t2u(left.BusinessID) = corp2.t2u(right.BusinessID),
+																transform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn,
+																					self.BusinessID         := left.BusinessID;
+																					self										:= right;																				
+																					self										:= left;
+																					self										:= [];
+																					),
+																left outer,
+																local
+																) : independent;	
 
-		DocumentIDTable 					:= Corp2_Raw_NH.Files(fileDate,puseprod).Input.DocumentIDTable   : independent; 
-		StockClassTable 					:= Corp2_Raw_NH.Files(fileDate,puseprod).Input.StockClassTable 	 : independent; 
-		CorpTypeTable 						:= Corp2_Raw_NH.Files(fileDate,puseprod).Input.CorpTypeTable 	 	 : independent; 
-		StatusTable 							:= Corp2_Raw_NH.Files(fileDate,puseprod).Input.StatusTable 		 	 : independent;
-		NameTypeTable 						:= Corp2_Raw_NH.Files(fileDate,puseprod).Input.NameTypeTable 		 : independent; 
-		OffPartyTypeTable 				:= Corp2_Raw_NH.Files(fileDate,puseprod).Input.OffPartyTypeTable : independent; 
-		PartyTypeTable 						:= Corp2_Raw_NH.Files(fileDate,puseprod).Input.PartyTypeTable 	 : independent; 
-
-		OfficerFixState						:= project(Officer,
-																				 transform(Corp2_Raw_NH.Layouts.OfficerLayoutIn,
-																									 self.state						:= Corp2_Raw_NH.Functions.Fix_State(left.city, left.state);
-																									 self.countryname			:= Corp2_Raw_NH.Functions.Fix_Country(left.countryname);
-																									 self									:= left;
-																									)
-																				);
-																					
-		AddressFixState						:= project(Address,
-																				 transform(Corp2_Raw_NH.Layouts.AddressLayoutIn,
-																									 self.state						:= Corp2_Raw_NH.Functions.Fix_State(left.city, left.state);
-																									 self.country 				:= Corp2_Raw_NH.Functions.Fix_Country(left.country);
-																									 self									:= left;
-																									)
-																				);
-
-		//Join Filing and DocumentIDTable - for Events & AR mapping
-		AddDocumentID2Filing			:= join(Filing, DocumentIDTable,
-																			corp2.t2u(left.DocumentTypeID) = right.TableCode,
-																			transform(Corp2_Raw_NH.Layouts.TempFilingWithCorpLayoutIn,
-																								self.docidcode					:= right.tablecode;
-																								self.dociddesc					:= right.tabledesc;
-																								self										:= left;
-																								self										:= [];
-																							 ),
-																			left outer,
-																			lookup
-																		 );	
-								 	
-		Events_AR_File		 				:= join(AddDocumentID2Filing, Corporation,
-																			corp2.t2u(left.CorporationID) = corp2.t2u(right.CorporationID),
-																			transform(Corp2_Raw_NH.Layouts.TempFilingWithCorpLayoutIn,
-																								self										:= right;
-																								self										:= left;
-																						 ),
-																			inner,
-																			local
-																		 ) : independent;	
-
-		//Join Stock and StockClassTable - for Stock mapping
-		AddStockClass2Stock				:= join(Stock, StockClassTable,
-																			corp2.t2u(left.StockClassID) = right.TableCode,
-																			transform(Corp2_Raw_NH.Layouts.TempStockWithCorpLayoutIn,
-																								self.stockclasscode			:= right.tablecode;
-																								self.stockclassdesc			:= right.tabledesc;
-																								self										:= left;
-																								self										:= [];
-																						 ),
-																			left outer,
-																			lookup
-																		 );
-								 
-		StockFile				 					:= join(AddStockClass2Stock, Corporation,
-																			corp2.t2u(left.CorporationID) = corp2.t2u(right.CorporationID),
-																			transform(Corp2_Raw_NH.Layouts.TempStockWithCorpLayoutIn,
-																								self 										:= right;
-																								self										:= left;
-																							 ),
-																			inner,
-																			local
-																		 );
-															 
-
-
-		//Join Corporation with the following files: CorpTypeTable, StatusTable, CorporationName, NameTypeTable, Address, & Merger (survivor & non-survivor)
-		AddCorpType2Corp					:= join(Corporation, CorpTypeTable,
-																			corp2.t2u(left.CorporationTypeID) = right.TableCode,
-																			transform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn,
-																								self.corptypecode						:= right.tablecode;
-																								self.corptypedesc						:= right.tabledesc;
-																								self.countryofincorporation := Corp2_Raw_NH.Functions.Fix_Country_Of_Incorporation(left.countryofincorporation);
-																								self												:= left;
-																								self												:= [];
-																							 ),
-																			left outer,
-																			lookup
-																		 );		
+		// Corporation, Address, Principals															
+		Add_Prin_Corp_Addr_File	:= join(Corp_Addr_File,Principals,
+																corp2.t2u(left.BusinessID) = corp2.t2u(right.BusinessID),
+																transform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn,
+																					self.BusinessID         := left.BusinessID;
+																					self										:= right;																				
+																					self										:= left;
+																					self										:= [];
+																					),
+																left outer,
+																local
+																) : independent;	
 	
-		AddStatusDesc2Corp 			  := join(AddCorpType2Corp, StatusTable,
-																			corp2.t2u(left.CorporationStatusID) = corp2.t2u(right.TableCode),
-																			transform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn,
-																								self.statuscode						:= right.tablecode;
-																								self.statusdesc						:= right.tabledesc;
-																								self											:= left;
-																							 ),
-																			left outer,
-																			lookup
-																		 );		
+		// Corporation, Address, Principals, Prin Purpose														
+		Add_Corp_PrinPurp_File	:= join(Add_Prin_Corp_Addr_File,PrinPurp,
+																corp2.t2u(left.BusinessID) = corp2.t2u(right.BusinessID),
+																transform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn,
+																					self.BusinessID         := left.BusinessID;
+																					self										:= right;																				
+																					self										:= left;
+																					self										:= [];
+																					),
+																left outer,
+																local
+																) : independent;	
 
-		AddCorpName2Corp					:= join(AddStatusDesc2Corp, CorporationName,
-																			corp2.t2u(left.corporationid) = corp2.t2u(right.corporationid),
-																			transform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn,
-																								self							 					:= right;
-																								self												:= left;
-																							 ),
-																			left outer,
-																			local
-																		 );
-																			 
-		AddNameType2Corp					:= join(AddCorpName2Corp, NameTypeTable,
-																			corp2.t2u(left.NameTypeID) = corp2.t2u(right.TableCode),
-																			transform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn,
-																								self.nametypecode						:= right.tablecode;
-																								self.nametypedesc						:= right.tabledesc;
-																								self												:= left;
-																							 ),
-																			left outer,
-																			lookup
-																		 );
-																			 
-		AddAddress2Corp 					:= join(AddNameType2Corp, AddressFixState,
-																			corp2.t2u(left.CorporationID) = corp2.t2u(right.CorporationID),
-																			transform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn,
-																								self.corporationid					:= left.corporationid;
-																								self 												:= right;
-																								self												:= left;
-																							 ),
-																			left outer,
-																			local
-																		 );	
-		//Add Merger Survivor records
-		CorporationFile1					 	:= join(AddAddress2Corp, MergerSurvivor,
-																				corp2.t2u(left.CorporationID) = corp2.t2u(right.survivorcorporationid),
-																				transform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn,
-																									self.corporationid											:= left.corporationid;
-																									self.survivor_mergerid									:= right.mergerid;
-																									self.survivor_survivorcorporationid			:= right.survivorcorporationid;
-																									self.survivor_mergedcorporationid				:= right.mergedcorporationid;
-																									self.survivor_mergerdate								:= right.mergerdate;
-																									self																		:= left;
-																								 ),
-																				left outer,
-																				local
-																			 );
-
-		//Note: Need to concatenate Merger "Non-Survivor" records onto corporation file that already includes the Merger "Survivor" records.
-		CorporationFile2						:= join(AddAddress2Corp, MergerNonSurvivor,
-																				corp2.t2u(left.CorporationID) = corp2.t2u(right.mergedcorporationid),
-																				transform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn,
-																									self.corporationid											:= left.corporationid;
-																									self.nonsurvivor_mergerid								:= right.mergerid;
-																									self.nonsurvivor_survivorcorporationid	:= right.survivorcorporationid;
-																									self.nonsurvivor_mergedcorporationid		:= right.mergedcorporationid;
-																									self.nonsurvivor_mergerdate							:= right.mergerdate;
-																									self																		:= left;
-																								 ),
-																				inner,
-																				local
-																			 );
-																			 
-		CorporationFile := distribute(CorporationFile1 + CorporationFile2,hash(corporationid));
-		
-		//Join for "Contacts": Officer, OffPartyTypeTable, & PartyTypeTable		
-		AddOfficer2Cont						:= join(Corporation, OfficerFixState,
-																			corp2.t2u(left.CorporationID) = corp2.t2u(right.CorporationID),
-																			transform(Corp2_Raw_NH.Layouts.TempContactsLayoutIn,
-																								self												:= left;
-																								self												:= right;
-																								self												:= [];
-																							 ),
-																			inner,
-																			local
-																		 );
-
-		AddCorpName2Cont						:= join(AddOfficer2Cont, CorporationName,
-																				corp2.t2u(left.corporationid) = corp2.t2u(right.corporationid),
-																				transform(Corp2_Raw_NH.Layouts.TempContactsLayoutIn,
-																									self							 					:= right;
-																									self												:= left;
-																								 ),
-																				left outer,
-																				local
-																			 );
-
-		AddOffPartyType2Cont			:= join(AddCorpName2Cont, OffPartyTypeTable,
-																			corp2.t2u(left.officerid) = corp2.t2u(right.offid),
-																			transform(Corp2_Raw_NH.Layouts.TempContactsLayoutIn,
-																								self			 									:= right;
-																								self												:= left;
-																							 ),
-																			left outer,
-																			lookup
-																		 );
-
-		ContactFile								:= join(AddOffPartyType2Cont, PartyTypeTable,
-																			corp2.t2u(left.PartyTypeID) = corp2.t2u(right.TableCode),
-																			transform(Corp2_Raw_NH.Layouts.TempContactsLayoutIn,
-																								self.partytypecode					:= right.tablecode;
-																								self.partytypedesc					:= right.tabledesc;
-																								self												:= left;
-																							 ),
-																			left outer,
-																			lookup
-																		 );
-
+		// Corporation, Address, Principals, Prin Purpose, RA															
+		Add_Corp_RA_File	:= join(Add_Corp_PrinPurp_File,dNormRA,
+																corp2.t2u(left.BusinessID) = corp2.t2u(right.BusinessID),
+																transform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn,
+																					self.BusinessID         := left.BusinessID;
+																					self										:= right;																				
+																					self										:= left;
+																					self										:= [];
+																					),
+																left outer,
+																local
+																) : independent;	
+																
+		// Corporation and Filing			
+		 Corp_Filings			:= join(Corporation,Filing,
+																corp2.t2u(left.BusinessID) = corp2.t2u(right.BusinessID),
+																transform(Corp2_Raw_NH.Layouts.TempFilingWithCorpLayoutIn,
+																					self.BusinessID         := left.BusinessID;
+																					self.FilingDate         := right.FilingDateTime[1..10];
+																					self										:= right;																				
+																					self										:= left;
+																					self										:= [];
+																					),
+																left outer,
+																local
+																) : independent;
+																
 		//********************************************************************
 		//This begins the MAIN mapping.
 		//Note: The Corporation and RA data is mapped here.
@@ -233,225 +131,238 @@ export NH := MODULE;
 				self.dt_last_seen												:= (unsigned4)fileDate;
 				self.corp_ra_dt_first_seen							:= (unsigned4)fileDate;
 				self.corp_ra_dt_last_seen								:= (unsigned4)fileDate;			
-				self.corp_key														:= state_fips + '-' + corp2.t2u(l.corporationid);
+				self.corp_key														:= state_fips + '-' + corp2.t2u(l.businessid);
 				self.corp_vendor												:= state_fips;
 				self.corp_state_origin									:= state_origin;			
 				self.corp_process_date									:= fileDate;
-				self.corp_orig_sos_charter_nbr					:= corp2.t2u(l.corporationnumber);
-				self.corp_ln_name_type_cd								:= Corp2_Raw_NH.Functions.CorpLNNameTypeCD(l.nametypeid,l.corporationtypeid);
-				self.corp_ln_name_type_desc							:= Corp2_Raw_NH.Functions.CorpLNNameTypeDesc(l.nametypeid,l.corporationtypeid,l.nametypedesc);
-				self.corp_legal_name 									 	:= Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,l.corpname).BusinessName;
-				self.corp_address1_type_cd	      			:= if(corp2.t2u(l.addresstypeid) not in ['10','11','14'] and Corp2_Mapping.fAddressExists(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip).ifaddressexists,
-																											Corp2_Raw_NH.Functions.CorpAddressTypeCD(l.addresstypeid),
-																											''
-																										 );
-				self.corp_address1_type_desc      			:= if(self.corp_address1_type_cd <> '',
-																											Corp2_Raw_NH.Functions.CorpAddressTypeDesc(l.addresstypeid),
-																											''
-																										 );
-				self.corp_address1_line1								:= if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip,l.country).AddressLine1,'');
-				self.corp_address1_line2								:= if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip,l.country).AddressLine2,'');
-				self.corp_address1_line3								:= if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip,l.country).AddressLine3,'');
-				self.corp_prep_addr1_line1							:= if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip,l.country).PrepAddrLine1,'');
-				self.corp_prep_addr1_last_line					:= if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip,l.country).PrepAddrLastLine,'');
-				self.corp_orig_org_structure_cd					:= if(corp2.t2u(l.corporationtypeid) not in ['63','75'],corp2.t2u(l.corporationtypeid),'');
-				self.corp_orig_org_structure_desc				:= if(corp2.t2u(l.corporationtypeid) not in ['63','75'],corp2.t2u(l.corptypedesc),'');
-				self.corp_for_profit_ind								:= if(corp2.t2u(l.corporationtypeid) 		 in ['25'],'N','');
-				self.corp_orig_bus_type_desc						:= Corp2_Raw_NH.Functions.CorpOrigBusTypeDesc(l.purpose);
-				self.corp_status_cd											:= corp2.t2u(l.corporationstatusid);
-				self.corp_status_desc										:= corp2.t2u(l.statusdesc);
-				self.corp_status_date										:= Corp2_Mapping.fValidateDate(l.dissolvedate,'CCYY-MM-DD').PastDate;				
-				self.corp_standing											:= if(corp2.t2u(l.corporationstatusid) = '3','Y','');
-				self.corp_foreign_domestic_ind					:= corp2.t2u(l.citizenship);
-				self.corp_inc_date											:= if(corp2.t2u(l.citizenship) = 'D',Corp2_Mapping.fValidateDate(l.dateformed,'CCYY-MM-DD').PastDate,'');
-				self.corp_term_exist_cd									:= map(corp2.t2u(l.duration) = 'PERPETUAL' 																	=> 'P',
-																											 Corp2_Mapping.fValidateDate(l.duration,'MM/DD/CCYY').GeneralDate<>'' => 'D',
+				self.corp_orig_sos_charter_nbr					:= corp2.t2u(l.businessid);
+				self.corp_ln_name_type_cd								:= corp2.t2u(l.NormBusinessTypeCode);
+				self.corp_ln_name_type_desc							:= map(self.corp_ln_name_type_cd = '01' => 'LEGAL',
+				                                               self.corp_ln_name_type_cd = '03' => 'DBA',
+																											 self.corp_ln_name_type_cd = '05' => 'TRADENAME',
+																											 self.corp_ln_name_type_cd = '10' => 'HOME STATE',
+																											 self.corp_ln_name_type_cd = '11' => 'FOREIGN REGISTERED NAME',
+																											 ''
+																											 );
+				self.corp_legal_name 									 	:= Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.NormBusinessName).BusinessName;
+				self.corp_address1_type_cd	      			:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.PrinOfficeAddress,l.PrinOfficeAddress2,l.PrinOfficeCity,l.PrinOfficeState,l.PrinOfficeZip,l.PrinOfficeCountry).ifAddressExists, 'B', '');
+				self.corp_address1_type_desc      			:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.PrinOfficeAddress,l.PrinOfficeAddress2,l.PrinOfficeCity,l.PrinOfficeState,l.PrinOfficeZip,l.PrinOfficeCountry).ifAddressExists, 'BUSINESS', '');
+				self.corp_address1_line1								:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.PrinOfficeAddress,l.PrinOfficeAddress2,l.PrinOfficeCity,l.PrinOfficeState,l.PrinOfficeZip,l.PrinOfficeCountry).AddressLine1,'');
+				self.corp_address1_line2								:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.PrinOfficeAddress,l.PrinOfficeAddress2,l.PrinOfficeCity,l.PrinOfficeState,l.PrinOfficeZip,l.PrinOfficeCountry).AddressLine2,'');
+				self.corp_address1_line3								:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.PrinOfficeAddress,l.PrinOfficeAddress2,l.PrinOfficeCity,l.PrinOfficeState,l.PrinOfficeZip,l.PrinOfficeCountry).AddressLine3,'');
+				self.corp_prep_addr1_line1							:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.PrinOfficeAddress,l.PrinOfficeAddress2,l.PrinOfficeCity,l.PrinOfficeState,l.PrinOfficeZip,l.PrinOfficeCountry).PrepAddrLine1,'');
+				self.corp_prep_addr1_last_line					:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.PrinOfficeAddress,l.PrinOfficeAddress2,l.PrinOfficeCity,l.PrinOfficeState,l.PrinOfficeZip,l.PrinOfficeCountry).PrepAddrLastLine,'');
+        self.corp_address2_type_cd	      			:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.MailingAddress,l.MailingAddress2,l.MailingCity,l.MailingState,l.MailingZip,l.MailingCountry).ifAddressExists, 'M', '');
+				self.corp_address2_type_desc      			:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.MailingAddress,l.MailingAddress2,l.MailingCity,l.MailingState,l.MailingZip,l.MailingCountry).ifAddressExists, 'MAILING', '');
+				self.corp_address2_line1								:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.MailingAddress,l.MailingAddress2,l.MailingCity,l.MailingState,l.MailingZip,l.MailingCountry).AddressLine1,'');
+				self.corp_address2_line2								:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.MailingAddress,l.MailingAddress2,l.MailingCity,l.MailingState,l.MailingZip,l.MailingCountry).AddressLine2,'');
+				self.corp_address2_line3								:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.MailingAddress,l.MailingAddress2,l.MailingCity,l.MailingState,l.MailingZip,l.MailingCountry).AddressLine3,'');
+				self.corp_prep_addr2_line1							:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.MailingAddress,l.MailingAddress2,l.MailingCity,l.MailingState,l.MailingZip,l.MailingCountry).PrepAddrLine1,'');
+				self.corp_prep_addr2_last_line					:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.MailingAddress,l.MailingAddress2,l.MailingCity,l.MailingState,l.MailingZip,l.MailingCountry).PrepAddrLastLine,'');
+				self.corp_phone_number                  := Corp2_Raw_NH.Functions.PhoneNo(l.PhoneNumber);
+				self.corp_email_address                 := corp2.t2u(l.BusinessEmail);
+				self.corp_filing_date                   := if(l.NormDateInJurisdiction <> '',Corp2_Mapping.fValidateDate(l.NormDateInJurisdiction,'CCYY-MM-DD').PastDate,'');
+				self.corp_filing_cd                     := corp2.t2u(l.NormFilingCode);
+				self.corp_filing_desc                   := if(self.corp_filing_cd <> '','HOME STATE','');
+				self.corp_orig_org_structure_desc				:= corp2.t2u(l.BusinessType);
+				self.corp_for_profit_ind								:= map(corp2.t2u(l.BusinessType) in ['FOREIGN PROFIT CORPORATION','DOMESTIC PROFIT CORPORATION',
+				                                                                             'DOMESTIC PROFESSIONAL PROFIT CORPORATION',
+																																										 'FOREIGN PROFESSIONAL PROFIT CORPORATION']                         => 'Y',
+				                                               corp2.t2u(l.BusinessType) in ['DOMESTIC NONPROFIT CORPORATION','FOREIGN NONPROFIT CORPORATION']  => 'N',
+																											 '');
+				self.corp_status_desc										:= corp2.t2u(l.BusinessStatus);
+				self.corp_standing											:= map(corp2.t2u(l.BusinessStatus) = 'GOOD STANDING'        => 'Y',
+				                                               corp2.t2u(l.BusinessStatus) = 'NOT IN GOOD STANDING' => 'N',
+																											 '');
+				self.corp_foreign_domestic_ind					:= Corp2_Raw_NH.Functions.CorpForeignDomesticInd(l.BusinessType);
+				self.corp_inc_date											:= if(self.corp_foreign_domestic_ind = 'D', Corp2_Mapping.fValidateDate(l.CreationDate,'CCYY-MM-DD').PastDate, '');
+				self.corp_term_exist_cd									:= map(corp2.t2u(l.duration) = '9999-01-01' 																	=> 'P',
+				                                               corp2.t2u(l.duration) = '9999-09-09' 																	=> '',
+																											 Corp2_Mapping.fValidateDate(l.duration,'CCYY-MM-DD').GeneralDate<>''   => 'D',
 																											 ''
 																											);
+				self.corp_term_exist_exp								:= if(self.corp_term_exist_cd = 'D',Corp2_Mapping.fValidateDate(l.duration,'CCYY-MM-DD').GeneralDate,'');																							
 				self.corp_term_exist_desc								:= map(self.corp_term_exist_cd = 'P'	=> 'PERPETUAL',
 																											 self.corp_term_exist_cd = 'D'	=> 'EXPIRATION DATE',
 																											 ''
 																											);
-				self.corp_term_exist_exp								:= Corp2_Mapping.fValidateDate(l.duration,'MM/DD/CCYY').GeneralDate;
+				
 				self.corp_inc_state											:= state_origin;
-				self.corp_inc_county										:= if(corp2.t2u(l.countyofincorporation) not in ['UNKNOWN'],corp2.t2u(l.countyofincorporation),'');
-				self.corp_forgn_state_cd								:= if(corp2.t2u(l.citizenship) = 'F' and corp2.t2u(l.stateofincorporation) not in [state_origin,'','XX'],corp2.t2u(l.stateofincorporation),'');
-				self.corp_forgn_state_desc							:= if(corp2.t2u(l.citizenship) = 'F' and corp2.t2u(l.stateofincorporation) not in [state_origin,'','XX'],Corp2_Raw_NH.Functions.State_Description(l.stateofincorporation),'');
-				self.corp_forgn_date										:= if(corp2.t2u(l.citizenship) = 'F',Corp2_Mapping.fValidateDate(l.dateformed,'CCYY-MM-DD').PastDate,'');
-				self.corp_ra_full_name							 		:= Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.registeredagentname).BusinessName;
-				self.corp_ra_address_type_cd	      		:= if(corp2.t2u(l.addresstypeid) in ['10','11','14'] and Corp2_Mapping.fAddressExists(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip).ifaddressexists,
-																											Corp2_Raw_NH.Functions.CorpAddressTypeCD(l.addresstypeid),
-																											''
-																										 );
-				self.corp_ra_address_type_desc      		:= if(self.corp_ra_address_type_cd<>'',
-																											Corp2_Raw_NH.Functions.CorpAddressTypeDesc(l.addresstypeid),
-																											''
-																										 );
-				self.corp_ra_address_line1							:= if(self.corp_ra_address_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip,l.country).AddressLine1,'');
-				self.corp_ra_address_line2							:= if(self.corp_ra_address_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip,l.country).AddressLine2,'');
-				self.corp_ra_address_line3							:= if(self.corp_ra_address_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip,l.country).AddressLine3,'');
-				self.ra_prep_addr_line1									:= if(self.corp_ra_address_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip,l.country).PrepAddrLine1,'');
-				self.ra_prep_addr_last_line							:= if(self.corp_ra_address_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.address1,l.address2+l.address3,l.city,l.state,l.zip,l.country).PrepAddrLastLine,'');
-				self.corp_agent_county									:= stringlib.stringfilter(corp2.t2u(l.county),' ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-				self.corp_country_of_formation					:= Corp2_Mapping.fCleanCountry(state_origin,state_desc,,l.countryofincorporation).Country;
-				self.corp_dissolved_date								:= Corp2_Mapping.fValidateDate(l.dissolvedate,'CCYY-MM-DD').PastDate;
-				self.corp_home_state_name								:= if(corp2.t2u(l.nametypeid) in ['13','15'],corp2.t2u(l.corpname),'');
-				self.corp_merger_indicator							:= map(corp2.t2u(l.survivor_mergerid)	 	 <> '' => 'S',
-																											 corp2.t2u(l.nonsurvivor_mergerid) <> '' => 'N',
-																											 ''
-																											);
-				self.corp_merged_corporation_id					:= if(corp2.t2u(l.survivor_mergedcorporationid) <> '',corp2.t2u(l.survivor_mergedcorporationid),'');
-				self.corp_merger_date										:= map(corp2.t2u(l.survivor_mergerdate)	   <> '' => Corp2_Mapping.fValidateDate(l.survivor_mergerdate,'CCYY-MM-DD').PastDate,
-																											 corp2.t2u(l.nonsurvivor_mergerdate) <> '' => Corp2_Mapping.fValidateDate(l.nonsurvivor_mergerdate,'CCYY-MM-DD').PastDate,
-																											 ''
-																											);
-				self.corp_merger_desc										:= map(corp2.t2u(l.survivor_mergedcorporationid)	  <> '' => 'CORPORATION MERGED WITH: ' + corp2.t2u(l.survivor_mergedcorporationid),
-																											 corp2.t2u(l.nonsurvivor_mergedcorporationid) <> '' => 'CORPORATION MERGED INTO: ' + corp2.t2u(l.nonsurvivor_mergedcorporationid),
-																											 ''
-																											);
-				self.corp_merger_id											:= if(corp2.t2u(l.nonsurvivor_mergedcorporationid) <> '',corp2.t2u(l.nonsurvivor_mergedcorporationid),'');
-				self.internalfield1				      				:= corp2.t2u(l.addresstypeid); //scubbing				
+				self.corp_inc_county										:= corp2.t2u(l.PrinOfficeCounty);
+				self.corp_forgn_state_cd								:= if(corp2.t2u(l.CitizenStateOfInc) not in [state_origin,'','NEW HAMPSHIRE','DATA NOT FOUND'],Corp2_Raw_NH.Functions.State_Description(l.CitizenStateOfInc),'');
+				self.corp_forgn_state_desc							:= if(self.corp_forgn_state_cd <> '',corp2.t2u(l.CitizenStateOfInc),'');
+				self.corp_forgn_date										:= if(self.corp_foreign_domestic_ind = 'F', Corp2_Mapping.fValidateDate(l.CreationDate[1..10],'CCYY-MM-DD').PastDate,'');
+        self.corp_entity_desc				            := corp2.t2u(l.NAICSCode);
+				NEmail                                  := corp2.t2u(l.NotificationEmail);
+				BEmail                                  := corp2.t2u(l.BusinessEmail);
+				self.corp_addl_info                     := if(NEmail <> '' and BEmail <> '', 'NOTIFICATION EMAIL: ' + NEmail + '; BUSINESS EMAIL: ' +  BEmail, 
+				                                              if(NEmail <> '','NOTIFICATION EMAIL: ' + NEmail, if(BEmail <> '', 'BUSINESS EMAIL: ' +  BEmail, ''))); 
+				self.corp_ra_full_name							 		:= Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.NormRAName).BusinessName;
+				self.corp_ra_addl_info                  := corp2.t2u(l.NormRAType);
+				self.corp_ra_address_type_cd	      		:= corp2.t2u(l.NormRAAddressType);
+				self.corp_ra_address_type_desc      		:= map(self.corp_ra_address_type_cd = 'R'  => 'REGISTERED OFFICE',
+				                                               self.corp_ra_address_type_cd = 'M'  => 'MAILING ADDRESS',
+																											 '');
+				self.corp_ra_address_line1							:= if(self.corp_ra_address_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.NormRAAddress,l.NormRAAddress2,l.NormRACity,l.NormRAState,l.NormRAZip,l.NormRACountry).AddressLine1,'');
+				self.corp_ra_address_line2							:= if(self.corp_ra_address_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.NormRAAddress,l.NormRAAddress2,l.NormRACity,l.NormRAState,l.NormRAZip,l.NormRACountry).AddressLine2,'');
+				self.corp_ra_address_line3							:= if(self.corp_ra_address_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.NormRAAddress,l.NormRAAddress2,l.NormRACity,l.NormRAState,l.NormRAZip,l.NormRACountry).AddressLine3,'');
+				self.ra_prep_addr_line1									:= if(self.corp_ra_address_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.NormRAAddress,l.NormRAAddress2,l.NormRACity,l.NormRAState,l.NormRAZip,l.NormRACountry).PrepAddrLine1,'');
+				self.ra_prep_addr_last_line							:= if(self.corp_ra_address_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.NormRAAddress,l.NormRAAddress2,l.NormRACity,l.NormRAState,l.NormRAZip,l.NormRACountry).PrepAddrLastLine,'');
+				self.corp_agent_county									:= corp2.t2u(l.NormRAPrinCounty);
+				self.corp_agent_country									:= Corp2_Mapping.fCleanCountry(state_origin,state_desc,,l.NormRAPrinCountry).Country;
+				self.corp_country_of_formation					:= Corp2_Mapping.fCleanCountry(state_origin,state_desc,,l.PrinOfficeCountry).Country;
+				self.corp_home_state_name								:= corp2.t2u(l.HomeStateName);
+				self.corp_management_desc               := corp2.t2u(l.ManagementStyle);
+				self.corp_naics_desc                    := corp2.t2u(l.NAICSSubCode);
+				self.corp_profession                    := corp2.t2u(l.Profession);
 				self.recordorigin												:= 'C';
 				self 																		:= [];
 		end; 
 
-		CorporationData	 	 				:= project(CorporationFile,CorporationTransform(left));
+ 		MapCorporation	 	 				:= project(Add_Corp_RA_File,CorporationTransform(left));
 
-		HasRAAddress			 				:= CorporationData(corp2.t2u(corp_ra_address_line1+corp_ra_address_line2+corp_ra_address_line3)<>'');
-		HasNoRAAddress		 				:= CorporationData(corp2.t2u(corp_ra_address_line1+corp_ra_address_line2+corp_ra_address_line3)='');
-
-		MapCorporation						:= join(HasNoRAAddress, HasRAAddress,
-																			corp2.t2u(left.corp_key) 							 = corp2.t2u(right.corp_key) and
-																			corp2.t2u(left.corp_ln_name_type_desc) = corp2.t2u(right.corp_ln_name_type_desc) and
-																			corp2.t2u(left.corp_ra_full_name)			 = corp2.t2u(right.corp_ra_full_name),
-																			transform(Corp2_mapping.LayoutsCommon.Main,
-																								self.corp_ra_address_type_cd		:= right.corp_ra_address_type_cd;
-																								self.corp_ra_address_type_desc	:= right.corp_ra_address_type_desc;
-																								self.corp_ra_address_line1			:= right.corp_ra_address_line1;
-																								self.corp_ra_address_line2			:= right.corp_ra_address_line2;
-																								self.corp_ra_address_line3			:= right.corp_ra_address_line3;
-																								self.ra_prep_addr_line1					:= right.ra_prep_addr_line1;
-																								self.ra_prep_addr_last_line			:= right.ra_prep_addr_last_line;
-																								self														:= if(corp2.t2u(left.corp_key)<>'',left,right);
-																							 ),
-																			full outer,
-																			local
-																		 );
-																		 
+    //********************************************************************
+		//Continue the MAIN mapping.
+		//Note: Previous Business Name data is mapped here.
+		//********************************************************************
+		Corp2_mapping.LayoutsCommon.Main PrevNamesTransform(Corp2_Raw_NH.Layouts.PrevNamesLayoutIn l) := transform
+		    self.dt_vendor_first_reported						:= (unsigned4)fileDate;
+				self.dt_vendor_last_reported						:= (unsigned4)fileDate;
+				self.dt_first_seen											:= (unsigned4)fileDate;
+				self.dt_last_seen												:= (unsigned4)fileDate;
+				self.corp_ra_dt_first_seen							:= (unsigned4)fileDate;
+				self.corp_ra_dt_last_seen								:= (unsigned4)fileDate;			
+				self.corp_key														:= state_fips + '-' + corp2.t2u(l.businessid);
+				self.corp_vendor												:= state_fips;
+				self.corp_state_origin									:= state_origin;			
+				self.corp_process_date									:= fileDate;
+				self.corp_orig_sos_charter_nbr					:= corp2.t2u(l.businessid);
+				self.corp_inc_state											:= state_origin;
+				self.corp_legal_name 									 	:= Corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.PreviousName).BusinessName;
+				self.corp_ln_name_type_cd								:= 'P';
+				self.corp_ln_name_type_desc							:= 'PRIOR';
+				self.recordorigin												:= 'C';
+				self 																		:= [];
+		end; 
+		
+		MapPrevNames			:= project(PrevNames,PrevNamesTransform(left));
+		
 		//********************************************************************
 		//Continue the MAIN mapping.
 		//Note: The Contact data is mapped here.
 		//********************************************************************
-		Corp2_mapping.LayoutsCommon.Main ContactTransform(Corp2_Raw_NH.Layouts.TempContactsLayoutIn l) := transform
+		Corp2_mapping.LayoutsCommon.Main ContactTransform(Corp2_Raw_NH.Layouts.TempCorporationLayoutIn l) := transform
 				self.dt_vendor_first_reported						:= (unsigned4)fileDate;
 				self.dt_vendor_last_reported						:= (unsigned4)fileDate;
 				self.dt_first_seen											:= (unsigned4)fileDate;
 				self.dt_last_seen												:= (unsigned4)fileDate;
 				self.corp_ra_dt_first_seen							:= (unsigned4)fileDate;
 				self.corp_ra_dt_last_seen								:= (unsigned4)fileDate;			
-				self.corp_key														:= state_fips + '-' + corp2.t2u(l.corporationid);
+				self.corp_key														:= state_fips + '-' + corp2.t2u(l.businessid);
 				self.corp_vendor												:= state_fips;
 				self.corp_state_origin									:= state_origin;			
 				self.corp_process_date									:= fileDate;
-				self.corp_orig_sos_charter_nbr					:= corp2.t2u(l.corporationnumber);
-				self.corp_legal_name 									 	:= Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,l.corpname).BusinessName;
+				self.corp_orig_sos_charter_nbr					:= corp2.t2u(l.businessid);
+				self.corp_legal_name 									 	:= Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,l.NormBusinessName).BusinessName;
 				self.corp_inc_state											:= state_origin;				
-				self.cont_type_cd												:= 'F';
-				self.cont_type_desc											:= 'OFFICER';
-				self.cont_full_name 									 	:= Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,l.name).BusinessName;
-				self.cont_title1_desc               		:= corp2.t2u(l.partytypedesc);
-				self.cont_address_type_cd	      				:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.Address1,l.Address2+l.Address3,l.City,l.state,l.Zip).ifaddressexists,'T','');
-				self.cont_address_type_desc    	  			:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.Address1,l.Address2+l.Address3,l.City,l.state,l.Zip).ifaddressexists,'CONTACT','');
-				self.cont_address_line1									:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.Address1,l.Address2+l.Address3,l.City,l.state,l.Zip).AddressLine1;
-				self.cont_address_line2									:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.Address1,l.Address2+l.Address3,l.City,l.state,l.Zip).AddressLine2;
-				self.cont_address_line3									:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.Address1,l.Address2+l.Address3,l.City,l.state,l.Zip).AddressLine3;
+				self.cont_full_name 									 	:= Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,l.PrincipalName).BusinessName;
+				self.cont_title1_desc               		:= corp2.t2u(l.PrincipalTitle);
+				self.cont_address_type_cd	      				:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.PrincipalAddress,l.PrincipalAddress2,l.PrincipalCity,l.PrincipalState,l.PrincipalZip).ifaddressexists,'T','');
+				self.cont_address_type_desc    	  			:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,l.PrincipalAddress,l.PrincipalAddress2,l.PrincipalCity,l.PrincipalState,l.PrincipalZip).ifaddressexists,'CONTACT','');
+				self.cont_address_line1									:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.PrincipalAddress,l.PrincipalAddress2,l.PrincipalCity,l.PrincipalState,l.PrincipalZip,l.PrincipalCountry).AddressLine1;
+				self.cont_address_line2									:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.PrincipalAddress,l.PrincipalAddress2,l.PrincipalCity,l.PrincipalState,l.PrincipalZip,l.PrincipalCountry).AddressLine2;
+				self.cont_address_line3									:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,l.PrincipalAddress,l.PrincipalAddress2,l.PrincipalCity,l.PrincipalState,l.PrincipalZip,l.PrincipalCountry).AddressLine3;
+        self.cont_address_county		            := corp2.t2u(l.PrincipalCounty);
+				self.cont_country                       := corp2.t2u(l.PrincipalCountry);  
 				self.recordorigin												:= 'T';
 				self 																		:= [];
 		end;
 		
-		MapContacts			:= project(ContactFile,ContactTransform(left));
+		MapContacts			:= project(Add_Corp_RA_File,ContactTransform(left));
 		
-		MapMain		 			:= dedup(sort(distribute(MapCorporation + MapContacts,hash(corp_key)),record,local),record,local) : independent;
+		MapMain		 			:= dedup(sort(distribute(MapCorporation + MapPrevNames + MapContacts,hash(corp_key)),record,local),record,local) : independent;
 
 		//********************************************************************
 		//This begins the AR mapping.
+		//Note: The Corporation and Filing data is mapped here.
 		//********************************************************************
-		Corp2_mapping.LayoutsCommon.AR ARTransform(Corp2_Raw_NH.Layouts.TempFilingWithCorpLayoutIn l):= transform,
-		skip(corp2.t2u(l.documenttypeid)<>'113')
-				self.corp_key														:= state_fips + '-' + corp2.t2u(l.corporationid);
+		Corp2_mapping.LayoutsCommon.AR ARTransform1(Corp2_Raw_NH.Layouts.TempFilingWithCorpLayoutIn l):= transform,
+		  skip(corp2.t2u(l.FilingType) not in ['ANNUAL REPORT','NONPROFIT REPORT','ANNUAL REPORT REMINDER'])
+				self.corp_key														:= state_fips + '-' + corp2.t2u(l.BusinessID);
 				self.corp_vendor												:= state_fips;
 				self.corp_state_origin									:= state_origin;			
 				self.corp_process_date									:= fileDate;
-				self.corp_sos_charter_nbr								:= corp2.t2u(l.corporationnumber);		
-				self.ar_report_nbr							 				:= map(Corp2_Mapping.fValidateDate(l.documentid,'MM/DD/CCYY').GeneralDate<>'' => '', //if a date, blank out
-																											 stringlib.stringfilterout(corp2.t2u(l.documentid),'=.`')='' 			=> '', //if only special characters, blank out
-																											 stringlib.stringfind(corp2.t2u(l.documentid),'DATE',1) <>0				=> '', //if contains the word "DATE", blank out
-																											 stringlib.stringfind(corp2.t2u(l.documentid),'VOL',1)  <>0				=> '', //if contains the word "VOL", blank out
-																											 stringlib.stringfind(corp2.t2u(l.documentid),'V:',1)  <>0				=> '', //if contains the word "V:" (represents VOL), blank out
-																											 corp2.t2u(l.documentid)
-																											);				
-				self.ar_year														:= if(Corp2_Mapping.fValidateDate(l.filingdate,'CCYY-MM-DD').PastDate<>'',Corp2_Mapping.fValidateDate(l.filingdate,'CCYY-MM-DD').PastDate[1..4],'');
-				self.ar_filed_dt												:= Corp2_Mapping.fValidateDate(l.filingdate,'CCYY-MM-DD').PastDate;
-				self.ar_report_dt												:= Corp2_Mapping.fValidateDate(l.filingdate,'CCYYMMDD').PastDate;
-				self.ar_comment													:= Corp2_Raw_NH.Functions.ARComment(l.effectivedate);
+				self.corp_sos_charter_nbr								:= corp2.t2u(l.BusinessID);		
+				self.ar_due_dt													:= if(LENGTH(l.NextAnnRptYear) = 4 and TRIM(l.NextAnnRptYear) NOT IN ['0',''], l.NextAnnRptYear,'');
 				self 																		:= [];
 		end;
-			
-		AllAR						:= project(Events_AR_File, ARTransform(left));
-		MapAR						:= dedup(sort(distribute(AllAR,hash(corp_key)),record,local),record,local) : independent;
+				
+		AR1						:= project(Corp_Filings, ARTransform1(left));
+		
+		//********************************************************************
+		Corp2_mapping.LayoutsCommon.AR ARTransform2(Corp2_Raw_NH.Layouts.TempFilingWithCorpLayoutIn l):= transform,
+		  skip(corp2.t2u(l.FilingType) not in ['ANNUAL REPORT','NONPROFIT REPORT','ANNUAL REPORT REMINDER'])
+				self.corp_key														:= state_fips + '-' + corp2.t2u(l.BusinessID);
+				self.corp_vendor												:= state_fips;
+				self.corp_state_origin									:= state_origin;			
+				self.corp_process_date									:= fileDate;
+				self.corp_sos_charter_nbr								:= corp2.t2u(l.BusinessID);		
+				self.ar_report_nbr	                    := corp2.t2u(l.FilingNumber);	
+				self.ar_report_dt												:= Corp2_Mapping.fValidateDate(l.FilingDate,'CCYY-MM-DD').PastDate;
+				self.ar_filed_dt												:= if(LENGTH(l.LastAnnRptYear) = 4 and TRIM(l.LastAnnRptYear) NOT IN ['0',''], l.LastAnnRptYear,'');
+        self.ar_type                            := corp2.t2u(l.FilingType);				
+				self 																		:= [];
+		end;
+		
+		AR2 						:= project(Corp_Filings, ARTransform2(left));
+		
+		MapAR						:= dedup(sort(distribute(AR1 + AR2,hash(corp_key)),record,local),record,local) : independent;
 
 		//********************************************************************
 		//This begins the Event mapping.
 		//********************************************************************
-		Corp2_mapping.LayoutsCommon.Events EventFilingTransform(Corp2_Raw_NH.Layouts.TempFilingWithCorpLayoutIn l, integer c) := transform,
-		skip(corp2.t2u(l.documenttypeid)='113' or
-				 c = 2 and Corp2_Mapping.fValidateDate(l.filingdate,'CCYY-MM-DD').PastDate = Corp2_Mapping.fValidateDate(l.effectivedate,'CCYY-MM-DD').GeneralDate
-				)
-				self.corp_key														:= state_fips + '-' + corp2.t2u(l.corporationid);
+		Corp2_mapping.LayoutsCommon.Events EventFilingTransform(Corp2_Raw_NH.Layouts.FilingLayoutIn l, integer c) := transform,
+		skip(corp2.t2u(l.FilingType) in ['ANNUAL REPORT','NONPROFIT REPORT'])
+				self.corp_key														:= state_fips + '-' + corp2.t2u(l.BusinessID);
 				self.corp_vendor												:= state_fips;
 				self.corp_state_origin									:= state_origin;			
 				self.corp_process_date									:= fileDate;
-				self.corp_sos_charter_nbr								:= corp2.t2u(l.corporationnumber);
-				self.event_filing_reference_nbr 				:= map(Corp2_Mapping.fValidateDate(l.documentid,'MM/DD/CCYY').GeneralDate<>'' => '', //if a date, blank out
-																											 stringlib.stringfilterout(corp2.t2u(l.documentid),'=.`')='' 			=> '', //if only special characters, blank out
-																											 stringlib.stringfind(corp2.t2u(l.documentid),'DATE',1) <>0				=> '', //if contains the word "DATE", blank out
-																											 stringlib.stringfind(corp2.t2u(l.documentid),'VOL',1)  <>0				=> '', //if contains the word "VOL", blank out
-																											 stringlib.stringfind(corp2.t2u(l.documentid),'V:',1)  <>0				=> '', //if contains the word "V:" (represents VOL), blank out
-																											 corp2.t2u(l.documentid)
-																											);
-				self.event_filing_date									:= choose(c,Corp2_Mapping.fValidateDate(l.filingdate,'CCYY-MM-DD').PastDate,
-																														Corp2_Mapping.fValidateDate(l.effectivedate,'CCYY-MM-DD').GeneralDate
+				self.corp_sos_charter_nbr								:= corp2.t2u(l.BusinessID);
+				self.event_filing_reference_nbr 				:= corp2.t2u(l.FilingNumber);
+				self.event_filing_date									:= choose(c,Corp2_Mapping.fValidateDate(l.filingdatetime[1..10],'CCYY-MM-DD').PastDate,
+																														Corp2_Mapping.fValidateDate(l.effectivedatetime[1..10],'CCYY-MM-DD').GeneralDate
 																												 );
-				self.event_date_type_cd									:= choose(c,if(Corp2_Mapping.fValidateDate(l.filingdate,'CCYY-MM-DD').PastDate<>'','FIL',''),
-																														if(Corp2_Mapping.fValidateDate(l.effectivedate,'CCYY-MM-DD').GeneralDate<>'','EFF','')
+				self.event_date_type_cd									:= choose(c,if(Corp2_Mapping.fValidateDate(l.filingdatetime[1..10],'CCYY-MM-DD').PastDate<>'','FIL',''),
+																														if(Corp2_Mapping.fValidateDate(l.effectivedatetime[1..10],'CCYY-MM-DD').GeneralDate<>'','EFF','')
 																												 );				
-				self.event_date_type_desc								:= choose(c,if(Corp2_Mapping.fValidateDate(l.filingdate,'CCYY-MM-DD').PastDate<>'','FILING',''),
-																														if(Corp2_Mapping.fValidateDate(l.effectivedate,'CCYY-MM-DD').GeneralDate<>'','EFFECTIVE','')
+				self.event_date_type_desc								:= choose(c,if(Corp2_Mapping.fValidateDate(l.filingdatetime[1..10],'CCYY-MM-DD').PastDate<>'','FILING',''),
+																														if(Corp2_Mapping.fValidateDate(l.effectivedatetime[1..10],'CCYY-MM-DD').GeneralDate<>'','EFFECTIVE','')
 																												 );
-				self.event_desc													:= corp2.t2u(l.dociddesc);
+				self.event_filing_desc                  := corp2.t2u(l.FilingType);
 				self 																		:= [];	
 		end;
 		
-		AllEvent 				:= normalize(Events_AR_File, if(Corp2_Mapping.fValidateDate(left.effectivedate,'CCYY-MM-DD').GeneralDate<>'',2,1),EventFilingTransform(left,counter));
+		AllEvent 				:= normalize(Filing, if(Corp2_Mapping.fValidateDate(left.effectivedatetime[1..10],'CCYY-MM-DD').GeneralDate<>'' and
+		                                        left.effectivedatetime[1..10] <> left.filingdatetime[1..10],2,1),EventFilingTransform(left,counter));
 		MapEvent				:= dedup(sort(distribute(AllEvent,hash(corp_key)),record,local),record,local) : independent;
 
 		//********************************************************************
 		//This begins the Stock mapping.
 		//********************************************************************
-		Corp2_mapping.LayoutsCommon.Stock StockTransform(Corp2_Raw_NH.Layouts.TempStockWithCorpLayoutIn l) := transform	
-				self.corp_key														:= state_fips + '-' + corp2.t2u(l.corporationid);
+		Corp2_mapping.LayoutsCommon.Stock StockTransform(Corp2_Raw_NH.Layouts.StockLayoutIn l) := transform	
+				self.corp_key														:= state_fips + '-' + corp2.t2u(l.BusinessID);
 				self.corp_vendor												:= state_fips;
 				self.corp_state_origin									:= state_origin;			
 				self.corp_process_date									:= fileDate;
-				self.corp_sos_charter_nbr								:= corp2.t2u(l.corporationnumber);
-				self.stock_class												:= Corp2_Raw_NH.Functions.StockClass(l.stockclassdesc);
-				self.stock_authorized_nbr								:= if((integer)l.authorizedshares <> 0,stringlib.stringfilterout((string)(integer)l.authorizedshares,'-'),''); //remove negative, if exists
-				self.stock_shares_issued								:= if((integer)l.issuedshares <> 0,(string)(integer)l.issuedshares,'');
-		    self.stock_par_value										:= if((integer)l.parvalue <> 0,stringlib.stringfilterout((string)(integer)l.parvalue,'-'),''); 								 //remove negative, if exists
+				self.corp_sos_charter_nbr								:= corp2.t2u(l.BusinessID);
+				self.stock_class												:= Corp2_Raw_NH.Functions.StockClass(l.ShareClass);
+				self.stock_authorized_nbr								:= if((integer)l.numberofshares <> 0,stringlib.stringfilterout((string)(integer)l.numberofshares,'-'),''); //remove negative, if exists
+		    self.stock_par_value										:= if((integer)l.parvalue <> 0,stringlib.stringfilterout((string)(integer)l.parvalue,'-$'),''); 							 //remove negative & $, if exists
+				self.stock_addl_info                    := corp2.t2u(l.Note);
 				self																		:= [];
 		end;
 
-		AllStock				:= project(StockFile, StockTransform(left));
+		AllStock				:= project(Stock, StockTransform(left));
 		MapStock				:= dedup(sort(distribute(AllStock,hash(corp_key)),record,local),record,local) : independent;
 
 		//********************************************************************
@@ -477,8 +388,8 @@ export NH := MODULE;
 		AR_TranslateBitMap		 := output(AR_T);
 
 		//Submits Profile's stats to Orbit
-		AR_SubmitStats 			   := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_NH_AR').SubmitStats;
-		AR_ScrubsWithExamples  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_NH_AR').CompareToProfile_with_Examples;
+		AR_SubmitStats 			   := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_NH_AR').SubmitStats;
+		AR_ScrubsWithExamples  := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_NH_AR').CompareToProfile_with_Examples;
 
 		AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
@@ -557,8 +468,8 @@ export NH := MODULE;
 		Event_TranslateBitMap		 	:= output(Event_T);
 
 		//Submits Profile's stats to Orbit
-		Event_SubmitStats 			 := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_NH_Event').SubmitStats;
-		Event_ScrubsWithExamples := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_NH_Event').CompareToProfile_with_Examples;
+		Event_SubmitStats 			 := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_NH_Event').SubmitStats;
+		Event_ScrubsWithExamples := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_NH_Event').CompareToProfile_with_Examples;
 
 		Event_ScrubsAlert				 	:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment	  := Scrubs.fn_email_attachment(Event_ScrubsAlert);
@@ -579,8 +490,7 @@ export NH := MODULE;
 																											Event_filing_reference_nbr_Invalid 		<> 0 or
 																											Event_filing_date_Invalid 						<> 0 or
 																											Event_date_type_cd_Invalid 						<> 0 or
-																											Event_date_type_desc_Invalid 					<> 0 or
-																											Event_desc_Invalid 					 					<> 0
+																											Event_date_type_desc_Invalid 					<> 0 
 																										 );
 
 		Event_GoodRecords					:= Event_N.ExpandedInFile(
@@ -592,8 +502,7 @@ export NH := MODULE;
 																											Event_filing_reference_nbr_Invalid 		= 0 and
 																											Event_filing_date_Invalid 						= 0 and
 																											Event_date_type_cd_Invalid 						= 0 and
-																											Event_date_type_desc_Invalid 					= 0 and
-																											Event_desc_Invalid 					  				= 0																										 
+																											Event_date_type_desc_Invalid 					= 0 																								 
 																										 );
 
 		Event_FailBuild					 	:= if(count(Event_GoodRecords) = 0,true,false);
@@ -639,8 +548,8 @@ export NH := MODULE;
 		Main_TranslateBitMap			:= output(Main_T);
 
 		//Submits Profile's stats to Orbit
-		Main_SubmitStats 			    := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_NH_Main').SubmitStats;
-		Main_ScrubsWithExamples   := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_NH_Main').CompareToProfile_with_Examples;
+		Main_SubmitStats 			    := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_NH_Main').SubmitStats;
+		Main_ScrubsWithExamples   := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_NH_Main').CompareToProfile_with_Examples;
 
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
@@ -669,7 +578,6 @@ export NH := MODULE;
 																											 corp_ln_name_type_desc_Invalid 				<> 0 or
 																											 corp_address1_type_cd_Invalid 					<> 0 or
 																											 corp_address1_type_desc_Invalid 				<> 0 or
-																											 corp_status_cd_Invalid 								<> 0 or
 																											 corp_status_desc_Invalid 							<> 0 or
 																											 corp_standing_Invalid 									<> 0 or
 																											 corp_inc_state_Invalid 								<> 0 or
@@ -681,22 +589,11 @@ export NH := MODULE;
 																											 corp_forgn_state_cd_Invalid  					<> 0 or
 																											 corp_forgn_state_desc_Invalid 					<> 0 or
 																											 corp_forgn_date_Invalid 								<> 0 or
-																											 corp_orig_org_structure_cd_Invalid			<> 0 or
 																											 corp_orig_org_structure_desc_Invalid 	<> 0 or
 																											 corp_for_profit_ind_Invalid 						<> 0 or
 																											 corp_ra_address_type_desc_Invalid 			<> 0 or
-																											 cont_title1_desc_Invalid 							<> 0 or
-																											 cont_title2_desc_Invalid 							<> 0 or
-																											 cont_title3_desc_Invalid 							<> 0 or
-																											 cont_title4_desc_Invalid 							<> 0 or
-																											 cont_title5_desc_Invalid 							<> 0 or
 																											 cont_address_type_cd_Invalid 					<> 0 or
-																											 corp_merged_corporation_id_Invalid 		<> 0 or
-																											 corp_merger_date_Invalid 							<> 0 or
-																											 corp_merger_id_Invalid 								<> 0 or
-																											 corp_merger_indicator_Invalid 					<> 0 or
-																											 recordorigin_Invalid 									<> 0 or
-																											 internalfield1_Invalid									<> 0																								 
+																											 recordorigin_Invalid 									<> 0 																							 
 																											 
 																										);
 																								 																	
@@ -717,7 +614,6 @@ export NH := MODULE;
 																											 corp_ln_name_type_desc_Invalid 				= 0 and
 																											 corp_address1_type_cd_Invalid 					= 0 and
 																											 corp_address1_type_desc_Invalid 				= 0 and
-																											 corp_status_cd_Invalid 								= 0 and
 																											 corp_status_desc_Invalid 							= 0 and
 																											 corp_standing_Invalid 									= 0 and
 																											 corp_inc_state_Invalid 								= 0 and
@@ -729,22 +625,11 @@ export NH := MODULE;
 																											 corp_forgn_state_cd_Invalid  					= 0 and
 																											 corp_forgn_state_desc_Invalid 					= 0 and
 																											 corp_forgn_date_Invalid 								= 0 and
-																											 corp_orig_org_structure_cd_Invalid			= 0 and
 																											 corp_orig_org_structure_desc_Invalid 	= 0 and
 																											 corp_for_profit_ind_Invalid 						= 0 and
 																											 corp_ra_address_type_desc_Invalid 			= 0 and
-																											 cont_title1_desc_Invalid 							= 0 and
-																											 cont_title2_desc_Invalid 							= 0 and
-																											 cont_title3_desc_Invalid 							= 0 and
-																											 cont_title4_desc_Invalid 							= 0 and
-																											 cont_title5_desc_Invalid 							= 0 and
 																											 cont_address_type_cd_Invalid 					= 0 and
-																											 corp_merged_corporation_id_Invalid 		= 0 and
-																											 corp_merger_date_Invalid 							= 0 and
-																											 corp_merger_id_Invalid 								= 0 and
-																											 corp_merger_indicator_Invalid 					= 0 and
-																											 recordorigin_Invalid 									= 0 and
-																											 internalfield1_Invalid									= 0																								 
+																											 recordorigin_Invalid 									= 0 																						 
 																								  );
 
 		Main_FailBuild					:= map( corp2_mapping.fCalcPercent(count(Main_N.ExpandedInFile(corp_key_invalid<>0)),count(Main_N.ExpandedInFile),false) 										> Scrubs_Corp2_Mapping_NH_Main.Threshold_Percent.CORP_KEY										 => true,
@@ -795,8 +680,8 @@ export NH := MODULE;
 		Stock_TranslateBitMap			:= output(Stock_T);
 
 		//Submits Profile's stats to Orbit
-		Stock_SubmitStats 			  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Stock','ScrubsAlerts', Stock_OrbitStats, version,'Corp_NH_Stock').SubmitStats;
-		Stock_ScrubsWithExamples  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_NH_Stock','ScrubsAlerts', Stock_OrbitStats, version,'Corp_NH_Stock').CompareToProfile_with_Examples;
+		Stock_SubmitStats 			  := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Stock','ScrubsAlerts', Stock_OrbitStats, version,'Corp_NH_Stock').SubmitStats;
+		Stock_ScrubsWithExamples  := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_NH_Stock','ScrubsAlerts', Stock_OrbitStats, version,'Corp_NH_Stock').CompareToProfile_with_Examples;
 
 		Stock_ScrubsAlert					:= Stock_ScrubsWithExamples(RejectWarning = 'Y');
 		Stock_ScrubsAttachment		:= Scrubs.fn_email_attachment(Stock_ScrubsAlert);

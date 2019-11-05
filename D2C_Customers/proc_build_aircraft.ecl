@@ -2,7 +2,8 @@
 
 /********* FAA_AIRCRAFT **********/
 
-aircraft_reg  := faa.file_aircraft_registration_out((unsigned6)did_out > 0);
+//SINGLE src(AR) - ALL allowed
+aircraft_reg  := faa.file_aircraft_registration_out((unsigned6)did_out > 0); 
 aircraft_info := faa.file_aircraft_info_in;
 
 DESC_FIELDS := ['AIRCRAFT_CATEGORY_CODE', 'TYPE_AIRCRAFT', 'AIRCRAFT_WEIGHT'];
@@ -38,7 +39,7 @@ EXPORT proc_build_aircraft(unsigned1 mode, string8 ver, string20 customer_name) 
                mode = 3 => coreDerogatoryDS //MONTHLY
                );
    
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'aircraft');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 10);
    return res;
 
 END;

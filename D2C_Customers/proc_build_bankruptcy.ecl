@@ -1,6 +1,9 @@
 ﻿import PromoteSupers, Watchdog, BankruptcyV2;
 
 /********* BANKRUPTCY **********/
+//SRC code - 'BA'
+//SOURCE IS NOT AVAILALBE IN THE DATASET
+//PACER is the only source indicated as bulk and consumer restricted by default (consult legal)
 
 BKSearchDS := bankruptcyV2.file_bankruptcy_search_v3(name_type='D' and lname!='' and prim_name!='');
 BKMainDS   :=	bankruptcyV2.file_bankruptcy_main_v3(case_number!='');
@@ -40,7 +43,7 @@ EXPORT proc_build_bankruptcy(unsigned1 mode, string8 ver, string20 customer_name
                mode = 3 => coreDerogatoryDS   //MONTHLY
                );
             
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'bankruptcy');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 5);
    return res;
 
 END;

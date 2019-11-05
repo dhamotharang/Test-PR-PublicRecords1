@@ -2,7 +2,10 @@
 
 /********* HUNTING_FISHING_PERMITS **********/
 
-hf	 := eMerges.file_hunters_out((unsigned6)did_out > 0, Source_Code not in D2C.Constants.CCWRestrictedSources);
+hf	 := eMerges.file_hunters_out(
+            (unsigned6)did_out > 0,
+             Source_Code not in D2C.Constants.CCWRestrictedSources,
+             D2C_Customers.SRC_Allowed.Check(12, source_code));
 
 EXPORT proc_build_hunting(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
@@ -28,7 +31,7 @@ EXPORT proc_build_hunting(unsigned1 mode, string8 ver, string20 customer_name) :
                mode = 3 => coreDerogatoryDS //MONTHLY
                );
    
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'hunting');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 12);
    return res;
 
 END;

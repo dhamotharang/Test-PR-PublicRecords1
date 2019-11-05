@@ -32,7 +32,7 @@ dictMajor := DICTIONARY(dsMajor, {abbreviation => major});
 
 EXPORT proc_build_students(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-    students   := DISTRIBUTE(American_student_list.File_american_student_DID(did<>0), hash(did));
+    students   := DISTRIBUTE(American_student_list.File_american_student_DID(did<>0, D2C_Customers.SRC_Allowed.Check(22, source)), hash(did));
     students_s := SORT(students, did, historical_flag, -date_last_seen, local);
 
 	D2C_Customers.layouts.rStudent AddStudent(students_s L) := TRANSFORM
@@ -53,7 +53,7 @@ EXPORT proc_build_students(unsigned1 mode, string8 ver, string20 customer_name) 
                  mode = 3 => coreDerogatoryDS //MONTHLY
                );
                 
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'students');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 22);
    return res;
 
 END;

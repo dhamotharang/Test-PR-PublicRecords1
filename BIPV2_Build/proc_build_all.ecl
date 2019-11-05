@@ -10,11 +10,11 @@ export proc_build_all(
   ,pPowStartIteration     = '\'\''
   ,pEmpDownStartIteration = '1'
   ,pEmpStartIteration     = '\'\''
-  ,pDotNumIterations      = '3'
+  ,pDotNumIterations      = '2'
   ,pProxNumIterations     = '2'
   ,pProxMj6NumIterations  = '3'
-  ,pProxPostNumIterations = '3'
-  ,pLgid3NumIterations    = '15'
+  ,pProxPostNumIterations = '1'
+  ,pLgid3NumIterations    = '7'
   ,pPowDownNumIterations  = '2'
   ,pPowNumIterations      = '2'
   ,pEmpDownNumIterations  = '6'
@@ -80,6 +80,7 @@ export proc_build_all(
   ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
   ,pSkipCrosswalk         = 'false'
+  ,pSkipMktgListBuild     = 'false'
   ,pSkipCDWBuild          = 'false'
   ,pSkipXAppend           = 'false'
   ,pSkipEntityReport      = 'false'
@@ -102,7 +103,7 @@ export proc_build_all(
 ) := 
 functionmacro
     
-    import BIPV2_Build, BIPV2_DotID, BIPV2_ProxID, BIPV2_Entity, bipv2, ut,BizLinkFull,tools;    
+    import BIPV2_Build, BIPV2_DotID, BIPV2_ProxID, BIPV2_Entity, bipv2, ut,BizLinkFull,tools,Marketing_List;    
 
     // -- Cleanup the previous build -- this needs to expand to more files
     // notdeleteversion  := regexfind('[[:digit:]]+',pversion,0,nocase);  //do this so we don't delete any files from a rebuild--may want to keep those until the next build for research purposes.
@@ -175,7 +176,8 @@ functionmacro
       
       // -- Now do Post process stuff.  All keys have been built so do some housekeeping, copying, renaming, promoting(if requested), verifying, and updating DOPS(if requested)
 
-
+      
+      ,if(pSkipMktgListBuild = false ,Marketing_List.proc_build_all           (pversion                                                                                                     )) // do Build Marketing List in background
       ,if(pSkipCDWBuild      = false ,BIPV2_Build.proc_CDW_Files              (pversion                                                                                                     )) // do Build CDW
       // ,if(pSkipXAppend       = false ,BIPV2_Build.proc_External_Append_Testing(pversion                                                                                                     )) // do external append testing
       // ,if(pSkipDataCard      = false ,BIPV2_Build.proc_DataCard               (pversion                                                                                                     )) // do datacard --moved to earlier in build

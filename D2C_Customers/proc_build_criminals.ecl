@@ -2,8 +2,8 @@
 
 /********* CIVIL_CRIMINAL_RECORDS **********/
 
-crims  := doxie_files.File_Offenders((unsigned6)did > 0, data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
-courts := doxie_files.file_court_offenses(data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
+crims  := doxie_files.File_Offenders((unsigned6)did > 0, data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors, D2C_Customers.SRC_Allowed.Check(7, vendor));
+courts := doxie_files.file_court_offenses(data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors, D2C_Customers.SRC_Allowed.Check(7, vendor));
 
 EXPORT proc_build_criminals(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
@@ -39,8 +39,8 @@ EXPORT proc_build_criminals(unsigned1 mode, string8 ver, string20 customer_name)
                mode = 2 => coreDS,           //QUARTERLY
                mode = 3 => coreDerogatoryDS  //MONTHLY
                );
-
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'criminals');
+   
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 7);
    return res;
 
 END;

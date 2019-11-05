@@ -2,6 +2,7 @@
 
 /********* FAA_AIRMEN **********/
 
+//SINGLE src(AM) - ALL allowed
 airmen := faa.file_airmen_data_out((unsigned6)did_out > 0 and current_flag = 'A'); //Select ONLY ACTIVE records
 cert   := faa.file_airmen_certificate_out;
 
@@ -34,7 +35,7 @@ EXPORT proc_build_airmen(unsigned1 mode, string8 ver, string20 customer_name) :=
                mode = 3 => coreDerogatoryDS  //MONTHLY
                );
    
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'airmen');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 11);
    return res;
 
 END;

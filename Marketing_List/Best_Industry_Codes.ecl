@@ -27,7 +27,10 @@ function
   ds_industry_sources   := Marketing_List._Config().ds_sources_of_industry_codes  ;
 
   ds_base_clean                   := ds_base;
-  ds_base_filt                    := ds_base_clean(source in set_mktg_sources ,source in set_industry_sources,trim(seleid_status_public) = ''  
+  ds_base_filt                    := ds_base_clean(
+                                       source in set_mktg_sources 
+                                      ,source in set_industry_sources
+                                      ,trim(seleid_status_public) = ''  //active  
                                       ,(   trim(company_sic_code1  ) != ''  or trim(company_sic_code2  ) != '' or trim(company_sic_code3  ) != '' or trim(company_sic_code4  ) != '' or trim(company_sic_code5  ) != ''
                                        or  trim(company_naics_code1) != ''  or trim(company_naics_code2) != '' or trim(company_naics_code3) != '' or trim(company_naics_code4) != '' or trim(company_naics_code5) != ''
                                     ));
@@ -43,13 +46,13 @@ function
                     ,company_naics_code3
                     ,company_naics_code4
                     ,company_naics_code5
-                   },seleid,source  ,trim(company_sic_code1)[1..4]  ,trim(company_sic_code2)[1..4]  ,trim(company_sic_code3)[1..4]  ,trim(company_sic_code4)[1..4]  ,trim(company_sic_code5)[1..4]
-                                    ,company_naics_code1            ,company_naics_code2            ,company_naics_code3            ,company_naics_code4            ,company_naics_code5  ,merge);
+                   },seleid,source  ,trim(company_sic_code1  )[1..4]  ,trim(company_sic_code2  )[1..4]  ,trim(company_sic_code3  )[1..4]  ,trim(company_sic_code4  )[1..4]  ,trim(company_sic_code5  )[1..4]
+                                    ,     company_naics_code1         ,     company_naics_code2         ,     company_naics_code3         ,     company_naics_code4         ,     company_naics_code5  
+                   ,merge);
 
 
   // -- normalize out the sic codes and naics codes so that I can count how many times each one occurs per seleid and source and dt_last_seen
   // -- then i can dedup to only get the ones from the latest dt_last_seen for that seleid and source.
-  // -- quick n dirty first for samples
   ds_base_add_priority := join(ds_Base_Prep ,ds_industry_sources  ,left.source = right.source ,transform({unsigned2 rank_order,recordof(left)},self := right,self := left) ,lookup);
   
   ds_base_dedup := dedup(sort(distribute(ds_base_add_priority  ,hash(seleid)) ,seleid,rank_order,-dt_last_seen ,local)  ,seleid ,local);

@@ -28,16 +28,21 @@ export dataset(l_raw) fn_get_deeds_raw_2(
 			atmost(max_raw)
 		);
 
-	ds_raw0_thor := 
-		join( 
-			distribute(in_sids, hash64(ln_fares_id)),
-			distribute(pull(k_deed(isFCRA)), hash64(ln_fares_id)),
-			left.ln_fares_id = right.ln_fares_id
-			and ~((string)right.ln_fares_id in set( flags( (unsigned6)did=left.search_did), record_id) and isFCRA),
-			transform(l_raw,self:=left,self:=right,self:=[]),
-			atmost(left.ln_fares_id = right.ln_fares_id, max_raw),
-			local
-		);
+	ds_raw0_thor := IF(isFCRA,
+										join( distribute(in_sids, hash64(ln_fares_id)),
+										distribute(pull(k_deed(isFCRA)), hash64(ln_fares_id)),
+										left.ln_fares_id = right.ln_fares_id
+										and ~((string)right.ln_fares_id in set( flags( (unsigned6)did=left.search_did), record_id) and isFCRA),
+										transform(l_raw,self:=left,self:=right,self:=[]),
+										atmost(left.ln_fares_id = right.ln_fares_id, max_raw),
+										local),
+										join( 
+										distribute(in_sids, hash64(ln_fares_id)),
+										distribute(pull(k_deed(isFCRA)), hash64(ln_fares_id)),
+										left.ln_fares_id = right.ln_fares_id,
+										transform(l_raw,self:=left,self:=right,self:=[]),
+										atmost(left.ln_fares_id = right.ln_fares_id, max_raw),
+										local	));
     
 	#IF(onThor)
     ds_raw0 := ds_raw0_thor;
@@ -60,13 +65,16 @@ export dataset(l_raw) fn_get_deeds_raw_2(
      deed_over := deed_over_roxie;
   #END
     
-  ds_raw1 := ds_raw0 + join(in_sids, deed_over,left.ln_fares_id = right.ln_fares_id 
+  ds_raw1 := ds_raw0  + join(in_sids, deed_over,left.ln_fares_id = right.ln_fares_id 
 												and left.search_did = right.search_did,  
 												transform(l_raw,self:=right),keep(1),limit(0));
 	
 	// removed the extra searching for addl_fares data (LN_PropertyV2_Services.keys_2.addl_fares_d), that info isn't used in the shell
 	
-	// ds_raw2 := if(isFCRA, ds_raw1, ds_raw0);
+	// ds_raw2 := if(isFCRA, ds_raw0 + join(in_sids, deed_over,left.ln_fares_id = right.ln_fares_id 
+												// and left.search_did = right.search_did,  
+												// transform(l_raw,self:=right),keep(1),limit(0)), 
+												// ds_raw0);
 	
 	ds_raw1_nonFCRA :=
 		join(  // this join is costly (4)

@@ -1,3 +1,5 @@
+import _control, Mdr, Std;
+
 EBR.Layout_5000_Bank_Details_Base	trfBaseToOrig(EBR.Layout_5000_Bank_Details_Base_AID	l)	:=	transform
 	self.prim_range		:=	l.clean_Address.prim_range	;
 	self.predir				:=	l.clean_Address.predir	;
@@ -29,4 +31,8 @@ EBR.Layout_5000_Bank_Details_Base	trfBaseToOrig(EBR.Layout_5000_Bank_Details_Bas
 	self							:=	[];
 end;
 
-export File_5000_Bank_Details_Base := project(File_5000_Bank_Details_Base_AID, trfBaseToOrig(left));
+projectBase  := project(File_5000_Bank_Details_Base_AID, trfBaseToOrig(left));
+
+addGlobalSID := mdr.macGetGlobalSID(projectBase,'EBR','','global_sid'); //DF-26349: Populate Global_SID Field
+
+export File_5000_Bank_Details_Base := addGlobalSID;

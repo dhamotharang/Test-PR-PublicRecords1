@@ -52,7 +52,7 @@
 		EXPORT fileLocation(BOOLEAN useProdData)	:= IF(useProdData, data_services.foreign_prod, data_services.foreign_dataland);
 		EXPORT fileScope						:= 'fraudgov::base::built::kel::';
 		// EXPORT fileScope						:= 'gov::otto::';
-		// EXPORT fileScope						:= 'fraudgov::base::20190928::kel::';
+		// EXPORT fileScope						:= 'fraudgov::base::20191025::kel::';
 		EXPORT fatherFileScope			:= 'fraudgov::base::father::kel::';
 		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrZWVJczQh';
 		EXPORT reqSource						:= 'batch';		
@@ -64,7 +64,7 @@
 		EXPORT HpccConnectionQa			:= 'ramps_cert_fraudgov';
 		EXPORT HpccConnectionQaDev	:= 'ramps_certthor_devroxie_fraudgov';
 		EXPORT HpccConnectionDev		:= 'ramps_dev_fraudgov';
-		EXPORT EclCompileStrategy		:= 'REMOTE';											
+		EXPORT EclCompileStrategy		:= 'LOCAL';											
 		EXPORT KeepEcl							:= 'FALSE';	
 		EXPORT ForceRun							:= 'FALSE';
 		EXPORT CustomerDashboard 		:= MODULE
@@ -76,10 +76,10 @@
 			END;
 		END;
 		EXPORT CustomerDashboard1_1		:= MODULE
-			EXPORT VizServiceVersion								:= '1';
+			EXPORT VizServiceVersion								:= '2';
 			EXPORT CompositionUuid									:= '4dbbbb5c-e1d6-40ef-a8f9-51a33b35260a'; 	//Customer Dashboard 1.1 Composition ID
 			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
-				EXPORT InputLogicalCluster								:= fileLocation(useProdData) + 'gov::otto::' + 'customerdashboardtopclusters';
+				EXPORT InputLogicalCluster								:= fileLocation(useProdData) + fileScope + 'customerdashtopclusters';
 				EXPORT InputLogicalIdentitiesAndElements	:= fileLocation(useProdData) + fileScope + 'customerdashtopclustersandelements';
 				EXPORT InputLogicalEntityStats						:= fileLocation(useProdData) + fileScope + 'entitystats';
 			END;

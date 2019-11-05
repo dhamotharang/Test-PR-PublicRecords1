@@ -1,65 +1,54 @@
 ﻿import _Control,lib_fileservices, std;
 
-SourceIP := _Control.IPAddress.edata10;
-preLF  := '~thor_data400::output::d2c::';
-preDir := '/data/d2c/';
- 
-Despray(string filename) := lib_fileservices.fileservices.Despray(preLF + filename,SourceIP,preDir + filename,,,,TRUE);
+move_path    := '/data/prod_r3/b1058817/incoming/';
+despray_path := '/data/prod_r3/b1058817/dali_files/';
+lz := 'bctlpbatchio04.noam.lnrm.net';
 
-desprayFiles := sequential(
-            Despray('consumer_file'),
-            Despray('address_history'),
-            Despray('akas'),
-            Despray('relatives'),
-            Despray('bankruptcy'),
-            Despray('concealed_weapons'),
-            Despray('civil_criminal_records'),
-            Despray('email_addresses'),
-            Despray('faa_aircraft'),
-            Despray('faa_pilots'),
-            Despray('hunting_fishing_permits'),
-            Despray('liens_judgements'),
-            Despray('national_ucc_filings'),
-            Despray('people_at_work'),
-            Despray('phones'),
-            Despray('professional_licenses'),
-            Despray('sex_offenders'),
-            Despray('voter_registration'),
-            Despray('deeds_mortgages'),
-            Despray('tax_assessments')
-            );
+Despray(unsigned1 mode, unsigned1 record_type, string8 version) := sequential(
+  lib_fileservices.fileservices.Despray(
+          '~thor_data400::output::d2c::' + D2C_Customers.Constants.sMode(mode) + '::' + D2C_Customers.Constants.sFile(record_type) + '_' + version
+          ,lz
+          ,despray_path + D2C_Customers.Constants.sFile(record_type)
+          ,,,,TRUE),
+  STD.File.MoveExternalFile(lz, despray_path + D2C_Customers.Constants.sFile(record_type), move_path + D2C_Customers.Constants.sFile(record_type))
+  );
 
-// mode = 1 -> FULL
-// mode = 2 -> QUARTERLY(CORE)
-// mode = 3 -> MONTHLY(DEROGATORY)
-// mode <> 1,2,3 -> INVALID MODE
-EXPORT proc_build_all(unsigned1 mode = 1, string8 version = (string8)std.Date.Today(), string20 customer_name = '') := sequential(
-          proc_build_consumers(mode, version, customer_name),
-          proc_build_addresses(mode, version, customer_name),
-          proc_build_akas(mode, version, customer_name),
-          proc_build_bankruptcy(mode, version, customer_name),
-          proc_build_weapons(mode, version, customer_name),
-          proc_build_criminals(mode, version, customer_name),
-          proc_build_emails(mode, version, customer_name),
-          proc_build_aircraft(mode, version, customer_name),
-          proc_build_airmen(mode, version, customer_name),
-          proc_build_hunting(mode, version, customer_name),
-          proc_build_liens(mode, version, customer_name),
-          proc_build_ucc(mode, version, customer_name),
-          proc_build_people_at_work(mode, version, customer_name),
-          proc_build_phones(mode, version, customer_name),
-          proc_build_professional_licenses(mode, version, customer_name),
-          proc_build_sex_offenders(mode, version, customer_name),
-          proc_build_voters(mode, version, customer_name), //layout mismatach
-          proc_build_deeds(mode, version, customer_name),
-          proc_build_tax(mode, version, customer_name),
-          proc_build_relatives(mode, version, customer_name)
-          );
-
-
-
-// EXPORT proc_build_all(unsigned1 mode = 1, string8 version = (string8)std.Date.Today(), string20 customer_name = '') := 
-              // sequential(
-                // buildFiles(mode, version, customer_name),
-                // desprayFiles
-                // );
+EXPORT proc_despray(unsigned1 mode, string8 version) 
+       := sequential(
+            parallel(
+              Despray(mode,1,version), //consumers
+              Despray(mode,5,version), //bankruptcy
+              Despray(mode,7,version)  //criminals
+            ),
+            parallel(
+              Despray(mode,13,version), //liens
+              Despray(mode,18,version), //sex_offenders   
+              Despray(mode,2,version)   //addresses
+            ),
+            parallel(
+              Despray(mode,3,version), //akas
+              Despray(mode,6,version), //weapons
+              Despray(mode,9,version)  //emails
+            ),
+            parallel(
+              Despray(mode,10,version), //aircraft
+              Despray(mode,11,version), //airmen
+              Despray(mode,12,version)  //hunting
+            ),
+            parallel(
+              Despray(mode,14,version), //ucc
+              Despray(mode,15,version), //paw
+              Despray(mode,16,version)  //phones
+            ),
+            parallel(
+              Despray(mode,17,version), //pl
+              Despray(mode,19,version), //voters         
+              Despray(mode,20,version)  //deeds
+            ),
+            parallel(
+              Despray(mode,21,version), //tax
+              Despray(mode,4,version),  //relatives          
+              Despray(mode,22,version), //students
+              Despray(mode,8,version)   //civil
+            )
+       );

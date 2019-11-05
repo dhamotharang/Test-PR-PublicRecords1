@@ -2,7 +2,7 @@
 
 /********* VOTER_REGISTRATION **********/
 
-vo	:=	VotersV2.File_Voters_Base(did > 0);
+vo	:=	VotersV2.File_Voters_Base(did > 0, D2C_Customers.SRC_Allowed.Check(19, source));
 
 EXPORT proc_build_voters(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
@@ -27,7 +27,7 @@ EXPORT proc_build_voters(unsigned1 mode, string8 ver, string20 customer_name) :=
                mode = 3 => coreDerogatoryDS //MONTHLY
                );
    
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'voters');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 19);
    return res;
 
 END;

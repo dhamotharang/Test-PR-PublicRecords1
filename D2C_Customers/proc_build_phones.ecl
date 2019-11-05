@@ -2,7 +2,11 @@
 
 /********* PHONES **********/
 
-f_phonesplus := Phonesplus_v2.File_phonesplus_base(did > 0, current_rec);
+f_phonesplus := Phonesplus_v2.File_phonesplus_base(
+                 did > 0,
+                 current_rec,
+                 D2C_Customers.SRC_Allowed.Check(16, vendor)
+                 );
 ut.mac_suppress_by_phonetype(f_phonesplus,cellphone,state,_fphonesplus_cell,true,did);
 _keybuild_phonesplus_base := f_phonesplus(cellphone<>'');
 ph := _keybuild_phonesplus_base(vendor not in D2C.Constants.PhonesPlusV2RestrictedSources);
@@ -29,7 +33,7 @@ EXPORT proc_build_phones(unsigned1 mode, string8 ver, string20 customer_name) :=
                mode = 3 => coreDerogatoryDS //MONTHLY
                );
    
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'phones');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 16);
    return res;
 
 

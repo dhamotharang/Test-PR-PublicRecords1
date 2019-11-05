@@ -2,7 +2,7 @@
 
 /********* SEX_OFFENDERS **********/
 
-main     := sexoffender.file_Main;
+main     := sexoffender.file_Main(D2C_Customers.SRC_Allowed.Check(18, source_file));
 offenses := sexoffender.File_offenses_2;
 
 offenses_d := project(dedup(offenses, seisint_primary_key, Offense_description, all)
@@ -66,7 +66,7 @@ EXPORT proc_build_sex_offenders(unsigned1 mode, string8 ver, string20 customer_n
                mode = 3 => coreDerogatoryDS //MONTHLY                  
                );
 
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'sex_offenders');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 18);
    return res;
 
 END;
