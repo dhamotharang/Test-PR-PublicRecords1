@@ -35,7 +35,7 @@ EXPORT Search_Records(
                            $.Transforms.xfSearchOut(LEFT, search_params.dob_mask)),iesp.Constants.Email.MAX_RECS);
     input_subject := ROW($.Transforms.xfInputEcho(rec_in, _recs[1].subject_lexid)); 
     
-    response_row := ROW({_header, search_recs, input_subject}, iesp.emailsearchv2.t_EmailSearchV2Response);
+    response_row := ROW({_header, COUNT(search_recs), search_recs, input_subject}, iesp.emailsearchv2.t_EmailSearchV2Response);
     
     // Now combine results for output 
     combined_rec := RECORD
