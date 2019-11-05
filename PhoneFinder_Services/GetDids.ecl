@@ -24,14 +24,16 @@ FUNCTION
 
   rCntDIDs_Layout :=
   RECORD(didville.Layout_Did_OutBatch)
-    UNSIGNED1 did_count := 1;
+    UNSIGNED1 did_count := 0;
   END;
 
   dFormat2CntDIDs := SORT(PROJECT(dADLBatchOut, rCntDIDs_Layout), seq, -score);
 
   rCntDIDs_Layout tCntDIDs(rCntDIDs_Layout le, rCntDIDs_Layout ri) :=
   TRANSFORM
-    SELF.did_count := IF(le.score > ri.score, le.did_count, le.did_count + 1);
+    SELF.did_count := MAP(le.did = 0          => $.Constants.LexIDCntType.Blank,
+                          le.score > ri.score => $.Constants.LexIDCntType.Single,
+                          $.Constants.LexIDCntType.Single + 1);
     SELF           := le;
   END;
 

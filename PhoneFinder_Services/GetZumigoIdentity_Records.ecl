@@ -60,35 +60,35 @@ MODULE
 
   Phones.Layouts.ZumigoIdentity.subjectVerificationRequest toZin(PhoneFinder_Services.Layouts.PhoneFinder.Final l) :=
   TRANSFORM
-    SELF.acctno := l.acctno;
-    SELF.sequence_number    := l.seq;
-    SELF.phone  := l.phone;
-    SELF.lexid := l.did;
-    SELF.nametype := 'FULL NAME';
-    SELF.first_name := l.fname;
-    SELF.last_name := l.lname;
-    SELF.addresstype := 'FULL ADDRESS';
-    SELF.prim_range := l.prim_range;
-    SELF.predir := l.predir;
-    SELF.prim_name := l.prim_name;
-    SELF.addr_suffix := l.suffix;
-    SELF.postdir := l.postdir;
-    SELF.unit_desig := l.unit_desig;
-    SELF.sec_range := l.sec_range;
-    SELF.p_city_name := l.city_name;
-    SELF.st := l.st;
-    SELF.z5 := l.zip;
-    SELF.zip4 := l.zip4;
-    SELF.county_name := l.county_name;
-    SELF := [];
+    SELF.acctno          := l.acctno;
+    SELF.sequence_number := l.seq;
+    SELF.phone           := l.phone;
+    SELF.lexid           := l.did;
+    SELF.nametype        := 'FULL NAME';
+    SELF.first_name      := l.fname;
+    SELF.last_name       := l.lname;
+    SELF.addresstype     := 'FULL ADDRESS';
+    SELF.prim_range      := l.prim_range;
+    SELF.predir          := l.predir;
+    SELF.prim_name       := l.prim_name;
+    SELF.addr_suffix     := l.suffix;
+    SELF.postdir         := l.postdir;
+    SELF.unit_desig      := l.unit_desig;
+    SELF.sec_range       := l.sec_range;
+    SELF.p_city_name     := l.city_name;
+    SELF.st              := l.st;
+    SELF.z5              := l.zip;
+    SELF.zip4            := l.zip4;
+    SELF.county_name     := l.county_name;
+    SELF                 := [];
   END;
 
   SHARED Zum_inrecs := PROJECT(Phones_wireless, toZin(LEFT));
 
   SHARED Zum_inMod := MODULE(Phones.IParam.inZumigoParams)
-    EXPORT STRING20  Usecase             := PhoneFinder_Services.Constants.ZumigoConstants.Usecase;
-    EXPORT STRING3   productCode         := PhoneFinder_Services.Constants.ZumigoConstants.productCode;
-    EXPORT STRING8   billingId           := inMod.billingId;
+    EXPORT STRING20 Usecase              := PhoneFinder_Services.Constants.ZumigoConstants.Usecase;
+    EXPORT STRING3  productCode          := PhoneFinder_Services.Constants.ZumigoConstants.productCode;
+    EXPORT STRING8  billingId            := inMod.billingId;
     EXPORT STRING20 productName          := PhoneFinder_Services.Constants.ZumigoConstants.productName;
 
     EXPORT BOOLEAN NameAddressValidation := inMod.IncludeNameAddressValidation;
@@ -97,10 +97,10 @@ MODULE
     EXPORT BOOLEAN DeviceHistory         := inMod.IncludeDeviceHistory;
     EXPORT BOOLEAN DeviceChangeInfo      := inMod.IncludeDeviceChangeInfo;
     EXPORT STRING10 optInType            := PhoneFinder_Services.Constants.ZumigoConstants.optInType;
-    EXPORT STRING5  optInMethod         := PhoneFinder_Services.Constants.ZumigoConstants.optInMethod;
-    EXPORT STRING3  optinDuration       := PhoneFinder_Services.Constants.ZumigoConstants.optinDuration;
-    EXPORT STRING   optinId               := IF(Phones.Constants.Debug.Testing, '1', inMod.billingId);
-    EXPORT STRING   optInVersionId        := '';
+    EXPORT STRING5  optInMethod          := PhoneFinder_Services.Constants.ZumigoConstants.optInMethod;
+    EXPORT STRING3  optinDuration        := PhoneFinder_Services.Constants.ZumigoConstants.optinDuration;
+    EXPORT STRING   optinId              := IF(Phones.Constants.Debug.Testing, '1', inMod.billingId);
+    EXPORT STRING   optInVersionId       := '';
     EXPORT STRING15 optInTimestamp       := (STRING)STD.Date.CurrentDate(TRUE)+' '+(STRING)INTFORMAT(STD.Date.CurrentTime(TRUE),6,1);
     EXPORT DATASET(Gateway.Layouts.Config) gateways := dGateways(Gateway.Configuration.IsZumigoIdentity(servicename));
   END;
@@ -112,31 +112,33 @@ MODULE
 
   PhoneFinder_Services.Layouts.PhoneFinder.Final toZumValidated(PhoneFinder_Services.Layouts.PhoneFinder.Final l, Phones.Layouts.ZumigoIdentity.zOut r) :=
   TRANSFORM
-    SELF.CallForwardingIndicator   := IF(Zum_inMod.CallHandlingInfo AND r.acctno <>'', PhoneFinder_Services.Functions.CallForwardingDesc(r.call_forwarding),''); //get call forwarded value only when CallHandlingInfo is selected and a right record exists
-    SELF.rec_source := r.source; // for royalty count
-    SELF.imsi_changedate := r.imsi_changedate;
-    SELF.imsi_ActivationDate := r.imsi_ActivationDate;
-    SELF.iccid_changedthis_time := r.iccid_changedthis_time;
-    SELF.iccid_seensince := r.iccid_seensince;
-    SELF.imsi_changedthis_time := r.imsi_changedthis_time;
-    SELF.imei_changedthis_time := r.imei_changed_this_time;
-    SELF.imsi_seensince := r.imsi_seensince;
-    SELF.imei_seensince := r.imei_seensince;
-    SELF.imei_changedate := r.imei_changedate;
-    SELF.imei_ActivationDate := r.imei_ActivationDate;
-    SELF.loststolen := r.loststolen;
-    SELF.loststolen_date := r.loststolen_date;
-    SELF.imsi_Tenure_MinDays := IF(r.sim_Tenure_MinDays != 0, r.sim_Tenure_MinDays, r.imsi_Tenure_MinDays); //Temporary patch until the Gateway ESP is released with new changes.
-    SELF.imsi_Tenure_MaxDays := IF(r.sim_Tenure_MaxDays != 0, r.sim_Tenure_MaxDays, r.imsi_Tenure_MaxDays);
-    SELF.imei_Tenure_MinDays := r.imei_Tenure_MinDays;
-    SELF.imei_Tenure_MaxDays := r.imei_Tenure_MaxDays;
-    SELF.sim_Tenure_MinDays  := IF(r.sim_Tenure_MinDays != 0, r.sim_Tenure_MinDays, r.imsi_Tenure_MinDays);
-    SELF.sim_Tenure_MaxDays  := IF(r.sim_Tenure_MaxDays != 0, r.sim_Tenure_MaxDays, r.imsi_Tenure_MinDays);
-    IsValidated      := (r.first_name_score BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX) AND
-                        (r.last_name_score BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX);
+    SELF.CallForwardingIndicator := IF(Zum_inMod.CallHandlingInfo AND r.acctno <>'', PhoneFinder_Services.Functions.CallForwardingDesc(r.call_forwarding),''); //get call forwarded value only when CallHandlingInfo is selected and a right record exists
+    SELF.rec_source              := r.source; // for royalty count
+    SELF.imsi_changedate         := r.imsi_changedate;
+    SELF.imsi_ActivationDate     := r.imsi_ActivationDate;
+    SELF.iccid_changedthis_time  := r.iccid_changedthis_time;
+    SELF.iccid_seensince         := r.iccid_seensince;
+    SELF.imsi_changedthis_time   := r.imsi_changedthis_time;
+    SELF.imei_changedthis_time   := r.imei_changed_this_time;
+    SELF.imsi_seensince          := r.imsi_seensince;
+    SELF.imei_seensince          := r.imei_seensince;
+    SELF.imei_changedate         := r.imei_changedate;
+    SELF.imei_ActivationDate     := r.imei_ActivationDate;
+    SELF.loststolen              := r.loststolen;
+    SELF.loststolen_date         := r.loststolen_date;
+    SELF.imsi_Tenure_MinDays     := IF(r.sim_Tenure_MinDays != 0, r.sim_Tenure_MinDays, r.imsi_Tenure_MinDays); //Temporary patch until the Gateway ESP is released with new changes.
+    SELF.imsi_Tenure_MaxDays     := IF(r.sim_Tenure_MaxDays != 0, r.sim_Tenure_MaxDays, r.imsi_Tenure_MaxDays);
+    SELF.imei_Tenure_MinDays     := r.imei_Tenure_MinDays;
+    SELF.imei_Tenure_MaxDays     := r.imei_Tenure_MaxDays;
+    SELF.sim_Tenure_MinDays      := IF(r.sim_Tenure_MinDays != 0, r.sim_Tenure_MinDays, r.imsi_Tenure_MinDays);
+    SELF.sim_Tenure_MaxDays      := IF(r.sim_Tenure_MaxDays != 0, r.sim_Tenure_MaxDays, r.imsi_Tenure_MinDays);
+
+    BOOLEAN IsValidated          := (r.first_name_score BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX) AND
+                                    (r.last_name_score BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX);
 
     SELF.PhoneOwnershipIndicator := IsValidated;
-    SELF := l;
+    SELF.dt_last_seen            := IF(IsValidated, (STRING)STD.Date.Today(), l.dt_last_seen);
+    SELF                         := l;
   END;
 
   EXPORT Zumigo_GLI := JOIN(dPhoneRecs, Zumigo_Hist,
