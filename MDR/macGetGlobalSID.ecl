@@ -22,7 +22,7 @@ IMPORT _control, MDR, STD;
   #DECLARE(sFilter);
   #SET(sFilter, '');   
   #IF(sFieldName <> '')
-    #APPEND(sFilter, '(source_codes = (STRING)l.' + #TEXT(#EXPAND(sFieldName)) + ')')
+     #APPEND(sFilter, '(STD.Str.ToUpperCase(source_codes) = STD.Str.ToUpperCase((STRING)l.' + #TEXT(#EXPAND(sFieldName)) + '))')
   #END
 
   fFilterGlbSrcid (lInRec l) := FUNCTION
