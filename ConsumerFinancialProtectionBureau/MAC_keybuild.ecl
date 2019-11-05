@@ -2,6 +2,9 @@ import ConsumerFinancialProtectionBureau, RoxieKeyBuild, doxie_files, PromoteSup
 export MAC_keybuild(key_type, filedate, pUseProd = false, isfcra = false, all_seq)  := macro
     #uniquename(base_rec);
     %base_rec% := ConsumerFinancialProtectionBureau.#expand('Build_'+ key_type +'(pUseProd, isfcra);');
+    #uniquename(seq_base);
+    PromoteSupers.Mac_SF_BuildProcess(%base_rec%, 
+            ConsumerFinancialProtectionBureau.Filenames(,pUseProd,isfcra).#expand('base'+key_type), %seq_base%,2,,true,filedate);
 
     #uniquename(key_idx);
     %key_idx% := ConsumerFinancialProtectionBureau.create_index(key_type, %base_rec%, filedate, pUseProd, isfcra);
@@ -15,10 +18,13 @@ export MAC_keybuild(key_type, filedate, pUseProd = false, isfcra = false, all_se
     #uniquename(seq_move);
     promotesupers.Mac_SK_Move_v2(ConsumerFinancialProtectionBureau.Filenames(, pUseProd, isfcra).#expand('key'+key_type), 'Q', %seq_move%, 2);
     all_seq := sequential(
-                        output(%base_rec%,, ConsumerFinancialProtectionBureau.Filenames(filedate, pUseProd, isfcra).#expand('Base'+ key_type)),
+                        ConsumerFinancialProtectionBureau.CheckSuperfiles(
+                                ConsumerFinancialProtectionBureau.Filenames(,pUseProd,isfcra).#expand('base'+ key_type)),
+                        %seq_base%,
                         %seq_build%,
                         %seq_move_built%,
-                        ConsumerFinancialProtectionBureau.CheckSuperfiles(ConsumerFinancialProtectionBureau.Filenames(,pUseProd,isfcra).#expand('key'+key_type)),
+                        ConsumerFinancialProtectionBureau.CheckSuperfiles(
+                                ConsumerFinancialProtectionBureau.Filenames(,pUseProd,isfcra).#expand('key'+key_type)),
                         %seq_move%
                         );
 endmacro;

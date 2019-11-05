@@ -35,7 +35,7 @@ export build_BLKGRP(boolean pUseProd = false, boolean isfcra = false) := functio
         self.is_latest := true;
 
     END;
-
+    
     return PROJECT(RawData, CFPB_convert(left, counter, std.Date.CurrentDate()));
 
 END;
