@@ -12,7 +12,7 @@ IMPORT _control, MDR, STD;
 
   dFilterGSidFile := dDataGlobalSid(STD.Str.ToUpperCase(data_set) = STD.Str.ToUpperCase(sdata_set));
 
-  aCheckDatasetEntry := IF(EXISTS(dFilterGSidFile) = FALSE, FAIL(' DATASET ENTRY NOT FOUND '))
+  aCheckDatasetEntry := IF(EXISTS(dFilterGSidFile) = FALSE, FAIL(' Dataset entry not found on lookup table, check dataset name on passed parameter '))
     : FAILURE(STD.System.Email.SendEmail(_control.MyInfo.EmailAddressNotify,
       '***FAILURE:DATASET ENTRY NOT FOUND ' + sdata_set + ' - ' + WORKUNIT,
       WORKUNIT + ' has failed. DATASET ENTRY not found for the sdata_set ' + sdata_set + ' provided. Please check workunit - '+ FAILMESSAGE));
