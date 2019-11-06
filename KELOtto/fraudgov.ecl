@@ -1,10 +1,16 @@
-﻿IMPORT Std, KELOtto, FraudShared, data_services, ut;
+﻿IMPORT Std, KELOtto, FraudShared, data_services, ut,doxie,Suppress;
 #CONSTANT ('Platform','FraudGov');
 RunKelDemo :=false:stored('RunKelDemo');
 
 FileIn := If(RunKelDemo=false,'fraudgov::base::built::Main','fraudgov::in::sprayed::demodata');
 
-fraudgov_dataset_base_prep := dataset(data_services.foreign_prod+FileIn, FraudShared.Layouts.Base.Main, thor); 
+fraudgov_dataset_Input := dataset(data_services.foreign_prod+FileIn, FraudShared.Layouts.Base.Main, thor); 
+
+// Supress CCPA
+mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
+Supress_CCPA := Suppress.MAC_SuppressSource(fraudgov_dataset_Input, mod_access, did, NULL,TRUE);			
+
+fraudgov_dataset_base_prep	:= Supress_CCPA;
 
 //PULL(FraudShared.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Main.built);
  
