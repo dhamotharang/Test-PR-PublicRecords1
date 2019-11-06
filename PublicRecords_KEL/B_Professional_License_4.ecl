@@ -4,8 +4,8 @@ IMPORT B_Professional_License_5,CFG_Compile,E_Professional_License FROM PublicRe
 IMPORT * FROM KEL11.Null;
 EXPORT B_Professional_License_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Professional_License_5(__in,__cfg).__ENH_Professional_License_5) __ENH_Professional_License_5 := B_Professional_License_5(__in,__cfg).__ENH_Professional_License_5;
-  SHARED __EE207994 := __ENH_Professional_License_5;
-  EXPORT __ST85477_Layout := RECORD
+  SHARED __EE220816 := __ENH_Professional_License_5;
+  EXPORT __ST91713_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
@@ -25,11 +25,11 @@ EXPORT B_Professional_License_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST85477_Layout __ND207928__Project(B_Professional_License_5(__in,__cfg).__ST86740_Layout __PP207285) := TRANSFORM
-    __EE207923 := __PP207285.License_Dates_;
-    SELF.Max_Expire_Date_ := KEL.Aggregates.MaxNN(__EE207923,__T(__EE207923).Date_Of_Expiration_);
-    SELF.Valid_Professional_License_ := __AND(__OP2(__PP207285.License_Number_,<>,__CN('')),__OR(__OP2(__PP207285.Max_Issue_Date_,<,__PP207285.Current_Date_),__NT(__PP207285.Max_Issue_Date_)));
-    SELF := __PP207285;
+  SHARED __ST91713_Layout __ND220750__Project(B_Professional_License_5(__in,__cfg).__ST93114_Layout __PP220107) := TRANSFORM
+    __EE220745 := __PP220107.License_Dates_;
+    SELF.Max_Expire_Date_ := KEL.Aggregates.MaxNN(__EE220745,__T(__EE220745).Date_Of_Expiration_);
+    SELF.Valid_Professional_License_ := __AND(__OP2(__PP220107.License_Number_,<>,__CN('')),__OR(__OP2(__PP220107.Max_Issue_Date_,<,__PP220107.Current_Date_),__NT(__PP220107.Max_Issue_Date_)));
+    SELF := __PP220107;
   END;
-  EXPORT __ENH_Professional_License_4 := PROJECT(__EE207994,__ND207928__Project(LEFT));
+  EXPORT __ENH_Professional_License_4 := PROJECT(__EE220816,__ND220750__Project(LEFT));
 END;

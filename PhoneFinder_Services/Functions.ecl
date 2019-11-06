@@ -596,10 +596,12 @@
 
     lFinal := pf.PhoneFinder.Final;
 
-    pf.PhoneFinder.TempOut tFormat2Denorm(pf.BatchInAppendAcctno pInput) :=
+    pf.PhoneFinder.TempOut tFormat2Denorm(pf.BatchInAppendDID pInput) :=
     TRANSFORM
-      SELF := pInput;
-      SELF := [];
+      SELF.phone := pInput.homephone;
+      SELF.z4    := pInput.zip4;
+      SELF       := pInput;
+      SELF       := [];
     END;
 
     dFormat2Denorm := PROJECT(dSearchIn, tFormat2Denorm(LEFT));

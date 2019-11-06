@@ -1,8 +1,8 @@
-import Seed_Files, iesp;
+﻿import Seed_Files,std, iesp;
 
 export Boca_Shell_Test_Function(dataset(Risk_Indicators.Layout_Input) inData, string30 account_value, string20 TestDataTableName, boolean IsFCRA) := FUNCTION
 
-	Test_Data_Table_Name := stringlib.stringtouppercase(TestDataTableName);
+	Test_Data_Table_Name := STD.Str.touppercase(TestDataTableName);
 	
 	keyName := Seed_Files.Key_Boca_Shell(IsFCRA);
 	

@@ -23,7 +23,7 @@ EXPORT E_Phone_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Inquiry_;
   END;
-  SHARED __d0_Inquiry__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d0_KELfiltered,'search_info.transaction_id,SequenceNumber','__in'),E_Inquiry(__in,__cfg).Lookup,TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.SequenceNumber) = RIGHT.KeyVal,TRANSFORM(__d0_Inquiry__Layout,SELF.Inquiry_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Inquiry__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d0_KELfiltered,'search_info.transaction_id,search_info.sequence_number','__in'),E_Inquiry(__in,__cfg).Lookup,TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number) = RIGHT.KeyVal,TRANSFORM(__d0_Inquiry__Layout,SELF.Inquiry_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Prefiltered := __d0_Inquiry__Mapped;
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   SHARED __Mapping1 := 'person_q.work_phone(OVERRIDE:Phone_Number_:0),Inquiry_(DEFAULT:Inquiry_:0),src(OVERRIDE:Source_:\'\'),dateofinquiry(OVERRIDE:Date_First_Seen_:EPOCH|OVERRIDE:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
@@ -33,7 +33,7 @@ EXPORT E_Phone_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     RECORDOF(__d1_KELfiltered);
     KEL.typ.uid Inquiry_;
   END;
-  SHARED __d1_Inquiry__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d1_KELfiltered,'search_info.transaction_id,SequenceNumber','__in'),E_Inquiry(__in,__cfg).Lookup,TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.SequenceNumber) = RIGHT.KeyVal,TRANSFORM(__d1_Inquiry__Layout,SELF.Inquiry_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Inquiry__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d1_KELfiltered,'search_info.transaction_id,search_info.sequence_number','__in'),E_Inquiry(__in,__cfg).Lookup,TRIM((STRING)LEFT.search_info.transaction_id) + '|' + TRIM((STRING)LEFT.search_info.sequence_number) = RIGHT.KeyVal,TRANSFORM(__d1_Inquiry__Layout,SELF.Inquiry_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d1_Prefiltered := __d1_Inquiry__Mapped;
   SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0 + __d1;

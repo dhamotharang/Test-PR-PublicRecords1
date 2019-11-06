@@ -17,11 +17,12 @@ EXPORT GatewayData := MODULE
                                          // we populate status only if domain is invalid
                                          invalid_domain := $.Constants.isUndeliverableEmail(RIGHT.domain_status);
                                          accept_all_domain := RIGHT.accept_all;
-                                         SELF.email_status := MAP(invalid_domain => RIGHT.domain_status,
+                                         _email_status     := MAP(invalid_domain => RIGHT.domain_status,
                                                                   accept_all_domain => $.Constants.DomainAcceptAll,
-                                                                   ''),
+                                                                   '');
+                                         SELF.email_status := _email_status,
                                          SELF.email_status_reason := IF(invalid_domain,$.Constants.GatewayValues.get_error_desc($.Constants.GatewayValues.EMAIL_DOMAIN_INVALID), ''),
-                                         SELF.date_last_verified := RIGHT.date_last_verified,
+                                         SELF.date_last_verified := IF(_email_status<>'', RIGHT.date_last_verified,''),
                                          SELF:=LEFT),
                                LEFT OUTER, KEEP(1), LIMIT(0));
 

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Address_Attributes_Batch_Service" wuTimeout="300000">
   <part name="Batch_In" type="tns:XmlDataSet" cols="100" rows="100"/>
   <part name="GLBPurpose" type="xsd:integer"/>
@@ -39,7 +39,7 @@
 </pre>
 */
 
-IMPORT Address, iesp, ut, Risk_Indicators, RiskWise,Address_Shell, Gateway;
+IMPORT Address, iesp, ut, Risk_Indicators,std, RiskWise,Address_Shell, Gateway;
 
 EXPORT Address_Attributes_Batch_Service() := FUNCTION
 /* ************************************************************************
@@ -52,18 +52,27 @@ EXPORT Address_Attributes_Batch_Service() := FUNCTION
 	'GLBPurpose',
 	'DPPAPurpose',
 	'DataRestrictionMask',
-	'Gateways'
+	'Gateways',
+  'LexIdSourceOptout',
+	'_TransactionId',
+	'_BatchUID',
+	'_GCID'
 	));
 
 	batch_In := DATASET([], Address_Shell.layouts.batch_in) : STORED('Batch_In');
 	
 	UNSIGNED1 GLBPurpose  := 0 : STORED('GLBPurpose');
   UNSIGNED1 DPPAPurpose := 0 : STORED('DPPAPurpose');
+  
 	
 	// gatewaysIn := DATASET([], Risk_Indicators.Layout_Gateways_In) : STORED('Gateways', FEW);
 	gatewaysIn := Gateway.Configuration.Get();
   
   STRING50 outOfBandDataRestriction := '' : STORED('DataRestrictionMask');
+  unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 	
 	/* ***********************************************************
 	 *           Clean and format input as needed                *
@@ -86,7 +95,7 @@ EXPORT Address_Attributes_Batch_Service() := FUNCTION
 		SELF.Zip5 := cleanedFields.ZIP;
 		SELF.Zip4 := cleanedFields.ZIP4;
 		SELF.County := cleanedFields.County[3..5]; // We only want the last 3 for county
-		capsCity := TRIM(StringLib.StringToUpperCase(le.City));
+		capsCity := TRIM(STD.Str.ToUpperCase(le.City));
 		useCity := IF(capsCity = '', TRIM(cleanedFields.V_City_Name), capsCity);
 		SELF.StateCityZip := IF(useCity <> '' AND TRIM(cleanedFields.St) <> '' AND TRIM(cleanedFields.ZIP) <> '', useCity + ', ' + TRIM(cleanedFields.St) + ' ' + TRIM(cleanedFields.ZIP), '');
 
@@ -114,11 +123,12 @@ EXPORT Address_Attributes_Batch_Service() := FUNCTION
 	 *************************************************************/
 	STRING30 AddressBasedPRAttrVersion := '' : STORED('AddressBasedPRAttrVersion');
 	STRING30 PropertyInfoAttrVersion 	:= '' : STORED('PropertyInfoAttrVersion');
+  
 
-	publicRecordsAttributesVersion := IF(TRIM(AddressBasedPRAttrVersion) <> '' AND StringLib.StringContains(AddressBasedPRAttrVersion, 'addressbasedprattrv', TRUE),(UNSIGNED1)(AddressBasedPRAttrVersion[20..]),0);
-	propertyInformationAttributesVersion := IF(TRIM(PropertyInfoAttrVersion) <> '' AND StringLib.StringContains(PropertyInfoAttrVersion, 'propertyinfoattrv', TRUE),(UNSIGNED1)(PropertyInfoAttrVersion[18..]),0);
+	publicRecordsAttributesVersion := IF(TRIM(AddressBasedPRAttrVersion) <> '' AND STD.Str.Contains(AddressBasedPRAttrVersion, 'addressbasedprattrv', TRUE),(UNSIGNED1)(AddressBasedPRAttrVersion[20..]),0);
+	propertyInformationAttributesVersion := IF(TRIM(PropertyInfoAttrVersion) <> '' AND STD.Str.Contains(PropertyInfoAttrVersion, 'propertyinfoattrv', TRUE),(UNSIGNED1)(PropertyInfoAttrVersion[18..]),0);
 																				
-	// propertyInformationGatewayURL := gatewaysIn(StringLib.StringToLowerCase(servicename) = 'reportservice')[1].url;
+	// propertyInformationGatewayURL := gatewaysIn(STD.Str.ToLowerCase(servicename) = 'reportservice')[1].url;
 		
 	/* **********************************************************
 	 *             Get the requested attribues                  *

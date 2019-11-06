@@ -7,10 +7,10 @@ EXPORT Fn_CleanInputBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.L
 				cleaned_name      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Business_Name(le.B_InpName);
 				cleaned_alt_name  := PublicRecords_KEL.ECL_Functions.Fn_Clean_Business_Name(le.B_InpAltName);
 				cleaned_zip       := PublicRecords_KEL.ECL_Functions.Fn_Clean_Zip(le.B_InpAddrZip);
-				cleaned_Addr			:= PublicRecords_KEL.ECL_Functions.Fn_Clean_Address_Roxie(le.B_InpAddrLine1, le.B_InpAddrCity, le.B_InpAddrState, cleaned_zip);
+				cleaned_Addr			:= PublicRecords_KEL.ECL_Functions.Fn_Clean_Address_Roxie(le.B_InpAddrLine1 + ' ' + le.B_InpAddrLine2, le.B_InpAddrCity, le.B_InpAddrState, cleaned_zip);
 				cleaned_email     := PublicRecords_KEL.ECL_Functions.Fn_Clean_Email(le.B_InpEmail);
 				cleaned_phone10   := PublicRecords_KEL.ECL_Functions.Fn_Clean_Phone(le.B_InpPhone);
-				cleaned_TIN       := PublicRecords_KEL.ECL_Functions.Fn_Clean_SSN(le.B_InpTIN);
+				cleaned_TIN       := PublicRecords_KEL.ECL_Functions.Fn_Clean_SSN(le.B_InpTIN, IsTIN := TRUE);
 				cleaned_archivedate := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.B_InpArchDt, 
 																																						PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_LOW_ARCHIVEDATE, 
 																																						PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_HIGH_ARCHIVEDATE,
@@ -25,6 +25,7 @@ EXPORT Fn_CleanInputBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.L
 				SELF.B_InpName := le.B_InpName;
 				SELF.B_InpAltName := le.B_InpAltName;
 				SELF.B_InpAddrLine1 := le.B_InpAddrLine1;
+				SELF.B_InpAddrLine2 := le.B_InpAddrLine2;				
 				SELF.B_InpAddrCity := le.B_InpAddrCity;
 				SELF.B_InpAddrState := le.B_InpAddrState;
 				SELF.B_InpAddrZip := le.B_InpAddrZip;

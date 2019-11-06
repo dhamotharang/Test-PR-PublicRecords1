@@ -5,14 +5,10 @@ out_rec := personreports.layouts.CommonAssetReportIndividual;
 // accepts atmost one DID, actually
 EXPORT AssetReport (
   dataset (doxie.layout_references) dids,
-  PersonReports.IParam._assetreport mod_asset,
+  $.IParam._assetreport mod_asset,
   boolean IsFCRA = false) := FUNCTION
 
-  //Convert to the old _report style module: $.input._assetreport
   mod_access := PROJECT (mod_asset, doxie.IDataAccess);
-  param := MODULE (PROJECT (mod_asset, $.IParam.old_assetreport))
-    $.input.mac_copy_report_fields(mod_asset);
-  END;
 
   // DID should be atmost one (do we keep layout_references for legacy reasons?)
   did := dids[1].did;
@@ -36,7 +32,7 @@ EXPORT AssetReport (
   ds_flags := if (IsFCRA, FFD.GetFlagFile(ds_best, pc_recs));
 
   // person records 
-  pers := PersonReports.Person_records (dids, mod_access, PROJECT (mod_asset, PersonReports.IParam.personal, OPT), IsFCRA, ds_flags, slim_pc_recs(DataGroup = FFD.Constants.DataGroups.HDR));
+  pers := PersonReports.Person_records (dids, mod_access, PROJECT (mod_asset, $.IParam.personal, OPT), IsFCRA, ds_flags, slim_pc_recs(DataGroup = FFD.Constants.DataGroups.HDR));
   
    p_addresses  := choosen (pers.SubjectAddressesSlim,  iesp.Constants.BR.MaxAddress);
    p_akas       := project (choosen (pers.Akas, iesp.Constants.BR.MaxAKA), 
@@ -54,18 +50,18 @@ EXPORT AssetReport (
   proflic := PersonReports.proflic_records (dids, PROJECT (mod_asset, $.IParam.proflic), IsFCRA);
   p_proflic     := choosen (proflic.proflicenses_v2, iesp.constants.BR.MaxProfLicenses);
   
-  pilots := PersonReports.faacert_records (dids, module (project (param, PersonReports.input.faacerts)) end, IsFCRA, ds_flags, 
+  pilots := PersonReports.faacert_records (dids, PROJECT (mod_asset, $.IParam.faacerts), IsFCRA, ds_flags, 
                                           slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Pilot));
   p_faa_cert    := choosen (pilots.assetreport_view, iesp.constants.BR.MaxFaaCertificates);
 
   //asset data
-  vehs := PersonReports.vehicle_records (dids, module (project (param, PersonReports.input.vehicles)) end, IsFCRA);
+  vehs := PersonReports.vehicle_records (dids, PROJECT (mod_asset, $.IParam.vehicles), IsFCRA);
   p_vehicles    := choosen (vehs.vehicles, iesp.Constants.BR.MaxVehicles);
   
-  uccs := PersonReports.ucc_records (dids, module (project (param, PersonReports.input.ucc)) end, IsFCRA);
+  uccs := PersonReports.ucc_records (dids, PROJECT (mod_asset, $.IParam.ucc), IsFCRA);
   p_uccs        := choosen (uccs.ucc_v2, iesp.Constants.BR.MaxUCCFilings);
 
-  p_watercrafts := choosen (PersonReports.watercraft_records(dids, module (project (param, PersonReports.input.watercrafts))       end, IsFCRA,true,ds_flags, 
+  p_watercrafts := choosen (PersonReports.watercraft_records(dids, PROJECT (mod_asset, $.IParam.watercrafts), IsFCRA,true,ds_flags, 
                           slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Watercraft)
                                      ).wtr_recs, iesp.Constants.BR.MaxWatercrafts);
                                      
@@ -83,7 +79,7 @@ EXPORT AssetReport (
                                      )), iesp.Constants.BR.MaxAircrafts);
 
   
-  p_paw         := choosen (PersonReports.peopleatwork_records(dids, PROJECT (mod_asset,PersonReports.IParam.peopleatwork, OPT), IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
+  p_paw         := choosen (PersonReports.peopleatwork_records(dids, PROJECT (mod_asset, $.IParam.peopleatwork), IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
   
  
   // -----------------------------------------------------------------------

@@ -253,6 +253,8 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
 	final_recsDefault := DATASET([transform_TopBusinessRecs()]);
 	final_recsLNOnlyCreditReport := DATASET([transform_TopBusinessRecsLNOnlyCreditReport()]);
 	
+	// use the restricted topbusiness records only for the LNOnlyBusinessCreditReport option.
+	// the other LNOnly... options will use the larger set of records
 	final_recs := if (inmod.BusinessCreditReportType = BusinessCredit_Services.Constants.LNOnlyBusinessCreditReport, 
 	                                  final_recsLNOnlyCreditReport, final_recsDefault );
 

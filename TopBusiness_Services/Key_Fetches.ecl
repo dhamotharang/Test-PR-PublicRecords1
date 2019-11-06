@@ -86,7 +86,7 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
 
   // *** Key fetch to get LNCA/DCA linkids key records
 	// NOTE: This one will need to use a passed in fetch limit
-	EXPORT ds_dca_linkidskey_recs := DCAV2.Key_Linkids.kFetch(ds_in_linkids,FETCH_LEVEL,,FETCH_LIMIT);
+	EXPORT ds_dca_linkidskey_recs := DCAV2.Key_Linkids.kFetch(ds_in_linkids, mod_access, FETCH_LEVEL,,FETCH_LIMIT);
 
   //*** Key fetch to get DEA linkids key records
 	EXPORT ds_dea_linkidskey_recs := DEA.Key_dea_linkids.kFetch(ds_in_linkids,FETCH_LEVEL,,FETCH_LIMIT);
@@ -159,7 +159,7 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
 	                                                                 FETCH_LEVEL,,FETCH_LIMIT);
 
 	// *** Key fetch to get Sheila Greco linkids key records
-  EXPORT ds_sg_linkidskey_recs := Sheila_Greco.Key_LinkIds.kFetch(ds_in_linkids,FETCH_LEVEL,,FETCH_LIMIT);
+  EXPORT ds_sg_linkidskey_recs := Sheila_Greco.Key_LinkIds.kFetch(ds_in_linkids, mod_access,FETCH_LEVEL,,FETCH_LIMIT);
 
 	// *** Key fetch to get UCC linkids key records
 	// NOTE: This one will need to use a passed in fetch limit

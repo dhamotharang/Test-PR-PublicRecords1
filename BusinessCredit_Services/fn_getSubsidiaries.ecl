@@ -27,18 +27,22 @@ EXPORT fn_getSubsidiaries (BusinessCredit_Services.Iparam.reportrecords inmod, b
 		Boolean isOwner 			:= FALSE;
 		Boolean isGuarantor 	:= FALSE;
 		Boolean isParentinBIP	:= FALSE;
+    UNSIGNED6 DID := 0;
+    UNSIGNED4 global_sid := 0;
+    UNSIGNED8 record_sid := 0;
 	END;
 
-	buzCredit_Subsidiary_Recs	:=	JOIN (subsidiaryRecs, Business_Credit.Key_BusinessInformation(),
-																			BusinessCredit_Services.Macros.mac_JoinBusAccounts() AND
-																			RIGHT.Record_Type = Business_Credit.Constants().AccountBase,
-																			TRANSFORM(temp_rec ,
-																				SELF.isOwner 			:= LEFT.Guarantor_Owner_Indicator = '001' or LEFT.Guarantor_Owner_Indicator = '003',
-																				SELF.isGuarantor 	:= LEFT.Guarantor_Owner_Indicator = '002' or LEFT.Guarantor_Owner_Indicator = '003',
-																				SELF							:= RIGHT,
-																				SELF							:= []), 
-																			LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT, SKIP));
-																				 
+	buzCredit_Subsidiary_Recs_Org	:=	JOIN (subsidiaryRecs, Business_Credit.Key_BusinessInformation(),
+                                          BusinessCredit_Services.Macros.mac_JoinBusAccounts() AND
+                                          RIGHT.Record_Type = Business_Credit.Constants().AccountBase,
+                                          TRANSFORM(temp_rec ,
+                                            SELF.isOwner 			:= LEFT.Guarantor_Owner_Indicator = '001' or LEFT.Guarantor_Owner_Indicator = '003',
+                                            SELF.isGuarantor 	:= LEFT.Guarantor_Owner_Indicator = '002' or LEFT.Guarantor_Owner_Indicator = '003',
+                                            SELF							:= RIGHT,
+                                            SELF							:= []), 
+                                          LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT, SKIP));
+  buzCredit_Subsidiary_Recs := Suppress.MAC_SuppressSource(buzCredit_Subsidiary_Recs_org, mod_access, did);
+  
 	//getting the BIP Children
 	bip_DirChilds_input :=	PROJECT(inmod.BusinessIds , {UNSIGNED6 seleid});
 	bip_DirChilds 			:= 	PROJECT(BIPv2_HRCHY.FunctionsShow.ShowDirectParentsChildren(bip_DirChilds_input), 

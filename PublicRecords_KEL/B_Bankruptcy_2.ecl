@@ -4,8 +4,8 @@ IMPORT B_Bankruptcy_3,CFG_Compile,E_Bankruptcy FROM PublicRecords_KEL;
 IMPORT * FROM KEL11.Null;
 EXPORT B_Bankruptcy_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Bankruptcy_3(__in,__cfg).__ENH_Bankruptcy_3) __ENH_Bankruptcy_3 := B_Bankruptcy_3(__in,__cfg).__ENH_Bankruptcy_3;
-  SHARED __EE361416 := __ENH_Bankruptcy_3;
-  EXPORT __ST70096_Layout := RECORD
+  SHARED __EE383162 := __ENH_Bankruptcy_3;
+  EXPORT __ST75627_Layout := RECORD
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr Filing_Type_;
@@ -31,7 +31,7 @@ EXPORT B_Bankruptcy_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST360391_Layout := RECORD
+  EXPORT __ST382066_Layout := RECORD
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr Filing_Type_;
@@ -60,6 +60,11 @@ EXPORT B_Bankruptcy_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.nbool Banko7_Year_;
     KEL.typ.nbool Banko7_Year_Update_Filter_;
     KEL.typ.nkdate Bankruptcy_Date_;
+    KEL.typ.nstr Bus_Change_Chapter_;
+    KEL.typ.nbool Bus_Chapter11_;
+    KEL.typ.nbool Bus_Chapter13_;
+    KEL.typ.nbool Bus_Chapter7_;
+    KEL.typ.nbool Bus_Chapter_Type_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nbool Chapter13_;
     KEL.typ.nbool Chapter7_;
@@ -75,36 +80,40 @@ EXPORT B_Bankruptcy_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST70089_Layout := RECORD
+  EXPORT __ST75620_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Court_Code_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Original_Case_Number_;
-    KEL.typ.ndataset(__ST70096_Layout) Records_;
+    KEL.typ.ndataset(__ST75627_Layout) Records_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Deadlines_Layout) Deadlines_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Case_Details_Layout) Case_Details_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(__ST360391_Layout) Best_Child_Record_;
+    KEL.typ.ndataset(__ST382066_Layout) Best_Child_Record_;
     KEL.typ.nkdate Current_Date_;
     KEL.typ.nbool Has_Case_Number_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST70089_Layout __ND361384__Project(B_Bankruptcy_3(__in,__cfg).__ST76805_Layout __PP360439) := TRANSFORM
-    __EE361419 := __PP360439.Records_;
-    SELF.Records_ := __BN(PROJECT(__T(__EE361419),__ST70096_Layout),__NL(__EE361419));
-    __EE361382 := __PP360439.Best_Child_Record_;
-    __ST360391_Layout __ND361307__Project(B_Bankruptcy_3(__in,__cfg).__ST209684_Layout __PP361013) := TRANSFORM
-      SELF.Chapter13_ := __OP2(__PP361013.Original_Chapter_,=,__CN('13'));
-      SELF.Chapter7_ := __OP2(__PP361013.Original_Chapter_,=,__CN('7'));
-      SELF.Chapter_Type_ := __OP2(__PP361013.Original_Chapter_,IN,__CN(['7','11','12','13','15']));
-      SELF.Is_Disposed_ := __NOT(__NT(__PP361013.Disposition_));
-      SELF := __PP361013;
+  SHARED __ST75620_Layout __ND383130__Project(B_Bankruptcy_3(__in,__cfg).__ST82771_Layout __PP382119) := TRANSFORM
+    __EE383165 := __PP382119.Records_;
+    SELF.Records_ := __BN(PROJECT(__T(__EE383165),__ST75627_Layout),__NL(__EE383165));
+    __EE383128 := __PP382119.Best_Child_Record_;
+    __ST382066_Layout __ND383040__Project(B_Bankruptcy_3(__in,__cfg).__ST223371_Layout __PP382722) := TRANSFORM
+      SELF.Bus_Chapter11_ := __OP2(__PP382722.Bus_Change_Chapter_,=,__CN('11'));
+      SELF.Bus_Chapter13_ := __OP2(__PP382722.Bus_Change_Chapter_,=,__CN('13'));
+      SELF.Bus_Chapter7_ := __OP2(__PP382722.Bus_Change_Chapter_,=,__CN('7'));
+      SELF.Bus_Chapter_Type_ := __OP2(__PP382722.Bus_Change_Chapter_,IN,__CN(['7','9','11','12','13','15']));
+      SELF.Chapter13_ := __OP2(__PP382722.Original_Chapter_,=,__CN('13'));
+      SELF.Chapter7_ := __OP2(__PP382722.Original_Chapter_,=,__CN('7'));
+      SELF.Chapter_Type_ := __OP2(__PP382722.Original_Chapter_,IN,__CN(['7','11','12','13','15']));
+      SELF.Is_Disposed_ := __NOT(__NT(__PP382722.Disposition_));
+      SELF := __PP382722;
     END;
-    SELF.Best_Child_Record_ := __PROJECT(__EE361382,__ND361307__Project(LEFT));
-    SELF := __PP360439;
+    SELF.Best_Child_Record_ := __PROJECT(__EE383128,__ND383040__Project(LEFT));
+    SELF := __PP382119;
   END;
-  EXPORT __ENH_Bankruptcy_2 := PROJECT(__EE361416,__ND361384__Project(LEFT));
+  EXPORT __ENH_Bankruptcy_2 := PROJECT(__EE383162,__ND383130__Project(LEFT));
 END;

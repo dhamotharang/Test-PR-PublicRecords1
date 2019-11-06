@@ -1,11 +1,12 @@
 // ================================================================================
 // ======  RETURNS InfoUSA_Deadco DATA FOR A GIVEN ROOT&SUB IN ESP-COMPLIANT WAY =====
 // ================================================================================
-IMPORT InfoUSA, BIPV2, iesp, MDR, ut;
+IMPORT InfoUSA, BIPV2, iesp, MDR, ut, doxie;
 
 EXPORT InfoUSA_DeadcoSource_Records(
   dataset(Layouts.rec_input_ids_wSrc) in_docids,
-  SourceService_Layouts.OptionsLayout inoptions, 
+  SourceService_Layouts.OptionsLayout inoptions,
+	doxie.IDataAccess mod_access, 
 	boolean IsFCRA = false) 
  := MODULE
 
@@ -16,7 +17,7 @@ EXPORT InfoUSA_DeadcoSource_Records(
 																						
 	// *** Key fetch to get abi_number from linkids
   SHARED infousa_deadco_recs := InfoUSA.Key_deadco_LinkIds.kFetch(
-	                       DEDUP(in_docs_linkonly,ALL),inoptions.fetch_level,,
+	                       DEDUP(in_docs_linkonly,ALL), mod_access, inoptions.fetch_level,,
 												 TopBusiness_Services.Constants.SlimKeepLimit);
 
 	SHARED infousa_deadco_idValue := JOIN(infousa_deadco_recs,in_docids,

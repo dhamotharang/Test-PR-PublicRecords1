@@ -28,7 +28,7 @@ EXPORT LIB_RiskView_Models (
 	 // EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
 	
 	
-	EXPORT ValidatingModel := Models.RVA1904_1_0(BocaShell,FALSE); // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.RVG1809_1_0(BocaShell); // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -158,6 +158,7 @@ that is sent INTO calcindex for ECL.
 																			{'RVG1808_2', MType_G+'RVG1808_2', calcIndex( 74), '0-999', 0}, //Telechek
 																			{'RVA1809_1', MType_A+'RVA1809_1', calcIndex( 76), '0-999', 0}, //CactusJack
                                                                             {'RVA1904_1', MType_A+'RVA1904_1', calcIndex( 78), '0-999', 0}, //Westlake Financial
+                                                                            {'RVG1809_1', MType_G+'RVG1809_1', calcIndex( 79), '0-999', 0}, //Tranzaction
 																			
 																			
 																		// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
@@ -213,6 +214,7 @@ that is sent INTO calcindex for ECL.
 											'RVG1808_2' => UNGROUP(Models.RVG1808_2_0(BocaShell, isPreScreenPurpose)),	
 											'RVA1809_1' => UNGROUP(Models.RVA1809_1_0(BocaShell, isPreScreenPurpose)),	
                                             'RVA1904_1' => UNGROUP(Models.RVA1904_1_0(BocaShell, isPreScreenPurpose)),	
+                                            'RVG1809_1' => UNGROUP(Models.RVG1809_1_0(BocaShell)),	
 											// ----------------------------------------------------------------------------------
 											// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 											'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),

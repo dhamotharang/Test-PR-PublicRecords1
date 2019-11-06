@@ -43,6 +43,15 @@ EXPORT E_Sele_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   SHARED __d0_Prefiltered := __d0_Plane__Mapped;
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0;
+  EXPORT Registration_Details_Layout := RECORD
+    KEL.typ.nint Registrant_Type_;
+    KEL.typ.nstr Fractional_Owner_;
+    KEL.typ.nkdate Certificate_Issue_Date_;
+    KEL.typ.nstr Certification_;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -56,18 +65,16 @@ EXPORT E_Sele_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr N_Number_;
-    KEL.typ.nint Registrant_Type_;
-    KEL.typ.nstr Fractional_Owner_;
-    KEL.typ.nkdate Certificate_Issue_Date_;
-    KEL.typ.nstr Certification_;
+    KEL.typ.ndataset(Registration_Details_Layout) Registration_Details_;
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Legal_,Plane_,Ult_I_D_,Org_I_D_,Sele_I_D_,N_Number_,Registrant_Type_,Fractional_Owner_,Certificate_Issue_Date_,Certification_,ALL));
+  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Legal_,Plane_,Ult_I_D_,Org_I_D_,Sele_I_D_,N_Number_,ALL));
   Sele_Aircraft_Group := __PostFilter;
   Layout Sele_Aircraft__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
+    SELF.Registration_Details_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Registrant_Type_,Fractional_Owner_,Certificate_Issue_Date_,Certification_},Registrant_Type_,Fractional_Owner_,Certificate_Issue_Date_,Certification_),Registration_Details_Layout)(__NN(Registrant_Type_) OR __NN(Fractional_Owner_) OR __NN(Certificate_Issue_Date_) OR __NN(Certification_)));
     SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
@@ -75,6 +82,7 @@ EXPORT E_Sele_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF := __r;
   END;
   Layout Sele_Aircraft__Single_Rollup(InLayout __r) := TRANSFORM
+    SELF.Registration_Details_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Registration_Details_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Registrant_Type_) OR __NN(Fractional_Owner_) OR __NN(Certificate_Issue_Date_) OR __NN(Certification_)));
     SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
     SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);

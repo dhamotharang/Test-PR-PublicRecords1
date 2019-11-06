@@ -7,7 +7,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// ---------------- DNB DMI - Dunn Bradstreet DMI ------------------
 	DNBDMIRaw := IF(StringLib.StringFind(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0, // Only grab DNB DMI data if it is explicitly passed in as allowed
-									DNB_DMI.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+									DNB_DMI.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
@@ -220,7 +220,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 	
 	// ---------------- DCA - Directory of Corporate Affiliations AKA LNCA ------------------
-	DCARaw := DCAV2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+	DCARaw := DCAV2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
@@ -373,7 +373,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// ---------------- DEADCO ------------------
                                                                                                    
-	DEADCORaw := InfoUSA.Key_DEADCO_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+	DEADCORaw := InfoUSA.Key_DEADCO_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,

@@ -16,6 +16,9 @@ EXPORT Constants := MODULE
 		
 		EXPORT STRING1        SBFEDataBusinessCreditReport := '1'; // default
 		EXPORT STRING1        LNOnlyBusinessCreditReport := '2';
+		EXPORT STRING1        LNOnlyB2BTradeReport := '3';
+		EXPORT STRING1        LNOnlyB2BCombinedCreditReport := '4';
+		EXPORT SET OF STRING1 LNOnlyCreditSet := ['2', '3', '4'];
 		
 		EXPORT UNSIGNED1	TWO_YR_PAYMENT_HISTORY      := 24;  // Small Bus credit Report SBFE Addition
 		EXPORT UNSIGNED1  TOPCHARGEOFFCOUNT := 10; // Small Bus credit Report SBFE Addition

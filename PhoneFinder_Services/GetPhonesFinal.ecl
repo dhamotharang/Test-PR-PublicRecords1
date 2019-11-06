@@ -171,14 +171,14 @@ FUNCTION
                           UNGROUP(TOPN(GROUP(dPhoneState, acctno), PhoneFinder_Services.Constants.WFConstants.MaxSectionLimit, acctno, -phone_score)));
 
   #IF(PhoneFinder_Services.Constants.Debug.Main)
-      OUTPUT(dPhoneSlim, NAMED('dPhoneSlim'), EXTEND);
-      OUTPUT(dPhoneState, NAMED('dPhoneState'), EXTEND);
-      OUTPUT(dPhoneSort, NAMED('dPhoneSort'), EXTEND);
-      OUTPUT(dPhoneRollup, NAMED('dPhoneRollup'), EXTEND);
-      OUTPUT(dPrimaryPhoneDetail, NAMED('dPrimaryPhoneDetail'), EXTEND);
-      OUTPUT(dPhoneDetail, NAMED('dPhoneDetail'), EXTEND);
-      OUTPUT(dTUPhonesOnly, NAMED('dTUPhonesOnly'), EXTEND);
-      OUTPUT(dAllPhonesDetail, NAMED('dAllPhonesDetail'), EXTEND);
+      OUTPUT(dPhoneSlim, NAMED('dPhoneSlim_Final'), EXTEND);
+      OUTPUT(dPhoneState, NAMED('dPhoneState_Final'), EXTEND);
+      OUTPUT(dPhoneSort, NAMED('dPhoneSort_Final'), EXTEND);
+      OUTPUT(dPhoneRollup, NAMED('dPhoneRollup_Final'), EXTEND);
+      OUTPUT(dPrimaryPhoneDetail, NAMED('dPrimaryPhoneDetail_Final'), EXTEND);
+      OUTPUT(dPhoneDetail, NAMED('dPhoneDetail_Final'), EXTEND);
+      OUTPUT(dTUPhonesOnly, NAMED('dTUPhonesOnly_Final'), EXTEND);
+      OUTPUT(dAllPhonesDetail, NAMED('dAllPhonesDetail_Final'), EXTEND);
     #END
 
   RETURN dAllPhonesDetail;
