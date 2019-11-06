@@ -47,23 +47,36 @@ EXPORT Functions := MODULE
 	END;
 
   // Add Business Credit / SBFE Sorting
-	EXPORT fn_BusinessCreditSorting ( DATASET(doxie.Layout_Rollup.KeyRec_feedback) ds_in, UNSIGNED6 inSeleId, UNSIGNED6 inOrgId, UNSIGNED6 inUltId) := FUNCTION
+	EXPORT fn_BusinessCreditSorting ( DATASET(doxie.Layout_Rollup.KeyRec_feedback) ds_in, 
+                                    Doxie.IDataAccess mod_access,
+                                    UNSIGNED6 inSeleId, 
+                                    UNSIGNED6 inOrgId, 
+                                    UNSIGNED6 inUltId) := FUNCTION
+                                    
 		// Hit the SBFE keys to see if the did has matches for any of the SELEid/OrgId/UltId input combinations
 		// We only need to keep one match to set the indicator for the next join.
-		ds_BusinessCredit_hits := JOIN( ds_in, Business_Credit.Key_IndividualOwnerInformation(),
-																			KEYED( (UNSIGNED6)LEFT.did = RIGHT.did ) AND
-																			inUltId  = RIGHT.UltId AND
-																			inOrgId  = RIGHT.OrgId AND
-																			inSeleId = RIGHT.SELEId AND
-																			RIGHT.SELEid != 0,
-																			TRANSFORM( doxie.Layout_Rollup.KeyRec_feedback,
-																								 SELF.BusinessCreditMatch := (UNSIGNED6)LEFT.did = RIGHT.did,
-																								 SELF                     := LEFT,
-																							 ),
-																			LEFT OUTER,
-																			KEEP (1),
-																			LIMIT(0)
-																	);
+		ds_BusinessCredit_hits_org := JOIN( ds_in, Business_Credit.Key_IndividualOwnerInformation(),
+                                        KEYED( (UNSIGNED6)LEFT.did = RIGHT.did ) AND
+                                        inUltId  = RIGHT.UltId AND
+                                        inOrgId  = RIGHT.OrgId AND
+                                        inSeleId = RIGHT.SELEId AND
+                                        RIGHT.SELEid != 0,
+                                        TRANSFORM( doxie.Layout_Rollup.KeyRec_feedback_sids,
+                                                   SELF.BusinessCreditMatch := (UNSIGNED6)LEFT.did = RIGHT.did,
+                                                   SELF.global_sid          := RIGHT.global_sid,
+                                                   SELF.record_sid          := RIGHT.record_sid,
+                                                   SELF                     := LEFT,
+                                                 ),
+                                        LEFT OUTER,
+                                        KEEP (1),
+                                        LIMIT(0)
+                                    );
+    ds_BusinessCredit_hits_flagSupp := Suppress.MAC_FlagSuppressedSource(ds_BusinessCredit_hits_org, mod_access, did);
+    ds_BusinessCredit_hits := 
+      PROJECT( ds_BusinessCredit_hits_flagSupp,
+        TRANSFORM( doxie.Layout_Rollup.KeyRec_feedback,
+          SELF.BusinessCreditMatch := ~LEFT.is_suppressed AND LEFT.BusinessCreditMatch,
+          SELF                     := LEFT));
 
 		// sort so sbfe records bubble to the top, keeping the same penalty order for true/false records
 		ds_BusinessCredit_atTop := SORT( ds_BusinessCredit_hits, ~BusinessCreditMatch );

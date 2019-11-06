@@ -36,6 +36,13 @@ EXPORT E_T_I_N_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   SHARED __d0_Prefiltered := __d0_Location__Mapped;
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0;
+  EXPORT Reported_Dates_Layout := RECORD
+    KEL.typ.nkdate Date_Vendor_Last_Reported_;
+    KEL.typ.nkdate Date_Vendor_First_Reported_;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -52,16 +59,16 @@ EXPORT E_T_I_N_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Postdirectional_;
     KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
     KEL.typ.nstr Secondary_Range_;
-    KEL.typ.nkdate Date_Vendor_Last_Reported_;
-    KEL.typ.nkdate Date_Vendor_First_Reported_;
+    KEL.typ.ndataset(Reported_Dates_Layout) Reported_Dates_;
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Tax_I_D_,Location_,Primary_Range_,Predirectional_,Primary_Name_,Suffix_,Postdirectional_,Z_I_P5_,Secondary_Range_,Date_Vendor_Last_Reported_,Date_Vendor_First_Reported_,ALL));
+  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Tax_I_D_,Location_,Primary_Range_,Predirectional_,Primary_Name_,Suffix_,Postdirectional_,Z_I_P5_,Secondary_Range_,ALL));
   T_I_N_Address_Group := __PostFilter;
   Layout T_I_N_Address__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
+    SELF.Reported_Dates_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Date_Vendor_Last_Reported_,Date_Vendor_First_Reported_},Date_Vendor_Last_Reported_,Date_Vendor_First_Reported_),Reported_Dates_Layout)(__NN(Date_Vendor_Last_Reported_) OR __NN(Date_Vendor_First_Reported_)));
     SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
@@ -69,6 +76,7 @@ EXPORT E_T_I_N_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF := __r;
   END;
   Layout T_I_N_Address__Single_Rollup(InLayout __r) := TRANSFORM
+    SELF.Reported_Dates_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Reported_Dates_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Date_Vendor_Last_Reported_) OR __NN(Date_Vendor_First_Reported_)));
     SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
     SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);

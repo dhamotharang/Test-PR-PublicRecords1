@@ -16,7 +16,7 @@
  </message>
 */
 
-import OFAC_XG5;
+import OFAC_XG5, STD, iesp, Patriot, ut;
 
 export Patriot_Batch := MACRO
 
@@ -55,12 +55,18 @@ IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, 
 
 in_format capitalize(in_format le) :=
 TRANSFORM
-	SELF.name_first := Stringlib.StringToUpperCase(le.name_first);
-	SELF.name_middle := Stringlib.StringToUpperCase(le.name_middle);
-	SELF.name_last := Stringlib.StringToUpperCase(le.name_last);
-	SELF.name_unparsed := Stringlib.StringToUpperCase(le.name_unparsed);
-	SELF.country := Stringlib.StringToUpperCase(le.country);
-	SELF.search_type := Stringlib.StringToUpperCase(search_type);
+
+cl := LENGTH(TRIM(le.country));
+	country_decoded := IF(cl=2 AND ut.Country_ISO2_To_Name(le.country)<>'',ut.Country_ISO2_To_Name(le.country),
+												IF(cl=3 AND ut.Country_ISO3_To_Name(le.country)<>'',ut.Country_ISO3_To_Name(le.country), le.country));
+
+	SELF.name_first := STD.Str.ToUpperCase(le.name_first);
+	SELF.name_middle := STD.Str.ToUpperCase(le.name_middle);
+	SELF.name_last := STD.Str.ToUpperCase(le.name_last);
+	SELF.name_unparsed := if( OFAC_version = 4 and le.name_first = '' and le.name_middle = '' and le.name_last = '' and le.name_unparsed = '' and le.country <> '', 
+														STD.Str.ToUpperCase(country_decoded), STD.Str.ToUpperCase(le.name_unparsed));
+	SELF.country := STD.Str.ToUpperCase(country_decoded);
+	SELF.search_type := STD.Str.ToUpperCase(search_type); 
 	SELF.dob := le.dob;	
 	SELF := le;
 END;

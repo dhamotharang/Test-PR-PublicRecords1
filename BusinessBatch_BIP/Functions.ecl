@@ -840,9 +840,9 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
 
     // append property source to record so we can filter out marketing-restricted sources
     {RawRecordType, string _prop_src, boolean _use_st} AddPropertySource(RawRecordType le) := TRANSFORM
-      // Lexis Asrs property sources need to have the state appended to them (as some states are restricted)
+      // Lexis property sources need to have the state appended to them (as some states are restricted)
       rawSrc := MDR.sourceTools.fProperty(le.ln_fares_id);
-      addState := rawSrc = MDR.sourceTools.src_LnPropV2_Lexis_Asrs;
+      addState := rawSrc IN [MDR.sourceTools.src_LnPropV2_Lexis_Asrs, MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs];
       fullSrc := IF (addState, rawSrc + le.st, rawSrc);
 
       SELF._prop_src := fullSrc;
@@ -1324,7 +1324,7 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
   EXPORT GetDCAInfo(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
                     DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
   FUNCTION
-    dDCAInfoRaw := DCAV2.Key_LinkIds.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);
+    dDCAInfoRaw := DCAV2.Key_LinkIds.kFetch(dLinkIds, mod_access, BIPV2.IDconstants.Fetch_Level_SELEID);
     RawRecordType := RECORDOF(dDCAInfoRaw);
 
     // currently, all DCA records are marketing-allowed for the BRM rollup service

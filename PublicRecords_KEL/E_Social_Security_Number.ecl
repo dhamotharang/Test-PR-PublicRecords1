@@ -59,33 +59,13 @@ EXPORT E_Social_Security_Number(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid := __d4_KELfiltered((KEL.typ.uid)ssn = 0);
   SHARED __d4_Prefiltered := __d4_KELfiltered((KEL.typ.uid)ssn <> 0);
   SHARED __d4 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d4_Prefiltered,InLayout,__Mapping4,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping4_Transform(LEFT)));
-  SHARED __Mapping5 := 'ssn(OVERRIDE:UID|DEFAULT:S_S_N_:\'\'),officialfirstseen(DEFAULT:Official_First_Seen_:DATE),officiallastseen(DEFAULT:Official_Last_Seen_:DATE),dateofdeath(DEFAULT:Date_Of_Death_:DATE),issuestate(DEFAULT:Issue_State_:\'\'),headerfirstseen(DEFAULT:Header_First_Seen_:DATE),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
-  SHARED __d5_Norm := NORMALIZE(__in,LEFT.Dataset_Fraudpoint3__Key_Address,TRANSFORM(RECORDOF(__in.Dataset_Fraudpoint3__Key_Address),SELF:=RIGHT));
+  SHARED __Mapping5 := 'ssn(OVERRIDE:UID|DEFAULT:S_S_N_:\'\'),officialfirstseen(DEFAULT:Official_First_Seen_:DATE),officiallastseen(DEFAULT:Official_Last_Seen_:DATE),dod8(OVERRIDE:Date_Of_Death_:DATE),issuestate(DEFAULT:Issue_State_:\'\'),headerfirstseen(DEFAULT:Header_First_Seen_:DATE),src(OVERRIDE:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED __d5_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie__Key_Death_MasterV2_SSA_DID,TRANSFORM(RECORDOF(__in.Dataset_Doxie__Key_Death_MasterV2_SSA_DID),SELF:=RIGHT));
   EXPORT __d5_KELfiltered := __d5_Norm((UNSIGNED)ssn != 0);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Fraudpoint3__Key_Address_Invalid := __d5_KELfiltered((KEL.typ.uid)ssn = 0);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Death_MasterV2_SSA_DID_Invalid := __d5_KELfiltered((KEL.typ.uid)ssn = 0);
   SHARED __d5_Prefiltered := __d5_KELfiltered((KEL.typ.uid)ssn <> 0);
   SHARED __d5 := __SourceFilter(KEL.FromFlat.Convert(__d5_Prefiltered,InLayout,__Mapping5,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  SHARED __Mapping6 := 'person_q.appended_ssn(OVERRIDE:UID|OVERRIDE:S_S_N_:\'\'),officialfirstseen(DEFAULT:Official_First_Seen_:DATE),officiallastseen(DEFAULT:Official_Last_Seen_:DATE),dateofdeath(DEFAULT:Date_Of_Death_:DATE),issuestate(DEFAULT:Issue_State_:\'\'),headerfirstseen(DEFAULT:Header_First_Seen_:DATE),src(OVERRIDE:Source_:\'\'),dateofinquiry(OVERRIDE:Date_First_Seen_:EPOCH|OVERRIDE:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
-  SHARED __d6_Norm := NORMALIZE(__in,LEFT.Dataset_Inquiry_AccLogs__Key_FCRA_DID,TRANSFORM(RECORDOF(__in.Dataset_Inquiry_AccLogs__Key_FCRA_DID),SELF:=RIGHT));
-  EXPORT __d6_KELfiltered := __d6_Norm((UNSIGNED)person_q.appended_ssn > 0);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid := __d6_KELfiltered((KEL.typ.uid)person_q.appended_ssn = 0);
-  SHARED __d6_Prefiltered := __d6_KELfiltered((KEL.typ.uid)person_q.appended_ssn <> 0);
-  SHARED __d6 := __SourceFilter(KEL.FromFlat.Convert(__d6_Prefiltered,InLayout,__Mapping6,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  SHARED __Mapping7 := 'ssn(OVERRIDE:UID|DEFAULT:S_S_N_:\'\'),officialfirstseen(DEFAULT:Official_First_Seen_:DATE),officiallastseen(DEFAULT:Official_Last_Seen_:DATE),dod8(OVERRIDE:Date_Of_Death_:DATE),issuestate(DEFAULT:Issue_State_:\'\'),headerfirstseen(DEFAULT:Header_First_Seen_:DATE),src(OVERRIDE:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
-  SHARED __d7_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie__Key_Death_MasterV2_SSA_DID,TRANSFORM(RECORDOF(__in.Dataset_Doxie__Key_Death_MasterV2_SSA_DID),SELF:=RIGHT));
-  EXPORT __d7_KELfiltered := __d7_Norm((UNSIGNED)ssn != 0);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Death_MasterV2_SSA_DID_Invalid := __d7_KELfiltered((KEL.typ.uid)ssn = 0);
-  SHARED __d7_Prefiltered := __d7_KELfiltered((KEL.typ.uid)ssn <> 0);
-  SHARED __d7 := __SourceFilter(KEL.FromFlat.Convert(__d7_Prefiltered,InLayout,__Mapping7,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  SHARED Date_First_Seen_8Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED Date_Last_Seen_8Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping8 := 'ssn(OVERRIDE:UID|DEFAULT:S_S_N_:\'\'),officialfirstseen(DEFAULT:Official_First_Seen_:DATE),officiallastseen(DEFAULT:Official_Last_Seen_:DATE),dateofdeath(DEFAULT:Date_Of_Death_:DATE),issuestate(DEFAULT:Issue_State_:\'\'),headerfirstseen(DEFAULT:Header_First_Seen_:DATE),src(OVERRIDE:Source_:\'\'),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH:Date_First_Seen_8Rule),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_8Rule),DPMBitmap(DEFAULT:__Permits:PERMITS)';
-  SHARED __d8_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie__Key_Header_Address,TRANSFORM(RECORDOF(__in.Dataset_Doxie__Key_Header_Address),SELF:=RIGHT));
-  EXPORT __d8_KELfiltered := __d8_Norm((UNSIGNED)ssn != 0);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Address_Invalid := __d8_KELfiltered((KEL.typ.uid)ssn = 0);
-  SHARED __d8_Prefiltered := __d8_KELfiltered((KEL.typ.uid)ssn <> 0);
-  SHARED __d8 := __SourceFilter(KEL.FromFlat.Convert(__d8_Prefiltered,InLayout,__Mapping8,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  EXPORT InData := __d0 + __d1 + __d2 + __d3 + __d4 + __d5 + __d6 + __d7 + __d8;
+  EXPORT InData := __d0 + __d1 + __d2 + __d3 + __d4 + __d5;
   EXPORT Dates_Of_Death_Layout := RECORD
     KEL.typ.nkdate Date_Of_Death_;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -142,7 +122,7 @@ EXPORT E_Social_Security_Number(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
   EXPORT Official_Last_Seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Official_Last_Seen_);
   EXPORT Issue_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Issue_State_);
   EXPORT Header_First_Seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Header_First_Seen_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Header_Quick__Key_Did_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Risk_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Fraudpoint3__Key_Address_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Death_MasterV2_SSA_DID_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Address_Invalid),COUNT(S_S_N__SingleValue_Invalid),COUNT(Official_First_Seen__SingleValue_Invalid),COUNT(Official_Last_Seen__SingleValue_Invalid),COUNT(Issue_State__SingleValue_Invalid),COUNT(Header_First_Seen__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Header_Quick__Key_Did_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Risk_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Fraudpoint3__Key_Address_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Death_MasterV2_SSA_DID_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Address_Invalid,KEL.typ.int S_S_N__SingleValue_Invalid,KEL.typ.int Official_First_Seen__SingleValue_Invalid,KEL.typ.int Official_Last_Seen__SingleValue_Invalid,KEL.typ.int Issue_State__SingleValue_Invalid,KEL.typ.int Header_First_Seen__SingleValue_Invalid});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Header_Quick__Key_Did_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Risk_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Death_MasterV2_SSA_DID_Invalid),COUNT(S_S_N__SingleValue_Invalid),COUNT(Official_First_Seen__SingleValue_Invalid),COUNT(Official_Last_Seen__SingleValue_Invalid),COUNT(Issue_State__SingleValue_Invalid),COUNT(Header_First_Seen__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Header_Quick__Key_Did_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Risk_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Death_MasterV2_SSA_DID_Invalid,KEL.typ.int S_S_N__SingleValue_Invalid,KEL.typ.int Official_First_Seen__SingleValue_Invalid,KEL.typ.int Official_Last_Seen__SingleValue_Invalid,KEL.typ.int Issue_State__SingleValue_Invalid,KEL.typ.int Header_First_Seen__SingleValue_Invalid});
   EXPORT NullCounts := DATASET([
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid),COUNT(__d0)},
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SSN',COUNT(__d0(__NL(S_S_N_))),COUNT(__d0(__NN(S_S_N_)))},
@@ -193,45 +173,15 @@ EXPORT E_Social_Security_Number(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HeaderFirstSeen',COUNT(__d4(__NL(Header_First_Seen_))),COUNT(__d4(__NN(Header_First_Seen_)))},
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d4(Date_First_Seen_=0)),COUNT(__d4(Date_First_Seen_!=0))},
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d4(Date_Last_Seen_=0)),COUNT(__d4(Date_Last_Seen_!=0))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Fraudpoint3__Key_Address_Invalid),COUNT(__d5)},
+    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Death_MasterV2_SSA_DID_Invalid),COUNT(__d5)},
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SSN',COUNT(__d5(__NL(S_S_N_))),COUNT(__d5(__NN(S_S_N_)))},
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OfficialFirstSeen',COUNT(__d5(__NL(Official_First_Seen_))),COUNT(__d5(__NN(Official_First_Seen_)))},
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OfficialLastSeen',COUNT(__d5(__NL(Official_Last_Seen_))),COUNT(__d5(__NN(Official_Last_Seen_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfDeath',COUNT(__d5(__NL(Date_Of_Death_))),COUNT(__d5(__NN(Date_Of_Death_)))},
+    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dod8',COUNT(__d5(__NL(Date_Of_Death_))),COUNT(__d5(__NN(Date_Of_Death_)))},
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IssueState',COUNT(__d5(__NL(Issue_State_))),COUNT(__d5(__NN(Issue_State_)))},
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HeaderFirstSeen',COUNT(__d5(__NL(Header_First_Seen_))),COUNT(__d5(__NN(Header_First_Seen_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d5(__NL(Source_))),COUNT(__d5(__NN(Source_)))},
+    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d5(__NL(Source_))),COUNT(__d5(__NN(Source_)))},
     {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d5(Date_First_Seen_=0)),COUNT(__d5(Date_First_Seen_!=0))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d5(Date_Last_Seen_=0)),COUNT(__d5(Date_Last_Seen_!=0))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Inquiry_AccLogs__Key_FCRA_DID_Invalid),COUNT(__d6)},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','person_q.appended_ssn',COUNT(__d6(__NL(S_S_N_))),COUNT(__d6(__NN(S_S_N_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OfficialFirstSeen',COUNT(__d6(__NL(Official_First_Seen_))),COUNT(__d6(__NN(Official_First_Seen_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OfficialLastSeen',COUNT(__d6(__NL(Official_Last_Seen_))),COUNT(__d6(__NN(Official_Last_Seen_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfDeath',COUNT(__d6(__NL(Date_Of_Death_))),COUNT(__d6(__NN(Date_Of_Death_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IssueState',COUNT(__d6(__NL(Issue_State_))),COUNT(__d6(__NN(Issue_State_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HeaderFirstSeen',COUNT(__d6(__NL(Header_First_Seen_))),COUNT(__d6(__NN(Header_First_Seen_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Src',COUNT(__d6(__NL(Source_))),COUNT(__d6(__NN(Source_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d6(Date_First_Seen_=0)),COUNT(__d6(Date_First_Seen_!=0))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d6(Date_Last_Seen_=0)),COUNT(__d6(Date_Last_Seen_!=0))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Death_MasterV2_SSA_DID_Invalid),COUNT(__d7)},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SSN',COUNT(__d7(__NL(S_S_N_))),COUNT(__d7(__NN(S_S_N_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OfficialFirstSeen',COUNT(__d7(__NL(Official_First_Seen_))),COUNT(__d7(__NN(Official_First_Seen_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OfficialLastSeen',COUNT(__d7(__NL(Official_Last_Seen_))),COUNT(__d7(__NN(Official_Last_Seen_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dod8',COUNT(__d7(__NL(Date_Of_Death_))),COUNT(__d7(__NN(Date_Of_Death_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IssueState',COUNT(__d7(__NL(Issue_State_))),COUNT(__d7(__NN(Issue_State_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HeaderFirstSeen',COUNT(__d7(__NL(Header_First_Seen_))),COUNT(__d7(__NN(Header_First_Seen_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d7(__NL(Source_))),COUNT(__d7(__NN(Source_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d7(Date_First_Seen_=0)),COUNT(__d7(Date_First_Seen_!=0))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d7(Date_Last_Seen_=0)),COUNT(__d7(Date_Last_Seen_!=0))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Address_Invalid),COUNT(__d8)},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SSN',COUNT(__d8(__NL(S_S_N_))),COUNT(__d8(__NN(S_S_N_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OfficialFirstSeen',COUNT(__d8(__NL(Official_First_Seen_))),COUNT(__d8(__NN(Official_First_Seen_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OfficialLastSeen',COUNT(__d8(__NL(Official_Last_Seen_))),COUNT(__d8(__NN(Official_Last_Seen_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfDeath',COUNT(__d8(__NL(Date_Of_Death_))),COUNT(__d8(__NN(Date_Of_Death_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IssueState',COUNT(__d8(__NL(Issue_State_))),COUNT(__d8(__NN(Issue_State_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HeaderFirstSeen',COUNT(__d8(__NL(Header_First_Seen_))),COUNT(__d8(__NN(Header_First_Seen_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d8(__NL(Source_))),COUNT(__d8(__NN(Source_)))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d8(Date_First_Seen_=0)),COUNT(__d8(Date_First_Seen_!=0))},
-    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d8(Date_Last_Seen_=0)),COUNT(__d8(Date_Last_Seen_!=0))}]
+    {'SocialSecurityNumber','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d5(Date_Last_Seen_=0)),COUNT(__d5(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

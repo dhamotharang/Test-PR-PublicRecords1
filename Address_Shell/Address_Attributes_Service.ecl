@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Address_Attributes_Service">
 	<part name="AddressAttributesReportRequest" type="tns:XmlDataSet" cols="110" rows="50" />
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="25"/>
@@ -68,7 +68,7 @@ Sample Gateway XML:
 </pre>
 */
 
-IMPORT Address, iesp, ut, Risk_Indicators, RiskWise, Gateway;
+IMPORT Address, iesp, ut,std, Risk_Indicators, RiskWise, Gateway;
 
 EXPORT Address_Attributes_Service() := FUNCTION
 	/* ************************************************************************
@@ -81,7 +81,11 @@ EXPORT Address_Attributes_Service() := FUNCTION
 	'PropertyInfoAttrVersion',
 	'ERCAttrVersion',
 	'gateways',
-	'ReturnFlatLayout'
+	'ReturnFlatLayout',
+  'LexIdSourceOptout',
+	'_TransactionId',
+	'_BatchUID',
+	'_GCID'
 	));
 	
 	requestIn := DATASET([], iesp.addressattributesreport.t_AddressAttributesReportRequest) : STORED('AddressAttributesReportRequest', FEW);
@@ -93,9 +97,14 @@ EXPORT Address_Attributes_Service() := FUNCTION
 	// gatewaysIn := DATASET([], Risk_Indicators.Layout_Gateways_In) : STORED('gateways', FEW);
   
   STRING50 outOfBandDataRestriction := '' : STORED('DataRestrictionMask');
+  unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 	
 	// This is purely for ECL engineers.  It is NOT passed in by the ESP.
 	flatLayout := FALSE : STORED('ReturnFlatLayout');
+  
 		
 	/* ***********************************************************
 	 *           Clean and format input as needed                *
@@ -117,14 +126,14 @@ EXPORT Address_Attributes_Service() := FUNCTION
 		SELF.UnitDesignation := cleanedFields.Unit_Desig;
 		SELF.UnitNumber := cleanedFields.Sec_Range;
 		SELF.StreetAddress1 := Address.Addr1FromComponents(cleanedFields.Prim_Range, cleanedFields.Predir,	cleanedFields.Prim_Name, cleanedFields.Addr_Suffix, cleanedFields.Postdir, cleanedFields.Unit_Desig, cleanedFields.Sec_Range);
-		SELF.StreetAddress2 := StringLib.StringToUpperCase(le.SearchBy.Address.StreetAddress2);
+		SELF.StreetAddress2 := STD.Str.ToUpperCase(le.SearchBy.Address.StreetAddress2);
 		SELF.City := cleanedFields.V_City_Name;
 		SELF.State := cleanedFields.St;
 		SELF.Zip5 := cleanedFields.ZIP;
 		SELF.Zip4 := cleanedFields.ZIP4;
 		SELF.County := cleanedFields.County[3..5]; // We only want the last 3 for county
 		SELF.PostalCode := le.SearchBy.Address.PostalCode;
-		capsCity := TRIM(StringLib.StringToUpperCase(le.SearchBy.Address.City));
+		capsCity := TRIM(STD.Str.ToUpperCase(le.SearchBy.Address.City));
 		useCity := IF(capsCity = '', TRIM(cleanedFields.V_City_Name), capsCity);
 		SELF.StateCityZip := IF(useCity <> '' AND TRIM(cleanedFields.St) <> '' AND TRIM(cleanedFields.ZIP) <> '', useCity + ', ' + TRIM(cleanedFields.St) + ' ' + TRIM(cleanedFields.ZIP), '');
 
@@ -158,9 +167,9 @@ EXPORT Address_Attributes_Service() := FUNCTION
 	requestedAttributes := PROJECT(option.RequestedAttributeGroups, TRANSFORM(attributes, SELF.Request := LEFT.Value));
 	
 	// ESDL Input
-	pubRecAttribRequest := requestedAttributes (StringLib.StringContains(Request, 'addressbasedprattrv', TRUE))[1];
-	propertyInformationAttribRequest := requestedAttributes (StringLib.StringContains(Request, 'propertyinfoattrv', TRUE))[1];
-	ERCAttribRequest := requestedAttributes (StringLib.StringContains(Request, 'ercattrv', TRUE))[1];
+	pubRecAttribRequest := requestedAttributes (STD.Str.Contains(Request, 'addressbasedprattrv', TRUE))[1];
+	propertyInformationAttribRequest := requestedAttributes (STD.Str.Contains(Request, 'propertyinfoattrv', TRUE))[1];
+	ERCAttribRequest := requestedAttributes (STD.Str.Contains(Request, 'ercattrv', TRUE))[1];
 	
 	// Out-of-band (Not Passed in by the ESP - ONLY for ECL Scripts)
 	STRING30 AddressBasedPRAttrVersion := '' : STORED('AddressBasedPRAttrVersion');
@@ -169,23 +178,23 @@ EXPORT Address_Attributes_Service() := FUNCTION
 
 	publicRecordsAttributesVersion := MAP(
 																				TRIM(pubRecAttribRequest.Request) <> '' => (UNSIGNED1)(pubRecAttribRequest.Request[20..]), // We found a valid public records request, get the version number
-																				TRIM(AddressBasedPRAttrVersion) <> '' AND StringLib.StringContains(AddressBasedPRAttrVersion, 'addressbasedprattrv', TRUE) => (UNSIGNED1)(AddressBasedPRAttrVersion[20..]), // Check the out-of-band
+																				TRIM(AddressBasedPRAttrVersion) <> '' AND STD.Str.Contains(AddressBasedPRAttrVersion, 'addressbasedprattrv', TRUE) => (UNSIGNED1)(AddressBasedPRAttrVersion[20..]), // Check the out-of-band
 																				0 // No public records request
 																				);
 	propertyInformationAttributesVersion := MAP(
 																				TRIM(propertyInformationAttribRequest.Request) <> '' => (UNSIGNED1)(propertyInformationAttribRequest.Request[18..]), // We found a valid property information request, get the version number
-																				TRIM(PropertyInfoAttrVersion) <> '' AND StringLib.StringContains(PropertyInfoAttrVersion, 'propertyinfoattrv', TRUE) => (UNSIGNED1)(PropertyInfoAttrVersion[18..]), // Check the out-of-band
+																				TRIM(PropertyInfoAttrVersion) <> '' AND STD.Str.Contains(PropertyInfoAttrVersion, 'propertyinfoattrv', TRUE) => (UNSIGNED1)(PropertyInfoAttrVersion[18..]), // Check the out-of-band
 																				0 // No property information request
 																				);
 	ercAttributesVersion := MAP(
 																				TRIM(ERCAttribRequest.Request) <> '' => (UNSIGNED1)(ERCAttribRequest.Request[9..]), // We found a valid erc request, get the version number
-																				TRIM(ERCAttrVersion) <> '' AND StringLib.StringContains(ERCAttrVersion, 'ercattrv', TRUE) => (UNSIGNED1)(ERCAttrVersion[9..]), // Check the out-of-band
+																				TRIM(ERCAttrVersion) <> '' AND STD.Str.Contains(ERCAttrVersion, 'ercattrv', TRUE) => (UNSIGNED1)(ERCAttrVersion[9..]), // Check the out-of-band
 																				0 // No erc request
 																				);
 																				
-	propertyInformationGatewayURL := gatewaysIn(StringLib.StringToLowerCase(servicename) = 'reportservice')[1].url;
+	propertyInformationGatewayURL := gatewaysIn(STD.Str.ToLowerCase(servicename) = 'reportservice')[1].url;
 	
-	ercGatewayURL := gatewaysIn(StringLib.StringToLowerCase(servicename) = 'erc')[1].url;
+	ercGatewayURL := gatewaysIn(STD.Str.ToLowerCase(servicename) = 'erc')[1].url;
 	
 	/* ***********************************************************
 	 *   Verify Input Options, ensure enough data is present     *
@@ -198,7 +207,8 @@ EXPORT Address_Attributes_Service() := FUNCTION
 	/* **********************************************************
 	 *             Get the requested attribues                  *
 	 ************************************************************/
-	comboAttributes := Address_Shell.AddressAttributesFunction(cleanedInput, publicRecordsAttributesVersion, propertyInformationAttributesVersion, ercAttributesVersion, gatewaysIn);
+	comboAttributes := Address_Shell.AddressAttributesFunction(cleanedInput, publicRecordsAttributesVersion,
+  propertyInformationAttributesVersion, ercAttributesVersion,gatewaysIn);
 
 	final := Address_Shell.convertToIESP.getAttributes(comboAttributes, publicRecordsAttributesVersion, propertyInformationAttributesVersion, ercAttributesVersion);
 

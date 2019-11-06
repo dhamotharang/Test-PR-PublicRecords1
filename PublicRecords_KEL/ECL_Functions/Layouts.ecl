@@ -9,6 +9,7 @@ EXPORT Layouts := MODULE
 		STRING78 P_InpNameMid;
 		STRING78 P_InpNameLast;
 		STRING120 P_InpAddrLine1;
+		STRING120 P_InpAddrLine2;
 		STRING50 P_InpAddrCity;
 		STRING25 P_InpAddrState;
 		STRING10 P_InpAddrZip;
@@ -92,7 +93,7 @@ EXPORT Layouts := MODULE
 		STRING1 P_InpNameFirstFlag;
 		STRING1 P_InpNameMidFlag;
 		STRING1 P_InpNameLastFlag;
-		STRING1 P_InpAddrLine1Flag;
+		STRING1 P_InpAddrStFlag;
 		STRING1 P_InpAddrCityFlag;
 		STRING1 P_InpAddrStateFlag;
 		STRING1 P_InpAddrZipFlag;
@@ -150,6 +151,7 @@ EXPORT Layouts := MODULE
 		STRING120 B_InpName;
 		STRING120 B_InpAltName;
 		STRING120 B_InpAddrLine1;
+		STRING120 B_InpAddrLine2;
 		STRING50 B_InpAddrCity;
 		STRING25 B_InpAddrState;
 		STRING10 B_InpAddrZip;
@@ -169,6 +171,7 @@ EXPORT Layouts := MODULE
 		STRING78 B_Rep1InpNameMid;
 		STRING78 B_Rep1InpNameLast;
 		STRING120 B_Rep1InpAddrLine1;
+		STRING120 B_Rep1InpAddrLine2;
 		STRING50 B_Rep1InpAddrCity;
 		STRING25 B_Rep1InpAddrState;
 		STRING10 B_Rep1InpAddrZip;
@@ -184,6 +187,7 @@ EXPORT Layouts := MODULE
 		STRING78 B_Rep2InpNameMid;
 		STRING78 B_Rep2InpNameLast;
 		STRING120 B_Rep2InpAddrLine1;
+		STRING120 B_Rep2InpAddrLine2;
 		STRING50 B_Rep2InpAddrCity;
 		STRING25 B_Rep2InpAddrState;
 		STRING10 B_Rep2InpAddrZip;
@@ -199,6 +203,7 @@ EXPORT Layouts := MODULE
 		STRING78 B_Rep3InpNameMid;
 		STRING78 B_Rep3InpNameLast;
 		STRING120 B_Rep3InpAddrLine1;
+		STRING120 B_Rep3InpAddrLine2;
 		STRING50 B_Rep3InpAddrCity;
 		STRING25 B_Rep3InpAddrState;
 		STRING10 B_Rep3InpAddrZip;
@@ -214,6 +219,7 @@ EXPORT Layouts := MODULE
 		STRING78 B_Rep4InpNameMid;
 		STRING78 B_Rep4InpNameLast;
 		STRING120 B_Rep4InpAddrLine1;
+		STRING120 B_Rep4InpAddrLine2;
 		STRING50 B_Rep4InpAddrCity;
 		STRING25 B_Rep4InpAddrState;
 		STRING10 B_Rep4InpAddrZip;
@@ -229,6 +235,7 @@ EXPORT Layouts := MODULE
 		STRING78 B_Rep5InpNameMid;
 		STRING78 B_Rep5InpNameLast;
 		STRING120 B_Rep5InpAddrLine1;
+		STRING120 B_Rep5InpAddrLine2;
 		STRING50 B_Rep5InpAddrCity;
 		STRING25 B_Rep5InpAddrState;
 		STRING10 B_Rep5InpAddrZip;
@@ -442,7 +449,7 @@ EXPORT Layouts := MODULE
 		STRING1	B_InpArchDtFlag;
 		STRING1	B_InpNameFlag;
 		STRING1	B_InpAltNameFlag;
-		STRING1	B_InpAddrLine1Flag;
+		STRING1	B_InpAddrStFlag;
 		STRING1	B_InpAddrCityFlag;
 		STRING1	B_InpAddrStateFlag;
 		STRING1	B_InpAddrZipFlag;
@@ -454,7 +461,7 @@ EXPORT Layouts := MODULE
 		STRING1	B_Rep1InpNameFirstFlag;
 		STRING1	B_Rep1InpNameMidFlag;
 		STRING1	B_Rep1InpNameLastFlag;
-		STRING1	B_Rep1InpAddrLine1Flag;
+		STRING1	B_Rep1InpAddrStFlag;
 		STRING1	B_Rep1InpAddrCityFlag;
 		STRING1	B_Rep1InpAddrStateFlag;
 		STRING1	B_Rep1InpAddrZipFlag;
@@ -468,7 +475,7 @@ EXPORT Layouts := MODULE
 		STRING1	B_Rep2InpNameFirstFlag;
 		STRING1	B_Rep2InpNameMidFlag;
 		STRING1	B_Rep2InpNameLastFlag;
-		STRING1	B_Rep2InpAddrLine1Flag;
+		STRING1	B_Rep2InpAddrStFlag;
 		STRING1	B_Rep2InpAddrCityFlag;
 		STRING1	B_Rep2InpAddrStateFlag;
 		STRING1	B_Rep2InpAddrZipFlag;
@@ -482,7 +489,7 @@ EXPORT Layouts := MODULE
 		STRING1	B_Rep3InpNameFirstFlag;
 		STRING1	B_Rep3InpNameMidFlag;
 		STRING1	B_Rep3InpNameLastFlag;
-		STRING1	B_Rep3InpAddrLine1Flag;
+		STRING1	B_Rep3InpAddrStFlag;
 		STRING1	B_Rep3InpAddrCityFlag;
 		STRING1	B_Rep3InpAddrStateFlag;
 		STRING1	B_Rep3InpAddrZipFlag;
@@ -496,7 +503,7 @@ EXPORT Layouts := MODULE
 		STRING1	B_Rep4InpNameFirstFlag;
 		STRING1	B_Rep4InpNameMidFlag;
 		STRING1	B_Rep4InpNameLastFlag;
-		STRING1	B_Rep4InpAddrLine1Flag;
+		STRING1	B_Rep4InpAddrStFlag;
 		STRING1	B_Rep4InpAddrCityFlag;
 		STRING1	B_Rep4InpAddrStateFlag;
 		STRING1	B_Rep4InpAddrZipFlag;
@@ -510,7 +517,7 @@ EXPORT Layouts := MODULE
 		STRING1	B_Rep5InpNameFirstFlag;
 		STRING1	B_Rep5InpNameMidFlag;
 		STRING1	B_Rep5InpNameLastFlag;
-		STRING1	B_Rep5InpAddrLine1Flag;
+		STRING1	B_Rep5InpAddrStFlag;
 		STRING1	B_Rep5InpAddrCityFlag;
 		STRING1	B_Rep5InpAddrStateFlag;
 		STRING1	B_Rep5InpAddrZipFlag;
@@ -709,6 +716,26 @@ EXPORT Layouts := MODULE
 		INTEGER3 B_Rep4LexIDScore;
 		INTEGER7 B_Rep5LexID;
 		INTEGER3 B_Rep5LexIDScore;
+		STRING6 B_InpValNameInvalidFlag;
+		STRING6 B_InpValAltNameInvalidFlag;
+    STRING6 B_InpValAddrStInvalidFlag;
+		STRING6 B_InpValPhoneInvalidFlag;
+		STRING6 B_InpValTINInvalidFlag;
+		STRING6 B_InpValEmailInvalidFlag;
+		STRING6 B_InpValAddrZipBadLenFlag;
+		STRING6 B_InpValAddrZipAllZeroFlag;
+		STRING6 B_InpValAddrStateBadAbbrFlag;
+		STRING6 B_InpValPhoneBadCharFlag;
+		STRING6 B_InpValPhoneBadLenFlag;
+		STRING6 B_InpValPhoneBogusFlag;
+		STRING6 B_InpValTINBadCharFlag;
+		STRING6 B_InpValTINBadLenFlag;
+		STRING6 B_InpValTINBogusFlag;
+		STRING6 B_InpValEmailBogusFlag;
+		STRING6 B_InpValEmailUserBadCharFlag;
+		STRING6 B_InpValEmailUserAllZeroFlag;
+		STRING6 B_InpValEmailDomBadCharFlag;
+		STRING6 B_InpValEmailDomAllZeroFlag;
 	END;
 	
 	SHARED LayoutPersonInternal := RECORD
@@ -1046,6 +1073,16 @@ EXPORT Layouts := MODULE
 		DECIMAL7_2 BE_B2BMatBalVol24Mc;
 		DECIMAL7_2 BE_B2BOpsBalVol24Mc;
 		DECIMAL7_2 BE_B2BOthBalVol24Mc;
+		INTEGER3 BE_AstVehAirCntEv;
+		INTEGER3 BE_AstVehWtrCntEv;
+		INTEGER3 BE_AstVehAutoCntEv;
+		INTEGER3 BE_AstVehAutoCnt2Y;
+		INTEGER3 BE_AstVehAutoPersCnt2Y;
+		INTEGER3 BE_AstVehAutoCommCnt2Y;
+		INTEGER3 BE_AstVehAutoOtherCnt2Y;
+		INTEGER4 BE_AstVehAutoValTot2Y;
+		INTEGER3 BE_AstVehAutoEmrgNewMsncEv;
+		STRING10 BE_AstVehAutoEmrgNewDtEv;
 	END;	
 		
 	EXPORT LayoutBusinessSeleID := RECORD
@@ -1061,7 +1098,6 @@ EXPORT Layouts := MODULE
 		INTEGER G_ProcBusUID;
 		LayoutInputBIIInternal - B_InpAcct;
 		LayoutBusinessSeleIDInternal;
-		LayoutExternalFlags;
 	END;	
 
 END;

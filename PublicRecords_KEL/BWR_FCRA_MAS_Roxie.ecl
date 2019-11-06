@@ -5,8 +5,9 @@ threads := 1;
 RoxieIP := RiskWise.shortcuts.Dev156;
 NeutralRoxieIP:= RiskWise.Shortcuts.Dev156;
 
-//InputFile := '~temp::kel::consumer_fcra_1mm.csv'; //1 million
-InputFile := '~temp::kel::consumer_fcra_100k.csv';
+InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
+//InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
+
 
 /* Data Setting 	FCRA 	
 DRMFares = 1 //FARES - bit 1
@@ -39,26 +40,25 @@ Score_threshold := 80;
 
 // Output additional file in Master Layout
 // Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
-Output_Master_Results := FALSE;
-// Output_Master_Results := TRUE; 
+// Output_Master_Results := FALSE;
+Output_Master_Results := TRUE; 
 
 // Toggle to include/exclude SALT profile of results file
-Output_SALT_Profile := FALSE;
-// Output_SALT_Profile := TRUE;
+// Output_SALT_Profile := FALSE;
+Output_SALT_Profile := TRUE;
 
 RecordsToRun := 0;
 eyeball := 100;
 
-OutputFile := '~calbrecht::BundleTest_100K_RoxieDev_current_09172019_FCRA'+ ThorLib.wuid() ;
-// OutputFile := '~calbrecht::BundleTest_100K_RoxieDev_archive_09172019_FCRA'+ ThorLib.wuid() ;
-
+OutputFile := '~lweiner::out::PersonFCRA_Roxie_100k_Archive_KS-4216_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
     STRING FirstName           ;
     STRING MiddleName          ;
     STRING LastName            ;
-    STRING StreetAddress       ;
+    STRING StreetAddressLine1  ;
+    STRING StreetAddressLine2  ;
     STRING City                ;
     STRING State               ;
     STRING Zip                 ;
@@ -80,7 +80,7 @@ prii_layout := RECORD
     STRING Perf;
     STRING Proj;
 END;
-p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
+p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
 // P_IN1 := p_in( ACCOUNT IN ['AAAA7833-122054', 'TMOBJUN7088-84991']);
 p := IF (RecordsToRun = 0, P_IN, CHOOSEN (P_IN, RecordsToRun));
 //p2 := p_in;

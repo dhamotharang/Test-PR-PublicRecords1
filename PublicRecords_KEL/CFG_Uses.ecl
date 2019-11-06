@@ -1,12 +1,13 @@
-﻿//HPCC Systems KEL Compiler Version 1.0.0
-IMPORT KEL10 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+IMPORT KEL11 AS KEL;
 IMPORT PublicRecords_KEL;
-IMPORT * FROM KEL10.Null;
+IMPORT * FROM KEL11.Null;
 EXPORT CFG_Uses := MODULE, VIRTUAL
   // **** Do not override these definitions - they are used to define the interface to KEL queries ****;
   EXPORT FDCLayout := RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC);
   EXPORT FDCDataset := DATASET(FDCLayout);
   EXPORT FDCDefault := PublicRecords_KEL.ECL_Functions.Dataset_FDC;
+  EXPORT UNSIGNED8 Permit__NONE := 0x0;
   EXPORT UNSIGNED8 Permit_Restricted := 0x1;
   EXPORT UNSIGNED8 Permit_NoRestriction := 0x2;
   EXPORT UNSIGNED8 Permit_FCRA := 0x4;

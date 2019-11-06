@@ -136,7 +136,7 @@ MODULE
 													TRANSFORM(iesp.share.t_StringArrayItem,SELF.Value := LEFT.phone));
 
 			tmpMod := MODULE(PROJECT(globalMod,BatchServices.RealTimePhones_Params.params,OPT))
-												EXPORT STRING15                              Phone                  := '';
+												EXPORT STRING15                              Phone                  := IF(~inMod.IsPrimarySearchPII, pInput.homephone, '');
 												EXPORT STRING30                              FirstName              := '';
 												EXPORT STRING30                              LastName               := pInput.name_last;
 												EXPORT STRING200                             Addr                   := Address.Addr1FromComponents( pInput.prim_range,

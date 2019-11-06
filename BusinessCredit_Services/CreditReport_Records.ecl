@@ -81,7 +81,7 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
 											));
 	                                              
 	
-  BusInquiries 					:=  if (inmod.BusinessCreditReportType <> BusinessCredit_Services.Constants.LNOnlyBusinessCreditReport,
+  BusInquiries 					:=  if (inmod.BusinessCreditReportType NOT IN BusinessCredit_Services.Constants.LNOnlyCreditSet,
 	                      BusinessCredit_Services.fn_getBusInquiries(inmod));
 		
   buzCreditTradeLineMod	:= BusinessCredit_Services.fn_getBuzCreditTrades(inmod, buzCreditHeader_recs,IndustryCode); 
@@ -98,9 +98,9 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
 	                                  DATASET([],iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor));
 	
    // efficiency reduce what is passed into function 
-  BusAdditionalInfo			:= BusinessCredit_Services.fn_getAdditionalInfo(inmod, 
-                                                                        topBusiness_recs_raw,
-                                                                        buzCreditHeader_recs);
+  BusAdditionalInfo			:= BusinessCredit_Services.fn_getAdditionalInfo(topBusiness_recs_raw,
+                                                                        buzCreditHeader_recs,
+                                                                        mod_access);
 
   buzCreditScoreMod			:= BusinessCredit_Services.fn_getBusiness_CreditScore(inmod, 	                                                                                                                                                     
                                                                               BipOrSBFEBestInfo,																																															

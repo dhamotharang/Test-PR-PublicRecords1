@@ -94,6 +94,7 @@ end;
 		
 export t_EmailSearchV2Response := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
+	integer RecordCount {xpath('RecordCount')};
 	dataset(t_EmailSearchV2Record) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.Email.MAX_RECS)};
 	t_EmailSearchV2InputSubject InputSubject {xpath('InputSubject')};
 end;

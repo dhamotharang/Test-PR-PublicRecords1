@@ -1,9 +1,9 @@
 
-IMPORT iesp, doxie, VotersV2_Services, doxie_crs, ut;
+IMPORT $, iesp, doxie, VotersV2_Services, ut;
 
 EXPORT voter_records (
   dataset (doxie.layout_references) dids,
-  input.voters in_params = module (input.voters) end,
+  $.IParam.voters in_params = MODULE ($.IParam.voters) END,
   boolean IsFCRA = false
 ) := MODULE
 
@@ -138,7 +138,7 @@ EXPORT voter_records (
 
   EXPORT voters := project (VotersV2_Services.raw.MOXIE_VIEW.by_did (dids, in_params.ssn_mask, IsFCRA), xform_v1(Left));
 
-  EXPORT voters_v2 := project (VotersV2_Services.raw.Source_View.by_did (dids, in_params.ssn_mask, IsFCRA, in_params.applicationType), xform_v2(Left));
+  EXPORT voters_v2 := project (VotersV2_Services.raw.Source_View.by_did (dids, in_params.ssn_mask, IsFCRA, in_params.application_type), xform_v2(Left));
 
 END;
 

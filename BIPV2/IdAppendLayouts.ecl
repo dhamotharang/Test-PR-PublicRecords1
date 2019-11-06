@@ -185,6 +185,8 @@ export IdAppendLayouts := module
 
 		boolean is_marketing {xpath('is_marketing')},
 		boolean dnb_full_remove {xpath('dnb_full_remove')},
+		
+		boolean do_segmentation {xpath('do_segmentation')},
 
 		// query permissions need to be passed to remote service
 		permissions - dummy_field,

@@ -878,7 +878,7 @@ export Functions := module
 	//      preferring any emails from the individual source detail files which are 
 	//      in the LEFT DATASET.
 	
-	uc(string x) := STD.Str.ToUpperCase(x);
+	uc(string x) := TRIM(ut.fn_KeepPrintableChars(STD.Str.ToUpperCase(x)), ALL);
 	
 	ds_detail_wemail := JOIN(ds_detail_all, ds_email_combined,
                             LEFT.did = (UNSIGNED6)RIGHT.did,
@@ -922,14 +922,16 @@ export Functions := module
                               SELF        := LEFT), 
 												    LEFT OUTER,  // keep all the recs from the LEFT ds
 													  ATMOST(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
-    
+    ds_detail_wemail_sorted := SORT(ds_detail_wemail, did, bdid, company_name, RECORD);
+    ds_detail_wemail_deduped := DEDUP(ds_detail_wemail_sorted,  did, bdid, company_name);
+		
     doxie.compliance.logSoldToSources (ds_detail_spoke_flagged(~is_suppressed), mod_access);
     doxie.compliance.logSoldToSources (ds_detail_zoom_flagged(~is_suppressed), mod_access);
     doxie.compliance.logSoldToSources (ds_detail_oneclick_flagged(~is_suppressed), mod_access);
     doxie.compliance.logSoldToSources (ds_detail_saleschannel_flagged(~is_suppressed), mod_access);
     doxie.compliance.logSoldToSources (ds_email_data_suppressed, mod_access);
     doxie.compliance.logSoldToSources (ds_detail_thrive_flagged(~is_suppressed), mod_access);
-	  RETURN ds_detail_wemail;
+	  RETURN ds_detail_wemail_deduped;
   END; // end of getDetailedWithEmail function 
 	
 	EXPORT getParentCompany(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus)	ds_recs_in, BOOLEAN IncludeCorp= FALSE) := FUNCTION
