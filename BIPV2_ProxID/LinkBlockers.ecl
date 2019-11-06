@@ -22,6 +22,7 @@ SHARED bp := OverLinks;
     (LEFT.active_duns_number = RIGHT.active_duns_number OR RIGHT.active_duns_number = (TYPEOF(RIGHT.active_duns_number))'')
     AND (LEFT.active_enterprise_number = RIGHT.active_enterprise_number OR RIGHT.active_enterprise_number = (TYPEOF(RIGHT.active_enterprise_number))'')
     AND (LEFT.active_domestic_corp_key = RIGHT.active_domestic_corp_key OR RIGHT.active_domestic_corp_key = (TYPEOF(RIGHT.active_domestic_corp_key))'')
+    // AND (LEFT.sbfe_id = RIGHT.sbfe_id OR RIGHT.sbfe_id = (TYPEOF(RIGHT.sbfe_id))'')/*HACK sbfe_id not needed*/
     AND (LEFT.hist_enterprise_number = RIGHT.hist_enterprise_number OR RIGHT.hist_enterprise_number = (TYPEOF(RIGHT.hist_enterprise_number))'')
     AND (LEFT.hist_duns_number = RIGHT.hist_duns_number OR RIGHT.hist_duns_number = (TYPEOF(RIGHT.hist_duns_number))'')
     AND (LEFT.hist_domestic_corp_key = RIGHT.hist_domestic_corp_key OR RIGHT.hist_domestic_corp_key = (TYPEOF(RIGHT.hist_domestic_corp_key))'')
