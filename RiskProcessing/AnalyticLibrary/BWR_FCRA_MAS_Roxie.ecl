@@ -8,8 +8,8 @@ roxieIP := RiskWise.Shortcuts.prod_batch_fcra;
 NeutralRoxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
 // NeutralRoxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP;
 
-//InputFile := '~temp::kel::consumer_fcra_1mm.csv'; //1 million
-InputFile := '~temp::kel::consumer_fcra_100k.csv';
+InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
+//InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
 
 /* Data Setting 	FCRA 	
 DRMFares = 1 //FARES - bit 1
@@ -53,12 +53,14 @@ RecordsToRun := 10;
 eyeball := 100;
 
 OutputFile := '~ak::out::PublicRecs::FCRA_AnalyticalLibrary_'+ ThorLib.wuid() ;
+
 prii_layout := RECORD
     STRING Account             ;
     STRING FirstName           ;
     STRING MiddleName          ;
     STRING LastName            ;
-    STRING StreetAddress       ;
+    STRING StreetAddressLine1  ;
+    STRING StreetAddressLine2  ;
     STRING City                ;
     STRING State               ;
     STRING Zip                 ;
@@ -80,6 +82,7 @@ prii_layout := RECORD
     STRING Perf;
     STRING Proj;
 END;
+
 p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
 // P_IN1 := p_in( ACCOUNT IN ['AAAA7833-122054', 'TMOBJUN7088-84991']);
 p := IF (RecordsToRun = 0, P_IN, CHOOSEN (P_IN, RecordsToRun));
