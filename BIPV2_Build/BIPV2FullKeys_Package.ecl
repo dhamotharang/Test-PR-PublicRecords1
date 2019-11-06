@@ -86,7 +86,9 @@ module
   export consumer2BipKey                := BIPV2_Crosswalk.Keys(pversion,puseotherenvironment).ConsumerToBip;
   export seg_linkids                    := tools.macf_FilesIndex('BIPV2_Segmentation.Key_LinkIds().key                   ' ,segknames.seg_linkids                    );
 
-
+  export highRiskIndustriesPhone        := key_high_risk_industries.keyvs_phone(pversion,puseotherenvironment);
+  export highRiskIndustriesAddr         := key_high_risk_industries.keyvs_addr(pversion,puseotherenvironment);
+  export highRiskIndustriesCode         := key_high_risk_industries.keyvs_code(pversion,puseotherenvironment);
 
   export outputpackage := 
   sequential(
@@ -146,6 +148,9 @@ module
     ,if(pKey in [0 ,48] ,sequential(output(48 ,named('KeyNumber'),overwrite) ,output(choosen(bip2ConsumerKey              .logical ,100),named('bip2ConsumerKey'               ))))
     ,if(pKey in [0 ,49] ,sequential(output(49 ,named('KeyNumber'),overwrite) ,output(choosen(consumer2BipKey              .logical ,100),named('consumer2BipKey'               ))))
     ,if(pKey in [0 ,50] ,sequential(output(50 ,named('KeyNumber'),overwrite) ,output(choosen(seg_linkids                  .logical ,100),named('seg_linkids'                   ))))
+    ,if(pKey in [0 ,50] ,sequential(output(49 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesPhone      .logical ,100),named('highRiskIndustriesPhone'       ))))
+    ,if(pKey in [0 ,51] ,sequential(output(50 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesAddr       .logical ,100),named('highRiskIndustriesAddr'        ))))
+    ,if(pKey in [0 ,52] ,sequential(output(51 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesCode       .logical ,100),named('highRiskIndustriesCode'        ))))
   );       
 /*
   regexfilter := pRegexFieldFilter;

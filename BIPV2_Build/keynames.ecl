@@ -34,6 +34,10 @@ module
 
 	export biz_preferred             := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::biz_preferred'                               ,pversion    );
 
+  export highRiskIndustriesPhone   := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::high_risk_industries_phone'                  ,pversion    );
+  export highRiskIndustriesAddr    := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::high_risk_industries_addr'                   ,pversion    );
+  export highRiskIndustriesCodes   := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::high_risk_industries'                        ,pversion    );
+
   export BIPV2FullKeys := 
     (
       linkids                 .dall_filenames
@@ -44,6 +48,9 @@ module
     + status                  .dall_filenames
     + aml_addr                .dall_filenames
     + biz_preferred           .dall_filenames
+    + highRiskIndustriesPhone .dall_filenames
+    + highRiskIndustriesAddr  .dall_filenames
+    + highRiskIndustriesCodes .dall_filenames
     + BIPv2_HRCHY.keynames            (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Crosswalk.filenames(pversion,pUseOtherEnvironment).dall_filenames
  //   + bipv2_proxid.keynames(pversion).attribute_matches     .dall_filenames
