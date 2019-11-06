@@ -171,7 +171,8 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 									,string superfile
 									,string newlogicalfile
 									,string previouslogicalfile
-									,string keydifffile) := function
+									,string keydifffile
+									,string p_targetcluster = STD.System.Job.Target()) := function
 		return output(WsWorkunits.soapcall_WUWaitComplete
 																(WsWorkunits.Create_Wuid_Raw
 																		(
@@ -183,7 +184,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																				+	',index('+iKeyAttribute+',\''+newlogicalfile+'\')\r\n'
 																				+	',\''+keydifffile+'\'\r\n'
 																				+',overwrite)'
-																			,STD.System.Job.Target()
+																			,p_targetcluster
 																			,p_esp
 																			,'8010'
 																			)
@@ -196,7 +197,8 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 									,string superfile
 									,string previouslogicalfile
 									,string keydifffile
-									,string patchedfile) := function
+									,string patchedfile
+									,string p_targetcluster = STD.System.Job.Target()) := function
 		return output(WsWorkunits.soapcall_WUWaitComplete
 																(WsWorkunits.Create_Wuid_Raw
 																		(
@@ -208,7 +210,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																				+	',\''+keydifffile+'\'\r\n'
 																				+	',\''+patchedfile+'\'\r\n'
 																				+',overwrite)'
-																			,STD.System.Job.Target()
+																			,p_targetcluster
 																			,p_esp
 																			,'8010'
 																			)
@@ -219,7 +221,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 	
 	export fRunKDiff(dataset(rListToProcess) dListToProcess
 														,boolean holdpreviousforkeydiff = true
-														) := function
+														,string p_targetcluster = STD.System.Job.Target()) := function
 		dStatus := fGetFileStatus(dListToProcess) : independent;
 		
 		return if (~regexfind('hthor', STD.System.Job.Target())
@@ -233,6 +235,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 															,newlogicalfile
 															,previouslogicalfile
 															,keydifffile
+															,p_targetcluster
 														)
 											)
 									,nothor(apply(global(dStatus,few)
@@ -258,7 +261,8 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 	end;
 	
 	export fRunKPatch(dataset(rListToProcess) dListToProcess
-											,boolean holdpatchedinsuper = true) := function
+											,boolean holdpatchedinsuper = true
+											,string p_targetcluster = STD.System.Job.Target()) := function
 		dStatus := fGetFileStatus(dListToProcess) : independent;
 		
 		return if (~regexfind('hthor', STD.System.Job.Target())
@@ -271,6 +275,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 															,previouslogicalfile
 															,keydifffile
 															,keypatchfile
+															,p_targetcluster
 														)
 											)
 									,if (holdpatchedinsuper
@@ -286,7 +291,8 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 	
 	export fSpawnKeyDiffWrapper(dataset(rListToProcess) p_dListToProcess
 															,string p_dopsdatasetname = STD.System.Job.User()
-															,boolean holdpreviousforkeydiff = true) := function
+															,boolean holdpreviousforkeydiff = true
+															,string p_targetcluster = STD.System.Job.Target()) := function
 															
 		return if (~regexfind('hthor', STD.System.Job.Target())
 						,sequential
@@ -300,7 +306,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																		+ '#workunit(\'priority\',\'high\');\r\n'
 																		+ 'ds := dataset(\''+vKeyDiffFileListPrefix+p_dopsdatasetname+'\',dops.modKeydiff().rListToProcess,thor);\r\n'
 																			+ 'dops.modKeydiff(\''+p_esp+'\',\''+p_location+'\',\''+p_environment+'\').fRunKDiff(ds,'+if (holdpreviousforkeydiff,'true','false')+')'
-																			,STD.System.Job.Target()
+																			,p_targetcluster
 																			,p_esp
 																			,'8010'
 																			)
@@ -315,7 +321,8 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 	
 	export fSpawnKeyPatchWrapper(dataset(rListToProcess) p_dListToProcess
 															,string p_dopsdatasetname = STD.System.Job.User()
-															,boolean holdpatchedinsuper = true) := function
+															,boolean holdpatchedinsuper = true
+															,string p_targetcluster = STD.System.Job.Target()) := function
 															
 		return if (~regexfind('hthor', STD.System.Job.Target())
 						,sequential
@@ -328,7 +335,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																		+ '#workunit(\'priority\',\'high\');\r\n'
 																		+ 'ds := dataset(\''+vKeyPatchFileListPrefix+p_dopsdatasetname+'\',dops.modKeydiff().rListToProcess,thor);\r\n'
 																			+ 'dops.modKeydiff(\''+p_esp+'\',\''+p_location+'\',\''+p_environment+'\').fRunKPatch(ds,'+if (holdpatchedinsuper,'true','false')+')'
-																			,STD.System.Job.Target()
+																			,p_targetcluster
 																			,p_esp
 																			,'8010'
 																			)
