@@ -1592,7 +1592,7 @@ output(dataset_curr,named('line_248'));
    							
     			  fcra_alert_msg:=	if(count(FCRA_result)<28,'\n ALERT: This FCRA report did not run properly for all products or versions','');
       			
-      			nonfcra_alert_msg:=	if(count(NON_FCRA_result)<41,'\n ALERT: This NON-FCRA report did not run properly for all products or versions','');
+      			nonfcra_alert_msg:=	if(count(NON_FCRA_result)<7,'\n ALERT: This NON-FCRA report did not run properly for all products or versions','');
       																									 
       				 // result;
       
