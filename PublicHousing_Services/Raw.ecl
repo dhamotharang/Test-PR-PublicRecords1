@@ -90,7 +90,6 @@ EXPORT Raw := MODULE
 				export string120 fuzzy_l           := ''    : stored('Fuzzies');
 				export boolean   dedup_results_l   := true 	: stored('Deduped');
 				export string3   thresh_val        := ''    : stored('AppendThreshold');
-				export boolean   GLB_data          := false : stored('GLBData');
 				export unsigned1 glb               := 8     : stored('glbpurpose');     //different from in_mod default
 				export boolean   patriotproc       := false : stored('PatriotProcess');
 				export boolean   show_minors       := false : stored('IncludeMinors');  //different from in_mod default

@@ -20,7 +20,6 @@
   <part name="Fuzzies" type="xsd:string"/>
   <part name="Deduped" type="xsd:boolean"/>
   <part name="AppendThreshold" type="xsd:string"/>
-  <part name="GLBData" type="xsd:boolean"/>
   <part name="PatriotProcess" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
@@ -57,7 +56,7 @@
 import address, doxie, AutoStandardI, Royalty, VehicleV2_Services;
 
 export RealTime_Batch_Service_V2 := macro
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	inputData := DATASET([], VehicleV2_Services.Batch_Layout.RealTime_InLayout_V2) : STORED('batch_in',FEW);
 	
 	STRING1 sBIPFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID	 : STORED('BIPFetchLevel');
@@ -79,7 +78,6 @@ export RealTime_Batch_Service_V2 := macro
 		export string120 fuzzy_l             := '' 		: stored('Fuzzies');
 		export boolean   dedup_results_l     := true 	: stored('Deduped');
 		export string3   thresh_val          := '' 		: stored('AppendThreshold');
-		export boolean   GLB_data            := false : stored('GLBData');
 		export unsigned1 glb                 := 8     : stored('glbpurpose');
 	  export unsigned1 dppa                := mod_access.dppa;
 		export boolean   patriotproc         := false : stored('PatriotProcess');
