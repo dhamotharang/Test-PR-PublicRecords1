@@ -27,10 +27,11 @@ EXPORT ds_CompanyNameScore := DATASET([
 + '        le.cnp_name          = ri.cnp_name \n'
 + '    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_support0 = 0)\n'
 + '    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_support0 > 0)  \n'
-+ '                                                                                                                                                                         => cnp_name_score_supp\n'
-+ '    ,self.active_domestic_corp_key_score > Config.active_domestic_corp_key_Force*100  and not_both_legal_names                                                           => 0\n'
-+ '    ,self.active_duns_number_score       > Config.active_duns_number_Force      *100  and not_both_legal_names                                                           => 0\n'
++ '                                                                                                                                                                             => cnp_name_score_supp\n'
++ '    ,self.active_domestic_corp_key_score > Config.active_domestic_corp_key_Force*100  and not_both_legal_names                                                               => 0\n'
++ '    ,self.active_duns_number_score       > Config.active_duns_number_Force      *100  and not_both_legal_names                                                               => 0\n'
 + '    ,self.company_fein_score             > Config.company_fein_Force            *100  and not_both_legal_names  and (le.SALT_Partition = \'\' and ri.SALT_Partition = \'\')  => 0                    /*no partitioned sources allowed*/\n'
++ '    ,self.sbfe_id_score                  > Config.sbfe_id_Force                 *100  and not_both_legal_names  and (le.SALT_Partition = \'\' and ri.SALT_Partition = \'\')  => 0                    /*no partitioned sources allowed*/\n'
 + '\n'
 + '    ,(cnp_name_bow_most_38           >= 800 or self.cnp_name_phonetic_score        >= 700) and string_similarity_ratio >= 0.70/* or string_similarity_ratio >= 0.80 */   => map(cnp_name_bow_most_38 > self.cnp_name_phonetic_score and cnp_name_bow_most_38 > 800 => cnp_name_bow_most_38  \n'
 + '                                                                                                                                                                           ,self.cnp_name_phonetic_score  >= 700                                                   => self.cnp_name_phonetic_score\n'
@@ -53,9 +54,10 @@ EXPORT ds_CompanyNameScore := DATASET([
 + '    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_support0 = 0)\n'
 + '    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_support0 > 0)  \n'
 + '                                                                                                                                                                         => cnp_name_score_supp\n'
-+ '    ,active_domestic_corp_key_score > Config.active_domestic_corp_key_Force*100  and not_both_legal_names                                                           => 0\n'
-+ '    ,active_duns_number_score       > Config.active_duns_number_Force      *100  and not_both_legal_names                                                           => 0\n'
-+ '    ,company_fein_score             > Config.company_fein_Force            *100  and not_both_legal_names  and (le.SALT_Partition = \'\' and ri.SALT_Partition = \'\')  => 0                    /*no partitioned sources allowed*/\n'
++ '    ,active_domestic_corp_key_score > Config.active_domestic_corp_key_Force*100  and not_both_legal_names                                                                => 0\n'
++ '    ,active_duns_number_score       > Config.active_duns_number_Force      *100  and not_both_legal_names                                                                => 0\n'
++ '    ,company_fein_score             > Config.company_fein_Force            *100  and not_both_legal_names  and (le.SALT_Partition = \'\' and ri.SALT_Partition = \'\')   => 0                    /*no partitioned sources allowed*/\n'
++ '    ,sbfe_id_score                  > Config.sbfe_id_Force                 *100  and not_both_legal_names  and (le.SALT_Partition = \'\' and ri.SALT_Partition = \'\')   => 0                    /*no partitioned sources allowed*/\n'
 + '\n'
 + '    ,(cnp_name_bow_most_38           >= 800 or cnp_name_phonetic_score        >= 700) and string_similarity_ratio >= 0.70/* or string_similarity_ratio >= 0.80 */   => map(cnp_name_bow_most_38 > cnp_name_phonetic_score and cnp_name_bow_most_38 > 800 => cnp_name_bow_most_38  \n'
 + '                                                                                                                                                                           ,cnp_name_phonetic_score  >= 700                                                   => cnp_name_phonetic_score\n'
@@ -81,7 +83,7 @@ EXPORT ds_CompanyNumberEquality := DATASET([
 EXPORT ds_ScoreAssignment := DATASET([
 								{pModule,'debug', '(SELF.Conf := [(]SELF.cnp_number_score [+])([^;]*?)([/] 100 [+] outside;)', 'HACKScoreAssignment',
 								'import ut;\n'
-+'iComp1 := (self.salt_partition_score + SELF.cnp_number_score + SELF.hist_enterprise_number_score + SELF.ebr_file_number_score + SELF.active_enterprise_number_score + SELF.hist_domestic_corp_key_score + SELF.foreign_corp_key_score + SELF.unk_corp_key_score + SELF.active_domestic_corp_key_score + SELF.hist_duns_number_score + SELF.active_duns_number_score + SELF.company_phone_score + SELF.company_fein_score + SELF.cnp_name_score + SELF.cnp_btype_score + SELF.company_name_type_derived_score + IF(SELF.company_address_score>0,MAX(SELF.company_address_score,IF(SELF.company_addr1_score>0,MAX(SELF.company_addr1_score,SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score),SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score) + IF(SELF.company_csz_score>0,MAX(SELF.company_csz_score,SELF.v_city_name_score + SELF.st_score + SELF.zip_score),SELF.v_city_name_score + SELF.st_score + SELF.zip_score)),IF(SELF.company_addr1_score>0,MAX(SELF.company_addr1_score,SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score),SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score) + IF(SELF.company_csz_score>0,MAX(SELF.company_csz_score,SELF.v_city_name_score + SELF.st_score + SELF.zip_score),SELF.v_city_name_score + SELF.st_score + SELF.zip_score))) / 100 + outside;\n'
++'iComp1 := (self.salt_partition_score + SELF.cnp_number_score + SELF.hist_enterprise_number_score + SELF.ebr_file_number_score + SELF.active_enterprise_number_score + SELF.hist_domestic_corp_key_score + SELF.foreign_corp_key_score + SELF.unk_corp_key_score + SELF.active_domestic_corp_key_score + SELF.hist_duns_number_score + SELF.active_duns_number_score + SELF.company_phone_score + SELF.company_fein_score + SELF.sbfe_id_score + SELF.cnp_name_score + SELF.cnp_btype_score + SELF.company_name_type_derived_score + IF(SELF.company_address_score>0,MAX(SELF.company_address_score,IF(SELF.company_addr1_score>0,MAX(SELF.company_addr1_score,SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score),SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score) + IF(SELF.company_csz_score>0,MAX(SELF.company_csz_score,SELF.v_city_name_score + SELF.st_score + SELF.zip_score),SELF.v_city_name_score + SELF.st_score + SELF.zip_score)),IF(SELF.company_addr1_score>0,MAX(SELF.company_addr1_score,SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score),SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score) + IF(SELF.company_csz_score>0,MAX(SELF.company_csz_score,SELF.v_city_name_score + SELF.st_score + SELF.zip_score),SELF.v_city_name_score + SELF.st_score + SELF.zip_score))) / 100 + outside;\n'
 +'iComp  := map( iComp1            >= MatchThreshold                                   => iComp1 \n'
 +'              ,le.company_address = ri.company_address and le.cnp_name = ri.cnp_name and ut.nneq(le.active_duns_number,ri.active_duns_number)=> 9000 + iComp1\n'
 +'              ,le.cnp_name = ri.cnp_name and  le.prim_range_derived = ri.prim_range_derived and le.prim_name_derived = ri.prim_name_derived and ut.nneq(le.v_city_name,ri.v_city_name) and le.st = ri.st and le.zip = ri.zip and ut.nneq(le.active_duns_number,ri.active_duns_number)=> 9000 + iComp1\n'
@@ -209,6 +211,7 @@ EXPORT ds_Debug := DATASET([
 			+'  SALT311.UIDType Proxid;\n'
 			+'  DATASET(SALT311.Layout_FieldValueList) company_name_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
 			+'  DATASET(SALT311.Layout_FieldValueList) company_address_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
+			+'  DATASET(SALT311.Layout_FieldValueList) sbfe_id_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
 			+'  DATASET(SALT311.Layout_FieldValueList) active_domestic_corp_key_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
 			+'  DATASET(SALT311.Layout_FieldValueList) active_duns_number_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
 			+'  DATASET(SALT311.Layout_FieldValueList) company_fein_Values := DATASET([],SALT311.Layout_FieldValueList);\n'
@@ -630,9 +633,9 @@ EXPORT ds_BasicMatch :=   DATASET([
     }
 		,{  pModule
       ,'BasicMatch'
-      ,'(AND LEFT[.]company_csz = RIGHT[.]company_csz AND LEFT[.]company_addr1 = RIGHT[.]company_addr1 AND LEFT[.]company_address = RIGHT[.]company_address)'  //regex
+      ,'(AND LEFT[.]company_csz = RIGHT[.]company_csz AND LEFT[.]company_addr1 = RIGHT[.]company_addr1).*?(AND LEFT[.]company_address = RIGHT[.]company_address)'  //regex
       ,'HACKBasicMatch03'  //not regex
-      ,   '/*HACKBasicMatch03*/ /*$1*/'  //replacement
+      ,   '/*HACKBasicMatch03*/ /*$1*/\n       /*$2*/'  //replacement
       ,'comment out the code'
     }
   ],Tools.layout_attribute_hacks2);
@@ -670,10 +673,10 @@ EXPORT ds_config  :=  DATASET([
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Proc_Iterate
 EXPORT ds_ProcIterate  :=  DATASET([
-       {pModule,'Proc_Iterate','STRING iter'                                ,'HACKProcIterate01' ,'STRING iter,string keyversion/*HACKProcIterate01 -- add keyversion*/'                         ,'add keyversion to parameters'           }
-      ,{pModule,'Proc_Iterate','Keys[(]InFile[)].BuildAll;'                 ,'HACKProcIterate02' ,'Keys(InFile,keyversion).BuildAll; // HACKProcIterate02 keys to add keyersion'                 ,'add keyversion parameter to keys call'  }
-      ,{pModule,'Proc_Iterate','changes_it\'[+]iter;'                       ,'HACKProcIterate03' ,'changes_it\'+keyversion;/* HACKProcIterate03 use keyversion for changes file*/'               ,'change to keyversion for changes file'  }
-      ,{pModule,'Proc_Iterate','CHOOSEN[(]MM[.]MatchSampleRecords,10000[)]' ,'HACKProcIterate04' ,'CHOOSEN(MM.MatchSampleRecords,1000)/*HACKProcIterate04 -- lower MatchSampleRecords to 1000*/' ,'lower MatchSampleRecords to 1000'       }
+       {pModule,'Proc_Iterate','STRING iter'                                ,'HACKProcIterate01'  ,'STRING iter,string keyversion/*HACKProcIterate01 -- add keyversion*/'                         ,'add keyversion to parameters'           }
+      ,{pModule,'Proc_Iterate','Keys[(]InFile[)].BuildAll;'                 ,'HACKProcIterate02'  ,'Keys(InFile,keyversion).BuildAll; // HACKProcIterate02 keys to add keyersion'                 ,'add keyversion parameter to keys call'  }
+      ,{pModule,'Proc_Iterate','changes_it\'[+]iter;'                       ,'HACKProcIterate03'  ,'changes_it\'+keyversion;/* HACKProcIterate03 use keyversion for changes file*/'               ,'change to keyversion for changes file'  }
+      ,{pModule,'Proc_Iterate','CHOOSEN[(]MM[.]MatchSampleRecords,10000[)]' ,'HACKProcIterate04'  ,'CHOOSEN(MM.MatchSampleRecords,1000)/* HACKProcIterate04 lower match sample records output*/'  ,'lower match sample records output'      }
   ],Tools.layout_attribute_hacks2);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -691,6 +694,13 @@ EXPORT ds_LinkBlockers  :=  DATASET([
        ,'HACK cnp_name_phonetic not needed'  
        ,'// AND (LEFT.cnp_name_phonetic = RIGHT.cnp_name_phonetic OR RIGHT.cnp_name_phonetic = (TYPEOF(RIGHT.cnp_name_phonetic))\'\')/*HACK cnp_name_phonetic not needed*/' 
        ,'HACK cnp_name_phonetic not needed'}
+      ,{pModule
+       ,'LinkBlockers'
+       ,'AND [(]LEFT[.]sbfe_id = RIGHT[.]sbfe_id OR RIGHT[.]sbfe_id = [(]TYPEOF[(]RIGHT[.]sbfe_id[)][)]\'\'[)]'  
+       ,'HACK sbfe_id not needed'  
+       ,'// AND (LEFT.sbfe_id = RIGHT.sbfe_id OR RIGHT.sbfe_id = (TYPEOF(RIGHT.sbfe_id))\'\')/*HACK sbfe_id not needed*/' 
+       ,'HACK sbfe_id not needed'}
+
   ],Tools.layout_attribute_hacks2);
 
 

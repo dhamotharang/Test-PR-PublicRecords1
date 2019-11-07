@@ -1,4 +1,4 @@
-import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus,Phonesplus_v2,NID;
+﻿import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus,Phonesplus_v2,NID;
 
 export proc_build_phonesplus_keys(string filedate) := 
 function
@@ -121,7 +121,7 @@ CellPhone.MAC_AcceptSK_to_QA('~thor_data400::key::phonesplus_' ,mv_autokey,false
 // -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
 /////////////////////////////////////////////////////////////////////////////////
 
-email := fileservices.sendemail('RoxieBuilds@seisint.com ; vniemela@seisint.com ; tgibson@seisint.com ; fhumayun@seisint.com ; john.freibaum@lexisnexis.com',
+email := fileservices.sendemail('RoxieBuilds@seisint.com ; vniemela@seisint.com ; jason.allerdings@lexisnexisrisk.com',
 								 
 								'PHONESPLUS: BUILD SUCCESS '+ filedate ,
 								'keys: 1) thor_data400::key::phonesplus_address_qa(thor_data400::key::phonesplus::'+ filedate +'::address),\n' +

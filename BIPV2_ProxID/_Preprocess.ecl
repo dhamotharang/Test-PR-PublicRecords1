@@ -1,4 +1,4 @@
-﻿import bipv2,bipv2_files,BIPV2_ProxID,ut,salt26,tools,strata,bipv2_tools,wk_ut,std,tools;
+﻿import bipv2,bipv2_files,BIPV2_ProxID,tools,bipv2_tools,wk_ut,std,mdr;
 EXPORT _Preprocess(
    dataset(layouts.orig_DOT_Base) pDataset          = BIPV2_Files.files_dotid().DS_BASE
   ,string                         pversion          = bipv2.KeySuffix  
@@ -10,8 +10,12 @@ EXPORT _Preprocess(
 ) := 
 function
 
-  ds_slim           := project(pDataset,transform(BIPV2_ProxID.layout_DOT_Base ,self.cnp_name_phonetic := left.cnp_name,self := left));
-  ds_patch_proxids  := BIPV2_ProxID._fPatch_Proxids(ds_slim);
+  ds_slim           := project(pDataset,transform(BIPV2_ProxID.layout_DOT_Base 
+    ,self.cnp_name_phonetic := left.cnp_name
+    ,self.sbfe_id           := if(mdr.sourceTools.SourceIsBusiness_Credit(left.source) ,left.vl_id ,'')
+    ,self                   := left
+  ));
+  ds_patch_proxids  := BIPV2_Tools.initParentID(ds_slim,dotid,proxid);
   ds_use            := if(pStrataBuildStep = 'Proxid' ,ds_patch_proxids ,ds_slim);
 
   // -- only use match candidates
@@ -35,7 +39,6 @@ function
        promotefile
     )
     ,copy2StorageThor
-    // ,if(not wk_ut._constants.IsDev and pCopy2StorageThor = true,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(pFilename)[1].name)  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
   );
   
 end;
