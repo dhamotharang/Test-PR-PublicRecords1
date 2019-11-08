@@ -12,8 +12,10 @@
 import ut,BIPV2;
 EXPORT Best_From_BIP_Best_Proxid(
 
-  dataset(recordof(Marketing_List.Source_Files().bip_best)) pDataset_Best = Marketing_List.Source_Files().bip_best
- ,dataset(recordof(Marketing_List.Source_Files().bip_base)) pDataset_Base = Marketing_List.Source_Files().bip_base
+  dataset(recordof(Marketing_List.Source_Files().bip_best)) pDataset_Best   = Marketing_List.Source_Files().bip_best
+ ,dataset(recordof(Marketing_List.Source_Files().bip_base)) pDataset_Base   = Marketing_List.Source_Files().bip_base
+ ,boolean                                                   pDebug          = false
+ ,set of unsigned6                                          pSampleProxids  = []
 
 ) :=
 function
@@ -84,6 +86,21 @@ function
   ));
   
   // -- filter final dataset to make sure we didn't lose any records because of the marketing filter on company_name and address
-  return ds_best_prep(trim(business_name) != '',trim(prim_name) != '',trim(v_city_name) != '',trim(st) != '',trim(zip) != '');
+  ds_best_proxid := ds_best_prep(trim(business_name) != '',trim(prim_name) != '',trim(v_city_name) != '',trim(st) != '',trim(zip) != '');
   
+  output_debug := parallel(
+   
+    output('---------------------Marketing_List.Best_From_BIP_Best_Proxid---------------------'                       ,named('Marketing_List_Best_From_BIP_Best_Proxid' ),all)
+   ,output(choosen(pDataset_Best                    (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Best_Proxid_pDataset_Best'                            ),all)
+   ,output(choosen(pDataset_Base                    (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Best_Proxid_pDataset_Base'                            ),all)
+   ,output(choosen(ds_base_filt                     (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Best_Proxid_ds_base_filt'                             ),all)
+   ,output(choosen(ds_best_filter_out_seleid_level  (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Best_Proxid_ds_best_filter_out_seleid_level'          ),all)
+   ,output(choosen(ds_best_get_active_proxids       (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Best_Proxid_ds_best_get_active_proxids'               ),all)
+   ,output(choosen(ds_best_prep                     (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Best_Proxid_ds_best_prep'                             ),all)
+   ,output(choosen(ds_best_proxid                   (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Best_Proxid_ds_best_proxid'                           ),all)
+  
+  );
+
+  return when(ds_best_proxid  ,if(pDebug = true ,output_debug));
+
 end;

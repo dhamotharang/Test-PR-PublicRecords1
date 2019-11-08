@@ -10,14 +10,20 @@
 import BIPV2,ut;
 EXPORT Best_From_BIP_Base_Seleid(
 
-   dataset(recordof(Marketing_List.Source_Files().bip_base) ) pDataset_Base = Marketing_List.Source_Files().bip_base
-  ,dataset(Marketing_List.Layouts.business_information_prep ) pBest_Prep    = Marketing_List.Best_From_BIP_Best_Seleid()
+   dataset(recordof(Marketing_List.Source_Files().bip_base) ) pDataset_Base   = Marketing_List.Source_Files().bip_base
+  ,dataset(Marketing_List.Layouts.business_information_prep ) pBest_Prep      = Marketing_List.Best_From_BIP_Best_Seleid()
+  ,boolean                                                    pDebug          = false
+  ,set of unsigned6                                           pSampleProxids  = []
 ) :=
 function
 
   // -- define set of marketing approved sources
   ds_base       := pDataset_Base;
   mktg_sources  := Marketing_List._Config().set_marketing_approved_sources;
+
+  // -- get debug seleids from proxids
+  ds_debug_seleids  := table(pDataset_Base(proxid in pSampleProxids )  ,{seleid},seleid,few);
+  set_debug_seleids := set(ds_debug_seleids ,seleid);
 
   // -- Filter base file for only marketing sources, active seleids, company name non-blank, and address non-blank
   ds_base_clean := ds_base;
@@ -73,5 +79,26 @@ function
    ds_add_age   := join(ds_base_err_stat  ,ds_base_age    ,left.seleid = right.seleid ,transform(recordof(left),self.dt_first_seen  := right.dt_first_seen ,self.dt_last_seen := right.dt_last_seen,self.age_of_company := right.age_of_company,self := left)  ,left outer,hash);
    ds_add_email := join(ds_add_age        ,ds_base_email  ,left.seleid = right.seleid ,transform(recordof(left),self.business_email := right.business_email,self := left)  ,left outer,hash);
    
-  return ds_add_email;
+  output_debug := parallel(
+   
+    output('---------------------Marketing_List.Best_From_BIP_Base_Seleid---------------------'            ,named('Marketing_List_Best_From_BIP_Base_Seleid'          ),all)
+   ,output(choosen(pDataset_Base          (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_pDataset_Base'           ),all)
+   ,output(choosen(pBest_Prep             (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_pBest_Prep'              ),all)
+   ,output(choosen(ds_base_filt           (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_base_filt'            ),all)
+   ,output(choosen(ds_Best_Prep           (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_Best_Prep'            ),all)
+   ,output(choosen(ds_base_prep           (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_base_prep'            ),all)
+   ,output(choosen(ds_base_msa_prep       (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_base_msa_prep'        ),all)
+   ,output(choosen(ds_base_err_stat_prep  (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_base_err_stat_prep'   ),all)
+   ,output(choosen(ds_base_msa            (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_base_msa'             ),all)
+   ,output(choosen(ds_base_err_stat       (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_base_err_stat'        ),all)
+   ,output(choosen(ds_base_age_prep       (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_base_age_prep'        ),all)
+   ,output(choosen(ds_base_age            (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_base_age'             ),all)
+   ,output(choosen(ds_base_email_prep     (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_base_email_prep'      ),all)
+   ,output(choosen(ds_base_email          (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_base_email'           ),all)
+   ,output(choosen(ds_add_age             (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_add_age'              ),all)
+   ,output(choosen(ds_add_email           (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Base_Seleid_ds_add_email'            ),all)
+                                                                                                                                       
+  );
+
+  return when(ds_add_email  ,if(pDebug = true ,output_debug));
 end;
