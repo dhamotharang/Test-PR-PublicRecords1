@@ -88,6 +88,7 @@ export IdAppendLocal := module
 				transform(recordof(withBType),
 					self.contact_did := right.contact_title[1].contact_did,
 					self.contact_job_title := trim(right.contact_title[1].contact_job_title_derived),
+					self.is_suppressed := right.is_suppressed,
 					self := left),
 				left outer, keep(1));
 

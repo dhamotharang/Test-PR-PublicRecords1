@@ -12,6 +12,7 @@ export IdAppendThor(
 		,string svcAppendUrl = ''
 		,boolean useFuzzy = false
 		,boolean doZipExpansion = false
+		,boolean segmentation = true
 	) := module
 
 	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -44,6 +45,7 @@ export IdAppendThor(
 		,useFuzzy := useFuzzy
 		,weightThreshold := weightThreshold
 		,disableSaltForce := not primForce
+		,segmentation := segmentation
 	);
 	#END
 
@@ -56,7 +58,8 @@ export IdAppendThor(
 			,doZipExpansion := doZipExpansion
 			,reAppend := reAppend
 			,mimicRoxie := mimicRoxie
-			,svcAppendUrl := svcAppendUrl);
+			,svcAppendUrl := svcAppendUrl
+			,segmentation := segmentation);
 
 	export IdsOnly() := function
 		resRemote := project(remoteAppend.IdsOnly(), BIPV2.IdAppendLayouts.IdsOnlyOutput);
