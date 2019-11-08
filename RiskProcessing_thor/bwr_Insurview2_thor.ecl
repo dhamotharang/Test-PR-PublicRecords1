@@ -12,7 +12,6 @@ settingsOK := OnThor and _Control.Environment.OnVault and _Control.LibraryUse.Fo
 // settingsOK := true;
 
 #WORKUNIT('name', 'InsurView2 Attributes' + 	if(settingsOK,  ' THOR ', ERROR(9,'Toggle OnThor OnVault LibraryUse') ) );  // throw an error here if the controls aren't set correctly
-// #WORKUNIT('name', 'InsurView2 Attributes testing Ricardos iid_getHeader' + 	if(settingsOK,  ' THOR ', ERROR(9,'Toggle OnThor OnVault LibraryUse') ) );  // throw an error here if the controls aren't set correctly
 #workunit('priority','high');
 
 #STORED('did_add_force', if(OnThor, 'thor', 'roxi') );  // stored parameter used inside the DID append macro to determine which version of the macro to use
@@ -224,8 +223,20 @@ RiskView.Layouts.layout_riskview_input getInput(riskview.layouts.Layout_Riskview
 	SELF := le;
 END;
 batchin_with_seq := PROJECT(BatchIn, getInput(LEFT, COUNTER)) : PERSIST('~BOCASHELLFCRA::Insurview2attributes_batchin_with_seq', expire(3));  // use persist instead of independent;
-								 
-Search_Results := riskview.Search_Function(batchin_with_seq,
+
+//error_message := 'Error - Minimum input fields required: First Name, Last Name, Address, and Zip or City and State; LexID only; or First Name, Last Name, and SSN';
+// Brad wants to keep error message stating just first/last name, but also allow user to use unparsedfullname field in place of first/last fields if they want
+valid_inputs := batchin_with_seq(
+							((TRIM(name_first)<>'' AND TRIM(name_last)<>'') or TRIM(unparsedfullname)<>'') AND  // name check
+							(TRIM(ssn)<>'' OR   																																// ssn check
+								( TRIM(street_addr)<>'' AND 																											// address check
+								(TRIM(z5)<>'' OR (TRIM(p_city_name)<>'' AND TRIM(St)<>'')))												// zip or city/state check
+							)
+								 OR
+							(UNSIGNED)LexID <> 0
+						);
+            
+Search_Results := riskview.Search_Function(valid_inputs,
 	Gateways,
 	DataRestriction,
 	AttributesVersionRequest, 
@@ -267,6 +278,15 @@ Search_Results := riskview.Search_Function(batchin_with_seq,
 Results := JOIN(batchin_with_seq, search_results, LEFT.seq=RIGHT.seq,
 			RiskView.Transforms.FormatBatch(LEFT, RIGHT));
 
+// get the records that are insufficient by doing left only join and populating the errorcode with the insufficient PII Inputs message
+insufficient_inputs_transformed := join(batchin_with_seq, Valid_Inputs, left.seq=right.seq,
+	TRANSFORM(riskprocessing.layouts.insurview2_batch_response_layout, 
+		self.time_ms := 0,  // set this to 0 because we're not running on roxie, have no timings 
+		self.errorcode := if(right.seq<>left.seq, 'Insufficient PII Inputs', ''); 
+		SELF.acctno := left.acctno;
+		self := [];
+		), left only); 
+    
 results_transformed := project(results,
 	transform(riskprocessing.layouts.insurview2_batch_response_layout, 
 	self.time_ms := 0,  // set this to 0 because we're not running on roxie, have no timings 
@@ -275,10 +295,13 @@ results_transformed := project(results,
   self := [];
 		));
 
+all_results_transformed := results_transformed + insufficient_inputs_transformed;
 
 OUTPUT(CHOOSEN(batchin_with_seq, eyeball_count), NAMED('Sample_batchin_with_seq'));
 OUTPUT(CHOOSEN(results, eyeball_count), NAMED('results'));
+
+OUTPUT(CHOOSEN(insufficient_inputs_transformed, eyeball_count), NAMED('insufficient_inputs_transformed'));
 OUTPUT(CHOOSEN(results_transformed, eyeball_count), NAMED('results_transformed'));
 
-OUTPUT(sort(results_transformed, acctno),, '~dvstemp::out::Insurview2_' + IF(onThor, 'thor_', 'roxie_') + thorlib.wuid(), CSV(heading(single), QUOTE('"')) );	
+OUTPUT(sort(all_results_transformed, acctno),, '~dvstemp::out::Insurview2_' + IF(onThor, 'thor_', 'roxie_') + thorlib.wuid(), CSV(heading(single), QUOTE('"')) );	
 
