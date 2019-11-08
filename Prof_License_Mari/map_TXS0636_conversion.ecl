@@ -39,10 +39,10 @@ EXPORT map_TXS0636_conversion(STRING pVersion) := FUNCTION
 												'^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|^.* CP$|' +
 												'^C-21 .*$|^PRUDENTIAL .*$|^.* REALTORS$|^.* PROPERTIES$|^PENDING$|^.*INDIES$|^RAYMOND SAMBROTTO$|' +
 												'^SACKS$|^.* AT GLACIER$|^.* RENTALS$|^.* BY WYNDHAM$|^.* OFFICE$|^.* GENERAL DELIVERY|^.* VISTA VILLAGE$|^.* INDUSTRIAL ESTATES|' +
-												' WELDIN BUILDING$|^.* LAKE RESORT$| ATTN:.*$|^BANK ONE BLDG|^.* HIDDEN RIVER CORP PARK$|^.*CORPORATE LICENSING.*$|^.* MANAGER.*$' +
+												' WELDIN BUILDING$|^.* LAKE RESORT$| ATTN:.*$|^ATTENTION.*$|^BANK ONE BLDG|^.* HIDDEN RIVER CORP PARK$|^.*CORPORATE LICENSING.*$|^.* MANAGER.*$' +
 												')';
 	//invalid_addr := '(N/A|NONE |NO VALID|SAME |UNKNOWN|TBD|NOT CURRENTLY)';
-	C_O_Ind := '(C/O |ATTN:|ATTN |ATT:)';
+	C_O_Ind := '(C/O |ATTN:|ATTN |ATT: |ATTENTION )';
 	DBA_Ind := '( DBA |D/B/A |/DBA | A/K/A | AKA )';
 	
 
@@ -246,10 +246,10 @@ EXPORT map_TXS0636_conversion(STRING pVersion) := FUNCTION
 																Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(TrimAddress2, RemovePattern));
 
 		clnMastAddress1				:= IF(REGEXFIND(care_of_ind,TrimMastAddress1),REGEXFIND(care_of_ind,TrimMastAddress1,1),
-																   IF(REGEXFIND('(^.*) (ATTN)',TrimMastAddress1),REGEXFIND('(^.*) (ATTN)',TrimMastAddress1,1),
+																   IF(REGEXFIND('(^.*) (C/O |ATTENTION |ATTN )',TrimMastAddress1),REGEXFIND('(^.*) (C/O |ATTENTION |ATTN )',TrimMastAddress1,1), 
 																      IF(REGEXFIND(C_O_Ind,TrimMastAddress1),'',TrimMastAddress1)));
 		clnMastAddress2				:= IF(REGEXFIND(care_of_ind,TrimMastAddress2),REGEXFIND(care_of_ind,TrimMastAddress2,1),
-																   IF(REGEXFIND('(^.*) (ATTN)',TrimMastAddress2),REGEXFIND('(^.*) (ATTN)',TrimMastAddress2,1),
+																   IF(REGEXFIND('(^.*) (C/O |ATTENTION |ATTN )',TrimMastAddress1),REGEXFIND('(^.*) (C/O |ATTENTION |ATTN )',TrimMastAddress1,1), 
 																	  	IF(REGEXFIND(C_O_Ind,TrimMastAddress2),'',TrimMastAddress2)));
     goodMastAddress1      := stringlib.stringfilterout(Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(clnMastAddress1, RemovePattern),',$');
 		goodMastAddress2      := stringlib.stringfilterout(Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(clnMastAddress2, RemovePattern),',$');
@@ -267,6 +267,7 @@ EXPORT map_TXS0636_conversion(STRING pVersion) := FUNCTION
 												   addrOfficeName[1..7] = 'LICENSE' => '',
 													 addrOfficeName[1..6] = 'ATTN: ' => addrOfficeName[7..],
 													 addrOfficeName[1..5] in ['ATT: ','ATTN '] => addrOfficeName[6..],
+													 addrOfficeName[1..10]= 'ATTENTION ' => addrOfficeName[11..],
 													 addrOfficeName[1..4] = 'C/O ' => addrOfficeName[5..],
 													 Prof_License_Mari.func_is_address(addrOfficeName)=>'',
 													 addrOfficeName);
