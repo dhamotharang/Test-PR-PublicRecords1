@@ -12,6 +12,7 @@ export IdAppendRoxieRemote(
 		,boolean useFuzzy = true
 		,boolean doZipExpansion = true
 		,string svcAppendUrl = ''
+		,string svcName = ''
         ,unsigned soapTimeout = 30
         ,unsigned soapTimeLimit = 0
         ,unsigned soapRetries = 3
@@ -25,7 +26,7 @@ export IdAppendRoxieRemote(
 	inputUrl := if(svcAppendUrl[1..4] = 'http', svcAppendUrl, 'http://' + svcAppendUrl);
 	shared urlBipAppend := if(svcAppendUrl = '', prodUrl, inputUrl);
 
-	shared serviceName := 'bizlinkfull.svcappend';
+	shared serviceName := if(svcName = '', 'bizlinkfull.svcappend', svcName);
 
 	shared soapInput(boolean includeBest = false
 			,string fetchLevel = ''
