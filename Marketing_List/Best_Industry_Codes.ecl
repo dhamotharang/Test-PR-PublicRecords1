@@ -18,6 +18,8 @@ EXPORT Best_Industry_Codes(
 
    dataset(recordof(Marketing_List.Source_Files().bip_base) ) pDataset_Base = Marketing_List.Source_Files().bip_base
   ,dataset(Marketing_List.Layouts.business_information_prep ) pBest_Prep    = Marketing_List.Best_From_BIP_Best_seleid()
+  ,boolean                                                    pDebug          = false
+  ,set of unsigned6                                           pSampleProxids  = []
 ) :=
 function
 
@@ -25,6 +27,10 @@ function
   set_mktg_sources      := Marketing_List._Config().set_marketing_approved_sources;
   set_industry_sources  := Marketing_List._Config().set_sources_of_industry_codes ;
   ds_industry_sources   := Marketing_List._Config().ds_sources_of_industry_codes  ;
+
+  // -- get debug seleids from proxids
+  ds_debug_seleids  := table(pDataset_Base(proxid in pSampleProxids )  ,{seleid},seleid,few);
+  set_debug_seleids := set(ds_debug_seleids ,seleid);
 
   ds_base_clean                   := ds_base;
   ds_base_filt                    := ds_base_clean(
@@ -73,6 +79,20 @@ function
     self := []
   ));
   
-  return ds_base_out;
+  output_debug := parallel(
+   
+    output('---------------------Marketing_List_Best_Industry_Codes---------------------'                 ,named('Marketing_List_Best_Industry_Codes'         ),all)
+   ,output(choosen(pDataset_Base        (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_Industry_Codes_pDataset_Base'           ),all)
+   ,output(choosen(pBest_Prep           (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_Industry_Codes_pBest_Prep'              ),all)
+   ,output(choosen(ds_base_clean        (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_Industry_Codes_ds_base_clean'           ),all)
+   ,output(choosen(ds_base_filt         (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_Industry_Codes_ds_base_filt'            ),all)
+   ,output(choosen(ds_Base_Prep         (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_Industry_Codes_ds_Base_Prep'            ),all)
+   ,output(choosen(ds_base_add_priority (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_Industry_Codes_ds_base_add_priority'    ),all)
+   ,output(choosen(ds_base_dedup        (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_Industry_Codes_ds_base_dedup'           ),all)
+   ,output(choosen(ds_base_out          (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_Industry_Codes_ds_base_out'             ),all)
+                                                                                                                                       
+  );
+
+  return when(ds_base_out  ,if(pDebug = true ,output_debug));
 
 end;
