@@ -12,6 +12,7 @@ EXPORT IdAppendThorRemote(
 		,boolean mimicRoxie = false // This is for ease of testing and can cause slower performance
 		                            // on thor appends so should not be used for production.
 		,string svcAppendUrl = ''
+		,boolean segmentation = true
 	) := module
 
 	shared serviceName := 'BizLinkFull.svcappend';
@@ -44,7 +45,8 @@ EXPORT IdAppendThorRemote(
 		+ xmlBool('use_fuzzy', useFuzzy)
 		+ xmlBool('do_zip_expansion', doZipExpansion)
 		+ xmlBool('re_append', reAppend)
-		+ xmlBool('from_thor', not mimicRoxie);
+		+ xmlBool('from_thor', not mimicRoxie)
+		+ xmlBool('do_segmentation', segmentation);
 
 	shared IdsAndBest(boolean includeBest, string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean allBest = false) := function
 

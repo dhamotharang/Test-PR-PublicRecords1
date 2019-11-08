@@ -1,4 +1,7 @@
-﻿import doxie, tools;
+﻿/*2019-02-21T20:50:34Z (Hennigar, Jennifer (RIS-BCT))
+Modification to associate key to reduce duplicate entries
+*/
+import doxie, tools;
 
 export Keys(string		pversion							= '',boolean pUseProd = false) := module
 

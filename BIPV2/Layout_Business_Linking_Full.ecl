@@ -1,6 +1,7 @@
-import Business_Header, AID;
+﻿import Business_Header, AID;
 EXPORT Layout_Business_Linking_Full := record
-		Business_Header.Layout_Business_Linking.Linking_Interface;
+		Business_Header.Layout_Business_Linking.Linking_Interface 
+		- employee_count_org_raw - revenue_org_raw - employee_count_local_raw - revenue_local_raw; //Temporarily Removing These Until we are ready to develop firmographics
 		unsigned8	company_Aceaid	:= 0;
 		string50	company_name_type_derived := '';
 		string50	company_address_type_derived := '';

@@ -28,7 +28,8 @@
 																				 aircraft = mvr << 1,			 					 			 //	 8388608
 																				 watercraft = aircraft << 1,			 				 //	 16777216
                                      personheader =  watercraft << 1,         //33554432
-                                     allProducts = (personheader << 1) - 1); 		 //  67108863
+                                     email =  personheader << 1,         //67108864
+                                     allProducts = (email << 1) - 1); 		 //  134217727
 																				 
 
 	// Function used to verify whether a customer product mask (tstBits) contains a particular product 

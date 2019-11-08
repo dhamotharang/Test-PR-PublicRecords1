@@ -26,6 +26,6 @@ Roxiekeybuild.MAC_SK_Move_v2(prte2_demoWatchlistScreening.constants.keyname+ '@v
 	PerformUpdateOrNot	:= IF(doDOPS,updatedops,NoUpdate);
 	//----------------------------------------------------------------
 
-return sequential(build_match_key, mv_match_key,qa_match_key, PerformUpdateOrNot);
+return sequential(build_match_key, mv_match_key,qa_match_key/*, PerformUpdateOrNot*/);
 
 end;

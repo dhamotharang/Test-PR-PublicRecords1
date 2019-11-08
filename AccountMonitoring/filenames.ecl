@@ -64,6 +64,7 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 		EXPORT aircraft			 	 := documents_template('aircraft');
 		EXPORT watercraft		 	 := documents_template('watercraft');
 		EXPORT personheader		 	 := documents_template('personheader');
+		EXPORT email    		 	 := documents_template('email');
 	END;
 	
 	// The file name and location of the history files.  
@@ -97,6 +98,7 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 		EXPORT aircraft				 := history_template('aircraft');
 		EXPORT watercraft			 := history_template('watercraft');
     EXPORT personheader		 	 := history_template('personheader');
+    EXPORT email    		 	 := history_template('email');
 	END;
 	
 	// The file name and location of the Inquiry tracking files are used solely for auditing purposes

@@ -1,1 +1,2 @@
-﻿EXPORT File_OptOut_Base := DATASET('~thor::base::new_suppression::opt_out',Suppress.Layout_OptOut,THOR,OPT);
+﻿EXPORT File_OptOut_Base := Suppress.Files.OptOut.Basefile;
+

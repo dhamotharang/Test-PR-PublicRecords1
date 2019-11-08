@@ -61,7 +61,7 @@ EXPORT files := module
 	EXPORT DS_gong_cn_to_company := hist_out;
 	EXPORT DS_gong_did := Project(file_Gong_Weekly, Layouts.Layout_Gong_DID);
 	EXPORT DS_gong_eda_npa_nxx_line := dedup(PROJECT(File_Weekly_Full_Prepped_for_Keys(TRIM(phone10)<>''), 
-									Layouts.Layout_Gong_DID - [did]), record, all);
+									Layouts.Layout_Gong_DID), record, all);
 	/////DS_gong_eda_st_bizword_city////
 		layouts.Layout_extra addOrig(recordof(DS_gong_did) l) := TRANSFORM
 			SELF.word := '';
@@ -247,7 +247,11 @@ EXPORT files := module
 				and left.prim_name=right.prim_name
 				and left.prim_range=right.prim_range
 				and left.name_last=right.name_last,
-			transform(Layouts.layout_span, self.span_first_seen:=right.dt_first_seen, self:=left),
+			transform(Layouts.layout_span, 
+								self.global_sid := 0,
+								self.record_sid := 0,
+								self.span_first_seen:=right.dt_first_seen, 
+								self:=left),
 			keep(1), left outer, hash
 		);
 		gong_span_fl_wdtg := join(

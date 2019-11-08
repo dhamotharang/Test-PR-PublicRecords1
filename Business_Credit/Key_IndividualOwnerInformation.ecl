@@ -1,4 +1,4 @@
-IMPORT	Business_Credit,	BIPV2,	Address,	doxie,	lib_date,	STD;
+﻿IMPORT	Business_Credit,	BIPV2,	Address,	doxie,	lib_date,	MDR, STD;
 EXPORT	Key_IndividualOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																				Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	FUNCTION
 
@@ -63,6 +63,9 @@ EXPORT	Key_IndividualOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today
 		STRING9		Federal_TaxID_SSN;
 		STRING3		Federal_TaxID_SSN_Identifier;
 		STRING2		source;
+		//DF-26180 Add CCPA fields to thor_data400::key::sbfe::qa::individualownerinformation
+		UNSIGNED4	global_sid;
+		UNSIGNED8   record_sid;
 	END;
 	
 	dIOInformation			:=	PROJECT(dLinked,TRANSFORM(rIOInformation,
@@ -77,7 +80,10 @@ EXPORT	Key_IndividualOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today
 																	SELF.dt_datawarehouse_first_reported	:=	(UNSIGNED4)LEFT.Extracted_Date;
 																	SELF.dt_datawarehouse_last_reported		:=	(UNSIGNED4)LEFT.Extracted_Date;
 																	SELF																	:=	LEFT));
-	dIOInformationDist	:=	SORT(DISTRIBUTE(dIOInformation,
+
+	addGlobalSID 				:=  MDR.macGetGlobalSID(dIOInformation,'SBFECV','','global_sid'); //DF-25791: Populate Global_SID	
+	
+	dIOInformationDist	:=	SORT(DISTRIBUTE(addGlobalSID,
 																	HASH(	record_type, Sbfe_Contributor_Number, Contract_Account_Number, Account_Type_Reported, Account_Holder_Business_Name, Clean_Account_Holder_Business_Name, 
 																				Business_Name, Clean_Business_Name, Company_Website, 
 																				Guarantor_Owner_Indicator, Relationship_To_Business_Indicator, Percent_Of_Liability, Percent_Of_Ownership;

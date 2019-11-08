@@ -21,8 +21,8 @@ shared rgxSureHonor := 	// no oriental names
 shared rgxSuffix := '(' + rgxGen + '|' + rgxHonor + ')';
 shared rgxSureSuffix := '(' + rgxSureGen + '|' + rgxSureHonor + ')';
 shared rgxTitles := '(MR|MRS|MISS|MS|DR|REV|SHRF|SIR)';
-//shared rgxConnector := 	'( AND |&| OR | AND/OR |&/OR |\\+)';
-shared rgxConnector := 	'( AND |&| OR | AND/OR |&/OR |& OR |& ETUX |\\+)';
+
+export rgxConnector := 	'( AND |&| OR | AND/OR |&/OR |& OR |& ETUX |\\+)';
 shared rgxInitial := '[A-Z][.]?';
 shared rgxHyphenated := '([A-Z]+(-[A-Z-]+)?)';
 
@@ -30,7 +30,7 @@ shared rgxFL := '^' + rgxBasic + ' +('  + rgxLastStrong + ')$';
 shared rgxFLhL := '^' + rgxBasic + ' +(([A-Z]{2,})-([A-Z]{2,}))$';
 shared rgxLF := '^(' + rgxLastStrong + ') +' + rgxBasic + '$';
 shared rgxLFM := '^(' + rgxLastStrong + ') +' + rgxBasic + ' +([A-Z]+)$';
-shared rgxFLoLF := '^' + rgxHyphenated + ' +(' + rgxLast + ')$';										//rgxHyphenated + '$';
+export rgxFLoLF := '^' + rgxHyphenated + ' +(' + rgxLast + ')$';										//rgxHyphenated + '$';
 shared rgxFLcS := '^' + rgxBasic + ' +('  + rgxLast + ') *, *' + rgxSuffix + '$';
 shared rgxFLS := '^' + rgxBasic + ' +('  + rgxLastStrong + ') +' + rgxSuffix + '$';
 shared rgxFLSorLFS := '^' + rgxBasic + ' +'  + rgxBasic + ' +' + rgxSuffix + '$';
@@ -42,7 +42,7 @@ shared rgxFiLS := '^(' + rgxInitial + ') +(' + rgxLast + ') +' + rgxSuffix + '$'
 shared rgxFiML := '^(' + rgxInitial + ') +([A-Z]+) +(' + rgxLast + ')$';
 shared rgxFiMLS := '^(' + rgxInitial + ') +([A-Z]+) +(' + rgxLast + ') +' + rgxSuffix + '$';
 
-shared rgxFLL := '^' + rgxBasic + ' +('  + rgxLastStrong + ')' + ' +('  + rgxLast +  ')$';
+export rgxFLL := '^' + rgxBasic + ' +('  + rgxLastStrong + ')' + ' +('  + rgxLast +  ')$';
 shared rgxFLLS := '^' + rgxBasic + ' +('  + rgxLastStrong + ')' + ' +('  + rgxLast +  ') +' + rgxSuffix +  '$';
 //shared rgxFMLL := '^' + rgxBasic + ' +([A-Z]+) +('  + rgxLast + ')' + ' +('  + rgxLast +  ')$';
 shared rgxFMLL := '^(' + rgxLast + ') +([A-Z]+) +('  + rgxLast + ')' + ' +('  + rgxLast +  ')$';
@@ -100,18 +100,17 @@ shared rgxLFaFMS := '^(' + rgxLast + ') +([A-Z]+) *' + rgxConnector +
 					' *([A-Z]+) +([A-Z]+) +' + rgxSuffix + '$';
 
 // dual L F & F
-shared rgxLFaF := '^(' + rgxLast + ') +' + rgxBasicX + ' *' + rgxConnector + ' *' + rgxHyphenated + '$';
+export rgxLFaF := '^(' + rgxLast + ') +' + rgxBasicX + ' *' + rgxConnector + ' *' + rgxHyphenated + '$';
 shared rgxLFaFS := '^(' + rgxLast + ') +' + rgxBasicX + ' *' + rgxConnector +
 					' *' + rgxHyphenated + ' +' + rgxSureSuffix + '$';
-shared rgxLFiaFiL := '^' + rgxBasic + ' +([A-Z]) *' + rgxConnector + ' *([A-Z]) +' + rgxBasic + '$';
+export rgxLFiaFiL := '^' + rgxBasic + ' +([A-Z]) *' + rgxConnector + ' *([A-Z]) +' + rgxBasic + '$';
 shared rgxFiMiaFiL := '^([A-Z]) +([A-Z]) *' + rgxConnector + ' *([A-Z]) +(' + rgxLast + ')$';
 shared rgxLFiaFiMi := '^' + rgxBasic + ' +([A-Z]) *' + rgxConnector + ' *([A-Z]) +([A-Z])$';
 shared rgxLFiaFi := '^(' + rgxLast + ') +([A-Z]) *' + rgxConnector + ' *' + '([A-Z])$';
 shared rgxLFiMiaFiMi := '^(' + rgxLast + ') +([A-Z]) +([A-Z]) *' + rgxConnector + 
 					' *' + '([A-Z]) +([A-Z])$';
 // dual L F & F M
-//shared rgxLFaFM := '^(' + rgxLast + ') +([A-Z-]+) *' + rgxConnector + ' *([A-Z-]+) +' + rgxBasic + '( +[A-Z]+)?$';
-shared rgxLFaFM := '^(' + rgxLast + ') +([A-Z-]+) *' + rgxConnector + ' *([A-Z-]+) +' + rgxHyphenated + '$';
+export rgxLFaFM := '^(' + rgxLast + ') +([A-Z-]+) *' + rgxConnector + ' *([A-Z-]+) +' + rgxHyphenated + '$';
 shared rgxFSaFL := '^([A-Z]+) +' + rgxSureGen + ' *' + rgxConnector + ' *([A-Z-]+) +(' + rgxLast + ')$';
 shared rgxFLaFM := '^' + rgxBasic + ' +(' + rgxLastStrong + ') *' + rgxConnector + ' *' + rgxBasic + '( +([A-Z]+))?$';
 shared rgxLFaLcF := '^(' + rgxLast + ') +' + rgxBasic + ' *' + rgxConnector + ' *(' + rgxLast + '), *' + rgxBasic + '$';
@@ -125,7 +124,7 @@ shared rgxLFaFL := '^' + rgxBasic + ' +' + rgxBasic + ' *' + rgxConnector + ' *'
 
 shared rgxLFMaFML := 
 '^(' + rgxLast + ') +' + '([A-Z]+) +([A-Z]+ )?'+ rgxConnector + ' *([A-Z]+) +([A-Z]+ )?\\1$';
-shared rgxFMLaFML := 
+export rgxFMLaFML := 
 '^' + rgxBasic + ' +' + '([A-Z]+) +(' + rgxLast + ') *'+ rgxConnector + ' *([A-Z]+) +([A-Z]+) +\\3$';
 shared rgxFMLaFML2 := 
 '^' + rgxBasic + ' +' + '([A-Z]+) +(' + rgxLast + ') *'+ rgxConnector + ' *([A-Z]+) +([A-Z]+) +([A-Z]+)$';
@@ -177,7 +176,7 @@ shared rgxLFSM :=
 '^(' + rgxLast + ') +' + rgxBasic + ' +' + rgxSureGen + ' +([A-Z]+)$';
 
 
-shared rgxLcFaF := '^(' + rgxLast + ') *, *([A-Z]+) *' + rgxConnector + ' *([A-Z][A-Z-]*)$';
+export rgxLcFaF := '^(' + rgxLast + ') *, *([A-Z]+) *' + rgxConnector + ' *([A-Z][A-Z-]*)$';
 shared rgxLcFaFM := '^(' + rgxLast + ') *, *([A-Z-]+) *' + rgxConnector + ' *([A-Z][A-Z-]*) +([A-Z]+)( +[A-Z]+)?$';
 
 shared rgxFMLaFM := 
@@ -219,7 +218,7 @@ shared rgxFaFLS :=
 shared rgxFiaFiL := 
 		'^([A-Z]) *'+ rgxConnector + 
 	/* name 2*/	' *([A-Z]) +(' + rgxLast + ')$';
-shared rgxFaFL := 
+export rgxFaFL := 
 		'^' + rgxFirst + ' *'+ rgxConnector + 
 	/* name 2*/	' *' + rgxFirst + ' +(' + rgxLast + ')$';
 shared rgxLFMiaFM := 
@@ -315,7 +314,7 @@ shared rgxLcFhF := 		// hyphenated first name (Taiwanese or Hong Kong style)
 shared rgxLScFM := '^(' + rgxLast + ') +' + rgxSuffix + ' *, *'  + rgxBasic + ' +' + rgxBasic + '$';
 shared rgxLSFM := '^(' + rgxLast + ') +' + rgxSureGen + ' +'  + rgxBasic + '( +' + rgxBasic + ')?$';
 shared rgxLScF := '^(' + rgxLast + ') +' + rgxGen + ' *, *'  + rgxBasic + '$';
-shared rgxLScFMM := '^(' + rgxLast + ') +' + rgxSuffix + ' *, *'  + rgxBasic + ' +([A-Z]+ +[A-Z]+)$';
+export rgxLScFMM := '^(' + rgxLast + ') +' + rgxSuffix + ' *, *'  + rgxBasic + ' +([A-Z]+ +[A-Z]+)$';
 
 shared rgxFMiL := '^' + rgxBasic + ' +([A-Z]) +('  + rgxLast + ')$';
 shared rgxFMiLI := '^' + rgxBasic + ' +([A-Z]) +('  + rgxLast + ') +([A-Z])$';
@@ -1558,9 +1557,8 @@ END;
 
 			//*** Dual Names
 export string70 FormatName1(string s, NameFormat fmt = 0, string1 clue='U') := FUNCTION
-	n := IF(fmt = 0, DualNameFormat(s), fmt);
 	return blank5 +
-		CASE (n,
+		CASE (fmt,
 			NameFormat.LFiaFi =>	FormatNameFL(rgxLFiaFi, s, 4, 1),
 			NameFormat.LFiaFiMi =>	FormatNameFL(rgxLFiaFiMi, s, 2, 1),
 			NameFormat.FiMiaFiL =>	FormatNameFML(rgxFiMiaFiL, s, 1, 2, 5),
@@ -1729,12 +1727,12 @@ export string70 FormatName1(string s, NameFormat fmt = 0, string1 clue='U') := F
 			NameFormat.LScFMaFML => FormatNameFMLS(rgxLScFMaFML, s, 3, 5, 1, 2),
 			'');
 END;
+
 // format the second name of a dual name
 export string70 FormatName2(string s, NameFormat fmt = 0) := FUNCTION
-	n := IF(fmt = 0, DualNameFormat(s), fmt);
 
 	return blank5 +
-		CASE (n,
+		CASE (fmt,
 			//*** Dual Names
 			NameFormat.LFiaFi =>	FormatNameFL(rgxLFiaFi, s, 6, 1),
 			NameFormat.LFiaFiMi =>	FormatNameFML(rgxLFiaFiMi, s, 4, 5, 1),
@@ -1939,4 +1937,165 @@ export string70 FormatName2(string s, NameFormat fmt = 0) := FUNCTION
 			'');
 END;
 
+
+
+shared titles :=
+ '\\b(MR|MRS|MS|MMS|MISS|DR|REV|RABBI|REVEREND|MSGR|PROF|FR|LT COL|COL|LCOL|LTCOL|LTC|CH|LT GEN|LT CDR|LCDR|LT CMDR|MAJ|SFC|SRTA|APCO|CAPT|CPT|SGT|SSG|MSG|MGR|CPL|CPO|SHRF|SMSG|SMSGT|SIR)\\b';
+export string Title (string s, NameFormat n, string1 clue='U', string fullname='') := FUNCTION
+	clnname := FormatName(s, n);
+	return MAP(
+		n = NameFormat.LcTF =>		REGEXFIND(rgxLcTF, s, 4),
+		REGEXFIND(titles, fullname) => REGEXFIND(titles, fullname, 1),
+		REGEXFIND(rgxMrMrs, fullname) => REGEXFIND(rgxMrMrs, fullname, 2),
+		CASE($.NameTester.genderEx(clnname[6..25],clnname[26..45]),
+			'M' => 'MR',
+			'F' => 'MS',
+		'')
+	);
+END;
+
+// first title of dual name
+export string Title1 (string s, NameFormat n, string1 clue='U', string fullname='') := FUNCTION
+	clnname := FormatName1(s, n);
+	return MAP(
+		REGEXFIND(titles, fullname) => REGEXFIND(titles, fullname, 1),
+		REGEXFIND(rgxMrMrs, fullname) => REGEXFIND(rgxMrMrs, fullname, 2),
+		CASE(NameTester.genderEx(clnname[6..25],clnname[26..45]),
+			'M' => 'MR',
+			'F' => 'MS',
+		'')
+	);
+END;
+
+export string Title2 (string s, NameFormat n, string fullname='') := FUNCTION
+	clnname := FormatName2(s, n);
+	return	CASE(NameTester.genderEx(clnname[6..25],clnname[26..45]),
+			'M' => 'MR',
+			'F' => 'MS',
+			'');
+END;
+
+export set of NameFormat ValidatedDualNameFormats := [
+				NameFormat.FLSaFM,
+				NameFormat.FLSaIFI,
+				NameFormat.FLaFL,
+				NameFormat.FLaFM,
+				NameFormat.FMLSaFML,
+				NameFormat.FMLaFL,
+				NameFormat.FMLaFML,
+				NameFormat.FMLaFML2,
+				NameFormat.FMLaIFI,
+				NameFormat.FMLcFML,
+				NameFormat.FMSaFML,
+				NameFormat.FMaFMLS,
+				NameFormat.FMiaFMiL,
+				NameFormat.LFaFMiS,
+				NameFormat.FMiaFMiMiL,
+				NameFormat.LFMaLFMS,
+				NameFormat.FaFLS,
+				NameFormat.FaFMLS,
+				NameFormat.FiMiaFiL,
+				NameFormat.FiaFiL,
+				NameFormat.LFMSaFML,
+				NameFormat.LFMaFML,
+				NameFormat.LFMaFMS,
+				NameFormat.LFMaFMiI,
+				NameFormat.LFMaFiMiI,
+				NameFormat.LFMaFiMiL,
+				NameFormat.LFMaLFM,
+				NameFormat.LFMaLFM2,
+				NameFormat.LFMaLFM2S,
+				NameFormat.LFMiaF,
+				NameFormat.LFMiaFM,
+				NameFormat.LFMiaFMiL,
+				NameFormat.LFMiaIFI,
+				NameFormat.LFaFL,
+				NameFormat.LFaFMS,
+				NameFormat.LFaFS,
+				NameFormat.FSaFL,
+				NameFormat.LFaLF,
+				NameFormat.LFaLF1,
+				NameFormat.LFaLFM,
+				NameFormat.LFaLFM2,
+				NameFormat.LFaLcF,
+				NameFormat.LFiMiaFiMi,
+				NameFormat.LFiaFi,
+				NameFormat.LFiaFiL,
+				NameFormat.LFiaFiMi,
+				NameFormat.LSFMaFM,
+				NameFormat.LSFaFM,
+				NameFormat.LcFMSaLcFM,
+				NameFormat.LcFMaF,
+				NameFormat.LcFMaFMM,
+				NameFormat.LcSFaFMM,
+				NameFormat.LcFMaFMS,
+				NameFormat.LcFMaLcF,
+				NameFormat.LcFMaLcFM,
+				NameFormat.LcFMaLcFS,
+				NameFormat.LcFMiMiaFMM,
+				NameFormat.LcFaFM,
+				NameFormat.LcFaLcF,
+				NameFormat.LcFaLcFM,
+				NameFormat.LcFMSaLcFM,
+				NameFormat.FMaFLS,
+				NameFormat.MrMrs,
+				NameFormat.LFMaFM,
+				NameFormat.LFMSaFMM
+			];
+
+export set of NameFormat LikelyNameFormats := [
+	NameFormat.FL, NameFormat.LF, NameFormat.LFM, NameFormat.FLcS, NameFormat.FLS, NameFormat.LFS, NameFormat.FLSorLFS,
+	NameFormat.FMLLS, NameFormat.FMSL, NameFormat.FiL,NameFormat.FiMLS,NameFormat.FiLS, //NameFormat.FiMiL,
+	NameFormat.FMiL, NameFormat.FMiLS, NameFormat.LSFM, NameFormat.FMLSorLFMS,
+	/*NameFormat.LFi,*/ NameFormat.LFiS, NameFormat.LFMS, NameFormat.LFMiS,	NameFormat.ILI,
+	NameFormat.LcFMS, NameFormat.LcFMcS,NameFormat.LcFcMS,NameFormat.LcFcMcS,
+	NameFormat.LScFM, NameFormat.LScFMM, NameFormat.LcScFM, NameFormat.LcScF, NameFormat.FcMcL, NameFormat.LScF,
+	NameFormat.LcF, NameFormat.LFMi, NameFormat.LcFhF, NameFormat.FiIIL, NameFormat.SFL, NameFormat.FSL,
+	NameFormat.FMMLS, NameFormat.LcFM, NameFormat.LcFMM, NameFormat.LcSFM, NameFormat.LcFS, NameFormat.LcFcS, NameFormat.LcTF,
+	NameFormat.LFMicS, NameFormat.LFMiMi, NameFormat.FMLcIII, NameFormat.FMcSL, NameFormat.FMLcS,
+	NameFormat.FccL,NameFormat.LLcFM
+	];
+	
+export set of NameFormat PossibleNameFormats := [
+	NameFormat.FMiMiL		//,NameFormat.LcFcM
+	];
+	
+export set of NameFormat FirstNameFirst := [
+	NameFormat.FL, NameFormat.FLcS, NameFormat.FLS, NameFormat.FMLLS, 
+	NameFormat.FiML, NameFormat.FiL,NameFormat.FiMLS,NameFormat.FiLS,	//NameFormat.FiMiL,
+	NameFormat.FMLcS, NameFormat.FMcSL, NameFormat.FMLcIII, NameFormat.FMiLS, NameFormat.FLL, NameFormat.FMiLI,NameFormat.ILI,
+	NameFormat.FxL, NameFormat.FxLS, NameFormat.FxLL,	NameFormat.FSL, NameFormat.FML,NameFormat.FMSL,
+	NameFormat.FMLL, NameFormat.FMiMiL, NameFormat.FMML, NameFormat.FMMLS, NameFormat.FiIIL, NameFormat.FMLyL,
+	NameFormat.FccL, NameFormat.FcMcL
+	];
+
+export set of NameFormat LastNameFirst := [
+	NameFormat.LF, NameFormat.LFM, NameFormat.LFi, NameFormat.LFiS, NameFormat.LFMS, NameFormat.LFMiS, 
+	NameFormat.LcFMS, NameFormat.LcFMcS, NameFormat.LScF, NameFormat.LScFM, NameFormat.LScFMM,
+	NameFormat.LcScFM,NameFormat.LcScF,	NameFormat.LxFM,
+	NameFormat.LcFMM, NameFormat.LcSFM, NameFormat.LFMi, NameFormat.LFiMi,
+	/*NameFormat.LFMMi,*/ NameFormat.LFcMi, NameFormat.LSFM,
+	NameFormat.LcF, NameFormat.LcFM, NameFormat.LcFcM, NameFormat.LcFcMS,NameFormat.LcFcMcS,
+	NameFormat.LcFcS, NameFormat.LcFS, NameFormat.LLcFM, NameFormat.LLcFS, NameFormat.LcFhF,
+	NameFormat.LFMiM, NameFormat.LFMiMi, NameFormat.LFMicS
+	];
+	
+export set of NameFormat NameFML := [
+	NameFormat.FL, NameFormat.FLcS, NameFormat.FLS, NameFormat.FMLLS, 
+	NameFormat.FiML, NameFormat.FiL,NameFormat.FiMLS,NameFormat.FiLS,	//NameFormat.FiMiL,
+	NameFormat.FMLcS, NameFormat.FMcSL, NameFormat.FMLcIII, NameFormat.FMiLS, NameFormat.FLL, NameFormat.FMiLI,
+	NameFormat.FxL, NameFormat.FxLS, NameFormat.FxLL, NameFormat.FML, NameFormat.FMSL,
+	NameFormat.FMLL, NameFormat.FMiMiL, NameFormat.FMML, NameFormat.FMMLS,	NameFormat.FiIIL, NameFormat.FMLyL,
+	NameFormat.FccL, NameFormat.FcMcL
+	];
+
+export set of NameFormat NameLFM := [
+	NameFormat.LF, NameFormat.LFM, NameFormat.LFi, NameFormat.LFMS, NameFormat.LFMiS, 
+	NameFormat.LcFMS, NameFormat.LcFMcS, NameFormat.LScFM, NameFormat.LScFMM,
+	NameFormat.LcFMM, NameFormat.LFMi, NameFormat.LFiMi,/*NameFormat.LFMMi,*/ NameFormat.LFcMi, 
+	NameFormat.LcF, NameFormat.LcFM, NameFormat.LcFcM, NameFormat.LcFcMS,NameFormat.LcFcMcS,
+	NameFormat.LcFcS, NameFormat.LLcFM, NameFormat.LLcFS, NameFormat.LxFM, NameFormat.LcFhF,
+	NameFormat.LFMiM, NameFormat.LFMiMi, NameFormat.LFMicS
+	];
+	
 END;

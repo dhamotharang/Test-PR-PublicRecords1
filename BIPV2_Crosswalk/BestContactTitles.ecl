@@ -1,4 +1,5 @@
-﻿import BIPV2_Contacts;
+﻿ 
+import BIPV2_Contacts;
 import BIPV2_Build;
 import STD;
 
@@ -24,5 +25,5 @@ export BestContactTitles(string pVersion=(string) STD.Date.Today()) := function
   
   flatContactTitles := normalize(contactTitles, left.contact_title,transform(flatContactTitleRec,self := left, self := right));
 
-  return flatContactTitles;
+  return flatContactTitles(proxid=0);
 end;

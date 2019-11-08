@@ -28,6 +28,8 @@ module
 																										+	files().base.kel_personevents_demo.built;
 	shared Base_personstats													:=	files().base.kel_personstats_delta.built 
 																										+	files().base.kel_personstats_demo.built;
+	shared Base_customerdashtopclusters							:=	files().base.kel_customerdashtopclusters_delta.built
+																										+ files().base.kel_customerdashtopclusters_demo.built;																										
 																					
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customeraddress.New, Base_customeraddress, Build_kel_customeraddress , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_personstats.New, Base_personstats, Build_kel_personstats , pOverwrite := true);
@@ -41,6 +43,7 @@ module
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_entity_scorebreakdown.New, Base_entity_scorebreakdown, Build_kel_entity_scorebreakdown , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopEntityStats.New, Base_customerdashtopentitystats, Build_kel_CustomerDashTopEntityStats , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopClustersAndElements.New, Base_customerdashtopclustersandelements, Build_kel_CustomerDashTopClustersAndElements , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopClusters.New, Base_CustomerDashTopClusters, Build_kel_CustomerDashTopClusters , pOverwrite := true);
 	//KEL Demo
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customeraddress_Demo.New, KELOtto.KelFiles.CustomerAddress, Build_kel_customeraddress_Demo , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_personstats_Demo.New, KELOtto.KelFiles.PersonStats, Build_kel_personstats_Demo , pOverwrite := true);
@@ -54,6 +57,7 @@ module
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_entity_scorebreakdown_Demo.New, KELOtto.KelFiles.ScoreBreakdown, Build_kel_entity_scorebreakdown_Demo , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopEntityStats_Demo.New, KELOtto.CustomerDash.TopEntityStats, Build_kel_CustomerDashTopEntityStats_Demo , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopClustersAndElements_Demo.New, KELOtto.CustomerDash.TopClustersAndElements, Build_kel_CustomerDashTopClustersAndElements_Demo , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopClusters_Demo.New, KELOtto.CustomerDashboard.MainClusters, Build_kel_CustomerDashTopClusters_Demo , pOverwrite := true);
 	//KEL Delta
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customeraddress_Delta.New, KELOtto.KelFiles.CustomerAddress, Build_kel_customeraddress_Delta , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_personstats_Delta.New, KELOtto.KelFiles.PersonStats, Build_kel_personstats_Delta , pOverwrite := true);
@@ -67,6 +71,7 @@ module
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_entity_scorebreakdown_Delta.New, KELOtto.KelFiles.ScoreBreakdown, Build_kel_entity_scorebreakdown_Delta , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopEntityStats_Delta.New, KELOtto.CustomerDash.TopEntityStats, Build_kel_CustomerDashTopEntityStats_Delta , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopClustersAndElements_Delta.New, KELOtto.CustomerDash.TopClustersAndElements, Build_kel_CustomerDashTopClustersAndElements_Delta , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopClusters_Delta.New, KELOtto.CustomerDashboard.MainClusters, Build_kel_CustomerDashTopClusters_Delta , pOverwrite := true);
 	
 // Return
 	export full_build :=
@@ -82,7 +87,8 @@ module
 			 Build_kel_person_associations_details,
 			 Build_kel_entity_scorebreakdown,
 			 Build_kel_CustomerDashTopEntityStats,
-			 Build_kel_CustomerDashTopClustersAndElements
+			 Build_kel_CustomerDashTopClustersAndElements,
+			 Build_kel_CustomerDashTopClusters
 			 
 		);
 	
@@ -99,7 +105,8 @@ module
 			 Build_kel_person_associations_details_Demo,
 			 Build_kel_entity_scorebreakdown_Demo,
 			 Build_kel_CustomerDashTopEntityStats_Demo,
-			 Build_kel_CustomerDashTopClustersAndElements_Demo
+			 Build_kel_CustomerDashTopClustersAndElements_Demo,
+			 Build_kel_CustomerDashTopClusters_Demo
 			 
 		);
 		
@@ -116,7 +123,8 @@ module
 			 Build_kel_person_associations_details_Delta,
 			 Build_kel_entity_scorebreakdown_Delta,
 			 Build_kel_CustomerDashTopEntityStats_Delta,
-			 Build_kel_CustomerDashTopClustersAndElements_Delta
+			 Build_kel_CustomerDashTopClustersAndElements_Delta,
+			 Build_kel_CustomerDashTopClusters_Delta
 			 
 		);
 	export All :=

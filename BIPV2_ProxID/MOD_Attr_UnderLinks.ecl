@@ -15,6 +15,10 @@ match_candidates(ih).Layout_Attribute_Matches Score(Cands le,Cands ri,UNSIGNED c
   INTEGER2 cnp_number_score_temp := MAP(
                         le.cnp_number = ri.cnp_number  => le.cnp_number_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.cnp_number_weight100,ri.cnp_number_weight100),s.cnp_number_switch));
+  INTEGER2 sbfe_id_score := MAP(
+                        le.sbfe_id_isnull OR ri.sbfe_id_isnull => 0,
+                        le.sbfe_id = ri.sbfe_id  => le.sbfe_id_weight100,
+                        0 /* switchN/0 */);
   INTEGER2 active_enterprise_number_score_temp := MAP(
                         le.active_enterprise_number_isnull OR ri.active_enterprise_number_isnull => 0,
                         le.active_enterprise_number = ri.active_enterprise_number  => le.active_enterprise_number_weight100,
@@ -40,7 +44,7 @@ match_candidates(ih).Layout_Attribute_Matches Score(Cands le,Cands ri,UNSIGNED c
   INTEGER2 cnp_number_score := IF ( cnp_number_score_temp >= Config.cnp_number_Force * 100, cnp_number_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 active_enterprise_number_score := IF ( active_enterprise_number_score_temp >= Config.active_enterprise_number_Force * 100, active_enterprise_number_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 active_domestic_corp_key_score := IF ( active_domestic_corp_key_score_temp >= Config.active_domestic_corp_key_Force * 100, active_domestic_corp_key_score_temp, SKIP ); // Enforce FORCE parameter
-  SELF.Conf_Prop := (cnp_number_score + active_enterprise_number_score + active_domestic_corp_key_score + active_duns_number_score + company_fein_score + cnp_name_phonetic_score) / 100; // Score based on forced fields
+  SELF.Conf_Prop := (cnp_number_score + sbfe_id_score + active_enterprise_number_score + active_domestic_corp_key_score + active_duns_number_score + company_fein_score + cnp_name_phonetic_score) / 100; // Score based on forced fields
   SELF.support_cnp_name := ri.Basis_weight100/100;
 END;
 Matches0 := DISTRIBUTE(JOIN(Cands,Cands,LEFT.Basis = RIGHT.Basis AND LEFT.Proxid > RIGHT.Proxid,Score(LEFT,RIGHT)),Proxid1+Proxid2);

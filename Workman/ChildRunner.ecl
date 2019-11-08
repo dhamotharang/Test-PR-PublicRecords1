@@ -108,7 +108,7 @@ functionmacro
   Get_Results(string pwuid) := WorkMan.mac_Parse_Results(pSetResults ,pStopCondition,pSetNameCalculations);
   
   
-// myevent := '<a href="http://' + 'prod_esp.br.seisint.com' + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + 'VernEvent' + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Rerun' + '%3C%2FAdvice%3E%3C%2FEvent%3E">Rerun Workunit</a>';
+// myevent := '<a href="http://' + 'uspr-prod-thor-esp.risk.regn.net' + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + 'VernEvent' + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Rerun' + '%3C%2FAdvice%3E%3C%2FEvent%3E">Rerun Workunit</a>';
 
 //  http://10.241.3.241:8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20150330-165839#/stub/Summary
 //  output('<a href="http://10.241.3.242:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20150330-165839">W20150330-165839</a>' ,named('RelativeWU_WithUrl__html'));  //works
@@ -117,7 +117,7 @@ functionmacro
   // -- Add this code to the Child/Iteration so you know what wuid kicked it off.
   // outputRunnerwuidcode  := 'output(\'<a href="http://' + localesp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Summary">Parent Workunit</a>\' ,named(\'Parent_Wuid__html\'));\n';
 
-// http://prod_esp.br.seisint.com:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20150331-151832#/stub/Main-DL/Activity-DL/DetailW20150331x101550-DL/Summary
+// http://uspr-prod-thor-esp.risk.regn.net:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20150331-151832#/stub/Main-DL/Activity-DL/DetailW20150331x101550-DL/Summary
 // http://10.241.3.241:8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20150330-165839#/stub/Summary
   
   // -- Number of times this wuid called
@@ -157,11 +157,12 @@ functionmacro
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
   ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
   ds_previous_build_final_iterations := sort(ds_previous_builds,-version,-(unsigned)iteration);
+  latest_previous_iteration          := (string)max(ds_previous_builds  ,(unsigned)iteration);
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
     default_start_iteration            := if(pOutputSuperfile != ''  
     // default_start_iteration            := if((#TEXT(pStartIteration) = '' or trim((string)pStartIteration) = '') and pOutputSuperfile != '' //and trim(ds_previous_build_final_iterations[1].iteration) != '' 
-                                            ,(string)((unsigned)ds_previous_build_final_iterations[1].iteration + 1)
+                                            ,(string)((unsigned)latest_previous_iteration + 1)
                                             ,''
                                          );
     StartIteration := default_start_iteration;

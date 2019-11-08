@@ -1,4 +1,4 @@
-/* ************ Function to add records from record not in phonesplus 
+﻿/* ************ Function to add records from record not in phonesplus 
 for relatives of individuals flagged as included.  The added records are generated
 with the did from header and name from watchdog.  The other data is propagated 
 from relative's record that exist in phonesplus 
@@ -68,6 +68,8 @@ recordof(phplus_in) t_other_members_recs(land_lines le, other_household_members 
 	self.lname := ri.lname;
 //----RecordKey = Rules -> bit map to store rules met
 	self.rules := le.rules | Translation_Codes.rules_bitmap_code('Hdr-Household');
+	self.household_flag := true;  //DF-25784 add indicator that this is a household record
+	self.source := le.source; //DF-25784 use source of phones plus relative
 	self := le; 
 end;
 
