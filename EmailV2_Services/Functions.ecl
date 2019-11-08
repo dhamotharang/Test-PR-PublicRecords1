@@ -136,7 +136,7 @@ EXPORT Functions := MODULE
 
     email_rolled_recs := RollupEmailData(email_matching_recs,in_mod,search_by);
 
-    RETURN email_rolled_recs;
+    RETURN IF(~in_mod.KeepRawData, email_rolled_recs, email_matching_recs);
   END;
 
   OrderByEmailStatus(STRING _status) := MAP($.Constants.isValid(_status) => 1,  // valid email adresses to the top
@@ -320,6 +320,19 @@ EXPORT Functions := MODULE
                                   SELF := LEFT));
 
     RETURN email_rels_ready;
+  END;
+
+  EXPORT CalculateRoyalties($.Layouts.email_combined_rec row_in
+  ) := FUNCTION
+
+    ext_royalties:= PROJECT(row_in.Royalties, Royalty.Layouts.Royalty);  // royalties from input (like gateway royalties)
+
+    inh_royalties := Royalty.RoyaltyEmail.GetRoyaltySet(row_in.Records, email_src);
+
+    // Now combine results for output
+    res_row := ROW({row_in.Records, inh_royalties + ext_royalties}, $.Layouts.email_royalty_combined_rec);
+
+    RETURN res_row;
   END;
 
 END;

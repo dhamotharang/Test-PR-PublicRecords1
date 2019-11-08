@@ -13,12 +13,12 @@ EXPORT Transforms := MODULE
     SELF.email_domain := ClndUserDomain;
     SELF := _input;
   END;
-  
+
   hasCityStateorZip($.Layouts.batch_in_rec _input) := FUNCTION
     has_address := (_input.p_city_name != '' AND _input.st != '') OR _input.z5 != '';
     RETURN has_address;
   END;
-  
+
   hasFullAddress($.Layouts.batch_in_rec _input) := FUNCTION
     str_addr := STD.Str.CleanSpaces(Address.Addr1FromComponents(_input.prim_range,_input.predir,_input.prim_name,
                                               _input.addr_suffix,_input.postdir,_input.unit_desig,_input.sec_range));
@@ -26,12 +26,12 @@ EXPORT Transforms := MODULE
                         ((_input.p_city_name != '' AND _input.st != '') OR _input.z5 != '');
     RETURN has_full_address;
   END;
-  
+
   hasFullName($.Layouts.batch_in_rec _input) := TRIM(_input.name_first,ALL) <> '' AND TRIM(_input.name_last,ALL) <> '';
   hasFullSSN($.Layouts.batch_in_rec _input) := LENGTH(STD.Str.Filter(_input.ssn,'0123456789')) = 9;
-  
+
   hasSufficientIdentityInput($.Layouts.batch_in_rec _input, BOOLEAN require_full_address) := FUNCTION
-  
+
     has_full_address := hasFullAddress(_input);
     has_address := hasCityStateorZip(_input);
     has_full_name := hasFullName(_input);
@@ -40,12 +40,12 @@ EXPORT Transforms := MODULE
     has_lexid := _input.DID>0;
     BOOLEAN has_sufficient_input := has_lexid OR (has_ssn AND has_full_name) OR (has_full_name AND has_full_address)
                                     OR (~require_full_address AND (has_full_name AND has_address));
-    
+
     RETURN has_sufficient_input;
   END;
-  
+
   EXPORT $.Layouts.batch_in_ext_rec checkIdentityInput($.Layouts.batch_in_rec le, BOOLEAN full_address_check = FALSE) := TRANSFORM
-  
+
     insufficient_input := ~hasSufficientIdentityInput(le, full_address_check);
     SELF.is_rejected_rec := insufficient_input;
     SELF.record_err_msg := IF(insufficient_input,AutoKeyI.errorcodes._msgs(AutoKeyI.errorcodes._codes.INSUFFICIENT_INPUT),'');
@@ -58,7 +58,7 @@ EXPORT Transforms := MODULE
   END;
 
   EXPORT $.Layouts.batch_in_didvile_rec toMACDidAppend($.Layouts.batch_in_rec l) := TRANSFORM
-      SELF.seq     := (UNSIGNED) l.acctno; 
+      SELF.seq     := (UNSIGNED) l.acctno;
       SELF.fname  := l.name_first;
       SELF.mname  := l.name_middle;
       SELF.lname  := l.name_last;
@@ -66,7 +66,7 @@ EXPORT Transforms := MODULE
       SELF := l;
       SELF := [];
     END;
-  
+
     EXPORT $.Layouts.email_raw_rec addRawPayload ($.Layouts.email_ids_rec LE,
                                                                dx_Email.Layouts.i_Payload RI)
     := TRANSFORM
@@ -101,8 +101,6 @@ EXPORT Transforms := MODULE
                               SELF := [];
   END;
 
-  
- 
   SHARED BatchShare.Layouts.ShareAddress xfAddrPenalties($.Layouts.email_internal_rec le) := TRANSFORM
             SELF.predir         := le.cleaned.Address.predir;
             SELF.prim_name      := le.cleaned.Address.prim_name;
@@ -112,23 +110,23 @@ EXPORT Transforms := MODULE
             SELF.sec_range      := le.cleaned.Address.sec_range;
             SELF.p_city_name    := le.cleaned.Address.p_city_name;
             SELF.st             := le.cleaned.Address.st;
-            SELF.z5             := le.cleaned.Address.zip;          
-            SELF.zip4           := le.cleaned.Address.zip4;  
+            SELF.z5             := le.cleaned.Address.zip;
+            SELF.zip4           := le.cleaned.Address.zip4;
             SELF:=[];
   END;
-  
+
   SHARED BatchShare.Layouts.ShareName xfNamePenalties($.Layouts.email_internal_rec le) := TRANSFORM
-            SELF.name_last      := le.cleaned.Name.lname;   
-            SELF.name_middle    := le.cleaned.Name.mname; 
-            SELF.name_first     := le.cleaned.Name.fname;  
+            SELF.name_last      := le.cleaned.Name.lname;
+            SELF.name_middle    := le.cleaned.Name.mname;
+            SELF.name_first     := le.cleaned.Name.fname;
             SELF.name_suffix    := le.cleaned.Name.name_suffix;
   END;
-  
+
   SHARED BatchShare.Layouts.SharePII xfPiiPenalties($.Layouts.email_internal_rec le) := TRANSFORM
-            SELF.ssn    := le.cleaned.clean_ssn;   
-            SELF.dob    := IF(le.cleaned.clean_dob>0,(STRING8)le.cleaned.clean_dob,''); 
+            SELF.ssn    := le.cleaned.clean_ssn;
+            SELF.dob    := IF(le.cleaned.clean_dob>0,(STRING8)le.cleaned.clean_dob,'');
   END;
-  
+
   SHARED BatchServices.Layouts.layout_batch_in_for_penalties xfPenaltiesLayout($.Layouts.batch_in_rec le) := TRANSFORM
             SELF._predir         := le.predir;
             SELF._prim_name      := le.prim_name;
@@ -138,24 +136,24 @@ EXPORT Transforms := MODULE
             SELF._sec_range      := le.sec_range;
             SELF._p_city_name    := le.p_city_name;
             SELF._st             := le.st;
-            SELF._z5             := le.z5;          
-  
-            SELF._name_last      := le.name_last;   
-            SELF._name_middle    := le.name_middle; 
-            SELF._name_first     := le.name_first;  
+            SELF._z5             := le.z5;
+
+            SELF._name_last      := le.name_last;
+            SELF._name_middle    := le.name_middle;
+            SELF._name_first     := le.name_first;
             SELF._name_suffix     := le.name_suffix;
-            SELF._ssn            := le.ssn;  
-            SELF._dob            := le.dob;  
-            SELF._acctno         := le.acctno;  
+            SELF._ssn            := le.ssn;
+            SELF._dob            := le.dob;
+            SELF._acctno         := le.acctno;
             SELF:=[];
   END;
-  
-  EXPORT $.Layouts.email_internal_rec AddPenalties ($.Layouts.email_internal_rec _raw, 
-                                                                 $.Layouts.batch_in_rec _input) 
+
+  EXPORT $.Layouts.email_internal_rec AddPenalties ($.Layouts.email_internal_rec _raw,
+                                                                 $.Layouts.batch_in_rec _input)
   := TRANSFORM
-  
+
     input_pii := PROJECT(_input, xfPenaltiesLayout(LEFT));
-    
+
     address_to_match := PROJECT(_raw, xfAddrPenalties(LEFT));
     indv_name_to_match := PROJECT(_raw, xfNamePenalties(LEFT));
     ssn_dob_to_match := PROJECT(_raw, xfPiiPenalties(LEFT));
@@ -168,24 +166,24 @@ EXPORT Transforms := MODULE
     SELF.penalt_addr := penalty_addr;
     SELF.penalt_name := penalty_name;
     SELF.penalt_didssndob := penalty_pii;
-    SELF.penalt := IF(_raw.DID>0 AND _raw.DID=_raw.subject_lexid, 0, 
+    SELF.penalt := IF(_raw.DID>0 AND _raw.DID=_raw.subject_lexid, 0,
                       penalty_name + penalty_addr + penalty_pii);
     SELF:=_raw;
   END;
-  
-  EXPORT $.Layouts.email_final_rec AddFuzzyRelationship ($.Layouts.email_final_rec _indiv, 
+
+  EXPORT $.Layouts.email_final_rec AddFuzzyRelationship ($.Layouts.email_final_rec _indiv,
                                                         $.Layouts.batch_in_rec _input,
-                                                        UNSIGNED pemalty_threshold) 
+                                                        UNSIGNED pemalty_threshold)
   := TRANSFORM
-  
+
     input_pii := PROJECT(_input, xfPenaltiesLayout(LEFT));
-    
+
     address_to_match := PROJECT(_indiv, xfAddrPenalties(LEFT));
     indv_name_to_match := PROJECT(_indiv, xfNamePenalties(LEFT));
     ssn_dob_to_match := PROJECT(_indiv, xfPiiPenalties(LEFT));
     penalty_addr := BatchShare.Functions.penalize_address(input_pii, address_to_match);
     penalty_name := IF(_input.has_full_name, BatchShare.Functions.penalize_fullname(input_pii, indv_name_to_match), $.Constants.Defaults.RELATIONSHIP_PENALTY); // in case if input has only lexid, we need to penalize for relationship purpose
-    penalty_pii := BatchShare.Functions.penalize_ssn_dob(input_pii, ssn_dob_to_match) 
+    penalty_pii := BatchShare.Functions.penalize_ssn_dob(input_pii, ssn_dob_to_match)
     // to avoid subject matching based solely on name we should penalize results based on name+ssn - in case if email record doesn't have ssn populated
       + IF(_indiv.cleaned.clean_ssn = '' AND ~_input.has_full_address AND _input.has_full_ssn, $.Constants.Defaults.RELATIONSHIP_PENALTY, 0);
     SELF.penalt_addr := penalty_addr;
@@ -204,7 +202,7 @@ EXPORT Transforms := MODULE
       SELF.email_domain := STD.Str.ToUpperCase(le.Domain);
       SELF.email_status := STD.Str.ToLowerCase(le.Status);
       error_desc := $.Constants.GatewayValues.get_error_desc(STD.Str.ToUpperCase(le.error_code));
-      SELF.email_status_reason := MAP(error_desc<>''=> error_desc, 
+      SELF.email_status_reason := MAP(error_desc<>''=> error_desc,
                                       le.Error ='(null)' => '', // ESP is returning (null) in case of blank, we need to clean up
                                       STD.Str.ToTitleCase(le.Error));
       SELF.is_disposable_address := STD.Str.ToLowerCase(le.disposable) = $.Constants.STR_TRUE;
@@ -218,7 +216,8 @@ EXPORT Transforms := MODULE
       SELF.email := STD.Str.ToUpperCase(TRIM(le.Result.Address, ALL));
       SELF.email_username := STD.Str.ToUpperCase(le.Result.Account);
       SELF.email_domain := STD.Str.ToUpperCase(le.Result.Domain);
-      SELF.email_status := STD.Str.ToLowerCase(le.Result.Status);
+      _email_status := STD.Str.ToLowerCase(le.Result.Status);
+      SELF.email_status := IF(~$.Constants.isUnknown(_email_status), _email_status, '');  //status unknown brings no value here;  we populate status 'unknown' by default later, blanking it here will allow to use previous status if any
       error_desc := $.Constants.GatewayValues.get_error_desc(STD.Str.ToUpperCase(le.Result.ErrorCode));
       SELF.email_status_reason := IF(error_desc<>'', error_desc, STD.Str.ToTitleCase(le.Result.Error));
       isDisposableAddress := STD.Str.ToLowerCase(le.Result.Disposable) = $.Constants.STR_TRUE;
@@ -228,14 +227,14 @@ EXPORT Transforms := MODULE
                                isDisposableAddress => $.Constants.GatewayValues.DisposableAddress,'');
       SELF.additional_status_info := additional_status;
   END;
-   
+
   EXPORT iesp.briteverify_email.t_BriteVerifyEmailRequest xfBVSoapRequest($.Layouts.Gateway_Data.batch_in_bv_rec L, STRING apikey)
   := TRANSFORM
     SELF.SearchBy.EmailAddress  := TRIM(L.email,ALL);
     SELF.Options.JSONServiceAPIKey := apikey;
     SELF:=[];
   END;
-  
+
   EXPORT $.Layouts.batch_in_rec xfSearchIn(iesp.emailsearchv2.t_EmailSearchV2SearchBy rec_in)
   := TRANSFORM
     SELF.acctno  := $.Constants.Defaults.SingleSearchAccountNo;
@@ -258,11 +257,11 @@ EXPORT Transforms := MODULE
     SELF.st := rec_in.Address.State;
     SELF.z5 := rec_in.Address.Zip5;
     SELF.zip4 := rec_in.Address.Zip4;
-   
+
     SELF := rec_in;
     SELF := [];
   END;
-  
+
   EXPORT iesp.emailsearchv2.t_EmailSearchV2Record  xfSearchOut($.Layouts.email_final_rec le, UNSIGNED dob_mask = 0)
   := TRANSFORM
     SELF.Original.EmailAddress := le.Original.email;
@@ -275,7 +274,7 @@ EXPORT Transforms := MODULE
     SELF.Original.CompanyTitle := le.CompanyTitle;
     SELF.Original.CompanyName := le.orig_CompanyName;
     SELF.Original := le.Original;
-    
+
     SELF.Cleaned.EmailAddress := le.Cleaned.clean_email;
     SELF.Cleaned.CompanyName := le.cln_CompanyName;
     SELF.Cleaned.Name.first := le.Cleaned.Name.fname;
@@ -294,8 +293,8 @@ EXPORT Transforms := MODULE
     SELF.Cleaned.Address.State := le.Cleaned.Address.st;
     SELF.Cleaned.Address.Zip5 := le.Cleaned.Address.zip;
     SELF.Cleaned.Address.Zip4 := le.Cleaned.Address.zip4;
-    SELF.Cleaned.Address.StreetAddress1 := Address.Addr1FromComponents(le.Cleaned.Address.prim_range, le.Cleaned.Address.Predir, le.Cleaned.Address.prim_name, le.Cleaned.Address.addr_suffix, le.Cleaned.Address.Postdir, le.Cleaned.Address.unit_desig, le.Cleaned.Address.sec_range);                
-    SELF.Cleaned.Address.StateCityZip := Address.Addr2FromComponents(le.Cleaned.Address.p_city_name, le.Cleaned.Address.st, le.Cleaned.Address.zip);                
+    SELF.Cleaned.Address.StreetAddress1 := Address.Addr1FromComponents(le.Cleaned.Address.prim_range, le.Cleaned.Address.Predir, le.Cleaned.Address.prim_name, le.Cleaned.Address.addr_suffix, le.Cleaned.Address.Postdir, le.Cleaned.Address.unit_desig, le.Cleaned.Address.sec_range);
+    SELF.Cleaned.Address.StateCityZip := Address.Addr2FromComponents(le.Cleaned.Address.p_city_name, le.Cleaned.Address.st, le.Cleaned.Address.zip);
 
     SELF.BestInfo.SSN := le.BestInfo.SSN;
     SELF.BestInfo.DOB := iesp.ECL2ESP.ApplyDateMask(iesp.ECL2ESP.toDate(le.BestInfo.dob), dob_mask);
@@ -315,8 +314,8 @@ EXPORT Transforms := MODULE
     SELF.BestInfo.Address.State := le.BestInfo.st;
     SELF.BestInfo.Address.Zip5 := le.BestInfo.zip;
     SELF.BestInfo.Address.Zip4 := le.BestInfo.zip4;
-    SELF.BestInfo.Address.StreetAddress1 := Address.Addr1FromComponents(le.BestInfo.prim_range, le.BestInfo.Predir, le.BestInfo.prim_name, le.BestInfo.suffix, le.BestInfo.Postdir, le.BestInfo.unit_desig, le.BestInfo.sec_range);                
-    SELF.BestInfo.Address.StateCityZip := Address.Addr2FromComponents(le.BestInfo.city_name, le.BestInfo.st, le.BestInfo.zip);                
+    SELF.BestInfo.Address.StreetAddress1 := Address.Addr1FromComponents(le.BestInfo.prim_range, le.BestInfo.Predir, le.BestInfo.prim_name, le.BestInfo.suffix, le.BestInfo.Postdir, le.BestInfo.unit_desig, le.BestInfo.sec_range);
+    SELF.BestInfo.Address.StateCityZip := Address.Addr2FromComponents(le.BestInfo.city_name, le.BestInfo.st, le.BestInfo.zip);
 
     SELF.LexId := le.DID;
     SELF.ProcessDate := iesp.ECL2ESP.toDatestring8(le.process_date);
@@ -333,14 +332,14 @@ EXPORT Transforms := MODULE
     SELF.PenaltyDidSsnDob := le.penalt_didssndob;
     SELF.EmailStatus := le.email_status;
     SELF.EmailStatusReason := le.email_status_reason;
-    
-    _last_verified := IF(le.email_status<>'' AND le.date_last_verified<>'' AND ~$.Constants.isUnknown(le.email_status), 
+
+    _last_verified := IF(le.email_status<>'' AND le.date_last_verified<>'' AND ~$.Constants.isUnknown(le.email_status),
                          $.Constants.LastVerified + ' ' + le.date_last_verified,'');
     SELF.AdditionalStatusInfo := MAP(le.additional_status_info<>'' AND _last_verified<>'' => TRIM(le.additional_status_info) + '; '+_last_verified,
-                                     le.additional_status_info<>'' => le.additional_status_info, 
-                                     _last_verified<>'' => _last_verified, 
-                                     ''); 
-                                 
+                                     le.additional_status_info<>'' => le.additional_status_info,
+                                     _last_verified<>'' => _last_verified,
+                                     '');
+
     SELF.EmailId := le.email_id;
     SELF.Relationship := le.Relationship;
     SELF.isDeepDive := le.isDeepDive;
@@ -349,32 +348,32 @@ EXPORT Transforms := MODULE
     SELF := le;
     SELF := [];
   END;
-  
+
   EXPORT iesp.share.t_ResponseHeader  xfAddHeader(INTEGER status, DATASET($.Layouts.email_final_rec) re)
   := TRANSFORM
-  
+
     service_header := iesp.ECL2ESP.GetHeaderRow();
-    
+
     SELF.QueryId       := service_header.QueryId;
     SELF.TransactionId := service_header.TransactionId;
     SELF.Status        := status;
     SELF.Message       := AutoKeyI.errorcodes._msgs(status);
-    SELF.Exceptions    := PROJECT(re, TRANSFORM(iesp.share.t_WsException, 
+    SELF.Exceptions    := PROJECT(re, TRANSFORM(iesp.share.t_WsException,
                                                         SELF.Source :='Roxie',
                                                         SELF.Code := LEFT.record_err_code,
                                                         SELF.Message := LEFT.record_err_msg,
                                                         SELF.Location := ''));
     SELF.Disclaimers   := service_header.Disclaimers;
   END;
-  
+
   EXPORT iesp.emailsearchv2.t_EmailSearchV2InputSubject  xfInputEcho(iesp.emailsearchv2.t_EmailSearchV2SearchBy _in, UNSIGNED lexid)
   := TRANSFORM
-  
+
     SELF.InputEcho     := _in;
     SELF.SubjectLexid  := lexid;
   END;
-  
-  EXPORT $.Layouts.batch_final_rec xfBatchOut($.Layouts.email_final_rec le)
+
+  EXPORT $.Layouts.batch_final_rec xfBatchOut($.Layouts.email_final_rec le, UNSIGNED dob_mask = 0)
     := TRANSFORM
       SELF.acctno          := le.acctno,
       SELF.orig_first_name := le.original.first_name;
@@ -409,18 +408,47 @@ EXPORT Transforms := MODULE
       SELF.best_zip := le.bestinfo.zip;
       SELF.best_zip4 := le.bestinfo.zip4;
       SELF.best_ssn := le.bestinfo.ssn;
-      SELF.best_dob := le.bestinfo.dob;
+      SELF.best_dob := iesp.ECL2ESP.DateToInteger(iesp.ECL2ESP.ApplyDateMask(iesp.ECL2ESP.toDate(le.BestInfo.dob), dob_mask));
       SELF.clean_email := le.cleaned.clean_email;
       SELF := le.cleaned.Name;
       SELF := le.cleaned.Address;
-      _last_verified := IF(le.email_status<>'' AND le.date_last_verified<>'' AND ~$.Constants.isUnknown(le.email_status), 
+      _last_verified := IF(le.email_status<>'' AND le.date_last_verified<>'' AND ~$.Constants.isUnknown(le.email_status),
                          $.Constants.LastVerified + ' ' + le.date_last_verified,'');
-      SELF.additional_status_info := 
+      SELF.additional_status_info :=
                                   MAP(le.additional_status_info<>'' AND _last_verified<>'' => TRIM(le.additional_status_info) + '; '+_last_verified,
-                                     le.additional_status_info<>'' => le.additional_status_info, 
-                                     _last_verified<>'' => _last_verified, 
-                                     ''); 
+                                     le.additional_status_info<>'' => le.additional_status_info,
+                                     _last_verified<>'' => _last_verified,
+                                     '');
       SELF := le;
+  END;
+
+  EXPORT EmailV2_Services.Layouts.crs_email_rec xform_crs_email($.Layouts.email_final_rec le)
+   := TRANSFORM
+      SELF.OriginalCompanyName := le.orig_CompanyName;
+      SELF.CompanyTitle := le.CompanyTitle;
+      SELF.OriginalEmail := le.Original.email;
+      //cleaned:
+      SELF.EmailAddress := le.Cleaned.clean_email;
+      SELF.CompanyName := le.cln_CompanyName;
+      SELF.Name.first := le.Cleaned.Name.fname;
+      SELF.Name.Middle := le.Cleaned.Name.mname;
+      SELF.Name.last := le.Cleaned.Name.lname;
+      SELF.Name.Suffix := le.Cleaned.Name.name_suffix;
+      SELF.Name.Prefix := le.Cleaned.Name.title;
+      SELF.Address.StreetNumber := le.Cleaned.Address.prim_range;
+      SELF.Address.StreetPreDirection := le.Cleaned.Address.predir;
+      SELF.Address.StreetName := le.Cleaned.Address.prim_name;
+      SELF.Address.StreetSuffix := le.Cleaned.Address.addr_suffix;
+      SELF.Address.StreetPostDirection := le.Cleaned.Address.postdir;
+      SELF.Address.UnitDesignation := le.Cleaned.Address.unit_desig;
+      SELF.Address.UnitNumber := le.Cleaned.Address.sec_range;
+      SELF.Address.City := le.Cleaned.Address.p_city_name;
+      SELF.Address.State := le.Cleaned.Address.st;
+      SELF.Address.Zip5 := le.Cleaned.Address.zip;
+      SELF.Address.Zip4 := le.Cleaned.Address.zip4;
+      SELF.Address.StreetAddress1 := Address.Addr1FromComponents(le.Cleaned.Address.prim_range, le.Cleaned.Address.Predir, le.Cleaned.Address.prim_name, le.Cleaned.Address.addr_suffix, le.Cleaned.Address.Postdir, le.Cleaned.Address.unit_desig, le.Cleaned.Address.sec_range);
+      SELF.Address.StateCityZip := Address.Addr2FromComponents(le.Cleaned.Address.p_city_name, le.Cleaned.Address.st, le.Cleaned.Address.zip);
+      SELF := [];
   END;
 
 END;
