@@ -124,7 +124,8 @@ or ssn in ['595637941','589650781','770703763'])
 */
                            : PERSIST('~temp::deleteme27');
                            
-// JP 
-//tempbuild := DATASET('~temp::fraudgovsharedbase', RECORDOF(CustomerAddressPersonPrep1), THOR);
+// output this to setup ramps cert to be able to build without having all the appends.
+//tempbuild := PULL(DATASET('~foreign::10.173.14.201::temp::fraudgovsharedbase', RECORDOF(CustomerAddressPersonPrep1), THOR));
+//output(distribute(KELOtto.FraudGovShared, HASH32(record_id)),, '~temp::fraudgovsharedbase', overwrite, EXPIRE(7));
 
 EXPORT FraudGovShared := CustomerAddressPersonPrep1; // tempbuild;
