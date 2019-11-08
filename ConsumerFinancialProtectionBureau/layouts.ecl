@@ -22,7 +22,7 @@ EXPORT layouts := module
         STRING field19;
         STRING field20;
         STRING field21;
-    END;
+    end;
     export original_BLKGRP_attr_over18 := RECORD
         STRING field1;
         STRING field2;
@@ -38,7 +38,7 @@ EXPORT layouts := module
         STRING field12;
         STRING field13;
         STRING field14;
-    END;
+    end;
     export original_census_surnames := RECORD
         STRING field1;
         STRING field2;
@@ -51,15 +51,13 @@ EXPORT layouts := module
         STRING field9;
         STRING field10;
         STRING field11;
-    END;
-    
+    end;
     shared common := RECORD
         Unsigned4 record_sid;
         Unsigned8 global_src_id;
         Unsigned6 dt_vendor_first_reported; 
         Boolean is_latest;
-    END;
-
+    end;
     export BLKGRP := record
         common;
         unsigned2 seqno;
@@ -84,7 +82,6 @@ EXPORT layouts := module
         unsigned2 NH_API_Other;
         unsigned2 NH_Asian_HPI_Other;	
     end;
-
     export BLKGRP convert_BLKGRP(original_blkgrp L, unsigned4 rsid, unsigned4 date) := TRANSFORM
         self.seqno := (unsigned2) L.field1;
         self.GEOID10_BlkGrp := L.field2;
@@ -111,11 +108,10 @@ EXPORT layouts := module
         self.dt_vendor_first_reported := date;
         self.global_src_id := 0;
         self.is_latest := true;
-    END;
-
+    end;
     export BLKGRP_keyed_fields := RECORD
         dx_ConsumerFinancialProtectionBureau.layouts.BLKGRP_keyed_fields;
-    END;
+    end;
     export BLKGRP_payload := RECORD
         dx_ConsumerFinancialProtectionBureau.layouts.BLKGRP_payload;
     end;
@@ -136,7 +132,6 @@ EXPORT layouts := module
         REAL4 here_given_mult_other;
         REAL4 here_given_hispanic;
     end;
-    
     export BLKGRP_attr_over18 convert_BLKGRP_attr_over18(original_BLKGRP_attr_over18 L,  unsigned4 rsid, unsigned4 date) := TRANSFORM
         self.GeoInd := L.field1;
         self.geo_pr_White := (REAL4) L.field2;
@@ -156,16 +151,13 @@ EXPORT layouts := module
         self.dt_vendor_first_reported := date;
         self.global_src_id := 0;
         self.is_latest := true;
-    END;
-
+    end;
     export BLKGRP_attr_over18_keyed_fields := RECORD
         dx_ConsumerFinancialProtectionBureau.layouts.BLKGRP_attr_over18_keyed_fields;
-    END;
-
+    end;
     export BLKGRP_attr_over18_payload := RECORD
         dx_ConsumerFinancialProtectionBureau.layouts.BLKGRP_attr_over18_payload;
     end;
-
     export census_surnames := record
         common;
         STRING20 name; //key
@@ -180,7 +172,6 @@ EXPORT layouts := module
         UDECIMAL4_2 pct2prace;
         UDECIMAL4_2 pcthispanic;
     end;
-
     export census_surnames convert_census_surnames(original_census_surnames L,  unsigned4 rsid, unsigned4 date) := TRANSFORM
         self.name := L.field1;
         self.name_rank := (UNSIGNED3) L.field2;
@@ -197,12 +188,10 @@ EXPORT layouts := module
         self.dt_vendor_first_reported := date;
         self.global_src_id := 0;
         self.is_latest := true;
-    END;
-
+    end;
     export census_surnames_keyed_fields := RECORD
         dx_ConsumerFinancialProtectionBureau.layouts.census_surnames_keyed_fields;
-    END;
-
+    end;
     export census_surnames_payload := RECORD
         dx_ConsumerFinancialProtectionBureau.layouts.census_surnames_payload;
     end;
