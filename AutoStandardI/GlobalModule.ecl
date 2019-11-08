@@ -1,4 +1,4 @@
-﻿import doxie,address,suppress, AutoStandardI, BIPV2, lib_thorlib;
+import doxie,address,suppress, AutoStandardI, BIPV2, lib_thorlib;
 
 export GlobalModule(boolean isFCRA = false) := module
 	export boolean OnlyCurrentLegal := FALSE : STORED('OnlyCurrentLegal');
@@ -36,6 +36,7 @@ export GlobalModule(boolean isFCRA = false) := module
 	export unsigned1 deaversion := 0 : stored('DeaVersion');
 	export unsigned1 propertyversion := 0 : stored('PropertyVersion');
 	export unsigned1 CriminalRecordVersion := 0 : stored('CriminalRecordVersion');
+	export unsigned1 EmailVersion := 1 : stored('EmailVersion');
 	export string120 unparsedfullname := '' : stored('UnParsedFullName');
 	export string120 entity2_unparsedfullname := '' : stored('entity2_UnParsedFullName');
 	export string11 ssn := '' : stored('ssn');
@@ -110,8 +111,8 @@ export GlobalModule(boolean isFCRA = false) := module
 	export boolean excludelessors := false : stored('ExcludeLessors');
 	export boolean moxievehicles := false : stored('moxievehicles');
 	export string8 DidTypeMask := '11111111' : Stored('DidTypeMask');
-  export boolean isCRS := false : STORED('IsCRS');	
-	
+  export boolean isCRS := false : STORED('IsCRS');
+
 	export unsigned1 scorethreshold := 10 : stored('ScoreThreshold');
 	export string6 ssnmask := 'NONE' : stored('SSNMask');
 	export unsigned1 dlmask := 0 : stored('DLMask');
@@ -180,29 +181,29 @@ export GlobalModule(boolean isFCRA = false) := module
 	export boolean AlwaysCompute := false : stored('AlwaysCompute');
 	export boolean Include_Bus_DPPA := false : stored('Include_Bus_DPPA');
 	export boolean IncludeNameVariations := false : stored('IncludeNameVariations');
-	export boolean IncludeAddressVariations := false : stored('IncludeAddressVariations');	
-	export boolean IncludeBusinessesAtAddress := false : stored('IncludeBusinessesAtAddress');  
-	export boolean IncludeBusinessFilings := false : stored('IncludeBusinessFilings');   
+	export boolean IncludeAddressVariations := false : stored('IncludeAddressVariations');
+	export boolean IncludeBusinessesAtAddress := false : stored('IncludeBusinessesAtAddress');
+	export boolean IncludeBusinessFilings := false : stored('IncludeBusinessFilings');
 	export boolean IncludeBankruptcies := false : stored('IncludeBankruptcies');
 	export boolean IncludeBankruptciesV2 := false : stored('IncludeBankruptciesV2');
 	export boolean IncludeSourceDocCounts := false : stored('IncludeSourceDocCounts');
-	export boolean IncludeProperties := false : stored('IncludeProperties'); 
-	export boolean IncludePropertiesV2 := false : stored('IncludePropertiesV2'); 
-	export boolean IncludeLiensJudgments := false : stored('IncludeLiensJudgments'); 
-	export boolean IncludeLiensJudgmentsV2 := false : stored('IncludeLiensJudgmentsV2'); 
+	export boolean IncludeProperties := false : stored('IncludeProperties');
+	export boolean IncludePropertiesV2 := false : stored('IncludePropertiesV2');
+	export boolean IncludeLiensJudgments := false : stored('IncludeLiensJudgments');
+	export boolean IncludeLiensJudgmentsV2 := false : stored('IncludeLiensJudgmentsV2');
 	export boolean IncludeLiens := false : stored('IncludeLiens');
 	export boolean IncludeJudgments := false : stored('IncludeJudgments');
-	export boolean IncludeMotorVehicles := false : stored('IncludeMotorVehicles');  
+	export boolean IncludeMotorVehicles := false : stored('IncludeMotorVehicles');
 	export boolean IncludeMotorVehiclesV2 := false : stored('IncludeMotorVehiclesV2');
 	export boolean IncludeWatercrafts := false : stored('IncludeWatercrafts');
 	export boolean IncludeAircrafts := false : stored('IncludeAircrafts');
-	export boolean IncludeCorporationFilings := false : stored('IncludeCorporationFilings');        
-	export boolean IncludeCorporationFilingsV2 := false : stored('IncludeCorporationFilingsV2');        
-	export boolean IncludeBusinessRegistrations := false : stored('IncludeBusinessRegistrations'); 
-	export boolean IncludeUCCFilings := false : stored('IncludeUCCFilings'); 
-	export boolean IncludeUCCFilingsV2 := false : stored('IncludeUCCFilingsV2'); 
-	export boolean IncludeDunBradstreetRecords := false : stored('IncludeDunBradstreetRecords'); 
-	export boolean IncludeAssociatedBusinesses := false : stored('IncludeAssociatedBusinesses');      
+	export boolean IncludeCorporationFilings := false : stored('IncludeCorporationFilings');
+	export boolean IncludeCorporationFilingsV2 := false : stored('IncludeCorporationFilingsV2');
+	export boolean IncludeBusinessRegistrations := false : stored('IncludeBusinessRegistrations');
+	export boolean IncludeUCCFilings := false : stored('IncludeUCCFilings');
+	export boolean IncludeUCCFilingsV2 := false : stored('IncludeUCCFilingsV2');
+	export boolean IncludeDunBradstreetRecords := false : stored('IncludeDunBradstreetRecords');
+	export boolean IncludeAssociatedBusinesses := false : stored('IncludeAssociatedBusinesses');
 	export boolean IncludeAssociatedPeople := false : stored('IncludeAssociatedPeople');
 	export boolean IncludeReversePhone := false : stored('IncludeReversePhone');
 	export boolean IncludeYellowPages := false : stored('IncludeYellowPages');
@@ -279,7 +280,7 @@ export GlobalModule(boolean isFCRA = false) := module
 	export unsigned MaxFinder := 50 : stored('MaxFinder');
 	export unsigned MaxLiensJudgmentsUCC := 50 : stored('MaxLiensJudgmentsUCC');
 	export unsigned MaxLiensJudgmentsUCCV2 := 50 : stored('MaxLiensJudgmentsUCCV2');
-	export unsigned MaxParentCompany := 50 : stored('MaxParentCompany');	
+	export unsigned MaxParentCompany := 50 : stored('MaxParentCompany');
 	export unsigned MaxRegisteredAgents := 50 : stored('MaxRegisteredAgents');
 	export unsigned MaxCompanyIDnumbers := 50 : stored('MaxCompanyIDnumbers');
 	export unsigned MaxBusinessAssociates := 100 : stored('MaxBusinessAssociates');
@@ -318,13 +319,13 @@ export GlobalModule(boolean isFCRA = false) := module
 	// The DataRestrictionMask string default was revised here so that the new
 	// Experian Credit Header default value is not restricted (i.e. position 6=0) if
 	// no DataRestrictionMask value is input.
-  // NOTE: Position 1 was left as "1" and positions 2-5 were left as blank to match the 
+  // NOTE: Position 1 was left as "1" and positions 2-5 were left as blank to match the
   // previous default value of "1" (which was the same as "1    " since it is a string).
 	export string DataRestrictionMask := AutoStandardI.Constants.DataRestrictionMask_default : STORED('DataRestrictionMask');
 	export string DataPermissionMask := AutoStandardI.Constants.DataPermissionMask_default : STORED('DataPermissionMask');
 	export boolean BpsLeadingNameMatch := false: stored('BpsLeadingNameMatch');
 	export boolean AllowFuzzyDOBMatch := true: stored('AllowFuzzyDOBMatch');
-	export boolean UseSSNFallBack := false : STORED('UseSSNFallBack');	
+	export boolean UseSSNFallBack := false : STORED('UseSSNFallBack');
 	export boolean UseUberFetch := false : STORED('UseUberFetch');
 	export boolean SearchAroundAddress := false : STORED('SearchAroundAddress');
 	export boolean cleanfmlname := false : STORED('CleanFMLName');
