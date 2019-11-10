@@ -1,4 +1,4 @@
-﻿IMPORT DueDiligence, iesp, Risk_Indicators, STD, ut;
+﻿IMPORT DueDiligence, iesp, Risk_Indicators, STD, ut, doxie;
 
 EXPORT CommonIndividual := MODULE
 
@@ -51,7 +51,8 @@ EXPORT CommonIndividual := MODULE
   END;
   
   EXPORT GetIIDSSNFlags(DATASET(DueDiligence.Layouts.Indv_Internal) inData, STRING dataRestrictionMask,
-                        UNSIGNED1 dppa, UNSIGNED1 glba, INTEGER bsVersion, UNSIGNED8 bsOptions) := FUNCTION
+                        UNSIGNED1 dppa, UNSIGNED1 glba, INTEGER bsVersion, UNSIGNED8 bsOptions,
+                        doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
       
       
       exactMatchLevel := risk_indicators.iid_constants.default_ExactMatchLevel;
@@ -78,7 +79,8 @@ EXPORT CommonIndividual := MODULE
                                                     SELF := LEFT.individual;
                                                     SELF := [];));	
 
-      withSSNFlags := risk_indicators.iid_getSSNFlags(GROUP(ssnFlagsPrepseq, seq), dppa, glba, FALSE, TRUE, exactMatchLevel, dataRestrictionMask, bsVersion, bsOptions);	
+      withSSNFlags := risk_indicators.iid_getSSNFlags(GROUP(ssnFlagsPrepseq, seq), dppa, glba, FALSE, TRUE, exactMatchLevel, dataRestrictionMask, bsVersion, bsOptions,
+                                                                                              mod_access := mod_access);	
 		
       RETURN withSSNFlags;
   END;

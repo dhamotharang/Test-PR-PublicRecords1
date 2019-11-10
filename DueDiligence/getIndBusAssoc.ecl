@@ -1,4 +1,4 @@
-﻿IMPORT BIPv2, Business_Risk_BIP, DueDiligence, PAW, STD;
+﻿IMPORT BIPv2, Business_Risk_BIP, DueDiligence, PAW, STD, Doxie, Suppress;
 
 /*
 	Following Keys being used:
@@ -7,7 +7,8 @@
 */
 EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
                       Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                      BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+                      BIPV2.mod_sources.iParams linkingOptions,
+                      doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
     withPAW := JOIN(individuals, PAW.Key_Did,
                     KEYED(LEFT.inquiredDID = RIGHT.did), 
@@ -21,9 +22,10 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
 
 
 
-    pawBusiness := JOIN(withPAW, PAW.Key_contactid,
+    pawBusiness_unsuppressed := JOIN(withPAW, PAW.Key_contactid,
                         KEYED(LEFT.contactID = RIGHT.contact_id),
-                        TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED4 historyDate, STRING8 dateFirstSeen, STRING8 dateLastSeen},
+                        TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED4 historyDate, STRING8 dateFirstSeen, STRING8 dateLastSeen, UNSIGNED4 global_sid},
+                                  SELF.global_sid := RIGHT.global_sid;
                                   SELF.seq := LEFT.seq;
                                   SELF.ultID := RIGHT.ultID;
                                   SELF.orgID := RIGHT.orgID;
@@ -35,6 +37,7 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
                                   SELF := [];),
                         ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));
                         
+    pawBusiness := Suppress.MAC_SuppressSource(pawBusiness_unsuppressed, mod_access);
                         
     //clean the dates
     pawCleanDates := DueDiligence.Common.CleanDatasetDateFields(pawBusiness(seleID > 0), 'dateFirstSeen, dateLastSeen');
@@ -58,7 +61,7 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
                                                               
                                                               
     //get all associated business details, returns DS of DueDiligence.LayoutsInternal.IndBusAssociations                                                          
-    allBusiness := DueDiligence.getIndBusAssocBus(convertToBusiness, options, linkingOptions);     
+    allBusiness := DueDiligence.getIndBusAssocBus(convertToBusiness, options, linkingOptions, mod_access);     
 
                                     
     //add the inquired's did back in

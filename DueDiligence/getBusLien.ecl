@@ -1,11 +1,11 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, MDR, LiensV2, Risk_Indicators, UT, STD, iesp;
+﻿IMPORT BIPV2, Business_Risk_BIP, MDR, LiensV2, Risk_Indicators, UT, STD, iesp, doxie, Suppress;
  
 EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,  
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,           //***search level options set to SELEID
 											 BIPV2.mod_sources.iParams linkingOptions,                     //***These are all your DRM, GLBA, DPPA options
 											 boolean ReportIsRequested = FALSE, 
-											 boolean DebugMode = FALSE 
-											 )  := FUNCTION
+											 boolean DebugMode = FALSE,
+                                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END)  := FUNCTION
 
 	// ------                                                                             ------
 	// ------ Get the LinkIDs for this Business                                          ------
@@ -53,12 +53,12 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------ Get Liens main records.                                                            ------
 	// ------                                                                                    ------
 	// ------                                                                                    ------
-	BusinessLiens_main :=
+	BusinessLiens_main_unsuppressed :=
 		JOIN(
 			BusinessLiensTMSIDSeq_Filtered, LiensV2.key_liens_main_ID,
 			KEYED( LEFT.tmsid = RIGHT.tmsid AND
 			       LEFT.rmsid = RIGHT.rmsid),
-			TRANSFORM(DueDiligence.LayoutsInternal.layout_liens_judgments,
+			TRANSFORM({unsigned4 global_sid, DueDiligence.LayoutsInternal.layout_liens_judgments},
 			  /* create a new intermediate resultset */ 
 			  /* populate the data from the LEFT     */  
 				SELF.seq                                 := LEFT.seq,
@@ -71,6 +71,7 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 				SELF.date_first_seen                     := (STRING)LEFT.date_first_seen,
 				SELF.date_last_seen                      := (STRING)LEFT.date_last_seen,
 				/* populate the data from RIGHT     */   
+        SELF.global_sid                                        := RIGHT.global_sid;
         SELF.filing_jurisdiction                 := RIGHT.filing_jurisdiction,
         SELF.filing_number                       := RIGHT.filing_number,
 				SELF.filing_type_desc                    := RIGHT.filing_type_desc,
@@ -91,7 +92,7 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 			INNER,
 			ATMOST(DueDiligence.Constants.MAX_ATMOST)
 		);            /*   END the JOIN       */ 
-		
+    BusinessLiens_main := Suppress.Suppress_ReturnOldLayout(BusinessLiens_main_unsuppressed, mod_access, DueDiligence.LayoutsInternal.layout_liens_judgments);
 	// ----                                                                                 ------	
 	// ---- Sort the liens and judgement records in seq , TMSID and date sequence           ------
 	// ----                                                                                 ------
@@ -253,7 +254,7 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 // -----                                                                                     -----
 	UpdateBusnLiensWithReport  := IF(ReportIsRequested, 
                                   /* Pass both released and unreleased liens to the business report  */ 
-                                  DueDiligence.reportBusLien(Update_BusnLiens, BusinessLiens_categorized, DebugMode),
+                                  DueDiligence.reportBusLien(Update_BusnLiens, BusinessLiens_categorized, DebugMode, mod_access),
 																			             /* ELSE */ 
 																			 Update_BusnLiens); 
 		

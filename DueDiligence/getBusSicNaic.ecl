@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, CalBus, DCAV2, DueDiligence, EBR, FBNv2, OSHAIR, YellowPages, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, CalBus, DCAV2, DueDiligence, EBR, FBNv2, OSHAIR, YellowPages, STD, Doxie;
 
 /*
 	Following Keys being used:
@@ -12,7 +12,8 @@
 EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 											Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
 											BIPV2.mod_sources.iParams linkingOptions,
-											BOOLEAN includeReportData) := FUNCTION
+											BOOLEAN includeReportData,
+                                            doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
 	linkIDs := DueDiligence.CommonBusiness.GetLinkIDs(indata);
@@ -55,7 +56,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 
 	// ---------------- DCA - Directory of Corporate Affiliations AKA LNCA ------------------
-	dcaRaw := DCAV2.Key_LinkIds.kFetch2(linkIDs, ,
+	dcaRaw := DCAV2.Key_LinkIds.kFetch2(linkIDs, mod_access,
 																			 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																			 0, //ScoreThreshold --> 0 = Give me everything
 																			 Business_Risk_BIP.Constants.Limit_Default,
@@ -116,7 +117,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													
 													
 	// ---------------- Ficticious Business Name ---------------------
-	fbnRaw := FBNv2.Key_LinkIds.kFetch2(linkIDs, ,
+	fbnRaw := FBNv2.Key_LinkIds.kFetch2(linkIDs, mod_access,
 																			 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																			 0, //ScoreThreshold --> 0 = Give me everything
 																			 Business_Risk_BIP.Constants.Limit_Default,

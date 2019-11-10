@@ -1,9 +1,10 @@
-﻿IMPORT DueDiligence, iesp, liensv2, riskwise;
+﻿IMPORT DueDiligence, iesp, liensv2, riskwise, Doxie, Suppress;
 
 EXPORT reportBusLienDebtorCreditor( 
-                                    DATASET(DueDiligence.LayoutsInternal.layout_liens_judgments_categorized) UnreleasedLiens,
-											              boolean DebugMode = FALSE
-                                   ) := FUNCTION
+                DATASET(DueDiligence.LayoutsInternal.layout_liens_judgments_categorized) UnreleasedLiens,
+                boolean DebugMode = FALSE,
+                doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+                ) := FUNCTION
 
   // ------                                                                    ------
   // ------  Liens in this list should have already been short listed prior to ------
@@ -14,12 +15,13 @@ EXPORT reportBusLienDebtorCreditor(
   // ------                                                                   ------
   // ------ Pick up DEBTOR/CREDITOR information regarding this lien           ------
   // ------                                                                   ------  
-  liensPartyCREDITORDEBTOR := JOIN (UnreleasedLiens, liensv2.key_liens_party_id, 
+  liensPartyCREDITORDEBTOR_unsuppressed := JOIN (UnreleasedLiens, liensv2.key_liens_party_id, 
                                     keyed(left.tmsid=right.tmsid) AND 
                                    (unsigned3)(RIGHT.date_first_seen[1..6]) < left.HistoryDate AND 
                                    (unsigned)RIGHT.date_first_seen <> 0 AND	                                                // date first seen was blank on some records
                                     right.name_type IN DueDiligence.Constants.PARTY_SET,                                    // ***Pick up DEBTOR AND CREDITOR records only         
-                                    TRANSFORM(DueDiligence.LayoutsInternalReport.BusLiensDebtorsCreditorsFlatLayout,
+                                    TRANSFORM({UNSIGNED4 global_sid, DueDiligence.LayoutsInternalReport.BusLiensDebtorsCreditorsFlatLayout},
+                                               SELF.global_sid     := RIGHT.global_sid;
                                                SELF.seq      := LEFT.seq,       //*** This is the sequence number of the Inquired Business (or the Parent)
                                                SELF.ultid    := LEFT.ultid,
                                                SELF.orgid    := LEFT.orgid,
@@ -53,6 +55,7 @@ EXPORT reportBusLienDebtorCreditor(
                                     LEFT OUTER,                                                       //***Keep all the lien records even if there are no Debtors found
                                     ATMOST(keyed(left.tmsid=right.tmsid), riskwise.max_atmost));
  
+  liensPartyCREDITORDEBTOR := Suppress.Suppress_ReturnOldLayout(liensPartyCREDITORDEBTOR_unsuppressed, mod_access, DueDiligence.LayoutsInternalReport.BusLiensDebtorsCreditorsFlatLayout);
  
   SortLiensParty  := SORT(liensPartyCREDITORDEBTOR, seq, ultid, orgid, seleid, did, tmsid, rmsid, -date_last_seen); 
   
