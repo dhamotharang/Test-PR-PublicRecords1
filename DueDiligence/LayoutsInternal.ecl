@@ -337,10 +337,13 @@ EXPORT LayoutsInternal := MODULE
 
   EXPORT IndCrimLayoutFinal := RECORD
     InternalSeqAndIdentifiersLayout;
+    UNSIGNED4 historyDate;
     STRING sort_key;
-    STRING sort_eventTypeCodeFull;
-    UNSIGNED1 temp_chargeLevelCalcWeight;
-    UNSIGNED temp_category;
+    UNSIGNED category;
+    BOOLEAN currIncar;
+    BOOLEAN currParole;
+    BOOLEAN currProbation;
+    BOOLEAN prevIncar;
     DueDiligence.Layouts.CriminalOffenses
   END;
 
@@ -348,28 +351,20 @@ EXPORT LayoutsInternal := MODULE
     InternalSeqAndIdentifiersLayout;
     UNSIGNED4 historyDate;
 
+
     //misc additional fields
     STRING offenderKey;
     STRING sort_key;
-    STRING sort_eventTypeCodeFull;
-    STRING8 temp_date;
+    STRING8 temp_offenseDate;
     UNSIGNED temp_category;
-    UNSIGNED4 temp_calcdFirstSeenDate;
-    STRING8 temp_firstReportedActivity; 
+    UNSIGNED4 temp_calcdFirstSeenDate; 
     BOOLEAN temp_previouslyIncarcerated;
     STRING1 temp_offenseScore;
     STRING5 temp_courtOffLevel;
-
-    //event type category hits
-    BOOLEAN attr_legalEventCat9;
-    BOOLEAN attr_legalEventCat8;
-    BOOLEAN attr_legalEventCat7;
-    BOOLEAN attr_legalEventCat6;
-    BOOLEAN attr_legalEventCat5;
-    BOOLEAN attr_legalEventCat4;
-    BOOLEAN attr_legalEventCat3;
-    BOOLEAN attr_legalEventCat2;
-    BOOLEAN attr_legalEventCat0;
+    UNSIGNED4 sentenceEndDate;
+    UNSIGNED4 incarAdmitDate;
+    STRING parole;
+    STRING probation;
 
     //Top Level Data
     //Remove duplicate fields that are in the source detail - will be rolled up
@@ -380,6 +375,7 @@ EXPORT LayoutsInternal := MODULE
 
     //Party Names
     STRING120 partyName;
+    DATASET({STRING120 name}) uniquePartyNames;
   END;
 
 
