@@ -1730,7 +1730,7 @@ bsData := if(bsversion >= 52,
 // gateways := DATASET([],risk_indicators.Layout_Gateways_In);	// net acuity is not used for version 41 attributes in the shell
 ipdata := DATASET([],riskwise.Layout_IP2O);	// net acuity is not used for version 41 attributes in the shell
 // fdAttributesV2 := Models.getFDAttributes(final, iid, '', gateways, dppa, 0, '');	// hardcoding glb = 0 here as it is not really needed for anything
-fdAttributesV2 := Models.getFDAttributes(bsData, iid, '', ipdata);
+fdAttributesV2 := Models.getFDAttributes(bsData, iid, '', ipdata, mod_access := mod_access);
 
 risk_indicators.Layout_Boca_Shell addFDattributesV2(bsData le, fdAttributesV2 ri) := TRANSFORM
 	self.fdAttributesv2 := ri.version2;
