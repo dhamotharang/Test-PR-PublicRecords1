@@ -1,4 +1,4 @@
-﻿import _Control, paw, riskwise, ut, mdr, fcra, risk_indicators, doxie, Suppress;
+﻿import _Control, paw, riskwise, ut, mdr, fcra, risk_indicators, doxie, Suppress, data_services;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Employment(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_employment, 
@@ -6,6 +6,8 @@ export Boca_Shell_Employment(GROUPED DATASET(risk_indicators.layout_bocashell_ne
 															boolean isPreScreen, 
 															integer bsVersion,
 															doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
 patw := record
 	clam_pre_employment.seq;
@@ -100,13 +102,10 @@ pawfile_full_nonfcra_thor := join(distribute(with_paw_did, hash64(contact_id)),
 						left outer,
 						atmost(riskwise.max_atmost), keep(1000), LOCAL);
 	
-pawfile_suppress_roxie := Suppress.MAC_SuppressSource(pawfile_full_nonfcra_roxie, mod_access);
-pawfile_full_formatted_roxie := PROJECT(pawfile_suppress_roxie, TRANSFORM(patw,
-                                                  SELF := LEFT));
-																									
-pawfile_suppress_thor := Suppress.MAC_SuppressSource(pawfile_full_nonfcra_thor, mod_access);
-pawfile_full_formatted_thor := PROJECT(pawfile_suppress_thor, TRANSFORM(patw,
-                                                  SELF := LEFT));
+pawfile_full_formatted_roxie := Suppress.Suppress_ReturnOldLayout(pawfile_full_nonfcra_roxie, mod_access, patw, data_environment);
+																					
+pawfile_full_formatted_thor := Suppress.Suppress_ReturnOldLayout(pawfile_full_nonfcra_thor, mod_access, patw, data_environment);
+
 																									
 #IF(onThor)
 	pawfile_full_nonfcra := group(sort(pawfile_full_formatted_thor,seq),seq);
@@ -249,7 +248,7 @@ sorted_pawfile_full := sort(grouped_pawfile, seq, -(unsigned)bdid, -last_seen_da
 
 rolled_paw := rollup(sorted_pawfile_full, true, roll_paw(left, right));
 
-dead_business_ct_per_bdid := table(grouped_pawfile, {seq, bdid, dead_business_count := count(group, dead_business_ct=1)}, 
+dead_business_ct_per_bdid := table(UNGROUP(grouped_pawfile), {seq, bdid, dead_business_count := count(group, dead_business_ct=1)}, 
 											seq, bdid);
 
 dead_business_ct_per_seq := table(dead_business_ct_per_bdid, {seq, dead_business_ct := count(group, dead_business_count>0)}, 

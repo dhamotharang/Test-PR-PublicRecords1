@@ -1,4 +1,4 @@
-﻿import _Control, gong,suppress, riskwise, address, ut,doxie, FCRA,gateway, risk_indicators;
+﻿import _Control, gong,suppress, riskwise, ut,doxie, FCRA,gateway, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
 // this function will be used on Neutral roxie only
@@ -23,24 +23,26 @@ export ADL_Based_Modeling_IID_Function(DATASET (risk_indicators.layout_input) in
 																		string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 																		unsigned8 BSOptions=0,
 																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
-                                    string100 IntendedPurpose='',
-                                     unsigned1 LexIdSourceOptout = 1,
-                                    string TransactionID = '',
-                                    string BatchUID = '',
-                                    unsigned6 GlobalCompanyId = 0
+																		string100 IntendedPurpose='',
+																		unsigned1 LexIdSourceOptout = 1,
+																		string TransactionID = '',
+																		string BatchUID = '',
+																		unsigned6 GlobalCompanyId = 0
 																		 ) := function		
-SHARED MOD_Access := MODULE(Doxie.IDataAccess)
-		 
+
+mod_access := MODULE(Doxie.IDataAccess)
+		EXPORT glb := GLB_Purpose;
+		EXPORT dppa := DPPA_Purpose;
 		EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
 		EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
 		EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
-		END;
+END;
     
 // ====================================================================
 // step 1.  Get the DID
 // ====================================================================
 	append_best := 0;	// will not be appending best here
-	with_DID_roxie := risk_indicators.iid_getDID_prepOutput(indata, DPPA_Purpose, GLB_Purpose, isFCRA, 2 ,DataRestriction, append_best, gateways, BSOptions);
+	with_DID_roxie := risk_indicators.iid_getDID_prepOutput(indata, DPPA_Purpose, GLB_Purpose, isFCRA, 2 ,DataRestriction, append_best, gateways, BSOptions, mod_access);
 	with_DID_thor := risk_indicators.iid_getDID_prepOutput_THOR(indata, DPPA_Purpose, GLB_Purpose, isFCRA, 2 ,DataRestriction, append_best, gateways, BSOptions); 
 	
   #IF(onThor)
@@ -55,7 +57,12 @@ SHARED MOD_Access := MODULE(Doxie.IDataAccess)
 // step 2.  append most recent address and when available, populate blank ssn and dob																								
 // ====================================================================
 
-	with_header := risk_indicators.iid_getHeader(with_DID, DPPA_Purpose, GLB_Purpose, isFCRA, ln_branded, bsversion := BSversion, dataRestriction:=DataRestriction, BSOptions:=BSOptions);
+	with_header := risk_indicators.iid_getHeader(with_DID, DPPA_Purpose, GLB_Purpose, isFCRA, ln_branded, 
+																					bsversion := BSversion, dataRestriction:=DataRestriction, 
+																					BSOptions:=BSOptions, LexIdSourceOptout := LexIdSourceOptout, 
+																					TransactionID := TransactionID, 
+																					BatchUID := BatchUID, 
+																					GlobalCompanyID := GlobalCompanyID);
 	// output(with_header, named('with_header'));
 
 	DoAddressAppend := Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IncludeAddressAppend, BSOptions);
@@ -443,10 +450,11 @@ iid_results := risk_indicators.InstantID_Function(iid_prep,
 										bsversion,
 										in_DataRestriction := DataRestriction,
 										in_BSOptions := BSOptions,
-                    in_IntendedPurpose := IntendedPurpose,LexIdSourceOptout := LexIdSourceOptout, 
-                    TransactionID := TransactionID, 
-                    BatchUID := BatchUID, 
-                    GlobalCompanyID := GlobalCompanyID);
+										in_IntendedPurpose := IntendedPurpose,
+										LexIdSourceOptout := LexIdSourceOptout, 
+										TransactionID := TransactionID, 
+										BatchUID := BatchUID, 
+										GlobalCompanyID := GlobalCompanyID);
 
 
 iid_results_with_flags := group( sort(
