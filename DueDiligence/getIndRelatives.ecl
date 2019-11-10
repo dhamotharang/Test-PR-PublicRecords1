@@ -1,7 +1,8 @@
-﻿IMPORT Business_Risk_BIP, DueDiligence, Header, Relationship, RelationshipIdentifier_Services, RiskWise;
+﻿IMPORT Business_Risk_BIP, DueDiligence, Header, Relationship, RelationshipIdentifier_Services, RiskWise, Doxie;
 
 EXPORT getIndRelatives(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
-                       Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
+                       Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+                       doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 												
 		
     
@@ -71,7 +72,7 @@ EXPORT getIndRelatives(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                 SELF.indvType := IF(RIGHT.title IN Header.relative_titles.set_Spouse, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);
                                 SELF := [];));
 
-    bestRelativeData := DueDiligence.getIndInformation(options).GetIndividualBestDataWithLexID(relatives);
+    bestRelativeData := DueDiligence.getIndInformation(options, mod_access).GetIndividualBestDataWithLexID(relatives);
 
 
     slimmedRolledSpouseData := getListOfRelations(bestRelativeData, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);

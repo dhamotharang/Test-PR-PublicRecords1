@@ -8,12 +8,20 @@ EXPORT DueDiligenceServiceMain(DATASET(DueDiligence.LayoutsInternal.SharedInput)
                                iesp.duediligenceshared.t_DDRAttributesAdditionalInfo additionalInfo,
                                DATASET({INTEGER4 seq, iesp.duediligenceattributes.t_DueDiligenceAttributesRequest}) rawReqInputWithSeq,
                                BOOLEAN intermidatesRequested = FALSE,
-                               BOOLEAN debugMode = FALSE) := FUNCTION   
+                               BOOLEAN debugMode = FALSE,
+                               unsigned1 LexIdSourceOptout = 1,
+                               string TransactionID = '',
+                               string BatchUID = '',
+                               unsigned6 GlobalCompanyId = 0) := FUNCTION   
       
       
       //********************************************************PERSON ATTRIBUTES HERE**********************************************************
       SHARED mac_getPersonAttributes() := FUNCTIONMACRO
-          consumerResults := DueDiligence.getIndAttributes(inData, ssnMask, FALSE, busOptions, busLinkingOptions, debugMode);
+          consumerResults := DueDiligence.getIndAttributes(inData, ssnMask, FALSE, busOptions, busLinkingOptions, debugMode,
+                                                                                                  LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                  TransactionID := TransactionID, 
+                                                                                                  BatchUID := BatchUID, 
+                                                                                                  GlobalCompanyID := GlobalCompanyID);
 		 
           indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
           indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);
@@ -30,7 +38,11 @@ EXPORT DueDiligenceServiceMain(DATASET(DueDiligence.LayoutsInternal.SharedInput)
       
       //********************************************************BUSINESS ATTRIBUTES HERE********************************************************
       SHARED mac_getBusinessAttributes() := FUNCTIONMACRO
-          businessResults := DueDiligence.getBusAttributes(inData, ssnMask, FALSE, busOptions, busLinkingOptions, debugMode);
+          businessResults := DueDiligence.getBusAttributes(inData, ssnMask, FALSE, busOptions, busLinkingOptions, debugMode,
+                                                                                                  LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                  TransactionID := TransactionID, 
+                                                                                                  BatchUID := BatchUID, 
+                                                                                                  GlobalCompanyID := GlobalCompanyID);
 
           busIndex := DueDiligence.CommonQuery.GetBusinessAttributes(businessResults);
           busIndexHits := DueDiligence.CommonQuery.GetBusinessAttributeFlags(businessResults);

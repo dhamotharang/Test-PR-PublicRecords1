@@ -1,16 +1,18 @@
-﻿IMPORT BIPv2, DueDiligence, Watercraft;
+﻿IMPORT BIPv2, DueDiligence, Watercraft, Doxie, Suppress;
 
 /*
 	Following Keys being used:
 			Watercraft.key_watercraft_wid
 */
-EXPORT getSharedWatercraft(DATASET(DueDiligence.LayoutsInternal.WatercraftSlimLayout) inWatercraft) := FUNCTION
+EXPORT getSharedWatercraft(DATASET(DueDiligence.LayoutsInternal.WatercraftSlimLayout) inWatercraft,
+                                                      doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
    
-   watercraftDetails := JOIN(inWatercraft, watercraft.key_watercraft_wid(),
+   watercraftDetails_unsuppressed := JOIN(inWatercraft, watercraft.key_watercraft_wid(),
                              KEYED(LEFT.stateOrigin = RIGHT.state_origin AND
                                    LEFT.watercraftKey = RIGHT.watercraft_key AND
                                    LEFT.sequenceKey = RIGHT.sequence_key),		 
-                             TRANSFORM(DueDiligence.LayoutsInternal.WatercraftSlimLayout,
+                             TRANSFORM({unsigned4 global_sid, DueDiligence.LayoutsInternal.WatercraftSlimLayout},
+                                       SELF.global_sid := RIGHT.global_sid;
                                        SELF.year := RIGHT.model_year;
                                        SELF.model := RIGHT.watercraft_model_description;
                                        SELF.make := RIGHT.watercraft_make_description;
@@ -39,6 +41,8 @@ EXPORT getSharedWatercraft(DATASET(DueDiligence.LayoutsInternal.WatercraftSlimLa
                              ATMOST(LEFT.watercraftKey = RIGHT.watercraft_key AND
                                     LEFT.stateOrigin = RIGHT.state_origin AND  
                                     LEFT.sequenceKey = RIGHT.sequence_key, DueDiligence.Constants.MAX_ATMOST_1000));
+                                    
+    watercraftDetails := Suppress.Suppress_ReturnOldLayout(watercraftDetails_unsuppressed, mod_access, DueDiligence.LayoutsInternal.WatercraftSlimLayout);
     
     slimSort := SORT(watercraftDetails, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, stateOrigin, watercraftKey, -sequenceKey);
     waterRoll := ROLLUP(slimSort,

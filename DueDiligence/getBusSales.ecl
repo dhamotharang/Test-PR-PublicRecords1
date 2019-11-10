@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, EBR;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, EBR, Doxie;
 
 /*
 	Following Keys being used:
@@ -7,12 +7,13 @@
 
 EXPORT getBusSales(DATASET(DueDiligence.Layouts.Busn_Internal) busInfo,
 											Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-											BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+											BIPV2.mod_sources.iParams linkingOptions,
+                                            doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	linkIDs := DueDiligence.CommonBusiness.GetLinkIDs(busInfo);
 		
 	// ---------------- EBR - Experian Business Records ------------------
-	ebr5600Raw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(linkIDs, ,
+	ebr5600Raw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(linkIDs, mod_access,
 																															 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																															 0, //ScoreThreshold --> 0 = Give me everything
 																															 linkingOptions,
