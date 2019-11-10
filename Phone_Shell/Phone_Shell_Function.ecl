@@ -9,7 +9,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 																																						 	UNSIGNED1 PhoneRestrictionMaskTemp = Phone_Shell.Constants.PRM.AllPhones,
 																																						 	UNSIGNED3 MaxPhones = Phone_Shell.Constants.Default_MaxPhones,
 																																						 	UNSIGNED3 InsuranceVerificationAgeLimit = Phone_Shell.Constants.Default_InsuranceVerificationAgeLimit,
-																																							 UNSIGNED2 PhoneShellVersion = 10, // use 2-digit notation (10 = phone shell version 1.0)
+																																							 UNSIGNED2 PhoneShellVersion = 21, // use 2-digit notation (10 = phone shell version 1.0)
 																																						 	STRING2 SPIIAccessLevel = Phone_Shell.Constants.Default_SPIIAccessLevel, // 5A or 5B - used in TransUnion Gateway
 																																						 	STRING30 VerticalMarket = '', // Example: 'Receivables Management' restricts certain Gateways
 																																						 	STRING30 IndustryClass = '', // Example: 'UTILI' restricts the Utility Data Search
