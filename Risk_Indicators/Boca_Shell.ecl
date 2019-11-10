@@ -186,7 +186,7 @@ gateways_in := Gateway.Configuration.Get();
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(
-  bsversion >= 55 and stringlib.StringToLowerCase(trim(le.servicename)) = Gateway.Constants.ServiceName.ThreatMetrix => le.url, // TMX allowed for shell 5.5 and higher
+	bsversion >= 55 and stringlib.StringToLowerCase(trim(le.servicename)) in [Gateway.Constants.ServiceName.ThreatMetrix,Gateway.Constants.ServiceName.ThreatMetrix_test]  => le.url, // TMX allowed for shell 5.5 and higher
   bsversion >= 50 and stringlib.StringToLowerCase(trim(le.servicename))in[Gateway.Constants.ServiceName.InsurancePhoneHeader, Gateway.Constants.ServiceName.DeltaInquiry] => le.url, // insurance phones gateway allowed if shell version 50 or higher
                  le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
                   '');
