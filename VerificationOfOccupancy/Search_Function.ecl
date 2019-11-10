@@ -5,24 +5,26 @@
 	Riskwise, Risk_Indicators, ut, Gateway, VerificationOfOccupancy,address, Relationship, Std;
 
 	EXPORT Search_Function(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOIn) VOO_In, 
-																							string50 DataRestrictionMask, 
-																							integer glba,  
-																							integer dppa,
-																							boolean isUtility,
-																							string9 AttributesVersion,
-																							boolean IncludeModel,
-																							string50 DataPermissionMask,
-																							boolean IncludeReport = FALSE, 
-																							boolean PAR_request = FALSE,
-												unsigned1 LexIdSourceOptout = 1,
-		string TransactionID = '',
-		string BatchUID = '',
-		unsigned6 GlobalCompanyId = 0) := MODULE
-	  SHARED MOD_Access := MODULE(Doxie.IDataAccess)
-		 
-		EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
-		EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
-		EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+													string50 DataRestrictionMask, 
+													integer glba,  
+													integer dppa,
+													boolean isUtility,
+													string9 AttributesVersion,
+													boolean IncludeModel,
+													string50 DataPermissionMask,
+													boolean IncludeReport = FALSE, 
+													boolean PAR_request = FALSE,
+													unsigned1 LexIdSourceOptout = 1,
+													string TransactionID = '',
+													string BatchUID = '',
+													unsigned6 GlobalCompanyId = 0) := MODULE
+		
+		SHARED MOD_Access := MODULE(Doxie.IDataAccess)
+			EXPORT glb := glba;
+			EXPORT dppa := ^.dppa;
+			EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+			EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+			EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
 		END;
 																							
 
@@ -103,7 +105,7 @@
 	// Get the DID and Append the Input Account Number
 	// ********************************************************************
 		SHARED with_DID := JOIN(VOO_In, 
-										ungroup(risk_indicators.iid_getDID_prepOutput(iid_prep, DPPA, GLBA, isFCRA, 50, DataRestrictionMask, append_best, gateways, BSOptions)), 
+										ungroup(risk_indicators.iid_getDID_prepOutput(iid_prep, DPPA, GLBA, isFCRA, 50, DataRestrictionMask, append_best, gateways, BSOptions, mod_access)), 
 										LEFT.seq = RIGHT.seq, TRANSFORM(Risk_Indicators.Layout_Output, SELF.Account := LEFT.AcctNo; SELF := RIGHT));;
 		
 	// ********************************************************************

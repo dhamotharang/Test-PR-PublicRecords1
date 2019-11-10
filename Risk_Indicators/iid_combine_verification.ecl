@@ -1,4 +1,4 @@
-﻿import _Control, ut, did_add, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR;
+﻿import _Control, ut, did_add, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR, data_services, Suppress;
 onThor := _Control.Environment.OnThor;
 
 export iid_combine_verification(grouped dataset(risk_indicators.Layout_Output) ssnrecs, 
@@ -6,8 +6,10 @@ export iid_combine_verification(grouped dataset(risk_indicators.Layout_Output) s
 								boolean from_IT1O=false, string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel,
 								boolean isFCRA, unsigned8 BSOptions,
 								integer bsVersion, string50 DataPermission=iid_constants.default_DataPermission, 
-								string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction) := function	
+								string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
+								doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function	
 								
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
 ExactAddrRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactAddrMatch]=iid_constants.sTrue;								
 ExactAddrZip5andPrimRange := ExactMatchLevel[risk_indicators.iid_constants.posExactAddrZip5andPrimRange]=iid_constants.sTrue;
@@ -1210,7 +1212,8 @@ with_advo := if(isFCRA or datarestriction[iid_constants.posADVORestriction] = '1
 
 did_deceased_key := if(isfcra, doxie.key_death_masterV2_ssa_DID_fcra, doxie.key_death_masterV2_ssa_DID);
 		
-Risk_Indicators.Layout_Output getDIDdeceased(with_advo le, 	did_deceased_key ri) := TRANSFORM
+{Risk_Indicators.Layout_Output, UNSIGNED4 global_sid} getDIDdeceased(with_advo le, 	did_deceased_key ri) := TRANSFORM
+																	SELF.global_sid := ri.global_sid;
 																	SELF.DIDdeceased := ri.l_did<>0;
 																	SELF.DIDdeceasedDate := (UNSIGNED)ri.dod8;
 																	SELF.DIDdeceasedDOB := (UNSIGNED)ri.dob8;
@@ -1219,14 +1222,16 @@ Risk_Indicators.Layout_Output getDIDdeceased(with_advo le, 	did_deceased_key ri)
 																	SELF := le;
 END;
 	
-withDIDdeceased_nonfcra_roxie := JOIN(with_advo, did_deceased_key, 
+withDIDdeceased_nonfcra_roxie_unsuppressed := JOIN(with_advo, did_deceased_key, 
 												LEFT.did<>0 AND KEYED(LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
 												getDIDdeceased(LEFT, RIGHT),	
 												LEFT OUTER, ATMOST(riskwise.max_atmost), KEEP(100));
 
-withDIDdeceased_nonfcra_thor := JOIN(distribute(with_advo, hash64(did)), 
+withDIDdeceased_nonfcra_roxie := Suppress.Suppress_ReturnOldLayout(withDIDdeceased_nonfcra_roxie_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
+
+withDIDdeceased_nonfcra_thor_unsuppressed := JOIN(distribute(with_advo, hash64(did)), 
 												distribute(pull(did_deceased_key), hash64(l_did)), 
 												LEFT.did<>0 AND (LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
@@ -1234,26 +1239,32 @@ withDIDdeceased_nonfcra_thor := JOIN(distribute(with_advo, hash64(did)),
 												getDIDdeceased(LEFT, RIGHT),	
 												LEFT OUTER, ATMOST(LEFT.did=RIGHT.l_did, riskwise.max_atmost), KEEP(100), LOCAL);
 										
+withDIDdeceased_nonfcra_thor := Suppress.Suppress_ReturnOldLayout(withDIDdeceased_nonfcra_thor_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
+
 #IF(onThor)
 	withDIDdeceased_nonfcra := group(sort(distribute(withDIDdeceased_nonfcra_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
 #ELSE
 	withDIDdeceased_nonfcra := withDIDdeceased_nonfcra_roxie;
 #END
 
-withDIDdeceased_FCRA_roxie := JOIN(with_advo, did_deceased_key, 
+withDIDdeceased_FCRA_roxie_unsuppressed := JOIN(with_advo, did_deceased_key, 
 												LEFT.did<>0 AND KEYED(LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
 													getDIDdeceased(LEFT,RIGHT),												
 												LEFT OUTER, ATMOST(riskwise.max_atmost), KEEP(100));
 
-withDIDdeceased_FCRA_thor := JOIN(distribute(with_advo, hash64(did)), 
+withDIDdeceased_FCRA_roxie := Suppress.Suppress_ReturnOldLayout(withDIDdeceased_FCRA_roxie_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
+
+withDIDdeceased_FCRA_thor_unsuppressed := JOIN(distribute(with_advo, hash64(did)), 
 												distribute(pull(did_deceased_key), hash64(l_did)), 
 												LEFT.did<>0 AND (LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
 													getDIDdeceased(LEFT,RIGHT),												
 												LEFT OUTER, ATMOST(LEFT.did=RIGHT.l_did, riskwise.max_atmost), KEEP(100), LOCAL);
+
+withDIDdeceased_FCRA_thor := Suppress.Suppress_ReturnOldLayout(withDIDdeceased_FCRA_thor_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
 
 #IF(onThor)
 	withDIDdeceased_FCRA := group(sort(distribute(withDIDdeceased_FCRA_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);

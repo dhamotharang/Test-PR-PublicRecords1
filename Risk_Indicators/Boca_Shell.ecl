@@ -1,4 +1,4 @@
-﻿import ut, riskwise, risk_indicators, AutoStandardI, doxie, PublicRecords_KEL, Gateway;
+﻿import ut, riskwise, risk_indicators, AutoStandardI, doxie, Gateway;
 
 export Boca_Shell := MACRO
 
@@ -105,10 +105,10 @@ boolean   include_ofac       := false    : stored('IncludeOfac');
 boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
 
 //CCPA fields
-unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
-string TransactionID := '' : stored ('_TransactionId');
-string BatchUID := '' : stored('_BatchUID');
-unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 rec := record
   unsigned4 seq;

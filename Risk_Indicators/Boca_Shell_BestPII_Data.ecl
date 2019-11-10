@@ -173,7 +173,7 @@ with_best_inquiries := join(with_match_flags, best_inquiries, left.seq=right.seq
 		self := left), left outer, keep(1));
 
 // get the flags and counts for the rest of the best_flags section
-IID_best_flags := risk_indicators.get_IID_Best_Flags(iid_prep, GLBPurpose, DPPApurpose, isFCRA, datarestrictionmask, datapermissionmask, bsversion, bsoptions);
+IID_best_flags := risk_indicators.get_IID_Best_Flags(iid_prep, GLBPurpose, DPPApurpose, isFCRA, datarestrictionmask, datapermissionmask, bsversion, bsoptions, mod_access := mod_access);
 
 with_best_flags := join(with_best_inquiries, IID_best_flags, left.seq=right.seq,
 	transform(risk_indicators.Layout_Boca_Shell,
