@@ -14,12 +14,18 @@ EXPORT Best_From_BIP_Best_Seleid(
 
   dataset(recordof(Marketing_List.Source_Files().bip_best)) pDataset_Best = Marketing_List.Source_Files().bip_best
  ,dataset(recordof(Marketing_List.Source_Files().bip_base)) pDataset_Base = Marketing_List.Source_Files().bip_base
+ ,boolean                                                   pDebug          = false
+ ,set of unsigned6                                          pSampleProxids  = []
 
 ) :=
 function
 
   ds_base := pDataset_Base;
   ds_best := pDataset_Best;
+
+  // -- get debug seleids from proxids
+  ds_debug_seleids  := table(pDataset_Best(proxid in pSampleProxids )  ,{seleid},seleid,few);
+  set_debug_seleids := set(ds_debug_seleids ,seleid);
   
   // -- define set of marketing approved sources and the marketing sources bitmap
   mktg_sources  := Marketing_List._Config().set_marketing_approved_sources;
@@ -83,8 +89,23 @@ function
     self.dt_first_seen       := 0                                       ; //need to get from the base file
     self.dt_last_seen        := 0                                       ; //need to get from the base file
   ));
-  
+    
   // -- filter final dataset to make sure we didn't lose any records because of the marketing filter on company_name and address
-  return ds_best_prep(trim(business_name) != '',trim(prim_name) != '',trim(v_city_name) != '',trim(st) != '',trim(zip) != '');
+  ds_best_seleid := ds_best_prep(trim(business_name) != '',trim(prim_name) != '',trim(v_city_name) != '',trim(st) != '',trim(zip) != '');
+  
+  output_debug := parallel(
+   
+    output('---------------------Marketing_List.Best_From_BIP_Best_Seleid---------------------'                      ,named('Marketing_List_Best_From_BIP_Best_Seleid' ),all)
+   ,output(choosen(pDataset_Best                    (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_pDataset_Best'                            ),all)
+   ,output(choosen(pDataset_Base                    (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_pDataset_Base'                            ),all)
+   ,output(choosen(ds_base_filt                     (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_base_filt'                             ),all)
+   ,output(choosen(ds_best_filter_out_seleid_level  (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_best_filter_out_seleid_level'          ),all)
+   ,output(choosen(ds_best_get_active_seleids       (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_best_get_active_seleids'               ),all)
+   ,output(choosen(ds_best_prep                     (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_best_prep'                             ),all)
+   ,output(choosen(ds_best_seleid                   (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_best_seleid'                           ),all)
+  
+  );
+
+  return when(ds_best_seleid  ,if(pDebug = true ,output_debug));
   
 end;

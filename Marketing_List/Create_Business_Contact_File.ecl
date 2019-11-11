@@ -46,13 +46,15 @@ EXPORT Create_Business_Contact_File(
    pDataset_Crosswalk             = 'Marketing_List.Source_Files().crosswalk'
   ,pMrktg_BitMap                  = 'Marketing_List._Config().Marketing_Bitmap'
   ,pDataset_Business_Information  = 'Marketing_List.Files().business_information.built'
-  ,pDoSample                      = 'false'
   ,pDebug                         = 'false'
+  ,pSampleProxids                 = '[]'
 
 
 ) :=
 functionmacro
 
+  import ut;
+  
   mktg_bmap     := pMrktg_BitMap              ;
   ds_crosswalk  := pDataset_Crosswalk           (proxid != 0  ,exists(contactNames((contact_name_permits & mktg_bmap) != 0)))   ;  //get proxid level, has to contain contacts
   ds_biz_info   := pDataset_Business_Information                                                                                ;  //use this to use only proxids that are in this file
@@ -61,11 +63,12 @@ functionmacro
   
   ds_get_active_proxids := join(ds_crosswalk  ,ds_active_proxids  ,left.proxid = right.proxid ,transform({recordof(left) - contactSSNs - contactDOBs - contactEmails - contactPhones - contactAddresses},self := left)  ,hash);
 
-  ds_prep := project(ds_get_active_proxids  ,transform({unsigned4 dt_last_seen  ,Marketing_List.Layouts.business_contact},
+  ds_prep := project(ds_get_active_proxids  ,transform({unsigned4 dt_last_seen  ,unsigned4 Age ,unsigned executive_ind ,Marketing_List.Layouts.business_contact},
     best_contact_name := topn(left.contactnames((contact_name_permits & mktg_bmap) != 0) ,1                     ,-dt_last_seen_at_business);
     job_titles        := topn(left.jobtitles   ((job_title_permits    & mktg_bmap) != 0) ,5 ,executive_ind_order,-dt_title_last_seen      );
 
     self.dt_last_seen         := left.dt_last_seen                      ;
+    self.age                  := ut.age(left.dt_last_seen)              ;
     self.seleid               := left.seleid                            ;
     self.proxid               := left.proxid                            ;
     self.lexid                := left.contact_did                       ;
@@ -87,17 +90,48 @@ functionmacro
     self.title5               := job_titles[5].job_title            ;
     self.title5_dt_first_seen := job_titles[5].dt_title_first_seen  ;
     self.title5_dt_last_seen  := job_titles[5].dt_title_first_seen  ;
-    self.person_hierarchy     := left.contact_rank                      ;
+    self.person_hierarchy     := job_titles[1].executive_ind_order  ;
+    self.executive_ind        := job_titles[1].executive_ind_order  ;
   
-  ));
+  ))(trim(fname) != '',trim(lname) != '');
   
   ds_dist   := distribute (ds_prep  ,hash(seleid,proxid));
   ds_sort   := sort       (ds_dist  ,seleid,proxid,if(lexid != 0  ,'LEXID' + '-' + (string)lexid  ,trim(fname) + trim(lname)) ,-dt_last_seen ,local);
   ds_dedup  := dedup      (ds_sort  ,seleid,proxid,if(lexid != 0  ,'LEXID' + '-' + (string)lexid  ,trim(fname) + trim(lname)) ,local);
   
-  ds_return_result := project(ds_dedup  ,Marketing_List.Layouts.business_contact);
+  ds_sort2  := sort       (ds_dedup  ,seleid,proxid,map(age <= 2 and dt_last_seen != 0 => 1,age > 2 and dt_last_seen != 0 => 2  ,3) ,if(person_hierarchy = 0  ,9999 ,person_hierarchy) ,-dt_last_seen,if(lexid != 0  ,1,2),lexid,lname,fname,local);
+  ds_group  := group      (ds_sort2  ,seleid,proxid,local);
+  ds_iterate := iterate(ds_group  ,transform(recordof(left)
+    ,self.person_hierarchy := if(left.proxid = 0 ,1  ,left.person_hierarchy + 1)
+    ,self                  := right
   
-  return ds_return_result;
+  ));
+  
+  ds_return_result_contact := project(ds_iterate  ,Marketing_List.Layouts.business_contact);
+
+  output_debug := parallel(
+    output('---------------------Marketing_List.Create_Business_Contact_File---------------------'        ,named('Marketing_List_Create_Business_Contact_File'        ),all)
+   ,output(mktg_bmap                                                                                      ,named('Create_Business_Contact_File_mktg_bmap'             ),all)
+   ,output(choosen(ds_crosswalk             (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_crosswalk'          ),all)
+   ,output(choosen(ds_biz_info              (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_biz_info'           ),all)
+   ,output(choosen(ds_active_proxids        (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_active_proxids'     ),all)
+   ,output(choosen(ds_get_active_proxids    (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_get_active_proxids' ),all)
+   ,output(choosen(ds_prep                  (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_prep'               ),all)
+   ,output(choosen(ds_dist                  (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_dist'               ),all)
+   ,output(choosen(ds_sort                  (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_sort'               ),all)
+   ,output(choosen(ds_dedup                 (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_dedup'              ),all)
+   ,output(choosen(ds_sort2                 (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_sort2'              ),all)
+   ,output(choosen(ds_group                 (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_group'              ),all)
+   ,output(choosen(ds_iterate               (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_iterate'            ),all)
+   ,output(choosen(ds_return_result_contact (count(pSampleProxids) = 0 or proxid in pSampleProxids ),300) ,named('Create_Business_Contact_File_ds_return_result'      ),all)
+                                                                                                                  
+  );
+
+  #IF(pDebug = true)
+    return when(ds_return_result_contact  ,output_debug);
+  #ELSE
+    return ds_return_result_contact;
+  #END
 
 
 endmacro;
