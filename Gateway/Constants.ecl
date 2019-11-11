@@ -10,6 +10,7 @@ export Constants := module
 		export integer WAIT_TIMEOUT_POLK 			:= 20;
 		export integer WAIT_TIMEOUT_EXPERIAN 	:= 5;
 		export integer STATUS_SUCCESS 	      := 0;
+    export integer MAX_THREADS            := 20;
 	end;
 
 	export ServiceName := module
