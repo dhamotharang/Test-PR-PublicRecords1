@@ -36,7 +36,7 @@ EXPORT RunWuid(
   ,pPollingFrequency  = '\'5\''
   ,pForceRun          = 'false'                               // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
   ,pForceSkip         = 'false'                               // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
-  ,pInDebug           = ''
+  ,pInDebug           = '\'\''
 ) := 
 functionmacro
 
