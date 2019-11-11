@@ -1,7 +1,8 @@
-﻿IMPORT _Control, paw, riskwise, ut, risk_indicators, AML, MDR;
+﻿IMPORT _Control, paw, riskwise, ut, risk_indicators, AML, MDR, Doxie, Suppress, ProfileBooster;
 onThor := _Control.Environment.OnThor;
 
-export getBusnAssoc( DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION;
+export getBusnAssoc( DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, 
+									 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION;
 
 
 ProfileBooster.Layouts.Layout_PB_Slim_PAW append_contact_id(pbslim le, paw.key_did rt) := transform
@@ -34,7 +35,8 @@ with_contactID_thor := join(
 #END
 
 
-ProfileBooster.Layouts.Layout_PB_Slim_PAW append_paw_details(with_contactID le, paw.Key_contactid rt) := transform
+{ProfileBooster.Layouts.Layout_PB_Slim_PAW, UNSIGNED4 global_sid} append_paw_details(with_contactID le, paw.Key_contactid rt) := transform
+	self.global_sid := rt.global_sid;
 	self.seq := le.seq;
 	self.did := le.did;
 	self.did2 := le.did2;
@@ -53,7 +55,7 @@ ProfileBooster.Layouts.Layout_PB_Slim_PAW append_paw_details(with_contactID le, 
 	self := le;
 end;
 								
-pawTitle_roxie := join(with_contactID, paw.Key_contactid,
+pawTitle_roxie_unsuppressed := join(with_contactID, paw.Key_contactid,
 								 right.contact_id<>0 and 
 								 right.bdid <> 0 and
 								 right.company_title <> '' and
@@ -65,7 +67,9 @@ pawTitle_roxie := join(with_contactID, paw.Key_contactid,
 								 append_paw_details(left, right),
 								 atmost(riskwise.max_atmost), keep(1));  
 
-pawTitle_thor := join(
+pawTitle_roxie := Suppress.Suppress_ReturnOldLayout(pawTitle_roxie_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Slim_PAW);
+
+pawTitle_thor_unsuppressed := join(
 	distribute(with_contactID, contact_id), 
 	distribute(pull(paw.Key_contactid(contact_id<>0 and 
 								 bdid <> 0 and
@@ -77,6 +81,8 @@ pawTitle_thor := join(
 								 append_paw_details(left, right),
 								 atmost(left.contact_id=right.contact_id,riskwise.max_atmost), keep(1),
 	local); 
+
+pawTitle_thor := Suppress.Suppress_ReturnOldLayout(pawTitle_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Slim_PAW);
 
 #IF(onThor)
 	pawTitle := pawTitle_thor;
