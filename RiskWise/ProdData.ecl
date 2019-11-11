@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Prod Data - Raw">
 	<part name="did" type="xsd:integer"/>
 	<part name="first" type="xsd:string"/>
@@ -407,6 +407,9 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
 	
 	address_hierarchy_recs := choosen(dx_header.key_addr_hist()(keyed(s_did=searchdid)), 200);
 	if(include_header or Include_All_Files, output(sort(address_hierarchy_recs,address_history_seq) , named('address_hierarchy_recs'))) ;	
+  
+  address_hierarchy_Unique_recs := choosen(dx_header.Key_Addr_Unique_Expanded()(keyed(did=searchdid)), 200);
+	if(include_header or Include_All_Files, output(sort(address_hierarchy_Unique_recs,addr_ind) , named('address_hierarchy_unique_recs'))) ;	
 	
 	gong_recs := choosen(gong.Key_History_did(keyed(l_did=searchdid) and searchdid!=0), max_recs);
 	if(searchdid!=0 and (include_all_files=true or include_gong_and_targus=true), output(gong_recs, named('gong_by_did')) );
