@@ -135,13 +135,17 @@ export HighRiskIndustries := module
 																						 self            := left;
 																						 ));
 
-          filterCodes  := flattenDs(code!='');
-					sortCodes    := sort(distribute(filterCodes, hash32(seleid)), seleid, code, code_type,local);
+          filterCodes              := flattenDs(code!='');
+					highRiskSICKeys          := filterCodes(code_type='SIC' and code in highRiskSicCodes);
+					highRiskNAICSKeys        := filterCodes(code_type='NAICS' and code in highRiskNAICSCodes);
+					allCodes                 := highRiskSICKeys + highRiskNAICSKeys;
+					
+					sortCodes    := sort(distribute(allCodes, hash32(seleid)), seleid, code, code_type,local);
 										
 					rollInfo      := rollup(sortCodes,
 					                        left.seleid     = right.seleid 
 														  and left.code       = right.code  
-														  and left. code_type = right.code_type,
+														  and left.code_type  = right.code_type,
 															transform(HighRiskCodesLayout,
 															          self.dt_first_seen := if(right.dt_first_seen > 0 and right.dt_first_seen < left.dt_first_seen,
 																				                         right.dt_first_seen, left.dt_first_seen),
