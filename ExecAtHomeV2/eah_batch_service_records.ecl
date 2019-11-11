@@ -126,9 +126,7 @@ FUNCTION
   // Mutually exclusive datasets, so dedup not necessary
   dsContacts := dsMrktContacts + dsPawContacts;
 
-  dsWithContactInfo := ExecAtHomeV2.GetContactInfo(dsContacts,
-                                                   inMod.DataRestrictionMask,
-                                                   inMod.DataPermissionMask);
+  dsWithContactInfo := ExecAtHomeV2.GetContactInfo(dsContacts, mod_access);
 
   // Previously limited above, there should never be more than
   // 25 executives per company
