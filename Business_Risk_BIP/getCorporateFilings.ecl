@@ -1,9 +1,10 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, Corp2, EBR, MDR, Risk_Indicators, UT, riskwise;
+﻿IMPORT BIPV2, Business_Risk_BIP, Corp2, EBR, MDR, Risk_Indicators, UT, riskwise, Doxie, STD;
 
 EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	STRING1 CURRENT := 'C';
 	STRING1 HISTORY := 'H';
@@ -15,7 +16,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	
 	// NOTE: owner_type_code--One of the following descriptions will be listed: 0 = Unknown; 1 = Public; 2 = Private; 3 = Foreign; 4 = Non-Profit
 
-	EBRRaw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(LinkIDs, ,
+	EBRRaw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(LinkIDs, mod_access,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, // ScoreThreshold --> 0 = Give me everything
 																							linkingOptions,
@@ -102,8 +103,8 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	fn_getSOSStanding(STRING record_type, STRING corp_status_cd, STRING corp_status_desc) := 
     MAP(
       Business_Risk_BIP.Common.is_ActiveCorp(record_type, corp_status_cd, corp_status_desc)    => '3',
-      StringLib.StringFind(StringLib.StringToUpperCase(corp_status_desc), 'INACTIVE', 1) <> 0  => '2',
-      StringLib.StringFind(StringLib.StringToUpperCase(corp_status_desc), 'DISSOLVED', 1) <> 0 => '1',
+      STD.Str.Find(STD.Str.ToUpperCase(corp_status_desc), 'INACTIVE', 1) <> 0  => '2',
+      STD.Str.Find(STD.Str.ToUpperCase(corp_status_desc), 'DISSOLVED', 1) <> 0 => '1',
       '0');
 
 	CorpFilingsCleaned := PROJECT(CorpFilings_Recs_Filt, TRANSFORM(layout_corpfilings_inflated,
@@ -111,22 +112,22 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			SELF.temp_corp_inc_date := IF( LEFT.corp_inc_date = '', '99999999', LEFT.corp_inc_date ),
 			SELF.temp_corp_forgn_date := IF( LEFT.corp_forgn_date = '', '99999999', LEFT.corp_forgn_date ),
 			SELF.SOSStanding := SOSStanding,			
-			SELF.CurrDefunct := IF(StringLib.StringToUpperCase(LEFT.corp_status_desc) IN ['FORFEITED','TERMINATED','DISSOLVED'] and left.record_type = CURRENT, true, false);
-			SELF.everDefunct := IF(StringLib.StringToUpperCase(LEFT.corp_status_desc) IN ['FORFEITED','TERMINATED','DISSOLVED'], true, false);
+			SELF.CurrDefunct := IF(STD.Str.ToUpperCase(LEFT.corp_status_desc) IN ['FORFEITED','TERMINATED','DISSOLVED'] and left.record_type = CURRENT, true, false);
+			SELF.everDefunct := IF(STD.Str.ToUpperCase(LEFT.corp_status_desc) IN ['FORFEITED','TERMINATED','DISSOLVED'], true, false);
 			SELF.PrivateOwnership := IF(TRIM(LEFT.corp_for_profit_ind) = 'Y', TRUE, FALSE);
-			SELF.OrigBus := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(IF(TRIM(LEFT.corp_orig_bus_type_desc, LEFT, RIGHT) = '', LEFT.corp_entity_desc[1..20], LEFT.corp_orig_bus_type_desc[1..20])))}], {STRING TypeDesc});
-			SELF.TermExist := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_term_exist_cd, LEFT, RIGHT)))}], {STRING Term});
+			SELF.OrigBus := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(IF(TRIM(LEFT.corp_orig_bus_type_desc, LEFT, RIGHT) = '', LEFT.corp_entity_desc[1..20], LEFT.corp_orig_bus_type_desc[1..20])))}], {STRING TypeDesc});
+			SELF.TermExist := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_term_exist_cd, LEFT, RIGHT)))}], {STRING Term});
 			SELF.SOSStandingBest := DATASET([{SOSStanding}], {STRING Standing}),
 			SELF.SOSStandingWorst := DATASET([{SOSStanding}], {STRING Standing}),
 			SELF.Filings := DATASET([{Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_filing_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate),
-																Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_filing_cd, LEFT, RIGHT))),
+																Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_filing_cd, LEFT, RIGHT))),
 																LEFT.corp_foreign_domestic_ind}], {STRING FilingDate, STRING FilingCD, STRING ForgnDomstcInd});
 			SELF.FilingStatus := DATASET(
       [
         {
           Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_status_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate),
           LEFT.corp_status_cd,
-          Business_Risk_BIP.Common.filterOutSpecialChars( StringLib.StringToUpperCase(TRIM(LEFT.corp_status_desc, LEFT, RIGHT)) ),
+          Business_Risk_BIP.Common.filterOutSpecialChars( STD.Str.ToUpperCase(TRIM(LEFT.corp_status_desc, LEFT, RIGHT)) ),
           LEFT.record_type
         }
       ], 
@@ -137,25 +138,25 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 			SELF.Incorporation := 
       DATASET(
-        [ { incDate, Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_inc_state, LEFT, RIGHT)))} ], 
+        [ { incDate, Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_inc_state, LEFT, RIGHT)))} ], 
         {STRING IncDate, STRING IncState} );
 
 			ForgnIncDate := Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_forgn_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate);
 
 			SELF.ForgnIncorporation := 
       DATASET(
-        [ { ForgnIncDate, Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_forgn_state_cd, LEFT, RIGHT)))} ], 
+        [ { ForgnIncDate, Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_forgn_state_cd, LEFT, RIGHT)))} ], 
         {STRING IncDate, STRING IncState} );
 
 			registeredAgentChanged := (INTEGER)LEFT.corp_ra_effective_date > 0 OR // We have a registered agent effective date or a registered agent name
 																TRIM(LEFT.Corp_RA_Name) <> '';
-			SELF.RegAgentChanges := IF(registeredAgentChanged, DATASET([{StringLib.StringToUpperCase(TRIM(LEFT.Corp_RA_Name, LEFT, RIGHT)), Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_ra_effective_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate), '1'}], {STRING AgentName, STRING AgentChangeDate, STRING AgentChanged}),
+			SELF.RegAgentChanges := IF(registeredAgentChanged, DATASET([{STD.Str.ToUpperCase(TRIM(LEFT.Corp_RA_Name, LEFT, RIGHT)), Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_ra_effective_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate), '1'}], {STRING AgentName, STRING AgentChangeDate, STRING AgentChanged}),
 																												 DATASET([{'', Business_Risk_BIP.Constants.MissingDate, '0'}], {STRING AgentName, STRING AgentChangeDate, STRING AgentChanged}));
 			SELF.Amendments := DATASET([{(INTEGER)LEFT.corp_amendments_filed}], {INTEGER Amendment});
-			SELF.OrigSOS := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_orig_sos_charter_nbr, LEFT, RIGHT)))}], {STRING CharterNBR});
-			SELF.OrigOrg := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(StringLib.StringFilterOut(TRIM(LEFT.corp_orig_org_structure_desc, LEFT, RIGHT), '\n')))}], {STRING StructureDesc});
-			SELF.ForeignState := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_forgn_state_cd, LEFT, RIGHT)))}], {STRING StateCD});
-			SELF.Address1 := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_address1_type_desc, LEFT, RIGHT)))}], {STRING TypeDesc});
+			SELF.OrigSOS := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_orig_sos_charter_nbr, LEFT, RIGHT)))}], {STRING CharterNBR});
+			SELF.OrigOrg := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(STD.Str.FilterOut(TRIM(LEFT.corp_orig_org_structure_desc, LEFT, RIGHT), '\n')))}], {STRING StructureDesc});
+			SELF.ForeignState := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_forgn_state_cd, LEFT, RIGHT)))}], {STRING StateCD});
+			SELF.Address1 := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_address1_type_desc, LEFT, RIGHT)))}], {STRING TypeDesc});
 			SELF := LEFT));
 	
 	// Sort to the top the most recent, Current, Legal record for each corp_key. Among these, 

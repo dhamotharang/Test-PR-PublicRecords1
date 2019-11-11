@@ -119,7 +119,7 @@
 */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty;
+IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, STD;
 
 EXPORT SmallBusiness_Marketing_Batch_Service() := FUNCTION
 	/* ************************************************************************
@@ -148,7 +148,11 @@ EXPORT SmallBusiness_Marketing_Batch_Service() := FUNCTION
 	'ModelName4',
 	'ModelName5',
 	'IncludeTargusGateway',
-	'RunTargusGatewayAnywayForTesting'
+	'RunTargusGatewayAnywayForTesting',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'
 	));
 
 	// Can't have duplicate definitions of Stored with different default values, 
@@ -170,7 +174,7 @@ EXPORT SmallBusiness_Marketing_Batch_Service() := FUNCTION
 	STRING	  DataRestrictionMask  := Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('DataRestrictionMask');
 	STRING	  DataPermissionMask   := Business_Risk_BIP.Constants.Default_DataPermissionMask : STORED('DataPermissionMask');
 	STRING5	IndustryClass_In		   := Business_Risk_BIP.Constants.Default_IndustryClass : STORED('IndustryClass');
-	IndustryClass                  := StringLib.StringToUpperCase(TRIM(IndustryClass_In, LEFT, RIGHT));
+	IndustryClass                  := STD.Str.ToUpperCase(TRIM(IndustryClass_In, LEFT, RIGHT));
 	UNSIGNED1	LinkSearchLevel      := Business_Risk_BIP.Constants.LinkSearch.Default : STORED('LinkSearchLevel');
 	UNSIGNED1	MarketingMode        := 1 : STORED('MarketingMode');
 	STRING50	AllowedSources       := Business_Risk_BIP.Constants.Default_AllowedSources : STORED('AllowedSources');
@@ -194,11 +198,17 @@ EXPORT SmallBusiness_Marketing_Batch_Service() := FUNCTION
 	BOOLEAN IncludeTargusGateway := FALSE : STORED('IncludeTargusGateway');
 	BOOLEAN RunTargusGateway     := FALSE : STORED('RunTargusGatewayAnywayForTesting');
 	
-	AttrsRequested  := DATASET([ {StringLib.StringToUpperCase(AttrsVer1_in)},{StringLib.StringToUpperCase(AttrsVer2_in)} ], LNSmallBusiness.Layouts.AttributeGroupRec);
-	ModelsRequested := DATASET([ {StringLib.StringToUpperCase(ModelName1_in)},{StringLib.StringToUpperCase(ModelName2_in)},{StringLib.StringToUpperCase(ModelName3_in)},{StringLib.StringToUpperCase(ModelName4_in)},{StringLib.StringToUpperCase(ModelName5_in)} ], LNSmallBusiness.Layouts.ModelNameRec);
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+    string TransactionID := '' : STORED('_TransactionId');
+    string BatchUID := '' : STORED('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+	AttrsRequested  := DATASET([ {STD.Str.ToUpperCase(AttrsVer1_in)},{STD.Str.ToUpperCase(AttrsVer2_in)} ], LNSmallBusiness.Layouts.AttributeGroupRec);
+	ModelsRequested := DATASET([ {STD.Str.ToUpperCase(ModelName1_in)},{STD.Str.ToUpperCase(ModelName2_in)},{STD.Str.ToUpperCase(ModelName3_in)},{STD.Str.ToUpperCase(ModelName4_in)},{STD.Str.ToUpperCase(ModelName5_in)} ], LNSmallBusiness.Layouts.ModelNameRec);
 	ModelOptions    := DATASET([], LNSmallBusiness.Layouts.ModelOptionsRec); // ModelOptions is never consumed in SmallBusiness_BIP_Function.
 	
-	allow_SBA_attrs  := EXISTS(AttrsRequested(AttributeGroup = StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_MKT_ATTR_V1_NAME)));   // i.e. "LN" Small Business for Marketing Attributes
+	allow_SBA_attrs  := EXISTS(AttrsRequested(AttributeGroup = STD.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_MKT_ATTR_V1_NAME)));   // i.e. "LN" Small Business for Marketing Attributes
 	
 	
 	Gateways 	:= DATASET([], Gateway.Layouts.Config); 
@@ -229,8 +239,11 @@ EXPORT SmallBusiness_Marketing_Batch_Service() := FUNCTION
 																														DisableIntermediateShellLogging := TRUE /* Always Turn Off Intermediate Shell Logging in Batch */,
 																														IncludeTargusGateway := IncludeTargusGateway,
 																														RunTargusGateway := RunTargusGateway, /* for testing purposes only */
-																														BIPIDWeightThreshold := LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_Marketing_Batch_Service
-																														);
+																														BIPIDWeightThreshold := LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_Marketing_Batch_Service,
+																														LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                                        TransactionID := TransactionID, 
+                                                                                                                        BatchUID := BatchUID, 
+                                                                                                                        GlobalCompanyID := GlobalCompanyID);
 
 	SBA_Results := PROJECT( SBA_Results_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );
 

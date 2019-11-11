@@ -411,7 +411,7 @@
     // Primary phone section
     iesp.phonefinder.t_PhoneFinderDetailedInfo tFormat2IespPrimaryPhone(lFinal pInput) :=
     TRANSFORM
-      doVerify := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneIsActive;
+      doVerify := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneLastName;
 
       vVerificationDesc := IF(doVerify AND ~pInput.is_verified AND pInput.verification_desc = '', $.Constants.VerifyMessage.PhoneCannotBeVerified, pInput.verification_desc);
 

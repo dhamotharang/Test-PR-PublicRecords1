@@ -41,6 +41,12 @@ boolean exclude_weakaka := FALSE: stored('ExcludeWeakAKA');
 boolean use_dob_Filter := FALSE :stored('UseDobFilter');
 integer2 dob_radius := -1 :stored('DobRadius');
 
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 dob_radius_use := if(use_dob_Filter,dob_radius,-1);
 
 temp := record
@@ -73,6 +79,7 @@ END;
 
 
 output(Patriot.Search_Batch_Function(GROUP(PROJECT(f,capitalize(LEFT)),acctno), ofac_only_value,threshold_value,
-				ofac_version,include_ofac,include_additional_watchlists,dob_radius_use,watchlists_request,exclude_aka,exclude_weakaka),NAMED('Results'));
+				ofac_version,include_ofac,include_additional_watchlists,dob_radius_use,watchlists_request,exclude_aka,exclude_weakaka,
+				LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyID),NAMED('Results'));
 
 ENDMACRO;

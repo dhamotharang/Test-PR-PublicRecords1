@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp;
+﻿IMPORT Business_Risk_BIP, Gateway, iesp;
 
 // NOTE: If you change this you MUST redeploy the Library as the interface has changed.
 EXPORT LIB_Business_Shell_LIBIN := INTERFACE
@@ -25,4 +25,9 @@ EXPORT LIB_Business_Shell_LIBIN := INTERFACE
 	EXPORT BOOLEAN    DoNotUseAuthRepInBIPAppend 											:= FALSE;
   EXPORT BOOLEAN    CorteraRetrotest                                := FALSE;
 	EXPORT BOOLEAN		IsBIID20																				:= FALSE;	
+	// CCPA parameters
+	export unsigned1 bus_LexIdSourceOptout := 1;
+	export string16 bus_TransactionID := '';
+	export string16 bus_BatchUID := '';
+	export unsigned6 bus_GlobalCompanyId := 0;
 END;

@@ -1,11 +1,12 @@
-﻿IMPORT Address, BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk, Business_Risk_BIP, BusinessInstantID20_Services, Census_data, DID_Add, Risk_Indicators, STD, ut;
+﻿IMPORT Address, BIPV2, Business_Risk, Business_Risk_BIP, DID_Add, Risk_Indicators, STD, ut, Doxie;
 
 	// The following function determines whether Business data passed in from the customer were actually found
 	// in various sources.
 	EXPORT getVerifiedElements(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := 
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := 
 		FUNCTION
 				UCase := STD.Str.ToUpperCase;
     ds_BIPIDs := Business_Risk_BIP.Common.GetLinkIDs(Shell);
@@ -28,7 +29,8 @@
                        JoinLimit                := Business_Risk_BIP.Constants.Limit_BusHeader,
                        dnbFullRemove            := FALSE,
                        bypassContactSuppression := TRUE,
-                       JoinType                 := BIPV2.IDconstants.JoinTypes.LimitTransformJoin );// Options.KeepLargeBusinesses  Business_Risk_BIP.Constants.DefaultJoinType );
+                       JoinType                 := BIPV2.IDconstants.JoinTypes.LimitTransformJoin,
+						mod_access := mod_access);// Options.KeepLargeBusinesses  Business_Risk_BIP.Constants.DefaultJoinType );
 	
 		// clean up the business header before doing anything else
 		Business_Risk_BIP.Common.mac_slim_header(ds_BusinessHeaderRaw1, ds_BusinessHeaderRaw);	

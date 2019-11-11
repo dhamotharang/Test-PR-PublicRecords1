@@ -1,4 +1,4 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function searches the Targus PDE Gateway.	  											*
  * -This gateway is only searched if the access rules are met             *
  * -There is a cost associated with use of this gateway									  *
@@ -8,11 +8,13 @@
  * Adapted from Risk_Indicators.getTargusGW                               *
  ************************************************************************ */
 
-IMPORT Gateway, Phone_Shell, Risk_Indicators, RiskWise, Targus, UT;
+IMPORT Gateway, Phone_Shell, RiskWise, Targus, STD, ut;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Gateway_Targus (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, DATASET(Gateway.Layouts.Config) Gateways, UNSIGNED1 DPPAPurpose, UNSIGNED1 GLBPurpose, UNSIGNED1 PhoneRestrictionMask) := FUNCTION
 
-	targusURL := Gateways (StringLib.StringToLowerCase(servicename) = 'targus')[1].url;
+    applyOptOut := TRUE; // Temporary variable to enable Targus opt out
+
+	targusURL := Gateways (STD.Str.ToLowerCase(servicename) = 'targus')[1].url;
 
 	Targus.layout_targus_in prep_for_Targus(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le) := TRANSFORM
 		SELF.User.GLBPurpose := GLBPurpose;
@@ -60,7 +62,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Gateway_Tar
   targus_cfg := gateways(Gateway.Configuration.IsTargus(servicename))[1];
 	makeGatewayCall := targus_cfg.url != '' AND EXISTS(targus_in);
 	gateway_result := IF(makeGatewayCall, 
-                       Gateway.SoapCall_Targus(targus_in, targus_cfg, timeoutSecs, numRetries, makeGatewayCall, gw_mod_access), 
+                       Gateway.SoapCall_Targus(targus_in, targus_cfg, timeoutSecs, numRetries, makeGatewayCall, gw_mod_access, applyOptOut), 
                        DATASET([], targus.layout_targus_out));
 
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getTargus(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Targus.layout_targus_out ri) := transform
@@ -68,12 +70,12 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Gateway_Tar
 		
 		hitPDE := ri.response.VerifyExpressResult.ErrorCode = 0 AND phone <> '';
 		
-		fullName := StringLib.StringToUpperCase(TRIM(ri.response.VerifyExpressResult.EnhancedData.Name));
-		fname := fullName[1..(StringLib.StringFind(fullName, ',', 1) - 1)];
-		lname := fullName[(StringLib.StringFind(fullName, ',', 1) + 1)..];
-		streetAddr := StringLib.StringToUpperCase(TRIM(ri.response.VerifyExpressResult.EnhancedData.PrimaryAddress));
-		cty := StringLib.StringToUpperCase(TRIM(ri.response.VerifyExpressResult.EnhancedData.CityName));
-		st := StringLib.StringToUpperCase(TRIM(ri.response.VerifyExpressResult.EnhancedData.State));
+		fullName := STD.Str.ToUpperCase(TRIM(ri.response.VerifyExpressResult.EnhancedData.Name));
+		fname := fullName[1..(STD.Str.Find(fullName, ',', 1) - 1)];
+		lname := fullName[(STD.Str.Find(fullName, ',', 1) + 1)..];
+		streetAddr := STD.Str.ToUpperCase(TRIM(ri.response.VerifyExpressResult.EnhancedData.PrimaryAddress));
+		cty := STD.Str.ToUpperCase(TRIM(ri.response.VerifyExpressResult.EnhancedData.CityName));
+		st := STD.Str.ToUpperCase(TRIM(ri.response.VerifyExpressResult.EnhancedData.State));
 		zip := TRIM(ri.response.VerifyExpressResult.EnhancedData.ZIPCode)[1..5];
 		
 		SElf.Gathered_Phone := IF(hitPDE, phone, '');
@@ -91,10 +93,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Gateway_Tar
 		SELF.Sources.Source_Owner_Name_First := fname;
 		SELF.Sources.Source_Owner_Name_Last := lname;
 		
-		didMatch := StringLib.StringFind(matchcode, 'L', 1) > 0;
-		nameMatch := StringLib.StringFind(matchcode, 'N', 1) > 0;
-		addrMatch := StringLib.StringFind(matchcode, 'A', 1) > 0;
-		ssnMatch := StringLib.StringFind(matchcode, 'S', 1) > 0;
+		didMatch := STD.Str.Find(matchcode, 'L', 1) > 0;
+		nameMatch := STD.Str.Find(matchcode, 'N', 1) > 0;
+		addrMatch := STD.Str.Find(matchcode, 'A', 1) > 0;
+		ssnMatch := STD.Str.Find(matchcode, 'S', 1) > 0;
 		
 		 // Subject since this includes a match on full name, household if it includes a match on address, otherwise just a lead to the subject
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := IF(hitPDE, 	MAP(nameMatch => Phone_Shell.Constants.Phone_Subject_Level.Subject,

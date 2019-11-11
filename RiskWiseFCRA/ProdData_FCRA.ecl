@@ -175,6 +175,9 @@ output(clean_a2, named('cleaned_input'));
 	address_hierarchy_recs := choosen(dx_header.key_addr_hist(iType)(keyed(s_did=in_did)), 200);
 	if(include_header or Include_All_Files, output(sort(address_hierarchy_recs,address_history_seq) , named('address_hierarchy_recs'))) ;	
 	
+  address_hierarchy_unique_recs := choosen(dx_header.Key_Addr_Unique_Expanded(iType)(keyed(did=in_did)), 200);
+	if(include_header or Include_All_Files, output(sort(address_hierarchy_unique_recs,addr_ind) , named('address_hierarchy_unique_recs'))) ;	
+	
 	deathMaster_Recs := choosen(doxie.key_death_masterV2_ssa_DID_fcra(keyed(l_did=in_did)), 10);
 	if(Include_DeathMaster or Include_All_Files, output(deathMaster_Recs, named('deathMaster_Recs')));
 										

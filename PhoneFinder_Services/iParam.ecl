@@ -35,6 +35,7 @@ MODULE
 		EXPORT BOOLEAN   VerifyPhoneName      	:= FALSE;
 		EXPORT BOOLEAN	 VerifyPhoneNameAddress	:= FALSE;
 		EXPORT BOOLEAN	 VerifyPhoneIsActive		:= FALSE;
+    EXPORT BOOLEAN   VerifyPhoneLastName    := FALSE;
     EXPORT INTEGER   DateFirstSeenThreshold := 180;
     EXPORT INTEGER   DateLastSeenThreshold  := 30;
     EXPORT INTEGER   LengthOfTimeThreshold  := 90;
@@ -119,6 +120,7 @@ MODULE
     EXPORT BOOLEAN VerifyPhoneName;
     EXPORT BOOLEAN VerifyPhoneNameAddress;
     EXPORT BOOLEAN VerifyPhoneIsActive;
+    EXPORT BOOLEAN VerifyPhoneLastName;
     EXPORT INTEGER DateFirstSeenThreshold;
     EXPORT INTEGER DateLastSeenThreshold;
     EXPORT INTEGER LengthOfTimeThreshold;
@@ -163,6 +165,7 @@ MODULE
       EXPORT BOOLEAN   VerifyPhoneName				:= pfOptions.VerificationOptions.VerifyPhoneName;
       EXPORT BOOLEAN   VerifyPhoneNameAddress := pfOptions.VerificationOptions.VerifyPhoneNameAddress;
       EXPORT BOOLEAN   VerifyPhoneIsActive    := pfOptions.VerificationOptions.VerifyPhoneIsActive;
+      EXPORT BOOLEAN   VerifyPhoneLastName    := pfOptions.VerificationOptions.VerifyPhoneLastName;
       EXPORT INTEGER   DateFirstSeenThreshold := pfOptions.VerificationOptions.DateFirstSeenThreshold;
       EXPORT INTEGER   DateLastSeenThreshold  := pfOptions.VerificationOptions.DateLastSeenThreshold;
       EXPORT INTEGER   LengthOfTimeThreshold  := pfOptions.VerificationOptions.LengthOfTimeThreshold;
@@ -339,7 +342,7 @@ MODULE
       EXPORT INTEGER   MaxOtherPhones		              := iesp.Constants.Phone_Finder.MaxOtherPhones;// TO LIMIT OTHER PHONES
 
       EXPORT BOOLEAN   UseInHousePhoneMetadata	:= FALSE : STORED('UseInHousePhoneMetadata');
-      EXPORT BOOLEAN UseInHousePhoneMetadataOnly := UseInHousePhoneMetadata OR ~UseTransUnionPVS;;
+      EXPORT BOOLEAN   UseInHousePhoneMetadataOnly := UseInHousePhoneMetadata OR ~UseTransUnionPVS;
       EXPORT BOOLEAN   UseAccuData_CNAM         := UseInHousePhoneMetadata AND ~doxie.compliance.isAccuDataRestricted(drm) AND TransactionType != $.Constants.TransType.PhoneRiskAssessment;
 
 

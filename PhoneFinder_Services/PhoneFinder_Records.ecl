@@ -26,7 +26,7 @@ MODULE
 
   // Phone verification is a "phone only" search, even if the phone is blank.  If the phone is blank, the
   // verification will fail and the appropriate status will be returned.
-  SHARED INTEGER verifyRequest := IF(tmpMod.VerifyPhoneIsActive, 1, 0) + IF(tmpMod.VerifyPhoneName, 1, 0) + IF(tmpMod.VerifyPhoneNameAddress, 1, 0);
+  SHARED INTEGER verifyRequest := IF(tmpMod.VerifyPhoneIsActive, 1, 0) + IF(tmpMod.VerifyPhoneName, 1, 0) + IF(tmpMod.VerifyPhoneNameAddress, 1, 0) + IF(tmpMod.VerifyPhoneLastName, 1, 0);
   SHARED BOOLEAN verifyInputDID := (verifyRequest > 0) OR ~tmpMod.IsPrimarySearchPII;
 
 	useADL := tmpMod.IsPrimarySearchPII OR vPhoneBlank OR (vIsPhone10 AND (tmpMod.VerifyPhoneNameAddress OR tmpMod.VerifyPhoneName));
