@@ -440,12 +440,7 @@ ElementCountAggregation := DISTRIBUTE(TABLE(FullGraphPrep8(entity_type_ != 1), {
 // Join the element count back to each entity within all the trees.
 FullGraphElementCount1 := JOIN(FullGraphPrep8, ElementCountAggregation, LEFT.source_customer_ = RIGHT.source_customer_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_, TRANSFORM(RECORDOF(LEFT), SELF.cl_element_count_ := RIGHT.cl_element_count_, SELF := LEFT), LEFT OUTER, LOCAL);
 
-HighRiskIdentityAggregation := DISTRIBUTE(TABLE(FullGraphPrep8, {source_customer_, UNSIGNED cl_hr_identity_count_ := COUNT(GROUP, entity_type_ = 1 AND score_ > 80), UNSIGNED cl_hr_element_count_ := COUNT(GROUP, entity_type_ != 1 AND score_ > 80), tree_uid_}, source_customer_, tree_uid_, MERGE), HASH32(tree_uid_)); 
-
-FullGraphElementCount2 := JOIN(FullGraphElementCount1, HighRiskIdentityAggregation, LEFT.source_customer_ = RIGHT.source_customer_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_, TRANSFORM({RECORDOF(LEFT), UNSIGNED cl_hr_identity_count_, UNSIGNED cl_hr_element_count_}, 
-                            SELF.cl_hr_identity_count_ := RIGHT.cl_hr_identity_count_, SELF.cl_hr_element_count_ := RIGHT.cl_hr_element_count_, SELF := LEFT), LEFT OUTER, LOCAL);
-
-FullGraphElementCount := JOIN(FullGraphElementCount2, AdditionalAttributes, LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.entity_context_uid_, 
+FullGraphElementCount := JOIN(FullGraphElementCount1, AdditionalAttributes, LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.entity_context_uid_, 
    TRANSFORM({
                RECORDOF(LEFT),
                RIGHT.event_count_,

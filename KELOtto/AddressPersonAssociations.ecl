@@ -341,7 +341,7 @@ EXPORT AddressMatch := TABLE(Matches,
   SHARED LexidAssociationsPrep := AppendLexidToLexidAssociation.MacAppendLexidToLexidAssociations(PersonAddressMatchStatsPrep4, FromPersonLexId, ToPersonLexId, 'VerifiedPR', 2, 25000000) 
          : PERSIST('~deletemefraudgov1');
          
-  EXPORT HighFrequencyFroms := TABLE(LexidAssociationsPrep, {AssociatedCustomerFileInfo, FromPersonLexId, recs := COUNT(GROUP)}, AssociatedCustomerFileInfo, FromPersonLexId, MERGE);
+  EXPORT HighFrequencyFroms := TABLE(/*PersonAddressMatchStatsPrep4*/LexidAssociationsPrep, {AssociatedCustomerFileInfo, FromPersonLexId, recs := COUNT(GROUP)}, AssociatedCustomerFileInfo, FromPersonLexId, MERGE);
   // Remove high frequency matches.
 	EXPORT PersonAddressMatchStatsPrep := DEDUP(SORT(DISTRIBUTE(LexidAssociationsPrep, HASH32(FromPersonLexId, ToPersonLexId)), FromPersonLexId, ToPersonLexId, LOCAL), FromPersonLexId, ToPersonLexId, LOCAL);
 	EXPORT PersonAddressMatchStats := JOIN(LexidAssociationsPrep, HighFrequencyFroms(recs > LargeAssociationThreshold), LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND LEFT.FromPersonLexId=RIGHT.FromPersonLexId, LEFT ONLY, LOOKUP);
