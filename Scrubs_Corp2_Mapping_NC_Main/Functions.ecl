@@ -33,10 +33,10 @@ EXPORT Functions := MODULE
 																	  '19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34',''];
 																		
     //Below table needs to be updated when we see new Event codes in Raw updates!
-		EXPORT set_valid_Event_codes :=['AADR','AAUT','ACOP','ADIS','ADMN','AGT','AINC','ALLC','AMLP','AMNC','AMND','AMU','AMU1','ANNX',
+		EXPORT set_valid_Event_codes :=['AADR','AAUT','ACOP','ADIS','ADMN','AGT','AINC','ALLC','AMLP','AMNC','AMND','AMU','AMU1','ANNX','AOV',
 																		'AREI','AREL','AS&L','AUTH','BAMD','BINC','BYL','CAAB','CALP','CANC','CAMP','CBIN','CBNP','CFLP','CINC',
-																		'CLLC','CMA','CMAP','CMER','CNP','CNSL','COI','CON','CONV','COPA','CORR','CROA','DESG','DISS','DLLP','DLP',
-																		'DLPC','DNAM','DNLP','DOPA','EXPI','FDBA','FDCV','FLLP','FLP','FNAM','FNLP','HINC','ICOP','IMU','IMU1',
+																		'CLLC','CLLP','CMA','CMAP','CMER','CNP','CNSL','COI','CON','CONV','COPA','CORR','CROA','DESG','DISS','DLLP',
+																		'DLP','DLPC','DNAM','DNLP','DOPA','EXPI','FDBA','FDCV','FLLP','FLP','FNAM','FNLP','HINC','ICOP','IMU','IMU1',
 																		'INC','INCC','IRDM','IS&L','JDIS','JREI','JUDO','L3C','L3CF','LIQD','LLCC','LLCD','LLCF','LLCN','LLP','LLPC',
 																		'MDIS','MERD','MERG','MISC','NADR','NAME','NBAN','NCCV','NCOP','NIAM','NIAP','NICA','NINC','NIRE','NOP',
 																		'PASP','PLSP','PREI','RCCA','RCCC','RCCN','RCCP','RCLL','RCPC','RCPL','RDEV','RDNF','REG','REN','RESR','REV',
