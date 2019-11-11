@@ -56,7 +56,8 @@ export Update_Base	:= MODULE
 											
 		dAppendADLS							:= 	NCPDP.fAppend_ADLS.prov_info(dCleanNameAddr);
 	
-		dRollupBase							:= 	fRollupBase.prov_info(dAppendADLS);
+		// dRollupBase							:= 	fRollupBase.prov_info(dAppendADLS);
+		dRollupBase							:= 	fRollupBase.prov_info(dCleanNameAddr);
    
 		return dRollupBase;
 	end;
@@ -1296,7 +1297,15 @@ export Update_Base	:= MODULE
 			BaseSort := SORT(dDistributed, ncpdp_provider_id,  dt_first_seen,	dt_last_seen, record_type, local);
       BaseDedup := DEDUP(BaseSort,ncpdp_provider_id, dt_first_seen,	dt_last_seen, local); 
 			
-		return BaseDedup;
+			BaseDedup add_sid(BaseDedup L) := TRANSFORM
+				SELF.global_sid								:= 23921;
+				SELF.record_sid								:= L.source_rid;
+				SELF						 							:= L;
+			END;
+	
+			with_ccpa := project(BaseDedup, add_sid (left));
+			
+		return with_ccpa;
 	end;
 	
     export keybuild (string pversion)    := function
