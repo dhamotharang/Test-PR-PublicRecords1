@@ -454,4 +454,11 @@ MODULE
 		RETURN dsCleanCompanyName[1].cnp_name; 
 	END;			
 
+    //RQ-16410: Added IsValidIdentity to filter out 'City, State' names in Accudata ListingName
+    EXPORT IsValidIdentity(STRING ListingName) := FUNCTION
+        WordCount := STD.Str.CountWords(ListingName, ' ');
+        LastWord := STD.Str.GetNthWord(ListingName, WordCount);
+        result := ListingName != '' AND ~ut.valid_st(LastWord);
+        RETURN result;
+    END;
 END;
