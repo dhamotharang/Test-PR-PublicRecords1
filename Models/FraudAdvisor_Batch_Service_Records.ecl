@@ -11,6 +11,14 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
                                             string BatchUID = '',
                                             unsigned6 GlobalCompanyId = 0) :=  function
 
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := args.glb;
+	EXPORT dppa := args.dppa;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
+
 Boolean VALIDATION := false; //True when validating model, false for production mode.
 
 //These 2 value types are being used multiple times.
@@ -262,7 +270,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
                                            model_name);
 
 		attr := if(doVersion1 or doVersion2 or requestedattributegroups IN ['fraudpointattrv201','fraudpointattrv202','fraudpointattrv203'] or doParo,
-			Models.getFDAttributes(clam, iid, ''/*account_value*/, ipdata, model_indicator),
+			Models.getFDAttributes(clam, iid, ''/*account_value*/, ipdata, model_indicator, mod_access := mod_access),
 			project(group(clam), transform(Models.Layout_FraudAttributes, self.input.seq:=left.seq, self := []) )
 		);
 

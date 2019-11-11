@@ -395,7 +395,9 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		 Options.IncludeSeleTIN OR
 		 Options.IncludeSeleAddress OR
 		 Options.IncludeProxAddress);
-
+		 
+  EXPORT DoFDCJoin_RiskWise__Key_CityStZip := 
+	  (Options.IncludeZipCode);
 	// ---------------[ Phone ]---------------
 
 	EXPORT DoFDCJoin_Gong__Key_History_DID := 

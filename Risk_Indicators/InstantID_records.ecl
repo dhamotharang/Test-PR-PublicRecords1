@@ -359,6 +359,7 @@ risk_indicators.Layout_Input into(rec l) := transform
 end;
 prep := PROJECT(d,into(LEFT));
 
+  Excluded_Minor := if(Excludeminors,risk_indicators.rcSet.isCodeAM((INTEGER)prep[1].age,prep[1].dob),false);
 
 // Changed to default to version 2 in order to get back ADL info used in Red Flags.
 unsigned1 BSversion := 51 : stored('BSVersion');
@@ -754,9 +755,7 @@ vermiddle := Map(ischase AND isMiddleExpressionFound => '',
 	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings_chase), original_reason_with_seq_chase);
 
   // we need to set the flag for Exclude_Minors and modify the reason codes output if the applicant is actually a minor when this option is true
-  Excluded_Minor := if(Excludeminors,risk_indicators.rcSet.isCodeAM((INTEGER)le.age,le.dob),false);
-
-  risk_indicators.mac_add_sequence(dataset([{'AM', risk_indicators.getHRIDesc('AM')}], risk_indicators.Layout_Desc), excluded_minors_set);
+  risk_indicators.mac_add_sequence(dataset([{risk_indicators.iid_constants.minor_reasoncode, risk_indicators.getHRIDesc(risk_indicators.iid_constants.minor_reasoncode)}], risk_indicators.Layout_Desc), excluded_minors_set);
   reasons_with_seq := if(Excluded_Minor, excluded_minors_set, original_reasons_with_seq);
   reason_with_seq_chase := if(Excluded_Minor, excluded_minors_set, original_reason_with_seq_chase);
   	
@@ -1134,13 +1133,13 @@ risk_indicators.Layout_InstantID_NuGenPlus minorsTransform(post_dob_masking l) :
                 self.lname_prev :=l.lname_prev;
                 self.ri:= Dataset([transform(risk_indicators.layouts.layout_desc_plus_seq,
                           self.seq:=1;
-                          self.hri:='AM';
-                          self.desc:=risk_indicators.getHRIDesc('AM') )]);
+                          self.hri:=risk_indicators.iid_constants.minor_reasoncode;
+                          self.desc:=risk_indicators.getHRIDesc(risk_indicators.iid_constants.minor_reasoncode) )]);
                    self:=[];
                 
 END;
 temp_output:= Project(post_dob_masking,minorsTransform(LEFT));
-final_output:=if(excludeminors,temp_output,post_dob_masking);
+final_output:=if(Excluded_Minor,temp_output,post_dob_masking);
 
 // output(age,named('age'));
 //output(excludeminors,named('excludeminors'));

@@ -208,7 +208,23 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_AstVehAutoValTot2Y := IF(ResultsFound, RIGHT.BE_AstVehAutoValTot2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_AstVehAutoEmrgNewMsncEv := IF(ResultsFound, RIGHT.BE_AstVehAutoEmrgNewMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_AstVehAutoEmrgNewDtEv := IF(ResultsFound, RIGHT.BE_AstVehAutoEmrgNewDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			
+			SELF.BE_DrgBkCnt1Y := IF(ResultsFound, RIGHT.BE_DrgBkCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkCnt7Y := IF(ResultsFound, RIGHT.BE_DrgBkCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkCnt10Y := IF(ResultsFound, RIGHT.BE_DrgBkCnt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkOldDt10Y := IF(ResultsFound, RIGHT.BE_DrgBkOldDt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_DrgBkOldMsnc10Y := IF(ResultsFound, RIGHT.BE_DrgBkOldMsnc10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkNewDt10Y := IF(ResultsFound, RIGHT.BE_DrgBkNewDt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_DrgBkNewMsnc10Y := IF(ResultsFound, RIGHT.BE_DrgBkNewMsnc10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkUpdtNewDt10Y := IF(ResultsFound, RIGHT.BE_DrgBkUpdtNewDt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_DrgBkUpdtNewMsnc10Y := IF(ResultsFound, (INTEGER)RIGHT.BE_DrgBkUpdtNewMsnc10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkDispCnt10Y := IF(ResultsFound, RIGHT.BE_DrgBkDispCnt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkDschCnt10Y := IF(ResultsFound, RIGHT.BE_DrgBkDschCnt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkDsmsCnt10Y := IF(ResultsFound, RIGHT.BE_DrgBkDsmsCnt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkNewDispType10Y := IF(ResultsFound, RIGHT.BE_DrgBkNewDispType10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_DrgBkCh7Cnt10Y := IF(ResultsFound, RIGHT.BE_DrgBkCh7Cnt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkCh11Cnt10Y := IF(ResultsFound, RIGHT.BE_DrgBkCh11Cnt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkCh13Cnt10Y := IF(ResultsFound, RIGHT.BE_DrgBkCh13Cnt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_DrgBkNewChType10Y := IF(ResultsFound, RIGHT.BE_DrgBkNewChType10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			
 			SELF := LEFT,
 			SELF := [];
@@ -418,7 +434,23 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_AstVehAutoValTot2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_AstVehAutoEmrgNewMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_AstVehAutoEmrgNewDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-
+			SELF.BE_DrgBkCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkCnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkOldDt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_DrgBkOldMsnc10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkNewDt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_DrgBkNewMsnc10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkUpdtNewDt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_DrgBkUpdtNewMsnc10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkDispCnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkDschCnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkDsmsCnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkNewDispType10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_DrgBkCh7Cnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkCh11Cnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkCh13Cnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_DrgBkNewChType10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			
 			// Attribute from NonFCRABusinessSeleIDNoDatesAttributesV1 KEL query
 			SELF.B_LexIDLegalRstdOnlyFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;

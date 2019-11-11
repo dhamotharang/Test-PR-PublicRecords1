@@ -2056,7 +2056,7 @@ adls_from_address := project(addr_raw(inquiryADLsFromAddr<>0),
 	transform(risk_indicators.Boca_Shell_Fraud.layout_identities_input, self.did := left.inquiryADLsFromAddr;
 							 self.historydate := left.historydate;));
 
-suspicious_identities_hist := risk_indicators.Boca_Shell_Fraud.suspicious_identities_function_hist(adls_from_address);
+suspicious_identities_hist := risk_indicators.Boca_Shell_Fraud.suspicious_identities_function_hist(adls_from_address, mod_access);
 
 
 // if realtime production mode, search just the suspicious Identities key instead

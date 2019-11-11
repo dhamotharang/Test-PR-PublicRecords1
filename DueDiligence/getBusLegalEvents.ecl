@@ -1,9 +1,10 @@
-﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, SALT28, iesp;
+﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, SALT28, iesp, doxie;
 
 EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
-												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-											   BIPV2.mod_sources.iParams linkingOptions,
-												 boolean ReportIsRequested) := FUNCTION
+                                                    Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
+                                                    BIPV2.mod_sources.iParams linkingOptions,
+                                                    boolean ReportIsRequested,
+                                                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	// ------                                                                                    ------
 	// ------ The Business Executives have been added to the Busn_Internal                       ------
@@ -81,7 +82,7 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------ The results will come back this layout:                                            ------
 	// ------      DueDiligence.layouts.Busn_Internal                                            ------
 	// ------                                                                                    ------  
-	UpdateInquiredBusinessWithDerog   := DueDiligence.getBusLien(updateBusnWithEvidenceOfCrim, options, linkingOptions, ReportIsRequested); 
+	UpdateInquiredBusinessWithDerog   := DueDiligence.getBusLien(updateBusnWithEvidenceOfCrim, options, linkingOptions, ReportIsRequested, mod_access := mod_access); 
 	
   
   

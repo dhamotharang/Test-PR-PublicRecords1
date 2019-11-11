@@ -876,7 +876,7 @@ EXPORT Layouts := MODULE
 		STRING6 PL_ProfLicFlagEv;
 		STRING500 PL_ProfLicIssueDtListEv;
 		STRING500 PL_ProfLicExpDtListEv;
-		STRING10 PL_ProfLicIndxByLicListEv;
+		STRING100 PL_ProfLicIndxByLicListEv;
 		STRING6 PL_ProfLicActvFlag;
 		STRING10 PL_ProfLicActvNewIssueDt;
 		STRING10 PL_ProfLicActvNewExpDt;
@@ -1083,6 +1083,23 @@ EXPORT Layouts := MODULE
 		INTEGER4 BE_AstVehAutoValTot2Y;
 		INTEGER3 BE_AstVehAutoEmrgNewMsncEv;
 		STRING10 BE_AstVehAutoEmrgNewDtEv;
+		INTEGER3 BE_DrgBkCnt1Y;
+		INTEGER3 BE_DrgBkCnt7Y;
+		INTEGER3 BE_DrgBkCnt10Y;
+		STRING10 BE_DrgBkOldDt10Y;
+		INTEGER3 BE_DrgBkOldMsnc10Y;
+		STRING10 BE_DrgBkNewDt10Y;
+		INTEGER3 BE_DrgBkNewMsnc10Y;
+		STRING10 BE_DrgBkUpdtNewDt10Y;
+		INTEGER3 BE_DrgBkUpdtNewMsnc10Y;
+		INTEGER3 BE_DrgBkDispCnt10Y;
+		INTEGER3 BE_DrgBkDschCnt10Y;
+		INTEGER3 BE_DrgBkDsmsCnt10Y;
+		STRING10 BE_DrgBkNewDispType10Y;
+		INTEGER3 BE_DrgBkCh7Cnt10Y;
+		INTEGER3 BE_DrgBkCh11Cnt10Y;
+		INTEGER3 BE_DrgBkCh13Cnt10Y;
+		STRING6 BE_DrgBkNewChType10Y;
 	END;	
 		
 	EXPORT LayoutBusinessSeleID := RECORD

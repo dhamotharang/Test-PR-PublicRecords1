@@ -40,9 +40,16 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
 
   // add best info
   email_with_best_recs := $.Functions.AddBestInfo(email_with_num_recs,in_mod);
+  // checking if additional info like best and num_ calculations needed, if not projecting to final rec
+  email_with_additional_info := IF(in_mod.IncludeAdditionalInfo,
+                                  email_with_best_recs,
+                                  PROJECT(email_ddpd_recs,
+                                          TRANSFORM($.Layouts.email_final_rec,
+                                                    SELF:=LEFT,
+                                                    SELF:=[])));
 
   // add email status
-  email_recs_with_hist_status := $.GatewayData.AddStatusFromHistory(email_with_best_recs, in_mod); // per EMAIL-158 reqs. we now add status info using BV history for basic search as well
+  email_recs_with_hist_status := $.GatewayData.AddStatusFromHistory(email_with_additional_info, in_mod); // per EMAIL-158 reqs. we now add status info using BV history for basic search as well
   email_recs_valdtd := $.GatewayData.VerifyDeliveryStatus(email_recs_with_hist_status, in_mod);  // validate status using external GW calls
   email_recs_with_BV := IF(in_mod.CheckEmailDeliverable, email_recs_valdtd.Records, email_recs_with_hist_status);
 
@@ -53,8 +60,8 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
     // will be treated the same as if BV returned an invalid status;
     // they will be removed from Email Address Append results if the option to remove invalid email addresses is turned on.
 
-    filter_undeliverable := ~in_mod.KeepUndeliverableEmail;
-    email_recs_ready := IF(filter_undeliverable,
+  filter_undeliverable := ~in_mod.KeepUndeliverableEmail;
+  email_recs_ready := IF(filter_undeliverable,
                              email_recs_with_BV(~$.Constants.isUndeliverableEmail(email_status)
                              AND (email_quality_mask & BNOT($.Constants.EmailQualityRulesForBVCall) = 0)),  // filtering  email addresses deemed invalid based on flags within the email base file
                              email_recs_with_BV);
@@ -68,9 +75,11 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
 
   // keep max results requested
   ds_results_chsn := UNGROUP(TOPN(GROUP(email_recs_srtd, acctno), in_mod.MaxResultsPerAcct, acctno));
+  // to support email source docs we need to keep all raw data
+  ds_results_unmasked := IF(~in_mod.KeepRawData, ds_results_chsn, email_recs_srtd);
 
   // masking
-  Suppress.Mac_mask(ds_results_chsn, ds_results_best_ssnmasked, bestinfo.ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
+  Suppress.Mac_mask(ds_results_unmasked, ds_results_best_ssnmasked, bestinfo.ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
   Suppress.Mac_mask(ds_results_best_ssnmasked, ds_results_clean_ssnmasked,cleaned.clean_ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
   Suppress.Mac_mask(ds_results_clean_ssnmasked, ds_results_ssnmasked,original.ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
 

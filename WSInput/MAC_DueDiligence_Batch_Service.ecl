@@ -3,9 +3,9 @@
 EXPORT MAC_DueDiligence_Batch_Service := MACRO
 
   #WEBSERVICE(FIELDS(	
-										/*---- Due Diligence Request Fields ----*/
-										'batch_in',
-										'attributesVersion',
+                    /*---- Due Diligence Request Fields ----*/
+                    'batch_in',
+                    'attributesVersion',
                     /*---- Due Diligence FBOP Fields ----*/
                     'FBOP_DateTolerance',
                     'FBOP_DateToleranceYearsPrior',
@@ -17,13 +17,18 @@ EXPORT MAC_DueDiligence_Batch_Service := MACRO
                     'FBOP_DOBNumberOfYearsRadius',                  
                     /*---- Citizenship Request Fields ----*/
                     'modelName',
-										/*---- Compliance Fields ----*/
-										'glbPurpose',
-										'dppaPurpose',
-										'dataRestrictionMask',
-										'dataPermissionMask',
+                    /*---- Compliance Fields ----*/
+                    'glbPurpose',
+                    'dppaPurpose',
+                    'dataRestrictionMask',
+                    'dataPermissionMask',
+                    /*---- CCPA ----*/
+                    'LexIdSourceOptout',
+                    '_TransactionId',
+                    '_BatchUID',
+                    '_GCID',
                     /*---- Debug ----*/
-										'debugMode',
-										'modelValidation'
-									));
+                    'debugMode',
+                    'modelValidation'
+					));
 ENDMACRO;

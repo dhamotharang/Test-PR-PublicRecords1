@@ -16,7 +16,15 @@ EXPORT Best := MODULE
   rec_seleBest := RECORD		
     STRING20 acctno;
     BIPV2.Key_BH_Linking_Ids.kfetchOutRec;
-  END;		
+  END;			
+
+ rec_seleBestSlimFein := Record
+    STRING20 acctno;
+    BIPV2.idlayouts.l_key_ids_bare - [proxid, powid, empid, dotid];
+	string2 source; 
+	string9 company_fein;
+	unsigned4 dt_last_seen;
+  END;
 
   // filter the particular records that are marked as having a parent
   ds_parentsIds := ds_SeleBest(ParentAboveSELE = TRUE);
@@ -517,10 +525,10 @@ END;
   
   // transform for making fein vars into separate fields. 
       BusinessBatch_BIP.Layouts.Fein_Final
-      MakeFlatFein( rec_seleBest le,
-                DATASET(rec_seleBest) allrows) := TRANSFORM
+      MakeFlatFein( rec_seleBestSlimFein le,               
+			DATASET(rec_seleBestSlimFein) allrows) := TRANSFORM
               SELF.acctno := le.acctno;
-                SELF.ultid := LE.ultid;
+              SELF.ultid := LE.ultid;
               SELF.orgid := LE.orgid;
               SELF.seleid := LE.seleid;
               SELF.fein_var1 := allrows[1].company_fein;
@@ -628,7 +636,23 @@ END;
                               TRANSFORM(rec_seleBest,
                                 SELF.acctno := LEFT.acctno;
                                 SELF := RIGHT), LEFT OUTER, LIMIT(0), KEEP(100));
-                                
+   // new line added here.
+   // reduce size of what is passed around in order to get company_fein variations output.
+    // ds_busHeaderRecsSlimmer := project(ds_busHeaderRecsSlim, transform(rec_seleBestSlimFein,
+		                                                                // self.acctno := ''; self := left));
+  	 ds_busHeaderRecsSlimmer := project(ds_busHeaderRecsSlimSorted, transform(rec_seleBestSlimFein,
+		                                                                self.acctno := ''; self := left));																																	
+    // ds_busHeaderRecsSlimSortedWFein  := SORT(ds_busHeaderRecsSlimmer(source <> mdr.sourcetools.src_Experian_FEIN_Rest and
+		                                                                             // company_fein <> ''),#expand(BIPV2.IDmacros.mac_ListTop3Linkids()), RECORD);
+    ds_busHeaderRecsSlimSortedWFein  := ds_busHeaderRecsSlimmer(source <> mdr.sourcetools.src_Experian_FEIN_Rest and
+		                                                                             company_fein <> '');																																					 
+    DS_BHRecsWAcctNoFein :=  JOIN(SORT(DS_SELEBestRecsAcctnoBHSlim,#expand(BIPV2.IDmacros.mac_ListTop3Linkids())),
+                                      ds_busHeaderRecsSlimSortedWFein,
+                              BIPV2.IDmacros.mac_JoinTop3Linkids(),                             
+						TRANSFORM(rec_seleBestSlimFein,
+                                SELF.acctno := LEFT.acctno;
+                                SELF := RIGHT), LEFT OUTER, LIMIT(0), KEEP(100))(ultid <> 0);
+
   DS_seleBestGroupedYrsInBusDedup := DEDUP(SORT(DS_BHRecsWAcctno(dt_first_seen <> 0),
                                     acctno, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),dt_first_seen),
                                       acctno,#expand(BIPV2.IDmacros.mac_ListTop3Linkids()),dt_first_seen);
@@ -652,9 +676,9 @@ END;
                                                 LEFT.prim_name = RIGHT.prim_name AND
                                                 LEFT.prim_range = RIGHT.prim_range,
                                                 TRANSFORM(LEFT), LEFT ONLY), acctno), acctno);																					
-    // grab the top X rows for each acctno of the different linkids/acctno
-    DS_SeleBestGroupedAddrDedupSmall := TOPN( GROUP( SORT(DS_seleBestGroupedAddrDedupSlim,acctno, -dt_last_seen), 
-                acctno), maxVariationsPerAcctno , acctno);
+								
+    DS_SeleBestGroupedAddrDedupSmall :=  GROUP( SORT(DS_seleBestGroupedAddrDedupSlim,acctno, ultid, orgid, seleid, -dt_last_seen), 
+                acctno, ultid, orgid, seleid); 						
   
   // put the DS into  a flat layout
   ds_AddressVarsOutStart := ROLLUP(DS_SeleBestGroupedAddrDedupSmall, 
@@ -666,7 +690,7 @@ END;
   ds_seleBestGroupedcnameDedup := DEDUP(SORT(DS_BHRecsWAcctno, acctno,  
                                   #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), company_name, RECORD),acctno,
                                   #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), company_name);
-  
+																	
   // eliminate dups of cnames that might exist in best
   ds_seleBestGroupedcnameDedupSlim := GROUP(SORT(JOIN(ds_seleBestGroupedcnameDedup, ds_seleBest,	                                               
                                                 LEFT.acctno = RIGHT.acctno AND
@@ -674,28 +698,25 @@ END;
                                                 LEFT.company_name = RIGHT.company_name,
                                                 TRANSFORM(LEFT), LEFT ONLY), acctno), acctno);
 
-  DS_SeleBestGroupedCnameDedupSmall := TOPN( GROUP( SORT(DS_seleBestGroupedCnameDedupSlim,acctno, -dt_last_seen), 
-                acctno), maxVariationsPerAcctno , acctno);
+  DS_SeleBestGroupedCnameDedupSmall := 
+	                        GROUP( SORT(DS_seleBestGroupedCnameDedupSlim,acctno, ultid, orgid, seleid,-dt_last_seen), 
+                acctno, ultid, orgid, seleid); 					
                                                 
   ds_CnameVarsOut := ROLLUP(ds_seleBestGroupedCnameDedupSmall , GROUP, MakeFlatCname(LEFT,ROWS(LEFT)));
   
-  // ok if we drop rows with acctno's here cause we do left outer from selebest below
-  ds_seleBestGroupedFeinDedup := DEDUP(SORT(DS_BHRecsWAcctno(source <> 'E5' and company_fein <> ''), acctno,   #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), company_fein, record)
-                                ,acctno,  #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),company_fein);
-  
+  // ok if we drop rows with acctno's here cause we do left outer from selebest  when we join back farther below w ds_FeinVarsOut 														
+  // ************** already filtered by Source <> 'E5' and company_fein <> ''
+   ds_seleBestGroupedFeinDedup := DEDUP(SORT(DS_BHRecsWAcctNoFein, acctno,   #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), company_fein, record)
+                                ,acctno,  #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),company_fein);															
   // eliminate dups of feins that might exist in best.
-  ds_seleBestGroupedFeinDedupSlim := GROUP(SORT(JOIN(ds_seleBestGroupedFeinDedup, ds_seleBest,	                                               
+
+   ds_seleBestGroupedFeinDedupSlim := GROUP(SORT(JOIN(ds_seleBestGroupedFeinDedup, ds_seleBest,	                                               
                                                 LEFT.acctno = RIGHT.acctno AND
                                                 BIPV2.IDmacros.mac_JoinTop3Linkids() AND
                                                 LEFT.company_fein = RIGHT.company_fein,
-                                                TRANSFORM(LEFT), LEFT ONLY), acctno), acctno);
-                                                                                                    
-  DS_SeleBestGroupedFeinDedupSmall := TOPN( GROUP( SORT(DS_seleBestGroupedFeinDedupSlim,acctno, -dt_last_seen), 
-                acctno), maxVariationsPerAcctno , acctno);																								 
-                                                  
-  ds_FeinVarsOut := ROLLUP(ds_seleBestGroupedFeinDedupSmall , GROUP, MakeFlatFein(LEFT,ROWS(LEFT)));
-  
-  
+                                                TRANSFORM(LEFT), LEFT ONLY), acctno, ultid, orgid, seleid, -dt_last_seen), acctno, ultid, orgid, seleid);		                                                                                                    							
+								
+    ds_FeinVarsOut := ROLLUP(ds_seleBestGroupedFeinDedupSlim , GROUP, MakeFlatFein(LEFT,ROWS(LEFT)));
   // create a DS from input best to start with that will have all incoming acctno's from input
   //
   ds_initialAcctno := PROJECT(ds_seleBest, TRANSFORM({STRING20 acctno;
@@ -774,9 +795,13 @@ END;
                                   SELF := RIGHT,
                                   SELF :=[]; // self.business_type set later from corp data
                                   )), acctno,record), BusinessBatch_BIP.Layouts.BestLayoutWithFeinVars);	  																		  
-  
+    // output(DS_SELEBestRecsAcctnoBHSlim, named('DS_SELEBestRecsAcctnoBHSlim'));
+	// output(count(ds_busHeaderRecsSlimSortedWFein), named('count_ds_busHeaderRecsSlimSortedWFein'));
+	// output(count(DS_BHRecsWAcctNoFein), named('count_DS_BHRecsWAcctNoFein'));
+	// output(DS_BHRecsWAcctNoFein, named('DS_BHRecsWAcctNoFein'));
   // output(DS_SeleBestGrouped, named('DS_SeleBestGrouped'));
-    //output(ds_seleBest, named('ds_seleBest'));
+    // output(ds_seleBest, named('ds_seleBest'));
+    // output(ds_busHeaderRecsSlimmer, named('ds_busHeaderRecsSlimmer'));
     //output(ds_seleBestSORTEDBYRecordScore, named('ds_seleBestSORTEDBYRecordScore'));
   // output(ds_SeleBestWacctno, named('ds_SeleBestWacctno'));
   // output(DS_SELEBestRecsAcctnoBH, named('DS_SELEBestRecsAcctnoBH'));
@@ -805,8 +830,8 @@ END;
   // output(ds_parents, named('ds_parents'));
   //output(ds_CnameVarsOut, named('ds_CnameVarsOut'));
   // output(ds_seleBestGroupedFeinDedup, named('ds_seleBestGroupedFeinDedup'));
-  // output(ds_seleBestGroupedFeinDedupSlim, named('ds_seleBestGroupedFeinDedupSlim'));
-  // output(DS_SeleBestGroupedFeinDedupSmall, named('DS_SeleBestGroupedFeinDedupSmall'));
+   // output(ds_seleBestGroupedFeinDedupSlim, named('ds_seleBestGroupedFeinDedupSlim'));
+   // output(DS_SeleBestGroupedFeinDedupSmall, named('DS_SeleBestGroupedFeinDedupSmall'));
   //output(ds_seleBestGroupedcnameDedup, named('ds_seleBestGroupedcnameDedup'));
   // output(ds_FeinVarsOut, named('ds_FeinVarsOut'));
   // output(DS_BHRecsWAcctno, named('DS_BHRecsWAcctno'));

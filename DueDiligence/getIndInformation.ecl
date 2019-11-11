@@ -1,7 +1,8 @@
 ﻿IMPORT Business_Risk_BIP, doxie, DueDiligence, Gateway, risk_indicators;
 
 
-EXPORT getIndInformation(Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := MODULE
+EXPORT getIndInformation(Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+                                                doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := MODULE
 
 
 
@@ -19,7 +20,8 @@ EXPORT getIndInformation(Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := 
         
         
 
-        withDID := risk_indicators.iid_getDID_prepOutput(inData, options.DPPA_Purpose, options.GLBA_Purpose, FALSE, bsVersion, options.DataRestrictionMask, appendBest, gateways, bsOptions);
+        withDID := risk_indicators.iid_getDID_prepOutput(inData, options.DPPA_Purpose, options.GLBA_Purpose, FALSE, bsVersion, options.DataRestrictionMask, appendBest, gateways, bsOptions,
+                                                                                              mod_access := mod_access);
         
         //pick the DID with the highest score, 
         //in the event that multiple have the same score, choose the lowest value DID to make this deterministic

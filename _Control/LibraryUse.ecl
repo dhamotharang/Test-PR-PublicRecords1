@@ -49,23 +49,23 @@ export ForceOffOne_Business_Risk_BIP__LIB_Business_Shell := TRUE;
 // export ForceOffOne_AutoHeaderI__LIB_FetchI_Hdr_Biz := FALSE;
 export ForceOffOne_AutoHeaderI__LIB_FetchI_Hdr_Biz := TRUE;
 
-export ForceOffOne_PublicRecords_KEL__LIB_ConsumerAttributes := FALSE;
-// export ForceOffOne_PublicRecords_KEL__LIB_ConsumerAttributes := TRUE;
+// export ForceOffOne_PublicRecords_KEL__LIB_ConsumerAttributes := FALSE;
+export ForceOffOne_PublicRecords_KEL__LIB_ConsumerAttributes := TRUE;
 
-export ForceOffOne_PublicRecords_KEL__LIB_BusinessSeleAttributes := FALSE;
-// export ForceOffOne_PublicRecords_KEL__LIB_BusinessSeleAttributes := TRUE;
+// export ForceOffOne_PublicRecords_KEL__LIB_BusinessSeleAttributes := FALSE;
+export ForceOffOne_PublicRecords_KEL__LIB_BusinessSeleAttributes := TRUE;
 
-export ForceOffOne_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes := FALSE;
-// export ForceOffOne_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes := TRUE;
+// export ForceOffOne_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes := FALSE;
+export ForceOffOne_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes := TRUE;
 
-export ForceOffOne_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes_NoDates := FALSE;
-// export ForceOffOne_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes_NoDates := TRUE;
+// export ForceOffOne_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes_NoDates := FALSE;
+export ForceOffOne_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes_NoDates := TRUE;
 
-export ForceOffOne_PublicRecords_KEL__LIB_ConsumerInputAttributes := FALSE;
-// export ForceOffOne_PublicRecords_KEL__LIB_ConsumerInputAttributes := TRUE;
+// export ForceOffOne_PublicRecords_KEL__LIB_ConsumerInputAttributes := FALSE;
+export ForceOffOne_PublicRecords_KEL__LIB_ConsumerInputAttributes := TRUE;
 
-export ForceOffOne_PublicRecords_KEL__LIB_BusinessInputAttributes := FALSE;
-// export ForceOffOne_PublicRecords_KEL__LIB_BusinessInputAttributes := TRUE;
+// export ForceOffOne_PublicRecords_KEL__LIB_BusinessInputAttributes := FALSE;
+export ForceOffOne_PublicRecords_KEL__LIB_BusinessInputAttributes := TRUE;
 
 // cleaner library is shared between Thor and Roxie, so by default it should be OFF,
 // so that no sandboxing would be required for the build jobs (dev and prod).

@@ -110,6 +110,10 @@ seq_map := join( indata1, indata,
 			export string50 DataPermission := in_DataPermission;
 			export boolean IncludeNAPData := in_IncludeNAPData;
 			export string100 IntendedPurpose := in_IntendedPurpose;
+			export unsigned1 iid_LexIdSourceOptout := LexIdSourceOptout;
+			export string16 iid_TransactionID := (string16)TransactionID;
+			export string16 iid_BatchUID := (string16)BatchUID;
+			export unsigned6 iid_GlobalCompanyId := GlobalCompanyId;
 		END;
 
 	// Call Library
@@ -122,7 +126,11 @@ seq_map := join( indata1, indata,
 								in_runSSNCodes, in_runBestAddrCheck, in_runChronoPhoneLookup, in_runAreaCodeSplitSearch, // optimization options	
 								in_allowCellphones, in_ExactMatchLevel, in_DataRestriction, in_CustomDataFilter, in_runDLverification,
 								watchlists_requested, DOBMatchOptions, in_EverOccupant_PastMonths, in_EverOccupant_StartDate, in_append_best,
-								in_BSOptions_override, in_LastSeenThreshold, in_CompanyID, in_DataPermission, in_IncludeNAPData, in_IntendedPurpose);
+								in_BSOptions_override, in_LastSeenThreshold, in_CompanyID, in_DataPermission, in_IncludeNAPData, in_IntendedPurpose,
+								LexIdSourceOptout := LexIdSourceOptout, 
+								TransactionID := TransactionID, 
+								BatchUID := BatchUID, 
+								GlobalCompanyID := GlobalCompanyID);
 
 	iid_results := base;
 	

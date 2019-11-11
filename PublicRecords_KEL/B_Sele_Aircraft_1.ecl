@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Aircraft,E_Business_Org,E_Business_Sele,E_Business_Ult,E_Se
 IMPORT * FROM KEL11.Null;
 EXPORT B_Sele_Aircraft_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Sele_Aircraft(__in,__cfg).__Result) __E_Sele_Aircraft := E_Sele_Aircraft(__in,__cfg).__Result;
-  SHARED __EE938191 := __E_Sele_Aircraft;
-  EXPORT __ST74715_Layout := RECORD
+  SHARED __EE934836 := __E_Sele_Aircraft;
+  EXPORT __ST76027_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.nint Ult_I_D_;
@@ -19,9 +19,9 @@ EXPORT B_Sele_Aircraft_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST74715_Layout __ND938252__Project(E_Sele_Aircraft(__in,__cfg).Layout __PP938105) := TRANSFORM
+  SHARED __ST76027_Layout __ND934897__Project(E_Sele_Aircraft(__in,__cfg).Layout __PP934750) := TRANSFORM
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('faa_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP938105;
+    SELF := __PP934750;
   END;
-  EXPORT __ENH_Sele_Aircraft_1 := PROJECT(__EE938191,__ND938252__Project(LEFT));
+  EXPORT __ENH_Sele_Aircraft_1 := PROJECT(__EE934836,__ND934897__Project(LEFT));
 END;

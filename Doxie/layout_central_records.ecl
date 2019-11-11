@@ -1,7 +1,7 @@
 ﻿// Extends header-based data with single source data
 
 import moxie_phonesplus_server, bankruptcyv2_services, doxie_crs, doxie, liensv2_services,
-  UCCv2_Services, Votersv2_services, WatercraftV2_services,	DeaV2_Services, EmailService, iesp;
+  UCCv2_Services, Votersv2_services, WatercraftV2_services,	DeaV2_Services, EmailService, EmailV2_Services, iesp;
 
 con := doxie_crs.constants;
 
@@ -51,7 +51,7 @@ recASL2			:= iesp.student.t_StudentRecord;
 
 
 //**** Monster record def
-// maxlength overrides maxcount on child datasets 
+// maxlength overrides maxcount on child datasets
 // but maxcount for all new child datasets needs to specified to future compatibility
 export layout_central_records := record, maxlength(doxie_crs.maxlength_report)
   doxie.layout_central_header and not [subject_names, subject_addresses, errors];
@@ -96,7 +96,8 @@ export layout_central_records := record, maxlength(doxie_crs.maxlength_report)
 	dataset(recpsummary) phone_summary {xpath('PhoneSummary'), maxcount(con.max_phone_summary)};
 	dataset(recASL) student_information {xpath('PossibleStudentInformation'), MAXCOUNT(iesp.Constants.MaxCountASL)};
 	dataset(recASL2) studentV2_information {xpath('PossibleStudentRecords/PossibleStudentRecord'), MAXCOUNT(iesp.Constants.MaxCountASLSearch)};
-	
+
+  EmailV2_Services.Layouts.crs_email_combined_rec;
 	boolean bankruptcies_v2_indicator := false;
 	boolean corporate_affiliations_indicator := false;
 	boolean propertyV2__indicator := false;

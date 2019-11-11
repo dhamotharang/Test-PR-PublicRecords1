@@ -9,7 +9,9 @@ EXPORT IParams := MODULE
     EXPORT BOOLEAN   RequireLexidMatch    := FALSE;  // specific to EAA search type
     EXPORT UNSIGNED1 EmailQualityRulesMask := 0;
     EXPORT BOOLEAN   RunDeepDive          := FALSE;  // specific to EAA search type
-    EXPORT STRING    SearchType := '';
+    EXPORT BOOLEAN   KeepRawData          := FALSE;  // if true data won't be rolled up - keeping all individual source docs - for headersource service usage
+    EXPORT BOOLEAN   IncludeAdditionalInfo := TRUE;  // if true best info and num_lexId_per_email/num_email_per_lexid calculated (default). Can be set to False if this info is not used in results to skip these steps - (will be False for headersource service usage)
+    EXPORT STRING    SearchType := '';  // expected values are listed in $.Constants.SearchType
     EXPORT STRING    RestrictedUseCase := $.Constants.RestrictedUseCase.Standard; // for the purpose of email filtering by source as needed
     EXPORT STRING    BVAPIkey := '';
     EXPORT UNSIGNED  MaxEmailsForDeliveryCheck := $.Constants.Defaults.MaxEmailsToCheckDeliverable;   //max number of result email addresses per account to send to gateway for delivery check
@@ -83,7 +85,7 @@ EXPORT IParams := MODULE
     email_search_params := MODULE(PROJECT(mod_access, SearchParams, OPT))
       EXPORT BOOLEAN  RunDeepDive := in_optns.IncludeAlsoFound OR in_optns.IncludeNoLexIdMatch;  //= ~nodeepdive, specific to EAA search type
       EXPORT UNSIGNED2  PenaltThreshold := IF(in_optns.PenaltyThreshold > 0, in_optns.PenaltyThreshold, $.Constants.Defaults.PenaltThreshold);  // specific to EAA search type
-      EXPORT UNSIGNED MaxResultsPerAcct := IF(in_optns.MaxResults > 0, in_optns.MaxResults, $.Constants.Defaults.MaxResults);
+      EXPORT UNSIGNED MaxResultsPerAcct := MAP(in_optns.MaxResults > 0 => in_optns.MaxResults, in_optns.ReturnCount > 0 => in_optns.ReturnCount, $.Constants.Defaults.MaxResults);
       EXPORT STRING SearchType := STD.Str.ToUpperCase(TRIM(in_optns.SearchType,ALL));
       EXPORT BOOLEAN IncludeHistoricData := in_optns.IncludeHistoricData;
       EXPORT BOOLEAN RequireLexidMatch := ~in_optns.IncludeNoLexIdMatch; //specific to EAA search type

@@ -206,7 +206,7 @@
 	STRING6 PL_ProfLicFlagEv;
 	STRING500 PL_ProfLicIssueDtListEv;
 	STRING500 PL_ProfLicExpDtListEv;
-	STRING10 PL_ProfLicIndxByLicListEv;
+	STRING100 PL_ProfLicIndxByLicListEv;
 	STRING6 PL_ProfLicActvFlag;
 	STRING10 PL_ProfLicActvNewIssueDt;
 	STRING10 PL_ProfLicActvNewExpDt;
