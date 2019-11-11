@@ -26,6 +26,7 @@ export t_PhoneFinderVerificationSearchOption := record
 	integer LengthOfTimeThreshold {xpath('LengthOfTimeThreshold')};
 	boolean VerifyPhoneLastNameAddress {xpath('VerifyPhoneLastNameAddress')};
 	boolean VerifyPhoneAddress {xpath('VerifyPhoneAddress')};
+	boolean VerifyPhoneLastName {xpath('VerifyPhoneLastName')};
 end;
 		
 export t_ZumigoOption := record
