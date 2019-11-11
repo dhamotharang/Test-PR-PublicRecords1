@@ -1,8 +1,9 @@
-﻿IMPORT DueDiligence, iesp;
+﻿IMPORT DueDiligence, iesp, Doxie;
 
 EXPORT reportBusLien(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnLiens, 
 											   DATASET(DueDiligence.LayoutsInternal.layout_liens_judgments_categorized) BusinessLiens,
-											   boolean DebugMode = FALSE) := FUNCTION
+											   boolean DebugMode = FALSE,
+                                               doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
    // -----                                                                                     ----- 
@@ -15,7 +16,7 @@ EXPORT reportBusLien(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnLiens
                                                     KEEP(iesp.constants.DDRAttributesConst.MaxLienJudgementsEvictions)); 
 
 
-  UdateBusinessLiensForReporting   := DueDiligence.reportBusLienDebtorCreditor(BusinessLiensButLimted, debugmode);
+  UdateBusinessLiensForReporting   := DueDiligence.reportBusLienDebtorCreditor(BusinessLiensButLimted, debugmode, mod_access);
 			
  
  /* perform the DENORMALIZE (join) by Link ID                                 */   															 															

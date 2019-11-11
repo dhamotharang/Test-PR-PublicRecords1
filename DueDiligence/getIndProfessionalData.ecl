@@ -1,13 +1,14 @@
-﻿IMPORT DueDiligence;
+﻿IMPORT DueDiligence, Doxie;
 
-  EXPORT getIndProfessionalData(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := FUNCTION
+  EXPORT getIndProfessionalData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
+                                                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
     //Need to convert the inquuired individual into a dataset BEFORE calling the getIndProfLic 
    indivRelatedPartyDS := DueDiligence.CommonIndividual.CreateRelatedPartyDataset(inData);  
    
     //get the professional licenses
-   indProfLicenseData := DueDiligence.getIndProfLic(indivRelatedPartyDS);
+   indProfLicenseData := DueDiligence.getIndProfLic(indivRelatedPartyDS, mod_access);
    
    
    //reformat the license data into the related party - that is pass the DATASET of licenses created by the getIndProfLic 

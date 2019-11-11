@@ -318,6 +318,14 @@ single_model := Dataset([Transform(Models.Layouts.Layout_Model_Request_In,
 //identity fields are available as regular input fields, but if the new model is requested via InstantID or FlexID, the fields will be
 //available only through this custom model request.  
 
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := GLB_Purpose;
+	EXPORT dppa := DPPA_Purpose;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
+
 //If this model request limit changes, update the model_check and custom_field_replacement functions as well
 Model_requests := choosen(ModelOptions_In, 3);
 
@@ -687,7 +695,7 @@ test_prep := PROJECT(d,into_test_prep(LEFT));
 model_indicator := IF(doParoAttributes, Models.FraudAdvisor_Constants.attrvparo, ''); //model names will now be passed in through the model request structure in getFDAttributes
 
 // Get the attributes
-attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs, ModelRequests := Valid_requested_models);
+attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs, ModelRequests := Valid_requested_models, mod_access := mod_access);
 //For Paro update
 // attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs,
                                      // DPPA_Purpose, GLB_Purpose, DataRestriction, DataPermission, '', Valid_requested_models);

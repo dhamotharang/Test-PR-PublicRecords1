@@ -1195,4 +1195,6 @@ inputssnflag := map(
 return inputssnflag;
 end;
 
+Export minor_reasoncode := 'AM';
+
 end;

@@ -1,9 +1,10 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
 
 EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                     Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
                     BIPV2.mod_sources.iParams linkingOptions,
-                    STRING6 ssnMask) := FUNCTION
+                    STRING6 ssnMask,
+                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
 
@@ -22,7 +23,7 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     getAircraftData := DueDiligence.reportIndAircraft(getVehicleData);
 
-    getBusinessAssociationReportData := DueDiligence.reportIndBusAssoc(getAircraftData, options, linkingOptions);
+    getBusinessAssociationReportData := DueDiligence.reportIndBusAssoc(getAircraftData, options, linkingOptions, mod_access);
     
     getIdentityReportData := DueDiligence.reportIndIdentity(getBusinessAssociationReportData);
 

@@ -13,7 +13,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Original_Filing_Number_;
     KEL.typ.nstr Filing_Type_Description_;
     KEL.typ.nint Amount_;
-    KEL.typ.nstr Eviction_Flag_;
+    KEL.typ.nstr Landlord_Tenant_Dispute_Flag_;
     KEL.typ.nstr Certificate_Number_;
     KEL.typ.nstr I_R_S_Serial_Number_;
     KEL.typ.nstr Case_Number_;
@@ -29,7 +29,6 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nbool Sent_To_Credit_Bureau_Flag_;
     KEL.typ.nstr Satisfaction_Type_;
     KEL.typ.nkdate Original_Filing_Date_;
-    KEL.typ.nkdate Release_Date_;
     KEL.typ.nkdate Collection_Date_;
     KEL.typ.nkdate Effective_Date_;
     KEL.typ.nkdate Expiration_Date_;
@@ -42,7 +41,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(DEFAULT:UID),tmsid(DEFAULT:T_M_S_I_D_),rmsid(DEFAULT:R_M_S_I_D_),filingnumber(DEFAULT:Filing_Number_:\'\'),originalfilingnumber(DEFAULT:Original_Filing_Number_:\'\'),filingtypedescription(DEFAULT:Filing_Type_Description_:\'\'),amount(DEFAULT:Amount_:\'\'),evictionflag(DEFAULT:Eviction_Flag_:\'\'),certificatenumber(DEFAULT:Certificate_Number_:\'\'),irsserialnumber(DEFAULT:I_R_S_Serial_Number_:\'\'),casenumber(DEFAULT:Case_Number_:\'\'),caselinkid(DEFAULT:Case_Link_I_D_:\'\'),filingbook(DEFAULT:Filing_Book_:\'\'),filingpage(DEFAULT:Filing_Page_:\'\'),filingstate(DEFAULT:Filing_State_:\'\'),filingstatusdescription(DEFAULT:Filing_Status_Description_:\'\'),agencyid(DEFAULT:Agency_I_D_:\'\'),agency(DEFAULT:Agency_:\'\'),agencycounty(DEFAULT:Agency_County_:\'\'),agencystate(DEFAULT:Agency_State_:\'\'),senttocreditbureauflag(DEFAULT:Sent_To_Credit_Bureau_Flag_),satisfactiontype(DEFAULT:Satisfaction_Type_:\'\'),originalfilingdate(DEFAULT:Original_Filing_Date_:DATE),releasedate(DEFAULT:Release_Date_:DATE),collectiondate(DEFAULT:Collection_Date_:DATE),effectivedate(DEFAULT:Effective_Date_:DATE),expirationdate(DEFAULT:Expiration_Date_:DATE),lapsedate(DEFAULT:Lapse_Date_:0),processdate(DEFAULT:Process_Date_:DATE),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(DEFAULT:UID),tmsid(DEFAULT:T_M_S_I_D_),rmsid(DEFAULT:R_M_S_I_D_),filingnumber(DEFAULT:Filing_Number_:\'\'),originalfilingnumber(DEFAULT:Original_Filing_Number_:\'\'),filingtypedescription(DEFAULT:Filing_Type_Description_:\'\'),amount(DEFAULT:Amount_:\'\'),landlordtenantdisputeflag(DEFAULT:Landlord_Tenant_Dispute_Flag_:\'\'),certificatenumber(DEFAULT:Certificate_Number_:\'\'),irsserialnumber(DEFAULT:I_R_S_Serial_Number_:\'\'),casenumber(DEFAULT:Case_Number_:\'\'),caselinkid(DEFAULT:Case_Link_I_D_:\'\'),filingbook(DEFAULT:Filing_Book_:\'\'),filingpage(DEFAULT:Filing_Page_:\'\'),filingstate(DEFAULT:Filing_State_:\'\'),filingstatusdescription(DEFAULT:Filing_Status_Description_:\'\'),agencyid(DEFAULT:Agency_I_D_:\'\'),agency(DEFAULT:Agency_:\'\'),agencycounty(DEFAULT:Agency_County_:\'\'),agencystate(DEFAULT:Agency_State_:\'\'),senttocreditbureauflag(DEFAULT:Sent_To_Credit_Bureau_Flag_),satisfactiontype(DEFAULT:Satisfaction_Type_:\'\'),originalfilingdate(DEFAULT:Original_Filing_Date_:DATE),collectiondate(DEFAULT:Collection_Date_:DATE),effectivedate(DEFAULT:Effective_Date_:DATE),expirationdate(DEFAULT:Expiration_Date_:DATE),lapsedate(DEFAULT:Lapse_Date_:0),processdate(DEFAULT:Process_Date_:DATE),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -73,10 +72,9 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Satisfaction_Type_;
     KEL.typ.nint Amount_;
     KEL.typ.nstr Filing_State_;
-    KEL.typ.nstr Eviction_Flag_;
+    KEL.typ.nstr Landlord_Tenant_Dispute_Flag_;
     KEL.typ.nkdate Original_Filing_Date_;
     KEL.typ.nkdate Effective_Date_;
-    KEL.typ.nkdate Release_Date_;
     KEL.typ.nkdate Collection_Date_;
     KEL.typ.nkdate Expiration_Date_;
     KEL.typ.nint Lapse_Date_;
@@ -124,7 +122,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   Layout Lien_Judgment__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
     SELF.T_M_S_I_D_ := KEL.Intake.SingleValue(__recs,T_M_S_I_D_);
     SELF.R_M_S_I_D_ := KEL.Intake.SingleValue(__recs,R_M_S_I_D_);
-    SELF.Filing_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Filing_Number_,Original_Filing_Number_,Filing_Type_Description_,Filing_Status_Description_,Satisfaction_Type_,Amount_,Filing_State_,Eviction_Flag_,Original_Filing_Date_,Effective_Date_,Release_Date_,Collection_Date_,Expiration_Date_,Lapse_Date_,Process_Date_},Filing_Number_,Original_Filing_Number_,Filing_Type_Description_,Filing_Status_Description_,Satisfaction_Type_,Amount_,Filing_State_,Eviction_Flag_,Original_Filing_Date_,Effective_Date_,Release_Date_,Collection_Date_,Expiration_Date_,Lapse_Date_,Process_Date_),Filing_Layout)(__NN(Filing_Number_) OR __NN(Original_Filing_Number_) OR __NN(Filing_Type_Description_) OR __NN(Filing_Status_Description_) OR __NN(Satisfaction_Type_) OR __NN(Amount_) OR __NN(Filing_State_) OR __NN(Eviction_Flag_) OR __NN(Original_Filing_Date_) OR __NN(Effective_Date_) OR __NN(Release_Date_) OR __NN(Collection_Date_) OR __NN(Expiration_Date_) OR __NN(Lapse_Date_) OR __NN(Process_Date_)));
+    SELF.Filing_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Filing_Number_,Original_Filing_Number_,Filing_Type_Description_,Filing_Status_Description_,Satisfaction_Type_,Amount_,Filing_State_,Landlord_Tenant_Dispute_Flag_,Original_Filing_Date_,Effective_Date_,Collection_Date_,Expiration_Date_,Lapse_Date_,Process_Date_},Filing_Number_,Original_Filing_Number_,Filing_Type_Description_,Filing_Status_Description_,Satisfaction_Type_,Amount_,Filing_State_,Landlord_Tenant_Dispute_Flag_,Original_Filing_Date_,Effective_Date_,Collection_Date_,Expiration_Date_,Lapse_Date_,Process_Date_),Filing_Layout)(__NN(Filing_Number_) OR __NN(Original_Filing_Number_) OR __NN(Filing_Type_Description_) OR __NN(Filing_Status_Description_) OR __NN(Satisfaction_Type_) OR __NN(Amount_) OR __NN(Filing_State_) OR __NN(Landlord_Tenant_Dispute_Flag_) OR __NN(Original_Filing_Date_) OR __NN(Effective_Date_) OR __NN(Collection_Date_) OR __NN(Expiration_Date_) OR __NN(Lapse_Date_) OR __NN(Process_Date_)));
     SELF.Book_Filing_Details_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Filing_Number_,Filing_Book_,Filing_Page_},Filing_Number_,Filing_Book_,Filing_Page_),Book_Filing_Details_Layout)(__NN(Filing_Number_) OR __NN(Filing_Book_) OR __NN(Filing_Page_)));
     SELF.Agency_I_D_ := KEL.Intake.SingleValue(__recs,Agency_I_D_);
     SELF.Agency_ := KEL.Intake.SingleValue(__recs,Agency_);
@@ -142,7 +140,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF := __r;
   END;
   Layout Lien_Judgment__Single_Rollup(InLayout __r) := TRANSFORM
-    SELF.Filing_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Filing_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Filing_Number_) OR __NN(Original_Filing_Number_) OR __NN(Filing_Type_Description_) OR __NN(Filing_Status_Description_) OR __NN(Satisfaction_Type_) OR __NN(Amount_) OR __NN(Filing_State_) OR __NN(Eviction_Flag_) OR __NN(Original_Filing_Date_) OR __NN(Effective_Date_) OR __NN(Release_Date_) OR __NN(Collection_Date_) OR __NN(Expiration_Date_) OR __NN(Lapse_Date_) OR __NN(Process_Date_)));
+    SELF.Filing_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Filing_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Filing_Number_) OR __NN(Original_Filing_Number_) OR __NN(Filing_Type_Description_) OR __NN(Filing_Status_Description_) OR __NN(Satisfaction_Type_) OR __NN(Amount_) OR __NN(Filing_State_) OR __NN(Landlord_Tenant_Dispute_Flag_) OR __NN(Original_Filing_Date_) OR __NN(Effective_Date_) OR __NN(Collection_Date_) OR __NN(Expiration_Date_) OR __NN(Lapse_Date_) OR __NN(Process_Date_)));
     SELF.Book_Filing_Details_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Book_Filing_Details_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Filing_Number_) OR __NN(Filing_Book_) OR __NN(Filing_Page_)));
     SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
@@ -173,7 +171,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OriginalFilingNumber',COUNT(__d0(__NL(Original_Filing_Number_))),COUNT(__d0(__NN(Original_Filing_Number_)))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FilingTypeDescription',COUNT(__d0(__NL(Filing_Type_Description_))),COUNT(__d0(__NN(Filing_Type_Description_)))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Amount',COUNT(__d0(__NL(Amount_))),COUNT(__d0(__NN(Amount_)))},
-    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','EvictionFlag',COUNT(__d0(__NL(Eviction_Flag_))),COUNT(__d0(__NN(Eviction_Flag_)))},
+    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LandlordTenantDisputeFlag',COUNT(__d0(__NL(Landlord_Tenant_Dispute_Flag_))),COUNT(__d0(__NN(Landlord_Tenant_Dispute_Flag_)))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CertificateNumber',COUNT(__d0(__NL(Certificate_Number_))),COUNT(__d0(__NN(Certificate_Number_)))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IRSSerialNumber',COUNT(__d0(__NL(I_R_S_Serial_Number_))),COUNT(__d0(__NN(I_R_S_Serial_Number_)))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CaseNumber',COUNT(__d0(__NL(Case_Number_))),COUNT(__d0(__NN(Case_Number_)))},
@@ -189,7 +187,6 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SentToCreditBureauFlag',COUNT(__d0(__NL(Sent_To_Credit_Bureau_Flag_))),COUNT(__d0(__NN(Sent_To_Credit_Bureau_Flag_)))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SatisfactionType',COUNT(__d0(__NL(Satisfaction_Type_))),COUNT(__d0(__NN(Satisfaction_Type_)))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OriginalFilingDate',COUNT(__d0(__NL(Original_Filing_Date_))),COUNT(__d0(__NN(Original_Filing_Date_)))},
-    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ReleaseDate',COUNT(__d0(__NL(Release_Date_))),COUNT(__d0(__NN(Release_Date_)))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CollectionDate',COUNT(__d0(__NL(Collection_Date_))),COUNT(__d0(__NN(Collection_Date_)))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','EffectiveDate',COUNT(__d0(__NL(Effective_Date_))),COUNT(__d0(__NN(Effective_Date_)))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ExpirationDate',COUNT(__d0(__NL(Expiration_Date_))),COUNT(__d0(__NN(Expiration_Date_)))},

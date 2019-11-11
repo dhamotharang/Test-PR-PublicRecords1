@@ -1,11 +1,12 @@
-﻿IMPORT DueDiligence, risk_indicators;
+﻿IMPORT DueDiligence, risk_indicators, Doxie;
 
 EXPORT getIndSSNData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                       STRING dataRestrictionMask,
                       UNSIGNED1 dppa,
                       UNSIGNED1 glba,
                       INTEGER bsVersion,
-                      UNSIGNED8 bsOptions) := FUNCTION
+                      UNSIGNED8 bsOptions,
+                      doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 																							
 		
 	
@@ -13,7 +14,7 @@ EXPORT getIndSSNData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 		parents := DueDiligence.CommonIndividual.getRelationship(inData, parents, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);																																																		
 		allInd := parents + inData;
 
-		withSSNFlags := DueDiligence.CommonIndividual.GetIIDSSNFlags(allInd, dataRestrictionMask, dppa, glba, bsVersion, bsOptions);
+		withSSNFlags := DueDiligence.CommonIndividual.GetIIDSSNFlags(allInd, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, mod_access);
 		
 		validateSSN := JOIN(allInd, withSSNFlags,
 																						LEFT.seq = (UNSIGNED)RIGHT.account AND
