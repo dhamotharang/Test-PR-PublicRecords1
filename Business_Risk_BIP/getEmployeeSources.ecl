@@ -1,13 +1,14 @@
-﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, BusReg, DCAV2, DNB_DMI, InfoUSA, MDR, OSHAIR, Risk_Indicators, UT, YellowPages;
+﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, BusReg, DCAV2, DNB_DMI, InfoUSA, MDR, Risk_Indicators, Doxie, STD;
 
 EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	// ---------------- DNB DMI - Dunn Bradstreet DMI ------------------
-	DNBDMIRaw := IF(StringLib.StringFind(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0, // Only grab DNB DMI data if it is explicitly passed in as allowed
-									DNB_DMI.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
+	DNBDMIRaw := IF(STD.Str.Find(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0, // Only grab DNB DMI data if it is explicitly passed in as allowed
+									DNB_DMI.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
@@ -35,7 +36,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
 			 INTEGER FirmEmployeeCount := MAX(GROUP, IF(RawFields.Employees_Total = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, 
                                        (INTEGER)RawFields.Employees_Total)),
-			 INTEGER FinanceWorthOfBus := MAX(GROUP, (INTEGER)(StringLib.StringFilter(RawFields.Net_Worth_Sign, '-') + (STRING)RawFields.Net_Worth))
+			 INTEGER FinanceWorthOfBus := MAX(GROUP, (INTEGER)(STD.Str.Filter(RawFields.Net_Worth_Sign, '-') + (STRING)RawFields.Net_Worth))
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
 			 );
@@ -92,7 +93,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (StringLib.StringFilter((STRING)SICField, '0123456789'))[1..4],
+			 STRING10 SICCode := (STD.Str.Filter((STRING)SICField, '0123456789'))[1..4],
 			 BOOLEAN IsPrimary := PrimarySIC // SIC1 is the primary SIC in DNB DMI data, all others are not primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)SICField)[1..4]
@@ -178,7 +179,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (StringLib.StringFilter((STRING)RawFields.SIC, '0123456789'))[1..4],
+			 STRING10 SICCode := (STD.Str.Filter((STRING)RawFields.SIC, '0123456789'))[1..4],
 			 BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)RawFields.SIC)[1..4]
@@ -191,7 +192,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 NAICCode := (StringLib.StringFilter((STRING)RawFields.NAICS, '0123456789'))[1..6],
+			 STRING10 NAICCode := (STD.Str.Filter((STRING)RawFields.NAICS, '0123456789'))[1..6],
 			 BOOLEAN IsPrimary := TRUE // There is only 1 NAIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)RawFields.NAICS)[1..6]
@@ -220,7 +221,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 	
 	// ---------------- DCA - Directory of Corporate Affiliations AKA LNCA ------------------
-	DCARaw := DCAV2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
+	DCARaw := DCAV2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
@@ -302,7 +303,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (StringLib.StringFilter((STRING)SICField, '0123456789'))[1..4],
+			 STRING10 SICCode := (STD.Str.Filter((STRING)SICField, '0123456789'))[1..4],
 			 BOOLEAN IsPrimary := PrimarySIC // SIC1 is the primary SIC in DCA data, all others are not primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)SICField)[1..4]
@@ -341,7 +342,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 NAICCode := (StringLib.StringFilter((STRING)NAICField, '0123456789'))[1..6],
+			 STRING10 NAICCode := (STD.Str.Filter((STRING)NAICField, '0123456789'))[1..6],
 			 BOOLEAN IsPrimary := PrimaryNAIC // NAIC1 is the primary SIC in DCA data, all others are not primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)NAICField)[1..6]
@@ -373,7 +374,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	// ---------------- DEADCO ------------------
                                                                                                    
-	DEADCORaw := InfoUSA.Key_DEADCO_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
+	DEADCORaw := InfoUSA.Key_DEADCO_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
