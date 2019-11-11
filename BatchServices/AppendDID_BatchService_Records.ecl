@@ -1,64 +1,58 @@
-﻿Import doxie, Batchservices, DidVille, risk_indicators, suppress, AutoStandardI, STD;
+﻿IMPORT doxie, Batchservices, DidVille, risk_indicators, suppress, STD;
 
-EXPORT APPendDID_batchService_Records := MODULE
-	EXPORT Search(DATASET (  BatchServices.AppendDid_BatchService_Layouts.layout_did_InbatchWithAcctnoWithDID) Ds_batchInProcessed,
-												 doxie.IDataAccess mod_access,  
-												 STRING120 Appends,
-												 STRING120 verify, 
-												 STRING120 fuzzy,
-												 boolean 	 dedup_results,
-												 unsigned2 thresh_num,																														
-												 boolean   GLB_data,
-												 boolean 	 patriotproc,												
-												//  unsigned1 glb_purpose_value,											
-												//  boolean 	 Include_minors,
-												 boolean 	 useNonBlankKey,
-												//  STRING32  appType,		
-												 unsigned1 soap_xadl_version_value,
-												//  STRING6 	 ssnMaskVal,
-                      unsigned8 MaxResultsPerAcct,
-                      boolean IncludeRanking,
-                      boolean DoPartialSuppression
-            ) := FUNCTION
+EXPORT APPendDID_batchService_Records (
+           DATASET(BatchServices.AppendDid_BatchService_Layouts.layout_did_InbatchWithAcctnoWithDID) Ds_batchInProcessed,
+           doxie.IDataAccess mod_access,
+           STRING120 Appends,
+           STRING120 verify,
+           STRING120 fuzzy,
+           boolean   dedup_results,
+           unsigned2 thresh_num,
+           boolean   patriotproc,
+           boolean   useNonBlankKey,
+           unsigned1 soap_xadl_version_value,
+           unsigned8 MaxResultsPerAcct,
+           boolean IncludeRanking,
+           boolean DoPartialSuppression) := FUNCTION
 
 recs := PROJECT(Ds_batchInProcessed,
-               TRANSFORM(DidVille.Layout_Did_OutBatch,							    
-							    SELF.seq :=  (unsigned4) LEFT.acctno;
-									SELF.SSN :=  std.str.filter(LEFT.ssn,'0123456789');
-									SELF := LEFT));
-											
+               TRANSFORM(DidVille.Layout_Did_OutBatch,                  
+                  SELF.seq :=  (unsigned4) LEFT.acctno;
+                  SELF.SSN :=  std.str.filter(LEFT.ssn,'0123456789');
+                  SELF := LEFT));
+                      
 Limit_MaxResultsPerAcct := BatchServices.Constants.Didville.Limit_MaxResultsPerAcct;
 
-GLB := mod_access.isValidGlb() OR GLB_data;
+GLB := mod_access.isValidGlb();
 hhidplus := std.str.find(appends,'HHID_PLUS',1)<>0;
 edabest := std.str.find(appends,'BEST_EDA',1)<>0;
 inLimit :=if(MaxResultsPerAcct > Limit_MaxResultsPerAcct,Limit_MaxResultsPerAcct,MaxResultsPerAcct);
 // call common did function here.
 res1TMP := didville.did_service_common_function(recs, appends, verify, fuzzy, dedup_results, 
                                             thresh_num, GLB, patriotproc, false, 
-																						false, hhidplus, edabest, mod_access.glb, 
-																						mod_access.show_minors,,UseNonBlankKey, mod_access.application_type, soap_xadl_version_value,
-																						inLimit,IndustryClass_val := mod_access.industry_class
-																						);																																												
+                                            false, hhidplus, edabest, mod_access.glb, 
+                                            mod_access.show_minors,,UseNonBlankKey, mod_access.application_type, soap_xadl_version_value,
+                                            inLimit,IndustryClass_val := mod_access.industry_class
+                                            );                                                                                        
  ResultsRanking_pre := Didville.fn_GetRankedAddress(UNGROUP(res1TMP), mod_access);
    
  ResultsRanking := IF(IncludeRanking, GROUP(SORT(ResultsRanking_pre, seq, -score), seq), 
                                         SORT(res1TMP, seq, -score));
-			
+      
 // appends adl_category and changes the Seq# back to acctno so that it
 // is back into subset of the layout that was passed in
-BatchServices.AppendDid_BatchService_Layouts.layout_did_outBatchAdlCatWacctno add_adl_cat(res1Tmp L, risk_indicators.key_ADL_Risk_Table_v4 R) := transform			
-	category := TRIM(stringlib.stringtouppercase(R.adl_category));		
-	self.adl_Category := Risk_Indicators.iid_constants.adlCategory(category);
-	SELF.Acctno := (STRING20) L.SEQ;
-	self := L;
+BatchServices.AppendDid_BatchService_Layouts.layout_did_outBatchAdlCatWacctno add_adl_cat(res1Tmp L, risk_indicators.key_ADL_Risk_Table_v4 R) := transform      
+  category := TRIM(stringlib.stringtouppercase(R.adl_category));    
+  self.adl_Category := Risk_Indicators.iid_constants.adlCategory(category);
+  SELF.Acctno := (STRING20) L.SEQ;
+  self := L;
 end;
-	
+  
 ds_batchResults := JOIN(ResultsRanking, risk_indicators.key_ADL_Risk_Table_v4, left.did != 0 and keyed(left.did=right.did), 
-												add_adl_cat(LEFT,RIGHT), left outer,limit(0),KEEP(1));												
-		
+                        add_adl_cat(LEFT,RIGHT), left outer,limit(0),KEEP(1));                        
+    
 // a temporary layout for partial suppression :
- layout_did_outBatchAdlCatWacctno_plus := 
+layout_did_outBatchAdlCatWacctno_plus := 
           record(BatchServices.AppendDid_BatchService_Layouts.layout_did_outBatchAdlCatWacctno)
                  unsigned row_counter 
           end;
@@ -87,10 +81,9 @@ ResultsSuppressedPartialy :=  join(ds_batchResults_with_numbers,ResultsSuppresse
 ResultsSuppressed := project(if(DoPartialSuppression,ResultsSuppressedPartialy,ResultsSuppressedFully),
                               BatchServices.AppendDid_BatchService_Layouts.layout_did_outBatchAdlCatWacctno   
                              );                       
-Suppress.MAC_Mask(ResultsSuppressed,ResultsMasked, ssn, null, true, false, maskVal:=mod_access.ssn_mask);	
+Suppress.MAC_Mask(ResultsSuppressed,ResultsMasked, ssn, null, true, false, maskVal:=mod_access.ssn_mask);  
     
- //output(ds_batchResults_with_numbers,named('ds_batchResults_with_numbers'));
+//output(ds_batchResults_with_numbers,named('ds_batchResults_with_numbers'));
  
-	RETURN (ResultsMasked);
-	END;
+RETURN ResultsMasked;
 END;
