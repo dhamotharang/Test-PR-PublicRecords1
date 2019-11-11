@@ -1,5 +1,5 @@
-import corp2, doxie, doxie_cbrs, doxie_raw, dx_death_master, gong, AutoStandardI, DeathV2_Services,
- Address, Risk_Indicators, WorkPlace_Services, Business_Header, Header;
+import BatchServices, corp2, doxie, doxie_cbrs, doxie_raw, dx_death_master, gong, AutoStandardI, DeathV2_Services,
+ Address, Risk_Indicators, Suppress, WorkPlace_Services, Business_Header, Header;
 
 export WorkPlace_Functions := module
 
@@ -8,67 +8,90 @@ shared mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoS
 shared death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 shared glb_ok := death_params.isValidGlb();
 
-	// This function returns the spouse did  
+	// This function returns the spouse did
 	shared getSpouseDID(dataset(doxie.layout_references) dids) := FUNCTION
-		
+
 		// get did for all possible relatives.
     // Note: now this call is using input permission values; before, defaults were used (dppa=glb=date_threshold=0, ln_branded=false)
 		relatives_did := Doxie_Raw.relative_raw(dids, mod_access);
-		
-    relatives_did_alive := project(dx_death_master.Exclude(relatives_did(depth=1), person2, death_params), 
-      transform({doxie.layout_references,unsigned1 titleNo}, 
+
+    relatives_did_alive := project(dx_death_master.Exclude(relatives_did(depth=1), person2, death_params),
+      transform({doxie.layout_references,unsigned1 titleNo},
         self.did := left.person2, self.titleNo := left.TitleNo;
       ));
-														
-		spouses_did := relatives_did_alive(titleNo in Header.relative_titles.set_Spouse);		
+
+		spouses_did := relatives_did_alive(titleNo in Header.relative_titles.set_Spouse);
 		RETURN spouses_did;
 	END;
 
 	// This function returns spouse did in a batch format.
 	export getSpouseDidBatch(dataset(WorkPlace_Layouts.subjectSpouse) inDids) := FUNCTION
-			outDids := PROJECT(inDids, TRANSFORM(WorkPlace_Layouts.subjectSpouse, 					
+			outDids := PROJECT(inDids, TRANSFORM(WorkPlace_Layouts.subjectSpouse,
 					dtspouse := dataset([{left.did}], doxie.layout_references);
 					lDid := getSpouseDID(dtspouse);
-					self.spousedid := lDid[1].did;							
+					self.spousedid := lDid[1].did;
 					self := left));
 			RETURN outDids;
 	END;
-	
+
 	// Given the phone number, this function returns the listing name and address
 	EXPORT getBusinessListingBatch(dataset(WorkPlace_Layouts.PhoneListingBatch) phones):= FUNCTION
-	
-		dk := JOIN(phones, gong.Key_History_phone, 
-				       (keyed(right.p7 = left.phone[4..10]) and 
-				        keyed(right.p3 = left.phone[1..3]) 
-				        and right.current_flag 
-				        and right.listing_type_bus = 'B'), 					    
-							 TRANSFORM(WorkPlace_Layouts.PhoneListingBatch, 
-								 SELF.acctno := LEFT.acctno,
-								 SELF.phone := LEFT.phone,
-								 SELF := RIGHT),								
-					     KEEP(WorkPlace_Constants.Limits.KEEP_LIMIT), 
-							 LIMIT(WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED)); 
+    optout_layout := RECORD
+      BatchServices.WorkPlace_Layouts.PhoneListingBatch;
+      unsigned6 key_did;
+      unsigned4 global_sid;
+      unsigned8 record_sid;
+    END;
+
+    pre_dk := JOIN(phones, gong.Key_History_phone,
+      (keyed(right.p7 = left.phone[4..10]) and
+      keyed(right.p3 = left.phone[1..3])
+      and right.current_flag
+      and right.listing_type_bus = 'B'),
+      TRANSFORM(optout_layout,
+        SELF.acctno := LEFT.acctno,
+        SELF.phone := LEFT.phone,
+        SELF.global_sid := RIGHT.global_sid,
+        SELF.record_sid := RIGHT.record_sid,
+        SELF.key_did := RIGHT.did,
+        SELF := RIGHT),
+      KEEP(WorkPlace_Constants.Limits.KEEP_LIMIT),
+      LIMIT(WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
+
+    dk_optout := Suppress.MAC_SuppressSource(pre_dk, mod_access, key_did);
+    dk := PROJECT(dk_optout, BatchServices.WorkPlace_Layouts.PhoneListingBatch);
 		RETURN dk;
 	END;
-	
+
 	// Given the bdid, this function returns the phone number
 	EXPORT getBusinessPhoneBatch(dataset(WorkPlace_Layouts.bdidPhoneBatch) bdids) := FUNCTION
-		kgh := gong.Key_History_BDID;
-		
-		gh_slim := join(bdids, kgh,
-				              left.bdid!=0 and 
-				              keyed(left.bdid=right.bdid) and 
-										  right.current_record_flag='Y',				 
-				            transform(WorkPlace_Layouts.bdidPhoneBatch, 
-											self.acctno := left.acctno,		
-											self.phone := right.phone10,
-											self.bdid := left.bdid),
-					          KEEP(WorkPlace_Constants.Limits.KEEP_LIMIT), 
-										LIMIT(WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
-		
-		RETURN gh_slim;
-	END;
-	
+
+    optout_layout := RECORD
+      BatchServices.WorkPlace_Layouts.bdidPhoneBatch;
+      unsigned6 key_did;
+      unsigned4 global_sid;
+      unsigned8 record_sid;
+    END;
+
+    pre_gh_slim := join(bdids, gong.Key_History_BDID,
+      left.bdid!=0 and
+      keyed(left.bdid=right.bdid) and
+      right.current_record_flag='Y',
+      transform(optout_layout,
+        self.acctno := left.acctno,
+        self.phone := right.phone10,
+        self.bdid := left.bdid,
+        self.global_sid := RIGHT.global_sid,
+        self.record_sid := RIGHT.record_sid,
+        self.key_did := RIGHT.did),
+      KEEP(WorkPlace_Constants.Limits.KEEP_LIMIT),
+      LIMIT(WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
+
+    gh_slim_optout := Suppress.MAC_SuppressSource(pre_gh_slim, mod_access, key_did);
+    gh_slim := PROJECT(gh_slim_optout, BatchServices.WorkPlace_Layouts.bdidPhoneBatch);
+    RETURN gh_slim;
+  END;
+
   // This function determines the value for the self_employed indicator	in the WorkPlace output.
 	/* No longer needed, but left in as commented out instead of removing in case it
      is needed in the future.
@@ -76,46 +99,46 @@ shared glb_ok := death_params.isValidGlb();
   character) first/last names that could occur anywhere within a company name.
   Maybe first/last name with a space on either side should be checked for instead?
 	EXPORT setSelfEmployedFlag(dataset(BatchServices.WorkPlace_Layouts.final) inFinal) := FUNCTION
-		
-		outFinal := project(inFinal, TRANSFORM(BatchServices.WorkPlace_Layouts.final, 	
+
+		outFinal := project(inFinal, TRANSFORM(BatchServices.WorkPlace_Layouts.final,
 		  uc_company_name := StringLib.StringToUpperCase(left.company_name);
-			SELF.self_employed :=  
+			SELF.self_employed :=
 					IF (StringLib.StringFind(uc_company_name, trim(left.subject_first_name,left,right), 1) > 0 or
-							StringLib.StringFind(uc_company_name, trim(left.subject_last_name,left,right), 1) > 0 or 
-							(unsigned4) left.subject_ssn = left.company_fein, 		
+							StringLib.StringFind(uc_company_name, trim(left.subject_last_name,left,right), 1) > 0 or
+							(unsigned4) left.subject_ssn = left.company_fein,
 							  BatchServices.WorkPlace_Constants.SELF_EMPLOYED,
-							  BatchServices.WorkPlace_Constants.NOT_SELF_EMPLOYED);		  
-						
+							  BatchServices.WorkPlace_Constants.NOT_SELF_EMPLOYED);
+
 			SELF := LEFT));
-			
+
 		RETURN outFinal;
 	END;
   */
 
-	
+
 	// This function gets the most recent corp status for each bdid in a dataset of bdids
 	// and optionally (if requested) gets multiple other SOS fields for the online report service.
 	export getCorpStatus(dataset(doxie_cbrs.layout_references) ds_in_bdids,
 	                     boolean IncludeSOSInfo=false) := FUNCTION
 
-	// First use the bdid(s) to look up all the corp_keys on the 
+	// First use the bdid(s) to look up all the corp_keys on the
 	// thor_data400::key::corp2::qa::corp::bdid key file.
 	ds_bdids_corpkey := join(ds_in_bdids, corp2.keys().corp.bdid.qa,
 	                           keyed(left.bdid = right.bdid),
 													 transform(WorkPlace_Layouts.bdids_corpstat,
-													   self.corp_key := right.corp_key, //only keep corp_key from right 
+													   self.corp_key := right.corp_key, //only keep corp_key from right
 														 self          := left  // keep bdid from left
 								           ),
 										       inner,
 													 limit(WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
 
-	// Then use all the corp_keys to look up the status & status date and other optional 
+	// Then use all the corp_keys to look up the status & status date and other optional
 	// fields on the thor_data400::key::corp2::qa::corp::corp_key.record_type key file.
 	ds_bdids_wcorpstat_all := join(ds_bdids_corpkey,corp2.keys().corp.corpkey.qa,
                                    keyed(left.corp_key = right.corp_key and
 													               right.record_type = WorkPlace_Constants.CURRENT), // only want current info
 	                               transform(WorkPlace_Layouts.bdids_corpstat,
-														       // fields from corp::corp_key.record_type key file, 
+														       // fields from corp::corp_key.record_type key file,
 																	 // see Corp2.Layout_Corporate_Direct_Corp_Base
                                    self.corp_status_desc := right.corp_status_desc,
                                    self.corp_status_date := if(right.corp_status_date<>'',
@@ -142,7 +165,7 @@ shared glb_ok := death_params.isValidGlb();
                                    self.sos_comp_zip4        := if(IncludeSOSInfo,right.corp_addr1_zip4,''),
   	                               self.sos_address_type     := if(IncludeSOSInfo,right.corp_address1_type_desc,''),
                                    self.sos_status           := if(IncludeSOSInfo,
-																	                                 trim(right.corp_status_desc,left,right) + 
+																	                                 trim(right.corp_status_desc,left,right) +
 																                                   if(right.corp_status_comment<>'',
 																																	   ' - ' + trim(right.corp_status_comment,left,right),
 																																	   ''),
@@ -177,26 +200,26 @@ shared glb_ok := death_params.isValidGlb();
 		                               self.sos_fein         := '', //if(IncludeSOSInfo,right.corp_???,''),
 
 										               // rest of the fields from the left
-                                   self              := left), 
+                                   self              := left),
 												         inner,
 													       keep(WorkPlace_Constants.Limits.KEEP_LIMIT), // keep 1
 													       limit(WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
 
-    // Sort status info for a bdid by descending non-blank corp_status_date to 
+    // Sort status info for a bdid by descending non-blank corp_status_date to
 		// keep only the 1 most current status for all current corp recs for a bdid.
 		ds_bdids_wcorpstat := dedup(sort(ds_bdids_wcorpstat_all(corp_status_date<>''),
 		                                 bdid,-corp_status_date),
 																bdid);
-		
+
 		return ds_bdids_wcorpstat;
 	end; // end of getCorpStatus function
- 
-  // This function adds any missing company address/phone info from the 
+
+  // This function adds any missing company address/phone info from the
 	// business_header "best" file.
- 
+
  export AddBestInfo(dataset(WorkPlace_Services.Layouts.poe_didkey_plus) ds_inRecs) := FUNCTION
 
-	  // 1. For any recs with a non-zero bdid, sort/dedup on bdid to reduce the number 
+	  // 1. For any recs with a non-zero bdid, sort/dedup on bdid to reduce the number
 		//    of lookups against the bh best key file.
     ds_inrecs_bdids_deduped := dedup(sort(ds_inRecs(bdid !=0),bdid),bdid);
 
@@ -207,10 +230,10 @@ shared glb_ok := death_params.isValidGlb();
 	  ds_inrecs_bdids_wbestinfo := join(ds_inrecs_bdids_deduped, Business_Header.Key_BH_Best,
 	  			                              keyed(left.bdid=right.bdid),
                                       transform(WorkPlace_Services.Layouts.poe_didkey_plus,
-																        // save company name/address/phone/fein from right bh best 
+																        // save company name/address/phone/fein from right bh best
                                         self.company_name        := right.company_name,
-																				// store full address and address parts; 
-																				// since batch uses full and online uses parts and 
+																				// store full address and address parts;
+																				// since batch uses full and online uses parts and
 																				// this function is used for both batch & online.
 		                                    self.company_address     := Address.Addr1FromComponents(
 														                                        right.prim_range,
@@ -227,16 +250,16 @@ shared glb_ok := death_params.isValidGlb();
                                         self.company_postdir     := right.postdir,
                                         self.company_unit_desig  := right.unit_desig,
                                         self.company_sec_range   := right.sec_range,
-																																
+
 														            self.company_city        := right.city,
                                         self.company_state       := right.state,
                                         self.company_zip         := if(right.zip <> 0,
 																															         // use intformat in case leading digit of zip is zero
-																	                                     intformat(right.zip,ZIP5_WIDTH,LEADING_ZERO_FILL) + 
+																	                                     intformat(right.zip,ZIP5_WIDTH,LEADING_ZERO_FILL) +
 														                                           if(right.zip4 <>0,
 																				 	  							                '-' + intformat(right.zip4,ZIP4_WIDTH,LEADING_ZERO_FILL),
 																																					''),
-																																			 ''),	
+																																			 ''),
                                         self.company_zip5        := if(right.zip <> 0,
 																	                                     intformat(right.zip,ZIP5_WIDTH,LEADING_ZERO_FILL),
 																																			 ''),
@@ -246,7 +269,7 @@ shared glb_ok := death_params.isValidGlb();
 																        self.company_phone1      := (string10) right.phone,
 																        self.company_fein        := right.fein,
 																				// use existing field in the layout to indicate found on bh best
-																	      self.from_gong           := true, 
+																	      self.from_gong           := true,
 																	      //rest of fields from left
 																	      self                     := left),
 											                inner, // only recs from left that match right
@@ -270,19 +293,19 @@ shared glb_ok := death_params.isValidGlb();
 				// store best entire company address if any parts are missing
 				self.company_address     := if(comp_addr_missing and right.from_gong,
 																	     right.company_address,left.company_address),
-        self.company_prim_range  := if(comp_addr_missing and right.from_gong, 
+        self.company_prim_range  := if(comp_addr_missing and right.from_gong,
 				                               right.company_prim_range,left.company_prim_range),
-        self.company_predir      := if(comp_addr_missing and right.from_gong, 
+        self.company_predir      := if(comp_addr_missing and right.from_gong,
 			                                 right.company_predir,left.company_predir),
-        self.company_prim_name   := if(comp_addr_missing and right.from_gong, 
+        self.company_prim_name   := if(comp_addr_missing and right.from_gong,
 			                                 right.company_prim_name,left.company_prim_name),
-        self.company_addr_suffix := if(comp_addr_missing and right.from_gong, 
+        self.company_addr_suffix := if(comp_addr_missing and right.from_gong,
 																			 right.company_addr_suffix,left.company_addr_suffix),
-        self.company_postdir     := if(comp_addr_missing and right.from_gong, 
+        self.company_postdir     := if(comp_addr_missing and right.from_gong,
 																		   right.company_postdir,left.company_postdir),
-        self.company_unit_desig  := if(comp_addr_missing and right.from_gong, 
+        self.company_unit_desig  := if(comp_addr_missing and right.from_gong,
 																			 right.company_unit_desig,left.company_unit_desig),
-        self.company_sec_range   := if(comp_addr_missing and right.from_gong, 
+        self.company_sec_range   := if(comp_addr_missing and right.from_gong,
 																			 right.company_sec_range,left.company_sec_range),
         self.company_city        := if(comp_addr_missing and right.from_gong,
 			                                 right.company_city,left.company_city),
@@ -294,7 +317,7 @@ shared glb_ok := death_params.isValidGlb();
 																			 (string) right.company_zip5,left.company_zip5),
         self.company_zip4        := if(comp_addr_missing and right.from_gong,
 																			 (string) right.company_zip4,left.company_zip4),
-	      // store best phone in phone1 if phone1 is empty or 
+	      // store best phone in phone1 if phone1 is empty or
 				// store in phone2 if phone1 is not empty and phone1 is not = phone2.
         self.company_phone1      := if(left.company_phone1 = '' and right.from_gong,
 																       right.company_phone1,left.company_phone1),
@@ -309,12 +332,12 @@ shared glb_ok := death_params.isValidGlb();
 											               left outer,  // keep all the recs from the left ds
 												             atmost(WorkPlace_Constants.Limits.JOIN_LIMIT));
 
-    // Uncomment lines below as needed for debugging	
+    // Uncomment lines below as needed for debugging
     //OUTPUT(ds_inrecs,                 NAMED('aci_ds_inrecs'));
     //OUTPUT(ds_inrecs_bdids_deduped,   NAMED('ds_inrecs_bdids_deduped'));
     //OUTPUT(ds_inrecs_bdids_wbestinfo, NAMED('ds_inrecs_bdids_wbestinfo'));
     //OUTPUT(ds_inrecs_bestinfo_added,  NAMED('ds_inrecs_bestinfo_added'));
-	
+
 		ds_outRecs := ds_inrecs_bestinfo_added;
 
 		return ds_outRecs;
@@ -324,12 +347,17 @@ shared glb_ok := death_params.isValidGlb();
 	// This function cleans/validates the company_phone1&2 fields data.
 	export CleanPhones(dataset(WorkPlace_Services.Layouts.poe_didkey_plus) ds_inRecs) := FUNCTION
 
-		// 1. Check company_phone1 on Telecordia key file to see if the area code (npa) and 
-		//    the first 3 of the 7 digit phone# (nxx) and the 4th position of the 7 digit 
+    // The did is always kept from the left recordset, we need the one from the key for opt out.
+    optout_layout := RECORD
+      WorkPlace_Services.Layouts.poe_didkey_plus;
+      unsigned6 key_did;
+    END;
+		// 1. Check company_phone1 on Telecordia key file to see if the area code (npa) and
+		//    the first 3 of the 7 digit phone# (nxx) and the 4th position of the 7 digit
 		//    phone# (tb) are all valid.
-	  ds_inrecs_npanxx_checked1 := join(ds_inrecs, Risk_Indicators.key_Telcordia_tds, 
-				                               keyed(left.company_phone1[1..3] = right.npa) and 
-																			 keyed(left.company_phone1[4..6] = right.nxx) 
+	  ds_inrecs_npanxx_checked1 := join(ds_inrecs, Risk_Indicators.key_Telcordia_tds,
+				                               keyed(left.company_phone1[1..3] = right.npa) and
+																			 keyed(left.company_phone1[4..6] = right.nxx)
 																			 and left.company_phone1[7]    = right.tb,
 							                       transform(WorkPlace_Services.Layouts.poe_didkey_plus,
 								                       // Blank out phone1 if not valid npa/nxx
@@ -340,72 +368,94 @@ shared glb_ok := death_params.isValidGlb();
 																     left outer,  // keep all recs from left
 					                           keep(WorkPlace_Constants.Limits.KEEP_LIMIT),
 																     limit(WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
-		
-		// 2. Check company_phone1 on gong history to see if it is: 
-		//    i.  disconnected (no rec with current_flag = true)                   OR
-		//    ii. it is not a business phone# (no rec with business_flag=true).
-	  ds_inrecs_gong_checked1 := join(ds_inrecs_npanxx_checked1, gong.Key_History_phone, 
-				                               keyed(left.company_phone1[4..10] = right.p7) and 
-					                             keyed(left.company_phone1[1..3]  = right.p3) and 
-																       right.current_flag and //we only want current data
-							                         right.business_flag,   //we only want businesses
-							                       transform(WorkPlace_Services.Layouts.poe_didkey_plus,
-								                       // Blank out phone1 if not current and not a business
-																	     self.company_phone1 := if(right.current_flag and right.business_flag,
-																			                           left.company_phone1,''),
-																	     // other fields from left
-								                       self  := left),
-																     left outer,  // keep all recs from left
-					                           keep(WorkPlace_Constants.Limits.KEEP_LIMIT),
-																     limit(WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
 
-		// 3. Check company_phone2 on Telecordia key file to see if the area code (npa) and 
-		//    the first 3 of the 7 digit phone# (nxx) and the 4th position of the 7 digit 
-		//    phone# (tb) are all valid.
-	  ds_inrecs_npanxx_checked2 := join(ds_inrecs_gong_checked1, Risk_Indicators.key_Telcordia_tds, 
-				                               keyed(left.company_phone2[1..3] = right.npa) and 
-																			 keyed(left.company_phone2[4..6] = right.nxx) 
-																			 and left.company_phone2[7]    = right.tb,
-							                       transform(WorkPlace_Services.Layouts.poe_didkey_plus,
-								                       // Blank out phone2 if not valid npa/nxx
-																	     self.company_phone2 := if(right.npa !='' and right.nxx != '',
-																			                           left.company_phone2,''),
-																	     // other fields from left
-								                       self  := left),
-																     left outer,  // keep all recs from left
-					                           keep(WorkPlace_Constants.Limits.KEEP_LIMIT),
-																     limit(WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
-		
-		// 4. Check company_phone2 on gong history to see if it is: 
+		// 2. Check company_phone1 on gong history to see if it is:
 		//    i.  disconnected (no rec with current_flag = true)                   OR
 		//    ii. it is not a business phone# (no rec with business_flag=true).
-	  ds_inrecs_gong_checked2 := join(ds_inrecs_npanxx_checked2, gong.Key_History_phone, 
-				                               keyed(left.company_phone2[4..10] = right.p7) and 
-					                             keyed(left.company_phone2[1..3]  = right.p3) and 
-																       right.current_flag and //we only want current data
-							                         right.business_flag,   //we only want businesses
-							                       transform(WorkPlace_Services.Layouts.poe_didkey_plus,
-								                       // Blank out phone1 if not current and not a business
-																	     self.company_phone2 := if(right.current_flag and right.business_flag,
-																			                           left.company_phone2,''),
-																	     // other fields from left
-								                       self  := left),
-																     left outer,  // keep all recs from left
-					                           keep(WorkPlace_Constants.Limits.KEEP_LIMIT),
-																     limit(WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
+	  pre_ds_inrecs_gong_checked1 := join(ds_inrecs_npanxx_checked1, gong.Key_History_phone,
+      keyed(left.company_phone1[4..10] = right.p7) and
+      keyed(left.company_phone1[1..3]  = right.p3) and
+      right.current_flag and //we only want current data
+      right.business_flag,   //we only want businesses
+      transform(optout_layout,
+        // Blank out phone1 if not current and not a business
+        self.company_phone1 := if(right.current_flag and right.business_flag,
+          left.company_phone1,''),
+        //Opt out fields
+        self.record_sid := right.record_sid,
+        self.global_sid := right.global_sid,
+        self.key_did := right.did,
+        // other fields from left
+        self  := left),
+      left outer,  // keep all recs from left
+      keep(WorkPlace_Constants.Limits.KEEP_LIMIT),
+      limit(WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
+
+    ds_inrecs_gong_checked1_optout := Suppress.MAC_FlagSuppressedSource(pre_ds_inrecs_gong_checked1, mod_access, key_did);
+    ds_inrecs_gong_checked1 := project(ds_inrecs_gong_checked1_optout, TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
+      self.company_phone1 := if(left.is_suppressed, '', left.company_phone1),
+      self.record_sid := if(left.is_suppressed, 0, left.record_sid),
+      self.global_sid := if(left.is_suppressed, 0, left.global_sid),
+      self := left));
+
+    // 3. Check company_phone2 on Telecordia key file to see if the area code (npa) and
+    //    the first 3 of the 7 digit phone# (nxx) and the 4th position of the 7 digit
+    //    phone# (tb) are all valid.
+    ds_inrecs_npanxx_checked2 := join(ds_inrecs_gong_checked1, Risk_Indicators.key_Telcordia_tds,
+      keyed(left.company_phone2[1..3] = right.npa) and
+      keyed(left.company_phone2[4..6] = right.nxx)
+      and left.company_phone2[7] = right.tb,
+      transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+        // Blank out phone2 if not valid npa/nxx
+        self.company_phone2 := if(right.npa !='' and right.nxx != '',
+          left.company_phone2,''),
+        // other fields from left
+        self  := left),
+      left outer,  // keep all recs from left
+      keep(WorkPlace_Constants.Limits.KEEP_LIMIT),
+      limit(WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
+
+    // 4. Check company_phone2 on gong history to see if it is:
+    //    i.  disconnected (no rec with current_flag = true)                   OR
+    //    ii. it is not a business phone# (no rec with business_flag=true).
+    pre_ds_inrecs_gong_checked2 := join(ds_inrecs_npanxx_checked2, gong.Key_History_phone,
+      keyed(left.company_phone2[4..10] = right.p7) and
+      keyed(left.company_phone2[1..3]  = right.p3) and
+      right.current_flag and //we only want current data
+      right.business_flag,   //we only want businesses
+      transform(optout_layout,
+        // Blank out phone1 if not current and not a business
+        self.company_phone2 := if(right.current_flag and right.business_flag,
+          left.company_phone2,''),
+        //Opt out fields
+        self.record_sid := right.record_sid,
+        self.global_sid := right.global_sid,
+        self.key_did := right.did,
+        // other fields from left
+        self  := left),
+      left outer,  // keep all recs from left
+      keep(WorkPlace_Constants.Limits.KEEP_LIMIT),
+      limit(WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
+
+    ds_inrecs_gong_checked2_optout := Suppress.MAC_FlagSuppressedSource(pre_ds_inrecs_gong_checked2, mod_access, key_did);
+    ds_inrecs_gong_checked2 := project(ds_inrecs_gong_checked2_optout, TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
+      self.company_phone2 := if(left.is_suppressed, '', left.company_phone2),
+      self.record_sid := if(left.is_suppressed, 0, left.record_sid),
+      self.global_sid := if(left.is_suppressed, 0, left.global_sid),
+      self := left));
 
     // 5. After both phone#s checked, move phone2 to phone 1 if phone1 is empty
     ds_inrecs_phones_swapped := project(ds_inrecs_gong_checked2,
-								                       transform(WorkPlace_Services.Layouts.poe_didkey_plus,
-								                       // If phone 1 empty and phone2 is not, move phone2 to phone1
-																	     self.company_phone1 := if(left.company_phone1  = '' and 
-																			                           left.company_phone2 != '',
-																			                           left.company_phone2,left.company_phone1),
-																	     self.company_phone2 := if(left.company_phone1  = '' and 
-																			                           left.company_phone2 != '',
-																			                           '',left.company_phone2),
-																	     // other fields from left
-								                       self  := left));
+      transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+        // If phone 1 empty and phone2 is not, move phone2 to phone1
+        self.company_phone1 := if(left.company_phone1  = '' and
+                                  left.company_phone2 != '',
+                                  left.company_phone2,left.company_phone1),
+        self.company_phone2 := if(left.company_phone1  = '' and
+                                  left.company_phone2 != '',
+                                  '',left.company_phone2),
+        // other fields from left
+        self  := left));
 
     // Uncomment lines below as needed for debugging
     //OUTPUT(ds_inrecs,                 NAMED('cp1_ds_inrecs'));
@@ -414,37 +464,37 @@ shared glb_ok := death_params.isValidGlb();
     //OUTPUT(ds_inrecs_npanxx_checked2, NAMED('ds_inrecs_npanxx_checked2'));
     //OUTPUT(ds_inrecs_gong_checked2,   NAMED('ds_inrecs_gong_checked2'));
     //OUTPUT(ds_inrecs_phones_swapped,  NAMED('ds_inrecs_phones_swapped'));
-	
+
 		ds_outRecs := ds_inrecs_phones_swapped;
 
 		return ds_outRecs;
 	end; // end of CleanPhones function
 
 	// This function cleans/validates the company_name field data.
-	export CleanCompName(dataset(WorkPlace_Services.Layouts.poe_didkey_plus) ds_inRecs, 
+	export CleanCompName(dataset(WorkPlace_Services.Layouts.poe_didkey_plus) ds_inRecs,
 											 BOOLEAN IncludeSelfRepCompanyName = FALSE) := FUNCTION
 
 		// 1. Blank out any company_names that only contain certain invalid terms.
 		//    See the specific list in BatchServices.WorkPlace_Constants.INVALID_COMPANY_NAMES_SET
-		//    which was based upon the list in requirement 3.1.6 of the WorkPlace Locator 2.2 
+		//    which was based upon the list in requirement 3.1.6 of the WorkPlace Locator 2.2
 		//    Product Specifications document dated 02/08/2011.
     ds_inrecs_compname_checked := project(ds_inrecs,
       transform(WorkPlace_Services.Layouts.poe_didkey_plus,
-			 
+
 				company_name := stringlib.StringToUpperCase(trim(left.company_name, left, right));
-				
+
 				self.company_name := IF(company_name IN BatchServices.WorkPlace_Constants.INVALID_COMPANY_NAMES_SET OR
 															 (~IncludeSelfRepCompanyName AND company_name IN BatchServices.WorkPlace_Constants.SELF_REP_COMPANY_NAMES_SET), '',
 																 LEFT.company_name);
-																
+
         self              := left));
- 
-    // Uncomment lines below as needed for debugging	
+
+    // Uncomment lines below as needed for debugging
     //OUTPUT(ds_inrecs,                  NAMED('ccn_ds_inrecs'));
     //OUTPUT(ds_inrecs_compname_checked, NAMED('ds_inrecs_compname_checked'));
-	
+
 		ds_outRecs := ds_inrecs_compname_checked;
-		
+
 		return ds_outRecs;
 	end; // end of CleanCompName function
 
