@@ -27,7 +27,7 @@ EXPORT _config (
     SHARED curEquifaxWeeklyHeaderDate := regexreplace('WEEKLY_HEADER_(.*).DAT',fst_weekly_file,'\\1');
     
     // We always add 7 days (sunday to sunday)
-    SHARED newEquifaxWeeklyHeaderDate := ut.date_add('7D',get_v_eq_as_of_date);
+    SHARED newEquifaxWeeklyHeaderDate := regexfind('2[0-9]{7}',fst_weekly_file,0);
     
     EXPORT isNewEquifaxMonthlyFile(string sourceIP) := (count(STD.File.RemoteDirectory(sourceIP,sourcePath,monthly_files,false)(size != 0 )) = 16);
     EXPORT isNewEquifaxWeeklyFile(string sourceIP) := (count(STD.File.RemoteDirectory(sourceIP,sourcePath,weekly_files ,false)(size != 0 )) = 1)
