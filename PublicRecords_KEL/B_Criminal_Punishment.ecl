@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Criminal_Punishment,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL11.Null;
 EXPORT B_Criminal_Punishment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Criminal_Punishment(__in,__cfg).__Result) __E_Criminal_Punishment := E_Criminal_Punishment(__in,__cfg).__Result;
-  SHARED __EE1143090 := __E_Criminal_Punishment;
-  EXPORT __ST56566_Layout := RECORD
+  SHARED __EE1139737 := __E_Criminal_Punishment;
+  EXPORT __ST57444_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ndataset(E_Criminal_Punishment(__in,__cfg).Sources_Layout) Sources_;
     KEL.typ.ndataset(E_Criminal_Punishment(__in,__cfg).Reported_Punishment_Persistent_I_Ds_Layout) Reported_Punishment_Persistent_I_Ds_;
@@ -29,9 +29,9 @@ EXPORT B_Criminal_Punishment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST56566_Layout __ND1143374__Project(E_Criminal_Punishment(__in,__cfg).Layout __PP1142859) := TRANSFORM
+  SHARED __ST57444_Layout __ND1140021__Project(E_Criminal_Punishment(__in,__cfg).Layout __PP1139506) := TRANSFORM
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('doc_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP1142859;
+    SELF := __PP1139506;
   END;
-  EXPORT __ENH_Criminal_Punishment := PROJECT(__EE1143090,__ND1143374__Project(LEFT));
+  EXPORT __ENH_Criminal_Punishment := PROJECT(__EE1139737,__ND1140021__Project(LEFT));
 END;

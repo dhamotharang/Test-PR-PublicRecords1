@@ -34,5 +34,11 @@
 		export string50 DataPermission:=iid_constants.default_DataPermission;
 		export boolean IncludeNAPData := false;
 		export string100 IntendedPurpose := '';
+		
+		// CCPA parameters
+		export unsigned1 iid_LexIdSourceOptout := 1;
+		export string16 iid_TransactionID := '';
+		export string16 iid_BatchUID := '';
+		export unsigned6 iid_GlobalCompanyId := 0;
 	END;
 	

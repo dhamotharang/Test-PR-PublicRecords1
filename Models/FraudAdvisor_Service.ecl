@@ -318,6 +318,14 @@ single_model := Dataset([Transform(Models.Layouts.Layout_Model_Request_In,
 //identity fields are available as regular input fields, but if the new model is requested via InstantID or FlexID, the fields will be
 //available only through this custom model request.  
 
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := GLB_Purpose;
+	EXPORT dppa := DPPA_Purpose;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
+
 //If this model request limit changes, update the model_check and custom_field_replacement functions as well
 Model_requests := choosen(ModelOptions_In, 3);
 
@@ -687,7 +695,7 @@ test_prep := PROJECT(d,into_test_prep(LEFT));
 model_indicator := IF(doParoAttributes, Models.FraudAdvisor_Constants.attrvparo, ''); //model names will now be passed in through the model request structure in getFDAttributes
 
 // Get the attributes
-attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs, ModelRequests := Valid_requested_models);
+attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs, ModelRequests := Valid_requested_models, mod_access := mod_access);
 //For Paro update
 // attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs,
                                      // DPPA_Purpose, GLB_Purpose, DataRestriction, DataPermission, '', Valid_requested_models);
@@ -847,14 +855,12 @@ All_models := Project(Valid_requested_models, transform(Models.layouts.Enhanced_
                                               self.model_name := custom_name, // piping model name through to keep track of what's what
                                               self := Models.FP_models.Execute_model(Model_params)));
 
-temp_fp_test_seed := Project(Valid_requested_models, Transform(Models.layouts.Enhanced_layout_fp1109,
+fp_test_seed := Project(Valid_requested_models, Transform(Models.layouts.Enhanced_layout_fp1109,
                                                 seed_custom_temp  := left.ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom');
                                                 seed_custom_name  := STD.STR.ToLowerCase(TRIM(seed_custom_temp[1].OptionValue));
                                                 
                                                 self := Risk_Indicators.FraudPoint_TestSeed_Function(test_prep, Test_Data_Table_Name, seed_custom_name)));
 
-//Filter out testseeds that don't have a score or reason codes as we didn't get a proper hit.
-fp_test_seed := temp_fp_test_seed(score != '' and ri[1].hri != '');
 
 models.Layout_Reason_Codes form_modelout_rc(Models.Layout_ModelOut le, unsigned1 cnt) :=
 TRANSFORM

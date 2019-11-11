@@ -195,6 +195,7 @@ EXPORT Automated_Rules_File :=  Rules_Generation('Person','Best PII') +
 																Rules_Generation('Person','Derogs -Bankruptcy History') +
 																Rules_Generation('Person','Derogs -Criminal History') +
 																Rules_Generation('Business','Business B2B Trade') +
-																Rules_Generation('Business','Business LexID') +
+																// Rules_Generation('Business','Business LexID') +
 																Rules_Generation('Business','Business Input Validation') +
-																Rules_Generation('Person','Validation') ;
+																Rules_Generation('Person','Validation') +
+																Rules_Generation('Business','Business Derog - Bankruptcy History') ;

@@ -1,10 +1,10 @@
-/*--LIBRARY--*/
-import Gateway;
+﻿/*--LIBRARY--*/
+import Gateway, Risk_Indicators;
 
 EXPORT LIB_Boca_Shell_Function (
-	GROUPED DATASET (Layout_output) iid,
+	GROUPED DATASET (Risk_Indicators.Layout_output) iid,
 	DATASET (Gateway.Layouts.Config) gateways,
-	BS_LIBIN args
+	Risk_Indicators.BS_LIBIN args
 	) := MODULE
 	
 	dppa := args.bs_dppa;
@@ -22,7 +22,10 @@ EXPORT LIB_Boca_Shell_Function (
 	DataRestriction := args.bs_DataRestriction;
 	BSOptions := args.bs_BSOptions;
 	DataPermission := args.bs_DataPermission;
-
+	LexIdSourceOptout := args.bs_LexIdSourceOptout;
+	TransactionID := args.bs_TransactionID; 
+	BatchUID := args.bs_BatchUID; 
+	GlobalCompanyID := args.bs_GlobalCompanyID;
 
   ids_wide := boca_shell_FCRA_Neutral_Function (iid, dppa, glb,  
                                                 isUtility, isLN, includeRelativeInfo, false, BSversion, 
@@ -36,7 +39,11 @@ EXPORT LIB_Boca_Shell_Function (
                                    includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo, BSversion,
 																	 false, doScore, filter_out_fares,
 																	 DataRestriction, BSOptions, glb, gateways, 
-																	 DataPermission);
+																	 DataPermission,
+																	LexIdSourceOptout := LexIdSourceOptout, 
+																	TransactionID := TransactionID, 
+																	BatchUID := BatchUID, 
+																	GlobalCompanyID := GlobalCompanyID);
 
 	export results := per_prop;
 END;

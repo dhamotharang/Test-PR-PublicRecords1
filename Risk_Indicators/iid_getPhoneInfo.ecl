@@ -1,4 +1,4 @@
-﻿﻿import _Control, riskwise, did_add, ut, risk_indicators, NID, gateway,phones, iesp,STD;
+﻿﻿import _Control, riskwise, did_add, ut, risk_indicators, NID, gateway,phones, iesp,STD, Doxie;
 onThor := _Control.Environment.OnThor;
 
 export iid_getPhoneInfo(grouped dataset(risk_indicators.Layout_Output) with_address_info, dataset(Gateway.Layouts.Config) gateways,
@@ -11,7 +11,8 @@ export iid_getPhoneInfo(grouped dataset(risk_indicators.Layout_Output) with_addr
 													string20 companyID,
 													unsigned2 EverOccupant_PastMonths=0,
 													unsigned4 EverOccupant_StartDate = 99999999,
-													boolean IncludeNAPData = false
+													boolean IncludeNAPData = false,
+													doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 												) := function
 
 ExactFirstNameRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactFirstNameMatch]=risk_indicators.iid_constants.sTrue;
@@ -33,7 +34,7 @@ cellPhoneTypes := ['04','55','60','01','57','62','64','65'];
 // by searching the inquiry results this way, we are rolling them up like NAS does and not picking the best 1 result - 
 // using this newly created iid_getInquiryNAP for now but might want to change to use boca shell inquiries for code maintenance
 // bsversion must be >= 50 for historydatetimestamp enhancement [Bug 148853]
-withInquiriesNAP := if(doInquiries and ~isFCRA, risk_indicators.iid_getInquiryNAP(with_address_info, isFCRA, ExactMatchLevel, LastSeenThreshold, 50), with_address_info);
+withInquiriesNAP := if(doInquiries and ~isFCRA, risk_indicators.iid_getInquiryNAP(with_address_info, isFCRA, ExactMatchLevel, LastSeenThreshold, 50, mod_access), with_address_info);
 
 
 Risk_Indicators.Layouts.layout_input_plus_overrides prep_phones(risk_indicators.layout_output le, integer C) := transform

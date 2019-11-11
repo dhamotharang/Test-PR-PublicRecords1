@@ -1,6 +1,6 @@
 ﻿//Risk_Indicators.iid_common_function
 
-import emailv2_services,gateway,email_data,risk_indicators;
+import emailv2_services,gateway,doxie,email_data,risk_indicators;
 
 export iid_common_function(grouped DATASET(risk_indicators.Layout_Output) with_did, unsigned1 dppa, unsigned1 glb, boolean isUtility=false, 
 							boolean ln_branded, boolean suppressNearDups=false, 
@@ -14,21 +14,36 @@ export iid_common_function(grouped DATASET(risk_indicators.Layout_Output) with_d
 							unsigned4 EverOccupant_StartDate,
 							unsigned8 BSOptions, 
 							unsigned3 LastSeenThreshold = risk_indicators.iid_constants.oneyear,
-							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission
+							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+							unsigned1 LexIdSourceOptout = 1,
+							string TransactionID = '',
+							string BatchUID = '',
+							unsigned6 GlobalCompanyId = 0
 							) :=
 FUNCTION
+
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := ^.glb;
+	EXPORT dppa := ^.dppa;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 // check the first record in the batch to determine if this a realtime transaction or an archive test
 production_realtime_mode := with_did[1].historydate=risk_indicators.iid_constants.default_history_date
 														or with_did[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate)[1..6];
 														
-with_ADLVelocity := risk_indicators.Boca_Shell_ADL(with_DID, isFCRA, dppa, DataRestriction);	// real time BocaShell 2 and 3 stuff
+with_ADLVelocity := risk_indicators.Boca_Shell_ADL(with_DID, isFCRA, dppa, DataRestriction, mod_access);	// real time BocaShell 2 and 3 stuff
 
 // skip the realtime velocity stuff if history run and bocashell version 50 or higher
 adlRec := if(production_realtime_mode and BSversion between 2 and 49, with_ADLVelocity, with_did);	
 
 // returns the full list of raw header records for that did																								
-with_header := risk_indicators.iid_getHeader(adlRec, dppa, glb, isFCRA, ln_branded, ExactMatchLevel, DataRestriction, CustomDataFilter, BSversion, DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, LastSeenThreshold, BSOptions);
+with_header := risk_indicators.iid_getHeader(adlRec, dppa, glb, isFCRA, ln_branded, ExactMatchLevel, DataRestriction, CustomDataFilter, BSversion, DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, LastSeenThreshold, BSOptions,LexIdSourceOptout, 
+	TransactionID, 
+	BatchUID , 
+	GlobalCompanyID);
 
 // append address hierarchy seq # to the addresses from the header
 with_hierarchy := if(bsversion >= 50, Risk_Indicators.iid_append_address_hierarchy(with_header, isFCRA, bsversion) );
@@ -36,20 +51,20 @@ with_hierarchy := if(bsversion >= 50, Risk_Indicators.iid_append_address_hierarc
 //  call to get miltary flags if shell version 5.0 or higher
 header_with_Military_addresses   := if(bsversion >= 50, risk_indicators.iid_GetMilitaryAddr(with_hierarchy), with_header);
 
-with_ssn_addr_velocity := risk_indicators.getVelocityHist(header_with_Military_addresses, isFCRA, dppa, DataRestriction, BSversion);//  history BocaShell stuff
+with_ssn_addr_velocity := risk_indicators.getVelocityHist(header_with_Military_addresses, isFCRA, dppa, DataRestriction, BSversion, mod_access);//  history BocaShell stuff
 with_ADL_counts := if(production_realtime_mode and BSversion between 2 and 49, 
 	header_with_Military_addresses, 
 	with_ssn_addr_velocity);  // for shell version 50 and higher, use the runtime calculation of ADL velocity counters
 
 all_header := if(BSversion > risk_indicators.iid_constants.basic_shell_version, 
-	risk_indicators.getPhoneAddrVelocity(with_ADL_counts, isUtility, dppa, isFCRA, DataRestriction, bsversion, BSOptions), header_with_Military_addresses);	
+	risk_indicators.getPhoneAddrVelocity(with_ADL_counts, isUtility, dppa, isFCRA, DataRestriction, bsversion, BSOptions, mod_access), header_with_Military_addresses);	
 	
 with_addr_history := if(bsversion > 3, risk_indicators.Boca_Shell_Address_History(all_header, isFCRA, datarestriction), all_header);
 
 // the HHID summary is a lot of additional searching for each DID in the household.  if we don't need to do that searching, keep it turned off for efficiency.
 includeHHIDSummary := bsversion >= 50 and isFCRA=false and (BSOptions & risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary) > 0;
 
-with_hhid_summary := if(includeHHIDSummary, risk_indicators.Boca_Shell_HHID_Summary(with_addr_history, dppa, dataRestriction, bsversion), with_addr_history);
+with_hhid_summary := if(includeHHIDSummary, risk_indicators.Boca_Shell_HHID_Summary(with_addr_history, dppa, dataRestriction, bsversion, mod_access), with_addr_history);
 
 just_layout_output := PROJECT (with_hhid_summary,
 		TRANSFORM(risk_indicators.layout_output, 
@@ -70,7 +85,7 @@ isInstantIDv1 := not isFCRA and (BSOptions & iid_constants.BSOptions.IsInstantID
 rolled_header := if(isFraudpoint or (bsversion>=41 and ~isFCRA) or isInstantIDv1, with_fraud_velocity, rolled_header_normal);
 
 // iid_getSSNFlags was located prior to rolled_header. When entering a 4 byte ssn, flags were being set before the ssn was fixed.
-with_ssn_flags := risk_indicators.iid_getSSNFlags(rolled_header, dppa, glb, isFCRA, runSSNCodes, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission );
+with_ssn_flags := risk_indicators.iid_getSSNFlags(rolled_header, dppa, glb, isFCRA, runSSNCodes, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission, mod_access);
 
 with_best_addr := risk_indicators.iid_check_best(with_hhid_summary, with_ssn_flags, ExactMatchLevel, bsversion);
 

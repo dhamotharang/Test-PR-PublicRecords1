@@ -1,5 +1,5 @@
 ﻿
-import Risk_Indicators, Business_Risk, Models, iesp, doxie, Gateway, ut, Address;
+import Risk_Indicators, iesp, doxie, Gateway, Address;
 
 EXPORT getAMLattributesV2 (DATASET(Risk_Indicators.Layout_Input) iid_prep, 
 																						string50 DataRestrictionMask, 
@@ -129,7 +129,7 @@ seq_map := join( bestappended, bestappended_deduped,
   
 
 	
-	with_DID := risk_indicators.iid_getDID_prepOutput(bestappended_deduped, dppa, GLBA, isFCRA, BSversion, DataRestrictionMask, AppendBest, Gateways, BSOptions);
+	with_DID := risk_indicators.iid_getDID_prepOutput(bestappended_deduped, dppa, GLBA, isFCRA, BSversion, DataRestrictionMask, AppendBest, Gateways, BSOptions, mod_access);
 	// Dedup records with > 1 DID by Score
 	DedupWithDID := DEDUP(SORT(ungroup(with_DID(DID <> 0)), seq, -score, DID), seq);
 	// Dedup records with > 1 DID = 0 by Score

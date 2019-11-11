@@ -34,6 +34,12 @@
 	export string50 bs_DataPermission := risk_indicators.iid_constants.default_DataPermission;
 	export boolean IN_isDirectToConsumer := false;
 	export boolean bs_IncludeLnJ := false;
-  export integer2 bs_ReportingPeriod := 84;
-  export string100 bs_IntendedPurpose := '';
+	export integer2 bs_ReportingPeriod := 84;
+	export string100 bs_IntendedPurpose := '';
+	
+	// CCPA parameters
+	export unsigned1 bs_LexIdSourceOptout := 1;
+    export string16 bs_TransactionID := '';
+    export string16 bs_BatchUID := '';
+    export unsigned6 bs_GlobalCompanyId := 0;
 END;

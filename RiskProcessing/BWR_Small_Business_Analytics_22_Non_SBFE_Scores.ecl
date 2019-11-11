@@ -160,7 +160,8 @@ layout_soap := RECORD
 	UNSIGNED1 MarketingMode;
 	STRING50 AllowedSources;
 	REAL Global_Watchlist_Threshold;
-	boolean DisableBusinessShellLogging
+	boolean DisableBusinessShellLogging;
+  STRING DataPermissionMask;  
 END;
 
 layout_soap transform_input_request(f_with_seq le, UNSIGNED8 ctr) := TRANSFORM
@@ -306,7 +307,8 @@ layout_soap transform_input_request(f_with_seq le, UNSIGNED8 ctr) := TRANSFORM
 	SELF.Seq := (STRING)le.seq;
 	SELF.AccountNumber := le.accountnumber;
 	self.DisableBusinessShellLogging := true;  // turn off logging
-	
+	SELF.DataPermissionMask := dataPermissionMask_val;
+
 	SELF := [];
 END;
 

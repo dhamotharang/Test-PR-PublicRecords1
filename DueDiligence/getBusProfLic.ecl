@@ -1,16 +1,17 @@
-﻿IMPORT BIPv2, prof_licenseV2, riskwise, ut, risk_indicators, Prof_License_Mari, STD;
+﻿IMPORT BIPv2, prof_licenseV2, riskwise, ut, risk_indicators, Prof_License_Mari, STD, doxie;
 
 
 
 EXPORT getBusProfLic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
-											BOOLEAN includeReportData) := FUNCTION
+											BOOLEAN includeReportData,
+                                            doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 											
 											
 	//grab the executives
 	execs := DueDiligence.CommonBusiness.getExecs(indata);
 	
 	//call individual routine to get prof licenses for the exec individuals
-	profLic := DueDiligence.getIndProfLic(execs);
+	profLic := DueDiligence.getIndProfLic(execs, mod_access);
 	
 	//join execs with licene data to update licenses for the execs
 	joinExecLic := JOIN(execs, profLic,

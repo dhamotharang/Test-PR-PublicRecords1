@@ -1,10 +1,5 @@
-/*2015-10-08T00:55:16Z (Michele Walklin)
-fix Len of Res calculations not to use capped fields. bug 190814
-*/
-/*2015-10-07T02:15:37Z (Michele Walklin)
-check in changes for CapOne for review cap960
-*/
-import risk_indicators, ut, easi, riskwise, MDR;
+﻿
+import risk_indicators, ut, easi, riskwise, MDR, STD;
 
 export get_LeadIntegrity_Attributes(grouped dataset(risk_indicators.Layout_Boca_Shell) clam, integer1 version=1) := function
 
@@ -89,7 +84,7 @@ export get_LeadIntegrity_Attributes(grouped dataset(risk_indicators.Layout_Boca_
 
 
 	getPreviousMonth(unsigned histdate) := FUNCTION
-			rollBack := trim((string)(histdate)[5..6])='01';
+			rollBack := trim(((string)(histdate))[5..6])='01';
 			histYear := if(rollBack, (unsigned)((trim((string)histdate)[1..4]))-1, (unsigned)(trim((string)histdate)[1..4]));
 			histMonth := if(rollBack, 12, (unsigned)((trim((string)histdate)[5..6]))-1);
 			return (unsigned)(intformat(histYear,4,1) + intformat(histMonth,2,1));
@@ -164,7 +159,7 @@ export get_LeadIntegrity_Attributes(grouped dataset(risk_indicators.Layout_Boca_
 // create all of the attributes from what we have available in the clam_with_easi
 working_layout map_fields(clam_with_Easi le) := transform
   self.did := le.did;
-	system_yearmonth := if(le.historydate = risk_indicators.iid_constants.default_history_date, (integer)(ut.GetDate[1..6]), le.historydate);
+	system_yearmonth := if(le.historydate = risk_indicators.iid_constants.default_history_date, (integer)(((STRING8)Std.Date.Today())[1..6]), le.historydate);
 	
 	fulldate := (unsigned4)risk_indicators.iid_constants.full_history_date(le.historydate);
 	
@@ -186,9 +181,9 @@ working_layout map_fields(clam_with_Easi le) := transform
 
 	// Identity Authentication Attributes	
 	self.SubjectFirstSeen := TRIM((string)ut.Min2(le.ssn_verification.header_first_seen, le.ssn_verification.credit_first_seen));
-	last_seen := ut.max2(le.ssn_verification.header_last_seen, le.ssn_verification.credit_last_seen);
+	last_seen := MAX(le.ssn_verification.header_last_seen, le.ssn_verification.credit_last_seen);
 	self.DateLastUpdate := checkDate6(last_seen);
-	today := ut.GetDate;
+	today := ((STRING8)Std.Date.Today());
 	self.RecentUpdate := checkboolean( (system_yearmonth - last_seen) < 100 );
 	self.PhoneFullNameMatch := checkboolean( le.iid.nap_summary in [9,12] );
 	self.PhoneLastNameMatch:= checkboolean( le.iid.nap_summary in [7,9,11,12] );
@@ -306,9 +301,9 @@ working_layout map_fields(clam_with_Easi le) := transform
 	self.InputAddrAutoVal := TRIM((string)IAAutomatedValuation);
 	self.InputAddrConfScore := TRIM((string)capU(le.avm.input_address_information.avm_confidence_score, capZero, cap2byte));
 	
-	IACountyMedianValuation := ut.imin2(le.avm.input_address_information.avm_median_fips_level, cap10byte);
-	IATractMedianValuation := ut.imin2(le.avm.input_address_information.avm_median_geo11_level, cap10byte);
-	IABlockMedianValuation := ut.imin2(le.avm.input_address_information.avm_median_geo12_level, cap10byte);
+	IACountyMedianValuation := MIN(le.avm.input_address_information.avm_median_fips_level, cap10byte);
+	IATractMedianValuation := MIN(le.avm.input_address_information.avm_median_geo11_level, cap10byte);
+	IABlockMedianValuation := MIN(le.avm.input_address_information.avm_median_geo12_level, cap10byte);
 	
 	self.InputAddrCountyIndex := TRIM((string)capR((REAL)formatdecimalstring(IAAutomatedValuation/IACountyMedianValuation, decimal_length), (REAL)capZero, 99.9));
 	self.InputAddrTractIndex :=  TRIM((string)capR((REAL)formatdecimalstring(IAAutomatedValuation/IATractMedianValuation, decimal_length), (REAL)capZero, 99.9));
@@ -502,17 +497,17 @@ working_layout map_fields(clam_with_Easi le) := transform
 	self.CurrAddrConfScore := TRIM((string)capU(CAConfidenceScore, capZero, cap2byte));
 	
 	
-	CACountyMedianValuation := ut.imin2(map(CAaddrChooser=0 => 0,
+	CACountyMedianValuation := MIN(map(CAaddrChooser=0 => 0,
 														CAaddrChooser=1 => le.avm.input_address_information.avm_median_fips_level,
 														CAaddrChooser=2 => le.avm.address_history_1.avm_median_fips_level,
 														le.avm.address_history_2.avm_median_fips_level)
 																				, cap10byte);
-	CATractMedianValuation := ut.imin2(map(CAaddrChooser=0 => 0,
+	CATractMedianValuation := MIN(map(CAaddrChooser=0 => 0,
 														CAaddrChooser=1 => le.avm.input_address_information.avm_median_geo11_level,
 														CAaddrChooser=2 => le.avm.address_history_1.avm_median_geo11_level,
 														le.avm.address_history_2.avm_median_geo11_level)
 																				, cap10byte);
-	CABlockMedianValuation := ut.imin2(map(CAaddrChooser=0 => 0,
+	CABlockMedianValuation := MIN(map(CAaddrChooser=0 => 0,
 														CAaddrChooser=1 => le.avm.input_address_information.avm_median_geo12_level,
 														CAaddrChooser=2 => le.avm.address_history_1.avm_median_geo12_level,
 														le.avm.address_history_2.avm_median_geo12_level)
@@ -700,17 +695,17 @@ working_layout map_fields(clam_with_Easi le) := transform
 	self.PrevAddrConfScore := TRIM((string)capU(PAConfidenceScore, capZero, cap2byte));
 	
 	
-	PACountyMedianValuation := ut.imin2(map(PAaddrChooser=0 => 0,
+	PACountyMedianValuation := MIN(map(PAaddrChooser=0 => 0,
 														PAaddrChooser=1 => le.avm.input_address_information.avm_median_fips_level,
 														PAaddrChooser=2 => le.avm.address_history_1.avm_median_fips_level,
 														le.avm.address_history_2.avm_median_fips_level)
 																				, cap10byte);
-	PATractMedianValuation := ut.imin2(map(PAaddrChooser=0 => 0,
+	PATractMedianValuation := MIN(map(PAaddrChooser=0 => 0,
 														PAaddrChooser=1 => le.avm.input_address_information.avm_median_geo11_level,
 														PAaddrChooser=2 => le.avm.address_history_1.avm_median_geo11_level,
 														le.avm.address_history_2.avm_median_geo11_level)
 																				, cap10byte);
-	PABlockMedianValuation := ut.imin2(map(PAaddrChooser=0 => 0,
+	PABlockMedianValuation := MIN(map(PAaddrChooser=0 => 0,
 														PAaddrChooser=1 => le.avm.input_address_information.avm_median_geo12_level,
 														PAaddrChooser=2 => le.avm.address_history_1.avm_median_geo12_level,
 														le.avm.address_history_2.avm_median_geo12_level)
@@ -744,7 +739,7 @@ working_layout map_fields(clam_with_Easi le) := transform
 		0
 	);
 
-	self.InputAddrCurrAddrAssessedDiff := TRIM((string)ut.imin2(9999999999,ut.max2(-9999999999,(integer)assessedDiff)));
+	self.InputAddrCurrAddrAssessedDiff := TRIM((string)MIN(9999999999,MAX(-9999999999,(integer)assessedDiff)));
 
 	self.InputAddrCurrAddrIncomeDiff  := TRIM((string)MAP(CAaddrChooser = 2 => capI(((INTEGER)CAmed_hhinc - (INTEGER)IAmed_hhinc), -cap10Byte, cap10Byte),
 																												CAaddrChooser = 3 => capI(((INTEGER)PAmed_hhinc - (INTEGER)IAmed_hhinc), -cap10Byte, cap10Byte),
@@ -821,7 +816,7 @@ working_layout map_fields(clam_with_Easi le) := transform
 										PAaddrChooser=3 => le.address_verification.address_history_2.st,
 										'');
 	self.CurrAddrPrevAddrStateDiff:= checkboolean( if(isInputPrevMatch, false, (prevAddrSt<>currAddrSt)) );
-	self.CurrAddrPrevAddrAssessedDiff := TRIM((string)if(isInputPrevMatch, 0, ut.max2(-9999999999, ut.imin2(9999999999,CAAssessedValue - PAAssessedValue))));
+	self.CurrAddrPrevAddrAssessedDiff := TRIM((string)if(isInputPrevMatch, 0, MAX(-9999999999, MIN(9999999999,CAAssessedValue - PAAssessedValue))));
 	self.CurrAddrPrevAddrIncomeDiff := TRIM((string)if(isInputPrevMatch,0, capI(((INTEGER)CAmed_hhinc - (INTEGER)PAmed_hhinc), -cap10Byte, cap10Byte)));
 	self.CurrAddrPrevAddrHomeValDiff := TRIM((string)if(isInputPrevMatch, 0, capI(((INTEGER)CAmed_hval - (INTEGER)PAmed_hval), -cap10Byte, cap10Byte)));
 	self.CurrAddrPrevAddrCrimeDiff := TRIM((string)if(isInputPrevMatch,0, capI(((INTEGER)CAtotcrime - (INTEGER)PAtotcrime), -200, 200)));
@@ -926,7 +921,7 @@ working_layout map_fields(clam_with_Easi le) := transform
 	
 // Derogatory Public Records
 	self.totalnumberderogs := TRIM((string)capU(le.bjl.criminal_count + le.bjl.filing_count + le.bjl.liens_historical_unreleased_count + le.bjl.liens_recent_unreleased_count, capZero, cap255));
-	date_last_derog := ut.max2(ut.max2(le.bjl.last_criminal_date, (integer)le.bjl.last_liens_unreleased_date),le.bjl.date_last_seen);
+	date_last_derog := MAX(MAX(le.bjl.last_criminal_date, (integer)le.bjl.last_liens_unreleased_date),le.bjl.date_last_seen);
 	self.datelastderog := TRIM((string)if(date_last_derog>fullDate, 0, date_last_derog));
 	self.numfelonies := TRIM((string)capU(le.bjl.felony_count, capZero, cap255));
 	self.datelastconviction := TRIM((string)if(le.bjl.last_felony_date>fullDate, 0, le.bjl.last_felony_date));
@@ -1005,7 +1000,7 @@ working_layout map_fields(clam_with_Easi le) := transform
 	
 	self.ProfLicCount := TRIM((string)capU(le.professional_license.proflic_count, capZero, cap255));
 	self.MostRecentProfLicDate := TRIM((string)if(le.professional_license.date_most_recent>fullDate, 0, le.professional_license.date_most_recent));
-	self.MostRecentProfLicExpireDate := IF((UNSIGNED)le.professional_license.expiration_date[1..4] > 2100 OR (UNSIGNED)le.professional_license.expiration_date[1..4] < 1989, '', TRIM((string)le.professional_license.expiration_date));
+	self.MostRecentProfLicExpireDate := IF( (UNSIGNED)(((STRING)le.professional_license.expiration_date)[1..4]) > 2100 OR (UNSIGNED)(((STRING)le.professional_license.expiration_date)[1..4]) < 1989, '', TRIM((string)le.professional_license.expiration_date));
 	self.ProfLicCount30 := TRIM((string)capU(le.professional_license.proflic_count30, capZero, cap255));
 	self.ProfLicCount90 := TRIM((string)capU(le.professional_license.proflic_count90, capZero, cap255));
 	self.ProfLicCount180 := TRIM((string)capU(le.professional_license.proflic_count180, capZero, cap255));
@@ -1074,7 +1069,7 @@ renameField( v1_name, v3_name, blank_condition=false, null_9999_condition = FALS
 	self.version3.v3_name := if(trim(le.v1_name) IN IF(null_9999_condition, ['', '9999'], ['']) or blank_condition, '-1', le.v1_name );
 ENDMACRO;
 
-string calcMonths( integer sysDt, string someDt, integer cap ) := (string)ut.imin2( cap, months_apart( sysDt, (unsigned)someDt ));
+string calcMonths( integer sysDt, string someDt, integer cap ) := (string)MIN( cap, months_apart( sysDt, (unsigned)someDt ));
 
 // some v1 fields were YYYYMM values, and their updated v3 values are months since instead.
 YYYYMM_to_months( v1_name, v3_name, blank_condition=false, cap=9998 ) := MACRO
@@ -1094,7 +1089,7 @@ working_layout map_fields_v3( working_layout le ) := TRANSFORM
 	cap960 := 960;
 	capNull := -1;
 	
-	sysdate := if(le.clam.historydate <> 999999, (integer)((string)le.clam.historydate[1..6]), (integer)(ut.GetDate[1..6]));
+	sysdate := if(le.clam.historydate <> 999999, (integer)(((string)le.clam.historydate)[1..6]), (integer)(((STRING8)Std.Date.Today())[1..6]));
 
 
 	noAddr    := not le.clam.input_validation.Address;
@@ -1438,7 +1433,7 @@ working_layout map_fields_v3( working_layout le ) := TRANSFORM
 			hls = 0 and cls = 0 => -1,
 			hls = 0             => cls,
 			cls = 0 						=> hls,
-			ut.max2(hls,cls)
+			MAX(hls,cls)
 		);
 
 		self.DateLastUpdate := '';
@@ -1464,7 +1459,7 @@ working_layout map_fields_v3( working_layout le ) := TRANSFORM
 			outDate := if(foundDate > le.clam.historyDate, getPreviousMonth(le.clam.historyDate), foundDate);
 			return (string)outDate;
 		END;
-		system_yearmonth := if(le.clam.historydate = risk_indicators.iid_constants.default_history_date, (integer)(ut.GetDate[1..6]), le.clam.historydate);
+		system_yearmonth := if(le.clam.historydate = risk_indicators.iid_constants.default_history_date, (integer)(((STRING8)Std.Date.Today())[1..6]), le.clam.historydate);
 				
 		IADateFirstReported := fixYYYY00((unsigned)checkDate6(le.clam.address_verification.input_address_information.date_first_seen));
 		IADateLastReported := fixYYYY00((unsigned)checkDate6(le.clam.address_verification.input_address_information.date_last_seen));
@@ -1564,17 +1559,17 @@ working_layout map_fields_v3( working_layout le ) := TRANSFORM
 													CAaddrChooser=1 => le.clam.avm.input_address_information.avm_Automated_valuation,
 													CAaddrChooser=2 => le.clam.avm.address_history_1.avm_Automated_valuation,
 													le.clam.avm.address_history_2.avm_Automated_valuation);	
-			CACountyMedianValuation := ut.imin2(map(CAaddrChooser=0 => 0,
+			CACountyMedianValuation := MIN(map(CAaddrChooser=0 => 0,
 																CAaddrChooser=1 => le.clam.avm.input_address_information.avm_median_fips_level,
 																CAaddrChooser=2 => le.clam.avm.address_history_1.avm_median_fips_level,
 																le.clam.avm.address_history_2.avm_median_fips_level)
 																						, cap10byte);
-			CATractMedianValuation := ut.imin2(map(CAaddrChooser=0 => 0,
+			CATractMedianValuation := MIN(map(CAaddrChooser=0 => 0,
 																CAaddrChooser=1 => le.clam.avm.input_address_information.avm_median_geo11_level,
 																CAaddrChooser=2 => le.clam.avm.address_history_1.avm_median_geo11_level,
 																le.clam.avm.address_history_2.avm_median_geo11_level)
 																						, cap10byte);
-			CABlockMedianValuation := ut.imin2(map(CAaddrChooser=0 => 0,
+			CABlockMedianValuation := MIN(map(CAaddrChooser=0 => 0,
 																CAaddrChooser=1 => le.clam.avm.input_address_information.avm_median_geo12_level,
 																CAaddrChooser=2 => le.clam.avm.address_history_1.avm_median_geo12_level,
 																le.clam.avm.address_history_2.avm_median_geo12_level)
@@ -1645,17 +1640,17 @@ working_layout map_fields_v3( working_layout le ) := TRANSFORM
 																PAaddrChooser=2 => le.clam.avm.address_history_1.avm_Automated_valuation,
 																le.clam.avm.address_history_2.avm_Automated_valuation);
 			
-			PACountyMedianValuation := ut.imin2(map(PAaddrChooser=0 => 0,
+			PACountyMedianValuation := MIN(map(PAaddrChooser=0 => 0,
 																PAaddrChooser=1 => le.clam.avm.input_address_information.avm_median_fips_level,
 																PAaddrChooser=2 => le.clam.avm.address_history_1.avm_median_fips_level,
 																le.clam.avm.address_history_2.avm_median_fips_level)
 																						, cap10byte);
-			PATractMedianValuation := ut.imin2(map(PAaddrChooser=0 => 0,
+			PATractMedianValuation := MIN(map(PAaddrChooser=0 => 0,
 																PAaddrChooser=1 => le.clam.avm.input_address_information.avm_median_geo11_level,
 																PAaddrChooser=2 => le.clam.avm.address_history_1.avm_median_geo11_level,
 																le.clam.avm.address_history_2.avm_median_geo11_level)
 																						, cap10byte);
-			PABlockMedianValuation := ut.imin2(map(PAaddrChooser=0 => 0,
+			PABlockMedianValuation := MIN(map(PAaddrChooser=0 => 0,
 																PAaddrChooser=1 => le.clam.avm.input_address_information.avm_median_geo12_level,
 																PAaddrChooser=2 => le.clam.avm.address_history_1.avm_median_geo12_level,
 																le.clam.avm.address_history_2.avm_median_geo12_level)
@@ -1924,6 +1919,10 @@ END;
 p3_inq := join( p3, Risk_Indicators.Key_Inquiry_Table_DID, keyed(left.clam.did=right.did), addInquiries(left,right), left outer, keep(1));
 
 
+fn_format_InputAddrMobilityIndex(STRING indexValue) := FUNCTION
+  indexValue_temp := TRIM((STRING)capR((REAL)indexValue, -1.0, 99.0), ALL)[1..3];
+  RETURN IF( indexValue_temp[3] = '.', indexValue_temp[1..2], indexValue_temp); // for RQ-16680 "Remove extra decimal..."
+END;
 
 working_layout map_fields_v4( working_layout le ) := TRANSFORM
 	self.seq    := le.seq;
@@ -1931,9 +1930,6 @@ working_layout map_fields_v4( working_layout le ) := TRANSFORM
 	self.did := le.did;
 	le_clam := row( le.clam, risk_indicators.Layout_Boca_Shell );
 	attr := models.Attributes_Master(le_clam, false, le.clam.inEasi, le.clam.easi1, le.clam.easi2);
-
-
-
 
 	self.version4.AgeOldestRecord                      := attr.AgeOldestRecord_buildDate;
 	self.version4.AgeNewestRecord                      := attr.AgeNewestRecord_buildDate;
@@ -2019,7 +2015,7 @@ working_layout map_fields_v4( working_layout le ) := TRANSFORM
 	self.version4.InputAddrCarTheftIndex               := le.InputAddrCarTheftIndex;
 	self.version4.InputAddrBurglaryIndex               := le.InputAddrBurglaryIndex;
 	self.version4.InputAddrCrimeIndex                  := le.InputAddrCrimeIndex;
-	self.version4.InputAddrMobilityIndex               := TRIM((STRING)capR((REAL)attr.InputAddrMobilityIndex, -1.0, 99.0), ALL)[1..3];
+	self.version4.InputAddrMobilityIndex               := fn_format_InputAddrMobilityIndex(attr.InputAddrMobilityIndex);
 	self.version4.InputAddrVacantPropCount             := attr.InputAddrVacantPropCount;
 	self.version4.InputAddrBusinessCount               := attr.InputAddrBusinessCount;
 	self.version4.InputAddrSingleFamilyCount           := attr.InputAddrSingleFamilyCount;

@@ -1,8 +1,9 @@
-IMPORT FraudShared;
+﻿IMPORT doxie, FraudShared, suppress;
 
 EXPORT GetPayloadRecords(
   DATASET(FraudShared_Services.Layouts.Recid_rec) ds_ids,
-  string fraud_platform
+  string fraud_platform,
+  doxie.IDataAccess mod_access
 ) := FUNCTION
 
   // JOIN RECORD_ID with Payload
@@ -14,7 +15,6 @@ EXPORT GetPayloadRecords(
 			SELF := RIGHT,
 			SELF := LEFT),
 		LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
-
-    // OUTPUT(results, NAMED('GetPayloadRecords'));
-    RETURN results;
+    suppressed_results := suppress.MAC_SuppressSource(results,mod_access);
+    RETURN suppressed_results;
 END;

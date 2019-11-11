@@ -1,4 +1,4 @@
-﻿IMPORT advo, BIPV2, Business_Risk_BIP, Codes, DueDiligence, iesp, Risk_Indicators;
+﻿IMPORT advo, BIPV2, Business_Risk_BIP, Codes, DueDiligence, iesp, Risk_Indicators, Doxie;
 
 
 /*
@@ -8,7 +8,8 @@
 */
 EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                           Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                          BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+                          BIPV2.mod_sources.iParams linkingOptions,
+                          doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
                           
                           
                           
@@ -189,7 +190,7 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     indAgents := uniqueAgentID(agentIsBus = FALSE);
 
     busLexIDs := DueDiligence.getBusInformation(options, linkingOptions).GetBusinessBestDataWithPII(busAgents.clean);
-    indLexIDs := DueDiligence.getIndInformation(options).GetIndividualBestDataWithPII(indAgents.clean);
+    indLexIDs := DueDiligence.getIndInformation(options, mod_access).GetIndividualBestDataWithPII(indAgents.clean);
                                         
                                         
                                           

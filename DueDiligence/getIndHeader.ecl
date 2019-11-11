@@ -1,4 +1,4 @@
-﻿Import doxie, drivers, header, mdr, Risk_Indicators, riskwise, header_quick, ut, STD;
+﻿Import doxie, drivers, header, mdr, Risk_Indicators, riskwise, header_quick, ut, STD, Suppress, data_services;
 
 /*
 	Following Keys being used:
@@ -12,9 +12,12 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                     UNSIGNED1 dppa,
                     UNSIGNED1 glba,
                     BOOLEAN isFCRA,
-                    BOOLEAN includeReport = FALSE) := FUNCTION
+                    BOOLEAN includeReport = FALSE,
+                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+                    ) := FUNCTION
 
-												
+	data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+											
     BOOLEAN isUtility := FALSE;
 
     glb_ok := Risk_Indicators.iid_constants.glb_ok(glba, isFCRA);
@@ -25,14 +28,15 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     allInd := parents + inData;
 
     getHeaderData(key, didField, atmostValue, keepValue) := FUNCTIONMACRO
-        results := JOIN(allInd, key, 
+        results_unsuppressed := JOIN(allInd, key, 
                         KEYED(LEFT.individual.did = RIGHT.didField) AND
                         RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(dataRestrictionMask, isFCRA) AND 
                         (~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
                         (header.isPreGLB(RIGHT) OR glb_ok) AND 
                         (~mdr.Source_is_DPPA(RIGHT.src) OR (dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src), dppa, RIGHT.src))) AND 
                         ~Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st), 
-                        TRANSFORM(DueDiligence.LayoutsInternal.IndSlimHeader, 
+                        TRANSFORM({unsigned4 global_sid, DueDiligence.LayoutsInternal.IndSlimHeader}, 
+                                  SELF.global_sid := RIGHT.global_sid;
                                   SELF.seq := LEFT.seq;
                                   SELF.inquiredDID := LEFT.inquiredDID;
                                   SELF.did := LEFT.individual.did;
@@ -54,13 +58,15 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                         ATMOST(atmostValue), 
                         KEEP(keepValue));
                         
+        results := Suppress.MAC_SuppressSource(results_unsuppressed, mod_access, data_env := data_environment);
+        
         RETURN results;		
     ENDMACRO;
+    
+    keyHeader := getHeaderData(doxie.Key_Header, s_did, ut.limits.HEADER_PER_DID, DueDiligence.Constants.MAX_ATMOST_150);	
 
-
-    keyHeader := getHeaderData(doxie.Key_Header, s_did, ut.limits.HEADER_PER_DID, DueDiligence.Constants.MAX_ATMOST_150);									
     quickHeader := getHeaderData(header_quick.key_DID, did, RiskWise.max_atmost, DueDiligence.Constants.MAX_ATMOST_100);
-                        
+    
     realHeader :=  quickHeader + keyHeader;
 
     headerCleanDates := DueDiligence.Common.CleanDatasetDateFields(realHeader, 'dateFirstSeen, dateLastSeen');

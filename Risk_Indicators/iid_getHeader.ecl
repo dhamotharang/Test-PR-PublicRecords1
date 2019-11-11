@@ -11,16 +11,19 @@ export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsig
 							unsigned4 EverOccupant_StartDate = risk_indicators.iid_constants.default_history_date,
 							unsigned3 LastSeenThreshold = risk_indicators.iid_constants.oneyear,
 							unsigned8 BSOptions=0,
-              unsigned1 LexIdSourceOptout = 1,
-              string TransactionID = '',
-              string BatchUID = '',
-              unsigned6 GlobalCompanyId = 0) := function
-SHARED MOD_Access := MODULE(Doxie.IDataAccess)
-		 
-		EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
-		EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
-		EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
-		END;
+							unsigned1 LexIdSourceOptout = 1,
+							string TransactionID = '',
+							string BatchUID = '',
+							unsigned6 GlobalCompanyId = 0) := function
+							
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := ^.glb;
+	EXPORT dppa := ^.dppa;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
+
 unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
 
@@ -175,7 +178,6 @@ Unsigned4 Global_sid;
 end;
 risk_indicators_iid_getHeader_ccpa get_j_pre(g_inrec le, header_key ri) := TRANSFORM
 	SELF.Global_Sid := ri.Global_Sid;
-  self.did := ri.did;
   self.seq := le.seq; 
 	self.h := ri; 
 	self.valid_dob := ri.valid_dob, 
@@ -184,7 +186,7 @@ risk_indicators_iid_getHeader_ccpa get_j_pre(g_inrec le, header_key ri) := TRANS
 	self := []
 END;
 
-j_pre_roxie := join (g_inrec, header_key, 
+j_pre_roxie_unsuppressed := join (g_inrec, header_key, 
 													 LEFT.did<>0 AND keyed(LEFT.did = RIGHT.s_did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
 														(right.src in risk_indicators.iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.PhillipMorrisFilter) and
@@ -215,9 +217,9 @@ j_pre_roxie := join (g_inrec, header_key,
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(ut.limits.HEADER_PER_DID));
-		  	 get_j_pre_risk_indicators_iid_getHeader_ccpa := Suppress.Suppress_ReturnOldLayout(j_pre_roxie, mod_access,Layout_Header_Data);
+		  	 j_pre_roxie := Suppress.Suppress_ReturnOldLayout(j_pre_roxie_unsuppressed, mod_access,Layout_Header_Data, iType);
 
-j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)), 
+j_pre_thor_unsuppressed := join (distribute(g_inrec(did<>0), hash64(did)), 
 										distribute(pull(header_key(s_did<>0)), hash64(s_did)), 
 													 (LEFT.did = RIGHT.s_did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
@@ -250,33 +252,29 @@ j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(left.did=right.s_did, ut.limits.HEADER_PER_DID), LOCAL);
-		  	 get_j_pre_risk_indicators_iid_getHeader_ccpa_a := Suppress.Suppress_ReturnOldLayout(j_pre_thor, mod_access,Layout_Header_Data);
+		  	 j_pre_thor := Suppress.Suppress_ReturnOldLayout(j_pre_thor_unsuppressed, mod_access,Layout_Header_Data, iType);
 
 j_pre_thor_nodid := project(g_inrec(did=0), transform(Layout_Header_Data, self := left, self := []));
 
 #IF(onThor)
-	j_pre := get_j_pre_risk_indicators_iid_getHeader_ccpa_a+j_pre_thor_nodid;
+	j_pre := j_pre_thor+j_pre_thor_nodid;
 #ELSE
-	j_pre := get_j_pre_risk_indicators_iid_getHeader_ccpa;
+	j_pre := j_pre_roxie;
 #END
 
 // get quick header
 header_quick_key := if(isFCRA, header_quick.key_did_fcra, header_quick.key_DID);
-risk_indicators_iid_getHeader_ccpa_b := Record
-Layout_Header_Data;
-Unsigned4 Global_sid; 
-end;
-risk_indicators_iid_getHeader_ccpa_b get_j_quickpre(g_inrec le, header_quick_key ri) := TRANSFORM
+
+risk_indicators_iid_getHeader_ccpa get_j_quickpre(g_inrec le, header_quick_key ri) := TRANSFORM
 	SELF.Global_Sid := ri.Global_Sid;
-  self.did := ri.did;
-  self.seq := le.seq, 
+	self.seq := le.seq, 
 	self.came_from_fastheader := true, 
 	self.h := ri, 
 	self := le, 
 	self := [] 
 END;
 
-j_quickpre_roxie := join (g_inrec, header_quick_key,
+j_quickpre_roxie_unsuppressed := join (g_inrec, header_quick_key,
 																LEFT.did<>0 AND keyed(LEFT.did = RIGHT.did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in risk_indicators.iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.PhillipMorrisFilter) and
@@ -307,9 +305,9 @@ j_quickpre_roxie := join (g_inrec, header_quick_key,
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_quickpre(LEFT,RIGHT), 
 													 atmost(ut.limits.HEADER_PER_DID));
-		  	 get_j_quickpre_risk_indicators_iid_getHeader_ccpa_b := Suppress.Suppress_ReturnOldLayout(j_quickpre_roxie, mod_access,Layout_Header_Data);
+		  	 j_quickpre_roxie := Suppress.Suppress_ReturnOldLayout(j_quickpre_roxie_unsuppressed, mod_access,Layout_Header_Data, iType);
 
-j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)), 
+j_quickpre_thor_unsuppressed := join (distribute(g_inrec(did<>0), hash64(did)), 
 												 distribute(pull(header_quick_key(did<>0)), hash64(did)),
 														(LEFT.did = RIGHT.did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
@@ -342,12 +340,12 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_quickpre(LEFT,RIGHT), 
 													 atmost(LEFT.did = RIGHT.did, ut.limits.HEADER_PER_DID), LOCAL);
-				  	 get_j_quickpre_risk_indicators_iid_getHeader_ccpa_bi := Suppress.Suppress_ReturnOldLayout(j_quickpre_thor, mod_access,Layout_Header_Data);
+				  	 j_quickpre_thor := Suppress.Suppress_ReturnOldLayout(j_quickpre_thor_unsuppressed, mod_access,Layout_Header_Data, iType);
 											 
 #IF(onThor)
-	j_quickpre := get_j_quickpre_risk_indicators_iid_getHeader_ccpa_bi;
+	j_quickpre := j_quickpre_thor;
 #ELSE
-	j_quickpre := get_j_quickpre_risk_indicators_iid_getHeader_ccpa_b;
+	j_quickpre := j_quickpre_roxie;
 #END
 
 header_recs_combined := j_pre + j_quickpre;  

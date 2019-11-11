@@ -46,7 +46,12 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
   BOOLEAN FBOP_includeLexIDPrimaryDOBYear := FALSE : STORED('FBOP_IncludeLexIDPrimaryDOBYear');
   BOOLEAN FBOP_includeDOBYearRadius := FALSE : STORED('FBOP_IncludeDOBYearRadius');
   UNSIGNED1 FBOP_DOBNumberOfYearsRadius := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_DOBNumberOfYearsRadius');
-  
+ 
+  //CCPA fields
+  unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+  string TransactionID := '' : STORED('_TransactionId');
+  string BatchUID := '' : STORED('_BatchUID');
+  unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 
 
@@ -157,7 +162,11 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
   DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, dataRestriction, dataPermission, Business_Risk_BIP.Constants.Default_IndustryClass);
   
   //retrieve the data based on input to be used in searches (PII vs LexID vs Combo of PII and LexID)
-  dataToSearchBy := DueDiligence.fn_getProductInput(requestedProducts, cleanData, busOptions, busLinkingOptions);
+  dataToSearchBy := DueDiligence.fn_getProductInput(requestedProducts, cleanData, busOptions, busLinkingOptions,
+                                                                                               LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                               TransactionID := TransactionID, 
+                                                                                               BatchUID := BatchUID, 
+                                                                                               GlobalCompanyID := GlobalCompanyID);
                                       
                                       
                                       

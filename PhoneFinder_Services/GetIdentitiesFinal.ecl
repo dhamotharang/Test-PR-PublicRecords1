@@ -17,7 +17,16 @@ FUNCTION
                                       SELF               := LEFT,
                                       SELF               := []));
 
-  dIdentitySlimFiltered := dIdentitySlim((lname != '' OR listed_name != '') AND typeflag != Phones.Constants.TypeFlag.DataSource_PV);
+  // Hack for Zumigo date- Need a better fix - Typeflag P record having PO indicator
+  dIdentitySlimPropagatePO := ITERATE(GROUP(SORT(dIdentitySlim, acctno, IF(isPrimaryIdentity, 0, 1), IF(PhoneOwnershipIndicator, 0, 1)), acctno),
+                                      TRANSFORM($.Layouts.PhoneFinder.IdentitySlim,
+                                                SELF.PhoneOwnershipIndicator := RIGHT.isPrimaryIdentity AND (COUNTER = 1 OR LEFT.phone = RIGHT.phone) AND (LEFT.PhoneOwnershipIndicator OR RIGHT.PhoneOwnershipIndicator),
+                                                SELF.dt_last_seen            := IF(SELF.PhoneOwnershipIndicator, STD.Date.Today(), RIGHT.dt_last_seen),
+                                                SELF                         := RIGHT));
+
+  dIdentitySlimWithPO := IF(inMod.IsPrimarySearchPII, UNGROUP(dIdentitySlimPropagatePO), dIdentitySlim);
+
+  dIdentitySlimFiltered := dIdentitySlimWithPO((lname != '' OR listed_name != '') AND typeflag != Phones.Constants.TypeFlag.DataSource_PV);
 
   // Rollup
   $.Layouts.PhoneFinder.IdentitySlim tIdentityRollup($.Layouts.PhoneFinder.IdentitySlim le, $.Layouts.PhoneFinder.IdentitySlim ri) :=
@@ -25,6 +34,7 @@ FUNCTION
     BOOLEAN isAddrMissing := le.prim_range = '' AND le.prim_name = '';
 
     SELF.dt_first_seen           := ut.Min2(le.dt_first_seen, ri.dt_first_seen);
+    // Hack for Zumigo - Need a better fix
     SELF.dt_last_seen            := IF(le.dt_last_seen <= (INTEGER)today AND le.dt_last_seen >= ri.dt_last_seen, le.dt_last_seen, ri.dt_last_seen);
     SELF.PhoneOwnershipIndicator := le.PhoneOwnershipIndicator OR ri.PhoneOwnershipIndicator;
     SELF.isPrimaryIdentity       := le.isPrimaryIdentity OR ri.isPrimaryIdentity;
@@ -172,6 +182,7 @@ FUNCTION
 
   #IF($.Constants.Debug.Main)
     OUTPUT(dIdentitySlim, NAMED('dIdentitySlim'), EXTEND);
+    IF(inMod.IsPrimarySearchPII, OUTPUT(dIdentitySlimPropagatePO, NAMED('dIdentitySlimPropagatePO'), EXTEND));
     OUTPUT(dIdentitySlimFiltered, NAMED('dIdentitySlimFiltered'), EXTEND);
     OUTPUT(dDIDRollUp, NAMED('dIdentityDIDRollUp'), EXTEND);
     OUTPUT(dNoDIDRollUp, NAMED('dIdentityNoDIDRollUp'), EXTEND);

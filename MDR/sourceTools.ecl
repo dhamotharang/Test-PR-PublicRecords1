@@ -199,6 +199,7 @@ MODULE
 	export src_Daily_Utilities           := 'DU';    
 	export src_Dunn_Bradstreet           := 'D ';  // aka D&B DMI
 	export src_Dunn_Bradstreet_Fein      := 'DN';
+	export src_Dunndata_Consumer		     := 'A3';  //DF-23679 Dunndata Consumer Masterfile
 	export src_EBR                       := 'ER';  // Experian Business Reports	
 	export src_Edgar                     := 'E ';  // US Securities and Exchange Commission, "Edgar" system data
 	export src_Emdeon                    := '7U';  // Emdeon Healthcare Claims
@@ -1087,7 +1088,7 @@ MODULE
 		,src_ZOOM                      ,src_TUCS_Ptrack
 	]; 
 
-// Marketing approved sources as of 6/2019.
+// Marketing approved sources as of 11/2019.
 export set_Marketing_Sources           := [
 		 src_AMS											 ,src_AK_Busreg                 ,src_AK_Perm_Fund						   ,src_Accurint_Trade_Show			 
 		,src_Aircrafts								 ,src_Accurint_Arrest_Log				,src_AlloyMedia_consumer       ,src_Airmen    						 		 
@@ -1101,7 +1102,7 @@ export set_Marketing_Sources           := [
 		,src_IRS_Non_Profit    				 ,src_InfutorNarc								,src_InfutorTRK  							 ,src_InfutorCID    						
 		,src_Infutor_Motorcycle_Veh 	 ,src_InfutorNare 							,src_Ingenix_Sanctions				 ,src_LaborActions_EBSA					
 		,src_LaborActions_WHD				   /*,src_Liens										  ,src_Liens_v2  */  					 ,src_LnPropV2_Fares_Asrs			 
-		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists								  ,src_MO_DL   
+		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists								  ,src_MO_DL                     ,src_Dunndata_Consumer 
 		,src_Marriage 								 ,src_MediaOne								  ,src_NaturalDisaster_Readiness ,src_NJ_Gaming_Licenses			 
 		,src_OR_Worker_Comp						 ,src_OSHAIR										,src_PBSA											 ,src_Professional_License			 
 		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard

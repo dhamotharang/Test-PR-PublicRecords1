@@ -1,12 +1,16 @@
-﻿import _Control, riskwise, ut, STD, risk_indicators;
+﻿import _Control, riskwise, risk_indicators, Doxie, data_services, Suppress;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_ADL (GROUPED DATASET(risk_indicators.layout_output) iid, boolean isFCRA, unsigned1 dppa,
-					string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction) := function
+					string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction, 
+					doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+	
 dppa_ok := risk_indicators.iid_constants.dppa_ok(dppa, isFCRA);
 
-risk_indicators.layout_output addADL(iid le, risk_indicators.key_ADL_Risk_Table_v4 ri) := transform
+{risk_indicators.layout_output, UNSIGNED4 global_sid} addADL(iid le, risk_indicators.key_ADL_Risk_Table_v4 ri) := transform
+	self.global_sid := ri.global_sid;
 	// determine which section of the table is permitted for use based on the data restriction mask
 	header_version := map(DataRestriction[risk_indicators.iid_constants.posEquifaxRestriction]=risk_indicators.iid_constants.sFalse and
 												DataRestriction[risk_indicators.iid_constants.posTransUnionRestriction]=risk_indicators.iid_constants.sFalse and
@@ -68,14 +72,18 @@ risk_indicators.layout_output addADL(iid le, risk_indicators.key_ADL_Risk_Table_
 	
 	self := le;
 END;
-ADLinfo_nonfcra_roxie := join(iid, risk_indicators.key_ADL_Risk_Table_v4, left.did != 0 and keyed(left.did=right.did), addADL(LEFT,RIGHT), left outer, 
+ADLinfo_nonfcra_roxie_unsuppressed := join(iid, risk_indicators.key_ADL_Risk_Table_v4, left.did != 0 and keyed(left.did=right.did), addADL(LEFT,RIGHT), left outer, 
 								ATMOST(RiskWise.max_atmost), KEEP(1));
 								
-ADLinfo_nonfcra_thor := group(join(distribute(iid, hash64(did)), 
+ADLinfo_nonfcra_roxie := Suppress.Suppress_ReturnOldLayout(ADLinfo_nonfcra_roxie_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
+							
+ADLinfo_nonfcra_thor_unsuppressed := group(join(distribute(iid, hash64(did)), 
 														 distribute(pull(risk_indicators.key_ADL_Risk_Table_v4), hash64(did)), 
 														 left.did != 0 and (left.did=right.did), addADL(LEFT,RIGHT), left outer, 
 								ATMOST(RiskWise.max_atmost), KEEP(1), LOCAL), seq, did);
 								
+ADLinfo_nonfcra_thor := Suppress.Suppress_ReturnOldLayout(ADLinfo_nonfcra_thor_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
+
 #IF(onThor)
 	ADLinfo_nonfcra := ADLinfo_nonfcra_thor;
 #ELSE
