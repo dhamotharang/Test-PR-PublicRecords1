@@ -127,14 +127,15 @@ MODULE
   EXPORT MaxCheckIdentities := 10;
 
   EXPORT VerifyMessage :=
-    MODULE
-      EXPORT PhoneCannotBeVerified := 'Input phone number cannot be verified';
-      EXPORT PhoneNotEntered := 'No phone number was entered';
-      EXPORT PhoneMatchesNameAddress := 'Input phone number matches name and address';
-      EXPORT PhoneMatchesName := 'Input phone number matches name';
-      EXPORT PhoneIsActive := 'Input phone number is verified as Active for the defined threshold period';
-      EXPORT PhoneNotActive := 'Input phone number is NOT verified as Active for the defined threshold period';
-    END;
+		MODULE
+            EXPORT PhoneCannotBeVerified := 'Input phone number cannot be verified';
+            EXPORT PhoneNotEntered := 'No phone number was entered';
+            EXPORT PhoneMatchesNameAddress := 'Input phone number matches name and address';
+            EXPORT PhoneMatchesName := 'Input phone number matches name';
+            EXPORT PhoneIsActive := 'Input phone number is verified as Active for the defined threshold period';
+            EXPORT PhoneNotActive := 'Input phone number is NOT verified as Active for the defined threshold period';
+            EXPORT PhoneMatchesLastName := 'Input phone number matches last name';
+		END;
 
   EXPORT VARSTRING ErrorCodes(INTEGER c) :=
     CASE(c,
