@@ -1,8 +1,5 @@
-﻿/*2019-02-21T20:50:34Z (Hennigar, Jennifer (RIS-BCT))
-Modification to associate key to reduce duplicate entries
-*/
-import doxie, tools;
-
+﻿import doxie, tools;
+//this attribute strips out base file fields for the keys
 export Keys(string		pversion							= '',boolean pUseProd = false) := module
 
 	shared facility_Base						:= Files(pversion,pUseProd).facility_Base.Built;
