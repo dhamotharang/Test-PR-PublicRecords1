@@ -150,7 +150,7 @@ cvi := __COMMON__(CASE(p,
 									includecompliancecap and IncludeDLinCVI AND DLverified AND cviAdj7<'40' AND ~override1 AND ~override2 AND ~override3 => '20',	
 									cviAdj8));
                   
-  cviAdj10:= if(includecompliancecap and ( (p=8 and s=8) or (p=8 and s=11) or (p=8 and s=12) ),'30',cviAdj9);	
+  cviAdj10:= if(includecompliancecap and ( (p=8 and s=8) or (p=8 and s=11) or (p=8 and s=12) ) AND ~override1 AND ~override2 AND ~override3, '30', cviAdj9);	
 	//Adjustment for Targets fp1403_2 model
 	target_Adj := __COMMON__(if(CustomCVIModelName = 'CCVI1501_1', if((s=7 and p=7) OR (s=9 and p=9), '20', cviAdj10), cviAdj10));
 
