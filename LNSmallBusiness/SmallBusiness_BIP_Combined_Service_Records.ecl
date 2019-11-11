@@ -195,8 +195,11 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
                                                  SmallBizCombined_inmod.IncludeTargusGateway,
                                                  SmallBizCombined_inmod.RunTargusGateway, /* for testing purposes only */
                                                  BusinessCredit_Services.Constants.BIPID_WEIGHT_THRESHOLD, 
-                                                 DisableSBFE := disallowSBFE
-																								 );
+                                                 DisableSBFE := disallowSBFE,
+												 LexIdSourceOptout := SmallBizCombined_inmod.in_LexIdSourceOptout, 
+                                                 TransactionID := SmallBizCombined_inmod.in_TransactionID, 
+                                                 BatchUID := SmallBizCombined_inmod.in_BatchUID, 
+                                                 GlobalCompanyID := SmallBizCombined_inmod.in_GlobalCompanyID);
 
 
 	  SBA_Results_Temp := 

@@ -207,7 +207,7 @@ SmallBusinessMarketingRequest XML:
 #option('expandSelectCreateRow', true);
 #option('embeddedWarningsAsErrors', 0);
 
-IMPORT Address, Business_Risk_BIP, Gateway, IESP, Risk_Reporting, UT, Models, Inquiry_AccLogs, STD, OFAC_XG5;
+IMPORT Address, Business_Risk_BIP, IESP, Risk_Reporting, Models, Inquiry_AccLogs, STD, OFAC_XG5;
 
 EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 	/* ************************************************************************
@@ -227,7 +227,11 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 	'LinkSearchLevel',
 	'AllowedSources',
 	'Global_Watchlist_Threshold',
-	'OutcomeTrackingOptOut'
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'
 	));
 	
 	//localized constants
@@ -283,6 +287,12 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 	STRING DataRestrictionMask_stored := Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('DataRestrictionMask');
 	STRING DataPermissionMask_stored  := Business_Risk_BIP.Constants.Default_DataPermissionMask  : STORED('DataPermissionMask');
 	STRING5 IndustryClass_stored      := Business_Risk_BIP.Constants.Default_IndustryClass       : STORED('IndustryClass');
+
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+    string TransactionID := '' : STORED('_TransactionId');
+    string BatchUID := '' : STORED('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 	// Below we'll prefer users.DataRestrictionMask, users.DataPermissionMask, users.industryclass, etc., over
 	// DataRestrictionMask_stored, DataPermissionMask_stored, etc., since they are "internal" or overridden values
@@ -381,7 +391,7 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 	UNSIGNED1	GLBA_Purpose         := IF(TRIM(users.GLBPurpose) <> '', (INTEGER)users.GLBPurpose, GLBPurpose_stored);
 	STRING  DataRestrictionMask    := IF(TRIM(users.DataRestrictionMask) <> '', users.DataRestrictionMask, DataRestrictionMask_stored);
 	STRING  DataPermissionMask		 := IF(TRIM(users.DataPermissionMask) <> '', users.DataPermissionMask, DataPermissionMask_stored);
-	STRING5	IndustryClass		   		 := StringLib.StringToUpperCase(TRIM( IF( users.industryclass <> '', users.industryclass, IndustryClass_stored ) , LEFT, RIGHT ));
+	STRING5	IndustryClass		   		 := STD.Str.ToUpperCase(TRIM( IF( users.industryclass <> '', users.industryclass, IndustryClass_stored ) , LEFT, RIGHT ));
 	UNSIGNED1	LinkSearchLevel      := Business_Risk_BIP.Constants.LinkSearch.Default : STORED('LinkSearchLevel');
 	UNSIGNED1	MarketingMode        := 1;
 	STRING50	AllowedSources       := Business_Risk_BIP.Constants.Default_AllowedSources : STORED('AllowedSources');
@@ -397,9 +407,9 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 		FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 	
 	// SmallBusinessAttrV1 (etc) is a valid input
-	AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := StringLib.StringToUpperCase(LEFT.Value)));
-	ModelsRequested := PROJECT(option.IncludeModels.Names, TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, SELF.ModelName := StringLib.StringToUpperCase(LEFT.Value)));
-	ModelOptions := PROJECT(option.IncludeModels.ModelOptions, TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, SELF.OptionName := StringLib.StringToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT));
+	AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := STD.Str.ToUpperCase(LEFT.Value)));
+	ModelsRequested := PROJECT(option.IncludeModels.Names, TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, SELF.ModelName := STD.Str.ToUpperCase(LEFT.Value)));
+	ModelOptions := PROJECT(option.IncludeModels.ModelOptions, TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, SELF.OptionName := STD.Str.ToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT));
 																																																								SELF.OptionValue := LEFT.OptionValue));
 	
 	
@@ -537,7 +547,11 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 																														DisableOutcomeTracking,
 																														IncludeTargusGateway,
 																														RunTargusGateway, /* for testing purposes only */
-																														LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_Marketing_Service
+																														LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_Marketing_Service,
+                                                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                                        TransactionID := TransactionID, 
+                                                                                                                        BatchUID := BatchUID, 
+                                                                                                                        GlobalCompanyID := GlobalCompanyID
 																														);
 																														
 
