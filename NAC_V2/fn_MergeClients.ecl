@@ -128,7 +128,7 @@ END;
 
 EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
 	c1 := DISTRIBUTE(newbase, HASH32(ClientId)); 
-	clients := DEDUP(SORT(c1, ClientId,CaseId,ProgramState,ProgramCode,GroupId,StartDate,EndDate,-updated, local),
+	clients := DEDUP(SORT(c1, ClientId,CaseId,ProgramState,ProgramCode,GroupId,StartDate,EndDate,-$.fn_lfnversion(filename), local),
 									ClientId,CaseId,ProgramState,ProgramCode,GroupId,StartDate,EndDate, local);
 	
 	current := DISTRIBUTE(base,HASH32(ClientId));

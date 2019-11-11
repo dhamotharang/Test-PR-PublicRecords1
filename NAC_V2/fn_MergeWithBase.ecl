@@ -7,7 +7,7 @@ IMPORT Std;
 removeDupes(dataset(nac_V2.layout_base2) b) := function
 // keep the most recent version
 		b1 := DISTRIBUTE(b, hash32(clientid));
-		b2 := SORT(b1, clientid,programstate,programcode,groupid,caseid,startdate,enddate,-updated, local);
+		b2 := SORT(b1, clientid,programstate,programcode,groupid,caseid,startdate,enddate,-$.fn_lfnversion(filename), local);
 		b3 := DEDUP(b2, clientid,programstate,programcode,groupid,caseid,startdate,enddate, local);
 	return b3;
 END;

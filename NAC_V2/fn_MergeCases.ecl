@@ -14,7 +14,7 @@ It is expected that if there are updates to previous Case records, it would be f
 EXPORT fn_MergeCases(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
 
 	c1 := DISTRIBUTE(newbase, HASH32(CaseID)); 
-	cases := DEDUP(SORT(c1, CaseId,ProgramState,ProgramCode,GroupId,-updated, local),
+	cases := DEDUP(SORT(c1, CaseId,ProgramState,ProgramCode,GroupId,-$.fn_lfnversion(filename), local),
 									CaseId,ProgramState,ProgramCode,GroupId, local);
 	// only update active cases
 	current := DISTRIBUTE(base(StartDate <= std.date.Today(), EndDate >= std.date.Today()),
