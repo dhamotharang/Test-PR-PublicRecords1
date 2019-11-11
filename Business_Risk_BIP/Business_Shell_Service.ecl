@@ -506,7 +506,11 @@ EXPORT Business_Shell_Service() := FUNCTION
 	'Gateways',
 	'RunTargusGatewayAnywayForTesting',
 	'OverrideExperianRestriction',
-	'IncludeAuthRepInBIPAppend'
+	'IncludeAuthRepInBIPAppend',
+	'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'
 	));
 	
 	/* ************************************************************************
@@ -765,6 +769,12 @@ EXPORT Business_Shell_Service() := FUNCTION
 	BOOLEAN IncludeAuthRepInBIPAppend := FALSE : STORED('IncludeAuthRepInBIPAppend');
 	BOOLEAN CorteraRetrotest := FALSE : STORED('CorteraRetrotest');
 	
+	//CCPA fields
+	unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 	Gateways := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
  
   layout_watchlists_temp := record
@@ -1038,8 +1048,12 @@ EXPORT Business_Shell_Service() := FUNCTION
 																																 OverrideExperianRestriction,
 																																 IncludeAuthRepInBIPAppend,
 																																 FALSE,
-                                                                 CorteraRetrotest,
-																																 ds_CorteraRetrotestRecsRaw);
+																																 CorteraRetrotest,
+																																 ds_CorteraRetrotestRecsRaw,
+																																 LexIdSourceOptout := LexIdSourceOptout, 
+																																 TransactionID := TransactionID, 
+																																 BatchUID := BatchUID, 
+																																 GlobalCompanyID := GlobalCompanyID);
 	
 	Final_Results := PROJECT(Shell_Results, TRANSFORM(Business_Risk_BIP.Layouts.OutputLayout, SELF := LEFT));
 

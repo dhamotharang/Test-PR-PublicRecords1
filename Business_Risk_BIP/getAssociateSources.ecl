@@ -1,9 +1,10 @@
-﻿IMPORT BankruptcyV3, BIPV2, Business_Risk_BIP, Data_Services, Doxie_Files, EASI, Liensv2, LN_PropertyV2, MDR, PAW, Risk_Indicators, RiskWise, UT;
+﻿IMPORT BankruptcyV3, BIPV2, Business_Risk_BIP, Doxie_Files, EASI, Liensv2, LN_PropertyV2, PAW, Risk_Indicators, RiskWise, UT, doxie, Suppress, STD;
 
 EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 											 
 	MinAssociatesNeededToCalculate := 0; // Legal keeps changing their mind as to how many Associates are needed to return values, making this a variable up top should they change again.
 											 
@@ -73,7 +74,7 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	BankruptcyRaw := JOIN(BankruptcyTMSID, BankruptcyV3.key_bankruptcyv3_search_full_bip(), LEFT.BK_TMSID <> '' AND KEYED(LEFT.BK_TMSID = RIGHT.TMSID) AND
 												RIGHT.Name_Type = 'D' AND (UNSIGNED)RIGHT.DID = LEFT.DID AND (UNSIGNED)(RIGHT.Date_Filed[1..6]) < LEFT.HistoryDate AND (UNSIGNED)RIGHT.Date_Filed > 0,
 											TRANSFORM({RECORDOF(LEFT), UNSIGNED3 BankruptcyCount, UNSIGNED3 BankruptcyCount1Year, UNSIGNED3 CurrentAssociateBankruptcyCount},
-															DismissedBankruptcy := StringLib.StringToUpperCase(RIGHT.disposition) = 'DISMISSED';
+															DismissedBankruptcy := STD.Str.ToUpperCase(RIGHT.disposition) = 'DISMISSED';
 															TodaysDate := Business_Risk_BIP.Common.todaysDate(BkBuildDate, LEFT.HistoryDate);
 															IsBankruptcy := DismissedBankruptcy = FALSE AND RIGHT.TMSID <> ''
                                               AND (Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 OR
@@ -129,12 +130,13 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	
 	LienJudgmentTMSID := DEDUP(SORT(LienJudgmentTMSIDRaw, Seq, DID, TMSID, RMSID), Seq, DID, TMSID, RMSID);
 															
-	LienJudgmentRaw := JOIN(LienJudgmentTMSID, LiensV2.key_liens_main_ID, LEFT.TMSID <> '' AND LEFT.RMSID <> '' AND KEYED(LEFT.TMSID = RIGHT.TMSID AND LEFT.RMSID = RIGHT.RMSID) AND
+	LienJudgmentRaw_unsuppressed := JOIN(LienJudgmentTMSID, LiensV2.key_liens_main_ID, LEFT.TMSID <> '' AND LEFT.RMSID <> '' AND KEYED(LEFT.TMSID = RIGHT.TMSID AND LEFT.RMSID = RIGHT.RMSID) AND
 												(((UNSIGNED)(RIGHT.Orig_Filing_Date[1..6]) < LEFT.HistoryDate AND (UNSIGNED)RIGHT.Orig_Filing_Date > 0) 
 												OR ((UNSIGNED)RIGHT.Orig_Filing_Date = 0 AND (UNSIGNED)RIGHT.Process_Date[1..6] < LEFT.HistoryDate AND (UNSIGNED)RIGHT.Process_Date > 0)) AND
-												TRIM(StringLib.StringToUpperCase(RIGHT.Filing_Type_Desc)) NOT IN Risk_Indicators.iid_constants.set_Invalid_Liens_50, // Ignore certain Lien types - matches Consumer Shell 5.0
-											TRANSFORM({RECORDOF(LEFT), UNSIGNED3 LienCount, UNSIGNED3 CurrentAssociateLienCount, UNSIGNED3 JudgmentCount, UNSIGNED3 CurrentAssociateJudgmentCount, STRING8 Orig_Filing_Date, STRING8 Release_Date},
-															FilingType := StringLib.StringToUpperCase(RIGHT.Filing_Type_Desc);
+												TRIM(STD.Str.ToUpperCase(RIGHT.Filing_Type_Desc)) NOT IN Risk_Indicators.iid_constants.set_Invalid_Liens_50, // Ignore certain Lien types - matches Consumer Shell 5.0
+											TRANSFORM({RECORDOF(LEFT), UNSIGNED3 LienCount, UNSIGNED3 CurrentAssociateLienCount, UNSIGNED3 JudgmentCount, UNSIGNED3 CurrentAssociateJudgmentCount, STRING8 Orig_Filing_Date, STRING8 Release_Date, UNSIGNED4 global_sid},
+															SELF.global_sid := RIGHT.global_sid;
+															FilingType := STD.Str.ToUpperCase(RIGHT.Filing_Type_Desc);
 															Type_Category := MAP(FilingType IN Risk_Indicators.iid_constants.set_Invalid_Liens_50	=> 'Invalid',
 																									 FilingType IN Risk_Indicators.iid_constants.setSuits           	=> 'Judgment',
 																									 FilingType IN Risk_Indicators.iid_constants.setSmallClaims    		=> 'Judgment',
@@ -164,7 +166,7 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 															SELF.Release_Date := MAP(((INTEGER)RIGHT.release_date[1..6]) <= LEFT.HistoryDate	=> RIGHT.release_date,
 																																																									 Business_Risk_BIP.Constants.MissingDate);
 															SELF := LEFT), LEFT OUTER, KEEP(100), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
-	
+	LienJudgmentRaw := Suppress.MAC_SuppressSource(LienJudgmentRaw_unsuppressed, mod_access);
 	// Get the "best" count per TMSID
 	LienJudgmentRolledTMSID := ROLLUP(SORT(LienJudgmentRaw, Seq, DID, TMSID, -Orig_Filing_Date, -Release_Date), LEFT.Seq = RIGHT.Seq AND LEFT.DID = RIGHT.DID AND LEFT.TMSID = RIGHT.TMSID, TRANSFORM(RECORDOF(LEFT), 
 															SELF.LienCount := MAX(LEFT.LienCount, RIGHT.LienCount); // Only keep 1 Lien count per TMSID, thus MAX instead of adding together
@@ -292,16 +294,17 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 														SELF := LEFT),
 											LEFT OUTER, ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 	
-	PAWRaw := JOIN(PAWContactID, PAW.Key_ContactID, LEFT.Contact_ID <> 0 AND KEYED(LEFT.Contact_ID = RIGHT.Contact_ID) AND 
+	PAWRaw_unsuppressed := JOIN(PAWContactID, PAW.Key_ContactID, LEFT.Contact_ID <> 0 AND KEYED(LEFT.Contact_ID = RIGHT.Contact_ID) AND 
 								(UNSIGNED)(RIGHT.Dt_First_Seen[1..6]) < LEFT.HistoryDate AND (UNSIGNED)RIGHT.Dt_First_Seen > 0 AND RIGHT.UltID > 0,
-											TRANSFORM({RECORDOF(LEFT), UNSIGNED6 UltID, UNSIGNED6 OrgID, UNSIGNED6 SeleID, UNSIGNED6 ProxID, UNSIGNED6 PowID},
+											TRANSFORM({RECORDOF(LEFT), UNSIGNED6 UltID, UNSIGNED6 OrgID, UNSIGNED6 SeleID, UNSIGNED6 ProxID, UNSIGNED6 PowID, UNSIGNED4 global_sid},
+														SELF.global_sid := RIGHT.global_sid;
 														SELF.UltID := RIGHT.UltID;
 														SELF.OrgID := RIGHT.OrgID;
 														SELF.SeleID := RIGHT.SeleID;
 														SELF.ProxID := RIGHT.ProxID;
 														SELF.PowID := RIGHT.PowID;
 														SELF := LEFT), LEFT OUTER, ATMOST(Business_Risk_BIP.Constants.Limit_Default));
-	
+	PAWRaw := Suppress.MAC_SuppressSource(PAWRaw_unsuppressed, mod_access);
 	// Count up the number of unique Businesses per DID
 	PAWUniqueBusinessRecords := TABLE(PAWRaw,
 		{Seq,
@@ -345,7 +348,7 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// ----- City/County -----
 	withCityCountyCounts := JOIN(withPAW, Shell, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 			// Grab the contacts who share the same City as the input Business - Check the Input_Echo section in case the address didn't clean properly
-			matchingCity := RIGHT.ContactDIDs ((RIGHT.Clean_Input.City <> '' AND City_Name = RIGHT.Clean_Input.City) OR (RIGHT.Input_Echo.City <> '' AND City_Name = StringLib.StringToUpperCase(RIGHT.Input_Echo.City)));
+			matchingCity := RIGHT.ContactDIDs ((RIGHT.Clean_Input.City <> '' AND City_Name = RIGHT.Clean_Input.City) OR (RIGHT.Input_Echo.City <> '' AND City_Name = STD.Str.ToUpperCase(RIGHT.Input_Echo.City)));
 			matchingCounty := RIGHT.ContactDIDs ((RIGHT.Clean_Input.County <> '' AND County = RIGHT.Clean_Input.County) OR (RIGHT.Input_Echo.County <> '' AND County = RIGHT.Input_Echo.County));
 			associates := COUNT(RIGHT.ContactDIDs);
 			SELF.Associates.AssociateCityCount := IF(associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(COUNT(matchingCity), -1, 999999), '-1');
