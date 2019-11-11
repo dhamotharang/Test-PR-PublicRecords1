@@ -1,7 +1,8 @@
-﻿import _Control, Risk_Indicators, dx_header, RiskWise, InfutorCID, Gong, header_quick, MDR, ut, address, AID_Build, ProfileBooster;
+﻿import _Control, Risk_Indicators, dx_header, RiskWise, InfutorCID, Gong, header_quick, MDR, ut, address, AID_Build, ProfileBooster, Doxie, Suppress;
 onThor := _Control.Environment.OnThor;
 
-EXPORT getVerification(DATASET(ProfileBooster.Layouts.Layout_PB_Shell) PBShell) := FUNCTION
+EXPORT getVerification(DATASET(ProfileBooster.Layouts.Layout_PB_Shell) PBShell,
+											doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	nines	 := 9999999;
 
@@ -13,7 +14,8 @@ address_rank_key := dx_header.key_addr_hist();
 
 
 //search Infutor by DID to verify input name, address, phone
-	Layouts.Layout_PB_Shell getInfutor(PBShell le, infutorcid_key ri) := transform	
+	{ProfileBooster.Layouts.Layout_PB_Shell, UNSIGNED4 global_sid} getInfutor(PBShell le, infutorcid_key ri) := transform
+		self.global_sid := ri.global_sid;
 		self.firstscore 	:= Risk_Indicators.FnameScore(le.fname, ri.fname);
 		self.firstcount 	:= (integer)Risk_Indicators.iid_constants.g(self.firstscore);
 		self.lastscore 		:= Risk_Indicators.LnameScore(le.lname, ri.lname);
@@ -29,17 +31,21 @@ address_rank_key := dx_header.key_addr_hist();
 		self 							:= le;
 	end;
 	
-	wInfutorcid_roxie := join(PBShell, infutorcid_key,	
+	wInfutorcid_roxie_unsuppressed := join(PBShell, infutorcid_key,	
 										left.did<>0 and
 										keyed(left.did=right.did) and
 										right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
 										getInfutor(left,right), left outer, atmost(riskwise.max_atmost), KEEP(100));	
 										
-	wInfutorcid_thor := join(distribute(PBShell, did), distribute(pull(infutorcid_key), did),	
+	wInfutorcid_roxie := Suppress.Suppress_ReturnOldLayout(wInfutorcid_roxie_unsuppressed, mod_access, Layouts.Layout_PB_Shell);
+	
+	wInfutorcid_thor_unsuppressed := join(distribute(PBShell, did), distribute(pull(infutorcid_key), did),	
 										left.did<>0 and
 										left.did=right.did and
 										right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
 										getInfutor(left,right), left outer, KEEP(100), local);
+										
+	wInfutorcid_thor := Suppress.Suppress_ReturnOldLayout(wInfutorcid_thor_unsuppressed, mod_access, Layouts.Layout_PB_Shell);
 
 	#IF(onThor)
 		wInfutorCid := wInfutorCid_thor;
@@ -48,7 +54,8 @@ address_rank_key := dx_header.key_addr_hist();
 	#END
   
 //search Gong by DID to verify input name, address, phone
-	Layouts.Layout_PB_Shell getGong(PBShell le, gonghistorydid_key ri) := transform	
+	{ProfileBooster.Layouts.Layout_PB_Shell, UNSIGNED4 global_sid} getGong(PBShell le, gonghistorydid_key ri) := transform
+		self.global_sid 			:= ri.global_sid;
 		self.firstscore 	:= Risk_Indicators.FnameScore(le.fname, ri.name_first);
 		self.firstcount 	:= (integer)Risk_Indicators.iid_constants.g(self.firstscore);
 		self.lastscore 		:= Risk_Indicators.LnameScore(le.lname, ri.name_last);
@@ -64,16 +71,21 @@ address_rank_key := dx_header.key_addr_hist();
 		self 							:= le;
 	end;
 	
-	wGong_roxie := join(PBShell, gonghistorydid_key,	
+	wGong_roxie_unsuppressed := join(PBShell, gonghistorydid_key,	
 										left.did<>0 and
 										keyed(left.did=right.l_did) and
 										right.dt_first_seen < risk_indicators.iid_constants.myGetDate(left.historydate),
 										getGong(left,right), left outer, atmost(riskwise.max_atmost), KEEP(100));	
-	wGong_thor := join(distribute(PBShell, did), distribute(pull(gonghistorydid_key), did),	
+	
+	wGong_roxie := Suppress.Suppress_ReturnOldLayout(wGong_roxie_unsuppressed, mod_access, Layouts.Layout_PB_Shell);
+	
+	wGong_thor_unsuppressed := join(distribute(PBShell, did), distribute(pull(gonghistorydid_key), did),	
 										left.did<>0 and
 										left.did=right.l_did and
 										right.dt_first_seen < risk_indicators.iid_constants.myGetDate(left.historydate),
 										getGong(left,right), left outer, KEEP(100), local);
+										
+	wGong_thor := Suppress.Suppress_ReturnOldLayout(wGong_thor_unsuppressed, mod_access, Layouts.Layout_PB_Shell);
 
 	#IF(onThor)
 		wGong := wGong_thor;
@@ -82,7 +94,8 @@ address_rank_key := dx_header.key_addr_hist();
 	#END
   
 //search header by DID to verify input name, address, phone, SSN	
-	ProfileBooster.Layouts.Layout_PB_Shell getHeader(ProfileBooster.Layouts.Layout_PB_Shell le, header_key ri) := transform
+	{ProfileBooster.Layouts.Layout_PB_Shell, UNSIGNED4 global_sid} getHeader(ProfileBooster.Layouts.Layout_PB_Shell le, header_key ri) := transform
+		self.global_sid 					:= ri.global_sid;
 		self.firstscore 			:= Risk_Indicators.FnameScore(le.fname, ri.fname);
 		self.firstcount 			:= (integer)Risk_Indicators.iid_constants.g(self.firstscore);
 		self.lastscore 				:= Risk_Indicators.LnameScore(le.lname, ri.lname);
@@ -127,18 +140,23 @@ address_rank_key := dx_header.key_addr_hist();
 		self									:= le;
 	end;
 	
-	wHeader_roxie := join(PBShell, header_key,	
+	wHeader_roxie_unsuppressed := join(PBShell, header_key,	
 										left.DID <> 0 and
 										keyed(left.DID = right.s_DID) and
 										right.src in MDR.sourcetools.set_Marketing_Header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(200), atmost(RiskWise.max_atmost));	
-	wHeader_thor := join(distribute(PBShell, did), distribute(pull(header_key), s_did),	
+									
+	wHeader_roxie := Suppress.Suppress_ReturnOldLayout(wHeader_roxie_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
+	
+	wHeader_thor_unsuppressed := join(distribute(PBShell, did), distribute(pull(header_key), s_did),	
 										left.DID <> 0 and
 										left.DID = right.s_DID and
 										right.src in MDR.sourcetools.set_Marketing_Header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(200), local);
+
+	wHeader_thor := Suppress.Suppress_ReturnOldLayout(wHeader_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
 
 	#IF(onThor)
 		wHeader := wHeader_thor;
@@ -146,7 +164,8 @@ address_rank_key := dx_header.key_addr_hist();
 		wHeader := wHeader_roxie;
 	#END
   
-	ProfileBooster.Layouts.Layout_PB_Shell getQHeader(ProfileBooster.Layouts.Layout_PB_Shell le, quickheader_key ri) := transform
+	{ProfileBooster.Layouts.Layout_PB_Shell, UNSIGNED4 global_sid} getQHeader(ProfileBooster.Layouts.Layout_PB_Shell le, quickheader_key ri) := transform
+		self.global_sid			:= ri.global_sid;
 		self.firstscore 			:= Risk_Indicators.FnameScore(le.fname, ri.fname);
 		self.firstcount 			:= (integer)Risk_Indicators.iid_constants.g(self.firstscore);
 		self.lastscore 				:= Risk_Indicators.LnameScore(le.lname, ri.lname);
@@ -190,18 +209,23 @@ address_rank_key := dx_header.key_addr_hist();
 		self									:= le;
 	end;
 	
-	wQHeader_roxie := join(PBShell, quickheader_key,		
+	wQHeader_roxie_unsuppressed := join(PBShell, quickheader_key,		
 										left.DID <> 0 and
 										keyed(left.DID = right.DID) and
 										right.src in MDR.sourcetools.set_Marketing_Header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getQHeader(left, right), keep(200), ATMOST(RiskWise.max_atmost));	
-	wQHeader_thor := join(distribute(PBShell, did), distribute(pull(quickheader_key), did),		
+									
+	wQHeader_roxie := Suppress.Suppress_ReturnOldLayout(wQHeader_roxie_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
+
+	wQHeader_thor_unsuppressed := join(distribute(PBShell, did), distribute(pull(quickheader_key), did),		
 										left.DID <> 0 and
 										left.DID = right.DID and
 										right.src in MDR.sourcetools.set_Marketing_Header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getQHeader(left, right), keep(200), local);
+									
+	wQHeader_thor := Suppress.Suppress_ReturnOldLayout(wQHeader_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
 
 	#IF(onThor)
 		wQHeader := wQHeader_thor;
@@ -213,7 +237,7 @@ address_rank_key := dx_header.key_addr_hist();
 	sortVer := sort(ungroup(wInfutorCid + wGong + wHeader + wQHeader), seq);
 
 //rollup to accumulate the verification counts 
-  Layouts.Layout_PB_Shell rollVer(Layouts.Layout_PB_Shell le, Layouts.Layout_PB_Shell ri) := transform
+  ProfileBooster.Layouts.Layout_PB_Shell rollVer(ProfileBooster.Layouts.Layout_PB_Shell le, ProfileBooster.Layouts.Layout_PB_Shell ri) := transform
 		self.firstcount		:= le.firstcount + ri.firstcount;
 		self.lastcount		:= le.lastcount + ri.lastcount;
 		self.addrcount		:= le.addrcount + ri.addrcount;
@@ -233,7 +257,7 @@ address_rank_key := dx_header.key_addr_hist();
 	
   rolledVer := rollup(sortVer, rollVer(left,right), seq);
 
-	Layouts.Layout_PB_Shell addVerification(PBShell le, rolledVer ri) := TRANSFORM
+	ProfileBooster.Layouts.Layout_PB_Shell addVerification(PBShell le, rolledVer ri) := TRANSFORM
 		self.firstscore 	:= ri.firstscore;
 		self.firstcount 	:= ri.firstcount;
 		self.lastscore 		:= ri.lastscore;
@@ -389,7 +413,7 @@ address_rank_key := dx_header.key_addr_hist();
 																	self := left), left outer);
 
 //rollup to get current and previous address on same record
-  Layouts.Layout_PB_Shell rollAddrs(Layouts.Layout_PB_Shell le, Layouts.Layout_PB_Shell ri) := transform
+  ProfileBooster.Layouts.Layout_PB_Shell rollAddrs(ProfileBooster.Layouts.Layout_PB_Shell le, ProfileBooster.Layouts.Layout_PB_Shell ri) := transform
 		self.curr_prim_range	:= if(ri.curr_prim_range<>'', ri.curr_prim_range, le.curr_prim_range);
 		self.curr_predir			:= if(ri.curr_predir<>'', ri.curr_predir, le.curr_predir);
 		self.curr_prim_name		:= if(ri.curr_prim_name<>'', ri.curr_prim_name, le.curr_prim_name);
