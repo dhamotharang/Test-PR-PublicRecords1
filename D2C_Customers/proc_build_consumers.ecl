@@ -1,6 +1,7 @@
 ﻿import std, PromoteSupers, Infutor, Relationship, Header, death_master;
 
 /********* CONSUMER_FILE **********/
+//FULL - 603,096,897
 
 EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
@@ -9,10 +10,8 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
    dist_death := distribute(death(crlf<>'SA'), hash(did));
    dsDeath := dedup(sort(dist_death, did, -filedate, local), did, filedate, local);
 
-   Infutor_Best := map( mode = 1 => D2C_Customers.Files.FullInfutorDS,            //FULL
-                        mode = 2 => D2C_Customers.Files.coreInfutorDS,            //QUARTERLY
-                        mode = 3 => D2C_Customers.Files.coreInfutorDerogatoryDS   //MONTHLY
-                      );   
+   Infutor_Best := D2C_Customers.Files.InfutorBest(mode);
+
    ds := join(
       distribute(Infutor_Best, hash(did)),
       distribute(dsDeath, hash((unsigned6)did)),
@@ -23,12 +22,12 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
    
    //Get all did cluster with no TS records
    //DOB is blanked out for cluster having TS records ONLY
-   notTU := dedup(D2C_Customers.Files.FullHdrDS(src <> 'TS', dob > 0), did, all);
+   notTU := dedup(D2C_Customers.Files.InfutorHdr(1)(src <> 'TS', dob > 0), did, all);
 
-   relatives := distribute(Relationship.key_relatives_v3(not(confidence IN ['NOISE','LOW'])), hash(did1));
+   // relatives := distribute(Relationship.key_relatives_v3(not(confidence IN ['NOISE','LOW'])), hash(did1));
    //Get all dids which are NOT the primary core dids
-   notPrimary_dids := join(distribute(ds, hash(did)), relatives, left.did = right.did1, left only, local); //56,740,234
-   setofNonCoreDids := set(notPrimary_dids, did);
+   // notPrimary_dids := join(distribute(ds, hash(did)), relatives, left.did = right.did1, left only, local); //56,740,234
+   // setofNonCoreDids := set(notPrimary_dids, did);
    
    consumers := project(ds, transform(D2C_Customers.layouts.rConsumers,
             self.LexID         := left.did;
@@ -55,14 +54,17 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
                      left outer,
                      local);
    
-   D2C_Customers.layouts.rConsumers SetReport(j_w_notTU l, notTU r) := TRANSFORM
-      self.Report_Candidate := if(l.LexID = r.did and mode = 1, 'N', l.Report_Candidate);
-      SELF := l;
-   END;
+   kRelatives := Relationship.key_relatives_v3(not(confidence IN ['NOISE','LOW']) and did1 > 0);
 
+   D2C_Customers.layouts.rConsumers SetReport(j_w_notTU l, kRelatives r) := TRANSFORM
+      self.Report_Candidate := if(l.LexID = r.did1 and mode = 1, l.Report_Candidate, 'N');
+      SELF := l;
+   END; 
+   
    inDS := join(distribute(j_w_notTU, hash(LexID)),
-               distribute(notTU, hash(did)),
-               left.LexID = right.did,
+               distribute(kRelatives, hash(did1)),
+               // distribute(notTU, hash(did)),
+               left.LexID = right.did1,
                transform(left),
                left outer,
                local);

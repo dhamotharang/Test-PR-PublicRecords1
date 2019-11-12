@@ -1,6 +1,7 @@
 ﻿import std, PromoteSupers, eMerges, Watchdog, D2C;
 
 /********* HUNTING_FISHING_PERMITS **********/
+//SRC Code - 'E2','E1'
 
 EXPORT proc_build_hunting(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
    

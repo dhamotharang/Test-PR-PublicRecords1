@@ -2,7 +2,6 @@
 
 /********* BANKRUPTCY **********/
 //SRC code - 'BA'
-//SOURCE IS NOT AVAILALBE IN THE DATASET
 //PACER is the only source indicated as bulk and consumer restricted by default (consult legal)
      
 EXPORT proc_build_bankruptcy(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION

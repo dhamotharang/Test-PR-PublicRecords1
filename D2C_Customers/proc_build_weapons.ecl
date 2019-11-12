@@ -1,6 +1,7 @@
 ﻿import std, PromoteSupers, eMerges, Watchdog, D2C;
 
 /********* CONCEALED_WEAPONS **********/
+//SRC Code - 'E3'
 
 EXPORT proc_build_weapons(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 

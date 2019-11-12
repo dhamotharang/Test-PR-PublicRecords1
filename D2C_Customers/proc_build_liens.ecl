@@ -3,6 +3,7 @@
 /********* LIENS_JUDGEMENTS **********/
 
 // li := LiensV2.key_liens_DID(did > 0);//Unrestricted
+//SRC code - 'L2','LI'
 
 EXPORT proc_build_liens(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
    

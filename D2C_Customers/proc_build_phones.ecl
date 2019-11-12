@@ -1,6 +1,7 @@
 ﻿import std, PromoteSupers, Phonesplus_v2, D2C, ut;
 
 /********* PHONES **********/
+//SRC code - 'GO','WP','PN','GN'
 
 EXPORT proc_build_phones(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
    

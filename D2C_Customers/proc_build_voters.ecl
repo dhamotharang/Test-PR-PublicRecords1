@@ -1,6 +1,7 @@
 ﻿import std, PromoteSupers, VotersV2, Watchdog, D2C;
 
 /********* VOTER_REGISTRATION **********/
+//SRC code - 'VO'
 
 EXPORT proc_build_voters(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
    

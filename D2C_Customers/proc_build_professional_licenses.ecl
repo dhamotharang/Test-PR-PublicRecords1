@@ -1,6 +1,7 @@
 ﻿import std, PromoteSupers, prof_licensev2, Watchdog, D2C;
 
 /********* PROFESSIONAL_LICENSES **********/
+//SRC code - 'PL'
 
 EXPORT proc_build_professional_licenses(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
    

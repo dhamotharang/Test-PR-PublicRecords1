@@ -16,8 +16,11 @@ EXPORT MAC_WriteCSVFile(inDS, mode, ver, record_type) := FUNCTIONMACRO
 #else
     %sortDS% := inDS;
 #end
+    #uniquename(uniqDS)
+    %uniqDS% := dedup(%sortDS%, record, all);
+
     #uniquename(outDS)
-	%outDS% := choosen(dedup(%sortDS%, record, all), if(TestBuild, 10, CHOOSEN:ALL));
+	%outDS% := if(TestBuild, choosen(%uniqDS%, 10), %uniqDS%);
 
     #uniquename(doit)
     //csv with separator(|) and terminator(\n)             

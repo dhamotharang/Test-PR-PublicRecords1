@@ -1,51 +1,45 @@
-﻿import std, ut, d2c, mdr, Infutor, SexOffender, doxie_files, BankruptcyV2, LiensV2, header, death_master, AutoStandardI,Suppress,doxie, faa, bankruptcyV2, ln_propertyv2, Email_Data, eMerges, paw, Phonesplus_v2, prof_licensev2, sexoffender, American_student_list, UCCV2, VotersV2;
+﻿import std, ut, d2c, mdr, Infutor, SexOffender, doxie_files, BankruptcyV2, LiensV2, header, death_master, Suppress,doxie, faa, bankruptcyV2, ln_propertyv2, Email_Data, eMerges, paw, Phonesplus_v2, prof_licensev2, sexoffender, American_student_list, UCCV2, VotersV2, Transunion_PTrak, Property;
+
+//TBD - Need to add Foreclosure data
 
 EXPORT Files := MODULE
 
-    shared TestBuild := false : stored('TestBuild');    
-    
-    /********* FULL DS **********/
-    infutor_hdr := Infutor.infutor_header(D2C_Customers.SRC_Allowed.Check(1, src));
+    shared TestBuild := false : stored('TestBuild');     
+      
+    EXPORT infutor_hdr  := Infutor.infutor_header(D2C_Customers.SRC_Allowed.Check(1, src)); //
+    EXPORT infutor_best := Infutor.file_infutor_best;  //708,358,966
+    EXPORT coresDS      := Header.key_ADL_segmentation(ind1 = 'CORE'); //257,216,208 
 
-    TS_rec  := infutor_hdr(src = 'TS');
+    TS_rec  := infutor_hdr(src = 'TS');  //2,163,551,849
     INF_rec := infutor_hdr(src = 'IF');
-    cnt_TS_rec  := count(TS_rec);  //2,163,551,849
-    cnt_INF_rec := count(INF_rec); //1,282,733,656
 
-    //As per agreement, only 70% of TS and 33% of IF transactions are allowed for My Life
-    //The records are selected based on lowest did/rid
-    TS_70per_rec  := choosen(sort(distribute(TS_rec, hash(did)), did, rid, local), cnt_TS_rec*0.70);   //1,514,486,294
-    INF_33per_rec := choosen(sort(distribute(INF_rec, hash(did)), did, rid, local), cnt_INF_rec*0.33); //  423,302,106
+    cnt_TS_rec  := count(Transunion_PTrak.File_Transunion_DID_Out(did >0)); //5B recs
+    cnt_INF_rec := count(INF_rec); //1,282,733,656  1,325,244,746(33%)
 
-    //Final set of header records allowed
-    inf_hdr_allowed_recs := infutor_hdr(src not in ['TS', 'IF']) + TS_70per_rec + INF_33per_rec; //7,491,686,415        
-    inf_hdr_w_suppr := D2C_Customers.MAC_Suppressions(inf_hdr_allowed_recs, 1);    
-    EXPORT FullHdrDS := choosen(inf_hdr_w_suppr, if(TestBuild, 1000, CHOOSEN:ALL));
-    
-    infutor_best := Infutor.file_infutor_best : independent;  //705,593,920
-    inf_best_w_suppr := D2C_Customers.MAC_Suppressions(infutor_best, 1);
-    AllowedDidFomHdr := dedup(fullHdrDS, did, all);
-    //Select ONLY allowed dids from infutor best by joining with hdr
-    //101,198,920 dids are dropped from infutor best beacuse of join
-    j_best_w_hdr := join(distribute(inf_best_w_suppr, hash(did)), distribute(AllowedDidFomHdr, hash(did)), left.did = right.did, inner, local); 
-    EXPORT fullInfutorDS := choosen(j_best_w_hdr, if(TestBuild, 1000, CHOOSEN:ALL));  //604,395,000 
+    temp_inf_hdr := RECORD
+        recordof(infutor_hdr);
+        unsigned4 dt_latest;
+        record_id := 0;
+    END;
 
-    /********* CORE DS **********/
-    EXPORT coresDS       := Header.key_ADL_segmentation(ind1 = 'CORE'); //257,216,208 
-    
-    EXPORT coreInfutorDS := join(
-      distribute(fullInfutorDS, hash(did)),
-      distribute(coresDS, hash(did)),  // CORE - 248,957,730
-      left.did = right.did,
-      transform(left),
-      local);   
-    EXPORT coreHdrDS := join(
-      distribute(fullHdrDS, hash(did)),
-      distribute(coresDS, hash(did)),  // CORE - 248,957,730
-      left.did = right.did,
-      transform(left),
-      local);
-    
+//As per agreement, only 70% of TS and 33% of IF transactions are allowed for My Life
+//The records are selected based on newest records
+    pTS := project(TS_rec, transform(temp_inf_hdr, self.dt_latest := max(left.dt_vendor_last_reported, left.dt_last_seen); self := left;));
+    pIF := project(INF_rec,transform(temp_inf_hdr, self.dt_latest := max(left.dt_vendor_last_reported, left.dt_last_seen); self := left;)); 
+
+    dTS := sort(distribute(pTS, hash(did)), -dt_latest, local);
+    dIF := sort(distribute(pIF, hash(did)), -dt_latest, local);
+
+    TS_70per:=PROJECT(dTS,TRANSFORM(temp_inf_hdr,SELF.record_id:=LEFT.record_id+COUNTER;SELF:=LEFT;))(record_id<=cnt_TS_rec*0.70);
+    INF_33per:=PROJECT(dIF,TRANSFORM(temp_inf_hdr,SELF.record_id:=LEFT.record_id+COUNTER;SELF:=LEFT;))(record_id<=cnt_INF_rec*0.33);
+
+    //1,514,486,294
+    TS_70  := if(count(TS_rec) <= cnt_TS_rec*0.70, TS_rec, project(TS_70per, recordof(infutor_hdr)));
+    //  423,302,106
+    INF_33 := project(INF_33per, recordof(infutor_hdr));
+        
+    SHARED FilteredHeaderRecs := distribute(infutor_hdr(src not in ['TS', 'IF']) + TS_70 + INF_33, hash(did)); //7,491,686,415        
+        
     so    := SexOffender.Key_SexOffender_DID(false)(did > 0);//Unrestricted
     crims := doxie_files.File_Offenders((unsigned6)did > 0, data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
     bk    := BankruptcyV2.key_bankruptcy_did(false)(did > 0); //Unrestricted
@@ -54,32 +48,18 @@ EXPORT Files := MODULE
     //crlf='SA' flags Direct records where the SSN was overlaid w/ one from the SSA
     dist_death := distribute(death(crlf<>'SA'), hash(did));
 
-    /********* DEROGATORY DS **********/
     EXPORT derogatoryDS := dedup(table(so, {(unsigned6)did})
                                + table(crims, {(unsigned6)did})
                                + table(bk, {did})
                                + table(li, {did})
                                + table(dist_death, {(unsigned6)did})
                                ,all);
-    shared SetofderogatoryDS := set(derogatoryDS, did);
-
-    //use join instead set       
-    EXPORT coreInfutorDerogatoryDS := join(distribute(coreInfutorDS, hash(did)),
-                                           distribute(derogatoryDS, hash(did)),
-                                           left.did = right.did,
-                                           transform(left),
-                                           local);
-    EXPORT coreHdrDerogatoryDS := join(distribute(coreHdrDS, hash(did)),
-                                           distribute(derogatoryDS, hash(did)),
-                                           left.did = right.did,
-                                           transform(left),
-                                           local);
 
     /********* AIRCRAFT **********/
     AirCraft  := faa.file_aircraft_registration_out((unsigned6)did_out > 0);
     AirCraft_p := project(AirCraft, transform({recordof(AirCraft) - [did_out], unsigned6 did}, self.did := (unsigned6)left.did_out; self := left));
     EXPORT AircraftDS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(AirCraft_p, derogatoryDS, mode, 10);
-        
+            
     /********* AIRMEN **********/
     Airmen  := faa.file_airmen_data_out((unsigned6)did_out > 0 and current_flag = 'A'); //Select ONLY ACTIVE records
     Airmen_p := project(Airmen, transform({recordof(Airmen) - [did_out], unsigned6 did}, self.did := (unsigned6)left.did_out; self := left));
@@ -98,7 +78,7 @@ EXPORT Files := MODULE
     /********* DEEDS_MORTGAGES **********/
     Deeds := ln_propertyv2.File_Search_DID(did > 0, D2C_Customers.SRC_Allowed.Check(20, ln_fares_id));
     EXPORT DeedsDS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(Deeds, derogatoryDS, mode, 20);
-
+    
     /********* EMAIL_ADDRESSES **********/
     Emails := Email_Data.File_Email_Base(
          did > 0,
@@ -150,6 +130,7 @@ EXPORT Files := MODULE
     EXPORT PLDS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(PL_p, derogatoryDS, mode, 17);
 
     /********* SEX_OFFENDERS **********/
+    //TBD 30% of data(substantial)
     SO := sexoffender.file_Main(D2C_Customers.SRC_Allowed.Check(18, source_file));
     SO_p := project(SO, transform({recordof(SO) - [did], unsigned6 did}, self.did := (unsigned6)left.did; self := left));             
     EXPORT SODS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(SO_p, derogatoryDS, mode, 18);
@@ -184,5 +165,40 @@ EXPORT Files := MODULE
               );
     CCW_p := project(CCW, transform({recordof(CCW) - [did_out], unsigned6 did}, self.did := (unsigned6)left.did_out; self := left));                           
     EXPORT CCWDS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(CCW_p, derogatoryDS, mode, 15);
+
+    // Foreclosure := Property.File_Foreclosure_Base_v2(did > 0);
+    // EXPORT ForeclosureDS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(Foreclosure, derogatoryDS, mode, 19);
+
+/********* FULL DS **********/
+    AllowedDeeds    := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, DeedsDS(1),  '[\'LP\']');
+    AllowedTax      := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, TaxDS(1), '[\'LA\']');
+    AllowedPL       := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, PLDS(1), '[\'PL\']');
+    AllowedHunting  := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, HuntingDS(1), '[\'E2\',\'E1\']');
+    AllowedLiens    := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, LiensDS(1), '[\'L2\',\'LI\']');
+    AllowedCCW      := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, CCWDS(1), '[\'E3\']');
+    AllowedPhones   := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, PhonesDS(1), '[\'GO\',\'WP\',\'PN\',\'GN\']');
+    AllowedVoters   := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, VotersDS(1), '[\'VO\']');
+
+/*****Infutor Header********/ 
+    AllowedRecs := AllowedDeeds + AllowedTax + AllowedPL + AllowedHunting + AllowedLiens + AllowedCCW + AllowedPhones + AllowedVoters;
+    OtherAllowedRecs := FilteredHeaderRecs(src not in ['LP','LA','PL','E2','E1','L2','LI','E3','GO','WP','PN','GN','VO']);
+    // EXPORT FullHdrDS := choosen(AllowedRecs + OtherAllowedRecs, if(TestBuild, 1000, CHOOSEN:ALL));
+    TotalAllowedRecs := AllowedRecs + OtherAllowedRecs;
+    EXPORT FullInfHdrDS := if(TestBuild, topn(TotalAllowedRecs, 1000, did), TotalAllowedRecs);// : persist('~persist::d2c_customer::infutor_hdr');
+
+/*****Infutor Best********/    
+    // inf_best_w_suppr := D2C_Customers.MAC_Suppressions(distribute(infutor_best, hash(did)), 1);
+    AllowedDidFomHdr := dedup(FullInfHdrDS, did, all);
+//Select ONLY allowed dids from infutor best by joining with hdr
+//101,198,920 dids are dropped from infutor best beacuse of join
+    j_best_w_hdr := join(distribute(infutor_best, hash(did)), distribute(AllowedDidFomHdr, hash(did)), left.did = right.did, inner, local); 
+    
+    EXPORT FullInfBestDS := if(TestBuild, topn(j_best_w_hdr, 1000, did), j_best_w_hdr);// : persist('~persist::d2c_customer::infutor_best');    
+    
+    //FULL - 604,395,000
+    //CORE - 248,957,730
+
+    EXPORT InfutorHdr(unsigned1 mode)  := D2C_Customers.MAC_BaseFile(FullInfHdrDS, derogatoryDS, mode, 1) : persist('~persist::d2c::' + D2C_Customers.Constants.sMode(mode) + '::infutor_hdr');
+    EXPORT InfutorBest(unsigned1 mode) := D2C_Customers.MAC_BaseFile(FullInfBestDS,derogatoryDS, mode, 1) : persist('~persist::d2c::' + D2C_Customers.Constants.sMode(mode) + '::infutor_best');
 
 END;
