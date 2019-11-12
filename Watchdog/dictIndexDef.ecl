@@ -23,7 +23,9 @@ return case( trim(superkeyname) ,
 'thor_data400::key::watchdog_nonglb_noneq.did_qa'                 =>   'watchdog.Key_Prep_Watchdog_nonglb(true)' ,                      
 'thor_data400::key::watchdog_nonglb_noneq.teaser_qa '          =>    'Watchdog.Key_Prep_Watchdog_teaser(true)' ,  
   'thor_data400::key::watchdog_best::fcra::nonen_did_qa' => 'Watchdog.Key_Watchdog_FCRA_nonEN()',
-'thor_data400::key::watchdog_best::FCRA::nonEQ_did'                        =>   'Watchdog.Key_Watchdog_FCRA_nonEQ' ,   
+'thor_data400::key::watchdog_best::FCRA::nonEQ_did'                        =>   'Watchdog.Key_Watchdog_FCRA_nonEQ()' ,   
+'thor_data400::key::watchdog_marketing.did_qa'         => 'watchdog.Key_Prep_Watchdog_marketing(false)',
+'thor_data400::key::watchdog_marketing_noneq.did_qa' => 'watchdog.Key_Prep_Watchdog_marketing(true)',
  
 											 '');
 											 
