@@ -1,4 +1,4 @@
-import watchdog,lib_fileservices,RoxieKeybuild,Orbit3,Std;
+﻿import watchdog,lib_fileservices,RoxieKeybuild,Orbit3,Std,KeyDiffAll;
 
 filedate := (STRING8)Std.Date.Today();
 	
@@ -27,9 +27,13 @@ email_failure := fileservices.sendemail(
 update_version := RoxieKeyBuild.updateversion('FCRA_WatchdogKeys',filedate,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'F');
 create_build := Orbit3.proc_Orbit3_CreateBuild('FCRA Watchdog',filedate,'F');
 
+//keydiff fcra
+keydiff_fcra :=  KeyDiffAll.fn_Keydiff ( 'FCRA_WatchdogKeys','B','F');
+
+
 EXPORT Proc_build_FCRA_keys := sequential(parallel(FCRA_nonEN_key,FCRA_nonEQ_key),
                                           parallel(mv_FCRA_nonEN,mv_FCRA_nonEQ),
 																					parallel(mv_FCRA_nonEN_qa,mv_FCRA_nonEQ_qa),
-																					update_version,create_build): 
+																					update_version,create_build,keydiff_fcra): 
 			                                        success(email_success),
 			                                         failure(email_failure); 
