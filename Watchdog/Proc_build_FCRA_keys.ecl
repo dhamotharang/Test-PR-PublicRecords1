@@ -1,4 +1,4 @@
-﻿import watchdog,lib_fileservices,RoxieKeybuild,Orbit3,Std,KeyDiffAll;
+﻿import watchdog,lib_fileservices,RoxieKeybuild,Orbit3,Std;
 
 filedate := (STRING8)Std.Date.Today();
 	
@@ -28,7 +28,7 @@ update_version := RoxieKeyBuild.updateversion('FCRA_WatchdogKeys',filedate,'Sudh
 create_build := Orbit3.proc_Orbit3_CreateBuild('FCRA Watchdog',filedate,'F');
 
 //keydiff fcra
-keydiff_fcra :=  KeyDiffAll.fn_Keydiff ( 'FCRA_WatchdogKeys','B','F');
+keydiff_fcra :=  Watchdog.fGetIndexAttributes ( 'FCRA_WatchdogKeys','B','F');
 
 
 EXPORT Proc_build_FCRA_keys := sequential(parallel(FCRA_nonEN_key,FCRA_nonEQ_key),

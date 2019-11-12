@@ -7,7 +7,7 @@
 
 watchtype := 'marketing';
 
-import watchdog,ut,RoxieKeyBuild,Orbit3,Watchdog_V2,KeyDiffAll;
+import watchdog,ut,RoxieKeyBuild,Orbit3,Watchdog_V2;
 
 boolean isnewheader := Watchdog.proc_Validate_NewHdr.out;
 
@@ -28,9 +28,9 @@ create_build_wdog := Orbit3.proc_Orbit3_CreateBuild('Watchdog Best',filedate_wd,
 
 //keydiff
 
-keydiff_nfcra := KeyDiffAll.fn_Keydiff ( 'WatchdogKeys','B','N');
+keydiff_nfcra := Watchdog.fGetIndexAttributes ( 'WatchdogKeys','B','N');
 
-keydiff_marketing := KeyDiffAll.fn_Keydiff ('MarketingHeaderKeys','B','N');
+keydiff_marketing := Watchdog.fGetIndexAttributes ('MarketingHeaderKeys','B','N');
 
 
 out_all := sequential(set_inputs,watchdog.BWR_Best(isnewheader),watchdog.BWR_BestMarketingEnhanced,/*watchdog.BWR_Delta,*/watchdog.input_clear,watchdog.BWR_Watchdog_Roxie_Marketing(filedate_wd),watchdog.BWR_Run_Watchdog_Marketing_stats,Watchdog_V2.Proc_Build_Merged_Key(filedate_wd),send_email,updatedops,update_wdog,create_build,create_build_wdog,keydiff_nfcra,keydiff_marketing) : FAILURE(send_bad_email);

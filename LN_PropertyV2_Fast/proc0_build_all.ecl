@@ -1,4 +1,4 @@
-﻿IMPORT LN_PropertyV2_Fast,STD, RoxieKeyBuild,AVM_V2, _Control,Std, PromoteSupers,KeyDiffAll;
+﻿IMPORT LN_PropertyV2_Fast,STD, RoxieKeyBuild,AVM_V2, _Control,Std, PromoteSupers;
 #OPTION('multiplePersistInstances',FALSE);
 
 EXPORT proc0_build_all(string8 process_date, boolean isFast, string emailRecipients) := FUNCTION
@@ -79,12 +79,12 @@ mostcurrentlog	:= sort(LN_PropertyV2_Fast.BuildLogger.file,-version)[1];
 PromoteSupers.MAC_SF_BuildProcess(LN_PropertyV2.create_ppr_extract,'~thor_data400::out::ln_propertyv2::ppr_extract',ppr_extract,2,,true,process_date);
 
 //Keydiff nonfcra
-keydiff_nfcra :=  KeyDiffAll.fn_Keydiff ( 'LNPropertyV2Keys','B','N');
-keydiff_full_nfcra:=  KeyDiffAll.fn_Keydiff ( 'LNPropertyV2FullKeys','B','N');
+keydiff_nfcra :=  LN_PropertyV2_Fast.fGetIndexAttributes ( 'LNPropertyV2Keys','B','N');
+keydiff_full_nfcra:=  LN_PropertyV2_Fast.fGetIndexAttributes ( 'LNPropertyV2FullKeys','B','N');
 
 //keydiff fcra
-keydiff_fcra :=  KeyDiffAll.fn_Keydiff ( 'FCRA_LNPropertyV2Keys','B','F');
-keydiff_full_fcra  :=  KeyDiffAll.fn_Keydiff ( 'FCRA_LNPropertyV2FullKeys','B','F');
+keydiff_fcra :=  LN_PropertyV2_Fast.fGetIndexAttributes ( 'FCRA_LNPropertyV2Keys','B','F');
+keydiff_full_fcra  :=  LN_PropertyV2_Fast.fGetIndexAttributes ( 'FCRA_LNPropertyV2FullKeys','B','F');
 
 												 
 																
