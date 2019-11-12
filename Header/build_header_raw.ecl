@@ -1,8 +1,8 @@
-﻿import ut,mdr,PromoteSupers;
+﻿import ut,mdr,PromoteSupers,dx_header;
 export build_header_raw(string filedate,boolean incremental = FALSE) := function
 
 h:=distribute(header.Header_Joined(filedate).final,hash(did));
-
+h_ccpa_compliant:=header.fn_suppress_ccpa(PROJECT(h,TRANSFORM(dx_header.layout_header,SELF:=LEFT)));
 basename:='~thor_data400::base::header_raw';
 basenamei:='~thor_data400::base::header_raw_incremental';
 fname:=basename+'_'+filedate;
