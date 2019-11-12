@@ -29,11 +29,13 @@ email_failure := fileservices.sendemail(
 
 string dops_fcrapkg_wdog := 'FCRA_WatchdogKeys';
 
-update_version := RoxieKeyBuild.updateversion(dops_fcrapkg_wdog,filedate,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'F');
-create_build := Orbit3.proc_Orbit3_CreateBuild('FCRA Watchdog',filedate,'F');
+string env_flag := 'F';
+
+update_version := RoxieKeyBuild.updateversion(dops_fcrapkg_wdog,filedate,'Sudhir.Kasavajjala@lexisnexisrisk.com',,env_flag);
+create_build := Orbit3.proc_Orbit3_CreateBuild('FCRA Watchdog',filedate,env_flag);
 
 //keydiff fcra
-keydiff_fcra :=  Watchdog.fGetIndexAttributes (dops_fcrapkg_wdog,'B','F');
+keydiff_fcra :=  Watchdog.fGetIndexAttributes (dops_fcrapkg_wdog,'B',env_flag);
 
 
 EXPORT Proc_build_FCRA_keys := sequential(parallel(FCRA_nonEN_key,FCRA_nonEQ_key),

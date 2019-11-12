@@ -21,21 +21,24 @@ set_inputs := output('Setting input files...') : success(watchdog.Input_set);
 string dops_pkg_wdog := 'WatchdogKeys';
 string dops_pkg_mktg := 'MarketingHeaderKeys';
 
+string env_flag_nb  := 'N|B';
+string env_flag_n := 'N';
+
 string email_notification := 'Sudhir.Kasavajjala@lexisnexisrisk.com';
 
 send_bad_email := fileservices.SendEmail(email_notification,'Watchdog-marketing Build FAILED','');
 send_email := fileservices.SendEmail(email_notification,'Watchdog-marketing Build FINISHED','');
-updatedops          := RoxieKeyBuild.updateversion(dops_pkg_mktg,filedate_wd,email_notification,,'N');
+updatedops          := RoxieKeyBuild.updateversion(dops_pkg_mktg,filedate_wd,email_notification,,env_flag_n);
 create_build := Orbit3.proc_Orbit3_CreateBuild('Watchdog Marketing Best',filedate_wd);
 
-update_wdog := RoxieKeyBuild.updateversion(dops_pkg_wdog,filedate_wd,email_notification,,'N|B');
-create_build_wdog := Orbit3.proc_Orbit3_CreateBuild('Watchdog Best',filedate_wd,'N|B');
+update_wdog := RoxieKeyBuild.updateversion(dops_pkg_wdog,filedate_wd,email_notification,,env_flag_nb);
+create_build_wdog := Orbit3.proc_Orbit3_CreateBuild('Watchdog Best',filedate_wd,env_flag_nb);
 
 //keydiff
 
-keydiff_nfcra := Watchdog.fGetIndexAttributes ( dops_pkg_wdog,'B','N');
+keydiff_nfcra := Watchdog.fGetIndexAttributes ( dops_pkg_wdog,'B',env_flag_n);
 
-keydiff_marketing := Watchdog.fGetIndexAttributes (dops_pkg_mktg,'B','N');
+keydiff_marketing := Watchdog.fGetIndexAttributes (dops_pkg_mktg,'B',env_flag_n);
 
 
 out_all := sequential(set_inputs,watchdog.BWR_Best(isnewheader),watchdog.BWR_BestMarketingEnhanced,/*watchdog.BWR_Delta,*/watchdog.input_clear,watchdog.BWR_Watchdog_Roxie_Marketing(filedate_wd),watchdog.BWR_Run_Watchdog_Marketing_stats,Watchdog_V2.Proc_Build_Merged_Key(filedate_wd),send_email,updatedops,update_wdog,create_build,create_build_wdog,keydiff_nfcra,keydiff_marketing) : FAILURE(send_bad_email);
