@@ -155,21 +155,31 @@ END;
 
 EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 version) := FUNCTION
 
-	cases := PROJECT(ds(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
+	ca1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
 										self := LEFT.CaseRec;
 										self.RecordCode := left.RecordCode;
-										));
+										)), hash32(CaseId));
+										
+	cases := DEDUP(SORT(ca1, CaseId,ProgramState,ProgramCode, local),
+									CaseId,ProgramState,ProgramCode, local);
 
-	clients := PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
+	cl1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 											self := LEFT.ClientRec;
 											self.RecordCode := left.RecordCode;
 											)
-										);
+										), HASH32(ClientId));
 
-	addresses := PROJECT(ds(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
+	clients := DEDUP(SORT(cl1, ClientId,CaseId,ProgramState,ProgramCode, local),
+									ClientId,CaseId,ProgramState,ProgramCode, local);
+
+	ad1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
 												self := LEFT.AddressRec;
 												self.RecordCode := left.RecordCode;
-												self := []));
+												self := [])), HASH32(CaseId, ClientId));
+
+	addresses := DEDUP(SORT(ad1, CaseId,ClientId,ProgramState,ProgramCode,AddressType, local),
+									CaseId,ClientId,ProgramState,ProgramCode,AddressType, local);
+
 
 	contacts := $.Files2.dsContactRecords;
 										
