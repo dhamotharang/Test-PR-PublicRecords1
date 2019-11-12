@@ -7,9 +7,9 @@ export Filenames(boolean pUseProd = false, boolean isfcra = false) := module
     export BaseBLKGRP_attr_over18_in := ConsumerFinancialProtectionBureau._Dataset(true).thor_cluster_files + 'in::' + ConsumerFinancialProtectionBureau._Dataset().name + '::BLKGRP_attr_over18';
     export BaseCensus_surnames_in := ConsumerFinancialProtectionBureau._Dataset(true).thor_cluster_files + 'in::' + ConsumerFinancialProtectionBureau._Dataset().name + '::names_2010census';
 
-  	export BaseBLKGRP := ConsumerFinancialProtectionBureau._Dataset(pUseProd).thor_cluster_files + 'base::' + ConsumerFinancialProtectionBureau._Dataset().name + FCRA_extension + '::BLKGRP';
-	export BaseBLKGRP_attr_over18 := ConsumerFinancialProtectionBureau._Dataset(pUseProd).thor_cluster_files + 'base::' + ConsumerFinancialProtectionBureau._Dataset().name + FCRA_extension + '::BLKGRP_attr_over18';
-	export BaseCensus_surnames := ConsumerFinancialProtectionBureau._Dataset(pUseProd).thor_cluster_files + 'base::' + ConsumerFinancialProtectionBureau._Dataset().name + FCRA_extension + '::census_surnames';
+  	export BaseBLKGRP := ConsumerFinancialProtectionBureau._Dataset(pUseProd).thor_cluster_files + 'base::' + ConsumerFinancialProtectionBureau._Dataset().name  + '::BLKGRP';
+	export BaseBLKGRP_attr_over18 := ConsumerFinancialProtectionBureau._Dataset(pUseProd).thor_cluster_files + 'base::' + ConsumerFinancialProtectionBureau._Dataset().name  + '::BLKGRP_attr_over18';
+	export BaseCensus_surnames := ConsumerFinancialProtectionBureau._Dataset(pUseProd).thor_cluster_files + 'base::' + ConsumerFinancialProtectionBureau._Dataset().name  + '::census_surnames';
 
 	export keyBLKGRP := ConsumerFinancialProtectionBureau._Dataset(pUseProd).thor_cluster_files + 'key::' + ConsumerFinancialProtectionBureau._Dataset().name + FCRA_extension + '::BLKGRP';
 	export keyBLKGRP_attr_over18 := ConsumerFinancialProtectionBureau._Dataset(pUseProd).thor_cluster_files + 'key::' + ConsumerFinancialProtectionBureau._Dataset().name + FCRA_extension + '::BLKGRP_attr_over18';
