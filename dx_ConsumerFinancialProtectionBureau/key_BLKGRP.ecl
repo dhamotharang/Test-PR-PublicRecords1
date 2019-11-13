@@ -3,7 +3,7 @@ IMPORT $, Data_Services, Doxie;
 keyed_fields := $.layouts.BLKGRP_keyed_fields;
 payload := $.layouts.BLKGRP_payload;
 			   
-EXPORT Key_BLKGRP(boolean isFCRA = false) := INDEX(keyed_fields
+EXPORT Key_BLKGRP(boolean isFCRA = false, boolean pUseProd = false) := INDEX(keyed_fields
                                                     ,payload
-                                                    ,$.Filenames(isFCRA).keyBLKGRP,opt);
+                                                    ,$.Filenames(pUseProd, isFCRA).keyBLKGRP,opt);
 
