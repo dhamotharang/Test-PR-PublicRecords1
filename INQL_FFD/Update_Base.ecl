@@ -65,12 +65,15 @@ EXPORT Update_Base (boolean isDaily = true, boolean isFCRA = true, string pVersi
 	
   daily_base_updated  				  := appended_base + prev_daily_base;
  	
-	filtered_daily_base        		:= daily_base_updated
+  filtered_daily_base        		:= daily_base_updated
 																			(
 																			((ppc in _Constants.FCRA_PPC) and datetime[1..8] between _Flags(pVersion).dt2yearsago and pVersion) 
 							                    or 	((ppc not in _Constants.FCRA_PPC) and datetime[1..8] between _Flags(pVersion).dt1yearago and pVersion)
 																			);
-	amex_remediated_base          := INQL_FFD.FN_Apply_AMEX_Remediation(filtered_daily_base).base_amex_remediation;
+																			
+  excluded_filtered_daily_base 	:= 	filtered_daily_base (ppc not in _Constants.FCRA_PPC_EXCLUDE);
+	
+	amex_remediated_base          := INQL_FFD.FN_Apply_AMEX_Remediation(excluded_filtered_daily_base).base_amex_remediation;
   daily_base  				  				:= dedup(distribute(amex_remediated_base,hash(lex_id)),record, all);
 
   return daily_base;
