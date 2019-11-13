@@ -27,7 +27,7 @@ EXPORT _config (
     SHARED curEquifaxWeeklyHeaderDate := regexreplace('WEEKLY_HEADER_(.*).DAT',fst_weekly_file,'\\1');
     
     // We always add 7 days (sunday to sunday)
-    SHARED newEquifaxWeeklyHeaderDate := ut.date_add('7D',get_v_eq_as_of_date);
+    SHARED newEquifaxWeeklyHeaderDate := regexfind('2[0-9]{7}',fst_weekly_file,0);
     
     EXPORT isNewEquifaxMonthlyFile(string sourceIP) := (count(STD.File.RemoteDirectory(sourceIP,sourcePath,monthly_files,false)(size != 0 )) = 16);
     EXPORT isNewEquifaxWeeklyFile(string sourceIP) := (count(STD.File.RemoteDirectory(sourceIP,sourcePath,weekly_files ,false)(size != 0 )) = 1)
@@ -47,9 +47,10 @@ EXPORT _config (
                                  output('NO NEW MONTHLY FILE. FLAG FILE WAS LEFT UNCHANGED'));
                                  
     // v_eq_as_of_date
-    
+    verifyFileDate(string newWeeklyFileDate):= IF( ut.DaysApart(newWeeklyFileDate,(STRING8)Std.Date.Today() )>10, FAIL('NEW WEEKLY FILE DATE IS MORE THAN 10 DAYS APART FROM RUN DATE'));
     EXPORT set_v_eq_as_of_date(STRING overwriteDate='') := if(isNewEquifaxWeeklyFile(sourceIP),
                                     sequential(
+                                         verifyFileDate(IF(overwriteDate='',newEquifaxWeeklyHeaderDate,overwriteDate)),
                                          output(dataset([{if(overwriteDate='',newEquifaxWeeklyHeaderDate,overwriteDate)}],{string v_eq_as_of_date}),,v_eq_as_of_date_file_name+'_'+workunit),
                                          std.file.startsuperfiletransaction(),
                                          std.file.createsuperfile(v_eq_as_of_date_file_name,,true),

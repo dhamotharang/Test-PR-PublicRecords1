@@ -1,4 +1,4 @@
-IMPORT ut, DID_Add, Header, header_slimsort, watchdog, business_regression, roxiekeybuild, lib_fileservices, versioncontrol, header_services,mdr;
+﻿IMPORT ut, DID_Add, Header, header_slimsort, watchdog, business_regression, roxiekeybuild, lib_fileservices, versioncontrol, header_services,mdr;
 
 export proc_build_business_contacts_base_files(
 
@@ -10,6 +10,17 @@ export proc_build_business_contacts_base_files(
 module
 
 	shared names := filenames(pversion).base;
+	
+	// Filtering empty/zero global_sid business contacts records for append global_sid macro call.
+	shared pBC_Add_AID_for_gsid := pBC_Add_AID(global_sid = 0);
+	
+	// Filtering business contact records with non-blank global_sid's to avoid sending them to append global_sid macro call.
+	shared pBC_Add_AID_w_gsid   := pBC_Add_AID(global_sid <> 0);
+	
+	// Appending Global_Sid's using macro macGetGlobalDSID call.
+	shared pBC_Add_AID_w_gsid_appended := mdr.macGetGlobalSID(pBC_Add_AID_for_gsid, 'BusinessHeader', 'source', 'global_sid');
+	
+	shared pBC_Add_AID_gsid := pBC_Add_AID_w_gsid_appended + pBC_Add_AID_w_gsid;
 
 	shared layout_ssn_assign := RECORD
 		UNSIGNED6 uid;
@@ -22,13 +33,13 @@ module
 		SELF := l;
 	END;
 
-	shared Contacts_DID := PROJECT(pBC_Add_AID(did != 0), SlimForSSN(LEFT));
+	shared Contacts_DID := PROJECT(pBC_Add_AID_gsid(did != 0), SlimForSSN(LEFT));
 
 	// Append SSN by DID to Contacts
 	DID_Add.MAC_Add_SSN_By_DID(Contacts_DID, did, ssn, Business_Contacts_SSN_Append) 
 
 	shared Business_Contacts_SSN_Append_Dist := DISTRIBUTE(Business_Contacts_SSN_Append, HASH(uid));
-	shared Business_Contacts_BDID_Dist := DISTRIBUTE(pBC_Add_AID, HASH(uid));
+	shared Business_Contacts_BDID_Dist := DISTRIBUTE(pBC_Add_AID_gsid, HASH(uid));
 
 	Business_Header.Layout_Business_Contact_full_new AssignSSNs(Business_Header.Layout_Business_Contacts_Temp l, layout_ssn_assign r) := TRANSFORM
 		SELF.ssn := IF(r.ssn != '', (UNSIGNED6) r.ssn, l.ssn);
