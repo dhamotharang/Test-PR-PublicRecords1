@@ -12,13 +12,15 @@
   ,pSales_Ranking               = 'Marketing_List._Config().ds_sources_of_sales_revenue'
   ,pMrktg_BitMap                = 'Marketing_List._Config().Marketing_Bitmap'
   ,pMrktg_Approved_Sources      = 'Marketing_List._Config().set_marketing_approved_sources'
-  ,pDoSample                    = 'false'
   ,pDebug                       = 'false'
+  ,pSampleProxids               = '[]'
 
 
 ) :=
 functionmacro
 
+  import Address;
+  
   #UNIQUENAME(ds_best     )
   #UNIQUENAME(ds_base_best)
   
@@ -26,8 +28,12 @@ functionmacro
   %ds_base_best%  := pDataset_Base  ;
   // ds_base := topn(ds_base_best                ,20000  ,proxid) : persist('~persist::lbentley::BH687::ds_base');
 
-  ds_mrktg_list_best_proxid  := Marketing_List.Best_From_BIP_Best_Proxid  (%ds_best%        ,%ds_base_best%       );
-  ds_mrktg_list_best_seleid  := Marketing_List.Best_From_BIP_Best_Seleid  (%ds_best%        ,%ds_base_best%       );
+  // -- get debug seleids from proxids
+  ds_debug_seleids := table(pDataset_Best(proxid in pSampleProxids )  ,{seleid},seleid,few);
+  set_debug_seleids := set(ds_debug_seleids ,seleid);
+
+  ds_mrktg_list_best_proxid  := Marketing_List.Best_From_BIP_Best_Proxid  (%ds_best%        ,%ds_base_best% ,pDebug ,pSampleProxids       );
+  ds_mrktg_list_best_seleid  := Marketing_List.Best_From_BIP_Best_Seleid  (%ds_best%        ,%ds_base_best% ,pDebug ,pSampleProxids       );
   
   ds_both_best := join(ds_mrktg_list_best_proxid  ,ds_mrktg_list_best_seleid ,left.seleid = right.seleid ,transform(Marketing_List.Layouts.business_information
     ,self.proxid_level.business_name      := left.business_name     ;     
@@ -36,11 +42,6 @@ functionmacro
     ,self.proxid_level.state              := left.st                ;
     ,self.proxid_level.zip5               := left.zip               ; 
     ,self.proxid_level.county             := left.fips_state + left.fips_county ;
-    // ,self.proxid_level.msa                := left.msa               ; 
-    // ,self.proxid_level.err_stat           := left.err_stat          ;
-    // ,self.proxid_level.age_of_company     := left.age_of_company    ; 
-    // ,self.proxid_level.dt_first_seen      := left.dt_first_seen     ;
-    // ,self.proxid_level.dt_last_seen       := left.dt_last_seen      ; 
     ,self.proxid_level.business_phone     := left.business_phone    ;
                                             
     ,self.seleid_level.business_name      := right.business_name     ;     
@@ -49,11 +50,6 @@ functionmacro
     ,self.seleid_level.state              := right.st                ;
     ,self.seleid_level.zip5               := right.zip               ; 
     ,self.seleid_level.county             := right.fips_state + right.fips_county ;
-    // ,self.seleid_level.msa                := right.msa               ; 
-    // ,self.seleid_level.err_stat           := right.err_stat          ;
-    // ,self.seleid_level.age_of_company     := right.age_of_company    ; 
-    // ,self.seleid_level.dt_first_seen      := right.dt_first_seen     ;
-    // ,self.seleid_level.dt_last_seen       := right.dt_last_seen      ; 
     ,self.seleid_level.business_phone     := right.business_phone    ;
 
     ,self                 := left
@@ -61,8 +57,8 @@ functionmacro
 
   ),hash);
 
-  ds_mrktg_list_base_proxid  := Marketing_List.Best_From_BIP_Base_Proxid  (%ds_base_best%   ,ds_mrktg_list_best_proxid );
-  ds_mrktg_list_base_seleid  := Marketing_List.Best_From_BIP_Base_Seleid  (%ds_base_best%   ,ds_mrktg_list_best_seleid );
+  ds_mrktg_list_base_proxid  := Marketing_List.Best_From_BIP_Base_Proxid  (%ds_base_best%   ,ds_mrktg_list_best_proxid  ,pDebug ,pSampleProxids);
+  ds_mrktg_list_base_seleid  := Marketing_List.Best_From_BIP_Base_Seleid  (%ds_base_best%   ,ds_mrktg_list_best_seleid  ,pDebug ,pSampleProxids);
 
   ds_both_best_plus_proxid_base := join(ds_both_best  ,ds_mrktg_list_base_proxid ,left.proxid = right.proxid ,transform(recordof(left)
     ,self.proxid_level.msa             := right.msa
@@ -86,7 +82,7 @@ functionmacro
 
   ),hash);
 
-  ds_industry_codes   := Marketing_List.Best_Industry_Codes (%ds_base_best%   ,ds_mrktg_list_best_seleid );
+  ds_industry_codes   := Marketing_List.Best_Industry_Codes (%ds_base_best%   ,ds_mrktg_list_best_seleid  ,pDebug ,pSampleProxids);
 
   ds_both_best_both_base_plus_Industry := join(ds_both_best_both_base ,ds_industry_codes  ,left.seleid = right.seleid ,transform(recordof(left)
     ,self.seleid_level.SIC_Primary        := right.SIC_Primary       
@@ -111,71 +107,52 @@ functionmacro
                           ,pinfutor_base    
                           ,paccutrend_base  
                           ,pEmployees_Ranking
-                          ,pSales_Ranking    
+                          ,pSales_Ranking 
+                          ,pDebug 
+                          ,pSampleProxids
                         );
 
-  ds_both_best_both_base_plus_Industry_and_sales := join(ds_both_best_both_base_plus_Industry ,ds_best_emps_sales  ,left.seleid = right.seleid ,transform(recordof(left)
+  ds_return_result_biz := join(ds_both_best_both_base_plus_Industry ,ds_best_emps_sales  ,left.seleid = right.seleid ,transform(recordof(left)
     ,self.seleid_level.number_of_employees  := right.number_of_employees
     ,self.seleid_level.annual_revenue       := right.annual_revenue
     ,self.seleid_level.src_revenue          := right.source
     ,self                                   := left
   ) ,hash ,left outer);
   
-/*  
-  ds_industry_codes   := Marketing_List.Best_Industry_Codes (ds_base_best   ,ds_mrktg_list_best );
-  ds_best_emps_sales  := Marketing_List.Best_Sales_And_Employees(
-                           pdca_base        
-                          ,peq_biz_base     
-                          ,poshair_base     
-                          ,pcortera_base    
-                          ,pinfutor_base    
-                          ,paccutrend_base  
-                          ,pEmployees_Ranking
-                          ,pSales_Ranking    
-                        );
-                        
-  ds_both := join(ds_mrktg_list_best  ,ds_mrktg_list_base ,left.proxid = right.proxid ,transform(recordof(left)
-    ,self.msa             := right.msa
-    ,self.err_stat        := right.err_stat
-    ,self.age_of_company  := right.age_of_company
-    ,self.dt_first_seen   := right.dt_first_seen
-    ,self.dt_last_seen    := right.dt_last_seen
-    ,self.business_email  := right.business_email
-    ,self                 := left
-
-  ),hash);
-
-  ds_both_2 := join(ds_both ,ds_industry_codes  ,left.proxid = right.proxid ,transform(recordof(left)
-    ,self.sics    := right.sics
-    ,self.naicss  := right.naicss
-    ,self         := left
-  ) ,hash ,left outer);
-
-  ds_add_emp := join(ds_both_2 ,ds_best_emps_sales  ,left.proxid = right.proxid ,transform(recordof(left)
-    ,self.number_of_employees := right.number_of_employees
-    ,self.sales               := right.sales
-    ,self.src_sales           := right.source
-    ,self                     := left
-  ) ,hash ,left outer);
-
-  outputdebug := parallel(
-     output(choosen(ds_mrktg_list_base  ,300) ,named('ds_mrktg_list_base' ),all)
-    ,output(choosen(ds_mrktg_list_best  ,300) ,named('ds_mrktg_list_best' ),all)
-    ,output(choosen(ds_both             ,300) ,named('ds_both'            ),all)
-    ,output(choosen(ds_both_2           ,300) ,named('ds_both_2'          ),all)
-    ,output(choosen(ds_industry_codes   ,300) ,named('ds_industry_codes'  ),all)
-    ,output(choosen(ds_add_emp          ,300) ,named('ds_add_emp'         ),all)
+  
+  output_debug := parallel(
+   
+    output('---------------------Marketing_List.Create_Business_Information_File---------------------'                    ,named('Marketing_List_Create_Business_Information_File'                       ),all)
+   ,output(pMrktg_BitMap                                                                                                  ,named('Create_Business_Information_File_pMrktg_BitMap'                        ),all)
+   ,output(pMrktg_Approved_Sources                                                                                        ,named('Create_Business_Information_File_pMrktg_Approved_Sources'              ),all)
+   ,output(pEmployees_Ranking                                                                                             ,named('Create_Business_Information_File_pEmployees_Ranking'                   ),all)
+   ,output(pSales_Ranking                                                                                                 ,named('Create_Business_Information_File_pSales_Ranking'                       ),all)
+   ,output(choosen(pDataset_Best                        (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_pDataset_Best'                        ),all)
+   ,output(choosen(pDataset_Base                        (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_pDataset_Base'                        ),all)
+   ,output(choosen(pdca_base                            (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_pdca_base'                            ),all)
+   ,output(choosen(peq_biz_base                         (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_peq_biz_base'                         ),all)
+   ,output(choosen(poshair_base                         (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_poshair_base'                         ),all)
+   ,output(choosen(pcortera_base                        (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_pcortera_base'                        ),all)
+   ,output(choosen(pinfutor_base                        (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_pinfutor_base'                        ),all)
+   ,output(choosen(paccutrend_base                      (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_paccutrend_base'                      ),all)
+   ,output(choosen(ds_mrktg_list_best_proxid            (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_ds_mrktg_list_best_proxid'            ),all)
+   ,output(choosen(ds_mrktg_list_best_seleid            (count(pSampleProxids) = 0 or seleid in set_debug_seleids ),300)  ,named('Create_Business_Information_File_ds_mrktg_list_best_seleid'            ),all)
+   ,output(choosen(ds_both_best                         (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_ds_both_best'                         ),all)
+   ,output(choosen(ds_mrktg_list_base_proxid            (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_ds_mrktg_list_base_proxid'            ),all)
+   ,output(choosen(ds_mrktg_list_base_seleid            (count(pSampleProxids) = 0 or seleid in set_debug_seleids ),300)  ,named('Create_Business_Information_File_ds_mrktg_list_base_seleid'            ),all)
+   ,output(choosen(ds_both_best_plus_proxid_base        (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_ds_both_best_plus_proxid_base'        ),all)
+   ,output(choosen(ds_both_best_both_base               (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_ds_both_best_both_base'               ),all)
+   ,output(choosen(ds_industry_codes                    (count(pSampleProxids) = 0 or seleid in set_debug_seleids ),300)  ,named('Create_Business_Information_File_ds_industry_codes'                    ),all)
+   ,output(choosen(ds_both_best_both_base_plus_Industry (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_ds_both_best_both_base_plus_Industry' ),all)
+   ,output(choosen(ds_best_emps_sales                   (count(pSampleProxids) = 0 or seleid in set_debug_seleids ),300)  ,named('Create_Business_Information_File_ds_best_emps_sales'                   ),all)
+   ,output(choosen(ds_return_result_biz                 (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Create_Business_Information_File_ds_return_result_biz'                 ),all)
+                                                                                                                                  
   );
 
-  ds_return_result := project(ds_add_emp ,Marketing_List.Layouts.base);
-
   #IF(pDebug = true)
-    return when(ds_return_result  ,outputdebug);
+    return when(ds_return_result_biz  ,output_debug);
   #ELSE
-    return ds_return_result;
+    return ds_return_result_biz;
   #END
-
-*/
-  return ds_both_best_both_base_plus_Industry_and_sales;
   
 endmacro;

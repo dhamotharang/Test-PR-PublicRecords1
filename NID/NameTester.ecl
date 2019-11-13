@@ -494,8 +494,8 @@ export boolean IsFirstNameOrInitialOrBlank(string name) :=
 	IsFirstNameEx(name) OR (LENGTH(TRIM(name)) <= 1);
 	
 
-shared rgxDoubleName := '^([A-Z]\'?[A-Z]+)( |-)([A-Z]\'?[A-Z]+)$';
-shared boolean IsDoubleLastName(string name) :=
+export rgxDoubleName := '^([A-Z]\'?[A-Z]+)( |-)([A-Z]\'?[A-Z]+)$';
+export boolean IsDoubleLastName(string name) :=
 					IsLastNameEx(REGEXFIND(rgxDoubleName, name, 1))
 							OR IsLastNameEx(REGEXFIND(rgxDoubleName, name, 3));
 							

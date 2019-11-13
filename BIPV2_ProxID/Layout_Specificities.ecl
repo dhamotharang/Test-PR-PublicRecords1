@@ -16,6 +16,11 @@ EXPORT active_domestic_corp_key_ChildRec := RECORD
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+EXPORT sbfe_id_ChildRec := RECORD
+  TYPEOF(l.sbfe_id) sbfe_id;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
 EXPORT hist_enterprise_number_ChildRec := RECORD
   TYPEOF(l.hist_enterprise_number) hist_enterprise_number;
   UNSIGNED8 cnt;
@@ -180,6 +185,10 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 active_domestic_corp_key_switch;
   REAL4 active_domestic_corp_key_maximum;
   DATASET(active_domestic_corp_key_ChildRec) nulls_active_domestic_corp_key {MAXCOUNT(100)};
+  REAL4 sbfe_id_specificity;
+  REAL4 sbfe_id_switch;
+  REAL4 sbfe_id_maximum;
+  DATASET(sbfe_id_ChildRec) nulls_sbfe_id {MAXCOUNT(100)};
   REAL4 hist_enterprise_number_specificity;
   REAL4 hist_enterprise_number_switch;
   REAL4 hist_enterprise_number_maximum;

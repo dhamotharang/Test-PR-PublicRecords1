@@ -1,28 +1,25 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
 
 // translates ma_phase01.mp Ab intio graph into ECL
 
 watercraft_color_desc(string3 code)
 := case(code, 	
 'AQU' => 'AQUA',
-'BLK' => 'BLACK',
+'BLA' => 'BLACK',
 'BLU' => 'BLUE',
-'BRN' => 'BROWN',
+'BRO' => 'BROWN',
 'GOL' => 'GOLD',
-'GRN' => 'GREEN',
-'GRY' => 'GRAY',
-'LBL' => 'LIGHT BLUE',
-'LGN' => 'LIGHT GREEN',
-'MRN' => 'MAROON',
-'NCO' => 'NO COLOR',
+'GRA' => 'GRAY',
+'GRE' => 'GREEN',
+'MAR' => 'MAROON',
+'NO' => 'NO COLOR',
 'ORA' => 'ORANGE',
 'OTH' => 'OTHER',
-'PNK' => 'PINK',
+'PIN' => 'PINK',
 'PUR' => 'PURPLE',
 'RED' => 'RED',
-'WHT' => 'WHITE',
+'WHI' => 'WHITE',
 'YEL' => 'YELLOW',
-'SEL' => 'YELLOW',
 '' );   
 
 searchpattern := '^(.*)-(.*)$';

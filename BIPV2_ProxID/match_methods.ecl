@@ -17,6 +17,11 @@ EXPORT match_active_domestic_corp_key(TYPEOF(h.active_domestic_corp_key) L, TYPE
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
 );
+EXPORT match_sbfe_id(TYPEOF(h.sbfe_id) L, TYPEOF(h.sbfe_id) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+   MAP(L = R => SALT311.MatchCode.ExactMatch,
+    SALT311.MatchCode.NoMatch),
+     MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
+);
 EXPORT match_hist_enterprise_number(TYPEOF(h.hist_enterprise_number) L, TYPEOF(h.hist_enterprise_number) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT311.MatchCode.ExactMatch,
     SALT311.MatchCode.NoMatch),
