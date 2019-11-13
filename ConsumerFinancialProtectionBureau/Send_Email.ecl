@@ -13,12 +13,12 @@ export Send_Email(
 																,'Alan.Jaramillo@LexisNexisRisk.com;'  + _Control.myinfo.EmailAddressNotify
 															);
 							
-	export build_success := fileservices.sendemail(
+	export build_success := STD.System.Email.sendemail(
 													notificationlist,
 													'CFPB Build Succeeded ' + pversion,
 													'Sample records are in WUID:' + workunit);
 
-	export build_failure := fileservices.sendemail(
+	export build_failure := STD.System.Email.sendemail(
 												notificationlist,
 												'CFPB  '+ pversion+' Build FAILED',
 												workunit + '\n' + failmessage);						

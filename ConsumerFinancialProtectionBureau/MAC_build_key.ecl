@@ -1,7 +1,7 @@
 import ConsumerFinancialProtectionBureau as CFPB; //makes navigating macro easier in vscode
 export MAC_build_key(key_type, filedate, pUseProd = false, isfcra = false, all_seq)  := macro
         import ConsumerFinancialProtectionBureau as CFPB; 
-        import RoxieKeyBuild, dx_ConsumerFinancialProtectionBureau;
+        import RoxieKeyBuild, dx_ConsumerFinancialProtectionBureau, std;
         #uniquename(key_data);
         %key_data% := dataset(CFPB.Filenames(pUseProd).#expand('base'+key_type),CFPB.layouts.#expand(key_type),THOR,__compressed__,OPT);     
         #uniquename(seq_build);
@@ -12,8 +12,11 @@ export MAC_build_key(key_type, filedate, pUseProd = false, isfcra = false, all_s
                                                 %seq_build%);
         #uniquename(seq_move);
         RoxieKeyBuild.Mac_SK_Move_v3(CFPB.filenames(pUseProd, isfcra).#expand('key'+key_type)+'_@version@', 'D', %seq_move%,filedate, 2);
-        all_seq := sequential(
+        all_seq := if(STD.File.FileExists(CFPB.filenames(pUseProd, isfcra).#expand('key'+key_type)+ '_' + filedate),
+                        output(CFPB.filenames(pUseProd, isfcra).#expand('key'+key_type)+ '_' + filedate +' already exists, ceasing key operations.'),
+                        sequential(
                                 %seq_build%,
                                 %seq_move%
-                                );
+                                )
+                        );
 endmacro;
