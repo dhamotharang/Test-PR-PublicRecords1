@@ -32,7 +32,7 @@ export OrbitIConstants(string envment,string bname) := module
 
 		
 	
-	export emaillist := 'Sudhir.Kasavajjala@lexisnexis.com, Jason.Allerdings@lexisnexis.com';
+	export emaillist := 'Sudhir.Kasavajjala@lexisnexisrisk.com, Jason.Allerdings@lexisnexisrisk.com';
 	export dremaillist := if(_Control.ThisEnvironment.Name = 'Prod',
 												'datareceiving@lexisnexis.com,ALP-MediaOps@choicepoint.com,Sudhir.Kasavajjala@lexisnexis.com',
 												'Sudhir.Kasavajjala@lexisnexis.com');
