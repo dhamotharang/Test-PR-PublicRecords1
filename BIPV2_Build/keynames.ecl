@@ -52,7 +52,7 @@ module
     + highRiskIndustriesAddr  .dall_filenames
     + highRiskIndustriesCodes .dall_filenames
     + BIPv2_HRCHY.keynames            (pversion,pUseOtherEnvironment).dall_filenames
-    + BIPV2_Crosswalk.filenames(pversion,pUseOtherEnvironment).dall_filenames
+    + BIPV2_Crosswalk.filenames(pversion,pUseOtherEnvironment).dall_keynames
  //   + bipv2_proxid.keynames(pversion).attribute_matches     .dall_filenames
     + bipv2_proxid.keynames           (pversion,pUseOtherEnvironment).match_candidates_debug.dall_filenames
     + bipv2_proxid.keynames           (pversion,pUseOtherEnvironment).specificities_debug   .dall_filenames
