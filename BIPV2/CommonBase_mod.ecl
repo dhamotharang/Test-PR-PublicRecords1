@@ -1611,6 +1611,8 @@ EXPORT CommonBase_mod := MODULE
   string30 contact_status_derived;
   string1 address_type_derived;
   boolean is_vanity_name_derived;
+  unsigned4 global_sid := 0;
+  unsigned8 record_sid := 0;
  END;
 
 	EXPORT Layout_Static := Layout_S40;
