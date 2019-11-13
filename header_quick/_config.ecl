@@ -47,9 +47,10 @@ EXPORT _config (
                                  output('NO NEW MONTHLY FILE. FLAG FILE WAS LEFT UNCHANGED'));
                                  
     // v_eq_as_of_date
-    
+    verifyFileDate(string newWeeklyFileDate):= IF( ut.DaysApart(newWeeklyFileDate,(STRING8)Std.Date.Today() )>10, FAIL('NEW WEEKLY FILE DATE IS MORE THAN 10 DAYS APART FROM RUN DATE'));
     EXPORT set_v_eq_as_of_date(STRING overwriteDate='') := if(isNewEquifaxWeeklyFile(sourceIP),
                                     sequential(
+                                         verifyFileDate(IF(overwriteDate='',newEquifaxWeeklyHeaderDate,overwriteDate)),
                                          output(dataset([{if(overwriteDate='',newEquifaxWeeklyHeaderDate,overwriteDate)}],{string v_eq_as_of_date}),,v_eq_as_of_date_file_name+'_'+workunit),
                                          std.file.startsuperfiletransaction(),
                                          std.file.createsuperfile(v_eq_as_of_date_file_name,,true),
