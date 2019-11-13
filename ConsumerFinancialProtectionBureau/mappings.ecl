@@ -1,5 +1,12 @@
 import ConsumerFinancialProtectionBureau as cfpb;
 EXPORT mappings := module
+    shared common := macro
+        self.record_sid := rsid;
+        self.dt_vendor_first_reported := date;
+        self.dt_vendor_last_reported := date;
+        self.global_src_id := 0;
+        self.is_latest := true;
+    endmacro;
     export cfpb.layouts.BLKGRP convert_BLKGRP(cfpb.layouts.original_blkgrp L, unsigned4 rsid, unsigned4 date) := TRANSFORM
         self.seqno := (unsigned2) L.field1;
         self.GEOID10_BlkGrp := L.field2;
@@ -22,11 +29,7 @@ EXPORT mappings := module
         self.NH_Asian_HPI:=  (unsigned2)L.field19;
         self.NH_API_Other:=  (unsigned2)L.field20;
         self.NH_Asian_HPI_Other:=  (unsigned2)L.field21;
-        self.record_sid := rsid;
-        self.dt_vendor_first_reported := date;
-        self.dt_vendor_last_reported := date;
-        self.global_src_id := 0;
-        self.is_latest := true;
+        common();
     end;
     export cfpb.layouts.BLKGRP_attr_over18 convert_BLKGRP_attr_over18(cfpb.layouts.original_BLKGRP_attr_over18 L,  unsigned4 rsid, unsigned4 date) := TRANSFORM
         self.GeoInd := L.field1;
@@ -43,11 +46,7 @@ EXPORT mappings := module
         self.here_given_api :=  (REAL4) L.field12;
         self.here_given_mult_other :=  (REAL4) L.field13;
         self.here_given_hispanic := (REAL4) L.field14;
-        self.record_sid := rsid;
-        self.dt_vendor_first_reported := date;
-        self.dt_vendor_last_reported := date;
-        self.global_src_id := 0;
-        self.is_latest := true;
+        common();
     end;
     export cfpb.layouts.census_surnames convert_census_surnames(cfpb.layouts.original_census_surnames L,  unsigned4 rsid, unsigned4 date) := TRANSFORM
         self.name := L.field1;
@@ -61,10 +60,6 @@ EXPORT mappings := module
         self.pctaian := (UDECIMAL4_2) L.field9;
         self.pct2prace := (UDECIMAL4_2) L.field10;
         self.pcthispanic := (UDECIMAL4_2) L.field11;
-        self.record_sid := rsid;
-        self.dt_vendor_first_reported := date;
-        self.dt_vendor_last_reported := date;
-        self.global_src_id := 0;
-        self.is_latest := true;
+        common();
     end;
 end;
