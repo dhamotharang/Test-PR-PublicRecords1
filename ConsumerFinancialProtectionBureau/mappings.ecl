@@ -24,6 +24,7 @@ EXPORT mappings := module
         self.NH_Asian_HPI_Other:=  (unsigned2)L.field21;
         self.record_sid := rsid;
         self.dt_vendor_first_reported := date;
+        self.dt_vendor_last_reported := date;
         self.global_src_id := 0;
         self.is_latest := true;
     end;
@@ -44,6 +45,7 @@ EXPORT mappings := module
         self.here_given_hispanic := (REAL4) L.field14;
         self.record_sid := rsid;
         self.dt_vendor_first_reported := date;
+        self.dt_vendor_last_reported := date;
         self.global_src_id := 0;
         self.is_latest := true;
     end;
@@ -61,6 +63,7 @@ EXPORT mappings := module
         self.pcthispanic := (UDECIMAL4_2) L.field11;
         self.record_sid := rsid;
         self.dt_vendor_first_reported := date;
+        self.dt_vendor_last_reported := date;
         self.global_src_id := 0;
         self.is_latest := true;
     end;

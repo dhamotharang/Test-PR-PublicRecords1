@@ -55,7 +55,8 @@ EXPORT layouts := module
     shared common := RECORD
         Unsigned4 record_sid;
         Unsigned8 global_src_id;
-        Unsigned6 dt_vendor_first_reported; 
+        Unsigned6 dt_vendor_first_reported;
+        Unsigned6 dt_vendor_last_reported;  
         Boolean is_latest;
     end;
     export BLKGRP := record
