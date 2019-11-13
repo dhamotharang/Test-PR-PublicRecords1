@@ -14,7 +14,6 @@ EXPORT proc_build_all(
   ,pSales_Ranking               = 'Marketing_List._Config().ds_sources_of_sales_revenue'
   ,pMrktg_BitMap                = 'Marketing_List._Config().Marketing_Bitmap'
   ,pMrktg_Approved_Sources      = 'Marketing_List._Config().set_marketing_approved_sources'
-  ,pDoSample                    = 'false'
   ,pDebug                       = 'false'
   ,pCompileTest                 = 'false'
   ,pRun_in_Background           = 'true'                                       
@@ -39,7 +38,6 @@ functionmacro
                         + ',' + #TEXT(pSales_Ranking         ) + '' + '\n'
                         + ',' + #TEXT(pMrktg_BitMap          ) + '' + '\n'
                         + ',' + #TEXT(pMrktg_Approved_Sources) + '' + '\n'
-                        + ',' + #TEXT(pDoSample              ) + '' + '\n'
                         + ',' + #TEXT(pDebug                 ) + '' + '\n'
                         + ');';
                         
