@@ -5,16 +5,18 @@
 EXPORT Files := MODULE
 
     shared TestBuild := false : stored('TestBuild');     
-      
-    EXPORT infutor_hdr  := Infutor.infutor_header(D2C_Customers.SRC_Allowed.Check(1, src)); //
+
+    //Infutor Header -            9,331,483,588
+    //After applying src filter,  7,504,725,548 
+    EXPORT infutor_hdr  := Infutor.infutor_header(D2C_Customers.SRC_Allowed.Check(1, src));
     EXPORT infutor_best := Infutor.file_infutor_best;  //708,358,966
     EXPORT coresDS      := Header.key_ADL_segmentation(ind1 = 'CORE'); //257,216,208 
 
-    TS_rec  := infutor_hdr(src = 'TS');  //2,163,551,849
-    INF_rec := infutor_hdr(src = 'IF');
+    TS_rec  := infutor_hdr(src = 'TS');  //2,168,648,561 - 28% of Infu Header
+    INF_rec := infutor_hdr(src = 'IF');  //1,282,783,753 - 17% of Infu Header
 
     cnt_TS_rec  := count(Transunion_PTrak.File_Transunion_DID_Out(did >0)); //5B recs
-    cnt_INF_rec := count(INF_rec); //1,282,733,656  1,325,244,746(33%)
+    cnt_INF_rec := count(INF_rec);
 
     temp_inf_hdr := RECORD
         recordof(infutor_hdr);
@@ -33,7 +35,7 @@ EXPORT Files := MODULE
     TS_70per:=PROJECT(dTS,TRANSFORM(temp_inf_hdr,SELF.record_id:=LEFT.record_id+COUNTER;SELF:=LEFT;))(record_id<=cnt_TS_rec*0.70);
     INF_33per:=PROJECT(dIF,TRANSFORM(temp_inf_hdr,SELF.record_id:=LEFT.record_id+COUNTER;SELF:=LEFT;))(record_id<=cnt_INF_rec*0.33);
 
-    //1,514,486,294
+    //2,168,648,561 - Taking all from header as it is < 5B of Transunion Base File
     TS_70  := if(count(TS_rec) <= cnt_TS_rec*0.70, TS_rec, project(TS_70per, recordof(infutor_hdr)));
     //  423,302,106
     INF_33 := project(INF_33per, recordof(infutor_hdr));
@@ -171,20 +173,20 @@ EXPORT Files := MODULE
 
 /********* FULL DS **********/
     AllowedDeeds    := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, DeedsDS(1),  '[\'LP\']');
-    AllowedTax      := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, TaxDS(1), '[\'LA\']');
-    AllowedPL       := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, PLDS(1), '[\'PL\']');
-    AllowedHunting  := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, HuntingDS(1), '[\'E2\',\'E1\']');
-    AllowedLiens    := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, LiensDS(1), '[\'L2\',\'LI\']');
-    AllowedCCW      := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, CCWDS(1), '[\'E3\']');
-    AllowedPhones   := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, PhonesDS(1), '[\'GO\',\'WP\',\'PN\',\'GN\']');
-    AllowedVoters   := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, VotersDS(1), '[\'VO\']');
+    AllowedTax      := D2C_Customers.MAC_GetAllowedRecs(AllowedDeeds, TaxDS(1), '[\'LA\']');
+    AllowedPL       := D2C_Customers.MAC_GetAllowedRecs(AllowedTax, PLDS(1), '[\'PL\']');
+    AllowedHunting  := D2C_Customers.MAC_GetAllowedRecs(AllowedPL, HuntingDS(1), '[\'E2\',\'E1\']');
+    AllowedLiens    := D2C_Customers.MAC_GetAllowedRecs(AllowedHunting, LiensDS(1), '[\'L2\',\'LI\']');
+    AllowedCCW      := D2C_Customers.MAC_GetAllowedRecs(AllowedLiens, CCWDS(1), '[\'E3\']');
+    AllowedPhones   := D2C_Customers.MAC_GetAllowedRecs(AllowedCCW, PhonesDS(1), '[\'GO\',\'WP\',\'PN\',\'GN\']');
+    AllowedVoters   := D2C_Customers.MAC_GetAllowedRecs(AllowedPhones, VotersDS(1), '[\'VO\']');
 
 /*****Infutor Header********/ 
-    AllowedRecs := AllowedDeeds + AllowedTax + AllowedPL + AllowedHunting + AllowedLiens + AllowedCCW + AllowedPhones + AllowedVoters;
-    OtherAllowedRecs := FilteredHeaderRecs(src not in ['LP','LA','PL','E2','E1','L2','LI','E3','GO','WP','PN','GN','VO']);
+    // AllowedRecs := AllowedDeeds + AllowedTax + AllowedPL + AllowedHunting + AllowedLiens + AllowedCCW + AllowedPhones + AllowedVoters;
+    // OtherAllowedRecs := FilteredHeaderRecs(src not in ['LP','LA','PL','E2','E1','L2','LI','E3','GO','WP','PN','GN','VO']);
     // EXPORT FullHdrDS := choosen(AllowedRecs + OtherAllowedRecs, if(TestBuild, 1000, CHOOSEN:ALL));
-    TotalAllowedRecs := AllowedRecs + OtherAllowedRecs;
-    EXPORT FullInfHdrDS := if(TestBuild, topn(TotalAllowedRecs, 1000, did), TotalAllowedRecs);// : persist('~persist::d2c_customer::infutor_hdr');
+    TotalAllowedRecs := AllowedVoters;
+    EXPORT FullInfHdrDS := if(TestBuild, topn(TotalAllowedRecs, 1000, did), TotalAllowedRecs);
 
 /*****Infutor Best********/    
     // inf_best_w_suppr := D2C_Customers.MAC_Suppressions(distribute(infutor_best, hash(did)), 1);
@@ -195,10 +197,11 @@ EXPORT Files := MODULE
     
     EXPORT FullInfBestDS := if(TestBuild, topn(j_best_w_hdr, 1000, did), j_best_w_hdr);// : persist('~persist::d2c_customer::infutor_best');    
     
+    //FULL - 5,645,398,427
+    EXPORT InfutorHdr(unsigned1 mode)  := D2C_Customers.MAC_BaseFile(FullInfHdrDS, derogatoryDS, mode, 1) : persist('~persist::d2c::' + D2C_Customers.Constants.sMode(mode) + '::infutor_hdr');
+
     //FULL - 604,395,000
     //CORE - 248,957,730
-
-    EXPORT InfutorHdr(unsigned1 mode)  := D2C_Customers.MAC_BaseFile(FullInfHdrDS, derogatoryDS, mode, 1) : persist('~persist::d2c::' + D2C_Customers.Constants.sMode(mode) + '::infutor_hdr');
     EXPORT InfutorBest(unsigned1 mode) := D2C_Customers.MAC_BaseFile(FullInfBestDS,derogatoryDS, mode, 1) : persist('~persist::d2c::' + D2C_Customers.Constants.sMode(mode) + '::infutor_best');
 
 END;
