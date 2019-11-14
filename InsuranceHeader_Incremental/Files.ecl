@@ -111,5 +111,10 @@ EXPORT Files := MODULE
 	EXPORT	FCRA_Current_DS			:= DATASET(Filenames.FCRA_SF.current, idl_header.Layout_Header_Link, THOR);
 	EXPORT	FCRA_Father_DS			:= DATASET(Filenames.FCRA_SF.father, idl_header.Layout_Header_Link, THOR);
 	EXPORT	FCRA_Grandfather_DS			:= DATASET(Filenames.FCRA_SF.grandfather, idl_header.Layout_Header_Link, THOR);
+
+// Minors File
+	EXPORT 	Minors_Current_DS		:= DATASET(Filenames.Minors_SF.current, Layout_Minors, CSV);
+	EXPORT 	Minors_Father_DS		:= DATASET(Filenames.Minors_SF.father, Layout_Minors, CSV);
+	EXPORT 	Minors_Grandfather_DS		:= DATASET(Filenames.Minors_SF.grandfather, Layout_Minors, CSV);
  
 END;
