@@ -14,7 +14,8 @@ return case( trim(superkeyname) ,
   'thor_data400::key::ln_propertyv2::qa::search.did'                          =>  'LN_PropertyV2_Fast.key_property_did(false,false)' ,                          
   'thor_data400::key::ln_propertyv2::qa::search.fid'                          =>  'LN_PropertyV2_Fast.key_search_fid(false,false)' ,                            
   'thor_data400::key::ln_propertyv2::qa::search.fid_county'           =>  'LN_PropertyV2_Fast.key_county_fid(false,false)' ,                            
-  'thor_data400::key::ln_propertyv2::qa::search.linkids'                   =>  'LN_PropertyV2_Fast.key_LinkIds.Key(false)' ,                                 
+  'thor_data400::key::ln_propertyv2::qa::search.linkids'                   =>  'LN_PropertyV2_Fast.key_LinkIds.Key(false)' , 
+	/*
 'thor_data400::key::ln_propertyv2::autokey::addressb2_qa'          =>  'AutokeyB2.Key_Address(\'~thor_data400::key::ln_propertyv2::autokey::\')',       
 'thor_data400::key::ln_propertyv2::autokey::address_qa'              =>  'AutoKey.Key_Address(\'~thor_data400::key::ln_propertyv2::autokey::\')',         
 'thor_data400::key::ln_propertyv2::autokey::citystnameb2_qa'         =>  'AutokeyB2.Key_CityStName(\'~thor_data400::key::ln_propertyv2::autokey::\')',    
@@ -30,7 +31,7 @@ return case( trim(superkeyname) ,
 'thor_data400::key::ln_propertyv2::autokey::stnameb2_qa' =>  'AutokeyB2.Key_StName(\'~thor_data400::key::ln_propertyv2::autokey::\')',        
 'thor_data400::key::ln_propertyv2::autokey::stname_qa' =>  'AutoKey.Key_StName(\'~thor_data400::key::ln_propertyv2::autokey::\')',          
 'thor_data400::key::ln_propertyv2::autokey::zipb2_qa' =>  'AutokeyB2.Key_Zip(\'~thor_data400::key::ln_propertyv2::autokey::\')',           
-'thor_data400::key::ln_propertyv2::autokey::zip_qa' =>  'AutoKey.Key_Zip(\'~thor_data400::key::ln_propertyv2::autokey::\')'    ,
+'thor_data400::key::ln_propertyv2::autokey::zip_qa' =>  'AutoKey.Key_Zip(\'~thor_data400::key::ln_propertyv2::autokey::\')'    ,*/
 'thor_data400::key::ln_propertyv2::qa::addr.full_v4'                  => 'LN_PropertyV2_Fast.Key_Prop_Address_V4(false,false)' ,
 'thor_data400::key::ln_propertyv2::qa::addr.full_v4_no_fares'         => 'LN_PropertyV2_Fast.Key_Prop_Address_V4_No_Fares(false)' ,
 'thor_data400::key::ln_propertyv2::qa::deed::zip_avg_sales_price'    =>  'LN_PropertyV2_Fast.key_deed_zip_avg_sales_price(false)' , 
@@ -73,7 +74,7 @@ return case( trim(superkeyname) ,
 'thor_data400::key::watchdog_nonglb_noneq.did_qa'                 =>   'watchdog.Key_Prep_Watchdog_nonglb(true)' ,                      
 'thor_data400::key::watchdog_nonglb_noneq.teaser_qa '          =>    'Watchdog.Key_Prep_Watchdog_teaser(true)' ,  
   'thor_data400::key::watchdog_best::fcra::nonen_did_qa' => 'Watchdog.Key_Watchdog_FCRA_nonEN()',
-'thor_data400::key::watchdog_best::FCRA::nonEQ_did'                        =>   'Watchdog.Key_Watchdog_FCRA_nonEQ' ,                                              
+'thor_data400::key::watchdog_best::FCRA::nonEQ_did'                        =>   'Watchdog.Key_Watchdog_FCRA_nonEQ' ,   
  
 											 '');
 end;
