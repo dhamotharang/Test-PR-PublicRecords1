@@ -3,10 +3,7 @@
 /********* AKAS **********/     
 EXPORT proc_build_akas(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   ds := map( mode = 1 => D2C_Customers.Files.FullHdrDS,            //FULL
-              mode = 2 => D2C_Customers.Files.coreHdrDS,            //QUARTERLY
-              mode = 3 => D2C_Customers.Files.coreHdrDerogatoryDS   //MONTHLY
-            );
+   ds := D2C_Customers.Files.InfutorHdr(mode);
 
    D2C_Customers.layouts.rAkas xf(ds L) := transform
     self.LexID       := L.did;
