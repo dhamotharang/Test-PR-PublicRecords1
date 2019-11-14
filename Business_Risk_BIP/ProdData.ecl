@@ -965,7 +965,7 @@ layout_watchlists_temp := record
 	
 	DataBridge := Business_Risk_BIP.PD_DataBridge(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, AllowedSourcesSet);
   
-	EmailV2 := LN_PropertyV2.Key_LinkIds.kFetch(kFetchLinkIDs,
+	EmailV2 := dx_Email.Key_LinkIds.kFetch(kFetchLinkIDs,
 																							kFetchLinkSearchLevel,
 																							0 // ScoreThreshold --> 0 = Give me everything
 																					 );
