@@ -20,7 +20,7 @@ recsupp := doxie_crs.layout_best_supplemental_info;
 
 export layout_central_header := record, maxlength (doxie_crs.maxlength_report)
   dataset(recbesr) best_information_children;
-  dataset(recsupp) best_supplemental_info;
+  dataset(recsupp) best_supplemental_info_children;
   dataset(recssnr) ssn_children;
   dataset(recshrr) hri_ssn_children;
   dataset(recdear) deathfile_children;

@@ -225,27 +225,27 @@ fdnrecs := if(NOT IsFCRA and FDN_Any,
 // end of the coding section added for FDN changes
 
 doxie.layout_central_header Format () := transform
-         self.best_information_children    := global(besr);
-         self.best_supplemental_info       := global(best_supplemental_info);
-         self.hri_ssn_children             := IF (~IsFCRA, global(shrr));
-         self.deathfile_children           := IF (~IsFCRA, global(dear));
-         self.ssn_children                 := global(ssnr);
-         self.addresses_children           := global(addr);
-         self.resident_links_children      := global(resr);
-         self.phones_children              := global(phor);
-         self.phones_old_children          := if (Include_OldPhones_Val, global(phOld));
-         self.ssn_lookups_children         := global(sslr);
-         self.names_children               := namr;
-         self.relative_summary_children    := IF (~IsFCRA, global(relr(relative = true)) );
-         self.associate_summary_children   := IF (~IsFCRA, global(assr) );
-         self.nbrs_summary_children        := IF (~IsFCRA, global(nbrr) );
-         self.nbrs_summary2_children       := IF (~IsFCRA, global(nbrr2) );
-         self.nbrhoods_children            := IF (~IsFCRA, global(nbhr) );
-         self.fdn_children                 := IF(~IsFCRA, global(fdnrecs) );
+         self.best_information_children             := global(besr);
+         self.best_supplemental_info_children       := global(best_supplemental_info);
+         self.hri_ssn_children                      := IF (~IsFCRA, global(shrr));
+         self.deathfile_children                    := IF (~IsFCRA, global(dear));
+         self.ssn_children                          := global(ssnr);
+         self.addresses_children                    := global(addr);
+         self.resident_links_children               := global(resr);
+         self.phones_children                       := global(phor);
+         self.phones_old_children                   := if (Include_OldPhones_Val, global(phOld));
+         self.ssn_lookups_children                  := global(sslr);
+         self.names_children                        := namr;
+         self.relative_summary_children             := IF (~IsFCRA, global(relr(relative = true)) );
+         self.associate_summary_children            := IF (~IsFCRA, global(assr) );
+         self.nbrs_summary_children                 := IF (~IsFCRA, global(nbrr) );
+         self.nbrs_summary2_children                := IF (~IsFCRA, global(nbrr2) );
+         self.nbrhoods_children                     := IF (~IsFCRA, global(nbhr) );
+         self.fdn_children                          := IF(~IsFCRA, global(fdnrecs) );
          // these two datasets were not returned from neutral or central_record services before,
          // but were calculated in central records for use in certain single-sources
-         self.subject_names                := global(csa_names);
-         self.subject_addresses            := global(csa_addresses);
+         self.subject_names                         := global(csa_names);
+         self.subject_addresses                     := global(csa_addresses);
          self.errors := []; // this can be eventually removed from the layout
 end;
 
