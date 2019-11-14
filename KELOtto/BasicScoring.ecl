@@ -51,7 +51,7 @@ EXPORT BasicScoring := MODULE
 												'dt_first_seen_,dt_last_seen_,' +
 	                      'hri06_flag_,hri26_flag_,hri29_flag_,hri38_flag_,hri71_flag_,hri_it_flag_,hri_mi_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_ssn100_flag_,kr_ssn101_flag_,' +
 												'safe_flag_,contributor_safe_flag_,' +
   											'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
@@ -64,7 +64,7 @@ EXPORT BasicScoring := MODULE
                         'cluster_score_,event_count_,identity_count_,identity_count_gt2_,score_,source_customer_count_,kr_high_risk_flag_,_isdisposableemail_,not_safe_last_domain_gt2_,kr_medium_risk_flag_,' + 
 												'dt_first_seen_,dt_last_seen_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_eml500_flag_,kr_eml501_flag_,kr_eml502_flag_,kr_eml590_flag_,kr_eml591_flag_,kr_eml592_flag_,kr_eml593_flag_,' +
 												'safe_flag_,contributor_safe_flag_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
@@ -79,7 +79,7 @@ EXPORT BasicScoring := MODULE
                         'hri07_flag_,hri08_flag_,hri15_flag_,hri27_flag_,hri31_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,'+ 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'safe_flag_,contributor_safe_flag_,' +
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_phn400_flag_,kr_phn401_flag_,kr_phn402_flag_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
 												'cl_high_kr_identity_top10_,cl_nas9_top10_,cl_nas3_top10_,cl_ip_high_risk_identity_top10_,' +
@@ -94,7 +94,7 @@ EXPORT BasicScoring := MODULE
 												'safe_flag_,contributor_safe_flag_,' +
                         'ip_not_us_,ip_vpn_,ip_high_risk_city_,ip_hosted_,ip_tor_,' +
 												'_iprngbeg_,_iprngend_,_edgecountry_,_edgeregion_,_edgecity_,_edgeconnspeed_,_edgemetrocode_,_edgelatitude_,_edgelongitude_,_edgepostalcode_,_edgecountrycode_,_edgeregioncode_,_edgecitycode_,_edgecontinentcode_,_edgetwolettercountry_,_edgeinternalcode_,_edgeareacodes_,_edgecountryconf_,_edgeregionconf_,_edgecitycong_,_edgepostalconf_,_edgegmtoffset_,_edgeindst_,_siccode_,_domainname_,_ispname_,_homebiztype_,_asn_,_asnname_,_primarylang_,_secondarylang_,_proxytype_,_proxydescription_,_isanisp_,_companyname_,_organizationname_,' +
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_ip600_flag_,kr_ip601_flag_,kr_ip602_flag_,kr_ip603_flag_,kr_ip604_flag_,kr_ip605_flag_,kr_ip1000_flag_,kr_ip1001_flag_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
 												'cl_high_kr_identity_top10_,cl_nas9_top10_,cl_nas3_top10_,cl_ip_high_risk_identity_top10_,' +
@@ -108,7 +108,7 @@ EXPORT BasicScoring := MODULE
 												'dt_first_seen_,dt_last_seen_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'high_risk_routing_,abbreviated_bankname_,' +
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_bnk800_flag_,kr_bnk801_flag_,kr_bnk802_flag_,kr_bnk890_flag_,kr_bnk891_flag_,kr_bnk892_flag_,kr_bnk893_flag_,safe_flag_,contributor_safe_flag_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
 												'cl_high_kr_identity_top10_,cl_nas9_top10_,cl_nas3_top10_,cl_ip_high_risk_identity_top10_,' +
@@ -121,7 +121,7 @@ EXPORT BasicScoring := MODULE
 												'dt_first_seen_,dt_last_seen_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
                         'hri41_flag_,hri_df_flag_,' + 
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_dl200_flag_,kr_dl201_flag_,kr_dl202_flag_,kr_dl203_flag_,kr_dl204_flag_,kr_dl290_flag_,kr_dl291_flag_,kr_dl292_flag_,kr_dl293_flag_,safe_flag_,contributor_safe_flag_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
 												'cl_high_kr_identity_top10_,cl_nas9_top10_,cl_nas3_top10_,cl_ip_high_risk_identity_top10_,' +
