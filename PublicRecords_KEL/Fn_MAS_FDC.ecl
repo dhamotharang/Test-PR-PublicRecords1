@@ -1737,7 +1737,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 														UCCV2.Key_LinkIds.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
 														PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
 														0, /*ScoreThreshold --> 0 = Give me everything*/
-														PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT,
+														PublicRecords_KEL.ECL_Functions.Constants.UCC_JOIN_LIMIT,
 														BIPV2.IDconstants.JoinTypes.LimitTransformJoin));
 				
 		With_UCC_Linkid_records := DENORMALIZE(With_Vehicle_Main_Records, UCC_LinkIds_Records,
