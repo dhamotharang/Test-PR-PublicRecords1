@@ -3,7 +3,7 @@
 import doxie,Data_Services, dx_Header,header;
 
 nbr_pre_ccpa_compliance := PROJECT (doxie.nbr_headers, TRANSFORM(dx_Header.layouts.i_nbr_uid,SELF:=LEFT,SELF.global_sid:=0,SELF.record_sid:=0));
-nbr_wth_ccpa_compliance := header.fn_suppress_ccpa(nbr_pre_ccpa_compliance);
+nbr_wth_ccpa_compliance := header.fn_suppress_ccpa(nbr_pre_ccpa_compliance,true);
 
 export data_key_nbr_headers_uid := nbr_wth_ccpa_compliance;
 // index(

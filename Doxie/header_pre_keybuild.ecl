@@ -167,7 +167,7 @@ TRANSFORM
 	self := le;
 END;
 
-with_appends_ccpa_compliant:=header.fn_suppress_ccpa(with_appends);
+with_appends_ccpa_compliant:=header.fn_suppress_ccpa(with_appends,true);
 with_segmented := JOIN(with_appends_ccpa_compliant,segmented_h,left.did=right.did,get_lookups(LEFT,RIGHT), LOCAL): PERSIST('persist::header_pre_keybuild');
 
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
