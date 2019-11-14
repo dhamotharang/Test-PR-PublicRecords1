@@ -327,7 +327,7 @@ end;
 
 targus_gw_prep := join(input, valid_internal_listings, (left.phone10=right.phone10), prep(left, right), full only);
 
-targus_gw := if(count(targus_gw_prep)>0, risk_indicators.getTargusGW(targus_gw_prep, gateways, dppa, glb), dataset([], layout_dirs_phone));
+targus_gw := if(count(targus_gw_prep)>0, risk_indicators.getTargusGW(targus_gw_prep, gateways, dppa, glb, isFCRA), dataset([], layout_dirs_phone));
 // output(insurance_gw_prep, named('insurance_gw_prep'));
 // output(insurance_gw, named('insurance_gw'));
 // output(gateways, named('gateways'));

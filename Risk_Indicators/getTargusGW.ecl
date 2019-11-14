@@ -1,8 +1,9 @@
 ﻿import targus, riskwise, gateway,Phones, std, Risk_Indicators;
 
-export getTargusGW(DATASET(Risk_Indicators.Layout_Input) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 dppa, unsigned1 glb) := function
+export getTargusGW(DATASET(Risk_Indicators.Layout_Input) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 dppa, unsigned1 glb,
+									boolean isFCRA = false) := function
 
-applyOptOut := TRUE; // Temporary variable to enable Targus opt out
+applyOptOut := ~isFCRA; // Temporary variable to enable Targus opt out
 // targus and targuse3220 should have the same url
 targus_gateway_cfg := gateways(servicename='targus' or servicename='targuse3220')[1];
 makeGatewayCall := targus_gateway_cfg.url!='';
