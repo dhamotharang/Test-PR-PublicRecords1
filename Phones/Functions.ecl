@@ -458,7 +458,7 @@ MODULE
     EXPORT IsValidIdentity(STRING ListingName) := FUNCTION
         WordCount := STD.Str.CountWords(ListingName, ' ');
         LastWord := STD.Str.GetNthWord(ListingName, WordCount);
-        result := ListingName != '' AND ~ut.valid_st(LastWord);
+        result := IF(LENGTH(LastWord) = 2, ~ut.valid_st(LastWord), TRUE);
         RETURN result;
     END;
 END;
