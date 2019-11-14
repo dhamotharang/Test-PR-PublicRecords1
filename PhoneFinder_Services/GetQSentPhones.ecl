@@ -89,6 +89,7 @@ MODULE
 			fn_len := length(trim(ri.fname));
       fn_parsed := if(fn_len > 3 and ri.fname[fn_len-1] = ' ', ri.fname[1..fn_len-2], ri.fname);
    		SELF.fname            := fn_parsed;
+            SELF.coc_description  := IF(ri.RealTimePhone_Ext.ServiceClass != '', $.Functions.ServiceClassDesc(ri.RealTimePhone_Ext.ServiceClass), '');
 			SELF                  := ri;
 			SELF                  := le;
 			SELF                  := [];
@@ -179,7 +180,8 @@ MODULE
 
  			fn_len := length(trim(ri.fname));
       fn_parsed := if(fn_len > 3 and ri.fname[fn_len-1] = ' ', ri.fname[1..fn_len-2], ri.fname);
-   		SELF.fname             := fn_parsed;
+            SELF.fname             := fn_parsed;
+            SELF.coc_description   := IF(ri.RealTimePhone_Ext.ServiceClass != '', $.Functions.ServiceClassDesc(ri.RealTimePhone_Ext.ServiceClass), '');
 			SELF                   := ri;
 			SELF                   := le;
 			SELF                   := [];
