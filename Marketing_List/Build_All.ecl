@@ -15,8 +15,8 @@ EXPORT Build_All(
   ,pSales_Ranking               = 'Marketing_List._Config().ds_sources_of_sales_revenue'
   ,pMrktg_BitMap                = 'Marketing_List._Config().Marketing_Bitmap'
   ,pMrktg_Approved_Sources      = 'Marketing_List._Config().set_marketing_approved_sources'
-  ,pDoSample                    = 'false'
   ,pDebug                       = 'false'
+  ,pSampleProxids               = '[]'
 
 
 ) :=
@@ -38,12 +38,12 @@ functionmacro
                         ,pSales_Ranking             
                         ,pMrktg_BitMap              
                         ,pMrktg_Approved_Sources    
-                        ,pDoSample                  
-                        ,pDebug                     
+                        ,pDebug 
+                        ,pSampleProxids
   );
 
   // -- Generate Business Contact Dataset
-  ds_business_contact     := Marketing_List.Create_Business_Contact_File(pDataset_Crosswalk ,pMrktg_BitMap);
+  ds_business_contact     := Marketing_List.Create_Business_Contact_File(pDataset_Crosswalk ,pMrktg_BitMap,,pDebug,pSampleProxids);
   
   // -- Write out both files to disk
   output_business_info    := tools.macf_WriteFile(Marketing_List.Filenames(pversion).business_information.logical ,ds_business_info     ,pOverwrite := true);

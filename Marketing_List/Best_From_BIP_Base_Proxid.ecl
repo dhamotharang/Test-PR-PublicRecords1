@@ -12,6 +12,8 @@ EXPORT Best_From_BIP_Base_Proxid(
 
    dataset(recordof(Marketing_List.Source_Files().bip_base) ) pDataset_Base = Marketing_List.Source_Files().bip_base
   ,dataset(Marketing_List.Layouts.business_information_prep ) pBest_Prep    = Marketing_List.Best_From_BIP_Best_Proxid()
+ ,boolean                                                     pDebug          = false
+ ,set of unsigned6                                            pSampleProxids  = []
 ) :=
 function
 
@@ -73,5 +75,27 @@ function
    ds_add_age   := join(ds_base_err_stat  ,ds_base_age    ,left.proxid = right.proxid ,transform(recordof(left),self.dt_first_seen  := right.dt_first_seen ,self.dt_last_seen := right.dt_last_seen,self.age_of_company := right.age_of_company,self := left)  ,left outer,hash);
    ds_add_email := join(ds_add_age        ,ds_base_email  ,left.proxid = right.proxid ,transform(recordof(left),self.business_email := right.business_email,self := left)  ,left outer,hash);
    
-  return ds_add_email;
+  output_debug := parallel(
+   
+    output('---------------------Marketing_List.Best_From_BIP_Base_Proxid---------------------'             ,named('Marketing_List_Best_From_BIP_Base_Proxid'           ),all)
+   ,output(choosen(pDataset_Base          (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_pDataset_Base'           ),all)
+   ,output(choosen(pBest_Prep             (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_pBest_Prep'              ),all)
+   ,output(choosen(ds_base_filt           (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_base_filt'            ),all)
+   ,output(choosen(ds_Best_Prep           (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_Best_Prep'            ),all)
+   ,output(choosen(ds_base_prep           (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_base_prep'            ),all)
+   ,output(choosen(ds_base_msa_prep       (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_base_msa_prep'        ),all)
+   ,output(choosen(ds_base_err_stat_prep  (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_base_err_stat_prep'   ),all)
+   ,output(choosen(ds_base_msa            (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_base_msa'             ),all)
+   ,output(choosen(ds_base_err_stat       (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_base_err_stat'        ),all)
+   ,output(choosen(ds_base_age_prep       (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_base_age_prep'        ),all)
+   ,output(choosen(ds_base_age            (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_base_age'             ),all)
+   ,output(choosen(ds_base_email_prep     (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_base_email_prep'      ),all)
+   ,output(choosen(ds_base_email          (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_base_email'           ),all)
+   ,output(choosen(ds_add_age             (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_add_age'              ),all)
+   ,output(choosen(ds_add_email           (count(pSampleProxids) = 0 or proxid in pSampleProxids    ),300)  ,named('Best_From_BIP_Base_Proxid_ds_add_email'            ),all)
+  
+  );
+
+  return when(ds_add_email  ,if(pDebug = true ,output_debug));
+
 end;

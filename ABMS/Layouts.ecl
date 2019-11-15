@@ -1,5 +1,5 @@
-﻿/*2014-04-10T00:18:17Z (Dhananjay Nikam)
-
+﻿/*2019-10-28T19:26:59Z (Hennigar, Jennifer (RIS-BCT))
+CCPA-773
 */
 IMPORT Address,BIPV2;
 
@@ -249,6 +249,8 @@ EXPORT Layouts := MODULE
 			Miscellaneous.Cleaned_Phone  clean_phone;
 			STRING    address_type_desc;
 			BIPV2.IDlayouts.l_xlink_ids ;
+			unsigned4 								global_sid					:= 23941; // Source ID for ABMS - CCPA project 20190910  
+			unsigned8 								record_sid; 
 		END;
 
     EXPORT Career := RECORD

@@ -2,6 +2,7 @@
 
 noTx := row([],Layout_GetRelationship.TransactionalFlags_layout);
 
+
 EXPORT proc_GetRelationshipPairs(DATASET(Layout_GetRelationship.DIDs_pairs_layout) DID_ds,
                                  boolean   RelativeFlag                      = FALSE,
                                  boolean   AssociateFlag                     = FALSE,
@@ -83,7 +84,7 @@ shared isTx   :=  txflag.VehicleFlag OR
                   txflag.POBoxFlag;
 
 shared relationship_key_qa           := Relationship.key_relatives_v3;
-shared dWatchdogUniversalKey         := Watchdog_V2.IDX_UniversalKey_File.IndexFile;
+shared dWatchdogUniversalKey         := dx_BestRecords.key_watchdog();
 shared relationship_Marketing_Filter := dWatchdogUniversalKey.permissions & dx_BestRecords.Constants.PERM_TYPE.marketing > 0;
 shared relationship_D2C_Filter       := dWatchdogUniversalKey.permissions & dx_BestRecords.Constants.PERM_TYPE.glb_d2c_filtered > 0;
 shared DID_ds_dist                   := distribute(DID_ds,hash(did));

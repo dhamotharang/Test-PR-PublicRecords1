@@ -36,7 +36,7 @@ EXPORT RunWuid(
   ,pPollingFrequency  = '\'5\''
   ,pForceRun          = 'false'                               // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
   ,pForceSkip         = 'false'                               // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
-
+  ,pInDebug           = '\'\''
 ) := 
 functionmacro
 
@@ -78,7 +78,7 @@ functionmacro
 // http://uspr-prod-thor-esp.risk.regn.net:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20150331-151832#/stub/Main-DL/Activity-DL/DetailW20150331x101550-DL/Summary
 // http://10.241.3.241:8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20150330-165839#/stub/Summary
 
-  createworkunit        := wk_ut.CreateWuid_Raw(/* outputRunnerwuidcode + */ECL  ,pcluster ,localesp ); 
+  createworkunit        := wk_ut.CreateWuid_Raw(/* outputRunnerwuidcode + */ECL  ,pcluster ,localesp,, #expand(pInDebug)); 
   
   // -- Number of times this wuid called
   try_Number            := (unsigned)wk_ut.get_Scalar_Result(workunit,'Try_Number') + 1;
