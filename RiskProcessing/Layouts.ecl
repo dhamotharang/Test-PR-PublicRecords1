@@ -363,6 +363,7 @@ rva.AddrInputDeedMailing;
 rva.AddrInputOwnershipIndex;
 rva.AddrInputPhoneService;
 rva.AddrInputPhoneCount;
+rva.AddrInputDwellType;
 rva.AddrInputDwellTypeIndex;
 rva.AddrInputDelivery;
 rva.AddrInputTimeLastSale;
