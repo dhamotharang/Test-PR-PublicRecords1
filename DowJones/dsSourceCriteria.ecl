@@ -1814,6 +1814,12 @@ EXPORT dsSourceCriteria := DATASET([
 {'ATO (Australia) Disqualified Trustees Register List','1801'},
 {'Indian Home Affairs Ministry Unlawful Activities','1802'},
 {'OFAC - Executive Order on the Situation in Syria','1803'},
-{'EC 2019/1731 ISIL (Da\'esh) and Al-Qaida List','1804'}
+{'EC 2019/1731 ISIL (Da\'esh) and Al-Qaida List','1804'},
+{'EC (CFSP) 2019/1788 Burundi List','1805'},
+{'EC 2019/1779 Burundi List','1806'},
+{'AMBD (Brunei Darussalam) Alert List','1807'},
+{'CBIRC (China) National Enforcement Actions','1808'},
+{'CBIRC (China) Provincial Enforcement Actions','1809'},
+{U'Singapore Exchange Directors’ and Executive Officers’ Watch List','1810'}
 ],r);
 

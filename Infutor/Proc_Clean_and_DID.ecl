@@ -257,13 +257,19 @@ getaddr := join(distribute(getname,hash(addr_street_blob,city,st,zip,zip4)),
 														left.zip4 = right.zip4 
                ,tjoin1(left,right), left outer,local): persist('~thor_data400::persist::infutor_clean');
 							 
-d_clean_filt := dedup(getaddr(fname<>'',
+getaddr_filt := getaddr(fname<>'',
 															lname<>'',
 															zip<>'',
 															(phone<>'' or (prim_range<>'' and prim_name<>'')),
 															~(stringlib.stringfind(prim_name,'PO BOX',1)>0 and trim(zip4)='')
-															),
-											all); 
+															); 
+
+#if(__ECL_VERSION__ < '7.4.24')
+	d_clean_filt  := dedup(sort(getaddr_filt, record, local), record, local);
+#else
+	d_clean_filt  := dedup(getaddr_filt, all);   // Original Code
+#end  
+
 
 // Apply Flip name macro
 ut.mac_flipnames(d_clean_filt,fname,mname,lname,flip_out);

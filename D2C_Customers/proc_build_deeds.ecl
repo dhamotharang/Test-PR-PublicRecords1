@@ -1,20 +1,27 @@
 ﻿import std, PromoteSupers, ln_propertyv2, ln_property, Watchdog, D2C;
 
 /********* DEEDS_MORTGAGES **********/
-
-dLNPropertyDeed   := ln_propertyv2.File_Deed;
-dLNPropertySearch := ln_propertyv2.File_Search_DID(did > 0);
-
-//Will include up to 10 years of deed & mortgage data
-Property_for_10yrs := dLNPropertySearch(Std.Date.YearsBetween((unsigned4)process_date ,Std.Date.Today()) < 10 and source_code = 'OP' and ln_fares_id[1..2] <> 'OM');
-
-dPD  :=	distribute(dLNPropertyDeed,hash(ln_fares_id));
-dPS  :=	distribute(Property_for_10yrs,hash(ln_fares_id));
+//SRC code - 'LP'
 
 EXPORT proc_build_deeds(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
+   //20B records in property search
+   BaseFile := D2C_Customers.Files.DeedsDS(mode);
+   //Will include up to 10 years of deed & mortgage data
+   Property_for_10yrs := BaseFile(
+                        Std.Date.YearsBetween((unsigned4)process_date,
+                        Std.Date.Today()) < 10 and source_code = 'OP' and ln_fares_id[1..2] <> 'OM'
+                        );
+
+   //1B records in property deed
+   //Recs filtered based on ln_fares_id[1..2]
+   dLNPropertyDeed   := ln_propertyv2.File_Deed;
+
+   dPD  := distribute(dLNPropertyDeed,hash(ln_fares_id));
+   dPS  := distribute(Property_for_10yrs,hash(ln_fares_id));
+
    {D2C_Customers.layouts.rDeeds_Mortgages, string12 ln_fares_id} AddDeed(dPS L, dPD R) := transform
-        self.LexID             := (unsigned6)L.did;
+        self.LexID             := L.did;
         self.ln_fares_id       := L.ln_fares_id;
         self.State             := R.State;
         self.County            := R.County_name;
@@ -48,21 +55,12 @@ EXPORT proc_build_deeds(unsigned1 mode, string8 ver, string20 customer_name) := 
         self.Legal_Description := R.legal_brief_description	;            
    end; 
    
-   ds := join(dPS, dPD,
+   inDS := join(dPS, dPD,
          left.ln_fares_id=right.ln_fares_id,
          AddDeed(left,right),
          local
         );
-        
-   fullDS := ds;
-   coreDS := join(distribute(ds, hash(LexID)), distribute(D2C_Customers.Files.coresDS, hash(did)), left.LexID = right.did, transform(left), local);
-   coreDerogatoryDS := join(coreDS, distribute(Files.derogatoryDS, did), left.LexID = right.did, transform(left), local);
-   
-   inDS := map( mode = 1 => fullDS,          //FULL
-                 mode = 2 => coreDS,          //QUARTERLY
-                 mode = 3 => coreDerogatoryDS //MONTHLY
-               );
-   
+
    res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 20);
    return res;
 

@@ -76,7 +76,7 @@ ut.MAC_SK_Move_v2('~thor_data400::key::qsent_fdids', 'Q', mv_fdids_key);
 ut.mac_sk_move_v2('~thor_data400::key::qsent_companyname','Q',mv2qa_qcname);
 
 /* **ROXIE KEY NOTIFICATION EMAIL********************************************************************************************************** */	
-email := fileservices.sendemail('RoxieBuilds@seisint.com ; vniemela@seisint.com ; tgibson@seisint.com ; fhumayun@seisint.com',
+email := fileservices.sendemail('RoxieBuilds@seisint.com ; vniemela@seisint.com ; jason.allerdings@lexisnexisrisk.com',
 								 
 								'qsent: BUILD SUCCESS '+ filedate ,
 								'keys: 1) thor_data400::key::qsent_address_qa(thor_data400::key::qsent::'+ filedate +'::address),\n' +

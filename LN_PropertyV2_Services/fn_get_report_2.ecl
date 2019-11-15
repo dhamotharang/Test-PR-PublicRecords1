@@ -44,7 +44,7 @@ export dataset(l_out) fn_get_report_2(
  	did_rec := if(isFCRA, project(in_fids, transform(doxie.layout_best, self.did:=left.search_did,self:=left,self:=[])));
 	// adding a dedup of the DID and SSN so we don't end up with so many records coming out of GetFlagFile for same person
 	did_rec_deduped := if(isFCRA, dedup(sort(did_rec, did, ssn), did, ssn));
-	ds_flags := if (IsFCRA, FCRA.GetFlagFile(did_rec_deduped), fcra.compliance.blank_flagfile);
+	ds_flags := if (IsFCRA and ~OnThor, FCRA.GetFlagFile(did_rec_deduped), fcra.compliance.blank_flagfile);
 
 	// Apply FaresID-based restrictions
 	fids1 := in_fids(ln_fares_id[1] not in in_mod.srcRestrict);	// blacklist FARES, Fidelity, or LnBranded as needed
@@ -70,6 +70,7 @@ export dataset(l_out) fn_get_report_2(
 	// Get raw parties based on fid suppression so far
 	parties_extraRaw := LN_PropertyV2_Services.fn_get_parties_raw(fids2,nonSS,isFCRA,ds_flags);
 	
+  
 	// Suppress records (fids) and parties based on DID and SSN
 	suppressed_dids := 
 		JOIN(
@@ -109,14 +110,18 @@ export dataset(l_out) fn_get_report_2(
 			transform( {STRING12 ln_fares_id}, self := left)
 		);
 	
-	fids2_having_removed_suppressed_DIDs_and_SSNs := 
+	fids2_having_removed_suppressed_DIDs_and_SSNs_roxie := 
 		JOIN(
 			fids2_having_removed_suppressed_DIDs, suppressed_ssns,
 			left.ln_fares_id = right.ln_fares_id,
 			transform( recordof(fids2), self := left ),
 			left only
 		);
-				
+fids2_having_removed_suppressed_DIDs_and_SSNs_thor := project(parties_extraRaw, transform(recordof(fids2), self := left));
+
+
+fids2_having_removed_suppressed_DIDs_and_SSNs := if(onThor, fids2_having_removed_suppressed_DIDs_and_SSNs_thor, fids2_having_removed_suppressed_DIDs_and_SSNs_roxie);
+
 	// retrieve raw results with minimal processing (just the JOINs)
 	deeds_raw		:= LN_PropertyV2_Services.fn_get_deeds_raw_2(fids2_having_removed_suppressed_DIDs_and_SSNs,isFCRA,ds_flags,in_mod);
 	assess_raw	:= LN_PropertyV2_Services.fn_get_assessments_raw_2(fids2_having_removed_suppressed_DIDs_and_SSNs,isFCRA,ds_flags,in_mod);

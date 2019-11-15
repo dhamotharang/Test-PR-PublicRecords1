@@ -76,6 +76,7 @@ EXPORT	Key_BusinessInformation(STRING pVersion	=	(STRING8)Std.Date.Today(),
 																	SELF.dt_datawarehouse_first_reported	:=	(UNSIGNED4)LEFT.Extracted_Date;
 																	SELF.dt_datawarehouse_last_reported		:=	(UNSIGNED4)LEFT.Extracted_Date;
 																	SELF																	:=	LEFT));
+																	
 	dBusinessInformationDist	:=	SORT(DISTRIBUTE(dBusinessInformation,
 																	HASH(	record_type, Sbfe_Contributor_Number, Contract_Account_Number, Account_Type_Reported, Account_Holder_Business_Name, Clean_Account_Holder_Business_Name, 
 																				Business_Name, Clean_Business_Name, Company_Website, Original_fname, Original_mname, Original_lname, Original_suffix, E_Mail_Address, 

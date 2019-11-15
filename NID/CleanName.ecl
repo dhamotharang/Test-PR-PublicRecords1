@@ -1,31 +1,25 @@
 ﻿IMPORT Std, Address;
 
-	rgxMispelledTrust := ' (TRU ST|TRUS, T|TR, UST)$';
-	CheckMispelledTrust(string s) := IF(REGEXFIND(rgxMispelledTrust, s), REGEXREPLACE(rgxMispelledTrust, s, ' TRUST'), s);
-	string TrimRightPunct(string s) := REGEXREPLACE('[ ,&+*/\\x00-\\x1f\\x80-\\xff-]+$',s,'');
-	string Unquote(string s) := REGEXREPLACE('^\'(.+)\'$', s, '$1');
+set of string1 Types :=  ['$', 'T', 'B', 'P', 'D', 'U', 'I', ''];
 
-	string Preprocess(string s, string options) := Std.Str.CleanSpaces(CheckMispelledTrust(
-		TrimRightPunct(Address.NameTester.RemoveNonPrintingChars(Unquote(
-			STD.str.SubstituteIncluded(
-				Address.Persons.SuffixToAlpha(s),
-						'\r\n\t\000',' ')
-				)))));
-		
 EXPORT CleanName(string s) := FUNCTION
 
 		rawName := s;
-		preprocessed := TRIM(Preprocess(Std.Str.ToUpperCase(s),''),LEFT,RIGHT);
+		preprocessed := TRIM($.Preprocess(Std.Str.ToUpperCase(s),''),LEFT,RIGHT);
 		preCleaned := Address.PrecleanName(s);
 		fmt := Address.Persons.PersonalNameFormat(preCleaned);
 		quality := Address.Persons.NameQuality(preCleaned);
-		isDual := Address.Persons.IsDualName(preCleaned);
+		isDual := false;			//Address.Persons.IsDualName(preCleaned);
 		
-		ntype := $.fn_nonPerson(rawName, preprocessed, preCleaned);
-
+		ntype := $.fn_nonPerson(rawName, preprocessed, preCleaned, quality);
+		cleaned := CASE(ntype,
+							   MatchType.Person => $.mod_NameFormat.FormatName(preCleaned, fmt), 
+							   MatchType.Dual => $.mod_NameFormat.FormatName1(preCleaned, fmt),
+								 '');
+		cleaned2 := IF(ntype = MatchType.Dual, $.mod_NameFormat.FormatName2(preCleaned, fmt), '');
 		
-		ds := DATASET([{rawName, preprocessed, preCleaned, '', ntype, fmt, quality, isDual}], $.rNameId);
+		dBiz := DATASET([{rawName, preprocessed, preCleaned, cleaned, cleaned2, ntype, fmt, quality, isDual}], $.rNameId);
 
-		return ds;
+		return dBiz;
 
 END;

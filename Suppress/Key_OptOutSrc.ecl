@@ -11,5 +11,8 @@ fname(boolean isFCRA) := IF (isFCRA,
 
 key_name(boolean isFCRA) := $.file_version(isFCRA).get_file(dops_dataset, fname(isFCRA));
 
+EXPORT Key_OptOutSrc(boolean isFCRA = false) := INDEX({rec.lexid}, rec, key_name(isFCRA), OPT);
+/* This is not yet implemented in ThorProd, commenting to use code above
 EXPORT Key_OptOutSrc(integer d_env = data_services.data_env.iNonFCRA) := 
   INDEX({rec.lexid}, rec,  key_name(data_services.data_env.isFCRA(d_env)));
+*/

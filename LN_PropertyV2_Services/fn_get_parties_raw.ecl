@@ -38,10 +38,11 @@ export dataset(l_raw) fn_get_parties_raw(
 	);
 	
 	// filter out any did/ln_fares_id combos that are in the flag file
-	in_fids_thor := join(in_fids, flags,
-		left.search_did=(unsigned6)right.did and left.ln_fares_id=right.record_id,
-		transform(l_fid, self.search_did := left.search_did, self.ln_fares_id := left.ln_fares_id),
-		left only, lookup);
+	in_fids_thor := IF(~isFCRA, in_fids,
+										join(in_fids, flags,
+											left.search_did=(unsigned6)right.did and left.ln_fares_id=right.record_id,
+											transform(l_fid, self.search_did := left.search_did, self.ln_fares_id := left.ln_fares_id),
+											left only, lookup));
 	
 	ds_raw_thor := join(
 		distribute(in_fids_thor, hash64(ln_fares_id)), 

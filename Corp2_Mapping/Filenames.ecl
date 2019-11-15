@@ -7,7 +7,7 @@ C:\Users\goulmi01\AppData\Roaming\HPCC Systems\eclide\mgould_prod\Boca_Prod\Corp
 import VersionControl; 
 string landing_zone := 'uspr-edata10.risk.regn.net';
 export Filenames(
-
+ 
 	 string 	pversion							= ''
 	,string 	pGroupname						= VersionControl.Groupname('31')
 	,boolean	pUseOtherEnvironment	= false
@@ -685,9 +685,6 @@ module
 				 + prinpurp.dall_filenames
 				 + stock.dall_filenames
 				;
-
-	end;
-
 
 	end;
 

@@ -36,7 +36,7 @@ EXPORT RunWuid(
   ,pPollingFrequency  = '\'5\''
   ,pForceRun          = 'false'                               // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
   ,pForceSkip         = 'false'                               // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
-
+  ,pInDebug           = '\'\''
 ) := 
 functionmacro
 
@@ -66,7 +66,7 @@ functionmacro
                     // ,output('<a href="http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + pWaitEvent + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Fail'  + '%3C%2FAdvice%3E%3C%2FEvent%3E">Fail Workunit</a>'  ,named('Fail__html' ),overwrite)                              
                   );
            
-// myevent := '<a href="http://' + 'prod_esp.br.seisint.com' + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + 'VernEvent' + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Rerun' + '%3C%2FAdvice%3E%3C%2FEvent%3E">Rerun Workunit</a>';
+// myevent := '<a href="http://' + 'uspr-prod-thor-esp.risk.regn.net' + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + 'VernEvent' + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Rerun' + '%3C%2FAdvice%3E%3C%2FEvent%3E">Rerun Workunit</a>';
 
 //  http://10.241.3.241:8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20150330-165839#/stub/Summary
 //  output('<a href="http://10.241.3.242:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20150330-165839">W20150330-165839</a>' ,named('RelativeWU_WithUrl__html'));  //works
@@ -75,10 +75,10 @@ functionmacro
   // -- Add this code to the Child/Iteration so you know what wuid kicked it off.
   // outputRunnerwuidcode  := 'output(\'<a href="http://' + localesp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Summary">Parent Workunit</a>\' ,named(\'Parent_Wuid__html\'));\n';
 
-// http://prod_esp.br.seisint.com:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20150331-151832#/stub/Main-DL/Activity-DL/DetailW20150331x101550-DL/Summary
+// http://uspr-prod-thor-esp.risk.regn.net:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20150331-151832#/stub/Main-DL/Activity-DL/DetailW20150331x101550-DL/Summary
 // http://10.241.3.241:8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20150330-165839#/stub/Summary
 
-  createworkunit        := wk_ut.CreateWuid_Raw(/* outputRunnerwuidcode + */ECL  ,pcluster ,localesp ); 
+  createworkunit        := wk_ut.CreateWuid_Raw(/* outputRunnerwuidcode + */ECL  ,pcluster ,localesp,, #expand(pInDebug)); 
   
   // -- Number of times this wuid called
   try_Number            := (unsigned)wk_ut.get_Scalar_Result(workunit,'Try_Number') + 1;

@@ -1,8 +1,7 @@
 
 EXPORT SRC_Allowed := MODULE
 //1
-EXPORT Consumers_allowed_and_extracted :=[ 
-
+EXPORT Consumers_allowed_and_extracted :=[
         
         // These sources are used in the bulk extract and will be sub-source-filtered based on the recornds found in the extract dataset file
 
@@ -34,7 +33,7 @@ EXPORT Death_state_NOT_allowed := [
 ];
 
 // src
-Consumers_allowed := [
+EXPORT Consumers_allowed := [
 
         'TS',      //       2,163,551,849       TUCS_Ptrack  (19607)                          // Consumer allowed. But no more than 70% to any customer
         'IF',      //       1,282,733,656       Infutor TRK - Name and Address Resource (18075) // Consumer allowed. No vehicle. No more that 33% of the file
@@ -423,7 +422,7 @@ Airmen_allowed    := [
         'AM' // 18321 - only source. No bulk and no consumer restrictions in orbit
 
 ];
-// 12
+// 12 source_code
 Hunting_allowed   := [ //Motznik Computer Service not allowed but status = Removed From Production      
 
         // these amount to over 99% of records
@@ -438,7 +437,7 @@ Hunting_allowed   := [ //Motznik Computer Service not allowed but status = Remov
         // EMerge_CCW_NY             := 'E7'; // this is the only known exclusion (2 records on this date)
 ];
 
-// 13 
+// 13 filing_state
 Liens_NOT_allowed     := [
 
         'MA' // 15097 no bulk and no consumer (even though 15083 and 15095 are ok)
@@ -565,8 +564,8 @@ Tax_Assessments_bulk_D2C_allowed := [
         //'DA' // Dayton Assessments (historical)
 
 ];
-//22
-Student_NOT_allowed := [
+//22 source
+Student_allowed := [
 
         'SL'                  // 18065 bulk restricted
         /* not in file? */    // 18765 bulk restricted
@@ -597,7 +596,7 @@ EXPORT Check(UNSIGNED1 rec_type, STRING src) := CASE(rec_type,
     19 =>    (src       in Voter_Registration_allowed         ),
     20 =>    (src[1..2] in Deeds_Mortgages_bulk_D2C_allowed   ),
     21 =>    (src[1..2] in Tax_Assessments_bulk_D2C_allowed   ),
-    22 => ~  (src       in Student_NOT_allowed                ),
+    22 =>    (src       in Student_allowed                    ),
     false);
 
 END;

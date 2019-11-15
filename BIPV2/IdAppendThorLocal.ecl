@@ -32,13 +32,14 @@ export IdAppendThorLocal(
 		,primForcePost = false
 		,weightThreshold = 0
 		,disableSaltForce = false
+		,segmentation = true
 	) := functionmacro
 
-	import BIPV2_Company_Names, BizLinkFull,ut,_Control;
+	import BIPV2_Company_Names, BizLinkFull,ut,_Control,BIPV2_xlink_segmentation;
 
 	#uniquename(zipset)
 	#uniquename(infilec)
-	#uniquename(outfile1)
+	#uniquename(outfile0)
 	#uniquename(infilecnp)
 	%infilec% :=
 	project(infile,
@@ -121,18 +122,23 @@ export IdAppendThorLocal(
 		Input_mname := pContact_mname,
 		Input_lname := pContact_lname,
 		Input_contact_ssn := pContact_ssn,
-		Outfile := %OutFile1%,
+		Outfile := %OutFile0%,
 		AsIndex := %useKeyedJoins%,
 		In_bGetAllScores := bGetAllScores
 		,In_disableForce := disableSaltForce
 	);
 
+	#UNIQUENAME(OutSegResult)
+	%OutSegResult% := BIPV2_xlink_segmentation.mac_Segmentation(%OutFile0%,%useKeyedJoins%);
+	
+	#UNIQUENAME(OutFile1)
+	%OutFile1% := IF(segmentation, %OutSegResult%, %OutFile0%);
 
   #uniquename(outnorm)
   %outnorm% := normalize(
-	%OutFile1%((results[1].score >= (integer)score_threshold or results_ultid[1].score >= (integer)score_threshold)
-	           ,results[1].weight >= (integer)weightThreshold
-	           ,(results[1].proxid > 0 or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work
+	%OutFile1%((results[1].score >= (integer)score_threshold or results_seleid[1].score >= (integer)score_threshold or results_ultid[1].score >= (integer)score_threshold)
+	           ,(results[1].weight >= (integer)weightThreshold or results_seleid[1].weight >= weightThreshold)
+	           ,(results[1].proxid > 0 or results_seleid[1].seleid > 0 or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work
 	(integer)keep_count,
 	transform(
 		{%OutFile1%.reference, %OutFile1%.results.proxid, %OutFile1%.results.weight, %OutFile1%.results.score, %OutFile1%.results.seleid, %OutFile1%.results.orgid, %OutFile1%.results.ultid, %OutFile1%.results.powid
@@ -271,7 +277,7 @@ export IdAppendThorLocal(
 
 		self:= left.results[counter];    
 		)
-	)((score >= (integer)score_threshold or ultscore >= (integer)score_threshold), (proxid > 0 or ultid > 0));// proxid > 0 also because of case where threshold is zero (without this you get keep_count records even with no IDs on them)
+	)((score >= (integer)score_threshold or selescore >= (integer)score_threshold or ultscore >= (integer)score_threshold), (proxid > 0 or seleid > 0 or ultid > 0));// proxid > 0 also because of case where threshold is zero (without this you get keep_count records even with no IDs on them)
 
 
 	#uniquename(outfile20);

@@ -16,8 +16,8 @@ EXPORT Best_Sales_And_Employees(
   ,paccutrend_base        = 'Marketing_List.Source_Files().accutrend'            
   ,pEmployees_Ranking     = 'Marketing_List._Config().ds_sources_of_number_of_employees'
   ,pSales_Ranking         = 'Marketing_List._Config().ds_sources_of_sales_revenue'
-  ,pDoSample              = 'false'
   ,pDebug                 = 'false'
+  ,pSampleSeleids         = '[]'
 
 
 ) :=
@@ -31,22 +31,21 @@ import cortera,mdr;
 Sales_desc = Sales description (27% pop).  Sample values:  revenue, sales, interest income, billings, managed assets, premium, puberest income and none
 
 */
-  ds_dca_base       := if(pDoSample   = false  ,pdca_base        ,choosen(pdca_base        ,5000))      ;
-  ds_eq_biz_base    := if(pDoSample   = false  ,peq_biz_base     ,choosen(peq_biz_base     ,5000))      ;
-  ds_oshair_base    := if(pDoSample   = false  ,poshair_base     ,choosen(poshair_base     ,5000))      ;
-  ds_cortera_base   := if(pDoSample   = false  ,pcortera_base    ,choosen(pcortera_base    ,5000))      ;
-  ds_infutor_base   := if(pDoSample   = false  ,pinfutor_base    ,choosen(pinfutor_base    ,5000))      ;
-  ds_accutrend_base := if(pDoSample   = false  ,paccutrend_base  ,choosen(paccutrend_base  ,5000))      ;
+  ds_dca_base       := pdca_base              ;
+  ds_eq_biz_base    := peq_biz_base           ;
+  ds_oshair_base    := poshair_base           ;
+  ds_cortera_base   := pcortera_base          ;
+  ds_infutor_base   := pinfutor_base          ;
+  ds_accutrend_base := paccutrend_base        ;
 
   ds_cortera_base_normexec := Cortera.proc_createExecutives(ds_cortera_base);
 
-  // go with 
   ds_dca_base_filt       := ds_dca_base                (pID != 0  ,(integer)trim(rawfields.emp_num           )  > 0 or  (trim(rawfields.Sales ) != '' and regexfind('(revenue|sales)',rawfields.Sales_Desc,nocase)));
   ds_eq_biz_base_filt    := ds_eq_biz_base             (pID != 0  ,(integer)trim(efx_corpempcnt              )  > 0 or  (trim(efx_corpamount  ) != '' and regexfind('(revenue|sales)',efx_corpamounttp     ,nocase)));
   ds_oshair_base_filt    := ds_oshair_base             (pID != 0  ,(integer)Number_In_Establishment             > 0 );
   ds_cortera_base_filt   := ds_cortera_base_normexec   (pID != 0  ,(integer)trim(TOTAL_EMPLOYEES             )  > 0 or   trim(TOTAL_SALES     ) != '');
   ds_infutor_base_filt   := ds_infutor_base            (pID != 0  ,         trim(employee_code               ) != '');
-  ds_accutrend_base_filt := ds_accutrend_base          (pID != 0  ,(integer)trim(rawfields.EMP_SIZE          )  > 0 );
+  ds_accutrend_base_filt := ds_accutrend_base          (pID != 0  ,(integer)trim(rawfields.EMP_SIZE          )  > 0 );                                                                                                      
 
 
   mapinfutoremp(string1 pempcode) := map(
@@ -105,8 +104,8 @@ Sales_desc = Sales description (27% pop).  Sample values:  revenue, sales, inter
     ,self.annual_revenue            := right.annual_revenue
     ,self.source                    := right.source
     ,self.annual_revenue_rank_order := right.annual_revenue_rank_order
-    ,self.pID                       := if(left.pID != 0  ,left.pID  ,right.pID)
-    ,self.dt_last_seen              := if(left.pID != 0  ,left.dt_last_seen  ,right.dt_last_seen)
+    ,self.pID                       := if(left.pID != 0  ,left.pID            ,right.pID          )
+    ,self.dt_last_seen              := if(left.pID != 0  ,left.dt_last_seen   ,right.dt_last_seen )
   )  ,hash ,full outer);
   
   ds_stats := dataset([
@@ -145,39 +144,39 @@ Sales_desc = Sales description (27% pop).  Sample values:  revenue, sales, inter
   ]  ,{string stat  ,unsigned cnt_recs ,unsigned cnt_seleids  ,unsigned cnt_seleid_dups,unsigned cnt_zero_seleids});
 
   outputdebug := parallel(
-    output(ds_stats ,named('ds_stats'))
-   ,output(topn(ds_dca_base             ,100  ,pID) ,named('ds_dca_base'             ))
-   ,output(topn(ds_eq_biz_base          ,100  ,pID) ,named('ds_eq_biz_base'          ))
-   ,output(topn(ds_oshair_base          ,100  ,pID) ,named('ds_oshair_base'          ))
-   ,output(topn(ds_cortera_base         ,100  ,pID) ,named('ds_cortera_base'         ))
-   ,output(topn(ds_infutor_base         ,100  ,pID) ,named('ds_infutor_base'         ))
-   ,output(topn(ds_accutrend_base       ,100  ,pID) ,named('ds_accutrend_base'       ))
-   ,output(topn(ds_cortera_base_normexec,100  ,pID) ,named('ds_cortera_base_normexec'))
-   ,output(topn(ds_dca_base_filt        ,100  ,pID) ,named('ds_dca_base_filt'        ))
-   ,output(topn(ds_eq_biz_base_filt     ,100  ,pID) ,named('ds_eq_biz_base_filt'     ))
-   ,output(topn(ds_oshair_base_filt     ,100  ,pID) ,named('ds_oshair_base_filt'     ))
-   ,output(topn(ds_cortera_base_filt    ,100  ,pID) ,named('ds_cortera_base_filt'    ))
-   ,output(topn(ds_infutor_base_filt    ,100  ,pID) ,named('ds_infutor_base_filt'    ))
-   ,output(topn(ds_accutrend_base_filt  ,100  ,pID) ,named('ds_accutrend_base_filt'  ))
-   ,output(topn(ds_dca_prep             ,100  ,pID) ,named('ds_dca_prep'             ))
-   ,output(topn(ds_eq_biz_prep          ,100  ,pID) ,named('ds_eq_biz_prep'          ))
-   ,output(topn(ds_oshair_prep          ,100  ,pID) ,named('ds_oshair_prep'          ))
-   ,output(topn(ds_cortera_prep         ,100  ,pID) ,named('ds_cortera_prep'         ))
-   ,output(topn(ds_infutor_prep         ,100  ,pID) ,named('ds_infutor_prep'         ))
-   ,output(topn(ds_accutrend_prep       ,100  ,pID) ,named('ds_accutrend_prep'       ))
-   ,output(topn(ds_dca_table            ,100  ,pID) ,named('ds_dca_table'            ))
-   ,output(topn(ds_eq_biz_table         ,100  ,pID) ,named('ds_eq_biz_table'         ))
-   ,output(topn(ds_oshair_table         ,100  ,pID) ,named('ds_oshair_table'         ))
-   ,output(topn(ds_cortera_table        ,100  ,pID) ,named('ds_cortera_table'        ))
-   ,output(topn(ds_infutor_table        ,100  ,pID) ,named('ds_infutor_table'        ))
-   ,output(topn(ds_accutrend_table      ,100  ,pID) ,named('ds_accutrend_table'      ))
-   ,output(topn(ds_concat               ,100  ,pID) ,named('ds_concat'               ))
-   ,output(topn(ds_add_emp_ranking      ,100  ,pID) ,named('ds_add_emp_ranking'      ))
-   ,output(topn(ds_add_sales_ranking    ,100  ,pID) ,named('ds_add_sales_ranking'    ))
-   ,output(topn(best_emp_seleid         ,100  ,pID) ,named('best_emp_seleid'         ))
-   ,output(topn(best_sales_seleid       ,100  ,pID) ,named('best_sales_seleid'       ))
-   ,output(topn(ds_out                  ,100  ,pID) ,named('ds_out'                  ))
-  
+    output(ds_stats                                                                                        ,named('ds_stats'                ))
+   ,output(topn(ds_dca_base             (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_dca_base'             ))
+   ,output(topn(ds_eq_biz_base          (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_eq_biz_base'          ))
+   ,output(topn(ds_oshair_base          (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_oshair_base'          ))
+   ,output(topn(ds_cortera_base         (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_cortera_base'         ))
+   ,output(topn(ds_infutor_base         (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_infutor_base'         ))
+   ,output(topn(ds_accutrend_base       (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_accutrend_base'       ))
+   ,output(topn(ds_cortera_base_normexec(count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_cortera_base_normexec'))
+   ,output(topn(ds_dca_base_filt        (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_dca_base_filt'        ))
+   ,output(topn(ds_eq_biz_base_filt     (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_eq_biz_base_filt'     ))
+   ,output(topn(ds_oshair_base_filt     (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_oshair_base_filt'     ))
+   ,output(topn(ds_cortera_base_filt    (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_cortera_base_filt'    ))
+   ,output(topn(ds_infutor_base_filt    (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_infutor_base_filt'    ))
+   ,output(topn(ds_accutrend_base_filt  (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_accutrend_base_filt'  ))
+   ,output(topn(ds_dca_prep             (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_dca_prep'             ))
+   ,output(topn(ds_eq_biz_prep          (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_eq_biz_prep'          ))
+   ,output(topn(ds_oshair_prep          (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_oshair_prep'          ))
+   ,output(topn(ds_cortera_prep         (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_cortera_prep'         ))
+   ,output(topn(ds_infutor_prep         (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_infutor_prep'         ))
+   ,output(topn(ds_accutrend_prep       (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_accutrend_prep'       ))
+   ,output(topn(ds_dca_table            (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_dca_table'            ))
+   ,output(topn(ds_eq_biz_table         (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_eq_biz_table'         ))
+   ,output(topn(ds_oshair_table         (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_oshair_table'         ))
+   ,output(topn(ds_cortera_table        (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_cortera_table'        ))
+   ,output(topn(ds_infutor_table        (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_infutor_table'        ))
+   ,output(topn(ds_accutrend_table      (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_accutrend_table'      ))
+   ,output(topn(ds_concat               (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_concat'               ))
+   ,output(topn(ds_add_emp_ranking      (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_add_emp_ranking'      ))
+   ,output(topn(ds_add_sales_ranking    (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_add_sales_ranking'    ))
+   ,output(topn(best_emp_seleid         (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('best_emp_seleid'         ))
+   ,output(topn(best_sales_seleid       (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('best_sales_seleid'       ))
+   ,output(topn(ds_out                  (count(pSampleSeleids) = 0 or seleid in pSampleSeleids),100  ,pID) ,named('ds_out'                  ))
+
   );
   
   #IF(pDebug = true)

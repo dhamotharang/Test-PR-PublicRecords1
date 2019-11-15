@@ -59,6 +59,7 @@ EXPORT layouts := MODULE
 			UNSIGNED6 SELEID		:= 0;
 			UNSIGNED6 OrgID			:= 0;
 			UNSIGNED6 UltID			:= 0;
+      STRING200 email_address := '';
 		END;
 		
 		EXPORT update := RECORD
@@ -102,6 +103,7 @@ EXPORT layouts := MODULE
 			STRING10 guardian_dob;
 			STRING9 guardian_ssn;
 			BIPV2.IDlayouts.l_header_ids;
+      STRING200 email_address := '';
 		END;
 	
 	END;
@@ -259,6 +261,11 @@ EXPORT layouts := MODULE
 			Header.Layout_Header.did;
 		END;
     
+   SHARED email_documentid_record := RECORD
+			AccountMonitoring.product_files.email.main_key.did;
+			AccountMonitoring.product_files.email.main_key.clean_email;
+		END;
+    
 		template(default,doxie.layout_references);
 		template(bankruptcy,bankruptcy_documentid_record);
 		template(deceased,deceased_documentid_record);
@@ -286,6 +293,7 @@ EXPORT layouts := MODULE
 		template(aircraft,aircraft_documentid_record);
 		template(watercraft,watercraft_documentid_record);
 		template(personheader,personheader_documentid_record);
+		template(email,email_documentid_record);
 	END;
 	
 	EXPORT results := RECORD
