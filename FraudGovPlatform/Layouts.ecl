@@ -1332,8 +1332,6 @@ RECORD
   unsigned8 event_count_;
   unsigned8 identity_count_;
   unsigned1 cl_adjacent_safe_flag_;
-  unsigned8 cl_hr_identity_count_;
-  unsigned8 cl_hr_element_count_;
   DATASET(flagsrec) flags;
  END;
 
@@ -2240,8 +2238,6 @@ RECORD
   unsigned8 event_count_;
   unsigned8 identity_count_;
   unsigned1 cl_adjacent_safe_flag_;
-  unsigned8 cl_hr_identity_count_;
-  unsigned8 cl_hr_element_count_;
   DATASET(flagsrec) flags;
   integer1 high_risk_centroid;
   integer1 known_risk_centroid;
