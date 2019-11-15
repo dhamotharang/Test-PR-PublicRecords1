@@ -2,7 +2,7 @@
 
 //Step 1 Check _Control.Environment  onThor := TRUE if not = TRUE sandbox to TRUE before running
 //Step 2 Doxie.Version_SuperKey  needs to be sandboxed from 'qa' to 'pb'
-//Step 3 Watchdog_V2.IDX_UniversalKey_File  needs to be sandboxed replace  doxie.Version_SuperKey with 'qa'
+//Step 3 dx_BestRecords.key_watchdog()  needs to be sandboxed replace  doxie.Version_SuperKey with 'qa'
 //Step 4 after job finishes notify team that the OneMain is available on bctlpedata11
  
  NotifyListtemp := '';  //   add additional email addresses if needed, comma delimited similar ProfileBooster.Constants.ECL_Developers_Slim

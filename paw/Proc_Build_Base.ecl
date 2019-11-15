@@ -1,4 +1,4 @@
-IMPORT Business_Header,watchdog,header_services, ut, versioncontrol, corp2,mdr;
+﻿IMPORT Business_Header,watchdog,header_services, ut, versioncontrol, corp2,mdr;
 
 export Proc_Build_Base(
 
@@ -112,8 +112,19 @@ function
 																																										left.source,
 																																										left.vendor_id);
 																													self := left;));
-
-	VersionControl.macBuildNewLogicalFile( filenames(pversion).base.new		,dAdd_Contact_id,Out			);
+																													
+	// Filtering empty/zero global_sid PAW records for append global_sid macro call.
+	dAdd_Contact_id_for_gsid := dAdd_Contact_id(global_sid = 0);
+	
+	// Filtering PAW records with non-blank global_sid's to avoid sending them to append global_sid macro call.
+	dAdd_Contact_id_w_gsid   := dAdd_Contact_id(global_sid <> 0);
+	
+	// Appending Global_Sid's using macro macGetGlobalDSID call.
+	dAdd_Contact_id_w_gsid_appended := mdr.macGetGlobalSID(dAdd_Contact_id_for_gsid, 'PAWV2', 'source', 'global_sid');
+	
+	dAdd_Contact_id_gsid := dAdd_Contact_id_w_gsid_appended + dAdd_Contact_id_w_gsid;																												
+	
+	VersionControl.macBuildNewLogicalFile( filenames(pversion).base.new		,dAdd_Contact_id_gsid,Out			);
 
 	return sequential(
 		 out

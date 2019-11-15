@@ -1960,68 +1960,68 @@ end;
 		RETURN dedup_get_exceptions(record_type <> 'D');
 	END;
 	
-	EXPORT Modified_License_Base	:= FUNCTION
-		orig_lic_base		:= Enclarity.Files(filedate,pUseProd).license_base.built(record_type <> 'D');
-		mo_only					:= orig_lic_base(lic_state = 'MO');
-		no_mo_lic				:= orig_lic_base(lic_state <> 'MO');
-		npi_base				:= Enclarity.Files(filedate,pUseProd).npi_base.built;
+	// EXPORT Modified_License_Base	:= FUNCTION
+		// orig_lic_base		:= Enclarity.Files(filedate,pUseProd).license_base.built(record_type <> 'D');
+		// mo_only					:= orig_lic_base(lic_state = 'MO');
+		// no_mo_lic				:= orig_lic_base(lic_state <> 'MO');
+		// npi_base				:= Enclarity.Files(filedate,pUseProd).npi_base.built;
 		
-		lic_base_w_tax	:= record
-			Enclarity.Layouts.license_base;
-			Enclarity.Layouts.npi_base.npi_num;
-			Enclarity.Layouts.npi_base.taxonomy;
-		end;
+		// lic_base_w_tax	:= record
+			// Enclarity.Layouts.license_base;
+			// Enclarity.Layouts.npi_base.npi_num;
+			// Enclarity.Layouts.npi_base.taxonomy;
+		// end;
 		
-		joined_npi	:= join(sort(distribute(mo_only, hash(group_key)), group_key, local),
-												sort(distribute(npi_base, hash(group_key)), group_key, local),
-													left.group_key = right.group_key,
-													transform({lic_base_w_tax},
-														self.npi_num	:= right.npi_num,
-														self.taxonomy	:= trim(right.taxonomy,all),
-														self					:= left),
-													left outer, local);
+		// joined_npi	:= join(sort(distribute(mo_only, hash(group_key)), group_key, local),
+												// sort(distribute(npi_base, hash(group_key)), group_key, local),
+													// left.group_key = right.group_key,
+													// transform({lic_base_w_tax},
+														// self.npi_num	:= right.npi_num,
+														// self.taxonomy	:= trim(right.taxonomy,all),
+														// self					:= left),
+													// left outer, local);
 	
-		mo_apn			:= joined_npi(taxonomy[1..4] = '363L' or taxonomy[1..4] = '364S' or taxonomy[1..3] = '367')
-										:persist('~thor_data400::base::enclarity::modified_license_w_taxonomy');
+		// mo_apn			:= joined_npi(taxonomy[1..4] = '363L' or taxonomy[1..4] = '364S' or taxonomy[1..3] = '367')
+										// :persist('~thor_data400::base::enclarity::modified_license_w_taxonomy');
 		
-		non_mo_apn	:= joined_npi(taxonomy[1..4] <> '363L' and taxonomy[1..4] <> '364S' and taxonomy[1..3] <> '367')
-										:persist('~thor_data400::base::enclarity::modified_license_w_taxonomy_non_apn');;
+		// non_mo_apn	:= joined_npi(taxonomy[1..4] <> '363L' and taxonomy[1..4] <> '364S' and taxonomy[1..3] <> '367')
+										// :persist('~thor_data400::base::enclarity::modified_license_w_taxonomy_non_apn');;
 		
-		clear_exp_stat	:= project(mo_apn, 
-																transform(enclarity.Layouts.license_base,
-																	old_rec									:= if(left.dt_vendor_last_reported < (unsigned4)filedate, true, false);
-																	self.lic_end_date				:= if(old_rec,'00000000',left.lic_end_date),
-																	self.lic_status					:= if(old_rec,'',left.lic_status),
-																	self.clean_lic_end_date	:= if(old_rec,'00000000',left.clean_lic_end_date),
-																	self										:= left));
+		// clear_exp_stat	:= project(mo_apn, 
+																// transform(enclarity.Layouts.license_base,
+																	// old_rec									:= if(left.dt_vendor_last_reported < (unsigned4)filedate, true, false);
+																	// self.lic_end_date				:= if(old_rec,'00000000',left.lic_end_date),
+																	// self.lic_status					:= if(old_rec,'',left.lic_status),
+																	// self.clean_lic_end_date	:= if(old_rec,'00000000',left.clean_lic_end_date),
+																	// self										:= left));
 																	
-		sort_clear_exp_stat	:= sort(distribute(clear_exp_stat, hash(group_key, lic_state, lic_num, lic_begin_date)),
-															group_key, lic_state, lic_num, lic_begin_date, local);
+		// sort_clear_exp_stat	:= sort(distribute(clear_exp_stat, hash(group_key, lic_state, lic_num, lic_begin_date)),
+															// group_key, lic_state, lic_num, lic_begin_date, local);
 
-		Enclarity.Layouts.license_base t_rollup(sort_clear_exp_stat L, sort_clear_exp_stat R) := TRANSFORM
-			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-			SELF						 							:= IF(L.lic_end_date = '00000000', L, R);
-		END;
+		// Enclarity.Layouts.license_base t_rollup(sort_clear_exp_stat L, sort_clear_exp_stat R) := TRANSFORM
+			// SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+			// SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			// SELF						 							:= IF(L.lic_end_date = '00000000', L, R);
+		// END;
 
-		roll_mo_lic := ROLLUP(sort_clear_exp_stat,					
-										LEFT.group_key 			= RIGHT.group_key 			AND 
-										LEFT.lic_state 			= RIGHT.lic_state				AND				
-										LEFT.lic_num				= RIGHT.lic_num					AND						
-										// LEFT.lic_end_date		= RIGHT.lic_end_date	 	AND	 // don't match end date
-										// LEFT.lic_status			= RIGHT.lic_status		  AND
-										LEFT.lic_begin_date = RIGHT.lic_begin_date	AND
-										LEFT.record_type		= RIGHT.record_type,
-										t_rollup(LEFT,RIGHT),LOCAL);
+		// roll_mo_lic := ROLLUP(sort_clear_exp_stat,					
+										// LEFT.group_key 			= RIGHT.group_key 			AND 
+										// LEFT.lic_state 			= RIGHT.lic_state				AND				
+										// LEFT.lic_num				= RIGHT.lic_num					AND						
+										LEFT.lic_end_date		= RIGHT.lic_end_date	 	AND	 // don't match end date
+										LEFT.lic_status			= RIGHT.lic_status		  AND
+										// LEFT.lic_begin_date = RIGHT.lic_begin_date	AND
+										// LEFT.record_type		= RIGHT.record_type,
+										// t_rollup(LEFT,RIGHT),LOCAL);
 									
-		recombined_provs	:= no_mo_lic + project(non_mo_apn, enclarity.Layouts.license_base) + roll_mo_lic;
+		// recombined_provs	:= no_mo_lic + project(non_mo_apn, enclarity.Layouts.license_base) + roll_mo_lic;
 		
-		dedup_recombined_provs	:= dedup(sort(distribute(recombined_provs, hash(group_key, lic_state, lic_num, lic_end_date, lic_status)),
-																	group_key, lic_state, lic_num, lic_end_date, lic_status, local), record, local):
-										persist('~thor_data400::base::enclarity::modified_license_persist_for_keys::' + filedate);
+		// dedup_recombined_provs	:= dedup(sort(distribute(recombined_provs, hash(group_key, lic_state, lic_num, lic_end_date, lic_status)),
+																	// group_key, lic_state, lic_num, lic_end_date, lic_status, local), record, local):
+										// persist('~thor_data400::base::enclarity::modified_license_persist_for_keys::' + filedate);
 										
-		RETURN dedup_recombined_provs;
-	END;
+		// RETURN dedup_recombined_provs;
+	// END;
 	
 	EXPORT Taxonomy_Base := FUNCTION
 		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).taxonomy_base.built, Enclarity.layouts.taxonomy_base);

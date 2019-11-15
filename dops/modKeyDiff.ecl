@@ -150,7 +150,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 	export fHoldPreviousLogical(dataset(rListToProcess) dListToProcess) := function
 		dStatus := fGetFileStatus(dListToProcess);
 		return sequential
-							(output(choosen(dStatus,1000),named('keydiff_records'))
+							(output(choosen(dStatus,1000))
 									,nothor(apply(global(dStatus(iskeydiff),few)
 														,sequential
 															(
@@ -268,7 +268,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 		return if (~regexfind('hthor', STD.System.Job.Target())
 						,sequential
 								(
-									output(choosen(dStatus,1000),named('keypatch_records'))
+									output(choosen(dStatus,1000))
 									,apply(dStatus(iskeypatch)
 										,fKeyPatch(attributename
 															,superfile

@@ -17,5 +17,5 @@ EXPORT _Constants := module
 	export FCRA_DAILY_BASE_EVENTNAME			:= 'BLD_FCRA_HIST_DAILY_PROCESS_EVENT';
 	export FCRA_DAILY_BLD_SCHEDULERNAME   := 'BLD_FCRA_HIST_DAILY_PROCESS';
 	export FCRA_PPC                       := ['165','216'];
-	
+	export FCRA_PPC_EXCLUDE               := ['420','426'];
 END;
