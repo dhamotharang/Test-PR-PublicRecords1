@@ -11,5 +11,6 @@
 	
 	
 	export dsProcessing := DATASET($.Superfile_list.sfProcessing, $.Layout_Base2, thor);
+	export dsProcessed := DATASET($.Superfile_list.sfProcessed, $.Layout_Base2, thor);
 
 END;

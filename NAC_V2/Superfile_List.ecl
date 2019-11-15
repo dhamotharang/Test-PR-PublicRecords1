@@ -1,4 +1,4 @@
-﻿import data_services;
+﻿import data_services, STD;
 EXPORT Superfile_List := module
 
 	export in_old    := '~nac::in::consortium_old_layout';
@@ -32,8 +32,38 @@ EXPORT Superfile_List := module
 */
 	export sfReady := '~nac::out::ready';			// New Base2 file prepped for ingest
 	export sfProcessing := '~nac::out::processing';			// New Base2 file being processed for ingest
-	export sfProcesed := '~nac::out::processed';			// New Base2 file archived after ingest
+	export sfProcessed := '~nac::out::processed';			// New Base2 file archived after ingest
 	
-	//export 
+	export Promote(string sf, string filename) := FUNCTION
+			sfList := [
+			sf,
+			sf+'::father',
+			sf+'::grandfather'
+			];
 	
+		return 	Std.file.fPromoteSuperFileList(sfList, filename, deltail := true);
+	END;
+	
+	export Demote(string sf) := FUNCTION
+			sfList := [
+			sf,
+			sf+'::father',
+			sf+'::grandfather'
+			];
+	
+		return 	Std.file.fPromoteSuperFileList(sfList, reverse := true);
+	END;
+	
+	export MoveReadyToProcessing :=
+				Std.file.PromoteSuperFileList([sfReady, sfProcessing]);
+				
+	export MoveProcessingToProcessed :=
+				Std.file.PromoteSuperFileList(
+						[sfProcessing, 
+							sfProcessed,
+							sfProcessed + '_father',
+							sfProcessed + '_grandfather'
+						], deltail := true);
+
+
 end;
