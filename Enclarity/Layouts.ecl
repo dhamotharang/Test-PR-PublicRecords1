@@ -1,4 +1,4 @@
-IMPORT Address, BIPV2, AID;
+﻿IMPORT Address, BIPV2, AID;
 
 export layouts:= Module
 	export Collapse_input := record
@@ -451,6 +451,13 @@ export layouts:= Module
 			src_and_date;
 			UNSIGNED6 did;
 			UNSIGNED1	did_score :=0;
+			INTEGER2	xadl2_weight 				:= 0;
+			UNSIGNED2	xadl2_score	 				:= 0;
+			INTEGER1	xadl2_distance			:= 0;
+			UNSIGNED4	xadl2_keys_used			:= 0;
+			STRING		xadl2_keys_desc			:= '';
+			STRING60	xadl2_matches				:= '';
+			STRING		xadl2_matches_desc	:= '';			
 			UNSIGNED6 bdid;
 			UNSIGNED1 bdid_score := 0;	
 			STRING100	prepped_name;
@@ -469,6 +476,8 @@ export layouts:= Module
 			string9		clean_ssn;
 			string9		best_ssn;
 			BIPV2.IDlayouts.l_xlink_ids;
+			unsigned4 								global_sid					:= 24201; // Source ID for Enclarity - CCPA project 20190612 
+			unsigned8 								record_sid; 
 		end;
 		
 	export license_base	:= RECORD
@@ -637,6 +646,13 @@ export layouts:= Module
 			src_and_date;
 			UNSIGNED6 did	:= 0;
 			UNSIGNED2 did_score		:= 0;
+			INTEGER2	xadl2_weight 				:= 0;
+			UNSIGNED2	xadl2_score	 				:= 0;
+			INTEGER1	xadl2_distance			:= 0;
+			UNSIGNED4	xadl2_keys_used			:= 0;
+			STRING		xadl2_keys_desc			:= '';
+			STRING60	xadl2_matches				:= '';
+			STRING		xadl2_matches_desc	:= '';			
 			UNSIGNED6 bdid :=0;
 			UNSIGNED1 bdid_score := 0;	
 			clean_name;
@@ -691,10 +707,20 @@ export layouts:= Module
 			Sanction_input.sanc1_rein_date;
 
 			BIPV2.IDlayouts.l_xlink_ids;
+			unsigned4 								global_sid					:= 24201; // Source ID for Enclarity - CCPA project 20190612 
+			unsigned8 								record_sid; 
 	END;
-
+	
+	EXPORT individual_exception_base := record
+			string38        group_key;
+			License_input.lic_state	;
+			License_input.lic_num_in;
+			License_input.lic_num;
+	END;
+			
 	EXPORT autokey_common	:= RECORD
-			individual_base;
+			individual_base - 
+				[xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];
 			facility_input.dept_group_key;
 			facility_input.prac_company_name;
 			facility_input.pv_addr_ind;
