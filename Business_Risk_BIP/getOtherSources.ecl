@@ -1,9 +1,10 @@
-﻿IMPORT AutoKey, BBB2, BIPV2, Business_Risk, Business_Risk_BIP, CalBus, Data_Services, Doxie, FBNv2, GovData, IRS5500, MDR, PAW, Phones, Phonesplus_v2, Risk_Indicators, UT, UtilFile, YellowPages;
+﻿IMPORT AutoKey, BBB2, BIPV2, Business_Risk, Business_Risk_BIP, CalBus, Data_Services, Doxie, FBNv2, GovData, IRS5500, MDR, PAW, Phones, Phonesplus_v2, Risk_Indicators, UT, UtilFile, YellowPages, STD;
 
 EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	// ---------------- Better Business Bureau ------------------ 
 	BBBMemberRaw := BBB2.Key_BBB_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
@@ -87,7 +88,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 	
 	// ---------------- Ficticious Business Name ---------------------
-	FBNRaw := FBNv2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
+	FBNRaw := FBNv2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
@@ -138,7 +139,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (StringLib.StringFilter((STRING)SIC_Code, '0123456789'))[1..4],
+			 STRING10 SICCode := (STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..4],
 			 BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)SIC_Code)[1..4]
@@ -198,7 +199,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
                                         // For v30 and up, need to differentiate between 0 and '' for FirmReportedSales. Set missing records to -1.                          
 																				SELF.FirmReportedSales := IF(RIGHT.Income_Amount = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, 
                                                                   (INTEGER)RIGHT.Income_Amount);
-																				SELF.FirmReportedEarnings :=  (INTEGER)(StringLib.StringFilter(RIGHT.Negative_Rev_Amount, '-') + (STRING)RIGHT.Form_990_Revenue_Amount);
+																				SELF.FirmReportedEarnings :=  (INTEGER)(STD.Str.Filter(RIGHT.Negative_Rev_Amount, '-') + (STRING)RIGHT.Form_990_Revenue_Amount);
 																				SELF.RecordCount := LEFT.RecordCount;
 																				SELF := []), left outer);
 																				
@@ -422,10 +423,10 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		fnameMatchRev := fname1InputPopulated AND le.Clean_Input.Rep_FirstName[1] = ri.LName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.FNameScore(ri.LName, le.Clean_Input.Rep_FirstName));
 		lnameMatchRev := lname1InputPopulated AND le.Clean_Input.Rep_LastName[1] = ri.FName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.LNameScore(ri.FName, le.Clean_Input.Rep_LastName));
 		
-		fnameOrigFnameMatch := fname1InputPopulated AND StringLib.StringFind(ri.Orig_FName, le.Clean_Input.Rep_FirstName, 1) > 0;
-		fnameOrigLnameMatch := fname1InputPopulated AND StringLib.StringFind(ri.Orig_LName, le.Clean_Input.Rep_FirstName, 1) > 0;
-		lnameOrigFnameMatch := lname1InputPopulated AND StringLib.StringFind(ri.Orig_FName, le.Clean_Input.Rep_LastName, 1) > 0;
-		lnameOrigLnamematch := lname1InputPopulated AND StringLib.StringFind(ri.Orig_LName, le.Clean_Input.Rep_LastName, 1) > 0;
+		fnameOrigFnameMatch := fname1InputPopulated AND STD.Str.Find(ri.Orig_FName, le.Clean_Input.Rep_FirstName, 1) > 0;
+		fnameOrigLnameMatch := fname1InputPopulated AND STD.Str.Find(ri.Orig_LName, le.Clean_Input.Rep_FirstName, 1) > 0;
+		lnameOrigFnameMatch := lname1InputPopulated AND STD.Str.Find(ri.Orig_FName, le.Clean_Input.Rep_LastName, 1) > 0;
+		lnameOrigLnamematch := lname1InputPopulated AND STD.Str.Find(ri.Orig_LName, le.Clean_Input.Rep_LastName, 1) > 0;
 		
 		fname2InputPopulated := TRIM(le.Clean_Input.Rep2_FirstName) <> '';
 		lname2InputPopulated := TRIM(le.Clean_Input.Rep2_LastName) <> '';
@@ -434,10 +435,10 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		fnameMatchRev2 := fname2InputPopulated AND le.Clean_Input.Rep2_FirstName[1] = ri.LName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.FNameScore(ri.LName, le.Clean_Input.Rep2_FirstName));
 		lnameMatchRev2 := lname2InputPopulated AND le.Clean_Input.Rep2_LastName[1] = ri.FName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.LNameScore(ri.FName, le.Clean_Input.Rep2_LastName));
 		
-		fnameOrigFnameMatch2 := fname2InputPopulated AND StringLib.StringFind(ri.Orig_FName, le.Clean_Input.Rep2_FirstName, 1) > 0;
-		fnameOrigLnameMatch2 := fname2InputPopulated AND StringLib.StringFind(ri.Orig_LName, le.Clean_Input.Rep2_FirstName, 1) > 0;
-		lnameOrigFnameMatch2 := lname2InputPopulated AND StringLib.StringFind(ri.Orig_FName, le.Clean_Input.Rep2_LastName, 1) > 0;
-		lnameOrigLnamematch2 := lname2InputPopulated AND StringLib.StringFind(ri.Orig_LName, le.Clean_Input.Rep2_LastName, 1) > 0;
+		fnameOrigFnameMatch2 := fname2InputPopulated AND STD.Str.Find(ri.Orig_FName, le.Clean_Input.Rep2_FirstName, 1) > 0;
+		fnameOrigLnameMatch2 := fname2InputPopulated AND STD.Str.Find(ri.Orig_LName, le.Clean_Input.Rep2_FirstName, 1) > 0;
+		lnameOrigFnameMatch2 := lname2InputPopulated AND STD.Str.Find(ri.Orig_FName, le.Clean_Input.Rep2_LastName, 1) > 0;
+		lnameOrigLnamematch2 := lname2InputPopulated AND STD.Str.Find(ri.Orig_LName, le.Clean_Input.Rep2_LastName, 1) > 0;
 		
 		fname3InputPopulated := TRIM(le.Clean_Input.Rep3_FirstName) <> '';
 		lname3InputPopulated := TRIM(le.Clean_Input.Rep3_LastName) <> '';
@@ -446,10 +447,10 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		fnameMatchRev3 := fname3InputPopulated AND le.Clean_Input.Rep3_FirstName[1] = ri.LName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.FNameScore(ri.LName, le.Clean_Input.Rep3_FirstName));
 		lnameMatchRev3 := lname3InputPopulated AND le.Clean_Input.Rep3_LastName[1] = ri.FName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.LNameScore(ri.FName, le.Clean_Input.Rep3_LastName));
 		
-		fnameOrigFnameMatch3 := fname3InputPopulated AND StringLib.StringFind(ri.Orig_FName, le.Clean_Input.Rep3_FirstName, 1) > 0;
-		fnameOrigLnameMatch3 := fname3InputPopulated AND StringLib.StringFind(ri.Orig_LName, le.Clean_Input.Rep3_FirstName, 1) > 0;
-		lnameOrigFnameMatch3 := lname3InputPopulated AND StringLib.StringFind(ri.Orig_FName, le.Clean_Input.Rep3_LastName, 1) > 0;
-		lnameOrigLnamematch3 := lname3InputPopulated AND StringLib.StringFind(ri.Orig_LName, le.Clean_Input.Rep3_LastName, 1) > 0;
+		fnameOrigFnameMatch3 := fname3InputPopulated AND STD.Str.Find(ri.Orig_FName, le.Clean_Input.Rep3_FirstName, 1) > 0;
+		fnameOrigLnameMatch3 := fname3InputPopulated AND STD.Str.Find(ri.Orig_LName, le.Clean_Input.Rep3_FirstName, 1) > 0;
+		lnameOrigFnameMatch3 := lname3InputPopulated AND STD.Str.Find(ri.Orig_FName, le.Clean_Input.Rep3_LastName, 1) > 0;
+		lnameOrigLnamematch3 := lname3InputPopulated AND STD.Str.Find(ri.Orig_LName, le.Clean_Input.Rep3_LastName, 1) > 0;
 		
 		fname4InputPopulated := TRIM(le.Clean_Input.Rep4_FirstName) <> '';
 		lname4InputPopulated := TRIM(le.Clean_Input.Rep4_LastName) <> '';
@@ -458,10 +459,10 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		fnameMatchRev4 := fname4InputPopulated AND le.Clean_Input.Rep4_FirstName[1] = ri.LName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.FNameScore(ri.LName, le.Clean_Input.Rep4_FirstName));
 		lnameMatchRev4 := lname4InputPopulated AND le.Clean_Input.Rep4_LastName[1] = ri.FName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.LNameScore(ri.FName, le.Clean_Input.Rep4_LastName));
 		
-		fnameOrigFnameMatch4 := fname4InputPopulated AND StringLib.StringFind(ri.Orig_FName, le.Clean_Input.Rep4_FirstName, 1) > 0;
-		fnameOrigLnameMatch4 := fname4InputPopulated AND StringLib.StringFind(ri.Orig_LName, le.Clean_Input.Rep4_FirstName, 1) > 0;
-		lnameOrigFnameMatch4 := lname4InputPopulated AND StringLib.StringFind(ri.Orig_FName, le.Clean_Input.Rep4_LastName, 1) > 0;
-		lnameOrigLnamematch4 := lname4InputPopulated AND StringLib.StringFind(ri.Orig_LName, le.Clean_Input.Rep4_LastName, 1) > 0;
+		fnameOrigFnameMatch4 := fname4InputPopulated AND STD.Str.Find(ri.Orig_FName, le.Clean_Input.Rep4_FirstName, 1) > 0;
+		fnameOrigLnameMatch4 := fname4InputPopulated AND STD.Str.Find(ri.Orig_LName, le.Clean_Input.Rep4_FirstName, 1) > 0;
+		lnameOrigFnameMatch4 := lname4InputPopulated AND STD.Str.Find(ri.Orig_FName, le.Clean_Input.Rep4_LastName, 1) > 0;
+		lnameOrigLnamematch4 := lname4InputPopulated AND STD.Str.Find(ri.Orig_LName, le.Clean_Input.Rep4_LastName, 1) > 0;
 		
 		fname5InputPopulated := TRIM(le.Clean_Input.Rep5_FirstName) <> '';
 		lname5InputPopulated := TRIM(le.Clean_Input.Rep5_LastName) <> '';
@@ -470,10 +471,10 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		fnameMatchRev5 := fname5InputPopulated AND le.Clean_Input.Rep5_FirstName[1] = ri.LName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.FNameScore(ri.LName, le.Clean_Input.Rep5_FirstName));
 		lnameMatchRev5 := lname5InputPopulated AND le.Clean_Input.Rep5_LastName[1] = ri.FName[1] AND Risk_Indicators.iid_constants.g(Risk_Indicators.LNameScore(ri.FName, le.Clean_Input.Rep5_LastName));
 		
-		fnameOrigFnameMatch5 := fname5InputPopulated AND StringLib.StringFind(ri.Orig_FName, le.Clean_Input.Rep5_FirstName, 1) > 0;
-		fnameOrigLnameMatch5 := fname5InputPopulated AND StringLib.StringFind(ri.Orig_LName, le.Clean_Input.Rep5_FirstName, 1) > 0;
-		lnameOrigFnameMatch5 := lname5InputPopulated AND StringLib.StringFind(ri.Orig_FName, le.Clean_Input.Rep5_LastName, 1) > 0;
-		lnameOrigLnamematch5 := lname5InputPopulated AND StringLib.StringFind(ri.Orig_LName, le.Clean_Input.Rep5_LastName, 1) > 0;
+		fnameOrigFnameMatch5 := fname5InputPopulated AND STD.Str.Find(ri.Orig_FName, le.Clean_Input.Rep5_FirstName, 1) > 0;
+		fnameOrigLnameMatch5 := fname5InputPopulated AND STD.Str.Find(ri.Orig_LName, le.Clean_Input.Rep5_FirstName, 1) > 0;
+		lnameOrigFnameMatch5 := lname5InputPopulated AND STD.Str.Find(ri.Orig_FName, le.Clean_Input.Rep5_LastName, 1) > 0;
+		lnameOrigLnamematch5 := lname5InputPopulated AND STD.Str.Find(ri.Orig_LName, le.Clean_Input.Rep5_LastName, 1) > 0;
 		
 		nameMatch1 := fnameMatch OR lnameMatch OR fnameMatchRev OR lnameMatchRev OR 
 								 fnameOrigFnameMatch OR fnameOrigLnameMatch OR lnameOrigFnameMatch OR lnameOrigLnamematch;
@@ -708,7 +709,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 NAICCode := (StringLib.StringFilter((STRING)NAICs_Code, '0123456789'))[1..6],
+			 STRING10 NAICCode := (STD.Str.Filter((STRING)NAICs_Code, '0123456789'))[1..6],
 			 BOOLEAN IsPrimary := TRUE // There is only 1 NAIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)NAICs_Code)[1..6]
@@ -779,7 +780,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(pub_date, HistoryDate),
 			 STRING6 DateLastSeen := (STRING)'0', // This dataset doesn't contain a last seen date
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 NAICCode := (StringLib.StringFilter((STRING)NAICs_Code, '0123456789'))[1..6],
+			 STRING10 NAICCode := (STD.Str.Filter((STRING)NAICs_Code, '0123456789'))[1..6],
 			 BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)NAICs_Code)[1..6]
@@ -806,7 +807,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(pub_date, HistoryDate),
 			 STRING6 DateLastSeen := (STRING)'0', // This dataset doesn't contain a last seen date
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (StringLib.StringFilter((STRING)SIC_Code, '0123456789'))[1..4],
+			 STRING10 SICCode := (STD.Str.Filter((STRING)SIC_Code, '0123456789'))[1..4],
 			 BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)SIC_Code)[1..4]
@@ -853,7 +854,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 																	
 	// ---------------- PAW ---------------------
-	PAWRaw := PAW.Key_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),,
+	PAWRaw := PAW.Key_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, 
 																							Business_Risk_BIP.Constants.Limit_Default,

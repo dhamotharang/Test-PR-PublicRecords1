@@ -3,7 +3,7 @@ IMPORT MDR;
 EXPORT Constants :=
 MODULE
 	EXPORT UNSIGNED  MAX_RECORDS := 10000;
-	EXPORT UNSIGNED  STRING_MATCH_THRESHOLD := 2; 
+	EXPORT UNSIGNED  STRING_MATCH_THRESHOLD := 2;
 	export unsigned8 	MaxResults 						:= 2000;
 	export unsigned2	PenaltThreshold 			:= 10;
   // PhonesPlusV2 special text to indicate "Insurance Verified and moved from below to above the line".
@@ -142,12 +142,12 @@ MODULE
 		EXPORT ActUpperTh		:= 365;
 		EXPORT LastActivityThreshold:= 30;
 
-	END;	
+	END;
 
 	EXPORT GatewayValues :=
 	MODULE
-		 EXPORT STRING AccuDataLNP  := 'LNP'; // local number poratability data - AccuData gateway transaction type
-	  	EXPORT STRING AccuDataCNAM := 'CNM2'; // Retrieve Calling Name for phone number
+		EXPORT STRING AccuDataLNP  := 'LNP'; // local number poratability data - AccuData gateway transaction type
+	  EXPORT STRING AccuDataCNAM := 'CNM2'; // Retrieve Calling Name for phone number
 		EXPORT UNSIGNED1 SQLSelectLimit			 	 := 100;  // Limit SQL select for each phone
 		EXPORT UNSIGNED1 requestTimeout			 	 := 5;
 		EXPORT UNSIGNED1 requestRetries			 	 := 0;
@@ -158,6 +158,7 @@ MODULE
 		EXPORT STRING 	 ClientIDPrefix				 := 'LEXISNEXIS_';
 		EXPORT UNSIGNED1 MaxZumigoRequest			 := 15;
 		EXPORT STRING 	 TimeoutMessage 			 := 'timeout expired';
+    EXPORT UNSIGNED1 ThreatMetrixNumThreads := 10;
 	END;
 	// Zumigo Input Values
 	EXPORT ZumigoInputOptions :=
@@ -166,7 +167,7 @@ MODULE
 		EXPORT OptInMethod := ['TCO','MA','TCP','IVR','SMS','TCPA','ONE','OTHER'];
 		EXPORT TCPA_OptInMethod := 'TCPA';
 		EXPORT OptInDuration := ['ONE','ONG'];
-		EXPORT ONE_OptInDuration := 'ONE'; 
+		EXPORT ONE_OptInDuration := 'ONE';
 	END;
 
 	EXPORT UNSIGNED1 Zumigo_NameAddr_Validation_Threshold_MIN :=80;
@@ -188,7 +189,7 @@ MODULE
 	//Phone Ownership (Phone Attributes) and Phone Finder
 	EXPORT Sources :=
 	MODULE
-		EXPORT LERG6		        :=  MDR.sourceTools.src_Phones_Lerg6; 
+		EXPORT LERG6		        :=  MDR.sourceTools.src_Phones_Lerg6;
 		EXPORT ATT_LIDB_SRC			:= MDR.sourceTools.src_Phones_LIDB;
 		export set_VERIFICATION		:= [LERG6, ATT_LIDB_SRC];
 		EXPORT ICONECTIV_SRC		:= MDR.sourceTools.src_PhonesPorted_iConectiv;
@@ -200,9 +201,9 @@ MODULE
 
 	END;
 	EXPORT TransactionCodes :=
-	MODULE	
+	MODULE
 		EXPORT REACTIVATED			:= 'RE';
-		EXPORT PORT_DELETE			:=  'PD'; 
+		EXPORT PORT_DELETE			:=  'PD';
 		EXPORT PORT_ADD 			:= 'PA';
 		EXPORT ACTIVE_STATUS		:= 'AS';
 		EXPORT SWAP_ACTIVATION 		:= 'SA';

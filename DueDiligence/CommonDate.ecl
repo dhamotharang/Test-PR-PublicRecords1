@@ -3,6 +3,14 @@
 EXPORT CommonDate := MODULE
 
 
+    EXPORT GetAreDatesWithinNumYears(UNSIGNED4 dateToCheck, UNSIGNED4 dateToCheckAgainst, UNSIGNED1 numberOfYears) := FUNCTION
+    
+        daysBetween := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)dateToCheck, (STRING)dateToCheckAgainst);
+        daysWithinNumYrs := dateToCheck <> 0 AND dateToCheckAgainst <> 0 AND daysBetween <= ut.DaysInNYears(numberOfYears);
+        
+        RETURN daysWithinNumYrs;
+    END;
+    
     EXPORT fn_filterOnArchiveDate(INTEGER fieldDate, INTEGER archiveDate) := FUNCTION
       
       isEarlierThanArchiveDate := fieldDate <= archiveDate;

@@ -1,10 +1,10 @@
 ﻿Import doxie, drivers, header, mdr, Risk_Indicators, riskwise, header_quick, ut, STD, Suppress, data_services;
+IMPORT drivers, DueDiligence, dx_header, header, header_quick, MDR, Risk_Indicators, ut;
 
 /*
 	Following Keys being used:
-			doxie.Key_Header
+			dx_header.key_header
 			header_quick.key_DID
-			VotersV2.Key_Voters_States
 */
 
 EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
@@ -12,13 +12,12 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                     UNSIGNED1 dppa,
                     UNSIGNED1 glba,
                     BOOLEAN isFCRA,
+                    INTEGER bsVersion,
                     BOOLEAN includeReport = FALSE,
-                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
-                    ) := FUNCTION
+                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
-	data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
-											
-    BOOLEAN isUtility := FALSE;
+    data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+                        
 
     glb_ok := Risk_Indicators.iid_constants.glb_ok(glba, isFCRA);
     dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
@@ -31,10 +30,9 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
         results_unsuppressed := JOIN(allInd, key, 
                         KEYED(LEFT.individual.did = RIGHT.didField) AND
                         RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(dataRestrictionMask, isFCRA) AND 
-                        (~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
                         (header.isPreGLB(RIGHT) OR glb_ok) AND 
                         (~mdr.Source_is_DPPA(RIGHT.src) OR (dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src), dppa, RIGHT.src))) AND 
-                        ~Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st), 
+                        ~Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st, bsVersion), 
                         TRANSFORM({unsigned4 global_sid, DueDiligence.LayoutsInternal.IndSlimHeader}, 
                                   SELF.global_sid := RIGHT.global_sid;
                                   SELF.seq := LEFT.seq;
@@ -62,12 +60,13 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
         
         RETURN results;		
     ENDMACRO;
-    
-    keyHeader := getHeaderData(doxie.Key_Header, s_did, ut.limits.HEADER_PER_DID, DueDiligence.Constants.MAX_ATMOST_150);	
 
-    quickHeader := getHeaderData(header_quick.key_DID, did, RiskWise.max_atmost, DueDiligence.Constants.MAX_ATMOST_100);
-    
-    realHeader :=  quickHeader + keyHeader;
+
+    keyHeader := getHeaderData(dx_header.key_header(0), s_did, ut.limits.HEADER_PER_DID, DueDiligence.Constants.MAX_ATMOST_150);									
+    quickHeader := getHeaderData(header_quick.key_DID, did, DueDiligence.Constants.MAX_ATMOST_1000, DueDiligence.Constants.MAX_ATMOST_100);
+                        
+    headerAll :=  quickHeader + keyHeader;
+    realHeader := IF(dataRestrictionMask[Risk_Indicators.iid_constants.posEquifaxRestriction] = Risk_Indicators.iid_constants.sTrue, headerAll(src NOT IN [MDR.sourceTools.src_Equifax, MDR.sourcetools.src_Equifax_Quick, MDR.sourcetools.src_Equifax_Weekly]), headerAll);
 
     headerCleanDates := DueDiligence.Common.CleanDatasetDateFields(realHeader, 'dateFirstSeen, dateLastSeen');
 
@@ -95,33 +94,34 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                
     addVoterInfo := DueDiligence.getIndVoterData(addDateFirstReported, filterHeader);
 
-		
+    addMobilityInfo := DueDiligence.getIndMobility(addVoterInfo, inquiredHeaderData, isFCRA, bsVersion);
 
-																																					
-		
-
+                                                                          
 
 
-		// output(parents, named('parents'));
-		// output(allInd, named('allInd'));
-    
-		// output(keyHeader, named('keyHeader'));
-		// output(quickHeader, named('quickHeader'));
-		// output(allInd, named('allInd_header'));
-		// output(realHeader, named('realHeader'));
-		
-		// output(headerCleanDates, named('headerCleanDates'));
-		// output(filterHeader, named('filterHeader'));
-		// output(inquiredHeaderData, named('inquiredHeaderData'));
-		
-		// output(sortHeaderDateFirstSeen, named('sortHeaderDateFirstSeen'));
-		// output(dedupHeaderDateFirstSeen, named('dedupHeaderDateFirstSeen'));
-		// output(addDateFirstReported, named('addDateFirstReported'));
-    
-		// output(addVoterInfo, named('addVoterInfo'));
-	
-		
 
 
-		RETURN addVoterInfo;
+    // output(parents, named('parents'));
+    // output(allInd, named('allInd'));
+
+    // output(keyHeader, named('keyHeader'));
+    // output(quickHeader, named('quickHeader'));
+    // output(allInd, named('allInd_header'));
+    // output(realHeader, named('realHeader'));
+
+    // output(headerCleanDates, named('headerCleanDates'));
+    // output(filterHeader, named('filterHeader'));
+    // output(inquiredHeaderData, named('inquiredHeaderData'));
+
+    // output(sortHeaderDateFirstSeen, named('sortHeaderDateFirstSeen'));
+    // output(dedupHeaderDateFirstSeen, named('dedupHeaderDateFirstSeen'));
+    // output(addDateFirstReported, named('addDateFirstReported'));
+
+    // output(addVoterInfo, named('addVoterInfo'));
+    // output(addMobilityInfo, named('addMobilityInfo'));
+
+
+
+
+    RETURN addMobilityInfo;
 END;

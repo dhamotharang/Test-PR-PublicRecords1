@@ -462,7 +462,19 @@ out_roll3 := IF(dcp_value>=4,out_roll2,out_roll);
 //collected, or those that have not been matched by DID, HHID, Name, or Address. NOTE! Doing this will append
 //a lot of records of people working at a perticular business who share the same phone number.
 
-outReady := JOIN(out_roll3, gong.Key_History_phone, LENGTH(TRIM(LEFT.phone)) = 10 and LEFT.phone[4..10] = RIGHT.p7
+// Filter the key since the backOne transform is somewhat complex in how it uses key data.
+phone_hist_key_filtered := JOIN(out_roll3, gong.Key_History_phone,
+  LENGTH(TRIM(LEFT.phone)) = 10 and
+  LEFT.phone[4..10] = RIGHT.p7 and
+  LEFT.phone[1..3] = RIGHT.p3 and
+  RIGHT.current_flag,
+  TRANSFORM(RIGHT),
+  ATMOST(LENGTH(TRIM(LEFT.phone)) = 10 and LEFT.phone[4..10] = RIGHT.p7
+    and LEFT.phone[1..3] = RIGHT.p3, 1000));
+
+phone_hist_key_optout := Suppress.MAC_SuppressSource(phone_hist_key_filtered, mod_access);
+
+outReady := JOIN(out_roll3, phone_hist_key_optout, LENGTH(TRIM(LEFT.phone)) = 10 and LEFT.phone[4..10] = RIGHT.p7
   and LEFT.phone[1..3] = RIGHT.p3 and RIGHT.current_flag,
   backOne(LEFT,RIGHT), left outer,
   ATMOST(LENGTH(TRIM(LEFT.phone)) = 10 and LEFT.phone[4..10] = RIGHT.p7

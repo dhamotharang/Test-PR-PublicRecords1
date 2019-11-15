@@ -1,4 +1,4 @@
-export mac_get_ppl_by_phone(f_in, 
+export mac_get_ppl_by_phone(f_in,
                             f_out,
 					                  glb_purpose = 0,
 													  dppa_purpose = 0,
@@ -6,7 +6,7 @@ export mac_get_ppl_by_phone(f_in,
 														min_confidencescore = 11,
 														data_restriction_mask='') := macro
 
-import Data_Services, doxie, ut, doxie_files, autokey, cellphone, drivers, Phones, phonesplus, phonesplus_batch,Phonesplus_v2, MDR;
+import Data_Services, doxie, ut, doxie_files, autokey, header, cellphone, drivers, Phones, phonesplus, phonesplus_batch,Phonesplus_v2, MDR;
 
 #uniquename(key_fdid)
 #uniquename(key_auto_phone)
@@ -30,23 +30,23 @@ phonesplus_batch.layout_phonesplus_reverse_fdid %get_ppl_fdids%(f_in l, %key_aut
 		self.fdid := r.did;
 		self := l;
 end;
-	
-#uniquename(f_ppl_fdids)	
+
+#uniquename(f_ppl_fdids)
 %f_ppl_fdids% := join(f_in((unsigned)phoneno>0), %key_auto_phone%,
-	                    keyed(left.phoneno[4..10] = right.p7) and 
+	                    keyed(left.phoneno[4..10] = right.p7) and
 							 			  keyed(left.phoneno[1..3] = right.p3),
 										  %get_ppl_fdids%(left, right), LIMIT(ut.limits.PHONE_PER_PERSON,SKIP));
 
-#uniquename(get_by_fdid)							    
+#uniquename(get_by_fdid)
 %prec% %get_by_fdid%(%f_ppl_fdids% l, %key_fdid% r) := transform
   self.seq := l.seq;
 	self.acctno := l.acctno;
-	self.glb_dppa_flag := IF (Phones.Functions.IsPhoneRestricted(r.origstate, 
-																															 glb_purpose, 
-																															 dppa_purpose, 
-																															 industry_class_value, 
-																															 , 
-																															 r.datefirstseen, 
+	self.glb_dppa_flag := IF (Phones.Functions.IsPhoneRestricted(r.origstate,
+																															 glb_purpose,
+																															 dppa_purpose,
+																															 industry_class_value,
+																															 ,
+																															 r.datefirstseen,
 																															 r.dt_nonglb_last_seen,
 																															 r.rules,
 																															 r.src_all,
@@ -60,23 +60,23 @@ end;
 %f_by_fdid% := join(%f_ppl_fdids%, %key_fdid%,
                     keyed(left.fdid=right.fdid),
 				            %get_by_fdid%(left, right), LIMIT(ut.limits.PHONE_PER_PERSON,SKIP));
-										
-#uniquename(f_by_fdid_post_filter)	
-Header.MAC_Filter_Sources(%f_by_fdid%,%f_by_fdid_post_filter%,src,data_restriction_mask);										
-	       
-#uniquename(cell_recs)				 				 
+
+#uniquename(f_by_fdid_post_filter)
+Header.MAC_Filter_Sources(%f_by_fdid%,%f_by_fdid_post_filter%,src,data_restriction_mask);
+
+#uniquename(cell_recs)
 %cell_recs% := dedup(sort((%f_by_fdid_post_filter%), record), record)(confidencescore >= min_confidencescore);
 
 #uniquename(get_cell_slim)
 phonesplus_batch.layout_phonesplus_reverse_common %get_cell_slim%(%cell_recs% l) := transform
-     
+
 	dls_value := if(l.datelastseen=0, l.datevendorlastreported, l.datelastseen);
-	
+
   self.vendor_id := l.vendor;
   self.src := if(l.vendor='GH', 'PH', l.src);
 	self.tnt := if(l.vendor='GH', 'H', '');
 	self.phone := l.cellphone;
-	self.listing_type_res := if(trim(l.ListingType, left, right) in ['R','BR','RS'],'R','');	
+	self.listing_type_res := if(trim(l.ListingType, left, right) in ['R','BR','RS'],'R','');
   self.listing_type_bus := if(trim(l.ListingType, left, right) in ['B','BG','BR'],'B','');
   self.listing_type_gov := if(trim(l.ListingType, left, right) in ['G','BG'],'G','');
 	self.dt_last_seen := ut.date6_to_date8(dls_value);

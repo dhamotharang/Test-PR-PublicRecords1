@@ -11,6 +11,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
     EXPORT DataRestrictionMask := Options.DataRestrictionMask;
     EXPORT DataPermissionMask := Options.DataPermissionMask;
     EXPORT industry_class := Options.IndustryClass;
+	EXPORT unsigned1 lexid_source_optout := Options.bus_LexIdSourceOptout;
+	EXPORT string transaction_id := Options.bus_TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := Options.bus_GlobalCompanyId; // mbs gcid
   END;
 
 	RESTRICTED_SET := ['0', ''];
@@ -59,7 +62,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 					Business_Risk_BIP.Constants.AllowedSources(
 							(
 								Source <> MDR.SourceTools.src_Dunn_Bradstreet OR
-								StringLib.StringFind(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0
+								STD.Str.Find(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0
 							) AND
 							(
 								Options.MarketingMode = Business_Risk_BIP.Constants.Default_MarketingMode OR
@@ -104,7 +107,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		cleanedCompanyAddress := Address.CleanFields(companyCleanAddr);
 		SELF.Clean_Input.StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Predir, cleanedCompanyAddress.Prim_Name,
 																											cleanedCompanyAddress.Addr_Suffix, cleanedCompanyAddress.Postdir, cleanedCompanyAddress.Unit_Desig, cleanedCompanyAddress.Sec_Range);
-		SELF.Clean_Input.StreetAddress2 := TRIM(StringLib.StringToUppercase(le.StreetAddress2));
+		SELF.Clean_Input.StreetAddress2 := TRIM(STD.Str.ToUppercase(le.StreetAddress2));
 		SELF.Clean_Input.Prim_Range := cleanedCompanyAddress.Prim_Range;
 		SELF.Clean_Input.Predir := cleanedCompanyAddress.Predir;
 		SELF.Clean_Input.Prim_Name := cleanedCompanyAddress.Prim_Name;
@@ -124,36 +127,36 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.County := companyCleanAddr[143..145];  // Address.CleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
 		SELF.Clean_Input.Geo_Block := cleanedCompanyAddress.Geo_Blk;
 		// Company Other PII
-		filteredFEIN := StringLib.StringFilter(le.FEIN, '0123456789');
+		filteredFEIN := STD.Str.Filter(le.FEIN, '0123456789');
 		SELF.Clean_Input.FEIN := IF(LENGTH(filteredFEIN) != 9 OR (INTEGER)filteredFEIN <= 0, '', filteredFEIN); // Filter out FEIN's that aren't 9-Bytes, or are repeating 0's
 		BusPhone10 := RiskWise.CleanPhone(le.Phone10);
 		SELF.Clean_Input.Phone10 := BusPhone10;
-		SELF.Clean_Input.IPAddr := StringLib.StringFilter(le.IPAddr, '0123456789.');
+		SELF.Clean_Input.IPAddr := STD.Str.Filter(le.IPAddr, '0123456789.');
 		SELF.Clean_Input.CompanyURL := REGEXREPLACE('^WWW[. ]{0,1}',TRIM(REGEXREPLACE('[:/].*$',REGEXREPLACE('HTTP://',le.CompanyURL,'',NOCASE),''),LEFT,RIGHT),'',NOCASE);
-		SELF.Clean_Input.SIC := StringLib.StringFilter(le.SIC, '0123456789');
-		SELF.Clean_Input.NAIC := StringLib.StringFilter(le.NAIC, '0123456789');
+		SELF.Clean_Input.SIC := STD.Str.Filter(le.SIC, '0123456789');
+		SELF.Clean_Input.NAIC := STD.Str.Filter(le.NAIC, '0123456789');
 		// Authorized Representative Name Fields
 		cleanedName := Address.CleanPerson73(le.Rep_FullName);
 		cleanedRepName := Address.CleanNameFields(cleanedName);
 		BOOLEAN validCleaned := TRIM(le.Rep_FullName) <> '';
-		SELF.Clean_Input.Rep_FullName := StringLib.StringToUpperCase(le.Rep_FullName);
-		SELF.Clean_Input.Rep_NameTitle := TRIM(StringLib.StringToUppercase(IF(le.Rep_NameTitle = '' AND validCleaned,		cleanedRepName.Title, le.Rep_NameTitle)), LEFT, RIGHT);
-		RepFirstName := TRIM(StringLib.StringToUppercase(IF(le.Rep_FirstName = '' AND validCleaned,		cleanedRepName.FName, le.Rep_FirstName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep_FullName := STD.Str.ToUpperCase(le.Rep_FullName);
+		SELF.Clean_Input.Rep_NameTitle := TRIM(STD.Str.ToUppercase(IF(le.Rep_NameTitle = '' AND validCleaned,		cleanedRepName.Title, le.Rep_NameTitle)), LEFT, RIGHT);
+		RepFirstName := TRIM(STD.Str.ToUppercase(IF(le.Rep_FirstName = '' AND validCleaned,		cleanedRepName.FName, le.Rep_FirstName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep_FirstName := RepFirstName;
-		RepPreferredFirstName := StringLib.StringToUpperCase(NID.PreferredFirstNew(RepFirstName, TRUE /*UseNew*/));
+		RepPreferredFirstName := STD.Str.ToUpperCase(NID.PreferredFirstNew(RepFirstName, TRUE /*UseNew*/));
 		SELF.Clean_Input.Rep_PreferredFirstName := RepPreferredFirstName;
-		SELF.Clean_Input.Rep_MiddleName := TRIM(StringLib.StringToUppercase(IF(le.Rep_MiddleName = '' AND validCleaned,	cleanedRepName.MName, le.Rep_MiddleName)), LEFT, RIGHT);
-		RepLastName := TRIM(StringLib.StringToUppercase(IF(le.Rep_LastName = '' AND validCleaned,			cleanedRepName.LName, le.Rep_LastName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep_MiddleName := TRIM(STD.Str.ToUppercase(IF(le.Rep_MiddleName = '' AND validCleaned,	cleanedRepName.MName, le.Rep_MiddleName)), LEFT, RIGHT);
+		RepLastName := TRIM(STD.Str.ToUppercase(IF(le.Rep_LastName = '' AND validCleaned,			cleanedRepName.LName, le.Rep_LastName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep_LastName := RepLastName;
-		SELF.Clean_Input.Rep_NameSuffix := TRIM(StringLib.StringToUppercase(IF(le.Rep_NameSuffix = '' AND validCleaned,	cleanedRepName.Name_Suffix, le.Rep_NameSuffix)), LEFT, RIGHT);
-		SELF.Clean_Input.Rep_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep_FormerLastName), LEFT, RIGHT);
+		SELF.Clean_Input.Rep_NameSuffix := TRIM(STD.Str.ToUppercase(IF(le.Rep_NameSuffix = '' AND validCleaned,	cleanedRepName.Name_Suffix, le.Rep_NameSuffix)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep_FormerLastName := TRIM(STD.Str.ToUppercase(le.Rep_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative Address Fields
 		repAddress := Risk_Indicators.MOD_AddressClean.street_address(le.Rep_StreetAddress1 + ' ' + le.Rep_StreetAddress2, le.Rep_Prim_Range, le.Rep_Predir, le.Rep_Prim_Name, le.Rep_Addr_Suffix, le.Rep_Postdir, le.Rep_Unit_Desig, le.Rep_Sec_Range);
 		repCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(repAddress, le.Rep_City, le.Rep_State, le.Rep_Zip);
 		cleanedRepAddress := Address.CleanFields(repCleanAddr);
 		SELF.Clean_Input.Rep_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRepAddress.Prim_Range, cleanedRepAddress.Predir, cleanedRepAddress.Prim_Name,
 																											cleanedRepAddress.Addr_Suffix, cleanedRepAddress.Postdir, cleanedRepAddress.Unit_Desig, cleanedRepAddress.Sec_Range);
-		SELF.Clean_Input.Rep_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep_StreetAddress2));
+		SELF.Clean_Input.Rep_StreetAddress2 := TRIM(STD.Str.ToUppercase(le.Rep_StreetAddress2));
 		SELF.Clean_Input.Rep_Prim_Range := cleanedRepAddress.Prim_Range;
 		SELF.Clean_Input.Rep_Predir := cleanedRepAddress.Predir;
 		SELF.Clean_Input.Rep_Prim_Name := cleanedRepAddress.Prim_Name;
@@ -173,39 +176,39 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep_County := repCleanAddr[143..145];  // Address.CleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
 		SELF.Clean_Input.Rep_Geo_Block := cleanedRepAddress.Geo_Blk;
 		// Authorized Representative Other PII
-		filteredSSN := StringLib.StringFilter(le.Rep_SSN, '0123456789');
+		filteredSSN := STD.Str.Filter(le.Rep_SSN, '0123456789');
 		SELF.Clean_Input.Rep_SSN := IF(LENGTH(filteredSSN) != 9 OR (INTEGER)filteredSSN <= 0, '', filteredSSN); // Filter out SSN's that aren't 9-Bytes, or are repeating 0's
 		SELF.Clean_Input.Rep_DateOfBirth := RiskWise.CleanDOB(le.Rep_DateOfBirth);
 		RepPhone10 := RiskWise.CleanPhone(le.Rep_Phone10);
 		SELF.Clean_Input.Rep_Phone10 := RepPhone10;
 		SELF.Clean_Input.Rep_Age := IF((INTEGER)le.Rep_Age = 0 AND (INTEGER)le.Rep_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep_DateOfBirth), (le.Rep_Age));
 		SELF.Clean_Input.Rep_DLNumber := RiskWise.CleanDL_Num(le.Rep_DLNumber);
-		SELF.Clean_Input.Rep_DLState := StringLib.StringToUpperCase(TRIM(le.Rep_DLState, LEFT, RIGHT));
-		SELF.Clean_Input.Rep_Email := StringLib.StringToUpperCase(TRIM(le.Rep_Email, LEFT, RIGHT));
-		SELF.Clean_Input.Rep_BusinessTitle := StringLib.StringToUpperCase(TRIM(le.Rep_BusinessTitle, LEFT, RIGHT));
+		SELF.Clean_Input.Rep_DLState := STD.Str.ToUpperCase(TRIM(le.Rep_DLState, LEFT, RIGHT));
+		SELF.Clean_Input.Rep_Email := STD.Str.ToUpperCase(TRIM(le.Rep_Email, LEFT, RIGHT));
+		SELF.Clean_Input.Rep_BusinessTitle := STD.Str.ToUpperCase(TRIM(le.Rep_BusinessTitle, LEFT, RIGHT));
 
 		// Authorized Representative 2 Name Fields
 		cleanedNameRep2 := Address.CleanPerson73(le.Rep2_FullName);
 		cleanedRep2Name := Address.CleanNameFields(cleanedNameRep2);
 		BOOLEAN validCleanedRep2 := TRIM(le.Rep2_FullName) <> '';
-		SELF.Clean_Input.Rep2_FullName := StringLib.StringToUpperCase(le.Rep2_FullName);
-		SELF.Clean_Input.Rep2_NameTitle := TRIM(StringLib.StringToUppercase(IF(le.Rep2_NameTitle = '' AND validCleanedRep2,		cleanedRep2Name.Title, le.Rep2_NameTitle)), LEFT, RIGHT);
-		Rep2FirstName := TRIM(StringLib.StringToUppercase(IF(le.Rep2_FirstName = '' AND validCleanedRep2,		cleanedRep2Name.FName, le.Rep2_FirstName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep2_FullName := STD.Str.ToUpperCase(le.Rep2_FullName);
+		SELF.Clean_Input.Rep2_NameTitle := TRIM(STD.Str.ToUppercase(IF(le.Rep2_NameTitle = '' AND validCleanedRep2,		cleanedRep2Name.Title, le.Rep2_NameTitle)), LEFT, RIGHT);
+		Rep2FirstName := TRIM(STD.Str.ToUppercase(IF(le.Rep2_FirstName = '' AND validCleanedRep2,		cleanedRep2Name.FName, le.Rep2_FirstName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep2_FirstName := Rep2FirstName;
-		Rep2PreferredFirstName := StringLib.StringToUpperCase(NID.PreferredFirstNew(Rep2FirstName, TRUE /*UseNew*/));
+		Rep2PreferredFirstName := STD.Str.ToUpperCase(NID.PreferredFirstNew(Rep2FirstName, TRUE /*UseNew*/));
 		SELF.Clean_Input.Rep2_PreferredFirstName := Rep2PreferredFirstName;
-		SELF.Clean_Input.Rep2_MiddleName := TRIM(StringLib.StringToUppercase(IF(le.Rep2_MiddleName = '' AND validCleanedRep2,	cleanedRep2Name.MName, le.Rep2_MiddleName)), LEFT, RIGHT);
-		Rep2LastName := TRIM(StringLib.StringToUppercase(IF(le.Rep2_LastName = '' AND validCleanedRep2,			cleanedRep2Name.LName, le.Rep2_LastName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep2_MiddleName := TRIM(STD.Str.ToUppercase(IF(le.Rep2_MiddleName = '' AND validCleanedRep2,	cleanedRep2Name.MName, le.Rep2_MiddleName)), LEFT, RIGHT);
+		Rep2LastName := TRIM(STD.Str.ToUppercase(IF(le.Rep2_LastName = '' AND validCleanedRep2,			cleanedRep2Name.LName, le.Rep2_LastName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep2_LastName := Rep2LastName;
-		SELF.Clean_Input.Rep2_NameSuffix := TRIM(StringLib.StringToUppercase(IF(le.Rep2_NameSuffix = '' AND validCleanedRep2,	cleanedRep2Name.Name_Suffix, le.Rep2_NameSuffix)), LEFT, RIGHT);
-		SELF.Clean_Input.Rep2_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep2_FormerLastName), LEFT, RIGHT);
+		SELF.Clean_Input.Rep2_NameSuffix := TRIM(STD.Str.ToUppercase(IF(le.Rep2_NameSuffix = '' AND validCleanedRep2,	cleanedRep2Name.Name_Suffix, le.Rep2_NameSuffix)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep2_FormerLastName := TRIM(STD.Str.ToUppercase(le.Rep2_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative 2 Address Fields
 		rep2Address := Risk_Indicators.MOD_AddressClean.street_address(le.Rep2_StreetAddress1 + ' ' + le.Rep2_StreetAddress2, le.Rep2_Prim_Range, le.Rep2_Predir, le.Rep2_Prim_Name, le.Rep2_Addr_Suffix, le.Rep2_Postdir, le.Rep2_Unit_Desig, le.Rep2_Sec_Range);
 		Rep2CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(rep2Address, le.Rep2_City, le.Rep2_State, le.Rep2_Zip);
 		cleanedRep2Address := Address.CleanFields(Rep2CleanAddr);
 		SELF.Clean_Input.Rep2_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep2Address.Prim_Range, cleanedRep2Address.Predir, cleanedRep2Address.Prim_Name,
 																											cleanedRep2Address.Addr_Suffix, cleanedRep2Address.Postdir, cleanedRep2Address.Unit_Desig, cleanedRep2Address.Sec_Range);
-		SELF.Clean_Input.Rep2_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep2_StreetAddress2));
+		SELF.Clean_Input.Rep2_StreetAddress2 := TRIM(STD.Str.ToUppercase(le.Rep2_StreetAddress2));
 		SELF.Clean_Input.Rep2_Prim_Range := cleanedRep2Address.Prim_Range;
 		SELF.Clean_Input.Rep2_Predir := cleanedRep2Address.Predir;
 		SELF.Clean_Input.Rep2_Prim_Name := cleanedRep2Address.Prim_Name;
@@ -225,39 +228,39 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep2_County := Rep2CleanAddr[143..145];  // Address.CleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
 		SELF.Clean_Input.Rep2_Geo_Block := cleanedRep2Address.Geo_Blk;
 		// Authorized Representative 2 Other PII
-		filteredSSNRep2 := StringLib.StringFilter(le.Rep2_SSN, '0123456789');
+		filteredSSNRep2 := STD.Str.Filter(le.Rep2_SSN, '0123456789');
 		SELF.Clean_Input.Rep2_SSN := IF(LENGTH(filteredSSNRep2) != 9 OR (INTEGER)filteredSSNRep2 <= 0, '', filteredSSNRep2); // Filter out SSN's that aren't 9-Bytes, or are Rep2eating 0's
 		SELF.Clean_Input.Rep2_DateOfBirth := RiskWise.CleanDOB(le.Rep2_DateOfBirth);
 		Rep2Phone10 := RiskWise.CleanPhone(le.Rep2_Phone10);
 		SELF.Clean_Input.Rep2_Phone10 := Rep2Phone10;
 		SELF.Clean_Input.Rep2_Age := IF((INTEGER)le.Rep2_Age = 0 AND (INTEGER)le.Rep2_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep2_DateOfBirth), (le.Rep2_Age));
 		SELF.Clean_Input.Rep2_DLNumber := RiskWise.CleanDL_Num(le.Rep2_DLNumber);
-		SELF.Clean_Input.Rep2_DLState := StringLib.StringToUpperCase(TRIM(le.Rep2_DLState, LEFT, RIGHT));
-		SELF.Clean_Input.Rep2_Email := StringLib.StringToUpperCase(TRIM(le.Rep2_Email, LEFT, RIGHT));
-		SELF.Clean_Input.Rep2_BusinessTitle := StringLib.StringToUpperCase(TRIM(le.Rep2_BusinessTitle, LEFT, RIGHT));
+		SELF.Clean_Input.Rep2_DLState := STD.Str.ToUpperCase(TRIM(le.Rep2_DLState, LEFT, RIGHT));
+		SELF.Clean_Input.Rep2_Email := STD.Str.ToUpperCase(TRIM(le.Rep2_Email, LEFT, RIGHT));
+		SELF.Clean_Input.Rep2_BusinessTitle := STD.Str.ToUpperCase(TRIM(le.Rep2_BusinessTitle, LEFT, RIGHT));
 
 		// Authorized Representative 3 Name Fields
 		cleanedNameRep3 := Address.CleanPerson73(le.Rep3_FullName);
 		cleanedRep3Name := Address.CleanNameFields(cleanedNameRep3);
 		BOOLEAN validCleanedRep3 := TRIM(le.Rep3_FullName) <> '';
-		SELF.Clean_Input.Rep3_FullName := StringLib.StringToUpperCase(le.Rep3_FullName);
-		SELF.Clean_Input.Rep3_NameTitle := TRIM(StringLib.StringToUppercase(IF(le.Rep3_NameTitle = '' AND validCleanedRep3,		cleanedRep3Name.Title, le.Rep3_NameTitle)), LEFT, RIGHT);
-		Rep3FirstName := TRIM(StringLib.StringToUppercase(IF(le.Rep3_FirstName = '' AND validCleanedRep3,		cleanedRep3Name.FName, le.Rep3_FirstName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep3_FullName := STD.Str.ToUpperCase(le.Rep3_FullName);
+		SELF.Clean_Input.Rep3_NameTitle := TRIM(STD.Str.ToUppercase(IF(le.Rep3_NameTitle = '' AND validCleanedRep3,		cleanedRep3Name.Title, le.Rep3_NameTitle)), LEFT, RIGHT);
+		Rep3FirstName := TRIM(STD.Str.ToUppercase(IF(le.Rep3_FirstName = '' AND validCleanedRep3,		cleanedRep3Name.FName, le.Rep3_FirstName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep3_FirstName := Rep3FirstName;
-		Rep3PreferredFirstName := StringLib.StringToUpperCase(NID.PreferredFirstNew(Rep3FirstName, TRUE /*UseNew*/));
+		Rep3PreferredFirstName := STD.Str.ToUpperCase(NID.PreferredFirstNew(Rep3FirstName, TRUE /*UseNew*/));
 		SELF.Clean_Input.Rep3_PreferredFirstName := Rep3PreferredFirstName;
-		SELF.Clean_Input.Rep3_MiddleName := TRIM(StringLib.StringToUppercase(IF(le.Rep3_MiddleName = '' AND validCleanedRep3,	cleanedRep3Name.MName, le.Rep3_MiddleName)), LEFT, RIGHT);
-		Rep3LastName := TRIM(StringLib.StringToUppercase(IF(le.Rep3_LastName = '' AND validCleanedRep3,			cleanedRep3Name.LName, le.Rep3_LastName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep3_MiddleName := TRIM(STD.Str.ToUppercase(IF(le.Rep3_MiddleName = '' AND validCleanedRep3,	cleanedRep3Name.MName, le.Rep3_MiddleName)), LEFT, RIGHT);
+		Rep3LastName := TRIM(STD.Str.ToUppercase(IF(le.Rep3_LastName = '' AND validCleanedRep3,			cleanedRep3Name.LName, le.Rep3_LastName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep3_LastName := Rep3LastName;
-		SELF.Clean_Input.Rep3_NameSuffix := TRIM(StringLib.StringToUppercase(IF(le.Rep3_NameSuffix = '' AND validCleanedRep3,	cleanedRep3Name.Name_Suffix, le.Rep3_NameSuffix)), LEFT, RIGHT);
-		SELF.Clean_Input.Rep3_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep3_FormerLastName), LEFT, RIGHT);
+		SELF.Clean_Input.Rep3_NameSuffix := TRIM(STD.Str.ToUppercase(IF(le.Rep3_NameSuffix = '' AND validCleanedRep3,	cleanedRep3Name.Name_Suffix, le.Rep3_NameSuffix)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep3_FormerLastName := TRIM(STD.Str.ToUppercase(le.Rep3_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative 3 Address Fields
 		Rep3Address := Risk_Indicators.MOD_AddressClean.street_address(le.Rep3_StreetAddress1 + ' ' + le.Rep3_StreetAddress2, le.Rep3_Prim_Range, le.Rep3_Predir, le.Rep3_Prim_Name, le.Rep3_Addr_Suffix, le.Rep3_Postdir, le.Rep3_Unit_Desig, le.Rep3_Sec_Range);
 		Rep3CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(Rep3Address, le.Rep3_City, le.Rep3_State, le.Rep3_Zip);
 		cleanedRep3Address := Address.CleanFields(Rep3CleanAddr);
 		SELF.Clean_Input.Rep3_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep3Address.Prim_Range, cleanedRep3Address.Predir, cleanedRep3Address.Prim_Name,
 																											cleanedRep3Address.Addr_Suffix, cleanedRep3Address.Postdir, cleanedRep3Address.Unit_Desig, cleanedRep3Address.Sec_Range);
-		SELF.Clean_Input.Rep3_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep3_StreetAddress2));
+		SELF.Clean_Input.Rep3_StreetAddress2 := TRIM(STD.Str.ToUppercase(le.Rep3_StreetAddress2));
 		SELF.Clean_Input.Rep3_Prim_Range := cleanedRep3Address.Prim_Range;
 		SELF.Clean_Input.Rep3_Predir := cleanedRep3Address.Predir;
 		SELF.Clean_Input.Rep3_Prim_Name := cleanedRep3Address.Prim_Name;
@@ -277,40 +280,40 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep3_County := Rep3CleanAddr[143..145];  // Address.CleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
 		SELF.Clean_Input.Rep3_Geo_Block := cleanedRep3Address.Geo_Blk;
 		// Authorized Representative 3 Other PII
-		filteredSSNRep3 := StringLib.StringFilter(le.Rep3_SSN, '0123456789');
+		filteredSSNRep3 := STD.Str.Filter(le.Rep3_SSN, '0123456789');
 		SELF.Clean_Input.Rep3_SSN := IF(LENGTH(filteredSSNRep3) != 9 OR (INTEGER)filteredSSNRep3 <= 0, '', filteredSSNRep3); // Filter out SSN's that aren't 9-Bytes, or are Rep3eating 0's
 		SELF.Clean_Input.Rep3_DateOfBirth := RiskWise.CleanDOB(le.Rep3_DateOfBirth);
 		Rep3Phone10 := RiskWise.CleanPhone(le.Rep3_Phone10);
 		SELF.Clean_Input.Rep3_Phone10 := Rep3Phone10;
 		SELF.Clean_Input.Rep3_Age := IF((INTEGER)le.Rep3_Age = 0 AND (INTEGER)le.Rep3_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep3_DateOfBirth), (le.Rep3_Age));
 		SELF.Clean_Input.Rep3_DLNumber := RiskWise.CleanDL_Num(le.Rep3_DLNumber);
-		SELF.Clean_Input.Rep3_DLState := StringLib.StringToUpperCase(TRIM(le.Rep3_DLState, LEFT, RIGHT));
-		SELF.Clean_Input.Rep3_Email := StringLib.StringToUpperCase(TRIM(le.Rep3_Email, LEFT, RIGHT));
-		SELF.Clean_Input.Rep3_BusinessTitle := StringLib.StringToUpperCase(TRIM(le.Rep3_BusinessTitle, LEFT, RIGHT));
+		SELF.Clean_Input.Rep3_DLState := STD.Str.ToUpperCase(TRIM(le.Rep3_DLState, LEFT, RIGHT));
+		SELF.Clean_Input.Rep3_Email := STD.Str.ToUpperCase(TRIM(le.Rep3_Email, LEFT, RIGHT));
+		SELF.Clean_Input.Rep3_BusinessTitle := STD.Str.ToUpperCase(TRIM(le.Rep3_BusinessTitle, LEFT, RIGHT));
 
 
 	// Authorized Representative 4 Name Fields
 		cleanedNameRep4 := Address.CleanPerson73(le.Rep4_FullName);
 		cleanedRep4Name := Address.CleanNameFields(cleanedNameRep4);
 		BOOLEAN validCleanedRep4 := TRIM(le.Rep4_FullName) <> '';
-		SELF.Clean_Input.Rep4_FullName := StringLib.StringToUpperCase(le.Rep4_FullName);
-		SELF.Clean_Input.Rep4_NameTitle := TRIM(StringLib.StringToUppercase(IF(le.Rep4_NameTitle = '' AND validCleanedRep4,		cleanedRep4Name.Title, le.Rep4_NameTitle)), LEFT, RIGHT);
-		Rep4FirstName := TRIM(StringLib.StringToUppercase(IF(le.Rep4_FirstName = '' AND validCleanedRep4,		cleanedRep4Name.FName, le.Rep4_FirstName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep4_FullName := STD.Str.ToUpperCase(le.Rep4_FullName);
+		SELF.Clean_Input.Rep4_NameTitle := TRIM(STD.Str.ToUppercase(IF(le.Rep4_NameTitle = '' AND validCleanedRep4,		cleanedRep4Name.Title, le.Rep4_NameTitle)), LEFT, RIGHT);
+		Rep4FirstName := TRIM(STD.Str.ToUppercase(IF(le.Rep4_FirstName = '' AND validCleanedRep4,		cleanedRep4Name.FName, le.Rep4_FirstName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep4_FirstName := Rep4FirstName;
-		Rep4PreferredFirstName := StringLib.StringToUpperCase(NID.PreferredFirstNew(Rep4FirstName, TRUE /*UseNew*/));
+		Rep4PreferredFirstName := STD.Str.ToUpperCase(NID.PreferredFirstNew(Rep4FirstName, TRUE /*UseNew*/));
 		SELF.Clean_Input.Rep4_PreferredFirstName := Rep4PreferredFirstName;
-		SELF.Clean_Input.Rep4_MiddleName := TRIM(StringLib.StringToUppercase(IF(le.Rep4_MiddleName = '' AND validCleanedRep4,	cleanedRep4Name.MName, le.Rep4_MiddleName)), LEFT, RIGHT);
-		Rep4LastName := TRIM(StringLib.StringToUppercase(IF(le.Rep4_LastName = '' AND validCleanedRep4,			cleanedRep4Name.LName, le.Rep4_LastName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep4_MiddleName := TRIM(STD.Str.ToUppercase(IF(le.Rep4_MiddleName = '' AND validCleanedRep4,	cleanedRep4Name.MName, le.Rep4_MiddleName)), LEFT, RIGHT);
+		Rep4LastName := TRIM(STD.Str.ToUppercase(IF(le.Rep4_LastName = '' AND validCleanedRep4,			cleanedRep4Name.LName, le.Rep4_LastName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep4_LastName := Rep4LastName;
-		SELF.Clean_Input.Rep4_NameSuffix := TRIM(StringLib.StringToUppercase(IF(le.Rep4_NameSuffix = '' AND validCleanedRep4,	cleanedRep4Name.Name_Suffix, le.Rep4_NameSuffix)), LEFT, RIGHT);
-		SELF.Clean_Input.Rep4_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep4_FormerLastName), LEFT, RIGHT);
+		SELF.Clean_Input.Rep4_NameSuffix := TRIM(STD.Str.ToUppercase(IF(le.Rep4_NameSuffix = '' AND validCleanedRep4,	cleanedRep4Name.Name_Suffix, le.Rep4_NameSuffix)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep4_FormerLastName := TRIM(STD.Str.ToUppercase(le.Rep4_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative 4 Address Fields
 		rep4Address := Risk_Indicators.MOD_AddressClean.street_address(le.Rep4_StreetAddress1 + ' ' + le.Rep4_StreetAddress2, le.Rep4_Prim_Range, le.Rep4_Predir, le.Rep4_Prim_Name, le.Rep4_Addr_Suffix, le.Rep4_Postdir, le.Rep4_Unit_Desig, le.Rep4_Sec_Range);
 		Rep4CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(rep4Address, le.Rep4_City, le.Rep4_State, le.Rep4_Zip);
 		cleanedRep4Address := Address.CleanFields(Rep4CleanAddr);
 		SELF.Clean_Input.Rep4_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep4Address.Prim_Range, cleanedRep4Address.Predir, cleanedRep4Address.Prim_Name,
 																											cleanedRep4Address.Addr_Suffix, cleanedRep4Address.Postdir, cleanedRep4Address.Unit_Desig, cleanedRep4Address.Sec_Range);
-		SELF.Clean_Input.Rep4_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep4_StreetAddress2));
+		SELF.Clean_Input.Rep4_StreetAddress2 := TRIM(STD.Str.ToUppercase(le.Rep4_StreetAddress2));
 		SELF.Clean_Input.Rep4_Prim_Range := cleanedRep4Address.Prim_Range;
 		SELF.Clean_Input.Rep4_Predir := cleanedRep4Address.Predir;
 		SELF.Clean_Input.Rep4_Prim_Name := cleanedRep4Address.Prim_Name;
@@ -330,39 +333,39 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep4_County := Rep4CleanAddr[143..145];  // Address.CleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
 		SELF.Clean_Input.Rep4_Geo_Block := cleanedRep4Address.Geo_Blk;
 		// Authorized Representative 4 Other PII
-		filteredSSNRep4 := StringLib.StringFilter(le.Rep4_SSN, '0123456789');
+		filteredSSNRep4 := STD.Str.Filter(le.Rep4_SSN, '0123456789');
 		SELF.Clean_Input.Rep4_SSN := IF(LENGTH(filteredSSNRep4) != 9 OR (INTEGER)filteredSSNRep4 <= 0, '', filteredSSNRep4); // Filter out SSN's that aren't 9-Bytes, or are Rep2eating 0's
 		SELF.Clean_Input.Rep4_DateOfBirth := RiskWise.CleanDOB(le.Rep4_DateOfBirth);
 		Rep4Phone10 := RiskWise.CleanPhone(le.Rep4_Phone10);
 		SELF.Clean_Input.Rep4_Phone10 := Rep4Phone10;
 		SELF.Clean_Input.Rep4_Age := IF((INTEGER)le.Rep4_Age = 0 AND (INTEGER)le.Rep4_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep4_DateOfBirth), (le.Rep4_Age));
 		SELF.Clean_Input.Rep4_DLNumber := RiskWise.CleanDL_Num(le.Rep4_DLNumber);
-		SELF.Clean_Input.Rep4_DLState := StringLib.StringToUpperCase(TRIM(le.Rep4_DLState, LEFT, RIGHT));
-		SELF.Clean_Input.Rep4_Email := StringLib.StringToUpperCase(TRIM(le.Rep4_Email, LEFT, RIGHT));
-		SELF.Clean_Input.Rep4_BusinessTitle := StringLib.StringToUpperCase(TRIM(le.Rep4_BusinessTitle, LEFT, RIGHT));
+		SELF.Clean_Input.Rep4_DLState := STD.Str.ToUpperCase(TRIM(le.Rep4_DLState, LEFT, RIGHT));
+		SELF.Clean_Input.Rep4_Email := STD.Str.ToUpperCase(TRIM(le.Rep4_Email, LEFT, RIGHT));
+		SELF.Clean_Input.Rep4_BusinessTitle := STD.Str.ToUpperCase(TRIM(le.Rep4_BusinessTitle, LEFT, RIGHT));
 
 	// Authorized Representative 5 Name Fields
 		cleanedNameRep5 := Address.CleanPerson73(le.Rep5_FullName);
 		cleanedRep5Name := Address.CleanNameFields(cleanedNameRep5);
 		BOOLEAN validCleanedRep5 := TRIM(le.Rep5_FullName) <> '';
-		SELF.Clean_Input.Rep5_FullName := StringLib.StringToUpperCase(le.Rep5_FullName);
-		SELF.Clean_Input.Rep5_NameTitle := TRIM(StringLib.StringToUppercase(IF(le.Rep5_NameTitle = '' AND validCleanedRep5,		cleanedRep5Name.Title, le.Rep5_NameTitle)), LEFT, RIGHT);
-		Rep5FirstName := TRIM(StringLib.StringToUppercase(IF(le.Rep5_FirstName = '' AND validCleanedRep5,		cleanedRep5Name.FName, le.Rep5_FirstName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep5_FullName := STD.Str.ToUpperCase(le.Rep5_FullName);
+		SELF.Clean_Input.Rep5_NameTitle := TRIM(STD.Str.ToUppercase(IF(le.Rep5_NameTitle = '' AND validCleanedRep5,		cleanedRep5Name.Title, le.Rep5_NameTitle)), LEFT, RIGHT);
+		Rep5FirstName := TRIM(STD.Str.ToUppercase(IF(le.Rep5_FirstName = '' AND validCleanedRep5,		cleanedRep5Name.FName, le.Rep5_FirstName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep5_FirstName := Rep5FirstName;
-		Rep5PreferredFirstName := StringLib.StringToUpperCase(NID.PreferredFirstNew(Rep5FirstName, TRUE /*UseNew*/));
+		Rep5PreferredFirstName := STD.Str.ToUpperCase(NID.PreferredFirstNew(Rep5FirstName, TRUE /*UseNew*/));
 		SELF.Clean_Input.Rep5_PreferredFirstName := Rep5PreferredFirstName;
-		SELF.Clean_Input.Rep5_MiddleName := TRIM(StringLib.StringToUppercase(IF(le.Rep5_MiddleName = '' AND validCleanedRep5,	cleanedRep5Name.MName, le.Rep5_MiddleName)), LEFT, RIGHT);
-		Rep5LastName := TRIM(StringLib.StringToUppercase(IF(le.Rep5_LastName = '' AND validCleanedRep5,			cleanedRep5Name.LName, le.Rep5_LastName)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep5_MiddleName := TRIM(STD.Str.ToUppercase(IF(le.Rep5_MiddleName = '' AND validCleanedRep5,	cleanedRep5Name.MName, le.Rep5_MiddleName)), LEFT, RIGHT);
+		Rep5LastName := TRIM(STD.Str.ToUppercase(IF(le.Rep5_LastName = '' AND validCleanedRep5,			cleanedRep5Name.LName, le.Rep5_LastName)), LEFT, RIGHT);
 		SELF.Clean_Input.Rep5_LastName := Rep5LastName;
-		SELF.Clean_Input.Rep5_NameSuffix := TRIM(StringLib.StringToUppercase(IF(le.Rep5_NameSuffix = '' AND validCleanedRep5,	cleanedRep5Name.Name_Suffix, le.Rep5_NameSuffix)), LEFT, RIGHT);
-		SELF.Clean_Input.Rep5_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep5_FormerLastName), LEFT, RIGHT);
+		SELF.Clean_Input.Rep5_NameSuffix := TRIM(STD.Str.ToUppercase(IF(le.Rep5_NameSuffix = '' AND validCleanedRep5,	cleanedRep5Name.Name_Suffix, le.Rep5_NameSuffix)), LEFT, RIGHT);
+		SELF.Clean_Input.Rep5_FormerLastName := TRIM(STD.Str.ToUppercase(le.Rep5_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative 5 Address Fields
 		rep5Address := Risk_Indicators.MOD_AddressClean.street_address(le.Rep5_StreetAddress1 + ' ' + le.Rep5_StreetAddress2, le.Rep5_Prim_Range, le.Rep5_Predir, le.Rep5_Prim_Name, le.Rep5_Addr_Suffix, le.Rep5_Postdir, le.Rep5_Unit_Desig, le.Rep5_Sec_Range);
 		Rep5CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(rep5Address, le.Rep5_City, le.Rep5_State, le.Rep5_Zip);
 		cleanedRep5Address := Address.CleanFields(Rep5CleanAddr);
 		SELF.Clean_Input.Rep5_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep5Address.Prim_Range, cleanedRep5Address.Predir, cleanedRep5Address.Prim_Name,
 																											cleanedRep5Address.Addr_Suffix, cleanedRep5Address.Postdir, cleanedRep5Address.Unit_Desig, cleanedRep5Address.Sec_Range);
-		SELF.Clean_Input.Rep5_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep5_StreetAddress2));
+		SELF.Clean_Input.Rep5_StreetAddress2 := TRIM(STD.Str.ToUppercase(le.Rep5_StreetAddress2));
 		SELF.Clean_Input.Rep5_Prim_Range := cleanedRep5Address.Prim_Range;
 		SELF.Clean_Input.Rep5_Predir := cleanedRep5Address.Predir;
 		SELF.Clean_Input.Rep5_Prim_Name := cleanedRep5Address.Prim_Name;
@@ -382,16 +385,16 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep5_County := Rep5CleanAddr[143..145];  // Address.CleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
 		SELF.Clean_Input.Rep5_Geo_Block := cleanedRep5Address.Geo_Blk;
 		// Authorized Representative 5 Other PII
-		filteredSSNRep5 := StringLib.StringFilter(le.Rep5_SSN, '0123456789');
+		filteredSSNRep5 := STD.Str.Filter(le.Rep5_SSN, '0123456789');
 		SELF.Clean_Input.Rep5_SSN := IF(LENGTH(filteredSSNRep5) != 9 OR (INTEGER)filteredSSNRep5 <= 0, '', filteredSSNRep5); // Filter out SSN's that aren't 9-Bytes, or are Rep2eating 0's
 		SELF.Clean_Input.Rep5_DateOfBirth := RiskWise.CleanDOB(le.Rep5_DateOfBirth);
 		Rep5Phone10 := RiskWise.CleanPhone(le.Rep5_Phone10);
 		SELF.Clean_Input.Rep5_Phone10 := Rep5Phone10;
 		SELF.Clean_Input.Rep5_Age := IF((INTEGER)le.Rep5_Age = 0 AND (INTEGER)le.Rep5_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep5_DateOfBirth), (le.Rep5_Age));
 		SELF.Clean_Input.Rep5_DLNumber := RiskWise.CleanDL_Num(le.Rep5_DLNumber);
-		SELF.Clean_Input.Rep5_DLState := StringLib.StringToUpperCase(TRIM(le.Rep5_DLState, LEFT, RIGHT));
-		SELF.Clean_Input.Rep5_Email := StringLib.StringToUpperCase(TRIM(le.Rep5_Email, LEFT, RIGHT));
-		SELF.Clean_Input.Rep5_BusinessTitle := StringLib.StringToUpperCase(TRIM(le.Rep5_BusinessTitle, LEFT, RIGHT));
+		SELF.Clean_Input.Rep5_DLState := STD.Str.ToUpperCase(TRIM(le.Rep5_DLState, LEFT, RIGHT));
+		SELF.Clean_Input.Rep5_Email := STD.Str.ToUpperCase(TRIM(le.Rep5_Email, LEFT, RIGHT));
+		SELF.Clean_Input.Rep5_BusinessTitle := STD.Str.ToUpperCase(TRIM(le.Rep5_BusinessTitle, LEFT, RIGHT));
 
 
 		SELF.Clean_Input.HistoryDate := IF(le.HistoryDate <= 0, (INTEGER)Business_Risk_BIP.Constants.NinesDate, le.HistoryDate); // If HistoryDate not populated run in "realtime" mode
@@ -747,7 +750,8 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																										Options.DataRestrictionMask,
 																										0, /*Append_Best*/
 																										DATASET([], Gateway.Layouts.Config), /*Gateways*/
-																										0 /*BSOptions*/);
+																										0 /*BSOptions*/,
+																										mod_access := mod_access);
 
 	// Pick the DID with the highest score, in the event that multiple have the same score, choose the lowest value DID to make this deterministic
 	DIDKept := ROLLUP(SORT(DIDAppend, Seq, -Score, DID), LEFT.Seq = RIGHT.Seq, TRANSFORM(LEFT));
@@ -777,15 +781,15 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 	// Search by FEIN before we take out inputs with no BIP IDs assigned.
 	WatchListHit := Business_Risk_BIP.getWatchlists(withBIP, Options, linkingOptions, AllowedSourcesSet);
 
-	Phone := Business_Risk_BIP.getPhones(withBIP, Options, linkingOptions, AllowedSourcesSet);
+	Phone := Business_Risk_BIP.getPhones(withBIP, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
 	InputBasedSources := Business_Risk_BIP.getInputBasedSources(withBIP, Options, linkingOptions, AllowedSourcesSet);
 
-	BusinessByFEIN := Business_Risk_BIP.getBusinessByFEIN(withBIP, Options, linkingOptions, AllowedSourcesSet);
+	BusinessByFEIN := Business_Risk_BIP.getBusinessByFEIN(withBIP, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
-	BusinessByPhone := Business_Risk_BIP.getBusinessByPhone(withBIP, Options, linkingOptions, AllowedSourcesSet);
+	BusinessByPhone := Business_Risk_BIP.getBusinessByPhone(withBIP, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
-	BusinessByAddress := Business_Risk_BIP.getBusinessByAddress(withBIP, Options, linkingOptions, AllowedSourcesSet);
+	BusinessByAddress := Business_Risk_BIP.getBusinessByAddress(withBIP, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
   InquiriesByInputs := Business_Risk_BIP.getInquiriesByInputs(withBIP, Options, linkingOptions, AllowedSourcesSet);
 
@@ -913,7 +917,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 
-  withAuthRepLexIDs := Business_Risk_BIP.getAuthRepLexIDs(withPropertyByInputs, Options);
+  withAuthRepLexIDs := Business_Risk_BIP.getAuthRepLexIDs(withPropertyByInputs, Options, mod_access);
 
 	// Don't bother running a bunch of searches on Seq's that didn't find any ID's, just add them back at the end
 	NoLinkIDsFound := withAuthRepLexIDs (BIP_IDs.PowID.LinkID = 0 AND BIP_IDs.ProxID.LinkID = 0 AND BIP_IDs.SeleID.LinkID = 0 AND BIP_IDs.OrgID.LinkID = 0 AND BIP_IDs.UltID.LinkID = 0);
@@ -954,7 +958,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW));
 
 
-	businessHeader := Business_Risk_BIP.getBusinessHeader(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
+	businessHeader := Business_Risk_BIP.getBusinessHeader(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
 	consumerHeader_all := Business_Risk_BIP.getConsumerHeader(businessHeader + NoLinkIDsFound, Options, mod_access, AllowedSourcesSet); // Pass in Business Header results for companies with BIP IDs assigned. Also pass in records with no BIP IDs assigned.
 
@@ -962,7 +966,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 	consumerHeader_noIds := consumerHeader_all(BIP_IDs.PowID.LinkID = 0 AND BIP_IDs.ProxID.LinkID = 0 AND BIP_IDs.SeleID.LinkID = 0 AND BIP_IDs.OrgID.LinkID = 0 AND BIP_IDs.UltID.LinkID = 0);
 
-	associates := Business_Risk_BIP.getAssociateSources(businessHeader, Options, linkingOptions, AllowedSourcesSet); // Need to pass Business Header in because that contains the set of Contact DIDs
+	associates := Business_Risk_BIP.getAssociateSources(businessHeader, Options, linkingOptions, AllowedSourcesSet, mod_access); // Need to pass Business Header in because that contains the set of Contact DIDs
 
 	OSHA := Business_Risk_BIP.getOSHA(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
 
@@ -970,15 +974,15 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 	Property := Business_Risk_BIP.getProperty(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
 
-	EDA := Business_Risk_BIP.getEDA(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
+	EDA := Business_Risk_BIP.getEDA(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
-	EBR := Business_Risk_BIP.getEBR(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
+	EBR := Business_Risk_BIP.getEBR(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
-	Tradelines := Business_Risk_BIP.getTradelines(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
+	Tradelines := Business_Risk_BIP.getTradelines(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
 	AddrAndPropertyData := Business_Risk_BIP.getAddrAndPropertyData(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
 
-	employeeSources := Business_Risk_BIP.getEmployeeSources(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
+	employeeSources := Business_Risk_BIP.getEmployeeSources(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
 	UCC := Business_Risk_BIP.getUCC(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
 
@@ -986,13 +990,13 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 	Inquiries := Business_Risk_BIP.getInquiries(LinkIDsFound, Options, AllowedSourcesSet, mod_access);
 
-	otherSources := Business_Risk_BIP.getOtherSources(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
+	otherSources := Business_Risk_BIP.getOtherSources(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
-	CorporateFilings := Business_Risk_BIP.getCorporateFilings(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
+	CorporateFilings := Business_Risk_BIP.getCorporateFilings(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
 	AirWatercraft := Business_Risk_BIP.getAirWatercraft(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
 
-	MotorVehicleData := Business_Risk_BIP.getMotorVehicles(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
+	MotorVehicleData := Business_Risk_BIP.getMotorVehicles(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
 	GovernmentDebarred := Business_Risk_BIP.getGovernmentDebarred(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
 
@@ -1266,7 +1270,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 
- withAuthRepTitles := Business_Risk_BIP.getAuthRepTitles(withAssociates, Options, linkingOptions, AllowedSourcesSet);
+ withAuthRepTitles := Business_Risk_BIP.getAuthRepTitles(withAssociates, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
 	withOSHA := JOIN(withAuthRepTitles, OSHA, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Firmographic.OwnershipType := checkBlank(RIGHT.Firmographic.OwnershipType, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
@@ -3793,7 +3797,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 
-	 BestAddrPhones := Business_Risk_BIP.getBestAddrPhones(withTargusGateway, Options, linkingOptions, AllowedSourcesSet);
+	 BestAddrPhones := Business_Risk_BIP.getBestAddrPhones(withTargusGateway, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
 	 withBestAddrPhones := JOIN(withTargusGateway, BestAddrPhones, LEFT.Seq = Right.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Best_Info.BestPhoneService := checkBlank(RIGHT.Best_Info.BestPhoneService, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
@@ -3802,7 +3806,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 	// Now that everything is back together, combine the sources into their delimited list fields, and calculate source based attributes
 	Business_Risk_BIP.Layouts.LayoutSources rollSource(Business_Risk_BIP.Layouts.LayoutSources le, Business_Risk_BIP.Layouts.LayoutSources ri) := TRANSFORM
-		SELF.Source := IF(StringLib.StringFind(le.Source, ',', 1) > 0, '\'' + le.Source + '\'', le.Source); // Because this is a comma delimited list - if a source contains a comma, put quotes around it
+		SELF.Source := IF(STD.Str.Find(le.Source, ',', 1) > 0, '\'' + le.Source + '\'', le.Source); // Because this is a comma delimited list - if a source contains a comma, put quotes around it
 		MinDate := MAP((INTEGER)le.DateFirstSeen > 0 AND (INTEGER)ri.DateFirstSeen > 0		=> MIN((INTEGER)le.DateFirstSeen, (INTEGER)ri.DateFirstSeen),
 									 (INTEGER)le.DateFirstSeen <= 0 AND (INTEGER)ri.DateFirstSeen > 0	=> (INTEGER)ri.DateFirstSeen,
 																																														 (INTEGER)le.DateFirstSeen);
@@ -3824,7 +3828,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF := le;
 	END;
 	Business_Risk_BIP.Layouts.LayoutSICNAIC rollSICNAICSource(Business_Risk_BIP.Layouts.LayoutSICNAIC le, Business_Risk_BIP.Layouts.LayoutSICNAIC ri) := TRANSFORM
-		SELF.Source := IF(StringLib.StringFind(le.Source, ',', 1) > 0, '\'' + le.Source + '\'', le.Source); // Because this is a comma delimited list - if a source contains a comma, put quotes around it
+		SELF.Source := IF(STD.Str.Find(le.Source, ',', 1) > 0, '\'' + le.Source + '\'', le.Source); // Because this is a comma delimited list - if a source contains a comma, put quotes around it
 		MinDate := MAP((INTEGER)le.DateFirstSeen > 0 AND (INTEGER)ri.DateFirstSeen > 0		=> MIN((INTEGER)le.DateFirstSeen, (INTEGER)ri.DateFirstSeen),
 									 (INTEGER)le.DateFirstSeen <= 0 AND (INTEGER)ri.DateFirstSeen > 0	=> (INTEGER)ri.DateFirstSeen,
 																																														 (INTEGER)le.DateFirstSeen);
@@ -4913,7 +4917,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 	withFinalDelimitedFields := PROJECT(withBestAddrPhones, finalizeDelimitedFields(LEFT));
 
  // Add Verified input elements.
- withVerifiedInputElements := Business_Risk_BIP.getVerifiedElements(withFinalDelimitedFields, Options, linkingOptions, AllowedSourcesSet);
+ withVerifiedInputElements := Business_Risk_BIP.getVerifiedElements(withFinalDelimitedFields, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
  // Add Scores and other Verification Indicators.
  TempShell := Business_Risk_BIP.getScoresAndIndicators( withVerifiedInputElements, Options );

@@ -1,9 +1,10 @@
-﻿import _Control, doxie_files,ut,doxie, liensv2, riskwise, property, bankruptcyv3, ProfileBooster, Risk_Indicators, MDR;
+﻿import _Control, doxie_files,ut,doxie, liensv2, riskwise, property, bankruptcyv3, ProfileBooster, Risk_Indicators, MDR, Suppress;
 onThor := _Control.Environment.OnThor;
 
 //Note - this function mimics Bocashell derogs function with mods made specific to Profile Booster. 
 //			 Only a portion of fields returned here are actually used in PB and the others could be removed at some point.
-export getDerogs_Hist (GROUPED DATASET(Risk_Indicators.layouts.layout_derogs_input) ids) := FUNCTION
+export getDerogs_Hist (GROUPED DATASET(Risk_Indicators.layouts.layout_derogs_input) ids,
+										doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 															 
 bans_did := BankruptcyV3.key_bankruptcyV3_did();
 bans_search := BankruptcyV3.key_bankruptcyv3_search_full_bip();
@@ -187,7 +188,8 @@ liens_added_thor := JOIN(
 	liens_added := liens_added_roxie;
 #END
 
-layout_extended get_liens_nonFCRA(layout_extended le, klr_nonFCRA ri) := TRANSFORM
+{layout_extended, UNSIGNED4 global_sid} get_liens_nonFCRA(layout_extended le, klr_nonFCRA ri) := TRANSFORM
+	self.global_sid := ri.global_sid;
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	isRecent := ut.DaysApart(ri.date_first_seen,myGetDate)<365*2+1;
 	
@@ -256,7 +258,7 @@ layout_extended get_liens_nonFCRA(layout_extended le, klr_nonFCRA ri) := TRANSFO
 	SELF := le;
 END;
 
-liens_full_roxie := JOIN (liens_added, klr_nonFCRA, 
+liens_full_roxie_unsuppressed := JOIN (liens_added, klr_nonFCRA, 
                     LEFT.rmsid<>'' AND
                     keyed(left.tmsid=right.tmsid) and keyed(LEFT.rmsid=RIGHT.rmsid) AND 
 										right.name_type='D' and 
@@ -264,9 +266,10 @@ liens_full_roxie := JOIN (liens_added, klr_nonFCRA,
                     get_liens_nonFCRA(LEFT,RIGHT),
 										LEFT OUTER, KEEP(100),
 				ATMOST(keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid), Riskwise.max_atmost));
+				
+liens_full_roxie := Suppress.Suppress_ReturnOldLayout(liens_full_roxie_unsuppressed, mod_access, layout_extended);
 
-
-liens_full_thor1 := JOIN (
+liens_full_thor1_unsuppressed := JOIN (
 	distribute(liens_added(rmsid<>''), hash64(tmsid, rmsid)), 
 	distribute(pull(klr_nonFCRA(name_type='D')), hash64(tmsid, rmsid)), 
                     left.tmsid=right.tmsid and LEFT.rmsid=RIGHT.rmsid AND 
@@ -275,6 +278,9 @@ liens_full_thor1 := JOIN (
 										LEFT OUTER, KEEP(100),
 				ATMOST(left.tmsid=right.tmsid and left.rmsid=right.rmsid, Riskwise.max_atmost),
 	local);
+	
+liens_full_thor1 := Suppress.Suppress_ReturnOldLayout(liens_full_thor1_unsuppressed, mod_access, layout_extended);
+
 liens_full_thor2 := liens_added(rmsid='');
 liens_full_thor := liens_full_thor1 + liens_full_thor2; // put the records with missing rmsid back together with those that have rmsid populated
 
@@ -752,20 +758,23 @@ wFID_thor := join(
 	wFID := wFID_roxie;
 #END
 
-layout_extended add_foreclosure_flag(layout_extended le, kforf rt) := transform
+{layout_extended, UNSIGNED4 global_sid} add_foreclosure_flag(layout_extended le, kforf rt) := transform
+	self.global_sid := rt.global_sid;
 	self.BJL.last_foreclosure_date := rt.recording_date;
 	self.BJL.foreclosure_flag := rt.fid!='';
 	self := le;
 end;	
 					
-all_foreclosures_roxie := join(wFID, kforf,
+all_foreclosures_roxie_unsuppressed := join(wFID, kforf,
 						left.fid!='' and 
 						keyed(left.fid=right.fid) and
 						(unsigned3)(right.recording_date[1..6]) < left.historydate AND right.source=MDR.sourceTools.src_Foreclosures,
 						add_foreclosure_flag(left, right),
 						left outer, atmost(keyed(left.fid=right.fid), riskwise.max_atmost), keep(50));
+						
+all_foreclosures_roxie := Suppress.Suppress_ReturnOldLayout(all_foreclosures_roxie_unsuppressed, mod_access, layout_extended);
 
-all_foreclosures_thor1 := join(
+all_foreclosures_thor1_unsuppressed := join(
 	distribute(wFID(fid<>''), hash64(fid)), 
 	distribute(pull(kforf), hash64(fid)),
 						left.fid=right.fid and
@@ -773,6 +782,9 @@ all_foreclosures_thor1 := join(
 						add_foreclosure_flag(left, right),
 						left outer, atmost(left.fid=right.fid, riskwise.max_atmost), keep(50),
 	local);
+	
+all_foreclosures_thor1 := Suppress.Suppress_ReturnOldLayout(all_foreclosures_thor1_unsuppressed, mod_access, layout_extended);
+
 all_foreclosures_thor := all_foreclosures_thor1 + wFID(fid='');  // add back the records with blank FID						
 
 #IF(onThor)

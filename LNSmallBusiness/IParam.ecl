@@ -41,14 +41,18 @@ EXPORT IParam :=
         EXPORT BOOLEAN  IncludeTargusGateway            := FALSE;
         EXPORT BOOLEAN  RunTargusGateway                := FALSE;
         EXPORT BOOLEAN  TestDataEnabled			            := FALSE;
-	      EXPORT STRING   TestDataTableName	              := '';
+        EXPORT STRING   TestDataTableName	              := '';
         EXPORT STRING1  FetchLevel 						          := BIPV2.IDconstants.Fetch_Level_SELEID;
         EXPORT BOOLEAN  IncludeCreditReport             := FALSE; 
-	   EXPORT BOOLEAN  LimitPaymentHistory24Months                   := FALSE; 
-	  EXPORT STRING1 BusinessCreditReportType :=   LNSmallBusiness.Constants.SBFEDataBusinessCreditReport;
-	  EXPORT STRING       SBFEContributorIds         :=  ''; 
+        EXPORT BOOLEAN  LimitPaymentHistory24Months                   := FALSE; 
+        EXPORT STRING1 BusinessCreditReportType :=   LNSmallBusiness.Constants.SBFEDataBusinessCreditReport;
+        EXPORT STRING       SBFEContributorIds         :=  ''; 
         EXPORT BOOLEAN  MinInputMetForAuthRepPopulated  := FALSE; 
-				EXPORT BOOLEAN UseInputDataAsIs                 := FALSE;
+        EXPORT BOOLEAN UseInputDataAsIs                 := FALSE;
+        EXPORT unsigned1 in_LexIdSourceOptout := 1;
+        EXPORT string in_TransactionID := '';
+        EXPORT string in_BatchUID := '';
+        EXPORT unsigned6 in_GlobalCompanyId := 0;
 	    END;
 
   END;

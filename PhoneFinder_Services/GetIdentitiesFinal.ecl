@@ -79,7 +79,7 @@ FUNCTION
   vmod := PROJECT(inMod, $.IParam.PhoneVerificationParams, OPT);
 
   // Need this for calculation of phone verification if no identities present
-  doVerify := ~(inMod.IsPrimarySearchPII) AND (inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress);
+  doVerify := ~(inMod.IsPrimarySearchPII) AND (inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneLastName);
 
   dOtherRecs := JOIN( dIdentitySlim,
                       dIdentityTopn,

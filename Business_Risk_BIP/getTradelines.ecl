@@ -1,9 +1,10 @@
-IMPORT BIPV2, Business_Risk_BIP, EBR, EBR_Services, MDR, TopBusiness_Services, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, EBR, EBR_Services, MDR, TopBusiness_Services, UT, Doxie, STD;
 
 EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	
 	// linkids := Business_Risk_BIP.Common.GetLinkIDs(Shell); // For debugging only.
 
@@ -42,7 +43,7 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	END;
 	
 	// --------------- EBR Data ----------------
-	EBRRaw := EBR.Key_0010_Header_linkids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
+	EBRRaw := EBR.Key_0010_Header_linkids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, // ScoreThreshold --> 0 = Give me everything
 																							linkingOptions,
@@ -70,7 +71,7 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := StringLib.StringFilter((STRING)SIC_Code, '0123456789')[1..4],
+			 STRING10 SICCode := STD.Str.Filter((STRING)SIC_Code, '0123456789')[1..4],
 			 BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), SIC_Code
