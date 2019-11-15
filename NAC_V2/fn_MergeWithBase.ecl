@@ -19,7 +19,8 @@ EXPORT fn_MergeWithBase(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2)
 	f1 := $.fn_MergeCases(newrecs, base);
 	f2 := $.fn_MergeClients(newrecs, f1);
 	//f3 := $.fn_MergeAddresses(newrecs, f2);
+	f4 := $.fn_AddContacts(f2);
 
-	return f2;
+	return f4;
 
 END;
