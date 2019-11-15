@@ -82,7 +82,7 @@ export data_key_Rid_SrcID (boolean pFastHeader = false, boolean pCombo = true, d
 
     rWithDid:={get_recs,TYPEOF(final_header.did) did};
     get_recs_with_did:=join(get_recs,final_header,LEFT.src=RIGHT.src AND LEFT.src=RIGHT.src,TRANSFORM(rWithDid,SELF:=LEFT,SELF:=RIGHT),HASH,LOCAL);
-    get_recs_ccpa_compliant:=header.fn_suppress_ccpa(get_recs_with_did);
+    get_recs_ccpa_compliant:=header.fn_suppress_ccpa(get_recs_with_did,true);
     get_recs_final:=PROJECT(get_recs_ccpa_compliant,TRANSFORM(dx_Header.layouts.i_rid_src,SELF:=LEFT));
 
 	return PROJECT (get_recs_final,dx_Header.layouts.i_rid_src );

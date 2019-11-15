@@ -2,7 +2,7 @@
 
 EXPORT fn_UniversalKeySearch := MODULE
 
-EXPORT basekey := $.IDX_UniversalKey_File.IndexFile;
+EXPORT basekey := dx_BestRecords.key_watchdog();
 EXPORT PermissionsType := dx_BestRecords.Constants.PERM_TYPE;
 
 //Fetch records function
