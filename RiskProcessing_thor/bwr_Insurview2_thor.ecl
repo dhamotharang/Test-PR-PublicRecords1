@@ -23,7 +23,8 @@ RecordsToRun :=  0; //Run all records
 
 eyeball_count := 10;
 
-test_file_name := '~rbao::in::smartpay_9025_f2_cons1_input.csv';
+// test_file_name := '~rbao::in::smartpay_9025_f2_cons1_input.csv';
+test_file_name := '~dvstemp::in::insurview2_sample_20191111_2019113';
     
 // Lots of configurable options //
 STRING Auto_model_name := '';
@@ -37,14 +38,14 @@ STRING Custom3_model_name := '';
 STRING Custom4_model_name := '';
 STRING Custom5_model_name := '';
 STRING prescreen_score_threshold := '';
-STRING IntendedPurpose := '';
+STRING IntendedPurpose := 'Insurance Application';
 STRING EndUserCompanyName := '';
 STRING CustomerNumber := '';
 STRING SecurityCode := '';
 // string DataRestriction := '1000010001000100000000000'; // to restrict fares, experian, transunion and experian FCRA 
 string DataRestriction := '0000000000010100000000000'; // This is the DRM coming in from ISS in the production roxie logs
 STRING50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission;
-STRING strFFDOptionsMask_in	 :=  '1';
+STRING strFFDOptionsMask_in	 :=  '100';
 BOOLEAN IncludeLnJ := false;
 BOOLEAN IncludeRecordsWithSSN := FALSE;
 BOOLEAN IncludeBureauRecs := FALSE; 
@@ -113,12 +114,14 @@ OUTPUT(CHOOSEN(BatchIn, eyeball_count), NAMED('Sample_BatchIn'));
 	
 
 // Fixed Values. //
-BOOLEAN RetainInputDID := false;	// If your file already has a DID, set this option to true to keep it instead of running DID append again
+// BOOLEAN RetainInputDID := false;	// If your file already has a DID, set this option to true to keep it instead of running DID append again
+BOOLEAN RetainInputDID := true;	// If your file already has a DID, set this option to true to keep it instead of running DID append again
 
 // these are the main differences between riskview5.0 and insurview2
 STRING AttributesVersionRequest := 'insurview2attr';
 boolean InsuranceMode := true;
 boolean InsuranceBankruptcyAllow10Yr := true;
+
 
   
 gateways_in := Gateway.Constants.void_gateway;
