@@ -1,4 +1,4 @@
-﻿IMPORT	Business_Credit,	BIPV2,	Address,	doxie,	lib_date,	STD;
+﻿IMPORT	Business_Credit,	BIPV2,	Address,	doxie,	lib_date,	MDR, STD;
 EXPORT	Key_BusinessInformation(STRING pVersion	=	(STRING8)Std.Date.Today(),
 																Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	FUNCTION
 
@@ -76,7 +76,10 @@ EXPORT	Key_BusinessInformation(STRING pVersion	=	(STRING8)Std.Date.Today(),
 																	SELF.dt_datawarehouse_first_reported	:=	(UNSIGNED4)LEFT.Extracted_Date;
 																	SELF.dt_datawarehouse_last_reported		:=	(UNSIGNED4)LEFT.Extracted_Date;
 																	SELF																	:=	LEFT));
-	dBusinessInformationDist	:=	SORT(DISTRIBUTE(dBusinessInformation,
+																	
+	addGlobalSID 							:=  MDR.macGetGlobalSID(dBusinessInformation,'SBFECV','','global_sid'); //DF-25791: Populate Global_SID	
+	
+	dBusinessInformationDist	:=	SORT(DISTRIBUTE(addGlobalSID,
 																	HASH(	record_type, Sbfe_Contributor_Number, Contract_Account_Number, Account_Type_Reported, Account_Holder_Business_Name, Clean_Account_Holder_Business_Name, 
 																				Business_Name, Clean_Business_Name, Company_Website, Original_fname, Original_mname, Original_lname, Original_suffix, E_Mail_Address, 
 																				Clean_title, Clean_fname, Clean_mname, Clean_lname, Clean_suffix, Original_Address_Line_1, Original_Address_Line_2, Original_City, 

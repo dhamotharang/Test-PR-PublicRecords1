@@ -23,7 +23,6 @@ firstrinid	:= FraudGovPlatform.Constants().FirstRinId;
 		self.FileDate := (unsigned)l.fn[sub..sub+7];
 		self.FileTime := ut.CleanSpacesAndUpper(l.fn[sub2..sub2+5]);
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
-		self.file_type := 3 ;
 		self.rawlinkid	:= Map(l.rawlinkid>0 and l.rawlinkid <firstrinid => if(exists(IDLExternalLinking.did_getAllRecs(l.rawlinkid)),l.rawlinkid,0)
 												,l.rawlinkid>=firstrinid => if(exists(Fraudshared.key_did('FraudGov')(did=l.rawlinkid)),l.rawlinkid,0)
 												,l.rawlinkid);

@@ -1,7 +1,4 @@
-﻿/*2014-04-07T18:00:50Z (Myana, Saritha (RIS-DAY))
-BIPV2 enhancement!
-*/
-IMPORT Address, NID, tools, ut, _Validate;
+﻿IMPORT Address, NID, tools, ut, _Validate;
 
 EXPORT Build_Base_Main(STRING 																 pversion,
 											 DATASET(Layouts.Base.Main) 						 inMainBase,
@@ -241,9 +238,18 @@ EXPORT Build_Base_Main(STRING 																 pversion,
 	
  	// Add source record id
   ut.MAC_Append_Rcid(baseMainPlusDescriptions, source_rec_id, baseMainPlusSourceRid);
+	
+	// Add global_sid and record_sid for CCPA
+	ABMS.Layouts.Base.Main add_sid(baseMainPlusSourceRid L) := TRANSFORM
+			SELF.global_sid								:= 23941;
+			SELF.record_sid								:= L.source_rec_id;
+			SELF						 							:= L;
+		END;
+	
+	with_ccpa := project(baseMainPlusSourceRid, add_sid (left));
 
 	// Return
-	tools.mac_WriteFile(Filenames(pversion).Base.Main.New, baseMainPlusSourceRid, Build_Base_File);
+	tools.mac_WriteFile(Filenames(pversion).Base.Main.New, with_ccpa, Build_Base_File);
 
 	EXPORT full_build := SEQUENTIAL(Build_Base_File,
 			                            Promote(pversion).buildfiles.New2Built);

@@ -147,7 +147,7 @@ export _proc_dotid(
 		'BIPV2_DOTID Controller ' + BIPV2.KeySuffix + ' ' + (string)startiter + '-' + (string)(startiter + numiters - 1);
 	export MultIter_run(
      startIter          = '\'\''
-    ,numIters           = '3'
+    ,numIters           = '2'
     ,doInit             = 'true'
     ,doSpec             = 'true'
     ,doIters            = 'true'
@@ -191,7 +191,7 @@ export _proc_dotid(
                         ,'recordsrejected0'
                         ,'unlinkablerecords0'
                        ];
-    StopCondition   := '(PostClusterCount / PreClusterCount * 100.0) > (99.9)';
+    StopCondition   := '(PostClusterCount / PreClusterCount * 100.0) > (99.99)';
     SetNameCalculations := ['Convergence_PCT','Convergence_Threshold'];
 
     kickInit   := Workman.mac_WorkMan(eclInit   ,version,cluster ,1         ,1  ,pBuildName := 'DOTIDInit' ,pNotifyEmails := pEmailList
@@ -211,7 +211,7 @@ export _proc_dotid(
       ,pSetNameCalculations := SetNameCalculations
       ,pBuildName           := 'DotIters'
       ,pNotifyEmails        := pEmailList
-      ,pOutputFilename      := '~BIPV2_build::@version@_@iteration@::workunit_history::proc_dotid.iterations'
+      ,pOutputFilename      := '~BIPV2_build::@version@::workunit_history::proc_dotid.iterations'
       ,pOutputSuperfile     := '~BIPV2_build::qa::workunit_history'                                            
       ,pCompileOnly         := pCompileTest
     );

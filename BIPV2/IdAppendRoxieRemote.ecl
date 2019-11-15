@@ -12,9 +12,11 @@ export IdAppendRoxieRemote(
 		,boolean useFuzzy = true
 		,boolean doZipExpansion = true
 		,string svcAppendUrl = ''
+		,string svcName = ''
         ,unsigned soapTimeout = 30
         ,unsigned soapTimeLimit = 0
         ,unsigned soapRetries = 3
+				,boolean segmentation = true
 	) := module
 
 	shared disableSaltForce := not primForce;
@@ -24,7 +26,7 @@ export IdAppendRoxieRemote(
 	inputUrl := if(svcAppendUrl[1..4] = 'http', svcAppendUrl, 'http://' + svcAppendUrl);
 	shared urlBipAppend := if(svcAppendUrl = '', prodUrl, inputUrl);
 
-	shared serviceName := 'bizlinkfull.svcappend';
+	shared serviceName := if(svcName = '', 'bizlinkfull.svcappend', svcName);
 
 	shared soapInput(boolean includeBest = false
 			,string fetchLevel = ''
@@ -56,6 +58,7 @@ export IdAppendRoxieRemote(
 				self.data_access_glb := mod_access.glb,
 				self.data_access_dppa := mod_access.dppa,
 				self.data_access_lexid_source_optout := mod_access.lexid_source_optout,
+				self.do_segmentation := segmentation,
 				self := defaultPermissions,
 			))
 		);
