@@ -38,7 +38,7 @@ EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='
 		//--------------------------------------------------------------------------------------
 		key_validation :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_fcra,dataset_name, 'F'), named(dataset_name+'Validation'));
 		
-		return sequential( build_key, key_validation/*, PerformUpdateOrNot*/);
+		return sequential( build_key, key_validation, PerformUpdateOrNot);
 
 		END;
 

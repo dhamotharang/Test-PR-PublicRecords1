@@ -1,4 +1,4 @@
-﻿IMPORT PRTE2_PhonesPlus, roxiekeybuild, ut, VersionControl, PRTE2_Common, _control, PRTE, AutoKey, dops, prte2;
+﻿IMPORT PRTE2_Testseed, roxiekeybuild, ut, VersionControl, PRTE2_Common, _control, PRTE, AutoKey, dops, prte2, Orbit3;
 
 //Variables for DOPS and email are used in current PRTE process
 EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
@@ -17,5 +17,8 @@ EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='
 		//--------------------------------------------------------------------------------------
 		key_validation :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,dataset_name, 'N'), named(dataset_name+'Validation'));
 		
-		return sequential( keys, key_validation, PerformUpdateOrNot);
+		//Orbit Build
+		create_orbit_build	:= Orbit3.proc_Orbit3_CreateBuild('PRTE - Testseed', filedate, 'N', true, true, false,  _control.MyInfo.EmailAddressNormal);
+
+		return sequential( keys, key_validation, PerformUpdateOrNot/*,create_orbit_build*/);
 		END;
