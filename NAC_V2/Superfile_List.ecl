@@ -65,5 +65,12 @@ EXPORT Superfile_List := module
 							sfProcessed + '_grandfather'
 						], deltail := true);
 
+	export MoveProcessedToReady :=			// for restart
+				Std.file.PromoteSuperFileList(
+						[sfReady, 
+							sfProcessed,
+							sfProcessed + '_father',
+							sfProcessed + '_grandfather'
+						], reverse := true);
 
 end;
