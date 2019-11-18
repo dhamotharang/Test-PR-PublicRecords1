@@ -20,7 +20,7 @@ fname_persist := '~thor_data400::persist::gong_history_wdtg';
 // define layouts
 layout_narrow := Relocations.layout_wdtg.narrow;
 
-layout_narrow2 := record
+layout_narrow_gsid := record
 	layout_narrow;
 	//CCPA-22 add global_sid/record_sid
 	UNSIGNED4 global_sid;
@@ -28,9 +28,11 @@ layout_narrow2 := record
 end;
 
 layout_span := record
-	layout_narrow2;
+	layout_narrow;
 	typeof(gong_raw.dt_first_seen)	span_first_seen;
 	typeof(gong_raw.dt_last_seen) 	span_last_seen := '';
+  UNSIGNED4 global_sid;
+	UNSIGNED8 record_sid;
 end;
 
 
@@ -46,7 +48,7 @@ gong_decent := gong_raw(
 
 
 // define narrowed layout with date-spanning fields
-gong_slim := project(gong_decent, layout_narrow2);
+gong_slim := project(gong_decent, layout_narrow_gsid);
 
 
 // add date-spanning fields, grouped by phone/location/surname
