@@ -80,7 +80,8 @@ SkipOverlinking       := SkipDataCard         ; // --
 SkipSeleidRelative    := SkipOverlinking      ; // -- Thread 4
 SkipCrosswalk         := SkipSeleidRelative   ; 
 SkipMktgListBuild     := SkipCrosswalk        ; 
-SkipCDWBuild          := SkipMktgListBuild    ; // -- back to Master
+SkipHighRiskKeys      := SkipMktgListBuild    ; 
+SkipCDWBuild          := SkipHighRiskKeys    ; // -- back to Master
 SkipXAppend           := SkipCDWBuild         ; //
 SkipDashboard         := SkipXAppend          ;
 SkipCopyOtherKeys     := SkipDashboard        ;
@@ -172,6 +173,7 @@ BIPV2_Build.proc_build_all(
   ,pSkipSeleidRelative    := SkipSeleidRelative
   ,pSkipCrosswalk         := SkipCrosswalk
   ,pSkipMktgListBuild     := SkipMktgListBuild
+  ,pSkipHighRiskKeys      := SkipHighRiskKeys
   ,pSkipCDWBuild          := SkipCDWBuild
   ,pSkipXAppend           := SkipXAppend
   ,pSkipDashboard         := SkipDashboard
