@@ -1,4 +1,4 @@
-﻿import tools, _control, ut, std, Scrubs, Scrubs_DataBridge;
+﻿import tools, _control, ut, std, Scrubs, Scrubs_DataBridge, dops, Orbit3;
 						
 export Build_All(
 	 string															pversion
@@ -24,6 +24,8 @@ function
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
 		,QA_Records()
+	  ,dops.updateversion('DataBridgeKeys',pversion,DataBridge.Email_Notification_Lists().BuildSuccess,,'N')
+		,Orbit3.proc_Orbit3_CreateBuild('DataBridge',pversion,'N')
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	    failure(Send_Emails(pversion,,not pIsTesting).buildfailure);
 	
