@@ -89,9 +89,7 @@ FUNCTION
     SELF.Phonestatus		         := IF(ri.phone != '', ri.Phonestatus, le.Phonestatus);
     SELF.PortingCode             := IF(ri.phone != '', ri.PortingCode, le.PortingCode);
     SELF.ListingType             := IF(ri.ListingType != '', ri.ListingType, le.ListingType);
-    SELF.coc_description         := IF(ri.ServiceClass != '',
-                                        $.Functions.ServiceClassDesc(ri.ServiceClass),
-                                        le.coc_description);
+    SELF.coc_description         := IF(ri.coc_description != '', ri.coc_description, le.coc_description);
     SELF.carrier_name            := MAP(ri.operatingcompany.name != ''=> ri.operatingcompany.name,
                                         ri.carrier_name != ''=> ri.carrier_name,
                                         le.carrier_name);
@@ -106,8 +104,8 @@ FUNCTION
     SELF.PortingStatus           := le.PortingStatus;
     SELF.FirstPortedDate         := le.FirstPortedDate;
     SELF.LastPortedDate          := le.LastPortedDate;
-    SELF.ActivationDate          := le.ActivationDate;
-    SELF.DisconnectDate          := le.DisconnectDate;
+    SELF.ActivationDate          := IF(ri.phone != '', ri.ActivationDate, le.ActivationDate);
+    SELF.DisconnectDate          := IF(ri.phone != '', ri.DisconnectDate, le.DisconnectDate);
     SELF.Prepaid                 := le.Prepaid;
     SELF.NoContractCarrier       := le.NoContractCarrier;
     SELF.Spoof                   := le.Spoof;
@@ -162,7 +160,6 @@ FUNCTION
                         LEFT.acctno = RIGHT.acctno AND
                         LEFT.phone  = RIGHT.phone,
                         TRANSFORM($.Layouts.PhoneFinder.PhoneSlim,
-                                  SELF.coc_description := IF(LEFT.ServiceClass != '', $.Functions.ServiceClassDesc(LEFT.ServiceClass), LEFT.coc_description),
                                   SELF                 := LEFT),
                         LEFT ONLY);
 

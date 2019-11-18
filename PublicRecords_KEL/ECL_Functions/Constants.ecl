@@ -14,9 +14,10 @@ EXPORT Constants := MODULE
   EXPORT INTEGER NO_DATA_FOUND_INT := -99998;
   
   EXPORT INTEGER DEFAULT_JOIN_LIMIT := 10000;
-  EXPORT INTEGER BUSINESS_HEADER_LIMIT := 8000;
+  EXPORT INTEGER BUSINESS_HEADER_LIMIT := 25000;
   EXPORT INTEGER CORTERA_TRADELINE_LIMIT := 25000;
-  
+  EXPORT INTEGER UCC_JOIN_LIMIT := 1000;
+	
   // This is the set of explicitly Allowed Sources for use within the Analytic Library.  If a record doesn't belong to one of these sources, it will be blocked from usage
   // TODO: KS-1968 - Define the set of ALLOWED_SOURCES.
   EXPORT SET OF STRING2 ALLOWED_SOURCES := [];

@@ -1,4 +1,4 @@
-﻿IMPORT DidVille, FraudShared, FraudShared_Services, iesp, Royalty;
+﻿IMPORT DeathV2_Services, DidVille, FraudShared, FraudShared_Services, iesp, Royalty;
 
 EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
@@ -214,6 +214,10 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 		
 	  SHARED ds_batch_w_ExternalServices := IF(IsRealTime,FraudGovPlatform_Services.Functions.getExternalServicesRecs(ds_in, batch_params),
 																							DATASET([], FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw));
+																							
+		SHARED ds_death := MAP(batch_params.IsOnline AND ~IsRealTime => FraudGovPlatform_Services.Raw(ds_in, batch_params).GetDeath(),
+													batch_params.IsOnline AND IsRealTime => ds_batch_w_ExternalServices[1].childrecs_death,
+													DATASET([],DeathV2_Services.layouts.BatchOut));
 																						
 		SHARED ds_realtime_tmp := FraudGovPlatform_Services.mod_RealTimeScoring(ds_batch_w_ExternalServices, batch_params);
 
@@ -295,7 +299,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 			SELF.IdentityResolved := IF(~IsRealTime,ds_api_results_w_scores[1].identity_resolved,FraudGovConst_.IDENTITY_RESOLVED_REALTIME);
 			SELF.LexID := ds_api_results_w_scores[1].lexid;
 
-			SELF.Deceased := ROW(FraudGovPlatform_Services.Transforms.xform_deceased(ds_api_results_w_scores.childRecs_Death[1]));
+			SELF.Deceased := ROW(FraudGovPlatform_Services.Transforms.xform_deceased(ds_death[1]));
 			
 			SELF.Criminals :=	IF(~batch_params.IsOnline,
 													PROJECT(CHOOSEN(ds_api_results_w_scores.childRecs_Criminal, batch_params.MaxCriminals),
