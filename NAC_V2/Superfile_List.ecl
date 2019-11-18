@@ -57,6 +57,9 @@ EXPORT Superfile_List := module
 	export MoveReadyToProcessing :=
 				Std.file.PromoteSuperFileList([sfReady, sfProcessing]);
 				
+	export MoveProcessingToReady :=			// for restart
+				Std.file.PromoteSuperFileList([sfProcessing, sfReady]);
+				
 	export MoveProcessingToProcessed :=
 				Std.file.PromoteSuperFileList(
 						[sfProcessing, 
