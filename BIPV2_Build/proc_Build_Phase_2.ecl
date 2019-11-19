@@ -19,6 +19,7 @@ export proc_Build_Phase_2(
   ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
   ,pSkipCrosswalk         = 'false'
+  ,pSkipHighRiskKeys      = 'false'
   ,pCompileTest           = 'false'
    
 ) := 
@@ -43,6 +44,7 @@ functionmacro
       ,if(pSkipIndustry         = false ,BIPV2_Build.proc_industry_license     (pversion             )                                                                                        )
       ,if(pSkipMisckeys         = false ,BIPV2_Build.proc_misc_keys            (pversion             )                                                                                        )
       ,if(pSkipCrosswalk        = false ,BIPV2_Build.proc_crosswalk            (pversion             )                                                                                        )
+      ,if(pSkipHighRiskKeys     = false ,BIPV2_Build.proc_build_HighRiskKey    (pversion             )                                                                                        )
       ,if(pSkipQASamples        = false ,BIPV2_Build.proc_BIPV2_QA_Samples     (pversion,pCompileTest)                                                                                        )
       ,if(pSkipSegStats         = false ,BIPV2_Build.proc_segmentation         (pversion             )                                                                                        )
       ,if(pSkipStrata           = false ,BIPV2_Build.proc_Strata               (pversion             )                                                                                        )
