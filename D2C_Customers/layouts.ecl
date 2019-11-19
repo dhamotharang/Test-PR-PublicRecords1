@@ -29,6 +29,7 @@
     EXPORT lRelativesSlim := record
         unsigned6 LexID1;
         unsigned6 LexID2;
+        boolean   isanylnamematch;
     END;
 
     EXPORT rRelatives := record

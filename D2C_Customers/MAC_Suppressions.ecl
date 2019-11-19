@@ -1,6 +1,6 @@
 EXPORT MAC_Suppressions(inDS, record_type) := FUNCTIONMACRO
   
-  import Suppress, AutoStandardI;
+  import AutoStandardI, header;
   
   appType := (string)AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));  
 
@@ -9,7 +9,11 @@ EXPORT MAC_Suppressions(inDS, record_type) := FUNCTIONMACRO
 
 //CCPA suppression
   #uniquename(cleaned_ccpa)
-  %cleaned_ccpa% := header.fn_suppress_ccpa(%dinDS%);
+  #if(record_type in [0])   
+   %cleaned_ccpa% := header.fn_suppress_ccpa(%dinDS%, true);
+  #else
+   %cleaned_ccpa% := %dinDS%;
+  #end
 
 //DID suppression
   #uniquename(cleaned_did)		
