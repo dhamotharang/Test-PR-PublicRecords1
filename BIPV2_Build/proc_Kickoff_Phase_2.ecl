@@ -19,6 +19,7 @@ EXPORT proc_Kickoff_Phase_2(
   ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
   ,pSkipCrosswalk         = 'false'
+  ,pSkipHighRiskKeys      = 'false'
   ,pUniqueOutput          = '\'\''
   ,pOutputEcl             = 'false'
   ,pCompileTest           = 'false'
@@ -46,6 +47,7 @@ functionmacro
   + ',@pSkipOverlinking@\n'        
   + ',@pSkipSeleidRelative@\n'
   + ',@pSkipCrosswalk@\n'
+  + ',@pSkipHighRiskKeys@\n'
   + ',@pCompileTest@\n'
   + ');';
   
@@ -69,11 +71,12 @@ functionmacro
   ecl14   := regexreplace('@pSkipOverlinking@'    ,ecl13  ,fbool(pSkipOverlinking     ),nocase);
   ecl15   := regexreplace('@pSkipSeleidRelative@' ,ecl14  ,fbool(pSkipSeleidRelative  ),nocase);
   ecl16   := regexreplace('@pSkipCrosswalk@'      ,ecl15  ,fbool(pSkipCrosswalk       ),nocase);
-  ecl17   := regexreplace('@pCompileTest@'        ,ecl16  ,fbool(pCompileTest         ),nocase);
+  ecl17   := regexreplace('@pSkipHighRiskKeys@'   ,ecl16  ,fbool(pSkipHighRiskKeys    ),nocase);
+  ecl18   := regexreplace('@pCompileTest@'        ,ecl17  ,fbool(pCompileTest         ),nocase);
                                                             
-  kickWuid	  := wk_ut.CreateWuid(ecl17,cluster);
+  kickWuid	  := wk_ut.CreateWuid(ecl18,cluster);
 //  kickXlink	  := wk_ut.CreateWuidNWait(ecl16,'1',pversion,cluster,,_control.MyInfo.EmailAddressNotify,,pUniqueOutput,pPollingFrequency,false);
   
-  return if(pOutputEcl = false  ,kickWuid  ,ecl13);
+  return if(pOutputEcl = false  ,kickWuid  ,ecl18);
 
 endmacro;

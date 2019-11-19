@@ -7,8 +7,8 @@ rm_score := PROJECT(rm_score0, TRANSFORM({rm_score0 , UNSIGNED4 DT_EFFECTIVE_FIR
                                  SELF := LEFT
                                  )); 
 
-rm_score_ccpa_compliant := header.fn_suppress_ccpa(rm_score);
+rm_score_ccpa_compliant := header.fn_suppress_ccpa(rm_score,true);
 
-EXPORT Key_InsuranceHeader_DID := INDEX(rm_score_ccpa_compliant, {unsigned6 s_did := did}, {rm_score}-_Control.Layout_KeyExclusions, 
+EXPORT Key_InsuranceHeader_DID := INDEX(rm_score_ccpa_compliant, {unsigned6 s_did := did}, {rm_score_ccpa_compliant}-_Control.Layout_KeyExclusions, 
 						                      '~thor_data400::key::insuranceheader_xlink::' + doxie.Version_SuperKey + '::did' );
 

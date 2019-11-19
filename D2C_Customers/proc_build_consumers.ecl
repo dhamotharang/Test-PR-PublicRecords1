@@ -1,6 +1,7 @@
 ﻿import std, PromoteSupers, Infutor, Relationship, Header, death_master;
 
 /********* CONSUMER_FILE **********/
+//FULL - 603,096,897
 
 EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
@@ -9,10 +10,8 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
    dist_death := distribute(death(crlf<>'SA'), hash(did));
    dsDeath := dedup(sort(dist_death, did, -filedate, local), did, filedate, local);
 
-   Infutor_Best := map( mode = 1 => D2C_Customers.Files.FullInfutorDS,            //FULL
-                        mode = 2 => D2C_Customers.Files.coreInfutorDS,            //QUARTERLY
-                        mode = 3 => D2C_Customers.Files.coreInfutorDerogatoryDS   //MONTHLY
-                      );   
+   Infutor_Best := D2C_Customers.Files.InfutorBest(mode);
+
    ds := join(
       distribute(Infutor_Best, hash(did)),
       distribute(dsDeath, hash((unsigned6)did)),
@@ -21,25 +20,14 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
       left outer,
       local);
    
-   //Get all transunion records with dob whch needs to be blank out
-   //needs to find out the transunion srcs
-   //the cluster has records with TU with dob and no other srcs has dob
-   notTU := dedup(Infutor.infutor_header(src not in ['TS', 'LT', 'TU'], dob > 0), did, all);
+   //Get all did cluster with no TS records
+   //DOB is blanked out for cluster having TS records ONLY
+   notTU := dedup(D2C_Customers.Files.InfutorHdr(1)(src <> 'TS', dob > 0), did, all);
 
-   //cannot send more than 75% TU records with low dids - TBD
-   //how many unqique lexid has TU records in infutor header
-   //src GN for Neustar - breakdown of segmentation
-   //src 1F for Infutor - breakdown of segmentation
-   //infutor header conists of GONG(GO) and GN
-
-   relatives := distribute(Relationship.key_relatives_v3(not(confidence IN ['NOISE','LOW'])), hash(did1));
+   // relatives := distribute(Relationship.key_relatives_v3(not(confidence IN ['NOISE','LOW'])), hash(did1));
    //Get all dids which are NOT the primary core dids
-   notPrimary_dids := join(distribute(ds, hash(did)), relatives, left.did = right.did1, left only, local); //56,740,234
-   setofNonCoreDids := set(notPrimary_dids, did);
-   
-   //Get all dids which are NOT the primary core dids and exist as associations ONLY
-   // Associations_ONLY := join(distribute(notPrimary_dids, hash(did)), distribute(relatives, hash(did2)), left.did = right.did2, inner, local);  //752,653
-   // Associations_ONLY_dids := set(Associations_ONLY, did);
+   // notPrimary_dids := join(distribute(ds, hash(did)), relatives, left.did = right.did1, left only, local); //56,740,234
+   // setofNonCoreDids := set(notPrimary_dids, did);
    
    consumers := project(ds, transform(D2C_Customers.layouts.rConsumers,
             self.LexID         := left.did;
@@ -66,14 +54,17 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
                      left outer,
                      local);
    
-   D2C_Customers.layouts.rConsumers SetReport(j_w_notTU l, notTU r) := TRANSFORM
-      self.Report_Candidate := if(l.LexID = r.did and mode = 1, 'N', l.Report_Candidate);
-      SELF := l;
-   END;
+   kRelatives := Relationship.key_relatives_v3(not(confidence IN ['NOISE','LOW']) and did1 > 0);
 
+   D2C_Customers.layouts.rConsumers SetReport(j_w_notTU l, kRelatives r) := TRANSFORM
+      self.Report_Candidate := if(l.LexID = r.did1 and mode = 1, l.Report_Candidate, 'N');
+      SELF := l;
+   END; 
+   
    inDS := join(distribute(j_w_notTU, hash(LexID)),
-               distribute(notTU, hash(did)),
-               left.LexID = right.did,
+               distribute(kRelatives, hash(did1)),
+               // distribute(notTU, hash(did)),
+               left.LexID = right.did1,
                transform(left),
                left outer,
                local);
