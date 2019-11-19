@@ -15,6 +15,7 @@ EXPORT AddressPersonAssociations := MODULE
 	SHARED HighFrequencyPhoneThreshold := 20;
   SHARED HighFrequencyAddressCutoff := 20;
 	SHARED LargeAssociationThreshold := 200; // this is the cutoff for associations for overconnected people.
+  SHARED DemoHashes := [3977509724, 2727638882, 1139485299, 2459821998, 3635312545, 1026679856, 4401323, 3005794324, 866735130];
 
 	SHARED Sharing := KELOtto.SharingRules;
 
@@ -165,10 +166,10 @@ EXPORT AddressPersonAssociations := MODULE
 //																TRANSFORM({RECORDOF(LEFT), RIGHT.HighFrequencyAddressFlag}, SELF := LEFT, SELF := RIGHT), LOOKUP);
 
   EXPORT EmailMatchPrep := MatchElements(DISTRIBUTE(DistributedAddressEvents(OttoEmailId != 14695981039346656037), HASH64(AssociatedCustomerFileInfo,OttoEmailId)), 'LEFT.OttoEmailId = RIGHT.OttoEmailId');
-	EXPORT AddressMatchPrep := MatchElements(DistributedAddressEvents(AddressHash NOT IN [0,14695981039346656037]), 'LEFT.AddressHash != 14695981039346656037 AND LEFT.AddressHash = RIGHT.AddressHash AND ABS(Std.Date.ToDaysSince1900((UNSIGNED)LEFT.event_date) - Std.Date.ToDaysSince1900((UNSIGNED)RIGHT.event_date)) < MAP(LEFT.AssociatedCustomerFileInfo = 2481802344 => 360, DateOverLapThreshold)');
+	EXPORT AddressMatchPrep := MatchElements(DistributedAddressEvents(AddressHash NOT IN [0,14695981039346656037]), 'LEFT.AddressHash != 14695981039346656037 AND LEFT.AddressHash = RIGHT.AddressHash AND ABS(Std.Date.ToDaysSince1900((UNSIGNED)LEFT.event_date) - Std.Date.ToDaysSince1900((UNSIGNED)RIGHT.event_date)) < MAP(LEFT.AssociatedCustomerFileInfo IN DemoHashes => 30, DateOverLapThreshold)');
   EXPORT PhoneMatchPrep := MatchElements(DISTRIBUTE(DistributedAddressEvents(cell_phone != '' OR phone_number != ''), HASH64(AssociatedCustomerFileInfo,cell_phone)), '(LEFT.cell_phone = RIGHT.cell_phone OR LEFT.cell_phone = RIGHT.phone_number)');
 	EXPORT IpWithoutHf := JOIN(DistributedAddressEvents, HighFrequencyIps, LEFT.OttoIpAddressId=RIGHT.OttoIpAddressId, LEFT ONLY, LOOKUP);
-  EXPORT IpMatchPrep := MatchElements(DISTRIBUTE(IpWithoutHf(OttoIpAddressId NOT IN [0,14695981039346656037]), HASH64(AssociatedCustomerFileInfo,OttoIpAddressId)), 'LEFT.OttoIpAddressId = RIGHT.OttoIpAddressId');
+  EXPORT IpMatchPrep := MatchElements(DISTRIBUTE(IpWithoutHf(OttoIpAddressId NOT IN [0,14695981039346656037]), HASH64(AssociatedCustomerFileInfo,OttoIpAddressId)), 'LEFT.OttoIpAddressId = RIGHT.OttoIpAddressId AND ABS(Std.Date.ToDaysSince1900((UNSIGNED)LEFT.event_date) - Std.Date.ToDaysSince1900((UNSIGNED)RIGHT.event_date)) < MAP(LEFT.AssociatedCustomerFileInfo IN DemoHashes => 30, DateOverLapThreshold)');
   EXPORT Bank1MatchPrep := MatchElements(DISTRIBUTE(DistributedAddressEvents(OttoBankAccountId NOT IN [0,12638153115695167395] OR OttoBankAccountId2 NOT IN [0,12638153115695167395]), HASH64(AssociatedCustomerFileInfo,OttoBankAccountId)), '(LEFT.OttoBankAccountId = RIGHT.OttoBankAccountId OR LEFT.OttoBankAccountId = RIGHT.OttoBankAccountId2)');
 
 // Reduce to 1 row per did per customer, day with the flags aggregated.
