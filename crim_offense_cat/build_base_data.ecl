@@ -14,6 +14,7 @@ export build_Base_Data(boolean pUseProd = false) := function
                 L.category[..length(L.category)-1],
                 L.category
                 );
+            self.id := L.id;
     END;
     final_data := project(rawdata, remove_quotes(left));
     RETURN final_data;
