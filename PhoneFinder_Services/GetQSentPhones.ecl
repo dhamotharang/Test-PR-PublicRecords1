@@ -19,7 +19,7 @@ MODULE
 													pGateway) :=
 	FUNCTIONMACRO
 		IMPORT AutoStandardI,BatchServices,Doxie_Raw,Gateway,iesp,Phones,std;
-		
+
 		globalMod := AutoStandardI.GlobalModule();
 
 		timeoutSecs  := 5; // gateway timeout
@@ -176,7 +176,7 @@ MODULE
 			SELF.did               := (UNSIGNED)ri.did;
 			SELF.telcordia_only    := ri.telcordia_only = 'Y';
 			SELF.sort_order        := cnt;
-			SELF.isPrimaryIdentity := TRUE;
+			SELF.isPrimaryIdentity := inMod.isPrimarySearchPII;
 
  			fn_len := length(trim(ri.fname));
       fn_parsed := if(fn_len > 3 and ri.fname[fn_len-1] = ' ', ri.fname[1..fn_len-2], ri.fname);
