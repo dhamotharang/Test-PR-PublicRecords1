@@ -106,7 +106,7 @@ export OutputGeoXMLFile(dataset(recordof(Layout_Watchlist.rgeo)) infile
 	outfile := PROJECT(infile, Layout_Watchlist.rgeoOut);
 
 	hdr := MakeXMLHdr(Watchlistname, cnt, 'Country_List');
-	return OUTPUT(outfile,,'~thor::uniqueid::'+filename,
+	return OUTPUT(Distribute(outfile,0),,'~thor::uniqueid::'+filename,
 			xml('Country', heading(hdr,GeoFooter),trim, OPT), overwrite);
 END;
 
