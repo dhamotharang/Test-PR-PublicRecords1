@@ -516,10 +516,13 @@ Professional_Licenses_NOT_allowed := [
 
 ];
 //18 // source_file
-Sex_Offenders_allowed := [
+Sex_Offenders_NOT_allowed := [
+
+        // 19135	Item	Sex Offender Registry	HDI/Appriss (formerly Hygenics)
+        // All hygenics allowed but must be filtered down to only 30% of RECRODS.
 
         // 'TX_OFFENDER_REGISTRY', //       382,292       16% // 13103 bulk and consumer restricted
-        'CA_SEX_OFFENDER_REGI' //       369,923       16% // 13129 (historical) no orbit restrictions
+        // 'CA_SEX_OFFENDER_REGI' //       369,923       16% // 13129 (historical) no orbit restrictions
         // 'FL_SEX_OFFENDER_REGI', //       258,821       11% // 13723, 13761 says removed from production. 761 bulk and consumer restricted
         // 'MI_SEX_OFFENDER_REGI', //       92,063       4% // 15137 bulk and consumer restricted
         // 'MO_SEX_OFFENDER_REGI', //       81,019       3% // 15403, 15423 bulk and consumer restricted
@@ -589,7 +592,7 @@ EXPORT Check(UNSIGNED1 rec_type, STRING src) := CASE(rec_type,
     15 => ~  (src       in People_At_Work_NOT_allowed         ),
     16 =>    (src       in Phones_allowed                     ),
     17 => ~  (src       in Professional_Licenses_NOT_allowed  ) AND ~(src[1..3] in ['ENC','HMS'] ), 
-    18 =>    (src       in Sex_Offenders_allowed              ),
+    18 => ~  (src       in Sex_Offenders_NOT_allowed          ),
     19 =>    (src       in Voter_Registration_allowed         ),
     20 =>    (src[1..2] in Deeds_Mortgages_bulk_D2C_allowed   ),
     21 =>    (src[1..2] in Tax_Assessments_bulk_D2C_allowed   ),

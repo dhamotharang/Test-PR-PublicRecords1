@@ -1,4 +1,4 @@
-import ut;
+﻿import MDR, ut;
 export Rollup_Base(
 
 	 dataset(Layouts.Base)	pDataset
@@ -6,8 +6,14 @@ export Rollup_Base(
 	
 ) :=
 function
-
-	pDataset_Dist := distribute(pDataset	,hash64(did,bdid));
+	
+	//DF-26531: Populate Global_SID
+	w_gsid 				:= pDataset(global_sid<>0);																		//Records with global_sid
+	no_gsid				:= pDataset(global_sid=0);																		//Recods without global_sid
+	addGlobalSID	:= MDR.macGetGlobalSID(no_gsid,'POE','source','global_sid');	//Populate global_sid to those without, if available 	
+	allRecs 			:= w_gsid + addGlobalSID;																			//Concat results
+	
+	pDataset_Dist := distribute(allRecs	,hash64(did,bdid));
 	
 	pDataset_sort := sort(pDataset_Dist	
 	   ,except 

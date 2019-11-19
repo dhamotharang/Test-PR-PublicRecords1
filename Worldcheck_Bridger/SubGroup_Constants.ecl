@@ -1163,6 +1163,7 @@
 		export string KEYWORD_FRDGCCRF_CP						:= '849';
 		export string KEYWORD_FRDGCCRF							:= '850';
 		export string KEYWORD_OFAC_EO13884					:= '851';
+		export string KEYWORD_PTTC									:= '852';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
