@@ -10,11 +10,11 @@ export build_Base_Data(boolean pUseProd = false) := function
                 L.offensecharge[2..],
                 L.offensecharge
                 );
-            self.category := if(L.category[length(L.category)] = '"',
-                L.category[..length(L.category)-1],
-                L.category
+            self.id := if(L.id[length(L.id)] = '"',
+                L.id[..length(L.id)-1],
+                L.id
                 );
-            self.id := L.id;
+            self.category := L.category;
     END;
     final_data := project(rawdata, remove_quotes(left));
     RETURN final_data;
