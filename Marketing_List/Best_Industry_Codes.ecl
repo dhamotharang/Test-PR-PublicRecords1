@@ -2,6 +2,8 @@
   Get:
     SICs
     NAICSs
+
+  use base file instead of best because the base file has the source of the sic code.  Best file does not.
 */  
   
   // -- 9.  pick best industry codes from single source using first 4 digits in this priority order(if same seleid and same unique id, then keep industry code with most recent dt last seen.  for tie breakers use one listed most often):
@@ -64,24 +66,31 @@ function
   ds_base_dedup := dedup(sort(distribute(ds_base_add_priority  ,hash(seleid)) ,seleid,rank_order,-dt_last_seen ,local)  ,seleid ,local);
   
   ds_base_out := project(ds_base_dedup,transform(Marketing_List.Layouts.business_information_prep,
-    self                    := left;
-    self.SIC_Primary        := left.company_sic_code1;
-    self.SIC2               := left.company_sic_code2;
-    self.SIC3               := left.company_sic_code3;
-    self.SIC4               := left.company_sic_code4;
-    self.SIC5               := left.company_sic_code5;
-    self.NAICS_Primary      := left.company_naics_code1;
-    self.NAICS2             := left.company_naics_code2;
-    self.NAICS3             := left.company_naics_code3;
-    self.NAICS4             := left.company_naics_code4;
-    self.NAICS5             := left.company_naics_code5;
 
-    self := []
+    ds_sics  := dataset([{left.company_sic_code1   },{left.company_sic_code2  },{left.company_sic_code3  },{left.company_sic_code4  },{left.company_sic_code5  }] ,{string4 sic  });
+    ds_naics := dataset([{left.company_naics_code1 },{left.company_naics_code2},{left.company_naics_code3},{left.company_naics_code4},{left.company_naics_code5}] ,{string6 naics});
+    
+    ds_sics_nonblank  := ds_sics (sic   != '');
+    ds_naics_nonblank := ds_naics(naics != '');
+    
+    self.SIC_Primary        := ds_sics_nonblank [1].sic;
+    self.SIC2               := ds_sics_nonblank [2].sic;
+    self.SIC3               := ds_sics_nonblank [3].sic;
+    self.SIC4               := ds_sics_nonblank [4].sic;
+    self.SIC5               := ds_sics_nonblank [5].sic;
+    self.NAICS_Primary      := ds_naics_nonblank[1].naics;
+    self.NAICS2             := ds_naics_nonblank[2].naics;
+    self.NAICS3             := ds_naics_nonblank[3].naics;
+    self.NAICS4             := ds_naics_nonblank[4].naics;
+    self.NAICS5             := ds_naics_nonblank[5].naics;
+
+    self                    := left;
+    self                    := []
   ));
   
   output_debug := parallel(
    
-    output('---------------------Marketing_List_Best_Industry_Codes---------------------'                 ,named('Marketing_List_Best_Industry_Codes'         ),all)
+    output('---------------------Marketing_List_Best_Industry_Codes---------------------'                ,named('Marketing_List_Best_Industry_Codes'          ),all)
    ,output(choosen(pDataset_Base        (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_Industry_Codes_pDataset_Base'           ),all)
    ,output(choosen(pBest_Prep           (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_Industry_Codes_pBest_Prep'              ),all)
    ,output(choosen(ds_base_clean        (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_Industry_Codes_ds_base_clean'           ),all)
