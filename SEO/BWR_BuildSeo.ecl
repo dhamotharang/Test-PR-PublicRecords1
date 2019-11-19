@@ -1,5 +1,7 @@
 ﻿#OPTION('MultiplePersistInstances', false);
-version:=ut.GetDate : independent;
+IMPORT Std, Watchdog, Infutor;
+version := (string8)Std.Date.Today() : independent;
+
 // Find CORE LexIds from consumers
 
 knowx := DISTRIBUTE(Pull(infutor.Key_Header_Infutor_Knowx)(Length(TRIM(fname))>1,Length(TRIM(lname))>1), did);
@@ -88,8 +90,8 @@ sfBaseAddr := '~thor::seo_addr';
 							sfBaseAddr,
 							sfBaseAddr+'::father',
 							sfBaseAddr+'::delete'];
-	PromoteFiles(string lfn) := NOTHOR(Std.File.PromoteSuperFileList(SFList, lfn, true));
-	PromoteAddrFiles(string lfn) := NOTHOR(Std.File.PromoteSuperFileList(SFListAddr, lfn, true));
+	PromoteFiles(string lfn) := NOTHOR(Std.File.PromoteSuperFileList(SFList, lfn, deltail := true));
+	PromoteAddrFiles(string lfn) := NOTHOR(Std.File.PromoteSuperFileList(SFListAddr, lfn, deltail := true));
 
 SEQUENTIAL(
 	writeit,
@@ -97,5 +99,5 @@ SEQUENTIAL(
 	SEO.DesprayFile(lfn, 'seo', version),
 	SEO.DesprayFile(lfn2, 'seoaddr', version),
 	PromoteFiles(lfn),
-	PromoteAddrFiles(lfn2
+	PromoteAddrFiles(lfn2)
 );
