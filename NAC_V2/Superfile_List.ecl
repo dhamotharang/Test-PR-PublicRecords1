@@ -37,8 +37,8 @@ EXPORT Superfile_List := module
 	export Promote(string sf, string filename) := FUNCTION
 			sfList := [
 			sf,
-			sf+'::father',
-			sf+'::grandfather'
+			sf+'_father',
+			sf+'_grandfather'
 			];
 	
 		return 	Std.file.fPromoteSuperFileList(sfList, filename, deltail := true);
@@ -47,8 +47,8 @@ EXPORT Superfile_List := module
 	export Demote(string sf) := FUNCTION
 			sfList := [
 			sf,
-			sf+'::father',
-			sf+'::grandfather'
+			sf+'_father',
+			sf+'_grandfather'
 			];
 	
 		return 	Std.file.fPromoteSuperFileList(sfList, reverse := true);
@@ -60,13 +60,13 @@ EXPORT Superfile_List := module
 	export MoveProcessingToReady :=			// for restart
 				Std.file.PromoteSuperFileList([sfProcessing, sfReady]);
 				
-	export MoveProcessingToProcessed :=
+	export MoveProcessingToProcessed := IF(STD.File.GetSuperFileSubCount(sfProcessing) > 0,
 				Std.file.PromoteSuperFileList(
 						[sfProcessing, 
 							sfProcessed,
 							sfProcessed + '_father',
 							sfProcessed + '_grandfather'
-						], deltail := true);
+						], deltail := true));
 
 	export MoveProcessedToReady :=			// for restart
 				Std.file.PromoteSuperFileList(
