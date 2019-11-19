@@ -1,4 +1,4 @@
-﻿EXPORT fnRunCustomerDashboard1_1(BOOLEAN runProd = FALSE,//set to TRUE it will run against DSP Prod on the RAMPS Prod cluster. Set to FALSE it will run against DSP QA on the RAMPS Cert cluster
+﻿EXPORT fnRunHighRiskIdentity(BOOLEAN runProd = FALSE,//set to TRUE it will run against DSP Prod on the RAMPS Prod cluster. Set to FALSE it will run against DSP QA on the RAMPS Cert cluster
 	BOOLEAN useProdData = FALSE,												//set to TRUE it will use the files generated in Thor Prod, else it will use the files generated in Dataland
 	BOOLEAN newVersion = FALSE,													//set to FALSE it will create the new indexes but not automatically update the existing dashboard service to use them
 	BOOLEAN updateROSE = FALSE													//set to TRUE it will run from the specified DSP on ramps dev cluster for ROSE environment
@@ -6,8 +6,8 @@
 	IMPORT RAMPS_WebServices, STD, Data_Services, FraudGovPlatform_Analytics;
 	
 	//Input Parameters
-	cmpUuid							:= FraudGovPlatform_Analytics.Constants.RampsWebServices.CustomerDashboard1_1.CompositionUuid;
-	vizVersion 					:= FraudGovPlatform_Analytics.Constants.RampsWebServices.CustomerDashboard1_1.VizServiceVersion;
+	cmpUuid							:= FraudGovPlatform_Analytics.Constants.RampsWebServices.HighRiskIdentityDashboard.CompositionUuid;
+	vizVersion 					:= FraudGovPlatform_Analytics.Constants.RampsWebServices.HighRiskIdentityDashboard.VizServiceVersion;
 	reqSource 					:= FraudGovPlatform_Analytics.Constants.RampsWebServices.reqSource;																
 	encodedCreds 				:= FraudGovPlatform_Analytics.Constants.RampsWebServices.EncodedCredentials;			
 	dspToUse						:= FraudGovPlatform_Analytics.configFunctions.getDspToUse(runProd, updateROSE);
@@ -17,12 +17,10 @@
 	forceRun						:= FraudGovPlatform_Analytics.Constants.RampsWebServices.ForceRun;
 	
 	//Files used to create the dashboard
-	inputLogicalClusterFilename 							:= STD.Str.FindReplace(FraudGovPlatform_Analytics.Constants.RampsWebServices.CustomerDashboard1_1.Filenames(useProdData).InputLogicalCluster, '::', '%3A%3A');
-	inputLogicalIdentitiesAndElementsFilename	:= STD.Str.FindReplace(FraudGovPlatform_Analytics.Constants.RampsWebServices.CustomerDashboard1_1.Filenames(useProdData).InputLogicalIdentitiesAndElements, '::', '%3A%3A');
-	inputLogicalEntityStatsFilename 					:= STD.Str.FindReplace(FraudGovPlatform_Analytics.Constants.RampsWebServices.CustomerDashboard1_1.Filenames(useProdData).InputLogicalEntityStats, '::', '%3A%3A');
+	inputLogicalPersonStatsFilename 					:= STD.Str.FindReplace(FraudGovPlatform_Analytics.Constants.RampsWebServices.HighRiskIdentityDashboard.Filenames(useProdData).InputLogicalPersonStats, '::', '%3A%3A');
+	inputLogicalEntityStatsFilename 					:= STD.Str.FindReplace(FraudGovPlatform_Analytics.Constants.RampsWebServices.HighRiskIdentityDashboard.Filenames(useProdData).InputLogicalEntityStats, '::', '%3A%3A');
 		
-	fileNames	:= '&InputLogicalClusterFilename='+inputLogicalClusterFilename
-		+'&InputLogicalIdentitiesAndElementsFilename='+inputLogicalIdentitiesAndElementsFilename
+	fileNames	:= '&InputLogicalPersonStatsFilename='+inputLogicalPersonStatsFilename
 		+'&InputLogicalEntityStatsFilename='+inputLogicalEntityStatsFilename;
 
 	dRunComposition := RAMPS_WebServices.macRunComposition(cmpUuid, encodedCreds, 
