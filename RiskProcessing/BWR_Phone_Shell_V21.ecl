@@ -1,12 +1,13 @@
 ﻿//REMOVE DID field in layout and getting populated in soap input if wanting apples to apples with other scripts as NOT all scripts are sending this in.
-#WORKUNIT('name', 'Phone_Shell');
+#WORKUNIT('name', 'Phone_Shell V2.1');
 
-IMPORT Phone_Shell, Relocations, Risk_Indicators, RiskWise, data_services;
+IMPORT Phone_Shell, Relocations, Risk_Indicators, RiskWise, data_services, Models;
 
 RecordsToRun := 0; // Number of records to run through the service - set to 0 to run all
 
 eyeball := 250; // Number of sample records to view
 
+// RoxieIP := RiskWise.Shortcuts.Dev156; // Dev156 Fusion Roxie
 RoxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie; // Production Roxie
 // RoxieIP := RiskWise.Shortcuts.Staging_Neutral_RoxieIP; // Staging/Cert Roxie
 
@@ -20,25 +21,43 @@ Threads := 30; // Number of Parallel threads to SOAPCALL with
 //OutputFile := '~akoenen::out::phone_shell';
 
 //InputFile := data_services.foreign_prod +'bweiner::in::mar18_1p_pii.csv';
-InputFile := '~bweiner::in::mar18_1p_pii.csv';
+InputFile := '~bweiner::in::sep19_1p_pii.csv';
 
 // OutputFile := '~bweiner::out::phone_shell_sample_mar18_1p-equifax_OFF';
-OutputFile := '~bweiner::out::phone_shell_sample_mar18_1p-equifax_ON';
+OutputFile := '~bweiner::out::phone_shell_sample_sep19_1p-equifax_ON';
 
 /* *****************************************
  * Phone Shell Input Options               *
  *******************************************/
-// DataRestrictionMask := '0000000000000000000000000'; //orig PHone shell setting
-DataRestrictionMask := '101000000000000000000000000'; //If bit 24 is 1 that means NO Equifax data can be used
-//DataPermission := Phone_Shell.Constants.Default_DataPermission; //orig PHone shell setting
-DataPermission := '100000000000000000000'; 
-//set Premium A flag here
-//PremiumAFlag := TRUE;
-PremiumAFlag := FALSE; //no Equifax gateway
+// DataRestrictionMask := '0000000000000000000000000'; //orig Phone shell setting, no restrictions
+// DataRestrictionMask := '101000000000000000000000000'; //If bit 24 is 1 that means NO Equifax data can be used, if bit 16 is 1 that means NO inquiries
+// ^^ Above 101000000000000000000000000 amounts to NO Fares and NO Experian Business Reports
+ DataRestrictionMask := '0000000000000101000000000000000000000000'; // DRM from Ben W's script (based on product settings) - amounts to Experian FCRA Header OFF and Inquiries OFF
 
+// DataPermission := Phone_Shell.Constants.Default_DataPermission; //orig Phone shell setting
+// DataPermission := '100000000000000000000'; 
+// ^^ Above 100000000000000000000 amounts to use_qsent = use in-house(not gateway) qsent data, per AutoStandardI.DataPermissionI
+ DataPermission := '00000000010100000000000000000000000'; // DPM from Ben W's script (based on product settings) - amounts to use_DeathMasterSSAUpdates and use_SBFEData
+
+//set Premium A flag here
+// PremiumAFlag := TRUE;
+// PremiumAFlag := FALSE; //no Equifax gateway
+PremiumAFlag := FALSE;
+PremiumSource_A_limit := 0; // if Equifax gateway ON, how many Equifax phones to return (max 3)
+PhoneShell_version := 21; // 21 for 2.1; A different script should be used for 1.0.
+
+IncludeFPScores := TRUE; // Default is FALSE (for v1) or TRUE (for v2+). This is to match better when compared to running a Boca Shell directly.
 EnableInsuranceAttributes := TRUE; // Should probably always be TRUE - turns on the Insurance Verification Attributes
-ScoringModelName := 'COLLECTIONSCORE_V3';//'PHONESCORE_V2' = OLD phone model; // Set to BLANK to turn off the scoring model
-Score_Threshold_In := 306; //orig script had 245
+
+ScoringModelName := 'COLLECTIONSCORE_V3'; // This value means "run the model". Set to BLANK ('') to turn off the scoring model.
+
+// Score_Threshold_In := 387; //387 phoneshell v21 w/ new combined model //217 phoneshell v1 w/ v3 models //306 older v2 models //orig script had 245
+Score_Threshold_In := 0; // get all phones regardless of score
+
+BocaShell_Watchlist_Threshold := '0.84';
+GLBPurpose := 1;
+DPPAPurpose := 3;
+IncludeLastResort := TRUE;
 
 /* *****************************************
  * Gateway Information                     *
@@ -49,7 +68,7 @@ QSentV2_TransUnion_Gateway_URL := ''; // NOTE: THIS URL IS ONLY FOR TRANSUNION T
 
 EnableTargus_Gateway := FALSE; // Set to TRUE to run the Targus Gateway (Source_List == 'PDE')
 Targus_Gateway_URL := '';
-// Targus_Gateway_URL := 'http://rw_score_dev:Password01@10.176.68.164:7726/WsGateway/?ver_=1.70';
+// Targus_Gateway_URL := Riskwise.Shortcuts.gw_targus.url;
 
 prii_layout := RECORD
      STRING Account;
@@ -74,7 +93,7 @@ prii_layout := RECORD
      STRING Email;
      STRING EmployerName;
      INTEGER HistoryDateYYYYMM;
-		 UNSIGNED8 DID;
+		   UNSIGNED8 DID;
 END;
 
 Input := DISTRIBUTE(IF(RecordsToRun <= 0, DATASET(InputFile, prii_layout, CSV(QUOTE('"'))),
@@ -125,7 +144,7 @@ layoutSOAPIn := RECORD
 	UNSIGNED RelocationsTargetRadius := 0;
 	STRING VerticalMarket := '';
 	BOOLEAN IncludeLastResort := FALSE;
-	UNSIGNED BocaShell_Version := 0;
+	UNSIGNED PhoneShell_Version := 21;
 	BOOLEAN BocaShell_IncludeRelatives := FALSE;
 	BOOLEAN BocaShell_IncludeDL := FALSE;
 	BOOLEAN BocaShell_IncludeVehicle := FALSE;
@@ -181,9 +200,9 @@ layoutSOAPIn intoSOAP(Input le) := TRANSFORM
 		{'targus', IF(EnableTargus_Gateway, Targus_Gateway_URL, '')} // Targus Gateway
 		], Risk_Indicators.Layout_Gateways_In);
 	
-	SELF.GLBPurpose := 1;
+	SELF.GLBPurpose := GLBPurpose;
 	// SELF.DPPAPurpose := 1; //orig phone shell setting
-  SELF.DPPAPurpose := 3;
+ SELF.DPPAPurpose := DPPAPurpose;
 	SELF.DataRestrictionMask := DataRestrictionMask;
 	SELF.DataPermissionMask := DataPermission;
 	SELF.Phone_Restriction_Mask := Phone_Shell.Constants.PRM.AllPhones;
@@ -194,8 +213,8 @@ layoutSOAPIn intoSOAP(Input le) := TRANSFORM
 	SELF.RelocationsMaxDaysAfter := Relocations.wdtg.default_daysAfter;
 	SELF.RelocationsTargetRadius := Relocations.wdtg.default_radius;
 	SELF.VerticalMarket := '';
-	SELF.IncludeLastResort := TRUE;
-	SELF.BocaShell_Version := 41;
+	SELF.IncludeLastResort := IncludeLastResort;
+	SELF.PhoneShell_Version := PhoneShell_version;
 	SELF.BocaShell_IncludeRelatives := TRUE;
 	SELF.BocaShell_IncludeDL := FALSE;
 	SELF.BocaShell_IncludeVehicle := FALSE;
@@ -204,7 +223,7 @@ layoutSOAPIn intoSOAP(Input le) := TRANSFORM
 	SELF.BocaShell_OFAC_Only := TRUE;
 	SELF.BocaShell_ExcludeWatchlists := FALSE;
 	SELF.BocaShell_Include_AdditionalWatchlists := FALSE;
-	SELF.BocaShell_DoScore := FALSE;
+	SELF.BocaShell_DoScore := IncludeFPScores;
 	SELF.BocaShell_SuppressNearDups := FALSE;
 	SELF.BocaShell_Require2Elements := FALSE;
 	//SELF.BocaShell_AppendBest := 0;//orig phone shell settings
@@ -212,11 +231,11 @@ layoutSOAPIn intoSOAP(Input le) := TRANSFORM
 	SELF.BocaShell_OFAC_Version := 1;
 	SELF.BocaShell_DOB_Radius := -1;
 	// SELF.BocaShell_Watchlist_Threshold := '0.84'; //orig phone shell settings
-	SELF.BocaShell_Watchlist_Threshold := '0.8399999737739563';
+	SELF.BocaShell_Watchlist_Threshold := BocaShell_Watchlist_Threshold;
 	SELF.Score_Threshold := Score_Threshold_In;
 	SELF.UsePremiumSource_A := PremiumAFlag; //set to true if you want to use Equifax data
 	// SELF.PremiumSource_A_limit := 3; //orig phone settings
-	SELF.PremiumSource_A_limit := 1; //the maximum is 3 ....if you want less change this
+	SELF.PremiumSource_A_limit := PremiumSource_A_limit; //the maximum is 3 ....if you want less change this
 	self.IncludePhonesFeedback := false;
 	SELF.DID := le.did;
 	//SELF := le; //sets other input variables that cause batch to be different
@@ -251,7 +270,7 @@ OUTPUT(COUNT(errors), NAMED('Total_Number_Of_Errors'));
 
 goodResults := SORT(soapResults (TRIM(Phone_Shell.Gathered_Phone) <> '' AND TRIM(Phone_Shell.Sources.Source_List_Last_Seen) <> ''), Phone_Shell.Input_Echo.AcctNo, -LENGTH(TRIM(Phone_Shell.Sources.Source_List)), Phone_Shell.Gathered_Phone);
 
-modelingShell := SORT(Phone_Shell.To_Modeling_Shell(goodResults, DataRestrictionMask), AcctNo, -LENGTH(TRIM(Source_List)), Gathered_Ph);
+modelingShell := SORT(Phone_Shell.To_Modeling_Shell_v21(goodResults, DataRestrictionMask), AcctNo, -LENGTH(TRIM(Source_List)), Gathered_Ph);
 
 OUTPUT(CHOOSEN(goodResults, eyeball), NAMED('Sample_Success'));
 OUTPUT(COUNT(goodResults), NAMED('Total_Number_Of_Success'));
@@ -259,14 +278,27 @@ OUTPUT(COUNT(goodResults), NAMED('Total_Number_Of_Success'));
 
 OUTPUT(CHOOSEN(modelingShell, eyeball), NAMED('Sample_Modeling_Shell'));
 
-OUTPUT(goodResults,, OutputFile + '_' + ThorLib.wuid() + '.csv', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
-OUTPUT(modelingShell,, OutputFile + '_ModelingLayout_' + ThorLib.wuid() + '.csv', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
+alt_layout := record
+  Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout.Phone_Shell phone_shell;
+  Risk_Indicators.Layout_Boca_Shell - LnJ_Datasets - ConsumerStatements - bk_chapters boca_shell;
+end;
+alt_layout get_alt(Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout le) := transform
+  self := le;
+end;
+goodout := project(goodresults,get_alt(left));
+models.flatten(goodout, goodresults_flat);
+output(goodresults_flat,, OutputFile + '_' + ThorLib.wuid() + '.csv', CSV(HEADING(single), QUOTE('"')), named('GoodResults_flattened')); // flattens output for csv
+
+OUTPUT(goodResults,, OutputFile + '_' + ThorLib.wuid(), named('GoodResults_fullTHOR')); // saves it as a THOR/FLAT file for later use in a script
+
+OUTPUT(modelingShell,, OutputFile + '_ModelingLayout_' + ThorLib.wuid() + '.csv', CSV(HEADING(single), QUOTE('"')), named('ModelingResults_csv'));
 
 //for model validation on ECL side
 //tmpGoodResults := PROJECT(goodResults, TRANSFORM(
 //  phone_Shell.Layout_Phone_Shell_Temp.Phone_Shell_Layout, SELF := LEFT, SELF :=[]));
 //OUTPUT(choosen(tmpGoodResults,eyeball), NAMED('Total_Number_Of_TmpSuccess'));
 //OUTPUT(tmpGoodResults,, OutputFile + '_tmpPS' + ThorLib.wuid() + '.csv', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
+
 
 fieldsOfInterest := RECORD
 	STRING50 AcctNo := '';
@@ -283,4 +315,4 @@ slimmedResults := PROJECT(goodResults, TRANSFORM(fieldsOfInterest,
 	
 sortedSlim := SORT(slimmedResults, AcctNo, -((UNSIGNED)Phone_Score), Gathered_Phone, -Source_List);
 
-OUTPUT(sortedSlim,, OutputFile + '_' + ThorLib.wuid() + '_Slimmed_Results.csv', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
+OUTPUT(sortedSlim,, OutputFile + '_' + ThorLib.wuid() + '_Slimmed_Results.csv', CSV(HEADING(single), QUOTE('"')), named('SlimResults'));
