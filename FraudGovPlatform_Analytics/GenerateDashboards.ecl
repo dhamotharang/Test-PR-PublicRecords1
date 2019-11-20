@@ -23,11 +23,13 @@
 
 	dRunCustDashboard							:= DATASET(FraudGovPlatform_Analytics.fnRunCustomerDashboard(runProd, useProdData, newVersion, updateROSE));
 	dRunCustDashboard1_1					:= DATASET(FraudGovPlatform_Analytics.fnRunCustomerDashboard1_1(runProd, useProdData, newVersion, updateROSE));
+	dRunHighRiskIdentity					:= DATASET(FraudGovPlatform_Analytics.fnRunHighRiskIdentity(runProd, useProdData, newVersion, updateROSE));
 	dRunClusDetailsDashboard			:= DATASET(FraudGovPlatform_Analytics.fnRunClusterDetailsDashboard(runProd, useProdData, newVersion, updateROSE));
 	
 	//Dashboards for Non Prod environment
 	RunCustDashboard 					:= OUTPUT(dRunCustDashboard);
 	RunCustDashboard1_1				:= OUTPUT(dRunCustDashboard1_1);
+	RunHighRiskIdentity				:= OUTPUT(dRunHighRiskIdentity);
 	RunClusDetailsDashboard 	:= OUTPUT(dRunClusDetailsDashboard);
 	
 	//PROD Dashboards Code Begin
@@ -63,10 +65,11 @@
 	dRunNewClusterRecordsDashboard	:= FraudGovPlatform_Analytics.fnRunNewClusterRecordsDashboard();
 	RunPersonStatsDeltaDashboard		:= OUTPUT(dRunPersonStatsDeltaDashboard);
 	RunNewClusterRecordsDashboard 	:= OUTPUT(dRunNewClusterRecordsDashboard);
-	RETURN PARALLEL(If(runProd,
+	RETURN PARALLEL(IF(runProd,
 											SEQUENTIAL(CreateSuper,RunCustDashboard_Prod,RunCustDashboard1_1_Prod,RunClusDetailsDashboard_Prod,AddFileToSuper),
 											SEQUENTIAL(RunCustDashboard, RunCustDashboard1_1, RunClusDetailsDashboard)
 											)
+								, IF(~runProd AND updateROSE, RunHighRiskIdentity)
 								, IF(~runProd AND ~updateROSE, SEQUENTIAL(RunPersonStatsDeltaDashboard, RunNewClusterRecordsDashboard))
 									);
 END;

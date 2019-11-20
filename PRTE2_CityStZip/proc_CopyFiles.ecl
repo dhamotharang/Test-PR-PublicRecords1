@@ -1,6 +1,7 @@
 ﻿IMPORT _control, STD, data_services;
 
-EXPORT Copy_Files := MODULE
+EXPORT proc_CopyFiles := module;
+
 
 SHARED CopyFiles1(string srcfile, string destfile, string dest_cluster) := FUNCTION
 				 RETURN STD.File.Copy(srcfile,
@@ -11,10 +12,8 @@ END;
 
 EXPORT fnCopyFromProd(STRING current_version, string dest_cluster) := FUNCTION
 
-CopyFiles1(data_services.foreign_prod + 'thor_data400::key::phones_transaction_qa','~prte::key::' + current_version + '::phones_transaction',dest_cluster); 
-
-CopyFiles1(data_services.foreign_prod + 'thor_data400::key::phones_type_qa','~prte::key::' + current_version + '::phones_type',dest_cluster); 
-
+CopyFiles1(data_services.foreign_prod + 'thor_data400::key::citystzip_qa',	'~prte::key::citystzip::'+ current_version + '::citystzip', dest_cluster);
+CopyFiles1(data_services.foreign_prod + 'thor_data400::key::zipcityst_qa',	'~prte::key::zipcityst::'+ current_version + '::zipcityst', dest_cluster);
  
 RETURN 'Success';	
 	END;
