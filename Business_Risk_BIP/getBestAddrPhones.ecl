@@ -1,9 +1,10 @@
-﻿IMPORT BIPV2, Risk_Indicators, SALT28, CellPhone, Gong, ut;
+﻿IMPORT BIPV2, Risk_Indicators, SALT28, CellPhone, Gong, ut, doxie, Suppress;
 
 EXPORT getBestAddrPhones(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 											 
 	/* ************************************************************************
 	 *  Get Switch Type and Phone Type																						*
@@ -71,16 +72,20 @@ EXPORT getBestAddrPhones(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	 *  Get Phone Disconnect																									*
 	 ************************************************************************ */
 	
-	Layout_Raw_Phone_Characteristics getDisconnectHRisk(PotentialPhones le, Risk_Indicators.key_phone_table_v2 ri) := TRANSFORM
+	{Layout_Raw_Phone_Characteristics, UNSIGNED4 global_sid, UNSIGNED6 did} getDisconnectHRisk(PotentialPhones le, Risk_Indicators.key_phone_table_v2 ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
+		SELF.did := ri.did;
 		SELF.seq := le.seq;
 		SELF.phone10 := le.phone10;		
 		SELF.Phone_Disconnected := IF(ri.potdisconnect, TRUE, FALSE);
 		SELF := le;
 		SELF := [];
 	END;
-	phoneDisconnectHRiskTemp := JOIN(PotentialPhones, Risk_Indicators.key_phone_table_v2, KEYED(LEFT.Phone10 = RIGHT.phone10), 
+	phoneDisconnectHRiskTemp_unsuppressed := JOIN(PotentialPhones, Risk_Indicators.key_phone_table_v2, KEYED(LEFT.Phone10 = RIGHT.phone10), 
 																					getDisconnectHRisk(LEFT, RIGHT), KEEP(100), ATMOST(Business_Risk_BIP.Constants.Limit_Default), left outer);
 
+	phoneDisconnectHRiskTemp := Suppress.Suppress_ReturnOldLayout(phoneDisconnectHRiskTemp_unsuppressed, mod_access, Layout_Raw_Phone_Characteristics);
+	
 	Layout_Raw_Phone_Characteristics rollDisconnectHRisk(Layout_Raw_Phone_Characteristics le, Layout_Raw_Phone_Characteristics ri) := TRANSFORM
 		SELF.seq := le.seq;
 		SELF.phone10 := le.phone10;		

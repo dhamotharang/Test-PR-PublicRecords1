@@ -17,9 +17,12 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
 		SELF 													:= [];
 	END;
 	
-	in_options 					:= ROW(xform_topbusiness_options());
-	in_topbusiness_mod	:= MODULE(PROJECT(inmod, AutoStandardI.DataRestrictionI.params, OPT)) END;	
-	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+  in_options 					:= ROW(xform_topbusiness_options());
+  in_topbusiness_mod	:= MODULE(PROJECT(inmod, AutoStandardI.DataRestrictionI.params, OPT))
+    EXPORT boolean ignoreFares := FALSE;
+    EXPORT boolean ignoreFidelity := FALSE;
+  END;	
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
      
 	add_best := TopBusiness_Services.BestSection.fn_fullView(	in_topbusiness_ds, 
 																														PROJECT(DATASET(in_options),TRANSFORM(TopBusiness_Services.BestSection_Layouts.rec_OptionsLayout, self := left, self := []))[1],

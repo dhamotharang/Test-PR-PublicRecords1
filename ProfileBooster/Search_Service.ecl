@@ -7,7 +7,7 @@
  </message>
 */
 
-IMPORT iesp, Risk_indicators, Riskwise, address,std;
+IMPORT iesp, Risk_indicators, address, std, ProfileBooster, Risk_Reporting, Inquiry_AccLogs;
 
 EXPORT Search_Service := MACRO
 
@@ -45,7 +45,14 @@ EXPORT Search_Service := MACRO
 	/* ************* End Scout Fields **************/
 	
 	string6  outOfBandHistoryDate := '' : STORED('HistoryDateYYYYMM');
-	HistoryDateYYYYMM 						:= StringLib.StringToUpperCase(optionsIn.HistoryDateYYYYMM);
+	
+	//CCPA fields
+	unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+	HistoryDateYYYYMM 						:= STD.Str.ToUpperCase(optionsIn.HistoryDateYYYYMM);
 	HistoryDateInput							:= if(HistoryDateYYYYMM <> '', HistoryDateYYYYMM, outOfBandHistoryDate);	
 	
 	STRING50 outOfBandDataRestriction   := AutoStandardI.GlobalModule().DataRestrictionMask;
@@ -61,7 +68,7 @@ EXPORT Search_Service := MACRO
 
 	TestDataEnabled 			:= userIn.TestDataEnabled;
 	TestDataTableName 		:= Trim(userIn.TestDataTableName);
-	attributesVersion 		:= StringLib.StringToUpperCase(optionsIn.AttributesVersionRequest);
+	attributesVersion 		:= STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest);
 	
 	industry_class_val 		:= (string)userIn.IndustryClass;
 
@@ -140,8 +147,8 @@ EXPORT Search_Service := MACRO
 
 	Risk_Indicators.Layout_Input intoLayoutInput(Risk_Indicators.iid_constants.ds_Record le, INTEGER c) := TRANSFORM
 		SELF.seq 				:= c;
-		SELF.fname 			:= trim(stringlib.stringtouppercase(fname));
-		SELF.lname 			:= trim(stringlib.stringtouppercase(lname));
+		SELF.fname 			:= trim(STD.Str.touppercase(fname));
+		SELF.lname 			:= trim(STD.Str.touppercase(lname));
 		SELF.ssn 				:= trim(search.SSN);
 		SELF.in_zipCode := trim(search.address.zip5);
 		SELF.phone10 		:= trim(search.Phone);
@@ -152,13 +159,23 @@ EXPORT Search_Service := MACRO
 
 #IF(DEBUG)
   // temporary for testing on dev roxie when new key isn't available
-  searchResults := ProfileBooster.Search_Function(PB_Input, DataRestriction, DataPermission, AttributesVersion, false, domodel, custommodel_in); // Realtime Values
+  searchResults := ProfileBooster.Search_Function(PB_Input, DataRestriction, DataPermission, AttributesVersion, false, 
+																						domodel, custommodel_in,
+																						LexIdSourceOptout := LexIdSourceOptout, 
+																						TransactionID := TransactionID, 
+																						BatchUID := BatchUID, 
+																						GlobalCompanyID := GlobalCompanyID); // Realtime Values
   PBResults := searchResults;
   
 #ELSE
 	searchResults := IF(TestDataEnabled, 
 											ProfileBooster.TestSeed_Function(packagedTestseedInput, TestDataTableName), // TestSeed Values
-											ProfileBooster.Search_Function(PB_Input, DataRestriction, DataPermission, AttributesVersion, domodel, custommodel_in) // Realtime Values
+											ProfileBooster.Search_Function(PB_Input, DataRestriction, DataPermission, AttributesVersion, 
+																									domodel, custommodel_in,
+																									LexIdSourceOptout := LexIdSourceOptout, 
+																									TransactionID := TransactionID, 
+																									BatchUID := BatchUID, 
+																									GlobalCompanyID := GlobalCompanyID) // Realtime Values
 										 );	
 										   
 										 
@@ -170,7 +187,7 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 			EstIncomeRangeAttribute := 'PBATTRV1HHEIR';
 
 			self.Name:= MAP( 
-					c <> 107 AND trim(stringlib.stringtouppercase(AttributesVersion)) = EstIncomeRangeAttribute => '',
+					c <> 107 AND trim(STD.Str.touppercase(AttributesVersion)) = EstIncomeRangeAttribute => '',
 					c = 1	 	=> 'DoNotMail',
 					c = 2		=> 'VerifiedProspectFound',
 					c = 3		=> 'VerifiedName',
@@ -359,7 +376,7 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 			
 			
 			self.Value:=  MAP(			
-					c <> 107 AND trim(stringlib.stringtouppercase(AttributesVersion)) = EstIncomeRangeAttribute => '',
+					c <> 107 AND trim(STD.Str.touppercase(AttributesVersion)) = EstIncomeRangeAttribute => '',
 					c = 1		=> le.attributes.version1.DoNotMail,
 					c = 2		=> le.attributes.version1.VerifiedProspectFound,
 					c = 3		=> le.attributes.version1.VerifiedName,

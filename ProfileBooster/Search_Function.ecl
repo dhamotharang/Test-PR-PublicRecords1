@@ -1,14 +1,24 @@
 ﻿import 	_Control, address, Address_Attributes, avm_v2, dma, doxie, Gateway, LN_PropertyV2_Services, mdr, ProfileBooster, 
-				Riskwise, Risk_Indicators, Relationship, aid, std, dx_header;
+				Riskwise, Risk_Indicators, Relationship, aid, std, dx_header, Suppress;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_In, 
-																						string50 DataRestrictionMask,
-																						string50 DataPermissionMask,
-																						string8 AttributesVersion, 
-                                            boolean domodel=false,
-                                            string modelname = ''
-                                            ) := FUNCTION
+												string50 DataRestrictionMask,
+												string50 DataPermissionMask,
+												string8 AttributesVersion, 
+												boolean domodel=false,
+												string modelname = '',
+												unsigned1 LexIdSourceOptout = 1,
+												string TransactionID = '',
+												string BatchUID = '',
+												unsigned6 GlobalCompanyId = 0
+												) := FUNCTION
+
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 BOOLEAN DEBUG := FALSE;
 
@@ -40,10 +50,10 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		mname  			:= l.Name_Middle;
 		lname  			:= l.Name_Last ;
 		suffix 			:= l.Name_Suffix ;
-		self.fname  := stringlib.stringtouppercase(fname);
-		self.mname  := stringlib.stringtouppercase(mname);
-		self.lname  := stringlib.stringtouppercase(lname);
-		self.suffix := stringlib.stringtouppercase(suffix);
+		self.fname  := Std.Str.touppercase(fname);
+		self.mname  := Std.Str.touppercase(mname);
+		self.lname  := Std.Str.touppercase(lname);
+		self.suffix := Std.Str.touppercase(suffix);
 		
 		addr_value 	:= trim(l.street_addr);
 		clean_a2 		:= Risk_Indicators.MOD_AddressClean.clean_addr(addr_value, l.City_name, l.st, l.z5);
@@ -69,7 +79,7 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		county          		 := Address.CleanFields(clean_a2).county;
 		self.county          := county[3..5]; //bytes 1-2 are state code, 3-5 are county number
 		self.geo_blk         := Address.CleanFields(clean_a2).geo_blk;
-		self.Phone10				 := StringLib.StringFilter(l.Phone10, '0123456789');
+		self.Phone10				 := Std.Str.Filter(l.Phone10, '0123456789');
 		self := [];
 	END;
 
@@ -92,8 +102,8 @@ end;
 
 r_layout_input_PlusRaw	prep_for_AID(PB_In le)	:=
 transform
-	self.Line1		:=	trim(stringlib.stringtouppercase(le.street_addr));
-	self.LineLast	:=	address.addr2fromcomponents(stringlib.stringtouppercase(le.City_name), stringlib.stringtouppercase(le.St),  le.Z5);  // );, uppercase and trim city and state, zip5 only
+	self.Line1		:=	trim(Std.Str.touppercase(le.street_addr));
+	self.LineLast	:=	address.addr2fromcomponents(Std.Str.touppercase(le.City_name), Std.Str.touppercase(le.St),  le.Z5);  // );, uppercase and trim city and state, zip5 only
 	self.rawAID			:=	0;
 	self	:=	le;
 end;
@@ -126,11 +136,11 @@ Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := T
 		mname  			:= l.Name_Middle;
 		lname  			:= l.Name_Last ;
 		suffix 			:= l.Name_Suffix ;
-		self.fname  := stringlib.stringtouppercase(fname);
-		self.mname  := stringlib.stringtouppercase(mname);
-		self.lname  := stringlib.stringtouppercase(lname);
-		self.suffix := stringlib.stringtouppercase(suffix);
-		self.Phone10				 := StringLib.StringFilter(l.Phone10, '0123456789');		
+		self.fname  := Std.Str.touppercase(fname);
+		self.mname  := Std.Str.touppercase(mname);
+		self.lname  := Std.Str.touppercase(lname);
+		self.suffix := Std.Str.touppercase(suffix);
+		self.Phone10				 := Std.Str.Filter(l.Phone10, '0123456789');		
 		
 		addr_value 	:= trim(l.street_addr);
 		self.in_streetAddress:= addr_value;
@@ -166,7 +176,7 @@ Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := T
   did_prepped_output := ungroup(Risk_Indicators.iid_getDID_prepOutput_THOR(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions));
 #ELSE
 	iid_prep :=iid_prep_roxie;
-  did_prepped_output := ungroup(risk_indicators.iid_getDID_prepOutput(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions));
+  did_prepped_output := ungroup(risk_indicators.iid_getDID_prepOutput(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions, mod_access));
 #END
 
 // ********************************************************************
@@ -220,27 +230,32 @@ donotmail_key := dma.key_DNM_Name_Address;
 		withDoNotMail := withDoNotMail_roxie;
 	#END
 	
-  withVerification := ProfileBooster.getVerification(withDoNotMail);
+  withVerification := ProfileBooster.getVerification(withDoNotMail, mod_access);
 
 //Search Death Master by DID. Set 2 dates (1 with SSA permission and 1 not) and choose appropriately 
-	ProfileBooster.Layouts.Layout_PB_Shell getDeceasedDID(withVerification le, Doxie.key_Death_masterV2_DID ri) := transform
+	{ProfileBooster.Layouts.Layout_PB_Shell, UNSIGNED4 global_sid} getDeceasedDID(withVerification le, Doxie.key_Death_masterV2_ssa_DID ri) := transform
+	    SELF.global_sid := ri.global_sid;
 		SELF.dod 		:= if(ri.src <> MDR.sourceTools.src_Death_Restricted, (UNSIGNED)ri.dod8, 0);  //excludes SSA 
 		SELF.dodSSA := (UNSIGNED)ri.dod8;  //unrestricted so includes SSA
 		self 	:= le;
 	end;
 
-	withDeceasedDID_roxie := join(withVerification, Doxie.key_Death_masterV2_ssa_DID,
+	withDeceasedDID_roxie_unsuppressed := join(withVerification, Doxie.key_Death_masterV2_ssa_DID,
 									left.DID <> 0 and
 									(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND									
 									keyed(left.DID = right.l_did),
 									getDeceasedDID(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));
+	
+	withDeceasedDID_roxie := Suppress.Suppress_ReturnOldLayout(withDeceasedDID_roxie_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
 
-	withDeceasedDID_thor := join(distribute(withVerification, did), 
+	withDeceasedDID_thor_unsuppressed := join(distribute(withVerification, did), 
 														 distribute(pull(Doxie.key_Death_masterV2_ssa_DID), l_did),
 									left.DID <> 0 and
 									(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND									
 									left.DID = right.l_did,
 									getDeceasedDID(left, right), left outer, keep(200), local);
+
+	withDeceasedDID_thor := Suppress.Suppress_ReturnOldLayout(withDeceasedDID_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
 
 	#IF(onThor)
 		withDeceasedDID := withDeceasedDID_thor;
@@ -260,7 +275,8 @@ donotmail_key := dma.key_DNM_Name_Address;
   rolledDeceased := rollup(sortedDeceased, rollDeceased(left,right), seq);
 
 //join to the Infutor key to get marital status and gender
-	ProfileBooster.Layouts.Layout_PB_Shell getInfutor(rolledDeceased le, ProfileBooster.Key_Infutor_DID ri ) := TRANSFORM
+	{ProfileBooster.Layouts.Layout_PB_Shell, UNSIGNED4 global_sid} getInfutor(rolledDeceased le, ProfileBooster.Key_Infutor_DID ri ) := TRANSFORM
+		self.global_sid := ri.global_sid;
 		self.marital_status	:= ri.marital_status;
 		self.gender					:= ri.gender;
 		self.DOB						:= if(le.DOB = '', ri.DOB, le.DOB);
@@ -269,18 +285,23 @@ donotmail_key := dma.key_DNM_Name_Address;
 		self 								:= le;
 	END;
 	
-	withInfutor_roxie := join(rolledDeceased, ProfileBooster.Key_Infutor_DID,
+	withInfutor_roxie_unsuppressed := join(rolledDeceased, ProfileBooster.Key_Infutor_DID,
 		keyed(left.DID = right.DID), 
 		getInfutor(left,right), left outer, keep(1)
 	);
 	
-	withInfutor_thor := join(distribute(rolledDeceased, did), 
+	withInfutor_roxie := Suppress.Suppress_ReturnOldLayout(withInfutor_roxie_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
+	
+	withInfutor_thor_unsuppressed := join(distribute(rolledDeceased, did), 
 													 distribute(pull(ProfileBooster.Key_Infutor_DID), did),
 		left.DID = right.DID, 
 		getInfutor(left,right), left outer, keep(1), local)
 	// ;	
 	: PERSIST('~PROFILEBOOSTER::with_infutor_thor_full'); // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
+	withInfutor_thor := Suppress.Suppress_ReturnOldLayout(withInfutor_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
+
+
 	#IF(onThor)
 		withInfutor := withInfutor_thor;
 	#ELSE
@@ -451,7 +472,7 @@ end;
 
 //--------- Get age of household members and relatives -------------//
 
-	ageRecs 		:= ProfileBooster.getAge(slimShell(DID <> DID2)); //we already have age of prospect so exclude them here
+	ageRecs 		:= ProfileBooster.getAge(slimShell(DID <> DID2), mod_access); //we already have age of prospect so exclude them here
 		
 	dedupHH 	 	:= dedup(sort(ageRecs(rec_type=ProfileBooster.Constants.recType.Relative), seq, HHID), seq, HHID); 
 
@@ -481,7 +502,7 @@ end;
 	dk := choosen(dx_header.key_max_dt_last_seen(), 1);
 	hdrBuildDate01 := dk[1].max_date_last_seen[1..6]+'01';
 
-	studentRecs := ProfileBooster.getStudent(slimShell);
+	studentRecs := ProfileBooster.getStudent(slimShell, mod_access);
 	
 	withStudent := join(withAge, studentRecs,
 												left.seq = right.seq and
@@ -519,7 +540,7 @@ end;
 																	
 //--------- Watercraft-------------//
 
-	watercraftRecs := ProfileBooster.getWatercraft(slimShell);
+	watercraftRecs := ProfileBooster.getWatercraft(slimShell, mod_access);
 	
 	withWatercraft := join(withStudent, watercraftRecs,
 												left.seq = right.seq and
@@ -566,7 +587,7 @@ end;
 
 //--------- Vehicles -------------//
 
-	vehicleRecs := ProfileBooster.getVehicles(slimShell);
+	vehicleRecs := ProfileBooster.getVehicles(slimShell, mod_access);
 	
 	withVehicles := join(withAircraft, vehicleRecs,
 												left.seq = right.seq and
@@ -609,7 +630,7 @@ end;
 																	self.historydate 	:= left.historydate;
 																	self 							:= [])), seq);
 	
-	derogRecs := ProfileBooster.getDerogs_Hist(preDerogs);
+	derogRecs := ProfileBooster.getDerogs_Hist(preDerogs, mod_access);
 
 	withDerogs := join(withVehicles, derogRecs,
 												left.seq = right.seq and
@@ -709,7 +730,7 @@ end;
 
 //--------- Professional License -------------//
 
-	profLicRecs := ProfileBooster.getProfLic(slimShell);
+	profLicRecs := ProfileBooster.getProfLic(slimShell, mod_access);
 	
 	withProfLic := join(withDerogs, profLicRecs,
 												left.seq = right.seq and
@@ -723,7 +744,7 @@ end;
 
 //--------- People at Work -------------//
 
-	busnAssocRecs := ProfileBooster.getBusnAssoc(slimShell);
+	busnAssocRecs := ProfileBooster.getBusnAssoc(slimShell, mod_access);
 	
 	withBusnAssoc := join(withProfLic, busnAssocRecs,
 												left.seq = right.seq and
@@ -1404,7 +1425,7 @@ prop_common_distr := distribute(prop_common, did);
 // *******************************************************************************************************************
 // Now that we have all necessary data in the PBShell, pass it to the attributes function to produce the attributes
 // *******************************************************************************************************************
-  attributes := if(StringLib.StringToUpperCase(AttributesVersion) in ProfileBooster.Constants.setValidAttributeVersions OR domodel, //if valid attributes version requested, go get attributes
+  attributes := if(Std.Str.ToUpperCase(AttributesVersion) in ProfileBooster.Constants.setValidAttributeVersions OR domodel, //if valid attributes version requested, go get attributes
 									 ProfileBooster.getAttributes(withAVMMed, DataPermissionMask),
 									 emptyAttr);  
 									 

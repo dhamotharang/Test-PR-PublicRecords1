@@ -92,6 +92,12 @@ in_data := GROUP(SORTED(DATASET([{'1',1,STD.Str.ToUpperCase(firstname_value),
                                         
 REAL ESP_version := 1.000000 : STORED('_espclientinterfaceversion');
 
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 ofac_version_from_ESP := 
   MAP(
     OFAC_version_Null = 0 => 2,
@@ -119,7 +125,8 @@ if( ofac_version_from_ESP = 4 and not exists(gateways(servicename = 'bridgerwlc'
 IF( ofac_version_from_ESP != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
-a := SORT(patriot.Search_Function(in_data,ofaconly_value,global_watchlist_threshold,ofac_version_from_ESP,Include_Ofac_from_ESP,Include_Additional_watchlists_from_ESP,dob_radius_use,watchlists_request),-score,pty_key);
+a := SORT(patriot.Search_Function(in_data,ofaconly_value,global_watchlist_threshold,ofac_version_from_ESP,Include_Ofac_from_ESP,Include_Additional_watchlists_from_ESP,dob_radius_use,watchlists_request,
+																LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyID),-score,pty_key);
 // output(a, named('Results'));
 
 

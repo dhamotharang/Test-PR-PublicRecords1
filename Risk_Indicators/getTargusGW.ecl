@@ -1,7 +1,9 @@
-import targus, address, riskwise, ut, gateway,Phones, std;
+﻿import targus, riskwise, gateway,Phones, std, Risk_Indicators;
 
-export getTargusGW(DATASET(Layout_Input) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 dppa, unsigned1 glb) := function
+export getTargusGW(DATASET(Risk_Indicators.Layout_Input) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 dppa, unsigned1 glb,
+									boolean isFCRA = false) := function
 
+applyOptOut := ~isFCRA; // Temporary variable to enable Targus opt out
 // targus and targuse3220 should have the same url
 targus_gateway_cfg := gateways(servicename='targus' or servicename='targuse3220')[1];
 makeGatewayCall := targus_gateway_cfg.url!='';
@@ -29,7 +31,7 @@ gw_mod_access := Gateway.IParam.GetGatewayModAccess(glb, dppa);
 // Redundant makeGatewayCall passed to SOAP call as a safety mechanism in case Roxie 
 // ever decides to execute both sides of the IF statement.
 gateway_result := if(makeGatewayCall, 
-													Gateway.SoapCall_Targus(targus_in, targus_gateway_cfg, timeout, retries, makeGatewayCall, gw_mod_access),
+													Gateway.SoapCall_Targus(targus_in, targus_gateway_cfg, timeout, retries, makeGatewayCall, gw_mod_access, applyOptOut),
 													dataset([],targus.layout_targus_out));
 
 riskwise.Layout_Dirs_Phone tran(indata le, gateway_result rt) := transform
@@ -62,19 +64,19 @@ riskwise.Layout_Dirs_Phone tran(indata le, gateway_result rt) := transform
 	self.listing_type_res := map(hitPDE => if(rt.response.PhonedataExpressSearchResult.NameType='Business', 'B','R'),
 															 hitE3220Phone => if(trim(rt.response.NameVerificationSearchResult.NameType)='B', 'B', if(trim(rt.response.NameVerificationSearchResult.NameType)='C', 'R', '')),
 															 '');
-	self.listed_name := if(hitPDE, if(rt.response.PhonedataExpressSearchResult.NameType='Business', stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.BusinessName),''), '');
-	self.name_first := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.FirstName), '');
-	self.name_middle := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.MiddleName), '');
-	self.name_last := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.LastName), if(hitE3220Both, le.lname, ''));
-	self.prim_range := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.PrimaryAddressNumber), '');
-	self.predir := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.StreetPreDirection), '');
-	self.prim_name := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.StreetName), '');
-	self.suffix := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.StreetNameSuffix), '');
-	self.postdir := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.StreetnamePostDirection), '');
-	self.unit_desig := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.SecondaryAddressType), '');
-	self.sec_range := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.SecondaryAddressNumber), '');
-	self.p_city_name := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.PostOfficeCityName), '');
-	self.st := if(hitPDE, stringlib.stringtouppercase(rt.response.PhonedataExpressSearchResult.State), '');
+	self.listed_name := if(hitPDE, if(rt.response.PhonedataExpressSearchResult.NameType='Business', STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.BusinessName),''), '');
+	self.name_first := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.FirstName), '');
+	self.name_middle := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.MiddleName), '');
+	self.name_last := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.LastName), if(hitE3220Both, le.lname, ''));
+	self.prim_range := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.PrimaryAddressNumber), '');
+	self.predir := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.StreetPreDirection), '');
+	self.prim_name := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.StreetName), '');
+	self.suffix := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.StreetNameSuffix), '');
+	self.postdir := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.StreetnamePostDirection), '');
+	self.unit_desig := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.SecondaryAddressType), '');
+	self.sec_range := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.SecondaryAddressNumber), '');
+	self.p_city_name := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.PostOfficeCityName), '');
+	self.st := if(hitPDE, STD.Str.touppercase(rt.response.PhonedataExpressSearchResult.State), '');
 	self.z5 := if(hitPDE, rt.response.PhonedataExpressSearchResult.ZipCode, '');
 	self.z4 := if(hitPDE, rt.response.PhonedataExpressSearchResult.ZipPlus4, '');
 	self.src := 'TG';

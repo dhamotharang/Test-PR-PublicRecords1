@@ -100,7 +100,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 	zForwardedPhones := zumOut(response.LineIdentityResponse.Subscriber.CallHandlingInfo.CallForwarding AND response.LineIdentityResponse.Subscriber.CallHandlingInfo.CallForwardedNumber<>'');
 	dsForwardedPhones := PROJECT(zForwardedPhones,TRANSFORM(Phones.Layouts.PhoneIdentity,SELF.phone:=LEFT.response.LineIdentityResponse.Subscriber.CallHandlingInfo.CallForwardedNumber, SELF:=[]));
 	dsForwardedPhoneswIdentity := IF(IncludeCallForwardedPhonesInfo,
-                                  Phones.getLNIdentity_byPhone(dsForwardedPhones,mod_access.glb,mod_access.dppa,mod_access.DataRestrictionMask));
+    Phones.getLNIdentity_byPhone(dsForwardedPhones, mod_access));
 
 	//***flatten by creating a record for each name/address validation pair
 	iesp.zumigo_identity.t_ZumigoIdentityResponseEx normZumigo (iesp.zumigo_identity.t_ZumigoIdentityResponseEx l,  INTEGER c) := TRANSFORM
@@ -331,7 +331,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 																SELF := LEFT,
 																SELF := [])),
 			DATASET([],Didville.Layout_Did_OutBatch));
-  zPhoneOwners_wDIDs := Phones.Functions.GetDIDs(zPhoneOwners,mod_access);			
+  zPhoneOwners_wDIDs := Phones.Functions.GetDIDs(zPhoneOwners,mod_access);
 	zHistoryRecs_wDIDs := JOIN(zHistoryRecs,zPhoneOwners_wDIDs,
 								LEFT.submitted_phonenumber = RIGHT.phone10,
 								TRANSFORM(Phones.Layouts.ZumigoIdentity.zOut,SELF.lexid:=RIGHT.did,SELF:=LEFT,SELF:=[]),
@@ -395,16 +395,16 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
    									LEFT OUTER,LIMIT(Phones.Constants.MAX_RECORDS,SKIP));
 
 
-	
-  // get the best name/addr for zumigo name/addr lexid 
+
+  // get the best name/addr for zumigo name/addr lexid
   z_owners := PROJECT(zPhoneOwners_wDIDs(did  > 0), TRANSFORM(PhoneFinder_Services.Layouts.BatchInAppendDID,
                                                               SELF.seq := LEFT.seq,
                                                               SELF.did := LEFT.did,
                                                               SELF.homephone := LEFT.phone10,
                                                               SELF := []));
 
-  zPhoneOwners_bestInfo := PhoneFinder_Services.Functions.GetBestInfo(z_owners, mod_access); 
-                                                                             
+  zPhoneOwners_bestInfo := PhoneFinder_Services.Functions.GetBestInfo(z_owners, mod_access);
+
   Phones.Layouts.ZumigoIdentity.zOut addBestInfo(Phones.Layouts.ZumigoIdentity.zOut l, PhoneFinder_Services.Layouts.BatchInAppendDID r)
                                           := TRANSFORM
 

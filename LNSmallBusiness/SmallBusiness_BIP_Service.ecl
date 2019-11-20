@@ -239,7 +239,11 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	'Global_Watchlist_Threshold',
 	'OutcomeTrackingOptOut',
 	'IncludeTargusGateway',
-	'RunTargusGatewayAnywayForTesting'
+	'RunTargusGatewayAnywayForTesting',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'
 	));
 	
 	/* ************************************************************************
@@ -297,6 +301,12 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	STRING DataPermissionMask_stored  := Business_Risk_BIP.Constants.Default_DataPermissionMask  : STORED('DataPermissionMask');
 	STRING5 IndustryClass_stored      := Business_Risk_BIP.Constants.Default_IndustryClass       : STORED('IndustryClass');
 
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+    string TransactionID := '' : STORED('_TransactionId');
+    string BatchUID := '' : STORED('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+    
 	// Below we'll prefer users.DataRestrictionMask, users.DataPermissionMask, users.industryclass, etc., over
 	// DataRestrictionMask_stored, DataPermissionMask_stored, etc., since they are "internal" or overridden values
 	// populated for Development/QA purposes, etc.
@@ -397,7 +407,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	UNSIGNED1	GLBA_Purpose         := IF(TRIM(users.GLBPurpose) <> '', (INTEGER)users.GLBPurpose, GLBPurpose_stored);
 	STRING  DataRestrictionMask    := IF(TRIM(users.DataRestrictionMask) <> '', users.DataRestrictionMask, DataRestrictionMask_stored);
 	STRING  DataPermissionMask		 := IF(TRIM(users.DataPermissionMask) <> '', users.DataPermissionMask, DataPermissionMask_stored);
-	STRING5	IndustryClass		   		 := StringLib.StringToUpperCase(TRIM( IF( users.industryclass <> '', users.industryclass, IndustryClass_stored ) , LEFT, RIGHT ));
+	STRING5	IndustryClass		   		 := STD.Str.ToUpperCase(TRIM( IF( users.industryclass <> '', users.industryclass, IndustryClass_stored ) , LEFT, RIGHT ));
 	UNSIGNED1	LinkSearchLevel      := Business_Risk_BIP.Constants.LinkSearch.Default : STORED('LinkSearchLevel');
 	UNSIGNED1	MarketingMode        := Business_Risk_BIP.Constants.Default_MarketingMode : STORED('MarketingMode');
 	STRING50	AllowedSources       := Business_Risk_BIP.Constants.Default_AllowedSources : STORED('AllowedSources');
@@ -413,9 +423,9 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 	// SmallBusinessAttrV1 (etc) is a valid input
-	AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := StringLib.StringToUpperCase(LEFT.Value)));
-	ModelsRequested := PROJECT(option.IncludeModels.Names, TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, SELF.ModelName := StringLib.StringToUpperCase(LEFT.Value)));
-	ModelOptions := PROJECT(option.IncludeModels.ModelOptions, TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, SELF.OptionName := StringLib.StringToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT));
+	AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := STD.Str.ToUpperCase(LEFT.Value)));
+	ModelsRequested := PROJECT(option.IncludeModels.Names, TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, SELF.ModelName := STD.Str.ToUpperCase(LEFT.Value)));
+	ModelOptions := PROJECT(option.IncludeModels.ModelOptions, TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, SELF.OptionName := STD.Str.ToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT));
 																																																								SELF.OptionValue := LEFT.OptionValue));
 	
 	Gateways 											 := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
@@ -575,9 +585,13 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 																														IncludeTargusGateway,
 																														RunTargusGateway, /* for testing purposes only */
 																														LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_BIP_Service,
-                              CorteraRetrotest,
-																														ds_CorteraRetrotestRecsRaw,
-                              AppendBestsFromLexIDs := SBA_20_Request
+                                                                                                                        CorteraRetrotest,
+                                                                                                                        ds_CorteraRetrotestRecsRaw,
+                                                                                                                        AppendBestsFromLexIDs := SBA_20_Request,
+                                                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                                        TransactionID := TransactionID, 
+                                                                                                                        BatchUID := BatchUID, 
+                                                                                                                        GlobalCompanyID := GlobalCompanyID
 																														);
 
 	 SBA_Results_Temp := PROJECT( SBA_Results_Temp_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );

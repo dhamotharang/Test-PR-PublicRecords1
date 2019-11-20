@@ -1,4 +1,4 @@
-﻿IMPORT $, BatchShare, doxie, Gateway, iesp, STD, ut;
+IMPORT $, BatchShare, doxie, Gateway, iesp, STD, ut;
 
 EXPORT IParams := MODULE
 
@@ -45,19 +45,23 @@ EXPORT IParams := MODULE
       EXPORT BOOLEAN RunDeepDive := base_params.RunDeepDive OR ~RequireLexidMatch; // applicable to EAA search only, ignored by other search types
       EXPORT UNSIGNED1 DIDScoreThreshold := $.Constants.Defaults.DID_SCORE_THRESHOLD : STORED('DIDScoreThreshold');
 
-      _EmailQualityRulesString := '' : STORED('EmailQualityRulesMask');
+      _EmailQualityRulesString := '' : STORED('EmailQualityRulesMask'); // internal option not passed by EmailSearchV2 batch plugin
       EXPORT UNSIGNED1 EmailQualityRulesMask := MAP(
                    _EmailQualityRulesString<>'' => GetEmailRulesMask(_EmailQualityRulesString),
                    $.Constants.SearchType.isEAA(SearchType) => 0, // default here may change
                    $.Constants.SearchType.isEIA(SearchType) OR $.Constants.SearchType.isEIC(SearchType) => 0xF,  // by default no restrictions on search by input email address
                    0);
       EXPORT STRING   BVAPIkey := $.Constants.GatewayValues.BVAPIkey;
-      EXPORT UNSIGNED MaxEmailsForDeliveryCheck := $.Constants.Defaults.MaxEmailsToCheckDeliverable : STORED('MaxEmailsForDeliveryCheck');
+      EXPORT UNSIGNED MaxEmailsForDeliveryCheck := $.Constants.Defaults.MaxEmailsToCheckDeliverable : STORED('MaxEmailsForDeliveryCheck'); // internal option not passed by EmailSearchV2 batch plugin
       STRING  _SearchTier := ''  : STORED('SearchTier');
-      STRING  SearchTier := IF(_SearchTier<>'', STD.Str.ToLowerCase(_SearchTier), $.Constants.Basic);
-      BOOLEAN  _CheckEmailDeliverable := FALSE : STORED('CheckEmailDeliverable');
-      EXPORT BOOLEAN  CheckEmailDeliverable := _CheckEmailDeliverable OR SearchTier = $.Constants.Premium;
-      BOOLEAN  _KeepUndeliverableEmail := FALSE : STORED('KeepUndeliverableEmail');
+      SHARED STRING SearchTier := IF($.Constants.isValidTier(_SearchTier), _SearchTier,
+                                     $.Constants.Basic); //default to basic
+      EXPORT STRING   RestrictedUseCase := IF ($.Constants.isBasic(SearchTier),
+                                               $.Constants.RestrictedUseCase.NoRoyaltySources,
+                                               $.Constants.RestrictedUseCase.Standard);
+      BOOLEAN  _CheckEmailDeliverable := FALSE : STORED('CheckEmailDeliverable');  // not used by EmailSearchV2 batch plugin, internal option
+      EXPORT BOOLEAN  CheckEmailDeliverable := $.Constants.isPremium(SearchTier) OR _CheckEmailDeliverable;
+      BOOLEAN  _KeepUndeliverableEmail := FALSE : STORED('KeepUndeliverableEmail'); // internal option not passed by EmailSearchV2 batch plugin
       EXPORT BOOLEAN  KeepUndeliverableEmail := _KeepUndeliverableEmail OR $.Constants.SearchType.isEIA(SearchType)
                                                 OR $.Constants.SearchType.isEIC(SearchType); // we never suppress email records for EIC/EIA searches
       BOOLEAN  _BypassTMXcheck := FALSE : STORED('SkipTMXcheck'); // specific to EAA search type
@@ -66,8 +70,8 @@ EXPORT IParams := MODULE
 
       EXPORT BOOLEAN UseTMXRules := ~SkipTMXcheck;
 
-      EXPORT UNSIGNED MaxEmailsForTMXCheck := $.Constants.Defaults.MaxEmailsToCheckDeliverable : STORED('MaxEmailsForTMXCheck'); // specific to EAA search type
-      BOOLEAN KeepTMXRejectedEmail := FALSE  : STORED('KeepTMXRejectedEmail'); // specific to EAA search type
+      EXPORT UNSIGNED MaxEmailsForTMXCheck := $.Constants.Defaults.MaxEmailsToCheckDeliverable : STORED('MaxEmailsForTMXCheck'); // specific to EAA search type - internal option not passed by EmailSearchV2 batch plugin
+      BOOLEAN KeepTMXRejectedEmail := FALSE  : STORED('KeepTMXRejectedEmail'); // specific to EAA search type - internal option not passed by EmailSearchV2 batch plugin
       EXPORT BOOLEAN SuppressTMXRejectedEmail := ~KeepTMXRejectedEmail AND $.Constants.SearchType.isEAA(SearchType); // specific to EAA search type - regulates whether email addresses failing TMX check are to be removed
       EXPORT DATASET (Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
     END;
@@ -91,9 +95,16 @@ EXPORT IParams := MODULE
       EXPORT BOOLEAN RequireLexidMatch := ~in_optns.IncludeNoLexIdMatch; //specific to EAA search type
 
       EXPORT UNSIGNED1 EmailQualityRulesMask := IF(in_optns.EmailQualityRulesMask != '', GetEmailRulesMask(in_optns.EmailQualityRulesMask), 0);
+      EXPORT BOOLEAN isDirectMarketing () := in_optns.IsMarketingUse OR mod_access.isDirectMarketing ();
+      SHARED STRING _SearchTier := MAP($.Constants.isValidTier(in_optns.SearchTier) => in_optns.SearchTier,
+                                       in_optns.CheckEmailDeliverable => $.Constants.Premium, // convert as premium till Web starts to send SearchTier values
+                                       $.Constants.Basic); //default to basic
+      EXPORT STRING   RestrictedUseCase := IF ($.Constants.isBasic(_SearchTier),
+                                               $.Constants.RestrictedUseCase.NoRoyaltySources,
+                                               $.Constants.RestrictedUseCase.Standard);
       EXPORT STRING   BVAPIkey := IF(in_optns.BVAPIkey != '', in_optns.BVAPIkey, $.Constants.GatewayValues.BVAPIkey);;
       EXPORT UNSIGNED MaxEmailsForDeliveryCheck := IF(in_optns.MaxEmailsForDeliveryCheck > 0, in_optns.MaxEmailsForDeliveryCheck, $.Constants.Defaults.MaxEmailsToCheckDeliverable);
-      EXPORT BOOLEAN  CheckEmailDeliverable := in_optns.CheckEmailDeliverable;
+      EXPORT BOOLEAN  CheckEmailDeliverable := $.Constants.isPremium(_SearchTier);
       EXPORT BOOLEAN  KeepUndeliverableEmail := in_optns.KeepUndeliverableEmail;
       BOOLEAN  SkipTMXcheck := in_optns.SkipTMX OR $.Constants.SearchType.isEIA(SearchType)
                                       OR $.Constants.SearchType.isEIC(SearchType); // we never suppress email records for EIC/EIA searches and we are not returning TMX data otherwise

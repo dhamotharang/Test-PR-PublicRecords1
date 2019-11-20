@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, STD, ut, Doxie;
+﻿IMPORT BIPV2, Business_Risk_BIP, Doxie, DueDiligence;
 
 
 EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData,
@@ -12,14 +12,8 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
                         string BatchUID = '',
                         unsigned6 GlobalCompanyId = 0) := FUNCTION
 
-    mod_access := MODULE(Doxie.IDataAccess)
-      EXPORT glb := options.GLBA_Purpose;
-      EXPORT dppa := options.DPPA_Purpose;
-      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
-      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
-      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
-    END;																					 
-
+																					 
+																						 
     INTEGER bsVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
     UNSIGNED8 bsOptions := DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS;
     BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
@@ -27,6 +21,14 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     UNSIGNED1 dppa := options.DPPA_Purpose;
     UNSIGNED1 glba := options.GLBA_Purpose;
     STRING dataRestrictionMask := options.DataRestrictionMask;
+    
+    mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT glb := options.GLBA_Purpose;
+      EXPORT dppa := options.DPPA_Purpose;
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
 
 
 
@@ -53,7 +55,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     indRelatives := DueDiligence.getIndRelatives(indProfLic, options, mod_access);
 
     //get header information
-    indHeader := DueDiligence.getIndHeader(indRelatives, dataRestrictionMask, dppa, glba, isFCRA, includeReport, mod_access);
+    indHeader := DueDiligence.getIndHeader(indRelatives, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, includeReport, mod_access);
 
     //get information pertaining to SSN
     indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, mod_access);
