@@ -8,12 +8,12 @@
   ,pcortera_base                = 'Marketing_List.Source_Files().cortera'              
   ,pinfutor_base                = 'Marketing_List.Source_Files().infutor'              
   ,paccutrend_base              = 'Marketing_List.Source_Files().accutrend'            
+  ,pDebug                       = 'false'
+  ,pSampleProxids               = '[]'
   ,pEmployees_Ranking           = 'Marketing_List._Config().ds_sources_of_number_of_employees'
   ,pSales_Ranking               = 'Marketing_List._Config().ds_sources_of_sales_revenue'
   ,pMrktg_BitMap                = 'Marketing_List._Config().Marketing_Bitmap'
   ,pMrktg_Approved_Sources      = 'Marketing_List._Config().set_marketing_approved_sources'
-  ,pDebug                       = 'false'
-  ,pSampleProxids               = '[]'
 
 
 ) :=
