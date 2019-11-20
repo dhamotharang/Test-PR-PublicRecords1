@@ -80,7 +80,8 @@ export data_key_Rid_SrcID (boolean pFastHeader = false, boolean pCombo = true, d
 	dFheader:=project(dataset('~thor_data400::persist::qh_seqd',header.Layout_New_Records,flat),TRANSFORM(dx_Header.layouts.i_rid_src,SELF.global_sid:=0,SELF.record_sid:=0,SELF:=LEFT));
 	get_recs := if(pCombo,pDataset,if(pFastHeader, dFheader, get_recs0 + header.file_transunion_rid_srcid + header.file_tn_rid_srcid));
 
-    get_recs_with_did:=PROJECT(get_recs,TRANSFORM({unsigned8 did:=0, RECORDOF(LEFT)},SELF:=LEFT));
+    rWithDid:={get_recs,TYPEOF(final_header.did) did};
+    get_recs_with_did:=join(get_recs,final_header,LEFT.src=RIGHT.src AND LEFT.rid=RIGHT.rid,TRANSFORM(rWithDid,SELF:=LEFT,SELF:=RIGHT),LEFT OUTER,HASH,LOCAL);
     get_recs_ccpa_compliant:=header.fn_suppress_ccpa(get_recs_with_did,true);
     get_recs_final:=PROJECT(get_recs_ccpa_compliant,TRANSFORM(dx_Header.layouts.i_rid_src,SELF:=LEFT));
 
