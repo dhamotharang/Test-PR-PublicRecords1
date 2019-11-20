@@ -1,18 +1,20 @@
-﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, Gong, MDR, Risk_Indicators, UT; 
+﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, Gong, MDR, Risk_Indicators, UT, Doxie, Suppress; 
 
 EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	// ---------------- Gong - EDA Phone Data ------------------
-	GongAddressSeq := JOIN(Shell, Gong.Key_History_Address, TRIM(LEFT.Clean_Input.Prim_Range) <> '' AND TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
+	GongAddressSeq_unsuppressed := JOIN(Shell, Gong.Key_History_Address, TRIM(LEFT.Clean_Input.Prim_Range) <> '' AND TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
 																	KEYED(LEFT.Clean_Input.Prim_Range = RIGHT.Prim_Range AND LEFT.Clean_Input.Prim_Name = RIGHT.Prim_Name AND LEFT.Clean_Input.State = RIGHT.st AND
 																				LEFT.Clean_Input.Zip5 = RIGHT.Z5) AND ut.NNEQ(LEFT.Clean_Input.Sec_Range, RIGHT.Sec_Range)
 																	AND RIGHT.Current_Flag = TRUE AND RIGHT.Business_Flag = TRUE,
 															TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq, UNSIGNED3 HistoryDate}, SELF.Seq := LEFT.Seq; SELF.HistoryDate := LEFT.Clean_Input.HistoryDate; SELF := RIGHT),
 													ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 	
+	GongAddressSeq := Suppress.Mac_SuppressSource(GongAddressSeq_unsuppressed, mod_access);
 	// Filter out records after our history date
 	GongAddress := Business_Risk_BIP.Common.FilterRecords(GongAddressSeq, dt_first_seen, (UNSIGNED)Business_Risk_BIP.Constants.MissingDate, '', AllowedSourcesSet);
 
@@ -73,7 +75,9 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) AddressVerSources;
 	END;
   
-	tempGongCalc calcGong(Business_Risk_BIP.Layouts.Shell le, Gong.key_history_phone ri) := TRANSFORM
+	{tempGongCalc, UNSIGNED4 global_sid, UNSIGNED6 did} calcGong(Business_Risk_BIP.Layouts.Shell le, Gong.key_history_phone ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
+		SELF.did := ri.did;
 		SELF.Seq := le.Seq;
 		
 		NamePopulated				:= TRIM(le.Clean_Input.CompanyName) <> '' AND TRIM(ri.Listed_Name) <> '';
@@ -115,12 +119,14 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		SELF.AddressMatched := AddressMatched;
 		SELF.PhoneMatched := PhoneMatched;
 	END;
-	gongBNAPRaw := JOIN(Shell, Gong.key_history_phone, (INTEGER)LEFT.Clean_Input.Phone10 > 0 AND KEYED(LEFT.Clean_Input.Phone10[1..3] = RIGHT.p3 AND LEFT.Clean_Input.Phone10[4..10] = RIGHT.p7) AND 
+	gongBNAPRaw_unsuppressed := JOIN(Shell, Gong.key_history_phone, (INTEGER)LEFT.Clean_Input.Phone10 > 0 AND KEYED(LEFT.Clean_Input.Phone10[1..3] = RIGHT.p3 AND LEFT.Clean_Input.Phone10[4..10] = RIGHT.p7) AND 
 																						// See comments for Business_Risk_BIP.Common.FilterRecords for full explaination - the <= and < checks are valid and should be different below for realtime vs historical modes
 																						((LEFT.Clean_Input.HistoryDate = (INTEGER)Business_Risk_BIP.Constants.NinesDate AND (INTEGER)(((STRING)RIGHT.dt_first_seen)[1..6]) <= LEFT.Clean_Input.HistoryDate) OR (INTEGER)(((STRING)RIGHT.dt_first_seen)[1..6]) < LEFT.Clean_Input.HistoryDate)
 																						AND (INTEGER)RIGHT.dt_first_seen > 0,
 																				calcGong(LEFT, RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 
+	gongBNAPRaw := Suppress.Suppress_ReturnOldLayout(gongBNAPRaw_unsuppressed, mod_access, tempGongCalc);
+	
 	gongBNAP := ROLLUP(SORT(gongBNAPRaw, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(tempGongCalc,
 																								SELF.BNAP := (STRING)MAX((INTEGER)LEFT.BNAP, (INTEGER)RIGHT.BNAP);
 																								SELF.PhoneMatch := (STRING)MAX((INTEGER)LEFT.PhoneMatch, (INTEGER)RIGHT.PhoneMatch);
@@ -146,7 +152,7 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	
 																	
 		// ---------------- Gong - EDA Phone Data ------------------
-	GongLinkIdRaw := Gong.key_History_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
+	GongLinkIdRaw := Gong.key_History_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,

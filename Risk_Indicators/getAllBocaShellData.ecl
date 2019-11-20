@@ -648,7 +648,7 @@ ssnFlagsPrep := group(join(bestSSNsd, pre_ids_only, left.did=right.did,
 ExactMatchLevel:=risk_indicators.iid_constants.default_ExactMatchLevel;
 
 //aml  just ids with ssn flags
-withSSNFlags := Risk_Indicators.iid_getSSNFlags(ssnFlagsPrep, dppa, glb, isFCRA, false/*runSSNCodes*/, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission );
+withSSNFlags := Risk_Indicators.iid_getSSNFlags(ssnFlagsPrep, dppa, glb, isFCRA, false/*runSSNCodes*/, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission, mod_access := mod_access);
 
 //todo withSSNFlags need again for relatives
 risk_indicators.layout_bocashell_neutral add_ssnFlags(	withSSNFlags le, pre_ids_only ri) := TRANSFORM
@@ -1730,7 +1730,7 @@ bsData := if(bsversion >= 52,
 // gateways := DATASET([],risk_indicators.Layout_Gateways_In);	// net acuity is not used for version 41 attributes in the shell
 ipdata := DATASET([],riskwise.Layout_IP2O);	// net acuity is not used for version 41 attributes in the shell
 // fdAttributesV2 := Models.getFDAttributes(final, iid, '', gateways, dppa, 0, '');	// hardcoding glb = 0 here as it is not really needed for anything
-fdAttributesV2 := Models.getFDAttributes(bsData, iid, '', ipdata);
+fdAttributesV2 := Models.getFDAttributes(bsData, iid, '', ipdata, mod_access := mod_access);
 
 risk_indicators.Layout_Boca_Shell addFDattributesV2(bsData le, fdAttributesV2 ri) := TRANSFORM
 	self.fdAttributesv2 := ri.version2;

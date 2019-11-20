@@ -259,8 +259,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
                                                                                                             
                                                       // now that we have all the data populated and filtered from all sources, time to clean up and count the 'all' parameters
                                                       allNumbers := models.common.zip2(LEFT.Sources.Source_Owner_All_DIDs, LEFT.Sources.Source_List_All_Last_Seen,',',models.common.options.leftouter);
+                                                      // filter out all '0' DIDs as we don't want to show or count them
+                                                      allNumbers_nonZero := allNumbers(str1 != '0');
                                                       // keep one record per DID (str1), with the most recent (str2 descending) date for each did
-                                                      allNumbersDeduped := dedup(sort(allNumbers,str1,-str2),str1);
+                                                      allNumbersDeduped := dedup(sort(allNumbers_nonZero,str1,-str2),str1);
                                                       todaysDate := Phone_Shell.Common.parseDate((string) STD.Date.Today(), TRUE);
                                                       
                                                       SELF.Sources.Source_Count_All_DIDs := count(allNumbersDeduped);

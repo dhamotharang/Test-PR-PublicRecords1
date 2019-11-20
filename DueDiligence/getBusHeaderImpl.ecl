@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
 
 /*
 	Following Keys being used: 
@@ -6,7 +6,9 @@
 */
 EXPORT getBusHeaderImpl := MODULE
 
-    EXPORT getFilteredData(DATASET(DueDiligence.Layouts.Busn_Internal) inData, Business_Risk_BIP.LIB_Business_Shell_LIBIN options, BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+    EXPORT getFilteredData(DATASET(DueDiligence.Layouts.Busn_Internal) inData, Business_Risk_BIP.LIB_Business_Shell_LIBIN options, 
+                                                  BIPV2.mod_sources.iParams linkingOptions,
+                                                  doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
         busHeaderRaw1 := BIPV2.Key_BH_Linking_Ids.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(inData),
 																													Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																													0, /*ScoreThreshold --> 0 = Give me everything*/
@@ -14,7 +16,8 @@ EXPORT getBusHeaderImpl := MODULE
 																													Business_Risk_BIP.Constants.Limit_BusHeader,
 																													FALSE, /* dnbFullRemove */
 																													TRUE, /* bypassContactSuppression */
-																													Options.KeepLargeBusinesses)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
+																													Options.KeepLargeBusinesses,
+                                                                                                                    mod_access := mod_access)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
 																	
 				
 				// clean up the business header before doing anything else

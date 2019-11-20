@@ -20,11 +20,10 @@ EXPORT E_Zip_Code(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'zip5(DEFAULT:UID),zipclass(DEFAULT:Zip_Class_:\'\'),city(DEFAULT:City_:\'\'),state(DEFAULT:State_:\'\'),county(DEFAULT:County_:\'\'),cityname(DEFAULT:City_Name_:\'\'),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'zip(OVERRIDE:UID),zipclass(DEFAULT:Zip_Class_:\'\'),city(DEFAULT:City_:\'\'),state(DEFAULT:State_:\'\'),county(DEFAULT:County_:\'\'),cityname(DEFAULT:City_Name_:\'\'),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie__Key_Header,TRANSFORM(RECORDOF(__in.Dataset_Doxie__Key_Header),SELF:=RIGHT));
-  EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED3)zip !=0);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid := __d0_KELfiltered((KEL.typ.uid)zip = 0);
-  SHARED __d0_Prefiltered := __d0_KELfiltered((KEL.typ.uid)zip <> 0);
+  SHARED __Mapping0 := 'zip5(OVERRIDE:UID),zipclass(OVERRIDE:Zip_Class_:\'\'),city(OVERRIDE:City_:\'\'),state(OVERRIDE:State_:\'\'),county(OVERRIDE:County_:\'\'),prefctystname(OVERRIDE:City_Name_:\'\'),src(OVERRIDE:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_RiskWise__key_CityStZip,TRANSFORM(RECORDOF(__in.Dataset_RiskWise__key_CityStZip),SELF:=RIGHT));
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_RiskWise__key_CityStZip_Invalid := __d0_Norm((KEL.typ.uid)Zip5 = 0);
+  SHARED __d0_Prefiltered := __d0_Norm((KEL.typ.uid)Zip5 <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD
@@ -74,15 +73,15 @@ EXPORT E_Zip_Code(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   EXPORT State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,State_);
   EXPORT County__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,County_);
   EXPORT City_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,City_Name_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid),COUNT(Zip_Class__SingleValue_Invalid),COUNT(City__SingleValue_Invalid),COUNT(State__SingleValue_Invalid),COUNT(County__SingleValue_Invalid),COUNT(City_Name__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid,KEL.typ.int Zip_Class__SingleValue_Invalid,KEL.typ.int City__SingleValue_Invalid,KEL.typ.int State__SingleValue_Invalid,KEL.typ.int County__SingleValue_Invalid,KEL.typ.int City_Name__SingleValue_Invalid});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_RiskWise__key_CityStZip_Invalid),COUNT(Zip_Class__SingleValue_Invalid),COUNT(City__SingleValue_Invalid),COUNT(State__SingleValue_Invalid),COUNT(County__SingleValue_Invalid),COUNT(City_Name__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_RiskWise__key_CityStZip_Invalid,KEL.typ.int Zip_Class__SingleValue_Invalid,KEL.typ.int City__SingleValue_Invalid,KEL.typ.int State__SingleValue_Invalid,KEL.typ.int County__SingleValue_Invalid,KEL.typ.int City_Name__SingleValue_Invalid});
   EXPORT NullCounts := DATASET([
-    {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid),COUNT(__d0)},
+    {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_RiskWise__key_CityStZip_Invalid),COUNT(__d0)},
     {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ZipClass',COUNT(__d0(__NL(Zip_Class_))),COUNT(__d0(__NN(Zip_Class_)))},
     {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','City',COUNT(__d0(__NL(City_))),COUNT(__d0(__NN(City_)))},
     {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','State',COUNT(__d0(__NL(State_))),COUNT(__d0(__NN(State_)))},
     {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','County',COUNT(__d0(__NL(County_))),COUNT(__d0(__NN(County_)))},
-    {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CityName',COUNT(__d0(__NL(City_Name_))),COUNT(__d0(__NN(City_Name_)))},
-    {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prefctystname',COUNT(__d0(__NL(City_Name_))),COUNT(__d0(__NN(City_Name_)))},
+    {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
     {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'ZipCode','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});

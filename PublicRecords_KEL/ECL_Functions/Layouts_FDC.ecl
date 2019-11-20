@@ -4,7 +4,7 @@ IMPORT ADVO, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BusReg,CalBus, CellP
 	Header_Quick, InfoUSA, InfutorCID, Inquiry_AccLogs, IRS5500, LN_PropertyV2, Phonesplus_v2, Prof_License_Mari, Prof_LicenseV2,
 	PublicRecords_KEL, OSHAIR, Targus, USPIS_HotList, UtilFile,SAM, VehicleV2, Watercraft,YellowPages, 
 	UCCV2, dx_Infutor_NARB, dx_Equifax_Business_Data, BIPV2_Build, DriversV2, Risk_Indicators, Relationship,dx_header, data_services, Doxie,
-	American_student_list,AlloyMedia_student_list;
+	American_student_list,AlloyMedia_student_list,RiskWise;
 	
 	EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_KEL.Interface_Options) := MODULE 
 	
@@ -384,6 +384,14 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 	EXPORT Layout_UtilFile__Kfetch2_LinkIds := RECORD
 		LayoutIDs;
 		RECORDOF(UtilFile__Kfetch2_LinkIds);
+		STRING2 src;
+		UNSIGNED8 DPMBitmap;
+	END;
+	
+	SHARED RiskWise__key_CityStZip := RiskWise.Key_CityStZip;
+	EXPORT Layout_RiskWise__key_CityStZip := RECORD
+		LayoutIDs;
+		RECORDOF(RiskWise__key_CityStZip);
 		STRING2 src;
 		UNSIGNED8 DPMBitmap;
 	END;
@@ -816,7 +824,8 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		DATASET(Layout_Inquiry_AccLogs__Key_FCRA_DID) Dataset_Inquiry_AccLogs__Key_FCRA_DID;		
 		DATASET(Layout_USPIS_HotList__key_addr_search_zip) Dataset_USPIS_HotList__key_addr_search_zip;		
 		DATASET(Layout_UtilFile__Key_Address) Dataset_UtilFile__Key_Address;		
-		DATASET(Layout_UtilFile__Key_DID) Dataset_UtilFile__Key_DID;		
+		DATASET(Layout_UtilFile__Key_DID) Dataset_UtilFile__Key_DID;
+		DATASET(Layout_RiskWise__key_CityStZip) Dataset_RiskWise__key_CityStZip;
 		// Person 
 		DATASET(Layout_Doxie__Key_Header_Address) Dataset_Doxie__Key_Header_Address; 
 		DATASET(Layout_Doxie__Key_Death_MasterV2_SSA_DID) Dataset_Doxie__Key_Death_MasterV2_SSA_DID; 

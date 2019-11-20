@@ -79,9 +79,9 @@
 	<part name="MarketingMode" type="xsd:integer"/>
 	<part name="AllowedSources" type="xsd:string"/>
 	<part name="BIPBestAppend" type="xsd:integer"/>
-  <part name="OFAC_Version" type="xsd:integer"/>
-  <part name="Global_Watchlist_Threshold" type="xsd:real"/>
-  <part name="Watchlists_Requested" type="tns:XmlDataSet" cols="90" rows="10"/>
+	<part name="OFAC_Version" type="xsd:integer"/>
+	<part name="Global_Watchlist_Threshold" type="xsd:real"/>
+	<part name="Watchlists_Requested" type="tns:XmlDataSet" cols="90" rows="10"/>
 	<!-- Output Options -->
 	<part name="OutputRecordCount" type="xsd:integer"/>
 	<part name="IncludeAll" type="xsd:boolean"/>
@@ -107,11 +107,12 @@
 	<part name="IncludeCorpFilings" type="xsd:boolean"/>
 	<part name="IncludeBankruptcy" type="xsd:boolean"/>
 	<part name="IncludeCortera" type="xsd:boolean"/>
- <part name="IncludeWatchlistSearch" type="xsd:boolean"/>
- <part name="IncludeProfessionalLicense" type="xsd:boolean"/>
+	<part name="IncludeEmailV2" type="xsd:boolean"/>
+	<part name="IncludeWatchlistSearch" type="xsd:boolean"/>
+	<part name="IncludeProfessionalLicense" type="xsd:boolean"/>
 	<part name="IncludeSBFE" type="xsd:boolean"/>
 	<part name="IncludeDataBridge" type="xsd:boolean"/>
- <part name="KeepLargeBusinesses" type="xsd:integer"/>
+	<part name="KeepLargeBusinesses" type="xsd:integer"/>
 	<part name="OverrideExperianRestriction" type="xsd:boolean"/>
 	<part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
 </message>
@@ -119,7 +120,7 @@
 /*--INFO-- Prod Data Service - This is the XML Service utilizing BIP linking*/
 
 #option('expandSelectCreateRow', true);
-IMPORT Address, AutoStandardI, BIPV2, BizLinkFull, Business_Risk_BIP, Corp2, Doxie, EBR, EBR_Services, Gateway,
+IMPORT Address, AutoStandardI, BIPV2, BizLinkFull, Business_Risk_BIP, Corp2, Doxie, dx_Email, EBR, EBR_Services, Gateway,
  iesp, LiensV2, LN_PropertyV2, MDR, NID, Risk_Indicators, RiskWise, UT;
 
 EXPORT ProdData() := FUNCTION
@@ -180,11 +181,13 @@ EXPORT ProdData() := FUNCTION
 	'IncludeBusinessHeader',
 	'IncludeBusReg',
 	'IncludeCorpFilings',
-  'IncludeCortera',
+	'IncludeCortera',
+	'IncludeDataBridge',
 	'IncludeDCA',
 	'IncludeDEADCO',
 	'IncludeDNBDMI',
 	'IncludeEBR',
+	'IncludeEmailV2',
 	'IncludeFBN',
 	'IncludeInquiriesBus',
 	'IncludeIRS990NonProfit',
@@ -198,8 +201,7 @@ EXPORT ProdData() := FUNCTION
 	'IncludeUCC',
 	'IncludeUtility',
 	'IncludeWatchlistSearch',
- 'IncludeProfessionalLicense',
- 'IncludeDataBridge',
+	'IncludeProfessionalLicense',
 	'KeepLargeBusinesses',
 	'OverrideExperianRestriction',
   'gateways'
@@ -327,6 +329,7 @@ layout_watchlists_temp := record
 	BOOLEAN IncludeSBFE_In := FALSE : STORED('IncludeSBFE');
 	BOOLEAN IncludeCortera_In := FALSE : STORED('IncludeCortera');
 	BOOLEAN IncludeDataBridge_In := FALSE : STORED('IncludeDataBridge');
+	BOOLEAN IncludeEmailV2_In := FALSE : STORED('IncludeEmailV2');
 	UNSIGNED1 KeepLargeBusinesses_In  := Business_Risk_BIP.Constants.DefaultJoinType : STORED('KeepLargeBusinesses');
 	BOOLEAN OverrideExperianRestriction_In := FALSE : STORED('OverrideExperianRestriction');
 
@@ -479,6 +482,7 @@ layout_watchlists_temp := record
 		EXPORT BOOLEAN		IncludeWatchlist		:= FALSE;
 		EXPORT BOOLEAN		IncludeSBFE		      := FALSE;
 		EXPORT BOOLEAN		IncludeDataBridge    := FALSE;
+		EXPORT BOOLEAN		IncludeEmailV2			:= FALSE;
 	END;
 	// Grab the output options
 	outputs := MODULE(OutputInterface)
@@ -511,6 +515,7 @@ layout_watchlists_temp := record
 		EXPORT BOOLEAN IncludeProfLic := IncludeProfLic_In;
 		EXPORT BOOLEAN IncludeSBFE := IncludeSBFE_In;
 		EXPORT BOOLEAN IncludeDataBridge := IncludeDataBridge_In;
+		EXPORT BOOLEAN IncludeEmailV2 := IncludeEmailV2_In;
 	END;
 
 	// Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These parameters should be global so figure them out here and pass around appropriately
@@ -952,13 +957,19 @@ layout_watchlists_temp := record
 	// --------------- SBFE data ----------------
 	SBFE := Business_Risk_BIP.PD_SBFE(LinkIDsFound, options, linkingOptions, AllowedSourcesSet).SBFE_data_raw;
 
-  // --------------- Cortera data ----------------
-  Cortera := Business_Risk_BIP.PD_Cortera(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-  CorteraRecs := Cortera.CorteraRecs;
-  Cortera_Attribute_recs := Cortera.Cortera_Attribute_recs;
-  Cortera_Tradelines := Business_Risk_BIP.PD_Cortera_Tradelines(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
+	// --------------- Cortera data ----------------
+	Cortera := Business_Risk_BIP.PD_Cortera(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
+	CorteraRecs := Cortera.CorteraRecs;
+	Cortera_Attribute_recs := Cortera.Cortera_Attribute_recs;
+	Cortera_Tradelines := Business_Risk_BIP.PD_Cortera_Tradelines(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
 	
-  DataBridge := Business_Risk_BIP.PD_DataBridge(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, AllowedSourcesSet);
+	DataBridge := Business_Risk_BIP.PD_DataBridge(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, AllowedSourcesSet);
+  
+	EmailV2 := dx_Email.Key_LinkIds.kFetch(kFetchLinkIDs,
+																							kFetchLinkSearchLevel,
+																							0 // ScoreThreshold --> 0 = Give me everything
+																					 );
+
 	
 	
 	// Keep all of the outputs at the end so that we can keep them sorted more easily, and so that the function compiles
@@ -1010,6 +1021,7 @@ layout_watchlists_temp := record
 	IF(outputs.IncludeProfLic OR outputs.IncludeAll, OUTPUT(CHOOSEN((ProfLic), outputs.OutputRecordCount), NAMED('ProfessionalLicense')));
 	IF((outputs.IncludeSBFE OR outputs.IncludeAll), OUTPUT(CHOOSEN((SBFE), outputs.OutputRecordCount), NAMED('SBFE')));
 	IF((outputs.IncludeDataBridge OR outputs.IncludeAll), OUTPUT(CHOOSEN((DataBridge), outputs.OutputRecordCount), NAMED('DataBridge')));
+	IF((outputs.IncludeEmailV2 OR outputs.IncludeAll), OUTPUT(CHOOSEN((EmailV2), outputs.OutputRecordCount), NAMED('EmailV2')));
 
 	RETURN(TRUE);
 END;

@@ -434,7 +434,7 @@ EXPORT Layouts := MODULE
     STRING25 source;
     STRING35 caseNumber;
     STRING35 offenseStatute;
-    STRING8 offenseDDFirstReportedActivity;
+    UNSIGNED4 offenseDDFirstReportedActivity;
     UNSIGNED4 offenseDDLastReportedActivity;
     UNSIGNED4 offenseDDLastCourtDispDate;
     UNSIGNED1 offenseDDLegalEventTypeCode;
@@ -459,25 +459,25 @@ EXPORT Layouts := MODULE
   END;
 
   EXPORT CriminalSources := RECORD
-    STRING75 offenseCharge;
-    STRING1 offenseConviction;
-    STRING1 offenseChargeLevelCalculated;
-    STRING35 offenseChargeLevelReported;
+    STRING75 charge;
+    STRING1 conviction;
+    STRING1 chargeLevelCalculated;
+    STRING35 chargeLevelReported;
     STRING25 source;
     STRING50 courtDisposition1;
     STRING50 courtDisposition2;
-    UNSIGNED4 offenseReportedDate;
-    UNSIGNED4 offenseArrestDate;
-    UNSIGNED4 offenseCourtDispDate;
-    UNSIGNED4 offenseAppealDate;
-    UNSIGNED4 offenseSentenceDate;
-    UNSIGNED4 offenseSentenceStartDate;
+    UNSIGNED4 reportedDate;
+    UNSIGNED4 arrestDate;
+    UNSIGNED4 courtDispDate;
+    UNSIGNED4 appealDate;
+    UNSIGNED4 sentenceDate;
+    UNSIGNED4 sentenceStartDate;
     UNSIGNED4 DOCConvictionOverrideDate;
     UNSIGNED4 DOCScheduledReleaseDate;
     UNSIGNED4 DOCActualReleaseDate;
     STRING50 DOCInmateStatus;
     STRING50 DOCParoleStatus;
-    STRING30 offenseMaxTerm;
+    STRING30 maxTerm;
     BOOLEAN currentlyIncarcerated;
     BOOLEAN currentlyParoled;
     BOOLEAN currentlyProbation;
@@ -489,27 +489,31 @@ EXPORT Layouts := MODULE
     STRING25 DOCCurrentLocationSecurity;
     DATASET({STRING120 name}) partyNames;
   END;
+  
+  EXPORT LegalAttributes := RECORD
+    BOOLEAN attr_stateLegalEvent9;
+    BOOLEAN attr_stateLegalEvent8;
+    BOOLEAN attr_stateLegalEvent7;
+    BOOLEAN attr_stateLegalEvent6;
+    BOOLEAN attr_stateLegalEvent5;
+    BOOLEAN attr_stateLegalEvent4;
+    BOOLEAN attr_stateLegalEvent3;
+    BOOLEAN attr_stateLegalEvent2;
+    
+    BOOLEAN attr_offenseType9;
+    BOOLEAN attr_offenseType8;
+    BOOLEAN attr_offenseType7;
+    BOOLEAN attr_offenseType6;
+    BOOLEAN attr_offenseType5;
+    BOOLEAN attr_offenseType4;
+    BOOLEAN attr_offenseType3;
+    BOOLEAN attr_offenseType2;
+    BOOLEAN attr_offenseType0;
+  END;
 
   EXPORT CriminalOffenses := RECORD
     //fields used for attribute calculation - calc based on roll of sources
-    BOOLEAN attr_currentlyIncarceratedOrParoled;
-    BOOLEAN attr_felonyPast3Yrs;
-    BOOLEAN attr_felonyOver3Yrs;
-    BOOLEAN attr_previouslyIncarcerated;
-    BOOLEAN attr_uncategorizedConvictionPast3Yrs;
-    BOOLEAN attr_uncategorizedConvictionOver3Yrs;
-    BOOLEAN attr_misdemeanorConvictionPast3Yrs;
-    BOOLEAN attr_misdemeanorConvictionOver3Yrs;
-
-    BOOLEAN attr_legalEventCat9;
-    BOOLEAN attr_legalEventCat8;
-    BOOLEAN attr_legalEventCat7;
-    BOOLEAN attr_legalEventCat6;
-    BOOLEAN attr_legalEventCat5;
-    BOOLEAN attr_legalEventCat4;
-    BOOLEAN attr_legalEventCat3;
-    BOOLEAN attr_legalEventCat2;
-    BOOLEAN attr_legalEventCat0;
+    LegalAttributes;
 
     //Top Level Data
     CriminalTopLevel;

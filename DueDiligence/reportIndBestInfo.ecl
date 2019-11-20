@@ -44,7 +44,7 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                                                     SELF.personalInfo.inputAddressType := Advo.Lookup_Descriptions.fn_resbus(LEFT.Residential_OR_Business_Clean);
                                                     SELF.personalInfo.bestAddressType := Advo.Lookup_Descriptions.fn_resbus(LEFT.Residential_OR_Business_Best);
                                                     
-                                                    SELF.personalInfo.InputSSN := LEFT.inputSSN;
+                                                    SELF.personalInfo.InputSSN := LEFT.indvRawInput.ssn;
                                                     SELF.personalInfo.BestSSN := LEFT.bestSSN;
                                                     SELF.personalInfo.InputDOB := iesp.ECL2ESP.toDatestring8(LEFT.indvRawInput.dob);
                                                     SELF.personalInfo.BestDOB := iesp.ECL2ESP.toDate(LEFT.bestDOB);;

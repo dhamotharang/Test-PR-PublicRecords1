@@ -74,7 +74,11 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
       'TestDataEnabled',
       'TestDataTableName',	
 	 'SBFEContributorIds',
-	 'BusinessCreditReportType'
+	 'BusinessCreditReportType',
+     'LexIdSourceOptout',
+     '_TransactionId',
+     '_BatchUID',
+     '_GCID'
       ));
 		
     /* ************************************************************************
@@ -118,7 +122,13 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
 			//Look up the industry by the company ID.
 			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_BIP_Combined_Service);
 		/* ************* End Scout Fields **************/
-   
+
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+    string TransactionID := '' : STORED('_TransactionId');
+    string BatchUID := '' : STORED('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
     // Below we'll prefer users.DataRestrictionMask, users.DataPermissionMask, users.industryclass, etc., over
     // DataRestrictionMask_stored, DataPermissionMask_stored, etc., since they are "internal" or overridden values
     // populated for Development/QA purposes, etc.
@@ -208,15 +218,15 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
     Attributes_Requested := 
       PROJECT(option.AttributesVersionRequest, 
               TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, 
-                         SELF.AttributeGroup := StringLib.StringToUpperCase(LEFT.Value)));
+                         SELF.AttributeGroup := STD.Str.ToUpperCase(LEFT.Value)));
     Models_Requested := 
       PROJECT(option.IncludeModels.Names, 
               TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, 
-                         SELF.ModelName := StringLib.StringToUpperCase(LEFT.Value)));
+                         SELF.ModelName := STD.Str.ToUpperCase(LEFT.Value)));
     Model_Options := 
       PROJECT(option.IncludeModels.ModelOptions, 
               TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, 
-                         SELF.OptionName  := StringLib.StringToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT));
+                         SELF.OptionName  := STD.Str.ToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT));
                          SELF.OptionValue := LEFT.OptionValue));
     
     Gateways_ := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
@@ -367,22 +377,25 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
        EXPORT BOOLEAN   IncludeTargusGateway            := Include_TargusGateway;
        EXPORT BOOLEAN   RunTargusGateway                := Run_TargusGateway;
        EXPORT BOOLEAN   TestDataEnabled			            := TestData_Enabled;
-	     EXPORT STRING    TestDataTableName	              := TestData_TableName;
+       EXPORT STRING    TestDataTableName	              := TestData_TableName;
        EXPORT STRING6   DOBMask                         := global_mod.DOBMask;
        EXPORT STRING32  ApplicationType                 := global_mod.ApplicationType;
        EXPORT STRING1   FetchLevel 					            := BIPV2.IDconstants.Fetch_Level_SELEID;
        EXPORT BOOLEAN   IncludeCreditReport             := option.IncludeCreditReport;  	
        EXPORT BOOLEAN   LimitPaymentHistory24Months := LimitPaymentHistory24MonthsVal;
-	  EXPORT STRING       SBFEContributorIds := ContributorIds;			
-	  EXPORT STRING1   BusinessCreditReportType := BusinessCreditReportTypeVal;
+       EXPORT STRING       SBFEContributorIds := ContributorIds;			
+       EXPORT STRING1   BusinessCreditReportType := BusinessCreditReportTypeVal;
        EXPORT BOOLEAN   MinInputMetForAuthRepPopulated  := MinimumInputMetForAuthorizedRepPopulated;
        EXPORT DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := Watchlists_Requested_;
        EXPORT DATASET(Gateway.Layouts.Config) Gateways  := Gateways_;
        EXPORT DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) AttributesRequested := Attributes_Requested;
        EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) ModelsRequested := Models_Requested;
        EXPORT DATASET(LNSmallBusiness.Layouts.ModelOptionsRec) ModelOptions := Model_Options;
-	  EXPORT BOOLEAN   UseInputDataAsIs                := TRUE;
-	
+       EXPORT BOOLEAN   UseInputDataAsIs                := TRUE;
+       EXPORT unsigned1 in_LexIdSourceOptout := LexIdSourceOptout;
+       EXPORT string in_TransactionID := TransactionID;
+       EXPORT string in_BatchUID := BatchUID;
+       EXPORT unsigned6 in_GlobalCompanyId := GlobalCompanyId;
       END;
     
   ds_Results_withSmBizSBFEroyalty := LNSmallBusiness.SmallBusiness_BIP_Combined_Service_Records(SmallBizCombined_inmod);

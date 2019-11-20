@@ -1,4 +1,4 @@
-﻿import Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services, STD, daybatchPCNSR, Models;
+﻿import Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services, STD, daybatchPCNSR, Models, Doxie, Suppress;
 
 export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam,
 	grouped DATASET(Risk_Indicators.Layout_Output) iid,
@@ -10,7 +10,8 @@ export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam,
   string DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
   string DataPermission=risk_indicators.iid_constants.default_DataPermission,
   string32 appType = '',
-  DATASET(Models.Layouts.Layout_Model_Request_In) ModelRequests = DATASET([],Models.Layouts.Layout_Model_Request_In)
+  DATASET(Models.Layouts.Layout_Model_Request_In) ModelRequests = DATASET([],Models.Layouts.Layout_Model_Request_In),
+  doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 	) := FUNCTION
 
 
@@ -1241,7 +1242,8 @@ xlayout := record
   STRING6 refresh_date :='';  // for demographic data rollup
 end;
 
-	xlayout get_household(wIPs le, daybatchPCNSR.Key_PCNSR_DID rt) := transform
+	{xlayout, UNSIGNED4 global_sid} get_household(wIPs le, daybatchPCNSR.Key_PCNSR_DID rt) := transform
+        self.global_sid := rt.global_sid;
 		self.hownstatusflag := map(rt.own_rent='9' => '4',
 							  rt.own_rent in ['7','8'] => '3',
 							  rt.own_rent in ['1','2','3','4','5','6'] => '2',
@@ -1251,11 +1253,13 @@ end;
     self := le;
 	end;
 
-	hous_recs := join(wIPs, DayBatchPCNSR.Key_PCNSR_DID, 
+	hous_recs_unsuppressed := join(wIPs, DayBatchPCNSR.Key_PCNSR_DID, 
 					left.did!=0 and keyed(left.did=right.did), 
 					get_household(left, right), left outer,
           ATMOST(keyed(left.did=right.did), RiskWise.max_atmost), keep(50));
 
+    hous_recs := Suppress.Suppress_ReturnOldLayout(hous_recs_unsuppressed, mod_access, xlayout);
+    
   xlayout roll_hous(xlayout le, xlayout rt) := transform
     self := if(le.refresh_date > rt.refresh_date, le, rt); 
   end;

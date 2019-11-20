@@ -1,8 +1,9 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, STD, Watercraft;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, STD, Watercraft, Doxie;
 
 EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-											 BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+											 BIPV2.mod_sources.iParams linkingOptions,
+                                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 										 
 
 	watercraftRaw := Watercraft.Key_LinkIds.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(BusnData),
@@ -39,7 +40,7 @@ EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   slimWatercraft := PROJECT(filteredWatercraft, TRANSFORM(DueDiligence.LayoutsInternal.WatercraftSlimLayout, SELF := LEFT;));
   
   //Get the details about the watercraft
-  watercraftDetails := DueDiligence.getSharedWatercraft(slimWatercraft);  
+  watercraftDetails := DueDiligence.getSharedWatercraft(slimWatercraft, mod_access);  
   
   addWaterCraft := JOIN(BusnData, watercraftDetails,
                         #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),												

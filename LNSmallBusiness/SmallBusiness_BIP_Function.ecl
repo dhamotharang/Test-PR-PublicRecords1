@@ -23,10 +23,14 @@ EXPORT SmallBusiness_BIP_Function (
 											BOOLEAN IncludeTargusGateway = FALSE,
 											BOOLEAN RunTargusGateway = FALSE,
 											UNSIGNED2 BIPIDWeightThreshold = LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.DEFAULT_VALUE,
-                      BOOLEAN CorteraRetrotest = FALSE,
-											DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw),
-											BOOLEAN AppendBestsFromLexIDs = FALSE, 
-											BOOLEAN DisableSBFE = FALSE           
+                                            BOOLEAN CorteraRetrotest = FALSE,
+                                            DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw),
+                                            BOOLEAN AppendBestsFromLexIDs = FALSE, 
+                                            BOOLEAN DisableSBFE = FALSE,
+                                            unsigned1 LexIdSourceOptout = 1,
+                                            string TransactionID = '',
+                                            string BatchUID = '',
+                                            unsigned6 GlobalCompanyId = 0
 																							) := FUNCTION
 
 	RESTRICTED_SET := ['0', ''];
@@ -242,7 +246,11 @@ EXPORT SmallBusiness_BIP_Function (
 																																 FALSE,
 																																 FALSE,
 																																 CorteraRetrotest,
-																																 ds_CorteraRetrotestRecsRaw);
+																																 ds_CorteraRetrotestRecsRaw,
+                                                                                                                                 LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                                                 TransactionID := TransactionID, 
+                                                                                                                                 BatchUID := BatchUID, 
+                                                                                                                                 GlobalCompanyID := GlobalCompanyID);
 
   Shell_Results_nosbfe := 
 	  PROJECT(Shell_Results_pre, TRANSFORM(Business_Risk_BIP.Layouts.Shell, SELF.SBFE := [], SELF := LEFT));
@@ -399,11 +407,28 @@ unsigned8 BSOptions :=
 
 	IID_Prep := PROJECT(IID_Prep_Acct, Risk_Indicators.Layout_Input );
 
-	IID := Risk_Indicators.InstantID_Function(IID_Prep, Gateways,	DPPA_Purpose,	GLBA_Purpose, IsUtility, LN_Branded, OFAC_Only, SuppressNearDups, Require2ele, IsFCRA, 
-	From_BIID, ExcludeWatchLists, From_IT1O, OFAC_Version, Include_OFAC, Addtl_Watchlists, Global_Watchlist_Threshold, DOB_Radius, BSVersion, In_DataRestriction := DataRestrictionMask_in, 
-	in_runDLverification := include_DL_verification, in_append_best := AppendBest, in_BSOptions := BSOptions, in_LastSeenThreshold := LastSeenThreshold, in_DataPermission := DataPermissionMask);
+	IID := Risk_Indicators.InstantID_Function(IID_Prep, Gateways,	DPPA_Purpose,	GLBA_Purpose, IsUtility, 
+                                                                          LN_Branded, OFAC_Only, SuppressNearDups, Require2ele, 
+                                                                          IsFCRA, From_BIID, ExcludeWatchLists, From_IT1O, OFAC_Version,
+                                                                          Include_OFAC, Addtl_Watchlists, Global_Watchlist_Threshold, DOB_Radius, 
+                                                                          BSVersion, In_DataRestriction := DataRestrictionMask_in, 
+                                                                          in_runDLverification := include_DL_verification, in_append_best := AppendBest, 
+                                                                          in_BSOptions := BSOptions, in_LastSeenThreshold := LastSeenThreshold, 
+                                                                          in_DataPermission := DataPermissionMask,
+                                                                          LexIdSourceOptout := LexIdSourceOptout, 
+                                                                          TransactionID := TransactionID, 
+                                                                          BatchUID := BatchUID, 
+                                                                          GlobalCompanyID := GlobalCompanyID);
 	
-	Clam := Risk_Indicators.Boca_Shell_Function(IID, Gateways,	DPPA_Purpose,	GLBA_Purpose, IsUtility, LN_Branded, IncludeRel, IncludeDL, IncludeVeh, IncludeDerog, BSVersion, DoScore, Nugen, DataRestriction := DataRestrictionMask_in, BSOptions := BSOptions, DataPermission := DataPermissionMask);																							 
+	Clam := Risk_Indicators.Boca_Shell_Function(IID, Gateways,	DPPA_Purpose,	GLBA_Purpose, IsUtility, 
+                                                                                    LN_Branded, IncludeRel, IncludeDL, 
+                                                                                    IncludeVeh, IncludeDerog, BSVersion, 
+                                                                                    DoScore, Nugen, DataRestriction := DataRestrictionMask_in, 
+                                                                                    BSOptions := BSOptions, DataPermission := DataPermissionMask,
+                                                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                    TransactionID := TransactionID, 
+                                                                                    BatchUID := BatchUID, 
+                                                                                    GlobalCompanyID := GlobalCompanyID);																							 
 	
 	Blank_Boca_Shell := GROUP(DATASET([], Risk_Indicators.Layout_Boca_Shell), Seq);
 	

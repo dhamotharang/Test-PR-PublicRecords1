@@ -31,8 +31,8 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	srchrec 	:= dataset([into_srch()]);
 	res_input	:=project(srchrec,AddressReport_Services.layouts.in_address);
-	nbr_input	:=project(srchrec,transform(doxie.layout_nbr_targets,self:=left,self:=[]));		
-	gong_input:=project(srchrec,transform(doxie.layout_AppendGongByAddr_input,self:=left,self:=[]));		
+	nbr_input	:=project(srchrec,transform(doxie.layout_nbr_targets,self:=left,self:=[]));
+	gong_input:=project(srchrec,transform(doxie.layout_AppendGongByAddr_input,self:=left,self:=[]));
 	bus_input	:=project(srchrec,transform(Doxie_Raw.Layout_address_input,Self.city_name:=left.p_city_Name,self:=left));
 
 	//**************************************
@@ -57,7 +57,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 															Res_final_all(sec_range=split_addr.sec_range));
 
 	IF(COUNT(dedup(sort(recs,DID),DID))>MAX(AddressReport_Services.constants.MaxResidents,AddressReport_Services.constants.MaxProperties),FAIL(203,doxie.ErrorCodes(203)));
-	headerRecs 								:= project(recs, TRANSFORM(dx_header.layout_header,self:=left,self:=[]));			 
+	headerRecs 								:= project(recs, TRANSFORM(dx_header.layout_header,self:=left,self:=[]));
 
   //Some values are not provided in the input module; until that, has to make this call:
   mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
@@ -73,7 +73,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
     EXPORT unsigned3 date_threshold := param.dateval;
     EXPORT string ssn_mask := param.ssn_mask;
   END;
-  
+
 	isCNSMR := mod_access.isConsumer();
   glb_ok :=  mod_access.isValidGLB ();
   dppa_ok := mod_access.isValidDPPA ();
@@ -106,14 +106,14 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	end;
 	veh_ids_for_addr := VehicleV2_Services.autokey_ids(false,true,true);
 	vehicles 				:= if(~isCNSMR, VehicleV2_Services.raw.get_vehicle_crs_report_by_Veh_key(mod_vehicle_report, veh_ids_for_addr));
-																
+
 	bk_ids 					:= BankruptcyV2_Services.bankruptcy_ids(dataset([],doxie.layout_references),
 																													dataset([],doxie_cbrs.layout_references),
 																													dataset([],bankruptcyv2_services.layout_tmsid_ext),
 																													dataset([],BIPV2.IDlayouts.l_xlink_ids),,
 																													0);
 	Bankruptcies_all:= Doxie_Raw.bk_legacy_raw(,,bk_ids,,mod_access.ssn_mask,'D');
-																
+
 	dl_in_seq				:= DriversV2_Services.autokey_ids(,true,true);
 	dl_IDs1					:= project(dl_in_seq,DriversV2_Services.layouts.seq);
 	dl_IDs2					:= DriversV2_Services.DLRaw.get_seq_from_dids(cur_dids);
@@ -128,10 +128,10 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	// Below added on 03/30/2011 for criminal records, sex offenders, bookings, hunting and fire arm licences
 	Crims_filtered  := if(param.include_CriminalRecords,AddressReport_Services.functions.fCrimes());
-	sexOffender_filtered					:= if(param.include_SexualOffenses,AddressReport_Services.functions.fSexOffendors());	
+	sexOffender_filtered					:= if(param.include_SexualOffenses,AddressReport_Services.functions.fSexOffendors());
 	Hunting_Filtered							:= if(param.include_HuntingFishingLicenses,AddressReport_Services.functions.fHuntingAndFishing());
 	formatedFilteredWeaponRecords	:= if(param.include_WeaponPermits ,AddressReport_Services.functions.fWeaponsPermits());
-	// end 03/30/2011 maintenance 
+	// end 03/30/2011 maintenance
 
 	//Remove Invalid address records from Bankruptcies
 	AddressReport_Services.Mac_address_Filter(Bankruptcies_all,
@@ -148,7 +148,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 																						Bankruptcies_filter
 																						);
 	Bankruptcies				:=Bankruptcies_filter;
-											
+
 	Neighbors_recs_all	:=doxie.nbr_records(nbr_input,
 																					'C',
 																					1,
@@ -163,15 +163,15 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	ut.PermissionTools.GLB.mac_FilterOutMinors(Neighbors_recs_all,Neighbors_recs_fil,,,dob)
 	Neighbors_recs :=Neighbors_recs_fil;
-	Neighbors_filtered:=AddressReport_Services.transform_neighbors(Neighbors_recs,,, param);
-	
+	Neighbors_filtered:=AddressReport_Services.transform_neighbors(Neighbors_recs,,, param, mod_access);
+
 	//************************************* //
 	//Location Report Project Data Retrieval
-	
+
 	//Neighbors
 	nbr_dids 				:= project(Neighbors_recs, doxie.layout_references);
 	nbr_best				:= doxie.best_records(nbr_dids, IsFCRA, , , true,checkRNA:=true, includeDOD:=true, modAccess := mod_access)(dod = '');
-	
+
 	//Current Residents and Neighbor dids
 	all_dids				:= cur_dids & nbr_dids;
 
@@ -187,60 +187,60 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	veh_ids_for_resaddr_dd := dedup(sort(veh_ids_for_curdids + veh_ids_for_addr,
 	                                     vehicle_key, iteration_key, sequence_key),
 	                                vehicle_key, iteration_key, sequence_key);
-	
-	// Determine which res/addr vehicle ids are still associated with the resident or report address, 
+
+	// Determine which res/addr vehicle ids are still associated with the resident or report address,
 	// even it the latest registration has expired, but only within last 5 years.
 	//
 	// First sort/dedup to use only unique vehicle_key values
 	veh_ids_ra_vk_deduped := dedup(sort(veh_ids_for_resaddr_dd, vehicle_key),vehicle_key);
 
-  // Join res/addr unique vehicle_key values to the vehicle party key to get all the party recs 
+  // Join res/addr unique vehicle_key values to the vehicle party key to get all the party recs
   veh_ra_partyrecs := join(veh_ids_ra_vk_deduped, VehicleV2.Key_Vehicle_Party_Key,
-													    keyed(left.vehicle_key = right.vehicle_key) and 
+													    keyed(left.vehicle_key = right.vehicle_key) and
 															// v--- Only use non-Infutor records since the Infutor ones might
 															//   be the highest iteration_key, but not the most recent data
-															//   (A known Infutor data issue discussed with Cathy Tio in data fab 
+															//   (A known Infutor data issue discussed with Cathy Tio in data fab
 															//   on 05/31/16 and JIRA DF-16655 was created).
 															not MDR.sourceTools.SourceIsInfutor_Veh(right.source_code),
 													 transform(right),
 													 inner,
 													 limit(ut.limits.DEFAULT, skip));
-  
+
   // Then sort/dedup to only keep the record with the most recent iteration_key & sequence_key
-	// values for each vehicle_key.  
+	// values for each vehicle_key.
 	veh_ra_pr_dd_pre := dedup(sort(veh_ra_partyrecs,
-	                           vehicle_key, -iteration_key, -sequence_key, 
+	                           vehicle_key, -iteration_key, -sequence_key,
 														 orig_name_type),  //owners before registrants and lienholders, not that it should matter
 	                      vehicle_key);
   veh_ra_pr_dd := Suppress.MAC_SuppressSource(veh_ra_pr_dd_pre,mod_access,append_did);
-  
+
   // Join the previously deduped res & addr vehicle ids to the most recent party key info to
 	// see if the vehicle ids still belong to the resident/addr
 	// (i.e. all 3 ***_key values match the most recent ones)
   veh_ids_for_resaddr_stillowned := join(veh_ids_for_resaddr_dd, veh_ra_pr_dd,
 																	         left.vehicle_key   = right.vehicle_key   and
 																	         left.iteration_key = right.iteration_key and
-																	         left.sequence_key  = right.sequence_key, 
+																	         left.sequence_key  = right.sequence_key,
 																         transform(right),
 																         inner);
 
-  // Now join the previously deduped res  addr vehicle ids to the ones that are still owned 
+  // Now join the previously deduped res  addr vehicle ids to the ones that are still owned
 	// to identify the ones that should be used.
   veh_ids_for_resaddr_touse := join(veh_ids_for_resaddr_dd, veh_ids_for_resaddr_stillowned,
-																		   left.vehicle_key   = right.vehicle_key, 
+																		   left.vehicle_key   = right.vehicle_key,
 																    transform(left),
 																    inner);
 
   // Calculate the date 5 years back from today
   unsigned4 current_date := STD.Date.Today(); // current/run date in unsigned4 yyyymmdd format
   string8 FiveYearsBack  := (string8) (current_date - 50000); // subtract 5 from yyyy portion
-		
+
   // Get report formatted recs for the res/addr vehicle ids to be used
   vehicle_recs_resaddr_vehraw := if(~isCNSMR, VehicleV2_Services.raw.get_vehicle_crs_report_by_Veh_key(
 															    									mod_vehicle_report,
 															    									veh_ids_for_resaddr_touse));
 
-  // Filter to only keep recs out of Vehicle_raw that are "current" or 
+  // Filter to only keep recs out of Vehicle_raw that are "current" or
 	// ones where the registration latest expiration date is within the last 5 years.
   vehicle_recs_resaddr_vehraw_kept := vehicle_recs_resaddr_vehraw
 															        (is_current or
@@ -279,15 +279,15 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	                                                   IsFCRA);
 
   // Sort/dedup to only keep the most recent license info for each did
-	hf_raw_info_deduped := dedup(sort(hf_raw_info, did_out, source_state, license_type_mapped, 
+	hf_raw_info_deduped := dedup(sort(hf_raw_info, did_out, source_state, license_type_mapped,
 	                                  -datelicense, -HomeState), // prefer non-blanks over blank fields
                                did_out, source_state, license_type_mapped);  // some raw data HomeState fields had invalid data, so don't dedupe on it
 
 	mod_hf_srparams := module(project(param, hunting_fishing_services.Search_Records.params,opt))
   end;
 	// Use HF function that does penalty, suppression, ssn masking, formatting into iesp layout, etc.
-	hf_recs := hunting_fishing_services.Search_Records.formatandFilterRawRecords(hf_raw_info_deduped, 
-						                                                                   mod_hf_srparams, 
+	hf_recs := hunting_fishing_services.Search_Records.formatandFilterRawRecords(hf_raw_info_deduped,
+						                                                                   mod_hf_srparams,
 																																							 IsFCRA);
 
 	//Criminals - Residents and Neighbors
@@ -312,7 +312,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	relr						:= join(ra_recs(isRelative), ra_best, left.person2 = right.did, transform(AddressReport_Services.Layouts.rel_asst_layout, self := left, self := right));
 	assr						:= join(ra_recs(~isRelative), ra_best, left.person2 = right.did, transform(AddressReport_Services.Layouts.rel_asst_layout, self := left, self := right));
-		
+
 	//************************************* //
 	// Getting Data from Services - End     //
 	//************************************* //
@@ -330,20 +330,20 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	//*********************************************
 	Bankruptcies_filtered		:=iesp.transform_bankruptcy(Bankruptcies);
-	vehicles_filtered				:=vehicles;							
+	vehicles_filtered				:=vehicles;
 	LiensJudgments_filtered	:=LiensJudgments;
 	Phones									:=doxie.fn_AppendGongByAddr(gong_input);
 	phones_Filtered					:=project(dedup(phones(not(publish_code = 'N' or omit_phone = 'Y')),phone),
 																		transform (AddressReport_Services.layouts.phone_out_layout, Self.name_first := Left.fname;
 																							 Self.name_last := Left.lname; Self := Left));
-	
+
 	//Old business header
 	business_recs_old				:=dedup(project(Location_Services.business_records(bus_input),transform(
 																					AddressReport_Services.layouts.layout_Business_out,
 																					self.zip:=(string) left.zip,
 																					self.zip4:=(string) left.zip4,
 																					self:=left, self := [])),all);
-																						
+
 	//Remove Invalid address records from business
 	AddressReport_Services.Mac_address_Filter(business_recs_old,
 																						prim_name,
@@ -357,10 +357,10 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 																						zip,
 																						res_input,
 																						business_recs_out_old
-																						);	
-	
+																						);
+
 	business_recs_all_old	:=dedup(sort(business_recs_out_old,bdid),bdid);
-	
+
 	key_gong_bus			:=Gong.Key_History_BDID;
 	rec_bus	:=record
 		AddressReport_Services.layouts.layout_Business_out;
@@ -373,13 +373,18 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 		self:=l;
 	END;
 
-	business_recs_gong_old:=join(business_recs_all_old,key_gong_bus,
-											keyed(LEFT.bdid=right.bdid) and right.current_record_flag='Y',
-											flag_bus_old(LEFT,RIGHT),limit(ut.limits.DEFAULT,skip),keep(1),left outer);
-	
+  gong_bus_filtered := join(business_recs_all_old, key_gong_bus,
+    keyed(LEFT.bdid=right.bdid) and right.current_record_flag='Y',
+    TRANSFORM(RIGHT), limit(ut.limits.DEFAULT,skip),  keep(1));
+  gong_bus_optout := Suppress.MAC_SuppressSource(gong_bus_filtered, mod_access);
+
+  business_recs_gong_old:=join(business_recs_all_old, gong_bus_optout,
+    LEFT.bdid=right.bdid,
+    flag_bus_old(LEFT,RIGHT),limit(ut.limits.DEFAULT,skip),keep(1), left outer);
+
 	//New Business header
 	business_recs_new				:= Location_Services.GetByBusinessIDs(bus_input, mod_access).linkIdsBestOut;
-			
+
 	//Remove Invalid address records from business
 	AddressReport_Services.Mac_address_Filter(business_recs_new,
 																						prim_name,
@@ -393,13 +398,13 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 																						zip,
 																						res_input,
 																						business_recs_out_new
-																						);	
-																						
+																						);
+
 	// business_recs_all_new	:=dedup(sort(business_recs_out,bdid),bdid);
 	//no need to dedup, new business header records are already unique by BIP ids
 	gong_in := project(business_recs_out_new, BIPV2.IDlayouts.l_xlink_ids);
 	gong_out := Gong.key_History_LinkIDs.kfetch(gong_in, mod_access, param.BusinessReportFetchLevel);
-	
+
 	rec_bus flag_bus_new(business_recs_out_new l,gong_out r):=TRANSFORM
 		self.gong_flag	:=if(trim(r.phone10)<>'',true,false);
 		self.phone			:=if(trim(r.phone10)<>'',(unsigned)r.phone10,(unsigned)l.company_phone);
@@ -410,7 +415,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	business_recs_gong_new:=join(business_recs_out_new,gong_out,
 		BIPV2.IDmacros.mac_JoinLinkids(param.BusinessReportFetchLevel) and right.current_record_flag='Y',
 		flag_bus_new(LEFT,RIGHT),keep(1),left outer);
-	
+
 	//Decide which business records to use based on useNewBusinessHeader boolean flag
 	business_recs			:= if(param.useNewBusinessHeader, business_recs_gong_new, business_recs_gong_old);
 
@@ -419,7 +424,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 										(stusab = split_addr.st and
 										 county = split_addr.county[3..5] and
 										 tract 	= split_addr.geo_blk[1..6] and
-										 blkgrp = split_addr.geo_blk[7]);		
+										 blkgrp = split_addr.geo_blk[7]);
 	//************************** Final records **************************************
 
 	census_final								:= AddressReport_Services.Functions.ProjectCensus(census_data[1]);
@@ -456,7 +461,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	possible_vehicles1					:= AddressReport_Services.Functions.projectVehicles(vehicle_recs, row(res_input[1],AddressReport_Services.layouts.in_address));
 	// Join possible_vehicles0 recs to the dataset of current residents to set ResidentUniqueId field
   possible_vehicles2          := join(possible_vehicles1,Res_cur0,
- 																      left.registrant_did = right.did  
+ 																      left.registrant_did = right.did
 																      OR
 																      (left.AssociatedToReportAddress          and
 																       left.RegistrantName.First = right.fname and
@@ -464,20 +469,20 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 																      ),
 														          transform(iesp.addressreport.t_AddrReportPossibleVehicles,
 														          // when join condition met, set resident did
-														          self.ResidentUniqueId := if(right.did !=0, 
+														          self.ResidentUniqueId := if(right.did !=0,
 															                                    intformat(right.did,12,1),'');
 															        self := left),
 	                                    LEFT OUTER, ALL); // keep left ds rec even if no match to right
  	// Sort to put into resident/rptaddr/neighbors(street name, number, etc.) order???
   possible_vehicles           := sort(possible_vehicles2,
  	                                    //vehicles for residents/rpt addr first
-	                                    if(ResidentUniqueId !='',0,1), // so non-blank dids sort to the top 
+	                                    if(ResidentUniqueId !='',0,1), // so non-blank dids sort to the top
 																			-AssociatedToReportAddress, // descending so recs with "true" sort to the top
 																			// then vehicles for neighbors in order by street name, number, etc.
 																			RegistrantAddress.StreetName, RegistrantAddress.StreetPreDirection,
 																			RegistrantAddress.StreetNumber, RegistrantAddress.StreetPostDirection,
 																			RegistrantAddress.UnitNumber,
-																			RegistrantName.Last, RegistrantName.First, 
+																			RegistrantName.Last, RegistrantName.First,
 																			RegistrantName.Middle, RegistrantName.Suffix,
 																			-YearMake, Make, Model);
 
@@ -487,21 +492,21 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	                                      left.licensee_did = right.did,
 														          transform(iesp.addressreport.t_AddrReportPossibleHuntingFishing,
 														          // when join condition met, set resident did
-														          self.ResidentUniqueId := if(right.did !=0, 
+														          self.ResidentUniqueId := if(right.did !=0,
 															                                    intformat(right.did,12,1),'');
 															        self := left),
 	                                    LEFT OUTER); // keep left ds rec even if no match to right
  	// Sort to put into resident/rptaddr/neighbors(street name, number, etc.) order
   possible_hf                := sort(possible_hf2,
  	                                    //hf lics for residents/rpt addr first
-	                                    if(ResidentUniqueId !='',0,1), // so non-blank dids sort to the top 
+	                                    if(ResidentUniqueId !='',0,1), // so non-blank dids sort to the top
 																			-AssociatedToReportAddress, // descending so recs with "true" sort to the top
 																			// then hf lics for neighbors in order by street name, number, etc.
 																			Address.StreetName, Address.StreetPreDirection,
 																			Address.StreetNumber, Address.StreetPostDirection,
 																			Address.UnitNumber,
 																			Name.Last, Name.First, Name.Middle, Name.Suffix,
-																			HomeState, LicenseState, LicenseType, 
+																			HomeState, LicenseState, LicenseType,
 																			-IssueDate.Year, -IssueDate.Month, -IssueDate.Day);
 
 	possible_other_occupants		:= AddressReport_Services.Functions.projectOtherOccupants(Neighbors_filtered.NeighborAddresses);
@@ -527,7 +532,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	//**************************************************************** //
 	////////////////// Main Transform //////////////////////////////////
-	//**************************************************************** //	
+	//**************************************************************** //
 
 	AddressReport_Services.Layouts.iesp_out_plus_royalties_layout Format_Final():=transform
 		self.ReportResponse._Header														:=iesp.ECL2ESP.GetHeaderRow();
@@ -558,20 +563,20 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 																														split_addr.prim_name, split_addr.prim_range, split_addr.predir, split_addr.postdir,
 																														split_addr.addr_suffix, split_addr.unit_desig, split_addr.sec_range,
 																														split_addr.v_city_name, split_addr.st, split_addr.zip, split_addr.zip4, '');
-		//maintenance 03/30/2011													
+		//maintenance 03/30/2011
 		self.ReportResponse.CriminalRecords.remark         		:=if(Display_CriminalRecords_msg,AddressReport_Services.constants.msg(AddressReport_Services.Constants.MaxCriminalRecords,'CriminalRecords'),'');
 		self.ReportResponse.CriminalRecords.CriminalRecords 	:=if(param.include_CriminalRecords, 	GLOBAL(choosen(Crims_filtered,AddressReport_Services.Constants.MaxCriminalRecords)));
 		self.ReportResponse.SexualOffenses.remark           	:=if(Display_SexOffensesRecords_msg,AddressReport_Services.constants.msg(AddressReport_Services.Constants.MaxSexualOffenses,'SexualOffenses'),'');
 		self.ReportResponse.SexualOffenses.SexualOffenses	 		:=if(param.include_SexualOffenses, 	GLOBAL(choosen(sexOffender_filtered,AddressReport_Services.Constants.MaxSexualOffenses)));
-		self.ReportResponse.HuntingFishings.remark          	:=if(Display_HuntFishRecords_msg,AddressReport_Services.constants.msg(AddressReport_Services.Constants.MaxHuntingandFishing,'HuntingAndFishings'),''); 	
+		self.ReportResponse.HuntingFishings.remark          	:=if(Display_HuntFishRecords_msg,AddressReport_Services.constants.msg(AddressReport_Services.Constants.MaxHuntingandFishing,'HuntingAndFishings'),'');
 		self.ReportResponse.HuntingFishings.HuntingFishings 	:=if(param.include_HuntingFishingLicenses, 	GLOBAL(choosen(Hunting_Filtered,AddressReport_Services.Constants.MaxHuntingandFishing)));
-		self.ReportResponse.ConcealedWeapons.remark         	:=if(Display_WeaponRecords_msg,AddressReport_Services.constants.msg(AddressReport_Services.Constants.MaxWeaponPermits,'ConcealedWeapons'),''); 	
+		self.ReportResponse.ConcealedWeapons.remark         	:=if(Display_WeaponRecords_msg,AddressReport_Services.constants.msg(AddressReport_Services.Constants.MaxWeaponPermits,'ConcealedWeapons'),'');
 		self.ReportResponse.ConcealedWeapons.ConcealedWeapons	:=if(param.include_WeaponPermits, 	GLOBAL(choosen(formatedFilteredWeaponRecords,AddressReport_Services.Constants.MaxWeaponPermits)));
 		//end maintance 03/30/2011
 		self:=[];
 	end;
 	addressReport 	:= dataset([Format_Final()]);
-	
+
 	AddressReport_Services.Layouts.iesp_out_plus_royalties_layout Format_LocationFinal():=transform
 		self.ReportResponse._Header																		:=iesp.ECL2ESP.GetHeaderRow();
 		self.ReportResponse.Residents.present													:= Residents_cur;
@@ -593,7 +598,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	end;
 
 	locationReport 	:= dataset([Format_LocationFinal()]);
-	
+
 	finalReport			:= if(param.locationReport, locationReport, addressReport);
 
 	ds_invalid_addr:= srchrec((p_city_name='NOCITYNAME' or p_city_name='') or
@@ -605,10 +610,10 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 		self:=[];
 	end;
 	ds_blank:=dataset([blank_fmt()]);
-	
+
 	individual := if(invalid_addr,ds_blank,finalReport);
-	
-  // Uncomment as needed for debugging	
+
+  // Uncomment as needed for debugging
 	//output(Res_cur0,                         named('Res_cur0'));
 	//output(cur_dids,                         named('cur_dids'));
 	//output(nbr_dids,                         named('nbr_dids'));
@@ -633,7 +638,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	//output(hf_raw_info_deduped,              named('hf_raw_info_deduped'));
 	//output(hf_recs,                          named('hf_recs'));
 
-  //output(Residents_cur,                  named('residents_cur'));	
+  //output(Residents_cur,                  named('residents_cur'));
 	//output(possible_vehicles1,             named('possible_vehicles1'));
 	//output(possible_vehicles2,             named('possible_vehicles2'));
 	//output(possible_vehicles,              named('possible_vehicles'));

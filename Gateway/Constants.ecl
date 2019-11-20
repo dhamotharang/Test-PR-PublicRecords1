@@ -10,6 +10,7 @@ export Constants := module
 		export integer WAIT_TIMEOUT_POLK 			:= 20;
 		export integer WAIT_TIMEOUT_EXPERIAN 	:= 5;
 		export integer STATUS_SUCCESS 	      := 0;
+    export integer MAX_THREADS            := 20;
 	end;
 
 	export ServiceName := module
@@ -38,6 +39,7 @@ export Constants := module
 		export String40 Attus			:= 'attus';								// active, as of 07/24/2012
 		export String40 EquifaxSts := 'equifaxsts';					// active, as of 03/22/2016
 		export String40 ThreatMetrix := 'threatmetrix';      // added for threatmetrix
+		export String40 ThreatMetrix_test := 'threatmetrix_test';      // added for threatmetrix_test transactions for modeling team
 		export String40 EmailRisk := 'emailrisk';      // added for EmailRisk
 
 

@@ -35,6 +35,7 @@ MODULE
 		EXPORT BOOLEAN   VerifyPhoneName      	:= FALSE;
 		EXPORT BOOLEAN	 VerifyPhoneNameAddress	:= FALSE;
 		EXPORT BOOLEAN	 VerifyPhoneIsActive		:= FALSE;
+    EXPORT BOOLEAN   VerifyPhoneLastName    := FALSE;
     EXPORT INTEGER   DateFirstSeenThreshold := 180;
     EXPORT INTEGER   DateLastSeenThreshold  := 30;
     EXPORT INTEGER   LengthOfTimeThreshold  := 90;
@@ -119,6 +120,7 @@ MODULE
     EXPORT BOOLEAN VerifyPhoneName;
     EXPORT BOOLEAN VerifyPhoneNameAddress;
     EXPORT BOOLEAN VerifyPhoneIsActive;
+    EXPORT BOOLEAN VerifyPhoneLastName;
     EXPORT INTEGER DateFirstSeenThreshold;
     EXPORT INTEGER DateLastSeenThreshold;
     EXPORT INTEGER LengthOfTimeThreshold;
@@ -163,6 +165,7 @@ MODULE
       EXPORT BOOLEAN   VerifyPhoneName				:= pfOptions.VerificationOptions.VerifyPhoneName;
       EXPORT BOOLEAN   VerifyPhoneNameAddress := pfOptions.VerificationOptions.VerifyPhoneNameAddress;
       EXPORT BOOLEAN   VerifyPhoneIsActive    := pfOptions.VerificationOptions.VerifyPhoneIsActive;
+      EXPORT BOOLEAN   VerifyPhoneLastName    := pfOptions.VerificationOptions.VerifyPhoneLastName;
       EXPORT INTEGER   DateFirstSeenThreshold := pfOptions.VerificationOptions.DateFirstSeenThreshold;
       EXPORT INTEGER   DateLastSeenThreshold  := pfOptions.VerificationOptions.DateLastSeenThreshold;
       EXPORT INTEGER   LengthOfTimeThreshold  := pfOptions.VerificationOptions.LengthOfTimeThreshold;
@@ -214,8 +217,9 @@ MODULE
       EXPORT BOOLEAN UseDeltabase 					 := IF(IsGetMetaData, RealTimedata, FALSE);
 
       EXPORT BOOLEAN IncludeAccudataOCN      := pfOptions.IncludeAccudataOCN;
-      EXPORT BOOLEAN UseAccuData_OCN         := ((IncludePhoneMetadata AND displayAll) OR IncludeAccudataOCN) AND ~doxie.compliance.isAccuDataRestricted(drm);
-
+      //EXPORT BOOLEAN UseAccuData_OCN         := ((IncludePhoneMetadata AND displayAll) OR IncludeAccudataOCN) AND ~doxie.compliance.isAccuDataRestricted(drm);
+      //The gateway is down for past 2 months,not calling this gateway until further update from Product
+      EXPORT BOOLEAN UseAccuData_OCN         := FALSE;
       EXPORT BOOLEAN IncludeTargus           := pfOptions.IncludeTargus;
       EXPORT BOOLEAN UseTargus          		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeTargus) AND ~doxie.compliance.isPhoneFinderTargusRestricted(drm);
 
@@ -319,12 +323,13 @@ MODULE
       EXPORT BOOLEAN   useWaterfallv6			 := FALSE : STORED('useWaterfallv6');//internal
       EXPORT BOOLEAN   IncludePhoneMetadata:= FALSE : STORED('IncludePhoneMetadata');
 
-      EXPORT BOOLEAN   UseAccudata_ocn     := IncludePhoneMetadata AND
-                                              ~doxie.compliance.isAccuDataRestricted(drm) AND
-                                              TransactionType IN [$.Constants.TransType.Premium,
-                                                                  $.Constants.TransType.Ultimate,
-                                                                  $.Constants.TransType.PHONERISKASSESSMENT]; // accudata_ocn gateway call
-
+      // EXPORT BOOLEAN   UseAccudata_ocn     := IncludePhoneMetadata AND
+      //                                         ~doxie.compliance.isAccuDataRestricted(drm) AND
+      //                                          TransactionType IN [$.Constants.TransType.Premium,
+      //                                                             $.Constants.TransType.Ultimate,
+      //                                                              $.Constants.TransType.PHONERISKASSESSMENT]; // accudata_ocn gateway call
+      //The gateway is down for past 2 months,not calling this gateway until further update from Product
+      EXPORT BOOLEAN   UseAccudata_ocn     := FALSE;
              BOOLEAN   SubjectMetadata 		 := FALSE : STORED('SubjectMetadataOnly');
       EXPORT BOOLEAN   SubjectMetadataOnly := IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
       EXPORT BOOLEAN   SuppressNonRelevantRecs := FALSE : STORED('SuppressNonRelevantRecs');
@@ -339,7 +344,7 @@ MODULE
       EXPORT INTEGER   MaxOtherPhones		              := iesp.Constants.Phone_Finder.MaxOtherPhones;// TO LIMIT OTHER PHONES
 
       EXPORT BOOLEAN   UseInHousePhoneMetadata	:= FALSE : STORED('UseInHousePhoneMetadata');
-      EXPORT BOOLEAN UseInHousePhoneMetadataOnly := UseInHousePhoneMetadata OR ~UseTransUnionPVS;;
+      EXPORT BOOLEAN   UseInHousePhoneMetadataOnly := UseInHousePhoneMetadata OR ~UseTransUnionPVS;
       EXPORT BOOLEAN   UseAccuData_CNAM         := UseInHousePhoneMetadata AND ~doxie.compliance.isAccuDataRestricted(drm) AND TransactionType != $.Constants.TransType.PhoneRiskAssessment;
 
 

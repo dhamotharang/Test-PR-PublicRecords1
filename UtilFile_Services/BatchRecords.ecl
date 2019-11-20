@@ -17,6 +17,7 @@ EXPORT BatchRecords (DATASET(UtilFile_Services.Layouts.batch_work) ds_work_recs,
     SELF.name_last  :=LEFT.lname,
     SELF.name_suffix:=LEFT.name_suffix,
     SELF.addresses:=PROJECT(LEFT,TRANSFORM(UtilFile_Services.Layouts.utilAddress,
+      SELF.z5:=LEFT.zip,
       SELF.county_name:=countyName(LEFT.st,LEFT.county[3..5]),
       SELF:=LEFT)),
     SELF:=LEFT,
@@ -78,10 +79,7 @@ EXPORT BatchRecords (DATASET(UtilFile_Services.Layouts.batch_work) ds_work_recs,
     SELF.util_type_desc:=STD.Str.ToUpperCase(UtilFile.Util_Type_Desc(utilType)),
     SELF:=LEFT));
 
-  // OUTPUT(ds_key_did,NAMED('ds_key_did'));
-  // OUTPUT(ds_daily_did,NAMED('ds_daily_did'));
   // OUTPUT(SORT(ds_util_wrk,acctno,did,exchange_serial_number,util_type,-record_date),NAMED('ds_util_wrk'));
-
   // OUTPUT(SORT(ds_util_srt,record_date),NAMED('ds_util_srt'));
   // OUTPUT(SORT(ds_util_grp,record_date),NAMED('ds_util_grp'));
   // OUTPUT(SORT(ds_util_roll,acctno,record_date),NAMED('ds_util_roll'));

@@ -1,4 +1,4 @@
-IMPORT Census_Data,Gong,Gong_Services,MDR,Phones,ut;
+IMPORT Census_Data, Doxie, Gong, Gong_Services, MDR, Phones, Suppress;
 
 lBatchIn   := PhoneFinder_Services.Layouts.BatchInAppendDID;
 lCommon    := PhoneFinder_Services.Layouts.PhoneFinder.Common;
@@ -7,41 +7,54 @@ lCommon    := PhoneFinder_Services.Layouts.PhoneFinder.Common;
 EXPORT GetGongPhones( DATASET(lBatchIn)                        dIn,
 											PhoneFinder_Services.iParam.SearchParams inMod) :=
 FUNCTION
+  mod_access := PROJECT(inMod, Doxie.IDataAccess);
 	// Split the phone number into phone7 and area code
 	rBatchInSplitPhone_Layout :=
 	RECORD(lBatchIn)
 		STRING7 phone7;
 		STRING3 area_code;
 	END;
-	
+
 	rBatchInSplitPhone_Layout	tSplitPhone10(dIn pInput) :=
 	TRANSFORM
 		SELF.phone7    := IF(LENGTH(TRIM(pInput.homephone)) = 10,pInput.homephone[4..10],pInput.homephone[1..7]);
 		SELF.area_code := IF(LENGTH(TRIM(pInput.homephone)) = 10,pInput.homephone[1..3],'');
 		SELF           := pInput;
 	END;
-	
+
 	dInSplitPhone10 := PROJECT(dIn,tSplitPhone10(LEFT));
-	
+
 	// Get gong records
 	rGongPhone_Layout :=
 	RECORD(Gong_Services.Layout_GongHistorySearchService)
 		rBatchInSplitPhone_Layout batch_in;
 	END;
-	
-	rGongPhone_Layout tGetByPhone(dInSplitPhone10 le,Gong.Key_History_phone ri) :=
+
+  rGongPhone_Layout_optout := RECORD
+    rGongPhone_Layout;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
+  END;
+
+	rGongPhone_Layout_optout tGetByPhone(dInSplitPhone10 le,Gong.Key_History_phone ri) :=
 	TRANSFORM
 		SELF.batch_in := le;
+    SELF.global_sid := ri.global_sid;
+    SELF.record_sid := ri.record_sid;
+    SELF.did := ri.did;
 		SELF          := ri;
 	END;
-	
-	dPhoneRecs := JOIN( dInSplitPhone10,
+
+	pre_dPhoneRecs := JOIN( dInSplitPhone10,
 											Gong.Key_History_phone,
 											KEYED(LEFT.phone7 = RIGHT.p7) and
 											KEYED(LEFT.area_code = RIGHT.p3 or LEFT.area_code = ''),
 											tGetByPhone(LEFT,RIGHT),
 											LIMIT(PhoneFinder_Services.Constants.MaxGongPhones,SKIP));
-	
+
+  dPhoneRecs_optout := Suppress.MAC_SuppressSource(pre_dPhoneRecs, mod_access);
+  dPhoneRecs := PROJECT(dPhoneRecs_optout, rGongPhone_Layout);
+
 	dPhoneRecsSort := SORT( dPhoneRecs,
 													batch_in.acctno,publish_code,phone10,
 													prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,
@@ -57,7 +70,7 @@ FUNCTION
 		SELF.dt_last_seen        := IF( (le.dt_last_seen = '' or ri.dt_last_seen <> '') and (ri.dt_last_seen > le.dt_last_seen),
 																		ri.dt_last_seen,
 																		le.dt_last_seen);
-		SELF.current_record_flag := IF(le.current_record_flag <> '',le.current_record_flag,ri.current_record_flag); 
+		SELF.current_record_flag := IF(le.current_record_flag <> '',le.current_record_flag,ri.current_record_flag);
 		SELF.v_city_name         := IF( le.p_city_name = le.v_city_name and le.v_city_name <> ri.v_city_name,
 																		ri.v_city_name,
 																		le.v_city_name);
@@ -92,19 +105,19 @@ FUNCTION
 															,omit_locality
 															,name_first
 															,name_last);
-	
+
 	// Append county name
 	rAppendcountyName_Layout :=
 	RECORD(rGongPhone_Layout)
 		STRING18 county_name;
 	END;
-	
+
 	rAppendcountyName_Layout tAppendcountyName(rGongPhone_Layout le,Census_Data.Key_Fips2county ri) :=
 	TRANSFORM
 		SELF.county_name := IF(le.county_code <> '',ri.county_name,'');
 		SELF             := le;
 	END;
-	
+
 	dAppendcountyName := JOIN(dPhoneRecsRollup,
 														Census_Data.Key_Fips2county,
 														KEYED(LEFT.st                = RIGHT.state_code and
@@ -112,7 +125,7 @@ FUNCTION
 														tAppendcountyName(LEFT,RIGHT),
 														LEFT OUTER,
 														KEEP(1));
-	
+
 	// Reformat to common layout
 	lCommon tFormatGong2Common(dAppendcountyName pInput) :=
 	TRANSFORM
@@ -134,7 +147,7 @@ FUNCTION
 	END;
 
 	dGongFormat2Common := PROJECT(dAppendcountyName,tFormatGong2Common(LEFT));
-	
+
 	// Calculate penalty
 	lCommon tGetPenalty(dGongFormat2Common pInput) :=
 	TRANSFORM
@@ -143,10 +156,10 @@ FUNCTION
 	END;
 
 	dGongPenalty := PROJECT(dGongFormat2Common,tGetPenalty(LEFT));
-	
+
 	// Filter out records which do not meet the penalty threshold
 	dGongPenaltyFilter := dGongPenalty(penalt <= inMod.PenaltyThreshold);
-	
+
 	// Debug
 	#IF(PhoneFinder_Services.Constants.Debug.Gong)
 		OUTPUT(dIn,NAMED('dGong_In'),EXTEND);
@@ -158,6 +171,6 @@ FUNCTION
 		OUTPUT(dGongFormat2Common,NAMED('dGongFormat2Common'),OVERWRITE);
 		OUTPUT(dGongPenalty,NAMED('dGongPenalty'),OVERWRITE);
 	#END
-	
+
 	RETURN dGongPenaltyFilter;
 END;

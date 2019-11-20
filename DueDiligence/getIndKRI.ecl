@@ -304,6 +304,46 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
     SELF.PerIdentityRisk_Flag := perIDRiskFinal;                                             
 		SELF.PerIdentityRisk := (STRING)(10-STD.Str.Find(perIDRiskFinal, DueDiligence.Constants.T_INDICATOR, 1));
     
+    
+    //MOBILITY
+    daysHeaderAddrFirstSeen := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.earliestHeaderAddressReported, (STRING)le.Historydate);
+    daysAtCurrentAddr := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.currentAddressFirstSeen, (STRING)le.Historydate);
+    daysBetweenCurrPrevAddr := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.currentAddressFirstSeen, (STRING)le.previousAddressFirstSeen);
+
+    movedLessThan1YearAgo := le.currentAddressFirstSeen <> 0 AND daysAtCurrentAddr < ut.DaysInNYears(1);
+    movedTwice := le.move1Distance <> DueDiligence.Constants.EMPTY AND le.move2Distance <> DueDiligence.Constants.EMPTY;
+    movedThreeTimes := movedTwice AND le.move3Distance <> DueDiligence.Constants.EMPTY;
+
+
+    perMobility_Flag9 := IF(le.hasAddressHistory = FALSE, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perMobility_Flag8 := IF(le.earliestHeaderAddressReported <> 0 AND daysHeaderAddrFirstSeen < ut.DaysInNYears(1), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perMobility_Flag7 := IF(le.earliestHeaderAddressReported <> 0 AND daysHeaderAddrFirstSeen >= ut.DaysInNYears(1) AND
+                            le.hasAddressHistory AND le.hasPreviousAddressHistory = FALSE, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+                            
+    perMobility_Flag6 := IF(movedLessThan1YearAgo AND
+                            ((movedTwice AND (UNSIGNED)le.move1Distance <= 50 AND (UNSIGNED)le.move2Distance <= 50) OR
+                             (movedThreeTimes AND (UNSIGNED)le.move1Distance <= 50 AND (UNSIGNED)le.move2Distance <= 50 AND (UNSIGNED)le.move3Distance <= 50)), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+
+    perMobility_Flag5 := IF(movedLessThan1YearAgo AND le.previousAddressFirstSeen <> 0 AND daysBetweenCurrPrevAddr < ut.DaysInNYears(3), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perMobility_Flag4 := IF(movedLessThan1YearAgo AND le.previousAddressFirstSeen <> 0 AND daysBetweenCurrPrevAddr >= ut.DaysInNYears(3), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+
+    perMobility_Flag3 := IF(le.currentAddressFirstSeen <> 0 AND daysAtCurrentAddr >= ut.DaysInNYears(1) AND daysAtCurrentAddr < ut.DaysInNYears(3), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perMobility_Flag2 := IF(le.currentAddressFirstSeen <> 0 AND daysAtCurrentAddr >= ut.DaysInNYears(3) AND daysAtCurrentAddr < ut.DaysInNYears(5), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perMobility_Flag1 := IF(le.currentAddressFirstSeen <> 0 AND daysAtCurrentAddr >= ut.DaysInNYears(5), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+
+    perMobility_Flag_Final := DueDiligence.Common.calcFinalFlagField(perMobility_Flag9,
+                                                                      perMobility_Flag8,
+                                                                      perMobility_Flag7,
+                                                                      perMobility_Flag6,
+                                                                      perMobility_Flag5,
+                                                                      perMobility_Flag4,
+                                                                      perMobility_Flag3,
+                                                                      perMobility_Flag2,
+                                                                      perMobility_Flag1);
+
+    SELF.PerMobility_Flag := perMobility_Flag_Final;                                             
+    SELF.PerMobility := (STRING)(10-STD.Str.Find(perMobility_Flag_Final, DueDiligence.Constants.T_INDICATOR, 1)); 
+    
 
     
     
@@ -352,8 +392,8 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
                                               SELF.PerAccessToFundsIncome_Flag := INVALID_INDIVIDUAL_FLAGS;
                                               SELF.PerGeographic := INVALID_INDIVIDUAL_SCORE;
                                               SELF.PerGeographic_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              // SELF.PerMobility := INVALID_INDIVIDUAL_SCORE;
-                                              // SELF.PerMobility_Flag := INVALID_INDIVIDUAL_FLAGS;
+                                              SELF.PerMobility := INVALID_INDIVIDUAL_SCORE;
+                                              SELF.PerMobility_Flag := INVALID_INDIVIDUAL_FLAGS;
                                               SELF.PerStateLegalEvent := INVALID_INDIVIDUAL_SCORE;
                                               SELF.PerStateLegalEvent_Flag := INVALID_INDIVIDUAL_FLAGS;
                                               // SELF.PerFederalLegalEvent := INVALID_INDIVIDUAL_SCORE;

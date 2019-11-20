@@ -495,7 +495,10 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   MatchingNameAddrPhoneDidRawRecs := join(name_addr_phone_key_recs_for_did, key_history_did,
      keyed(left.did = right.l_did), TRANSFORM(right), LIMIT (ut.limits .GONG_HISTORY_MAX, SKIP));
 
-  MatchingNameAddrPhoneDidRecs := project(MatchingNameAddrPhoneDidRawRecs, doDidJoin(LEFT));
+  MatchingNameAddrPhoneDidRawRecs_OptOut := Suppress.MAC_SuppressSource(
+    MatchingNameAddrPhoneDidRawRecs, mod_access);
+
+  MatchingNameAddrPhoneDidRecs := project(MatchingNameAddrPhoneDidRawRecs_OptOut, doDidJoin(LEFT));
 
   MatchingNameAddrPhoneHHIDRawRecs := join(name_addr_phone_key_recs_for_hhid, key_history_hhid,
     keyed(left.hhid = right.s_hhid), TRANSFORM(right), LIMIT (ut.limits .GONG_HISTORY_MAX, SKIP));
@@ -851,7 +854,7 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   ds_inData := dataset([{company_name, prange_value, pname_value, zip_val, '',
                         city_value, state_value, phone_value,'','','','','',''}], BIPV2.IDFunctions.rec_SearchInput);
 
-  ds_businessIdsInfoOut := Gong_Services.Fetch_Gong_History_By_BusinessIds(ds_inData);
+  ds_businessIdsInfoOut := Gong_Services.Fetch_Gong_History_By_BusinessIds(ds_inData, mod_access);
 
   ds_businessIdsInfoOutDeduped := dedup(ds_businessIdsInfoOut, all);
 

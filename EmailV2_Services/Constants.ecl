@@ -13,6 +13,7 @@ EXPORT Constants := MODULE
   END;
 
   EXPORT Defaults := MODULE
+    EXPORT UNSIGNED EmailQualityRules    := 0;
     EXPORT UNSIGNED PenaltThreshold      := 10;
     EXPORT UNSIGNED MaxResults           := 25;
     EXPORT UNSIGNED MaxResultsPerAcct    := 10;
@@ -34,6 +35,10 @@ EXPORT Constants := MODULE
   EXPORT STRING STR_FALSE := 'false';
   EXPORT STRING Basic := 'basic';
   EXPORT STRING Premium := 'premium';
+  EXPORT BOOLEAN isPremium(STRING _tier) := STD.Str.ToLowerCase(_tier) = Premium;
+  EXPORT BOOLEAN isBasic(STRING _tier) := STD.Str.ToLowerCase(_tier) = Basic;
+  EXPORT BOOLEAN isValidTier(STRING _tier) := STD.Str.ToLowerCase(_tier) IN [Basic, Premium];
+
   EXPORT STRING LastVerified := 'last verified';
 
   STRING StatusInvalid := 'invalid';

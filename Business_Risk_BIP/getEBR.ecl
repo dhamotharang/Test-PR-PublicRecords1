@@ -1,13 +1,15 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, EBR, MDR, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, EBR, MDR, doxie, STD;
 
 EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	// ---------------- EBR - Experian Business Records ------------------
-	EBR5600Raw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
-																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+	EBR5600Raw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), 
+																							mod_access,
+																							Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							linkingOptions,
 																							Business_Risk_BIP.Constants.Limit_Default,
@@ -85,7 +87,7 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 STRING10 SICCode := (StringLib.StringFilter((STRING)SICField, '0123456789'))[1..4],
+			 STRING10 SICCode := (STD.Str.Filter((STRING)SICField, '0123456789'))[1..4],
 			 BOOLEAN IsPrimary := PrimarySIC // SIC1 is the primary SIC in DNB DMI data, all others are not primary
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)SICField)[1..4]

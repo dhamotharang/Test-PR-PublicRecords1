@@ -1,9 +1,10 @@
-﻿IMPORT BIPv2, BizLinkFull, Business_Risk_BIP, Doxie, DueDiligence, iesp, MDR, Risk_Indicators, dx_header;
+﻿IMPORT BIPv2, BizLinkFull, Business_Risk_BIP, Doxie, DueDiligence, iesp, MDR, Risk_Indicators, dx_header, Suppress;
 
 
 EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
                       Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                      BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+                      BIPV2.mod_sources.iParams linkingOptions,
+                      doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
  
 
   //retrieve execs off the inquired business
@@ -194,7 +195,7 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
   
   
   //check to see if the individual is deceased
-  deceasedDIDs := JOIN(uniqueDIDs, Doxie.key_Death_masterV2_ssa_DID,
+  deceasedDIDs_unsuppressed := JOIN(uniqueDIDs, Doxie.key_Death_masterV2_ssa_DID,
                       (UNSIGNED)(RIGHT.dod8) < LEFT.historydate AND									
                       KEYED(LEFT.DID = RIGHT.l_did) AND
                       NOT((Risk_Indicators.iid_constants.deathSSA_ok(options.DataRestrictionMask) = FALSE AND RIGHT.src = MDR.sourceTools.src_Death_Restricted) 
@@ -202,6 +203,8 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
                       TRANSFORM({RECORDOF(RIGHT)},
                                 SELF := RIGHT;), 
                       KEEP(1), ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));
+                      
+  deceasedDIDs := Suppress.MAC_SuppressSource(deceasedDIDs_unsuppressed, mod_access);
   
   uniqueDeceasedDIDs := DEDUP(SORT(deceasedDIDs, l_did), l_did);
   

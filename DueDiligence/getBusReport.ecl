@@ -1,9 +1,10 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
 
 EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) busnData, 
                     Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
                     BIPV2.mod_sources.iParams linkingOptions,
-                    string6 ssnMask) := FUNCTION
+                    string6 ssnMask,
+                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 													 
 
 	
@@ -20,13 +21,13 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) busnData,
 	addOperatingInfoToReport := DueDiligence.reportBusOperatingInformation(addOperatingLocToReport);
 	
   //This section is for Registered Agents	
-  addRegisteredAgents := DueDiligence.reportBusRegisteredAgents(addOperatingInfoToReport, options, linkingOptions);
+  addRegisteredAgents := DueDiligence.reportBusRegisteredAgents(addOperatingInfoToReport, options, linkingOptions, mod_access);
   
   //This section is for Best Business Information 	
   addBestData := DueDiligence.reportBusBestInfo(addRegisteredAgents);   	
   
   //This section is for Business Executives 
-  addExecutives := DueDiligence.reportBusExecs(addBestData, options, linkingOptions);
+  addExecutives := DueDiligence.reportBusExecs(addBestData, options, linkingOptions, mod_access);
   
   //This section will add Business Executives that were not included in Attribute logic due to the DID not being populated in contacts key 
   addDIDLessExecutives := DueDiligence.reportBusDIDLessExecs(addExecutives);  

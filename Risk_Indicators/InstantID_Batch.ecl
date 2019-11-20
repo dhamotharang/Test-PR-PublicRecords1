@@ -143,6 +143,11 @@ export InstantID_Batch := macro
 // so add the default to #stored to eliminate the assignment of a default value.
 #stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
 
+// NEVER RELEASE THIS LINE OF CODE TO PROD
+ #option ('optimizelevel', 2);  // this is for deploying to cert
+ // #option ('optimizelevel', 0);  // this is for deploying to a 100-way as the service is large.
+                                    
+                                  
 unsigned1 DPPA_Purpose := 0 : stored('DPPAPurpose');
 unsigned1 GLB_Purpose := AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
 STRING5 industry_class_val := '' : STORED('IndustryClass');
@@ -852,7 +857,7 @@ isMiddleExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constant
  
  Excluded_Minor := if(Excludeminors,risk_indicators.rcSet.isCodeAM((INTEGER)le.age,le.dob),false);
 
-  risk_indicators.mac_add_sequence(dataset([{'AM', risk_indicators.getHRIDesc('AM')}], risk_indicators.Layout_Desc), excluded_minors_set);
+  risk_indicators.mac_add_sequence(dataset([{risk_indicators.iid_constants.minor_reasoncode, risk_indicators.getHRIDesc(risk_indicators.iid_constants.minor_reasoncode)}], risk_indicators.Layout_Desc), excluded_minors_set);
   reasons_with_seq := if(Excluded_Minor, excluded_minors_set, original_reasons_with_seq);
   reason_with_seq_chase := if(Excluded_Minor, excluded_minors_set, original_reason_with_seq_chase);
   
@@ -953,15 +958,19 @@ Layout_InstandID_NuGenExt minorsTransform(formed_pre1_temp l) := transform
                 self.wphone10:=l.wphone10;
                 self.employer_name :=l.employer_name;
                 self.lname_prev :=l.lname_prev;
-                self.ri:= Dataset([transform(risk_indicators.layouts.layout_desc_plus_seq,
+								Excluded_Minor := if(Excludeminors,risk_indicators.rcSet.isCodeAM((INTEGER)l.age,l.dob),false);
+                minor_ri:= Dataset([transform(risk_indicators.layouts.layout_desc_plus_seq,
                           self.seq:=1;
-                          self.hri:='AM';
-                          self.desc:=risk_indicators.getHRIDesc('AM') )]);
-                self:=[];
+                          self.hri:=risk_indicators.iid_constants.minor_reasoncode;
+                          self.desc:=risk_indicators.getHRIDesc(risk_indicators.iid_constants.minor_reasoncode) )]);
+								self.ri := if(excluded_minor, minor_ri, l.ri);
+								self := [];
                 
 END;
-temp_output:= Project(formed_pre1_temp,minorsTransform(LEFT));
-formed_pre1:=if(excludeminors,temp_output,formed_pre1_temp);
+minors_output:= Project(formed_pre1_temp(ri[1].hri=risk_indicators.iid_constants.minor_reasoncode),minorsTransform(LEFT));
+everyone_else := formed_pre1_temp(ri[1].hri<>risk_indicators.iid_constants.minor_reasoncode);
+
+formed_pre1:=if(excludeminors,minors_output + everyone_else,formed_pre1_temp);
 
 //for Emerging Identities, return standardized county name
 formed_pre := join(formed_pre1, census_data.Key_Fips2County, 

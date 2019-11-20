@@ -1,4 +1,4 @@
-IMPORT $.^.^._Control, $.^.^.PublicRecords_KEL;
+﻿IMPORT $.^.^._Control, $.^.^.PublicRecords_KEL;
 
 Use_NonFCRA_BusinessSeleAttributes_NoDates_Library := NOT _Control.LibraryUse.ForceOff_PublicRecords_KEL__LIB_NonFCRA_BusinessSeleAttributes_NoDates;
 
@@ -21,7 +21,7 @@ EXPORT LIB_NonFCRA_BusinessSeleAttributes_NoDates_Function(DATASET(PublicRecords
 				Options.KEL_Permissions_Mask, 
 				FDCDataset).res0;
 			SELF := NonFCRABusinessSeleIDResults[1])),
-		DATASET([],{INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes}))
+		DATASET([],{INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes}));
 #end
 
 	RETURN(BusinessSeleAttributes_NoDates_Results);

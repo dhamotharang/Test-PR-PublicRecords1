@@ -302,7 +302,7 @@ EXPORT LayoutsInternal := MODULE
   END;
 
 
-  //------                                     ------
+
   EXPORT CriminalOffenses := RECORD
     InternalSeqAndIdentifiersLayout;
     DueDiligence.Layouts.CriminalOffenses offense;
@@ -337,10 +337,13 @@ EXPORT LayoutsInternal := MODULE
 
   EXPORT IndCrimLayoutFinal := RECORD
     InternalSeqAndIdentifiersLayout;
+    UNSIGNED4 historyDate;
     STRING sort_key;
-    STRING sort_eventTypeCodeFull;
-    UNSIGNED1 temp_chargeLevelCalcWeight;
-    UNSIGNED temp_category;
+    UNSIGNED category;
+    BOOLEAN currIncar;
+    BOOLEAN currParole;
+    BOOLEAN currProbation;
+    BOOLEAN prevIncar;
     DueDiligence.Layouts.CriminalOffenses
   END;
 
@@ -348,28 +351,20 @@ EXPORT LayoutsInternal := MODULE
     InternalSeqAndIdentifiersLayout;
     UNSIGNED4 historyDate;
 
+
     //misc additional fields
     STRING offenderKey;
     STRING sort_key;
-    STRING sort_eventTypeCodeFull;
-    STRING8 temp_date;
+    STRING8 temp_offenseDate;
     UNSIGNED temp_category;
-    UNSIGNED4 temp_calcdFirstSeenDate;
-    STRING8 temp_firstReportedActivity; 
+    UNSIGNED4 temp_calcdFirstSeenDate; 
     BOOLEAN temp_previouslyIncarcerated;
     STRING1 temp_offenseScore;
     STRING5 temp_courtOffLevel;
-
-    //event type category hits
-    BOOLEAN attr_legalEventCat9;
-    BOOLEAN attr_legalEventCat8;
-    BOOLEAN attr_legalEventCat7;
-    BOOLEAN attr_legalEventCat6;
-    BOOLEAN attr_legalEventCat5;
-    BOOLEAN attr_legalEventCat4;
-    BOOLEAN attr_legalEventCat3;
-    BOOLEAN attr_legalEventCat2;
-    BOOLEAN attr_legalEventCat0;
+    UNSIGNED4 sentenceEndDate;
+    UNSIGNED4 incarAdmitDate;
+    STRING parole;
+    STRING probation;
 
     //Top Level Data
     //Remove duplicate fields that are in the source detail - will be rolled up
@@ -380,6 +375,61 @@ EXPORT LayoutsInternal := MODULE
 
     //Party Names
     STRING120 partyName;
+    DATASET({STRING120 name}) uniquePartyNames;
+  END;
+  
+  EXPORT addressDetails := RECORD
+    UNSIGNED6 addressSeq;
+    DueDiligence.Layouts.AddressSlimDetail;
+    UNSIGNED4 dateFirstSeen;
+    UNSIGNED4 dateLastSeen;
+  END;
+  
+  EXPORT chronoAddressesLayout := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 did;
+    UNSIGNED4 historyDate;
+    BOOLEAN moveWithin3Yrs;
+    UNSIGNED1 addrs_last36;
+    STRING10 chronoprim_range := '';
+    STRING2  chronopredir:= '';
+    STRING28 chronoprim_name:= '';
+    STRING4  chronosuffix:= '';
+    STRING2  chronopostdir:= '';
+    STRING10 chronounit_desig:= '';
+    STRING8  chronosec_range:= '';
+    STRING30 chronocity := '';
+    STRING2 chronostate := '';
+    STRING5 chronozip := '';
+    STRING4 chronozip4 := '';
+    STRING3 chronocounty := '';
+    STRING7 chronogeo_blk := '';
+    UNSIGNED3 chronodate_first := 0;
+    UNSIGNED3 chronodate_last := 0;
+    UNSIGNED3 address_history_seq;
+    STRING2 src := '';
+    DATASET(addressDetails) chronoAddresses;
+  END;
+  
+  EXPORT DistanceZipLayout := RECORD
+    UNSIGNED6 did;
+    UNSIGNED6 seq;
+    UNSIGNED3 addressHistorySeq;
+    UNSIGNED4 dateFirstSeen;
+    STRING5 chronoZip;
+    
+    STRING5  addr1_zip;
+    UNSIGNED4 addr1_firstSeenDate;
+    STRING5  addr2_zip;
+    UNSIGNED4 addr2_firstSeenDate;
+    STRING5  addr3_zip;
+    UNSIGNED4 addr3_firstSeenDate;
+    STRING5  addr4_zip;
+    UNSIGNED4 addr4_firstSeenDate;
+    
+    STRING5  Move1_dist;
+    STRING5  Move2_dist;
+    STRING5  Move3_dist;
   END;
 
 

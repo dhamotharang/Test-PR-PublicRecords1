@@ -18,11 +18,13 @@ EXPORT getAllBocaShellData_AML (
     string BatchUID = '',
     unsigned6 GlobalCompanyId = 0) := FUNCTION
     
-    mod_access := MODULE(Doxie.IDataAccess)
-      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
-      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
-      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
-    END;
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := ^.glb;
+	EXPORT dppa := ^.dppa;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 	
   // IsAML  := (BSOptions & iid_constants.BSOptions.IsAML) > 0;
@@ -539,7 +541,7 @@ ssnFlagsPrepforAddr := group(project(ssnFlagsPrep, transform(risk_indicators.Lay
 ExactMatchLevel:=iid_constants.default_ExactMatchLevel;
 
 //aml  just ids with ssn flags				fixed memory limit error - iid_getssnflags expects diff seq for each individual.																													
-withSSNFlags := iid_getSSNFlags(group(ssnFlagsPrepseq, seq), dppa, glb, isFCRA, false/*runSSNCodes*/, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission );	
+withSSNFlags := iid_getSSNFlags(group(ssnFlagsPrepseq, seq), dppa, glb, isFCRA, false/*runSSNCodes*/, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission, mod_access := mod_access);	
 
 SSNFlagsOrigSeq := join(withSSNFlags, ssnFlagsPrep, (integer)left.account = right.origseq and left.did = right.did, 
 												transform({recordof(withSSNFlags)}, self.seq := right.origseq, self.account := right.account, self := left));
@@ -1380,7 +1382,7 @@ final := if(production_realtime_mode and ~doScore, BSdata, group(wModels,seq));	
 // gateways := DATASET([],risk_indicators.Layout_Gateways_In);	// net acuity is not used for version 41 attributes in the shell
 ipdata := DATASET([],riskwise.Layout_IP2O);	// net acuity is not used for version 41 attributes in the shell
 // fdAttributesV2 := Models.getFDAttributes(final, iid, '', gateways, dppa, 0, '');	// hardcoding glb = 0 here as it is not really needed for anything
-fdAttributesV2 := Models.getFDAttributes(final, iid, '', ipdata);
+fdAttributesV2 := Models.getFDAttributes(final, iid, '', ipdata, mod_access := mod_access);
 
 Layout_Boca_Shell addFDattributesV2(bsData le, fdAttributesV2 ri) := TRANSFORM
 	self.fdAttributesv2 := ri.version2;

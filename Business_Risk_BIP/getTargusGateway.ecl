@@ -1,11 +1,13 @@
-IMPORT Address, BIPV2, Business_Risk, doxie, Gateway, MDR, Phones, Risk_Indicators, Riskwise, Targus, ut;
+﻿IMPORT BIPV2, Business_Risk, doxie, Gateway, MDR, Risk_Indicators, Targus, Business_Risk_BIP, STD;
 
 EXPORT getTargusGateway(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet,
                        doxie.IDataAccess mod_access) := FUNCTION
-	
+	 
+	 applyOptOut := TRUE; // Temporary variable to enable Targus opt out
+	 
 	// Gateway url for development: 'http://rw_score_dev:[PASSWORD_REDACTED]@gatewaycertesp.sc.seisint.com:7726/WsGateway'
 
 	RESTRICTED_SET := ['0', ''];
@@ -82,7 +84,7 @@ EXPORT getTargusGateway(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	targus_out_pre := // Targus.Layout_Targus_Out
 		IF(
 			makeGatewayCall, 
-			Gateway.SoapCall_Targus(targus_in, targus_gateway_cfg, timeout, retries, makeGatewayCall, mod_access),
+			Gateway.SoapCall_Targus(targus_in, targus_gateway_cfg, timeout, retries, makeGatewayCall, mod_access, applyOptOut),
 			DATASET([],targus.layout_targus_out)
 		);
 	
@@ -117,12 +119,12 @@ EXPORT getTargusGateway(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																						PDESearchResult.PrimaryAddressNumber, PDESearchResult.StreetName, PDESearchResult.SecondaryAddressNumber,
 																						ZIPScore, CityStateScore)));
 
-		StateMatched				:= StringLib.StringToUpperCase(le.Clean_Input.State) = StringLib.StringToUpperCase(PDESearchResult.State);
+		StateMatched				:= STD.Str.ToUpperCase(le.Clean_Input.State) = STD.Str.ToUpperCase(PDESearchResult.State);
 		
 		PhonePopulated			:= TRIM(le.Clean_Input.Phone10) <> '' AND TRIM(Enhanced_Data.Phone) <> '';
 		PhoneMatched				:= PhonePopulated AND (le.Clean_Input.Phone10[1] = Enhanced_Data.Phone[1] OR le.Clean_Input.Phone10[4] = Enhanced_Data.Phone[4] OR le.Clean_Input.Phone10[4] = Enhanced_Data.Phone[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Phone10, Enhanced_Data.Phone));
 		PhoneDisonnectStatus := 
-			CASE( stringlib.stringtouppercase(Enhanced_Data.phonestatus), 'CONNECTED' => '0', 'DISCONNECTED' => '1', '2'); // A 2 indicates "Unknown"
+			CASE( STD.Str.touppercase(Enhanced_Data.phonestatus), 'CONNECTED' => '0', 'DISCONNECTED' => '1', '2'); // A 2 indicates "Unknown"
 		
 		// NOTE: The results from the Targus Gateway contain no date information whatsoever so 
 		// set date first and last seen dates to '0'.
@@ -140,8 +142,8 @@ EXPORT getTargusGateway(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		// The Targus Gateway returns only one record per input.
 		SELF.InputPhoneEntityCount := IF( TargusHit, '1', '0' ); 
 		SELF.InputPhoneMobile := 
-				IF( stringlib.stringtouppercase(ri.Response.WirelessConnectionSearchResult.OwnerType) = 'WIRELESS' OR
-		        stringlib.stringfind( stringlib.stringtouppercase(ri.Response.VerifyExpressResult.InputVerification.Phone.PhoneType),'CELL',1 ) > 0,
+				IF( STD.Str.touppercase(ri.Response.WirelessConnectionSearchResult.OwnerType) = 'WIRELESS' OR
+		        STD.Str.find( STD.Str.touppercase(ri.Response.VerifyExpressResult.InputVerification.Phone.PhoneType),'CELL',1 ) > 0,
 						'1',
 						'0');
 						

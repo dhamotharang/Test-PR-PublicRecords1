@@ -71,7 +71,7 @@ EXPORT BatchService(useCannedRecs = FALSE) := MACRO
 	ds_records := FraudGovPlatform_Services.BatchRecords(ds_batch_in_with_did, batch_params);
 
 	// ** Simple transform to convert the ds_records to the flat output layout
-	flatten_out := FraudGovPlatform_Services.Functions.getFlatBatchOut(ds_records);
+	flatten_out := FraudGovPlatform_Services.Functions.getFlatBatchOut(ds_records, batch_params);
 
 	BatchShare.MAC_RestoreAcctno(ds_batch_in, flatten_out, Results,true, false);
 	 
