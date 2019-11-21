@@ -644,34 +644,35 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                                              addHistPhones(LEFT,ROWS(RIGHT)));
 
     // Returns the Phone data without the score.
-    phones_with_attrs := Phone_Shell.Phone_Shell_Function(	phone_shell_withphones_in,
-                                                            gateways_in,
-                                                            GLB_Purpose,
-                                                            DPPA_Purpose,
-                                                            Doxie.DataRestriction.fixed_DRM,
-                                                            Doxie.DataPermission.permission_mask,
-                                                            ,
-                                                            ,
-                                                            ,
-                                                            ,
-                                                            ,
-                                                            ,
-                                                            ,
-                                                            ,
-                                                            ,
-                                                            ,
+    phones_with_attrs := Phone_Shell.Phone_Shell_Function(	
+                              phone_shell_withphones_in,
+                              gateways_in,
+                              GLB_Purpose,
+                              DPPA_Purpose,
+                              Doxie.DataRestriction.fixed_DRM,
+                              Doxie.DataPermission.permission_mask,
+                              , // phone restriction mask
+                              , // maxphones
+                              , // ins verification age limit
+                              10, // phone shell version, force to phone shell v1.0 for now
+                              , // spii access level
+                              , // vertical limit
+                              , // industry class
+                              , // relocation max days before
+                              , // relocation max days after
+                              , // relocations target radius
 																														inMod.IncludeLastResort,
-                                                            IncludePhonesFeedback,
+                              IncludePhonesFeedback,
 																														Batch := COUNT(phone_shell_withphones_in) > 1, //if only called by batch products
 																														BlankOutDuplicatePhones := inMod.BlankOutDuplicatePhones,
 																														UsePremiumSource_A := UsePremiumSource_A,
 																														RunRelocation := RunRelocation);
 
     // SCORE THE PHONES
-    // model_results  := if(version = v_enum.CP_V3,
-				//											Phone_Shell.PhoneScore_cp3_v3(phones_with_attrs, Phone_Shell.Constants.Default_PhoneScore),
-				//											Phone_Shell.PhoneScore_wf8_v3(phones_with_attrs));//v_enum.WFP_V8
-    model_results := Phone_Shell.PhoneModel_v21_1(phones_with_attrs); // new combined model for Phone Shell v2.1+
+    model_results  := if(version = v_enum.CP_V3, // these are the models for Phone Shell v1.0
+															Phone_Shell.PhoneScore_cp3_v3(phones_with_attrs, Phone_Shell.Constants.Default_PhoneScore),
+															Phone_Shell.PhoneScore_wf8_v3(phones_with_attrs));//v_enum.WFP_V8
+    // model_results := Phone_Shell.PhoneModel_v21_1(phones_with_attrs); // new combined model for Phone Shell v2.1+
 
     STRING2 map_source_code_phone_shell(STRING10 ph_type) := MAP
       (ph_type = 'EDAFLA' OR ph_type = 'EDAFA' OR ph_type = 'EDALA' => 'ES',
