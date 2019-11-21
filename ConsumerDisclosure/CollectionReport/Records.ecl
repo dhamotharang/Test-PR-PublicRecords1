@@ -48,7 +48,7 @@ EXPORT Records(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.QUICK_HEADER, header_quick.key_DID, did, dt_last_seen, $.Constants.DateFormat.YYYYMM)
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.SALES_CHANNEL, saleschannel.keys().did.qa, did, date_last_seen)
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.SPOKE, spoke.keys().did.qa, did, dt_last_seen)
-    + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.TARGUS, targus.Key_Targus_DID, did, dt_last_seen)
+    + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.TARGUS, targus.Key_Targus_DID, did, dt_last_seen, $.Constants.DateFormat.YYYYMM)
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.THRIVE, thrive.keys().did.qa, did, dt_last_seen, $.Constants.DateFormat.YYYYMM)
     + $.MAC.GetCollectionFromRaw(vehicle_parties, in_mod, $.Constants.Collection.VEHICLE_PARTY, vehiclev2.Key_Vehicle_Party_Key, vehicle_key, date_last_seen,  $.Constants.DateFormat.YYYYMM)
     + $.MAC.GetCollectionFromRaw(vehicle_main, in_mod, $.Constants.Collection.VEHICLE_MAIN, vehiclev2.Key_Vehicle_Main_Key, vehicle_key)
