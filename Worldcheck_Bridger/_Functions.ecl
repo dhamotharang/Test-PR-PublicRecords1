@@ -1266,6 +1266,7 @@
 				trim(kword, left, right) = 'FRDGCCRF' =>SubGroup_Constants.numKeywordsID.KEYWORD_FRDGCCRF,
 				trim(kword, left, right) = 'OFAC-EO13884' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13884,
 				trim(kword, left, right) = 'PTTC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTTC,
+				trim(kword, left, right) = 'RBNZ-ALERT' =>SubGroup_Constants.numKeywordsID.KEYWORD_RBNZ_ALERT,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
