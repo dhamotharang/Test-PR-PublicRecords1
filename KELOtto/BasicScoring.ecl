@@ -11,6 +11,7 @@ EXPORT BasicScoring := MODULE
 	EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
 	EXPORT CustomWeightingChart := DATASET('~fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
 
+
 // Add a column to tag that have {value} so the str.findreplace is only done for those rows that need it (for speed in the join).
 	EXPORT WeightingChartPrepped := PROJECT(WeightingChart, TRANSFORM({RECORDOF(WeightingChart), BOOLEAN HasValue}, SELF.HasValue := Std.Str.Find(LEFT.UiDescription, '{value}') > 0, SELF := LEFT));
 	EXPORT CustomWeightingChartPrepped := PROJECT(CustomWeightingChart, TRANSFORM({RECORDOF(CustomWeightingChart), BOOLEAN HasValue}, SELF.HasValue := Std.Str.Find(LEFT.UiDescription, '{value}') > 0, SELF := LEFT));
@@ -307,10 +308,17 @@ EXPORT BasicScoring := MODULE
                         RIGHT.indicatortype = 'CL', 
                         TRANSFORM(RECORDOF(LEFT), SELF.Cluster_Score_ := MAP(RIGHT.entity_context_uid_ != '' AND RIGHT.Value > 0 => RIGHT.CustomerPercentile, 0), SELF := LEFT), LEFT OUTER, LOCAL);
 
-  HighRiskIdentityAggregation := DISTRIBUTE(TABLE(ScoredGraphPrep2, {source_customer_, UNSIGNED cl_hr_identity_count_ := COUNT(GROUP, entity_type_ = 1 AND score_ > 80), UNSIGNED cl_hr_element_count_ := COUNT(GROUP, entity_type_ != 1 AND score_ > 80), tree_uid_}, source_customer_, tree_uid_, MERGE), HASH32(tree_uid_)); 
+  HighRiskIdentityAggregation := DISTRIBUTE(TABLE(ScoredGraphPrep2, 
+	                                 {source_customer_, 
+																	  UNSIGNED cl_hr_identity_count_ := COUNT(GROUP, entity_type_ = 1 AND score_ > 80), 
+																		UNSIGNED cl_hr_element_count_ := COUNT(GROUP, entity_type_ != 1 AND score_ > 80),
+																		UNSIGNED connected_element_count_ := COUNT(GROUP, entity_type_ != 1 AND identity_count_ > 1),
+																		tree_uid_}, 
+	                                  source_customer_, tree_uid_, MERGE), HASH32(tree_uid_)); 
 
-  EXPORT ScoredGraphPrep3 := JOIN(ScoredGraphPrep2, HighRiskIdentityAggregation, LEFT.source_customer_ = RIGHT.source_customer_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_, TRANSFORM({RECORDOF(LEFT), UNSIGNED cl_hr_identity_count_, UNSIGNED cl_hr_element_count_}, 
-                            SELF.cl_hr_identity_count_ := RIGHT.cl_hr_identity_count_, SELF.cl_hr_element_count_ := RIGHT.cl_hr_element_count_, SELF := LEFT), LEFT OUTER, LOCAL);
+  EXPORT ScoredGraphPrep3 := JOIN(ScoredGraphPrep2, HighRiskIdentityAggregation, LEFT.source_customer_ = RIGHT.source_customer_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_, TRANSFORM({RECORDOF(LEFT), UNSIGNED cl_hr_identity_count_, UNSIGNED cl_hr_element_count_, UNSIGNED connected_element_count_}, 
+                            SELF.cl_hr_identity_count_ := RIGHT.cl_hr_identity_count_, SELF.cl_hr_element_count_ := RIGHT.cl_hr_element_count_, 
+														SELF.connected_element_count_ := RIGHT.connected_element_count_, SELF := LEFT), LEFT OUTER, LOCAL);
 
   // Flag/Indicator Child dataset.
 
@@ -345,6 +353,6 @@ EXPORT BasicScoring := MODULE
                                                       {'safe_flag_', (STRING)LEFT.safe_flag_},
                                                       {'identity_count_', (STRING)LEFT.identity_count_}
 																											], FlagsRec)(Value <> '');
-															 SELF := LEFT));// : PERSIST('~temp::deleteme65');
+															 SELF := LEFT)) : PERSIST('~temp::deleteme65');
 				
 END;
