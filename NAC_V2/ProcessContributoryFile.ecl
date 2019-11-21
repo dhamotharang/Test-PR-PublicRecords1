@@ -29,7 +29,7 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 							 IP
 							,spraying + lfn
 							,,,,
-							,if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01','thor400_36_02')
+							,if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01','thor400_44')
 							,ilfn
 							,
 							,
