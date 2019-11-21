@@ -60,8 +60,17 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																				,p_esp).LayoutDetails();
 
 	EXPORT fGetFileStatus(dataset(rListToProcess) dListToProcess) := function
+	
+		rListToProcess xListToProcess(dListToProcess l) := transform
+			self.superfile := if (regexfind('~',l.superfile),l.superfile,'~'+l.superfile);
+			self.newlogicalfile := if (regexfind('~',l.newlogicalfile),l.newlogicalfile,'~'+l.newlogicalfile);
+			self.previouslogicalfile := if (regexfind('~',l.previouslogicalfile),l.previouslogicalfile,'~'+l.previouslogicalfile);
+			self := l;
+		end;
 		
-		rlist xGetFileStatus(dListToProcess l) := transform
+		dCheckforTild := project(dListToProcess,xListToProcess(left));
+		
+		rlist xGetFileStatus(dCheckforTild l) := transform
 			isFileExists := STD.File.FileExists(l.newlogicalfile + '_keydiff');
 			patchFilename := if (STD.File.FileExists(l.newlogicalfile)
 																	,l.newlogicalfile + '_keypatch'
@@ -95,7 +104,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 			self := l;
 		end;
 		
-		dGetFileStatus := nothor(project(global(dListToProcess,few),xGetFileStatus(left)));
+		dGetFileStatus := nothor(project(global(dCheckforTild,few),xGetFileStatus(left)));
 		
 		rlist xIsKeyDiff(dGetFileStatus l) := transform
 			self.iskeydiff := if (
@@ -150,7 +159,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 	export fHoldPreviousLogical(dataset(rListToProcess) dListToProcess) := function
 		dStatus := fGetFileStatus(dListToProcess);
 		return sequential
-							(output(choosen(dStatus,1000),named('keydiff_records'))
+							(output(choosen(dStatus,1000))
 									,nothor(apply(global(dStatus(iskeydiff),few)
 														,sequential
 															(
@@ -224,7 +233,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 														,string p_targetcluster = STD.System.Job.Target()) := function
 		dStatus := fGetFileStatus(dListToProcess) : independent;
 		
-		return if (~regexfind('hthor', STD.System.Job.Target())
+		return if (~regexfind('hthor', p_targetcluster)
 						,sequential
 								(
 									// add to super to hold the previous key so it is not deleted
@@ -265,10 +274,10 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 											,string p_targetcluster = STD.System.Job.Target()) := function
 		dStatus := fGetFileStatus(dListToProcess) : independent;
 		
-		return if (~regexfind('hthor', STD.System.Job.Target())
+		return if (~regexfind('hthor', p_targetcluster)
 						,sequential
 								(
-									output(choosen(dStatus,1000),named('keypatch_records'))
+									output(choosen(dStatus,1000))
 									,apply(dStatus(iskeypatch)
 										,fKeyPatch(attributename
 															,superfile
@@ -294,7 +303,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 															,boolean holdpreviousforkeydiff = true
 															,string p_targetcluster = STD.System.Job.Target()) := function
 															
-		return if (~regexfind('hthor', STD.System.Job.Target())
+		return if (~regexfind('hthor', p_targetcluster)
 						,sequential
 							(
 								output(p_dListToProcess,,vKeyDiffFileListPrefix+p_dopsdatasetname,overwrite)
@@ -324,7 +333,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 															,boolean holdpatchedinsuper = true
 															,string p_targetcluster = STD.System.Job.Target()) := function
 															
-		return if (~regexfind('hthor', STD.System.Job.Target())
+		return if (~regexfind('hthor', p_targetcluster)
 						,sequential
 							(
 								output(p_dListToProcess,,vKeyPatchFileListPrefix+p_dopsdatasetname,overwrite)

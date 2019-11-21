@@ -1,4 +1,4 @@
-import Business_Header;
+﻿import Business_Header, Mdr;
 
 export Update_Base(
 
@@ -28,8 +28,15 @@ function
 																,dStandardizedInputRSIHFile + dStandardizedInputCCFile + dPrepBusHeaderFile + base_file
 																,dStandardizedInputRSIHFile + dStandardizedInputCCFile + dPrepBusHeaderFile
 															);
+	
+	//DF-26534: Add Global_SID to Non-BusinessHeader Records
+	busHeader_file					:= update_combined(rawfields.source='BusinessHeader');	
+	nonBusHeader_gs					:= update_combined(rawfields.source<>'BusinessHeader' and global_sid<>0);	
+	nonBusHeader_no_gs			:= update_combined(rawfields.source<>'BusinessHeader' and global_sid=0);
+	addGlobalSID 						:= mdr.macGetGlobalSID(nonBusHeader_no_gs, 'Debt_Settlement', '', 'global_sid');	
+	concat_file							:= busHeader_file + nonBusHeader_gs + addGlobalSID;
 															
-	dAppendIds							:= Append_Ids.fAll				(update_combined			);
+	dAppendIds							:= Append_Ids.fAll				(concat_file			);
 	dRollup									:= Rollup_Base						(dAppendIds						);
 	return dRollup;
 

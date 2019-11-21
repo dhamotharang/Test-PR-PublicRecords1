@@ -24,6 +24,8 @@ EXPORT raw := RECORD
 	STRING	CITY;
 	STRING	STATE;
 	STRING	ZIP;
+	STRING 	DOB; 		//fmt: YYYYMMDD, MM/DD/YYYY
+	STRING 	CE_REQ_MET;
 	// STRING	COUNTY_CODE;
 
 	// the vendor stop provide individual/home addresses and provide the business address
@@ -78,6 +80,8 @@ EXPORT Common := RECORD
 	STRING	COMPANY_NAME;
 	STRING	BUSINESS_PHONE;
 	STRING	BUSINESS_FAX;
+	STRING 	DOB; 		//fmt: YYYYMMDD, MM/DD/YYYY
+	STRING 	CE_REQ_MET;
  END;
 
  END;

@@ -1,17 +1,17 @@
+// Added changes based on: https://reedelsevier.sharepoint.com/:u:/r/sites/OG-EquifaxInquiryData/Shared%20Documents/General/FW%20RE%20MyLife.msg?csf=1&e=NRihsF
 
 EXPORT SRC_Allowed := MODULE
 //1
-EXPORT Consumers_allowed_and_extracted :=[ 
-
+EXPORT Consumers_allowed_and_extracted :=[
         
         // These sources are used in the bulk extract and will be sub-source-filtered based on the recornds found in the extract dataset file
 
         'VO',      //       471,098,311       Voters v2
 
         'GO',      //       1,095,448,334       Gong History
-        'WP',      //       371,782,031       Targus White pages
-        'PN',      //       353,662,315       PCNSR Phones
-        'GN',      //       327,998,600       Gong Neustar
+        // 'WP',      //       371,782,031       Targus White pages 
+        // 'PN',      //       353,662,315       PCNSR Phones
+        // 'GN',      //       327,998,600       Gong Neustar
 
         'SL',      //       185,932,655       American Students List
 
@@ -36,7 +36,7 @@ EXPORT Death_state_NOT_allowed := [
 // src
 EXPORT Consumers_allowed := [
 
-        'TS',      //       2,163,551,849       TUCS_Ptrack  (19607)                          // Consumer allowed. But no more than 70% to any customer
+        // 'TS',      //       2,163,551,849       TUCS_Ptrack  (19607)                          // Consumer allowed. But no more than 70% to any customer
         'IF',      //       1,282,733,656       Infutor TRK - Name and Address Resource (18075) // Consumer allowed. No vehicle. No more that 33% of the file
         // 'LT',      //       1,128,094,614       Lexis Trans Union (18059)                       // Bulk and consumer defauled to restricted (consult legal)
         // 'TU',      //       374,328,480       TransUnion (historiclal: 18061   )  (20033, TU)       // Bulk and consumer defauled to restricted (consult legal)
@@ -62,7 +62,7 @@ EXPORT Consumers_allowed := [
 
         'FF',      //       172,494       Federal Firearms        // bulk consumer allowed  18055      Federal Firearms Licenses      Bureau of Alcohol, Tobacco and Firearms (ATF)
                                                                 // bulk consumer allowed  14091      Georgia Firearm Instructors      Georgia Secretary of State
-        // 'FE'      //       18,145       Federal Explosives           //   18053      Federal Explosives Licenses      Bureau of Alcohol, Tobacco and Firearms (ATF)
+        'FE',      //       18,145       Federal Explosives           //   18053      Federal Explosives Licenses      Bureau of Alcohol, Tobacco and Firearms (ATF)
         'LA',      //       410,513,410       LN_Propertyv2 Lexis Assessors
         'LP',      //       395,407,380       LN_Propertyv2 Lexis Deeds and Mortgages
 
@@ -483,9 +483,9 @@ Phones_allowed         :=[
         // 'PN', //       1,432,062,004 // PCNSR Phones  (infoUSA)    // 18221 - bulk restricted
         // pcnsr is the master build.  the underlying source is white pages and consumer universe
 
-        // // 'GO', //       304,113,781   // Gong History               
-        'N2', //       251,337,629   // Neustar Wireless Phones    // 20437 - bulk restricted
-        // 'WP', //       155,311,403   // WHITE PAGES               // 17955, 19605 - bulk and consumer restricted
+        'GO', //       304,113,781   // Gong History               
+        // 'N2', //       251,337,629   // Neustar Wireless Phones    // 20437 - bulk restricted
+        'WP', //       155,311,403   // WHITE PAGES               // 17955, 19605 - bulk and consumer restricted
         '02', //       78,775,546    // Cellphones Traffix        // 17919 - no orbit restriction
         // 'TM', //       66,227,671    // Thrive LT (Lending Transactions)  // 19781 - bulk restricted
         // '01', //       41,352,583    // Cellphones Kroll              // 17921 - bulk restricted
@@ -517,10 +517,13 @@ Professional_Licenses_NOT_allowed := [
 
 ];
 //18 // source_file
-Sex_Offenders_allowed := [
+Sex_Offenders_NOT_allowed := [
+
+        // 19135	Item	Sex Offender Registry	HDI/Appriss (formerly Hygenics)
+        // All hygenics allowed but must be filtered down to only 30% of RECRODS.
 
         // 'TX_OFFENDER_REGISTRY', //       382,292       16% // 13103 bulk and consumer restricted
-        'CA_SEX_OFFENDER_REGI' //       369,923       16% // 13129 (historical) no orbit restrictions
+        // 'CA_SEX_OFFENDER_REGI' //       369,923       16% // 13129 (historical) no orbit restrictions
         // 'FL_SEX_OFFENDER_REGI', //       258,821       11% // 13723, 13761 says removed from production. 761 bulk and consumer restricted
         // 'MI_SEX_OFFENDER_REGI', //       92,063       4% // 15137 bulk and consumer restricted
         // 'MO_SEX_OFFENDER_REGI', //       81,019       3% // 15403, 15423 bulk and consumer restricted
@@ -590,7 +593,7 @@ EXPORT Check(UNSIGNED1 rec_type, STRING src) := CASE(rec_type,
     15 => ~  (src       in People_At_Work_NOT_allowed         ),
     16 =>    (src       in Phones_allowed                     ),
     17 => ~  (src       in Professional_Licenses_NOT_allowed  ) AND ~(src[1..3] in ['ENC','HMS'] ), 
-    18 =>    (src       in Sex_Offenders_allowed              ),
+    18 => ~  (src       in Sex_Offenders_NOT_allowed          ),
     19 =>    (src       in Voter_Registration_allowed         ),
     20 =>    (src[1..2] in Deeds_Mortgages_bulk_D2C_allowed   ),
     21 =>    (src[1..2] in Tax_Assessments_bulk_D2C_allowed   ),

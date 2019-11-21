@@ -3,9 +3,7 @@
 trimUpper(STRING s) := 
   std.str.CleanSpaces(std.Str.ToUppercase(s));
 	
-Base := Cortera.Files.Executives;	
-	
-EXPORT As_Industry() := FUNCTION
+EXPORT As_Industry(dataset(Cortera.Layout_Executives) base) := FUNCTION
 
 		Industry_Layout := TopBusiness_BIPV2.Layouts.rec_industry_combined_layout;
 
