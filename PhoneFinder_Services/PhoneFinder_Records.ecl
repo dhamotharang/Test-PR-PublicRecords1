@@ -94,7 +94,7 @@ MODULE
     SELF.acctno               := L.acctno;
     SELF.seq                  := L.seq;
     SELF.phone                := L.phone;
-    SELF.phonestatus          := L.phonestatus;
+    SELF.phonestatus          := IF(L.phonestatus != '', L.phonestatus, PhoneFinder_Services.Constants.PhoneStatus.NotAvailable);
     BOOLEAN UsePVS            := L.typeflag = Phones.Constants.TypeFlag.DataSource_PV;
     SELF.coc_description      := L.coc_description;
     SELF.carrier_name         := L.carrier_name;
