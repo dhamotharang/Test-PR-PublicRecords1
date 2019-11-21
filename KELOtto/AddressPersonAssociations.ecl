@@ -13,6 +13,7 @@ EXPORT AddressPersonAssociations := MODULE
 	SHARED HighFrequencyAddressThreshold := 10;
 	SHARED HighFrequencyIpThreshold := 20;
 	SHARED HighFrequencyPhoneThreshold := 20;
+	SHARED HighFrequencyBankThreshold := 20;
   SHARED HighFrequencyAddressCutoff := 20;
 	SHARED LargeAssociationThreshold := 200; // this is the cutoff for associations for overconnected people.
   SHARED DemoHashes := [3977509724, 2727638882, 1139485299, 2459821998, 3635312545, 1026679856, 4401323, 3005794324, 866735130];
@@ -146,7 +147,29 @@ EXPORT AddressPersonAssociations := MODULE
 																SELF.cell_phone := MAP(RIGHT.HighFrequencyPhoneFlag=1=> '', LEFT.cell_phone), // Zero the address id if it is high frequency
 																SELF := LEFT, SELF := RIGHT), LEFT OUTER, LOOKUP);	
 
-	EXPORT SharedEvents := JOIN(FraudgovSharedPrep4, DEDUP(SORT(Sharing, targetcustomerhash), targetcustomerhash),
+	EXPORT HighFrequencyBank1 := TABLE(
+															DEDUP(SORT(KELOtto.fraudgovshared(did > 0), AssociatedCustomerFileInfo, did, OttoBankAccountId), AssociatedCustomerFileInfo, did, OttoBankAccountId), 
+															{AssociatedCustomerFileInfo, OttoBankAccountId, HighFrequencyBankFlag := MAP(count(group)>=HighFrequencyBankThreshold=>1,0)}, 
+															 AssociatedCustomerFileInfo, OttoBankAccountId, MERGE)(HighFrequencyBankFlag=1); 
+
+  EXPORT FraudgovSharedPrep5 := JOIN(FraudgovSharedPrep4, HighFrequencyBank1, 
+	                              LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND LEFT.OttoBankAccountId=RIGHT.OttoBankAccountId,
+																TRANSFORM(RECORDOF(LEFT), 
+																SELF.OttoBankAccountId := MAP(RIGHT.HighFrequencyBankFlag=1=> 0, LEFT.OttoBankAccountId), // Zero the address id if it is high frequency
+																SELF := LEFT, SELF := RIGHT), LEFT OUTER, LOOKUP);	
+
+	EXPORT HighFrequencyBank2 := TABLE(
+															DEDUP(SORT(KELOtto.fraudgovshared(did > 0), AssociatedCustomerFileInfo, did, OttoBankAccountId2), AssociatedCustomerFileInfo, did, OttoBankAccountId2), 
+															{AssociatedCustomerFileInfo, OttoBankAccountId2, HighFrequencyBankFlag := MAP(count(group)>=HighFrequencyBankThreshold=>1,0)}, 
+															 AssociatedCustomerFileInfo, OttoBankAccountId2, MERGE)(HighFrequencyBankFlag=1); 
+
+  EXPORT FraudgovSharedPrep6 := JOIN(FraudgovSharedPrep5, HighFrequencyBank2, 
+	                              LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND LEFT.OttoBankAccountId2=RIGHT.OttoBankAccountId2,
+																TRANSFORM(RECORDOF(LEFT), 
+																SELF.OttoBankAccountId2 := MAP(RIGHT.HighFrequencyBankFlag=1=> 0, LEFT.OttoBankAccountId2), // Zero the address id if it is high frequency
+																SELF := LEFT, SELF := RIGHT), LEFT OUTER, LOOKUP);	
+
+	EXPORT SharedEvents := JOIN(FraudgovSharedPrep6, DEDUP(SORT(Sharing, targetcustomerhash), targetcustomerhash),
                               LEFT.associatedcustomerfileinfo = RIGHT.targetcustomerhash,
 											TRANSFORM({RECORDOF(LEFT), INTEGER customer_id_,	INTEGER industry_type_, IdentityRec, STRING CleanAddressString, UNSIGNED EventMonth}, 
 																SELF.customer_id_ := (INTEGER)RIGHT.inclusion_id,
@@ -266,7 +289,7 @@ EXPORT AddressMatch := TABLE(Matches,
 
 	EXPORT PersonAddressMatchStatsPrep3 := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2 : PERSIST('~temp::deleteme31'); // JP
 
-
+//  output(KELOtto.AddressPersonAssociations.PersonAddressMatchStatsPrep3,, '~temp::PersonAddressMatchStatsPrep3', overwrite, EXPIRE(7));
 //  SHARED tempAssociations := DATASET('~foreign::10.173.14.201::temp::PersonAddressMatchStatsPrep3', RECORDOF(PersonAddressMatchStatsPrep2), THOR);
 //	EXPORT PersonAddressMatchStatsPrep3 := tempAssociations;
 									
@@ -294,8 +317,8 @@ EXPORT AddressMatch := TABLE(Matches,
          
   EXPORT HighFrequencyFroms := TABLE(LexidAssociationsPrep, {AssociatedCustomerFileInfo, FromPersonLexId, recs := COUNT(GROUP)}, AssociatedCustomerFileInfo, FromPersonLexId, MERGE);
   // Remove high frequency matches.
-	EXPORT PersonAddressMatchStatsPrep := DEDUP(SORT(DISTRIBUTE(LexidAssociationsPrep, HASH32(FromPersonLexId, ToPersonLexId)), FromPersonLexId, ToPersonLexId, LOCAL), FromPersonLexId, ToPersonLexId, LOCAL);
-	EXPORT PersonAddressMatchStats := JOIN(LexidAssociationsPrep, HighFrequencyFroms(recs > LargeAssociationThreshold), LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND LEFT.FromPersonLexId=RIGHT.FromPersonLexId, LEFT ONLY, LOOKUP);
+	EXPORT PersonAddressMatchStatsPrep := DEDUP(SORT(DISTRIBUTE(PersonAddressMatchStatsPrep4/*LexidAssociationsPrep*/, HASH32(FromPersonLexId, ToPersonLexId)), FromPersonLexId, ToPersonLexId, LOCAL), FromPersonLexId, ToPersonLexId, LOCAL);
+	EXPORT PersonAddressMatchStats := JOIN(PersonAddressMatchStatsPrep4/*LexidAssociationsPrep*/, HighFrequencyFroms(recs > LargeAssociationThreshold), LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND LEFT.FromPersonLexId=RIGHT.FromPersonLexId, LEFT ONLY, LOOKUP);
 												 
 	//   Same Day or within 7 days?
 	//   Multiple Distinct addresses (non-high fequency, within time threshold?)

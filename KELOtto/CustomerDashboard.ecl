@@ -10,6 +10,7 @@
 	 INTEGER1 High_Risk_Centroid;
 	 INTEGER1 Known_Risk_Centroid;
 	 INTEGER1 High_Scoring_Cluster := 0;
+	 INTEGER1 connected_element_count_ := 0;
 	 KELOtto.Q__show_Customer_Person.Res0.Cl_High_Risk_Routing_Count_;
 	 KELOtto.Q__show_Customer_Person.Res0.Cl_No_Lex_Id_Gt22_Count_;
 	 KELOtto.Q__show_Customer_Person.Res0.Cl_Death_Prior_To_All_Events_Identity_Count_;
@@ -104,7 +105,7 @@
 	
   EXPORT OttoFullGraphElements := ClusterPrep(safe_flag_ = 0 AND entity_type_ != 1 AND Cl_High_Kr_Identity_Percent_ < 1 );
 
-  EXPORT OttoFullGraphIdentities := ClusterPrep(safe_flag_ = 0 AND entity_type_ = 1 AND Cl_High_Kr_Identity_Percent_ < 1);
+  EXPORT OttoFullGraphIdentities := ClusterPrep(safe_flag_ = 0 AND entity_type_ = 1 AND Cl_High_Kr_Identity_Percent_ < 1 AND connected_element_count_ > 1);
 	
   EXPORT Identities_1 := JOIN(OttoFullGraphIdentities, OttoFullGraphIdentities, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_ and LEFT.entity_context_uid_ != RIGHT.entity_context_uid_, TRANSFORM({RECORDOF(LEFT), STRING RelatedEntityContextUid}, SELF.RelatedEntityContextUid := RIGHT.entity_context_uid_, SELF := LEFT), HASH);
   EXPORT Identities_2 := JOIN(OttoFullGraphIdentities, OttoFullGraphIdentities, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.entity_context_uid_ and LEFT.entity_context_uid_ != RIGHT.tree_uid_, TRANSFORM({RECORDOF(LEFT), STRING RelatedEntityContextUid}, SELF.RelatedEntityContextUid := RIGHT.tree_uid_, SELF := LEFT), KEEP(1), HASH);
