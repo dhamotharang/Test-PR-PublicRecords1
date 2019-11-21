@@ -4,4 +4,8 @@ export layouts := module
         string category;
         string id;
     end;
+    export offense_layout := record
+        string75 offense_desc,
+        integer8 rcount
+    end;
 end;
