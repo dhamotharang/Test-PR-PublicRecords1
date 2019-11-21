@@ -42,7 +42,7 @@ base := join(request,
 							self.jobid := (unsigned)left.jobid,
 							self.response_file_name := right.filename,
 							self.response_InputFileNamestring := '',
-						  self := left));
+						  self := left))(source<>'IB');
 
 addGlobalSID := mdr.macGetGlobalSID(base, 'PSS', 'source', 'global_sid'); //DF-26599: Populate Global_SID
 
