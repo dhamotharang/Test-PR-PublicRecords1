@@ -347,13 +347,15 @@
 
     EXPORT rForeclosure := RECORD
         unsigned1 record_type:=23;
+        unsigned6 LexID;
         string    Owner;
         string    Lender;
         string200 Site_Address;
         string2   Deed_Type;
         unsigned4 Recording_Date;
         string    Attorney;
-        string    Plaintiff;
+        string    Plaintiff1;
+        string    Plaintiff2;
         string    title_company;
         unsigned4 filing_date;
         unsigned4 auction_date;

@@ -485,7 +485,7 @@ Phones_allowed         :=[
 
         'GO', //       304,113,781   // Gong History               
         // 'N2', //       251,337,629   // Neustar Wireless Phones    // 20437 - bulk restricted
-        'WP', //       155,311,403   // WHITE PAGES               // 17955, 19605 - bulk and consumer restricted
+        // 'WP', //       155,311,403   // WHITE PAGES               // 17955, 19605 - bulk and consumer restricted
         '02', //       78,775,546    // Cellphones Traffix        // 17919 - no orbit restriction
         // 'TM', //       66,227,671    // Thrive LT (Lending Transactions)  // 19781 - bulk restricted
         // '01', //       41,352,583    // Cellphones Kroll              // 17921 - bulk restricted

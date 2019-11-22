@@ -6,39 +6,9 @@ EXPORT Files := MODULE
 
     //Infutor Header -            9,331,483,588
     //After applying src filter,  7,504,725,548 
-    EXPORT infutor_hdr  := Infutor.infutor_header(D2C_Customers.SRC_Allowed.Check(1, src));
+    EXPORT infutor_hdr  := distribute(Infutor.infutor_header(D2C_Customers.SRC_Allowed.Check(1, src)), hash(did));
     EXPORT infutor_best := Infutor.file_infutor_best;  //708,358,966
-    EXPORT coresDS      := Header.key_ADL_segmentation(ind1 = 'CORE'); //257,216,208 
-
-    TS_rec  := infutor_hdr(src = 'TS');  //2,168,648,561 - 28% of Infu Header
-    INF_rec := infutor_hdr(src = 'IF');  //1,282,783,753 - 17% of Infu Header
-
-    cnt_TS_rec  := count(Transunion_PTrak.File_Transunion_DID_Out(did >0)); //5B recs
-    cnt_INF_rec := count(INF_rec);
-
-    temp_inf_hdr := RECORD
-        recordof(infutor_hdr);
-        unsigned4 dt_latest;
-        record_id := 0;
-    END;
-
-//As per agreement, only 70% of TS and 33% of IF transactions are allowed for My Life
-//The records are selected based on newest records
-    pTS := project(TS_rec, transform(temp_inf_hdr, self.dt_latest := max(left.dt_vendor_last_reported, left.dt_last_seen); self := left;));
-    pIF := project(INF_rec,transform(temp_inf_hdr, self.dt_latest := max(left.dt_vendor_last_reported, left.dt_last_seen); self := left;)); 
-
-    dTS := sort(distribute(pTS, hash(did)), -dt_latest, local);
-    dIF := sort(distribute(pIF, hash(did)), -dt_latest, local);
-
-    TS_70per:=PROJECT(dTS,TRANSFORM(temp_inf_hdr,SELF.record_id:=LEFT.record_id+COUNTER;SELF:=LEFT;))(record_id<=cnt_TS_rec*0.70);
-    INF_33per:=PROJECT(dIF,TRANSFORM(temp_inf_hdr,SELF.record_id:=LEFT.record_id+COUNTER;SELF:=LEFT;))(record_id<=cnt_INF_rec*0.33);
-
-    //2,168,648,561 - Taking all from header as it is < 5B of Transunion Base File
-    TS_70  := if(count(TS_rec) <= cnt_TS_rec*0.70, TS_rec, project(TS_70per, recordof(infutor_hdr)));
-    //  423,302,106
-    INF_33 := project(INF_33per, recordof(infutor_hdr));
-        
-    SHARED FilteredHeaderRecs := distribute(infutor_hdr(src not in ['TS', 'IF']) + TS_70 + INF_33, hash(did)); //7,491,686,415        
+    EXPORT coresDS      := Header.key_ADL_segmentation(ind1 = 'CORE'); //257,216,208       
     
     /********* AIRCRAFT **********/
     AirCraft  := faa.file_aircraft_registration_out((unsigned6)did_out > 0);
@@ -101,8 +71,10 @@ EXPORT Files := MODULE
                  current_rec,
                  D2C_Customers.SRC_Allowed.Check(16, vendor)
                  );
-    ut.mac_suppress_by_phonetype(f_phonesplus,cellphone,state,_fphonesplus_cell,true,did);
-    _keybuild_phonesplus_base := f_phonesplus(cellphone<>'');
+    IR_src_maxlastdt := max(f_phonesplus(vendor = 'IR'), datevendorlastreported); 
+    phoneplus := f_phonesplus(vendor <> 'IR') + f_phonesplus(vendor = 'IR' and datevendorlastreported = IR_src_maxlastdt);
+    ut.mac_suppress_by_phonetype(phoneplus,cellphone,state,_fphonesplus_cell,true,did);
+    _keybuild_phonesplus_base := _fphonesplus_cell(cellphone<>'');
     Phones := _keybuild_phonesplus_base(vendor not in D2C.Constants.PhonesPlusV2RestrictedSources);
     EXPORT PhonesDS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(Phones, mode, 16);
 
@@ -151,11 +123,11 @@ EXPORT Files := MODULE
     CCW_p := project(CCW, transform({recordof(CCW) - [did_out], unsigned6 did}, self.did := (unsigned6)left.did_out; self := left));                           
     EXPORT CCWDS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(CCW_p, mode, 15);
 
-    // Foreclosure := Property.File_Foreclosure_Base_v2(did > 0);
-    // EXPORT ForeclosureDS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(Foreclosure, derogatoryDS, mode, 19);
+    // Foreclosure := Property.File_Foreclosure_Base_v2(name1_did <> '' or name2_did1 <> '');
+    // EXPORT ForeclosureDS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(Foreclosure, mode, 23);
 
 /********* FULL DS **********/
-    wAllowedDeeds    := D2C_Customers.MAC_GetAllowedRecs(FilteredHeaderRecs, DeedsDS(1),  '[\'LP\']');
+    wAllowedDeeds    := D2C_Customers.MAC_GetAllowedRecs(infutor_hdr, DeedsDS(1),  '[\'LP\']');
     wAllowedTax      := D2C_Customers.MAC_GetAllowedRecs(wAllowedDeeds, TaxDS(1), '[\'LA\']');
     wAllowedPL       := D2C_Customers.MAC_GetAllowedRecs(wAllowedTax, PLDS(1), '[\'PL\']');
     wAllowedHunting  := D2C_Customers.MAC_GetAllowedRecs(wAllowedPL, HuntingDS(1), '[\'E2\',\'E1\']');
