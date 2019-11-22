@@ -97,7 +97,7 @@ functionmacro
   
   // -- dedup contacts by proxid and fname, lname, tie breaker goes to latest populated title_dt_last_seens, and if that is same, then prefer ones with lexid.
   ds_dist   := distribute (ds_prep  ,hash(seleid,proxid));
-  ds_sort   := sort       (ds_dist  ,     seleid,proxid  ,trim(fname) + trim(lname)   ,if(trim(title) != ''  ,1  ,2) ,-title_dt_last_seen   ,-dt_last_seen ,if(lexid != 0  ,1,2) ,lexid  ,local);
+  ds_sort   := sort       (ds_dist  ,     seleid,proxid  ,trim(fname) + trim(lname)   ,if(trim(title) != ''  ,1  ,2) ,-title_dt_last_seen   ,-dt_last_seen ,if(person_hierarchy = 0  ,9999 ,person_hierarchy) ,if(lexid != 0  ,1,2) ,lexid  ,local);
   ds_dedup  := dedup      (ds_sort  ,     seleid,proxid  ,trim(fname) + trim(lname)                                                                                                      ,local);
 
   // -- sort contacts per proxid in person hierarchy order, set person hierarchy
