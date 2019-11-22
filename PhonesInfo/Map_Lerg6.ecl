@@ -382,7 +382,8 @@
 	//Append Global SID
 	////////////////////////////////////////////////////////////////////////////////
 	
-	addGlobal_SID	:= MDR.macGetGlobalSid(aggrRoll, 'PhonesMetadata', 'source', 'global_sid');
+	// addGlobal_SID	:= MDR.macGetGlobalSid(aggrRoll, 'PhonesMetadata', 'source', 'global_sid');
+     addGlobalSID   := MDR.macGetGlobalSID(aggrRoll,'PhonesMetadata_Virtual','','global_sid'); //CCPA-799 Use virtual as suppression has already been done.
 
 	////////////////////////////////////////////////////////////////////////////////
 	//Append Record SID
