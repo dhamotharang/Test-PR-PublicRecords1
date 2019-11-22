@@ -1,5 +1,5 @@
 ﻿
-import std, header_services, vehiclev2, Watercraft;
+import std, header_services, vehiclev2, Watercraft; 
 
 export applyRegulatory := module
 
@@ -123,15 +123,23 @@ export applyRegulatory := module
 																		, dataset([], layout)))));
 
 					endmacro;
+				
+			// layouts and transformation need for suppression. 
+			// moved here from header_services.Supplemental_Data 10-7-19
+			export layout_in := record
+					string32 hval_s;
+					string2  nl;
+			end;
 
+			export layout_out := record
+					data16 hval;
+			end;
 
-			export layout_in := 
-					record
-							string32 hval_s;
-							string2  nl;
-					end;
-
-
+			export layout_out in_to_out(layout_in l) := transform
+					self.hval := stringlib.string2data(l.hval_s);
+			end;
+			//
+			
 			export complex_append(base_ds, filename, Drop_Layout, trans) := 
 					functionmacro
 							Base_File_Append_In := suppress.applyregulatory.getFile(filename, Drop_Layout);
@@ -358,6 +366,7 @@ export applyRegulatory := module
 											string8   zip;
 											string5   prim_range;
 											string1   same_lname;
+											string2   title ;
 											string5   number_cohabits;
 											string2   eor;
 									end; 
@@ -402,7 +411,7 @@ export applyRegulatory := module
 											self.confidence 						:= 'HIGH';
 											self.cluster    						:= 'CORE';
 											self.generation 						:= 'S';
-											self.title 									:= 43;
+											self.title 									:= (unsigned1) L.title;
 											self.personal 							:= TRUE;
 											self.lname_cnt 							:= 1;
 											self 												:= L;
@@ -504,7 +513,8 @@ export applyRegulatory := module
 						
 							sup_in := suppress.applyregulatory.getFile(filename, supLayout);																			
 
-							local dSuppressedIn := project(sup_In, header_services.Supplemental_Data.in_to_out(left));
+							// local dSuppressedIn := project(sup_In, header_services.Supplemental_Data.in_to_out(left));
+							local dSuppressedIn := project(sup_In, suppress.applyRegulatory.in_to_out(left));
 					
 							return join (base_ds, dSuppressedIn, 
 									hashFunc1(left) = right.hval or
@@ -523,9 +533,7 @@ export applyRegulatory := module
 	            HF_DID_Hash(recordof(ds) L) := hashmd5(trim(l.did_out, 	left, right));				
 							HF_DID_SOURCE_STATE_Hash(recordof(ds) L) := hashmd5(trim(l.did_out, 	left, right), trim(l.source_state, 	left, right));
 							HF_PERSISTENT_ID_Hash(recordof(ds) L) := hashmd5(l.persistent_record_id);
-
-							// complex_hunt_fish_sup(base_ds, filename, hashFunc1, hashFunc2)
-							
+						
 							ds1 := Suppress.applyRegulatory.complex_sup_trio(ds, 'file_hunt_fish_sup.txt', HF_DID_SOURCE_STATE_Hash, HF_DID_Hash, HF_PERSISTENT_ID_Hash);
 						
 							return suppress.applyRegulatory.simple_append(ds1, 'file_hunt_fish_inj.thor', emerges.layout_hunters_out); 
@@ -544,7 +552,6 @@ export applyRegulatory := module
 							ds1 := Suppress.applyRegulatory.complex_sup_trio(ds, 'file_ccw_sup.txt', CCW_Hash1, CCW_Hash2, CCW_Hash3);
 
 							return Suppress.applyRegulatory.CCW_simple_append(ds1, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
-							// return Suppress.applyRegulatory.simple_append(ds1, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
 					endmacro; // applyCCW
 
 
@@ -736,7 +743,7 @@ export applyRegulatory := module
 							
 			export hdr_incremental_sup(ds) := 
 				functionmacro
-					local hashFunc(recordof(ds) l) := hashmd5(l.rid);
+					local hashFunc(recordof(ds) l) := hashmd5(intformat((unsigned6)l.rid,15,1));
 					local reverse_sup_result := Suppress.applyRegulatory.simple_reverse_sup(ds, 'hdr_incremental_sup.txt', hashFunc);
 					return reverse_sup_result;
 				endmacro;

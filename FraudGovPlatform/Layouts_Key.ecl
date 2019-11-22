@@ -1,10 +1,18 @@
 ﻿EXPORT Layouts_Key := MODULE 
 
-	flagsrec := RECORD
+	shared flagsrec := RECORD
 		string indicator;
 		string value;
   END;
 
+	EXPORT Cluster_Exp1_	:= RECORD
+		string entity_context_uid_;
+		unsigned1 __entity_context_uid__flags;
+		unsigned2 date_first_seen_;
+		unsigned2 date_last_seen_;
+		integer8 __recordcount;
+	END;
+	
 	EXPORT ClusterDetails	:=	RECORD
 		integer8 customer_id_;
 		integer8 industry_type_;

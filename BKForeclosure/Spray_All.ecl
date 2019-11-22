@@ -1,4 +1,4 @@
-﻿IMPORT BKForeclosure, STD;
+﻿IMPORT BKForeclosure, Property, STD;
 
 /**
  * parameter: string: pVersion       : The version of the build.
@@ -10,13 +10,15 @@
  * parameter: set   : setUpdateGlobs : A set of globs that will be used in a wild card spray
  */
 EXPORT Spray_All(
-	STRING pVersion,
-	STRING pHostname,
-	STRING pSource,
-	STRING pGroup = STD.System.Thorlib.Group(),
-	SET OF STRING setRefreshGlobs = [ '*_NOD_Orphan_Refresh_*.txt', '*_NOD_Refresh_*.txt', '*_REO_Orphan_Refresh_*.txt', '*_REO_Refresh_*.txt' ],
-	SET OF STRING setDeleteGlobs = [ 'NOD_Update_Delete_*.txt', 'REO_Update_Delete_*.txt' ],
-	SET OF STRING setUpdateGlobs = [ '*_NOD_Update_*.txt', '*_REO_Update_*.txt']
+	STRING  pVersion,
+	STRING  pHostname,
+	STRING  pSource,
+	STRING  pGroup = STD.System.Thorlib.Group(),
+	BOOLEAN pSpray = FALSE,
+	STRING  pGlob = 'REOOut.txt', 
+	SET OF  STRING setRefreshGlobs = [ '*_NOD_Orphan_Refresh_*.txt', '*_NOD_Refresh_*.txt', '*_REO_Orphan_Refresh_*.txt', '*_REO_Refresh_*.txt' ],
+	SET OF  STRING setDeleteGlobs = [ 'NOD_Update_Delete_*.txt', 'REO_Update_Delete_*.txt' ],
+	SET OF  STRING setUpdateGlobs = [ '*_NOD_Update_*.txt', '*_REO_Update_*.txt']
 ) := MODULE
 
 	//Folder date is a day after version date
@@ -61,7 +63,16 @@ EXPORT Spray_All(
 			setRefreshGlobs,
 			pGroup,
 			maxRecordSize
-		).SprayFile
+		).SprayFile,
+		IF(pSpray,
+			Property.spray_Foreclosure_Raw(
+				pVersion,
+				pHostname,
+				pVersion,
+				pGroup,
+				pSource + '/' + pGlob
+			)
+		);
 	);
 
 	//Add inputs to combined superfile

@@ -1,4 +1,4 @@
-﻿IMPORT  versioncontrol, tools, Data_Services, HealthcareNoMatchHeader_InternalLinking;
+﻿IMPORT  STD, versioncontrol, tools, Data_Services, HealthcareNoMatchHeader_InternalLinking;
 EXPORT  Filenames(  STRING	  pSrc        = '',
                     STRING    pVersion    = '',
                     BOOLEAN	  pUseProd    = FALSE) :=  MODULE
@@ -6,8 +6,8 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
   EXPORT  pThreshold  :=  HealthcareNoMatchHeader_InternalLinking.Config.MatchThreshold;
 
   //  Prefix
-	EXPORT  IsDataland          :=  tools._Constants.IsDataland;
-	EXPORT  foreign_environment :=  IF(IsDataland,'~',Data_Services.foreign_prod);
+	EXPORT  IsBocaProd          :=  tools._Constants.IsBocaProd;
+	EXPORT  foreign_environment :=  IF(pUseProd,IF(IsBocaProd,'~',Data_Services.foreign_prod),'~');
   EXPORT  cluster_name        :=  'ushc::';
 	EXPORT  prefix              :=  foreign_environment + cluster_name;
 
@@ -120,6 +120,19 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
       History_Match.dAll_filenames
     ;
   END;
+  
+  EXPORT  ExternalKeys  :=  MODULE
+    EXPORT  Meow            :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'Meow'  , pVersion);
+    EXPORT  Sup_RID         :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'sup::RID'  , pVersion);
+    EXPORT  Refs            :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'Refs'  , pVersion);
+    EXPORT  Refs_NoMatch    :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'Refs::NOMATCH'  , pVersion);
+		EXPORT	dAll_filenames	:=
+      Meow.dAll_filenames  +
+      Sup_RID.dAll_filenames  +
+      Refs.dAll_filenames  +
+      Refs_NoMatch.dAll_filenames
+    ;
+  END;
 
 	EXPORT	dAll_filenames	:=
 		Base.dAll_filenames +
@@ -130,4 +143,31 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
   // workman files
   EXPORT  WUPrefix              :=  prefix    + pSrc  + '::' + pVersion + '::';
   EXPORT  MasterWUOutput_SF     :=  WUPrefix  + 'HealthcareNotMatchHeader::qa::workunit_history';
+  
+  // For Cleanup
+  EXPORT  dAllSuperFiles    :=  
+            dAll_filenames+
+            Linking().dAll_filenames+
+            DebugKeys.dAll_filenames+
+            ExternalKeys.dAll_filenames;
+            
+  EXPORT  dAllLogicalFiles  :=  
+            PROJECT(
+              STD.File.LogicalFileList(Input.AsHeaderTemp[2..])+
+              STD.File.LogicalFileList(Input.BaseTemp[2..])+
+              STD.File.LogicalFileList(lPersistTemplate[2..]+pVersion+'*')+
+              STD.File.LogicalFileList(IngestCache[2..])+
+              //  Linking files may be hanging around after removing from multiple Superfiles
+              STD.File.LogicalFileList(Linking('*').Iteration.New[2..])+
+              STD.File.LogicalFileList(Linking('*').Changes.New[2..])+
+              //  Add logical file names from Superfiles because not all files are added to Superfiles in SALT generated code
+              PROJECT(dAllSuperFiles,TRANSFORM(STD.File.FsLogicalFileInfoRecord,SELF.name:=LEFT.logicalname;SELF:=[])),
+              //  Add tilde(~) to name field because the Tools require it
+              TRANSFORM(
+                STD.File.FsLogicalFileInfoRecord,
+                SELF.name :=  IF(LEFT.name[1]<>'~','~','')+LEFT.name;
+                SELF      :=  LEFT
+              )
+            );
+            
 END;

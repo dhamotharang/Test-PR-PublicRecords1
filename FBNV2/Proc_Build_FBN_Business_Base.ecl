@@ -1,4 +1,4 @@
-﻿IMPORT  _control, address, CCPA, fbnv2,  did_add,  didville, ut, header_slimsort, business_header, Business_Header_SS, watchdog, MDR, aid, PromoteSupers, Std;
+﻿IMPORT  _control, address, MDR, fbnv2,  did_add,  didville, ut, header_slimsort, business_header, Business_Header_SS, watchdog, MDR, aid, PromoteSupers, Std;
 
 dBusinessInputs := ungroup(Mapping_FBN_FL_Business)+
 				                         ungroup(Mapping_FBN_CA_San_Diego_Business)+				 
@@ -334,13 +334,13 @@ ut.MAC_Append_Rcid (rolledup_recs,source_rec_id,out_file);
 ///////////////////////////////////////////////////////////////////////////////////////
 
 //Apply Global_SID - TMSID[1..3]
-addGlobalSID 		:= CCPA.macGetGlobalSID(out_file, 'Fbn2', 'tmsid[1..3]', 'global_sid'); 
+addGlobalSID 		:= MDR.macGetGlobalSid(out_file, 'Fbn2', 'tmsid[1..3]', 'global_sid'); 
 
 withGSIDs				:= addGlobalSID(global_sid<>0);	//Global_SIDs Populated
 remainRec				:= addGlobalSID(global_sid=0);	//No Global_SIDs Populated
 
 //Apply Global_SID - TMSID[1..2]
-addGlobalSID2		:= CCPA.macGetGlobalSID(remainRec, 'Fbn2', 'tmsid[1..2]', 'global_sid');
+addGlobalSID2		:= MDR.macGetGlobalSid(remainRec, 'Fbn2', 'tmsid[1..2]', 'global_sid');
 
 //Concat All Results
 concatRecs			:= withGSIDs + addGlobalSID2;

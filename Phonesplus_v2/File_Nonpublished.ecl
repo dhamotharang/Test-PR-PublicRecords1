@@ -52,12 +52,14 @@ gong_nonpublished 			:= project(Gong_Neustar.File_History(publish_code = 'N' and
 //-----------------------Non-published records in targus------------------------------------
 targus_nonpublished			:=  project(Targus.File_consumer_base(stringlib.stringfind(phone_number, 'X', 1) > 0),
 								transform(temp_np_layout, 
-														self.DateFirstSeen  := if((unsigned3)left.dt_first_seen[1..6] > 0, (unsigned3)left.dt_first_seen[1..6],(unsigned3)left.dt_last_seen[1..6]);
-														self.DateLastSeen 	:= if((unsigned3)left.dt_last_seen[1..6] > 0, (unsigned3)left.dt_last_seen[1..6],(unsigned3)left.dt_first_seen[1..6]);
-													    self.publish_code 	:= 'N', 
+														vDateFirstSeen := (string)left.dt_first_seen;
+														vDateLastSeen  := (string)left.dt_last_seen;
+														self.DateFirstSeen  := if((unsigned3)vDateFirstSeen[1..6] > 0, (unsigned3)vDateFirstSeen[1..6],(unsigned3)vDateLastSeen[1..6]);
+														self.DateLastSeen 	:= if((unsigned3)vDateLastSeen[1..6] > 0, (unsigned3)vDateLastSeen[1..6],(unsigned3)vDateFirstSeen[1..6]);
+													  self.publish_code 	:= 'N'; 
 														self.phone 			:= left.phone_number;
 														self.zip5		  	:= left.zip;
-														self.FileID			:= 'TA',
+														self.FileID			:= 'TA';
 														self:= left)); 
 
 //---------------------All Non-publsied records--------------------------------------------

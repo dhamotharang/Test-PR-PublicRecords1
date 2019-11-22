@@ -5,6 +5,7 @@ import BIPV2_Suppression;
 import BizLinkFull;
 import SALT311;
 import Std.Str;
+import BIPV2_xlink_segmentation;
 
 // Should we disable fallback? Can we disable fallback?
 
@@ -17,6 +18,7 @@ export IdAppendRoxieLocal(
 		,boolean useFuzzy = true
 		,boolean doZipExpansion = true
 		,boolean reAppend = true
+		,boolean segmentation = true
 	) := function
 
 inputRecPlus := {
@@ -101,7 +103,11 @@ SALTInput := project(inputDsCnp, transform({BizLinkFull.Process_Biz_Layouts.Inpu
 ));
 
 // get meow_biz.raw_results
-rawResults := BizLinkFull.MEOW_Biz(SALTInput).raw_results; 
+meowBizRawResults := BizLinkFull.MEOW_Biz(SALTInput).raw_results; 
+
+OutSegResult := BIPV2_xlink_segmentation.mac_Segmentation(meowBizRawResults, ,UniqueId);
+
+rawResults := IF(segmentation, OutSegResult, meowBizRawResults);
 
 // apply score threshold
 // convert layout 

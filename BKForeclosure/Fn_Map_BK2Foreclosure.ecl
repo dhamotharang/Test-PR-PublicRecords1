@@ -1,4 +1,4 @@
-﻿IMPORT Address,BKForeclosure,codes,Property,STD;
+﻿IMPORT Address,BKForeclosure,codes,Property,STD,ut;
 #option('multiplePersistInstances',FALSE);
 
 EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
@@ -23,20 +23,38 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
     SELF.document_type := CHOOSE(uReoNod, lreo.doc_type_cd, lnod.doc_type );
     SELF.document_desc := CHOOSE(uReoNod, lreo.document_desc, lnod.document_desc );
     SELF.recording_date := CHOOSE(uReoNod, lreo.recording_date, lnod.recording_dt );
-    SELF.document_nbr := CHOOSE(uReoNod, lreo.recording_doc_num, lnod.recording_doc_num );
-    SELF.document_book := CHOOSE(uReoNod, lreo.recording_book_num, lnod.book_number );
-    SELF.document_pages := CHOOSE(uReoNod, lreo.recording_page_num, lnod.page_number );
+		SELF.document_year	:= Fn_get_document_date(CHOOSE(uReoNod, lreo.recording_doc_num, lnod.recording_doc_num ));
+		TempDocNbr				:= CHOOSE(uReoNod, lreo.recording_doc_num, lnod.recording_doc_num );
+    SELF.document_nbr := IF(LENGTH(STD.Str.Filter(TempDocNbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'))>12 AND REGEXFIND('[^0-9]',STD.Str.Filter(TempDocNbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')[1..2]),
+														STD.Str.Filter(TempDocNbr[7..],'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'),
+														IF(LENGTH(STD.Str.Filter(TempDocNbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'))>12 AND REGEXFIND('^[0-9]',STD.Str.Filter(TempDocNbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')[1..2]),
+															STD.Str.Filter(TempDocNbr[9..],'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'),
+															STD.Str.Filter(TempDocNbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')));
+		TempDocBook					:= STD.Str.Filter(CHOOSE(uReoNod, lreo.recording_book_num, lnod.book_number ),'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+    SELF.document_book	:= IF(LENGTH(TRIM(TempDocBook))>6 AND REGEXFIND('^[0]+',TempDocBook),ut.rmv_ld_zeros(TempDocBook),TempDocBook);
+		TempDocPages				:= STD.Str.Filter(CHOOSE(uReoNod, lreo.recording_page_num, lnod.page_number ),'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-');			 
+    SELF.document_pages := IF(LENGTH(TRIM(TempDocPages))>6 AND REGEXFIND('^[0]+',TempDocPages),ut.rmv_ld_zeros(TempDocPages),TempDocPages);
     SELF.title_company_name := CHOOSE(uReoNod, lreo.title_co_name, '' );
-    SELF.first_defendant_borrower_owner_first_name := CHOOSE(uReoNod, lreo.buyer1_fname, lnod.borrower1_fname );
-    SELF.first_defendant_borrower_owner_last_name := CHOOSE(uReoNod, IF(lreo.name1_first = '', '',lreo.buyer1_lname),
-																																		 IF(lnod.name1_first = '', '', lnod.borrower1_lname));
-    SELF.first_defendant_borrower_company_name := CHOOSE(uReoNod, IF( lreo.name1_first = '' AND lreo.buyer1_lname <> '', lreo.buyer1_lname, '' ),
-                                                                  IF( lnod.name1_first = '' AND lnod.borrower1_lname <> '', lnod.borrower1_lname, '' ));
-    SELF.second_defendant_borrower_owner_first_name := CHOOSE(uReoNod, lreo.buyer2_fname, lnod.borrower2_fname );
-    SELF.second_defendant_borrower_owner_last_name := CHOOSE(uReoNod, IF(lreo.name2_first = '', '', lreo.buyer2_lname), 
-																																				IF(lnod.name2_first = '', '', lnod.borrower2_lname ));
-    SELF.second_defendant_borrower_company_name := CHOOSE(uReoNod,IF(lreo.name2_first = '' AND lreo.buyer2_lname <> '', lreo.buyer2_lname, ''),
-                                                                  IF( lnod.name2_first = '' AND lnod.borrower2_lname <> '', lnod.borrower2_lname, '' ));
+		TempFirstBorrowerFirstName	:= CHOOSE(uReoNod, lreo.buyer1_fname, lnod.borrower1_fname );
+		TempFirstBorrowerLastName		:= CHOOSE(uReoNod, IF(lreo.name1_first = '', '',lreo.buyer1_lname),
+																									 IF(lnod.name1_first = '', '', lnod.borrower1_lname));
+    SELF.first_defendant_borrower_owner_first_name := TempFirstBorrowerFirstName;
+    SELF.first_defendant_borrower_owner_last_name := TempFirstBorrowerLastName;
+		TempFirstBorrowerCompany		:= CHOOSE(uReoNod, IF( lreo.name1_first = '' AND lreo.buyer1_lname <> '' , lreo.buyer1_lname, '' ),
+                                                      IF( lnod.name1_first = '' AND lnod.borrower1_lname <> '', lnod.borrower1_lname, '' ));
+    SELF.first_defendant_borrower_company_name := TempFirstBorrowerCompany;
+		TempSecondBorrowerFirstName	:= CHOOSE(uReoNod, lreo.buyer2_fname, lnod.borrower2_fname );
+		TempSecondBorrowerLastName	:= CHOOSE(uReoNod, IF(lreo.name2_first = '', '', lreo.buyer2_lname), 
+																									 IF(lnod.name2_first = '', '', lnod.borrower2_lname ));
+    SELF.second_defendant_borrower_owner_first_name := IF(TRIM(TempFirstBorrowerFirstName) = TRIM(TempSecondBorrowerFirstName) AND 
+																													TRIM(TempFirstBorrowerLastName) = TRIM(TempSecondBorrowerLastName),'',
+																													TempSecondBorrowerFirstName);
+    SELF.second_defendant_borrower_owner_last_name := IF(TRIM(TempFirstBorrowerFirstName) = TRIM(TempSecondBorrowerFirstName) AND 
+																													TRIM(TempFirstBorrowerLastName) = TRIM(TempSecondBorrowerLastName),'',
+																													TempSecondBorrowerLastName);
+		TempSecondBorrowerCompany		:= CHOOSE(uReoNod,IF(lreo.name2_first = '' AND lreo.buyer2_lname <> '', lreo.buyer2_lname, ''),
+                                                  IF( lnod.name2_first = '' AND lnod.borrower2_lname <> '', lnod.borrower2_lname, '' ));
+    SELF.second_defendant_borrower_company_name := IF(TRIM(TempFirstBorrowerCompany) = TRIM(TempSecondBorrowerCompany),'',TempSecondBorrowerCompany);
     SELF.date_of_default := CHOOSE(uReoNod, '', lnod.as_of_dt );
     SELF.amount_of_default := CHOOSE(uReoNod, '', lnod.unpaid_balance );
     SELF.court_case_nbr := CHOOSE(uReoNod, '', lnod.case_number );
@@ -76,7 +94,7 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
     SELF.original_document_number := CHOOSE(uReoNod, '', lnod.loan_doc_num );
     SELF.original_recording_book := CHOOSE(uReoNod, '', lnod.loan_book );
     SELF.original_recording_page := CHOOSE(uReoNod, '', lnod.loan_page );
-    SELF.parcel_number_parcel_id := CHOOSE(uReoNod, lreo.APN, lnod.APN );
+    SELF.parcel_number_parcel_id := CHOOSE(uReoNod, STD.Str.CleanSpaces(lreo.APN), STD.Str.CleanSpaces(lnod.APN)); //extra spaces in APN causing duplication issue
     SELF.property_indicator := CHOOSE(uReoNod, lreo.property_use_cd, '' );
     SELF.property_desc := CHOOSE(uReoNod, lreo.property_desc, '' );
     SELF.use_code := CHOOSE(uReoNod, lreo.asses_land_use, '' );	

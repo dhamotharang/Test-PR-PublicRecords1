@@ -1,6 +1,7 @@
 ﻿EXPORT Append_Lexid( pBaseFile ) := 
 FUNCTIONMACRO
 		import DID_Add;
+		FirstRinID := FraudGovPlatform.Constants().FirstRinID;
 		
 		dFileBase 		:= distribute	(pull(pBaseFile),record_id	);
 		without_did 	:= dFileBase(DID=0);
@@ -67,8 +68,8 @@ FUNCTIONMACRO
 												,dDidOut_dedup
 												,left.record_id = RIGHT.record_id
 												,Transform(recordof(left)
-												,SELF.did				:= right.did 
-												,SELF.did_score	:= right.did_score
+												,self.did := if(right.did<>0,right.did,left.rawlinkid)
+												,self.did_score := if(right.did_score<>0,right.did_score,if(left.rawlinkid >0 and left.rawlinkid <firstrinid,100,0)) 
 												,self:=left)
 												,left outer
 												,local

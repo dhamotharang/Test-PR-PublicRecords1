@@ -9,7 +9,7 @@ EXPORT Proc_Transfer_Needed_Keys () := function
 import rampscopy, dops,_Control;
 
 filestocopyds := dataset([
-{'thor_data400::key::aid::rawaid_to_acecahe_qa','','',''}
+ {'thor_data400::key::aid::rawaid_to_acecahe_qa','','',''}
 ,{'thor_data400::key::aircraft_id_qa','','',''}
 ,{'thor_data400::key::aircraft_reg_did_qa','','',''}
 ,{'thor_data400::key::american_student::qa::did2','','',''}
@@ -67,6 +67,7 @@ filestocopyds := dataset([
 ,{'thor_data400::key::vehiclev2::party_key_qa','','',''}
 ,{'thor_data400::key::watercraft_did_qa','','',''}
 ,{'thor_data400::key::watercraft_sid_qa','','',''}
+,{'thor_data400::key::watchdog_qa','','',''}
 			]
 															,rampscopy.layouts.filestocopy);
 
@@ -83,8 +84,8 @@ filestocopyds := dataset([
 											// ,false).begincopy;
 											
 PBKEY := dops.xFerRoxieFiles(filestocopyds
-											,'prod_esp.br.seisint.com'  	// dstthoresp - prod thor ESP
-											,'prod_dali.br.seisint.com'  	// dstthordali - prod dali
+											,'uspr-prod-thor-esp.risk.regn.net'  	// dstthoresp - prod thor ESP
+											,'uspr-prod-thor-dali.risk.regn.net'  	// dstthordali - prod dali
 											,'thor400_44'  								// dstthorcluster - different cluster
 											,'8010' 											// dstthorespport
 											,'prod' // destenv - prod or dr or dev or some environment identity, this value will be used in dops.copyconstants.copyfile

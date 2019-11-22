@@ -1,4 +1,4 @@
-﻿IMPORT	Header, Address, ut, NID,Std;
+﻿﻿IMPORT	Header, Address, ut, NID,Std;
 EXPORT	fn_setRecordStatus(	STRING	pVersion,
 														Constants().buildType	pBuildType	= Constants().buildType.Daily)	:=	FUNCTION
 
@@ -90,7 +90,7 @@ EXPORT	fn_setRecordStatus(	STRING	pVersion,
 														LEFT.Original_Contract_Account_Number	=		RIGHT.Original_Contract_Account_Number	AND
 														LEFT.Account_Type_Reported						=		RIGHT.Account_Type_Reported		AND
 														LEFT.Extracted_Date										<=	RIGHT.Extracted_Date					AND
-														LEFT.process_date											<		RIGHT.process_date,
+														LEFT.process_date											<=		RIGHT.process_date,
 													tAccountsDeleted(LEFT,RIGHT),
 													LEFT OUTER,
 													LOCAL

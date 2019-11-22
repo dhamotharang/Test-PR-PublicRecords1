@@ -85,12 +85,13 @@ Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 																						(data)TRIM(SELF.clean_email, LEFT, RIGHT) + //using clean field as orig is pretty messy
 																						(data)TRIM(SELF.email_src, LEFT, RIGHT));
 	SELF.rules											:= 0;
-	SELF.global_sid                 := 25651;
 	SELF := input;
 	SELF := [];
 END;
 
-t_mappend_f := PROJECT(domain_d, t_map_to_common(LEFT));
+t_mappend_f 	:= PROJECT(domain_d, t_map_to_common(LEFT));
 
-RETURN t_mappend_f;//(~Entiera.fn_profanity(clean_email));
+addGlobalSID 	:= mdr.macGetGlobalSID(t_mappend_f,'EmailDataV2','email_src','global_sid'); //DF-25302: Populate Global_SID
+
+RETURN addGlobalSID;//(~Entiera.fn_profanity(clean_email));
 END;

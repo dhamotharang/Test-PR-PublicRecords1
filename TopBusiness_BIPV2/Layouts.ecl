@@ -9,7 +9,8 @@ EXPORT Layouts := MODULE
   end;
 
  shared rec_industry_section_fields := record
-   string4 siccode; 
+   string8 siccode; 
+   string4 siccode_plus := ''; 
    string6 naics; 
    string350 industry_description;
    string1502 business_description;

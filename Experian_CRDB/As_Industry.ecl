@@ -1,4 +1,4 @@
-IMPORT TopBusiness_BIPV2, ut, _Validate, MDR;
+﻿IMPORT TopBusiness_BIPV2, ut, _Validate, MDR;
 
 dsExperian_CRDB := Experian_CRDB.Files().base.qa;
 
@@ -15,8 +15,8 @@ Industry_Layout_seq Norm_Industry(dsExperian_CRDB L, INTEGER C) := TRANSFORM
   SELF.source                    := MDR.sourceTools.src_Experian_CRDB;
   SELF.source_docid              := TRIM(L.experian_bus_id,LEFT,RIGHT);
   SELF.source_rec_id             := L.source_rec_id;          
-  SELF.siccode                   := CHOOSE(C, L.primary_sic_code_4_digit, L.primary_sic_code[1..4], L.second_sic_code[1..4], L.third_sic_code[1..4],
-                                              L.fourth_sic_code[1..4], L.fifth_sic_code[1..4], L.sixth_sic_code[1..4],
+  SELF.siccode                   := CHOOSE(C, L.primary_sic_code_4_digit, L.primary_sic_code, L.second_sic_code, L.third_sic_code,
+                                              L.fourth_sic_code, L.fifth_sic_code, L.sixth_sic_code,
                                               '', '', '', ''); 
   SELF.naics                     := CHOOSE(C, '', '', '', '', '', '', '',
                                               L.primary_naics_code, L.second_naics_code, L.third_naics_code, L.fourth_naics_code); 

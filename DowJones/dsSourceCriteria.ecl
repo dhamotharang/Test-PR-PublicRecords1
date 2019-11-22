@@ -1805,6 +1805,24 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2019/1375 ISIL (Da\'esh) and Al-Qaida List','1792'},
 {'National Anti-Corruption Directorate (Romania) Final Convictions','1793'},
 {'EC (CFSP) 2019/1405 Ukraine List','1794'},
-{'EC 2019/1403 Ukraine List','1795'}
+{'EC 2019/1403 Ukraine List','1795'},
+{'EC (CFSP) 2019/1576 Central African Republic List','1796'},
+{'EC 2019/1574 Central African Republic List','1797'},
+{'EC (CFSP) 2019/1596 Venezuela List','1798'},
+{'EC 2019/1586 Venezuela List','1799'},
+{'OFAC - Foreign Interference in a United States Election List','1800'},
+{'ATO (Australia) Disqualified Trustees Register List','1801'},
+{'Indian Home Affairs Ministry Unlawful Activities','1802'},
+{'OFAC - Executive Order on the Situation in Syria','1803'},
+{'EC 2019/1731 ISIL (Da\'esh) and Al-Qaida List','1804'},
+{'EC (CFSP) 2019/1788 Burundi List','1805'},
+{'EC 2019/1779 Burundi List','1806'},
+{'AMBD (Brunei Darussalam) Alert List','1807'},
+{'CBIRC (China) National Enforcement Actions','1808'},
+{'CBIRC (China) Provincial Enforcement Actions','1809'},
+{U'Singapore Exchange Directors’ and Executive Officers’ Watch List','1810'},
+{'Government of Malta Freezing Orders','1811'},
+{'EC (CFSP) 2019/1893 Venezuela List','1812'},
+{'EC 2019/1891 Venezuela List','1813'}
 ],r);
 

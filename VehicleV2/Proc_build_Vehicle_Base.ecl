@@ -1,4 +1,4 @@
-﻿import _control, CCPA, vehicleV2, PromoteSupers, Std;
+﻿import _control, MDR, vehicleV2, PromoteSupers, Std;
 															
 //build vehicle main & party base file
 
@@ -11,7 +11,7 @@ concatMain 		:= VehicleV2.Map_Experian_Main			          +
 								 VehicleV2.mapping_Infutor_Motorcycle_main 	+
 								 VehicleV2.mapping_Infutor_Vin_main;
 									
-addGlobalSID 	:= CCPA.macGetGlobalSID(concatMain, 'VehicleV2', 'source_code', 'global_sid'); //DF-26080: Populate Global_SID Field
+addGlobalSID 	:= MDR.macGetGlobalSid(concatMain, 'VehicleV2', 'source_code', 'global_sid'); //DF-26080: Populate Global_SID Field
 
 //build main file
 PromoteSupers.MAC_SF_BuildProcess(	addGlobalSID,
@@ -22,7 +22,7 @@ PromoteSupers.MAC_SF_BuildProcess(	addGlobalSID,
 		
 //prep party file
 concatParty		:= VehicleV2.VehicleV2_DID	+	VehicleV2.irs_dummy_recs_party;
-addGlobalSID2 := CCPA.macGetGlobalSID(concatParty, 'VehicleV2', 'source_code', 'global_sid'); //DF-26080: Populate Global_SID Field
+addGlobalSID2 := MDR.macGetGlobalSid(concatParty, 'VehicleV2', 'source_code', 'global_sid'); //DF-26080: Populate Global_SID Field
 
 //build party file		
 PromoteSupers.MAC_SF_BuildProcess(	addGlobalSID2,

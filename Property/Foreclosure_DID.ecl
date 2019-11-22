@@ -1,7 +1,7 @@
-﻿import _control, bipv2, CCPA, ut, MDR, BKForeclosure, Std;
+﻿import _control, bipv2, MDR, ut, MDR, BKForeclosure, Std;
 
 foreclosureIn 				:= property.File_Foreclosure_In;  //contains both new and base file data
-addGSForeclosureIn		:= CCPA.macGetGlobalSID(foreclosureIn,'Foreclosure','','global_sid'); //DF-25926: Add Global_SID
+addGSForeclosureIn		:= MDR.macGetGlobalSid(foreclosureIn,'Foreclosure','','global_sid'); //DF-25926: Add Global_SID
 
 layout_foreclosureIn 	:= recordof(addGSForeclosureIn);
 normalizeDIDLayout 		:= recordof(Property.File_Foreclosure_Normalized);
@@ -229,7 +229,7 @@ end;
 
 //Distribute the data before denormalize to avoid skewing
 foreclosureInDist					:=	DISTRIBUTE(addGSForeclosureIn, HASH32(sequence));
-foreclosureNormalizedDist	:=	DISTRIBUTE(Property.foreclosure_normalized, HASH32(sequence));
+foreclosureNormalizedDist	:=	DISTRIBUTE(Property.foreclosure_normalized(source = 'FR'), HASH32(sequence)); //only want CL data as BK is appended at the end
 
 foreclosureBase := denormalize(foreclosureInDist, foreclosureNormalizedDist,
 									left.sequence = right.sequence,
@@ -238,12 +238,12 @@ foreclosureBase := denormalize(foreclosureInDist, foreclosureNormalizedDist,
 
 //Combine BlackKnight base files, mapped to Foreclosure_base layout, with Core Logic base file. Project CL into base and add source code
 ForceclosureBaseV2 := PROJECT(foreclosureBase,TRANSFORM(Property.Layout_Fares_Foreclosure_v2, 
-																												SELF.SOURCE := MDR.sourceTools.src_Foreclosures;
+																												SELF.SOURCE := IF(TRIM(LEFT.SOURCE) IN ['B7','I5'],LEFT.SOURCE,MDR.sourceTools.src_Foreclosures); //make sure not overwritting BK records although there shouldn't be any
 																												SELF := LEFT; SELF := [])); //To combine BK and CL
 
 BKforeclosureBase	:= BKForeclosure.Fn_Map_BK2Foreclosure;
 
-CombineAll	:= ForceclosureBaseV2 + BKforeclosureBase;
+CombineAll	:= DEDUP(SORT(ForceclosureBaseV2 + BKforeclosureBase,foreclosure_id,-process_date),ALL);
 
 ut.mac_suppress_by_phonetype(CombineAll,		attorney_phone_nbr,state,                   phone_out1);
 ut.mac_suppress_by_phonetype(phone_out1,     lender_phone,      lender_beneficiary_state,phone_out2);
