@@ -669,9 +669,10 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
 																														RunRelocation := RunRelocation);
 
     // SCORE THE PHONES
-    model_results  := if(version = v_enum.CP_V3, // these are the models for Phone Shell v1.0
-															Phone_Shell.PhoneScore_cp3_v3(phones_with_attrs, Phone_Shell.Constants.Default_PhoneScore),
-															Phone_Shell.PhoneScore_wf8_v3(phones_with_attrs));//v_enum.WFP_V8
+
+    model_results  := if(version = v_enum.CP_V3, // these are the models for Phone Shell v1.0, use the old score threshold too
+															Phone_Shell.PhoneScore_cp3_v3(phones_with_attrs, 217),
+															Phone_Shell.PhoneScore_wf8_v3(phones_with_attrs, 217));//v_enum.WFP_V8
     // model_results := Phone_Shell.PhoneModel_v21_1(phones_with_attrs); // new combined model for Phone Shell v2.1+
 
     STRING2 map_source_code_phone_shell(STRING10 ph_type) := MAP
