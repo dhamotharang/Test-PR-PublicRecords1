@@ -98,8 +98,8 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 										self.RecordCode := left.RecordCode;
 										)), hash32(CaseId));
 										
-	cases := DEDUP(SORT(ca1, CaseId,ProgramState,ProgramCode, local),
-									CaseId,ProgramState,ProgramCode, local);
+	cases := DEDUP(SORT(ca1, CaseId,ProgramState,ProgramCode,GroupId, local),
+									CaseId,ProgramState,ProgramCode,GroupId, local);
 
 	cl1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 											self := LEFT.ClientRec;
@@ -107,16 +107,16 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 											)
 										), HASH32(ClientId));
 
-	clients := DEDUP(SORT(cl1, ClientId,CaseId,ProgramState,ProgramCode, local),
-									ClientId,CaseId,ProgramState,ProgramCode, local);
+	clients := DEDUP(SORT(cl1, ClientId,CaseId,ProgramState,ProgramCode,GroupId, local),
+									ClientId,CaseId,ProgramState,ProgramCode,GroupId, local);
 
 	ad1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
 												self := LEFT.AddressRec;
 												self.RecordCode := left.RecordCode;
 												self := [])), HASH32(CaseId, ClientId));
 
-	addresses := DEDUP(SORT(ad1, CaseId,ClientId,ProgramState,ProgramCode,AddressType, local),
-									CaseId,ClientId,ProgramState,ProgramCode,AddressType, local);
+	addresses := DEDUP(SORT(ad1, CaseId,ClientId,ProgramState,ProgramCode,GroupId,AddressType, local),
+									CaseId,ClientId,ProgramState,ProgramCode,GroupId,AddressType, local);
 
 	ds1 := PROJECT(cases, TRANSFORM(layout_Base2,
 								self.ProgramState := left.ProgramState;
@@ -150,6 +150,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					// save case information
 					self.ProgramState := left.ProgramState;
 					self.ProgramCode := left.ProgramCode;
+					self.GroupId := left.GroupId;
 					self.CaseId := left.CaseId;
 					self.RegionCode := left.RegionCode;
 					self.CountyCode := left.CountyCode;
@@ -158,6 +159,10 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					self.case_Phone1 := left.case_Phone1;
 					self.case_Phone2 := left.case_Phone2;
 					self.case_Email := left.case_Email;
+					self.filename := left.filename;
+					self.OrigGroupId := left.OrigGroupId;
+					self.Created := left.Created;
+					self.Updated := left.Updated;
 										
 					// add client information
 					self.eligibility_status_indicator := right.Eligibility;
