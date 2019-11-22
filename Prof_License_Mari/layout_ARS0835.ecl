@@ -41,6 +41,7 @@ EXPORT layout_ARS0835 := MODULE
 	STRING100  FullName,
 	STRING50   Address1,
 	STRING50   Address2,
+	STRING50   Address3,   //city, state, zip
   // STRING30   City,
 	// STRING10   State,
 	// STRING10   Zip,

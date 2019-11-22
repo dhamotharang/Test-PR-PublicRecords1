@@ -33,6 +33,7 @@ EXPORT Superfile_List := module
 	export sfReady := '~nac::out::ready';			// New Base2 file prepped for ingest
 	export sfProcessing := '~nac::out::processing';			// New Base2 file being processed for ingest
 	export sfProcessed := '~nac::out::processed';			// New Base2 file archived after ingest
+	export sfOnboarding := '~nac::out::onboarding';			// For testing: do not process these files
 	
 	export Promote(string sf, string filename) := FUNCTION
 			sfList := [
