@@ -5,5 +5,6 @@ EXPORT layouts := module
      export payload := RECORD
         keyed_fields;
         string category;
+        string id;
     end;
 end;
