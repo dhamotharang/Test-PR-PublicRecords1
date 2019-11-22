@@ -4,7 +4,7 @@ export _Dataset(boolean pUseProd = false) := module
 
 	export Name										:= 'CFPB';
 	export thor_cluster_Files			:= 	if(pUseProd 
-																			,VersionControl.foreign_prod + 'thor_data400::',
+																			,VersionControl.foreign_prod + 'thor::',
 																			'~thor50_dev_eclcc::' //this is the one I'm allowed to use
 																		);
 	export thor_cluster_Persists	:= thor_cluster_Files		;

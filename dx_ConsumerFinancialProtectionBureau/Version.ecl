@@ -1,5 +1,5 @@
 export version := module
-    export qa := '_qa';
-    export father := '_father';
-    export grandfather := '_grandfather';
+    export qa := 'qa';
+    export father := 'father';
+    export grandfather := 'grandfather';
 end;
