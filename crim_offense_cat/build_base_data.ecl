@@ -19,7 +19,7 @@ export build_Base_Data(boolean pUseProd = false) := function
                 L.id
                 );
             self.category := L.category;
-        END;
+    END;
     final_data := project(rawdata, remove_quotes(left));
     RETURN final_data;
 END;
