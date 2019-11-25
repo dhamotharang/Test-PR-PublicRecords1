@@ -664,6 +664,7 @@ Export CIID := RECORD
 	unsigned8 Record_ID;
 	unsigned6 fdn_file_info_id;
 	integer1 relativeaddressmatch;
+	unsigned6 did_orig;
  END;
  
  Export Crim	:= RECORD
@@ -676,6 +677,7 @@ Export CIID := RECORD
  string20	lname_orig;
  string10	ssn_orig;
  string10	dob_orig;
+ unsigned6 did_orig;
  END;
  
  Export Death	:= RECORD
@@ -683,6 +685,7 @@ Export CIID := RECORD
  string errorcode;
  unsigned8 Record_ID;
  unsigned6 fdn_file_info_id;
+ unsigned6 did_orig;
  END;
  
  Export FraudPoint	:= RECORD
@@ -2067,6 +2070,7 @@ EXPORT fullgraph	:= RECORD
  Export Advo	:= Record
   unsigned8 record_id;
   unsigned6 fdn_file_info_id;
+	unsigned6 did;
   string1 advo_hitflag;
   string1 advo_vacancyindicator;
   string1 advo_throwbackindicator;
