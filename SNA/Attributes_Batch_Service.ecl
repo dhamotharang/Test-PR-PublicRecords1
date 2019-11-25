@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SNA Attributes Batch Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="GLBPurpose" type="xsd:byte"/>
@@ -61,7 +61,7 @@
 </pre>
 */
 
-import address, risk_indicators, models, riskwise, ut, fcra_opt_out, SNA, AutoStandardI;
+import address, risk_indicators, SNA, AutoStandardI, Doxie, Didville, STD;
 
 
 EXPORT Attributes_Batch_Service := MACRO
@@ -120,6 +120,20 @@ EXPORT Attributes_Batch_Service := MACRO
   batch_in_preseq := dataset( [], layout_in ) : stored('batch_in',few);
 	unsigned1 DPPA := 0 : stored('DPPAPurpose');
 	unsigned1 GLB  := AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
+  
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+    string TransactionID := '' : STORED('_TransactionId');
+    string BatchUID := '' : STORED('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+    
+    mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := ^.glb;
+	EXPORT dppa := ^.dppa;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 	// can't have duplicate definitions for the Stored value DataRestrictionMask, 
 	// so we need workaround to check if datarestriction stored is the global default
 	// if restriction=global default of '1    0', then use risk_indicators default instead
@@ -191,11 +205,11 @@ EXPORT Attributes_Batch_Service := MACRO
 		cleaned_name := address.CleanPerson73(le.UnParsedFullName);
 		boolean valid_cleaned := le.UnParsedFullName <> '';
 		
-		self.fname  := StringLib.StringToUppercase(if(le.Name_First=''   AND valid_cleaned, cleaned_name[6..25], le.Name_First));
-		self.lname  := StringLib.StringToUppercase(if(le.Name_Last=''    AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
-		self.mname  := StringLib.StringToUppercase(if(le.Name_Middle=''  AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
-		self.suffix := StringLib.StringToUppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
-		self.title  := StringLib.StringToUppercase(if(valid_cleaned, cleaned_name[1..5],''));
+		self.fname  := STD.Str.ToUppercase(if(le.Name_First=''   AND valid_cleaned, cleaned_name[6..25], le.Name_First));
+		self.lname  := STD.Str.ToUppercase(if(le.Name_Last=''    AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
+		self.mname  := STD.Str.ToUppercase(if(le.Name_Middle=''  AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
+		self.suffix := STD.Str.ToUppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
+		self.title  := STD.Str.ToUppercase(if(valid_cleaned, cleaned_name[1..5],''));
 
 		street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 		clean_a2 := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;											
@@ -224,8 +238,8 @@ EXPORT Attributes_Batch_Service := MACRO
 		self.county        := clean_a2[143..145];
 		self.geo_blk       := clean_a2[171..177];
 
-		// self.dl_number := StringLib.StringToUppercase(riskwise.cleanDL_num(le.dl_number));
-		// self.dl_state  := StringLib.StringToUppercase(le.dl_state);
+		// self.dl_number := STD.Str.ToUppercase(riskwise.cleanDL_num(le.dl_number));
+		// self.dl_state  := STD.Str.ToUppercase(le.dl_state);
 
 		// SELF.ip_address := le.ip_addr;
 		self := [];
@@ -247,7 +261,7 @@ EXPORT Attributes_Batch_Service := MACRO
   resu_did := resu + project( iid_prep_acct( did != 0 ), didville.Layout_Did_OutBatch );
 
   // attributes for each person
-    attribs := SNA.GetAttributes( ungroup(resu_did), GLB, DPPA, DataRestriction );
+    attribs := SNA.GetAttributes( ungroup(resu_did), GLB, DPPA, DataRestriction, mod_access );
     attribs0 := attribs( seq % 2 = 0 );
     attribs1 := attribs( seq % 2 = 1 );
 
@@ -283,7 +297,7 @@ EXPORT Attributes_Batch_Service := MACRO
     END;
     // one or the other may have no did (either not input or unable to did-append), so do an inner join here
     with2dids := join( resu0, resu1, left.seq+1 = right.seq /* and left.did!=right.did (?) */, p2p(left,right), keep(1) );
-    attributes_p2p := SNA.PersonToPersonAttributes( with2dids, GLB, DPPA, DataRestriction );
+    attributes_p2p := SNA.PersonToPersonAttributes( with2dids, GLB, DPPA, DataRestriction, mod_access);
   //
 
   SNA.Layouts.Layout_Batch_Attributes_v1 batchify( attribs_both le, attributes_p2p ri ) := TRANSFORM
