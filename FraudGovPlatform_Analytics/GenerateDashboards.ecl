@@ -47,6 +47,7 @@
 															STD.File.StartSuperFileTransaction(),
 															STD.File.ClearSuperfile(CustSuperFileName,true),
 															STD.File.ClearSuperfile(Cust1_1SuperFileName,true),
+															STD.File.ClearSuperfile(HighRiskIdSuperFileName,true),
 															STD.File.ClearSuperfile(ClusterSuperFileName,true),
 															STD.File.FinishSuperFileTransaction();
 														);
