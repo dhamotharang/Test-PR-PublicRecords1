@@ -16,9 +16,11 @@
 
 	CustSuperFileName 				:= FraudGovPlatform.Filenames().CustomerDashboard;
 	Cust1_1SuperFileName 			:= FraudGovPlatform.Filenames().CustomerDashboard1_1;
+	HighRiskIdSuperFileName 	:= FraudGovPlatform.Filenames().HighRiskIdentity;
 	ClusterSuperFileName			:= FraudGovPlatform.Filenames().ClusterDetails;
 	custLogicalfilename				:= CustSuperFileName +'::'+(STRING8)STD.Date.Today();
 	cust1_1Logicalfilename		:= Cust1_1SuperFileName +'::'+(STRING8)STD.Date.Today();
+	highriskidLogicalfilename	:= HighRiskIdSuperFileName +'::'+(STRING8)STD.Date.Today();
 	clusterLogicalfilename		:= ClusterSuperFileName +'::'+(STRING8)STD.Date.Today();
 
 	dRunCustDashboard							:= DATASET(FraudGovPlatform_Analytics.fnRunCustomerDashboard(runProd, useProdData, newVersion, updateROSE));
