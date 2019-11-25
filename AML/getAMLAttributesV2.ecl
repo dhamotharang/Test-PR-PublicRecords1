@@ -1,5 +1,5 @@
 ﻿
-import Risk_Indicators, iesp, doxie, Gateway, Address;
+import Risk_Indicators, iesp, doxie, Gateway, Address, AML;
 
 EXPORT getAMLattributesV2 (DATASET(Risk_Indicators.Layout_Input) iid_prep, 
 																						string50 DataRestrictionMask, 
@@ -201,7 +201,7 @@ Addproperty :=  join(IID, GetProperty,
 															self.propertyCount := right.owned.property_total;
 															self := left), left outer);
 
-GetWatercraft := AML.IndWatercraft(Addproperty);
+GetWatercraft := AML.IndWatercraft(Addproperty, mod_access);
 
 getAircraft :=   AML.IndAircraft(GetWatercraft);
 
@@ -226,7 +226,7 @@ GetAddrAttrib := 			AML.IndAddrAttrib(getAircraft, dppa,
 //  99 -  no clue who this person is or how they got in here
 
 
-GetBusnExes := AML.IndGetBusnAssoc(ungroup(IID));
+GetBusnExes := AML.IndGetBusnAssoc(ungroup(IID), mod_access);
 
 busnexec := GetBusnExes(relatdegree in[50,52]);
 
@@ -331,7 +331,7 @@ PrepIndivProfLic := project(IID,
 																			
 PrepProfLic  := 	dedup(sort(busnexec + PrepIndivProfLic, seq, assocdid), seq, assocdid);																		
 
-GetProfLic  := AML.IndProfLic(PrepProfLic, isFCRA , DataRestrictionMask);
+GetProfLic  := AML.IndProfLic(PrepProfLic, isFCRA , DataRestrictionMask, mod_access);
 
 											
 //Relatives, indiv and execs section											
@@ -370,7 +370,7 @@ ExecDerogPrep  := project(GetBusnExes(isexec and relatdegree = 52), PregexecDero
 DDExecDerogPrep := dedup(sort(ExecDerogPrep, seq, did), seq, did);
 
 //  need relatives and execs
-GetRelatAMLCrim := AML.IndAllLegalEvents((DDRelatDerogPrep + DDExecDerogPrep),isFCRA);
+GetRelatAMLCrim := AML.IndAllLegalEvents((DDRelatDerogPrep + DDExecDerogPrep),isFCRA, mod_access);
 
 
 // relatives, assoc exec, exec relatives and individual
@@ -395,9 +395,9 @@ ExecSSNPrep := project(busnexecparents + busnexecRelatives + busnexecAssoc, Prep
 SSNIDS := GetRelatives + ExecSSNPrep;
 
 // need indiv, relatives, assoc exec, execs parents to go in
-GetSSNFlags := SSNData(SSNIDS,dppa, glba,isFCRA , DataRestrictionMask,  FALSE, bsversion);  //Layouts.RelatLayoutV2 IsBusn = False
+GetSSNFlags := SSNData(SSNIDS,dppa, glba,isFCRA , DataRestrictionMask,  FALSE, bsversion, mod_access);  //Layouts.RelatLayoutV2 IsBusn = False
 
-GetHeader := AML.IndGetHeader(GetSSNFlags, dppa, glba,isFCRA , DataRestrictionMask);  //Layouts.RelatLayoutV2
+GetHeader := AML.IndGetHeader(GetSSNFlags, dppa, glba,isFCRA , DataRestrictionMask, mod_access);  //Layouts.RelatLayoutV2
 	
 	
 
@@ -465,7 +465,7 @@ PrepStudentExecIDS := ungroup(project(busnexec (relatdegree in [50,52]), PrepStu
 
 StudentIDs := dedup(sort(PrepStudentExecIDS + PrepStudentIndivIDS, seq,did), seq,did);
 
-GetStudentDegree := ungroup(AMLStudent(grouped(StudentIDs, seq, did)));
+GetStudentDegree := ungroup(AMLStudent(grouped(StudentIDs, seq, did), mod_access));
 
 AddStudentDegree := join(AddRelatDerogs(relatdegree = 0), GetStudentDegree,
                         left.seq = right.seq and

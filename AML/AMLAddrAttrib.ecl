@@ -1,6 +1,6 @@
-﻿import Easi, ut, risk_indicators, Riskwise, ADVO, business_risk, Address_Attributes, doxie;
+﻿import Easi, ut, risk_indicators, Riskwise, ADVO, business_risk, Address_Attributes, AML;
 
-export AMLAddrAttrib(GROUPED DATASET(Risk_indicators.layout_output) AMLAddr, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION 
+export AMLAddrAttrib(GROUPED DATASET(Risk_indicators.layout_output) AMLAddr) := FUNCTION 
 
 
 used_census := EASI.Layout_Easi_Census;

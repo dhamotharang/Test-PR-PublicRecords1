@@ -2,7 +2,7 @@
  *        This function gathers the EDA_Characteristics attributes.	      *
  ************************************************************************ */
 
-IMPORT Gong, Phone_Shell, RiskWise, UT, STD, doxie;
+IMPORT Gong, Phone_Shell, RiskWise, UT, STD, doxie, Suppress;
 
 todays_date := (string) STD.Date.Today();
 
@@ -27,7 +27,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 	/* ************************************************************************
 	 *  Get Current EDA Records																								*
 	 ************************************************************************ */
-	layoutEDA getEDAAttributes(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Gong.key_history_phone ri) := TRANSFORM
+	{layoutEDA, unsigned4 global_sid} getEDAAttributes(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Gong.key_history_phone ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.dt_first_seen := ri.dt_first_seen;
 		SELF.dt_last_seen := ri.dt_last_seen;
 		SELF.Prim_Range := ri.prim_range;
@@ -116,9 +117,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		SELF := le;
 	END;
 	
-	edaAttributes := JOIN(Input, Gong.key_history_phone, TRIM(LEFT.Gathered_Phone) NOT IN ['', '0'] AND KEYED(LEFT.Gathered_Phone[1..3] = RIGHT.p3 AND LEFT.Gathered_Phone[4..10] = RIGHT.p7) AND RIGHT.current_flag = TRUE,
+	edaAttributes_unsuppressed := JOIN(Input, Gong.key_history_phone, TRIM(LEFT.Gathered_Phone) NOT IN ['', '0'] AND KEYED(LEFT.Gathered_Phone[1..3] = RIGHT.p3 AND LEFT.Gathered_Phone[4..10] = RIGHT.p7) AND RIGHT.current_flag = TRUE,
 																				getEDAAttributes(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
-																				
+	edaAttributes := Suppress.Suppress_ReturnOldLayout(edaAttributes_unsuppressed, mod_access, layoutEDA);												
 	uniqueDIDCurr := DEDUP(SORT(edaAttributes, Unique_Record_Sequence, Clean_Input.Seq, Gathered_Phone, EDA_Characteristics.EDA_DID, EDA_Characteristics.EDA_BDID), Unique_Record_Sequence, Clean_Input.Seq, Gathered_Phone, EDA_Characteristics.EDA_DID, EDA_Characteristics.EDA_BDID);
 	
 	layoutEDA rollUniqueDIDCurr(layoutEDA le, layoutEDA ri) := TRANSFORM
@@ -145,7 +146,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 	/* ************************************************************************
 	 *  Get Historical EDA Records																						*
 	 ************************************************************************ */
-	layoutEDA getEDAAttributesHist(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Gong.key_history_phone ri) := TRANSFORM
+	{layoutEDA, unsigned4 global_sid} getEDAAttributesHist(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Gong.key_history_phone ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.dt_first_seen := ri.dt_first_seen;
 		SELF.dt_last_seen := ri.dt_last_seen;
 		SELF.Prim_Range := ri.prim_range;
@@ -208,9 +210,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		SELF := le;
 	END;
 	
-	edaAttributesHist := JOIN(Input, Gong.key_history_phone, TRIM(LEFT.Gathered_Phone) NOT IN ['', '0'] AND KEYED(LEFT.Gathered_Phone[4..10] = RIGHT.p7 AND LEFT.Gathered_Phone[1..3] = RIGHT.p3) AND RIGHT.current_flag = FALSE,
+	edaAttributesHist_unsuppressed := JOIN(Input, Gong.key_history_phone, TRIM(LEFT.Gathered_Phone) NOT IN ['', '0'] AND KEYED(LEFT.Gathered_Phone[4..10] = RIGHT.p7 AND LEFT.Gathered_Phone[1..3] = RIGHT.p3) AND RIGHT.current_flag = FALSE,
 																				getEDAAttributesHist(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
-																				
+	edaAttributesHist := Suppress.Suppress_ReturnOldLayout(edaAttributesHist_unsuppressed, mod_access, layoutEDA);												
+																			
 	uniqueDIDHist := DEDUP(SORT(edaAttributesHist, Unique_Record_Sequence, Clean_Input.Seq, Gathered_Phone, EDA_Characteristics.EDA_DID, EDA_Characteristics.EDA_BDID), Unique_Record_Sequence, Clean_Input.Seq, Gathered_Phone, EDA_Characteristics.EDA_DID, EDA_Characteristics.EDA_BDID);
 	
 	layoutEDA rollUniqueDIDHist(layoutEDA le, layoutEDA ri) := TRANSFORM

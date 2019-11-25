@@ -1,5 +1,5 @@
 ﻿
-import american_student_list, Riskwise, AlloyMedia_student_list, MDR, risk_indicators, doxie, Suppress;
+import american_student_list, Riskwise, AlloyMedia_student_list, MDR, risk_indicators, doxie, Suppress, ut;
 
 export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean isMarketing, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 		
@@ -37,7 +37,16 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 		student(left,right), left outer, atmost(keyed(left.did=right.l_did), 100)
 	);
 	
-student_file := Suppress.Suppress_ReturnOldLayout(student_file_unsuppressed, mod_access, Layout_AS_Plus);
+student_file_flagged := Suppress.MAC_FlagSuppressedSource(student_file_unsuppressed, mod_access);
+
+student_file := PROJECT(student_file_flagged, TRANSFORM(Layout_AS_Plus, 
+		self.student.date_last_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.date_last_seen);
+		self.student.file_type2 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.file_type2);
+		self.student.college_tier := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_tier);
+		self.src := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.src);
+		self.student := IF(~left.is_suppressed, left.student);
+		SELF := LEFT;
+)); 
 
 	Layout_AS_Plus roll( Layout_AS_Plus le, Layout_AS_Plus ri ) := TRANSFORM
 		self := map(
@@ -158,7 +167,22 @@ student_file := Suppress.Suppress_ReturnOldLayout(student_file_unsuppressed, mod
 			and right.date_vendor_first_reported < risk_indicators.iid_constants.myGetDate(left.historydate),
 			alloy_main(left, right), atmost(keyed(left.did=right.did), 100));
 
-	alloy_file := Suppress.Suppress_ReturnOldLayout(alloy_file_unsuppressed, mod_access, Layout_AS_Plus);
+	alloy_file_flagged := Suppress.MAC_FlagSuppressedSource(alloy_file_unsuppressed, mod_access);
+
+	alloy_file := PROJECT(alloy_file_flagged, TRANSFORM(Layout_AS_Plus, 
+		self.student.college_major := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_major);
+		self.student.file_type  := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.file_type);
+		self.student.file_type2 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.file_type2);
+		self.student.college_type := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_type);
+		self.student.college_code := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_code);
+		self.student.class := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.class);
+		self.student.date_first_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.date_first_seen);
+		self.student.date_last_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.date_last_seen);
+		self.student.college_name := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_name);
+		self.student.college_tier := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_tier);
+		self.student.rec_type := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.rec_type);
+		SELF := LEFT;
+	)); 
 
 	student_all := group(rollup(sort(ungroup(student_file + alloy_file),seq,record /* use record to avoid indeterminate code */), roll(left,right), seq),seq);
 	return student_all;

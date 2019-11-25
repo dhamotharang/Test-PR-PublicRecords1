@@ -18,7 +18,9 @@ FUNCTION
                                  mod_access.DataRestrictionMask,
                                  mod_access.DataPermissionMask,
                                  ExecAtHomeV2.Constants.PROFILE_BOOSTER_ATTR_NAME,
-                                 FALSE); // DoModel: TRUE = get Banking Experience score: PBM1803_0_1_score
+                                 FALSE,
+								 glba := mod_access.glb,
+								 dppa := mod_access.dppa); // DoModel: TRUE = get Banking Experience score: PBM1803_0_1_score
 
   ds_ProfileBoostAttrs :=
   JOIN(ds_PII,ds_ProfBoosterAtts,
