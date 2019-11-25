@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Fraud_Defense_Manager_Batch_Service" wuTimeout="300000">
   <part name="Batch_In" type="tns:XmlDataSet" cols="100" rows="100"/>
   <part name="GLBPurpose" type="xsd:integer"/>
@@ -40,7 +40,7 @@
 */
 
 
-IMPORT Address, Gateway, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT, Royalty;
+IMPORT Gateway, Suspicious_Fraud_LN, Royalty;
 
 EXPORT Fraud_Defense_Manager_Batch_Service := MACRO
 	/* ************************************************************************
@@ -51,6 +51,21 @@ EXPORT Fraud_Defense_Manager_Batch_Service := MACRO
 	UNSIGNED1 GLBPurpose					:= 8 : STORED('GLBPurpose');
 	UNSIGNED1 DPPAPurpose					:= 0 : STORED('DPPAPurpose');
 	STRING DataRestrictionMask		:= '1    0' : STORED('DataRestrictionMask');
+	
+	//CCPA fields
+	unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+	
+	mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := GLBPurpose;
+	EXPORT dppa := DPPAPurpose;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
+
 	// Gateways Coded in this Product: NetAcuity
 	GatewaysTemp									:= Gateway.Configuration.Get();
 	Gateways 											:= GatewaysTemp (StringLib.StringToLowerCase(ServiceName) <> 'delta_inquiry'); // Filter out the Deltabase Gateway - Batch won't hit Deltabase
@@ -58,7 +73,7 @@ EXPORT Fraud_Defense_Manager_Batch_Service := MACRO
 	/* ************************************************************************
 	 *  Get the Identity Fraud Network Results                                      *
 	 ************************************************************************ */
-	results := Suspicious_Fraud_LN.Fraud_Defense_Manager_Search_Function(Batch_In, GLBPurpose, DPPAPurpose, DataRestrictionMask, Gateways);
+	results := Suspicious_Fraud_LN.Fraud_Defense_Manager_Search_Function(Batch_In, GLBPurpose, DPPAPurpose, DataRestrictionMask, Gateways, mod_access);
 	
 	/* ************************************************************************
 	 *  Project the Results into the Proper Output Layout                     *
