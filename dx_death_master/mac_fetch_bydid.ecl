@@ -21,12 +21,12 @@ EXPORT mac_fetch_bydid(ds_in, did_field, death_params, skip_GLB_check = FALSE, r
   LOCAL local_glb_ok := skip_GLB_check OR death_params.isValidGlb();  
   LOCAL local_dids := DEDUP(SORT(PROJECT(ds_in, TRANSFORM(doxie.layout_references, SELF.did := (UNSIGNED6) LEFT.did_field;)), did), did);
   LOCAL din_with_death := 
-    join(local_dids, key_death, keyed(left.did=right.l_did) and
+    JOIN(local_dids, key_death, keyed(left.did=right.l_did) and
       not deathv2_services.functions.Restricted(right.src, right.glb_flag, local_glb_ok, death_params),
     TRANSFORM(RIGHT), 
     KEEP(30), LIMIT(0)); // as of nov.2019 we have a max of 21 records per did, average 1.25 records per did.
   
-  LOCAL din_with_death_suppressed := suppress.MAC_SuppressSource(din_with_death, death_params, did_field, global_sid, data_env := _data_env); 
+  LOCAL din_with_death_suppressed := suppress.MAC_SuppressSource(din_with_death, death_params, l_did, global_sid, data_env := _data_env); 
 
   LOCAL layout_out_rec appendDeceased(RECORDOF(ds_in) L, RECORDOF(key_death) R) := TRANSFORM
     SELF.death.is_deceased := R.l_did > 0;
