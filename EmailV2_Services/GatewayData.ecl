@@ -153,7 +153,7 @@ EXPORT GatewayData := MODULE
                                             SELF:=[]),
                                  LEFT ONLY);
 
-    ds_email_in := ds_batch_in + input_only_emails;
+    ds_email_in := ds_batch_in + IF($.Constants.SearchType.isEIA(in_mod.SearchType), input_only_emails);  // for EIC if we didn't findPII based on email address, we cannot check identity
 
     // we need to check in domain lookup first to identify invalid domains and populate status for those:
     ds_email_with_domain := CheckDomainStatus(ds_email_in);
