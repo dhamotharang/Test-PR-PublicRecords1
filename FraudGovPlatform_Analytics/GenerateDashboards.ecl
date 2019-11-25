@@ -43,7 +43,7 @@
 
 	CreateSuper := Sequential(IF(~(STD.File.SuperFileExists(CustSuperFileName)), STD.File.CreateSuperFile(CustSuperFileName),output('CustomerDash Superfile already exists. Skipping creating superfile.')),
 															IF(~(STD.File.SuperFileExists(Cust1_1SuperFileName)), STD.File.CreateSuperFile(Cust1_1SuperFileName),output('CustomerDash 1_1 Superfile already exists. Skipping creating superfile.')),
-															IF(~(STD.File.SuperFileExists(ClusterSuperFileName)), STD.File.CreateSuperFile(ClusterSuperFileName),output('ClusterDetails Superfile already exists. Skipping creating superfile.')),
+															IF(~(STD.File.SuperFileExists(highriskidSuperFileName)), STD.File.CreateSuperFile(highriskidSuperFileName),output('highriskidentity Superfile already exists. Skipping creating superfile.')),															IF(~(STD.File.SuperFileExists(ClusterSuperFileName)), STD.File.CreateSuperFile(ClusterSuperFileName),output('ClusterDetails Superfile already exists. Skipping creating superfile.')),
 															STD.File.StartSuperFileTransaction(),
 															STD.File.ClearSuperfile(CustSuperFileName,true),
 															STD.File.ClearSuperfile(Cust1_1SuperFileName,true),
@@ -55,6 +55,7 @@
 		STD.File.StartSuperFileTransaction(),
 		STD.File.AddSuperFile(CustSuperFileName, custLogicalfilename),
 		STD.File.AddSuperFile(CustSuperFileName, cust1_1Logicalfilename),
+		STD.File.AddSuperFile(highriskidSuperFileName, highriskidLogicalfilename),
 		STD.File.AddSuperFile(ClusterSuperFileName, clusterLogicalfilename),
 		STD.File.FinishSuperFileTransaction());
 		
@@ -69,8 +70,8 @@
 	RunPersonStatsDeltaDashboard		:= OUTPUT(dRunPersonStatsDeltaDashboard);
 	RunNewClusterRecordsDashboard 	:= OUTPUT(dRunNewClusterRecordsDashboard);
 	RETURN PARALLEL(IF(runProd,
-											SEQUENTIAL(CreateSuper,RunCustDashboard_Prod,RunCustDashboard1_1_Prod,RunClusDetailsDashboard_Prod,RunHighRiskIdentity_Prod,AddFileToSuper),
-											SEQUENTIAL(RunCustDashboard, RunCustDashboard1_1, RunClusDetailsDashboard, RunHighRiskIdentity)
+											SEQUENTIAL(CreateSuper,RunCustDashboard_Prod,RunCustDashboard1_1_Prod,RunHighRiskIdentity_Prod,RunClusDetailsDashboard_Prod,AddFileToSuper),
+											SEQUENTIAL(RunCustDashboard, RunCustDashboard1_1, RunHighRiskIdentity, RunClusDetailsDashboard)
 											)
 								, IF(~runProd AND ~updateROSE, SEQUENTIAL(RunPersonStatsDeltaDashboard, RunNewClusterRecordsDashboard))
 									);
