@@ -10,7 +10,7 @@ EXPORT fn_filterBase1(Dataset($.Layouts.Base) b1, DATASET($.Layout_Base2) b2) :=
 						left.Case_State_Abbreviation = right.ProgramState and left.Case_Benefit_Type = right.ProgramCode
 						and (integer)(left.Case_Benefit_Month+'02') BETWEEN right.startdate and right.enddate,
 						TRANSFORM($.Layouts.Base, self := left),
-						INNER, LOCAL);
+						LEFT ONLY, LOCAL);
 
 	return j;
 END;
