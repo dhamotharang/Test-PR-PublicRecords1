@@ -131,6 +131,7 @@ EXPORT Records := MODULE
       EXPORT STRING14 did := (STRING)dids[1].did;
     END;
     hntMod := MODULE(PROJECT(glbMod,Hunting_Fishing_Services.Search_Records.params,opt))
+      doxie.compliance.MAC_CopyModAccessValues(mod_access);
       EXPORT STRING14 did := (STRING)dids[1].did;
     END;
     intMod := MODULE(PROJECT(glbMod,InternetDomain_Services.SearchService_Records.params,opt))
