@@ -1,10 +1,11 @@
-IMPORT Address, Doxie, Gateway, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
+﻿IMPORT Address, Doxie, Gateway, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT, STD;
 
 EXPORT Fraud_Defense_Manager_Search_Function(DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_In) Batch_In, 
 																				UNSIGNED1 GLBPurpose, 
 																				UNSIGNED1 DPPAPurpose, 
 																				STRING50 DataRestrictionMask,
-																				DATASET(Gateway.Layouts.Config) Gateways = Gateway.Constants.void_gateway) := FUNCTION
+																				DATASET(Gateway.Layouts.Config) Gateways = Gateway.Constants.void_gateway,
+																				doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	/* ************************************************
 	 *   Grab Gateway Information                     *
 	 **************************************************/
@@ -66,7 +67,7 @@ EXPORT Fraud_Defense_Manager_Search_Function(DATASET(Suspicious_Fraud_LN.layouts
 		SELF.Clean_Input.DeviceID := StringLib.StringToUpperCase(TRIM(le.DeviceID));
 		
 		HistoryDateYYYYMM := (UNSIGNED)(((STRING)le.ArchiveDate)[1..6]);
-		Today := (UNSIGNED)(ut.GetDate[1..6]);
+		Today := (UNSIGNED)((STRING8)Std.Date.Today())[1..6];
 		// If history date is populated and less than today's date, use historical date, otherwise run realtime
 		SELF.Clean_Input.ArchiveDate := IF(HistoryDateYYYYMM <= Today AND HistoryDateYYYYMM > 0, HistoryDateYYYYMM, 999999);
 		
@@ -164,39 +165,42 @@ EXPORT Fraud_Defense_Manager_Search_Function(DATASET(Suspicious_Fraud_LN.layouts
 	Append_Best := 0; // Don't need to append SSN
 	BSOptions := 0; // No special Boca Shell options, just want to append the DID
 	
-	didAppended := Risk_Indicators.iid_getDID_prepOutput(prepDIDInput, DPPAPurpose, GLBPurpose, isFCRA, BSVersion, DataRestrictionMask, Append_Best, Gateways, BSOptions);
+	didAppended := Risk_Indicators.iid_getDID_prepOutput(prepDIDInput, DPPAPurpose, GLBPurpose, isFCRA, BSVersion, DataRestrictionMask, Append_Best, Gateways, BSOptions, mod_access);
 	
 	with_DID := JOIN(cleanedInputDeduped, didAppended, LEFT.seq = RIGHT.seq, TRANSFORM(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus, SELF.Input_Echo.LexID := RIGHT.did; SELF.Clean_Input.DID := RIGHT.did; SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(RiskWise.max_atmost));
 	
 	/* ************************************************
 	 *  Gather Inquiries Data - Used For Risk Codes   *
 	 **************************************************/
-	AddressInquiries			:= Suspicious_Fraud_LN.Search_Inquiries_Address(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway);
+	AddressInquiries			:= Suspicious_Fraud_LN.Search_Inquiries_Address(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway, mod_access);
 	
-	EmailInquiries				:= Suspicious_Fraud_LN.Search_Inquiries_Email(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway);
+	EmailInquiries				:= Suspicious_Fraud_LN.Search_Inquiries_Email(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway, mod_access);
 	
-	IPAddressInquiries		:= Suspicious_Fraud_LN.Search_Inquiries_IPAddress(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway);
+	IPAddressInquiries		:= Suspicious_Fraud_LN.Search_Inquiries_IPAddress(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway, mod_access);
 	
-	NameInquiries					:= Suspicious_Fraud_LN.Search_Inquiries_Name(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway);
+	NameInquiries					:= Suspicious_Fraud_LN.Search_Inquiries_Name(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway, mod_access);
 	
-	PhoneInquiries				:= Suspicious_Fraud_LN.Search_Inquiries_Phone(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway);
+	PhoneInquiries				:= Suspicious_Fraud_LN.Search_Inquiries_Phone(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway, mod_access);
 	
-	SSNInquiries					:= Suspicious_Fraud_LN.Search_Inquiries_SSN(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway);
+	SSNInquiries					:= Suspicious_Fraud_LN.Search_Inquiries_SSN(with_DID, DPPAPurpose, GLBPurpose, DataRestrictionMask, DeltabaseGateway, mod_access);
 	
 	/* ************************************************
 	 *   Gather Risk Codes/Risk Indicators            *
 	 **************************************************/
-	AddressRisk						:= Suspicious_Fraud_LN.Search_Address_Risk(with_DID, AddressInquiries, DPPAPurpose, GLBPurpose, DataRestrictionMask);
+	AddressRisk						:= Suspicious_Fraud_LN.Search_Address_Risk(with_DID, AddressInquiries, DPPAPurpose, GLBPurpose, DataRestrictionMask, mod_access);
 	
-	EmailRisk							:= Suspicious_Fraud_LN.Search_Email_Risk(with_DID, EmailInquiries, DPPAPurpose, GLBPurpose, DataRestrictionMask);
+	EmailRisk							:= Suspicious_Fraud_LN.Search_Email_Risk(with_DID, EmailInquiries, DPPAPurpose, GLBPurpose, DataRestrictionMask, mod_access);
 	
 	IPAddressRisk					:= Suspicious_Fraud_LN.Search_IPAddress_Risk(with_DID, IPAddressInquiries, DPPAPurpose, GLBPurpose, DataRestrictionMask, NetAcuityGateway);
 	
 	NameRisk							:= Suspicious_Fraud_LN.Search_Name_Risk(with_DID, NameInquiries, DPPAPurpose, GLBPurpose, DataRestrictionMask);
 	
-	PhoneRisk							:= Suspicious_Fraud_LN.Search_Phone_Risk(with_DID, PhoneInquiries, DPPAPurpose, GLBPurpose, DataRestrictionMask);
+	PhoneRisk							:= Suspicious_Fraud_LN.Search_Phone_Risk(with_DID, PhoneInquiries, DPPAPurpose, GLBPurpose, DataRestrictionMask, mod_access);
 	
-	SSNRisk								:= Suspicious_Fraud_LN.Search_SSN_Risk(with_DID, SSNInquiries, DPPAPurpose, GLBPurpose, DataRestrictionMask);
+	SSNRisk								:= Suspicious_Fraud_LN.Search_SSN_Risk(with_DID, SSNInquiries, DPPAPurpose, GLBPurpose, DataRestrictionMask,
+																																LexIdSourceOptout := mod_access.lexid_source_optout, 
+																																TransactionID := mod_access.transaction_id, 
+																																GlobalCompanyID := mod_access.global_company_id);
 	
 	CombinationRisk				:= Suspicious_Fraud_LN.Search_Combination_Risk(with_DID, AddressInquiries, EmailInquiries, IPAddressInquiries, NameInquiries, PhoneInquiries, SSNInquiries, DPPAPurpose, GLBPurpose, DataRestrictionMask);
 	
@@ -208,7 +212,7 @@ EXPORT Fraud_Defense_Manager_Search_Function(DATASET(Suspicious_Fraud_LN.layouts
 																																																																				Address_Hit := ut.Exists2(RIGHT.RiskCode_Address);
 																																																																				SELF.Suspicious_Address.Address_Hit := IF(Address_Hit, 'Y', 'N');
 																																																																				SELF.Suspicious_Address.Address_Message := IF(Address_Hit, '', Suspicious_Fraud_LN.Constants.AddressMessage);
-																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, UT.GetDate, ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
+																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, (STRING8)Std.Date.Today(), ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
 																																																																				validDate := Doxie.DOBTools((UNSIGNED)RIGHT.Suspicious_Address.DateFirstSeenInFile).IsValidDOB;
 																																																																				cleanDate := IF(validDate, RIGHT.Suspicious_Address.DateFirstSeenInFile, todaysDate);
 																																																																				SELF.Suspicious_Address.DateFirstSeenInFile := IF(Address_Hit, cleanDate, '');
@@ -219,7 +223,7 @@ EXPORT Fraud_Defense_Manager_Search_Function(DATASET(Suspicious_Fraud_LN.layouts
 																																																																				Email_Hit := ut.Exists2(RIGHT.RiskCode_Email);
 																																																																				SELF.Suspicious_Email.Email_Hit := IF(Email_Hit, 'Y', 'N');
 																																																																				SELF.Suspicious_Email.Email_Message := IF(Email_Hit, '', Suspicious_Fraud_LN.Constants.EmailMessage);
-																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, UT.GetDate, ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
+																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, (STRING8)Std.Date.Today(), ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
 																																																																				validDate := Doxie.DOBTools((UNSIGNED)RIGHT.Suspicious_Email.DateFirstSeenInFile).IsValidDOB;
 																																																																				cleanDate := IF(validDate, RIGHT.Suspicious_Email.DateFirstSeenInFile, todaysDate);
 																																																																				SELF.Suspicious_Email.DateFirstSeenInFile := IF(Email_Hit, cleanDate, '');
@@ -230,7 +234,7 @@ EXPORT Fraud_Defense_Manager_Search_Function(DATASET(Suspicious_Fraud_LN.layouts
 																																																																				IPAddress_Hit := ut.Exists2(RIGHT.RiskCode_IPAddress);
 																																																																				SELF.Suspicious_IPAddress.IPAddress_Hit := IF(IPAddress_Hit, 'Y', 'N');
 																																																																				SELF.Suspicious_IPAddress.IPAddress_Message := IF(IPAddress_Hit, '', Suspicious_Fraud_LN.Constants.IPAddressMessage);
-																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, UT.GetDate, ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
+																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, (STRING8)Std.Date.Today(), ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
 																																																																				validDate := Doxie.DOBTools((UNSIGNED)RIGHT.Suspicious_IPAddress.DateFirstSeenInFile).IsValidDOB;
 																																																																				cleanDate := IF(validDate, RIGHT.Suspicious_IPAddress.DateFirstSeenInFile, todaysDate);
 																																																																				SELF.Suspicious_IPAddress.DateFirstSeenInFile := IF(IPAddress_Hit, cleanDate, '');
@@ -241,7 +245,7 @@ EXPORT Fraud_Defense_Manager_Search_Function(DATASET(Suspicious_Fraud_LN.layouts
 																																																																				Name_Hit := ut.Exists2(RIGHT.RiskCode_Name);
 																																																																				SELF.Suspicious_Name.Name_Hit := IF(Name_Hit, 'Y', 'N');
 																																																																				SELF.Suspicious_Name.Name_Message := IF(Name_Hit, '', Suspicious_Fraud_LN.Constants.NameMessage);
-																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, UT.GetDate, ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
+																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, (STRING8)Std.Date.Today(), ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
 																																																																				validDate := Doxie.DOBTools((UNSIGNED)RIGHT.Suspicious_Name.DateFirstSeenInFile).IsValidDOB;
 																																																																				cleanDate := IF(validDate, RIGHT.Suspicious_Name.DateFirstSeenInFile, todaysDate);
 																																																																				SELF.Suspicious_Name.DateFirstSeenInFile := IF(Name_Hit, cleanDate, '');
@@ -252,7 +256,7 @@ EXPORT Fraud_Defense_Manager_Search_Function(DATASET(Suspicious_Fraud_LN.layouts
 																																																																				Phone_Hit := ut.Exists2(RIGHT.RiskCode_Phone);
 																																																																				SELF.Suspicious_Phone.Phone_Hit := IF(Phone_Hit, 'Y', 'N');
 																																																																				SELF.Suspicious_Phone.Phone_Message := IF(Phone_Hit, '', Suspicious_Fraud_LN.Constants.PhoneMessage);
-																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, UT.GetDate, ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
+																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, (STRING8)Std.Date.Today(), ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
 																																																																				validDate := Doxie.DOBTools((UNSIGNED)RIGHT.Suspicious_Phone.DateFirstSeenInFile).IsValidDOB;
 																																																																				cleanDate := IF(validDate, RIGHT.Suspicious_Phone.DateFirstSeenInFile, todaysDate);
 																																																																				SELF.Suspicious_Phone.DateFirstSeenInFile := IF(Phone_Hit, cleanDate, '');
@@ -263,7 +267,7 @@ EXPORT Fraud_Defense_Manager_Search_Function(DATASET(Suspicious_Fraud_LN.layouts
 																																																																				SSN_Hit := ut.Exists2(RIGHT.RiskCode_SSN);
 																																																																				SELF.Suspicious_SSN.SSN_Hit := IF(SSN_Hit, 'Y', 'N');
 																																																																				SELF.Suspicious_SSN.SSN_Message := IF(SSN_Hit, '', Suspicious_Fraud_LN.Constants.SSNMessage);
-																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, UT.GetDate, ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
+																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, (STRING8)Std.Date.Today(), ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
 																																																																				validDate := Doxie.DOBTools((UNSIGNED)RIGHT.Suspicious_SSN.DateFirstSeenInFile).IsValidDOB;
 																																																																				cleanDate := IF(validDate, RIGHT.Suspicious_SSN.DateFirstSeenInFile, todaysDate);
 																																																																				SELF.Suspicious_SSN.DateFirstSeenInFile := IF(SSN_Hit, cleanDate, '');
@@ -274,7 +278,7 @@ EXPORT Fraud_Defense_Manager_Search_Function(DATASET(Suspicious_Fraud_LN.layouts
 																																																																				Combination_Hit := ut.Exists2(RIGHT.RiskCode_Combination);
 																																																																				SELF.Suspicious_Combination.Combination_Search_Hit := IF(Combination_Hit, 'Y', 'N');
 																																																																				SELF.Suspicious_Combination.Combination_Search_Message := IF(Combination_Hit, '', Suspicious_Fraud_LN.Constants.CombinationMessage);
-																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, UT.GetDate, ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
+																																																																				todaysDate := IF(LEFT.Clean_Input.ArchiveDate = 999999, (STRING8)Std.Date.Today(), ((STRING)LEFT.Clean_Input.ArchiveDate)[1..6] + '01');
 																																																																				validDate := Doxie.DOBTools((UNSIGNED)RIGHT.Suspicious_Combination.DateFirstSeenInFile).IsValidDOB;
 																																																																				cleanDate := IF(validDate, RIGHT.Suspicious_Combination.DateFirstSeenInFile, todaysDate);
 																																																																				SELF.Suspicious_Combination.DateFirstSeenInFile := IF(Combination_Hit, cleanDate, '');
