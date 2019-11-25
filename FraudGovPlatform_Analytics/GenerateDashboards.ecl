@@ -37,6 +37,7 @@
 	RunCustDashboard_Prod					:= OUTPUT(dRunCustDashboard,,custLogicalfilename,  cluster(ThorName),compressed,overwrite);
 	RunCustDashboard1_1_Prod			:= OUTPUT(dRunCustDashboard1_1,,cust1_1Logicalfilename,  cluster(ThorName),compressed,overwrite);
 	RunClusDetailsDashboard_Prod	:= OUTPUT(dRunClusDetailsDashboard,,clusterLogicalfilename,cluster(ThorName),compressed, overwrite);
+	RunHighRiskIdentity_Prod			:= OUTPUT(dRunHighRiskIdentity,,highriskidLogicalfilename,cluster(ThorName),compressed, overwrite);
 
 	CreateSuper := Sequential(IF(~(STD.File.SuperFileExists(CustSuperFileName)), STD.File.CreateSuperFile(CustSuperFileName),output('CustomerDash Superfile already exists. Skipping creating superfile.')),
 															IF(~(STD.File.SuperFileExists(Cust1_1SuperFileName)), STD.File.CreateSuperFile(Cust1_1SuperFileName),output('CustomerDash 1_1 Superfile already exists. Skipping creating superfile.')),
@@ -66,10 +67,9 @@
 	RunPersonStatsDeltaDashboard		:= OUTPUT(dRunPersonStatsDeltaDashboard);
 	RunNewClusterRecordsDashboard 	:= OUTPUT(dRunNewClusterRecordsDashboard);
 	RETURN PARALLEL(IF(runProd,
-											SEQUENTIAL(CreateSuper,RunCustDashboard_Prod,RunCustDashboard1_1_Prod,RunClusDetailsDashboard_Prod,AddFileToSuper),
-											SEQUENTIAL(RunCustDashboard, RunCustDashboard1_1, RunClusDetailsDashboard)
+											SEQUENTIAL(CreateSuper,RunCustDashboard_Prod,RunCustDashboard1_1_Prod,RunClusDetailsDashboard_Prod,RunHighRiskIdentity_Prod,AddFileToSuper),
+											SEQUENTIAL(RunCustDashboard, RunCustDashboard1_1, RunClusDetailsDashboard, RunHighRiskIdentity)
 											)
-								, IF(~runProd AND updateROSE, RunHighRiskIdentity)
 								, IF(~runProd AND ~updateROSE, SEQUENTIAL(RunPersonStatsDeltaDashboard, RunNewClusterRecordsDashboard))
 									);
 END;
