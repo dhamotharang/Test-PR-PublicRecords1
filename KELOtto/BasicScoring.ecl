@@ -7,7 +7,6 @@ EXPORT BasicScoring := MODULE
 	EXPORT WeightingChart := DATASET('~foreign::10.173.14.201::fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
 	EXPORT CustomWeightingChart := DATASET('~foreign::10.173.14.201::fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
 */
-
 	EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
 	EXPORT CustomWeightingChart := DATASET('~fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
 

@@ -317,10 +317,10 @@ EXPORT AddressMatch := TABLE(Matches,
          
   EXPORT HighFrequencyFroms := TABLE(LexidAssociationsPrep, {AssociatedCustomerFileInfo, FromPersonLexId, recs := COUNT(GROUP)}, AssociatedCustomerFileInfo, FromPersonLexId, MERGE);
   // Remove high frequency matches.
-	EXPORT PersonAddressMatchStatsPrep := DEDUP(SORT(DISTRIBUTE(PersonAddressMatchStatsPrep4/*LexidAssociationsPrep*/, HASH32(FromPersonLexId, ToPersonLexId)), FromPersonLexId, ToPersonLexId, LOCAL), FromPersonLexId, ToPersonLexId, LOCAL);
-	EXPORT PersonAddressMatchStats := JOIN(PersonAddressMatchStatsPrep4/*LexidAssociationsPrep*/, HighFrequencyFroms(recs > LargeAssociationThreshold), LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND LEFT.FromPersonLexId=RIGHT.FromPersonLexId, LEFT ONLY, LOOKUP);
+	EXPORT PersonAddressMatchStatsPrep := DEDUP(SORT(DISTRIBUTE(LexidAssociationsPrep, HASH32(FromPersonLexId, ToPersonLexId)), FromPersonLexId, ToPersonLexId, LOCAL), FromPersonLexId, ToPersonLexId, LOCAL);
+	EXPORT PersonAddressMatchStats := JOIN(LexidAssociationsPrep, HighFrequencyFroms(recs > LargeAssociationThreshold), LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND LEFT.FromPersonLexId=RIGHT.FromPersonLexId, LEFT ONLY, LOOKUP);
 												 
-	//   Same Day or within 7 days?
+	//   Same Day or within 7 days?Veep1234!
 	//   Multiple Distinct addresses (non-high fequency, within time threshold?)
 	//   
 
