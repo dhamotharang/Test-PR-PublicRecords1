@@ -669,12 +669,12 @@ ids_full_ssn := join(	withSSNFlags, pre_ids_only, left.seq=right.seq and left.di
 
 //AML position title   all ids
 
-relatEmpl :=  AML.AMLEmployment(pre_ids_only);
+relatEmpl :=  AML.AMLEmployment(pre_ids_only, mod_access);
 
 //AML  degree
-relatStudent := AML.AMLStudent(ids_only);
+relatStudent := AML.AMLStudent(ids_only, mod_access);
 //  AML professional license
-relatProfLic :=  AML.AMLProfLicense(ids_only);
+relatProfLic :=  AML.AMLProfLicense(ids_only, mod_access);
 
 
 RelatInput :=  join(ssnFlagsPrep, pre_ids_only,
@@ -705,7 +705,7 @@ relatAddr  := AML.AMLAddrAttrib(ssnFlagsPrep);
 
 
 //  AML  header info
-relatHeader :=  AML.AMLGetHeader(group(RelatInput,seq), dppa, glb, isFCRA, DataRestriction);
+relatHeader :=  AML.AMLGetHeader(group(RelatInput,seq), dppa, glb, isFCRA, DataRestriction, mod_access);
 
 //AML   relates parents
 
@@ -723,7 +723,7 @@ RelatInfo :=  join(withSSNFlags, pre_ids_only(isrelat),
 															self.RelatParentPubRec10yrs := 0;
 															self := []));
 
-relatParentPubRec := AML.AMLRelativesAssocs(group(RelatInfo, seq), dppa, glb, isFCRA,  DataRestriction);
+relatParentPubRec := AML.AMLRelativesAssocs(group(RelatInfo, seq), dppa, glb, isFCRA,  DataRestriction, mod_access);
 
 
 

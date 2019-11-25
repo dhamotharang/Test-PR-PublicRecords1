@@ -12,7 +12,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
     UNSIGNED1 PhoneRestrictionMask, STRING50 DataRestrictionMask, UNSIGNED1 GLBPurpose, UNSIGNED1 DPPAPurpose, 
     UNSIGNED3 Max_Neighborhoods = 0, Neighbors_Per_NA = 6, Neighbor_Recency = 3, BOOLEAN probation_override_value = FALSE, 
     BOOLEAN no_scrub = FALSE, STRING ssn_mask_value = '', STRING industry_class_value = '',
-    UNSIGNED2 PhoneShellVersion = 10) := FUNCTION
+    UNSIGNED2 PhoneShellVersion = 10,
+	doxie.IDataAccess in_mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
     
   IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1
 
@@ -32,6 +33,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
     EXPORT string ssn_mask := ssn_mask_value;
     // EXPORT unsigned1 dl_mask := 1;
     // EXPORT unsigned1 dob_mask := suppress.constants.dateMask.ALL;
+	EXPORT unsigned1 lexid_source_optout := in_mod_access.lexid_source_optout;
+	EXPORT string transaction_id := in_mod_access.transaction_id; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := in_mod_access.global_company_id; // mbs gcid
   END;
 
 	Subj_Best_Rec := RECORD
@@ -123,7 +127,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
 	
 	neighbors := TOPN(neighbors_ready, 100, nbr_rank);
 	
-	Progressive_Phone.Layout_Progressive_Batch_Out_With_DID by_addr_lastname(neighbors le, Gong.key_Address_current ri) := TRANSFORM
+	{Progressive_Phone.Layout_Progressive_Batch_Out_With_DID, unsigned4 global_sid} by_addr_lastname(neighbors le, Gong.key_Address_current ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.AcctNo := (STRING20)le.seqTarget;
 		SELF.Subj_First := le.fname;
 		SELF.Subj_Middle := le.mname;
@@ -159,7 +164,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
 		SELF := [];
 	END;
 	
-	neighbor_out_ready := JOIN(neighbors, Gong.key_Address_current,
+	neighbor_out_ready_unsuppressed := JOIN(neighbors, Gong.key_Address_current,
 																							KEYED(LEFT.prim_name = RIGHT.prim_name) AND
 																							KEYED(LEFT.st = RIGHT.st) AND
 																							KEYED(LEFT.zip = RIGHT.z5) AND
@@ -180,7 +185,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
 																							NID.mod_PFirstTools.PFLeqPFR(LEFT.fname, RIGHT.fname) OR 
 																							LENGTH(TRIM(RIGHT.fname)) = 1 AND LEFT.fname[1] = RIGHT.fname),					          
 		                         by_addr_lastname(LEFT, RIGHT), LIMIT(ut.limits.PHONE_PER_PERSON, SKIP));
-														 
+	neighbor_out_ready := Suppress.Suppress_ReturnOldLayout(neighbor_out_ready_unsuppressed, mod_access, Progressive_Phone.Layout_Progressive_Batch_Out_With_DID);
+	
 	neighbor_out_dedup := UNGROUP(DEDUP(SORT(neighbor_out_ready, AcctNo, Subj_Phone10, -subj_date_last, -subj_date_first),
 																															 AcctNo, Subj_Phone10));
 	

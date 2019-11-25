@@ -406,7 +406,8 @@ businessResults :=  if(TestDataEnabled, AML.AMLRiskAttributes_BusnTestSeed_Funct
 																								GLBA,
 																								IncludeNegativeNews, 
 																								bsversion, 
-																								DataPermissionMask));
+																								DataPermissionMask,
+																								mod_access));
 
 
 businessResultsV2 :=  if(TestDataEnabled, AML.AMLRiskAttributesV2_BusnTestSeed_Function(test_Busnprep, TestDataTableName), 

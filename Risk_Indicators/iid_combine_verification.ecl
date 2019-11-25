@@ -1229,7 +1229,16 @@ withDIDdeceased_nonfcra_roxie_unsuppressed := JOIN(with_advo, did_deceased_key,
 												getDIDdeceased(LEFT, RIGHT),	
 												LEFT OUTER, ATMOST(riskwise.max_atmost), KEEP(100));
 
-withDIDdeceased_nonfcra_roxie := Suppress.Suppress_ReturnOldLayout(withDIDdeceased_nonfcra_roxie_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
+withDIDdeceased_nonfcra_roxie_flagged := Suppress.MAC_FlagSuppressedSource(withDIDdeceased_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
+
+withDIDdeceased_nonfcra_roxie := PROJECT(withDIDdeceased_nonfcra_roxie_flagged, TRANSFORM(Risk_Indicators.Layout_Output, 
+	SELF.DIDdeceased := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.DIDdeceased);
+	SELF.DIDdeceasedDate := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.DIDdeceasedDate);
+	SELF.DIDdeceasedDOB := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.DIDdeceasedDOB);
+	SELF.DIDdeceasedfirst := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DIDdeceasedfirst);
+	SELF.DIDdeceasedlast := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DIDdeceasedlast);
+    SELF := LEFT;
+)); 
 
 withDIDdeceased_nonfcra_thor_unsuppressed := JOIN(distribute(with_advo, hash64(did)), 
 												distribute(pull(did_deceased_key), hash64(l_did)), 
@@ -1239,7 +1248,16 @@ withDIDdeceased_nonfcra_thor_unsuppressed := JOIN(distribute(with_advo, hash64(d
 												getDIDdeceased(LEFT, RIGHT),	
 												LEFT OUTER, ATMOST(LEFT.did=RIGHT.l_did, riskwise.max_atmost), KEEP(100), LOCAL);
 										
-withDIDdeceased_nonfcra_thor := Suppress.Suppress_ReturnOldLayout(withDIDdeceased_nonfcra_thor_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
+withDIDdeceased_nonfcra_thor_flagged := Suppress.MAC_FlagSuppressedSource(withDIDdeceased_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
+
+withDIDdeceased_nonfcra_thor := PROJECT(withDIDdeceased_nonfcra_thor_flagged, TRANSFORM(Risk_Indicators.Layout_Output, 
+	SELF.DIDdeceased := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.DIDdeceased);
+	SELF.DIDdeceasedDate := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.DIDdeceasedDate);
+	SELF.DIDdeceasedDOB := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.DIDdeceasedDOB);
+	SELF.DIDdeceasedfirst := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DIDdeceasedfirst);
+	SELF.DIDdeceasedlast := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DIDdeceasedlast);
+    SELF := LEFT;
+)); 
 
 #IF(onThor)
 	withDIDdeceased_nonfcra := group(sort(distribute(withDIDdeceased_nonfcra_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
@@ -1247,16 +1265,16 @@ withDIDdeceased_nonfcra_thor := Suppress.Suppress_ReturnOldLayout(withDIDdecease
 	withDIDdeceased_nonfcra := withDIDdeceased_nonfcra_roxie;
 #END
 
-withDIDdeceased_FCRA_roxie_unsuppressed := JOIN(with_advo, did_deceased_key, 
+withDIDdeceased_FCRA_roxie_unformatted := JOIN(with_advo, did_deceased_key, 
 												LEFT.did<>0 AND KEYED(LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
 													getDIDdeceased(LEFT,RIGHT),												
 												LEFT OUTER, ATMOST(riskwise.max_atmost), KEEP(100));
+												
+withDIDdeceased_FCRA_roxie := PROJECT(withDIDdeceased_FCRA_roxie_unformatted, TRANSFORM(Risk_Indicators.Layout_Output, SELF := LEFT));
 
-withDIDdeceased_FCRA_roxie := Suppress.Suppress_ReturnOldLayout(withDIDdeceased_FCRA_roxie_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
-
-withDIDdeceased_FCRA_thor_unsuppressed := JOIN(distribute(with_advo, hash64(did)), 
+withDIDdeceased_FCRA_thor_unformatted := JOIN(distribute(with_advo, hash64(did)), 
 												distribute(pull(did_deceased_key), hash64(l_did)), 
 												LEFT.did<>0 AND (LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
@@ -1264,7 +1282,7 @@ withDIDdeceased_FCRA_thor_unsuppressed := JOIN(distribute(with_advo, hash64(did)
 													getDIDdeceased(LEFT,RIGHT),												
 												LEFT OUTER, ATMOST(LEFT.did=RIGHT.l_did, riskwise.max_atmost), KEEP(100), LOCAL);
 
-withDIDdeceased_FCRA_thor := Suppress.Suppress_ReturnOldLayout(withDIDdeceased_FCRA_thor_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
+withDIDdeceased_FCRA_thor := PROJECT(withDIDdeceased_FCRA_thor_unformatted, TRANSFORM(Risk_Indicators.Layout_Output, SELF := LEFT));
 
 #IF(onThor)
 	withDIDdeceased_FCRA := group(sort(distribute(withDIDdeceased_FCRA_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
