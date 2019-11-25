@@ -1051,6 +1051,13 @@ Export CIID := RECORD
   integer8 associated_with_incarcerated_flag_;
   integer8 associated_with_fraud_offenses_flag_;
   integer8 deceased_match_;
+  unsigned4 date_of_birth_;
+  unsigned1 __date_of_birth__flags;
+  string deceased_match_date_of_death_;
+  unsigned1 __deceased_match_date_of_death__flags;
+  integer8 age_;
+  unsigned1 __age__flags;
+  integer8 is_minor_;
   integer8 death_prior_to_all_events_;
   integer8 nas9_flag_;
   integer8 nap3_flag_;
@@ -1100,9 +1107,13 @@ Export CIID := RECORD
   integer8 in_customer_population__1_;
   integer8 contributor_safe_flag__1_;
   integer8 safe_flag__1_;
+  unsigned8 cl_deceased_count_;
   unsigned8 event_count_;
   unsigned8 identity_count_;
   unsigned1 cl_adjacent_safe_flag_;
+  unsigned8 cl_hr_identity_count_;
+  unsigned8 cl_hr_element_count_;
+  unsigned8 connected_element_count_;
   DATASET(flagsrec) flags;
  END;
  
@@ -1327,11 +1338,13 @@ RECORD
   integer8 in_customer_population__1_;
   integer8 contributor_safe_flag__1_;
   integer8 safe_flag__1_;
-  unsigned8 cl_hr_identity_count_;
-  unsigned8 cl_hr_element_count_;
+  unsigned8 cl_deceased_count_;
   unsigned8 event_count_;
   unsigned8 identity_count_;
   unsigned1 cl_adjacent_safe_flag_;
+  unsigned8 cl_hr_identity_count_;
+  unsigned8 cl_hr_element_count_;
+  unsigned8 connected_element_count_;
   DATASET(flagsrec) flags;
  END;
 
@@ -2198,7 +2211,7 @@ RECORD
    unsigned1 __dt_first_seen__flags;
    unsigned4 dt_last_seen_;
    unsigned1 __dt_last_seen__flags;
-   unsigned2 date_first_seen_;
+  unsigned2 date_first_seen_;
    unsigned2 date_last_seen_;
    integer8 __recordcount;
   END) exp1_;
@@ -2233,11 +2246,13 @@ RECORD
   integer8 in_customer_population__1_;
   integer8 contributor_safe_flag__1_;
   integer8 safe_flag__1_;
-  unsigned8 cl_hr_identity_count_;
-  unsigned8 cl_hr_element_count_;
+  unsigned8 cl_deceased_count_;
   unsigned8 event_count_;
   unsigned8 identity_count_;
   unsigned1 cl_adjacent_safe_flag_;
+  unsigned8 cl_hr_identity_count_;
+  unsigned8 cl_hr_element_count_;
+  unsigned8 connected_element_count_;
   DATASET(flagsrec) flags;
   integer1 high_risk_centroid;
   integer1 known_risk_centroid;
