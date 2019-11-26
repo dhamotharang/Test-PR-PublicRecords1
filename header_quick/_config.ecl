@@ -13,7 +13,7 @@ EXPORT _config (
     
     EXPORT monthly_files       := 'MONTHLY_HEADER_*.DAT';
     EXPORT weekly_files        := 'WEEKLY_HEADER_*.DAT';
-    SHARED v_version_file_name       := '~  ';
+    SHARED v_version_file_name       := '~thor_data400::flag::version::equifax_monthly';
     SHARED v_eq_as_of_date_file_name := '~thor_data400::flag::version::equifax_weekly';
     
     // Get version values
