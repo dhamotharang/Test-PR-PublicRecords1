@@ -1,4 +1,4 @@
-﻿IMPORT KELOtto, FraudGovPlatform;
+﻿IMPORT KELOtto, FraudGovPlatform,doxie,suppress;
 RunKelDemo :=false:stored('RunKelDemo');
 
 newr := RECORD
@@ -184,6 +184,7 @@ newr := RECORD
   unsigned6 fdn_file_info_id;
   STRING Hri;
   integer1 relativeaddressmatch;
+	unsigned6 did_orig;
  END;
 
 FileIn := If(RunKelDemo=false,FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Ciid.built
@@ -197,5 +198,9 @@ PersonCIIDAttr := PROJECT(FileIn,
               //MAP((INTEGER)LEFT.did in BankAccountDLRiskTestSet => '|DF|45',''),
 							SELF := LEFT));
 
-EXPORT PersonCIID := PersonCIIDAttr;
+// Supress CCPA
+mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
+Supress_CCPA := Suppress.MAC_SuppressSource(PersonCIIDAttr, mod_access, did_orig, NULL,TRUE);	
+
+EXPORT PersonCIID := Supress_CCPA;
 

@@ -4,6 +4,6 @@ IMPORT B_Address,E_Address,E_Customer FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT Q__show_Customer_Address := MODULE
   SHARED TYPEOF(B_Address.__ENH_Address) __ENH_Address := B_Address.__ENH_Address;
-  SHARED __EE2458599 := __ENH_Address;
-  EXPORT Res0 := __UNWRAP(__EE2458599);
+  SHARED __EE2979658 := __ENH_Address;
+  EXPORT Res0 := __UNWRAP(__EE2979658);
 END;

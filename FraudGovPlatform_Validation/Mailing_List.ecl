@@ -24,6 +24,7 @@ EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') :
 										;
 										
 	shared Analytics_list	:= 	'Julie.Carmigniani@lexisnexisrisk.com'
+											+';Michael.Sterling@lexisnexisrisk.com'
 											+	';'+Dev_list										
 											;
 

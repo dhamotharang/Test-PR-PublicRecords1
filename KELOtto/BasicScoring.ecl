@@ -3,8 +3,13 @@ EXPORT BasicScoring := MODULE
 
   IMPORT KELOtto, FraudGovPlatform_Analytics, FraudGovPlatform, Data_services, Std;
 
-	EXPORT WeightingChart := DATASET(IF(KELOtto.Constants.useProdData, Data_services.foreign_prod, data_services.foreign_dataland)+'fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
-	EXPORT CustomWeightingChart := DATASET(IF(KELOtto.Constants.useProdData, Data_services.foreign_prod, data_services.foreign_dataland)+'fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
+/*
+	EXPORT WeightingChart := DATASET('~foreign::10.173.14.201::fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
+	EXPORT CustomWeightingChart := DATASET('~foreign::10.173.14.201::fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
+*/
+	EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
+	EXPORT CustomWeightingChart := DATASET('~fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
+
 
 // Add a column to tag that have {value} so the str.findreplace is only done for those rows that need it (for speed in the join).
 	EXPORT WeightingChartPrepped := PROJECT(WeightingChart, TRANSFORM({RECORDOF(WeightingChart), BOOLEAN HasValue}, SELF.HasValue := Std.Str.Find(LEFT.UiDescription, '{value}') > 0, SELF := LEFT));
@@ -12,8 +17,10 @@ EXPORT BasicScoring := MODULE
 	
   EXPORT PersonStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Person.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'score_,cluster_score_,event_count_,' + 
-												'dt_first_seen_,dt_last_seen_,deceased_match_date_of_death_,' + 
-                        'nas9_flag_,_nas__summary_,_nap__summary_,_subjectssncount_,_ssnfoundforlexid_,subject_ssn_count_,stolen_identity_index_,synthetic_identity_index_,manipulated_identity_index_,vulnerable_victim_index_,friendlyfraud_index_,suspicious_activity_index_,all_high_risk_death_prior_to_all_events_,all_max_deceased_to_event_diff_,death_prior_to_all_events_,deceased_,deceased_event_percent_,deceased_match_,high_risk_death_prior_to_all_events_,in_customer_population_,max_deceased_to_event_diff_,no_lex_id_,id_ssn_identity_count_max_,no_lex_id_gt22_,' + 
+												'dt_first_seen_,dt_last_seen_,deceased_match_date_of_death_,deceased_match_,date_of_birth_,age_,is_minor_,' +
+												'vl_event30_active_flag_,address_is_cmra30_count_,address_is_cmra30_flag_,address_invalid30_count_,address_invalid30_flag_,hri14_active30_flag_,hri50_active30_flag_,validation_addr_problems30_count_,validation_addr_problems30_flag_,address_is_out_of_state30_count_,address_is_of_state30_flag_,' +
+												'vl_event7_active_flag_,' +
+                        'nas9_flag_,_nas__summary_,_nap__summary_,_subjectssncount_,_ssnfoundforlexid_,subject_ssn_count_,stolen_identity_index_,synthetic_identity_index_,manipulated_identity_index_,vulnerable_victim_index_,friendlyfraud_index_,suspicious_activity_index_,all_high_risk_death_prior_to_all_events_,all_max_deceased_to_event_diff_,death_prior_to_all_events_,deceased_,deceased_event_percent_,high_risk_death_prior_to_all_events_,in_customer_population_,max_deceased_to_event_diff_,no_lex_id_,id_ssn_identity_count_max_,no_lex_id_gt22_,' + 
                         '_cvi_,_v2__sourcerisklevel_,_v2__assocsuspicousidentitiescount_,_v2__assoccreditbureauonlycount_,_v2__inputaddrageoldest_,_v2__inputaddrdwelltype_,_v2__divssnidentitycountnew_,' + 
                         'hri03_flag_,hri06_flag_,hri07_flag_,hri08_flag_,hri11_flag_,hri12_flag_,hri14_flag_,hri15_flag_,hri19_flag_,hri25_flag_,hri26_flag_,hri27_flag_,hri28_flag_,hri29_flag_,hri30_flag_,hri31_flag_,hri37_flag_,hri38_flag_,hri41_flag_,hri48_flag_,hri50_flag_,hri51_flag_,hri52_flag_,hri71_flag_,hri83_flag_,hri90_flag_,hri_cl_flag_,hri_co_flag_,hri_dd_flag_,hri_df_flag_,hri_iv_flag_,hri_it_flag_,hri_mi_flag_,hri_mo_flag_,hri_ms_flag_,hri_nf_flag_,hri_pa_flag_,hri_po_flag_,hri_va_flag_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
@@ -44,7 +51,7 @@ EXPORT BasicScoring := MODULE
 												'dt_first_seen_,dt_last_seen_,' +
 	                      'hri06_flag_,hri26_flag_,hri29_flag_,hri38_flag_,hri71_flag_,hri_it_flag_,hri_mi_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_ssn100_flag_,kr_ssn101_flag_,' +
 												'safe_flag_,contributor_safe_flag_,' +
   											'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
@@ -57,7 +64,7 @@ EXPORT BasicScoring := MODULE
                         'cluster_score_,event_count_,identity_count_,identity_count_gt2_,score_,source_customer_count_,kr_high_risk_flag_,_isdisposableemail_,not_safe_last_domain_gt2_,kr_medium_risk_flag_,' + 
 												'dt_first_seen_,dt_last_seen_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_eml500_flag_,kr_eml501_flag_,kr_eml502_flag_,kr_eml590_flag_,kr_eml591_flag_,kr_eml592_flag_,kr_eml593_flag_,' +
 												'safe_flag_,contributor_safe_flag_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
@@ -72,7 +79,7 @@ EXPORT BasicScoring := MODULE
                         'hri07_flag_,hri08_flag_,hri15_flag_,hri27_flag_,hri31_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,'+ 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'safe_flag_,contributor_safe_flag_,' +
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_phn400_flag_,kr_phn401_flag_,kr_phn402_flag_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
 												'cl_high_kr_identity_top10_,cl_nas9_top10_,cl_nas3_top10_,cl_ip_high_risk_identity_top10_,' +
@@ -87,7 +94,7 @@ EXPORT BasicScoring := MODULE
 												'safe_flag_,contributor_safe_flag_,' +
                         'ip_not_us_,ip_vpn_,ip_high_risk_city_,ip_hosted_,ip_tor_,' +
 												'_iprngbeg_,_iprngend_,_edgecountry_,_edgeregion_,_edgecity_,_edgeconnspeed_,_edgemetrocode_,_edgelatitude_,_edgelongitude_,_edgepostalcode_,_edgecountrycode_,_edgeregioncode_,_edgecitycode_,_edgecontinentcode_,_edgetwolettercountry_,_edgeinternalcode_,_edgeareacodes_,_edgecountryconf_,_edgeregionconf_,_edgecitycong_,_edgepostalconf_,_edgegmtoffset_,_edgeindst_,_siccode_,_domainname_,_ispname_,_homebiztype_,_asn_,_asnname_,_primarylang_,_secondarylang_,_proxytype_,_proxydescription_,_isanisp_,_companyname_,_organizationname_,' +
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_ip600_flag_,kr_ip601_flag_,kr_ip602_flag_,kr_ip603_flag_,kr_ip604_flag_,kr_ip605_flag_,kr_ip1000_flag_,kr_ip1001_flag_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
 												'cl_high_kr_identity_top10_,cl_nas9_top10_,cl_nas3_top10_,cl_ip_high_risk_identity_top10_,' +
@@ -101,7 +108,7 @@ EXPORT BasicScoring := MODULE
 												'dt_first_seen_,dt_last_seen_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'high_risk_routing_,abbreviated_bankname_,' +
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_bnk800_flag_,kr_bnk801_flag_,kr_bnk802_flag_,kr_bnk890_flag_,kr_bnk891_flag_,kr_bnk892_flag_,kr_bnk893_flag_,safe_flag_,contributor_safe_flag_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
 												'cl_high_kr_identity_top10_,cl_nas9_top10_,cl_nas3_top10_,cl_ip_high_risk_identity_top10_,' +
@@ -114,7 +121,7 @@ EXPORT BasicScoring := MODULE
 												'dt_first_seen_,dt_last_seen_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
                         'hri41_flag_,hri_df_flag_,' + 
-												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
+												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_dl200_flag_,kr_dl201_flag_,kr_dl202_flag_,kr_dl203_flag_,kr_dl204_flag_,kr_dl290_flag_,kr_dl291_flag_,kr_dl292_flag_,kr_dl293_flag_,safe_flag_,contributor_safe_flag_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
 												'cl_high_kr_identity_top10_,cl_nas9_top10_,cl_nas3_top10_,cl_ip_high_risk_identity_top10_,' +
@@ -300,6 +307,18 @@ EXPORT BasicScoring := MODULE
                         RIGHT.indicatortype = 'CL', 
                         TRANSFORM(RECORDOF(LEFT), SELF.Cluster_Score_ := MAP(RIGHT.entity_context_uid_ != '' AND RIGHT.Value > 0 => RIGHT.CustomerPercentile, 0), SELF := LEFT), LEFT OUTER, LOCAL);
 
+  HighRiskIdentityAggregation := DISTRIBUTE(TABLE(ScoredGraphPrep2, 
+	                                 {source_customer_, 
+																	  UNSIGNED cl_hr_identity_count_ := COUNT(GROUP, entity_type_ = 1 AND score_ > 80), 
+																		UNSIGNED cl_hr_element_count_ := COUNT(GROUP, entity_type_ != 1 AND score_ > 80),
+																		UNSIGNED connected_element_count_ := COUNT(GROUP, entity_type_ != 1 AND identity_count_ > 1),
+																		tree_uid_}, 
+	                                  source_customer_, tree_uid_, MERGE), HASH32(tree_uid_)); 
+
+  EXPORT ScoredGraphPrep3 := JOIN(ScoredGraphPrep2, HighRiskIdentityAggregation, LEFT.source_customer_ = RIGHT.source_customer_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_, TRANSFORM({RECORDOF(LEFT), UNSIGNED cl_hr_identity_count_, UNSIGNED cl_hr_element_count_, UNSIGNED connected_element_count_}, 
+                            SELF.cl_hr_identity_count_ := RIGHT.cl_hr_identity_count_, SELF.cl_hr_element_count_ := RIGHT.cl_hr_element_count_, 
+														SELF.connected_element_count_ := RIGHT.connected_element_count_, SELF := LEFT), LEFT OUTER, LOCAL);
+
   // Flag/Indicator Child dataset.
 
   FlagsRec := RECORD
@@ -308,11 +327,11 @@ EXPORT BasicScoring := MODULE
   END;
 
   FinalRec := RECORD
-   RECORDOF(ScoredGraphPrep1);// AND NOT [event_count_,identity_count_]; // field exclusion list to keep the layout consistent with previous version for roxie/esp
+   RECORDOF(ScoredGraphPrep3);// AND NOT [event_count_,identity_count_]; // field exclusion list to keep the layout consistent with previous version for roxie/esp
    DATASET(FlagsRec) Flags;
   END;
        
-  EXPORT ScoredGraph := PROJECT(ScoredGraphPrep2, 
+  EXPORT ScoredGraph := PROJECT(ScoredGraphPrep3, 
                     TRANSFORM(FinalRec, 
 										           SELF.Flags := DATASET([
 															                        {'high_frequency_flag_', (STRING)LEFT.high_frequency_flag_},
@@ -333,6 +352,6 @@ EXPORT BasicScoring := MODULE
                                                       {'safe_flag_', (STRING)LEFT.safe_flag_},
                                                       {'identity_count_', (STRING)LEFT.identity_count_}
 																											], FlagsRec)(Value <> '');
-															 SELF := LEFT));// : PERSIST('~temp::deleteme65');
+															 SELF := LEFT)) : PERSIST('~temp::deleteme65');
 				
 END;
