@@ -314,6 +314,7 @@ MODULE
 	export src_Lobbyists                 := 'LB';
 	export src_Mari_Prof_Lic		 				 :=	'MP'; // Mortgage Assest Research Institute Professional Licenses
 	export src_Mari_Public_Sanc					 :=	'MQ'; // Mortgage Assest Research Institute Public sanctions
+	export src_Marketing_Relatives_Data  := 'AZ';
 	export src_Marriage					 				 :=	'MR';
 	export src_MartinDale_Hubbell        := 'MH';
 	export src_MediaOne									 := 'M1';

@@ -92,6 +92,7 @@ module
 	export CustomerMappings := FraudGov_Prefix('config') + 'CustomerMappings';
 	export CustomerDashboard := FraudGov_Prefix('config') + 'kel::customerdashboard';
 	export CustomerDashboard1_1 := FraudGov_Prefix('config') + 'kel::customerdashboard1_1';
+	export HighRiskIdentity := FraudGov_Prefix('config') + 'kel::HighRiskIdentity';
 	export ClusterDetails := FraudGov_Prefix('config') + 'kel::clusterdetails';
 	export ProdDashboardVersion := FraudGov_Prefix('config') + 'kel::ProdDashboardVersion';
 
