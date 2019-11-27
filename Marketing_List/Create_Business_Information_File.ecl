@@ -112,10 +112,11 @@ functionmacro
                           ,pSampleProxids
                         );
 
+  // -- if no data for emp num or revenue, set to -1.
   ds_return_result_biz := join(ds_both_best_both_base_plus_Industry ,ds_best_emps_sales  ,left.seleid = right.seleid ,transform(recordof(left)
-    ,self.seleid_level.number_of_employees  := right.number_of_employees
-    ,self.seleid_level.annual_revenue       := right.annual_revenue
-    ,self.seleid_level.src_revenue          := right.source
+    ,self.seleid_level.number_of_employees  := if(right.seleid != 0                               ,right.number_of_employees  ,-1)
+    ,self.seleid_level.annual_revenue       := if(right.seleid != 0                               ,right.annual_revenue       ,-1)
+    ,self.seleid_level.src_revenue          := if(right.seleid != 0 and right.annual_revenue >= 0 ,right.source               ,'')
     ,self                                   := left
   ) ,hash ,left outer);
   
