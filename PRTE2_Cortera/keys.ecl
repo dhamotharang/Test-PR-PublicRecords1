@@ -1,14 +1,14 @@
-﻿IMPORT RoxieKeyBuild, AutoKeyB2, PRTE, _control, autokeyb, Business_Header_SS, business_header, ut, corp2, doxie, address, corp2_services, PRTE2_Common, Data_Services, doxie, BIPV2, Cortera, UT, PromoteSupers, std, Prte2, PRTE2_Cortera, Address, AID, AID_Support;
+﻿IMPORT RoxieKeyBuild, AutoKeyB2, PRTE, _control, autokey, Business_Header_SS, business_header, ut, corp2, doxie, address, corp2_services, PRTE2_Common, Data_Services, doxie, BIPV2, Cortera, UT, PromoteSupers, std, Prte2, PRTE2_Cortera, Address, AID, AID_Support;
 
 EXPORT Keys := MODULE
 
 
   //DEFINE THE INDEX
-  EXPORT Attributes_Link_Id := INDEX(files.attributes(ultimate_linkID > 0) , {ULTIMATE_LINKID}, {files.attributes},
+  EXPORT Attributes_Link_Id := INDEX(files.Key_attr (ultimate_linkID > 0) , {ULTIMATE_LINKID}, {files.Key_attr},
          Data_Services.Data_location.Prefix('DEFAULT')+ constants.key_prefix + doxie.Version_SuperKey + '::attr_linkid');
 
 
-  EXPORT Header_Link_Id := INDEX(files.hdr_out(link_id > 0), {link_id}, {files.hdr_out},
+  EXPORT Header_Link_Id := INDEX(files.Key_hdr (link_id > 0), {link_id}, {files.Key_hdr},
          Data_Services.Data_location.Prefix('DEFAULT')+ constants.key_prefix + doxie.Version_SuperKey + '::hdr_linkid');
 
   
@@ -17,7 +17,7 @@ EXPORT Keys := MODULE
   
    //DEFINE THE INDEX
    EXPORT Cortera_LinkIds_Name := constants.KEY_PREFIX+doxie.Version_SuperKey+'::linkids';
-   EXPORT Base  := Files.Hdr_Out(COUNTRY='US');
+   EXPORT Base  := Files.Key_hdr(COUNTRY='US');
 
    BIPV2.IDmacros.mac_IndexWithXLinkIDs(Base, k, Cortera_LinkIds_Name)
    EXPORT Key := k;

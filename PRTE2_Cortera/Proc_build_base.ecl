@@ -45,10 +45,10 @@ PRTE2.CleanFields(PRTE2_Cortera.Files.Input_INS, ds_clean_INS);
                                                  self.err_stat    :=  left.Clean_Address.err_stat; 
     
     //Populate BDID
-    SELF.bdid   := prte2.fn_AppendFakeID.bdid(left.Name, SELF.prim_range, SELF.prim_name, SELF.v_city_name, SELF.st, SELF.zip, left.cust_name);
+    SELF.bdid   := prte2.fn_AppendFakeID.bdid(left.Name, left.Clean_Address.prim_range, left.Clean_Address.prim_name, left.Clean_Address.v_city_name, left.Clean_Address.st, left.Clean_Address.zip, left.cust_name);
     
     //Fake ID
-    vLinkingIds := prte2.fn_AppendFakeID.LinkIds(left.name, left.link_fein, left.link_inc_date, self.prim_range, self.prim_name, self.sec_range, self.v_city_name, self.st, self.zip, left.cust_name);
+    vLinkingIds := prte2.fn_AppendFakeID.LinkIds(left.name, left.link_fein, left.link_inc_date, left.Clean_Address.prim_range, left.Clean_Address.prim_name, left.Clean_Address.sec_range, left.Clean_Address.v_city_name, left.Clean_Address.st, left.Clean_Address.zip, left.cust_name);
     
       SELF.powid   := vLinkingIds.powid;
       SELF.proxid  := vLinkingIds.proxid;
@@ -83,9 +83,5 @@ PRTE2.CleanFields(PRTE2_Cortera.Files.Input_INS, ds_clean_INS);
     //Build Base
     PromoteSupers.MAC_SF_BuildProcess(Header_File, Constants.Base_Prefix + 'header', bld_base_hdr, ,, true);
     PromoteSupers.MAC_SF_BuildProcess(Attribute_File, Constants.Base_Prefix + 'Attributes', bld_base_attr, ,, true);
-    return sequential(bld_base_hdr, bld_base_attr);
-    end;
-    
-    // EXPORT proc_build_base := bld_base;
-
-
+ return sequential(bld_base_hdr, bld_base_attr);
+end;

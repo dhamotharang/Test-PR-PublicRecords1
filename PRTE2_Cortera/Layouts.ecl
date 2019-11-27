@@ -6,19 +6,11 @@ EXPORT Layouts := MODULE
   
   EXPORT Header_out := RECORD
   Cortera.Layout_Header_out; 
-  STRING10 cust_name;
-  STRING10 bug_num;
   END;
   
   EXPORT Attributes_Out := RECORD
   Cortera.Layout_Attributes_Out; 
-  STRING10 cust_name;
-  STRING10 bug_num;
   END;
-  
-  EXPORT HDRINS := Cortera.Layout_Header;
-  
-  EXPORT Executive := Cortera.Layout_Executives;   
   
   EXPORT rlayout := RECORD, MAXLENGTH(62766)
 	cortera.Layout_Header_Out;

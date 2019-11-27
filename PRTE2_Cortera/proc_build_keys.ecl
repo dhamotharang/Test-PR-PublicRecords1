@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, RoxieKeyBuild, AutoKeyB2, PRTE2, _control, autokeyb, Business_Header_SS, business_header, ut, corp2, doxie, address, corp2_services, PRTE2_Common;
+﻿IMPORT BIPV2, RoxieKeyBuild, AutoKeyB2, PRTE2, PRTE, _control, autokeyb, Business_Header_SS, business_header, ut, corp2, doxie, address, corp2_services, Orbit3, PRTE2_Common;
 
 EXPORT proc_build_keys(string filedate) := FUNCTION
 
@@ -44,6 +44,11 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::linkids',
                             'Q',
                              move_qa_key_cortera_lnk_key);
 
+  is_running_in_prod := PRTE2_Common.Constants.is_running_in_prod;
+  NoUpdate           := OUTPUT('Skipping DOPS update because we are not in PROD');
+  updatedops         := PRTE.UpdateVersion('Cortera', filedate, _control.MyInfo.EmailAddressNormal, 'B', 'N', 'N');
+  PerformUpdateOrNot := IF(is_running_in_prod, updatedops, NoUpdate);
+  // orbit_update       := Orbit3.proc_Orbit3_CreateBuild ('CorteraKeys',filedate);
 
  RETURN     SEQUENTIAL(
                        //Build Keys
@@ -62,6 +67,10 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::linkids',
                        Parallel(
                                 move_qa_key_cortera_attr_key,
                                 move_qa_key_cortera_hdr_key,
-                                move_qa_key_cortera_lnk_key));
+                                move_qa_key_cortera_lnk_key),
+                       
+                       //Update DOPs         
+                                PerformUpdateOrNot,
+                                /*orbit_update*/);
 
 END;
