@@ -59,8 +59,8 @@ functionmacro
   ds_crosswalk  := pDataset_Crosswalk           (proxid != 0  ,exists(contactNames((contact_name_permits & mktg_bmap) != 0)))   ;  //get proxid level, has to contain contacts
   ds_biz_info   := pDataset_Business_Information                                                                                ;  //use this to use only proxids that are in this file
   
-  ds_active_proxids := table(ds_biz_info  ,{proxid} ,proxid ,merge);
-  
+  // -- only get contacts that are part of active businesses by joining to the business information file
+  ds_active_proxids     := table(ds_biz_info  ,{proxid} ,proxid ,merge);
   ds_get_active_proxids := join(ds_crosswalk  ,ds_active_proxids  ,left.proxid = right.proxid ,transform({recordof(left) - contactSSNs - contactDOBs - contactEmails - contactPhones - contactAddresses},self := left)  ,hash);
 
   ds_prep := project(ds_get_active_proxids  ,transform({unsigned4 dt_last_seen  ,unsigned4 Age ,unsigned executive_ind ,Marketing_List.Layouts.business_contact},
@@ -95,11 +95,13 @@ functionmacro
   
   ))(trim(fname) != '',trim(lname) != '');
   
+  // -- dedup contacts by proxid and fname, lname, tie breaker goes to latest populated title_dt_last_seens, and if that is same, then prefer ones with lexid.
   ds_dist   := distribute (ds_prep  ,hash(seleid,proxid));
-  ds_sort   := sort       (ds_dist  ,seleid,proxid,if(lexid != 0  ,'LEXID' + '-' + (string)lexid  ,trim(fname) + trim(lname)) ,-dt_last_seen ,local);
-  ds_dedup  := dedup      (ds_sort  ,seleid,proxid,if(lexid != 0  ,'LEXID' + '-' + (string)lexid  ,trim(fname) + trim(lname)) ,local);
-  
-  ds_sort2  := sort       (ds_dedup  ,seleid,proxid,map(age <= 2 and dt_last_seen != 0 => 1,age > 2 and dt_last_seen != 0 => 2  ,3) ,if(person_hierarchy = 0  ,9999 ,person_hierarchy) ,-dt_last_seen,if(lexid != 0  ,1,2),lexid,lname,fname,local);
+  ds_sort   := sort       (ds_dist  ,     seleid,proxid  ,trim(fname) + trim(lname)   ,if(trim(title) != ''  ,1  ,2) ,-title_dt_last_seen   ,-dt_last_seen ,if(person_hierarchy = 0  ,9999 ,person_hierarchy) ,if(lexid != 0  ,1,2) ,lexid  ,local);
+  ds_dedup  := dedup      (ds_sort  ,     seleid,proxid  ,trim(fname) + trim(lname)                                                                                                      ,local);
+
+  // -- sort contacts per proxid in person hierarchy order, set person hierarchy
+  ds_sort2  := sort       (ds_dedup  ,seleid,proxid,map(age <= 2 and dt_last_seen != 0 => 1,age > 2 and dt_last_seen != 0 => 2  ,3) ,if(person_hierarchy = 0  ,9999 ,person_hierarchy) ,-title_dt_last_seen,-dt_last_seen,if(lexid != 0  ,1,2),lexid,lname,fname,local);
   ds_group  := group      (ds_sort2  ,seleid,proxid,local);
   ds_iterate := iterate(ds_group  ,transform(recordof(left)
     ,self.person_hierarchy := if(left.proxid = 0 ,1  ,left.person_hierarchy + 1)
@@ -107,8 +109,10 @@ functionmacro
   
   ));
   
-  ds_return_result_contact := project(ds_iterate  ,Marketing_List.Layouts.business_contact);
+  // for contacts that do not have a title, set the person hierarchy to zero.
+  ds_return_result_contact := project(ds_iterate  ,transform(Marketing_List.Layouts.business_contact,self.person_hierarchy := if(trim(left.title) != '' ,left.person_hierarchy  ,0) ,self := left ));
 
+  // -- Optional Debug outputs
   output_debug := parallel(
     output('---------------------Marketing_List.Create_Business_Contact_File---------------------'        ,named('Marketing_List_Create_Business_Contact_File'        ),all)
    ,output(mktg_bmap                                                                                      ,named('Create_Business_Contact_File_mktg_bmap'             ),all)
