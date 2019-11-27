@@ -1823,6 +1823,8 @@ EXPORT dsSourceCriteria := DATASET([
 {U'Singapore Exchange Directors’ and Executive Officers’ Watch List','1810'},
 {'Government of Malta Freezing Orders','1811'},
 {'EC (CFSP) 2019/1893 Venezuela List','1812'},
-{'EC 2019/1891 Venezuela List','1813'}
+{'EC 2019/1891 Venezuela List','1813'},
+{'EC (CFSP) 2019/1944 ISIL (Da\'esh) and Al-Qaeda List','1814'},
+{'EC 2019/1943 ISIL (Da\'esh) and Al-Qaida List','1815'}
 ],r);
 
