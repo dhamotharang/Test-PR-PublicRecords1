@@ -25,17 +25,9 @@ just_offense_charge remove_quotes(original_layout L) := TRANSFORM, skip(L.str2[1
         right
         );
     END;
-
-sort(offense_data, str);
 offense_charges := project(offense_data, remove_quotes(left));
-sort(offense_charges, offensecharge);
 old_base := dataset(crim_offense_cat.Filenames(pUseProd).base, crim_offense_cat.layouts.base_layout, thor, __compressed__, opt);
 uncategorized_offenses := join(offense_charges, old_base, left.offensecharge = right.offensecharge,left only);
 
-just_offense_charge get_only_charge(uncategorized_offenses L) := TRANSFORM
-    self.offensecharge := L.offensecharge;
-END;
-new_offenses := project(uncategorized_offenses, get_only_charge(left));
-
-count(new_offenses);
-output(new_offenses);
+output(uncategorized_offenses, {offensecharge}, crim_offense_cat.filenames(pUseprod).new_offenses+rpt_date, overwrite);
+//count(new_offenses);

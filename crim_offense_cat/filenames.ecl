@@ -9,4 +9,6 @@ export Filenames(boolean pUseProd = false) := module
 	export Key := crim_offense_cat._Dataset(pUseProd).thor_cluster_files + 'key::' + crim_offense_cat._Dataset().name;
 
 	export doc_offenses := '~thor::in::crim_offense_cat::charge::1::wuresult (4)mod.csv';
+	export new_offenses := crim_offense_cat._Dataset(pUseProd).thor_cluster_files + 'misc::' + crim_offense_cat._Dataset().name +'::uncategorized_offenses';
+
 end;
