@@ -22,12 +22,12 @@ ds_bip_prep := table(ds_bip_base  ,{proxid
 ds_bip_prep_dedup := table(ds_bip_prep  ,{proxid,cnp_name_addr,active_domestic_corp_key,company_fein,active_duns_number} ,proxid,cnp_name_addr,active_domestic_corp_key,company_fein,active_duns_number ,merge);
 
 ds_bip_prep_child := project(ds_bip_prep_dedup  ,transform({unsigned6 proxid,dataset({string grouping})  ds_grouping_fields} 
-  ,self.ds_grouping_fields := 
+  ,self.ds_grouping_fields := (
       dataset([{if(left.cnp_name_addr            != '' ,'CNPADDR-' + left.cnp_name_addr            ,'')}],{string grouping}) 
     + dataset([{if(left.active_domestic_corp_key != '' ,'CORPKEY-' + left.active_domestic_corp_key ,'')}],{string grouping}) 
     + dataset([{if(left.company_fein             != '' ,'FEIN-'    + left.company_fein             ,'')}],{string grouping}) 
     + dataset([{if(left.active_duns_number       != '' ,'DUNS-'    + left.active_duns_number       ,'')}],{string grouping}) 
-    (grouping != '')
+    )(grouping != '')
   ,self := left));
 
 ds_bip_prep_norm := normalize(ds_bip_prep_child ,left.ds_grouping_fields  ,transform({unsigned6 proxid,string grouping},self := right,self := left));
