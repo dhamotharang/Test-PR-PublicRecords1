@@ -18,7 +18,9 @@ EXPORT Constants := MODULE
 	EXPORT Prefix				:='~prte::';
 	
 	EXPORT ipaddr_prod					 := '10.173.44.105';  //prod IP
+	EXPORT ipaddr_dataland			 := '10.173.14.204';  //dataland IP
 	EXPORT ipaddr_roxie_nonfcra  := '10.173.101.101'; //roxie non fcra IP
 	EXPORT ipaddr_roxie_fcra		 := '10.173.235.23';  //roxie fcra IP
+	
 															 	
 END;

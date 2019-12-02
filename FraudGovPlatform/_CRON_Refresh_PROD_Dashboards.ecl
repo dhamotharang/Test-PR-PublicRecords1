@@ -11,7 +11,7 @@ ECL :=
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
-+'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
++'   FraudGovPlatform_Validation.Mailing_List().Analytics\n'
 +' 	 ,\'FraudGov Prod Dashboards Refresh\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'

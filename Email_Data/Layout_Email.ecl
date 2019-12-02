@@ -173,6 +173,9 @@ export base := record
   string8 date_vendor_first_reported;
   string8 date_vendor_last_reported;
 	boolean current_rec;
+  //CCPA-112
+  unsigned4 global_sid:=0;
+  unsigned8 record_sid:=0;
 end;
  
  //Appended SCRUBS bits field in flat layout
