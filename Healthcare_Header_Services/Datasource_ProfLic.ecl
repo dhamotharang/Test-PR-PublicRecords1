@@ -8,6 +8,7 @@ EXPORT Datasource_ProfLic := Module
 																		self.l_providerid := left.lnpid;
 																		self.vendorid:=(string)right.prolic_seq_id;
 																		self.rawData:=[];
+                                    self:=right;
 																		self:=left;),
 											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)); 
 			noHits := join(input,rawdataIndividual,left.acctno=right.acctno,transform(Healthcare_Header_Services.Layouts.searchKeyResults_plus_input, self:=left),left only);
@@ -17,8 +18,9 @@ EXPORT Datasource_ProfLic := Module
 											transform(Healthcare_Header_Services.Layouts.proflic_base_with_input,
 																		self.l_providerid := left.l_providerid;
 																		self.vendorid:=left.vendorid;
-																		self.rawData:=right;
-																		self:=left;),
+                                    self.rawData:=right;
+                                    self.global_sid:=right.global_sid;
+                                    self:=left;),
 											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)); //I believe this should be a 1:1 join...
 					
 			rawdataBusbyVendorid:= join(dedup(sort(noHits(vendorid<>''),record),record), Prof_LicenseV2.Key_Proflic_Bdid(),

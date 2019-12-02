@@ -586,6 +586,7 @@ EXPORT Transforms := MODULE
 		self.hasStateRestrict := l.state_restrict_flag='Y';
 		self.hasOIG := l.oig_flag='Y';
 		self.hasOPM := l.opm_flag='Y';
+    self.hasoptout:=l.hasoptout;
 		self.status := l.provider_status;
 		self.names := if(l.hasoptout=false,project(l,transform(Layouts.layout_nameinfo,
 																			self.nameSeq := 1;
