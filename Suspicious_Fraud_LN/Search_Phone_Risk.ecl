@@ -1,10 +1,11 @@
-IMPORT dx_header, AutoKey, Data_Services, PhonesPlus_V2, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
+﻿IMPORT dx_header, AutoKey, Data_Services, PhonesPlus_V2, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT, Doxie, Suppress, STD;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Phone_Risk (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
 																																				DATASET(Suspicious_Fraud_LN.layouts.Layout_Phone_Inquiries) Inquiries,
 																																				UNSIGNED1 DPPAPurpose,
 																																				UNSIGNED1 GLBPurpose,
-																																				STRING50 DataRestrictionMask) := FUNCTION
+																																				STRING50 DataRestrictionMask,
+																																				doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	// Phone Indexed Keys Used
 	PhonesPlusAutoKey := AutoKey.Key_Phone(Data_Services.Data_Location.Prefix('phonesPlus') + 'thor_data400::key::phonesplusv2_');
@@ -35,14 +36,15 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Phone_Risk (DATASET(
 		UNSIGNED4 UniqueDIDCount2Months := 0;
 	END;
 	
-	TempPhonesPlusPhone getPhonesPlusDIDs(layoutPPTemp le, PhonesPlusKey ri) := TRANSFORM
+	{TempPhonesPlusPhone, unsigned4 global_sid} getPhonesPlusDIDs(layoutPPTemp le, PhonesPlusKey ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.Seq := le.Seq;
 		SELF.Phone10 := le.Clean_Input.Phone10;
 		
 		SELF.DateFirstSeen := Suspicious_Fraud_LN.Common.padDate((STRING)ri.DateFirstSeen);
 		SELF.DID := ri.DID;
 		
-		todaysDateTemp := IF((INTEGER)ut.GetDate >= le.Clean_Input.ArchiveDate AND le.Clean_Input.ArchiveDate <> 999999, (STRING)le.Clean_Input.ArchiveDate + '01', ut.GetDate);
+		todaysDateTemp := IF((INTEGER)Std.Date.Today() >= le.Clean_Input.ArchiveDate AND le.Clean_Input.ArchiveDate <> 999999, (STRING)le.Clean_Input.ArchiveDate + '01', (STRING8)Std.Date.Today());
 		// If todaysDate is greater than the header build date, use the header build date
 		todaysDate := IF(todaysDateTemp >= headerBuildDate, headerBuildDate, todaysDateTemp);
 		
@@ -50,9 +52,10 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Phone_Risk (DATASET(
 		SELF.UniqueDIDCount := 1; // Will rollup later
 		SELF.UniqueDIDCount2Months := IF(dateLastAge BETWEEN 0 AND 61, 1, 0);
 	END;
-	withPhonesPlus := JOIN(getPhoneFDID, PhonesPlusKey, LEFT.FDID <> 0 AND KEYED(LEFT.FDID = RIGHT.FDID) AND
+	withPhonesPlus_unsuppressed := JOIN(getPhoneFDID, PhonesPlusKey, LEFT.FDID <> 0 AND KEYED(LEFT.FDID = RIGHT.FDID) AND
 																											(UNSIGNED)((STRING)RIGHT.DateFirstSeen)[1..6] <= LEFT.Clean_Input.ArchiveDate AND (INTEGER)RIGHT.DID > 0, // Only grab non-zero DID records before our ArchiveDate
 																		getPhonesPlusDIDs(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
+	withPhonesPlus := Suppress.Suppress_ReturnOldLayout(withPhonesPlus_unsuppressed, mod_access, TempPhonesPlusPhone);
 	phonesPlusDeduped := DEDUP(SORT(withPhonesPlus, Seq, DID, -UniqueDIDCount2Months, DateFirstSeen), Seq, DID);
 	PhonesPlusCounted := ROLLUP(phonesPlusDeduped, LEFT.Seq = RIGHT.Seq, TRANSFORM(TempPhonesPlusPhone, SELF.DateFirstSeen := MAP((INTEGER)LEFT.DateFirstSeen = 0		=> RIGHT.DateFirstSeen,
 																																																											(INTEGER)RIGHT.DateFirstSeen = 0	=> LEFT.DateFirstSeen,
@@ -71,7 +74,9 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Phone_Risk (DATASET(
 		BOOLEAN Disconnected := FALSE;
 		BOOLEAN PayPhone := FALSE;
 	END;
-	TempHRIPhone getHRIPhones(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, RiskTableKey ri) := TRANSFORM
+	{TempHRIPhone, unsigned4 global_sid, unsigned6 did} getHRIPhones(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, RiskTableKey ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
+		SELF.did := ri.did;
 		SELF.Seq := le.Seq;
 		SELF.Phone10 := le.Clean_Input.Phone10;
 		SELF.DateFirstSeen := IF((UNSIGNED)ri.dt_first_seen <> 0, Suspicious_Fraud_LN.Common.padDate((STRING)ri.dt_first_seen), '');
@@ -82,10 +87,10 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Phone_Risk (DATASET(
 		// Taken from Risk_Indicators.PRIIPhoneRiskFlag
 		SELF.PayPhone := ri.nxx_type = '16' OR REGEXFIND('PAYPHONE|PAY PHONE', ri.LName); // OR le.Clean_Input.Phone10[7] = '9';
 	END;
-	withHRI := JOIN(Input, RiskTableKey, (INTEGER)LEFT.Clean_Input.Phone10 <> 0 AND KEYED(LEFT.Clean_Input.Phone10 = RIGHT.Phone10) AND
+	withHRI_unsuppressed := JOIN(Input, RiskTableKey, (INTEGER)LEFT.Clean_Input.Phone10 <> 0 AND KEYED(LEFT.Clean_Input.Phone10 = RIGHT.Phone10) AND
 																				(UNSIGNED)((STRING)RIGHT.dt_first_seen)[1..6] <= LEFT.Clean_Input.ArchiveDate, // Make sure this phone is prior to the archive date
 																			getHRIPhones(LEFT, RIGHT), KEEP(100), ATMOST(RiskWise.max_atmost));
-	
+	withHRI := Suppress.Suppress_ReturnOldLayout(withHRI_unsuppressed, mod_access, TempHRIPhone);
 	rolledHRI := ROLLUP(withHRI, LEFT.Seq = RIGHT.Seq, TRANSFORM(TempHRIPhone,
 														SELF.DateFirstSeen := MAP((UNSIGNED)LEFT.DateFirstSeen = 0	=> RIGHT.DateFirstSeen,
 																											(UNSIGNED)RIGHT.DateFirstSeen = 0	=> LEFT.DateFirstSeen,
