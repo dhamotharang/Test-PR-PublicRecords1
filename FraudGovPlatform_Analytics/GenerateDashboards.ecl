@@ -43,6 +43,7 @@
 
 	CreateSuper := Sequential(IF(~(STD.File.SuperFileExists(CustSuperFileName)), STD.File.CreateSuperFile(CustSuperFileName),output('CustomerDash Superfile already exists. Skipping creating superfile.')),
 															IF(~(STD.File.SuperFileExists(Cust1_1SuperFileName)), STD.File.CreateSuperFile(Cust1_1SuperFileName),output('CustomerDash 1_1 Superfile already exists. Skipping creating superfile.')),
+															IF(~(STD.File.SuperFileExists(ClusterSuperFileName)), STD.File.CreateSuperFile(ClusterSuperFileName),output('ClusterSuperFileName Superfile already exists. Skipping creating superfile.')),
 															IF(~(STD.File.SuperFileExists(highriskidSuperFileName)), STD.File.CreateSuperFile(highriskidSuperFileName),output('highriskidentity Superfile already exists. Skipping creating superfile.')),															IF(~(STD.File.SuperFileExists(ClusterSuperFileName)), STD.File.CreateSuperFile(ClusterSuperFileName),output('ClusterDetails Superfile already exists. Skipping creating superfile.')),
 															STD.File.StartSuperFileTransaction(),
 															STD.File.ClearSuperfile(CustSuperFileName,true),
@@ -55,7 +56,7 @@
 	AddFileToSuper := SEQUENTIAL(
 		STD.File.StartSuperFileTransaction(),
 		STD.File.AddSuperFile(CustSuperFileName, custLogicalfilename),
-		STD.File.AddSuperFile(CustSuperFileName, cust1_1Logicalfilename),
+		STD.File.AddSuperFile(Cust1_1SuperFileName, cust1_1Logicalfilename),
 		STD.File.AddSuperFile(highriskidSuperFileName, highriskidLogicalfilename),
 		STD.File.AddSuperFile(ClusterSuperFileName, clusterLogicalfilename),
 		STD.File.FinishSuperFileTransaction());
