@@ -1165,6 +1165,8 @@
 		export string KEYWORD_OFAC_EO13884					:= '851';
 		export string KEYWORD_PTTC									:= '852';
 		export string KEYWORD_RBNZ_ALERT						:= '853';
+		export string KEYWORD_HRAZTN								:= '854';
+		export string KEYWORD_TTSEC									:= '855';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
