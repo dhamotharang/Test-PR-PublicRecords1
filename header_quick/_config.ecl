@@ -35,11 +35,11 @@ EXPORT _config (
     
     
     // v_version
-    EXPORT set_v_version := if(isNewEquifaxMonthlyFile(sourceIP),
+    EXPORT set_v_version(STRING overwriteDate='') := if(isNewEquifaxMonthlyFile(sourceIP) OR overwriteDate<>'',
                                  sequential(
-                                     output(dataset([{newEquifaxMothlyHeaderDate}],{string v_version}),,v_version_file_name+'_'+workunit),
+                                     output(dataset([{if(overwriteDate='',newEquifaxMothlyHeaderDate,overwriteDate)}],{string v_version}),,v_version_file_name+'_'+workunit),
                                      std.file.startsuperfiletransaction(),
-                                     std.file.createsuperfile(v_version_file_name,,true),
+                                     std.   file.createsuperfile(v_version_file_name,,true),
                                      std.file.clearsuperfile(v_version_file_name,true),
                                      std.file.addsuperfile(v_version_file_name,v_version_file_name+'_'+workunit),
                                      std.file.finishsuperfiletransaction()
