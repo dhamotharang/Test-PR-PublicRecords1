@@ -123,8 +123,8 @@ EXPORT Files := MODULE
     CCW_p := project(CCW, transform({recordof(CCW) - [did_out], unsigned6 did}, self.did := (unsigned6)left.did_out; self := left));                           
     EXPORT CCWDS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(CCW_p, mode, 15);
 
-    // Foreclosure := Property.File_Foreclosure_Base_v2(name1_did <> '' or name2_did1 <> '');
-    // EXPORT ForeclosureDS(unsigned1 mode) := D2C_Customers.MAC_BaseFile(Foreclosure, mode, 23);
+    Foreclosure := Property.File_Foreclosure_Base_v2(name1_did <> '' or name2_did <> '' or name3_did <> '' or name4_did <> '');
+    EXPORT ForeclosureDS(unsigned1 mode) := Foreclosure;//D2C_Customers.MAC_BaseFile(Foreclosure, mode, 23);
 
 /********* FULL DS **********/
     wAllowedDeeds    := D2C_Customers.MAC_GetAllowedRecs(infutor_hdr, DeedsDS(1),  '[\'LP\']');

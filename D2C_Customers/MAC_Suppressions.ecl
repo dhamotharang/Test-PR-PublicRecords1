@@ -20,7 +20,7 @@ EXPORT MAC_Suppressions(inDS, record_type) := FUNCTIONMACRO
   Suppress.MAC_Suppress(%cleaned_ccpa%,%cleaned_did%,appType,Suppress.Constants.LinkTypes.DID,did);
 
 //SSN suppression
-  SetOfNoSSN := [10,11,5,20,9,12,16,17,18,21,15];
+  SetOfNoSSN := [10,11,5,20,9,12,16,17,18,21,15,23];
 
   #uniquename(cleaned_ssn)	
   #if(record_type not in SetOfNoSSN) //[1,2,3,4,6,7,13,14,19,22,23]
