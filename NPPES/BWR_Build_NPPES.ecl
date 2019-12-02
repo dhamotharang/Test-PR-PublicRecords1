@@ -151,6 +151,8 @@ rolledup_dAppendIds := rollup(npi_dist_sort, rollupBase(left, right), except dt_
 										Clean_location_address.geo_match,	
 										Clean_location_address.err_stat,		
 										source_rec_id,
+										record_sid,
+										
 																   local);
 
 PromoteSupers.MAC_SF_BuildProcess(project(rolledup_dAppendIds,nppes.layouts.base),NPPES.Cluster + 'base::NPPES',NPPES_Base,3,false,true);
