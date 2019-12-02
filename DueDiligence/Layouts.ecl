@@ -426,6 +426,7 @@ EXPORT Layouts := MODULE
     UNSIGNED4 dob;
     STRING10 phone;
     Address;
+    UNSIGNED1 relationship;
   END;
 
   EXPORT CriminalTopLevel := RECORD
@@ -648,6 +649,24 @@ EXPORT Layouts := MODULE
     STRING14 phone;
     STRING11 fein;
   END;
+  
+  EXPORT SlimRelation := RECORD
+    SlimIndividual;
+    UNSIGNED1 amlRelationshipDegree;
+    STRING2 relationToInquired;
+    BOOLEAN currentlyIncarcerated;    
+    BOOLEAN everIncarcerated;
+    BOOLEAN potentialSexOffender;
+    BOOLEAN currentlyParoleOrProbation;
+    BOOLEAN felonyPast3Yrs;
+    UNSIGNED4 headerFirstSeenDate;
+    BOOLEAN validSSN;
+    UNSIGNED4 ssnLowIssueDate;
+    UNSIGNED2 ssnMultiIdentities;
+    UNSIGNED2 ssnPerADL;
+    BOOLEAN hasSSN;
+    BOOLEAN ssnRisk;
+  END;
 
   EXPORT BusReportDetails := RECORD
     SlimBusiness bestBusInfo;
@@ -677,7 +696,6 @@ EXPORT Layouts := MODULE
   END;
 
   EXPORT IndReportDetails := RECORD
-    STRING9 inputSSN;
     STRING9 bestSSN;
     STRING10 bestPhone;
     UNSIGNED4 bestDOB;
@@ -704,9 +722,11 @@ EXPORT Layouts := MODULE
     RelatedParty individual;											  //populated in DueDiligence.getIndAttributes, DueDiligence.getIndInformation
     GeographicRiskLayout; 
     UNSIGNED4 numberOfSpouses;																							
-    DATASET(SlimIndividual) spouses;																												//populated in DueDiligence.getIndRelatives
+    DATASET(SlimRelation) spouses;																												//populated in DueDiligence.getIndRelatives
     UNSIGNED4 numberOfParents;
-    DATASET(SlimIndividual) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			  //populated in DueDiligence.getIndRelatives
+    DATASET(SlimRelation) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			  //populated in DueDiligence.getIndRelatives
+    UNSIGNED4 numberOfAssociates;
+    DATASET(SlimRelation) associates;
     STRING2 indvType;                         		  //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
     
     INTEGER2 cit_inputSSNInvalid;
