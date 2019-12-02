@@ -61,7 +61,25 @@ gong_by_did_unsuppressed := join(ids_wide, gong.key_history_did, left.did != 0 a
 										((unsigned)RIGHT.dt_first_seen <= (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)), 
 										addPhone(LEFT,RIGHT), left outer, atmost(left.did=right.l_did, Riskwise.max_atmost), keep(100));
                                                   
-gong_by_did1 := Suppress.Suppress_ReturnOldLayout(gong_by_did_unsuppressed, mod_access, Layout_Gong);
+gong_by_did_flagged := Suppress.MAC_FlagSuppressedSource(gong_by_did_unsuppressed, mod_access);
+
+gong_by_did1 := PROJECT(gong_by_did_flagged, TRANSFORM(Layout_Gong, 
+	self.gong_did.gong_ADL_dt_first_seen_full := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gong_did.gong_ADL_dt_first_seen_full );
+	self.gong_did.gong_ADL_dt_last_seen_full := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gong_did.gong_ADL_dt_last_seen_full );
+	self.gong_did.gong_did_phone_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.gong_did.gong_did_phone_ct );
+	self.gong_did.gong_did_addr_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.gong_did.gong_did_addr_ct );
+	self.gong_did.gong_did_first_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.gong_did.gong_did_first_ct );
+	self.gong_did.gong_did_last_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.gong_did.gong_did_last_ct );
+	self.gongPhone := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gongPhone);
+	self.gongAddr := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gongAddr);
+	self.gongFirst := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gongFirst);
+	self.gongLast := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gongLast);
+	self.phones_on_file := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.phones_on_file);
+	self.phones_on_file_created12months := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.phones_on_file_created12months);
+	self.invalid_gong_dt_first_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.invalid_gong_dt_first_seen);
+	self.invalid_gong_dt_last_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.invalid_gong_dt_last_seen);
+    SELF := LEFT;
+)); 
 
 // make this check to telcordia it's own join instead of nested inside the previous transform
 gong_by_did := join(gong_by_did1, risk_indicators.Key_Telcordia_tpm_Slim, 

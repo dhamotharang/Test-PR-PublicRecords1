@@ -38,10 +38,28 @@ Layout_Impulse_CCPA addImpulse(ids_wide le, Impulse_Email.Key_Impulse_DID ri) :=
     self.global_sid := ri.global_sid;
 	self := le;
 end;
-wImpulse := join(ids_wide, Impulse_Email.Key_Impulse_DID, left.did<>0 and (unsigned)stringlib.stringfilterout(right.created[1..7],'-')< left.historydate and	
+wImpulse_unsuppressed := join(ids_wide, Impulse_Email.Key_Impulse_DID, left.did<>0 and (unsigned)stringlib.stringfilterout(right.created[1..7],'-')< left.historydate and	
 																// left.did=right.did, addImpulse(left,right), left outer);
 																keyed(left.did=right.did), addImpulse(left,right), left outer, atmost(riskwise.max_atmost));
 
+wImpulse_flagged := Suppress.MAC_FlagSuppressedSource(wImpulse_unsuppressed, mod_access);
+
+wImpulse := PROJECT(wImpulse_flagged, TRANSFORM(Layout_Impulse, 
+	self.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count);
+	self.first_seen_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.first_seen_date);
+	self.last_seen_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.last_seen_date);
+	self.siteidsrc := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.siteidsrc);
+	self.siteid := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.siteid);
+	self.count30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count30);
+	self.count90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count90);
+	self.count180 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count180);
+	self.count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count12);
+	self.count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count24);
+	self.count36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count36);
+	self.count60 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count60);
+	self.annual_income := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.annual_income);
+    SELF := LEFT;
+)); 
 
 // ADD THRIVE RECORDS FOR VERSION 5.0 AND HIGHER
 key_main := thrive.keys().did.qa;
@@ -77,7 +95,7 @@ Layout_Impulse_CCPA append_thrive(ids_wide le, key_main rt) := transform
     self := le;
 end;
 	
-wThrive := join (ids_wide, key_main,
+wThrive_unsuppressed := join (ids_wide, key_main,
 		left.did<>0 and
      keyed (left.did = right.did) and    
 		((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.full_history_date(left.historydate)) AND
@@ -86,11 +104,31 @@ wThrive := join (ids_wide, key_main,
 		append_thrive(left, right),
      atmost(riskwise.max_atmost)
   );
+	
+	
+wThrive_flagged := Suppress.MAC_FlagSuppressedSource(wThrive_unsuppressed, mod_access);
+
+wThrive := PROJECT(wThrive_flagged, TRANSFORM(Layout_Impulse, 
+	self.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count);
+	self.first_seen_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.first_seen_date);
+	self.last_seen_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.last_seen_date);
+	self.siteidsrc := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.siteidsrc);
+	self.siteid := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.siteid);
+	self.count30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count30);
+	self.count90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count90);
+	self.count180 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count180);
+	self.count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count12);
+	self.count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count24);
+	self.count36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count36);
+	self.count60 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.count60);
+	self.annual_income := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.annual_income);
+    SELF := LEFT;
+)); 
 
 paydayrecords := if(bsversion>=50, ungroup(wImpulse + wThrive), ungroup(wImpulse));  // only use impulse for shell versions prior to 5.0
 sorted_payday := group(sort(paydayrecords,seq, siteid, -last_seen_date),seq);
 
-Layout_Impulse_CCPA rollImpulse(Layout_Impulse_CCPA le, Layout_Impulse_CCPA ri) := transform
+Layout_Impulse rollImpulse(Layout_Impulse le, Layout_Impulse ri) := transform
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	self.count := le.count + ri.count;
 	self.first_seen_date := ut.Min2(le.first_seen_date,ri.first_seen_date);
@@ -109,10 +147,7 @@ Layout_Impulse_CCPA rollImpulse(Layout_Impulse_CCPA le, Layout_Impulse_CCPA ri) 
 	self := le;
 end;
 
-Suppressed_Impulse := Suppress.MAC_SuppressSource(rollup(sorted_payday, left.seq=right.seq, rollImpulse(left,right)), mod_access);	
-
-rolled_Impulse := PROJECT(Suppressed_Impulse, TRANSFORM(Layout_Impulse,
-                                                  SELF := LEFT));
+rolled_Impulse :=rollup(sorted_payday, left.seq=right.seq, rollImpulse(left,right));
                                                   
 // output(wImpulse, named('wImpulse'));
 // output(wThrive, named('wThrive'));
