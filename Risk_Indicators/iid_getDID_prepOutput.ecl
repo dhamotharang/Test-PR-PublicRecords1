@@ -76,7 +76,12 @@ export iid_getDID_prepOutput(DATASET(risk_indicators.layout_input) indata, unsig
 			self.new_did_from_rid := 0; // to be set later if public_records didn't get a hit
 			self := left), atmost(riskwise.max_atmost), keep(1), left outer);
 			
-	with_public_records_flag := Suppress.Suppress_ReturnOldLayout(with_public_records_flag_unsuppressed, mod_access, didResolveRec, data_environment);
+	with_public_records_flag_flagged := Suppress.MAC_FlagSuppressedSource(with_public_records_flag_unsuppressed, mod_access, data_env := data_environment);
+
+	with_public_records_flag := PROJECT(with_public_records_flag_flagged, TRANSFORM(didResolveRec, 
+		self.public_records_hit := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.public_records_hit);
+		SELF := LEFT;
+	)); 
 
 	with_new_did := join(with_public_records_flag, dx_header.key_did_rid(),
 		left.did<>0 and ~left.public_records_hit and

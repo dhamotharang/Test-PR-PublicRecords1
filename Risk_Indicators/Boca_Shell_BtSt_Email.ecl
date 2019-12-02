@@ -49,8 +49,14 @@ export Boca_Shell_BtSt_Email(grouped dataset(Risk_Indicators.layout_ciid_btst_Ou
 			email_details(left, right, EmailDetailsCount), 
 				atmost(riskwise.max_atmost), keep(1000), left outer);
                                                   
-    emails_orig := Suppress.Suppress_ReturnOldLayout(emails_orig_unsuppressed, mod_access, email_tmp);
-                                                  
+    emails_orig_flagged := Suppress.MAC_FlagSuppressedSource(emails_orig_unsuppressed, mod_access);
+
+	emails_orig := PROJECT(emails_orig_flagged, TRANSFORM(email_tmp, 
+		self.domain_type := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.domain_type);
+		self.email := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.email);
+			SELF := LEFT;
+	)); 
+                                       
 	emails := sort(dedup(emails_orig, #EXPAND(btStSeqField), email), #EXPAND(btStSeqField), email);
   
     RETURN emails;

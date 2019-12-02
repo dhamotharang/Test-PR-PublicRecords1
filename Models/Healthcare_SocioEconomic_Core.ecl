@@ -1,9 +1,4 @@
-﻿﻿
-import risk_indicators, models, Profilebooster;
-IMPORT LUCI, STD;
-IMPORT HCSE_GE_18_LUCI_MODEL;
-IMPORT HCSE_LT_18_LUCI_MODEL;
-IMPORT HCSE_SERA_GBM_M0_V1_model_LUCI;
+﻿IMPORT risk_indicators, models, Profilebooster, LUCI, STD, HCSE_GE_18_LUCI_MODEL, HCSE_LT_18_LUCI_MODEL, HCSE_SERA_GBM_M0_V1_model_LUCI;
 
 
 export Healthcare_SocioEconomic_Core(Socio_TC_Model_Version_in, SuppressResultsForOptOuts, isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Options_in, ofac_version_in, gateways_in_ds, CoreResults,
@@ -194,7 +189,11 @@ export Healthcare_SocioEconomic_Core(Socio_TC_Model_Version_in, SuppressResultsF
 	onThor := Models.Healthcare_Constants_Core.default_onThor;
 
 	//Calling Profile Booster Search Function and fetching the attributes
-	pb_attributes := ProfileBooster.Search_Function(Profilebooster_In_With_LexID, DataRestriction, DataPermission, Profilebooster_AttributesVersionRequest);  
+	pb_attributes := ProfileBooster.Search_Function(Profilebooster_In_With_LexID, DataRestriction, DataPermission, Profilebooster_AttributesVersionRequest,
+																						LexIdSourceOptout := LexIdSourceOptout, 
+																						TransactionID := TransactionID, 
+																						BatchUID := BatchUID, 
+																						GlobalCompanyID := GlobalCompanyID);  
 	//Combining Lead Integrity and Profile Booster attributes
 	Combined_LI_PB_Attributes := 	Join(rawResults_final, pb_attributes, left.seq=(string)right.seq, transform(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_combined,
 					self.acctno := left.acctno;
