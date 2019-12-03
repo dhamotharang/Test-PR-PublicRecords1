@@ -23,9 +23,9 @@ module
   record
     core_business_info_proxid                     ;
     string60                  business_email      ;
-    unsigned                  annual_revenue      ;
+    integer                   annual_revenue      ;
     string2                   src_revenue         ;
-    unsigned                  number_of_employees ;
+    integer                   number_of_employees ;
     string4                   SIC_Primary         ;
     string4                   SIC2                ;
     string4                   SIC3                ;

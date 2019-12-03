@@ -1,67 +1,5 @@
 ﻿IMPORT Std;
 
-
-Layout_Base2 xContact(Layout_Base2 src, Layouts2.rStateContactEx contact) := TRANSFORM
-		// fill in contact fields, but do not overwrite if there is a more specific contact
-		boolean ignore := src.ContactName <> '';
-		self.ContactName := if(ignore, src.ContactName, contact.ContactName);
-		self.ContactPhone := if(ignore, src.ContactPhone, contact.ContactPhone);
-		self.ContactExt := if(ignore, src.ContactExt, contact.ContactExt);
-		self.ContactEmail := if(ignore, src.ContactEmail, contact.ContactEmail);
-		
-		self := src;
-		
-END;
-
-AddContacts(DATASET(layout_Base2) base, DATASET(Layouts2.rStateContactEx) contacts) := FUNCTION
-		b1 := DISTRIBUTE(base);	//, HASH64(ProgramState, ProgramCode));
-		c1 := contacts(UpdateType<>'D');	//, HASH64(ProgramState, ProgramCode));
-		// add client specific contacts
-		b2 := IF(EXISTS(c1(clientId<>'')),		
-						JOIN(b1, c1(clientId<>''),
-							left.ProgramState=right.ProgramState
-							and left.ProgramCode=right.ProgramCode
-							and left.ClientId=right.ClientId,
-							xContact(LEFT,RIGHT),
-							LEFT OUTER, KEEP(1), MANY LOOKUP),
-						b1);
-	// add case specific contacts
-		b3 := IF(EXISTS(c1(CaseId<>'')),		
-						JOIN(b2, c1(CaseId<>''),
-							left.ProgramState=right.ProgramState
-							and left.ProgramCode=right.ProgramCode
-							and left.CaseId=right.CaseId,
-							xContact(LEFT,RIGHT),
-							LEFT OUTER, KEEP(1), MANY LOOKUP),
-						b2);
-	// add county contacts
-		b4 := IF(EXISTS(c1(ProgramCounty<>'')),		
-						JOIN(b3, c1(ProgramCounty<>''),
-							left.ProgramState=right.ProgramState
-							and left.ProgramCode=right.ProgramCode
-							and left.CountyName=right.ProgramCounty,
-							xContact(LEFT,RIGHT),
-							LEFT OUTER, KEEP(1), MANY LOOKUP),
-						b3);
-	// add regional contacts
-		b5 := IF(EXISTS(c1(ProgramRegion<>'')),		
-						JOIN(b4, c1(ProgramRegion<>''),
-							left.ProgramState=right.ProgramState
-							and left.ProgramCode=right.ProgramCode
-							and left.RegionCode=right.ProgramRegion,
-							xContact(LEFT,RIGHT),
-							LEFT OUTER, KEEP(1), MANY LOOKUP),
-						b4);
-	// add default contact
-		b6 := JOIN(b5, c1(ClientId='',CaseId='',ProgramCounty='',ProgramRegion=''),
-							left.ProgramState=right.ProgramState
-							and left.ProgramCode=right.ProgramCode,
-							xContact(LEFT,RIGHT),
-							LEFT OUTER, KEEP(1), MANY LOOKUP);
-
-	return b6;
-END;
-
 	$.Layout_Base2 xAddress($.Layout_Base2 src, $.Layouts2.rAddressEx addr) := TRANSFORM
 	
 							self.Physical_AddressCategory := IF(addr.AddressType in ['P','B'],addr.AddressCategory,src.Physical_AddressCategory);	
@@ -155,24 +93,30 @@ END;
 
 EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 version) := FUNCTION
 
-	cases := PROJECT(ds(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
+	ca1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
 										self := LEFT.CaseRec;
 										self.RecordCode := left.RecordCode;
-										));
+										)), hash32(CaseId));
+										
+	cases := DEDUP(SORT(ca1, CaseId,ProgramState,ProgramCode,GroupId, local),
+									CaseId,ProgramState,ProgramCode,GroupId, local);
 
-	clients := PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
+	cl1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 											self := LEFT.ClientRec;
 											self.RecordCode := left.RecordCode;
 											)
-										);
+										), HASH32(ClientId));
 
-	addresses := PROJECT(ds(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
+	clients := DEDUP(SORT(cl1, ClientId,CaseId,ProgramState,ProgramCode,GroupId, local),
+									ClientId,CaseId,ProgramState,ProgramCode,GroupId, local);
+
+	ad1 := DISTRIBUTE(PROJECT(ds(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
 												self := LEFT.AddressRec;
 												self.RecordCode := left.RecordCode;
-												self := []));
+												self := [])), HASH32(CaseId, ClientId));
 
-	contacts := $.Files2.dsContactRecords;
-										
+	addresses := DEDUP(SORT(ad1, CaseId,ClientId,ProgramState,ProgramCode,GroupId,AddressType, local),
+									CaseId,ClientId,ProgramState,ProgramCode,GroupId,AddressType, local);
 
 	ds1 := PROJECT(cases, TRANSFORM(layout_Base2,
 								self.ProgramState := left.ProgramState;
@@ -206,6 +150,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					// save case information
 					self.ProgramState := left.ProgramState;
 					self.ProgramCode := left.ProgramCode;
+					self.GroupId := left.GroupId;
 					self.CaseId := left.CaseId;
 					self.RegionCode := left.RegionCode;
 					self.CountyCode := left.CountyCode;
@@ -214,6 +159,10 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					self.case_Phone1 := left.case_Phone1;
 					self.case_Phone2 := left.case_Phone2;
 					self.case_Email := left.case_Email;
+					self.filename := left.filename;
+					self.OrigGroupId := left.OrigGroupId;
+					self.Created := left.Created;
+					self.Updated := left.Updated;
 										
 					// add client information
 					self.eligibility_status_indicator := right.Eligibility;
@@ -234,7 +183,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					
 					self := right;
 					self := left;
-					), INNER, LOCAL);
+					), LEFT OUTER, LOCAL);
 					
 	// add head of household as case name
 	ds3 := JOIN(DISTRIBUTE(ds2(case_last_name=''), HASH32(ProgramState,ProgramCode,CaseId)),
@@ -252,8 +201,6 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 	
 	ds5 := JoinAddresses(ds4, addresses);
 	
-	ds6 := AddContacts(ds5, contacts);
-
-	return ds6;
+	return ds5;
 
 END;

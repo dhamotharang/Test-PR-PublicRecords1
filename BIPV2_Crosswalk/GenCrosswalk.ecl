@@ -63,8 +63,6 @@ export GenCrosswalk(
                                   self.dt_first_seen_at_business     := left.dt_first_seen_contact;
                                   self.dt_last_seen_at_business      := left.dt_last_seen_contact;
                                   self.dt_first_seen                 := if(left.company_incorporation_date > 0, left.company_incorporation_date, left.dt_first_seen),
-                                  self.global_sid                    := 0; //CHANGE ONCE POPULATED FROM HEADER
-                                  self.record_sid                    := 0; //CHANGE ONCE POPULATED FROM HEADER
                                   self                               := left,
                          ));
                                                                                    
