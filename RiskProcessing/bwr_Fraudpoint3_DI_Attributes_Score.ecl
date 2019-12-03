@@ -17,7 +17,7 @@ unsigned retrys         := 5 ;  //number of retrys in the soapcall
 
 //---------------- FILE NAMES -----------------
 filename := data_services.foreign_prod + 'nmontpetit::out::chase_1139_apr_dev_sample_pii';
-outputfile := '~tfuerstenberg::out::TMX_examples_' + thorlib.wuid();
+outputfile := '~tfuerstenberg::out::TMX_examples_' + '_' + thorlib.wuid();
 qa_outputfile := outputfile+'_QA';
 
 
@@ -82,6 +82,7 @@ f := if(record_limit = 0, //depending on the record_limit, either process the en
 				choosen(dataset(filename,prii_layout, csv(quote('"'))), record_limit));
 
 output(choosen(f,eyeball), named('original_input'));
+output(count(f), named('original_input_count'));
 
 Layout_Attributes_In := RECORD
 	string name;
@@ -275,7 +276,7 @@ resu := soapcall(dist_dataset, roxieIP,
 				retry(retrys),
 				onFail(myFail(LEFT)));
 				
-output(choosen(resu, eyeball), named('roxie_result'));
+// output(choosen(resu, eyeball), named('roxie_result'));
 	
 fd_attributes_norm := RECORD
 	string30 AccountNumber;
@@ -1447,9 +1448,14 @@ qa_results := GROUP(SORT(JOIN(resu(Shell.Account<>''), fdInput, LEFT.Shell.Accou
                       TRANSFORM({Models.Layout_Fraudpoint_Debug.Shell, STRING errorcode}, 
                       SELF.Account := RIGHT.old_account_number, SELF := LEFT.Shell, SELF := LEFT)), Account), Account);
 
-output(choosen(normed, eyeball), named('sample'));
-output(choosen(normed(errorcode<>''), eyeball), named('errors'));
-output(count(normed(errorcode<>'')), named('err_count'));
+DI_input_errors := normed(errorcode = '0ReceivedRoxieException: (Invalid request for Digital Insights, must supply a phone number and email.)');
+
+Other_errors := normed(errorcode not in ['','0ReceivedRoxieException: (Invalid request for Digital Insights, must supply a phone number and email.)']);
+
+// output(choosen(normed, eyeball), named('sample'));
+output(choosen(DI_input_errors, eyeball), named('DI_input_errors'));
+output(choosen(Other_errors, eyeball), named('Other_errors'));
+output(count(Other_errors), named('Other_error_count'));
 
 attr_plus_scores := group(sort(normed, accountnumber), accountnumber);
 
@@ -1517,7 +1523,7 @@ end;
 
 rolled_scores := rollup(scores_denormed, true, combine_scores(left,right));
 
-to_1_record := join(rolled_scores, attrs_only,
+to_1_record_temp := join(rolled_scores, attrs_only,
                     left.accountnumber = right.accountnumber,
                     Transform(fd_attributes_norm,
                               self.fp_score1 :=left.fp_score1;
@@ -1550,13 +1556,19 @@ to_1_record := join(rolled_scores, attrs_only,
                               self := right
                               ));
 
-output(choosen(to_1_record, eyeball), named('to_1_record'));
+// output(choosen(to_1_record_temp, eyeball), named('to_1_record'));
 
 fd_attributes_norm_minus_compromised_dl := record
 	fd_attributes_norm - IdentityDriversLicenseComp;
 end;
 
+//Add any errors back to the results so that we have all the input records
+to_1_record := to_1_record_temp + DI_input_errors;
+
 without_compromised_dl := project(to_1_record, transform(fd_attributes_norm_minus_compromised_dl, self := left));
+
+output(choosen(to_1_record, eyeball), named('to_1_record'));
+output(choosen(without_compromised_dl, eyeball), named('without_compromised_dl'));
 
 // if the option is turned on to suppress compromised DLs, then output the file that has the attribute included
 // otherwise, output the file without that field in the layout
@@ -1564,6 +1576,8 @@ if(_SuppressCompromisedDLs,
 output(to_1_record,,outputfile,CSV(heading(single), quote('"')), overwrite),
 output(without_compromised_dl,,outputfile,CSV(heading(single), quote('"')), overwrite)
 );
+
+output(Other_errors,,outputfile + '_errors',CSV(heading(single), quote('"')), overwrite);
 
 IF(_include_internal_extras, OUTPUT(CHOOSEN(qa_results, eyeball), NAMED('Sample_QA_Results')));
 IF(_include_internal_extras, OUTPUT(qa_results,,qa_outputfile, CSV(heading(single), quote('"')), overwrite));

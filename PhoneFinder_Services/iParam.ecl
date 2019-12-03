@@ -217,8 +217,9 @@ MODULE
       EXPORT BOOLEAN UseDeltabase 					 := IF(IsGetMetaData, RealTimedata, FALSE);
 
       EXPORT BOOLEAN IncludeAccudataOCN      := pfOptions.IncludeAccudataOCN;
-      EXPORT BOOLEAN UseAccuData_OCN         := ((IncludePhoneMetadata AND displayAll) OR IncludeAccudataOCN) AND ~doxie.compliance.isAccuDataRestricted(drm);
-
+      //EXPORT BOOLEAN UseAccuData_OCN         := ((IncludePhoneMetadata AND displayAll) OR IncludeAccudataOCN) AND ~doxie.compliance.isAccuDataRestricted(drm);
+      //The gateway is down for past 2 months,not calling this gateway until further update from Product
+      EXPORT BOOLEAN UseAccuData_OCN         := FALSE;
       EXPORT BOOLEAN IncludeTargus           := pfOptions.IncludeTargus;
       EXPORT BOOLEAN UseTargus          		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeTargus) AND ~doxie.compliance.isPhoneFinderTargusRestricted(drm);
 
@@ -322,12 +323,13 @@ MODULE
       EXPORT BOOLEAN   useWaterfallv6			 := FALSE : STORED('useWaterfallv6');//internal
       EXPORT BOOLEAN   IncludePhoneMetadata:= FALSE : STORED('IncludePhoneMetadata');
 
-      EXPORT BOOLEAN   UseAccudata_ocn     := IncludePhoneMetadata AND
-                                              ~doxie.compliance.isAccuDataRestricted(drm) AND
-                                              TransactionType IN [$.Constants.TransType.Premium,
-                                                                  $.Constants.TransType.Ultimate,
-                                                                  $.Constants.TransType.PHONERISKASSESSMENT]; // accudata_ocn gateway call
-
+      // EXPORT BOOLEAN   UseAccudata_ocn     := IncludePhoneMetadata AND
+      //                                         ~doxie.compliance.isAccuDataRestricted(drm) AND
+      //                                          TransactionType IN [$.Constants.TransType.Premium,
+      //                                                             $.Constants.TransType.Ultimate,
+      //                                                              $.Constants.TransType.PHONERISKASSESSMENT]; // accudata_ocn gateway call
+      //The gateway is down for past 2 months,not calling this gateway until further update from Product
+      EXPORT BOOLEAN   UseAccudata_ocn     := FALSE;
              BOOLEAN   SubjectMetadata 		 := FALSE : STORED('SubjectMetadataOnly');
       EXPORT BOOLEAN   SubjectMetadataOnly := IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
       EXPORT BOOLEAN   SuppressNonRelevantRecs := FALSE : STORED('SuppressNonRelevantRecs');
