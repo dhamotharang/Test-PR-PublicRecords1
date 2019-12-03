@@ -1167,6 +1167,7 @@
 		export string KEYWORD_RBNZ_ALERT						:= '853';
 		export string KEYWORD_HRAZTN								:= '854';
 		export string KEYWORD_TTSEC									:= '855';
+		export string KEYWORD_ESCNMC								:= '856';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
