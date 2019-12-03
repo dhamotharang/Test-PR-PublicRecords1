@@ -2,10 +2,11 @@
 
 EXPORT proc_quickHdr_build_all (
 	STRING sourceIP = _control.IPAddress.bctlpedata10,
-	STRING sourcePathWeekly  = '/data/Builds/builds/quick_header/data/',
-	STRING sourcePathMonthly = '/data/Builds/builds/quick_header/data/',
-	STRING destinationGroup  = STD.System.Thorlib.Group(),
-	STRING overwriteFileDate = '',
+    STRING sourcePathWeekly  = '/data/Builds/builds/quick_header/data/',
+    STRING sourcePathMonthly = '/data/Builds/builds/quick_header/data/',
+    STRING destinationGroup  = STD.System.Thorlib.Group(),
+    STRING overwriteWeeklyFileDate = '',
+    STRING overwriteMonthlyFileDate = '',
 	STRING buildRunWatchers  =    'Gregory.Rose@lexisnexisrisk.com'
 								+',Debendra.Kumar@lexisnexisrisk.com'
 								+',Gabriel.Marcan@lexisnexisrisk.com'
@@ -102,8 +103,8 @@ EXPORT proc_quickHdr_build_all (
 
 	RETURN SEQUENTIAL(
 		check_superfiles_are_in_sync,
-		header_quick._config(sourceIP, sourcePathMonthly).set_v_version,
-		header_quick._config(sourceIP, sourcePathWeekly).set_v_eq_as_of_date(overwriteFileDate),
+		header_quick._config(sourceIP, sourcePathMonthly).set_v_version(overwriteMonthlyFileDate),
+		header_quick._config(sourceIP, sourcePathWeekly).set_v_eq_as_of_date(overwriteWeeklyFileDate),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doWeekly,200),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doMonthly,300),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, notify('Build_Header_Ingest', '*'),400),
