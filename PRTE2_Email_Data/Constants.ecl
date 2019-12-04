@@ -1,9 +1,9 @@
-IMPORT _Control, ut, PRTE, PRTE2, PRTE2_Common;
+﻿IMPORT _Control, ut, PRTE, PRTE2, PRTE2_Common;
 
 EXPORT Constants := MODULE
 
 		EXPORT in_prefix_name						:= '~prte::in::email_data::';
-		EXPORT base_prefix_name					:= '~prte::base::email_data::';
+	  EXPORT base_prefix_name					:= '~prte::base::email_data::';
 		EXPORT base_prefix_alpha				:= 'prct::base::ct::email_data_v2';
 		EXPORT qaVersion              	:= '::qa::';
 																 
