@@ -29,7 +29,9 @@ module
 	shared Base_personstats													:=	files().base.kel_personstats_delta.built 
 																										+	files().base.kel_personstats_demo.built;
 	shared Base_customerdashtopclusters							:=	files().base.kel_customerdashtopclusters_delta.built
-																										+ files().base.kel_customerdashtopclusters_demo.built;																										
+																										+ files().base.kel_customerdashtopclusters_demo.built;	
+																										
+	shared Personevents_prep												:= Distribute(KELOtto.KelFiles.PersonEvents,hash(uid));																									
 																					
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customeraddress.New, Base_customeraddress, Build_kel_customeraddress , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_personstats.New, Base_personstats, Build_kel_personstats , pOverwrite := true);
@@ -47,7 +49,7 @@ module
 	//KEL Demo
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customeraddress_Demo.New, KELOtto.KelFiles.CustomerAddress, Build_kel_customeraddress_Demo , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_personstats_Demo.New, KELOtto.KelFiles.PersonStats, Build_kel_personstats_Demo , pOverwrite := true);
-	tools.mac_WriteFile(Filenames(pversion).Base.kel_personevents_Demo.New, KELOtto.KelFiles.PersonEvents, Build_kel_personevents_Demo , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_personevents_Demo.New, Personevents_prep, Build_kel_personevents_Demo , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customerstats_Demo.New, KELOtto.KelFiles.CustomerStats, Build_kel_customerstats_Demo , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerStatsPivot_Demo.New, KELOtto.KelFiles.CustomerStatsPivot, Build_kel_CustomerStatsPivot_Demo , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_fullgraph_Demo.New, KELOtto.KelFiles.FullCluster, Build_kel_fullgraph_Demo , pOverwrite := true);
@@ -61,7 +63,7 @@ module
 	//KEL Delta
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customeraddress_Delta.New, KELOtto.KelFiles.CustomerAddress, Build_kel_customeraddress_Delta , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_personstats_Delta.New, KELOtto.KelFiles.PersonStats, Build_kel_personstats_Delta , pOverwrite := true);
-	tools.mac_WriteFile(Filenames(pversion).Base.kel_personevents_Delta.New, KELOtto.KelFiles.PersonEvents, Build_kel_personevents_Delta , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_personevents_Delta.New, Personevents_prep, Build_kel_personevents_Delta , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customerstats_Delta.New, KELOtto.KelFiles.CustomerStats, Build_kel_customerstats_Delta , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerStatsPivot_Delta.New, KELOtto.KelFiles.CustomerStatsPivot, Build_kel_CustomerStatsPivot_Delta , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_fullgraph_Delta.New, KELOtto.KelFiles.FullCluster, Build_kel_fullgraph_Delta , pOverwrite := true);

@@ -1,4 +1,5 @@
 ﻿export Build_Base(version) := module
+import $, doxie, Email_Data, MDR, Suppress;
 //-------Concatenate all Email sources in a common layout-
 #option('multiplePersistInstances',FALSE);
 
@@ -36,17 +37,27 @@ export email_sources := entiera_src +
 export append_best_data    := Fn_Append_Best (email_sources);
 //-------Append HHID
 export append_hhid         := Fn_Append_Hhid(append_best_data) : persist('~persist::email_data::before_rollup'); 
+//-------Rollup records with the same email, name, address - for FCRA only
+export rollup_email_fcra   := Fn_Rollup_Email_Data_orig(append_hhid);
+//-------Suppress records by global_sid -- CCPA-791
+filter_out_did             := append_hhid(did=0);
+filter_in_did              := append_hhid(did<>0);
+mod_access                 := MODULE(doxie.IDataAccess) END; // default mod_access
+suppress_global_sid        := Suppress.MAC_SuppressSource (filter_in_did, mod_access, , , TRUE);
+export after_suppress_all  := suppress_global_sid + filter_out_did;
 //-------Rollup records with the same email, name, address
-export rollup_email_orig   := Fn_Rollup_Email_Data_orig(append_hhid);
+export rollup_email_orig   := Fn_Rollup_Email_Data_orig(after_suppress_all);
 //-------Rollup records with the same email, name, address
 export rollup_email        := Fn_Rollup_Email_Data(rollup_email_orig);
 //------Propagate sources for records with the same email-did or same email and simillar name (when did = 0)
 export propagate_src_email := Fn_Propagate_Src(rollup_email ) ;
 //-----Propagate did to records with same email simillar name
-export propagate_did   		:= Fn_Propagate_Did(propagate_src_email);
+export propagate_did   		 := Fn_Propagate_Did(propagate_src_email);
 //-----Concatenate current base and previous base to create a final base with histor
 export rollup_with_history := Fn_Rollup_Base_History(propagate_did);
 //-----Concatenate current base and previoubase to create a final base with histor and misc emails
 // export rollup_with_history_misc := Fn_Append_Misc(rollup_with_history) ; // removed 8-3 bjd 
+//-----Populate Virtual Global_sid -- DF-26409
+export addGlobalSID        := MDR.macGetGlobalSid(rollup_with_history,'emaildata_virtual','','global_sid');
 
 end;
