@@ -158,6 +158,7 @@ end;
 ,orig_DOT_Base.active_domestic_corp_key
 ,orig_DOT_Base.active_duns_number
 ,orig_DOT_Base.active_enterprise_number
+,typeof(orig_DOT_Base.vl_id) sbfe_id
 ,orig_DOT_Base.cnp_btype
 ,orig_DOT_Base.cnp_classid
 ,orig_DOT_Base.cnp_hasnumber

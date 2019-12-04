@@ -4,8 +4,10 @@ export Keys(
 	 string pversion = ''
 
 ) := module
-	
-	shared Base_ClusterDetails_prep				:= PROJECT(KELOtto.KelFiles.FullCluster	, TRANSFORM(Layouts_key.ClusterDetails	,SELF.exp1_:=topn(LEFT.exp1_ , 255,LEFT.exp1_.entity_context_uid_),self.zip_ := (integer8) LEFT.zip_ ,SELF:=LEFT ));
+	shared ClusterDetails_prep						:= Project(KELOtto.KelFiles.FullCluster	, TRANSFORM(Layouts_key.ClusterDetails
+																								,self.exp1_:= Project(left.exp1_,Transform(Layouts_key.Cluster_Exp1_,self:=left))
+																								,self.zip_ := (integer8) LEFT.zip_ ,self:=left));
+	shared Base_ClusterDetails_prep				:= PROJECT(ClusterDetails_prep	, TRANSFORM(Layouts_key.ClusterDetails	,SELF.exp1_:=topn(LEFT.exp1_ , 255,LEFT.exp1_.entity_context_uid_),SELF:=LEFT ));
 	shared Base_ElementPivot_prep 				:= PROJECT(KelOtto.KelFiles.EntityStats, Transform(Layouts_Key.ElementPivot,self.entityhash:=(unsigned8)left.entityhash,self:=left));
 	shared Base_ScoreBreakdown_prep				:= PROJECT(KelOtto.KelFiles.ScoreBreakdown, Layouts_Key.ScoreBreakdown);
 	shared Base_WeightingChart						:= PROJECT(Files().Input.ConfigRiskLevel.Sprayed, Transform(Layouts_Key.WeightingChart

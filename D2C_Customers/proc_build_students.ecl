@@ -1,5 +1,8 @@
 import American_student_list, Watchdog, PromoteSupers;
 
+/********* STUDENTS **********/
+//SRC code - 'SL'
+
 dsMajor := DATASET([
 {'A','BIOLOGICAL SCIENCE'},
 {'B','BUSINESS/COMMERCE'},
@@ -21,7 +24,7 @@ dsMajor := DATASET([
 {'R','MARKETING'},
 {'S','FINANCE'},
 {'T','MEDICINE'},
-{'U',''},		//UNCLASSIFIED
+{'U','UNCLASSIFIED'},
 {'V','CHIROPRACTIC'},
 {'W','ART'},
 {'X',''},
@@ -30,12 +33,13 @@ dsMajor := DATASET([
 ], {STRING1 abbreviation, string18 major});
 dictMajor := DICTIONARY(dsMajor, {abbreviation => major});
 
-Wdog := distribute(Watchdog.File_Best_nonglb(adl_ind = 'CORE'), hash(did));
+/********* STUDENTS **********/
 
 EXPORT proc_build_students(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-    students   := DISTRIBUTE(American_student_list.File_american_student_DID(did<>0), hash(did));
-    students_s := SORT(students, did, historical_flag, -date_last_seen, local);
+    //200M records
+    BaseFile := distribute(D2C_Customers.Files.ASLDS(mode), hash(did));
+    students_s := SORT(BaseFile, did, historical_flag, -date_last_seen, local);
 
 	D2C_Customers.layouts.rStudent AddStudent(students_s L) := TRANSFORM
         self.LexId := (unsigned6)L.did;				
@@ -44,24 +48,9 @@ EXPORT proc_build_students(unsigned1 mode, string8 ver, string20 customer_name) 
         self.COLLEGE_MAJOR := dictMajor[L.COLLEGE_MAJOR].major;        
 	END;
 
-    ds := project(students_s, AddStudent(left))(COLLEGE_NAME<>'');	
+    inDS := project(students_s, AddStudent(left))(COLLEGE_NAME<>'');
 
-    fullDS := ds;
-    coreDS := join(distribute(ds, hash(LexID)), Wdog, left.LexID = right.did, transform(left), local);
-    coreDerogatoryDS := join(coreDS, distribute(Files.derogatoryDS, did), left.LexID = right.did, transform(left), local);
-   
-    outDS := map( mode = 1 => fullDS,          //FULL
-                 mode = 2 => coreDS,          //QUARTERLY
-                 mode = 3 => coreDerogatoryDS //MONTHLY
-               );
-   
-   sMode := map(Mode = 1 => 'full',
-                Mode = 2 => 'core',
-                Mode = 3 => 'derogatory',
-                ''
-                );
-                
-   PromoteSupers.MAC_SF_BuildProcess(outDS,'~thor_data400::output::d2c::' + sMode + '::students',doit,2,,true,ver);
-   return if(Mode not in [1,2,3], output('phones - INVALID MODE - ' + Mode), doit);
+    res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 22);
+    return res;
 
 END;

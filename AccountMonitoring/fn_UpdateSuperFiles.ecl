@@ -1,71 +1,23 @@
 ﻿/* This function updates all the super files for a particular product*/
 
-import dops, _control, AccountMonitoring, STD, _Control, Data_Services;
-
-EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask = 
-                            AccountMonitoring.types.productMask.allProducts, // all
-                            string roxie_esp_server = dops.constants.vESPSet('nonfcra','prod')[1], // prod //'10.173.104.101' 
-                            string roxie_vip_server =  _Control.RoxieEnv.prodvip,
-                            string roxie_port = '8010'
-                            
-                            ) := function
-
-   
-                  
-  liveClust := dops.GetRoxieClusterInfo(roxie_esp_server).LiveCluster(roxie_vip_server); 
-  roxiePack := dops.GetRoxiePackage(roxie_esp_server,roxie_port,liveClust).Keys();                               
-
-  Superfiles := AccountMonitoring.config_UpdateSuperFiles(product_mask);
-  newSuperfileLink :=  join(Superfiles,roxiePack,
-                        left.RoxieSuperFile = right.superfile,
-                        transform(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout,
-                          self.MonitorSuperFile := left.MonitorSuperFile,
-                          self.RoxieSuperFile := left.RoxieSuperFile,
-                          self.LogicalFile := right.subfile,
-                          self.LogicalFileExists := true, // assume all exists for now
-                          self.FirstInstance := false,
-                        ));
-
-   
-  global_newSuperfileLink   := global(newSuperfileLink,few);
-
-  newSuperfileLinkCheckLogical  :=  nothor(PROJECT(global_newSuperfileLink,
-                                           TRANSFORM(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout,
-                                            SELF.LogicalFileExists := STD.File.FileExists(Data_Services.Default_Data_Location + left.LogicalFile),
-                                            SELF := left)
-                                           ));
-                         
-  CGM_LogicalFiles := newSuperfileLinkCheckLogical;
-  CGM_LogicalFilesGroup := GROUP(CGM_LogicalFiles,MonitorSuperFile);
-
-   AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_Rollup_layout RollFiles
-      (AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout L, 
-      DATASET(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout) AllRows) := TRANSFORM
-         SELF.MonitorSuperFile := L.MonitorSuperFile;
-         SELF.RoxieSuperFile := L.RoxieSuperFile;
-         SELF.LogicalFiles := PROJECT(AllRows,TRANSFORM(AccountMonitoring.layouts.UPDATE_SOURCE.LogicalFile_layout,SELF := LEFT));
-         SELF.AllLogicalFilesExist := min( AllRows,AllRows.LogicalFileExists);
-     END;
-   
-  CGM_LogicalFilesFinal := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
-           
-  updateMonitorFiles(DATASET(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_Rollup_layout) inFiles, 
-                     STRING stem_name = AccountMonitoring.constants.filename_cluster) := FUNCTION
+IMPORT dops, AccountMonitoring, STD, _Control, Data_Services;
 
   add_logicals(STRING SuperFileName, DATASET(AccountMonitoring.layouts.UPDATE_SOURCE.LogicalFile_layout) LogicalFiles) := FUNCTION
-            update_action := APPLY(LogicalFiles,
-                           
+     update_action := APPLY(LogicalFiles,
                                 SEQUENTIAL(
                                           STD.File.StartSuperFileTransaction()
                                          ,STD.File.AddSuperFile(SuperFileName,Data_Services.Default_Data_Location + logicalFile)
                                          ,STD.File.FinishSuperFileTransaction()
                                 ));
-            RETURN update_action;
-        END;
+    RETURN update_action;
+  END;
 
-    
+  updateMonitorFiles(DATASET(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_Rollup_layout) inFiles, 
+                     STRING stem_name = AccountMonitoring.constants.filename_cluster) := FUNCTION
+
+  
     update_action := APPLY(inFiles,
-                   if(AllLogicalFilesExist,
+                   IF(AllLogicalFilesExist,
                       SEQUENTIAL(
                              STD.File.StartSuperFileTransaction()
                             ,IF(NOT STD.File.SuperfileExists(TRIM(stem_name+monitorsuperfile)+'_qa'),STD.File.CreateSuperFile(TRIM(stem_name+monitorsuperfile)+'_qa'))
@@ -79,9 +31,55 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
                    ,STD.System.Log.addWorkunitWarning(TRIM(stem_name+monitorsuperfile)+
                      ' were not updated as package files(s) were not available on THOR.',1)      
                   ));
-    return NOTHOR(update_action);		
+    RETURN NOTHOR(update_action);		
   END;
 
+
+EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask = 
+                            AccountMonitoring.types.productMask.allProducts, // all
+                            STRING roxie_esp_server = dops.constants.vESPSet('nonfcra','prod')[1], // prod //'10.173.104.101' 
+                            STRING roxie_vip_server =  _Control.RoxieEnv.prodvip,
+                            STRING roxie_port = '8010'
+                            
+                            ) := FUNCTION
+                  
+  liveClust := dops.GetRoxieClusterInfo(roxie_esp_server).LiveCluster(roxie_vip_server); 
+  roxiePack := dops.GetRoxiePackage(roxie_esp_server,roxie_port,liveClust).Keys();                               
+
+  Superfiles := AccountMonitoring.config_UpdateSuperFiles(product_mask);
+  newSuperfileLink :=  JOIN(Superfiles,roxiePack,
+                        STD.Str.ToLowerCase(left.RoxieSuperFile) = STD.Str.ToLowerCase(RIGHT.superfile),
+                        TRANSFORM(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout,
+                          SELF.MonitorSuperFile := LEFT.MonitorSuperFile,
+                          SELF.RoxieSuperFile := LEFT.RoxieSuperFile,
+                          SELF.LogicalFile := RIGHT.subfile,
+                          SELF.LogicalFileExists := TRUE, // assume all exists for now
+                          SELF.FirstInstance := FALSE,
+                        ));
+
+   
+  global_newSuperfileLink   := GLOBAL(newSuperfileLink,few);
+
+  newSuperfileLinkCheckLogical  :=  NOTHOR(PROJECT(global_newSuperfileLink,
+                                           TRANSFORM(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout,
+                                            SELF.LogicalFileExists := STD.File.FileExists(Data_Services.Default_Data_Location + left.LogicalFile),
+                                            SELF := left)
+                                           ));
+                         
+  CGM_LogicalFiles := newSuperfileLinkCheckLogical;
+  CGM_LogicalFilesGroup := GROUP(CGM_LogicalFiles,MonitorSuperFile);
+
+  AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_Rollup_layout RollFiles
+      (AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout L, 
+      DATASET(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout) AllRows) := TRANSFORM
+         SELF.MonitorSuperFile := L.MonitorSuperFile;
+         SELF.RoxieSuperFile := L.RoxieSuperFile;
+         SELF.LogicalFiles := PROJECT(AllRows,TRANSFORM(AccountMonitoring.layouts.UPDATE_SOURCE.LogicalFile_layout,SELF := LEFT));
+         SELF.AllLogicalFilesExist := MIN( AllRows,AllRows.LogicalFileExists);
+  END;
+   
+  CGM_LogicalFilesFinal := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
+           
 /*        output(liveClust,named('liveClust'));
           output(choosen(roxiePack,4000),named('roxiePack'));
           output(CGM_LogicalFiles,named('CGM_LogicalFiles'));
@@ -90,8 +88,8 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
   update_monitor_file :=
         SEQUENTIAL(updateMonitorFiles(CGM_LogicalFilesFinal)
                   );
-    update_monitor_file;
+  update_monitor_file;
 
 
-  return(0);
-  end;
+  RETURN(0);
+END;

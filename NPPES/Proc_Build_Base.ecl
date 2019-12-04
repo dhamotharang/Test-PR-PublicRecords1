@@ -312,7 +312,7 @@ end;
 																		dt_vendor_first_reported, dt_vendor_last_reported, process_date,
 																		clean_name_provider.name_score, clean_name_provider_other.name_score,
 																		clean_name_authorized_official.name_score, RawAID_Mailing, AceAID_Mailing,
-																		RawAID_Location, AceAID_Location, source_rec_id, lnpid,
+																		RawAID_Location, AceAID_Location, record_sid,source_rec_id, lnpid,
 																		xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, 
 																		xadl2_matches, xadl2_matches_desc,																		
 																 LOCAL);

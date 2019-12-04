@@ -26,11 +26,16 @@
         string60  Name;
     END;
     
+    EXPORT lRelativesSlim := record
+        unsigned6 LexID1;
+        unsigned6 LexID2;
+    END;
+
     EXPORT rRelatives := record
         unsigned1 Record_Type := 4;
         unsigned1 Type;
-        unsigned6 LexID1;
-        unsigned6 LexID2;
+        lRelativesSlim;
+        string1   Association := 'A';
     END;
     
     EXPORT rBankruptcy := record
@@ -337,6 +342,26 @@
       string2   CLASS;
       string50  COLLEGE_NAME;
       string18  COLLEGE_MAJOR;
+    END;
+
+    EXPORT rForeclosure := RECORD
+        unsigned1 record_type:=23;
+        string    Owner;
+        string    Lender;
+        string200 Site_Address;
+        string2   Deed_Type;
+        unsigned4 Recording_Date;
+        string    Attorney;
+        string    Plaintiff;
+        string    title_company;
+        unsigned4 filing_date;
+        unsigned4 auction_date;
+        unsigned4 date_of_default;
+    END;
+
+    EXPORT lIteration:=RECORD
+        UNSIGNED6 did;
+        STRING1 came_from;
     END;
 
 END;
