@@ -46,9 +46,9 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::linkids',
 
   is_running_in_prod := PRTE2_Common.Constants.is_running_in_prod;
   NoUpdate           := OUTPUT('Skipping DOPS update because we are not in PROD');
-  updatedops         := PRTE.UpdateVersion('Cortera', filedate, _control.MyInfo.EmailAddressNormal, 'B', 'N', 'N');
+  updatedops         := PRTE.UpdateVersion('CorteraKeys', filedate, _control.MyInfo.EmailAddressNormal, l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
   PerformUpdateOrNot := IF(is_running_in_prod, updatedops, NoUpdate);
-  // orbit_update       := Orbit3.proc_Orbit3_CreateBuild ('CorteraKeys',filedate);
+  orbit_update       := Orbit3.proc_Orbit3_CreateBuild ('PRTE - Cortera',filedate);
 
  RETURN     SEQUENTIAL(
                        //Build Keys
@@ -71,6 +71,6 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::linkids',
                        
                        //Update DOPs         
                                 PerformUpdateOrNot,
-                                /*orbit_update*/);
+                                orbit_update);
 
 END;
