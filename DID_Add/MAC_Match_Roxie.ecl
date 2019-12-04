@@ -13,4 +13,4 @@ end;
 
 outfile := table(%outpipe%, %slimrec%);// :  persist('~persist_did_add_mac_match_roxie','100way');
 
-endmacro;
+endmacro : DEPRECATED('Use DID_Add.Mac_Match_Roxie_V2 Instead');

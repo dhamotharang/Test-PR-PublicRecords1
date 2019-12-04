@@ -36,4 +36,4 @@ outfile := DID_Add.DID_log.fLogstopTime_ROXIE(%roxres%,%dologging%);
 outfile := %roxres%;
 //'10.150.193.1-100:9876'
 //'10.150.29.203-212:9876'
-endmacro;
+endmacro :DEPRECATED('Use DID_Add.Mac_Match_Fast_Roxie_V2 Instead');
