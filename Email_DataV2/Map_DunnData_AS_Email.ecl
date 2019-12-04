@@ -90,14 +90,15 @@ Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 	SELF.orig_CompanyName						:= IF(TRIM(input.clean_cname) != '',ut.CleanSpacesAndUpper(input.NAME_FULL),'');
 	SELF.cln_CompanyName						:= ut.CleanSpacesAndUpper(input.clean_cname);
 	SELF.rules											:= 0;
-	SELF.global_sid                 := 27651;
 	SELF := input;
 	SELF := [];
 END;
 
-d_final := PROJECT(domain_d, t_map_to_common(LEFT));
+d_final 	:= PROJECT(domain_d, t_map_to_common(LEFT));
+
+addGlobalSID 	:= mdr.macGetGlobalSID(d_final,'EmailDataV2','email_src','global_sid'); //DF-25302: Populate Global_SID
 
 // d_final := OUTPUT(t_mappend_f, ,'~thor_data400::base::DunnData_As_Email_Initial',__compressed__,overwrite);
 
-RETURN d_final;
+RETURN addGlobalSID;
 END;
