@@ -19,23 +19,18 @@ END;
 
 EXPORT DO := FUNCTION
 
-   MakeSuperKeys (Constants.key_prefix + '@version@::did');
-   MakeSuperKeys (Constants.key_prefix + '@version@::email_addresses');
-   MakeSuperKeys (Constants.key_prefix + '@version@::payload');
-	 MakeSuperKeys (Constants.key_prefix + '@version@::linkids');
-  	 
-   MakeSuperKeys (Constants.key_FCRA_prefix + '@version@::did');
-   MakeSuperKeys (Constants.key_FCRA_prefix + '@version@::payload');
-	  
-	 
-	 MakeSuperKeys (Constants.key_prefix + 'autokey::@version@::address');
-   MakeSuperKeys (Constants.key_prefix + 'autokey::@version@::citystname');
-   MakeSuperKeys (Constants.key_prefix + 'autokey::@version@::name');
-   MakeSuperKeys (Constants.key_prefix + 'autokey::@version@::ssn2');
-   MakeSuperKeys (Constants.key_prefix + 'autokey::@version@::stname');
-   MakeSuperKeys (Constants.key_prefix + 'autokey::@version@::zip');
-	 MakeSuperKeys (Constants.key_prefix + 'autokey::@version@::payload');
-	 	 
+MakeSuperKeys ('~prte::key::email_datav2::@version@::email_event_lkp');
+
+MakeSuperKeys ('~prte::key::email_datav2::@version@::domain_lkp');
+
+MakeSuperFiles ('~prte::Base::EmailEvent@version@');
+
+MakeSuperFiles ('~prte::Base::DomainEvent@version@');
+
+FileServices.CreateSuperFile ('~PRTE::IN::emailevent');
+
+FileServices.CreateSuperFile ('~PRTE::IN::emaildomain');
+
 RETURN 'SUCCESS';
 
 End;
