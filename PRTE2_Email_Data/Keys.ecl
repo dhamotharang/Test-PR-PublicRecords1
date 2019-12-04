@@ -46,14 +46,5 @@ export autokeys(string filedate):= function
 	return bld_auto_keys; 				
 end;
 
-/*
-auto_payload := RECORD
-unsigned6 fakeid;
-recordof(Files.File_AutoKey);
-END;
-
-shared dsPayload := dataset([], auto_payload);
-export Key_Payload := index(dsPayload,{fakeid}, {dsPayload},Data_Services.Data_location.Prefix('email_data')+ Constants.autokeyname + doxie.Version_SuperKey + '::payload');
-*/
 
 END;
