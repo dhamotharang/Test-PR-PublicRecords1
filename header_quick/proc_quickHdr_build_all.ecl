@@ -3,10 +3,10 @@
 EXPORT proc_quickHdr_build_all (
 	STRING sourceIP = _control.IPAddress.bctlpedata10,
     STRING sourcePathWeekly  = '/data/Builds/builds/quick_header/data/',
-    STRING sourcePathMonthly = '/data/Builds/builds/quick_header/data/',
-    STRING destinationGroup  = STD.System.Thorlib.Group(),
     STRING overwriteWeeklyFileDate = '',
+    STRING sourcePathMonthly = '/data/Builds/builds/quick_header/data/',
     STRING overwriteMonthlyFileDate = '',
+    STRING destinationGroup  = STD.System.Thorlib.Group(),
 	STRING buildRunWatchers  =    'Gregory.Rose@lexisnexisrisk.com'
 								+',Debendra.Kumar@lexisnexisrisk.com'
 								+',Gabriel.Marcan@lexisnexisrisk.com'
