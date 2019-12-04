@@ -1,5 +1,4 @@
-﻿Import doxie, drivers, header, mdr, Risk_Indicators, riskwise, header_quick, ut, STD, Suppress, data_services;
-IMPORT drivers, DueDiligence, dx_header, header, header_quick, MDR, Risk_Indicators, ut;
+﻿IMPORT data_services, doxie, drivers, DueDiligence, dx_header, header, header_quick, MDR, Risk_Indicators, Suppress, ut;
 
 /*
 	Following Keys being used:
@@ -23,8 +22,14 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
 
 
-    parents := DueDiligence.CommonIndividual.getRelationship(inData, parents, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);																																																							
-    allInd := parents + inData;
+    parents := DueDiligence.CommonIndividual.GetRelationshipAsInquired(inData, parents, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);																																																							
+    spouse := DueDiligence.CommonIndividual.GetRelationshipAsInquired(inData, spouses, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);																																																							
+    associates := DueDiligence.CommonIndividual.GetRelationshipAsInquired(inData, associates, DueDiligence.Constants.INQUIRED_INDIVIDUAL_OTHER_RELATION);
+    
+    //remove any duplices - make sure we do not have any spouse/parents in associates
+    removeDups := DEDUP(SORT(spouse + parents + associates, seq, individual.did, indvType), seq, individual.did);
+    
+    allInd := removeDups + inData;
 
     getHeaderData(key, didField, atmostValue, keepValue) := FUNCTIONMACRO
         results_unsuppressed := JOIN(allInd, key, 
@@ -75,6 +80,9 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     //only inquired records
     inquiredHeaderData := filterHeader(indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL);
+    
+    //only parent and inquired records
+    inquiredWithParentHeaderData := filterHeader(indvType IN [DueDiligence.Constants.INQUIRED_INDIVIDUAL, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT]);
 
 
     //first seen date for a given inquired did
@@ -83,16 +91,42 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     addDateFirstReported := JOIN(inData, dedupHeaderDateFirstSeen,
                                   LEFT.seq = RIGHT.seq AND
-                                  LEFT.individual.did = RIGHT.did,
+                                  LEFT.inquiredDID = RIGHT.did,
                                   TRANSFORM(DueDiligence.Layouts.Indv_Internal,
                                             SELF.firstReportedDate := RIGHT.dateFirstSeen;
                                             SELF := LEFT;),
                                   LEFT OUTER,
                                   ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
+      
+      
+    //get the earliest first seen date for the inquireds relationships (spouses, parents, other relations)
+    nonInquiredHeaderData := filterHeader(indvType <> DueDiligence.Constants.INQUIRED_INDIVIDUAL);
+    
+    sortRelativeDateFirstSeen := SORT(nonInquiredHeaderData(dateFirstSeen <> 0), seq, did, dateFirstSeen);
+    dedupRelativeDateFirstSeen := DEDUP(sortRelativeDateFirstSeen, seq, did);
+    
+    convertToRelatedParty := DueDiligence.CommonIndividual.CreateRelatedPartyDataset(removeDups);
+    
+    addRelativeFirstSeen := JOIN(convertToRelatedParty, dedupRelativeDateFirstSeen,
+                                  LEFT.seq = RIGHT.seq AND
+                                  LEFT.party.did = RIGHT.did,
+                                  TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
+                                            SELF.headerfirstseen := RIGHT.dateFirstSeen;
+                                            SELF := LEFT;),
+                                  LEFT OUTER,
+                                  ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
+
+    perAssocOptions := MODULE(DueDiligence.DataInterface.iAttributePerAssoc)
+                                EXPORT BOOLEAN includeLegalData := FALSE;
+                                EXPORT BOOLEAN includeSSNData := FALSE;
+                                EXPORT BOOLEAN includeHeaderData := TRUE;
+                       END;
+                                             
+    updateRelatives := DueDiligence.CommonIndividual.UpdateRelationships(addDateFirstReported, addRelativeFirstSeen, perAssocOptions);
 
                                
                                
-    addVoterInfo := DueDiligence.getIndVoterData(addDateFirstReported, filterHeader);
+    addVoterInfo := DueDiligence.getIndVoterData(updateRelatives, inquiredWithParentHeaderData);
 
     addMobilityInfo := DueDiligence.getIndMobility(addVoterInfo, inquiredHeaderData, isFCRA, bsVersion);
 
@@ -116,6 +150,13 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     // output(sortHeaderDateFirstSeen, named('sortHeaderDateFirstSeen'));
     // output(dedupHeaderDateFirstSeen, named('dedupHeaderDateFirstSeen'));
     // output(addDateFirstReported, named('addDateFirstReported'));
+    
+    // output(nonInquiredHeaderData, named('nonInquiredHeaderData'));
+    // output(sortRelativeDateFirstSeen, named('sortRelativeDateFirstSeen'));
+    // output(dedupRelativeDateFirstSeen, named('dedupRelativeDateFirstSeen'));
+    // output(convertToRelatedParty, named('convertToRelatedParty'));
+    // output(addRelativeFirstSeen, named('addRelativeFirstSeen'));
+    // output(updateRelatives, named('updateRelatives'));
 
     // output(addVoterInfo, named('addVoterInfo'));
     // output(addMobilityInfo, named('addMobilityInfo'));
