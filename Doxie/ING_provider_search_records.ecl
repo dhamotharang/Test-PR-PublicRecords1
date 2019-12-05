@@ -39,10 +39,7 @@ EXPORT ING_provider_search_records ( STRING15 taxid_value, STRING2 lic_st, STRIN
 		Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
 			 self.glb_ok := ut.glb_ok (gm.GLBPurpose);
 			 self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
-                         self.glb_ok :=  gm.GLBPurpose;
-			 self.dppa_ok := gm.DPPAPurpose;
-
-			 self.DRM := gm.DataRestrictionMask;
+                         self.DRM := gm.DataRestrictionMask;
 	 	   self.glb:= gm.GLBPurpose;
        self.dppa:= gm.DPPAPurpose; 
 
