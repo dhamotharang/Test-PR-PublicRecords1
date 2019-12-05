@@ -1,0 +1,65 @@
+import ConsumerFinancialProtectionBureau as cfpb;
+EXPORT mappings := module
+    shared common := macro
+        self.record_sid := rsid;
+        self.dt_vendor_first_reported := date;
+        self.dt_vendor_last_reported := date;
+        self.global_src_id := 0;
+        self.is_latest := true;
+    endmacro;
+    export cfpb.layouts.BLKGRP convert_BLKGRP(cfpb.layouts.original_blkgrp L, unsigned4 rsid, unsigned4 date) := TRANSFORM
+        self.seqno := (unsigned2) L.field1;
+        self.GEOID10_BlkGrp := L.field2;
+        self.State_FIPS10 := L.field3;
+        self.County_FIPS10 := L.field4;
+        self.Tract_FIPS10 := L.field5;
+        self.BlkGrp_FIPS10:=  (unsigned2)L.field6;
+        self.Total_Pop:=  (unsigned2)L.field7;
+        self.Hispanic_Total:=  (unsigned2)L.field8;
+        self.Non_Hispanic_Total:=  (unsigned2)L.field9;
+        self.NH_White_alone:=  (unsigned2)L.field10;
+        self.NH_Black_alone:=  (unsigned2)L.field11;
+        self.NH_AIAN_alone:=  (unsigned2)L.field12;
+        self.NH_API_alone:=  (unsigned2)L.field13;
+        self.NH_Other_alone:=  (unsigned2)L.field14;
+        self.NH_Mult_Total:=  (unsigned2)L.field15;
+        self.NH_White_Other:=  (unsigned2)L.field16;
+        self.NH_Black_Other:=  (unsigned2)L.field17;
+        self.NH_AIAN_Other:=  (unsigned2)L.field18;
+        self.NH_Asian_HPI:=  (unsigned2)L.field19;
+        self.NH_API_Other:=  (unsigned2)L.field20;
+        self.NH_Asian_HPI_Other:=  (unsigned2)L.field21;
+        common();
+    end;
+    export cfpb.layouts.BLKGRP_attr_over18 convert_BLKGRP_attr_over18(cfpb.layouts.original_BLKGRP_attr_over18 L,  unsigned4 rsid, unsigned4 date) := TRANSFORM
+        self.GeoInd := L.field1;
+        self.geo_pr_White := (REAL4) L.field2;
+        self.geo_pr_Black := (REAL4) L.field3;
+        self.geo_pr_AIAN := (REAL4) L.field4;
+        self.geo_pr_API :=  (REAL4) L.field5;
+        self.geo_pr_mult_other :=  (REAL4) L.field6;
+        self.geo_pr_Hispanic :=  (REAL4) L.field7;
+        self.here :=  (REAL4) L.field8;
+        self.here_given_white :=  (REAL4) L.field9;
+        self.here_given_black :=  (REAL4) L.field10;
+        self.here_given_aian :=  (REAL4) L.field11;
+        self.here_given_api :=  (REAL4) L.field12;
+        self.here_given_mult_other :=  (REAL4) L.field13;
+        self.here_given_hispanic := (REAL4) L.field14;
+        common();
+    end;
+    export cfpb.layouts.census_surnames convert_census_surnames(cfpb.layouts.original_census_surnames L,  unsigned4 rsid, unsigned4 date) := TRANSFORM
+        self.name := L.field1;
+        self.name_rank := (UNSIGNED3) L.field2;
+        self.name_count := (UNSIGNED3) L.field3;
+        self.prop100k := (UDECIMAL5_2) L.field4;
+        self.cum_prop100k := (UDECIMAL9_2) L.field5;
+        self.pctwhite := (UDECIMAL4_2) L.field6;
+        self.pctblack := (UDECIMAL4_2) L.field7;
+        self.pctapi := (UDECIMAL4_2) L.field8;
+        self.pctaian := (UDECIMAL4_2) L.field9;
+        self.pct2prace := (UDECIMAL4_2) L.field10;
+        self.pcthispanic := (UDECIMAL4_2) L.field11;
+        common();
+    end;
+end;
