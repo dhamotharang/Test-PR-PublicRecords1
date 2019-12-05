@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ProfessionalLicenseReportRequest">
   <part name="UniqueId" type="xsd:string"/>
   <part name="LicenseNumber" type="xsd:string"/>
@@ -65,6 +65,8 @@ export Prof_LicenseReportService := MACRO
 	Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
 		 self.glb_ok :=  ut.glb_ok (input_params.GLBPurpose);
 		 self.dppa_ok := ut.dppa_ok(input_params.DPPAPurpose);
+		 self.glb :=  input_params.GLBPurpose;
+		 self.dppa := input_params.DPPAPurpose;
 		 self.drm := input_params.DataRestrictionMask;	
 		 self.includeSanctions:=true;
 		// self:=[];Do not uncomment otherwise the default values will not get set.

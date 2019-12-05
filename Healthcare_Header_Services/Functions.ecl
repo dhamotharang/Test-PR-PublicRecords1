@@ -1,4 +1,4 @@
-import AMS,Address,AutoStandardI,DEA,iesp,doxie,suppress,deathv2_Services,NPPES,STD,Healthcare_Affiliations;
+﻿import AMS,Address,AutoStandardI,DEA,iesp,doxie,suppress,deathv2_Services,NPPES,STD,Healthcare_Affiliations;
 EXPORT Functions := MODULE
 	shared gm := AutoStandardI.GlobalModule();
 	//Cleaning Functions
@@ -1014,7 +1014,7 @@ EXPORT Functions := MODULE
 			glb_ok := deathparams.isValidGlb();
 			byDids := normalize(input,left.dids,transform(Layouts.layout_death_DID,self.acctno := left.acctno;self.ProviderID:=left.ProviderID;self.did:=right.did;self.ssn:=if(left.UserSSNFound,left.UserSSN,'');self.freq:=right.freq;self.dob:=if(left.UserDOBFound,left.UserDOB[1..6],'');self.UserSSNFound:=left.UserSSNFound;self:=[]));
 			byDids_BestFreq := dedup(sort(byDids,acctno,ProviderID,-freq),acctno,ProviderID);
-      deathRecs			:=dx_death_master.Get.byDid(byDids, did, deathparams, /*skip_glb_check=*/TRUE);
+      deathRecs			:=dx_death_master.Get.byDid(byDids,did, deathparams);
 			death_BestHit := join(byDids(SSN<>''),deathRecs,			
 									left.did = right.did,
 									transform(layouts.layout_death_BestHit,
