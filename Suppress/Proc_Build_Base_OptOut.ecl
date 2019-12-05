@@ -18,7 +18,7 @@ EXPORT Proc_Build_Base_OptOut(STRING pVersion) := FUNCTION
 			SELF							:= L;
 			SELF							:= [];
 		END;
-		minor_file 				:= CHOOSEN(InsuranceHeader_Incremental.Files.Minors_Current_DS,0); 
+		minor_file 				:= InsuranceHeader_Incremental.Files.Minors_Current_DS; 
 		minor_0					:= PROJECT(minor_file, tInputM(LEFT));
 
 		// Create opt out records for Public Records, Health Care, and Insurance
