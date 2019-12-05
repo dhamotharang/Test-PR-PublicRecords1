@@ -8,7 +8,7 @@ basename:='~thor_data400::base::header_raw';
 basenamei:='~thor_data400::base::header_raw_incremental';
 fname:=basename+'_'+filedate;
 
-s1:=output(h,,fname,compressed);
+s1:=output(h_ccpa_compliant,,fname,compressed);
 
 built:=basename+'_built';
 prod:=basename+'_prod';
@@ -68,7 +68,7 @@ full_ := sequential(
 									,PostUpdate
 									);
 
-PromoteSupers.MAC_SF_BuildProcess( h
+PromoteSupers.MAC_SF_BuildProcess( h_ccpa_compliant
                                   ,basenamei
                                   ,incremental_
                                   ,numgenerations:=2
