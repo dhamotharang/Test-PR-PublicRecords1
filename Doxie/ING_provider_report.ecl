@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="IngenixProviderReportRequest">
 	<part name="DID" type="xsd:string"/>
   <part name="ProviderID" type="xsd:unsignedInt" required="1"/>
@@ -52,6 +52,8 @@ Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transfor
 	self.DRM := gm.DataRestrictionMask;
 	self.glb_ok :=  ut.glb_ok (gm.GLBPurpose);
 	self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
+	self.glb :=  gm.GLBPurpose;
+	self.dppa := gm.DPPAPurpose;
 	// self:=[];Do not uncomment otherwise the default values will not get set.
 end;
 cfg:=dataset([buildConfig()]);
