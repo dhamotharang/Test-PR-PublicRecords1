@@ -108,7 +108,10 @@ EXPORT DocumentRetrievalService() := FUNCTION
 		SuperReportRow,
 		ReportsDeltabaseResult.deltabaseReportsAll);
 	
-	IF(EXISTS(ReportsAll) AND ReportsAll[1].Releasable != '1', FAIL(ErrorCodeImageNonReleasable, 'Image is non-releasable'));	
+	// Check the releasable flag for the last item in "ReportsAll", since it will be the most recent.
+	MostRecentReport := ReportsAll[COUNT(ReportsAll)];
+	IF(EXISTS(ReportsAll) AND MostRecentReport.Releasable != '1',
+		FAIL(ErrorCodeImageNonReleasable, 'Image is non-releasable'));
 	
 	// Compose our reponse.
 	IsImageTooLarge := LENGTH(ImageRetrievalResponse[1].response.ImageData) = iesp.Constants.Retrieve_Document.MaxDocumentSize;
