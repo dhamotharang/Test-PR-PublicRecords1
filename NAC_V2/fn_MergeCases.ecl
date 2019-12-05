@@ -14,13 +14,13 @@ It is expected that if there are updates to previous Case records, it would be f
 EXPORT fn_MergeCases(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
 
 	c1 := DISTRIBUTE(newbase, HASH32(CaseID)); 
+	// find most recent version
 	cases := DEDUP(SORT(c1, CaseId,ProgramState,ProgramCode,GroupId,-$.fn_lfnversion(filename), local),
 									CaseId,ProgramState,ProgramCode,GroupId, local);
-	// only update active cases
-	current := DISTRIBUTE(base(StartDate <= std.date.Today(), EndDate >= std.date.Today()),
-														HASH32(CaseId, ProgramState, ProgramCode, GroupId));
 
-	updated := JOIN(current, cases, 
+	baseCases := DISTRIBUTE(base,	HASH32(CaseId));
+
+	updated := JOIN(baseCases, cases, 
 							LEFT.CaseId = right.CaseId AND 
 							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode and LEFT.GroupId = RIGHT.GroupId,
 							TRANSFORM($.Layout_Base2,
@@ -39,8 +39,8 @@ EXPORT fn_MergeCases(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) ba
 								self := left;
 						),
 							LEFT OUTER, LOCAL);
-							
-	new := JOIN(current, cases, 
+/*							
+	new := JOIN(baseCases, cases, 
 							LEFT.CaseId = right.CaseId AND 
 							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode and LEFT.GroupId = RIGHT.GroupId,
 							TRANSFORM($.Layout_Base2,
@@ -50,8 +50,8 @@ EXPORT fn_MergeCases(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) ba
 
 							
 		notcurrent := base(StartDate > std.date.Today() OR EndDate < std.date.Today());
-
+*/
 									
-	return updated + notcurrent + new;
+	return updated;
 
 END;
