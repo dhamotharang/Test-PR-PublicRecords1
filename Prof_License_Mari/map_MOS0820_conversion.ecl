@@ -13,7 +13,7 @@ EXPORT map_MOS0820_conversion(STRING pVersion) := FUNCTION
 	src_st							:= code[1..2];	//License state
 	mari_dest						:= '~thor_data400::in::proflic_mari::';
 
-	MD_Lic_types := ['IAS','INB','BRA','BRO','BRP','BRS','PCB','PCS','SAL','BRK','SCG','RSL','RAP', 'ACM'];
+	MD_Lic_types := ['IAS','INB','BRA','BRO','BRP','BRS','PCB','PCS','SAL','BRK','SCG','RSL','RAP','REC','ACM'];
 
 	//Move file from sprayed to using
 	move_to_using := PARALLEL(
@@ -99,7 +99,7 @@ EXPORT map_MOS0820_conversion(STRING pVersion) := FUNCTION
 																	 StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(L.PRC_FIRST_NAME+' '+L.PRC_MIDDLE_NAME+' '+tempLastName+' '+L.PRC_SUFFIX)),' '));
 		tempBusName						:= IF(TRIM(L.PRC_FIRST_NAME,LEFT,RIGHT) = ' ' AND tempLastName != ' ',
 																StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(tempLastName)),
-																IF(TRIM(L.PRC_FIRST_NAME,LEFT,RIGHT) = ' ' AND TRIM(L.PRC_ENTITY_NAME,LEFT,RIGHT) != ' ',
+																IF(TRIM(L.PRC_FIRST_NAME,LEFT,RIGHT) != ' ' AND TRIM(L.PRC_ENTITY_NAME,LEFT,RIGHT) != ' ',
 																	 StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(L.PRC_ENTITY_NAME)),' '));
 		std_org_name 					:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(tempBusName);
 		tmpNameOrgSufx				:= Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(std_org_name);
@@ -233,7 +233,7 @@ EXPORT map_MOS0820_conversion(STRING pVersion) := FUNCTION
 		clnAddr_2							:= IF(tmpNameContact2<>'',REGEXREPLACE(tmpNameContact2, trimAddr_2, ''), trimAddr_2);
 		//temp_preaddr1 				:= StringLib.StringCleanSpaces(trimAddr_1+' '+trimAddr_2); //Concat addr1 and addr2 for cleaning
 		temp_preaddr1 				:= StringLib.StringCleanSpaces(clnAddr_1+' '+clnAddr_2); //Concat addr1 and addr2 for cleaning
-		temp_preaddr2 				:= StringLib.StringCleanSpaces(L.BA_CITY+' '+L.BA_STATE +' '+L.BA_ZIP); //Concat city, state, zipe for cleaning
+		temp_preaddr2 				:= StringLib.StringCleanSpaces(L.BA_CITY+' '+L.BA_STATE +' '+L.BA_ZIP); //Concat city, state, zip for cleaning
 		clnAddrAddr1					:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(temp_preaddr1,temp_preaddr2); //Address cleaner to remove 'c/o' and 'attn' from address
 		tmpADDR_ADDR1_1				:= TRIM(clnAddrAddr1[1..10],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[11..12],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[13..40],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[41..44],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[45..46],LEFT,RIGHT);																	
 		tmpADDR_ADDR2_1				:= TRIM(clnAddrAddr1[47..56],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[57..64],LEFT,RIGHT);
@@ -257,11 +257,12 @@ EXPORT map_MOS0820_conversion(STRING pVersion) := FUNCTION
 		tempAddr1_2							:= IF(IsMailingAddr != 'M',' ',
 																IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND cleanAddr2_2 = ' ',CleanAddr1_2,
 																	IF(IsMailingAddr = 'M' AND tempContact2 != ' ' AND cleanAddr2_2 != ' ',cleanAddr2_2,
-																		IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND cleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr1_2),CleanAddr2_2,CleanAddr1_2))));
+																		IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND cleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr1_2),cleanAddr2_2,CleanAddr1_2))));
 		self.ADDR_ADDR1_2			:= IF(REGEXFIND('^.* LLC$',tempAddr1_2),'',tempAddr1_2);
 		tempAddr2_2						:= IF(IsMailingAddr != 'M',' ',
-															IF(IsMailingAddr = 'M' AND tempContact2 != ' ' AND cleanAddr2_2 != ' ',' ',
-																IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND cleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr1_2),CleanAddr1_2,CleanAddr2_2)));
+																IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND cleanAddr2_2 = ' ',CleanAddr1_2,
+																	IF(IsMailingAddr = 'M' AND tempContact2 != ' ' AND cleanAddr2_2 != ' ',cleanAddr2_2,
+																		IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND cleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr1_2),CleanAddr1_2,cleanAddr2_2))));
 		self.ADDR_ADDR2_2			:= IF(REGEXFIND('(^ATTN|^C/O)',tempAddr2_2),'',tempAddr2_2);
 		self.ADDR_CITY_2		  := IF(self.ADDR_MAIL_IND = 'M' AND TRIM(L.REL_CITY) != ' ',ut.CleanSpacesAndUpper(L.REL_CITY),' ');
 		self.ADDR_STATE_2			:= IF(self.ADDR_MAIL_IND = 'M' AND TRIM(L.REL_STATE) != ' ',ut.CleanSpacesAndUpper(L.REL_STATE),' ');
