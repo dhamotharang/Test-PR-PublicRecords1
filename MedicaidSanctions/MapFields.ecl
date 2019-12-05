@@ -57,7 +57,7 @@ $.Layout_XG.routp xForm($.Layout_Sanctions infile) := TRANSFORM
 									Std.Str.CleanSpaces(infile.first + ' ' + infile.middle + ' ' + infile.last + ' ' + infile.suffix)
 									);
 						self.gender := '';
-						self.Reason_Listed := 'Medicaid Sanction';
+						self.Reason_Listed := 'Medicaid Exclusion';
 						self.Listed_Date := Std.Date.ConvertDateFormat(infile.offense_date,'%Y%m%d', '%Y/%m/%d');
 						self.modified_date := Std.Date.ConvertDateFormat(infile.offense_date,'%Y%m%d', '%Y/%m/%d');
 						self.aka_list.aka := DATASET([], $.Layout_XG.layout_aliases);

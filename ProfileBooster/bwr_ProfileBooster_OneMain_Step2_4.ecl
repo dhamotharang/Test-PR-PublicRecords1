@@ -34,6 +34,15 @@ output(choosen(ds_in, eyeball_count), named('sample_input_records_step2_4'));
 	
 search_function_with_acctno := ProfileBooster.OneMain_Step2_Function(ds_in, eyeball_count, StepName):independent, FAILURE(FileServices.SendEmail(EmailList,'OneMain Step2_4 attribute calculation failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
 
+checkInputs := join(ds_in, search_function_with_acctno,
+										right.lexid = left.lexid ,
+										transform(ProfileBooster.Layouts.Layout_PB_BatchOutFlat,
+															self := right), right only);
+															
+output(choosen(checkInputs,100), named('checkInputs_step4'));
+output(Count(checkInputs), named('checkInputsCounts_step4'));
+output(Count(checkInputs(lexid = 0)), named('checkInputs_LexidZeroCount_step4'));	
+	
 								
 output(choosen(search_function_with_acctno, eyeball_count), named('search_function_with_acctno_Step2_4'));
 output(search_function_with_acctno,, '~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part4', csv(quote('"')), EXPIRE(30), OVERWRITE);

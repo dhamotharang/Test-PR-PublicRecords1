@@ -1,10 +1,16 @@
-﻿IMPORT Std, KELOtto, FraudShared, data_services, ut;
+﻿IMPORT Std, KELOtto, FraudShared, data_services, ut,doxie,Suppress;
 #CONSTANT ('Platform','FraudGov');
 RunKelDemo :=false:stored('RunKelDemo');
 
 FileIn := If(RunKelDemo=false,'fraudgov::base::built::Main','fraudgov::in::sprayed::demodata');
 
-fraudgov_dataset_base_prep := dataset(data_services.foreign_prod+FileIn, FraudShared.Layouts.Base.Main, thor); 
+fraudgov_dataset_Input := dataset(data_services.foreign_prod+FileIn, FraudShared.Layouts.Base.Main, thor); 
+
+// Supress CCPA
+mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
+Supress_CCPA := Suppress.MAC_SuppressSource(fraudgov_dataset_Input, mod_access, did, NULL,TRUE);			
+
+fraudgov_dataset_base_prep	:= Supress_CCPA;
 
 //PULL(FraudShared.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Main.built);
  
@@ -76,7 +82,7 @@ Set_record_id:=[59386231,59812325,78505368,82750428,13496281,64149144,74043112,3
 Set_did:=[101469336770, 2064197553,199600630,802421875,1612657577,1375235801,1466482754,1215789174,2231445703,1056261901,464680867,102723930787,298166078,1752427243,1213942861,1970080308,1894039365,2248303771,529728450,1357828170,2578799228,2773009559,56371566];
 
 // filter out spurious transactions in the future.
-fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today() and did != 1);// AND (record_id in Set_record_id OR did % 100000 in [0] OR did = 899999999550 OR email_address != '' or ssn = '294287743' or event_type_1 = '10000' /*or ip_address != ''*/ or bank_account_number_1 != '' or drivers_license != '' or did in set_did OR classification_Activity.Confidence_that_activity_was_deceitful_id = 3));
+fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today() and did != 1);//  AND (record_id in Set_record_id OR did % 100000 in [0] OR did = 899999999550 OR email_address != '' or ssn = '294287743' or event_type_1 = '10000' or ip_address[1..3] = '209' or bank_account_number_1 != '' or drivers_license != '' or did in set_did OR classification_Activity.Confidence_that_activity_was_deceitful_id = 3));
 
 final := DISTRIBUTE(fraudgov_dataset);
 
