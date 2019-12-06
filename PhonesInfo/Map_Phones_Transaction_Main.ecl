@@ -15,6 +15,6 @@
 									otpFile; 
 									
 	//Add Global_SID Field
-	addGlobalSID:= 	MDR.macGetGlobalSid(concatFiles, 'PhonesMetadata', 'source', 'global_sid');												
-
+	// addGlobalSID:= 	MDR.macGetGlobalSid(concatFiles, 'PhonesMetadata', 'source', 'global_sid');												
+     addGlobalSID:= 	MDR.macGetGlobalSID(concatFiles,'PhonesMetadata_Virtual','','global_sid');//CCPA-799
 EXPORT Map_Phones_Transaction_Main := addGlobalSID;
