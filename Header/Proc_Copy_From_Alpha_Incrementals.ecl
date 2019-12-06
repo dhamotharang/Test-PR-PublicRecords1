@@ -75,7 +75,29 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   
   seq := sequential(copyKeys, moveKeys);
   return seq;  
-END;    
+END;
+
+EXPORT copy_ca_minors_from_alpha(string filedt) := function
+  
+  aDali := _control.IPAddress.aprod_thor_dali;
+  lc := '~foreign::' + aDali + '::';
+  get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
+
+  prefix := 'thor_data400::base::insuranceheader_incremental::ca_minors::';  
+  currentSF := prefix + 'current';
+  deleteSF  := prefix + 'delete';
+  lf := '~' + prefix + filedt;
+
+  copyFile := fc(get_alogical(currentSF), lf);    
+  moveFile := sequential(    
+        STD.File.StartSuperFileTransaction( )
+       ,nothor(STD.file.PromoteSuperFileList(['~' + currentSF, '~' + deleteSF], lf))
+       ,STD.File.FinishSuperFileTransaction( )
+       );
+  
+  seq := sequential(copyFile, moveFile);
+  return seq;  
+END;
                 
 EXPORT copy_from_alpha(string filedt) := function
     
@@ -241,26 +263,28 @@ SHARED orbit_update_entries(boolean isCreate, string skipPackage='000') := funct
 
 END;
 
-// check if we have a local copy already   
-EXPORT ok_to_copy(string filedt) := filedt<>'' and (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::idl')) and (~std.file.fileexists('~thor400_36::key::insuranceheader_xlink::'+filedt+'::did::refs::idl'));
-SHARED ok_to_copy_UniqExKeys(string filedt) := filedt<>'' and (~std.file.fileexists('~thor_data400::key::header::' + filedt + '::addr_unique_expanded'));
-
 // run on hthor
 EXPORT Refresh_copy(string filedt) :=  FUNCTION
 
-    noLABcopy := ~test_copy AND ~ok_to_copy(filedt);
+    noLABcopy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::idl'));
     cpLab := if(noLABcopy
              ,output('No LAB copy. see outputs')
              ,copy_from_alpha(filedt)
              );
              
-    noUniqExcopy := ~test_copy AND ~ok_to_copy_UniqExKeys(filedt);
+    noUniqExcopy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::header::' + filedt + '::addr_unique_expanded'));
     cpUniqEx := if(noUniqExcopy
              ,output('No Address Unique Expanded copy. see outputs')
              ,copy_addr_uniq_keys_from_alpha(filedt)
              );
+
+    noCAminorcopy := filedt <>'' AND ~test_copy AND ~(~std.file.fileexists('~thor_data400::base::insuranceheader_incremental::ca_minors::' + filedt));
+    cpCAminor := if(noCAminorcopy
+             ,output('No CA Minors copy. see outputs')
+             ,copy_ca_minors_from_alpha(filedt)
+             );            
              
-    return sequential(cpLab, cpUniqEx);
+    return sequential(cpLab, cpUniqEx, cpCAminor);
 END;
 
 EXPORT movetoQA(string filedt) := sequential(
