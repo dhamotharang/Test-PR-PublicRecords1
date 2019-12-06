@@ -49,9 +49,9 @@ output(Accuity.Reformat.outputs.source_DNB_1090,,'~thor_data400::accuity::source
 /*output(Accuity.Reformat.outputs.source_ECO_1144,,'~thor_data400::accuity::source_ECO_1144.xml', 
 			xml('Entity', heading(FROMUNICODE(Accuity.MakeHdr.CreateXMLFileHdr('ECO 1144', Accuity.Reformat.outputs.source_ECO_1144), 'utf8')
 						,Accuity.MakeHdr.Footer),trim, OPT), overwrite),*/
-output(Accuity.Reformat.outputs.source_ES_1014,,'~thor_data400::accuity::source_ES_1014.xml', 
+/*output(Accuity.Reformat.outputs.source_ES_1014,,'~thor_data400::accuity::source_ES_1014.xml', 
 			xml('Entity', heading(FROMUNICODE(Accuity.MakeHdr.CreateXMLFileHdr('ES 1014', Accuity.Reformat.outputs.source_ES_1014), 'utf8')
-						,Accuity.MakeHdr.Footer),trim, OPT), overwrite),
+						,Accuity.MakeHdr.Footer),trim, OPT), overwrite),*/
 output(Accuity.Reformat.outputs.source_ESE_1158,,'~thor_data400::accuity::source_ESE_1158.xml', 
 			xml('Entity', heading(FROMUNICODE(Accuity.MakeHdr.CreateXMLFileHdr('ESE 1158', Accuity.Reformat.outputs.source_ESE_1158), 'utf8')
 						,Accuity.MakeHdr.Footer),trim, OPT), overwrite),
@@ -158,7 +158,7 @@ Accuity.Despray('~thor_data400::accuity::source_CSSF_1114.xml', _Control.IPAddre
 Accuity.Despray('~thor_data400::accuity::source_CWL_32.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_source_CWL_32.xml'),
 Accuity.Despray('~thor_data400::accuity::source_DNB_1090.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_source_DNB_1090.xml'),
 //Accuity.Despray('~thor_data400::accuity::source_ECO_1144.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_source_ECO_1144.xml'), Deactivated by Vendor 10/25/2017
-Accuity.Despray('~thor_data400::accuity::source_ES_1014.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_source_ES_1014.xml'),
+//Accuity.Despray('~thor_data400::accuity::source_ES_1014.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_source_ES_1014.xml'),
 Accuity.Despray('~thor_data400::accuity::source_ESE_1158.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_source_ESE_1158.xml'),
 Accuity.Despray('~thor_data400::accuity::source_EUE_1170.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_source_EUE_1170.xml'),
 Accuity.Despray('~thor_data400::accuity::source_FDJ_1152.xml', _Control.IPAddress.bctlpedata10,'/data/stub_cleaning/accuity/output/accuity_source_FDJ_1152.xml'),

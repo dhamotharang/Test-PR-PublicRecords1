@@ -1,4 +1,4 @@
-export Sets := module
+﻿export Sets := module
 export Include := module
 
 export source_ofac := [
@@ -35,7 +35,7 @@ export source_listID := [
 'CWL 32',//	  Cumulative Warning List
 'DNB 1090',//	DUTCH BANK
 'ECO 1144',//	EXPORT CONTROL ORGANISATION UK - IRAN LIST
-'ES 1014',//	Spain
+//'ES 1014',//	Spain
 'ESE 1158',//	EGYPT FINANCIAL SUPERVISORY AUTHORITY
 'EU 33',		// EUROPEAN UNION
 'EUE 1170',//	European Union Enhancements List

@@ -33,7 +33,8 @@ EXPORT proc_build_all(unsigned1 mode = 1, string8 version = (string8)std.Date.To
           D2C_Customers.proc_build_deeds(mode, version, customer_name),
           D2C_Customers.proc_build_tax(mode, version, customer_name),         
           D2C_Customers.proc_build_students(mode, version, customer_name),
-          D2C_Customers.proc_build_civil(mode, version, customer_name)//,
+          D2C_Customers.proc_build_civil(mode, version, customer_name),
+          D2C_Customers.proc_build_foreclosure(mode, version, customer_name)
           ) //end of parallel
           ) //end of if
          ) //end of parallel
