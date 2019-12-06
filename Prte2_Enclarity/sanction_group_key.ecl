@@ -1,0 +1,25 @@
+﻿Export sanction_group_key:=RECORD
+  string38 group_key;
+  string10 sanc1_date;
+  string10 sanc1_code;
+  string2 sanc1_state;
+  string25 sanc1_lic_num;
+  string10 sanc1_prof_type;
+  string10 sanc1_rein_date;
+  unsigned6 pid;
+  string2 src;
+  unsigned4 dt_vendor_first_reported;
+  unsigned4 dt_vendor_last_reported;
+  unsigned4 dt_first_seen;
+  unsigned4 dt_last_seen;
+  string1 record_type;
+  unsigned8 source_rid;
+  unsigned8 lnpid;
+  string8 clean_sanc1_date;
+  string8 clean_sanc1_rein_date;
+  string8 ln_derived_rein_date;
+  boolean ln_derived_rein_flag;
+  string5 level;
+  string50 sanc1_desc;
+  unsigned8 __internal_fpos__;
+ END;
