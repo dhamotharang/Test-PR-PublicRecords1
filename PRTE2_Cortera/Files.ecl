@@ -11,7 +11,7 @@ EXPORT Files := MODULE
   // EXPORT Key_attr   := project(attributes, layouts.Attributes_Out - [cust_name, bug_num]);
   
   //Input Files
-  EXPORT Input_Boca := dataset('~prte::in::cortera::boca', PRTE2_Cortera.Layouts.rlayout, CSV(HEADING(3), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));	 
-  EXPORT Input_INS  := dataset('~prte::in::cortera::Insurance', PRTE2_Cortera.Layouts.rlayout, CSV(HEADING(3), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
+  EXPORT Input_Boca := dataset('~prte::in::cortera::boca', PRTE2_Cortera.Layouts.rlayout, CSV(HEADING(3), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')))(link_id >0); 
+  EXPORT Input_INS  := dataset('~prte::in::cortera::Insurance', PRTE2_Cortera.Layouts.rlayout, CSV(HEADING(3), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')))(link_id >0); 
 
 END;
