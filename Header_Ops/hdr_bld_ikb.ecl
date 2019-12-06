@@ -1,4 +1,4 @@
-﻿import Header,_control,std,InsuranceHeader,doxie, dops;
+﻿import Header,_control,std,InsuranceHeader,doxie, dops,RoxieKeyBuild,dx_header;
 
 EXPORT hdr_bld_ikb(string filedate, unsigned1 status) := module
 
@@ -17,12 +17,21 @@ EXPORT hdr_bld_ikb(string filedate, unsigned1 status) := module
    CopyKeys := Header.Proc_Copy_From_Alpha_Incrementals().Refresh_copy(filedate);
 
    UpdateIncIdl := Header.Proc_Copy_From_Alpha_Incrementals().update_inc_idl(,filedate);
-                    
-   BuildiDid := sequential(
+
+   RoxieKeyBuild.MAC_build_logical ( dx_header.key_first_ingest(),  header.data_key_first_ingest(filedate), 
+                dx_Header.names('').i_first_ingest, dx_Header.names(filedate).i_first_ingest, build_first_ingest);
+   RoxieKeyBuild.Mac_SK_Move_to_Built_v2(dx_Header.names('@version@').i_first_ingest,
+                                         dx_Header.names(filedate).i_first_ingest, mv_first_ingest_BUILT);
+   RoxieKeyBuild.Mac_SK_Move_V2(         dx_Header.names('@version@').i_first_ingest, 'Q', mv_first_ingest_QA,2);
+
+BuildiDid := sequential(
                     nothor(std.file.ClearSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header')),
                     nothor(std.file.AddSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header',
                                           '~thor_data400::key::insuranceheader_xlink::'+filedate+'::idl')),
-                    InsuranceHeader.proc_payload_inc(filedate)
+                    InsuranceHeader.proc_payload_inc(filedate),
+                    build_first_ingest,
+                    mv_first_ingest_BUILT,
+                    mv_first_ingest_QA
                     );
 
    BuildFcra := Doxie.Proc_FCRA_Doxie_keys_All(,true,filedate);
