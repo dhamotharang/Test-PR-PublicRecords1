@@ -21,8 +21,8 @@ EXPORT fn_suppress_ccpa(ds_in, isheader=FALSE, sdata_set, sFieldName='', sGlobal
   #UNIQUENAME(mod_access);
   %mod_access% := MODULE(doxie.IDataAccess) END;
   #UNIQUENAME(suppress_global_sid);
-  %suppress_global_sid% := IF(suppressIt,Suppress.MAC_SuppressSource(%ds_in_wglobal_sid%,%mod_access%,,,TRUE, data_services.data_env.iNonFCRA)
-    ,%ds_in_wglobal_sid%);
+  %suppress_global_sid% := IF(suppressIt,Suppress.MAC_SuppressSource(%append_global_sid%,%mod_access%,,,TRUE, data_services.data_env.iNonFCRA)
+    ,%append_global_sid%);
   #UNIQUENAME(ds_out);
   #IF(isheader)
     %ds_out%:= PROJECT(%suppress_global_sid%,TRANSFORM(RECORDOF(ds_in), SELF:=LEFT));
