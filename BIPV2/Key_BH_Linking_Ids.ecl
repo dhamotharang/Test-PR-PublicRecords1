@@ -19,7 +19,7 @@ MODULE
 	end;	
 	
 	shared layout_key := record
-		infile_rec;
+		infile_rec - global_sid - record_sid;
 		BIPV2.IDlayouts.l_xlink_ids.DotScore;
 		BIPV2.IDlayouts.l_xlink_ids.DotWeight;
 		BIPV2.IDlayouts.l_xlink_ids.EmpScore;
@@ -56,8 +56,8 @@ MODULE
 																											self.UltWeight  := 100,
 																											self.SELEscore	:= 100,
 																											self.SELEweight	:= 100,
-                                                      self.global_sid := 0  ,
-                                                      self.record_sid := 0  ,
+                                                      // self.global_sid := 0  ,
+                                                      // self.record_sid := 0  ,
                                                       self 						:= left,
 																											));
 		    
@@ -76,8 +76,8 @@ MODULE
                                                 self.UltWeight  := 100,
                                                 self.SELEscore  := 100,
                                                 self.SELEweight := 100,
-                                                self.global_sid := 0  ,
-                                                self.record_sid := 0  ,
+                                                // self.global_sid := 0  ,
+                                                // self.record_sid := 0  ,
                                                 self.locid      := 0  ,
                                                 self            := left,
                                                 ));

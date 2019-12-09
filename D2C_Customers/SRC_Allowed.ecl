@@ -1,15 +1,14 @@
-// Added changes based on: https://reedelsevier.sharepoint.com/:u:/r/sites/OG-EquifaxInquiryData/Shared%20Documents/General/FW%20RE%20MyLife.msg?csf=1&e=NRihsF
 
 EXPORT SRC_Allowed := MODULE
 //1
-EXPORT Consumers_allowed_and_extracted :=[
-        
+EXPORT Consumers_allowed_and_extracted :=[ 
+    
         // These sources are used in the bulk extract and will be sub-source-filtered based on the recornds found in the extract dataset file
 
         'VO',      //       471,098,311       Voters v2
 
         'GO',      //       1,095,448,334       Gong History
-        // 'WP',      //       371,782,031       Targus White pages 
+        // 'WP',      //       371,782,031       Targus White pages
         // 'PN',      //       353,662,315       PCNSR Phones
         // 'GN',      //       327,998,600       Gong Neustar
 
@@ -456,21 +455,269 @@ UCC_allowed       := [
         // However, the status of this source is=Don't Process
 ];
 // 15 source
-People_At_Work_NOT_allowed :=[
+People_At_Work_allowed :=[
  
-        // 'QQ',//      125,975,695 // Eq Employer
-        // 'ZM',//       93,562,531 // ZOOM
-        'BR',//       54,574,353 // Business Registration 
-                                   // 18253      Item      National Business Registrations      Dun & Bradstreet
+        'QQ',  //   Eq Employer                                                  125,408,072   21.052%  21%
+        'ZM',  //   ZOOM                                                         93,728,176   15.734%  37%
+        // 'BR',  //   Business Registration                                        54,724,888   9.187%  46%
+                                   // 18253 National Business Registrations      Dun & Bradstreet
+                                   // 18255 no restrictions but part of 'BR'
 
-        'IA',//       52,251,593 // INFOUSA ABIUS(USABIZ) // 18209, 18217, 18219, 18275, 18315 - Bulk sale restricted in Orbit
-        // 'C0',//       34,148,464 // FL Corporations
-        // 'CN',//       19,846,810 // TX Corporations
-        // 'C,',//       16,239,391 // CA Corporations
-        // 'SK',//       12,233,208 // SK&A Medical Professionals // 18031      Item      SKA Licensed Physicians - Bulk restricted on Orbit
-        // 'C<',//       11,809,083 // MA Corporations
-        // 'C)',//        9,442,993 // AK Corporations
-        'UF'//        9,093,347 // src_FBNV2_INF  INF FBNV2 Infousa // 18209, 18217, 18219, 18275, 18315 - Bulk sale restricted in Orbit
+        // 'IA',  //   INFOUSA ABIUS(USABIZ)                                        52,262,563   8.773%  55%
+        'C0',  //   FL Corporations                                              34,188,895   5.739%  60%
+        'CN',  //   TX Corporations                                              19,942,685   3.348%  64%
+        'C,',  //   CA Corporations                                              16,287,658   2.734%  67%
+        'SK',  ///   SK&A Medical Professionals                                   12,246,873   2.056%  69%
+        'C<',  //   MA Corporations                                              11,840,076   1.988%  71%
+        'C)',  //   AK Corporations                                              9,444,090   1.585%  72%
+        // 'UF',  //   INF FBNV2 Infousa                                            9,097,449   1.527%  74%
+        // 'WF',  //   FL  FBNV2 Florida                                            8,781,722   1.474%  75%
+        'PF',  //   CP  FBNV2 Historical Choicepoint                             8,257,181   1.386%  77%
+        'C1',  //   GA Corporations                                              8,086,763   1.358%  78%
+        'C{',  //   NY Corporations                                              6,936,932   1.164%  79%
+        'CS',  //   WA Corporations                                              6,404,648   1.075%  80%
+        'MH',  //   MartinDale Hubbell  ( 17803)                                  5,972,697   1.003%  81%
+        'C4',  //   IL Corporations                                              5,458,720   0.916%  82%
+        'C*',  //   AZ Corporations                                              5,057,424   0.849%  83%
+        'C9',  //   LA Corporations                                              4,865,284   0.817%  84%
+        'BA',  //   Bankruptcy                                                   4,098,156   0.688%  84%
+        'CB',  //   OR Corporations                                              4,064,536   0.682%  85%
+        'C6',  //   IA Corporations                                              3,877,878   0.651%  86%
+        'CP',  //   UT Corporations                                              3,716,199   0.624%  86%
+        // 'TF',  //   EXP FBNV2 Experian Direct     ( 20808)                       3,674,844   0.617%  87%
+        'C.',  //   CT Corporations                                              3,427,880   0.575%  88%
+        // 'DF',  //   DCA                                                          3,394,102   0.570%  88%
+        // 'IC',  //   INFOUSA DEAD COMPANIES                                       3,174,110   0.533%  89%
+        // 'IN',  //   IRS Non-Profit ( 18195 rolaylties apply)                       3,026,476   0.508%  89%   
+        'C5',  //   IN Corporations                                              2,873,212   0.482%  90%
+        'C(',  //   AL Corporations                                              2,794,891   0.469%  90%
+        'C?',  //   MS Corporations                                              2,728,899   0.458%  91%
+        'C\\',  //   NE Corporations                                              2,669,930   0.448%  91%
+        'C]',  //   NV Corporations                                              2,602,463   0.437%  92%
+        'C[',  //   MT Corporations                                              2,588,530   0.435%  92%
+        'C@',  //   MO Corporations                                              2,525,088   0.424%  92%
+        // 'PL',  //   Professional License (some PL is not allowed)                2,502,428   0.420%  93%
+        'CR',  //   VA Corporations                                              2,388,119   0.401%  93%
+        'DA',  //   DEA                                                          2,122,728   0.356%  94%
+        'I ',  //   IRS 5500    (18191)                                          2,086,353   0.350%  94%
+        //'SP',  //   Spoke  (17895 bulk not allowed)                            2,065,857   0.347%  94%
+        'TX',  //   Texas Sales Tax Registrations(TXBUS)  (17143 ok to use)      2,059,362   0.346%  95%
+        /// 'C`',  //   NM Corporations                                              1,969,346   0.331%  95%
+        // 'W ',  //   Domain Registrations (WHOIS)   (19279 restricted)         1,775,984   0.298%  95%
+
+        // 'ML',  //   Medical Information Directory  /American Medical Information 1,670,269   0.280%  95% (18315) no bulk
+        'CV',  //   WV Corporations                                              1,635,270   0.275%  96%
+        'C>',  //   MN Corporations                                              1,619,882   0.272%  96%
+        // 'II',  //   INFOUSA IDEXEC         (18217) no bulk                       1,426,334   0.239%  96%
+        'C|',  //   NC Corporations                                              1,411,387   0.237%  97%
+        'CH',  //   PA Corporations                                              1,383,031   0.232%  97%
+        'CQ',  //   VT Corporations                                              1,375,585   0.231%  97%
+        // 'RB',  //   Redbooks International Advertisers                           1,200,261   0.201%  97% (17813 no bulk + no consumer)
+        // 'GB',  //   Gong Business    (cannot confirm. some gong restricted)      1,110,246   0.186%  97%
+        'CI',  //   RI Corporations                                              1,041,371   0.175%  98%
+        'C8',  //   KY Corporations                                              1,032,423   0.173%  98%
+        // 'GF',  //   CAO FBNV2 California Orange county                           779,993   0.131%  98%
+        'C;',  //   MD Corporations                                              774,529   0.130%  98%
+        'LC',  //   CL,CJ Liens v2 Chicago Law                                   760,904   0.128%  98%
+        // 'HF',  //   TXH FBNV2 Texas Harris                                       711,452   0.119%  98%
+        // 'FL',  //   Florida FBN                                                  672,011   0.113%  98%
+        'C^',  //   NH Corporations                                              597,296   0.100%  98%
+        // 'PP',  //   Phones Plus (most PP sources noted as restricted on Orbit)    536,857   0.090%  99%
+        // 'XF',  //   TXD FBNV2 Texas Dallas                                       505,911   0.085%  99%
+        // 'ED',  //   NM DL                                                        500,468   0.084%  99%
+        'C2',  //   HI Corporations                                              498,191   0.084%  99%
+        // 'C7', / //   KS Corporations                                              454,101   0.076%  99%
+        // 'FN',  //   Florida Non-Profit (13769 not allowed)                       402,835   0.068%  99%
+        'C~',  //   OH Corporations                                              401,960   0.067%  99%
+        // 'MW',  //   MS Worker Comp   (21232 restricted)                          398,724   0.067%  99%
+        'CZ',  //   WY Corporations                                              398,593   0.067%  99%
+        'C-',  //   CO Corporations                                              396,804   0.067%  99%
+        'SG',  //   Sheila Greco (18125, 18177 not restricted)                   377,615   0.063%  99%
+        // 'YF',  //   NBX,NYN,NKI,NQU,NRI FBNV2 New York                           369,086   0.062%  99%
+        'C+',  //   AR Corporations                                              317,527   0.053%  99%
+        // 'ZF',  //   CSC FBNV2 California Santa Clara                             309,158   0.052%  99%
+        'C3',  //   ID Corporations                                              265,311   0.045%  99%
+        'CA',  //   OK Corporations                                              260,617   0.044%  100%
+        'FK',  //   FCC Radio Licenses ( 18229 not restricted)                   216,800   0.036%  100%
+        // 'VF',  //   CAV FBNV2 California Ventura                                 187,169   0.031%  100%
+        // 'SA',  //   SDA - Standard Directory of Advertisers (18199 no bulk)      179,038   0.030%  100%
+        'FT',  //   California Sales Tax (13095 ok to use)                       172,963   0.029%  100%
+        'C}',  //   ND Corporations                                              165,277   0.028%  100%
+        'V ',  //   Vickers  (18211 ok to use)                                159,985   0.027%  100%
+        'IT',  //   Iowa Sales Tax    ( 14427 ok to use)                         139,263   0.023%  100%
+        // 'EQ',  //   Equifax                                                      131,858   0.022%  100%
+        'TL',  //   Texas Liquor Licenses (17153 ok to use)                      109,101   0.018%  100%
+        'BY',  //   Bankruptcy Attorneys   (18107 ok to use)                     108,736   0.018%  100%
+        'C!',  //   WV Historical Corporations                                   91,310   0.015%  100%
+        'LB'   //   Lobbyists (some checked. None restricted)                 90,994   0.015%  100%
+        
+        // ******************* Below account to 0.195% of records and has not been checked for permission. ASSUMING not allowed *******************
+
+        // 'CL',  //   California Liquor Licenses                                   89,890   0.015%  100%
+        // 'FA',  //   LN_Propertyv2 Fares Assessors                                88,445   0.015%  100%
+        // 'BF',  //   CAB FBNV2 California San Bernadino                           84,206   0.014%  100%
+        // 'WT',  //   Wither and Die                                               82,063   0.014%  100%
+        // 'EY',  //   Employee Directories                                         74,051   0.012%  100%
+        // 'CF',  //   ACF - America's Corporate Financial Directory                65,135   0.011%  100%
+        // 'WC',  //   OR Worker Comp                                               59,137   0.010%  100%
+        // 'EN',  //   Experian Credit Header                                       58,313   0.010%  100%
+        // 'E ',  //   Edgar                                                        55,182   0.009%  100%
+        // 'CY',  //   Certegy                                                      53,121   0.009%  100%
+        // 'C=',  //   MI Corporations                                              50,667   0.009%  100%
+        // 'FF',  //   Federal Firearms                                             48,039   0.008%  100%
+        // 'AA',  //   SDAA - Standard Directory of Ad Agencies                     40,933   0.007%  100%
+        // 'SL',  //   American Students List                                       37,561   0.006%  100%
+        // 'AB',  //   Alaska Business Registrations                                37,551   0.006%  100%
+        // 'IL',  //   Indiana Liquor Licenses                                      29,538   0.005%  100%
+        // 'WP',  //   Targus White pages                                           25,673   0.004%  100%
+        // 'FP',  //   LN_Propertyv2 Fares Deeds                                    19,390   0.003%  100%
+        // 'LA',  //   LN_Propertyv2 Lexis Assessors                                19,048   0.003%  100%
+        // 'CU',  //   Credit Unions                                                17,445   0.003%  100%
+        // 'L2',  //   Liens v2                                                     16,321   0.003%  100%
+        // 'AY',  //   Alloy Media Student Directory                                14,203   0.002%  100%
+        // 'E2',  //   EMerge Fish                                                  12,951   0.002%  100%
+        // 'CT',  //   Conneticut Liquor Licenses                                   10,290   0.002%  100%
+        // 'E1',  //   EMerge Hunt                                                  8,669   0.001%  100%
+        // 'LP',  //   LN_Propertyv2 Lexis Deeds and Mortgages                      8,163   0.001%  100%
+        // 'AM',  //   Airmen                                                       6,546   0.001%  100%
+        // 'EM',  //   EMerge Master                                                6,076   0.001%  100%
+        // 'VO',  //   Voters v2                                                    5,922   0.001%  100%
+        // 'UT',  //   Utilities                                                    5,898   0.001%  100%
+        // 'OL',  //   Ohio Liquor Licenses                                         4,147   0.001%  100%
+        // 'FE',  //   Federal Explosives                                           3,150   0.001%  100%
+        // 'LL',  //   Louisana Liquor Licenses                                     2,938   0.000%  100%
+        // 'CX',  //   WI Corporations                                              2,552   0.000%  100%
+        // 'CK',  //   SD Corporations                                              1,759   0.000%  100%
+        // 'EB',  //   EMerge Boat                                                  1,705   0.000%  100%
+        // 'D0',  //   Death California                                             1,686   0.000%  100%
+        // 'E3',  //   EMerge CCW                                                   1,470   0.000%  100%
+        // 'CG',  //   US Coastguard                                                1,183   0.000%  100%
+        // 'SB',  //   SEC Broker/Dealer                                            750   0.000%  100%
+        // 'AT',  //   Accurint Trade Show                                          577   0.000%  100%
+        // 'GG',  //   Gong Government                                              505   0.000%  100%
+        // '.E',  //   TX Experian Veh                                              464   0.000%  100%
+        // 'ZT',  //   Z type Utilities                                             440   0.000%  100%
+        // 'E4',  //   EMerge Cens                                                  434   0.000%  100%
+        // 'DE',  //   Death Master                                                 405   0.000%  100%
+        // 'D2',  //   Death Florida                                                331   0.000%  100%
+        // 'AK',  //   AK Perm Fund                                                 300   0.000%  100%
+        // 'M ',  //   GA Experian Veh                                              272   0.000%  100%
+        // 'YH',  //   WA Experian Veh                                              268   0.000%  100%
+        // 'GE',  //   FL Experian Veh                                              228   0.000%  100%
+        // 'AR',  //   Aircrafts                                                    223   0.000%  100%
+        // '71',  //   AR Experian Veh                                              204   0.000%  100%
+        // 'ME',  //   MD Experian Veh                                              192   0.000%  100%
+        // 'D%',  //   Death Virginia                                               183   0.000%  100%
+        // 'LI',  //   Liens                                                        181   0.000%  100%
+        // 'FD',  //   FL DL                                                        166   0.000%  100%
+        // '!E',  //   OH Experian Veh                                              147   0.000%  100%
+        // 'IE',  //   IL Experian Veh                                              146   0.000%  100%
+        // 'KE',  //   KY Experian Veh                                              137   0.000%  100%
+        // 'TE',  //   TN Experian Veh                                              130   0.000%  100%
+        // 'DS',  //   Death State                                                  108   0.000%  100%
+        // '+E',  //  NM Experian Veh                                              108   0.000%  100%
+        // 'D9',  //   Death Montana                                                106   0.000%  100%
+        // 'EE',  //   CO Experian Veh                                              102   0.000%  100%
+        // 'NT',  //   Foreclosures - Notice of Delinquency                         97   0.000%  100%
+        // 'FB',  //   Fares Deeds from Assessors                                   95   0.000%  100%
+        // 'TD',  //   TX DL                                                        93   0.000%  100%
+        // 'PI',  //   Pennsylvania Liquor Licenses                                 85   0.000%  100%
+        // '73',  //   AZ Experian Veh                                              84   0.000%  100%
+        // '75',  //   KS Experian Veh                                              72   0.000%  100%
+        // 'D7',  //   Death Michigan                                               72   0.000%  100%
+        // 'OV',  //   OH Veh                                                       68   0.000%  100%
+        // 'LW',  //   AL Watercraft                                                63   0.000%  100%
+        // 'SD',  //   TN DL                                                        61   0.000%  100%
+        // '74',  //   IA Experian Veh                                              58   0.000%  100%
+        // 'LE',  //   LA Experian Veh                                              57   0.000%  100%
+        // 'XE',  //   MS Experian Veh                                              57   0.000%  100%
+        // 'FV',  //   FL Veh                                                       53   0.000%  100%
+        // 'PE',  //   MI Experian Veh                                              47   0.000%  100%
+        // 'SE',  //   SC Experian Veh                                              46   0.000%  100%
+        // '70',  //   SD Experian Veh                                              46   0.000%  100%
+        // '76',  //   NC Experian Veh                                              43   0.000%  100%
+        // 'MV',  //   MS Veh                                                       40   0.000%  100%
+        // 'ZK',  //   Z type Util Work Phone                                       40   0.000%  100%
+        // '#E',  //   WY Experian Veh                                              38   0.000%  100%
+        // 'FR',  //   Foreclosures                                                 32   0.000%  100%
+        // 'TV',  //   TX Veh                                                       27   0.000%  100%
+        // 'NE',  //   MA Experian Veh                                              23   0.000%  100%
+        // 'ND',  //   MN DL                                                        23   0.000%  100%
+        // 'CE',  //   CT Experian Veh                                              23   0.000%  100%
+        // 'D3',  //   Death Georgia                                                23   0.000%  100%
+        // 'QD',  //   NC DL                                                        22   0.000%  100%
+        // 'QE',  //   NY Experian Veh                                              21   0.000%  100%
+        // 'CD',  //   MI DL                                                        21   0.000%  100%
+        // '@E',  //   ND Experian Veh                                              18   0.000%  100%
+        // 'VE',  //   MN Experian Veh                                              18   0.000%  100%
+        // 'RE',  //   ME Experian Veh                                              17   0.000%  100%
+        // 'IV',  //   ID Veh                                                       17   0.000%  100%
+        // 'UE',  //   UT Experian Veh                                              17   0.000%  100%
+        // 'OD',  //   OH DL                                                        15   0.000%  100%
+        // 'HE',  //   NE Experian Veh                                              15   0.000%  100%
+        // 'C:',  //   ME Corporations                                              15   0.000%  100%
+        // 'ZE',  //   MT Experian Veh                                              13   0.000%  100%
+        // 'BW',  //   MO Watercraft                                                12   0.000%  100%
+        // '?E',  //   NV Experian Veh                                              12   0.000%  100%
+        // '[W',  //   TX Watercraft                                                12   0.000%  100%
+        // 'PD',  //   MA DL                                                        10   0.000%  100%
+        // '2W',  //   MS Watercraft                                                10   0.000%  100%
+        // 'KV',  //   KY Veh                                                       10   0.000%  100%
+        // 'DD',  //   CT DL                                                        10   0.000%  100%
+        // '79',  //   VT Experian Veh                                              9   0.000%  100%
+        // 'XW',  //   MI Watercraft                                                9   0.000%  100%
+        // 'WD',  //   WI DL                                                        9   0.000%  100%
+        // 'RV',  //   NC Veh                                                       8   0.000%  100%
+        // 'WV',  //   WI Veh                                                       8   0.000%  100%
+        // 'WW',  //   WI Watercraft                                                8   0.000%  100%
+        // 'WE',  //   WI Experian Veh                                              8   0.000%  100%
+        // 'FW',  //   FL Watercraft                                                8   0.000%  100%
+        // 'OE',  //   OK Experian Veh                                              7   0.000%  100%
+        // 'NV',  //   MN Veh                                                       7   0.000%  100%
+        // 'LV',  //   MT Veh                                                       7   0.000%  100%
+        // 'EV',  //   NE Veh                                                       7   0.000%  100%
+        // '$E',  //   DE Experian Veh                                              6   0.000%  100%
+        // 'KW',  //   KY Watercraft                                                6   0.000%  100%
+        // 'BE',  //   AL Experian Veh                                              6   0.000%  100%
+        // 'QW',  //   ME Watercraft                                                5   0.000%  100%
+        // 'IW',  //   IA Watercraft                                                5   0.000%  100%
+        // '4W',  //   ND Watercraft                                                5   0.000%  100%
+        // 'BD',  //   NV DL                                                        5   0.000%  100%
+        // 'EF',  //   CAS FBNV2 California San Diego                               5   0.000%  100%
+        // 'HW',  //   KS Watercraft                                                4   0.000%  100%
+        // 'ID',  //   ID DL                                                        4   0.000%  100%
+        // 'KD',  //   KY DL                                                        4   0.000%  100%
+        // 'VW',  //   VA Watercraft                                                4   0.000%  100%
+        // 'EW',  //   CT Watercraft                                                4   0.000%  100%
+        // 'W2',  //   NM Watercraft                                                4   0.000%  100%
+        // 'OW',  //   OH Watercraft                                                3   0.000%  100%
+        // 'SW',  //   SC Watercraft                                                3   0.000%  100%
+        // 'XV',  //   NM Veh                                                       3   0.000%  100%
+        // 'AV',  //   ME Veh                                                       3   0.000%  100%
+        // 'GD',  //   LA DL                                                        3   0.000%  100%
+        // 'YV',  //   WY Veh                                                       3   0.000%  100%
+        // 'QV',  //   NV Veh                                                       2   0.000%  100%
+        // '7X',  //   MD Experian DL                                               2   0.000%  100%
+        // 'JW',  //   MA Watercraft                                                2   0.000%  100%
+        // '3X',  //   ID Experian DL                                               2   0.000%  100%
+        // '6X',  //   LA Experian DL                                               2   0.000%  100%
+        // 'D@',  //   Death Ohio                                                   2   0.000%  100%
+        // 'CW',  //   CO Watercraft                                                2   0.000%  100%
+        // 'UW',  //   Util Work Phone                                              2   0.000%  100%
+        // 'AE',  //   AK Experian Veh                                              2   0.000%  100%
+        // 'PW',  //   IL Watercraft                                                1   0.000%  100%
+        // '9X',  //   ND Experian DL                                               1   0.000%  100%
+        // 'TW',  //   TN Watercraft                                                1   0.000%  100%
+        // '@W',  //   WY Watercraft                                                1   0.000%  100%
+        // '7W',  //   NV Watercraft                                                1   0.000%  100%
+        // 'RW',  //   AR Watercraft                                                1   0.000%  100%
+        // '77',  //   RI Experian Veh                                              1   0.000%  100%
+        // '!W',  //   WV Watercraft                                                1   0.000%  100%
+        // 'MI',  //   Mixed Non-DPPA                                               1   0.000%  100%
+        // '5X',  //   KY Experian DL                                               1   0.000%  100%
+        // 'ZW',  //   AZ Watercraft                                                1   0.000%  100%
+        // 'GW',  //   GA Watercraft                                                1   0.000%  100%
+        // 'YD',  //   WY DL                                                        1   0.000%  100%
 
 ];
 // 16 vendor
@@ -485,7 +732,7 @@ Phones_allowed         :=[
 
         'GO', //       304,113,781   // Gong History               
         // 'N2', //       251,337,629   // Neustar Wireless Phones    // 20437 - bulk restricted
-        'WP', //       155,311,403   // WHITE PAGES               // 17955, 19605 - bulk and consumer restricted
+        // 'WP', //       155,311,403   // WHITE PAGES               // 17955, 19605 - bulk and consumer restricted
         '02', //       78,775,546    // Cellphones Traffix        // 17919 - no orbit restriction
         // 'TM', //       66,227,671    // Thrive LT (Lending Transactions)  // 19781 - bulk restricted
         // '01', //       41,352,583    // Cellphones Kroll              // 17921 - bulk restricted
@@ -590,7 +837,7 @@ EXPORT Check(UNSIGNED1 rec_type, STRING src) := CASE(rec_type,
     12 =>    (src       in Hunting_allowed                    ),
     13 => ~  (src       in Liens_NOT_allowed                  ),
     14 =>    (src       in UCC_allowed                        ),
-    15 => ~  (src       in People_At_Work_NOT_allowed         ),
+    15 =>    (src       in People_At_Work_allowed             ),
     16 =>    (src       in Phones_allowed                     ),
     17 => ~  (src       in Professional_Licenses_NOT_allowed  ) AND ~(src[1..3] in ['ENC','HMS'] ), 
     18 => ~  (src       in Sex_Offenders_NOT_allowed          ),
