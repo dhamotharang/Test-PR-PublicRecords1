@@ -116,7 +116,7 @@ case(TRIM(code,ALL),
 	'DNB1090'  =>       'Netherlands Bank',
 	'DTC1030'  =>       'Defense Trade Controls',
 	'ECO1144'  =>       'UK Export Control Organisation-Iran',
-	'ES1014'  =>        'Spain Ministry of Finance and Administration',
+//	'ES1014'  =>        'Spain Ministry of Finance and Administration',
 	'ESE1158'  =>       'Egypt Financial Supervisory Authority',
 	'EU33'  =>          'European Union List',
 	'EUE1170'  =>       'EU Enhancements',
@@ -202,7 +202,7 @@ case(TRIM(code,ALL),
 	'DNB1090'  =>	'Individuals, companies, and organizations sanctioned by the Dutch government for supporting terrorism',
   'DTC1030'  =>       'Defense Trade Controls',
 	'ECO1144'  =>	'Entities and organizations in Iran that present a potential concern on WMD End-Use Control grounds, based on previous licensing decisions',
-	'ES1014'  =>	'Entities sanctioned under EU regulations implemented by Spain\'s Ministerio de Economia',
+	//'ES1014'  =>	'Entities sanctioned under EU regulations implemented by Spain\'s Ministerio de Economia',
 	'ESE1158'  =>	'Persons, groups, and entities subject to an assets freeze',
   'EU33'  =>          'European Union List',
 	'EUE1170'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on EU regulations, but not included in the EU List. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
@@ -313,7 +313,7 @@ code= 'PRT1128' => 'DD7BE72D-F3E7-47B0-AD77-2EAE260993E0', //Sanctioned Airport 
 code= 'SAR1032' => '0AE318D8-D530-4088-9478-8225CF6B38A3', //SAUDI ARABIA - Most Wanted List
 code= 'SL1136'  => '7A27F697-1CE8-4F7A-89DB-36433539B105', //SLOVAKIAN LIST
 code= 'SAP1056' => '78EB65FC-BDD4-4599-A2E2-AC2BC1804878', //SOUTH AFRICAN POLICE WANTED
-code= 'ES1014'  => '0DD1F6D8-37DF-4DF4-B6C3-DC58698A909B', //Spain
+//code= 'ES1014'  => '0DD1F6D8-37DF-4DF4-B6C3-DC58698A909B', //Spain
 code= 'SECO42'  => '75DFF111-309D-4613-BE9C-9ED39FD725C1', //Swiss State Secretariat for Economic Affairs
 code= 'TW1016'  => 'B639C576-74D1-4B5A-AE5D-E73A0A75FC25', //Taiwan List
 code= 'UGO1120' => 'E142C34B-6F6D-46D3-A02B-9E1CF4EF3B87', //U.S. Government Officials
