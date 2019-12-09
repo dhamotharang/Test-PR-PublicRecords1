@@ -38,6 +38,8 @@ Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transfor
 		self.DRM := gm.DataRestrictionMask;
 		self.glb_ok := ut.glb_ok (gm.GLBPurpose);
 		self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
+		self.glb := gm.GLBPurpose;
+		self.dppa := gm.DPPAPurpose;
 		self.doDeepDive := req_DeepDive;
 		self.hasFullNCPDP:=false;
 		
