@@ -555,9 +555,25 @@ end;
 																						,
 																						,'sudhir.kasavajjala@lexisnexis.com');	
   //append bitmap to base
-  dbuildbase := project (scrub_file_step1.BitmapInfile,FLAccidents_Ecrash.Layout_Basefile);
+  dbuildbase := project (scrub_file_step1.BitmapInfile,FLAccidents_Ecrash.Layout_Basefile) :persist('~thor_data400::persist::ecrash_base');
 
+  //Insurance eCrashSlim Base file
+  FLAccidents_Ecrash.Layout_InseCrashSlim t_eCrashSlim(dbuildbase l) := transform
+	  //fabricated
+		self.accident_nbr := if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
+		self.accident_date := if(L.incident_id[1..9] ='188188188','20100901',L.crash_date);
+		self.impact_location := if (l.report_code ='TM' ,
+                            if(l.initial_point_of_contact[1..25] !='','Damaged_Area_1: ' + l.initial_point_of_contact[1..25],'')
+														+ if(l.initial_point_of_contact[25..] !='','Damaged_Area_2: ' + l.initial_point_of_contact[25..],''),
+														if(l.damaged_areas_derived1 !='','Damaged_Area_1: ' + l.damaged_areas_derived1,'')
+														+ if(l.damaged_areas_derived2 !='','Damaged_Area_2: ' + l.damaged_areas_derived2,''));
+		self := l;
+	end;
+	p_InseCrashSlim := project(dbuildbase, t_eCrashSlim(left)) : persist('~thor_data400::persist::InseCrashSlim_base', SINGLE);
+
+		
  	PromoteSupers.Mac_SF_BuildProcess(dbuildbase,'~thor_data400::base::ecrash',buildBase,,,true);
+ 	PromoteSupers.Mac_SF_BuildProcess(p_InseCrashSlim,'~thor_data400::base::InseCrashSlim',buildInseCrashSlimBase,,,true);
   PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.compare_add_new,'~thor_data400::base::ecrash_supplemental',buildsuppBase,,,true);
 	PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.TMafterTF,'~thor_data400::base::ecrash_TMafterTF',buildBaseTMafterTF,,,true);
 	PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildPhotoFile.CmbndPhotos,'~thor_data400::base::ecrash_documents',buildDocumentBase,,,true);
@@ -572,7 +588,8 @@ return sequential(  buildsuppBase
 		                ,output(Scrubs_report_with_examples, all, named('ScrubsReportWithExamples'))
 		                //Send Alerts if Scrubs exceeds threholds
 		                ,if(count(Scrubs_alert) > 1, mailfile, output('No_Scrubs_Alerts'))	 
-                    ,buildBase  
+                    ,buildBase
+										,buildInseCrashSlimBase
 										,buildDocumentBase
 										,buildBaseTMafterTF
 										,buildAgencyCmbndBase
