@@ -5,12 +5,12 @@ export build_key(string filedate, boolean pUseProd = false)  := function
                                     dx_crim_offense_cat.key(pUseProd), 
                                     key_data, 
                                     dx_crim_offense_cat.names(pUseProd).key,
-                                    crim_offense_cat.filenames(pUseProd).key + '_' + filedate,
+                                    crim_offense_cat.filenames(pUseProd).key + '::' + filedate + '::charge',
                                     seq_build
                                     );
-    RoxieKeyBuild.Mac_SK_Move_v3(crim_offense_cat.filenames(pUseProd).key+'_@version@', 'D', seq_move,filedate, 2);
-    all_seq := if(STD.File.FileExists(crim_offense_cat.filenames(pUseProd).key+ '_' + filedate),
-                    output(crim_offense_cat.filenames(pUseProd).key+ '_' + filedate +' already exists, ceasing key operations.'),
+    RoxieKeyBuild.Mac_SK_Move_v3(crim_offense_cat.filenames(pUseProd).key+'::@version@'+ '::charge', 'D', seq_move,filedate, 2);
+    all_seq := if(STD.File.FileExists(crim_offense_cat.filenames(pUseProd).key+ '::' + filedate+ '::charge'),
+                    output(crim_offense_cat.filenames(pUseProd).key+ '::' + filedate+ '::charge already exists, ceasing key operations.'),
                     sequential(
                             seq_build,
                             seq_move

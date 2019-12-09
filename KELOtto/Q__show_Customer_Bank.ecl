@@ -4,6 +4,6 @@ IMPORT B_Bank,B_Bank_3,E_Bank,E_Customer FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT Q__show_Customer_Bank := MODULE
   SHARED TYPEOF(B_Bank.__ENH_Bank) __ENH_Bank := B_Bank.__ENH_Bank;
-  SHARED __EE2458629 := __ENH_Bank;
-  EXPORT Res0 := __UNWRAP(__EE2458629);
+  SHARED __EE2979688 := __ENH_Bank;
+  EXPORT Res0 := __UNWRAP(__EE2979688);
 END;

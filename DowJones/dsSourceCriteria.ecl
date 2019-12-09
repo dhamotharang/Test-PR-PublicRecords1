@@ -1821,6 +1821,12 @@ EXPORT dsSourceCriteria := DATASET([
 {'CBIRC (China) National Enforcement Actions','1808'},
 {'CBIRC (China) Provincial Enforcement Actions','1809'},
 {U'Singapore Exchange Directors’ and Executive Officers’ Watch List','1810'},
-{'Government of Malta Freezing Orders','1811'}
+{'Government of Malta Freezing Orders','1811'},
+{'EC (CFSP) 2019/1893 Venezuela List','1812'},
+{'EC 2019/1891 Venezuela List','1813'},
+{'EC (CFSP) 2019/1944 ISIL (Da\'esh) and Al-Qaeda List','1814'},
+{'EC 2019/1943 ISIL (Da\'esh) and Al-Qaida List','1815'},
+{'CSSF (Luxembourg) Sanctions and Administrative Measures','1816'},
+{'OFAC - Countering America\'s Adversaries Through Sanctions Act of 2017 (CAATSA)','1817'}
 ],r);
 
