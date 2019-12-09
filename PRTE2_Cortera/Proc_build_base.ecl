@@ -50,11 +50,11 @@ PRTE2.CleanFields(PRTE2_Cortera.Files.Input_INS, ds_clean_INS);
     //Fake ID
     vLinkingIds := prte2.fn_AppendFakeID.LinkIds(left.name, left.link_fein, left.link_inc_date, left.Clean_Address.prim_range, left.Clean_Address.prim_name, left.Clean_Address.sec_range, left.Clean_Address.v_city_name, left.Clean_Address.st, left.Clean_Address.zip, left.cust_name);
     
-      SELF.powid   := vLinkingIds.powid;
-      SELF.proxid  := vLinkingIds.proxid;
-      SELF.seleid  := vLinkingIds.seleid;
-      SELF.orgid     := vLinkingIds.orgid;
-      SELF.ultid     := vLinkingIds.ultid;
+      SELF.powid  := vLinkingIds.powid;
+      SELF.proxid := vLinkingIds.proxid;
+      SELF.seleid := vLinkingIds.seleid;
+      SELF.orgid  := vLinkingIds.orgid;
+      SELF.ultid  := vLinkingIds.ultid;
     
       SELF.persistent_record_id := (left.link_id << 32) + left.dt_vendor_first_reported;
       SELF.clean_phone := ut.CleanPhone(left.PHONE);
@@ -73,8 +73,9 @@ PRTE2.CleanFields(PRTE2_Cortera.Files.Input_INS, ds_clean_INS);
                                                 )
                                       );
     
-    Attribute_File := Project(combine_files_clean,
-                                            Transform(PRTE2_cortera.Layouts.Attributes_Out,
+Attribute_File := Project(combine_files_clean,
+                                            Transform(PRTE2_cortera.Layouts.Attributes_Out, 
+                                                      SELF.current_rec := true;
                                                       SELF.ultimate_linkid   := LEFT.LINK_ID;
                                                       SELF := LEFT,
                                                       SELF := []

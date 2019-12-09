@@ -2,13 +2,11 @@
 EXPORT Files := MODULE
 
   //Base
-  EXPORT Hdr_Out    := dataset(PRTE2_cortera.Constants.base_prefix +'HEADER', PRTE2_cortera.Layouts.base, thor);
-  EXPORT Key_hdr   := project(HDR_Out, transform(Layouts.header_out, self := left, self := []));  
-  // EXPORT Key_hdr   := project(HDR_Out, Layouts.Header_Out - [cust_name, bug_num]);
+  EXPORT Hdr_Out := dataset(PRTE2_cortera.Constants.base_prefix +'HEADER', PRTE2_cortera.Layouts.base, thor);
+  EXPORT Key_hdr := project(HDR_Out, transform(Layouts.header_out, self := left, self := []));  
   
   EXPORT Attributes := dataset(PRTE2_cortera.Constants.base_prefix +'Attributes', PRTE2_Cortera.Layouts.Attributes_out, thor);
   EXPORT Key_attr   := project(Attributes, transform(Layouts.attributes_out, self := left, self := []));  
-  // EXPORT Key_attr   := project(attributes, layouts.Attributes_Out - [cust_name, bug_num]);
   
   //Input Files
   EXPORT Input_Boca := dataset('~prte::in::cortera::boca', PRTE2_Cortera.Layouts.rlayout, CSV(HEADING(3), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')))(link_id >0); 
