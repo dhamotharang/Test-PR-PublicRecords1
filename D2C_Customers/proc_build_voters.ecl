@@ -1,12 +1,14 @@
 ﻿import std, PromoteSupers, VotersV2, Watchdog, D2C;
 
 /********* VOTER_REGISTRATION **********/
-
-vo	:=	VotersV2.File_Voters_Base(did > 0);
+//SRC code - 'VO'
 
 EXPORT proc_build_voters(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
+   
+   //500M records
+   BaseFile := D2C_Customers.Files.VotersDS(mode);
 
-   ds := project(vo, transform(D2C_Customers.layouts.rVoter_Registration,
+   inDS := project(BaseFile, transform(D2C_Customers.layouts.rVoter_Registration,
             self.LexID            := (unsigned6)left.did;
             self.Name             := stringlib.stringcleanspaces(left.first_name + ' ' + left.middle_name + ' ' + left.last_name + ' ' + left.name_suffix);
             self.Resident_Address := stringlib.stringcleanspaces(left.res_addr1 + ', ' + left.res_addr1 + if(left.res_addr1 <> '', ', ','') + left.res_city + ', ' + left.res_state + ' ' + left.res_zip);
@@ -17,15 +19,6 @@ EXPORT proc_build_voters(unsigned1 mode, string8 ver, string20 customer_name) :=
             self.State_of_registration := left.res_state;
             self.Status                := left.voter_status;
             ));
-   
-   fullDS := ds;
-   coreDS := join(distribute(ds, hash(LexID)), distribute(D2C_Customers.Files.coresDS, hash(did)), left.LexID = right.did, transform(left), local);
-   coreDerogatoryDS := join(coreDS, distribute(Files.derogatoryDS, did), left.LexID = right.did, transform(left), local);
-   
-   inDS := map(mode = 1 => fullDS,          //FULL
-               mode = 2 => coreDS,          //QUARTERLY
-               mode = 3 => coreDerogatoryDS //MONTHLY
-               );
    
    res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 19);
    return res;

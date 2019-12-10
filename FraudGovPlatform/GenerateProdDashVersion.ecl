@@ -1,13 +1,14 @@
 ﻿Import Dops, FraudGovPlatform,std,_control;
-
 ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor','Thor400_Dev',	'Thor400_44');
 RIN_CERT_Version:= Dops.GetBuildVersion('FraudGovKeys','B','N','C');
 string currentBuildVersion := RIN_CERT_Version;
 
 CustomerDash_WU						:=	FraudGovPlatform.files().CustomerDashboard.response[1].workunitid;
+CustomerDashboard1_1_WU		:=	FraudGovPlatform.files().CustomerDashboard1_1.response[1].workunitid;
 ClusterDetails_WU					:=	FraudGovPlatform.files().ClusterDetails.response[1].workunitid;
 
-CustomerDash_WUState				:=	FraudGovPlatform.fn_Getwuinfo(CustomerDash_wu,'ramps_prod_esp.risk.regn.net')[1].state;
+CustomerDash_WUState					:=	FraudGovPlatform.fn_Getwuinfo(CustomerDash_wu,'ramps_prod_esp.risk.regn.net')[1].state;
+CustomerDashboard1_1_WUState	:=	FraudGovPlatform.fn_Getwuinfo(CustomerDashboard1_1_WU,'ramps_prod_esp.risk.regn.net')[1].state;
 ClusterDetails_WUState				:=	FraudGovPlatform.fn_Getwuinfo(ClusterDetails_wu,'ramps_prod_esp.risk.regn.net')[1].state;
 //Write Prod Dashboards version to a file
 ProdDashVer_Super					:=	FraudGovPlatform.FileNames().ProdDashboardVersion;
@@ -36,7 +37,7 @@ fsuperadd	:= Sequential(
 												STD.File.AddSuperfile(ProdDashVerRefresh_Super, ProdDashVerRefresh_Logical),
 												STD.File.FinishSuperFileTransaction()
 												);
-DashboardsReady 					:=	If(CustomerDash_WUState='completed' and ClusterDetails_WUState='completed',true,false);
+DashboardsReady 					:=	If(CustomerDash_WUState='completed' and CustomerDashboard1_1_WUState='completed' and ClusterDetails_WUState='completed',true,false);
 
 
 EXPORT GenerateProdDashVersion		:= If(DashboardsReady,
@@ -46,4 +47,4 @@ EXPORT GenerateProdDashVersion		:= If(DashboardsReady,
 														fsuperadd
 														),
 											output('Prod Dashboards Not Ready')
-										 );
+										 );										 

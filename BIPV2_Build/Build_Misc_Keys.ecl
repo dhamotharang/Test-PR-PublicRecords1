@@ -1,4 +1,4 @@
-import BIPV2, tools,riskwise,BIPV2_Company_Names,Address_Attributes;
+﻿import BIPV2, tools,riskwise,BIPV2_Company_Names,Address_Attributes, BIPV2_Segmentation;
 
 EXPORT build_misc_keys(
 
@@ -8,14 +8,15 @@ EXPORT build_misc_keys(
 ) :=
 module
 
-  export BuildLinkIds       := tools.macf_writeindex('BIPV2.Key_BH_Linking_Ids.key              ,keynames(pversion).linkids.new'      );
-	export BuildLinkIds_hidden:= tools.macf_writeindex('BIPV2.Key_BH_Linking_Ids.Key_hidden       ,keynames(pversion).linkids_hidden.new'      );
-  export BuildTranslations  := tools.macf_writeindex('BIPV2_Company_Names.files.TranslationsKey ,keynames(pversion).translations.new' );
-  export BuildAML_Addr      := tools.macf_writeindex('Address_Attributes.key_AML_addr           ,keynames(pversion).aml_addr.new'     );
-  export BuildStatus        := tools.macf_writeindex('BIPV2.key_Status.lkey(pversion).new'                                            );
-  export BuildZipCitySt     := tools.macf_writeindex('keys(pversion).zipcityst.new'                                                   );
-  
-  shared keyfilt        := 'zipcityst|translations|business_header::.*?::linkids|status|bipv2_aml_addr';  //only promote these keys
+  export BuildLinkIds       := tools.macf_writeindex('BIPV2.Key_BH_Linking_Ids.key                 ,keynames(pversion).linkids.new'                        );
+  export BuildLinkIds_hidden:= tools.macf_writeindex('BIPV2.Key_BH_Linking_Ids.Key_hidden          ,keynames(pversion).linkids_hidden.new'                 );
+  export BuildTranslations  := tools.macf_writeindex('BIPV2_Company_Names.files.TranslationsKey    ,keynames(pversion).translations.new'                   );
+  export BuildAML_Addr      := tools.macf_writeindex('Address_Attributes.key_AML_addr              ,keynames(pversion).aml_addr.new'                       );
+  export BuildStatus        := tools.macf_writeindex('BIPV2.key_Status.lkey(pversion).new'                                                                 );
+  export BuildZipCitySt     := tools.macf_writeindex('keys(pversion).zipcityst.new'                                                                        );
+  export BuildSegKey        := tools.macf_writeindex('BIPV2_Segmentation.Key_LinkIds(pversion).Key ,BIPV2_Segmentation.keynames(pversion).seg_linkids.new' );
+
+  shared keyfilt        := 'zipcityst|translations|business_header::.*?::linkids|status|bipv2_aml_addr|segmentation_linkids';  //only promote these keys
 
   export promote2built  := promote(pversion,keyfilt).new2built;
   
@@ -30,6 +31,7 @@ module
       ,BuildAML_Addr    
       ,BuildStatus      
       ,BuildZipCitySt       
+      ,BuildSegKey       
      )
     ,promote2built
     ,if(pPromote2QA = true  ,Promote(pversion,keyfilt).Built2QA)

@@ -22,9 +22,11 @@ EXPORT DO := FUNCTION
    MakeSuperKeys (Constants.key_prefix + '@version@::did');
    MakeSuperKeys (Constants.key_prefix + '@version@::email_addresses');
    MakeSuperKeys (Constants.key_prefix + '@version@::payload');
+	 MakeSuperKeys (Constants.key_prefix + '@version@::linkids');
   	 
    MakeSuperKeys (Constants.key_FCRA_prefix + '@version@::did');
    MakeSuperKeys (Constants.key_FCRA_prefix + '@version@::payload');
+	  
 	 
 	 MakeSuperKeys (Constants.key_prefix + 'autokey::@version@::address');
    MakeSuperKeys (Constants.key_prefix + 'autokey::@version@::citystname');

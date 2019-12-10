@@ -1,4 +1,4 @@
-Import Gong, Ut;
+﻿Import Gong, Ut,data_services;
 
 #OPTION ('multiplePersistInstances', FALSE);
 
@@ -7,10 +7,10 @@ EXPORT Map_Disconnect_Gong_History(string version) := function
  //////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Pull Gong History Records///////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-	ds 			:= Gong.Key_History_Phone;
-	
+	ds := File_OptedOut_Inputs.Gong;//CCPA-799
+  
 	//Find File Date
-	fd 			:= nothor(Fileservices.Getsuperfilesubname('~thor_data400::key::gong_history_phone_qa',1));
+	fd 			:= nothor(Fileservices.Getsuperfilesubname(data_services.foreign_prod+'thor_data400::key::gong_history_phone_qa',1));
 	fdate := fd[34..41];
 	
 	//Concat Address Fields

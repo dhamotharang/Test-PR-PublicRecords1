@@ -1,5 +1,5 @@
 ﻿import std, _Control;
-path := '/data/projects/MedicaidSanctions/';
+path := '/data/hds_3/MedicaidSanctions/output/';
 
 EXPORT Unspray(string logicalname, string filename) :=
 	STD.File.Despray(logicalname,

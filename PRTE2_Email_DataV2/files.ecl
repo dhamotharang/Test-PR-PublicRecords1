@@ -15,11 +15,7 @@ Transform(layouts.i_did,
 Self:=Left;
 ));
 
-EXPORT Email_Address_File	:= DEDUP(SORT(DISTRIBUTE(CombinedBase2(did > 0), HASH(did))
-																		 ,clean_email,did,email_rec_key, IF(clean_name.lname <> '' AND clean_address.prim_range <> '', 1, IF(clean_name.lname <>  '',  2, 3)), -date_last_seen, LOCAL)
-																		 ,clean_email,did,email_rec_key,LOCAL);
-
-Export Email_Address_file_short:=project(Email_Address_File,
+Export Email_Address_file_short:=project(CombinedBase2,
 Transform (layouts.i_Email_Address,
 Self:=Left;
 ));
@@ -36,12 +32,18 @@ email_did		:= 	CombinedBase2(did > 0 and current_rec and append_is_valid_domain_
 	
    Export Payload:=Project(CombinedBase2,
 	 Transform(layouts.i_payload,
-   Self:=Left;
+	  self.rules:=(integer)left.rules;
+		self.orig_companyname:= left.cln_companyname;
+	  Self:=Left;
 	 Self:=[];
 	   ));
 	
+	Export Email_linkids:=Project(CombinedBase2(ultid!=0),layouts.Email_linkids_layout);
+	
 	Export Payload_FCRA:=project(did_ready,
 	Transform(layouts.i_payload,
+	  self.rules:=(integer)left.rules;
+		self.orig_companyname:= left.cln_companyname;
 	 Self:=Left;
 	 Self:=[];
    ));

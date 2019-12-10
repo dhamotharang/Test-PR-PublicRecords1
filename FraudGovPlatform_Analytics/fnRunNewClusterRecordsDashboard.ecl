@@ -5,13 +5,13 @@
 	runProd 		:= FALSE;
 	useProdData := TRUE;
 	newVersion 	:= TRUE;
+	dspToUse		:= FraudGovPlatform_Analytics.Constants.RampsWebServices.DspQa;
 	
 	//Input Parameters
 	cmpUuid 						:= FraudGovPlatform_Analytics.Constants.RampsWebServices.NewClusterRecordsDashboard.CompositionUuid;
 	vizVersion 					:= FraudGovPlatform_Analytics.Constants.RampsWebServices.NewClusterRecordsDashboard.VizServiceVersion;
 	reqSource 					:= FraudGovPlatform_Analytics.Constants.RampsWebServices.reqSource;																
 	encodedCreds 				:= FraudGovPlatform_Analytics.Constants.RampsWebServices.EncodedCredentials;			
-	dspToUse						:= FraudGovPlatform_Analytics.configFunctions.getDspToUse(runProd);
 	hpccConnection 			:= FraudGovPlatform_Analytics.configFunctions.getHpccConnection(runProd, newVersion);
 	eclCompileStrategy	:= FraudGovPlatform_Analytics.Constants.RampsWebServices.EclCompileStrategy;											
 	keepEcl 						:= FraudGovPlatform_Analytics.Constants.RampsWebServices.KeepEcl;					

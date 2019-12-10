@@ -68,6 +68,7 @@ filestocopyds := dataset([
 ,{'thor_data400::key::vehiclev2::party_key_qa','','',''}
 ,{'thor_data400::key::watercraft_did_qa','','',''}
 ,{'thor_data400::key::watercraft_sid_qa','','',''}
+,{'thor_data400::key::watchdog_qa','','',''}
 			]
 															,rampscopy.layouts.filestocopy);
 

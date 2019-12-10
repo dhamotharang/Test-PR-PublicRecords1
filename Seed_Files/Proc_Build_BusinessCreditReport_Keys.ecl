@@ -42,7 +42,8 @@ EXPORT Proc_Build_BusinessCreditReport_Keys(STRING filedate) := MODULE
 			mac_build_key(filedate, 'TopBusConnected', 'TopBusConnect'),
 			mac_build_key(filedate, 'TopBusContacts', 'TopBusContact'),
 			mac_build_key(filedate, 'FinalSect', 'TopBusActivity'),
-			mac_build_key(filedate, 'MatchInfo', 'MatchInfo')
+			mac_build_key(filedate, 'MatchInfo', 'MatchInfo'),
+			mac_build_key(filedate, 'CorteraB2B', 'CorteraB2B')
 			);
 	END;
 
@@ -80,8 +81,8 @@ EXPORT Proc_Build_BusinessCreditReport_Keys(STRING filedate) := MODULE
 			mac_build_prte_key(filedate, 'TopBusConnect', 'Section17'),
 			mac_build_prte_key(filedate, 'TopBusContact', 'Section18'),
 			mac_build_prte_key(filedate, 'TopBusActivity', 'Section19'),
-			mac_build_prte_key(filedate, 'MatchInfo', 'Section20')  
-			
+			mac_build_prte_key(filedate, 'MatchInfo', 'Section20'),
+			mac_build_prte_key(filedate, 'CorteraB2B', 'Section21') 
 			);
 	END;
 

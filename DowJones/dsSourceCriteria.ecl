@@ -1816,6 +1816,17 @@ EXPORT dsSourceCriteria := DATASET([
 {'OFAC - Executive Order on the Situation in Syria','1803'},
 {'EC 2019/1731 ISIL (Da\'esh) and Al-Qaida List','1804'},
 {'EC (CFSP) 2019/1788 Burundi List','1805'},
-{'EC 2019/1779 Burundi List','1806'}
+{'EC 2019/1779 Burundi List','1806'},
+{'AMBD (Brunei Darussalam) Alert List','1807'},
+{'CBIRC (China) National Enforcement Actions','1808'},
+{'CBIRC (China) Provincial Enforcement Actions','1809'},
+{U'Singapore Exchange Directors’ and Executive Officers’ Watch List','1810'},
+{'Government of Malta Freezing Orders','1811'},
+{'EC (CFSP) 2019/1893 Venezuela List','1812'},
+{'EC 2019/1891 Venezuela List','1813'},
+{'EC (CFSP) 2019/1944 ISIL (Da\'esh) and Al-Qaeda List','1814'},
+{'EC 2019/1943 ISIL (Da\'esh) and Al-Qaida List','1815'},
+{'CSSF (Luxembourg) Sanctions and Administrative Measures','1816'},
+{'OFAC - Countering America\'s Adversaries Through Sanctions Act of 2017 (CAATSA)','1817'}
 ],r);
 

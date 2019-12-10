@@ -3,13 +3,15 @@
 export _Config(
 	 boolean	pUseOtherEnvironment	= false
 	,string		pDatasetname					= 'Marketing_List'
-) := module(
+) := 
+module(
 	tools.Constants(
 		 pDatasetName					:= pDatasetname
 		,pUseOtherEnvironment	:= pUseOtherEnvironment
 		,pGroupname						:= '36'
 		,pMaxRecordSize				:= 4096
 		,pIsTesting						:= Tools._Constants.IsDataland
+    ,pAdd_Eclcc           := true
 	))
 	
   export EmailList                      := 'laverne.bentley@lexisnexisrisk.com';
@@ -19,6 +21,7 @@ export _Config(
   code                    := BIPV2.mod_sources.code.MARKETING_UNRESTRICTED;        // (= 9  )
   export Marketing_Bitmap := BIPV2.mod_sources.code2bmap(code);                    // (= 512) "&" with data permits field in best, non-zero = ok for marketing
  
+  // -- Ranking of approved sources for Industry codes
   export ds_sources_of_industry_codes      := dataset([
      {1   ,MDR.sourceTools.src_DCA                   }
     ,{2   ,MDR.sourceTools.src_Equifax_Business_Data }
@@ -29,6 +32,7 @@ export _Config(
     ,{7   ,MDR.sourceTools.src_Business_Registration }
   ], Marketing_List.Layouts.source_rank);
 
+  // -- Ranking of approved sources for Number of Employees
   export ds_sources_of_number_of_employees :=  dataset([
      {1   ,MDR.sourceTools.src_DCA                    }
     ,{2   ,MDR.sourceTools.src_Equifax_Business_Data  }
@@ -39,6 +43,7 @@ export _Config(
   ], Marketing_List.Layouts.source_rank);
   ;
   
+  // -- Ranking of approved sources for Sales and Revenue
   export ds_sources_of_sales_revenue :=   dataset([
      {1   ,MDR.sourceTools.src_DCA                    }
     ,{2   ,MDR.sourceTools.src_Equifax_Business_Data  }

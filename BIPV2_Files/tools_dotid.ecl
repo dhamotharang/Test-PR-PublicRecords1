@@ -735,7 +735,9 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 		
 		export outCounts := parallel(output(count(ds_in),named('cnt_total')), output(count(ds_tops),named('cnt_tops')), output(count(ds_good),named('cnt_good')));
 		
-		export result		:= project(ds_good, transform(l_dot, self.rcid:=0, self:=left)); // strip temporary rcids
+		ds_CCPA := mdr.macGetGlobalSID(ds_good, 'BIPV2', 'source', 'global_sid');
+		
+		export result		:= project(ds_CCPA, transform(l_dot, self.rcid:=0, self:=left)); // strip temporary rcids
 		export err_rec	:= mod_bct.err_rec + mod_filt.err_rec;
 		export err_summary := sort(table(err_rec, {string60 src_name:=BIPV2.mod_sources.TranslateSource_aggregate(source),source,remedy,reason,unsigned cnt:=count(group)}, source,remedy,reason, merge), record);
 		
