@@ -1,8 +1,10 @@
 ﻿/* ***********************************************************************************************************
 PRTE2_X_Ins_DataGathering.BWR_Gather_VIN_Year
 
-For CT purposes, VINS have no states applied so just gather by year.
-This is always a brand new year so don't need to read remote the "CustomerTest_X_Data_Gathering.Files.ALL_CT_VINs_RESERVED_DS", and remove matches.
+//TODO - SHOULD READ IN THE REMOTE ALPHA "CustomerTest_X_Data_Gathering.Files.ALL_CT_VINs_RESERVED_DS", and remove those.
+using -- PRTE2_X_Ins_AlphaRemote.Files.ALL_CT_VINs_RESERVED_DS
+
+For CT purposes, VINS have no states applied so just gather by years.
 
 vina_veh_type = Code that indicates the type of vehicle
 M=motorcycle
@@ -17,14 +19,15 @@ NOTE: After deduping there are always fewer... so added a dedup here prior to th
 *********************************************************************************************************** */
 IMPORT VehicleV2,STD,PRTE2_X_Ins_DataGathering,PromoteSupers;
 
-kvMain00 := VehicleV2.file_VehicleV2_main(orig_year = '2020' AND orig_vin <>''
-																			AND (vina_veh_type IN ['P','M','L'] 
+yearsToPull := ['2016','2017','2018','2019'];
+kvMain00 := VehicleV2.file_VehicleV2_main(orig_year IN yearsToPull AND orig_vin <>''
+																			AND (vina_veh_type IN ['P','M'] 
 																							OR (vina_veh_type = 'T' AND orig_vehicle_type_code = 'P')
 																			)
 																			AND vina_make_desc > '' AND (vina_model_desc > '' OR vina_series_desc > '')
 																			);
 kvMain01a := DISTRIBUTE(PULL(kvMain00),HASH(vina_vin));
-kvMain01 := DEDUP( SORT(kvMain01a,vina_vin,local), vina_vin,local);
+kvMain01 := DEDUP(SORT(kvMain01a,vina_vin,local),vina_vin,local);
 UsableVINLayout := PRTE2_X_Ins_DataGathering.Layouts.UsableVINLayout;
 // Sort them randomly to get a wide variety
 UsableVINLayout tranxGath1(kvMain01 L,INTEGER rnd) := TRANSFORM
@@ -33,7 +36,7 @@ UsableVINLayout tranxGath1(kvMain01 L,INTEGER rnd) := TRANSFORM
 END;
 kvMain02 := SORT( PROJECT(kvMain01,tranxGath1(LEFT,RANDOM())), hashvalue);
 
-All_Next := CHOOSEN(kvMain02,20000);
+All_Next := CHOOSEN(kvMain02,90000);
 OUTPUT(COUNT(kvMain00) +'|'+ COUNT(kvMain01)+'|'+ COUNT(kvMain02)+'|'+ COUNT(All_Next));
 
 Trimit(STRING S) := TRIM(S,left,right);
@@ -52,5 +55,5 @@ out1 := OUTPUT(SORT(RepTable0,-GroupCount),all);
 out2 := OUTPUT(SORT(RepTable1,-GroupCount),all);
 
 Files := PRTE2_X_Ins_DataGathering.Files;
-PromoteSupers.Mac_SF_BuildProcess(All_Next, Files.VIN_Data_Name, build_main_base,,,TRUE);
+PromoteSupers.Mac_SF_BuildProcess(All_Next, Files.VIN_Data_Name5yr, build_main_base,,,TRUE);
 SEQUENTIAL(out1,out2, build_main_base);

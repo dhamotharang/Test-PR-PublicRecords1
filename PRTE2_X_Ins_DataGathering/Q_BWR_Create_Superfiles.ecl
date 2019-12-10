@@ -1,7 +1,7 @@
 ﻿IMPORT promotesupers;
 
 Files := PRTE2_X_Ins_DataGathering.Files;
-Main_IN_Name		:= Files.VIN_Data_Name;
+Main_IN_Name		:= Files.VIN_Data_Name5yr;
 
 OUTPUT(Main_IN_Name);
 
