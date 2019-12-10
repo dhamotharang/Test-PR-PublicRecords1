@@ -70,7 +70,17 @@ END;
 
 SHARED update_supers(string spr0, string newLogical) := function
 
-    spr:='~'+ spr0;
+    spr:='~'+ case( spr0, 'thor_data400::key::header::qa::relatives_v3'=>
+                         'thor_data400::key::relatives_v3_qa',
+                         'thor_data400::key::insuranceheader_segmentation::qa::did_ind'=>
+                         'thor_data400::key::insuranceheader_segmentation::did_ind_qa',
+                         'thor400_44::key::insuranceheader_segmentation::qa::did_ind'=>
+                         'thor400_44::key::insuranceheader_segmentation::did_ind_qa',
+                         'thor400_44::key::insuranceheader_segmentation::built::did_ind'=>
+                         'thor400_44::key::insuranceheader_segmentation::did_ind_built',
+                         'thor400_36::key::insuranceheader_segmentation::qa::did_ind'=>
+                         'thor400_36::key::insuranceheader_segmentation::did_ind_qa'
+                  ,spr0);
     
     return if(~inspr(spr,newLogical)
           ,sequential(

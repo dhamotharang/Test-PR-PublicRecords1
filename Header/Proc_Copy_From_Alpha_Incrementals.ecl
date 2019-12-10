@@ -269,20 +269,20 @@ END;
 // run on hthor
 EXPORT Refresh_copy(string filedt) :=  FUNCTION
 
-    noLABcopy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::idl'));
-    cpLab := if(noLABcopy
+    ok_LAB_to_copy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::idl'));
+    cpLab := if(ok_LAB_to_copy
              ,output('No LAB copy. see outputs')
              ,copy_from_alpha(filedt)
              );
              
-    noUniqExcopy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::header::' + filedt + '::addr_unique_expanded'));
-    cpUniqEx := if(noUniqExcopy
+    ok_UniqEx_to_copy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::header::' + filedt + '::addr_unique_expanded'));
+    cpUniqEx := if(ok_UniqEx_to_copy
              ,output('No Address Unique Expanded copy. see outputs')
              ,copy_addr_uniq_keys_from_alpha(filedt)
              );
 
-    noCAminorcopy := filedt <>'' AND ~test_copy AND ~(~std.file.fileexists('~thor_data400::base::insuranceheader_incremental::ca_minors::' + filedt));
-    cpCAminor := if(noCAminorcopy
+    ok_CAminor_to_copy := filedt <>'' AND ~test_copy AND ~(~std.file.fileexists('~thor_data400::base::insuranceheader_incremental::ca_minors::' + filedt));
+    cpCAminor := if(ok_CAminor_to_copy
              ,output('No CA Minors copy. see outputs')
              ,copy_ca_minors_from_alpha(filedt)
              );            
