@@ -220,7 +220,7 @@ modified_batchoutflat_layout := RECORD
 END; 
 // read in the file into renamed layout, dedup it and remove lexid=0 records, which indicate pullid records, they dont want those
 original_output1 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part1', modified_batchoutflat_layout, csv(quote('"')));
-original_output2 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part2test', modified_batchoutflat_layout, csv(quote('"')));
+original_output2 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part2', modified_batchoutflat_layout, csv(quote('"')));
 original_output3 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part3', modified_batchoutflat_layout, csv(quote('"')));
 original_output4 := dataset('~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part4', modified_batchoutflat_layout, csv(quote('"')));
 
@@ -426,6 +426,8 @@ reducedInput := join(original_input, project_deduped, left.lexid=right.lexid, tr
  reducedOutput := join(reducedInput, project_deduped, left.lexid=right.lexid, transform(batchout, self := right));  // reduce output if there is no Input record - don't ask
  
  NewLexidCount := count(project_deduped) - count(reducedOutput);
+ 
+ Assert(count(reducedOutput) = count(reducedInput),'FAIL COUNTS', FAIL): FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 Input Output file counts do not match', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));	
 											
  output(NewLexidCount, NAMED('NewLexidCount'));
  output(choosen(original_input, 10), NAMED('original_input'));

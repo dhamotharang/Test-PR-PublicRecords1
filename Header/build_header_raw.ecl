@@ -1,13 +1,14 @@
-﻿import ut,mdr,PromoteSupers,dx_header;
+﻿import ut,mdr,PromoteSupers,dx_header,header;
 export build_header_raw(string filedate,boolean incremental = FALSE) := function
 
 h:=distribute(header.Header_Joined(filedate).final,hash(did));
-h_ccpa_compliant:=header.fn_suppress_ccpa(PROJECT(h,TRANSFORM(dx_header.layout_header,SELF:=LEFT)));
+h1:=PROJECT(h,TRANSFORM(dx_header.layout_header,SELF:=LEFT));
+h_ccpa_compliant:=header.fn_suppress_ccpa(h1,false);
 basename:='~thor_data400::base::header_raw';
 basenamei:='~thor_data400::base::header_raw_incremental';
 fname:=basename+'_'+filedate;
 
-s1:=output(h,,fname,compressed);
+s1:=output(h_ccpa_compliant,,fname,compressed);
 
 built:=basename+'_built';
 prod:=basename+'_prod';
@@ -67,7 +68,7 @@ full_ := sequential(
 									,PostUpdate
 									);
 
-PromoteSupers.MAC_SF_BuildProcess( h
+PromoteSupers.MAC_SF_BuildProcess( h_ccpa_compliant
                                   ,basenamei
                                   ,incremental_
                                   ,numgenerations:=2

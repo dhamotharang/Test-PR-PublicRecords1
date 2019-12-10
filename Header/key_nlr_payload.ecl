@@ -1,6 +1,6 @@
 import doxie,Data_Services,header;
 
-d:=Header.Prep_NLR_key;
+d:=header.fn_suppress_ccpa(Header.Prep_NLR_key,true);
 
 layout:=record
 	d.pflag1;
@@ -49,7 +49,5 @@ layout:=record
 	d.record_sid;
  END;
 
-d_ccpa_compliant:=header.fn_suppress_ccpa(d);
-
-export key_NLR_payload := INDEX (d_ccpa_compliant, {did,rid}, layout,
+export key_NLR_payload := INDEX (d, {did,rid}, layout,
 		Data_Services.Data_Location.Prefix('person_header')+'thor_data400::key::header_nlr::did.rid_'+doxie.version_superkey);

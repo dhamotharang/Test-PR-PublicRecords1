@@ -136,7 +136,7 @@ EXPORT RawFetch_server(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'
                                                                       AND Keyed(fallback_value >= param_fallback_value)
                                                                       
                                                                   ),
-                                                                  250000,
+                                                                  Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,
                                                                   ONFAIL(TRANSFORM(SlimKeyRec, 
                                                                                    SELF := ROW([],SlimKeyRec))),
                                                                   keyed),

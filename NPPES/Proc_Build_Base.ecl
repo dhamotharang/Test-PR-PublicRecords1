@@ -1,6 +1,11 @@
 ﻿/*2019-08-17T22:07:47Z (Hennigar, Jennifer (RIS-BCT))
 CCPA-256
 */
+
+/*2019-12-05T13:20:00Z (Vladislavas, Petrokas (RIS-BCT))
+ROOLLUP EXCEPT FIX (ADDED global_sid,record_sid,source_rec_id to the ROOLLUP EXCEPT)
+*/
+
 #stored('did_add_force','thor');
 import address, 
 	   business_header_ss, 
@@ -315,7 +320,7 @@ end;
 																		dt_vendor_first_reported, dt_vendor_last_reported, process_date,
 																		clean_name_provider.name_score, clean_name_provider_other.name_score,
 																		clean_name_authorized_official.name_score, RawAID_Mailing, AceAID_Mailing,
-																		RawAID_Location, AceAID_Location, source_rec_id, lnpid,
+																		RawAID_Location, AceAID_Location,global_sid,record_sid,source_rec_id, lnpid, //added global_sid,record_sid,source_rec_id
 																		xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, 
 																		xadl2_matches, xadl2_matches_desc,																		
 																 LOCAL);

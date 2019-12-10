@@ -31,13 +31,16 @@ EXPORT Fn_UpdateWeeklyBase (string pVersion = '') := function
 																		self := left;
 																		self := [];
 																		)); 
+																		
 	filtered_weekly_base_did_ssn   	:= appended_base
 																				(
 																			((ppc in _Constants.FCRA_PPC) and datetime[1..8] between _Flags(pVersion).dt2yearsago and pVersion) 
 							                    or 	((ppc not in _Constants.FCRA_PPC) and datetime[1..8] between _Flags(pVersion).dt1yearago and pVersion)
 																			);
 	
-	new_weekly_base  				  				:= dedup(sort(filtered_weekly_base_did_ssn,record),record, except version, filedate);
+	excluded_weekly_base            := filtered_weekly_base_did_ssn (ppc not in _Constants.FCRA_PPC_EXCLUDE);
+	
+	new_weekly_base  				  				:= dedup(sort(excluded_weekly_base,record),record, except version, filedate);
 
   
   return new_weekly_base;

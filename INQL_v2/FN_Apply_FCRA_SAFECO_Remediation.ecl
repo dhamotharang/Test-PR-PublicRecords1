@@ -8,7 +8,7 @@ r:=RECORD
     STRING transaction_id;
 END;
 
-fsafeco := dataset(data_services.foreign_fcra_logs + 'thor10_231::in::safeco::20190601-20190901', r,  csv( separator(','), terminator(['\n', '\r\n']), heading(1)), opt);
+fsafeco := dataset(data_services.foreign_fcra_logs + 'thor10_231::in::inquiry::remediation::safeco', r,  csv( separator(','), terminator(['\n', '\r\n']), heading(1)), opt);
 
 new_base_file := join(base_file, fsafeco, 
                         left.search_info.transaction_id = right.transaction_id,

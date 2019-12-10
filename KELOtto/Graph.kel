@@ -2,9 +2,12 @@
 chard)
 C:\Users\prichajx\AppData\Roaming\HPCC Systems\eclide\jprichard\Dataland\KELOtto\Graph\2018-05-25T15_50_30Z.ecl
 */
+#OPTION(persistlevel, 4)
 #OPTION(persistexpire, 7)
 #OPTION(codegen, 'nosmartjoins')
 #OPTION(codegen, 'nolookupjoins')
+
+
 
 // Defining the ERA to allow for ASOF functionality
 ERA reportedby BEFORE(DateFirstSeen=NULL(MIN));
@@ -30,6 +33,8 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     DATE EventDate,
     INTEGER LexId,
 		DATE DateOfBirth,
+		STRING Ssn,
+		STRING EmailAddress,
 		STRING Title=NULL(),
 		STRING FirstName=NULL(),
 		STRING MiddleName=NULL(),
@@ -107,15 +112,28 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     
     STRING curr_incar_flag,
     STRING off_cat_list,
-    INTEGER name_ssn_dob_match
-    
-    
+    INTEGER name_ssn_dob_match,
+		
+		STRING PrimaryRange=NULL(),
+		STRING Predirectional=NULL(),
+		STRING PrimaryName=NULL(),
+		STRING Suffix=NULL(),
+		STRING Postdirectional=NULL(),
+		STRING UnitDesignation=NULL(),
+		STRING SecondaryRange=NULL(),
+		STRING PostalCity=NULL(),
+		STRING VanityCity=NULL(),
+		STRING State=NULL(),
+		STRING Zip=NULL(),
+		STRING Zip4=NULL()
     ),
 	MODEL(UID,
     rCustomer,
     LexId,
     SourceCustomers{rSourceCustomer},
 		ReportedDateOfBirth{DateOfBirth},
+		ReportedSsn{EventDate, Ssn},
+		ReportedEmailAddress{EventDate, EmailAddress},
 		FullName{EventDate, Title,FirstName,MiddleName,LastName,NameSuffix},
 
     DeceasedDate,
@@ -183,8 +201,8 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     
     curr_incar_flag,
     name_ssn_dob_match,
-    Offenses {off_cat_list}
-    
+    Offenses {off_cat_list},
+    Address {EventDate, PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, UnitDesignation, SecondaryRange, PostalCity, VanityCity, State, Zip, Zip4}				
     ));	
 
 Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id), 
@@ -200,10 +218,8 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     DriversLicense rDriversLicense=UID(AssociatedCustomerFileInfo, OttoDriversLicenseId),
     STRING PhoneNumber,
     STRING OttoAddressId,
-
     STRING OttoEmailId,
     STRING OttoIpAddressId,
-
     STRING OttoDriversLicenseId,
 
     INTEGER RecordId=record_id,
@@ -361,7 +377,8 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     STRING advo_dropindicator,
     STRING advo_residentialorbusinessindicator,
     STRING advo_addresstype,
-    STRING advo_addressusagetype    
+    STRING advo_addressusagetype,
+		STRING ACECleanerErrorCode=NULL()
     ),
     MODEL(
       UID,
@@ -450,7 +467,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
 
     IpAddress,iprngbeg,iprngend,edgecountry,edgeregion,edgecity,edgeconnspeed,edgemetrocode,edgelatitude,edgelongitude,edgepostalcode,edgecountrycode,edgeregioncode,edgecitycode,edgecontinentcode,edgetwolettercountry,edgeinternalcode,edgeareacodes,edgecountryconf,edgeregionconf,edgecitycong,edgepostalconf,edgegmtoffset,edgeindst,siccode,domainname,ispname,homebiztype,asn,asnname,primarylang,secondarylang,proxytype,proxydescription,isanisp,companyname,ranks,households,women,women18to34,women35to49,men,men18to34,men35to49,teens,kids,naicscode,cbsacode,cbsatitle,cbsatype,csacode,csatitle,mdcode,mdtitle,organizationname,
     Confidence_that_activity_was_deceitful_id, name_risk_code,dob_risk_code,ssn_risk_code,drivers_license_risk_code,physical_address_risk_code,phone_risk_code,cell_phone_risk_code,work_phone_risk_code,bank_account_1_risk_code,bank_account_2_risk_code,email_address_risk_code,ip_address_fraud_code,business_risk_code,mailing_address_risk_code,device_risk_code,identity_risk_code,
-		advo_hitflag, advo_vacancyindicator, advo_addressstyle, advo_dropindicator, advo_residentialorbusinessindicator, advo_addresstype, advo_addressusagetype    
+		advo_hitflag, advo_vacancyindicator, advo_addressstyle, advo_dropindicator, advo_residentialorbusinessindicator, advo_addresstype, advo_addressusagetype, ACECleanerErrorCode
           ));
 
 Address := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, OttoAddressId),
@@ -839,6 +856,19 @@ USE KELOtto.fraudgovshared(FLAT,
 		MiddleName =cleaned_name.mname,
 		LastName = cleaned_name.lname,
 		NameSuffix = cleaned_name.name_suffix,
+		EmailAddress=email_address,
+		PrimaryRange = clean_address.prim_range,
+		Predirectional = clean_address.predir,
+		PrimaryName = clean_address.prim_name,
+		Suffix =clean_address.addr_suffix,
+		Postdirectional = clean_address.postdir,
+		UnitDesignation = clean_address.unit_desig,
+		SecondaryRange = clean_address.sec_range,
+		PostalCity = clean_address.p_city_name,
+		VanityCity = clean_address.v_city_name,
+		State = clean_address.st,
+		Zip = clean_address.zip,
+		Zip4 = clean_address.zip4,
     SubjectSsnCount = subjectssncount,
     DateOfBirthMatchLevel = dobmatchlevel,
     StolenIdentityIndex = StolenIdentityIndex,
@@ -1194,6 +1224,8 @@ Event: => ContributorSafeFlag := MAP(InCustomerPopulation = 0 AND Confidence_tha
 Event: => AddressIsVacant := MAP(advo_vacancyindicator = 'Y' => 1, 0);
 Event: => AddressIsCmra := MAP(advo_dropindicator='C' => 1, 0);
 Event: => AddressIsPoBox := MAP(advo_addresstype=9 => 1, 0);
+Event: => InvalidAddress := MAP(ACECleanerErrorCode IN ['E101','E212','E213','E214','E216','E302','E412','E413','E420','E421','E422','E423','E425','E427','E428','E429','E430','E431','E439','E500','E501','E502','E503','E504','E505','E600'] => 1, 0);
+Event: => AddressOutOfState := MAP(Location.State != rCustomer.JurisdictionState => 1, 0);
 
 Event: => DemoCustomer := rCustomer.CustomerId IN ['248283691','248283681','248283671'];
 Event: => Age := IF(DemoCustomer, DAYSBETWEEN(EventDate, DATEFROMPARTS(2018, 4, 7)), DAYSBETWEEN(EventDate, rCustomer.EventDateMax));
@@ -1433,8 +1465,10 @@ Person: => DtFirstSeen := MIN(PersonEvent.Transaction, EventDate);
 Person: => DtLastSeen := MAX(PersonEvent.Transaction, EventDate);
 
 Person: => NoLexId := MAP(LexId > 900000000000 => 1, 0);
-Person: => Age := YEARSBETWEEN(MAX(ReportedDateOfBirth, DateOfBirth), DATEFROMPARTS(2018, 4, 7));
+Person: => DateOfBirth := MAX(ReportedDateOfBirth, DateOfBirth);
+Person: => Age := YEARSBETWEEN(DateOfBirth, rCustomer.EventDateMax);
 
+Person: => IsMinor := MAP(Age < 18 => 1, 0);
 
 Person: => NoLexIdGt22 := MAP(NoLexId = 1 AND Age > 22 => 1, 0);
 Person: => EventCount := COUNT(PersonEvent{Transaction});
@@ -1445,16 +1479,45 @@ Person: => DeceasedMatch := MAP(Deceased=1 AND DeceasedNameMatch=1 AND DeceasedD
 Person: => DeceasedMatchDescription := MAP(DeceasedMatch=1 => 'Full Matched Deceased Identity', '');
 Person: => DeceasedMatchDateOfDeath := MAP(DeceasedMatch=1 => STRING(DeceasedDate), '');
 
+
 Person: => CurrentlyIncarceratedFlag := MAP(name_ssn_dob_match = 1 AND curr_incar_flag='Y' => 1, 0);
 Person: => FraudOffenseCount := COUNT(Offenses(CONTAINS(off_cat_list,'FRAUD')));
 Person: => FraudOffensesFlag := MAP(name_ssn_dob_match = 1 AND FraudOffenseCount > 0 => 1, 0);
 Person: => AssociatedWithIncarceratedFlag := MAP(name_ssn_dob_match = 0 AND curr_incar_flag='Y' => 1, 0);
 Person: => AssociatedWithFraudOffensesFlag := MAP(name_ssn_dob_match = 0 AND FraudOffenseCount > 0 => 1, 0);
 
+Person: => AddressIsCmra30Count := COUNT(PersonEvent.Transaction(AddressIsCmra=1 AND Age < 30));
+Person: => AddressIsCmra30Flag := MAP(AddressIsCmra30Count>0 => 1, 0);
+Person: => AddressInvalid30Count := COUNT(PersonEvent.Transaction((InvalidAddress=1 OR Hri11Flag=1) AND Age < 30));
+Person: => AddressInvalid30Flag := MAP(AddressInvalid30Count>0 => 1, 0);
+Person: => ValidationAddrProblems30Count := COUNT(PersonEvent.Transaction(v2_validationaddrproblems=1 AND Age < 30));
+Person: => ValidationAddrProblems30Flag := MAP(ValidationAddrProblems30Count>0 => 1, 0);
+Person: => AddressIsOutOfState30Count := COUNT(PersonEvent.Transaction(AddressOutOfState=1 AND Age < 30));
+Person: => AddressIsOfState30Flag := MAP(AddressIsOutOfState30Count>0 => 1, 0);
+ 
 // NOTE: This is "best" from the contributed not Best Best.
 
 Person: => BestFullName := ONLY(TOPN(FullName(TRIM(FirstName) != '' AND TRIM(LastName) != ''), 1, -EventDate));
 Person: => Label := TRIM(BestFullName.FirstName) + ' ' + TRIM(BestFullName.LastName);
+Person: => BestFirstName := BestFullName.FirstName;
+Person: => BestMiddleName := BestFullName.MiddleName;
+Person: => BestLastName := BestFullName.LastName;
+Person: => BestNameSuffix := BestFullName.NameSuffix;
+
+// Joe fill this in
+//Person: => LastAddress
+//Person: => LastSSN
+Person: => BestReportedSsn := ONLY(TOPN(ReportedSsn(TRIM(Ssn) != ''), 1, -EventDate){Ssn});
+Person: => BestSsn := BestReportedSsn.Ssn;
+Person: => BestReportedEmail := ONLY(TOPN(ReportedEmailAddress(TRIM(EmailAddress) != ''), 1, -EventDate){EmailAddress});
+Person: => BestEmail := BestReportedEmail.EmailAddress;
+Person: => BestReportedAddress := ONLY(TOPN(Address((TRIM(PrimaryName) != '' AND TRIM(PostalCity) != '' AND TRIM(State) != '') OR TRIM(Zip) != ''), 1, -EventDate));
+Person: => BestStreetAddress := CleanSpaces(TRIM(TRIM(BestReportedAddress.PrimaryRange) + ' ' + TRIM(TRIM(BestReportedAddress.Predirectional) + ' ' + TRIM(TRIM(BestReportedAddress.PrimaryName) + ' ' + TRIM(TRIM(BestReportedAddress.Suffix) + ' ' + TRIM(TRIM(BestReportedAddress.Postdirectional) + ' ' + TRIM(TRIM(BestReportedAddress.UnitDesignation) + ' ' + TRIM(TRIM(BestReportedAddress.SecondaryRange)))))))));
+Person: => BestCity := BestReportedAddress.PostalCity;
+Person: => BestState := BestReportedAddress.State;
+Person: => BestZip := BestReportedAddress.Zip;
+//    Address {EventDate, PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, UnitDesignation, SecondaryRange, PostalCity, VanityCity, State, Zip, Zip4}				
+
 
 Person: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 Person: => OtherCustomerPersonCustomerCount := COUNT(SourceCustomers(rSourceCustomer != rCustomer));
@@ -1488,6 +1551,7 @@ Person: => Hri08Flag := MAP(COUNT(PersonEvent.Transaction(Hri08Flag=1)) > 0 => 1
 Person: => Hri11Flag := MAP(COUNT(PersonEvent.Transaction(Hri11Flag=1)) > 0 => 1, 0);
 Person: => Hri12Flag := MAP(COUNT(PersonEvent.Transaction(Hri12Flag=1)) > 0 => 1, 0);
 Person: => Hri14Flag := MAP(COUNT(PersonEvent.Transaction(Hri14Flag=1)) > 0 => 1, 0);
+Person: => Hri14Active30Flag := MAP(COUNT(PersonEvent.Transaction(Hri14Flag=1 AND Age < 30)) > 0 => 1, 0);
 Person: => Hri15Flag := MAP(COUNT(PersonEvent.Transaction(Hri15Flag=1)) > 0 => 1, 0);
 Person: => Hri19Flag := MAP(COUNT(PersonEvent.Transaction(Hri19Flag=1)) > 0 => 1, 0);
 Person: => Hri25Flag := MAP(COUNT(PersonEvent.Transaction(Hri25Flag=1)) > 0 => 1, 0);
@@ -1502,6 +1566,7 @@ Person: => Hri38Flag := MAP(COUNT(PersonEvent.Transaction(Hri38Flag=1)) > 0 => 1
 Person: => Hri41Flag := MAP(COUNT(PersonEvent.Transaction(Hri41Flag=1)) > 0 => 1, 0);
 Person: => Hri48Flag := MAP(COUNT(PersonEvent.Transaction(Hri48Flag=1)) > 0 => 1, 0);
 Person: => Hri50Flag := MAP(COUNT(PersonEvent.Transaction(Hri50Flag=1)) > 0 => 1, 0);
+Person: => Hri50Active30Flag := MAP(COUNT(PersonEvent.Transaction(Hri50Flag=1 AND Age < 30)) > 0 => 1, 0);
 Person: => Hri51Flag := MAP(COUNT(PersonEvent.Transaction(Hri51Flag=1)) > 0 => 1, 0);
 Person: => Hri52Flag := MAP(COUNT(PersonEvent.Transaction(Hri52Flag=1)) > 0 => 1, 0);
 Person: => Hri71Flag := MAP(COUNT(PersonEvent.Transaction(Hri71Flag=1)) > 0 => 1, 0);
@@ -1596,7 +1661,10 @@ Person: => KrId13007Flag := MAP(COUNT(PersonEvent.Transaction(KrId13007Flag=1))>
 Person: => KrId14000Flag := MAP(COUNT(PersonEvent.Transaction(KrId14000Flag=1))>0 => 1, 0);
 Person: => KrId14001Flag := MAP(COUNT(PersonEvent.Transaction(KrId14001Flag=1))>0 => 1, 0);
 
-Person: => SafeFlag := MAP(COUNT(PersonEvent.Transaction(SafeFlag=1))>0 => 1, 0);
+Person: => SafeFlagLastDate := MAX(PersonEvent.Transaction(SafeFlag=1), EventDate); 
+Person: => SafeFlagTransactionCount := COUNT(PersonEvent.Transaction(SafeFlag=1));
+Person: => SafeFlag := MAP(SafeFlagTransactionCount>0 AND SafeFlagLastDate > KrLastEventDate => 1, 0);
+
 Person: => ContributorSafeFlag := MAP(COUNT(PersonEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
 // Velocity
@@ -1630,7 +1698,17 @@ Person: => ClAdjacentSafeElementCount := ClIpSafeCount + ClSsnSafeCount + ClPhon
 Person: => ClAdjacentSafeFlag := MAP(ClAdjacentSafeElementCount > 0 => 1, 0);
 Person: => ClAdjacentNoSafeFlag := MAP(ClAdjacentSafeElementCount = 0 => 1, 0);
 
-
+  // Adjacent high volume 
+Person: => ClIpHighIdentityCount := COUNT(PersonPerson.ToPerson.PersonIpAddress(Ip.IdentityCount>10){Ip});
+Person: => ClSsnHighIdentityCount := COUNT(PersonPerson.ToPerson.PersonSSN(Social.IdentityCount>10){Social});
+Person: => ClPhoneHighIdentityCount := COUNT(PersonPerson.ToPerson.PersonPhone(PhoneNumber.IdentityCount>10){PhoneNumber});
+Person: => ClEmailHighIdentityCount := COUNT(PersonPerson.ToPerson.PersonEmail(Emailof.IdentityCount>10){Emailof});
+Person: => ClBankAccountHighIdentityCount := COUNT(PersonPerson.ToPerson.PersonBankAccount(Account.IdentityCount>10){Account});
+Person: => ClDriversLicenseHighIdentityCount := COUNT(PersonPerson.ToPerson.PersonDriversLicense(License.IdentityCount>10){License});
+Person: => ClAddressHighIdentityCount := COUNT(PersonPerson.ToPerson.PersonAddress(Location.IdentityCount>10){Location});
+	
+	
+	
 Person: => ClHighRiskRoutingCount := SUM(PersonPerson.ToPerson, KrHighRiskRouting); // Count of Identities with high risk bank account routing.
 
 Person: => ClNoLexIdGt22Count := SUM(PersonPerson.ToPerson, NoLexIdGt22); // Count within cluster of identities with no lexid and older than 22.
@@ -1773,6 +1851,15 @@ SocialSecurityNumber: => ClAdjacentSafeIdentityCount := COUNT(PersonSSN.Subject(
 SocialSecurityNumber: => ClAdjacentSafeFlag := MAP(ClAdjacentSafeIdentityCount > 0 => 1, 0);
 SocialSecurityNumber: => ClAdjacentNoSafeFlag := MAP(ClAdjacentSafeIdentityCount = 0 => 1, 0);
 
+  // Adjacent high volume 
+SocialSecurityNumber: => ClIpHighIdentityCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonIpAddress(Ip.IdentityCount>10){Ip});
+SocialSecurityNumber: => ClSsnHighIdentityCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonSSN(Social.IdentityCount>10){Social});
+SocialSecurityNumber: => ClPhoneHighIdentityCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonPhone(PhoneNumber.IdentityCount>10){PhoneNumber});
+SocialSecurityNumber: => ClEmailHighIdentityCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.IdentityCount>10){Emailof});
+SocialSecurityNumber: => ClBankAccountHighIdentityCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonBankAccount(Account.IdentityCount>10){Account});
+SocialSecurityNumber: => ClDriversLicenseHighIdentityCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonDriversLicense(License.IdentityCount>10){License});
+SocialSecurityNumber: => ClAddressHighIdentityCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson.PersonAddress(Location.IdentityCount>10){Location});
+	
 SocialSecurityNumber: => ClHighRiskRoutingCount := COUNT(PersonSSN.Subject.PersonPerson.ToPerson(KrHighRiskRouting=1){LexId}); // Count of Identities with high risk bank account routing.
 
 SocialSecurityNumber: => ClNoLexIdGt22Count := COUNT(PersonSSN.Subject.PersonPerson.ToPerson(NoLexIdGt22=1){LexId}); // Count within cluster of identities with no lexid and older than 22.
@@ -1914,6 +2001,15 @@ Phone: => ClAdjacentSafeIdentityCount := COUNT(PersonPhone.Subject(SafeFlag=1));
 Phone: => ClAdjacentSafeFlag := MAP(ClAdjacentSafeIdentityCount > 0 => 1, 0);
 Phone: => ClAdjacentNoSafeFlag := MAP(ClAdjacentSafeIdentityCount = 0 => 1, 0);
 
+  // Adjacent high volume 
+Phone: => ClIpHighIdentityCount := COUNT(PersonPhone.Subject.PersonPerson.ToPerson.PersonIpAddress(Ip.IdentityCount>10){Ip});
+Phone: => ClSsnHighIdentityCount := COUNT(PersonPhone.Subject.PersonPerson.ToPerson.PersonSSN(Social.IdentityCount>10){Social});
+Phone: => ClPhoneHighIdentityCount := COUNT(PersonPhone.Subject.PersonPerson.ToPerson.PersonPhone(PhoneNumber.IdentityCount>10){PhoneNumber});
+Phone: => ClEmailHighIdentityCount := COUNT(PersonPhone.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.IdentityCount>10){Emailof});
+Phone: => ClBankAccountHighIdentityCount := COUNT(PersonPhone.Subject.PersonPerson.ToPerson.PersonBankAccount(Account.IdentityCount>10){Account});
+Phone: => ClDriversLicenseHighIdentityCount := COUNT(PersonPhone.Subject.PersonPerson.ToPerson.PersonDriversLicense(License.IdentityCount>10){License});
+Phone: => ClAddressHighIdentityCount := COUNT(PersonPhone.Subject.PersonPerson.ToPerson.PersonAddress(Location.IdentityCount>10){Location});
+	
 Phone: => ClHighRiskRoutingCount := COUNT(PersonPhone.Subject.PersonPerson.ToPerson(KrHighRiskRouting=1){LexId}); // Count of Identities with high risk bank account routing.
 
 Phone: => ClNoLexIdGt22Count := COUNT(PersonPhone.Subject.PersonPerson.ToPerson(NoLexIdGt22=1){LexId}); // Count within cluster of identities with no lexid and older than 22.
@@ -2051,6 +2147,15 @@ Email: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
 Email: => ClAdjacentSafeIdentityCount := COUNT(PersonEmail.Subject(SafeFlag=1));
 Email: => ClAdjacentSafeFlag := MAP(ClAdjacentSafeIdentityCount > 0 => 1, 0);
 Email: => ClAdjacentNoSafeFlag := MAP(ClAdjacentSafeIdentityCount = 0 => 1, 0);
+
+  // Adjacent high volume 
+Email: => ClIpHighIdentityCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson.PersonIpAddress(Ip.IdentityCount>10){Ip});
+Email: => ClSsnHighIdentityCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson.PersonSSN(Social.IdentityCount>10){Social});
+Email: => ClPhoneHighIdentityCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson.PersonPhone(PhoneNumber.IdentityCount>10){PhoneNumber});
+Email: => ClEmailHighIdentityCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.IdentityCount>10){Emailof});
+Email: => ClBankAccountHighIdentityCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson.PersonBankAccount(Account.IdentityCount>10){Account});
+Email: => ClDriversLicenseHighIdentityCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson.PersonDriversLicense(License.IdentityCount>10){License});
+Email: => ClAddressHighIdentityCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson.PersonAddress(Location.IdentityCount>10){Location});
 
 Email: => ClHighRiskRoutingCount := COUNT(PersonEmail.Subject.PersonPerson.ToPerson(KrHighRiskRouting=1){LexId}); // Count of Identities with high risk bank account routing.
 
@@ -2196,6 +2301,15 @@ BankAccount: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
 BankAccount: => ClAdjacentSafeIdentityCount := COUNT(PersonBankAccount.Subject(SafeFlag=1));
 BankAccount: => ClAdjacentSafeFlag := MAP(ClAdjacentSafeIdentityCount > 0 => 1, 0);
 BankAccount: => ClAdjacentNoSafeFlag := MAP(ClAdjacentSafeIdentityCount = 0 => 1, 0);
+
+  // Adjacent high volume 
+BankAccount: => ClIpHighIdentityCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson.PersonIpAddress(Ip.IdentityCount>10){Ip});
+BankAccount: => ClSsnHighIdentityCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson.PersonSSN(Social.IdentityCount>10){Social});
+BankAccount: => ClPhoneHighIdentityCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson.PersonPhone(PhoneNumber.IdentityCount>10){PhoneNumber});
+BankAccount: => ClEmailHighIdentityCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.IdentityCount>10){Emailof});
+BankAccount: => ClBankAccountHighIdentityCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson.PersonBankAccount(Account.IdentityCount>10){Account});
+BankAccount: => ClDriversLicenseHighIdentityCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson.PersonDriversLicense(License.IdentityCount>10){License});
+BankAccount: => ClAddressHighIdentityCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson.PersonAddress(Location.IdentityCount>10){Location});
 
 BankAccount: => ClHighRiskRoutingCount := COUNT(PersonBankAccount.Subject.PersonPerson.ToPerson(KrHighRiskRouting=1){LexId}); // Count of Identities with high risk bank account routing.
 
@@ -2346,6 +2460,15 @@ DriversLicense: => ClAdjacentSafeIdentityCount := COUNT(PersonDriversLicense.Sub
 DriversLicense: => ClAdjacentSafeFlag := MAP(ClAdjacentSafeIdentityCount > 0 => 1, 0);
 DriversLicense: => ClAdjacentNoSafeFlag := MAP(ClAdjacentSafeIdentityCount = 0 => 1, 0);
 
+  // Adjacent high volume 
+DriversLicense: => ClIpHighIdentityCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson.PersonIpAddress(Ip.IdentityCount>10){Ip});
+DriversLicense: => ClSsnHighIdentityCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson.PersonSSN(Social.IdentityCount>10){Social});
+DriversLicense: => ClPhoneHighIdentityCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson.PersonPhone(PhoneNumber.IdentityCount>10){PhoneNumber});
+DriversLicense: => ClEmailHighIdentityCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.IdentityCount>10){Emailof});
+DriversLicense: => ClBankAccountHighIdentityCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson.PersonBankAccount(Account.IdentityCount>10){Account});
+DriversLicense: => ClDriversLicenseHighIdentityCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson.PersonDriversLicense(License.IdentityCount>10){License});
+DriversLicense: => ClAddressHighIdentityCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson.PersonAddress(Location.IdentityCount>10){Location});
+
 DriversLicense: => ClHighRiskRoutingCount := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson(KrHighRiskRouting=1){LexId}); // Count of Identities with high risk bank account routing.
 
 DriversLicense: => ClNoLexIdGt22Count := COUNT(PersonDriversLicense.Subject.PersonPerson.ToPerson(NoLexIdGt22=1){LexId}); // Count within cluster of identities with no lexid and older than 22.
@@ -2492,6 +2615,15 @@ InternetProtocol: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
 InternetProtocol: => ClAdjacentSafeIdentityCount := COUNT(PersonIpAddress.Subject(SafeFlag=1));
 InternetProtocol: => ClAdjacentSafeFlag := MAP(ClAdjacentSafeIdentityCount > 0 => 1, 0);
 InternetProtocol: => ClAdjacentNoSafeFlag := MAP(ClAdjacentSafeIdentityCount = 0 => 1, 0);
+
+  // Adjacent high volume 
+InternetProtocol: => ClIpHighIdentityCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson.PersonIpAddress(Ip.IdentityCount>10){Ip});
+InternetProtocol: => ClSsnHighIdentityCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson.PersonSSN(Social.IdentityCount>10){Social});
+InternetProtocol: => ClPhoneHighIdentityCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson.PersonPhone(PhoneNumber.IdentityCount>10){PhoneNumber});
+InternetProtocol: => ClEmailHighIdentityCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.IdentityCount>10){Emailof});
+InternetProtocol: => ClBankAccountHighIdentityCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson.PersonBankAccount(Account.IdentityCount>10){Account});
+InternetProtocol: => ClDriversLicenseHighIdentityCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson.PersonDriversLicense(License.IdentityCount>10){License});
+InternetProtocol: => ClAddressHighIdentityCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson.PersonAddress(Location.IdentityCount>10){Location});
 
 InternetProtocol: => ClHighRiskRoutingCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson(KrHighRiskRouting=1){LexId}); // Count of Identities with high risk bank account routing.
 
@@ -2676,6 +2808,15 @@ Address: => ClAdjacentSafeIdentityCount := COUNT(PersonAddress.Subject(SafeFlag=
 Address: => ClAdjacentSafeFlag := MAP(ClAdjacentSafeIdentityCount > 0 => 1, 0);
 Address: => ClAdjacentNoSafeFlag := MAP(ClAdjacentSafeIdentityCount = 0 => 1, 0);
 
+  // Adjacent high volume 
+Address: => ClIpHighIdentityCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson.PersonIpAddress(Ip.IdentityCount>10){Ip});
+Address: => ClSsnHighIdentityCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson.PersonSSN(Social.IdentityCount>10){Social});
+Address: => ClPhoneHighIdentityCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson.PersonPhone(PhoneNumber.IdentityCount>10){PhoneNumber});
+Address: => ClEmailHighIdentityCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson.PersonEmail(Emailof.IdentityCount>10){Emailof});
+Address: => ClBankAccountHighIdentityCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson.PersonBankAccount(Account.IdentityCount>10){Account});
+Address: => ClDriversLicenseHighIdentityCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson.PersonDriversLicense(License.IdentityCount>10){License});
+Address: => ClAddressHighIdentityCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson.PersonAddress(Location.IdentityCount>10){Location});
+
 Address: => ClHighRiskRoutingCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson(KrHighRiskRouting=1){LexId}); // Count of Identities with high risk bank account routing.
 
 Address: => ClNoLexIdGt22Count := COUNT(PersonAddress.Subject.PersonPerson.ToPerson(NoLexIdGt22=1){LexId}); // Count within cluster of identities with no lexid and older than 22.
@@ -2854,6 +2995,12 @@ QUERY: showCustomerPersonEntities <= Person
                               AssociatedWithFraudOffensesFlag,
                               
                               DeceasedMatch,
+															DateOfBirth,
+															DeceasedMatchDateOfDeath,
+															Age,
+															IsMinor,
+															
+															
                               DeathPriorToAllEvents,
                               Nas9Flag,
                               Nap3Flag,
