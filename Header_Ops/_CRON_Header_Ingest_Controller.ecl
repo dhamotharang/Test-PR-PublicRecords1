@@ -3,7 +3,7 @@
 IMPORT _control, std, header;
 
 #workunit('name', 'PersonHeader: _CRON_Header_Ingest_Controller');
-EVERY_2_HR_ON_SUN_MON_TUE := '0 */2 * * 0,1,2';
+EVERY_2_HR_ON_SUN_MON_TUE := '0 */2 * * 0,1,2,3';
 
 wuname := '*Header Ingest*';
 valid_state := ['','unknown','submitted', 'compiling','compiled','blocked','running','wait'];
