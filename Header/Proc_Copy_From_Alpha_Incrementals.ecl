@@ -1,4 +1,4 @@
-﻿IMPORT STD,_control,ut,PRTE2_Header,Orbit3,dops,data_services,InsuranceHeader;
+﻿IMPORT STD,_control,ut,Orbit3,dops,data_services,InsuranceHeader, InsuranceHeader_PostProcess, RoxieKeyBuild;
 
 // use test_copy=TRUE to take no action, and just run the report on what action would take place.
 EXPORT Proc_copy_From_Alpha_Incrementals(boolean test_copy=false) := MODULE
@@ -101,12 +101,16 @@ END;
                 
 EXPORT copy_from_alpha(string filedt) := function
     
-    // create a new blank file for the insuranceheader_segmentation key 
-    ecl1:=  PRTE2_Header.fn_bld_blank_index(
-        '','InsuranceHeader_PostProcess.segmentation_keys.key_did_ind ',
-        'thor_data400::key::insuranceheader_segmentation::did_ind',           
-        '::did_ind','~thor_data400::key::insuranceheader_segmentation::',filedt,'01')
-        + '\r\n'+'bld01;';
+    payload01 :=recordof(InsuranceHeader_PostProcess.segmentation_keys.key_did_ind );
+    ds01      :=dataset([],payload01 );
+    daIndex01 :=index(ds01 ,{did},{ds01 } AND NOT [did]
+                     ,'~thor_data400::key::insuranceheader_segmentation::did_ind_qa');
+
+    RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(
+                daIndex01 
+               ,'~thor_data400::key::insuranceheader_segmentation::did_ind'
+               ,'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind'
+               ,bldSegmentation);
 
     // aDali := '10.194.126.207';//_control.IPAddress.adataland_dali;
     aDali := _control.IPAddress.aprod_thor_dali;
@@ -120,8 +124,7 @@ EXPORT copy_from_alpha(string filedt) := function
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
 
-     _Control.fSubmitNewWorkunit(ecl1,'thor400_44') // creates blank segmentation did_ind key
-    
+     bldSegmentation // creates blank segmentation did_ind key    
     ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedt, '::did::refs::address'))
     ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedt, '::did::refs::dln'))
     ,fc(get_alogical(aPref+'did::refs::dob')     ,fName(filedt, '::did::refs::dob'))
@@ -266,22 +269,22 @@ END;
 // run on hthor
 EXPORT Refresh_copy(string filedt) :=  FUNCTION
 
-    noLABcopy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::idl'));
-    cpLab := if(noLABcopy
-             ,output('No LAB copy. see outputs')
+    ok_LAB_to_copy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::idl'));
+    cpLab := if(ok_LAB_to_copy
              ,copy_from_alpha(filedt)
+             ,output('No LAB copy. see outputs')             
              );
              
-    noUniqExcopy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::header::' + filedt + '::addr_unique_expanded'));
-    cpUniqEx := if(noUniqExcopy
-             ,output('No Address Unique Expanded copy. see outputs')
+    ok_UniqEx_to_copy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::header::' + filedt + '::addr_unique_expanded'));
+    cpUniqEx := if(ok_UniqEx_to_copy
              ,copy_addr_uniq_keys_from_alpha(filedt)
+             ,output('No Address Unique Expanded copy. see outputs')             
              );
 
-    noCAminorcopy := filedt <>'' AND ~test_copy AND ~(~std.file.fileexists('~thor_data400::base::insuranceheader_incremental::ca_minors::' + filedt));
-    cpCAminor := if(noCAminorcopy
-             ,output('No CA Minors copy. see outputs')
+    ok_CAminor_to_copy := filedt <>'' AND ~test_copy AND ~(~std.file.fileexists('~thor_data400::base::insuranceheader_incremental::ca_minors::' + filedt));
+    cpCAminor := if(ok_CAminor_to_copy
              ,copy_ca_minors_from_alpha(filedt)
+             ,output('No CA Minors copy. see outputs')             
              );            
              
     return sequential(cpLab, cpUniqEx, cpCAminor);
