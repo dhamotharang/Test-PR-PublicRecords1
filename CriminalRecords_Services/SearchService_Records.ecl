@@ -166,7 +166,8 @@ export SearchService_Records := module
 
     // ---- Final formatting ----
     added_in_mod := project(in_params, functions.params);
-    recs_fmt := CriminalRecords_Services.Functions.fnCrimSearchVal(out_mskd, added_in_mod);
+    ds_with_offenses := CriminalRecords_Services.Functions.fnAppendOffenses(out_mskd,in_params,isFCRA);
+    recs_fmt := CriminalRecords_Services.Functions.fnCrimSearchVal(ds_with_offenses, added_in_mod);
     
     recs_sort := sort(
       recs_fmt,
