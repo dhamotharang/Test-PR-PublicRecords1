@@ -1,4 +1,4 @@
-import Codes;
+﻿import Codes;
 
 /*
   *************************************************************************************
@@ -113,7 +113,7 @@ export Master := dataset(
       // RESERVED: 390-399 - Delaware Corporation (ESP only)
       {'ROYALTY', 'DELCORP_SRCH2'		, '390', 'G', ''			, 'Delaware Corporation'},
       {'ROYALTY', 'DELCORP_RPT2'		, '391', 'G', ''			, 'Delaware Corporation'},
-      // RESERVED: 400-409 - Social Media Locator - Social Intelligence - AFI Social Media Locator Search – Project #2503 (ESP only)
+      // RESERVED: 400-409 - Social Media Locator - Social Intelligence - AFI Social Media Locator Search - Project #2503 (ESP only)
       {'ROYALTY', 'SMLOCATOR'				, '400', 'G', ''			, 'Social Media Locator (Social Intelligence)'},
       {'ROYALTY', 'SMLOCATOR_DEMO'	, '401', 'G', ''			, 'Social Media Locator (Social Intelligence) - DEMO'},
       // RESERVED: 410-419 - Worldview Validate - Global Data Consortium (ESP only)
@@ -251,6 +251,7 @@ export Master := dataset(
       {'ROYALTY', 'ACCUDATA_DEFAULT',                 '710', 'G', '' , 'Accudata standard request'},
       {'ROYALTY', 'ACCUDATA_CNAM_CNM2',               '711', 'G', '' , 'Accudata phone number calling name'},
       {'ROYALTY', 'ACCUDATA_OCN_LNP',                 '712', 'G', '' , 'Accudata local number portability data'},
-      {'ROYALTY', 'BRITE_VERIFY_EMAIL',               '720', 'G', '' , 'BRITE VERIFY realtime email'}
+      {'ROYALTY', 'BRITE_VERIFY_EMAIL',               '720', 'G', '' , 'BRITE VERIFY realtime email'},
+      {'ROYALTY', 'NETWISE_EMAIL',                    '750', 'G', '' , 'NetWise Data Social Media Email gateway'}
     ]
     , MasterLayout);

@@ -1265,6 +1265,19 @@ EXPORT Constants := MODULE
 		export MAX_COUNT_REPORT_RESPONSE_RECORDS := 2000;
   end;
 
+	// NetWise Data (Social Media Email) gateway for the Virtual Identity Report V2 Accurint product
+  EXPORT NETWISE := MODULE
+    export unsigned2 MAX_COUNT_ADDRESS_RECORDS   := 10;
+    export unsigned2 MAX_COUNT_EDUCATION_RECORDS := 10;
+    export unsigned2 MAX_COUNT_EMAIL_RECORDS     := 15;
+    export unsigned2 MAX_COUNT_IMAGE_RECORDS     := 10;
+    export unsigned2 MAX_COUNT_NAME_RECORDS      := 10;
+    export unsigned2 MAX_COUNT_PLACE_RECORDS     := 10;
+    export unsigned2 MAX_COUNT_PHONE_RECORDS     := 10;
+    export unsigned2 MAX_COUNT_RESULTS_RECORDS   := 5; 
+    export unsigned2 MAX_COUNT_WORK_RECORDS      := 10;
+  END;
+
   // Official Records - from certain counties
 	export unsigned2 OFFRECS_MAX_COUNT_REPORT_RESPONSE_RECORDS := 2;
 	export unsigned2 OFFRECS_MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
@@ -1577,7 +1590,7 @@ EXPORT Constants := MODULE
 	export SLR := module    // Keep values in sync with GWBRIDGER to avoid data loss
 		export MaxList		:= 50;
 		export MaxItem 		:= 1024;
-		export MaxSourceTypes := 100;
+    export MaxSourceTypes := 100;
 	end;
 	
   // Small Business 
