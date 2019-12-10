@@ -1,4 +1,4 @@
-IMPORT data_services,versionControl,_control,ut,std;
+IMPORT data_services,versionControl,_control,ut,std,dx_header;
 // This attribute is used to determine the latest header raw for subsequent builds (monthy of incremental)
 // Refer to Header.build_header_raw to see how it is being updated.
 
@@ -31,7 +31,7 @@ EXPORT File_header_raw_latest := module
         is_latest_header_raw_best := filedate_is_latest AND file_age_less_than_2_weeks;
        
         export File := when(
-                            dataset(fileName ,header.Layout_Header,thor),if(not(is_latest_header_raw_best),
+                            dataset(fileName ,dx_header.Layout_Header,thor),if(not(is_latest_header_raw_best),
                              STD.System.Email.SendEmail(_control.MyInfo.EmailAddressNotify,
                                '** CRITICAL ** HEADER_RAW', 'Lasted is older than 2 week. VERIFY!!\r\n\r\n'+raw_hdr_ver_info+'\r\n\r\n'+workunit))
                             ,before);

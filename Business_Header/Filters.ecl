@@ -169,6 +169,8 @@ module
 				// -- JIRA:DF-16735 Per Privacy Programs - Remove PETER KIRN records.
 				or	(regexfind('CAMELBACK GROUP|PETER KIRN|PETERKIRN', pInput.company_name, nocase) and ((pInput.state = 'CO' and trim(pInput.city) in ['GREENWOOD VILLAGE','WINTER PARK','TABERNASH']) or pInput.phone in [3039186563,8702926547]))
 				or	(regexfind('PETER KIRN|PETERKIRN', pInput.company_name, nocase))
+				// -- JIRA# DF-26483 - Flush the Internet Domain (Whois) records as per Jason.
+				or	(MDR.sourceTools.SourceIsWhois_domains(pInput.source))
 				; 		
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -480,6 +482,8 @@ module
 				or  (trim(pInput.vendor_id) = '12-221573' and trim(pInput.lname) = 'HUBBARD' and trim(pInput.fname) = 'MARY' and trim(pInput.company_prim_name) = 'CENTRAL' and pInput.company_zip = 33713)
 				// -- JIRA - DF-24522 - Consumer Dispute - Unlink to PAW - zoom record
 				or  (trim(pInput.vendor_id) = '185398039' and trim(pInput.lname) = 'ROLSETH' and pInput.company_phone = 6516313237 and regexfind('YADA SYSTEMS',pInput.company_name, nocase))
+				// -- JIRA# DF-26483 - Flush the Internet Domain (Whois) records as per Jason.
+				or	(MDR.sourceTools.SourceIsWhois_domains(pInput.source))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -693,6 +697,8 @@ module
 				//or (MDR.sourceTools.sourceIsPA_Corporations(pInput.source) and pInput.dt_last_seen = 20180521)
 				// -- JIRA# DF-23181 - FCRA dispute Connection to Business in PAW
 				or (MDR.sourceTools.sourceIsMA_Corporations(pInput.source) and trim(pInput.vendor_id) = '25-FW1GV5')
+				// -- JIRA# DF-26483 - Flush the Internet Domain (Whois) records as per Jason.
+				or	(MDR.sourceTools.SourceIsWhois_domains(pInput.source))
 				;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1079,6 +1085,8 @@ module
 				or  (trim(pInput.vendor_id) = '185398039' and trim(pInput.lname) = 'ROLSETH' and pInput.company_phone = 6516313237 and regexfind('YADA SYSTEMS',pInput.company_name, nocase))
 				// -- JIRA - DF-25118 - Father's PAW records associated to son
 				or  (trim(pInput.vendor_id) in ['12-N02262','12-767331'] and trim(pInput.lname) = 'RAY' and trim(pInput.fname) = 'GRANDSTAFF')
+				// -- JIRA# DF-26483 - Flush the Internet Domain (Whois) records as per Jason.
+				or	(MDR.sourceTools.SourceIsWhois_domains(pInput.source))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1777,6 +1785,8 @@ module
 				( mdr.sourceTools.sourceIsUT_Corporations(pInput.source) and trim(pInput.vendor_id) = '49-2039256')
 			or // -- JIRA# DF-23181 - FCRA dispute Connection to Business in PAW (NOTE: Remove the filter after the build run)
 				( MDR.sourceTools.sourceIsMA_Corporations(pInput.source) and trim(pInput.vendor_id) = '25-FW1GV5')
+			or // -- JIRA# DF-26483 - Flush the Internet Domain (Whois) records as per Jason.
+				( MDR.sourceTools.SourceIsWhois_domains(pInput.source))
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 
@@ -2308,6 +2318,8 @@ module
 				( mdr.sourceTools.sourceIsUT_Corporations(pInput.source) and trim(pInput.vendor_id) = '49-2039256')
 			or // -- JIRA# DF-23181 - FCRA dispute Connection to Business in PAW (NOTE: Remove the filter after the build run)
 				( MDR.sourceTools.sourceIsMA_Corporations(pInput.source) and trim(pInput.vendor_id) = '25-FW1GV5')
+			or // -- JIRA# DF-26483 - Flush the Internet Domain (Whois) records as per Jason.
+				( MDR.sourceTools.SourceIsWhois_domains(pInput.source))	
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 

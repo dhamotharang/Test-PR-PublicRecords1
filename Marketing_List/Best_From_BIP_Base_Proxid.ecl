@@ -62,7 +62,7 @@ function
       ,dt_first_seen := if(left.dt_first_seen = 99999999  ,0  ,left.dt_first_seen);
        self.dt_first_seen   := if(dt_first_seen  = 0 and left.dt_last_seen != 0 ,left.dt_last_seen  ,     dt_first_seen);
        self.dt_last_seen    := if(dt_first_seen != 0 and left.dt_last_seen  = 0 ,     dt_first_seen ,left.dt_last_seen );
-       self.age_of_company  := if(ut.Age(self.dt_first_seen) > 0  ,(string3)ut.Age(self.dt_first_seen) ,'');
+       self.age_of_company  := if(self.dt_first_seen > 17760704  ,(string3)ut.Age(self.dt_first_seen) ,'');
        self.proxid          := left.proxid
        
    ));

@@ -13,13 +13,16 @@ It is expected that if there are updates to previous Case records, it would be f
 
 EXPORT fn_MergeCases(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
 
-	cases := DISTRIBUTE(newbase, HASH32(ProgramState, ProgramCode, CaseID)); 
+	c1 := DISTRIBUTE(newbase, HASH32(CaseID)); 
+	cases := DEDUP(SORT(c1, CaseId,ProgramState,ProgramCode,GroupId,-$.fn_lfnversion(filename), local),
+									CaseId,ProgramState,ProgramCode,GroupId, local);
 	// only update active cases
 	current := DISTRIBUTE(base(StartDate <= std.date.Today(), EndDate >= std.date.Today()),
-														HASH32(ProgramState, ProgramCode, CaseId));
+														HASH32(CaseId, ProgramState, ProgramCode, GroupId));
 
 	updated := JOIN(current, cases, 
-							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode and LEFT.CaseId = RIGHT.CaseId,
+							LEFT.CaseId = right.CaseId AND 
+							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode and LEFT.GroupId = RIGHT.GroupId,
 							TRANSFORM($.Layout_Base2,
 								self.case_Monthly_Allotment := IF(RIGHT.ProgramState='',LEFT.case_Monthly_Allotment,RIGHT.case_Monthly_Allotment);
 								self.RegionCode := IF(RIGHT.ProgramState='',LEFT.RegionCode,RIGHT.RegionCode);
@@ -32,13 +35,14 @@ EXPORT fn_MergeCases(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) ba
 								self.Created := LEFT.Created;
 								self.Updated := IF(RIGHT.ProgramState='',LEFT.Updated,Std.Date.Today());
 								self.FileName := IF(RIGHT.FileName='',LEFT.FileName, right.FileName);
-								self.GroupId := IF(RIGHT.GroupId='',LEFT.GroupId,RIGHT.GroupId);
+								//self.GroupId := IF(RIGHT.GroupId='',LEFT.GroupId,RIGHT.GroupId);
 								self := left;
 						),
 							LEFT OUTER, LOCAL);
 							
 	new := JOIN(current, cases, 
-							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode and LEFT.CaseId = RIGHT.CaseId,
+							LEFT.CaseId = right.CaseId AND 
+							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode and LEFT.GroupId = RIGHT.GroupId,
 							TRANSFORM($.Layout_Base2,
 								self := right;
 						),

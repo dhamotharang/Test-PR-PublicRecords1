@@ -743,7 +743,7 @@ export Update( string fileDate,string version, boolean pShouldSpray = _Dataset()
 																						 ,if(poverwrite
 																								,OUTPUT(Event_BadRecords,,corp2_mapping._Dataset().thor_cluster_Files + 'out::corp2::'+version+'::rejected::event_NC',overwrite,__compressed__,named('Sample_Rejected_Event_Recs_NC_'+filedate))
 																								,sequential (if(Event_RejFile_Exists,fileservices.deletelogicalfile(corp2_mapping._dataset().thor_cluster_Files + 'out::corp2::'+version+'::rejected::event_'+ state_origin)),
-																														 OUTPUT(Main_BadRecords,,corp2_mapping._Dataset().thor_cluster_Files + 'out::corp2::'+version+'::rejected::event_'+ state_origin,__compressed__,named('Sample_Rejected_Event_Recs_NC_'+filedate))
+																														 OUTPUT(Event_BadRecords,,corp2_mapping._Dataset().thor_cluster_Files + 'out::corp2::'+version+'::rejected::event_'+ state_origin,__compressed__,named('Sample_Rejected_Event_Recs_NC_'+filedate))
 																														)
 																								)
 																						)

@@ -1,4 +1,4 @@
-import POE,mdr;
+﻿import POE,mdr;
 
 export As_POE(
 
@@ -38,6 +38,7 @@ function
 		self.company_rawaid 						:= l.bh_rawaid														;
 		self.company_phone							:= (unsigned5)l.bh_phone									;
 		self.company_fein					 			:= 0																			;
+		self.global_sid									:= l.global_sid														;
 		self														:= []																			;
 	
 	end;

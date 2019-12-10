@@ -81,6 +81,7 @@ export proc_build_all(
   ,pSkipSeleidRelative    = 'false'
   ,pSkipCrosswalk         = 'false'
   ,pSkipMktgListBuild     = 'false'
+  ,pSkipHighRiskKeys      = 'false'
   ,pSkipCDWBuild          = 'false'
   ,pSkipXAppend           = 'false'
   ,pSkipEntityReport      = 'false'
@@ -120,11 +121,10 @@ functionmacro
     bestCondition   := pSkipBest      = false or pSkipIndustry      = false or pSkipMisckeys        = false                                                         ;
     statsCondition  := pSkipMisckeys  = false or pSkipSegStats      = false or pSkipStrata          = false or pSkipDataCard    = false or pSkipOverlinking = false ;
     
-    XlinkStuffWuid  := if(xlinkCondition                ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,pSkipXlink,pSkipCopyXlinkKeys,pSkipXlinkValidation ,pSkipXlinkSample,pSkipWeeklyKeys  ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,true                 ,true                 ,true           ,'XlinkStuff'                      ,,pCompileTest),'');
-    BestWuid        := if(bestCondition                 ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,pSkipBest          ,pSkipIndustry,true          ,pSkipQASamples ,true           ,true         ,true             ,true                 ,true                 ,pSkipCrosswalk ,'BestAndMiscKeys'                 ,,pCompileTest),'');
-    StatsWuid       := if(statsCondition                ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,pSkipMisckeys ,true           ,pSkipSegStats  ,pSkipStrata  ,pSkipDataCard    ,pSkipOverlinking     ,true                 ,true           ,'Stats'                           ,,pCompileTest),'');
-    RelativesWuid   := if(pSkipSeleidRelative = false   ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,true                 ,pSkipSeleidRelative  ,true           ,'SeleidRelative'                  ,,pCompileTest),'');
-
+    XlinkStuffWuid  := if(xlinkCondition                ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,pSkipXlink,pSkipCopyXlinkKeys,pSkipXlinkValidation ,pSkipXlinkSample,pSkipWeeklyKeys  ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,true                 ,true                 ,true           ,true              ,'XlinkStuff'                      ,,pCompileTest),'');
+    BestWuid        := if(bestCondition                 ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,pSkipBest          ,pSkipIndustry,true          ,pSkipQASamples ,true           ,true         ,true             ,true                 ,true                 ,pSkipCrosswalk ,pSkipHighRiskKeys ,'BestAndMiscKeys'                 ,,pCompileTest),'');
+    StatsWuid       := if(statsCondition                ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,pSkipMisckeys ,true           ,pSkipSegStats  ,pSkipStrata  ,pSkipDataCard    ,pSkipOverlinking     ,true                 ,true           ,true              ,'Stats'                           ,,pCompileTest),'');
+    RelativesWuid   := if(pSkipSeleidRelative = false   ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,true                 ,pSkipSeleidRelative  ,true           ,true              ,'SeleidRelative'                  ,,pCompileTest),'');
     Wait4Threads    := if(XlinkStuffWuid != '' or BestWuid != '' or StatsWuid != '' or RelativesWuid != ''   ,wk_ut.Wait4Workunits([XlinkStuffWuid,BestWuid,StatsWuid,RelativesWuid],'1',pversion,'Wait4Wuids',,BIPV2_Build.mod_email.emailList));
     
     // -- Total up the workunit timings
