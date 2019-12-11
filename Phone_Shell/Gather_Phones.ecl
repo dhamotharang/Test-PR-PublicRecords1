@@ -43,7 +43,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 
 	 HeaderAddresses := Phone_Shell.Search_Header_Unique_Addresses(Input, GLBPurpose, DPPAPurpose, DataRestrictionMask, mod_access);
 	 
-	 NonSubjectPhones := Phone_Shell.Search_Parent_Spouse_Relative_RawData(Input, GLBPurpose, DPPAPurpose, DataRestrictionMask);
+	 NonSubjectPhones := Phone_Shell.Search_Parent_Spouse_Relative_RawData(Input, GLBPurpose, DPPAPurpose, DataRestrictionMask, mod_access);
 	 
 	 InputPhones := Phone_Shell.Search_Input(Input, PhoneRestrictionMask, PhoneShellVersion);
 
@@ -55,7 +55,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 
 	 Relocation := IF(RunRelocation, Phone_Shell.Search_Relocation(Input, RelocationsMaxDaysBefore, RelocationsMaxDaysAfter, RelocationsTargetRadius, PhoneRestrictionMask, PhoneShellVersion));
 
-	 Utility := Phone_Shell.Search_Utility(Input, GLBPurpose, PhoneRestrictionMask, IndustryClass, PhoneShellVersion, mod_access);
+	 Utility := Phone_Shell.Search_Utility(Input, GLBPurpose, PhoneRestrictionMask, IndustryClass, PhoneShellVersion);
 	 
 	 Spouse := Phone_Shell.Search_Spouse(Input, NonSubjectPhones (Subj_Phone_Type = '41'), PhoneRestrictionMask, PhoneShellVersion);
 
@@ -69,9 +69,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 
 	 PhonesPlus := Phone_Shell.Search_PhonesPlus(Input, HeaderAddresses, GLBPurpose, DPPAPurpose, IncludeLastResort, PhoneRestrictionMask, DataPermissionMask, IndustryClass, DataRestrictionMask, PhoneShellVersion, mod_access);
 	 
-	 SkipTrace := Phone_Shell.Search_Extended_Skip_Trace(Input, PhoneRestrictionMask, DataRestrictionMask, SX_Match_Restriction_Limit, Strict_APSX, PhoneShellVersion);
+	 SkipTrace := Phone_Shell.Search_Extended_Skip_Trace(Input, PhoneRestrictionMask, DataRestrictionMask, SX_Match_Restriction_Limit, Strict_APSX, PhoneShellVersion, mod_access);
 	 
-	 Neighbors := Phone_Shell.Search_Neighbors(Input, PhoneRestrictionMask, DataRestrictionMask, GLBPurpose, DPPAPurpose, PhoneShellVersion := PhoneShellVersion);
+	 Neighbors := Phone_Shell.Search_Neighbors(Input, PhoneRestrictionMask, DataRestrictionMask, GLBPurpose, DPPAPurpose, PhoneShellVersion := PhoneShellVersion, in_mod_access := mod_access);
 	 
 	 /* ***************************************************************
 		* 		Gateway Searches *

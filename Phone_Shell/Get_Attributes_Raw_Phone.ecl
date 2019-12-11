@@ -3,7 +3,7 @@
  * -Switch_Type adapted from Progressive_Phone.Mac_Get_Switchtype         *
  ************************************************************************ */
 
-IMPORT AutokeyB2, Business_Header_SS, CellPhone, Phone_Shell, Risk_Indicators, RiskWise, UT, data_services, doxie;
+IMPORT AutokeyB2, Business_Header_SS, CellPhone, Phone_Shell, Risk_Indicators, RiskWise, UT, data_services, doxie, Suppress;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Raw_Phone (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	/* ************************************************************************
@@ -65,14 +65,15 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Raw
 	/* ************************************************************************
 	 *  Get Phone Disconnect and Sic_Code																			*
 	 ************************************************************************ */
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getDisconnectHRisk(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Risk_Indicators.key_phone_table_v2 ri) := TRANSFORM
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} getDisconnectHRisk(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Risk_Indicators.key_phone_table_v2 ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.Raw_Phone_Characteristics.Phone_Disconnected := IF(ri.potdisconnect, TRUE, FALSE);
 		SELF.Raw_Phone_Characteristics.Phone_High_Risk := IF(TRIM(ri.sic_code) <> '', 1, 0);
 		SELF := le;
 	END;
-	phoneDisconnectHRiskTemp := JOIN(Input, Risk_Indicators.key_phone_table_v2, KEYED(LEFT.Gathered_Phone = RIGHT.phone10), 
+	phoneDisconnectHRiskTemp_unsuppressed := JOIN(Input, Risk_Indicators.key_phone_table_v2, KEYED(LEFT.Gathered_Phone = RIGHT.phone10), 
 																					getDisconnectHRisk(LEFT, RIGHT), KEEP(500), ATMOST(RiskWise.max_atmost));
-
+	phoneDisconnectHRiskTemp := Suppress.Suppress_ReturnOldLayout(phoneDisconnectHRiskTemp_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus rollDisconnectHRisk(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
 		// In case there are multiple results, if one of them says the phone isn't disconnected then the phone isn't disconnected.  Only if all records are disconnected is the phone disconnected
 		SELF.Raw_Phone_Characteristics.Phone_Disconnected := le.Raw_Phone_Characteristics.Phone_Disconnected AND ri.Raw_Phone_Characteristics.Phone_Disconnected;

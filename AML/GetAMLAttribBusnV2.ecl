@@ -1,5 +1,5 @@
 ﻿import Business_Risk, Business_Header_SS, ut, Business_Header, did_add, RiskWise,
-				Risk_indicators, doxie, Gateway;
+				Risk_indicators, doxie, Gateway, AML;
 
 EXPORT GetAMLAttribBusnV2(DATASET(Business_Risk.Layout_Input) indata, 
 																	string50 DataRestriction,
@@ -146,7 +146,7 @@ BDIDbestrecs := join(bdidAdded(bdid!=0), bdidbest,
 // execRelativesDegree  := 70;
 
 											
-GetLinkedBusn := GetLinkedBusnExecs(BDIDbestrecs);  //Layouts.BusnLayoutV2  in     Layouts.BusnExecsLayoutV2 = out
+GetLinkedBusn := GetLinkedBusnExecs(BDIDbestrecs, mod_access);  //Layouts.BusnLayoutV2  in     Layouts.BusnExecsLayoutV2 = out
 
 
 LinkCount := 	GetLinkedBusn(RelatDegree in [AMLConstants.LnkdBusnDegree, AMLConstants.relatedBusnDegree]);  //remove after testing
@@ -238,7 +238,7 @@ Layouts.AMLDerogsLayoutV2  PregexecDerog(AllBusnExecs le) := TRANSFORM
 END;
 ExecDerogPrep  := project(AddLnkBusnhdr(relatdegree in [AMLConstants.execSubjBsnDegree,AMLConstants.execsLnkdBusnDegree]), PregexecDerog(left));
 DDExecDerogPrep  := dedup(sort(ExecDerogPrep,seq, did, relatdegree), seq, did);
-GetExecCrim := IndAllLegalEvents((DDExecDerogPrep),isFCRA);
+GetExecCrim := AML.IndAllLegalEvents((DDExecDerogPrep),isFCRA, mod_access);
 
 
 
@@ -272,7 +272,7 @@ SDDIDs  := dedup(sort(AddLnkBusnhdr(relatdegree in [AMLConstants.execSubjBsnDegr
 
 prepprofLic := project(SDDIDs, PrepExecslayout(left));
 
-GetProfLic := IndProfLic(prepprofLic(relatdegree in [AMLConstants.execSubjBsnDegree,AMLConstants.execsLnkdBusnDegree]), isFCRA, DataRestriction);  //Layouts.AMLExecLayoutV2  				TESTED
+GetProfLic := AML.IndProfLic(prepprofLic(relatdegree in [AMLConstants.execSubjBsnDegree,AMLConstants.execsLnkdBusnDegree]), isFCRA, DataRestriction, mod_access);  //Layouts.AMLExecLayoutV2  				TESTED
 
 Layouts.BusnLayoutV2 PrepBdidSOS(GetAddrRisk le) := TRANSFORM
 	self.seq :=  le.seq;
@@ -314,7 +314,7 @@ GetBusnSOS := BusnSOSDetails(prepSOS); //Layouts.BusnLayoutV2         TESTED
 
 GetBusnHeader := BusnHeaderRecs(BDIDbestrecs);  //Layouts.BusnLayoutV2          TESTED
 
-GetBusnLiens :=  BusnLiens(BDIDbestrecs);  //Layouts.BusnLayoutV2             TESTED
+GetBusnLiens :=  BusnLiens(BDIDbestrecs, mod_access);  //Layouts.BusnLayoutV2             TESTED
 
 GetBusnWatercraft := BusnWatercraft(BDIDbestrecs);  //Layouts.BusnLayoutV2             TESTED
 
@@ -585,11 +585,11 @@ ExecSSNPrep := project(AddLnkBusnhdr(relatdegree in [AMLConstants.execSubjBsnDeg
 
 
 // need relatives, assoc exec, execs parents to go in
-GetSSNFlags := SSNData(ExecSSNPrep,dppa, glba,isFCRA , DataRestriction, TRUE, bsversion);  //Layouts.RelatLayoutV2  IsBusn = parm
+GetSSNFlags := SSNData(ExecSSNPrep,dppa, glba,isFCRA , DataRestriction, TRUE, bsversion, mod_access);  //Layouts.RelatLayoutV2  IsBusn = parm
 
 
 
-GetHeader := IndGetHeader(GetSSNFlags, dppa, glba,isFCRA , DataRestriction);
+GetHeader := IndGetHeader(GetSSNFlags, dppa, glba,isFCRA , DataRestriction, mod_access);
 
 // determine relatives citizenship index  for relatives
 

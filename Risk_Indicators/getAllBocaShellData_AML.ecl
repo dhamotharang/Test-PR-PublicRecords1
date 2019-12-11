@@ -121,7 +121,7 @@ production_realtime_mode := iid[1].historydate=risk_indicators.iid_constants.def
 	                  Risk_Indicators.Boca_Shell_Property_Hist_FCRA (p_address, ids_only),
                     Risk_Indicators.Boca_Shell_Property_Hist (p_address, ids_only, includeRelativeInfo, filter_out_fares));
 										
-  AMLSingleProperty :=  if (production_realtime_mode,   AML.AMLProperty(p_address, ids_only,includeRelativeInfo, filter_out_fares, mod_access), AML.AMLPropertyHist(p_address, ids_only,includeRelativeInfo, filter_out_fares, mod_access));
+  AMLSingleProperty :=  if (production_realtime_mode,   AML.AMLProperty(p_address, ids_only,includeRelativeInfo, filter_out_fares), AML.AMLPropertyHist(p_address, ids_only,includeRelativeInfo, filter_out_fares));
  
 	
   single_property := if (production_realtime_mode, prop, prop_hist);
@@ -565,12 +565,12 @@ ids_full_ssn := join(	SSNFlagsOrigSeq, pre_ids_only, left.seq=right.seq and left
 											
 //AML position title   all ids
 
-relatEmpl :=  AML.AMLEmployment(pre_ids_only);
+relatEmpl :=  AML.AMLEmployment(pre_ids_only, mod_access);
 
 //AML  degree
-relatStudent := AML.AMLStudent(ids_only);
+relatStudent := AML.AMLStudent(ids_only, mod_access);
 //  AML professional license
-relatProfLic :=  AML.AMLProfLicense(ids_only);
+relatProfLic :=  AML.AMLProfLicense(ids_only, mod_access);
 
 
 RelatInput :=  join(ssnFlagsPrepforAddr, pre_ids_only,
@@ -601,7 +601,7 @@ relatAddr  := AML.AMLAddrAttrib(ssnFlagsPrepforAddr);
 
 
 //  AML  header info
-relatHeader :=  AML.AMLGetHeader(group(RelatInput,seq), dppa, glb, isFCRA, DataRestriction);
+relatHeader :=  AML.AMLGetHeader(group(RelatInput,seq), dppa, glb, isFCRA, DataRestriction, mod_access);
 
 //AML   relates parents
 

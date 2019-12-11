@@ -18,7 +18,7 @@ EXPORT Phone_Shell.Layouts.layoutUniqueAddresses Search_Header_Unique_Addresses(
   END;
   
   
-  fullHeader := JOIN(Input, Doxie.Key_Header,
+  fullHeader_unsuppressed := JOIN(Input, Doxie.Key_Header,
 													LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.s_DID) AND
 													// We only want unique addresses to search by within the past 6 months
 													(LEFT.Clean_Input.Prim_Range <> RIGHT.Prim_Range OR LEFT.Clean_Input.Predir <> RIGHT.Predir OR LEFT.Clean_Input.Prim_Name <> RIGHT.Prim_Name OR 
@@ -56,7 +56,9 @@ EXPORT Phone_Shell.Layouts.layoutUniqueAddresses Search_Header_Unique_Addresses(
 																														SELF := RIGHT), 
 													KEEP(UT.Limits.HEADER_PER_DID), ATMOST(UT.Limits.HEADER_PER_DID));
 													
-	fastHeader := JOIN(Input, Header_Quick.Key_DID,
+	fullHeader := Suppress.Suppress_ReturnOldLayout(fullHeader_unsuppressed, mod_access, Phone_Shell.Layouts.layoutUniqueAddresses);
+	
+	fastHeader_unsuppressed := JOIN(Input, Header_Quick.Key_DID,
 													LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID) AND
 													// We only want unique addresses to search by within the past 6 months
 													(LEFT.Clean_Input.Prim_Range <> RIGHT.Prim_Range OR LEFT.Clean_Input.Predir <> RIGHT.Predir OR LEFT.Clean_Input.Prim_Name <> RIGHT.Prim_Name OR 
@@ -93,16 +95,15 @@ EXPORT Phone_Shell.Layouts.layoutUniqueAddresses Search_Header_Unique_Addresses(
 																														SELF.DateLastSeen := (STRING8)IF(RIGHT.dt_last_seen <> 0, RIGHT.dt_last_seen, RIGHT.dt_vendor_last_reported);
 																														SELF := RIGHT), 
 													KEEP(UT.Limits.HEADER_PER_DID), ATMOST(UT.Limits.HEADER_PER_DID));
-	
+													
+		fastHeader := Suppress.Suppress_ReturnOldLayout(fastHeader_unsuppressed, mod_access, Phone_Shell.Layouts.layoutUniqueAddresses);
+
 	// Don't dedup by Sec_Range, just keep the version that has Apartment number populated to avoid finding phone numbers for the entire apartment complex.
 	combinedUniqueHeaders := DEDUP(SORT(fullHeader + fastHeader, seq, DID, Prim_Range, Predir, Prim_Name, Addr_Suffix, -Sec_Range, Zip5, -((INTEGER)DateLastSeen)), seq, DID, Prim_Range, Predir, Prim_Name, Addr_Suffix, Zip5);
 	
-  combined_Unique_Headers_Suppressed := Suppress.MAC_SuppressSource(combinedUniqueHeaders, mod_access);
-  combined_Unique_Headers_Formatted := PROJECT(combined_Unique_Headers_Suppressed, TRANSFORM(  Phone_Shell.Layouts.layoutUniqueAddresses,
-                                                  SELF := LEFT));
 	// OUTPUT(fullHeader, NAMED('fullHeader'));
 	// OUTPUT(fastHeader, NAMED('fastHeader'));
 	// OUTPUT(combinedUniqueHeaders, NAMED('CombinedUniqueHeaders'));
 	
-	RETURN(combined_Unique_Headers_Formatted);
+	RETURN(combinedUniqueHeaders);
 END;

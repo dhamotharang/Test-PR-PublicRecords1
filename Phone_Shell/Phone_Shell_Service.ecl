@@ -309,6 +309,9 @@ string BatchUID := '' : stored('_BatchUID');
 unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 mod_access := MODULE(Doxie.IDataAccess)
+	  EXPORT glb := glbpurpose;
+	  EXPORT dppa := dppapurpose;
+	  EXPORT DataRestrictionMask := ^.DataRestrictionMask;
       EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
       EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
       EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid

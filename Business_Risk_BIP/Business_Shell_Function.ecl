@@ -791,7 +791,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 	BusinessByAddress := Business_Risk_BIP.getBusinessByAddress(withBIP, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
-  InquiriesByInputs := Business_Risk_BIP.getInquiriesByInputs(withBIP, Options, linkingOptions, AllowedSourcesSet);
+  InquiriesByInputs := Business_Risk_BIP.getInquiriesByInputs(withBIP, Options, linkingOptions, AllowedSourcesSet, mod_access);
 
   PropertyByInputs := Business_Risk_BIP.getPropertyByInputs(withBIP, Options, linkingOptions, AllowedSourcesSet);
 

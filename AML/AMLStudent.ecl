@@ -1,4 +1,4 @@
-﻿import american_student_list, Riskwise, AlloyMedia_student_list, RISK_INDICATORS, doxie, Suppress;
+﻿import american_student_list, Riskwise, AlloyMedia_student_list, RISK_INDICATORS, doxie, Suppress, AML;
 
 export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_only, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 		
@@ -36,14 +36,23 @@ export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_onl
 // 3.	ams_file_type in[“”] AND any of the following are populated: (ams_college_code, ams_college_tier, ams_college_major, ams_class, ams_income_level_code)
 
 													
-	student_file := join(ids_only, american_student_list.key_DID, 
+	student_file_unsuppressed := join(ids_only, american_student_list.key_DID, 
 		left.did!=0
 		and keyed(left.did=right.l_did)
 		and (unsigned3)(right.date_first_seen[1..6]) < left.historydate,
 		student(left,right), left outer, atmost(keyed(left.did=right.l_did), 100)
 	);
+	
+		student_file_flagged := Suppress.MAC_FlagSuppressedSource(student_file_unsuppressed, mod_access);
 
-	Layout_AS_Plus_CCPA roll( Layout_AS_Plus_CCPA le, Layout_AS_Plus_CCPA ri ) := TRANSFORM
+		student_file := PROJECT(student_file_flagged, TRANSFORM(Layout_AS_Plus, 
+		self.date_last_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.date_last_seen);
+		self.AttendCollege := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.AttendCollege);
+		self.src := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.src);
+		SELF := LEFT;
+		)); 
+
+		Layout_AS_Plus roll( Layout_AS_Plus le, Layout_AS_Plus ri ) := TRANSFORM
 		self := map(
 			// current ASL over historical
 			le.src='C' and ri.src='H' => le,
@@ -68,6 +77,7 @@ export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_onl
 
 	// alloy
 	Layout_AS_Plus_CCPA alloy_main(ids_only le, AlloyMedia_student_list.Key_DID ri) := TRANSFORM
+		self.global_sid := ri.global_sid;
 		self.did := le.did;
 		self.seq := le.seq;
 		self.historydate := le.historydate;
@@ -101,20 +111,19 @@ export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_onl
 		self.HRDegreeField := college_major in ['P','G','T','S'];  // accounting, law, medicine, finance
 		self.date_first_seen := ri.date_vendor_first_reported; 
 		self.date_last_seen := min( RISK_INDICATORS.iid_constants.mygetdate(le.historydate), ri.date_vendor_last_reported );
-		self.global_sid := ri.global_sid;
-        self := [];
+		self := [];
 	end;
 
-	alloy_file := join(ids_only, AlloyMedia_student_list.Key_DID, 
+	alloy_file_unsuppressed := join(ids_only, AlloyMedia_student_list.Key_DID, 
 			left.did!=0
 			and keyed(left.did=right.did)
 			and right.date_vendor_first_reported < RISK_INDICATORS.iid_constants.myGetDate(left.historydate),
 			alloy_main(left, right), atmost(keyed(left.did=right.did), 100), keep(1));
 
-    student_all_suppressed := Suppress.Mac_SuppressSource(group(rollup(sort(ungroup(student_file + alloy_file),seq, did), roll(left,right), seq, did),seq, did),mod_access);
-    student_all := PROJECT(student_all_suppressed, TRANSFORM(Layout_AS_Plus,
-                                                  SELF := LEFT));
-
+	alloy_file := Suppress.Suppress_ReturnOldLayout(alloy_file_unsuppressed, mod_access, Layout_AS_Plus);
+	
+	student_all := group(rollup(sort(ungroup(student_file + alloy_file),seq, did), roll(left,right), seq, did),seq, did);
+	
 	// output(student_file, named('student_file'), overwrite);
 	// output(alloy_file, named('alloy_file'), overwrite);
 	// output(student_all, named('student_all'), overwrite);

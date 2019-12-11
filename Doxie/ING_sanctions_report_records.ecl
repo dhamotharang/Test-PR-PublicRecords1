@@ -1,4 +1,4 @@
-import Healthcare_Provider_Services, Healthcare_Header_Services,ingenix_natlprof, doxie_files,codes,AutoStandardI,ut;
+﻿import Healthcare_Provider_Services, Healthcare_Header_Services,ingenix_natlprof, doxie_files,codes,AutoStandardI,ut;
 
 export ING_sanctions_report_records(set of unsigned6 sanction_id_set, dataset(doxie.layout_references) in_dids = dataset([],doxie.layout_references)) := FUNCTION
 
@@ -24,6 +24,9 @@ ds:=project(getHdrIDs_fromSanctionID, transform(newlayout,
 Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
 	 self.glb_ok := ut.glb_ok (gm.GLBPurpose);
 	 self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
+         self.glb:= gm.GLBPurpose;
+          self.dppa:= gm.DPPAPurpose; 
+
 	 self.DRM := gm.DataRestrictionMask;
 	 self.includeSanctions := true;
 	// self:=[];Do not uncomment otherwise the default values will not get set.

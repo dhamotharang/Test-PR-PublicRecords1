@@ -179,7 +179,15 @@ with_certegy_roxie_unsuppressed := join(dl_did_rolled, certegy.key_certegy_did,
 					get_certegy(LEFT,RIGHT),
 					left outer, atmost(riskwise.max_atmost), keep(100));
 					
-with_certegy_roxie := Suppress.Suppress_ReturnOldLayout(with_certegy_roxie_unsuppressed, mod_access, dl_temp, data_environment);
+with_certegy_roxie_flagged := Suppress.MAC_FlagSuppressedSource(with_certegy_roxie_unsuppressed, mod_access, data_env := data_environment);
+
+with_certegy_roxie := PROJECT(with_certegy_roxie_flagged, TRANSFORM(dl_temp, 
+	self.dl_score := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dl_score);
+	self.verified_dl := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.verified_dl);
+	self.any_dl_found := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.any_dl_found);
+	self.dl_exists := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.dl_exists);
+    SELF := LEFT;
+)); 
 
 with_certegy_thor_pre_unsuppressed := join(distribute(dl_did_rolled(did<>0 and dl_number<>'' and dl_state<>''), hash64(did)), 
 					distribute(pull(certegy.key_certegy_did), hash64(did)), 
@@ -188,7 +196,15 @@ with_certegy_thor_pre_unsuppressed := join(distribute(dl_did_rolled(did<>0 and d
 					get_certegy(LEFT,RIGHT),
 					left outer, atmost(riskwise.max_atmost), keep(100), local);
 
-with_certegy_thor_pre := Suppress.Suppress_ReturnOldLayout(with_certegy_thor_pre_unsuppressed, mod_access, dl_temp, data_environment);
+with_certegy_thor_pre_flagged := Suppress.MAC_FlagSuppressedSource(with_certegy_thor_pre_unsuppressed, mod_access, data_env := data_environment);
+
+with_certegy_thor_pre := PROJECT(with_certegy_thor_pre_flagged, TRANSFORM(dl_temp, 
+	self.dl_score := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dl_score);
+	self.verified_dl := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.verified_dl);
+	self.any_dl_found := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.any_dl_found);
+	self.dl_exists := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.dl_exists);
+    SELF := LEFT;
+)); 
 
 with_certegy_thor := group(with_certegy_thor_pre + dl_did_rolled(did=0 or dl_number='' or dl_state=''), seq);
 
