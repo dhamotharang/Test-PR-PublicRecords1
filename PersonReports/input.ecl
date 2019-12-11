@@ -6,8 +6,6 @@
 // Currently almost all of these are "fake": just synonyms of a superset input
 
 import AutoStandardI, Accident_Services,
-  Hunting_Fishing_Services,
-  InternetDomain_Services,
   suppress, FCRA;
 
 EXPORT input := MODULE
@@ -56,12 +54,6 @@ EXPORT input := MODULE
     export boolean Include_BestAddress := false;
 		export boolean IncludeAllCriminalRecords := false;
     export boolean IncludeSexualOffenses := false;
-  end;
-
-  export huntingfishing := INTERFACE (Hunting_Fishing_Services.Search_Records.params)
-  end;
-
-  export internetdomains := INTERFACE (InternetDomain_Services.SearchService_Records.params)
   end;
 
   export sexoffenses := INTERFACE (_report)

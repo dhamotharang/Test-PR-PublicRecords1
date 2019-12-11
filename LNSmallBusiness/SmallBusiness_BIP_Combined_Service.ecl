@@ -73,12 +73,12 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
       'RunTargusGatewayAnywayForTesting',
       'TestDataEnabled',
       'TestDataTableName',	
-	 'SBFEContributorIds',
-	 'BusinessCreditReportType',
-     'LexIdSourceOptout',
-     '_TransactionId',
-     '_BatchUID',
-     '_GCID'
+      'SBFEContributorIds',
+      'BusinessCreditReportType',
+      'LexIdSourceOptout',
+      '_TransactionId',
+      '_BatchUID',
+      '_GCID'
       ));
 		
     /* ************************************************************************
@@ -102,7 +102,7 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
 			 *  Fields needed for improved Scout Logging  *
 			 **********************************************/
 			string32 _LoginID               := ''	: STORED('_LoginID');
-			outofbandCompanyID		:= '' : STORED('_CompanyID');
+			outofbandCompanyID              := '' : STORED('_CompanyID');
 			string20 CompanyID              := if(users.CompanyId != '', users.CompanyId, outofbandCompanyID);
 			string20 FunctionName           := '' : STORED('_LogFunctionName');
 			string50 ESPMethod              := '' : STORED('_ESPMethodName');
@@ -181,13 +181,12 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
       Option.BusinessCreditReportType
     );
       // the default for  option.businessCreditReportType now is blank  - since esp not passing that in
-      // but later  when esp does pass that in we'll have either '0' , '1', '2', '3', or '4' (string1 values)
+      // but later when esp does pass that in we'll have either '0' , '1', '2', or '3' (string1 values)
       // which are defined as
       // '0' being default from ESP side -  we have to check for 0 here and keep it being true (default) as it was in the code previously.
       // '1' being SBFE report
       // '2' Ln Only credit report (no SBFE data allowed).
-      // '3' Ln Only B2B trade data (no SBFE data or credit report)
-      // '4' Ln Only combined report (no SBFE data, LN-Only B2B trade and credit report)
+      // '3' Ln Only combined report (no SBFE data, LN-Only B2B trade and credit report)
     #STORED('BusinessCreditReportType',busCreditReportTypeValue); //  CreditReportOption requirement 1.3.3													
     #STORED('LimitPaymentHistory24Months',Option.LimitPaymentHistory24Months); //  busines credit	report w SBFE data project additions	
     BOOLEAN LimitPaymentHistory24MonthsVal := FALSE : STORED('LimitPaymentHistory24Months');

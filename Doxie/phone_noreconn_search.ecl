@@ -549,19 +549,21 @@ EXPORT phone_noreconn_search := MACRO
 
 	// ** END *** of mods for Reverse Search Plus to filter on dt_last/first_seen
 
-  // the string 'FB'  in attr names stands for phones FeedBack (FB)
+	resultsWithDateSort := if(UseDateSort,sort(ds_results_ported_checkedFilteredDate,-dt_last_seen,penalt, lname, fname, record),ds_results_ported_checkedFilteredDate); 
 
-	doxie.MAC_Marshall_Results_NoCount(ds_results_ported_checkedFilteredDate,resultsPreFB,,disp_cnt);
+	doxie.MAC_Marshall_Results_NoCount(resultsWithDateSort,marshalled_results,,disp_cnt);												
 
-	PhonesFeedback_Services.Mac_Append_Feedback(resultsPreFB, did, Phone, resultsPhnFB, mod_access);
+  	// the string 'FB'  in attr names stands for phones FeedBack (FB)
+	PhonesFeedback_Services.Mac_Append_Feedback(marshalled_results, did, Phone, resultsPhnFB, mod_access);
 
-	resultsWithPhnFB := if(IncludePhonesFeedback,resultsPhnFB,resultsPreFB);
+	resultsWithPhnFB := if(IncludePhonesFeedback,resultsPhnFB,marshalled_results);
 
 	AddressFeedback_Services.MAC_Append_Feedback(resultsWithPhnFB, resultsAddrFB, address_feedback,,,,,,,,,,1);
 
 	resultsWithAddrFB := if(IncludeAddressFeedback, resultsAddrFB, resultsWithPhnFB);
 
-	results := if(UseDateSort,sort(resultsWithAddrFB,-dt_last_seen,penalt),resultsWithAddrFB);
+	//resort incase either phone feedback or address feedback changed the UseDateSort sort logic
+	results := if(UseDateSort AND (IncludePhonesFeedback OR IncludeAddressFeedback), sort(resultsWithAddrFB, -dt_last_seen,penalt, lname, fname, record), resultsWithAddrFB);
 
 	results_friendly := project(results, transform(recordof(results),
 											 self.COCDescription := [],
