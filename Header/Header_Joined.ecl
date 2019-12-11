@@ -142,7 +142,8 @@ header.macGetCleanAddr(merged_with_prim, RawAID, true, merged_with_prim_addr_rec
 
 merged_addr_recleaned := merged_no_prim + merged_with_prim_addr_recleaned;
 
-OldUtil := Header.File_Latest_Header_Raw(TRUE)(header.IsOldUtil(versionBuild,,,,7));
+OldUtil_ := Header.File_Latest_Header_Raw(TRUE)(header.IsOldUtil(versionBuild,,,,7));
+OldUtil  := project(OldUtil_, header.layout_header);
 patched:=Header.fn_clear_deletion_candidates(merged_addr_recleaned + OldUtil,versionBuild);//****** remove PII off deleted records
 
 patched1:=header.fn_fix_dates(patched,,versionBuild);
