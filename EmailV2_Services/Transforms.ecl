@@ -1,4 +1,4 @@
-﻿IMPORT $, AutoKeyI, Address, BatchShare, BatchServices, dx_Email, email_data, iesp, STD;
+IMPORT $, AutoKeyI, Address, BatchShare, BatchServices, dx_Email, email_data, iesp, STD;
 
 EXPORT Transforms := MODULE
 
@@ -262,7 +262,7 @@ EXPORT Transforms := MODULE
     SELF := [];
   END;
 
-  EXPORT iesp.emailsearchv2.t_EmailSearchV2Record  xfSearchOut($.Layouts.email_final_rec le, UNSIGNED dob_mask = 0)
+  EXPORT iesp.emailsearchv2.t_EmailSearchV2Record  xfSearchOut($.Layouts.email_final_rec le)
   := TRANSFORM
     SELF.Original.EmailAddress := le.Original.email;
     SELF.Original.FirstName := le.Original.first_name;
@@ -297,7 +297,7 @@ EXPORT Transforms := MODULE
     SELF.Cleaned.Address.StateCityZip := Address.Addr2FromComponents(le.Cleaned.Address.p_city_name, le.Cleaned.Address.st, le.Cleaned.Address.zip);
 
     SELF.BestInfo.SSN := le.BestInfo.SSN;
-    SELF.BestInfo.DOB := iesp.ECL2ESP.ApplyDateMask(iesp.ECL2ESP.toDate(le.BestInfo.dob), dob_mask);
+    SELF.BestInfo.DOB := iesp.ECL2ESP.toDate(le.BestInfo.dob);
     SELF.BestInfo.Name.first := le.BestInfo.fname;
     SELF.BestInfo.Name.Middle := le.BestInfo.mname;
     SELF.BestInfo.Name.last := le.BestInfo.lname;
@@ -373,7 +373,7 @@ EXPORT Transforms := MODULE
     SELF.SubjectLexid  := lexid;
   END;
 
-  EXPORT $.Layouts.batch_final_rec xfBatchOut($.Layouts.email_final_rec le, UNSIGNED dob_mask = 0)
+  EXPORT $.Layouts.batch_final_rec xfBatchOut($.Layouts.email_final_rec le)
     := TRANSFORM
       SELF.acctno          := le.acctno,
       SELF.orig_first_name := le.original.first_name;
@@ -408,7 +408,7 @@ EXPORT Transforms := MODULE
       SELF.best_zip := le.bestinfo.zip;
       SELF.best_zip4 := le.bestinfo.zip4;
       SELF.best_ssn := le.bestinfo.ssn;
-      SELF.best_dob := iesp.ECL2ESP.DateToInteger(iesp.ECL2ESP.ApplyDateMask(iesp.ECL2ESP.toDate(le.BestInfo.dob), dob_mask));
+      SELF.best_dob := le.BestInfo.dob;
       SELF.clean_email := le.cleaned.clean_email;
       SELF := le.cleaned.Name;
       SELF := le.cleaned.Address;
@@ -422,7 +422,7 @@ EXPORT Transforms := MODULE
       SELF := le;
   END;
 
-  EXPORT EmailV2_Services.Layouts.crs_email_rec xform_crs_email($.Layouts.email_final_rec le)
+  EXPORT $.Layouts.crs_email_rec xform_crs_email($.Layouts.email_final_rec le)
    := TRANSFORM
       SELF.OriginalCompanyName := le.orig_CompanyName;
       SELF.CompanyTitle := le.CompanyTitle;
@@ -449,6 +449,15 @@ EXPORT Transforms := MODULE
       SELF.Address.StreetAddress1 := Address.Addr1FromComponents(le.Cleaned.Address.prim_range, le.Cleaned.Address.Predir, le.Cleaned.Address.prim_name, le.Cleaned.Address.addr_suffix, le.Cleaned.Address.Postdir, le.Cleaned.Address.unit_desig, le.Cleaned.Address.sec_range);
       SELF.Address.StateCityZip := Address.Addr2FromComponents(le.Cleaned.Address.p_city_name, le.Cleaned.Address.st, le.Cleaned.Address.zip);
       SELF := [];
+  END;
+
+  EXPORT $.Layouts.email_final_rec ApplyDobMask ($.Layouts.email_final_rec le, UNSIGNED1 _dob_mask)
+   := TRANSFORM
+    SELF.BestInfo.DOB := IF(le.BestInfo.dob>0, iesp.ECL2ESP.DateToInteger(iesp.ECL2ESP.ApplyDateMask(iesp.ECL2ESP.toDate(le.BestInfo.dob), _dob_mask)), 0);
+    SELF.Cleaned.clean_dob := IF(le.Cleaned.clean_dob>0,iesp.ECL2ESP.DateToInteger(iesp.ECL2ESP.ApplyDateMask(iesp.ECL2ESP.toDate(le.Cleaned.clean_dob), _dob_mask)), 0);
+    _masked_dob := iesp.ECL2ESP.ApplyDateStringMask(iesp.ECL2ESP.toMaskableDatestring8(le.Original.dob), _dob_mask);
+    SELF.Original.dob := IF(le.Original.dob<>'', _masked_dob.Year + _masked_dob.month + _masked_dob.day,'');
+    SELF := le;
   END;
 
 END;

@@ -307,14 +307,11 @@ EXPORT Layouts := MODULE
     DATASET(Royalty.Layouts.RoyaltyForBatch) Royalties;
   END;
 
-  EXPORT crs_email_rec := RECORD(iesp.emailsearchv2.t_EmailSearchV2CleanData)
-	  STRING OriginalEmail {xpath('OriginalEmail')};
-	  STRING OriginalCompanyName {xpath('OriginalCompanyName')};
-	  STRING CompanyTitle {xpath('CompanyTitle')};
+  EXPORT crs_email_rec := RECORD(iesp.bpsreport.t_BpsReportEmailSearchRecord)
   END;
 
   EXPORT crs_email_combined_rec := RECORD
-    DATASET(crs_email_rec) EmailV2Records  {xpath('EmailSearchRecords/EmailSearchRecord'), MAXCOUNT(iesp.Constants.Email.MAX_RECS)};
+    DATASET(crs_email_rec) EmailV2Records  {xpath('Emails/Email'), MAXCOUNT(iesp.Constants.Email.MAX_RECS)};
     DATASET(Royalty.Layouts.Royalty) EmailV2Royalties;
   END;
 

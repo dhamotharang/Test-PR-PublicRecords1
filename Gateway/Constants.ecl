@@ -73,6 +73,7 @@ export Constants := module
 		export String40 IsEquifaxEmsReport := 'equifax_ems';			//Equifax Tri-Merge report.
 		export String40 IsTuFraudAlert := 'tu_fraud_alert';			//Transunion Fraud Alert
 		export String40 BriteVerifyEmail := 'BriteVerifyEmail';			//Brite Verify Email validation
+    export String40 NetWise := 'netwise';    //NetWise (Social Media Email Search) for use by the Virtual Identity Report V2 Accurint product
 	end;
 
 	export ConfigProperties := module

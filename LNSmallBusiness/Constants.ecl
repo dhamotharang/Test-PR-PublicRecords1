@@ -16,9 +16,8 @@ EXPORT Constants :=
 		
     EXPORT STRING1        SBFEDataBusinessCreditReport := '1'; // default
     EXPORT STRING1        LNOnlyBusinessCreditReport := '2';
-    EXPORT STRING1        LNOnlyB2BTradeReport := '3';
-    EXPORT STRING1        LNOnlyB2BCombinedCreditReport := '4';
-    EXPORT SET OF STRING1 LNOnlyCreditSet := ['2', '3', '4'];
+ 		EXPORT STRING1        LNOnlyB2BCombinedCreditReport := '3';
+  	EXPORT SET OF STRING1 LNOnlyCreditSet := [LNOnlyBusinessCreditReport, LNOnlyB2BCombinedCreditReport];
 
     EXPORT SMALL_BIZ_ATTR_V1_NAME   	:= 'SmallBusinessAttrV1';
     EXPORT SMALL_BIZ_ATTR_V2_NAME   	:= 'SmallBusinessAttrV2';

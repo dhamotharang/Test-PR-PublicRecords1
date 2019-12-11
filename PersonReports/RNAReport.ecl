@@ -1,4 +1,4 @@
-IMPORT $, doxie, iesp, AutoStandardI,address,AddressReport_Services;
+IMPORT $, doxie, iesp, AutoStandardI, address, AddressReport_Services;
 
 out_rec := iesp.rnareport.t_RNAReport;
 
@@ -25,8 +25,8 @@ EXPORT out_rec RNAReport (
 
   // translate required address components
   AI := AutoStandardI.InterfaceTranslator;
-  clean_addr	:=ai.clean_address.val (project (mod_rna, AI.clean_address.params));
-  split_addr:=Address.CleanFields(clean_addr);
+  clean_addr := ai.clean_address.val (project (mod_rna, AI.clean_address.params));
+  split_addr := Address.CleanFields(clean_addr);
 
 
 
@@ -34,46 +34,40 @@ EXPORT out_rec RNAReport (
   // Neighbor Records
   //************************************
 
-	doxie.layout_nbr_targets into_srch() := transform
-			self.prim_range 	:= split_addr.prim_range;
-			self.predir     	:= split_addr.predir;
-			self.prim_name	 	:= split_addr.prim_name;
-			self.suffix 	 	:= split_addr.addr_suffix;
-			self.postdir 	 	:= split_addr.postdir;
-			self.sec_range  	:= split_addr.sec_range;
-			self.zip		 	:= split_addr.zip;
-			self				:=[];
-		end;
+  doxie.layout_nbr_targets into_srch() := transform
+      self.prim_range := split_addr.prim_range;
+      self.predir     := split_addr.predir;
+      self.prim_name  := split_addr.prim_name;
+      self.suffix     := split_addr.addr_suffix;
+      self.postdir    := split_addr.postdir;
+      self.sec_range  := split_addr.sec_range;
+      self.zip        := split_addr.zip;
+      self            :=[];
+    end;
 
-		nbr_input:=dataset([into_srch()]);
-		boolean glb_ok_val  := mod_access.isValidGLB();
-		boolean dppa_ok_val := mod_access.isValidDPPA();
+    nbr_input:=dataset([into_srch()]);
 
-		Neighbors_recs_all:=doxie.nbr_records(
-										nbr_input,
-										'C',
-										1,
-										iesp.constants.BR.RNANbrProximityRadius,
-										iesp.constants.BR.RNANbrProximityRadius,
-										iesp.constants.BR.RNANbrProximityRadius,
-										true,
-										true,
-										iesp.constants.BR.RNANbrProximityRadius,
+    Neighbors_recs_all:=doxie.nbr_records(
+                    nbr_input,
+                    'C',
+                    1,
+                    iesp.constants.BR.RNANbrProximityRadius,
+                    iesp.constants.BR.RNANbrProximityRadius,
+                    iesp.constants.BR.RNANbrProximityRadius,
+                    true,
+                    true,
+                    iesp.constants.BR.RNANbrProximityRadius,
                     ,
                     mod_access);
 
-	p_neighbors := doxie.compliance.MAC_FilterOutMinors (Neighbors_recs_all, , dob, mod_access.show_minors);
-	nbr_mod := 	module(project(AutoStandardI.GlobalModule(), AddressReport_Services.input._addressreport, opt))
-								export glb_ok := glb_ok_val;
-								export dppa_ok := dppa_ok_val;
-							end;
-	Neighbors_recs:=AddressReport_Services.transform_neighbors(p_neighbors,true,mod_rna.include_criminalindicators, nbr_mod, mod_access);
-	iesp.bpsreport.t_NeighborSlim SetNeighbors (Neighbors_recs l) := transform
+  p_neighbors := doxie.compliance.MAC_FilterOutMinors (Neighbors_recs_all, , dob, mod_access.show_minors);
+  Neighbors_recs:=AddressReport_Services.transform_neighbors(p_neighbors, mod_access, true, mod_rna.include_criminalindicators, location_report := FALSE);
+  iesp.bpsreport.t_NeighborSlim SetNeighbors (Neighbors_recs l) := transform
 
-	  Self.NeighborAddresses := choosen(l.NeighborAddresses,mod_rna.neighbors_per_address);
-	  self.SubjectAddress:=[]; // intentionally blanked.
-	END;
-	nbrs_selected:=project(Neighbors_recs,SetNeighbors(LEFT));
+    Self.NeighborAddresses := choosen(l.NeighborAddresses,mod_rna.neighbors_per_address);
+    self.SubjectAddress:=[]; // intentionally blanked.
+  END;
+  nbrs_selected:=project(Neighbors_recs,SetNeighbors(LEFT));
 
   // Combine all them together
   out_rec Format () := TRANSFORM

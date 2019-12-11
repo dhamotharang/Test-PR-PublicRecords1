@@ -668,8 +668,12 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	// ****get attributes
 	temp_shell := clam;  
   
+  FirstData := models.getFirstData(temp_shell, genericModelName );
+  
   //Send it through the check to see if we need to call FirstData for Khols
-  shell2Use := models.getFirstData(temp_shell, genericModelName );
+  shell2Use := FirstData.FD_lookup;
+  
+  Khols_BillingIndicator := FirstData.BillingStateIndicator;
   
 	attributes := Models.getCBDAttributes(shell2Use, account_value, indata, attrversion);	
 
@@ -712,8 +716,9 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	final1 := if( ipid_only, project(ret,blankOS(left)), retAttr );
 
 	Risk_Indicators.Layout_BocaShell_BtSt.layout_OSOut_wAcct addEcho(final1 le) := TRANSFORM
-		self.Result.InputEcho.BillTo := searchBT,
+		self.Result.InputEcho.BillTo := searchBT;
 		self.Result.InputEcho.ShipTo := searchST;
+    self.Result.BillingStateIndicator := Khols_BillingIndicator;
 		self.AccountNumber := le.AccountNumber;
 		self.Result := le.Result;
 		self._Header.QueryId := QueryId;
