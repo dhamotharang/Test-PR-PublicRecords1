@@ -180,11 +180,7 @@ EXPORT Build_Base_Main(STRING 																 pversion,
 	combinedMainAID := Append_IDs.fAll(combinedMain);
 
  	combinedMain_dist := DISTRIBUTE(combinedMainAID, HASH(biog_number));
-  combinedMain_sort := SORT(combinedMain_dist,
-   														biog_number, (UNSIGNED)address_id, (UNSIGNED)address_occurrence_number,
-   														   (UNSIGNED)contact_occurrence_number, (UNSIGNED)moc_cert_id, record_type,
-   															 -dt_vendor_last_reported, RECORD,
-   														LOCAL);
+  combinedMain_sort := DEDUP(SORT(combinedMain_dist, RECORD, LOCAL), RECORD, LOCAL);
    	
    	Layouts.Base.Main rollupMain(Layouts.Base.Main L, Layouts.Base.Main R) := TRANSFORM
       SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
