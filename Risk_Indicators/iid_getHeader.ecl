@@ -217,7 +217,15 @@ j_pre_roxie_unsuppressed := join (g_inrec, header_key,
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(ut.limits.HEADER_PER_DID));
-		  	 j_pre_roxie := Suppress.Suppress_ReturnOldLayout(j_pre_roxie_unsuppressed, mod_access,Layout_Header_Data, iType);
+
+j_pre_roxie_flagged := Suppress.MAC_FlagSuppressedSource(j_pre_roxie_unsuppressed, mod_access, data_env := iType);
+
+j_pre_roxie := PROJECT(j_pre_roxie_flagged, TRANSFORM(Layout_Header_Data, 
+	self.h := IF(~left.is_suppressed, left.h); 
+	self.valid_dob :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.valid_dob);
+	self.hhid_summary.hhid := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hhid_summary.hhid);
+    SELF := LEFT;
+)); 
 
 j_pre_thor_unsuppressed := join (distribute(g_inrec(did<>0), hash64(did)), 
 										distribute(pull(header_key(s_did<>0)), hash64(s_did)), 
@@ -252,7 +260,15 @@ j_pre_thor_unsuppressed := join (distribute(g_inrec(did<>0), hash64(did)),
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(left.did=right.s_did, ut.limits.HEADER_PER_DID), LOCAL);
-		  	 j_pre_thor := Suppress.Suppress_ReturnOldLayout(j_pre_thor_unsuppressed, mod_access,Layout_Header_Data, iType);
+
+j_pre_thor_flagged := Suppress.MAC_FlagSuppressedSource(j_pre_thor_unsuppressed, mod_access, data_env := iType);
+
+j_pre_thor := PROJECT(j_pre_thor_flagged, TRANSFORM(Layout_Header_Data, 
+	self.h := IF(~left.is_suppressed, left.h); 
+	self.valid_dob :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.valid_dob);
+	self.hhid_summary.hhid := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hhid_summary.hhid);
+    SELF := LEFT;
+)); 
 
 j_pre_thor_nodid := project(g_inrec(did=0), transform(Layout_Header_Data, self := left, self := []));
 

@@ -1,13 +1,11 @@
-/*2015-05-09T00:01:14Z (Xuran Yan)
-Checked in for Bug: 180442 review
-*/
-import Business_Risk, Business_Header_SS, ut, Business_Header, did_add, BankruptcyV2, BankruptcyV3,liensv2,
-			RiskWise, YellowPages, Risk_indicators, corp2, LN_PropertyV2, ADVO, BusReg, doxie, EASI, Address_Attributes, header, mdr, drivers;
+﻿import Business_Risk, Business_Header_SS, ut, Business_Header, BankruptcyV3,liensv2,
+			RiskWise, YellowPages, Risk_indicators, corp2, LN_PropertyV2, ADVO, BusReg, doxie, EASI, Address_Attributes, header, mdr, drivers, Suppress, AML, STD;
 
-EXPORT AMLAssocBusnAttrib(DATASET(Layouts.AMLBusnAssocLayout) AssocBusn,
+EXPORT AMLAssocBusnAttrib(DATASET(AML.Layouts.AMLBusnAssocLayout) AssocBusn,
 																															string50 DataRestriction=Risk_indicators.iid_constants.default_DataRestriction,
 																															unsigned1 dppa,
-																															unsigned1 glba, integer bsVersion) := FUNCTION
+																															unsigned1 glba, integer bsVersion,
+																															doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 isFCRA := false;
 min_score := 80;
@@ -26,7 +24,7 @@ glb_ok := glba > 0 and glba < 8 or glba=11 or glba=12;
 dppa_ok := dppa > 0 and dppa < 8;
  
 // highrisk address
-Layouts.AMLBusnAssocLayout hrtrans(AssocBusn l, risk_indicators.key_HRI_Address_To_SIC r) := transform
+AML.Layouts.AMLBusnAssocLayout hrtrans(AssocBusn l, risk_indicators.key_HRI_Address_To_SIC r) := transform
   baddrtype		 := if (L.prim_name = '', '', risk_indicators.iid_constants.dwelltype(L.addr_type));
 	self.hriskaddrflag := MAP(baddrtype = 'M' => '3',
 						 l.prim_name='' OR l.z5='' => '5',
@@ -86,7 +84,7 @@ AddBusnHdrFrstDt :=   join(AddrHRrecAssoc, BusnHdrFirstSort,
 	                       left.seq=right.seq and
 												 left.bdid=right.bdid and 
 												 left.AssocBdid = right.AssocBdid,
-												 transform(Layouts.AMLBusnAssocLayout, 
+												 transform(AML.Layouts.AMLBusnAssocLayout, 
 															self.BusnHdrDtFirstSeen := right.dt_first_seen,
 															self := left),
 											left outer);
@@ -97,7 +95,7 @@ BusnHdrlastSort := dedup(sort(BusnHeadRec(dt_last_seen!=0), seq,bdid, AssocBdid,
 	                       left.seq=right.seq and
 												 left.bdid=right.bdid and
 												 left.assocbdid = right.assocbdid,
-												 transform(Layouts.AMLBusnAssocLayout, 
+												 transform(AML.Layouts.AMLBusnAssocLayout, 
 															self.BusnHdrDtLastSeen := right.dt_Last_seen,
 															self := left),
 											left outer);
@@ -111,7 +109,7 @@ AddHdrSrcCnt := join(AddBusnHdrDt,HdrSrcTable,
                      left.seq=right.seq and
 										 left.bdid=right.bdid and
 										 left.AssocBdid = right.AssocBdid,
-										 transform(Layouts.AMLBusnAssocLayout, 
+										 transform(AML.Layouts.AMLBusnAssocLayout, 
 															self.srcCount := right.SrcCount,
 															self := left),
 											left outer);
@@ -125,7 +123,7 @@ AddBusnHdrAddr := join(AddHdrSrcCnt, HdrAddrTable,
                        left.seq=right.seq and
 											 left.bdid=right.bdid and
 											 left.AssocBdid = right.AssocBdid,
-											 transform(Layouts.AMLBusnAssocLayout, 
+											 transform(AML.Layouts.AMLBusnAssocLayout, 
 															self.AddrCount := right.AddrCount,
 															self := left),
 											left outer);
@@ -147,7 +145,7 @@ LenInputAddr := join(AssocBusn,BusnHeadRec,
 LenInputAddrSort := dedup(sort(LenInputAddr(prim_name!='' and dt_first_seen <>0), seq,bdid, AssocBdid,prim_range,prim_name,addr_suffix,postdir, state, zip, dt_first_seen)
 														   ,seq,bdid, AssocBdid);
 									
-Layouts.AMLBusnAssocLayout   addAddrLen(AddBusnHdrAddr le, LenInputAddrSort ri)  := TRANSFORM
+AML.Layouts.AMLBusnAssocLayout   addAddrLen(AddBusnHdrAddr le, LenInputAddrSort ri)  := TRANSFORM
 	self.LengthInputAddr := ut.DaysApart((string)le.historydate,(string)ri.dt_first_seen);
 	self := le;
 		
@@ -200,9 +198,9 @@ end;
 
 corprec2 get_corp_recs(corpkeys L, corp2.key_corp_corpkey R) := transform
   self.CorpStatus := if (l.corp_key ='', 'U', if (business_header.is_ActiveCorp(r.record_type, R.corp_status_cd, R.corp_status_desc), 'A',
-							if (stringlib.stringfind(R.corp_status_desc, 'INACTIVE', 1) != 0, 'I',
-							if (stringlib.stringfind(R.corp_status_desc, 'DISSOLVED', 1) != 0, 'D',
-							if (stringlib.stringfind(R.corp_status_desc, 'REINSTATE', 1) != 0, 'R' 
+							if (STD.Str.find(R.corp_status_desc, 'INACTIVE', 1) != 0, 'I',
+							if (STD.Str.find(R.corp_status_desc, 'DISSOLVED', 1) != 0, 'D',
+							if (STD.Str.find(R.corp_status_desc, 'REINSTATE', 1) != 0, 'R' 
 							,'U')))));
   self.bdid := l.bdid;
 	self.assocbdid :=  l.assocbdid;
@@ -227,7 +225,7 @@ AddBusnStatus := join(AddBusnAddrLen, corp_sortDD,
                       left.seq=right.seq and
 											left.bdid=right.bdid and
 											left.Assocbdid = right.Assocbdid,
-											transform(Layouts.AMLBusnAssocLayout, 
+											transform(AML.Layouts.AMLBusnAssocLayout, 
 											          self.corpStatus := if(right.CorpStatus = '', 'U', right.CorpStatus),
 																self := left),
 											left outer);
@@ -262,7 +260,7 @@ AddBusnStatusEver := join(AddBusnStatus, FinalStatus,
                           left.seq=right.seq and
 													left.bdid=right.bdid and
 													left.Assocbdid=right.Assocbdid,
-													transform(Layouts.AMLBusnAssocLayout,
+													transform(AML.Layouts.AMLBusnAssocLayout,
 													          self.EverReinstat := right.EverReinstat,
 																		self.EverDissolution := right.EverDissolution,
 																		self  := left),
@@ -290,7 +288,7 @@ AddBusnAddrChng := join(AddBusnStatusEver, AddrChange,
 												left.seq=right.seq and
 												left.bdid=right.bdid and
 												left.Assocbdid=right.Assocbdid,
-												transform(Layouts.AMLBusnAssocLayout,
+												transform(AML.Layouts.AMLBusnAssocLayout,
 													      self.addressChangeSOS := right.addressChangeSOS,
 														  	self  := left),
 													left outer);
@@ -317,7 +315,7 @@ AddBusnContChng := join(AddBusnAddrChng, ContactChange,
 												left.seq=right.seq and
 												left.bdid=right.bdid and
 												left.Assocbdid=right.Assocbdid,
-												transform(Layouts.AMLBusnAssocLayout,
+												transform(AML.Layouts.AMLBusnAssocLayout,
 													      self.contactChangeSOS := right.contactChangeSOS,
 														  	self  := left),
 													left outer);
@@ -330,7 +328,7 @@ AddBusnCorpSt := join(AddBusnContChng, CorpStCount,
 												left.seq=right.seq and
 												left.bdid=right.bdid and
 												left.Assocbdid=right.Assocbdid,
-												transform(Layouts.AMLBusnAssocLayout,
+												transform(AML.Layouts.AMLBusnAssocLayout,
 													      self.CorpStateCount := right.CorpStateCount,
 														  	self  := left),
 													left outer);
@@ -361,8 +359,8 @@ proprec := Record
 	unsigned3 CountOwnProp;
 	string PurchaseDate;
 	unsigned6 TaxAssdValue;
-	recordof(LN_PropertyV2.key_search_fid()) - ln_fares_id ;
-	recordof(LN_PropertyV2.key_assessor_fid()) - ln_fares_id;
+	recordof(LN_PropertyV2.key_search_fid()) - ln_fares_id - source_code_2 - source_code_1 - cname ;
+	recordof(LN_PropertyV2.key_assessor_fid()) - ln_fares_id - process_date - vendor_source_flag - __internal_fpos__;
 	
 END;
 
@@ -483,7 +481,7 @@ BusnPropTaxRolled := rollup(PropTaxValueDD,
 AddBusnPropValue := join(AddBusnCorpSt, BusnPropTaxRolled,
                      left.seq=right.seq and
 										 left.AssocBdid=right.AssocBdid,
-										 transform(Layouts.AMLBusnAssocLayout,
+										 transform(AML.Layouts.AMLBusnAssocLayout,
 													   self.PropTaxValue := right.TaxAssdValue,
 														 self.CountSoldProp := right.CountSoldProp;
 														 self.CountOwnProp := right.CountOwnProp;
@@ -495,7 +493,7 @@ FirstProp := dedup(sort(PropTaxValueDD, seq ,AssocBdid,if(PurchaseDate='','99999
 AddBusnFirstProp := join(AddBusnPropValue, FirstProp,
                      left.seq=right.seq and
 										 left.AssocBdid=right.AssocBdid,
-										 transform(Layouts.AMLBusnAssocLayout,
+										 transform(AML.Layouts.AMLBusnAssocLayout,
 													   self.FirstPurchaseDate := (unsigned4)right.PurchaseDate,
 														 self.FirstPropTaxValue := if((unsigned)right.assessed_total_value = 0, (unsigned)right.market_total_value, (unsigned)right.assessed_total_value),
 														 self  := left),
@@ -503,14 +501,14 @@ AddBusnFirstProp := join(AddBusnPropValue, FirstProp,
 
 AddPropSoldCount  := join(AddBusnFirstProp, AssocCountSoldProp,
                       left.seq=right.seq and left.AssocBdid=right.AssocBdid,
-											transform(Layouts.AMLBusnAssocLayout, 
+											transform(AML.Layouts.AMLBusnAssocLayout, 
 																self.CountSoldProp := right.SoldPropCnt,
 																self := left),
 											left outer);
 											
 AddPropOwnCount  := join(AddPropSoldCount, AssocCountOwnProp,
                       left.seq=right.seq and left.AssocBdid=right.AssocBdid,
-											transform(Layouts.AMLBusnAssocLayout, 
+											transform(AML.Layouts.AMLBusnAssocLayout, 
 																self.CountOwnProp := right.OwnPropCnt,
 																self := left),
 											left outer);
@@ -545,7 +543,7 @@ AddBusnEasi := join(AddPropOwnCount, easi_census,
                left.seq=right.seq and
 							 left.bdid=right.bdid and
 							 left.assocBdid = right.assocBdid,
-							 transform(Layouts.AMLBusnAssocLayout,
+							 transform(AML.Layouts.AMLBusnAssocLayout,
 											   self.EasiTotCrime := right.easi.totCrime,
 												 self  := left),
 							 left outer);    		
@@ -559,7 +557,7 @@ with_sics := JOIN(AssocBusn,Business_header.key_sic_code,
 								right.sic_code <> '' and
 								(right.sic_code[1..4] in AML.AMLConstants.setHRBusCatgSicCds or 
 								right.sic_code in AML.AMLConstants.setHRBusFullSicCds),
-								transform(Layouts.AMLBusnAssocLayout, 
+								transform(AML.Layouts.AMLBusnAssocLayout, 
 													self.bdid := left.bdid,
 													self.Assocbdid := left.Assocbdid,
 													self.seq := left.seq,
@@ -575,7 +573,7 @@ AddBusnSIC := join(AddBusnEasi, with_sics,
                left.seq=right.seq and
 							 left.bdid=right.bdid and
 							 left.AssocBdid=right.AssocBdid,
-							 transform(Layouts.AMLBusnAssocLayout,
+							 transform(AML.Layouts.AMLBusnAssocLayout,
 											   self.HRBusiness := right.HRBusiness,
 												 self  := left),
 							 atmost(riskwise.max_atmost),left outer);  
@@ -586,7 +584,7 @@ AssocwithNaics := join(AddBusnSIC,  YellowPages.Key_YellowPages_BDID,
 												keyed(left.Assocbdid = right.bdid) and
 												right.naics_code <> '' and
 												right.naics_code in AML.AMLConstants.setHRNAICSCodes,
-												transform(Layouts.AMLBusnAssocLayout, 	
+												transform(AML.Layouts.AMLBusnAssocLayout, 	
 																		self.HRBusiness := if(right.naics_code in AML.AMLConstants.setHRNAICSCodes and 
 																													~left.HRBusiness, 1,(integer)left.HRBusiness);
 																		self := left), 
@@ -671,7 +669,7 @@ BusnBKsRolled := rollup(sort(BusnCountBKs,seq,bdid),
 											roll_and_countBK(LEFT,RIGHT));
 		
 
-Layouts.AMLBusnAssocLayout fill_in_bkrupt(AssocwithNaics L, BusnBKsRolled R) := transform
+AML.Layouts.AMLBusnAssocLayout fill_in_bkrupt(AssocwithNaics L, BusnBKsRolled R) := transform
 	self.BKcount		    := R.BKCount;
   self.BKcount12      := r.BK12Count;
 	self := L;
@@ -764,7 +762,7 @@ RepLegalEventsRolled  :=  rollup(sort(RepLegalEvents,seq, assocBdid),left.assocB
 AddRepContDerogs := join( wBKs ,RepLegalEventsRolled,
 											left.seq=right.seq and
 											left.assocBdid=right.assocBdid,
-											transform(Layouts.AMLBusnAssocLayout,
+											transform(AML.Layouts.AMLBusnAssocLayout,
 											   self.RepFelonyCnt := right.RepFelonyCnt,
 											   self.RepMinorEventCnt := right.RepMinorEventCnt,
 												 self.RepMinorCnt12 := right.RepMinorCnt12,
@@ -816,7 +814,9 @@ rmsids := join(AddRepContDerogs, 	liensv2.key_liens_bdid,
 			  get_lien_rmsid(LEFT,RIGHT), keep(100));
 
 
-lienrec get_liens(rmsids L, liensv2.key_liens_party_ID R) := transform
+{lienrec, unsigned4 global_sid, unsigned6 did} get_liens(rmsids L, liensv2.key_liens_party_ID R) := transform
+	self.global_sid := R.global_sid;
+	self.did := (unsigned6)R.did;
 	self.seq := L.seq;
 	self.historydate := l.historydate;
 	self.assocBdid := L.assocBdid;
@@ -838,7 +838,7 @@ lienrec get_liens(rmsids L, liensv2.key_liens_party_ID R) := transform
 	self := [];
 end;
 
-liensrecs1 := join(rmsids, liensv2.key_liens_party_ID,
+liensrecs1_unsuppressed := join(rmsids, liensv2.key_liens_party_ID,
 				keyed(left.rmsid = right.rmsid) and
 				keyed(left.tmsid = right.tmsid) and
 				left.assocBdid = (unsigned)right.bdid and  // for cases with multiple debtors, make sure to only include the party records that match on bdid
@@ -846,7 +846,7 @@ liensrecs1 := join(rmsids, liensv2.key_liens_party_ID,
 				(unsigned4)right.date_first_seen < left.historydate,
 			   get_liens(LEFT,RIGHT), 
 			   atmost( (keyed(left.rmsid=right.rmsid) and keyed(left.tmsid=right.tmsid)), riskwise.max_atmost), keep(100));
-
+liensrecs1 := Suppress.Suppress_ReturnOldLayout(liensrecs1_unsuppressed, mod_access, lienrec);
 lienrec get_liens_main(liensrecs1 L, liensv2.key_liens_main_ID R) := transform
 	self.lien_total := (integer)R.amount;
 	self.filingtype_desc := r.filing_type_desc;
@@ -881,7 +881,7 @@ lrecs_srt_ddp := rollup(sort(liensrecs,seq,assocbdid, -(if (filing_date = '', '0
 												roll_and_count(LEFT,RIGHT));
 
 
-Layouts.AMLBusnAssocLayout  AddBusnLiensCnts(AddRepContDerogs le,lrecs_srt_ddp ri)  := Transform
+AML.Layouts.AMLBusnAssocLayout  AddBusnLiensCnts(AddRepContDerogs le,lrecs_srt_ddp ri)  := Transform
 		  self.UnreleasedLienCount := ri.cnt_unrel;
 			self.ReleasedLienCount	:= ri.cnt_rel;
 			self.UnreleasedLienCount12 := ri.cnt_unrel12;
@@ -923,8 +923,9 @@ Rep_slim := record
 	unsigned3   RepIncarceratedCnt;
 end;
 
-Rep_slim getRepHdr(DIDContDD le, doxie.Key_Header ri) :=
+{Rep_slim, unsigned4 global_sid} getRepHdr(DIDContDD le, doxie.Key_Header ri) :=
 TRANSFORM
+	self.global_sid := ri.global_sid;
 	self.assocBdid  := le.assocBdid;
 	self.did   := le.did;
 	self.fname  := ri.fname;
@@ -948,7 +949,7 @@ TRANSFORM
 END;
 
 
-DIDContHdr :=   join(DIDContDD, doxie.Key_Header, 
+DIDContHdr_unsuppressed :=   join(DIDContDD, doxie.Key_Header, 
 														keyed(LEFT.did=RIGHT.s_did) AND
 														right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
 														RIGHT.dt_first_seen < (unsigned3)((string)left.historydate)[1..6] AND
@@ -958,6 +959,26 @@ DIDContHdr :=   join(DIDContDD, doxie.Key_Header,
 														~risk_indicators.iid_constants.filtered_source(right.src, right.st), 
 														getRepHdr(LEFT,RIGHT), LEFT OUTER,atmost(RiskWise.max_atmost), keep(100));
 														
+DIDContHdr_flagged := Suppress.MAC_FlagSuppressedSource(DIDContHdr_unsuppressed, mod_access);
+
+DIDContHdr := PROJECT(DIDContHdr_flagged, TRANSFORM(Rep_slim, 
+	self.fname  := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.fname);
+	self.lname  := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.lname);
+	SELF.prim_range := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prim_range);
+	SELF.predir := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.predir);
+	SELF.prim_name := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prim_name);
+	SELF.addr_suffix := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.addr_suffix);
+	SELF.postdir := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.postdir);
+	SELF.unit_desig := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.unit_desig);
+	SELF.sec_range := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.sec_range);
+	SELF.city_name := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.city_name);
+	SELF.zip5 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.zip5);
+	SELF.st := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.st);
+	SELF.dt_first_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_first_seen);
+	SELF.dt_last_seen :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_last_seen);
+    SELF := LEFT;
+)); 
+										
 DIDContHdrDS  :=   dedup(sort(DIDContHdr(dt_last_seen<>0 and prim_name<>''), seq, did, -dt_last_seen), 
 														seq, did);
 											
@@ -1016,7 +1037,7 @@ BusnIncarRolled := rollup(RepIncarceration,
 											left.seq=right.seq,
 											rollIncarcerations(LEFT,RIGHT));									
 																		
-Layouts.AMLBusnAssocLayout IncarcerationAdd(wBKs L, BusnIncarRolled R) := transform
+AML.Layouts.AMLBusnAssocLayout IncarcerationAdd(wBKs L, BusnIncarRolled R) := transform
 
 	self.RepIncarceratedCnt		:= R.RepIncarceratedCnt;
 	self := L;
@@ -1062,7 +1083,7 @@ withAdvo1DDVac :=  dedup(sort(withAdvo, seq, assocBdid, zip,prim_range, prim_nam
 AddBusnADVO := 	join( AddIncarceration, withAdvo1DDVac,
                 			left.seq=right.seq and
 											left.assocBdid=right.assocBdid,
-											transform(Layouts.AMLBusnAssocLayout, 
+											transform(AML.Layouts.AMLBusnAssocLayout, 
 																self.AddressVacancyInd := if(right.Address_Vacancy_Indicator = '', 'U', right.Address_Vacancy_Indicator),
 																self := left),
 											left outer);
@@ -1073,7 +1094,7 @@ withAdvo1DDFir :=  dedup(sort(withAdvo, seq, assocBdid, zip,prim_range,	prim_nam
 AddBusnFrstADVO := 	join( AddBusnADVO ,withAdvo1DDFir	,
                 			left.seq=right.seq and
 											left.assocBdid=right.assocBdid,
-											transform(Layouts.AMLBusnAssocLayout, 
+											transform(AML.Layouts.AMLBusnAssocLayout, 
 																self.AdvoFirstSeenDt  := (integer)right.date_first_seen,
 																self := left),
 											left outer);
@@ -1095,7 +1116,7 @@ busRegRecs := join(AddBusnFrstADVO, BusReg,
 busRegRecsSD := dedup(Sort(busRegRecs, seq, bdid, -dt_last_seen	), seq, bdid);			
 							 
 							 
-Layouts.AMLBusnAssocLayout GetbusnEmpCnt(	AddBusnFrstADVO le, busRegRecsSD ri ) := transform
+AML.Layouts.AMLBusnAssocLayout GetbusnEmpCnt(	AddBusnFrstADVO le, busRegRecsSD ri ) := transform
 							           self.EmpCount := (unsigned3)ri.emp_size;
 												 self :=   le;
 END;
@@ -1109,7 +1130,7 @@ AddbusnEmpCnt := join(AddBusnFrstADVO, busRegRecsSD,
 								
 RickBdidKey := Address_Attributes.key_business_risk_bdid	;
 
-Layouts.AMLBusnAssocLayout GetBusnShelf(	AddBusnFrstADVO le, RickBdidKey ri ) := transform
+AML.Layouts.AMLBusnAssocLayout GetBusnShelf(	AddBusnFrstADVO le, RickBdidKey ri ) := transform
 				self.ShellShelfBusn := (unsigned3)ri.potential_shelf_address;  
 				self :=   le;
 END;
@@ -1136,14 +1157,14 @@ crimeGeolink := Address_Attributes.key_crime_geolink;
 AddGeoCrime	:=  join(AddBusnShelf, GeoCrime, 
 												left.seq=right.seq 
 												and left.assocBdid=right.assocBdid,
-                        transform(Layouts.AMLBusnAssocLayout, 
+                        transform(AML.Layouts.AMLBusnAssocLayout, 
                               		 self.HighFelonNeighborhood := 100 * right.felon_ratio > 8,
 																	 self := left),
 												atmost(Riskwise.max_atmost), left outer);							
 
 addAssocHRBusiness :=  join(AddGeoCrime, Address_Attributes.key_business_risk_geolink,
                         keyed(right.geolink=left.st+left.county+left.geo_blk),
-												transform(Layouts.AMLBusnAssocLayout, 
+												transform(AML.Layouts.AMLBusnAssocLayout, 
                               		 Self.HRBusPct :=if(((right.cnt_shell+right.cnt_shelf) / right.cnt_businesses)>= .1, TRUE, FALSE),
 																	 self := left),
 												atmost(Riskwise.max_atmost),

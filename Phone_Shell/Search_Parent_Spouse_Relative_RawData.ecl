@@ -1,4 +1,4 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function searches for the raw data used within the following      *
  * functions.  We gather all of the data once so that we don't search the *
  * same key multiple times for performance reasons.  Searched by DID.     *
@@ -9,9 +9,10 @@
  * - Phone_Shell.Search_Spouse																						*
  ************************************************************************ */
 
-IMPORT Doxie, Doxie_Raw, DIDVille, Header_Quick, Header, Gong, Utilfile, MDR, Phone_Shell, Progressive_Phone, Risk_Indicators, RiskWise, UT, Person_Models, NID, AutoStandardI,STD;
+IMPORT Doxie, Doxie_Raw, DIDVille, Header_Quick, Header, Gong, Utilfile, MDR, Phone_Shell, Progressive_Phone, Risk_Indicators, RiskWise, UT, Person_Models, NID, AutoStandardI,STD, Suppress;
 
-EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_Spouse_Relative_RawData (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 GLBPurpose, UNSIGNED1 DPPAPurpose, STRING50 DataRestrictionMask) := FUNCTION
+EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_Spouse_Relative_RawData (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 GLBPurpose, UNSIGNED1 DPPAPurpose, STRING50 DataRestrictionMask,
+				doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	 /* ***************************************************************
 		* 							Get Relatives and Their Titles									*
 	  *************************************************************** */
@@ -56,9 +57,6 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
 	  *************************************************************** */
   // why input GLB, DPPA are not used?
 		
-  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
-    EXPORT string DataRestrictionMask := ^.DataRestrictionMask;
-  END;
   glb_ok := mod_access.isValidGLB();
   dppa_ok := mod_access.isValidDPPA();
 		
@@ -70,7 +68,8 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
 	 /* ***************************************************************
 		* 							Get Gong Data by Address and DID								*
 	  *************************************************************** */
-	Phone_Shell.Layouts.layoutWithCohabitDid byAddressLastName(sixMonths le, Gong.Key_History_Address ri) := TRANSFORM
+	{Phone_Shell.Layouts.layoutWithCohabitDid, unsigned4 global_sid} byAddressLastName(sixMonths le, Gong.Key_History_Address ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.AcctNo := IF(ri.phone10 = '', SKIP, (STRING20)le.seq);
 		SELF.subj_first := le.fname;
 		SELF.subj_middle := le.mname;
@@ -98,7 +97,7 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
 		SELF := [];
 	END;
 	
-	byAddrLName := JOIN(sixMonths, Gong.Key_History_Address,
+	byAddrLName_unsuppressed := JOIN(sixMonths, Gong.Key_History_Address,
 																				KEYED(LEFT.prim_name = RIGHT.prim_name AND LEFT.Zip = RIGHT.z5 AND
 																				LEFT.Prim_Range = RIGHT.Prim_Range AND LEFT.st = RIGHT.st) AND
 																				RIGHT.current_flag = TRUE AND RIGHT.phone10 <> '' AND
@@ -109,8 +108,11 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
 																				(LEFT.sec_range = '' OR LEFT.sec_range = RIGHT.sec_range OR LEFT.unit_desig = 'LOT' OR
 																				NID.mod_PFirstTools.PFLeqPFR(LEFT.fname, RIGHT.name_first) OR LEFT.fname[1] = RIGHT.name_first),
 																				byAddressLastName(LEFT, RIGHT), LIMIT(UT.Limits.PHONE_PER_PERSON, SKIP));
-																				
-	Phone_Shell.Layouts.layoutWithCohabitDid byDID(DIDVille.Layout_Did_OutBatch le, Gong.key_did ri) := TRANSFORM
+	
+	byAddrLName := Suppress.Suppress_ReturnOldLayout(byAddrLName_unsuppressed, mod_access, Phone_Shell.Layouts.layoutWithCohabitDid);
+	
+	{Phone_Shell.Layouts.layoutWithCohabitDid, unsigned4 global_sid} byDID(DIDVille.Layout_Did_OutBatch le, Gong.key_did ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.AcctNo := (STRING20)le.seq;
 		SELF.Subj_First := ri.name_first;
 		SELF.Subj_Middle := ri.name_middle;
@@ -137,7 +139,9 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
 		SELF := [];
 	END;
 	
-	outputByDID := JOIN(withRelativeDID, Gong.key_did, LEFT.DID <> 0 AND KEYED(LEFT.did = RIGHT.l_did) AND RIGHT.phone10 <> '', byDID(LEFT, RIGHT), LIMIT(UT.Limits.PHONE_PER_PERSON, SKIP));
+	outputByDID_unsuppressed := JOIN(withRelativeDID, Gong.key_did, LEFT.DID <> 0 AND KEYED(LEFT.did = RIGHT.l_did) AND RIGHT.phone10 <> '', byDID(LEFT, RIGHT), LIMIT(UT.Limits.PHONE_PER_PERSON, SKIP));
+	
+	outputByDID := Suppress.Suppress_ReturnOldLayout(outputByDID_unsuppressed, mod_access, Phone_Shell.Layouts.layoutWithCohabitDid);
 	
 	outputReady := DEDUP(SORT((byAddrLName + outputByDID), RECORD), RECORD);
 	

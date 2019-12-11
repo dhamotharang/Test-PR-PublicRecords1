@@ -1,10 +1,11 @@
-IMPORT ACA, ADVO, Business_Risk, Drivers, dx_header, MDR, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, USPIS_HotList, UT, STD;
+﻿IMPORT ACA, ADVO, Business_Risk, Drivers, dx_header, MDR, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, USPIS_HotList, UT, STD, Doxie, Suppress;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
 																																					DATASET(Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries) Inquiries,
 																																					UNSIGNED1 DPPAPurpose,
 																																					UNSIGNED1 GLBPurpose,
-																																					STRING50 DataRestrictionMask) := FUNCTION
+																																					STRING50 DataRestrictionMask,
+																																					doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
   todays_date := (string)STD.Date.Today();
 
@@ -423,7 +424,8 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 		UNSIGNED3 UniqueDIDCount1Months				:= 0; // Only count unique DID's with a last seen date <= 1 months
 	END;
 	
-	TempHeader GetHeaderAddress(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, FullHeaderKey ri, BOOLEAN fastHeader) := TRANSFORM
+	{TempHeader, unsigned4 global_sid} GetHeaderAddress(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, FullHeaderKey ri, BOOLEAN fastHeader) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.Seq := le.Seq;
 		SELF.DID := ri.DID;
 		SELF.Came_From_FastHeader := fastHeader;
@@ -470,7 +472,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 		SELF := le;
 	END;
 	
-	fullHeaderAddress := JOIN(Input, FullHeaderKey, LEFT.Clean_Input.Prim_Name <> '' AND LEFT.Clean_Input.Zip5 <> '' AND
+	fullHeaderAddress_unsuppressed := JOIN(Input, FullHeaderKey, LEFT.Clean_Input.Prim_Name <> '' AND LEFT.Clean_Input.Zip5 <> '' AND
 																									KEYED(LEFT.Clean_Input.Prim_Name = RIGHT.Prim_Name AND LEFT.Clean_Input.Zip5 = RIGHT.Zip AND
 																										LEFT.Clean_Input.Prim_Range = RIGHT.Prim_Range) AND
 																									LEFT.Clean_Input.Addr_Suffix = RIGHT.Suffix AND LEFT.Clean_Input.Predir = RIGHT.Predir AND 
@@ -482,7 +484,8 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 																												((UNSIGNED)(((STRING)RIGHT.dt_first_seen)[1..6]) <= LEFT.Clean_Input.ArchiveDate AND RIGHT.dt_first_seen <> 0) AND
 																									RIGHT.DID <> 0,
 																		GetHeaderAddress(LEFT, RIGHT, FALSE), ATMOST(ut.Limits.Header_Per_DID));
-
+	
+	fullHeaderAddress := Suppress.Suppress_ReturnOldLayout(fullHeaderAddress_unsuppressed, mod_access, TempHeader);
 	// Keep the unique DID's associated with the Address
 	headerAddress := DEDUP(SORT(fullHeaderAddress, Seq, Prim_Range, Prim_Name, Zip5, DID, DaysLastSeen, DateFirstSeen, DateLastSeen), Seq, DID);
 	

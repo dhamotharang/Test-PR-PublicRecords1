@@ -5,7 +5,7 @@
  * -First Name, Last Name, Address:: Source: PFFLA											  *
  ************************************************************************ */
 
-IMPORT Phone_Shell, PhonesFeedback, RiskWise, UT, STD, doxie;
+IMPORT Phone_Shell, PhonesFeedback, RiskWise, UT, STD, doxie, Suppress;
 
 todays_date := (string) STD.Date.Today();
 
@@ -14,7 +14,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesFeedb
          
  IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1
          
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getFeedbackPhonesAddr(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhonesFeedback.Key_PhonesFeedback_Address ri) := TRANSFORM
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} getFeedbackPhonesAddr(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhonesFeedback.Key_PhonesFeedback_Address ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SElf.Gathered_Phone := TRIM(ri.phone_number);
 		
 		matchCode := Phone_Shell.Common.generateMatchcode(le.Clean_Input.FirstName, le.Clean_Input.LastName, le.Clean_Input.StreetAddress1, le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Addr_Suffix, le.Clean_Input.City, le.Clean_Input.State, le.Clean_Input.Zip5, le.Clean_Input.DateOfBirth, le.Clean_Input.SSN, le.DID, le.Clean_Input.HomePhone, le.Clean_Input.WorkPhone, 
@@ -62,13 +63,16 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesFeedb
 		SELF := le;
 	END;
 	
-	byAddress := JOIN(Input, PhonesFeedback.Key_PhonesFeedback_Address, TRIM(LEFT.Clean_Input.Prim_Range) <> '' AND TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
+	byAddress_unsuppressed := JOIN(Input, PhonesFeedback.Key_PhonesFeedback_Address, TRIM(LEFT.Clean_Input.Prim_Range) <> '' AND TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
 																											KEYED(LEFT.Clean_Input.Prim_Range = RIGHT.Prim_Range AND LEFT.Clean_Input.Prim_Name = RIGHT.Prim_Name AND LEFT.Clean_Input.Zip5 = RIGHT.Zip5 AND 
 																											LEFT.Clean_Input.Predir = RIGHT.Predir AND LEFT.Clean_Input.Addr_Suffix = RIGHT.Addr_Suffix AND LEFT.Clean_Input.Sec_Range = RIGHT.Sec_Range) AND
 																											(INTEGER)RIGHT.phone_number <> 0,
 																											getFeedbackPhonesAddr(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
-
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getFeedbackPhonesDID(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhonesFeedback.Key_PhonesFeedback_DID ri) := TRANSFORM
+	
+	byAddress := Suppress.Suppress_ReturnOldLayout(byAddress_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
+	
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} getFeedbackPhonesDID(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhonesFeedback.Key_PhonesFeedback_DID ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SElf.Gathered_Phone := TRIM(ri.phone_number);
 		
 		matchCode := Phone_Shell.Common.generateMatchcode(le.Clean_Input.FirstName, le.Clean_Input.LastName, le.Clean_Input.StreetAddress1, le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Addr_Suffix, le.Clean_Input.City, le.Clean_Input.State, le.Clean_Input.Zip5, le.Clean_Input.DateOfBirth, le.Clean_Input.SSN, le.DID, le.Clean_Input.HomePhone, le.Clean_Input.WorkPhone, 
@@ -124,9 +128,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesFeedb
 		SELF := le;
 	END;
 	
-	byDID := JOIN(Input, PhonesFeedback.Key_PhonesFeedback_DID, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID),
+	byDID_unsuppressed := JOIN(Input, PhonesFeedback.Key_PhonesFeedback_DID, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID),
 																											getFeedbackPhonesDID(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
 
+	byDID := Suppress.Suppress_ReturnOldLayout(byDID_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
+	
 	combined := byAddress + byDID;
 	
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus get_Alls(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM

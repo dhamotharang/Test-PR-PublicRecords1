@@ -57,10 +57,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Infutor (DA
 		SELF := le;
 	END;
 	
-	byDID := JOIN(Input, Infutor.key_infutor_best_did, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID) AND (INTEGER)RIGHT.phone <> 0,
+	byDID_unsuppressed := JOIN(Input, Infutor.key_infutor_best_did, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID) AND (INTEGER)RIGHT.phone <> 0,
 																												getInfutor(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
-
-	Layout_Infutor_CCPA get_Alls(Layout_Infutor_CCPA le, Layout_Infutor_CCPA ri) := TRANSFORM
+	byDID := Suppress.Suppress_ReturnOldLayout(byDID_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
+	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus get_Alls(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
    self.Sources.Source_List_All_Last_Seen := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID, 
                                                    le.Sources.Source_List_All_Last_Seen, 
                                                    le.Sources.Source_List_All_Last_Seen + ',' + ri.Sources.Source_List_All_Last_Seen);
@@ -83,8 +83,5 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Infutor (DA
               dedup(sortedInfutor, Clean_Input.seq, Gathered_Phone, Sources.Source_List)
             );
             
- Infutor_Suppressed := Suppress.MAC_SuppressSource(final, mod_access);
- Infutor_Formatted := PROJECT(Infutor_Suppressed, TRANSFORM(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus,
-                                                  SELF := LEFT));
-	RETURN(Infutor_Formatted);
+	RETURN(final);
 END;

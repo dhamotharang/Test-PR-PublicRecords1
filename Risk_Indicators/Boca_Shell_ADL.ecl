@@ -75,14 +75,82 @@ END;
 ADLinfo_nonfcra_roxie_unsuppressed := join(iid, risk_indicators.key_ADL_Risk_Table_v4, left.did != 0 and keyed(left.did=right.did), addADL(LEFT,RIGHT), left outer, 
 								ATMOST(RiskWise.max_atmost), KEEP(1));
 								
-ADLinfo_nonfcra_roxie := Suppress.Suppress_ReturnOldLayout(ADLinfo_nonfcra_roxie_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
-							
+ADLinfo_nonfcra_roxie_flagged := Suppress.MAC_FlagSuppressedSource(ADLinfo_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
+
+ADLinfo_nonfcra_roxie := PROJECT(ADLinfo_nonfcra_roxie_flagged, TRANSFORM(risk_indicators.layout_output, 
+	self.phones_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phones_per_adl);
+	self.ssns_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ssns_per_adl);
+	self.addrs_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_per_adl);
+	self.phones_per_adl_created_6months := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phones_per_adl_created_6months);
+	self.ssns_per_adl_created_6months := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ssns_per_adl_created_6months);
+	self.ssns_per_adl_seen_18months := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ssns_per_adl_seen_18months);
+	self.addrs_per_adl_created_6months := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_per_adl_created_6months);
+	self.addrs_last_5years := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last_5years);
+	self.addrs_last_10years := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last_10years);
+	self.addrs_last_15years := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last_15years);
+	self.addrs_last30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last30);
+	self.addrs_last90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last90);
+	self.addrs_last12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last12);
+	self.addrs_last24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last24);
+	self.addrs_last36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last36);
+	self.lnames_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl);
+	self.lnames_per_adl30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl30);
+	self.lnames_per_adl90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl90);
+	self.lnames_per_adl180 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl180);
+	self.lnames_per_adl12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl12);
+	self.lnames_per_adl24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl24);
+	self.lnames_per_adl36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl36);
+	self.lnames_per_adl60 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl60);
+	self.last_from_did := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.last_from_did);
+	self.newest_lname_dt_first_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.newest_lname_dt_first_seen);
+	self.mobility_indicator := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.mobility_indicator);
+	self.reported_dob := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.reported_dob);
+	self.inferred_age := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inferred_age);
+	self.adlCategory := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.adlCategory);
+	self.address_history_summary.address_history_advo_college_hit := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.address_history_summary.address_history_advo_college_hit);
+    SELF := LEFT;
+)); 
+
 ADLinfo_nonfcra_thor_unsuppressed := group(join(distribute(iid, hash64(did)), 
 														 distribute(pull(risk_indicators.key_ADL_Risk_Table_v4), hash64(did)), 
 														 left.did != 0 and (left.did=right.did), addADL(LEFT,RIGHT), left outer, 
 								ATMOST(RiskWise.max_atmost), KEEP(1), LOCAL), seq, did);
 								
-ADLinfo_nonfcra_thor := Suppress.Suppress_ReturnOldLayout(ADLinfo_nonfcra_thor_unsuppressed, mod_access, Risk_Indicators.Layout_Output, data_environment);
+ADLinfo_nonfcra_thor_flagged := Suppress.MAC_FlagSuppressedSource(ADLinfo_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
+
+ADLinfo_nonfcra_thor := PROJECT(ADLinfo_nonfcra_thor_flagged, TRANSFORM(risk_indicators.layout_output, 
+	self.phones_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phones_per_adl);
+	self.ssns_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ssns_per_adl);
+	self.addrs_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_per_adl);
+	self.phones_per_adl_created_6months := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phones_per_adl_created_6months);
+	self.ssns_per_adl_created_6months := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ssns_per_adl_created_6months);
+	self.ssns_per_adl_seen_18months := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ssns_per_adl_seen_18months);
+	self.addrs_per_adl_created_6months := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_per_adl_created_6months);
+	self.addrs_last_5years := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last_5years);
+	self.addrs_last_10years := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last_10years);
+	self.addrs_last_15years := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last_15years);
+	self.addrs_last30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last30);
+	self.addrs_last90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last90);
+	self.addrs_last12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last12);
+	self.addrs_last24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last24);
+	self.addrs_last36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrs_last36);
+	self.lnames_per_adl := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl);
+	self.lnames_per_adl30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl30);
+	self.lnames_per_adl90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl90);
+	self.lnames_per_adl180 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl180);
+	self.lnames_per_adl12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl12);
+	self.lnames_per_adl24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl24);
+	self.lnames_per_adl36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl36);
+	self.lnames_per_adl60 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lnames_per_adl60);
+	self.last_from_did := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.last_from_did);
+	self.newest_lname_dt_first_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.newest_lname_dt_first_seen);
+	self.mobility_indicator := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.mobility_indicator);
+	self.reported_dob := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.reported_dob);
+	self.inferred_age := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inferred_age);
+	self.adlCategory := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.adlCategory);
+	self.address_history_summary.address_history_advo_college_hit := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.address_history_summary.address_history_advo_college_hit);
+    SELF := LEFT;
+)); 
 
 #IF(onThor)
 	ADLinfo_nonfcra := ADLinfo_nonfcra_thor;

@@ -37,15 +37,39 @@ address_rank_key := dx_header.key_addr_hist();
 										right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
 										getInfutor(left,right), left outer, atmost(riskwise.max_atmost), KEEP(100));	
 										
-	wInfutorcid_roxie := Suppress.Suppress_ReturnOldLayout(wInfutorcid_roxie_unsuppressed, mod_access, Layouts.Layout_PB_Shell);
-	
+	wInfutorcid_roxie_flagged := Suppress.MAC_FlagSuppressedSource(wInfutorcid_roxie_unsuppressed, mod_access);
+
+wInfutorcid_roxie := PROJECT(wInfutorcid_roxie_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		self.firstscore 	:=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstscore);
+		self.firstcount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstcount);
+		self.lastscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastscore);
+		self.lastcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastcount);
+		self.addrscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrscore);
+		self.addrcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrcount);
+		self.phonescore 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonescore);
+		self.phonecount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonecount);
+    SELF := LEFT;
+)); 
+
 	wInfutorcid_thor_unsuppressed := join(distribute(PBShell, did), distribute(pull(infutorcid_key), did),	
 										left.did<>0 and
 										left.did=right.did and
 										right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
 										getInfutor(left,right), left outer, KEEP(100), local);
 										
-	wInfutorcid_thor := Suppress.Suppress_ReturnOldLayout(wInfutorcid_thor_unsuppressed, mod_access, Layouts.Layout_PB_Shell);
+	wInfutorcid_thor_flagged := Suppress.MAC_FlagSuppressedSource(wInfutorcid_thor_unsuppressed, mod_access);
+
+	wInfutorcid_thor := PROJECT(wInfutorcid_thor_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		self.firstscore 	:=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstscore);
+		self.firstcount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstcount);
+		self.lastscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastscore);
+		self.lastcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastcount);
+		self.addrscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrscore);
+		self.addrcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrcount);
+		self.phonescore 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonescore);
+		self.phonecount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonecount);
+    SELF := LEFT;
+)); 
 
 	#IF(onThor)
 		wInfutorCid := wInfutorCid_thor;
@@ -77,15 +101,37 @@ address_rank_key := dx_header.key_addr_hist();
 										right.dt_first_seen < risk_indicators.iid_constants.myGetDate(left.historydate),
 										getGong(left,right), left outer, atmost(riskwise.max_atmost), KEEP(100));	
 	
-	wGong_roxie := Suppress.Suppress_ReturnOldLayout(wGong_roxie_unsuppressed, mod_access, Layouts.Layout_PB_Shell);
-	
+	wGong_roxie_flagged := Suppress.MAC_FlagSuppressedSource(wGong_roxie_unsuppressed, mod_access);
+
+	wGong_roxie := PROJECT(wGong_roxie_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		self.firstscore 	:=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstscore);
+		self.firstcount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstcount);
+		self.lastscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastscore);
+		self.lastcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastcount);
+		self.addrscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrscore);
+		self.addrcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrcount);
+		self.phonescore 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonescore);
+		self.phonecount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonecount);
+    SELF := LEFT;));
+
 	wGong_thor_unsuppressed := join(distribute(PBShell, did), distribute(pull(gonghistorydid_key), did),	
 										left.did<>0 and
 										left.did=right.l_did and
 										right.dt_first_seen < risk_indicators.iid_constants.myGetDate(left.historydate),
 										getGong(left,right), left outer, KEEP(100), local);
 										
-	wGong_thor := Suppress.Suppress_ReturnOldLayout(wGong_thor_unsuppressed, mod_access, Layouts.Layout_PB_Shell);
+	wGong_thor_flagged := Suppress.MAC_FlagSuppressedSource(wGong_thor_unsuppressed, mod_access);
+
+	wGong_thor := PROJECT(wGong_thor_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		self.firstscore 	:=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstscore);
+		self.firstcount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstcount);
+		self.lastscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastscore);
+		self.lastcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastcount);
+		self.addrscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrscore);
+		self.addrcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrcount);
+		self.phonescore 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonescore);
+		self.phonecount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonecount);
+    SELF := LEFT;));
 
 	#IF(onThor)
 		wGong := wGong_thor;
@@ -147,8 +193,43 @@ address_rank_key := dx_header.key_addr_hist();
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(200), atmost(RiskWise.max_atmost));	
 									
-	wHeader_roxie := Suppress.Suppress_ReturnOldLayout(wHeader_roxie_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
-	
+	wHeader_roxie_flagged := Suppress.MAC_FlagSuppressedSource(wHeader_roxie_unsuppressed, mod_access);
+
+	wHeader_roxie := PROJECT(wHeader_roxie_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		self.firstscore 	:=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstscore);
+		self.firstcount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstcount);
+		self.lastscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastscore);
+		self.lastcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastcount);
+		self.addrscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrscore);
+		self.addrcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrcount);
+		self.phonescore 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonescore);
+		self.phonecount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonecount);
+		self.socsscore 				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.socsscore);
+		self.socscount 				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.socscount);
+		self.dt_first_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_first_seen);
+		self.dt_last_seen			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_last_seen);
+		self.dob							:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.dob);
+		self.ProspectAge 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ProspectAge);
+		self.title						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.title);
+		self.HHID							:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HHID);
+		self.hdr_prim_range		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_prim_range);
+		self.hdr_predir				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_predir);
+		self.hdr_prim_name		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_prim_name);
+		self.hdr_addr_suffix	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_addr_suffix);
+		self.hdr_postdir			:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_postdir);
+		self.hdr_unit_desig		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_unit_desig);
+		self.hdr_sec_range		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_sec_range);
+		self.hdr_z5						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_z5);	
+		self.hdr_zip4					:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_zip4);
+		self.hdr_city_name		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_city_name);
+		self.hdr_st						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_st);
+		self.hdr_county				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_county);
+		self.hdr_geo_blk			:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_geo_blk);		
+		self.hdr_lname				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_lname);
+		self.hdr_addr1				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_addr1);
+		self.hdr_rawaid 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hdr_rawaid);
+    SELF := LEFT;));
+		
 	wHeader_thor_unsuppressed := join(distribute(PBShell, did), distribute(pull(header_key), s_did),	
 										left.DID <> 0 and
 										left.DID = right.s_DID and
@@ -156,8 +237,43 @@ address_rank_key := dx_header.key_addr_hist();
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(200), local);
 
-	wHeader_thor := Suppress.Suppress_ReturnOldLayout(wHeader_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
+	wHeader_thor_flagged := Suppress.MAC_FlagSuppressedSource(wHeader_thor_unsuppressed, mod_access);
 
+	wHeader_thor := PROJECT(wHeader_roxie_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		self.firstscore 	:=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstscore);
+		self.firstcount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.firstcount);
+		self.lastscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastscore);
+		self.lastcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.lastcount);
+		self.addrscore 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrscore);
+		self.addrcount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.addrcount);
+		self.phonescore 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonescore);
+		self.phonecount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.phonecount);
+		self.socsscore 				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.socsscore);
+		self.socscount 				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.socscount);
+		self.dt_first_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_first_seen);
+		self.dt_last_seen			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_last_seen);
+		self.dob							:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.dob);
+		self.ProspectAge 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ProspectAge);
+		self.title						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.title);
+		self.HHID							:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HHID);
+		self.hdr_prim_range		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_prim_range);
+		self.hdr_predir				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_predir);
+		self.hdr_prim_name		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_prim_name);
+		self.hdr_addr_suffix	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_addr_suffix);
+		self.hdr_postdir			:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_postdir);
+		self.hdr_unit_desig		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_unit_desig);
+		self.hdr_sec_range		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_sec_range);
+		self.hdr_z5						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_z5);	
+		self.hdr_zip4					:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_zip4);
+		self.hdr_city_name		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_city_name);
+		self.hdr_st						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_st);
+		self.hdr_county				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_county);
+		self.hdr_geo_blk			:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_geo_blk);		
+		self.hdr_lname				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_lname);
+		self.hdr_addr1				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hdr_addr1);
+		self.hdr_rawaid 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hdr_rawaid);
+    SELF := LEFT;));
+		
 	#IF(onThor)
 		wHeader := wHeader_thor;
 	#ELSE
