@@ -1168,6 +1168,8 @@
 		export string KEYWORD_HRAZTN								:= '854';
 		export string KEYWORD_TTSEC									:= '855';
 		export string KEYWORD_ESCNMC								:= '856';
+		export string KEYWORD_PTANACOM							:= '857';
+		export string KEYWORD_EEPPA									:= '858';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
