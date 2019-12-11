@@ -29,9 +29,7 @@ export Proc_Build_All(
 	//DF-23793 Add T to inenvment parameter to update Dops of Insurance customer test environment after build completes 
 	// idops_update:= dops.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N|F|T',,,'A');																	
 	//DF-26455 temporary disable updating iDOPS CT env
-	// idops_update:= dops.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N|F|T',,,'A');																	
-	//DF-26455 - update CT enenvironment only for now
-	idops_update:= dops.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'T',,,'A');																	
+	idops_update:= dops.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N|F|T',,,'A');																	
 
 	//Orbit update
 	orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('VINA',(filedate),'N'); 
@@ -53,7 +51,7 @@ export Proc_Build_All(
 				scrubbase,
 				buildkeys,
 				dops_update,
-				idops_update,
+				// idops_update, // DF-26652 temp disable
 				orbit_update,
 				// orbiti_update,  // DF-26652 temp disable
 				new_records_sample_for_qa,
