@@ -9,27 +9,30 @@ EXPORT getBusHeaderImpl := MODULE
     EXPORT getFilteredData(DATASET(DueDiligence.Layouts.Busn_Internal) inData, Business_Risk_BIP.LIB_Business_Shell_LIBIN options, 
                                                   BIPV2.mod_sources.iParams linkingOptions,
                                                   doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                                                  
+                                                  
+                                                  
         busHeaderRaw1 := BIPV2.Key_BH_Linking_Ids.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(inData),
-																													Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
-																													0, /*ScoreThreshold --> 0 = Give me everything*/
-																													linkingOptions,
-																													Business_Risk_BIP.Constants.Limit_BusHeader,
-																													FALSE, /* dnbFullRemove */
-																													TRUE, /* bypassContactSuppression */
-																													Options.KeepLargeBusinesses,
-                                                                                                                    mod_access := mod_access)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
+                                                          Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                                          0, /*ScoreThreshold --> 0 = Give me everything*/
+                                                          linkingOptions,
+                                                          Business_Risk_BIP.Constants.Limit_BusHeader,
+                                                          FALSE, /* dnbFullRemove */
+                                                          TRUE, /* bypassContactSuppression */
+                                                          Options.KeepLargeBusinesses,
+                                                          mod_access := mod_access)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
 																	
 				
-				// clean up the business header before doing anything else
+				//clean up the business header before doing anything else
 				Business_Risk_BIP.Common.mac_slim_header(busHeaderRaw1, busHeaderRaw);	
 					
-				// Add back our Seq numbers.
+				//Add back our Seq numbers.
 				busHeaderSeq := DueDiligence.CommonBusiness.AppendSeq(busHeaderRaw, indata, TRUE);
 				
 				//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
 				busHeaderCleanDate := DueDiligence.Common.CleanDatasetDateFields(busHeaderSeq, 'dt_first_seen, dt_vendor_first_reported, dt_last_seen');
 				
-				// Filter out records after our history date.
+				//Filter out records after our history date.
 				busHeaderFilt := DueDiligence.Common.FilterRecords(busHeaderCleanDate, dt_first_seen, dt_vendor_first_reported);
         
         RETURN busHeaderFilt;

@@ -24,15 +24,33 @@ EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim,
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(ut.limits.HEADER_PER_DID), atmost(RiskWise.max_atmost));	
 									
-	withHeader_ROXIE := Suppress.Suppress_ReturnOldLayout(withHeader_ROXIE_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Slim_header);
-	
+withHeader_ROXIE_flagged := Suppress.MAC_FlagSuppressedSource(withHeader_ROXIE_unsuppressed, mod_access);
+
+withHeader_ROXIE := PROJECT(withHeader_ROXIE_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Slim_header, 
+		self.age						:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.age);		
+		self.HHID						:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HHID);		
+		self.dt_first_seen	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_first_seen);		
+		self.dt_last_seen		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_last_seen);		
+		self.geoLink				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.geoLink);		
+		SELF := LEFT;
+)); 
+
 	withHeader_THOR_unsuppressed := join(distribute(PBslim(did2<>0), did2), 
 													distribute(pull(Doxie.Key_Header(dt_first_seen<>0 AND src IN MDR.sourcetools.set_Marketing_Header)), s_did),	
 										left.DID2 = right.s_DID and
 										right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(ut.limits.HEADER_PER_DID),  local);
 
-	withHeader_THOR := Suppress.Suppress_ReturnOldLayout(withHeader_THOR_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Slim_header);
+withHeader_THOR_flagged := Suppress.MAC_FlagSuppressedSource(withHeader_THOR_unsuppressed, mod_access);
+
+withHeader_THOR := PROJECT(withHeader_THOR_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Slim_header, 
+		self.age						:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.age);		
+		self.HHID						:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HHID);		
+		self.dt_first_seen	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_first_seen);		
+		self.dt_last_seen		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_last_seen);		
+		self.geoLink				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.geoLink);		
+		SELF := LEFT;
+)); 
 
   #IF(onThor)
     withHeader := withHeader_thor;

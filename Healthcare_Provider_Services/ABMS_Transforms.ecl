@@ -65,6 +65,8 @@ EXPORT ABMS_Transforms := MODULE
 			boolean isNPIMatched := inCriteria.NPI<>'' and inRec.npi = inCriteria.NPI and inCriteria.DerivedNPI = false;
 			self.DataIndicator :=  inRec.record_type;
 			self.isInputNPIMatched := isNPIMatched;
+      self.global_sid:=inrec.global_sid;
+      self.did :=inCriteria.did;
 			self.isDerivedNPIMatched := isNPIDerivedMatched;
 			self.DerivedNPI := '';//Not currently Used
 			self.isAddressSuppressed := inRec.address_suppress_ind = 'Y';
@@ -112,7 +114,7 @@ EXPORT ABMS_Transforms := MODULE
 			self._Penalty := min(allrows,_Penalty);
 			self.AccountNumber :=  inRec.AccountNumber;
 			self.ABMSBiogID:= inRec.ABMSBiogID;
-			self.Name := inRec.Name;
+			self.Name := allrows(hasoptout=false)[1].name;
 			self.Addresses := choosen(SORT(DEDUP(NORMALIZE(allRows(hasoptout=false), LEFT.Addresses, TRANSFORM(iesp.abms.t_ABMSAddressInfo, SELF := RIGHT)), RECORD, ALL, HASH ), -DateLastSeen)(Address.StreetName<>''),iesp.Constants.HPR.Max_ABMS_ADDRESSES);
 			self.Contacts := choosen(SORT(DEDUP(NORMALIZE(allRows(hasoptout=false), LEFT.Contacts, TRANSFORM(iesp.abms.t_ABMSContactInfo, SELF := RIGHT)), RECORD, ALL, HASH ), -DateLastSeen)(ContactType<>''),iesp.Constants.HPR.Max_ABMS_Contacts);
 			self.Organization := allrows(Organization<>'' and hasoptout=false)[1].Organization;
@@ -137,6 +139,8 @@ EXPORT ABMS_Transforms := MODULE
 			self.EducationHistory := dataset([],iesp.abms.t_ABMSEducation); //Will be filled in later via Join
 			self.ProfessionalAssociations := dataset([],iesp.abms.t_ABMSProfessionalAssociation); //Will be filled in later via Join
 			self.Specialty :=inRec.Specialty;
+                        self.hasoptout:=allRows[1].hasoptout;
+			self:=inrec;
 	end;
 	export filterZeroes(string inDate):= function
 		return if(inDate = '00000000','',inDate);

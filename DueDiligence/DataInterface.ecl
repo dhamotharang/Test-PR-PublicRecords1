@@ -39,4 +39,11 @@ EXPORT DataInterface := MODULE
         EXPORT BOOLEAN includeRegisteredAgents;
         EXPORT BOOLEAN includeAll;
       END;
+      
+      
+      EXPORT iAttributePerAssoc := INTERFACE
+        EXPORT BOOLEAN includeLegalData;
+        EXPORT BOOLEAN includeSSNData;
+        EXPORT BOOLEAN includeHeaderData;
+      END;
 END;

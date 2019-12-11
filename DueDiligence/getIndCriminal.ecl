@@ -60,7 +60,8 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                             
                                                             convictedFelony := LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY AND LEFT.offenseConviction = DueDiligence.Constants.YES;
                                                             convictedNonFelony := LEFT.offenseDDChargeLevelCalculated IN nonFelonies AND LEFT.offenseConviction = DueDiligence.Constants.YES;
-                                                                                        
+                                                                           
+                                                            SELF.felonyPast3Years := LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY AND reportedLast3Yrs;
                                                                                          
                                                             SELF.attr_stateLegalEvent8 := convictedFelony AND reportedLast3Yrs;
                                                             SELF.attr_stateLegalEvent7 := convictedFelony AND reportedOver3YrsOrCannotCalcDate;
@@ -75,7 +76,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 
 
     //roll up all offenses now by person
-    formatCrimData := PROJECT(updateWithOffenseType, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DueDiligence.Layouts.LegalAttributes, DATASET(DueDiligence.Layouts.CriminalOffenses) indCrimOffenses},
+    formatCrimData := PROJECT(updateWithOffenseType, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DueDiligence.LayoutsInternal.LegalFlags, DueDiligence.Layouts.LegalAttributes, DATASET(DueDiligence.Layouts.CriminalOffenses) indCrimOffenses},
                                                                 
                                                                 SELF.indCrimOffenses := DATASET([TRANSFORM(DueDiligence.Layouts.CriminalOffenses, SELF := LEFT;)]);
                                                                 SELF := LEFT;
@@ -111,6 +112,13 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                       SELF.attr_offenseType0 := LEFT.attr_offenseType0 OR RIGHT.attr_offenseType0;
                                       
                                       SELF.indCrimOffenses := LEFT.indCrimOffenses + RIGHT.indCrimOffenses;
+                                      
+                                      SELF.currIncar := LEFT.currIncar OR RIGHT.currIncar;
+                                      SELF.currParole := LEFT.currParole OR RIGHT.currParole;
+                                      SELF.currProbation := LEFT.currProbation OR RIGHT.currProbation;
+                                      SELF.prevIncar := LEFT.prevIncar OR RIGHT.prevIncar;
+                                      SELF.felonyPast3Years := LEFT.felonyPast3Years OR RIGHT.felonyPast3Years;
+                                      
                                       SELF := LEFT;));
 
 
@@ -121,7 +129,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                         SELF.crimOffenses := LEFT;
                                                         
                                                         SELF.indv.seq := LEFT.seq;
-                                                        SELF.indv.inquiredDID := LEFT.did;
+                                                        SELF.indv.individual.did := LEFT.did;
                                                        
                                                         //PerStateLegalEvent
                                                         SELF.indv.currentIncarceration := LEFT.attr_stateLegalEvent9;
@@ -149,7 +157,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
     //join all individuals and potential crim data
     addCrimData := JOIN(individuals, indivCrimLayout,
                         LEFT.seq = RIGHT.indv.seq AND
-                        LEFT.did = RIGHT.indv.inquiredDID,
+                        LEFT.did = RIGHT.indv.individual.did,
                         TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
                         
                                   stateCrim := DueDiligence.getIndKRILegalStateCriminal(RIGHT.indv);  
@@ -161,6 +169,12 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                   SELF.party.legalEventTypeFlags := legalEventType.value;
 
                                   SELF.party.indOffenses := RIGHT.crimOffenses.indCrimOffenses;
+                                  
+                                  SELF.currIncar := RIGHT.crimOffenses.currIncar;
+                                  SELF.currParole := RIGHT.crimOffenses.currParole;
+                                  SELF.currProbation := RIGHT.crimOffenses.currProbation;
+                                  SELF.prevIncar := RIGHT.crimOffenses.prevIncar;
+                                  SELF.felonyPast3Years := RIGHT.crimOffenses.felonyPast3Years;
                                   
                                   SELF := LEFT;),
                         LEFT OUTER,

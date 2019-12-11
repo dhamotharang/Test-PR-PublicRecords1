@@ -95,6 +95,7 @@ EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
     // OUTPUT(execsRawSeq, NAMED('execsRawSeq'));
     // OUTPUT(filterExecs, NAMED('filterExecs'));
+    // OUTPUT(pulledExecs, NAMED('pulledExecs'));
     // OUTPUT(withDIDs, NAMED('withDIDs'));
     // OUTPUT(addExecs, NAMED('addExecs'));
     // OUTPUT(withoutDIDs, NAMED('withoutDIDs'));

@@ -60,7 +60,16 @@ with_age_unsuppressed := join(with_hhid_dids, risk_indicators.Key_ADL_Risk_Table
 	self.age := age;
 	self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
-with_age := Suppress.Suppress_ReturnOldLayout(with_age_unsuppressed, mod_access, layout_hhid_temp);
+with_age_flagged := Suppress.MAC_FlagSuppressedSource(with_age_unsuppressed, mod_access);
+
+with_age := PROJECT(with_age_flagged, TRANSFORM(layout_hhid_temp, 
+	self.hh_age_65_plus := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_age_65_plus);
+	self.hh_age_31_to_65 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_age_31_to_65);
+	self.hh_age_18_to_30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_age_18_to_30);
+	self.hh_age_lt18 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_age_lt18);
+	self.age := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.age);
+    SELF := LEFT;
+)); 
 
 with_property_ownership := join(with_age, LN_PropertyV2.Key_Prop_Ownership_V4, 
 	keyed(left.did=right.did) and (unsigned)((string)right.purchase_date)[1..6] < left.historydate,
@@ -84,7 +93,12 @@ pawfile_full_nonfcra_unsuppressed := join(with_paw_did, paw.Key_contactid,
 							self.hh_workers_paw := if(right.contact_id<>0, 1, 0),
 							self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 							
-pawfile_full_nonfcra := Suppress.Suppress_ReturnOldLayout(pawfile_full_nonfcra_unsuppressed, mod_access, layout_hhid_temp);
+pawfile_full_nonfcra_flagged := Suppress.MAC_FlagSuppressedSource(pawfile_full_nonfcra_unsuppressed, mod_access);
+
+pawfile_full_nonfcra := PROJECT(pawfile_full_nonfcra_flagged, TRANSFORM(layout_hhid_temp, 
+	self.hh_workers_paw := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_workers_paw);
+    SELF := LEFT;
+)); 
 
 with_paw_rolled := dedup(sort(pawfile_full_nonfcra, seq, did, -hh_workers_paw, seq, did), seq, did );
 
@@ -107,7 +121,12 @@ with_collection_inquiries_unsuppressed := join(with_paw_rolled, Inquiry_AccLogs.
 							self := left),
 						left outer, atmost(riskwise.max_atmost), keep(1)) ;	
 						
-with_collection_inquiries := Suppress.Suppress_ReturnOldLayout(with_collection_inquiries_unsuppressed, mod_access, layout_hhid_temp);
+with_collection_inquiries_flagged := Suppress.MAC_FlagSuppressedSource(with_collection_inquiries_unsuppressed, mod_access);
+
+with_collection_inquiries := PROJECT(with_collection_inquiries_flagged, TRANSFORM(layout_hhid_temp, 
+	self.hh_collections_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_collections_ct);
+    SELF := LEFT;
+)); 
 
 with_impulse_unsuppressed := join(with_collection_inquiries, Impulse_Email.Key_Impulse_DID, 
 									keyed(left.did=right.did) and (unsigned)stringlib.stringfilterout(right.created[1..7],'-')< left.historydate,	
@@ -116,7 +135,12 @@ with_impulse_unsuppressed := join(with_collection_inquiries, Impulse_Email.Key_I
 										self.hh_payday_loan_users := if(right.did<>0, 1, 0);
 										self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 										
-with_impulse := Suppress.Suppress_ReturnOldLayout(with_impulse_unsuppressed, mod_access, layout_hhid_temp);
+with_impulse_flagged := Suppress.MAC_FlagSuppressedSource(with_impulse_unsuppressed, mod_access);
+
+with_impulse := PROJECT(with_impulse_flagged, TRANSFORM(layout_hhid_temp, 
+	self.hh_payday_loan_users := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_payday_loan_users);
+    SELF := LEFT;
+)); 
 
 with_thrive_unsuppressed := join(with_impulse, thrive.keys().did.qa, 
 									keyed(left.did=right.did) and 
@@ -127,7 +151,12 @@ with_thrive_unsuppressed := join(with_impulse, thrive.keys().did.qa,
 										self.hh_payday_loan_users := if(right.did<>0 or left.hh_payday_loan_users=1, 1, 0);
 										self := left), left outer, atmost(riskwise.max_atmost), keep(1));										
 										
-with_thrive := Suppress.Suppress_ReturnOldLayout(with_thrive_unsuppressed, mod_access, layout_hhid_temp);
+with_thrive_flagged := Suppress.MAC_FlagSuppressedSource(with_thrive_unsuppressed, mod_access);
+
+with_thrive := PROJECT(with_thrive_flagged, TRANSFORM(layout_hhid_temp, 
+	self.hh_payday_loan_users := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_payday_loan_users);
+    SELF := LEFT;
+)); 
 
 with_professional_license_unsuppressed := join(with_thrive, prof_licenseV2.Key_Proflic_Did (),
 											left.did!=0 and keyed(right.did = left.did) and trim(right.prolic_key)!='' and
@@ -137,8 +166,13 @@ with_professional_license_unsuppressed := join(with_thrive, prof_licenseV2.Key_P
 											self.hh_prof_license_holders := if(right.did<>0, 1, 0);
 											self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 											
-with_professional_license := Suppress.Suppress_ReturnOldLayout(with_professional_license_unsuppressed, mod_access, layout_hhid_temp);
-												
+with_professional_license_flagged := Suppress.MAC_FlagSuppressedSource(with_professional_license_unsuppressed, mod_access);
+
+with_professional_license := PROJECT(with_professional_license_flagged, TRANSFORM(layout_hhid_temp, 
+	self.hh_prof_license_holders := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_prof_license_holders);
+    SELF := LEFT;
+)); 
+											
 with_alloy_unsuppressed := join(with_professional_license, AlloyMedia_student_list.Key_DID, 
 			keyed(left.did=right.did)
 			and (right.file_type in ['H','C'] or
@@ -149,7 +183,12 @@ with_alloy_unsuppressed := join(with_professional_license, AlloyMedia_student_li
 				self.hh_college_attendees := if(right.did<>0, 1, 0);
 				self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
-with_alloy := Suppress.Suppress_ReturnOldLayout(with_alloy_unsuppressed, mod_access, layout_hhid_temp);
+with_alloy_flagged := Suppress.MAC_FlagSuppressedSource(with_alloy_unsuppressed, mod_access);
+
+with_alloy := PROJECT(with_alloy_flagged, TRANSFORM(layout_hhid_temp, 
+	self.hh_college_attendees := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_college_attendees);
+    SELF := LEFT;
+)); 
 
 with_american_student_unsuppressed := join(with_alloy, american_student_list.key_DID, 
 			left.hh_college_attendees<>1
@@ -162,7 +201,12 @@ with_american_student_unsuppressed := join(with_alloy, american_student_list.key
 				self.hh_college_attendees := if(right.did<>0 or left.hh_college_attendees=1, 1, 0);
 				self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
-with_american_student := Suppress.Suppress_ReturnOldLayout(with_american_student_unsuppressed, mod_access, layout_hhid_temp);
+with_american_student_flagged := Suppress.MAC_FlagSuppressedSource(with_american_student_unsuppressed, mod_access);
+
+with_american_student := PROJECT(with_american_student_flagged, TRANSFORM(layout_hhid_temp, 
+	self.hh_college_attendees := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_college_attendees);
+    SELF := LEFT;
+)); 
 
 with_bk := join(with_american_student, BankruptcyV3.key_bankruptcyV3_did(),
 	keyed(left.did=right.did),
@@ -212,7 +256,14 @@ with_liens_unsuppressed := join(with_lien_ids, liensv2.key_liens_party_id,
 				SELF := left),
 				LEFT OUTER, KEEP(1), ATMOST(Riskwise.max_atmost));
 
-with_liens := Suppress.Suppress_ReturnOldLayout(with_liens_unsuppressed, mod_access, layout_hhid_temp);
+with_liens_flagged := Suppress.MAC_FlagSuppressedSource(with_liens_unsuppressed, mod_access);
+
+with_liens := PROJECT(with_liens_flagged, TRANSFORM(layout_hhid_temp, 
+				self.hh_lienholders := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_lienholders);
+				self.hh_tot_derog := left.hh_criminals + left.hh_bankruptcies + IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_lienholders);
+				self.hh_members_w_derog := if(left.hh_criminals=1 or left.hh_bankruptcies=1 or IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hh_lienholders)=1, 1, 0);  // flag if any of the 3 categories    
+				SELF := LEFT;
+)); 
 
 with_liens_deduped := dedup(sort(with_liens, seq, did, -hh_lienholders, seq, did), seq, did );
 

@@ -1,4 +1,4 @@
-﻿import prof_licenseV2, riskwise, ut, risk_indicators, doxie, Suppress;
+﻿import prof_licenseV2, riskwise, ut, risk_indicators, doxie, Suppress, AML;
 
 export AMLProflicense(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
@@ -41,14 +41,27 @@ Layout_PL_Plus_CCPA PL_nonFCRA(ids_only le, key_did rt) := transform
     self.global_sid := rt.global_sid;
 	self := le;
 end;
-license_recs := join(ids_only, key_did,
+license_recs_unsuppressed := join(ids_only, key_did,
 											left.did!=0 and keyed(right.did = left.did) and
 											(unsigned)right.date_first_seen[1..6] < left.historydate,
 											PL_nonFCRA(left,right), left outer, 
 											atmost(right.did = left.did, riskwise.max_atmost));
+											
+license_recs_flagged := Suppress.MAC_FlagSuppressedSource(license_recs_unsuppressed, mod_access);
 
+license_recs := PROJECT(license_recs_flagged, TRANSFORM(Layout_PL_Plus, 
+	self.prolic_key :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prolic_key);
+	self.date_first_seen :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.date_first_seen);
+	self.professional_license_flag :=  IF(left.is_suppressed, false, left.professional_license_flag);
+	self.license_type :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.license_type);
+	self.proflic_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.proflic_count);
+	self.date_most_recent := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.date_most_recent);
+	self.expiration_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.expiration_date);
+	self.HRProfLicProv := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.HRProfLicProv);
+    SELF := LEFT;
+)); 
 
-Layout_PL_Plus_CCPA roll_licenses(Layout_PL_Plus_CCPA le, Layout_PL_Plus_CCPA rt) := transform
+Layout_PL_Plus roll_licenses(Layout_PL_Plus le, Layout_PL_Plus rt) := transform
 	self.professional_license_flag := le.professional_license_flag or rt.professional_license_flag;
 	self.proflic_count := le.proflic_count+IF(le.prolic_key=rt.prolic_key,0,rt.proflic_count);
 	self.date_most_recent := Max(le.date_most_recent,rt.date_most_recent);
@@ -58,10 +71,7 @@ Layout_PL_Plus_CCPA roll_licenses(Layout_PL_Plus_CCPA le, Layout_PL_Plus_CCPA rt
 	self := rt;
 end;
 
-rolled_licenses_suppressed := Suppress.Mac_SuppressSource(rollup(sort(license_recs, prolic_key,-date_most_recent), true, roll_licenses(left,right)), mod_access);	
-
-rolled_licenses := PROJECT(rolled_licenses_suppressed, TRANSFORM(Layout_PL_Plus,
-                                                  SELF := LEFT));
+rolled_licenses := rollup(sort(license_recs, prolic_key,-date_most_recent), true, roll_licenses(left,right));
 
 // output(license_recs, named('license_recs'), overwrite);					
 // output(rolled_licenses, named('rolled_licenses'), overwrite);					
