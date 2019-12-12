@@ -10,6 +10,7 @@ EXPORT ReturnToBatch (string pVersion, boolean pUseProd = false, string gcid, da
 		// 2 - Append LexID to records with LexID match AND Customer Record Key ONLY for records with NO LEXID
 		// 3 - Append LexID ONLY to records with LexID match and DO NOT append Customer Record Key for any records
 		// 4 - Append ONLY Customer Record Key for all records - NO LEXID appends for any records
+		// change flags null when input_lexid or input_crk fields are null/zero
 
 		UPI_DataBuild.layouts_V2.input_processing tMapping(UPI_DataBuild.layouts_V2.input_processing L) := TRANSFORM
 			self.batch_seq_number							:= L.batch_seq_number;
