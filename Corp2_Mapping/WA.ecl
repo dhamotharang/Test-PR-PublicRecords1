@@ -560,7 +560,7 @@ export WA := MODULE;
 																				 )  
 														 )
 											);
-															
+
  		isFileDateValid := if((string)Std.Date.Today() between ut.date_math(filedate,-31) and ut.date_math(filedate,31),true,false);
 		return sequential (if (isFileDateValid
 														,mapWA
