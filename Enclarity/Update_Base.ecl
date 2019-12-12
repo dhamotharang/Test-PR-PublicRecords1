@@ -71,247 +71,247 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 		RETURN PROJECT(cleanNames,tr(LEFT));
 	ENDMACRO;
 	
-	// EXPORT Facility_Base := FUNCTION
-		// hist_base	:= Mark_history(enclarity.Files(filedate,pUseProd).facility_base.built, Enclarity.layouts.facility_base);
+	EXPORT Facility_Base := FUNCTION
+		hist_base	:= Mark_history(enclarity.Files(filedate,pUseProd).facility_base.built, Enclarity.layouts.facility_base);
 
-		// stdInput := Enclarity.StandardizeInputFile(filedate, pUseProd).Facility;
+		stdInput := Enclarity.StandardizeInputFile(filedate, pUseProd).Facility;
 		
-		// cleanAdd_a	:= Clean_addr(stdInput, Enclarity.layouts.facility_base)
-			// :PERSIST('~thor_data400::persist::enclarity::facility_addr');
+		cleanAdd_a	:= Clean_addr(stdInput, Enclarity.layouts.facility_base)
+			:PERSIST('~thor_data400::persist::enclarity::facility_addr');
 			
-		// base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).facility_lBaseTemplate_built)) = 0
-												 // ,cleanAdd_a
-												 // ,cleanAdd_a + hist_base);
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).facility_lBaseTemplate_built)) = 0
+												 ,cleanAdd_a
+												 ,cleanAdd_a + hist_base);
 
-		// new_base_d := DISTRIBUTE(base_and_update, HASH(group_key));
+		new_base_d := DISTRIBUTE(base_and_update, HASH(group_key));
 
-		// new_base_s := SORT(new_base_d
-											// ,group_key
-											// ,dept_group_key
-											// ,prac_company_name
-											// ,addr_key
-											// ,Prepped_addr1
-											// ,Prepped_addr2
-											// ,pv_addr_ind
-											// ,phone1
-											// ,fax1
-											// ,dea_num
-											// ,dea_num_exp
-											// ,dea_bus_act_ind
-											// ,lic_num_in
-											// ,lic_state
-											// ,lic_num
-											// ,lic_type
-											// ,lic_status
-											// ,lic_begin_date
-											// ,lic_end_date
-											// ,lic_src_ind
-											// ,npi_num
-											// ,taxonomy
-											// ,type1
-											// ,classification
-											// ,specialization
-											// ,medicare_fac_num
-											// ,oig_flag
-											// ,sanc1_date
-											// ,sanc1_code
-											// ,clia_status_code
-											// ,clia_num
-											// ,clia_end_date
-											// ,clia_cert_type_code
-											// ,clia_cert_eff_date
-											// ,ncpdp_id
-											// ,tin1
-										// ,LOCAL);
+		new_base_s := SORT(new_base_d
+											,group_key
+											,dept_group_key
+											,prac_company_name
+											,addr_key
+											,Prepped_addr1
+											,Prepped_addr2
+											,pv_addr_ind
+											,phone1
+											,fax1
+											,dea_num
+											,dea_num_exp
+											,dea_bus_act_ind
+											,lic_num_in
+											,lic_state
+											,lic_num
+											,lic_type
+											,lic_status
+											,lic_begin_date
+											,lic_end_date
+											,lic_src_ind
+											,npi_num
+											,taxonomy
+											,type1
+											,classification
+											,specialization
+											,medicare_fac_num
+											,oig_flag
+											,sanc1_date
+											,sanc1_code
+											,clia_status_code
+											,clia_num
+											,clia_end_date
+											,clia_cert_type_code
+											,clia_cert_eff_date
+											,ncpdp_id
+											,tin1
+										,LOCAL);
 										
-		// Enclarity.Layouts.facility_base t_rollup (new_base_s L, new_base_s R) := TRANSFORM
-			// SELF.dt_vendor_first_reported 	:= ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			// SELF.dt_vendor_last_reported  	:= max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-			// SELF.clean_last_verify_date   := max	(L.clean_last_verify_date, R.clean_last_verify_date);
-			// SELF						 							:= IF(L.record_type = 'C', L, R);
-		// END;
+		Enclarity.Layouts.facility_base t_rollup (new_base_s L, new_base_s R) := TRANSFORM
+			SELF.dt_vendor_first_reported 	:= ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+			SELF.dt_vendor_last_reported  	:= max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.clean_last_verify_date   := max	(L.clean_last_verify_date, R.clean_last_verify_date);
+			SELF						 							:= IF(L.record_type = 'C', L, R);
+		END;
 
-		// base_f := ROLLUP(new_base_s
-											// ,   left.group_key=right.group_key
-											// AND left.dept_group_key=right.dept_group_key
-											// AND left.prac_company_name=right.prac_company_name
-											// AND left.addr_key=right.addr_key
-											// AND left.Prepped_addr1=right.Prepped_addr1
-											// AND left.Prepped_addr2=right.Prepped_addr2
-											// AND left.pv_addr_ind=right.pv_addr_ind
-											// AND left.phone1=right.phone1
-											// AND left.fax1=right.fax1
-											// AND left.dea_num=right.dea_num
-											// AND left.dea_num_exp=right.dea_num_exp
-											// AND left.dea_bus_act_ind=right.dea_bus_act_ind
-											// AND left.lic_num_in=right.lic_num_in
-											// AND left.lic_state=right.lic_state
-											// AND left.lic_num=right.lic_num
-											// AND left.lic_type=right.lic_type
-											// AND left.lic_status=right.lic_status
-											// AND left.lic_begin_date=right.lic_begin_date
-											// AND left.lic_end_date=right.lic_end_date
-											// AND left.lic_src_ind=right.lic_src_ind
-											// AND left.npi_num=right.npi_num
-											// AND left.taxonomy=right.taxonomy
-											// AND left.type1=right.type1
-											// AND left.classification=right.classification
-											// AND left.specialization=right.specialization
-											// AND left.medicare_fac_num=right.medicare_fac_num
-											// AND left.oig_flag=right.oig_flag
-											// AND left.sanc1_date=right.sanc1_date
-											// AND left.sanc1_code=right.sanc1_code
-											// AND left.medicare_fac_num=right.medicare_fac_num
-											// AND left.clia_status_code=right.clia_status_code
-											// AND left.clia_num=right.clia_num
-											// AND left.clia_end_date=right.clia_end_date
-											// AND left.clia_cert_type_code=right.clia_cert_type_code
-											// AND left.clia_cert_eff_date=right.clia_cert_eff_date
-											// AND left.ncpdp_id=right.ncpdp_id
-											// AND left.tin1=right.tin1
-										// ,t_rollup(LEFT,RIGHT),LOCAL);	
+		base_f := ROLLUP(new_base_s
+											,   left.group_key=right.group_key
+											AND left.dept_group_key=right.dept_group_key
+											AND left.prac_company_name=right.prac_company_name
+											AND left.addr_key=right.addr_key
+											AND left.Prepped_addr1=right.Prepped_addr1
+											AND left.Prepped_addr2=right.Prepped_addr2
+											AND left.pv_addr_ind=right.pv_addr_ind
+											AND left.phone1=right.phone1
+											AND left.fax1=right.fax1
+											AND left.dea_num=right.dea_num
+											AND left.dea_num_exp=right.dea_num_exp
+											AND left.dea_bus_act_ind=right.dea_bus_act_ind
+											AND left.lic_num_in=right.lic_num_in
+											AND left.lic_state=right.lic_state
+											AND left.lic_num=right.lic_num
+											AND left.lic_type=right.lic_type
+											AND left.lic_status=right.lic_status
+											AND left.lic_begin_date=right.lic_begin_date
+											AND left.lic_end_date=right.lic_end_date
+											AND left.lic_src_ind=right.lic_src_ind
+											AND left.npi_num=right.npi_num
+											AND left.taxonomy=right.taxonomy
+											AND left.type1=right.type1
+											AND left.classification=right.classification
+											AND left.specialization=right.specialization
+											AND left.medicare_fac_num=right.medicare_fac_num
+											AND left.oig_flag=right.oig_flag
+											AND left.sanc1_date=right.sanc1_date
+											AND left.sanc1_code=right.sanc1_code
+											AND left.medicare_fac_num=right.medicare_fac_num
+											AND left.clia_status_code=right.clia_status_code
+											AND left.clia_num=right.clia_num
+											AND left.clia_end_date=right.clia_end_date
+											AND left.clia_cert_type_code=right.clia_cert_type_code
+											AND left.clia_cert_eff_date=right.clia_cert_eff_date
+											AND left.ncpdp_id=right.ncpdp_id
+											AND left.tin1=right.tin1
+										,t_rollup(LEFT,RIGHT),LOCAL);	
 										
-		// Enclarity.Layouts.facility_base GetSourceRID(base_f L)	:= TRANSFORM
-			// SELF.record_type 					:= if((unsigned)l.dea_num_exp >0 and l.dea_num_exp  < (string8)Std.Date.Today()
-																			// and (unsigned)l.lic_end_date>0 and l.lic_end_date < (string8)Std.Date.Today()
-																				// ,'H'
-																				// ,l.record_type);
-			// SELF.source_rid 					:= HASH64(hashmd5(
-																	// trim(l.dept_group_key)
-																	// ,trim(l.prac_company_name)
-																	// ,trim(l.addr_key)
-																	// ,trim(l.Prepped_addr1)
-																	// ,trim(l.Prepped_addr2)
-																	// ,trim(l.pv_addr_ind)
-																	// ,trim(l.phone1)
-																	// ,trim(l.fax1)
-																	// ,trim(l.dea_num)
-																	// ,trim(l.dea_num_exp)
-																	// ,trim(l.dea_bus_act_ind)
-																	// ,trim(l.lic_num_in)
-																	// ,trim(l.lic_state)
-																	// ,trim(l.lic_num)
-																	// ,trim(l.lic_type)
-																	// ,trim(l.lic_status)
-																	// ,trim(l.lic_begin_date)
-																	// ,trim(l.lic_end_date)
-																	// ,trim(l.lic_src_ind)
-																	// ,trim(l.npi_num)
-																	// ,trim(l.taxonomy)
-																	// ,trim(l.type1)
-																	// ,trim(l.classification)
-																	// ,trim(l.specialization)
-																	// ,trim(l.medicare_fac_num)
-																	// ,trim(l.oig_flag)
-																	// ,trim(l.sanc1_date)
-																	// ,trim(l.sanc1_code)
-																	// ));
-			// SELF											:= L;
-		// END;
+		Enclarity.Layouts.facility_base GetSourceRID(base_f L)	:= TRANSFORM
+			SELF.record_type 					:= if((unsigned)l.dea_num_exp >0 and l.dea_num_exp  < (string8)Std.Date.Today()
+																			and (unsigned)l.lic_end_date>0 and l.lic_end_date < (string8)Std.Date.Today()
+																				,'H'
+																				,l.record_type);
+			SELF.source_rid 					:= HASH64(hashmd5(
+																	trim(l.dept_group_key)
+																	,trim(l.prac_company_name)
+																	,trim(l.addr_key)
+																	,trim(l.Prepped_addr1)
+																	,trim(l.Prepped_addr2)
+																	,trim(l.pv_addr_ind)
+																	,trim(l.phone1)
+																	,trim(l.fax1)
+																	,trim(l.dea_num)
+																	,trim(l.dea_num_exp)
+																	,trim(l.dea_bus_act_ind)
+																	,trim(l.lic_num_in)
+																	,trim(l.lic_state)
+																	,trim(l.lic_num)
+																	,trim(l.lic_type)
+																	,trim(l.lic_status)
+																	,trim(l.lic_begin_date)
+																	,trim(l.lic_end_date)
+																	,trim(l.lic_src_ind)
+																	,trim(l.npi_num)
+																	,trim(l.taxonomy)
+																	,trim(l.type1)
+																	,trim(l.classification)
+																	,trim(l.specialization)
+																	,trim(l.medicare_fac_num)
+																	,trim(l.oig_flag)
+																	,trim(l.sanc1_date)
+																	,trim(l.sanc1_code)
+																	));
+			SELF											:= L;
+		END;
 		
-		// d_rid	:= PROJECT(base_f, GetSourceRID(left));
+		d_rid	:= PROJECT(base_f, GetSourceRID(left));
 
-		// matchset 	:= ['A', 'P'];
-		// Business_Header_SS.MAC_Add_BDID_FLEX(
-			// d_rid
-			// ,matchset
-			// ,prac_company_name
-			// ,prim_range
-			// ,prim_name
-			// ,zip
-			// ,sec_range
-			// ,st
-			// ,clean_phone
-			// ,foo
-			// ,bdid
-			// ,Enclarity.layouts.facility_base
-			// ,TRUE
-			// ,bdid_score
-			// ,d_bdid
-			// ,
-			// ,
-			// ,
-			// ,BIPV2.xlink_version_set
-			// ,
-			// ,
-			// ,p_city_name
-			// ,
-			// ,
-			// ,
-			// ,
-			// ,src
-			// ,source_rid
-			// ,
-			// );
+		matchset 	:= ['A', 'P'];
+		Business_Header_SS.MAC_Add_BDID_FLEX(
+			d_rid
+			,matchset
+			,prac_company_name
+			,prim_range
+			,prim_name
+			,zip
+			,sec_range
+			,st
+			,clean_phone
+			,foo
+			,bdid
+			,Enclarity.layouts.facility_base
+			,TRUE
+			,bdid_score
+			,d_bdid
+			,
+			,
+			,
+			,BIPV2.xlink_version_set
+			,
+			,
+			,p_city_name
+			,
+			,
+			,
+			,
+			,src
+			,source_rid
+			,
+			);
 
-	// Health_Facility_Services.mac_get_best_lnpid_on_thor (
-					// d_bdid
-					// ,LNPID
-					// ,clean_company_name											
-					// ,prim_range
-					// ,PRIM_Name
-					// ,SEC_RANGE
-					// ,v_city_name
-					// ,ST
-					// ,ZIP
-					// ,//sanc_tin
-					// ,tin1
-					// ,phone1
-					// ,fax1
-					// ,//sanc_sancst
-					// ,//sanc_licnbr
-					// ,//Input_DEA_NUMBER
-					// ,group_key
-					// ,npi_num
-					// ,clia_num
-					// ,medicare_fac_num
-					// ,//Input_MEDICAID_NUMBER
-					// ,ncpdp_id
-					// ,taxonomy
-					// ,BDID
-					// ,//SRC
-					// ,//SOURCE_RID
-					// ,dLnpidOut
-					// ,false
-					// ,30
-					// );
+	Health_Facility_Services.mac_get_best_lnpid_on_thor (
+					d_bdid
+					,LNPID
+					,clean_company_name											
+					,prim_range
+					,PRIM_Name
+					,SEC_RANGE
+					,v_city_name
+					,ST
+					,ZIP
+					,//sanc_tin
+					,tin1
+					,phone1
+					,fax1
+					,//sanc_sancst
+					,//sanc_licnbr
+					,//Input_DEA_NUMBER
+					,group_key
+					,npi_num
+					,clia_num
+					,medicare_fac_num
+					,//Input_MEDICAID_NUMBER
+					,ncpdp_id
+					,taxonomy
+					,BDID
+					,//SRC
+					,//SOURCE_RID
+					,dLnpidOut
+					,false
+					,30
+					);
 
-		// with_lnpid:=dLnpidOut(lnpid>0);
-		// no_lnpid:=dLnpidOut(lnpid=0);
+		with_lnpid:=dLnpidOut(lnpid>0);
+		no_lnpid:=dLnpidOut(lnpid=0);
 
-		// Health_Provider_Services.mac_get_best_lnpid_on_thor (
-			// no_lnpid
-			// ,LNPID
-			// ,//FNAME
-			// ,//MNAME
-			// ,//LNAME
-			// ,//name_suffix
-			// ,//GENDER
-			// ,PRIM_Range
-			// ,PRIM_Name
-			// ,SEC_RANGE
-			// ,v_city_name
-			// ,ST
-			// ,ZIP
-			// ,//clean_SSN
-			// ,//clean_DOB
-			// ,clean_Phone
-			// ,LIC_STATE
-			// ,LIC_Num_in
-			// ,//TAX_ID
-			// ,DEA_NUM
-			// ,group_key
-			// ,NPI_NUM
-			// ,//UPIN
-			// ,//DID
-			// ,BDID
-			// ,//SRC
-			// ,//SOURCE_RID
-			// ,result,false,38
-			// );
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			no_lnpid
+			,LNPID
+			,//FNAME
+			,//MNAME
+			,//LNAME
+			,//name_suffix
+			,//GENDER
+			,PRIM_Range
+			,PRIM_Name
+			,SEC_RANGE
+			,v_city_name
+			,ST
+			,ZIP
+			,//clean_SSN
+			,//clean_DOB
+			,clean_Phone
+			,LIC_STATE
+			,LIC_Num_in
+			,//TAX_ID
+			,DEA_NUM
+			,group_key
+			,NPI_NUM
+			,//UPIN
+			,//DID
+			,BDID
+			,//SRC
+			,//SOURCE_RID
+			,result,false,38
+			);
 			
-		// RETURN result + with_lnpid;
-	// END;
+		RETURN result + with_lnpid;
+	END;
 	
 	EXPORT Individual_Base := FUNCTION
 		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).individual_base.built, Enclarity.layouts.individual_base);
@@ -1941,8 +1941,7 @@ end;
 			,result,false,38
 			);
 
-		// sort_result := sort(distribute(result, hash(group_key, lic_state, lic_num_in, lic_num)), group_key, lic_state, lic_num_in, lic_num, local);
-		sort_result := sort(distribute(d_dob, hash(group_key, lic_state, lic_num_in, lic_num)), group_key, lic_state, lic_num_in, lic_num, local);
+		sort_result := sort(distribute(result, hash(group_key, lic_state, lic_num_in, lic_num)), group_key, lic_state, lic_num_in, lic_num, local);
 		
 		exception_lu	  := sort(Enclarity.files().exceptions.qa, group_key, lic_state, lic_num_in, lic_num, local);
 		
@@ -1959,70 +1958,7 @@ end;
 		keep_out := dedup_get_exceptions(record_type = 'D'):persist('~thor_data400::persist::enclarity::license_excluded');
 		RETURN dedup_get_exceptions(record_type <> 'D');
 	END;
-	
-	// EXPORT Modified_License_Base	:= FUNCTION
-		// orig_lic_base		:= Enclarity.Files(filedate,pUseProd).license_base.built(record_type <> 'D');
-		// mo_only					:= orig_lic_base(lic_state = 'MO');
-		// no_mo_lic				:= orig_lic_base(lic_state <> 'MO');
-		// npi_base				:= Enclarity.Files(filedate,pUseProd).npi_base.built;
 		
-		// lic_base_w_tax	:= record
-			// Enclarity.Layouts.license_base;
-			// Enclarity.Layouts.npi_base.npi_num;
-			// Enclarity.Layouts.npi_base.taxonomy;
-		// end;
-		
-		// joined_npi	:= join(sort(distribute(mo_only, hash(group_key)), group_key, local),
-												// sort(distribute(npi_base, hash(group_key)), group_key, local),
-													// left.group_key = right.group_key,
-													// transform({lic_base_w_tax},
-														// self.npi_num	:= right.npi_num,
-														// self.taxonomy	:= trim(right.taxonomy,all),
-														// self					:= left),
-													// left outer, local);
-	
-		// mo_apn			:= joined_npi(taxonomy[1..4] = '363L' or taxonomy[1..4] = '364S' or taxonomy[1..3] = '367')
-										// :persist('~thor_data400::base::enclarity::modified_license_w_taxonomy');
-		
-		// non_mo_apn	:= joined_npi(taxonomy[1..4] <> '363L' and taxonomy[1..4] <> '364S' and taxonomy[1..3] <> '367')
-										// :persist('~thor_data400::base::enclarity::modified_license_w_taxonomy_non_apn');;
-		
-		// clear_exp_stat	:= project(mo_apn, 
-																// transform(enclarity.Layouts.license_base,
-																	// old_rec									:= if(left.dt_vendor_last_reported < (unsigned4)filedate, true, false);
-																	// self.lic_end_date				:= if(old_rec,'00000000',left.lic_end_date),
-																	// self.lic_status					:= if(old_rec,'',left.lic_status),
-																	// self.clean_lic_end_date	:= if(old_rec,'00000000',left.clean_lic_end_date),
-																	// self										:= left));
-																	
-		// sort_clear_exp_stat	:= sort(distribute(clear_exp_stat, hash(group_key, lic_state, lic_num, lic_begin_date)),
-															// group_key, lic_state, lic_num, lic_begin_date, local);
-
-		// Enclarity.Layouts.license_base t_rollup(sort_clear_exp_stat L, sort_clear_exp_stat R) := TRANSFORM
-			// SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			// SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-			// SELF						 							:= IF(L.lic_end_date = '00000000', L, R);
-		// END;
-
-		// roll_mo_lic := ROLLUP(sort_clear_exp_stat,					
-										// LEFT.group_key 			= RIGHT.group_key 			AND 
-										// LEFT.lic_state 			= RIGHT.lic_state				AND				
-										// LEFT.lic_num				= RIGHT.lic_num					AND						
-										LEFT.lic_end_date		= RIGHT.lic_end_date	 	AND	 // don't match end date
-										LEFT.lic_status			= RIGHT.lic_status		  AND
-										// LEFT.lic_begin_date = RIGHT.lic_begin_date	AND
-										// LEFT.record_type		= RIGHT.record_type,
-										// t_rollup(LEFT,RIGHT),LOCAL);
-									
-		// recombined_provs	:= no_mo_lic + project(non_mo_apn, enclarity.Layouts.license_base) + roll_mo_lic;
-		
-		// dedup_recombined_provs	:= dedup(sort(distribute(recombined_provs, hash(group_key, lic_state, lic_num, lic_end_date, lic_status)),
-																	// group_key, lic_state, lic_num, lic_end_date, lic_status, local), record, local):
-										// persist('~thor_data400::base::enclarity::modified_license_persist_for_keys::' + filedate);
-										
-		// RETURN dedup_recombined_provs;
-	// END;
-	
 	EXPORT Taxonomy_Base := FUNCTION
 		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).taxonomy_base.built, Enclarity.layouts.taxonomy_base);
 		
