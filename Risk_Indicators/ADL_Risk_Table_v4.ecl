@@ -22,7 +22,9 @@ base_hf_uncorrected := IF(isFCRA, hf(~fcra.Restricted_Header_Src(src, vendor_id[
  ****************************************************** */
 base_hf_corrected := Risk_Indicators.Header_Corrections_Function(base_hf_uncorrected);
 
-base_hf := IF(isFCRA, base_hf_corrected, base_hf_uncorrected);
+base_hf_before_suppress := IF(isFCRA, base_hf_corrected, base_hf_uncorrected);
+
+base_hf := fn_suppress_ccpa(base_hf_before_suppress, TRUE, 'RiskTable', 'src', 'global_sid', TRUE); // CCPA-795: OptOut Prefilter Data Layer
 
 /* ****************************************************
  * Corrections have been applied - Continue as normal *
@@ -157,8 +159,9 @@ full_adl_risk_wCat := JOIN(DISTRIBUTE(with_college_history_flag, HASH(did)),
 													 DISTRIBUTE(adl_category(did<>0), HASH(did)), 
 													 LEFT.did=RIGHT.did, 
 													 addCategory(left,right), LEFT OUTER, KEEP(1), LOCAL) : PERSIST (persist_name);									
+
+addGlobalSID := mdr.macGetGlobalSID(full_adl_risk_wCat,'RiskTable_Virtual','','global_sid'); //DF-26530: Populate Global_SID Field
 	
-	
-RETURN full_adl_risk_wCat;
+RETURN addGlobalSID;
 
 END;
