@@ -2,7 +2,8 @@
 // p_vertical: 'P' = Public Records, 'I' = Insurance, 'H' = Health care
 EXPORT TrackBuild(string p_vertical = 'P'
 									,string p_location = dops.constants.location
-									,string p_dopsenv = 'dev') := module
+									,string p_dopsenv = 'dev'
+									,string p_wuid = '') := module
 
 	////////////////////////////////////////////////////
 	// DECLRATIONS & DEFINITIONS
@@ -16,7 +17,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 																,'KEY BUILD:FCRA'
 																,'KEY BUILD:BOOLEAN'];
 	export vThresholdInSecs := 18000; // 5 hours (60 (secs) * 60 (mins) * 5)
-	export vdopsurlprefix := 'http://uspr-dops.risk.regn.net/';
+	export vdopsurlprefix := 'http://uspr-buildtracking.risk.regn.net/';
 	export FileTrackBuildPrefix := '~dops::trackbuild::';
 	
 	export applicationname := 'DOPS_'; // '_' is important to separate application with sequence
@@ -39,6 +40,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 	export LF_PrepforTracking(string FilePrefix) := FilePrefix + '::prepfortracking';
 	export LF_EmailNotify(string FilePrefix) := FilePrefix + '::emailnotify';
 	export LF_EmailResultstore(string FilePrefix) := FilePrefix + '::storeemailresult';
+	export LF_PrepforTrackingResult(string FilePrefix) := FilePrefix + '::prepfortrackingresult';
 	export LF_Errors(string FilePrefix) := FilePrefix + '::errors';
 	
 	export rTrackBuild := record
@@ -55,6 +57,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 		string emailid := '';
 		string thresholdinsecs := '';
 		string reason := '';
+		string wuerrors := '';
 	end;
 	
 	export rAppInfo := record
@@ -208,7 +211,9 @@ EXPORT TrackBuild(string p_vertical = 'P'
 	// rTrackBuild layout
 	////////////////////////////////////////////////////
 	export fConvertWUInfo() := function
-		dWUListWithAppInfo := STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*');
+		dWUListWithAppInfo := if (p_wuid <> ''
+															,STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*')(wuid = p_wuid)
+															,STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*'));
 		
 		rChildRecord := record
 			string wuid;
@@ -271,15 +276,22 @@ EXPORT TrackBuild(string p_vertical = 'P'
 	////////////////////////////////////////////////////
 	// Function to capture status and timestamp for each WU
 	////////////////////////////////////////////////////
-	export fGetWUStatus(string TrackBuildFile = SP_FileTrackBuild(FileInfoPrefix)) := function
+	export fGetWUStatus(string TrackBuildFile = SP_FileTrackBuild(FileInfoPrefix)
+											,string p_esp = localesp
+											,string p_port = '8010'
+											) := function
 			dInfo := sort(dGetInfo(TrackBuildFile),wuid);
 			
 			rTrackBuild xGetWUStatus(dInfo l) := transform
-				dWUInfo := STD.system.Workunit.WorkunitList(lowwuid := l.wuid, highwuid := l.wuid);
+				wuidtofilter := if (p_wuid <> '', p_wuid, l.wuid);
+				dWUInfo := STD.system.Workunit.WorkunitList(lowwuid := wuidtofilter, highwuid := wuidtofilter);
 				dWUTimeStamps := sort(STD.system.Workunit.WorkunitTimeStamps(l.wuid),-time);
 				vdate := l.datetime[1..8];
 				vtime := l.datetime[9..];
 				jobstate := STD.str.ToUpperCase(trim(dWUInfo[1].state,left,right));
+				self.wuerrors := if (jobstate in  ['ABORTED','FAILED']
+														,dops.WorkUnitModule(p_esp,p_port).GetWUErrors(l.wuid,true)[1].Message
+														,'');
 				self.jobstatus := jobstate;
 				self.created := regexreplace('[-:TZ]',SORT(dWUTimeStamps(STD.Str.ToUpperCase(id) in ['CREATED','QUERYSTARTED']),time)[1].time,'',nocase);
 				self.modified := regexreplace('[-:TZ]',dWUTimeStamps[1].time,'',nocase);
@@ -315,7 +327,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 			string emailid {xpath('emailid')};
 			string thresholdinsecs {xpath('thresholdinsecs')};
 			string reason {xpath('reason')};
-			
+			string wuerrors {xpath('wuerrors')};
 		end;
 	
 		rBTList := record, maxlength(50000)
@@ -323,7 +335,21 @@ EXPORT TrackBuild(string p_vertical = 'P'
 		end;
 		
 		rBTList xBTList(dDetails L) := transform
-			self.BTList   := DATASET([{ trim(l.datasetname,left,right), trim(l.buildversion,left,right), trim(l.componentname,left,right), trim(l.wuid,left,right), trim(l.datetime,left,right), trim(l.vertical,left,right), trim(l.location,left,right), trim(l.created,left,right), trim(l.modified,left,right), trim(l.jobstatus,left,right), trim(l.emailid,left,right), trim(l.thresholdinsecs,left,right), trim(l.reason,left,right)}], rBTInfoXML);
+			self.BTList   := DATASET([{ trim(l.datasetname,left,right)
+													,trim(l.buildversion,left,right)
+													, trim(l.componentname,left,right)
+													, trim(l.wuid,left,right)
+													, trim(l.datetime,left,right)
+													, trim(l.vertical,left,right)
+													, trim(l.location,left,right)
+													, trim(l.created,left,right)
+													, trim(l.modified,left,right)
+													, trim(l.jobstatus,left,right)
+													, trim(l.emailid,left,right)
+													, trim(l.thresholdinsecs,left,right)
+													, trim(l.reason,left,right)
+													, trim(l.wuerrors,left,right)}]
+													, rBTInfoXML);
 			self := L;
 		end;
 
@@ -392,7 +418,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 															,if (count(dDopsBTUpdate(trim(datasetname,left,right) = 'ERROR')) = 0
 																		,sequential
 																		(
-																			output(dDopsBTUpdate)
+																			output(dDopsBTUpdate,,LF_PrepforTrackingResult(FlagPrefix),overwrite)
 																			,STD.File.StartSuperFileTransaction()
 																			// from backup to delete
 																			,STD.File.AddSuperFile(
@@ -446,7 +472,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 	////////////////////////////////////////////////////
 	export fTrackAndEmail() := function
 	
-		dGetRecordsFromDB := sort(DB_BTInfo(dataset([{'', '', '', '', '', '', '', '', '', '', '', '',''}],rTrackBuild),true),datasetname, buildversion, componentname, datetime)(~(datasetname in vsIgnoreDataset and componentname in vsIgnoreComponent)) : independent;
+		dGetRecordsFromDB := sort(DB_BTInfo(dataset([{'', '', '', '', '', '', '', '', '', '', '', '','',''}],rTrackBuild),true),datasetname, buildversion, componentname, datetime)(~(datasetname in vsIgnoreDataset and componentname in vsIgnoreComponent)) : independent;
 	
 		rGetTimeDiff := record
 			rTrackBuild;

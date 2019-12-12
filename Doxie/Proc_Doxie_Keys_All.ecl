@@ -17,7 +17,6 @@ export proc_doxie_keys_all(boolean pFastHeader=false, string emailListBuilders) 
  g := Watchdog.DID_Gong;
  fhb := doxie_build.Proc_file_header_building;
  i := doxie.proc_Header_keys_dx(filedate,pFastHeader);
- v := doxie.proc_relatives_keys(filedate);
  w := doxie.proc_troy_keys(filedate);
  s := Header_SlimSort.Proc_BuildKeys(filedate);
  r := doxie.proc_create_header_relationships(filedate);
@@ -25,5 +24,5 @@ export proc_doxie_keys_all(boolean pFastHeader=false, string emailListBuilders) 
  o := address_file.proc_build(filedate);
  wa_phone := Header.proc_build_header_wa ; 
  
- return sequential(clr_super,chk_build,g,fhb,i,v,w,s,r,n,o,Promotesupers.SF_MaintBuilt('~thor_data400::Base::HeaderKey'),wa_phone);
+ return sequential(clr_super,chk_build,g,fhb,i,w,s,r,n,o,Promotesupers.SF_MaintBuilt('~thor_data400::Base::HeaderKey'),wa_phone);
 end;
