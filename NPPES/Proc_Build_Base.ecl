@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-﻿#stored('did_add_force','thor');
-=======
-﻿/*2019-08-17T22:07:47Z (Hennigar, Jennifer (RIS-BCT))
+/*2019-08-17T22:07:47Z (Hennigar, Jennifer (RIS-BCT))
 CCPA-256
 */
 
@@ -10,7 +7,6 @@ ROOLLUP EXCEPT FIX (ADDED global_sid,record_sid,source_rec_id to the ROOLLUP EXC
 */
 
 #stored('did_add_force','thor');
->>>>>>> 27485d8aa11601abb653dc7b0795ddb0d7e79544
 import address, 
 	   business_header_ss, 
 	   business_header, 
