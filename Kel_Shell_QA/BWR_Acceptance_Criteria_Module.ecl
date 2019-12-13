@@ -12,7 +12,7 @@ sample_size:=0;
 
 //***************************************************************************************************************************
 
-input_file:=dataset(logical_file_name,Base_Lay,CSV(HEADING(single), QUOTE('"')));
+input_file:=dataset(logical_file_name,Base_Lay,CSV(HEADING(6), QUOTE('"')));
 
 inut_file_records:= if(sample_size=0, choosen(input_file,all),choosen(input_file,sample_size) );
 
@@ -35,7 +35,8 @@ parallel(Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, fi
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Asset Attributes'),
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Derog - Bankruptcy History'),
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Secretary of State'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Best BII')
+				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Best BII'),
+				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Uniform Commercial Code')
 				 );
 
 

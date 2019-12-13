@@ -198,4 +198,8 @@ EXPORT Automated_Rules_File :=  Rules_Generation('Person','Best PII') +
 																// Rules_Generation('Business','Business LexID') +
 																Rules_Generation('Business','Business Input Validation') +
 																Rules_Generation('Person','Validation') +
-																Rules_Generation('Business','Business Derog - Bankruptcy History') ;
+																Rules_Generation('Business','Business Derog - Bankruptcy History') +
+																
+																Rules_Generation('Business','Secretary of State') +
+																// Rules_Generation('Business','Best BII') +
+																Rules_Generation('Business','Business Uniform Commercial Code') ;
