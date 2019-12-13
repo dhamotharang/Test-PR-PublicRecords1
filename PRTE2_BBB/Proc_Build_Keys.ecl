@@ -7,11 +7,11 @@ export Proc_Build_Keys(string filedate) := FUNCTION
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(Keys.Key_BBB_Member_BDID,
 	Constants.Key_BBB_Member_BDID_Gen_Name,
 	Constants.KEY_PREFIX + filedate + Constants.Memeber_Bdid_suffix, member_bdid_key);
-	
+		
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(Keys.Key_BBB_Non_Member_BDID,
 	Constants.Key_BBB_Non_Member_BDID_Gen_Name,
 	Constants.KEY_PREFIX + filedate + Constants.Nonmember_Bdid_suffix, nonmember_bdid_key);	
-		
+	
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(Keys.Key_BBB_Member_LinkIds,
 	Constants.Key_BBB_Member_LinkIds_Gen_Name,
 	Constants.KEY_PREFIX + filedate + Constants.Member_Linkids_Suffix, member_linkid_key);
@@ -73,7 +73,7 @@ export Proc_Build_Keys(string filedate) := FUNCTION
 		l_inloc := 'B', // B = Boca, A = Alpharetta
 		l_inenvment := 'N', // N = Non-FCRA, F = FCRA
 		l_includeboolean := 'N'); // N
-	updateorbit					:= Orbit3.proc_Orbit3_CreateBuild('PRTE - BBB', filedate, 'N', true, true, false, _control.MyInfo.EmailAddressNormal);
+	updateorbit					:= Orbit3.proc_Orbit3_CreateBuild('PRTE-BBB', filedate, 'N', true, true, false, _control.MyInfo.EmailAddressNormal);
 
 	
 	RETURN SEQUENTIAL(
