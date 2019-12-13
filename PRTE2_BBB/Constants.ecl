@@ -22,7 +22,7 @@ EXPORT Constants := MODULE
 		EXPORT Key_BBB_Non_Member_LinkIds_Name 	:= Key_Prefix+doxie.Version_SuperKey+Nonmember_Linkids_Suffix;
 		EXPORT Key_BBB_Member_BDID_Name 				:= Key_Prefix+doxie.Version_SuperKey+Memeber_Bdid_suffix;
 		EXPORT Key_BBB_Non_Member_BDID_Name 		:= Key_Prefix+doxie.Version_SuperKey+Nonmember_Bdid_suffix;
-		
+
 		//Key Names Generationsal
 		EXPORT Key_BBB_Member_LinkIds_Gen_Name 			:= '~prte::key::bbb_linkids_@version@';
 		EXPORT Key_BBB_Non_Member_LinkIds_Gen_Name 	:= '~prte::key::bbb_non_member_linkids_@version@';
