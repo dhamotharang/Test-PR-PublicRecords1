@@ -9,6 +9,13 @@ module
 																							 ,dx_Database_USA.Names(pversion,false).LinkIds.New
 																							 ,BuildLinkIdsKey);  
 																							 
+ 		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_Database_USA.Key_did
+																							 ,Database_USA.Files().Base.Built
+																							 ,dx_Database_USA.Names().did.QA
+																							 ,dx_Database_USA.Names(pversion,false).did.New
+																							 ,BuildDidKey);  				 
+																			
+																							 
 		 //DOPSGrowthCheck 
 		 GetDops:=dops.GetDeployedDatasets('P','B','N');
 	 	 OnlyDatabase_USA:=GetDops(datasetname='DatabaseUSAKeys');
@@ -28,7 +35,8 @@ module
 	
 	sequential(
 	    BuildLinkIdsKey
-		 ,Promote(pversion).BuildFiles.New2Built
+			,BuildDidKey
+			,Promote(pversion).BuildFiles.New2Built
   	 //,DeltaCommands  //Commented out because it accesses DOPs but the Database_USAKey package is not in DOPs yet.
 	);
 		
