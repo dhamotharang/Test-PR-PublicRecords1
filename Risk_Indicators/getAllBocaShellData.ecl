@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview, Business_Risk_BIP, BIPV2, MDR, ADVO, risk_indicators;
+﻿IMPORT _Control, Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview, Business_Risk_BIP, BIPV2, MDR, ADVO, risk_indicators, STD;
 onThor := _Control.Environment.OnThor;
 
 EXPORT getAllBocaShellData (
@@ -101,7 +101,7 @@ EXPORT getAllBocaShellData (
 	ids_only_derogs := project(pre_ids_only,
 						transform(risk_indicators.layouts.layout_derogs_input,
 						self.insurance_bk_filter := insuranceMode and
-								(left.shell_input.st='AZ' or stringlib.stringtouppercase(left.shell_input.in_state)='AZ');
+								(left.shell_input.st='AZ' or STD.str.touppercase(left.shell_input.in_state)='AZ');
 						self := left));
 
 	// try to get multiple records per did to pass into derogs
@@ -110,7 +110,7 @@ EXPORT getAllBocaShellData (
 													le.iid.did2,
 													le.iid.did3);
 		self.insurance_bk_filter := insuranceMode and
-								(le.shell_input.st='AZ' or stringlib.stringtouppercase(le.shell_input.in_state)='AZ');
+								(le.shell_input.st='AZ' or STD.str.touppercase(le.shell_input.in_state)='AZ');
 		self := le;
 	end;
 	p_did := NORMALIZE(pre_ids_only(~isrelat),3,get_dids (LEFT,COUNTER))(did<>0);
@@ -652,7 +652,8 @@ withSSNFlags := Risk_Indicators.iid_getSSNFlags(ssnFlagsPrep, dppa, glb, isFCRA,
 
 //todo withSSNFlags need again for relatives
 risk_indicators.layout_bocashell_neutral add_ssnFlags(	withSSNFlags le, pre_ids_only ri) := TRANSFORM
-  self.AMLParentNonUsSSN := if(Risk_Indicators.rcSet.isCode85(le.ssn, le.socllowissue) and stringlib.stringtolowercase(ri.relation) in ['father','mother'], 1, 0);
+  // self.AMLParentNonUsSSN := if(Risk_Indicators.rcSet.isCode85(le.ssn, le.socllowissue) and STD.str.tolowercase(ri.relation) in ['father','mother'], 1, 0);
+  self.AMLParentNonUsSSN := if(Risk_Indicators.rcSet.isCode85(le.ssn, le.socllowissue) and STD.str.tolowercase(ri.relation) in ['father','mother'], 1, 0);
 	self.AMLSocsRCISflag := le.socsRCISflag;
 	self.AMLSocllowissue := le.socllowissue;
 	self.AMLsocsvalflag  := le.socsvalflag;
@@ -1469,6 +1470,7 @@ with_inquiries_roxie := JOIN(with_employment, inquiries_rolled,
 									transform(risk_indicators.Layout_Boca_Shell,
 														self.acc_logs := right.acc_logs;
 														self.virtual_fraud := right.virtual_fraud;
+														self.attended_college := right.attended_college;
 														self := left),
 									LEFT OUTER, LOOKUP, PARALLEL);
 with_inquiries_thor := GROUP(JOIN(DISTRIBUTE(with_employment, HASH64(seq)),
@@ -1477,6 +1479,7 @@ with_inquiries_thor := GROUP(JOIN(DISTRIBUTE(with_employment, HASH64(seq)),
 									transform(risk_indicators.Layout_Boca_Shell,
 														self.acc_logs := right.acc_logs;
 														self.virtual_fraud := right.virtual_fraud;
+														self.attended_college := right.attended_college;
 														self := left),
 									LEFT OUTER, LOCAL, PARALLEL), seq);
 
@@ -1825,7 +1828,7 @@ AllowedSourcesSet :=
 				Business_Risk_BIP.Constants.AllowedSources(
 						(
 							Source <> MDR.SourceTools.src_Dunn_Bradstreet OR
-							StringLib.StringFind(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0
+							STD.str.Find(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0
 						) AND
 						(
 							Options.MarketingMode = Business_Risk_BIP.Constants.Default_MarketingMode OR
