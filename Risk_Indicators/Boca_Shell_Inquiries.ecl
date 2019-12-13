@@ -16,6 +16,10 @@ export Boca_Shell_Inquiries(
 isCollectionRetro :=  (BSOptions & risk_indicators.iid_constants.BSOptions.Collections_Neutral_Service) > 0;
 FDN_ok := Risk_Indicators.iid_constants.FDNcftf_ok(DataPermission); //per FP3 CR#8, use DPM instead of DRM to determine permission to virtual fraud
 
+turnOffTumblings := (BSOptions & risk_indicators.iid_constants.BSOptions.TurnOffTumblings) > 0;
+// default behavior for shell 5.3 and higher is to include the tumblings code.  if the query doesn't need it, turn it off 
+includeTumblings := bsversion >= 53 and ~TurnOffTumblings;
+
 high_risk_fraud_cutoff := 575;  // b)	High Risk = 575 and below
 low_risk_fraud_cutoff := 725;  // a)	Low Risk = 725 and above 
 cap125(unsigned cnt) := min(cnt, 125);
@@ -83,7 +87,8 @@ layout_temp := record
 	boolean good_inquiry;
 	boolean good_cbd_inquiry;
 	risk_indicators.layouts.layout_virtual_fraud Virtual_Fraud;
-
+	
+	boolean attended_college := false; // calculate the inquiries piece of this in here instead of searching inquiries again in Risk_Indicators.Boca_Shell_College_Attendance
 end;
 
 layout_temp_ccpa := RECORD
@@ -632,6 +637,9 @@ layout_temp_ccpa trans_name(risk_indicators.layout_bocashell_neutral le, key_did
 	self.Inq_BillGroup_count24 := 0;
 
 	self.historyDateTimeStamp := le.historyDateTimeStamp;
+	
+	self.attended_college := industry in Inquiry_AccLogs.shell_constants.StudentLoans_industry;  // used in college_attendance variable later
+	
 	self := [];
 	
 end;
@@ -1246,6 +1254,8 @@ layout_temp roll( layout_temp le, layout_temp rt ) := TRANSFORM
 	self.virtual_fraud.LexID_ssn_hi_risk_ct := cap125(le.virtual_fraud.LexID_ssn_hi_risk_ct + rt.virtual_fraud.LexID_ssn_hi_risk_ct);	
 	self.virtual_fraud.LexID_ssn_lo_risk_ct := cap125(le.virtual_fraud.LexID_ssn_lo_risk_ct + rt.virtual_fraud.LexID_ssn_lo_risk_ct);
 
+	self.attended_college := le.attended_college or rt.attended_college;
+	
 	self := rt;
 end;
 	
@@ -1760,7 +1770,7 @@ with_DOBsperadl_1dig := join(with_primrangesperadl_1dig, rolledDOBsperadl_1dig, 
 											self := left), left outer);
 
 // for BS 5.3 and higher, take the file that has all the new fields that were appended in 5.3.											
-with_all_per_adl := if(BSversion >= 53, with_DOBsperadl_1dig, with_Emails_per_adl);
+with_all_per_adl := if(includeTumblings, with_DOBsperadl_1dig, with_Emails_per_adl);
 
 // -----------------------------------------------------
 // start of the SSN velocity counter section
@@ -2200,7 +2210,7 @@ with_DOBsperssn_1dig := join(with_primrangesperssn_1dig, rolledDOBsperSSN_1dig, 
 																																																																	 right.subsCount);
 											self := left), left outer);
 											
-with_all_per_ssn := if(BSversion >= 53, with_DOBsperssn_1dig, with_ssn_velocity);
+with_all_per_ssn := if(includeTumblings, with_DOBsperssn_1dig, with_ssn_velocity);
 
 // -----------------------------------------------------
 // start of the Address velocity counter section
@@ -2581,7 +2591,7 @@ with_SSNsFromAddr_1dig := join(with_address_velocities, rolledSSNsFromAddr_1dig,
 																																																														 right.subsCount);
 											self := left), left outer);
 
-with_all_per_addr := if(BSversion >= 53, with_SSNsFromAddr_1dig, with_address_velocities);
+with_all_per_addr := if(includeTumblings, with_SSNsFromAddr_1dig, with_address_velocities);
 
 // -----------------------------------------------------
 // start of the Phone velocity counter section
@@ -2915,13 +2925,13 @@ with_email_velocities := rollup( grouped_Email_raw, roll_Email(left,right), true
 
 // email velocity is nonfcra only and only shell 5.0 and higher
 with_all_velocities := if(bsversion>=50, with_email_velocities, with_phone_velocities);
-                                                  
+                                                  			
 with_inquiries := group(join(clam_pre_Inquiries, with_all_velocities, left.seq=right.seq,
 													transform(risk_indicators.layout_boca_shell,
 													self.acc_logs := right,
 													self.virtual_fraud := right.virtual_fraud,
-													self := left)), seq);				
-
+													self.attended_college := right.attended_college;
+													self := left)), seq);		
 
 // append the pre-calculated billgroup counts
 billgroup_key := Inquiry_AccLogs.Key_Inquiry_Billgroups_DID;
