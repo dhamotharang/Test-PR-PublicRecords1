@@ -211,7 +211,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
  unsigned8 BSOptions := if(PhoneShellVersion >= 20,
                            risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary
                          + risk_indicators.iid_constants.BSOptions.IncludeDoNotMail
-                         + risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
+                         + risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity
+                         + risk_indicators.iid_constants.BSOptions.TurnOffTumblings,
                            0);
  // If Phone Shell version 2.0+, then turn on runDLVerification for the InstantID_Function.
  // Else use the default (false)
