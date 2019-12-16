@@ -14,7 +14,9 @@ EXPORT Proc_Build_Base_OptOut(STRING pVersion) := FUNCTION
 		// Minor file from header build
 		$.Layout_OptOut_Base tInputM(InsuranceHeader_Incremental.Layout_Minors L) := TRANSFORM
 			SELF.src						:= 'M';			//record from minor file
-			SELF.date_added					:= L.Date;																		
+			SELF.date_added					:= L.Date;
+			SELF.domain_id					:= $.Constants.Exemptions().Domain_Id_PR;
+			SELF.state_act					:= L.state;																		
 			SELF							:= L;
 			SELF							:= [];
 		END;
