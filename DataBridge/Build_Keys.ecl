@@ -9,6 +9,11 @@ module
 																							 ,dx_DataBridge.Names(pversion,false).LinkIds.New
 																							 ,BuildLinkIdsKey);  
 																							 
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_DataBridge.Key_DID
+																							 ,DataBridge.Files().Base.Built
+																							 ,dx_DataBridge.Names().DID.QA
+																							 ,dx_DataBridge.Names(pversion,false).DID.New
+																							 ,BuildDIDKey);
 		 //DOPSGrowthCheck Tools
 		 GetDops         := dops.GetDeployedDatasets('P','B','N');
 	 	 OnlyDataBridge  := GetDops(datasetname='DataBridgeKeys');
@@ -89,6 +94,7 @@ module
 	
 	sequential(
 	    BuildLinkIdsKey
+		 ,BuildDIDKey
 		 ,Promote(pversion).BuildFiles.New2Built
   	 ,DeltaCommands  
 	);
