@@ -88,21 +88,11 @@ EXPORT Proc_Build_Base_Global_Sid(STRING pVersion) := FUNCTION
 
 	RETURN SEQUENTIAL(
 					// Build Exemptions base file
-					output(ds_exemptions_pr,named('ds_exemptions_pr'));
-					output(ds_exemptions_hc,named('ds_exemptions_hc'));
-					output(ds_exemptions_ins,named('ds_exemptions_ins'));
-					output(ds_exemptions_pr_domain_id,named('ds_exemptions_pr_domain_id'));
-					output(ds_exemptions_hc_domain_id,named('ds_exemptions_hc_domain_id'));
-					output(ds_exemptions_ins_domain_id,named('ds_exemptions_ins_domain_id'));
-					output(ds_exemptions_new,named('ds_exemptions_new'));
-					output(dNewBase_Exemptions_0,named('dNewBase_Exemptions_0'));
 					build_base_exemptions;
 					doStats_Exemptions;
 					vStats_Exemptions;
 					stdStats_Exemptions;
 					//Build Global SID set base file
-					output('build global sid set file');
-					output(ds_global_sid_new,named('ds_global_sid_new'));
 					build_base_global_sid;
 					doStats_Global_Sid;
 					vStats_Global_Sid;
