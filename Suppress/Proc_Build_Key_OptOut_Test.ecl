@@ -2,10 +2,10 @@
 IMPORT RoxieKeyBuild, dops;
 export Proc_Build_Key_OptOut_Test(String pVersion) := FUNCTION
 
-    filedate := TRIM(pVersion+'t');
+    filedate := TRIM(pVersion);
 	spray_opt_out_input_file	:= Suppress.fSprayFiles.OptOutSrc(filedate,
                                                                  ,pDirectory:='/data/hds_2/test/'
-                                                                 ,pFilename:=TRIM('ccpalogs_cdtool_'+filedate+'*.csv',ALL)
+                                                                 ,pFilename:=TRIM('latest.csv',ALL)
                                                                  );
 																	
  
