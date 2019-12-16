@@ -17,7 +17,7 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor::key::new_suppression::fcra::@versi
 RoxieKeyBuild.Mac_SK_Move_V2('~thor::key::new_suppression::@version@::opt_out','Q',mv_qa_optout);
 RoxieKeyBuild.Mac_SK_Move_V2('~thor::key::new_suppression::fcra::@version@::opt_out','Q',mv_qa_optout_fcra);
 
-update_dops 	    := dops.updateversion('SuppressionOptOutKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N|F|B');
+update_dops 	    := dops.updateversion('SuppressionOptOutKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N|B');
 update_dops_fcra    := dops.updateversion('FCRA_SuppressionOptOutKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'F');
 update_idops 		:= dops.updateversion('SuppressionOptOutKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N',,,'A');
 
@@ -27,7 +27,8 @@ create_build        := Orbit3.proc_Orbit3_CreateBuild('Suppression Opt Out',pVer
 RETURN Sequential(  parallel(bld_optout_key,bld_optout_key_fcra),
 				    parallel(mv_built_optout, mv_built_optout_fcra),
 				    parallel(mv_qa_optout, mv_qa_optout_fcra),
-					// parallel(update_dops, update_dops_fcra),
+					parallel(update_dops, update_dops_fcra),
+					// parallel(update_dops, update_dops_fcra,update_idops),
 					// if( ut.Weekday((integer)pVersion[1..8]) <> 'SATURDAY' and ut.Weekday((integer)pVersion[1..8]) <> 'SUNDAY',
 					//     create_build,//    update_idops,Suppress.Proc_OrbitI_CreateBuild(pVersion,'nonfcra')*/
 					// 	output('No Orbit Entries Needed for weekend builds'))
