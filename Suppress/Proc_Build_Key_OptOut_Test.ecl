@@ -25,7 +25,7 @@ export Proc_Build_Key_OptOut_Test(String pVersion) := FUNCTION
     RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(key,'','~thor::key::new_suppression::'+filedate+'::opt_out',bld_optout_key,true);
 
     //Update DOPS
-    update_dops := dops.updateversion('SuppressionOptOutKeys',filedate,'christopher.brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N',l_updateflag:='DR');
+    update_dops := dops.updateversion('SuppressOptOutKeys',filedate,'christopher.brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N',l_updateflag:='DR');
 
     RETURN sequential(spray_opt_out_input_file
                       ,bld_optout_key
