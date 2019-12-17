@@ -16,7 +16,7 @@ EXPORT E_Bank_Account_Event := MODULE
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'associatedcustomerfileinfo(_r_Customer_:0),Account_(Account_:0),eventdate(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Mapping0 := 'associatedcustomerfileinfo(_r_Customer_:0),Account_(Account_:0),eventdate(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  EXPORT __d0_KELfiltered := KELOtto.fraudgovshared((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND bank_account_number_1 != '');
+  EXPORT __d0_KELfiltered := KELOtto.fraudgovshared(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND bank_account_number_1 != '');
   SHARED __d0_Account__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Account_;
@@ -30,7 +30,7 @@ EXPORT E_Bank_Account_Event := MODULE
   SHARED __d0_Prefiltered := __d0_Transaction__Mapped;
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   SHARED __Mapping1 := 'associatedcustomerfileinfo(_r_Customer_:0),Account_(Account_:0),eventdate(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  EXPORT __d1_KELfiltered := KELOtto.fraudgovshared((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND bank_account_number_2 != '');
+  EXPORT __d1_KELfiltered := KELOtto.fraudgovshared(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND bank_account_number_2 != '');
   SHARED __d1_Account__Layout := RECORD
     RECORDOF(__d1_KELfiltered);
     KEL.typ.uid Account_;

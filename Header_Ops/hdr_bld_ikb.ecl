@@ -22,14 +22,17 @@ EXPORT hdr_bld_ikb(string filedate, unsigned1 status) := module
                                          dx_Header.names(filedate).i_first_ingest, mv_first_ingest_BUILT);
    RoxieKeyBuild.Mac_SK_Move_V2(         dx_Header.names('@version@').i_first_ingest, 'Q', mv_first_ingest_QA,2);
 
-   BuildiDid := sequential(
+   newFirstIngestNotInQA:=~regexfind(filedate,nothor(std.file.SuperFileContents(dx_Header.names('QA').i_first_ingest))[1].name);
+
+BuildiDid := sequential(
                     nothor(std.file.ClearSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header')),
                     nothor(std.file.AddSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header',
                                           '~thor_data400::key::insuranceheader_xlink::'+filedate+'::idl')),
                     InsuranceHeader.proc_payload_inc(filedate),
-                    build_first_ingest,
-                    mv_first_ingest_BUILT,
-                    mv_first_ingest_QA
+                    if(newFirstIngestNotInQA,sequential(
+                            build_first_ingest,
+                            mv_first_ingest_BUILT,
+                            mv_first_ingest_QA))
                     );
 
    BuildFcra := Doxie.Proc_FCRA_Doxie_keys_All(,true,filedate);
