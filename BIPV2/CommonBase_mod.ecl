@@ -1521,6 +1521,7 @@ EXPORT CommonBase_mod := MODULE
   string7 geo_blk;
   string1 geo_match;
   string4 err_stat;
+	unsigned6 locid;
   string250 corp_legal_name;
   string250 dba_name;
   string9 active_duns_number;
@@ -1613,6 +1614,14 @@ EXPORT CommonBase_mod := MODULE
   boolean is_vanity_name_derived;
   unsigned4 global_sid := 0;
   unsigned8 record_sid := 0;
+	string10 employee_count_org_raw;
+	unsigned6 employee_count_org_derived;
+  string28 revenue_org_raw;
+  unsigned6 revenue_org_derived;
+  string10 employee_count_local_raw;
+  unsigned6 employee_count_local_derived;
+  string28 revenue_local_raw;
+  unsigned6 revenue_local_derived;
  END;
 
 	EXPORT Layout_Static := Layout_S40;
