@@ -1270,6 +1270,8 @@
 				trim(kword, left, right) = 'HRAZTN' =>SubGroup_Constants.numKeywordsID.KEYWORD_HRAZTN,
 				trim(kword, left, right) = 'TTSEC' =>SubGroup_Constants.numKeywordsID.KEYWORD_TTSEC,
 				trim(kword, left, right) = 'ESCNMC' =>SubGroup_Constants.numKeywordsID.KEYWORD_ESCNMC,
+				trim(kword, left, right) = 'PTANACOM' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTANACOM,
+				trim(kword, left, right) = 'EEPPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_EEPPA,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

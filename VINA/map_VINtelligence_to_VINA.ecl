@@ -4809,7 +4809,7 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 		SELF.nvpp_make_code					:= '';																																	//62
 		SELF.nvpp_make_abbreviation	:= '';  //TRIM(SELF.match_make);																				//63
 		SELF.nvpp_series_model			:= '';																																	//64
-		SELF.nvpp_series_name				:= '';																																	//65																	
+		SELF.nvpp_series_name				:= SELF.series_name;	//DF-25834																																//65																	
 		SELF.segmentation_code			:= cleanDesc(L.SEGMENTATION_CD);																				//66
 		// SELF.segmentation_code			:= IF(temp_veh_typ_cd IN ['C','M'] or SELF.proactive_vin='Y','',cleanDesc(L.SEGMENTATION_CD));																				//66
 		SELF.country_of_origin			:= MAP(cleanDesc(L.PLNT_CNTRY_NM) IN ['','UNKNOWN'] 	            			//67
@@ -5483,9 +5483,9 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 		SELF.nvpp_series_model 		 := IF(L.make_abbreviation IN ['MITS','HYUN'] AND R.make_abbreviation IN ['MITS','HYUN'],
 		                                 IF(L.make_abbreviation=R.make_abbreviation,R.nvpp_series_model,''),
 		                                 R.nvpp_series_model);
-		SELF.nvpp_series_name 		 := IF(L.make_abbreviation IN ['MITS','HYUN'] AND R.make_abbreviation IN ['MITS','HYUN'],
+		/*SELF.nvpp_series_name 		 := IF(L.make_abbreviation IN ['MITS','HYUN'] AND R.make_abbreviation IN ['MITS','HYUN'],
 		                                 IF(L.make_abbreviation=R.make_abbreviation,R.nvpp_series_name,''),
-		                                 R.nvpp_series_name);
+		                                 R.nvpp_series_name); DF-25834*/
 		SELF.complete_prefix_file_id:= IF(L.make_abbreviation IN ['MITS','HYUN'] AND R.make_abbreviation IN ['MITS','HYUN'],
 		                                 IF(L.make_abbreviation=R.make_abbreviation,R.complete_prefix_file_id,''),
 		                                 R.complete_prefix_file_id);
