@@ -3,9 +3,9 @@ EXPORT Proc_Build_File_New_Suppression_Opt_Out(String pVersion) := FUNCTION
 
 	clear_exemption_input_files	:= SEQUENTIAL(
 										  FileServices.StartSuperFileTransaction()
-										 ,FileServices.clearsuperfile($.Filenames().Exemptions.Input_PR.sprayed)
-										 ,FileServices.clearsuperfile($.Filenames().Exemptions.Input_HC.sprayed)
-										 ,FileServices.clearsuperfile($.Filenames().Exemptions.Input_Ins.sprayed)
+										 ,FileServices.clearsuperfile($.Filenames().Exemptions.Input_PR.sprayed, TRUE)
+										 ,FileServices.clearsuperfile($.Filenames().Exemptions.Input_HC.sprayed, TRUE)
+										 ,FileServices.clearsuperfile($.Filenames().Exemptions.Input_Ins.sprayed, TRUE)
 										 ,FileServices.finishSuperFileTransaction()	                            
 									);
 	// Spray and process exemptions extract from Orbit
@@ -28,7 +28,7 @@ EXPORT Proc_Build_File_New_Suppression_Opt_Out(String pVersion) := FUNCTION
 	// Spray process opt out input file and process sprayed opt out file and minor file
 	clear_opt_out_input_file	:= SEQUENTIAL(
 										  FileServices.StartSuperFileTransaction()
-										 ,FileServices.clearsuperfile($.Filenames().OptOut.input.sprayed)
+										 ,FileServices.clearsuperfile($.Filenames().OptOut.input.sprayed, TRUE)
 										 ,FileServices.finishSuperFileTransaction()		                            
 									);
 	spray_opt_out_input_file	:= $.fSprayFiles.OptOutSrc(pVersion,
