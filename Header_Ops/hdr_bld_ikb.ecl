@@ -6,9 +6,7 @@ EXPORT hdr_bld_ikb(string filedate, unsigned1 status) := module
    #stored ('emailList', Header.email_list.BocaDevelopers + ',Isabel.Ma@lexisnexisrisk.com');
    string  emailList := ''  :stored('emailList');
 
-   string  rpt_qa_email_list:='BocaRoxiePackageTeam@lexisnexis.com,Isabel.Ma@lexisnexisrisk.com';
-   
-   sf_name := '~thor_data400::out::header_ikb_status';
+   string  rpt_qa_email_list:='BocaRoxiePackageTeam@lexisnexis.com,Isabel.Ma@lexisnexisrisk.com';   
 
    wk:=workunit;
    wServer:= _control.ThisEnvironment.ESP_IPAddress;
@@ -24,7 +22,7 @@ EXPORT hdr_bld_ikb(string filedate, unsigned1 status) := module
                                          dx_Header.names(filedate).i_first_ingest, mv_first_ingest_BUILT);
    RoxieKeyBuild.Mac_SK_Move_V2(         dx_Header.names('@version@').i_first_ingest, 'Q', mv_first_ingest_QA,2);
 
-BuildiDid := sequential(
+   BuildiDid := sequential(
                     nothor(std.file.ClearSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header')),
                     nothor(std.file.AddSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header',
                                           '~thor_data400::key::insuranceheader_xlink::'+filedate+'::idl')),
@@ -42,38 +40,20 @@ BuildiDid := sequential(
                     header.Proc_Copy_From_Alpha_Incrementals().movetoQA(filedate),
                     output(header.Verify_XADL1_base_files,named('Verify_XADL1_base_files_after'), all)
                     );
-                    
+
+   step1 := CopyKeys;
+   step2 := UpdateIncIdl;
+   step3 := BuildKeys;
+   step4 := MovetoQA;
+
+   sf_name := '~thor_data400::out::header_ikb_status';
+   update_status(unsigned2 new_status) := Header.LogBuildStatus(sf_name,filedate,new_status).Write;
+
    EXPORT all := sequential(
-                     if(status = 0,
-                        sequential(
-                          Header.LogBuildStatus(sf_name, filedate, 1).Write // 1 -> IKB started
-                        )
-                     )
-                     ,if(status < 2,
-                        sequential(
-                          CopyKeys,
-                          Header.LogBuildStatus(sf_name, filedate, 2).Write // 2 ->  CopyKeys completed
-                        )
-                     )
-                     ,if(status < 3,
-                        sequential(
-                          UpdateIncIdl,
-                          Header.LogBuildStatus(sf_name, filedate, 3).Write, // 3 -> UpdateIncIdl Completed
-                        )
-                     )
-                     ,if(status < 4,
-                        sequential(
-                          BuildKeys,
-                          Header.LogBuildStatus(sf_name, filedate, 4).Write, // 3 -> BuildKeys Completed
-                        )
-                     )
-                     ,if(status < 5,
-                        sequential(
-                          MovetoQA,
-                          Header.LogBuildStatus(sf_name, filedate, 0).Write, // 0 -> IKB Completed
-                        )
-                     )
-                   ): failure(std.system.Email.SendEmail(emailList,'FAILED:IKB BUILD:'+workunit,wLink));                               
-                               
+               if(status<1,sequential(step1,update_status(1))),
+               if(status<2,sequential(step2,update_status(2))),
+               if(status<3,sequential(step3,update_status(3))),
+               if(status<4,sequential(step4,update_status(4)))
+               ): failure(std.system.Email.SendEmail(emailList,'FAILED:IKB BUILD:'+workunit,wLink));
                 
 END;
