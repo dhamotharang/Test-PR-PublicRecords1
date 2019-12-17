@@ -54,8 +54,8 @@ export SSN_Table_v4(boolean isFCRA) := function;
 		common_rec en;
 		common_rec tn;
 		//CCPA-768
-		UNSIGNED4	global_sid := 0;
-		UNSIGNED8 record_sid := 0;
+		UNSIGNED4	global_sid;
+		UNSIGNED8 record_sid;
 	END;
 
 	ssntable_version4_2 := risk_indicators.ssn_table_v4_2(isFCRA);
