@@ -23,7 +23,7 @@ FIELDTYPE:invalid_email:ALLOW( 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsT
 
 
 //--------------------------------------------------------------- 
-//FIELDS TO SCRUB -- Commented out fields are not being scrubbed
+//FIELDS TO SCRUB 
 //---------------------------------------------------------------
 FIELD:rcid:TYPE(UNSIGNED6):LIKE(invalid_rcid):0,0
 FIELD:powid:TYPE(UNSIGNED6):LIKE(invalid_mandatory):0,0

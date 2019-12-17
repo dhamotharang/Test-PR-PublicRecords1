@@ -56,14 +56,6 @@ EXPORT Functions := MODULE
 	EXPORT fn_url(STRING s) := function    
 	  RETURN IF(Stringlib.StringFilterOut(s, ' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz\'-!#$%&*,./:;?@_{}~+=()') = '', 1, 0);
   END;
-	
-	//****************************************************************************
-	//fn_sic:  returns true or false based upon whether or not there is
-  //                 an empty, 7-digit, or 8-digit value.
-	//****************************************************************************
-	EXPORT fn_sic(STRING s) := function    
-	  RETURN IF((s = '' or LENGTH(TRIM(s, ALL)) in [7,8]) AND Stringlib.StringFilterOut(s, ' 0123456789') = '', 1, 0);
-  END;
-	
+		
 END;
 

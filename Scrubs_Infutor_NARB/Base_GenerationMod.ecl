@@ -63,7 +63,7 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '\n'
     + '\n'
     + '//--------------------------------------------------------------- \n'
-    + '//FIELDS TO SCRUB -- Commented out fields are not being scrubbed\n'
+    + '//FIELDS TO SCRUB \n'
     + '//---------------------------------------------------------------\n'
     + 'FIELD:rcid:TYPE(UNSIGNED6):LIKE(invalid_rcid):0,0\n'
     + 'FIELD:powid:TYPE(UNSIGNED6):LIKE(invalid_mandatory):0,0\n'

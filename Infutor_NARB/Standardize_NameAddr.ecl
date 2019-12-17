@@ -29,6 +29,7 @@ EXPORT Standardize_NameAddr := MODULE
 		dStandardizedPerson := project(NID_output, tCleanPers(LEFT)) + notSendRecs : INDEPENDENT;	
 		
 		// -- Mapping Clean company name and clean phone numbers
+	  // -- Validates Sic Codes, if invalid the field is set to null
   	Infutor_NARB.Layouts.Base tMapCleanCompanyName(dStandardizedPerson L) := TRANSFORM   	  
 			InvalidNames  := '\\| NONE$|\\| N/A$|\\|$|\\| $';
 			SELF.clean_company_name := REGEXREPLACE(InvalidNames,ut.CleanSpacesAndUpper(L.normCompany_Name),'');

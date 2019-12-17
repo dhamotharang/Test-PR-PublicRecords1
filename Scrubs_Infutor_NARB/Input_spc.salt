@@ -19,7 +19,7 @@ FIELDTYPE:invalid_email:ALLOW( 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsT
 
 
 //--------------------------------------------------------------- 
-//FIELDS TO SCRUB -- Commented out fields are not being scrubbed
+//FIELDS TO SCRUB 
 //---------------------------------------------------------------
 FIELD:dt_first_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate8):0,0
 FIELD:dt_last_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate8):0,0

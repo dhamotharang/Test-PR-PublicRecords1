@@ -59,7 +59,7 @@ EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '\n'
     + '\n'
     + '//--------------------------------------------------------------- \n'
-    + '//FIELDS TO SCRUB -- Commented out fields are not being scrubbed\n'
+    + '//FIELDS TO SCRUB \n'
     + '//---------------------------------------------------------------\n'
     + 'FIELD:dt_first_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate8):0,0\n'
     + 'FIELD:dt_last_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate8):0,0\n'

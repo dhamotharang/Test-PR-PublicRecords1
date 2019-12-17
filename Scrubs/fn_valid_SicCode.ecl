@@ -1,12 +1,11 @@
 ﻿IMPORT Scrubs, Risk_Indicators;
 
-// EXPORT string fn_valid_SicCode(string code
 EXPORT integer fn_valid_SicCode(string code
 ) := function
 
   pSicLookup := Risk_Indicators.Files().SicLookup.built;
 
-//validates codes against DNB_SMI Sic Code Table
+//validates codes against DNB_DMI Sic Code Table
 //valid lengths are 4,6, and 8
 //sets zero codes to null
 //null is valid	
