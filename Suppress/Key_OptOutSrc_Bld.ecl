@@ -6,7 +6,6 @@ EXPORT Key_OptOutSrc_Bld(boolean isFCRA = false) := FUNCTION
 	ds_prep			:= PROJECT(ds, Suppress.Layout_OptOut);
 	lfn 					:= IF(isFCRA,data_services.Data_location.Prefix()+'thor::key::new_suppression::fcra::qa::opt_out',
 	                       data_services.Data_location.Prefix()+'thor::key::new_suppression::qa::opt_out');
-	
 	// key := INDEX(ds_prep, {rec.lexid}, rec, IF(isFCRA, lfn_fcra,lfn));
 	key := INDEX(ds_prep, {lexid}, {ds_prep}, lfn);
 	RETURN key;
