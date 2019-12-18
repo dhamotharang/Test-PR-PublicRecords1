@@ -3,19 +3,19 @@
 // placeholder for all of the roxie VIPs to use when processing files using soapcall
 export shortcuts := module
 
- export prod_batch_analytics_roxie := 'http://roxiethor.sc.seisint.com:9856';
+//-- update VIPS from warren as of Dec 11, 2019
+	export prod_batch_analytics_roxie := 'http://roxiethorvip.hpcc.risk.regn.net:9856';
+	export prod_batch_neutral := 'http://roxiethorvip.hpcc.risk.regn.net:9856';
+	export prod_batch_fcra := 'http://fcrathorvip.hpcc.risk.regn.net:9876';
 
-	export prod_batch_neutral := 'http://roxiebatch.br.seisint.com:9856';
-	export prod_batch_fcra := 'http://fcrabatch.sc.seisint.com:9876';
-
-	export DR_prod_neutral_roxieIP := 'http://aroxievip.sc.seisint.com:9876';
+	export DR_prod_neutral_roxieIP := 'http://prdrroxiethorvip.hpcc.risk.regn.net:9876';
 	export DR_prod_fcra_roxieIP := 'http://afcraroxievip.sc.seisint.com:9876';
 
-	export cert_OSS_neutral_roxieIP := 'http://roxiecertossvip.sc.seisint.com:9876'; 
-	export staging_neutral_roxieIP := 'http://roxiestaging.sc.seisint.com:9876'; 
-	export staging_fcra_roxieIP :='http://certfcraroxievip.sc.seisint.com:9876'; 
-
-	export QA_neutral_roxieIP := 'http://roxieqavip.br.seisint.com:9876'; 
+	export cert_OSS_neutral_roxieIP := 'http://certqavip.hpcc.risk.regn.net:9876'; 
+	export staging_neutral_roxieIP := 'http://certqavip.hpcc.risk.regn.net:9876'; 
+	export staging_fcra_roxieIP :='http://certfcraroxievip.hpcc.risk.regn.net:9876'; 
+	export QA_neutral_roxieIP := 'http://certqavip.hpcc.risk.regn.net:9876';
+//--
 
   export core_96_roxieIP := 'http://10.176.68.187:9876/';
   export core_97_roxieIP := 'http://10.176.68.184:9876/';
