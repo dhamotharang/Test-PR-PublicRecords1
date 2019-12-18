@@ -356,31 +356,11 @@ OUTPUT(CHOOSEN(SORT(dGetOriginalDateAccountOpened,accountnumber),pEyeball),NAMED
 dRecordWithTradelines	:=	SORT(DISTRIBUTE(dGetOriginalDateAccountOpened,
 														HASH(	sbfe_contributor_number,contract_account_number,account_type_reported,cycle_end_date)),
 																	sbfe_contributor_number,contract_account_number,account_type_reported,cycle_end_date,extracted_date,LOCAL);
+
 																	
-TradelineTempDatesLayout := RECORD
-STRING oldcycledate;
-RECORDOF(dRecordWithTradelines);
-END;
+dedupRecordWithTradelines := DEDUP(SORT(dRecordWithTradelines, AccountNumber, SBFE_Contributor_Number, Contract_account_number, account_type_reported, cycle_end_date, -version), AccountNumber, SBFE_Contributor_Number, Contract_Account_Number, account_type_reported, cycle_end_date);
 
-TradelineTempDatesLayout getOldCycleDates(dRecordWithTradelines le) := TRANSFORM
-	SELF.oldcycledate := le.cycle_end_date;
-	SELF.cycle_end_date := le.cycle_end_date[1..6];
-	SELF := le;
-END;
+OUTPUT(CHOOSEN(dedupRecordWithTradelines,pEyeball),NAMED('dRecordWithTradelinesSample'));
+OUTPUT(dedupRecordWithTradelines,,pOutputFilename,CSV(HEADING(SINGLE),SEPARATOR(','),TERMINATOR('\r\n'),QUOTE('"'),MAXLENGTH(100000)),OVERWRITE);
 
-TradelinesTruncatedHistoryDates	:=	PROJECT(dRecordWithTradelines, getOldCycleDates(LEFT));
-																	
-dedupRecordWithTradelines := DEDUP(SORT(TradelinesTruncatedHistoryDates, AccountNumber, SBFE_Contributor_Number, Contract_account_number, account_type_reported, cycle_end_date), AccountNumber, SBFE_Contributor_Number, Contract_Account_Number, account_type_reported, cycle_end_date);
-
-FinalRecordWithTradelines := PROJECT(dedupRecordWithTradelines,
-																							TRANSFORM(
-																								RECORDOF(dRecordWithTradelines),
-																								SELF.cycle_end_date:=LEFT.oldcycledate;
-																								SELF:=LEFT
-																							)
-																						);
-
-OUTPUT(CHOOSEN(FinalRecordWithTradelines,pEyeball),NAMED('dRecordWithTradelinesSample'));
-OUTPUT(FinalRecordWithTradelines,,pOutputFilename,CSV(HEADING(SINGLE),SEPARATOR(','),TERMINATOR('\r\n'),QUOTE('"'),MAXLENGTH(100000)),OVERWRITE);
-
-OUTPUT(TABLE(FinalRecordWithTradelines,{account_type_reported,COUNT(GROUP)},account_type_reported,FEW),NAMED('AccountTypeTable'));
+OUTPUT(TABLE(dedupRecordWithTradelines,{account_type_reported,COUNT(GROUP)},account_type_reported,FEW),NAMED('AccountTypeTable'));
