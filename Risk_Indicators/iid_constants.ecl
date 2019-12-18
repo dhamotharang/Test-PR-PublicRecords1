@@ -519,7 +519,8 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
    InsuranceFCRASODataFilter    = 1 << 33,
    RunThreatMetrix= 1          << 34,
    disablenongovernmentdldata =1 << 35,
-   enableEquifaxPhoneMart   =1 << 36
+   enableEquifaxPhoneMart   =1 << 36,
+	 TurnOffTumblings=1 << 37  // option to speed up bocashell 5.3 and higher if it's not needed
 		);
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);
