@@ -10,7 +10,7 @@
  *       last seen within 5 years:: Source: EDAHistory										*
  ************************************************************************ */
 
-IMPORT Gong, Phone_Shell, Risk_Indicators, RiskWise, UT, STD, doxie;
+IMPORT Gong, Phone_Shell, Risk_Indicators, RiskWise, UT, STD, doxie, Suppress;
 
 todays_date := (string) STD.Date.Today();
 
@@ -22,7 +22,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASE
 	 /* ***************************************************************
 		* 							Get the EDA (Gong) Data by DID									*
 	  *************************************************************** */
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus searchByDID(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Gong.Key_History_did ri) := TRANSFORM
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} searchByDID(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Gong.Key_History_did ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SElf.Gathered_Phone := TRIM(ri.phone10);
 		
 		matchcode := Phone_Shell.Common.generateMatchcode(le.Clean_Input.FirstName, le.Clean_Input.LastName, le.Clean_Input.StreetAddress1, le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Addr_Suffix, le.Clean_Input.City, le.Clean_Input.State, le.Clean_Input.Zip5, le.Clean_Input.DateOfBirth, le.Clean_Input.SSN, le.DID, le.Clean_Input.HomePhone, le.Clean_Input.WorkPhone, 
@@ -80,13 +81,14 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASE
 		SELF := le;
 	END;
 	
-	byDID := JOIN(Input, Gong.Key_History_did, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.L_DID) AND RIGHT.current_flag = TRUE AND (INTEGER)RIGHT.phone10 <> 0,
+	byDID_unsuppressed := JOIN(Input, Gong.Key_History_did, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.L_DID) AND RIGHT.current_flag = TRUE AND (INTEGER)RIGHT.phone10 <> 0,
 																			searchByDID(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
-
+	byDID := Suppress.Suppress_ReturnOldLayout(byDID_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
 	 /* ***************************************************************
 		* 		Get the EDA (Gong) Data by Unique Header Addresses				*
 	  *************************************************************** */
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus searchByUniqueAddresses(Phone_Shell.Layouts.layoutUniqueAddresses le, Gong.Key_History_Address ri) := TRANSFORM
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} searchByUniqueAddresses(Phone_Shell.Layouts.layoutUniqueAddresses le, Gong.Key_History_Address ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.Clean_Input.seq := le.seq; // Need to save this to join back to the input data in a moment
 		SELF.Gathered_Phone := TRIM(ri.phone10);
 		
@@ -138,10 +140,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASE
 		SELF := [];
 	END;
 	// Only search for addresses seen within the last 5 years - must match same last name, within 6 months doesn't have to match last name
-	uniqueAddressSearchResultsAll := JOIN(HeaderAddresses ((INTEGER)DateLastSeen >= (INTEGER)(ut.date_math((string) STD.Date.Today(), -1 * Phone_Shell.Constants.HeaderSearchDate)[1..6])), Gong.Key_History_Address, TRIM(LEFT.Prim_Range) <> '' AND TRIM(LEFT.Prim_Name) <> '' AND TRIM(LEFT.Zip5) <> '' AND
+	uniqueAddressSearchResultsAll_unsuppressed := JOIN(HeaderAddresses ((INTEGER)DateLastSeen >= (INTEGER)(ut.date_math((string) STD.Date.Today(), -1 * Phone_Shell.Constants.HeaderSearchDate)[1..6])), Gong.Key_History_Address, TRIM(LEFT.Prim_Range) <> '' AND TRIM(LEFT.Prim_Name) <> '' AND TRIM(LEFT.Zip5) <> '' AND
 																																												KEYED(LEFT.Prim_Range = RIGHT.Prim_Range AND LEFT.Prim_Name = RIGHT.Prim_Name AND LEFT.State = RIGHT.st AND LEFT.Zip5 = RIGHT.Z5 AND LEFT.Sec_Range = RIGHT.Sec_Range) AND
 																																												LEFT.Predir = RIGHT.Predir AND LEFT.Addr_Suffix = RIGHT.Suffix AND (INTEGER)RIGHT.phone10 <> 0,
 																																									searchByUniqueAddresses(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
+	uniqueAddressSearchResultsAll := Suppress.Suppress_ReturnOldLayout(uniqueAddressSearchResultsAll_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
 	uniqueAddressSearchResults := DEDUP(SORT(uniqueAddressSearchResultsAll  (TRIM(Sources.Source_List) <> ''), Clean_Input.seq, Gathered_Phone, TRIM(Sources.Source_List), -TRIM(Sources.Source_List_Last_Seen), -TRIM(Sources.Source_List_First_Seen)), Clean_Input.seq, Gathered_Phone, Sources.Source_List);
 	
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus combineInputAndUnique(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
@@ -159,7 +162,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASE
 	 /* ***************************************************************
 		* 		       Get the EDA (Gong) Data by Address				        *
 	  *************************************************************** */
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus searchByInputAddress(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Gong.Key_History_Address ri) := TRANSFORM
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} searchByInputAddress(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Gong.Key_History_Address ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.Gathered_Phone := TRIM(ri.phone10);
 		
 		matchcode := Phone_Shell.Common.generateMatchcode(le.Clean_Input.FirstName, le.Clean_Input.LastName, le.Clean_Input.StreetAddress1, le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Addr_Suffix, le.Clean_Input.City, le.Clean_Input.State, le.Clean_Input.Zip5, le.Clean_Input.DateOfBirth, le.Clean_Input.SSN, le.DID, le.Clean_Input.HomePhone, le.Clean_Input.WorkPhone,
@@ -209,12 +213,12 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASE
 		SELF := le;
 	END;
 	 
-	byAddressAll := JOIN(Input, Gong.Key_History_Address, TRIM(LEFT.Clean_Input.Prim_Range) <> '' AND TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
+	byAddressAll_unsuppressed := JOIN(Input, Gong.Key_History_Address, TRIM(LEFT.Clean_Input.Prim_Range) <> '' AND TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
 																											KEYED(LEFT.Clean_Input.Prim_Range = RIGHT.Prim_Range AND LEFT.Clean_Input.Prim_Name = RIGHT.Prim_Name AND LEFT.Clean_Input.State = RIGHT.st AND
 																											LEFT.Clean_Input.Zip5 = RIGHT.Z5 AND LEFT.Clean_Input.Sec_Range = RIGHT.Sec_Range) AND
 																											LEFT.Clean_Input.Predir = RIGHT.Predir AND LEFT.Clean_Input.Addr_Suffix = RIGHT.Suffix AND RIGHT.current_flag = TRUE AND (INTEGER)RIGHT.phone10 <> 0,
 																											searchByInputAddress(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
-																											
+	byAddressAll := Suppress.Suppress_ReturnOldLayout(byAddressAll_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);																										
 	// Don't keep the phones which didn't match on some part of the name
 	byAddress := byAddressAll (TRIM(Sources.Source_List) <> '');
 	

@@ -1,16 +1,15 @@
 ﻿import AutoStandardI, doxie, iesp, suppress, FCRA, FFD, Gateway;
 
 export Search_Records := module
-  export params := interface(
-    hunting_fishing_services.Search_IDs.params,
-    AutoStandardI.LIBIN.PenaltyI_Indv.base,
-    AutoStandardI.InterfaceTranslator.glb_purpose.params,
-    AutoStandardI.InterfaceTranslator.dppa_purpose.params,
-    AutoStandardI.InterfaceTranslator.penalt_threshold_value.params,
-    AutoStandardI.InterfaceTranslator.ssn_mask_value.params,
-    FCRA.iRules)
+  export params := interface(hunting_fishing_services.Search_IDs.params,
+                             AutoStandardI.LIBIN.PenaltyI_Indv.base,
+                             AutoStandardI.InterfaceTranslator.penalt_threshold_value.params,
+                             FCRA.iRules,
+                             doxie.IDataAccess)
+    EXPORT string DataPermissionMask := ''; //INTERFACES: different definitions in base modules
   end;
-  export formatandFilterRawRecords(DATASET(hunting_fishing_services.Layouts.raw_rec) argRecords,params in_mod, boolean isFCRA = false):=function
+
+  export formatandFilterRawRecords(DATASET(hunting_fishing_services.Layouts.raw_rec) argRecords, params in_mod, boolean isFCRA = false):=function
     // Calculate the penalty on the records
     recs_plus_pen := project(argRecords,transform(hunting_fishing_services.Layouts.raw_rec,
       tempindvmod := module(project(in_mod,AutoStandardI.LIBIN.PenaltyI_Indv.full,opt))
@@ -42,15 +41,11 @@ export Search_Records := module
       self := left));
 
     // ***** DID & SSN pulling and suppression ****
-    Suppress.MAC_Suppress(recs_plus_pen,pull_dids,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did_out);
-    Suppress.MAC_Suppress(pull_dids,pull_ssns,in_mod.applicationtype,Suppress.Constants.LinkTypes.SSN,best_ssn);
+    Suppress.MAC_Suppress(recs_plus_pen,pull_dids,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did_out);
+    Suppress.MAC_Suppress(pull_dids,pull_ssns,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,best_ssn);
     doxie.MAC_PruneOldSSNs(pull_ssns, recs_pruned, best_ssn, did_out, isFCRA);
 
-    // set the ssn_mask_value that is used in Suppress.MAC_Mask
-    string6 ssn_mask_value := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(in_mod,
-                                     AutoStandardI.InterfaceTranslator.ssn_mask_value.params)); 
-
-    suppress.MAC_Mask(recs_pruned, ssns_suppressed, best_ssn, blank, true, false);
+    suppress.MAC_Mask(recs_pruned, ssns_suppressed, best_ssn, blank, true, false, maskVal := in_mod.ssn_mask);
 
     // Format for output
     recs_fmtd := hunting_fishing_services.Functions.fnHuntFishVal(ssns_suppressed, in_mod.city);

@@ -1,5 +1,5 @@
 ﻿
-Import RISK_INDICATORS, ln_propertyv2, doxie, ut, header, mdr, drivers, riskwise,header_quick, FCRA, VotersV2, Suppress;
+Import RISK_INDICATORS, ln_propertyv2, doxie, ut, header, mdr, drivers, riskwise,header_quick, FCRA, VotersV2, Suppress, data_services, AML;
 
 export IndGetHeader(DATASET(Layouts.RelatLayoutV2) idsIN,
                            unsigned1 dppa, 
@@ -8,6 +8,9 @@ export IndGetHeader(DATASET(Layouts.RelatLayoutV2) idsIN,
 													 string50 DataRestriction,
                                                     doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
   													) := FUNCTION
+														
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);	
+													
 //version 2														
 boolean isUtility := false;
 integer bsversion := 50;
@@ -118,11 +121,26 @@ Keyheader_Join :=  JOIN(IDSSortDD, doxie.Key_Header,
 														AND ~Risk_Indicators.iid_constants.filtered_source(right.src, right.st)	, 
 														getHeader(LEFT,RIGHT),  LEFT OUTER, atmost(RiskWise.max_atmost), keep(150));
 
-Keyheader_Suppressed := Suppress.Mac_SuppressSource(Keyheader_Join, mod_access, relatdid);
+Keyheader_Flagged := Suppress.MAC_FlagSuppressedSource(Keyheader_Join, mod_access, did_field := relatdid, data_env := data_environment);
 
-Keyheader := PROJECT(Keyheader_Suppressed, TRANSFORM(relatives_slim,
-                                                  SELF := LEFT));
-														
+Keyheader := PROJECT(Keyheader_Flagged, TRANSFORM(relatives_slim, 																		
+	SELF.prim_range := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prim_range);
+	SELF.predir := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.predir);
+	SELF.prim_name := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prim_name);
+	SELF.addr_suffix := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.addr_suffix);
+	SELF.postdir := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.postdir);
+	SELF.unit_desig := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.unit_desig);
+	SELF.sec_range := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.sec_range);
+	SELF.zip5 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.zip5);
+	SELF.state := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.state);
+	SELF.county := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.county);
+	SELF.geo_blk := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.geo_blk);
+	SELF.dt_first_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_first_seen);
+	SELF.dt_last_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_last_seen);
+	SELF.src := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.src);
+	SELF.ssn := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.ssn);
+    SELF := LEFT;
+)); 											
 // get quick header
 
 relatives_slim_CCPA getQH(IDSSortDD le, header_quick.key_DID ri) := TRANSFORM
@@ -169,10 +187,26 @@ quickHeader_Join := join(IDSSortDD, header_quick.key_DID,
 													  getQH(left,right), 
 														atmost(ut.limits.HEADER_PER_DID), keep(100));
                             
-quickHeader_Suppressed := Suppress.Mac_SuppressSource(quickHeader_Join, mod_access, relatdid);
+quickHeader_Flagged := Suppress.MAC_FlagSuppressedSource(quickHeader_Join, mod_access, did_field := relatdid, data_env := data_environment);
 
-quickHeader := PROJECT(quickHeader_Suppressed, TRANSFORM(relatives_slim,
-                                                  SELF := LEFT));
+quickHeader := PROJECT(quickHeader_Flagged, TRANSFORM(relatives_slim, 																		
+	SELF.prim_range := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prim_range);
+	SELF.predir := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.predir);
+	SELF.prim_name := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prim_name);
+	SELF.addr_suffix := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.addr_suffix);
+	SELF.postdir := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.postdir);
+	SELF.unit_desig := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.unit_desig);
+	SELF.sec_range := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.sec_range);
+	SELF.zip5 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.zip5);
+	SELF.state := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.state);
+	SELF.county := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.county);
+	SELF.geo_blk := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.geo_blk);
+	SELF.dt_first_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_first_seen);
+	SELF.dt_last_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_last_seen);
+	SELF.src := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.src);
+	SELF.ssn := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.ssn);
+    SELF := LEFT;
+)); 	
 			   
 allheader :=  sort(ungroup(quickHeader + Keyheader), seq ,origdid, relatdid);
 

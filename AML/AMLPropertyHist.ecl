@@ -1,10 +1,9 @@
-﻿import Census_Data,LN_PropertyV2,ut, RiskWise, Risk_Indicators, doxie;
+﻿import LN_PropertyV2,ut, RiskWise, Risk_Indicators, STD;
 
 export AMLPropertyHist (GROUPED DATASET(Risk_Indicators.Layout_PropertyRecord) p_address,
                                  GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids, 
 																 boolean includeRelatives = true,
-																 boolean filter_out_fares=false,
-                                                                 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION											
+																 boolean filter_out_fares=false) := FUNCTION											
 
 
 proprec := record
@@ -327,7 +326,7 @@ TRANSFORM
 	SELF.mortgage_amount := (INTEGER)ri.mortgage_loan_amount;
 	
 	// remap the mortgage type field per heather and brent
-	mt := trim(stringlib.stringtouppercase(ri.mortgage_loan_type_code));
+	mt := trim(STD.Str.touppercase(ri.mortgage_loan_type_code));
 	fares := le.own_fares_id[1] = 'R';	// R means Fares
 	fidelity := le.own_fares_id[1] in ['O','D'];
 	
@@ -438,7 +437,7 @@ TRANSFORM
 																									le.mortgage_amount);
 																									
 	// remap the mortgage type field per heather and brent-------- FCRA should not have fares data in it
-	mt := trim(stringlib.stringtouppercase(ri.first_td_loan_type_code));
+	mt := trim(STD.Str.touppercase(ri.first_td_loan_type_code));
 	fares := le.own_fares_id[1] = 'R';	// R means Fares
 	fidelity := le.own_fares_id[1] in ['O','D'];
 	
@@ -451,7 +450,7 @@ TRANSFORM
 																								le.mortgage_type);
 	
 	// try here to remap the finance type per heather and brent ----- 
-	ft := trim(stringlib.stringtouppercase(ri.type_financing));
+	ft := trim(STD.Str.touppercase(ri.type_financing));
 	self.type_financing := risk_indicators.iid_constants.type_financing(fidelity, fares, ft);
 	
 	self.first_td_due_date := ri.first_td_due_date;	

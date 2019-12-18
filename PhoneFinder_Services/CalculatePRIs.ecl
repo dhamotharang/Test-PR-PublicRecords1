@@ -165,8 +165,11 @@ FUNCTION
                                     EXISTS(dIterateRIs)                          => $.Constants.RiskIndicator[$.Constants.RiskLevel.WARN],
                                     $.Constants.RiskIndicator[$.Constants.RiskLevel.PASS]);
     SELF.OTPRIFailed        := EXISTS(dIterateRIs(OTPRIFailed));
-      // Blanking out fname, lname, phone fields since we didn't find any results for the search criteria
-    SELF.phone              := IF(EXISTS(SELF.AlertIndicators(RiskId IN [-1, 0])), '', pInput.phone),
+
+    hasMetadata             := pInput.carrier_name <> ''OR pInput.phone_region_city <> '' OR pInput.phone_region_st <> '' OR
+                               pInput.coc_description <> '' OR pInput.servicetype <> 0;  
+    SELF.phone              := IF(EXISTS(SELF.AlertIndicators(RiskId IN [-1, 0])) AND ~hasMetadata, '', pInput.phone),
+    // Blanking out fname, lname fields since we didn't find any results for the search criteria
     SELF.fname              := IF(EXISTS(SELF.AlertIndicators(RiskId IN [-1, 0])), '', pInput.fname),
     SELF.lname              := IF(EXISTS(SELF.AlertIndicators(RiskId IN [-1, 0])), '', pInput.lname),
     SELF                    := pInput;

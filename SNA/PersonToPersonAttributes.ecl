@@ -1,12 +1,14 @@
-import doxie, riskwise, risk_indicators, mdr, drivers, header, ut;
+﻿import doxie, risk_indicators, mdr, drivers, header, ut, Suppress, SNA;
 
-EXPORT PersonToPersonAttributes( dataset(Layouts.Layout_PersonToPerson) in_dids, unsigned1 glb, unsigned1 dppa, string50 DataRestrictionMask ) := FUNCTION
+EXPORT PersonToPersonAttributes( dataset(SNA.Layouts.Layout_PersonToPerson) in_dids, unsigned1 glb, unsigned1 dppa, string50 DataRestrictionMask,
+                                                                doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
   isFCRA := false;
   glb_ok := Risk_Indicators.iid_constants.glb_ok(glb, isFCRA);
   dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
 
 
-  Layouts.Layout_PersonToPerson getAssociates( Layouts.Layout_PersonToPerson le, sna.Key_Person_Cluster ri, unsigned1 picker ) := TRANSFORM
+  {SNA.Layouts.Layout_PersonToPerson, UNSIGNED4 global_sid} getAssociates(SNA.Layouts.Layout_PersonToPerson le, sna.Key_Person_Cluster ri, unsigned1 picker ) := TRANSFORM
+    self.global_sid := ri.global_sid;
     self.seq := le.seq;
     self.person1 := le.person1;
     self.person2 := le.person2;
@@ -23,17 +25,21 @@ EXPORT PersonToPersonAttributes( dataset(Layouts.Layout_PersonToPerson) in_dids,
   END;
   
   // get all individuals associated with the 'left' person
-  withCluster1 := join( in_dids,      SNA.Key_Person_Cluster, keyed(left.person1=right.cluster_id), getAssociates(left,right,1), atmost(10000) );
+  withCluster1_unsuppressed := join( in_dids,      SNA.Key_Person_Cluster, keyed(left.person1=right.cluster_id), getAssociates(left,right,1), atmost(10000) );
+  withCluster1 := Suppress.Suppress_ReturnOldLayout(withCluster1_unsuppressed, mod_access, SNA.Layouts.Layout_PersonToPerson, didfield := associate);
 
   // then filter those down to people who are also associated with the 'right' person
-  withCluster2 := join( withCluster1, SNA.Key_Person_Cluster, keyed(left.person2=right.cluster_id) and left.associate = right.associated_did, getAssociates(left,right,2), keep(1) );
+  withCluster2_unsuppressed := join( withCluster1, SNA.Key_Person_Cluster, keyed(left.person2=right.cluster_id) and left.associate = right.associated_did, getAssociates(left,right,2), keep(1) );
+  withCluster2 := Suppress.Suppress_ReturnOldLayout(withCluster2_unsuppressed, mod_access, SNA.Layouts.Layout_PersonToPerson, didfield := associate);
 
   // the three best connected people in the intersection
   interestingPeople := topn( group(sort(withCluster2, seq, -connected_associate_paths), seq ), 3, seq );
 
 
   // for all people associated with both the input individuals, get all addresses with which they've been associated
-  Layouts.Layout_PersonToPerson getAddr( Layouts.Layout_PersonToPerson le, doxie.key_Header ri ) := TRANSFORM
+  {SNA.Layouts.Layout_PersonToPerson, unsigned4 global_sid, unsigned6 did} getAddr(SNA.Layouts.Layout_PersonToPerson le, doxie.key_Header ri ) := TRANSFORM
+    self.global_sid := ri.global_sid;
+    self.did := ri.s_did;
     self.prim_range := ri.prim_range;
     self.prim_name  := ri.prim_name;
     self.sec_range  := ri.sec_range;
@@ -43,7 +49,7 @@ EXPORT PersonToPersonAttributes( dataset(Layouts.Layout_PersonToPerson) in_dids,
   end;
   
 
-  intersection_with_addr := join( withCluster2, doxie.key_header,
+  intersection_with_addr_unsuppressed := join( withCluster2, doxie.key_header,
     left.associate != 0
     and keyed(left.associate=right.s_did)
     // history mode not supported at this time
@@ -59,6 +65,7 @@ EXPORT PersonToPersonAttributes( dataset(Layouts.Layout_PersonToPerson) in_dids,
     keep(100), atmost(ut.limits.HEADER_PER_DID)
   );
 
+  intersection_with_addr := Suppress.Suppress_ReturnOldLayout(intersection_with_addr_unsuppressed, mod_access, SNA.Layouts.Layout_PersonToPerson);
 
 
   // don't count the same individual at the same address more than once. dedup prior to sorting to make the sort faster
@@ -72,13 +79,13 @@ EXPORT PersonToPersonAttributes( dataset(Layouts.Layout_PersonToPerson) in_dids,
     unsigned1 shared_did_count := min(255,count(group));
   end;
 
-  intersect_plus := table( addr_deduped, layout_addr_info, seq, prim_range, prim_name, sec_range, zip );
+  intersect_plus := table( addr_deduped, layout_addr_info, person1, person2, associate, associate_degree1, associate_degree2, connected_associate_paths, seq, prim_range, prim_name, sec_range, zip );
 
   grped := group( sort( intersect_plus, seq, -shared_did_count), seq);
   limited := topn( grped, 3, seq );
 
 
-  Layouts.Layout_PersonToPerson3 into3( layout_addr_info le ) := TRANSFORM
+  SNA.Layouts.Layout_PersonToPerson3 into3( layout_addr_info le ) := TRANSFORM
     self.prim_range1           := le.prim_range;
     self.prim_name1            := le.prim_name;
     self.sec_range1            := le.sec_range;
@@ -91,7 +98,7 @@ EXPORT PersonToPersonAttributes( dataset(Layouts.Layout_PersonToPerson) in_dids,
 
   into := project( limited, into3(left) );
   
-  Layouts.Layout_PersonToPerson3 roll( Layouts.Layout_PersonToPerson3 le, Layouts.Layout_PersonToPerson3 ri ) := TRANSFORM
+  SNA.Layouts.Layout_PersonToPerson3 roll( SNA.Layouts.Layout_PersonToPerson3 le, SNA.Layouts.Layout_PersonToPerson3 ri ) := TRANSFORM
     pop2 := trim(le.prim_range2)='' and trim(le.prim_name2)='' and trim(le.sec_range2)='' and trim(le.zip2)='' and le.shared_did_count2=0; // second spot is blank
     pop3 := not pop2 and trim(le.prim_range3)='' and trim(le.prim_name3)='' and trim(le.sec_range3)='' and trim(le.zip3)='' and le.shared_did_count3=0; // third spot is bank
     
@@ -115,7 +122,7 @@ EXPORT PersonToPersonAttributes( dataset(Layouts.Layout_PersonToPerson) in_dids,
   rolled := rollup( into, roll(left,right), seq );
 
 
-  Layouts.Layout_PersonToPerson3 intoPerson3( interestingPeople le ) := TRANSFORM
+  SNA.Layouts.Layout_PersonToPerson3 intoPerson3( interestingPeople le ) := TRANSFORM
     self.connected_associate1_paths := le.connected_associate_paths;
     self.connected_associate1       := le.associate;
     self := le;
@@ -124,7 +131,7 @@ EXPORT PersonToPersonAttributes( dataset(Layouts.Layout_PersonToPerson) in_dids,
 
   interestingPeople3 := project( interestingPeople, intoPerson3(left) );
   
-  Layouts.Layout_PersonToPerson3 rollPeople( Layouts.Layout_PersonToPerson3 le, Layouts.Layout_PersonToPerson3 ri ) := TRANSFORM
+  SNA.Layouts.Layout_PersonToPerson3 rollPeople( SNA.Layouts.Layout_PersonToPerson3 le, SNA.Layouts.Layout_PersonToPerson3 ri ) := TRANSFORM
     pop2 := le.connected_associate2=0 and le.connected_associate2_paths=0;
     pop3 := not pop2 and le.connected_associate3=0 and le.connected_associate3_paths=0;
     
@@ -138,7 +145,7 @@ EXPORT PersonToPersonAttributes( dataset(Layouts.Layout_PersonToPerson) in_dids,
   END;
   rolledPeople := rollup( interestingPeople3, rollPeople(left,right), seq );
 
-  Layouts.Layout_PersonToPerson3 combine_peopleAddr( rolledPeople le, rolled ri ) := TRANSFORM
+  SNA.Layouts.Layout_PersonToPerson3 combine_peopleAddr( rolledPeople le, rolled ri ) := TRANSFORM
     self.connected_associate1_paths := le.connected_associate1_paths;
     self.connected_associate1       := le.connected_associate1;
     self.connected_associate2_paths := le.connected_associate2_paths;

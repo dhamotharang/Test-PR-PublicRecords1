@@ -106,14 +106,14 @@ IMPORT Autokey_Batch, BatchShare, Gateway, MDR, Phones, PhoneFinder_Services, Ro
     SELF.acctno               := L.acctno;
     SELF.seq                  := L.seq;
     SELF.phone                := L.phone;
-    SELF.phonestatus          := PhoneFinder_Services.Constants.PhoneStatus.NotAvailable;
-    BOOLEAN UseInternal_pvs   := L.typeflag = 'P';
-    SELF.coc_description      := IF(UseInternal_pvs, L.coc_description, '');
-    SELF.carrier_name         := IF(UseInternal_pvs, L.carrier_name, '');
-    SELF.phone_region_city    := IF(UseInternal_pvs, L.phone_region_city, '');
-    SELF.phone_region_st      := IF(UseInternal_pvs, L.phone_region_st, '');
-    SELF.RealTimePhone_Ext    := IF(UseInternal_pvs, L.RealTimePhone_Ext);
-    SELF.typeflag             := IF(UseInternal_pvs, L.typeflag, '');
+    SELF.phonestatus          := IF(L.phonestatus != '', L.phonestatus, PhoneFinder_Services.Constants.PhoneStatus.NotAvailable);
+    BOOLEAN UsePVS            := L.typeflag = Phones.Constants.TypeFlag.DataSource_PV;
+    SELF.coc_description      := L.coc_description;
+    SELF.carrier_name         := L.carrier_name;
+    SELF.phone_region_city    := L.phone_region_city;
+    SELF.phone_region_st      := L.phone_region_st;
+    SELF.RealTimePhone_Ext    := L.RealTimePhone_Ext;
+    SELF.typeflag             := IF(UsePVS, L.typeflag, '');
     SELF                      := [];
   END;
 

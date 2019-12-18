@@ -147,7 +147,7 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids, IdentityManagemen
 // =======================================================================
 // ========================   Emails	 ===================================
 // =======================================================================
-			EXPORT emails := PersonReports.email_records(dids, PROJECT(in_params, PersonReports.IParam.emails));
+			EXPORT emails := PersonReports.email_records(dids, PROJECT(in_params, PersonReports.IParam.emails, OPT));
 
 // =======================================================================
 // =====================  Vehicle From Gateways	 =========================

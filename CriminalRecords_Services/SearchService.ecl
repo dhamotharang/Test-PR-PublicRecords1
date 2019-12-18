@@ -86,6 +86,7 @@ export SearchService := MACRO
 		export unsigned2 	penalty_threshold := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(project (input_params, AutoStandardI.InterfaceTranslator.penalt_threshold_value.params));
     export string8 	  CaseFilingStartDate  := iesp.ECL2ESP.t_DateToString8(search_by.CaseFilingDateRange.StartDate);
     export string8 	  CaseFilingEndDate    := iesp.ECL2ESP.t_DateToString8(search_by.CaseFilingDateRange.EndDate);
+    export unsigned   OffenseCategories := CriminalRecords_Services.IParam.getOffenseCategories(first_row.options);
 	end;
 
 	is_valid_dateinput := (tempmod.CaseFilingStartDate = '' or STD.DATE.IsValidDate((UNSIGNED4)tempmod.CaseFilingStartDate)) 
@@ -102,55 +103,3 @@ export SearchService := MACRO
 																 															
 
 endmacro;
-//SearchService();
-/*
-<CrimSearchRequest>
-<row>
-<User>
-  <ReferenceCode></ReferenceCode>
-  <BillingCode></BillingCode>
-  <QueryId></QueryId>
-  <GLBPurpose>1</GLBPurpose>
-  <DLPurpose>1</DLPurpose>
-  <EndUser/>
-</User>
-<Options>
-  <ReturnCount>100</ReturnCount>
-  <StartingRecord>1</StartingRecord>
-  <UseNicknames>0</UseNicknames>
-  <IncludeAlsoFound>0</IncludeAlsoFound>
-  <UsePhonetics>0</UsePhonetics>
-  <StrictMatch>1</StrictMatch>
-</Options>
-<SearchBy>
-  <SSN></SSN>
-	<DOCNumber></DOCNumber>
-  <CaseNumber></CaseNumber>
-  <UniqueID></UniqueID>
-  <Name>
-    <Full></Full>
-    <First></First>
-    <Middle></Middle>
-    <Last></Last>
-  </Name>
-  <Address>
-    <StreetName></StreetName>
-    <StreetNumber></StreetNumber>
-    <StreetSuffix></StreetSuffix>
-    <UnitNumber></UnitNumber>
-    <State></State>
-    <City></City>
-    <Zip5></Zip5>
-		<County></County>
-  </Address>
-	<DOB>
-		<Year></Year>
-		<Month></Month>
-		<Day></Day>
-	</DOB>
-  <FilingJurisdiction></FilingJurisdiction>
-  <FilingJurisdictionState></FilingJurisdictionState>
-</SearchBy>
-</row>
-</CrimSearchRequest>
-*/

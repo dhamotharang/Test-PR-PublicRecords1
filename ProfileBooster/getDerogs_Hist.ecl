@@ -267,7 +267,40 @@ liens_full_roxie_unsuppressed := JOIN (liens_added, klr_nonFCRA,
 										LEFT OUTER, KEEP(100),
 				ATMOST(keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid), Riskwise.max_atmost));
 				
-liens_full_roxie := Suppress.Suppress_ReturnOldLayout(liens_full_roxie_unsuppressed, mod_access, layout_extended);
+liens_full_roxie_flagged := Suppress.MAC_FlagSuppressedSource(liens_full_roxie_unsuppressed, mod_access);
+
+liens_full_roxie_flagged_suppression_recs := liens_full_roxie_flagged(is_suppressed);
+liens_full_roxie_flagged_nonsuppression_recs := liens_full_roxie_flagged(~is_suppressed);
+		
+liens_full_roxie_flagged_processed_suppression_recs := PROJECT(liens_full_roxie_flagged_suppression_recs, TRANSFORM(RECORDOF(LEFT), 
+	SELF.BJL.last_liens_unreleased_date :=  Suppress.OptOutMessage('STRING');		
+	SELF.BJL.liens_recent_unreleased_count := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_historical_unreleased_count := (INTEGER)Suppress.OptOutMessage('INTEGER');																				
+	SELF.BJL.liens_unreleased_count30 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count90 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count180 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count12 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count24 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count36 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count60 := (INTEGER)Suppress.OptOutMessage('INTEGER');																																																										
+	SELF.BJL.last_liens_released_date := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_recent_released_count := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_historical_released_count := (INTEGER)Suppress.OptOutMessage('INTEGER');		
+	SELF.BJL.liens_released_count30 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count90 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count180 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count12 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count24 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count36 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count60 := (INTEGER)Suppress.OptOutMessage('INTEGER');													
+	SELF.date_first_seen := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.date_last_seen := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	self.tmsid := Suppress.OptOutMessage('STRING');
+	self.rmsid := Suppress.OptOutMessage('STRING');
+	SELF := LEFT;
+)); 
+
+liens_full_roxie := PROJECT(IF(mod_access.lexid_source_optout = 0, liens_full_roxie_flagged_nonsuppression_recs, liens_full_roxie_flagged_nonsuppression_recs + liens_full_roxie_flagged_processed_suppression_recs), TRANSFORM(layout_extended, SELF := LEFT));
 
 liens_full_thor1_unsuppressed := JOIN (
 	distribute(liens_added(rmsid<>''), hash64(tmsid, rmsid)), 
@@ -279,7 +312,40 @@ liens_full_thor1_unsuppressed := JOIN (
 				ATMOST(left.tmsid=right.tmsid and left.rmsid=right.rmsid, Riskwise.max_atmost),
 	local);
 	
-liens_full_thor1 := Suppress.Suppress_ReturnOldLayout(liens_full_thor1_unsuppressed, mod_access, layout_extended);
+liens_full_thor1_flagged := Suppress.MAC_FlagSuppressedSource(liens_full_thor1_unsuppressed, mod_access);
+
+liens_full_thor1_flagged_suppression_recs := liens_full_thor1_flagged(is_suppressed);
+liens_full_thor1_flagged_nonsuppression_recs := liens_full_thor1_flagged(~is_suppressed);
+		
+liens_full_thor1_flagged_processed_suppression_recs := PROJECT(liens_full_thor1_flagged_suppression_recs, TRANSFORM(RECORDOF(LEFT), 
+	SELF.BJL.last_liens_unreleased_date :=  Suppress.OptOutMessage('STRING');		
+	SELF.BJL.liens_recent_unreleased_count := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_historical_unreleased_count := (INTEGER)Suppress.OptOutMessage('INTEGER');																				
+	SELF.BJL.liens_unreleased_count30 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count90 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count180 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count12 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count24 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count36 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_unreleased_count60 := (INTEGER)Suppress.OptOutMessage('INTEGER');																																																										
+	SELF.BJL.last_liens_released_date := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_recent_released_count := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_historical_released_count := (INTEGER)Suppress.OptOutMessage('INTEGER');		
+	SELF.BJL.liens_released_count30 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count90 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count180 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count12 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count24 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count36 := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.BJL.liens_released_count60 := (INTEGER)Suppress.OptOutMessage('INTEGER');													
+	SELF.date_first_seen := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	SELF.date_last_seen := (INTEGER)Suppress.OptOutMessage('INTEGER');
+	self.tmsid := Suppress.OptOutMessage('STRING');
+	self.rmsid := Suppress.OptOutMessage('STRING');
+	SELF := LEFT;
+)); 
+
+liens_full_thor1 := PROJECT(IF(mod_access.lexid_source_optout = 0, liens_full_thor1_flagged_nonsuppression_recs, liens_full_thor1_flagged_nonsuppression_recs + liens_full_thor1_flagged_processed_suppression_recs), TRANSFORM(layout_extended, SELF := LEFT));
 
 liens_full_thor2 := liens_added(rmsid='');
 liens_full_thor := liens_full_thor1 + liens_full_thor2; // put the records with missing rmsid back together with those that have rmsid populated
@@ -772,7 +838,18 @@ all_foreclosures_roxie_unsuppressed := join(wFID, kforf,
 						add_foreclosure_flag(left, right),
 						left outer, atmost(keyed(left.fid=right.fid), riskwise.max_atmost), keep(50));
 						
-all_foreclosures_roxie := Suppress.Suppress_ReturnOldLayout(all_foreclosures_roxie_unsuppressed, mod_access, layout_extended);
+all_foreclosures_roxie_flagged := Suppress.MAC_FlagSuppressedSource(all_foreclosures_roxie_unsuppressed, mod_access);
+
+all_foreclosures_roxie_flagged_suppression_recs := all_foreclosures_roxie_flagged(is_suppressed);
+all_foreclosures_roxie_flagged_nonsuppression_recs := all_foreclosures_roxie_flagged(~is_suppressed);
+		
+all_foreclosures_roxie_flagged_processed_suppression_recs := PROJECT(all_foreclosures_roxie_flagged_suppression_recs, TRANSFORM(RECORDOF(LEFT), 
+	self.BJL.last_foreclosure_date := Suppress.OptOutMessage('STRING');
+	self.BJL.foreclosure_flag := [];
+    SELF := LEFT;
+)); 
+
+all_foreclosures_roxie := PROJECT(IF(mod_access.lexid_source_optout = 0, all_foreclosures_roxie_flagged_nonsuppression_recs, all_foreclosures_roxie_flagged_nonsuppression_recs + all_foreclosures_roxie_flagged_processed_suppression_recs), TRANSFORM(layout_extended, SELF := LEFT));
 
 all_foreclosures_thor1_unsuppressed := join(
 	distribute(wFID(fid<>''), hash64(fid)), 
@@ -783,7 +860,18 @@ all_foreclosures_thor1_unsuppressed := join(
 						left outer, atmost(left.fid=right.fid, riskwise.max_atmost), keep(50),
 	local);
 	
-all_foreclosures_thor1 := Suppress.Suppress_ReturnOldLayout(all_foreclosures_thor1_unsuppressed, mod_access, layout_extended);
+all_foreclosures_thor1_flagged := Suppress.MAC_FlagSuppressedSource(all_foreclosures_thor1_unsuppressed, mod_access);
+
+all_foreclosures_thor1_flagged_suppression_recs := all_foreclosures_thor1_flagged(is_suppressed);
+all_foreclosures_thor1_flagged_nonsuppression_recs := all_foreclosures_thor1_flagged(~is_suppressed);
+		
+all_foreclosures_thor1_flagged_processed_suppression_recs := PROJECT(all_foreclosures_thor1_flagged_suppression_recs, TRANSFORM(RECORDOF(LEFT), 
+	self.BJL.last_foreclosure_date := Suppress.OptOutMessage('STRING');
+	self.BJL.foreclosure_flag := [];
+    SELF := LEFT;
+)); 
+
+all_foreclosures_thor1 := PROJECT(IF(mod_access.lexid_source_optout = 0, all_foreclosures_thor1_flagged_nonsuppression_recs, all_foreclosures_thor1_flagged_nonsuppression_recs + all_foreclosures_thor1_flagged_processed_suppression_recs), TRANSFORM(layout_extended, SELF := LEFT));
 
 all_foreclosures_thor := all_foreclosures_thor1 + wFID(fid='');  // add back the records with blank FID						
 

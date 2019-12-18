@@ -1,6 +1,6 @@
-﻿import doxie, risk_indicators, doxie_raw, progressive_phone, ut, mdr, header, drivers, Riskwise, Relationship, Suppress;
+﻿import doxie, risk_indicators, doxie_raw, ut, mdr, header, drivers, Riskwise, Relationship, Suppress, Data_Services, AML, STD;
 
-EXPORT AMLRelativesAssocs ( Grouped DATASET(Layouts.RelativeParentLayout) iid_res,    
+EXPORT AMLRelativesAssocs ( Grouped DATASET(AML.Layouts.RelativeParentLayout) iid_res,    
 													 unsigned1 dppa, 
 													 unsigned1 glb,
 													 boolean isFCRA = false, 
@@ -8,13 +8,15 @@ EXPORT AMLRelativesAssocs ( Grouped DATASET(Layouts.RelativeParentLayout) iid_re
                                                      doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 													 ) := FUNCTION;
 
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+	
 Relationship.mac_read_application_type();  
 glb_ok := glb > 0 and glb < 8 or glb=11 or glb=12;
 dppa_ok := dppa > 0 and dppa < 8;
 
 boolean isUtility := false;
 
-Layouts.RelativeParentLayout addSeq(iid_res le, Integer C) := TRANSFORM
+AML.Layouts.RelativeParentLayout addSeq(iid_res le, Integer C) := TRANSFORM
                 SELF.seq := le.seq;
 								self.DIDseq := c;
                 SELF := le;
@@ -96,10 +98,6 @@ relatives_slim := record
 	unsigned1 RelatParentPubRec10yrs;
 end;
 								
-relatives_slim_CCPA := RECORD
-  unsigned4 global_sid;
-  relatives_slim;
-END;
 
 AllDIDs :=  rel_ids + SubjectDIDS ;
 
@@ -117,7 +115,7 @@ END;
 	END;
 	
 
-header_raw := JOIN(allDids, Doxie.Key_Header, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.s_did) AND
+header_raw_unsuppressed := JOIN(allDids, Doxie.Key_Header, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.s_did) AND
 
 														(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 														(header.isPreGLB(RIGHT) OR glb_ok) AND
@@ -126,8 +124,10 @@ header_raw := JOIN(allDids, Doxie.Key_Header, LEFT.DID <> 0 AND KEYED(LEFT.DID =
 														~risk_indicators.iid_constants.filtered_source(right.src, right.st)
 														 and	~Doxie.DataRestriction.isHeaderSourceRestricted(RIGHT.src, DataRestriction),
 															getHeaderRaw(LEFT, RIGHT),   atmost(200), keep(100)); //LIMIT(UT.limits.HEADER_PER_DID, SKIP));
-                                                              
-ParentIDs := rel_ids(stringlib.stringtolowercase(relation)  in ['father','mother', 'parent'] );
+               
+header_raw := Suppress.Suppress_ReturnOldLayout(header_raw_unsuppressed, mod_access, Doxie_Raw.Layout_HeaderRawOutput, data_environment := data_environment);			
+				 
+ParentIDs := rel_ids(STD.Str.tolowercase(relation)  in ['father','mother', 'parent'] );
 
 relatives_slim getParentHistDt(ParentIDs le, RelidsWseq ri ) := TRANSFORM
   self.did := le.did;
@@ -147,9 +147,8 @@ JustParents := join(ParentIDs, RelidsWseq,
 												 right.didseq=left.seq ,
 									 getParentHistDt(left,right));
 
-relatives_slim_CCPA getParentHeader(JustParents le, header_raw ri) := TRANSFORM
+relatives_slim getParentHeader(JustParents le, header_raw ri) := TRANSFORM
   self.did := le.did;
-  self.global_sid := ri.global_sid;
 	SELF.relation := le.relation;
 	SELF.seq   :=  le.seq;
 	SELF.prim_range := ri.prim_range;
@@ -185,36 +184,24 @@ ParentHeader := join(JustParents, header_raw, right.dt_first_seen <> 0 and left.
 										 getParentHeader(left,right), left outer, keep(1));
 
 
-ParentHdrTenYrs := project(ParentHeader, TRANSFORM(relatives_slim_CCPA, 
+ParentHdrTenYrs := project(ParentHeader, TRANSFORM(relatives_slim, 
 																					self.RelatParentPubRec10yrs := if((ut.DaysApart((string)left.firstseendt, (string)risk_indicators.iid_constants.myGetDate(left.historydate)) >= ut.DaysInNYears(10)),1,0),
 																					self := left));
 																						
 
-relatives_slim_CCPA rollrelatives(ParentHdrTenYrs le,ParentHdrTenYrs ri ) := Transform
+relatives_slim rollrelatives(ParentHdrTenYrs le,ParentHdrTenYrs ri ) := Transform
 		self.RelatParentPubRec10yrs := if(le.RelatParentPubRec10yrs = 1, le.RelatParentPubRec10yrs, ri.RelatParentPubRec10yrs);
-        self := le;
+		self := le;
 End;
 
 rollRelatPar := rollup(ParentHdrTenYrs, left.seq=right.seq, rollrelatives(left, right));
 
-RelativeParentLayout_CCPA := RECORD
-unsigned4 global_sid;
-Layouts.RelativeParentLayout;
-END;
-
-
-RelateParentResultsJoined := 	join(RelidsWseq, rollRelatPar,
+RelateParentResults := 	join(RelidsWseq, rollRelatPar,
 												 left.didseq=right.seq ,
-												 transform(RelativeParentLayout_CCPA, 
+												 transform(AML.Layouts.RelativeParentLayout, 
 																	 self.RelatParentPubRec10yrs := right.RelatParentPubRec10yrs,
-                                                                     self.global_sid := right.global_sid,
 																	 self := left),
 												left outer);
-							
-RelateParentResultsSuppressed := Suppress.Mac_SuppressSource(RelateParentResultsJoined, mod_access);	
-
-RelateParentResults := PROJECT(RelateParentResultsSuppressed, TRANSFORM(Layouts.RelativeParentLayout,
-                                                   SELF := LEFT));
                                                    
 // output(iid_res, named('iid_res'));
 // output(RelidsWseq, named('RelidsWseq'));
