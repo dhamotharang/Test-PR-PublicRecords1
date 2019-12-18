@@ -1,11 +1,16 @@
 ﻿/*--SOAP--
 <message name="Prod Data FCRA - Raw">
 	<part name="did" type="xsd:integer"/>
+	<part name="first" type="xsd:string"/>
+	<part name="middle" type="xsd:string"/>
+	<part name="last" type="xsd:string"/>
 	<part name="addr" type="xsd:string"/>
 	<part name="city" type="xsd:string"/>
 	<part name="state" type="xsd:string"/>
 	<part name="zip" type="xsd:string"/>
 	<part name="socs" type="xsd:string"/>
+	<part name="dob" type="xsd:string"/>
+	<part name="phone" type="xsd:string"/>
 	<part name="IncludeAllFiles" type="xsd:boolean"/>
 	<part name="IncludeAircraft" type="xsd:boolean"/>
 	<part name="IncludeStudent" type="xsd:boolean"/>
@@ -34,23 +39,29 @@
   <part name="DisplayDeployedEnvironment" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string"/>
   <part name="IntendedPurpose" type="xsd:string"/>
+  <part name="neutral_gateway" type="xsd:string"/>
  </message>
 */
 
 import american_student_list, avm_v2, doxie, doxie_files, fcra, liensv2, ln_propertyv2, riskwise, risk_indicators,
        watercraft, bankruptcyv3, bankruptcyv2, gong, impulse_email, infutorcid, email_data, paw,
        advo, inquiry_acclogs,  prof_licenseV2, header_quick, AlloyMedia_student_list,
-       SexOffender, _Control, watchdog, data_services;
+	 SexOffender, _Control, watchdog, data_services, std, gateway;
 
 export ProdData_FCRA := MACRO
 
 #WEBSERVICE(FIELDS(
 	'did',
+	'first',
+	'middle',
+	'last',
 	'addr',
 	'city',
 	'state',
 	'zip',
 	'socs',
+	'dob',
+	'phone',
 	'IncludeAllFiles',	
 	'IncludeADVO',
   'IncludeAircraft',
@@ -78,17 +89,23 @@ export ProdData_FCRA := MACRO
 	'IncludeWatercraft',	
 	'DisplayDeployedEnvironment',
 	'DataRestrictionMask',
-  'IntendedPurpose'
+  'IntendedPurpose',
+	'neutral_gateway'
 	));
 
 boolean	isFCRA := true;
 unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
-unsigned6 in_did := 0    : stored('did');
+unsigned6 input_did := 0    : stored('did');
 string9 in_socs := ''	   : stored('socs');
 string120 in_addr := ''	 : stored('addr');
 string25 in_city := ''	 : stored('city');
 string2 in_state := ''	 : stored('state');
 string5 in_zip := ''	   : stored('zip');
+string in_first := '' 		: stored('first');
+string in_middle := '' 		: stored('middle');
+string in_last := '' 			: stored('last');
+string in_dob := '' 			: stored('dob');
+string10 in_phone := ''   : stored('phone');
 
 boolean Include_All_Files := false : stored('IncludeAllFiles');
 boolean Include_Aircraft := false : stored('IncludeAircraft');
@@ -121,6 +138,7 @@ string DataRestrictionMask := '' : STORED('DataRestrictionMask');
 string IntendedPurpose := '' : STORED('IntendedPurpose');
 string delta_PersonContext_gateway := '' : STORED('delta_PersonContext_gateway');
 boolean Include_PersonContext := false : STORED('IncludePersonContext');
+string neutral_ip := riskwise.shortcuts.QA_neutral_roxieIP : stored('neutral_gateway');
 
 max_recs := 100;
 
@@ -130,7 +148,12 @@ end;
 emptyset := dataset([{''}],a);
 
 risk_indicators.layout_input parseAddr(emptySet l) := transform
-	self.did := in_did;
+	self.did := input_did;
+	self.score := if(input_did<>0, 100, 0);
+	self.fname := std.str.touppercase(in_first);
+	self.mname := std.str.touppercase(in_middle);
+	self.lname := std.str.touppercase(in_last);
+	
 	clean_addr := Risk_Indicators.MOD_AddressClean.clean_addr(in_addr, in_city, in_state, in_zip);
 	
 	self.in_streetaddress := in_addr;
@@ -156,12 +179,22 @@ risk_indicators.layout_input parseAddr(emptySet l) := transform
 	self.county := clean_addr[143..145];
 	self.geo_blk := clean_addr[171..177];
 	self.ssn := in_socs;
-	
+	self.dob := in_dob;
+	self.phone10 := in_phone;
 	self := [];
 end;
 clean_a2 := project(emptyset, parseAddr(left));
 output(clean_a2, named('cleaned_input'));
-	
+
+bsversion := 54; 
+neutral_gateways := DATASET ([{'neutralroxie', neutral_ip}], Gateway.Layouts.Config);
+								
+neutral_did_response := if(input_did=0, Risk_Indicators.Neutral_DID_Soapcall(clean_a2, neutral_gateways, bsversion, 2, DataRestrictionMask, true),
+	project(clean_a2, transform(Risk_Indicators.Layouts.Layout_Neutral_DID_Service, self := left, self := []) ) );
+output(neutral_did_response, named('neutral_did_response'));
+
+in_did := neutral_did_response[1].did;
+
 // DID section
 	header_recs := choosen(dx_header.key_header(iType)(keyed(s_did=in_did)), 200);
 	if(include_header or Include_All_Files, output(header_recs, named('header_records'))) ;	
@@ -452,10 +485,12 @@ input_with_did := project(clean_a2, transform(risk_indicators.layout_output, sel
 gw_personcontext := dataset( [{'delta_personcontext',delta_PersonContext_gateway}], risk_indicators.layout_gateways_in );
 gateways := project(gw_personContext, transform(gateway.layouts.config, self := left, self := []) );
 
-bsversion := 50;
+
     
 pc := Risk_Indicators.checkPersonContext(group(input_with_did, seq), gateways, bsversion, intendedPurpose);
 if(include_personContext or delta_personcontext_gateway <> '', output(pc, named('person_context')) );
 
 //
+
+
 ENDMACRO;
