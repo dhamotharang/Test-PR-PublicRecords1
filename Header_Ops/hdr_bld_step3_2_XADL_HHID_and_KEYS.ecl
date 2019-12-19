@@ -32,14 +32,17 @@ step4:=Header.proc_postHeaderBuilds(build_version).headerKeys;
 step5:= STD.File.MoveExternalFile(_control.IPAddress.bctlpedata10, _Constant.QH_path_ready + _Constant.QH_filename, _Constant.QH_path_done + _Constant.QH_filename);
 
 sequential(
-            header._config.setup_build,
-            dlog('KEY BUILD:XADL TO KEYS'),
-            if(status<1,sequential(step1,update_status(1))),
-            if(status<2,sequential(step2,update_status(2))),
-            if(status<3,sequential(step3,update_status(3))),
-            if(status<4,sequential(step4,update_status(4))),
-            if(status<5,sequential(step5,update_status(5)))
-          );
+    header._config.setup_build,
+    dlog('KEY BUILD:XADL TO KEYS'),
+    if(status<1,sequential(step1,update_status(1))),
+    if(status<2,sequential(step2,update_status(2))),
+    if(status<3,sequential(step3,update_status(3))),
+    if(status<4,sequential(step4,update_status(4))),
+    if(status<5,sequential(step5,update_status(5))),
+//In order to keep consistency across all builds and 
+//reserving status to add future steps, the end status is set as 9
+    if(status<9,update_status(9))            
+    );
           
 //WorkUnits History
 // 20191023 W20191120-084316 W20191122-102546 W20191124-113755
