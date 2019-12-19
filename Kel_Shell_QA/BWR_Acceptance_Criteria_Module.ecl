@@ -23,7 +23,7 @@ regex_replace:= regexreplace('[{RECORD ; END}]',get_lay,' ');
 filtered_lay:=nothor(STD.STr.SplitWords(trim(regex_replace,left,right),' ')); 
  // output(filtered_lay);
 
- // step 2
+// step 2
 // run this action Attribute 
 parallel(Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Professional License'),
          Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Assets'),
@@ -38,6 +38,7 @@ parallel(Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, fi
                                                                 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Best BII')
                                                                 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Judgments')
                                                                 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Derogs - Landlord Tenant Disputes')
+                                                                Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Derogs - Overall History')
                                                                 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Derogs - Lien and Judgment History')
                                                                 );
 
