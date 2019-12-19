@@ -48,11 +48,11 @@ MODULE
       self.base := left.death;
       self.src := left.death.src;
 	  // establishing this flag earlier since IsLimitedAccessDMF is included in output layout
-	  self.IsLimitedAccessDMF := (left.death.src = MDR.sourceTools.src_Death_Restricted) or (left.death.death_rec_src = 'SSA');	
+	  self.IsLimitedAccessDMF := left.death.src = MDR.sourceTools.src_Death_Restricted;	
       self := left));
 
 	  census_data.MAC_Fips2County_Keyed(death_recs,base.state,base.fipscounty,county_name,wct);
-		
+	OUTPUT(death_recs);	
     return dedup(wct, all);
 	END;
 
