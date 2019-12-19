@@ -12,7 +12,7 @@ EXPORT  ProcessDebarredParties := FUNCTION
 		// self.aka 			 := if(STD.Str.Find(L.name_info, 'aka ', 1) > 0 or STD.Str.Find(L.name_info, 'AKA ', 1) > 0
 												// ,STD.Str.FilterOut(TRIM(L.name_info, left, right)[STD.Str.Find(REGEXREPLACE('AKA ', L.name_info, 'aka '), 'aka ', 1) + 3..(length(L.name_info) - (STD.Str.Find(regexreplace('AKA ', L.name_info, 'aka '), 'aka ', 1))+4) + (STD.Str.Find(REGEXREPLACE('AKA ', L.name_info, 'aka '), 'aka ', 1) + 3)], ')')
 												// ,'');
-		self.name_info := IF(STD.Str.Find(L.name_info, 'aka ', 1) > 0 or STD.Str.Find(L.name_info, 'AKA ', 1) > 0
+		self.name_info := IF(STD.Str.Find(L.name_info, 'aka ', 1) > 0 or STD.Str.Find(L.name_info, 'AKA ', 1) > 0 or STD.Str.Find(L.name_info, '(', 1) > 0
 												,TRIM(L.name_info, left, right)[1..STD.Str.Find(L.name_info, '(', 1) - 1]
 												,L.name_info);
 		self.DOB 								:= STD.Str.ToUpperCase(L.DOB);
