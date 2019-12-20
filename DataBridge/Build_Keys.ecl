@@ -8,9 +8,10 @@ module
 																							 ,dx_DataBridge.Names().LinkIds.QA
 																							 ,dx_DataBridge.Names(pversion,false).LinkIds.New
 																							 ,BuildLinkIdsKey);  
-																							 
+	  
+		//Create DID records with non-zero DIDs																						 
 		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_DataBridge.Key_DID
-																							 ,DataBridge.Files().Base.Built
+																							 ,DataBridge.Files().Base.Built(did <> 0)
 																							 ,dx_DataBridge.Names().DID.QA
 																							 ,dx_DataBridge.Names(pversion,false).DID.New
 																							 ,BuildDIDKey);
