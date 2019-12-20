@@ -3,8 +3,14 @@
 //CCPA-799 VC: Input files with optout applied
 EXPORT File_OptedOut_Inputs := Module;
 
-	ds_Gong 	  := Gong.Key_History_Phone;
-  EXPORT Gong := PhonesInfo.fn_Apply_OptOut.Gong(ds_Gong):persist('~thor400_sta_eclcc::persist::optedout::gong'); //Apply optout close to input as we don't carry DID forward.
+	ds_Gong 	     := Gong.Key_History_Phone;
+  
+  GongWDid       := ds_Gong(did <> 0);//CCPA-799 Performance tuning
+  GongWoutDid    := ds_Gong(did = 0);
+  GongSuppressed := PhonesInfo.fn_Apply_OptOut.Gong(GongWDid)+GongWoutDid;//Apply optout close to input as we don't carry DID forward. 
+  Gong_dist   := distribute(GongSuppressed, hash(p3+p7)):persist('~thor400_sta_eclcc::persist::optedout::gong');   
+  
+  EXPORT Gong := Gong_dist;
 
   //Not needed as phonesplus already has the optout
 	// ds_Phonesplus     := PhonesPlus_v2.Key_Phonesplus_Fdid;
