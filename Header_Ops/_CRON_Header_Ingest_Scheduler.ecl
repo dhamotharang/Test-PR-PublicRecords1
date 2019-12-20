@@ -66,7 +66,7 @@ ECL := '\n'
 +'#stored (\'versionBuild\',\''+ build_version + '\');\n'
 +'#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest ' + ingestType + if(status <> 9, ' RECOVER ', '') + '\');\n\n'
 
-+ if(norun, 'fileservices.sendemail(Header.email_list.BocaDevelopers,\'Monitoring Header Ingest\',\'Header Ingest for this week completed - Try to run next week\');\n', 'Header_Ops.hdr_bld_ingest(\'' + build_version + '\',' + incremental + ', ' + status + ');\n');
++ if(norun, 'fileservices.sendemail(Header.email_list.BocaDevelopers,\'Monitoring Header Ingest\',\'Header Ingest for this week completed - Try to run next week\');\n', 'Header_Ops.hdr_bld_ingest(\'' + build_version + '\',' + incremental + ', ' + if(status = 9, 0, status) + ');\n');
 
 THOR := 'thor400_44_eclcc';
 
