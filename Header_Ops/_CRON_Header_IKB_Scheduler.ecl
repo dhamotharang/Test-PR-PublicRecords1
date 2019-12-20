@@ -65,7 +65,7 @@ ECL3 := '\n'
 +'#stored (\'buildname\', \'header_incremental_keys\');\n'
 +'#WORKUNIT(\'protect\',true);\n\n'
 +'import Header, header_ops;\n\n'
-+'build_ikb := header_ops.hdr_bld_ikb(\'' + bldversion + '\',' + status + ').all;\n\n'
++'build_ikb := header_ops.hdr_bld_ikb(\'' + bldversion + '\',' + if(status = 9, 0, status) + ').all;\n\n'
 +'build_ikb;';
 
 ECL := if(active_wk
