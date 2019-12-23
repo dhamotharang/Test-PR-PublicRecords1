@@ -348,10 +348,13 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED4 seq;
     UNSIGNED6 inquiredDID;
     UNSIGNED6 did;
+    STRING9 inputSSN;
+    STRING9 bestSSN;
     STRING2 indvType;
     UNSIGNED4 historydate;
     DueDiligence.Layouts.Name;
     STRING ssn;
+    STRING1 validSSN;
     DueDiligence.Layouts.Address;
     UNSIGNED4 dateFirstSeen;
     STRING50 src;

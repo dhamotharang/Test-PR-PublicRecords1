@@ -83,13 +83,20 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     
     //get identity risk
     indIDRisk := DueDiligence.getIndIdentityRisk(indPerAssoc, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, mod_access);
+    
+    //populate the attributes and flags
+    indKRI := DueDiligence.getIndKRI(indIDRisk);
 
     //if a person report is being requested, populate the report
-    indReportData :=  IF(includeReport, DueDiligence.getIndReport(indIDRisk, options, linkingOptions, ssnMask, mod_access), indIDRisk);
+    indReportData :=  IF(includeReport, DueDiligence.getIndReport(indKRI, options, linkingOptions, ssnMask, mod_access), indKRI);
+    
+    //populate the attributes and flags for those without a DID
+    indNoDIDKRI := DueDiligence.getIndKRINoDID(noDIDFound);
+    
+    //add both did and didless individuals
+    finalInd := SORT(indReportData + indNoDIDKRI, seq);
 
-
-    //populate the attributes and flags
-    indKRI := DueDiligence.getIndKRI(indReportData + noDIDFound);
+    
     
     
 
@@ -111,10 +118,12 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     IF(debugMode, OUTPUT(indCriminalData, NAMED('indCriminalData')));
     IF(debugMode, OUTPUT(indPerAssoc, NAMED('indPerAssoc')));
     IF(debugMode, OUTPUT(indIDRisk, NAMED('indIDRisk')));
-    IF(debugMode, OUTPUT(indReportData, NAMED('indReportData')));
     IF(debugMode, OUTPUT(indKRI, NAMED('indKRI')));
+    IF(debugMode, OUTPUT(indReportData, NAMED('indReportData')));
+    IF(debugMode, OUTPUT(indNoDIDKRI, NAMED('indNoDIDKRI')));
+    IF(debugMode, OUTPUT(finalInd, NAMED('finalInd')));
 
 
 
-    RETURN indKRI;
+    RETURN finalInd;
 END;

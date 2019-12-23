@@ -687,6 +687,9 @@ EXPORT SOURCE_GOVERNMENT := MDR.SourceTools.src_Gong_Government;
 EXPORT SOURCE_EBR := MDR.SourceTools.src_EBR;
 EXPORT SOURCE_BOTH_SOS_BUSINESS_REGISTRATION := 'BOTH';
 
+EXPORT SOURCE_IDENTITY_SOURCES_UTILITY := MDR.SourceTools.set_Utility_sources + [MDR.SourceTools.src_Experian_Phones, MDR.SourceTools.src_Targus_White_pages];
+
+
 
 //Industry (SIC/NAICS)
 EXPORT INDUSTRY_INDICATOR_SIC := 'S';

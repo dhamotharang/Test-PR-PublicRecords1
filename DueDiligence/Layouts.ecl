@@ -667,6 +667,30 @@ EXPORT Layouts := MODULE
     BOOLEAN hasSSN;
     BOOLEAN ssnRisk;
   END;
+  
+  EXPORT SourceDetailsLayout := RECORD
+    STRING2 source;
+    UNSIGNED sourceCount;
+    UNSIGNED sourceFirstSeen;
+    UNSIGNED sourceLastSeen;
+  END;
+  
+  EXPORT ssnDetails := RECORD
+    STRING9 ssn;
+    UNSIGNED4 firstSeen;
+    UNSIGNED4 lastSeen;
+    UNSIGNED4 issuedLowDate;
+    UNSIGNED4 issuedHighDate;
+    STRING2 issuedState;
+    BOOLEAN randomized;
+    BOOLEAN enumerationAtEntry;
+    BOOLEAN isITIN;
+    BOOLEAN invalid;
+    BOOLEAN issuedPriorToDOB;
+    BOOLEAN randomlyIssuedInvalid;
+    BOOLEAN reportedDeceased;
+    DATASET(SourceDetailsLayout) sourceInfo;
+  END;
 
   EXPORT BusReportDetails := RECORD
     SlimBusiness bestBusInfo;
@@ -699,6 +723,7 @@ EXPORT Layouts := MODULE
     STRING9 bestSSN;
     STRING10 bestPhone;
     UNSIGNED4 bestDOB;
+    UNSIGNED4 dateLastReported;
     Name bestName;
     Address bestAddress;
     DATASET(IndPropertyDataLayout) perProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
@@ -706,6 +731,11 @@ EXPORT Layouts := MODULE
     DATASET(VehicleDataLayout) perVehicle {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)};  
     DATASET(AircraftDataLayout) perAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};
     DATASET(BusAsscoiations) perBusinessAssociations;// {MAXCOUNT(DueDiligence.Constants.MAX_BUS_ASSOCIATIONS)}; 
+    ssnDetails inputSSNDetails;
+    ssnDetails bestSSNDetails;
+    DATASET({STRING9 ssn}) ssnOnFile;
+    DATASET({STRING8 dob}) dobOnFile;
+    DATASET(Name) akas;
   END;
 
 
@@ -722,9 +752,9 @@ EXPORT Layouts := MODULE
     RelatedParty individual;											  //populated in DueDiligence.getIndAttributes, DueDiligence.getIndInformation
     GeographicRiskLayout; 
     UNSIGNED4 numberOfSpouses;																							
-    DATASET(SlimRelation) spouses;																												//populated in DueDiligence.getIndRelatives
+    DATASET(SlimRelation) spouses;																												//populated in DueDiligence.getIndRelationships
     UNSIGNED4 numberOfParents;
-    DATASET(SlimRelation) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			  //populated in DueDiligence.getIndRelatives
+    DATASET(SlimRelation) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			  //populated in DueDiligence.getIndRelationships
     UNSIGNED4 numberOfAssociates;
     DATASET(SlimRelation) associates;
     STRING2 indvType;                         		  //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
