@@ -28,19 +28,19 @@ EXPORT Map_Disconnect_Gong_History(string version) := function
 	//Dedup/Remap Gong History Records////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Dedup Gong History Records By Hhid, Did, or Bdid
-	addAddr_hhid 	:= addAddr(hhid<>0 and did=0 and bdid=0) + addAddr(hhid<>0 and did<>0 and bdid=0) + addAddr(hhid<>0 and did<>0 and bdid<>0) + addAddr(hhid=0 and did=0 and bdid=0);
+	addAddr_hhid 	  := addAddr(hhid<>0 and did=0 and bdid=0) + addAddr(hhid<>0 and did<>0 and bdid=0) + addAddr(hhid<>0 and did<>0 and bdid<>0) + addAddr(hhid=0 and did=0 and bdid=0);
 	addAddr_did 		:= addAddr(hhid=0 and did<>0 and bdid=0) + addAddr(hhid=0 and did<>0 and bdid<>0);
 	addAddr_bdid		:= addAddr(hhid=0 and did=0 and bdid<>0) + addAddr(hhid<>0 and did=0 and bdid<>0);
 	
-	//Pull Current Records First
-	dhhid									:= dedup(sort(distribute(addAddr_hhid, hash(phone10)), phone10, hhid, -current_record_flag,  dt_first_seen, -dt_last_seen, local), phone10, hhid, local);
-	ddid										:= dedup(sort(distribute(addAddr_did, hash(phone10)), phone10, did, -current_record_flag, dt_first_seen, -dt_last_seen, local), phone10, did, local);
-	dbdid									:= dedup(sort(distribute(addAddr_bdid, hash(phone10)), phone10, bdid, -current_record_flag, dt_first_seen, -dt_last_seen, local), phone10, bdid, local);	
+	//Pull Current Records First //CCPA-799 - performance tuning
+	dhhid									:= dedup(sort(addAddr_hhid, p3+p7, hhid, -current_record_flag,  dt_first_seen, -dt_last_seen, local), p3+p7, hhid, local);
+	ddid									:= dedup(sort(addAddr_did,  p3+p7, did, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+p7, did, local);
+	dbdid									:= dedup(sort(addAddr_bdid, p3+p7, bdid, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+p7, bdid, local);	
 
 	allRec		:= dhhid + ddid + dbdid;
 
 	//Dedup By Address1; Sort Current Records First
-	ddRec 		:= dedup(sort(distribute(allRec, hash(phone10)), phone10, address1, -current_record_flag, dt_first_seen, -dt_last_seen, local), phone10, address1, local);
+  ddRec 		:= dedup(sort(allRec, p3+p7, address1, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+p7, address1, local);
 
 	//Remap Records to Common Layout	and Add Action Codes
 	PhonesInfo.Layout_Deact_GH.Temp2 fixF(ddRec l, unsigned c):= transform			

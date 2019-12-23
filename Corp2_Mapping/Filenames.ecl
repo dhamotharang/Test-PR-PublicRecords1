@@ -72,18 +72,16 @@ module
 	export az_raw :=
 	module
 
-		export CHGEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CHGEXT::az',landing_zone,,,143,,pGroupname,,,'FIXED',,,,,);
-		export COREXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::COREXT::az',landing_zone,,,903,,pGroupname,,,'FIXED',,,,,);
-		export FLMEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::FLMEXT::az',landing_zone,,,143,,pGroupname,,,'FIXED',,,,,);
-		export OFFEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::OFFEXT::az',landing_zone,,,163,,pGroupname,,,'FIXED',,,,,);
-		export StatusCodeType_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StatusCodeType_Table::az',landing_zone,,,,, pGroupname,,,'VARIABLE',,100,'\\t','\\n',);
-
+		export CHGEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::chgext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
+		export COREXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
+		export FLMEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::flmext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
+		export OFFEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::offext::az',landing_zone,,,,, pGroupname,,,'VARIABLE');
+	
 		export dAll_filenames :=
 			  CHGEXT.dAll_filenames
 			+ COREXT.dAll_filenames
 			+ FLMEXT.dAll_filenames
 			+ OFFEXT.dAll_filenames
-			+ StatusCodeType_Table.dAll_filenames
 			;
 
 	end;
