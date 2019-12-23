@@ -123,7 +123,7 @@
     BOOLEAN hasITIN;                                                //populated in DueDiligecne.getIndSSNData
     BOOLEAN hasImmigrantSSN;                                        //populated in DueDiligecne.getIndSSNData
     BOOLEAN validSSN;                                               //populated in DueDiligecne.getIndSSNData
-    BOOLEAN hasParent;                                              //populated in DueDiligence.getIndRelatives
+    BOOLEAN hasParent;                                              //populated in DueDiligence.getIndRelationships
     BOOLEAN atleastOneParentHasSSN;                                 //populated in DueDiligecne.getIndSSNData
     BOOLEAN atleastOneParentHasITIN;                                //populated in DueDiligecne.getIndSSNData
     BOOLEAN atleastOneParentHasImmigrantSSN;                        //populated in DueDiligecne.getIndSSNData
