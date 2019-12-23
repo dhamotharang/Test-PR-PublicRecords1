@@ -109,7 +109,7 @@
 	//Submits Profile's stats to Orbit
 	
 	SuperFile :=FraudGovPlatform.Filenames().OutputF.Scrubs_FraudGov + '::log';
-	Super_Log_File := SuperFile + '::scrubs_fraudgov';
+	Super_Log_File := SuperFile + '::' + scopename;
 	SuperFile_Entries := dataset(Super_Log_File,Scrubs.Layouts.LogRecord,thor,opt);
 	
 	Create_New_File	:=	sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp_'+scopename,thor,overwrite,named(scope_datasetName+'_LogEntryFull')),
