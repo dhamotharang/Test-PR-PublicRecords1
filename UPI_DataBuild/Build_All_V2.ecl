@@ -140,7 +140,7 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 	// export step2	:= output(pVersion_crk_macro(gcid, pVersion));
 	export step2	:= HealthcareNoMatchHeader_InternalLinking.MAC_AppendCRK(
 				gcid
-			 ,pBatch_jobID
+			 ,pVersion_unique
 			 ,UPI_DataBuild.Filenames_V2(pVersion_unique, pUseProd, gcid, pHistMode).temp_header.built
 			 ,UPI_DataBuild.Filenames_V2(pVersion_unique, pUseProd, gcid, pHistMode).asheader.built);
 			 			 
