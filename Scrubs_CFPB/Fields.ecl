@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311;
-EXPORT BaseFile_Fields := MODULE
+EXPORT Fields := MODULE
  
 EXPORT NumFields := 26;
  

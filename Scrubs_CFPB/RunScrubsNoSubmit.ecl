@@ -9,7 +9,7 @@ IMPORT _Control, Scrubs_CFPB, Scrubs;
 /*******************************************************************************/
 datasetName	    :=	'CFPB';
 filedate		:=	'20191220';
-scopename		:=	'BaseFile';
+scopename		:=	'';
 
 /*******************************************************************************/
 /*	NO NEED TO CHANGE ANYTHING BELOW THIS LINE                                 */

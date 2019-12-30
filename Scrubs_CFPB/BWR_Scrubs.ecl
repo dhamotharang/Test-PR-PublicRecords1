@@ -1,9 +1,9 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_CFPB.BaseFile_BWR_Scrubs - Checking field validity in a file - SALT V3.11.9');
+#workunit('name','Scrubs_CFPB.BWR_Scrubs - Checking field validity in a file - SALT V3.11.9');
 IMPORT Scrubs_CFPB,SALT311;
-infile := Scrubs_CFPB.BaseFile_In_CFPB;
-mod_scrubs := Scrubs_CFPB.BaseFile_Scrubs;
+infile := Scrubs_CFPB.In_CFPB;
+mod_scrubs := Scrubs_CFPB.Scrubs;
 expandedfile := mod_scrubs.FromNone(infile).ExpandedInfile;
 fromexpandedGlobal := mod_scrubs.FromExpanded(expandedfile);
 // Summary of errors found across all sources

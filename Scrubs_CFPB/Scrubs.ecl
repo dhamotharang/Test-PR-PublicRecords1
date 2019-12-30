@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311,STD;
-EXPORT BaseFile_Scrubs := MODULE
+EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
   EXPORT NumRules := 26;
@@ -8,7 +8,7 @@ EXPORT BaseFile_Scrubs := MODULE
   EXPORT NumFieldsWithRules := 10;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
-  EXPORT Expanded_Layout := RECORD(BaseFile_Layout_CFPB)
+  EXPORT Expanded_Layout := RECORD(Layout_CFPB)
     UNSIGNED1 record_sid_Invalid;
     UNSIGNED1 global_src_id_Invalid;
     UNSIGNED1 dt_vendor_first_reported_Invalid;
@@ -20,10 +20,10 @@ EXPORT BaseFile_Scrubs := MODULE
     UNSIGNED1 tract_fips10_Invalid;
     UNSIGNED1 blkgrp_fips10_Invalid;
   END;
-  EXPORT  Bitmap_Layout := RECORD(BaseFile_Layout_CFPB)
+  EXPORT  Bitmap_Layout := RECORD(Layout_CFPB)
     UNSIGNED8 ScrubsBits1;
   END;
-  EXPORT Rule_Layout := RECORD(BaseFile_Layout_CFPB)
+  EXPORT Rule_Layout := RECORD(Layout_CFPB)
     STRING Rules {MAXLENGTH(1000)};
   END;
   SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
@@ -45,16 +45,16 @@ EXPORT BaseFile_Scrubs := MODULE
           ,'record:Number_Errored_Records:SUMMARY'
           ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
   SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
-          ,BaseFile_Fields.InvalidMessage_record_sid(1),BaseFile_Fields.InvalidMessage_record_sid(2)
-          ,BaseFile_Fields.InvalidMessage_global_src_id(1),BaseFile_Fields.InvalidMessage_global_src_id(2)
-          ,BaseFile_Fields.InvalidMessage_dt_vendor_first_reported(1),BaseFile_Fields.InvalidMessage_dt_vendor_first_reported(2),BaseFile_Fields.InvalidMessage_dt_vendor_first_reported(3)
-          ,BaseFile_Fields.InvalidMessage_dt_vendor_last_reported(1),BaseFile_Fields.InvalidMessage_dt_vendor_last_reported(2),BaseFile_Fields.InvalidMessage_dt_vendor_last_reported(3)
-          ,BaseFile_Fields.InvalidMessage_seqno(1),BaseFile_Fields.InvalidMessage_seqno(2)
-          ,BaseFile_Fields.InvalidMessage_geoid10_blkgrp(1),BaseFile_Fields.InvalidMessage_geoid10_blkgrp(2),BaseFile_Fields.InvalidMessage_geoid10_blkgrp(3)
-          ,BaseFile_Fields.InvalidMessage_state_fips10(1),BaseFile_Fields.InvalidMessage_state_fips10(2),BaseFile_Fields.InvalidMessage_state_fips10(3)
-          ,BaseFile_Fields.InvalidMessage_county_fips10(1),BaseFile_Fields.InvalidMessage_county_fips10(2),BaseFile_Fields.InvalidMessage_county_fips10(3)
-          ,BaseFile_Fields.InvalidMessage_tract_fips10(1),BaseFile_Fields.InvalidMessage_tract_fips10(2),BaseFile_Fields.InvalidMessage_tract_fips10(3)
-          ,BaseFile_Fields.InvalidMessage_blkgrp_fips10(1),BaseFile_Fields.InvalidMessage_blkgrp_fips10(2)
+          ,Fields.InvalidMessage_record_sid(1),Fields.InvalidMessage_record_sid(2)
+          ,Fields.InvalidMessage_global_src_id(1),Fields.InvalidMessage_global_src_id(2)
+          ,Fields.InvalidMessage_dt_vendor_first_reported(1),Fields.InvalidMessage_dt_vendor_first_reported(2),Fields.InvalidMessage_dt_vendor_first_reported(3)
+          ,Fields.InvalidMessage_dt_vendor_last_reported(1),Fields.InvalidMessage_dt_vendor_last_reported(2),Fields.InvalidMessage_dt_vendor_last_reported(3)
+          ,Fields.InvalidMessage_seqno(1),Fields.InvalidMessage_seqno(2)
+          ,Fields.InvalidMessage_geoid10_blkgrp(1),Fields.InvalidMessage_geoid10_blkgrp(2),Fields.InvalidMessage_geoid10_blkgrp(3)
+          ,Fields.InvalidMessage_state_fips10(1),Fields.InvalidMessage_state_fips10(2),Fields.InvalidMessage_state_fips10(3)
+          ,Fields.InvalidMessage_county_fips10(1),Fields.InvalidMessage_county_fips10(2),Fields.InvalidMessage_county_fips10(3)
+          ,Fields.InvalidMessage_tract_fips10(1),Fields.InvalidMessage_tract_fips10(2),Fields.InvalidMessage_tract_fips10(3)
+          ,Fields.InvalidMessage_blkgrp_fips10(1),Fields.InvalidMessage_blkgrp_fips10(2)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
@@ -62,22 +62,22 @@ EXPORT BaseFile_Scrubs := MODULE
           ,'Rules with possible edits'
           ,'Records with at least one error'
           ,'Records without errors','UNKNOWN');
-EXPORT FromNone(DATASET(BaseFile_Layout_CFPB) h) := MODULE
+EXPORT FromNone(DATASET(Layout_CFPB) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.record_sid_Invalid := BaseFile_Fields.InValid_record_sid((SALT311.StrType)le.record_sid);
-    SELF.global_src_id_Invalid := BaseFile_Fields.InValid_global_src_id((SALT311.StrType)le.global_src_id);
-    SELF.dt_vendor_first_reported_Invalid := BaseFile_Fields.InValid_dt_vendor_first_reported((SALT311.StrType)le.dt_vendor_first_reported);
-    SELF.dt_vendor_last_reported_Invalid := BaseFile_Fields.InValid_dt_vendor_last_reported((SALT311.StrType)le.dt_vendor_last_reported);
-    SELF.seqno_Invalid := BaseFile_Fields.InValid_seqno((SALT311.StrType)le.seqno);
-    SELF.geoid10_blkgrp_Invalid := BaseFile_Fields.InValid_geoid10_blkgrp((SALT311.StrType)le.geoid10_blkgrp);
-    SELF.state_fips10_Invalid := BaseFile_Fields.InValid_state_fips10((SALT311.StrType)le.state_fips10);
-    SELF.county_fips10_Invalid := BaseFile_Fields.InValid_county_fips10((SALT311.StrType)le.county_fips10);
-    SELF.tract_fips10_Invalid := BaseFile_Fields.InValid_tract_fips10((SALT311.StrType)le.tract_fips10);
-    SELF.blkgrp_fips10_Invalid := BaseFile_Fields.InValid_blkgrp_fips10((SALT311.StrType)le.blkgrp_fips10);
+    SELF.record_sid_Invalid := Fields.InValid_record_sid((SALT311.StrType)le.record_sid);
+    SELF.global_src_id_Invalid := Fields.InValid_global_src_id((SALT311.StrType)le.global_src_id);
+    SELF.dt_vendor_first_reported_Invalid := Fields.InValid_dt_vendor_first_reported((SALT311.StrType)le.dt_vendor_first_reported);
+    SELF.dt_vendor_last_reported_Invalid := Fields.InValid_dt_vendor_last_reported((SALT311.StrType)le.dt_vendor_last_reported);
+    SELF.seqno_Invalid := Fields.InValid_seqno((SALT311.StrType)le.seqno);
+    SELF.geoid10_blkgrp_Invalid := Fields.InValid_geoid10_blkgrp((SALT311.StrType)le.geoid10_blkgrp);
+    SELF.state_fips10_Invalid := Fields.InValid_state_fips10((SALT311.StrType)le.state_fips10);
+    SELF.county_fips10_Invalid := Fields.InValid_county_fips10((SALT311.StrType)le.county_fips10);
+    SELF.tract_fips10_Invalid := Fields.InValid_tract_fips10((SALT311.StrType)le.tract_fips10);
+    SELF.blkgrp_fips10_Invalid := Fields.InValid_blkgrp_fips10((SALT311.StrType)le.blkgrp_fips10);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
-  EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),BaseFile_Layout_CFPB);
+  EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_CFPB);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
     SELF.ScrubsBits1 := ( le.record_sid_Invalid << 0 ) + ( le.global_src_id_Invalid << 2 ) + ( le.dt_vendor_first_reported_Invalid << 4 ) + ( le.dt_vendor_last_reported_Invalid << 6 ) + ( le.seqno_Invalid << 8 ) + ( le.geoid10_blkgrp_Invalid << 10 ) + ( le.state_fips10_Invalid << 12 ) + ( le.county_fips10_Invalid << 14 ) + ( le.tract_fips10_Invalid << 16 ) + ( le.blkgrp_fips10_Invalid << 18 );
     SELF := le;
@@ -99,7 +99,7 @@ EXPORT FromNone(DATASET(BaseFile_Layout_CFPB) h) := MODULE
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
-  EXPORT Infile := PROJECT(h,BaseFile_Layout_CFPB);
+  EXPORT Infile := PROJECT(h,Layout_CFPB);
   Expanded_Layout into(h le) := TRANSFORM
     SELF.record_sid_Invalid := (le.ScrubsBits1 >> 0) & 3;
     SELF.global_src_id_Invalid := (le.ScrubsBits1 >> 2) & 3;
@@ -181,7 +181,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
     UNSIGNED1 ErrNum := CHOOSE(c,le.record_sid_Invalid,le.global_src_id_Invalid,le.dt_vendor_first_reported_Invalid,le.dt_vendor_last_reported_Invalid,le.seqno_Invalid,le.geoid10_blkgrp_Invalid,le.state_fips10_Invalid,le.county_fips10_Invalid,le.tract_fips10_Invalid,le.blkgrp_fips10_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,BaseFile_Fields.InvalidMessage_record_sid(le.record_sid_Invalid),BaseFile_Fields.InvalidMessage_global_src_id(le.global_src_id_Invalid),BaseFile_Fields.InvalidMessage_dt_vendor_first_reported(le.dt_vendor_first_reported_Invalid),BaseFile_Fields.InvalidMessage_dt_vendor_last_reported(le.dt_vendor_last_reported_Invalid),BaseFile_Fields.InvalidMessage_seqno(le.seqno_Invalid),BaseFile_Fields.InvalidMessage_geoid10_blkgrp(le.geoid10_blkgrp_Invalid),BaseFile_Fields.InvalidMessage_state_fips10(le.state_fips10_Invalid),BaseFile_Fields.InvalidMessage_county_fips10(le.county_fips10_Invalid),BaseFile_Fields.InvalidMessage_tract_fips10(le.tract_fips10_Invalid),BaseFile_Fields.InvalidMessage_blkgrp_fips10(le.blkgrp_fips10_Invalid),'UNKNOWN'));
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_record_sid(le.record_sid_Invalid),Fields.InvalidMessage_global_src_id(le.global_src_id_Invalid),Fields.InvalidMessage_dt_vendor_first_reported(le.dt_vendor_first_reported_Invalid),Fields.InvalidMessage_dt_vendor_last_reported(le.dt_vendor_last_reported_Invalid),Fields.InvalidMessage_seqno(le.seqno_Invalid),Fields.InvalidMessage_geoid10_blkgrp(le.geoid10_blkgrp_Invalid),Fields.InvalidMessage_state_fips10(le.state_fips10_Invalid),Fields.InvalidMessage_county_fips10(le.county_fips10_Invalid),Fields.InvalidMessage_tract_fips10(le.tract_fips10_Invalid),Fields.InvalidMessage_blkgrp_fips10(le.blkgrp_fips10_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.record_sid_Invalid,'LEFTTRIM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.global_src_id_Invalid,'LEFTTRIM','LENGTHS','UNKNOWN')
@@ -201,7 +201,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
-  EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(BaseFile_Layout_CFPB) prevDS = DATASET([], BaseFile_Layout_CFPB), STRING10 Src='UNK'):= FUNCTION
+  EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Layout_CFPB) prevDS = DATASET([], Layout_CFPB), STRING10 Src='UNK'):= FUNCTION
   // field error stats
     SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
@@ -265,7 +265,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldErrorStats := IF(examples>0,j,SummaryInfo);
  
     // field population stats
-    mod_hygiene := BaseFile_hygiene(PROJECT(h, BaseFile_Layout_CFPB));
+    mod_hygiene := hygiene(PROJECT(h, Layout_CFPB));
     hygiene_summaryStats := mod_hygiene.Summary('');
     getFieldTypeText(infield) := FUNCTIONMACRO
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
@@ -372,7 +372,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     END;
     TotalRecsStats := PROJECT(hygiene_summaryStats, xTotalRecs(LEFT, 'records:total_records:POP'));
  
-    mod_Delta := BaseFile_Delta(prevDS, PROJECT(h, BaseFile_Layout_CFPB));
+    mod_Delta := Delta(prevDS, PROJECT(h, Layout_CFPB));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
     DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),26,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
@@ -385,13 +385,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
 END;
  
-EXPORT StandardStats(DATASET(BaseFile_Layout_CFPB) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
+EXPORT StandardStats(DATASET(Layout_CFPB) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
   myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_CFPB, BaseFile_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_CFPB, Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;

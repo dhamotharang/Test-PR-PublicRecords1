@@ -1,6 +1,6 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
 IMPORT SALT311;
-EXPORT BaseFile_GenerationMod := MODULE(SALT311.iGenerationMod)
+EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
   EXPORT salt_VERSION := 'V3.11.9';
@@ -9,7 +9,7 @@ EXPORT BaseFile_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_CFPB';
-  EXPORT spc_NAMESCOPE := 'BaseFile';
+  EXPORT spc_NAMESCOPE := '';
   EXPORT spc_PROCESS := '';
   EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
@@ -41,7 +41,6 @@ EXPORT BaseFile_GenerationMod := MODULE(SALT311.iGenerationMod)
     'OPTIONS:-gh\n'
     + 'MODULE:Scrubs_CFPB\n'
     + 'FILENAME:CFPB\n'
-    + 'NAMESCOPE:BaseFile\n'
     + '\n'
     + 'FIELDTYPE:invalid_no:ALLOW(0123456789)\n'
     + 'FIELDTYPE:invalid_id:LEFTTRIM:LENGTHS(1..5)\n'

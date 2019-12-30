@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311,STD;
-EXPORT BaseFile_hygiene(dataset(BaseFile_layout_CFPB) h) := MODULE
+EXPORT hygiene(dataset(layout_CFPB) h) := MODULE
  
 //A simple summary record
 EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
@@ -190,32 +190,32 @@ ErrorRecord := RECORD
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    BaseFile_Fields.InValid_record_sid((SALT311.StrType)le.record_sid),
-    BaseFile_Fields.InValid_global_src_id((SALT311.StrType)le.global_src_id),
-    BaseFile_Fields.InValid_dt_vendor_first_reported((SALT311.StrType)le.dt_vendor_first_reported),
-    BaseFile_Fields.InValid_dt_vendor_last_reported((SALT311.StrType)le.dt_vendor_last_reported),
-    BaseFile_Fields.InValid_is_latest((SALT311.StrType)le.is_latest),
-    BaseFile_Fields.InValid_seqno((SALT311.StrType)le.seqno),
-    BaseFile_Fields.InValid_geoid10_blkgrp((SALT311.StrType)le.geoid10_blkgrp),
-    BaseFile_Fields.InValid_state_fips10((SALT311.StrType)le.state_fips10),
-    BaseFile_Fields.InValid_county_fips10((SALT311.StrType)le.county_fips10),
-    BaseFile_Fields.InValid_tract_fips10((SALT311.StrType)le.tract_fips10),
-    BaseFile_Fields.InValid_blkgrp_fips10((SALT311.StrType)le.blkgrp_fips10),
-    BaseFile_Fields.InValid_total_pop((SALT311.StrType)le.total_pop),
-    BaseFile_Fields.InValid_hispanic_total((SALT311.StrType)le.hispanic_total),
-    BaseFile_Fields.InValid_non_hispanic_total((SALT311.StrType)le.non_hispanic_total),
-    BaseFile_Fields.InValid_nh_white_alone((SALT311.StrType)le.nh_white_alone),
-    BaseFile_Fields.InValid_nh_black_alone((SALT311.StrType)le.nh_black_alone),
-    BaseFile_Fields.InValid_nh_aian_alone((SALT311.StrType)le.nh_aian_alone),
-    BaseFile_Fields.InValid_nh_api_alone((SALT311.StrType)le.nh_api_alone),
-    BaseFile_Fields.InValid_nh_other_alone((SALT311.StrType)le.nh_other_alone),
-    BaseFile_Fields.InValid_nh_mult_total((SALT311.StrType)le.nh_mult_total),
-    BaseFile_Fields.InValid_nh_white_other((SALT311.StrType)le.nh_white_other),
-    BaseFile_Fields.InValid_nh_black_other((SALT311.StrType)le.nh_black_other),
-    BaseFile_Fields.InValid_nh_aian_other((SALT311.StrType)le.nh_aian_other),
-    BaseFile_Fields.InValid_nh_asian_hpi((SALT311.StrType)le.nh_asian_hpi),
-    BaseFile_Fields.InValid_nh_api_other((SALT311.StrType)le.nh_api_other),
-    BaseFile_Fields.InValid_nh_asian_hpi_other((SALT311.StrType)le.nh_asian_hpi_other),
+    Fields.InValid_record_sid((SALT311.StrType)le.record_sid),
+    Fields.InValid_global_src_id((SALT311.StrType)le.global_src_id),
+    Fields.InValid_dt_vendor_first_reported((SALT311.StrType)le.dt_vendor_first_reported),
+    Fields.InValid_dt_vendor_last_reported((SALT311.StrType)le.dt_vendor_last_reported),
+    Fields.InValid_is_latest((SALT311.StrType)le.is_latest),
+    Fields.InValid_seqno((SALT311.StrType)le.seqno),
+    Fields.InValid_geoid10_blkgrp((SALT311.StrType)le.geoid10_blkgrp),
+    Fields.InValid_state_fips10((SALT311.StrType)le.state_fips10),
+    Fields.InValid_county_fips10((SALT311.StrType)le.county_fips10),
+    Fields.InValid_tract_fips10((SALT311.StrType)le.tract_fips10),
+    Fields.InValid_blkgrp_fips10((SALT311.StrType)le.blkgrp_fips10),
+    Fields.InValid_total_pop((SALT311.StrType)le.total_pop),
+    Fields.InValid_hispanic_total((SALT311.StrType)le.hispanic_total),
+    Fields.InValid_non_hispanic_total((SALT311.StrType)le.non_hispanic_total),
+    Fields.InValid_nh_white_alone((SALT311.StrType)le.nh_white_alone),
+    Fields.InValid_nh_black_alone((SALT311.StrType)le.nh_black_alone),
+    Fields.InValid_nh_aian_alone((SALT311.StrType)le.nh_aian_alone),
+    Fields.InValid_nh_api_alone((SALT311.StrType)le.nh_api_alone),
+    Fields.InValid_nh_other_alone((SALT311.StrType)le.nh_other_alone),
+    Fields.InValid_nh_mult_total((SALT311.StrType)le.nh_mult_total),
+    Fields.InValid_nh_white_other((SALT311.StrType)le.nh_white_other),
+    Fields.InValid_nh_black_other((SALT311.StrType)le.nh_black_other),
+    Fields.InValid_nh_aian_other((SALT311.StrType)le.nh_aian_other),
+    Fields.InValid_nh_asian_hpi((SALT311.StrType)le.nh_asian_hpi),
+    Fields.InValid_nh_api_other((SALT311.StrType)le.nh_api_other),
+    Fields.InValid_nh_asian_hpi_other((SALT311.StrType)le.nh_asian_hpi_other),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
@@ -227,9 +227,9 @@ ErrorRecordsTotals := RECORD
 END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
-  FieldNme := BaseFile_Fields.FieldName(TotalErrors.FieldNum);
+  FieldNme := Fields.FieldName(TotalErrors.FieldNum);
   FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_id','invalid_id','invalid_date','invalid_date','Unknown','invalid_seqno','invalid_geoid10_blkgrp','invalid_state_fips10','invalid_county_fips10','invalid_tract_fips10','invalid_blkgrp_fips10','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown');
-  ErrorMessage := CHOOSE(TotalErrors.FieldNum,BaseFile_Fields.InValidMessage_record_sid(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_global_src_id(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_dt_vendor_first_reported(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_dt_vendor_last_reported(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_is_latest(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_seqno(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_geoid10_blkgrp(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_state_fips10(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_county_fips10(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_tract_fips10(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_blkgrp_fips10(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_total_pop(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_hispanic_total(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_non_hispanic_total(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_white_alone(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_black_alone(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_aian_alone(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_api_alone(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_other_alone(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_mult_total(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_white_other(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_black_other(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_aian_other(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_asian_hpi(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_api_other(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_nh_asian_hpi_other(TotalErrors.ErrorNum));
+  ErrorMessage := CHOOSE(TotalErrors.FieldNum,Fields.InValidMessage_record_sid(TotalErrors.ErrorNum),Fields.InValidMessage_global_src_id(TotalErrors.ErrorNum),Fields.InValidMessage_dt_vendor_first_reported(TotalErrors.ErrorNum),Fields.InValidMessage_dt_vendor_last_reported(TotalErrors.ErrorNum),Fields.InValidMessage_is_latest(TotalErrors.ErrorNum),Fields.InValidMessage_seqno(TotalErrors.ErrorNum),Fields.InValidMessage_geoid10_blkgrp(TotalErrors.ErrorNum),Fields.InValidMessage_state_fips10(TotalErrors.ErrorNum),Fields.InValidMessage_county_fips10(TotalErrors.ErrorNum),Fields.InValidMessage_tract_fips10(TotalErrors.ErrorNum),Fields.InValidMessage_blkgrp_fips10(TotalErrors.ErrorNum),Fields.InValidMessage_total_pop(TotalErrors.ErrorNum),Fields.InValidMessage_hispanic_total(TotalErrors.ErrorNum),Fields.InValidMessage_non_hispanic_total(TotalErrors.ErrorNum),Fields.InValidMessage_nh_white_alone(TotalErrors.ErrorNum),Fields.InValidMessage_nh_black_alone(TotalErrors.ErrorNum),Fields.InValidMessage_nh_aian_alone(TotalErrors.ErrorNum),Fields.InValidMessage_nh_api_alone(TotalErrors.ErrorNum),Fields.InValidMessage_nh_other_alone(TotalErrors.ErrorNum),Fields.InValidMessage_nh_mult_total(TotalErrors.ErrorNum),Fields.InValidMessage_nh_white_other(TotalErrors.ErrorNum),Fields.InValidMessage_nh_black_other(TotalErrors.ErrorNum),Fields.InValidMessage_nh_aian_other(TotalErrors.ErrorNum),Fields.InValidMessage_nh_asian_hpi(TotalErrors.ErrorNum),Fields.InValidMessage_nh_api_other(TotalErrors.ErrorNum),Fields.InValidMessage_nh_asian_hpi_other(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);
@@ -238,7 +238,7 @@ EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRU
   myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   fieldPopulationOverall := Summary('');
  
-  SALT311.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_CFPB, BaseFile_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
+  SALT311.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_CFPB, Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
  
   fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
   fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT311.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
