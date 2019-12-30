@@ -15,4 +15,4 @@ PARALLEL(
          OUTPUT(summaryGlobal, ALL, NAMED('ScrubsSummaryStats')),
          OUTPUT(ENTH(errsGlobal, 1000), ALL, NAMED('ScrubsErrs')),
          OUTPUT(standardStats, ALL, NAMED('StandardStats'))
-        );
+);

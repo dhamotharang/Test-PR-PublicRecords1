@@ -75,13 +75,13 @@ MAC_Scrubs_Report(BuildDate,myFolder,myFile)	:=	MACRO
 		CreateBitmaps,
 		TranslateBitmap,
 		GenerateCSVTemplate,
-		GenerateAlertsCSVTemplate
-		//SubmitStats,
+		GenerateAlertsCSVTemplate,
+		SubmitStats,
 		//mailfile
 	);
 ENDMACRO;
 
-folderName	:=	'Scrubs_'+datasetName;
+folderName	:=	'Scrubs_CFPB';
 inFileName	:=	IF(TRIM(scopename,ALL)<>'',TRIM(scopename,ALL)+'_In_'+datasetName,'In_'+datasetName);
 
 MAC_Scrubs_Report(filedate,folderName,inFileName);
