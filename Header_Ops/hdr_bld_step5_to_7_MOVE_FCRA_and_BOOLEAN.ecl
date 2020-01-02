@@ -37,6 +37,9 @@ seq := sequential(
             ,if(status<2,sequential(step2,update_status(2)))
             ,if(status<3,sequential(step3,update_status(3)))
             ,if(status<4,sequential(step4,update_status(4)))
+//In order to keep consistency across all builds and 
+//reserving status to add future steps, the end status is set as 9
+            ,if(status<9,update_status(9))
           );
    
 if(qh_running
