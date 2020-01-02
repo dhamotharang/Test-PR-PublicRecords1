@@ -1,4 +1,4 @@
-
+﻿
 // When scrubs encounters new valid event filing descriptions in future updates,
 // the new values will need to be added to this attribute if they are valid values. 
 
@@ -22,6 +22,7 @@ EXPORT set_valid_filing :=
 							'FICTITIOUS NAME AMENDMENT',
 							'FICTITIOUS NAME ASSIGNMENT',
 							'FICTITIOUS NAME REGISTRATION',
+							'FICTITIOUS NAME RENEWAL',
 							'FICTITIOUS NAME RESERVATION',
 							'FICTICIOUS NAME WITHDRAWAL',
 							'FORM REQUEST',
