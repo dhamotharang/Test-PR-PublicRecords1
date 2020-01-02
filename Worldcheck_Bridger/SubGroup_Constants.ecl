@@ -1171,6 +1171,7 @@
 		export string KEYWORD_PTANACOM							:= '857';
 		export string KEYWORD_EEPPA									:= '858';
 		export string KEYWORD_CANS_UN1373						:= '859';
+		export string KEYWORD_OFAC_MALI							:= '860';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

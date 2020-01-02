@@ -1207,6 +1207,7 @@ export Update_Base	:= MODULE
 			);
 			
 			still_blank := result1(lnpid = 0);
+			has_lnpid		:= result1(lnpid > 0);
 			
 	Health_Facility_Services.mac_get_best_lnpid_on_thor (
 					still_blank
@@ -1240,7 +1241,7 @@ export Update_Base	:= MODULE
 					,30
 					);
 			
-			result := result1 + result2;
+			result := has_lnpid + result2;
 			
 			sort_base_m	:= sort(distribute(base_m, hash(ncpdp_provider_id, prov_info_clean_dr_fname, prov_info_clean_dr_mname,
 											prov_info_clean_dr_lname, prov_info_clean_dr_suffix, prov_info_phys_prim_range, prov_info_phys_prim_name, 
