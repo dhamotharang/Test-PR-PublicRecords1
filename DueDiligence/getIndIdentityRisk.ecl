@@ -60,6 +60,26 @@ EXPORT getIndIdentityRisk(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                               LEFT.bestAddress.city <> DueDiligence.Constants.EMPTY AND
                                                               LEFT.bestAddress.state <> DueDiligence.Constants.EMPTY AND
                                                               LEFT.bestAddress.zip5 <> DueDiligence.Constants.EMPTY;
+                                                              
+                                                              
+                                    //fields for identity report
+                                    SELF.inputSSNDetails.enumerationAtEntry := Risk_Indicators.rcSet.isCode85(LEFT.inputSSNDetails.ssn, (STRING)LEFT.inputSSNDetails.issuedLowDate);
+                                    SELF.inputSSNDetails.isITIN := LEFT.cit_inputSSNITIN;
+                                    SELF.inputSSNDetails.invalid := LEFT.cit_inputSSNInvalid = 1;
+                                    SELF.inputSSNDetails.issuedPriorToDOB := LEFT.cit_inputSSNIssuePriorToDOB = 1;
+                                    SELF.inputSSNDetails.randomlyIssuedInvalid := LEFT.cit_inputSSNRandomIssuedInvalid = 1;
+                                    SELF.inputSSNDetails.reportedDeceased := LEFT.cit_inputSSNReportedDeceased = 1;
+                                    
+                                    SELF.bestSSNDetails.randomized := Risk_Indicators.rcSet.isCodeRS(RIGHT.ssn, RIGHT.socsvalflag, RIGHT.socllowissue, RIGHT.socsRCISflag);
+                                    SELF.bestSSNDetails.enumerationAtEntry :=  Risk_Indicators.rcSet.isCode85(LEFT.bestSSNDetails.ssn, RIGHT.socllowissue);
+                                    SELF.bestSSNDetails.isITIN := Risk_Indicators.rcSet.isCodeIT(LEFT.bestSSN);
+                                    SELF.bestSSNDetails.invalid := LEFT.bs_bestSSNValid = '1' OR ddBestSSNInvalid;
+                                    SELF.bestSSNDetails.issuedPriorToDOB := ddBestSSNIssuedPriorDOB;
+                                    SELF.bestSSNDetails.randomlyIssuedInvalid := ddBestSSNRandomIssuedInvalid;
+                                    SELF.bestSSNDetails.reportedDeceased := Risk_Indicators.rcSet.isCode02(LEFT.bs_bestSSNDecsFlag) OR Risk_Indicators.rcSet.isCode02(RIGHT.decsflag);
+                                    SELF.bestSSNDetails.issuedLowDate := (UNSIGNED)RIGHT.socllowissue;
+                                    SELF.bestSSNDetails.issuedHighDate := (UNSIGNED)RIGHT.soclhighissue;
+                                    SELF.bestSSNDetails.issuedState := RIGHT.soclstate;
                                     
                                     SELF := LEFT;),
                           LEFT OUTER,

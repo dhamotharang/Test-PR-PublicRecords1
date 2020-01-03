@@ -1,4 +1,4 @@
-import FLAccidents_Ecrash,codes,ut,AutoStandardI,iesp,AutoKeyI,lib_stringlib,doxie,autoheaderi,nid,Accident_Services;
+﻿import FLAccidents_Ecrash,codes,ut,AutoStandardI,iesp,AutoKeyI,lib_stringlib,doxie,autoheaderi,nid,Accident_Services;
 
 export Records(IParam.searchrecords in_mod) := function
 
@@ -30,7 +30,8 @@ export Records(IParam.searchrecords in_mod) := function
 														      )
                           ,record,all);
 		
-	get_recs := join(concat_search_types,FLAccidents_Ecrash.key_EcrashV2_accnbrV1,left.accnbr=right.l_accnbr,transform(recordof(carrierid_services.layouts.r_payload_with_penalty),self.found_by_deep_dive:=if(left.did=(string)(integer)right.did,left.found_by_deep_dive,false),self := right),limit(constants.max_recs_on_join,skip));
+	get_recs_all := join(concat_search_types,FLAccidents_Ecrash.key_EcrashV2_accnbrV1,left.accnbr=right.l_accnbr,transform(recordof(carrierid_services.layouts.r_payload_with_penalty),self.found_by_deep_dive:=if(left.did=(string)(integer)right.did,left.found_by_deep_dive,false),self := right),limit(constants.max_recs_on_join,skip));
+	get_recs     := get_recs_all((report_code = 'EA' and work_type_id in ['2', '3']) or (report_code = 'FA'));
 
 	UNSIGNED bDOL := IF(in_mod.DateOfLoss!='',Accident_Services.Constants.DOL,0);
 	UNSIGNED bNAME := IF((in_mod.FirstName!='' AND in_mod.LastName!='') OR in_mod.unparsedFullName!='' OR in_mod.companyname!='',Accident_Services.Constants.NAME,0);
