@@ -199,7 +199,66 @@ EXPORT LayoutsInternalReport := MODULE
   EXPORT ReportingOfBEOAssociatedBus := RECORD
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout  AssociatedBusLINKID;
-    DATASET (iesp.duediligencebusinessreport.t_DDRBusinessNameWithLexID) RptAssocBusNames;
+    DATASET(iesp.duediligencebusinessreport.t_DDRBusinessNameWithLexID) RptAssocBusNames;
+  END;
+  
+  EXPORT ReportIdentity := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID;
+    UNSIGNED estimatedAge;
+    iesp.duediligencepersonreport.t_DDRPersonSSNDetails inputSSNDetails;
+    iesp.duediligencepersonreport.t_DDRPersonSSNDetails bestSSNDetails; 
+    iesp.duediligencepersonreport.t_DDRPersonLexIDInformation identityDetails;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonLexIDSourcesReporting) allSourcesReporting;
+    UNSIGNED2 allSourcesCounts;
+  END;
+  
+  EXPORT PersonSSNDeviation := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID; 
+    UNSIGNED didTiedToSSN; 
+    UNSIGNED4 historyDate; 
+    STRING9 inputSSN; 
+    STRING9 ssnOnFile; 
+    STRING9 bestSSN; 
+    STRING9 inquiredBestSSN;
+    DueDiligence.Layouts.Name bestName; 
+    DueDiligence.Layouts.Address bestAddress;
+    UNSIGNED bestDOB;
+    UNSIGNED2 relation;  
+    STRING relationText;
+    UNSIGNED differentSSNs;
+    UNSIGNED differentBestSSNs;
+    STRING9 maskedInputSSN; 
+    STRING9 maskedSSNOnFile; 
+    STRING9 maskedBestSSN; 
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSSNDeviations) inputPersonDeviations;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSSNDeviations) bestPersonDeviations;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSSNLexID) reportedSSNs;
+  END;
+  
+  EXPORT IdentitySources := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID; 
+    STRING source;
+    UNSIGNED4 sourceCount;
+    UNSIGNED4 sourceFirstSeen;
+    UNSIGNED4 sourceLastSeen;
+    UNSIGNED2 sourceID;
+    STRING sourceCategory;
+    UNSIGNED4 sourceCategoryCount;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSources) espInputSourceDetails;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSources) espBestSourceDetails;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonLexIDSourcesReporting) espSourceDetailsWithDates;
+  END;
+  
+  EXPORT IdentityNestedData := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID;
+    DueDiligence.Layouts.Name aka;
+    DATASET(iesp.share.t_Name) espAKAs;
+    UNSIGNED4 dob;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonDOBAge) espDOBAge;
   END;
   
 END;

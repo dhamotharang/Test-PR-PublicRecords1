@@ -413,7 +413,11 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                     pickLongestStr(LEFT.investigation.investigationagent.agentreportnumber,
                                    RIGHT.investigation.investigationagent.agentreportnumber),
                 SELF := LEFT)	);
-		
+
+    shared accVehiclesDuped(DATASET(iesp.accident.t_AccidentReportVehicle) vehicles) :=
+         dedup(sort(vehicles,TagNumber,Make,Model,-(unsigned6)Owner.UniqueId),
+                             TagNumber,Make,Model); 
+                             
     EXPORT accidentRecsByDid(PersonReports.input.accidents acc_mod):= FUNCTION
       acc_raw   := PersonReports.accident_records(in_did, acc_mod);
       acc_clean := project(acc_raw,
@@ -429,7 +433,12 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                              -investigation.investigationagent.agentreportnumber,-d2i(accidentdate));
       acc_rolled_2 :=  accidentRollup(acc_raw_sorted_2);
       acc_rolled_sorted := sort(acc_rolled_2,-d2i(accidentdate),-accidentlocation.stateroadhighwayname);
-      RETURN acc_rolled_sorted;
+      //dedup each inner vehicle dataset
+      acc_final := project(acc_rolled_sorted,
+                     TRANSFORM(iesp.accident.t_AccidentReportRecord,
+                               SELF.Vehicles := accVehiclesDuped(LEFT.Vehicles),
+                               SELF := LEFT));
+      RETURN acc_final;
     END;
 	
     EXPORT pilotCertRecsByDid(Ioptions in_mod):= FUNCTION

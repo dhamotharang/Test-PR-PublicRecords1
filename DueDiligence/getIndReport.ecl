@@ -25,7 +25,7 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     getBusinessAssociationReportData := DueDiligence.reportIndBusAssoc(getAircraftData, options, linkingOptions, mod_access);
     
-    getIdentityReportData := DueDiligence.reportIndIdentity(getBusinessAssociationReportData);
+    getIdentityReportData := DueDiligence.reportIndIdentity(getBusinessAssociationReportData, options, ssnMask, mod_access);
 
 
 
