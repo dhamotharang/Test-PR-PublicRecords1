@@ -1,4 +1,4 @@
-IMPORT eMerges, iesp,DriversV2_Services,ut,
+﻿IMPORT eMerges, iesp,DriversV2_Services,ut,
         LiensV2_Services,LN_PropertyV2_Services, AutoStandardI,
         CriminalRecords_Services, SexOffender_Services,hunting_fishing_services,
         CCW_Services, doxie,VehicleV2_Services,doxie_cbrs, LN_PropertyV2,
@@ -385,6 +385,7 @@ export projectVehicles(dataset(VehicleV2_Services.Layout_Report) in_ds,
     self.PlateNumber        := reg_to_use.reg_license_plate;
     self.ResidentUniqueId          := ''; // null for now, will be filled in by the calling function
     self.AssociatedToReportAddress := regaddr_sameas_rptaddr;
+    self.ReportedName := reg_to_use.Reported_Name;
     self.registrant_did            := (unsigned6) reg_to_use.append_did;
   end;
   return project(in_ds, set_vehicles(left));  
