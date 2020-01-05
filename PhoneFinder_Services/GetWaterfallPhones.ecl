@@ -184,7 +184,7 @@
     SELF.RealTimePhone_Ext := ri.RealTimePhone_Ext;
     SELF.typeflag          := IF(isPrimaryPhone, ri.typeflag, le.typeflag);
     SELF.phone_source      := ri.phone_source;
-    SELF.dt_last_seen      := ri.dt_last_seen;
+    SELF.dt_last_seen      := IF(isPrimaryPhone, ri.dt_last_seen, le.dt_last_seen);
     SELF.isPrimaryPhone    := isPrimaryPhone;
     SELF                   := le;
   END;
