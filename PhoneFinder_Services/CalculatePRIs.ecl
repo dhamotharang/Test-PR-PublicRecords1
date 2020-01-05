@@ -139,7 +139,7 @@ FUNCTION
     END;
 
     dIterateRIs := PROJECT(dRIs(Active AND LevelCount > 0), tCheckRIs(LEFT));
-
+    
     // For each Level we would only have ONE LevelCount. The structure of RIs is misleading.
     // For any RI with respective Level, we can look at the LevelCount to get the threshold of PASS/WARN/FAIL
     rLevelCnt_Layout :=
@@ -162,6 +162,7 @@ FUNCTION
                                                 SELF.flag     := LEFT.Category,
                                                 SELF.Messages := PROJECT(ROWS(LEFT), TRANSFORM(iesp.share.t_StringArrayItem, SELF.value := LEFT.RiskDescription))));
     SELF.PhoneRiskIndicator := MAP( EXISTS(tblLevelCnt(cntLevels >= LevelCount)) => $.Constants.RiskIndicator[$.Constants.RiskLevel.FAILED],
+                                    EXISTS(dIterateRIs) AND inMod.SuppressRiskIndicatorWarnStatus   => $.Constants.RiskIndicator[$.Constants.RiskLevel.PASS],
                                     EXISTS(dIterateRIs)                          => $.Constants.RiskIndicator[$.Constants.RiskLevel.WARN],
                                     $.Constants.RiskIndicator[$.Constants.RiskLevel.PASS]);
     SELF.OTPRIFailed        := EXISTS(dIterateRIs(OTPRIFailed));
