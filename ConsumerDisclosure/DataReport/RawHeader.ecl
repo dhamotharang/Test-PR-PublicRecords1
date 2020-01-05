@@ -975,15 +975,15 @@ header_recs := project(header_recs_final_srt,
   return header_recs;
 end;
 
+// Caller of this function is responsible for filtering suppressed/overwritten records, if required. 
+// Keep in mind though that this function, as well as everything else in this module, is not supposed to be used for anything other 
+// than consumer disclosure.
 export GetAddressList(DATASET(layout_header_out) in_header_recs) := 
   FUNCTION
-  filtered_recs := in_header_recs(~MetaData.ComplianceFlags.isSuppressed,
-                              // ~MetaData.ComplianceFlags.isDisputed,
-                              ~MetaData.ComplianceFlags.isOverwritten);
-  all_addresses := PROJECT(filtered_recs, 
-                            TRANSFORM($.Layouts.address_rec, 
-                              SELF.subject_did:=(UNSIGNED)LEFT.Metadata.Lexid,
-                              SELF:=LEFT.RawData.head));
+  all_addresses := PROJECT(in_header_recs, TRANSFORM($.Layouts.address_rec, 
+    SELF.subject_did := (UNSIGNED) LEFT.Metadata.Lexid;
+    SELF:=LEFT.RawData.head;
+    ));
 
   unique_address_list := DEDUP(SORT(all_addresses, subject_did,zip,prim_name,prim_range,predir,postdir,suffix,sec_range,-geo_blk), 
                             subject_did,zip,prim_name,prim_range,predir,postdir,suffix,sec_range);
