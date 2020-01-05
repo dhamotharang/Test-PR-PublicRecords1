@@ -420,6 +420,11 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
   address_hierarchy_Unique_recs := choosen(dx_header.Key_Addr_Unique_Expanded()(keyed(did=searchdid)), 200);
 	if(include_header or Include_All_Files, output(sort(address_hierarchy_Unique_recs,addr_ind) , named('address_hierarchy_unique_recs'))) ;	
 	
+	ingest_key := dx_Header.key_first_ingest();
+	ingest_date_recs := join(header_recs, ingest_key, keyed(left.rid=right.rid), 
+		transform(recordof(ingest_key), self := right), atmost(riskwise.max_atmost), keep(1));
+	if(include_header or Include_All_Files, output(ingest_date_recs , named('ingest_date_recs'))) ;	
+
 	gong_recs := choosen(gong.Key_History_did(keyed(l_did=searchdid) and searchdid!=0), max_recs);
 	if(searchdid!=0 and (include_all_files=true or include_gong_and_targus=true), output(gong_recs, named('gong_by_did')) );
 

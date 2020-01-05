@@ -156,7 +156,7 @@ EXPORT FP_models := MODULE
   EXPORT Set_BSOptions(DATASET(Models.Layouts.Layout_Model_Request_In) ModelRequest,
                        DATASET(Models.Layouts.Layout_Attributes_In) Attr_Request,
                        BOOLEAN inputok = FALSE,
-                       BOOLEAN doInquiries = FALSE) := Function
+                       BOOLEAN doInquiries = FALSE, boolean UseIngestDate=false) := Function
     
     attributesV2set := [Models.FraudAdvisor_Constants.attrV2,
                         Models.FraudAdvisor_Constants.attrV201,
@@ -195,7 +195,8 @@ EXPORT FP_models := MODULE
                            IF(turn_on_AlwaysCheckInsurance, Risk_indicators.iid_constants.BSOptions.AlwaysCheckInsurance, 0) +
                            IF(turn_on_IncludeInquiries, Risk_indicators.iid_constants.BSOptions.IncludeInquiries, 0) +
                            IF(turn_on_IncludeInsNAP, Risk_indicators.iid_constants.BSOptions.IncludeInsNAP, 0)+
-                           IF(turn_on_ThreatMetrix, Risk_indicators.iid_constants.BSOptions.RunThreatMetrix, 0);
+                           IF(turn_on_ThreatMetrix, Risk_indicators.iid_constants.BSOptions.RunThreatMetrix, 0) +
+													 if(UseIngestDate, risk_indicators.iid_constants.BSOptions.UseIngestDate, 0);
     
     Return BSOptions;
   END;

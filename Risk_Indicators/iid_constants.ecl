@@ -334,7 +334,7 @@ export CreateFullName(string title, string fname, string mname, string lname, st
 end;
 
 export override_addr_type(string street_addr, string addr_type, string carr_rte) := function
-	s := stringlib.stringtouppercase(street_addr);
+	s := std.str.touppercase(street_addr);
 	checked_rare_PO := if(
 		REGEXFIND( '^(P[\\s\\.]*[O0BM]?[\\.\\s]*)?((B([O0]X)?)|X)[\\s\\d\\.#]*', s )  // po boxes (abbreviated)
 		OR REGEXFIND( '^POST[\\s\\.]*OFFICE[\\.\\s]*BOX[\\s\\d\\.#]*', s ) // po boxes (spelled out)
@@ -344,7 +344,7 @@ export override_addr_type(string street_addr, string addr_type, string carr_rte)
 end;
 //iid logic with chase pio2 logic
 export override_addr_type_chase(string street_addr_chase, string addr_type_chase) := function
-	s_chase := stringlib.stringtouppercase(street_addr_chase);
+	s_chase := std.str.touppercase(street_addr_chase);
 	checked_rare_PO_chase := if(
 		REGEXFIND( '^(P[\\s\\.]*[O0BM]?[\\.\\s]*)?((B([O0]X)?)|X)[\\s\\d\\.#]*', s_chase )  // po boxes (abbreviated)
 		OR REGEXFIND( '^POST[\\s\\.]*OFFICE[\\.\\s]*BOX[\\s\\d\\.#]*', s_chase ) // po boxes (spelled out)
@@ -520,7 +520,8 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
    RunThreatMetrix= 1          << 34,
    disablenongovernmentdldata =1 << 35,
    enableEquifaxPhoneMart   =1 << 36,
-	 TurnOffTumblings=1 << 37  // option to speed up bocashell 5.3 and higher if it's not needed
+	 TurnOffTumblings=1 << 37,  // option to speed up bocashell 5.3 and higher if it's not needed
+	 UseIngestDate=1 << 38 // archive filtering by IngestDate instead of dt_first_seen and vendor date first reported
 		);
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);
@@ -1069,7 +1070,7 @@ export Get_chase_NAS_NAP( string chase_f, string chase_l, string chase_addr,  in
 	return Chase_nas_nap;
 end;
 
-export IntendedPurposeCodes(string IntendedPurpose) := case( stringlib.stringtouppercase(IntendedPurpose),
+export IntendedPurposeCodes(string IntendedPurpose) := case( std.str.touppercase(IntendedPurpose),
 'APPLICATION' => ['110'],
 'CREDIT TRANSACTION' => ['110'],
 'CREDIT MORTGAGE' => ['110'],

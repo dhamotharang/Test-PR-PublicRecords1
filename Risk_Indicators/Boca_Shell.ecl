@@ -49,7 +49,8 @@ export Boca_Shell := MACRO
     '_TransactionId',
     '_BatchUID',
     '_GCID',
-		'TurnOffTumblings'));
+		'TurnOffTumblings',
+		'UseIngestDate'));
 
 string30 account_value := '' 		: stored('AccountNumber');
 string30 fname_val := ''     		: stored('FirstName');
@@ -105,6 +106,7 @@ unsigned1 ofac_version      := 1        : stored('OFACVersion');
 boolean   include_ofac       := false    : stored('IncludeOfac');
 boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
 boolean   TurnOffTumblings  := false    : stored('TurnOffTumblings');
+boolean UseIngestDate             := FALSE : stored('UseIngestDate'); 
 
 //CCPA fields
 unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
@@ -230,7 +232,8 @@ unsigned8 BSOptions :=
 	if(RetainInputDID, Risk_Indicators.iid_constants.BSOptions.RetainInputDID, 0 ) +
 	if(bsVersion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0) +
 	if(bsVersion >= 55, risk_indicators.iid_constants.BSOptions.RunThreatMetrix, 0) + 
-	if(TurnOffTumblings, risk_indicators.iid_constants.BSOptions.TurnOffTumblings, 0);
+	if(TurnOffTumblings, risk_indicators.iid_constants.BSOptions.TurnOffTumblings, 0) +
+	if(UseIngestDate, risk_indicators.iid_constants.BSOptions.UseIngestDate, 0);
 
 
 
