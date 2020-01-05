@@ -90,6 +90,7 @@ export t_PhoneFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	string PrimarySearchCriteria {xpath('PrimarySearchCriteria')}; //values['Phone','PII','']
 	t_PhoneFinderSwitchModeOptions RDPSwitchModeOptions {xpath('RDPSwitchModeOptions')};//hidden[internal]
     boolean SuppressNonRelevantRecs {xpath('SuppressNonRelevantRecs')};//hidden[internal]
+	boolean SuppressRiskIndicatorWarnStatus {xpath('SuppressRiskIndicatorWarnStatus')};//hidden[internal]
 end;
 		
 export t_SpoofCommon := record
