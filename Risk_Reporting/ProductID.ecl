@@ -37,6 +37,7 @@ EXPORT ProductID := MODULE
 	EXPORT RiskWise__RiskWiseMainPRWO := Riskwise;
 	EXPORT RiskWise__RiskWiseMainSS1O := Riskwise;
 	EXPORT RiskWise__RiskWiseMainWF2O := Riskwise;
+  EXPORT ConsumerProfile_Services__ReportServiceFCRA := Riskwise;
 	
 //NON FCRA
 	EXPORT AML__AML_Service := Accurint;
