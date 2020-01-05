@@ -59,5 +59,5 @@ EXPORT ProductID := MODULE
 	EXPORT Risk_Indicators__FlexID_Service := Accurint;	
 	EXPORT VerificationOfOccupancy__PAR_Search_Service := Accurint;	
 	EXPORT VerificationOfOccupancy__Search_Service := Accurint;	
-	
+	EXPORT Identifier2__Identifier2_Service := Accurint;
 END;
