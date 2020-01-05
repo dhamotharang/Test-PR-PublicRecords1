@@ -700,6 +700,7 @@ export t_TopBusinessMotorVehicleParty := record
 	string4 DecalYear {xpath('DecalYear')};
 	iesp.share.t_Date SourceDateFirstSeen {xpath('SourceDateFirstSeen')};
 	iesp.share.t_Date SourceDateLastSeen {xpath('SourceDateLastSeen')};
+  string30 ReportedName {xpath('ReportedName')};
 end;
 		
 export t_TopBusinessMotorVehicleDetail := record

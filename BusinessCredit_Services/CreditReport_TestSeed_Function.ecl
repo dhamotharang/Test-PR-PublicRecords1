@@ -2913,6 +2913,7 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 								self.SourceDateLastSeen.Year          := rt.MV_Recs_Curr_Part_LSeen_Year            ;
 								self.SourceDateLastSeen.Month         := rt.MV_Recs_Curr_Part_LSeen_Month           ;
 								self.SourceDateLastSeen.Day           := rt.MV_Recs_Curr_Part_LSeen_Day             ;
+								self.ReportedName                     :=  '' ;
 						));
 				));
 				self.MotorVehicleRecords.CurrentSourceDocs :=
@@ -3070,6 +3071,7 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 								self.SourceDateLastSeen.Year            := rt.MV_Recs_Prior_Part_LSeen_Year           ;
 								self.SourceDateLastSeen.Month           := rt.MV_Recs_Prior_Part_LSeen_Month          ;
 								self.SourceDateLastSeen.Day             := rt.MV_Recs_Prior_Part_LSeen_Day            ;
+              self.ReportedName                       := ''                                         ; 
 						));
 				));
 				self.MotorVehicleRecords.PriorSourceDocs :=
