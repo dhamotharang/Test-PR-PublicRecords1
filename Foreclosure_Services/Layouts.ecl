@@ -50,9 +50,10 @@ export Layouts := MODULE;
 	end;
 	export Final_Batch := record
 		STRING30	ACCTNO;
-		Foreclosure_Vacancy.Layouts.Final_Renewal;
+		Foreclosure_Vacancy.Layouts.Final_Renewal - PROPERTY_TYPE_CD;
 		string45 parcel_number_parcel_id;
 		string45 parcel_number_unmatched_id;
+		string3 property_type_cd;
 		String1 source;
 	end;
 END;
