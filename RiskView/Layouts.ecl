@@ -958,6 +958,47 @@ export layout_riskview_lnj_batch := record
 	%Jgmts%
 end;
 
+// Flattened version of iesp.riskview2.t_Rv2ReportSummaryRecord
+export layout_riskview5_batch_consumer_summary := record
+	//iesp.share.t_Name
+	string62 Full;
+	string20 First;
+	string20 Middle;
+	string20 Last;
+	string5 Suffix;
+	string3 Prefix;
+	//iesp.share.t_Address;
+	string10 StreetNumber;
+	string2 StreetPreDirection;
+	string28 StreetName;
+	string4 StreetSuffix;
+	string2 StreetPostDirection;
+	string10 UnitDesignation;
+	string8 UnitNumber;
+	string60 StreetAddress1;
+	string60 StreetAddress2;
+	string25 City;
+	string2 State;
+	string5 Zip5;
+	string4 Zip4;
+	string18 County;
+	string9 PostalCode;
+	string50 StateCityZip;
+	string9 SSN;
+	string10 Phone;
+	//iesp.share.t_MaskableDate;
+	string4 Year;
+	string2 Month;
+	string2 Day;
+	string12 UniqueId;
+	string1 AddressStability;
+	string1 InquiriesRestricted;
+	string1 SSNMismatch;
+	string1 DOBMismatch;
+	string1 AddressMismatch;
+	string1 PhoneMismatch;
+	string1 UniqueIDMismatch;
+end;
 
 export layout_riskview5_batch_response := record
 	string30 acctno;
@@ -966,6 +1007,7 @@ export layout_riskview5_batch_response := record
 	string3	 Billing_Index2 := '';
 	layout_riskview_lnj_batch;
 	STRING12 inquiry_lexid := '';
+	layout_riskview5_batch_consumer_summary;
 end;
 
 export attributes_internal_layout := record

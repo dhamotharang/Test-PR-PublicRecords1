@@ -1530,6 +1530,8 @@ EXPORT Constants := MODULE
 			export MaxAttributes := 1000;
 			export MaxAlertCount := 12;
 			export MaxPublicReportCount := 99;
+			export MaxStateExclusions := 50;
+			export MaxReportingSourceExclusions := 12292;
 	end;
 		
   // Risk Metrics
