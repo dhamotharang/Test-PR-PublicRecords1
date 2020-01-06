@@ -137,11 +137,8 @@ EXPORT phone_noreconn_search := MACRO
 	// eliminate minors as necessary
 	ut.PermissionTools.GLB.mac_FilterOutMinors(dids_deduped, filteredDids)
 
-	resultOut_w_tzone_no_suppress := doxie.phone_noreconn_records(srchMod).val(filteredDids, gateways_in);
+	resultOut_w_tzone := doxie.phone_noreconn_records(srchMod).val(filteredDids, gateways_in);
 
-	// Suppress records without full name and address
-	resultOut_w_tzone := if(~SuppressBlankNameAddress or (SuppressBlankNameAddress and exists(resultOut_w_tzone_no_suppress(listed_name != '' OR (fname != '' AND lname!= '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))))),
-                          resultOut_w_tzone_no_suppress);
 
 	boolean  batch_friendly := false : stored('BatchFriendly');
 	boolean  IncludePhonesFeedback := false : stored('IncludePhonesFeedback');
@@ -564,8 +561,11 @@ EXPORT phone_noreconn_search := MACRO
 
 	//resort incase either phone feedback or address feedback changed the UseDateSort sort logic
 	results := if(UseDateSort AND (IncludePhonesFeedback OR IncludeAddressFeedback), sort(resultsWithAddrFB, -dt_last_seen,penalt, lname, fname, record), resultsWithAddrFB);
+	
+	// Suppress records without full name and address, Royalties are calculated off of Non-suppressed results
+	results_suppress := IF(~SuppressBlankNameAddress OR (SuppressBlankNameAddress AND EXISTS(results(listed_name != '' OR (fname != '' AND lname != '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))))), results);
 
-	results_friendly := project(results, transform(recordof(results),
+	results_friendly := project(results_suppress, transform(recordof(results),
 											 self.COCDescription := [],
 											 self.SSCDescription := [],
 											 self.RealTimePhone_Ext := [],
@@ -584,7 +584,7 @@ EXPORT phone_noreconn_search := MACRO
 
 	if(issueHint,ut.outputMessage(ut.constants_MessageCodes.TRYSSN4));
 
-	out_rslt := output(if(~batch_friendly,results,results_friendly), named('Results'));
+	out_rslt := output(if(~batch_friendly,results_suppress,results_friendly), named('Results'));
 
   //OUTPUT(dt_filterOk, named('dt_filterOk'));
 	// output(dt_first_seenValueTrimmed, named('dt_first_seenValueTrimmed'));
