@@ -29,7 +29,8 @@ EXPORT LIB_Business_Shell_Function (
 											unsigned1 LexIdSourceOptout = 1,
 											string TransactionID = '',
 											string BatchUID = '',
-											unsigned6 GlobalCompanyId = 0
+											unsigned6 GlobalCompanyId = 0,
+ 											BOOLEAN UseOldBIPAppend_In = FALSE
 											) := FUNCTION
 
 options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)

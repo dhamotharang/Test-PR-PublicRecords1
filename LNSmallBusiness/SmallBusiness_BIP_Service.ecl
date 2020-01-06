@@ -212,6 +212,11 @@ SmallBusinessAnalyticsRequest XML:
 */ 
 #option('expandSelectCreateRow', true);
 #option('embeddedWarningsAsErrors', 0);
+// #option('optimizelevel', 0);  // NEVER RELEASE THIS LINE OF CODE TO PROD
+                                    // this is for deploying to a 100-way as 
+                                    // the service is large.
+                                    // This service won't run on a 1-way.
+
 IMPORT Address, Business_Risk_BIP, Cortera, Gateway, IESP, MDR, OFAC_XG5, Phones, Risk_Reporting, 
 			 Royalty, Models, Inquiry_AccLogs, STD, LNSmallBusiness;
 
@@ -585,13 +590,13 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 																														IncludeTargusGateway,
 																														RunTargusGateway, /* for testing purposes only */
 																														LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_BIP_Service,
-                                                                                                                        CorteraRetrotest,
-                                                                                                                        ds_CorteraRetrotestRecsRaw,
-                                                                                                                        AppendBestsFromLexIDs := SBA_20_Request,
-                                                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
-                                                                                                                        TransactionID := TransactionID, 
-                                                                                                                        BatchUID := BatchUID, 
-                                                                                                                        GlobalCompanyID := GlobalCompanyID
+																														CorteraRetrotest,
+																														ds_CorteraRetrotestRecsRaw,
+																														AppendBestsFromLexIDs := SBA_20_Request,
+																														LexIdSourceOptout := LexIdSourceOptout, 
+																														TransactionID := TransactionID, 
+																														BatchUID := BatchUID, 
+																														GlobalCompanyID := GlobalCompanyID
 																														);
 
 	 SBA_Results_Temp := PROJECT( SBA_Results_Temp_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );
@@ -634,7 +639,6 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		SELF.Attributes := NameValuePairsVersion101;
 	END;
 
-
 	// Create Version 2 Name/Value Pair Attributes
 	NameValuePairsVersion2 := NORMALIZE(SBA_Results, 316, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion2(LEFT, COUNTER));
 	
@@ -642,7 +646,14 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V2_NAME;
 		SELF.Attributes := NameValuePairsVersion2;
 	END;
-  
+
+	// Create Version 21 Name/Value Pair Attributes
+	NameValuePairsVersion21 := NORMALIZE(SBA_Results, 355, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion21(LEFT, COUNTER));
+	
+	iesp.smallbusinessanalytics.t_SBAAttributesGroup Version21(LNSmallBusiness.BIP_Layouts.IntermediateLayout le) := TRANSFORM
+		SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V21_NAME;
+		SELF.Attributes := NameValuePairsVersion21;
+	END;  
   
 	// Create SBFE Name/Value Pair Attributes
 	NameValuePairsSBFE := NORMALIZE(SBA_Results, 1841, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoSBFE(LEFT, COUNTER));
@@ -662,11 +673,13 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		SELF.Result.BusinessID.OrgID := le.OrgID;
 		SELF.Result.BusinessID.UltID := le.UltID;
 		SELF.Result.Models := le.ModelResults;
-		SELF.Result.AttributeGroups := IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 1, PROJECT(le, Version1(LEFT))) + 
-																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 101, PROJECT(le, Version101(LEFT))) +
-																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 2, PROJECT(le, Version2(LEFT))) +
-																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..9] = LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR)[1].AttributeGroup[10..] = 1, PROJECT(le, SBFEVersion1(LEFT))) +
-																	 DATASET([], iesp.smallbusinessanalytics.t_SBAAttributesGroup);
+		SELF.Result.AttributeGroups := 
+					IF(EXISTS(AttributesRequested(TRIM(AttributeGroup) = 'SMALLBUSINESSATTRV1')), PROJECT(le, Version1(LEFT))) + 
+					IF(EXISTS(AttributesRequested(TRIM(AttributeGroup) = 'SMALLBUSINESSATTRV101')), PROJECT(le, Version101(LEFT))) +
+					IF(EXISTS(AttributesRequested(TRIM(AttributeGroup) = 'SMALLBUSINESSATTRV2')), PROJECT(le, Version2(LEFT))) +
+					IF(EXISTS(AttributesRequested(TRIM(AttributeGroup) = 'SMALLBUSINESSATTRV21')), PROJECT(le, Version21(LEFT))) +
+					IF(EXISTS(AttributesRequested(TRIM(AttributeGroup) = 'SBFEATTRV1')), PROJECT(le, SBFEVersion1(LEFT))) +
+					DATASET([], iesp.smallbusinessanalytics.t_SBAAttributesGroup);
 																																
 		SELF._Header := [];
 		SELF := [];

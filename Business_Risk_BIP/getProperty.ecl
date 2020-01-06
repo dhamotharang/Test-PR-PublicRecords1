@@ -168,6 +168,7 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		
 		
 	END;
+  
 	RepPropertyOwned := JOIN(Shell, OwnershipKey, (LEFT.Clean_Input.Rep_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep_LexID = RIGHT.DID) or
 																									LEFT.Clean_Input.Rep2_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep2_LexID = RIGHT.DID) or
 																									LEFT.Clean_Input.Rep3_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep3_LexID = RIGHT.DID) or
@@ -195,7 +196,7 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
 			 Source := CASE(LN_Fares_ID[2],
 											'A' => MDR.SourceTools.src_LnPropV2_Fares_Asrs,
-											'D' => MDR.SourceTools.src_LnPropV2_Fares_Deeds,
+											'D' => IF (Options.BusShellVersion	>= 31 AND Options.MarketingMode = 1,'',MDR.SourceTools.src_LnPropV2_Fares_Deeds),
 														 '');
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
 			 STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_vendor_first_reported, HistoryDate),
@@ -211,6 +212,7 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		UNSIGNED4 Seq;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) Sources;
 	END;
+  
 	PropertyStatsTemp := PROJECT(PropertyStats, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
 																				SELF.Sources := DATASET([{LEFT.Source, 
@@ -219,7 +221,8 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources)));
-	PropertyStatsRolled := ROLLUP(PropertyStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.Sources := LEFT.Sources + RIGHT.Sources));
+  
+  PropertyStatsRolled := ROLLUP(PropertyStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.Sources := LEFT.Sources + RIGHT.Sources));
 	
 	withProperty := JOIN(Shell, PropertyStatsRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,

@@ -12,7 +12,7 @@ import BIPV2_xlink_segmentation;
 export IdAppendRoxieLocal(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = 0
+		,unsigned weightThreshold = 44
 		,boolean disableSaltForce = false
 		,boolean primForcePost = false 
 		,boolean useFuzzy = true

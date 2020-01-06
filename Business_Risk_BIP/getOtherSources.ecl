@@ -1,4 +1,6 @@
-﻿IMPORT AutoKey, BBB2, BIPV2, Business_Risk, Business_Risk_BIP, CalBus, Data_Services, Doxie, FBNv2, GovData, IRS5500, MDR, PAW, Phones, Phonesplus_v2, Risk_Indicators, UT, UtilFile, YellowPages, STD;
+﻿IMPORT AutoKey, BBB2, BIPV2, Business_Risk, Business_Risk_BIP, CalBus, Data_Services, DNB_FEINV2, 
+    Doxie, dx_DataBridge, FBNv2, Frandx, GovData, IRS5500, MDR, PAW, Phones, Phonesplus_v2, 
+    Risk_Indicators, TXBUS, UT, UtilFile, STD, YellowPages;
 
 EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -64,12 +66,13 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Rollup the dates first/last seen into child datasets by Seq
 	tempLayout := RECORD
 		UNSIGNED4 Seq;
-		INTEGER FirmReportedSales;
 		INTEGER FirmReportedEarnings;
 		UNSIGNED4 RecordCount;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) Sources;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSICNAIC) SICNAICSources;
+		DATASET(Business_Risk_BIP.Layouts.LayoutSalesSources) SalesSources;
 	END;
+	
 	BBBStatsTemp := PROJECT(SORT(UNGROUP(BBBMemberStats + BBBNonMemberStats), Seq), TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
 																				SELF.Sources := DATASET([{LEFT.Source, 
@@ -197,15 +200,21 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources);
                                         // For v30 and up, need to differentiate between 0 and '' for FirmReportedSales. Set missing records to -1.                          
-																				SELF.FirmReportedSales := IF(RIGHT.Income_Amount = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, 
-                                                                  (INTEGER)RIGHT.Income_Amount);
+																				SELF.SalesSources := DATASET([{LEFT.Source, 
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																																	LEFT.DateLastSeen,
+																																	LEFT.DateVendorLastSeen,
+																																	IF(RIGHT.Income_Amount = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, 
+																																						(INTEGER)RIGHT.Income_Amount);
+																																	}], Business_Risk_BIP.Layouts.LayoutSalesSources);	
 																				SELF.FirmReportedEarnings :=  (INTEGER)(STD.Str.Filter(RIGHT.Negative_Rev_Amount, '-') + (STRING)RIGHT.Form_990_Revenue_Amount);
 																				SELF.RecordCount := LEFT.RecordCount;
 																				SELF := []), left outer);
 																				
 	IRS990StatsRolled := ROLLUP(IRS990StatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; 
 																																		SELF.Sources := LEFT.Sources + RIGHT.Sources; 
-																																		SELF.FirmReportedSales := MAX(LEFT.FirmReportedSales, RIGHT.FirmReportedSales); 
+																																		SELF.SalesSources := LEFT.SalesSources + RIGHT.SalesSources;
 																																		SELF.FirmReportedEarnings := MAX(LEFT.FirmReportedEarnings, RIGHT.FirmReportedEarnings);
 																																		SELF.RecordCount := LEFT.RecordCount + RIGHT.RecordCount;
 																																		SELF := LEFT));
@@ -213,7 +222,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	withIRS990 := JOIN(withFBN, IRS990StatsRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Sources := LEFT.Sources + RIGHT.Sources;
-																							SELF.Firmographic.FirmReportedSales := (STRING)Business_Risk_BIP.Common.capNum(IF(RIGHT.RecordCount > 0, RIGHT.FirmReportedSales, -1), -1, 99999999999);
+																							SELF.SalesSources := LEFT.SalesSources + RIGHT.SalesSources;
 																							SELF.Firmographic.FirmReportedEarnings := (STRING)Business_Risk_BIP.Common.capNum(IF(RIGHT.RecordCount > 0, RIGHT.FirmReportedEarnings, -1), -1, 999999999);
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
@@ -343,12 +352,16 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		DateVendorFirstSeen := Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.datevendorfirstreported, Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate)[1..6];
 		DateLastSeen := Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.datelastseen, Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate)[1..6];
 		DateVendorLastSeen := Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.datevendorlastreported, Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate)[1..6];
-		Sources := DATASET([{MDR.SourceTools.src_Phones_Plus, 
+		
+    
+    Sources := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31 AND Options.MarketingMode = 1,
+                    DATASET([], Business_Risk_BIP.Layouts.LayoutSources),
+                    DATASET([{MDR.SourceTools.src_Phones_Plus, 
 												 DateFirstSeen, 
 												 DateVendorFirstSeen, 
 												 DateLastSeen,
 												 DateVendorLastSeen,
-												 1}], Business_Risk_BIP.Layouts.LayoutSources); 
+												 1}], Business_Risk_BIP.Layouts.LayoutSources)); 
 												 
 		SELF.PhoneSources := IF(BNAPCalc IN ['4', '5', '8'], Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
 		SELF.NameSources := IF(Options.BusShellVersion >= 22 AND BNAPCalc IN ['5', '8'], Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));																											
@@ -961,8 +974,246 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	 SELF := LEFT),
 													LEFT OUTER, KEEP(1), ATMOST(100), FEW));
 
+	// ---------------- DataBridge ------------------
+
+  dataBridge_raw := dx_DataBridge.Key_LinkIds.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+                                                        mod_access,
+                                                        Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                                        0 /*ScoreThreshold --> 0 = Give me everything*/
+                                                        );
+
+	Business_Risk_BIP.Common.AppendSeq(dataBridge_raw, Shell, dataBridge_seq, Options.LinkSearchLevel);
+	
+	// kFetchErrorCodesDataBridge := Business_Risk_BIP.Common.GrabFetchErrorCode(dataBridge_seq);
+	
+	dataBridge := Business_Risk_BIP.Common.FilterRecords(dataBridge_seq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_DataBridge, AllowedSourcesSet);
+
+  // Get all unique SIC Codes along with dates. For this data source, we only need the primary code.
+  dataBridgeSIC := TABLE(dataBridge,
+    {
+      Seq,
+      LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+      STRING2 Source := MDR.SourceTools.src_DataBridge,
+      STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6( IF( dt_first_seen = 0, dt_vendor_first_reported, dt_first_seen ), HistoryDate),
+      STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6( IF( dt_last_seen = 0, dt_vendor_last_reported, dt_last_seen ), HistoryDate),
+      UNSIGNED4 RecordCount := COUNT(GROUP),
+      STRING10 SICCode := (STD.Str.Filter((STRING)sic8_1, '0123456789'))[1..4],
+      BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
+    },
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)sic8_1)[1..4]
+  );
+
+  dataBridgeSICTemp := 
+    PROJECT(
+      dataBridgeSIC, 
+      TRANSFORM( tempLayout,
+        SELF.Seq := LEFT.Seq;
+        SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, LEFT.SICCode, Business_Risk_BIP.Common.industryGroup(LEFT.SICCode, Business_Risk_BIP.Constants.SIC), '' /*NAICCode*/, '' /*NAICIndustry*/, LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
+        SELF := []
+      )
+    );
+
+  dataBridgeSICRolled := 
+    ROLLUP(
+      dataBridgeSICTemp, 
+      LEFT.Seq = RIGHT.Seq, 
+      TRANSFORM( tempLayout, 
+        SELF.Seq := LEFT.Seq; 
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; 
+        SELF := LEFT
+      )
+    );
+
+  withDataBridge := 
+    JOIN(withPAWAttributes, dataBridgeSICRolled, 
+      LEFT.Seq = RIGHT.Seq,
+      TRANSFORM( Business_Risk_BIP.Layouts.Shell,
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
+        SELF := LEFT
+      ),
+      LEFT OUTER, KEEP(1), ATMOST(100), FEW
+    );
+ 
+  
+	// ---------------- TXBus ------------------
+  
+  TXBus_raw := TXBUS.Key_TXBUS_LinkIds.keyfetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+                                                        Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                                        0, // ScoreThreshold --> 0 = Give me everything
+                                                        Business_Risk_BIP.Constants.Limit_Default);
+
+	Business_Risk_BIP.Common.AppendSeq(TXBus_raw, Shell, TXBus_seq, Options.LinkSearchLevel);
+	
+	// kFetchErrorCodesDataBridge := Business_Risk_BIP.Common.GrabFetchErrorCode(TXBus_seq);
+	
+	TXBus := Business_Risk_BIP.Common.FilterRecords(TXBus_seq, dt_first_seen, 0, MDR.SourceTools.src_TXBUS, AllowedSourcesSet);
+
+  // Get all unique NAIC Codes along with dates. For this data source, we only need the primary code.
+  TXBusNAIC := TABLE(TXBus,
+    {
+      Seq,
+      LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+      STRING2 Source := MDR.SourceTools.src_TXBUS,
+      STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
+      STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
+      UNSIGNED4 RecordCount := COUNT(GROUP),
+      STRING10 NAICCode := (STD.Str.Filter((STRING)outlet_naics_code, '0123456789'))[1..6],
+      BOOLEAN IsPrimary := TRUE
+    },
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)outlet_naics_code)[1..6]
+  );
+
+  TXBusNAICTemp := 
+    PROJECT(
+      TXBusNAIC, 
+      TRANSFORM(tempLayout,
+        SELF.Seq := LEFT.Seq;
+        SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, '' /*SICCode*/, '' /*SICIndustry*/, LEFT.NAICCode, Business_Risk_BIP.Common.industryGroup(LEFT.NAICCode, Business_Risk_BIP.Constants.NAIC), LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
+        SELF := []
+      )
+    );
+
+  TXBusNAICRolled := 
+    ROLLUP(
+      TXBusNAICTemp, 
+      LEFT.Seq = RIGHT.Seq, 
+      TRANSFORM( tempLayout, 
+        SELF.Seq := LEFT.Seq; 
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; 
+        SELF := LEFT
+      )
+    );
+
+  withTXBusNAIC := 
+    JOIN(withDataBridge, TXBusNAICRolled, 
+      LEFT.Seq = RIGHT.Seq,
+      TRANSFORM( Business_Risk_BIP.Layouts.Shell,
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
+        SELF := LEFT
+      ),
+      LEFT OUTER, KEEP(1), ATMOST(100), FEW
+    );
+
+	// ---------------- Frandx ------------------
+
+  Frandx_raw := Frandx.Key_Linkids.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+                                                        Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                                        0); // ScoreThreshold --> 0 = Give me everything
+
+	Business_Risk_BIP.Common.AppendSeq(Frandx_raw, Shell, Frandx_seq, Options.LinkSearchLevel);
+	
+	// kFetchErrorCodesDataBridge := Business_Risk_BIP.Common.GrabFetchErrorCode(Frandx_seq);
+	
+	Frandx := Business_Risk_BIP.Common.FilterRecords(Frandx_seq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_Frandx, AllowedSourcesSet);
+
+  // Get all unique SIC Codes along with dates. For this data source, we only need the primary code.
+  FrandxSIC := TABLE(Frandx,
+    {
+      Seq,
+      LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+      STRING2 Source := MDR.SourceTools.src_Frandx,
+      STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6( IF( dt_first_seen = 0, dt_vendor_first_reported, dt_first_seen ), HistoryDate),
+      STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6( IF( dt_last_seen = 0, dt_vendor_last_reported, dt_last_seen ), HistoryDate),
+      UNSIGNED4 RecordCount := COUNT(GROUP),
+      STRING10 SICCode := (STD.Str.Filter((STRING)sic_code, '0123456789'))[1..4],
+      BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
+    },
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)sic_code)[1..4]
+  );
+
+  FrandxSICTemp := 
+    PROJECT(
+      FrandxSIC, 
+      TRANSFORM( tempLayout,
+        SELF.Seq := LEFT.Seq;
+        SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, LEFT.SICCode, Business_Risk_BIP.Common.industryGroup(LEFT.SICCode, Business_Risk_BIP.Constants.SIC), '' /*NAICCode*/, '' /*NAICIndustry*/, LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
+        SELF := []
+      )
+    );
+
+  FrandxSICRolled := 
+    ROLLUP(
+      FrandxSICTemp, 
+      LEFT.Seq = RIGHT.Seq, 
+      TRANSFORM( tempLayout, 
+        SELF.Seq := LEFT.Seq; 
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; 
+        SELF := LEFT
+      )
+    );
+
+  withFrandxSIC := 
+    JOIN(withTXBusNAIC, FrandxSICRolled, 
+      LEFT.Seq = RIGHT.Seq,
+      TRANSFORM( Business_Risk_BIP.Layouts.Shell,
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
+        SELF := LEFT
+      ),
+      LEFT OUTER, KEEP(1), ATMOST(100), FEW
+    );
+
+	// ---------------- DNB FEIN ------------------
+
+  DNBFEIN_raw := DNB_FEINV2.Key_LinkIds.KeyFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+                                                Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                                0, // ScoreThreshold --> 0 = Give me everything
+                                                Business_Risk_BIP.Constants.Limit_Default);
+
+	Business_Risk_BIP.Common.AppendSeq(DNBFEIN_raw, Shell, DNBFEIN_seq, Options.LinkSearchLevel);
+	
+	// kFetchErrorCodesDataBridge := Business_Risk_BIP.Common.GrabFetchErrorCode(Frandx_seq);
+	
+	DNBFEIN := Business_Risk_BIP.Common.FilterRecords(DNBFEIN_seq, date_first_seen, date_vendor_first_reported, MDR.SourceTools.src_Frandx, AllowedSourcesSet);
+
+  // Get all unique SIC Codes along with dates. For this data source, we only need the primary code.
+  DNBFEIN_SIC := TABLE(DNBFEIN,
+    {
+      Seq,
+      LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+      STRING2 Source := MDR.SourceTools.src_Dunn_Bradstreet_Fein,
+      STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
+      STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
+      UNSIGNED4 RecordCount := COUNT(GROUP),
+      STRING10 SICCode := (STD.Str.Filter((STRING)sic_code, '0123456789'))[1..4],
+      BOOLEAN IsPrimary := TRUE // There is only 1 SIC field on this source, mark it as primary
+    },
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)sic_code)[1..4]
+  );
+
+  DNBFEIN_SIC_Temp := 
+    PROJECT(
+      DNBFEIN_SIC, 
+      TRANSFORM( tempLayout,
+        SELF.Seq := LEFT.Seq;
+        SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, LEFT.SICCode, Business_Risk_BIP.Common.industryGroup(LEFT.SICCode, Business_Risk_BIP.Constants.SIC), '' /*NAICCode*/, '' /*NAICIndustry*/, LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
+        SELF := []
+      )
+    );
+
+  DNBFEIN_SIC_Rolled := 
+    ROLLUP(
+      DNBFEIN_SIC_Temp, 
+      LEFT.Seq = RIGHT.Seq, 
+      TRANSFORM( tempLayout, 
+        SELF.Seq := LEFT.Seq; 
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; 
+        SELF := LEFT
+      )
+    );
+
+  withDNBFEIN_SIC := 
+    JOIN(withFrandxSIC, DNBFEIN_SIC_Rolled, 
+      LEFT.Seq = RIGHT.Seq,
+      TRANSFORM( Business_Risk_BIP.Layouts.Shell,
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
+        SELF := LEFT
+      ),
+      LEFT OUTER, KEEP(1), ATMOST(100), FEW
+    );
+
+ 
 	//------------ Get Error Codes --------------
-	withErrorCodesBBBMember := JOIN(WithPAWAttributes, kFetchErrorCodesBBBMember, LEFT.Seq = RIGHT.Seq,
+	withErrorCodesBBBMember := JOIN(withDNBFEIN_SIC, kFetchErrorCodesBBBMember, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeBBBMember := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
