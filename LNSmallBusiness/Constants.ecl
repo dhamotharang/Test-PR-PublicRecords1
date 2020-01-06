@@ -21,6 +21,7 @@ EXPORT Constants :=
 
     EXPORT SMALL_BIZ_ATTR_V1_NAME   	:= 'SmallBusinessAttrV1';
     EXPORT SMALL_BIZ_ATTR_V2_NAME   	:= 'SmallBusinessAttrV2';
+    EXPORT SMALL_BIZ_ATTR_V21_NAME   	:= 'SmallBusinessAttrV21';
     EXPORT SMALL_BIZ_SBFE_ATTR_NAME 	:= 'SmallBusinessAttrSBFE';
 		EXPORT SMALL_BIZ_MKT_ATTR_V1_NAME := 'SmBusMktAttrV1';
     EXPORT SMALL_BIZ_ATTR           	:= 'SMALLBUSINESSATTRV';

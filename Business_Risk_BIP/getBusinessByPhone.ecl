@@ -136,5 +136,7 @@ EXPORT getBusinessByPhone(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT(CHOOSEN(PhoneVerification, 100), NAMED('Sample_PhoneVerification'));
 	// OUTPUT(CHOOSEN(PhoneVerificationRolled, 100), NAMED('Sample_PhoneVerificationRolled'));
 	// OUTPUT(CHOOSEN(withPhoneVerification, 100), NAMED('Sample_withPhoneVerification'));
+  // OUTPUT(AllowedSourcesSet,NAMED('Allowed_Srcs_BusPhone'));
+          
 	RETURN withPhoneVerification;
 END;						
