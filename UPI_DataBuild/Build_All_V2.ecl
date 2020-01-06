@@ -121,7 +121,7 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 		return make_them;
 	end;
 	
-	export pVersion_unique	:= pVersion + '_' + trim(pBatch_jobID);
+	export pVersion_unique			:= pVersion + '_' + trim(pBatch_jobID);
 	
 	export step1 := sequential(
 			check_supers
@@ -137,10 +137,10 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 			,UPI_DataBuild.Build_Base_V2.Build_temp_header(pVersion_unique,pUseProd,gcid,pHistMode,gcid_name,pBatch_jobID).temp_header_all
 			,UPI_DataBuild.Promote_V2.promote_temp_header(pVersion_unique,pUseProd,gcid,pHistMode).buildfiles.Built2QA
 	);
-
+	// export step2	:= output(pVersion_crk_macro(gcid, pVersion));
 	export step2	:= HealthcareNoMatchHeader_InternalLinking.MAC_AppendCRK(
 				gcid
-			 ,pVersion
+			 ,pVersion_unique
 			 ,UPI_DataBuild.Filenames_V2(pVersion_unique, pUseProd, gcid, pHistMode).temp_header.built
 			 ,UPI_DataBuild.Filenames_V2(pVersion_unique, pUseProd, gcid, pHistMode).asheader.built);
 			 			 

@@ -2,7 +2,7 @@
 
 dops_datasetname:=header._info.dops_datasetname;
 
-qhdr := '*Quick Header Build*';
+qhdr := '*QuickHeader*';
 valid_state := ['','unknown','submitted', 'compiling','compiled','blocked','running','wait'];
 d := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=qhdr))(wuid <> thorlib.wuid() and state in valid_state), -wuid):independent;
 qh_running :=  exists(d);
@@ -37,6 +37,9 @@ seq := sequential(
             ,if(status<2,sequential(step2,update_status(2)))
             ,if(status<3,sequential(step3,update_status(3)))
             ,if(status<4,sequential(step4,update_status(4)))
+//In order to keep consistency across all builds and 
+//reserving status to add future steps, the end status is set as 9
+            ,if(status<9,update_status(9))
           );
    
 if(qh_running
@@ -48,6 +51,6 @@ if(qh_running
   );   
 
 //WorkUnits History
-
+// 20191128 W20200101-195006 W20200101-195006 W20200102-111321
 // 20190324 W20190422-081331 & W20190422-103255
 // 20181224 W20190120-135405
