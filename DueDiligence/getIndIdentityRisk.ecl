@@ -4,6 +4,7 @@ EXPORT getIndIdentityRisk(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                           STRING dataRestrictionMask,
                           UNSIGNED1 dppa,
                           UNSIGNED1 glba,
+                          BOOLEAN isFCRA,
                           INTEGER bsVersion,
                           UNSIGNED8 bsOptions,
                           doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
@@ -21,7 +22,7 @@ EXPORT getIndIdentityRisk(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                       SELF := [];));
       
       
-    bestSSNWithFlags := DueDiligence.CommonIndividual.GetIIDSSNFlags(ssnBestIndvInternal, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, mod_access);
+    bestSSNWithFlags := DueDiligence.CommonIndividual.GetIIDSSNFlags(ssnBestIndvInternal, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, isFCRA, mod_access);
     
     identityData := JOIN(inData, bestSSNWithFlags,
                           LEFT.seq = (UNSIGNED)RIGHT.account AND
