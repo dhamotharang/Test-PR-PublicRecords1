@@ -160,8 +160,11 @@ EXPORT ImageSearchService() := FUNCTION
 	
 	ImageRetrievalResponse := ImageService.GetImages(ImageRetrievalRequest);  // RR-14857
 
-	IF(EXISTS(ReportsAll) AND ~(RequestVendorCode = eCrash_Services.Constants.VENDOR_CRASHLOGIC) AND ReportsAll[1].Releasable != '1',
-	  FAIL(ErrorCodeImageNonReleasable, 'Image is non-releasable'));
+	// Check the releasable flag for the last item in "ReportsAll", since it will be the most recent.
+	MostRecentReport := ReportsAll[COUNT(ReportsAll)];
+	IF(EXISTS(ReportsAll) AND MostRecentReport.Releasable != '1' AND
+		RequestVendorCode != eCrash_Services.Constants.VENDOR_CRASHLOGIC,
+		FAIL(ErrorCodeImageNonReleasable, 'Image is non-releasable'));
 
 	IF(
 		ImageRetrievalResponse[1].response.ImageData = '' 
