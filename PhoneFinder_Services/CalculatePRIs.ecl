@@ -55,13 +55,11 @@ IMPORT $, iesp, MDR, STD, ut;
 EXPORT CalculatePRIs( DATASET($.Layouts.PhoneFinder.Final) dIn,
                       $.iParam.SearchParams                inMod) :=
 FUNCTION
-  // If PHONERISKASSESSMENT, ONLY check OTP RI
-  dRIs := MAP(inMod.TransactionType = $.Constants.TransType.PHONERISKASSESSMENT AND inMod.UseThreatMetrixRules =>
-                    PROJECT(inMod.RiskIndicators(Category = $.Constants.enumCategory[2]), iesp.phonefinder.t_PhoneFinderRiskIndicator),
-              inMod.TransactionType = $.Constants.TransType.PHONERISKASSESSMENT =>
-                     PROJECT(inMod.RiskIndicators(Category = $.Constants.enumCategory[2] AND OTP),
-                     TRANSFORM(iesp.phonefinder.t_PhoneFinderRiskIndicator, SELF.Level := 'H', SELF.LevelCount := 1, SELF := LEFT)),
-               inMod.RiskIndicators);
+  
+  dRIs := IF(inMod.TransactionType = $.Constants.TransType.PHONERISKASSESSMENT,
+                     PROJECT(inMod.RiskIndicators(Category != $.Constants.enumCategory[1] OR RiskId IN $.Constants.PhoneRiskAssessmentExceptions), 
+                            iesp.phonefinder.t_PhoneFinderRiskIndicator),
+            inMod.RiskIndicators);
 
   rRiskInd_Layout :=
   RECORD(iesp.phonefinder.t_PhoneFinderRiskIndicator)
