@@ -801,20 +801,24 @@ isMiddleExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constant
 
 	SELF.fua := if(ischase and chase_expressions, risk_indicators.getActionCodes(le,4, NAS_summary1, NAP_summary1, ac_settings := actioncode_settings),risk_indicators.getActionCodes(le,4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings /*, rc*/));
 	
-	cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,'',IncludeITIN,IncludeComplianceCap),
-									ischase => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,'',IncludeITIN,IncludeComplianceCap),
-										actualIIDVersion=0 => risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC),	
-										risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,'',IncludeITIN,IncludeComplianceCap));
-		//need two chase checks here because chase would like their model returned in the normal CVI slot even though it is a custom model call. one for Custom model with modification, and one without.																		
-									
-	isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
-	
-	SELF.CVI := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
-							IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
-							IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)cvi_temp > 10 => '10',
-							IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)cvi_temp > 10 and actualIIDVersion=1 => '10',
-							isCodeDI AND (INTEGER)cvi_temp > 10 => '10',
-							cvi_temp);
+	OverrideOptions := MODULE(Risk_Indicators.iid_constants.IOverrideOptions) 
+	EXPORT isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) AND actualIIDVersion=1;
+    EXPORT isCodePO := IF(CustomCVIModelName = 'CCVI1909_1', risk_indicators.rcSet.isCodePO(le.addr_type), risk_indicators.rcSet.isCodePO(le.addr_type) AND IsPOBoxCompliant);
+    EXPORT isCodeCL := risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) AND IncludeCLoverride;
+    EXPORT isCodeMI := risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) AND IncludeMIoverride AND actualIIDVersion=1;
+    EXPORT isCodeMS := risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) AND IncludeMSoverride;
+    END;
+
+    //chase wants their custom cvi mapped to the normal and custom cvi and reason codes. 
+     SELF.CVI :=                        map(CustomCVIModelName = 'CCVI1810_1' => Models.CVI1810_1_0(NAP_summary1,NAS_summary1,le,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
+                                                            actualIIDVersion=0 => risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast, ,OverrideOptions),
+                                                            risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions));
+
+     // Chase custom score is calculated in SELF.CVI if it's requested, no need to call the attribute here too
+     SELF.cviCustomScore := MAP(CustomCVIModelName = 'CCVI1909_1' => Models.CVI1909_1_0(NAP_summary1,NAS_summary1,SELF.CVI, SELF.verify_dob, le.addr_type, le.zipclass, (STRING)le.socsverlevel, le.ssn, le.ssnExists, le.lastssnmatch2),
+                                                            CustomCVIModelName = 'CCVI1501_1' => Models.CVI1501_1_0(NAP_summary1,NAS_summary1,le,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
+                                                            CustomCVIModelName <> '' => SELF.CVI,
+                                                            '');
 	
 	 SELF.verdl := if(IncludeDLverification,le.verified_dl,'');
   SELF.corrected_dl:= IF(self.verdl <>le.dl_number,le.verified_dl,'');
@@ -832,18 +836,18 @@ isMiddleExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constant
 	isCode02 := risk_indicators.rcSet.isCode02(le.decsflag);
 
 	self.deceasedDate := MAP(	ssn_verified and isCode02 => if(le.deceasedDate=0, '', (string)le.deceasedDate),
-														isCodeDI => if(le.DIDdeceasedDate=0, '', (STRING)le.DIDdeceasedDate),
+														OverrideOptions.isCodeDI => if(le.DIDdeceasedDate=0, '', (STRING)le.DIDdeceasedDate),
 														
 														'');
 	self.deceasedDOB := MAP(ssn_verified and isCode02 => if(le.deceasedDOB=0, '', (string)le.deceasedDOB),
-													isCodeDI => if(le.DIDdeceasedDOB=0, '', (STRING)le.DIDdeceasedDOB),
+													OverrideOptions.isCodeDI => if(le.DIDdeceasedDOB=0, '', (STRING)le.DIDdeceasedDOB),
 													'');
 													
 	self.deceasedFirst := MAP( ssn_verified and isCode02 => le.deceasedFirst,
-														isCodeDI => le.DIDdeceasedFirst,
+														OverrideOptions.isCodeDI => le.DIDdeceasedFirst,
 														'');
 	self.deceasedLast := MAP(	ssn_verified and isCode02 => le.deceasedLast,
-														isCodeDI => le.DIDdeceasedLast,
+														OverrideOptions.isCodeDI => le.DIDdeceasedLast,
 														'');
 	
 	risk_indicators.mac_add_sequence(le.watchlists, watchlists_with_seq);
@@ -873,20 +877,7 @@ isMiddleExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constant
 															 FALSE);
 	self.addressPOBox := (Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass)) and actualIIDVersion=1;
 	self.addressCMRA := (le.hrisksic in risk_indicators.iid_constants.setCRMA or le.ADVODropIndicator='C') and actualIIDVersion=1;
-	
-	custom_cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName_in,IncludeITIN,IncludeComplianceCap),
-													CustomCVIModelName_in <> '' => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName_in,IncludeITIN,IncludeComplianceCap),
-													'');
-	
-	SELF.cviCustomScore := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)custom_cvi_temp > 10 => '10',
-							IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)custom_cvi_temp > 10 => '10',
-							IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)custom_cvi_temp > 10 => '10',
-							IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)custom_cvi_temp > 10 and actualIIDVersion=1 => '10',
-							isCodeDI AND (INTEGER)custom_cvi_temp > 10 => '10',
-							custom_cvi_temp);	
-							
 
-	
 	self.InstantIDVersion := (string)actualIIDVersion;	
 	
 	//new for Emerging Identities
