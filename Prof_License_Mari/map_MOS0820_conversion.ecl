@@ -13,7 +13,7 @@ EXPORT map_MOS0820_conversion(STRING pVersion) := FUNCTION
 	src_st							:= code[1..2];	//License state
 	mari_dest						:= '~thor_data400::in::proflic_mari::';
 
-	MD_Lic_types := ['IAS','INB','BRA','BRO','BRP','BRS','PCB','PCS','SAL','BRK','SCG','RSL','RAP','REC','ACM'];
+	MD_Lic_types := ['IAS','INB','BRA','BRO','BRP','BRS','PCB','PCS','SAL','BRK','SCG','RSL','RAP','GR','ACM'];
 
 	//Move file from sprayed to using
 	move_to_using := PARALLEL(
@@ -99,7 +99,7 @@ EXPORT map_MOS0820_conversion(STRING pVersion) := FUNCTION
 																	 StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(L.PRC_FIRST_NAME+' '+L.PRC_MIDDLE_NAME+' '+tempLastName+' '+L.PRC_SUFFIX)),' '));
 		tempBusName						:= IF(TRIM(L.PRC_FIRST_NAME,LEFT,RIGHT) = ' ' AND tempLastName != ' ',
 																StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(tempLastName)),
-																IF(TRIM(L.PRC_FIRST_NAME,LEFT,RIGHT) != ' ' AND TRIM(L.PRC_ENTITY_NAME,LEFT,RIGHT) != ' ',
+																IF(TRIM(L.PRC_FIRST_NAME,LEFT,RIGHT) = ' ' AND TRIM(L.PRC_ENTITY_NAME,LEFT,RIGHT) != ' ',
 																	 StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(L.PRC_ENTITY_NAME)),' '));
 		std_org_name 					:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(tempBusName);
 		tmpNameOrgSufx				:= Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(std_org_name);
@@ -250,19 +250,19 @@ EXPORT map_MOS0820_conversion(STRING pVersion) := FUNCTION
 																ut.CleanSpacesAndUpper(L.BA_CNTY),' ');
 		//IF rel_address != ba_address then rel_address = addr_addr1_2 else blank
 		CleanAddr1_2					:= ut.CleanSpacesAndUpper(L.REL_ADDRESS1);
-		cleanAddr2_2					:= ut.CleanSpacesAndUpper(L.REL_ADDRESS2);
+		CleanAddr2_2					:= ut.CleanSpacesAndUpper(L.REL_ADDRESS2);
 		IsMailingAddr					:= IF(trimAddr_1 != CleanAddr1_2
 																	AND CleanAddr1_2 != ' ','M',' ');
 		self.ADDR_MAIL_IND		:= IsMailingAddr;
 		tempAddr1_2							:= IF(IsMailingAddr != 'M',' ',
-																IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND cleanAddr2_2 = ' ',CleanAddr1_2,
-																	IF(IsMailingAddr = 'M' AND tempContact2 != ' ' AND cleanAddr2_2 != ' ',cleanAddr2_2,
-																		IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND cleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr1_2),cleanAddr2_2,CleanAddr1_2))));
+																IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND CleanAddr2_2 = ' ',CleanAddr1_2,
+																	IF(IsMailingAddr = 'M' AND tempContact2 != ' ' AND CleanAddr2_2 != ' ',CleanAddr2_2,
+																		IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND CleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr1_2),CleanAddr2_2,CleanAddr1_2))));
 		self.ADDR_ADDR1_2			:= IF(REGEXFIND('^.* LLC$',tempAddr1_2),'',tempAddr1_2);
 		tempAddr2_2						:= IF(IsMailingAddr != 'M',' ',
-																IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND cleanAddr2_2 = ' ',CleanAddr1_2,
-																	IF(IsMailingAddr = 'M' AND tempContact2 != ' ' AND cleanAddr2_2 != ' ',cleanAddr2_2,
-																		IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND cleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr1_2),CleanAddr1_2,cleanAddr2_2))));
+																IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND CleanAddr2_2 = ' ',CleanAddr2_2,
+																	IF(IsMailingAddr = 'M' AND tempContact2 != ' ' AND CleanAddr2_2 != ' ',CleanAddr2_2,
+																		IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND CleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr2_2),CleanAddr1_2,CleanAddr2_2))));
 		self.ADDR_ADDR2_2			:= IF(REGEXFIND('(^ATTN|^C/O)',tempAddr2_2),'',tempAddr2_2);
 		self.ADDR_CITY_2		  := IF(self.ADDR_MAIL_IND = 'M' AND TRIM(L.REL_CITY) != ' ',ut.CleanSpacesAndUpper(L.REL_CITY),' ');
 		self.ADDR_STATE_2			:= IF(self.ADDR_MAIL_IND = 'M' AND TRIM(L.REL_STATE) != ' ',ut.CleanSpacesAndUpper(L.REL_STATE),' ');
