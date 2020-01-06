@@ -30,7 +30,7 @@ EXPORT SearchService() := MACRO
 														 searchBy.AmountMin <> '' AND searchBy.AmountMax <> '' AND searchBy.AmountMin <= searchBy.AmountMax => TRUE, FALSE);
 	
 	BOOLEAN isMinimumInput := searchBy.Name.Last <> '' OR searchBy.SSN <> '' OR searchBy.Phone10 <> '' OR searchBy.UniqueId <> '' OR 
-														searchBy.EmailAddress <> '' OR (searchBy.DriversLicense.DriversLicenseNumber <> '' AND searchBy.DriversLicense.DriversLicenseState <> '') OR
+														searchBy.EmailAddress <> '' OR searchBy.DriversLicense.DriversLicenseNumber <> '' OR
 														searchBy.HouseholdID <> '' OR searchBy.CustomerPersonId <> ''  OR searchBy.DeviceSerialNumber <> '' OR 
 														ValidAmount OR searchBy.BankName <> '' OR searchBy.BankInformation.BankRoutingNumber <> '' OR
 														searchBy.BankInformation.BankAccountNumber <> '' OR searchBy.ISPName <> '' OR searchBy.MACAddress <> '' OR searchBy.DeviceId <> '' OR searchBy.IPAddress <> '' OR

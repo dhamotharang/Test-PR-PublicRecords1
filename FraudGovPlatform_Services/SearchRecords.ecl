@@ -260,8 +260,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(EmailAddress)) = 
 																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(L.fragment_value))),																			
 				 L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => 
-															ds_recentTransactions_w_timeline(DriversLicense.DriversLicenseNumber = L.fragment_value AND 
-																													DriversLicense.DriversLicenseState = ds_in[1].dl_state),
+															ds_recentTransactions_w_timeline(DriversLicense.DriversLicenseNumber = L.fragment_value),
 				 DATASET([], iesp.fraudgovreport.t_FraudGovTimelineDetails));
 
 		ds_recentTransactions_sorted := SORT(ds_recentTransactions,-eventDate.year, -eventDate.Month, -eventDate.day);
