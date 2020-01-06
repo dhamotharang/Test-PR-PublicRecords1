@@ -136,6 +136,9 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 								self.filename := left.filename;
 								self.NCF_FileDate := (unsigned4)left.filename[11..18];
 								self.NCF_FileTime := left.filename[20..26];
+								self.created := left.created;
+								self.updated := left.updated;
+								self.replaced := left.replaced;
 								self := [];
 								));
 
@@ -178,8 +181,8 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					// add date information
 					self.StartDate_Raw := right.StartDate;
 					self.EndDate_Raw := right.EndDate;
-					self.StartDate := fn_FirstDayOfMonth(right.StartDate);
-					self.EndDate := fn_LastDayOfMonth(right.EndDate);
+					self.StartDate := IF(right.PeriodType='M',fn_FirstDayOfMonth(right.StartDate), (integer)right.StartDate);
+					self.EndDate := IF(right.PeriodType='M',fn_LastDayOfMonth(right.EndDate), (integer)right.EndDate);
 					
 					self := right;
 					self := left;
@@ -200,7 +203,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 	ds4 := ds2(case_last_name<>'') + ds3;
 	
 	ds5 := JoinAddresses(ds4, addresses);
-	
+
 	return ds5;
 
 END;
