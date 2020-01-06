@@ -140,6 +140,27 @@ EXPORT LayoutsInternal := MODULE
     BOOLEAN atleastOneParentHasImmigrantSSN;
     UNSIGNED4 mostRecentParentSSNIssuanceDate;
   END;
+  
+  EXPORT LegalAttributes := RECORD
+    BOOLEAN attr_stateLegalEvent9;
+    BOOLEAN attr_stateLegalEvent8;
+    BOOLEAN attr_stateLegalEvent7;
+    BOOLEAN attr_stateLegalEvent6;
+    BOOLEAN attr_stateLegalEvent5;
+    BOOLEAN attr_stateLegalEvent4;
+    BOOLEAN attr_stateLegalEvent3;
+    BOOLEAN attr_stateLegalEvent2;
+    
+    BOOLEAN attr_offenseType9;
+    BOOLEAN attr_offenseType8;
+    BOOLEAN attr_offenseType7;
+    BOOLEAN attr_offenseType6;
+    BOOLEAN attr_offenseType5;
+    BOOLEAN attr_offenseType4;
+    BOOLEAN attr_offenseType3;
+    BOOLEAN attr_offenseType2;
+    BOOLEAN attr_offenseType0;
+  END;
 
   EXPORT RelatedParty := RECORD
     InternalSeqAndIdentifiersLayout;
@@ -148,6 +169,7 @@ EXPORT LayoutsInternal := MODULE
     LegalFlags;
     UNSIGNED4 headerFirstSeen;
     RelatedPartySSNInfo;
+    LegalAttributes;
   END;
   
   EXPORT SlimRelationWithHistoryDate := RECORD
@@ -378,7 +400,8 @@ EXPORT LayoutsInternal := MODULE
     STRING sort_key;
     UNSIGNED category;
     LegalFlags;
-    DueDiligence.Layouts.CriminalOffenses
+    DueDiligence.Layouts.CriminalOffenses;
+    LegalAttributes;
   END;
 
   EXPORT IndCrimLayoutFlat := RECORD

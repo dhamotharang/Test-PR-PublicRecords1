@@ -477,7 +477,8 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                                                 SELF.offenseDDFirstReportedActivity := (UNSIGNED)IF(LEFT.temp_offenseDate = DueDiligence.Constants.EMPTY, (STRING8)LEFT.temp_calcdFirstSeenDate, LEFT.temp_offenseDate);
                                                                 SELF.offenseDDLastReportedActivity := LEFT.offenseDDLastReportedActivity;
                                                                 SELF.offenseDDLastCourtDispDate := LEFT.offenseDDLastCourtDispDate;
-                                                                // SELF.offenseDDLegalEventTypeCode :=
+                                                                // SELF.offenseCategoryID;
+                                                                // SELF.offenseCategoryDescription;
                                                                 SELF.offenseCharge := LEFT.charge;
                                                                 SELF.offenseDDChargeLevelCalculated := chargeLevelCalculated;
                                                                 SELF.offenseChargeLevelReported := LEFT.chargeLevelReported;
