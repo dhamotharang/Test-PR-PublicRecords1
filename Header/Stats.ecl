@@ -43,7 +43,7 @@ EXPORT Stats := module
 
 		isForPublicRecords:=TRUE;
 
-		filedate:=regexfind('[0-9]{8}',std.file.SuperFileContents(header.Filename_Header)[1].name,0);
+		filedate:=nothor(regexfind('[0-9]{8}',std.file.SuperFileContents(header.Filename_Header)[1].name,0));
 
 		EXPORT GenerateLinkingStats:=sequential(
 		

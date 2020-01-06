@@ -27,8 +27,10 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
   
   EXPORT  Base  :=  MODULE
     EXPORT  allRecords    :=  versioncontrol.mBuildFilenameVersions(lBaseTemplate + 'AllRecords'  , pVersion);
+    EXPORT  history       :=  versioncontrol.mBuildFilenameVersions(lBaseTemplate + 'History'  , pVersion);
 		EXPORT	dAll_filenames	:=
-      allRecords.dAll_filenames
+      allRecords.dAll_filenames +
+      history.dAll_filenames
     ;
   END;
   
