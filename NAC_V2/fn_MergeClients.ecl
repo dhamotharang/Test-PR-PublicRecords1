@@ -79,6 +79,16 @@ Let’s say there’s some case reorganization or something else that causes a n
 */
 // update with new client fields
 $.Layout_Base2 xForm($.Layout_Base2 newbase, $.Layout_Base2 base)	 :=	TRANSFORM
+//**** Case fields
+	self.case_Monthly_Allotment := newbase.case_Monthly_Allotment;
+	self.RegionCode := newbase.RegionCode;
+	self.CountyCode := newbase.CountyCode;
+	self.CountyName := newbase.CountyName;
+	self.case_Phone1 := newbase.case_Phone1;
+	self.case_Phone2 := newbase.case_Phone2;
+	self.case_Email := newbase.case_Email;
+								
+//**** Client fields
 	self.StartDate 	:=	newbase.StartDate;
 	self.EndDate		:=	newbase.EndDate;
 	self.StartDate_Raw		:=	newbase.StartDate_Raw;
@@ -121,6 +131,7 @@ $.Layout_Base2 xForm($.Layout_Base2 newbase, $.Layout_Base2 base)	 :=	TRANSFORM
 	self.name_suffix		:=	newbase.name_suffix;
 	
 	self.updated := newbase.created;
+	self.filename := newbase.filename;
 
 	self := base;
 

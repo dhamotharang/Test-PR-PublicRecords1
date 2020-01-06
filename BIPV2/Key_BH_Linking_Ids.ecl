@@ -1,4 +1,4 @@
-﻿import BIPV2, AutoStandardI,BizLinkFull,BIPV2_Build,BIPv2_HRCHY,tools,BIPV2_Suppression, LocationID_Ingest,LocationID_xLink,doxie;
+﻿﻿import BIPV2, AutoStandardI,BizLinkFull,BIPV2_Build,BIPv2_HRCHY,tools,BIPV2_Suppression, LocationID_Ingest,LocationID_xLink,doxie;
 
 EXPORT Key_BH_Linking_Ids := 
 MODULE
@@ -19,7 +19,9 @@ MODULE
 	end;	
 	
 	shared layout_key := record
-		infile_rec - global_sid - record_sid;
+		infile_rec - global_sid        - record_sid            - employee_count_org_raw   - employee_count_org_derived
+		           - revenue_org_raw   - revenue_org_derived   - employee_count_local_raw - employee_count_local_derived 
+							 - revenue_local_raw - revenue_local_derived - locid;
 		BIPV2.IDlayouts.l_xlink_ids.DotScore;
 		BIPV2.IDlayouts.l_xlink_ids.DotWeight;
 		BIPV2.IDlayouts.l_xlink_ids.EmpScore;
@@ -34,12 +36,8 @@ MODULE
 		BIPV2.IDlayouts.l_xlink_ids.UltWeight;
     unsigned4 global_sid;
     unsigned8 record_sid;
+		unsigned6 locid;
 	end;
-
-    shared layout_key_with_locid := record(layout_key)
-      unsigned6 locid;
-    end;
-
 		    	
 	shared infile_key := project(infile, transform(layout_key,  
 																											self.DotScore   := 100,
@@ -61,7 +59,7 @@ MODULE
                                                       self 						:= left,
 																											));
 		    
-	shared infile_hidden_key := project(infile_hidden, transform(layout_key_with_locid,  
+	shared infile_hidden_key := project(infile_hidden, transform(layout_key,  
                                                 self.DotScore   := 100,
                                                 self.DotWeight  := 100,
                                                 self.EmpScore   := 100,
@@ -78,29 +76,14 @@ MODULE
                                                 self.SELEweight := 100,
                                                 // self.global_sid := 0  ,
                                                 // self.record_sid := 0  ,
-                                                self.locid      := 0  ,
+                                                // self.locid      := 0  ,
                                                 self            := left,
                                                 ));
-
-
-     LocationID_xLink.Append(infile_key, 
-		                   prim_range, 
-                             predir, 
-		                   prim_name, 
-                             addr_suffix, 
-                             postdir, 
-                             sec_range, 
-                             v_city_name, 
-                             st, 
-                             zip, 
-                             out_infile_key_with_locid); 			
-	
-     shared infile_key_with_locid := project(out_infile_key_with_locid, layout_key_with_locid);
-  
+		  
   BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_hidden_key, k1, superfile_name_hidden);																					
   Export Key_hidden := k1;
 
-	BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_key_with_locid, k, superfile_name);	
+	BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_key, k, superfile_name);	
 	export Key      := k;//withOUT ParentAbovSeleField (see comment below)
 	export KeyPlus  := BIPV2.IDmacros.mac_AddParentAbovSeleField(Key); //with ParentAbovSeleField
   export keyversions(string pversion = 'qa',boolean pUseOtherEnvironment = false) := tools.macf_FilesIndex('Key',BIPV2_Build.keynames(pversion, pUseOtherEnvironment).linkids); //allow easy access to other versions(logical or super) of key
