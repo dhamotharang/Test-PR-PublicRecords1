@@ -23,6 +23,13 @@ latest_move    := Header.LogBuildStatus(prev_st_sf_name, '').GetLatest;
 version_base_qa   := header._info.version_base_qa;
 prod_roxie_version:= header._info.current_prod_roxie_version;
 
+step4 := sequential(
+    fileservices.StartSuperFileTransaction(),
+    fileservices.clearsuperfile('~thor_data400::base::header_prod'),
+    fileservices.addsuperfile('~thor_data400::base::header_prod','thor_data400::base::header_' + prod_roxie_version),
+    fileservices.FinishSuperFileTransaction()
+    );
+
 sequential(
     header._config.setup_build,
     if(regexfind('hthor',STD.System.Thorlib.Group()),fail('Workunit must run on non-hthor')),
@@ -36,6 +43,7 @@ sequential(
     if(status<1,sequential(step1,update_status(1))),
     if(status<2,sequential(step2,update_status(2))),
     if(status<3,sequential(step3,update_status(3))),
+    if(status<4,sequential(step4,update_status(4))),
 //In order to keep consistency across all builds and 
 //reserving status to add future steps, the end status is set as 9
     if(status<9,update_status(9))
