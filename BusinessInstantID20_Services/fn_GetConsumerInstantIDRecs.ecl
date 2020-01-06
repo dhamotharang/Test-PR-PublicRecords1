@@ -98,7 +98,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			boolean ofac_only              := true : stored('OfacOnly');
 			boolean ExcludeWatchLists      := false : stored('ExcludeWatchLists');
 			unsigned1 OFAC_version_temp    := Options.OFAC_Version;
-				OFAC_version := if(trim(stringlib.stringtolowercase(LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
+				OFAC_version := if(trim(STD.Str.tolowercase(LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
 			
 			boolean Include_Additional_watchlists := FALSE;//Options.include_additional_watchlists;
 			boolean Include_Ofac                  := FALSE;//Options.include_ofac;
@@ -242,15 +242,15 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			FraudDefenderReq := EXISTS(model_url(name='Models.FraudAdvisor_Service'));
 
 			// check to see if custom CVI requested
-			customCVIparams := project(model_url(StringLib.StringToLowerCase(name)='risk_indicators.instantid'), transform(models.layout_parameters, self := left.parameters[1]));
-			customCVIvalue := trim(StringLib.StringToLowercase(customCVIparams(StringLib.StringToLowerCase(name)='custom')[1].value));
+			customCVIparams := project(model_url(STD.Str.ToLowerCase(name)='risk_indicators.instantid'), transform(models.layout_parameters, self := left.parameters[1]));
+			customCVIvalue := trim(STD.Str.ToLowercase(customCVIparams(STD.Str.ToLowerCase(name)='custom')[1].value));
 
 			//Check to see if new custom CVI field is populated with a valid value
-			Valid_CCVI := StringLib.StringToUppercase(In_CustomCVIModelName) in ['','CCVI1501_1','CCVI1609_1'];
-			CustomCVIModelName := if(Valid_CCVI, StringLib.StringToUppercase(In_CustomCVIModelName), error('Invalid Custom CVI model name.'));
+			Valid_CCVI := STD.Str.ToUppercase(In_CustomCVIModelName) in ['','CCVI1501_1','CCVI1609_1'];
+			CustomCVIModelName := if(Valid_CCVI, STD.Str.ToUppercase(In_CustomCVIModelName), error('Invalid Custom CVI model name.'));
 
-			customfraud_params := project(model_url(StringLib.StringToLowerCase(name) in ['models.customfa_service', 'models.fraudadvisor_service']), transform(models.layout_parameters, self := left.parameters[1]));
-			customfraud_modelname := trim(StringLib.StringToUppercase(customfraud_params(StringLib.StringToLowerCase(name) in ['custom', 'version'])[1].value));
+			customfraud_params := project(model_url(STD.Str.ToLowerCase(name) in ['models.customfa_service', 'models.fraudadvisor_service']), transform(models.layout_parameters, self := left.parameters[1]));
+			customfraud_modelname := trim(STD.Str.ToUppercase(customfraud_params(STD.Str.ToLowerCase(name) in ['custom', 'version'])[1].value));
 
 			// -----[ Project formal parameter ds_CleanedInput into input for CIID. ]-----
 			layout_temp := RECORD
@@ -465,8 +465,8 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.seq := l.seq;	// take seq from the ret_test_seed data as we will need it for joining to scores later.
 				self.ssn := ssn_value;
 				self.phone10 := phone_value;
-				self.fname := stringlib.stringtouppercase(fname_val);
-				self.lname := stringlib.stringtouppercase(lname_val);
+				self.fname := STD.Str.touppercase(fname_val);
+				self.lname := STD.Str.touppercase(lname_val);
 				SELF.in_zipCode := zip_value;
 				self := [];
 			end;
@@ -646,28 +646,25 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				SELF.Watchlist_contry := le.Watchlist_contry;
 				SELF.Watchlist_Entity_Name := le.Watchlist_Entity_Name;
 
-				cvi_temp := IF(actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,
-																																		veraddr,verlast),
-																						risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,
-																																				veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI));
-				isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
-				SELF.CVI := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
-										IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
-										IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)cvi_temp > 10 => '10',
-										IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)cvi_temp > 10 and actualIIDVersion=1 => '10',
-										isCodeDI AND (INTEGER)cvi_temp > 10 => '10',
-										cvi_temp);
-				
-				custom_cvi_temp := if(CustomCVIModelName <> '', risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,
-																														veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName), '');
-				
-				SELF.cviCustomScore := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)custom_cvi_temp > 10 => '10',
-										IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)custom_cvi_temp > 10 => '10',
-										IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)custom_cvi_temp > 10 => '10',
-										IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)custom_cvi_temp > 10 and actualIIDVersion=1 => '10',
-										isCodeDI AND (INTEGER)custom_cvi_temp > 10 => '10',
-										custom_cvi_temp);
-				
+      OverrideOptions := MODULE(Risk_Indicators.iid_constants.IOverrideOptions) 
+      EXPORT isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) AND actualIIDVersion=1;
+      EXPORT isCodePO := IF(CustomCVIModelName = 'CCVI1909_1', risk_indicators.rcSet.isCodePO(le.addr_type), risk_indicators.rcSet.isCodePO(le.addr_type) AND IsPOBoxCompliant);
+      EXPORT isCodeCL := risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) AND IncludeCLoverride;
+      EXPORT isCodeMI := risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) AND IncludeMIoverride AND actualIIDVersion=1;
+      EXPORT isCodeMS := risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) AND IncludeMSoverride;
+      EXPORT isCode12 := Risk_Indicators.rcSet.isCode12(le.zipclass);
+      EXPORT isCode72 := Risk_Indicators.rcSet.isCode72((STRING)le.socsverlevel, le.SSN, le.ssnExists, le.lastssnmatch2);
+      END;
+
+    //chase wants their custom cvi mapped to the normal and custom cvi and reason codes. 
+     SELF.CVI := IF(actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast, ,OverrideOptions),
+                                risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,,, OverrideOptions));
+	
+     // Chase custom score is calculated in SELF.CVI if it's requested, no need to call the attribute here too
+     SELF.cviCustomScore := MAP(CustomCVIModelName = 'CCVI1501_1' => Models.CVI1501_1_0(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,,, OverrideOptions),
+                                                            CustomCVIModelName <> '' => SELF.CVI,
+                                                            '');
+                                                            
 				self.SubjectSSNCount := if(risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months), (string)le.ssns_per_adl_seen_18months, '');
 				self.age := if (le.age = '***','',le.age);
 				
@@ -675,16 +672,16 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				ssn_verified := le.socsverlevel IN risk_indicators.iid_constants.ssn_name_match;
 				isCode02 := risk_indicators.rcSet.isCode02(le.decsflag);
 				self.deceasedDate := MAP(	ssn_verified and isCode02 => if(le.deceasedDate=0, '', (string)le.deceasedDate),
-																	isCodeDI => if(le.DIDdeceasedDate=0, '', (STRING)le.DIDdeceasedDate),
+																	OverrideOptions.isCodeDI => if(le.DIDdeceasedDate=0, '', (STRING)le.DIDdeceasedDate),
 																	'');
 				self.deceasedDOB := MAP(ssn_verified and isCode02 => if(le.deceasedDOB=0, '', (string)le.deceasedDOB),
-																isCodeDI => if(le.DIDdeceasedDOB=0, '', (STRING)le.DIDdeceasedDOB),
+																OverrideOptions.isCodeDI => if(le.DIDdeceasedDOB=0, '', (STRING)le.DIDdeceasedDOB),
 																'');
 				self.deceasedFirst := MAP(ssn_verified and isCode02 => le.deceasedFirst,
-																	isCodeDI => le.DIDdeceasedFirst,
+																	OverrideOptions.isCodeDI => le.DIDdeceasedFirst,
 																	'');
 				self.deceasedLast := MAP(	ssn_verified and isCode02 => le.deceasedLast,
-																	isCodeDI => le.DIDdeceasedLast,
+																	OverrideOptions.isCodeDI => le.DIDdeceasedLast,
 																	'');
 				
 				risk_indicators.mac_add_sequence(le.watchlists, watchlists_with_seq);
@@ -801,7 +798,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 
 			// this is not ideal to index into the datasets by position number, as the position can change,
 			// but I can't figure out how to reference the row in the parameters dataset that is named 'isstudent'
-			student_params := project(model_url(StringLib.StringToLowerCase(name)='models.studentadvisor_service'), transform(models.layout_parameters, self := left.parameters[1]));
+			student_params := project(model_url(STD.Str.ToLowerCase(name)='models.studentadvisor_service'), transform(models.layout_parameters, self := left.parameters[1]));
 			student_boolean := student_params[1].value='1';
 
 			ModelRequests1 := project(dataset([{1}], {unsigned a}), 
@@ -823,11 +820,11 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				modelRequests1, 
 				dataset([], models.layouts.Layout_Model_Request_In));
 				
-			fa_params := model_url(StringLib.StringToLowerCase(name)='models.fraudadvisor_service')[1].parameters;
-			model_version := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='version')[1].value));
-			custom_modelname := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='custom')[1].value));
+			fa_params := model_url(STD.Str.ToLowerCase(name)='models.fraudadvisor_service')[1].parameters;
+			model_version := trim(STD.Str.ToUppercase(fa_params(STD.Str.ToLowerCase(name)='version')[1].value));
+			custom_modelname := trim(STD.Str.ToUppercase(fa_params(STD.Str.ToLowerCase(name)='custom')[1].value));
 			modelname := if(model_version='', custom_modelname, model_version);
-			includeRiskIndices := fa_params(StringLib.StringToLowerCase(name)='includeriskindices')[1].value='1';
+			includeRiskIndices := fa_params(STD.Str.ToLowerCase(name)='includeriskindices')[1].value='1';
 
 			//Check to see if the FP model requested requires a valid GLB 
 			FP3_models_requiring_GLB	:= ['FP31505_0', 'FP3FDN1505_0', 'FP31505_9', 'FP3FDN1505_9']; //these models require valid GLB, else fail

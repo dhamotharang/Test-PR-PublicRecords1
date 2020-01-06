@@ -227,12 +227,13 @@ working_layout format_out(ret le, indata ri) := TRANSFORM
 																										   le.combo_suffix,le.combo_postdir,le.combo_unit_desig,
 																										   le.combo_sec_range),
 				    '');
+            
 	self.score := map(tribCode in ['np31'] => if((le.socsverlevel=7 and le.phoneverlevel=7) OR (le.socsverlevel=9 and le.phoneverlevel=9), '20',
-											  Risk_Indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,self.correctsocs,self.correctaddr,self.correcthphone,'',self.veraddr,self.verlast,OFAC, IncludeDOBInCVI)),
-                      tribCode in ['np60'] => Risk_Indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,self.correctsocs,self.correctaddr,self.correcthphone,'ecvi',self.veraddr,self.verlast,OFAC),
-                      tribCode in ['np50','np80','np90'] => Risk_Indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,self.correctsocs,self.correctaddr,self.correcthphone,'svi',self.veraddr,self.verlast,OFAC),
-                      tribCode in ['np82', 'np92'] => Risk_Indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,self.correctsocs,self.correctaddr,self.correcthphone,'ddvi',self.veraddr,self.verlast,false),
-                      Risk_Indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,self.correctsocs,self.correctaddr,self.correcthphone,'',self.veraddr,self.verlast,OFAC));
+											  Risk_Indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,'',self.veraddr,self.verlast,OFAC, IncludeDOBInCVI)),
+                      tribCode in ['np60'] => Risk_Indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'ecvi',self.veraddr,self.verlast,OFAC),
+                      tribCode in ['np50','np80','np90'] => Risk_Indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'svi',self.veraddr,self.verlast,OFAC),
+                      tribCode in ['np82', 'np92'] => Risk_Indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'ddvi',self.veraddr,self.verlast,false),
+                      Risk_Indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'',self.veraddr,self.verlast,OFAC));
 	self.ri := if(doOutput, RiskWise.patriotReasonCodes(le, 6, OFAC), dataset([],Risk_Indicators.Layout_Desc)); 
 	self.reason1 := self.ri[1].hri;
 	self.reason2 := self.ri[2].hri;

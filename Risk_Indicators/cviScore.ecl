@@ -1,5 +1,6 @@
-﻿export cviScore(INTEGER1 p, INTEGER1 s, Layout_Output l, STRING9 corrected_ssn, STRING50 corrected_address, STRING10 corrected_phone, STRING5 inTweak, STRING50 veraddr, STRING20 verlast, 
-								BOOLEAN OFAC=TRUE) := 
+﻿export cviScore(INTEGER1 p, INTEGER1 s, Layout_Output l, STRING5 inTweak, STRING50 veraddr, STRING20 verlast, 
+							BOOLEAN OFAC=TRUE,
+                            Risk_Indicators.iid_constants.IOverrideOptions OverrideOptions = MODULE(Risk_Indicators.iid_constants.IOverrideOptions)END) := 
 FUNCTION
 
 BOOLEAN isPOTS := l.isPOTS;
@@ -124,6 +125,13 @@ cvi := __COMMON__(CASE(p,
 															cviAdj6));
 															
 
-RETURN (cviAdj7);
+    FinalCVI :=     MAP(OverrideOptions.isCodeMS and (INTEGER)cviAdj7 > 10 => '10',
+							OverrideOptions.isCodePO and (INTEGER)cviAdj7 > 10 => '10',
+							OverrideOptions.isCodeCL and (INTEGER)cviAdj7 > 10 => '10',
+							OverrideOptions.isCodeMI and (INTEGER)cviAdj7 > 10=> '10',
+							OverrideOptions.isCodeDI AND (INTEGER)cviAdj7 > 10 => '10',
+                            cviAdj7);
+              
+RETURN FinalCVI;
 
 END;
