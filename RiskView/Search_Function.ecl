@@ -1,4 +1,4 @@
-﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Models, iesp, personcontext;
+﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Models, iesp, personcontext, STD, RiskView;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
@@ -36,13 +36,16 @@ EXPORT Search_Function(
 	boolean RetainInputDID,
 	boolean exception_score_reason = FALSE,
   boolean InsuranceMode = FALSE, //BF _ This value is set to true for insurance only.
-	boolean InsuranceBankruptcyAllow10Yr = FALSE //Value is true for insurance only.
+	boolean InsuranceBankruptcyAllow10Yr = FALSE, //Value is true for insurance only.
+	unsigned6 MinimumAmount = 0,
+	dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
+	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem)
   ) := function
 
 
-boolean   isPreScreenPurpose := StringLib.StringToUpperCase(intended_purpose) = 'PRESCREENING';
-boolean   isCollectionsPurpose := StringLib.StringToUpperCase(intended_purpose) = 'COLLECTIONS';
-boolean   isDirectToConsumerPurpose := StringLib.StringToUpperCase(intended_purpose) = Constants.directToConsumer;
+boolean   isPreScreenPurpose := STD.Str.ToUpperCase(intended_purpose) = 'PRESCREENING';
+boolean   isCollectionsPurpose := STD.Str.ToUpperCase(intended_purpose) = 'COLLECTIONS';
+boolean   isDirectToConsumerPurpose := STD.Str.ToUpperCase(intended_purpose) = Constants.directToConsumer;
 boolean   FilterLiens := if(DataRestriction[risk_indicators.iid_constants.posLiensJudgRestriction]='1', true, false ); //DRM says don't run lnj or include is false so don't run lnj
 
 // cleaning for batch and XML done the same for both
@@ -52,13 +55,13 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
 	self.score := if(self.did<>0, 100, 0);
 	
 	// clean up input
-	invalidPrescreenSSN := LENGTH(TRIM(StringLib.StringFilter(le.ssn, '0123456789'))) < 4 OR
-								StringLib.StringFilter(le.ssn, '0123456789') IN ['000000000', '111111111', '222222222', '333333333', '444444444', '555555555', '666666666', '777777777', '888888888', '999999999'] OR
+	invalidPrescreenSSN := LENGTH(TRIM(STD.Str.Filter(le.ssn, '0123456789'))) < 4 OR
+								STD.Str.Filter(le.ssn, '0123456789') IN ['000000000', '111111111', '222222222', '333333333', '444444444', '555555555', '666666666', '777777777', '888888888', '999999999'] OR
 								TRIM(le.SSN) = '';
-	ssn_val := IF((invalidPrescreenSSN AND isPreScreenPurpose) OR StringLib.StringFilter(le.ssn, '0123456789') = '000000000', '', StringLib.StringFilter(le.ssn, '0123456789'));	// Consider a social as "not provided on input" if it is all repeating digits, less than 4 bytes, or blank on input for prescreen mode, otherwise only blank out all 0's.
+	ssn_val := IF((invalidPrescreenSSN AND isPreScreenPurpose) OR STD.Str.Filter(le.ssn, '0123456789') = '000000000', '', STD.Str.Filter(le.ssn, '0123456789'));	// Consider a social as "not provided on input" if it is all repeating digits, less than 4 bytes, or blank on input for prescreen mode, otherwise only blank out all 0's.
 	hphone_val := riskwise.cleanPhone(le.home_phone);
 	wphone_val := riskwise.cleanphone(le.work_phone);
-	email_val := stringlib.stringtouppercase(le.email);
+	email_val := STD.Str.touppercase(le.email);
 	dob_val := riskwise.cleandob(le.dob);
 	dl_num_clean := riskwise.cleanDL_num(le.dl_number);
 
@@ -73,11 +76,11 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
 	cleaned_name := address.CleanPerson73(le.UnParsedFullName);
 	boolean valid_cleaned := le.UnParsedFullName <> '';
 		
-	self.fname := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, address.cleanNameFields(cleaned_name).fname, le.Name_First));
-	self.lname := stringlib.stringtouppercase(if(le.Name_Last='' AND valid_cleaned, address.cleanNameFields(cleaned_name).lname, le.Name_Last));
-	self.mname := stringlib.stringtouppercase(if(le.Name_Middle='' AND valid_cleaned, address.cleanNameFields(cleaned_name).mname, le.Name_Middle));
-	self.suffix := stringlib.stringtouppercase(if(le.Name_Suffix ='' AND valid_cleaned, address.cleanNameFields(cleaned_name).name_suffix, le.Name_Suffix));	
-	self.title := stringlib.stringtouppercase(if(valid_cleaned, address.cleanNameFields(cleaned_name).title,''));
+	self.fname := STD.Str.touppercase(if(le.Name_First='' AND valid_cleaned, address.cleanNameFields(cleaned_name).fname, le.Name_First));
+	self.lname := STD.Str.touppercase(if(le.Name_Last='' AND valid_cleaned, address.cleanNameFields(cleaned_name).lname, le.Name_Last));
+	self.mname := STD.Str.touppercase(if(le.Name_Middle='' AND valid_cleaned, address.cleanNameFields(cleaned_name).mname, le.Name_Middle));
+	self.suffix := STD.Str.touppercase(if(le.Name_Suffix ='' AND valid_cleaned, address.cleanNameFields(cleaned_name).name_suffix, le.Name_Suffix));	
+	self.title := STD.Str.touppercase(if(valid_cleaned, address.cleanNameFields(cleaned_name).title,''));
 
 	street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 	clean_addr := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;											
@@ -128,8 +131,8 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
     self.country 			:= '';
   // #END
 	
-	self.dl_number 		:= stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state 		:= stringlib.stringtouppercase(le.dl_state);
+	self.dl_number 		:= STD.Str.touppercase(dl_num_clean);
+	self.dl_state 		:= STD.Str.touppercase(le.dl_state);
 	history_date := if(le.historydateTimeStamp='', risk_indicators.iid_constants.default_history_date, (unsigned)le.historydateTimeStamp[1..6]);
 	self.historydate := history_date;
 	self.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(le.historydateTimeStamp, history_date);
@@ -148,8 +151,8 @@ r_layout_input_PlusRaw	:= RECORD
 end;
 
 r_layout_input_PlusRaw	prep_for_AID(bsprep_roxie le)	:= transform
-	SELF.Line1		:=	TRIM(stringlib.stringtouppercase(le.in_streetAddress));
-	SELF.LineLast	:=	address.addr2fromcomponents(stringlib.stringtouppercase(le.in_city), stringlib.stringtouppercase(le.in_state),  le.in_zipCode);
+	SELF.Line1		:=	TRIM(STD.Str.touppercase(le.in_streetAddress));
+	SELF.LineLast	:=	address.addr2fromcomponents(STD.Str.touppercase(le.in_city), STD.Str.touppercase(le.in_state),  le.in_zipCode);
 	SELF.rawAID			:=	0;
 	SELF	:=	le;
 end;
@@ -216,7 +219,7 @@ LexIDOnlyOnInput := IF(onThor, FALSE,
 											bsprep[1].DID > 0 AND bsprep[1].SSN = '' AND bsprep[1].dob = '' AND bsprep[1].phone10 = '' AND bsprep[1].wphone10 = '' AND 
 											bsprep[1].fname = '' AND bsprep[1].lname = '' AND bsprep[1].in_streetAddress = '' AND bsprep[1].z5 = '' AND bsprep[1].dl_number = '');
 										
-Crossindustry_model := StringLib.StringToUpperCase(Crossindustry_model_name);									
+Crossindustry_model := STD.Str.ToUpperCase(Crossindustry_model_name);									
 
 // BF _ Custom models are set to blank for insurance, therefore version 50 is selected.
 bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 
@@ -261,7 +264,6 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
                       Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException, 0) +
 		if(InsuranceMode and InsuranceBankruptcyAllow10Yr, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr, 0);
 
-		
 	// In prescreen mode or if Lex ID is the only input run the ADL Based shell to append inputs
 	ADL_Based_Shell := isPreScreenPurpose OR LexIDOnlyOnInput;
 	
@@ -274,7 +276,10 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose,
 		IncludeLnJ :=IncludeLnJ,
     ReportingPeriod := ReportingPeriod,
-    IntendedPurpose := Intended_Purpose
+    IntendedPurpose := Intended_Purpose,
+		in_MinimumAmount := MinimumAmount,
+		in_ExcludeStates := ExcludeStates,
+		in_ExcludeReportingSources := ExcludeReportingSources
 	);
 	
 #if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
@@ -285,7 +290,7 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		string1 ConfirmationSubjectFound;
 	END;	
 
-Report_output := if(RiskviewReportRequest, RiskView.Search_RptFunction(bsprep, 
+Report_output := if(RiskviewReportRequest OR IncludeLnJ, RiskView.Search_RptFunction(bsprep, 
 				LexIDOnlyOnInput, 
 				ungroup(clam), bsversion, 
 				DataRestriction, intended_purpose, SSNMask, DOBMask, DLMask, isDirectToConsumerPurpose),
@@ -305,7 +310,7 @@ model_info := Models.LIB_RiskView_Models().ValidV50Models; // Grab the valid mod
 valid_model_names := SET(model_info, Model_Name);
 valid_attributes := RiskView.Constants.valid_attributes;
 
-valid_attributes_requested := stringlib.stringtolowercase(AttributesVersionRequest) in valid_attributes;
+valid_attributes_requested := STD.Str.tolowercase(AttributesVersionRequest) in valid_attributes;
 
 isLnJRunningAlone := if(IncludeLnJ and  
 	(valid_attributes_requested  = false and // noattributes
@@ -409,22 +414,22 @@ transform(riskview.layouts.layout_riskview5_search_results,
 // Get all of our model scores
 noModelResults := DATASET([], Models.Layout_ModelOut);
 	
-auto_model := StringLib.StringToUpperCase(auto_model_name);
+auto_model := STD.Str.ToUpperCase(auto_model_name);
 valid_auto := auto_model <> '' AND auto_model IN valid_model_names;
 auto_model_result := MAP(valid_auto => Models.LIB_RiskView_V50_Function(clam, auto_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																			 noModelResults);
 
-bankcard_model := StringLib.StringToUpperCase(bankcard_model_name);
+bankcard_model := STD.Str.ToUpperCase(bankcard_model_name);
 valid_bankcard := bankcard_model <> '' AND bankcard_model IN valid_model_names;
 bankcard_model_result := MAP(valid_bankcard	=> Models.LIB_RiskView_V50_Function(clam, bankcard_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																							 noModelResults);
 
-short_term_lending_model := StringLib.StringToUpperCase(short_term_lending_model_name);
+short_term_lending_model := STD.Str.ToUpperCase(short_term_lending_model_name);
 valid_short_term_lending := short_term_lending_model <> '' AND short_term_lending_model IN valid_model_names;
 short_term_lending_model_result := MAP(valid_short_term_lending	=> Models.LIB_RiskView_V50_Function(clam, short_term_lending_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																																	 noModelResults);
 
-telecommunications_model := StringLib.StringToUpperCase(Telecommunications_model_name);
+telecommunications_model := STD.Str.ToUpperCase(Telecommunications_model_name);
 valid_telecommunications := telecommunications_model <> '' AND telecommunications_model IN valid_model_names;
 telecommunications_model_result := MAP(valid_telecommunications	=> Models.LIB_RiskView_V50_Function(clam, telecommunications_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																																	 noModelResults);
@@ -434,31 +439,31 @@ valid_Crossindustry := Crossindustry_model <> '' AND Crossindustry_model IN vali
 Crossindustry_model_result := MAP(valid_Crossindustry	=> Models.LIB_RiskView_V50_Function(clam, Crossindustry_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																															 noModelResults);
 	
-custom_model := StringLib.StringToUpperCase(Custom_model_name);
+custom_model := STD.Str.ToUpperCase(Custom_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom := custom_model not in ['','MLA1608_0'] AND custom_model IN valid_model_names;
 custom_model_result := MAP(valid_custom	=> Models.LIB_RiskView_V50_Function(clam, custom_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																					 noModelResults);
 
-custom2_model := StringLib.StringToUpperCase(Custom2_model_name);
+custom2_model := STD.Str.ToUpperCase(Custom2_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom2 := custom2_model not in ['','MLA1608_0'] AND custom2_model IN valid_model_names;
 custom2_model_result := MAP(valid_custom2	=> Models.LIB_RiskView_V50_Function(clam, custom2_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																						 noModelResults);
 
-custom3_model := StringLib.StringToUpperCase(Custom3_model_name);
+custom3_model := STD.Str.ToUpperCase(Custom3_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom3 := custom3_model not in ['','MLA1608_0'] AND custom3_model IN valid_model_names;
 custom3_model_result := MAP(valid_custom3	=> Models.LIB_RiskView_V50_Function(clam, custom3_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																					   noModelResults);
 
-custom4_model := StringLib.StringToUpperCase(Custom4_model_name);
+custom4_model := STD.Str.ToUpperCase(Custom4_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom4 := custom4_model not in ['','MLA1608_0'] AND custom4_model IN valid_model_names;
 custom4_model_result := MAP(valid_custom4	=> Models.LIB_RiskView_V50_Function(clam, custom4_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																					   noModelResults);
 
-custom5_model := StringLib.StringToUpperCase(Custom5_model_name);
+custom5_model := STD.Str.ToUpperCase(Custom5_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom5 := custom5_model not in ['','MLA1608_0'] AND custom5_model IN valid_model_names;
 custom5_model_result := MAP(valid_custom5	=> Models.LIB_RiskView_V50_Function(clam, custom5_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
@@ -623,7 +628,7 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 
 	//California or Rhodes Island state exceptions, return alert code 100D
 	boolean isCaliforniaException := isCalifornia_in_person and 
-																	StringLib.StringToUpperCase(intended_purpose) = 'APPLICATION' and
+																	STD.Str.ToUpperCase(intended_purpose) = 'APPLICATION' and
 																	((integer)(boolean)rt.iid.combo_firstcount+(integer)(boolean)rt.iid.combo_lastcount
 																	+(integer)(boolean)rt.iid.combo_addrcount+(integer)(boolean)rt.iid.combo_hphonecount
 																	+(integer)(boolean)rt.iid.combo_ssncount+(integer)(boolean)rt.iid.combo_dobcount) < 3;
@@ -1166,8 +1171,8 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
 	self.PhoneInputProblems	 := if(suppress_condition, '', le.PhoneInputProblems	);
 	self.PhoneInputSubjectCount	 := if(suppress_condition, '', le.PhoneInputSubjectCount	);
 	self.PhoneInputMobile 	 := if(suppress_condition, '', le.PhoneInputMobile 	);
-//don't display data if suppressed or no report option selected
-	self.report := if(~RiskviewReportRequest or suppress_condition 
+//don't display data if suppressed or no report option selected	
+		self.report := if((~IncludeLnJ AND ~RiskviewReportRequest) or suppress_condition 
 		or AlertRegulatoryCondition = '3' or ReportSuppressAlerts, row([], iesp.riskview2.t_RiskView2Report), le.report);	
 	//LnJ new attributes
 	self.LnJEvictionTotalCount     := if(suppress_condition, '',     le.LnJEvictionTotalCount     );     

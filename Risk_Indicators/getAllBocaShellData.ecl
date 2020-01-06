@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview, Business_Risk_BIP, BIPV2, MDR, ADVO, risk_indicators, STD;
+﻿﻿IMPORT _Control, Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview, Business_Risk_BIP, BIPV2, MDR, ADVO, risk_indicators, STD, iesp;
 onThor := _Control.Environment.OnThor;
 
 EXPORT getAllBocaShellData (
@@ -22,7 +22,10 @@ EXPORT getAllBocaShellData (
   unsigned1 LexIdSourceOptout = 1,
   string TransactionID = '',
   string BatchUID = '',
-  unsigned6 GlobalCompanyId = 0 
+  unsigned6 GlobalCompanyId = 0,
+  unsigned6 MinimumAmount = 0,
+  dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
+  dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem)
   ) := FUNCTION
   
    mod_access := MODULE(Doxie.IDataAccess)
@@ -495,11 +498,11 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
   // =============== Derogs ===============
 
   derogs := IF (IsFCRA,
-                Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, iid, ReportingPeriod),
+                Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, iid, ReportingPeriod, MinimumAmount, ExcludeStates, ExcludeReportingSources),
 								Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion, mod_access));
 
 	derogs_hist := IF (IsFCRA,
-                     Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, ReportingPeriod),
+                     Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, ReportingPeriod, MinimumAmount, ExcludeStates, ExcludeReportingSources),
                      Risk_Indicators.Boca_Shell_Derogs_Hist      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion));
   doc_rolled := if (production_realtime_mode, derogs, derogs_hist);
 

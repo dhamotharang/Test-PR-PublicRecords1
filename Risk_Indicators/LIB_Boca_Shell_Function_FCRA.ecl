@@ -1,11 +1,11 @@
 ﻿/*--LIBRARY--*/
 
-import fcra, gateway;
+import fcra, gateway, Risk_Indicators;
 
 EXPORT LIB_Boca_Shell_Function_FCRA (
-	DATASET (Layout_input) pre_iid,
+	DATASET (Risk_Indicators.Layout_input) pre_iid,
 	DATASET (Gateway.Layouts.Config) gateways,
-	BS_LIBIN args
+	Risk_Indicators.BS_LIBIN args
 	) := MODULE
 	
 	dppa := args.bs_dppa;
@@ -39,8 +39,11 @@ EXPORT LIB_Boca_Shell_Function_FCRA (
 	IN_doScore := args.bs_doScore;
 	IN_isDirectToConsumerPurpose := args.IN_isDirectToConsumer;
 	IncludeLnJ := args.bs_IncludeLnJ;
- in_ReportingPeriod := args.bs_ReportingPeriod;
- in_IntendedPurpose := args.bs_IntendedPurpose;
+	in_ReportingPeriod := args.bs_ReportingPeriod;
+	in_IntendedPurpose := args.bs_IntendedPurpose;
+	in_MinimumAmount := args.bs_MinimumAmount;
+	in_ExcludeStates := args.bs_ExcludeStates;
+	in_ExcludeReportingSources := args.bs_ExcludeReportingSources;
 
 
 	// when running FCRA shell version 4 or higher in prescreen mode for attributes, set append best=2 so we append an SSN to input if it's missing
@@ -77,14 +80,17 @@ EXPORT LIB_Boca_Shell_Function_FCRA (
 
   dppa_ok := dppa > 0 and dppa < 8;
   //NB: DL is not used in FCRA-dependent scoring
-  per_prop := getAllBocaShellData (iid, group(sort(project(ids_wide, transform(layout_bocashell_neutral, self.age := 0, self := left, self := [])),seq),seq), p,
+  per_prop := Risk_Indicators.getAllBocaShellData (iid, group(sort(project(ids_wide, transform(layout_bocashell_neutral, self.age := 0, self := left, self := [])),seq),seq), p,
                                    TRUE, isLN, dppa, dppa_ok,
                                    includeRelativeInfo, /*includeDLInfo*/ FALSE, includeVehInfo, includeDerogInfo,
 							IN_BSversion, IN_IsPreScreen, IN_doScore,
 							true,  // filter out fares always true in FCRA
 							DataRestriction,
 							BSOptions, glb, gateways, DataPermission, 
-							IN_isDirectToConsumerPurpose, IncludeLnJ, in_ReportingPeriod);
+							IN_isDirectToConsumerPurpose, IncludeLnJ, in_ReportingPeriod, 
+							MinimumAmount := in_MinimumAmount, ExcludeStates := in_ExcludeStates,
+							ExcludeReportingSources := in_ExcludeReportingSources
+							);
 
 	export results := per_prop;
 END;
