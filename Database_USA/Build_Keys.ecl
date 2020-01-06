@@ -10,7 +10,7 @@ module
 																							 ,BuildLinkIdsKey);  
 																							 
  		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_Database_USA.Key_did
-																							 ,Database_USA.Files().Base.Built
+																							 ,Database_USA.Files().Base.Built(did > 0)
 																							 ,dx_Database_USA.Names().did.QA
 																							 ,dx_Database_USA.Names(pversion,false).did.New
 																							 ,BuildDidKey);  				 
