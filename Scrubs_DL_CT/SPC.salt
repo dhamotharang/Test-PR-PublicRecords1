@@ -40,9 +40,9 @@ FIELDTYPE:invalid_clean_name:CUSTOM(Scrubs_DL_CT.Functions.fn_valid_name>0,clean
 FIELD:append_process_date:TYPE(STRING8):LIKE(invalid_past_date):0,0
 FIELD:credentialstate:TYPE(STRING2):LIKE(invalid_credentialstate):0,0
 FIELD:credentialnumber:TYPE(STRING25):LIKE(invalid_credentialnumber):0,0
-FIELD:lastname:TYPE(STRING16):LIKE(invalid_name):0,0
-FIELD:firstname:TYPE(STRING14):0,0
-FIELD:middleinitial:TYPE(STRING1):0,0
+FIELD:lastname:TYPE(STRING40):LIKE(invalid_name):0,0
+FIELD:firstname:TYPE(STRING40):0,0
+FIELD:middleinitial:TYPE(STRING35):0,0
 FIELD:gender:TYPE(STRING1):LIKE(invalid_sex):0,0
 FIELD:height:TYPE(STRING3):LIKE(invalid_height):0,0
 FIELD:eyecolor:TYPE(STRING3):LIKE(invalid_eye_color):0,0
