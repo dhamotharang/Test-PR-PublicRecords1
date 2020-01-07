@@ -25,7 +25,7 @@ export CT_as_DL(dataset(drivers.Layout_CT_Full) pFile_CT_Input)			:= function
 	end;
 
 	norm_file := normalize(pFile_CT_Input, 
-												 if(trim(left.MailAddrStreet,left,right) <> trim(left.ResiAddrStreet,left,right) and 
+												 if(TrimUpper(left.MailAddrStreet) <> TrimUpper(left.ResiAddrStreet) and 
 														trim(left.ResiAddrStreet + left.ResidencyCity + left.ResidencyState,all) <> '',2,1)
 														,trfNormAddr(left,counter)
 											   );
@@ -75,7 +75,8 @@ export CT_as_DL(dataset(drivers.Layout_CT_Full) pFile_CT_Input)			:= function
 		self.cleaning_score 							:= l.clean_name_score;
 		self.status             					:= l.StatusNONCDL;
 		self.CDL_Status         					:= l.LicenseStatusCDL;
-		SELF.orig_canceldate		          := l.CancelDate;
+		self.orig_canceldate		          := l.CancelDate;
+		self.orig_origcdldate             := l.OriginalDate_CDL;
 		self                    					:= l;
 		self                          		:= [];		
 	end;

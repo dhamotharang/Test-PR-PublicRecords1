@@ -1,4 +1,4 @@
-﻿import DriversV2, Scrubs, std, Scrubs_DL_CT;
+﻿import DriversV2, Scrubs, std ;
 
 //***** Usage :-
 //***** DriversV2.Mac_DL_Update_Spray

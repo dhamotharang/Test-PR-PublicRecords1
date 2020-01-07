@@ -3,10 +3,10 @@
     string8	    Append_PROCESS_DATE;
 		string2			CredentialState	;
 		string25		CredentialNumber	;
-		string16		LastName	;
-		string14		FirstName	;
-		string1			MiddleInitial	;
-		string3			Suffix	;
+		string40		LastName	;
+		string40		FirstName	;
+		string35		MiddleInitial	;
+		string5			Suffix	;
 		string1			Gender	;
 		string3			Height	;
 		string3			EyeColor	;
