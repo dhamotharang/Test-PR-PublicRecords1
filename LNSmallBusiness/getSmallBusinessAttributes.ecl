@@ -535,7 +535,7 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version2.AssociateCurrSOSCount := attr.AssociateCurrSOSCount;
     SELF.Version2.SourceIndex := attr.SourceIndex;    
 
-    // SBA Version 2.1 Attributes (355) 
+    // SBA Version 2.1 Attributes (357) 
 		SELF.Version21.LNLexIDSELE := attr.LNLexIDSELE;
 		SELF.Version21.InputCheckBusName := attr.InputCheckBusName;
 		SELF.Version21.InputCheckBusAltName := attr.InputCheckBusAltName;
@@ -611,8 +611,10 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.FirmIRSRetirementPlan := attr.FirmIRSRetirementPlan;
 		SELF.Version21.FirmAgeObserved := attr.FirmAgeObserved;
 		SELF.Version21.FirmEmployeeCount := attr.FirmEmployeeCount;
+		SELF.Version21.FirmEmployeeRangeCount := attr.FirmEmployeeRangeCount;
 		SELF.Version21.FirmOwnershipType := attr.FirmPublicFlag; // This assignment is correct despite having a diffferent name.
 		SELF.Version21.FirmReportedSales := attr.FirmReportedSales;
+		SELF.Version21.FirmReportedSalesRange := attr.FirmReportedSalesRange;
 		SELF.Version21.FirmParentCompanyInd := attr.FirmParentCompanyInd;
 		SELF.Version21.SOSIncorporationFilingsCount := attr.SOSIncorporationFilingsCount;
 		SELF.Version21.SOSIncorporationTimeOldest := attr.SOSIncorporationTimeOldest;

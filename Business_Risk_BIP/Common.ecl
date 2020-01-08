@@ -933,7 +933,8 @@ OUTPUT(converted, NAMED('Converted_Set'));
   EXPORT INTEGER getSalesRangeIndexV31(INTEGER SalesAmount) := FUNCTION
 			SalesIndex := MAP(
 					SalesAmount = -1																	=> -1,
-					SalesAmount = 0																		=> 0,
+					SalesAmount = 0																		=>  0,
+					SalesAmount >= 1 AND SalesAmount < 25000			    =>  5,
 					SalesAmount >= 25000 AND SalesAmount < 50000			=> 10,
 					SalesAmount >= 50000 AND SalesAmount < 100000 		=> 20,
 					SalesAmount >= 100000 AND SalesAmount < 150000 	  => 30,

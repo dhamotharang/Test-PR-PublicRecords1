@@ -471,7 +471,7 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   // Sum of all most recent, populated employee count values among all unique data source company identifiers.
   tbl_FirmEmployeeCount := TABLE(
     DEDUP(SORT(CorteraRecs_past24Months(total_employees != ''), Seq, ultimate_linkid, -dt_last_seen, -(INTEGER)total_employees), Seq, ultimate_linkid),
-    {seq, FirmEmployeeCount := SUM( GROUP, IF(total_employees = '', -1, (INTEGER)total_employees )) },
+    {seq, FirmEmployeeCount := SUM( GROUP, (INTEGER)total_employees )},
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
 
   CorteraStats_pre := 
@@ -479,16 +479,20 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       CorteraStats_pre_pre, tbl_FirmEmployeeCount, 
       LEFT.seq = RIGHT.seq, 
       TRANSFORM( RECORDOF(CorteraStats_pre_pre),
-        SELF.FirmEmployeeCount := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmEmployeeCount, LEFT.FirmEmployeeCount ),
+        SELF.FirmEmployeeCount := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmEmployeeCount(seq = LEFT.seq)) > 0, RIGHT.FirmEmployeeCount, -1 ),
+								LEFT.FirmEmployeeCount ),
         SELF := LEFT,
         SELF := []
-      )
+      ),
+			LEFT OUTER, FEW
     );
 
   // Sum of all most recent, populated reported sales values among all unique data source company identifiers. 
   tbl_FirmReportedSales := TABLE(
       DEDUP(SORT(CorteraRecs_past24Months(total_sales != ''), Seq, ultimate_linkid, -dt_last_seen, -(INTEGER)total_sales), Seq, ultimate_linkid),
-      {seq, FirmReportedSales := SUM( GROUP, IF(total_sales = '', -1, (INTEGER)total_sales )) },
+      {seq, FirmReportedSales := SUM( GROUP, (INTEGER)total_sales )},
       Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
 
   CorteraStats :=
@@ -496,7 +500,10 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       CorteraStats_pre, tbl_FirmReportedSales, 
       LEFT.Seq = RIGHT.Seq, 
       TRANSFORM( RECORDOF(CorteraStats_pre_pre),
-        SELF.FirmReportedSales := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmReportedSales, LEFT.FirmReportedSales ), 
+        SELF.FirmReportedSales := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmReportedSales(seq = LEFT.seq)) > 0, RIGHT.FirmReportedSales, -1 ),
+								LEFT.FirmReportedSales ),
         SELF := LEFT,
         SELF := []
       ),
