@@ -122,7 +122,7 @@
 	// ********************************************************************************************************************************
 		SHARED key_header := dx_header.key_header();
 		SHARED VerificationOfOccupancy_CCPA getHeaderDates(Risk_Indicators.Layout_Output l, key_header r) := transform
-	  SELF.Global_Sid := r.Global_Sid;		
+        SELF.Global_Sid := r.Global_Sid;		
 		addrmatch							:= trim(l.z5) = trim(r.zip) and
 															 trim(l.prim_range) = trim(r.prim_range) and
 															 ut.NNEQ(trim(l.sec_range), trim(r.sec_range)) and
@@ -161,7 +161,7 @@
 			self									:= [];
 		end;
 		
-		SHARED with_HeaderDates := join(with_DID, key_header,
+		SHARED with_HeaderDates_unsuppressed := join(with_DID, key_header,
 		
 										LEFT.DID <> 0 AND
 										keyed(left.DID = right.s_DID) and
@@ -173,12 +173,16 @@
 										(	~mdr.Source_is_DPPA(RIGHT.src) OR 
 											(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))), 
 										getHeaderDates(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));
-					 Getheaderdate_suppressed := Suppress.Mac_SuppressSource(with_HeaderDates, mod_access);	
+                    
+        with_HeaderDates_flagged := Suppress.MAC_FlagSuppressedSource(with_HeaderDates_unsuppressed, mod_access);
 
-		SHARED Getheaderdate_VerificationOfOccupancy_CCPA := PROJECT(Getheaderdate_suppressed, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell,
-													  SELF := LEFT));
+        SHARED with_HeaderDates := PROJECT(with_HeaderDates_flagged, TRANSFORM( VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+			self.target_addr			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.target_addr);
+			self.h							:= IF(~left.is_suppressed, left.h);
+            self := LEFT;
+		));
 
-		SHARED with_QHeaderDates := join(with_DID, header_quick.key_DID,		
+		SHARED with_QHeaderDates_unsuppressed := join(with_DID, header_quick.key_DID,		
 										LEFT.DID <> 0 AND
 										keyed(left.DID = right.DID) and
 										// trim((string)right.dt_last_seen) >= hdrBuildDate01 and
@@ -191,11 +195,15 @@
 										(	~mdr.Source_is_DPPA(RIGHT.src) OR 
 											(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))), 
 										getQHeaderDates(left, right), keep(200), ATMOST(RiskWise.max_atmost));
-					  GetQheaderdate_suppressed := Suppress.Mac_SuppressSource(with_QHeaderDates, mod_access);	
+		with_QHeaderDates_flagged := Suppress.MAC_FlagSuppressedSource(with_QHeaderDates_unsuppressed, mod_access);
 
-		SHARED GetQheaderdate_VerificationOfOccupancy_CCPA := PROJECT(GetQheaderdate_suppressed, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell,
-													  SELF := LEFT));
-		SHARED with_allHeaderDates := Getheaderdate_VerificationOfOccupancy_CCPA + GetQheaderdate_VerificationOfOccupancy_CCPA;
+        SHARED with_QHeaderDates := PROJECT(with_QHeaderDates_flagged, TRANSFORM( VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+			self.target_addr			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.target_addr);
+			self.h								:= IF(~left.is_suppressed, left.h);
+            self := LEFT;
+		));
+    
+		SHARED with_allHeaderDates := with_HeaderDates + with_QHeaderDates;
 		
 		SHARED sort_allHeaderDates := sort(with_allHeaderDates, seq, -target_addr);  //put recs that matched target first so rollup works later 
 
@@ -384,7 +392,7 @@
 			self									:= [];
 		end;
 
-		SHARED with_Header := join(with_DID, key_header,	
+		SHARED with_Header_unsuppressed := join(with_DID, key_header,	
 										LEFT.DID <> 0 AND
 										keyed(left.DID = right.s_DID) and
 										// trim((string)right.dt_last_seen) >= hdrBuildDate01 and
@@ -395,12 +403,22 @@
 										(	~mdr.Source_is_DPPA(RIGHT.src) OR 
 											(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))), 
 										getHeader(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));
-					  Getheader_suppressed := Suppress.Mac_SuppressSource(with_Header, mod_access);	
+		with_Header_flagged := Suppress.MAC_FlagSuppressedSource(with_Header_unsuppressed, mod_access);
 
-		SHARED Getheader_VerificationOfOccupancy_CCPA := PROJECT(Getheader_suppressed, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell,
-													  SELF := LEFT));
+        SHARED with_Header := PROJECT(with_Header_flagged, TRANSFORM( VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+			self.target_addr			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.target_addr);
+			self.other_addr 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.other_addr);
+			self.Transunion_seen 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Transunion_seen);
+			self.Equifax_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Equifax_seen);
+			self.Experian_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Experian_seen);
+			self.pub_src_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.pub_src_seen);
+			self.src_group				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.src_group);
+			self.SubjectAddresses := IF(~left.is_suppressed, left.SubjectAddresses);
+			self.h								:= IF(~left.is_suppressed, left.h);
+            self := LEFT;
+		));
 
-		SHARED with_QHeader := join(with_DID, header_quick.key_DID,		
+		SHARED with_QHeader_unsuppressed := join(with_DID, header_quick.key_DID,		
 										LEFT.DID <> 0 AND
 										keyed(left.DID = right.DID) and
 										// trim((string)right.dt_last_seen) >= hdrBuildDate01 and
@@ -413,12 +431,23 @@
 										(	~mdr.Source_is_DPPA(RIGHT.src) OR 
 											(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))), 
 										getQHeader(left, right), keep(200), ATMOST(RiskWise.max_atmost));
-	   GetQheader_suppressed := Suppress.Mac_SuppressSource(with_QHeader, mod_access);	
+                    
+	   with_QHeader_flagged := Suppress.MAC_FlagSuppressedSource(with_QHeader_unsuppressed, mod_access);
 
-		SHARED GetQheader_VerificationOfOccupancy_CCPA := PROJECT(GetQheader_suppressed, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell,
-													  SELF := LEFT));               
+        SHARED with_QHeader := PROJECT(with_QHeader_flagged, TRANSFORM( VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+			self.target_addr			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.target_addr);
+			self.other_addr 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.other_addr);
+			self.Transunion_seen 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Transunion_seen);
+			self.Equifax_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Equifax_seen);
+			self.Experian_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Experian_seen);
+			self.pub_src_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.pub_src_seen);
+			self.src_group				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.src_group);
+			self.SubjectAddresses := IF(~left.is_suppressed, left.SubjectAddresses);
+			self.h								:= IF(~left.is_suppressed, left.h);
+            self := LEFT;
+		));      
 
-		SHARED with_allHeader := Getheader_VerificationOfOccupancy_CCPA + GetQheader_VerificationOfOccupancy_CCPA;
+		SHARED with_allHeader := with_Header + with_QHeader;
 		
 		SHARED sort_allHeader := sort(with_allHeader, seq, -target_addr);  //put recs that matched target first so rollup works later 
 
@@ -779,17 +808,24 @@
 			self 			:= l;
 		end;
 
-		SHARED with_DOD := join(with_otherProximity, Doxie.key_death_masterV2_ssa_DID,
+		SHARED with_DOD_unsuppressed := join(with_otherProximity, Doxie.key_death_masterV2_ssa_DID,
 										left.DID <> 0 and
 										keyed(left.DID = right.l_did) and
 										(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermissionMask)),
 										getDOD(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));
-					  GetDOD_suppressed := Suppress.Mac_SuppressSource(with_DOD, mod_access);	
+	 with_DOD_flagged := Suppress.MAC_FlagSuppressedSource(with_DOD_unsuppressed, mod_access);
 
-		SHARED GetDOD_VerificationOfOccupancy_CCPA := PROJECT(GetDOD_suppressed, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell,
-													  SELF := LEFT));
+	with_DOD := PROJECT(with_DOD_flagged, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+            SELF.DIDdeceased := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.DIDdeceased);
+			SELF.DIDdeceasedDate := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.DIDdeceasedDate);
+			SELF.DIDdeceasedDOB := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.DIDdeceasedDOB);
+			SELF.DIDdeceasedfirst := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DIDdeceasedfirst);
+			SELF.DIDdeceasedlast := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DIDdeceasedlast);
+			SELF.DIDdeceasedsrc := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DIDdeceasedsrc);
+			SELF := LEFT;
+	)); 
 
-		SHARED dedup_DOD := dedup(SORT(GetDOD_VerificationOfOccupancy_CCPA, seq, -DIDdeceasedfirst,-DIDdeceasedlast,-DIDdeceasedDate,-DIDdeceasedDOB, -DIDdeceasedsrc), seq);        
+		SHARED dedup_DOD := dedup(SORT(with_DOD, seq, -DIDdeceasedfirst,-DIDdeceasedlast,-DIDdeceasedDate,-DIDdeceasedDOB, -DIDdeceasedsrc), seq);        
 
 	// *******************************************************************************************************************
 	// Go determine if the person has been incarcerated
@@ -972,7 +1008,7 @@
 			self									:= l;
 		end;
 
-	SHARED with_Header_Relatives := join(allRelatives, key_header,	
+	SHARED with_Header_Relatives_unsuppressed := join(allRelatives, key_header,	
 										LEFT.DID <> 0 AND
 										keyed(left.relativeDID = right.s_DID) and
 										// trim((string)right.dt_last_seen) >= hdrBuildDate01 and
@@ -982,12 +1018,23 @@
 										(	~mdr.Source_is_DPPA(RIGHT.src) OR 
 											(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))), 
 										getHeaderRel(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));
-					  GetheaderRel_suppressed := Suppress.Mac_SuppressSource(with_Header_Relatives, mod_access);	
+                    
+    with_Header_Relatives_flagged := Suppress.MAC_FlagSuppressedSource(with_Header_Relatives_unsuppressed, mod_access);
 
-		SHARED GetheaderRel_VerificationOfOccupancy_CCPA := PROJECT(GetheaderRel_suppressed, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell,
-													  SELF := LEFT));
-
-	SHARED with_QHeader_Relatives := join(allRelatives, header_quick.key_DID,			
+    SHARED with_Header_Relatives := PROJECT(with_Header_Relatives_flagged, TRANSFORM( VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+			self.target_addr			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.target_addr);
+			self.other_addr 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.other_addr);
+			self.Transunion_seen 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Transunion_seen);
+			self.Equifax_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Equifax_seen);
+			self.Experian_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Experian_seen);
+			self.pub_src_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.pub_src_seen);
+			self.src_group				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.src_group);
+			self.SubjectAddresses := IF(~left.is_suppressed, left.SubjectAddresses);
+			self.h								:= IF(~left.is_suppressed, left.h);
+            self := LEFT;
+		));
+    
+	SHARED with_QHeader_Relatives_unsuppressed := join(allRelatives, header_quick.key_DID,			
 										LEFT.DID <> 0 AND
 										keyed(left.relativeDID = right.DID) and
 										// trim((string)right.dt_last_seen) >= hdrBuildDate01 and
@@ -999,12 +1046,23 @@
 										(	~mdr.Source_is_DPPA(RIGHT.src) OR 
 											(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))), 
 										getQHeaderRel(left, right), keep(200), ATMOST(RiskWise.max_atmost));
-					  GetQheaderRel_suppressed := Suppress.Mac_SuppressSource(with_Header_Relatives, mod_access);	
+                    
+	with_QHeader_Relatives_flagged := Suppress.MAC_FlagSuppressedSource(with_QHeader_Relatives_unsuppressed, mod_access);
 
-		SHARED GetQheaderRel_VerificationOfOccupancy_CCPA := PROJECT(GetQheaderRel_suppressed, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell,
-													  SELF := LEFT));
+    SHARED with_QHeader_Relatives := PROJECT(with_QHeader_Relatives_flagged, TRANSFORM( VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+			self.target_addr			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.target_addr);
+			self.other_addr 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.other_addr);
+			self.Transunion_seen 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Transunion_seen);
+			self.Equifax_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Equifax_seen);
+			self.Experian_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Experian_seen);
+			self.pub_src_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.pub_src_seen);
+			self.src_group				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.src_group);
+			self.SubjectAddresses := IF(~left.is_suppressed, left.SubjectAddresses);
+			self.h								:= IF(~left.is_suppressed, left.h);
+            self := LEFT;
+		));
 
-	SHARED with_allHeader_Relatives := GetheaderRel_VerificationOfOccupancy_CCPA + GetQheaderRel_VerificationOfOccupancy_CCPA;
+	SHARED with_allHeader_Relatives := with_Header_Relatives + with_QHeader_Relatives;
 		
 	SHARED sort_allHeader_Relatives := sort(with_allHeader_Relatives, seq, relativeDID);
 
