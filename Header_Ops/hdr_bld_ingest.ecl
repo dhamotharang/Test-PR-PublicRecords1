@@ -16,7 +16,9 @@ dlog(string8 build_version) :=dops.TrackBuild().fSetInfoinWorktunit(dops_dataset
 
 percent_nbm_change_threshold:=100;
 
-ecl(string build_version) := '#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest STAT\');\n\n'
+ecl(string build_version) := '\n'
++ '#WORKUNIT(\'protect\',true);\n'
++ '#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest STAT\');\n\n'
 + 'Header.Header_Ingest_Stats_Report(\'' + build_version + '\',' + percent_nbm_change_threshold + ');';
 
 sf_name(boolean incremental) := '~thor_data400::out::header_ingest_status_' + if(incremental, 'inc', 'mon');
