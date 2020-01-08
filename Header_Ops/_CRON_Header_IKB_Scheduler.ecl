@@ -29,7 +29,7 @@ sf_name := '~thor_data400::out::header_ikb_status';
 ver    := Header.LogBuildStatus(sf_name).GetLatest.versionName;
 status := Header.LogBuildStatus(sf_name).GetLatest.versionStatus;
 
-bldversion := if(status <> 4, ver, filedate); // 4 -> Completed
+bldversion := if(status <> 9, ver, filedate); // 9 -> Completed
 
 // Get versions for packages from DOPS waiting to be deployed
 ver_lab_TBD := Dops.GetBuildVersion('PersonLabKeys'//'PersonLABKeys' // DOPS package name  20190111
@@ -41,7 +41,7 @@ ver_lab_TBD := Dops.GetBuildVersion('PersonLabKeys'//'PersonLABKeys' // DOPS pac
 ver_lab_cert_ver := dops.GetBuildVersion('PersonLabKeys','B','N','C')[1..9];
                  
 
-norun := if(filedate = lastestIkbVersionOnThor and status = 4
+norun := if(filedate = lastestIkbVersionOnThor and status = 9
           ,true   //norun
           ,if(ver_lab_TBD <> ver_lab_cert_ver
           ,true   //norun
@@ -50,7 +50,7 @@ norun := if(filedate = lastestIkbVersionOnThor and status = 4
           
 wuname1 := filedate + ' IKB - Running Right Now';
 wuname2 := filedate + ' IKB - Data Was Already Built';
-wuname3 := bldversion + if(status <> 4, ' IKB - Update Incremental linking keys RECOVER', ' IKB - Update Incremental linking keys');
+wuname3 := bldversion + if(status <> 9, ' IKB - Update Incremental linking keys RECOVER', ' IKB - Update Incremental linking keys');
 
 ECL1 := '\n'
 +'#WORKUNIT(\'name\',\'' + wuname1 + '\');\n'
@@ -65,7 +65,7 @@ ECL3 := '\n'
 +'#stored (\'buildname\', \'header_incremental_keys\');\n'
 +'#WORKUNIT(\'protect\',true);\n\n'
 +'import Header, header_ops;\n\n'
-+'build_ikb := header_ops.hdr_bld_ikb(\'' + bldversion + '\',' + status + ').all;\n\n'
++'build_ikb := header_ops.hdr_bld_ikb(\'' + bldversion + '\',' + if(status = 9, 0, status) + ').all;\n\n'
 +'build_ikb;';
 
 ECL := if(active_wk

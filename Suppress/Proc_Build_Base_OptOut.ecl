@@ -88,9 +88,9 @@ EXPORT Proc_Build_Base_OptOut(STRING pVersion) := FUNCTION
 		PromoteSupers.Mac_SF_BuildProcess(dNewBase,Filenames().OptOut.base,build_base,,,true);
 		
 		RETURN SEQUENTIAL(
-								OUTPUT(input_raw,named('input_raw'));
-								output(dNewInput,named('dNewInput'));
-								output(dNewBase_0,named('dNewBase_0'));
+								// OUTPUT(input_raw,named('input_raw'));
+								// output(dNewInput,named('dNewInput'));
+								// output(dNewBase_0,named('dNewBase_0'));
 								build_base,
 								doStats,
 								vStats,
