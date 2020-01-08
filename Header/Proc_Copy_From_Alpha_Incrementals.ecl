@@ -281,7 +281,7 @@ EXPORT Refresh_copy(string filedt) :=  FUNCTION
              ,output('No Address Unique Expanded copy. see outputs')             
              );
 
-    ok_CAminor_to_copy := filedt <>'' AND ~test_copy AND ~(~std.file.fileexists('~thor_data400::base::insuranceheader_incremental::ca_minors::' + filedt));
+    ok_CAminor_to_copy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::base::insuranceheader_incremental::ca_minors::' + filedt));
     cpCAminor := if(ok_CAminor_to_copy
              ,copy_ca_minors_from_alpha(filedt)
              ,output('No CA Minors copy. see outputs')             

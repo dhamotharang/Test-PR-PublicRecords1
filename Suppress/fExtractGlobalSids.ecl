@@ -22,7 +22,9 @@ EXPORT SET OF UNSIGNED4 fExtractGlobalSids(STRING20 domain, STRING1 pdata='') :=
 
     global_sid_list             := PROJECT(infile_in_scope,TRANSFORM({LEFT.global_sid},SELF:=LEFT));
     global_sid_list_dedup       := DEDUP(SORT(DISTRIBUTE(global_sid_list),RECORD,LOCAL),RECORD,LOCAL);
-    global_sid_set              := SET(global_sid_list_dedup,global_sid);
+    //CCPA-685 temporary exclude these virtual global_sids from global_sid set
+    global_sids_Exclusion	    :=  [27751,27761,27771,27781,27791,27801,27811,27821,28281];
+    global_sid_set              := SET(global_sid_list_dedup(global_sid not in global_sids_Exclusion),global_sid);
 
     RETURN global_sid_set;
     

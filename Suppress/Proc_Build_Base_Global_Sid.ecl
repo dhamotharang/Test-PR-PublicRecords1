@@ -59,9 +59,11 @@ EXPORT Proc_Build_Base_Global_Sid(STRING pVersion) := FUNCTION
     globalsid_hc				:= suppress.fExtractGlobalSids(suppress.Constants.Exemptions().Domain_Id_HC);
     globalsid_ins				:= suppress.fExtractGlobalSids(suppress.Constants.Exemptions().Domain_Id_INS);
 	ds_global_sid_new			:= DATASET(
-									//For now insurance will use PR key
-									[{vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'N',globalsid_pr_npd+globalsid_ins,0},
-									 {vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'Y',globalsid_pr_pd+globalsid_ins,0},
+									//For now insurance will use PR key and we will use hardcoded global_sid seg
+									// [{vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'N',globalsid_pr_npd+globalsid_ins,0},
+									//  {vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'Y',globalsid_pr_pd+globalsid_ins,0},
+									[{vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'N',Suppress.Constants.OptOut().CACCPA_Global_Sid,0},
+									 {vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'Y',Suppress.Constants.OptOut().CACCPA_Global_Sid,0},
 									 {vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_HC,'Y',globalsid_hc,0},
 									 {vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_INS,'N',globalsid_ins,0}],
 									Suppress.Layout_Global_Sid_Base);	
@@ -88,21 +90,11 @@ EXPORT Proc_Build_Base_Global_Sid(STRING pVersion) := FUNCTION
 
 	RETURN SEQUENTIAL(
 					// Build Exemptions base file
-					output(ds_exemptions_pr,named('ds_exemptions_pr'));
-					output(ds_exemptions_hc,named('ds_exemptions_hc'));
-					output(ds_exemptions_ins,named('ds_exemptions_ins'));
-					output(ds_exemptions_pr_domain_id,named('ds_exemptions_pr_domain_id'));
-					output(ds_exemptions_hc_domain_id,named('ds_exemptions_hc_domain_id'));
-					output(ds_exemptions_ins_domain_id,named('ds_exemptions_ins_domain_id'));
-					output(ds_exemptions_new,named('ds_exemptions_new'));
-					output(dNewBase_Exemptions_0,named('dNewBase_Exemptions_0'));
 					build_base_exemptions;
 					doStats_Exemptions;
 					vStats_Exemptions;
 					stdStats_Exemptions;
 					//Build Global SID set base file
-					output('build global sid set file');
-					output(ds_global_sid_new,named('ds_global_sid_new'));
 					build_base_global_sid;
 					doStats_Global_Sid;
 					vStats_Global_Sid;

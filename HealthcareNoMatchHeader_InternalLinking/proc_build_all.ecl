@@ -75,7 +75,7 @@ EXPORT proc_build_all(
 	IF(
     pSrc  <>  ''
     ,IF(
-      VersionControl.IsValidVersion(pVersion)
+      pVersion <> ''
       ,full_build
       ,OUTPUT('No Valid version parameter passed, skipping HealthcareNoMatchHeader_InternalLinking.proc_build_all().All')
     )
