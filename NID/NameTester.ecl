@@ -257,8 +257,10 @@ export boolean IsFirstNameEx(string name) := MAP(
 		false
 	);
 
-//set of STRING32 cnames := TokenManagement.SortAndTerminateSet(SET(CensusSurnames,name));
-//export boolean isCensusName(string name) := TokenManagement.FindToken(cnames, name);
+export boolean IsHyphenatedFirstName(string s) := MAP(
+	REGEXFIND('([A-Z]+)-([A-Z]+)', s) => IsFirstName(s) OR
+											IsFirstName(REGEXFIND('([A-Z]+)-([A-Z]+)', s, 1)),
+	IsFirstname(s));
 
 SET of STRING1 genders := 
 ['U', // unknown
@@ -269,10 +271,8 @@ SET of STRING1 genders :=
 export string1 gender(string name) := FUNCTION
 // 0: unknown  1: male  2: female  3: either
 	n := MAP(
-		LENGTH(name) = 1 => 0,
-		TRIM(name) = '' => 0,
+		LENGTH(TRIM(name)) <= 1 => 0,
 		IF(
-			//TokenManagement.FindToken(maleNames, name) OR
 			name in dictBoys OR
 			Address.IndianNames.IsIndianBoysName(name) OR
 			Address.ArabicNames.IsArabicBoysName(name) OR
@@ -282,7 +282,6 @@ export string1 gender(string name) := FUNCTION
 			,1, 0) 
 				+
 		IF(
-			//TokenManagement.FindToken(femaleNames, name) OR
 			name in dictGirls OR
 			Address.IndianNames.IsIndianGirlsName(name) OR
 			Address.ArabicNames.IsArabicGirlsName(name) OR
@@ -295,7 +294,7 @@ export string1 gender(string name) := FUNCTION
     RETURN CASE(n,
 		1 => 'M',
 		2 => 'F',
-		IF(LENGTH(name) > 1, datalib.gender(name),
+		IF(LENGTH(TRIM(name)) > 1, datalib.gender(name),
 			genders[n+1])
 	);
 END;
@@ -428,6 +427,8 @@ export IsSuffix(string name) := REGEXFIND('^'+rgxSuffix+'$',name);
 // uninclude suffixes that could possibly be names
 export IsSureSuffix(string name) := REGEXFIND('^'+rgxSureSuffix+'$',name);
 export HasSuffix(string name) := REGEXFIND(rgxFMLS,name) OR REGEXFIND(rgxFLSorLFS,name);
+
+export boolean InvalidFirstName(string name) := name in ['NFN','NMN','NMI','NT','ASS','BASTARD'];
 
 shared ShortLastNames := ['NG','OK','OX','UI','KU','DO','JO','RO','UX','KRCH','LI'];
 shared BadLastNames := ['ASS','AV','NMN','NMI','NLN','ERROR', 'RET','RE','XX','XY','OR','ET','AKA',

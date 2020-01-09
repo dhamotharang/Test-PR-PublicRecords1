@@ -15,10 +15,10 @@ export NameTypes := enum(UNSIGNED2,
 					Blank = 6);
 // name quality
 		
-		export DerivedName   := 000000001000b;		// Individual name Derived from dual name
-		export DerivedName2  := 000000010000b;		// second Individual name Derived from dual name
-		export MaleName  	 := 000000100000b;		// Male Name
-		export FemaleName 	 := 000001000000b;		// Female Name
+		export DerivedName   	:= 0100000000000000b;		// Individual name Derived from dual name
+		export DerivedName2  	:= 1000000000000000b;		// second Individual name Derived from dual name
+		export MaleName  	 		:= 0000000001000000b;		// Likely Male Name
+		export FemaleName 	 	:= 0000000010000000b;		// Likely Female Name
 
 		shared NameTypeBits := 111b;		// nametype bit map
 		shared NameQualityBits := 111000b;		// nametype bit map
@@ -43,6 +43,15 @@ export NameTypes := enum(UNSIGNED2,
 					2 => DerivedName2,
 					0);
 
+		export unsigned2 fn_setNameIndicators(integer2 nametype, unsigned2 quality, string1 gender='U', unsigned1 derivation=0) :=
+			nametype | quality |
+				IF(gender in ['M','N'],MaleName,0) |
+				IF(gender in ['F','N'],FemaleName,0) |
+				case(derivation,
+					1 => DerivedName,
+					2 => DerivedName2,
+					0);
+					
 		export fn_getNameType(unsigned2 name_ind) := name_ind & NameTypeBits;
 		
 		export string1 GetTypeFromInd(unsigned2 name_ind) := CASE(
