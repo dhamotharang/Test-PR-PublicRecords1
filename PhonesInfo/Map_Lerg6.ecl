@@ -389,11 +389,11 @@
 	//Append Record SID
 	////////////////////////////////////////////////////////////////////////////////
 	
-	dx_PhonesInfo.Layouts.lerg6Main addRecTr(addGlobal_SID l):= TRANSFORM
+	dx_PhonesInfo.Layouts.lerg6Main addRecTr(addGlobalSID l):= TRANSFORM
 		self.record_sid					:=  hash64(mdr.sourceTools.src_Phones_Lerg6 + l.ocn + l.npa + l.nxx + l.block_id + l.switch + l.aocn + l.sha_indicator + l.status + l.eff_date + l.dt_start);
 		self 	                	:= l;
 	END;
 
-	addRecID 			:= project(addGlobal_SID, addRecTr(left));
+	addRecID 			:= project(addGlobalSID, addRecTr(left));
 
 EXPORT Map_Lerg6 := addRecID;
