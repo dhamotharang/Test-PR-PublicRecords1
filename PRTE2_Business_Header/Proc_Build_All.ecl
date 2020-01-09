@@ -1,4 +1,4 @@
-﻿import _control, VersionControl, Business_Header, tools, PRTE;
+﻿import _control, VersionControl, Business_Header, tools, PRTE, dops,prte2,orbit3;
 
 export Proc_Build_All(
 
@@ -22,16 +22,20 @@ export proc_Build_Bases := sequential(
 		 ,PRTE2_Business_Header.proc_build_bizword_key(pversion).all
 );
 
-export update_dops :=	iff(pShouldUpdateDOPS, 
-														PRTE.UpdateVersion(
-															'BusinessHeaderKeys'								//	Package name
-															,pversion														//	Package version
-															,_control.MyInfo.EmailAddressNormal	//	Who to email with specifics
-															,'B'																//  inloc - 'B' - Boca, 'A' - Alpharetta
-															,'N'																//	N = Non-FCRA, F = FCRA
-															,'N'                                //	N = Do not also include boolean, Y = Include boolean, too
-														)
-												 );
+
+//---------- making DOPS optional and only in PROD build -------------------------------
+	notifyEmail					:= _control.MyInfo.EmailAddressNormal;
+	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
+	updatedops					:=	PRTE.UpdateVersion(Constants.dops_name, pversion, notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
+	
+	PerformUpdateOrNot	:= IF(pShouldUpdateDOPS,PARALLEL(updatedops),NoUpdate);
+//---------------------------------------------------------------------------------------
+
+ updateorbit		:= Orbit3.proc_Orbit3_CreateBuild('PRTE2- BusinessHeader', pversion, 'N', true, true, false, _control.MyInfo.EmailAddressNormal);  
+
+
+key_validation :=  output(dops.ValidatePRCTFileLayout(pversion, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
+
 
 export All := 
 	if(tools.fun_IsValidVersion(pversion)
@@ -39,7 +43,9 @@ export All :=
 				PRTE2_Business_Header.promote().Inputfiles.Sprayed2Using
 			 ,proc_Build_Bases
 			 ,PRTE2_Business_Header.promote().Inputfiles.Using2Used
-			 ,update_dops
+			 ,PerformUpdateOrNot
+			 ,key_validation
+			 ,updateorbit	
 		 )
 		,output('No Valid version parameter passed, skipping PRTE2_Business_Header.proc_Build_All')
 	);
