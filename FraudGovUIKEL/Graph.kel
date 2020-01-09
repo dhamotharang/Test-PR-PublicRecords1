@@ -10,7 +10,7 @@ FUNCTION: IsNonIntegerStr(STRING s) <= ECL(REGEXFIND('[^0-9]', s)) RETURNS BOOLE
 
 
 
-Legal :=   ENTITY
+Legal :=  ENTITY
 (FLAT(UID(seleid),
   STRING bestultcompanyname,
   STRING bestultfein,
@@ -128,7 +128,7 @@ Legal :=   ENTITY
 
 
 
-Employer :=   ENTITY
+Employer :=  ENTITY
 (FLAT(UID(uacctno),
 	Legal rLegal=UID(seleid),
   STRING dummycode,
@@ -188,6 +188,7 @@ Employer :=   ENTITY
   STRING country,
   STRING leaseclientind,
   STRING aggregateleasingno,
+	STRING transferdate,
 
   INTEGER ultid,
   INTEGER orgid,
@@ -868,11 +869,11 @@ Employer :=   ENTITY
    */
 		),
 	MODEL(
-UID,rLegal,dummycode,uacctno,checkdigit,fedno,cocd,areacd,status,liabcd,datefirstemp,dateliabest,compyr,timelapsecd,ownershipcd,reinstatedate,unitaddeddate,liabtermdate,dateacquired,bkstopcode,bankruptcydate,legalactioncd,letofassessment,statusreceiptdate,acquiredbyacctno,unpaidbalcd,warrantsissued,datewarrantissued,auditdate,fieldrepcd,datepurged,numownssn,ownername1,ownerssn1,ownername2,ownerssn2,ownername3,ownerssn3,reconamt,unpdbalamt,prevchrgamt,ownername,phones{phonenumber},mno,mnosic6,mnoavgwages,flempname,slempname,fltradename,sltradename,flstreetaddr,slstreetaddr,attnof,citystate,zip,altzipcode,country,leaseclientind,aggregateleasingno,ultid,orgid,seleid,proxid,powid,dotid,empid,score,weight,rCleanAddr,physicaladdressstate,physicaladdressrecordtype));
+UID,rLegal,dummycode,uacctno,checkdigit,fedno,cocd,areacd,status,liabcd,datefirstemp,dateliabest,compyr,timelapsecd,ownershipcd,reinstatedate,unitaddeddate,liabtermdate,dateacquired,bkstopcode,bankruptcydate,legalactioncd,letofassessment,statusreceiptdate,acquiredbyacctno,unpaidbalcd,warrantsissued,datewarrantissued,auditdate,fieldrepcd,datepurged,numownssn,ownername1,ownerssn1,ownername2,ownerssn2,ownername3,ownerssn3,reconamt,unpdbalamt,prevchrgamt,ownername,phones{phonenumber},mno,mnosic6,mnoavgwages,flempname,slempname,fltradename,sltradename,flstreetaddr,slstreetaddr,attnof,citystate,zip,altzipcode,country,leaseclientind,aggregateleasingno,transferdate,ultid,orgid,seleid,proxid,powid,dotid,empid,score,weight,rCleanAddr,physicaladdressstate,physicaladdressrecordtype));
 
 
   
-Claim :=   ENTITY
+Claim :=  ENTITY
 (FLAT(UID(bizrecid),
   Employer rEmployer=UID(uacctno),
   Claimant rClaimant=UID(application_id),
@@ -1162,35 +1163,42 @@ Claim :=   ENTITY
   INTEGER selegsaflag,
   INTEGER proxgsaflag*/
 		),
-	MODEL(UID, rEmployer, rClaimant, rLegal, claim_status, claim_submit_ccyymmdd, bizrecid, uacctno,claim_sep_emp_name, claim_sep_emp_no));
+	MODEL(UID, rEmployer, rClaimant, rLegal, claim_status, claim_submit_ccyymmdd, bizrecid, uacctno, claim_sep_emp_name, claim_sep_emp_no));
 
 
 
-Person :=  ENTITY
+Person := ENTITY
 (FLAT(UID(employeelexid),
-	STRING employeelexid,
+  Employer rEmployer=UID(uacctno),
+  STRING employeelexid,
 	STRING firstname,
 	STRING middleinit,
 	STRING lastname
-), MODEL(UID, employeelexid, firstname, middleinit, lastname));
+), MODEL(UID, rEmployer, employeelexid, firstname, middleinit, lastname));
 
 
-Claimant :=   ENTITY
+Claimant :=  ENTITY
 (FLAT(UID(application_id),
 	STRING claimant_ssn,
 	INTEGER claimantlexid),
 	MODEL(UID, claimant_ssn, claimantlexid));
 
 
-CleanAddress :=  ENTITY
+CleanAddress := ENTITY
 (FLAT(UID(physicaladdresscleanedaddress),
 	STRING addr=physicaladdresscleanedaddress),
 	MODEL(UID, addr));
-/*Define associations between entities
+	
+Quarter := ENTITY
+ (FLAT(UID(qtryr),
+   INTEGER qtryr),
+	 MODEL(UID, qtryr));
+/*
+	Define associations between entities
 */
 
 
-LegalEmployer :=   ASSOCIATION
+LegalEmployer :=  ASSOCIATION
 (FLAT(
     Legal rLegal=UID(seleid),
     Employer rEmployer=UID(uacctno)
@@ -1198,15 +1206,22 @@ LegalEmployer :=   ASSOCIATION
    ));
 
 
-EmployerClaim :=   ASSOCIATION
+EmployerClaim :=  ASSOCIATION
 (FLAT(
     Employer rEmployer=UID(uacctno),
 		Claim rClaim=UID(bizrecid)
     //DATE claim_submit_ccyymmdd
    ));
+	 
+EmployerPersonWages := ASSOCIATION
+	(FLAT(
+	  Employer rEmployer=UID(uacctno),
+	  Person rPerson=UID(employeelexid),
+		INTEGER wageyearqtr,
+		REAL wageamt));
 
 
-LegalClaim :=   ASSOCIATION
+LegalClaim :=  ASSOCIATION
 (FLAT(
     Legal rLegal=UID(seleid),
 		Claim rClaim=UID(bizrecid)
@@ -1214,21 +1229,21 @@ LegalClaim :=   ASSOCIATION
    ));
 
 
-EmployerAddr :=  ASSOCIATION
+EmployerAddr := ASSOCIATION
 (FLAT(
 		CleanAddress rAddr=UID(physicaladdresscleanedaddress),
     Employer rEmployer=UID(uacctno)
 	));
 
 	
-LegalAddr :=  ASSOCIATION
+LegalAddr := ASSOCIATION
 (FLAT(
 		CleanAddress rAddr=UID(physicaladdresscleanedaddress),
     Legal rLegal=UID(seleid)
 	));
 
 	
-LegalPersonWages :=  ASSOCIATION
+LegalPersonWages := ASSOCIATION
 (FLAT(
 		Legal rLegal=UID(seleid),
 		INTEGER wageyearqtr,
@@ -1236,22 +1251,16 @@ LegalPersonWages :=  ASSOCIATION
 		Person rPerson=UID(employeelexid)));
 
 /*
-SeleSeleEmployees :=  ASSOCIATION
-(FLAT(
-		Fromultid,
-		Toultid,
-		Legal rFromLegal=UID(FromSeleID),
-		Legal rToLegal=UID(ToSeleID),
-		// Employer rEmployer=UID(uacctno),
-		Employer rFromEmployer=UID(FromEmpNum),
-		Employer rToEmployer=UID(ToEmpNum),
-    INTEGER fromstartwageyearqtr,
-    INTEGER fromendwageyearqtr,
-    INTEGER tostartwageyearqtr,
-    INTEGER toendwageyearqtr,
-		Person rPerson=UID(employeelexid)
-		));
-*/ 
+EmployerQuarters := ASSOCIATION
+  (FLAT(
+		Employer rEmployer=UID(uacctno),
+		Quarter rQuarter=UID(qtryr),
+		INTEGER qtryr,
+		REAL taxrate,
+		INTEGER nowagesflag,
+		INTEGER employeecount,
+		INTEGER totalwages));
+	
 FromEmployerEmployees := ASSOCIATION
                 (FLAT(Employer rFromEmployer=UID(FromEmpNum),
                       Employer rToEmployer=UID(ToEmpNum),
@@ -1263,7 +1272,7 @@ FromEmployerEmployees := ASSOCIATION
 											STRING fromendtaxrate,
 											STRING tostarttaxrate,
 											STRING toendtaxrate,
-											BOOLEAN CleanMovementFlag,
+											INTEGER CleanMovementFlag,
                       Person rPerson=UID(employeelexid)
                                 ));
 
@@ -1278,20 +1287,21 @@ ToEmployerEmployees := ASSOCIATION
 											STRING fromendtaxrate,
 											STRING tostarttaxrate,
 											STRING toendtaxrate,
-											BOOLEAN CleanMovementFlag,
+											INTEGER CleanMovementFlag,
                       Person rPerson=UID(employeelexid)
                                 ));
-                
+	
   
 USE FraudgovUIKEL.Files.WagesAssociations(FLAT,
 		ToEmployerEmployees(FILTER((UNSIGNED)employeelexid != 0 AND FromEmpNum != 0 AND ToEmpNum != 0)),
 		FromEmployerEmployees(FILTER((UNSIGNED)employeelexid != 0 AND FromEmpNum != 0 AND ToEmpNum != 0)));
+		
 USE FraudGovUIKel.Files.Wages(FLAT,
 		Person(FILTER((UNSIGNED)employeelexid != 0)),
 		Legal,	
-    Employer(FILTER((UNSIGNED)empnum != 0), 
-      physicaladdresscleanedaddress=addresscleanedaddress,
-		  uacctno=empnum),
+    Employer(FILTER((UNSIGNED)uacctno != 0), 
+      physicaladdresscleanedaddress=addresscleanedaddress),
+		EmployerPersonWages(FILTER((UNSIGNED)employeelexid != 0)), 
 		LegalPersonWages(FILTER((UNSIGNED)employeelexid != 0)));
 USE FRAUDGovUIKEL.Files.Employer(FLAT,
     Employer(FILTER((UNSIGNED)uacctno != 0)),
@@ -1299,8 +1309,8 @@ USE FRAUDGovUIKEL.Files.Employer(FLAT,
 		LegalEmployer(FILTER((UNSIGNED)uacctno != 0)),
 		LegalAddr(FILTER((UNSIGNED)uacctno != 0)),
 		CleanAddress(FILTER((UNSIGNED)uacctno != 0)),
-		EmployerAddr(FILTER((UNSIGNED)uacctno != 0))
-	);
+		EmployerAddr(FILTER((UNSIGNED)uacctno != 0)));
+		
 USE FraudGovUIKEL.Files.Claims(FLAT, 
   Claim(FILTER((UNSIGNED)claim_sep_emp_no != 0)),
 	EmployerClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0)),
@@ -1308,7 +1318,15 @@ USE FraudGovUIKEL.Files.Claims(FLAT,
 	);
 USE FraudGovUIKEL.Files.Claimant(FLAT,
   Claimant(FILTER((UNSIGNED)application_id != 0)));
-                        
+	
+	
+USE FraudGovUIKEL.Files.FinalWageTaxRateInfo(FLAT,
+  EmployerQuarters(FILTER((UNSIGNED)uacctno != 0)));
+USE FraudGovUIKEL.Files.FullEmployerWageYearQtr(FLAT,
+  Quarter(FILTER((UNSIGNED)qtryr>1950)));
+
+
+
 
 
 // Address Fields
@@ -1542,11 +1560,11 @@ Legal: => dsVelBusAcctPerAddrInBusLegEnt := LegalEmployer.rEmployer(BusAcctUIDEc
 
 // New legal attributes
 // Legal: => FirstMoveToCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND rFromLegal.seleid != 0)); // need to include associations where there is no prior wage reported.
-// Legal: => MoveToCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.seleid != 0));
-// Legal: => MoveSameSeleDiffEmpCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal = rToLegal AND FromEmpNum != ToEmpNum));
-// Legal: => MoveSameSeleDiffEmp :=SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal = rToLegal AND FromEmpNum != ToEmpNum);
-// Legal: => MoveSameUltDiffSeleEmpCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid));
-// Legal: => MoveSameUltDiffSeleEmp := SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid);
+// Legal: => MoveToCount := COUNT(ToEmployerEmployees(fromendwageyearqtr < tostartwageyearqtr AND rFromLegal != rToLegal AND rFromLegal.seleid != 0));
+// Legal: => MoveSameSeleDiffEmp := ToEmployerEmployees(fromendwageyearqtr < tostartwageyearqtr AND rFromLegal = rToLegal AND rFromEmployer != rToEmployer);
+// Legal: => MoveSameSeleDiffEmpCount := COUNT(MoveSameSeleDiffEmp);
+// Legal: => MoveSameUltDiffSeleEmp := ToEmployerEmployees(fromendwageyearqtr < tostartwageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid);
+// Legal: => MoveSameUltDiffSeleEmpCount := COUNT(MoveSameUltDiffSeleEmp);
 // Legal: => MoveTos := SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.seleid != 0){rFromLegal.seleid, rToLegal.seleid, rPerson.employeelexid};
 // Legal: => SameUltDiffSeleEmployeeCount := COUNT(SeleSeleEmployees(fromwageyearqtr = towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid){rPerson});
 // Legal: => TestWagesTotal := SUM(LegalPersonWages, wageamt);
@@ -1563,7 +1581,8 @@ Claim: => EmpAgeAtClaim := MAP(rEmployer.BusAcctNewestRecordDt=-99999 => -99999,
                           DAYSBETWEEN(DATE(rEmployer.BusAcctOpenDtEcho),claim_submit_ccyymmdd));
 Claim: => BusAgeAtClaim := MAP(claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99998,
                           DAYSBETWEEN(DATE(rLegal.OldestEmployerBeganDt),claim_submit_ccyymmdd));
-Claim: => DateCheck := rLegal.OldestEmployerBeganDt;
+Claim: => EmployerBeganDt := rEmployer.BusAcctOpenDtEcho;
+Claim: => StatusReceiptDt := rEmployer.statusreceiptdate;
 
 
 
@@ -1574,7 +1593,11 @@ Claimant: => LexID := claimantlexid;
 
 // Employer attributes
 Employer: => ClaimCount := COUNT(EmployerClaim);
-
+Employer: => BusNewestRecordDtYrQtr := INTEGER(STRING(YEAR(DATE(BusNewestRecordDt))) + 
+																		STRING(MAP(MONTH(DATE(BusNewestRecordDt)) <=3 => 1, 
+																				MONTH(DATE(BusNewestRecordDt)) <=6 => 2,
+																				MONTH(DATE(BusNewestRecordDt)) <=9 => 3,
+																								MONTH(DATE(BusNewestRecordDt)) <=12 => 4)));
 // Employer: => StatusReceiptFirstEmploymentDiff := DAYSBETWEEN(datefirstemp, statusreceiptdate);
 // Add flag for if the date is in the last 2 years... and the StatusReceiptFirstEmploymentDiff < 0
 Employer: => BusAcctUIDEcho := MAP((fltradename:Null OR flstreetaddr:Null OR zip:Null) AND (fltradename:Null OR flstreetaddr:Null OR citystate:Null) => -99999,
@@ -1601,8 +1624,7 @@ Employer: => BusAcctNewestUpdateMasterDt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																								20190701);
  // fixme. Need to put in an "lastupdated" date into the entities. Do we keep multiple versions?
 Employer: => BusNewestRecordDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
-																			rLegal.BusNewestRecordDt);
- // fixme
+																			rLegal.BusNewestRecordDt); // fixme 
 Employer: => BusAcctDtEmployerBeganEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							 ISVALIDDATE(datefirstemp) => INTEGER(datefirstemp), // In YYYYMMDD format
 																							 -99998);
@@ -1610,31 +1632,29 @@ Employer: => BusAcctTaxLiabEndDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							 ISVALIDDATE(liabtermdate) => INTEGER(liabtermdate), // In YYYYMMDD format
 																							 -99998);
 Employer: => BusNewestTaxLiabStartDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
-																					  rLegal.NewestTaxLiabStartDt);
- // possible fixme?
+																					  rLegal.NewestTaxLiabStartDt); // possible fixme? 
 Employer: => BusNewestTaxLiabEndDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
-																					rLegal.NewestTaxLiabEndDt);
-// possible fixme?
+																					rLegal.NewestTaxLiabEndDt);// possible fixme? 
 Employer: => BusAcctTaxLiabStartMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							BusAcctTaxLiabStartDtEcho=-99998 => -99998,
-																							BusAcctTaxLiabStartDtEcho > BusAcctNewestRecordDt => -99997,
+																							BusAcctTaxLiabStartDtEcho > BusAcctNewestRecordDt => -99997, 
 																							MAX(MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho), DATE(BusAcctNewestRecordDt)), 999), 0));
 Employer: => BusOldestTaxLiabStartMsince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																								BusOldestTaxLiabStartDt=-99998 => -99998,
 																								BusOldestTaxLiabStartDt > BusNewestRecordDt => -99997,
 																								MAX(MIN(MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt), DATE(BusNewestRecordDt)), 999), 0));
 Employer: => BusAcctOldestUnemClmDt := MAP(BusAcctUIDEcho=-99999 => -99999,
-																					 ClaimCount=0 => -99998,
+																					 ClaimCount=0 => -99998, //here
 																					 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // All claim dates are invalid
 																					 INTEGER(MIN(EmployerClaim.rClaim, claim_submit_ccyymmdd)));
 Employer: => BusOldestUnemClmDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																			 rLegal.ClaimCount=0 => -99998,
 																			 rLegal.OldestUnemClmDt);
  // Will have -99997 if no dates
-Employer: => BusIncorpDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+Employer: => BusIncorpDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999, //here
                                 rLegal.IncorpDt > BusNewestRecordDt => -99998, // No SOS incorporation on file prior to BusNewestRecordDt
                                 rLegal.IncorpDt);
-Employer: => BusIncorpMSince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+Employer: => BusIncorpMSince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999, 
 																		BusIncorpDt=-99997 => -99997, // Or unable to calculate
 																		DAYSBETWEEN(DATE(BusIncorpDt), DATE(BusNewestRecordDt)) < 0 => -99998,
 																		MAX(MIN(MONTHSBETWEEN(DATE(BusIncorpDt), DATE(BusNewestRecordDt)), 999), 0));
@@ -1801,7 +1821,7 @@ Employer: => BusAcctOwnerNotPopFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							(BusAcctOwnerName3Pop=0 OR BusAcctOwnerSSN3Pop=0) => 1,
 																					 -99997);
 Employer: => BusAcctPerBusOwnerNotPopCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
-																								rLegal.BusAcctPerBusOwnerNotPopCnt);
+																								rLegal.BusAcctPerBusOwnerNotPopCnt); 
 Employer: => BusOwnerNotPopFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
 																			 rLegal.BusOwnerNotPopFlag);
 Employer: => BusAcctFullAddressCleanPop := MAP((flstreetaddr:Null OR citystate:Null OR zip:Null) => -99999, // (Street+City+State) OR(Street+Zip) not met. Demorgan'd out 														,							 
@@ -2115,21 +2135,436 @@ Employer: => BusUnemClm60To120DAfterOpenFlag :=  MAP(BusAcctUIDEcho=-99999 OR rL
 																									BusOldestAcctOpenDt = BusAcctNewestRecordDt => -99997,
 																									IF(BusUnemClmAfterOldestOpenCnt120D - BusUnemClmAfterOldestOpenCnt60D > 0,1,0));
 
-																									
+// SUTA attributes
+// WAGE 
+Employer: => BA_WgQtrCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
+																	COUNT(Sequence.Dedup(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr>0), LEFT.wageyearqtr=RIGHT.wageyearqtr, wageyearqtr)));
+Employer: => BA_QtlyWgsTotA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																			BA_WgQtrCntEv<1 => -99998,
+																			ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [1,7]), wageamt<0) => -99997,
+																			SUM(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [1,7] AND wageamt > 0), wageamt)); // 20182-20181=1 or 20191-20184=7
+Employer: => BA_QtlyWgsTotA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																			BA_WgQtrCntEv<1 => -99998,
+																			ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [2,8]), wageamt<0) => -99997,
+																			SUM(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [2,8] AND wageamt > 0), wageamt)); // 20184-20182=2 or 20191-20183=8
+Employer: => BA_QtlyWgsTotA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																			BA_WgQtrCntEv<1 => -99998,
+																			ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [3,9]), wageamt<0) => -99997,
+																			SUM(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [3,9] AND wageamt > 0), wageamt)); // 20184-20181=3 or 20191-20182=9
+Employer: => BA_QtlyWgsTotA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																			BA_WgQtrCntEv<1 => -99998,
+																			ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [10]), wageamt<0) => -99997,
+																			SUM(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [10] AND wageamt > 0), wageamt)); // 20194-20184=10
+Employer: => BA_QtlyWgsTotA5Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																			BA_WgQtrCntEv<1 => -99998,
+																			ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [11,17]), wageamt<0) => -99997,
+																			SUM(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [11,17] AND wageamt > 0), wageamt)); // 20191-20174=17, 20194-20183=11
+Employer: => BA_YrlyWgsTotA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																			BA_WgQtrCntEv<1 => -99998,
+																			(BA_QtlyWgsTotA1Qc=-99997 AND 
+																			 BA_QtlyWgsTotA2Qc=-99997 AND
+																			 BA_QtlyWgsTotA3Qc=-99997 AND
+																			 BA_QtlyWgsTotA4Qc=-99997) => -99997,
+																			 SUM(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [1,2,3,7,8,9,10] AND wageamt > 0), wageamt));
+Employer: => BA_YrlyWgsTotA5Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																			BA_WgQtrCntEv<1 => -99998,
+																				ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [11,12,13,17,18,19,20]), wageamt<0) => -99997,
+																			 // Get total wages from -9 to -5 quarters ago
+																			 // 20194 - {20183, 20182, 20181, 20174} = {11,12,13,20}
+																			 // 20193 - {20182, 20181, 20174, 20173} = {11,12,19,20}
+																			 // 20192 - {20181, 20174, 20173, 21072} = {11,18,19,20}
+																			 // 20191 - {20174, 20173, 20172, 20171} = {17,18,19,20}
+																			 SUM(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [11,12,13,17,18,19,20] AND wageamt > 0), wageamt)); 
+Employer: => BA_QtlyEmplCntA1Qc :=  MAP(BusAcctUIDEcho=-99999 => -99999,
+																				BA_WgQtrCntEv<1 => -99998,
+																				COUNT(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [1,7])) = 0 => 0,
+																				ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [1,7]), rPerson:Null) => -99997,
+																				COUNT(Sequence.Dedup(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [1,7]).rPerson, LEFT.employeelexid=RIGHT.employeelexid, employeelexid)));
+Employer: => BA_QtlyEmplCntA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				BA_WgQtrCntEv<1 => -99998,
+																				COUNT(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [2,8])) = 0 => 0,
+																				ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [2,8]), rPerson:Null) => -99997,
+																				COUNT(Sequence.Dedup(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [2,8]).rPerson, LEFT.employeelexid=RIGHT.employeelexid, employeelexid))); 
+Employer: => BA_QtlyEmplCntA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				BA_WgQtrCntEv<1 => -99998,
+																				COUNT(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [3,9])) = 0 => 0,
+																				ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [3,9]), rPerson:Null) => -99997,
+																				COUNT(Sequence.Dedup(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [3,9]).rPerson, LEFT.employeelexid=RIGHT.employeelexid, employeelexid)));
+Employer: => BA_QtlyEmplCntA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				BA_WgQtrCntEv<1 => -99998,
+																				COUNT(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [10])) = 0 => 0,
+																				ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [10]), rPerson:Null) => -99997,
+																				COUNT(Sequence.Dedup(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [10]).rPerson, LEFT.employeelexid=RIGHT.employeelexid, employeelexid))); 
+Employer: => BA_QtlyEmplCntA5Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				BA_WgQtrCntEv<1 => -99998,
+																				COUNT(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [11,17])) = 0 => 0,
+																				ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [11,17]), rPerson:Null) => -99997,
+																				COUNT(Sequence.Dedup(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [11,17]).rPerson, LEFT.employeelexid=RIGHT.employeelexid, employeelexid))); 
+Employer: => BA_YrlyEmplCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																			BA_WgQtrCntEv<1 => -99998,
+																			(BA_QtlyEmplCntA1Qc=-99997 AND 
+																			 BA_QtlyEmplCntA2Qc=-99997 AND
+																			 BA_QtlyEmplCntA3Qc=-99997 AND
+																			 BA_QtlyEmplCntA4Qc=-99997) => -99997,
+																			 COUNT(Sequence.Dedup(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [1,2,3,7,8,9,10]).rPerson, LEFT.employeelexid=RIGHT.employeelexid, employeelexid))); 
+Employer: => BA_YrlyEmplCntA5Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																			BA_WgQtrCntEv<1 => -99998,
+																				COUNT(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [11,12,13,17,18,19,20])) = 0 => 0,
+																				ALL(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [11,12,13,17,18,19,20]), rPerson:Null) => -99997,
+																			 // Get total wages from -9 to -5 quarters ago
+																			 // 20194 - {20183, 20182, 20181, 20174} = {11,12,13,20}
+																			 // 20193 - {20182, 20181, 20174, 20173} = {11,12,19,20}
+																			 // 20192 - {20181, 20174, 20173, 21072} = {11,18,19,20}
+																			 // 20191 - {20174, 20173, 20172, 20171} = {17,18,19,20}
+																			 COUNT(Sequence.Dedup(EmployerPersonWages(Employer.BusNewestRecordDtYrQtr-wageyearqtr IN [11,12,13,17,18,19,20]).rPerson, LEFT.employeelexid=RIGHT.employeelexid, employeelexid)));
+
+// Tax Liability History
+Employer: => BA_TaxQtrCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
+																	COUNT(Sequence.Dedup(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr>0), LEFT.qtryr=RIGHT.qtryr, qtryr)));
+																	
+Employer: => BA_QtlyTaxRtEchoA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				COUNT(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [1,7])) = 0 => -99998,
+																				ALL(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [1,7]), taxrate<0 OR taxrate>100) => -99997,
+																				SUM(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [1,7]), taxrate)); // 20182-20181=1 or 20191-20184=7
+																		
+Employer: => BA_QtlyTaxRtEchoA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				COUNT(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [2,8])) = 0 => -99998,
+																				ALL(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [2,8]), taxrate<0 OR taxrate>100) => -99997,
+																				SUM(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [2,8]), taxrate)); 
+Employer: => BA_QtlyTaxRtEchoA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				COUNT(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [3,9])) = 0 => -99998,
+																				ALL(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [3,9]), taxrate<0 OR taxrate>100) => -99997,
+																				SUM(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [3,9]), taxrate)); 
+Employer: => BA_QtlyTaxRtEchoA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				COUNT(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [10])) = 0 => -99998,
+																				ALL(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [10]), taxrate<0 OR taxrate>100) => -99997,
+																				SUM(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [10]), taxrate)); 
+Employer: => BA_QtlyTaxRtEchoA5Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				COUNT(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [11,17])) = 0 => -99998,
+																				ALL(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [11,17]), taxrate<0 OR taxrate>100) => -99997,
+																				SUM(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [11,17]), taxrate)); 
+Employer: => BA_YrlyTaxRtAvgA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+																				COUNT(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [1,2,3,7,8,9,10])) = 0 => -99998,
+																				ALL(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [1,2,3,7,8,9,10]), taxrate<0 OR taxrate>100) => -99997,
+																				AVE(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [1,2,3,7,8,9,10]),taxrate));
+Employer: => BA_YrlyTaxRtAvgA5Qc :=  MAP(BusAcctUIDEcho=-99999 => -99999,
+																				COUNT(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [11,12,13,17,18,19,20])) = 0 => -99998,
+																				ALL(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [11,12,13,17,18,19,20]), taxrate<0 OR taxrate>100) => -99997,
+																				AVE(EmployerQuarters(Employer.BusNewestRecordDtYrQtr-qtryr IN [11,12,13,17,18,19,20]),taxrate));
+                                                   
+																									 
+// Movement Attributes pt. 1
+																									 
+Employer: => BA_EmpMvToQtlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                          BA_WgQtrCntEv < 1 => -99998,
+																					BA_QtlyEmplCntA1Qc < 1 => -99997,
+																					COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [1,7])));
+Employer: => BA_EmpMvFrQtlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                          BA_WgQtrCntEv < 1 => -99998,
+																					BA_QtlyEmplCntA2Qc < 1 => -99997,
+																					COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [1,7])));
+Employer: => BA_EmpMvToQtlyCntA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                          BA_WgQtrCntEv < 1 => -99998,
+																					BA_QtlyEmplCntA2Qc < 1 => -99997,
+																					COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [2,8])));
+Employer: => BA_EmpMvFrQtlyCntA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                          BA_WgQtrCntEv < 1 => -99998,
+																					BA_QtlyEmplCntA3Qc < 1 => -99997,
+																					COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [2,8])));																	
+Employer: => BA_EmpMvToQtlyCntA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                          BA_WgQtrCntEv < 1 => -99998,
+																					BA_QtlyEmplCntA3Qc < 1 => -99997,
+																					COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [3,9])));
+Employer: => BA_EmpMvFrQtlyCntA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                          BA_WgQtrCntEv < 1 => -99998,
+																					BA_QtlyEmplCntA4Qc < 1 => -99997,
+																					COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [3,9])));
+Employer: => BA_EmpMvToQtlyCntA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                          BA_WgQtrCntEv < 1 => -99998,
+																					BA_QtlyEmplCntA4Qc < 1 => -99997,
+																					COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [4,10])));
+Employer: => BA_EmpMvFrQtlyCntA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                          BA_WgQtrCntEv < 1 => -99998,
+																					BA_QtlyEmplCntA5Qc < 1 => -99997,
+																					COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [4,10])));
+Employer: => BA_EmpMvToYrlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                          BA_WgQtrCntEv < 1 => -99998,
+																					BA_QtlyEmplCntA5Qc < 1 AND BA_YrlyEmplCntA1Qc <1 => -99997,
+                                          COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [1,2,3,4,7,8,9,10])));
+Employer: => BA_EmpMvFrYrlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                          BA_WgQtrCntEv < 1 => -99998,
+																					BA_QtlyEmplCntA5Qc < 1 AND BA_YrlyEmplCntA1Qc <1 => -99997,
+                                          COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [1,2,3,4,7,8,9,10])));
+Employer: => BA_EmpMvToLwTaxRtQtlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																					       BA_QtlyEmplCntA1Qc < 1  OR BA_QtlyTaxRtEchoA1Qc <= 0  OR ALL(ToEmployerEmployees.rFromEmployer, BA_QtlyTaxRtEchoA2Qc <= 0) => -99997,
+																					       COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate > tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [1,7])));
+Employer: => BA_EmpMvFrHiTaxRtQtlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA2Qc < 1 OR BA_QtlyTaxRtEchoA2Qc <= 0 OR ALL(FromEmployerEmployees.rToEmployer, BA_QtlyTaxRtEchoA1Qc <= 0) => -99997,
+																								 COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate > tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [1,7])));
+Employer: => BA_EmpMvToLwTaxRtQtlyCntA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																					       BA_QtlyEmplCntA2Qc < 1  OR BA_QtlyTaxRtEchoA2Qc <= 0  OR ALL(ToEmployerEmployees.rFromEmployer, BA_QtlyTaxRtEchoA3Qc <= 0) => -99997,
+																					       COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate > tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [2,8])));
+Employer: => BA_EmpMvFrHiTaxRtQtlyCntA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA3Qc < 1 OR BA_QtlyTaxRtEchoA3Qc <= 0 OR ALL(FromEmployerEmployees.rToEmployer, BA_QtlyTaxRtEchoA2Qc <= 0) => -99997,
+																								 COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate > tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [2,8])));
+Employer: => BA_EmpMvToLwTaxRtQtlyCntA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																					       BA_QtlyEmplCntA3Qc < 1 OR BA_QtlyTaxRtEchoA3Qc <= 0 OR ALL(ToEmployerEmployees.rFromEmployer, BA_QtlyTaxRtEchoA4Qc <= 0) => -99997,
+																					       COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate > tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [3,9])));
+Employer: => BA_EmpMvFrHiTaxRtQtlyCntA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA4Qc < 1 OR  BA_QtlyTaxRtEchoA4Qc <= 0 OR ALL(FromEmployerEmployees.rToEmployer, BA_QtlyTaxRtEchoA3Qc <= 0) => -99997,
+																								 COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate > tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [3,9])));
+Employer: => BA_EmpMvToLwTaxRtQtlyCntA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																					       BA_QtlyEmplCntA4Qc < 1 OR BA_QtlyTaxRtEchoA4Qc <= 0 OR ALL(ToEmployerEmployees.rFromEmployer, BA_QtlyTaxRtEchoA5Qc <= 0) => -99997,
+																					       COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate > tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [4,10])));
+Employer: => BA_EmpMvFrHiTaxRtQtlyCntA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA5Qc < 1 OR BA_QtlyTaxRtEchoA5Qc <= 0 OR ALL(FromEmployerEmployees.rToEmployer, BA_QtlyTaxRtEchoA4Qc <= 0) => -99997,
+																								 COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate > tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [4,10])));
+Employer: => BA_EmpMvToLwTaxRtYrlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																					       BA_EmpMvToLwTaxRtQtlyCntA1Qc=-99997 AND BA_EmpMvToLwTaxRtQtlyCntA2Qc=-99997 AND BA_EmpMvToLwTaxRtQtlyCntA3Qc=-99997 AND BA_EmpMvToLwTaxRtQtlyCntA4Qc=-99997  => -99997,
+																					       COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate > tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [1,2,3,4,7,8,9,10])));
+Employer: => BA_EmpMvFrHiTaxRtYrlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_EmpMvFrHiTaxRtQtlyCntA1Qc=-99997 AND BA_EmpMvFrHiTaxRtQtlyCntA2Qc=-99997 AND BA_EmpMvFrHiTaxRtQtlyCntA3Qc=-99997 AND BA_EmpMvFrHiTaxRtQtlyCntA4Qc=-99997 => -99997,
+																								 COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate > tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [1,2,3,4,7,8,9,10])));
+
+//Movement Attributes pt. 2
+Employer: => BA_EmpMvToBUIDQtlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                              BA_WgQtrCntEv < 1 => -99998,
+																							BA_QtlyEmplCntA2Qc < 1 => -99997,
+																							COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [1,7]){rToEmployer}));
+Employer: => BA_EmpMvFrBUIDQtlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                              BA_WgQtrCntEv < 1 => -99998,
+																							BA_QtlyEmplCntA1Qc < 1 => -99997,
+																							COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [1,7]){rFromEmployer}));																							
+Employer: => BA_EmpMvToBUIDQtlyCntA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                              BA_WgQtrCntEv < 1 => -99998,
+																							BA_QtlyEmplCntA3Qc < 1 => -99997,
+																							COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [2,8]){rToEmployer}));
+Employer: => BA_EmpMvFrBUIDQtlyCntA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                              BA_WgQtrCntEv < 1 => -99998,
+																							BA_QtlyEmplCntA2Qc < 1 => -99997,
+																							COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [2,8]){rFromEmployer}));																							
+Employer: => BA_EmpMvToBUIDQtlyCntA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                              BA_WgQtrCntEv < 1 => -99998,
+																							BA_QtlyEmplCntA4Qc < 1 => -99997,
+																							COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [3,9]){rToEmployer}));
+Employer: => BA_EmpMvFrBUIDQtlyCntA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                              BA_WgQtrCntEv < 1 => -99998,
+																							BA_QtlyEmplCntA3Qc < 1 => -99997,
+																							COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [3,9]){rFromEmployer}));																							
+Employer: => BA_EmpMvToBUIDQtlyCntA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                              BA_WgQtrCntEv < 1 => -99998,
+																							BA_QtlyEmplCntA5Qc < 1 => -99997,
+																							COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [10]){rToEmployer}));
+Employer: => BA_EmpMvFrBUIDQtlyCntA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                              BA_WgQtrCntEv < 1 => -99998,
+																							BA_QtlyEmplCntA4Qc < 1 => -99997,
+																							COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [10]){rFromEmployer}));																							
+Employer: => BA_EmpMvToBUIDYrlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                             BA_WgQtrCntEv < 1 => -99998,
+																						 BA_QtlyEmplCntA5Qc < 1 OR BA_YrlyEmplCntA1Qc < 1 => -99997,
+																						 COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [1,2,3,7,8,9,10]){rToEmployer}));
+Employer: => BA_EmpMvFrBUIDYrlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                             BA_WgQtrCntEv < 1 => -99998,
+																						 BA_YrlyEmplCntA1Qc <1 => -99997,
+																						 COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [1,2,3,7,8,9,10]){rFromEmployer}));
+Employer: => BA_EmpMvToLwTaxRtBUIDQtlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BA_WgQtrCntEv < 1 => -99998,
+																										 BA_QtlyEmplCntA2Qc <1 OR BA_QtlyTaxRtEchoA2Qc<=0 OR ALL(FromEmployerEmployees.rToEmployer, BA_QtlyTaxRtEchoA1Qc <= 0)  => -99997,
+																										 COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate>tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [1,7]){rToEmployer}));
+Employer: => BA_EmpMvFrHiTaxRtBUIDQtlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BA_WgQtrCntEv < 1 => -99998,
+																										 BA_QtlyEmplCntA1Qc <1 OR BA_QtlyTaxRtEchoA1Qc<=0 OR ALL(ToEmployerEmployees.rFromEmployer, BA_QtlyTaxRtEchoA2Qc <= 0)  => -99997,
+																										 COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate>tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [1,7]){rFromEmployer}));
+Employer: => BA_EmpMvToLwTaxRtBUIDQtlyCntA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BA_WgQtrCntEv < 1 => -99998,
+																										 BA_QtlyEmplCntA3Qc <1 OR BA_QtlyTaxRtEchoA3Qc<=0 OR ALL(FromEmployerEmployees.rToEmployer, BA_QtlyTaxRtEchoA2Qc <= 0)  => -99997,
+																										 COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate>tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [2,8]){rToEmployer}));
+Employer: => BA_EmpMvFrHiTaxRtBUIDQtlyCntA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BA_WgQtrCntEv < 1 => -99998,
+																										 BA_QtlyEmplCntA2Qc <1 OR BA_QtlyTaxRtEchoA2Qc<=0 OR ALL(ToEmployerEmployees.rFromEmployer, BA_QtlyTaxRtEchoA3Qc <= 0)  => -99997,
+																										 COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate>tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [2,8]){rFromEmployer}));
+Employer: => BA_EmpMvToLwTaxRtBUIDQtlyCntA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BA_WgQtrCntEv < 1 => -99998,
+																										 BA_QtlyEmplCntA4Qc <1 OR BA_QtlyTaxRtEchoA4Qc<=0 OR ALL(FromEmployerEmployees.rToEmployer, BA_QtlyTaxRtEchoA3Qc <= 0)  => -99997,
+																										 COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate>tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [3,9]){rToEmployer}));
+Employer: => BA_EmpMvFrHiTaxRtBUIDQtlyCntA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BA_WgQtrCntEv < 1 => -99998,
+																										 BA_QtlyEmplCntA3Qc <1 OR BA_QtlyTaxRtEchoA3Qc<=0 OR ALL(ToEmployerEmployees.rFromEmployer, BA_QtlyTaxRtEchoA4Qc <= 0)  => -99997,
+																										 COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate>tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [3,9]){rFromEmployer}));
+Employer: => BA_EmpMvToLwTaxRtBUIDQtlyCntA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BA_WgQtrCntEv < 1 => -99998,
+																										 BA_QtlyEmplCntA5Qc <1 OR BA_QtlyTaxRtEchoA5Qc<=0 OR ALL(FromEmployerEmployees.rToEmployer, BA_QtlyTaxRtEchoA4Qc <= 0)  => -99997,
+																										 COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate>tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [10]){rToEmployer}));
+Employer: => BA_EmpMvFrHiTaxRtBUIDQtlyCntA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BA_WgQtrCntEv < 1 => -99998,
+																										 BA_QtlyEmplCntA4Qc <1 OR BA_QtlyTaxRtEchoA4Qc<=0 OR ALL(ToEmployerEmployees.rFromEmployer, BA_QtlyTaxRtEchoA5Qc <= 0)  => -99997,
+																										 COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate>tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [10]){rFromEmployer}));
+Employer: => BA_EmpMvToLwTaxRtBUIDYrlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BA_WgQtrCntEv < 1 => -99998,
+																										 BA_EmpMvFrHiTaxRtQtlyCntA1Qc<1 AND BA_EmpMvFrHiTaxRtQtlyCntA2Qc<1 AND BA_EmpMvFrHiTaxRtQtlyCntA3Qc<1 AND BA_EmpMvFrHiTaxRtQtlyCntA4Qc<1 => -99997,
+																										 COUNT(FromEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate>tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [1,2,3,7,8,9,10]){rToEmployer}));
+Employer: => BA_EmpMvFrHiTaxRtBUIDYrlyCntA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                     BA_WgQtrCntEv < 1 => -99998,
+																										 BA_EmpMvToLwTaxRtQtlyCntA1Qc=-99997 AND BA_EmpMvToLwTaxRtQtlyCntA2Qc=-99997 AND BA_EmpMvToLwTaxRtQtlyCntA3Qc=-99997 AND BA_EmpMvToLwTaxRtQtlyCntA4Qc=-99997 => -99997,
+																										 COUNT(ToEmployerEmployees(CleanMovementFlag = 1 AND fromendtaxrate>tostarttaxrate AND Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [1,2,3,7,8,9,10]){rFromEmployer}));
+Employer: => BA_EmpMvToPerBUIDQtlyAvgA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA2Qc < 1 => -99997,
+																								 BA_EmpMvFrQtlyCntA1Qc/BA_EmpMvToBUIDQtlyCntA1Qc);
+Employer: => BA_EmpMvFrPerBUIDQtlyAvgA1Qc	:= MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA1Qc < 1 => -99997,
+																								 BA_EmpMvToQtlyCntA1Qc/BA_EmpMvFrBUIDQtlyCntA1Qc);
+Employer: => BA_EmpMvToPerBUIDQtlyAvgA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA3Qc < 1 => -99997,
+																								 BA_EmpMvFrQtlyCntA2Qc/BA_EmpMvToBUIDQtlyCntA2Qc);
+Employer: => BA_EmpMvFrPerBUIDQtlyAvgA2Qc	:= MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA2Qc < 1 => -99997,
+																								 BA_EmpMvToQtlyCntA2Qc/BA_EmpMvFrBUIDQtlyCntA2Qc);
+Employer: => BA_EmpMvToPerBUIDQtlyAvgA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA4Qc < 1 => -99997,
+																								 BA_EmpMvFrQtlyCntA3Qc/BA_EmpMvToBUIDQtlyCntA3Qc);
+Employer: => BA_EmpMvFrPerBUIDQtlyAvgA3Qc	:= MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA3Qc < 1 => -99997,
+																								 BA_EmpMvToQtlyCntA3Qc/BA_EmpMvFrBUIDQtlyCntA3Qc);
+Employer: => BA_EmpMvToPerBUIDQtlyAvgA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA5Qc < 1 => -99997,
+																								 BA_EmpMvFrQtlyCntA4Qc/BA_EmpMvToBUIDQtlyCntA4Qc);
+Employer: => BA_EmpMvFrPerBUIDQtlyAvgA4Qc	:= MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA4Qc < 1 => -99997,
+																								 BA_EmpMvToQtlyCntA4Qc/BA_EmpMvFrBUIDQtlyCntA4Qc);
+Employer: => BA_EmpMvToPerBUIDYrlyAvgA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA5Qc <1 AND BA_YrlyEmplCntA1Qc <1 => -99997,
+																								 BA_EmpMvFrYrlyCntA1Qc/BA_EmpMvToBUIDYrlyCntA1Qc);
+Employer: => BA_EmpMvFrPerBUIDYrlyAvgA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_YrlyEmplCntA1Qc < 1 => -99997,
+																								 BA_EmpMvToYrlyCntA1Qc/BA_EmpMvFrBUIDYrlyCntA1Qc);
+//lists for max attributes 
+Employer: => MoveToPerQuarterList := FromEmployerEmployees(CleanMovementFlag=1){rToEmployer,fromendwageyearqtr,EmployeeMoveCount := COUNT(GROUP)};
+Employer: => MoveFromPerQuarterList := ToEmployerEmployees(CleanMovementFlag=1){rFromEmployer,tostartwageyearqtr,EmployeeMoveCount := COUNT(GROUP)};
+																								 
+																								 
+Employer: => BA_EmpMvToPerBUIDQtlyMaxA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA2Qc < 1 => -99997,
+																								 MAX(MoveToPerQuarterList(Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [1,7]),EmployeeMoveCount));
+Employer: => BA_EmpMvFrPerBUIDQtlyMaxA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA1Qc < 1 => -99997,
+																								 MAX(MoveFromPerQuarterList(Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [1,7]),EmployeeMoveCount));
+Employer: => BA_EmpMvToPerBUIDQtlyMaxA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA3Qc < 1 => -99997,
+																								 MAX(MoveToPerQuarterList(Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [2,8]),EmployeeMoveCount));
+Employer: => BA_EmpMvFrPerBUIDQtlyMaxA2Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA2Qc < 1 => -99997,
+																								 MAX(MoveFromPerQuarterList(Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [2,8]),EmployeeMoveCount));
+Employer: => BA_EmpMvToPerBUIDQtlyMaxA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA4Qc < 1 => -99997,
+																								 MAX(MoveToPerQuarterList(Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [3,9]),EmployeeMoveCount));
+Employer: => BA_EmpMvFrPerBUIDQtlyMaxA3Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA3Qc < 1 => -99997,
+																								 MAX(MoveFromPerQuarterList(Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [3,9]),EmployeeMoveCount));
+Employer: => BA_EmpMvToPerBUIDQtlyMaxA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA5Qc < 1 => -99997,
+																								 MAX(MoveToPerQuarterList(Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [10]),EmployeeMoveCount));
+Employer: => BA_EmpMvFrPerBUIDQtlyMaxA4Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA4Qc < 1 => -99997,
+																								 MAX(MoveFromPerQuarterList(Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [10]),EmployeeMoveCount));
+Employer: => BA_EmpMvToPerBUIDYrlyMaxA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA5Qc <1 AND BA_YrlyEmplCntA1Qc < 1 => -99997,
+																								 MAX(MoveToPerQuarterList(Employer.BusNewestRecordDtYrQtr-fromendwageyearqtr IN [1,2,3,7,8,9,10]),EmployeeMoveCount));
+Employer: => BA_EmpMvFrPerBUIDYrlyMaxA1Qc := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                 BA_WgQtrCntEv < 1 => -99998,
+																								 BA_QtlyEmplCntA3Qc < 1 => -99997,
+																								 MAX(MoveFromPerQuarterList(Employer.BusNewestRecordDtYrQtr-tostartwageyearqtr IN [1,2,3,7,8,9,10]),EmployeeMoveCount));
+
+
 // New Employer Attributes
-Employer: => MoveTos := ToEmployerEmployees(rFromEmployer != rToEmployer AND fromstartwageyearqtr < tostartwageyearqtr){rFromEmployer, rToEmployer, FromUltID, ToUltID, rPerson};
-Employer: => MoveToCount := COUNT(MoveTos);
-Employer: => MoveFromSameUltCount := COUNT(MoveTos(FromUltID=ToUltID));
+// Employer: => MoveTos := ToEmployerEmployees(rFromEmployer != rToEmployer AND fromstartwageyearqtr < tostartwageyearqtr){rFromEmployer, rToEmployer, FromUltID, ToUltID, FromSeleID, ToSeleID, CleanMovementFlag, rPerson};
+// Employer: => MoveToCount := COUNT(MoveTos);
+// Employer: => MoveFromSameUltCount := COUNT(MoveTos(FromUltID=ToUltID));
 
-FromEmployerEmployees: => FromSeleID := rFromEmployer.rLegal.seleid;
-FromEmployerEmployees: => ToSeleID := rToEmployer.rLegal.seleid;
-FromEmployerEmployees: => FromUltID := rFromEmployer.rLegal.ultid;
-FromEmployerEmployees: => ToUltID := rToEmployer.rLegal.ultid;
 
-ToEmployerEmployees: => FromSeleID := rFromEmployer.rLegal.seleid;
-ToEmployerEmployees: => ToSeleID := rToEmployer.rLegal.seleid;
-ToEmployerEmployees: => FromUltID := rFromEmployer.rLegal.ultid;
-ToEmployerEmployees: => ToUltID := rToEmployer.rLegal.ultid;
+//New Nicole Attributes 9/17
+// Employer: => MoveFroms := FromEmployerEmployees(rFromEmployer != rToEmployer AND fromstartwageyearqtr < tostartwageyearqtr){rFromEmployer, rToEmployer, FromUltID, ToUltID, FromSeleID, ToSeleID, CleanMovementFlag, rPerson};
+// Employer: => MoveFromCount := COUNT(MoveFroms);
+// Employer: => MoveToSameUltCount := COUNT(MoveFroms(FromUltID=ToUltID));
+
+// Employer: => AllMovesEmpNum := COUNT(MoveTos(Employer.MoveTos.rFromEmployer != Employer.MoveFroms.rToEmployer)) + COUNT(MoveFroms(Employer.MoveTos.rFromEmployer != Employer.MoveFroms.rToEmployer)) + COUNT(MoveTos(Employer.MoveTos.rFromEmployer = Employer.MoveFroms.rToEmployer));
+// Employer: => AllMovesUltId := COUNT(MoveTos(Employer.MoveTos.FromUltID != Employer.MoveFroms.ToUltID)) + COUNT(MoveFroms(Employer.MoveTos.FromUltID != Employer.MoveFroms.ToUltID)) + COUNT(MoveTos(Employer.MoveTos.FromUltID = Employer.MoveFroms.ToUltID));
+// Employer: => AllMovesSeleId := COUNT(MoveTos(Employer.MoveTos.FromSeleID != Employer.MoveFroms.ToSeleID)) + COUNT(MoveFroms(Employer.MoveTos.FromSeleID != Employer.MoveFroms.ToSeleID)) + COUNT(MoveTos(Employer.MoveTos.FromSeleID = Employer.MoveFroms.ToSeleID));
+
+// Employer: => UniqueEmpNumMoveTos := COUNT(MoveFroms{rToEmployer});
+// Employer: => UniqueEmpNumMoveFroms := COUNT(MoveTos{rFromEmployer}); 
+
+// Employer: => UniqueUltMoveTos := COUNT(MoveFroms{ToUltID});
+// Employer: => UniqueUltMoveFroms := COUNT(MoveTos{FromUltID});
+
+// Employer: => UniqueSeleMoveTos := COUNT(MoveFroms{ToSeleID});
+// Employer: => UniqueSeleMoveFroms := COUNT(MoveTos{FromSeleID});
+
+//CleanVersions
+// Employer: => CleanMoveToCount := COUNT(MoveTos(CleanMovementFlag = 1));
+// Employer: => CleanMoveFromSameUltCount := COUNT(MoveTos(CleanMovementFlag = 1 AND FromUltID=ToUltID));
+
+// Employer: => CleanUniqueEmpNumMoveTos := COUNT(MoveFroms(CleanMovementFlag = 1){rToEmployer});
+// Employer: => CleanUniqueEmpNumMoveFroms := COUNT(MoveTos(CleanMovementFlag = 1){rFromEmployer});
+
+// Employer: => CleanAllMovesEmpNum := COUNT(MoveTos(CleanMovementFlag = 1)(Employer.MoveTos.rFromEmployer != Employer.MoveFroms.rToEmployer)) + COUNT(MoveFroms(CleanMovementFlag = 1)(Employer.MoveTos.rFromEmployer != Employer.MoveFroms.rToEmployer)) + COUNT(MoveTos(CleanMovementFlag = 1)(Employer.MoveTos.rFromEmployer = Employer.MoveFroms.rToEmployer));
+// Employer: => CleanAllMovesUltId := COUNT(MoveTos(CleanMovementFlag = 1)(Employer.MoveTos.FromUltID != Employer.MoveFroms.ToUltID)) + COUNT(MoveFroms(CleanMovementFlag = 1)(Employer.MoveTos.FromUltID != Employer.MoveFroms.ToUltID)) + COUNT(MoveTos(CleanMovementFlag = 1)(Employer.MoveTos.FromUltID = Employer.MoveFroms.ToUltID));
+// Employer: => CleanAllMovesSeleId := COUNT(MoveTos(CleanMovementFlag = 1)(Employer.MoveTos.FromSeleID != Employer.MoveFroms.ToSeleID)) + COUNT(MoveFroms(CleanMovementFlag = 1)(Employer.MoveTos.FromSeleID != Employer.MoveFroms.ToSeleID)) + COUNT(MoveTos(CleanMovementFlag = 1)(Employer.MoveTos.FromSeleID = Employer.MoveFroms.ToSeleID));
+
+// Employer: => CleanUniqueUltMoveTos := COUNT(MoveFroms(CleanMovementFlag = 1){ToUltID});
+// Employer: => CleanUniqueUltMoveFroms := COUNT(MoveTos(CleanMovementFlag = 1){FromUltID});
+
+// Employer: => CleanUniqueSeleMoveTos := COUNT(MoveFroms(CleanMovementFlag = 1){ToSeleID});
+// Employer: => CleanUniqueSeleMoveFroms := COUNT(MoveTos(CleanMovementFlag = 1){FromSeleID});
+
+//Movement Flags
+// Employer: => HasMovementFlag := IF(AllMovesEmpNum>1,1,0);
+// Employer: => HasCleanMovementFlag := IF(CleanAllMovesEmpNum>1,1,0);
+
+
+// FromEmployerEmployees: => FromSeleID := rFromEmployer.rLegal.seleid;
+// FromEmployerEmployees: => ToSeleID := rToEmployer.rLegal.seleid;
+// FromEmployerEmployees: => FromUltID := rFromEmployer.rLegal.ultid;
+// FromEmployerEmployees: => ToUltID := rToEmployer.rLegal.ultid;
+
+// ToEmployerEmployees: => FromSeleID := rFromEmployer.rLegal.seleid;
+// ToEmployerEmployees: => ToSeleID := rToEmployer.rLegal.seleid;
+// ToEmployerEmployees: => FromUltID := rFromEmployer.rLegal.ultid;
+// ToEmployerEmployees: => ToUltID := rToEmployer.rLegal.ultid;
+
+Employer: => taxratetest := IF(BA_QtlyTaxRtEchoA2Qc = 0.0,1,0);
+
+//person test
+Person: => EmployerCount := COUNT(EmployerPersonWages{rEmployer});
+Employer: => PersonCount := COUNT(EmployerPersonWages{rPerson});
 
 // Claim: => EmployerClaimCount := rEmployer.ClaimCount;
 QUERY: showEmployers <= Employer;
@@ -2143,4 +2578,7 @@ QUERY: showPerson <= Person;
 QUERY: showLegalPersonWages <= LegalPersonWages;
 QUERY: showFromEmployerEmployees <= FromEmployerEmployees;
 QUERY: showToEmployerEmployees <= ToEmployerEmployees;
-// QUERY: showSeleSeleEmployees <= SeleSeleEmployees;
+QUERY: showEmployerPersonWages <= EmployerPersonWages;
+QUERY: showEmployerQuarters <= EmployerQuarters;
+QUERY: showEmployerQuartersEmp <= EmployerQuarters.rEmployer;
+
