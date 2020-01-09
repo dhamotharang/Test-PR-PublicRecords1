@@ -178,7 +178,92 @@ dsOut := PROJECT(ds, TRANSFORM(FraudGovUIKEL.Layouts.EmployerOutput,
 				self.BusAcctPerBusTaxLiabBlceCredCnt := (STRING)left.Bus_Acct_Per_Bus_Tax_Liab_Blce_Cred_Cnt_;
 				self.BusAcctPerBusTaxLiabBlceOthCnt := (STRING)left.Bus_Acct_Per_Bus_Tax_Liab_Blce_Oth_Cnt_;
 				self.BusTaxLiabBlceDebitFlag := (STRING)left.Bus_Tax_Liab_Blce_Debit_Flag_;
-
+        
+				//SUTA ATTRIBUTES
+				//Tax Liability History
+				self.BA_QtlyTaxRtEchoA1Qc := (STRING)left.B_A___Qtly_Tax_Rt_Echo_A1_Qc_;
+				self.BA_QtlyTaxRtEchoA2Qc := (STRING)left.B_A___Qtly_Tax_Rt_Echo_A2_Qc_;
+				self.BA_QtlyTaxRtEchoA3Qc := (STRING)left.B_A___Qtly_Tax_Rt_Echo_A3_Qc_;
+				self.BA_QtlyTaxRtEchoA4Qc := (STRING)left.B_A___Qtly_Tax_Rt_Echo_A4_Qc_;
+				self.BA_QtlyTaxRtEchoA5Qc := (STRING)left.B_A___Qtly_Tax_Rt_Echo_A5_Qc_;
+				self.BA_YrlyTaxRtAvgA1Qc := (STRING)left.B_A___Yrly_Tax_Rt_Avg_A1_Qc_;
+				//Wages
+				self.BA_WgQtrCntEv := (STRING)left.B_A___Wg_Qtr_Cnt_Ev_;
+				self.BA_QtlyWgsTotA1Qc := (STRING)left.B_A___Qtly_Wgs_Tot_A1_Qc_;
+				self.BA_QtlyWgsTotA2Qc := (STRING)left.B_A___Qtly_Wgs_Tot_A2_Qc_;
+				self.BA_QtlyWgsTotA3Qc := (STRING)left.B_A___Qtly_Wgs_Tot_A3_Qc_;
+				self.BA_QtlyWgsTotA4Qc := (STRING)left.B_A___Qtly_Wgs_Tot_A4_Qc_;
+				self.BA_QtlyWgsTotA5Qc := (STRING)left.B_A___Qtly_Wgs_Tot_A5_Qc_;
+				self.BA_YrlyWgsTotA1Qc := (STRING)left.B_A___Yrly_Wgs_Tot_A1_Qc_;
+				self.BA_YrlyWgsTotA5Qc := (STRING)left.B_A___Yrly_Wgs_Tot_A5_Qc_;
+				self.BA_QtlyEmplCntA1Qc := (STRING)left.B_A___Qtly_Empl_Cnt_A1_Qc_;
+				self.BA_QtlyEmplCntA2Qc := (STRING)left.B_A___Qtly_Empl_Cnt_A2_Qc_;
+				self.BA_QtlyEmplCntA3Qc := (STRING)left.B_A___Qtly_Empl_Cnt_A3_Qc_;
+				self.BA_QtlyEmplCntA4Qc := (STRING)left.B_A___Qtly_Empl_Cnt_A4_Qc_;
+				self.BA_QtlyEmplCntA5Qc := (STRING)left.B_A___Qtly_Empl_Cnt_A5_Qc_;
+				self.BA_YrlyEmplCntA1Qc := (STRING)left.B_A___Yrly_Empl_Cnt_A1_Qc_;
+				self.BA_YrlyEmp5CntA1Qc := (STRING)left.B_A___Yrly_Empl_Cnt_A5_Qc_;
+				//employee movement
+				self.BA_EmpMvToQtlyCntA1Qc := (STRING)left.B_A___Emp_Mv_To_Qtly_Cnt_A1_Qc_;
+				self.BA_EmpMvFrQtlyCntA1Qc := (STRING)left.B_A___Emp_Mv_Fr_Qtly_Cnt_A1_Qc_;
+				self.BA_EmpMvToQtlyCntA2Qc := (STRING)left.B_A___Emp_Mv_To_Qtly_Cnt_A2_Qc_;
+				self.BA_EmpMvFrQtlyCntA2Qc := (STRING)left.B_A___Emp_Mv_Fr_Qtly_Cnt_A2_Qc_;
+				self.BA_EmpMvToQtlyCntA3Qc := (STRING)left.B_A___Emp_Mv_To_Qtly_Cnt_A3_Qc_;
+				self.BA_EmpMvFrQtlyCntA3Qc := (STRING)left.B_A___Emp_Mv_Fr_Qtly_Cnt_A3_Qc_;
+				self.BA_EmpMvToQtlyCntA4Qc := (STRING)left.B_A___Emp_Mv_To_Qtly_Cnt_A4_Qc_;
+				self.BA_EmpMvFrQtlyCntA4Qc := (STRING)left.B_A___Emp_Mv_Fr_Qtly_Cnt_A4_Qc_;
+				self.BA_EmpMvToYrlyCntA1Qc := (STRING)left.B_A___Emp_Mv_To_Yrly_Cnt_A1_Qc_;
+				self.BA_EmpMvFrYrlyCntA1Qc := (STRING)left.B_A___Emp_Mv_Fr_Yrly_Cnt_A1_Qc_;
+				self.BA_EmpMvToLwTaxRtQtlyCntA1Qc := (STRING)left.B_A___Emp_Mv_To_Lw_Tax_Rt_Qtly_Cnt_A1_Qc_;
+				self.BA_EmpMvFrHiTaxRtQtlyCntA1Qc := (STRING)left.B_A___Emp_Mv_Fr_Hi_Tax_Rt_Qtly_Cnt_A1_Qc_;
+				self.BA_EmpMvToLwTaxRtQtlyCntA2Qc := (STRING)left.B_A___Emp_Mv_To_Lw_Tax_Rt_Qtly_Cnt_A2_Qc_;
+				self.BA_EmpMvFrHiTaxRtQtlyCntA2Qc := (STRING)left.B_A___Emp_Mv_Fr_Hi_Tax_Rt_Qtly_Cnt_A2_Qc_;
+				self.BA_EmpMvToLwTaxRtQtlyCntA3Qc := (STRING)left.B_A___Emp_Mv_To_Lw_Tax_Rt_Qtly_Cnt_A3_Qc_;
+				self.BA_EmpMvFrHiTaxRtQtlyCntA3Qc := (STRING)left.B_A___Emp_Mv_Fr_Hi_Tax_Rt_Qtly_Cnt_A3_Qc_;
+				self.BA_EmpMvToLwTaxRtQtlyCntA4Qc := (STRING)left.B_A___Emp_Mv_To_Lw_Tax_Rt_Qtly_Cnt_A4_Qc_;
+				self.BA_EmpMvFrHiTaxRtQtlyCntA4Qc := (STRING)left.B_A___Emp_Mv_Fr_Hi_Tax_Rt_Qtly_Cnt_A4_Qc_;
+				self.BA_EmpMvToLwTaxRtYrlyCntA1Qc := (STRING)left.B_A___Emp_Mv_To_Lw_Tax_Rt_Yrly_Cnt_A1_Qc_;
+				self.BA_EmpMvFrHiTaxRtYrlyCntA1Qc := (STRING)left.B_A___Emp_Mv_Fr_Hi_Tax_Rt_Yrly_Cnt_A1_Qc_;
+				self.BA_EmpMvToBUIDQtlyCntA1Qc := (STRING)left.B_A___Emp_Mv_To_B_U_I_D_Qtly_Cnt_A1_Qc_;
+				self.BA_EmpMvFrBUIDQtlyCntA1Qc := (STRING)left.B_A___Emp_Mv_Fr_B_U_I_D_Qtly_Cnt_A1_Qc_;
+				self.BA_EmpMvToBUIDQtlyCntA2Qc := (STRING)left.B_A___Emp_Mv_To_B_U_I_D_Qtly_Cnt_A2_Qc_;
+				self.BA_EmpMvFrBUIDQtlyCntA2Qc := (STRING)left.B_A___Emp_Mv_Fr_B_U_I_D_Qtly_Cnt_A2_Qc_;
+				self.BA_EmpMvToBUIDQtlyCntA3Qc := (STRING)left.B_A___Emp_Mv_To_B_U_I_D_Qtly_Cnt_A3_Qc_;
+				self.BA_EmpMvFrBUIDQtlyCntA3Qc := (STRING)left.B_A___Emp_Mv_Fr_B_U_I_D_Qtly_Cnt_A3_Qc_;
+				self.BA_EmpMvToBUIDQtlyCntA4Qc := (STRING)left.B_A___Emp_Mv_To_B_U_I_D_Qtly_Cnt_A4_Qc_;
+				self.BA_EmpMvFrBUIDQtlyCntA4Qc := (STRING)left.B_A___Emp_Mv_Fr_B_U_I_D_Qtly_Cnt_A4_Qc_;
+				self.BA_EmpMvToBUIDYrlyCntA1Qc := (STRING)left.B_A___Emp_Mv_To_B_U_I_D_Yrly_Cnt_A1_Qc_;
+				self.BA_EmpMvFrBUIDYrlyCntA1Qc := (STRING)left.B_A___Emp_Mv_Fr_B_U_I_D_Yrly_Cnt_A1_Qc_;
+				self.BA_EmpMvToLwTaxRtBUIDQtlyCntA1Qc := (STRING)left.B_A___Emp_Mv_To_Lw_Tax_Rt_B_U_I_D_Qtly_Cnt_A1_Qc_;
+				self.BA_EmpMvFrHiTaxRtBUIDQtlyCntA1Qc := (STRING)left.B_A___Emp_Mv_Fr_Hi_Tax_Rt_B_U_I_D_Qtly_Cnt_A1_Qc_;
+				self.BA_EmpMvToLwTaxRtBUIDQtlyCntA2Qc := (STRING)left.B_A___Emp_Mv_To_Lw_Tax_Rt_B_U_I_D_Qtly_Cnt_A2_Qc_;
+				self.BA_EmpMvFrHiTaxRtBUIDQtlyCntA2Qc := (STRING)left.B_A___Emp_Mv_Fr_Hi_Tax_Rt_B_U_I_D_Qtly_Cnt_A2_Qc_;
+				self.BA_EmpMvToLwTaxRtBUIDQtlyCntA3Qc := (STRING)left.B_A___Emp_Mv_To_Lw_Tax_Rt_B_U_I_D_Qtly_Cnt_A3_Qc_;
+				self.BA_EmpMvFrHiTaxRtBUIDQtlyCntA3Qc := (STRING)left.B_A___Emp_Mv_Fr_Hi_Tax_Rt_B_U_I_D_Qtly_Cnt_A3_Qc_;
+				self.BA_EmpMvToLwTaxRtBUIDQtlyCntA4Qc := (STRING)left.B_A___Emp_Mv_To_Lw_Tax_Rt_B_U_I_D_Qtly_Cnt_A4_Qc_;
+				self.BA_EmpMvFrHiTaxRtBUIDQtlyCntA4Qc := (STRING)left.B_A___Emp_Mv_Fr_Hi_Tax_Rt_B_U_I_D_Qtly_Cnt_A4_Qc_;
+				self.BA_EmpMvToLwTaxRtBUIDYrlyCntA1Qc := (STRING)left.B_A___Emp_Mv_To_Lw_Tax_Rt_B_U_I_D_Yrly_Cnt_A1_Qc_;
+				self.BA_EmpMvFrHiTaxRtBUIDYrlyCntA1Qc := (STRING)left.B_A___Emp_Mv_Fr_Hi_Tax_Rt_B_U_I_D_Yrly_Cnt_A1_Qc_;
+				self.BA_EmpMvToPerBUIDQtlyAvgA1Qc := (STRING)left.B_A___Emp_Mv_To_Per_B_U_I_D_Qtly_Avg_A1_Qc_;
+				self.BA_EmpMvFrPerBUIDQtlyAvgA1Qc := (STRING)left.B_A___Emp_Mv_Fr_Per_B_U_I_D_Qtly_Avg_A1_Qc_;
+				self.BA_EmpMvToPerBUIDQtlyAvgA2Qc := (STRING)left.B_A___Emp_Mv_To_Per_B_U_I_D_Qtly_Avg_A2_Qc_;
+				self.BA_EmpMvFrPerBUIDQtlyAvgA2Qc := (STRING)left.B_A___Emp_Mv_Fr_Per_B_U_I_D_Qtly_Avg_A2_Qc_;
+				self.BA_EmpMvToPerBUIDQtlyAvgA3Qc := (STRING)left.B_A___Emp_Mv_To_Per_B_U_I_D_Qtly_Avg_A3_Qc_;
+				self.BA_EmpMvFrPerBUIDQtlyAvgA3Qc := (STRING)left.B_A___Emp_Mv_Fr_Per_B_U_I_D_Qtly_Avg_A3_Qc_;
+				self.BA_EmpMvToPerBUIDQtlyAvgA4Qc := (STRING)left.B_A___Emp_Mv_To_Per_B_U_I_D_Qtly_Avg_A4_Qc_;
+				self.BA_EmpMvFrPerBUIDQtlyAvgA4Qc := (STRING)left.B_A___Emp_Mv_Fr_Per_B_U_I_D_Qtly_Avg_A4_Qc_;
+				self.BA_EmpMvToPerBUIDYrlyAvgA1Qc := (STRING)left.B_A___Emp_Mv_To_Per_B_U_I_D_Yrly_Avg_A1_Qc_;
+				self.BA_EmpMvFrPerBUIDYrlyAvgA1Qc := (STRING)left.B_A___Emp_Mv_Fr_Per_B_U_I_D_Yrly_Avg_A1_Qc_;
+				self.BA_EmpMvToPerBUIDQtlyMaxA1Qc := (STRING)left.B_A___Emp_Mv_To_Per_B_U_I_D_Qtly_Max_A1_Qc_;
+				self.BA_EmpMvFrPerBUIDQtlyMaxA1Qc := (STRING)left.B_A___Emp_Mv_Fr_Per_B_U_I_D_Qtly_Max_A1_Qc_;
+				self.BA_EmpMvToPerBUIDQtlyMaxA2Qc := (STRING)left.B_A___Emp_Mv_To_Per_B_U_I_D_Qtly_Max_A2_Qc_;
+				self.BA_EmpMvFrPerBUIDQtlyMaxA2Qc := (STRING)left.B_A___Emp_Mv_Fr_Per_B_U_I_D_Qtly_Max_A2_Qc_;
+				self.BA_EmpMvToPerBUIDQtlyMaxA3Qc := (STRING)left.B_A___Emp_Mv_To_Per_B_U_I_D_Qtly_Max_A3_Qc_;
+				self.BA_EmpMvFrPerBUIDQtlyMaxA3Qc := (STRING)left.B_A___Emp_Mv_Fr_Per_B_U_I_D_Qtly_Max_A3_Qc_;
+				self.BA_EmpMvToPerBUIDQtlyMaxA4Qc := (STRING)left.B_A___Emp_Mv_To_Per_B_U_I_D_Qtly_Max_A4_Qc_;
+				self.BA_EmpMvFrPerBUIDQtlyMaxA4Qc := (STRING)left.B_A___Emp_Mv_Fr_Per_B_U_I_D_Qtly_Max_A4_Qc_;
+				self.BA_EmpMvToPerBUIDYrlyMaxA1Qc := (STRING)left.B_A___Emp_Mv_To_Per_B_U_I_D_Yrly_Max_A1_Qc_;
+				self.BA_EmpMvFrPerBUIDYrlyMaxA1Qc := (STRING)left.B_A___Emp_Mv_Fr_Per_B_U_I_D_Yrly_Max_A1_Qc_;	
 ));
 
 writeFile(dsMac, reportName) := FUNCTIONMACRO
@@ -186,12 +271,12 @@ writeFile(dsMac, reportName) := FUNCTIONMACRO
 	daliserver := std.system.Thorlib.DaliServer();
 	cpos := std.Str.Find(daliserver, ':', 1)-1;
 	lzip := daliserver[1..cpos];
-	lz_dir := '/var/lib/HPCCSystems/mydropzone/fraudgov/kelattributes/20190701/';
-	file_path := '~hrude::fraudgov::kelattributes::20190701::';
+	lz_dir := FraudGovUIKEL.Scripts.Utils.FilePaths.LZ_Dir;
+	file_path := FraudGovUIKEL.Scripts.Utils.FilePaths.LogicalPath;
 	thor_file := file_path + reportName;
 	lz_path := lz_dir + reportName + '.csv';
 	thor_out := OUTPUT(dsMac,, thor_file, CSV(HEADING(SINGLE),SEPARATOR(','),QUOTE('"')), OVERWRITE);
 	RETURN SEQUENTIAL(std.file.CreateExternalDirectory(lzip, lz_dir), thor_out, std.file.Despray(thor_file, lzip,lz_path,,,,true));
 ENDMACRO;
 
-writeFile(dsOut, 'EmployerOutput');
+writeFile(dsOut, 'SUTAEmployerOutput');

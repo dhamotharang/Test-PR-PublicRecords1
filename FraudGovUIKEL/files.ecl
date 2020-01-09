@@ -106,7 +106,7 @@ EXPORT files := MODULE
   unsigned6 wagesrecid;
  END;
 
- EXPORT Wages := DATASET('~fraudgov::tndata::20190701::wages_output', WagesRec, THOR);
+EXPORT Wages := PROJECT(DATASET('~fraudgov::tndata::20190701::wages_output', WagesRec, THOR), TRANSFORM({RECORDOF(LEFT), UNSIGNED uacctno}, SELF.uacctno := (UNSIGNED)LEFT.empnum, SELF := LEFT));
  
  TrumpRec := RECORD
   string dummycode;
@@ -1341,7 +1341,7 @@ copy_Record :=
     string seleentitycontextuid;
     string proxentitycontextuid;
     unsigned6 wagesrecid;
-		// INTEGER uacctno;
+		UNSIGNED uacctno;
 		// string qtryr;
 		// REAL taxrate;
   end;
@@ -1349,7 +1349,7 @@ copy_Record :=
 
 copy_Dataset :=
   dataset([
-    {'210645975', 'JILL      ', 'A', 'HERBERT        ', '722515', '20181', 1866, 832771, '20182', '4/18/2018 8:45:53 PM', '', '271262777', 'PO BOX 496454                                               ', 'PT CHARLOTTE                  ', 'FL', '33949', '     ', '     ', 'DUNKIN DONUTS OF GATLINBURG                                                                         ', 'GATLINBURG DONUTS LLC                                                                               ', 0, 0, '', '', '', '', 1109568951, 0, 0, 0, 0, '                    ', '', '', 55, 100, 33, 26, 'NAME,SSN,SSN4', '1/7/2/7/1/0/0/0/1/7/0/7/7/1/1/1/0/0/0/0/0//5                ', 'FIRSTNAME,MIDDLENAME,LASTNAME,STATE,SSN5,SSN4,MAINNAME,', '          ', '  ', 'PO BOX 496454               ', '    ', '  ', '          ', '        ', 'PT CHARLOTTE             ', 'PORT CHARLOTTE           ', 'FL', '33949', '6454', '54', '4', 'P ', '12015', '26.912405 ', '-82.044072 ', '6580', '0103004', '5', 'S800', true, false, ' PO BOX 496454<BR/>PORT CHARLOTTE, FL 33949-6454', ' PO BOX 496454<BR/>PT CHARLOTTE, FL 33949', false, true, 'No error                                                ', 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, '_011109568951', '_0271926724', '_0471926724', '_07319247459', 1875633}/*, 
+    {'210645975', 'JILL      ', 'A', 'HERBERT        ', '722515', '20181', 1866, 832771, '20182', '4/18/2018 8:45:53 PM', '', '271262777', 'PO BOX 496454                                               ', 'PT CHARLOTTE                  ', 'FL', '33949', '     ', '     ', 'DUNKIN DONUTS OF GATLINBURG                                                                         ', 'GATLINBURG DONUTS LLC                                                                               ', 0, 0, '', '', '', '', 1109568951, 0, 0, 0, 0, '                    ', '', '', 55, 100, 33, 26, 'NAME,SSN,SSN4', '1/7/2/7/1/0/0/0/1/7/0/7/7/1/1/1/0/0/0/0/0//5                ', 'FIRSTNAME,MIDDLENAME,LASTNAME,STATE,SSN5,SSN4,MAINNAME,', '          ', '  ', 'PO BOX 496454               ', '    ', '  ', '          ', '        ', 'PT CHARLOTTE             ', 'PORT CHARLOTTE           ', 'FL', '33949', '6454', '54', '4', 'P ', '12015', '26.912405 ', '-82.044072 ', '6580', '0103004', '5', 'S800', true, false, ' PO BOX 496454<BR/>PORT CHARLOTTE, FL 33949-6454', ' PO BOX 496454<BR/>PT CHARLOTTE, FL 33949', false, true, 'No error                                                ', 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, '_011109568951', '_0271926724', '_0471926724', '_07319247459', 1875633, 231231}/*, 
  //   {'210645975', 'JILL      ', 'A', 'HERBERT        ', '722515', '20182', 3466, '832771', '20183', '8/16/2018 10:02:21 PM', '', '271262777', 'PO BOX 496454                                               ', 'PT CHARLOTTE                  ', 'FL', '33949', '     ', '     ', 'DUNKIN DONUTS OF GATLINBURG                                                                         ', 'GATLINBURG DONUTS LLC                                                                               ', 0, 0, '', '', '', '', 1109568951, 0, 0, 0, 0, '                    ', '', '', 55, 100, 33, 26, 'NAME,SSN,SSN4', '1/7/2/7/1/0/0/0/1/7/0/7/7/1/1/1/0/0/0/0/0//5                ', 'FIRSTNAME,MIDDLENAME,LASTNAME,STATE,SSN5,SSN4,MAINNAME,', '          ', '  ', 'PO BOX 496454               ', '    ', '  ', '          ', '        ', 'PT CHARLOTTE             ', 'PORT CHARLOTTE           ', 'FL', '33949', '6454', '54', '4', 'P ', '12015', '26.912405 ', '-82.044072 ', '6580', '0103004', '5', 'S800', true, false, ' PO BOX 496454<BR/>PORT CHARLOTTE, FL 33949-6454', ' PO BOX 496454<BR/>PT CHARLOTTE, FL 33949', false, true, 'No error                                                ', 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, '_011109568951', '_0271926724', '_0471926724', '_07319247459', 700109,'0',0,'0'}, 
  //   {'210645975', 'JILL      ', ' ', 'HERBERT        ', '722515', '20174', 2973, '832773', '20191', '2/6/2019 9:32:46 PM', '', '271262777', 'PO BOX 496454                                               ', 'PT CHARLOTTE                  ', 'FL', '33949', '     ', '     ', 'DUNKIN DONUTS OF GATLINBURG                                                                         ', 'GATLINBURG DONUTS LLC                                                                               ', 0, 0, '', '', '', '', 1109568951, 0, 0, 0, 0, '                    ', '', '', 53, 100, 34, 26, 'NAME,SSN,SSN4', '1/7/0/7/1/0/0/0/0/7/0/7/7/1/1/1/0/0/0/0/0//5                ', 'FIRSTNAME,LASTNAME,STATE,SSN5,SSN4,MAINNAME,', '          ', '  ', 'PO BOX 496454               ', '    ', '  ', '          ', '        ', 'PT CHARLOTTE             ', 'PORT CHARLOTTE           ', 'FL', '33949', '6454', '54', '4', 'P ', '12015', '26.912405 ', '-82.044072 ', '6580', '0103004', '5', 'S800', true, false, ' PO BOX 496454<BR/>PORT CHARLOTTE, FL 33949-6454', ' PO BOX 496454<BR/>PT CHARLOTTE, FL 33949', false, true, 'No error                                                ', 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, '_011109568951', '_0271926724', '_0471926724', '_07319247459', 8088187,'0',0,'0'}, 
  //   {'210645975', 'JILL      ', 'A', 'HERBERT        ', '722515', '20181', 3466, '832774', '20184', '8/16/2018 10:02:21 PM', '', '271262777', 'PO BOX 496454                                               ', 'PT CHARLOTTE                  ', 'FL', '33949', '     ', '     ', 'DUNKIN DONUTS OF GATLINBURG                                                                         ', 'GATLINBURG DONUTS LLC                                                                               ', 0, 0, '', '', '', '', 1109568951, 0, 0, 0, 0, '                    ', '', '', 55, 100, 33, 26, 'NAME,SSN,SSN4', '1/7/2/7/1/0/0/0/1/7/0/7/7/1/1/1/0/0/0/0/0//5                ', 'FIRSTNAME,MIDDLENAME,LASTNAME,STATE,SSN5,SSN4,MAINNAME,', '          ', '  ', 'PO BOX 496454               ', '    ', '  ', '          ', '        ', 'PT CHARLOTTE             ', 'PORT CHARLOTTE           ', 'FL', '33949', '6454', '54', '4', 'P ', '12015', '26.912405 ', '-82.044072 ', '6580', '0103004', '5', 'S800', true, false, ' PO BOX 496454<BR/>PORT CHARLOTTE, FL 33949-6454', ' PO BOX 496454<BR/>PT CHARLOTTE, FL 33949', false, true, 'No error                                                ', 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, 71926724, 71926724, 71926724, 319247459, 319247459, 0, 0, 100, 69, '_011109568951', '_0271926724', '_0471926724', '_07319247459', 700109,'0',0,'0'}, 
@@ -1525,6 +1525,21 @@ shared NormTaxRate := NORMALIZE(TaxRatePrep1,20,NormIt(LEFT,COUNTER));
 EXPORT QtrYrTaxRates := NormTaxRate(qtryr != 'NA');
 //Wage File with appended tax rate
 EXPORT WagesPlusTaxRate := JOIN(WagesPrepEmpNum, NormTaxRate(qtryr != 'NA'), (INTEGER)LEFT.empnum = RIGHT.uacctno AND LEFT.wageyearqtr = RIGHT.qtryr);
+//Tax Rates with Quarters with No Wages Included 
+
+SHARED AllQuarterTaxRatesRec := RECORD
+	RECORDOF(NormTaxRate);
+	INTEGER NoWagesFlag;
+END;
+
+EXPORT AllQuarterTaxRates_1 := JOIN(NormTaxRate(qtryr != 'NA'), WagesPrepEmpNum, LEFT.uacctno = (INTEGER)RIGHT.empnum AND LEFT.qtryr = RIGHT.wageyearqtr, TRANSFORM(AllQuarterTaxRatesRec,
+		SELF.NoWagesFlag := IF(RIGHT.empnum = '',1,0),
+		SELF := LEFT),
+		LEFT OUTER);
+
+EXPORT AllQuarterTaxRates := DEDUP(SORT(AllQuarterTaxRates_1,uacctno,qtryr),uacctno,qtryr);
+
+
 //Creating file for wage/empnum/tax rate information - Wage output counts
 
 EXPORT EmployerWageInfo_1 := TABLE(WagesPlusTaxRate,{empnum, tradename, namecount := COUNT(GROUP)},empnum,tradename,MERGE);
@@ -1550,6 +1565,11 @@ SHARED WagesAssocWithTaxRate_1 := RECORD
 	STRING fromstarttaxrate;
 
 END;
+
+EXPORT FinalWageTaxRateInfo := JOIN(AllQuarterTaxRates,EmployerWageInfo,LEFT.uacctno = (INTEGER)RIGHT.empnum AND LEFT.qtryr = RIGHT.wageyearqtr, FULL OUTER);
+
+EXPORT FullEmployerWageYearQtr := SORT(TABLE(FinalWageTaxRateInfo, {UNSIGNED qtryr := (UNSIGNED)qtryr}, qtryr, FEW)+DATASET([{20193}], {UNSIGNED qtryr}), qtryr);
+
 
 EXPORT WageAssociationPrep5_1 := JOIN(WageAssociationPrep4, EmployerWageInfo, (STRING)LEFT.fromempnum = (STRING)RIGHT.empnum AND (STRING)LEFT.fromstartwageyearqtr = (STRING)RIGHT.wageyearqtr,
 		TRANSFORM(WagesAssocWithTaxRate_1,
@@ -1583,8 +1603,8 @@ EXPORT WageAssociationPrep5_3 := JOIN(WageAssociationPrep5_2, EmployerWageInfo, 
 SHARED WagesAssocWithTaxRate_4 := RECORD
 	RECORDOF(WageAssociationPrep5_3);
 	STRING toendtaxrate;
-	BOOLEAN CleanMovementFlag;
-	BOOLEAN PotentialNewEmployerFlag;
+	INTEGER CleanMovementFlag;
+	INTEGER PotentialNewEmployerFlag;
 END;
 
 EXPORT WageAssociationPrep5_4 := JOIN(WageAssociationPrep5_3, EmployerWageInfo, (STRING)LEFT.toempnum = (STRING)RIGHT.empnum AND (STRING)LEFT.toendwageyearqtr = (STRING)RIGHT.wageyearqtr,
@@ -1600,4 +1620,5 @@ EXPORT WageAssociationPrep5_4 := JOIN(WageAssociationPrep5_3, EmployerWageInfo, 
 //FinalAssociations
 EXPORT WagesAssociations := WageAssociationPrep5_4((fromstartwageyearqtr = fromendwageyearqtr AND fromstartwageyearqtr >= tostartwageyearqtr AND mintostartwageyearqtr = tostartwageyearqtr) OR maxfromendwageyearqtr = fromendwageyearqtr OR tostartwageyearqtr <= fromendwageyearqtr);
 END;
+
 
