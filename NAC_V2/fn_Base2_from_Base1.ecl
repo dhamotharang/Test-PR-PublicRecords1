@@ -3,14 +3,16 @@ IMPORT NAC,std,ut,dops;
 
 
 export fn_Base2_from_Base1(string version) := FUNCTION
-	base1 := nac_v2.fn_Base1ToBase2(nac.Files().Base) : INDEPENDENT;		// convert base1 to baes2
-	base2 := Nac_V2.Files2.dsNCF2Base;
+	rawbase2 := Nac_V2.Files2.dsNCF2Base;
+	newdata := Nac_V2.Files2.dsProcessing;
 
-	//merged := NAC_V2.fn_MergeWithBase(nac_v2.files2.dsProcessing, base2) : PERSIST('~nac::persist::merged_base2');
-	updated := IFF(EXISTS(nac_v2.files2.dsProcessing),
-							NAC_V2.fn_MergeWithBase(nac_v2.files2.dsProcessing, base2) , // update base2
-							base2) : INDEPENDENT;
-	newbase := base1 + updated;
+	base2 := IFF(EXISTS(newdata),
+							NAC_V2.fn_MergeWithBase(newdata, rawbase2) , // update base2
+							rawbase2) : INDEPENDENT;
+	// convert base1 to baes2
+	base1 := nac_v2.fn_Base1ToBase2(NAC_V2.fn_filterBase1(nac_V2.Files.Base, base2)) : INDEPENDENT;
+	newbase := base1 + base2;
+	
 	lfn_base := Nac_V2.Superfile_List.sfBase2 + '::' + workunit;  		// includes base 1
 	lfn_base2 := Nac_V2.Superfile_List.sfNCF2Base + '::' + workunit;	// just ncf2 data
 	 
@@ -31,7 +33,7 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 		
 		OUTPUT(newbase,,lfn_base, COMPRESSED),
 		nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfBase2, lfn_base),
-		OUTPUT(updated,,lfn_base2, COMPRESSED),
+		OUTPUT(base2,,lfn_base2, COMPRESSED),
 		nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfNCF2Base, lfn_base2),
 		nac_v2.Superfile_List.MoveProcessingToProcessed,
 		

@@ -1,4 +1,4 @@
-import RoxieKeyBuild,Suppress,Orbit3,ut,dops;
+import RoxieKeyBuild,Suppress,Orbit3,ut,dops, Orbit3Insurance;
 
 export Proc_Build_Key_New_Suppression_Opt_Out(String pVersion) := 
 FUNCTION
@@ -21,17 +21,19 @@ update_dops 	    := dops.updateversion('SuppressOptOutKeys',pVersion,'christophe
 update_dops_fcra    := dops.updateversion('FCRA_SuppressOptOutKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'F');
 update_idops 		:= dops.updateversion('SuppressOptOutKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N',,,'A');
 
-create_build        := Orbit3.proc_Orbit3_CreateBuild('Suppression Opt Out',pVersion,'N|B|F');
-         										
+create_build        := Orbit3.proc_Orbit3_CreateBuild('Suppression Opt Out',pVersion,'N|B');
+create_build_fcra   := Orbit3.proc_Orbit3_CreateBuild('FCRA Suppression Opt Out',pVersion,'F');
+
+create_build_ins	:=  Orbit3Insurance.Proc_Orbit3I_CreateBuild ('Suppression Opt Out',pVersion,'N',
+                                         'christopher.brodeur@lexisnexisrisk.com,DataDevelopment-Ins@lexisnexis.com,InsDataOps@risk.lexisnexis.com');
 													
 RETURN Sequential(  parallel(bld_optout_key,bld_optout_key_fcra),
 				    parallel(mv_built_optout, mv_built_optout_fcra),
 				    parallel(mv_qa_optout, mv_qa_optout_fcra),
-					parallel(update_dops, update_dops_fcra),
-					// parallel(update_dops, update_dops_fcra,update_idops),
-					// if( ut.Weekday((integer)pVersion[1..8]) <> 'SATURDAY' and ut.Weekday((integer)pVersion[1..8]) <> 'SUNDAY',
-					//     create_build,//    update_idops,Suppress.Proc_OrbitI_CreateBuild(pVersion,'nonfcra')*/
-					// 	output('No Orbit Entries Needed for weekend builds'))
+					parallel(update_dops, update_dops_fcra,update_idops),
+					if( ut.Weekday((integer)pVersion[1..8]) <> 'SATURDAY' and ut.Weekday((integer)pVersion[1..8]) <> 'SUNDAY',
+					    parallel(create_build,create_build_fcra, create_build_ins),
+						output('No Orbit Entries Needed for weekend builds'))
                  );
 
 end;
