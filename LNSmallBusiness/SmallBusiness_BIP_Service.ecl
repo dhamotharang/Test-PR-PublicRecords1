@@ -648,7 +648,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	END;
 
 	// Create Version 21 Name/Value Pair Attributes
-	NameValuePairsVersion21 := NORMALIZE(SBA_Results, 355, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion21(LEFT, COUNTER));
+	NameValuePairsVersion21 := NORMALIZE(SBA_Results, 357, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion21(LEFT, COUNTER));
 	
 	iesp.smallbusinessanalytics.t_SBAAttributesGroup Version21(LNSmallBusiness.BIP_Layouts.IntermediateLayout le) := TRANSFORM
 		SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V21_NAME;

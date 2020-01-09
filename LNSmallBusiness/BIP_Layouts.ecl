@@ -784,8 +784,10 @@ EXPORT BIP_Layouts := MODULE
 		STRING2 FirmIRSRetirementPlan;
 		STRING3 FirmAgeObserved;
 		STRING6 FirmEmployeeCount;
+		STRING6 FirmEmployeeRangeCount;
 		STRING2 FirmOwnershipType;
 		STRING11 FirmReportedSales;
+		STRING9 FirmReportedSalesRange;
 		STRING2 FirmParentCompanyInd;
 		STRING5 SOSIncorporationFilingsCount;
 		STRING5 SOSIncorporationTimeOldest;

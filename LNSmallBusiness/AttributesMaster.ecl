@@ -174,7 +174,9 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
                        (integer)BusShell.Firmographic.FirmEmployeeCount between 11 and 25  => '3',
                        (integer)BusShell.Firmographic.FirmEmployeeCount > 25               => '4',
                                                                                               '0');
+ EXPORT STRING6 FirmEmployeeRangeCount := BusShell.Firmographic.FirmEmployeeRangeCount;
  EXPORT STRING11 FirmReportedSales   := BusShell.Firmographic.FirmReportedSales;
+ EXPORT STRING9 FirmReportedSalesRange := BusShell.Firmographic.FirmReportedSalesRange;
  EXPORT STRING9 FirmReportedEarnings   := BusShell.Firmographic.FirmReportedEarnings;
  EXPORT STRING2 FirmIRSRetirementPlan := BusShell.Firmographic.FirmIRSRetirementPlan;
  EXPORT STRING2 FirmNonProfit   := BusShell.Firmographic.FirmNonProfit;

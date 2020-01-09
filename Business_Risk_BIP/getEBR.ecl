@@ -61,7 +61,7 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   // Sum of all most recent, populated employee count values among all unique data source company identifiers.
   tbl_FirmEmployeeCount_EBR5600 := TABLE(
     DEDUP(SORT(EBR5600_past24Months(empl_size_actual != ''), Seq, file_number, -date_last_seen, -(INTEGER)empl_size_actual), Seq, file_number),
-    {seq, FirmEmployeeCount := SUM( GROUP, IF(empl_size_actual = '', -1, (INTEGER)empl_size_actual )) },
+    {seq, FirmEmployeeCount := SUM( GROUP, (INTEGER)empl_size_actual )},
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
 
   EBR5600Stats_pre := 
@@ -69,16 +69,20 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       EBR5600Stats_pre_pre, tbl_FirmEmployeeCount_EBR5600, 
       LEFT.seq = RIGHT.seq, 
       TRANSFORM( RECORDOF(EBR5600Stats_pre_pre),
-        SELF.FirmEmployeeCount := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmEmployeeCount, LEFT.FirmEmployeeCount ),
+        SELF.FirmEmployeeCount := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmEmployeeCount_EBR5600(seq = LEFT.seq)) > 0, RIGHT.FirmEmployeeCount, -1 ),
+								LEFT.FirmEmployeeCount ),
         SELF := LEFT,
         SELF := []
-      )
+      ),
+			LEFT OUTER, FEW
     );
 
   // Sum of all most recent, populated reported sales values among all unique data source company identifiers. 
   tbl_SalesSources_EBR5600 := TABLE(
     DEDUP(SORT(EBR5600_past24Months(EBR.fFix_amount_codes(Sales_Actual) != ''), Seq, file_number, -date_last_seen, -(INTEGER)EBR.fFix_amount_codes(Sales_Actual)), Seq, file_number),
-    {seq, FirmReportedSales := SUM( GROUP, IF(EBR.fFix_amount_codes(Sales_Actual) = '', -1, ((INTEGER)EBR.fFix_amount_codes(Sales_Actual))*1000 )) },
+    {seq, FirmReportedSales := SUM( GROUP, ((INTEGER)EBR.fFix_amount_codes(Sales_Actual))*1000 )},
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
 
   EBR5600Stats :=
@@ -86,7 +90,10 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       EBR5600Stats_pre, tbl_SalesSources_EBR5600, 
       LEFT.Seq = RIGHT.Seq, 
       TRANSFORM( RECORDOF(EBR5600Stats_pre_pre),
-        SELF.FirmReportedSales := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmReportedSales, LEFT.FirmReportedSales ), 
+        SELF.FirmReportedSales := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_SalesSources_EBR5600(seq = LEFT.seq)) > 0, RIGHT.FirmReportedSales, -1 ),
+								LEFT.FirmReportedSales ),
         SELF := LEFT,
         SELF := []
       ),
@@ -233,7 +240,7 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   // Sum of all most recent, populated employee count values among all unique data source company identifiers.
   tbl_FirmEmployeeCount_EBRCRDB := TABLE(
     DEDUP(SORT(EBRCRDB_past24Months(estimated_number_of_employees != ''), Seq, experian_bus_id , -dt_last_seen, -(INTEGER)estimated_number_of_employees), Seq, experian_bus_id ),
-    {seq, FirmEmployeeCount := SUM( GROUP, IF(estimated_number_of_employees = '', -1, (INTEGER)estimated_number_of_employees )) },
+    {seq, FirmEmployeeCount := SUM( GROUP, (INTEGER)estimated_number_of_employees )},
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
 
   EBRCRDBStats_pre := 
@@ -241,16 +248,20 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       EBRCRDBStats_pre_pre, tbl_FirmEmployeeCount_EBRCRDB, 
       LEFT.seq = RIGHT.seq, 
       TRANSFORM( RECORDOF(EBRCRDBStats_pre_pre),
-        SELF.FirmEmployeeCount := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmEmployeeCount, LEFT.FirmEmployeeCount ),
+        SELF.FirmEmployeeCount := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmEmployeeCount_EBRCRDB(seq = LEFT.seq)) > 0, RIGHT.FirmEmployeeCount, -1 ),
+								LEFT.FirmEmployeeCount ),
         SELF := LEFT,
         SELF := []
-      )
+      ),
+			LEFT OUTER, FEW
     );
 
   // Sum of all most recent, populated reported sales values among all unique data source company identifiers. 
   tbl_SalesSources_EBRCRDB := TABLE(
     DEDUP(SORT(EBRCRDB_past24Months(estimated_annual_sales_amount != ''), Seq, experian_bus_id , -dt_last_seen, -(INTEGER)estimated_annual_sales_amount), Seq, experian_bus_id ),
-    {seq, FirmReportedSales := SUM( GROUP, IF(EBR.fFix_amount_codes(estimated_annual_sales_amount) = '', -1, (INTEGER)estimated_annual_sales_amount )) },
+    {seq, FirmReportedSales := SUM( GROUP, (INTEGER)estimated_annual_sales_amount )},
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
 
   EBRCRDBStats :=
@@ -258,7 +269,10 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       EBRCRDBStats_pre, tbl_SalesSources_EBRCRDB, 
       LEFT.Seq = RIGHT.Seq, 
       TRANSFORM( RECORDOF(EBRCRDBStats_pre_pre),
-        SELF.FirmReportedSales := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmReportedSales, LEFT.FirmReportedSales ), 
+        SELF.FirmReportedSales := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_SalesSources_EBRCRDB(seq = LEFT.seq)) > 0, RIGHT.FirmReportedSales, -1 ),
+								LEFT.FirmReportedSales ),
         SELF := LEFT,
         SELF := []
       ),
