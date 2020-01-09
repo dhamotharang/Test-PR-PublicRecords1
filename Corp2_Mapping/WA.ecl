@@ -24,7 +24,7 @@ export WA := MODULE;
 												transform(Corp2_Raw_WA.Layouts.TempCorporationsLayout, self := left; self := right;),
 												LEFT OUTER, local) : independent;
 	
-	//Join the Document Types file to the Corporations file to get merger information
+	//Join the Corporations to BusinessInfo to get mailing and physical address information
 	 CorpBusInfo := join(Corporations, BusInfoIn,
 												corp2.t2u(left.UBI) = corp2.t2u(right.UBI),
 												transform(Corp2_Raw_WA.Layouts.TempCorpBusInfoLayout, self := left; self := right;),
@@ -66,24 +66,24 @@ export WA := MODULE;
 		self.corp_ln_name_type_desc				:= map (corp2.t2u(input.Category) = 'RES' => 'RESERVATION',
 		                                          corp2.t2u(input.Category) = ''    => 'OTHER',
 																							'LEGAL');
-		self.corp_address1_type_cd	    	:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5,input.MailingCountry).ifAddressExists, 'M', '');
-		self.corp_address1_type_desc    	:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5,input.MailingCountry).ifAddressExists, 'MAILING', '');
-		self.corp_address1_line1					:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5,input.MailingCountry).AddressLine1,'');
-		self.corp_address1_line2					:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5,input.MailingCountry).AddressLine2,'');
-		self.corp_address1_line3					:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5,input.MailingCountry).AddressLine3,'');
-		self.corp_prep_addr1_line1				:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5,input.MailingCountry).PrepAddrLine1,'');
-		self.corp_prep_addr1_last_line		:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5,input.MailingCountry).PrepAddrLastLine,'');
+		self.corp_address1_type_cd	    	:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5+input.MailingZip4,input.MailingCountry).ifAddressExists, 'M', '');
+		self.corp_address1_type_desc    	:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5+input.MailingZip4,input.MailingCountry).ifAddressExists, 'MAILING', '');
+		self.corp_address1_line1					:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5+input.MailingZip4,input.MailingCountry).AddressLine1,'');
+		self.corp_address1_line2					:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5+input.MailingZip4,input.MailingCountry).AddressLine2,'');
+		self.corp_address1_line3					:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5+input.MailingZip4,input.MailingCountry).AddressLine3,'');
+		self.corp_prep_addr1_line1				:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5+input.MailingZip4,input.MailingCountry).PrepAddrLine1,'');
+		self.corp_prep_addr1_last_line		:= if(self.corp_address1_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.MailingAddressLine1,input.MailingAddressLine2 + ' ' + input.MailingAddressLine3,input.MailingCity,input.MailingState,input.MailingZip5+input.MailingZip4,input.MailingCountry).PrepAddrLastLine,'');
 
-    self.corp_address2_type_cd	    	:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5,input.PhysicalCountry).ifAddressExists, 'B', '');
-		self.corp_address2_type_desc    	:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5,input.PhysicalCountry).ifAddressExists, 'BUSINESS', '');
-		self.corp_address2_line1					:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5,input.PhysicalCountry).AddressLine1,'');
-		self.corp_address2_line2					:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5,input.PhysicalCountry).AddressLine2,'');
-		self.corp_address2_line3					:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5,input.PhysicalCountry).AddressLine3,'');
-		self.corp_prep_addr2_line1				:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5,input.PhysicalCountry).PrepAddrLine1,'');
-		self.corp_prep_addr2_last_line		:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5,input.PhysicalCountry).PrepAddrLastLine,'');
+    self.corp_address2_type_cd	    	:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5+input.PhysicalZip4,input.PhysicalCountry).ifAddressExists, 'B', '');
+		self.corp_address2_type_desc    	:= if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5+input.PhysicalZip4,input.PhysicalCountry).ifAddressExists, 'BUSINESS', '');
+		self.corp_address2_line1					:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5+input.PhysicalZip4,input.PhysicalCountry).AddressLine1,'');
+		self.corp_address2_line2					:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5+input.PhysicalZip4,input.PhysicalCountry).AddressLine2,'');
+		self.corp_address2_line3					:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5+input.PhysicalZip4,input.PhysicalCountry).AddressLine3,'');
+		self.corp_prep_addr2_line1				:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5+input.PhysicalZip4,input.PhysicalCountry).PrepAddrLine1,'');
+		self.corp_prep_addr2_last_line		:= if(self.corp_address2_type_cd <> '',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PhysicalAddressLine1,input.PhysicalAddressLine2 + ' ' + input.PhysicalAddressLine3,input.PhysicalCity,input.PhysicalState,input.PhysicalZip5+input.PhysicalZip4,input.PhysicalCountry).PrepAddrLastLine,'');
 		self.corp_phone_number            := Corp2_Raw_WA.Functions.PhoneNo(input.PhoneNumber);
 		self.corp_email_address           := corp2.t2u(input.Email);
-		self.corp_addl_info               := corp2.t2u(input.Email);  //mapped here also since corp_email_address is not displayed yet
+		self.corp_addl_info               := if(corp2.t2u(input.Email) <> '', 'EMAIL: ' + corp2.t2u(input.Email),'');  //mapped here also since corp_email_address is not displayed yet
 		
 		self.corp_for_profit_ind					:= case(corp2.t2u(input.TYPE),'PROFIT' => 'Y', 'NONPROFIT' => 'N', '');
 		self.corp_orig_org_structure_cd		:= corp2.t2u(input.Category);
@@ -183,9 +183,6 @@ export WA := MODULE;
 	// Map AR 
 	//-----------------------------------------
 	// Keep only records that have valid annual report document types in the Document field and that have an associated Corporation record
-	// ValidARDocTypes := ['AMENDED ANNUAL REPORT','AMENDED REPORT','ANNUAL REPORT','ANNUAL REPORT-WAIVER GRANTED',
-	                    // 'DELINQUENT ANNUAL REPORT NOTICE','ANNUAL REPORT DUE DATE NOTICE'];
-											
 	ValidARDocTypes := ['AMENDED ANNUAL REPORT','AMENDED REPORT','ANNUAL REPORT','ANNUAL REPORT-WAIVER GRANTED','ARDQ'];
 											
 	AR_recs := join(CorpsIn, DocTypesIn(corp2.t2u(Document) in ValidARDocTypes),
@@ -279,8 +276,8 @@ export WA := MODULE;
 		AR_TranslateBitMap		 := output(AR_T);
 
 	//Submits Profile's stats to Orbit
-		AR_SubmitStats 			   := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_WA_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_WY_AR').SubmitStats;
-		AR_ScrubsWithExamples  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_WA_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_WY_AR').CompareToProfile_with_Examples;
+		AR_SubmitStats 			   := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_WA_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_WY_AR').SubmitStats;
+		AR_ScrubsWithExamples  := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_WA_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_WY_AR').CompareToProfile_with_Examples;
 
 		AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
@@ -356,8 +353,8 @@ export WA := MODULE;
 		Event_TranslateBitMap			:= OUTPUT(Event_T);
 
 		//Submits Profile's stats to Orbit
-		Event_SubmitStats 			 := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_WA_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_WA_Event').SubmitStats;
-		Event_ScrubsWithExamples := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_WA_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_WA_Event').CompareToProfile_with_Examples;
+		Event_SubmitStats 			 := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_WA_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_WA_Event').SubmitStats;
+		Event_ScrubsWithExamples := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_WA_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_WA_Event').CompareToProfile_with_Examples;
 
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
@@ -530,42 +527,52 @@ export WA := MODULE;
 							
 	
  //-------------------- UPDATE -----------------------------------------------------//	
-	VersionControl.macBuildNewLogicalFile('~thor_data400::in::corp2::'+version+'::main_wa'	,Main_ApprovedRecords ,write_main		     ,,,pOverwrite);		
-	VersionControl.macBuildNewLogicalFile('~thor_data400::in::corp2::'+version+'::ar_wa'		,MapAR		            ,write_ar			     ,,,pOverwrite);
-	VersionControl.macBuildNewLogicalFile('~thor_data400::in::corp2::'+version+'::event_wa'	,MapEvents            ,write_event	     ,,,pOverwrite);
+ 
+  Fail_Build						:= if(AR_FailBuild = true or Main_FailBuild = true or Event_FailBuild = true,true,false);
+	IsScrubErrors					:= if(AR_IsScrubErrors = true or Main_IsScrubErrors = true or Event_IsScrubErrors = true,true,false);
 	
-	VersionControl.macBuildNewLogicalFile('~thor_data400::failed::corp2::'+version+'::main_wa'	,MapMain              ,write_fail_main ,,,pOverwrite);		
-			
-	mapWA:= sequential(   if(pshouldspray = true,Corp2_mapping.fSprayFiles(state_origin ,version,pOverwrite := pOverwrite))
-	                      ,AR_All
-												,Event_All
-												,Main_All
-												,IF(Main_FailBuild <> true
-														,sequential( write_ar
-																			  ,write_event
-														            ,write_main
-																				,fileservices.addsuperfile(Corp2_Mapping._Dataset().thor_cluster_Files + 'in::'+Corp2_Mapping._Dataset().NameMapped+'::sprayed::ar'		,Corp2_Mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::ar_WA')
-																				,fileservices.addsuperfile(Corp2_Mapping._Dataset().thor_cluster_Files + 'in::'+Corp2_Mapping._Dataset().NameMapped+'::sprayed::event',Corp2_Mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::event_WA')
-																				,fileservices.addsuperfile(Corp2_Mapping._Dataset().thor_cluster_Files + 'in::'+Corp2_Mapping._Dataset().NameMapped+'::sprayed::main'	,Corp2_Mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::main_WA')																		 
-																				,if (count(Main_BadRecords) <> 0 
-																						 ,Corp2_Mapping.Send_Email(state_origin,version,count(Main_BadRecords)<>0,,,,count(Main_BadRecords),,,,count(Main_ApprovedRecords),count(mapAR),count(mapEvents)).RecordsRejected																				 
-																						 ,Corp2_Mapping.Send_Email(state_origin,version,count(Main_BadRecords)<>0,,,,count(Main_BadRecords),,,,count(Main_ApprovedRecords),count(mapAR),count(mapEvents)).MappingSuccess																				 
-																						 )	 
-																			 ,if (Main_IsScrubErrors
-																				 ,Corp2_Mapping.Send_Email(state_origin,version,Main_IsScrubErrors).FieldsInvalidPerScrubs
-																				 )
-																		 )  															
-														 ,sequential (write_fail_main
+	VersionControl.macBuildNewLogicalFile(Corp2_Mapping._dataset().thor_cluster_Files + 'in::corp2::' 	+ version + '::ar_' 		+ state_origin, AR_ApprovedRecords	 , write_ar,,,pOverwrite);
+	VersionControl.macBuildNewLogicalFile(Corp2_Mapping._dataset().thor_cluster_Files + 'in::corp2::' 	+ version + '::main_' 	+ state_origin, Main_ApprovedRecords , write_main,,,pOverwrite);
+	VersionControl.macBuildNewLogicalFile(Corp2_Mapping._dataset().thor_cluster_Files + 'in::corp2::' 	+ version + '::event_' 	+ state_origin, Event_ApprovedRecords, write_event,,,pOverwrite);
+
+	VersionControl.macBuildNewLogicalFile(Corp2_Mapping._dataset().thor_cluster_Files + 'fail::corp2::' + version + '::ar_' 		+ state_origin, AR_F		, write_fail_ar,,,pOverwrite);
+	VersionControl.macBuildNewLogicalFile(Corp2_Mapping._dataset().thor_cluster_Files + 'fail::corp2::' + version + '::main_' 	+ state_origin, Main_F	, write_fail_main,,,pOverwrite);
+	VersionControl.macBuildNewLogicalFile(Corp2_Mapping._dataset().thor_cluster_Files + 'fail::corp2::' + version + '::event_' 	+ state_origin, Event_F	, write_fail_event,,,pOverwrite);
+		
+	mapWA:= sequential(if(pshouldspray = true,Corp2_mapping.fSprayFiles(state_origin ,version,pOverwrite := pOverwrite))
+	                   ,AR_All
+										 ,Event_All
+										 ,Main_All
+										 ,IF(Fail_Build <> true
+												,sequential(write_ar
+																	 ,write_event
+														       ,write_main
+																	 ,fileservices.addsuperfile(Corp2_Mapping._Dataset().thor_cluster_Files + 'in::'+Corp2_Mapping._Dataset().NameMapped+'::sprayed::ar'		,Corp2_Mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::ar_WA')
+																	 ,fileservices.addsuperfile(Corp2_Mapping._Dataset().thor_cluster_Files + 'in::'+Corp2_Mapping._Dataset().NameMapped+'::sprayed::event',Corp2_Mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::event_WA')
+																	 ,fileservices.addsuperfile(Corp2_Mapping._Dataset().thor_cluster_Files + 'in::'+Corp2_Mapping._Dataset().NameMapped+'::sprayed::main'	,Corp2_Mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::main_WA')																		 
+																	 ,if (count(Main_BadRecords) <> 0 or count(AR_BadRecords) <> 0 or count(Event_BadRecords) <> 0
+																			 ,Corp2_Mapping.Send_Email(state_origin,version,count(Main_BadRecords)<>0,count(AR_BadRecords)<>0,count(Event_BadRecords)<>0,,count(Main_BadRecords),count(AR_BadRecords),count(Event_BadRecords),,count(Main_ApprovedRecords),count(AR_ApprovedRecords),count(Event_ApprovedRecords)).RecordsRejected																				 
+																			 ,Corp2_Mapping.Send_Email(state_origin,version,count(Main_BadRecords)<>0,count(AR_BadRecords)<>0,count(Event_BadRecords)<>0,,count(Main_BadRecords),count(AR_BadRecords),count(Event_BadRecords),,count(Main_ApprovedRecords),count(AR_ApprovedRecords),count(Event_ApprovedRecords)).MappingSuccess																				 
+																			 )	 
+																	 ,if(IsScrubErrors
+																		  ,Corp2_Mapping.Send_Email(state_origin,version,Main_IsScrubErrors,AR_IsScrubErrors,Event_IsScrubErrors).FieldsInvalidPerScrubs
+																			)
+																	 ) //if Fail_Build <> true																	
+														 ,sequential (write_fail_ar
+																				 ,write_fail_event												 
+																				 ,write_fail_main
 																				 ,Corp2_Mapping.Send_Email(state_origin,version).MappingFailed
-																				 )  
+																				 ) //if Fail_Build = true
 														 )
 											);
 
- 		isFileDateValid := if((string)Std.Date.Today() between ut.date_math(filedate,-31) and ut.date_math(filedate,31),true,false);
-		return sequential (if (isFileDateValid
-														,mapWA
-														,sequential (Corp2_Mapping.Send_Email(state_origin,filedate).InvalidFileDateParm
-																				,FAIL('Corp2_Mapping.WA failed.  An invalid filedate was passed in as a parameter.')))); 	
+ 	isFileDateValid 	:= true;
+	isTMFileDateValid := true;
+	
+	return sequential (if( isFileDateValid and isTMFileDateValid
+												,mapWA
+												,sequential (Corp2_Mapping.Send_Email(state_origin,filedate).InvalidFileDateParm
+																		,FAIL('Corp2_Mapping.WA failed.  An invalid filedate was passed in as a parameter.')))); 	
 
  End; //Update Function
 

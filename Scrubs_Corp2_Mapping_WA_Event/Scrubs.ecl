@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311,STD;
-IMPORT Scrubs,Scrubs_Corp2_Mapping_WA_Event; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
@@ -73,7 +73,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     event_filing_date_ALLOW_ErrorCount := COUNT(GROUP,h.event_filing_date_Invalid=1);
     event_filing_date_CUSTOM_ErrorCount := COUNT(GROUP,h.event_filing_date_Invalid=2);
     event_filing_date_Total_ErrorCount := COUNT(GROUP,h.event_filing_date_Invalid>0);
-    event_desc_CUSTOM_ErrorCount := COUNT(GROUP,h.event_desc_Invalid=1);
+    event_desc_ALLOW_ErrorCount := COUNT(GROUP,h.event_desc_Invalid=1);
     AnyRule_WithErrorsCount := COUNT(GROUP, h.corp_key_Invalid > 0 OR h.corp_vendor_Invalid > 0 OR h.corp_state_origin_Invalid > 0 OR h.corp_process_date_Invalid > 0 OR h.corp_sos_charter_nbr_Invalid > 0 OR h.event_filing_date_Invalid > 0 OR h.event_desc_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
@@ -82,9 +82,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.corp_key_Total_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_sos_charter_nbr_Total_ErrorCount > 0, 1, 0) + IF(le.event_filing_date_Total_ErrorCount > 0, 1, 0) + IF(le.event_desc_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.corp_key_Total_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_sos_charter_nbr_Total_ErrorCount > 0, 1, 0) + IF(le.event_filing_date_Total_ErrorCount > 0, 1, 0) + IF(le.event_desc_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.corp_key_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_key_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_sos_charter_nbr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_sos_charter_nbr_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.event_filing_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.event_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.event_desc_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.corp_key_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_key_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_sos_charter_nbr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_sos_charter_nbr_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.event_filing_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.event_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.event_desc_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -108,7 +108,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.corp_process_date_Invalid,'ALLOW','CUSTOM','UNKNOWN')
           ,CHOOSE(le.corp_sos_charter_nbr_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.event_filing_date_Invalid,'ALLOW','CUSTOM','UNKNOWN')
-          ,CHOOSE(le.event_desc_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
+          ,CHOOSE(le.event_desc_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'corp_key','corp_vendor','corp_state_origin','corp_process_date','corp_sos_charter_nbr','event_filing_date','event_desc','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_date','invalid_charter_nbr','invalid_date','invalid_event_desc','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.corp_key,(SALT311.StrType)le.corp_vendor,(SALT311.StrType)le.corp_state_origin,(SALT311.StrType)le.corp_process_date,(SALT311.StrType)le.corp_sos_charter_nbr,(SALT311.StrType)le.event_filing_date,(SALT311.StrType)le.event_desc,'***SALTBUG***');
@@ -130,7 +130,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'corp_process_date:invalid_date:ALLOW','corp_process_date:invalid_date:CUSTOM'
           ,'corp_sos_charter_nbr:invalid_charter_nbr:ALLOW','corp_sos_charter_nbr:invalid_charter_nbr:LENGTHS'
           ,'event_filing_date:invalid_date:ALLOW','event_filing_date:invalid_date:CUSTOM'
-          ,'event_desc:invalid_event_desc:CUSTOM'
+          ,'event_desc:invalid_event_desc:ALLOW'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -160,7 +160,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.corp_process_date_ALLOW_ErrorCount,le.corp_process_date_CUSTOM_ErrorCount
           ,le.corp_sos_charter_nbr_ALLOW_ErrorCount,le.corp_sos_charter_nbr_LENGTHS_ErrorCount
           ,le.event_filing_date_ALLOW_ErrorCount,le.event_filing_date_CUSTOM_ErrorCount
-          ,le.event_desc_CUSTOM_ErrorCount
+          ,le.event_desc_ALLOW_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -175,7 +175,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.corp_process_date_ALLOW_ErrorCount,le.corp_process_date_CUSTOM_ErrorCount
           ,le.corp_sos_charter_nbr_ALLOW_ErrorCount,le.corp_sos_charter_nbr_LENGTHS_ErrorCount
           ,le.event_filing_date_ALLOW_ErrorCount,le.event_filing_date_CUSTOM_ErrorCount
-          ,le.event_desc_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
+          ,le.event_desc_ALLOW_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
