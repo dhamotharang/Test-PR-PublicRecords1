@@ -381,11 +381,11 @@ EXPORT Functions := MODULE
 													{STRING fragmentType}));
 										
 			driversLicenseNumber :=  IF(l.dl_number <> '' AND 
-																	(l.dl_state <> '' AND
+																	((l.dl_state <> '' AND
 																	l.dl_state = r.drivers_license_state AND
 																	l.dl_number  = r.drivers_license)
 																	OR (platform = FraudShared_Services.Constants.Platform.FraudGov AND
-																	l.dl_number  = r.drivers_license), 
+																	l.dl_number  = r.drivers_license)), 
 																	DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT}], 
 																			{STRING fragmentType}));
 																			
