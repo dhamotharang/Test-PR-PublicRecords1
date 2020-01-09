@@ -2,7 +2,7 @@
 
 dops_datasetname:=header._info.dops_datasetname;
 
-qhdr := '*Quick Header Build*';
+qhdr := '*QuickHeader*';
 valid_state := ['','unknown','submitted', 'compiling','compiled','blocked','running','wait'];
 d := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=qhdr))(wuid <> thorlib.wuid() and state in valid_state), -wuid):independent;
 qh_running :=  exists(d);
@@ -51,6 +51,6 @@ if(qh_running
   );   
 
 //WorkUnits History
-
+// 20191128 W20200101-195006 W20200101-195006 W20200102-111321
 // 20190324 W20190422-081331 & W20190422-103255
 // 20181224 W20190120-135405

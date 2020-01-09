@@ -138,7 +138,8 @@ export IdAppendLocal := module
 					self.powWeight := if(isProxLevel or left.powid = right.powid, left.powWeight, 0),
 					self.parent_proxid := right.parent_proxid,
 					self := left,
-					self := right),
+					self := right,
+					self := []),
 				left outer);
 
 		return postHeader;

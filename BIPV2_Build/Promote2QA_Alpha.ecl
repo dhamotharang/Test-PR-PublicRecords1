@@ -11,7 +11,7 @@ functionmacro
 
   import bipv2_build,tools;
 
-  email                 := BIPV2_Build.Send_Emails(pversion ,,not tools._constants.isdataland/* and pShouldUpdateDOPS*/);
+  email                 := BIPV2_Build.Send_Emails(pversion ,,false); //don't try to update dops in alpharetta.  this package doesn't exist there
   CheckAlphaKeys        := email.BIPV2AlphaKeys.Roxie;
   outputAlpha_keys      := BIPV2_Build.AlphaProdKeys_Package(pversion,false).outputpackage;
     
