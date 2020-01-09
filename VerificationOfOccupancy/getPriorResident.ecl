@@ -1,4 +1,4 @@
-﻿import Risk_Indicators, ut, RiskWise, header_quick, MDR,suppress, drivers,std,VerificationOfOccupancy, dx_header, inquiry_acclogs,Doxie;
+﻿import Risk_Indicators, ut, RiskWise, header_quick, MDR, suppress, drivers, std, VerificationOfOccupancy, dx_header, inquiry_acclogs, Doxie;
 
 EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOShell, 
 																		string50 DataRestrictionMask, 
@@ -32,7 +32,7 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
   SELF 														:= le;
 	END;
 	
-	resDIDs := join(VOOShell, Key_Header_Address,
+	resDIDs_unsuppressed := join(VOOShell, Key_Header_Address,
 													keyed(left.prim_name = right.prim_name) and
 													keyed(left.z5 = right.zip) and
 													keyed(left.prim_range = right.prim_range) and
@@ -44,25 +44,31 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 													(~mdr.Source_is_DPPA(RIGHT.src) OR 
 														(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))),
 									getDIDs(LEFT,RIGHT), left outer, ATMOST(5000));
-   VerificationOfOccupancy_suppressed := Suppress.Mac_SuppressSource(resDIDs, mod_access);   
-   VerificationOfOccupancy_Transform := PROJECT(VerificationOfOccupancy_suppressed, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell,
-                                                  SELF := LEFT));                
+                  
+    resDIDs_flagged := Suppress.MAC_FlagSuppressedSource(resDIDs_unsuppressed, mod_access);
+
+	resDIDs := PROJECT(resDIDs_flagged, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+            SELF.prior_res_DID 							:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.prior_res_DID);
+            SELF.prior_res_dt_first_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.prior_res_dt_first_seen);
+            SELF.prior_res_dt_last_seen 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.prior_res_dt_last_seen);
+            SELF.prior_res_fname 						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prior_res_fname);
+            SELF.prior_res_lname 						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prior_res_lname);
+            SELF.prior_res_target_addrmatch := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.prior_res_target_addrmatch);
+			SELF := LEFT;
+	));          
 
 //no need to keep all records, keep only the most recent for each "prior resident" DID
-	dedupDIDs := dedup(sort(VerificationOfOccupancy_Transform, seq, prior_res_DID, -prior_res_dt_last_seen, -prior_res_dt_first_seen), seq, prior_res_DID);
+	dedupDIDs := dedup(sort(resDIDs, seq, prior_res_DID, -prior_res_dt_last_seen, -prior_res_dt_first_seen), seq, prior_res_DID);
 
 //apply HouseHold ID (HHID) to each of the header records we found above so we can link household members
 	key_header := dx_header.key_header();
 	 VerificationOfOccupancy_CCPA getHHIDs(dedupDIDs le, key_header ri) := TRANSFORM
 		SELF.prior_res_HHID 	:= ri.HHID;
-    self.Global_sid := ri.global_sid;		
-    SELF 										:= le;
-    
-    
-  
+        self.Global_sid := ri.global_sid;		
+        SELF 										:= le;
 	END;
 	
-	resHHIDs := join(dedupDIDs, key_header,
+	resHHIDs_unsuppressed := join(dedupDIDs, key_header,
 									keyed(left.prior_res_DID = right.s_DID) and 
 									left.prim_name = right.prim_name and
 									left.z5 = right.zip and
@@ -76,18 +82,22 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 									(~mdr.Source_is_DPPA(RIGHT.src) OR 
 										(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))),
 									getHHIDs(LEFT,RIGHT), left outer, KEEP(1), ATMOST(riskwise.max_atmost));  //just apply HHID to the 1 record we are joining
-resHHIDs_VerificationOfOccupancy_suppressed := Suppress.Mac_SuppressSource(resHHIDs, mod_access);   
-   resHHIDs_VerificationOfOccupancy_Transform := PROJECT(resHHIDs_VerificationOfOccupancy_suppressed, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell,
-                                                  SELF := LEFT));  
+                  
+    resHHIDs_flagged := Suppress.MAC_FlagSuppressedSource(resHHIDs_unsuppressed, mod_access);
+
+	resHHIDs := PROJECT(resHHIDs_flagged, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+            SELF.prior_res_HHID 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.prior_res_HHID);
+			SELF := LEFT;
+	));     
 //of all prior residents at this address, keep just the most recent
-	dedupHHIDs := dedup(sort(resHHIDs_VerificationOfOccupancy_Transform, seq, -prior_res_dt_last_seen, -prior_res_dt_first_seen), seq);
+	dedupHHIDs := dedup(sort(resHHIDs, seq, -prior_res_dt_last_seen, -prior_res_dt_first_seen), seq);
 
 //join most recent prior resident to all prior residents by HHID.  This will be our prior resident's household members.
-	VerificationOfOccupancy.Layouts.Layout_VOOShell getPriorHH(dedupHHIDs le, resHHIDs_VerificationOfOccupancy_Transform ri) := TRANSFORM
+	VerificationOfOccupancy.Layouts.Layout_VOOShell getPriorHH(dedupHHIDs le, resHHIDs ri) := TRANSFORM
 		SELF 									:= ri;
 	END;
 	
-	priorHH := join(dedupHHIDs, resHHIDs_VerificationOfOccupancy_Transform,
+	priorHH := join(dedupHHIDs, resHHIDs,
 									left.seq = right.seq and left.prior_res_HHID = right.prior_res_HHID,
 									getPriorHH(LEFT,RIGHT), left outer);  
 
@@ -166,7 +176,7 @@ endmacro;
 	headerMacro(getHeader, key_header);
 	headerMacro(getQHeader, header_quick.key_DID);
 
-	newerHeader := join(rolled_Property, key_header,	
+	newerHeader_unsuppressed := join(rolled_Property, key_header,	
 									LEFT.prior_res_DID <> 0 AND
 									keyed(left.prior_res_DID = right.s_DID) and
 									// trim((string)right.dt_last_seen) >= hdrBuildDate01 and
@@ -185,9 +195,15 @@ endmacro;
 									 left.addr_suffix <> right.suffix or 
 									 left.postdir <> right.postdir), 
 									getHeader(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));
-	 getHeader_VerificationOfOccupancy_CCPA := Suppress.Suppress_ReturnOldLayout(newerHeader, mod_access, VerificationOfOccupancy.Layouts.Layout_VOOShell);
+                  
+    newerHeader_flagged := Suppress.MAC_FlagSuppressedSource(newerHeader_unsuppressed, mod_access);
 
-	newerQHeader := join(rolled_Property, header_quick.key_DID,		
+	newerHeader := PROJECT(newerHeader_flagged, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+            SELF.prior_res_new_addr 	:= IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.prior_res_new_addr);
+			SELF := LEFT;
+	));     
+  
+	newerQHeader_unsuppressed := join(rolled_Property, header_quick.key_DID,		
 									LEFT.prior_res_DID <> 0 AND
 									keyed(left.prior_res_DID = right.DID) and
 									// trim((string)right.dt_last_seen) >= hdrBuildDate01 and
@@ -208,8 +224,13 @@ endmacro;
 									 left.addr_suffix <> right.suffix or 
 									 left.postdir <> right.postdir),  
 									getQHeader(left, right), keep(200), ATMOST(RiskWise.max_atmost));
-	 getQHeader_VerificationOfOccupancy_CCPA := Suppress.Suppress_ReturnOldLayout(newerQHeader, mod_access, VerificationOfOccupancy.Layouts.Layout_VOOShell);
+                  
+	newerQHeader_flagged := Suppress.MAC_FlagSuppressedSource(newerQHeader_unsuppressed, mod_access);
 
+	newerQHeader := PROJECT(newerQHeader_flagged, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+            SELF.prior_res_new_addr 	:= IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.prior_res_new_addr);
+			SELF := LEFT;
+	)); 
 //rollup by sequence to set the ownership flags for all prior residents as though they are one entity.  I.E. - if any DID within the 
 //	prior resident "household" has any of the owned/sold/new_addr/acct_open flags set, set it on for the record being returned.
   VerificationOfOccupancy.Layouts.Layout_VOOShell rollHeader(VerificationOfOccupancy.Layouts.Layout_VOOShell l, VerificationOfOccupancy.Layouts.Layout_VOOShell r) := transform
@@ -230,7 +251,7 @@ endmacro;
 		self														:= l;
 	end;
 	
-  rolledHeader := rollup(sort(ungroup(getHeader_VerificationOfOccupancy_CCPA) & ungroup(getQHeader_VerificationOfOccupancy_CCPA), seq), rollHeader(left,right), seq);
+  rolledHeader := rollup(sort(ungroup(newerHeader) & ungroup(newerQHeader), seq), rollHeader(left,right), seq);
 
 // Join prior resident DIDs to inquiries to see if any account opening searches exist within the last year for an address other than the target address
 	layout_inq := record

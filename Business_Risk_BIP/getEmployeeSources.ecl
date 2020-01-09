@@ -271,7 +271,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   // Sum of all most recent, populated employee count values among all unique data source company identifiers.
   tbl_FirmEmployeeCount_DCA := TABLE(
     DEDUP(SORT(DCA_past24Months(RawFields.Emp_Num != ''), Seq, RawFields.enterprise_num, -date_last_seen, -(INTEGER)RawFields.Emp_Num), Seq, RawFields.enterprise_num),
-    {seq, FirmEmployeeCount := SUM( GROUP, IF(RawFields.Emp_Num = '', -1, (INTEGER)RawFields.Emp_Num )) },
+    {seq, FirmEmployeeCount := SUM( GROUP, (INTEGER)RawFields.Emp_Num )},
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
 
   DCAStats_pre := 
@@ -279,16 +279,20 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       DCAStats_pre_pre, tbl_FirmEmployeeCount_DCA, 
       LEFT.seq = RIGHT.seq, 
       TRANSFORM( RECORDOF(DCAStats_pre_pre),
-        SELF.FirmEmployeeCount := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmEmployeeCount, LEFT.FirmEmployeeCount ),
+        SELF.FirmEmployeeCount := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmEmployeeCount_DCA(seq = LEFT.seq)) > 0, RIGHT.FirmEmployeeCount, -1 ),
+								LEFT.FirmEmployeeCount ),
         SELF := LEFT,
         SELF := []
-      )
+      ),
+			LEFT OUTER, FEW
     );
 
   // Sum of all most recent, populated reported sales values among all unique data source company identifiers. 
   tbl_FirmReportedSales_DCA := TABLE(
     DEDUP(SORT(DCA_past24Months(RawFields.Sales != ''), Seq, RawFields.enterprise_num, -date_last_seen, -(INTEGER)RawFields.Sales), Seq, RawFields.enterprise_num),
-    {seq, FirmReportedSales := SUM( GROUP, IF(RawFields.Sales = '', -1, (INTEGER)RawFields.Sales )) },
+    {seq, FirmReportedSales := SUM( GROUP, (INTEGER)RawFields.Sales )},
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
 
   DCAStats :=
@@ -296,7 +300,10 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       DCAStats_pre, tbl_FirmReportedSales_DCA, 
       LEFT.Seq = RIGHT.Seq, 
       TRANSFORM( RECORDOF(DCAStats_pre_pre),
-        SELF.FirmReportedSales := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmReportedSales, LEFT.FirmReportedSales ), 
+        SELF.FirmReportedSales :=
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmReportedSales_DCA(seq = LEFT.seq)) > 0, RIGHT.FirmReportedSales, -1 ),
+								LEFT.FirmReportedSales ),
         SELF := LEFT,
         SELF := []
       ),
@@ -668,7 +675,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   // Sum of all most recent, populated employee count values among all unique data source company identifiers.
   tbl_FirmEmployeeCount_EFXBus := TABLE(
     DEDUP(SORT(equifaxBus_past24Months(efx_locempcnt != ''), Seq, efx_id, -dt_last_seen, -(INTEGER)efx_locempcnt), Seq, efx_id),
-    {seq, FirmEmployeeCount := SUM( GROUP, IF(efx_locempcnt = '', -1, (INTEGER)efx_locempcnt )) },
+    {seq, FirmEmployeeCount := SUM( GROUP, (INTEGER)efx_locempcnt )},
     Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
 
   equifaxBusStats_pre := 
@@ -676,16 +683,20 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       equifaxBusStats_pre_pre, tbl_FirmEmployeeCount_EFXBus, 
       LEFT.seq = RIGHT.seq, 
       TRANSFORM( RECORDOF(equifaxBusStats_pre_pre),
-        SELF.FirmEmployeeCount := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmEmployeeCount, LEFT.FirmEmployeeCount ),
+        SELF.FirmEmployeeCount := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmEmployeeCount_EFXBus(seq = LEFT.seq)) > 0, RIGHT.FirmEmployeeCount, -1 ),
+								LEFT.FirmEmployeeCount ),
         SELF := LEFT,
         SELF := []
-      )
+      ),
+			LEFT OUTER, FEW
     );
 
   // Sum of all most recent, populated reported sales values among all unique data source company identifiers. 
   tbl_FirmReportedSales_EFXBus := TABLE(
       DEDUP(SORT(equifaxBus_past24Months(efx_locamount != ''), Seq, efx_id, -dt_last_seen, -(INTEGER)efx_locamount), Seq, efx_id),
-      {seq, FirmReportedSales := SUM( GROUP, IF(efx_locamount = '', -1, (INTEGER)efx_locamount*1000)) },
+      {seq, FirmReportedSales := SUM( GROUP, (INTEGER)efx_locamount*1000)},
       Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
 
   equifaxBusStats :=
@@ -693,7 +704,10 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       equifaxBusStats_pre, tbl_FirmReportedSales_EFXBus, 
       LEFT.Seq = RIGHT.Seq, 
       TRANSFORM( RECORDOF(equifaxBusStats_pre_pre),
-        SELF.FirmReportedSales := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmReportedSales, LEFT.FirmReportedSales ), 
+        SELF.FirmReportedSales := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmReportedSales_EFXBus(seq = LEFT.seq)) > 0, RIGHT.FirmReportedSales, -1 ),
+								LEFT.FirmReportedSales ),
         SELF := LEFT,
         SELF := []
       ),
@@ -912,7 +926,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
     
   tbl_FirmEmployeeCount_InfuNARB := TABLE(
       DEDUP(SORT(infutorNARB(employee_code != ''), Seq, record_id, -dt_last_seen, -infutorNARB_empl_ct(employee_code)), Seq, record_id),
-      {seq, FirmEmployeeCount := SUM( GROUP, IF(employee_code = '', -1, infutorNARB_empl_ct(employee_code)) ) },
+      {seq, FirmEmployeeCount := SUM( GROUP, infutorNARB_empl_ct(employee_code) )},
       Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );   
 
   infutorNARBStats_pre := 
@@ -920,10 +934,14 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       infutorNARBStats_pre_pre, tbl_FirmEmployeeCount_InfuNARB, 
       LEFT.seq = RIGHT.seq, 
       TRANSFORM( RECORDOF(equifaxBusStats_pre_pre),
-        SELF.FirmEmployeeCount := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmEmployeeCount, LEFT.FirmEmployeeCount ),
+        SELF.FirmEmployeeCount := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmEmployeeCount_InfuNARB(seq = LEFT.seq)) > 0, RIGHT.FirmEmployeeCount, -1 ),
+								LEFT.FirmEmployeeCount ),
         SELF := LEFT,
         SELF := []
-      )
+      ),
+			LEFT OUTER, FEW
     );
 
   // Sum of all most recent, populated reported sales values among all unique data source company identifiers. 
@@ -944,7 +962,7 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
     
   tbl_FirmReportedSales_InfuNARB := TABLE(
       DEDUP(SORT(infutorNARB(sales_code != ''), Seq, record_id, -dt_last_seen, -infutorNARB_sales(sales_code)), Seq, record_id),
-      {seq, FirmReportedSales := SUM( GROUP, IF(sales_code = '', -1, infutorNARB_sales(sales_code)) )},
+      {seq, FirmReportedSales := SUM( GROUP, infutorNARB_sales(sales_code) )},
       Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) ); 
 
   infutorNARBStats :=
@@ -952,7 +970,10 @@ EXPORT getEmployeeSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       infutorNARBStats_pre, tbl_FirmReportedSales_InfuNARB, 
       LEFT.Seq = RIGHT.Seq, 
       TRANSFORM( RECORDOF(equifaxBusStats_pre_pre),
-        SELF.FirmReportedSales := IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, RIGHT.FirmReportedSales, LEFT.FirmReportedSales ), 
+        SELF.FirmReportedSales := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmReportedSales_InfuNARB(seq = LEFT.seq)) > 0, RIGHT.FirmReportedSales, -1 ),
+								LEFT.FirmReportedSales ),
         SELF := LEFT,
         SELF := []
       ),
