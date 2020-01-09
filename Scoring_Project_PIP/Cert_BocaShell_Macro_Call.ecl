@@ -1,7 +1,8 @@
 ﻿//BocaShell Daily Tracking Report Data Collection - scheduled for daily run
 
 #workunit('name','Cert_Bocashell_Collections');
-IMPORT  Scoring_Project_Macros, RiskWise, UT, Scoring_Project_DailyTracking, scoring_project_pip, zz_bbraaten2;
+//added std
+IMPORT  Scoring_Project_Macros, RiskWise, std, UT, Scoring_Project_DailyTracking, scoring_project_pip, zz_bbraaten2;
 
 //Here are the URLs to run data collections for testing non-FCRA OSS roxie
 // cert130 OSS - roxiecertossvip.sc.seisint.com:9876
@@ -24,6 +25,10 @@ no_of_recs_to_run := 0;
 archive_date := 201207;
 bs_version_41 := 41;
 bs_version_50 := 50;
+
+//added boca54
+bs_version_54 := 54;
+
 //***** UNIQUE OUPUT FILE TAG *********
 filetag := '_1'; 
 
@@ -33,19 +38,27 @@ bocashell_file_in := '~scoring_project::in::riskview_xml_generic_v3_v4_v5_201611
 // bocashell_file_in := '~scoring_project::in::bocashell_v3_v4_v5_input_20160419';  
 // bocashell_file_in := '~scoring_project::in::bocashell_v3_v4_v5_input_20160517';
 
-
+//replaced ut.getdate (deprecated) with (STRING8)Std.Date.Today() 
 //**********OUTPUT FILE NAMES**************//
-bocashell_41_nonfcra_file_out := '~scoringqa::out::nonfcra::bocashell_41_historydate_999999_cert_' + ut.getdate + filetag;
-bocashell_41_nonfcra_file_out_HD := '~scoringqa::out::nonfcra::bocashell_41_historydate_201207_cert_' + ut.getdate + filetag;
+bocashell_41_nonfcra_file_out := '~scoringqa::out::nonfcra::bocashell_41_historydate_999999_cert_' + (STRING8)Std.Date.Today() + filetag;
+bocashell_41_nonfcra_file_out_HD := '~scoringqa::out::nonfcra::bocashell_41_historydate_201207_cert_' + (STRING8)Std.Date.Today() + filetag;
 
-bocashell_41_fcra_file_out := '~scoringqa::out::fcra::bocashell_41_historydate_999999_cert_' + ut.getdate + filetag;
-bocashell_41_fcra_file_out_HD := '~scoringqa::out::fcra::bocashell_41_historydate_201207_cert_' + ut.getdate + filetag;
+bocashell_41_fcra_file_out := '~scoringqa::out::fcra::bocashell_41_historydate_999999_cert_' + (STRING8)Std.Date.Today() + filetag;
+bocashell_41_fcra_file_out_HD := '~scoringqa::out::fcra::bocashell_41_historydate_201207_cert_' + (STRING8)Std.Date.Today() + filetag;
 
-bocashell_50_nonfcra_file_out := '~scoringqa::out::nonfcra::bocashell_50_historydate_999999_cert_' + ut.getdate + filetag;
-bocashell_50_nonfcra_file_out_HD := '~scoringqa::out::nonfcra::bocashell_50_historydate_201207_cert_' + ut.getdate + filetag;
+bocashell_50_nonfcra_file_out := '~scoringqa::out::nonfcra::bocashell_50_historydate_999999_cert_' + (STRING8)Std.Date.Today() + filetag;
+bocashell_50_nonfcra_file_out_HD := '~scoringqa::out::nonfcra::bocashell_50_historydate_201207_cert_' + (STRING8)Std.Date.Today() + filetag;
 
-bocashell_50_fcra_file_out := '~scoringqa::out::fcra::bocashell_50_historydate_999999_cert_' + ut.getdate + filetag;
-bocashell_50_fcra_file_out_HD := '~scoringqa::out::fcra::bocashell_50_historydate_201207_cert_' + ut.getdate + filetag;
+bocashell_50_fcra_file_out := '~scoringqa::out::fcra::bocashell_50_historydate_999999_cert_' + (STRING8)Std.Date.Today() + filetag;
+bocashell_50_fcra_file_out_HD := '~scoringqa::out::fcra::bocashell_50_historydate_201207_cert_' + (STRING8)Std.Date.Today() + filetag;
+
+//added boca54
+
+bocashell_54_nonfcra_file_out := '~scoringqa::out::nonfcra::bocashell_54_historydate_999999_cert_' + (STRING8)Std.Date.Today() + filetag;
+bocashell_54_nonfcra_file_out_HD := '~scoringqa::out::nonfcra::bocashell_54_historydate_201207_cert_' + (STRING8)Std.Date.Today() + filetag;
+
+bocashell_54_fcra_file_out := '~scoringqa::out::fcra::bocashell_54_historydate_999999_cert_' + (STRING8)Std.Date.Today() + filetag;
+bocashell_54_fcra_file_out_HD := '~scoringqa::out::fcra::bocashell_54_historydate_201207_cert_' + (STRING8)Std.Date.Today() + filetag;
 
 
 //**********CALLING MACROS FOR 41*************//
@@ -63,13 +76,26 @@ Bocashell_50_nonfcra_201207 := Scoring_Project_PIP.BocaShell_50_nonFCRA_cert_MAC
 Bocashell_50_fcra_999999 := Scoring_Project_PIP.BocaShell_50_FCRA_cert_MACRO( bs_version_50, fcra_roxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,bocashell_file_in,bocashell_50_fcra_file_out,no_of_recs_to_run);
 Bocashell_50_fcra_201207 := Scoring_Project_PIP.BocaShell_50_FCRA_cert_MACRO( bs_version_50, fcra_roxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,bocashell_file_in,bocashell_50_fcra_file_out_HD,no_of_recs_to_run, archive_date);
 
+//added macros for 54
+Bocashell_54_nonfcra_999999 := Scoring_Project_PIP.BocaShell_54_nonFCRA_cert_MACRO( bs_version_54, neutralroxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,bocashell_file_in,bocashell_54_nonfcra_file_out,no_of_recs_to_run);
+Bocashell_54_nonfcra_201207 := Scoring_Project_PIP.BocaShell_54_nonFCRA_cert_MACRO( bs_version_54, neutralroxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,bocashell_file_in,bocashell_54_nonfcra_file_out_HD,no_of_recs_to_run, archive_date);
+
+Bocashell_54_fcra_999999 := Scoring_Project_PIP.BocaShell_54_FCRA_cert_MACRO( bs_version_54, fcra_roxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,bocashell_file_in,bocashell_54_fcra_file_out,no_of_recs_to_run);
+Bocashell_54_fcra_201207 := Scoring_Project_PIP.BocaShell_54_FCRA_cert_MACRO( bs_version_54, fcra_roxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,bocashell_file_in,bocashell_54_fcra_file_out_HD,no_of_recs_to_run, archive_date);
+
 
 Nonfcra_41 := sequential(Bocashell_41_nonfcra_999999, Bocashell_41_nonfcra_201207);
 Fcra_41 := sequential(Bocashell_41_fcra_999999, Bocashell_41_fcra_201207);
 Nonfcra_50 := sequential(Bocashell_50_nonfcra_999999, Bocashell_50_nonfcra_201207);
 Fcra_50 := sequential(Bocashell_50_fcra_999999,Bocashell_50_fcra_201207);
 
-data_collection := parallel(Nonfcra_41, Nonfcra_50, Fcra_41, Fcra_50);
+//added nonfcra_54 and fcra_54
+Nonfcra_54 := sequential(Bocashell_54_nonfcra_999999, Bocashell_54_nonfcra_201207);
+Fcra_54 := sequential(Bocashell_54_fcra_999999,Bocashell_54_fcra_201207);
+
+//data_collection := parallel(Nonfcra_41, Nonfcra_50, Fcra_41, Fcra_50);
+data_collection := parallel(Nonfcra_41, Nonfcra_50, Nonfcra_54, Fcra_41, Fcra_50, Fcra_54);
+
 
 // cert_report_41:=Scoring_Project_DailyTracking.BocaShell_41_Cert_Tracking_DailyReport;
 
