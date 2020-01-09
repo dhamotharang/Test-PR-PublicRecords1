@@ -18,12 +18,14 @@ EXPORT Standardize_V2 (string pVersion, boolean pUseProd, string gcid, unsigned1
 			SELF.history_or_current				:= 'C';
 			SELF.startdate								:= (unsigned)pVersion[1..8]; // place holder for point-in-time
 			SELF.enddate									:= 99991231; // place holder for point-in-time
-			SELF.runtime_threshold				:= pLexidThreshold;
+			SELF.runtime_threshold				:= if(pAppendOption = '4', 90, pLexidThreshold);
 			SELF.history_mode							:= (string)pHistMode;
 			SELF.append_option						:= (string)pAppendOption;
 			SELF.current_input						:= 'Y';
 			SELF.prev_lexid								:= L.input_lexid;
 			SELF.prev_crk									:= L.input_crk;
+			SELF.crk_changed							:= '';
+			SELF.lexid_changed						:= '';
 			SELF  :=  L;
 			SELF  :=  [];
 		END;

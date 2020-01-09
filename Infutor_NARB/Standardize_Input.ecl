@@ -1,4 +1,4 @@
-﻿IMPORT  _control, MDR, ut, _Validate, std, mdr;
+﻿IMPORT  _control, MDR, ut, _Validate, std, mdr, scrubs;
 
 EXPORT Standardize_Input := MODULE
 
@@ -192,7 +192,7 @@ EXPORT Standardize_Input := MODULE
 							,STRING  pPersistname = Infutor_NARB.Persistnames().StandardizeInput
 	           ) := FUNCTION
 	
-		dPreprocess	:= fPreProcess(pRawInput,pversion	) : PERSIST(pPersistname);
+		dPreprocess	:= fPreProcess(pRawInput,pversion	) : PERSIST(pPersistname, REFRESH(TRUE), SINGLE);
 
 		RETURN dPreprocess;
 	

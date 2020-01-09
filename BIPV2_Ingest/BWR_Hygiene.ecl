@@ -1,7 +1,7 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BIPV2_Ingest.BWR_Hygiene - Hygiene & Stats - SALT V3.5.2');
-IMPORT BIPV2_Ingest,SALT35; 
+#workunit('name','BIPV2_Ingest.BWR_Hygiene - Hygiene & Stats - SALT V3.5.3');
+IMPORT BIPV2_Ingest,SALT35;
 // First create an instantiated hygiene module
   infile := BIPV2_Ingest.In_BASE;
   ip := DISTRIBUTE(infile, SKEW(0.1));
@@ -68,6 +68,17 @@ IMPORT BIPV2_Ingest,SALT35;
   //  OUTPUT(SALT35.MAC_CrossTab(infile,source,hist_domestic_corp_key,Examples),NAMED('hist_domestic_corp_keyBysource'));
   //  OUTPUT(SALT35.MAC_CrossTab(infile,source,foreign_corp_key,Examples),NAMED('foreign_corp_keyBysource'));
   //  OUTPUT(SALT35.MAC_CrossTab(infile,source,unk_corp_key,Examples),NAMED('unk_corp_keyBysource'));
+  //  OUTPUT(SALT35.MAC_CrossTab(infile,source,global_sid,Examples),NAMED('global_sidBysource'));
+  //  OUTPUT(SALT35.MAC_CrossTab(infile,source,record_sid,Examples),NAMED('record_sidBysource'));
+  //  OUTPUT(SALT35.MAC_CrossTab(infile,source,employee_count_org_raw,Examples),NAMED('employee_count_org_rawBysource'));
+  //  OUTPUT(SALT35.MAC_CrossTab(infile,source,employee_count_org_derived,Examples),NAMED('employee_count_org_derivedBysource'));
+  //  OUTPUT(SALT35.MAC_CrossTab(infile,source,revenue_org_raw,Examples),NAMED('revenue_org_rawBysource'));
+  //  OUTPUT(SALT35.MAC_CrossTab(infile,source,revenue_org_derived,Examples),NAMED('revenue_org_derivedBysource'));
+  //  OUTPUT(SALT35.MAC_CrossTab(infile,source,employee_count_local_raw,Examples),NAMED('employee_count_local_rawBysource'));
+  //  OUTPUT(SALT35.MAC_CrossTab(infile,source,employee_count_local_derived,Examples),NAMED('employee_count_local_derivedBysource'));
+  //  OUTPUT(SALT35.MAC_CrossTab(infile,source,revenue_local_raw,Examples),NAMED('revenue_local_rawBysource'));
+  //  OUTPUT(SALT35.MAC_CrossTab(infile,source,revenue_local_derived,Examples),NAMED('revenue_local_derivedBysource'));
+  //  OUTPUT(SALT35.MAC_CrossTab(infile,source,locid,Examples),NAMED('locidBysource'));
   //  OUTPUT(SALT35.MAC_CrossTab(infile,source,source_docid,Examples),NAMED('source_docidBysource'));
   //  OUTPUT(SALT35.MAC_CrossTab(infile,source,title,Examples),NAMED('titleBysource'));
   //  OUTPUT(SALT35.MAC_CrossTab(infile,source,fname,Examples),NAMED('fnameBysource'));
