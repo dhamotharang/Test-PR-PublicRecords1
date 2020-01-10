@@ -338,6 +338,8 @@ rollupoffenseOut := ROLLUP(result_sort2,
 
 /*************************************End******************************************/
 
-	PromoteSupers.MAC_SF_BuildProcess(rollupoffenseOut,'~thor_data400::base::corrections_offenses_' + doxie_build.buildstate, aout, 2, ,true);
+  deduped_rollupoffenseOutPID := dedup(sort(distribute(rollupoffenseOut,HASH(offense_persistent_id)),offense_persistent_id,local),offense_persistent_id,local);
+
+	PromoteSupers.MAC_SF_BuildProcess(deduped_rollupoffenseOutPID,'~thor_data400::base::corrections_offenses_' + doxie_build.buildstate, aout, 2, ,true);
 				 
 export Out_DOC_Offenses := aout;
