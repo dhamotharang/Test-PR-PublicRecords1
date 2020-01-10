@@ -10,5 +10,6 @@
 	unsigned2		__nameFormat := 0;
 	unsigned2		__nameQuality := 0;
 	unsigned2		__nameInd := 0;
+	string1			__gender;
 	boolean			__isDualName := false;
 END;

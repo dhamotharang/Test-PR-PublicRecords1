@@ -19,7 +19,15 @@ EXPORT CleanName(string s) := FUNCTION
 								 '');
 		cleaned2 := IF(ntype = MatchType.Dual, $.mod_NameFormat.FormatName2(preCleaned, fmt), '');
 		
-		dBiz := DATASET([{__nid, rawName, preprocessed, preCleaned, cleaned, cleaned2, ntype, fmt, quality, isDual}], $.rNameId);
+		cln_fname		:= cleaned[6..25];
+		cln_mname		:= cleaned[26..45];
+		gender			:= if(ntype = $.MatchType.Person,
+								$.NameTester.GenderEx(cln_fname,cln_mname),'');
+
+		nameind := $.NameIndicators.fn_setNameIndicators(ntype, quality, gender);
+
+		dBiz := DATASET([{__nid, NID.Conversions.NameTypeToChar(ntype),
+					rawName, preprocessed, preCleaned, cleaned, cleaned2, ntype, fmt, quality, nameind, gender, isDual}], $.rNameId);
 
 		return dBiz;
 
