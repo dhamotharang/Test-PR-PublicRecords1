@@ -12,7 +12,7 @@
 	
 	PersonStatsScore := JOIN(KELOtto.Q__show_Customer_Person.Res0, KELOtto.BasicScoring.Scores, 
 	                      LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_=RIGHT.industry_type_ AND LEFT.entity_context_uid_=RIGHT.entity_context_uid_,
-                        TRANSFORM(RECORDOF(LEFT), SELF.Score_ := MAP(RIGHT.entity_context_uid_ != '' AND RIGHT.TotalWeightValue > 0 => RIGHT.ScorePercentile, 0), SELF := LEFT), LEFT OUTER, LOCAL);
+                        TRANSFORM(RECORDOF(LEFT), SELF.Score_ := MAP(RIGHT.entity_context_uid_ != '' AND RIGHT.TotalWeightValue > 0 => RIGHT.ScorePercentile, 0), SELF := LEFT), LEFT OUTER, HASH);
 												
   EXPORT PersonStats := hipie_ecl.macSlimDataset(PersonStatsScore, 'industry_type_,customer_id_,entity_context_uid_', 
 	                      'best_first_name_,best_middle_name_,best_last_name_,best_name_suffix_,best_ssn_,best_email_,best_street_address_,best_city_,best_zip_,best_state_,date_of_birth_,' +
