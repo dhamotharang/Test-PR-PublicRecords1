@@ -1,11 +1,11 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib;
 
 fIn_raw := watercraft_preprocess.Files_raw.MI;
 
 InvalidData := ['UNK','UN ','NONE','NA ','0 ','UNKOWN','BADHINGIVEN','N/A'];
 
 //Trim and uppercase all fields prior to mapping
-Watercraft.layout_mi CleanTrimRaw(fIn_raw L) := TRANSFORM
+Watercraft.layout_mi_new CleanTrimRaw(fIn_raw L) := TRANSFORM
 self.STATEABREV	:= ut.CleanSpacesAndUpper(L.STATEABREV);
 self.REG_NUM		:= ut.CleanSpacesAndUpper(L.REG_NUM);
 ClnHull					:= ut.CleanSpacesAndUpper(IF(REGEXFIND('^[^A-Z0-9_]',L.HULL_ID), REGEXREPLACE('^[^A-Z0-9_]',L.HULL_ID,''), L.HULL_ID));
