@@ -1,4 +1,4 @@
-import std;
+﻿import std;
 
 _PRTE_BUILD := false;  // CONFIGURE HEADER FOR PRTE BUILD BY CHNAGING THIS VALUE.
 
@@ -25,6 +25,7 @@ EXPORT Constants := MODULE
         EXPORT KEY_PREFIX				:= '~prte::key::business_header::';
 				EXPORT KEY_PREFIX2			:= '~prte::key::';
         //EXPORT KEY_PREFIX_FCRA := '~prte::key::business_header::filtered::fcra::';
+				EXPORT dops_name := 'BusinessHeaderKeys';
 
 	
 END;

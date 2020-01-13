@@ -1,5 +1,4 @@
-﻿export layout_MI := 
-
+﻿EXPORT Layout_MI_new := 
 record
 string3	STATEABREV;
 string22	REG_NUM;
@@ -23,9 +22,10 @@ string2	STATE;
 string10	ZIP;
 string50	COUNTY;
 string5	FIPS;
-string2	TRANS_CODE;
-string1	FEE_CODE;
-string8	POSTING;
+string6	TRANS_CODE;
+string255 SECOND_OWNER_NAME;
+//string1	FEE_CODE;
+//string8	POSTING;
 string8 TITLE_DATE;
 string2	lf;
 end;
