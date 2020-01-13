@@ -1,4 +1,4 @@
-﻿IMPORT Email_DataV2, email_data, dx_Email, STD, PromoteSupers, RoxieKeyBuild, MDR, dops, Orbit3, Scrubs_Email_Event;
+﻿IMPORT Email_DataV2, email_data, dx_Email, STD, PromoteSupers, RoxieKeyBuild, MDR, dops, Orbit3;
 
 EXPORT proc_build_bv_lookup(STRING version) := FUNCTION
   // input files
@@ -94,7 +94,6 @@ EXPORT proc_build_bv_lookup(STRING version) := FUNCTION
 										 ,build_table
 										 ,build_key
 										 ,zDoPopulationStats
-										 ,Scrubs_Email_Event.email_PostBuildScrubs(version)
 										 // ,dops_update
 										 // ,orbit_update
 										);	
