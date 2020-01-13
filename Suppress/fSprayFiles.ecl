@@ -80,7 +80,8 @@ EXPORT	fSprayFiles := MODULE
 
 	EXPORT Exemptions_File(
 								STRING		pVersionDate			=	'',
-								STRING		pServerIP				=	$.Constants.serverIP,
+								// STRING		pServerIP				=	$.Constants.serverIP,
+								STRING		pServerIP				=	_Control.IPAddress.bctlpedata12,		//temp. will remove when orbit team is ready for the move
 								STRING		pDirectory				=	$.Constants.Exemptions().Directory,
 								STRING		pFilename				=	$.Constants.Exemptions().FileToSpray_PR,
 								STRING		pDestPath				=	$.FileNames().Exemptions.lGlobalSidPRTemplate,
