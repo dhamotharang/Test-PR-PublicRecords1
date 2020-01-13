@@ -1,4 +1,4 @@
-﻿IMPORT Models;
+﻿IMPORT Models, Std;
 
 eyeball := 100;
 
@@ -58,10 +58,10 @@ OUTPUT(CHOOSEN(inputData, eyeball), NAMED('Sample_Raw_Input'));
  string10 CheckTimeNewest;
  string10 CheckNegTimeOldest;
  string10 CheckNegRiskDecTimeNewest;
- string10 CheckNegPaidNewest;
+ string10 CheckNegPaidTimeNewest;
  string10 CheckCountTotal;
  string10 CheckAmountTotal;
- string10 CheckAmountTotalSinceNeg;
+ string10 CheckAmountTotalSinceNegPaid;
  string10 CheckAmountTotal03Month;
  END;
  
@@ -94,7 +94,7 @@ checknegriskdectimenewest_1 := map(
     (Integer)left.NO_NEG_DECL_DAYS > 2556.75                    => -1,
                                                         min(84, max(1, round((Integer)left.NO_NEG_DECL_DAYS / (365.25 / 12)))));
 
-checknegpaidnewest_1 := map(
+checknegpaidtimenewest_1 := map(
     left.LTD_DAYS = ''       => -1,
     (Integer)left.LTD_DAYS > 2556.75 => -1,
     (Integer)left.LTD_DAYS <= 0         => -1,
@@ -114,7 +114,7 @@ _first_seen_date := models.common.sas_date((string)(left.FIRST_SEEN_DATE));
 
 mos_snc_first_seen_date := if(not(_first_seen_date = NULL), (string)round((sysdate - (integer)_first_seen_date) / (365.25 / 12)), '');
 
-checkamounttotalsinceneg_1 := map(
+checkamounttotalsincenegpaid_1 := map(
     left.LTD_AMT = '' or left.LTD_QTY_TRUE = '' or left.LTD_AMT_TRUE = '' => -1,
     (Real)left.LTD_AMT <= 0 or (Integer)left.LTD_QTY_TRUE <= 0 or (Real)left.LTD_AMT_TRUE <= 0       => -1,
     (integer)mos_snc_first_seen_date >= 84                           => checkamounttotal_1,
@@ -160,8 +160,8 @@ archive_bf_last_seen_date := map(
   self.CheckNegRiskDecTimeNewest := if((string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
                                     or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checknegriskdectimenewest_1);
 
-  self.CheckNegPaidNewest := if((string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
-                             or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checknegpaidnewest_1);
+  self.CheckNegPaidTimeNewest := if((string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
+                             or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checknegpaidtimenewest_1);
 
   self.CheckCountTotal := if((string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
                           or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checkcounttotal_1);
@@ -169,8 +169,8 @@ archive_bf_last_seen_date := map(
   self.CheckAmountTotal := if((string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1'
                            or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checkamounttotal_1);
 
-  self.CheckAmountTotalSinceNeg := if((string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
-                                   or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checkamounttotalsinceneg_1);
+  self.CheckAmountTotalSinceNegPaid := if((string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
+                                   or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checkamounttotalsincenegpaid_1);
 
   self.CheckAmountTotal03Month := if((string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
                                   or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checkamounttotal03month_1);
