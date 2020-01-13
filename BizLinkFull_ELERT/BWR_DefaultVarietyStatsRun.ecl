@@ -68,4 +68,4 @@ BizLinkFull_ELERT.macMaster(
   '')),
   FAILURE(pkgSTD.System.Email.SendEmail(BizLinkFull_ELERT.modConstants.sEmailNotify,
   'FAILED: BizLinkFull ELERT ('+pkgControl.ThisEnvironment.ESP_IPAddress+' '+WORKUNIT+')',
-  FAILMESSAGE)), WHEN(CRON('* * 1 1-12 *'));
+  FAILMESSAGE));
