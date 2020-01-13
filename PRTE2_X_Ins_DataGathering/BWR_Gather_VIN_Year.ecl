@@ -33,7 +33,7 @@ UsableVINLayout tranxGath1(kvMain01 L,INTEGER rnd) := TRANSFORM
 END;
 kvMain02 := SORT( PROJECT(kvMain01,tranxGath1(LEFT,RANDOM())), hashvalue);
 
-All_Next := CHOOSEN(kvMain02,20000);
+All_Next := CHOOSEN(kvMain02,30000);
 OUTPUT(COUNT(kvMain00) +'|'+ COUNT(kvMain01)+'|'+ COUNT(kvMain02)+'|'+ COUNT(All_Next));
 
 Trimit(STRING S) := TRIM(S,left,right);

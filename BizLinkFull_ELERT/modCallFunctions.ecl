@@ -78,7 +78,7 @@ EXPORT modCallFunctions := MODULE
 																			,zipRadius
 																			,inUrl
 																			,inSvcName
-                                                                            ,bSegmentation).IdsOnly(), pkg1.IdAppendLayouts.IdsOnlyOutput) ));
+                                                                            ,segmentation := bSegmentation).IdsOnly(), pkg1.IdAppendLayouts.IdsOnlyOutput) ));
 
   dRoxie := normalize(append, count(left.ds),
                       transform(pkg1.IDAppendLayouts.AppendOutput,
@@ -330,7 +330,7 @@ Business_Header_SS.MAC_Match_Flex
 ,/* 30: src_matching_is_priority  = FALSE                              */
 ,/* 31: setofstrings = '[\'NA\',\'NA\',\'NA\']'                        */
 ,/* 32: bScoreParents = TRUE                                           */  
-,/* 33: bSegmentation = TRUE                                           */  bSegmentation
+// ,/* 33: bSegmentation = TRUE                                           */  bSegmentation  // NEEDS TO BE ADDED BACK ONCE MMF IS PLUMBED FOR SEGMENTATION
 );
 
 RETURN JOIN(dOutput, dInData, left.acctNo=right.uniqueid, TRANSFORM(modLayouts.lSampleLayout,

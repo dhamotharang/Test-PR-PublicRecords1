@@ -24,7 +24,7 @@ watercraft_color_desc(string3 code)
 
 searchpattern := '^(.*)-(.*)$';
 
-Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_MA_clean_in, Watercraft.Layout_MA, hull_clean_in)
+Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_MA_clean_in, Watercraft.Layout_MA_new, hull_clean_in)
 
 watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform
 	// New watercraft_key logic to be implemented at a later date

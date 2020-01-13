@@ -1,6 +1,6 @@
 ﻿/* ***********************************************************************************************************
 PRTE2_X_Ins_DataGathering.Layouts
-
+UsableVINLayout
 For CT purposes, VINS have no states applied so just gather by year.
 
 vina_veh_type = Code that indicates the type of vehicle
