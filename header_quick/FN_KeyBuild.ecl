@@ -254,8 +254,7 @@ RETURN SEQUENTIAL(
 			SEQUENTIAL(B3,M3,MQ3),
 			SEQUENTIAL(B4,M4,MQ4),
 			SEQUENTIAL(B5,M5,MQ5)
-																		), 615),
-		build_source_key_prep(filedate)
+			), 615)
 	);
 
 END;

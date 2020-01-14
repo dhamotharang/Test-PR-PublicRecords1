@@ -8,8 +8,9 @@
 										include for profit and nonprofit corporations, well as limited liability companies, 
 										limited partnerships, cooperatives and some unique business types.
 
-	Source Notes:  		The vendor data consists of 3 separate files: 
+	Source Notes:  		The vendor data consists of 4 separate files: 
 											~ corporations, 
 											~ governingpersons (contacts), 
-											~ documents (annual reports and events)														
+											~ documents (annual reports and events)	
+											~ business info (addresses)
 */
