@@ -7,7 +7,7 @@
 /*--INFO-- TRIS single search query. Optimal output is got when atleast first name, last name , SSN and address fields are input to the query. More input the better 
 */
 
-import TaxRefundIS_Service, iesp, AutoStandardI;
+import TaxRefundIS_Service, iesp, AutoStandardI, Std;
 
 EXPORT SearchService := MACRO
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -66,7 +66,10 @@ EXPORT SearchService := MACRO
 		doxie.MAC_Header_Field_Declare();
 		
 //c.	Do name parsing and input (SSN and Phones) data cleaning  
-	  dsCleanName 		:= Address.CleanNameFields(Address.CleanPersonFML73(unparsed_fullname_value));
+		fullNameFromComponents:=Std.Str.CleanSpaces(search_by.Name.First+' '
+			+search_by.Name.Middle+' '+search_by.Name.Last+' '+search_by.Name.Suffix);
+		unparsedFullName:=IF(unparsed_fullname_value!='',unparsed_fullname_value,fullNameFromComponents);
+	  dsCleanName 		:= Address.CleanNameFields(Address.CleanPersonFML73(unparsedFullName));
 		CleanSSN  			:= TaxRefundIS_Service.functions.fn_CleanSSN (ssn_value );
 		CleanHomePhone	:= Address.CleanPhone(search_by.HomePhone);
 		CleanWorkPhone	:= Address.CleanPhone(search_by.WorkPhone);
