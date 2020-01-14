@@ -13,7 +13,7 @@ FUNCTION
                               STD.Str.ToUpperCase(TRIM(inRec.Rep_1_Last_Name)),    // lname,
                               risk_indicators.nullstring,                          // ssn -- not used in business products,
                               STD.Str.ToUpperCase(TRIM(inRec.Bus_FEIN)),           // fein,
-                              STD.Str.ToUpperCase(TRIM(inRec.Bus_Zip5)),           // zip,
+                              STD.Str.ToUpperCase(TRIM(inRec.Bus_Zip)), // zip,
                               STD.Str.ToUpperCase(TRIM(inRec.Bus_Phone10)),        // phone,
                               STD.Str.ToUpperCase(TRIM(inRec.Bus_Company_Name)));  // company_name);
 
