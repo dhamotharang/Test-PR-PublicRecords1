@@ -345,7 +345,7 @@ import _control, Prof_License,fieldstats,did_add,ut,header_slimsort,watchdog,did
                 );                                                                             
 
 			appendLnpid := appendlnpidProvider + appendlnpidFacility;
-			prepFPOS := dedup(appendLnpid,whole record, all); // : persist('~thor_data400::persist::prof_licenses');
+			prepFPOS := DEDUP(DISTRIBUTE(appendLnpid, RANDOM()), WHOLE RECORD, LOCAL, ALL); // : persist('~thor_data400::persist::prof_licenses');
 			
 			// INFUTOR data is no longer allowed/wanted.
       prepFPOS_cleaned := prepFPOS(vendor != 'INFUTOR');
