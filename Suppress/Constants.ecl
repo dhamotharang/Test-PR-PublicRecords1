@@ -74,7 +74,7 @@ export Constants := module
 	//	Server IP to Spray from
 	EXPORT	STRING serverIP					:=	IF(	_Control.thisenvironment.name='Dataland',
 													_Control.IPAddress.bctlpedata12,
-													_Control.IPAddress.bctlpedata12);		// Will be on edata12 till this process is automatec
+													_Control.IPAddress.bctlpedata10);		// Will be on edata12 till this process is automatec
 
 	EXPORT OptOut(STRING8 filedate='') := MODULE
 
