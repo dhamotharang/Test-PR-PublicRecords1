@@ -49,7 +49,7 @@ EXPORT modFiles(STRING sInPrefix = '') := MODULE
 		string name_suffix_cln;
 	end;
 
-    shared saotInputLayout := record
+    shared sampleDataInputLayout := record
         unsigned6 proxid;
         unsigned6 seleid;
         unsigned6 orgid;
@@ -117,11 +117,26 @@ EXPORT modFiles(STRING sInPrefix = '') := MODULE
         // USING THE ACTUAL FILENAME SO WE ALWAYS USE A LOCAL COPY FOR THIS. ONLY PAIN COMES FROM PULLING IT REMOTELY!!
 		// dHeaderSources := PROJECT(BIPV2.CommonBase.ds_built, TRANSFORM(BIPV2.CommonBase.Layout, SELF:=LEFT, SELF:=[]));
 		dHeaderSources := PROJECT(dataset('~thor_data400::bipv2::internal_linking::built', BIPV2.CommonBase_mod.Layout, thor), TRANSFORM(BIPV2.CommonBase.Layout, SELF:=LEFT, SELF:=[]));
-     
-		dTopBusiness := PROJECT(DATASET(prefix + 'thor::bipheader::qa::topBusiness', BIzLinkFull_ELERT.modLayouts.lSrcLayout, THOR),
-		                        TRANSFORM(recordof(left), 
-                                          SELF.SRC_CATEGORY:='T'; 
-                                          SELF := LEFT));
+        
+        headerClean := BIPV2.CommonBase.clean(dHeaderSources);//removes ghost records, same filter as ds_clean file which is not copied in dataland
+
+        dTopBusinessRead := DATASET(prefix + 'thor::bipheader::qa::topBusiness', sampleDataInputLayout, THOR);
+		dTopBusiness := PROJECT(dTopBusinessRead,
+		                        TRANSFORM(BIzLinkFull_ELERT.modLayouts.lSrcLayout, 
+                                          self.src_category := left.source,
+                                          self.rid := left.rcid,
+                                          self.city := left.p_city_name,
+                                          self.state := left.st,
+                                          self.zip5 := left.zip,
+                                          self.phone10 := left.company_phone,
+                                          self.fein := left.company_fein,
+                                          self.url := left.company_url,
+                                          self.email := left.contact_email,
+                                          self.contact_fname := left.fname,
+                                          self.contact_mname := left.mname,
+                                          self.contact_lname := left.lname,
+                                          self.sic_code := left.company_sic_code1,
+                                          SELF := LEFT))(company_name != '' or contact_ssn != '' or prim_name != '' or phone10 != '' or city != '' or fein != '');
         macSourceSampler(dProfile(description = 'Inquiry'), dTopBusiness, topBusinessOut, false, iNumSamples);
 		 
 	    // inds :=   dataset(prefix + 'bip::prod::batch_jobs::apitoprocessbip.txt', rec_api, csv(heading(1), separator(','), quote('"'), terminator('\r\n')));
@@ -144,21 +159,32 @@ EXPORT modFiles(STRING sInPrefix = '') := MODULE
 									SELF.Contact_lname := '';
 									SELF.zip_radius_miles := 0;
 									SELF.sic_code := '';
-									// SELF.inSeleid := '';
-									// SELF.allow7DigitMatch := FALSE;
 									SELF.contact_ssn := LEFT.cleanssn;
 									SELF.contact_did := (unsigned)LEFT.ln_did;
 									SELF.SRC_CATEGORY:='B#';
-									SELF :=[]));                                
+									SELF :=[]))(company_name != '' or contact_ssn != '' or prim_name != '' or phone10 != '' or city != '' or fein != '');                                
         macSourceSampler(dProfile(description = 'Batch'), dBatch, batchOut, false, iNumSamples);
-															
-		dPreFill := PROJECT(DATASET(prefix + 'thor::bipheader::qa::prefill_inquiries', BIzLinkFull_ELERT.modLayouts.lSrcLayout, THOR),
-		                    TRANSFORM(recordof(left), 
-                                      SELF.SRC_CATEGORY:='P'; 
-                                      SELF := LEFT));
+
+        dPreFillRead := DATASET(prefix + 'thor::bipheader::qa::prefill_inquiries', sampleDataInputLayout, THOR);
+		dPreFill := PROJECT(dPreFillRead,
+		                    TRANSFORM(BIzLinkFull_ELERT.modLayouts.lSrcLayout, 
+                                      self.src_category := left.source,
+                                      self.rid := left.rcid,
+                                      self.city := left.p_city_name,
+                                      self.state := left.st,
+                                      self.zip5 := left.zip,
+                                      self.phone10 := left.company_phone,
+                                      self.fein := left.company_fein,
+                                      self.url := left.company_url,
+                                      self.email := left.contact_email,
+                                      self.contact_fname := left.fname,
+                                      self.contact_mname := left.mname,
+                                      self.contact_lname := left.lname,
+                                      self.sic_code := left.company_sic_code1,
+                                      SELF := LEFT))(company_name != '' or contact_ssn != '' or prim_name != '' or phone10 != '' or city != '' or fein != '');
         macSourceSampler(dProfile(description = 'Inquiry'), dPreFill, preFillOut, false, iNumSamples);
 		 
-        dSAOTData := project(DATASET('~thor::bipheader::qa::saotDataSample', saotInputLayout, THOR),
+        dSAOTData := project(DATASET('~thor::bipheader::qa::saotDataSample', sampleDataInputLayout, THOR),
                              transform(bizlinkfull_elert.modLayouts.lSrcLayout,
                                        self.src_category := left.source,
                                        self.rid := left.rcid,
@@ -173,10 +199,10 @@ EXPORT modFiles(STRING sInPrefix = '') := MODULE
                                        self.contact_mname := left.mname,
                                        self.contact_lname := left.lname,
                                        self.sic_code := left.company_sic_code1,
-                                       self := left));//src := 'T1','T2','T3','T4','T5'
+                                       self := left))(company_name != '' or contact_ssn != '' or prim_name != '' or phone10 != '' or city != '' or fein != '');//src := 'T1','T2','T3','T4','T5'
         macSourceSampler(dProfile(description = 'Inquiry'), dSAOTData, saotOut, false, iNumSamples);
 
-		headerBase := project(dHeaderSources,
+		headerBase := project(headerClean,
                               TRANSFORM(modLayouts.lSrcLayout, 
 			                            SELF.SRC_CATEGORY := LEFT.SOURCE;
 							  		    SELF.RID     := LEFT.RCID;
@@ -191,10 +217,10 @@ EXPORT modFiles(STRING sInPrefix = '') := MODULE
 							  		    SELF.CITY    := LEFT.P_CITY_NAME;
 							  		    SELF.STATE   := LEFT.ST;
 							  		    SELF.ZIP5    := LEFT.ZIP;
-							  		    SELF         := LEFT;));
+							  		    SELF         := LEFT;))(company_name != '' or contact_ssn != '' or prim_name != '' or phone10 != '' or city != '' or fein != '');
         macSourceSampler(dProfile(description = 'Header'), headerBase, headerOut, false, iNumSamples);
 
-        externalSamples := BIzLinkFull_ELERT.ExternalBuildSample.captureData(50000, bUseForeign);
+        externalSamples := BIzLinkFull_ELERT.ExternalBuildSample.captureData(50000, bUseForeign)(company_name != '' or contact_ssn != '' or prim_name != '' or phone10 != '' or city != '' or fein != '');
         macSourceSampler(dProfile(description = 'External'), externalSamples, extSampleOut, false, iNumSamples);
 
         fullBase := headerOut
