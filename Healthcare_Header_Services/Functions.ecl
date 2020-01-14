@@ -938,6 +938,7 @@ EXPORT Functions := MODULE
 															self.UserState := right.st;
 															self.UserZip := right.z5;
 															self.dids := left.dids;
+															self.isDeepDiveResults := left.src = Constants.SRC_BOCA_PERSON_HEADER;
 															self.clianumbers := dataset([{right.CLIANumber}],layouts.layout_clianumber);
 															self.npis := left.npis;),
 												keep(Constants.MAX_RECS_ON_JOIN), limit(0));

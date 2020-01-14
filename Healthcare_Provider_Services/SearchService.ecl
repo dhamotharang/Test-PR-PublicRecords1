@@ -142,8 +142,7 @@ export SearchService := MACRO
 				string q_id := '' : stored ('_QueryId');
 				string t_id := '' : stored ('_TransactionId');
 				string msg	:= 'Too many subjects found.';
-				string optoutmsg	:= 'THIS SUBJECT CURRENTLY HAS A STATE OPT OUT ON FILE PREVENTING THE RETURN OF SOME OR ALL OF THE INFORMATION YOU REQUESTED. IF THE CONSUMER HAS ANY QUESTIONS ABOUT THIS, PLEASE INSTRUCT THEM TO CALL LEXISNEXIS RISK SOLUTIONS INC. AT 800-456-1244.';
-				optoutMessage := if(hasoptout,DATASET([{'700',optoutmsg}], iesp.share.t_ResultDisclaimer),DATASET([], iesp.share.t_ResultDisclaimer));
+				string optoutmsg	:= 'THIS SUBJECT CURRENTLY HAS A STATE OPT OUT ON FILE PREVENTING THE RETURN OF SOME OR ALL OF THE INFORMATION YOU REQUESTED. IF THE CONSUMER HAS ANY QUESTIONS ABOUT THIS, PLEASE INSTRUCT THEM TO CALL LEXISNEXIS RISK SOLUTIONS INC. AT 1-888-217-1591.';				optoutMessage := if(hasoptout,DATASET([{'700',optoutmsg}], iesp.share.t_ResultDisclaimer),DATASET([], iesp.share.t_ResultDisclaimer));
 				//optoutMessage := row({700,optoutmsg,q_id, t_id,[], []},iesp.share.t_ResponseHeader);
 				badheader := ROW ({203, msg, q_id, t_id, [],[]}, iesp.share.t_ResponseHeader);
 				goodheader := ROW ({0, '', q_id, t_id, [],optoutMessage}, iesp.share.t_ResponseHeader);

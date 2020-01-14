@@ -34,8 +34,10 @@ EXPORT Datasource_ABMS := MODULE
 																															self.includeEducation := cfg[1].IncludeABMSEducation;
 																															self.includeProfessionalAssociations := cfg[1].IncludeABMSProfessionalAssociations;
 																															self := left),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-			convertedInputRecords := convertedInputRecordsUserData+convertedInputRecordsDerivedDid+convertedInputRecordsDerivedNPI;
-       mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);      
+      removeDeepDiveRecs := inputSlim(isDeepDiveResults);
+      convertedInputRecordsRaw := convertedInputRecordsUserData+convertedInputRecordsDerivedDid+convertedInputRecordsDerivedNPI;		
+      convertedInputRecords := join(convertedInputRecordsRaw,removeDeepDiveRecs,left.acctno=right.acctno,transform(left),left only);      
+			mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);      
 			testmacabmsfile:=Suppress.MAC_FlagSuppressedSource(convertedInputRecords, mod_access); 
       setOptOutselectabmsfile := project(testmacabmsfile, transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput,self.hasOptOut:= left.is_suppressed;self:=left;self:=[]))   ;              
 			abmsRecsRaw := Healthcare_Provider_Services.ABMS_Records().getRecords(setOptOutselectabmsfile,cfg);	;	
