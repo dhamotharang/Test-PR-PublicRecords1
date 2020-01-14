@@ -1,9 +1,10 @@
 // This is used to build OptOut test key until PRTE is ready
-IMPORT RoxieKeyBuild, dops;
+IMPORT RoxieKeyBuild, dops, _Control;
 export Proc_Build_Key_OptOut_Test(String pVersion) := FUNCTION
 
     filedate := TRIM(pVersion);
-	spray_opt_out_input_file	:= Suppress.fSprayFiles.OptOutSrc(filedate,
+	spray_opt_out_input_file	:= Suppress.fSprayFiles.OptOutSrc(filedate
+                                                                 ,pServerIP:=_Control.IPAddress.bctlpedata12
                                                                  ,pDirectory:='/data/hds_2/test/'
                                                                  ,pFilename:=TRIM('latest.csv',ALL)
                                                                  );
