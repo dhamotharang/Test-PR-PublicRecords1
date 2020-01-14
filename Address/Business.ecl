@@ -238,6 +238,7 @@ export boolean MatchPattern(string s) := MAP(
 		REGEXFIND('^[A-Z]+ [A-Z] [A-Z] [A-Z] [A-Z]$',s) => true, 	// SUNTRUST B A N K
 		REGEXFIND('^[A-Z]+ +[A-Z]+ *( AND |&) *[A-Z]+ +(MD(S)?|DDS|DPM|ATTY|CPA|VETERINARIANS)?$',s) => true, 	// ROGER KOLPACOFF & MUNDALL MDS
 		REGEXFIND('\\bA (GUY|LOCK|WING) *( AND |&) *A (GIRL|SAFE|PRAYER)\\b',s) => true, 	// ROGER KOLPACOFF & MUNDALL MDS
+		REGEXFIND('\\b(CARPET|RUG|GOLF|SNOW|NEWS|TAX|SPA|DIESEL|SALES|MOBILE|TRAILER|HOME|LIMO|TRUCKING) +SERVICE\\b', s) => true,
 		REGEXFIND(rgxHoa,s) => true,
 		false
 	);
@@ -962,7 +963,9 @@ MatchType MatchX(string str, string options) := FUNCTION
 										=> MatchType.Business,
 		IsGeoDesignation2(REGEXFIND('^(CENTRAL|NORTH(ERN)?|SOUTH(ERN)?|WEST(ERN)?|EAST(ERN)?) +[A-Z]+ +([A-Z]+)\\b', s, 6))
 										=> MatchType.Business,
+		NameTester.IsAmbiguousWord(REGEXFIND('\\b([A-Z]+) +SERVICE\\b', TRIM(name), 1)) => MatchType.Business,
 		Persons.IsDualName(name) => MatchType.Dual,
+		IsAmbiguousBusiness(words, s, name) => MatchType.Business,
 		IsFirmName(s, name) => MatchType.Business,
 		IsAmbiguousBusiness(words, s, name) => MatchType.Business,
 		REGEXFIND('^[A-Z]{2,} *(&| AND ) *+[A-Z]{2,} +L +[CP],?$', s) => MatchType.Business,
