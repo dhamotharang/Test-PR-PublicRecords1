@@ -1,7 +1,7 @@
 ﻿//EXPORT BocaShell_54_nonFCRA_cert_MACRO := 'todo';
 EXPORT BocaShell_54_nonFCRA_cert_MACRO( bs_version, nonfcraroxie_IP,neutralroxie_IP, Thread, Timeout, Retry, Input_file_name,Output_file_name, records_ToRun, retro_date = 999999):= functionmacro
 
-			IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, Scoring_Project_PIP;
+			IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, std, UT, Scoring_Project_PIP;
 
 			unsigned8 no_of_records := records_ToRun;
 			integer retry := retry;
@@ -95,15 +95,26 @@ EXPORT BocaShell_54_nonFCRA_cert_MACRO( bs_version, nonfcraroxie_IP,neutralroxie
 			ds_soap_output := Scoring_Project_PIP.test_BocaShell_SoapCall  (PROJECT (ds_soap_in, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
 			                                                                                           bs_service, roxieIP, threads);
 
+
 			//GLOBAL OUTPUT LAYOUT
-			Global_output_lay:= RECORD	 
-			Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout;			 
-			END;
+			// Global_output_lay:= RECORD	 
+			// Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout;			 
+			// END;
+
+//added  global output layout for Boca54
+      Global_output_lay_54	:= RECORD 
+	     Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout_54
+	      END;
 			
-			Global_output_lay trans(ds_soap_output le, layout_soap_input ri) :=	TRANSFORM
-			SELF.AccountNumber := ri.old_account_number;
-			SELF := le;
-			END;
+			// Global_output_lay trans(ds_soap_output le, layout_soap_input ri) :=	TRANSFORM
+			// SELF.AccountNumber := ri.old_account_number;
+			// SELF := le;
+			// END;
+//added for  Boca54
+      Global_output_lay_54 trans(ds_soap_output le, layout_soap_input ri) :=	TRANSFORM
+			  SELF.AccountNumber := ri.old_account_number;
+			  SELF := le;
+		  	END;
 
 			ds_soap_output_pjt := JOIN (ds_soap_output,ds_soap_in,LEFT.seq=(unsigned)RIGHT.accountnumber,trans(LEFT,RIGHT));
 

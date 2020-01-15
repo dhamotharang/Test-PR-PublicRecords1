@@ -1,5 +1,5 @@
 ﻿EXPORT Global_Output_Layouts :=module
-import models, Risk_Indicators, Business_Risk, ut, riskwise, riskview, RiskProcessing, iESP, Address_Shell, Business_Risk_BIP, ProfileBooster, BusinessInstantID20_Services;
+import models, Risk_Indicators, Business_Risk, std, ut, riskwise, riskview, RiskProcessing, iESP, Address_Shell, Business_Risk_BIP, ProfileBooster, BusinessInstantID20_Services;
 
 //********************************************FCRA PRODUCTS LAYOUTS *****************************************************************************
 
@@ -4404,6 +4404,11 @@ riskprocessing.layouts.layout_internal_shell_noDatasets;
 // string errorcode;
 
  END;
+
+//added BocaShell_Global_Layout_54 14Jan2020
+Export BocaShell_Global_Layout_54	:= RECORD
+ riskprocessing.layouts.layout_internal_shell;
+END;
 
 Export RiskViewAttributes_v3 := RECORD
 	unsigned8 time_ms := 0;	

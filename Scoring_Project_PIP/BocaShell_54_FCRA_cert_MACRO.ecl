@@ -1,6 +1,6 @@
 ﻿EXPORT BocaShell_54_FCRA_cert_MACRO ( bs_version, fcraroxie_IP,neutralroxie_IP, Thread, Timeout, Retry, Input_file_name,Output_file_name, records_ToRun, retro_date = 999999):= functionmacro
 //
-			IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, Scoring_Project_PIP;
+			IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, std, Scoring_Project_PIP;
 
 			unsigned8 no_of_records := records_ToRun;
 			integer retry := retry;
@@ -22,8 +22,6 @@
 			//*********** SETTINGS ************************************
 
 			DRM := scoring_project_pip.User_Settings_Module.BocaShell_54_FCRA_settings.DRM;  
-
-
 		
 		// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
 		// PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
@@ -90,11 +88,22 @@
 		                                                                                             bs_service, fcraroxieIP, threads);
 
 			//GLOBAL OUTPUT LAYOUT
-			Global_output_lay:= RECORD	 
-			Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout;			 
-			END;
+			// Global_output_lay:= RECORD	 
+			// Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout;			 
+			// END;
 
-			Global_output_lay trans(ds_soap_output le, layout_soap_input ri) :=	TRANSFORM
+//added  global output layout for Boca54
+   Global_output_lay_54	:= RECORD 
+	  Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout_54
+	   END;
+
+			// Global_output_lay trans(ds_soap_output le, layout_soap_input ri) :=	TRANSFORM
+			// SELF.AccountNumber := ri.old_account_number;
+			// SELF := le;
+			// END;
+			
+//added for  Boca54
+Global_output_lay_54 trans(ds_soap_output le, layout_soap_input ri) :=	TRANSFORM
 			SELF.AccountNumber := ri.old_account_number;
 			SELF := le;
 			END;
