@@ -1,5 +1,4 @@
 ﻿import STD;
-
 ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'nac2', rpt);
 ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
 
