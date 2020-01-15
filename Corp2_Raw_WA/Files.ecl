@@ -12,7 +12,9 @@ EXPORT Files(STRING  pversion = '',
 										,'Data/Governors/Governor'); //XML data
 		tools.mac_FilesInput(Corp2_Raw_WA.Filenames(pversion, pUseOtherEnvironment).Input.DocumentTypes, Corp2_Raw_WA.Layouts.DocumentTypesLayoutIn, DocumentTypes
 										,'Data/DocumentTypes/DocumentType'); //XML data
-	
+		tools.mac_FilesInput(Corp2_Raw_WA.Filenames(pversion, pUseOtherEnvironment).Input.BusinessInfo, Corp2_Raw_WA.Layouts.BusinessInfoLayoutIn, BusinessInfo
+		                ,'Data/DocumentTypes/BusinessInfo'); //XML data
+
 	END;
 
 END;

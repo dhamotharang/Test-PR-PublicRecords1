@@ -126,6 +126,8 @@ EXPORT lStatsRec := RECORD
     STRING120 sDescription;
     STRING   sProfileBucket;
     UNSIGNED iTotalCnt;
+    UNSIGNED iProdHits;
+    REAL nProdHits;
     UNSIGNED iBaselineHits;
     REAL nBaselineHits;
     UNSIGNED iNewHits;
@@ -164,6 +166,8 @@ EXPORT lReadableStatsHorizRec := RECORD
 	STRING sProfileBucket;
     STRING sDescription;
     STRING iTotalCnt;
+    STRING iProdHits;
+    STRING nProdHits;
     STRING iBaselineHits;
     STRING nBaselineHits;
     STRING iNewHits;

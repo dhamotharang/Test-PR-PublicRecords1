@@ -1172,6 +1172,9 @@
 		export string KEYWORD_EEPPA									:= '858';
 		export string KEYWORD_CANS_UN1373						:= '859';
 		export string KEYWORD_OFAC_MALI							:= '860';
+		export string KEYWORD_EU_MAL								:= '861';
+		export string KEYWORD_OFAC_EO13871					:= '862';
+		export string KEYWORD_LTLRC									:= '863';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

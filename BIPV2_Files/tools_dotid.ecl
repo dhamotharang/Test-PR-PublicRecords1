@@ -358,7 +358,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 	import BIPV2_Tools,bipv2;
   export Set_Duns := BIPV2_Tools.SetDuns;
 
-	shared dataset(l_dot) SetEnterprise(dataset(l_dot) ds_in) := function
+	export dataset(l_dot) SetEnterprise(dataset(l_dot) ds_in) := function
 		l_dot toEnt(l_dot L, ds_active_entnum R) := transform
 			self.active_enterprise_number	:= if(R.enterprise_num != '', R.enterprise_num, '');
 			self.hist_enterprise_number		:= if(R.enterprise_num = '' and MDR.sourceTools.SourceIsDCA(L.source), L.vl_id, '');
@@ -743,7 +743,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     [{
        count(pDs_Fein)
       ,count(ds_result  )
-      ,count(ds_as_linking(company_fein != ''))
+      ,count(pDs_Fein   (company_fein != ''))
       ,count(ds_result  (company_fein != ''))
       // ,count(ds_as_linking(deleted_fein != ''))
       ,count(ds_result  (deleted_fein != ''))
@@ -808,7 +808,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
                             zip, 
                             ds_with_locid); 			
 		
-		export result		:= project(ds_with_locid, transform(l_dot, self.rcid:=0, self:=left)); // strip temporary rcids
+		export result		:= project(ds_CCPA, transform(l_dot, self.rcid:=0, self:=left)); // strip temporary rcids
 		export err_rec	:= mod_bct.err_rec + mod_filt.err_rec;
 		export err_summary := sort(table(err_rec, {string60 src_name:=BIPV2.mod_sources.TranslateSource_aggregate(source),source,remedy,reason,unsigned cnt:=count(group)}, source,remedy,reason, merge), record);
 		
