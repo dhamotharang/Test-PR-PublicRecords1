@@ -18,6 +18,7 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
 
   // ----------------- wild -----------------
   EXPORT i_wild_ssn           := prefix + 'header.wild.ssn.did' + postfix;
+  EXPORT i_wild_ssn_fcra      := prefix + 'fcra.header.wild.ssn.did' + postfix;
   EXPORT i_wild_ssn_en        := prefix + 'header.wild.ssn.did.en' + postfix;
   EXPORT i_wild_StFnameLname  := prefix + 'header.wild.st.fname.lname' + postfix;
   EXPORT i_wild_StreetZipName := prefix + 'header.wild.pname.zip.name.range' + postfix;
@@ -128,6 +129,10 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
   EXPORT i_addr_unique_expanded      := prefix          + sf_addr_unique_expanded_p2;
   EXPORT i_addr_unique_expanded_fcra := prefix + 'fcra::' + sf_addr_unique_expanded_p2;
  
+  EXPORT sf_first_ingest    := 'header::@version@::first_ingest_date'; 
+  EXPORT sf_first_ingest_p2 := IF (file_version = '', sf_first_ingest, ChangeFileVersion (sf_first_ingest, file_version));
+  EXPORT i_first_ingest := prefix + sf_first_ingest_p2;
+
   // do not want to define a name for index which is located in a different folder
   //  EXPORT i_geolink := prefix + 'addrrisk_geolink' + postfix;
 END;

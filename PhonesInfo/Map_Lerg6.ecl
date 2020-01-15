@@ -382,17 +382,18 @@
 	//Append Global SID
 	////////////////////////////////////////////////////////////////////////////////
 	
-	addGlobal_SID	:= MDR.macGetGlobalSid(aggrRoll, 'PhonesMetadata', 'source', 'global_sid');
+	// addGlobal_SID	:= MDR.macGetGlobalSid(aggrRoll, 'PhonesMetadata', 'source', 'global_sid');
+     addGlobalSID   := MDR.macGetGlobalSID(aggrRoll,'PhonesMetadata_Virtual','','global_sid'); //CCPA-799 Use virtual as suppression has already been done.
 
 	////////////////////////////////////////////////////////////////////////////////
 	//Append Record SID
 	////////////////////////////////////////////////////////////////////////////////
 	
-	dx_PhonesInfo.Layouts.lerg6Main addRecTr(addGlobal_SID l):= TRANSFORM
+	dx_PhonesInfo.Layouts.lerg6Main addRecTr(addGlobalSID l):= TRANSFORM
 		self.record_sid					:=  hash64(mdr.sourceTools.src_Phones_Lerg6 + l.ocn + l.npa + l.nxx + l.block_id + l.switch + l.aocn + l.sha_indicator + l.status + l.eff_date + l.dt_start);
 		self 	                	:= l;
 	END;
 
-	addRecID 			:= project(addGlobal_SID, addRecTr(left));
+	addRecID 			:= project(addGlobalSID, addRecTr(left));
 
 EXPORT Map_Lerg6 := addRecID;

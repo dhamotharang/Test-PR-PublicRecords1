@@ -99,7 +99,7 @@ trans_type_desc(string code)
 'COR' => 'CORRECTION',
  '');
 
-Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_MI_clean_in, Watercraft.layout_MI,hull_clean_in)
+Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_MI_clean_in, Watercraft.layout_MI_new,hull_clean_in)
 
 
 watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform

@@ -29,6 +29,7 @@ EXPORT Constants := MODULE
 				20 => 'deeds',
 				21 => 'tax',
 				22 => 'students',
+                23 => 'foreclosure',
 				''));
 
 END;

@@ -21,7 +21,7 @@ EXPORT Update_Base_V2 (
 	EXPORT pNewFile 	:= UPI_DataBuild.Files_V2(pVersion, pUseProd, gcid, pHistMode).from_batch;
 	EXPORT pHistFile	:= UPI_DataBuild.Files_V2(pVersion, pUseProd, gcid, pHistMode).member_base.built;
 
-	EXPORT Clean_addr (pStdFile)	:= FUNCTIONMACRO // this build does not clean names, so adding preferred name here
+	EXPORT Clean_addr (pStdFile)	:= FUNCTIONMACRO
 	
 		expand_base_layout	:= RECORD
 			{pStdFile};
@@ -146,8 +146,6 @@ EXPORT Update_Base_V2 (
 	EXPORT all_others_match (pUpdateFile, pBaseToCheck) := FUNCTIONMACRO
 	
 		match_flag := IF(
-				// dates_match(left.input_dob, right.input_dob)										AND	
-				// dates_match(left.input_guardian_dob, right.input_guardian_dob)										AND	
 				trim(left.input_dob, all) = trim(right.input_dob, all)										AND	
 				trim(left.input_guardian_dob, all) = trim(right.input_guardian_dob, all)										AND	
 				trim(stringlib.stringtouppercase(left.input_gender),left,right)						=
@@ -244,8 +242,8 @@ EXPORT Update_Base_V2 (
 										trim(stringlib.stringtouppercase(udf2),left,right),
 										trim(stringlib.stringtouppercase(udf3),left,right),
 										// trim(stringlib.stringtouppercase(batch_jobid),left,right),
-										//-dt_vendor_last_reported, local);
-										local);
+										-dt_vendor_last_reported, local);
+										// local);
 										
 		RETURN temp_file_sort;
 	ENDMACRO;	
@@ -260,13 +258,23 @@ EXPORT Update_Base_V2 (
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF.startdate								:= ut.EarliestDate(L.startdate, r.startdate);
-			left_rid_non_zero							:= L.source_rid > 0;
-			right_rid_non_zero						:= R.source_rid > 0;
-			both_rid_non_zero_not_equal		:= left_rid_non_zero and right_rid_non_zero and (L.source_rid <> R.source_rid);
-			SELF.source_rid               := IF(both_rid_non_zero_not_equal, skip, (if (left_rid_non_zero, L.source_rid, R.source_rid)));
+			SELF.source_rid               := min(L.source_rid, R.source_rid);
 			SELF.batch_jobid							:= IF(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.batch_jobid, R.batch_jobid);
 			SELF.batch_seq_number					:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.batch_seq_number, R.batch_seq_number);
 			SELF.gcid_name								:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.gcid_name, R.gcid_name);
+			SELF.rid											:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.rid, R.rid);
+			SELF.nomatch_id								:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.nomatch_id, R.nomatch_id);
+			SELF.lexid										:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.lexid, R.lexid);
+			SELF.lexid_score							:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.lexid_score, R.lexid_score);
+			SELF.guardian_lexid						:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.guardian_lexid, R.guardian_lexid);
+			SELF.guardian_lexid_score			:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.guardian_lexid_score, R.guardian_lexid_score);
+			SELF.append_option						:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.append_option, R.append_option);
+			SELF.runtime_threshold				:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.runtime_threshold, R.runtime_threshold);
+			SELF.history_mode							:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.history_mode, R.history_mode);
+			SELF.input_crk								:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.input_crk, R.input_crk);
+			SELF.input_lexid							:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.input_lexid, R.input_lexid);
+			SELF.prev_crk									:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.prev_crk, R.prev_crk);
+			SELF.prev_lexid								:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.prev_lexid, R.prev_lexid);
 			SELF						 		 				  := IF(L.history_or_current = 'C', L, R);	
 		END;
 
@@ -326,8 +334,7 @@ EXPORT Update_Base_V2 (
 								 trim(stringlib.stringtouppercase(left.udf2),left,right)		=
 								 trim(stringlib.stringtouppercase(right.udf2),left,right)		AND
 								 trim(stringlib.stringtouppercase(left.udf3),left,right)		=
-								 trim(stringlib.stringtouppercase(right.udf3),left,right)	AND
-								 (LEFT.source_rid = 0 or RIGHT.source_rid = 0),
+								 trim(stringlib.stringtouppercase(right.udf3),left,right),
 					roll_them(LEFT, RIGHT),LOCAL);
 					
 		RETURN rolled_base;
@@ -344,9 +351,16 @@ EXPORT Update_Base_V2 (
 	EXPORT mark_old (pBaseFile) := FUNCTIONMACRO
 	
 		old_base	:= project(pBaseFile, TRANSFORM(UPI_DataBuild.Layouts_V2.Input_processing, 
-				SELF.current_input	:= 'N',
+				SELF.current_input		:= 'N',
+				SELF.batch_seq_number := '',
+				SELF.batch_jobid			:= '',
+				SELF.prev_crk					:= '',
+				SELF.prev_lexid				:= 0,
+				SELF.crk_changed			:= '',
+				SELF.lexid_changed		:= '',
 				SELF								:= left));
-		RETURN old_base;
+		deduped_old_base := dedup(sort(old_base, record, local), record, local);
+		RETURN deduped_old_base;
 	ENDMACRO;
 	
 	EXPORT Pre_Process_Input := FUNCTION
@@ -360,8 +374,11 @@ EXPORT Update_Base_V2 (
    	END;	
 							
  	EXPORT Processed_Input:= FUNCTION
-								
-				pre_processed_input	:= pre_process_input;
+	
+				use_threshold					:= if(pAppendOption = '4', 90, pLexidThreshold);
+												
+				pre_processed_input		:=  Append_LexID(pVersion, pUseProd, gcid, use_threshold, pHistMode, pBatch_jobID, pre_process_input).LexID_Append;
+
 								
 				previous_base		:= IF(NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0
 												 ,dataset([],upi_databuild.Layouts_V2.input_processing)
@@ -369,50 +386,48 @@ EXPORT Update_Base_V2 (
 																				transform(UPI_DataBuild.Layouts_V2.Input_processing, self := left, self := []))));
 												 						
 				stdInput			:= dist_and_sort_them(pre_processed_input);
-				ds_current		:= dist_and_sort_them(previous_base);
+				
+				ds_current		:= dist_and_sort_them(roll_them_up(previous_base));
 				
 				// Right now we don't care about historical only records, that will be handled after CRK results
 				// First we want to compare the new input to the old base to re-use source_rid for any previously
 				// processed individuals (where we can clearly identify as the same individual)
 				UPI_DataBuild.Layouts_V2.input_processing reuse_existing_source_rids(UPI_DataBuild.Layouts_V2.input_processing new_update, UPI_DataBuild.Layouts_v2.input_processing last_built_base) := TRANSFORM
-					// SELF.current_input						:= 'Y';
-					// SELF.batch_jobid							:= new_update.batch_jobid;
-					// SELF.batch_seq_number					:= new_update.batch_seq_number;
 					SELF.source_rid								:= last_built_base.source_rid;
-					// SELF.prev_crk									:= last_built_base.crk;
-					// SELF.prev_lexid								:= last_built_base.lexid;
 					SELF.prev_crk									:= new_update.input_crk;
 					SELF.prev_lexid								:= new_update.input_lexid;
 					SELF 													:= new_update;
 					SELF													:= [];
 				END;
 				
-				assign_existing_source_rids := JOIN(stdInput, ds_current, 
+				assign_existing_source_rids := DEDUP(SORT(JOIN(stdInput, ds_current, 
 									name_fields_match(stdInput, ds_current)		AND
 									addresses_match(stdInput, ds_current)			AND
 									all_others_match(stdInput, ds_current),
-								reuse_existing_source_rids(LEFT, RIGHT), LOCAL);	
+								reuse_existing_source_rids(LEFT, RIGHT),LEFT OUTER, LOCAL), RECORD, LOCAL), RECORD, LOCAL);	
 								
+				no_existing_source_rids 	:= assign_existing_source_rids(source_rid = 0);
+				with_existing_source_rids	:= assign_existing_source_rids(source_rid > 0);				
 				// Second join - this one is to identify the truly new records and assign new source_rids
 		
 				UPI_DataBuild.Layouts_V2.input_processing find_new_recs(UPI_DataBuild.Layouts_V2.input_processing new_update, UPI_DataBuild.Layouts_V2.input_processing last_built_base) := TRANSFORM
 					SELF.current_input						:= 'Y';
 					SELF.batch_jobid							:= new_update.batch_jobid;
 					SELF.batch_seq_number					:= new_update.batch_seq_number;
-					SELF.prev_crk									:= new_update.input_crk;
-					SELF.prev_lexid								:= new_update.input_lexid;
+					SELF.prev_crk									:= if(pHistMode = 'A', last_built_base.crk, new_update.input_crk);
+					SELF.prev_lexid								:= if(pHistMode = 'A', last_built_base.lexid, new_update.input_lexid);
 					SELF 													:= new_update;
 					SELF													:= [];
 				END;
 
-				truly_new_recs := JOIN(stdInput, ds_current,
-									name_fields_match(stdInput, ds_current)		AND
-									addresses_match(stdInput, ds_current)			AND
-									all_others_match(stdInput, ds_current),
+				truly_new_recs := JOIN(no_existing_source_rids, ds_current,
+									name_fields_match(no_existing_source_rids, ds_current)		AND
+									addresses_match(no_existing_source_rids, ds_current)			AND
+									all_others_match(no_existing_source_rids, ds_current),
 								find_new_recs(LEFT, RIGHT), LEFT ONLY, LOCAL);
 
 				// add the two together to assign new source_rids
-				recombined_input	:= assign_existing_source_rids + truly_new_recs;  
+				recombined_input	:= with_existing_source_rids + truly_new_recs;  
 								
 				need_rid					:= recombined_input(source_rid = 0);
 				has_rid						:= recombined_input(source_rid > 0);
@@ -423,9 +438,7 @@ EXPORT Update_Base_V2 (
 				
 				all_rids	:= has_rid + new_rid;
 				
-				prepped_input := Append_LexID(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, pBatch_jobID, all_rids).LexID_Append;
-					
-   		RETURN sort(prepped_input, batch_seq_number);
+   		RETURN sort(all_rids, batch_seq_number);
 	END;
 		
  	EXPORT Add_CRK_results := FUNCTION
@@ -439,42 +452,58 @@ EXPORT Update_Base_V2 (
 												 ,mark_old(project(UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
 																				transform(UPI_DataBuild.Layouts_V2.Input_processing, self := left, self := []))));
 				
-				update_current_batch	:= join(sort(distribute(crk_results,hash(source_rid)),source_rid,local)
+				update_current_batch	:= dedup(sort(join(sort(distribute(crk_results,hash(source_rid)),source_rid,local)
 														,sort(distribute(linked_input_file,hash(source_rid)),source_rid,local)
 														,LEFT.source_rid = RIGHT.source_rid AND
 														 RIGHT.current_input = 'Y'
 														,TRANSFORM(UPI_DataBuild.Layouts_V2.input_processing
+																,SELF.input_crk			:= RIGHT.input_crk
+																,SELF.input_lexid		:= RIGHT.input_lexid
 																,SELF.prev_crk			:= RIGHT.prev_crk
 																,SELF.prev_lexid		:= RIGHT.prev_lexid
 																,SELF.crk						:= LEFT.crk
 																,SELF.nomatch_id		:= LEFT.nomatch_id
 																,SELF.rid						:= LEFT.rid
-																,SELF.crk_changed		:= if(RIGHT.input_crk = LEFT.crk, 'N', 'Y')
-																,SELF.lexid_changed	:= if(RIGHT.input_lexid = LEFT.lexid, 'N', 'Y')
+																,SELF.crk_changed		:= map(RIGHT.input_crk <> '' AND RIGHT.input_crk =  LEFT.crk => 'N'
+																													,RIGHT.input_crk <> '' AND RIGHT.input_crk <> LEFT.crk => 'Y'
+																													,RIGHT.input_crk = '' => ''
+																													,'')
+																,SELF.lexid_changed	:= map(RIGHT.input_lexid > 0 AND RIGHT.input_lexid =  LEFT.lexid => 'N'
+																													,RIGHT.input_lexid > 0 AND RIGHT.input_lexid <> LEFT.lexid => 'Y'
+																													,RIGHT.input_lexid = 0 => ''
+																													,'')
 																,SELF           		:= RIGHT
 																,SELF								:= LEFT)
 														,RIGHT OUTER
-														,LOCAL);
+														,LOCAL), RECORD, LOCAL), RECORD, LOCAL);
 				
-				update_older_records	:= join(sort(distribute(crk_results,hash(source_rid)),source_rid,local)
+				update_older_records	:= dedup(sort(join(sort(distribute(crk_results,hash(source_rid)),source_rid,local)
 														,sort(distribute(previous_base,hash(source_rid)),source_rid,local)
 														,LEFT.source_rid = RIGHT.source_rid AND
 														 RIGHT.current_input = 'N'
 														,TRANSFORM({previous_base}
-																,SELF.prev_crk			:= RIGHT.input_crk
-																,SELF.prev_lexid		:= RIGHT.input_lexid
+																,SELF.input_crk			:= RIGHT.input_crk
+																,SELF.input_lexid		:= RIGHT.input_lexid
+																,SELF.prev_crk			:= RIGHT.prev_crk
+																,SELF.prev_lexid		:= RIGHT.prev_lexid
 																,SELF.crk						:= LEFT.crk
 																,SELF.nomatch_id		:= LEFT.nomatch_id
 																,SELF.rid						:= LEFT.rid
-																,SELF.crk_changed		:= if(RIGHT.input_crk = LEFT.crk, 'N', 'Y')
-																,SELF.lexid_changed	:= if(RIGHT.input_lexid = LEFT.lexid, 'N', 'Y')
+																,SELF.crk_changed		:= map(RIGHT.input_crk <> '' AND RIGHT.input_crk =  LEFT.crk => 'N'
+																													,RIGHT.input_crk <> '' AND RIGHT.input_crk <> LEFT.crk => 'Y'
+																													,RIGHT.input_crk = '' => ''
+																													,'')
+																,SELF.lexid_changed	:= map(RIGHT.input_lexid > 0 AND RIGHT.input_lexid =  LEFT.lexid => 'N'
+																													,RIGHT.input_lexid > 0 AND RIGHT.input_lexid <> LEFT.lexid => 'Y'
+																													,RIGHT.input_lexid = 0 => ''
+																													,'')
 																,SELF           		:= RIGHT)
 														,RIGHT OUTER
-														,LOCAL);
+														,LOCAL), RECORD, LOCAL), RECORD, LOCAL);
 														
-				ds_current		:= Clean_addr(update_older_records);	
+				ds_current		:= dedup(sort(update_older_records, record, local), record, local);	
 
-				stdInput := update_current_batch;
+				stdInput := dedup(sort(update_current_batch, record, local), record, local);
 				
 				// First of a series of 3 joins - the first is to determine the truly historical records, which in this build logic are those
 				// that have previously been processed, and then do not appear again in the new update
@@ -485,8 +514,8 @@ EXPORT Update_Base_V2 (
 					SELF.dt_vendor_first_reported	:= ut.EarliestDate(new_update.dt_vendor_first_reported, last_built_base.dt_vendor_first_reported);
 					SELF.dt_vendor_last_reported	:= max(new_update.dt_vendor_last_reported, last_built_base.dt_vendor_last_reported);
 					SELF.dt_last_seen							:= max(new_update.dt_last_seen, last_built_base.dt_last_seen);
-					SELF.batch_jobid							:= max(new_update.batch_jobid, last_built_base.batch_jobid);
-					SELF.batch_seq_number					:= if((integer)new_update.batch_jobid > (integer)last_built_base.batch_jobid, new_update.batch_seq_number, last_built_base.batch_seq_number);
+					SELF.batch_jobid							:= new_update.batch_jobid;
+					SELF.batch_seq_number					:= new_update.batch_jobid;
 					SELF.gcid_name								:= new_update.gcid_name;
 					SELF.prev_crk									:= new_update.input_crk;
 					SELF.prev_lexid								:= new_update.input_lexid;
@@ -496,11 +525,11 @@ EXPORT Update_Base_V2 (
 					SELF													:= [];
 				END;
 
-				historical_only := JOIN(stdInput, ds_current, 
+				historical_only := dedup(sort(JOIN(stdInput, ds_current, 
 									name_fields_match(stdInput, ds_current)		AND
 									addresses_match(stdInput, ds_current)			AND
 									all_others_match(stdInput, ds_current),
-								find_truly_historical(LEFT, RIGHT), RIGHT ONLY, LOCAL);
+								find_truly_historical(LEFT, RIGHT), RIGHT ONLY, LOCAL), RECORD, LOCAL), RECORD, LOCAL);
 								
 				// Second join, this one is to update the records that have been seen previously and update the dt_last_seen and 
 				// dt_vendor_last_reported, and make sure the history_or_current flag is C
@@ -521,15 +550,19 @@ EXPORT Update_Base_V2 (
 					SELF.input_crk								:= new_update.input_crk;
 					SELF.input_lexid							:= new_update.input_lexid;
 					SELF.current_input						:= 'Y';
-					SELF 													:= last_built_base;
+					SELF 													:= new_update;
 					SELF													:= [];
 				END;
 				
-				update_existing_recs := JOIN(stdInput, ds_current, 
+				update_existing_recs := JOIN(sort(stdInput, source_rid), sort(ds_current, source_rid),
+									LEFT.source_rid = RIGHT.source_rid				AND
 									name_fields_match(stdInput, ds_current)		AND
 									addresses_match(stdInput, ds_current)			AND
 									all_others_match(stdInput, ds_current),
-								update_already_seen_recs(LEFT, RIGHT), LOCAL);	
+								update_already_seen_recs(LEFT, RIGHT), LEFT OUTER, LOCAL);	
+								
+				still_need_update	:= dedup(sort(update_existing_recs(crk = ''), record, local), record, local);
+				has_update				:= dedup(sort(update_existing_recs(crk <> ''), record, local), record, local);
 								
 				// Last of three joins - this one is to identify the truly new records and process them as usual
 		
@@ -543,45 +576,56 @@ EXPORT Update_Base_V2 (
 					SELF							:= [];
 				END;
 
-				truly_new_recs := JOIN(stdInput, ds_current,
-									name_fields_match(stdInput, ds_current)		AND
-									addresses_match(stdInput, ds_current)			AND
-									all_others_match(stdInput, ds_current),
+				truly_new_recs := JOIN(still_need_update, ds_current,
+									name_fields_match(still_need_update, ds_current)		AND
+									addresses_match(still_need_update, ds_current)			AND
+									all_others_match(still_need_update, ds_current)			AND
+									LEFT.batch_seq_number <> '',
 								find_new_recs(LEFT, RIGHT), LEFT ONLY, LOCAL);
 
 				// add all three pieces together
-				recombined 		:= roll_them_up(historical_only + update_existing_recs + truly_new_recs);  
-								
-				recombined_roll	:= roll_them_up(recombined);
+				recombined 		:= historical_only + has_update + truly_new_recs; 
 				
-				new_base	:= PROJECT(recombined_roll
+				dedup_recombined	:= dedup(sort(recombined, record, local), record, local);
+
+				new_base	:= PROJECT(dedup_recombined
 														,TRANSFORM({UPI_DataBuild.Layouts_V2.input_processing}
-																,SELF.crk_changed		:= if(LEFT.input_crk = LEFT.crk, 'N', 'Y')
-																,SELF.lexid_changed	:= if(LEFT.input_lexid = LEFT.lexid, 'N', 'Y')
+																,SELF.crk_changed		:= map(LEFT.input_crk <> '' AND LEFT.input_crk =  LEFT.crk => 'N'
+																													,LEFT.input_crk <> '' AND LEFT.input_crk <> LEFT.crk => 'Y'
+																													,LEFT.input_crk = '' => ''
+																													,'')
+																,SELF.lexid_changed	:= map(LEFT.input_lexid > 0 AND LEFT.input_lexid =  LEFT.lexid => 'N'
+																													,LEFT.input_lexid > 0 AND LEFT.input_lexid <> LEFT.lexid => 'Y'
+																													,LEFT.input_lexid = 0 => ''
+																													,'')
 																,SELF           		:= LEFT));
+																
+				dedup_base	:= dedup(sort(new_base, record, local), record, local);	
 					
-   		RETURN sort(new_base, batch_seq_number);
+   		RETURN sort(dedup_base, batch_seq_number);
    	END; 
 		
+		EXPORT PrepReturn			:= FUNCTION
+		   	
+   				this_batch_only	:= dedup(Add_CRK_Results(batch_jobid = pBatch_jobID), record);
+   					
+   				prepReturn_file		:= UPI_DataBuild.ReturnToBatch(pVersion, pUseProd, gcid, this_batch_only, pAppendOption).batch_processing;
+						
+					RETURN sort(prepReturn_file, batch_seq_number);
+		END;
+
  		EXPORT Return_ToBatch := FUNCTION
    					
-   				this_batch_only	:= Add_CRK_Results(current_input = 'Y');
-   					
-   				prepReturn		:= UPI_DataBuild.ReturnToBatch(pVersion, pUseProd, gcid, this_batch_only, pAppendOption).batch_processing;
-   					//AppendOption:
-   					// 1 - Append LexID to records with LexID match AND Customer Record Key for all records
-   					// 2 - Append LexID to records with LexID match AND Customer Record Key ONLY for records with NO LEXID
-   					// 3 - Append LexID ONLY to records with LexID match and DO NOT append Customer Record Key for any records
-   					// 4 - Append ONLY Customer Record Key for all records - NO LEXID appends for any records
-   				
-      		RETURN prepReturn;
+					slimReturn	:= project(prepReturn, UPI_DataBuild.layouts_V2.to_batch);
+					
+					sortReturn	:= sort(slimReturn, (integer)batch_seq_number);
+						
+      		RETURN sortReturn;
    		END;	
 		
  	EXPORT Return_Metrics	:= FUNCTION
    	
-   				base_file		:= UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.built;
-   				
-   				this_batch_only	:= Add_CRK_results(current_input = 'Y');
+   				this_batch_only	:= prepReturn;
    				
    				prepMetrics		:= UPI_DataBuild.Metrics_Report(pVersion, pUseProd, gcid, this_batch_only).get_all;
    				
@@ -590,9 +634,10 @@ EXPORT Update_Base_V2 (
 	
   	EXPORT All_Data_Base := FUNCTION
    	
-   			new_base	:= project(Add_CRK_results, UPI_DataBuild.Layouts_V2.base);
-   			
-   			RETURN sort(new_base, batch_seq_number);
+   			new_base			:= project(Add_CRK_results, UPI_DataBuild.Layouts_V2.base); 
+ 				rolled_base		:= dist_and_sort_them(roll_them_up(new_base));
+  			
+   			RETURN rolled_base;
    	END;
 												
 END;

@@ -1825,6 +1825,25 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2019/1893 Venezuela List','1812'},
 {'EC 2019/1891 Venezuela List','1813'},
 {'EC (CFSP) 2019/1944 ISIL (Da\'esh) and Al-Qaeda List','1814'},
-{'EC 2019/1943 ISIL (Da\'esh) and Al-Qaida List','1815'}
+{'EC 2019/1943 ISIL (Da\'esh) and Al-Qaida List','1815'},
+{'CSSF (Luxembourg) Sanctions and Administrative Measures','1816'},
+{'OFAC - Countering America\'s Adversaries Through Sanctions Act of 2017 (CAATSA)','1817'},
+{'RePET (Argentina) Public Registry of People and Entities Linked to Terrorist Acts and Financing','1818'},
+{'EC (CFSP) 2019/2109 Democratic Republic of the Congo List','1819'},
+{'EC 2019/2101 Democratic Republic of the Congo List','1820'},
+{'EC 2019/2105 Banned Air Carriers List','1821'},
+{'Finance and Economy Ministry (Monaco) Economic Sanctions','1822'},
+{'Finance and Economy Ministry (Monaco) Terrorism Sanctions','1823'},
+{'UN Security Council Resolution 1267 (1999), 1989 (2011) 2253 (2015) ISIL (Da\'esh) and Al-Qaida Sanctions List','1824'},
+{'UN Security Council Resolution 1533 (2004) Democratic Republic of the Congo List','1825'},
+{'UN Security Council Resolution 1581 (2003) Iraq List','1826'},
+{'UN Security Council Resolution 1591 (2005) Sudan','1827'},
+{'UN Security Council Resolution 1988 (2011) List','1828'},
+{'UN Security Council Resolution 2127 (2013) Central African Republic List','1829'},
+{'UN Security Council Resolution 751 (1992) Somalia List','1830'},
+{'EC (CFSP) 2020/9 Mali List','1831'},
+{'EC 2020/8 Mali List','1832'},
+{'Greater Jakarta Metropolitan Regional Police Wanted List','1833'},
+{'OFAC - North Korea Sanctions and Policy Enhancement Act of 2016','1834'}
 ],r);
 

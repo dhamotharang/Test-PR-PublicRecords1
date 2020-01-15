@@ -1,4 +1,4 @@
-﻿import header, did_add, ut, data_services;
+﻿import header, did_add, ut, data_services, dx_header;
 
 export stat(boolean incremental=FALSE, string filedate=header.version_build, string operatorEmailList) := module
 
@@ -11,7 +11,7 @@ export stat(boolean incremental=FALSE, string filedate=header.version_build, str
 SHARED  NewHeaderFile  := if(~incremental,NewHeaderFileN,NewHeaderFileI);
 
 SHARED loc     := Data_Services.Data_location.prefix('person_header');
-export New_Key := dataset(loc + NewHeaderFile,header.layout_header,flat);
+export New_Key := dataset(loc + NewHeaderFile,dx_header.layout_header,flat);
 
 shared NewHeader     := 'header_raw_'+filedate;
 

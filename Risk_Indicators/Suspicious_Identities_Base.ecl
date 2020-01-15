@@ -7,7 +7,9 @@ hf1 := doxie_build.file_header_building(did!=0 AND ~iid_constants.filtered_sourc
 h_quick := PROJECT( header_quick.file_header_quick(did!=0 AND ~iid_constants.filtered_source(src, st)), TRANSFORM(Header.Layout_Header, self.src := IF(left.src in ['QH', 'WH'], MDR.sourceTools.src_Equifax, left.src), SELF := LEFT));
 headerprod_building := UNGROUP(hf1 + h_quick);
 
-base_hf := DISTRIBUTE(PROJECT(headerprod_building(dt_last_seen<>0),TRANSFORM(Header.Layout_Header, SELF := LEFT)), HASH(did));
+base_hf_before_suppress := DISTRIBUTE(PROJECT(headerprod_building(dt_last_seen<>0),TRANSFORM(Header.Layout_Header, SELF := LEFT)), HASH(did));
+
+base_hf := fn_suppress_ccpa(base_hf_before_suppress, TRUE, 'RiskTable', 'src', 'global_sid', TRUE); // CCPA-795: OptOut Prefilter Data Layer
 
 did_slim := RECORD
 	base_hf.did;
@@ -82,4 +84,6 @@ suspicious_identities := join(suspicious_header,dids_with_suspicious_ssns, left.
 		// ), full outer, local) : persist('persist::suspicious_identities');
 // output(suspicious_ssns,,'~dvstemp::out::suspicious_ssns_testing');
 
-EXPORT Suspicious_Identities_Base := suspicious_identities;
+	addGlobalSID := mdr.macGetGlobalSID(suspicious_identities,'RiskTable_Virtual','','global_sid'); //DF-26530: Populate Global_SID Field
+
+EXPORT Suspicious_Identities_Base := addGlobalSID;

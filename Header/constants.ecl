@@ -1,4 +1,4 @@
-export constants := module
+﻿export constants := module
 
 export ssn_indicators := module
 
@@ -80,5 +80,12 @@ export checkRNA := true; // there are additional glb and dppa restrictions for R
   END;
 
  EXPORT current_resident := 'CURR_RES';
+ 
+  // defines permissions required for accessing individual best record or fields
+  EXPORT PERM_TYPE := ENUM(unsigned1,
+    d2c                      = 1b,      //infutor
+    marketing                = 10b,     //marketing
+    marketing_noneq          = 100b     //marketing_noneq
+   );
 
 end;

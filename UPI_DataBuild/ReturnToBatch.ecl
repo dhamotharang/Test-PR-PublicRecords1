@@ -10,9 +10,9 @@ EXPORT ReturnToBatch (string pVersion, boolean pUseProd = false, string gcid, da
 		// 2 - Append LexID to records with LexID match AND Customer Record Key ONLY for records with NO LEXID
 		// 3 - Append LexID ONLY to records with LexID match and DO NOT append Customer Record Key for any records
 		// 4 - Append ONLY Customer Record Key for all records - NO LEXID appends for any records
+		// change flags null when input_lexid or input_crk fields are null/zero
 
-		UPI_DataBuild.layouts_V2.to_batch tMapping(UPI_DataBuild.layouts_V2.input_processing L) := TRANSFORM
-		// UPI_DataBuild.layouts_V2.input_processing tMapping(UPI_DataBuild.layouts_V2.input_processing L) := TRANSFORM
+		UPI_DataBuild.layouts_V2.input_processing tMapping(UPI_DataBuild.layouts_V2.input_processing L) := TRANSFORM
 			self.batch_seq_number							:= L.batch_seq_number;
 			self.input_lexid									:= L.input_lexid;
 			self.input_crk										:= L.input_crk;
@@ -55,25 +55,33 @@ EXPORT ReturnToBatch (string pVersion, boolean pUseProd = false, string gcid, da
 																							 L.append_option = '3' => L.lexid_score,
 																							 L.append_option = '4' => 0,
 																							 L.lexid_score); 
-			self.lexid_changed								:= map(L.append_option = '1' => L.lexid_changed,
-																							 L.append_option = '2' => L.lexid_changed,
-																							 L.append_option = '3' => L.lexid_changed,
-																							 L.append_option = '4' => 'N',
-																							 L.lexid_changed); 
-			self.prev_lexid										:= L.prev_lexid; 
+			self.lexid_changed								:= map(L.input_lexid = 0 => ''
+																							,L.append_option = '1' AND L.input_lexid > 0 AND L.input_lexid <> L.lexid => 'Y'
+																							,L.append_option = '1' AND L.input_lexid > 0 AND L.input_lexid =  L.lexid => 'N'
+																							,L.append_option = '2' AND L.input_lexid > 0 AND L.input_lexid <> L.lexid => 'Y'
+																							,L.append_option = '2' AND L.input_lexid > 0 AND L.input_lexid =  L.lexid => 'N'	
+																							,L.append_option = '3' AND L.input_lexid > 0 AND L.input_lexid <> L.lexid => 'Y'
+																							,L.append_option = '3' AND L.input_lexid > 0 AND L.input_lexid =  L.lexid => 'N'
+																							,L.append_option = '4' => ''
+																							,''); 
+			self.prev_lexid										:= L.input_lexid; 
 			self.crk													:= map(L.append_option = '1' => L.crk,
 																							 L.append_option = '2' AND self.lexid = 0 => L.crk,
 																							 L.append_option = '2' AND self.lexid > 0 => '',
 																							 L.append_option = '3' => '',
 																							 L.append_option = '4' => L.crk,
 																							 L.crk);
-			self.crk_changed									:= map(L.append_option = '1' => L.crk_changed,
-																							 L.append_option = '2' AND self.lexid = 0 => L.crk_changed,
-																							 L.append_option = '2' AND self.lexid > 0 => 'N',
-																							 L.append_option = '3' => 'N',
-																							 L.append_option = '4' => L.crk_changed,
-																							 L.crk_changed);
-			self.prev_crk											:= L.prev_crk;
+			self.crk_changed									:= map(L.input_crk = '' => ''
+																							,L.append_option = '1' AND L.input_crk <> '' AND L.input_crk <> L.crk => 'Y'
+																							,L.append_option = '1' AND L.input_crk <> '' AND L.input_crk =  L.crk => 'N'
+																							,L.append_option = '2' AND SELF.lexid > 0 => ''
+																							,L.append_option = '2' AND L.input_crk <> '' AND L.input_crk <> L.crk AND SELF.lexid = 0 => 'Y'
+																							,L.append_option = '2' AND L.input_crk <> '' AND L.input_crk =  L.crk AND SELF.lexid = 0 => 'N'
+																							,L.append_option = '3' => ''
+																							,L.append_option = '4' AND L.input_crk <> '' AND L.input_crk <> L.crk => 'Y'
+																							,L.append_option = '4' AND L.input_crk <> '' AND L.input_crk =  L.crk => 'N'
+																							,'');
+			self.prev_crk											:= L.input_crk;
 			SELF  :=  L;	
 			SELF  :=  [];
 		END;
@@ -85,7 +93,9 @@ EXPORT ReturnToBatch (string pVersion, boolean pUseProd = false, string gcid, da
 
 		reformatFile	:= project(pBaseFile, tMapping(left));
 		
-		sort_return	:= sort(reformatFile, (integer)batch_seq_number);
+		dedup_return	:= dedup(sort(reformatFile, record, local), record, local);
+		
+		sort_return	:= sort(dedup_return, (integer)batch_seq_number);
 		
 		RETURN sort_return;
 	END;
