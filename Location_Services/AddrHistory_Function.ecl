@@ -1,24 +1,12 @@
-﻿import address, AutoStandardI, DeathV2_Services, dx_BestRecords, doxie, doxie_raw, doxie_ln, dx_death_master,
+﻿import address, DeathV2_Services, dx_BestRecords, doxie, doxie_raw, doxie_ln, dx_death_master,
        LN_PropertyV2, LN_PropertyV2_Services, location_services, MDR, property, risk_indicators, 
        STD, ut;
 
 todays_date := (string) STD.Date.Today();
 
 export AddrHistory_Function(dataset(location_services.Layout_AddrHistory_In) inrecs,
-                            unsigned1 glbperms,
-                            unsigned1 dppaperms,
-                            boolean ln_branded_val,
-                            boolean prob_override_val,
-                            string32 appType) :=
+                            doxie.IDataAccess mod_access) :=
 function
-
-mod_access := module(doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
-  EXPORT boolean ln_branded := ln_branded_val;
-  EXPORT boolean probation_override := prob_override_val;
-  EXPORT string32 application_type := appType;
-  EXPORT unsigned1 glb := glbperms;
-  EXPORT unsigned1 dppa := dppaperms;
-end;
 
 death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
@@ -57,10 +45,10 @@ dids := dedup(sort(project(withdid, doxie.layout_references), did), did);
 doxie.mac_best_records(dids,
                        did,
                        best_recs,
-                       1,
+                       0, //not used
                        glb_ok,
                        ,
-                       doxie.DataRestriction.fixed_DRM,
+                       mod_access.DataRestrictionMask,
                        include_DOD:=true);
 
 withdid get_best_info (withdid L, best_recs R) := transform
@@ -506,10 +494,10 @@ hrs_dids := dedup(sort(project(hrs_withownership, doxie.layout_references), did)
 doxie.mac_best_records(hrs_dids,
                        did,
                        best_hrs_recs,
-                       1,
+                       0, //not used
                        glb_ok,
                        ,
-                       doxie.DataRestriction.fixed_DRM);
+                       mod_access.DataRestrictionMask);
 
 hrs_withownership check_current(hrs_withownership L, best_hrs_recs R) := transform
   self.current_addr := if (L.prim_range = r.prim_range and L.prim_name = r.prim_name and
@@ -613,10 +601,10 @@ currentdids := doxie.did_from_address(clas, true);
 doxie.mac_best_records(currentdids,
                        did,
                        outfile,
-                       dppa_ok,
+                       0, //not used
                        glb_ok,
                        ,
-                       doxie.DataRestriction.fixed_DRM,
+                       mod_access.DataRestrictionMask,
                        include_DOD:=true);
 
 currentbests0 := project(outfile, transform(dx_BestRecords.Layout_Best,
@@ -776,10 +764,10 @@ dids_for_best := project(prev_hdrs_prev_props, transform(doxie.layout_references
 doxie.mac_best_records(dids_for_best,
                        did,
                        outfile2,
-                       dppa_ok,
+                       0, //not used
                        glb_ok,
                        ,
-                       doxie.DataRestriction.fixed_DRM,
+                       mod_access.DataRestrictionMask,
                        include_DOD:=true);
 
 prev_hdr_wDOD := join(prev_hdrs_prev_props, outfile2,
