@@ -1,12 +1,13 @@
-﻿IMPORT Tools;
-EXPORT _Constants(
+IMPORT Tools;
+
+EXPORT Constants(
 
 	BOOLEAN	pUseOtherEnvironment	= FALSE
 
 ) :=
 Tools.Constants(
 
-	 pDatasetName					:= 'DataBridge'
+	 pDatasetName					:= 'Database_USA'
 	,pUseOtherEnvironment	:= pUseOtherEnvironment
 	,pGroupname						:= ''
 	,pMaxRecordSize       := 4096
