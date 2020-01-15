@@ -1277,6 +1277,7 @@
 				trim(kword, left, right) = 'EU-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_MAL,
 				trim(kword, left, right) = 'OFAC-EO13871' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13871,
 				trim(kword, left, right) = 'LTLRC' =>SubGroup_Constants.numKeywordsID.KEYWORD_LTLRC,
+				trim(kword, left, right) = 'OFAC-NKSPEA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_NKSPEA,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
