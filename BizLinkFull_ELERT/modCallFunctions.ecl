@@ -7,10 +7,12 @@ IMPORT Business_Header_SS;
 EXPORT modCallFunctions := MODULE 
   //Change all of this to match your data. -ZRS 4/8/2019    
   //Main Thor Call for Healthcare Provider Header
-  EXPORT DATASET(modLayouts.lSampleLayout) fCallWrapperIdAppendThor(DATASET(pkgQAMonitor.modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bForce=TRUE,BOOLEAN isFuzzy=FALSE, BOOLEAN zipRadius=FALSE, STRING inUrl='', STRING inSvcName='') := FUNCTION
+  EXPORT DATASET(modLayouts.lSampleLayout) fCallWrapperIdAppendThor(DATASET(pkgQAMonitor.modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bForce=TRUE,BOOLEAN isFuzzy=FALSE, BOOLEAN zipRadius=FALSE, STRING inUrl='', STRING inSvcName='', BOOLEAN bUseSourceRid=FALSE) := FUNCTION
 		// dThorInput := dInData(source not in ['T1','T2','T3','T4','T5', 'T', 'P', 'B#']);
 		dThorInput := project(distribute(dInData, uniqueId), transform(pkg1.IdAppendLayouts.AppendInput, 
 																						 self.request_id := left.uniqueId;
+																						 self.source := IF(bUseSourceRid, left.src_category, left.source);
+																						 self.source_record_id := IF(bUseSourceRid, left.source_record_id, 0);
 																						 self := left, 
 																						 Self:=[]));  
 
@@ -36,11 +38,13 @@ EXPORT modCallFunctions := MODULE
 																																											));
   END;
  
- EXPORT DATASET(modLayouts.lSampleLayout) fCallWrapperIdAppendRoxie(DATASET(pkgQAMonitor.modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bForce=FALSE,BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='') := FUNCTION
+ EXPORT DATASET(modLayouts.lSampleLayout) fCallWrapperIdAppendRoxie(DATASET(pkgQAMonitor.modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bForce=FALSE,BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='', BOOLEAN bUseSourceRid=FALSE) := FUNCTION
    
 	
 	dRoxieInput := project(dInData, transform(pkg1.IdAppendLayouts.AppendInput, 
 																						 self.request_id := left.uniqueId;
+																						 self.source := IF(bUseSourceRid, left.src_category, left.source);
+																						 self.source_record_id := IF(bUseSourceRid, left.source_record_id, 0);
 																						 self := left, 
 																						 Self:=[]));  
 	groupSize := 5;
@@ -71,7 +75,7 @@ EXPORT modCallFunctions := MODULE
 								self.ds := project(pkg1.IdAppendRoxieRemote(left.grp_ds
 																			,iscore // 75 is the default, valid values are >= 51 and <= 100
 																			,iweight // default is 0. Can be set higher to ensure a stronger match
-																			,bForce
+																			,not bForce
 																			,true  //reappend
 																			,false //primForcePost
 																			,isFuzzy
@@ -119,7 +123,7 @@ EXPORT modCallFunctions := MODULE
     END;
 
 //IdFunctions call
- EXPORT DATASET(modLayouts.lSampleLayout) fCallWrapperIdFunctions(DATASET(pkgQAMonitor.modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bForce=FALSE,BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='') := FUNCTION
+ EXPORT DATASET(modLayouts.lSampleLayout) fCallWrapperIdFunctions(DATASET(pkgQAMonitor.modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bForce=FALSE,BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='', BOOLEAN bUseSourceRid=FALSE) := FUNCTION
 
 
 
@@ -234,7 +238,7 @@ EXPORT modCallFunctions := MODULE
 												
 	END; 
 
-EXPORT DATASET(modLayouts.lSampleLayout) fCallWrapperMMF(DATASET(pkgQAMonitor.modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bForce=FALSE,BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='') := FUNCTION
+EXPORT DATASET(modLayouts.lSampleLayout) fCallWrapperMMF(DATASET(pkgQAMonitor.modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bForce=FALSE,BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='', BOOLEAN bUseSourceRid=FALSE) := FUNCTION
 
 lMmfInput := RECORD
   UNSIGNED   acctno;
@@ -293,6 +297,8 @@ END;
 																									SELF.company_sic_code1 := LEFT.sic_code;
 																									SELF.company_url := LEFT.url;
 																									SELF.contact_email := left.email;
+																									self.source := IF(bUseSourceRid, left.src_category, left.source);
+																						 			self.source_record_id := IF(bUseSourceRid, left.source_record_id, 0);
 																									SELF := LEFT));
 
 

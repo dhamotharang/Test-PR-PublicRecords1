@@ -60,7 +60,7 @@ EXPORT macMaster(
                                       '\niExpireTime := ' + iExpireTime + ';' + 
                                       '\nsSamplesFileName := \'' + sSamplesFileName + '\';' +     
                                       '\nsEmailTo := \'' + sEmailList + '\';' +     
-                                      '\nsInPrefix := \'' + sInPrefix + '\';' +     
+                                      '\nsInPrefix := \'' + sInPrefix + '\';' + 
 																			'\ndSamples := BizLinkFull_ELERT.modFiles(sInPrefix).dSamples;' +
                                       '\n#WORKUNIT(\'name\',\'BizLinkFull_ELERT Generate Samples \' + sVersion);' +
 																			'\nBizLinkFull_ELERT.macAnalyzeSamples(dSamples, dProfile, sVersion); //makes csvStats available\n' +
