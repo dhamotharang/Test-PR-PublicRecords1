@@ -77,7 +77,7 @@ dr := contactcard.FinderRecords(dids, mod_access).SubjectDeathRecords;
 
 // attach death indicators, using "best" death record; note, 'si' has no more than 1 row
 rec.subject_rec dodWork(contactcard.layouts.subject_rec l) := transform
-  r := dr[1];
+  r := topn(dr, 1, did, dod8, if(IsLimitedAccessDMF, 1, 0))[1];
   iDOB := (unsigned)l.dob.year * 10000 + (unsigned)l.dob.month * 100 + (unsigned)l.dob.day;
   iDOD := (unsigned)r.dod8;
   self.dod.year := (unsigned)r.dod8[1..4];
