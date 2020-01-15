@@ -792,8 +792,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
  	// Search by FEIN before we take out inputs with no BIP IDs assigned.
 	WatchListHit := Business_Risk_BIP.getWatchlists(withBIP, Options, linkingOptions, AllowedSourcesSet);
 
-  ds_KELB2B_Attributes := Business_Risk_BIP.getB2BAttributes(withBIP, Options, AllowedSourcesSet);
-  
+// ds_KELB2B_Attributes := Business_Risk_BIP.getB2BAttributes(withBIP, Options, AllowedSourcesSet);
+  ds_KELB2B_Attributes := DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID);
+    
 	Phone := Business_Risk_BIP.getPhones(withBIP, Options, linkingOptions, AllowedSourcesSet);
 
 	InputBasedSources := Business_Risk_BIP.getInputBasedSources(withBIP, Options, linkingOptions, AllowedSourcesSet);
