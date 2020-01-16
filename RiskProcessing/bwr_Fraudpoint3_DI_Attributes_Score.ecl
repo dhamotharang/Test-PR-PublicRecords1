@@ -39,7 +39,7 @@ historydate_to_use := 0;   //999999 will run in current mode
 GLB  := 1;
 DPPA := 3;
 DataRestriction_Mask := '0000000000000000000000000';  // byte 6, if 1, restricts experian || byte 8, if 1, restricts equifax || byte 10 restricts Transunion
-DataPermission_Mask  := '0000000000100';    // to allow population of FDN Virtual Fraud, Test Fraud and Contributory Fraud, set position 11 to '1'
+DataPermission_Mask  := '0000000000101';    // to allow population of FDN Virtual Fraud, Test Fraud and Contributory Fraud, set position 11 to '1'
                                             // to allow access to Insurance DL data, set position 13 to '1'
 _IncludeRiskIndices := FALSE; // Set to true to return riskIndicies if the requested model is able
 _OfacOnly           := FALSE;
