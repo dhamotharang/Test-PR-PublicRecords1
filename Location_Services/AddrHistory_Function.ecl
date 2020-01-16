@@ -1,24 +1,12 @@
-﻿import address, AutoStandardI, DeathV2_Services, dx_BestRecords, doxie, doxie_raw, doxie_ln, dx_death_master,
+﻿import address, DeathV2_Services, dx_BestRecords, doxie, doxie_raw, doxie_ln, dx_death_master,
        LN_PropertyV2, LN_PropertyV2_Services, location_services, MDR, property, risk_indicators, 
        STD, ut;
 
 todays_date := (string) STD.Date.Today();
 
 export AddrHistory_Function(dataset(location_services.Layout_AddrHistory_In) inrecs,
-                            unsigned1 glbperms,
-                            unsigned1 dppaperms,
-                            boolean ln_branded_val,
-                            boolean prob_override_val,
-                            string32 appType) :=
+                            doxie.IDataAccess mod_access) :=
 function
-
-mod_access := module(doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
-  EXPORT boolean ln_branded := ln_branded_val;
-  EXPORT boolean probation_override := prob_override_val;
-  EXPORT string32 application_type := appType;
-  EXPORT unsigned1 glb := glbperms;
-  EXPORT unsigned1 dppa := dppaperms;
-end;
 
 death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
@@ -57,10 +45,10 @@ dids := dedup(sort(project(withdid, doxie.layout_references), did), did);
 doxie.mac_best_records(dids,
                        did,
                        best_recs,
-                       1,
+                       0, //not used
                        glb_ok,
                        ,
-                       doxie.DataRestriction.fixed_DRM,
+                       mod_access.DataRestrictionMask,
                        include_DOD:=true);
 
 withdid get_best_info (withdid L, best_recs R) := transform
@@ -114,7 +102,7 @@ srchrec := project(dfseq, into_srch(LEFT));
 
 location_services.get_hriAddr(srchrec, withsearch);
 
-location_services.get_gong_by_address(withsearch, phones_children, withgonginfo);
+location_services.get_gong_by_address(withsearch, phones_children, mod_access, withgonginfo);
 
 
 location_services.Layout_AddrHistory_Norm integrate_search(withbestinfo L, withgonginfo R) := transform
@@ -506,10 +494,10 @@ hrs_dids := dedup(sort(project(hrs_withownership, doxie.layout_references), did)
 doxie.mac_best_records(hrs_dids,
                        did,
                        best_hrs_recs,
-                       1,
+                       0, //not used
                        glb_ok,
                        ,
-                       doxie.DataRestriction.fixed_DRM);
+                       mod_access.DataRestrictionMask);
 
 hrs_withownership check_current(hrs_withownership L, best_hrs_recs R) := transform
   self.current_addr := if (L.prim_range = r.prim_range and L.prim_name = r.prim_name and
@@ -524,7 +512,7 @@ hrscurrent := join(hrs_withownership, best_hrs_recs,
 
 doxie.mac_AddHRIAddress(hrscurrent,hrs_highrisk);
 
-location_services.get_gong_by_address(hrs_highrisk, phone_children, hrs_wgong);
+location_services.get_gong_by_address(hrs_highrisk, phone_children, mod_access, hrs_wgong);
 
 withpropinfo add_history(withpropinfo L, hrs_wgong R) := transform
   self.address_history := L.address_history + if (~R.current_addr, dataset([{R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range, R.city_name, R.st, R.zip, R.zip4, (string)R.dt_first_seen, (string)R.dt_last_seen, R.owned_by_subject, choosen(R.hri_address,location_services.consts.max_hri_addr), choosen(R.phone_children,location_services.consts.max_hri_phone)}], location_services.Layout_address_hist));
@@ -613,10 +601,10 @@ currentdids := doxie.did_from_address(clas, true);
 doxie.mac_best_records(currentdids,
                        did,
                        outfile,
-                       dppa_ok,
+                       0, //not used
                        glb_ok,
                        ,
-                       doxie.DataRestriction.fixed_DRM,
+                       mod_access.DataRestrictionMask,
                        include_DOD:=true);
 
 currentbests0 := project(outfile, transform(dx_BestRecords.Layout_Best,
@@ -666,7 +654,7 @@ ownedprops := denormalize(cpwd,
 
 doxie.mac_AddHRIAddress(ownedprops,owned_wHRI);
 
-location_services.get_gong_by_address(owned_wHRI, phones_children, owned_wGong);
+location_services.get_gong_by_address(owned_wHRI, phones_children, mod_access, owned_wGong);
 
 withhist add_current(withhist L, owned_wGong R) := transform
   self.current_property := L.current_property + dataset([{R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range, R.p_city_name, R.st, R.zip, R.zip4, R.sales_price, R.purchase_date, R.refinance_date, R.years_owned, R.seller1, R.seller2, R.purchaser1, R.purchaser2, R.current_residents, R.owner_is_resident, R.foreclosure_flag, R.phones_children, R.hri_address}],location_services.Layout_Prop_Owned);
@@ -776,10 +764,10 @@ dids_for_best := project(prev_hdrs_prev_props, transform(doxie.layout_references
 doxie.mac_best_records(dids_for_best,
                        did,
                        outfile2,
-                       dppa_ok,
+                       0, //not used
                        glb_ok,
                        ,
-                       doxie.DataRestriction.fixed_DRM,
+                       mod_access.DataRestrictionMask,
                        include_DOD:=true);
 
 prev_hdr_wDOD := join(prev_hdrs_prev_props, outfile2,
@@ -809,7 +797,7 @@ prev_props_wresidents := denormalize(prev_props,
 
 doxie.mac_AddHRIAddress(prev_props_wresidents,prev_props_wHRI);
 
-location_services.get_gong_by_address(prev_props_wHRI, phones_children, prev_wGong);
+location_services.get_gong_by_address(prev_props_wHRI, phones_children, mod_access, prev_wGong);
 
 location_services.Layout_AddrHistory_Norm add_prev_props(withcurrent L, prev_wGong R) := transform
   self.previous_property := L.previous_property + dataset([{R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range, R.p_city_name, R.st, R.zip, R.zip4, R.years_owned, R.purchase_Date, R.purchase_price, R.refinance_Date, R.seller1, R.seller2, R.sale_date, R.sales_price, R.purchaser1, R.purchaser2,R.current_residents, R.Net_Profit_From_Sale, R.pcnt_Gain_or_Loss, R.foreclosure_flag, R.phones_children, R.hri_address}], location_services.layout_prev_property);

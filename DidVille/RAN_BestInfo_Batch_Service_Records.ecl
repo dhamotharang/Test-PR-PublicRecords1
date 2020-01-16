@@ -20,7 +20,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	unsigned relatives_depth := 2 : stored('RelativesDepth');
 
 	checkRNA := header.constants.checkRNA;
-	
+
 	//convert to standard input layout
 	in_seq_rec := record
 		STRING20 acctno;
@@ -65,8 +65,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
 	f_with_did := project(f_with_did_raw, transform({f_with_did_raw}, self.did:=if(left.score>=75, left.did, 0), self:=left))+
 		project(f_in_seq(did>0),transform({f_with_did_raw},self.score:=100, self:=left, self:=[]));
-	
-	/* Get the subject Best Address by did. Join against Watchdog GLB and non-GLB keys. If the 
+
+	/* Get the subject Best Address by did. Join against Watchdog GLB and non-GLB keys. If the
 		 customer has sufficient GLB permissions, retain the records from the Watchdog GLB key. If
 		 not, retain those from the non-GLB key.
 	*/
@@ -79,8 +79,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	dppaOk := mod_access.isValidDPPA(checkRNA);
   glbOk := mod_access.isValidGLB(checkRNA);
  	fixed_DRM := mod_access.DataRestrictionMask;
-	
-	doxie.mac_best_records(f_with_did,	
+
+	doxie.mac_best_records(f_with_did,
 												 did,
 												 outfile,
 												 dppaOk,
@@ -95,26 +95,26 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self := r;
 		self := [];
 	end;
-	
+
 	f_subj_best := join(f_with_did, outfile,
 											left.did = right.did,
-										get_subj_best(left, right), left outer, keep(1));	  			   
-	
+										get_subj_best(left, right), left outer, keep(1));
+
 	/* Find Neighbors for the search subject based on the input address (not on the Best address
 		 information!). Return the top 3 Neighbors, i.e. closest addresses by distance.
 	*/
-	//find nbrs - for input address, init 	
+	//find nbrs - for input address, init
 	doxie.layout_nbr_targets  get_nbr_in_init(f_with_did l) := transform
 		self.seqTarget := l.seq;
 		self.zip := l.z5;
 		self.suffix := l.addr_suffix;
 		self := l;
 		self := [];
-	end;		
-		
+	end;
+
 	f_in_nbr_init := group(project(f_with_did, get_nbr_in_init(left)));
 
-	//find nbrs - for input address, pick top 3		
+	//find nbrs - for input address, pick top 3
 	f_in_nbrs_raw := doxie.nbr_records(f_in_nbr_init,
 								'C',
 								Max_Neighborhoods,
@@ -123,7 +123,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 								Neighbor_Recency,
 								false, false,,,
                 mod_access);
-								
+
 	nbr_with_rank_rec := record
 		doxie.layout_nbr_records;
 		unsigned nbr_rank;
@@ -148,20 +148,20 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
 	f_in_nbrs := TopN(f_in_nbrs_ready, 3, nbr_rank);
 
-	/* Find Neighbors for the search subject based on the Best address information. Return 
+	/* Find Neighbors for the search subject based on the Best address information. Return
 		 the top 3 Neighbors, i.e. closest addresses by distance.
 	*/
-	//find nbrs - for best address, init 	
+	//find nbrs - for best address, init
 	doxie.layout_nbr_targets  get_nbr_best_init(f_subj_best l) := transform
 		self.seqTarget := l.seq;
 		self.dt_last_seen := l.addr_dt_last_seen;
 		self := l;
 		self := [];
-	end;		
-			
-	f_best_nbr_init := group(project(f_subj_best, get_nbr_best_init(left)));	
+	end;
 
-	//find nbrs - for best address, pick top 3		
+	f_best_nbr_init := group(project(f_subj_best, get_nbr_best_init(left)));
+
+	//find nbrs - for best address, pick top 3
 	f_best_nbrs_raw := doxie.nbr_records(f_best_nbr_init,
 								'C',
 								Max_Neighborhoods,
@@ -170,7 +170,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 								Neighbor_Recency,
 								false, false,,,
                 mod_access);
-															
+
 	nbr_with_rank_rec get_nbr_best_rank(f_best_nbrs_raw l, unsigned cnt) := transform
 		self.nbr_rank := cnt;
 		self := l;
@@ -190,44 +190,41 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
 	f_best_nbrs := TopN(f_best_nbrs_ready, 3, nbr_rank);
 
-	/* Get Relatives and Roommates (Associates). That is, get the identities of everyone who 
-		 lives in the same dwelling as the search subject. A Roommate differs from a Relative  
-		 only in that a Relative is related in some way to the search subject. Describe a 
+	/* Get Relatives and Roommates (Associates). That is, get the identities of everyone who
+		 lives in the same dwelling as the search subject. A Roommate differs from a Relative
+		 only in that a Relative is related in some way to the search subject. Describe a
 		 Relative's relationship to the search subject by his/her relationship title.
 	*/
 	//get relatives and roomies - init
 	doxie_Raw.Layout_RelativeRawBatchInput get_rel(f_with_did l, unsigned cnt) := transform
 		self.input.seq := l.seq;
 		self.input.did := l.did;
-		self.input.glb_purpose := mod_access.glb;
-		self.input.dppa_purpose := mod_access.dppa;
-		self.input.ln_branded_value := true;
-		self.input.include_relatives_val := true;
-		self.input.include_associates_val := true;
-		self.input.relative_depth := relatives_depth;
 		self.seq := cnt;
 		self := [];
 	end;
 
 	f_rel_ready := group(project(f_with_did, get_rel(left, counter)),seq);
 
+  incl_relatives := true;
+  incl_associates := true;
   // we'd need just up to 10 relatives and associates each, but it's safer to pre-fetch some more
   // to allow choosing the "best" ten later. 100 is arbitrary number; almost always it will cover
   // all 1st degree relatives (assuming 1st degree is "better" than other degrees by definition)
-	f_rel_out_init := sort(group(doxie_raw.relative_raw_batch(f_rel_ready,,100,200)),
+	f_rel_raw := doxie_raw.relative_raw_batch(f_rel_ready, mod_access, relatives_depth, incl_relatives,incl_associates,100,200);
+  f_rel_out_init := sort(ungroup(f_rel_raw),
 												 input.seq, depth, p2_sort, p3_sort, p4_sort);
 
 	//get relatives and roomies - rank as well as translate titleNo to text
 	rel_with_rank_rec := record
 		doxie_Raw.Layout_RelativeRawBatchInput;
-		unsigned4 rel_rank;	
+		unsigned4 rel_rank;
 		string40 relationship;
 	end;
 
 	rel_with_rank_rec get_rel_rank(f_rel_out_init l, unsigned cnt) := transform
 		self.rel_rank := cnt;
-		self.relationship := 
-					IF( l.titleNo <> 0, STD.Str.CleanSpaces(Header.relative_titles.fn_get_str_title(l.TitleNo) 
+		self.relationship :=
+					IF( l.titleNo <> 0, STD.Str.CleanSpaces(Header.relative_titles.fn_get_str_title(l.TitleNo)
 							                                    + IF(l.TitleNo = Header.relative_titles.num_associate,' '+Header.translateRelativePrimrange(l.rel_prim_range),'')),
 							                IF(l.isRelative = FALSE, STD.Str.CleanSpaces(Header.relative_titles.fn_get_str_title(Header.relative_titles.num_associate) + ' ' + Header.translateRelativePrimrange(l.rel_prim_range)),
 																				              Header.relative_titles.fn_get_str_title(Header.relative_titles.num_relative))
@@ -239,8 +236,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	f_rel_out := project(f_rel_out_init, get_rel_rank(left, counter)); // *** HAS REL_PRIM_RANGE ***
 
 	/* Although we do a better job of identifying relationships among household members--by
-		 specifying whether they are a spouse, child, sibling, parent or grandparent 
-     --at this point we still use a very 
+		 specifying whether they are a spouse, child, sibling, parent or grandparent
+     --at this point we still use a very
 		 simple rule that requires someone to have the same last name to be considered a Relative.
 	*/
 	IsRel := f_rel_out.isRelative and f_rel_out.rel_prim_range  <> -1;	//keep out rels by ssn
@@ -254,7 +251,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
 	f_roommie_for_best := join(f_rel_out(IsRoommie), f_rel_for_best,
 														 left.person2 = right.person2, get_non_rel(left), left only)(person2<>0);
-	
+
 	/* Pick top ten Relatives. Retrieve Best Address and Phones information for each of them.
 	*/
 	//get relatives - pick top 10
@@ -266,12 +263,12 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 													,
 													mod_access.DataRestrictionMask,
 													include_dod :=true);
-													
+
 	f_rel_best_valid := f_rel_best(prim_name <> '' or phone<>'');
 	f_rel_best_valid_to_use := if(UseBlankPhoneNumberRecords, f_rel_best(prim_name <> ''), f_rel_best_valid);
 	f_rel_best_dep := dedup(sort(f_rel_best_valid_to_use, NID.PreferredFirstNew(fname), lname, prim_name, -sec_range, zip, phone),
 															 NID.PreferredFirstNew(fname), lname, prim_name, zip, phone);
-																 
+
 	best_with_rank_rec := record
 		doxie.layout_best;
 		unsigned1 depth;
@@ -299,7 +296,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	didville.Mac_RAN_phone_append(f_rel_best_final_ready, f_rel_best_final_app_raw,fixed_DRM, mod_access.glb, mod_access.industry_class, checkRNA, mod_access.dppa)
 	f_rel_best_final_app_flted := f_rel_best_final_app_raw(phone<>'');
 	f_rel_best_final_app_to_use := if(UseBlankPhoneNumberRecords, f_rel_best_final_app_raw, f_rel_best_final_app_flted);
-	f_rel_best_final_app := if(dedup_with_same_phone, 
+	f_rel_best_final_app := if(dedup_with_same_phone,
 														 dedup(sort(f_rel_best_final_app_to_use, seqTarget, phone, rel_rank), seqTarget, phone),
 														 f_rel_best_final_app_to_use);
 
@@ -307,19 +304,19 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	best_with_rank_rec check_input(f_rel_best_final_app l) := transform
 		self := l;
 	end;
-				
+
 	f_rel_best_final_addr_ckd := if(suppress_same_address,
 																	join(f_rel_best_final_app, f_in_seq,
-																			left.seqTarget = right.seq and 
-										left.prim_name = right.prim_name and 
+																			left.seqTarget = right.seq and
+										left.prim_name = right.prim_name and
 										left.prim_range = right.prim_range and
-										left.zip = right.z5, 
+										left.zip = right.z5,
 										check_input(left), left only),
 								f_rel_best_final_app);
-								
+
 	f_rel_best_final_phone_ckd := if(suppress_same_phone,
 																	 join(f_rel_best_final_addr_ckd, f_in_seq,
-																				left.seqTarget = right.seq and 
+																				left.seqTarget = right.seq and
 											left.phone in [right.phone10,  right.phoneno_1,
 																	right.phoneno_2, right.phoneno_3,
 												 right.phoneno_4, right.phoneno_5,
@@ -327,10 +324,10 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 												 right.phoneno_8, right.phoneno_9,
 												 right.phoneno_10, right.phoneno_11],
 									 check_input(left), left only),
-								 f_rel_best_final_addr_ckd);						  
-	
+								 f_rel_best_final_addr_ckd);
+
 	f_rel_best_final_phone_ckd_toUse := if(UseBlankPhoneNumberRecords, f_rel_best_final_phone_ckd, f_rel_best_final_phone_ckd(phone<>''));
-	f_rel_best_final_grp := group(sort(f_rel_best_final_phone_ckd_toUse, seqTarget, rel_rank), seqTarget);					
+	f_rel_best_final_grp := group(sort(f_rel_best_final_phone_ckd_toUse, seqTarget, rel_rank), seqTarget);
 
 	f_rel_best_final :=	topN(f_rel_best_final_grp, 10, rel_rank);
 
@@ -344,9 +341,9 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 													dppaOk,
 													glbOk,
 													,
-													fixed_DRM,	
+													fixed_DRM,
 													include_dod := true);
-													
+
 	f_roommie_best_valid := f_roommie_best(prim_name <> '' or phone<>'');
 	f_roommie_best_dep := dedup(sort(f_roommie_best_valid, NID.PreferredFirstNew(fname), lname, prim_name, -sec_range, zip, phone),
 								              NID.PreferredFirstNew(fname), lname, prim_name, zip, phone);
@@ -357,23 +354,23 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
 	didville.Mac_RAN_phone_append(f_roomie_best_final_ready, f_roomie_best_final_app_raw,fixed_DRM,mod_access.glb, mod_access.industry_class, checkRNA, mod_access.DPPA)
 	f_roomie_best_final_app_flted := f_roomie_best_final_app_raw(phone<>'');
-	f_roomie_best_final_app := if(dedup_with_same_phone, 
+	f_roomie_best_final_app := if(dedup_with_same_phone,
 																dedup(sort(f_roomie_best_final_app_flted, seqTarget, phone, rel_rank), seqTarget, phone),
 																f_roomie_best_final_app_flted);
-							
+
 	//check against input address, phones
 	f_roomie_best_final_addr_ckd := if(suppress_same_address,
 																		 join(f_roomie_best_final_app, f_in_seq,
-																					left.seqTarget = right.seq and 
-												left.prim_name = right.prim_name and 
+																					left.seqTarget = right.seq and
+												left.prim_name = right.prim_name and
 												left.prim_range = right.prim_range and
-												left.zip = right.z5, 
+												left.zip = right.z5,
 												check_input(left), left only),
 									 f_roomie_best_final_app);
-								
+
 	f_roomie_best_final_phone_ckd := if(suppress_same_phone,
 																			join(f_roomie_best_final_addr_ckd, f_in_seq,
-																					 left.seqTarget = right.seq and 
+																					 left.seqTarget = right.seq and
 												 left.phone in [right.phone10,  right.phoneno_1,
 																		 right.phoneno_2, right.phoneno_3,
 														right.phoneno_4, right.phoneno_5,
@@ -381,20 +378,20 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 														right.phoneno_8, right.phoneno_9,
 														right.phoneno_10, right.phoneno_11],
 									 check_input(left), left only),
-										f_roomie_best_final_addr_ckd);						  
+										f_roomie_best_final_addr_ckd);
 
-	f_roomie_best_final_grp := group(sort(f_roomie_best_final_phone_ckd(phone<>''), seqTarget, rel_rank), seqTarget);					
+	f_roomie_best_final_grp := group(sort(f_roomie_best_final_phone_ckd(phone<>''), seqTarget, rel_rank), seqTarget);
 
 	f_roomie_best_final :=	topN(f_roomie_best_final_grp, 10, rel_rank);
-									
-	//generate output - initialize 
+
+	//generate output - initialize
 	out_with_seq_rec := record
 		unsigned4 seq;
 		didville.Layout_RAN_BestInfo_BatchIn;
 		didville.Layout_RAN_BestInfo_BatchOut;
 	  boolean input_addr_matched_rel;
 		boolean input_addr_name_matched_rel;
-	end;					   
+	end;
 
 	out_with_seq_rec init_out(f_in_seq l) := transform
 		self.phoneno := l.phone10;
@@ -424,7 +421,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_state_1 := if(cnt=1, r.st, l.rel_state_1);
 		self.rel_zipcode_1 := if(cnt=1, r.zip + r.zip4, l.rel_zipcode_1);
 		self.rel_phone_1 := if(cnt=1, r.phone, l.rel_phone_1);
-		
+
 		self.rel_ssn_1   := if(cnt=1, r.ssn, l.rel_ssn_1);
 		self.rel_dob_1   := if(cnt=1, if(r.dob=0, '',(string) r.dob),
 													        l.rel_dob_1);
@@ -432,7 +429,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_relationship_1 := if(cnt=1, r.relationship, l.rel_relationship_1);
 		self.rel_relationship_type_1 := if(cnt=1, r.relationship_type, l.rel_relationship_type_1);
 		self.rel_relationship_confidence_1 := if(cnt=1, r.relationship_confidence, l.rel_relationship_confidence_1);
-		
+
 		self.rel_depth_2 := if(cnt=2, (string)r.depth, l.rel_depth_2);
 		self.rel_first_name_2 := if(cnt=2, r.fname, l.rel_first_name_2);
 		self.rel_middle_name_2 := if(cnt=2, r.mname, l.rel_middle_name_2);
@@ -451,7 +448,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_relationship_2 := if(cnt=2, r.relationship, l.rel_relationship_2);
 		self.rel_relationship_type_2 := if(cnt=2, r.relationship_type, l.rel_relationship_type_2);
 		self.rel_relationship_confidence_2 := if(cnt=2, r.relationship_confidence, l.rel_relationship_confidence_2);
-		
+
 		self.rel_depth_3 := if(cnt=3, (string)r.depth, l.rel_depth_3);
 		self.rel_first_name_3 := if(cnt=3, r.fname, l.rel_first_name_3);
 		self.rel_middle_name_3 := if(cnt=3, r.mname, l.rel_middle_name_3);
@@ -470,7 +467,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_relationship_3 := if(cnt=3, r.relationship, l.rel_relationship_3);
 		self.rel_relationship_type_3 := if(cnt=3, r.relationship_type, l.rel_relationship_type_3);
 		self.rel_relationship_confidence_3 := if(cnt=3, r.relationship_confidence, l.rel_relationship_confidence_3);
-		
+
 		self.rel_depth_4 := if(cnt=4, (string)r.depth, l.rel_depth_4);
 		self.rel_first_name_4 := if(cnt=4, r.fname, l.rel_first_name_4);
 		self.rel_middle_name_4 := if(cnt=4, r.mname, l.rel_middle_name_4);
@@ -489,7 +486,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_relationship_4 := if(cnt=4, r.relationship, l.rel_relationship_4);
 		self.rel_relationship_type_4 := if(cnt=4, r.relationship_type, l.rel_relationship_type_4);
 		self.rel_relationship_confidence_4 := if(cnt=4, r.relationship_confidence, l.rel_relationship_confidence_4);
-			 
+
 		self.rel_depth_5 := if(cnt=5, (string)r.depth, l.rel_depth_5);
 		self.rel_first_name_5 := if(cnt=5, r.fname, l.rel_first_name_5);
 		self.rel_middle_name_5 := if(cnt=5, r.mname, l.rel_middle_name_5);
@@ -508,7 +505,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_relationship_5 := if(cnt=5, r.relationship, l.rel_relationship_5);
 		self.rel_relationship_type_5 := if(cnt=5, r.relationship_type, l.rel_relationship_type_5);
 		self.rel_relationship_confidence_5 := if(cnt=5, r.relationship_confidence, l.rel_relationship_confidence_5);
-		
+
 		self.rel_depth_6 := if(cnt=6, (string)r.depth, l.rel_depth_6);
 		self.rel_first_name_6 := if(cnt=6, r.fname, l.rel_first_name_6);
 		self.rel_middle_name_6 := if(cnt=6, r.mname, l.rel_middle_name_6);
@@ -527,7 +524,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_relationship_6 := if(cnt=6, r.relationship, l.rel_relationship_6);
 		self.rel_relationship_type_6 := if(cnt=6, r.relationship_type, l.rel_relationship_type_6);
 		self.rel_relationship_confidence_6 := if(cnt=6, r.relationship_confidence, l.rel_relationship_confidence_6);
-		
+
 		self.rel_depth_7 := if(cnt=7, (string)r.depth, l.rel_depth_7);
 		self.rel_first_name_7 := if(cnt=7, r.fname, l.rel_first_name_7);
 		self.rel_middle_name_7 := if(cnt=7, r.mname, l.rel_middle_name_7);
@@ -546,7 +543,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_relationship_7 := if(cnt=7, r.relationship, l.rel_relationship_7);
 		self.rel_relationship_type_7 := if(cnt=7, r.relationship_type, l.rel_relationship_type_7);
 		self.rel_relationship_confidence_7 := if(cnt=7, r.relationship_confidence, l.rel_relationship_confidence_7);
-		
+
 		self.rel_depth_8 := if(cnt=8, (string)r.depth, l.rel_depth_8);
 		self.rel_first_name_8 := if(cnt=8, r.fname, l.rel_first_name_8);
 		self.rel_middle_name_8 := if(cnt=8, r.mname, l.rel_middle_name_8);
@@ -565,7 +562,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_relationship_8 := if(cnt=8, r.relationship, l.rel_relationship_8);
 		self.rel_relationship_type_8 := if(cnt=8, r.relationship_type, l.rel_relationship_type_8);
 		self.rel_relationship_confidence_8 := if(cnt=8, r.relationship_confidence, l.rel_relationship_confidence_8);
-		
+
 		self.rel_depth_9 := if(cnt=9, (string)r.depth, l.rel_depth_9);
 		self.rel_first_name_9 := if(cnt=9, r.fname, l.rel_first_name_9);
 		self.rel_middle_name_9 := if(cnt=9, r.mname, l.rel_middle_name_9);
@@ -584,7 +581,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_relationship_9 := if(cnt=9, r.relationship, l.rel_relationship_9);
 		self.rel_relationship_type_9 := if(cnt=9, r.relationship_type, l.rel_relationship_type_9);
 		self.rel_relationship_confidence_9 := if(cnt=9, r.relationship_confidence, l.rel_relationship_confidence_9);
-		
+
 		self.rel_depth_10 := if(cnt=10, (string)r.depth, l.rel_depth_10);
 		self.rel_first_name_10 := if(cnt=10, r.fname, l.rel_first_name_10);
 		self.rel_middle_name_10 := if(cnt=10, r.mname, l.rel_middle_name_10);
@@ -606,35 +603,35 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
 		self.RelAssocNeigh_Flag:='Y';
 
-		rel_addr1_match := if (cnt=1,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ; 
-		rel_addr2_match := if (cnt=2,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ; 
-		rel_addr3_match := if (cnt=3,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ; 
-		rel_addr4_match := if (cnt=4,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ; 
-		rel_addr5_match := if (cnt=5,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ; 
-		rel_addr6_match := if (cnt=6,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ; 
-		rel_addr7_match := if (cnt=7,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ; 
-		rel_addr8_match := if (cnt=8,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ; 
-		rel_addr9_match := if (cnt=9,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ; 
-		rel_addr10_match := if (cnt=10,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ; 
-		self.input_addr_matched_rel := CompareInputAddrWithRel and 
+		rel_addr1_match := if (cnt=1,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ;
+		rel_addr2_match := if (cnt=2,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ;
+		rel_addr3_match := if (cnt=3,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ;
+		rel_addr4_match := if (cnt=4,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ;
+		rel_addr5_match := if (cnt=5,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ;
+		rel_addr6_match := if (cnt=6,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ;
+		rel_addr7_match := if (cnt=7,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ;
+		rel_addr8_match := if (cnt=8,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ;
+		rel_addr9_match := if (cnt=9,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ;
+		rel_addr10_match := if (cnt=10,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5, false) ;
+		self.input_addr_matched_rel := CompareInputAddrWithRel and
 		             (l.input_addr_matched_rel OR
 		             (rel_addr1_match or rel_addr2_match or rel_addr3_match or rel_addr4_match or rel_addr5_match or rel_addr6_match or rel_addr7_match or rel_addr8_match or rel_addr9_match or rel_addr10_match));
-		
-		rel_addr1_name_match := if (cnt=1,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ; 
-		rel_addr2_name_match := if (cnt=2,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ; 
-		rel_addr3_name_match := if (cnt=3,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ; 
-		rel_addr4_name_match := if (cnt=4,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ; 
-		rel_addr5_name_match := if (cnt=5,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ; 
-		rel_addr6_name_match := if (cnt=6,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ; 
-		rel_addr7_name_match := if (cnt=7,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ; 
-		rel_addr8_name_match := if (cnt=8,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ; 
-		rel_addr9_name_match := if (cnt=9,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ; 
-		rel_addr10_name_match := if (cnt=10,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ; 
-		self.input_addr_name_matched_rel := CompareInputAddrNameWithRel and 
+
+		rel_addr1_name_match := if (cnt=1,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ;
+		rel_addr2_name_match := if (cnt=2,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ;
+		rel_addr3_name_match := if (cnt=3,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ;
+		rel_addr4_name_match := if (cnt=4,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ;
+		rel_addr5_name_match := if (cnt=5,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ;
+		rel_addr6_name_match := if (cnt=6,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ;
+		rel_addr7_name_match := if (cnt=7,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ;
+		rel_addr8_name_match := if (cnt=8,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ;
+		rel_addr9_name_match := if (cnt=9,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ;
+		rel_addr10_name_match := if (cnt=10,r.prim_range = l.prim_range and r.prim_name =l.prim_name and r.zip = l.z5 and r.lname = l.name_last, false) ;
+		self.input_addr_name_matched_rel := CompareInputAddrNameWithRel and
 		             (l.input_addr_name_matched_rel OR
 		             (rel_addr1_name_match or rel_addr2_name_match or rel_addr3_name_match or rel_addr4_name_match or rel_addr5_name_match or rel_addr6_name_match or rel_addr7_name_match or rel_addr8_name_match or rel_addr9_name_match or rel_addr10_name_match));
 
-		
+
 		self.rel_title_1 := if(cnt=1, r.title, l.rel_title_1);
 		self.rel_title_2 := if(cnt=2, r.title, l.rel_title_2);
 		self.rel_title_3 := if(cnt=3, r.title, l.rel_title_3);
@@ -645,7 +642,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_title_8 := if(cnt=8, r.title, l.rel_title_8);
 		self.rel_title_9 := if(cnt=9, r.title, l.rel_title_9);
 		self.rel_title_10 := if(cnt=10, r.title, l.rel_title_10);
-		
+
 		self.rel_name_suffix_1 := if(cnt=1, r.name_suffix, l.rel_name_suffix_1);
 		self.rel_name_suffix_2 := if(cnt=2, r.name_suffix, l.rel_name_suffix_2);
 		self.rel_name_suffix_3 := if(cnt=3, r.name_suffix, l.rel_name_suffix_3);
@@ -656,7 +653,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.rel_name_suffix_8 := if(cnt=8, r.name_suffix, l.rel_name_suffix_8);
 		self.rel_name_suffix_9 := if(cnt=9, r.name_suffix, l.rel_name_suffix_9);
 		self.rel_name_suffix_10 := if(cnt=10, r.name_suffix, l.rel_name_suffix_10);
-		
+
 		self := l;
 	end;
 
@@ -664,7 +661,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 											 denormalize(f_out_init, f_rel_best_final,
 																left.seq = right.seqTarget,
 																get_out_rel(left, right,counter)));
-							
+
 	//generate output - get roomies
 	out_with_seq_rec get_out_roomie(f_out_with_rel l, f_roomie_best_final r, unsigned cnt) := transform
 		self.asso_first_name_1 := if(cnt=1, r.fname, l.asso_first_name_1);
@@ -720,7 +717,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.asso_relationship_3 := if(cnt=3, r.relationship, l.asso_relationship_3);
 		self.asso_relationship_type_3 := if(cnt=3, r.relationship_type, l.asso_relationship_type_3);
 		self.asso_relationship_confidence_3 := if(cnt=3, r.relationship_confidence, l.asso_relationship_confidence_3);
-		
+
 		self.asso_first_name_4 := if(cnt=4, r.fname, l.asso_first_name_4);
 		self.asso_middle_name_4 := if(cnt=4, r.mname, l.asso_middle_name_4);
 		self.asso_last_name_4 := if(cnt=4, r.lname, l.asso_last_name_4);
@@ -738,7 +735,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.asso_relationship_4 := if(cnt=4, r.relationship, l.asso_relationship_4);
 		self.asso_relationship_type_4 := if(cnt=4, r.relationship_type, l.asso_relationship_type_4);
 		self.asso_relationship_confidence_4 := if(cnt=4, r.relationship_confidence, l.asso_relationship_confidence_4);
-		
+
 		self.asso_first_name_5 := if(cnt=5, r.fname, l.asso_first_name_5);
 		self.asso_middle_name_5 := if(cnt=5, r.mname, l.asso_middle_name_5);
 		self.asso_last_name_5 := if(cnt=5, r.lname, l.asso_last_name_5);
@@ -774,7 +771,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.asso_relationship_6 := if(cnt=6, r.relationship, l.asso_relationship_6);
 		self.asso_relationship_type_6 := if(cnt=6, r.relationship_type, l.asso_relationship_type_6);
 		self.asso_relationship_confidence_6 := if(cnt=6, r.relationship_confidence, l.asso_relationship_confidence_6);
-		
+
 		self.asso_first_name_7 := if(cnt=7, r.fname, l.asso_first_name_7);
 		self.asso_middle_name_7 := if(cnt=7, r.mname, l.asso_middle_name_7);
 		self.asso_last_name_7 := if(cnt=7, r.lname, l.asso_last_name_7);
@@ -792,7 +789,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.asso_relationship_7 := if(cnt=7, r.relationship, l.asso_relationship_7);
 		self.asso_relationship_type_7 := if(cnt=7, r.relationship_type, l.asso_relationship_type_7);
 		self.asso_relationship_confidence_7 := if(cnt=7, r.relationship_confidence, l.asso_relationship_confidence_7);
-		
+
 		self.asso_first_name_8 := if(cnt=8, r.fname, l.asso_first_name_8);
 		self.asso_middle_name_8 := if(cnt=8, r.mname, l.asso_middle_name_8);
 		self.asso_last_name_8 := if(cnt=8, r.lname, l.asso_last_name_8);
@@ -810,7 +807,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.asso_relationship_8 := if(cnt=8, r.relationship, l.asso_relationship_8);
 		self.asso_relationship_type_8 := if(cnt=8, r.relationship_type, l.asso_relationship_type_8);
 		self.asso_relationship_confidence_8 := if(cnt=8, r.relationship_confidence, l.asso_relationship_confidence_8);
-		
+
 		self.asso_first_name_9 := if(cnt=9, r.fname, l.asso_first_name_9);
 		self.asso_middle_name_9 := if(cnt=9, r.mname, l.asso_middle_name_9);
 		self.asso_last_name_9 := if(cnt=9, r.lname, l.asso_last_name_9);
@@ -828,7 +825,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.asso_relationship_9 := if(cnt=9, r.relationship, l.asso_relationship_9);
 		self.asso_relationship_type_9 := if(cnt=9, r.relationship_type, l.asso_relationship_type_9);
 		self.asso_relationship_confidence_9 := if(cnt=9, r.relationship_confidence, l.asso_relationship_confidence_9);
-		
+
 		self.asso_first_name_10 := if(cnt=10, r.fname, l.asso_first_name_10);
 		self.asso_middle_name_10 := if(cnt=10, r.mname, l.asso_middle_name_10);
 		self.asso_last_name_10 := if(cnt=10, r.lname, l.asso_last_name_10);
@@ -846,9 +843,9 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.asso_relationship_10 := if(cnt=10, r.relationship, l.asso_relationship_10);
 		self.asso_relationship_type_10 := if(cnt=10, r.relationship_type, l.asso_relationship_type_10);
 		self.asso_relationship_confidence_10 := if(cnt=10, r.relationship_confidence, l.asso_relationship_confidence_10);
-		
+
 		self.RelAssocNeigh_Flag:='Y';
-		
+
 		self.asso_title_1 := if(cnt=1, r.title, l.asso_title_1);
 		self.asso_title_2 := if(cnt=2, r.title, l.asso_title_2);
 		self.asso_title_3 := if(cnt=3, r.title, l.asso_title_3);
@@ -859,7 +856,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.asso_title_8 := if(cnt=8, r.title, l.asso_title_8);
 		self.asso_title_9 := if(cnt=9, r.title, l.asso_title_9);
 		self.asso_title_10 := if(cnt=10, r.title, l.asso_title_10);
-		
+
 		self.asso_name_suffix_1 := if(cnt=1, r.name_suffix, l.asso_name_suffix_1);
 		self.asso_name_suffix_2 := if(cnt=2, r.name_suffix, l.asso_name_suffix_2);
 		self.asso_name_suffix_3 := if(cnt=3, r.name_suffix, l.asso_name_suffix_3);
@@ -870,7 +867,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.asso_name_suffix_8 := if(cnt=8, r.name_suffix, l.asso_name_suffix_8);
 		self.asso_name_suffix_9 := if(cnt=9, r.name_suffix, l.asso_name_suffix_9);
 		self.asso_name_suffix_10 := if(cnt=10, r.name_suffix, l.asso_name_suffix_10);
-		
+
 		self := l;
 	end;
 
@@ -911,19 +908,19 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.nbr_zipcode_input_3 := if(cnt=3, r.zip + r.zip4, l.nbr_zipcode_input_3);
 		self.nbr_phone_input_3 := if(cnt=3, r.phone, l.nbr_phone_input_3);
 		self.RelAssocNeigh_Flag:='Y';
-		
+
 		self.nbr_title_1 := if(cnt=1, r.title, l.nbr_title_1);
 		self.nbr_title_2 := if(cnt=2, r.title, l.nbr_title_2);
 		self.nbr_title_3 := if(cnt=3, r.title, l.nbr_title_3);
-		
+
 		self.nbr_middle_name_input_1 := if(cnt=1, r.mname, l.nbr_middle_name_input_1);
 		self.nbr_middle_name_input_2 := if(cnt=2, r.mname, l.nbr_middle_name_input_2);
 		self.nbr_middle_name_input_3 := if(cnt=3, r.mname, l.nbr_middle_name_input_3);
-		
+
 		self.nbr_name_suffix_1 := if(cnt=1, r.name_suffix, l.nbr_name_suffix_1);
 		self.nbr_name_suffix_2 := if(cnt=2, r.name_suffix, l.nbr_name_suffix_2);
 		self.nbr_name_suffix_3 := if(cnt=3, r.name_suffix, l.nbr_name_suffix_3);
-		
+
 	  self := l;
 	end;
 
@@ -943,7 +940,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.nbr_state_Updated_1 := if(cnt=1, r.st, l.nbr_state_Updated_1);
 		self.nbr_zipcode_Updated_1 := if(cnt=1, r.zip + r.zip4, l.nbr_zipcode_Updated_1);
 		self.nbr_phone_Updated_1 := if(cnt=1, r.phone, l.nbr_phone_Updated_1);
-		
+
 		self.nbr_first_name_Updated_2 := if(cnt=2, r.fname, l.nbr_first_name_Updated_2);
 		self.nbr_last_name_Updated_2 := if(cnt=2, r.lname, l.nbr_last_name_Updated_2);
 		self.nbr_address_Updated_2 := if(cnt=2, address.Addr1FromComponents(r.prim_range, r.predir, r.prim_name,
@@ -964,19 +961,19 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		self.nbr_zipcode_Updated_3 := if(cnt=3, r.zip + r.zip4, l.nbr_zipcode_Updated_3);
 		self.nbr_phone_Updated_3 := if(cnt=3, r.phone, l.nbr_phone_Updated_3);
 		self.RelAssocNeigh_Flag:='Y';
-		
+
 		self.nbr_title_Updated_1 := if(cnt=1, r.title, l.nbr_title_Updated_1);
 		self.nbr_title_Updated_2 := if(cnt=2, r.title, l.nbr_title_Updated_2);
 		self.nbr_title_Updated_3 := if(cnt=3, r.title, l.nbr_title_Updated_3);
-		
+
 		self.nbr_middle_name_Updated_1 := if(cnt=1, r.mname, l.nbr_middle_name_Updated_1);
 		self.nbr_middle_name_Updated_2 := if(cnt=2, r.mname, l.nbr_middle_name_Updated_2);
 		self.nbr_middle_name_Updated_3 := if(cnt=3, r.mname, l.nbr_middle_name_Updated_3);
-		
+
 		self.nbr_name_suffix_Updated_1 := if(cnt=1, r.name_suffix, l.nbr_name_suffix_Updated_1);
 		self.nbr_name_suffix_Updated_2 := if(cnt=2, r.name_suffix, l.nbr_name_suffix_Updated_2);
 		self.nbr_name_suffix_Updated_3 := if(cnt=3, r.name_suffix, l.nbr_name_suffix_Updated_3);
-		
+
 		self := l;
 	end;
 
