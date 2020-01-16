@@ -33,6 +33,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT address_layout_new := RECORD ,MAXLENGTH(max_size)
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
 				string100		ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -56,7 +59,7 @@ EXPORT layouts := MODULE
 				string20 		fax1;
 				string20 		fax2;
 				string20 		fax3;	
-				// string20 other_phone1; // dropped
+				string20 other_phone1; // dropped previously and now back?
 		END;		
 			
 		EXPORT csr_layout := RECORD
@@ -110,6 +113,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT dea_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -134,6 +140,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT disciplinaryact_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -162,6 +171,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT education_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -228,6 +240,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT language_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -263,6 +278,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT license_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -307,6 +325,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT npi_layout_new := RECORD
+				string15		load_id;
+				string10		load_source_data_date;
+				string10		load_qa_approval_date;
 				string100 	ln_key;
 				string25 		hms_src;
 				string100 	key;
@@ -327,6 +348,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT phone_layout_new := RECORD
+			string15	load_id;
+			string10	load_source_data_date;
+			string10	load_qa_approval_date;
 			phone_layout;
 		END;
 		
@@ -341,6 +365,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		EXPORT specialty_layout_new	:= RECORD
+			string15	load_id;
+			string10	load_source_data_date;
+			string10	load_qa_approval_date;
 			specialty_layout;
 		END;
 		
