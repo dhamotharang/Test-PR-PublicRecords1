@@ -142,12 +142,10 @@ export SearchService := MACRO
 				string q_id := '' : stored ('_QueryId');
 				string t_id := '' : stored ('_TransactionId');
 				string msg	:= 'Too many subjects found.';
-				string optoutmsg	:= 'THIS SUBJECT CURRENTLY HAS A STATE OPT OUT ON FILE PREVENTING THE RETURN OF SOME OR ALL OF THE INFORMATION YOU REQUESTED. IF THE CONSUMER HAS ANY QUESTIONS ABOUT THIS, PLEASE INSTRUCT THEM TO CALL LEXISNEXIS RISK SOLUTIONS INC. AT 1-888-217-1591.';				optoutMessage := if(hasoptout,DATASET([{'700',optoutmsg}], iesp.share.t_ResultDisclaimer),DATASET([], iesp.share.t_ResultDisclaimer));
-				//optoutMessage := row({700,optoutmsg,q_id, t_id,[], []},iesp.share.t_ResponseHeader);
+				optoutMessage := if(hasoptout,DATASET([{'700',Healthcare_Provider_Services.Constants.optoutmsg}], iesp.share.t_ResultDisclaimer),DATASET([], iesp.share.t_ResultDisclaimer));
 				badheader := ROW ({203, msg, q_id, t_id, [],[]}, iesp.share.t_ResponseHeader);
 				goodheader := ROW ({0, '', q_id, t_id, [],optoutMessage}, iesp.share.t_ResponseHeader);
-				self._Header         := map(returnThresholdExceeded =>badheader,
-																		goodheader);
+				self._Header         := if(returnThresholdExceeded ,badheader,goodheader);
 				self.SearchBy				 := first_row.searchby;
 				self.Options				 := first_row.options;
 				self.RecordCount 		 := count(recsFmt);

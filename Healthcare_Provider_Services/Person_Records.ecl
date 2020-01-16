@@ -550,11 +550,11 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 	export dsRelatives := if(count(dsDids(did>0))>0,choosen(relativesSlim,nbrRelsFinal));
 	export dsNeighbors := if(count(dsDids(did>0))>0,choosen(neighborsslim,iesp.Constants.HPR.MAX_Relatives));
 	export dsAssociates := if(exists(dsDids),choosen(associates, iesp.constants.BR.MaxAssociates));
-	export dsHistoricalNeighbors := if(count(dsDids(did>0))>0,choosen(neighbors_historical, iesp.constants.BR.MaxHistoricalNeighborhood));
-	export dsDOD := if(count(dsDids(did>0))>0,project(bestrecs(length(trim(dod,all))>1),transform(iesp.share.t_Date, self := iesp.ECL2ESP.toDatestring8(Left.dod))));
-	shared dsDODBlank := dx_death_master.Get.byDid(dsDids,did,death_params);
+	export dsHistoricalNeighbors := if(exists(dsDids),choosen(neighbors_historical, iesp.constants.BR.MaxHistoricalNeighborhood));
+	export dsDOD := if(exists(dsDids),project(bestrecs(length(trim(dod,all))>1),transform(iesp.share.t_Date, self := iesp.ECL2ESP.toDatestring8(Left.dod))));
+	 dsDODBlank := dx_death_master.Get.byDid(dsDids,did,death_params);
 	shared dsDodBlankVerified := dsDODBlank(death.dod8='');
-	shared blankDODExists := count(dsDodBlankVerified)>=1 and inputData.IncludeBlankDOD;
+	shared blankDODExists := exists(dsDodBlankVerified) and inputData.IncludeBlankDOD;
 	export DeceasedFlag := if(count(dsDOD)>0 or blankDODExists,true,false);
 	export echo := dsDids; 
 end;
