@@ -388,7 +388,6 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.LnjJudgmentTimeNewest           := if(lnjattributes_requested, ri.LnjJudgmentTimeNewest	, '');           
 		self.LnjJudgmentDollarTotal          := if(lnjattributes_requested, ri.LnjJudgmentDollarTotal	, ''); 
 		
-		
 		// liens 1&2
 	
 		 A:= dataset([transform(
@@ -603,10 +602,9 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		iesp.riskview2.t_RiskView2Report;
 	END;
 	
-	report_results := if(run_report, Report_TestSeed_Function(Indata, TestDataTableName_in), dataset([], returnLayout));
-	
-	
-	FinalSeed := Join(seedResults, report_results, left.seq=right.seq, transform(RiskView.Layouts.Layout_RiskView5_Search_Results, self.report:=right, self:=left), LEFT OUTER, KEEP(1), ATMOST(100));
+	report_results := if(run_report OR lnjattributes_requested, Report_TestSeed_Function(Indata, TestDataTableName_in), dataset([], returnLayout));
+	              
+    FinalSeed := Join(seedResults, report_results, left.seq=right.seq, transform(RiskView.Layouts.Layout_RiskView5_Search_Results, self.report:=right, self:=left), LEFT OUTER, KEEP(1), ATMOST(100));
 	
 
 	// ------------------ DEBUGGING SECTION --------------------
@@ -623,6 +621,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	// OUTPUT(Custom_Model_Name, NAMED('TS_Custom_Model_Name'));
 	// OUTPUT(seedResults, NAMED('seedResults'));
 	// OUTPUT(report_results, NAMED('report_results'));
+	// OUTPUT(finalseed, NAMED('finalseed'));
 	// ---------------------------------------------------------
 	
 	RETURN FinalSeed;

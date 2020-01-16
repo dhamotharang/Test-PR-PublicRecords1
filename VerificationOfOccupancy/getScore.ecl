@@ -1,4 +1,4 @@
-﻿import doxie, mdr, drivers, dx_header,doxie,suppress, riskwise, Relationship;
+﻿import doxie, mdr, drivers, dx_header, suppress, riskwise, Relationship, VerificationOfOccupancy;
 
 EXPORT getScore(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOBatchOut) VOO_attr,
 								DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOO_shell, 
@@ -7,7 +7,7 @@ EXPORT getScore(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOBatchOut) VOO_
 																		integer dppa,
 																		boolean isUtility,
 																		boolean dppa_ok,
-                                    doxie.IDataAccess CCPA_mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
     	
 VerificationOfOccupancy.Layouts.Layout_VOOBatchOut appendScore(VOO_attr le) := transform
 
@@ -225,7 +225,7 @@ VerificationOfOccupancy_CCPA getDIDs(VOO_shell le, Key_Header_Address ri) := TRA
 	SELF 													:= le;
 END;
 
-targetDIDs := join(VOO_shell, Key_Header_Address,
+targetDIDs_unsuppressed := join(VOO_shell, Key_Header_Address,
 												keyed(left.prim_name = right.prim_name) and
 												keyed(left.z5 = right.zip) and
 												keyed(left.prim_range = right.prim_range) and
@@ -238,10 +238,16 @@ targetDIDs := join(VOO_shell, Key_Header_Address,
 												(~mdr.Source_is_DPPA(RIGHT.src) OR 
 													(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))),
 								getDIDs(LEFT,RIGHT), left outer, ATMOST(riskwise.max_atmost));
-    getDIDs_VerificationOfOccupancy_CCPA := Suppress.Suppress_ReturnOldLayout(targetDIDs, ccpa_mod_access, VerificationOfOccupancy.Layouts.Layout_VOOShell);
+                
+    targetDIDs_flagged := Suppress.MAC_FlagSuppressedSource(targetDIDs_unsuppressed, mod_access);
 
+	targetDIDs := PROJECT(targetDIDs_flagged, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+    SELF.infer_own_targetDID 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.infer_own_targetDID);
+    SELF.infer_own_current 				:= IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.infer_own_current);
+	SELF := LEFT;
+	)); 
 //keep only those DIDs that are currently updating for the target address
-dedupTargetDIDs := dedup(sort(getDIDs_VerificationOfOccupancy_CCPA(infer_own_current), seq, infer_own_targetDID), seq, infer_own_targetDID);
+dedupTargetDIDs := dedup(sort(targetDIDs(infer_own_current), seq, infer_own_targetDID), seq, infer_own_targetDID);
 
 //join target DIDs to related DIDs and keep the non-matches (we want to know if there are unrelated entities currently reporting at the target address)
 VerificationOfOccupancy.Layouts.Layout_VOOShell getUnrelated(dedupTargetDIDs le, relatedDIDs ri) := TRANSFORM

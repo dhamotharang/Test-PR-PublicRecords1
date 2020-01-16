@@ -52,7 +52,7 @@ MODULE
       self := left));
 
 	  census_data.MAC_Fips2County_Keyed(death_recs,base.state,base.fipscounty,county_name,wct);
-	OUTPUT(death_recs);	
+
     return dedup(wct, all);
 	END;
 

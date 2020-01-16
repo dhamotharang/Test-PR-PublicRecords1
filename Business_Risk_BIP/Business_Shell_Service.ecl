@@ -259,6 +259,11 @@
 /*--INFO-- Business Shell Service - This is the XML Service utilizing BIP linking. */
 
 #option('expandSelectCreateRow', true);
+// #option('optimizelevel', 0);  // NEVER RELEASE THIS LINE OF CODE TO PROD
+                                    // this is for deploying to a 100-way as 
+                                    // the service is large.
+                                    // This service won't run on a 1-way.
+																		
 IMPORT Business_Risk_BIP, Cortera, Gateway, iesp, UT, Risk_Indicators, OFAC_XG5;
 
 EXPORT Business_Shell_Service() := FUNCTION
@@ -508,11 +513,12 @@ EXPORT Business_Shell_Service() := FUNCTION
 	'OverrideExperianRestriction',
 	'IncludeAuthRepInBIPAppend',
 	'LexIdSourceOptout',
-    '_TransactionId',
-    '_BatchUID',
-    '_GCID'
+	'_TransactionId',
+	'_BatchUID',
+	'_GCID'
 	));
 	
+  
 	/* ************************************************************************
 	 *                          Grab service inputs                           *
 	 ************************************************************************ */
@@ -737,7 +743,7 @@ EXPORT Business_Shell_Service() := FUNCTION
 	STRING2		Rep5_DLState          := '' : STORED('Rep5_DLState');
 	STRING100	Rep5_Email            := '' : STORED('Rep5_Email');
 	UNSIGNED6	Rep5_LexID            := 0  : STORED('Rep5_LexID');
-	STRING50			Rep5_BusinessTitle  := ''  : STORED('Rep5_BusinessTitle');
+	STRING50	Rep5_BusinessTitle  := ''  : STORED('Rep5_BusinessTitle');
   
  ds_CorteraRetrotestRecsRaw := DATASET([], Cortera.layout_Retrotest_raw) : STORED('CorteraRetrotestRecords', FEW);
 
@@ -1053,7 +1059,7 @@ EXPORT Business_Shell_Service() := FUNCTION
 																																 LexIdSourceOptout := LexIdSourceOptout, 
 																																 TransactionID := TransactionID, 
 																																 BatchUID := BatchUID, 
-																																 GlobalCompanyID := GlobalCompanyID);
+																																 GlobalCompanyID := GlobalCompanyID );
 	
 	Final_Results := PROJECT(Shell_Results, TRANSFORM(Business_Risk_BIP.Layouts.OutputLayout, SELF := LEFT));
 

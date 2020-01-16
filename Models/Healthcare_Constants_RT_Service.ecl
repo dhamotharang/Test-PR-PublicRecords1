@@ -570,14 +570,14 @@
 	export CFG_MBS_TotalCostRiskScore_Category_2_Low  := 'TotalCostRiskScore_Category_2_Low';
 	export CFG_MBS_TotalCostRiskScore_Category_1_High := 'TotalCostRiskScore_Category_1_High';
 
-	export decimal8_4 val_TotalCostRiskScore_Category_5_Low  := 1100;
-	export decimal8_4 val_TotalCostRiskScore_Category_4_High := 1100;
-	export decimal8_4 val_TotalCostRiskScore_Category_4_Low  := 850;
-	export decimal8_4 val_TotalCostRiskScore_Category_3_High := 850;
-	export decimal8_4 val_TotalCostRiskScore_Category_3_Low  := 650;
-	export decimal8_4 val_TotalCostRiskScore_Category_2_High := 650;
-	export decimal8_4 val_TotalCostRiskScore_Category_2_Low  := 450;
-	export decimal8_4 val_TotalCostRiskScore_Category_1_High := 450;
+	export unsigned1 val_TotalCostRiskScore_Category_5_Low  := 96;
+	export unsigned1 val_TotalCostRiskScore_Category_4_High := 95;
+	export unsigned1 val_TotalCostRiskScore_Category_4_Low  := 86;
+	export unsigned1 val_TotalCostRiskScore_Category_3_High := 85;
+	export unsigned1 val_TotalCostRiskScore_Category_3_Low  := 71;
+	export unsigned1 val_TotalCostRiskScore_Category_2_High := 70;
+	export unsigned1 val_TotalCostRiskScore_Category_2_Low  := 51;
+	export unsigned1 val_TotalCostRiskScore_Category_1_High := 50;
 
 	Export usage_GLB_Value := '06';
 

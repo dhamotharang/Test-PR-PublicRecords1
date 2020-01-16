@@ -438,7 +438,8 @@ EXPORT Layouts := MODULE
     UNSIGNED4 offenseDDFirstReportedActivity;
     UNSIGNED4 offenseDDLastReportedActivity;
     UNSIGNED4 offenseDDLastCourtDispDate;
-    UNSIGNED1 offenseDDLegalEventTypeCode;
+    UNSIGNED2 offenseCategoryID;
+    STRING100 offenseCategoryDescription;
     STRING75 offenseCharge;
     STRING1 offenseDDChargeLevelCalculated;
     STRING35 offenseChargeLevelReported; 

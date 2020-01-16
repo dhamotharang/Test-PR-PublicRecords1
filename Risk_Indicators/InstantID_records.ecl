@@ -271,7 +271,7 @@ d := dataset([{(unsigned)account_value}],rec);
 //Check to see if new custom CVI field is populated with a valid value
 Custom_Model_Name := trim(STD.STR.ToUpperCase(In_CustomCVIModelName));
 
-Valid_CCVI := Custom_Model_Name in ['','CCVI1501_1','CCVI1609_1','CCVI1810_1'];
+Valid_CCVI := Custom_Model_Name in ['','CCVI1501_1','CCVI1609_1','CCVI1810_1', 'CCVI1909_1'];
 CustomCVIModelName := if(Valid_CCVI, Custom_Model_Name, error('Invalid Custom CVI model name.')):INDEPENDENT;
 ischase := if(CustomCVIModelName = 'CCVI1810_1', TRUE,FALSE);
 
@@ -403,7 +403,7 @@ ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purp
 //For round 2 validation of Threatmetrix model
 VALIDATION_MODE := False;
  #if(VALIDATION_MODE)
-ModelValidationResults := Models.IID1906_0_0(ret);
+  ModelValidationResults := Models.IID1906_0_0(ret);
   export InstantID_records :=ModelValidationResults;
 #ELSE
 //might be able to set special chase conditions here at a later date, 
@@ -416,40 +416,7 @@ targus := Royalty.RoyaltyTargus.GetOnlineRoyalties(UNGROUP(ret), src, TargusType
 //Only get royalties for hitting the Insurance DL information if they are allowed to access the information
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 insurance := If(TrackInsuranceRoyalties, Royalty.RoyaltyFDNDLDATA.GetWebRoyalties(UNGROUP(ret), did, insurance_dl_used, true));
-																	
-ret_test_seed_un := risk_indicators.InstantID_Test_Function(Test_Data_Table_Name,fname_val,lname_val,ssn_value,zip_value,
-                       					 phone_value,Account_value, NumReturnCodes);
-																												 
-ret_test_seed := project(ret_test_seed_un,transform(risk_indicators.Layout_InstantID_NuGenPlus, 
-																										// strictly an inputecho of fields that are not mapped in the testseed function
-																										self.mname := mname_val;
-																										self.suffix := suffix_val;
-																										SELF.in_streetAddress := addr_value;
-																										SELF.in_city := city_val;
-																										SELF.in_state := state_val;
-																										SELF.in_country := country_value;
-																										self.dob := dob_value;
-																										SELF.dl_number :=dl_number_value;
-																										SELF.dl_state := dl_state_value;
-																										self.PassportUpperLine := passportupperline ;
-																										self.PassportLowerLine := passportlowerline ;
-																										self.Gender := gender ; 
-																										self.InstantIDVersion := (string)actualIIDVersion;
-																										self := left;
-																										self := []));
-
-risk_indicators.layout_input into_test_prep(risk_indicators.Layout_InstantID_NuGenPlus l) := transform
-	self.seq := l.seq;	// take seq from the ret_test_seed data as we will need it for joining to scores later.
-	self.ssn := ssn_value;
-	self.phone10 := phone_value;
-	self.fname := STD.STR.ToUpperCase(fname_val);
-	self.lname := STD.STR.ToUpperCase(lname_val);
-	SELF.in_zipCode := zip_value;
-	self := [];
-end;
-
-test_prep := PROJECT(ret_test_seed,into_test_prep(LEFT));																												 
-
+																																											 
 tscore(UNSIGNED1 i) := IF(i=255,0,i);
 
 
@@ -564,7 +531,7 @@ vermiddle := Map(ischase AND isMiddleExpressionFound => '',
 	SELF.NAP_summary := NAP_summary1;
 	
 	SELF.NAP_Type    :=le.nap_type;
-  SELF.NAP_Status  := le.nap_status;
+    SELF.NAP_Status  := le.nap_status;
 
 	SELF.valid_ssn := IF(le.socllowissue != '', 'G', '');
 	SELF.corrected_lname := le.correctlast;
@@ -696,34 +663,27 @@ vermiddle := Map(ischase AND isMiddleExpressionFound => '',
 	SELF.Watchlist_contry := le.Watchlist_contry;
 	SELF.Watchlist_Entity_Name := le.Watchlist_Entity_Name;
 
-	//chase wants their custom cvi mapped to the normal and custom cvi and reason codes. 
-	cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName,IncludeITIN,IncludeComplianceCap),
-									ischase => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName,IncludeITIN,IncludeComplianceCap),
-									actualIIDVersion=0 => risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast),
-										risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,'',IncludeITIN,IncludeComplianceCap));
-	//need two chase checks here because chase would like their model returned in the normal CVI slot even though it is a custom model call. one for Custom model with modification, and one without.																		
+OverrideOptions := MODULE(Risk_Indicators.iid_constants.IOverrideOptions) 
+	EXPORT isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) AND actualIIDVersion=1;
+    EXPORT isCodePO := IF(CustomCVIModelName = 'CCVI1909_1', risk_indicators.rcSet.isCodePO(le.addr_type), risk_indicators.rcSet.isCodePO(le.addr_type) AND IsPOBoxCompliant);
+    EXPORT isCodeCL := risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) AND IncludeCLoverride;
+    EXPORT isCodeMI := risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) AND IncludeMIoverride AND actualIIDVersion=1;
+    EXPORT isCodeMS := risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) AND IncludeMSoverride;
+    EXPORT isCode12 := Risk_Indicators.rcSet.isCode12(le.zipclass);
+    EXPORT isCode72 := Risk_Indicators.rcSet.isCode72((STRING)le.socsverlevel, le.SSN, le.ssnExists, le.lastssnmatch2);
+END;
+
+    //chase wants their custom cvi mapped to the normal and custom cvi and reason codes. 
+     SELF.CVI :=                        map(CustomCVIModelName = 'CCVI1810_1' => Models.CVI1810_1_0(NAP_summary1,NAS_summary1,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
+                                                            actualIIDVersion=0 => risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast, ,OverrideOptions),
+                                                            risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions));
 	
-	isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
-	
-	
-	SELF.CVI := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
-							IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
-							IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)cvi_temp > 10 => '10',
-							IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)cvi_temp > 10 and actualIIDVersion=1 => '10',
-							isCodeDI AND (INTEGER)cvi_temp > 10 => '10',
-							cvi_temp);
-	
-	custom_cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName,IncludeITIN,IncludeComplianceCap),
-													CustomCVIModelName <> '' => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName,IncludeITIN,IncludeComplianceCap),
-													'');
-	
-	SELF.cviCustomScore := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)custom_cvi_temp > 10 => '10',
-							IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)custom_cvi_temp > 10 => '10',
-							IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)custom_cvi_temp > 10 => '10',
-							IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)custom_cvi_temp > 10 and actualIIDVersion=1 => '10',
-							isCodeDI AND (INTEGER)custom_cvi_temp > 10 => '10',
-							custom_cvi_temp);
-	
+     // Chase custom score is calculated in SELF.CVI if it's requested, no need to call the attribute here too
+     SELF.cviCustomScore := MAP(CustomCVIModelName = 'CCVI1909_1' => Models.CVI1909_1_0(NAP_summary1,NAS_summary1,SELF.CVI, SELF.verify_dob, le.addr_type, le.zipclass, (STRING)le.socsverlevel, le.ssn, le.ssnExists, le.lastssnmatch2),
+                                                            CustomCVIModelName = 'CCVI1501_1' => Models.CVI1501_1_0(NAP_summary1,NAS_summary1,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
+                                                            CustomCVIModelName <> '' => SELF.CVI,
+                                                            '');
+  
 	self.SubjectSSNCount := if(risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months), (string)le.ssns_per_adl_seen_18months, '');
 	self.age := if (le.age = '***','',le.age);
   
@@ -731,16 +691,16 @@ vermiddle := Map(ischase AND isMiddleExpressionFound => '',
 	ssn_verified := le.socsverlevel IN risk_indicators.iid_constants.ssn_name_match;
 	isCode02 := risk_indicators.rcSet.isCode02(le.decsflag);
 	self.deceasedDate := MAP(	ssn_verified and isCode02 => if(le.deceasedDate=0, '', (string)le.deceasedDate),
-														isCodeDI => if(le.DIDdeceasedDate=0, '', (STRING)le.DIDdeceasedDate),
+														OverrideOptions.isCodeDI => if(le.DIDdeceasedDate=0, '', (STRING)le.DIDdeceasedDate),
 														'');
 	self.deceasedDOB := MAP(ssn_verified and isCode02 => if(le.deceasedDOB=0, '', (string)le.deceasedDOB),
-													isCodeDI => if(le.DIDdeceasedDOB=0, '', (STRING)le.DIDdeceasedDOB),
+													OverrideOptions.isCodeDI => if(le.DIDdeceasedDOB=0, '', (STRING)le.DIDdeceasedDOB),
 													'');
 	self.deceasedFirst := MAP(ssn_verified and isCode02 => le.deceasedFirst,
-														isCodeDI => le.DIDdeceasedFirst,
+														OverrideOptions.isCodeDI => le.DIDdeceasedFirst,
 														'');
 	self.deceasedLast := MAP(	ssn_verified and isCode02 => le.deceasedLast,
-														isCodeDI => le.DIDdeceasedLast,
+														OverrideOptions.isCodeDI => le.DIDdeceasedLast,
 														'');
 	
 	risk_indicators.mac_add_sequence(le.watchlists, watchlists_with_seq);
@@ -770,11 +730,15 @@ vermiddle := Map(ischase AND isMiddleExpressionFound => '',
   
 	self.cviCustomScore_name := if(Valid_CCVI, CustomCVIModelName, '');
 	
+    noCustomRIorFUA := CustomCVIModelName IN ['', 'CCVI1909_1'];
+    
 	self.cviCustomScore_ri  := MAP(ischase and chase_expressions => reason_with_seq_chase(hri<>''),
+                                                                    noCustomRIorFUA => empty_reasons_with_seq,
 																	CustomCVIModelName <> ''=>reasons_with_seq(hri<>''), 
 																	empty_reasons_with_seq);
 																	
 	SELF.cviCustomScore_fua := MAP(ischase and chase_expressions => risk_indicators.getActionCodes(le, 4, NAS_summary1, NAP_summary1, ac_settings := actioncode_settings),
+                                                                    noCustomRIorFUA => empty_reasons,
 																	CustomCVIModelName <> '' => risk_indicators.getActionCodes(le, 4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings),
 																	empty_reasons);
 		
@@ -1050,7 +1014,47 @@ end;
 // FP3710_9 is a call to Flagship FP3710_0 except with Criminal Risk Codes returned
 scores :=	project(scores_out, limit_scores_out(left) );
 
+DebugTurnOffTestseeds := FALSE; // SHOULD ALWAYS BE FALSE WHEN GOING TO PRODUCTION
+#IF(DebugTurnOffTestseeds)
+iid := formed;
+red_flags := risk_indicators.Red_Flags_Function(ret, reasoncode_settings);
+#ELSE
+ret_test_seed_un := risk_indicators.InstantID_Test_Function(Test_Data_Table_Name,fname_val,lname_val,ssn_value,zip_value,
+                       					 phone_value,Account_value, NumReturnCodes);
+																												 
+ret_test_seed := project(ret_test_seed_un,transform(risk_indicators.Layout_InstantID_NuGenPlus, 
+               																										// strictly an inputecho of fields that are not mapped in the testseed function
+               																										self.mname := mname_val;
+               																										self.suffix := suffix_val;
+               																										SELF.in_streetAddress := addr_value;
+               																										SELF.in_city := city_val;
+               																										SELF.in_state := state_val;
+               																										SELF.in_country := country_value;
+               																										self.dob := dob_value;
+               																										SELF.dl_number :=dl_number_value;
+               																										SELF.dl_state := dl_state_value;
+               																										self.PassportUpperLine := passportupperline ;
+               																										self.PassportLowerLine := passportlowerline ;
+               																										self.Gender := gender ; 
+               																										self.InstantIDVersion := (string)actualIIDVersion;
+               																										self := left;
+               																										self := []));
+
+      risk_indicators.layout_input into_test_prep(risk_indicators.Layout_InstantID_NuGenPlus l) := transform
+         	self.seq := l.seq;	// take seq from the ret_test_seed data as we will need it for joining to scores later.
+         	self.ssn := ssn_value;
+         	self.phone10 := phone_value;
+         	self.fname := STD.STR.ToUpperCase(fname_val);
+         	self.lname := STD.STR.ToUpperCase(lname_val);
+         	SELF.in_zipCode := zip_value;
+         	self := [];
+         end;
+
+test_prep := PROJECT(ret_test_seed,into_test_prep(LEFT));	
+
 iid := if(Test_Data_Enabled, ret_test_seed, formed);	// choose either test results or real results
+red_flags := if(Test_Data_Enabled, seed_files.GetRedFlags(test_prep, Test_Data_Table_Name), risk_indicators.Red_Flags_Function(ret, reasoncode_settings));
+#END
 
 risk_indicators.Layout_InstantID_NuGenPlus combo(risk_indicators.Layout_InstantID_NuGenPlus le, scores ri) :=
 TRANSFORM
@@ -1063,8 +1067,6 @@ END;
 
 scores_added := JOIN(iid, scores, 
 										LEFT.AcctNo=RIGHT.AccountNumber, combo(LEFT,RIGHT), LEFT OUTER, PARALLEL);
-
-red_flags := if(Test_Data_Enabled, seed_files.GetRedFlags(test_prep, Test_Data_Table_Name), risk_indicators.Red_Flags_Function(ret, reasoncode_settings));
 
 with_red_flags := join(scores_added, red_flags, left.seq=right.seq, 
 											transform(risk_indicators.Layout_InstantID_NuGenPlus,

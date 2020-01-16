@@ -82,22 +82,22 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     indPerAssoc := DueDiligence.getIndPerAssoc(indCriminalData);
     
     //get identity risk
-    indIDRisk := DueDiligence.getIndIdentityRisk(indPerAssoc, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, mod_access);
-    
+    indIDRisk := DueDiligence.getIndIdentityRisk(indPerAssoc, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, bsOptions, mod_access);
+
     //populate the attributes and flags
     indKRI := DueDiligence.getIndKRI(indIDRisk);
 
     //if a person report is being requested, populate the report
     indReportData :=  IF(includeReport, DueDiligence.getIndReport(indKRI, options, linkingOptions, ssnMask, mod_access), indKRI);
-    
+
     //populate the attributes and flags for those without a DID
     indNoDIDKRI := DueDiligence.getIndKRINoDID(noDIDFound);
-    
+
     //add both did and didless individuals
     finalInd := SORT(indReportData + indNoDIDKRI, seq);
+    
+    
 
-    
-    
     
 
     //debugging section

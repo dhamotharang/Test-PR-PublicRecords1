@@ -1530,6 +1530,8 @@ EXPORT Constants := MODULE
 			export MaxAttributes := 1000;
 			export MaxAlertCount := 12;
 			export MaxPublicReportCount := 99;
+			export MaxStateExclusions := 50;
+			export MaxReportingSourceExclusions := 12292;
 	end;
 		
   // Risk Metrics
@@ -2086,7 +2088,7 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxDefault         := 100;
 		export unsigned2 MaxAircrafts       := 1000;
 		export unsigned2 MaxATF             := 200;
-		export unsigned2 MaxAVM             := 1000;
+		export unsigned2 MaxAVM             := 2000;
 		export unsigned2 MaxBankruptcies    := 1000;  
 		export unsigned2 MaxCrimOffenders		:= 2000;  
 		export unsigned2 MaxCrimOffenses		:= 750;

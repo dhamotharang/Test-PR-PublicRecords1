@@ -42,8 +42,19 @@ temp combo(temp le, temp ri) := TRANSFORM
 	self.citystatescore := le.citystatescore;
 	self.zipscore := le.zipscore;
 	self.socsscore := le.socsscore;
+	
+use_inquiry_dob :=	map(
+	risk_indicators.iid_constants.tscore(le.dobscore) = 255                                         => true,
+	risk_indicators.iid_constants.tscore(le.dobscore)<risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore)
+	AND TRIM(le.verdob[5..8]) IN ['','0000']
+	AND ri.inquiryNAPdob[1..4]=le.verdob[1..4]                                    => true,
+	risk_indicators.iid_constants.tscore(le.dobscore)<risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore)
+	AND TRIM(le.verdob[7..8]) IN ['','00']
+	AND ri.inquiryNAPdob[1..6]=le.verdob[1..6]                                    => true,
+	false);
+																							 
 	// choose the higher of header dob or inquiry dob
-	self.dobscore := if(risk_indicators.iid_constants.tscore(le.dobscore)>=risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore), le.dobscore, ri.inquiryNAPdobScore);
+	self.dobscore := if(use_inquiry_dob,  ri.inquiryNAPdobScore, le.dobscore );
 	self.verfirst := 	le.verfirst;
 	self.vermiddle := 	le.vermiddle;
 	self.verlast := 	le.verlast;
@@ -63,15 +74,8 @@ temp combo(temp le, temp ri) := TRANSFORM
 	self.verhphone := 	le.verhphone;
 	self.verwphone := 	le.verwphone;
 	self.versocs := 	le.versocs;
-	self.verdob := map(
-		risk_indicators.iid_constants.tscore(le.dobscore) = 255                                         => ri.inquiryNAPdob,
-		risk_indicators.iid_constants.tscore(le.dobscore)<risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore)
-			AND TRIM(le.verdob[5..8]) IN ['','0000']
-			AND ri.inquiryNAPdob[1..4]=le.verdob[1..4]                                    => ri.inquiryNAPdob,
-		risk_indicators.iid_constants.tscore(le.dobscore)<risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore)
-			AND TRIM(le.verdob[7..8]) IN ['','00']
-			AND ri.inquiryNAPdob[1..6]=le.verdob[1..6]                                    => ri.inquiryNAPdob,
-																							 le.verdob);
+	self.verdob := if(use_inquiry_dob, ri.inquiryNAPdob, le.verdob);
+	
 	self.pullidflag := le.pullidflag;
 	self.watchlists := le.watchlists;
 	
@@ -147,9 +151,9 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonzero(wphonecount);
 	nonzero(socscount);
 	// add the inquiry nap dob count to the header dob count (inquiry dob count is always an exact match check)
-	self.dobcount := le.dobcount + if(ri.inquiryNAPdobcount>0, 1, 0);
+	self.dobcount := le.dobcount + if(use_inquiry_dob and ri.inquiryNAPdobcount>0, 1, 0);
 	nonzero(cmpycount);
-	self.dobsources := TRIM(le.dobsources) + if(ri.inquiryNAPdobcount>0, 'S ,','');
+	self.dobsources := TRIM(le.dobsources) + if(use_inquiry_dob and ri.inquiryNAPdobcount>0, 'S ,','');
 	
 	// num_nonderogs are calculated in both the NAP side and the NAS side,  we should be adding them together instead of just picking a non-zero result
 		nonzero(num_nonderogs);

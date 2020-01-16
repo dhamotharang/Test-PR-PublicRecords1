@@ -5,17 +5,27 @@ EXPORT getLiens(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
+AllowedLSrcs := ['MA',        
+'HG',                  
+'CL',                  
+'IL',                  
+'NY',                  
+'CJ']; 
+
 	UCase := StringLib.StringToUpperCase;
 	BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 	
 	// --------------- Judgments and Liens ----------------
 	
 	// Get the TMSID/RMSID results for Liens and Judgments data
-	LiensJudgmentsTMSIDRaw := LiensV2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+	LiensJudgmentsTMSIDRaw_temp := LiensV2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
 																							Options.KeepLargeBusinesses);
+                                              
+  LiensJudgmentsTMSIDRaw:= IF(Options.MarketingMode = 1,LiensJudgmentsTMSIDRaw_temp(TMSID[1..2] IN AllowedLSrcs), LiensJudgmentsTMSIDRaw_temp);
+  
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq2(LiensJudgmentsTMSIDRaw, Shell, LiensJudgmentsTMSIDSeq);
 	

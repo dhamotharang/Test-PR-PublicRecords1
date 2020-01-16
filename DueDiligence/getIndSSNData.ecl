@@ -29,7 +29,7 @@ EXPORT getIndSSNData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     allInd := spouse + parents + relatives + inData;
     uniqueDIDs := DEDUP(SORT(allInd, individual.did), individual.did);
 
-    withSSNFlags := DueDiligence.CommonIndividual.GetIIDSSNFlags(uniqueDIDs, dataRestriction, dppa, glba, bsVersion, bsOptions, mod_access);
+    withSSNFlags := DueDiligence.CommonIndividual.GetIIDSSNFlags(uniqueDIDs, dataRestriction, dppa, glba, bsVersion, bsOptions, isFCRA, mod_access);
 
 
     validateSSN := JOIN(allInd, withSSNFlags,

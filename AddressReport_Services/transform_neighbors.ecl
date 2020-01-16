@@ -165,9 +165,9 @@ export transform_neighbors(dataset(doxie.layout_nbr_records) neighbors,
 
   //If didn't find Phones by EDA, use Phones Plus to retrieve neighbors phones for Location Report
   nbr_pp_in := join(neighbors_crim_ind, nbr_Phone_tmp0((integer)Phone10<>0), left.did = right.did, transform(left), left only);
-  doxie.MAC_Get_GLB_DPPA_PhonesPlus(nbr_pp_in, nbr_pp_out, true,,
-                                    mod_access.glb, mod_access.dppa, mod_access.industry_class,if(location_report,0,11),
-                                    '',,false,mod_access.DataRestrictionMask, false, true);
+  nbr_pp_out := doxie.MAC_Get_GLB_DPPA_PhonesPlus(nbr_pp_in, mod_access, true,,
+                                    if(location_report,0,11),
+                                    '',,false, false, true);
   srt_pp_out := sort(nbr_pp_out, did, -confidencescore, -dt_last_seen);
 
   nbr_phone_layout addphonesplus(nbr_pp_in L, srt_pp_out R) := transform
