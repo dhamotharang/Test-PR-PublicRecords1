@@ -1,5 +1,5 @@
 ﻿export ExtractContacts(inContacts, key_did_ind) := functionmacro
-   contactDs      := project(inContacts, recordof(BIPV2_Build.key_contact_linkids.dkeybuild));
+   contactDs      := project(inContacts, BIPV2_Contacts.Layouts.contact_linkids.layoutOrigFile);
    bestContacts   := BIPV2_Build.BestContactTitle(contactDs).contact_title(proxid=0);
    
    FlatContactRec := record
