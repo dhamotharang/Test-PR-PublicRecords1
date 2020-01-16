@@ -43,6 +43,9 @@
 									 ',20 => modData'+%iIndex%+'.mode20' +
 									 ',21 => modData'+%iIndex%+'.mode21' +
 									 ',22 => modData'+%iIndex%+'.mode22' +
+									 ',23 => modData'+%iIndex%+'.mode23' +
+                   ',24 => modData'+%iIndex%+'.mode24' +
+									 ',25 => modData'+%iIndex%+'.mode25' +
 								   ')')
 
       #SET(iIndex,%iIndex%+1)
