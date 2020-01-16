@@ -1,10 +1,11 @@
 ﻿// Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
 IMPORT $, Foreclosure_Services, PersonReports, doxie, doxie_crs, ATF_Services, iesp,
       AutoStandardI, ut, American_Student_Services, dx_header,
-			SmartRollup, FCRA, LN_PropertyV2_Services;
+			SmartRollup, FCRA, LN_PropertyV2_Services, Royalty;
 iespOut := iesp.smartlinxreport;
 out_rec := record(iespOut.t_SmartlinxReportIndividual)
     dataset(iesp.share.t_CodeMap) Messages;
+    dataset(Royalty.Layouts.Royalty) EmailV2Royalties;
 end;
 // accepts atmost one DID, actually
 EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
@@ -115,9 +116,9 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_addresses_prior := s_addresses(verified=false);
 	s_addresses_current_count := count(s_addresses_current);
 	s_addresses_prior_count := count(s_addresses_prior);
-	tmp_addresses   := choosen (SmartRollup.fn_smart_getAddrMetadata.addresses(s_addressesSequence,doBadSecRange,mod_smartlinx),iesp.Constants.SMART.MaxAddress);	
+	tmp_addresses   := choosen (SmartRollup.fn_smart_getAddrMetadata.addresses(s_addressesSequence,doBadSecRange,mod_smartlinx),iesp.Constants.SMART.MaxAddress);
 	tmp_p_addresses      := choosen (SmartRollup.fn_smart_getPhonesPlusMetadata.byPhone(tmp_addresses),iesp.Constants.SMART.MaxAddress);
-	p_addressesWSourceCounts := choosen(SmartRollup.fn_smart_getAddrMetadata.AddAddressSourceCounts(subject_did,tmp_p_addresses,mod_smartlinx),iesp.Constants.Smart.MaxAddress);	
+	p_addressesWSourceCounts := choosen(SmartRollup.fn_smart_getAddrMetadata.AddAddressSourceCounts(subject_did,tmp_p_addresses,mod_smartlinx),iesp.Constants.Smart.MaxAddress);
 	p_addresses_current := p_addressesWSourceCounts(verified=true);
 	p_addresses_prior   := p_addressesWSourceCounts(verified=false);
 	subject_imposters := IF (mod_smartlinx.include_imposters, pers.imposters,dataset([],iesp.bps_share.t_BpsReportImposter));
@@ -223,12 +224,14 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	p_prop_current := choosen (if (mod_smartlinx.Smart_rollup, s_prop_current , dataset([],iesp.smartlinxreport.t_SLRPropertyAssessmentDeedsRecord)), iesp.constants.SMART.MaxProperties);
 	p_prop_prior   := choosen (if (mod_smartlinx.Smart_rollup, s_prop_prior   , dataset([],iesp.smartlinxreport.t_SLRPropertyAssessmentDeedsRecord)), iesp.constants.SMART.MaxProperties);
 
-
 	// OTHER PROPERTY SECTION
-	emails      := IF (mod_smartlinx.include_email,  PersonReports.email_records(dids, PROJECT (mod_smartlinx, $.IParam.emails), IsFCRA), dataset([],iesp.emailsearch.t_EmailSearchRecord));
+	emails      := IF (mod_smartlinx.include_email and mod_smartlinx.email_version=1,  PersonReports.email_records(dids, PROJECT (mod_smartlinx, $.IParam.emails), IsFCRA), dataset([],iesp.emailsearch.t_EmailSearchRecord));
 	s_emails    := SmartRollup.fn_smart_rollup_email(emails);  //count children since rows are per source
-	s_emails_count := count(s_emails);
+  emailsV2    := if (mod_smartlinx.include_email and mod_smartlinx.email_version=2,  PersonReports.emailV2_records(dids, PROJECT (mod_smartlinx, $.IParam.emails)));
+	s_emails_count := if (mod_smartlinx.email_version=1, count(s_emails), count(emailsV2.EmailV2Records));
+
 	p_emails      := choosen (s_emails, iesp.Constants.SMART.MaxEmails);
+	p_emailsV2    := choosen (emailsV2.EmailV2Records, iesp.Constants.SMART.MaxEmails);
 
   vehiclesMod   := PersonReports.vehicle_records (dids, PROJECT (mod_smartlinx, $.IParam.vehicles, OPT), IsFCRA);
 	vehicles      := IF (mod_smartlinx.include_motorvehicles and count(vehiclesMod.vehicles_v2) < iesp.constants.SMART.MaxUnRolledRecords, vehiclesMod.vehicles_v2,dataset([],iesp.motorvehicle.t_MotorVehicleReport2Record)); //using vehicles instead of vehicles_v2 because the v2 version doesn't contain historyFlag.
@@ -431,6 +434,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
      Self.ReportAddresses.CurrentAddresses := p_addresses_current;
      Self.ReportAddresses.PriorAddresses   := p_addresses_prior;
 		 Self.EmailAddresses                   := p_emails;
+		 Self.Emails                           := p_emailsV2;
      Self.Imposters                        := p_imposters;
 		 Self.ImposterEntities                 := p_imposter_entities;
      Self.SexualOffenses                   := p_sexOff;
@@ -483,6 +487,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 
 		Self.Sources :=     p_sources;
 		Self.Messages :=    messages_property_ds;//add addition messages once the Max of 1 is taken off of iesp.bpsreport.t_BpsReportBaseResponse
+		self.EmailV2Royalties := emailsv2.EmailV2Royalties;
 		self := [];
  END;
   individual := dataset ([Format ()]); // is supposed to produce one row only (usebestdid = true)

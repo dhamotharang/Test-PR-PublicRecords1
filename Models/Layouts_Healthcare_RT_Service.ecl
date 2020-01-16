@@ -331,14 +331,14 @@ EXPORT Layouts_Healthcare_RT_Service := module
 			decimal8_4 TotalCostRiskScore_Rank_99_Max   :=  1384.471;
 			decimal8_4 TotalCostRiskScore_Rank_100_Min  :=  138;
 
-			decimal8_4 TotalCostRiskScore_Category_5_Low  := 1100;
-			decimal8_4 TotalCostRiskScore_Category_4_High := 1100;
-			decimal8_4 TotalCostRiskScore_Category_4_Low  := 850;
-			decimal8_4 TotalCostRiskScore_Category_3_High := 850;
-			decimal8_4 TotalCostRiskScore_Category_3_Low  := 650;
-			decimal8_4 TotalCostRiskScore_Category_2_High := 650;
-			decimal8_4 TotalCostRiskScore_Category_2_Low  := 450;
-			decimal8_4 TotalCostRiskScore_Category_1_High := 450;
+			unsigned1 TotalCostRiskScore_Category_5_Low  :=  96;
+			unsigned1 TotalCostRiskScore_Category_4_High :=  95;
+			unsigned1 TotalCostRiskScore_Category_4_Low  :=  86;
+			unsigned1 TotalCostRiskScore_Category_3_High :=  85;
+			unsigned1 TotalCostRiskScore_Category_3_Low  :=  71;
+			unsigned1 TotalCostRiskScore_Category_2_High :=  70;
+			unsigned1 TotalCostRiskScore_Category_2_Low  :=  51;
+			unsigned1 TotalCostRiskScore_Category_1_High :=  50;
 
 			Boolean SuppressResultsForOptOuts := Healthcare_Constants_RT_Service.CFG_True;
 			UNSIGNED1 LexIdSourceOptout := 1;

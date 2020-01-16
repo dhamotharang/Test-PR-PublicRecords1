@@ -525,7 +525,7 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   hhid_dids := PROJECT(doxie.Get_Household_DIDs(indids(did<>0)),doxie.layout_references);
   use_dids := IF(include_HHID_DIDs, hhid_dids, indids(did<>0));
   // get the records based on did parameters
-  gong.Mac_History_Daily_Did(use_dids, did, did_key_raw_recs);
+  gong.Mac_History_Daily_Did(use_dids, mod_access, did, did_key_raw_recs);
 
   did_key_recs :=  project(did_key_raw_recs,doDidProject(LEFT));
 

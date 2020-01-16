@@ -106,7 +106,7 @@ IMPORT Autokey_Batch, BatchShare, Gateway, MDR, Phones, PhoneFinder_Services, Ro
     SELF.acctno               := L.acctno;
     SELF.seq                  := L.seq;
     SELF.phone                := L.phone;
-    SELF.phonestatus          := PhoneFinder_Services.Constants.PhoneStatus.NotAvailable;
+    SELF.phonestatus          := L.phonestatus;
     BOOLEAN UsePVS            := L.typeflag = Phones.Constants.TypeFlag.DataSource_PV;
     SELF.coc_description      := L.coc_description;
     SELF.carrier_name         := L.carrier_name;

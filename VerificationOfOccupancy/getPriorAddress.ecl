@@ -1,4 +1,4 @@
-﻿	import Risk_Indicators, RiskWise, MDR,Doxie,Suppress, drivers, dx_header;
+﻿	import Risk_Indicators, RiskWise, MDR, Doxie, Suppress, drivers, dx_header, VerificationOfOccupancy;
 
 EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOShell, 
 													 DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) allHeader, 
@@ -8,8 +8,7 @@ EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) 
 																		boolean isUtility,
 																		boolean dppa_ok,
 																		boolean fares_ok = true,
-                                    
-                                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END ) := FUNCTION
+                                                                        doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
                                     
 
 // ******************************************************************************************************************************
@@ -116,7 +115,7 @@ EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) 
 		SELF 													:= le;
 	END;
 	
-	priorAddrDIDs := join(rolled_Property, Key_Header_Address,
+	priorAddrDIDs_unsuppressed := join(rolled_Property, Key_Header_Address,
 												keyed(left.h.prim_name = right.prim_name) and
 												keyed(left.h.zip = right.zip) and
 												keyed(left.h.prim_range = right.prim_range) and
@@ -128,11 +127,19 @@ EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) 
 												(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 												(~mdr.Source_is_DPPA(RIGHT.src) OR 
 													(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))),
-									 getPriorDIDs(LEFT,RIGHT), left outer, ATMOST(RiskWise.max_atmost));                  
-                 getPriorDIDs_VerificationOfOccupancy_CCPA := Suppress.Suppress_ReturnOldLayout(priorAddrDIDs, mod_access, VerificationOfOccupancy.Layouts.Layout_VOOShell);
+									 getPriorDIDs(LEFT,RIGHT), left outer, ATMOST(RiskWise.max_atmost));           
+                   
+    priorAddrDIDs_flagged := Suppress.MAC_FlagSuppressedSource(priorAddrDIDs_unsuppressed, mod_access);
 
+	priorAddrDIDs := PROJECT(priorAddrDIDs_flagged, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+		SELF.prior_addr_current				:= IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.prior_addr_current);
+		SELF.prior_addr_DID 					:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.prior_addr_DID);
+		SELF.prior_addr_dt_first_seen      := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.prior_addr_dt_first_seen);
+		SELF.prior_addr_dt_last_seen 	    := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.prior_addr_dt_last_seen);
+		SELF := LEFT;
+	)); 
 //Dedup to just a list of DIDs associated with prior address - if any are currently updating, save that one for the DID
-	dedupAddrDIDs := dedup(sort(GetPriorDIDs_VerificationOfOccupancy_CCPA, seq, prior_addr_DID, -prior_addr_current), seq, prior_addr_DID);  
+	dedupAddrDIDs := dedup(sort(priorAddrDIDs, seq, prior_addr_DID, -prior_addr_current), seq, prior_addr_DID);  
 
 //apply HouseHold ID to each DID found at the prior address and flag subject and/or prior DIDs if currently updating at that address
   key_header := dx_header.key_header();
@@ -144,7 +151,7 @@ EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) 
 		SELF 														:= le;
 	END;
 	
-	priorAddrHHIDs := join(dedupAddrDIDs, key_header,
+	priorAddrHHIDs_unsuppressed := join(dedupAddrDIDs, key_header,
 									keyed(left.prior_addr_DID = right.s_DID) and 
 									left.h.prim_name = right.prim_name and
 									left.h.zip = right.zip and
@@ -154,9 +161,16 @@ EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) 
 									(RIGHT.dt_first_seen <> 0 AND RIGHT.dt_first_seen <= LEFT.historydate) and // Check the history date
 									right.hhid <> 0,
 									getHHIDs(LEFT,RIGHT), left outer, KEEP(1), ATMOST(100));  //just apply HHID to the 1 record we are joining
-                 GetHHID_VerificationOfOccupancy_CCPA := Suppress.Suppress_ReturnOldLayout(priorAddrHHIDs, mod_access, VerificationOfOccupancy.Layouts.Layout_VOOShell);
-                 
+                  
+    priorAddrHHIDs_flagged := Suppress.MAC_FlagSuppressedSource(priorAddrHHIDs_unsuppressed, mod_access);
 
+	priorAddrHHIDs := PROJECT(priorAddrHHIDs_flagged, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+		SELF.prior_addr_HHID 						:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.prior_addr_HHID);
+        SELF.prior_addr_rpting_subject 	    := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.prior_addr_rpting_subject);
+		SELF.prior_addr_rpting_newID 		:= IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.prior_addr_rpting_newID);
+		SELF := LEFT;
+	)); 
+  
 //rollup by sequence to set the updating status flags for the subject's prior address
   VerificationOfOccupancy.Layouts.Layout_VOOShell rollPriorHHIDs(VerificationOfOccupancy.Layouts.Layout_VOOShell l, VerificationOfOccupancy.Layouts.Layout_VOOShell r) := transform
 		self.prior_addr_current 				:= if(r.prior_addr_current, r.prior_addr_current, l.prior_addr_current);
@@ -165,7 +179,7 @@ EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) 
 		self														:= l;
 	end;
 	
-  rolled_PriorHHIDs := rollup(GetHHID_VerificationOfOccupancy_CCPA, rollPriorHHIDs(left,right), seq);
+  rolled_PriorHHIDs := rollup(priorAddrHHIDs, rollPriorHHIDs(left,right), seq);
 
   // output(allHeader, named('allHeader'));
   // output(dedupHeader, named('dedupHeader'));

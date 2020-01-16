@@ -25,7 +25,7 @@
   <part name="DisplayDeployedEnvironment" type="xsd:boolean"/>
 	<part name="IncludeAllFiles" type="xsd:boolean"/>
 	<part name="IncludeBestData" type="xsd:boolean"/>
-	<part name="IncludeIndataAfterPullid" type="xsd:boolean"/>
+	<part name="IncludePullID" type="xsd:boolean"/>
 	<part name="IncludeHeader" type="xsd:boolean"/>
 	<part name="IncludeSSNTable" type="xsd:boolean"/>
 	<part name="IncludeADVO" type="xsd:boolean"/>
@@ -60,14 +60,16 @@
 	<part name="IncludeThrive" type="xsd:boolean"/>
 	<part name="IncludeMari" type="xsd:boolean"/>
 	<part name="IncludeDeathDID" type="xsd:boolean"/>
+	<part name="IncludeVehicles" type="xsd:boolean"/>
  </message>
 */
+
 
 import AutoStandardI, ut, riskwise, risk_indicators, didville, gong,
 			 ln_propertyv2,business_risk,paw,driversv2,certegy,inquiry_acclogs,email_data,yellowpages,
 			 business_header_ss,advo,daybatchpcnsr,easi,avm_v2,avm_v2,utilfile,liensv2,business_header, 
 			 _Control, watercraft, AlloyMedia_student_list, American_student_list, doxie_files,  
-			 prof_licenseV2,BankruptcyV2, BankruptcyV3, gateway, Royalty,Relationship,dx_header;
+			 prof_licenseV2,BankruptcyV2, BankruptcyV3, gateway, Royalty,Relationship,dx_header, suppress, VehicleV2, std;
 
 export ProdData := MACRO
 
@@ -97,7 +99,7 @@ export ProdData := MACRO
 		'DisplayDeployedEnvironment',
 		'IncludeAllFiles',
 		'IncludeBestData',
-		'IncludeIndataAfterPullid',
+		'IncludePullID',
 		'IncludeHeader',
 		'IncludeSSNTable',
 		'IncludeADVO',
@@ -131,7 +133,8 @@ export ProdData := MACRO
 		'IncludeBankruptcy',
 		'IncludeThrive',
 		'IncludeMari',
-		'IncludeDeathDID'
+		'IncludeDeathDID',
+		'IncludeVehicles'
 		));
 
 unsigned6 in_did := 0 	  : stored('did');
@@ -165,7 +168,7 @@ boolean include_all_header := false : stored('IncludeAllHeader');
 boolean include_all_files := false : stored('IncludeAllFiles');
 boolean include_header := false : stored('IncludeHeader');
 boolean include_best_data := false : stored('IncludeBestData');
-boolean include_indata_after_pullid := false : stored('IncludeIndataAfterPullid');
+boolean Include_PullID := false : stored('IncludePullID');
 boolean include_ssntable := false : stored('IncludeSSNTable');
 boolean include_advo := false : stored('IncludeADVO');
 boolean include_gong_and_targus := false : stored('IncludeGONGandTargus');
@@ -196,6 +199,7 @@ boolean include_bankruptcy := false : stored('IncludeBankruptcy');
 boolean Include_Mari := false : stored('IncludeMari');
 boolean Include_Thrive := false : stored('IncludeThrive');
 boolean Include_Death := false : stored('IncludeDeathDID');
+boolean Include_Vehicles := false : stored('IncludeVehicles');
 boolean include_netacuitysearch := false : stored('IncludeNetacuitySearch');
 boolean include_targusgatewaysearch := false : stored('IncludeTargusGatewaySearch');
 unsigned3 history_date := 999999  		: stored('HistoryDateYYYYMM');
@@ -222,8 +226,8 @@ end;
 
 input_rec addseq(emptyset le, integer C) := transform		
 	SELF.DID := in_did;
-	self.fname := stringlib.stringtouppercase(in_first);
-	self.lname := stringlib.stringtouppercase(in_last);
+	self.fname := std.str.touppercase(in_first);
+	self.lname := std.str.touppercase(in_last);
 	
 	clean_addr := Risk_Indicators.MOD_AddressClean.clean_addr(in_addr, in_city, in_state, in_zip);	
 	
@@ -366,12 +370,12 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
 	in_hval	:= hashmd5(indata[1].ssn);
 	raw			:= topn(misc2.key_dateCorrect_hval(hval=in_hval),1,-endDate,record);
 	if(indata[1].ssn!='' and (include_all_files=true or include_ssntable=true), output(raw, named('SSN_date_correction')) );
-	
-	appType2 := Suppress.Constants.ApplicationTypes.DEFAULT;
-	Suppress.MAC_Suppress(indata,indata_t1_pulled,appType,Suppress.Constants.LinkTypes.SSN,ssn);
-	Suppress.MAC_Suppress(indata_t1_pulled,indata_t2_pulled,appType2,Suppress.Constants.LinkTypes.DID,did);
-	if((include_all_files=true or include_indata_after_pullid=true),output(indata_t2_pulled, named('indata_after_pullid')));
-	
+		
+	pullid_SSN := suppress.Key_New_Suppression(keyed(product in Suppress.Constants.SuppressGeneral) and 
+															 keyed(linking_type=Suppress.Constants.LinkTypes.SSN) and
+															 keyed(linking_ID=intformat((integer)indata[1].ssn, 9, 1) ) );
+	if(indata[1].ssn!='' and (Include_PullID=true or include_all_files=true), output(pullid_SSN, named('pullid_SSN')) );
+		
 	if(indata[1].ssn!='' and (include_all_files=true or include_ssntable=true), output(choosen(doxie.Key_SSN_Map(keyed(ssn5=indata[1].ssn[1..5]) and indata[1].ssn!=''), max_recs), named('ssn_map')) );
 	
 	if(indata[1].ssn != '' and (include_all_files=true or include_ssntable=true), OUTPUT(CHOOSEN(dx_header.key_legacy_ssn()(KEYED(ssn = indata[1].ssn)), max_recs), NAMED('Frozen_SSN_Table')));
@@ -391,7 +395,12 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
 	unique_dids := dedup(sort(dids, did), did);
 	did_from_pii := if(count(unique_dids)=1, unique_dids[1].did, ungroup(did_results)[1].did);		  
 	searchdid := if(in_did=0, did_from_pii, in_did);
-							  
+	
+	pullid_DID := suppress.Key_New_Suppression(keyed(product in Suppress.Constants.SuppressGeneral) and 
+															 keyed(linking_type=Suppress.Constants.LinkTypes.DID) and
+															 keyed(linking_ID=intformat(searchdid, 12, 1) ) );
+	if(searchdid!=0 and (Include_PullID=true or include_all_files=true), output(pullid_did, named('pullid_did')) );
+	
 	d := record
 		unsigned6 did := 0;
 	end;
@@ -411,6 +420,11 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
   address_hierarchy_Unique_recs := choosen(dx_header.Key_Addr_Unique_Expanded()(keyed(did=searchdid)), 200);
 	if(include_header or Include_All_Files, output(sort(address_hierarchy_Unique_recs,addr_ind) , named('address_hierarchy_unique_recs'))) ;	
 	
+	ingest_key := dx_Header.key_first_ingest();
+	ingest_date_recs := join(header_recs, ingest_key, keyed(left.rid=right.rid), 
+		transform(recordof(ingest_key), self := right), atmost(riskwise.max_atmost), keep(1));
+	if(include_header or Include_All_Files, output(ingest_date_recs , named('ingest_date_recs'))) ;	
+
 	gong_recs := choosen(gong.Key_History_did(keyed(l_did=searchdid) and searchdid!=0), max_recs);
 	if(searchdid!=0 and (include_all_files=true or include_gong_and_targus=true), output(gong_recs, named('gong_by_did')) );
 
@@ -697,7 +711,7 @@ gateways := project(gateways_in, gw_switch(left));
 	AVM_V2.MOD_get_AVM_from_History.MAC_get_AVM(avm_addr, full_history_date, selected_AVM);
 	if(in_addr!='' and (include_all_files=true or include_avm=true), output(selected_AVM, named('selected_AVM')) );
 	
-	avm_apn := choosen(avm_v2.Key_AVM_APN(keyed(unformatted_apn=STRINGLIB.StringToUpperCase(in_apn))),max_recs);
+	avm_apn := choosen(avm_v2.Key_AVM_APN(keyed(unformatted_apn=std.str.ToUpperCase(in_apn))),max_recs);
 	if(in_addr!='' and (include_all_files=true or include_avm=true), output(avm_apn, named('avm_apn')) );
 	
 	utiliRecsByAddr := JOIN(indata, UtilFile.Key_Address,
@@ -780,5 +794,28 @@ gateways := project(gateways_in, gw_switch(left));
 	
 	// For Score and Outcome Tracking we need to be able to determine if we are deployed to Cert or Prod - using this as a test.
 	IF(DisplayDeployedEnvironment, OUTPUT(_Control.ThisEnvironment.RoxieEnv, NAMED('Current_Environment')));
+	
+vehicle_ids := choosen(VehicleV2.key_vehicle_did(keyed(searchdid=append_did)), max_recs);
+// if(searchdid!=0 and (include_all_files=true or include_vehicles=true), output(vehicle_ids, named('vehicle_ids')) );
+
+vehicles_main := JOIN(vehicle_ids, VehicleV2.Key_Vehicle_Main_Key,
+						keyed(LEFT.vehicle_key=RIGHT.vehicle_key) AND 
+						keyed(left.iteration_key=right.iteration_key) and right.orig_vin<>'',
+						transform(recordof(VehicleV2.Key_Vehicle_Main_Key), 
+						self := right;
+						), atmost(riskwise.max_atmost), keep(max_recs));
+
+if(searchdid!=0 and (include_all_files=true or include_vehicles=true), output(vehicles_main, named('vehicles_main')) );
+						
+
+vehicles_party := JOIN(vehicle_ids, VehicleV2.Key_Vehicle_Party_Key,
+						keyed(LEFT.vehicle_key=RIGHT.vehicle_key) AND 
+						keyed(left.iteration_key=right.iteration_key) and
+						keyed(left.sequence_key=right.sequence_key),
+						transform(recordof(VehicleV2.Key_Vehicle_Party_Key), 
+						self := right;
+						), atmost(riskwise.max_atmost), keep(max_recs));
+
+if(searchdid!=0 and (include_all_files=true or include_vehicles=true), output(vehicles_party, named('vehicles_party')) );
 
 ENDMACRO;

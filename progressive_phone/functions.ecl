@@ -580,59 +580,60 @@ EXPORT functions := MODULE
   /////////////////////////////////////////////////////////////
 v_enum := progressive_phone.Constants.Running_Version;
 EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_raw,
-                      progressive_phone.iParam.Batch inMod = progressive_phone.waterfall_phones_options,
-                      DATASET(iesp.share.t_StringArrayItem) f_dedup_phones = DATASET([],iesp.share.t_StringArrayItem),
-                      DATASET(Gateway.Layouts.Config) Gateways_In = DATASET([], Gateway.Layouts.Config),
-                      DATASET(histphones_layout) f_phone_in_hist = DATASET([], histphones_layout),
-                      UNSIGNED2 MaxNumAssociate = 0,
-                      UNSIGNED2 MaxNumAssociateOther = 0,
-                      UNSIGNED2 MaxNumFamilyOther = 0,
-                      UNSIGNED2 MaxNumFamilyClose = 0,
-                      UNSIGNED2 MaxNumParent = 0,
-                      UNSIGNED2 MaxNumSpouse = 0,
-                      UNSIGNED2 MaxNumSubject = 0,
-                      UNSIGNED2 MaxNumNeighbor = 0,
-																						STRING    modelName = '',
-																				  BOOLEAN UsePremiumSource_A = FALSE,
-                      INTEGER PremiumSource_A_limit = 0,
-                      v_enum version = v_enum.WFP_V8,
-																						BOOLEAN RunRelocation = FALSE) := FUNCTION
+                   progressive_phone.iParam.Batch inMod = progressive_phone.waterfall_phones_options,
+                   DATASET(iesp.share.t_StringArrayItem) f_dedup_phones = DATASET([],iesp.share.t_StringArrayItem),
+                   DATASET(Gateway.Layouts.Config) Gateways_In = DATASET([], Gateway.Layouts.Config),
+                   DATASET(histphones_layout) f_phone_in_hist = DATASET([], histphones_layout),
+                   UNSIGNED2 MaxNumAssociate = 0,
+                   UNSIGNED2 MaxNumAssociateOther = 0,
+                   UNSIGNED2 MaxNumFamilyOther = 0,
+                   UNSIGNED2 MaxNumFamilyClose = 0,
+                   UNSIGNED2 MaxNumParent = 0,
+                   UNSIGNED2 MaxNumSpouse = 0,
+                   UNSIGNED2 MaxNumSubject = 0,
+                   UNSIGNED2 MaxNumNeighbor = 0,
+																			STRING    modelName = '',
+																	  BOOLEAN UsePremiumSource_A = FALSE,
+                   INTEGER PremiumSource_A_limit = 0,
+                   v_enum version = v_enum.WFP_V8,
+																			BOOLEAN RunRelocation = FALSE) := FUNCTION
 
     doxie.MAC_Header_Field_Declare()
     doxie.MAC_Selection_Declare()
 
     Phone_Shell.Layout_Phone_Shell.Input makePhoneShell(progressive_phone.layout_progressive_batch_in le) := transform
-      SELF.AcctNo 									:= le.acctno;
-      SELF.DID 											:= le.did;
-      SELF.FirstName 								:= le.name_first;
-      SELF.MiddleName 							:= le.name_middle;
-      SELF.LastName 								:= le.name_last;
-      SELF.TitleName 								:= le.name_suffix;
-      SELF.SuffixName 							:= le.name_suffix;
-      SELF.City 										:= le.p_city_name;
-      SELF.State 										:= le.st;
-      SELF.Prim_Range 							:= le.prim_range;
-      SELF.Predir										:= le.predir;
-      SELF.Prim_Name 								:= le.prim_name;
-      SELF.Addr_Suffix 							:= le.suffix;
-      SELF.Postdir 									:= le.postdir;
-						SELF.Unit_Desig								:= le.unit_desig;
-      SELF.Sec_Range 								:= le.sec_range;
-      SELF.zip4											:= le.z4;
-      SELF.Zip5 										:= le.z5;
-      SELF.SSN 											:= le.ssn;
-      SELF.DateOfBirth 							:= le.dob;
-      SELF.HomePhone 								:= le.phoneno;
+      SELF.AcctNo 				 := le.acctno;
+      SELF.DID 							 := le.did;
+      SELF.FirstName 	 := le.name_first;
+      SELF.MiddleName  := le.name_middle;
+      SELF.LastName 		 := le.name_last;
+      SELF.TitleName 	 := le.name_suffix;
+      SELF.SuffixName  := le.name_suffix;
+      SELF.City 					  := le.p_city_name;
+      SELF.State 					 := le.st;
+      SELF.Prim_Range  := le.prim_range;
+      SELF.Predir				  := le.predir;
+      SELF.Prim_Name 	 := le.prim_name;
+      SELF.Addr_Suffix := le.suffix;
+      SELF.Postdir 			 := le.postdir;
+						SELF.Unit_Desig	 := le.unit_desig;
+      SELF.Sec_Range 	 := le.sec_range;
+      SELF.zip4						  := le.z4;
+      SELF.Zip5 					  := le.z5;
+      SELF.SSN 							 := le.ssn;
+      SELF.DateOfBirth := le.dob;
+      SELF.HomePhone 		:= le.phoneno;
+      
       SELF.TransUnionGatewayEnabled := FALSE;
-      SELF.TargusGatewayEnabled := FALSE;
-      SELF.InsuranceGatewayEnabled := TRUE; // this is not a GW, its a key, thus it gives a slight scoring boost
+      SELF.TargusGatewayEnabled     := FALSE;
+      SELF.InsuranceGatewayEnabled  := TRUE; // this is not a GW, its a key, thus it gives a slight scoring boost
     END;
 
     // phone_shell_in := PROJECT(f_in_raw, makePhoneShell(LEFT, COUNTER));
     phone_shell_in := PROJECT(f_in_raw, makePhoneShell(LEFT));
 
-    Phone_Shell.Layout_Phone_Shell.Input addHistPhones(  Phone_Shell.Layout_Phone_Shell.Input le,
-                                                    DATASET(histphones_layout) ri) := TRANSFORM
+    Phone_Shell.Layout_Phone_Shell.Input addHistPhones( Phone_Shell.Layout_Phone_Shell.Input le,
+                                                        DATASET(histphones_layout) ri) := TRANSFORM
       SELF.InputPhoneList := ri;
       SELF := le;
     END;
@@ -642,6 +643,14 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                                              LEFT.AcctNo = RIGHT.acctno,
                                              GROUP,
                                              addHistPhones(LEFT,ROWS(RIGHT)));
+                                             
+    // As a temporary workaround we are getting a custom modelName (scoreModel) value in from progressive_phone_batch_service
+    // so that it can still run on Phone Shell V1 while everything else that comes through here will default to Phone Shell V2
+    // The custom value from progressive_phone_batch_service is PSV1_ + the original modelName value
+    // This function doesn't care what the original modelName was, but we need to determine if this came from progressive_phone_batch_service
+    // in order to pass the correct Phone Shell Version parameter to the Phone_Shell_Function
+    boolean isProgressiveBatch := modelName[1..5] = 'PSV1_'; // see if this is coming from progressive_phone_batch_service
+    unsigned2 PhoneShellVersion := if(isProgressiveBatch, 10, 21); // if yes, use phone shell 1.0, else use phone shell 2.1 (current default)
 
     // Returns the Phone data without the score.
     phones_with_attrs := Phone_Shell.Phone_Shell_Function(	
@@ -654,7 +663,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                               , // phone restriction mask
                               , // maxphones
                               , // ins verification age limit
-                              10, // phone shell version, force to phone shell v1.0 for now
+                              PhoneShellVersion, // phone shell version, default is most current (2.1 as of this coding)
                               , // spii access level
                               , // vertical limit
                               , // industry class
@@ -669,14 +678,18 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
 																														RunRelocation := RunRelocation);
 
     // SCORE THE PHONES
-
-    model_results  := if(version = v_enum.CP_V3, // these are the models for Phone Shell v1.0, use the old score threshold too
-															Phone_Shell.PhoneScore_cp3_v3(phones_with_attrs, 217),
-															Phone_Shell.PhoneScore_wf8_v3(phones_with_attrs, 217));//v_enum.WFP_V8
-    // model_results := Phone_Shell.PhoneModel_v21_1(phones_with_attrs); // new combined model for Phone Shell v2.1+
+    
+    // For now, since progressive_phone_batch_service still needs to use Phone Shell V1, need to check that and
+    // retain old logic/models for them. Everyone else gets the new Phone Shell V21 model
+    model_results := if(PhoneShellVersion = 10,
+                        if(version = v_enum.CP_V3, // these are the models for Phone Shell v1.0, use the old score threshold too
+                           Phone_Shell.PhoneScore_cp3_v3(phones_with_attrs, 217),
+                           Phone_Shell.PhoneScore_wf8_v3(phones_with_attrs, 217)), //v_enum.WFP_V8
+                        Phone_Shell.PhoneModel_v21_1(phones_with_attrs) // new combined model for Phone Shell v2.1+ , uses common/default score threshold
+                       );
 
     STRING2 map_source_code_phone_shell(STRING10 ph_type) := MAP
-      (ph_type = 'EDAFLA' OR ph_type = 'EDAFA' OR ph_type = 'EDALA' => 'ES',
+         (ph_type = 'EDAFLA' OR ph_type = 'EDAFA' OR ph_type = 'EDALA' => 'ES',
           ph_type = 'EDACA' => 'AP',
           ph_type = 'EDADID' OR ph_type = 'EDAHistory' => 'SE',
           ph_type = 'PPDID' OR ph_type = 'PPFLA' OR ph_type = 'PPLFA' OR ph_type = 'PPFA' OR
@@ -725,12 +738,12 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       rec := {STRING sField};
 
       SET OF STRING name_prefix_elems := Std.Str.SplitWords(sources.source_owner_name_prefix, ',');
-      SET OF STRING name_first_elems := Std.Str.SplitWords(sources.source_owner_name_first, ',');
+      SET OF STRING name_first_elems  := Std.Str.SplitWords(sources.source_owner_name_first, ',');
       SET OF STRING name_middle_elems := Std.Str.SplitWords(sources.source_owner_name_middle, ',');
-      SET OF STRING name_last_elems := Std.Str.SplitWords(sources.source_owner_name_last, ',');
+      SET OF STRING name_last_elems   := Std.Str.SplitWords(sources.source_owner_name_last, ',');
       SET OF STRING name_suffix_elems := Std.Str.SplitWords(sources.source_owner_name_suffix, ',');
       SET OF STRING source_code_elems := Std.Str.SplitWords(sources.source_list,',');
-      SET OF STRING source_did_elems := Std.Str.SplitWords(sources.Source_Owner_DID,',');
+      SET OF STRING source_did_elems  := Std.Str.SplitWords(sources.Source_Owner_DID,',');
 
       ds_source_code := DATASET(source_code_elems, rec);
 

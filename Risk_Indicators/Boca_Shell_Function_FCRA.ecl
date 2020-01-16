@@ -1,4 +1,4 @@
-﻿import FCRA, Risk_Indicators, _control, Gateway;
+﻿import FCRA, Risk_Indicators, _control, Gateway, iesp;
 onThor := _Control.Environment.OnThor;
 
 USE_BOCA_SHELL_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_Boca_Shell_Function;
@@ -36,9 +36,12 @@ export Boca_Shell_Function_FCRA (	DATASET (risk_indicators.Layout_input) pre_iid
 																	string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
 																	BOOLEAN	IN_isDirectToConsumer = false,
 																	BOOLEAN IncludeLnJ = false,
-                 integer2 ReportingPeriod = 84,
-                 string100 IntendedPurpose = ''
-                 ) := FUNCTION
+																	integer2 ReportingPeriod = 84,
+																	string100 IntendedPurpose = '',
+																	unsigned6 in_MinimumAmount = 0,
+																	dataset(iesp.share.t_StringArrayItem) in_ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
+																	dataset(iesp.share.t_StringArrayItem) in_ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem)
+																	) := FUNCTION
 
 // for batch queries, dedup the input to reduce searching
 pre_iid := dedup(sort(pre_iid1, 
@@ -100,8 +103,11 @@ seq_map := join( pre_iid1, pre_iid,
 			export real bs_Global_watchlist_threshold       := IN_Global_watchlist_threshold;
 			export boolean bs_IsDirectToConsumer						:= IN_isDirectToConsumer;
 			export boolean bs_IncludeLnJ										:= IncludeLnJ;
-      export integer2 bs_ReportingPeriod := ReportingPeriod; 
-      export string100 bs_IntendedPurpose := IntendedPurpose;
+			export integer2 bs_ReportingPeriod := ReportingPeriod; 
+			export string100 bs_IntendedPurpose := IntendedPurpose;
+			export unsigned6 bs_MinimumAmount := in_MinimumAmount;
+			export dataset(iesp.share.t_StringArrayItem) bs_ExcludeStates := in_ExcludeStates;
+			export dataset(iesp.share.t_StringArrayItem) bs_ExcludeReportingSources := in_ExcludeReportingSources;
 	END;
 
 	fcra_shell_results := library('Risk_Indicators.LIB_Boca_Shell_Function_FCRA', Risk_Indicators.IBoca_Shell_Function_FCRA(pre_iid, gateways, args)).results;
@@ -152,7 +158,10 @@ seq_map := join( pre_iid1, pre_iid,
 							true,  // filter out fares always true in FCRA
 							DataRestriction,
 							BSOptions, glb, gateways, DataPermission, IN_isDirectToConsumer, 
-							IncludeLnJ, ReportingPeriod, adl_based_shell
+							IncludeLnJ, ReportingPeriod, adl_based_shell,
+							MinimumAmount := in_MinimumAmount,
+							ExcludeStates := in_ExcludeStates,
+							ExcludeReportingSources := in_ExcludeReportingSources
 
        );
 

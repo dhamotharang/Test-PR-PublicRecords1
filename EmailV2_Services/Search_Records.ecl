@@ -30,7 +30,7 @@ EXPORT Search_Records(
     _header := ROW($.Transforms.xfAddHeader(_status,_recs(is_rejected_rec)));
     // final transform for records
     search_recs := CHOOSEN(PROJECT(_recs(~is_rejected_rec),
-                           $.Transforms.xfSearchOut(LEFT, search_params.dob_mask)),iesp.Constants.Email.MAX_RECS);
+                           $.Transforms.xfSearchOut(LEFT)),iesp.Constants.Email.MAX_RECS);
     input_subject := ROW($.Transforms.xfInputEcho(rec_in, _recs[1].subject_lexid));
 
     response_row := ROW({_header, COUNT(search_recs), search_recs, input_subject}, iesp.emailsearchv2.t_EmailSearchV2Response);

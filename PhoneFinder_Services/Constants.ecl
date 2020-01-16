@@ -115,7 +115,9 @@ MODULE
                                                 {'Phone Association','H','1','-1','No phone associated with subject',0,0,'',true,true}
                                               ],
                                               iesp.phonefinder.t_PhoneFinderRiskIndicator);
+
   EXPORT SET OF STRING enumCategory := ['Phone Association','Phone Activity','Phone Criteria'];
+  EXPORT SET OF INTEGER PhoneRiskAssessmentExceptions := [1, 5];// Phone Association exceptions reqested in LRA
 
   EXPORT SpoofPhoneOrigin :=
     MODULE

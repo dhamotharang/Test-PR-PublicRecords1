@@ -294,7 +294,7 @@ RiskWise.Layout_IDPO format_out(Risk_Indicators.Layout_Output le, model rt) := T
 
 	self.score := case( tribcode,
 		'idp3' => (string)(integer)rt.score,
-		Risk_Indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,SELF.correctsocs,self.correctaddr,self.correcthphone,'',veraddr,verlast,true)
+		Risk_Indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast,true)
 	);
 	
 	self.ri    := case( tribcode,

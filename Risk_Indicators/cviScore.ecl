@@ -1,5 +1,8 @@
-﻿export cviScore(INTEGER1 p, INTEGER1 s, Layout_Output l, STRING9 corrected_ssn, STRING50 corrected_address, STRING10 corrected_phone, STRING5 inTweak, STRING50 veraddr, STRING20 verlast, 
-								BOOLEAN OFAC=TRUE) := 
+﻿IMPORT Risk_Indicators, STD;
+
+export cviScore(INTEGER1 p, INTEGER1 s, Risk_Indicators.Layout_Output l, STRING5 inTweak, STRING50 veraddr, STRING20 verlast, 
+							BOOLEAN OFAC=TRUE,
+                            Risk_Indicators.iid_constants.IOverrideOptions OverrideOptions = MODULE(Risk_Indicators.iid_constants.IOverrideOptions)END) := 
 FUNCTION
 
 BOOLEAN isPOTS := l.isPOTS;
@@ -66,12 +69,12 @@ cvi := __COMMON__(CASE(p,
 				
 	
 	// determine if we need to override to 10
-	override1 := __COMMON__(((	rcSet.isCode02(l.decsflag) OR 
-									rcSet.isCode03(l.socsdobflag) OR 
-									((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
-									(rcSet.isCode08(l.phonetype,l.phone10) AND rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~rcSet.isCode30(l.addrmiskeyflag) AND ~rcSet.isCode31(l.hphonemiskeyflag))) AND
+	override1 := __COMMON__(((	Risk_Indicators.rcSet.isCode02(l.decsflag) OR 
+									Risk_Indicators.rcSet.isCode03(l.socsdobflag) OR 
+									((Risk_Indicators.rcSet.isCode06(l.socsvalflag, l.ssn) OR Risk_Indicators.rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~Risk_Indicators.rcSet.isCode29(l.socsmiskeyflag)) OR 
+									(Risk_Indicators.rcSet.isCode08(l.phonetype,l.phone10) AND Risk_Indicators.rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~Risk_Indicators.rcSet.isCode30(l.addrmiskeyflag) AND ~Risk_Indicators.rcSet.isCode31(l.hphonemiskeyflag))) AND
 								cvi>'10') OR 
-								(OFAC and rcSet.isCode32(l.watchlist_table, l.watchlist_record_number )));
+								(OFAC and Risk_Indicators.rcSet.isCode32(l.watchlist_table, l.watchlist_record_number )));
 	
 				
 	cviAdj2 := __COMMON__(IF(override1,'10',cvi));
@@ -92,11 +95,11 @@ cvi := __COMMON__(CASE(p,
 					    cviAdj2 = '30' and l.socsverlevel = 9 and l.phoneverlevel in [6,7,8,9,10,11,12] => '40',
 					    cviAdj2),
 			     tweak = 'svi' => 
-					MAP(cviAdj2 = '10' and ((rcSet.isCode02(l.decsflag) OR rcSet.isCode03(l.socsdobflag) OR 
-										((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
-										(rcSet.isCode08(l.phonetype,l.phone10) AND rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND 
-												~rcSet.isCode30(l.addrmiskeyflag) AND ~rcSet.isCode31(l.hphonemiskeyflag))) OR 
-									    (OFAC and rcSet.isCode32(l.watchlist_table, l.watchlist_record_number))) => '10',
+					MAP(cviAdj2 = '10' and ((Risk_Indicators.rcSet.isCode02(l.decsflag) OR Risk_Indicators.rcSet.isCode03(l.socsdobflag) OR 
+										((Risk_Indicators.rcSet.isCode06(l.socsvalflag, l.ssn) OR Risk_Indicators.rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~Risk_Indicators.rcSet.isCode29(l.socsmiskeyflag)) OR 
+										(Risk_Indicators.rcSet.isCode08(l.phonetype,l.phone10) AND Risk_Indicators.rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND 
+												~Risk_Indicators.rcSet.isCode30(l.addrmiskeyflag) AND ~Risk_Indicators.rcSet.isCode31(l.hphonemiskeyflag))) OR 
+									    (OFAC and Risk_Indicators.rcSet.isCode32(l.watchlist_table, l.watchlist_record_number))) => '10',
 					    cviAdj2 <= '20' =>
 							MAP(l.socsverlevel IN [4,7,9] and l.dobcount>0 and l.hriskphoneflag<>'5' and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
 							    l.socsverlevel IN [4,7,9] and ga(l.combo_addrscore) and l.combo_prim_range=l.prim_range and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
@@ -106,24 +109,31 @@ cvi := __COMMON__(CASE(p,
 					    cviAdj2),
 			     cviAdj2));
 				
-	cviAdj4 := __COMMON__(IF(tweak='svi',IF((rcSet.isCode02(l.decsflag) OR rcSet.isCode03(l.socsdobflag) OR ((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
-	              (rcSet.isCode08(l.phonetype,l.phone10) AND rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~rcSet.isCode30(l.addrmiskeyflag) AND ~rcSet.isCode31(l.hphonemiskeyflag)) AND
+	cviAdj4 := __COMMON__(IF(tweak='svi',IF((Risk_Indicators.rcSet.isCode02(l.decsflag) OR Risk_Indicators.rcSet.isCode03(l.socsdobflag) OR ((Risk_Indicators.rcSet.isCode06(l.socsvalflag, l.ssn) OR Risk_Indicators.rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~Risk_Indicators.rcSet.isCode29(l.socsmiskeyflag)) OR 
+	              (Risk_Indicators.rcSet.isCode08(l.phonetype,l.phone10) AND Risk_Indicators.rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~Risk_Indicators.rcSet.isCode30(l.addrmiskeyflag) AND ~Risk_Indicators.rcSet.isCode31(l.hphonemiskeyflag)) AND
 			     cvi>'10'),'10',cviAdj3),cviAdj3));
 					 
-	override2 := __COMMON__(cviAdj4 > '20' and l.ssnexists and l.socscount = 0 and ~l.lastssnmatch2 and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9);	// ssn does not belong to this last and it belongs to someone else
-	override3 := __COMMON__(cviAdj4 > '20' and l.socsvalflag != '1' and ~l.ssnexists and l.socscount = 0 and l.versocs <> '' and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9);	// ssn does not belong to anybody, but there is a social for this person				 
+	override2 := __COMMON__(cviAdj4 > '20' and l.ssnexists and l.socscount = 0 and ~l.lastssnmatch2 and LENGTH(STD.Str.Filter(l.ssn,'0123456789'))=9);	// ssn does not belong to this last and it belongs to someone else
+	override3 := __COMMON__(cviAdj4 > '20' and l.socsvalflag != '1' and ~l.ssnexists and l.socscount = 0 and l.versocs <> '' and LENGTH(STD.Str.Filter(l.ssn,'0123456789'))=9);	// ssn does not belong to anybody, but there is a social for this person				 
 
 	cviAdj5 := __COMMON__(IF(override2, '20', cviAdj4));	
 	cviAdj6 := __COMMON__(IF(override3, '20', cviAdj5));	
 	
 	// for american express add custom cvi override logic
 	cviAdj7 := __COMMON__(IF(tweak='amxvi' and cviAdj6 > '30',
-															MAP(rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) and rcSet.isCode30(l.addrmiskeyflag) => '25',
-																	rcSet.isCodeCL(l.ssn, l.bestssn, l.socsverlevel, l.combo_ssn) and ~rcSet.isCode29(l.socsmiskeyflag) => '15',
+															MAP(Risk_Indicators.rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) and Risk_Indicators.rcSet.isCode30(l.addrmiskeyflag) => '25',
+																	Risk_Indicators.rcSet.isCodeCL(l.ssn, l.bestssn, l.socsverlevel, l.combo_ssn) and ~Risk_Indicators.rcSet.isCode29(l.socsmiskeyflag) => '15',
 																	cviAdj6),
 															cviAdj6));
 															
 
-RETURN (cviAdj7);
+    FinalCVI :=     __COMMON__(MAP(OverrideOptions.isCodeMS and (INTEGER)cviAdj7 > 10 => '10',
+							OverrideOptions.isCodePO and (INTEGER)cviAdj7 > 10 => '10',
+							OverrideOptions.isCodeCL and (INTEGER)cviAdj7 > 10 => '10',
+							OverrideOptions.isCodeMI and (INTEGER)cviAdj7 > 10=> '10',
+							OverrideOptions.isCodeDI AND (INTEGER)cviAdj7 > 10 => '10',
+                            cviAdj7));
+              
+RETURN FinalCVI;
 
 END;

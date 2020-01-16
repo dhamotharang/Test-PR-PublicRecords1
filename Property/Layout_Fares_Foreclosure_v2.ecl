@@ -1,4 +1,4 @@
-﻿IMPORT AID, BIPV2;
+﻿﻿IMPORT AID, BIPV2;
 
 export Layout_Fares_Foreclosure_v2 := record
 	string70	foreclosure_id;
@@ -101,9 +101,9 @@ export Layout_Fares_Foreclosure_v2 := record
 	string9		property_address_zip_code_2;
 	string4		carrier_code_2;
 	string60	full_site_address_unparsed_2;
-	string2		property_indicator;
+	string3		property_indicator;
 	string55	property_desc;
-	string3		use_code;
+	string4		use_code;
 	string55	use_desc;
 	string5		number_of_units;
 	string9		living_area_square_feet;

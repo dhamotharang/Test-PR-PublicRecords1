@@ -137,11 +137,8 @@ EXPORT phone_noreconn_search := MACRO
 	// eliminate minors as necessary
 	ut.PermissionTools.GLB.mac_FilterOutMinors(dids_deduped, filteredDids)
 
-	resultOut_w_tzone_no_suppress := doxie.phone_noreconn_records(srchMod).val(filteredDids, gateways_in);
+	resultOut_w_tzone := doxie.phone_noreconn_records(srchMod).val(filteredDids, gateways_in);
 
-	// Suppress records without full name and address
-	resultOut_w_tzone := if(~SuppressBlankNameAddress or (SuppressBlankNameAddress and exists(resultOut_w_tzone_no_suppress(listed_name != '' OR (fname != '' AND lname!= '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))))),
-                          resultOut_w_tzone_no_suppress);
 
 	boolean  batch_friendly := false : stored('BatchFriendly');
 	boolean  IncludePhonesFeedback := false : stored('IncludePhonesFeedback');
@@ -549,21 +546,26 @@ EXPORT phone_noreconn_search := MACRO
 
 	// ** END *** of mods for Reverse Search Plus to filter on dt_last/first_seen
 
-  // the string 'FB'  in attr names stands for phones FeedBack (FB)
+	resultsWithDateSort := if(UseDateSort,sort(ds_results_ported_checkedFilteredDate,-dt_last_seen,penalt, lname, fname, record),ds_results_ported_checkedFilteredDate); 
 
-	doxie.MAC_Marshall_Results_NoCount(ds_results_ported_checkedFilteredDate,resultsPreFB,,disp_cnt);
+	doxie.MAC_Marshall_Results_NoCount(resultsWithDateSort,marshalled_results,,disp_cnt);												
 
-	PhonesFeedback_Services.Mac_Append_Feedback(resultsPreFB, did, Phone, resultsPhnFB, mod_access);
+  	// the string 'FB'  in attr names stands for phones FeedBack (FB)
+	PhonesFeedback_Services.Mac_Append_Feedback(marshalled_results, did, Phone, resultsPhnFB, mod_access);
 
-	resultsWithPhnFB := if(IncludePhonesFeedback,resultsPhnFB,resultsPreFB);
+	resultsWithPhnFB := if(IncludePhonesFeedback,resultsPhnFB,marshalled_results);
 
 	AddressFeedback_Services.MAC_Append_Feedback(resultsWithPhnFB, resultsAddrFB, address_feedback,,,,,,,,,,1);
 
 	resultsWithAddrFB := if(IncludeAddressFeedback, resultsAddrFB, resultsWithPhnFB);
 
-	results := if(UseDateSort,sort(resultsWithAddrFB,-dt_last_seen,penalt),resultsWithAddrFB);
+	//resort incase either phone feedback or address feedback changed the UseDateSort sort logic
+	results := if(UseDateSort AND (IncludePhonesFeedback OR IncludeAddressFeedback), sort(resultsWithAddrFB, -dt_last_seen,penalt, lname, fname, record), resultsWithAddrFB);
+	
+	// Suppress records without full name and address, Royalties are calculated off of Non-suppressed results
+	results_suppress := IF(~SuppressBlankNameAddress OR (SuppressBlankNameAddress AND EXISTS(results(listed_name != '' OR (fname != '' AND lname != '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))))), results);
 
-	results_friendly := project(results, transform(recordof(results),
+	results_friendly := project(results_suppress, transform(recordof(results),
 											 self.COCDescription := [],
 											 self.SSCDescription := [],
 											 self.RealTimePhone_Ext := [],
@@ -582,7 +584,7 @@ EXPORT phone_noreconn_search := MACRO
 
 	if(issueHint,ut.outputMessage(ut.constants_MessageCodes.TRYSSN4));
 
-	out_rslt := output(if(~batch_friendly,results,results_friendly), named('Results'));
+	out_rslt := output(if(~batch_friendly,results_suppress,results_friendly), named('Results'));
 
   //OUTPUT(dt_filterOk, named('dt_filterOk'));
 	// output(dt_first_seenValueTrimmed, named('dt_first_seenValueTrimmed'));

@@ -47,7 +47,7 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                                                     SELF.personalInfo.InputSSN := LEFT.indvRawInput.ssn;
                                                     SELF.personalInfo.BestSSN := LEFT.bestSSN;
                                                     SELF.personalInfo.InputDOB := iesp.ECL2ESP.toDatestring8(LEFT.indvRawInput.dob);
-                                                    SELF.personalInfo.BestDOB := iesp.ECL2ESP.toDate(LEFT.bestDOB);;
+                                                    SELF.personalInfo.BestDOB := iesp.ECL2ESP.toDate(LEFT.bestDOB);
                                                     SELF.personalInfo.InputPhone := LEFT.indvRawInput.phone;
                                                     SELF.personalInfo.BestPhone := LEFT.bestPhone;
                                                     

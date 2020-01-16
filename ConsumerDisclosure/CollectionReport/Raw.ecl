@@ -73,14 +73,13 @@ EXPORT Raw := MODULE
     RETURN raw_recs_ddp;
   ENDMACRO;
   EXPORT GetPatriotRecs(DATASET(doxie.layout_references) dids) := FUNCTION
-    // -- we may need to revisit how we are fetching these records. Is it ok to just go by dids?
     k_did := patriot.key_did_patriot_file;
     ids := JOIN(dids, k_did,
       KEYED(LEFT.did = RIGHT.did),
       TRANSFORM({k_did.did; k_did.pty_key;}, SELF := RIGHT), 
       KEEP(100), LIMIT(0));
     recs := JOIN(ids, patriot.key_patriot_file,
-      KEYED(LEFT.pty_key = RIGHT.pty_key), // AND LEFT.did = RIGHT.did -- no did on patriot file yet.
+      KEYED(LEFT.pty_key = RIGHT.pty_key) AND LEFT.did = RIGHT.did,
       TRANSFORM(RIGHT),
       KEEP(1), LIMIT(0));
     RETURN recs;

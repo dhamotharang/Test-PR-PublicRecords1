@@ -269,6 +269,7 @@ EXPORT compliance := MODULE
   // ==============================================================================================
   EXPORT boolean use_qsent(string dpm)               := dpm [1] NOT IN restrictedSet; // use in-house(not gateway) qsent data
   EXPORT boolean use_targus(string dpm)              := dpm [2] NOT IN restrictedSet; // use targus gateway
+  EXPORT boolean use_confirm(string dpm)             := dpm [3] NOT IN restrictedSet; // confirm if phone is active (typically, thorugh gateway call)
   EXPORT boolean use_LastResort(string dpm)          := dpm [6] NOT IN restrictedSet; 	
   EXPORT boolean use_Polk(string dpm)                := dpm [7] NOT IN restrictedSet;
   EXPORT boolean use_DM_SSA_updates(string dpm)      := dpm[10] NOT IN restrictedSet;

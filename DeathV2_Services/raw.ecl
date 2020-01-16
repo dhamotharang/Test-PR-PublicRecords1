@@ -47,10 +47,12 @@ MODULE
       self.base.did := if((unsigned)left.death.did > 0, left.death.did, '');
       self.base := left.death;
       self.src := left.death.src;
+	  // establishing this flag earlier since IsLimitedAccessDMF is included in output layout
+	  self.IsLimitedAccessDMF := left.death.src = MDR.sourceTools.src_Death_Restricted;	
       self := left));
 
 	  census_data.MAC_Fips2County_Keyed(death_recs,base.state,base.fipscounty,county_name,wct);
-		
+
     return dedup(wct, all);
 	END;
 
@@ -116,7 +118,6 @@ MODULE
 																						 if(death_supp.decedent_age = '' and left.dead_age > 0,
 																								'YEARS',
 																								DeathV2_Services.splitAge(death_supp.decedent_age).unit);
-														SELF.IsLimitedAccessDMF := (left.src = MDR.sourceTools.src_Death_Restricted);
 														self.supp.state_death_flag := if(death_supp.source_state in death_master.Constants('').set_EmptySuppStates,
 																													   '', 
 																														 death_supp.state_death_flag);

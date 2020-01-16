@@ -77,6 +77,7 @@
   <part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
   <part name="SuppressCompromisedDLs" type="xsd:boolean"/>
   <part name="IncludeQAOutputs" type="xsd:boolean"/>
+  <part name="UseIngestDate" type="xsd:boolean"/>
  </message>
 */
 /*--INFO-- Contains Fraud Advisor 3, 5, 9, Version1 and Fraud Attributes */
@@ -171,7 +172,8 @@ export FraudAdvisor_Service := MACRO
         'LexIdSourceOptout',
         '_TransactionId',
         '_BatchUID',
-        '_GCID'
+        '_GCID',
+				'UseIngestDate'
 	));
 
 Risk_indicators.MAC_unparsedfullname(title_val,first_value,middle_value,last_value,suffix_value,'FirstName','MiddleName','LastName','NameSuffix')
@@ -283,6 +285,7 @@ boolean   IncludeRiskIndices := false : stored('IncludeRiskIndices');  // to inc
 boolean SuppressCompromisedDLs := false : stored('SuppressCompromisedDLs');
 // Set to TRUE when running RiskProcessing scripts to include some intermediate boca shell outputs for modelers
 boolean IncludeQAOutputs             := FALSE : stored('IncludeQAOutputs'); 
+boolean UseIngestDate             := FALSE : stored('UseIngestDate'); 
 
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 
@@ -573,7 +576,7 @@ bsVersion := map(
 //=========================
 //=== BS options        ===
 //=========================
-BSOptions := Models.FP_Models.Set_BSOptions(Valid_requested_models, attributesIn, input_ok, doInquiries);
+BSOptions := Models.FP_Models.Set_BSOptions(Valid_requested_models, attributesIn, input_ok, doInquiries, UseIngestDate);
 
 iid := //Group(Dataset([],risk_indicators.layout_output), seq);
        risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn, 

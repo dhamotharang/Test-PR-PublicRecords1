@@ -318,17 +318,18 @@ EXPORT Raw(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in, FraudG
 
 			SELF.fua := risk_indicators.getActionCodes(le,4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := batch_params.actioncode_settings /*, rc*/);
 			
-			cvi_temp := if(batch_params.actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,
-																														batch_params.OFAC),	
-																					risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,
-																														batch_params.OFAC, batch_params.IncludeDOBinCVI, batch_params.IncludeDriverLicenseInCVI));
-			isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and batch_params.actualIIDVersion=1;
-			SELF.CVI := map(batch_params.IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
-									batch_params.IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
-									batch_params.IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)cvi_temp > 10 => '10',
-									batch_params.IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)cvi_temp > 10 and batch_params.actualIIDVersion=1 => '10',
-									isCodeDI AND (INTEGER)cvi_temp > 10 => '10',
-									cvi_temp);
+            OverrideOptions := MODULE(Risk_Indicators.iid_constants.IOverrideOptions) 
+            EXPORT isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) AND batch_params.actualIIDVersion=1;
+            EXPORT isCodePO := risk_indicators.rcSet.isCodePO(le.addr_type) AND batch_params.IsPOBoxCompliant;
+            EXPORT isCodeCL := risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) AND batch_params.IncludeCLoverride;
+            EXPORT isCodeMI := risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) AND batch_params.IncludeMIoverride AND batch_params.actualIIDVersion=1;
+            EXPORT isCodeMS := risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) AND batch_params.IncludeMSoverride;
+            END;
+            
+			SELF.CVI :=  if(batch_params.actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast,
+																														batch_params.OFAC,OverrideOptions),	
+																					risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast,
+																														batch_params.OFAC, batch_params.IncludeDOBinCVI, batch_params.IncludeDriverLicenseInCVI,,,OverrideOptions));
 			
 			
 			self.verdl := le.verified_dl;
@@ -345,18 +346,18 @@ EXPORT Raw(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in, FraudG
 			isCode02 := risk_indicators.rcSet.isCode02(le.decsflag);
 
 			self.deceasedDate := MAP(	ssn_verified and isCode02 => if(le.deceasedDate=0, '', (string)le.deceasedDate),
-																isCodeDI => if(le.DIDdeceasedDate=0, '', (STRING)le.DIDdeceasedDate),
+																OverrideOptions.isCodeDI => if(le.DIDdeceasedDate=0, '', (STRING)le.DIDdeceasedDate),
 																
 																'');
 			self.deceasedDOB := MAP(ssn_verified and isCode02 => if(le.deceasedDOB=0, '', (string)le.deceasedDOB),
-															isCodeDI => if(le.DIDdeceasedDOB=0, '', (STRING)le.DIDdeceasedDOB),
+															OverrideOptions.isCodeDI => if(le.DIDdeceasedDOB=0, '', (STRING)le.DIDdeceasedDOB),
 															'');
 															
 			self.deceasedFirst := MAP( ssn_verified and isCode02 => le.deceasedFirst,
-																isCodeDI => le.DIDdeceasedFirst,
+																OverrideOptions.isCodeDI => le.DIDdeceasedFirst,
 																'');
 			self.deceasedLast := MAP(	ssn_verified and isCode02 => le.deceasedLast,
-																isCodeDI => le.DIDdeceasedLast,
+																OverrideOptions.isCodeDI => le.DIDdeceasedLast,
 																'');
 			
 			risk_indicators.mac_add_sequence(le.watchlists, watchlists_with_seq);

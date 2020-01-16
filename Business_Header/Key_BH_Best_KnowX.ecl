@@ -1,4 +1,4 @@
-import business_header_ss,ut, lib_fileservices, header_services,codes, Data_Services;
+﻿import business_header_ss,ut, lib_fileservices, header_services,codes, Data_Services;
 
 bh_base := Business_Header.filters.bases.business_header_best(Files().Base.Business_Headers.built);
 codesV3 := codes.Key_Codes_V3;
@@ -137,7 +137,7 @@ full_out_suppress := join(supp_1,dSuppressedIn,
 
 /////////////////////////////////////////////////////////////////////////
 
-shared f_best_blanksource_unique := full_out_suppress + Base_File_Append;
+f_best_blanksource_unique := full_out_suppress + Base_File_Append;
 
 EXPORT Key_BH_Best_KnowX := INDEX(
 	f_best_blanksource_unique, 
