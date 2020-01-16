@@ -28,12 +28,12 @@ EXPORT Datasource_ABMS := MODULE
 																															self.includeCareer := cfg[1].IncludeABMSCareer;
 																															self.includeEducation := cfg[1].IncludeABMSEducation;
 																															self.includeProfessionalAssociations := cfg[1].IncludeABMSProfessionalAssociations;
-																															self := left),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+																															self := left),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 			convertedInputRecordsDerivedNPI := join(input,getDerivedNPIs,left.acctno = (string)right.seq, transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput, self.acctno := right.acctno; self.seq := right.seq; self.npi:=right.npi;self.DerivedNPI:=if(left.npi<>'' and left.npi=right.npi,false,true);
 																															self.includeCareer := cfg[1].IncludeABMSCareer;
 																															self.includeEducation := cfg[1].IncludeABMSEducation;
 																															self.includeProfessionalAssociations := cfg[1].IncludeABMSProfessionalAssociations;
-																															self := left),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+																															self := left),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
       removeDeepDiveRecs := inputSlim(isDeepDiveResults);
       convertedInputRecordsRaw := convertedInputRecordsUserData+convertedInputRecordsDerivedDid+convertedInputRecordsDerivedNPI;		
       convertedInputRecords := join(convertedInputRecordsRaw,removeDeepDiveRecs,left.acctno=right.acctno,transform(left),left only);      
@@ -48,11 +48,11 @@ EXPORT Datasource_ABMS := MODULE
 			end;
 			abmsRecsRawBest := dedup(sort(project(abmsRecsRaw,transform(getBestRec,self.acctno:=left.AccountNumber;self.penalt:=left._Penalty;)),acctno,penalt),acctno);
 			//join back to the original to get all the records within the same group that have the same penalty
-			abmsRecsRawFilter := join(abmsRecsRaw,abmsRecsRawBest,left.AccountNumber=right.acctno and left._Penalty=right.penalt,transform(recordof(abmsRecsRaw),self:=left),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+			abmsRecsRawFilter := join(abmsRecsRaw,abmsRecsRawBest,left.AccountNumber=right.acctno and left._Penalty=right.penalt,transform(recordof(abmsRecsRaw),self:=left),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 			abmsRecs := project(abmsRecsRawFilter,iesp.abms.t_ABMSResults);	
 			//Now that we have records back we need to rejoin them back to the correct acctno
-			relink2InputAcctno := join(convertedInputRecordsUserData,abmsRecs, left.acctno = right.AccountNumber, transform(Healthcare_Header_Services.layouts.layout_abms, self.acctno := right.AccountNumber; self := right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-			relink2DerivedData := join(convertedInputRecordsDerivedDid+convertedInputRecordsDerivedNPI,abmsRecs, left.acctno = right.AccountNumber, transform(Healthcare_Header_Services.layouts.layout_abms, self.acctno := (string)left.seq; self.AccountNumber:=(string)left.seq;self := right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+			relink2InputAcctno := join(convertedInputRecordsUserData,abmsRecs, left.acctno = right.AccountNumber, transform(Healthcare_Header_Services.layouts.layout_abms, self.acctno := right.AccountNumber; self := right),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
+			relink2DerivedData := join(convertedInputRecordsDerivedDid+convertedInputRecordsDerivedNPI,abmsRecs, left.acctno = right.AccountNumber, transform(Healthcare_Header_Services.layouts.layout_abms, self.acctno := (string)left.seq; self.AccountNumber:=(string)left.seq;self := right),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 			//hopefully, the relinked data will be linked to the original acct number and have a penalty that should put the best record on top
 			finalABMSData := sort(relink2InputAcctno+relink2DerivedData,acctno,if(isInputNPIMatched or isDerivedNPIMatched,1,2),_Penalty);
 			finalABMSDataDedup := dedup(finalABMSData,acctno,abmsbiogid);
@@ -74,7 +74,7 @@ EXPORT Datasource_ABMS := MODULE
 			results := join(inputRecs,fmtRec_ABMSData, left.acctno=right.acctno,
 																			transform(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout,
 																								self.abmsRaw := right.childinfo;
-																								self := left),limit(0),left outer);
+																								self := left),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN),limit(0),left outer);
 			return results;
 		end;
 end;
