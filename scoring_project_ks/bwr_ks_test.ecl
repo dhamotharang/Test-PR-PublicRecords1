@@ -2571,7 +2571,7 @@ end;
       																				 ,
       																				 'Scoring_QA@risk.lexisnexis.com');
       																				 
-      					out_file1 := output(NON_FCRA_result , ,'~ScoringQA::out::ks1::NON_FCRA_result' + curr_date, CSV(heading(single), quote('"')), overwrite, EXPIRE(30) );
+      					out_file1 := output(NON_FCRA_result , ,'~ScoringQA::out::ks1::NON_FCRA_result' + curr_date, CSV(heading(single), quote('"')), overwrite);
       			
       			
       			// string out_file_layout := '';

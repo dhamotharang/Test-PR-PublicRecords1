@@ -369,8 +369,11 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       RETURN student_duped_sorted;
     END;
 		
-    EXPORT marDivRecsByDid():= FUNCTION
-      marDiv_raw := PersonReports.marriagedivorce_records(in_did);
+    EXPORT marDivRecsByDid(Ioptions in_mod):= FUNCTION
+      mardiv_mod := Module(PersonReports.IParam.mardiv)
+          $.IParams.MAC_copy_old_report_fields(in_mod);
+      End;
+      marDiv_raw := PersonReports.marriagedivorce_records(in_did, mardiv_mod);
       marDiv_raw_sorted:= sort(marDiv_raw, -FilingTypeCode,StateOrigin,FilingNumber,-d2i(marriagedate));
       marDiv_duped := dedup(marDiv_raw_sorted, FilingNumber, StateOrigin, FilingTypeCode);
       marDiv_duped_sorted := sort(marDiv_duped, -d2i(marriagedate));
@@ -508,12 +511,11 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       RETURN voter_rolled_sorted;
   END;
 	
-	EXPORT pawRecsByDid(string6 ssnmask):= FUNCTION
-       // standard restrictions - glb, dppa etc not enforced on PAW data
-       param := Module(PersonReports.IParam.peopleatwork)
-          Export ssn_mask := (string)ssnmask;
-       End;					 
-       paw_raw := PersonReports.peopleatwork_records(in_did, param);
+	EXPORT pawRecsByDid(Ioptions in_mod):= FUNCTION
+       paw_mod := Module(PersonReports.IParam.peopleatwork)
+           $.IParams.MAC_copy_old_report_fields(in_mod); //only report part is present in the input
+       End;
+       paw_raw := PersonReports.peopleatwork_records(in_did, paw_mod);
        
        paw_raw_sorted:= sort(paw_raw,-businessids.ultid,-businessids.orgid,-businessids.seleid,
                             -companyname,-title,-d2i(datelastseen),-d2i(datefirstseen));
