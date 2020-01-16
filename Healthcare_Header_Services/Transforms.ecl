@@ -1877,7 +1877,6 @@ EXPORT Transforms := MODULE
 																								self.Effective_Date :=l.rawdata.issue_date;	
 																								self.Termination_Date:=l.rawdata.expiration_date;	
 																								self:=[];));
-		//self.StateLicenses := dataset([{l.acctno,l.lnpid,0,l.rawdata.source_st,l.rawdata.license_number,'','',l.rawdata.issue_date,l.rawdata.expiration_date}],Layouts.layout_licenseinfo)(LicenseNumber<>'');
 		self.ProfLicRaw := project(l,build_ProflicRaw(left));
 		Self.SrcRecRaw :=  project(l,transform(Layouts.layout_SrcRec,
 																		self.Src := constants.SRC_PROFLIC;

@@ -51,15 +51,7 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 		self := R;
 	end;
 dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(doxie_crs.layout_deathfile_records,self.did:=(string)left.did;self:=left;self:=[];))	;
-	// dear  := JOIN (dids_owners, doxie.key_death_masterV2_DID, 
-								 // keyed (Left.did = Right.l_did) 
-								 // and not DeathV2_Services.Functions.Restricted (right.src, right.glb_flag, if (Left.is_subject, glb_ok, rna_glb_ok), death_params),
-								 // GetDeadRecords (Left, Right),
-								 // left outer, limit (ut.limits.HEADER_PER_DID), keep (ut.limits.DEATH_PER_DID)); //
-
-
-	// dear := doxie.deathfile_records (in_params.include_BlankDOD or (unsigned)dod8 != 0);
-	// for the purpose of deceased indicator we need only one record per person, preferrably with a county
+		// for the purpose of deceased indicator we need only one record per person, preferrably with a county
 	export src_deceased := dedup (sort (dear, did, -dod8, trim (county_name) = ''), did, dod8);
 
 		besr_choice := IF(EXISTS(bestrecs), bestrecs, project (dsDids, transform (doxie.layout_best, 
@@ -557,7 +549,7 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 	shared nbrRelsFinal := if(nbrRels=0,iesp.Constants.HPR.MAX_Relatives,min(nbrRels,iesp.Constants.BR.MaxRelatives));
 	export dsRelatives := if(count(dsDids(did>0))>0,choosen(relativesSlim,nbrRelsFinal));
 	export dsNeighbors := if(count(dsDids(did>0))>0,choosen(neighborsslim,iesp.Constants.HPR.MAX_Relatives));
-	export dsAssociates := if(count(dsDids(did>0))>0,choosen(associates, iesp.constants.BR.MaxAssociates));
+	export dsAssociates := if(exists(dsDids),choosen(associates, iesp.constants.BR.MaxAssociates));
 	export dsHistoricalNeighbors := if(count(dsDids(did>0))>0,choosen(neighbors_historical, iesp.constants.BR.MaxHistoricalNeighborhood));
 	export dsDOD := if(count(dsDids(did>0))>0,project(bestrecs(length(trim(dod,all))>1),transform(iesp.share.t_Date, self := iesp.ECL2ESP.toDatestring8(Left.dod))));
 	shared dsDODBlank := dx_death_master.Get.byDid(dsDids,did,death_params);

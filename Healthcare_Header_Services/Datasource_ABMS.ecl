@@ -1,4 +1,4 @@
-﻿Import Healthcare_Provider_Services,iesp,Suppress,Healthcare_Header_Services:;
+﻿Import Healthcare_Provider_Services,iesp,Suppress,Healthcare_Header_Services;
 EXPORT Datasource_ABMS := MODULE
 		Export getABMSData(dataset(Healthcare_Header_Services.layouts.autokeyInput) input, dataset(Healthcare_Header_Services.layouts.layout_slim) inputSlim,dataset(Healthcare_Header_Services.layouts.common_runtime_config) cfg) := function
 			convertedInputRecordsUserData := project(input,transform(Healthcare_Provider_Services.ABMS_Layouts.autokeyInput,
@@ -51,14 +51,14 @@ EXPORT Datasource_ABMS := MODULE
 			abmsRecsRawFilter := join(abmsRecsRaw,abmsRecsRawBest,left.AccountNumber=right.acctno and left._Penalty=right.penalt,transform(recordof(abmsRecsRaw),self:=left),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 			abmsRecs := project(abmsRecsRawFilter,iesp.abms.t_ABMSResults);	
 			//Now that we have records back we need to rejoin them back to the correct acctno
-			relink2InputAcctno := join(convertedInputRecordsUserData,abmsRecs, left.acctno = right.AccountNumber, transform(layouts.layout_abms, self.acctno := right.AccountNumber; self := right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-			relink2DerivedData := join(convertedInputRecordsDerivedDid+convertedInputRecordsDerivedNPI,abmsRecs, left.acctno = right.AccountNumber, transform(layouts.layout_abms, self.acctno := (string)left.seq; self.AccountNumber:=(string)left.seq;self := right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+			relink2InputAcctno := join(convertedInputRecordsUserData,abmsRecs, left.acctno = right.AccountNumber, transform(Healthcare_Header_Services.layouts.layout_abms, self.acctno := right.AccountNumber; self := right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+			relink2DerivedData := join(convertedInputRecordsDerivedDid+convertedInputRecordsDerivedNPI,abmsRecs, left.acctno = right.AccountNumber, transform(Healthcare_Header_Services.layouts.layout_abms, self.acctno := (string)left.seq; self.AccountNumber:=(string)left.seq;self := right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 			//hopefully, the relinked data will be linked to the original acct number and have a penalty that should put the best record on top
 			finalABMSData := sort(relink2InputAcctno+relink2DerivedData,acctno,if(isInputNPIMatched or isDerivedNPIMatched,1,2),_Penalty);
 			finalABMSDataDedup := dedup(finalABMSData,acctno,abmsbiogid);
 			reformatDedup := project(finalABMSDataDedup,iesp.abms.t_ABMSResults);
 			
-			layouts.layout_fullchild_abms doRollup(iesp.abms.t_ABMSResults l, dataset(iesp.abms.t_ABMSResults) r) := TRANSFORM
+			Healthcare_Header_Services.layouts.layout_fullchild_abms doRollup(iesp.abms.t_ABMSResults l, dataset(iesp.abms.t_ABMSResults) r) := TRANSFORM
 				SELF.acctno := l.AccountNumber;
 				self.ProviderID := (unsigned6)l.ABMSBiogID;
 				self.childinfo := project(r,iesp.abms.t_ABMSResults);
@@ -66,15 +66,15 @@ EXPORT Datasource_ABMS := MODULE
 			results_rolled := rollup(group(sort(reformatDedup,AccountNumber,ABMSBiogID),AccountNumber,ABMSBiogID),group,doRollup(left,rows(left)));
 						return results_rolled;
 		end;
-		Export appendABMSData (dataset(layouts.autokeyInput) input,
-													 dataset(layouts.layout_slim) inputSlim,
-													 dataset(layouts.CombinedHeaderResultsDoxieLayout) inputRecs,
-													 dataset(Layouts.common_runtime_config) cfg) := function
+		Export appendABMSData (dataset(Healthcare_Header_Services.layouts.autokeyInput) input,
+													 dataset(Healthcare_Header_Services.layouts.layout_slim) inputSlim,
+													 dataset(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout) inputRecs,
+													 dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := function
 			fmtRec_ABMSData := getABMSData(input(name_last <> ''),inputSlim,cfg);//Remove business only search records
 			results := join(inputRecs,fmtRec_ABMSData, left.acctno=right.acctno,
-																			transform(layouts.CombinedHeaderResultsDoxieLayout,
+																			transform(Healthcare_Header_Services.layouts.CombinedHeaderResultsDoxieLayout,
 																								self.abmsRaw := right.childinfo;
-																								self := left),left outer);
+																								self := left),limit(0),left outer);
 			return results;
 		end;
 end;

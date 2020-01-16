@@ -43,7 +43,7 @@ EXPORT Records := module
 		getLNPIDs := Header_Records_SearchKeys(IndividualRecords,cfg).getHdrLNPids;
 		DidNotReturn := project(join(IndividualRecords,getLNPIDs,left.acctno=right.acctno,transform(left),left only),transform(Layouts.searchKeyResults_plus_input,self.glb_ok:=cfg[1].glb_ok;self.isSearchFailed:=true;self:=left));;
 		//Separate Header good hits and failures 
-		failedSearches := project(getLNPIDs(isSearchFailed=true and lnpid=0)+DidNotReturn,buildFailureRecord(left));  // mainly adds 203 to the ProcessingMessage of the record
+		failedSearches := project(getLNPIDs(isSearchFailed and lnpid=0)+DidNotReturn,buildFailureRecord(left));  // mainly adds 203 to the ProcessingMessage of the record
 		goodSearches := getLNPIDs(isSearchFailed=false or lnpid>0);
 		
 		//Use goodsearchs hits for finalIndividuals merge and rollup
