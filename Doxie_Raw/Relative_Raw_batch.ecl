@@ -77,6 +77,10 @@ outrec take_l(outrec le) := transform
 // ----------[ All associates--we care only about first generation ]----------
 rel_dids := ungroup(project(dids,transform(Relationship.Layout_GetRelationship.DIDs_layout,self.did := left.input.did)));
 
+Relkey := MAP(mod_access.isDirectMarketing() => Relationship.constants.RelKeyFlag.DM,
+              mod_access.isConsumer() => Relationship.constants.RelKeyFlag.D2C,
+              '');
+
 rel_1_pre := Relationship.proc_GetRelationship(rel_dids,
   RelativeFlag:=TRUE,
   AssociateFlag:=TRUE,
@@ -85,8 +89,8 @@ rel_1_pre := Relationship.proc_GetRelationship(rel_dids,
   HighConfidenceRelatives:=relMod.relationship_highConfidenceRelatives,
   HighConfidenceAssociates:=relMod.relationship_highConfidenceAssociates,
   RelLookbackMonths:=relMod.relationship_relLookbackMonths,
-  txflag:=Relationship.Functions.getTransAssocFlgs(relMod.relationship_transAssocMask)
-  ).result;
+  txflag:=Relationship.Functions.getTransAssocFlgs(relMod.relationship_transAssocMask),
+  RelKeyFlag := Relkey).result;
 
 assoc_1_us := join(dids,rel_1_pre,
                     (unsigned6)left.input.did = right.did1 and not right.isRelative,
@@ -128,8 +132,8 @@ relas_2_rels := Relationship.proc_GetRelationship(sgen_dids,
   HighConfidenceRelatives:=relMod.relationship_highConfidenceRelatives,
   HighConfidenceAssociates:=relMod.relationship_highConfidenceAssociates,
   RelLookbackMonths:=relMod.relationship_relLookbackMonths,
-  txflag:=Relationship.Functions.getTransAssocFlgs(relMod.relationship_transAssocMask)
-  ).result;
+  txflag:=Relationship.Functions.getTransAssocFlgs(relMod.relationship_transAssocMask),
+  RelKeyFlag := Relkey).result;
 relas_2_pre := JOIN(relas_1_look_for_more,relas_2_rels,
                     left.person2 = right.did1 and right.isRelative,
                     take_rr(left, right, 2),
@@ -165,8 +169,8 @@ relas_3_rels := Relationship.proc_GetRelationship(tgen_dids,
   HighConfidenceRelatives:=relMod.relationship_highConfidenceRelatives,
   HighConfidenceAssociates:=relMod.relationship_highConfidenceAssociates,
   RelLookbackMonths:=relMod.relationship_relLookbackMonths,
-  txflag:=Relationship.Functions.getTransAssocFlgs(relMod.relationship_transAssocMask)
-  ).result;
+  txflag:=Relationship.Functions.getTransAssocFlgs(relMod.relationship_transAssocMask),
+  RelKeyFlag := Relkey).result;
 relas_3_pre := JOIN(relas_2_look_for_more,relas_3_rels,
                     left.person2 = right.did1 and right.isRelative,
                     take_rr(left, right, 3),
