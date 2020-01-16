@@ -82,7 +82,8 @@ EXPORT Datasource_SelectFile := MODULE
 											keep(Healthcare_Header_Services.Constants.IDS_PER_DID), limit(0)); 
 			  Supmacselectfile:=Suppress.MAC_FlagSuppressedSource(rawdataIndividualwithAddrScores, CFG[1]); 
         setOptOutselectfile := project(Supmacselectfile, transform(Healthcare_Header_Services.Layouts.selectfile_providers_base_with_input,self.hasOptOut:= left.is_suppressed;self:=left;self:=[];))   ;                                                                                 
-				rawdataDeduped:=dedup(sort(setOptOutselectfile,record),record);
+				rawdataDeduped:=dedup(sort(setOptOutselectfile,acctno,lnpid,addr_conf_score,addr_rectype,bdid,best_dob,best_ssn,bill_addr_ind,bill1_fax_ind,bill1_phone_ind,birth_year,addr_suffix,clean_company_name,clean_last_verify_date,p_city_name,postdir,predir,prim_name,prim_range,sec_range,st,unit_desig,zip,date_of_death,dea_bus_act_ind,dea_num,dea_num_exp,did,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,fax1,fips_county,fips_st,first_name,gender,geo_lat,geo_long,group_key,last_name,lic_begin_date,lic_end_date,lic_num,lic_state,lic_status,lic_type,lnpid,middle_name,normed_addr_rec_type,npi_num,oig_flag,opm_flag,orig_fullname,phone1,prac_addr_ind,prac1_fax_ind,prac1_phone_ind,primary_location,provider_status,state_restrict_flag,suffix_name,suffix_other,title,upin,v_city_name,zip4),
+														acctno,lnpid,addr_conf_score,addr_rectype,bdid,best_dob,best_ssn,bill_addr_ind,bill1_fax_ind,bill1_phone_ind,birth_year,addr_suffix,clean_company_name,clean_last_verify_date,p_city_name,postdir,predir,prim_name,prim_range,sec_range,st,unit_desig,zip,date_of_death,dea_bus_act_ind,dea_num,dea_num_exp,did,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,fax1,fips_county,fips_st,first_name,gender,geo_lat,geo_long,group_key,last_name,lic_begin_date,lic_end_date,lic_num,lic_state,lic_status,lic_type,lnpid,middle_name,normed_addr_rec_type,npi_num,oig_flag,opm_flag,orig_fullname,phone1,prac_addr_ind,prac1_fax_ind,prac1_phone_ind,primary_location,provider_status,state_restrict_flag,suffix_name,suffix_other,title,upin,v_city_name,zip4);
 				baseRecs := project(sort(rawdataDeduped,acctno,-addr_conf_score,-clean_last_verify_date),Healthcare_Header_Services.Transforms.build_selectfile_Provider_base(left));
 		  
 	return baseRecs;
@@ -115,7 +116,7 @@ EXPORT Datasource_SelectFile := MODULE
 			results := join(input,licenseinfo_rollup, left.acctno=right.acctno and left.srcid = right.ProviderID and left.vendorid=right.group_key,
 																			transform(Healthcare_Header_Services.Layouts.CombinedHeaderResults,
 																								self.StateLicenses := right.childinfo;
-																								self := left),left outer,limit(0));
+																								self := left),left outer,keep(Healthcare_Header_Services.Constants.MAX_SEARCH_RECS),limit(0));
 			return results;
 	end;
 	Export appendSpecialty(dataset(Healthcare_Header_Services.Layouts.CombinedHeaderResults) input, dataset(Healthcare_Header_Services.Layouts.GroupKey) searchby):= function
