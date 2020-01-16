@@ -65,7 +65,7 @@ export Constants := MODULE
 	Export ONE_STEP_PASS_BAD_CONFIG := 'INVALID';
 	
 	Export SRC_ING := 'I';//Deprecate
-	Export Record_type:= 'C';//Deprecate
+	Export Record_type:= 'C';
 	Export SRC_AMS := MDR.SourceTools.src_AMS;//'SJ';
 	Export SRC_ABMS := MDR.SourceTools.src_ABMS;//'0Q';
 	Export SRC_SANC := 'S';
