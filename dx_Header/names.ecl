@@ -116,8 +116,6 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
 
   EXPORT i_DMV_restricted := prefix + 'header::DMV_restricted' + postfix;
 
-  EXPORT i_ParentLnames := prefix + 'header.parentlnames' + postfix;
-
   EXPORT i_address_research := prefix + 'address_research' + postfix;
 
   EXPORT i_ssn_address := prefix + 'header_ssn_address' + postfix;
