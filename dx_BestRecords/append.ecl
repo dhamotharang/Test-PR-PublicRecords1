@@ -6,17 +6,17 @@ EXPORT append(did_ds, did_field, permission_type, left_outer = 'true', use_distr
 
   IMPORT infutor, dx_BestRecords, watchdog, _Control;
 
-// on Vault, we're only choosing between just these 2 files, and since they are ingested files instead of roxie keys, 
+// on Vault, we're only choosing between just these 2 files, and since they are ingested files instead of roxie keys,
 // and when the rest of them exist as roxie keys, you get an error stating the branches aren't the same
-#IF(_Control.Environment.onVault) 
-	LOCAL out_glb := dx_BestRecords.mac_join(did_ds, did_field, watchdog.Key_watchdog_glb, use_distributed, left_outer);
-	LOCAL out_glb_nonexp := dx_BestRecords.mac_join(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonExperian, use_distributed, left_outer);
+#IF(_Control.Environment.onVault)
+  LOCAL out_glb := dx_BestRecords.mac_join(did_ds, did_field, watchdog.Key_watchdog_glb, use_distributed, left_outer);
+  LOCAL out_glb_nonexp := dx_BestRecords.mac_join(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonExperian, use_distributed, left_outer);
 
-		LOCAL best_data := MAP(
-		permission_type = dx_BestRecords.Constants.perm_type.glb => out_glb, 
-		permission_type = dx_BestRecords.Constants.perm_type.glb_nonexperian => out_glb_nonexp 
-		);
-	
+    LOCAL best_data := MAP(
+    permission_type = dx_BestRecords.Constants.perm_type.glb => out_glb,
+    permission_type = dx_BestRecords.Constants.perm_type.glb_nonen => out_glb_nonexp
+    );
+
 #ELSE
   //Infutor data not included in the new key.
   LOCAL best_data := IF(permission_type = dx_BestRecords.Constants.PERM_TYPE.infutor,
