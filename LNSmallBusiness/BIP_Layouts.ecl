@@ -721,6 +721,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING1 InputCheckBusFax;
 		STRING1 InputCheckBusNAICS;
 		STRING1 InputCheckBusSIC;
+		STRING1 InputCheckBusAge;
 		STRING1 InputCheckAuthRepFirstName;
 		STRING1 InputCheckAuthRepMiddleName;
 		STRING1 InputCheckAuthRepLastName;
@@ -774,6 +775,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING2 VerificationBusInputPhone;
 		STRING2 VerificationBusInputTIN;
 		STRING2 VerificationBusInputIndustry;
+		STRING3 BusinessAddrCount;
 		STRING5 BusinessRecordTimeOldest;
 		STRING5 BusinessRecordTimeNewest;
 		STRING2 BusinessRecordUpdated12M;
@@ -788,7 +790,15 @@ EXPORT BIP_Layouts := MODULE
 		STRING2 FirmOwnershipType;
 		STRING11 FirmReportedSales;
 		STRING9 FirmReportedSalesRange;
+		STRING9 FirmReportedEarnings;
 		STRING2 FirmParentCompanyInd;
+		STRING5 OrgLocationCount;
+		STRING5 OrgRelatedCount;
+		STRING5 OrgLegalEntityCount;
+		STRING5 OrgAddrLegalEntityCount;
+		STRING2 OrgSingleLocation;
+		STRING5 SOSTimeAgentChange;
+		STRING2 SOSForeignStateFlag;
 		STRING5 SOSIncorporationFilingsCount;
 		STRING5 SOSIncorporationTimeOldest;
 		STRING2 SOSStateCount;
@@ -836,6 +846,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING9 JudgmentsSuitsTotalAmount;
 		STRING5 JudgmentsOtherCount;
 		STRING9 JudgmentOtherTotalAmount;
+		STRING9 LienJudgmentDollarTotal;
 		STRING4 AssetPropCountEver;
 		STRING4 AssetPropCountCurrent;
 		STRING4 AssetPropStateCountCurrent;
@@ -862,6 +873,9 @@ EXPORT BIP_Layouts := MODULE
 		STRING5 InquiryHighRiskCount12M;
 		STRING5 InquiryOtherCount03M;
 		STRING5 InquiryOtherCount12M;
+		STRING5 InquiryConsumerAddress;
+		STRING5 InquiryConsumerPhone;
+		STRING5 InquiryConsumerAddressSSN;
 		STRING2 BusExecLinkRepNameOnFile;
 		STRING2 BusExecLinkRepAddrOnFile;
 		STRING2 BusExecLinkRepPhoneOnFile;
@@ -914,6 +928,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING3 InputBusAddrCurrentCount;
 		STRING5 InputAddrTINCount;
 		STRING2 InputBusNameOtherBusNameMatch;
+		STRING2 InputAddrSourceCount;
 		STRING2 InputAddrType;
 		STRING2 InputAddrZipMismatch;
 		STRING2 InputAddrVacancy;
@@ -938,6 +953,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING6 AssociateCountWithLien;
 		STRING6 AssociateJudgmentCount;
 		STRING6 AssociateCountWithJudgment;
+		STRING6 AssociateWatchlistCount;
 		STRING6 AssociateCityCount;
 		STRING6 AssociateCountyCount;
 		STRING6 AssociateHighRiskAddrCount;
