@@ -67,7 +67,7 @@
 
 import AutoStandardI, ut, riskwise, risk_indicators, didville, gong,
 			 ln_propertyv2,business_risk,paw,driversv2,certegy,inquiry_acclogs,email_data,yellowpages,
-			 business_header_ss,advo,daybatchpcnsr,easi,avm_v2,avm_v2,utilfile,liensv2,business_header, 
+			 business_header_ss,advo,daybatchpcnsr,easi,avm_v2,utilfile,liensv2,business_header, 
 			 _Control, watercraft, AlloyMedia_student_list, American_student_list, doxie_files,  
 			 prof_licenseV2,BankruptcyV2, BankruptcyV3, gateway, Royalty,Relationship,dx_header, suppress, VehicleV2, std;
 
@@ -498,7 +498,7 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
 	if(searchdid!=0 and (include_all_files=true or include_paw=true), output(peopleatwork, named('peopleatwork')) );
 	
 	sid := dataset([searchdid],Relationship.Layout_GetRelationship.DIDs_layout);
-	relatives2 := Relationship.proc_GetRelationship(sid,topNCount:=max_recs,
+	relatives2 := Relationship.proc_GetRelationshipNeutral(sid,topNCount:=max_recs,
 		RelativeFlag:=TRUE,AssociateFlag:=TRUE,
 		doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result;  
 	if(searchdid!=0 and (include_all_files=true or include_relatives=true), output(relatives2, named('Relatives')) );

@@ -137,7 +137,7 @@ relrec := record
   string10	Rel_BestZip;
 end;
 
-relrec into_rel(outf2 L, Relationship.layout_GetRelationship.InterfaceOuput R) := transform
+relrec into_rel(outf2 L, Relationship.layout_GetRelationship.interfaceOutputNeutral R) := transform
   self.seq := l.seq;
   self.did := R.did2;
   self.recent_cohabit := R.rel_dt_last_seen /100;
@@ -146,7 +146,7 @@ relrec into_rel(outf2 L, Relationship.layout_GetRelationship.InterfaceOuput R) :
 end;
 
 rdid_ds := project(outf2,transform(Relationship.Layout_GetRelationship.DIDs_layout,self.did:=(integer)left.adl,SELF := []));
-rel_recs := Relationship.proc_GetRelationship(rdid_ds,TRUE,TRUE,FALSE,FALSE,ut.limits.RELATIVES_PER_PERSON,,TRUE).result;
+rel_recs := Relationship.proc_GetRelationshipNeutral(rdid_ds,TRUE,TRUE,FALSE,FALSE,ut.limits.RELATIVES_PER_PERSON,,TRUE).result;
 
 myrels1 := join(outf2, rel_recs,
             (integer)left.adl = right.did1,

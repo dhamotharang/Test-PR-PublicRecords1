@@ -1,4 +1,4 @@
-﻿IMPORT paw, riskwise, ut, risk_indicators, Business_Header, doxie, Business_Header_SS, did_add, Suppress, 
+﻿IMPORT paw, riskwise, risk_indicators, Business_Header, doxie, Business_Header_SS, did_add, Suppress, 
 Address, header, Relationship, AML;
 
 export IndGetBusnAssoc( DATASET(Layouts.LayoutAMLShellV2) BusnIndv,
@@ -168,10 +168,10 @@ pawAssocTitle := Suppress.Suppress_ReturnOldLayout(pawAssocTitle_unsuppressed, m
 	DDAssocExecs_dids := PROJECT(DDAssocExecs_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.Assocdid));
 
-	rellyids := Relationship.proc_GetRelationship(DDAssocExecs_dids,TopNCount:=100,
+	rellyids := Relationship.proc_GetRelationshipNeutral(DDAssocExecs_dids,TopNCount:=100,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result; 
 
- Layouts.AMLExecLayoutV2  Getparents(DDAssocExecs le, rellyids ri) := TRANSFORM 
+ Layouts.AMLExecLayoutV2  Getparents(DDAssocExecs le, Relationship.layout_GetRelationship.interfaceOutputNeutral ri) := TRANSFORM 
 	
 		self.seq := le.seq;
 		self.origdid := le.origdid;
