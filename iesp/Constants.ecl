@@ -1166,7 +1166,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 SEARCH_MAX_COMPANYSEARCH_RESPONSE_RECORDS := 2000;
 	end;
 
-	export MemberPoint := MODULE
+	export KeepContact := MODULE
 		export unsigned2 MAX_PHONES := 3;
 		export unsigned2 MAX_EMAILS := 10;
 	end;
