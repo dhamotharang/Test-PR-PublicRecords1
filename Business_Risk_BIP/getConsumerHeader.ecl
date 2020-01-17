@@ -657,7 +657,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 		ConsumerHeaderDIDSlim := DEDUP(SORT(ConsumerHeaderDID(FEINMatched), Seq, DID), Seq, DID);
 		
-		HeaderRelatives :=  Relationship.proc_GetRelationship(PROJECT(ConsumerHeaderDIDSlim, TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID)),
+		HeaderRelatives :=  Relationship.proc_GetRelationshipNeutral(PROJECT(ConsumerHeaderDIDSlim, TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID)),
 																	TopNCount:=100,
 																	RelativeFlag :=TRUE,AssociateFlag:=TRUE,
 																	doAtmost:=TRUE,MaxCount:=Business_Risk_BIP.Constants.Limit_Default).result; 

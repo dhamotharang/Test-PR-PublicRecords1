@@ -275,7 +275,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 				// Use relationship proc to retrieve relative dids.
 				rdid_ds := project(in_recs2,transform(Relationship.Layout_GetRelationship.DIDs_layout,SELF:=LEFT,SELF := []));
 				
-				raw_recs_relative_match := project(Relationship.proc_GetRelationship(rdid_ds,TRUE,TRUE,,,coa_services.constants.max_recs_on_coa_relative_join,,TRUE).result,
+				raw_recs_relative_match := project(Relationship.proc_GetRelationshipNeutral(rdid_ds,TRUE,TRUE,,,coa_services.constants.max_recs_on_coa_relative_join,,TRUE).result,
 																		transform (doxie.layout_references,self.did := left.did2));												  					
 								
 				dids_together  := raw_recs_relative_match +	util_final;		
