@@ -103,11 +103,14 @@ akas t_akas(akas l) := transform
 end;
 l_akas := project(akas,t_akas(left));
 
+email_v2 := Doxie.emailv2_records(dids, mod_access);
+
 prop_count := doxie.Fn_comp_prop_count(dids[1].did,0,mod_access.dppa,mod_access.glb,mod_access.ln_branded,mod_access.probation_override);
+
 
 individual :=
   dataset([
-          transform(rec.result_rec2,
+          transform(rec.result_ext_rec,
                     self.akas :=  choosen(l_akas, con.max_akas),
                     self.finders := choosen(project(srtd, rec.finder_rec), con.max_finders),
                     self.indicators := choosen(project(doxie.header_lookups(dids),
@@ -119,7 +122,8 @@ individual :=
                     self.subject_information := choosen(sdi, 1);
                     self.imposters :=  choosen(imposters_cln, con.max_imposters),
                     self.addresses := choosen(addr_phone_rolled_srtd, con.max_addresses),
-                    self := []
+                    self.EmailV2Records := if(storeds.Include_Email_Addresses, email_v2.EmailV2Records),
+                    self.EmailV2Royalties := if(storeds.Include_Email_Addresses, email_v2.EmailV2Royalties)
                    )
   ])(con.AllowMinors or (not SubjectIsMinor));
 
