@@ -2,7 +2,7 @@
          TopBusiness_Services, STD, Suppress;
 
 EXPORT  Search_Records(
-								RelationshipIdentifier_Services.Layouts.Local_tRelationshipIdentifierSearch ds_dataInSearch
+								        RelationshipIdentifier_Services.Layouts.Local_tRelationshipIdentifierSearch ds_dataInSearch
                 ,RelationshipIdentifier_Services.Layouts.OptionsLayout options
                 ,DATASET(RelationshipIdentifier_Services.Layouts.Batch.Input_Processed) tmpds_BatchIn
                 ,RelationshipIdentifier_Services.iParam.BatchParams               inMod
@@ -43,15 +43,16 @@ EXPORT  Search_Records(
 	SHARED integer CurDate := STD.Date.today();
 	SHARED unsigned4 endDateTmp := (unsigned4) options.asOfDate;
 	SHARED unsigned4 endDate := if (endDateTmp = 0, (unsigned4) curDate, endDateTmp);
-  SHARED unsigned4 endDatetmpBatch := (unsigned4) inmod.endDate;
+ SHARED unsigned4 endDatetmpBatch := (unsigned4) inmod.endDate;
 	SHARED unsigned4 enddatebatch := if (endDateTmpBatch = 0, (unsigned4) curDate, endDateTmpBatch);
-  SHARED ssnMaskVal := mod_access.ssn_mask;
+ SHARED ssnMaskVal := mod_access.ssn_mask;
 	SHARED application_type_value := mod_access.Application_type;
 
 	SHARED DRM := mod_access.dataRestrictionMask;
 	SHARED DPM := mod_access.DataPermissionMask;
-  SHARED dppa_ok := mod_access.isValidDppa();
-  SHARED glb_ok := mod_access.isValidGlb();
+ SHARED dppa_ok := mod_access.isValidDppa();
+ SHARED glb_ok := mod_access.isValidGlb();
+ SHARED is_consumer := mod_access.isConsumer();
 
 	// will contain both person and business INPUT stuff
 	//
@@ -60,37 +61,58 @@ EXPORT  Search_Records(
 	// in order to keep input metadata and grp recs by acctno correctly.
 	//
 	UNSIGNED1 region := address.Components.Country.US; // default
-	ds_inDataSearchBys := PROJECT(DS_dataInSearch.SearchBy, TRANSFORM( {string20 acctno;
-														unsigned4 seq;
-														iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchBy;},
-									 SELF.acctno := (STRING20) counter;
-									 SELF.seq := 0;
-									 SELF.entityNo := LEFT.entityNo;
+ 
+ /*
+    D2C Relationship Connection project requirements
+    If the user inputs a business entity treat it as an individual entity
+    So companyName entered by user is treated as person full name
+ */
+ ds_searchData := PROJECT(DS_dataInSearch.SearchBy, 
+                           TRANSFORM(iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchBy,
+                             SELF.Name.Full := IF(is_consumer and LEFT.Name.Full = '',LEFT.companyName, LEFT.Name.Full),
+                             SELF.IndividualOrBusiness := IF(is_consumer and LEFT.IndividualOrBusiness = 'B', 'I', LEFT.IndividualOrBusiness),
+                             SELF := LEFT
+                         ));
+ 
+	ds_inDataSearchBys := PROJECT(ds_searchData, 
+                               TRANSFORM({string20 acctno; unsigned4 seq; iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchBy;},
+									                        SELF.acctno := (STRING20) counter,
+									                        SELF.seq := 0,
+									                        SELF.entityNo := LEFT.entityNo,
+                                 
+									                        addr2 := Address.Addr2FromComponents(LEFT.Address.City, LEFT.Address.STATE, LEFT.Address.zip5);
+                                 
+									                        in_streetaddr := address.Addr1FromComponents(LEFT.Address.streetNumber,LEFT.Address.StreetPreDirection,
+		                                                                            LEFT.Address.streetName,LEFT.Address.StreetSuffix,
+																								                                                      LEFT.Address.StreetPostDirection,'',LEFT.Address.UnitNumber);
+									                        string60 in_streetAddress1 := IF( LEFT.Address.StreetAddress1='',in_streetAddr,LEFT.Address.StreetAddress1);
 
-									 addr2 := Address.Addr2FromComponents(LEFT.Address.City, LEFT.Address.STATE, LEFT.Address.zip5);
-									 in_streetaddr := address.Addr1FromComponents(LEFT.Address.streetNumber,LEFT.Address.StreetPreDirection,
-		                                              LEFT.Address.streetName,LEFT.Address.StreetSuffix,
-																								 LEFT.Address.StreetPostDirection,'',LEFT.Address.UnitNumber);
-									 string60 in_streetAddress1 := IF( LEFT.Address.StreetAddress1='',in_streetAddr,LEFT.Address.StreetAddress1);
+									                        tmpAddr := if (LEFT.Address.streetNumber = '' and LEFT.Address.StreetPreDirection = ''
+									                                       AND LEFT.Address.streetName  = '' AND LEFT.Address.StreetSuffix = ''
+																	                               AND LEFT.Address.StreetPostDirection = '' and LEFT.Address.UnitNumber = '' AND
+																	                               LEFT.Address.StreetAddress1 <> '', in_streetAddress1, '');
 
-									 tmpAddr := if (LEFT.Address.streetNumber = '' and LEFT.Address.StreetPreDirection = ''
-									                AND LEFT.Address.streetName  = '' AND LEFT.Address.StreetSuffix = ''
-																	AND LEFT.Address.StreetPostDirection = '' and LEFT.Address.UnitNumber = '' AND
-																	LEFT.Address.StreetAddress1 <> '', in_streetAddress1, '');
+                                 clean_addr := Address.GetCleanAddress(TmpAddr, addr2, region).results;
 
-                    clean_addr := Address.GetCleanAddress(TmpAddr, addr2, region).results;
-
-		                SELF.Address.StreetNumber         := IF (LEFT.Address.StreetNumber        <> '', LEFT.Address.StreetNumber, clean_addr.prim_range);
-										SELF.Address.StreetPreDirection   := IF (LEFT.Address.StreetPreDirection  <> '', LEFT.Address.StreetPreDirection, clean_addr.preDir);
-										SELF.Address.StreetName           := IF (LEFT.Address.StreetName          <> '', LEFT.Address.StreetName, clean_addr.prim_name);
-										SELF.Address.StreetSuffix         := IF (LEFT.Address.StreetSuffix        <> '', LEFT.Address.StreetSuffix, clean_addr.suffix);
-										SELF.Address.StreetPostDirection  := IF (LEFT.Address.StreetPostDirection <> '', LEFT.Address.StreetPostDirection,clean_addr.postdir);
-										SELF.Address.UnitNumber           := IF (LEFT.Address.UnitNumber          <> '', LEFT.Address.UnitNumber, clean_addr.sec_range);
-										SELF.Address.zip5                 := IF (LEFT.Address.zip5                <> '', LEFT.Address.Zip5, clean_addr.zip);
-										SELF.Address.State                := IF (LEFT.Address.State               <> '', LEFT.Address.State, clean_addr.state);
-										SELF.Address.city                 := IF (LEFT.Address.City                <> '', LEFT.Address.City,  clean_addr.v_city);
-		                SELF := LEFT;
-			              ));
+		                               SELF.Address.StreetNumber         := IF (LEFT.Address.StreetNumber        <> '', LEFT.Address.StreetNumber, clean_addr.prim_range),
+										                      SELF.Address.StreetPreDirection   := IF (LEFT.Address.StreetPreDirection  <> '', LEFT.Address.StreetPreDirection, clean_addr.preDir),
+										                      SELF.Address.StreetName           := IF (LEFT.Address.StreetName          <> '', LEFT.Address.StreetName, clean_addr.prim_name),
+										                      SELF.Address.StreetSuffix         := IF (LEFT.Address.StreetSuffix        <> '', LEFT.Address.StreetSuffix, clean_addr.suffix),
+										                      SELF.Address.StreetPostDirection  := IF (LEFT.Address.StreetPostDirection <> '', LEFT.Address.StreetPostDirection,clean_addr.postdir),
+										                      SELF.Address.UnitNumber           := IF (LEFT.Address.UnitNumber          <> '', LEFT.Address.UnitNumber, clean_addr.sec_range),
+										                      SELF.Address.zip5                 := IF (LEFT.Address.zip5                <> '', LEFT.Address.Zip5, clean_addr.zip),
+										                      SELF.Address.State                := IF (LEFT.Address.State               <> '', LEFT.Address.State, clean_addr.state),
+										                      SELF.Address.city                 := IF (LEFT.Address.City                <> '', LEFT.Address.City,  clean_addr.v_city),
+                                 
+                                 name                              := Address.GetCleanNameAddress.fnCleanName(LEFT.Name);
+                                 
+                                 SELF.Name.First                   := IF (LEFT.Name.First                  <> '', LEFT.Name.First, name.fname),
+                                 SELF.Name.Middle                  := IF (LEFT.Name.Middle                 <> '', LEFT.Name.Middle, name.mname),
+                                 SELF.Name.Last                    := IF (LEFT.Name.Last                   <> '', LEFT.Name.last, name.lname),
+                                 SELF.Name.Suffix                  := IF (LEFT.Name.Suffix                 <> '', LEFT.Name.Suffix, name.name_suffix),
+                                 SELF.Name.Prefix                  := IF (LEFT.Name.Prefix                 <> '', LEFT.Name.Prefix, name.title),
+		                               SELF := LEFT
+			                            ));
 
 	ds_inDataBIP := PROJECT(ds_inDataSearchBys(IndividualOrBusiness = RelationshipIdentifier_Services.Constants.BUSINESS),
              TRANSFORM(BIPV2.IDfunctions.rec_SearchInput,
