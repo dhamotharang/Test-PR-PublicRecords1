@@ -2,6 +2,7 @@
 import BIPV2_Best;
 import BIPV2_Files;
 import BIPV2_Build;
+import BIPV2_Contacts;
 import MDR;
 import BIPV2_PostProcess;
 import InsuranceHeader_PostProcess;
