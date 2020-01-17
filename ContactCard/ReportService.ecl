@@ -7,6 +7,7 @@
   <part name="IncludePhonesPlus" type="xsd:boolean"/>
   <part name="IncludePhonesPlusForRNA" type="xsd:boolean"/>
   <part name="IncludePhonesFeedback" type="xsd:boolean"/>
+  <part name="IncludeEmailAddresses" type="xsd:boolean"/>
 
   <part name="TargetRadius" 			type="xsd:string"/>
   <part name="MaxDaysBefore" 			type="xsd:integer"/>
@@ -33,6 +34,9 @@
   <part name="SSNMask" type="xsd:string"/>
   <part name="DLMask" type="xsd:string"/>
   <part name="ApplicationType" type="xsd:string"/>
+  <part name="IndustryClass" type="xsd:string"/>
+  <part name="ResellerType" type="xsd:unsignedInt"/>
+  <part name="IntendedUse" type="xsd:string"/>
 
   <part name="MaxRelatives" type="xsd:unsignedInt"/>
   <part name="RelativeDepth" type="xsd:byte"/>
@@ -44,6 +48,9 @@
   <part name="ProbationOverride" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string"/>
   <part name="DataPermissionMask" type="xsd:string"/>
+
+  <part name="MaxEmailResults" type="xsd:unsignedInt"  default="5"/>
+  <part name="EmailSearchTier" type="xsd:string"  default="Basic"/>
 
 
 </message>
@@ -70,8 +77,11 @@ con := ContactCard.constants;
 
 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
 
-recs := contactcard.ReportRecords(doxie.get_dids(), mod_access);
+report_res := contactcard.ReportRecords(doxie.get_dids(), mod_access);
+recs := project(report_res, contactcard.layouts.result_rec);
+royalties := report_res.EmailV2Royalties;
 
 output(recs, named('Results'));
+output(royalties, named('RoyaltySet'));
 
 ENDMACRO;
