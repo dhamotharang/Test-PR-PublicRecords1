@@ -16,19 +16,19 @@ EXPORT test_get_batch_service := MACRO
 
   //Iterate through permissions:
   glb_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb, FALSE, FALSE), acctno);
-  glb_nonexperian_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonexperian, FALSE, FALSE), acctno);
-  glb_nonequifax_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonequifax, FALSE, FALSE), acctno);
-  glb_nonexperian_nonequifax_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonexperian_nonequifax, FALSE, FALSE), acctno);
+  glb_nonexperian_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonen, FALSE, FALSE), acctno);
+  glb_nonequifax_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_noneq, FALSE, FALSE), acctno);
+  glb_nonexperian_nonequifax_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonen_noneq, FALSE, FALSE), acctno);
   glb_nonblank_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonblank, FALSE, FALSE), acctno);
-  glb_nonexperian_nonblank_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonexperian_nonblank, FALSE, FALSE), acctno);
-  glb_nonequifax_nonblank_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonequifax_nonblank, FALSE, FALSE), acctno);
-  glb_nonexperian_nonequifax_nonblank_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonexperian_nonequifax_nonblank, FALSE, FALSE), acctno);
+  glb_nonexperian_nonblank_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonen_nonblank, FALSE, FALSE), acctno);
+  glb_nonequifax_nonblank_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_noneq_nonblank, FALSE, FALSE), acctno);
+  glb_nonexperian_nonequifax_nonblank_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonen_noneq_nonblank, FALSE, FALSE), acctno);
   glb_nonutil_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonutil, FALSE, FALSE), acctno);
   glb_nonutil_nonblank_res := SORT(dx_BestRecords.append(batch_in, did, p_type.glb_nonutil_nonblank, FALSE, FALSE), acctno);
   nonglb_res := SORT(dx_BestRecords.append(batch_in, did, p_type.nonglb, FALSE, FALSE), acctno);
-  nonglb_preglb_res := SORT(dx_BestRecords.append(batch_in, did, p_type.nonglb_preglb, FALSE, FALSE), acctno);
+  nonglb_preglb_res := SORT(dx_BestRecords.append(batch_in, did, p_type.nonglb_noneq, FALSE, FALSE), acctno);
   nonglb_nonblank_res := SORT(dx_BestRecords.append(batch_in, did, p_type.nonglb_nonblank, FALSE, FALSE), acctno);
-  nonglb_nonblank_preglb_res := SORT(dx_BestRecords.append(batch_in, did, p_type.nonglb_nonblank_preglb, FALSE, FALSE), acctno);
+  nonglb_nonblank_preglb_res := SORT(dx_BestRecords.append(batch_in, did, p_type.nonglb_noneq_nonblank, FALSE, FALSE), acctno);
   marketing_res := SORT(dx_BestRecords.append(batch_in, did, p_type.marketing, FALSE, FALSE), acctno);
   marketing_preglb_res := SORT(dx_BestRecords.append(batch_in, did, p_type.marketing_preglb, FALSE, FALSE), acctno);
   infutor_res := SORT(dx_BestRecords.append(batch_in, did, p_type.infutor, FALSE, FALSE), acctno);
