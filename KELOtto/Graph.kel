@@ -3060,6 +3060,7 @@ QUERY: showCustomerPersonEntities <= Person
 
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
+                              KrLowRiskFlag,
 
                               CurrentlyIncarceratedFlag,
                               FraudOffensesFlag,
@@ -3168,7 +3169,7 @@ QUERY: showCustomerAddressEntities <= Address
                               
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
-                              
+                              KrLowRiskFlag,
                               
                               PersonCount := IdentityCount,
                               HighFrequencyFlag,
@@ -3213,12 +3214,12 @@ QUERY: showCustomerIpAddressEntities <= InternetProtocol
                               ClHighRiskPattern5Flag,
 
 															DtFirstSeen,
-															DtLastSeen
+															DtLastSeen,
                               
-/*
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
-                              
+                              KrLowRiskFlag
+/*                              
                               PersonCount := IdentityCount,
                               HighFrequencyFlag,
                               HighRiskDeathPriorToAllEventsPercentFlag,
@@ -3260,19 +3261,11 @@ QUERY: showCustomerSsnEntities <= SocialSecurityNumber
                               ClHighRiskPattern4Flag,
                               ClHighRiskPattern5Flag,
 															DtFirstSeen,
-															DtLastSeen
+															DtLastSeen,
                               
-/*
-
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
-                              
-                              PersonCount := IdentityCount,
-                              HighFrequencyFlag,
-                              HighRiskDeathPriorToAllEventsPercentFlag,
-                              AllHighRiskDeathPriorToAllEventsPersonPercentFlag,
-                              DeceasedPersonCount
-*/                              
+                              KrLowRiskFlag
 
                             };
 
@@ -3302,6 +3295,10 @@ QUERY: showCustomerPhoneEntities <= Phone
                               ContributorSafeFlag,
                               SafeFlag,
 
+                              KrHighRiskFlag,
+                              KrMediumRiskFlag,
+                              KrLowRiskFlag,
+															
                               ClHighRiskPattern1Flag,
                               ClHighRiskPattern2Flag,
                               ClHighRiskPattern3Flag,
@@ -3346,6 +3343,8 @@ QUERY: showCustomerEmailEntities <= Email
 
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
+                              KrLowRiskFlag,
+
 															DtFirstSeen,
 															DtLastSeen
                               
