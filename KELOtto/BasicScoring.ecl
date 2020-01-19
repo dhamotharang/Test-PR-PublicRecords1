@@ -25,7 +25,7 @@ EXPORT BasicScoring := MODULE
                         'hri03_flag_,hri06_flag_,hri07_flag_,hri08_flag_,hri11_flag_,hri12_flag_,hri14_flag_,hri15_flag_,hri19_flag_,hri25_flag_,hri26_flag_,hri27_flag_,hri28_flag_,hri29_flag_,hri30_flag_,hri31_flag_,hri37_flag_,hri38_flag_,hri41_flag_,hri48_flag_,hri50_flag_,hri51_flag_,hri52_flag_,hri71_flag_,hri83_flag_,hri90_flag_,hri_cl_flag_,hri_co_flag_,hri_dd_flag_,hri_df_flag_,hri_iv_flag_,hri_it_flag_,hri_mi_flag_,hri_mo_flag_,hri_ms_flag_,hri_nf_flag_,hri_pa_flag_,hri_po_flag_,hri_va_flag_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,kr_has_known_risk_element_flag_,kr_not_known_risk_has_known_risk_element_flag_,' +
-												'kr_high_risk_flag_,kr_medium_risk_flag_,kr_high_risk_routing_,currently_incarcerated_flag_,fraud_offenses_flag_,associated_with_incarcerated_flag_,associated_with_fraud_offenses_flag_,safe_flag_,contributor_safe_flag_,' +
+												'kr_high_risk_flag_,kr_medium_risk_flag_,kr_low_risk_flag_,kr_high_risk_routing_,currently_incarcerated_flag_,fraud_offenses_flag_,associated_with_incarcerated_flag_,associated_with_fraud_offenses_flag_,safe_flag_,contributor_safe_flag_,' +
                         'kr_id10000_flag_,kr_id10001_flag_,kr_id10002_flag_,kr_id10003_flag_,kr_id10004_flag_,kr_id10005_flag_,kr_id10006_flag_,kr_id10007_flag_,kr_id11000_flag_,kr_id11001_flag_,kr_id11002_flag_,kr_id11003_flag_,kr_id11004_flag_,kr_id11005_flag_,kr_id11006_flag_,kr_id11007_flag_,kr_id11008_flag_,kr_id11009_flag_,kr_id11010_flag_,kr_id11011_flag_,kr_id11012_flag_,kr_id11013_flag_,kr_id11014_flag_,kr_id11015_flag_,kr_id11016_flag_,kr_id11017_flag_,kr_id11018_flag_,kr_id11019_flag_,kr_id12000_flag_,kr_id12001_flag_,kr_id12002_flag_,kr_id12003_flag_,kr_id12004_flag_,kr_id12006_flag_,kr_id12007_flag_,kr_id13000_flag_,kr_id13001_flag_,kr_id13002_flag_,kr_id13003_flag_,kr_id13005_flag_,kr_id13006_flag_,kr_id13007_flag_,kr_id14000_flag_,kr_id14001_flag_,' +
 												'cl_email_count_,cl_high_risk_email_count_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +												
@@ -36,20 +36,20 @@ EXPORT BasicScoring := MODULE
   SHARED AddressStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Address.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'identity_count_,score_,event_count_,not_in_jurisdiction_state_,invalid_address_,address_is_vacant_,address_is_cmra_,address_is_po_box_,' +
 												'dt_first_seen_,dt_last_seen_,' +
-                        'all_deceased_match_person_count_,all_deceased_match_person_percent_,all_deceased_person_count_,all_deceased_person_percent_,all_high_frequency_flag_,all_high_risk_death_prior_to_all_events_person_count_,all_high_risk_death_prior_to_all_events_person_percent_,all_high_risk_death_prior_to_all_events_person_percent_flag_,all_person_count_,cluster_score_,deceased_match_person_percent_,deceased_person_count_,deceased_person_percent_,high_frequency_flag_,in_customer_population_,kr_high_risk_flag_,kr_medium_risk_flag_,source_customer_count_,_addresscmra_,' + 
+                        'all_deceased_match_person_count_,all_deceased_match_person_percent_,all_deceased_person_count_,all_deceased_person_percent_,all_high_frequency_flag_,all_high_risk_death_prior_to_all_events_person_count_,all_high_risk_death_prior_to_all_events_person_percent_,all_high_risk_death_prior_to_all_events_person_percent_flag_,all_person_count_,cluster_score_,deceased_match_person_percent_,deceased_person_count_,deceased_person_percent_,high_frequency_flag_,in_customer_population_,kr_high_risk_flag_,kr_medium_risk_flag_,kr_low_risk_flag_,source_customer_count_,_addresscmra_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
 												'kr_addr300_flag_,kr_addr301_flag_,kr_addr302_flag_,kr_addr303_flag_,' +
 												'cl_kr_not_known_risk_known_risk_element_identity_count_,cl_kr_event_after_known_risk_identity_count_,' +
 												'cl_high_kr_identity_top10_,cl_nas9_top10_,cl_nas3_top10_,cl_ip_high_risk_identity_top10_,' +
-												'cl_adjacent_safe_flag_,cl_bank_identity_count_gt2_count_,cl_ip_high_risk_count_,cl_active30_identity_count_,cl_active7_identity_count_,cl_high_kr_identity_count_,cl_high_risk_routing_count_,cl_no_lex_id_gt22_count_,cl_death_prior_to_all_events_identity_count_,cl_high_risk_death_prior_to_all_events_identity_count_,cl_event_count_,cl_identity_count_,cl_nas9_identity_count_,cl_nap3_identity_count_,cl_address_count_,cl_identity_event_avg_,cl_identity_count_percentile_,cl_event_count_percentile_,cl_impact_weight_,' +
+												'safe_flag_,cl_adjacent_safe_flag_,cl_bank_identity_count_gt2_count_,cl_ip_high_risk_count_,cl_active30_identity_count_,cl_active7_identity_count_,cl_high_kr_identity_count_,cl_high_risk_routing_count_,cl_no_lex_id_gt22_count_,cl_death_prior_to_all_events_identity_count_,cl_high_risk_death_prior_to_all_events_identity_count_,cl_event_count_,cl_identity_count_,cl_nas9_identity_count_,cl_nap3_identity_count_,cl_address_count_,cl_identity_event_avg_,cl_identity_count_percentile_,cl_event_count_percentile_,cl_impact_weight_,' +
                         'cl_ip_high_risk_identity_count_,cl_ip_not_us_identity_count_,cl_ip_vpn_identity_count_,cl_ip_high_risk_city_identity_count_,cl_ip_hosted_identity_count_,cl_ip_tor_identity_count_,cl_ip_not_us_event_count_,cl_ip_vpn_event_count_,cl_ip_high_risk_city_event_count_,cl_ip_hosted_event_count_,cl_ip_tor_event_count_'
                         );// : PERSIST('~temp::deleteme42');
   
   EXPORT SocialSecurityStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Social_Security_Number.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'cluster_score_,event_count_,identity_count_,score_,source_customer_count_,identity_count_gt2_,' + 
 												'dt_first_seen_,dt_last_seen_,' +
-	                      'hri06_flag_,hri26_flag_,hri29_flag_,hri38_flag_,hri71_flag_,hri_it_flag_,hri_mi_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
+	                      'hri06_flag_,hri26_flag_,hri29_flag_,hri38_flag_,hri71_flag_,hri_it_flag_,hri_mi_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,kr_low_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
                         'kr_ssn100_flag_,kr_ssn101_flag_,' +
@@ -61,7 +61,7 @@ EXPORT BasicScoring := MODULE
 												);// : PERSIST('~temp::deleteme47');
 
   EXPORT EmailStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Email.Res0, 'industry_type_,customer_id_,entity_context_uid_',
-                        'cluster_score_,event_count_,identity_count_,identity_count_gt2_,score_,source_customer_count_,kr_high_risk_flag_,_isdisposableemail_,not_safe_last_domain_gt2_,kr_medium_risk_flag_,' + 
+                        'cluster_score_,event_count_,identity_count_,identity_count_gt2_,score_,source_customer_count_,kr_high_risk_flag_,kr_medium_risk_flag_,kr_low_risk_flag_,_isdisposableemail_,not_safe_last_domain_gt2_,' + 
 												'dt_first_seen_,dt_last_seen_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
@@ -76,7 +76,7 @@ EXPORT BasicScoring := MODULE
   EXPORT PhoneStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Phone.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'phone_number_,_is_cell_phone_,cluster_score_,event_count_,identity_count_,identity_count_gt2_,score_,source_customer_count_,' + 
 												'dt_first_seen_,dt_last_seen_,' +
-                        'hri07_flag_,hri08_flag_,hri15_flag_,hri27_flag_,hri31_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,'+ 
+                        'hri07_flag_,hri08_flag_,hri15_flag_,hri27_flag_,hri31_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,kr_low_risk_flag_,'+ 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'safe_flag_,contributor_safe_flag_,' +
 												'kr_last_event_date_,kr_event_after_last_known_risk_count_,kr_event_after_last_known_risk_flag_,' +
@@ -88,7 +88,7 @@ EXPORT BasicScoring := MODULE
                         );// : PERSIST('~temp::deleteme45');
 
   EXPORT IPAddressStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Internet_Protocol.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
-                        'score_,cluster_score_,event_count_,identity_count_,source_customer_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' +
+                        'score_,cluster_score_,event_count_,identity_count_,source_customer_count_,kr_high_risk_flag_,kr_medium_risk_flag_,kr_low_risk_flag_,' +
 												'dt_first_seen_,dt_last_seen_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'safe_flag_,contributor_safe_flag_,' +
@@ -104,7 +104,7 @@ EXPORT BasicScoring := MODULE
 
 
   EXPORT BankAccountStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Bank_Account.Res0, 'industry_type_,customer_id_,entity_context_uid_',
-                        'cluster_score_,event_count_,identity_count_,identity_count_gt2_,score_,source_customer_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
+                        'cluster_score_,event_count_,identity_count_,identity_count_gt2_,score_,source_customer_count_,kr_high_risk_flag_,kr_medium_risk_flag_,kr_low_risk_flag_,' + 
 												'dt_first_seen_,dt_last_seen_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'high_risk_routing_,abbreviated_bankname_,' +
@@ -117,7 +117,7 @@ EXPORT BasicScoring := MODULE
 												);// : PERSIST('~temp::deleteme50');
 
   EXPORT DriversLicenseStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Drivers_License.Res0, 'industry_type_,customer_id_,entity_context_uid_',
-                        'cluster_score_,event_count_,identity_count_,identity_count_gt2_,score_,source_customer_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
+                        'cluster_score_,event_count_,identity_count_,identity_count_gt2_,score_,source_customer_count_,kr_high_risk_flag_,kr_medium_risk_flag_,kr_low_risk_flag_,' + 
 												'dt_first_seen_,dt_last_seen_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
                         'hri41_flag_,hri_df_flag_,' + 
