@@ -146,7 +146,7 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                
     addVoterInfo := DueDiligence.getIndVoterData(updateRelatives, inquiredWithParentHeaderData);
 
-    addMobilityInfo := DueDiligence.getIndMobility(addVoterInfo, inquiredHeaderData, isFCRA, bsVersion);
+    addMobilityInfo := DueDiligence.getIndMobility(addVoterInfo, inquiredHeaderData, isFCRA, bsVersion, includeReport);
     
     addReportData := IF(includeReport, DueDiligence.getIndHeaderReportData(addMobilityInfo, inquiredHeaderData), addMobilityInfo);
 

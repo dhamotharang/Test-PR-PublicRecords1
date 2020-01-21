@@ -40,6 +40,7 @@ EXPORT getIndRelationships(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                                                                                                        
                                                                                                                                  
                                                                                                   SELF.amlRelationshipDegree := IF(LEFT.individual.relationship IN Header.relative_titles.set_Parent, 10, amlDegree);
+                                                                                                  SELF.rawRelationshipType := LEFT.indvType;
                                                                                                   SELF := LEFT.individual; 
                                                                                                   SELF := [];)]);
                                                             SELF := [];));
