@@ -1,4 +1,4 @@
-import Worldcheck_Bridger, ut;
+﻿import Worldcheck_Bridger, ut;
 
 dPerson	:= File_Person;
 
@@ -48,8 +48,8 @@ dXg1 := JOIN(dXgNamed, Functions.RollupNames,LEFT.id = RIGHT.ID,
 								Functions.GetRoles(dPerson) & Functions.GetBirthPlaces(dPerson) & Functions.GetSources
 								& GetSanctionsAsAddlInfo & GetImagesAsAddlInfo,(integer)id)
 								,id,LOCAL);
-addlinfo := ROLLUP(	info,			
-							id, rollInfo(left, right),local);
+addlinfo := CHOOSEN(ROLLUP(	info,			
+							id, rollInfo(left, right),local),256);
 
 dXg2 := JOIN(dXg1, addlinfo,LEFT.id = RIGHT.ID,
 				TRANSFORM(Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp,

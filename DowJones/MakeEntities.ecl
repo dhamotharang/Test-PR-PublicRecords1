@@ -1,4 +1,4 @@
-import Worldcheck_Bridger, ut;
+﻿import Worldcheck_Bridger, ut;
 
 Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp 
 					xForm_Entity(Layouts.rEntities src) := TRANSFORM
@@ -45,8 +45,8 @@ dXg1 := JOIN(dXgNamed, DowJones.Functions.RollupNames,LEFT.id = RIGHT.ID,
 								 Functions.GetSources & Functions.GetVessels
 									& GetSanctionsAsAddlInfo,(integer)id)
 								,id,LOCAL);
-	addlinfo := ROLLUP(	info,			
-							id, rollInfo(left, right),local);
+	addlinfo := CHOOSEN(ROLLUP(	info,			
+							id, rollInfo(left, right),local),256);
 
 	dXg2 := JOIN(dXg1, addlinfo,LEFT.id = RIGHT.ID,
 				TRANSFORM(Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp,
