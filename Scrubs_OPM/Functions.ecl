@@ -2,15 +2,6 @@
 
 EXPORT Functions := MODULE
 
-  //****************************************************************************
-  //fn_numeric:  Returns true if only populated with numbers
-  //****************************************************************************
-  EXPORT fn_numeric(STRING nmbr) := FUNCTION
-    
-		RETURN IF(Stringlib.StringFilterOut(nmbr, '0123456789') = '',1,0);
-							
-  END;		
-
 	//****************************************************************************
 	//fn_check_past_date:  Returns true if only for past dates 
 	//****************************************************************************

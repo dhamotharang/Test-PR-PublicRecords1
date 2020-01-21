@@ -2,7 +2,7 @@
 
 EXPORT Spray(
 	 STRING		pversion			= ''
-	,STRING		pServerIP			= _control.IPAddress.bctlpedata12
+	,STRING		pServerIP			= _control.IPAddress.bctlpedata11
 	,STRING		pDirectory		= '/data/Builds/builds/OPM/data/' + pversion[1..8]  
 	,STRING		pFileName			= '*NonDOD*.txt'
 	,STRING		pGroupName		= STD.System.Thorlib.Group( )
@@ -32,7 +32,7 @@ EXPORT Spray(
 	
 	], tools.Layout_Sprays.Info);
 		
-	RETURN IF( pDirectory != '' //AND NOT pExistSprayed
+	RETURN IF( pDirectory != '' AND NOT pExistSprayed
 						,tools.fun_Spray(FilesToSpray,,,pOverwrite,,FALSE,pIsTesting,,_Constants().Name+' '+pversion,pNameOutput,,,,TRUE) );
 
 END;

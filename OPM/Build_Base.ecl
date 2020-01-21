@@ -21,7 +21,7 @@ function
 				,Build_Base_File
 				,IF( NOT pWriteFileOnly, Promote(pversion).buildfiles.New2Built	)
 			)		
-			,OUTPUT('No Valid version parameter passed, skipping DataBridge.Build_Base atribute') 
+			,OUTPUT('No Valid version parameter passed, skipping OPM.Build_Base atribute') 
 		);
 		
 end;

@@ -1,8 +1,8 @@
 ﻿IMPORT STD,SALT311;
 EXPORT Ingest(BOOLEAN incremental=FALSE
-, DATASET(Layouts.Base) 						Delta = DATASET([],Layouts.Base)
-, DATASET(Layouts.Base) 						dsBase 
-, DATASET(RECORDOF(OPM.in_file))    infile 
+, DATASET(Layouts.Base) 					Delta = DATASET([],Layouts.Base)
+, DATASET(Layouts.Base) 					dsBase 
+, DATASET(RECORDOF(OPM.in_file)) 	infile 
 ) := MODULE
   SHARED NullFile := DATASET([],Layouts.Base); // Use to replace files you wish to remove
  

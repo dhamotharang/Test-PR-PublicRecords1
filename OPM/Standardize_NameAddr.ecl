@@ -3,7 +3,7 @@
 EXPORT Standardize_NameAddr := MODULE	
 	//////////////////////////////////////////////////////////////////////////////////////
 	// -- function: fStandardizeNames
-	// -- Standardizes people and company names and phone numbers
+	// -- Standardizes people names
 	//////////////////////////////////////////////////////////////////////////////////////
 	EXPORT fStandardizeNames(DATASET(OPM.Layouts.Base) pPreProcessInput) :=	FUNCTION
 
@@ -100,7 +100,6 @@ EXPORT Standardize_NameAddr := MODULE
 	// -- FUNCTION: fAll
 	//////////////////////////////////////////////////////////////////////////////////////
 	EXPORT fAll( DATASET(OPM.Layouts.Base) pBaseFile
-							,STRING pversion
 							,STRING pPersistname = OPM.Persistnames().StandardizeNameAddr) := FUNCTION
 
   	dStandardizeName	:= fStandardizeNames(pBaseFile);			 

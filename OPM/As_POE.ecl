@@ -15,7 +15,7 @@ function
 			self.did_score									  := l.did_score;
 			self.dt_first_seen							  := l.dt_first_seen;
 			self.dt_last_seen					 			  := l.dt_last_seen;
-			self.vendor_id									  := (string)hash64(l.Employee_Name + l.Duty_Station + l.Agency + l.Country+ l.State + l.City + l.Occupational_Series);		
+			self.vendor_id									  := (string)l.record_sid;		
 			self.subject_job_title					  := l.Occu_Series_Desc;
 			self.subject_rawaid 						  := l.raw_aid;
 			self.subject_aceaid 						  := l.ace_aid;

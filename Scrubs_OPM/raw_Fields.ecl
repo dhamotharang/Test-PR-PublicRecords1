@@ -5,8 +5,8 @@ EXPORT raw_Fields := MODULE
 EXPORT NumFields := 11;
  
 // Processing for each FieldType
-EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_name','invalid_alpha_num','invalid_country','invalid_alpha_blank','invalid_number','invalid_alpha_blank_sp','invalid_alpha_num_sp','invalid_past_date','invalid_occu_Series_cd');
-EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_name' => 1,'invalid_alpha_num' => 2,'invalid_country' => 3,'invalid_alpha_blank' => 4,'invalid_number' => 5,'invalid_alpha_blank_sp' => 6,'invalid_alpha_num_sp' => 7,'invalid_past_date' => 8,'invalid_occu_Series_cd' => 9,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_name','invalid_alpha_num','invalid_country','invalid_alpha_blank','invalid_alpha_blank_sp','invalid_alpha_num_sp','invalid_past_date','invalid_occu_Series_cd');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_name' => 1,'invalid_alpha_num' => 2,'invalid_country' => 3,'invalid_alpha_blank' => 4,'invalid_alpha_blank_sp' => 5,'invalid_alpha_num_sp' => 6,'invalid_past_date' => 7,'invalid_occu_Series_cd' => 8,0);
  
 EXPORT MakeFT_invalid_name(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ.-\'`/, '); // Only allow valid symbols
@@ -35,12 +35,6 @@ EXPORT MakeFT_invalid_alpha_blank(SALT311.StrType s0) := FUNCTION
 END;
 EXPORT InValidFT_invalid_alpha_blank(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ \' '))));
 EXPORT InValidMessageFT_invalid_alpha_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ \' '),SALT311.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_number(SALT311.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_number(SALT311.StrType s) := WHICH(~Scrubs_OPM.Functions.fn_numeric(s)>0);
-EXPORT InValidMessageFT_invalid_number(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_OPM.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_alpha_blank_sp(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\',.(-) '); // Only allow valid symbols

@@ -20,8 +20,8 @@ EXPORT Append_Ids := MODULE
 	    SELF.mname            := L.mname;
 	    SELF.lname            := L.lname;
 	    SELF.name_suffix      := L.name_suffix;
-			SELF.state_code       := L.state_code;
-			SELF.zip5             := L.zip5;
+			SELF.state_code       := L.st;
+			SELF.zip5             := L.zip;
 			SELF.did              := 0;
 			SELF.did_score		    := 0;
 			SELF.ssn              := '';
@@ -107,8 +107,8 @@ EXPORT Append_Ids := MODULE
 			SELF.prim_name        := L.prim_name;
 			SELF.sec_range        := L.sec_range;
 			SELF.city       	    := L.p_city_name;
-			SELF.zip5             := L.zip5;
-			SELF.state_code       := L.state_code;
+			SELF.zip5             := L.zip;
+			SELF.state_code       := L.st;
 			SELF							    := [];
 		END;
 		
@@ -121,7 +121,7 @@ EXPORT Append_Ids := MODULE
 		Business_Header_SS.MAC_Add_BDID_Flex(
 			 dSlimInput     											// Input Dataset						
 			,BIP_Matchset                         // BIP Matchset what fields to match on           
-			,company          		             		// company_name	              
+			,Agency          		             		  // company_name	              
 			,prim_range             		          // prim_range		              
 			,prim_name            		            // prim_name		              
 			,zip5             					          // zip5					              
@@ -192,7 +192,7 @@ EXPORT Append_Ids := MODULE
 	END; // End fAppendBIP
 
 	
-	EXPORT fAll(DATASET(OPM.Layouts.Base) pDataset, STRING pversion) := FUNCTION
+	EXPORT fAll(DATASET(OPM.Layouts.Base) pDataset) := FUNCTION
     
 		dAppendDid    := fAppendDid(pDataset);	
 		dAppendLinkID	:= fAppendBIP(dAppendDid) : PERSIST(Persistnames().AppendIds);		

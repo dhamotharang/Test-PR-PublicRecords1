@@ -1,4 +1,4 @@
-﻿import tools, _control, ut, std, Scrubs, Scrubs_OPM;
+﻿import tools, _control, ut, std, dops, Scrubs, Scrubs_OPM;
 						
 export Build_All(
 	 string															pversion
@@ -16,12 +16,14 @@ function
 	full_build :=
 	sequential( Create_Supers
 							,Spray (pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite) 
-							,Scrubs.ScrubsPlus('OPM','Scrubs_OPM','Scrubs_OPM_Raw', 'Raw', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
+							,Scrubs.ScrubsPlus('OPM','Scrubs_OPM','Scrubs_OPM_Raw','Raw',pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
 							,Build_Base (pversion,pIsTesting,pSprayedFile,pBaseFile)
 							,Build_Strata(pversion,pOverwrite,,,pIsTesting)
 							,Promote().Inputfiles.using2used
 							,Promote().Buildfiles.Built2QA
 							,QA_Records()
+							,dops.updateversion('OPMKeys',pversion,Email_Notification_Lists().BuildSuccess,,'N')
+							,Orbit3.proc_Orbit3_CreateBuild('DataBridge',pversion,'N')
  	          ): success(Send_Emails(pversion,,not pIsTesting).Roxie), 
    	           failure(Send_Emails(pversion,,not pIsTesting).buildfailure);
 	

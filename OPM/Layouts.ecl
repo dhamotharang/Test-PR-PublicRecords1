@@ -28,7 +28,6 @@ export Layouts := module
    		BIPV2.IDlayouts.l_xlink_ids;
    		unsigned6												did													:= 0;
    	  unsigned1											  did_score							      := 0;
-			string5   										  zip5                        := ''; //derivied from (city,st)
 			string9	                        ssn                         := ''; //derivied ssn macro (MAC_Add_SSN_By_DID)
      	unsigned4 											dt_first_seen								     ;
    		unsigned4 											dt_last_seen								     ;
@@ -37,7 +36,8 @@ export Layouts := module
       unsigned4 											process_date          			     ;																											
     	string1												  record_type								  := '';   
       Sprayed_Input;
-			string2	State_Code	;
+			string2	                        State_Code	;			
+			string5   										  zip5                        := ''; //derivied from (city,st)
 			string	Occu_Series_Desc;
 			Address.Layout_Clean_Name; 
       Address.Layout_Clean182_fips; 
@@ -82,7 +82,7 @@ export Layouts := module
     		
    	 export BIPSlim := record
 			unsigned8		unique_id;	
-			string80  	company; 
+			string      Agency; 
 			string10  	prim_range;
 			string28		prim_name;
 			string8			sec_range;

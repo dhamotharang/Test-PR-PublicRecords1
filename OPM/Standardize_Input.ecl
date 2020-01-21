@@ -29,7 +29,8 @@ EXPORT Standardize_Input := MODULE
 				SELF.Computation_Date						  := IF(_validate.date.fIsValid(l.Computation_Date),l.Computation_Date,'');
 				SELF.Occupational_Series 					:= IF(ut.CleanSpacesAndUpper(l.Occupational_Series)in [List,'*-IN','SERIES'],'',ut.CleanSpacesAndUpper(l.Occupational_Series));
 				SELF.Occu_Series_Desc             := OPM.Functions.get_OccuDesc(self.Occupational_Series);
-				SELF.File_Date                    := l.File_Date; //Only 6 in length from vendor     									
+				SELF.File_Date                    := l.File_Date; //Only 6 in length from vendor     
+				SELF 															:= l;
 				SELF 															:= []  ;
 		END;
 		

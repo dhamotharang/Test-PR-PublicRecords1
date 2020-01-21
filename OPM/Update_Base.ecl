@@ -8,17 +8,16 @@ export Update_Base(
 ) := 
 function
   
-	dStandardizeInput	 := Standardize_Input.fAll	(pSprayedFile, pversion);		
-	
+	dStandardizeInput	 := Standardize_Input.fAll(pSprayedFile, pversion);		
 	dBase              := IF(pShouldUpdate
 													 ,PROJECT(pBaseFile, TRANSFORM(Layouts.Base, SELF.record_type :=  'H'; SELF :=  LEFT))
-													 ,DATASET([],Layouts.Base));
-													 
+													 ,DATASET([],Layouts.Base)
+													 );													 
 	ingestMod					 := OPM.Ingest(,,dBase,dStandardizeInput);  
 	update_combined    := ingestMod.AllRecords_Notag;
-	
-	dStandardize_Addr	 := Standardize_NameAddr.fAll(update_combined, pversion);
-	dAppendIds				 := Append_Ids.fAll(dStandardize_Addr	, pversion); 								 
+	addGlobalSID 			 := mdr.macGetGlobalSID(update_combined, 'OPM', 'source', 'global_sid'); //Populate Global_SID Field
+	dStandardize_Addr	 := Standardize_NameAddr.fAll(addGlobalSID);
+	dAppendIds				 := Append_Ids.fAll(dStandardize_Addr); 								 
 	dRollup						 := Rollup_Base(dAppendIds);
 	
   return dRollup;

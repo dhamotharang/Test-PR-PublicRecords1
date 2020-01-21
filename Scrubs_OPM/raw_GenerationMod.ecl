@@ -61,7 +61,6 @@ EXPORT raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_alpha_num:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
     + 'FIELDTYPE:invalid_country:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ-,\' )\n'
     + 'FIELDTYPE:invalid_alpha_blank:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ \' )\n'
-    + 'FIELDTYPE:invalid_number:CUSTOM(Scrubs_OPM.Functions.fn_numeric>0)\n'
     + 'FIELDTYPE:invalid_alpha_blank_sp:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ\',.(-) )\n'
     + 'FIELDTYPE:invalid_alpha_num_sp:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ(-)., /&:\')\n'
     + 'FIELDTYPE:invalid_past_date:CUSTOM(Scrubs_OPM.Functions.fn_check_past_date>0)\n'
