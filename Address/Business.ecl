@@ -839,6 +839,7 @@ MatchType MatchX(string str, string options) := FUNCTION
 		REGEXFIND(rgxCaseNum, s) => MatchType.Inv,
 		REGEXFIND('^CREDIT[A-Z ]+APPLICANT$', s) => MatchType.Inv,
 		REGEXFIND(rgxStreet,s) => MatchType.Inv,
+		REGEXFIND('^CEO +[A-Z]+$', TRIM(s)) => MatchType.Inv,
 		IsInvalidTaxpayer(s) => MatchType.Inv,
 		REGEXFIND('^[0-9]+ +(PERCENT|PER CENT)$', s) => MatchType.Inv,
 		//***** UNKNOWN
