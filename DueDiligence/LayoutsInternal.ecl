@@ -434,14 +434,7 @@ EXPORT LayoutsInternal := MODULE
     STRING120 partyName;
     DATASET({STRING120 name}) uniquePartyNames;
   END;
-  
-  EXPORT addressDetails := RECORD
-    UNSIGNED6 addressSeq;
-    DueDiligence.Layouts.AddressSlimDetail;
-    UNSIGNED4 dateFirstSeen;
-    UNSIGNED4 dateLastSeen;
-  END;
-  
+
   EXPORT chronoAddressesLayout := RECORD
     UNSIGNED6 seq;
     UNSIGNED6 did;
@@ -465,7 +458,9 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED3 chronodate_last := 0;
     UNSIGNED3 address_history_seq;
     STRING2 src := '';
-    DATASET(addressDetails) chronoAddresses;
+    STRING tempMoveDist;
+    UNSIGNED6 addrSeq;
+    DATASET(DueDiligence.Layouts.AddressDetails) chronoAddresses;
   END;
   
   EXPORT DistanceZipLayout := RECORD
