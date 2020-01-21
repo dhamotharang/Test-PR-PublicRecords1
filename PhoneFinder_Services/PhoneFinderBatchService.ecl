@@ -38,7 +38,7 @@
 EXPORT PhoneFinderBatchService :=
 MACRO
 
-	IMPORT AutoStandardI,Gateway,PhoneFinder_Services;
+	IMPORT AutoStandardI,Gateway,PhoneFinder_Services, AutoheaderV2;
 	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
    #stored('useOnlyBestDID',true); // used to determine the 1 "best" did for the input criteria
 	// Batch input request
@@ -62,7 +62,7 @@ MACRO
     dNonblankRelevantRecs := dPhones(identity1_full != '' OR (identity1_first != '' AND identity1_last!= '')
 													OR (identity1_streetname != '' AND ((identity1_city != '' AND identity1_state != '' ) OR identity1_zip5 != ''))
 													OR carrier <>'');
-													
+
 
 		results := if(reportMod.SuppressNonRelevantRecs,dNonblankRelevantRecs,dPhones);
 
