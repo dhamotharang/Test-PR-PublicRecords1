@@ -2,7 +2,7 @@
 
 EXPORT fn_Watchdog_Slim(STRING pversion) := MODULE
 
-slim:=table(Watchdog_v2.IDX_UniversalKey_File.IndexFile,{did,cnt:=sum(group,permissions)},did,merge);
+slim:=table(dx_BestRecords.key_watchdog(),{did,cnt:=sum(group,permissions)},did,merge);
 										 
 SortedDS := SORT(slim, did);			
 

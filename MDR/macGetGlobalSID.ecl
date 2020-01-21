@@ -1,6 +1,6 @@
-﻿IMPORT MDR, STD;
+﻿EXPORT macGetGlobalSid(dInFile, sdata_set, sFieldName='', sGlobalSid='global_sid') := FUNCTIONMACRO
 
-EXPORT macGetGlobalSid(dInFile, sdata_set, sFieldName='', sGlobalSid='global_sid') := FUNCTIONMACRO
+  IMPORT _control, MDR, STD;
 
   // Parameters to pass to this macro:
   // dInFile = The dataset to have it's Global_SID populated by this macro (dataset)
@@ -12,39 +12,37 @@ EXPORT macGetGlobalSid(dInFile, sdata_set, sFieldName='', sGlobalSid='global_sid
 
   dFilterGSidFile := dDataGlobalSid(STD.Str.ToUpperCase(data_set) = STD.Str.ToUpperCase(sdata_set));
 
-  aCheckDatasetEntry := IF(EXISTS(dFilterGSidFile) = FALSE, FAIL(' DATASET ENTRY NOT FOUND '))
-    : FAILURE(STD.System.Email.SendEmail(_control.MyInfo.EmailAddressNotify,
+  aCheckDatasetEntry := IF(EXISTS(dFilterGSidFile) = FALSE, FAIL(' Dataset entry not found on lookup table, check dataset name on passed parameter '))
+  : FAILURE(STD.System.Email.SendEmail(_control.MyInfo.EmailAddressNotify,
       '***FAILURE:DATASET ENTRY NOT FOUND ' + sdata_set + ' - ' + WORKUNIT,
       WORKUNIT + ' has failed. DATASET ENTRY not found for the sdata_set ' + sdata_set + ' provided. Please check workunit - '+ FAILMESSAGE));
 
+  tGlobalSrcID := SORT(TABLE(dFilterGSidFile, {source_codes, global_sid, cnt:=COUNT(GROUP)}, source_codes, global_sid),-cnt, source_codes, global_sid);
+  aCheckDatasetDups := IF(tGlobalSrcID[1].cnt > 1 AND tGlobalSrcID[1].global_sid != 0, STD.System.Log.addWorkunitWarning('***WARNING:Duplicate GLB_SRCID for Dataset ' + sdata_set));
+
   lInRec := {RECORDOF(dInFile)};
 
-  #DECLARE(sFilter);
-  #SET(sFilter, '');   
-  #IF(sFieldName <> '')
-    #APPEND(sFilter, '(source_codes = (STRING)l.' + #TEXT(#EXPAND(sFieldName)) + ')')
-  #END
-
-  fFilterGlbSrcid (lInRec l) := FUNCTION
-    sGlbSrcid := dFilterGSidFile #IF(SFieldName <> '')#EXPAND(#TEXT(%sFilter%))#END;
-    tGlobalSrcID := TABLE(sGlbSrcid, {global_sid, cnt:=COUNT(GROUP)},global_sid);
-
-    aCheckDatasetDups := IF(tGlobalSrcID[1].cnt > 1 AND tGlobalSrcID[1].global_sid != 0, STD.System.Log.addWorkunitWarning('***WARNING:Duplicate GLB_SRCID for Dataset ' + sdata_set));
-    aCheckGlobalSRCID := IF(tGlobalSrcID[1].cnt = 1 AND tGlobalSrcID[1].global_sid = 0, STD.System.Log.addWorkunitWarning('***WARNING:GLB_SRCID IS BLANK for Dataset ' + sdata_set)); 
-
-    ORDERED(aCheckDatasetDups,aCheckGlobalSRCID);
-
-    RETURN tGlobalSrcID[1].global_sid;
-  END;
-
-  lInRec xGlobalSid(dInFile l) := TRANSFORM
-    SELF.#EXPAND(sGlobalSid) := (UNSIGNED4)fFilterGlbSrcid(l);
+  lInRec xGlobalSidJ(dInFile l, dFilterGSidFile r) := TRANSFORM
+    SELF.#EXPAND(sGlobalSid) := r.global_sid;
     SELF := l;
   END;
 
-  dOutFile := PROJECT(dInFile,xGlobalSid(LEFT));
+  lInRec xGlobalSidP(dInFile l) := TRANSFORM
+    SELF.#EXPAND(sGlobalSid) := dFilterGSidFile[1].global_sid;
+    SELF := l;
+  END;
 
-  ORDERED(aCheckDatasetEntry);
+  dOutFile := 
+  #IF(SFieldName <> '')
+    JOIN(dInFile,dFilterGSidFile,
+      STD.Str.ToUpperCase((STRING)LEFT.#EXPAND(sFieldName)) = STD.Str.ToUpperCase(RIGHT.source_codes),
+      xGlobalSidJ(LEFT, RIGHT), 
+      ALL, LEFT OUTER);
+  #ELSE
+    PROJECT(dInFile,xGlobalSidP(LEFT));
+  #END;
+
+  ORDERED(aCheckDatasetEntry, aCheckDatasetDups);
 
   RETURN dOutFile;
 

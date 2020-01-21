@@ -173,16 +173,12 @@
 				self.INCOME_LEVEL_CODE        			:= stringlib.StringToUpperCase(TRIM(pInput.INCOME_LEVEL_CODE,left,right));
 				self.INCOME_LEVEL        						:= stringlib.StringToUpperCase(TRIM(pInput.INCOME_LEVEL,left,right));
 				self.FILE_TYPE        							:= stringlib.StringToUpperCase(TRIM(pInput.FILE_TYPE,left,right));
-        self.global_sid                     := 23311; // DF-25320
 				self  															:= pInput;
 				self  															:= [];
 			END;
 	
 	rsFormattedInputFile	:=	PROJECT(CleanDOB, tFormatInput(left));
-
-
-	
-								 
+							 
 	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
 
 	layout_AIDClean_prep := RECORD
@@ -247,7 +243,9 @@
     SELF  := pInput;
 		
 	END;
-previous := dataset(American_student_list.Thor_Cluster + 'base::american_student_list',American_student_list.layout_american_student_base_v2,thor);	
+
+	previous := dataset(American_student_list.Thor_Cluster + 'base::american_student_list',American_student_list.layout_american_student_base_v2,thor);	
+	
 	rsCleanAIDGood := PROJECT(rsCleanAID, tProjectClean(LEFT)) + previous;
 	
 	//DF-20264 Suppress records in ASL suppression list
@@ -430,6 +428,8 @@ previous := dataset(American_student_list.Thor_Cluster + 'base::american_student
 	
   rsKeyedFormattedPlusBase	:=	PROJECT(rsFormattedInputPlusBaseFileTiered, tReKeyBase(left));
 	
+	addGlobalSID 	 := mdr.macGetGlobalSID(rsKeyedFormattedPlusBase,'Americanstudent','source','global_sid'); //DF-25320: Populate Global_SID
+	
 	//rsFormattedPlusBaseDist := distribute(rsKeyedFormattedPlusBase, hash(key));
 	
 	//rsFormattedPlusBaseSort := sort(rsFormattedPlusBaseDist,key,-COLLEGE_NAME, -COLLEGE_MAJOR, FIRST_NAME, LAST_NAME,prim_range,prim_name,sec_range,z5,-telephone, -Process_Date,-flag,local);
@@ -539,7 +539,7 @@ previous := dataset(American_student_list.Thor_Cluster + 'base::american_student
 			ut.NNEQ(LEFT.TELEPHONE,RIGHT.TELEPHONE),
 	local): INDEPENDENT;
 */
-	f0d := distribute(rsKeyedFormattedPlusBase, hash32(FULL_NAME, zip, addr, dob_formatted));
+	f0d := distribute(addGlobalSID, hash32(FULL_NAME, zip, addr, dob_formatted));
 	f0s := sort(f0d,FULL_NAME,zip,addr,dob_formatted,LN_COLLEGE_NAME,COLLEGE_MAJOR,TELEPHONE, -Process_Date, local);
 
 

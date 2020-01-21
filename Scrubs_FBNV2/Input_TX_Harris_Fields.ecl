@@ -2,7 +2,7 @@
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Input_TX_Harris_Fields := MODULE
  
-EXPORT NumFields := 7;
+EXPORT NumFields := 8;
  
 // Processing for each FieldType
 EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_mandatory','invalid_past_date');
@@ -20,17 +20,21 @@ END;
 EXPORT InValidFT_invalid_past_date(SALT311.StrType s) := WHICH(~Scrubs.fn_valid_pastDate(s)>0);
 EXPORT InValidMessageFT_invalid_past_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_pastDate'),SALT311.HygieneErrors.Good);
  
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'FILE_NUMBER','NAME1','NAME2','prep_addr1_line1','prep_addr1_line_last','prep_addr2_line1','prep_addr2_line_last');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'FILE_NUMBER','NAME1','NAME2','prep_addr1_line1','prep_addr1_line_last','prep_addr2_line1','prep_addr2_line_last');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'FILE_NUMBER' => 0,'NAME1' => 1,'NAME2' => 2,'prep_addr1_line1' => 3,'prep_addr1_line_last' => 4,'prep_addr2_line1' => 5,'prep_addr2_line_last' => 6,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['LENGTHS'],['LENGTHS'],['LENGTHS'],['LENGTHS'],['LENGTHS'],['LENGTHS'],['LENGTHS'],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'FILE_NUMBER','DATE_FILED','NAME1','NAME2','prep_addr1_line1','prep_addr1_line_last','prep_addr2_line1','prep_addr2_line_last');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'FILE_NUMBER','DATE_FILED','NAME1','NAME2','prep_addr1_line1','prep_addr1_line_last','prep_addr2_line1','prep_addr2_line_last');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'FILE_NUMBER' => 0,'DATE_FILED' => 1,'NAME1' => 2,'NAME2' => 3,'prep_addr1_line1' => 4,'prep_addr1_line_last' => 5,'prep_addr2_line1' => 6,'prep_addr2_line_last' => 7,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['LENGTHS'],['CUSTOM'],['LENGTHS'],['LENGTHS'],['LENGTHS'],['LENGTHS'],['LENGTHS'],['LENGTHS'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
 EXPORT Make_FILE_NUMBER(SALT311.StrType s0) := MakeFT_invalid_mandatory(s0);
 EXPORT InValid_FILE_NUMBER(SALT311.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_FILE_NUMBER(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
+ 
+EXPORT Make_DATE_FILED(SALT311.StrType s0) := MakeFT_invalid_past_date(s0);
+EXPORT InValid_DATE_FILED(SALT311.StrType s) := InValidFT_invalid_past_date(s);
+EXPORT InValidMessage_DATE_FILED(UNSIGNED1 wh) := InValidMessageFT_invalid_past_date(wh);
  
 EXPORT Make_NAME1(SALT311.StrType s0) := MakeFT_invalid_mandatory(s0);
 EXPORT InValid_NAME1(SALT311.StrType s) := InValidFT_invalid_mandatory(s);
@@ -78,6 +82,7 @@ Bad_Pivots := %t2%(Cnt>100);
 #uniquename(dl)
   %dl% := RECORD
     BOOLEAN Diff_FILE_NUMBER;
+    BOOLEAN Diff_DATE_FILED;
     BOOLEAN Diff_NAME1;
     BOOLEAN Diff_NAME2;
     BOOLEAN Diff_prep_addr1_line1;
@@ -90,6 +95,7 @@ Bad_Pivots := %t2%(Cnt>100);
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
     SELF.Diff_FILE_NUMBER := le.FILE_NUMBER <> ri.FILE_NUMBER;
+    SELF.Diff_DATE_FILED := le.DATE_FILED <> ri.DATE_FILED;
     SELF.Diff_NAME1 := le.NAME1 <> ri.NAME1;
     SELF.Diff_NAME2 := le.NAME2 <> ri.NAME2;
     SELF.Diff_prep_addr1_line1 := le.prep_addr1_line1 <> ri.prep_addr1_line1;
@@ -97,7 +103,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_prep_addr2_line1 := le.prep_addr2_line1 <> ri.prep_addr2_line1;
     SELF.Diff_prep_addr2_line_last := le.prep_addr2_line_last <> ri.prep_addr2_line_last;
     SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_FILE_NUMBER,1,0)+ IF( SELF.Diff_NAME1,1,0)+ IF( SELF.Diff_NAME2,1,0)+ IF( SELF.Diff_prep_addr1_line1,1,0)+ IF( SELF.Diff_prep_addr1_line_last,1,0)+ IF( SELF.Diff_prep_addr2_line1,1,0)+ IF( SELF.Diff_prep_addr2_line_last,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_FILE_NUMBER,1,0)+ IF( SELF.Diff_DATE_FILED,1,0)+ IF( SELF.Diff_NAME1,1,0)+ IF( SELF.Diff_NAME2,1,0)+ IF( SELF.Diff_prep_addr1_line1,1,0)+ IF( SELF.Diff_prep_addr1_line_last,1,0)+ IF( SELF.Diff_prep_addr2_line1,1,0)+ IF( SELF.Diff_prep_addr2_line_last,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -111,6 +117,7 @@ Bad_Pivots := %t2%(Cnt>100);
 #uniquename(AggRec)
   %AggRec% := RECORD
     Count_Diff_FILE_NUMBER := COUNT(GROUP,%Closest%.Diff_FILE_NUMBER);
+    Count_Diff_DATE_FILED := COUNT(GROUP,%Closest%.Diff_DATE_FILED);
     Count_Diff_NAME1 := COUNT(GROUP,%Closest%.Diff_NAME1);
     Count_Diff_NAME2 := COUNT(GROUP,%Closest%.Diff_NAME2);
     Count_Diff_prep_addr1_line1 := COUNT(GROUP,%Closest%.Diff_prep_addr1_line1);

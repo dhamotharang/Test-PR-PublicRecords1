@@ -14,6 +14,7 @@ EXPORT Copy_keys(
   ,psuperversions       = '\'built\''         //add them to these supers after copying
   ,pUniqueOut           = '\'Xlink\''
   ,pSkipDatalandCopy    = 'false'
+  ,pSkipAlphaCopy       = 'false'
   
 ) :=
 functionmacro
@@ -27,6 +28,8 @@ functionmacro
                           ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
   );  //kick off on dataland
 
+  kickAlphaCopy := BIPV2_Build.proc_Copy_Xlink_To_AlphaProd(pversion);
+  
   semail := BIPV2_Build.Send_Emails(pversion,pBuildName := 'BIPV2 Copy ' + pUniqueOut + ' Keys').BIPV2FullKeys;
 
   returnresult := iff(Tools._Constants.isdataland = false,
@@ -39,7 +42,8 @@ functionmacro
         ,BizLinkFull.Promote(pversion,pkeyfilter,,pIsTesting,tools.fun_Clustername_DFU('44')).new2Built
         ,BizLinkFull.Promote(pversion,pkeyfilter,,pIsTesting,tools.fun_Clustername_DFU('36')).new2Built
       ))
-      ,if(pSkipDatalandCopy = false,kickDatalandCopy)
+      ,if(pSkipDatalandCopy = false ,kickDatalandCopy )
+      ,if(pSkipAlphaCopy    = false ,kickAlphaCopy    )
       ,semail.BuildSuccess
     )
     //copies to dataland from prod

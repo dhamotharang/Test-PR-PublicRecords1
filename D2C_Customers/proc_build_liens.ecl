@@ -3,15 +3,19 @@
 /********* LIENS_JUDGEMENTS **********/
 
 // li := LiensV2.key_liens_DID(did > 0);//Unrestricted
-
-li_main  := dataset('~thor_data400::base::liens::main', liensv2.Layout_liens_main_module.layout_liens_main, thor);
-li_party := dataset('~thor_data400::base::liens::party', LiensV2.Layout_Liens_party_HeaderIngest, thor)((unsigned6)did > 0);
-li := join(distribute(li_party, hash(tmsid)), distribute(li_main, hash(tmsid)), left.rmsid = right.rmsid and left.tmsid = right.tmsid, left outer, local);
+//SRC code - 'L2','LI'
 
 EXPORT proc_build_liens(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
+   
+   //771M records
+   BaseFile := D2C_Customers.Files.LiensDS(mode);
+   //371M records
+   li_main  := dataset('~thor_data400::base::liens::main', liensv2.Layout_liens_main_module.layout_liens_main, thor)(D2C_Customers.SRC_Allowed.Check(13, filing_state));
 
-   ds := project(li, transform(D2C_Customers.layouts.rLiens,
-    self.LexID         := (unsigned6)left.did;
+   li := join(distribute(BaseFile, hash(tmsid)), distribute(li_main, hash(tmsid)), left.rmsid = right.rmsid and left.tmsid = right.tmsid, left outer, local);
+
+   inDS := project(li, transform(D2C_Customers.layouts.rLiens,
+    self.LexID         := left.did;
     self.Name          := stringlib.stringcleanspaces(left.fname + ' ' + left.mname + ' ' + left.lname + ' ' + left.name_suffix);
     self.Address       := stringlib.stringcleanspaces(left.prim_range + ' ' + left.predir + ' ' + left.prim_name + ' ' + left.addr_suffix + ' ' + left.postdir + ', '
                 + left.unit_desig + ' ' + left.sec_range + if(left.unit_desig <> '' or left.sec_range <>'', ', ', '')
@@ -27,16 +31,7 @@ EXPORT proc_build_liens(unsigned1 mode, string8 ver, string20 customer_name) := 
     self.Release_Date          := (unsigned4)left.Release_Date;
     ));
    
-   fullDS := ds;
-   coreDS := join(distribute(ds, hash(LexID)), distribute(D2C_Customers.Files.coresDS, hash(did)), left.LexID = right.did, transform(left), local);
-   coreDerogatoryDS := join(coreDS, distribute(Files.derogatoryDS, did), left.LexID = right.did, transform(left), local);
-   
-   inDS := map(mode = 1 => fullDS,           //FULL
-               mode = 2 => coreDS,           //QUARTERLY
-               mode = 3 => coreDerogatoryDS  //MONTHLY
-               );
-   
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'liens');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 13);
    return res;
 
 END;

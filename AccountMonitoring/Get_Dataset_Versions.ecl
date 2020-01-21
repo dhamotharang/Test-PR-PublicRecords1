@@ -673,6 +673,33 @@ EXPORT Get_Dataset_Versions(
 			
 		watercraft := watercraft_Linkid;
 		
+		// email
+		email_Lexid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.email.emailLexid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'EMAIL',
+				SELF.subfile := 'LEXID',
+				SELF.version := REGEXFIND(
+					'thor_200::key::email_datav2::(.*)::did',
+					LEFT.name,1,NOCASE)));
+			
+		email_addr := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.email.emailaddr_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'EMAIL',
+				SELF.subfile := 'EMAILADDR',
+				SELF.version := REGEXFIND(
+					'thor_200::key::email_datav2::(.*)::email_addresses',
+					LEFT.name,1,NOCASE)));
+			
+		email_main := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.email.emailmain_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'EMAIL',
+				SELF.subfile := 'MAIN',
+				SELF.version := REGEXFIND(
+					'thor_200::key::email_datav2::(.*)::payload',
+					LEFT.name,1,NOCASE)));
+			
+		email_lf := email_Lexid + email_addr + email_main;
+		
 		All_Records :=
 			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_address)
 					OR
@@ -699,7 +726,11 @@ EXPORT Get_Dataset_Versions(
 			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_inquiry), Inquiry ) +
 			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_corp), Corp ) +
 			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_mvr), Mvr ) +
-			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_aircraft), Aircraft );
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_aircraft), Aircraft ) +
+      // watercraft?  
+      // Header might needed to be added here once all the CGMs start using the roxie-version of the superkey as created by updateSuperfiles
+
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_email), email_lf );
 			
  		valid_despray_criteria := despray_ip_address != '' AND despray_path != '';
 		ALLOW_OVERWRITE        := TRUE;

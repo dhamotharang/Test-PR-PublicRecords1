@@ -1,5 +1,5 @@
 ﻿
-import crim_common, CrimSrch, Lib_FileServices, doxie_build, hygenics_search,hygenics_images,Lib_date,scrubs,scrubs_crim;
+import crim_common, CrimSrch, Lib_FileServices, doxie_build, hygenics_search,hygenics_images,Lib_date,scrubs,scrubs_crim,dops;
       #OPTION('multiplePersistInstances',FALSE);
 			#workunit('name','Accurint-Securint Criminal Build ' + CrimSrch.Version.Development);
 			
@@ -27,9 +27,13 @@ import crim_common, CrimSrch, Lib_FileServices, doxie_build, hygenics_search,hyg
 																					 Hygenics_Search.File_Moxie_Punishment_Dev,
 																					 CrimSrch.Version.Development,
 																					 zRunStrataPopulationStats);
+																					 
+   UpdateDopsAll := sequential(dops.updateversion('DOCKeys', CrimSrch.Version.Development, leMailTarget,,'N')
+											                  ,dops.updateversion('FCRA_DOCKeys', CrimSrch.Version.Development, leMailTarget,,'F'));							
 
 					sequential
 					(
+					        hygenics_crim.Hygenics_Crim_Upload_Date_Check,
 													Scrubs_Crim.fn_RunScrubsRaw(CrimSrch.Version.Development,'Charles.Pettola@lexisnexis.com,vani.chikte@lexisnexis.com'),
 													// Hygenics_Search.Out_Version_Attribute_Values,
 													// Hygenics_Search.Out_Vendor_Select_Attribute_Values,
@@ -63,5 +67,6 @@ import crim_common, CrimSrch, Lib_FileServices, doxie_build, hygenics_search,hyg
 																					'\r\n' +
 																					'Note:  This is Dev only at this point!'
 																																															),
-													Scrubs_Crim.fn_RunScrubsBase(CrimSrch.Version.Development,'Charles.Pettola@lexisnexis.com,vani.chikte@lexisnexis.com')
+													Scrubs_Crim.fn_RunScrubsBase(CrimSrch.Version.Development,'Charles.Pettola@lexisnexis.com,vani.chikte@lexisnexis.com'),
+             UpdateDopsAll													
 					);

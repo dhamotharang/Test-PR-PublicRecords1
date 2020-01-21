@@ -1,4 +1,4 @@
-IMPORT doxie, LN_PropertyV2, Census_Data, Suppress, ut, AutoStandardI;
+﻿IMPORT doxie, LN_PropertyV2, Census_Data, Suppress, ut, AutoStandardI;
 
 // k_fips			:= Census_Data.Key_Fips2County;
 
@@ -149,8 +149,9 @@ export dataset(l_out) fn_get_parties_2(
 				left.search_did = right.search_did,
 		    stripParsedAddr(left),left only
 	    );
-	ds_value3 := project(ds_value3_p,cleanProp2(left)) + ds_value3_n + ds_value3_x;
-	ds_value4 := dedup(ds_value3,except persistent_record_id, all);
+   ds_value3 := distribute(project(ds_value3_p,cleanProp2(left)) + ds_value3_n + ds_value3_x, hash64(ln_fares_id));
+   ds_value4 := dedup(ds_value3,except persistent_record_id, all, local);
+
 		
 	// rollup entities by party
 	l_tmp2 xf_roll_entities( l_tmp1 L, dataset(l_tmp1) R) := transform

@@ -1,19 +1,24 @@
-﻿EXPORT AllIDs(DATASET($.Layout_Sanctions) infile) := FUNCTION
+﻿
+bad_license := ['n/a', 'N/A', 'NA', 'unk', 'unknown', 'none', 'None', 'Not Found', '0', ','];
+
+bad(string s) := s='' or s in bad_license;
+
+EXPORT AllIDs(DATASET($.Layout_Sanctions) infile) := FUNCTION
 
 	{unsigned8 id, $.Layout_XG.layout_sp} xformIDs($.Layout_Sanctions infile, integer n) := TRANSFORM
 				self.id := infile.key;
 				self.type := 'Other';
 				self.label := CASE(n,
-							1 => IF(infile.license_number='', SKIP, 'License Number'),
-							2 => IF(infile.medicaid_number='', SKIP, 'Medicaid Number'),
-							3 => IF(infile.npi_number='', SKIP, 'NPI Number'),
-							4 => IF(infile.dea_number='', SKIP, 'DEA Number'),
+							1 => IF(bad(infile.license_number), SKIP, 'License Number'),
+							2 => IF(bad(infile.medicaid_number), SKIP, 'Medicaid Number'),
+							3 => IF(bad(infile.npi_number), SKIP, 'NPI Number'),
+							4 => IF(bad(infile.dea_number), SKIP, 'DEA Number'),
 							SKIP);
 				self.number := CASE(n,
-							1 => IF(infile.license_number='', SKIP, TRIM(infile.license_number)),
-							2 => IF(infile.medicaid_number='', SKIP, TRIM(infile.medicaid_number)),
-							3 => IF(infile.npi_number='', SKIP, TRIM(infile.npi_number)),
-							4 => IF(infile.dea_number='', SKIP, TRIM(infile.dea_number)),
+							1 => IF(bad(infile.license_number), SKIP, TRIM(infile.license_number)),
+							2 => IF(bad(infile.medicaid_number), SKIP, TRIM(infile.medicaid_number)),
+							3 => IF(bad(infile.npi_number), SKIP, TRIM(infile.npi_number)),
+							4 => IF(bad(infile.dea_number), SKIP, TRIM(infile.dea_number)),
 							SKIP);
 				self := [];
 	END;

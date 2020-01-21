@@ -1,4 +1,4 @@
-import doxie, Data_Services, BIPV2;
+﻿import doxie, Data_Services, BIPV2;
 
 EXPORT Keys := module
 
@@ -9,8 +9,9 @@ EXPORT LinkIds := MODULE
 // DEFINE THE INDEX
 	shared superfile_name		:= Data_Services.Data_location.Prefix('NONAMEGIVEN')+ Constants.key_prefix + doxie.Version_SuperKey + 'linkids';
 	
-	shared Base				:= project(files.base, {files.base}- [customer_name, bug_num] );
+	shared Base				:= project(files.base, {files.base}- [cust_name, bug_num, link_fein, link_inc_date, link_ssn, link_dob] );
 	
+	 
 	BIPV2.IDmacros.mac_IndexWithXLinkIDs(Base, k, superfile_name)
 	export Key := k;
 

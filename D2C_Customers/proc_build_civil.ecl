@@ -2,7 +2,7 @@ import Watchdog, PromoteSupers, civil_court;
 
 /********* CIVIL **********/
 
-party  := civil_court.File_Moxie_party_Prod;
+party  := civil_court.File_Moxie_party_Prod(D2C_Customers.SRC_Allowed.Check(8, vendor));
 matter := civil_court.File_Moxie_matter_Prod;
 
 matter_t := sort(table(matter, {case_key, disposition_date, filing_date}), case_key);
@@ -45,7 +45,7 @@ EXPORT proc_build_civil(unsigned1 mode, string8 ver, string20 customer_name) := 
                mode = 3 => coreDerogatoryDS //MONTHLY
                );
    
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'civil');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 8);
    return res;
 
 END;
