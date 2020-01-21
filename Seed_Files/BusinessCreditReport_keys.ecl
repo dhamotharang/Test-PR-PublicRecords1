@@ -422,7 +422,7 @@ EXPORT BusinessCreditReport_keys := MODULE
 
 		
 //=====================================================
-//===  Top Bus Contactst   Key - Section 18         === 
+//===  Top Bus Contacts    Key - Section 18         === 
 //=====================================================	
 	seed := Seed_Files.BusinessCreditReports_files.Section18;
 	newrec := record

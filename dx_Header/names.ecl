@@ -18,6 +18,7 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
 
   // ----------------- wild -----------------
   EXPORT i_wild_ssn           := prefix + 'header.wild.ssn.did' + postfix;
+  EXPORT i_wild_ssn_fcra      := prefix + 'fcra.header.wild.ssn.did' + postfix;
   EXPORT i_wild_ssn_en        := prefix + 'header.wild.ssn.did.en' + postfix;
   EXPORT i_wild_StFnameLname  := prefix + 'header.wild.st.fname.lname' + postfix;
   EXPORT i_wild_StreetZipName := prefix + 'header.wild.pname.zip.name.range' + postfix;
@@ -114,8 +115,6 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
   EXPORT i_addr_hist_fcra := prefix + 'fcra::header::address_rank' + postfix; //TODO: hist vs. rank?
 
   EXPORT i_DMV_restricted := prefix + 'header::DMV_restricted' + postfix;
-
-  EXPORT i_ParentLnames := prefix + 'header.parentlnames' + postfix;
 
   EXPORT i_address_research := prefix + 'address_research' + postfix;
 

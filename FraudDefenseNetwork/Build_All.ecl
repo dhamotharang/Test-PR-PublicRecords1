@@ -117,7 +117,7 @@ shared base_portion := sequential(
                                  ) : success(Send_Emails(pversion).Roxie), failure(Send_Emails(pversion).BuildFailure);
 
 //Create build automation -- 02/14/2017
-export create_build := Orbit3.proc_Orbit3_CreateBuild_AddItem ('FDN', pversion);
+export create_build := Orbit3.proc_Orbit3_CreateBuild ('FDN', pversion);
 
   shared keys_portion := sequential(
                                      FraudShared.Build_Keys(pversion, pBaseMainBuilt).All,
