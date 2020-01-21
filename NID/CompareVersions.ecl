@@ -49,6 +49,8 @@ EXPORT CompareVersions(DATASET(nid.Layout_Repository) v1, DATASET(nid.Layout_Rep
 											nametype, FEW),nametype),named('Types1'));
 		OUTPUT(SORT(TABLE(v2, {v2.nametype,cnt := COUNT(GROUP),pct := get_pct(COUNT(GROUP),COUNT(v2))}, 
 											nametype, FEW),nametype),named('Types2'));
+		OUTPUT(COUNT(v1), named('n_v1'));
+		OUTPUT(COUNT(v2), named('n_v2'));
 		OUTPUT(diff, named('diffs'));
 		OUTPUT(COUNT(diff), named('n_delta'));
 		OUTPUT(COUNT(j), named('n_total'));
