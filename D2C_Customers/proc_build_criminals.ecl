@@ -1,14 +1,16 @@
 ﻿import std, PromoteSupers, Watchdog, D2C, doxie_files;
 
-/********* CIVIL_CRIMINAL_RECORDS **********/
-
-crims  := doxie_files.File_Offenders((unsigned6)did > 0, data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
-courts := doxie_files.file_court_offenses(data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors);
+/********* CRIMINAL_RECORDS **********/
 
 EXPORT proc_build_criminals(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
 
-   D2C_Customers.layouts.rCrims AddCourt(crims L, courts R) := transform
-    self.LexID             := (unsigned6)L.did;
+   //631M records
+   BaseFile := D2C_Customers.Files.CrimsDS(mode);
+   //570M records
+   courts := doxie_files.file_court_offenses(data_type not in D2C.Constants.DOCRestrictedDataTypes, vendor not in D2C.Constants.DOCRestrictedVendors, D2C_Customers.SRC_Allowed.Check(7, vendor));
+
+   D2C_Customers.layouts.rCrims AddCourt(BaseFile L, courts R) := transform
+    self.LexID             := L.did;
     self.Name              := stringlib.stringcleanspaces(L.fname + ' ' + L.mname + ' ' + L.lname + ' ' + L.name_suffix);
     self.Address           := stringlib.stringcleanspaces(L.prim_range + ' ' + L.predir + ' ' + L.prim_name + ' ' + L.addr_suffix + ' ' + L.postdir + ', '
                             + L.unit_desig + ' ' + L.sec_range + if(L.unit_desig  <> '' or L.sec_range <> '', ', ', '')
@@ -30,17 +32,14 @@ EXPORT proc_build_criminals(unsigned1 mode, string8 ver, string20 customer_name)
     self.Court_Filing_Date      := (unsigned4)L.file_date;
    end;
    
-   ds := join(distribute(crims, hash(offender_key)), distribute(courts, hash(offender_key)), left.offender_key = right.offender_key, AddCourt(left,right), left outer, local);
-   fullDS := ds;
-   coreDS := join(distribute(ds, hash(LexID)), distribute(D2C_Customers.Files.coresDS, hash(did)), left.LexID = right.did, transform(left), local);
-   coreDerogatoryDS := coreDS;
-   
-   inDS := map(mode = 1 => fullDS,           //FULL
-               mode = 2 => coreDS,           //QUARTERLY
-               mode = 3 => coreDerogatoryDS  //MONTHLY
-               );
-
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'criminals');
+   inDS := join(distribute(BaseFile, hash(offender_key)),
+                distribute(courts, hash(offender_key)),
+                left.offender_key = right.offender_key,
+                AddCourt(left,right),
+                left outer,
+                local);
+      
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 7);
    return res;
 
 END;

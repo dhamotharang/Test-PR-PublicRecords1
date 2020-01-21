@@ -1,4 +1,4 @@
-﻿EXPORT GenerateDashboards(
+EXPORT GenerateDashboards(
 	BOOLEAN runProd = FALSE,			//set to TRUE it will run against DSP Prod on the RAMPS Prod cluster. Set to FALSE it will run against DSP QA on the RAMPS Cert cluster
 	BOOLEAN useProdData = FALSE,	//set to TRUE it will use the files generated in Thor Prod, else it will use the files generated in Dataland
 	BOOLEAN newVersion = FALSE,		//set to FALSE it will create the new indexes but not automatically update the existing dashboard service to use them

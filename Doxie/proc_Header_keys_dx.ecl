@@ -31,8 +31,6 @@ hhid_did := doxie_build.Proc_HHID_BuildKeys_dx (filedate);
 
 PromoteSupers.Mac_SF_BuildProcess(doxie.lookups,'~thor_data400::base::doxie_lookups',lookup_pre,2,,pCompress:=true,pVersion:=filedate)
 
-question_key := lssi.Proc_BuildKey(filedate);
-
 //Build keys
 name_zip_did := prefix + 'zip_did';
 RoxieKeybuild.MAC_build_logical (dx_Header.key_zip_did(), header.data_Key_Prep_Zip_Did, dx_Header.names('').i_zip_did, name_zip_did, zip_did);
@@ -104,8 +102,6 @@ name_SSN5 := prefix + 'ssn5.did';
 RoxieKeybuild.MAC_build_logical (dx_Header.key_SSN5(), header.data_key_SSN5, dx_Header.names('').i_ssn5, name_SSN5, ssn5_did);
 name_header_address := prefix + 'address';
 RoxieKeybuild.MAC_build_logical (dx_Header.key_header_address(), header.data_key_header_address, dx_Header.names('').i_header_address, name_header_address, address_payload);
-name_ParentLnames := prefix + 'parentlnames';
-RoxieKeybuild.MAC_build_logical (dx_Header.key_ParentLnames(), header.data_key_ParentLnames, dx_Header.names('').i_ParentLnames, name_ParentLnames, parentlnames);
 name_ZipPRLName := prefix + 'zipprlname';
 RoxieKeybuild.MAC_build_logical (dx_Header.key_ZipPRLName(), header.data_key_ZipPRLName, dx_Header.names('').i_auto_ZipPRLName, name_ZipPRLName, zipprlname);
 name_minors := prefix + 'minors';
@@ -180,7 +176,6 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_DTS_FnameSmall, nam
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_ssn4, name_ssn4, mv_ssn4);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_ssn5, name_ssn5, mv_ssn5);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_header_address, name_header_address, mv_address_payload);
-RoxieKeybuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_ParentLnames, name_ParentLnames, mv_parentlnames);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_auto_ZipPRLName, name_ZipPRLName, mv_zipprlname);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_minors, name_minors, mv_minors);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_DOBName, name_DOBName, mv_dobname);
@@ -219,7 +214,6 @@ header_key_builds := sequential(
 																,addr_key
 																,street_key
 																,st_city_fname_lname
-   															,question_key
 																,lookup_me
 																,nbours
 																,nbr
@@ -238,7 +232,6 @@ header_key_builds := sequential(
 																,dts_fsmall
 																,ssn4_did
 																,ssn5_did
-																,parentlnames
 																,zipprlname
 																,minors
 																,dob_name
@@ -296,7 +289,6 @@ header_key_builds := sequential(
 																,mv_dts_fsmall
 																,mv_ssn4
 																,mv_ssn5
-  															,mv_parentlnames
 																,mv_zipprlname
 																,mv_minors
 																,mv_dobname

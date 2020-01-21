@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************************************************
- Spray 20 test seed data files onto THOR from bctlpedata12 /data/hds_2/credit_report_test_seed/filedate
+ Spray 21 test seed data files onto THOR from bctlpedata12 /data/hds_2/credit_report_test_seed/filedate
 ********************************************************************************************************************/
 IMPORT Versioncontrol, _Control, tools, STD;
 EXPORT BusinessCreditReport_Spray(
@@ -45,6 +45,7 @@ FUNCTION
 		,{pServer,pDir,'BusinessCreditReport_testseeds_18TopBusContacts.csv' 		 	,0 ,flfile('topbuscontacts'	),[{fsfile('topbuscontacts'	)}],pGroupName,filedate,'','VARIABLE'}
 		,{pServer,pDir,'BusinessCreditReport_testseeds_19Activity.csv' 						,0 ,flfile('topbusactivity'	),[{fsfile('topbusactivity'	)}],pGroupName,filedate,'','VARIABLE'}
 		,{pServer,pDir,'BusinessCreditReport_testseeds_20CRMatch.csv' 						,0 ,flfile('crmatch'				),[{fsfile('crmatch'				)}],pGroupName,filedate,'','VARIABLE'}
+		,{pServer,pDir,'BusinessCreditReport_testseeds_21B2B.csv' 								,0 ,flfile('corteraB2B'			),[{fsfile('corteraB2B'			)}],pGroupName,filedate,'','VARIABLE'}
 	], VersionControl.Layout_Sprays.Info);
 		
 		RETURN SEQUENTIAL( 
@@ -65,9 +66,10 @@ FUNCTION
 				setupSuperFiles('topbusoper'),
 				setupSuperFiles('topbusparent'),
 				setupSuperFiles('topbusconnect'),
-				setupSuperFiles('topbuscontact'),
+				setupSuperFiles('topbuscontacts'),
 				setupSuperFiles('topbusactivity'),
 				setupSuperFiles('crmatch'),
+				setupSuperFiles('corteraB2B'),
 				tools.fun_Spray
 						( 
 							spry_raw,																// pSprayInformation

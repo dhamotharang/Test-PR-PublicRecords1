@@ -2,16 +2,20 @@
 
 /********* FAA_AIRMEN **********/
 
-airmen := faa.file_airmen_data_out((unsigned6)did_out > 0 and current_flag = 'A'); //Select ONLY ACTIVE records
-cert   := faa.file_airmen_certificate_out;
-
-//Select the latest records
-cert_d := dedup(sort(cert, letter, unique_id, cer_type, -date_last_seen), letter, unique_id, cer_type);
+//SINGLE src(AM) - ALL allowed
 
 EXPORT proc_build_airmen(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
+   
+   //11M records
+   BaseFile := D2C_Customers.Files.AirmenDS(mode);   
+   //5M records
+   cert   := faa.file_airmen_certificate_out;
 
-   D2C_Customers.layouts.rAirmen JoinAirmen_w_Cert(airmen L, cert_d R) := transform
-    self.LexID         := (unsigned6)L.did_out;
+   //Select the latest records
+   cert_d := dedup(sort(cert, letter, unique_id, cer_type, -date_last_seen), letter, unique_id, cer_type);
+
+   D2C_Customers.layouts.rAirmen JoinAirmen_w_Cert(BaseFile L, cert_d R) := transform
+    self.LexID         := L.did;
     self.Name          := stringlib.stringcleanspaces(L.fname + ' ' + L.mname + ' ' + L.lname + ' ' + L.name_suffix);
     self.Record_Status := L.record_type;  // (Active/Historical/Unknown)
     self.Address       := stringlib.stringcleanspaces(L.prim_range + ' ' + L.predir + ' ' + L.prim_name + ' ' + L.suffix + ' ' + L.postdir + ', '
@@ -23,18 +27,15 @@ EXPORT proc_build_airmen(unsigned1 mode, string8 ver, string20 customer_name) :=
     self.Ratings            := R.Ratings;          
    end;
    
-   ds := join(airmen, cert_d, left.letter_code = right.letter and left.unique_id = right.unique_id, JoinAirmen_w_Cert(left, right), left outer);
+   inDS := join(distribute(BaseFile, hash(letter_code, unique_id)),
+                distribute(cert_d, hash(letter, unique_id)),
+                left.letter_code = right.letter and left.unique_id = right.unique_id,
+                JoinAirmen_w_Cert(left, right),
+                left outer,
+                local
+                );
    
-   fullDS := ds;
-   coreDS := join(distribute(ds, hash(LexID)), distribute(D2C_Customers.Files.coresDS, hash(did)), left.LexID = right.did, transform(left), local);
-   coreDerogatoryDS := join(coreDS, distribute(D2C_Customers.Files.derogatoryDS, did), left.LexID = right.did, transform(left), local);
-   
-   inDS := map(mode = 1 => fullDS,           //FULL
-               mode = 2 => coreDS,           //QUARTERLY
-               mode = 3 => coreDerogatoryDS  //MONTHLY
-               );
-   
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'airmen');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 11);
    return res;
 
 END;

@@ -79,11 +79,14 @@ module
 		//boolean executive_ind:='';
 		boolean executive_ind:=False;
 		integer executive_ind_order:=0;
+		unsigned4 global_sid:=0;
+		unsigned8 record_sid:=0;
   end;
   
   shared ds1 := contacts_sources_w_append;
   
-  shared ds_add_ids := project(ds1,r1);
+  shared ds_add_ids1 := project(ds1,r1);
+	shared ds_add_ids  := mdr.macGetGlobalSID(ds_add_ids1, 'BIPV2', 'source', 'global_sid');
   shared ds_add_ids_commonbase := project(bipv2.commonbase.ds_built(BIPV2.mod_sources.srcInBase(source),ingest_status in ['New','Unchanged','Updated']),transform(r1
     ,self                              := left  
     ,self.company_address.prim_range	 := left.prim_range	
@@ -147,7 +150,7 @@ module
   ut.MAC_Sequence_Records(j_add_exec_ind,rid,add_rid);
  
 shared dDataset       := add_rid;
-shared layoutOrigFile	:= {recordof(contacts_records) - rid,unsigned4 global_sid,unsigned8 record_sid};
+shared layoutOrigFile	:= {recordof(contacts_records) - rid};
 shared layoutSeqFile	:= recordof(dDataset);
 shared bdidSlimLayout	:=
 record
@@ -322,8 +325,6 @@ transform
 	self.dotid			   := if(r.dotid			<> 0 ,r.dotid			  ,0);
 	self.dotweight	   := if(r.dotweight	<> 0 ,r.dotweight	  ,0);
 	self.dotscore 	   := if(r.dotscore 	<> 0 ,r.dotscore 	  ,0);
-  self.global_sid    := 0;
-  self.record_sid    := 0;
 	self 						   := l;
 end;
 dAssignBdids := join(
@@ -349,8 +350,6 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
 	self.powscore 	   := 100;
 	self.orgscore 	   := 100;
 	self.ultscore 	   := 100;
-  self.global_sid    := 0;
-  self.record_sid    := 0;
   self               := left
 ));
   shared ds_concat_prep := dAssignBdids + dAssignBdids_commonbase : persist('~persist::BIPV2_Build::key_contact_linkids.ds_concat_prep');
@@ -363,7 +362,7 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
 		
   export dkeybuild      := Suppress.applyRegulatory.applyContactBIPV2(contacts_bipd_pst);
   
-  export Key := BIPV2_Contacts.key_contact_linkids.Key(dkeybuild, superfile_name);
+  export Key := BIPV2_Contacts.key_contact_linkids.Key(project(dkeybuild, BIPV2_Contacts.Layouts.contact_linkids.layoutOrigFile), superfile_name);
   
   // -- ensure easy access to different logical and super versions of the key
   export keyvs := BIPV2_Contacts.key_contact_linkids.keyvs;

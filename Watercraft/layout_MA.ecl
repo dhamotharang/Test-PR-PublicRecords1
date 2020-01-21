@@ -1,4 +1,4 @@
-export layout_MA := 
+﻿export layout_MA := 
 record
 string3       STATEABREV;
 string22      REG_NUM;
@@ -38,3 +38,4 @@ string30      SERIAL_NUMBER;
 string10      HORSEPOWER;
 string2       LF;
 end;
+

@@ -2,8 +2,7 @@
 
 /********* FAA_AIRCRAFT **********/
 
-aircraft_reg  := faa.file_aircraft_registration_out((unsigned6)did_out > 0);
-aircraft_info := faa.file_aircraft_info_in;
+//SINGLE src(AR) - ALL allowed
 
 DESC_FIELDS := ['AIRCRAFT_CATEGORY_CODE', 'TYPE_AIRCRAFT', 'AIRCRAFT_WEIGHT'];
 sCodes := Codes.File_Codes_V3_In(field_name in DESC_FIELDS);
@@ -11,9 +10,14 @@ sCodes := Codes.File_Codes_V3_In(field_name in DESC_FIELDS);
 GetDesc(string fld_name, string cd) := sCodes(field_name = fld_name and code = cd)[1].long_desc;
 
 EXPORT proc_build_aircraft(unsigned1 mode, string8 ver, string20 customer_name) := FUNCTION
+   
+   //Records - 5M
+   BaseFile := D2C_Customers.Files.AircraftDS(mode);
+   //Records - 86K
+   Aircraft_info := faa.file_aircraft_info_in;
 
-   D2C_Customers.layouts.rAircraft AddAirCraftInfo(aircraft_reg L, aircraft_info R) := transform
-    self.LexID             := (unsigned6)L.did_out;
+   D2C_Customers.layouts.rAircraft AddAirCraftInfo(BaseFile L, aircraft_info R) := transform
+    self.LexID             := L.did;
     self.Name              := stringlib.stringcleanspaces(L.fname + ' ' + L.mname + ' ' + L.lname + ' ' + L.name_suffix);
     self.Address           := stringlib.stringcleanspaces(L.street + ', ' + L.street2 + if(L.street2 <> '', ', ', '')
                             + L.city + ', ' + L.state + ' ' + L.zip_code);
@@ -25,20 +29,17 @@ EXPORT proc_build_aircraft(unsigned1 mode, string8 ver, string20 customer_name) 
     self.Manufacturer_Name := L.aircraft_mfr_name;
     self.Type_of_Aircraft  := L.type_aircraft;
     self.Model             := L.model_name;
-   end;      
+   end;
    
-   ds := join(aircraft_reg, aircraft_info, left.aircraft_mfr_name = right.aircraft_mfr_name and left.model_name = right.model_name, AddAirCraftInfo(left, right), left outer);
+   inDS := join(BaseFile,
+              Aircraft_info,
+              left.aircraft_mfr_name = right.aircraft_mfr_name and left.model_name = right.model_name,
+              AddAirCraftInfo(left, right),
+              left outer,
+              lookup
+              );
    
-   fullDS := ds;
-   coreDS := join(distribute(ds, hash(LexID)), distribute(D2C_Customers.Files.coresDS, hash(did)), left.LexID = right.did, transform(left), local);
-   coreDerogatoryDS := join(coreDS, distribute(D2C_Customers.Files.derogatoryDS, did), left.LexID = right.did, transform(left), local);
-   
-   inDS := map(mode = 1 => fullDS,          //FULL
-               mode = 2 => coreDS,          //QUARTERLY
-               mode = 3 => coreDerogatoryDS //MONTHLY
-               );
-   
-   res := MAC_WriteCSVFile(inDS, mode, ver, 'aircraft');
+   res := D2C_Customers.MAC_WriteCSVFile(inDS, mode, ver, 10);
    return res;
 
 END;

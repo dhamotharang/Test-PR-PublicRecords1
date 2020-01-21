@@ -12,7 +12,7 @@ wk_ut.mac_ChainWuids(ecltext,1,2,'20130316',['iteration','pversion'],pOutputEcl 
 also, in the email it would be nice for it to report the results set that you pass in(like matches performed).
 
 */
-import tools,wk_ut,_control,ut;
+import tools,wk_ut,_control,ut,WsWorkunits;
 EXPORT mac_ChainWuids(
 
    pECL
@@ -36,6 +36,7 @@ EXPORT mac_ChainWuids(
                                                                 // it will not kick off the next iteration, it will stop there.  THIS HAS BEEN IMPLEMENTED, BUT 
                                                                 // IS BLOCKED BY JIRA ISSUE 11172.
   ,pForceSkip           = false
+  ,pInDebug             = '\'\''   // Debug values to pass through to Create_Wuid
 ) :=
 functionmacro
   
@@ -366,7 +367,7 @@ cond3 := STD.File.FileExists('~temp::lbentley::20130719::it38');
       #APPEND(PREECL ,'outsummary' + %'CNTR'% + '     := output(90); ')  
     #END
     
-    #APPEND(PREECL ,'kickiter'   + %'CNTR'% + '     := wk_ut.CreateWuid(\'#workunit(\\\'name\\\',\\\'---ChildRunner---' + if(pUniqueOutput != '' ,' for ' + pUniqueOutput ,'') + ', version: ' + pversion + ', iteration: ' + %'CNTR'% + '\\\');\\n' + 'wk_ut.RunWuid(\\\'' + %'LOOPTEXT'% + '\\\',\\\'' + %'CNTR'% + '\\\',\\\'' + pversion + '\\\',\\\'' + pCluster + '\\\',\\\'' + %'NOTIFYMASTEREVENT'% + '\\\',\\\'' + %'WAIT4MASTEREVENT'% + '\\\',\\\'\' + WORKUNIT + \'\\\',\\\'' + %'LOOPFILENAME'% + '\\\',\\\'' + pOutputSuperfile + '\\\',\\\'' + %'LOCALESP'% + '\\\',\\\'' + pNotifyEmails + '\\\',,\\\'' + trim(pUniqueOutput,all)  + '\\\',\\\'' + trim(pPollingFrequency,all)  + '\\\',' + if(pForceRun = true,'true','false')  + ',' + if(pForceSkip = true,'true','false') + ')\',\'' + %'WATCHERCLUSTER'% + '\',\'' + pESP + '\');\n')
+    #APPEND(PREECL ,'kickiter'   + %'CNTR'% + '     := wk_ut.CreateWuid(\'#workunit(\\\'name\\\',\\\'---ChildRunner---' + if(pUniqueOutput != '' ,' for ' + pUniqueOutput ,'') + ', version: ' + pversion + ', iteration: ' + %'CNTR'% + '\\\');\\n' + 'wk_ut.RunWuid(\\\'' + %'LOOPTEXT'% + '\\\',\\\'' + %'CNTR'% + '\\\',\\\'' + pversion + '\\\',\\\'' + pCluster + '\\\',\\\'' + %'NOTIFYMASTEREVENT'% + '\\\',\\\'' + %'WAIT4MASTEREVENT'% + '\\\',\\\'\' + WORKUNIT + \'\\\',\\\'' + %'LOOPFILENAME'% + '\\\',\\\'' + pOutputSuperfile + '\\\',\\\'' + %'LOCALESP'% + '\\\',\\\'' + pNotifyEmails + '\\\',,\\\'' + trim(pUniqueOutput,all)  + '\\\',\\\'' + trim(pPollingFrequency,all)  + '\\\',' + if(pForceRun = true,'true','false')  + ',' + if(pForceSkip = true,'true','false') + if(pInDebug != '', ', \\\''+ regexreplace('\'',pInDebug,'\\\\\\\\\\\\\'') + '\\\'', '') + ')\',\'' + %'WATCHERCLUSTER'% + '\',\'' + pESP + '\',,' + pInDebug + ');\n')
     #APPEND(PREECL ,'// -----------------------------------------------------------------------------------------\n\n')
     
     #APPEND(ECL, '\t,sendemail'  + %'CNTR'% + '\n')

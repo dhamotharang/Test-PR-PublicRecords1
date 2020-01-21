@@ -1,3 +1,4 @@
+﻿//SALTVERSION:35
 OPTIONS:-gn 
 MODULE:BIPV2_Ingest 
 
@@ -88,7 +89,17 @@ FIELD:hist_domestic_corp_key:DERIVED:0,0
 //FIELD:foreign_corp_key:DERIVED:0,0
 FIELD:foreign_corp_key:like(CORPKEY_FMT):DERIVED:0,0
 FIELD:unk_corp_key:DERIVED:0,0
-
+FIELD:global_sid:DERIVED:0,0
+FIELD:record_sid:DERIVED:0,0
+FIELD:employee_count_org_raw:DERIVED:0,0
+FIELD:employee_count_org_derived:DERIVED:0,0
+FIELD:revenue_org_raw:DERIVED:0,0
+FIELD:revenue_org_derived:DERIVED:0,0
+FIELD:employee_count_local_raw:DERIVED:0,0
+FIELD:employee_count_local_derived:DERIVED:0,0
+FIELD:revenue_local_raw:DERIVED:0,0
+FIELD:revenue_local_derived:DERIVED:0,0
+FIELD:locid:DERIVED:0,0
 
 // For now this is always blank.  Someday it'll be populated.  Once it is, it should become a regular field.
 FIELD:source_docid:DERIVED:0,0

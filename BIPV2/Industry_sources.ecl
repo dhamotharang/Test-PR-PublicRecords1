@@ -1,7 +1,7 @@
 ﻿IMPORT AMIDIR, BBB2, BusReg, CALBUS, Corp2, DCAV2, Diversity_Certification, DNB_FEINV2, EBR, Edgar, FBNV2, Frandx,
 			 govdata, InfoUSA, LaborActions_WHD, NCPDP, OIG, OSHAIR, Spoke, TXBUS, YellowPages, Experian_CRDB,Infutor_narb,
-			 Equifax_Business_Data,DataBridge
-			 //,Workers_Compensation, Zoom
+			 Equifax_Business_Data,DataBridge,DNB_DMI,Infutor_NARB
+			 //,Cortera,Workers_Compensation, Zoom
 ;
 
 export Industry_sources :=
@@ -32,6 +32,9 @@ export Industry_sources :=
 	+ Equifax_Business_Data.As_Industry
 	+ Infutor_NARB.As_Industry
 	+ DataBridge.As_Industry
+	+ DNB_DMI.As_Industry
+	+ Infutor_NARB.As_Industry
+	// + Cortera.Files.Industry
 	//+ Workers_Compensation.As_Industry  //*** removed as per Dave Wright, Bug# 57807
 	//+ Zoom.Zoom_As_Industry							//*** removed zoom due to no reseller agreement as per bug# 132603
 	;

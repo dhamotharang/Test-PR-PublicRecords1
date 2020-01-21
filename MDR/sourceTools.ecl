@@ -314,6 +314,7 @@ MODULE
 	export src_Lobbyists                 := 'LB';
 	export src_Mari_Prof_Lic		 				 :=	'MP'; // Mortgage Assest Research Institute Professional Licenses
 	export src_Mari_Public_Sanc					 :=	'MQ'; // Mortgage Assest Research Institute Public sanctions
+	export src_Marketing_Relatives_Data  := 'AZ';
 	export src_Marriage					 				 :=	'MR';
 	export src_MartinDale_Hubbell        := 'MH';
 	export src_MediaOne									 := 'M1';
@@ -349,6 +350,7 @@ MODULE
 	export src_PhonesPorted_TCPA				 := 'PJ';  // Landline-to-Cellphone
 	export src_PhonesPorted_TCPA_CL			 := 'PM';	 // Cellphone-to-Landline	- DF-23525
 	export src_PhonesPorted_iConectiv		 := 'PK';
+	export src_PhonesPorted2_iConectiv	 := 'P!';
 	export src_PhonesPorted_iConectiv_Rng:= 'PU';
 	export src_POS                       := 'PO';  // Provider of Services for Organization master repositry	
 	export src_Professional_License      := 'PL';	
@@ -1138,6 +1140,7 @@ export set_Marketing_Sources           := [
     ,src_Edgar                     ,src_Bankruptcy_Trustee        ,src_Infutor_Veh               ,src_MS_Worker_Comp
     ,src_Liens_v2_Chicago_Law      ,src_Liens_v2_ILFDLN           ,src_Liens_v2_Hogan            ,src_Liens_v2_MA
     ,src_Liens_v2_NYC              ,src_Liens_v2_NYFDLN
+				,src_LnPropV2_Fares_Deeds      ,src_LnPropV2_Lexis_Asrs       ,src_LnPropV2_Lexis_Deeds_Mtgs
 	]; 
 	
 export set_Marketing_Restricted := [
@@ -1908,7 +1911,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Phones_Accudata_CNAM_CNM2 := [src_Phones_Accudata_CNAM_CNM2 ];
 	export set_Phones_Lerg6							 := [src_Phones_Lerg6							 ];
 	export set_Phones_LIDB				 			 := [src_Phones_LIDB				 			 ];
-	export set_PhonesPorted						   := [src_PhonesPorted_TCPA, src_PhonesPorted_TCPA_CL, src_PhonesPorted_iConectiv, src_PhonesPorted_iConectiv_Rng, src_Phones_Accudata_OCN_LNP];
+	export set_PhonesPorted						   := [src_PhonesPorted_TCPA, src_PhonesPorted_TCPA_CL, src_PhonesPorted_iConectiv, src_PhonesPorted2_iConectiv, src_PhonesPorted_iConectiv_Rng, src_Phones_Accudata_OCN_LNP];
 	export set_POS                       := [src_POS                       ];  			
 	export set_Professional_License      := [src_Professional_License      ];
 	export set_PSS								       := [src_PSS									     ];

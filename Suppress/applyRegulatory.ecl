@@ -123,15 +123,23 @@ export applyRegulatory := module
 																		, dataset([], layout)))));
 
 					endmacro;
+				
+			// layouts and transformation need for suppression. 
+			// moved here from header_services.Supplemental_Data 10-7-19
+			export layout_in := record
+					string32 hval_s;
+					string2  nl;
+			end;
 
+			export layout_out := record
+					data16 hval;
+			end;
 
-			export layout_in := 
-					record
-							string32 hval_s;
-							string2  nl;
-					end;
-
-
+			export layout_out in_to_out(layout_in l) := transform
+					self.hval := stringlib.string2data(l.hval_s);
+			end;
+			//
+			
 			export complex_append(base_ds, filename, Drop_Layout, trans) := 
 					functionmacro
 							Base_File_Append_In := suppress.applyregulatory.getFile(filename, Drop_Layout);
@@ -291,7 +299,7 @@ export applyRegulatory := module
 									record
 											unsigned8 rid:=0;
 											BIPV2.IDlayouts.l_xlink_ids; 
-											BIPV2.Layout_Business_Linking_Full ;
+											BIPV2.Layout_Business_Linking_Full - employee_count_org_raw - revenue_org_raw  - employee_count_local_raw  - revenue_local_raw;
 											boolean executive_ind:=False;
 											integer executive_ind_order:=0;
 									end;
@@ -505,7 +513,8 @@ export applyRegulatory := module
 						
 							sup_in := suppress.applyregulatory.getFile(filename, supLayout);																			
 
-							local dSuppressedIn := project(sup_In, header_services.Supplemental_Data.in_to_out(left));
+							// local dSuppressedIn := project(sup_In, header_services.Supplemental_Data.in_to_out(left));
+							local dSuppressedIn := project(sup_In, suppress.applyRegulatory.in_to_out(left));
 					
 							return join (base_ds, dSuppressedIn, 
 									hashFunc1(left) = right.hval or
@@ -524,9 +533,7 @@ export applyRegulatory := module
 	            HF_DID_Hash(recordof(ds) L) := hashmd5(trim(l.did_out, 	left, right));				
 							HF_DID_SOURCE_STATE_Hash(recordof(ds) L) := hashmd5(trim(l.did_out, 	left, right), trim(l.source_state, 	left, right));
 							HF_PERSISTENT_ID_Hash(recordof(ds) L) := hashmd5(l.persistent_record_id);
-
-							// complex_hunt_fish_sup(base_ds, filename, hashFunc1, hashFunc2)
-							
+						
 							ds1 := Suppress.applyRegulatory.complex_sup_trio(ds, 'file_hunt_fish_sup.txt', HF_DID_SOURCE_STATE_Hash, HF_DID_Hash, HF_PERSISTENT_ID_Hash);
 						
 							return suppress.applyRegulatory.simple_append(ds1, 'file_hunt_fish_inj.thor', emerges.layout_hunters_out); 
@@ -545,7 +552,6 @@ export applyRegulatory := module
 							ds1 := Suppress.applyRegulatory.complex_sup_trio(ds, 'file_ccw_sup.txt', CCW_Hash1, CCW_Hash2, CCW_Hash3);
 
 							return Suppress.applyRegulatory.CCW_simple_append(ds1, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
-							// return Suppress.applyRegulatory.simple_append(ds1, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
 					endmacro; // applyCCW
 
 

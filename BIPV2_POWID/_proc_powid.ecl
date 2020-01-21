@@ -204,7 +204,7 @@ export _proc_powid(
         ,pSetNameCalculations := SetNameCalculations
         ,pBuildName           := 'PowIters'
         ,pNotifyEmails        := pEmailList
-        ,pOutputFilename      := '~BIPV2_build::@version@_@iteration@::workunit_history::BIPV2_POWID._proc_powid.iterations'
+        ,pOutputFilename      := '~BIPV2_build::@version@::workunit_history::BIPV2_POWID._proc_powid.iterations'
         ,pOutputSuperfile     := '~BIPV2_build::qa::workunit_history' 
         ,pCompileOnly         := pCompileTest
       );

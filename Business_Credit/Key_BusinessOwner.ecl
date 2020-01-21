@@ -45,6 +45,7 @@ EXPORT	Key_BusinessOwner(STRING pVersion	=	(STRING8)Std.Date.Today(),
 	END;
 	
 	dBusinessOwnerKey			:=	PROJECT(dBusinessOwner,tBusinessOwnerKey(LEFT));
+	
 	dBusinessOwnerKeyDist	:=	SORT(	DISTRIBUTE(dBusinessOwnerKey,
 																	HASH(	Sbfe_Contributor_Number, Contract_Account_Number, Account_Type_Reported,
 																				Business_Name, Web_Address, 
