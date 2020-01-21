@@ -3,7 +3,7 @@
 EXPORT RoyaltyNetWise := MODULE
 
   //Returns a dataset of royalties for the NetWise (Email) Data gateway
-  EXPORT GetRoyalties(DATASET(iesp.net_wise.t_NetWiseQueryResponseEx) ds_gw_response)
+  EXPORT GetRoyalties(DATASET(iesp.net_wise_search.t_NetWiseEmailSearchResponseEx) ds_gw_response)
     := FUNCTION
 
     //Any response that is not an http error status will be charged as royalty.
