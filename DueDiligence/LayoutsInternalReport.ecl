@@ -261,4 +261,48 @@ EXPORT LayoutsInternalReport := MODULE
     DATASET(iesp.duediligencepersonreport.t_DDRPersonDOBAge) espDOBAge;
   END;
   
+  EXPORT SlimResidentTenant := RECORD
+    UNSIGNED6 residentDID;
+    DueDiligence.Layouts.Name;
+    BOOLEAN relative;
+    BOOLEAN busAssocs;
+    BOOLEAN highRiskProfServOfStudy;
+    BOOLEAN potentialCrimArrest;
+    BOOLEAN potentialSOs;
+  END;
+  
+  EXPORT CurrentResidentTenantInfo := RECORD
+    UNSIGNED6 inquiredSeq;
+    UNSIGNED6 inquiredDID;
+    UNSIGNED6 inquiredAddressSeq;
+    SlimResidentTenant;
+    DueDiligence.Layouts.AddressSlimDetail;
+    UNSIGNED4 residentLastSeenDate;
+    UNSIGNED4 residentFirstSeenDate;
+    UNSIGNED4 historyDate;
+  END;
+  
+  
+  EXPORT MobilityData := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID;
+    UNSIGNED4 historyDate;
+    DueDiligence.Layouts.AddressDetails addrs;
+    STRING countyName;
+    STRING movingDistances;
+    STRING50 addressType;
+    STRING10 currentPreviousIndicator;
+    STRING residencyType;
+    STRING25 areaRisk;
+    UNSIGNED3 numberOfCurrentAddresses;
+    UNSIGNED6 numberOfPriorAddresses;
+    UNSIGNED6 numberCurrentResidentTenants;
+    UNSIGNED6 numberOfRelatives;
+    UNSIGNED6 numberOfBusAssocs;
+    UNSIGNED6 numberHighRiskProfServOfStudy;
+    UNSIGNED6 numberPotentialCrimArrest;
+    UNSIGNED6 numberOfPotentialSOs;
+    DATASET(SlimResidentTenant) resTenInfo;
+  END;
+  
 END;

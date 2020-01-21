@@ -1,6 +1,6 @@
 ﻿/*--SOAP--
 <message name="ReportService"> 
-	<part name="MemberPointReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
+	<part name="KeepContactReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
 </message>
 */
 /*--INFO--  
@@ -12,10 +12,10 @@ EXPORT ReportService := MACRO
 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
  #onwarning(4207, warning);
 	//b. Receive input 
-	rec_in := iesp.memberpointreport.t_MemberPointReportRequest;
+	rec_in := iesp.keepcontactreport.t_KeepContactReportRequest;
 
 	// "FEW" keyword set to make data read more efficient
-	ds_in  := DATASET ([], rec_in) : STORED ('MemberPointReportRequest', FEW);
+	ds_in  := DATASET ([], rec_in) : STORED ('KeepContactReportRequest', FEW);
 
 	/* independent" service keyword used here to make statement atomic and a signal to 
 	code generator to not combine it with other lines of code. It is evaluated at a global scope. */

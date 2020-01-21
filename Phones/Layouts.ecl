@@ -12,6 +12,7 @@ MODULE
 	EXPORT PhonesCommon :=
 	RECORD(doxie.layout_pp_raw_common)
 		BatchIn batch_in;
+    DATASET({STRING3 src}) Phn_src_all;
 	END;
 	EXPORT PhoneAcctno := RECORD
 		STRING20 acctno;

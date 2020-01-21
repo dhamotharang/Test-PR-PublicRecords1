@@ -41,7 +41,7 @@ END;
 
 justDids := PROJECT(relIdsWseq, 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.relatdid));
-rellyids := Relationship.proc_GetRelationship(justDids,TopNCount:= 100,
+rellyids := Relationship.proc_GetRelationshipNeutral(justDids,TopNCount:= 100,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost, 
 			HighConfidenceRelatives:= HighConfidenceRelatives_Value ,
 			HighConfidenceAssociates := HighConfidenceAssociates_Value ,

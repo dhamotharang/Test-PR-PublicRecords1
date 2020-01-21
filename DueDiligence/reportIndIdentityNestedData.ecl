@@ -17,7 +17,7 @@ EXPORT reportIndIdentityNestedData(DATASET(DueDiligence.Layouts.Indv_Internal) i
                                                        SELF.espDOBAge := DATASET([], iesp.duediligencepersonreport.t_DDRPersonDOBAge);));
                                                        
                                                        
-    //get the akas for an inquired
+    //get the dobs for an inquired
     normDOBs := NORMALIZE(inData, LEFT.dobOnFile, TRANSFORM(DueDiligence.LayoutsInternalReport.IdentityNestedData,
                                                              SELF.seq := LEFT.seq;
                                                              SELF.inquiredDID := LEFT.inquiredDID;

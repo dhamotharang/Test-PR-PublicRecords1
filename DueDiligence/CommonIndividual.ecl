@@ -91,7 +91,7 @@ EXPORT CommonIndividual := MODULE
 
 
       //make sure there are no spouses or parents in the associates list      
-      filtAssoc := DEDUP(SORT(allInd, seq, did, relationToInquired), seq, did);
+      filtAssoc := DEDUP(SORT(allInd, seq, did, -relationToInquired), seq, did);
 
       
       RETURN filtAssoc;

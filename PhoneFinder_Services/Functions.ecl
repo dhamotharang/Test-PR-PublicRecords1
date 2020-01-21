@@ -396,6 +396,7 @@
                                                     (STRING)STD.Date.MonthsBetween(dt_last_seen, today),
                                                     '');
       SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;
+      SELF.SourceDetails                     := IF(inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
       SELF                                   := pInput;
     END;
 
@@ -502,6 +503,7 @@
                                                     inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
                                                     '');
       SELF                                  := pInput.RealTimePhone_Ext;
+      SELF.SourceDetails                    := PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT));
       SELF                                  := pInput;
 
       // Below two fields are not being used currently
@@ -546,6 +548,7 @@
       SELF.source                  := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
                                           inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
                                           '');
+      SELF.SourceDetails           := PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT));
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
 
@@ -644,6 +647,7 @@
                                                     (STRING)STD.Date.MonthsBetween(dt_last_seen, today),
                                                     '');
       SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;
+      SELF.SourceDetails                     := [];
       SELF                                   := pInput;
     END;
 
@@ -692,7 +696,7 @@
                                     ri.RecentAddress.County, ri.RecentAddress.PostalCode, ri.RecentAddress.StateCityZip},
                                   {ri.FirstSeenWithPrimaryPhone.Year, ri.FirstSeenWithPrimaryPhone.Month, ri.FirstSeenWithPrimaryPhone.Day},
                                   {ri.LastSeenWithPrimaryPhone.Year, ri.LastSeenWithPrimaryPhone.Month, ri.LastSeenWithPrimaryPhone.Day},
-                                  ri.TimeWithPrimaryPhone, ri.TimeSinceLastSeenWithPrimaryPhone, ri.PrimaryAddressType, ri.RecordType, ri.phoneownershipindicator, ri.SSN},
+                                  ri.TimeWithPrimaryPhone, ri.TimeSinceLastSeenWithPrimaryPhone, ri.PrimaryAddressType, ri.RecordType, ri.phoneownershipindicator, ri.SSN, ri.SourceDetails},
                                 iesp.phonefinder.t_PhoneIdentityInfo);
       SELF               := le;
       SELF               := [];
@@ -744,6 +748,7 @@
       // Below two fieldss are not being used currently
       SELF.InquiryDetails          := [];
       SELF.ZumigoDeviceDetails     := [];
+      SELF.SourceDetails           := [];
     END;
 
     dOtherPhoneInfo := PROJECT(SORT(dIn(~isPrimaryPhone AND ~isPrimaryIdentity AND phone != ''), acctno, -phone_score), tFormat2IespOtherPhones(LEFT));
@@ -862,7 +867,8 @@
       // Below two fields are not being used currently
       SELF.InquiryDetails                   := [];
       SELF.ZumigoDeviceDetails              := [];
-    END;
+      SELF.SourceDetails                     := [];
+     END;
 
     dPrimaryPhoneInfo := PROJECT(dIn(isPrimaryPhone AND isPrimaryIdentity), tFormat2IespPrimaryPhone(LEFT));
 

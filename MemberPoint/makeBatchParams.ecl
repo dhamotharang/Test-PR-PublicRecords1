@@ -1,6 +1,6 @@
 IMPORT Gateway, iesp, Std;
 
-	EXPORT makeBatchParams(iesp.memberpointreport.t_MemberPointReportOption inOpts) := FUNCTION
+	EXPORT makeBatchParams(iesp.keepcontactreport.t_KeepContactReportOption inOpts) := FUNCTION
 		optAddressConfidenceThreshold:=IF(inOpts.BestAddressReturnCutoff='',(STRING1)MemberPoint.Constants.Defaults.AddressConfidenceThreshold,(STRING1)inOpts.BestAddressReturnCutoff);
 		optDeceasedMatchCodes:=IF(inOpts.DeceasedMatchCodes='',MemberPoint.Constants.Defaults.DeceasedMatchCodes,inOpts.DeceasedMatchCodes);
 		optPhonesReturnCutoff:=IF(inOpts.PhonesReturnCutoff='',MemberPoint.Constants.Defaults.PhonesReturnCutoff,inOpts.PhonesReturnCutoff);

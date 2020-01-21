@@ -61,6 +61,7 @@ ds_input_didsForRelationshipKey := PROJECT(DS_dataInreportBy,
 	RelativeFlag := TRUE;
 	AssociateFlag := TRUE;
 	AllFlag := TRUE; // getting all relationship types
+ RelKeyFlag := IF(mod_access.isConsumer(), 'D2C', '');
 
 // KEEP This documentation notes
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +91,8 @@ DS_relationships := Relationship.proc_GetRelationship(ds_input_didsForRelationsh
 																	,
 																	,
 																	,
-																	//Relationship.Layout_GetRelationship.TransactionalFlags_layout txflag = notx
+																	,//Relationship.Layout_GetRelationship.TransactionalFlags_layout txflag = notx
+                 RelKeyFLag
 																	).Result;
 
 dsrelativesDids := 	PROJECT(DS_relationships(TYPE = RelationshipIdentifier_Services.Constants.RELTYPE_PERSONAL and
@@ -119,9 +121,11 @@ ds_2ndDegreeRelatives := Relationship.proc_GetRelationship(dsrelativesDiDs,
 																	,
 																	,
 																	,
-																	//Relationship.Layout_GetRelationship.TransactionalFlags_layout txflag = notx
+																	,//Relationship.Layout_GetRelationship.TransactionalFlags_layout txflag = notx
+                 RelKeyFlag
 																	).Result(TYPE = RelationshipIdentifier_Services.Constants.RELTYPE_PERSONAL and
                                              CONFIDENCE = RelationshipIdentifier_Services.Constants.HIGH);
+
 NamesAdded := PROJECT(DS_relationships,
 									 TRANSFORM(RelationshipIdentifier_Services.Layouts.RelationshipFunctionRec,
 														 SELF.title_str := Header.relative_titles.fn_get_str_title(LEFT.title);
