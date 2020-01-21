@@ -190,6 +190,7 @@ FUNCTION
     OUTPUT(dIdentityTopn, NAMED('dIdentityTopn'), EXTEND);
     IF(doVerify, OUTPUT(dOtherRecs, NAMED('dOtherRecs'), EXTEND));
     OUTPUT(dIdentityRecs, NAMED('dIdentityRecs'), EXTEND);
+    IF(doVerify, OUTPUT(dFormat2BatchIn, NAMED('dFormat2BatchIn_Verify'), EXTEND));
     OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo'), EXTEND);
     OUTPUT(dIdentitiesFinal, NAMED('dIdentitiesFinal'), EXTEND);
     OUTPUT(dPrimaryAddressByZip, NAMED('dPrimaryAddressByZip'), EXTEND);
