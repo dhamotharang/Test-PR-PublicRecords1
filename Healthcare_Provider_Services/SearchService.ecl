@@ -129,7 +129,7 @@ export SearchService := MACRO
 	
 	convertedInput := Healthcare_Header_Services.Records.convertInputtoDataset(tmpMod);
 	rawRec := Healthcare_Header_Services.Records.getSearchServiceRecords(convertedInput, cfgData);
-	returnThresholdExceeded:=rawRec[1].ProcessingMessage = 203;
+	returnThresholdExceeded:=rawRec[1].ProcessingMessage = 203 and rawRec[1].lnpid=0;
 	hasoptout:=exists(rawRec(hasoptout = true));
 	recsFmt:= project(rawRec,Healthcare_Header_Services.Transforms.formatSearchServiceProviderOutput(left,convertedInput,cfgData));
   		//marshall the output...
