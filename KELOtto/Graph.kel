@@ -8,7 +8,6 @@ C:\Users\prichajx\AppData\Roaming\HPCC Systems\eclide\jprichard\Dataland\KELOtto
 #OPTION(codegen, 'nolookupjoins')
 
 
-
 // Defining the ERA to allow for ASOF functionality
 ERA reportedby BEFORE(DateFirstSeen=NULL(MIN));
 ERA reportedbetween BETWEEN(DateFirstSeen=NULL(MIN), DateLastSeen=NULL(MAX));
@@ -1294,15 +1293,15 @@ Event: => KrHighRiskEmailFlag := MAP(COUNT(EventTypes(EventType IN ['500','501',
 Event: => KrMediumRiskEmailFlag := MAP(COUNT(EventTypes(EventType IN ['502','592']))>0 => 1, 0);
 Event: => KrLowRiskEmailFlag := MAP(COUNT(EventTypes(EventType IN ['590','593']))>0 => 1, 0);
 
-Event: => KrHighRiskIpAddressFlag := MAP(ip_address_fraud_code != 0 OR COUNT(EventTypes(EventType IN ['601','602','605','691','1000','1091']))>0 => 1, 0);
-Event: => KrMediumRiskIpAddressFlag := MAP(ip_address_fraud_code != 0 OR COUNT(EventTypes(EventType IN ['600','603','604','692','1001','1092']))>0 => 1, 0);
-Event: => KrLowRiskIpAddressFlag := MAP(ip_address_fraud_code != 0 OR COUNT(EventTypes(EventType IN ['690','693','1090','1093']))>0 => 1, 0);
+Event: => KrHighRiskIpAddressFlag := MAP(COUNT(EventTypes(EventType IN ['601','602','605','691','1000','1091']))>0 => 1, 0);
+Event: => KrMediumRiskIpAddressFlag := MAP(COUNT(EventTypes(EventType IN ['600','603','604','692','1001','1092']))>0 => 1, 0);
+Event: => KrLowRiskIpAddressFlag := MAP(COUNT(EventTypes(EventType IN ['690','693','1090','1093']))>0 => 1, 0);
 
-Event: => KrHighRiskDlFlag := MAP(drivers_license_risk_code != 0 OR COUNT(EventTypes(EventType IN ['203','291']))>0 => 1, 0);
+Event: => KrHighRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['203','291']))>0 => 1, 0);
 Event: => KrMediumRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['202','204','292']))>0 => 1, 0);
 Event: => KrLowRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['200','201','290','293']))>0 => 1, 0);
 
-Event: => KrHighRiskBankFlag := MAP(bank_account_1_risk_code != 0 OR bank_account_2_risk_code != 0 OR COUNT(EventTypes(EventType IN ['800','891']))>0 => 1, 0);
+Event: => KrHighRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['800','891']))>0 => 1, 0);
 Event: => KrMediumRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['801','802','892']))>0 => 1, 0);
 Event: => KrLowRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['893','890']))>0 => 1, 0);
 
