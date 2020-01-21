@@ -20,7 +20,6 @@
     EXPORT BOOLEAN UseAllLookups   := FALSE;
   END;
 
-
   // Phonesplus data
   dPhonesPlus_ := IF(inMod.UseInhousePhones, Phones.Functions.GetPhonesPlusData(dIn, akMod, MDR.SourceTools.src_Phones_Plus, FALSE, TRUE, inMod.IsPhone7Search));
   dPhonesPlus  := PROJECT(dPhonesPlus_,
@@ -34,6 +33,7 @@
   dLastResort  := PROJECT(dLastResort_,
                           TRANSFORM(lCommon,
                                     SELF.phone_source := PhoneFinder_Services.Constants.PhoneSource.LastResort,
+                                    SELF.phn_src_all  := DATASET([MDR.SourceTools.src_wired_Assets_Royalty], $.Layouts.PhoneFinder.src_rec);
                                     SELF := LEFT));
 
   // Inhouse QSent data
@@ -42,6 +42,7 @@
   dInHouseQSent  := PROJECT(dInHouseQSent_,
                             TRANSFORM(lCommon,
                                       SELF.phone_source := PhoneFinder_Services.Constants.PhoneSource.InHouseQSent,
+                                      SELF.phn_src_all  := DATASET([MDR.SourceTools.src_InHouse_QSent], $.Layouts.PhoneFinder.src_rec);
                                       SELF := LEFT));
 
   // Gong data
@@ -67,6 +68,7 @@
   TRANSFORM
     SELF.dt_first_seen := (STRING)ut.Min2((INTEGER)le.dt_first_seen, (INTEGER)ri.dt_first_seen);
     SELF.dt_last_seen  := IF(le.dt_last_seen != '' and le.dt_last_seen >= ri.dt_last_seen, le.dt_last_seen, ri.dt_last_seen);
+    SELF.phn_src_all   := le.phn_src_all + ri.phn_src_all;
     SELF               := le;
   END;
 
@@ -103,8 +105,8 @@
   // Do not exclude primary phone in phone search
   dExcludePhones := DATASET([], $.Layouts.PhoneFinder.ExcludePhones);
 
-  dIn_IQ411 := PROJECT(dIn, TRANSFORM($.Layouts.BatchInAppendDID, 
-                                      SELF.acctno := LEFT.acctno, 
+  dIn_IQ411 := PROJECT(dIn, TRANSFORM($.Layouts.BatchInAppendDID,
+                                      SELF.acctno := LEFT.acctno,
                                       SELF.homephone := LEFT.homephone,
                                       SELF.orig_did := LEFT.orig_did,
                                       SELF := []));
@@ -112,14 +114,14 @@
   // QSent gateway data
   dQSentPrimaryPhoneNoDetails := IF(inMod.UseTransUnionIQ411, $.GetQSentPhones.GetQSentiQ411Data(dIn_IQ411, dExcludePhones, inMod, qSentGateway));
 
-  dIn_PVSD := PROJECT(dIn, TRANSFORM(lFinal, 
-                                      SELF.acctno := LEFT.acctno, 
+  dIn_PVSD := PROJECT(dIn, TRANSFORM(lFinal,
+                                      SELF.acctno := LEFT.acctno,
                                       SELF.phone := LEFT.homephone,
                                       SELF.did := LEFT.orig_did,
                                       SELF := []));
 
   // Call the gateway again with the primary phone number using service type 'PVSD' to get the phone info
-  dQSentAppendPrimaryPhoneDetails := IF(EXISTS(dIn_PVSD)AND inMod.UseTransUnionPVS 
+  dQSentAppendPrimaryPhoneDetails := IF(EXISTS(dIn_PVSD)AND inMod.UseTransUnionPVS
 	                                    AND ~inMod.UseInHousePhoneMetadata AND qSentGateway.url != '',
                                         $.GetQSentPhones.GetQSentPVSData(dIn_PVSD, inMod, phone, acctno, TRUE, qSentGateway));
 

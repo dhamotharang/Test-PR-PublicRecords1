@@ -1,11 +1,11 @@
 IMPORT $, MDR, Phones;
 
 // Equifax data
-EXPORT GetEquifaxPhones(DATASET($.Layouts.BatchInAppendDID) dIn, 
+EXPORT GetEquifaxPhones(DATASET($.Layouts.BatchInAppendDID) dIn,
 												$.iParam.SearchParams               inMod) :=
 FUNCTION
 	dEquifaxPhones := Phones.Raw.EquifaxPhones.ByPhone(dIn, homephone, FALSE);
-	
+
 	$.Layouts.PhoneFinder.Common tFormat2Common(RECORDOF(dEquifaxPhones) pInput) :=
 	TRANSFORM
 		SELF.phone_source  := $.Constants.PhoneSource.EquifaxPhones;
@@ -22,19 +22,20 @@ FUNCTION
     SELF.fname         := (STRING)pInput.equifax_phone.fname;
     SELF.lname         := (STRING)pInput.equifax_phone.lname;
     SELF.mname         := (STRING)pInput.equifax_phone.mname;
+    SELF.phn_src_all  := DATASET([MDR.sourceTools.src_Equifax], $.Layouts.PhoneFinder.src_rec);
     SELF.batch_in      := pInput;
 		SELF               := pInput;
 		SELF               := [];
 	END;
-	
+
 	dEquifaxFormat2Common := PROJECT(dEquifaxPhones, tFormat2Common(LEFT));
-	
+
 	// Debug
 	#IF($.Constants.Debug.EquifaxPhones)
 		IF(inMod.UseEquifax, OUTPUT(dIn, NAMED('dEquifaxPhones_In'), EXTEND));
 		IF(inMod.UseEquifax, OUTPUT(dEquifaxPhones, NAMED('dEquifaxPhones'), EXTEND));
 		IF(inMod.UseEquifax, OUTPUT(dEquifaxFormat2Common, NAMED('dEquifaxFormat2Common'), EXTEND));
 	#END
-	
+
 	RETURN dEquifaxFormat2Common;
 END;
