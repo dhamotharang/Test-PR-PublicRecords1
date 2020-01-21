@@ -1022,17 +1022,17 @@ USE KELOtto.fraudgovshared(FLAT,
 		Emailof=email_address,  		
     Transaction = record_id    
   ),
-  BankAccountEvent(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND bank_account_number_1 != ''),
+  BankAccountEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND bank_account_number_1 != ''),
     Transaction = record_id    
   ),
-  BankAccountEvent(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND bank_account_number_2 != ''),
+  BankAccountEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND bank_account_number_2 != ''),
     OttoBankAccountId = OttoBankAccountId2,
     Transaction = record_id    
   ),
-  DriversLicenseEvent(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND drivers_license != ''),
+  DriversLicenseEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND drivers_license != ''),
     Transaction = record_id    
   ),  
-  InternetProtocolEvent(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
+  InternetProtocolEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
     Transaction = record_id    
   ),
   AddressEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
@@ -1274,20 +1274,33 @@ Event: => IdNas9Flag := MAP(nas_summary = '9' /*AND relativeaddressmatch = 0 */=
 Event: => IdNap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not associated with identity per public records
 
 Event: => KrIdentityRisk := MAP(name_risk_code != 0 OR dob_risk_code != 0 OR identity_risk_code != 0 => 1, 0);
-Event: => KrHighRiskIdentityFlag := MAP(KrIdentityRisk = 1 OR COUNT(EventTypes(EventType IN ['10000','10001','10002','10004','10005','10006','10007','11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019','12000','12001','12002','12003','12004','12005','12006','12007','13000','13001','13002','13003','13004','13005','13006','13007','1400']))>0 => 1, 0); 
-Event: => KrMediumRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['10003','14001']))>0 => 1, 0);
+Event: => KrHighRiskIdentityFlag := MAP(KrIdentityRisk = 1 OR COUNT(EventTypes(EventType IN ['10000','10001','10002','10005','10006','10007','11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019','12000','12001','12002','12003','12004','12005','12006','12007','13000','13001','13002','13003','13004','13005','13006','13007','1400','14901']))>0 => 1, 0); 
+Event: => KrMediumRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['10003','10004','14001','14902']))>0 => 1, 0);
+Event: => KrLowRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['14900','14903']))>0 => 1, 0);
 
-Event: => KrHighRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['301','302','303']))>0 => 1, 0);
-Event: => KrMediumRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['300']))>0 => 1, 0);
+Event: => KrHighRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['301','302','303','391']))>0 => 1, 0);
+Event: => KrMediumRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['300','392']))>0 => 1, 0);
+Event: => KrLowRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['390','393']))>0 => 1, 0);
 
-Event: => KrHighRiskSsnFlag := MAP(COUNT(EventTypes(EventType IN ['202','204','292','100']))>0 => 1, 0);
-Event: => KrHighRiskPhoneFlag := MAP(COUNT(EventTypes(EventType IN ['400','402']))>0 => 1, 0);
+Event: => KrHighRiskSsnFlag := MAP(COUNT(EventTypes(EventType IN ['100','191']))>0 => 1, 0);
+Event: => KrMediumRiskSsnFlag := MAP(COUNT(EventTypes(EventType IN ['101','192']))>0 => 1, 0);
+Event: => KrLowRiskSsnFlag := MAP(COUNT(EventTypes(EventType IN ['103','104','105','190','193']))>0 => 1, 0);
+
+Event: => KrHighRiskPhoneFlag := MAP(COUNT(EventTypes(EventType IN ['400','402','491']))>0 => 1, 0);
+Event: => KrMediumRiskPhoneFlag := MAP(COUNT(EventTypes(EventType IN ['401','492']))>0 => 1, 0);
+Event: => KrLowRiskPhoneFlag := MAP(COUNT(EventTypes(EventType IN ['490','493']))>0 => 1, 0);
+
 Event: => KrHighRiskEmailFlag := MAP(COUNT(EventTypes(EventType IN ['500','501','591']))>0 => 1, 0);
-Event: => KrHighRiskIpAddressFlag := MAP(ip_address_fraud_code != 0 OR COUNT(EventTypes(EventType IN ['601','602','605','1000']))>0 => 1, 0);
+Event: => KrMediumRiskEmailFlag := MAP(COUNT(EventTypes(EventType IN ['502','592']))>0 => 1, 0);
+Event: => KrLowRiskEmailFlag := MAP(COUNT(EventTypes(EventType IN ['590','593']))>0 => 1, 0);
+
+Event: => KrHighRiskIpAddressFlag := MAP(ip_address_fraud_code != 0 OR COUNT(EventTypes(EventType IN ['601','602','605','691','1000','1091']))>0 => 1, 0);
+Event: => KrMediumRiskIpAddressFlag := MAP(ip_address_fraud_code != 0 OR COUNT(EventTypes(EventType IN ['600','603','604','692','1001','1092']))>0 => 1, 0);
+Event: => KrLowRiskIpAddressFlag := MAP(ip_address_fraud_code != 0 OR COUNT(EventTypes(EventType IN ['690','693','1090','1093']))>0 => 1, 0);
 
 Event: => KrHighRiskDlFlag := MAP(drivers_license_risk_code != 0 OR COUNT(EventTypes(EventType IN ['203','291']))>0 => 1, 0);
 Event: => KrMediumRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['202','204','292']))>0 => 1, 0);
-Event: => KrLowRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['200','201','293']))>0 => 1, 0);
+Event: => KrLowRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['200','201','290','293']))>0 => 1, 0);
 
 Event: => KrHighRiskBankFlag := MAP(bank_account_1_risk_code != 0 OR bank_account_2_risk_code != 0 OR COUNT(EventTypes(EventType IN ['800','891']))>0 => 1, 0);
 Event: => KrMediumRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['801','802','892']))>0 => 1, 0);
@@ -1330,15 +1343,30 @@ Event: => KrEml593Flag := MAP(COUNT(EventTypes(EventType IN ['593']))>0 => 1, 0)
 
 Event: => KrSsn100Flag := MAP(COUNT(EventTypes(EventType IN ['100']))>0 => 1, 0);
 Event: => KrSsn101Flag := MAP(COUNT(EventTypes(EventType IN ['101']))>0 => 1, 0);
+Event: => KrSsn103Flag := MAP(COUNT(EventTypes(EventType IN ['103']))>0 => 1, 0);
+Event: => KrSsn104Flag := MAP(COUNT(EventTypes(EventType IN ['104']))>0 => 1, 0);
+Event: => KrSsn105Flag := MAP(COUNT(EventTypes(EventType IN ['105']))>0 => 1, 0);
+Event: => KrSsn190Flag := MAP(COUNT(EventTypes(EventType IN ['190']))>0 => 1, 0);
+Event: => KrSsn191Flag := MAP(COUNT(EventTypes(EventType IN ['191']))>0 => 1, 0);
+Event: => KrSsn192Flag := MAP(COUNT(EventTypes(EventType IN ['192']))>0 => 1, 0);
+Event: => KrSsn193Flag := MAP(COUNT(EventTypes(EventType IN ['193']))>0 => 1, 0);
 
 Event: => KrPhn400Flag := MAP(COUNT(EventTypes(EventType IN ['400']))>0 => 1, 0);
 Event: => KrPhn401Flag := MAP(COUNT(EventTypes(EventType IN ['401']))>0 => 1, 0);
 Event: => KrPhn402Flag := MAP(COUNT(EventTypes(EventType IN ['402']))>0 => 1, 0);
+Event: => KrPhn490Flag := MAP(COUNT(EventTypes(EventType IN ['490']))>0 => 1, 0);
+Event: => KrPhn491Flag := MAP(COUNT(EventTypes(EventType IN ['491']))>0 => 1, 0);
+Event: => KrPhn492Flag := MAP(COUNT(EventTypes(EventType IN ['492']))>0 => 1, 0);
+Event: => KrPhn493Flag := MAP(COUNT(EventTypes(EventType IN ['493']))>0 => 1, 0);
 
 Event: => KrAddr300Flag := MAP(COUNT(EventTypes(EventType IN ['300']))>0 => 1, 0);
 Event: => KrAddr301Flag := MAP(COUNT(EventTypes(EventType IN ['301']))>0 => 1, 0);
 Event: => KrAddr302Flag := MAP(COUNT(EventTypes(EventType IN ['302']))>0 => 1, 0);
 Event: => KrAddr303Flag := MAP(COUNT(EventTypes(EventType IN ['303']))>0 => 1, 0);
+Event: => KrAddr390Flag := MAP(COUNT(EventTypes(EventType IN ['390']))>0 => 1, 0);
+Event: => KrAddr391Flag := MAP(COUNT(EventTypes(EventType IN ['391']))>0 => 1, 0);
+Event: => KrAddr392Flag := MAP(COUNT(EventTypes(EventType IN ['392']))>0 => 1, 0);
+Event: => KrAddr393Flag := MAP(COUNT(EventTypes(EventType IN ['393']))>0 => 1, 0);
 
 Event: => KrIp600Flag := MAP(COUNT(EventTypes(EventType IN ['600']))>0 => 1, 0);
 Event: => KrIp601Flag := MAP(COUNT(EventTypes(EventType IN ['601']))>0 => 1, 0);
@@ -1346,8 +1374,16 @@ Event: => KrIp602Flag := MAP(COUNT(EventTypes(EventType IN ['602']))>0 => 1, 0);
 Event: => KrIp603Flag := MAP(COUNT(EventTypes(EventType IN ['603']))>0 => 1, 0);
 Event: => KrIp604Flag := MAP(COUNT(EventTypes(EventType IN ['604']))>0 => 1, 0);
 Event: => KrIp605Flag := MAP(COUNT(EventTypes(EventType IN ['605']))>0 => 1, 0);
+Event: => KrIp690Flag := MAP(COUNT(EventTypes(EventType IN ['690']))>0 => 1, 0);
+Event: => KrIp691Flag := MAP(COUNT(EventTypes(EventType IN ['691']))>0 => 1, 0);
+Event: => KrIp692Flag := MAP(COUNT(EventTypes(EventType IN ['692']))>0 => 1, 0);
+Event: => KrIp693Flag := MAP(COUNT(EventTypes(EventType IN ['693']))>0 => 1, 0);
 Event: => KrIp1000Flag := MAP(COUNT(EventTypes(EventType IN ['1000']))>0 => 1, 0);
 Event: => KrIp1001Flag := MAP(COUNT(EventTypes(EventType IN ['1001']))>0 => 1, 0);
+Event: => KrIp1090Flag := MAP(COUNT(EventTypes(EventType IN ['1090']))>0 => 1, 0);
+Event: => KrIp1091Flag := MAP(COUNT(EventTypes(EventType IN ['1091']))>0 => 1, 0);
+Event: => KrIp1092Flag := MAP(COUNT(EventTypes(EventType IN ['1092']))>0 => 1, 0);
+Event: => KrIp1093Flag := MAP(COUNT(EventTypes(EventType IN ['1093']))>0 => 1, 0);
 
 Event: => KrId1010Flag := MAP(COUNT(EventTypes(EventType IN ['1010']))>0 => 1, 0);
 Event: => KrId2025Flag := MAP(COUNT(EventTypes(EventType IN ['2025']))>0 => 1, 0);
@@ -1396,6 +1432,10 @@ Event: => KrId13006Flag := MAP(COUNT(EventTypes(EventType IN ['13006']))>0 => 1,
 Event: => KrId13007Flag := MAP(COUNT(EventTypes(EventType IN ['13007']))>0 => 1, 0);
 Event: => KrId14000Flag := MAP(COUNT(EventTypes(EventType IN ['14000']))>0 => 1, 0);
 Event: => KrId14001Flag := MAP(COUNT(EventTypes(EventType IN ['14001']))>0 => 1, 0);
+Event: => KrId14900Flag := MAP(COUNT(EventTypes(EventType IN ['14900']))>0 => 1, 0);
+Event: => KrId14901Flag := MAP(COUNT(EventTypes(EventType IN ['14901']))>0 => 1, 0);
+Event: => KrId14902Flag := MAP(COUNT(EventTypes(EventType IN ['14902']))>0 => 1, 0);
+Event: => KrId14903Flag := MAP(COUNT(EventTypes(EventType IN ['14903']))>0 => 1, 0);
 
 
 Event: => IdAge := YEARSBETWEEN(DateOfBirth, rCustomer.EventDateMax);
@@ -1599,6 +1639,7 @@ Person: => IpTor := MAP(COUNT(PersonEvent.Transaction(IpTor=1))>0 => 1, 0);
 // Known Risk \ Safe
 Person: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskIdentityFlag=1)) > 0 => 1, 0);
 Person: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskIdentityFlag=1))>0 => 1, 0);
+Person: => KrLowRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrLowRiskIdentityFlag=1))>0 => 1, 0);
 Person: => KrHighRiskRouting := MAP(COUNT(PersonBankAccount.Account(HighRiskRouting=1))>0 => 1, 0);
 
 Person: => LastEventDate := MAX(PersonEvent.Transaction, EventDate); // last transaction date
@@ -1660,6 +1701,10 @@ Person: => KrId13006Flag := MAP(COUNT(PersonEvent.Transaction(KrId13006Flag=1))>
 Person: => KrId13007Flag := MAP(COUNT(PersonEvent.Transaction(KrId13007Flag=1))>0 => 1, 0);
 Person: => KrId14000Flag := MAP(COUNT(PersonEvent.Transaction(KrId14000Flag=1))>0 => 1, 0);
 Person: => KrId14001Flag := MAP(COUNT(PersonEvent.Transaction(KrId14001Flag=1))>0 => 1, 0);
+Person: => KrId14900Flag := MAP(COUNT(PersonEvent.Transaction(KrId14900Flag=1))>0 => 1, 0);
+Person: => KrId14901Flag := MAP(COUNT(PersonEvent.Transaction(KrId14901Flag=1))>0 => 1, 0);
+Person: => KrId14902Flag := MAP(COUNT(PersonEvent.Transaction(KrId14902Flag=1))>0 => 1, 0);
+Person: => KrId14903Flag := MAP(COUNT(PersonEvent.Transaction(KrId14903Flag=1))>0 => 1, 0);
 
 Person: => SafeFlagLastDate := MAX(PersonEvent.Transaction(SafeFlag=1), EventDate); 
 Person: => SafeFlagTransactionCount := COUNT(PersonEvent.Transaction(SafeFlag=1));
@@ -1815,7 +1860,9 @@ SocialSecurityNumber: => HriMiFlag := MAP(COUNT(SsnEvent.Transaction(HriMiFlag=1
 
 // Known Risk 
 SocialSecurityNumber: => KrHighRiskFlag := MAP(COUNT(SsnEvent.Transaction(KrHighRiskSsnFlag=1)) > 0 => 1, 0);
-SocialSecurityNumber: => KrMediumRiskFlag := 0;
+SocialSecurityNumber: => KrMediumRiskFlag := MAP(COUNT(SsnEvent.Transaction(KrMediumRiskSsnFlag=1)) > 0 => 1, 0);
+SocialSecurityNumber: => KrLowRiskFlag := MAP(COUNT(SsnEvent.Transaction(KrLowRiskSsnFlag=1)) > 0 => 1, 0);
+
 SocialSecurityNumber: => SafeFlag := MAP(COUNT(SsnEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 SocialSecurityNumber: => ContributorSafeFlag := MAP(COUNT(SsnEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
@@ -1826,6 +1873,13 @@ SocialSecurityNumber: => KrEventAfterLastKnownRiskFlag := MAP(KrEventAfterLastKn
 
 SocialSecurityNumber: => KrSsn100Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn100Flag=1))>0 => 1, 0);
 SocialSecurityNumber: => KrSsn101Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn101Flag=1))>0 => 1, 0);
+SocialSecurityNumber: => KrSsn103Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn103Flag=1))>0 => 1, 0);
+SocialSecurityNumber: => KrSsn104Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn104Flag=1))>0 => 1, 0);
+SocialSecurityNumber: => KrSsn105Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn105Flag=1))>0 => 1, 0);
+SocialSecurityNumber: => KrSsn190Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn190Flag=1))>0 => 1, 0);
+SocialSecurityNumber: => KrSsn191Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn191Flag=1))>0 => 1, 0);
+SocialSecurityNumber: => KrSsn192Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn192Flag=1))>0 => 1, 0);
+SocialSecurityNumber: => KrSsn193Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn193Flag=1))>0 => 1, 0);
 
 
 
@@ -1962,8 +2016,8 @@ Phone: => Hri31Flag := MAP(COUNT(PhoneEvent.Transaction(Hri31Flag=1)) > 0 => 1, 
 
 // Known Risk 
 Phone: => KrHighRiskFlag := MAP(COUNT(PhoneEvent.Transaction(KrHighRiskPhoneFlag=1)) > 0 => 1, 0);
-
-Phone: => KrMediumRiskFlag := 0;
+Phone: => KrMediumRiskFlag := MAP(COUNT(PhoneEvent.Transaction(KrMediumRiskPhoneFlag=1)) > 0 => 1, 0);
+Phone: => KrLowRiskFlag := MAP(COUNT(PhoneEvent.Transaction(KrLowRiskPhoneFlag=1)) > 0 => 1, 0);
 Phone: => SafeFlag := MAP(COUNT(PhoneEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 Phone: => ContributorSafeFlag := MAP(COUNT(PhoneEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
@@ -1975,7 +2029,10 @@ Phone: => KrEventAfterLastKnownRiskFlag := MAP(KrEventAfterLastKnownRiskCount>0=
 Phone: => KrPhn400Flag := MAP(COUNT(PhoneEvent.Transaction(KrPhn400Flag=1))>0 => 1, 0);
 Phone: => KrPhn401Flag := MAP(COUNT(PhoneEvent.Transaction(KrPhn401Flag=1))>0 => 1, 0);
 Phone: => KrPhn402Flag := MAP(COUNT(PhoneEvent.Transaction(KrPhn402Flag=1))>0 => 1, 0);
-
+Phone: => KrPhn490Flag := MAP(COUNT(PhoneEvent.Transaction(KrPhn490Flag=1))>0 => 1, 0);
+Phone: => KrPhn491Flag := MAP(COUNT(PhoneEvent.Transaction(KrPhn491Flag=1))>0 => 1, 0);
+Phone: => KrPhn492Flag := MAP(COUNT(PhoneEvent.Transaction(KrPhn492Flag=1))>0 => 1, 0);
+Phone: => KrPhn493Flag := MAP(COUNT(PhoneEvent.Transaction(KrPhn493Flag=1))>0 => 1, 0);
 
 
 // Velocity
@@ -2108,7 +2165,8 @@ Email: => NotSafeLastDomainGt2 := MAP(EmailLastDomain IN ['GOV','ORG'] AND Ident
 
 // Known Risk 
 Email: => KrHighRiskFlag := MAP(COUNT(EmailEvent.Transaction(KrHighRiskEmailFlag=1)) > 0 => 1, 0);
-Email: => KrMediumRiskFlag := 0;
+Email: => KrMediumRiskFlag := MAP(COUNT(EmailEvent.Transaction(KrMediumRiskEmailFlag=1)) > 0 => 1, 0);
+Email: => KrLowRiskFlag := MAP(COUNT(EmailEvent.Transaction(KrLowRiskEmailFlag=1)) > 0 => 1, 0);
 Email: => SafeFlag := MAP(COUNT(EmailEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 Email: => ContributorSafeFlag := MAP(COUNT(EmailEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
@@ -2573,7 +2631,8 @@ InternetProtocol: => IpTor := MAP(COUNT(InternetProtocolEvent.Transaction(IpTor=
 
 // Known Risk 
 InternetProtocol: => KrHighRiskFlag := MAP(COUNT(InternetProtocolEvent.Transaction(KrHighRiskIpAddressFlag=1)) > 0 => 1, 0);
-InternetProtocol: => KrMediumRiskFlag := 0;
+InternetProtocol: => KrMediumRiskFlag := MAP(COUNT(InternetProtocolEvent.Transaction(KrMediumRiskIpAddressFlag=1)) > 0 => 1, 0);
+InternetProtocol: => KrLowRiskFlag := MAP(COUNT(InternetProtocolEvent.Transaction(KrLowRiskIpAddressFlag=1)) > 0 => 1, 0);
 InternetProtocol: => SafeFlag := MAP(COUNT(InternetProtocolEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 InternetProtocol: => ContributorSafeFlag := MAP(COUNT(InternetProtocolEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
@@ -2583,8 +2642,16 @@ InternetProtocol: => KrIp602Flag := MAP(COUNT(InternetProtocolEvent.Transaction(
 InternetProtocol: => KrIp603Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp603Flag=1))>0 => 1, 0);
 InternetProtocol: => KrIp604Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp604Flag=1))>0 => 1, 0);
 InternetProtocol: => KrIp605Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp605Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp690Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp690Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp691Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp691Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp692Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp692Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp693Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp693Flag=1))>0 => 1, 0);
 InternetProtocol: => KrIp1000Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp1000Flag=1))>0 => 1, 0);
 InternetProtocol: => KrIp1001Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp1001Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp1090Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp1090Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp1091Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp1091Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp1092Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp1092Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp1093Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp1093Flag=1))>0 => 1, 0);
 
 
 InternetProtocol: => LastEventDate := MAX(InternetProtocolEvent.Transaction, EventDate);
@@ -2790,6 +2857,7 @@ Address: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
 // Known Risk  
 Address: => KrHighRiskFlag := MAP(COUNT(AddressEvent.Transaction(KrHighRiskAddressFlag=1))>0 => 1, 0);
 Address: => KrMediumRiskFlag := MAP(COUNT(AddressEvent.Transaction(KrMediumRiskAddressFlag=1))>0 => 1, 0);
+Address: => KrLowRiskFlag := MAP(COUNT(AddressEvent.Transaction(KrLowRiskAddressFlag=1))>0 => 1, 0);
 Address: => SafeFlag := MAP(COUNT(AddressEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 Address: => ContributorSafeFlag := MAP(COUNT(AddressEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
@@ -2797,6 +2865,10 @@ Address: => KrAddr300Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr300Flag=1)
 Address: => KrAddr301Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr301Flag=1))>0 => 1, 0);
 Address: => KrAddr302Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr302Flag=1))>0 => 1, 0);
 Address: => KrAddr303Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr303Flag=1))>0 => 1, 0);
+Address: => KrAddr390Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr390Flag=1))>0 => 1, 0);
+Address: => KrAddr391Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr391Flag=1))>0 => 1, 0);
+Address: => KrAddr392Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr392Flag=1))>0 => 1, 0);
+Address: => KrAddr393Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr393Flag=1))>0 => 1, 0);
 
 Address: => LastEventDate := MAX(AddressEvent.Transaction, EventDate);
 Address: => KrLastEventDate := MAX(AddressEvent.Transaction(KrHighRiskAddressFlag=1 OR KrMediumRiskAddressFlag=1), EventDate);
@@ -2988,6 +3060,7 @@ QUERY: showCustomerPersonEntities <= Person
 
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
+                              KrLowRiskFlag,
 
                               CurrentlyIncarceratedFlag,
                               FraudOffensesFlag,
@@ -3096,7 +3169,7 @@ QUERY: showCustomerAddressEntities <= Address
                               
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
-                              
+                              KrLowRiskFlag,
                               
                               PersonCount := IdentityCount,
                               HighFrequencyFlag,
@@ -3141,12 +3214,12 @@ QUERY: showCustomerIpAddressEntities <= InternetProtocol
                               ClHighRiskPattern5Flag,
 
 															DtFirstSeen,
-															DtLastSeen
+															DtLastSeen,
                               
-/*
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
-                              
+                              KrLowRiskFlag
+/*                              
                               PersonCount := IdentityCount,
                               HighFrequencyFlag,
                               HighRiskDeathPriorToAllEventsPercentFlag,
@@ -3188,19 +3261,11 @@ QUERY: showCustomerSsnEntities <= SocialSecurityNumber
                               ClHighRiskPattern4Flag,
                               ClHighRiskPattern5Flag,
 															DtFirstSeen,
-															DtLastSeen
+															DtLastSeen,
                               
-/*
-
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
-                              
-                              PersonCount := IdentityCount,
-                              HighFrequencyFlag,
-                              HighRiskDeathPriorToAllEventsPercentFlag,
-                              AllHighRiskDeathPriorToAllEventsPersonPercentFlag,
-                              DeceasedPersonCount
-*/                              
+                              KrLowRiskFlag
 
                             };
 
@@ -3230,6 +3295,10 @@ QUERY: showCustomerPhoneEntities <= Phone
                               ContributorSafeFlag,
                               SafeFlag,
 
+                              KrHighRiskFlag,
+                              KrMediumRiskFlag,
+                              KrLowRiskFlag,
+															
                               ClHighRiskPattern1Flag,
                               ClHighRiskPattern2Flag,
                               ClHighRiskPattern3Flag,
@@ -3274,6 +3343,8 @@ QUERY: showCustomerEmailEntities <= Email
 
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
+                              KrLowRiskFlag,
+
 															DtFirstSeen,
 															DtLastSeen
                               
