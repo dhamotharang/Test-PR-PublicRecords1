@@ -1,4 +1,4 @@
-﻿IMPORT STD, _Control;
+﻿﻿IMPORT STD, _Control, Prof_License_Mari, SANCTN;
 EXPORT ExternalBuildSample := MODULE
 
 
@@ -144,71 +144,25 @@ layout_garnishments := RECORD
 
 
 ds_garnishments := dataset(if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::base::elert::garnishments::data','~thor_data400::base::garnishments::qa::data'), layout_garnishments, thor);
-// output(ds_garnishments, named('ds_garnishments'));
 
 pj_garnishments := project(ds_garnishments, transform(modLayouts.lSrcLayout,
  		SELF.proxid :=left.proxid;
 		SELF.seleid :=left.seleid;
-		// SELF.orgid 	:=left.orgid;
-		// SELF.ultid 	:=left.ultid;
-		// SELF.empid 	:=left.empid;
-		// SELF.powid 	:=left.powid;
-		// SELF.dotid 	:=left.dotid;
-		// SELF.parent_proxid :=0;
-		// SELF.sele_proxid :=0;
-		// SELF.org_proxid :=0;
-		// SELF.ultimate_proxid :=0;
-		// BOOLEAN has_lgid;
 		SELF.company_name := std.str.ToUpperCase(left.rawfields.attorneyname);
-		// SELF.title := left.clean_defendant_name.title;
 		SELF.contact_fname := left.clean_defendant_name.fname	;
 		SELF.contact_mname := left.clean_defendant_name.mname	;
 		SELF.contact_lname := left.clean_defendant_name.lname	;
-		//SELF.name_suffix := left.clean_defendant_name.name_suffix	;
-		// SELF.iscontact;
-		// SELF.contact_ssn;
-		// SELF.contact_email := left.email;
 		SELF.prim_range := left.Clean_attorney_address.prim_range;
-		// SELF.predir := left.Clean_attorney_address.predir;
 		SELF.prim_name := left.Clean_attorney_address.prim_name;
-		// SELF.addr_suffix := left.Clean_attorney_address.addr_suffix;
-		// SELF.postdir := left.Clean_attorney_address.postdir;
-		// SELF.unit_desig := left.Clean_attorney_address.unit_desig;
 		SELF.sec_range := left.Clean_attorney_address.sec_range;
 		SELF.city := left.Clean_attorney_address.p_city_name;
-		// SELF.v_city_name := left.Clean_attorney_address.v_city_name;
 		SELF.state := left.Clean_attorney_address.st;
 		SELF.zip5 := left.Clean_attorney_address.zip;
-		// SELF.zip4 := left.Clean_attorney_address.zip4;
-		// SELF.fips_county := left.Clean_attorney_address.fips_county;
-		SELF.src_category := 'GT';
-		// SELF.dt_first_seen := left.dt_first_seen;
+		SELF.src_category := 'GR';
 		SELF.dt_last_seen := left.dt_last_seen;
-		// SELF.dt_vendor_last_reported := left.dt_vendor_last_reported;
-		// SELF.company_bdid := left.bdid;
-		// SELF.company_fein;
-		// SELF.active_duns_number;
 		SELF.phone10 := (string)left.clean_phones.AttorneyPhone;
-		// SELF.phone_type;
-		// SELF.company_url;
-		// SELF.company_sic_code1 := left.rawfields.sic1;
-		// SELF.company_status_derived;
-		// SELF.vl_id;
-		// SELF.source_record_id := left.source_rec_id;
-		// SELF.source_docid;
-		// SELF.contact_did := left.did;
-		// SELF.contact_email_domain := left.email_domain;
-		// SELF.contact_job_title_derived;
-		// SELF.err_stat := left.Clean_attorney_address.err_stat;
-		// SELF.is_sele_level;
-		// SELF.is_org_level;
-		// SELF.is_ult_level;
-		// SELF.rcid;
-		// SELF.address_type_derived;
 		SELF := [];));
 	
-	// pj_garnishments;
-	// RETURN	OUTPUT(pj_garnishments,,'~thor::bipheader::qa::garnishments', OVERWRITE, COMPRESSED);
 	RETURN	pj_garnishments;
 	END;
 
@@ -321,70 +275,26 @@ layout_spoke := RECORD,maxlength(8192)
  END;
 
 ds_spoke := dataset(if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::base::elert::spoke::data','~thor_data400::base::spoke::qa::data'), layout_spoke, thor);
-// output(choosen(ds_spoke,100), named('ds_spoke'));
 
 pj_spoke := project(ds_spoke, transform(modLayouts.lSrcLayout,
  		SELF.proxid :=left.proxid;
 		SELF.seleid :=left.seleid;
-		// SELF.orgid :=left.orgid;
-		// SELF.ultid :=left.ultid;
-		// SELF.empid :=left.empid;
-		// SELF.powid :=left.powid;
-		// SELF.dotid :=left.dotid;
-		// SELF.parent_proxid :=0;
-		// SELF.sele_proxid :=0;
-		// SELF.org_proxid :=0;
-		// SELF.ultimate_proxid :=0;
-		// BOOLEAN has_lgid;
 		SELF.company_name := std.str.ToUpperCase(left.rawfields.company_name);
-		// SELF.title := left.clean_contact_name.title;
 		SELF.contact_fname := left.clean_contact_name.fname;
 		SELF.contact_mname := left.clean_contact_name.mname;
 		SELF.contact_lname := left.clean_contact_name.lname;
-		// SELF.name_suffix := left.clean_contact_name.name_suffix;
-		// SELF.iscontact;
-		// SELF.contact_ssn;
-		// SELF.contact_email;
 		SELF.prim_range := left.clean_company_address.prim_range;
-		// SELF.predir := left.clean_company_address.predir;
 		SELF.prim_name := left.clean_company_address.prim_name;
-		// SELF.addr_suffix := left.clean_company_address.addr_suffix;
-		// SELF.postdir := left.clean_company_address.postdir;
-		// SELF.unit_desig := left.clean_company_address.unit_desig;
 		SELF.sec_range := left.clean_company_address.sec_range;
 		SELF.city := left.clean_company_address.p_city_name;
-		// SELF.v_city_name := left.clean_company_address.v_city_name;
 		SELF.state := left.clean_company_address.st;
 		SELF.zip5 := left.clean_company_address.zip;
-		// SELF.zip4 := left.clean_company_address.zip4;
-		// SELF.fips_county := left.clean_company_address.fips_county;
-		SELF.src_category :='S#';
-		// SELF.dt_first_seen := left.dt_first_seen;
+		SELF.src_category :='SP';
 		SELF.dt_last_seen := left.dt_last_seen;
-		// SELF.dt_vendor_last_reported := left.dt_vendor_last_reported;
-		// SELF.company_bdid;
-		// SELF.company_fein;
-		// SELF.active_duns_number;
 		SELF.phone10 := left.clean_phones.company_phone_number;
-		// SELF.phone_type;
-		// SELF.company_url;
-		// SELF.company_sic_code1;
-		// SELF.company_status_derived;
-		// SELF.vl_id;
-		// SELF.source_record_id;
-		// SELF.source_docid;
 		SELF.contact_did := left.did;
-		// SELF.contact_email_domain;
-		// SELF.contact_job_title_derived;
-		// SELF.err_stat := left.clean_company_address.err_stat;
-		// SELF.is_sele_level;
-		// SELF.is_org_level;
-		// SELF.is_ult_level;
-		// SELF.rcid;
-		// SELF.address_type_derived;
 		SELF := [];));	
 	
-	// RETURN OUTPUT(pj_spoke,,'~thor::bipheader::qa::spoke', OVERWRITE, COMPRESSED);
 	RETURN pj_spoke;
 	END;
 	
@@ -480,72 +390,26 @@ layout_taxpro := RECORD
  END;
  
 ds_taxpro := dataset(if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::persist::base::taxpro::copyfrom92','~thor_data400::persist::base::taxpro::copyfrom92'), layout_taxpro, thor);
-// output(ds_taxpro, named('ds_taxpro'));
 
  pj_taxpro := project(ds_taxpro, transform(modLayouts.lSrcLayout,
  		SELF.proxid :=left.proxid;
 		SELF.seleid :=left.seleid;
-		// SELF.orgid :=left.orgid;
-		// SELF.ultid :=left.ultid;
-		// SELF.empid :=left.empid;
-		// SELF.powid :=left.powid;
-		// SELF.dotid :=left.dotid;
-		// SELF.parent_proxid :=0;
-		// SELF.sele_proxid :=0;
-		// SELF.org_proxid :=0;
-		// SELF.ultimate_proxid :=0;
-		// BOOLEAN has_lgid;
 		SELF.company_name := std.str.ToUpperCase(left.company);
-		// SELF.title := left.name.title;
 		SELF.contact_fname := left.name.fname;
 		SELF.contact_mname := left.name.mname;
 		SELF.contact_lname := left.name.lname;
-		// SELF.name_suffix := left.name.name_suffix;
-		// SELF.iscontact;
 		SELF.contact_ssn := left.ssn;
-		// SELF.contact_email := left.email;
 		SELF.prim_range := left.addr.prim_range;
-		// SELF.predir := left.addr.predir;
 		SELF.prim_name := left.addr.prim_name;
-		// SELF.addr_suffix := left.addr.addr_suffix;
-		// SELF.postdir := left.addr.postdir;
-		// SELF.unit_desig := left.addr.unit_desig;
 		SELF.sec_range := left.addr.sec_range;
 		SELF.city := left.addr.p_city_name;
-		// SELF.v_city_name := left.addr.v_city_name;
 		SELF.state:= left.addr.st;
 		SELF.zip5 := left.addr.zip5;
-		// SELF.zip4 := left.addr.zip4;
-		// SELF.fips_county := left.addr.fips_county;
 		SELF.src_category := '@@';
-		// SELF.src_category := left.source;
-		// SELF.dt_first_seen := left.dt_first_seen;
 		SELF.dt_last_seen := left.dt_last_seen;
-		// SELF.dt_vendor_last_reported := left.dt_vendor_last_reported;
-		// SELF.company_bdid := left.bdid;
-		// SELF.company_fein;
-		// SELF.active_duns_number;
-		// SELF.phone10 := left.clean_phone_work;
-		// SELF.phone_type;
-		// SELF.company_url;
-		// SELF.company_sic_code1 := left.rawfields.sic1;
-		// SELF.company_status_derived;
-		// SELF.vl_id;
-		// SELF.source_record_id := left.source_rec_id;
-		// SELF.source_docid;
 		SELF.contact_did := left.did;
-		// SELF.contact_email_domain := left.email_domain;
-		// SELF.contact_job_title_derived;
-		// SELF.err_stat := left.addr.err_stat;
-//		SELF.is_sele_level;
-//		SELF.is_org_level;
-//		SELF.is_ult_level;
-//		SELF.rcid;
-//		SELF.address_type_derived;
 		SELF := [];));
 	
-	// pj_taxpro;
-	// RETURN	OUTPUT(pj_taxpro,,'~thor::bipheader::qa::taxpro', overwrite, compressed);
 	RETURN	pj_taxpro;
 	
 	END;
@@ -658,72 +522,27 @@ layout_thrive := RECORD,maxlength(40000)
  END;
 
 ds_thrive := dataset(if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::base::elert::thrive::data','~thor_data400::base::thrive::qa'), layout_thrive, thor);
-// output(ds_thrive, named('ds_thrive'));
 
  pj_thrive := project(ds_thrive, transform(modLayouts.lSrcLayout,
  		SELF.proxid :=left.proxid;
 		SELF.seleid :=left.seleid;
-		// SELF.orgid :=left.orgid;
-		// SELF.ultid :=left.ultid;
-		// SELF.empid :=left.empid;
-		// SELF.powid :=left.powid;
-		// SELF.dotid :=left.dotid;
-		// SELF.parent_proxid :=0;
-		// SELF.sele_proxid :=0;
-		// SELF.org_proxid :=0;
-		// SELF.ultimate_proxid :=0;
-		// BOOLEAN has_lgid;
 		SELF.company_name := std.str.ToUpperCase(left.employer);
-		// SELF.title := left.title;
 		SELF.contact_fname := left.fname;
 		SELF.contact_mname := left.mname;
 		SELF.contact_lname := left.lname;
-		// SELF.name_suffix := left.name_suffix;
-		// SELF.iscontact;
-		// SELF.contact_ssn;
 		SELF.email := left.email;
 		SELF.prim_range := left.prim_range;
-		// SELF.predir := left.predir;
 		SELF.prim_name := left.prim_name;
-		// SELF.addr_suffix := left.addr_suffix;
-		// SELF.postdir := left.postdir;
-		// SELF.unit_desig := left.unit_desig;
 		SELF.sec_range := left.sec_range;
 		SELF.city := left.p_city_name;
-		// SELF.v_city_name := left.v_city_name;
 		SELF.state:= left.st;
 		SELF.zip5 := left.zip;
-		// SELF.zip4 := left.zip4;
-		// SELF.fips_county := left.fips_county;
-		// SELF.src_category := left.src;
 		SELF.src_category := '!!';
-		// SELF.dt_first_seen := left.dt_first_seen;
 		SELF.dt_last_seen := left.dt_last_seen;
-		// SELF.dt_vendor_last_reported := left.dt_vendor_last_reported;
-		// SELF.company_bdid := left.bdid;
-		// SELF.company_fein;
-		// SELF.active_duns_number;
 		SELF.phone10 := left.clean_phone_work;
-		// SELF.phone_type;
-		// SELF.company_url;
-		// SELF.company_sic_code1 := left.rawfields.sic1;
-		// SELF.company_status_derived;
-		// SELF.vl_id;
-		// SELF.source_record_id := left.source_rec_id;
-		// SELF.source_docid;
 		SELF.contact_did := left.did;
-		// SELF.contact_email_domain := left.email_domain;
-		// SELF.contact_job_title_derived;
-		// SELF.err_stat := left.err_stat;
-		// SELF.is_sele_level;
-		// SELF.is_org_level;
-		// SELF.is_ult_level;
-		// SELF.rcid;
-		// SELF.address_type_derived;
 		SELF := [];));
 	
-	// pj_thrive;
-	// RETURN	OUTPUT(pj_thrive,,'~thor::bipheader::qa::thrive', OVERWRITE, COMPRESSED);
 	RETURN	pj_thrive;
   END;
 	
@@ -845,71 +664,23 @@ layout_vickers := RECORD
  END;
 
 ds_vickers_13d13g := dataset(if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::base::elert::vickers_13d13g_base::data','~thor_data400::base::vickers_13d13g_base'), layout_vickers, thor);
-// OUTPUT(ds_vickers_13d13g, named('ds_vickers_13d13g'));
 
  pj_vickers_13d13g := project(ds_vickers_13d13g, transform(modLayouts.lSrcLayout,
  		SELF.proxid :=left.proxid;
 		SELF.seleid :=left.seleid;
-		// SELF.orgid :=left.orgid;
-		// SELF.ultid :=left.ultid;
-		// SELF.empid :=left.empid;
-		// SELF.powid :=left.powid;
-		// SELF.dotid :=left.dotid;
-		// SELF.parent_proxid :=0;
-		// SELF.sele_proxid :=0;
-		// SELF.org_proxid :=0;
-		// SELF.ultimate_proxid :=0;
-		// BOOLEAN has_lgid;
 		SELF.company_name := std.str.ToUpperCase(left.filer_name);
-		// SELF.title := left.contact_name_prefix;
 		SELF.contact_fname := left.contact_name_first;
 		SELF.contact_mname := left.contact_name_middle;
 		SELF.contact_lname := left.contact_name_last;
-		// SELF.name_suffix := left.contact_name_suffix;
-		// SELF.iscontact;
-		// SELF.contact_ssn;
-		// SELF.contact_email := left.email;
 		SELF.prim_range := left.prim_range;
-		// SELF.predir := left.predir;
 		SELF.prim_name := left.prim_name;
-		// SELF.addr_suffix := left.addr_suffix;
-		// SELF.postdir := left.postdir;
-		// SELF.unit_desig := left.unit_desig;
 		SELF.sec_range := left.sec_range;
 		SELF.city := left.p_city_name;
-		// SELF.v_city_name := left.v_city_name;
 		SELF.state:= left.st;
 		SELF.zip5 := left.zip;
-		// SELF.zip4 := left.zip4;
-		// SELF.fips_county := left.fipscounty;
 		SELF.src_category := 'V@';
-		// SELF.dt_first_seen := left.dt_first_seen;
-		// SELF.dt_last_seen := left.dt_last_seen;
-		// SELF.dt_vendor_last_reported := left.dt_vendor_last_reported;
-		// SELF.company_bdid := left.bdid;
-		// SELF.company_fein;
-		// SELF.active_duns_number;
-		// SELF.company_phone := left.clean_phone_work;
-		// SELF.phone_type;
-		// SELF.company_url;
-		// SELF.company_sic_code1 := left.rawfields.sic1;
-		// SELF.company_status_derived;
-		// SELF.vl_id;
-		// SELF.source_record_id := left.source_rec_id;
-		// SELF.source_docid;
-		// SELF.contact_did := left.did;
-		// SELF.contact_email_domain := left.email_domain;
-		// SELF.contact_job_title_derived;
-		// SELF.err_stat := left.err_stat;
-		// SELF.is_sele_level;
-		// SELF.is_org_level;
-		// SELF.is_ult_level;
-		// SELF.rcid;
-		// SELF.address_type_derived;
 		SELF := [];));
 	
-	// pj_vickers_13d13g;
-  // RETURN OUTPUT(pj_vickers_13d13g,,'~thor::bipheader::qa::vickers_13d13g_base', OVERWRITE, COMPRESSED);
   RETURN pj_vickers_13d13g;
 
   END;
@@ -1017,71 +788,24 @@ layout_vickers := RECORD
  END;
 
 ds_vickers := dataset(if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::base::elert::vickers_insider_filing_base::data','~thor_data400::base::vickers_insider_filing_base'), layout_vickers, thor);
-// output(ds_vickers, named('ds_vickers'));
 
  pj_vickers := project(ds_vickers, transform(modLayouts.lSrcLayout,
  		SELF.proxid :=left.proxid;
 		SELF.seleid :=left.seleid;
-		// SELF.orgid :=left.orgid;
-		// SELF.ultid :=left.ultid;
-		// SELF.empid :=left.empid;
-		// SELF.powid :=left.powid;
-		// SELF.dotid :=left.dotid;
-		// SELF.parent_proxid :=0;
-		// SELF.sele_proxid :=0;
-		// SELF.org_proxid :=0;
-		// SELF.ultimate_proxid :=0;
-		// BOOLEAN has_lgid;
-		// SELF.company_name := std.str.ToUpperCase(left.employer);
-		// SELF.title := left.name_prefix;
+        SELF.company_name := std.str.ToUpperCase(left.filer_name);
 		SELF.contact_fname := left.name_first;
 		SELF.contact_mname := left.name_middle;
 		SELF.contact_lname := left.name_last;
-		// SELF.name_suffix := left.name_suffix;
-		// SELF.iscontact;
-		// SELF.contact_ssn;
-		// SELF.contact_email := left.email;
 		SELF.prim_range := left.prim_range;
-		// SELF.predir := left.predir;
 		SELF.prim_name := left.prim_name;
-		// SELF.addr_suffix := left.addr_suffix;
-		// SELF.postdir := left.postdir;
-		// SELF.unit_desig := left.unit_desig;
 		SELF.sec_range := left.sec_range;
 		SELF.city := left.p_city_name;
-		// SELF.v_city_name := left.v_city_name;
 		SELF.state:= left.st;
 		SELF.zip5 := left.zip;
-		// SELF.zip4 := left.zip4;
-		// SELF.fips_county := left.fipscounty;
 		SELF.src_category := 'V#';
-		// SELF.dt_first_seen := left.dt_first_seen;
-		// SELF.dt_last_seen := left.dt_last_seen;
-		// SELF.dt_vendor_last_reported := left.dt_vendor_last_reported;
-		// SELF.company_bdid := left.bdid;
-		// SELF.company_fein;
-		// SELF.active_duns_number;
-		// SELF.company_phone := left.clean_phone_work;
-		// SELF.phone_type;
-		// SELF.company_url;
-		// SELF.company_sic_code1 := left.rawfields.sic1;
-		// SELF.company_status_derived;
-		// SELF.vl_id;
-		// SELF.source_record_id := left.source_rec_id;
-		// SELF.source_docid;
-		// SELF.contact_did := left.did;
-		// SELF.contact_email_domain := left.email_domain;
-		// SELF.err_stat := left.err_stat;
-		// SELF.is_sele_level;
-		// SELF.is_org_level;
-		// SELF.is_ult_level;
-		// SELF.rcid;
-		// SELF.address_type_derived;
 		SELF := [];));
 	
 		RETURN pj_vickers;
-		// RETURN	OUTPUT(pj_vickers,,'~thor::bipheader::qa::vickers_base', OVERWRITE, COMPRESSED);
-
 		END;
 
 EXPORT zoomDsBipExternalBuild(string prefix) := FUNCTION
@@ -1233,89 +957,395 @@ layout_zoom := RECORD
  END;
 
 ds_zoom := dataset(if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::base::elert::zoom::data','~thor_data400::base::zoom::qa::data'), layout_zoom, thor);
-// OUTPUT(ds_zoom, named('ds_zoom'));
 
 pj_zoom := project(ds_zoom, transform(modLayouts.lSrcLayout,
  		SELF.proxid :=left.proxid;
 		SELF.seleid :=left.seleid;
-		// SELF.orgid 	:=left.orgid;
-		// SELF.ultid 	:=left.ultid;
-		// SELF.empid 	:=left.empid;
-		// SELF.powid 	:=left.powid;
-		// SELF.dotid 	:=left.dotid;
-		// SELF.parent_proxid :=0;
-		// SELF.sele_proxid :=0;
-		// SELF.org_proxid :=0;
-		// SELF.ultimate_proxid :=0;
-		// BOOLEAN has_lgid;
 		SELF.company_name := std.str.ToUpperCase(left.rawfields.company_name);
-		// SELF.title := left.clean_contact_name.title;
 		SELF.contact_fname := left.clean_contact_name.fname;
 		SELF.contact_mname := left.clean_contact_name.mname;
 		SELF.contact_lname := left.clean_contact_name.lname;
-		// SELF.name_suffix := left.clean_contact_name.name_suffix;
-		// SELF.iscontact;
-		// SELF.contact_ssn;
-		// SELF.contact_email;
 		SELF.prim_range := left.clean_company_address.prim_range;
-		// SELF.predir := left.clean_company_address.predir;
 		SELF.prim_name := left.clean_company_address.prim_name;
-		// SELF.addr_suffix := left.clean_company_address.addr_suffix;
-		// SELF.postdir := left.clean_company_address.postdir;
-		// SELF.unit_desig := left.clean_company_address.unit_desig;
 		SELF.sec_range := left.clean_company_address.sec_range;
 		SELF.city := left.clean_company_address.p_city_name;
-		// SELF.v_city_name := left.clean_company_address.v_city_name;
 		SELF.state := left.clean_company_address.st;
 		SELF.zip5 := left.clean_company_address.zip;
-		// SELF.zip4 := left.clean_company_address.zip4;
-		// SELF.fips_county := left.clean_company_address.fips_county;
-		SELF.src_category :='Z#';
-		// SELF.dt_first_seen := left.dt_first_seen;
+		SELF.src_category :='ZM';
 		SELF.dt_last_seen := left.dt_last_seen;
-		// SELF.dt_vendor_last_reported := left.dt_vendor_last_reported;
-		// SELF.company_bdid := left.bdid;
-		// SELF.company_fein;
-		// SELF.active_duns_number;
 		SELF.phone10 := left.clean_phones.company_phone;
-		// SELF.phone_type;
-		// SELF.company_url;
 		SELF.sic_code := left.rawfields.sic1;
-		// SELF.company_status_derived;
-		// SELF.vl_id;
-		SELF.source_record_id := left.source_rec_id;
-		// SELF.source_docid;
 		SELF.contact_did := left.did;
-		// SELF.contact_email_domain := left.rawfields.email_domain;
-		// SELF.contact_job_title_derived;
-		// SELF.err_stat := left.clean_company_address.err_stat;
-		// SELF.is_sele_level;
-		// SELF.is_org_level;
-		// SELF.is_ult_level;
-		// SELF.rcid;
-		// SELF.address_type_derived;
 		SELF := [];));
 	
-	RETURN pj_zoom;
-	// RETURN OUTPUT(pj_zoom,,'~thor::bipheader::qa::zoom', OVERWRITE, COMPRESSED);
+	RETURN pj_zoom;	
+	END;
+
+EXPORT bankruptcyAttorneysDsBipExternalBuild(string prefix) := FUNCTION
+
+layout_bankruptcy := RECORD
+  unsigned6 dotid;
+  unsigned2 dotscore;
+  unsigned2 dotweight;
+  unsigned6 empid;
+  unsigned2 empscore;
+  unsigned2 empweight;
+  unsigned6 powid;
+  unsigned2 powscore;
+  unsigned2 powweight;
+  unsigned6 proxid;
+  unsigned2 proxscore;
+  unsigned2 proxweight;
+  unsigned6 seleid;
+  unsigned2 selescore;
+  unsigned2 seleweight;
+  unsigned6 orgid;
+  unsigned2 orgscore;
+  unsigned2 orgweight;
+  unsigned6 ultid;
+  unsigned2 ultscore;
+  unsigned2 ultweight;
+  unsigned6 did;
+  unsigned1 did_score;
+  unsigned6 bdid;
+  unsigned1 bdid_score;
+  string fullname;
+  string firm;
+  string email;
+  string address;
+  string country;
+  string city;
+  string state;
+  string zipcode;
+  string phone;
+  string fax;
+  string lastupdated;
+  string10 clean_phone;
+  string8 date_first_seen;
+  string8 date_last_seen;
+  string8 date_vendor_first_reported;
+  string8 date_vendor_last_reported;
+  string5 title;
+  string20 fname;
+  string20 mname;
+  string20 lname;
+  string5 name_suffix;
+  string3 name_score;
+  string120 company_name;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 p_city_name;
+  string25 v_city_name;
+  string2 st;
+  string5 zip;
+  string4 zip4;
+  string4 cart;
+  string1 cr_sort_sz;
+  string4 lot;
+  string1 lot_order;
+  string2 dbpc;
+  string1 chk_digit;
+  string2 rec_type;
+  string2 fips_county;
+  string3 county;
+  string10 geo_lat;
+  string11 geo_long;
+  string4 msa;
+  string7 geo_blk;
+  string1 geo_match;
+  string4 err_stat;
+  string1 active_flag;
+ END;
+
+ds_bankruptcy := dataset(if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::base::elert::bat_attorneys::data','~thor_data400::base::bat::attorneys'), layout_bankruptcy, thor);
+
+
+pj_bankruptcy := project(ds_bankruptcy, transform(modLayouts.lSrcLayout,
+ 		SELF.proxid :=left.proxid;
+		SELF.seleid :=left.seleid;
+		SELF.company_name := std.str.ToUpperCase(left.company_name);
+		SELF.contact_fname := left.fname;
+		SELF.contact_mname := left.mname;
+		SELF.contact_lname := left.lname;
+		SELF.email := left.email;
+		SELF.prim_range := left.prim_range;
+		SELF.prim_name := left.prim_name;
+		SELF.sec_range := left.sec_range;
+		SELF.city := left.p_city_name;
+		SELF.state := left.st;
+		SELF.zip5 := left.zip;
+		SELF.src_category := 'BY';
+		SELF.phone10 := left.clean_phone;
+		SELF.contact_did := left.did;
+		SELF := [];));
+	
+	RETURN pj_bankruptcy;
 	
 	END;
+
+	EXPORT profLicMari(string prefix) := FUNCTION
+
+	dsMari := dataset(if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::base::elert::mari_prof_license::data','~thor_data400::base::proflic_mari::search'), Prof_License_Mari.layouts.final, thor);
+
+	modLayouts.lSrcLayout into_temp(dsMari L, INTEGER cnt) := TRANSFORM
+ 		SELF.proxid := L.proxid;
+		SELF.seleid := L.seleid;
+		SELF.contact_fname := L.fname	;
+		SELF.contact_mname := L.mname	;
+		SELF.contact_lname := L.lname	;
+		SELF.company_name		:= 	CHOOSE(cnt 	
+																				,L.name_company
+																				,L.name_company
+																				,L.name_company_dba
+																				,L.name_company_dba
+																				);
+																				
+		SELF.phone10 					:= 	CHOOSE(cnt
+																				,L.phn_mari_1
+																				,L.phn_mari_2
+																				,L.phn_mari_1
+																				,L.phn_mari_2
+																					);
+				
+		SELF.prim_range 		:= 	CHOOSE(cnt 	
+																				,l.Bus_prim_range
+																				,l.Mail_prim_range
+																				,l.Bus_prim_range
+																				,l.Mail_prim_range																						
+																			   );
+
+		SELF.prim_name 			:= 	CHOOSE(cnt 	
+																				,l.Bus_prim_name
+																				,l.Mail_prim_name
+																				,l.Bus_prim_name
+																				,l.Mail_prim_name																						
+																			   );
+
+		SELF.sec_range 			:= 	CHOOSE(cnt 	
+																				,l.Bus_sec_range
+																				,l.Mail_sec_range
+																				,l.Bus_sec_range
+																				,l.Mail_sec_range																						
+																			   );
+				
+		SELF.city		:=  CHOOSE(cnt 	
+																				,l.Bus_p_city_name
+																				,l.Mail_p_city_name
+																				,l.Bus_p_city_name
+																				,l.Mail_p_city_name
+																			   );																												 
+
+		SELF.zip5						:= 	CHOOSE(cnt 	
+																				,l.Bus_zip5
+																				,l.Mail_zip5
+																				,l.Bus_zip5
+																				,l.Mail_zip5																				
+																			   );
+																				 
+		SELF.state 						:= 	CHOOSE(cnt 	
+																				,l.Bus_state
+																				,l.Mail_state
+																				,l.Bus_state
+																				,l.Mail_state																				
+																			   );
+																				 
+		SELF.fein 					:= 	CHOOSE(cnt 	
+																				,IF(l.TAX_TYPE_1 = 'E', l.SSN_TAXID_1,'')
+																				,IF(l.TAX_TYPE_2 = 'E', l.SSN_TAXID_2,'')
+																				,IF(l.TAX_TYPE_1 = 'E', l.SSN_TAXID_1,'')
+																				,IF(l.TAX_TYPE_2 = 'E', l.SSN_TAXID_2,'')
+																			   );																																	
+
+		SELF.src_category 	:= 'MP';
+		SELF.dt_last_seen 	:= (integer)L.date_last_seen;
+		SELF.email 					:= L.email;
+		SELF.url 						:= L.url;
+		SELF								:= [];
+		END;
+
+	NormBusNameAddr := NORMALIZE(dsMari,4,into_temp(LEFT,COUNTER));
+
+	fNormBusNameAddr := NormBusNameAddr(company_name != '' or contact_ssn != '' or prim_name != '' or phone10 != '' or city != '' or fein != '');//filter out ones with only contact_name
+
+	dNormBusNameAddr := DEDUP(SORT(fNormBusNameAddr,	company_name,	prim_name,	city,	phone10,	fein,	contact_fname,	contact_mname,	contact_lname,	skew(1)),
+																			company_name,	prim_name,	city,	phone10,	fein,	contact_fname,	contact_mname,	contact_lname);
+
+	RETURN dNormBusNameAddr;
+END;
+
+	EXPORT SANCTN(string prefix) := FUNCTION
+
+	dsSanctn := dataset(if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::base::elert::sanctn::data','~thor_data400::persist::sanctn::party_did_new2'), SANCTN.layout_SANCTN_did, thor);
+
+	pj_Sanctn := project(dsSanctn, transform(modLayouts.lSrcLayout,
+										SELF.proxid :=left.proxid;
+										SELF.seleid :=left.seleid;
+										SELF.company_name := std.str.ToUpperCase(left.cname);
+										SELF.contact_fname := left.fname	;
+										SELF.contact_mname := left.mname	;
+										SELF.contact_lname := left.lname	;
+										SELF.prim_range := left.prim_range;
+										SELF.prim_name := left.prim_name;
+										SELF.sec_range := left.sec_range;
+										SELF.city := left.p_city_name;
+										SELF.state := left.st;
+										SELF.zip5 := left.zip5;
+										SELF.src_category := 'S@';
+										SELF.contact_ssn := left.ssn_appended;
+										SELF.contact_did := left.did;
+										SELF.source_record_id := left.source_rec_id;
+										SELF := [];
+										));
 	
+		RETURN	pj_Sanctn;
+	END;
+
+	EXPORT SANCTN_Mari(string prefix) := FUNCTION
+	
+	layout_sanctnMari := RECORD
+  unsigned6 ultid;
+  unsigned6 orgid;
+  unsigned6 seleid;
+  unsigned6 proxid;
+  unsigned6 powid;
+  unsigned6 empid;
+  unsigned6 dotid
+  =>
+  unsigned2 ultscore;
+  unsigned2 orgscore;
+  unsigned2 selescore;
+  unsigned2 proxscore;
+  unsigned2 powscore;
+  unsigned2 empscore;
+  unsigned2 dotscore;
+  unsigned2 ultweight;
+  unsigned2 orgweight;
+  unsigned2 seleweight;
+  unsigned2 proxweight;
+  unsigned2 powweight;
+  unsigned2 empweight;
+  unsigned2 dotweight;
+  unsigned8 source_rec_id;
+  string8 batch;
+  string1 dbcode;
+  string8 incident_num;
+  string7 party_num;
+  string sanctions;
+  string additional_info;
+  string150 party_firm;
+  string10 tin;
+  string50 name_first;
+  string50 name_last;
+  string50 name_middle;
+  string10 suffix;
+  string20 nickname;
+  string45 party_position;
+  string150 party_employer;
+  string9 ssn;
+  string8 dob;
+  string45 address;
+  string45 city;
+  string2 state;
+  string9 zip;
+  string1 party_type;
+  integer8 party_key;
+  integer8 int_key;
+  string20 phone;
+  string500 akaname;
+  string500 dbaname;
+  unsigned8 aid;
+  unsigned6 did;
+  unsigned6 did_score;
+  unsigned6 bdid;
+  unsigned6 bdid_score;
+  string8 date_vendor_first_reported;
+  string8 date_vendor_last_reported;
+  unsigned4 global_sid;
+  unsigned8 record_sid;
+  string5 title;
+  string20 fname;
+  string20 mname;
+  string20 lname;
+  string5 name_suffix;
+  string3 name_score;
+  string150 ename;
+  string150 cname;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 p_city_name;
+  string25 v_city_name;
+  string2 st;
+  string5 zip5;
+  string4 zip4;
+  string2 fips_state;
+  string3 fips_county;
+  string2 addr_rec_type;
+  string10 geo_lat;
+  string11 geo_long;
+  string4 cbsa;
+  string7 geo_blk;
+  string1 geo_match;
+  string4 cart;
+  string1 cr_sort_sz;
+  string4 lot;
+  string1 lot_order;
+  string2 dpbc;
+  string1 chk_digit;
+  string4 err_stat;
+  integer1 fp;
+ END;
+
+	dsSanctn_mari00 := dataset(if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::base::elert::sanctn_np::data','~thor_data400::key::sanctn::np::qa::party_linkids'), layout_sanctnMari, thor);
+	dsSanctn_mari := pull(index(dsSanctn_mari00,{ultid,orgid,seleid,proxid,powid,empid,dotid},{dsSanctn_mari00},if(_Control.ThisEnvironment.Name='Dataland','~thor_data400::base::elert::sanctn_np::data','~thor_data400::key::sanctn::np::qa::party_linkids'))); 
+
+	pj_SanctnMari := project(dsSanctn_mari, transform(bizlinkfull_elert.modLayouts.lSrcLayout,
+										SELF.proxid :=left.proxid;
+										SELF.seleid :=left.seleid;
+										SELF.company_name := std.str.ToUpperCase(left.cname);
+										SELF.contact_fname := left.fname	;
+										SELF.contact_mname := left.mname	;
+										SELF.contact_lname := left.lname	;
+										SELF.prim_range := left.prim_range;
+										SELF.prim_name := left.prim_name;
+										SELF.sec_range := left.sec_range;
+										SELF.city := left.p_city_name;
+										SELF.state := left.st;
+										SELF.zip5 := left.zip5;
+										SELF.src_category := 'M@';
+										SELF.fein := left.tin;
+										SELF.phone10 := left.phone;
+										SELF.contact_ssn := left.ssn;
+										SELF.contact_did := left.did;
+										SELF.source_record_id := left.source_rec_id;
+										SELF := [];
+										));
+	
+		RETURN	pj_SanctnMari;
+	END;
+
 	EXPORT captureData(unsigned iCountRecs2Pull = 50000, boolean bUseForeign = false) := function
         prefix := if(bUseForeign, '~foreign::'+_Control.IPAddress.prod_thor_dali+'::', '~');
 
-        // return ENTH(garnishmentsDsBipExternalBuild(prefix), iCountRecs2Pull)
-        //      + ENTH(spokeDsBipExternalBuild(prefix), iCountRecs2Pull) 
-        //      + ENTH(taxproDsBipExternalBuild(prefix), iCountRecs2Pull)  
-        //      // + ENTH(thriveDsBipExternalBuild(), iCountRecs2Pull) 
-        //      + ENTH(vickers13d13gDsBipExternalBuild(prefix), iCountRecs2Pull) 
-        //      + ENTH(vickersDsBipExternalBuild(prefix), iCountRecs2Pull) 
-        //      + ENTH(zoomDsBipExternalBuild(prefix), iCountRecs2Pull) ;
         return garnishmentsDsBipExternalBuild(prefix)[1..iCountRecs2Pull]
              + spokeDsBipExternalBuild(prefix)[1..iCountRecs2Pull]
              + taxproDsBipExternalBuild(prefix)[1..iCountRecs2Pull]
+             + thriveDsBipExternalBuild(prefix)[1..iCountRecs2Pull]
              + vickers13d13gDsBipExternalBuild(prefix)[1..iCountRecs2Pull]
              + vickersDsBipExternalBuild(prefix)[1..iCountRecs2Pull]
-             + zoomDsBipExternalBuild(prefix)[1..iCountRecs2Pull];
+             + zoomDsBipExternalBuild(prefix)[1..iCountRecs2Pull]
+             + bankruptcyAttorneysDsBipExternalBuild(prefix)[1..iCountRecs2Pull]
+						 + profLicMari(prefix)[1..iCountRecs2Pull]
+             + SANCTN(prefix)[1..iCountRecs2Pull]
+						 + SANCTN_Mari(prefix)[1..iCountRecs2Pull];
 	END;
 END;

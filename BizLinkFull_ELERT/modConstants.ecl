@@ -4,12 +4,11 @@ IMPORT _Control AS pkgControl;
 IMPORT wk_ut AS pkgWKUT;
 EXPORT modConstants := MODULE
   //Change All of this to match your data. -ZRS 4/8/2019    
-  EXPORT DATASET(modLayouts.lSampleLayout) fPrototypeThorCall(DATASET(modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bDisableForce=TRUE, BOOLEAN isFuzzy=FALSE, BOOLEAN zipRadius=FALSE, STRING inUrl='', STRING inSvcName='') := DATASET(modLayouts.lSampleLayout);
-  EXPORT DATASET(modLayouts.lSampleLayout) fPrototypeRoxieCall(DATASET(modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bDisableForce=FALSE, BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='') := DATASET(modLayouts.lSampleLayout);
-  EXPORT DATASET(modLayouts.lSampleLayout) fPrototypeIDFunctionsCall(DATASET(modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bDisableForce=FALSE, BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='') := DATASET(modLayouts.lSampleLayout);
-  EXPORT DATASET(modLayouts.lSampleLayout) fPrototypeMMFCall(DATASET(modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bDisableForce=FALSE, BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='') := DATASET(modLayouts.lSampleLayout);
-
-
+  EXPORT DATASET(modLayouts.lSampleLayout) fPrototypeThorCall(DATASET(modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bDisableForce=TRUE, BOOLEAN isFuzzy=FALSE, BOOLEAN zipRadius=FALSE, STRING inUrl='', STRING inSvcName='', BOOLEAN bUseSourceRid=FALSE) := DATASET(modLayouts.lSampleLayout);
+  EXPORT DATASET(modLayouts.lSampleLayout) fPrototypeRoxieCall(DATASET(modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bDisableForce=FALSE, BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='', BOOLEAN bUseSourceRid=FALSE) := DATASET(modLayouts.lSampleLayout);
+  EXPORT DATASET(modLayouts.lSampleLayout) fPrototypeIDFunctionsCall(DATASET(modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bDisableForce=FALSE, BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='', BOOLEAN bUseSourceRid=FALSE) := DATASET(modLayouts.lSampleLayout);
+  EXPORT DATASET(modLayouts.lSampleLayout) fPrototypeMMFCall(DATASET(modLayouts.lSampleLayout) dInData,INTEGER iScore=75,INTEGER iDistance=0,BOOLEAN bSegmentation=FALSE,INTEGER iWeight=0,BOOLEAN bDisableForce=FALSE, BOOLEAN isFuzzy=TRUE, BOOLEAN zipRadius=TRUE, STRING inUrl='', STRING inSvcName='', BOOLEAN bUseSourceRid=FALSE) := DATASET(modLayouts.lSampleLayout);
+  
   EXPORT STRING fPrototypeHyperlinkCreator(modLayouts.lSampleLayout dRec) := '';
 
   EXPORT sRoxieDev157SoapcallURL := 'dev157vip.hpcc.risk.regn.net:9876';
@@ -47,4 +46,5 @@ EXPORT modConstants := MODULE
   EXPORT sEmailNotifyQA    := '';
   EXPORT sEmailNotifyAll   := sEmailNotify + ',' + sEmailNotifyQA;
   EXPORT sESP := pkgWKUT._Constants.LocalEsp;
+  EXPORT bUseSrcRid := FALSE;
 END;
