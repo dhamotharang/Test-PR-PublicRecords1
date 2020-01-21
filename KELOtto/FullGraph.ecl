@@ -459,7 +459,8 @@ FullGraphElementCount := JOIN(FullGraphElementCount1, AdditionalAttributes, LEFT
              },
               SELF.event_count_ := RIGHT.event_count_, 
 							SELF.identity_count_ := RIGHT.identity_count_, 
-							SELF.cl_adjacent_safe_flag_ := RIGHT.cl_adjacent_safe_flag_, 
+							SELF.cl_adjacent_safe_flag_ := RIGHT.cl_adjacent_safe_flag_,
+              SELF.kr_high_risk_flag_ := MAX([LEFT.kr_high_risk_flag_,LEFT.kr_medium_risk_flag_,LEFT.kr_low_risk_flag_]),	// JP temporary hack to help web, will need to come out.						
 							SELF := LEFT), LEFT OUTER, HASH) : PERSIST('~fraudgov::deleteme101');
 
 EXPORT FullGraph := FullGraphElementCount;
