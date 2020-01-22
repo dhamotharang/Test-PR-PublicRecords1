@@ -299,7 +299,7 @@ export applyRegulatory := module
 									record
 											unsigned8 rid:=0;
 											BIPV2.IDlayouts.l_xlink_ids; 
-											BIPV2.Layout_Business_Linking_Full - employee_count_org_raw - revenue_org_raw  - employee_count_local_raw  - revenue_local_raw;
+											BIPV2.Layout_Business_Linking_Full ;
 											boolean executive_ind:=False;
 											integer executive_ind_order:=0;
 									end;
