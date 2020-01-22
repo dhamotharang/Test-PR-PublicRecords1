@@ -136,6 +136,8 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
 	tmx_gw := riskwise.shortcuts.gw_threatmetrix;
   self.gateways := project(tmx_gw, transform(Gateway.Layouts.Config, self := left, self := []) );   //dev TMX gateway
   
+	self.UseIngestDate := false;  // set this to true if they want to use ingest date for filtering instead of date first seen
+	
 	// if you are running realtime mode with today's date and you need realtime inquiries turn on deltabase searching	
   // self.gateways := project(riskwise.shortcuts.gw_delta_dev, transform(Gateway.Layouts.Config, self := left, self := []) );   //dev deltabase
 	// self.gateways := project(riskwise.shortcuts.gw_delta_prod, transform(Gateway.Layouts.Config, self := left, self := []) );   // production deltabase
