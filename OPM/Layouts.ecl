@@ -82,7 +82,7 @@ export Layouts := module
     		
    	 export BIPSlim := record
 			unsigned8		unique_id;	
-			string      Agency; 
+			string120   business_name; 
 			string10  	prim_range;
 			string28		prim_name;
 			string8			sec_range;

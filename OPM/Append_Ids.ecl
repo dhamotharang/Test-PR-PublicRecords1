@@ -109,6 +109,7 @@ EXPORT Append_Ids := MODULE
 			SELF.city       	    := L.p_city_name;
 			SELF.zip5             := L.zip;
 			SELF.state_code       := L.st;
+			SELF.business_name    := L.Agency;
 			SELF							    := [];
 		END;
 		
@@ -121,7 +122,7 @@ EXPORT Append_Ids := MODULE
 		Business_Header_SS.MAC_Add_BDID_Flex(
 			 dSlimInput     											// Input Dataset						
 			,BIP_Matchset                         // BIP Matchset what fields to match on           
-			,Agency          		             		  // company_name	              
+			,business_name          		          // company_name	              
 			,prim_range             		          // prim_range		              
 			,prim_name            		            // prim_name		              
 			,zip5             					          // zip5					              

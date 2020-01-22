@@ -22,8 +22,7 @@ function
 							,Promote().Inputfiles.using2used
 							,Promote().Buildfiles.Built2QA
 							,QA_Records()
-							,dops.updateversion('OPMKeys',pversion,Email_Notification_Lists().BuildSuccess,,'N')
-							,Orbit3.proc_Orbit3_CreateBuild('DataBridge',pversion,'N')
+							,Orbit3.proc_Orbit3_CreateBuild('OPM',pversion,'N')
  	          ): success(Send_Emails(pversion,,not pIsTesting).Roxie), 
    	           failure(Send_Emails(pversion,,not pIsTesting).buildfailure);
 	
