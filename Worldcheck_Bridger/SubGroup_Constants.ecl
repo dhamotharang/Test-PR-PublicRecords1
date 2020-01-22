@@ -1179,6 +1179,7 @@
 		export string KEYWORD_PHAMLC								:= '865';
 		export string KEYWORD_PHDOF_IC							:= '866';
 		export string KEYWORD_PKCNGOA								:= '867';
+		export string KEYWORD_LUICIJ_WC							:= '868';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

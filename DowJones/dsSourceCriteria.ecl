@@ -1844,6 +1844,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/9 Mali List','1831'},
 {'EC 2020/8 Mali List','1832'},
 {'Greater Jakarta Metropolitan Regional Police Wanted List','1833'},
-{'OFAC - North Korea Sanctions and Policy Enhancement Act of 2016','1834'}
+{'OFAC - North Korea Sanctions and Policy Enhancement Act of 2016','1834'},
+{'EC (CFSP) 2020/20 EU Terrorism List','1835'},
+{'EC 2020/19 Terrorism List','1836'}
 ],r);
 
