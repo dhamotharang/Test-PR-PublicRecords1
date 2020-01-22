@@ -35,7 +35,6 @@ histDate       := 0;
 
 dataRestrictionMask_val := '00000000000000000000';
 dataPermissionMask_val  := '00000000000100000000'; 			// For SBFE: '00000000000100000000' (pos 12 = '1')
-//  dataPermissionMask_val  := '00000000000000000000';	  // SBFE Not included: All 0's
 
 GLBA := '1';
 DPPA := '3';
