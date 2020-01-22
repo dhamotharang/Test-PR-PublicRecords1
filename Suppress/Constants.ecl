@@ -97,7 +97,7 @@ export Constants := module
 	
 	EXPORT Exemptions(STRING8 filedate='') := MODULE
 		//	Directory to Spray from
-		EXPORT STRING Directory				:= '/data/Builds/builds/ccpalogs/orbit/data/processing';
+		EXPORT STRING Directory				:= '/data/Builds/builds/ccpalogs/orbitoptout/data/processing';
 		EXPORT STRING GroupName				:= IF(	_control.thisenvironment.name='Dataland',
 													'THOR400_STA01',
 													'THOR400_36');					
