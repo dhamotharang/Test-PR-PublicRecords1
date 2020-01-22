@@ -1,42 +1,53 @@
-export Layouts_DL_CT_In := module
-  // In  record lenght 194
-	export Layout_CT_Update := record
-		string2	  orig_DLSTATE;
-		string9	  orig_DLNUMBER;
-		string35  orig_NAME;
-		string8	  orig_DOB;
-		string1	  orig_SEX;
-		string1	  orig_HEIGHT1;
-		string2	  orig_HEIGHT2;
-		string3	  orig_EYE_COLOR;
-		string61  orig_MAILADDRESS;
-		string6	  orig_CLASSIFICATION;
-		string5	  orig_ENDORSEMENTS;
-		string6	  orig_ISSUE_DATE;
-		string2	  orig_ISSUE_DATE_DD;
-		string6	  orig_EXPIRE_DATE;
-		string2	  orig_EXPIRE_DATE_DD;
-		string3	  orig_NONCDLSTATUS;
-		string3	  orig_CDLSTATUS;
-		string12  orig_RESTRICTIONS;
-		string8	  orig_ORIGDATE;
-		string8	  orig_ORIGCDLDATE;
-		string2	  orig_CANCELST;
-		string8	  orig_CANCELDATE;
-		string1   orig_Filler;
-		string2   orig_lf;
-	end;
-	
-	export Layout_CT_With_ProcessDte := record
-	    string8 Process_date;
-		Layout_CT_Update;
-	end;
+﻿Import Drivers;
 
-  export Layout_CT_cleaned := record
-	    string8 Process_date;
-		Layout_CT_Update -orig_Filler;
-		string73 temp_Clean_Name;
-		string182 temp_Clean_Address;
+export Layouts_DL_CT_In := module
+
+	export Layout_CT_Update := record
+		string2			CredentialState	;
+		string25		CredentialNumber	;
+		string40		LastName	;
+		string40		FirstName	;
+		string35			MiddleInitial	;
+		string5			Suffix	;
+		string1			Gender	;
+		string3			Height	;
+		string3			EyeColor	;
+		string8			Date_Birth	;
+		string35		ResiAddrStreet	;
+		string20		ResidencyCity	;
+		string2			ResidencyState	;
+		string9			ResidencyZip	; 
+		string35		MailAddrStreet	;
+		string20		MailingCity	;
+		string2			MailingState	;
+		string9			MailingZip	;		
+		string3			CredentialType	;
+		string1     Credential_Class;	
+		string5			Endorsements	;
+		string12		Restrictions	;
+		string8			ExpDate	;
+		string8			LastIssueRenewalDate	;
+		string8			Date_NonCDL	;
+		string8			OriginalDate_CDL	;
+		string3			StatusNONCDL;
+		string3			LicenseStatusCDL	;
+		string8			OriginalDate_LP	;
+		string8			OriginalDate_ID	;
+		string2			CancelState	;
+		string8			CancelDate	;
+		string8			CDLMediCertIssueDate	;
+		string8			CDLMediCertExpDate	;
 	end;
+   
+  export Layout_CT_Temp := record
+	
+	 Drivers.Layout_CT_Full;
+	 string35		Street	;
+	 string20		City	;
+	 string2		State	;
+	 string9		Zip	; 
+	 string1    addr_type;
+							 
+ 	end;
 
 end;
