@@ -1,4 +1,4 @@
-﻿import DriversV2;
+﻿import DriversV2, Scrubs, std ;
 
 //***** Usage :-
 //***** DriversV2.Mac_DL_Update_Spray
@@ -77,7 +77,7 @@ macro
 	                        %st%
 												))));
 
-	%recSize% := map(%subname% = 'CT'        => 196,
+	%recSize% := map(//%subname% = 'CT'        => 196,
 					 %subname% = 'LA'        => 151,
 					//%subname% = 'MA'        => 227,
 					//%subname% = 'ME'        => 309,
@@ -106,7 +106,7 @@ macro
 	//re-instated MO per Jill Luber 20090716
 	//%spray_raw% := if (%st% in ['CT', 'ME', 'MI', 'MN', 'MO', 'OH', 'TN', 'TX', 'WI', 'WV', 'WY'],
 	//%spray_raw% := if (%st% in ['CT', 'LA','ME', 'MI', 'MN','MO','NE','NV','OH', 'TN', 'TX', 'WI', 'WV', 'WY'],
-	%spray_raw% := if (%st% in ['CT', 'LA','ME', 'MI', 'MN','NE','NV','OH', 'TN', 'WI', 'WV', 'WY'] OR
+	%spray_raw% := if (%st% in ['LA','ME', 'MI', 'MN','NE','NV','OH', 'TN', 'WI', 'WV', 'WY'] OR
 	                   %subname% = 'MO_BASIC' OR %subname% = 'MO_ICISSU',
 						FileServices.SprayFixed(Source_IP
 												,source_path + file_name
@@ -217,7 +217,7 @@ macro
 
 	%scrub_files% := case(%subname%
 	                     ,'CT'             => DriversV2.Scrub_DL(filedate).CT
- 	                     ,'FL'             => DriversV2.Scrub_DL(filedate).FL
+											 ,'FL'             => DriversV2.Scrub_DL(filedate).FL
 	                     // ,'LA'             => DriversV2.Scrub_DL(filedate).LA
 	                     ,'MA'             => DriversV2.Scrub_DL(filedate).MA
 	                     ,'ME_MEDCERT'     => DriversV2.Scrub_DL(filedate).ME_MEDCERT
@@ -262,8 +262,8 @@ macro
 							FileServices.FinishSuperFileTransaction());
 
 	%add_AS_Dl_super% := if(FileServices.FindSuperFileSubName(DriversV2.Constants.cluster + 'in::dl2::As_DL_Mappers', DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'::'+filedate+'::As_DL') = 0, %super_As_DL%); 
-
-
+		
+	
 	sequential(%check_raw%, %IfnotCreate_RawSuper%, %add_Raw_super%, %check_clean%, %As_DL_mapper%, %scrub_files%, %IfnotCreate_CleanSuper%, %add_Clean_super%, %IfnotCreate_As_DL_Super%, %add_AS_Dl_super%
 						 ,NOTIFY((%st% + ' SPRAY COMPLETE FOR ' + filedate),'*'));
 #else
