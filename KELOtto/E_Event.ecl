@@ -226,7 +226,7 @@ EXPORT E_Event := MODULE
     RECORDOF(__d0__r_Internet_Protocol__Mapped);
     KEL.typ.uid _r_Bank_Account_;
   END;
-  SHARED __d0__r_Bank_Account__Mapped := JOIN(__d0__r_Internet_Protocol__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoBankAccountId) = RIGHT.KeyVal,TRANSFORM(__d0__r_Bank_Account__Layout,SELF._r_Bank_Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
+  SHARED __d0__r_Bank_Account__Mapped := JOIN(__d0__r_Internet_Protocol__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoBankAccountId) = RIGHT.KeyVal,TRANSFORM(__d0__r_Bank_Account__Layout,SELF._r_Bank_Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0__r_Drivers_License__Layout := RECORD
     RECORDOF(__d0__r_Bank_Account__Mapped);
     KEL.typ.uid _r_Drivers_License_;
