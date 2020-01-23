@@ -108,23 +108,9 @@ MODULE
   SHARED dSearchRecs := IF(IsPhoneRiskAssessment,
                             PROJECT(IF(EXISTS(dSearchRecs_pre), dSearchRecs_pre, dInputPhone), withInputphone(LEFT)),
                             dSearchRecs_pre_a);
-  //Populate all gateway sources
-  $.Layouts.PhoneFinder.Final getSource(PhoneFinder_Services.Layouts.PhoneFinder.Final l) :=
-  TRANSFORM
-    isLastResort       := IF(l.vendor_id in Royalty.Constants.LastResortRoyalty, [Royalty.Constants.LastResortRoyalty], []);
-    isEquifax          := IF(l.subj_phone_type_new = MDR.sourceTools.src_EQUIFAX, [MDR.sourceTools.src_EQUIFAX], []);
-    isInHouseQsent     := IF(l.src = MDR.sourceTools.src_Inhouse_QSent, [MDR.sourceTools.src_Inhouse_QSent], []);
-    isQsent_IQ411      := IF(l.typeflag = Phones.Constants.TypeFlag.DataSource_iQ411, [Phones.Constants.TypeFlag.DataSource_iQ411], []);
-    isTargus_PDE       := IF(l.TargusType = 'P', [MDR.sourceTools.src_Targus_Gateway], []);
-    gateway_sources    :=  DATASET([isLastResort + isEquifax + isInHouseQsent + isQsent_IQ411 + isTargus_PDE], $.Layouts.PhoneFinder.src_rec);
-    SELF.phn_src_all   :=  DEDUP(SORT(l.phn_src_all + gateway_sources, src), src);
-    SELF               := l;
-  END;
-
-  SHARED dSearchRecs_srcs := PROJECT(dSearchRecs, getSource(LEFT));
 
   // zumigo call
-  SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dSearchRecs_srcs, dInBestInfo, tmpMod, dGateways);
+  SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dSearchRecs, dInBestInfo, tmpMod, dGateways);
   dZumigo_recs := dZum_gw_recs.Zumigo_GLI; // zumigo records
 
   SHARED dZum_final := IF(tmpMod.UseZumigoIdentity, dZumigo_recs, dSearchRecs);
@@ -154,7 +140,7 @@ MODULE
   // Phone verfication, calculate PRIs
   SHARED dFinalResults_PRI := PhoneFinder_Services.GetPRIs(dPhoneMetadataResults, dInBestInfo, tmpMod, dGateways, dProcessInput);
 
-  SHARED dFinalResults_SRC := $.GetSourceInformation(dFinalResults_PRI);
+  SHARED dFinalResults := $.GetSourceInformation(dFinalResults_PRI);
 
   inputOptionCheck := tmpMod.IncludeInhousePhones OR tmpMod.IncludeTargus OR tmpMod.IncludeAccudataOCN OR
                       tmpMod.IncludeEquifax OR tmpMod.IncludeTransUnionIQ411 OR tmpMod.IncludeTransUnionPVS OR
@@ -170,7 +156,7 @@ MODULE
     OUTPUT(dPorted_Phones, NAMED('dPorted_Phones'));
     OUTPUT(dPhoneMetadataResults, NAMED('dPhoneMetadataResults'));
     OUTPUT(dFinalResults_PRI, NAMED('dFinalResults_PRI'));
-    OUTPUT(dFinalResults_SRC, NAMED('dFinalResults_SRC'));
+    OUTPUT(dFinalResults, NAMED('dFinalResults'));
   #END
 
   // Fail the service if multiple DIDs are returned for the search criteria OR if the phone number is not 10 digits OR if no records are returned
@@ -187,7 +173,7 @@ MODULE
       IsValidTransactionType AND ~inputOptionCheck  => FAIL(102, PhoneFinder_Services.Constants.ErrorCodes(102)));
 
   // Format to iesp layout
-  EXPORT dFormat2IESP := PhoneFinder_Services.Functions.FormatResults2IESP(dFinalResults_SRC, tmpMod);
+  EXPORT dFormat2IESP := PhoneFinder_Services.Functions.FormatResults2IESP(dFinalResults, tmpMod);
   // EXPORT dFormat2IESP := dataset([], iesp.phonefinder.t_PhoneFinderSearchRecord);
 
   //Deltabase Logging Dataset
