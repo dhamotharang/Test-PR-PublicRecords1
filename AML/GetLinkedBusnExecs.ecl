@@ -1,4 +1,4 @@
-﻿Import business_header, ut,PAW, RiskWise, doxie, Business_Risk, Business_Header_SS, did_add,Risk_Indicators, Address, Header,Relationship, Suppress, AML;
+﻿Import business_header, PAW, RiskWise, doxie, Business_Risk, Business_Header_SS, did_add,Risk_Indicators, Address, Header,Relationship, Suppress, AML;
 
 EXPORT GetLinkedBusnExecs(DATASET(Layouts.BusnLayoutV2) BusnIds, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
@@ -371,10 +371,10 @@ execBdidsBestAdded := join(DDBexecBdids, ExecBdidbest,
 	SDExecs_dids := PROJECT(SDExecs_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 
-	rellyids := Relationship.proc_GetRelationship(SDExecs_dids,TopNCount:=50,
+	rellyids := Relationship.proc_GetRelationshipNeutral(SDExecs_dids,TopNCount:=50,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result; 
 
-	Layouts.BusnExecsLayoutV2  Getparents(EverybodySD le, rellyids ri) := TRANSFORM
+	Layouts.BusnExecsLayoutV2  Getparents(EverybodySD le, Relationship.layout_GetRelationship.interfaceOutputNeutral ri) := TRANSFORM
 		
 			self.seq := le.seq;
 			self.Origbdid := le.Origbdid;

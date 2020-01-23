@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT MAC_MEOW_LocationID_Batch(infile,Ref = '',Input_LocId = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_v_city_name = '',Input_st = '',Input_zip5 = '',OutFile,AsIndex='true',UpdateIDs='false',Stats='') := MACRO
+EXPORT MAC_MEOW_LocationID_Batch(infile,Ref = '',Input_LocId = '',Input_prim_range = '',Input_predir = '',Input_prim_name_derived = '',Input_addr_suffix_derived = '',Input_postdir = '',Input_err_stat = '',Input_unit_desig = '',Input_sec_range = '',Input_v_city_name = '',Input_st = '',Input_zip5 = '',OutFile,AsIndex='true',UpdateIDs='false',Stats='') := MACRO
   #uniquename(ToProcess)
   IMPORT SALT37,LocationId_xLink;
   #uniquename(TPRec)
@@ -23,20 +23,25 @@ EXPORT MAC_MEOW_LocationID_Batch(infile,Ref = '',Input_LocId = '',Input_prim_ran
   #ELSE
     SELF.predir := (TYPEOF(SELF.predir))'';
   #END
-  #IF ( #TEXT(Input_prim_name) <> '' )
-    SELF.prim_name := (TYPEOF(SELF.prim_name))le.Input_prim_name;
+  #IF ( #TEXT(Input_prim_name_derived) <> '' )
+    SELF.prim_name_derived := (TYPEOF(SELF.prim_name_derived))le.Input_prim_name_derived;
   #ELSE
-    SELF.prim_name := (TYPEOF(SELF.prim_name))'';
+    SELF.prim_name_derived := (TYPEOF(SELF.prim_name_derived))'';
   #END
-  #IF ( #TEXT(Input_addr_suffix) <> '' )
-    SELF.addr_suffix := (TYPEOF(SELF.addr_suffix))le.Input_addr_suffix;
+  #IF ( #TEXT(Input_addr_suffix_derived) <> '' )
+    SELF.addr_suffix_derived := (TYPEOF(SELF.addr_suffix_derived))le.Input_addr_suffix_derived;
   #ELSE
-    SELF.addr_suffix := (TYPEOF(SELF.addr_suffix))'';
+    SELF.addr_suffix_derived := (TYPEOF(SELF.addr_suffix_derived))'';
   #END
   #IF ( #TEXT(Input_postdir) <> '' )
     SELF.postdir := (TYPEOF(SELF.postdir))le.Input_postdir;
   #ELSE
     SELF.postdir := (TYPEOF(SELF.postdir))'';
+  #END
+  #IF ( #TEXT(Input_err_stat) <> '' )
+    SELF.err_stat := (TYPEOF(SELF.err_stat))le.Input_err_stat;
+  #ELSE
+    SELF.err_stat := (TYPEOF(SELF.err_stat))'';
   #END
   #IF ( #TEXT(Input_unit_desig) <> '' )
     SELF.unit_desig := (TYPEOF(SELF.unit_desig))le.Input_unit_desig;
@@ -71,11 +76,12 @@ EXPORT MAC_MEOW_LocationID_Batch(infile,Ref = '',Input_LocId = '',Input_prim_ran
     SELF.UniqueId := le.UniqueId;
     SELF.prim_range := (TYPEOF(SELF.prim_range))le.prim_range;
     SELF.predir := (TYPEOF(SELF.predir))le.predir;
-    SELF.prim_name := (TYPEOF(SELF.prim_name))le.prim_name;
-    SELF.addr_suffix := (TYPEOF(SELF.addr_suffix))le.addr_suffix;
+    SELF.prim_name_derived := (TYPEOF(SELF.prim_name_derived))le.prim_name_derived;
+    SELF.addr_suffix_derived := (TYPEOF(SELF.addr_suffix_derived))le.addr_suffix_derived;
     SELF.postdir := (TYPEOF(SELF.postdir))le.postdir;
+    SELF.err_stat := (TYPEOF(SELF.err_stat))le.err_stat;
     SELF.unit_desig := (TYPEOF(SELF.unit_desig))le.unit_desig;
-    SELF.sec_range := (TYPEOF(SELF.sec_range))le.sec_range;
+    SELF.sec_range := (TYPEOF(SELF.sec_range))LocationId_xLink.Fields.Make_sec_range((SALT37.StrType)le.sec_range);
     SELF.v_city_name := (TYPEOF(SELF.v_city_name))le.v_city_name;
     SELF.st := (TYPEOF(SELF.st))le.st;
     SELF.zip5 := (TYPEOF(SELF.zip5))le.zip5;
@@ -97,18 +103,18 @@ EXPORT MAC_MEOW_LocationID_Batch(infile,Ref = '',Input_LocId = '',Input_prim_ran
   %OutputNewIDs% := DATASET([],LocationId_xLink.Process_LocationID_Layouts.LayoutScoredFetch);
 #END
   #uniquename(OutputSTATECITY)
-#IF(#TEXT(Input_v_city_name)<>'' AND #TEXT(Input_st)<>'' AND #TEXT(Input_prim_range)<>'' AND #TEXT(Input_prim_name)<>'')
+#IF(#TEXT(Input_v_city_name)<>'' AND #TEXT(Input_st)<>'' AND #TEXT(Input_prim_range)<>'' AND #TEXT(Input_prim_name_derived)<>'')
   #uniquename(HoldSTATECITY)
   %HoldSTATECITY% := %ToProcess%;
-  LocationId_xLink.Key_LocationId_STATECITY.MAC_ScoredFetch_Batch(%HoldSTATECITY%,UniqueId,v_city_name,st,prim_range,prim_name,sec_range,unit_desig,postdir,addr_suffix,predir,%OutputSTATECITY%,AsIndex)
+  LocationId_xLink.Key_LocationId_STATECITY.MAC_ScoredFetch_Batch(%HoldSTATECITY%,UniqueId,v_city_name,st,prim_range,prim_name_derived,sec_range,predir,postdir,addr_suffix_derived,unit_desig,err_stat,%OutputSTATECITY%,AsIndex)
 #ELSE
   %OutputSTATECITY% := DATASET([],LocationId_xLink.Process_LocationID_Layouts.LayoutScoredFetch);
 #END
   #uniquename(OutputZIP)
-#IF(#TEXT(Input_zip5)<>'' AND #TEXT(Input_prim_range)<>'' AND #TEXT(Input_prim_name)<>'')
+#IF(#TEXT(Input_zip5)<>'' AND #TEXT(Input_prim_range)<>'' AND #TEXT(Input_prim_name_derived)<>'')
   #uniquename(HoldZIP)
   %HoldZIP% := %ToProcess%;
-  LocationId_xLink.Key_LocationId_ZIP.MAC_ScoredFetch_Batch(%HoldZIP%,UniqueId,zip5,prim_range,prim_name,sec_range,unit_desig,postdir,addr_suffix,predir,%OutputZIP%,AsIndex)
+  LocationId_xLink.Key_LocationId_ZIP.MAC_ScoredFetch_Batch(%HoldZIP%,UniqueId,zip5,prim_range,prim_name_derived,sec_range,predir,postdir,addr_suffix_derived,unit_desig,err_stat,%OutputZIP%,AsIndex)
 #ELSE
   %OutputZIP% := DATASET([],LocationId_xLink.Process_LocationID_Layouts.LayoutScoredFetch);
 #END

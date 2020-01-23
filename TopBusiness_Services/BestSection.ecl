@@ -313,13 +313,18 @@ export BestSection := MODULE
 																																  self.company_incorporation_date :=
 																																	  (string8) left.company_incorporation_date;
 																																		))[1].company_incorporation_date;
-
-															year_started      := (integer) tmp_year_started_string[1..4]; // using from best file.
-
+ 
+                                                                              
+														
+                                                                                    year_startedIncorp :=  (integer) tmp_year_started_string[1..4]; // using from best file.
+                                                                                    year_startedFirstSeen := (integer) (((string8) (left.company_name[1].dt_first_seen))[1..4]);
+                                                                                    year_started := if (year_startedIncorp <>  0,  year_startedincorp, year_startedFirstSeen);
+                                                                      
 															tmpSource := project(left.company_incorporation_date,
 																				transform(BIPV2_Best.Layouts.company_incorporation_date_layout,
 																				      self.sources := left.sources;
 																						self := []));
+                                                                                                                            
                               self.YearStartedSourceDocID := project(tmpSource.Sources, transform({string50 sourceDocID},
 															                          self.sourceDocID := left.vl_id))[1].SourceDocID;
 
@@ -327,7 +332,8 @@ export BestSection := MODULE
 																												self.source := left.source;
 																										 ))[1].source;
 
-															tmpyears_inBusiness   := if (year_started <> 0, CurYear - year_started, 0);
+                              tmpyears_inBusiness   := if (year_started <> 0, if (left.company_name[1].dt_last_seen <> 0,
+                                                                                         ((unsigned4)  (((string8) (left.company_name[1].dt_last_seen))   [1..4])) - year_started, 0), 0);
                               self.Year_started     := year_started;
  															self.years_inBusiness := tmpyears_inBusiness;
 
@@ -339,7 +345,7 @@ export BestSection := MODULE
 
                                self.isActive := left.isActive;
 															 self.isDefunct := left.isDefunct;
-
+                                                                                
 															self := left;
 															));
 
@@ -443,24 +449,25 @@ export BestSection := MODULE
 		                     transform(iesp.topbusinessReport.t_TopBusinessBestOtherTins,
                                self := left));
 
+
     // set the isDefunct and IsActive fields using the DS obtained above.
 
 	  IsCompanyActiveRecs := join(ds_year_startedFromBest, CompActiveRecs,
 		     left.ultid = right.ultid AND
-				 left.orgid = right.orgid AND
-				 left.seleid = right.seleid,
-				    transform({recordof(left);},
+		     left.orgid = right.orgid AND
+		     left.seleid = right.seleid,
+		   transform({recordof(left);},
                self.YearStartedDerived := false;
                self.Fax := if (trim(right.phone_type, left,right) = 'F', right.company_phone, '');
-             self := left,
-						 self := []),
-						 left outer);
+               self := left,
+		    self := []),
+		left outer);
 
    // now sort header recs to bring the very first non zero dt_vendor_first_reported to the top
 	 // have to deal with any BIP header recs that have 6 digit dt_vendor_first_reported field so fix that so that sort remains true
 	 ds_BusHeaderRecsUCCdateFix := project(ds_BusHeaderRecs, transform(RECORDOF(LEFT),
 	                                                                        self.dt_vendor_first_reported := if (length((string) left.dt_vendor_first_reported) = 6,
-													                   left.dt_vendor_first_reported * 100, left.dt_vendor_first_reported);
+													             left.dt_vendor_first_reported * 100, left.dt_vendor_first_reported);
 														  self := left));
 		   CompActiveRecsLastReported := dedup(sort( ds_BusHeaderRecsUCCdateFix,ultid, orgid, seleid,
 	                                   if (dt_vendor_first_reported <> 0, 0, 1),
@@ -489,11 +496,10 @@ export BestSection := MODULE
 							                                if ( tmpDateVendorFirstReported  <> 0,
 																			         tmpDateVendorFirstReported,  0),
                                             left.year_started);
-                 Year_Started := if (left.year_started = 0, UseDerivedYearStarted, left.year_started);
-								 tmpyears_inBusiness   := if (year_started <> 0, CurYear - year_started, 0);
-							self.Year_started := Year_started;
-							self.years_inBusiness := if (left.isDefunct, 0,
-								                                           tmpYears_inBusiness);
+                 Year_Started := if (left.year_started = 0, UseDerivedYearStarted, left.year_started);								
+							self.Year_started := Year_started;							
+                                      self.years_inBusiness :=  left.years_inbusiness;
+								                                                                                   
               self.YearStartedDerived := UseDerivedYearStarted <> 0; // set accordingly
 								                                      // based on information in bug # : 119312
               self.yearStartedSource := if (Year_started <> 0, right.source, left.yearStartedSource);
@@ -501,6 +507,7 @@ export BestSection := MODULE
               self := left;
 						),
 			left outer);
+      
    // create a slimmed layout out of the phone information from best key
 	 // which will be used to set phone metadata based on lookup in gong history key
 
@@ -602,7 +609,7 @@ export BestSection := MODULE
 			self.Ticker := ''; //right.Ticker  field removed
 			self.Exchange := ''; //right.Exchange field removed
 			  tmpUrl := right.company_url[1].company_url;
-			  SlashPosition := stringlib.stringfind(tmpurl,'/',1);
+			  SlashPosition := stringlib.stringfind(tmpurl,'/',1);				
 			self.URL := if (tmpurl <> '' and SlashPosition > 1,  tmpUrl[1..slashPosition-1],
 			                                    tmpUrl);
 			self.Address.StreetNumber := right.company_address[1].company_prim_range,
@@ -639,15 +646,13 @@ export BestSection := MODULE
 			self.yearStartedDerived := right.YearStartedDerived;
 			self.YearsInBusiness   := (unsigned2)right.years_inBusiness,
 			self.IsDefunct         := right.IsDefunct;
-      self.IsActive := right.isActive;
-
+                self.IsActive := right.isActive;
 			self.countOtherTins := count(FinalTinVariations);
 			self.TotalCountOtherTins := if (count(FinalTinVariations) <=
 			                                        iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_FEINS,
 																							count(FinalTinVariations),
 																							iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_FEINS);
-
-      self.totalCountOtherCompanies := count(FinalCompanyNameVariations);
+                self.totalCountOtherCompanies := count(FinalCompanyNameVariations);
 			self.CountOtherCompanies := if (count(FinalCompanyNameVariations) <=
 			                                        iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_OTHER_COMPANIES,
 																							count(FinalCompanyNameVariations),
@@ -655,7 +660,11 @@ export BestSection := MODULE
 															 // boolean option to add these 2 DS (finalccompanynamevariations and
 															                         // finalTinVariations  is taken care above.
 			self.OthercompanyNames := choosen(FinalCompanyNameVariations ,iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_OTHER_COMPANIES);
-			self.OthercompanyTins := choosen(FinalTinVariations ,iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_OTHER_COMPANIES);
+			self.OthercompanyTins := choosen(FinalTinVariations ,iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_OTHER_COMPANIES);              
+               self.AddressFromDate := iesp.ECL2ESP.toDate(RIGHT.company_name[1].dt_first_seen);
+               self.AddressToDate :=  iesp.ECL2ESP.toDate(RIGHT.company_name[1].dt_last_seen);            
+               self.BestSicCode   :=  right.sic_code[1].company_sic_code1;
+               Self.BestNaicsCode := right.naics_code[1].company_naics_code1;
 			self := []),
 			left outer
 			);
@@ -685,8 +694,7 @@ export BestSection := MODULE
 													    and
 				                   (ut.StringSimilar(left.CompanyName ,right.listed_name) <= TopBusiness_Services.Constants.STRINGSIMILARCONSTANT));
 
-			 self.IsDefunct :=// OVERRIDE BUS HEADER DATA
-                           left.isDefunct and NOT(right.active_EDA = 'Y');
+			 self.IsDefunct := left.IsDefunct and (NOT(right.active_EDA = 'Y' and right.phone_type = 'B'));
 			 self := left),
 		 left outer);
 
@@ -741,7 +749,7 @@ export BestSection := MODULE
 		// output(FinalTinVariations, named('FinalTinVariations'));
 		// output(best_final_records_suppressedFein, named('best_final_records_suppressedFein'));
 		//output(ds_phone_final, named('ds_phone_final'));
-		//output(ds_final_records, named('ds_final_records'));
+		// output(ds_final_records, named('ds_final_records'));
 
 		return ds_final_records;
 	end;

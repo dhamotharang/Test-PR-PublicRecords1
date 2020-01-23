@@ -1,4 +1,4 @@
-import bipv2_best,bipv2;
+﻿import bipv2_best,bipv2;
 
 EXPORT Layouts :=
 module
@@ -63,6 +63,10 @@ RECORD
     string20 segmentation};
     
   export BIP_Owners := {h.ultid, h.orgid, h.seleid, h.proxid, h.company_name, h.fname, h.mname, h.lname, h.name_suffix,h.contact_did, h.contact_type_derived,h.prim_range,h.predir,h.prim_name,h.addr_suffix,h.postdir,h.unit_desig,h.sec_range,h.v_city_name,h.st,h.zip,h.zip4,h.contact_ssn};
-
+ 
+ export HighRiskCodesListLayout := record
+    string10 code;
+	string5 code_type;
+  end;
 
 end;

@@ -271,7 +271,9 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		 Options.IncludeProxAddress or
 		 Options.IncludeProxPhoneNumber or
 		 Options.IncludeTINPhone or
-		 Options.IncludeTINAddress );
+		 Options.IncludeTINAddress or
+		 Options.IncludeTradeline or
+		 Options.IncludeSeleTradeline);
 
 	EXPORT DoFDCJoin_Corp2__Key_LinkIDs_Corp := 
 		NOT Options.IsFCRA AND (

@@ -1,20 +1,21 @@
-﻿IMPORT Doxie, Gateway, iesp, Royalty;
+﻿IMPORT Doxie, dx_gateway, Gateway, iesp, Royalty;
 
-EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in, 
+EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
                         Gateway.Layouts.Config gateway_cfg,
                         INTEGER timeout=Gateway.NetwiseSearch.Constants.GW_TIMEOUT,
                         INTEGER retries=Gateway.NetWiseSearch.Constants.GW_RETRIES,
                         BOOLEAN makeGatewayCall = FALSE,
-                        Doxie.IDataAccess mod_access = MODULE (Doxie.IDataAccess) END
-                        //, BOOLEAN apply_opt_out = FALSE // CCPA opt out/Future use???
+                        Gateway.NetWiseSearch.IParams.SearchParams in_mod //,
+                        //BOOLEAN apply_opt_out = FALSE // CCPA opt out use
                        ) := FUNCTION
 
-  // Use a transform to set the soap input request.
-  iesp.net_wise.t_NetWiseQueryRequest tf_IntoRequest(
-                                      iesp.net_wise.t_NetWiseQueryRequest L) := TRANSFORM 
+  // Use a transform to set certain fields.
+  iesp.net_wise.t_NetWiseQueryRequest tf_IntoRequest(iesp.net_wise.t_NetWiseQueryRequest L)
+                                      := TRANSFORM 
  
-    SELF.User.ReferenceCode := if(L.User.ReferenceCode<>'', L.User.ReferenceCode, 
+    SELF.User.ReferenceCode := if(L.User.ReferenceCode<>'', TRIM(L.User.ReferenceCode), 
                                                             gateway_cfg.TransactionId),
+
     // Royalty tracking
     SELF.GatewayParams.TxnTransactionId := Gateway.Configuration.GetTransactionIdX(gateway_cfg);
     SELF.GatewayParams.BatchJobId       := Gateway.Configuration.GetBatchJobId(gateway_cfg);
@@ -30,8 +31,8 @@ EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
 
     SELF.Options.Blind := Gateway.Configuration.GetBlindOption(gateway_cfg);
 
-   // Need to fill in the correct AppId info ESP is expecting
-    SELF.SearchBy.AppId := Gateway.NetwiseSearch.Constants.APPID_VIR_TEXT;
+    // Need to fill in the correct AppId info ESP is expecting
+    SELF.SearchBy.AppId := in_mod.AppId; 
    
     SELF := L;
   END;
@@ -65,8 +66,8 @@ EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
                                  )
                         );
 
-  // Handle soapmessage and put the soapcall output back onto the ...ResponseEx layout 
-  iesp.net_wise.t_NetWiseQueryResponseEx tf_FormatFail(rec_extended_response L) := TRANSFORM
+  // Handle soapmessage and put the soapcall output back onto the ...ResponseEx
+  iesp.net_wise.t_NetWiseQueryResponseEx tf_Format_sc_out(rec_extended_response L) := TRANSFORM
 
     rec := RECORD  
       STRING  Source   := XMLTEXT('Source');
@@ -84,21 +85,27 @@ EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
     SELF := L;
   END;
 
-	ds_final_out := PROJECT(ds_soapcall_out,tf_FormatFail(LEFT));
-
-  // Outputs for debugging.  Un-comment them as needed!
-  //OUTPUT(ds_recs_in,        named('ds_recs_in'));
-  //OUTPUT(gateway_cfg.url,   named('gateway_url'));
-  //OUTPUT(ds_soap_request,   named('ds_soap_request'));
-  //OUTPUT(ds_soapcall_out,   named('ds_soapcall_out'));
-  //OUTPUT(ds_final_out,      named('ds_final_out'));
-
-  RETURN ds_final_out;
+	ds_final_out := PROJECT(ds_soapcall_out,tf_format_sc_out(LEFT));
 
   // FOR FUTURE(Phase 2) use when CCPA opt-out coding is implemented???
   /* v--- an example copied from Gateway.SoapCall_Targus
   d_recs_out_clean := dx_gateway.parser_targus.CleanResponse(d_recs_out, mod_access);
   return IF(apply_opt_out, d_recs_out_clean, d_recs_out);
   */
+  //apply_opt_out = TRUE; // for initial phase 2 testing???
+  // //Project in_mod onto Doxie.IDataAccess to strip off 'gateways' dataset and special ESP_AppID param
+  //mod_access := PROJECT(in_mod, Doxie.IDataAccess); 
+  //ds_final_out_clean := dx_gateway.parser_netwise.fn_CleanResponse(ds_final_out, mod_access);
+
+  // Outputs for debugging.  Un-comment them as needed!
+  //OUTPUT(ds_recs_in,        named('ds_recs_in'));
+  //OUTPUT(gateway_cfg,       named('gateway_cfg'));
+  //OUTPUT(ds_soap_request,   named('ds_soap_request'));
+  //OUTPUT(ds_soapcall_out,   named('ds_soapcall_out'));
+  //OUTPUT(ds_final_out,      named('ds_final_out'));
+  //OUTPUT(ds_final_out_clean, named('ds_final_out_clean'));
+
+  RETURN ds_final_out;  //phase 1; revise for Phase2, see below
+  //RETURN IF(apply_opt_out, ds_final_out_clean, ds_final_out); //phase 2???
 
 END;

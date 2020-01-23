@@ -1,5 +1,5 @@
 ﻿IMPORT autostandardI, BIPV2, BIPV2_Best,
-  BIPV2_WAF, BusinessCredit_Services, Census_Data, Doxie,
+  BIPV2_WAF, Census_Data, Doxie,
   gong, iesp, MDR, std, Suppress, TopBusiness_Services, ut;
 
 EXPORT BusinessSearch_Records := MODULE
@@ -21,9 +21,13 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 
  string6 ssn_mask_value := mod_access.ssn_mask;
 
-		string8 CurDate  := (STRING8) std.Date.Today();
-		BOOLEAN useBusinessCreditSorting := BusinessCredit_Services.Functions.fn_useBusinessCredit( global_mod.dataPermissionMask, In_Options.IncludeBusinessCredit );
-
+		string8 CurDate  := (STRING8) std.Date.Today();		
+           Boolean   useBusinessCreditSorting  := AutoStandardI.DataPermissionI.val(
+           MODULE( AutoStandardI.DataPermissionI.params )
+			EXPORT dataPermissionMask := global_mod.dataPermissionMask;
+		END
+                  ).use_SBFEData AND In_Options.IncludeBusinessCredit;
+                  
 		// needed for project into userpermits for salt WAF (we also found) key.
 		in_mod_WAF_KEY := PROJECT(global_mod, BIPV2.mod_sources.iParams,OPT);
 		unsigned userpermits_SALT := BIPV2.mod_sources.in_mod_values(in_mod_WAF_KEY).my_bmap;
@@ -1127,12 +1131,12 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 							 self.FromDate := tmpFromDate;
 						   self.ToDate := tmpToDate;
 
-							 // override the header data with phone data if we have it.
-							 // only if particular row on header has the companyPhone data will this override take place
+							 // override the header data with phone data if we have it for defunct
+							 // only if particular row on header has an active phone and that phone is a companyPhone  will this override take place
 							 // ** THESE 2 fields isActive and isDefunct not displayed on the BIP GUI.
 							 //
 							 self.isActive := left.isActive OR tmp_active_eda;
-							 self.IsDefunct := left.isDefunct and not(tmp_active_eda);
+							 self.IsDefunct := left.isDefunct and (not(tmp_active_eda and tmp_listing_type  ='B'));
 							 self := left;
 						));
 
@@ -1179,8 +1183,10 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 				                   (ut.StringSimilar(tmpcname ,right.listed_name) <= TopBusiness_Services.Constants.STRINGSIMILARCONSTANT));
 				 //                         and gongLinkidsHasCurrentPhone);
 			                             // for isActive and isDefunct
-			                             // using phone data to override the best data (i.e. header data even though from SELEIDBEST EXPORT)
-         self.Best.IsDefunct := left.Best.isDefunct and NOT(right.active_EDA = 'Y'); // and gongLinkidskeyOverride)
+			                             // using phone data to override the best data (i.e. header data even though from SELEIDBEST EXPORT)         
+         
+         self.Best.IsDefunct := left.Best.isDefunct and (NOT(right.active_EDA = 'Y' and right.listing_type = 'B'));
+                               
 			   self := left;
 			   self := []),
 		   left outer);
@@ -1389,8 +1395,9 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 //		output(SourceDNBDMISingleTonSELEIDsInSearchResults, named('SourceDNBDMISingleTonSELEIDsInSearchResults'));
 
 		// output(topResultsPreSuppress, named('topResultsPreSuppress'));
+           // output(topResults, named('TopResults'));
 		// output(tmpTopResultsScored, named('tmpTopResultsScored'));
-//		output(topResults, named('TopResults'));
+	
 		// output(topResultsScored_ultProxidFilter, named('topResultsScored_ultProxidfilter'));
 		// output(topResultsScored_orgidDiffProxid, named('topResultsScored_orgidDiffProxid'));
 //	  output(possible_Lafn, named('possible_lafn'));

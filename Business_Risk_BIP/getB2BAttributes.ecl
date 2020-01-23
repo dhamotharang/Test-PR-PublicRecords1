@@ -52,7 +52,7 @@ EXPORT getB2BAttributes(
     EXPORT BOOLEAN IncludeAddress := FALSE;
     EXPORT BOOLEAN IncludeAircraft := FALSE;
     EXPORT BOOLEAN IncludeBankruptcy := FALSE;
-    EXPORT BOOLEAN IncludeBusinessSele := TRUE;
+    EXPORT BOOLEAN IncludeBusinessSele := FALSE;
     EXPORT BOOLEAN IncludeBusinessProx := FALSE;
     EXPORT BOOLEAN IncludeCriminalOffender := FALSE;
     EXPORT BOOLEAN IncludeCriminalOffense := FALSE;

@@ -535,7 +535,7 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version2.AssociateCurrSOSCount := attr.AssociateCurrSOSCount;
     SELF.Version2.SourceIndex := attr.SourceIndex;    
 
-    // SBA Version 2.1 Attributes (357) 
+    // SBA Version 2.1 Attributes (373) 
 		SELF.Version21.LNLexIDSELE := attr.LNLexIDSELE;
 		SELF.Version21.InputCheckBusName := attr.InputCheckBusName;
 		SELF.Version21.InputCheckBusAltName := attr.InputCheckBusAltName;
@@ -548,6 +548,7 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.InputCheckBusFax := attr.InputCheckBusFax;
 		SELF.Version21.InputCheckBusNAICS := attr.InputCheckBusNAICS;
 		SELF.Version21.InputCheckBusSIC := attr.InputCheckBusSIC;
+		SELF.Version21.InputCheckBusAge := attr.InputCheckBusAge;
 		SELF.Version21.InputCheckAuthRepFirstName := attr.InputCheckAuthRepFirstName;
 		SELF.Version21.InputCheckAuthRepMiddleName := attr.InputCheckAuthRepMiddleName;
 		SELF.Version21.InputCheckAuthRepLastName := attr.InputCheckAuthRepLastName;
@@ -601,6 +602,7 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.VerificationBusInputPhone := attr.VerificationBusInputPhone;
 		SELF.Version21.VerificationBusInputTIN := attr.VerificationBusInputTIN;
 		SELF.Version21.VerificationBusInputIndustry := attr.VerificationBusInputIndustry;
+		SELF.Version21.BusinessAddrCount := attr.BusinessAddrCount;
 		SELF.Version21.BusinessRecordTimeOldest := attr.BusinessRecordTimeOldest;
 		SELF.Version21.BusinessRecordTimeNewest := attr.BusinessRecordTimeNewest;
 		SELF.Version21.BusinessRecordUpdated12M := attr.BusinessRecordUpdated12M;
@@ -612,10 +614,18 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.FirmAgeObserved := attr.FirmAgeObserved;
 		SELF.Version21.FirmEmployeeCount := attr.FirmEmployeeCount;
 		SELF.Version21.FirmEmployeeRangeCount := attr.FirmEmployeeRangeCount;
-		SELF.Version21.FirmOwnershipType := attr.FirmPublicFlag; // This assignment is correct despite having a diffferent name.
+		SELF.Version21.FirmOwnershipType := attr.FirmPublicFlag; // This assignment is correct despite having a different name.
 		SELF.Version21.FirmReportedSales := attr.FirmReportedSales;
 		SELF.Version21.FirmReportedSalesRange := attr.FirmReportedSalesRange;
+		SELF.Version21.FirmReportedEarnings := attr.FirmReportedEarnings;
 		SELF.Version21.FirmParentCompanyInd := attr.FirmParentCompanyInd;
+		SELF.Version21.OrgLocationCount := attr.OrgLocationCount;
+		SELF.Version21.OrgRelatedCount := attr.OrgRelatedCount;
+		SELF.Version21.OrgLegalEntityCount := attr.OrgLegalEntityCount;
+		SELF.Version21.OrgAddrLegalEntityCount := attr.OrgAddrLegalEntityCount;
+		SELF.Version21.OrgSingleLocation := attr.OrgSingleLocation;
+		SELF.Version21.SOSTimeAgentChange := attr.SOSTimeAgentChange;
+		SELF.Version21.SOSForeignStateFlag := attr.SOSForeignStateFlag;
 		SELF.Version21.SOSIncorporationFilingsCount := attr.SOSIncorporationFilingsCount;
 		SELF.Version21.SOSIncorporationTimeOldest := attr.SOSIncorporationTimeOldest;
 		SELF.Version21.SOSStateCount := attr.SOSStateCount;
@@ -663,6 +673,7 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.JudgmentsSuitsTotalAmount := attr.JudgmentsSuitsTotalAmount;
 		SELF.Version21.JudgmentsOtherCount := attr.JudgmentsOtherCount;
 		SELF.Version21.JudgmentOtherTotalAmount := attr.JudgmentOtherTotalAmount;
+		SELF.Version21.LienJudgmentDollarTotal := attr.LienJudgmentDollarTotal;
 		SELF.Version21.AssetPropCountEver := attr.AssetPropCountEver;
 		SELF.Version21.AssetPropCountCurrent := attr.AssetPropCountCurrent;
 		SELF.Version21.AssetPropStateCountCurrent := attr.AssetPropStateCountCurrent;
@@ -689,6 +700,9 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.InquiryHighRiskCount12M := attr.InquiryHighRiskCount12M;
 		SELF.Version21.InquiryOtherCount03M := attr.InquiryOtherCount03M;
 		SELF.Version21.InquiryOtherCount12M := attr.InquiryOtherCount12M;
+		SELF.Version21.InquiryConsumerAddress := attr.InquiryConsumerAddress;
+		SELF.Version21.InquiryConsumerPhone := attr.InquiryConsumerPhone;
+		SELF.Version21.InquiryConsumerAddressSSN := attr.InquiryConsumerAddressSSN;
 		SELF.Version21.BusExecLinkRepNameOnFile := attr.BusExecLinkRepNameOnFile;
 		SELF.Version21.BusExecLinkRepAddrOnFile := attr.BusExecLinkRepAddrOnFile;
 		SELF.Version21.BusExecLinkRepPhoneOnFile := attr.BusExecLinkRepPhoneOnFile;
@@ -741,6 +755,7 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.InputBusAddrCurrentCount := attr.InputBusAddrCurrentCount;
 		SELF.Version21.InputAddrTINCount := attr.InputAddrTINCount;
 		SELF.Version21.InputBusNameOtherBusNameMatch := attr.InputBusNameOtherBusNameMatch;
+		SELF.Version21.InputAddrSourceCount := attr.InputAddrSourceCount;
 		SELF.Version21.InputAddrType := attr.InputAddrType;
 		SELF.Version21.InputAddrZipMismatch := attr.InputAddrZipMismatch;
 		SELF.Version21.InputAddrVacancy := attr.InputAddrVacancy;
@@ -765,6 +780,7 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.AssociateCountWithLien := attr.AssociateCountWithLien;
 		SELF.Version21.AssociateJudgmentCount := attr.AssociateJudgmentCount;
 		SELF.Version21.AssociateCountWithJudgment := attr.AssociateCountWithJudgment;
+		SELF.Version21.AssociateWatchlistCount := attr.AssociateWatchlistCount;
 		SELF.Version21.AssociateCityCount := attr.AssociateCityCount;
 		SELF.Version21.AssociateCountyCount := attr.AssociateCountyCount;
 		SELF.Version21.AssociateHighRiskAddrCount := attr.AssociateHighRiskAddrCount;
@@ -892,7 +908,7 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.B2BActv1pDpdBalTotGrow1Y := attr.B2BActv1pDpdBalTotGrow1Y;
 		SELF.Version21.B2BActv31pDpdBalTotGrow1Y := attr.B2BActv31pDpdBalTotGrow1Y;
 		SELF.Version21.B2BActv61pDpdBalTotGrow1Y := attr.B2BActv61pDpdBalTotGrow1Y;
-		SELF.Version21.B2BActv91pDpdBalTotGrow1Y := attr.B2BActv91pDpdBalTotGrow1Y;	
+		SELF.Version21.B2BActv91pDpdBalTotGrow1Y := attr.B2BActv91pDpdBalTotGrow1Y;
 
 		// SBFE data
 		SELF.SBFEHitIndex := attr.SBFEHitIndex;
