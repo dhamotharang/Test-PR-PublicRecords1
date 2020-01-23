@@ -1,6 +1,6 @@
 ﻿IMPORT SALT39,STD;
 EXPORT NAC_hygiene(dataset(NAC_layout_NAC) h) := MODULE
- 
+
 //A simple summary record
 EXPORT Summary(SALT39.Str30Type  txt) := FUNCTION
   SummaryLayout := RECORD
@@ -86,7 +86,7 @@ EXPORT Summary(SALT39.Str30Type  txt) := FUNCTION
   END;
   RETURN TABLE(T,R1);
 END;
- 
+
 summary0 := Summary('Summary');
   invRec := RECORD
   UNSIGNED  FldNo;
@@ -139,11 +139,12 @@ SHARED FldIds := DATASET([{1,'SearchAddress1StreetAddress1'}
       ,{17,'ClientPhone'}
       ,{18,'ClientEmail'}],SALT39.MAC_Character_Counts.Field_Identification);
 EXPORT AllProfiles := SALT39.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
- 
+
 EXPORT SrcProfiles := SALT39.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
- 
+
 EXPORT Correlations := SALT39.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
- 
+
+
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
   UNSIGNED1 ErrorNum;
@@ -189,13 +190,13 @@ EXPORT ValidityErrors := ValErr;
 EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRUE) := FUNCTION
   myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   fieldPopulationOverall := Summary('');
- 
+
   SALT39.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_FraudGov, NAC_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
- 
+
   fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
   fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT39.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
   allProfiles_Standard := IF(doAllProfiles, SALT39.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
- 
+
   RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & allProfiles_Standard;
 END;
 END;
