@@ -1281,6 +1281,7 @@
 				trim(kword, left, right) = 'PHAMLC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHAMLC,
 				trim(kword, left, right) = 'PHDOF-IC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHDOF_IC,
 				trim(kword, left, right) = 'PKCNGOA' =>SubGroup_Constants.numKeywordsID.KEYWORD_PKCNGOA,
+				trim(kword, left, right) = 'LUICIJ-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_LUICIJ_WC,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
