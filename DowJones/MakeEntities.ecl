@@ -28,8 +28,8 @@ dXgNamed := JOIN(dXg, DowJones.ExtractNames(NameType='Primary Name'), LEFT.id = 
 		self := LEFT;),
 								LEFT OUTER, NOSORT, KEEP(1), LOCAL);
 							
-
-dXg1 := JOIN(dXgNamed, DowJones.Functions.RollupNames,LEFT.id = RIGHT.ID,
+akanames := DISTRIBUTE(CHOOSEN(Functions.RollupNames, 256), (integer)id);
+dXg1 := JOIN(dXgNamed, akanames, LEFT.id = RIGHT.ID,
 				TRANSFORM(Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp,
 						self.aka_list.aka := RIGHT.aka;
 						SELF := LEFT;), LEFT OUTER, LOCAL);
@@ -45,15 +45,16 @@ dXg1 := JOIN(dXgNamed, DowJones.Functions.RollupNames,LEFT.id = RIGHT.ID,
 								 Functions.GetSources & Functions.GetVessels
 									& GetSanctionsAsAddlInfo,(integer)id)
 								,id,LOCAL);
-	addlinfo := CHOOSEN(ROLLUP(	info,			
-							id, rollInfo(left, right),local),256);
+	addlinfo := DISTRIBUTE(CHOOSEN(ROLLUP(	info,			
+							id, rollInfo(left, right),local), 256), (integer)id);
 
 	dXg2 := JOIN(dXg1, addlinfo,LEFT.id = RIGHT.ID,
 				TRANSFORM(Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp,
 						self.additional_info_list.additionalinfo := RIGHT.additionalinfo;
 						SELF := LEFT;), LEFT OUTER, LOCAL);
 
-	dXg3 := JOIN(dXg2, DowJones.Functions.GetIdsAsIdlist,LEFT.id = RIGHT.ID,
+IdList := DISTRIBUTE(CHOOSEN(Functions.GetIdsAsIdlist, 256), (integer)id);
+	dXg3 := JOIN(dXg2, IdList,LEFT.id = RIGHT.ID,
 				TRANSFORM(Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp,
 						self.identification_list.identification := RIGHT.identification;
 						SELF := LEFT;), LEFT OUTER, LOCAL);
@@ -66,7 +67,7 @@ dXg1 := JOIN(dXgNamed, DowJones.Functions.RollupNames,LEFT.id = RIGHT.ID,
 			end;
 
 	addr :=	SORT(Functions.GetAddressesEntities(File_Entity),id,LOCAL);
-	addresses := ROLLUP(addr,	id, rollAddr(left, right), local);
+	addresses := DISTRIBUTE(CHOOSEN(ROLLUP(addr,	id, rollAddr(left, right), local), 256), (integer)id);
 	dXg4 := JOIN(dXg3, addresses,LEFT.id = RIGHT.ID,
 				TRANSFORM(Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp,
 						self.address_list.address := RIGHT.address;
