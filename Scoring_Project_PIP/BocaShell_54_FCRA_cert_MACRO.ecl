@@ -87,26 +87,17 @@
 			ds_soap_output := Scoring_Project_PIP.test_BocaShell_SoapCall(PROJECT (ds_soap_in, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
 		                                                                                             bs_service, fcraroxieIP, threads);
 
-			//GLOBAL OUTPUT LAYOUT
-			// Global_output_lay:= RECORD	 
-			// Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout;			 
-			// END;
+		//	GLOBAL OUTPUT LAYOUT
+			Global_output_lay:= RECORD	 
+			Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout;			 
+			END;
 
-//added  global output layout for Boca54
-   Global_output_lay_54	:= RECORD 
-	  Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout_54
-	   END;
 
-			// Global_output_lay trans(ds_soap_output le, layout_soap_input ri) :=	TRANSFORM
-			// SELF.AccountNumber := ri.old_account_number;
-			// SELF := le;
-			// END;
-			
-//added for  Boca54
-Global_output_lay_54 trans(ds_soap_output le, layout_soap_input ri) :=	TRANSFORM
+			Global_output_lay trans(ds_soap_output le, layout_soap_input ri) :=	TRANSFORM
 			SELF.AccountNumber := ri.old_account_number;
 			SELF := le;
 			END;
+			
 
 			ds_soap_output_pjt := JOIN (ds_soap_output,ds_soap_in,LEFT.seq=(unsigned)RIGHT.accountnumber,trans(LEFT,RIGHT));
 
