@@ -14,6 +14,7 @@ lECL1 :=
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'#OPTION(\'defaultSkewError\', 1);\n'
 +'wuname := \'FraudGov Data Build\';\n'
++'#WORKUNIT(\'protect\', true);\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
