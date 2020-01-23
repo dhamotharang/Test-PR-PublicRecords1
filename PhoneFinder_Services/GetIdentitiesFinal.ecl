@@ -50,6 +50,7 @@ FUNCTION
     SELF.st                      := IF(isAddrMissing, ri.st, le.st);
     SELF.zip                     := IF(isAddrMissing, ri.zip, le.zip);
     SELF.zip4                    := IF(isAddrMissing, ri.zip4, le.zip4);
+    SELF.phn_src_all             := le.phn_src_all + ri.phn_src_all;
     SELF                         := le;
   END;
 
@@ -189,6 +190,7 @@ FUNCTION
     OUTPUT(dIdentityTopn, NAMED('dIdentityTopn'), EXTEND);
     IF(doVerify, OUTPUT(dOtherRecs, NAMED('dOtherRecs'), EXTEND));
     OUTPUT(dIdentityRecs, NAMED('dIdentityRecs'), EXTEND);
+    IF(doVerify, OUTPUT(dFormat2BatchIn, NAMED('dFormat2BatchIn_Verify'), EXTEND));
     OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo'), EXTEND);
     OUTPUT(dIdentitiesFinal, NAMED('dIdentitiesFinal'), EXTEND);
     OUTPUT(dPrimaryAddressByZip, NAMED('dPrimaryAddressByZip'), EXTEND);

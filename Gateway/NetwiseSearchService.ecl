@@ -1,27 +1,21 @@
 ﻿/*
-  Stand-alone gateway 'wrapper' service to hit the NetWise Data gateway, 
+  Stand-alone gateway 'wrapper' service to hit the NetWise Data Email gateway, 
   which will be used for the Accurint Virtual Identity Report V2 online product.
 */
 
 EXPORT NetwiseSearchService() := MACRO
 
   #WEBSERVICE(FIELDS(	
-  /*---- Compliance Fields ----*/ // not needed for phase1, but may be needed for phase 2 CCPA changes???
-  //'DataPermissionMask',
-  //'DataRestrictionMask',
-  //'DPPAPurpose',
-  //'GLBPurpose',
-
-  /*---- Other Fields ----*/
-  'NetwiseQueryRequest',
+  'NetwiseEmailSearchRequest',
   'gateways'
   ));
 
   IMPORT Gateway, iesp, Royalty, ut;
 
   // Input request
-  ds_request_in := 
-     DATASET([], iesp.net_wise.t_NetWiseQueryRequest) : STORED('NetWiseQueryRequest', FEW);
+  // NOTE: ESP>Roxie/query request input layout is in the iesp.net_wise_search attribute
+  // whereas the query > gateway input request  is in the iesp.net_wise attribute; which is used in Gateway.SoapCall_NetWise
+  ds_request_in := DATASET([], iesp.net_wise_search.t_NetWiseEmailSearchRequest) : STORED('NetWiseEmailSearchRequest', FEW);
 
   first_row := ds_request_in[1] : INDEPENDENT;
 	iesp.ECL2ESP.SetInputUser(first_row.user);

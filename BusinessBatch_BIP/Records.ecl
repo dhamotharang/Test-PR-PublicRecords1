@@ -1,4 +1,4 @@
-﻿IMPORT AutoKeyI, BIPV2, BusinessBatch_BIP, Business_Risk_BIP, MDR, ut, AutoStandardI;
+﻿IMPORT AutoKeyI, BIPV2, BIPV2_Best, Business_Risk_BIP, BusinessBatch_BIP, MDR, ut;
 
 EXPORT Records( DATASET(BusinessBatch_BIP.Layouts.Input_Processed) ds_BatchIn,
                 BusinessBatch_BIP.iParam.BatchParams               inMod
@@ -8,7 +8,7 @@ FUNCTION
   // Identify marketing and append mode
   marketing_mode := inMod.ExcludeMarketing;
   append_mode := (inMod.Use_Append OR marketing_mode);      // marketing mode will always use bip append
-
+  
   // Passthrough records are those that supply BIP ids directly and don't require a search
   is_valid_passthrough := ds_BatchIn.seleid <> 0;
 
@@ -89,8 +89,10 @@ END;
 
   // append version
   // note - if marketing flag is set, the output should contain no marketing data
-  ds_BestInfoApp_pre := BusinessBatch_BIP.Functions(inMod).AppendBest(ds_AppIds, 
-    BIPV2.IdConstants.Fetch_Level_SELEID, isMarketing := marketing_mode);
+  ds_BestInfoApp_pre := 
+    BusinessBatch_BIP.Functions(inMod).AppendBestSeleProx(ds_AppIds, 
+                                                          isMarketing := marketing_mode);
+
   ds_BestInfoApp_post := ds_BestInfoApp_pre(trim(company_name) <> '');
   ds_BestInfoApp_all := PROJECT(ds_BestInfoApp_post, 
     TRANSFORM(recordof(ds_BestInfoTmp_all), 
@@ -962,6 +964,51 @@ END;
       SELF := []));
 
   ds_DCAInfo2FinalSorted := SORT(ds_DCAInfo2FinalWithErr, acctno, -weight, -record_score, RECORD);
+  
+  // assign records to be out based on "BestOnly" option, then append the ProxId information
+  ds_RecsForOutput := IF(inmod.BestOnly,ds_HeaderInfoAll,ds_DCAInfo2FinalSorted);
+  
+  BusinessBatch_BIP.Layouts.Final xfm_addProxIdInfo(BusinessBatch_BIP.Layouts.FinalWithLinkIds inMainRecs, 
+                                                    RECORDOF(ds_BestInfoApp_pre) inProxRecs ) :=
+  TRANSFORM
+    SELF.selescore := inProxRecs.selescore;
+    SELF.proxID := inProxRecs.proxid;
+    SELF.proxscore := inProxRecs.proxscore;
+    SELF.proxId_Comp_Name := inProxRecs.proxId_Comp_Name;
+    SELF.proxId_Comp_Address := inProxRecs.proxId_Comp_Address;
+    SELF.proxId_p_city_name := inProxRecs.proxId_p_city_name;
+    SELF.proxId_v_city_name := inProxRecs.proxId_v_city_name;
+    SELF.proxId_Comp_St := inProxRecs.proxId_St;
+    SELF.proxId_Comp_Z5 := inProxRecs.proxId_Zip;
+    SELF.proxId_Comp_Zip4 := inProxRecs.proxId_Zip4;
+    SELF.proxId_company_phone := inProxRecs.proxId_company_phone;
+    SELF.proxId_dt_first_seen := inProxRecs.proxId_dt_first_seen;
+    SELF.proxId_dt_last_seen := inProxRecs.proxId_dt_last_seen;
+    SELF.proxId_county_name := inProxRecs.proxId_county_name;
+    SELF.proxId_company_fein := inProxRecs.proxId_company_fein;
+    SELF.proxId_company_url := inProxRecs.proxId_company_url;
+    SELF.proxId_incorporation_date := inProxRecs.proxId_incorporation_date;
+    SELF.proxId_duns_number := inProxRecs.proxId_duns_number;
+    SELF.proxId_sic_code := inProxRecs.proxId_sic_code;
+    SELF.proxId_naics_code := inProxRecs.proxId_naics_code;
+    SELF.proxId_dba_name := inProxRecs.proxId_dba_name;
+    SELF := inMainRecs;
+  END;
+
+
+  ds_RecsWithProxInfo := 
+  JOIN(ds_RecsForOutput,ds_BestInfoApp_pre,
+       LEFT.UltID  = RIGHT.UltID  AND  
+       LEFT.OrgID  = RIGHT.OrgID  AND 
+       LEFT.SELEID = RIGHT.SELEID AND 
+       LEFT.ProxID = RIGHT.ProxID,
+    xfm_addProxIdInfo(LEFT,RIGHT),
+    LEFT OUTER);
+  
+  ds_out := IF(append_mode, 
+               ds_RecsWithProxInfo, 
+               PROJECT(ds_RecsForOutput, BusinessBatch_BIP.Layouts.Final));
+  
   //output(tmpTopResultsScoredGrouped, named('tmpTopResultsScoredGrouped'));
   //output(ds_bestInfo, named('ds_bestInfo'));
   
@@ -1024,7 +1071,7 @@ END;
   //output(ds_OSHAFinal, named('ds_OSHAFinal'));
   
   //output(ds_RegisteredAgents, named('ds_RegisteredAgents'));
+  // OUTPUT(ds_BestInfoApp_pre, named('ds_BestInfoApp_pre'));
   
-  RETURN PROJECT(IF(inmod.BestOnly,ds_HeaderInfoAll,ds_DCAInfo2FinalSorted),
-                                BusinessBatch_BIP.Layouts.Final);
+  RETURN ds_out;
 END;

@@ -85,6 +85,7 @@ FUNCTION
                                         SELF.listing_type_gov        := IF(STD.Str.Find(RIGHT.ListingType, 'GOVERNMENT') > 0, 'G', ''),
                                         SELF.RealTimePhone_Ext       := RIGHT,
                                         SELF.isLNameMatch            := STD.Str.findword(TRIM(IF(RIGHT.ListingName != '', RIGHT.ListingName, LEFT.listed_name)),TRIM(LEFT.lname), TRUE),
+                                        SELF.phn_src_all             := LEFT.phn_src_all;
                                         SELF := RIGHT, SELF := LEFT),
                               FULL OUTER,
                               LIMIT(1, SKIP));

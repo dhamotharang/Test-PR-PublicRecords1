@@ -1,6 +1,7 @@
 ﻿EXPORT svcCrosswalk() := macro
 
 	import BIPV2;
+	import Doxie;
 
 	inputDs := dataset([], BIPV2_Crosswalk.IdLinkLayouts.crosswalkInput) : stored('id_link_input');
 
@@ -16,8 +17,11 @@
 	set of string consumerSegmentation := ALL : stored('consumer_segmentation');
 	set of string businessSegmentation := ALL : stored('business_segmentation');
 	set of string sourcesToInclude := ALL : stored('sources_to_include');
+	boolean isMarketing := false : stored('is_marketing');
 
-
+modaccess := module(Doxie.iDataAccess)
+	EXPORT unsigned1 intended_use := if(isMarketing, 1, 0);
+end;
 
 cw := bipv2_crosswalk.BusinessLinks(inputDs
 	,useInputLexid := useInputLexid
@@ -32,6 +36,7 @@ cw := bipv2_crosswalk.BusinessLinks(inputDs
 	,consumerSegmentation := consumerSegmentation
 	,businessSegmentation := businessSegmentation
 	,sourcesToInclude := sourcesToInclude
+	,mod_access := modAccess
 );
 
 

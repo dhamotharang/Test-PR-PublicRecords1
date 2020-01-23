@@ -604,7 +604,7 @@ ssn_table_results1 := if(isFCRA, got_SSNTable_corr_proj, got_death_nonfcra_proj	
 		iids_dedp := dedup(sort(ungroup(multiple_use_ssns_with_wildcard_did)(did<>0),did), did);
 		justDids := PROJECT(iids_dedp, 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
-		rellyids := Relationship.proc_GetRelationship(justDids, topnCount:=500,
+		rellyids := Relationship.proc_GetRelationshipNeutral(justDids, topnCount:=500,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result;
 
 		multiple_use_ssn_with_relative_flag := join(multiple_use_ssns_with_wildcard_did, rellyids, 

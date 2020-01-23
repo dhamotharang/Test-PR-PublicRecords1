@@ -138,6 +138,8 @@ MODULE
 
     SELF.PhoneOwnershipIndicator := IsValidated;
     SELF.dt_last_seen            := IF(IsValidated, (STRING)STD.Date.Today(), l.dt_last_seen);
+    dMNO_srcs                      := l.phn_src_all + DATASET(['MNO'], $.Layouts.PhoneFinder.src_rec);
+    SELF.phn_src_all             := IF(IsValidated, dMNO_srcs, l.phn_src_all);
     SELF                         := l;
   END;
 
