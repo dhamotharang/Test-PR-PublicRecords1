@@ -16,9 +16,15 @@ EXPORT Map_Ported_Metadata_DeltaFile_Temp(string version):= FUNCTION
 	end;
 
 	//POPULATE & REFORMAT DATES - DAILY FILE	
-	dailyTeloInput 		:= PhonesInfo.File_Metadata_Delta_Temp.In_Port_DailyDelta(length((string)tn)=10);
+	dailyTelo 				:= PhonesInfo.File_Metadata_Delta_Temp.In_Port_DailyDelta(length((string)tn)=10 and lrn<>0);
+	
+	dailyTeloAdd			:= dailyTelo(operation<>'D');
+	dailyTeloDelAud		:= dailyTelo(operation='D' and trim(DownloadReason) = 'audit-discrepancy');	
+	dailyTeloDelOth		:= dedup(sort(distribute(dailyTelo(operation='D' and trim(DownloadReason) <> 'audit-discrepancy'), hash(tn)), tn, lrn, spid, uniqueid, ((string)activationtimestamp)[1..8], -((string)operationtimestamp)[1..8], local), tn, local); //Keep Latest Delete		
+	
+	concatDailyTelo		:= dailyTeloAdd + dailyTeloDelAud + dailyTeloDelOth;	
 
-	tempLayout fixTeloFile(dailyTeloInput l, unsigned c):= transform
+	tempLayout fixTeloFile(concatDailyTelo l, unsigned c):= transform
 	
 			fn_timeConvert(integer timestamp) := function
 														
@@ -33,10 +39,12 @@ EXPORT Map_Ported_Metadata_DeltaFile_Temp(string version):= FUNCTION
 				
 			end;
 			
-			f_port_dt					:= stringlib.stringfilter((string)l.activationtimestamp, '0123456789');	
+			f_port_dt		:= stringlib.stringfilter((string)l.activationtimestamp, '0123456789');	
 						
 		self.filename									:= l.filename[stringlib.stringfind(l.filename, 'npac', 1)..stringlib.stringfind(l.filename, '.csv', 1)-1];					
-		self.action_code							:= if(l.operation='M', 'A', l.operation);	
+		self.action_code							:= if(l.operation='M', 
+																				if(trim(l.downloadreason)='audit-discrepancy', 'U', 'A'), 
+																				l.operation);
 		self.country_code							:= ''; 
 		self.phone										:= (string)l.tn;		
 		self.dial_type								:= '';		
@@ -45,7 +53,9 @@ EXPORT Map_Ported_Metadata_DeltaFile_Temp(string version):= FUNCTION
 		self.routing_code							:= (string)l.lrn;	
 		self.porting_dt								:= f_port_dt;	
 		self.country_abbr							:= '';
-		self.file_dt_time							:= fn_timeConvert(l.updated);
+		self.file_dt_time							:= if(length((string)l.updated)<14,
+																				fn_timeConvert(l.updated),
+																				(string)l.updated);
 		self.vendor_first_reported_dt	:= if(self.file_dt_time<>'', self.file_dt_time, '');
 		self.vendor_last_reported_dt	:= if(self.file_dt_time<>'', self.file_dt_time, '');	
 		self.port_start_dt						:= f_port_dt;
@@ -56,27 +66,27 @@ EXPORT Map_Ported_Metadata_DeltaFile_Temp(string version):= FUNCTION
 		self.uniqueid									:= l.uniqueid;
 	end;
 
-	inputTelo 		:= project(dailyTeloInput, fixTeloFile(left, counter));
+	inputTelo 			:= project(concatDailyTelo, fixTeloFile(left, counter));
 	
 	//Append Spid
-	srtCRef 			:= sort(distribute(PhonesInfo.File_Source_Reference.Main, hash(ocn)), ocn, local);
-	srtTInput			:= sort(distribute(inputTelo, hash(ocn)), ocn, local);
+	srtCRef 				:= sort(distribute(PhonesInfo.File_Source_Reference.Main, hash(ocn)), ocn, local);
+	srtTInput				:= sort(distribute(inputTelo, hash(ocn)), ocn, local);
 	
 	tempLayout addSpidTr(srtTInput l, srtCRef r):= transform
 		self.spid 										:= r.spid;	
 		self 													:= l;
 	end;
 	
-	addTSPID 			:= join(srtTInput, srtCRef,
-												left.ocn = right.ocn,
-												addSpidTr(left, right), left outer, local, keep(1));
+	addTSPID 				:= join(srtTInput, srtCRef,
+													left.ocn = right.ocn,
+													addSpidTr(left, right), left outer, local, keep(1));
 	
-	teloInput			:= dedup(sort(distribute(addTSPID, hash(phone)), record, local), record, local);
+	teloInput				:= dedup(sort(distribute(addTSPID, hash(phone)), record, local), record, local);
 	
 	//Process Activities
-	inFile_d 			:= distribute(teloInput, hash(phone));
-	inFile_s 			:= sort(inFile_d, phone, -port_start_dt, -file_dt_time, -uniqueid, if(action_code in ['A','U'], 2, 1) ,local);
-	inFile_g 			:= group(inFile_s, phone);
+	inFile_d 				:= distribute(teloInput, hash(phone));
+	inFile_s 				:= sort(inFile_d, phone, -port_start_dt, -file_dt_time, -uniqueid, if(action_code in ['A','U'], 2, 1) ,local);
+	inFile_g 				:= group(inFile_s, phone);
 	
 	//Treat Adds and Updates the Same
 	tempLayout iter1(inFile_g l, inFile_g r) := transform
@@ -94,12 +104,12 @@ EXPORT Map_Ported_Metadata_DeltaFile_Temp(string version):= FUNCTION
 		self 													:= r;
 	end;
 			
-	tagGroups 		:= iterate(inFile_g, iter1(left,right));
-	tagGroups_ug 	:= ungroup(tagGroups);
+	tagGroups 			:= iterate(inFile_g, iter1(left,right));
+	tagGroups_ug 		:= ungroup(tagGroups);
 
 	//Rollup Records by Groupid
-	aggrTrans_d 	:= distribute(tagGroups_ug, hash(groupid));
-	aggrTrans_s		:= sort(aggrTrans_d, groupid, port_start_dt, file_dt_time, uniqueid, if(action_code in ['A','U'], 1, 2) ,local);
+	aggrTrans_d 		:= distribute(tagGroups_ug, hash(groupid, phone));
+	aggrTrans_s			:= sort(aggrTrans_d, groupid, phone, port_start_dt, file_dt_time, uniqueid, if(action_code in ['A','U'], 1, 2), local);
 	
 	tempLayout roll(aggrTrans_s l, aggrTrans_s r) := transform
 		self.is_ported								:= if(l.is_ported or r.is_ported, true, 														r.is_ported);
@@ -111,9 +121,9 @@ EXPORT Map_Ported_Metadata_DeltaFile_Temp(string version):= FUNCTION
 		self 													:= r;
 	end;
 
-	aggrTrans_r		:= rollup(aggrTrans_s, 
-													left.groupid = right.groupid, 
-													roll(left, right), local);
+	aggrTrans_r			:= rollup(aggrTrans_s, 
+														left.groupid = right.groupid, 
+														roll(left, right), local);
 	
 	//Reformat to iConectiv Base Layout (Service Providers will now be populated in the Metadata Base)
 	PhonesInfo.Layout_iConectiv.Main remED(aggrTrans_r l):= transform
@@ -122,13 +132,13 @@ EXPORT Map_Ported_Metadata_DeltaFile_Temp(string version):= FUNCTION
 		self													:= l;
 	end;
 	
-	fixEnd 				:= project(aggrTrans_r, remED(left));
+	fixEnd 					:= project(aggrTrans_r, remED(left));
 	
 	//Reformat to Metadata Base
 	//Adapted from PhonesInfo.PhonesInfo.Map_Common_Port_Main
 	
 	//Rollup Records w/ Updates <= 3 Days
-	rllUpdate	:= sort(distribute(fixEnd, hash(phone)), phone, spid, porting_dt, port_start_dt, routing_code, -vendor_last_reported_dt, local);	
+	rllUpdate				:= sort(distribute(fixEnd, hash(phone)), phone, spid, porting_dt, port_start_dt, routing_code, -vendor_last_reported_dt, local);	
 		
 	rllUpdate newDate(rllUpdate l, rllUpdate r) := transform
 				
@@ -176,7 +186,7 @@ EXPORT Map_Ported_Metadata_DeltaFile_Temp(string version):= FUNCTION
 		self 														:= l;
 	end;
 
-	iConectComm := dedup(sort(project(applyRollupDates, iConectM(left)), record, local), record, local);
+	iConectComm 			:= dedup(sort(project(applyRollupDates, iConectM(left)), record, local), record, local);
 		
 	//Map Ported Base to Common Layout - Append Serv/Line/Carrier Names from Reference Table
 	//Adapted from PhonesInfo.Map_Ported_Metadata_Main

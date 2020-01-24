@@ -9,19 +9,19 @@ EXPORT Spray_Telo_DailyDelta(string version, string filename, string eclsourceip
 	
 	//Spray New Raw DailyDelta File					
 	sprayDeltaDaily := std.File.SprayVariable(eclsourceip,
-																												srcdir + abbrVersion + '/' + filename,
-																												8192,
-																												',',
-																												'\r\n',
-																												,						
-																												STD.System.Thorlib.Group(),
-																												'~thor_data400::in::phones::telo_dailydelta::' + filename,
-																												,
-																												,
-																												,
-																												true,
-																												false,
-																												true);
+																						srcdir + abbrVersion + '/' + filename,
+																						8192,
+																						',',
+																						'\r\n',
+																						,						
+																						STD.System.Thorlib.Group(),
+																						'~thor_data400::in::phones::telo_dailydelta::' + filename,
+																						,
+																						,
+																						,
+																						true,
+																						false,
+																						true);
 
 	//Remove Previous Raw DailyDelta File and Add New to the DailyDelta Superfile
 	addDeltaDaily 	:= sequential(FileServices.StartSuperFileTransaction(),
@@ -29,7 +29,7 @@ EXPORT Spray_Telo_DailyDelta(string version, string filename, string eclsourceip
 																Fileservices.AddSuperfile('~thor_data400::in::phones::telo_dailydelta', '~thor_data400::in::phones::telo_dailydelta::' + filename),
 																FileServices.FinishSuperFileTransaction());
 	
-	return 	sequential(sprayDeltaDaily,
-											addDeltaDaily);
+	return sequential(sprayDeltaDaily,
+										addDeltaDaily);
 
 END;

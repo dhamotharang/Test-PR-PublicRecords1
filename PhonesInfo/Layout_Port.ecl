@@ -6,7 +6,7 @@
 			UNSIGNED8 updated;							//Unix timestamp of record modification
 			UNSIGNED8 ActivationTimestamp;  //SP provided timestamp for when the record becomes active
 			STRING19 	DatabaseName;					//which database owns the record
-			STRING8 	DownloadReason;				//new, modified, or delete for the entry
+			STRING17 	DownloadReason;				//new, modified, audit-discrepency, or delete for the entry
 			UNSIGNED4 Id;										//internal record ID
 			STRING4 	LnpType;							//- LNP type
 			UNSIGNED8 Lrn;									//routing number

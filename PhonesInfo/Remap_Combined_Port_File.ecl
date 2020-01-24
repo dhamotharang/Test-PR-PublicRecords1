@@ -4,7 +4,7 @@
 		dailyInput 		:= PhonesInfo.Reformat_Port_Input(file_dt_time[1..8]>='20150308');
 	
 		inFile_d 			:= distribute(dailyInput, hash(phone));
-		inFile_s 			:= sort(inFile_d, phone, -port_start_dt, -file_dt_time, -uniqueid, if(action_code in ['A','U'], 2, 1) ,local);
+		inFile_s 			:= sort(inFile_d, phone, -port_start_dt, -file_dt_time, -uniqueid, if(action_code in ['A','U'], 2, 1), local);
 		inFile_g 			:= group(inFile_s, phone);
 	
 	//Treat Adds and Updates the Same
@@ -28,8 +28,8 @@
 		tagGroups_ug 	:= ungroup(tagGroups);
 	
 	//Rollup Records by Groupid
-		aggrTrans_d 	:= distribute(tagGroups_ug, hash(groupid));
-		aggrTrans_s		:= sort(aggrTrans_d, groupid, port_start_dt, file_dt_time, if(action_code in ['A','U'], 1, 2) ,local);
+		aggrTrans_d 	:= distribute(tagGroups_ug, hash(groupid, phone));
+		aggrTrans_s		:= sort(aggrTrans_d, groupid, phone, port_start_dt, file_dt_time, if(action_code in ['A','U'], 1, 2), local);
 	
 		dailyInput roll(aggrTrans_s l, aggrTrans_s r) := transform
 			self.is_ported										:= if(l.is_ported or r.is_ported, true, 												r.is_ported);

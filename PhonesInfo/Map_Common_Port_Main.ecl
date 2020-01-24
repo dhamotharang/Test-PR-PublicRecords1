@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 
 /////////////////////////////////////////////////////////////////////
 //TCPA Main//////////////////////////////////////////////////////////
@@ -108,6 +108,6 @@ import ut;
 	iConectComm := project(applyRollupDates, iConectM(left));
 
 //Concat Files//////////////////////////////////////////////////////
-	concatComm 	:= tcpaComm + iConectComm;
+	concatComm 	:= /*tcpaComm +*/ iConectComm;
 
 EXPORT Map_Common_Port_Main := dedup(sort(concatComm, record, local), record, local);
