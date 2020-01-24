@@ -33,7 +33,6 @@
   dLastResort  := PROJECT(dLastResort_,
                           TRANSFORM(lCommon,
                                     SELF.phone_source := PhoneFinder_Services.Constants.PhoneSource.LastResort,
-                                    SELF.phn_src_all  := DATASET([MDR.SourceTools.src_wired_Assets_Royalty], $.Layouts.PhoneFinder.src_rec);
                                     SELF := LEFT));
 
   // Inhouse QSent data
@@ -42,7 +41,6 @@
   dInHouseQSent  := PROJECT(dInHouseQSent_,
                             TRANSFORM(lCommon,
                                       SELF.phone_source := PhoneFinder_Services.Constants.PhoneSource.InHouseQSent,
-                                      SELF.phn_src_all  := DATASET([MDR.SourceTools.src_InHouse_QSent], $.Layouts.PhoneFinder.src_rec);
                                       SELF := LEFT));
 
   // Gong data
@@ -59,7 +57,12 @@
   // Combine all the phone sources
   dPhoneRecsCombined := dPhonesPlus + dLastResort + dInHouseQSent + dGong + dTargus + dEquifaxPhones;
 
-  dPhoneRecsCombinedSort  := SORT(dPhoneRecsCombined,
+  empty_src := DATASET([], {STRING3 src});
+  dPhoneRecsCombined_Src := PROJECT(dPhoneRecsCombined, TRANSFORM(lCommon,
+                                                         SELF.phn_src_all := LEFT.phn_src_all + IF(LEFT.src != '', DATASET([LEFT.src], $.Layouts.PhoneFinder.src_rec), empty_src);
+                                                         SELF := LEFT));
+
+  dPhoneRecsCombinedSort  := SORT(dPhoneRecsCombined_Src,
                                   batch_in.acctno, phone, IF(lname != '', lname, listed_name), fname, prim_range, prim_name, zip,
                                   penalt, MAP(Phonesplus_v2.IsCell(append_phone_type) => 1, vendor_id = 'TG' => 2, vendor_id = 'GH' => 3, 4), -ConfidenceScore,
                                   -dt_last_seen, IF(activeflag = 'Y', 0, 1), doxie.tnt_score(tnt), dt_first_seen);
@@ -157,6 +160,7 @@
       OUTPUT(dTargus, NAMED('dTargus'), EXTEND);
     #END
     OUTPUT(dPhoneRecsCombined, NAMED('dPhoneRecsCombined'), EXTEND);
+    OUTPUT(dPhoneRecsCombined_Src, NAMED('dPhoneRecsCombined_Src'), EXTEND);
     OUTPUT(dPhoneRecsCombinedDedup, NAMED('dPhoneRecsCombinedDedup'), EXTEND);
     OUTPUT(dPhoneCarrierInfo, NAMED('dPhoneCarrierInfo'), EXTEND);
     OUTPUT(dReformat2Common, NAMED('dReformat2Common'), EXTEND);

@@ -83,49 +83,20 @@ EXPORT AppendBestSeleProx(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
       SELF.uniqueid := LEFT.request_id,
       SELF := LEFT));
 
+  // note: the BIPV2_Best.Key_LinkIds.kfetch2 call returns not only the SeleID Best record for the
+  //       input linkids, but also the best ProxId records for all associated ProxIds
   withBestSele0 := IF(isMarketing, 
                       BIPV2_Best.Key_linkIds.kfetch2Marketing(preBest, bipv2.IDconstants.Fetch_Level_SELEID, in_mod := loc_mod),
                       BIPV2_Best.Key_LinkIds.kfetch2(preBest, bipv2.IDconstants.Fetch_Level_SELEID, in_mod := loc_mod));
   withBestSele := DEDUP(withBestSele0, ultid, orgid, seleid, proxid, uniqueid, all);
 
-  withBestProx0 := IF(isMarketing, 
-                      BIPV2_Best.Key_linkIds.kfetch2Marketing(preBest, bipv2.IDconstants.Fetch_Level_ProxID, in_mod := loc_mod),
-                      BIPV2_Best.Key_LinkIds.kfetch2(preBest, bipv2.IDconstants.Fetch_Level_ProxID, in_mod := loc_mod));
-  withBestProx := DEDUP(withBestProx0, ultid, orgid, seleid, proxid, uniqueid, all);
-
- EXPORT BestSeleProxLayout := 
-    RECORD
-      UNSIGNED6 uniqueid;
-      BIPV2.IDAppendLayouts.svcAppendOut;
-      withBestSele.company_name.dt_first_seen;
-      withBestSele.company_name.dt_last_seen;
-      DATASET({withBestSele.company_name.sources}) company_name_sources;
-      STRING county_name;
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_name) proxId_comp_name := '';
-      TYPEOF(withBestSele.company_name.dt_first_seen) proxId_dt_first_seen := '';
-      TYPEOF(withBestSele.company_name.dt_last_seen) proxId_dt_last_seen := '';
-      STRING120 proxId_comp_address := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.p_city_name) proxId_p_city_name := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.v_city_name) proxId_v_city_name := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.st) proxId_st := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.zip) proxId_zip := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.zip4) proxId_zip4 := '';
-      STRING proxId_county_name := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_phone) proxId_company_phone := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_fein) proxId_company_fein := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_url) proxId_company_url := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_incorporation_date) proxId_incorporation_date;
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.duns_number) proxId_duns_number := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_sic_code1) proxId_sic_code := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_naics_code1) proxId_naics_code := '';
-      TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.dba_name) proxId_dba_name := '';
-    END;
-    
-    BestSeleProxLayout xfm_getSeleBest(BIPV2.IdAppendLayouts.IdsOnly l, RECORDOF(withBestSele) r) := 
+  BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp xfm_getSeleBest(BIPV2.IdAppendLayouts.IdsOnly l, 
+                                                               BIPV2_Best.Key_LinkIds.kFetch2_layout r) := 
     TRANSFORM
       SELF.proxid := l.proxid;
       SELF.proxscore := l.proxscore;
       SELF.proxweight := l.proxweight;
+      SELF.seleScore := l.seleScore;
       SELF.company_name := r.company_name[1].company_name;
       SELF.dt_first_seen := r.company_name[1].dt_first_seen;
       SELF.dt_last_seen := r.company_name[1].dt_last_seen;
@@ -175,11 +146,12 @@ EXPORT AppendBestSeleProx(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
       SELF.proxId_sic_code := '';
       SELF.proxId_naics_code := '';
       SELF.proxId_dba_name := '';
+      SELF._btype_id := 0;
       SELF := l;
       SELF := r;
     END;
 
-    {BestSeleProxLayout, UNSIGNED _btype_id} xfm_addProxBest(BestSeleProxLayout l, RECORDOF(withBestSele) r, INTEGER c) := 
+    BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp xfm_addProxBest(BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp l, BIPV2_Best.Key_LinkIds.kFetch2_layout r, INTEGER c) := 
     TRANSFORM
       SELF.proxId_comp_name := r.company_name[1].company_name;
       SELF.proxId_dt_first_seen := r.company_name[1].dt_first_seen;
@@ -215,27 +187,29 @@ EXPORT AppendBestSeleProx(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
         LEFT.seleid = RIGHT.seleid AND
         RIGHT.proxid = 0,
       xfm_getSeleBest(LEFT,RIGHT),
+      KEEP (1),
       LEFT OUTER);
       
-    postBestWithId :=
-    JOIN(postBestSele, withBestProx,
+  postBestWithProxAndId :=
+    JOIN(postBestSele, withBestSele,
          LEFT.uniqueid = RIGHT.uniqueid AND
          LEFT.seleid = RIGHT.seleid AND
          LEFT.proxid = RIGHT.proxid,
       xfm_addProxBest(LEFT,RIGHT,COUNTER),
+      KEEP (1),
       LEFT OUTER);
 
-  BIPV2_Company_Names.functions.mac_go(postBestWithId, outBtype, _btype_id, company_name);
+  BIPV2_Company_Names.functions.mac_go(postBestWithProxAndId, outBtype, _btype_id, company_name);
   withBTypeSeleProx :=
-    JOIN(postBestWithId, outBtype,
+    JOIN(postBestWithProxAndId, outBtype,
       LEFT._btype_id = RIGHT._btype_id,
-      TRANSFORM(RECORDOF(outBtype),
+      TRANSFORM(BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp,
         SELF.company_btype := RIGHT.cnp_btype,
         SELF := LEFT,
         SELF := RIGHT,
         SELF := []),
       KEEP(1), LEFT OUTER);
- 
+
   RETURN withBTypeSeleProx;
 
 END;

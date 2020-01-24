@@ -89,7 +89,7 @@ MODULE
 			fn_len := length(trim(ri.fname));
       fn_parsed := if(fn_len > 3 and ri.fname[fn_len-1] = ' ', ri.fname[1..fn_len-2], ri.fname);
    		SELF.fname            := fn_parsed;
-            SELF.coc_description  := IF(ri.RealTimePhone_Ext.ServiceClass != '', $.Functions.ServiceClassDesc(ri.RealTimePhone_Ext.ServiceClass), '');
+      SELF.coc_description  := IF(ri.RealTimePhone_Ext.ServiceClass != '', $.Functions.ServiceClassDesc(ri.RealTimePhone_Ext.ServiceClass), '');
 			SELF                  := ri;
 			SELF                  := le;
 			SELF                  := [];
@@ -180,9 +180,9 @@ MODULE
 
  			fn_len := length(trim(ri.fname));
       fn_parsed := if(fn_len > 3 and ri.fname[fn_len-1] = ' ', ri.fname[1..fn_len-2], ri.fname);
-            SELF.fname             := fn_parsed;
-            SELF.coc_description   := IF(ri.RealTimePhone_Ext.ServiceClass != '', $.Functions.ServiceClassDesc(ri.RealTimePhone_Ext.ServiceClass), '');
-			SELF                   := ri;
+      SELF.fname             := fn_parsed;
+      SELF.coc_description   := IF(ri.RealTimePhone_Ext.ServiceClass != '', $.Functions.ServiceClassDesc(ri.RealTimePhone_Ext.ServiceClass), '');
+      SELF                   := ri;
 			SELF                   := le;
 			SELF                   := [];
 		END;
@@ -191,8 +191,12 @@ MODULE
 
     dNormIQ411RecsDedup := DEDUP(SORT(dNormIQ411Recs, acctno, phone, -dt_first_seen), acctno, phone);
 
-    dIQ411PrimaryPhoneFlag := UNGROUP(ITERATE(GROUP(dNormIQ411RecsDedup, acctno), TRANSFORM(lFinal, SELF.isPrimaryPhone := COUNTER = 1, SELF := RIGHT)));
+    dIQ411PrimaryPhoneFlag_src := UNGROUP(ITERATE(GROUP(dNormIQ411RecsDedup, acctno), TRANSFORM(lFinal, SELF.isPrimaryPhone := COUNTER = 1, SELF := RIGHT)));
 
+    dIQ411PrimaryPhoneFlag := PROJECT(dIQ411PrimaryPhoneFlag_src, TRANSFORM(lFinal, SELF.phn_src_all   := LEFT.phn_src_all +
+                                                                                    IF(LEFT.phone_source = PhoneFinder_Services.Constants.PhoneSource.QSentGateway,
+                                                                                    DATASET(['I'], $.Layouts.PhoneFinder.src_rec)),
+                                                                                    SELF := LEFT));
 		// Debug
 		#IF(PhoneFinder_Services.Constants.Debug.QSent)
 			OUTPUT(dIn,NAMED('dQSentIQ411_In'));
