@@ -8,7 +8,7 @@ EXPORT B_Internet_Protocol_5 := MODULE
   SHARED VIRTUAL TYPEOF(E_Internet_Protocol_Event.__Result) __E_Internet_Protocol_Event := E_Internet_Protocol_Event.__Result;
   SHARED __EE122944 := __E_Internet_Protocol;
   SHARED __EE123417 := __ENH_Event_6;
-  SHARED __EE125185 := __EE123417(__EE123417.Kr_High_Risk_Ip_Address_Flag_ = 1);
+  SHARED __EE125185 := __EE123417(__EE123417.Kr_High_Risk_Ip_Address_Flag_ = 1 OR __EE123417.Kr_Medium_Risk_Ip_Address_Flag_ = 1 OR __EE123417.Kr_Low_Risk_Ip_Address_Flag_ = 1);
   SHARED __EE123415 := __E_Internet_Protocol_Event;
   SHARED __EE129188 := __EE123415(__NN(__EE123415.Ip_) AND __NN(__EE123415.Transaction_));
   SHARED __ST126302_Layout := RECORD
