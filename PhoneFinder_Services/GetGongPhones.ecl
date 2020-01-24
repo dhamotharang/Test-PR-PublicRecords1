@@ -152,7 +152,6 @@ FUNCTION
 	lCommon tGetPenalty(dGongFormat2Common pInput) :=
 	TRANSFORM
 		SELF.penalt := Phones.GetPenalty.GetPhonePenalty(pInput);
-		SELF.phn_src_all  := DATASET([MDR.SourceTools.src_Gong_phone_append], $.Layouts.PhoneFinder.src_rec);
 		SELF        := pInput;
 	END;
 
