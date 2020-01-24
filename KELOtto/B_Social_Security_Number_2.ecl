@@ -12,7 +12,7 @@ EXPORT B_Social_Security_Number_2 := MODULE
   SHARED VIRTUAL TYPEOF(E_Ssn_Event.__Result) __E_Ssn_Event := E_Ssn_Event.__Result;
   SHARED __EE488482 := __ENH_Social_Security_Number_3;
   SHARED __EE492828 := __ENH_Event_3;
-  SHARED __EE494690 := __EE492828(__EE492828.Kr_Ssn100_Flag_ = 1 OR __EE492828.Kr_Ssn101_Flag_ = 1);
+  SHARED __EE494690 := __EE492828(__EE492828.Kr_High_Risk_Ssn_Flag_ = 1 OR __EE492828.Kr_Medium_Risk_Ssn_Flag_ = 1 OR __EE492828.Kr_Low_Risk_Ssn_Flag_ = 1);
   SHARED __EE492826 := __E_Ssn_Event;
   SHARED __EE506494 := __EE492826(__NN(__EE492826.Social_) AND __NN(__EE492826.Transaction_));
   SHARED __ST498453_Layout := RECORD

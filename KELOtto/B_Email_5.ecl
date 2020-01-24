@@ -8,7 +8,7 @@ EXPORT B_Email_5 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_6.__ENH_Event_6) __ENH_Event_6 := B_Event_6.__ENH_Event_6;
   SHARED __EE108196 := __E_Email;
   SHARED __EE108608 := __ENH_Event_6;
-  SHARED __EE110315 := __EE108608(__EE108608.Kr_High_Risk_Email_Flag_ = 1);
+  SHARED __EE110315 := __EE108608(__EE108608.Kr_High_Risk_Email_Flag_ = 1 OR __EE108608.Kr_Medium_Risk_Email_Flag_ = 1 OR __EE108608.Kr_Low_Risk_Email_Flag_ = 1);
   SHARED __EE108606 := __E_Email_Event;
   SHARED __EE113476 := __EE108606(__NN(__EE108606.Emailof_) AND __NN(__EE108606.Transaction_));
   SHARED __ST111310_Layout := RECORD
