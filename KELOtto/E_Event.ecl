@@ -211,7 +211,7 @@ EXPORT E_Event := MODULE
     RECORDOF(__d0_Location__Mapped);
     KEL.typ.uid _r_Phone_;
   END;
-  SHARED __d0__r_Phone__Mapped := JOIN(__d0_Location__Mapped,E_Phone.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_phones.phone_number) = RIGHT.KeyVal,TRANSFORM(__d0__r_Phone__Layout,SELF._r_Phone_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0__r_Phone__Mapped := JOIN(__d0_Location__Mapped,E_Phone.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_phones.phone_number) = RIGHT.KeyVal,TRANSFORM(__d0__r_Phone__Layout,SELF._r_Phone_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
   SHARED __d0__r_Email__Layout := RECORD
     RECORDOF(__d0__r_Phone__Mapped);
     KEL.typ.uid _r_Email_;
@@ -221,17 +221,17 @@ EXPORT E_Event := MODULE
     RECORDOF(__d0__r_Email__Mapped);
     KEL.typ.uid _r_Internet_Protocol_;
   END;
-  SHARED __d0__r_Internet_Protocol__Mapped := JOIN(__d0__r_Email__Mapped,E_Internet_Protocol.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoIpAddressId) = RIGHT.KeyVal,TRANSFORM(__d0__r_Internet_Protocol__Layout,SELF._r_Internet_Protocol_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0__r_Internet_Protocol__Mapped := JOIN(__d0__r_Email__Mapped,E_Internet_Protocol.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoIpAddressId) = RIGHT.KeyVal,TRANSFORM(__d0__r_Internet_Protocol__Layout,SELF._r_Internet_Protocol_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
   SHARED __d0__r_Bank_Account__Layout := RECORD
     RECORDOF(__d0__r_Internet_Protocol__Mapped);
     KEL.typ.uid _r_Bank_Account_;
   END;
-  SHARED __d0__r_Bank_Account__Mapped := JOIN(__d0__r_Internet_Protocol__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoBankAccountId) = RIGHT.KeyVal,TRANSFORM(__d0__r_Bank_Account__Layout,SELF._r_Bank_Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0__r_Bank_Account__Mapped := JOIN(__d0__r_Internet_Protocol__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoBankAccountId) = RIGHT.KeyVal,TRANSFORM(__d0__r_Bank_Account__Layout,SELF._r_Bank_Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
   SHARED __d0__r_Drivers_License__Layout := RECORD
     RECORDOF(__d0__r_Bank_Account__Mapped);
     KEL.typ.uid _r_Drivers_License_;
   END;
-  SHARED __d0__r_Drivers_License__Mapped := JOIN(__d0__r_Bank_Account__Mapped,E_Drivers_License.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoDriversLicenseId) = RIGHT.KeyVal,TRANSFORM(__d0__r_Drivers_License__Layout,SELF._r_Drivers_License_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0__r_Drivers_License__Mapped := JOIN(__d0__r_Bank_Account__Mapped,E_Drivers_License.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoDriversLicenseId) = RIGHT.KeyVal,TRANSFORM(__d0__r_Drivers_License__Layout,SELF._r_Drivers_License_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
   EXPORT KELOtto_fraudgovshared_Invalid := __d0__r_Drivers_License__Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0__r_Drivers_License__Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
