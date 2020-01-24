@@ -2,16 +2,18 @@ import $, targus, royalty, doxie, dx_gateway;
 
 // replacement for Targus.Targus_Soapcall_Function
 
-EXPORT SoapCall_Targus(dataset(targus.Layout_Targus_In) d_recs_in, 
+EXPORT SoapCall_Targus(dataset(targus.Layout_Targus_In) d_recs_in,
 											 Gateway.Layouts.Config gateway_cfg,
-											 integer timeout=1, 
+											 integer timeout=1,
 											 integer retries=1,
 											 boolean makeGatewayCall = false,
                        doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END,
                        boolean apply_opt_out = false) := function
 
 d_recs_in_clean := dx_gateway.parser_targus.CleanRequest(d_recs_in, mod_access);
-d_recs_in_ready := IF(apply_opt_out, d_recs_in_clean, d_recs_in);
+// Commenting it out for now since doxie.phone_noreconn_service is coring due to this
+// d_recs_in_ready := IF(apply_opt_out, d_recs_in_clean, d_recs_in);
+d_recs_in_ready := d_recs_in;
 
 gateway_URL := gateway_cfg.url;
 
@@ -32,13 +34,13 @@ targus.layout_targus_in into_in(d_recs_in L) := transform
 	self.user.BillingCode := trim(L.user.BillingCode);
 	self.user.queryId := trim(L.user.QueryId);
 	self.Options.Blind := Gateway.Configuration.GetBlindOption(gateway_cfg);
-	
+
 	// Royalty tracking
 	self.GatewayParams.TxnTransactionId := Gateway.Configuration.GetTransactionIdX(gateway_cfg);
 	self.GatewayParams.BatchJobId 			:= Gateway.Configuration.GetBatchJobId(gateway_cfg);
 	self.GatewayParams.ProcessSpecId 		:= Gateway.Configuration.GetBatchspecId(gateway_cfg);
 	self.GatewayParams.QueryName 				:= Gateway.Configuration.GetRoxieQueryName(gateway_cfg);
-	
+
 	_royaltyCode := MAP(
 		L.options.IncludeWirelessConnectionSearch 	=> Royalty.Constants.RoyaltyCode.TARGUS_WCS,
 		L.options.IncludePhoneDataExpressSearch 		=> Royalty.Constants.RoyaltyCode.TARGUS_PDE,
@@ -47,13 +49,13 @@ targus.layout_targus_in into_in(d_recs_in L) := transform
 		Royalty.Constants.RoyaltyCode.TARGUS_VE
 		);
 	self.GatewayParams.RoyaltyCode 			:= _royaltyCode;
-	self.GatewayParams.RoyaltyType 			:= Royalty.Functions.GetRoyaltyType(_royaltyCode);	
-	
-	// Enabling call to external gateway. Additional field CheckVendorGatewayCall to preserve backward 
+	self.GatewayParams.RoyaltyType 			:= Royalty.Functions.GetRoyaltyType(_royaltyCode);
+
+	// Enabling call to external gateway. Additional field CheckVendorGatewayCall to preserve backward
 	// compatibility on Gateway ESP side in case of non-roxie calls.
-	self.GatewayParams.CheckVendorGatewayCall := true; 
+	self.GatewayParams.CheckVendorGatewayCall := true;
 	self.GatewayParams.MakeVendorGatewayCall 	:= makeGatewayCall;
-		
+
 	self.options.verifyexpressoptions.screenoptions := trim(L.options.verifyExpressOptions.screenOptions);
 	self.searchby.consumername.FullName := trim(L.searchby.consumername.FullName);
 	self.searchby.consumername.Fname := trim(L.searchby.consumername.Fname);
@@ -84,12 +86,14 @@ targus.layout_targus_in into_in(d_recs_in L) := transform
 end;
 
 d_recs_out := if (makeGatewayCall, soapcall(d_recs_in_ready,gateway_URL,'TargusComprehensive',
-				targus.Layout_Targus_In, into_in(LEFT),  
+				targus.Layout_Targus_In, into_in(LEFT),
 				dataset(targus.Layout_Targus_Out),
 				XPATH('TargusComprehensiveResponseEx'),
 				ONFAIL(errX(left)), timeout(timeout), retry(retries)));
 
 d_recs_out_clean := dx_gateway.parser_targus.CleanResponse(d_recs_out, mod_access);
-return IF(apply_opt_out, d_recs_out_clean, d_recs_out);
+// Commenting it out for now since doxie.phone_noreconn_service is coring due to this
+// return IF(apply_opt_out, d_recs_out_clean, d_recs_out);
+return d_recs_out;
 
 end;
