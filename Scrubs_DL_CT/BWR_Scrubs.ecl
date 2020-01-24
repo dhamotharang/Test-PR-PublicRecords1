@@ -1,9 +1,9 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_FraudGov.BWR_Scrubs - Checking field validity in a file - SALT V3.9.0');
-IMPORT Scrubs_FraudGov,SALT39;
-infile := Scrubs_FraudGov.NAC_In_NAC;
-mod_scrubs := Scrubs_FraudGov.NAC_Scrubs;
+#workunit('name','Scrubs_DL_CT.BWR_Scrubs - Checking field validity in a file - SALT V3.11.7');
+IMPORT Scrubs_DL_CT,SALT311;
+infile := Scrubs_DL_CT.In_In_CT;
+mod_scrubs := Scrubs_DL_CT.Scrubs;
 expandedfile := mod_scrubs.FromNone(infile).ExpandedInfile;
 fromexpandedGlobal := mod_scrubs.FromExpanded(expandedfile);
 // Summary of errors found across all sources
