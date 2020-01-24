@@ -81,13 +81,12 @@ END;
   // begin new code *********		to emulate	top biz ranking		
   tmpTopResultsScoredGrouped := BusinessBatch_BIP.Functions(inMod).getLINkidsAtProxidLevel(ds_Format2SearchInputAll);
 
-  // get linking info through idAppend 
+  // get linking info through idAppend
   ds_AppIds := PROJECT(BIPV2.IdAppendRoxie(ds_Format2AppInput, inMod.Score_Threshold, reAppend := false).IdsOnly(), BIPV2.IdAppendLayouts.IdsOnly);
 
   // Get the seleid best information for the search criteria
-  ds_BestInfoTmp := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).SeleBest(company_name <> ''); 
-  ds_BestInfoTmp_all := PROJECT(ds_BestInfoTmp, BusinessBatch_BIP.Layouts.ExpandedBestTmp);
-  
+  ds_BestInfoTmp_all := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).SeleBest(company_name <> ''); 
+
   // append version
   // note - if marketing flag is set, the output should contain no marketing data
   ds_BestInfoApp_pre := 
@@ -96,8 +95,8 @@ END;
 
   ds_BestInfoApp_post := ds_BestInfoApp_pre(trim(company_name) <> '');
   ds_BestInfoApp_all := PROJECT(ds_BestInfoApp_post, 
-    TRANSFORM(BusinessBatch_BIP.Layouts.ExpandedBestTmp, 
-      SELF.acctno := (STRING)LEFT.request_id, 
+    TRANSFORM(recordof(ds_BestInfoTmp_all), 
+      SELF.acctno := (string)LEFT.request_id, 
       SELF := LEFT, 
       SELF := []));
 
@@ -119,7 +118,7 @@ END;
                             LEFT.ultid = RIGHT.ultid AND
                             LEFT.orgid = RIGHT.orgid AND
                             LEFT.seleid = RIGHT.seleid,
-                            TRANSFORM(BusinessBatch_BIP.Layouts.ExpandedBestTmp,
+                            TRANSFORM(RECORDOF(LEFT),
                                 SElF.weight:= right.proxweight;
                                 SELF := LEFT));	
 
@@ -129,7 +128,7 @@ END;
     LEFT.orgid = RIGHT.orgid AND
     LEFT.seleid = RIGHT.seleid AND
     (LEFT.proxid = 0 OR LEFT.proxid = RIGHT.proxid), 
-    TRANSFORM(BusinessBatch_BIP.Layouts.ExpandedBestTmp,
+    TRANSFORM(RECORDOF(LEFT),
         SELF.weight := RIGHT.proxweight,
         SELF.record_score := RIGHT.record_score, 
         // get the parent info from the header data
@@ -966,6 +965,50 @@ END;
 
   ds_DCAInfo2FinalSorted := SORT(ds_DCAInfo2FinalWithErr, acctno, -weight, -record_score, RECORD);
   
+  // assign records to be out based on "BestOnly" option, then append the ProxId information
+  ds_RecsForOutput := IF(inmod.BestOnly,ds_HeaderInfoAll,ds_DCAInfo2FinalSorted);
+  
+  BusinessBatch_BIP.Layouts.Final xfm_addProxIdInfo(BusinessBatch_BIP.Layouts.FinalWithLinkIds inMainRecs, 
+                                                    RECORDOF(ds_BestInfoApp_pre) inProxRecs ) :=
+  TRANSFORM
+    SELF.selescore := inProxRecs.selescore;
+    SELF.proxID := inProxRecs.proxid;
+    SELF.proxscore := inProxRecs.proxscore;
+    SELF.proxId_Comp_Name := inProxRecs.proxId_Comp_Name;
+    SELF.proxId_Comp_Address := inProxRecs.proxId_Comp_Address;
+    SELF.proxId_p_city_name := inProxRecs.proxId_p_city_name;
+    SELF.proxId_v_city_name := inProxRecs.proxId_v_city_name;
+    SELF.proxId_Comp_St := inProxRecs.proxId_St;
+    SELF.proxId_Comp_Z5 := inProxRecs.proxId_Zip;
+    SELF.proxId_Comp_Zip4 := inProxRecs.proxId_Zip4;
+    SELF.proxId_company_phone := inProxRecs.proxId_company_phone;
+    SELF.proxId_dt_first_seen := inProxRecs.proxId_dt_first_seen;
+    SELF.proxId_dt_last_seen := inProxRecs.proxId_dt_last_seen;
+    SELF.proxId_county_name := inProxRecs.proxId_county_name;
+    SELF.proxId_company_fein := inProxRecs.proxId_company_fein;
+    SELF.proxId_company_url := inProxRecs.proxId_company_url;
+    SELF.proxId_incorporation_date := inProxRecs.proxId_incorporation_date;
+    SELF.proxId_duns_number := inProxRecs.proxId_duns_number;
+    SELF.proxId_sic_code := inProxRecs.proxId_sic_code;
+    SELF.proxId_naics_code := inProxRecs.proxId_naics_code;
+    SELF.proxId_dba_name := inProxRecs.proxId_dba_name;
+    SELF := inMainRecs;
+  END;
+
+
+  ds_RecsWithProxInfo := 
+  JOIN(ds_RecsForOutput,ds_BestInfoApp_pre,
+       LEFT.UltID  = RIGHT.UltID  AND  
+       LEFT.OrgID  = RIGHT.OrgID  AND 
+       LEFT.SELEID = RIGHT.SELEID AND 
+       LEFT.ProxID = RIGHT.ProxID,
+    xfm_addProxIdInfo(LEFT,RIGHT),
+    LEFT OUTER);
+  
+  ds_out := IF(append_mode, 
+               ds_RecsWithProxInfo, 
+               PROJECT(ds_RecsForOutput, BusinessBatch_BIP.Layouts.Final));
+  
   //output(tmpTopResultsScoredGrouped, named('tmpTopResultsScoredGrouped'));
   //output(ds_bestInfo, named('ds_bestInfo'));
   
@@ -1029,10 +1072,6 @@ END;
   
   //output(ds_RegisteredAgents, named('ds_RegisteredAgents'));
   // OUTPUT(ds_BestInfoApp_pre, named('ds_BestInfoApp_pre'));
-    
-  RETURN PROJECT(IF(inmod.BestOnly,
-                    ds_HeaderInfoAll,
-                    ds_DCAInfo2FinalSorted),
-                 BusinessBatch_BIP.Layouts.Final);
-
+  
+  RETURN ds_out;
 END;
