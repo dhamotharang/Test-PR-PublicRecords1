@@ -1,4 +1,4 @@
-import advo,Risk_Indicators,Standard,ut,PhonesFeedback_Services,iesp,paw_services, AddressFeedback_Services, Royalty, progressive_phone;
+﻿import advo,Risk_Indicators,Standard,ut,PhonesFeedback_Services,iesp,paw_services, AddressFeedback_Services, Royalty, progressive_phone;
 
 export Layout_Rollup := MODULE
 
@@ -144,11 +144,6 @@ export DobRec := RECORD
 	doxie.Layout_HeaderFileSearch.dob;
 	doxie.Layout_HeaderFileSearch.age;
 END;
-
-  export DobRecMasked := record
-    string8 dob;
-    doxie.Layout_HeaderFileSearch.age;
-  end;
 
 export DodRec := RECORD
 	doxie.Layout_HeaderFileSearch.dod;
@@ -350,11 +345,5 @@ export KeyRec_feedback_batch := RECORD
 		DATASET(Royalty.Layouts.Royalty) Royalty;
 		UNSIGNED2 householdRecordsAvailable := 0;
 	END;		
-
-  // Layout to handle string DOB masking
-  EXPORT KeyRec_Feedback_Masked := RECORD
-    KeyRec_feedback - dobRecs;
-    dataset(DobRecMasked) dobRecs {MAXCOUNT(doxie.rollup_limits.dobs)};
-  END;
 
 END;

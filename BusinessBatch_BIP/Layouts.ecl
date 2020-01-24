@@ -32,30 +32,6 @@ EXPORT Layouts := MODULE
     Batchshare.Layouts.ShareErrors;
   END;
   
-  EXPORT ProxBestFields :=
-  RECORD
-    UNSIGNED2 seleScore := 0;
-    UNSIGNED2 proxScore := 0;
-    TYPEOF(BIPV2_Best.Key_LinkIds.kFetch2_layout.company_name.dt_first_seen) proxId_dt_first_seen := 0;
-    TYPEOF(BIPV2_Best.Key_LinkIds.kFetch2_layout.company_name.dt_last_seen) proxId_dt_last_seen := 0 ;
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_name) proxId_comp_name := '';
-    STRING120 proxId_comp_address := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.p_city_name) proxId_p_city_name := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.v_city_name) proxId_v_city_name := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.st) proxId_st := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.zip) proxId_zip := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.zip4) proxId_zip4 := '';
-    STRING20 proxId_county_name := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_phone) proxId_company_phone := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_fein) proxId_company_fein := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_url) proxId_company_url := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_incorporation_date) proxId_incorporation_date := 0;
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.duns_number) proxId_duns_number := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_sic_code1) proxId_sic_code := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.company_naics_code1) proxId_naics_code := '';
-    TYPEOF(BIPV2.IDAppendLayouts.svcAppendOut.dba_name) proxId_dba_name := '';
-  END;
-  
   EXPORT scored := 
   RECORD
     INTEGER2 record_score;
@@ -381,7 +357,6 @@ EXPORT Layouts := MODULE
     STRING9   fein_var8;
     STRING9   fein_var9;
     unsigned2 Total_fein;
-    ProxBestFields - [seleScore,proxScore];
   END;
   
   EXPORT BusinessType_Final := RECORD
@@ -635,8 +610,7 @@ EXPORT Layouts := MODULE
     STRING1 Input_residential;
     UNSIGNED2  Input_total_businesses_active;
     UNSIGNED2  Input_total_businesses_history;
-    PARENT_FINAL;
-    ProxBestFields;
+    PARENT_FINAL;    
   END;
   
   EXPORT BestLayout := RECORD
@@ -722,7 +696,24 @@ EXPORT Layouts := MODULE
     STRING20  acctno;
     BusHeaderMetaDataFinal - [acctno];
     
-    ProxBestFields - [selescore,proxscore];
+    STRING120 proxId_Comp_Name;
+    STRING120 proxId_Comp_Address;
+    STRING25  proxId_p_city_name;
+    STRING25  proxId_v_city_name;
+    STRING2   proxId_Comp_St;
+    STRING5   proxId_Comp_Z5;
+    STRING4   proxId_Comp_Zip4;
+    STRING10  proxId_company_phone;
+    UNSIGNED4 proxId_dt_first_seen;
+    UNSIGNED4 proxId_dt_last_seen;
+    STRING20  proxId_county_name;
+    STRING9   proxId_company_fein;
+    STRING80  proxId_company_url;
+    UNSIGNED4 proxId_incorporation_date;
+    STRING9   proxId_duns_number;
+    STRING8   proxId_sic_code;
+    STRING10  proxId_naics_code;
+    STRING120 proxId_dba_name;
     
     Flags - [acctno] - BIPV2.IDlayouts.l_header_ids;
     
@@ -1168,25 +1159,6 @@ EXPORT Layouts := MODULE
   EXPORT FinalWithLinkIds :=
   RECORD(Final)
     scored;
-  END;
-  
-  EXPORT BestSeleProxLayoutExp := 
-  RECORD
-    UNSIGNED6 uniqueid;
-    BIPV2.IDAppendLayouts.svcAppendOut;
-    BIPV2_Best.Key_LinkIds.kFetch2_layout.company_name.dt_first_seen;
-    BIPV2_Best.Key_LinkIds.kFetch2_layout.company_name.dt_last_seen;
-    DATASET(BIPV2_Best.layouts.Source) company_name_sources;
-    STRING20 county_name;
-    ProxBestFields - [seleScore, proxScore];
-    UNSIGNED _btype_id := 0;
-  END;
-    
-  EXPORT ExpandedBestTmp := 
-  RECORD
-    RECORDOF(BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dataset([],BIPV2.IDfunctions.rec_SearchInput)).SeleBest);
-    ProxBestFields;
-    UNSIGNED _btype_id := 0;
   END;
   
 /*   // Sele best layout for reference purposes only

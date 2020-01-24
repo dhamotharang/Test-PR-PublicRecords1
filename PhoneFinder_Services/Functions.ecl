@@ -396,8 +396,7 @@
                                                     (STRING)STD.Date.MonthsBetween(dt_last_seen, today),
                                                     '');
       SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;
-      // Source details will be populated in Identities  only in a Phone Search.
-      SELF.SourceDetails                     := IF(~inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
+      SELF.SourceDetails                     := IF(inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
       SELF                                   := pInput;
     END;
 
@@ -504,8 +503,7 @@
                                                     inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
                                                     '');
       SELF                                  := pInput.RealTimePhone_Ext;
-      // Source details will be populated in Primary Phone Details  in a PII Search.
-      SELF.SourceDetails                    := IF(inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
+      SELF.SourceDetails                    := PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT));
       SELF                                  := pInput;
 
       // Below two fields are not being used currently
@@ -550,8 +548,7 @@
       SELF.source                  := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
                                           inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
                                           '');
-      // Source details will be populated in OtherPhones in a PII Search.
-      SELF.SourceDetails           := IF(inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
+      SELF.SourceDetails           := PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT));
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
 

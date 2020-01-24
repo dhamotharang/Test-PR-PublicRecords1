@@ -92,7 +92,7 @@ EXPORT reportIndIdentitySources(DATASET(DueDiligence.Layouts.Indv_Internal) inDa
                                                                                           src IN MDR.sourceTools.set_FAA => SOURCE_ID.AIRCRAFT,
                                                                                           src IN MDR.sourceTools.set_Bk => SOURCE_ID.BANKRUPTCY,
                                                                                           src IN MDR.sourceTools.set_WC => SOURCE_ID.WATERCRAFT,
-                                                                                          src IN MDR.sourceTools.set_Vehicles => SOURCE_ID.VEHICLE,
+                                                                                          src IN MDR.sourceTools.set_Vehicles => SOURCE_ID.WATERCRAFT,
                                                                                           src IN MDR.sourceTools.set_DL => SOURCE_ID.DRIVERS_LICENSE,
                                                                                           src IN MDR.sourceTools.set_Liens => SOURCE_ID.LIENS,
                                                                                           src IN MDR.sourceTools.set_Professional_License => SOURCE_ID.PROF_LICENSE,

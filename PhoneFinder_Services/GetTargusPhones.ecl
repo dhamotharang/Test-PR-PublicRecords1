@@ -51,7 +51,7 @@ FUNCTION
 		SELF              := ri;
 		SELF              := le;
 		SELF.phone_source := PhoneFinder_Services.Constants.PhoneSource.TargusGateway;
-		SELF.phn_src_all  := []; // had to blank this out since we are accounting targus in getPhones
+		SELF.phn_src_all  := DATASET([MDR.sourceTools.src_Targus_Gateway], $.Layouts.PhoneFinder.src_rec);
 	END;
 
 	dNormTargusRecs := NORMALIZE(dTargusRecs,LEFT.targus_recs,tNormTargusRecs(LEFT,RIGHT));

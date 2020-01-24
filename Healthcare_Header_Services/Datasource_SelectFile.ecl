@@ -318,8 +318,8 @@
 																		self.SancCategory := right.Cat;
 																		self.SancLegacyType := map(left.LicenseStatus='T' and left.sanc1_code = '112DS' => right.LegacyType,
 																															 left.sanc1_code = '112DS' => 'HISTORICAL CONDITIONS',
-																															 right.LegacyType);
-																		self.FullDesc := if(trim(left.sanc1_desc,right)<>'',left.sanc1_desc,right.desc);
+																															 left.SancLegacyType);
+																		self.FullDesc := if(trim(left.FullDesc,right)<>'',left.FullDesc,right.desc);//Support new granular field data
 																		self.SancLevel := if(RIGHT.level='STATE','',RIGHT.level);
 																		self.StateOrFederal := if(left.level='STATE','STATE','FEDERAL');
 																		self.SancLossOfLic := if((integer)left.ln_derived_rein_date>0,'FALSE',right.LossOfLicense);

@@ -2,9 +2,11 @@
 
 EXPORT Best := MODULE
 
-  EXPORT fullView  (DATASET(BusinessBatch_BIP.Layouts.ExpandedBestTmp) ds_seleBest,
-                    BusinessBatch_Bip.iParam.BatchParams inMod,
-                    DATASET(BIPV2.IDfunctions.rec_SearchInput) inRec) :=  MODULE   
+  EXPORT fullView  (DATASET(
+                      RECORDOF(BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(DATASET([], 
+                                      BIPV2.IDfunctions.rec_SearchInput)).SeleBest)) ds_seleBest, 																			
+                                      BusinessBatch_Bip.iParam.BatchParams inMod,
+                                      dataset(BIPV2.IDfunctions.rec_SearchInput) inRec) :=  MODULE   
   
   INTEGER maxVariationsPerAcctNo  := inMod.MaxResultsPerAcct;
   
@@ -152,9 +154,6 @@ EXPORT Best := MODULE
                           SELF.ultid := LEFT.ultid;
                           SELF.orgid := LEFT.orgid;
                           SELF.seleid := LEFT.seleid;
-                          SELF.selescore := LEFT.Selescore;
-                          SELF.proxid := LEFT.proxid;
-                          SELF.proxscore := LEFT.proxscore;
                               
                           SELF.Best_company_name := LEFT.company_name;															
                           SELF.best_prim_range := LEFT.prim_range;
@@ -226,27 +225,9 @@ EXPORT Best := MODULE
                           //yrCompInCorporated :=  (unsigned4)( left.company_incorporation_date[1..4]);
                           // if  years_in_business is blank from above (0 value company_incorporation_date from bipv2best key)
                           // then use the dt_first_seen value from selebest to calculate yrs_in_business
-                          SELF.years_in_business :=  if ( left.years_in_business= '', 
+                          self.years_in_business :=  if ( left.years_in_business= '', 
                                             (string3)  (CurYear -  (unsigned4) (left.dt_first_seen[1..4])), 
                                               left.years_in_business);											 	
-                          SELF.proxId_comp_name := LEFT.proxId_comp_name;
-                          SELF.proxId_dt_first_seen := LEFT.proxId_dt_first_seen;
-                          SELF.proxId_dt_last_seen := LEFT.proxId_dt_last_seen;
-                          SELF.proxId_comp_address := LEFT.proxId_comp_address;
-                          SELF.proxId_p_city_name := LEFT.proxId_p_city_name;
-                          SELF.proxId_v_city_name := LEFT.proxId_v_city_name;
-                          SELF.proxId_st := LEFT.proxId_st;
-                          SELF.proxId_zip := LEFT.proxId_zip;
-                          SELF.proxId_zip4 := LEFT.proxId_zip4;
-                          SELF.proxId_county_name := LEFT.proxId_county_name;
-                          SELF.proxId_company_phone := LEFT.proxId_company_phone;
-                          SELF.proxId_company_fein := LEFT.proxId_company_fein;
-                          SELF.proxId_company_url := LEFT.proxId_company_url;
-                          SELF.proxId_incorporation_date := LEFT.proxId_incorporation_date;
-                          SELF.proxId_duns_number := LEFT.proxId_duns_number;
-                          SELF.proxId_sic_code := LEFT.proxId_sic_code;
-                          SELF.proxId_naics_code := LEFT.proxId_naics_code;
-                          SELF.proxId_dba_name := LEFT.proxId_dba_name;
                           SELF := [];
                           )
                         );
@@ -263,7 +244,7 @@ EXPORT Best := MODULE
                                                   RECORD_TYPE_CODE = 'R' => 'Rural Route',
                                                   RECORD_TYPE_CODE = 'S' => 'Street',
                                                 '									');		
-                            SELF := LEFT;
+                                                                    SELF := LEFT;
                             SELF := [];
                               ), LEFT OUTER, limit(ut.limits.DEFAULT,skip));																								
       
@@ -360,7 +341,7 @@ EXPORT Best := MODULE
               SELF.dt_last_seen_var2 := allrows[2].dt_last_seen;
               SELF.county_var2 := addr_info(rec_num = 2)[1].countyName;
               SELF.address_type_var2 := Addr_info(rec_num = 2)[1].RECORD_TYPE;						
-              SELF.Address_status_var2 := allrows[2].err_stat;
+                SELF.Address_status_var2 := allrows[2].err_stat;
               SELF.URL_var2 := allrows[2].company_url;
               
               SELF.prim_range_var3 := allrows[3].prim_range;
@@ -400,7 +381,7 @@ EXPORT Best := MODULE
               
               SELF.prim_range_var5 := allrows[5].prim_range;
               SELF.prim_name_var5 := allrows[5].prim_name;
-              SELF.predir_var5 := allrows[5].predir;
+                SELF.predir_var5 := allrows[5].predir;
               SELF.postdir_var5 := allrows[5].postdir;
               SELF.sec_range_var5 := allrows[5].sec_range;
               SELF.unit_desig_var5 := allrows[5].unit_desig;
@@ -464,7 +445,7 @@ EXPORT Best := MODULE
               SELF.dt_last_seen_var8 := allrows[8].dt_last_seen;
               SELF.county_var8 := addr_info(rec_num = 8)[1].countyName;
               SELF.address_type_var8 := Addr_info(rec_num = 8)[1].RECORD_TYPE;	
-              SELF.Address_status_var8 := allrows[8].err_stat;
+                SELF.Address_status_var8 := allrows[8].err_stat;
               
               SELF.prim_range_var9 := allrows[9].prim_range;
               SELF.prim_name_var9 := allrows[9].prim_name;
