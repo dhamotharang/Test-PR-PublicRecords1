@@ -8,7 +8,7 @@ EXPORT B_Bank_Account_5 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_6.__ENH_Event_6) __ENH_Event_6 := B_Event_6.__ENH_Event_6;
   SHARED __EE91799 := __E_Bank_Account;
   SHARED __EE92210 := __ENH_Event_6;
-  SHARED __EE93916 := __EE92210(__EE92210.Kr_High_Risk_Bank_Flag_ = 1 OR __EE92210.Kr_Medium_Risk_Bank_Flag_ = 1);
+  SHARED __EE93916 := __EE92210(__EE92210.Kr_High_Risk_Bank_Flag_ = 1 OR __EE92210.Kr_Medium_Risk_Bank_Flag_ = 1 OR __EE92210.Kr_Low_Risk_Bank_Flag_ = 1);
   SHARED __EE92208 := __E_Bank_Account_Event;
   SHARED __EE96981 := __EE92208(__NN(__EE92208.Account_) AND __NN(__EE92208.Transaction_));
   SHARED __ST94899_Layout := RECORD

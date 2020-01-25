@@ -207,12 +207,14 @@ EXPORT B_Event_3 := MODULE
     KEL.typ.nuid UID;
     KEL.typ.nbool Exp1_;
     KEL.typ.nbool Exp2_;
+    KEL.typ.nbool Exp3_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
   SHARED __ST194325_Layout __ND196998__Project(__ST194306_Layout __PP196975) := TRANSFORM
-    SELF.Exp1_ := __OP2(__PP196975.Event_Type_,IN,__CN(['100']));
-    SELF.Exp2_ := __OP2(__PP196975.Event_Type_,IN,__CN(['101']));
+    SELF.Exp1_ := __OP2(__PP196975.Event_Type_,IN,__CN(['100','191']));
+    SELF.Exp2_ := __OP2(__PP196975.Event_Type_,IN,__CN(['101','192']));
+    SELF.Exp3_ := __OP2(__PP196975.Event_Type_,IN,__CN(['103','104','105','190','193']));
     SELF := __PP196975;
   END;
   SHARED __EE197005 := PROJECT(__EE195197,__ND196998__Project(LEFT));
@@ -223,7 +225,7 @@ EXPORT B_Event_3 := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE198030 := PROJECT(__CLEANANDDO(__EE197005,TABLE(__EE197005,{KEL.typ.int C_O_U_N_T___Event_Types_ := COUNT(GROUP,__T(__EE197005.Exp1_)),KEL.typ.int C_O_U_N_T___Event_Types__1_ := COUNT(GROUP,__T(__EE197005.Exp2_)),UID},UID,MERGE)),__ST194345_Layout);
+  SHARED __EE198030 := PROJECT(__CLEANANDDO(__EE197005,TABLE(__EE197005,{KEL.typ.int C_O_U_N_T___Event_Types_ := COUNT(GROUP,__T(__EE197005.Exp1_)),KEL.typ.int C_O_U_N_T___Event_Types__1_ := COUNT(GROUP,__T(__EE197005.Exp2_)),KEL.typ.int C_O_U_N_T___Event_Types__2_ := COUNT(GROUP,__T(__EE197005.Exp3_)),UID},UID,MERGE)),__ST194345_Layout);
   SHARED __ST195204_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
@@ -405,6 +407,7 @@ EXPORT B_Event_3 := MODULE
     KEL.typ.int Safe_Flag_ := 0;
     KEL.typ.int C_O_U_N_T___Event_Types_ := 0;
     KEL.typ.int C_O_U_N_T___Event_Types__1_ := 0;
+    KEL.typ.int C_O_U_N_T___Event_Types__2_ := 0;
     KEL.typ.nuid U_I_D__1_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -599,8 +602,9 @@ EXPORT B_Event_3 := MODULE
     KEL.typ.int Kr_Medium_Risk_Bank_Flag_ := 0;
     KEL.typ.int Kr_Medium_Risk_Dl_Flag_ := 0;
     KEL.typ.int Kr_Medium_Risk_Identity_Flag_ := 0;
-    KEL.typ.int Kr_Ssn100_Flag_ := 0;
-    KEL.typ.int Kr_Ssn101_Flag_ := 0;
+    KEL.typ.int Kr_High_Risk_Ssn_Flag_ := 0;
+    KEL.typ.int Kr_Medium_Risk_Ssn_Flag_ := 0;
+    KEL.typ.int Kr_Low_Risk_Ssn_Flag_ := 0;
     KEL.typ.int Safe_Flag_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -611,8 +615,9 @@ EXPORT B_Event_3 := MODULE
     SELF.Ip_Not_Us_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP197226._edgecountry_)),IN,__CN(['USA','','0'])))=>0,1);
     SELF.Ip_Tor_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP197226._proxydescription_),IN,__CN(['TOR EXIT','TOR RELAY'])))=>1,0);
     SELF.Ip_Vpn_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP197226._proxydescription_),=,__CN('VPN')))=>1,0);
-    SELF.Kr_Ssn100_Flag_ := MAP(__T(__OP2(__CN(__PP197226.C_O_U_N_T___Event_Types_),<>,__CN(0)))=>1,0);
-    SELF.Kr_Ssn101_Flag_ := MAP(__T(__OP2(__CN(__PP197226.C_O_U_N_T___Event_Types__1_),<>,__CN(0)))=>1,0);
+    SELF.Kr_High_Risk_Ssn_Flag_ := MAP(__T(__OP2(__CN(__PP197226.C_O_U_N_T___Event_Types_),<>,__CN(0)))=>1,0);
+    SELF.Kr_Medium_Risk_Ssn_Flag_ := MAP(__T(__OP2(__CN(__PP197226.C_O_U_N_T___Event_Types__1_),<>,__CN(0)))=>1,0);
+    SELF.Kr_Low_Risk_Ssn_Flag_ := MAP(__T(__OP2(__CN(__PP197226.C_O_U_N_T___Event_Types__2_),<>,__CN(0)))=>1,0);
     SELF := __PP197226;
   END;
   EXPORT __ENH_Event_3 := PROJECT(__EE198040,__ND197230__Project(LEFT)) : PERSIST('~temp::KEL::KELOtto::Event::Annotated_3',EXPIRE(7));
