@@ -260,9 +260,10 @@ EXPORT mod_Validation := MODULE
 					self := []));
 				
 	EXPORT VerifyRelatedClients(Dataset(Layouts2.rCaseEx) cases, Dataset(Layouts2.rClientEx) clients) := FUNCTION
-					ca := DISTRIBUTE(cases, Hash32(ProgramCode, ProgramState, CaseId));
-					cl := DISTRIBUTE(clients, Hash32(ProgramCode, ProgramState, CaseId));
-					j1 := JOIN(cl, ca, left.ProgramCode=right.ProgramCode
+					ca := DISTRIBUTE(cases, Hash32(GroupId, ProgramCode, ProgramState, CaseId));
+					cl := DISTRIBUTE(clients, Hash32(GroupId, ProgramCode, ProgramState, CaseId));
+					j1 := JOIN(cl, ca, left.GroupId=right.GroupId
+															AND left.ProgramCode=right.ProgramCode
 															AND left.ProgramState=right.ProgramState
 															AND left.CaseId=right.CaseId,
 										TRANSFORM(Layouts2.rClientex,
@@ -270,22 +271,24 @@ EXPORT mod_Validation := MODULE
 												self.errors := left.errors + 1;
 												self := left;),
 										LEFT ONLY, LOCAL);
-					j2 := JOIN(cl, ca, left.ProgramCode=right.ProgramCode
+					j2 := JOIN(cl, ca, left.GroupId=right.GroupId
+															AND left.ProgramCode=right.ProgramCode
 															AND left.ProgramState=right.ProgramState
 															AND left.CaseId=right.CaseId,
 										TRANSFORM(Layouts2.rClientex,
 												self := left;),
-										INNER, LOCAL);
+										INNER, KEEP(1), LOCAL);
 					RETURN j1 & j2;
 	END;
 
 	EXPORT VerifyRelatedAddresses(Dataset(Layouts2.rCaseEx) cases, Dataset(Layouts2.rClientEx) clients, Dataset(Layouts2.rAddressEx) addresses) := FUNCTION
-					ca := DISTRIBUTE(cases, Hash32(ProgramCode, ProgramState, CaseId));
-					cl := DISTRIBUTE(clients, Hash32(ProgramCode, ProgramState, CaseId, ClientId));
-					ad1 := DISTRIBUTE(addresses, Hash32(ProgramCode, ProgramState, CaseId));	// no 
+					ca := DISTRIBUTE(cases, Hash32(GroupId, ProgramCode, ProgramState, CaseId));
+					cl := DISTRIBUTE(clients, Hash32(GroupId, ProgramCode, ProgramState, CaseId, ClientId));
+					ad1 := DISTRIBUTE(addresses, Hash32(GroupId, ProgramCode, ProgramState, CaseId));	// no 
 
 					// find address records with no matching case id								
-					j1 := JOIN(ad1, ca, left.ProgramCode=right.ProgramCode
+					j1 := JOIN(ad1, ca, left.GroupId=right.GroupId
+															AND left.ProgramCode=right.ProgramCode
 															AND left.ProgramState=right.ProgramState
 															AND left.CaseId=right.CaseId,
 										TRANSFORM(nac_v2.Layouts2.rAddressEx,
@@ -294,7 +297,8 @@ EXPORT mod_Validation := MODULE
 												self := left;),
 										LEFT ONLY, LOCAL);
 										
-					j2 := JOIN(ad1, ca, left.ProgramCode=right.ProgramCode
+					j2 := JOIN(ad1, ca, left.GroupId=right.GroupId
+															AND left.ProgramCode=right.ProgramCode
 															AND left.ProgramState=right.ProgramState
 															AND left.CaseId=right.CaseId,
 										TRANSFORM(nac_v2.Layouts2.rAddressEx,
@@ -303,7 +307,8 @@ EXPORT mod_Validation := MODULE
 										
 					// find address records with no matching client id								
 					ad2 := DISTRIBUTE(j2(ClientId<>''), Hash32(ProgramCode, ProgramState, CaseId, ClientId));
-					j3 := JOIN(ad2, cl, left.ProgramCode=right.ProgramCode
+					j3 := JOIN(ad2, cl, left.GroupId=right.GroupId
+															AND left.ProgramCode=right.ProgramCode
 															AND left.ProgramState=right.ProgramState
 															AND left.CaseId=right.CaseId
 															AND left.ClientId=right.ClientId,
@@ -313,7 +318,8 @@ EXPORT mod_Validation := MODULE
 												self := left;),
 										LEFT ONLY, LOCAL);
 										
-					j4 := JOIN(ad2, cl, left.ProgramCode=right.ProgramCode
+					j4 := JOIN(ad2, cl, left.GroupId=right.GroupId
+															AND left.ProgramCode=right.ProgramCode
 															AND left.ProgramState=right.ProgramState
 															AND left.CaseId=right.CaseId
 															AND left.ClientId=right.ClientId,
