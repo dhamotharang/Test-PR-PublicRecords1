@@ -30,7 +30,7 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     Customer rCustomer=AssociatedCustomerFileInfo,
     Customer rSourceCustomer=SourceCustomerFileInfo,
     DATE EventDate,
-    INTEGER LexId,
+    INTEGER LexId, 
 		DATE DateOfBirth,
 		STRING Ssn,
 		STRING EmailAddress,
@@ -191,7 +191,7 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     SuspiciousActivityIndex,
 
     v2_sourcerisklevel,
-    v2_assocsuspicousidentitiescount,
+    v2_assocsuspicousidentitiescount, 
     v2_assoccreditbureauonlycount,
     v2_validationaddrproblems,
     v2_inputaddrageoldest,
@@ -1631,7 +1631,7 @@ Person: => Nap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not
 Person: => IpNotUs := MAP(COUNT(PersonEvent.Transaction(IpNotUs=1))>0 => 1, 0); 
 Person: => IpVpn := MAP(COUNT(PersonEvent.Transaction(IpVpn=1))>0 => 1, 0); 
 Person: => IpHighRiskCity := MAP(COUNT(PersonEvent.Transaction(IpHighRiskCity=1))>0 => 1, 0); 
-Person: => IpHosted := MAP(COUNT(PersonEvent.Transaction(IpHosted=1))>0 => 1, 0); 
+Person: => IpHosted := MAP(COUNT(PersonEvent.Transaction(IpHosted=1))>0 => 1, 0);
 Person: => IpTor := MAP(COUNT(PersonEvent.Transaction(IpTor=1))>0 => 1, 0); 
 
 
@@ -1642,7 +1642,7 @@ Person: => KrLowRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrLowRiskIdentityF
 Person: => KrHighRiskRouting := MAP(COUNT(PersonBankAccount.Account(HighRiskRouting=1))>0 => 1, 0);
 
 Person: => LastEventDate := MAX(PersonEvent.Transaction, EventDate); // last transaction date
-Person: => KrLastEventDate := MAX(PersonEvent(Transaction.KrHighRiskIdentityFlag=1), Transaction.EventDate); // last known risk IDENTITY transaction date
+Person: => KrLastEventDate := MAX(PersonEvent.Transaction(KrHighRiskIdentityFlag=1 OR KrMediumRiskIdentityFlag=1 OR KrLowRiskIdentityFlag=1), EventDate); // last known risk IDENTITY transaction date
 Person: => KrLastElementEventDate := MAX(PersonEvent(Transaction.HasKnownRiskElement=1), Transaction.EventDate); // last transaction date that involved a known risk ELEMENT
 Person: => KrHasKnownRiskElementFlag := MAX(PersonEvent, Transaction.HasKnownRiskElement);
 
@@ -1865,8 +1865,8 @@ SocialSecurityNumber: => KrLowRiskFlag := MAP(COUNT(SsnEvent.Transaction(KrLowRi
 SocialSecurityNumber: => SafeFlag := MAP(COUNT(SsnEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 SocialSecurityNumber: => ContributorSafeFlag := MAP(COUNT(SsnEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
-SocialSecurityNumber: => LastEventDate := MAX(SsnEvent.Transaction, EventDate);
-SocialSecurityNumber: => KrLastEventDate := MAX(SsnEvent.Transaction(KrSsn100Flag=1 OR KrSsn101Flag=1), EventDate);
+SocialSecurityNumber: => LastEventDate := MAX(SsnEvent.Transaction, EventDate); 
+SocialSecurityNumber: => KrLastEventDate := MAX(SsnEvent.Transaction(KrHighRiskSsnFlag=1 OR KrMediumRiskSsnFlag=1 OR KrLowRiskSsnFlag=1), EventDate);
 SocialSecurityNumber: => KrEventAfterLastKnownRiskCount := COUNT(SsnEvent(Transaction.EventDate > SocialSecurityNumber.KrLastEventDate));
 SocialSecurityNumber: => KrEventAfterLastKnownRiskFlag := MAP(KrEventAfterLastKnownRiskCount>0=>1, 0);
 
@@ -2021,7 +2021,7 @@ Phone: => SafeFlag := MAP(COUNT(PhoneEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 Phone: => ContributorSafeFlag := MAP(COUNT(PhoneEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
 Phone: => LastEventDate := MAX(PhoneEvent.Transaction, EventDate);
-Phone: => KrLastEventDate := MAX(PhoneEvent.Transaction(KrHighRiskPhoneFlag=1), EventDate);
+Phone: => KrLastEventDate := MAX(PhoneEvent.Transaction(KrHighRiskPhoneFlag=1 OR KrMediumRiskPhoneFlag=1 OR KrLowRiskPhoneFlag=1), EventDate);
 Phone: => KrEventAfterLastKnownRiskCount := COUNT(PhoneEvent(Transaction.EventDate > Phone.KrLastEventDate));
 Phone: => KrEventAfterLastKnownRiskFlag := MAP(KrEventAfterLastKnownRiskCount>0=>1, 0);
 
@@ -2170,7 +2170,7 @@ Email: => SafeFlag := MAP(COUNT(EmailEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 Email: => ContributorSafeFlag := MAP(COUNT(EmailEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
 Email: => LastEventDate := MAX(EmailEvent.Transaction, EventDate);
-Email: => KrLastEventDate := MAX(EmailEvent.Transaction(KrHighRiskEmailFlag=1), EventDate);
+Email: => KrLastEventDate := MAX(EmailEvent.Transaction(KrHighRiskEmailFlag=1 OR KrMediumRiskEmailFlag=1 OR KrLowRiskEmailFlag=1), EventDate);
 Email: => KrEventAfterLastKnownRiskCount := COUNT(EmailEvent(Transaction.EventDate > Email.KrLastEventDate));
 Email: => KrEventAfterLastKnownRiskFlag := MAP(KrEventAfterLastKnownRiskCount>0=>1, 0);
 
@@ -2325,7 +2325,7 @@ BankAccount: => SafeFlag := MAP(COUNT(BankAccountEvent.Transaction(SafeFlag=1))>
 BankAccount: => ContributorSafeFlag := MAP(COUNT(BankAccountEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
 BankAccount: => LastEventDate := MAX(BankAccountEvent.Transaction, EventDate);
-BankAccount: => KrLastEventDate := MAX(BankAccountEvent.Transaction(KrHighRiskBankFlag=1 OR KrMediumRiskBankFlag = 1), EventDate);
+BankAccount: => KrLastEventDate := MAX(BankAccountEvent.Transaction(KrHighRiskBankFlag=1 OR KrMediumRiskBankFlag = 1 OR KrLowRiskBankFlag=1), EventDate);
 BankAccount: => KrEventAfterLastKnownRiskCount := COUNT(BankAccountEvent(Transaction.EventDate > BankAccount.KrLastEventDate));
 BankAccount: => KrEventAfterLastKnownRiskFlag := MAP(KrEventAfterLastKnownRiskCount>0=>1, 0);
 
@@ -2654,7 +2654,7 @@ InternetProtocol: => KrIp1093Flag := MAP(COUNT(InternetProtocolEvent.Transaction
 
 
 InternetProtocol: => LastEventDate := MAX(InternetProtocolEvent.Transaction, EventDate);
-InternetProtocol: => KrLastEventDate := MAX(InternetProtocolEvent.Transaction(KrHighRiskIpAddressFlag=1), EventDate);
+InternetProtocol: => KrLastEventDate := MAX(InternetProtocolEvent.Transaction(KrHighRiskIpAddressFlag=1 OR KrMediumRiskIpAddressFlag=1 OR KrLowRiskIpAddressFlag=1), EventDate);
 InternetProtocol: => KrEventAfterLastKnownRiskCount := COUNT(InternetProtocolEvent(Transaction.EventDate > InternetProtocol.KrLastEventDate));
 InternetProtocol: => KrEventAfterLastKnownRiskFlag := MAP(KrEventAfterLastKnownRiskCount>0=>1, 0);
 
@@ -2870,7 +2870,7 @@ Address: => KrAddr392Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr392Flag=1)
 Address: => KrAddr393Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr393Flag=1))>0 => 1, 0);
 
 Address: => LastEventDate := MAX(AddressEvent.Transaction, EventDate);
-Address: => KrLastEventDate := MAX(AddressEvent.Transaction(KrHighRiskAddressFlag=1 OR KrMediumRiskAddressFlag=1), EventDate);
+Address: => KrLastEventDate := MAX(AddressEvent.Transaction(KrHighRiskAddressFlag=1 OR KrMediumRiskAddressFlag=1 OR KrLowRiskAddressFlag=1), EventDate);
 Address: => KrEventAfterLastKnownRiskCount := COUNT(AddressEvent(Transaction.EventDate > Address.KrLastEventDate));
 Address: => KrEventAfterLastKnownRiskFlag := MAP(KrEventAfterLastKnownRiskCount>0=>1, 0);
 

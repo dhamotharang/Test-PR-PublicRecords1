@@ -3,7 +3,7 @@ EXPORT data_key_first_ingest(STRING filedate):=FUNCTION
 
     new_ingest_date:=versionControl.fGetFilenameVersion(header.File_header_raw_latest.fileName);
     // take old key with first_ingest dates
-    ds_old:=pull(dx_header.key_first_ingest());
+    ds_old:=dedup(pull(dx_header.key_first_ingest()),record,all);
 
     // take linking payload key (with incremental) and find blank (IOW new rids)
     ds_pyld:=InsuranceHeader_xLink.Key_InsuranceHeader_DID;
@@ -24,6 +24,6 @@ EXPORT data_key_first_ingest(STRING filedate):=FUNCTION
           LOCAL);
                 
     // return updated dataset to build key
-    RETURN ds_for_new_key;
+    RETURN dedup(ds_for_new_key,record,all);
 
 END;
