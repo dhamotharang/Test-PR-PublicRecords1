@@ -8,8 +8,9 @@
     STRING      external_source_code;                       //
     STRING      source_code;                                //
     STRING      source_type;                                //NAPP|PRCOD,SBFEC, GTWL, etc
-    STRING      professional_flag;                          //Contains Professional Information and not consumer only information will available at  PIE and PAE
+    STRING      opt_out_category;                           //For future use
     STRING      data_based_exemptions;                      //DDPA|FCRA|NONE, FCRA|GLBA, HIPAA, etc
     STRING      usage_based_exemptions;                     //DPPA,FCRA,btpae,GLBA|utbws,DPPA |PRQA, etc
+    STRING      category;                                   //CAT1..CAT11 where CAT9 is professional flag
 
 END;
