@@ -8,7 +8,7 @@ EXPORT B_Phone_5 := MODULE
   SHARED VIRTUAL TYPEOF(E_Phone_Event.__Result) __E_Phone_Event := E_Phone_Event.__Result;
   SHARED __EE144286 := __E_Phone;
   SHARED __EE144692 := __ENH_Event_6;
-  SHARED __EE146393 := __EE144692(__EE144692.Kr_High_Risk_Phone_Flag_ = 1);
+  SHARED __EE146393 := __EE144692(__EE144692.Kr_High_Risk_Phone_Flag_ = 1 OR __EE144692.Kr_Medium_Risk_Phone_Flag_ = 1 OR __EE144692.Kr_Low_Risk_Phone_Flag_ = 1);
   SHARED __EE144690 := __E_Phone_Event;
   SHARED __EE149462 := __EE144690(__NN(__EE144690.Phone_Number_) AND __NN(__EE144690.Transaction_));
   SHARED __ST147376_Layout := RECORD

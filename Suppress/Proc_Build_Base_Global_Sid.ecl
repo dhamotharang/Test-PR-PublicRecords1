@@ -22,7 +22,8 @@ EXPORT Proc_Build_Base_Global_Sid(STRING pVersion) := FUNCTION
 		SELF.dt_vendor_first_reported 	:= (UNSIGNED4) pVersion[1..8];
 		SELF.dt_vendor_last_reported 	:= (UNSIGNED4) pVersion[1..8];
 		SELF.process_date				:= (UNSIGNED4) thorlib.WUID()[2..9];
-		SELF.professional_flag			:= IF(L.professional_flag='','N',L.professional_flag);
+		// SELF.professional_flag			:= IF(L.professional_flag='','N',L.professional_flag);
+		SELF.professional_flag			:= IF(REGEXFIND('CAT9',L.category),'Y','N');
 		SELF 							:= L;
 	END;
 

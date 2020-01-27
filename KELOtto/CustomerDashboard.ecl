@@ -94,7 +94,7 @@
 			 SELF.High_Risk_Centroid := MAP((LEFT.High_Risk_Routing_ = 1 OR LEFT.Identity_Count_Gt2_ > 0 ) AND LEFT.Identity_Count_ > 1 => 1, 0), SELF := LEFT, SELF := [])) + 
     PROJECT(KELOtto.Q__show_Customer_Internet_Protocol.Res0(identity_count_ > 1)/*(cl_event_count_ < 1000 AND event_count_ < 1000 AND identity_count_ < 50)*/, 
 		  TRANSFORM(ClusterRecord, 
-			 SELF.Known_Risk_Centroid := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
+			 SELF.Known_Risk_Centroid := MAP((LEFT.kr_high_risk_flag_ = 1  OR LEFT.kr_medium_risk_flag_ = 1 OR LEFT.kr_low_risk_flag_ = 1) AND LEFT.Kr_Event_After_Last_Known_Risk_Flag_ = 1 AND LEFT.Identity_Count_ > 1 => 1, 0),
 			 SELf.High_Risk_Centroid := MAP((LEFT.Ip_Not_Us_ + LEFT.Ip_Vpn_ + LEFT.Ip_High_Risk_City_ + LEFT.Ip_Hosted_ + LEFT.Ip_Tor_ > 0) AND LEFT.Identity_Count_ > 1 => 1, 0),SELF := LEFT));
 		
   EXPORT ClusterPrep := JOIN(KELOtto.KelFiles.FullCluster(entity_context_uid_ = tree_uid_), ClusterPrep1, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.entity_context_uid_, 

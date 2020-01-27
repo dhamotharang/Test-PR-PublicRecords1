@@ -8,7 +8,7 @@ EXPORT B_Address_5 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_6.__ENH_Event_6) __ENH_Event_6 := B_Event_6.__ENH_Event_6;
   SHARED __EE82975 := __E_Address;
   SHARED __EE83413 := __ENH_Event_6;
-  SHARED __EE85146 := __EE83413(__EE83413.Kr_High_Risk_Address_Flag_ = 1 OR __EE83413.Kr_Medium_Risk_Address_Flag_ = 1);
+  SHARED __EE85146 := __EE83413(__EE83413.Kr_High_Risk_Address_Flag_ = 1 OR __EE83413.Kr_Medium_Risk_Address_Flag_ = 1 OR __EE83413.Kr_Low_Risk_Address_Flag_ = 1);
   SHARED __EE83411 := __E_Address_Event;
   SHARED __EE88593 := __EE83411(__NN(__EE83411.Location_) AND __NN(__EE83411.Transaction_));
   SHARED __ST86183_Layout := RECORD
