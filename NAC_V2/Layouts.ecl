@@ -1,6 +1,26 @@
 ﻿import header,address,AID,Tools, STD;
 export Layouts := MODULE
 
+
+EXPORT rlInternalEmailFile := RECORD
+
+ integer2 recordid;
+  string100 eventtype;
+  string50 groupid;
+  string emailaddress;
+  string1 isrecipientinactive;
+  string8 createdate;
+
+END;
+
+
+EXPORT rlEmailValidation := RECORD
+	STRING EmailAddress;
+END;
+
+
+
+
 	export load := RECORD
 		string2	Case_State_Abbreviation
 		,string1	Case_Benefit_Type
