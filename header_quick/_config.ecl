@@ -35,11 +35,11 @@ EXPORT _config (
     
     
     // v_version
-    EXPORT set_v_version := if(isNewEquifaxMonthlyFile(sourceIP),
+    EXPORT set_v_version(STRING overwriteDate='') := if(isNewEquifaxMonthlyFile(sourceIP) OR overwriteDate<>'',
                                  sequential(
-                                     output(dataset([{newEquifaxMothlyHeaderDate}],{string v_version}),,v_version_file_name+'_'+workunit),
+                                     output(dataset([{if(overwriteDate='',newEquifaxMothlyHeaderDate,overwriteDate)}],{string v_version}),,v_version_file_name+'_'+workunit),
                                      std.file.startsuperfiletransaction(),
-                                     std.file.createsuperfile(v_version_file_name,,true),
+                                     std.   file.createsuperfile(v_version_file_name,,true),
                                      std.file.clearsuperfile(v_version_file_name,true),
                                      std.file.addsuperfile(v_version_file_name,v_version_file_name+'_'+workunit),
                                      std.file.finishsuperfiletransaction()
@@ -48,7 +48,7 @@ EXPORT _config (
                                  
     // v_eq_as_of_date
     verifyFileDate(string newWeeklyFileDate):= IF( ut.DaysApart(newWeeklyFileDate,(STRING8)Std.Date.Today() )>10, FAIL('NEW WEEKLY FILE DATE IS MORE THAN 10 DAYS APART FROM RUN DATE'));
-    EXPORT set_v_eq_as_of_date(STRING overwriteDate='') := if(isNewEquifaxWeeklyFile(sourceIP),
+    EXPORT set_v_eq_as_of_date(STRING overwriteDate='') := if(isNewEquifaxWeeklyFile(sourceIP) OR overwriteDate<>'',
                                     sequential(
                                          verifyFileDate(IF(overwriteDate='',newEquifaxWeeklyHeaderDate,overwriteDate)),
                                          output(dataset([{if(overwriteDate='',newEquifaxWeeklyHeaderDate,overwriteDate)}],{string v_eq_as_of_date}),,v_eq_as_of_date_file_name+'_'+workunit),

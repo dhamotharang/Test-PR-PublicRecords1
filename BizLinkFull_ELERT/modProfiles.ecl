@@ -21,13 +21,17 @@
     ];
 		
   SHARED SET OF STRING ssExternalSets := [
-				'GT'  //Garnishments
-			 ,'S#'  //Spoke
+				'GR'  //Garnishments
+			 ,'SP'  //Spoke
 			 ,'@@'  //Taxpro
 			 ,'!!'  //Thrive
-			 ,'V@' //Vickers13
-			 ,'V#' //VICKERS
-			 ,'Z@' //ZOOM
+			 ,'V@' 	//Vickers13
+			 ,'V#' 	//VICKERS
+			 ,'ZM' 	//ZOOM
+			 ,'BY'	//BANKRUPTCY_ATTORNEY
+			 ,'MP'	//Mari professional license
+			 ,'S@'	//Sanctn
+			 ,'M@'	//Sanctn np
   ];
   
   
@@ -135,10 +139,10 @@ EXPORT IARProfile := DATASET([
  ,	{'Equifax Business Marketing File', ['Z1'],	44, 0,	75, 9, 8, 'Header', []}
  ,	{'Bankruptcy',['BA'],	44, 0,	75, 9, 8, 'Header', []}
  ,	{'Judgement and Liens',['L2'],	44, 0,	75, 9, 8, 'Header', []}
- ,	{'Real Property',['LA'],	44, 0,	75, 9, 8, 'Header', []} //[LA, LP, FA, FP] needs modification
+ ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	44, 0,	75, 9, 8, 'Header', []} 
  ,	{'Business Registrations',['BR'],	44, 0,	75, 9, 8, 'Header', []}
  ,	{'Duns and Bradstreet FEIN',['DN'],	44, 0,	75, 9, 8, 'Header', []}
- ,	{'Experian FEIN Unrestricted',['E9'],	44, 0,	75, 9, 8, 'Header', []}
+ ,	{'Experian FEIN Unrestricted',['E6'],	44, 0,	75, 9, 8, 'Header', []}
  ,	{'Experian FEIN Restricted',['E5'],	44, 0,	75, 9, 8, 'Header', []}
  ,  {'BUSINESSCREDITREPORT',['T1'],	44, 0,	75, 9, 8, 'Inquiry', []}
  ,  {'SMALLBUSINESSANALYTICS', ['T2'], 44, 0,	75, 9, 8, 'Inquiry', []}
@@ -148,13 +152,17 @@ EXPORT IARProfile := DATASET([
  ,	{'TOPBUSINESS', ['T'],	44, 0,	75, 9, 8, 'Inquiry', []}
  ,	{'PREFILL', ['P'],	44, 0,	75, 9, 8, 'Inquiry', []}
  ,	{'BATCH', ['B#'],	44, 0,	75, 9, 8, 'Batch', []} //missing
- ,	{'GARNISH', ['GT'],	44, 0,	75, 9, 8, 'External', []}
- ,	{'SPOKE', ['S#'],	44, 0,	75, 9, 8, 'External', []}
+ ,	{'GARNISH', ['GR'],	44, 0,	75, 9, 8, 'External', []}
+ ,	{'SPOKE', ['SP'],	44, 0,	75, 9, 8, 'External', []}
  ,	{'TAXPRO', ['@@'],	44, 0,	75, 9, 8, 'External', []}
  ,	{'THRIVE', ['!!'],	44, 0,	75, 9, 8, 'External', []}//missing
  ,	{'VICKERS13', ['V@'],	44, 0,	75, 9, 8, 'External', []}
  ,	{'VICKERS', ['V#'],	44, 0,	75, 9, 8, 'External', []}
- ,	{'ZOOM', ['Z#'],	44, 0,	75, 9, 8, 'External', []} //missing
+ ,	{'ZOOM', ['ZM'],	44, 0,	75, 9, 8, 'External', []} //missing
+ ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	44, 0,	75, 9, 8, 'External', []}
+ ,	{'MARI_PROF_LICENSE', ['MP'],	44, 0,	75, 9, 8, 'External', []}
+ ,	{'SANCTN', ['S@'],	44, 0,	75, 9, 8, 'External', []}
+ ,	{'SANCTN_NP', ['M@'],	44, 0,	75, 9, 8, 'External', []}
     ], modLayouts.profileRec);
 
  EXPORT dProfileAll_SALT311Test := DATASET([
@@ -166,10 +174,10 @@ EXPORT IARProfile := DATASET([
  ,	{'Equifax Business Marketing File', ['Z1'],	44, 0,	75, 10, 11, 'Header', []}
  ,	{'Bankruptcy',['BA'],	44, 0,	75, 10, 11, 'Header', []}
  ,	{'Judgement and Liens',['L2'],	44, 0,	75, 10, 11, 'Header', []}
- ,	{'Real Property',['LA'],	44, 0,	75, 10, 11, 'Header', []} //[LA, LP, FA, FP] needs modification
+ ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	44, 0,	75, 10, 11, 'Header', []}
  ,	{'Business Registrations',['BR'],	44, 0,	75, 10, 11, 'Header', []}
  ,	{'Duns and Bradstreet FEIN',['DN'],	44, 0,	75, 10, 11, 'Header', []}
- ,	{'Experian FEIN Unrestricted',['E9'],	44, 0,	75, 10, 11, 'Header', []}
+ ,	{'Experian FEIN Unrestricted',['E6'],	44, 0,	75, 10, 11, 'Header', []}
  ,	{'Experian FEIN Restricted',['E5'],	44, 0,	75, 10, 11, 'Header', []}
  ,  {'BUSINESSCREDITREPORT',['T1'],	44, 0,	75, 10, 11, 'Inquiry', []}
  ,  {'SMALLBUSINESSANALYTICS', ['T2'], 44, 0,	75, 10, 11, 'Inquiry', []}
@@ -179,13 +187,17 @@ EXPORT IARProfile := DATASET([
  ,	{'TOPBUSINESS', ['T'],	44, 0,	75, 10, 11, 'Inquiry', []}
  ,	{'PREFILL', ['P'],	44, 0,	75, 10, 11, 'Inquiry', []}
  ,	{'BATCH', ['B#'],	44, 0,	75, 10, 11, 'Batch', []} //missing
- ,	{'GARNISH', ['GT'],	44, 0,	75, 10, 11, 'External', []}
- ,	{'SPOKE', ['S#'],	44, 0,	75, 10, 11, 'External', []}
+ ,	{'GARNISH', ['GR'],	44, 0,	75, 10, 11, 'External', []}
+ ,	{'SPOKE', ['SP'],	44, 0,	75, 10, 11, 'External', []}
  ,	{'TAXPRO', ['@@'],	44, 0,	75, 10, 11, 'External', []}
  ,	{'THRIVE', ['!!'],	44, 0,	75, 10, 11, 'External', []}//missing
  ,	{'VICKERS13', ['V@'],	44, 0,	75, 10, 11, 'External', []}
  ,	{'VICKERS', ['V#'],	44, 0,	75, 10, 11, 'External', []}
- ,	{'ZOOM', ['Z#'],	44, 0,	75, 10, 11, 'External', []} //missing
+ ,	{'ZOOM', ['ZM'],	44, 0,	75, 10, 11, 'External', []} //missing
+ ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	44, 0,	75, 10, 11, 'External', []}
+ ,	{'MARI_PROF_LICENSE', ['MP'],	44, 0,	75, 10, 11, 'External', []}
+ ,	{'SANCTN', ['S@'],	44, 0,	75, 10, 11, 'External', []}
+ ,	{'SANCTN_NP', ['M@'],	44, 0,	75, 10, 11, 'External', []}
     ], modLayouts.profileRec);
 
 EXPORT dProfileAll_segmentation_roxie_overall := DATASET([
@@ -197,10 +209,10 @@ EXPORT dProfileAll_segmentation_roxie_overall := DATASET([
  // ,	{'Equifax Business Marketing File', ['Z1'],	44, 0,	75, 9, 8, 'Header', []}
  // ,	{'Bankruptcy',['BA'],	44, 0,	75, 9, 8, 'Header', []}
  // ,	{'Judgement and Liens',['L2'],	44, 0,	75, 9, 8, 'Header', []}
- // ,	{'Real Property',['LA'],	44, 0,	75, 9, 8, 'Header', []} //[LA, LP, FA, FP] needs modification
+ // ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	44, 0,	75, 9, 8, 'Header', []} 
  // ,	{'Business Registrations',['BR'],	44, 0,	75, 9, 8, 'Header', []}
  // ,	{'Duns and Bradstreet FEIN',['DN'],	44, 0,	75, 9, 8, 'Header', []}
- // ,	{'Experian FEIN Unrestricted',['E9'],	44, 0,	75, 9, 8, 'Header', []}
+ // ,	{'Experian FEIN Unrestricted',['E6'],	44, 0,	75, 9, 8, 'Header', []}
  // ,	{'Experian FEIN Restricted',['E5'],	44, 0,	75, 9, 8, 'Header', []}
    {'BUSINESSCREDITREPORT',['T1'],	44, 0,	75, 14, 15, 'Inquiry', []}
  ,  {'SMALLBUSINESSANALYTICS', ['T2'], 44, 0,	75, 14, 15, 'Inquiry', []}
@@ -210,13 +222,17 @@ EXPORT dProfileAll_segmentation_roxie_overall := DATASET([
  ,	{'TOPBUSINESS', ['T'],	44, 0,	75, 14, 15, 'Inquiry', []}
  ,	{'PREFILL', ['P'],	44, 0,	75, 14, 15, 'Inquiry', []}
  ,	{'BATCH', ['B#'],	44, 0,	75, 14, 15, 'Batch', []} //missing
- ,	{'GARNISH', ['GT'],	44, 0,	75, 14, 15, 'External', []}
- ,	{'SPOKE', ['S#'],	44, 0,	75, 14, 15, 'External', []}
+ ,	{'GARNISH', ['GR'],	44, 0,	75, 14, 15, 'External', []}
+ ,	{'SPOKE', ['SP'],	44, 0,	75, 14, 15, 'External', []}
  ,	{'TAXPRO', ['@@'],	44, 0,	75, 14, 15, 'External', []}
  ,	{'THRIVE', ['!!'],	44, 0,	75, 14, 15, 'External', []}//missing
  ,	{'VICKERS13', ['V@'],	44, 0,	75, 14, 15, 'External', []}
  ,	{'VICKERS', ['V#'],	44, 0,	75, 14, 15, 'External', []}
- ,	{'ZOOM', ['Z#'],	44, 0,	75, 14, 15, 'External', []} //missing
+ ,	{'ZOOM', ['ZM'],	44, 0,	75, 14, 15, 'External', []} //missing
+ ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	44, 0,	75, 14, 15, 'External', []}
+ ,	{'MARI_PROF_LICENSE', ['MP'],	44, 0,	75, 14, 15, 'External', []}
+ ,	{'SANCTN', ['S@'],	44, 0,	75, 14, 15, 'External', []}
+ ,	{'SANCTN_NP', ['M@'],	44, 0,	75, 14, 15, 'External', []}
     ], modLayouts.profileRec);
 
 EXPORT dProfileAll_segmentation_thor_overall := DATASET([
@@ -228,10 +244,10 @@ EXPORT dProfileAll_segmentation_thor_overall := DATASET([
  // ,	{'Equifax Business Marketing File', ['Z1'],	44, 0,	75, 17, 18, 'Header', []}
  // ,	{'Bankruptcy',['BA'],	44, 0,	75, 17, 18, 'Header', []}
  // ,	{'Judgement and Liens',['L2'],	44, 0,	75, 17, 18, 'Header', []}
- // ,	{'Real Property',['LA'],	44, 0,	75, 17, 18, 'Header', []} //[LA, LP, FA, FP] needs modification
+ // ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	44, 0,	75, 17, 18, 'Header', []} 
  // ,	{'Business Registrations',['BR'],	44, 0,	75, 17, 18, 'Header', []}
  // ,	{'Duns and Bradstreet FEIN',['DN'],	44, 0,	75, 17, 18, 'Header', []}
- // ,	{'Experian FEIN Unrestricted',['E9'],	44, 0,	75, 17, 18, 'Header', []}
+ // ,	{'Experian FEIN Unrestricted',['E6'],	44, 0,	75, 17, 18, 'Header', []}
  // ,	{'Experian FEIN Restricted',['E5'],	44, 0,	75, 17, 18, 'Header', []}
    {'BUSINESSCREDITREPORT',['T1'],	44, 0,	75, 17, 18, 'Inquiry', []}
  ,  {'SMALLBUSINESSANALYTICS', ['T2'], 44, 0,	75, 17, 18, 'Inquiry', []}
@@ -241,13 +257,17 @@ EXPORT dProfileAll_segmentation_thor_overall := DATASET([
  ,	{'TOPBUSINESS', ['T'],	44, 0,	75, 17, 18, 'Inquiry', []}
  ,	{'PREFILL', ['P'],	44, 0,	75, 17, 18, 'Inquiry', []}
  ,	{'BATCH', ['B#'],	44, 0,	75, 17, 18, 'Batch', []} //missing
- ,	{'GARNISH', ['GT'],	44, 0,	75, 17, 18, 'External', []}
- ,	{'SPOKE', ['S#'],	44, 0,	75, 17, 18, 'External', []}
+ ,	{'GARNISH', ['GR'],	44, 0,	75, 17, 18, 'External', []}
+ ,	{'SPOKE', ['SP'],	44, 0,	75, 17, 18, 'External', []}
  ,	{'TAXPRO', ['@@'],	44, 0,	75, 17, 18, 'External', []}
  ,	{'THRIVE', ['!!'],	44, 0,	75, 17, 18, 'External', []}//missing
  ,	{'VICKERS13', ['V@'],	44, 0,	75, 17, 18, 'External', []}
  ,	{'VICKERS', ['V#'],	44, 0,	75, 17, 18, 'External', []}
- ,	{'ZOOM', ['Z#'],	44, 0,	75, 17, 18, 'External', []} //missing
+ ,	{'ZOOM', ['ZM'],	44, 0,	75, 17, 18, 'External', []} //missing
+ ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	44, 0,	75, 17, 18, 'External', []}
+ ,	{'MARI_PROF_LICENSE', ['MP'],	44, 0,	75, 17, 18, 'External', []}
+ ,	{'SANCTN', ['S@'],	44, 0,	75, 17, 18, 'External', []}
+ ,	{'SANCTN_NP', ['M@'],	44, 0,	75, 17, 18, 'External', []}
     ], modLayouts.profileRec);
 
 EXPORT dProfileAll_segmentation_MMF_overall := DATASET([
@@ -259,10 +279,10 @@ EXPORT dProfileAll_segmentation_MMF_overall := DATASET([
  ,	{'Equifax Business Marketing File', ['Z1'],	44, 0,	75, 21, 22, 'Header', []}
  ,	{'Bankruptcy',['BA'],	44, 0,	75, 21, 22, 'Header', []}
  ,	{'Judgement and Liens',['L2'],	44, 0,	75, 21, 22, 'Header', []}
- ,	{'Real Property',['LA'],	44, 0,	75, 21, 22, 'Header', []} //[LA, LP, FA, FP] needs modification
+ ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	44, 0,	75, 21, 22, 'Header', []} 
  ,	{'Business Registrations',['BR'],	44, 0,	75, 21, 22, 'Header', []}
  ,	{'Duns and Bradstreet FEIN',['DN'],	44, 0,	75, 21, 22, 'Header', []}
- ,	{'Experian FEIN Unrestricted',['E9'],	44, 0,	75, 21, 22, 'Header', []}
+ ,	{'Experian FEIN Unrestricted',['E6'],	44, 0,	75, 21, 22, 'Header', []}
  ,	{'Experian FEIN Restricted',['E5'],	44, 0,	75, 21, 22, 'Header', []}
  ,  {'BUSINESSCREDITREPORT',['T1'],	44, 0,	75, 21, 22, 'Inquiry', []}
  ,  {'SMALLBUSINESSANALYTICS', ['T2'], 44, 0,	75, 21, 22, 'Inquiry', []}
@@ -272,14 +292,85 @@ EXPORT dProfileAll_segmentation_MMF_overall := DATASET([
  ,	{'TOPBUSINESS', ['T'],	44, 0,	75, 21, 22, 'Inquiry', []}
  ,	{'PREFILL', ['P'],	44, 0,	75, 21, 22, 'Inquiry', []}
  ,	{'BATCH', ['B#'],	44, 0,	75, 21, 22, 'Batch', []} //missing
- ,	{'GARNISH', ['GT'],	44, 0,	75, 21, 22, 'External', []}
- ,	{'SPOKE', ['S#'],	44, 0,	75, 21, 22, 'External', []}
+ ,	{'GARNISH', ['GR'],	44, 0,	75, 21, 22, 'External', []}
+ ,	{'SPOKE', ['SP'],	44, 0,	75, 21, 22, 'External', []}
  ,	{'TAXPRO', ['@@'],	44, 0,	75, 21, 22, 'External', []}
  ,	{'THRIVE', ['!!'],	44, 0,	75, 21, 22, 'External', []}//missing
  ,	{'VICKERS13', ['V@'],	44, 0,	75, 21, 22, 'External', []}
  ,	{'VICKERS', ['V#'],	44, 0,	75, 21, 22, 'External', []}
- ,	{'ZOOM', ['Z#'],	44, 0,	75, 21, 22, 'External', []} //missing
+ ,	{'ZOOM', ['ZM'],	44, 0,	75, 21, 22, 'External', []} //missing
+ ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	44, 0,	75, 21, 22, 'External', []}
+ ,	{'MARI_PROF_LICENSE', ['MP'],	44, 0,	75, 21, 22, 'External', []}
+ ,	{'SANCTN', ['S@'],	44, 0,	75, 21, 22, 'External', []}
+ ,	{'SANCTN_NP', ['M@'],	44, 0,	75, 21, 22, 'External', []}
     ], modLayouts.profileRec);
+
+EXPORT dProfileAll_sRid_MMF_weight_overall := DATASET([
+		{'SBFE',['BC'],	0, 0,	75, 22, 23, 'Header', []}
+ ,	{'CORTERA',['RR'],	0, 0,	75, 22, 23, 'Header', []}
+ ,	{'Dunn Bradstreet', ['D'],	0,  0,	75, 22, 23, 'Header', []}
+ ,  {'SOS',MDR.SourceTools.set_CorpV2,	0, 0,	75,	22, 23, 'Header', []}
+ ,  {'Experian Business Reports',['ER'],	0, 0,	75, 22, 23, 'Header', []}
+ ,	{'Equifax Business Marketing File', ['Z1'],	0, 0,	75, 22, 23, 'Header', []}
+ ,	{'Bankruptcy',['BA'],	0, 0,	75, 22, 23, 'Header', []}
+ ,	{'Judgement and Liens',['L2'],	0, 0,	75, 22, 23, 'Header', []}
+ ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	0, 0,	75, 22, 23, 'Header', []}
+ ,	{'Business Registrations',['BR'],	0, 0,	75, 22, 23, 'Header', []}
+ ,	{'Duns and Bradstreet FEIN',['DN'],	0, 0,	75, 22, 23, 'Header', []}
+ ,	{'Experian FEIN Unrestricted',['E6'],	0, 0,	75, 22, 23, 'Header', []}
+ ,	{'Experian FEIN Restricted',['E5'],	0, 0,	75, 22, 23, 'Header', []}
+//  , 	{'BUSINESSCREDITREPORT',['T1'],	0, 0,	75, 22, 23, 'Inquiry', []}
+//  ,  {'SMALLBUSINESSANALYTICS', ['T2'], 0, 0,	75, 22, 23, 'Inquiry', []}
+//  ,  {'SMALLBUSINESSBIPCOMBINEDREPORT', ['T3'],	0, 0,	75, 22, 23, 'Inquiry', []}
+//  ,	{'SMALLBUSINESSRISK', ['T4'],	0, 0,	75, 22, 23, 'Inquiry', []}
+//  ,	{'BUSINESSINSTANTID2', ['T5'],	0, 0,	75, 22, 23, 'Inquiry', []}
+//  ,	{'TOPBUSINESS', ['T'],	0, 0,	75, 22, 23, 'Inquiry', []}
+//  ,	{'PREFILL', ['P'],	0, 0,	75, 22, 23, 'Inquiry', []}
+//  ,	{'BATCH', ['B#'],	0, 0,	75, 22, 23, 'Batch', []} //missing
+//  ,	{'GARNISH', ['GR'],	0, 0,	75, 22, 23, 'External', []}
+//  ,	{'SPOKE', ['SP'],	0, 0,	75, 22, 23, 'External', []}
+//  ,	{'TAXPRO', ['@@'],	0, 0,	75, 22, 23, 'External', []}
+//  ,	{'THRIVE', ['!!'],	0, 0,	75, 22, 23, 'External', []}//missing
+//  ,	{'VICKERS13', ['V@'],	0, 0,	75, 22, 23, 'External', []}
+//  ,	{'VICKERS', ['V#'],	0, 0,	75, 22, 23, 'External', []}
+//  ,	{'ZOOM', ['ZM'],	0, 0,	75, 22, 23, 'External', []} //missing
+//  ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	44, 0,	75, 22, 23, 'External', []}
+     ], modLayouts.profileRec);
+
+EXPORT dProfileAll_MMF_weight_overall := DATASET([
+// 		{'SBFE',['BC'],	0, 0,	75, 24, 25, 'Header', []}
+//  ,	{'CORTERA',['RR'],	0, 0,	75, 24, 25, 'Header', []}
+//  ,	{'Dunn Bradstreet', ['D'],	0,  0,	75, 24, 25, 'Header', []}
+//  ,  {'SOS',MDR.SourceTools.set_CorpV2,	0, 0,	75,	24, 25, 'Header', []}
+//  ,  {'Experian Business Reports',['ER'],	0, 0,	75, 24, 25, 'Header', []}
+//  ,	{'Equifax Business Marketing File', ['Z1'],	0, 0,	75, 24, 25, 'Header', []}
+//  ,	{'Bankruptcy',['BA'],	0, 0,	75, 24, 25, 'Header', []}
+//  ,	{'Judgement and Liens',['L2'],	0, 0,	75, 24, 25, 'Header', []}
+//  ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	0, 0,	75, 24, 25, 'Header', []}
+//  ,	{'Business Registrations',['BR'],	0, 0,	75, 24, 25, 'Header', []}
+//  ,	{'Duns and Bradstreet FEIN',['DN'],	0, 0,	75, 24, 25, 'Header', []}
+//  ,	{'Experian FEIN Unrestricted',['E6'],	0, 0,	75, 24, 25, 'Header', []}
+//  ,	{'Experian FEIN Restricted',['E5'],	0, 0,	75, 24, 25, 'Header', []}
+// ,  {'BUSINESSCREDITREPORT',['T1'],	0, 0,	75, 24, 25, 'Inquiry', []}
+// ,  {'SMALLBUSINESSANALYTICS', ['T2'], 0, 0,	75, 24, 25, 'Inquiry', []}
+// ,  {'SMALLBUSINESSBIPCOMBINEDREPORT', ['T3'],	0, 0,	75, 24, 25, 'Inquiry', []}
+// ,	{'SMALLBUSINESSRISK', ['T4'],	0, 0,	75, 24, 25, 'Inquiry', []}
+// ,	{'BUSINESSINSTANTID2', ['T5'],	0, 0,	75, 24, 25, 'Inquiry', []}
+// ,	{'TOPBUSINESS', ['T'],	0, 0,	75, 24, 25, 'Inquiry', []}
+// ,	{'PREFILL', ['P'],	0, 0,	75, 24, 25, 'Inquiry', []}
+// ,	{'BATCH', ['B#'],	0, 0,	75, 24, 25, 'Batch', []} //missing
+	{'GARNISH', ['GR'],	0, 0,	75, 24, 25, 'External', []}
+ ,	{'SPOKE', ['SP'],	0, 0,	75, 24, 25, 'External', []}
+ ,	{'TAXPRO', ['@@'],	0, 0,	75, 24, 25, 'External', []}
+ ,	{'THRIVE', ['!!'],	0, 0,	75, 24, 25, 'External', []}//missing
+ ,	{'VICKERS13', ['V@'],	0, 0,	75, 24, 25, 'External', []}
+ ,	{'VICKERS', ['V#'],	0, 0,	75, 24, 25, 'External', []}
+ ,	{'ZOOM', ['ZM'],	0, 0,	75, 24, 25, 'External', []} //missing
+ ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	44, 0,	75, 24, 25, 'External', []}
+ ,	{'MARI_PROF_LICENSE', ['MP'],	44, 0,	75, 24, 25, 'External', []}
+ ,	{'SANCTN', ['S@'],	44, 0,	75, 24, 25, 'External', []}
+ ,	{'SANCTN_NP', ['M@'],	44, 0,	75, 24, 25, 'External', []}
+     ], modLayouts.profileRec);
 
 EXPORT dProfileAll_zipExpansion := DATASET([
 		// {'SBFE',['BC'],	44, 0,	75, 12, 13, 'Header', []}
@@ -290,10 +381,10 @@ EXPORT dProfileAll_zipExpansion := DATASET([
  // ,	{'Equifax Business Marketing File', ['Z1'],	44, 0,	75, 12, 13, 'Header', []}
  	{'Bankruptcy',['BA'],	44, 0,	75, 12, 13, 'Header', []}
  // ,	{'Judgement and Liens',['L2'],	44, 0,	75, 12, 13, 'Header', []}
- // ,	{'Real Property',['LA'],	44, 0,	75, 12, 13, 'Header', []} //[LA, LP, FA, FP] needs modification
+ // ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	44, 0,	75, 12, 13, 'Header', []}
  ,	{'Business Registrations',['BR'],	44, 0,	75, 12, 13, 'Header', []}
  // ,	{'Duns and Bradstreet FEIN',['DN'],	44, 0,	75, 12, 13, 'Header', []}
- // ,	{'Experian FEIN Unrestricted',['E9'],	44, 0,	75, 12, 13, 'Header', []}
+ // ,	{'Experian FEIN Unrestricted',['E6'],	44, 0,	75, 12, 13, 'Header', []}
  // ,	{'Experian FEIN Restricted',['E5'],	44, 0,	75, 12, 13, 'Header', []}
  ,  {'BUSINESSCREDITREPORT',['T1'],	44, 0,	75, 12, 13, 'Inquiry', []}
  ,  {'SMALLBUSINESSANALYTICS', ['T2'], 44, 0,	75, 12, 13, 'Inquiry', []}
@@ -303,13 +394,17 @@ EXPORT dProfileAll_zipExpansion := DATASET([
  ,	{'TOPBUSINESS', ['T'],	44, 0,	75, 12, 13, 'Inquiry', []}
  ,	{'PREFILL', ['P'],	44, 0,	75, 12, 13, 'Inquiry', []}
  ,	{'BATCH', ['B#'],	44, 0,	75, 12, 13, 'Batch', []} //missing
- ,	{'GARNISH', ['GT'],	44, 0,	75, 12, 13, 'External', []}
- ,	{'SPOKE', ['S#'],	44, 0,	75, 12, 13, 'External', []}
+ ,	{'GARNISH', ['GR'],	44, 0,	75, 12, 13, 'External', []}
+ ,	{'SPOKE', ['SP'],	44, 0,	75, 12, 13, 'External', []}
  ,	{'TAXPRO', ['@@'],	44, 0,	75, 12, 13, 'External', []}
  ,	{'THRIVE', ['!!'],	44, 0,	75, 12, 13, 'External', []}//missing
  ,	{'VICKERS13', ['V@'],	44, 0,	75, 12, 13, 'External', []}
  ,	{'VICKERS', ['V#'],	44, 0,	75, 12, 13, 'External', []}
- ,	{'ZOOM', ['Z#'],	44, 0,	75, 12, 13, 'External', []} //missing
+ ,	{'ZOOM', ['ZM'],	44, 0,	75, 12, 13, 'External', []} //missing
+ ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	44, 0,	75, 12, 13, 'External', []}
+ ,	{'MARI_PROF_LICENSE', ['MP'],	44, 0,	75, 12, 13, 'External', []}
+ ,	{'SANCTN', ['S@'],	44, 0,	75, 12, 13, 'External', []}
+ ,	{'SANCTN_NP', ['M@'],	44, 0,	75, 12, 13, 'External', []}
     ], modLayouts.profileRec);
 
 EXPORT dProfileAll_roxie_segmentation := DATASET([
@@ -438,10 +533,10 @@ EXPORT dProfileAll_ThorProdVsThorLocal := DATASET([
  ,	{'Equifax Business Marketing File', ['Z1'],	0,0,0, 2, 2, 'Header', []}
  ,	{'Bankruptcy',['BA'],	0,0,0, 2, 2, 'Header', []}
  ,	{'Judgement and Liens',['L2'],	0,0,0, 2, 2, 'Header', []}
- ,	{'Real Property',['LA'],	0,0,0, 2, 2, 'Header', []} //[LA, LP, FA, FP] needs modification
+ ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	0,0,0, 2, 2, 'Header', []}
  ,	{'Business Registrations',['BR'],	0,0,0, 2, 2, 'Header', []}
  ,	{'Duns and Bradstreet FEIN',['DN'],	0,0,0, 2, 2, 'Header', []}
- ,	{'Experian FEIN Unrestricted',['E9'], 0,0,0, 2, 2, 'Header', []}
+ ,	{'Experian FEIN Unrestricted',['E6'], 0,0,0, 2, 2, 'Header', []}
  ,	{'Experian FEIN Restricted',['E5'],	0,0,0, 2, 2, 'Header', []}
  ,  {'BUSINESSCREDITREPORT',['T1'],	0,0,0, 2, 2, 'Inquiry', []}
  ,  {'SMALLBUSINESSANALYTICS', ['T2'], 0,0,0, 2, 2, 'Inquiry', []}
@@ -451,13 +546,17 @@ EXPORT dProfileAll_ThorProdVsThorLocal := DATASET([
  ,	{'TOPBUSINESS', ['T'],	0,0,0, 2, 2, 'Inquiry', []}
  ,	{'PREFILL', ['P'],	0,0,0, 2, 2, 'Inquiry', []}
  ,	{'BATCH', ['B#'],	0,0,0, 2, 2, 'Batch', []} //missing
- ,	{'GARNISH', ['GT'],	0,0,0, 2, 2, 'External', []}
- ,	{'SPOKE', ['S#'],	0,0,0, 2, 2, 'External', []}
+ ,	{'GARNISH', ['GR'],	0,0,0, 2, 2, 'External', []}
+ ,	{'SPOKE', ['SP'],	0,0,0, 2, 2, 'External', []}
  ,	{'TAXPRO', ['@@'],	0,0,0, 2, 2, 'External', []}
  ,	{'THRIVE', ['!!'],	0,0,0, 2, 2, 'External', []}//missing
  ,	{'VICKERS13', ['V@'],	0,0,0, 2, 2, 'External', []}
  ,	{'VICKERS', ['V#'],	0,0,0, 2, 2, 'External', []}
- ,	{'ZOOM', ['Z#'],	0,0,0, 2, 2, 'External', []} //missing
+ ,	{'ZOOM', ['ZM'],	0,0,0, 2, 2, 'External', []} //missing
+ ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	0, 0,	0, 2, 2, 'External', []}
+ ,	{'MARI_PROF_LICENSE', ['MP'],	0, 0,	0, 2, 2, 'External', []}
+ ,	{'SANCTN', ['S@'],	0, 0,	0, 2, 2, 'External', []}
+ ,	{'SANCTN_NP', ['M@'],	0, 0,	0, 2, 2, 'External', []}
     ], modLayouts.profileRec);         
  
 EXPORT dProfileAll_ThorUsingRoxieDefaults := DATASET([
@@ -469,10 +568,10 @@ EXPORT dProfileAll_ThorUsingRoxieDefaults := DATASET([
  ,	{'Equifax Business Marketing File', ['Z1'],	44, 0,	75, 19, 20,'Header', []}
  ,	{'Bankruptcy',['BA'],	44, 0,	75, 19, 20,'Header', []}
  ,	{'Judgement and Liens',['L2'],	44, 0,	75, 19, 20,'Header', []}
- ,	{'Real Property',['LA'],	44, 0,	75, 19, 20,'Header', []} //[LA, LP, FA, FP] needs modification
+ ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	44, 0,	75, 19, 20,'Header', []}
  ,	{'Business Registrations',['BR'],	44, 0,	75, 19, 20,'Header', []}
  ,	{'Duns and Bradstreet FEIN',['DN'],	44, 0,	75, 19, 20,'Header', []}
- ,	{'Experian FEIN Unrestricted',['E9'],	44, 0,	75, 19, 20,'Header', []}
+ ,	{'Experian FEIN Unrestricted',['E6'],	44, 0,	75, 19, 20,'Header', []}
  ,	{'Experian FEIN Restricted',['E5'],	44, 0,	75, 19, 20,'Header', []}
  ,  {'BUSINESSCREDITREPORT',['T1'],	44, 0,	75, 19, 20,'Inquiry', []}
  ,  {'SMALLBUSINESSANALYTICS', ['T2'], 44, 0,	75, 19, 20,'Inquiry', []}
@@ -482,13 +581,17 @@ EXPORT dProfileAll_ThorUsingRoxieDefaults := DATASET([
  ,	{'TOPBUSINESS', ['T'],	44, 0,	75, 19, 20,'Inquiry', []}
  ,	{'PREFILL', ['P'],	44, 0,	75, 19, 20,'Inquiry', []}
  ,	{'BATCH', ['B#'],	44, 0,	75, 19, 20,'Batch', []} //missing
- ,	{'GARNISH', ['GT'],	44, 0,	75, 19, 20,'External', []}
- ,	{'SPOKE', ['S#'],	44, 0,	75, 19, 20,'External', []}
+ ,	{'GARNISH', ['GR'],	44, 0,	75, 19, 20,'External', []}
+ ,	{'SPOKE', ['SP'],	44, 0,	75, 19, 20,'External', []}
  ,	{'TAXPRO', ['@@'],	44, 0,	75, 19, 20,'External', []}
  ,	{'THRIVE', ['!!'],	44, 0,	75, 19, 20,'External', []}//missing
  ,	{'VICKERS13', ['V@'],	44, 0,	75, 19, 20,'External', []}
  ,	{'VICKERS', ['V#'],	44, 0,	75, 19, 20,'External', []}
- ,	{'ZOOM', ['Z#'],	44, 0,	75, 19, 20,'External', []} //missing
+ ,	{'ZOOM', ['ZM'],	44, 0,	75, 19, 20,'External', []} //missing
+ ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	44, 0,	75, 19, 20, 'External', []}
+ ,	{'MARI_PROF_LICENSE', ['MP'],	44, 0,	75, 19, 20, 'External', []}
+ ,	{'SANCTN', ['S@'],	44, 0,	75, 19, 20, 'External', []}
+ ,	{'SANCTN_NP', ['M@'],	44, 0,	75, 19, 20, 'External', []}
     ], modLayouts.profileRec); 
 
 EXPORT statProfiles_ThorUsingRoxieDefaults := DATASET([
@@ -537,10 +640,10 @@ EXPORT dProfileAllDefault := DATASET([
  ,	{'Equifax Business Marketing File', ['Z1'],	44, 0,	75, 1, 2, 'Header', []}
  ,	{'Bankruptcy',['BA'],	44, 0,	75, 1, 2, 'Header', []}
  ,	{'Judgement and Liens',['L2'],	44, 0,	75, 1, 2, 'Header', []}
- ,	{'Real Property',['LA'],	44, 0,	75, 1, 2, 'Header', []} //[LA, LP, FA, FP] needs modification
+ ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	44, 0,	75, 1, 2, 'Header', []}
  ,	{'Business Registrations',['BR'],	44, 0,	75, 1, 2, 'Header', []}
  ,	{'Duns and Bradstreet FEIN',['DN'],	44, 0,	75, 1, 2, 'Header', []}
- ,	{'Experian FEIN Unrestricted',['E9'],	44, 0,	75, 1, 2, 'Header', []}
+ ,	{'Experian FEIN Unrestricted',['E6'],	44, 0,	75, 1, 2, 'Header', []}
  ,	{'Experian FEIN Restricted',['E5'],	44, 0,	75, 1, 2, 'Header', []}
  ,  {'BUSINESSCREDITREPORT',['T1'],	44, 0,	75, 1, 2, 'Inquiry', []}
  ,  {'SMALLBUSINESSANALYTICS', ['T2'], 44, 0,	75, 1, 2, 'Inquiry', []}
@@ -550,13 +653,17 @@ EXPORT dProfileAllDefault := DATASET([
  ,	{'TOPBUSINESS', ['T'],	44, 0,	75, 1, 2, 'Inquiry', []}
  ,	{'PREFILL', ['P'],	44, 0,	75, 1, 2, 'Inquiry', []}
  ,	{'BATCH', ['B#'],	44, 0,	75, 1, 2, 'Batch', []} //missing
- ,	{'GARNISH', ['GT'],	44, 0,	75, 1, 2, 'External', []}
- ,	{'SPOKE', ['S#'],	44, 0,	75, 1, 2, 'External', []}
+ ,	{'GARNISH', ['GR'],	44, 0,	75, 1, 2, 'External', []}
+ ,	{'SPOKE', ['SP'],	44, 0,	75, 1, 2, 'External', []}
  ,	{'TAXPRO', ['@@'],	44, 0,	75, 1, 2, 'External', []}
  ,	{'THRIVE', ['!!'],	44, 0,	75, 1, 2, 'External', []}//missing
  ,	{'VICKERS13', ['V@'],	44, 0,	75, 1, 2, 'External', []}
  ,	{'VICKERS', ['V#'],	44, 0,	75, 1, 2, 'External', []}
- ,	{'ZOOM', ['Z#'],	44, 0,	75, 1, 2, 'External', []} //missing
+ ,	{'ZOOM', ['ZM'],	44, 0,	75, 1, 2, 'External', []} //missing
+ ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	44, 0,	75, 1, 2, 'External', []}
+ ,	{'MARI_PROF_LICENSE', ['MP'],	44, 0,	75, 1, 2, 'External', []}
+ ,	{'SANCTN', ['S@'],	44, 0,	75, 1, 2, 'External', []}
+ ,	{'SANCTN_NP', ['M@'],	44, 0,	75, 1, 2, 'External', []}
     ], modLayouts.profileRec);        
 
 // DEFAULT BASE LINE FOR STATS. DONT CHANGE AND CHECKIN!!
@@ -593,10 +700,10 @@ EXPORT AllSourcesProfileConfigurable(unsigned inScore = 75, unsigned inWeight = 
          ,	{'Equifax Business Marketing File', ['Z1'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Header', []}
          ,	{'Bankruptcy',['BA'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Header', []}
          ,	{'Judgement and Liens',['L2'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Header', []}
-         ,	{'Real Property',['LA'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Header', []} //[LA, LP, FA, FP] needs modification
+         ,	{'Real Property',MDR.SourceTools.set_LnPropertyV2,	inWeight, inDistance,	inScore, mode_1, mode_2, 'Header', []} 
          ,	{'Business Registrations',['BR'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Header', []}
          ,	{'Duns and Bradstreet FEIN',['DN'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Header', []}
-         ,	{'Experian FEIN Unrestricted',['E9'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Header', []}
+         ,	{'Experian FEIN Unrestricted',['E6'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Header', []}
          ,	{'Experian FEIN Restricted',['E5'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Header', []}
          ,  {'BUSINESSCREDITREPORT',['T1'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Inquiry', []}
          ,  {'SMALLBUSINESSANALYTICS', ['T2'], inWeight, inDistance,	inScore, mode_1, mode_2, 'Inquiry', []}
@@ -606,13 +713,17 @@ EXPORT AllSourcesProfileConfigurable(unsigned inScore = 75, unsigned inWeight = 
          ,	{'TOPBUSINESS', ['T'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Inquiry', []}
          ,	{'PREFILL', ['P'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Inquiry', []}
          ,	{'BATCH', ['B#'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'Batch', []} //missing
-         ,	{'GARNISH', ['GT'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}
-         ,	{'SPOKE', ['S#'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}
+         ,	{'GARNISH', ['GR'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}
+         ,	{'SPOKE', ['SP'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}
          ,	{'TAXPRO', ['@@'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}
          ,	{'THRIVE', ['!!'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}//missing
          ,	{'VICKERS13', ['V@'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}
          ,	{'VICKERS', ['V#'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}
-         ,	{'ZOOM', ['Z#'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []} //missing
+         ,	{'ZOOM', ['ZM'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []} //missing
+				 ,	{'BANKRUPTCY_ATTORNEY', ['BY'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}
+				 ,	{'MARI_PROF_LICENSE', ['MP'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}
+				 ,	{'SANCTN', ['S@'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}
+				 ,	{'SANCTN_NP', ['M@'],	inWeight, inDistance,	inScore, mode_1, mode_2, 'External', []}
             ], modLayouts.profileRec)(srcCategory in filterSet);        
 end;
 

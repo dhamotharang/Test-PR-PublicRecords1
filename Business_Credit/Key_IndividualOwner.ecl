@@ -1,4 +1,4 @@
-﻿IMPORT	Business_Credit,	lib_date,	MDR, STD;
+﻿IMPORT	Business_Credit,	lib_date,	STD;
 EXPORT	Key_IndividualOwner(STRING pVersion	=	(STRING8)Std.Date.Today(),
 														Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	FUNCTION
 
@@ -49,9 +49,7 @@ EXPORT	Key_IndividualOwner(STRING pVersion	=	(STRING8)Std.Date.Today(),
 	
 	dIndividualOwnerKey			:=	PROJECT(dIndividualOwner,tIndividualOwnerKey(LEFT));
 	
-  addGlobalSID 						:=  MDR.macGetGlobalSID(dIndividualOwnerKey,'SBFECV','','global_sid'); //DF-25791: Populate Global_SID	
-	
-	dIndividualOwnerKeyDist	:=	SORT(	DISTRIBUTE(addGlobalSID,
+  	dIndividualOwnerKeyDist	:=	SORT(	DISTRIBUTE(dIndividualOwnerKey,
 																	HASH(	Sbfe_Contributor_Number, Contract_Account_Number, Account_Type_Reported, 
 																				Original_fname, Original_mname, Original_lname, Original_suffix, E_Mail_Address,
 																				Guarantor_Owner_Indicator, Relationship_to_Business_Indicator,

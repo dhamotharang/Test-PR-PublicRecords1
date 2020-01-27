@@ -1,11 +1,11 @@
 ﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 IMPORT KEL011 AS KEL;
-IMPORT E_Customer,E_Email,E_Person,E_Person_Email FROM KELOtto;
+IMPORT E_Address,E_Customer,E_Email,E_Person,E_Person_Email FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_Email := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_Email.__Result) __E_Person_Email := E_Person_Email.__Result;
-  SHARED __EE2114202 := __E_Person_Email;
-  EXPORT __ST39912_Layout := RECORD
+  SHARED __EE2628942 := __E_Person_Email;
+  EXPORT __ST46086_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Email.Typ) Emailof_;
@@ -16,16 +16,16 @@ EXPORT B_Person_Email := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST39912_Layout __ND2114236__Project(E_Person_Email.Layout __PP2114097) := TRANSFORM
-    __EE2114135 := __PP2114097.Event_Dates_;
-    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE2114135,__T(__EE2114135).Event_Date_);
-    __EE2114164 := __PP2114097.Event_Dates_;
-    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE2114164,__T(__EE2114164).Event_Date_);
-    SELF := __PP2114097;
+  SHARED __ST46086_Layout __ND2628976__Project(E_Person_Email.Layout __PP2628837) := TRANSFORM
+    __EE2628875 := __PP2628837.Event_Dates_;
+    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE2628875,__T(__EE2628875).Event_Date_);
+    __EE2628904 := __PP2628837.Event_Dates_;
+    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE2628904,__T(__EE2628904).Event_Date_);
+    SELF := __PP2628837;
   END;
-  EXPORT __ENH_Person_Email := PROJECT(__EE2114202,__ND2114236__Project(LEFT)) : PERSIST('~temp::KEL::KELOtto::Person_Email::Annotated',EXPIRE(7));
-  SHARED __EE2630326 := __ENH_Person_Email;
-  SHARED __IDX_Person_Email_Emailof__Filtered := __EE2630326(__NN(__EE2630326.Emailof_));
+  EXPORT __ENH_Person_Email := PROJECT(__EE2628942,__ND2628976__Project(LEFT)) : PERSIST('~temp::KEL::KELOtto::Person_Email::Annotated',EXPIRE(7));
+  SHARED __EE3311359 := __ENH_Person_Email;
+  SHARED __IDX_Person_Email_Emailof__Filtered := __EE3311359(__NN(__EE3311359.Emailof_));
   SHARED IDX_Person_Email_Emailof__Layout := RECORD
     E_Email.Typ Emailof_;
     __IDX_Person_Email_Emailof__Filtered._r_Customer_;
@@ -41,7 +41,7 @@ EXPORT B_Person_Email := MODULE
   EXPORT IDX_Person_Email_Emailof__Name := '~key::KEL::KELOtto::Person_Email::Emailof_';
   EXPORT IDX_Person_Email_Emailof_ := INDEX(IDX_Person_Email_Emailof__Projected,{Emailof_},{IDX_Person_Email_Emailof__Projected},IDX_Person_Email_Emailof__Name);
   EXPORT IDX_Person_Email_Emailof__Build := BUILD(IDX_Person_Email_Emailof_,OVERWRITE);
-  EXPORT __ST2630328_Layout := RECORDOF(IDX_Person_Email_Emailof_);
-  EXPORT IDX_Person_Email_Emailof__Wrapped := PROJECT(IDX_Person_Email_Emailof_,TRANSFORM(__ST39912_Layout,SELF.Emailof_ := __CN(LEFT.Emailof_),SELF:=LEFT));
+  EXPORT __ST3311361_Layout := RECORDOF(IDX_Person_Email_Emailof_);
+  EXPORT IDX_Person_Email_Emailof__Wrapped := PROJECT(IDX_Person_Email_Emailof_,TRANSFORM(__ST46086_Layout,SELF.Emailof_ := __CN(LEFT.Emailof_),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Person_Email_Emailof__Build);
 END;

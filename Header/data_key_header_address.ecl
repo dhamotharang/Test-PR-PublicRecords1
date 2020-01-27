@@ -29,7 +29,7 @@ geo_blk
 slim_dedup  := DEDUP(SORT(slim_f,record),record);
 
 pre_ccpa_compliance := PROJECT (slim_dedup, TRANSFORM(dx_Header.layouts.i_header_address,SELF:=LEFT,SELF.global_sid:=0,SELF.record_sid:=0));
-wth_ccpa_compliance := header.fn_suppress_ccpa(pre_ccpa_compliance);
+wth_ccpa_compliance := header.fn_suppress_ccpa(pre_ccpa_compliance,true);
 
 export data_key_header_address := wth_ccpa_compliance;
 

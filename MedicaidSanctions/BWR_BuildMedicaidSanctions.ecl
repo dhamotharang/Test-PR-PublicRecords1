@@ -1,6 +1,7 @@
-﻿#OPTION('MultiplePersistInstances', false);
-version := '20191011';
-baseversion := '20190926';
+﻿EXPORT BWR_BuildMedicaidSanctions(version, baseversion) := macro;
+#OPTION('MultiplePersistInstances', false);
+//version := '20191011';
+//baseversion := '20190926';
 root := '~thor::bridger::medicaid::hc_med_sanc_extract_' + baseversion + '.tab';
 
 ds1 := dataset(root, MedicaidSanctions.Layout_Sanctions, 
@@ -24,4 +25,5 @@ SEQUENTIAL(
 				'medicaidsanctions_' + version + '.xml')
 
 );
+endmacro;
 	

@@ -41,6 +41,12 @@ EXPORT CONSTANTS := MODULE
     EXPORT DR   := 'DR'; // Record Level Dispute Record
     EXPORT SR   := 'SR'; // Record Level Long Term Supression Record
     EXPORT HS   := 'HS'; // Consumer Level Header Statement
+		EXPORT HSN 	:= 'HSN'; //Record Level Header Statement Component Name
+		EXPORT HSA 	:= 'HSA'; //Record Level Header Statement Component Address
+		EXPORT HSD 	:= 'HSD'; //Record Level Header Statement Component Date Of Birth
+		EXPORT HSS 	:= 'HSS'; //Record Level Header Statement Component SSN.
+		EXPORT HSP 	:= 'HSP'; //Record Level Header Statement Component Phone.
+		EXPORT HSL 	:= 'HSL'; //Record Level Header Statement Component DLN.
     EXPORT SF   := 'SF'; //  Consumer Level Freeze Flag
     EXPORT IT   := 'IT'; //  Consumer Level Identity Theft Flag
     EXPORT FA   := 'FA'; //  Consumer Level Fraud Alert Flag
@@ -49,7 +55,7 @@ EXPORT CONSTANTS := MODULE
     EXPORT AA   := 'AA'; // Consumer Level Attorney Alert Flag
     
     EXPORT ConsumerLevel := [CS,HS,SF,IT,FA,LA,LH,AA];
-    EXPORT RecordLevel   := [RS,DR,SR];
+		EXPORT RecordLevel := [HS,RS,DR,HSN,HSA,HSD,HSS,HSP,HSL,SR];
 
   END;
   

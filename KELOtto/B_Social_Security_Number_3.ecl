@@ -6,8 +6,8 @@ EXPORT B_Social_Security_Number_3 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_4.__ENH_Event_4) __ENH_Event_4 := B_Event_4.__ENH_Event_4;
   SHARED VIRTUAL TYPEOF(E_Social_Security_Number.__Result) __E_Social_Security_Number := E_Social_Security_Number.__Result;
   SHARED VIRTUAL TYPEOF(E_Ssn_Event.__Result) __E_Ssn_Event := E_Ssn_Event.__Result;
-  SHARED __EE199168 := __E_Social_Security_Number;
-  SHARED __ST199358_Layout := RECORD
+  SHARED __EE227148 := __E_Social_Security_Number;
+  SHARED __ST227338_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
@@ -32,16 +32,16 @@ EXPORT B_Social_Security_Number_3 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE199048 := __E_Ssn_Event;
-  SHARED __EE199679 := __EE199048(__NN(__EE199048.Transaction_) AND __NN(__EE199048.Social_));
-  SHARED __EE199063 := __ENH_Event_4;
-  SHARED __EE199223 := __EE199063(__EE199063.Safe_Flag_ = 1);
-  __JC199691(E_Ssn_Event.Layout __EE199679, B_Event_4.__ST53186_Layout __EE199223) := __EEQP(__EE199679.Transaction_,__EE199223.UID);
-  SHARED __EE199692 := JOIN(__EE199679,__EE199223,__JC199691(LEFT,RIGHT),TRANSFORM(E_Ssn_Event.Layout,SELF:=LEFT),HASH,KEEP(1));
-  __JC199709(E_Social_Security_Number.Layout __EE199168, E_Ssn_Event.Layout __EE199692) := __EEQP(__EE199168.UID,__EE199692.Social_);
-  __JF199709(E_Ssn_Event.Layout __EE199692) := __NN(__EE199692.Social_);
-  SHARED __EE199710 := JOIN(__EE199168,__EE199692,__JC199709(LEFT,RIGHT),TRANSFORM(__ST199358_Layout,SELF:=LEFT,SELF.Ssn_Event_:=__JF199709(RIGHT)),HASH,LEFT OUTER,KEEP(1));
-  EXPORT __ST52442_Layout := RECORD
+  SHARED __EE227028 := __E_Ssn_Event;
+  SHARED __EE227659 := __EE227028(__NN(__EE227028.Transaction_) AND __NN(__EE227028.Social_));
+  SHARED __EE227043 := __ENH_Event_4;
+  SHARED __EE227203 := __EE227043(__EE227043.Safe_Flag_ = 1);
+  __JC227671(E_Ssn_Event.Layout __EE227659, B_Event_4.__ST60665_Layout __EE227203) := __EEQP(__EE227659.Transaction_,__EE227203.UID);
+  SHARED __EE227672 := JOIN(__EE227659,__EE227203,__JC227671(LEFT,RIGHT),TRANSFORM(E_Ssn_Event.Layout,SELF:=LEFT),HASH,KEEP(1));
+  __JC227689(E_Social_Security_Number.Layout __EE227148, E_Ssn_Event.Layout __EE227672) := __EEQP(__EE227148.UID,__EE227672.Social_);
+  __JF227689(E_Ssn_Event.Layout __EE227672) := __NN(__EE227672.Social_);
+  SHARED __EE227690 := JOIN(__EE227148,__EE227672,__JC227689(LEFT,RIGHT),TRANSFORM(__ST227338_Layout,SELF:=LEFT,SELF.Ssn_Event_:=__JF227689(RIGHT)),HASH,LEFT OUTER,KEEP(1));
+  EXPORT __ST59912_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
@@ -66,9 +66,9 @@ EXPORT B_Social_Security_Number_3 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST52442_Layout __ND199738__Project(__ST199358_Layout __PP199711) := TRANSFORM
-    SELF.Safe_Flag_ := MAP(__PP199711.Ssn_Event_=>1,0);
-    SELF := __PP199711;
+  SHARED __ST59912_Layout __ND227718__Project(__ST227338_Layout __PP227691) := TRANSFORM
+    SELF.Safe_Flag_ := MAP(__PP227691.Ssn_Event_=>1,0);
+    SELF := __PP227691;
   END;
-  EXPORT __ENH_Social_Security_Number_3 := PROJECT(__EE199710,__ND199738__Project(LEFT));
+  EXPORT __ENH_Social_Security_Number_3 := PROJECT(__EE227690,__ND227718__Project(LEFT)) : PERSIST('~temp::KEL::KELOtto::Social_Security_Number::Annotated_3',EXPIRE(7));
 END;

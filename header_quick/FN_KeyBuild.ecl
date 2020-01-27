@@ -220,8 +220,8 @@ PromoteSupers.mac_sf_buildprocess(head_out,'~thor_data400::base::quick_header',b
 //just keys
 autoKeys := header_quick.FN_AutokeyBuild(file_header_quick_skip_PID, filedate);
 
-     didkey := FN_key_DID(file_header_quick_skip_PID,                                 '~thor_data400::key::HeaderQuick::'      +filedate+'::DID') ;
-fcra_didkey := FN_key_DID(file_header_quick(src in mdr.sourceTools.set_scoring_FCRA,src not in mdr.sourceTools.set_scoring_FCRA_retro_test),
+     didkey := header_quick.FN_key_DID(file_header_quick_skip_PID,                                 '~thor_data400::key::HeaderQuick::'      +filedate+'::DID') ;
+fcra_didkey := header_quick.FN_key_DID(file_header_quick(src in mdr.sourceTools.set_scoring_FCRA,src not in mdr.sourceTools.set_scoring_FCRA_retro_test),
 																																											'~thor_data400::key::HeaderQuick::fcra::'+filedate+'::DID') ;
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(     didkey,           '',                                            '~thor_data400::key::HeaderQuick::'            +filedate+'::DID',         B1);
@@ -254,8 +254,7 @@ RETURN SEQUENTIAL(
 			SEQUENTIAL(B3,M3,MQ3),
 			SEQUENTIAL(B4,M4,MQ4),
 			SEQUENTIAL(B5,M5,MQ5)
-																		), 615),
-		build_source_key_prep(filedate)
+			), 615)
 	);
 
 END;

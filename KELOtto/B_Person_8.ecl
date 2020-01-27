@@ -1,16 +1,18 @@
 ﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 IMPORT KEL011 AS KEL;
-IMPORT E_Customer,E_Person FROM KELOtto;
+IMPORT E_Address,E_Customer,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_8 := MODULE
   SHARED VIRTUAL TYPEOF(E_Person.__Result) __E_Person := E_Person.__Result;
-  SHARED __EE56701 := __E_Person;
-  EXPORT __ST56020_Layout := RECORD
+  SHARED __EE64461 := __E_Person;
+  EXPORT __ST63635_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nint Lex_Id_;
     KEL.typ.ndataset(E_Person.Source_Customers_Layout) Source_Customers_;
     KEL.typ.ndataset(E_Person.Reported_Date_Of_Birth_Layout) Reported_Date_Of_Birth_;
+    KEL.typ.ndataset(E_Person.Reported_Ssn_Layout) Reported_Ssn_;
+    KEL.typ.ndataset(E_Person.Reported_Email_Address_Layout) Reported_Email_Address_;
     KEL.typ.ndataset(E_Person.Full_Name_Layout) Full_Name_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -71,6 +73,7 @@ EXPORT B_Person_8 := MODULE
     KEL.typ.nstr _curr__incar__flag_;
     KEL.typ.nint _name__ssn__dob__match_;
     KEL.typ.ndataset(E_Person.Offenses_Layout) Offenses_;
+    KEL.typ.ndataset(E_Person.Address_Layout) Address_;
     KEL.typ.int Deceased_ := 0;
     KEL.typ.int Deceased_Dob_Match_ := 0;
     KEL.typ.int Deceased_Name_Match_ := 0;
@@ -78,13 +81,13 @@ EXPORT B_Person_8 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST56020_Layout __ND57341__Project(E_Person.Layout __PP56192) := TRANSFORM
-    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP56192.Deceased_Date_))=>1,0);
-    __BS56522 := __T(__PP56192.Reported_Date_Of_Birth_);
-    SELF.Deceased_Dob_Match_ := MAP(EXISTS(__BS56522(__T(__OP2(__PP56192.Deceased_Date_Of_Birth_,=,__T(__PP56192.Reported_Date_Of_Birth_).Date_Of_Birth_))))=>1,0);
-    __BS56564 := __T(__PP56192.Full_Name_);
-    SELF.Deceased_Name_Match_ := MAP(EXISTS(__BS56564(__T(__AND(__OP2(__T(__PP56192.Full_Name_).First_Name_,=,__PP56192.Deceased_First_),__OP2(__T(__PP56192.Full_Name_).Last_Name_,=,__PP56192.Deceased_Last_)))))=>1,0);
-    SELF := __PP56192;
+  SHARED __ST63635_Layout __ND65583__Project(E_Person.Layout __PP63856) := TRANSFORM
+    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP63856.Deceased_Date_))=>1,0);
+    __BS64259 := __T(__PP63856.Reported_Date_Of_Birth_);
+    SELF.Deceased_Dob_Match_ := MAP(EXISTS(__BS64259(__T(__OP2(__PP63856.Deceased_Date_Of_Birth_,=,__T(__PP63856.Reported_Date_Of_Birth_).Date_Of_Birth_))))=>1,0);
+    __BS64301 := __T(__PP63856.Full_Name_);
+    SELF.Deceased_Name_Match_ := MAP(EXISTS(__BS64301(__T(__AND(__OP2(__T(__PP63856.Full_Name_).First_Name_,=,__PP63856.Deceased_First_),__OP2(__T(__PP63856.Full_Name_).Last_Name_,=,__PP63856.Deceased_Last_)))))=>1,0);
+    SELF := __PP63856;
   END;
-  EXPORT __ENH_Person_8 := PROJECT(__EE56701,__ND57341__Project(LEFT));
+  EXPORT __ENH_Person_8 := PROJECT(__EE64461,__ND65583__Project(LEFT)) : PERSIST('~temp::KEL::KELOtto::Person::Annotated_8',EXPIRE(7));
 END;

@@ -19,6 +19,6 @@ module
   export infutor      := Infutor_NARB         .files(pversionSourceFiles,pUseOtherEnviron).base            .logical ;
   export eq_biz       := Equifax_Business_Data.files(pversionSourceFiles,pUseOtherEnviron).base            .logical ;
   export DataBridge   := DataBridge           .files(pversionSourceFiles,pUseOtherEnviron).base            .logical ;        
-  export cortera      := Cortera              .Files.Hdr_Out                                                        ; // will pull the prod file on dataland automatically
+  export cortera      := Cortera              .Files.Executives                                                     ; // will pull the prod file on dataland automatically
   
 end;

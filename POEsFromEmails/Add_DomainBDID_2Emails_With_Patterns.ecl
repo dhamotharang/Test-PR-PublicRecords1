@@ -1,9 +1,9 @@
-import Domains;
+﻿import Domains;
 
 export Add_DomainBDID_2Emails_With_Patterns (
 
 	 //string						    																													pversion
-	 dataset(Domains.Layout_Whois_Base_BIP														)	pDomainsFile	= Domains.File_Whois_Base
+	 dataset(Domains.Layout_Whois_Base_BIP														)	pDomainsFile	= Domains.File_Whois_Base_Old
 	,dataset(POEsFromEmails.layouts.EmailWithUidPatternTagAndCount) pEmails				= POEsFromEmails.Get_UserId_Patterns_In_Emails()
 
 ) := function

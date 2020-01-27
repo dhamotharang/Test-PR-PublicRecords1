@@ -1,6 +1,6 @@
 ﻿// This is/will be the code to merge various watchdog keys into a single key that has a binary flag
 // field that will determine who can see the various records.
-IMPORT doxie, Roxiekeybuild, Watchdog, dx_BestRecords;
+IMPORT doxie, Roxiekeybuild, Watchdog, dx_BestRecords,mdr;
 
 Permissions := dx_BestRecords.Constants.PERM_TYPE;
 
@@ -111,5 +111,5 @@ EXPORT fn_build_merged := FUNCTION
 															  EXCEPT permissions,run_date,total_records,counts,
 														 LOCAL);
 
-	RETURN ds_merged_rollup;
+	RETURN mdr.macGetGlobalSID(ds_merged_rollup, 'WatchdogBest_Virtual', '', 'global_sid');
 END;

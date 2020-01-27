@@ -15,8 +15,10 @@
 	RETURN hpccConnection;
 	END;
 	
-	EXPORT getDspToUse(BOOLEAN runProd) := FUNCTION
-		dspToUse	:= IF(runProd, FraudGovPlatform_Analytics.Constants.RampsWebServices.DspProd, FraudGovPlatform_Analytics.Constants.RampsWebServices.DspQa);
+	EXPORT getDspToUse(BOOLEAN runProd, BOOLEAN updateROSE = FALSE) := FUNCTION
+		dspToUse	:= MAP(updateROSE => FraudGovPlatform_Analytics.Constants.RampsWebServices.DspQa, //DSP QA for ROSE environment
+			runProd => FraudGovPlatform_Analytics.Constants.RampsWebServices.DspProd, //DSP Prod for Prod
+			FraudGovPlatform_Analytics.Constants.RampsWebServices.DspCert); //DSP Cert for RIN Cert
 	RETURN dspToUse;
 	END;
 END;

@@ -9,7 +9,9 @@
 	export dsNCF2 := DATASET(Superfile_List.sfNCF2, Layouts2.rNac2, THOR);
 	export dsNCF2Base := DATASET(Superfile_List.sfNCF2Base, $.Layout_Base2, THOR);
 	
-	
-	export dsProcessing := DATASET($.Superfile_list.sfProcessing, $.Layout_Base2, thor);
+	export dsReady := DATASET($.Superfile_list.sfReady, $.Layout_Base2, thor, opt);	
+	export dsProcessing := DATASET($.Superfile_list.sfProcessing, $.Layout_Base2, thor, opt);
+	export dsProcessed := DATASET($.Superfile_list.sfProcessed, $.Layout_Base2, thor, opt);
+	export dsOnboarding := DATASET($.Superfile_list.sfOnboarding, $.Layout_Base2, thor, opt); // test data
 
 END;

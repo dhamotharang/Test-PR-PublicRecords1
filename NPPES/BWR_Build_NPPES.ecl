@@ -1,4 +1,8 @@
-﻿import Lib_FileServices, STRATA, ut, Roxiekeybuild, PromoteSupers, Orbit3;
+﻿/*2019-12-05T13:20:00Z (Vladislavas, Petrokas (RIS-BCT))
+ROOLLUP EXCEPT FIX (ADDED global_sid,record_sid,source_rec_id to the ROOLLUP EXCEPT)
+*/
+
+import Lib_FileServices, STRATA, ut, Roxiekeybuild, PromoteSupers, Orbit3;
 export BWR_Build_NPPES(string version) := function
 #workunit('name','Yogurt:NPPES Build - ' + version);
 
@@ -151,6 +155,9 @@ rolledup_dAppendIds := rollup(npi_dist_sort, rollupBase(left, right), except dt_
 										Clean_location_address.geo_match,	
 										Clean_location_address.err_stat,		
 										source_rec_id,
+										record_sid,
+										global_sid,
+										
 																   local);
 
 PromoteSupers.MAC_SF_BuildProcess(project(rolledup_dAppendIds,nppes.layouts.base),NPPES.Cluster + 'base::NPPES',NPPES_Base,3,false,true);

@@ -13,6 +13,7 @@ FIELDTYPE:invalid_past_date:CUSTOM(Scrubs.fn_valid_pastDate > 0)
 //---------------------------------------------------------------
 // FIELD:process_date:TYPE(STRING):0,0
 FIELD:FILE_NUMBER:TYPE(STRING20):LIKE(invalid_mandatory):0,0
+FIELD:DATE_FILED:TYPE(STRING8):LIKE(invalid_past_date):0,0
 // FIELD:RECORD_TYPE:TYPE(STRING):0,0
 FIELD:NAME1:TYPE(STRING192):LIKE(invalid_mandatory):0,0
 // FIELD:STREET_ADD1:TYPE(STRING):0,0	
