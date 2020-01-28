@@ -1,4 +1,4 @@
-﻿﻿// Machine-readable versions of the spec file and subsets thereof
+﻿// Machine-readable versions of the spec file and subsets thereof
 IMPORT SALT311;
 EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
