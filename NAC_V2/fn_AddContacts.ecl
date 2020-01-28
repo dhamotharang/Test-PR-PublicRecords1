@@ -2,10 +2,11 @@
 
 Layout_Base2 xContact($.Layout_Base2 src, $.Layouts2.rStateContactEx contact) := TRANSFORM
 		// fill in contact fields, but do not overwrite if there is a more specific contact
-		self.ContactName := contact.ContactName;
-		self.ContactPhone := contact.ContactPhone;
-		self.ContactExt := contact.ContactExt;
-		self.ContactEmail := contact.ContactEmail;
+		boolean ignore := contact.ContactName='' AND contact.ContactPhone='' AND contact.ContactEmail='';
+		self.ContactName := IF(ignore, src.ContactName, contact.ContactName);
+		self.ContactPhone := IF(ignore, src.ContactPhone, contact.ContactPhone);
+		self.ContactExt := IF(ignore, src.ContactExt, contact.ContactExt);
+		self.ContactEmail := IF(ignore, src.ContactEmail, contact.ContactEmail);
 		
 		self := src;
 		
