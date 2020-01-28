@@ -4,10 +4,12 @@
 				code will need to be refreshed.  
 				I also changed the names for the named outputs:
 					'InputSourceCounts' => 'Source_Level_InputSourceCounts'
-					'UpdateStats'	=>	'Source_Level_UpdateStats'
 					'UpdateStatsSrc' 	=> 'Source_Level_UpdateStatsSrc'
+					'UpdateStats'	=>	'Source_Level_UpdateStats'
 					'UpdateStatsXtab' 	=> 'Source_Level_UpdateStatsXtab'
 					'ValidityStatistics' 	=> 'Source_Level_ValidityStatistics'
+					
+DF-26609_PhonesPlus_Add_Lexids - added did to the rollup so we keep all 
 ************************************************************************************************************************************/
 IMPORT STD,SALT311;
 EXPORT Ingest_Source_Level_Base(BOOLEAN incremental=FALSE
@@ -77,27 +79,27 @@ EXPORT Ingest_Source_Level_Base(BOOLEAN incremental=FALSE
  
   // Ingest Files: Rollup to get unique new records
   DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(
-    cellphoneidkey, source, household_flag));
+    cellphoneidkey, source, household_flag, did));
   SortIngest0 := SORT(DistIngest0, 
-    cellphoneidkey, source, household_flag, __Tpe, record_sid, LOCAL);
+    cellphoneidkey, source, household_flag, did, __Tpe, record_sid, LOCAL);
   GroupIngest0 := GROUP(SortIngest0, 
-    cellphoneidkey, source, household_flag, LOCAL, ORDERED, STABLE);
+    cellphoneidkey, source, household_flag, did, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Existing Base: combine delta with base file
   DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(
-    cellphoneidkey, source, household_flag));
+    cellphoneidkey, source, household_flag, did));
   SortBase0 := SORT(DistBase0, 
-    cellphoneidkey, source, household_flag, __Tpe, record_sid, LOCAL);
+    cellphoneidkey, source, household_flag, did, __Tpe, record_sid, LOCAL);
   GroupBase0 := GROUP(SortBase0, 
-    cellphoneidkey, source, household_flag, LOCAL, ORDERED, STABLE);
+    cellphoneidkey, source, household_flag, did, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Everything: combine ingest and base recs
   Sort0 := SORT(AllBaseRecs0+AllIngestRecs0, 
-    cellphoneidkey, source, household_flag, __Tpe, record_sid, LOCAL);
+    cellphoneidkey, source, household_flag, did, __Tpe, record_sid, LOCAL);
   Group0 := GROUP(Sort0, 
-    cellphoneidkey, source, household_flag, LOCAL, ORDERED, STABLE);
+    cellphoneidkey, source, household_flag, did, LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
  
   //Now need to update 'rid' numbers on new records
