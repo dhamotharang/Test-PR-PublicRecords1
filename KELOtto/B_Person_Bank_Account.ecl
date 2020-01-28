@@ -4,8 +4,8 @@ IMPORT E_Address,E_Bank,E_Bank_Account,E_Customer,E_Person,E_Person_Bank_Account
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_Bank_Account := MODULE
   SHARED VIRTUAL TYPEOF(E_Person_Bank_Account.__Result) __E_Person_Bank_Account := E_Person_Bank_Account.__Result;
-  SHARED __EE2628578 := __E_Person_Bank_Account;
-  EXPORT __ST46040_Layout := RECORD
+  SHARED __EE2633550 := __E_Person_Bank_Account;
+  EXPORT __ST46082_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Bank_Account.Typ) Account_;
@@ -16,16 +16,16 @@ EXPORT B_Person_Bank_Account := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST46040_Layout __ND2628612__Project(E_Person_Bank_Account.Layout __PP2628473) := TRANSFORM
-    __EE2628511 := __PP2628473.Event_Dates_;
-    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE2628511,__T(__EE2628511).Event_Date_);
-    __EE2628540 := __PP2628473.Event_Dates_;
-    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE2628540,__T(__EE2628540).Event_Date_);
-    SELF := __PP2628473;
+  SHARED __ST46082_Layout __ND2633584__Project(E_Person_Bank_Account.Layout __PP2633445) := TRANSFORM
+    __EE2633483 := __PP2633445.Event_Dates_;
+    SELF.Dt_First_Seen_ := KEL.Aggregates.MinNN(__EE2633483,__T(__EE2633483).Event_Date_);
+    __EE2633512 := __PP2633445.Event_Dates_;
+    SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE2633512,__T(__EE2633512).Event_Date_);
+    SELF := __PP2633445;
   END;
-  EXPORT __ENH_Person_Bank_Account := PROJECT(__EE2628578,__ND2628612__Project(LEFT)) : PERSIST('~temp::KEL::KELOtto::Person_Bank_Account::Annotated',EXPIRE(7));
-  SHARED __EE3312527 := __ENH_Person_Bank_Account;
-  SHARED __IDX_Person_Bank_Account_Account__Filtered := __EE3312527(__NN(__EE3312527.Account_));
+  EXPORT __ENH_Person_Bank_Account := PROJECT(__EE2633550,__ND2633584__Project(LEFT)) : PERSIST('~temp::KEL::KELOtto::Person_Bank_Account::Annotated',EXPIRE(7));
+  SHARED __EE3317712 := __ENH_Person_Bank_Account;
+  SHARED __IDX_Person_Bank_Account_Account__Filtered := __EE3317712(__NN(__EE3317712.Account_));
   SHARED IDX_Person_Bank_Account_Account__Layout := RECORD
     E_Bank_Account.Typ Account_;
     __IDX_Person_Bank_Account_Account__Filtered._r_Customer_;
@@ -41,7 +41,7 @@ EXPORT B_Person_Bank_Account := MODULE
   EXPORT IDX_Person_Bank_Account_Account__Name := '~key::KEL::KELOtto::Person_Bank_Account::Account_';
   EXPORT IDX_Person_Bank_Account_Account_ := INDEX(IDX_Person_Bank_Account_Account__Projected,{Account_},{IDX_Person_Bank_Account_Account__Projected},IDX_Person_Bank_Account_Account__Name);
   EXPORT IDX_Person_Bank_Account_Account__Build := BUILD(IDX_Person_Bank_Account_Account_,OVERWRITE);
-  EXPORT __ST3312529_Layout := RECORDOF(IDX_Person_Bank_Account_Account_);
-  EXPORT IDX_Person_Bank_Account_Account__Wrapped := PROJECT(IDX_Person_Bank_Account_Account_,TRANSFORM(__ST46040_Layout,SELF.Account_ := __CN(LEFT.Account_),SELF:=LEFT));
+  EXPORT __ST3317714_Layout := RECORDOF(IDX_Person_Bank_Account_Account_);
+  EXPORT IDX_Person_Bank_Account_Account__Wrapped := PROJECT(IDX_Person_Bank_Account_Account_,TRANSFORM(__ST46082_Layout,SELF.Account_ := __CN(LEFT.Account_),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Person_Bank_Account_Account__Build);
 END;
