@@ -3,8 +3,8 @@ IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Address_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 17;
-  EXPORT NumRulesFromFieldType := 17;
+  EXPORT NumRules := 16;
+  EXPORT NumRulesFromFieldType := 16;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 13;
   EXPORT NumFieldsWithPossibleEdits := 0;
@@ -40,7 +40,7 @@ EXPORT Address_Scrubs := MODULE
           ,'inname_last:Invalid_Inname:ALLOW'
           ,'state:Invalid_State:ALLOW','state:Invalid_State:LENGTHS'
           ,'zip5:Invalid_Zip:ALLOW','zip5:Invalid_Zip:LENGTHS'
-          ,'ssn_append:Invalid_SSN_append:ALLOW','ssn_append:Invalid_SSN_append:LENGTHS'
+          ,'ssn_append:Invalid_SSN_append:CUSTOM'
           ,'permanent_flag:Invalid_Flag:ENUM'
           ,'opt_back_in:Invalid_Flag:ENUM'
           ,'date_yyyymmdd:Invalid_Date:CUSTOM'
@@ -61,7 +61,7 @@ EXPORT Address_Scrubs := MODULE
           ,Address_Fields.InvalidMessage_inname_last(1)
           ,Address_Fields.InvalidMessage_state(1),Address_Fields.InvalidMessage_state(2)
           ,Address_Fields.InvalidMessage_zip5(1),Address_Fields.InvalidMessage_zip5(2)
-          ,Address_Fields.InvalidMessage_ssn_append(1),Address_Fields.InvalidMessage_ssn_append(2)
+          ,Address_Fields.InvalidMessage_ssn_append(1)
           ,Address_Fields.InvalidMessage_permanent_flag(1)
           ,Address_Fields.InvalidMessage_opt_back_in(1)
           ,Address_Fields.InvalidMessage_date_yyyymmdd(1)
@@ -92,7 +92,7 @@ EXPORT FromNone(DATASET(Address_Layout_FCRA_Opt_Out) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Address_Layout_FCRA_Opt_Out);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.z5_Invalid << 0 ) + ( le.prim_range_Invalid << 2 ) + ( le.prim_name_Invalid << 3 ) + ( le.ssn_Invalid << 4 ) + ( le.julian_date_Invalid << 5 ) + ( le.inname_first_Invalid << 6 ) + ( le.inname_last_Invalid << 7 ) + ( le.state_Invalid << 8 ) + ( le.zip5_Invalid << 10 ) + ( le.ssn_append_Invalid << 12 ) + ( le.permanent_flag_Invalid << 14 ) + ( le.opt_back_in_Invalid << 15 ) + ( le.date_yyyymmdd_Invalid << 16 );
+    SELF.ScrubsBits1 := ( le.z5_Invalid << 0 ) + ( le.prim_range_Invalid << 2 ) + ( le.prim_name_Invalid << 3 ) + ( le.ssn_Invalid << 4 ) + ( le.julian_date_Invalid << 5 ) + ( le.inname_first_Invalid << 6 ) + ( le.inname_last_Invalid << 7 ) + ( le.state_Invalid << 8 ) + ( le.zip5_Invalid << 10 ) + ( le.ssn_append_Invalid << 12 ) + ( le.permanent_flag_Invalid << 13 ) + ( le.opt_back_in_Invalid << 14 ) + ( le.date_yyyymmdd_Invalid << 15 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -123,10 +123,10 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.inname_last_Invalid := (le.ScrubsBits1 >> 7) & 1;
     SELF.state_Invalid := (le.ScrubsBits1 >> 8) & 3;
     SELF.zip5_Invalid := (le.ScrubsBits1 >> 10) & 3;
-    SELF.ssn_append_Invalid := (le.ScrubsBits1 >> 12) & 3;
-    SELF.permanent_flag_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.opt_back_in_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.date_yyyymmdd_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.ssn_append_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.permanent_flag_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.opt_back_in_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.date_yyyymmdd_Invalid := (le.ScrubsBits1 >> 15) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -150,9 +150,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     zip5_ALLOW_ErrorCount := COUNT(GROUP,h.zip5_Invalid=1);
     zip5_LENGTHS_ErrorCount := COUNT(GROUP,h.zip5_Invalid=2);
     zip5_Total_ErrorCount := COUNT(GROUP,h.zip5_Invalid>0);
-    ssn_append_ALLOW_ErrorCount := COUNT(GROUP,h.ssn_append_Invalid=1);
-    ssn_append_LENGTHS_ErrorCount := COUNT(GROUP,h.ssn_append_Invalid=2);
-    ssn_append_Total_ErrorCount := COUNT(GROUP,h.ssn_append_Invalid>0);
+    ssn_append_CUSTOM_ErrorCount := COUNT(GROUP,h.ssn_append_Invalid=1);
     permanent_flag_ENUM_ErrorCount := COUNT(GROUP,h.permanent_flag_Invalid=1);
     opt_back_in_ENUM_ErrorCount := COUNT(GROUP,h.opt_back_in_Invalid=1);
     date_yyyymmdd_CUSTOM_ErrorCount := COUNT(GROUP,h.date_yyyymmdd_Invalid=1);
@@ -164,9 +162,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.z5_Total_ErrorCount > 0, 1, 0) + IF(le.prim_range_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prim_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.julian_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inname_first_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inname_last_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_Total_ErrorCount > 0, 1, 0) + IF(le.zip5_Total_ErrorCount > 0, 1, 0) + IF(le.ssn_append_Total_ErrorCount > 0, 1, 0) + IF(le.permanent_flag_ENUM_ErrorCount > 0, 1, 0) + IF(le.opt_back_in_ENUM_ErrorCount > 0, 1, 0) + IF(le.date_yyyymmdd_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.z5_Total_ErrorCount > 0, 1, 0) + IF(le.prim_range_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prim_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.julian_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inname_first_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inname_last_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_Total_ErrorCount > 0, 1, 0) + IF(le.zip5_Total_ErrorCount > 0, 1, 0) + IF(le.ssn_append_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.permanent_flag_ENUM_ErrorCount > 0, 1, 0) + IF(le.opt_back_in_ENUM_ErrorCount > 0, 1, 0) + IF(le.date_yyyymmdd_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.z5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.z5_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prim_range_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prim_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.julian_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inname_first_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inname_last_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.zip5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip5_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ssn_append_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ssn_append_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.permanent_flag_ENUM_ErrorCount > 0, 1, 0) + IF(le.opt_back_in_ENUM_ErrorCount > 0, 1, 0) + IF(le.date_yyyymmdd_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.z5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.z5_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prim_range_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prim_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.julian_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inname_first_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inname_last_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.zip5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip5_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ssn_append_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.permanent_flag_ENUM_ErrorCount > 0, 1, 0) + IF(le.opt_back_in_ENUM_ErrorCount > 0, 1, 0) + IF(le.date_yyyymmdd_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -193,7 +191,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.inname_last_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.state_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.zip5_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.ssn_append_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.ssn_append_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.permanent_flag_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.opt_back_in_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.date_yyyymmdd_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
@@ -223,7 +221,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.inname_last_ALLOW_ErrorCount
           ,le.state_ALLOW_ErrorCount,le.state_LENGTHS_ErrorCount
           ,le.zip5_ALLOW_ErrorCount,le.zip5_LENGTHS_ErrorCount
-          ,le.ssn_append_ALLOW_ErrorCount,le.ssn_append_LENGTHS_ErrorCount
+          ,le.ssn_append_CUSTOM_ErrorCount
           ,le.permanent_flag_ENUM_ErrorCount
           ,le.opt_back_in_ENUM_ErrorCount
           ,le.date_yyyymmdd_CUSTOM_ErrorCount
@@ -244,7 +242,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.inname_last_ALLOW_ErrorCount
           ,le.state_ALLOW_ErrorCount,le.state_LENGTHS_ErrorCount
           ,le.zip5_ALLOW_ErrorCount,le.zip5_LENGTHS_ErrorCount
-          ,le.ssn_append_ALLOW_ErrorCount,le.ssn_append_LENGTHS_ErrorCount
+          ,le.ssn_append_CUSTOM_ErrorCount
           ,le.permanent_flag_ENUM_ErrorCount
           ,le.opt_back_in_ENUM_ErrorCount
           ,le.date_yyyymmdd_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
