@@ -306,7 +306,7 @@ EXPORT IParam := MODULE
     EXPORT boolean include_peopleatwork := TRUE;
   END;
 
-  EXPORT _finderreport := INTERFACE (_report, doxie.IDataAccess, personal, include, dl, vehicles)
+  EXPORT _finderreport := INTERFACE (_report, doxie.IDataAccess, personal, include, dl, emails, vehicles)
     EXPORT boolean use_verified_address_ra := TRUE;
     EXPORT boolean use_verified_address_nb := TRUE;
     EXPORT boolean nbrs_with_phones := TRUE;
