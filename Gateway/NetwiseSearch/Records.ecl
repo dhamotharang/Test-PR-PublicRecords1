@@ -27,7 +27,10 @@ EXPORT Records(DATASET(iesp.net_wise_search.t_NetWiseEmailSearchRequest) ds_requ
                                             );
 
   //Project iesp gateway response layout onto iesp query search response layout
-  ds_search_resp_out := PROJECT(ds_gw_scnw_out, iesp.net_wise_search.t_NetWiseEmailSearchResponseEx);
+  ds_search_resp_out := PROJECT(ds_gw_scnw_out, //iesp.net_wise_search.t_NetWiseEmailSearchResponseEx
+                                TRANSFORM(iesp.net_wise_search.t_NetWiseEmailSearchResponse,
+                                  SELF._Header := LEFT.response._Header;
+                                  SELF.Results := LEFT.response.Results));
 
 
   // Outputs for debugging.  Un-comment them as needed!
