@@ -4,8 +4,8 @@
 	export	string100		preProcessed;
 	export	string100		preCleaned;
 	export	string73		CleanedName;
-	export	integer			nameType;
-	export	integer			nameFormat;
-	export	integer			nameQuality;
+	export	unsigned2		nameType;
+	export	unsigned2		nameFormat;
+	export	unsigned2		nameQuality;
 
 END;

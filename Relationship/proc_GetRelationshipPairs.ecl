@@ -129,14 +129,26 @@ doJoinThor(relKey) := functionmacro
 endmacro;
 
 doFilteredJoin(relFilter, joinOptions) := functionmacro
-  filteredOut  := dx_BestRecords.get(DID_ds,did,relFilter,Layout_GetRelationship.DIDs_layout);
-  out := join(filteredOut, relationship_key_qa, keyed(left.did=right.did1), xform(right),#EXPAND(joinOptions));
+  // Remove DID1s that need to be filtered
+  filteredOutDID1 := dx_BestRecords.get(DID_ds,did,relFilter,Layout_GetRelationship.DIDs_layout); 
+  // Get DID1 & DID2 pairs
+  getDID2 := JOIN(filteredOutDID1, relationship_key_qa, keyed(left.did=right.did1), xform(right),#EXPAND(joinOptions));
+  dDID2 := PROJECT(getDID2,TRANSFORM(Layout_GetRelationship.DIDs_layout,SELF.did:=LEFT.did2));
+  // Remove DID2s that should also be filtered
+  filteredOutDID2 := dx_BestRecords.get(dDID2,did,relFilter,Layout_GetRelationship.DIDs_layout);
+  out := JOIN(filteredOutDID2, getDID2, left.did=right.did2, TRANSFORM(RIGHT));
   return out;
 endmacro;
 doFilteredJoinThor(relFilter) := functionmacro
-  filteredOut := dx_BestRecords.get(DID_ds_dist,did,relFilter,Layout_GetRelationship.DIDs_layout,TRUE); 
+  // Remove DID1s that need to be filtered
+  filteredOutDID1 := dx_BestRecords.get(DID_ds,did,relFilter,Layout_GetRelationship.DIDs_layout,TRUE);
   fullFilteredKey := distribute(pull(relationship_key_qa),hash(did1));
-  out := join(filteredOut, fullFilteredKey, left.did=right.did1, xform(right), local);
+  // Get DID1 & DID2 pairs
+  getDID2 := join(DISTRIBUTED(filteredOutDID1,HASH(did)), fullFilteredKey, left.did=right.did1, xform(right), local);
+  dDID2   :=  PROJECT(getDID2,TRANSFORM(Layout_GetRelationship.DIDs_layout,SELF.did:=LEFT.did2));
+  // Remove DID2s that should also be filtered
+  filteredOutDID2 := dx_BestRecords.get(dDID2,did,relFilter,Layout_GetRelationship.DIDs_layout,TRUE);
+  out :=  JOIN(DISTRIBUTED(filteredOutDID2,HASH(did)), DISTRIBUTED(getDID2,HASH(did2)), left.did=right.did2, TRANSFORM(RIGHT),LOCAL);
   return out;
 endmacro;
 

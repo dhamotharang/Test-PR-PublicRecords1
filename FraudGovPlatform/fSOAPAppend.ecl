@@ -12,7 +12,7 @@ shared pii_current := Files().base.pii.built; //pii current build
 
 shared pii_previous := Files().base.pii.qa;			//pii previous build
 
-shared pii_updates := Join(pii_current,pii_previous,left=right,left only); //pii updates
+shared pii_updates := Join(pii_current,pii_previous,left.record_id=right.record_id,left only); //pii updates
 
 Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent; 
 

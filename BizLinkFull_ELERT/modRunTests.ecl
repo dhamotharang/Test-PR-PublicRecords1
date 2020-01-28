@@ -106,6 +106,15 @@ EXPORT mode21 := fFunctionMMF(dInData,
                             /*iScore*/rInRow.score,/*iDistance*/rInRow.distance, bSegmentation := FALSE) : INDEPENDENT;
 
 EXPORT mode22 := fFunctionMMF(dInData,
+                            /*iScore*/rInRow.score,/*iDistance*/rInRow.distance, bSegmentation := TRUE, bUseSourceRid := TRUE) : INDEPENDENT;
+
+EXPORT mode23 := fFunctionMMF(dInData,
+                            /*iScore*/rInRow.score,/*iDistance*/rInRow.distance, bSegmentation := TRUE, iWeight := 44, bUseSourceRid := TRUE) : INDEPENDENT;
+
+EXPORT mode24 := fFunctionMMF(dInData,
                             /*iScore*/rInRow.score,/*iDistance*/rInRow.distance, bSegmentation := TRUE) : INDEPENDENT;
-														
+
+EXPORT mode25 := fFunctionMMF(dInData,
+                            /*iScore*/rInRow.score,/*iDistance*/rInRow.distance, bSegmentation := TRUE, iWeight := 38) : INDEPENDENT;
+
 END;
