@@ -6,9 +6,12 @@ EXPORT  vehicle_records (
   boolean IsFCRA = false
 ) := MODULE
 
+  isCNSMR := in_params.isConsumer();
+
   report_mod := VehicleV2_Services.IParam.getReportModule();
-  shared vehi := VehicleV2_Services.raw.get_vehicle_crs_report (report_mod, dids) 
-  (~in_params.Use_CurrentlyOwnedVehicles or is_current); 
+  vehicle_crs_report := if(~isCNSMR, VehicleV2_Services.raw.get_vehicle_crs_report(report_mod, dids));
+
+  shared vehi := vehicle_crs_report(~in_params.Use_CurrentlyOwnedVehicles or is_current);
 
 
   // iesp.motorvehicle.t_MVReportRecord
