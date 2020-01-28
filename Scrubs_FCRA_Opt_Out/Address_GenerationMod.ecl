@@ -48,7 +48,7 @@ EXPORT Address_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Inname:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ -\'/)\n'
     + 'FIELDTYPE:Invalid_State:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(2)\n'
     + 'FIELDTYPE:Invalid_Zip:ALLOW(0123456789):LENGTHS(5)\n'
-    + 'FIELDTYPE:Invalid_SSN_append:CUSTOM(Scrubs.fn_valid_ssn>0)\n'
+    + 'FIELDTYPE:Invalid_SSN_append:ALLOW(0123456789-xX):LENGTHS(0,9..11)\n'
     + 'FIELDTYPE:Invalid_Flag:ENUM(Y|N|y|n|)\n'
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)\n'
     + 'FIELDTYPE:Invalid_Blank:LENGTHS(1..)\n'

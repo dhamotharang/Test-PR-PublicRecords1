@@ -44,10 +44,11 @@ EXPORT InValidFT_Invalid_Zip(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH
 EXPORT InValidMessageFT_Invalid_Zip(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('5'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_SSN_append(SALT311.StrType s0) := FUNCTION
-  RETURN  s0;
+  s1 := SALT311.stringfilter(s0,'0123456789-xX'); // Only allow valid symbols
+  RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_SSN_append(SALT311.StrType s) := WHICH(~Scrubs.fn_valid_ssn(s)>0);
-EXPORT InValidMessageFT_Invalid_SSN_append(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_ssn'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_SSN_append(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789-xX'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) >= 9 AND LENGTH(TRIM(s)) <= 11));
+EXPORT InValidMessageFT_Invalid_SSN_append(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789-xX'),SALT311.HygieneErrors.NotLength('0,9..11'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Flag(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -70,7 +71,7 @@ EXPORT InValidMessageFT_Invalid_Blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hygiene
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'z5','prim_range','prim_name','sec_range','ssn','did','source_flag','julian_date','inname_first','inname_last','address','city','state','zip5','did_score','ssn_append','permanent_flag','opt_back_in','date_yyyymmdd');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'z5','prim_range','prim_name','sec_range','ssn','did','source_flag','julian_date','inname_first','inname_last','address','city','state','zip5','did_score','ssn_append','permanent_flag','opt_back_in','date_yyyymmdd');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'z5' => 0,'prim_range' => 1,'prim_name' => 2,'sec_range' => 3,'ssn' => 4,'did' => 5,'source_flag' => 6,'julian_date' => 7,'inname_first' => 8,'inname_last' => 9,'address' => 10,'city' => 11,'state' => 12,'zip5' => 13,'did_score' => 14,'ssn_append' => 15,'permanent_flag' => 16,'opt_back_in' => 17,'date_yyyymmdd' => 18,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','LENGTHS'],['LENGTHS'],['LENGTHS'],[],['ALLOW'],[],[],['ALLOW'],['ALLOW'],['ALLOW'],[],[],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],['CUSTOM'],['ENUM'],['ENUM'],['CUSTOM'],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','LENGTHS'],['LENGTHS'],['LENGTHS'],[],['ALLOW'],[],[],['ALLOW'],['ALLOW'],['ALLOW'],[],[],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],['ALLOW','LENGTHS'],['ENUM'],['ENUM'],['CUSTOM'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
