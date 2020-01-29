@@ -1,4 +1,4 @@
-// ILS0829 / Illinois Department of Professional Regulation / Multiple Professions //
+﻿// ILS0829 / Illinois Department of Professional Regulation / Multiple Professions //
 
 export layout_ILS0829 := RECORD
 string10   LIC_TYPE;
@@ -7,7 +7,7 @@ string100  ORG_NAME;
 string30   L_NAME;
 string30   F_NAME;
 string100  OFFICENAME;
-string15   LICSTAT;
+string50   LICSTAT;
 string30   CITY_1;
 string2    STATE_1;
 string10   ZIP;
