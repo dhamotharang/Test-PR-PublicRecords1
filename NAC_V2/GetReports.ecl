@@ -2,9 +2,9 @@
 ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'nac2', rpt);
 ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
 
-EXPORT GetReports(string lfn) := function
+EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string fn) := function
 
-		nac2 := DATASET(lfn, $.Layouts2.rNac2Ex, thor);
+		//nac2 := DATASET(lfn, $.Layouts2.rNac2Ex, thor);
 
 		cases := PROJECT(nac2(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
 										self.RecordCode := left.RecordCode;
@@ -45,12 +45,13 @@ EXPORT GetReports(string lfn) := function
 		nWarnings := COUNT(errs(Severity='W'));
 		nRejected := COUNT(addresses(errors>0)) + COUNT(cases(errors>0)) + COUNT(clients(errors>0)) + COUNT(contacts(errors>0)) + COUNT(exceptions(errors>0));
 		nWarned := COUNT(addresses(warnings>0)) + COUNT(cases(warnings>0)) + COUNT(clients(warnings>0)) + COUNT(contacts(warnings>0)) + COUNT(exceptions(warnings>0));
+		nRejectable := COUNT(addresses(errors>0)) + COUNT(cases(errors>0)) + COUNT(clients(errors>0));
 
-		err_rate := nRejected/total;
+		err_rate := nRejectable/total;		// omit contact and exception records for threshold calculation
 		ExcessiveInvalidRecordsFound :=	err_rate	> $.Mod_Sets.threshld;
 
 	
-		fn := ExtractFileName(ModifyFileName(lfn, 'ncf2'));
+		//fn := ExtractFileName(ModifyFileName(lfn, 'ncf2'));
 
 		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound);
 
