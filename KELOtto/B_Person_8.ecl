@@ -4,8 +4,8 @@ IMPORT E_Address,E_Customer,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_8 := MODULE
   SHARED VIRTUAL TYPEOF(E_Person.__Result) __E_Person := E_Person.__Result;
-  SHARED __EE64461 := __E_Person;
-  EXPORT __ST63635_Layout := RECORD
+  SHARED __EE65242 := __E_Person;
+  EXPORT __ST64416_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nint Lex_Id_;
@@ -81,13 +81,13 @@ EXPORT B_Person_8 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST63635_Layout __ND65583__Project(E_Person.Layout __PP63856) := TRANSFORM
-    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP63856.Deceased_Date_))=>1,0);
-    __BS64259 := __T(__PP63856.Reported_Date_Of_Birth_);
-    SELF.Deceased_Dob_Match_ := MAP(EXISTS(__BS64259(__T(__OP2(__PP63856.Deceased_Date_Of_Birth_,=,__T(__PP63856.Reported_Date_Of_Birth_).Date_Of_Birth_))))=>1,0);
-    __BS64301 := __T(__PP63856.Full_Name_);
-    SELF.Deceased_Name_Match_ := MAP(EXISTS(__BS64301(__T(__AND(__OP2(__T(__PP63856.Full_Name_).First_Name_,=,__PP63856.Deceased_First_),__OP2(__T(__PP63856.Full_Name_).Last_Name_,=,__PP63856.Deceased_Last_)))))=>1,0);
-    SELF := __PP63856;
+  SHARED __ST64416_Layout __ND66364__Project(E_Person.Layout __PP64637) := TRANSFORM
+    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP64637.Deceased_Date_))=>1,0);
+    __BS65040 := __T(__PP64637.Reported_Date_Of_Birth_);
+    SELF.Deceased_Dob_Match_ := MAP(EXISTS(__BS65040(__T(__OP2(__PP64637.Deceased_Date_Of_Birth_,=,__T(__PP64637.Reported_Date_Of_Birth_).Date_Of_Birth_))))=>1,0);
+    __BS65082 := __T(__PP64637.Full_Name_);
+    SELF.Deceased_Name_Match_ := MAP(EXISTS(__BS65082(__T(__AND(__OP2(__T(__PP64637.Full_Name_).First_Name_,=,__PP64637.Deceased_First_),__OP2(__T(__PP64637.Full_Name_).Last_Name_,=,__PP64637.Deceased_Last_)))))=>1,0);
+    SELF := __PP64637;
   END;
-  EXPORT __ENH_Person_8 := PROJECT(__EE64461,__ND65583__Project(LEFT)) : PERSIST('~temp::KEL::KELOtto::Person::Annotated_8',EXPIRE(7));
+  EXPORT __ENH_Person_8 := PROJECT(__EE65242,__ND66364__Project(LEFT)) : PERSIST('~temp::KEL::KELOtto::Person::Annotated_8',EXPIRE(7));
 END;
