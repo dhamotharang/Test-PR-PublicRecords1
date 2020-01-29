@@ -333,7 +333,8 @@ MODULE
 	export src_NCPDP                     := 'J2';  // National Council for Prescription Drug Programs
 	export src_NPPES                     := 'NP';  // US National Provider & Plan Enumeration System
 	export src_OIG                       := 'ZO';  // US Office of Inspector General
-	export src_One_Click_Data            := 'OC';
+	export src_One_Click_Data            := 'OC';	
+	export src_OPM                       := '33';  // Office Of Personnel Management
 	export src_OSHAIR                    := 'OS';  // US Occupational Safety & Health Administration, incident reports
 	export src_OutwardMedia 						 						:= 'OM';
 	export src_OKC_Student_List										:= 'O9';  //okc student list	
@@ -1115,7 +1116,7 @@ export set_Marketing_Sources           := [
 		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard
 		,src_Vickers									 ,src_ZOOM											,src_Cortera									 ,src_Equifax_Business_Data		
 		,src_FBNV2_Hist_Choicepoint		 ,src_DCA												,src_Infutor_NARB							 ,src_Database_USA
-		,src_DataBridge
+		,src_DataBridge                ,src_OPM	
 		/*updated set_Marketing_Corp*/		
     ,src_AK_Corporations					 ,src_AL_Corporations						,src_AZ_Corporations					 ,src_AR_Corporations 
 		,src_CA_Corporations					 ,src_CO_Corporations						,src_CT_Corporations					 ,src_DC_Corporations
@@ -1164,8 +1165,8 @@ export set_Marketing_Restricted := [
   src_SD_Corporations,       src_TN_Corporations,        src_TN_Watercraft,          src_TX_Corporations,           src_TX_Watercraft,
   src_TXBUS,                 src_UCC,                    src_UCCV2,                  src_US_Coastguard,             src_UT_Corporations,
   src_VA_Corporations,       src_VT_Corporations,        src_WI_Corporations,        src_WI_Watercraft,             src_WV_Corporations,
-  src_WV_Watercraft,         src_WY_Corporations,        src_WY_Watercraft,           src_Bankruptcy,               src_Experian_CRDB,
-	 src_Business_Credit,       src_DCA,                    src_Dunn_Bradstreet,        src_IRS_5500
+  src_WV_Watercraft,         src_WY_Corporations,        src_WY_Watercraft,          src_Bankruptcy,                src_Experian_CRDB,
+	src_Business_Credit,       src_DCA,                    src_Dunn_Bradstreet,        src_IRS_5500
  ];
   
 
@@ -1746,7 +1747,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_NM_DL                     := [src_NM_DL                     ];
 	export set_NV_DL                     := [src_NV_DL                     ];
 	export set_LA_DL                     := [src_LA_DL                     ];		
-	export set_OH_DL                     := [src_OH_DL                     ];
+	export set_OH_DL                     := [src_OH_DL                     ];	
 	export set_OR_DL                     := [src_OR_DL                     ];
 	export set_TN_DL                     := [src_TN_DL                     ];
 	export set_TX_DL                     := [src_TX_DL                     ];
@@ -1898,6 +1899,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_NPPES                     := [src_NPPES                     ];
 	export set_OIG                       := [src_OIG                       ];
 	export set_One_Click_Data            := [src_One_Click_Data            ];
+	export set_OPM                       := [src_OPM                       ];
 	export set_OSHAIR                    := [src_OSHAIR                    ];
 	export set_OutwardMedia		           	:= [src_OutwardMedia			         ];
 	export set_OKC_Probate							 :=	[src_OKC_Probate  						 ];
@@ -2444,6 +2446,7 @@ export set_NonDerog_FCRA_sources_v50 := [
   export SourceIsOKC_Probate                (string  sr) := sr               in set_OKC_Probate		             ;	
 	export SourceIsOne_Click_Data             (string  sr) := sr               in set_One_Click_Data	           ;
 	export SourceIsOKC_Student_List           (string  sr) := sr               in set_OKC_Student_List           ;
+	export SourceIsOPM                        (string  sr) := sr               in set_OPM                        ;
 	#if(_Control.ThisEnvironment.IsPlatformThor = true)
 		export SourceIsOnProbation                (string  sr) := SourceGroup(sr)  in set_Probation                ;
 	#else
@@ -2974,6 +2977,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_One_Click_Data            ,'One Click Data'                                            }
     ,{src_OKC_Probate               ,'OKC Probate'                                               }
 		,{src_OKC_Student_List          ,'OKC Student List'                                          }
+		,{src_OPM			                  ,'OPM'   		                     														 }
 		,{src_OSHAIR                    ,'OSHAIR'                                                    }
 		,{src_OutwardMedia			        ,'Outward Media Email'                                       }
 		,{src_PBSA                      ,'United States Postal Service' 			                       }	  
@@ -3495,6 +3499,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_One_Click_Data            => 'One Click Data'                                       
     ,src_OKC_Probate               => 'OKC Probate' 
 		,src_OKC_Student_List					 => 'OKC Student List'
+		,src_OPM			                 => 'Office of Personnel Management'
 		,src_OSHAIR                    => 'OSHAIR'                                               
 		,src_OutwardMedia			         => 'Outward Media Email'                                  
 		,src_PBSA	                     => 'United States Postal Service'                   		 	
