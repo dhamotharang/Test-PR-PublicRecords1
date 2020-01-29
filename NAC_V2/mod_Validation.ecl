@@ -235,6 +235,8 @@ EXPORT mod_Validation := MODULE
 											DATASET([{errCodes.E119, 'E', 'F', FieldCode('E', errCodes.E119), left.UpdateType, left.ProgramState, left.RecordCode}], rErr))							
 							+ IF(left.ContactEmail <> '' AND NOT REGEXFIND(rgxEmail, TRIM(left.ContactEmail), NOCASE), 
 									DATASET([{warningCodes.W118, 'W', 'F', '2042', left.ContactEmail, left.ProgramState, left.RecordCode}], rErr))
+							+ IF(left.ContactName='' OR left.ContactPhone='' OR left.ContactEmail='', 
+											DATASET([{errCodes.E125, 'E', 'F', FieldCode('E', errCodes.E125), '', left.ProgramState, left.RecordCode}], rErr))							
 							;
 
 					self.errors := COUNT(self.dsErrs(severity='E'));

@@ -45,8 +45,9 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string fn) := function
 		nWarnings := COUNT(errs(Severity='W'));
 		nRejected := COUNT(addresses(errors>0)) + COUNT(cases(errors>0)) + COUNT(clients(errors>0)) + COUNT(contacts(errors>0)) + COUNT(exceptions(errors>0));
 		nWarned := COUNT(addresses(warnings>0)) + COUNT(cases(warnings>0)) + COUNT(clients(warnings>0)) + COUNT(contacts(warnings>0)) + COUNT(exceptions(warnings>0));
+		nRejectable := COUNT(addresses(errors>0)) + COUNT(cases(errors>0)) + COUNT(clients(errors>0));
 
-		err_rate := nRejected/total;
+		err_rate := nRejectable/total;		// omit contact and exception records for threshold calculation
 		ExcessiveInvalidRecordsFound :=	err_rate	> $.Mod_Sets.threshld;
 
 	
