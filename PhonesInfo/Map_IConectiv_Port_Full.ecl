@@ -1,4 +1,4 @@
-import std, ut;	
+﻿import std, ut;	
 	
 	//Pull Existing History w/ Newly Concatenated Daily
 		dailyInput 		:= PhonesInfo.File_iConectiv.In_Port_Daily_History;
@@ -58,9 +58,9 @@ import std, ut;
 		PhonesInfo.Layout_iConectiv.Intermediate roll(aggrTrans_s l, aggrTrans_s r) := transform
 				self.is_ported										:= if(l.is_ported or r.is_ported, true, 														r.is_ported);
 				self.vendor_first_reported_dt 		:= (string)ut.min2((unsigned)l.vendor_first_reported_dt, 						(unsigned)r.vendor_first_reported_dt);
-				self.vendor_last_reported_dt 			:= (string)ut.max2((unsigned)l.vendor_last_reported_dt, 						(unsigned)r.vendor_last_reported_dt);
+				self.vendor_last_reported_dt 			:= (string)max((unsigned)l.vendor_last_reported_dt, 						(unsigned)r.vendor_last_reported_dt);
 				self.port_start_dt								:= (string)ut.min2((unsigned)l.port_start_dt, 											(unsigned)r.port_start_dt);
-				self.port_end_dt									:= if(self.is_ported, '', (string)ut.max2((unsigned)l.port_end_dt, 	(unsigned)r.port_end_dt));
+				self.port_end_dt									:= if(self.is_ported, '', (string)max((unsigned)l.port_end_dt, 	(unsigned)r.port_end_dt));
 				self.porting_dt										:= if(l.porting_dt > r.porting_dt, l.porting_dt, 										r.porting_dt);
 				self 															:= r;
 		end;
