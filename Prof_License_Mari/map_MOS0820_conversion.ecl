@@ -13,7 +13,7 @@ EXPORT map_MOS0820_conversion(STRING pVersion) := FUNCTION
 	src_st							:= code[1..2];	//License state
 	mari_dest						:= '~thor_data400::in::proflic_mari::';
 
-	MD_Lic_types := ['IAS','INB','BRA','BRO','BRP','BRS','PCB','PCS','SAL','BRK','SCG','RSL','RAP','GR','ACM'];
+	MD_Lic_types := ['IAS','INB','BRA','BRO','BRP','BRS','PCB','PCS','SAL','BRK','SCG','RSL','RAP','ACM'];
 
 	//Move file from sprayed to using
 	move_to_using := PARALLEL(
@@ -260,9 +260,8 @@ EXPORT map_MOS0820_conversion(STRING pVersion) := FUNCTION
 																		IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND CleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr1_2),CleanAddr2_2,CleanAddr1_2))));
 		self.ADDR_ADDR1_2			:= IF(REGEXFIND('^.* LLC$',tempAddr1_2),'',tempAddr1_2);
 		tempAddr2_2						:= IF(IsMailingAddr != 'M',' ',
-																IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND CleanAddr2_2 = ' ',CleanAddr2_2,
-																	IF(IsMailingAddr = 'M' AND tempContact2 != ' ' AND CleanAddr2_2 != ' ',CleanAddr2_2,
-																		IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND CleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr2_2),CleanAddr1_2,CleanAddr2_2))));
+																IF(IsMailingAddr = 'M' AND tempContact2 != ' ' AND cleanAddr2_2 != ' ',' ',
+																IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND cleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr1_2),CleanAddr1_2,CleanAddr2_2)));
 		self.ADDR_ADDR2_2			:= IF(REGEXFIND('(^ATTN|^C/O|COMPANY)',tempAddr2_2),'',tempAddr2_2);
 		self.ADDR_CITY_2		  := IF(self.ADDR_MAIL_IND = 'M' AND TRIM(L.REL_CITY) != ' ',ut.CleanSpacesAndUpper(L.REL_CITY),' ');
 		self.ADDR_STATE_2			:= IF(self.ADDR_MAIL_IND = 'M' AND TRIM(L.REL_STATE) != ' ',ut.CleanSpacesAndUpper(L.REL_STATE),' ');
