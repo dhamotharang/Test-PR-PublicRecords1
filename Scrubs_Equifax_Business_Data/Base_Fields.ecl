@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311;
-IMPORT Scrubs_Equifax_Business_Data; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs_Equifax_Business_Data,Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Base_Fields := MODULE
  
 EXPORT NumFields := 227;
@@ -211,14 +211,14 @@ EXPORT InValidMessageFT_invalid_rcid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneE
 EXPORT MakeFT_invalid_sic(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_sic(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_sic(s)>0);
-EXPORT InValidMessageFT_invalid_sic(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_sic'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_sic(SALT311.StrType s) := WHICH(~Scrubs.fn_valid_SicCode(s)>0);
+EXPORT InValidMessageFT_invalid_sic(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_SicCode'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_naics(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_naics(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_naics(s)>0);
-EXPORT InValidMessageFT_invalid_naics(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_naics'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_naics(SALT311.StrType s) := WHICH(~Scrubs.fn_valid_NAICSCode(s)>0);
+EXPORT InValidMessageFT_invalid_naics(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_NAICSCode'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_url(SALT311.StrType s0) := FUNCTION
   RETURN  s0;

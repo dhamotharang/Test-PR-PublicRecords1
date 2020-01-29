@@ -382,6 +382,17 @@ export fTraffic_Flag_From_Vendor_and_Offense_Level(string5 pVendor, string5 pOff
 	pVendor IN ['I0008'] => if(trim(pOffenseLevel,right) in ['T','V'],'Y','N'),
 	pVendor IN ['I0018'] => if(trim(pOffenseLevel,right) in ['T','PO'],'Y','N'),
   
+  //IE phase2
+	pVendor IN ['I0057','I0060','I0061','I0062','I0067', 
+							'I0068','I0071','I0072','I0074',  
+							'I0075','I0076','I0078','I0079',  
+							'I0080','I0081','I0082','I0084',  
+							'I0086','I0087','I0089','I0090','I0091',  
+							'I0092','I0093','I0094'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
+							
+	pVendor IN ['I0097','I0098','I0107','I0108','I0109','I0113','I0115'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
+  pVendor IN ['I0114','I0102','I0103','I0105'] => if(trim(pOffenseLevel,right) in ['I'],'Y','N'),
+  pVendor IN ['I0100'] => if(trim(pOffenseLevel,right) in ['T','I'],'Y','N'),						
 
   ''
 	)
