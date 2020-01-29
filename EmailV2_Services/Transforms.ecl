@@ -1,4 +1,4 @@
-IMPORT $, AutoKeyI, Address, BatchShare, BatchServices, dx_Email, email_data, iesp, STD;
+﻿IMPORT $, AutoKeyI, Address, BatchShare, BatchServices, dx_Email, email_data, iesp, STD;
 
 EXPORT Transforms := MODULE
 
@@ -217,7 +217,7 @@ EXPORT Transforms := MODULE
       SELF.email_username := STD.Str.ToUpperCase(le.Result.Account);
       SELF.email_domain := STD.Str.ToUpperCase(le.Result.Domain);
       _email_status := STD.Str.ToLowerCase(le.Result.Status);
-      SELF.email_status := IF(~$.Constants.isUnknown(_email_status), _email_status, '');  //status unknown brings no value here;  we populate status 'unknown' by default later, blanking it here will allow to use previous status if any
+      SELF.email_status := _email_status;
       error_desc := $.Constants.GatewayValues.get_error_desc(STD.Str.ToUpperCase(le.Result.ErrorCode));
       SELF.email_status_reason := IF(error_desc<>'', error_desc, STD.Str.ToTitleCase(le.Result.Error));
       isDisposableAddress := STD.Str.ToLowerCase(le.Result.Disposable) = $.Constants.STR_TRUE;
