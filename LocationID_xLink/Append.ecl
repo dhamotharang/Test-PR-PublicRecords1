@@ -91,7 +91,7 @@ export Append(inDs,
 	#uniquename(createOutput)
 	%createOutput% := join(%addRef%, %resolvedDs%,
 	                       left.ref_append = right.reference,
-					               transform(%OutputRec%, self := left, self := right), left outer, hash);
+					               transform(%OutputRec%, self.locid := right.locid, self := left, self := right), left outer, hash);
 							   
 				   
 	outDs          := %createOutput%;
