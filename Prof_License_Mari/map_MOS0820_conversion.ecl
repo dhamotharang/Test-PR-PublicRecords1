@@ -263,7 +263,7 @@ EXPORT map_MOS0820_conversion(STRING pVersion) := FUNCTION
 																IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND CleanAddr2_2 = ' ',CleanAddr2_2,
 																	IF(IsMailingAddr = 'M' AND tempContact2 != ' ' AND CleanAddr2_2 != ' ',CleanAddr2_2,
 																		IF(IsMailingAddr = 'M' AND tempContact2 = ' ' AND CleanAddr2_2 != ' ' AND NOT REGEXFIND('^([0-9]+|ONE |TWO |P[ ]*O |BOX |RT )',CleanAddr2_2),CleanAddr1_2,CleanAddr2_2))));
-		self.ADDR_ADDR2_2			:= IF(REGEXFIND('(^ATTN|^C/O)',tempAddr2_2),'',tempAddr2_2);
+		self.ADDR_ADDR2_2			:= IF(REGEXFIND('(^ATTN|^C/O|COMPANY)',tempAddr2_2),'',tempAddr2_2);
 		self.ADDR_CITY_2		  := IF(self.ADDR_MAIL_IND = 'M' AND TRIM(L.REL_CITY) != ' ',ut.CleanSpacesAndUpper(L.REL_CITY),' ');
 		self.ADDR_STATE_2			:= IF(self.ADDR_MAIL_IND = 'M' AND TRIM(L.REL_STATE) != ' ',ut.CleanSpacesAndUpper(L.REL_STATE),' ');
 		tempZip2_2							:= IF(IsMailingAddr = 'M' AND TRIM(L.REL_ZIP) != ' ',TRIM(L.REL_ZIP,left,right)[1..5],' ');
