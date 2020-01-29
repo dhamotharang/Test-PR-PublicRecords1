@@ -15,9 +15,10 @@ function
 														,DATASET([],Database_USA.Layouts.Base));
 		
 	ingestMod					 :=  Database_USA.Ingest(,,dBase,dStandardizeInput);  
-	update_combined    :=  ingestMod.AllRecords_Notag;  
+	update_combined    :=  ingestMod.AllRecords_Notag; 
+	addGlobalSID 			 :=  mdr.macGetGlobalSID(update_combined, 'Database_USA', 'source', 'global_sid'); //DF-26856: Populate Global_SID Field
 
-	dStandardize_Addr	 :=  Database_USA.Standardize_NameAddr.fAll (update_combined);
+	dStandardize_Addr	 :=  Database_USA.Standardize_NameAddr.fAll (addGlobalSID);
 	dAppendIds				 :=  Database_USA.AppendIds.fAll (dStandardize_Addr); 	
 	dRollup						 :=	 Database_USA.Rollup_Base (dAppendIds);
 		

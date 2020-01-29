@@ -360,7 +360,49 @@
 											'I0018', //	IL KANE CRC         
 											'I0031', //	SC JASPER SC
 											'I0032', //	TN DAVIDSON GSC (LEG
-                      'I0041'  // FL_SARASOTA_COC
+                      'I0041',  // FL_SARASOTA_COC
+
+                      //IE phase2
+											'I0057',  // 	AZ_MARICOPA_JUST    
+											'I0060',  // 	FLCITRS_COC_DISP    
+											'I0061',  // 	FL_CLAY_CTY_COC     
+											'I0062',  // 	FL_INDIAN_RIVER_COC 
+											'I0067',  // FL_PINELLAS_CIR_COC 	
+											'I0068',  // 	FL_SAINT_LUCIE_COCS 
+											'I0071',  // 	OH_DELAWARE_MC      
+											'I0072',  // 	OH_ERIE_MC          
+											'I0074',  // 	OH_LUCAS_OREGON_MC  
+											'I0075',  // 	OH_LUCAS_TOLEDO_MC  
+											'I0076',  // 	OH_MADISON_MC       
+											'I0078',  // 	OHMNTGMRYMIASBRG_MC 
+											'I0079',  // 	OHMONTGOMRY_MC_EDIV 
+											'I0080',  // 	OHMONTGOMRY_MC_WDIV 
+											'I0081',  // 	OH_SANDUSKY_COCS    
+											'I0082',  // 	OHSANDUSKYFREMONT_MC
+											'I0084',  // 	OH_WARREN_CTY_COURT 
+											'I0086',  // 	OHWARRENFRANKLIN_MC 
+											'I0087',  // 	OH_WARN_LEBANON_MUN 
+											'I0089',  // 	OHWARNMORROW_MYRSCRT
+											'I0090',  // 	OH_WARNSPRBORO_MYRSC
+											'I0091',  // 	OHWARNWAYNSVIL_MYRSC
+											'I0092',  // 	OHWYANDTUPRSNDSKY_MC
+											'I0093',  // 	SC_BEAUFORT_SC      
+											'I0094',  // 	SC_SUMTER_SC        
+
+
+                      'I0097',  // AZ_SUP_CT_JUD_BRNCH 
+                      'I0098',  // DC_SPC   
+                      'I0100',	// HI_STATE_JUD_AOC    
+											'I0102',	// ID_STATE_JUD        
+											'I0103',	// ID_SUPREME_COURT    
+											'I0105',	// IN_AOC_(WEB)        
+											'I0107',	// MO_AOC              
+											'I0108',	// NM_AOC_DCS          
+											'I0109',	// NM_AOC_MAGC         
+											'I0113',	// OK_DCS_(WEB)        
+											'I0114',	// OR_AOC_(OECI)       
+											'I0115'	  // WI_AOC_CRIMINAL     
+ 
 
 											];
 										

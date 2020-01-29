@@ -44,7 +44,7 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		
 		processed := $.PreprocessNCF2(ilfn);
 		base2 := $.fn_constructBase2FromNCFEx(processed, version);				
-		reports := $.GetReports(ModifyFileName(ilfn, 'nac2'));
+		reports := $.GetReports(processed, lfn);		//ModifyFileName(ilfn, 'nac2'));
 		err_rate := reports.RejectedCount/reports.TotalRecords;
 		ExcessiveInvalidRecordsFound :=	err_rate	> treshld_;
 		
@@ -76,7 +76,7 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 				//,OUTPUT(err_rate, named('err_rate'))
 				,MoveToTempOrReject
 				,out_NCF_reports
-				,IF(EXISTS(reports.dsContacts), fn_ProcessContactRecord(reports.dsContacts))
+				,IF(EXISTS(reports.dsContacts(errors=0)), fn_ProcessContactRecord(reports.dsContacts(errors=0)))
 				,IF(EXISTS(reports.dsExceptions), fn_ProcessExceptionRecord(reports.dsExceptions))
 				,OUTPUT(base2,,ModifyFileName(ilfn, 'bas2'), COMPRESSED, OVERWRITE)
 				//,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfReady, ModifyFileName(ilfn, 'bas2')))

@@ -2,8 +2,9 @@
  
 EXPORT Layouts := module
 
+     
     // Corporations Raw Vendor Input File
-		EXPORT CorporationsLayoutIN 	:= RECORD 
+		EXPORT CorporationsLayoutIN 	:= RECORD
 			string UBI										{xpath('Ubi')};
 			string BusinessName						{xpath('BusinessName')}; 
 			string RecordStatus           {xpath('RecordStatus')};  
@@ -23,7 +24,7 @@ EXPORT Layouts := module
 		END;
 
     // Governing Persons Raw Vendor Input File
-		EXPORT GoverningPersonsLayoutIN 	:= RECORD 
+		EXPORT GoverningPersonsLayoutIN 	:= RECORD
 			string UBI				    				{xpath('Ubi')}; 
 			string Title									{xpath('Title')}; 
 			string FirstName      				{xpath('FirstName')};  
@@ -36,10 +37,33 @@ EXPORT Layouts := module
 		END;
 		
 		// Document Types Raw Vendor Input File
-		EXPORT DocumentTypesLayoutIN 	:= RECORD 
+		EXPORT DocumentTypesLayoutIN 	:= RECORD
 			string UBI      							{xpath('Ubi')}; 	
 			string CompletedDate					{xpath('CompletedDate')}; 
 			string Document								{xpath('Document')}; 
+		END;
+		
+		EXPORT BusinessInfoLayoutIN := RECORD
+			string UBI									{xpath('Ubi')};
+			string BusinessName					{xpath('BusinessName')}; 
+			string Email                {xpath('Email')};  
+			string MailingAddressLine1	{xpath('MailingAddressLine1')}; 
+			string MailingAddressLine2	{xpath('MailingAddressLine2')}; 
+			string MailingAddressLine3	{xpath('MailingAddressLine3')}; 
+			string MailingCity					{xpath('MailingCity')}; 
+			string MailingCountry				{xpath('MailingCountry')}; 
+			string MailingState         {xpath('MailingState')};
+			string MailingZip4					{xpath('MailingZip4')}; 
+			string MailingZip5          {xpath('MailingZip5')};  
+			string PhoneNumber		      {xpath('PhoneNumber')}; 
+			string PhysicalAddressLine1	{xpath('PhysicalAddressLine1')}; 
+			string PhysicalAddressLine2	{xpath('PhysicalAddressLine2')}; 
+			string PhysicalAddressLine3	{xpath('PhysicalAddressLine3')}; 
+			string PhysicalCity			    {xpath('PhysicalCity')}; 
+			string PhysicalCountry			{xpath('PhysicalCountry')}; 
+			string PhysicalState        {xpath('PhysicalState')};
+			string PhysicalZip4					{xpath('PhysicalZip4')}; 
+			string PhysicalZip5         {xpath('PhysicalZip5')};  
 		END;
 	 	    
 	//---------------------------------
@@ -49,6 +73,11 @@ EXPORT Layouts := module
 			CorporationsLayoutIN;
 	    DocumentTypesLayoutIN.Document;
 			DocumentTypesLayoutIN.CompletedDate;
+	 END; 
+	 
+	 EXPORT TempCorpBusInfoLayout  := RECORD
+			TempCorporationsLayout;
+			BusinessInfoLayoutIN;
 	 END; 
 	 
    EXPORT TempContactsLayout  := RECORD
