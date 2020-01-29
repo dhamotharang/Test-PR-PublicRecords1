@@ -2,7 +2,8 @@
 PRTE2_X_Ins_DataGathering.BWR_Gather_VIN_Year
 
 For CT purposes, VINS have no states applied so just gather by year.
-This is always a brand new year so don't need to read remote the "CustomerTest_X_Data_Gathering.Files.ALL_CT_VINs_RESERVED_DS", and remove matches.
+This is always a brand new year so DO NOT need to read remote the 
+	"CustomerTest_X_Data_Gathering.Files.ALL_CT_VINs_RESERVED_DS", and remove matches.
 
 vina_veh_type = Code that indicates the type of vehicle
 M=motorcycle
