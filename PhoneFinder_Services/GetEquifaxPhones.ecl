@@ -22,7 +22,6 @@ FUNCTION
     SELF.fname         := (STRING)pInput.equifax_phone.fname;
     SELF.lname         := (STRING)pInput.equifax_phone.lname;
     SELF.mname         := (STRING)pInput.equifax_phone.mname;
-    SELF.phn_src_all  := DATASET([MDR.sourceTools.src_Equifax], $.Layouts.PhoneFinder.src_rec);
     SELF.batch_in      := pInput;
 		SELF               := pInput;
 		SELF               := [];
