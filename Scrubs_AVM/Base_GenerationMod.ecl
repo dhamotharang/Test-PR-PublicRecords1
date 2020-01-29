@@ -44,7 +44,7 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'NAMESCOPE:Base\n'
     + '\n'
     + '//FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)\n'
-    + 'FIELDTYPE:Invalid_Date:ALLOW(0123456789):LENGTHS(..8)\n'
+    + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)\n'
     + 'FIELDTYPE:Invalid_AlphaNum:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)\n'
     + 'FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)\n'
     + 'FIELDTYPE:Invalid_Num:ALLOW(0123456789)\n'

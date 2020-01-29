@@ -1,4 +1,5 @@
 ﻿IMPORT SALT311;
+IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Base_Fields := MODULE
  
 EXPORT NumFields := 52;
@@ -8,11 +9,10 @@ EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Date','In
 EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_Date' => 1,'Invalid_AlphaNum' => 2,'Invalid_Alpha' => 3,'Invalid_Num' => 4,'Invalid_Comps' => 5,0);
  
 EXPORT MakeFT_Invalid_Date(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
-  RETURN  s1;
+  RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Date(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) >= 0 AND LENGTH(TRIM(s)) <= 8));
-EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('..8'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Date(SALT311.StrType s) := WHICH(~Scrubs.fn_valid_date(s)>0);
+EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_date'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_AlphaNum(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'); // Only allow valid symbols
@@ -45,7 +45,7 @@ EXPORT InValidMessageFT_Invalid_Comps(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hygiene
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'history_date','ln_fares_id_ta','ln_fares_id_pi','unformatted_apn','prim_range','predir','prim_name','suffix','postdir','unit_desig','sec_range','p_city_name','st','zip','zip4','lat','long','geo_blk','fips_code','land_use','recording_date','assessed_value_year','sales_price','assessed_total_value','market_total_value','tax_assessment_valuation','price_index_valuation','hedonic_valuation','automated_valuation','confidence_score','comp1','comp2','comp3','comp4','comp5','nearby1','nearby2','nearby3','nearby4','nearby5','history_history_date','history_land_use','history_recording_date','history_assessed_value_year','history_sales_price','history_assessed_total_value','history_market_total_value','history_tax_assessment_valuation','history_price_index_valuation','history_hedonic_valuation','history_automated_valuation','history_confidence_score');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'history_date','ln_fares_id_ta','ln_fares_id_pi','unformatted_apn','prim_range','predir','prim_name','suffix','postdir','unit_desig','sec_range','p_city_name','st','zip','zip4','lat','long','geo_blk','fips_code','land_use','recording_date','assessed_value_year','sales_price','assessed_total_value','market_total_value','tax_assessment_valuation','price_index_valuation','hedonic_valuation','automated_valuation','confidence_score','comp1','comp2','comp3','comp4','comp5','nearby1','nearby2','nearby3','nearby4','nearby5','history_history_date','history_land_use','history_recording_date','history_assessed_value_year','history_sales_price','history_assessed_total_value','history_market_total_value','history_tax_assessment_valuation','history_price_index_valuation','history_hedonic_valuation','history_automated_valuation','history_confidence_score');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'history_date' => 0,'ln_fares_id_ta' => 1,'ln_fares_id_pi' => 2,'unformatted_apn' => 3,'prim_range' => 4,'predir' => 5,'prim_name' => 6,'suffix' => 7,'postdir' => 8,'unit_desig' => 9,'sec_range' => 10,'p_city_name' => 11,'st' => 12,'zip' => 13,'zip4' => 14,'lat' => 15,'long' => 16,'geo_blk' => 17,'fips_code' => 18,'land_use' => 19,'recording_date' => 20,'assessed_value_year' => 21,'sales_price' => 22,'assessed_total_value' => 23,'market_total_value' => 24,'tax_assessment_valuation' => 25,'price_index_valuation' => 26,'hedonic_valuation' => 27,'automated_valuation' => 28,'confidence_score' => 29,'comp1' => 30,'comp2' => 31,'comp3' => 32,'comp4' => 33,'comp5' => 34,'nearby1' => 35,'nearby2' => 36,'nearby3' => 37,'nearby4' => 38,'nearby5' => 39,'history_history_date' => 40,'history_land_use' => 41,'history_recording_date' => 42,'history_assessed_value_year' => 43,'history_sales_price' => 44,'history_assessed_total_value' => 45,'history_market_total_value' => 46,'history_tax_assessment_valuation' => 47,'history_price_index_valuation' => 48,'history_hedonic_valuation' => 49,'history_automated_valuation' => 50,'history_confidence_score' => 51,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],[],[],[],[],[],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],['ALLOW'],[],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS'],[],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],[],[],[],[],[],['ALLOW'],['ALLOW'],['ALLOW'],[],[],[],['ALLOW'],[],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],[],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation

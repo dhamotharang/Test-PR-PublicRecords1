@@ -1,9 +1,10 @@
 ﻿IMPORT SALT311,STD;
+IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Base_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 43;
-  EXPORT NumRulesFromFieldType := 43;
+  EXPORT NumRules := 39;
+  EXPORT NumRulesFromFieldType := 39;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 39;
   EXPORT NumFieldsWithPossibleEdits := 0;
@@ -56,7 +57,7 @@ EXPORT Base_Scrubs := MODULE
     STRING Rules {MAXLENGTH(1000)};
   END;
   SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
-          ,'history_date:Invalid_Date:ALLOW','history_date:Invalid_Date:LENGTHS'
+          ,'history_date:Invalid_Date:CUSTOM'
           ,'ln_fares_id_ta:Invalid_Comps:ALLOW'
           ,'ln_fares_id_pi:Invalid_Comps:ALLOW'
           ,'unformatted_apn:Invalid_Comps:ALLOW'
@@ -64,7 +65,7 @@ EXPORT Base_Scrubs := MODULE
           ,'zip:Invalid_Num:ALLOW'
           ,'zip4:Invalid_Num:ALLOW'
           ,'fips_code:Invalid_Num:ALLOW'
-          ,'recording_date:Invalid_Date:ALLOW','recording_date:Invalid_Date:LENGTHS'
+          ,'recording_date:Invalid_Date:CUSTOM'
           ,'assessed_value_year:Invalid_Num:ALLOW'
           ,'sales_price:Invalid_Num:ALLOW'
           ,'assessed_total_value:Invalid_Num:ALLOW'
@@ -84,8 +85,8 @@ EXPORT Base_Scrubs := MODULE
           ,'nearby3:Invalid_Comps:ALLOW'
           ,'nearby4:Invalid_Comps:ALLOW'
           ,'nearby5:Invalid_Comps:ALLOW'
-          ,'history_history_date:Invalid_Date:ALLOW','history_history_date:Invalid_Date:LENGTHS'
-          ,'history_recording_date:Invalid_Date:ALLOW','history_recording_date:Invalid_Date:LENGTHS'
+          ,'history_history_date:Invalid_Date:CUSTOM'
+          ,'history_recording_date:Invalid_Date:CUSTOM'
           ,'history_assessed_value_year:Invalid_Num:ALLOW'
           ,'history_sales_price:Invalid_Num:ALLOW'
           ,'history_assessed_total_value:Invalid_Num:ALLOW'
@@ -103,7 +104,7 @@ EXPORT Base_Scrubs := MODULE
           ,'record:Number_Errored_Records:SUMMARY'
           ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
   SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
-          ,Base_Fields.InvalidMessage_history_date(1),Base_Fields.InvalidMessage_history_date(2)
+          ,Base_Fields.InvalidMessage_history_date(1)
           ,Base_Fields.InvalidMessage_ln_fares_id_ta(1)
           ,Base_Fields.InvalidMessage_ln_fares_id_pi(1)
           ,Base_Fields.InvalidMessage_unformatted_apn(1)
@@ -111,7 +112,7 @@ EXPORT Base_Scrubs := MODULE
           ,Base_Fields.InvalidMessage_zip(1)
           ,Base_Fields.InvalidMessage_zip4(1)
           ,Base_Fields.InvalidMessage_fips_code(1)
-          ,Base_Fields.InvalidMessage_recording_date(1),Base_Fields.InvalidMessage_recording_date(2)
+          ,Base_Fields.InvalidMessage_recording_date(1)
           ,Base_Fields.InvalidMessage_assessed_value_year(1)
           ,Base_Fields.InvalidMessage_sales_price(1)
           ,Base_Fields.InvalidMessage_assessed_total_value(1)
@@ -131,8 +132,8 @@ EXPORT Base_Scrubs := MODULE
           ,Base_Fields.InvalidMessage_nearby3(1)
           ,Base_Fields.InvalidMessage_nearby4(1)
           ,Base_Fields.InvalidMessage_nearby5(1)
-          ,Base_Fields.InvalidMessage_history_history_date(1),Base_Fields.InvalidMessage_history_history_date(2)
-          ,Base_Fields.InvalidMessage_history_recording_date(1),Base_Fields.InvalidMessage_history_recording_date(2)
+          ,Base_Fields.InvalidMessage_history_history_date(1)
+          ,Base_Fields.InvalidMessage_history_recording_date(1)
           ,Base_Fields.InvalidMessage_history_assessed_value_year(1)
           ,Base_Fields.InvalidMessage_history_sales_price(1)
           ,Base_Fields.InvalidMessage_history_assessed_total_value(1)
@@ -195,7 +196,7 @@ EXPORT FromNone(DATASET(Base_Layout_AVM) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Base_Layout_AVM);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.history_date_Invalid << 0 ) + ( le.ln_fares_id_ta_Invalid << 2 ) + ( le.ln_fares_id_pi_Invalid << 3 ) + ( le.unformatted_apn_Invalid << 4 ) + ( le.st_Invalid << 5 ) + ( le.zip_Invalid << 6 ) + ( le.zip4_Invalid << 7 ) + ( le.fips_code_Invalid << 8 ) + ( le.recording_date_Invalid << 9 ) + ( le.assessed_value_year_Invalid << 11 ) + ( le.sales_price_Invalid << 12 ) + ( le.assessed_total_value_Invalid << 13 ) + ( le.market_total_value_Invalid << 14 ) + ( le.tax_assessment_valuation_Invalid << 15 ) + ( le.price_index_valuation_Invalid << 16 ) + ( le.hedonic_valuation_Invalid << 17 ) + ( le.automated_valuation_Invalid << 18 ) + ( le.confidence_score_Invalid << 19 ) + ( le.comp1_Invalid << 20 ) + ( le.comp2_Invalid << 21 ) + ( le.comp3_Invalid << 22 ) + ( le.comp4_Invalid << 23 ) + ( le.comp5_Invalid << 24 ) + ( le.nearby1_Invalid << 25 ) + ( le.nearby2_Invalid << 26 ) + ( le.nearby3_Invalid << 27 ) + ( le.nearby4_Invalid << 28 ) + ( le.nearby5_Invalid << 29 ) + ( le.history_history_date_Invalid << 30 ) + ( le.history_recording_date_Invalid << 32 ) + ( le.history_assessed_value_year_Invalid << 34 ) + ( le.history_sales_price_Invalid << 35 ) + ( le.history_assessed_total_value_Invalid << 36 ) + ( le.history_market_total_value_Invalid << 37 ) + ( le.history_tax_assessment_valuation_Invalid << 38 ) + ( le.history_price_index_valuation_Invalid << 39 ) + ( le.history_hedonic_valuation_Invalid << 40 ) + ( le.history_automated_valuation_Invalid << 41 ) + ( le.history_confidence_score_Invalid << 42 );
+    SELF.ScrubsBits1 := ( le.history_date_Invalid << 0 ) + ( le.ln_fares_id_ta_Invalid << 1 ) + ( le.ln_fares_id_pi_Invalid << 2 ) + ( le.unformatted_apn_Invalid << 3 ) + ( le.st_Invalid << 4 ) + ( le.zip_Invalid << 5 ) + ( le.zip4_Invalid << 6 ) + ( le.fips_code_Invalid << 7 ) + ( le.recording_date_Invalid << 8 ) + ( le.assessed_value_year_Invalid << 9 ) + ( le.sales_price_Invalid << 10 ) + ( le.assessed_total_value_Invalid << 11 ) + ( le.market_total_value_Invalid << 12 ) + ( le.tax_assessment_valuation_Invalid << 13 ) + ( le.price_index_valuation_Invalid << 14 ) + ( le.hedonic_valuation_Invalid << 15 ) + ( le.automated_valuation_Invalid << 16 ) + ( le.confidence_score_Invalid << 17 ) + ( le.comp1_Invalid << 18 ) + ( le.comp2_Invalid << 19 ) + ( le.comp3_Invalid << 20 ) + ( le.comp4_Invalid << 21 ) + ( le.comp5_Invalid << 22 ) + ( le.nearby1_Invalid << 23 ) + ( le.nearby2_Invalid << 24 ) + ( le.nearby3_Invalid << 25 ) + ( le.nearby4_Invalid << 26 ) + ( le.nearby5_Invalid << 27 ) + ( le.history_history_date_Invalid << 28 ) + ( le.history_recording_date_Invalid << 29 ) + ( le.history_assessed_value_year_Invalid << 30 ) + ( le.history_sales_price_Invalid << 31 ) + ( le.history_assessed_total_value_Invalid << 32 ) + ( le.history_market_total_value_Invalid << 33 ) + ( le.history_tax_assessment_valuation_Invalid << 34 ) + ( le.history_price_index_valuation_Invalid << 35 ) + ( le.history_hedonic_valuation_Invalid << 36 ) + ( le.history_automated_valuation_Invalid << 37 ) + ( le.history_confidence_score_Invalid << 38 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -217,45 +218,45 @@ END;
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
   EXPORT Infile := PROJECT(h,Base_Layout_AVM);
   Expanded_Layout into(h le) := TRANSFORM
-    SELF.history_date_Invalid := (le.ScrubsBits1 >> 0) & 3;
-    SELF.ln_fares_id_ta_Invalid := (le.ScrubsBits1 >> 2) & 1;
-    SELF.ln_fares_id_pi_Invalid := (le.ScrubsBits1 >> 3) & 1;
-    SELF.unformatted_apn_Invalid := (le.ScrubsBits1 >> 4) & 1;
-    SELF.st_Invalid := (le.ScrubsBits1 >> 5) & 1;
-    SELF.zip_Invalid := (le.ScrubsBits1 >> 6) & 1;
-    SELF.zip4_Invalid := (le.ScrubsBits1 >> 7) & 1;
-    SELF.fips_code_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.recording_date_Invalid := (le.ScrubsBits1 >> 9) & 3;
-    SELF.assessed_value_year_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.sales_price_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.assessed_total_value_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.market_total_value_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.tax_assessment_valuation_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.price_index_valuation_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.hedonic_valuation_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.automated_valuation_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.confidence_score_Invalid := (le.ScrubsBits1 >> 19) & 1;
-    SELF.comp1_Invalid := (le.ScrubsBits1 >> 20) & 1;
-    SELF.comp2_Invalid := (le.ScrubsBits1 >> 21) & 1;
-    SELF.comp3_Invalid := (le.ScrubsBits1 >> 22) & 1;
-    SELF.comp4_Invalid := (le.ScrubsBits1 >> 23) & 1;
-    SELF.comp5_Invalid := (le.ScrubsBits1 >> 24) & 1;
-    SELF.nearby1_Invalid := (le.ScrubsBits1 >> 25) & 1;
-    SELF.nearby2_Invalid := (le.ScrubsBits1 >> 26) & 1;
-    SELF.nearby3_Invalid := (le.ScrubsBits1 >> 27) & 1;
-    SELF.nearby4_Invalid := (le.ScrubsBits1 >> 28) & 1;
-    SELF.nearby5_Invalid := (le.ScrubsBits1 >> 29) & 1;
-    SELF.history_history_date_Invalid := (le.ScrubsBits1 >> 30) & 3;
-    SELF.history_recording_date_Invalid := (le.ScrubsBits1 >> 32) & 3;
-    SELF.history_assessed_value_year_Invalid := (le.ScrubsBits1 >> 34) & 1;
-    SELF.history_sales_price_Invalid := (le.ScrubsBits1 >> 35) & 1;
-    SELF.history_assessed_total_value_Invalid := (le.ScrubsBits1 >> 36) & 1;
-    SELF.history_market_total_value_Invalid := (le.ScrubsBits1 >> 37) & 1;
-    SELF.history_tax_assessment_valuation_Invalid := (le.ScrubsBits1 >> 38) & 1;
-    SELF.history_price_index_valuation_Invalid := (le.ScrubsBits1 >> 39) & 1;
-    SELF.history_hedonic_valuation_Invalid := (le.ScrubsBits1 >> 40) & 1;
-    SELF.history_automated_valuation_Invalid := (le.ScrubsBits1 >> 41) & 1;
-    SELF.history_confidence_score_Invalid := (le.ScrubsBits1 >> 42) & 1;
+    SELF.history_date_Invalid := (le.ScrubsBits1 >> 0) & 1;
+    SELF.ln_fares_id_ta_Invalid := (le.ScrubsBits1 >> 1) & 1;
+    SELF.ln_fares_id_pi_Invalid := (le.ScrubsBits1 >> 2) & 1;
+    SELF.unformatted_apn_Invalid := (le.ScrubsBits1 >> 3) & 1;
+    SELF.st_Invalid := (le.ScrubsBits1 >> 4) & 1;
+    SELF.zip_Invalid := (le.ScrubsBits1 >> 5) & 1;
+    SELF.zip4_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.fips_code_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.recording_date_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.assessed_value_year_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.sales_price_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.assessed_total_value_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.market_total_value_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.tax_assessment_valuation_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.price_index_valuation_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.hedonic_valuation_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.automated_valuation_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.confidence_score_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.comp1_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.comp2_Invalid := (le.ScrubsBits1 >> 19) & 1;
+    SELF.comp3_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.comp4_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.comp5_Invalid := (le.ScrubsBits1 >> 22) & 1;
+    SELF.nearby1_Invalid := (le.ScrubsBits1 >> 23) & 1;
+    SELF.nearby2_Invalid := (le.ScrubsBits1 >> 24) & 1;
+    SELF.nearby3_Invalid := (le.ScrubsBits1 >> 25) & 1;
+    SELF.nearby4_Invalid := (le.ScrubsBits1 >> 26) & 1;
+    SELF.nearby5_Invalid := (le.ScrubsBits1 >> 27) & 1;
+    SELF.history_history_date_Invalid := (le.ScrubsBits1 >> 28) & 1;
+    SELF.history_recording_date_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.history_assessed_value_year_Invalid := (le.ScrubsBits1 >> 30) & 1;
+    SELF.history_sales_price_Invalid := (le.ScrubsBits1 >> 31) & 1;
+    SELF.history_assessed_total_value_Invalid := (le.ScrubsBits1 >> 32) & 1;
+    SELF.history_market_total_value_Invalid := (le.ScrubsBits1 >> 33) & 1;
+    SELF.history_tax_assessment_valuation_Invalid := (le.ScrubsBits1 >> 34) & 1;
+    SELF.history_price_index_valuation_Invalid := (le.ScrubsBits1 >> 35) & 1;
+    SELF.history_hedonic_valuation_Invalid := (le.ScrubsBits1 >> 36) & 1;
+    SELF.history_automated_valuation_Invalid := (le.ScrubsBits1 >> 37) & 1;
+    SELF.history_confidence_score_Invalid := (le.ScrubsBits1 >> 38) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -264,9 +265,7 @@ END;
 EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   r := RECORD
     TotalCnt := COUNT(GROUP); // Number of records in total
-    history_date_ALLOW_ErrorCount := COUNT(GROUP,h.history_date_Invalid=1);
-    history_date_LENGTHS_ErrorCount := COUNT(GROUP,h.history_date_Invalid=2);
-    history_date_Total_ErrorCount := COUNT(GROUP,h.history_date_Invalid>0);
+    history_date_CUSTOM_ErrorCount := COUNT(GROUP,h.history_date_Invalid=1);
     ln_fares_id_ta_ALLOW_ErrorCount := COUNT(GROUP,h.ln_fares_id_ta_Invalid=1);
     ln_fares_id_pi_ALLOW_ErrorCount := COUNT(GROUP,h.ln_fares_id_pi_Invalid=1);
     unformatted_apn_ALLOW_ErrorCount := COUNT(GROUP,h.unformatted_apn_Invalid=1);
@@ -274,9 +273,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     zip_ALLOW_ErrorCount := COUNT(GROUP,h.zip_Invalid=1);
     zip4_ALLOW_ErrorCount := COUNT(GROUP,h.zip4_Invalid=1);
     fips_code_ALLOW_ErrorCount := COUNT(GROUP,h.fips_code_Invalid=1);
-    recording_date_ALLOW_ErrorCount := COUNT(GROUP,h.recording_date_Invalid=1);
-    recording_date_LENGTHS_ErrorCount := COUNT(GROUP,h.recording_date_Invalid=2);
-    recording_date_Total_ErrorCount := COUNT(GROUP,h.recording_date_Invalid>0);
+    recording_date_CUSTOM_ErrorCount := COUNT(GROUP,h.recording_date_Invalid=1);
     assessed_value_year_ALLOW_ErrorCount := COUNT(GROUP,h.assessed_value_year_Invalid=1);
     sales_price_ALLOW_ErrorCount := COUNT(GROUP,h.sales_price_Invalid=1);
     assessed_total_value_ALLOW_ErrorCount := COUNT(GROUP,h.assessed_total_value_Invalid=1);
@@ -296,12 +293,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     nearby3_ALLOW_ErrorCount := COUNT(GROUP,h.nearby3_Invalid=1);
     nearby4_ALLOW_ErrorCount := COUNT(GROUP,h.nearby4_Invalid=1);
     nearby5_ALLOW_ErrorCount := COUNT(GROUP,h.nearby5_Invalid=1);
-    history_history_date_ALLOW_ErrorCount := COUNT(GROUP,h.history_history_date_Invalid=1);
-    history_history_date_LENGTHS_ErrorCount := COUNT(GROUP,h.history_history_date_Invalid=2);
-    history_history_date_Total_ErrorCount := COUNT(GROUP,h.history_history_date_Invalid>0);
-    history_recording_date_ALLOW_ErrorCount := COUNT(GROUP,h.history_recording_date_Invalid=1);
-    history_recording_date_LENGTHS_ErrorCount := COUNT(GROUP,h.history_recording_date_Invalid=2);
-    history_recording_date_Total_ErrorCount := COUNT(GROUP,h.history_recording_date_Invalid>0);
+    history_history_date_CUSTOM_ErrorCount := COUNT(GROUP,h.history_history_date_Invalid=1);
+    history_recording_date_CUSTOM_ErrorCount := COUNT(GROUP,h.history_recording_date_Invalid=1);
     history_assessed_value_year_ALLOW_ErrorCount := COUNT(GROUP,h.history_assessed_value_year_Invalid=1);
     history_sales_price_ALLOW_ErrorCount := COUNT(GROUP,h.history_sales_price_Invalid=1);
     history_assessed_total_value_ALLOW_ErrorCount := COUNT(GROUP,h.history_assessed_total_value_Invalid=1);
@@ -319,9 +312,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.history_date_Total_ErrorCount > 0, 1, 0) + IF(le.ln_fares_id_ta_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ln_fares_id_pi_ALLOW_ErrorCount > 0, 1, 0) + IF(le.unformatted_apn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.st_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fips_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recording_date_Total_ErrorCount > 0, 1, 0) + IF(le.assessed_value_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sales_price_ALLOW_ErrorCount > 0, 1, 0) + IF(le.assessed_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.market_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tax_assessment_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.price_index_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hedonic_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.automated_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.confidence_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_history_date_Total_ErrorCount > 0, 1, 0) + IF(le.history_recording_date_Total_ErrorCount > 0, 1, 0) + IF(le.history_assessed_value_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_sales_price_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_assessed_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_market_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_tax_assessment_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_price_index_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_hedonic_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_automated_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_confidence_score_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.history_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ln_fares_id_ta_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ln_fares_id_pi_ALLOW_ErrorCount > 0, 1, 0) + IF(le.unformatted_apn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.st_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fips_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessed_value_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sales_price_ALLOW_ErrorCount > 0, 1, 0) + IF(le.assessed_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.market_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tax_assessment_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.price_index_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hedonic_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.automated_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.confidence_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_history_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.history_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.history_assessed_value_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_sales_price_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_assessed_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_market_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_tax_assessment_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_price_index_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_hedonic_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_automated_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_confidence_score_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.history_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ln_fares_id_ta_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ln_fares_id_pi_ALLOW_ErrorCount > 0, 1, 0) + IF(le.unformatted_apn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.st_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fips_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recording_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recording_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.assessed_value_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sales_price_ALLOW_ErrorCount > 0, 1, 0) + IF(le.assessed_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.market_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tax_assessment_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.price_index_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hedonic_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.automated_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.confidence_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_history_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_history_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.history_recording_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_recording_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.history_assessed_value_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_sales_price_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_assessed_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_market_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_tax_assessment_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_price_index_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_hedonic_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_automated_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_confidence_score_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.history_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ln_fares_id_ta_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ln_fares_id_pi_ALLOW_ErrorCount > 0, 1, 0) + IF(le.unformatted_apn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.st_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.fips_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.assessed_value_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sales_price_ALLOW_ErrorCount > 0, 1, 0) + IF(le.assessed_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.market_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tax_assessment_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.price_index_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.hedonic_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.automated_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.confidence_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.comp5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.nearby5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_history_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.history_recording_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.history_assessed_value_year_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_sales_price_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_assessed_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_market_total_value_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_tax_assessment_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_price_index_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_hedonic_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_automated_valuation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.history_confidence_score_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -339,7 +332,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     UNSIGNED1 ErrNum := CHOOSE(c,le.history_date_Invalid,le.ln_fares_id_ta_Invalid,le.ln_fares_id_pi_Invalid,le.unformatted_apn_Invalid,le.st_Invalid,le.zip_Invalid,le.zip4_Invalid,le.fips_code_Invalid,le.recording_date_Invalid,le.assessed_value_year_Invalid,le.sales_price_Invalid,le.assessed_total_value_Invalid,le.market_total_value_Invalid,le.tax_assessment_valuation_Invalid,le.price_index_valuation_Invalid,le.hedonic_valuation_Invalid,le.automated_valuation_Invalid,le.confidence_score_Invalid,le.comp1_Invalid,le.comp2_Invalid,le.comp3_Invalid,le.comp4_Invalid,le.comp5_Invalid,le.nearby1_Invalid,le.nearby2_Invalid,le.nearby3_Invalid,le.nearby4_Invalid,le.nearby5_Invalid,le.history_history_date_Invalid,le.history_recording_date_Invalid,le.history_assessed_value_year_Invalid,le.history_sales_price_Invalid,le.history_assessed_total_value_Invalid,le.history_market_total_value_Invalid,le.history_tax_assessment_valuation_Invalid,le.history_price_index_valuation_Invalid,le.history_hedonic_valuation_Invalid,le.history_automated_valuation_Invalid,le.history_confidence_score_Invalid,100);
     SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Base_Fields.InvalidMessage_history_date(le.history_date_Invalid),Base_Fields.InvalidMessage_ln_fares_id_ta(le.ln_fares_id_ta_Invalid),Base_Fields.InvalidMessage_ln_fares_id_pi(le.ln_fares_id_pi_Invalid),Base_Fields.InvalidMessage_unformatted_apn(le.unformatted_apn_Invalid),Base_Fields.InvalidMessage_st(le.st_Invalid),Base_Fields.InvalidMessage_zip(le.zip_Invalid),Base_Fields.InvalidMessage_zip4(le.zip4_Invalid),Base_Fields.InvalidMessage_fips_code(le.fips_code_Invalid),Base_Fields.InvalidMessage_recording_date(le.recording_date_Invalid),Base_Fields.InvalidMessage_assessed_value_year(le.assessed_value_year_Invalid),Base_Fields.InvalidMessage_sales_price(le.sales_price_Invalid),Base_Fields.InvalidMessage_assessed_total_value(le.assessed_total_value_Invalid),Base_Fields.InvalidMessage_market_total_value(le.market_total_value_Invalid),Base_Fields.InvalidMessage_tax_assessment_valuation(le.tax_assessment_valuation_Invalid),Base_Fields.InvalidMessage_price_index_valuation(le.price_index_valuation_Invalid),Base_Fields.InvalidMessage_hedonic_valuation(le.hedonic_valuation_Invalid),Base_Fields.InvalidMessage_automated_valuation(le.automated_valuation_Invalid),Base_Fields.InvalidMessage_confidence_score(le.confidence_score_Invalid),Base_Fields.InvalidMessage_comp1(le.comp1_Invalid),Base_Fields.InvalidMessage_comp2(le.comp2_Invalid),Base_Fields.InvalidMessage_comp3(le.comp3_Invalid),Base_Fields.InvalidMessage_comp4(le.comp4_Invalid),Base_Fields.InvalidMessage_comp5(le.comp5_Invalid),Base_Fields.InvalidMessage_nearby1(le.nearby1_Invalid),Base_Fields.InvalidMessage_nearby2(le.nearby2_Invalid),Base_Fields.InvalidMessage_nearby3(le.nearby3_Invalid),Base_Fields.InvalidMessage_nearby4(le.nearby4_Invalid),Base_Fields.InvalidMessage_nearby5(le.nearby5_Invalid),Base_Fields.InvalidMessage_history_history_date(le.history_history_date_Invalid),Base_Fields.InvalidMessage_history_recording_date(le.history_recording_date_Invalid),Base_Fields.InvalidMessage_history_assessed_value_year(le.history_assessed_value_year_Invalid),Base_Fields.InvalidMessage_history_sales_price(le.history_sales_price_Invalid),Base_Fields.InvalidMessage_history_assessed_total_value(le.history_assessed_total_value_Invalid),Base_Fields.InvalidMessage_history_market_total_value(le.history_market_total_value_Invalid),Base_Fields.InvalidMessage_history_tax_assessment_valuation(le.history_tax_assessment_valuation_Invalid),Base_Fields.InvalidMessage_history_price_index_valuation(le.history_price_index_valuation_Invalid),Base_Fields.InvalidMessage_history_hedonic_valuation(le.history_hedonic_valuation_Invalid),Base_Fields.InvalidMessage_history_automated_valuation(le.history_automated_valuation_Invalid),Base_Fields.InvalidMessage_history_confidence_score(le.history_confidence_score_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
-          ,CHOOSE(le.history_date_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.history_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.ln_fares_id_ta_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.ln_fares_id_pi_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.unformatted_apn_Invalid,'ALLOW','UNKNOWN')
@@ -347,7 +340,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.zip_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.zip4_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.fips_code_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.recording_date_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.recording_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.assessed_value_year_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.sales_price_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.assessed_total_value_Invalid,'ALLOW','UNKNOWN')
@@ -367,8 +360,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.nearby3_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.nearby4_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.nearby5_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.history_history_date_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.history_recording_date_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.history_history_date_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.history_recording_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.history_assessed_value_year_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.history_sales_price_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.history_assessed_total_value_Invalid,'ALLOW','UNKNOWN')
@@ -395,7 +388,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.ruledesc := toRuleDesc(c);
       SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
-          ,le.history_date_ALLOW_ErrorCount,le.history_date_LENGTHS_ErrorCount
+          ,le.history_date_CUSTOM_ErrorCount
           ,le.ln_fares_id_ta_ALLOW_ErrorCount
           ,le.ln_fares_id_pi_ALLOW_ErrorCount
           ,le.unformatted_apn_ALLOW_ErrorCount
@@ -403,7 +396,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.zip_ALLOW_ErrorCount
           ,le.zip4_ALLOW_ErrorCount
           ,le.fips_code_ALLOW_ErrorCount
-          ,le.recording_date_ALLOW_ErrorCount,le.recording_date_LENGTHS_ErrorCount
+          ,le.recording_date_CUSTOM_ErrorCount
           ,le.assessed_value_year_ALLOW_ErrorCount
           ,le.sales_price_ALLOW_ErrorCount
           ,le.assessed_total_value_ALLOW_ErrorCount
@@ -423,8 +416,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.nearby3_ALLOW_ErrorCount
           ,le.nearby4_ALLOW_ErrorCount
           ,le.nearby5_ALLOW_ErrorCount
-          ,le.history_history_date_ALLOW_ErrorCount,le.history_history_date_LENGTHS_ErrorCount
-          ,le.history_recording_date_ALLOW_ErrorCount,le.history_recording_date_LENGTHS_ErrorCount
+          ,le.history_history_date_CUSTOM_ErrorCount
+          ,le.history_recording_date_CUSTOM_ErrorCount
           ,le.history_assessed_value_year_ALLOW_ErrorCount
           ,le.history_sales_price_ALLOW_ErrorCount
           ,le.history_assessed_total_value_ALLOW_ErrorCount
@@ -442,7 +435,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.AnyRule_WithErrorsCount
           ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
-          ,le.history_date_ALLOW_ErrorCount,le.history_date_LENGTHS_ErrorCount
+          ,le.history_date_CUSTOM_ErrorCount
           ,le.ln_fares_id_ta_ALLOW_ErrorCount
           ,le.ln_fares_id_pi_ALLOW_ErrorCount
           ,le.unformatted_apn_ALLOW_ErrorCount
@@ -450,7 +443,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.zip_ALLOW_ErrorCount
           ,le.zip4_ALLOW_ErrorCount
           ,le.fips_code_ALLOW_ErrorCount
-          ,le.recording_date_ALLOW_ErrorCount,le.recording_date_LENGTHS_ErrorCount
+          ,le.recording_date_CUSTOM_ErrorCount
           ,le.assessed_value_year_ALLOW_ErrorCount
           ,le.sales_price_ALLOW_ErrorCount
           ,le.assessed_total_value_ALLOW_ErrorCount
@@ -470,8 +463,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.nearby3_ALLOW_ErrorCount
           ,le.nearby4_ALLOW_ErrorCount
           ,le.nearby5_ALLOW_ErrorCount
-          ,le.history_history_date_ALLOW_ErrorCount,le.history_history_date_LENGTHS_ErrorCount
-          ,le.history_recording_date_ALLOW_ErrorCount,le.history_recording_date_LENGTHS_ErrorCount
+          ,le.history_history_date_CUSTOM_ErrorCount
+          ,le.history_recording_date_CUSTOM_ErrorCount
           ,le.history_assessed_value_year_ALLOW_ErrorCount
           ,le.history_sales_price_ALLOW_ErrorCount
           ,le.history_assessed_total_value_ALLOW_ErrorCount
