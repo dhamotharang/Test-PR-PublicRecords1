@@ -87,11 +87,12 @@ EXPORT InValidFT_YesNo(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(
 EXPORT InValidMessageFT_YesNo(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('YN '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_StateAbrv(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
-  RETURN  s1;
+  s1 := SALT311.stringtouppercase(s0); // Force to upper case
+  s2 := SALT311.stringfilter(s1,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
+  RETURN  s2;
 END;
-EXPORT InValidFT_StateAbrv(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2));
-EXPORT InValidMessageFT_StateAbrv(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT311.HygieneErrors.NotLength('0,2'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_StateAbrv(SALT311.StrType s) := WHICH(SALT311.stringtouppercase(s)<>s,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2));
+EXPORT InValidMessageFT_StateAbrv(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotCaps,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT311.HygieneErrors.NotLength('0,2'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Numeric(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -116,7 +117,7 @@ EXPORT InValidMessageFT_primname(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneError
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'ACTION_CODE','RECORD_ID','RECORD_TYPE','TELEPHONE','LISTING_TYPE','BUSINESS_NAME','BUSINESS_CAPTIONS','CATEGORY','INDENT','LAST_NAME','SUFFIX_NAME','FIRST_NAME','MIDDLE_NAME','PRIMARY_STREET_NUMBER','PRE_DIR','PRIMARY_STREET_NAME','PRIMARY_STREET_SUFFIX','POST_DIR','SECONDARY_ADDRESS_TYPE','SECONDARY_RANGE','CITY','STATE','ZIP_CODE','ZIP_PLUS4','LATITUDE','LONGITUDE','LAT_LONG_MATCH_LEVEL','UNLICENSED','ADD_DATE','OMIT_ADDRESS','DATA_SOURCE','unknownField','TransactionID','Original_Suffix','Original_First_Name','Original_Middle_Name','Original_Last_Name','Original_Address','Original_Last_Line','filename');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'ACTION_CODE','RECORD_ID','RECORD_TYPE','TELEPHONE','LISTING_TYPE','BUSINESS_NAME','BUSINESS_CAPTIONS','CATEGORY','INDENT','LAST_NAME','SUFFIX_NAME','FIRST_NAME','MIDDLE_NAME','PRIMARY_STREET_NUMBER','PRE_DIR','PRIMARY_STREET_NAME','PRIMARY_STREET_SUFFIX','POST_DIR','SECONDARY_ADDRESS_TYPE','SECONDARY_RANGE','CITY','STATE','ZIP_CODE','ZIP_PLUS4','LATITUDE','LONGITUDE','LAT_LONG_MATCH_LEVEL','UNLICENSED','ADD_DATE','OMIT_ADDRESS','DATA_SOURCE','unknownField','TransactionID','Original_Suffix','Original_First_Name','Original_Middle_Name','Original_Last_Name','Original_Address','Original_Last_Line','filename');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'ACTION_CODE' => 0,'RECORD_ID' => 1,'RECORD_TYPE' => 2,'TELEPHONE' => 3,'LISTING_TYPE' => 4,'BUSINESS_NAME' => 5,'BUSINESS_CAPTIONS' => 6,'CATEGORY' => 7,'INDENT' => 8,'LAST_NAME' => 9,'SUFFIX_NAME' => 10,'FIRST_NAME' => 11,'MIDDLE_NAME' => 12,'PRIMARY_STREET_NUMBER' => 13,'PRE_DIR' => 14,'PRIMARY_STREET_NAME' => 15,'PRIMARY_STREET_SUFFIX' => 16,'POST_DIR' => 17,'SECONDARY_ADDRESS_TYPE' => 18,'SECONDARY_RANGE' => 19,'CITY' => 20,'STATE' => 21,'ZIP_CODE' => 22,'ZIP_PLUS4' => 23,'LATITUDE' => 24,'LONGITUDE' => 25,'LAT_LONG_MATCH_LEVEL' => 26,'UNLICENSED' => 27,'ADD_DATE' => 28,'OMIT_ADDRESS' => 29,'DATA_SOURCE' => 30,'unknownField' => 31,'TransactionID' => 32,'Original_Suffix' => 33,'Original_First_Name' => 34,'Original_Middle_Name' => 35,'Original_Last_Name' => 36,'Original_Address' => 37,'Original_Last_Line' => 38,'filename' => 39,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW'],[],[],[],['ALLOW'],[],[],[],[],[],['ENUM'],['ALLOW'],[],['ENUM'],[],[],[],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],[],[],[],['CUSTOM'],['ALLOW'],[],[],[],[],[],[],[],[],[],[],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW'],[],[],[],['ALLOW'],[],[],[],[],[],['ENUM'],['ALLOW'],[],['ENUM'],[],[],[],['CAPS','ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],[],[],[],['CUSTOM'],['ALLOW'],[],[],[],[],[],[],[],[],[],[],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation

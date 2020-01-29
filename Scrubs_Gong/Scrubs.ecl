@@ -3,8 +3,8 @@ IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 17;
-  EXPORT NumRulesFromFieldType := 17;
+  EXPORT NumRules := 18;
+  EXPORT NumRulesFromFieldType := 18;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 13;
   EXPORT NumFieldsWithPossibleEdits := 0;
@@ -39,7 +39,7 @@ EXPORT Scrubs := MODULE
           ,'PRE_DIR:Directional:ENUM'
           ,'PRIMARY_STREET_NAME:primname:ALLOW'
           ,'POST_DIR:Directional:ENUM'
-          ,'STATE:StateAbrv:ALLOW','STATE:StateAbrv:LENGTHS'
+          ,'STATE:StateAbrv:CAPS','STATE:StateAbrv:ALLOW','STATE:StateAbrv:LENGTHS'
           ,'ZIP_CODE:zip:ALLOW','ZIP_CODE:zip:LENGTHS'
           ,'ZIP_PLUS4:zip4:ALLOW','ZIP_PLUS4:zip4:LENGTHS'
           ,'ADD_DATE:Invalid_Date:CUSTOM'
@@ -60,7 +60,7 @@ EXPORT Scrubs := MODULE
           ,Fields.InvalidMessage_PRE_DIR(1)
           ,Fields.InvalidMessage_PRIMARY_STREET_NAME(1)
           ,Fields.InvalidMessage_POST_DIR(1)
-          ,Fields.InvalidMessage_STATE(1),Fields.InvalidMessage_STATE(2)
+          ,Fields.InvalidMessage_STATE(1),Fields.InvalidMessage_STATE(2),Fields.InvalidMessage_STATE(3)
           ,Fields.InvalidMessage_ZIP_CODE(1),Fields.InvalidMessage_ZIP_CODE(2)
           ,Fields.InvalidMessage_ZIP_PLUS4(1),Fields.InvalidMessage_ZIP_PLUS4(2)
           ,Fields.InvalidMessage_ADD_DATE(1)
@@ -145,8 +145,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     PRE_DIR_ENUM_ErrorCount := COUNT(GROUP,h.PRE_DIR_Invalid=1);
     PRIMARY_STREET_NAME_ALLOW_ErrorCount := COUNT(GROUP,h.PRIMARY_STREET_NAME_Invalid=1);
     POST_DIR_ENUM_ErrorCount := COUNT(GROUP,h.POST_DIR_Invalid=1);
-    STATE_ALLOW_ErrorCount := COUNT(GROUP,h.STATE_Invalid=1);
-    STATE_LENGTHS_ErrorCount := COUNT(GROUP,h.STATE_Invalid=2);
+    STATE_CAPS_ErrorCount := COUNT(GROUP,h.STATE_Invalid=1);
+    STATE_ALLOW_ErrorCount := COUNT(GROUP,h.STATE_Invalid=2);
+    STATE_LENGTHS_ErrorCount := COUNT(GROUP,h.STATE_Invalid=3);
     STATE_Total_ErrorCount := COUNT(GROUP,h.STATE_Invalid>0);
     ZIP_CODE_ALLOW_ErrorCount := COUNT(GROUP,h.ZIP_CODE_Invalid=1);
     ZIP_CODE_LENGTHS_ErrorCount := COUNT(GROUP,h.ZIP_CODE_Invalid=2);
@@ -166,7 +167,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
     SELF.FieldsChecked_WithErrors := IF(le.ACTION_CODE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.RECORD_TYPE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.TELEPHONE_Total_ErrorCount > 0, 1, 0) + IF(le.LISTING_TYPE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.INDENT_ALLOW_ErrorCount > 0, 1, 0) + IF(le.PRE_DIR_ENUM_ErrorCount > 0, 1, 0) + IF(le.PRIMARY_STREET_NAME_ALLOW_ErrorCount > 0, 1, 0) + IF(le.POST_DIR_ENUM_ErrorCount > 0, 1, 0) + IF(le.STATE_Total_ErrorCount > 0, 1, 0) + IF(le.ZIP_CODE_Total_ErrorCount > 0, 1, 0) + IF(le.ZIP_PLUS4_Total_ErrorCount > 0, 1, 0) + IF(le.ADD_DATE_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.OMIT_ADDRESS_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.ACTION_CODE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.RECORD_TYPE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.TELEPHONE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.TELEPHONE_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.LISTING_TYPE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.INDENT_ALLOW_ErrorCount > 0, 1, 0) + IF(le.PRE_DIR_ENUM_ErrorCount > 0, 1, 0) + IF(le.PRIMARY_STREET_NAME_ALLOW_ErrorCount > 0, 1, 0) + IF(le.POST_DIR_ENUM_ErrorCount > 0, 1, 0) + IF(le.STATE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.STATE_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ZIP_CODE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ZIP_CODE_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ZIP_PLUS4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ZIP_PLUS4_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ADD_DATE_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.OMIT_ADDRESS_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.ACTION_CODE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.RECORD_TYPE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.TELEPHONE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.TELEPHONE_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.LISTING_TYPE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.INDENT_ALLOW_ErrorCount > 0, 1, 0) + IF(le.PRE_DIR_ENUM_ErrorCount > 0, 1, 0) + IF(le.PRIMARY_STREET_NAME_ALLOW_ErrorCount > 0, 1, 0) + IF(le.POST_DIR_ENUM_ErrorCount > 0, 1, 0) + IF(le.STATE_CAPS_ErrorCount > 0, 1, 0) + IF(le.STATE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.STATE_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ZIP_CODE_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ZIP_CODE_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ZIP_PLUS4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ZIP_PLUS4_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ADD_DATE_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.OMIT_ADDRESS_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -192,7 +193,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.PRE_DIR_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.PRIMARY_STREET_NAME_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.POST_DIR_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.STATE_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.STATE_Invalid,'CAPS','ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.ZIP_CODE_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.ZIP_PLUS4_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.ADD_DATE_Invalid,'CUSTOM','UNKNOWN')
@@ -222,7 +223,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.PRE_DIR_ENUM_ErrorCount
           ,le.PRIMARY_STREET_NAME_ALLOW_ErrorCount
           ,le.POST_DIR_ENUM_ErrorCount
-          ,le.STATE_ALLOW_ErrorCount,le.STATE_LENGTHS_ErrorCount
+          ,le.STATE_CAPS_ErrorCount,le.STATE_ALLOW_ErrorCount,le.STATE_LENGTHS_ErrorCount
           ,le.ZIP_CODE_ALLOW_ErrorCount,le.ZIP_CODE_LENGTHS_ErrorCount
           ,le.ZIP_PLUS4_ALLOW_ErrorCount,le.ZIP_PLUS4_LENGTHS_ErrorCount
           ,le.ADD_DATE_CUSTOM_ErrorCount
@@ -243,7 +244,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.PRE_DIR_ENUM_ErrorCount
           ,le.PRIMARY_STREET_NAME_ALLOW_ErrorCount
           ,le.POST_DIR_ENUM_ErrorCount
-          ,le.STATE_ALLOW_ErrorCount,le.STATE_LENGTHS_ErrorCount
+          ,le.STATE_CAPS_ErrorCount,le.STATE_ALLOW_ErrorCount,le.STATE_LENGTHS_ErrorCount
           ,le.ZIP_CODE_ALLOW_ErrorCount,le.ZIP_CODE_LENGTHS_ErrorCount
           ,le.ZIP_PLUS4_ALLOW_ErrorCount,le.ZIP_PLUS4_LENGTHS_ErrorCount
           ,le.ADD_DATE_CUSTOM_ErrorCount
