@@ -1,5 +1,5 @@
 ﻿
-EXPORT getIndMobility(inquiredInternal, inquiredHeaderData, isFCRA, bsVersion) := FUNCTIONMACRO
+EXPORT getIndMobility(inquiredInternal, inquiredHeaderData, isFCRA, bsVersion, includeReport) := FUNCTIONMACRO
 
     IMPORT DueDiligence, Risk_Indicators, ut;
     
@@ -180,30 +180,85 @@ EXPORT getIndMobility(inquiredInternal, inquiredHeaderData, isFCRA, bsVersion) :
                                           
                                           SELF := LEFT;),
                                 LEFT OUTER,
-                                ATMOST(DueDiligence.Constants.MAX_ATMOST_1));    
+                                ATMOST(DueDiligence.Constants.MAX_ATMOST_1));  
+                                
+                                
+                                
+    //need to keep track of the addresses and order if the report is called to display accordingly
+    convertHierarchyToDS := PROJECT(GROUP(SORT(rollHierarchyByAddr, seq, did, address_history_seq, -chronodate_last, chronodate_first), seq, did),
+                                    TRANSFORM(DueDiligence.LayoutsInternal.chronoAddressesLayout,
+                                              SELF.addrSeq := COUNTER;
+                                              SELF.chronoAddresses := DATASET([TRANSFORM(DueDiligence.Layouts.AddressDetails,
+                                                                                          SELF.seq := COUNTER;
+                                                                                          SELF.prim_range := LEFT.chronoprim_range;
+                                                                                          SELF.predir := LEFT.chronopredir;
+                                                                                          SELF.prim_name := LEFT.chronoprim_name;
+                                                                                          SELF.addr_suffix := LEFT.chronosuffix;
+                                                                                          SELF.postdir := LEFT.chronopostdir;
+                                                                                          SELF.unit_desig := LEFT.chronounit_desig;
+                                                                                          SELF.sec_range := LEFT.chronosec_range;
+                                                                                          SELF.city := LEFT.chronocity;
+                                                                                          SELF.state := LEFT.chronostate;
+                                                                                          SELF.zip5 := LEFT.chronozip;
+                                                                                          SELF.zip4 := LEFT.chronozip4;
+                                                                                          SELF.county := LEFT.chronocounty;
+                                                                                          SELF.geo_blk := LEFT.chronogeo_blk;
+                                                                                          SELF.dateFirstSeen := LEFT.chronodate_first;
+                                                                                          SELF.dateLastSeen := LEFT.chronodate_last;
+                                                                                          SELF := [];)]);
+                                              SELF := LEFT;));
+                                              
+    //limit residences
+    unGroupHierachyToDS := UNGROUP(convertHierarchyToDS);
+    grpHierachyToDS := GROUP(SORT(unGroupHierachyToDS, seq, did, addrSeq), seq, did);
+    limitedResidences := DueDiligence.Common.GetMaxRecords(grpHierachyToDS, DueDiligence.Constants.MAX_RESIDENCES);
+                                              
+    rollAddressesForReport := ROLLUP(SORT(limitedResidences, seq, did),
+                                     LEFT.seq = RIGHT.seq AND
+                                     LEFT.did = RIGHT.did,
+                                     TRANSFORM(DueDiligence.LayoutsInternal.chronoAddressesLayout,
+                                                SELF.chronoAddresses := LEFT.chronoAddresses + RIGHT.chronoAddresses;
+                                                SELF := LEFT;));
+                                                
+                                                
+
+    addReportAddresses := JOIN(addAddressHistories, rollAddressesForReport,
+                                LEFT.seq = RIGHT.seq AND
+                                LEFT.individual.did = RIGHT.did,
+                                TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+                                          SELF.residences := RIGHT.chronoAddresses;
+                                          SELF := LEFT;),
+                                LEFT OUTER,
+                                ATMOST(DueDiligence.Constants.MAX_ATMOST_1));  
+                                                
 
 
+    final := IF(includeReport, addReportAddresses, addAddressHistories); 
+                                      
 
 
+    // OUTPUT(inquiredHeaderData, NAMED('inquiredHeaderData'));
+    // OUTPUT(tempInquiredHeader, NAMED('tempInquiredHeader'));
+    // OUTPUT(addrHierarchy, NAMED('addrHierarchy'));
+
+    // OUTPUT(sortHierarchyByDate, NAMED('sortHierarchyByDate'));
+    // OUTPUT(rollAddrByDate, NAMED('rollAddrByDate'));
+    
+    // OUTPUT(slimAddrHierarchy, NAMED('slimAddrHierarchy')); 
+    
+    // OUTPUT(sortHierarchyByAddr, NAMED('sortHierarchyByAddr'));
+    // OUTPUT(rollHierarchyByAddr, NAMED('rollHierarchyByAddr')); 
+         
+    // OUTPUT(getMovingDistance, NAMED('getMovingDistance'));     
+  
+    // OUTPUT(addAddressHistories, NAMED('addAddressHistories'));  
+    // OUTPUT(convertHierarchyToDS, NAMED('convertHierarchyToDS'));  
+    // OUTPUT(limitedResidences, NAMED('limitedResidences'));  
+    // OUTPUT(rollAddressesForReport, NAMED('rollAddressesForReport'));  
+    // OUTPUT(addReportAddresses, NAMED('addReportAddresses'));  
+    // OUTPUT(final, NAMED('final'));  
+    
 
 
-    //OUTPUT(inquiredHeaderData, NAMED('inquiredHeaderData'));
-    //OUTPUT(tempInquiredHeader, NAMED('tempInquiredHeader'));
-    //OUTPUT(addrHierarchy, NAMED('addrHierarchy'));
-
-    //OUTPUT(slimAddrHierarchy, NAMED('slimAddrHierarchy'));     
-    //OUTPUT(sortHierarchyByAddr, NAMED('sortHierarchyByAddr'));   
-
-    //OUTPUT(sortHierarchyByDate, NAMED('sortHierarchyByDate'));
-    //OUTPUT(rollAddrByDate, NAMED('rollAddrByDate'));
-
-    //OUTPUT(rollHierarchyByAddr, NAMED('rollHierarchyByAddr'));     
-    //OUTPUT(transformHierarchy, NAMED('transformHierarchy'));     
-    //OUTPUT(getMovingDistance, NAMED('getMovingDistance'));     
-
-    //OUTPUT(rollByPerson, NAMED('rollByPerson'));  
-    //OUTPUT(addAddressHistories, NAMED('addAddressHistories'));  
-
-
-    RETURN addAddressHistories;
+    RETURN final;
 ENDMACRO;

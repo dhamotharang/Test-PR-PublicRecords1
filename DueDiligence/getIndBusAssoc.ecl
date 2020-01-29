@@ -23,20 +23,20 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
 
 
     pawBusiness_unsuppressed := JOIN(withPAW, PAW.Key_contactid,
-                        KEYED(LEFT.contactID = RIGHT.contact_id),
-                        TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED6 assocID, UNSIGNED4 historyDate, STRING8 dateFirstSeen, STRING8 dateLastSeen, UNSIGNED4 global_sid},
-                                  SELF.global_sid := RIGHT.global_sid;
-                                  SELF.seq := LEFT.seq;
-                                  SELF.ultID := RIGHT.ultID;
-                                  SELF.orgID := RIGHT.orgID;
-                                  SELF.seleID := RIGHT.seleID;
-                                  SELF.did := LEFT.inquiredDID;
-                                  SELF.assocID := RIGHT.did;
-                                  SELF.historyDate := LEFT.historyDate;
-                                  SELF.dateFirstSeen := RIGHT.dt_first_seen;
-                                  SELF.dateLastSeen := RIGHT.dt_last_seen;
-                                  SELF := [];),
-                        ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));
+                                      KEYED(LEFT.contactID = RIGHT.contact_id),
+                                      TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED6 assocID, UNSIGNED4 historyDate, STRING8 dateFirstSeen, STRING8 dateLastSeen, UNSIGNED4 global_sid},
+                                                SELF.global_sid := RIGHT.global_sid;
+                                                SELF.seq := LEFT.seq;
+                                                SELF.ultID := RIGHT.ultID;
+                                                SELF.orgID := RIGHT.orgID;
+                                                SELF.seleID := RIGHT.seleID;
+                                                SELF.did := LEFT.inquiredDID;
+                                                SELF.assocID := RIGHT.did;
+                                                SELF.historyDate := LEFT.historyDate;
+                                                SELF.dateFirstSeen := RIGHT.dt_first_seen;
+                                                SELF.dateLastSeen := RIGHT.dt_last_seen;
+                                                SELF := [];),
+                                      ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));
                         
     pawBusiness := Suppress.MAC_SuppressSource(pawBusiness_unsuppressed, mod_access);
                         
@@ -209,6 +209,7 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
                                                                                               SELF.relationToInquired := LEFT.indvType;
                                                                                               SELF.relationship := Header.relative_titles.num_associate;
                                                                                               SELF.amlRelationshipDegree := 52;
+                                                                                              SELF.rawRelationshipType := DueDiligence.Constants.INQUIRED_INDIVIDUAL_BUSINESS_ASSOCIATE;
                                                                                               SELF := LEFT.individual; 
                                                                                               SELF := [];)]);
                                                         SELF := [];));

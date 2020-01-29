@@ -67,6 +67,7 @@ FUNCTION
     SELF.sim_Tenure_MaxDays      := IF(le.sim_Tenure_MaxDays = 0, ri.sim_Tenure_MaxDays, le.sim_Tenure_MaxDays);
     SELF.imei_Tenure_MinDays     := IF(le.imei_Tenure_MinDays = 0, ri.imei_Tenure_MinDays, le.imei_Tenure_MinDays);
     SELF.imei_Tenure_MaxDays     := IF(le.imei_Tenure_MaxDays = 0, ri.imei_Tenure_MaxDays, le.imei_Tenure_MaxDays);
+    SELF.phn_src_all             := le.phn_src_all + ri.phn_src_all;
     SELF                         := le;
   END;
 
@@ -143,6 +144,7 @@ FUNCTION
     SELF.sim_Tenure_MaxDays      := IF(le.sim_Tenure_MaxDays = 0, ri.sim_Tenure_MaxDays, le.sim_Tenure_MaxDays);
     SELF.imei_Tenure_MinDays     := IF(le.imei_Tenure_MinDays = 0, ri.imei_Tenure_MinDays, le.imei_Tenure_MinDays);
     SELF.imei_Tenure_MaxDays     := IF(le.imei_Tenure_MaxDays = 0, ri.imei_Tenure_MaxDays, le.imei_Tenure_MaxDays);
+    SELF.phn_src_all             := le.phn_src_all + ri.phn_src_all;
     SELF                         := ri;
   END;
 

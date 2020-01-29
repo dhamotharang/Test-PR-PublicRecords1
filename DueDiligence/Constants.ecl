@@ -76,6 +76,7 @@ EXPORT MAX_PROPERTIES := 500;
 EXPORT MAX_WATERCRAFT := 500;
 EXPORT MAX_VEHICLE := 500;
 EXPORT MAX_AIRCRAFT := 500;
+EXPORT MAX_RESIDENCES := 500;
 
 
 EXPORT EMPTY := '';
@@ -328,6 +329,7 @@ EXPORT MIN_ADDRESS_SCORE := 70;
 EXPORT MAX_ADDRESS_SCORE := 100;
 
 EXPORT HighCrimeValue := 140;                 //  High = 140 or more,   Avg = 60 - 139,  Low = 1 - 59
+EXPORT LowCrimeValue := 59;                 //  High = 140 or more,   Avg = 60 - 139,  Low = 1 - 59
 
 EXPORT Owned_Property_code := 'OP'; 
 EXPORT Sold_Property_code  := 'SP';

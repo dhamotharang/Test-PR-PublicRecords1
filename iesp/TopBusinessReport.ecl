@@ -94,6 +94,10 @@ export t_TopBusinessBestSection := record
 	boolean Disconnected {xpath('Disconnected')};
 	string1 WirelessIndicator {xpath('WirelessIndicator')};
 	string10 FAX {xpath('FAX')};
+	iesp.share.t_Date AddressFromDate {xpath('AddressFromDate')};
+	iesp.share.t_Date AddressToDate {xpath('AddressToDate')};
+	string8 BestSicCode {xpath('BestSicCode')};
+	string10 BestNaicsCode {xpath('BestNaicsCode')};
 	integer2 YearStarted {xpath('YearStarted')};
 	boolean YearStartedDerived {xpath('YearStartedDerived')};
 	string2 YearStartedSource {xpath('YearStartedSource')};
@@ -365,7 +369,7 @@ export t_TopBusinessJudgmentLienParty := record
 	string9 TaxId {xpath('TaxId')};
 	string9 SSN {xpath('SSN')};
 	iesp.share.t_Name Name {xpath('Name')};
-	iesp.share.t_Address Address {xpath('Address')};	
+	iesp.share.t_Address Address {xpath('Address')};
 end;
 		
 export t_TopBusinessJudgmentLienFilings := record
@@ -390,8 +394,8 @@ export t_TopBusinessJudgmentLienDetail := record
 	iesp.share.t_Date OrigFilingDate {xpath('OrigFilingDate')};
 	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};
 	string3 Eviction {xpath('Eviction')};
-	String10 PartyType {xpath('PartyType')};
 	dataset(iesp.topbusiness_share.t_TopBusinessSourceDocInfo) SourceDocs {xpath('SourceDocs/SourceDoc'), MAXCOUNT(iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_SRCDOC_RECORDS)};
+	string10 PartyType {xpath('PartyType')};
 end;
 		
 export t_TopBusinessLienSection := record
@@ -560,7 +564,7 @@ export t_TopBusinessDeeds := record
 	string5 FaresMortgageTerm {xpath('FaresMortgageTerm')};
 	string60 FaresIrisApn {xpath('FaresIrisApn')};
 end;
- 		
+		
 export t_TopBusinessPropertyTransaction := record
 	string1 PartyType {xpath('PartyType')};
 	string120 CompanyName {xpath('CompanyName')};
@@ -700,7 +704,7 @@ export t_TopBusinessMotorVehicleParty := record
 	string4 DecalYear {xpath('DecalYear')};
 	iesp.share.t_Date SourceDateFirstSeen {xpath('SourceDateFirstSeen')};
 	iesp.share.t_Date SourceDateLastSeen {xpath('SourceDateLastSeen')};
-  string30 ReportedName {xpath('ReportedName')};
+	string30 ReportedName {xpath('ReportedName')};
 end;
 		
 export t_TopBusinessMotorVehicleDetail := record

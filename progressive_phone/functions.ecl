@@ -623,7 +623,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       SELF.SSN 							 := le.ssn;
       SELF.DateOfBirth := le.dob;
       SELF.HomePhone 		:= le.phoneno;
-      
+
       SELF.TransUnionGatewayEnabled := FALSE;
       SELF.TargusGatewayEnabled     := FALSE;
       SELF.InsuranceGatewayEnabled  := TRUE; // this is not a GW, its a key, thus it gives a slight scoring boost
@@ -643,7 +643,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                                              LEFT.AcctNo = RIGHT.acctno,
                                              GROUP,
                                              addHistPhones(LEFT,ROWS(RIGHT)));
-                                             
+
     // As a temporary workaround we are getting a custom modelName (scoreModel) value in from progressive_phone_batch_service
     // so that it can still run on Phone Shell V1 while everything else that comes through here will default to Phone Shell V2
     // The custom value from progressive_phone_batch_service is PSV1_ + the original modelName value
@@ -653,7 +653,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
     unsigned2 PhoneShellVersion := if(isProgressiveBatch, 10, 21); // if yes, use phone shell 1.0, else use phone shell 2.1 (current default)
 
     // Returns the Phone data without the score.
-    phones_with_attrs := Phone_Shell.Phone_Shell_Function(	
+    phones_with_attrs := Phone_Shell.Phone_Shell_Function(
                               phone_shell_withphones_in,
                               gateways_in,
                               GLB_Purpose,
@@ -678,7 +678,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
 																														RunRelocation := RunRelocation);
 
     // SCORE THE PHONES
-    
+
     // For now, since progressive_phone_batch_service still needs to use Phone Shell V1, need to check that and
     // retain old logic/models for them. Everyone else gets the new Phone Shell V21 model
     model_results := if(PhoneShellVersion = 10,
@@ -873,6 +873,23 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       SELF.vendor := IF(le.phone_shell.Royalties.lastresortphones_royalty > 0, MDR.sourceTools.src_wired_Assets_Royalty, '');
       // temp field used for filtering recs later
       SELF.relationship_cat := getRelationshipCategory(relationship);
+
+      //Capture Sources for PhoneFinder
+      ph_shell_bit := ut.BinaryStringToInteger(STD.Str.Reverse(le.phone_shell.PhonesPlus_Characteristics.PhonesPlus_src_all));
+
+      STRING src_all_decoded := Phonesplus_v2.Translation_Codes.fGet_all_sources(Ph_shell_bit);
+	    // Use the decoded src_all string to create a set
+      SET OF STRING2 set_src_all := STD.Str.SplitWords(src_all_decoded,' ');
+
+      // Turn the set into a dataset
+      empty := DATASET([], {STRING3 src});
+      ds_src_all := DATASET(set_src_all, {STRING3 src});
+      ds_src_eq  := IF(le.phone_shell.Royalties.efxdatamart_royalty > 0, DATASET([MDR.sourceTools.src_Equifax], {STRING3 src}) , empty);
+      ds_src_lastresort  := IF(le.phone_shell.Royalties.lastresortphones_royalty > 0, DATASET([MDR.sourceTools.src_wired_Assets_Royalty], {STRING3 src}) , empty);
+      ds_src_other       := DATASET([rSource.source_code], {STRING3 src});
+
+      SELF.phn_src_all   := ds_src_all + ds_src_eq + ds_src_lastresort + IF(ph_shell_bit = 0 AND ~EXISTS(ds_src_eq) AND ~EXISTS(ds_src_lastresort), ds_src_other, empty);
+     //END
       SELF := [];
     END;
 
@@ -922,6 +939,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
 		// output(phones_with_attrs,named('Function_PHONE_SHELL_RESULTS'));
 		// output(model_results,named('Function_SCORING_RESULTS'));
 		// output(phones_out1_Gr,named('phones_out1_Gr'));
+		// output(phones_out_temp,named('phones_out_temp'));
 		// output(phones_out1_TN,named('phones_out1_TN'));
 
 		RETURN PROJECT(phones_out1_TN, progressive_phone.layout_progressive_phone_common);

@@ -51,7 +51,7 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
  
  //***PEOPLE AT WORK RECS***\\ // DATASET([],iesp.peopleatwork.t_PeopleAtWorkRecord);
  paws := if(in_mod.IncludePeopleAtWork,
-            CHOOSEN(PersonSlimReport_Services.Functions(did_safe).pawRecsByDid(in_mod.ssn_mask),
+            CHOOSEN(PersonSlimReport_Services.Functions(did_safe).pawRecsByDid(in_mod),
                     iesp.Constants.PersonSlim.MaxPeopleAtWork));
 												
  //***AIRCRAFT RECS***\\ // DATASET([],iesp.faaaircraft.t_AircraftReportRecord);											
@@ -145,7 +145,7 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
 												 
  //***MARRIAGE & DIVORCE RECS***\\ // DATASET([],iesp.marriagedivorce.t_MarriageSearch2Record);
  marrDivorces := if(in_mod.IncludeMarriageDivorces,
-                    CHOOSEN(PersonSlimReport_Services.Functions(did_safe).marDivRecsByDid(),
+                    CHOOSEN(PersonSlimReport_Services.Functions(did_safe).marDivRecsByDid(in_mod),
                            iesp.Constants.PersonSlim.MaxMarriageDiv));
 													 
  //***STUDENT EDUCATION RECS***\\ // DATASET([],iesp.student.t_StudentRecord);

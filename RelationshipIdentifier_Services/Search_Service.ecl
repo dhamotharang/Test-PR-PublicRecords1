@@ -24,21 +24,29 @@ MACRO
 	ds_Search_in := dataset([],rec_in) : stored('RelationshipIdentifierSearchRequest',few);
 	first_row := ds_search_in[1] : Independent;
 	
-	
-	Num_Searches := Count(first_row.SearchBy);	
+	Num_Searches := Count(first_row.SearchBy);
 	
 	num_searchesLimit := Choosen(first_row.searchBy, iesp.constants.RelationshipIdentifier.MAX_COUNT_SEARCH_MATCH_RECORDS);
-	search_row := PROJECT(num_searchesLimit,TRANSFORM(
-               RelationshipIdentifier_Services.Layouts.Local_tRelationshipIdentifierSearch,	         
- self.SearchBy := LEFT));								
-  
-	 options_row := PROJECT(first_row.options, TRANSFORM( 
-                 iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchOption,
-		SELF.includeNeighbors := LEFT.includeNeighbors;
-		SELF.AsOfDate := LEFT.AsOfDate;
-		//self.PDF := LEFT.PDF;
-		SELF := LEFT));					
-									  								
+ /*
+ D2C Relationship Connection Requirement
+ Check if input is valid -- (Last Name, First Name and Address) OR (LexID) OR (SSN).
+ Added a new flag is_valid_input.
+ */ 
+	search_row := PROJECT(num_searchesLimit,
+                       TRANSFORM({RelationshipIdentifier_Services.Layouts.Local_tRelationshipIdentifierSearch, boolean is_valid_input},
+                         self.SearchBy := LEFT,
+                         self.is_valid_input := ((((LEFT.Name.First <> '' and LEFT.Name.Last <>  '') OR (LEFT.Name.Full <> '') OR 
+                                                (LEFT.CompanyName <> '')) and (LEFT.Address.StreetName <> '' and LEFT.Address.City <> ''
+                                                and LEFT.Address.State <> '')) OR (LEFT.UniqueId <> '') OR (LEFT.SSN <> ''))
+                      ));
+ search_row_sort := sort(search_row, if(is_valid_input, 1,0));
+	options_row := PROJECT(first_row.options, 
+                        TRANSFORM(iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchOption,
+		                        SELF.includeNeighbors := LEFT.includeNeighbors;
+		                        SELF.AsOfDate         := LEFT.AsOfDate;
+		                        //self.PDF            := LEFT.PDF;
+		                        SELF                  := LEFT
+                       ));			
 	// Set some base options
 	iesp.ECL2ESP.SetInputBaseRequest (first_row);
 
@@ -53,8 +61,8 @@ MACRO
 	integer ReturnCnt := 0 : stored('ReturnCount');
 		
 	unsigned4 maxResults := 0; // removed the ability to set this via stored.
-	                          // per request from above. 0 set here turns into 50
-														 //later on downstream within salt for business Searching.
+	                           // per request from above. 0 set here turns into 50
+														              //later on downstream within salt for business Searching.
 
 	boolean stored_IncludeNeighbors := TRUE : stored('IncludeNeighbors');	 // default to true as per requirements
 	boolean stored_lnbranded := FALSE : stored('LnBranded');
@@ -62,14 +70,15 @@ MACRO
 
 	batchParams := RelationshipIdentifier_Services.iParam.getBatchParams();
 
-	glb_ok :=  batchParams.isValidGlb();
-	
+	is_consumer := batchParams.isConsumer();
+ glb_ok := batchParams.isValidGlb() or is_consumer;
+ 	
 	// ***************************************
 	//4 lines coded per requirement 3.30 Relationship identifier Project.
 	//
-	PermissionsFlagGLB  := batchParams.glb = 0;
+	PermissionsFlagGLB := batchParams.glb = 0 and ~is_consumer;
 	
-  // END REl ident requirement
+ // END REl ident requirement
 	
 	RelationshipIdentifier_Services.Layouts.OptionsLayout search_options() := TRANSFORM	
 	 self.lnbranded       := stored_lnbranded;				
@@ -78,23 +87,24 @@ MACRO
 		//self.pdf := options_row.PDF;
 	end;
 	
-	 options := row(search_options());  
+	options := row(search_options());  
 										 
 // set params so that function can be called and batchParams passed along.
-	 ds_empty_batch := dataset([],RelationshipIdentifier_Services.Layouts.Batch.Input_Processed);
+	ds_empty_batch := dataset([],RelationshipIdentifier_Services.Layouts.Batch.Input_Processed);
    
-	 SearchRecs := relationshipIdentifier_services.Search_Records(Search_Row,options,
-                                                                ds_empty_batch,batchParams).ds_results; 
+	SearchRecs := relationshipIdentifier_services.Search_Records(
+                 PROJECT(Search_Row,RelationshipIdentifier_Services.Layouts.Local_tRelationshipIdentifierSearch),options,
+                         ds_empty_batch,batchParams).ds_results;
    				
-	 iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchResponse
-		 Format_out()      := TRANSFORM
-			 self._Header     := iesp.ECL2ESP.getHeaderRow();
-		  self.records     := SearchRecs;
-			 self.RecordCount := count(SearchRecs);			
+	iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchResponse
+	 Format_out()      := TRANSFORM
+		 self._Header     := iesp.ECL2ESP.getHeaderRow();
+	  self.records     := SearchRecs;
+		 self.RecordCount := count(SearchRecs);			
 			 // pls note this particular XML tag <SearchBy> is an echo of the input searches
 			 // and ESP automatically renames this tag to be <InputEcho> so that it compplies with standard
 			 // naming configuration on XML API functions for this service.
-			 SELF.SearchBy    := PROJECT(Search_Row.SearchBy,
+		 SELF.SearchBy    := PROJECT(Search_Row.SearchBy,
                         TRANSFORM(iesp.relationshipidentifiersearch.t_RelationshipIdentifierSearchBy,
                         SELF := LEFT));
                         // needed here to echo the input on the output
@@ -102,13 +112,13 @@ MACRO
 																					   // so that GUI can call report service ESP with these options.
 																					   // if everything resolves 1st time without user interaction
 																					   // 
-    self.optionsEcho := PROJECT(options,
+   self.optionsEcho := PROJECT(options,
                         TRANSFORM(iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchOption, 
                         self.asOfdate := iesp.ecl2esp.toDatestring8(LEFT.asOfDate);
                         SELF := LEFT;
                         self := []));
-		  END;			 
-			Results := dataset( [format_out()]);
+	  END;			 
+		Results := dataset( [format_out()]);
 			// ^^^^^ this line is the final results of the search service.
 			
 			
@@ -116,10 +126,17 @@ MACRO
 		// output(PermissionsFlagdppa , named('PermissionsFlagdppa'));
 		// output(dppa_ok, named('dppa_ok'));
 		// output(glb_ok, named('glb_ok'));
+    
+  /*
+  D2C Relationship Connection Requirement
+  Added a new condition to throw error if minimum input criteria is not met
+  Only for D2C product -- is_consumer = true
+  */
     	
 	 Map(
 			 Num_searches <= RelationshipIdentifier_Services.Constants.ONE  OR 
-		  Num_searches >  iesp.constants.RelationshipIdentifier.MAX_COUNT_SEARCH_MATCH_RECORDS 
+		  Num_searches >  iesp.constants.RelationshipIdentifier.MAX_COUNT_SEARCH_MATCH_RECORDS
+    OR (is_consumer and ~search_row_sort[1].is_valid_input)
 			                      => FAIL(301,doxie.ErrorCodes(301)),
 					PermissionsFlagGlb  => FAIL(100, 'GLB permissible purpose is required.'),
 					(~(glb_ok))         => FAIL(2, 'Invalid GLB permissible purpose'),

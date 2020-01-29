@@ -22,4 +22,6 @@ export unsigned2  targetRadius		:= Relocations.wdtg.default_radius			: stored('T
 // PhonesPlus data for relatives/associates/neighbors is taken separately from subject:
 export IncludePhonesPlus_for_RNA := false : stored('IncludePhonesPlusForRNA');
 
+export boolean Include_Email_Addresses := false : stored('IncludeEmailAddresses');
+
 END;

@@ -654,6 +654,7 @@ EXPORT Layouts := MODULE
   EXPORT SlimRelation := RECORD
     SlimIndividual;
     UNSIGNED1 amlRelationshipDegree;
+    STRING2 rawRelationshipType;
     STRING2 relationToInquired;
     BOOLEAN currentlyIncarcerated;    
     BOOLEAN everIncarcerated;
@@ -691,6 +692,13 @@ EXPORT Layouts := MODULE
     BOOLEAN randomlyIssuedInvalid;
     BOOLEAN reportedDeceased;
     DATASET(SourceDetailsLayout) sourceInfo;
+  END;
+  
+  EXPORT AddressDetails := RECORD
+    UNSIGNED6 seq;
+    AddressSlimDetail;
+    UNSIGNED4 dateFirstSeen;
+    UNSIGNED4 dateLastSeen;
   END;
 
   EXPORT BusReportDetails := RECORD
@@ -737,6 +745,7 @@ EXPORT Layouts := MODULE
     DATASET({STRING9 ssn}) ssnOnFile;
     DATASET({STRING8 dob}) dobOnFile;
     DATASET(Name) akas;
+    DATASET(addressDetails) residences {MAXCOUNT(DueDiligence.Constants.MAX_RESIDENCES)};
   END;
 
 
