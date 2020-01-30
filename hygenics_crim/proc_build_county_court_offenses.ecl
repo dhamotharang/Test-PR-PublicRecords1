@@ -47,7 +47,7 @@ layout_j_final := record
                 //string100 SexOffenderRegistryNumber;
 
                 //from charge
-                string40   CaseID                := '';
+                string100  CaseID                := '';
                 string20   WarrantNumber         := '';
                 //string8  WarrantDate           := '';
                 string200  WarrantDesc           := '';
@@ -1089,6 +1089,11 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 																		vVendor ='FO' and trim(temp_disp) = 'CONVICTION, SENTENCE' => 'CONVICTION, SENTENCE',
 																		vVendor ='FO' and trim(temp_disp) = 'CONVICTION-JAIL/FINE' => 'CONVICTION, JAIL AND FINE',
 																		vVendor ='FO' and trim(temp_disp) = 'CREDIT TIME SERVED'   => 'CONVICTION, CREDIT TIME SERVED',
+
+                                    vVendor ='I0060' and trim(temp_disp) = 'DISPOSITION NOT PROVIDED BY SOURCE' 
+																		            and trim(l.casestatus) in ['ADMIN DISMISSED/ NOLLE PROS','ADMIN NOLLE PROSEQUI','DISMISSED','DROPPED/ABANDONED','NOLLE PROSEQUI','RE-TRIAL DIVERSION','TRANSFERRED TO ANOTHER COURT']
+                                                    => trim(l.casestatus), // added by tp
+
                                     length(trim(temp_disp)) > 3 => temp_disp,
                                     vVendor ='QS' and stringlib.stringfind(l.sentencetype,'GUILTY',1)>0 => l.sentencetype,
                                     vVendor ='QS' and stringlib.stringfind(l.sentencetype,'DIS',1)>0 => l.sentencetype,
@@ -1305,7 +1310,32 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 	                                 trim(l.casecomments) <> '' => trim(l.casecomments),
 	                                 '');                                 
   addl_prov_desc_9T         := STD.Str.FindReplace(STD.Str.FindReplace( l.sentenceadditionalinfo, 'SENTENCED','SENT'),'SENTENCE','SENT');
-	                                 															 
+	
+ 
+  addl_prov_desc_I0090      :=  trim(map(vVendor = 'I0090' and regexfind('(.*)(CONDITION: )(.*)',l.casecomments) = true  
+							                                       => regexreplace('(.*)(CONDITION: )(.*)',l.casecomments,'$3'),''));		// added by tp
+	
+	addl_prov_desc_I0091      :=  trim(map(vVendor = 'I0091' and regexfind('(.*)(CONDITION: )(.*)',l.casecomments) = true  
+							                                       => regexreplace('(.*)(CONDITION: )(.*)',l.casecomments,'$3'),''));		// added by tp
+  
+	addl_prov_desc_I0092      :=  trim(map(vVendor = 'I0092' and regexfind('DAYS',l.sentenceadditionalinfo) = true  
+							                                       => regexreplace('ADDITIONAL INFORMATION: ',l.sentenceadditionalinfo,''),''));		// added by tp
+																										 
+	addl_prov_desc_I0093      :=  trim(map(vVendor = 'I0093' and regexfind('SENTENCE: ',l.sentenceadditionalinfo) = true  
+							                                       => regexreplace('SENTENCE: ',l.sentenceadditionalinfo,''),''));		// added by tp
+	
+	addl_prov_desc_I0094      :=  trim(map(vVendor = 'I0094' and regexfind('SENTENCE: ',l.sentenceadditionalinfo) = true  
+							                                       => regexreplace('SENTENCE: ',l.sentenceadditionalinfo,''),''));		// added by tp
+
+  addl_prov_desc_I0059      :=  trim(map(vVendor = 'I0059' and regexfind('JUDGEMENT AMENDED:',l.sentenceadditionalinfo)
+	                                         =>  regexreplace('PROBATION VIOLATED',
+	                                             regexreplace('REINSTATED WITH A SENTENCE', 
+												                        regexreplace('REVOKED',
+											                           regexreplace('JUDGEMENT AMENDED:',l.sentenceadditionalinfo,'JUDGEMNT AMNDED'),'REVKD'),'REINSTD WT SENTENCE'),'PROB VIO'),
+																							     vVendor = 'I0059' and regexfind('ADDITIONAL SENTENCING INFORMATION:',l.casecomments)
+																							       => regexreplace('ADDITIONAL SENTENCING INFORMATION: ',l.casecomments,''),''));             // added by tp	
+   
+	
 	addl_prov_desc_1          := MAP( vVendor ='TI' and regexfind('GUILTY - ',temp_disp) => regexreplace('(GUILTY - )(.*)',temp_disp,'$2'), //removing sentences from disp and mapping here
 	                                  vVendor ='TI' and regexfind('GUILTY PLEA- JURY VERDICT - ',temp_disp) => regexreplace('(GUILTY PLEA- JURY VERDICT - )(.*)',temp_disp,'$2'), //removing sentences from disp and mapping here
 																		vVendor ='TI' and regexfind('GUILTY BY JURY - ',temp_disp) => regexreplace('(GUILTY BY JURY - )(.*)',temp_disp,'$2'), //removing sentences from disp and mapping here
@@ -1345,6 +1375,14 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
                                     regexfind('^(LOCATION: )(.*)',l.sentenceadditionalinfo ) => '',
                                     regexfind('^(COMMUNITY CONTROL LENGTH: [0-9, YMD][0-9, YMD]*)$',l.sentenceadditionalinfo ) => regexreplace('^(COMMUNITY CONTROL LENGTH: [0-9, YMD][0-9, YMD]*)$',l.sentenceadditionalinfo,'$1' ),
                                     sentaddl_susp_time <> ''  => '',
+																		
+																		vVendor IN ['I0090'] => addl_prov_desc_I0090,   // added by tp
+																		vVendor IN ['I0091'] => addl_prov_desc_I0091,   // added by tp
+																		vVendor IN ['I0092'] => addl_prov_desc_I0092,   // added by tp
+																		vVendor IN ['I0093'] => addl_prov_desc_I0093,   // added by tp
+																		vVendor IN ['I0094'] => addl_prov_desc_I0094,   // added by tp
+                                    vVendor IN ['I0059'] => addl_prov_desc_I0059,   // added by tp																		
+																		
                                     l.sentenceadditionalinfo);
 
                                                                                                                                                                                                                                                                                                 
@@ -1378,7 +1416,14 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 																	 
                                    regexfind('(SUSPENDED) (SENTENCE:|LENGTH:) ([0-9]+ [A-Z]), (.*)', l.sentencestatus) => regexreplace('(SUSPENDED) (SENTENCE:|LENGTH:) ([0-9]+ [A-Z]), (.*)', l.sentencestatus,'$4'),
                                    sentstat_susp_time <> '' => '',
-																	 vVendor IN ['I0022','I0020'] => l.sentenceadditionalinfo[41..],
+																	 vVendor IN ['I0022','I0020'] => l.sentenceadditionalinfo[41..],                                   
+
+                                   vVendor IN ['I0090'] => addl_prov_desc_I0090[41..],   // added by tp
+																	 vVendor IN ['I0091'] => addl_prov_desc_I0091[41..],   // added by tp
+																	 vVendor IN ['I0092'] => addl_prov_desc_I0092[41..],   // added by tp
+																	 vVendor IN ['I0093'] => addl_prov_desc_I0093[41..],   // added by tp
+																	 vVendor IN ['I0094'] => addl_prov_desc_I0094[41..],   // added by tp
+                                   vVendor IN ['I0059'] => addl_prov_desc_I0059[41..],   // added by tp
 
                                    l.sentencestatus                                                                                                                                                                                                                                                                             
                                    );
@@ -1453,9 +1498,15 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
                                   '');                 
                                                                                                                                                                                                                                                                 
   public_serv_hrs           := IF(l.publicservicehours <> '' and regexfind('[0-9]+', l.publicservicehours, 0)<>'', 'Pub Serv: '+trim(l.publicservicehours) + ' Hours','') ;                                                                                                                                                                                                                                                                                                                             
-	
+
+  community_service_I0096      :=  trim(map(vVendor = 'I0096' and regexfind('(.*)(COMMUNITY SERVICE HOURS: )([0-9]+)',l.casecomments) = true  
+							                                      => regexreplace('(.*)(COMMUNITY SERVICE HOURS: )([0-9]+)',l.casecomments,'$3 Hours'), 
+	                                          vVendor = 'I0096' and regexfind('(COMMUNITY SERVICE HOURS: )([0-9]+)',l.casecomments) = true  
+							                                      => regexreplace('(COMMUNITY SERVICE HOURS: )([0-9]+)',l.casecomments,'$2 Hours'),''));		// added by tp
+
 	self.community_service    := MAP(vVendor = '8A' => NVClarkcomm_serv,
-	                                 community_serv <> '' => community_serv, 
+	                                 vVendor = 'I0096' => community_service_I0096, 	// added by tp
+	                                 community_serv <> '' => community_serv,  
 	                                 public_serv_hrs);
 																	 
  
