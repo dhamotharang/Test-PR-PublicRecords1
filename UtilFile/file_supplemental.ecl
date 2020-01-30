@@ -1,10 +1,9 @@
-IMPORT header_services;
+﻿IMPORT header_services;
 
 EXPORT file_supplemental := module
 
-header_services.Supplemental_Data.mac_verify('file_utility_inj.thor',Utilfile.Layout_DID_Out,read);
- 
-EXPORT in_supp := read();
+
+EXPORT in_supp := utilfile.regulatory.supplemental_data();
 
 //cleanup driver license and phone
 UtilFile.mac_cleandates(in_supp,dates_out)
