@@ -8,7 +8,7 @@ EXPORT As_Business_Linking (
 	) := function		
 		
 		business_header.layout_business_linking.linking_interface	trfMapBLInterface(Database_USA.layouts.Base l, unsigned4 cnt) := transform																				
-																							 
+			,skip (cnt=2 and L.Mail_Addr_Standardized = '') 											 
 				self.source_record_id            := l.record_sid; 
 				self.rcid												 := 0;
 				self.vl_id                       := trim(l.DBUSA_Business_ID) + trim(l.DBUSA_Executive_ID);
@@ -30,7 +30,9 @@ EXPORT As_Business_Linking (
 				self.company_naics_code4          := l.NAICS04;
 				self.company_naics_code5          := l.NAICS05;
 				self.company_org_structure_raw   := l.business_status_code;
-				self.company_address_type_raw    := 'PHYSICAL';
+				self.company_address_type_raw    := choose(cnt ,'PHYSICAL'
+																										   ,'MAILING'
+																				           );     
 				self.company_address.prim_range  := choose(cnt ,l.phy_prim_range
 																										   ,l.mail_prim_range
 																				           );              
@@ -85,7 +87,6 @@ EXPORT As_Business_Linking (
 				self.company_url								 := l.URL;
 				self.company_ticker              := l.ticker_symbol;
 				self.company_ticker_exchange     := l.stock_exchange;
-				// self.company_inc_state           := l.incorporation_state;
 				self.dt_first_seen               := l.dt_first_seen;
 				self.dt_last_seen                := l.dt_last_seen;
 				self.dt_vendor_last_reported     := l.dt_vendor_last_reported;
