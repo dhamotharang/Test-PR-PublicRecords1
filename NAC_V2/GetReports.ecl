@@ -50,8 +50,6 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string fn) := function
 		err_rate := nRejectable/total;		// omit contact and exception records for threshold calculation
 		ExcessiveInvalidRecordsFound :=	err_rate	> $.Mod_Sets.threshld;
 
-	
-		//fn := ExtractFileName(ModifyFileName(lfn, 'ncf2'));
 
 		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound);
 
@@ -64,11 +62,13 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string fn) := function
 			EXPORT	DATASET($.Print.dRow) dsNcr2 := ncr;
 			EXPORT	DATASET($.Print.rNCD) dsNcd2 := ncd;
 			EXPORT	DATASET($.Print.rNcx2) dsNcx2 := ncx;
-			EXPORT	integer RejectedCount := nRejected;
+			EXPORT	integer RejectedCount := nRejected;		// all rejected records
+			EXPORT	integer RejectableCount := nRejectable;	// no contact/exception records
 			EXPORT	integer ErrorCount := nErrors;
 			EXPORT	integer WarningCount := nWarnings;
 			EXPORT	integer WarnedCount := nWarned;
 			EXPORT	integer	TotalRecords := total;
+			EXPORT	boolean	RejectFile := ExcessiveInvalidRecordsFound;
 			EXPORT	DATASET($.Layouts2.rStateContactEx) dsContacts := contacts;
 			EXPORT	DATASET($.Layouts2.rExceptionRecord) dsExceptions := exceptionArchive;
 		END; 

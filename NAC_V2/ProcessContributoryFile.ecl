@@ -45,8 +45,7 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		processed := $.PreprocessNCF2(ilfn);
 		base2 := $.fn_constructBase2FromNCFEx(processed, version);				
 		reports := $.GetReports(processed, lfn);		//ModifyFileName(ilfn, 'nac2'));
-		err_rate := reports.RejectedCount/reports.TotalRecords;
-		ExcessiveInvalidRecordsFound :=	err_rate	> treshld_;
+		ExcessiveInvalidRecordsFound :=	reports.RejectFile;
 		
 		MoveToTempOrReject := 	if(ExcessiveInvalidRecordsFound
 												,MoveSprayingToError
