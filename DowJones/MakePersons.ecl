@@ -89,8 +89,9 @@ dXg3 := JOIN(dXg2, IdList, LEFT.id = RIGHT.ID,
 						
 // limit child datasets to 256 entries
 maxn := 256;
+maxAka := 255;		// because the primary name is part of the count
 EXPORT MakePersons := PROJECT(dXg6, TRANSFORM(Worldcheck_Bridger.Layout_Worldcheck_Entity_Unicode.routp,
-						self.aka_list.aka := CHOOSEN(left.aka_list.aka, maxn);
+						self.aka_list.aka := CHOOSEN(left.aka_list.aka, maxAka);
 						self.additional_info_list.additionalinfo := CHOOSEN(left.additional_info_list.additionalinfo,maxn);
 						self.identification_list.identification := CHOOSEN(left.identification_list.identification,maxn);
 						self.address_list.address := CHOOSEN(left.address_list.address,maxn);
