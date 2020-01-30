@@ -525,10 +525,9 @@ input_file_count_ds:=DATASET([
    			 XtabOut_ds2 := ITERATE(output_ds2, Xform_nonfcra(LEFT, RIGHT));
            	
           			
-   distr:= FileServices.SendEmail('Benjamin.Karnatz@lexisnexis.com,Weiyu.Ma@lexisnexisrisk.com,Matthew.Ludewig@lexisnexisrisk.com', 'Data Collection Response Counts Tracking Report ' , XtabOut_ds[COUNT(XtabOut_ds)].line);
-   		
-   distr2:= FileServices.SendEmail('Benjamin.Karnatz@lexisnexis.com,Weiyu.Ma@lexisnexisrisk.com,Matthew.Ludewig@lexisnexisrisk.com', 'Data Collection Error code Response Counts Tracking Report ' , XtabOut_ds2[COUNT(XtabOut_ds2)].line);
-   		
+	distr:= FileServices.SendEmail('Isabel.Ma@lexisnexisrisk.com; Matthew.Ludewig@lexisnexisrisk.com; Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com; Karen.Acuna@lexisnexisrisk.com; Lucky.Mores@lexisnexisrisk.com', 'Data Collection Response Counts Tracking Report ' , XtabOut_ds[COUNT(XtabOut_ds)].line);
+
+	distr2:= FileServices.SendEmail('Isabel.Ma@lexisnexisrisk.com; Matthew.Ludewig@lexisnexisrisk.com; Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com; Karen.Acuna@lexisnexisrisk.com; Lucky.Mores@lexisnexisrisk.com', 'Data Collection Error code Response Counts Tracking Report ' , XtabOut_ds2[COUNT(XtabOut_ds2)].line);    		
    
   sequential( filenames_details1,IF(COUNT(flag) > 0,distr),IF(COUNT(flag2) > 0,distr2));
  
