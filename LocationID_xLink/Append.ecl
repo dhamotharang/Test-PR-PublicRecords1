@@ -82,16 +82,11 @@ export Append(inDs,
 	#uniquename(resolvedDs)
 	%resolvedDs% := dedup(%flattenDs%(resolved), reference);
 	
-	#uniquename(OutputRec)
-	%OutputRec% := record
-		%FlatRec%.LocId;
-		inDs;
-	end;
 
 	#uniquename(createOutput)
 	%createOutput% := join(%addRef%, %resolvedDs%,
 	                       left.ref_append = right.reference,
-					               transform(%OutputRec%, self.locid := right.locid, self := left, self := right), left outer, hash);
+					               transform(recordof(inDs), self.locid := right.locid, self := left), left outer, hash);
 							   
 				   
 	outDs          := %createOutput%;
