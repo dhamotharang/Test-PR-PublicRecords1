@@ -2,7 +2,7 @@
 export Send_Email(string pversion,string build_name) :=
 module
 
-shared emaillist := 'Sudhir.Kasavajjala@lexisnexisrisk.com,Michael.Gould@lexisnexis.com,Charles.Salvo@lexisnexisrisk.com';
+shared emaillist := Email_Notification_Lists;
 
 	shared SuccessSubject := if(VersionControl.IsValidVersion(pversion)
 															,'SUCCESS : '+build_name + ' Build ' + pversion + ' Completed on ' + _Control.ThisEnvironment.Name
