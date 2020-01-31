@@ -9,7 +9,7 @@ export update_keys(string new_input_folder = '20200116', pUseProd = false) := fu
                                 output(newName + 'already in superfile, skipping input version control'),
                                 sequential(
                                         if(std.File.FileExists(newName),
-                                        output('input file with same name has been sprayed previously, change name to respray'),
+                                        output('input file with same name has been sprayed previously, change name to respray'), //have to stop father and child from ever being the same
                                         crim_offense_cat.spray_input(new_input_folder)),
                                         STD.File.PromoteSuperFileList(
                                                 [       
