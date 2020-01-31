@@ -1255,5 +1255,151 @@ EXPORT Layouts := MODULE
     BOOLEAN isDefunct;
   END;
 */
+  EXPORT SingleView := MODULE
+
+    EXPORT Consumer_Input :=
+    RECORD
+      string20 name_first := '';
+      string20 name_middle := '';
+      string20 name_last := '';
+      string5 name_suffix := '';
+      string120 unparsed_full_name := '';
+
+      string60 street_address := '';
+      string40 street_address2 := '';
+      string25 city := '';
+      string2 state := '';
+      string5 zip := '';
+
+      string9 ssn := '';
+      string8 dob := '';
+      string10 home_phone := '';
+      string120 email_address := '';
+
+      unsigned6 lex_id := 0;
+    END;
+
+    EXPORT Business_Input :=
+    RECORD
+      string120 comp_name := '';
+      string120 dba_name := '';
+
+      string60 co_street_address := '';
+      string40 co_street_address2 := '';
+      string25 co_city := '';
+      string2 co_state := '';
+      string5 co_zip := '';
+
+      string9 fein := '';
+      string16 co_phone := '';
+      string120 co_email_address := '';
+      string120 co_url := '';
+
+      unsigned6 ultid := 0;
+      unsigned6 orgid := 0;
+      unsigned6 seleid := 0;
+      unsigned6 proxid := 0;
+      unsigned6 powid := 0;
+    END;
+
+    EXPORT Input := 
+    RECORD
+      string20 acctno := '';
+      Consumer_Input;
+      Business_Input;
+    END;
+
+    EXPORT Input_Processed :=
+    RECORD(Input)
+      string20 orig_acctno := '';
+      Batchshare.Layouts.ShareErrors;
+    END;
+
+    EXPORT Consumer_Best := 
+    RECORD
+      string20 best_name_first;
+      string20 best_name_middle;
+      string20 best_name_last;
+      string5 best_name_suffix;
+      string10 best_prim_range;
+      string2 best_predir;
+      string28 best_prim_name;
+      string4 best_addr_suffix;
+      string10 best_unit_desig;
+      string8 best_sec_range;
+      string25 best_city;
+      string2 best_state;
+      string5 best_zip;
+      string4 best_zip4;
+      string10 best_home_phone;
+      unsigned6 lex_id;
+    END;
+
+    EXPORT Business_Best := 
+    RECORD
+      string120 best_co_name;
+      string10 best_co_prim_range;
+      string2 best_co_predir;
+      string28 best_co_prim_name;
+      string4 best_co_addr_suffix;
+      string10 best_co_unit_desig;
+      string8 best_co_sec_range;
+      string25 best_co_city;
+      string2 best_co_state;
+      string5 best_co_zip;
+      string4 best_co_zip4;
+      string16 best_co_phone;
+      unsigned6 ultid;
+      unsigned6 orgid;
+      unsigned6 seleid;
+      unsigned6 proxid;
+      unsigned6 powid;
+    END;
+
+    EXPORT Output_Consumer := 
+    RECORD
+      string20 acctno;
+      unsigned2 request_id;
+      Consumer_Best;
+      unsigned6 empid;
+      string50 job_title1;
+      string50 job_title2;
+      string50 job_title3;
+      string8 dt_first_seen;
+      string8 dt_last_seen;
+    END;
+
+    EXPORT Output_Business := 
+    RECORD
+      string20 acctno;
+      unsigned2 request_id;
+      Business_Best;
+      string50 job_title1;
+      string8 dt_first_seen1;
+      string8 dt_last_seen1;
+      string50 job_title2;
+      string8 dt_first_seen2;
+      string8 dt_last_seen2;
+      string50 job_title3;
+      string8 dt_first_seen3;
+      string8 dt_last_seen3;
+    END;
+
+    EXPORT Output_Summary :=
+    RECORD
+      string20 acctno;
+      unsigned2 request_id;
+      Consumer_Best;
+      Business_Best;
+      boolean input_is_linked;
+      unsigned4 linked_business_count;
+      unsigned4 linked_contact_count;
+      unsigned4 contact_lexid_count;
+      unsigned4 contact_no_lexid_count;
+      string40 status;
+      Batchshare.Layouts.ShareErrors;
+    END;
+
+  END;
 
 END;
