@@ -4,7 +4,7 @@ import header, ak_perm_fund,atf_services,bankrupt,bankruptcyv2_services,BIPV2,dr
     uccd, Gong_Services, Doxie_files, LN_TU, Doxie_LN, doxie_cbrs, moxie_phonesplus_server,
 	liensv2_services, header_quick, UCCv2_Services, Votersv2_services, vehiclev2_services, DriversV2_Services,
 	LN_PropertyV2_Services,DEAV2_Services,EmailService,FBNV2_services,iesp,ExperianCred, TransunionCred,
-	American_Student_Services;
+	American_Student_Services, EmailV2_Services;
 
 did0 := dataset([], Doxie.layout_references);
 
@@ -12,7 +12,7 @@ export Layout_crs_raw := record, maxlength(doxie_crs.maxlength_report)
   unsigned6 did;
   unsigned6 rid;
   header.layout_Source_ID;
-  dataset(atf_services.layouts.firearms_out) atf_child; 
+  dataset(atf_services.layouts.firearms_out) atf_child;
   dataset(Doxie.layout_bk_output) bk_child;
 	dataset(bankruptcyv2_services.layouts.layout_rollup) bk_V2_child;
   dataset(bankrupt.layout_liens) lien_child;
@@ -22,11 +22,12 @@ export Layout_crs_raw := record, maxlength(doxie_crs.maxlength_report)
   dataset(Doxie_Raw.Layout_emerge_raw) emerge_child;
   dataset(Votersv2_services.layouts.SourceOutput) voters_v2_child; //
   dataset(Doxie_Raw.layout_death_Raw) death_child;
-  dataset(Doxie_Raw.layout_state_death_Raw) state_death_child; 
+  dataset(Doxie_Raw.layout_state_death_Raw) state_death_child;
   dataset(prof_license.layout_doxie) proflic_child;
 	dataset(doxie.ingenix_sanctions_module.layout_ingenix_sanctions_report) sanc_child;
 	dataset(doxie.ingenix_provider_module.layout_ingenix_provider_report) prov_child;
 	dataset(EmailService.Assorted_Layouts.layout_report_rollup) Email_child;
+	dataset(EmailV2_Services.Layouts.crs_email_raw_rec) Email_v2_child;
   dataset(Doxie.Layout_VehicleSearch) veh_child;
   dataset(vehiclev2_services.Layout_Report) veh_v2_child;
   dataset(Doxie_Raw.Layout_Dea_Raw) dea_child;
@@ -37,11 +38,11 @@ export Layout_crs_raw := record, maxlength(doxie_crs.maxlength_report)
   dataset(Doxie_crs.layout_watercraft_report) watercraft_child;
   dataset(UCCv2_services.Legacy.layout_raw) ucc_child;
   dataset(UCCv2_services.layout_ucc_rollup_src) ucc_v2_child;
-  dataset(doxie_crs.layout_corp_affiliations_records) corpAffil_child;  
+  dataset(doxie_crs.layout_corp_affiliations_records) corpAffil_child;
   dataset(Doxie_crs.layout_whois) whoIs_child;
   dataset(Gong_Services.Layout_GongHistorySearchService) phone_child;
   dataset(doxie_ln.layout_deed_records) deed_child;
-  dataset(Doxie_LN.layout_assessor_records) assessor_child; 
+  dataset(Doxie_LN.layout_assessor_records) assessor_child;
   dataset(LN_PropertyV2_Services.layouts.out_widest)	deed2_child;
   dataset(LN_PropertyV2_Services.layouts.out_widest)	assessor2_child;
   dataset(ak_perm_fund.Layout_AK_Common) ak_child;

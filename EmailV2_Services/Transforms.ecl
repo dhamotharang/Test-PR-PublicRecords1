@@ -451,6 +451,52 @@ EXPORT Transforms := MODULE
       SELF := [];
   END;
 
+  EXPORT $.Layouts.crs_email_raw_rec xform_crs_raw($.Layouts.email_final_rec le)
+  := TRANSFORM
+    SELF.Original.EmailAddress := le.Original.email;
+    SELF.Original.IPAddress := le.Original.ip;
+    SELF.Original.LoginDate := le.Original.login_date;
+    SELF.Original.Website := le.Original.site;
+    SELF.Original.CompanyTitle := le.CompanyTitle;
+    SELF.Original.CompanyName := le.orig_CompanyName;
+
+    SELF.Cleaned.EmailAddress := le.Cleaned.clean_email;
+    SELF.Cleaned.Phone := le.Cleaned.clean_phone;
+    SELF.Cleaned.SSN := le.Cleaned.clean_ssn;
+    SELF.Cleaned.DOB := le.Cleaned.clean_dob;
+    SELF.Cleaned.CompanyName := le.cln_CompanyName;
+    SELF.Cleaned.Name.first := le.Cleaned.Name.fname;
+    SELF.Cleaned.Name.Middle := le.Cleaned.Name.mname;
+    SELF.Cleaned.Name.last := le.Cleaned.Name.lname;
+    SELF.Cleaned.Name.Suffix := le.Cleaned.Name.name_suffix;
+    SELF.Cleaned.Name.Prefix := le.Cleaned.Name.title;
+    SELF.Cleaned.Address.StreetNumber := le.Cleaned.Address.prim_range;
+    SELF.Cleaned.Address.StreetPreDirection := le.Cleaned.Address.predir;
+    SELF.Cleaned.Address.StreetName := le.Cleaned.Address.prim_name;
+    SELF.Cleaned.Address.StreetSuffix := le.Cleaned.Address.addr_suffix;
+    SELF.Cleaned.Address.StreetPostDirection := le.Cleaned.Address.postdir;
+    SELF.Cleaned.Address.UnitDesignation := le.Cleaned.Address.unit_desig;
+    SELF.Cleaned.Address.UnitNumber := le.Cleaned.Address.sec_range;
+    SELF.Cleaned.Address.City := le.Cleaned.Address.p_city_name;
+    SELF.Cleaned.Address.State := le.Cleaned.Address.st;
+    SELF.Cleaned.Address.Zip5 := le.Cleaned.Address.zip;
+    SELF.Cleaned.Address.Zip4 := le.Cleaned.Address.zip4;
+    SELF.Cleaned.Address.StreetAddress1 := Address.Addr1FromComponents(le.Cleaned.Address.prim_range, le.Cleaned.Address.Predir, le.Cleaned.Address.prim_name, le.Cleaned.Address.addr_suffix, le.Cleaned.Address.Postdir, le.Cleaned.Address.unit_desig, le.Cleaned.Address.sec_range);
+    SELF.Cleaned.Address.StateCityZip := Address.Addr2FromComponents(le.Cleaned.Address.p_city_name, le.Cleaned.Address.st, le.Cleaned.Address.zip);
+
+    SELF.LexId := le.DID;
+    SELF.ProcessDate := le.process_date;
+    SELF.DateFirstSeen := le.date_first_seen;
+    SELF.DateLastSeen := le.date_last_seen;
+    SELF.DateVendorFirstReported := le.date_vendor_first_reported;
+    SELF.DateVendorLastReported := le.date_vendor_last_reported;
+    SELF.Source := le.email_src;
+    SELF.EmailId := le.email_id;
+
+    SELF := le;
+    SELF := [];
+  END;
+
   EXPORT $.Layouts.email_final_rec ApplyDobMask ($.Layouts.email_final_rec le, UNSIGNED1 _dob_mask)
    := TRANSFORM
     SELF.BestInfo.DOB := IF(le.BestInfo.dob>0, iesp.ECL2ESP.DateToInteger(iesp.ECL2ESP.ApplyDateMask(iesp.ECL2ESP.toDate(le.BestInfo.dob), _dob_mask)), 0);
