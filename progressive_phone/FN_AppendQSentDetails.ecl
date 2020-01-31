@@ -62,7 +62,7 @@ EXPORT FN_AppendQSentDetails(dataset(progressive_phone.layout_progressive_batch_
 	without_qsent_dedup := project(finalout_without_qsent, phone_trans_dedupe(left, counter));
 	without_qsent_dedup_srt := sort((without_qsent_dedup + input_dedup), acctno, sort_order);
 
-	gw_layout := Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse;
+	gw_layout := Doxie_Raw.PhonesPlus_Layouts.PhoneplusSearchResponse_Ext;
 
 	gw_layout_out := record   //temporary structure to hold all resulting rows for each request (acct).
 		string20 acctno;
