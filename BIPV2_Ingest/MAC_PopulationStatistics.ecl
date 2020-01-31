@@ -1,5 +1,5 @@
- 
-EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_source = '',Input_source_record_id = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_dt_first_seen_company_name = '',Input_dt_last_seen_company_name = '',Input_dt_first_seen_company_address = '',Input_dt_last_seen_company_address = '',Input_dt_first_seen_contact = '',Input_dt_last_seen_contact = '',Input_isContact = '',Input_iscorp = '',Input_cnp_hasnumber = '',Input_cnp_name = '',Input_cnp_number = '',Input_cnp_btype = '',Input_cnp_lowv = '',Input_cnp_translated = '',Input_cnp_classid = '',Input_company_aceaid = '',Input_corp_legal_name = '',Input_dba_name = '',Input_active_duns_number = '',Input_hist_duns_number = '',Input_active_enterprise_number = '',Input_hist_enterprise_number = '',Input_ebr_file_number = '',Input_active_domestic_corp_key = '',Input_hist_domestic_corp_key = '',Input_foreign_corp_key = '',Input_unk_corp_key = '',Input_source_docid = '',Input_title = '',Input_fname = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_name_score = '',Input_company_name = '',Input_company_name_type_raw = '',Input_company_name_type_derived = '',Input_company_rawaid = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_v_city_name = '',Input_st = '',Input_zip = '',Input_zip4 = '',Input_cart = '',Input_cr_sort_sz = '',Input_lot = '',Input_lot_order = '',Input_dbpc = '',Input_chk_digit = '',Input_rec_type = '',Input_fips_state = '',Input_fips_county = '',Input_geo_lat = '',Input_geo_long = '',Input_msa = '',Input_geo_blk = '',Input_geo_match = '',Input_err_stat = '',Input_company_bdid = '',Input_company_address_type_raw = '',Input_company_fein = '',Input_best_fein_indicator = '',Input_company_phone = '',Input_phone_type = '',Input_phone_score = '',Input_company_org_structure_raw = '',Input_company_incorporation_date = '',Input_company_sic_code1 = '',Input_company_sic_code2 = '',Input_company_sic_code3 = '',Input_company_sic_code4 = '',Input_company_sic_code5 = '',Input_company_naics_code1 = '',Input_company_naics_code2 = '',Input_company_naics_code3 = '',Input_company_naics_code4 = '',Input_company_naics_code5 = '',Input_company_ticker = '',Input_company_ticker_exchange = '',Input_company_foreign_domestic = '',Input_company_url = '',Input_company_inc_state = '',Input_company_charter_number = '',Input_company_filing_date = '',Input_company_status_date = '',Input_company_foreign_date = '',Input_event_filing_date = '',Input_company_name_status_raw = '',Input_company_status_raw = '',Input_vl_id = '',Input_current = '',Input_contact_did = '',Input_contact_type_raw = '',Input_contact_job_title_raw = '',Input_contact_ssn = '',Input_contact_dob = '',Input_contact_status_raw = '',Input_contact_email = '',Input_contact_email_username = '',Input_contact_email_domain = '',Input_contact_phone = '',Input_from_hdr = '',Input_company_department = '',Input_company_address_type_derived = '',Input_company_org_structure_derived = '',Input_company_name_status_derived = '',Input_company_status_derived = '',Input_contact_type_derived = '',Input_contact_job_title_derived = '',Input_contact_status_derived = '',OutFile) := MACRO
+﻿ 
+EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_source = '',Input_source_record_id = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_dt_first_seen_company_name = '',Input_dt_last_seen_company_name = '',Input_dt_first_seen_company_address = '',Input_dt_last_seen_company_address = '',Input_dt_first_seen_contact = '',Input_dt_last_seen_contact = '',Input_isContact = '',Input_iscorp = '',Input_cnp_hasnumber = '',Input_cnp_name = '',Input_cnp_number = '',Input_cnp_btype = '',Input_cnp_lowv = '',Input_cnp_translated = '',Input_cnp_classid = '',Input_company_aceaid = '',Input_corp_legal_name = '',Input_dba_name = '',Input_active_duns_number = '',Input_hist_duns_number = '',Input_active_enterprise_number = '',Input_hist_enterprise_number = '',Input_ebr_file_number = '',Input_active_domestic_corp_key = '',Input_hist_domestic_corp_key = '',Input_foreign_corp_key = '',Input_unk_corp_key = '',Input_global_sid = '',Input_record_sid = '',Input_employee_count_org_raw = '',Input_employee_count_org_derived = '',Input_revenue_org_raw = '',Input_revenue_org_derived = '',Input_employee_count_local_raw = '',Input_employee_count_local_derived = '',Input_revenue_local_raw = '',Input_revenue_local_derived = '',Input_locid = '',Input_source_docid = '',Input_title = '',Input_fname = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_name_score = '',Input_company_name = '',Input_company_name_type_raw = '',Input_company_name_type_derived = '',Input_company_rawaid = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_v_city_name = '',Input_st = '',Input_zip = '',Input_zip4 = '',Input_cart = '',Input_cr_sort_sz = '',Input_lot = '',Input_lot_order = '',Input_dbpc = '',Input_chk_digit = '',Input_rec_type = '',Input_fips_state = '',Input_fips_county = '',Input_geo_lat = '',Input_geo_long = '',Input_msa = '',Input_geo_blk = '',Input_geo_match = '',Input_err_stat = '',Input_company_bdid = '',Input_company_address_type_raw = '',Input_company_fein = '',Input_best_fein_indicator = '',Input_company_phone = '',Input_phone_type = '',Input_phone_score = '',Input_company_org_structure_raw = '',Input_company_incorporation_date = '',Input_company_sic_code1 = '',Input_company_sic_code2 = '',Input_company_sic_code3 = '',Input_company_sic_code4 = '',Input_company_sic_code5 = '',Input_company_naics_code1 = '',Input_company_naics_code2 = '',Input_company_naics_code3 = '',Input_company_naics_code4 = '',Input_company_naics_code5 = '',Input_company_ticker = '',Input_company_ticker_exchange = '',Input_company_foreign_domestic = '',Input_company_url = '',Input_company_inc_state = '',Input_company_charter_number = '',Input_company_filing_date = '',Input_company_status_date = '',Input_company_foreign_date = '',Input_event_filing_date = '',Input_company_name_status_raw = '',Input_company_status_raw = '',Input_vl_id = '',Input_current = '',Input_contact_did = '',Input_contact_type_raw = '',Input_contact_job_title_raw = '',Input_contact_ssn = '',Input_contact_dob = '',Input_contact_status_raw = '',Input_contact_email = '',Input_contact_email_username = '',Input_contact_email_domain = '',Input_contact_phone = '',Input_from_hdr = '',Input_company_department = '',Input_company_address_type_derived = '',Input_company_org_structure_derived = '',Input_company_name_status_derived = '',Input_company_status_derived = '',Input_contact_type_derived = '',Input_contact_job_title_derived = '',Input_contact_status_derived = '',OutFile) := MACRO
   IMPORT SALT35,BIPV2_Ingest;
   #uniquename(of)
   %of% := RECORD
@@ -10,7 +10,7 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_source = '',Input_
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
-    SELF.fields := 
+    SELF.fields :=
     #IF( #TEXT(Input_source)='' )
       '' 
     #ELSE
@@ -207,6 +207,72 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_source = '',Input_
       '' 
     #ELSE
         IF( le.Input_unk_corp_key = (TYPEOF(le.Input_unk_corp_key))'','',':unk_corp_key')
+    #END
+ 
++    #IF( #TEXT(Input_global_sid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_global_sid = (TYPEOF(le.Input_global_sid))'','',':global_sid')
+    #END
+ 
++    #IF( #TEXT(Input_record_sid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_record_sid = (TYPEOF(le.Input_record_sid))'','',':record_sid')
+    #END
+ 
++    #IF( #TEXT(Input_employee_count_org_raw)='' )
+      '' 
+    #ELSE
+        IF( le.Input_employee_count_org_raw = (TYPEOF(le.Input_employee_count_org_raw))'','',':employee_count_org_raw')
+    #END
+ 
++    #IF( #TEXT(Input_employee_count_org_derived)='' )
+      '' 
+    #ELSE
+        IF( le.Input_employee_count_org_derived = (TYPEOF(le.Input_employee_count_org_derived))'','',':employee_count_org_derived')
+    #END
+ 
++    #IF( #TEXT(Input_revenue_org_raw)='' )
+      '' 
+    #ELSE
+        IF( le.Input_revenue_org_raw = (TYPEOF(le.Input_revenue_org_raw))'','',':revenue_org_raw')
+    #END
+ 
++    #IF( #TEXT(Input_revenue_org_derived)='' )
+      '' 
+    #ELSE
+        IF( le.Input_revenue_org_derived = (TYPEOF(le.Input_revenue_org_derived))'','',':revenue_org_derived')
+    #END
+ 
++    #IF( #TEXT(Input_employee_count_local_raw)='' )
+      '' 
+    #ELSE
+        IF( le.Input_employee_count_local_raw = (TYPEOF(le.Input_employee_count_local_raw))'','',':employee_count_local_raw')
+    #END
+ 
++    #IF( #TEXT(Input_employee_count_local_derived)='' )
+      '' 
+    #ELSE
+        IF( le.Input_employee_count_local_derived = (TYPEOF(le.Input_employee_count_local_derived))'','',':employee_count_local_derived')
+    #END
+ 
++    #IF( #TEXT(Input_revenue_local_raw)='' )
+      '' 
+    #ELSE
+        IF( le.Input_revenue_local_raw = (TYPEOF(le.Input_revenue_local_raw))'','',':revenue_local_raw')
+    #END
+ 
++    #IF( #TEXT(Input_revenue_local_derived)='' )
+      '' 
+    #ELSE
+        IF( le.Input_revenue_local_derived = (TYPEOF(le.Input_revenue_local_derived))'','',':revenue_local_derived')
+    #END
+ 
++    #IF( #TEXT(Input_locid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_locid = (TYPEOF(le.Input_locid))'','',':locid')
     #END
  
 +    #IF( #TEXT(Input_source_docid)='' )

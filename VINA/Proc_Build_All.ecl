@@ -29,7 +29,7 @@ export Proc_Build_All(
 	//DF-23793 Add T to inenvment parameter to update Dops of Insurance customer test environment after build completes 
 	// idops_update:= dops.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N|F|T',,,'A');																	
 	//DF-26455 temporary disable updating iDOPS CT env
-	idops_update:= dops.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N|F',,,'A');																	
+	idops_update:= dops.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N|F|T',,,'A');																	
 
 	//Orbit update
 	orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('VINA',(filedate),'N'); 
@@ -55,7 +55,7 @@ export Proc_Build_All(
 				orbit_update,
 				orbiti_update,
 				new_records_sample_for_qa,
-				CopyKey2Alpha('thor_data400::key::vina::vin_qa'),
+				CopyKey2Alpha('thor_data400::key::vina::vin_qa'), 
 				FileServices.clearsuperfile(processedSuperFile),
 				FileServices.addsuperfile(processedSuperFile,'~thor_data400::in::vintelligence::vin',,true),
 				FileServices.clearsuperfile('~thor_data400::in::vintelligence::vin'),

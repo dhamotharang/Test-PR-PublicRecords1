@@ -6,11 +6,14 @@ IMPORT Std;
 
 EXPORT fn_MergeWithBase(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base = $.Files2.dsNCF2Base) := FUNCTION
 
-	linked := $.proc_link(newbase);
-	f1 := $.fn_MergeCases(linked, base);
-	f2 := $.fn_MergeClients(linked, f1);
-	f3 := $.fn_MergeAddresses(linked, f2);
+	duped := Nac_V2.fn_removeDupes(newbase);
+	linked := $.proc_link(duped);
+	newrecs := SORT(DISTRIBUTE(linked, hash32(clientid)), clientid, updated, local);  // process older records first
+	f1 := $.fn_MergeCases(newrecs(clientid=''), base);
+	f2 := $.fn_MergeClients(newrecs(clientid<>''), f1);
+	//f3 := $.fn_MergeAddresses(newrecs, f2);
+	f4 := $.fn_AddContacts(f2);
 
-	return f3;
+	return f4;
 
 END;

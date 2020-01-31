@@ -1,10 +1,11 @@
-import	NAC, lib_FileServices, lib_StringLib, lib_ThorLib, Ut;
+﻿import	NAC, lib_FileServices, lib_StringLib, lib_ThorLib, Ut;
 
 // ------------------------------------------------------------------------------------------------
 string		gLandingZoneServer		:=	NAC.Constants.LandingZoneServer				:	stored('LandingZoneServer');
 string		gLandingZonePathBase	:=	NAC.Constants.LandingZonePathBase			:	stored('LandingZonePathBase');
 string		gTargetThor						:=	'thor400_44';//'thor40_241_11'											:	stored('TargetThor');
 string		gThorFilenameBase			:=	'nac::for_msh::';
+string		gThorFilenameBase2		:=	'nac::nac2::for_msh2::';
 string		gSubDirectorySpraying	:=	'spraying';
 string		gSubDirectorySprayed	:=	'sprayed';
 string		gSubDirectoryDone			:=	'done';
@@ -36,6 +37,13 @@ string		fEarliestFileName(dataset(lib_FileServices.FsFilenameRecord) pRemoteDire
 																																			);
 						return	zAddToSuper;
 					end;
+					fAddToSuper2(string pSuperName, string pFileName)	:=
+					function
+						zAddToSuper	:=	lib_FileServices.fileservices.AddSuperFile(	lSuperFN							:=	'~' + pSuperName,
+																																				lFN										:=	'~' + pFileName
+																																			);
+						return	zAddToSuper;
+					end;
 
 // ------------------------------------------------------------------------------------------------
 gMRR	:=
@@ -45,6 +53,7 @@ module
 	export	string		LandingZoneFileMask	:=	'??_MRR_*_*.dat';
 	export	unsigned2	RecordLength				:=	sizeof(NAC.Layouts.MRR);
 	export	string		SuperName						:=	gThorFilenameBase + 'mrr';
+	export	string		SuperName2					:=	gThorFilenameBase2 + 'mrr';
 	export						dSourceFileList			:=	global(nothor(lib_FileServices.fileservices.RemoteDirectory(gLandingZoneServer, fFullRemotePathFromTokens(gLandingZonePathBase, DirectorySource), LandingZoneFileMask)), few) : independent;
 	export	string		EarliestFile				:=	fEarliestFileName(dSourceFileList);
 	export						fClearSuperFile			:=	lib_FileServices.fileservices.ClearSuperFile('~' + SuperName);
@@ -53,6 +62,7 @@ module
 	export						fMoveToSprayed			:=	fMoveFileToSprayed(DirectoryTarget, EarliestFile);
 	export						fMoveToDone					:=	fMoveFileToDone(DirectoryTarget, EarliestFile);
 	export						fAddToSuper					:=	fAddToSuper(SuperName, gThorFilenameBase + EarliestFile);
+	export						fAddToSuper2				:=	fAddToSuper2(SuperName2, gThorFilenameBase + EarliestFile);
 end;
 
 if(gMRR.EarliestFile <> '',
@@ -61,6 +71,7 @@ if(gMRR.EarliestFile <> '',
 								gMRR.fSprayFile,
 								gMRR.fMoveToSprayed,
 								gMRR.fAddToSuper,
+								gMRR.fAddToSuper2,
 								gMRR.fMoveToDone
 							),
 	 output('No MRR Files')

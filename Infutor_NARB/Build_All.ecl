@@ -18,13 +18,14 @@ function
 	sequential(
 		 Create_Supers
 		,Spray (pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite)    
-		,Build_Base (pversion,pIsTesting,pSprayedFile,pBaseFile)
+		,
+		Build_Base (pversion,pIsTesting,pSprayedFile,pBaseFile)
+		,Scrubs.ScrubsPlus('Infutor_NARB','Scrubs_Infutor_NARB','Scrubs_Infutor_NARB_Input', 'Input', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
 		,Build_Keys (pversion).all
 		,Scrubs.ScrubsPlus('Infutor_NARB','Scrubs_Infutor_NARB','Scrubs_Infutor_NARB_Base', 'Base', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
 		,Build_Strata(pversion,pOverwrite,,,pIsTesting)
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
-		//,BIPStats (pversion) -- commenting out until the BIP team moves the code to Production
 		,QA_Records()
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	    failure(send_emails(pversion,,not pIsTesting).buildfailure);

@@ -29,8 +29,7 @@ import crim_common, CrimSrch, Lib_FileServices, doxie_build, hygenics_search,hyg
 																					 zRunStrataPopulationStats);
 																					 
    UpdateDopsAll := sequential(dops.updateversion('DOCKeys', CrimSrch.Version.Development, leMailTarget,,'N')
-                             ,dops.updateversion('DOCImagesKeys', CrimSrch.Version.Development, leMailTarget,,'N')
-											                  ,dops.updateversion('FCRA_DOCKeys', CrimSrch.Version.Development, leMailTarget,,'F'));								
+											                  ,dops.updateversion('FCRA_DOCKeys', CrimSrch.Version.Development, leMailTarget,,'F'));							
 
 					sequential
 					(

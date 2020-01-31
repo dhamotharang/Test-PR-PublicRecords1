@@ -426,7 +426,7 @@ EXPORT	Layouts	:=	MODULE
 		AccountBaseSegment;																																					//	AB
 		DATASET(MasterAccountContractSegment)				masterAccount{MAXCOUNT(1)};											//	MA
 		DATASET(AddressSegment)											address{MAXCOUNT(100)};													//	AD
-		DATASET(AccountModificationHistorySegment)	history{MAXCOUNT(25)};													//	AH
+		DATASET(AccountModificationHistorySegment)	history{MAXCOUNT(1000)};													//	AH
 		DATASET(PhoneNumberSegment)									phone{MAXCOUNT(100)};														//	PN
 		DATASET(TaxID_SSNSegment)										taxID{MAXCOUNT(100)};														//	TI
 		DATASET(IndividualOwnerLayout)							individualOwner{MAXCOUNT(200)};									//	IS
@@ -450,7 +450,7 @@ EXPORT	Layouts	:=	MODULE
 		AB_Virtual;																																									//	AB
 		DATASET(MA_Virtual)													masterAccount{MAXCOUNT(1)};											//	MA
 		DATASET(AD_Virtual)													address{MAXCOUNT(100)};													//	AD
-		DATASET(AH_Virtual)													history{MAXCOUNT(25)};													//	AH
+		DATASET(AH_Virtual)													history{MAXCOUNT(1000)};													//	AH
 		DATASET(PN_Virtual)													phone{MAXCOUNT(100)};														//	PN
 		DATASET(TI_Virtual)													taxID{MAXCOUNT(100)};														//	TI
 		DATASET(IndividualOwnerLayout_Virtual)			individualOwner{MAXCOUNT(200)};									//	IS

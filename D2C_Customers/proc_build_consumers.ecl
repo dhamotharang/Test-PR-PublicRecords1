@@ -23,11 +23,6 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
    //Get all did cluster with no TS records
    //DOB is blanked out for cluster having TS records ONLY
    notTU := dedup(D2C_Customers.Files.InfutorHdr(1)(src <> 'TS', dob > 0), did, all);
-
-   // relatives := distribute(Relationship.key_relatives_v3(not(confidence IN ['NOISE','LOW'])), hash(did1));
-   //Get all dids which are NOT the primary core dids
-   // notPrimary_dids := join(distribute(ds, hash(did)), relatives, left.did = right.did1, left only, local); //56,740,234
-   // setofNonCoreDids := set(notPrimary_dids, did);
    
    consumers := project(ds, transform(D2C_Customers.layouts.rConsumers,
             self.LexID         := left.did;
@@ -63,7 +58,6 @@ EXPORT proc_build_consumers(unsigned1 mode, string8 ver, string20 customer_name)
    
    inDS := join(distribute(j_w_notTU, hash(LexID)),
                distribute(kRelatives, hash(did1)),
-               // distribute(notTU, hash(did)),
                left.LexID = right.did1,
                transform(left),
                left outer,
