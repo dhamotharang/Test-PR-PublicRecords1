@@ -2,7 +2,7 @@
         LiensV2_Services,LN_PropertyV2_Services, AutoStandardI,
         CriminalRecords_Services, SexOffender_Services,hunting_fishing_services,
         CCW_Services, doxie,VehicleV2_Services,doxie_cbrs, LN_PropertyV2,
-        Gateway, BatchServices, Address, Doxie_Raw, std;
+        Gateway, BatchServices, Address, Doxie_Raw, std, Royalty;
         
 EXPORT Functions := MODULE
 /////////////////////////////////////////////////
@@ -697,9 +697,9 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
   
   gw_out_rec := record   //temporary structure to hold all resulting rows for each request (acct).
     unsigned6 rec_no;
-    dataset(Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse) gw_results {maxcount(batchServices.constants.RealTime.REALTIME_PHONE_LIMIT)};  
+    dataset(Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext) gw_results {maxcount(batchServices.constants.RealTime.REALTIME_PHONE_LIMIT)};  
   end;
-  qsent_out_rec := record(Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse)          //final gtw output layout = t_PhoneplusSearchResponse
+  qsent_out_rec := record(Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext)          //final gtw output layout = t_PhoneplusSearchResponse
    unsigned6 rec_no;                                                                       //with rec_no added
   end;  
   
@@ -719,7 +719,7 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
   end;
   gw_recs := project(rtp_in, getGateway(Left)) ;  
 
-  qsent_out_rec flat_recs(gw_out_rec L, Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse R) := transform
+  qsent_out_rec flat_recs(gw_out_rec L, Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext R) := transform
    self.rec_no             := L.rec_no;
    _dt_first_seen := iesp.ECL2ESP.t_DateToString8(R.RealTimePhone_Ext.ListingCreationDate);
    _dt_last_seen := iesp.ECL2ESP.t_DateToString8(R.RealTimePhone_Ext.ListingTransactionDate);

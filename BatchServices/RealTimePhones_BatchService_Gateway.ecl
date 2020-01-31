@@ -7,7 +7,7 @@ EXPORT RealTimePhones_BatchService_Gateway(dataset(in_layout) f_in,
 																					 BatchServices.RealTimePhones_Params.Params g_mod, string10 searchtype)
 			 := FUNCTION
  
-  gw_rec := Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse;
+  gw_rec := Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext;
 	flat_out := BatchServices.Layouts.RTPhones.rec_output_internal;
 	gw_out_rec := record   //temporary structure to hold all resulting rows for each request (acct).
 	    string20 acctno;
