@@ -721,8 +721,10 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
 
   qsent_out_rec flat_recs(gw_out_rec L, Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse R) := transform
    self.rec_no             := L.rec_no;
-   self.dt_first_seen     := iesp.ECL2ESP.t_DateToString8(R.RealTimePhone_Ext.ListingCreationDate);
-   self.dt_last_seen       := iesp.ECL2ESP.t_DateToString8(R.RealTimePhone_Ext.ListingTransactionDate);
+   _dt_first_seen := iesp.ECL2ESP.t_DateToString8(R.RealTimePhone_Ext.ListingCreationDate);
+   _dt_last_seen := iesp.ECL2ESP.t_DateToString8(R.RealTimePhone_Ext.ListingTransactionDate);
+   self.dt_first_seen := _dt_first_seen;
+   self.dt_last_seen := IF(_dt_last_seen <> '', _dt_last_seen, _dt_first_seen);
    self                   := R; 
   end;
   //flatten results to filter and get hriPhone and timezone
