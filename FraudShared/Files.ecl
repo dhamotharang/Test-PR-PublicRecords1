@@ -12,7 +12,7 @@ module
 	// -- Input File Versions
 	//////////////////////////////////////////////////////////////////
 	export Input := module
-	  tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.Mbs                   ,Layouts.Input.Mbs                    ,Mbs 										, 'CSV'		,,'|\n','|\t|'  	,,,true );
+	  tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.Mbs                   ,Layouts.Input.Mbs                    ,Mbs 										, 'CSV'		,,'|\n','|\t|'  	,,,false );
 	  tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsNewGcIdExclusion   ,Layouts.Input.MbsNewGcIdExclusion    ,MbsNewGcIdExclusion  	, 'CSV'		,,'|\n','|\t|'  	,,,true );
 	  tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsIndTypeExclusion 	,Layouts.Input.MbsIndTypeExclusion    ,MbsIndTypeExclusion  	, 'CSV'		,,'|\n','|\t|'  	,,,true );
 	  tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsProductInclude   	,Layouts.Input.MbsProductInclude      ,MbsProductInclude    	, 'CSV'		,,'|\n','|\t|'   	,,,true );
