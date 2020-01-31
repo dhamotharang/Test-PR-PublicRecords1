@@ -1,5 +1,5 @@
 ﻿Import Dops,Orbit3,std,FraudGovPlatform_Analytics,_control;
-ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor','Thor400_Dev',	'Thor400_44');
+ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor','Thor400_Dev',	'Thor400_36');
 //Refresh ProdDashVersion flag file
 Superfilename					:= FraudGovPlatform.FileNames().Flags.RefreshProdDashVersion;
 Logicalfilename				:= Superfilename +'::'+(STRING8)STD.Date.Today();
