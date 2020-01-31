@@ -298,6 +298,7 @@ layout_flag into_flags(src_recs L, integer C) := transform
             if (L.sanc_cnt != 0, 'SANC', skip), //10
             if (L.prov_cnt != 0, 'PROV',skip),
             if (L.email_cnt !=0, 'EMAIL',skip),
+            if (L.emailv2_cnt !=0, 'EMAIL_V2',skip),
             if (L.veh_cnt != 0, 'VEH', skip),
             if (L.vehv2_cnt != 0, 'VEH_V2', skip),
             if (L.eq_cnt != 0, 'EQ', skip),
@@ -343,7 +344,7 @@ layout_flag into_flags(src_recs L, integer C) := transform
             skip);
 end;
 
-recflags1 := normalize(src_recs,54,into_flags(LEFT,COUNTER));
+recflags1 := normalize(src_recs,55,into_flags(LEFT,COUNTER));
 
 mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(global_mod))
 END;
