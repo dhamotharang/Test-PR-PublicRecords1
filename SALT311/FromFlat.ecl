@@ -24,7 +24,7 @@
 		#END
   #END
   
-  #DECLARE(r) #SET(r,'')
+  #UNIQUENAME(r) #SET(r,'')
   #DECLARE(transformation) #SET(transformation,'PROJECT('+#TEXT(d)+',TRANSFORM('+#TEXT(l)+',\n')
   #EXPORTXML(orig_fields,RECORDOF(d))
   #FOR(orig_fields)
