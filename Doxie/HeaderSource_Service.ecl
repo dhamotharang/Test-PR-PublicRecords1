@@ -235,7 +235,7 @@ TRANSFORM
   self.sanc_child := dedup(SORT(L.sanc_child, -date_last_seen, RECORD), record);
   self.prov_child := dedup(SORT(L.prov_child, RECORD), record);   // no date field to sort by
   self.email_child := dedup(SORT(L.email_child, -latest_orig_login_date, RECORD),record);
-  self.email_v2_child := dedup(SORT(L.email_v2_child,cleaned.emailaddress,-datelastlseen, datefirstseen, -original.logindate),record);
+  self.email_v2_child := dedup(SORT(L.email_v2_child,cleaned.emailaddress,-datelastseen, datefirstseen, -original.logindate),record);
   self.FBNv2_child := dedup(SORT(L.FBNv2_child, -FilingDate, RECORD), record);
   self.DOC_people_child := dedup(SORT(L.DOC_people_child, -case_date, RECORD), record);
   self.DOCv2_child := dedup(SORT(L.DOCv2_child, -CaseFilingDate, RECORD), record);
@@ -280,9 +280,10 @@ foreclosure_table :=normalize(Sections_ddpd, left.for_child,foreclosure_child(ri
 
 Royalty.RoyaltyFares.MAC_SetA(property_table, foreclosure_table, royalties_fares);
 
-royalties_email := Royalty.RoyaltyEmail.GetRoyaltySet(Sections_ddpd.email_v2_child, Source);
+//  email royalties - not reported for now, till further instructions received
+//royalties_email := Royalty.RoyaltyEmail.GetRoyaltySet(Sections_ddpd.email_v2_child, Source);
 
-royalties := royalties_fares + royalties_email;
+royalties := royalties_fares; // + royalties_email;
 
 // =-=-=-=-=-=-=-=-=-=-=-= Occurrences =-=-=-=-=-=-=-=-=-=-=-=
 ds_occur := Doxie_Raw.Occurrence.fromHSS(Sections_ddpd);
