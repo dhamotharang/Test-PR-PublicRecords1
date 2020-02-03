@@ -16,7 +16,7 @@ functionmacro
   
   ecl_text :=    '#workunit(\'name\',\'BIPV2_ProxID._Underlinks @version@\');\n\n'
               + '#workunit(\'priority\',\'high\');\n'
-              + 'BIPV2_ProxID._Underlinks(\'@version@\',pMatchRegex := \'\',pJustSingletons := false);'
+              + 'BIPV2_ProxID._Underlinks(\'@version@\',pMatchRegex := \'\',pJustSingletons := true);'
               ;
                      
   kickbuild := Workman.mac_WorkMan(ecl_text ,version,cluster,1         ,1        ,pBuildName := 'Proxid_Underlinks',pNotifyEmails := pEmailList
