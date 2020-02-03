@@ -35,7 +35,7 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	// When we get the cleaned attributes, then B_InpArchDt will change to B_InpClnArchDt
 	InputPIIBIIAttributes := PublicRecords_KEL.Library.LIB_BusinessInputAttributes_Function(CheckTDSPhone, Prep_RepInput, Options);
 
-	BusinessSeleIDAttributes := PublicRecords_KEL.Library.LIB_BusinessSeleAttributes_Function(CheckTDSPhone, FDCDataset, Options);
+	BusinessSeleIDAttributes := PublicRecords_KEL.Library.LIB_BusinessSeleAttributes_Function(CheckTDSPhone, Prep_RepInput, FDCDataset, Options);
 	
 	withBusinessSeleIDAttributes := JOIN(InputPIIBIIAttributes, BusinessSeleIDAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,

@@ -57,6 +57,7 @@ MODULE
 	export src_BBB_Member                := 'BM';  // Better Business Bureau members
 	export src_BBB_Non_Member            := 'BN';  // Better Business Bureau non-members
 	export src_Best_Business             := 'BB';
+	export src_Best_Person               := 'BP';  // Best Person
 	export src_Business_Credit					 := 'BC';  // SBFE Business Credit
 	export src_Business_Registration     := 'BR';
 	export src_Calbus										 := 'C#';  // California business locator/CA sales & use tax permit holders
@@ -309,6 +310,8 @@ MODULE
 	export src_Lobbyists                 := 'LB';
 	export src_Mari_Prof_Lic		 				 :=	'MP'; // Mortgage Assest Research Institute Professional Licenses
 	export src_Mari_Public_Sanc					 :=	'MQ'; // Mortgage Assest Research Institute Public sanctions
+	export src_Marketing_Relatives_Data  := 'AZ';
+	export src_Relatives_Data 					 := 'RL';
 	export src_Marriage					 				 :=	'MR';
 	export src_MartinDale_Hubbell        := 'MH';
 	export src_MediaOne									 := 'M1';

@@ -53,8 +53,8 @@ EXPORT Fn_AppendBIPIDs_Roxie(
 			SELF.B_LexIDUlt := RIGHT.UltID;
 			SELF.B_LexIDOrg := RIGHT.OrgID;
 			SELF.B_LexIDLegal := RIGHT.SeleID;
-			SELF.B_LexIDSite := RIGHT.ProxID;
-			SELF.B_LexIDLoc := RIGHT.PowID;
+			SELF.B_LexIDSite := RIGHT.PowID;
+			SELF.B_LexIDLoc := RIGHT.ProxID;
 			SELF.B_LexIDLegalScore := RIGHT.SeleScore;
 			SELF.B_LexIDLegalWgt := RIGHT.SeleWeight;
 			SELF := LEFT), 

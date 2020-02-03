@@ -97,11 +97,11 @@ EXPORT Common_Functions := MODULE;
 		
 		BIPV2.IDlayouts.l_xlink_ids2 grabLinkIDs(PublicRecords_KEL.ECL_Functions.Layouts_FDC(PublicRecords_KEL.Interface_Options).Layout_FDC le) := TRANSFORM
 			SELF.UniqueID		:= le.G_ProcBusUID;
-			SELF.PowID			:= le.B_LexIDLoc;
+			SELF.PowID			:= le.B_LexIDSite;
 			SELF.PowScore		:= 0;
 			SELF.PowWeight	:= 0;
 			
-			SELF.ProxID			:= le.B_LexIDSite;
+			SELF.ProxID			:= le.B_LexIDLoc;
 			SELF.ProxScore	:= 0;
 			SELF.ProxWeight	:= 0;
 			
@@ -129,12 +129,25 @@ EXPORT Common_Functions := MODULE;
 		JoinResult := JOIN(RawData, RawShell, LEFT.UltID = RIGHT.B_LexIDUlt AND // UltID should always match
 																					(LEFT.OrgID= RIGHT.B_LexIDOrg OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltIDSet) AND // OrgID should match, OR we were doing an UltID only search
 																					(LEFT.SeleID= RIGHT.B_LexIDLegal OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltOrgIDSet) AND // SeleID should match, OR we were doing an UltID/OrgID only search
-																					(LEFT.ProxID = RIGHT.B_LexIDSite OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltOrgSeleIDSet) AND // ProxID should match, OR we were doing an UltID/OrgID/SeleID/Default only search
-																					(LEFT.PowID = RIGHT.B_LexIDLoc OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltOrgSeleProxIDSet), // PowID should match, OR we were doing an UltID/OrgID/SeleID/Default/ProxID only search
+																					(LEFT.ProxID = RIGHT.B_LexIDLoc OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltOrgSeleIDSet) AND // ProxID should match, OR we were doing an UltID/OrgID/SeleID/Default only search
+																					(LEFT.PowID = RIGHT.B_LexIDSite OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltOrgSeleProxIDSet), // PowID should match, OR we were doing an UltID/OrgID/SeleID/Default/ProxID only search
 									TRANSFORM({RECORDOF(LEFT), UNSIGNED4 UniqueID}, 
 											SELF.UniqueID := RIGHT.G_ProcBusUID; 
 											SELF := LEFT), 
 									FEW); // Can use FEW because the RIGHT side should contain < 10000 rows (100 only average in batch)
 	ENDMACRO;		
-	
+
+	EXPORT AppendSeqAndLexID (RawData, RawShell, JoinResult, LinkSearchLevel) := MACRO
+		JoinResult := JOIN(RawData, RawShell, LEFT.Contact_DID = RIGHT.P_LexID AND
+																					LEFT.UltID = RIGHT.B_LexIDUlt AND // UltID should always match
+																					(LEFT.OrgID= RIGHT.B_LexIDOrg OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltIDSet) AND // OrgID should match, OR we were doing an UltID only search
+																					(LEFT.SeleID= RIGHT.B_LexIDLegal OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltOrgIDSet) AND // SeleID should match, OR we were doing an UltID/OrgID only search
+																					(LEFT.ProxID = RIGHT.B_LexIDLoc OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltOrgSeleIDSet) AND // ProxID should match, OR we were doing an UltID/OrgID/SeleID/Default only search
+																					(LEFT.PowID = RIGHT.B_LexIDSite OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltOrgSeleProxIDSet), // PowID should match, OR we were doing an UltID/OrgID/SeleID/Default/ProxID only search
+									TRANSFORM({RECORDOF(LEFT), UNSIGNED4 UniqueID /*, INTEGER7 P_LexID*/}, 
+											SELF.UniqueID := RIGHT.UIDAppend; 
+											// SELF.P_LexID := RIGHT.P_LexID;
+											SELF := LEFT), 
+									FEW); // Can use FEW because the RIGHT side should contain < 10000 rows (100 only average in batch)
+	ENDMACRO;		
 END;	
