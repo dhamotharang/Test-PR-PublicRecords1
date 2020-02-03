@@ -18,8 +18,25 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Figure out if the kFetch was successful
 	kFetchErrorCodes := Business_Risk_BIP.Common.GrabFetchErrorCode(PropertySeq);
 	
-	// Filter out records after our history date
-	Property := Business_Risk_BIP.Common.FilterRecords(PropertySeq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_LnPropV2_Fares_Asrs, AllowedSourcesSet);
+	// Filter out records after our history date. Set sourceCode to null string for FilterRecords so all Property 
+	// records return whether Marketing restriction is indicated or not.
+	Property_pre := Business_Risk_BIP.Common.FilterRecords(PropertySeq, dt_first_seen, dt_vendor_first_reported, '', AllowedSourcesSet);
+
+	// Under the most recent definition for source codes that are allowed for Marketing purposes, all Property
+	// are ALLOWED with the exception of the following states ['ID','IL','KS','NM','SC','WA', ''] when they are
+	// in records whose src type is src_LnPropV2_Lexis_Asrs or src_LnPropV2_Lexis_Deeds_Mtgs (i.e. 'LA','LP').
+	Property_with_src := 
+		PROJECT(
+			Property_pre,
+			TRANSFORM( { RECORDOF(Property_pre), STRING src },
+				SELF.src := MDR.SourceTools.fProperty(LEFT.ln_fares_id),
+				SELF := LEFT
+			)
+		);
+	
+	Property := IF( Options.MarketingMode = 1,
+			Property_with_src(src IN AllowedSourcesSet AND Business_Risk_BIP.Common.isMarketingAllowedProperty(src, st)),
+			Property_with_src);
 	
 	PropertyWithBest := JOIN(DEDUP(SORT(Property, Seq, LN_Fares_ID), Seq, LN_Fares_ID), Shell, LEFT.Seq = RIGHT.Seq,
 															TRANSFORM({RECORDOF(LEFT), BOOLEAN AddrIsBest},
@@ -196,7 +213,7 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
 			 Source := CASE(LN_Fares_ID[2],
 											'A' => MDR.SourceTools.src_LnPropV2_Fares_Asrs,
-											'D' => IF (Options.BusShellVersion	>= 31 AND Options.MarketingMode = 1,'',MDR.SourceTools.src_LnPropV2_Fares_Deeds),
+											'D' => MDR.SourceTools.src_LnPropV2_Fares_Deeds,
 														 '');
 			 STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
 			 STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_vendor_first_reported, HistoryDate),
@@ -212,7 +229,6 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		UNSIGNED4 Seq;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) Sources;
 	END;
-  
 	PropertyStatsTemp := PROJECT(PropertyStats, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
 																				SELF.Sources := DATASET([{LEFT.Source, 
@@ -221,8 +237,7 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																	LEFT.DateLastSeen,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources)));
-  
-  PropertyStatsRolled := ROLLUP(PropertyStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.Sources := LEFT.Sources + RIGHT.Sources));
+	PropertyStatsRolled := ROLLUP(PropertyStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.Sources := LEFT.Sources + RIGHT.Sources));
 	
 	withProperty := JOIN(Shell, PropertyStatsRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
