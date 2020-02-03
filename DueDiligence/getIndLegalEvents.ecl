@@ -33,8 +33,15 @@ EXPORT getIndLegalEvents(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := 
     allRelatedParties := JOIN(relatedParty, sexOffender,
                               LEFT.did = RIGHT.did,
                               TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
-                                        SELF.seq := LEFT.seq;
-                                        SELF := RIGHT;),
+                                        SELF.party.legalEventTypeScore := RIGHT.party.legalEventTypeScore;
+                                        SELF.party.legalEventTypeFlags := RIGHT.party.legalEventTypeFlags;
+                                        SELF.party.stateCriminalLegalEventsScore := RIGHT.party.stateCriminalLegalEventsScore;
+                                        SELF.party.stateCriminalLegalEventsFlags := RIGHT.party.stateCriminalLegalEventsFlags;
+                                        SELF.party.indoffenses := RIGHT.party.indoffenses;
+                                        
+                                        SELF.potentialSO := RIGHT.potentialSO;
+                                        
+                                        SELF := LEFT;),
                               LEFT OUTER,
                               ATMOST(1));
     
