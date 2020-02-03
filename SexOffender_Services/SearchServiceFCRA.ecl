@@ -5,19 +5,19 @@
   <part name="GLBPurpose"          type="xsd:byte" default="1"/>
   <part name="DPPAPurpose"         type="xsd:byte" default="1"/>
   <part name="FCRAPurpose"         type="xsd:string"/>
-  <part name="SSNMask"               type="xsd:string"/>
+  <part name="SSNMask"             type="xsd:string"/>
   <part name="MaxWaitSeconds"      type="xsd:integer"/>
   <part name="ApplicationType"     type="xsd:string"/>
   
   <!-- SEARCH FIELDS -->
-  <part name="SSN"                  type="xsd:string"/>
+  <part name="SSN"                 type="xsd:string"/>
   <part name="DOB"                 type="xsd:string"/>
   
   <part name="UnParsedFullName"    type="xsd:string"/>
   <part name="FirstName"           type="xsd:string"/>
   <part name="MiddleName"          type="xsd:string"/>
   <part name="LastName"            type="xsd:string"/>
-  <part name="NameSuffix"           type="xsd:string"/>
+  <part name="NameSuffix"          type="xsd:string"/>
   
   <part name="prim_range"          type="xsd:string"/>
   <part name="predir"              type="xsd:string"/>
@@ -39,15 +39,15 @@
 
   <!-- Search request options -->
   <part name="ReturnCount"                  type="xsd:unsignedInt"/>
-  <part name="StartingRecord"                type="xsd:unsignedInt"/>
+  <part name="StartingRecord"               type="xsd:unsignedInt"/>
   <part name="IncludeRegisteredAddresses"   type="xsd:boolean"/>
   <part name="IncludeUnRegisteredAddresses" type="xsd:boolean"/>
   <part name="IncludeHistoricalAddresses"   type="xsd:boolean"/>
   <part name="IncludeAssociatedAddresses"   type="xsd:boolean"/>
-  <part name="IncludeOffenses"               type="xsd:boolean"/>
+  <part name="IncludeOffenses"              type="xsd:boolean"/>
   <part name="IncludeBestAddress"           type="xsd:boolean"/>
   <part name="IncludeWeAlsoFound"           type="xsd:boolean"/>
-  <part name="SearchAroundAddress"           type="xsd:boolean"/>
+  <part name="SearchAroundAddress"          type="xsd:boolean"/>
   
   <!-- Alert related options -->
   <part name="ReturnHashes" type="xsd:boolean"/>
@@ -62,7 +62,7 @@
 */
 /*--INFO-- Search and return Sexual Offender information.*/
 
-import AutoStandardI, iesp, ut, Address, FFD;
+import AutoStandardI, iesp, ut, Address, FFD, STD;
 
 export SearchServiceFCRA := macro
 
@@ -110,24 +110,26 @@ export SearchServiceFCRA := macro
   rdid := res_esdl[1].Records[1].UniqueId;
   
   input_params := AutoStandardI.GlobalModule(isFCRA);
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
+
   tempmod := module(project(input_params,SexOffender_Services.IParam.search,opt));
-     // Store soap/xml input fields unique to SexOffender SearchService into unique 
-     // attribute names to be passed into SexOffender_Services.Search_Records, etc.
-     export boolean include_regaddrs     := false : stored('IncludeRegisteredAddresses');
-     export boolean include_unregaddrs   := false : stored('IncludeUnregisteredAddresses');
-     export boolean include_histaddrs    := false : stored('IncludeHistoricalAddresses');
-     export boolean include_assocaddrs   := false : stored('IncludeAssociatedAddresses');
-     export boolean include_offenses     := false : stored('IncludeOffenses');
-     export boolean include_bestaddress := false : stored('IncludeBestAddress');
-     export boolean include_wealsofound := false : stored('IncludeWeAlsoFound');
-     export STRING  offenseCategory     := '' : stored('OffenseCategory');
-     string smt                          := '' : stored('ScarsMarksTattoos');
-     export STRING  SmtWords             := stringlib.stringtouppercase(smt);
-     EXPORT string14 did                 := rdid;
-     export string32 ApplicationType     := AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
-     export boolean zip_only_search := false;   
-     export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
-     export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
+    doxie.compliance.MAC_CopyModAccessValues(mod_access);
+    // Store soap/xml input fields unique to SexOffender SearchService into unique 
+    // attribute names to be passed into SexOffender_Services.Search_Records, etc.
+    export boolean include_regaddrs     := false : stored('IncludeRegisteredAddresses');
+    export boolean include_unregaddrs   := false : stored('IncludeUnregisteredAddresses');
+    export boolean include_histaddrs    := false : stored('IncludeHistoricalAddresses');
+    export boolean include_assocaddrs   := false : stored('IncludeAssociatedAddresses');
+    export boolean include_offenses     := false : stored('IncludeOffenses');
+    export boolean include_bestaddress  := false : stored('IncludeBestAddress');
+    export boolean include_wealsofound  := false : stored('IncludeWeAlsoFound');
+    export STRING  offenseCategory      := '' : stored('OffenseCategory');
+    string smt                          := '' : stored('ScarsMarksTattoos');
+    export STRING  SmtWords             := STD.Str.ToUpperCase(smt);
+    EXPORT string14 did                 := rdid;
+    export boolean zip_only_search := false;   
+    export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
+    export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
   end;
   tempresults := SexOffender_Services.Search_Records.fcra_val(tempmod);
 

@@ -186,6 +186,7 @@ Doxie_Raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     ds_doc_events_child := if(viewDOC(fileL.section),Doxie_Raw.DOC_Events_Raw(doc_persons,true,true,true,true,true,,,,mod_access.date_threshold,mod_access.dppa,mod_access.glb));
     // same as in doxie@Comprehensive_Report_Service
     tempmod := module(project(global_mod,CriminalRecords_Services.IParam.report,opt))
+      doxie.compliance.MAC_CopyModAccessValues(mod_access);    
       export string14 did := input[1].id;
       export string25   doc_number   := '' ;
       export string60   offender_key := '' ;

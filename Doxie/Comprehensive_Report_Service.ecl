@@ -210,11 +210,12 @@ gateways := project(gateways_in, gw_switch(left));
 if( OFACversion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 doxie.MAC_Header_Field_Declare();
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 doxie.MAC_Selection_Declare();
 
   // use non-remote header data; non-fcra;
   dids := doxie.get_dids();
-  ds_header := doxie.central_header (dids, false, false, in_getSSNBest);
+  ds_header := doxie.central_header (dids, false, false, in_getSSNBest); //TODO: pass mod_access
   cent := doxie.central_records (false, 'D', ds_header);
 
 //pick up the distributed records
@@ -242,6 +243,7 @@ progressivePhones := if (IncludeProgressivePhone, doxie.fn_progressivePhone.Comp
 // comment                                                                                                                                                                                         from doxie.MAC_Header_Field_Declare above
 global_mod := AutoStandardI.GlobalModule();
 tempmod := module(project(global_mod,CriminalRecords_Services.IParam.report,opt))
+    doxie.compliance.MAC_CopyModAccessValues(mod_access);
     export string14 did := (string) dids[1].did;
     export string25 doc_number   := '' ;
     export string60 offender_key := '' ;
@@ -346,9 +348,7 @@ end;
 
 recflags1 := normalize(src_recs,55,into_flags(LEFT,COUNTER));
 
-mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(global_mod))
-END;
-header_recs := Doxie_Raw.Header_Raw(dids, mod_access);
+header_recs := Doxie_Raw.Header_Raw(dids, mod_access); 
 
 layout_flag into_flags2(header_recs L, integer C) := transform
   self.field_present := choose(C,
