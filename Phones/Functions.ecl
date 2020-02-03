@@ -73,7 +73,7 @@ MODULE
 		     OR (src = MDR.sourceTools.src_TU_CreditHeader and data_restriction_mask[10] not in ['0',''])
  		    OR (src = MDR.sourceTools.src_InquiryAcclogs  and data_restriction_mask[16] not in ['0',''])
           OR(src in D2C.Constants.PhonesPlusV2RestrictedSources and is_CNSMR)
-          OR((Not Doxie.compliance.isMarketingAllowed(src,state)) and  Doxie.compliance.isDirectMarketing(industry_class));
+          OR(Doxie.compliance.isDirectMarketing(industry_class) and (Not Doxie.compliance.isMarketingAllowed(src,state)));
       //end of filters
 
 		// remove restricted sources from the dataset of all sources

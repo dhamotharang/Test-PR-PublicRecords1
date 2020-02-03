@@ -42,10 +42,27 @@
 */
 
 export RAN_BestInfo_Batch_Service := macro
-import didville;
+import didville,Doxie;
   //get input
   f_in_raw := dataset([],DidVille.Layout_RAN_BestInfo_BatchIn) : stored('batch_in',few);
-  recs :=  DidVille.RAN_BestInfo_Batch_Service_Records(f_in_raw);
+  unsigned4 ProfileBoosterRelatives := 0 : stored('ProfileBoosterMaxRelatives'); // Profile Booster relatives count - to limit fetching profile booster attributes for Relatives
+  unsigned4 ProfileBoosterAssociates := 0 : stored('ProfileBoosterMaxAssociates'); // Profile Booster Associates count - to limit fetching profile booster attributes for Associates
+  unsigned4 ProfileBoosterNeighbors := 0 : stored('ProfileBoosterMaxNeighbors');// Profile Booster Neighbors count - to limit fetching profile booster attributes for Neighbors
+  boolean IncludeProfileBooster := false : stored('IncludeProfileBooster');
+
+  MAP(IncludeProfileBooster AND (ProfileBoosterNeighbors) > 6 => FAIL(303, Doxie.ErrorCodes(303)+':'+' Neighbors count exceeds 6'),
+      IncludeProfileBooster AND (ProfileBoosterRelatives + ProfileBoosterAssociates + ProfileBoosterNeighbors) > 10 =>
+                FAIL(303,Doxie.ErrorCodes(303)+':'+' Relatives, Associates and Neighbors total count exceeds 10'));
+
+  // check if all input counts for profile booster blank and apply default values
+  useDefaultPBCounts := ProfileBoosterRelatives = 0 AND ProfileBoosterAssociates = 0 AND ProfileBoosterNeighbors = 0;
+  RelativesCount := IF(useDefaultPBCounts,4,ProfileBoosterRelatives);
+  AssociatesCount := IF(useDefaultPBCounts,4,ProfileBoosterAssociates);
+  NeighborsCount := IF(useDefaultPBCounts,2,ProfileBoosterNeighbors);
+
+  recs :=  DidVille.RAN_BestInfo_Batch_Service_Records(f_in_raw,PbRelativesCount := RelativesCount,
+                                                                PbAssociatesCount := AssociatesCount,
+                                                                PbNeighborsCount := NeighborsCount);
   Results := project(recs, transform(recordof(recs) - input_addr_matched_rel - input_addr_name_matched_rel, self := LEFT));
   OUTPUT(Results, NAMED('Results'));
 
