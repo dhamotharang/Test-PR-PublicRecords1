@@ -1,13 +1,13 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+﻿//HPCC Systems KEL Compiler Version 1.1.0
 IMPORT KEL11 AS KEL;
 IMPORT B_Input_B_I_I_6,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL11.Null;
 EXPORT B_Input_B_I_I_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_B_I_I_6(__in,__cfg).__ENH_Input_B_I_I_6) __ENH_Input_B_I_I_6 := B_Input_B_I_I_6(__in,__cfg).__ENH_Input_B_I_I_6;
-  SHARED __EE131355 := __ENH_Input_B_I_I_6;
-  EXPORT __ST94229_Layout := RECORD
+  SHARED __EE166771 := __ENH_Input_B_I_I_6;
+  EXPORT __ST107298_Layout := RECORD
     KEL.typ.nuid UID;
-    KEL.typ.ntyp(E_Business_Sele().Typ) Company_;
+    KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
     KEL.typ.nint B___Inp_Lex_I_D_Ult_;
     KEL.typ.nint B___Inp_Lex_I_D_Org_;
@@ -74,12 +74,14 @@ EXPORT B_Input_B_I_I_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nbool City_State_Zip_Not_Populated_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST94229_Layout __ND131353__Project(B_Input_B_I_I_6(__in,__cfg).__ST95420_Layout __PP131011) := TRANSFORM
-    SELF.Addr_Not_Populated_ := FN_Compile(__cfg).FN_Is_Not_Enough_To_Clean(__ECAST(KEL.typ.nstr,__PP131011.B___Inp_Addr_));
-    SELF.City_State_Zip_Not_Populated_ := FN_Compile(__cfg).FN_City_State_Zip_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP131011.B___Inp_Addr_City_),__ECAST(KEL.typ.nstr,__PP131011.B___Inp_Addr_State_),__ECAST(KEL.typ.nstr,__PP131011.B___Inp_Addr_Zip_));
-    SELF := __PP131011;
+  SHARED __ST107298_Layout __ND166769__Project(B_Input_B_I_I_6(__in,__cfg).__ST108587_Layout __PP166427) := TRANSFORM
+    SELF.Addr_Not_Populated_ := FN_Compile(__cfg).FN_Is_Not_Enough_To_Clean(__ECAST(KEL.typ.nstr,__PP166427.B___Inp_Addr_));
+    SELF.City_State_Zip_Not_Populated_ := FN_Compile(__cfg).FN_City_State_Zip_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP166427.B___Inp_Addr_City_),__ECAST(KEL.typ.nstr,__PP166427.B___Inp_Addr_State_),__ECAST(KEL.typ.nstr,__PP166427.B___Inp_Addr_Zip_));
+    SELF := __PP166427;
   END;
-  EXPORT __ENH_Input_B_I_I_5 := PROJECT(__EE131355,__ND131353__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_5 := PROJECT(__EE166771,__ND166769__Project(LEFT));
 END;

@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+//HPCC Systems KEL Compiler Version 1.1.0
 IMPORT KEL11 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT * FROM KEL11.Null;
@@ -70,8 +70,8 @@ EXPORT CFG_Compile := MODULE, VIRTUAL
   EXPORT UNSIGNED8 Permit_WatchdogExperianRestricted := 0x800000000000000;
   EXPORT UNSIGNED8 Permit_WatchdogNonRestricted := 0x1000000000000000;
   EXPORT UNSIGNED8 Permit_WatchdogPreGLBA := 0x2000000000000000;
-  EXPORT UNSIGNED8 Permit_Unassigned2 := 0x4000000000000000;
-  EXPORT UNSIGNED8 Permit_Unassigned1 := 0x8000000000000000;
+  EXPORT UNSIGNED8 Permit_MarketingRelatives := 0x4000000000000000;
+  EXPORT UNSIGNED8 Permit_NonMarketingRelatives := 0x8000000000000000;
   // **** These definitions may be overridden as needed ****;
   // Override to set the date to use for CURRENTDATE;
   EXPORT KEL.typ.kdate CurrentDate := KEL.Routines.Today();

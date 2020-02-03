@@ -2,6 +2,7 @@
 IMPORT KEL11 AS KEL;
 
 EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) InputData,
+			DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput,
 			DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC().Layout_FDC) FDCDataset,
 			PublicRecords_KEL.Interface_Options Options) := FUNCTION
 
@@ -10,7 +11,7 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 	RecordsWithSeleID := InputData(B_LexIDLegal > 0);
 	RecordsWithoutSeleID := InputData(B_LexIDLegal <= 0);
 	
-	BusinessSeleIDAttributesRaw := KEL.Clean(PublicRecords_KEL.Library.LIB_NonFCRA_BusinessSeleAttributes_Function(RecordsWithSeleID, FDCDataset, Options), TRUE, TRUE, TRUE);
+	BusinessSeleIDAttributesRaw := KEL.Clean(PublicRecords_KEL.Library.LIB_NonFCRA_BusinessSeleAttributes_Function(RecordsWithSeleID, RepInput, FDCDataset, Options), TRUE, TRUE, TRUE);
 
 	BusinessSeleIDNoDatesAttributesRaw := KEL.Clean(PublicRecords_KEL.Library.LIB_NonFCRA_BusinessSeleAttributes_NoDates_Function(RecordsWithSeleID, FDCDataset, Options), TRUE, TRUE, TRUE);
 	
@@ -19,10 +20,10 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			ResultsFound := RIGHT.B_LexIDLegal > 0 AND RIGHT.B_LexIDLegalSeenFlag = '1';
 			SELF.G_BuildBusHdrDt := Risk_Indicators.get_build_date('bip_build_version');
 			SELF.B_LexIDLegalSeenFlag := IF(ResultsFound, RIGHT.B_LexIDLegalSeenFlag, '0');
-			BE_VerSrcList_Sorted := SORT(RIGHT.BE_VerSrcList, SourceDateFirstSeen = 0, SourceDateFirstSeen, SourceDateLastSeen = 0, SourceDateLastSeen, TranslatedSourceCode);
-			SELF.BE_VerSrcList := IF(ResultsFound, PublicRecords_KEL.ECL_Functions.Common_Functions.roll_list(BE_VerSrcList_Sorted, TranslatedSourceCode, '|'), PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.BE_VerSrcEmrgDtList := IF(ResultsFound, PublicRecords_KEL.ECL_Functions.Common_Functions.roll_list(BE_VerSrcList_Sorted, SourceDateFirstSeen, '|'), PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.BE_VerSrcLastDtList := IF(ResultsFound, PublicRecords_KEL.ECL_Functions.Common_Functions.roll_list(BE_VerSrcList_Sorted, SourceDateLastSeen, '|'), PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			BE_VerSrcListEv_Sorted  := SORT(RIGHT.BE_VerSrcListEv, SourceDateFirstSeen = 0, SourceDateFirstSeen, SourceDateLastSeen = 0, SourceDateLastSeen, TranslatedSourceCode);
+			SELF.BE_VerSrcListEv := IF(ResultsFound, PublicRecords_KEL.ECL_Functions.Common_Functions.roll_list(BE_VerSrcListEv_Sorted, TranslatedSourceCode, '|'), PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_VerSrcEmrgDtListEv := IF(ResultsFound, PublicRecords_KEL.ECL_Functions.Common_Functions.roll_list(BE_VerSrcListEv_Sorted, SourceDateFirstSeen, '|'), PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_VerSrcLastDtListEv := IF(ResultsFound, PublicRecords_KEL.ECL_Functions.Common_Functions.roll_list(BE_VerSrcListEv_Sorted, SourceDateLastSeen, '|'), PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			//Tradeline Attributes		
 			SELF.G_BuildB2BDt := Risk_Indicators.get_Build_date('cortera_build_version');
 			SELF.BE_B2BCntEv := IF(ResultsFound, RIGHT.BE_B2BCntEv,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
@@ -225,7 +226,26 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_DrgBkCh11Cnt10Y := IF(ResultsFound, RIGHT.BE_DrgBkCh11Cnt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_DrgBkCh13Cnt10Y := IF(ResultsFound, RIGHT.BE_DrgBkCh13Cnt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_DrgBkNewChType10Y := IF(ResultsFound, RIGHT.BE_DrgBkNewChType10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			
+			//Sos Build Date//			
+			SELF.G_BuildSOSDt := Risk_Indicators.get_build_date('Corp_build_version');
+			SELF.BE_SOSCntEv := IF(ResultsFound, RIGHT.BE_SOSCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_SOSNewDtEv := IF(ResultsFound, RIGHT.BE_SOSNewDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_SOSOldDtEv := IF(ResultsFound, RIGHT.BE_SOSOldDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+      SELF.BE_SOSNewMsncEv := IF(ResultsFound, RIGHT.BE_SOSNewMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+      SELF.BE_SOSOldMsncEv := IF(ResultsFound, RIGHT.BE_SOSOldMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_SOSStateCntEv := IF(ResultsFound, RIGHT.BE_SOSStateCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_SOSDomCntEv := IF(ResultsFound, RIGHT.BE_SOSDomCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_SOSDomNewDtEv := IF(ResultsFound, RIGHT.BE_SOSDomNewDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_SOSDomOldDtEv := IF(ResultsFound, RIGHT.BE_SOSDomOldDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_SOSDomNewMsncEv := IF(ResultsFound, RIGHT.BE_SOSDomNewMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_SOSDomOldMsncEv := IF(ResultsFound, RIGHT.BE_SOSDomOldMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_SOSFrgnCntEv := IF(ResultsFound, RIGHT.BE_SOSFrgnCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_SOSFrgnNewDtEv := IF(ResultsFound, RIGHT.BE_SOSFrgnNewDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_SOSFrgnOldDtEv := IF(ResultsFound, RIGHT.BE_SOSFrgnOldDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_SOSFrgnNewMsncEv := IF(ResultsFound, RIGHT.BE_SOSFrgnNewMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_SOSFrgnOldMsncEv := IF(ResultsFound, RIGHT.BE_SOSFrgnOldMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			//LeinJudgment Build Date//			
+			SELF.G_BuildDrgLnJDt := Risk_Indicators.get_build_date('liens_build_version');
 			SELF := LEFT,
 			SELF := [];
 		),LEFT OUTER, KEEP(1));
@@ -246,9 +266,9 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			// Attributes from NonFCRABusinessSeleIDAttributesV1 KEL query
 			SELF.G_BuildBusHdrDt := Risk_Indicators.get_build_date('bip_build_version');
 			SELF.B_LexIDLegalSeenFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_VerSrcList := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_VerSrcEmrgDtList := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_VerSrcLastDtList :=  PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_VerSrcListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_VerSrcEmrgDtListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_VerSrcLastDtListEv :=  PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			//Tradeline Attributes No ID
 			SELF.G_BuildB2BDt := Risk_Indicators.get_Build_date('cortera_build_version');
 			SELF.BE_B2BCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -451,7 +471,27 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_DrgBkCh11Cnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_DrgBkCh13Cnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_DrgBkNewChType10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			
+			//SOS Build Date//			
+			SELF.G_BuildSOSDt := Risk_Indicators.get_build_date('Corp_build_version');
+			SELF.BE_SOSCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_SOSNewDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_SOSOldDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_SOSNewMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_SOSOldMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_SOSStateCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_SOSDomCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_SOSDomNewDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_SOSDomOldDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_SOSDomNewMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_SOSDomOldMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_SOSFrgnCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_SOSFrgnNewDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_SOSFrgnOldDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BE_SOSFrgnNewMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BE_SOSFrgnOldMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			//LeinJudgment Build Date//			
+			SELF.G_BuildDrgLnJDt := Risk_Indicators.get_build_date('liens_build_version');
+
 			// Attribute from NonFCRABusinessSeleIDNoDatesAttributesV1 KEL query
 			SELF.B_LexIDLegalRstdOnlyFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF := LEFT));
