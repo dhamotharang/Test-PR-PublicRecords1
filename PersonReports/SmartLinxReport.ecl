@@ -1,7 +1,7 @@
 ﻿// Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
 IMPORT $, Foreclosure_Services, PersonReports, doxie, doxie_crs, ATF_Services, iesp,
       AutoStandardI, ut, American_Student_Services, dx_header,
-      SmartRollup, FCRA, LN_PropertyV2_Services, Royalty;
+      SmartRollup, FCRA, LN_PropertyV2_Services, Royalty, STD;
 
 iespOut := iesp.smartlinxreport;
 out_rec := record(iespOut.t_SmartlinxReportIndividual)
@@ -13,8 +13,6 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
                                 PersonReports.IParam._smartlinxreport mod_smartlinx,
                                 boolean IsFCRA = false) := FUNCTION
 
-  //this will be gone after all interfaces extend IDataAccess
-  old_param := $.IParam.ConvertToOldSmartLinx(mod_smartlinx);
   mod_access := PROJECT (mod_smartlinx, doxie.IDataAccess);
 
   globals := AutoStandardI.GlobalModule();
@@ -162,7 +160,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   prov      := IF (mod_smartlinx.include_proflicenses and count(prov_recs) <= iesp.constants.SMART.MaxUnRolledRecords, prov_recs,dataset([],iesp.proflicense.t_ProviderRecord));
   s_profSancProv := SmartRollup.fn_smart_rollup_prof_lic(prof,prov,sanc);
   s_profSancProv_count := count(s_profSancProv);
-   p_profSancProv := choosen (if (mod_smartlinx.Smart_rollup, s_profSancProv, dataset([],iesp.smartlinxreport.t_SLRProfLicenseAndSanctionAndProvider)), iesp.constants.SMART.MaxProfLic);
+  p_profSancProv := choosen (if (mod_smartlinx.Smart_rollup, s_profSancProv, dataset([],iesp.smartlinxreport.t_SLRProfLicenseAndSanctionAndProvider)), iesp.constants.SMART.MaxProfLic);
 
   aMod := module(project (globals,ATF_Services.IParam.search_params,opt))
     export string14 did := (string)subject_did;
@@ -324,13 +322,13 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
                                 project(uccs,transform(iesp.smartlinxreport.t_SLRUcc, self := left, self := []))),
                             iesp.constants.SMART.MaxUCCs);
 
-  crim          := IF (mod_smartlinx.include_crimrecords, PersonReports.criminal_records  (dids, module (project (old_param, PersonReports.input.criminal)) end, IsFCRA),dataset([],iesp.criminal.t_CrimReportRecord));
+  crim          := IF (mod_smartlinx.include_crimrecords, PersonReports.criminal_records  (dids, PROJECT (mod_smartlinx, $.IParam.criminal), IsFCRA),dataset([],iesp.criminal.t_CrimReportRecord));
   p_crim        := choosen(crim,iesp.constants.SMART.MaxCrimRecords);
-  p_crim_doc_count := count(p_crim(stringlib.stringToUppercase(Datasource)=iesp.Constants.SMART.DOC));
-  p_crim_arrest_count := count(p_crim(stringlib.stringToUppercase(Datasource)=iesp.Constants.SMART.ARRESTLOG));
-  p_crim_crim_count := count(p_crim(stringlib.stringToUppercase(Datasource)=iesp.Constants.SMART.CRIMINALCOURT));
+  p_crim_doc_count := count(p_crim(STD.Str.ToUppercase(Datasource)=iesp.Constants.SMART.DOC));
+  p_crim_arrest_count := count(p_crim(STD.Str.ToUppercase(Datasource)=iesp.Constants.SMART.ARRESTLOG));
+  p_crim_crim_count := count(p_crim(STD.Str.ToUppercase(Datasource)=iesp.Constants.SMART.CRIMINALCOURT));
 
-  sexoff        := IF (mod_smartlinx.include_sexualoffences, PersonReports.sexoffenses_records  (dids, module (project (old_param, PersonReports.input.sexoffenses)) end, IsFCRA),dataset([],iesp.sexualoffender.t_SexOffReportRecord));
+  sexoff        := IF (mod_smartlinx.include_sexualoffences, PersonReports.sexoffenses_records  (dids, PROJECT (mod_smartlinx, $.IParam.sexoffenses), IsFCRA),dataset([],iesp.sexualoffender.t_SexOffReportRecord));
   p_sexOff      := choosen(sexoff,iesp.constants.SMART.MaxSexualOffenses);
   p_sexOff_count := count(p_sexOff);
 //ASSOCIATIONS
