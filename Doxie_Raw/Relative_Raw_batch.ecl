@@ -2,7 +2,7 @@ import ut, doxie, doxie_Raw, Relationship;
 
 inrec := doxie_Raw.Layout_RelativeRawBatchInput;
 outrec := inrec;
-relativeLayout := Relationship.layout_GetRelationship.InterfaceOuput;
+relativeLayout := Relationship.layout_GetRelationship.InterfaceOutput_new;
 
 export Relative_Raw_batch(
   grouped dataset(inrec) inputs, // by sequence
@@ -81,7 +81,7 @@ Relkey := MAP(mod_access.isDirectMarketing() => Relationship.constants.RelKeyFla
               mod_access.isConsumer() => Relationship.constants.RelKeyFlag.D2C,
               '');
 
-rel_1_pre := Relationship.proc_GetRelationship(rel_dids,
+rel_1_pre_neutral := Relationship.proc_GetRelationshipNeutral(rel_dids,
   RelativeFlag:=TRUE,
   AssociateFlag:=TRUE,
   MaxCount:=Doxie_Raw.Constants.RelativeAssociate_Limit, // Increased limit since relatives and associates are returned together
@@ -91,6 +91,8 @@ rel_1_pre := Relationship.proc_GetRelationship(rel_dids,
   RelLookbackMonths:=relMod.relationship_relLookbackMonths,
   txflag:=Relationship.Functions.getTransAssocFlgs(relMod.relationship_transAssocMask),
   RelKeyFlag := Relkey).result;
+
+rel_1_pre := Relationship.Functions_getRelationship.convertNeutralToFlat_new(rel_1_pre_neutral);
 
 assoc_1_us := join(dids,rel_1_pre,
                     (unsigned6)left.input.did = right.did1 and not right.isRelative,
@@ -124,7 +126,7 @@ relas_1_look_for_more := HAVING(relas_1(input_Relative_Depth > 1 and isRelative)
 
 sgen_dids := ungroup(project(relas_1_look_for_more,transform(Relationship.Layout_GetRelationship.DIDs_layout,self.did := left.person2)));
 
-relas_2_rels := Relationship.proc_GetRelationship(sgen_dids,
+relas_2_rels_neutral := Relationship.proc_GetRelationshipNeutral(sgen_dids,
   RelativeFlag:=TRUE,
   AssociateFlag:=TRUE,
   MaxCount:=Doxie_Raw.Constants.RelativeAssociate_Limit,  // Increased limit since relatives and associates are returned together
@@ -134,6 +136,9 @@ relas_2_rels := Relationship.proc_GetRelationship(sgen_dids,
   RelLookbackMonths:=relMod.relationship_relLookbackMonths,
   txflag:=Relationship.Functions.getTransAssocFlgs(relMod.relationship_transAssocMask),
   RelKeyFlag := Relkey).result;
+
+relas_2_rels := Relationship.Functions_getRelationship.convertNeutralToFlat_new(relas_2_rels_neutral);
+
 relas_2_pre := JOIN(relas_1_look_for_more,relas_2_rels,
                     left.person2 = right.did1 and right.isRelative,
                     take_rr(left, right, 2),
@@ -161,7 +166,7 @@ relas_2_look_for_more := HAVING(relas_2_grpd(input_Relative_Depth > 2 and isRela
 // ----------[ All the third generation relatives ]----------
 tgen_dids := ungroup(project(relas_2_look_for_more,transform(Relationship.Layout_GetRelationship.DIDs_layout,self.did := left.person2)));
 // Proc params set to only return relatives and not associates.
-relas_3_rels := Relationship.proc_GetRelationship(tgen_dids,
+relas_3_rels_neutral := Relationship.proc_GetRelationshipNeutral(tgen_dids,
   RelativeFlag:=TRUE,
   AssociateFlag:=TRUE,
   MaxCount:=Doxie_Raw.Constants.RelativeAssociate_Limit,  // Increased limit since relatives and associates are returned together
@@ -171,6 +176,9 @@ relas_3_rels := Relationship.proc_GetRelationship(tgen_dids,
   RelLookbackMonths:=relMod.relationship_relLookbackMonths,
   txflag:=Relationship.Functions.getTransAssocFlgs(relMod.relationship_transAssocMask),
   RelKeyFlag := Relkey).result;
+
+relas_3_rels := Relationship.Functions_getRelationship.convertNeutralToFlat_new(relas_3_rels_neutral);
+
 relas_3_pre := JOIN(relas_2_look_for_more,relas_3_rels,
                     left.person2 = right.did1 and right.isRelative,
                     take_rr(left, right, 3),

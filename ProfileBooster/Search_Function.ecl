@@ -451,7 +451,7 @@ end;
 	RelativeMax := 300;
 	withCurrBus_dids := PROJECT(withCurrBus_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
-	rellyids := Relationship.proc_GetRelationship(withCurrBus_dids,TopNCount:=RelativeMax,
+	rellyids := Relationship.proc_GetRelationshipNeutral(withCurrBus_dids,TopNCount:=RelativeMax,
 		RelativeFlag:=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RelativeMax, doThor := onThor).result; 
 	
 	relativeDIDs_roxie := join(withCurrBus, rellyids,

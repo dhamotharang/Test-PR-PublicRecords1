@@ -34,7 +34,7 @@ EXPORT search_functions := MODULE
           SELF := [];
         END;
         did_rec := DATASET ([prep_did()]);
-        RelativesAndAssociates := CHOOSEN(Relationship.proc_GetRelationship(did_rec,TRUE,TRUE,FALSE,FALSE,ut.limits.DEFAULT,,TRUE).result,500);
+        RelativesAndAssociates := CHOOSEN(Relationship.proc_GetRelationshipNeutral(did_rec,TRUE,TRUE,FALSE,FALSE,ut.limits.DEFAULT,,TRUE).result,500);
         self.MotorVehicle := Count(get_motorvehicles(l.did));
         self.DriversLicense := Count((Doxie_Raw.DLV2_Raw_Legacy(dataset([{l.did}],doxie.layout_references),'')((expiration_date >= (UNSIGNED)Std.Date.Today()-10000 and history = '') or expiration_date=0)));
         self.PossibleRelatives := count(RelativesAndAssociates(isRelative));

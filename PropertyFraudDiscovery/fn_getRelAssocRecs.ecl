@@ -50,7 +50,7 @@ EXPORT fn_getRelAssocRecs(DATASET(Layouts.batch_working) ds_work_recs,
 	// REFERENCE: Header.relative_titles
 	txMask := Relationship.Functions.getTransAssocFlgs(in_mod.relationship_transassocmask);
 	dids := PROJECT(ds_work_recs,TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout,SELF:=LEFT));
-	RelationshipRecs := Relationship.proc_GetRelationship(dids,txflag:=txMask).result;
+	RelationshipRecs := Relationship.proc_GetRelationshipNeutral(dids,txflag:=txMask).result;
 	ds_relationship1_recs := JOIN(ds_work_recs,RelationshipRecs,
 		LEFT.did=RIGHT.did1,TRANSFORM(tmpRelRec,SELF.acctno:=LEFT.acctno,SELF:=RIGHT));
 
