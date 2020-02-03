@@ -97,8 +97,8 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 		result8 := IF(isWildcard, result7, result7(prim_name_match_code<>SALT37.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
 		result9 := IF(isWildcard, result8, result8(prim_range_match_code<>SALT37.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
 		
-		// remove insurance LexIDs
-		result := result9(DID<IDLExternalLinking.Constants.INSURANCE_LEXID and DID>0);
+		// remove empty records 
+		result := result9(DID>0);
 		
 		// transform in search output		
 		resultfinal := project(result, 
