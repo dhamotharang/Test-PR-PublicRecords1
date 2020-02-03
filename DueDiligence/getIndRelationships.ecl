@@ -12,7 +12,7 @@ EXPORT getIndRelationships(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 	
     getRelations(DATASET(Relationship.Layout_GetRelationship.DIDs_layout) listOfDIDs) := FUNCTION
       
-        relativeIDs := Relationship.proc_GetRelationship(listOfDIDs, TopNCount := 100, RelativeFlag := TRUE, AssociateFlag := TRUE, 
+        relativeIDs := Relationship.proc_GetRelationshipNeutral(listOfDIDs, TopNCount := 100, RelativeFlag := TRUE, AssociateFlag := TRUE, 
                                                          doAtmost := TRUE, MaxCount := DueDiligence.Constants.MAX_ATMOST_1000).Result;
                                                           
         RETURN relativeIDs;
