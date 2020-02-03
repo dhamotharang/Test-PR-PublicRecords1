@@ -1343,10 +1343,10 @@ export set_NonDerog_FCRA_sources_v50 := [
 
   // POE = Place of Employment, now known as WorkPlace Locator
 	export set_POE := [
-		 /*src_jigsaw	 ,*/							src_spoke											,src_zoom											 ,src_teletrack
-	  ,src_one_click_data						 ,src_Clarity										,src_Garnishments							 ,src_Thrive_LT
-		,src_Thrive_PD								 ,src_Database_USA							,src_Databridge								 ,src_OPM
-		,src_Netwise
+		 /*src_jigsaw	 ,*/							 src_Clarity									 ,src_Database_USA						 ,src_Databridge
+		,src_Garnishments								,src_Netwise									 ,src_one_click_data					 ,src_OPM
+	  ,src_spoke											,src_teletrack								 ,src_Thrive_LT								 ,src_Thrive_PD
+		,src_zoom
 	] 
 	+ set_CorpV2
 	+ set_email
