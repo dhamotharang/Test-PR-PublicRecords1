@@ -74,7 +74,14 @@ export key_high_risk_industries := module
 
 	export Address_Search(dataset(AddrSearchLayout) addrSearchDs) := function 
 
-   LocationID_xLink.Append(addrSearchDs
+   AddLocIDField := record
+	   addrSearchDs;
+		 unsigned6 locid := 0;
+	 end;
+	 
+	 addrSearchDs2 := project(addrSearchDs,AddLocIDField);
+	 
+   LocationID_xLink.Append(addrSearchDs2
                           ,prim_range
                           ,predir
                           ,prim_name
