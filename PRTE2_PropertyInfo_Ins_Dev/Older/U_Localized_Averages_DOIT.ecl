@@ -5,7 +5,7 @@
 Logic in the query or ESP:
 				L.A. cannot be used if Source A (300) OR Source B (200) is available
         if either A or B is present, localized averaging CANNOT be used
-				see 'DEFLT' and set that Confidence Factor = 900 
+				see 'DEFLT' and set that Confidence Factor =900 
     Which records are touched?
         Only records that are OKCTY source
         It is available in all 50 states and DC
@@ -21,26 +21,26 @@ Logic in the query or ESP:
 */
 
 IMPORT PRTE2_Common, ut,STD;
-IMPORT PRTE2_PropertyInfo, PropertyCharacteristics;
+IMPORT PRTE2_PropertyInfo_Ins, PropertyCharacteristics, PRTE2_PropertyInfo_Ins_Dev;
 #workunit('name', 'Boca CT PropertyInfo Despray');
 
 dateString := ut.GetDate+'';
-LandingZoneIP 		:= PRTE2_PropertyInfo.Constants.LandingZoneIP;
-TempCSV						:= PRTE2_PropertyInfo.Files.PII_CSV_FILE + '::' +  WORKUNIT;
+LandingZoneIP 		:= PRTE2_PropertyInfo_Ins.Constants.LandingZoneIP;
+TempCSV						:= PRTE2_PropertyInfo_Ins.Files.SPRAYED_PREFIX_NAME + '::' +  WORKUNIT;
 
-ExportName1 := PRTE2_PropertyInfo.Constants.SourcePathForPIICSV + 'PropInfo_noChanges_'+dateString+'.csv';
-ExportName2a := PRTE2_PropertyInfo.Constants.SourcePathForPIICSV + 'PropInfo_Pre_Enhanced_'+dateString+'.csv';
-ExportName2 := PRTE2_PropertyInfo.Constants.SourcePathForPIICSV + 'PropInfo_Enhanced_'+dateString+'.csv';
-ExportName3 := PRTE2_PropertyInfo.Constants.SourcePathForPIICSV + 'PropInfo_all_'+dateString+'.csv';
+ExportName1 := PRTE2_PropertyInfo_Ins.Constants.SourcePathForPIICSV + 'PropInfo_noChanges_'+dateString+'.csv';
+ExportName2a := PRTE2_PropertyInfo_Ins.Constants.SourcePathForPIICSV + 'PropInfo_Pre_Enhanced_'+dateString+'.csv';
+ExportName2 := PRTE2_PropertyInfo_Ins.Constants.SourcePathForPIICSV + 'PropInfo_Enhanced_'+dateString+'.csv';
+ExportName3 := PRTE2_PropertyInfo_Ins.Constants.SourcePathForPIICSV + 'PropInfo_all_'+dateString+'.csv';
 
 LandUseFilterSet 	:= ['SFR','AGR','VNY','HSR','RNH','RVL','RES','RRR','RWH','COO','CLH','BGW','HST', 'PPT', 'PRS','ZLL',''];  
-DS_IN1						:= PRTE2_PropertyInfo.Files.PII_ALPHA_BASE_SF_DS_Prod(vendor_source = 'B');
-DS_IN2a						:= PRTE2_PropertyInfo.Files.PII_ALPHA_BASE_SF_DS_Prod(vendor_source <> 'B');
+DS_IN1						:= PRTE2_PropertyInfo_Ins.Files.PII_ALPHA_BASE_SF_DS_Prod(vendor_source = 'B');
+DS_IN2a						:= PRTE2_PropertyInfo_Ins.Files.PII_ALPHA_BASE_SF_DS_Prod(vendor_source <> 'B');
 DS_IN2b						:= DS_IN1(land_use_code not in LandUseFilterSet);
 DS_NoChanges			:= DS_IN2a+DS_IN2b;
 
 DS_IN							:= DS_IN1(land_use_code in LandUseFilterSet);
-// DS_IN							:= PRTE2_PropertyInfo.Files.PII_ALPHA_BASE_SF_DS_Prod(land_use_code in LandUseFilterSet);
+// DS_IN							:= PRTE2_PropertyInfo_Ins.Files.PII_ALPHA_BASE_SF_DS_Prod(land_use_code in LandUseFilterSet);
 
 //----------- GLOBALS -------------------------------------------------
 cleanValue(STRING someValue) := PropertyCharacteristics.Functions.fn_remove_zeroes(someValue);
@@ -56,7 +56,7 @@ fakeTaxDate := '';			// Terri says leave tax year blank
 
 //----------- TRANSFORM1 -------------------------------------------------
 DS_IN transfrmIN1( DS_IN L ) := TRANSFORM
-			FindRandomBSF := PRTE2_PropertyInfo.U_Localized_Averages_Sets.BUILDING_SQ_FT_RANDOM;
+			FindRandomBSF := PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.BUILDING_SQ_FT_RANDOM;
 			SELF.building_square_footage := ReplaceIF(L.building_square_footage, FindRandomBSF);
 			SELF.src_building_square_footage := ReplaceIF3(L.building_square_footage, L.src_building_square_footage, fakeSOURCE);
 			SELF.tax_dt_building_square_footage := ReplaceIF3(L.building_square_footage, L.tax_dt_building_square_footage, fakeTAXDate);
@@ -66,24 +66,24 @@ END;
 DS_IN transfrmIN2( DS_IN L ) := TRANSFORM		
 			
 			STRING final_building_square_footage 	:= L.building_square_footage;
-			STRING fake_garage_square_footage 		:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.GARAGE_SQ_FT_RANDOM(final_building_square_footage);
-			STRING fake_no_of_stories 						:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.NUM_STORIES_RANDOM(final_building_square_footage);
-			STRING fake_no_of_baths 							:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.NUM_BATHS_RANDOM(final_building_square_footage);
-			STRING fake_no_of_bedrooms 						:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.NUM_BEDROOMS_RANDOM(final_building_square_footage);
-			STRING fake_no_of_rooms								:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.NUM_OF_ROOMS_RANDOM(final_building_square_footage);
+			STRING fake_garage_square_footage 		:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.GARAGE_SQ_FT_RANDOM(final_building_square_footage);
+			STRING fake_no_of_stories 						:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.NUM_STORIES_RANDOM(final_building_square_footage);
+			STRING fake_no_of_baths 							:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.NUM_BATHS_RANDOM(final_building_square_footage);
+			STRING fake_no_of_bedrooms 						:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.NUM_BEDROOMS_RANDOM(final_building_square_footage);
+			STRING fake_no_of_rooms								:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.NUM_OF_ROOMS_RANDOM(final_building_square_footage);
 
-			STRING fake_no_of_fireplaces 					:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.NUM_FIREPLACE_RANDOM;
-			STRING fake_total_assessed_value 			:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.ASSESS_VALUE_RANDOM;
-			STRING fake_year_built 								:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.YEAR_BUILT_RANDOM;
+			STRING fake_no_of_fireplaces 					:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.NUM_FIREPLACE_RANDOM;
+			STRING fake_total_assessed_value 			:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.ASSESS_VALUE_RANDOM;
+			STRING fake_year_built 								:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.YEAR_BUILT_RANDOM;
 
-			STRING fake_air_conditioning_type 		:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.AIR_COND_TYPE_RANDOM;
-			STRING fake_construction_type 				:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.CONSTR_TYPE_RANDOM;
-			STRING fake_exterior_wall 						:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.EXTERIOR_WALL_RANDOM;
-			STRING fake_garage  									:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.GARAGE_TYPE_RANDOM;
-			STRING fake_foundation  							:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.FOUNDATION_RANDOM;
-			STRING fake_floor_type 								:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.FLOOR_TYPE_RANDOM;
-			STRING fake_roof_cover  							:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.ROOF_COVER_RANDOM;
-			STRING fake_heating  									:= PRTE2_PropertyInfo.U_Localized_Averages_Sets.HEAT_TYPE_RANDOM;
+			STRING fake_air_conditioning_type 		:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.AIR_COND_TYPE_RANDOM;
+			STRING fake_construction_type 				:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.CONSTR_TYPE_RANDOM;
+			STRING fake_exterior_wall 						:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.EXTERIOR_WALL_RANDOM;
+			STRING fake_garage  									:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.GARAGE_TYPE_RANDOM;
+			STRING fake_foundation  							:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.FOUNDATION_RANDOM;
+			STRING fake_floor_type 								:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.FLOOR_TYPE_RANDOM;
+			STRING fake_roof_cover  							:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.ROOF_COVER_RANDOM;
+			STRING fake_heating  									:= PRTE2_PropertyInfo_Ins_Dev.Older.U_Localized_Averages_Sets.HEAT_TYPE_RANDOM;
 
 			SELF.building_square_footage 			:= L.building_square_footage;	// Keeping values from first pass
 			SELF.air_conditioning_type 				:= ReplaceIF(L.air_conditioning_type, fake_air_conditioning_type);

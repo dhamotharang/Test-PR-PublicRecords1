@@ -25,6 +25,8 @@
   ,pDont_Wait         = 'false'                                       // if false, will wait for the childrunner to finish.  true = it will not wait, it will just submit the childrunner.  doesn't work if pECL is a dataset.
   ,pParallel          = 'false'                                       // if false, will wait for the childrunner to finish.  true = it will not wait, it will submit the childrunner and also compile set results with the previous call
   ,pCompileOnly       = 'false'                                       // if false, will run the build as normal.  true = it will compile the wuid.  this also means it will only compile one iteration of it.  it will not save the workman files either.  this is mainly for testing.
+  ,pAutoResubmit      = 'false'                                       // if true, then it will automatically resubmit the wuid upon failure.  FALSE it will not(the default).  This only works for runtime failures.  If it fails to compile, it will not autoreubmit.
+                                                                      // this is because fixing a compile time failure requires manual intervention, and we don't want to be constantly resubmitting code with syntax errors.
 
 ) :=
 functionmacro
@@ -32,30 +34,31 @@ functionmacro
   #IF(count(pECL) = 1)
     return_result := 
     WorkMan.mac_Work(
-       pECL
-      ,pversion            
-      ,pcluster            
-      ,pStartIteration     
-      ,pNumMaxIterations   
-      ,pNumMinIterations   
-      ,pOutputFilename     
-      ,pOutputSuperfile    
-      ,pSetResults         
-      ,pStopCondition      
-      ,pSetNameCalculations
-      ,pBuildName       
-      ,pESP             
-      ,pNotifyEmails    
-      ,pFailureEmails    
-      ,pShouldEmail     
-      ,pPollingFrequency
-      ,pForceRun        
-      ,pForceSkip       
-      ,pCleanupSuper    
-      ,pDebugValues     
-      ,pDont_Wait 
-      ,pParallel
-      ,pCompileOnly
+       pECL                        
+      ,pversion                    
+      ,pcluster                    
+      ,pStartIteration             
+      ,pNumMaxIterations           
+      ,pNumMinIterations           
+      ,pOutputFilename             
+      ,pOutputSuperfile            
+      ,pSetResults                 
+      ,pStopCondition              
+      ,pSetNameCalculations     
+      ,pBuildName               
+      ,pESP                     
+      ,pNotifyEmails            
+      ,pFailureEmails           
+      ,pShouldEmail             
+      ,pPollingFrequency        
+      ,pForceRun                
+      ,pForceSkip               
+      ,pCleanupSuper            
+      ,pDebugValues             
+      ,pDont_Wait               
+      ,pParallel                
+      ,pCompileOnly             
+      ,pAutoResubmit
     );
   #ELSE
     //first thing is to generate the code for each call to WorkMan.mac_Work in a transform
