@@ -239,7 +239,7 @@ EXPORT Build_Base_Main(STRING 																 pversion,
 	
 	baseMainPlusSourceRid_sort	:= dedup(sort(baseMainPlusSourceRid, record, local), record, local);
 	   	
-  baseMain_last := ROLLUP(baseMainPlusSourceRid_sort,
+  baseMain_roll := ROLLUP(baseMainPlusSourceRid_sort,
    										 rollupMain(LEFT, RIGHT),
 											 biog_number, address_id, address_occurrence_number, contact_occurrence_number,
    										 moc_cert_id, RECORD,
@@ -266,16 +266,59 @@ EXPORT Build_Base_Main(STRING 																 pversion,
 											,dotweight,LOCAL);	
 	
 	// Add global_sid and record_sid for CCPA
-	ABMS.Layouts.Base.Main add_sid(baseMain_last L) := TRANSFORM
+	ABMS.Layouts.Base.Main add_sid(baseMain_roll L) := TRANSFORM
 			SELF.global_sid								:= 23941;
 			SELF.record_sid								:= L.source_rec_id;
 			SELF						 							:= L;
 		END;
 	
-	with_ccpa := project(baseMain_last, add_sid (left));
+	with_ccpa := project(baseMain_roll, add_sid (left));
+
+	sort_with_ccpa:=dedup(sort(distribute(with_ccpa, hash(biog_number)), record, local), record, local);
+   	
+	ABMS.Layouts.Base.Main rollupLast(ABMS.Layouts.Base.Main L, ABMS.Layouts.Base.Main R) := TRANSFORM
+      SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+      SELF.dt_vendor_last_reported  := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			source_rec_id_to_use					:= IF(L.source_rec_id = 0, R.source_rec_id, L.source_rec_id);
+   		SELF.source_rec_id            := source_rec_id_to_use;
+   		SELF.record_sid		            := source_rec_id_to_use;
+   		// If there's a case where the records change gender to U or null, we keep the last known gender.
+   		// Regardless, it'll keep the most recent gender that's a definied gender of M or F.
+   		SELF.gender										:= IF(L.gender NOT IN ['M', 'F'], R.gender, L.gender);   
+   	  self.record_type							:= if(l.record_type = 'C' or r.record_type = 'C', 'C', 'H');
+			SELF 													:= L;
+	END;
+   	
+	baseMain_last := ROLLUP(sort_with_ccpa,
+   										 rollupLast(LEFT, RIGHT),
+											 biog_number, address_id, address_occurrence_number, contact_occurrence_number,
+   										 moc_cert_id, 
+											 RECORD,
+											 except
+											 dt_vendor_first_reported
+											,dt_vendor_last_reported
+											,bdid_score
+											,gender
+											,record_type
+											,source_rec_id
+											,record_sid
+											,ultscore
+											,orgscore
+											,selescore
+											,proxscore
+											,powscore
+											,empscore
+											,dotscore
+											,ultweight
+											,orgweight
+											,seleweight
+											,proxweight
+											,powweight
+											,empweight
+											,dotweight,LOCAL);
 
 	// Return
-	tools.mac_WriteFile(Filenames(pversion).Base.Main.New, with_ccpa, Build_Base_File);
+	tools.mac_WriteFile(Filenames(pversion).Base.Main.New, baseMain_last, Build_Base_File);
 
 	EXPORT full_build := SEQUENTIAL(Build_Base_File,
 			                            Promote(pversion).buildfiles.New2Built);
