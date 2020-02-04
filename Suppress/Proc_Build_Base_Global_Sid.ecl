@@ -61,10 +61,10 @@ EXPORT Proc_Build_Base_Global_Sid(STRING pVersion) := FUNCTION
     globalsid_ins				:= suppress.fExtractGlobalSids(suppress.Constants.Exemptions().Domain_Id_INS);
 	ds_global_sid_new			:= DATASET(
 									//For now insurance will use PR key and we will use hardcoded global_sid seg
-									// [{vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'N',globalsid_pr_npd+globalsid_ins,0},
-									//  {vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'Y',globalsid_pr_pd+globalsid_ins,0},
-									[{vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'N',Suppress.Constants.OptOut().CACCPA_Global_Sid,0},
-									 {vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'Y',Suppress.Constants.OptOut().CACCPA_Global_Sid,0},
+									[{vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'N',globalsid_pr_npd+globalsid_ins,0},
+									 {vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'Y',globalsid_pr_pd+globalsid_ins,0},
+									// [{vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'N',Suppress.Constants.OptOut().CACCPA_Global_Sid,0},
+									//  {vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_PR,'Y',Suppress.Constants.OptOut().CACCPA_Global_Sid,0},
 									 {vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_HC,'Y',globalsid_hc,0},
 									 {vendor_date,vendor_date,p_date,'',Suppress.Constants.Exemptions().Domain_Id_INS,'N',globalsid_ins,0}],
 									Suppress.Layout_Global_Sid_Base);	
