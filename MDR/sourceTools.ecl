@@ -329,6 +329,7 @@ MODULE
 	export src_MMCP						           := '61';  // Michigan/Illinois Medicaid Custom Program
 	export src_NaturalDisaster_Readiness := 'NR';
 	export src_NeustarWireless					 := 'N2';  //Neustar Wireless Phones 
+	export src_Netwise									 := 'WQ';  //Netwise Business to Consumer file (royalty gateway) - DF-26925
 	export src_NCOA                      := 'NC';
 	export src_NCPDP                     := 'J2';  // National Council for Prescription Drug Programs
 	export src_NPPES                     := 'NP';  // US National Provider & Plan Enumeration System
@@ -1343,9 +1344,10 @@ export set_NonDerog_FCRA_sources_v50 := [
 
   // POE = Place of Employment, now known as WorkPlace Locator
 	export set_POE := [
-		 /*src_jigsaw	 ,*/							src_spoke											,src_zoom											 ,src_teletrack
-	  ,src_one_click_data						 ,src_Clarity										,src_Garnishments							 ,src_Thrive_LT
-		,src_Thrive_PD
+		 /*src_jigsaw	 ,*/							 src_Clarity									 ,src_Database_USA						 ,src_Databridge
+		,src_Garnishments								,src_Netwise									 ,src_one_click_data					 ,src_OPM
+	  ,src_spoke											,src_teletrack								 ,src_Thrive_LT								 ,src_Thrive_PD
+		,src_zoom
 	] 
 	+ set_CorpV2
 	+ set_email
@@ -1896,6 +1898,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_NCPDP                     := [src_NCPDP                     ];
 	export set_NCOA                      := [src_NCOA                      ];
 	export set_NeustarWireless					 := [src_NeustarWireless					 ];
+	export set_Netwise									 := [src_Netwise									 ];
 	export set_NPPES                     := [src_NPPES                     ];
 	export set_OIG                       := [src_OIG                       ];
 	export set_One_Click_Data            := [src_One_Click_Data            ];
@@ -2438,6 +2441,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsMMCP						            (string  sr) := sr               in set_MMCP						           ;
   export SourceIsNaturalDisaster_Readiness  (string  sr) := sr               in set_NaturalDisaster_Readiness  ;
   export SourceIsNeustarWireless  					(string  sr) := sr               in set_NeustarWireless					   ;  //Jira DF-24336
+	export SourceIsNetwise				  					(string  sr) := sr               in set_Netwise									   ;
 	export SourceIsNCOA                       (string  sr) := sr               in set_NCOA                       ;
 	export SourceIsNCPDP                      (string  sr) := sr               in set_NCPDP                      ;
 	export SourceIsNPPES                      (string  sr) := sr               in set_NPPES                      ;
@@ -2972,6 +2976,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_NCOA                      ,'NCOA'                                                      }
 		,{src_NCPDP											,'NCPDP'																										 }
 		,{src_NeustarWireless						,'Neustar Wireless Phones'																	 }
+		,{src_Netwise										,'Netwise Business to Consumer file'												 }
 		,{src_NPPES                     ,'NPPES'                                                     }
 		,{src_OIG                       ,'OIG'                                                       }
 		,{src_One_Click_Data            ,'One Click Data'                                            }
@@ -3494,6 +3499,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_NaturalDisaster_Readiness => 'NaturalDisaster Readiness'														
 		,src_NCPDP										 => 'NCPDP'							
 		,src_NeustarWireless					 => 'Neustar Wireless Phones'
+		,src_Netwise									 => 'Netwise Business to Consumer file'
 		,src_NPPES                     => 'NPPES'                                                
 		,src_OIG                       => 'OIG'                                       
 		,src_One_Click_Data            => 'One Click Data'                                       
