@@ -1,9 +1,9 @@
-/* RiskProcessing.BWR_Small_Business_Analytics_21_NonSBFE_BusShellv31 */
+﻿/* RiskProcessing.BWR_Small_Business_Analytics_21_NonSBFE_BusShellv31 */
 
 #workunit('name','Small Business Analytics NonSBFE v21 BusShell v31');
 #option ('hthorMemoryLimit', 1000);
 
-IMPORT Business_Risk_BIP, Data_Services, LNSmallBusiness, Models, iESP, Risk_Indicators, RiskWise, UT;
+IMPORT Business_Risk_BIP, Data_Services, LNSmallBusiness, Models, iESP, Risk_Indicators, RiskWise, UT, STD;
 
 /* ********************************************************************
  *                               OPTIONS                              *
@@ -16,17 +16,15 @@ IMPORT Business_Risk_BIP, Data_Services, LNSmallBusiness, Models, iESP, Risk_Ind
  
 recordsToRun := ALL; // use ALL or numeric value
 eyeball      := 10;
-threads      := 2;
+threads      := 30;
 
 RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
 // RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production
 // RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
 // RoxieIP := RiskWise.shortcuts.Dev156;                  // Development Roxie 156
 
-// inputFile := Data_Services.foreign_prod + 'jpyon::in::compass_1190_bus_shell_in_in';
 inputFile := Data_Services.foreign_prod + 'jpyon::in::amex_8055_gcp_small_input_output1.csv';
 
-// outputFile := '~bpahl::out::small_business_analytics_sbfe';
 outputFile := '~modeling::out::SBA_v21_NonSBFE_BusShell_31_' + ThorLib.wuid();
 
 // Universally Set the History Date for ALL records. Set to 0 to use the History Date located on each record of the input file
@@ -68,6 +66,12 @@ BusinessModelRequested := IF(includeBusinessOnlyModel,
 BlendedModelRequested := IF(includeBlendedModel, 
 					DATASET([{'SLBB1702_0_2'}], iesp.share.t_StringArrayItem),// can't mix 1702 with 1809 models
 					DATASET([], iesp.share.t_StringArrayItem)); 
+
+// In the case where a rerun (for whatever reason) is not helping, modeling wants to be able to blank out the CompanyName
+// from the input file so that it will be filtered out in the beginning steps of the script as 'insufficient input'
+// set this to TRUE to blank out CompanyName on ALL records of the input file, or FALSE if you just want to process the input like normal
+//SetCompanyNameBlank := TRUE;
+SetCompanyNameBlank := FALSE;
      
 bus_in := record
   STRING30  AccountNumber := '';
@@ -97,8 +101,8 @@ bus_in := record
   STRING50  RepresentativeEmailAddress := '';
   STRING20  RepresentativeFormerLastName := '';
   INTEGER   historydate; // Business Shell 2.1 and higher accept YYYYMM, YYYMMDD, and YYYYMMDDTTTT dates. historyDate can be in any of these forms.
-  STRING8	 SICCode;
-  STRING8	 NAICCode;
+  STRING8   SICCode;
+  STRING8   NAICCode;
 end;
 
 // Now run the SmallBusinessAnalytics attributes
@@ -108,10 +112,19 @@ SmallBusinessAnalyticsoutput := RECORD
 	STRING ErrorCode;
 END;
 
-f := CHOOSEN(DATASET(inputFile, bus_in, CSV(HEADING(SINGLE), QUOTE('"'))), RecordsToRun);
+f_orig := CHOOSEN(DATASET(inputFile, bus_in, CSV(QUOTE('"'))), RecordsToRun);
 													
-output(f, NAMED('Total_Input')); 
-output(count(f), NAMED('Total_Input_Cnt')); 
+OUTPUT(COUNT(f_orig), NAMED('Total_Input_Cnt')); 
+//output(choosen(f_orig,eyeball),NAMED('Input_Before_CompanyName'));
+
+
+// In the case where a rerun (for whatever reason) is not helping, modeling wants to be able to blank out the CompanyName
+// from the input file so that it will be filtered out below as 'insufficient input'
+f := if(SetCompanyNameBlank,
+        PROJECT(f_orig, TRANSFORM(RECORDOF(LEFT),SELF.CompanyName := '', SELF := LEFT)),
+        f_orig);
+//output(choosen(f,eyeball),NAMED('Input_After_CompanyName'));
+
 
 // f_with_seq_nonFiltered has everything:
 f_with_seq_nonFiltered := PROJECT(f, TRANSFORM({UNSIGNED seq, RECORDOF(LEFT)}, SELF.seq := COUNTER, SELF := LEFT));	
@@ -161,7 +174,7 @@ inSufficientInput := JOIN(f_with_seq_nonFiltered, f_with_seq_Filtered_Rep,
 	
 f_with_seq := f_with_seq_Filtered_Rep;
 
-OUTPUT(choosen(inSufficientInput, eyeball), NAMED('inSufficientInput'));
+OUTPUT(CHOOSEN(inSufficientInput, eyeball), NAMED('inSufficientInput'));
 OUTPUT(CHOOSEN(f_with_seq, eyeball), NAMED('Sample_Raw_Input'));
 
 layout_soap := RECORD
@@ -179,7 +192,7 @@ layout_soap := RECORD
 	STRING50 AllowedSources;
 	REAL Global_Watchlist_Threshold;
 	boolean DisableBusinessShellLogging;
-  STRING DataPermissionMask;  
+	STRING DataPermissionMask;  
 END;
 
 layout_soap transform_input_request(f_with_seq le, UNSIGNED8 ctr) := TRANSFORM
@@ -350,7 +363,7 @@ OUTPUT(CHOOSEN(SmallBusinessAnalytics_input, eyeball), NAMED('SmallBusinessAnaly
 output(CHOOSEN(insufficientSoap_input, eyeball), NAMED('insufficientSoap_input'));
 
 SmallBusinessAnalyticsoutput myFail(layout_soap le) := TRANSFORM
-	SELF.ErrorCode := StringLib.StringFilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
+	SELF.ErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
 	SELF.Result.InputEcho.Seq := le.Seq;
 	SELF := le;
 	SELF := [];
@@ -368,8 +381,8 @@ SmallBusinessAnalytics_attributes :=
 
 MinimumInputErrorCode := 'Please input the minimum required fields';
 Passed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) = '');
-Insufficient_input_Failed := SmallBusinessAnalytics_attributes(Stringlib.StringFind(ErrorCode, MinimumInputErrorCode, 1) > 0) + inSufficientInput;
-Other_Failed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) <> '' AND Stringlib.StringFind(ErrorCode, MinimumInputErrorCode, 1) = 0);
+Insufficient_input_Failed := SmallBusinessAnalytics_attributes(STD.Str.Find(ErrorCode, MinimumInputErrorCode, 1) > 0) + inSufficientInput;
+Other_Failed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) <> '' AND STD.Str.Find(ErrorCode, MinimumInputErrorCode, 1) = 0);
 
 OUTPUT(CHOOSEN(Passed, eyeball), NAMED('SmallBusinessAnalytics_Results_Passed'));
 OUTPUT(CHOOSEN(Insufficient_input_Failed, eyeball), NAMED('SmallBusinessAnalytics_Insufficient_Input_Errors'));
@@ -489,7 +502,7 @@ layout_flat_v1 flatten_v1(layout_soap le, SmallBusinessAnalyticsoutput ri) := TR
 	SELF.UltID := ri.Result.BusinessID.UltID;
 	
 	// #IF(includeLN)
-	V21AttributeResults := ri.Result.AttributeGroups(StringLib.StringToLowerCase(Name) = 'smallbusinessattrv21')[1].Attributes;
+	V21AttributeResults := ri.Result.AttributeGroups(STD.Str.ToLowerCase(Name) = 'smallbusinessattrv21')[1].Attributes;
 	// SBA Version 2.1 Attributes (373) 
 	SELF.LNLexIDSELE := V21AttributeResults[1].value;
 	SELF.InputCheckBusName := V21AttributeResults[2].value;
@@ -996,24 +1009,26 @@ layout_flat_v1 flatten_v1(layout_soap le, SmallBusinessAnalyticsoutput ri) := TR
 END;
 
 //  Via SOAPCALL:
-flatResults_seq1 := SORT(JOIN(DISTRIBUTE(SmallBusinessAnalytics_input + insufficientSoap_input, HASH64((UNSIGNED)seq)), 
+flatResults_seq1 := JOIN(DISTRIBUTE(SmallBusinessAnalytics_input + insufficientSoap_input, HASH64((UNSIGNED)seq)), 
 		DISTRIBUTE((Passed + Insufficient_input_Failed), HASH64((UNSIGNED)Result.InputEcho.Seq)),
 		(UNSIGNED)LEFT.Seq = (UNSIGNED)RIGHT.Result.InputEcho.Seq, 
 		flatten_v1(LEFT, RIGHT), 
-		KEEP(1), ATMOST(10), LOCAL), seq);
+		KEEP(1), ATMOST(10), LOCAL);
 
-flatResults_seq := SORT(flatResults_seq1, SEQ);
+flatResults_seq := SORT(flatResults_seq1, seq);
 flatResults := PROJECT(flatResults_seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
+
 failureResults_seq := SORT(JOIN(DISTRIBUTE(SmallBusinessAnalytics_input, HASH64((UNSIGNED)seq)), 
 			DISTRIBUTE((Other_Failed), HASH64((UNSIGNED)Result.InputEcho.Seq)), 
 				(UNSIGNED)LEFT.Seq = (UNSIGNED)RIGHT.Result.InputEcho.Seq, 
 				flatten_v1(LEFT, RIGHT), KEEP(1), ATMOST(10), LOCAL),
 				seq);
 failureResults := PROJECT(failureResults_seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
+
 //This Returns any inputs that resulted in an error or whose result was dropped
-Error_Inputs_seq := SORT(JOIN(DISTRIBUTE(f_with_seq, HASH64(AccountNumber)), 
-		DISTRIBUTE(flatResults, HASH64(AccountNumber)), 
-		LEFT.AccountNumber = RIGHT.AccountNumber, 
+Error_Inputs_seq := SORT(JOIN(DISTRIBUTE(f_with_seq, HASH64((UNSIGNED)seq)), 
+		DISTRIBUTE(flatResults_seq, HASH64((UNSIGNED)seq)), 
+		(UNSIGNED)LEFT.seq = (UNSIGNED)RIGHT.seq, 
 		TRANSFORM({UNSIGNED6 seq, bus_in}, SELF := LEFT), LEFT ONLY, LOCAL),
 		seq); 
 Error_Inputs := PROJECT(Error_Inputs_Seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
@@ -1023,6 +1038,6 @@ OUTPUT(CHOOSEN(failureResults, eyeball), NAMED('Sample_Failed_Results'));
 OUTPUT(CHOOSEN(Error_Inputs, eyeball), NAMED('Sample_Failed_Inputs'));
 
 OUTPUT(COUNT(flatResults), NAMED('Total_Final_Results_Passed'));
-OUTPUT(flatResults,, outputFile, CSV(HEADING(single), QUOTE('"')), OVERWRITE);
-OUTPUT(failureResults,,outputFile+'_Errors', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
-OUTPUT(Error_Inputs,,outputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE);
+OUTPUT(flatResults,, outputFile, CSV(HEADING(single), QUOTE('"')), OVERWRITE, NAMED('Final_Results_Succeeded'));
+OUTPUT(failureResults,,outputFile+'_Errors', CSV(HEADING(single), QUOTE('"')), OVERWRITE, NAMED('Final_Results_Errors'));
+OUTPUT(Error_Inputs,,outputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE, NAMED('FinalResults_DroppedRerun'));

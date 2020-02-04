@@ -1,9 +1,9 @@
-/* RiskProcessing.BWR_Small_Business_Analytics_21_SBFE_BusShellv31 */
+﻿/* RiskProcessing.BWR_Small_Business_Analytics_21_SBFE_BusShellv31 */
 
 #workunit('name','Small Business Analytics SBFE v21 BusShell v31');
 #option ('hthorMemoryLimit', 1000);
 
-IMPORT Business_Risk_BIP, Data_Services, LNSmallBusiness, Models, iESP, Risk_Indicators, RiskWise, UT;
+IMPORT Business_Risk_BIP, Data_Services, LNSmallBusiness, Models, iESP, Risk_Indicators, RiskWise, STD;
 
 /* ********************************************************************
  *                               OPTIONS                              *
@@ -16,17 +16,15 @@ IMPORT Business_Risk_BIP, Data_Services, LNSmallBusiness, Models, iESP, Risk_Ind
  
 recordsToRun := ALL; // use ALL or numeric value
 eyeball      := 10;
-threads      := 2;
+threads      := 30;
 
 RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
 // RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production
 // RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
 // RoxieIP := RiskWise.shortcuts.Dev156;                  // Development Roxie 156
 
-// inputFileName := Data_Services.foreign_prod + 'jpyon::in::compass_1190_bus_shell_in_in';
 inputFileName := Data_Services.foreign_prod + 'jpyon::in::amex_8055_gcp_small_input_output1.csv';
 
-// outputFile := '~bpahl::out::small_business_analytics_sbfe';
 outputFile := '~modeling::out::SBA_v21_SBFE_BusShell_31_' + ThorLib.wuid();
 
 // Universally Set the History Date for ALL records. Set to 0 to use the History Date located on each record of the input file
@@ -67,14 +65,28 @@ AttributesRequested :=
 					DATASET([], iesp.share.t_StringArrayItem)
 		);
 
-// Uncomment the models below that you want to have returned
-Model1RequestName := 'SBBM1601_0_0';
-Model2RequestName := 'SBOM1601_0_0';
+// (2) Designate which models to run
+includeBusinessOnlyModel := TRUE; // Set to TRUE if we want SLBO, set to FALSE if SBFE data is not included
+// includeBusinessOnlyModel := FALSE;
 
-ModelsRequested :=
-		DATASET([{Model1RequestName}], iesp.share.t_StringArrayItem) + // Blended Score
-		DATASET([{Model2RequestName}], iesp.share.t_StringArrayItem) + // Business Only
-		DATASET([], iesp.share.t_StringArrayItem);
+includeBlendedModel := TRUE; // Set to TRUE if we want SLBB
+// includeBlendedModel := FALSE; 
+
+// ModelsRequested are configured based on includeBusinessOnlyModel and includeBlendedModel.
+BusinessModelRequested := IF(includeBusinessOnlyModel,
+					DATASET([{'SBOM1601_0_0'}], iesp.share.t_StringArrayItem),
+     DATASET([], iesp.share.t_StringArrayItem));
+  
+// Later on we will check we actually have to minimum inputs met to run this model.  
+BlendedModelRequested := IF(includeBlendedModel, 
+					DATASET([{'SBBM1601_0_0'}], iesp.share.t_StringArrayItem),
+     DATASET([], iesp.share.t_StringArrayItem));
+
+// In the case where a rerun (for whatever reason) is not helping, modeling wants to be able to blank out the CompanyName
+// from the input file so that it will be filtered out in the beginning steps of the script as 'insufficient input'
+// set this to TRUE to blank out CompanyName on ALL records of the input file, or FALSE if you just want to process the input like normal
+//SetCompanyNameBlank := TRUE;
+SetCompanyNameBlank := FALSE;
 
 /* **************************************
  *         MAIN SCRIPT CODE             *
@@ -109,8 +121,8 @@ InputFileLayout := RECORD
   STRING50  RepresentativeEmailAddress := '';
   STRING20  RepresentativeFormerLastName := '';
   INTEGER   historydate; // Business Shell 2.1 and higher accept YYYYMM, YYYMMDD, and YYYYMMDDTTTT dates. historyDate can be in any of these forms.
-  STRING8	 SICCode;
-  STRING8	 NAICCode;
+  STRING8   SICCode;
+  STRING8   NAICCode;
 END;
 
 SmallBusinessAnalyticsoutput := RECORD
@@ -120,7 +132,18 @@ SmallBusinessAnalyticsoutput := RECORD
 END;
 
 
-f := CHOOSEN(DATASET(inputFileName, InputFileLayout, CSV(HEADING(SINGLE), QUOTE('"'))), RecordsToRun);
+f_orig := CHOOSEN(DATASET(inputFileName, InputFileLayout, CSV(QUOTE('"'))), RecordsToRun);
+
+OUTPUT(COUNT(f_orig), NAMED('Total_Input_Cnt'));
+//output(choosen(f_orig,eyeball),NAMED('Input_Before_CompanyName')); 
+
+
+// In the case where a rerun (for whatever reason) is not helping, modeling wants to be able to blank out the CompanyName
+// from the input file so that it will be filtered out below as 'insufficient input'
+f := if(SetCompanyNameBlank,
+        PROJECT(f_orig, TRANSFORM(RECORDOF(LEFT),SELF.CompanyName := '', SELF := LEFT)),
+        f_orig);
+//output(choosen(f,eyeball),NAMED('Input_After_CompanyName'));
 
 // f_with_seq_nonFiltered has everything:
 f_with_seq_nonFiltered := PROJECT(f, TRANSFORM({UNSIGNED seq, RECORDOF(LEFT)}, SELF.seq := COUNTER, SELF := LEFT));	
@@ -192,21 +215,25 @@ layout_soap := RECORD
 END;
 
 layout_soap transform_input_request(f_with_seq le) := TRANSFORM
-	u := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_User, 
+	u := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_User, 
 			SELF.AccountNumber := le.accountnumber; 
 			SELF.DLPurpose := DPPA; 
 			SELF.GLBPurpose := GLBA; 
 			SELF.DataRestrictionMask := dataRestrictionMask_val; 
 			SELF.DataPermissionMask := dataPermissionMask_val; 
 			SELF := []));
-	o := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessanalytics.t_SBAOptions, 
+	o := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBAOptions, 
 			SELF.AttributesVersionRequest := AttributesRequested; 
-			SELF.IncludeModels.Names := ModelsRequested; 
+      // To minimize errors, don't use blended model if the minimum input requirements aren't met.   
+      AuthRepMinInputMet := (TRIM(le.Representativefirstname) <> '' AND TRIM(le.Representativelastname) <> '' AND TRIM(le.RepresentativeAddr) <> '' AND TRIM(le.RepresentativeCity) <> '' AND TRIM(le.RepresentativeState) <> '') OR 
+              (TRIM(le.Representativefirstname) <> '' AND TRIM(le.Representativelastname) <> '' AND TRIM(le.RepresentativeAddr) <> '' AND TRIM(le.RepresentativeZip) <> '') OR 
+              (TRIM(le.Representativefirstname) <> '' AND TRIM(le.Representativelastname) <> '' AND TRIM(le.RepresentativeSSN) <> '');
+			SELF.IncludeModels.Names := BusinessModelRequested + IF(AuthRepMinInputMet, BlendedModelRequested);
 			SELF := []));
-	c := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessanalytics.t_SBACompany, 
+	c := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBACompany, 
 			SELF.CompanyName := le.CompanyName; 
 			SELF.AlternateCompanyName := le.AlternateCompanyName; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
+			SELF.Address := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Address, 
 						SELF.StreetAddress1 := le.Addr; 
 						SELF.City := le.City; 
 						SELF.State := le.State; 
@@ -220,29 +247,29 @@ layout_soap transform_input_request(f_with_seq le) := TRANSFORM
 			SELF.NAICCode := le.NAICCode;
 			SELF.BusinessStructure := '';
 			SELF.YearsInBusiness := '';
-			SELF.BusinessStartDate := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
+			SELF.BusinessStartDate := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Date,
 						SELF.Year := (INTEGER)'';
 						SELF.Month := (INTEGER)'';
 						SELF.Day := (INTEGER)'';
 						SELF := []))[1]; 
 			SELF.YearlyRevenue := '';
 			SELF := []));
-	a1 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
-			SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
+	a1 := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
+			SELF.Name := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Name, 
 						SELF.First := le.Representativefirstname; 
 						SELF.Middle := le.RepresentativeMiddleName; 
 						SELF.Last := le.Representativelastname; 
 						SELF.Suffix := le.RepresentativeNameSuffix; 
 						SELF := []))[1]; 
 			SELF.FormerLastName := le.RepresentativeFormerLastName; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
+			SELF.Address := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Address,
 						SELF.StreetAddress1 := le.RepresentativeAddr; 
 						SELF.City := le.RepresentativeCity; 
 						SELF.State := le.RepresentativeState; 
 						SELF.Zip5 := le.RepresentativeZip[1..5]; 
 						SELF.Zip4 := le.RepresentativeZip[6..9]; 
 						SELF := []))[1];
-			SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
+			SELF.DOB := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Date, 
 						SELF.Year := (INTEGER)le.RepresentativeDOB[1..4];
 						SELF.Month := (INTEGER)le.RepresentativeDOB[5..6];
 						SELF.Day := (INTEGER)le.RepresentativeDOB[7..8];
@@ -254,22 +281,22 @@ layout_soap transform_input_request(f_with_seq le) := TRANSFORM
 			SELF.DriverLicenseState := le.RepresentativeDLState; 
 			SELF.BusinessTitle := ''; 
 			SELF := []));
-	a2 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
-			SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
+	a2 := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
+			SELF.Name := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Name, 
 						SELF.First := ''; 
 						SELF.Middle := ''; 
 						SELF.Last := ''; 
 						SELF.Suffix := ''; 
 						SELF := []))[1]; 
 			SELF.FormerLastName := ''; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
+			SELF.Address := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Address, 
 						SELF.StreetAddress1 := ''; 
 						SELF.City := ''; 
 						SELF.State := ''; 
 						SELF.Zip5 := ''; 
 						SELF.Zip4 := ''; 
 						SELF := []))[1];
-			SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
+			SELF.DOB := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Date, 
 						SELF.Year := (INTEGER)'';
 						SELF.Month := (INTEGER)'';
 						SELF.Day := (INTEGER)'';
@@ -281,22 +308,22 @@ layout_soap transform_input_request(f_with_seq le) := TRANSFORM
 			SELF.DriverLicenseState := ''; 
 			SELF.BusinessTitle := ''; 
 			SELF := []));
-	a3 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
-			SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
+	a3 := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
+			SELF.Name := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Name, 
 						SELF.First := ''; 
 						SELF.Middle := ''; 
 						SELF.Last := ''; 
 						SELF.Suffix := ''; 
 						SELF := []))[1]; 
 			SELF.FormerLastName := ''; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
+			SELF.Address := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Address,  
 						SELF.StreetAddress1 := ''; 
 						SELF.City := ''; 
 						SELF.State := ''; 
 						SELF.Zip5 := ''; 
 						SELF.Zip4 := ''; 
 						SELF := []))[1]; 
-			SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
+			SELF.DOB := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Date, 
 						SELF.Year := (INTEGER)'';
 						SELF.Month := (INTEGER)'';
 						SELF.Day := (INTEGER)'';
@@ -308,14 +335,14 @@ layout_soap transform_input_request(f_with_seq le) := TRANSFORM
 			SELF.DriverLicenseState := ''; 
 			SELF.BusinessTitle := ''; 
 			SELF := []));
-	s := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessanalytics.t_SBASearchBy, 
+	s := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBASearchBy, 
 			SELF.Seq := (STRING)le.seq; 
 			SELF.Company := c[1]; 
 			SELF.AuthorizedRep1 := a1[1]; 
 			SELF.AuthorizedRep2 := a2[1]; 
 			SELF.AuthorizedRep3 := a3[1]; 
 			SELF := []));
-	r := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessanalytics.t_SmallBusinessAnalyticsRequest, 
+	r := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SmallBusinessAnalyticsRequest, 
 			SELF.User := u[1]; 
 			SELF.Options := o[1]; 
 			SELF.SearchBy := s[1]; 
@@ -350,7 +377,7 @@ OUTPUT(CHOOSEN(insufficientSoap_input, eyeball), NAMED('insufficientSoap_input')
 // Now run the SmallBusinessAnalytics attributes
 
 SmallBusinessAnalyticsoutput myFail(layout_soap le) := TRANSFORM
-	SELF.ErrorCode := StringLib.StringFilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
+	SELF.ErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
 	SELF.Result.InputEcho.Seq := le.Seq;
 	SELF := le;
 	SELF := [];
@@ -368,8 +395,8 @@ SmallBusinessAnalytics_attributes :=
 
 MinimumInputErrorCode := 'Please input the minimum required fields';
 Passed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) = '');
-Insufficient_input_Failed := SmallBusinessAnalytics_attributes(Stringlib.StringFind(ErrorCode, MinimumInputErrorCode, 1) > 0);
-Other_Failed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) <> '' AND Stringlib.StringFind(ErrorCode, MinimumInputErrorCode, 1) = 0);
+Insufficient_input_Failed := SmallBusinessAnalytics_attributes(STD.Str.Find(ErrorCode, MinimumInputErrorCode, 1) > 0) + insufficientInput;
+Other_Failed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) <> '' AND STD.Str.Find(ErrorCode, MinimumInputErrorCode, 1) = 0);
 				
 OUTPUT(CHOOSEN(Passed, eyeball), NAMED('SmallBusinessAnalytics_Results_Passed'));
 OUTPUT(CHOOSEN(Insufficient_input_Failed, eyeball), NAMED('SmallBusinessAnalytics_Insufficient_Input_Errors'));
@@ -494,7 +521,7 @@ layout_flat_v21 flatten_v21(layout_soap le, SmallBusinessAnalyticsoutput ri) := 
 	SELF.UltID := ri.Result.BusinessID.UltID;
 	
 	#IF(includeLN)
-	V21AttributeResults := ri.Result.AttributeGroups(StringLib.StringToLowerCase(Name) = 'smallbusinessattrv21')[1].Attributes;
+	V21AttributeResults := ri.Result.AttributeGroups(STD.Str.ToLowerCase(Name) = 'smallbusinessattrv21')[1].Attributes;
 	// SBA Version 2.1 Attributes (373) 
 	SELF.LNLexIDSELE := V21AttributeResults[1].value;
 	SELF.InputCheckBusName := V21AttributeResults[2].value;
@@ -872,7 +899,7 @@ layout_flat_v21 flatten_v21(layout_soap le, SmallBusinessAnalyticsoutput ri) := 
 	#END
 	
   #IF(IncludeSBFE)
-	SBFEAttributeResults := ri.Result.AttributeGroups(StringLib.StringToLowerCase(Name) = 'smallbusinessattrsbfe')[1].Attributes;
+	SBFEAttributeResults := ri.Result.AttributeGroups(STD.Str.ToLowerCase(Name) = 'smallbusinessattrsbfe')[1].Attributes;
 	// Version1 Attributes Section
 	SELF.SBFEHitIndex := SBFEAttributeResults[1].value;
 	SELF.SBFEVerBusName := SBFEAttributeResults[2].value;
@@ -2720,23 +2747,26 @@ layout_flat_v21 flatten_v21(layout_soap le, SmallBusinessAnalyticsoutput ri) := 
 	// SBA Supports up to a max of 10 model scores
 	Model1 := ri.Result.Models[1];
 	
-	// Minimum input requirements are different if including the blended model, and one of these combinations must be populated:
-	//		a.	Authorized Rep Last Name, Authorized Rep First Name, Authorized Rep Street Address, Authorized Rep Zip
-	//		b.	Authorized Rep Last Name, Authorized Rep First Name and SSN
-	//		c.	Authorized Rep Last Name, Authorized Rep First Name, Authorized Rep Street Address, Authorized Rep City, Authorized Rep State 
-			
-	SBBMMinInputRequirementsNotMet := 
-      Model1.Name='SBBM1601_0_0' AND 
-      (((le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Name.First = '' OR 
-      le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Name.Last = '') AND
-      le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Name.Full = '') OR
-      (le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.SSN = '' AND
-      (le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Address.StreetAddress1 = '' OR
-      (le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Address.Zip5 = '' AND
-      (le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Address.City = '' OR
-      le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Address.State = '')))));
+	/* Per modeling, if the blended model is requested but the minimum input requirements are not met, we still need to return results for the query, even 
+    though the query fails in production in this situation. To handle this in the script, we turn off the blended model if minimum input requirements 
+    are not met, and then artifically populate the blended model in the results, making sure that the models are always output in the same order.
 
-	SELF.Model1Name := Model1.Name;
+	   Minimum input requirements are different if including the blended model, and one of these combinations must be populated:
+	  		a.	Authorized Rep Last Name, Authorized Rep First Name, Authorized Rep Street Address, Authorized Rep Zip
+	  		b.	Authorized Rep Last Name, Authorized Rep First Name and SSN
+	  		c.	Authorized Rep Last Name, Authorized Rep First Name, Authorized Rep Street Address, Authorized Rep City, Authorized Rep State */
+			
+	SBBMMinInputRequirementsNotMet := includeBlendedModel AND 
+				(((le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Name.First = '' OR 
+				le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Name.Last = '') AND
+				le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Name.Full = '') OR
+				(le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.SSN = '' AND
+				(le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Address.StreetAddress1 = '' OR
+				(le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Address.Zip5 = '' AND
+				(le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Address.City = '' OR
+				le.smallbusinessanalyticsrequest[1].Searchby.AuthorizedRep1.Address.State = '')))));
+
+	SELF.Model1Name := IF(includeBlendedModel, 'SBBM1601_0_0', Model1.Name);
 	SELF.Model1Score := IF(SBBMMinInputRequirementsNotMet, '0', (STRING)Model1.Scores[1].Value);
 	SELF.Model1RC1 := IF(SBBMMinInputRequirementsNotMet, '', Model1.Scores[1].ScoreReasons[1].ReasonCode);
 	SELF.Model1RC2 := IF(SBBMMinInputRequirementsNotMet, '', Model1.Scores[1].ScoreReasons[2].ReasonCode);
@@ -2745,7 +2775,9 @@ layout_flat_v21 flatten_v21(layout_soap le, SmallBusinessAnalyticsoutput ri) := 
 	SELF.Model1RC5 := IF(SBBMMinInputRequirementsNotMet, '', Model1.Scores[1].ScoreReasons[5].ReasonCode);
 	SELF.Model1RC6 := IF(SBBMMinInputRequirementsNotMet, '', Model1.Scores[1].ScoreReasons[6].ReasonCode);
   
-	Model2 := ri.Result.Models[2];
+	SBOM_Results := ri.Result.Models(TRIM(Name)='SBOM1601_0_0')[1];
+	Model2 := IF(includeBusinessOnlyModel AND TRIM(SELF.Model1Name) <> 'SBOM1601_0_0', SBOM_Results, ri.Result.Models[2]);
+
 	SELF.Model2Name := Model2.Name;
 	SELF.Model2Score := (STRING)Model2.Scores[1].Value;
 	SELF.Model2RC1 := Model2.Scores[1].ScoreReasons[1].ReasonCode;
@@ -2842,32 +2874,26 @@ END;
 
 
 //  Via SOAPCALL:
-flatResults_seq1 := SORT(JOIN(DISTRIBUTE(SmallBusinessAnalytics_input + insufficientSoap_input, 
-			HASH64((UNSIGNED)seq)), 
-			DISTRIBUTE((Passed + Insufficient_input_Failed), 
-			HASH64((UNSIGNED)Result.InputEcho.Seq)), 
+flatResults_seq1 := JOIN(DISTRIBUTE(SmallBusinessAnalytics_input + insufficientSoap_input, HASH64((UNSIGNED)seq)), 
+			DISTRIBUTE((Passed + Insufficient_input_Failed), HASH64((UNSIGNED)Result.InputEcho.Seq)), 
 			(UNSIGNED)LEFT.Seq = (UNSIGNED)RIGHT.Result.InputEcho.Seq,
-			flatten_v21(LEFT, RIGHT), KEEP(1), ATMOST(10), LOCAL), seq);
+			flatten_v21(LEFT, RIGHT), KEEP(1), ATMOST(10), LOCAL);
 
-flatResults_seq := SORT(flatResults_seq1, SEQ);
-
+flatResults_seq := SORT(flatResults_seq1, seq);
 flatResults := PROJECT(flatResults_seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
 
-failureResults_seq := SORT(JOIN(DISTRIBUTE(SmallBusinessAnalytics_input, 
-	HASH64((UNSIGNED)seq)), DISTRIBUTE((Other_Failed), 
-	HASH64((UNSIGNED)Result.InputEcho.Seq)), 
+failureResults_seq := SORT(JOIN(DISTRIBUTE(SmallBusinessAnalytics_input, HASH64((UNSIGNED)seq)), 
+        DISTRIBUTE((Other_Failed), HASH64((UNSIGNED)Result.InputEcho.Seq)), 
 	(UNSIGNED)LEFT.Seq = (UNSIGNED)RIGHT.Result.InputEcho.Seq, 
 	flatten_v21(LEFT, RIGHT), KEEP(1), ATMOST(10), LOCAL), seq);
-
 failureResults := PROJECT(failureResults_seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
 
 //This Returns any inputs that resulted in an error or whose result was dropped
-Error_Inputs_seq := SORT(JOIN(DISTRIBUTE(f_with_seq, HASH64(AccountNumber)),
-	DISTRIBUTE(flatResults, HASH64(AccountNumber)), 
-	LEFT.AccountNumber = RIGHT.AccountNumber, 
+Error_Inputs_seq := SORT(JOIN(DISTRIBUTE(f_with_seq, HASH64((UNSIGNED)seq)),
+	DISTRIBUTE(flatResults_seq, HASH64((UNSIGNED)seq)), 
+	(UNSIGNED)LEFT.seq = (UNSIGNED)RIGHT.seq, 
 	TRANSFORM({UNSIGNED6 seq, InputFileLayout}, SELF := LEFT), 
 	LEFT ONLY, LOCAL), seq); 
-
 Error_Inputs := PROJECT(Error_Inputs_Seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
 
 OUTPUT(CHOOSEN(flatResults, eyeball), NAMED('Sample_Final_Results'));
@@ -2875,6 +2901,6 @@ OUTPUT(CHOOSEN(failureResults, eyeball), NAMED('Sample_Failed_Results'));
 OUTPUT(CHOOSEN(Error_Inputs, eyeball), NAMED('Sample_Failed_Inputs'));
 
 OUTPUT(COUNT(flatResults), NAMED('Total_Final_Results_Passed'));
-OUTPUT(flatResults,, outputFile, CSV(HEADING(single), QUOTE('"')), OVERWRITE);
-OUTPUT(failureResults,,outputFile+'_Errors', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
-OUTPUT(Error_Inputs,,outputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE);
+OUTPUT(flatResults,, outputFile, CSV(HEADING(single), QUOTE('"')), OVERWRITE, NAMED('Final_Results_Passed'));
+OUTPUT(failureResults,,outputFile+'_Errors', CSV(HEADING(single), QUOTE('"')), OVERWRITE, NAMED('Final_Results_Errors'));
+OUTPUT(Error_Inputs,,outputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE, NAMED('Final_Results_DroppedRerun'));
