@@ -43,15 +43,13 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string fn) := function
 		total := COUNT(nac2);
 		nErrors := COUNT(errs(Severity='E'));
 		nWarnings := COUNT(errs(Severity='W'));
-		nRejected := COUNT(addresses(errors>0)) + COUNT(cases(errors>0)) + COUNT(clients(errors>0)) + COUNT(contacts(errors>0)) + COUNT(exceptions(errors>0));
+		nRejected := COUNT(addresses(errors>0)) + COUNT(cases(errors>0)) + COUNT(clients(errors>0)) + COUNT(contacts(errors>0)) + COUNT(exceptions(errors>0)) + COUNT(badrecords);
 		nWarned := COUNT(addresses(warnings>0)) + COUNT(cases(warnings>0)) + COUNT(clients(warnings>0)) + COUNT(contacts(warnings>0)) + COUNT(exceptions(warnings>0));
-		nRejectable := COUNT(addresses(errors>0)) + COUNT(cases(errors>0)) + COUNT(clients(errors>0));
+		nRejectable := COUNT(addresses(errors>0)) + COUNT(cases(errors>0)) + COUNT(clients(errors>0)) + COUNT(badrecords);
 
 		err_rate := nRejectable/total;		// omit contact and exception records for threshold calculation
-		ExcessiveInvalidRecordsFound :=	err_rate	> $.Mod_Sets.threshld;
+		ExcessiveInvalidRecordsFound :=	(total=0) OR (err_rate	> $.Mod_Sets.threshld);
 
-	
-		//fn := ExtractFileName(ModifyFileName(lfn, 'ncf2'));
 
 		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound);
 
@@ -64,11 +62,13 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string fn) := function
 			EXPORT	DATASET($.Print.dRow) dsNcr2 := ncr;
 			EXPORT	DATASET($.Print.rNCD) dsNcd2 := ncd;
 			EXPORT	DATASET($.Print.rNcx2) dsNcx2 := ncx;
-			EXPORT	integer RejectedCount := nRejected;
+			EXPORT	integer RejectedCount := nRejected;		// all rejected records
+			EXPORT	integer RejectableCount := nRejectable;	// no contact/exception records
 			EXPORT	integer ErrorCount := nErrors;
 			EXPORT	integer WarningCount := nWarnings;
 			EXPORT	integer WarnedCount := nWarned;
 			EXPORT	integer	TotalRecords := total;
+			EXPORT	boolean	RejectFile := ExcessiveInvalidRecordsFound;
 			EXPORT	DATASET($.Layouts2.rStateContactEx) dsContacts := contacts;
 			EXPORT	DATASET($.Layouts2.rExceptionRecord) dsExceptions := exceptionArchive;
 		END; 
