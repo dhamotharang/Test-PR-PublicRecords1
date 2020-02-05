@@ -32,6 +32,7 @@ export t_KeepContactReportOption := record (iesp.share.t_BaseReportOption)
 	string IncludeDeceasedProcess {xpath('IncludeDeceasedProcess')}; // Xsd type: bool
 	string IncludeSSN {xpath('IncludeSSN')}; // Xsd type: bool
 	string IncludeGender {xpath('IncludeGender')}; // Xsd type: bool
+	string IncludeDOB {xpath('IncludeDOB')}; // Xsd type: bool
 	boolean IncludeBlankDateLastSeen {xpath('IncludeBlankDateLastSeen')};
 	boolean IncludeHistoricRecords {xpath('IncludeHistoricRecords')};
 	string BestAddressReturnCutoff {xpath('BestAddressReturnCutoff')}; //values['H','M','L','']
@@ -47,6 +48,7 @@ export t_KeepContactReportOption := record (iesp.share.t_BaseReportOption)
 	string PhoneTransactionType {xpath('PhoneTransactionType')}; //values['','W','1','2','']
 	integer PenaltyThreshold {xpath('PenaltyThreshold')};
 	string PhoneFilter {xpath('PhoneFilter')}; //values['','C','L','']
+	string EmailTransactionType {xpath('EmailTransactionType')}; //values['','1','2','']
 end;
 		
 export t_KeepContactBest := record
