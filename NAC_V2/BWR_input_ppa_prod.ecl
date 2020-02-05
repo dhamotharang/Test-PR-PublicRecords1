@@ -1,5 +1,6 @@
-﻿//
-//	Dataland PPA/RIN Scheduler
+﻿IMPORT _Control, STD;
+//
+//	Prod PPA/RIN Scheduler
 //
 envVars :=
  '#WORKUNIT(\'protect\',true);\n'
@@ -13,7 +14,6 @@ envVars :=
 +'wuname := \'NAC2 PPA Contributory File Processor\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 ;
-
 
 
 ip := _Control.IPAddress.bctlpedata10;
@@ -33,7 +33,7 @@ end;
 dNAC2ConfigForceLower	:=	project(nac_V2.dNAC2Config, tNAC2ConfigForceLower(left));
 
 sGroupId	:=	set(dNAC2ConfigForceLower, GroupID);
-dOKFiles	:=	files(Name[1..4] in sGroupId);
+dOKFiles	:=	files(Name[6..9] in sGroupId);
 
 r2 := RECORD
 	string		datadir;
