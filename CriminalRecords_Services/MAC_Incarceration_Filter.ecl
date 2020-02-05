@@ -1,5 +1,3 @@
-import CriminalRecords_BatchService, CriminalRecords_Services;
-
 /*
 	The logic below was originally located in CriminalRecords_BatchService.Possible_Incarceration_Indicator_Batch_Service_Records.
   This is an attempt to make this logic more reusable, as we currently have pieces of this same code located in multiple places. 

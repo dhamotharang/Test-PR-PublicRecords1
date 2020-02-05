@@ -29,7 +29,7 @@ EXPORT Intake := MODULE
     RETURN #EXPAND(%'nv'%);
   ENDMACRO;
 
-  EXPORT AppendNonExistUidComponents(din,uidList,filename) :=FUNCTIONMACRO
+  EXPORT ConstructMissingFieldList(din,uidList,filename) :=FUNCTIONMACRO
     LOADXML('<xml/>');
     #DECLARE(__inChild) #SET(__inChild,-1)
     #DECLARE(__currentRec) #SET(__currentRec,'')
@@ -37,8 +37,8 @@ EXPORT Intake := MODULE
     #DECLARE(__prefix) #SET(__prefix,'')
     #DECLARE(__fieldList) #SET(__fieldList,',')
     #DECLARE(__uidField)
-    #DECLARE(__uidFieldList) #SET(__uidFieldList,uidList)
-    #DECLARE(__layout) #SET(__layout,'{RECORDOF('+#TEXT(din)+')')
+    #DECLARE(__uidFieldList) #SET(__uidFieldList,uidList+',')
+		#DECLARE(__missingList) #SET(__missingList, '')
 
     #EXPORTXML(fields, RECORDOF(din))
     #FOR(fields)
@@ -73,14 +73,31 @@ EXPORT Intake := MODULE
       #IF(%'__uidFieldList'% = '')
         #BREAK
       #ELSE
-        #SET(__uidField,REGEXFIND('([^,]+)$', %'__uidFieldList'%, 0))
+        #SET(__uidField,REGEXFIND('^([^,]+),', %'__uidFieldList'%, 1))
         #IF(NOT REGEXFIND(','+%'__uidField'%+',', %'__fieldList'%, NOCASE))
           #IF(NOT REGEXFIND('\\.',%'__uidField'%))
-            #APPEND(__layout,',STRING '+%'__uidField'%)
+            #APPEND(__missingList,','+%'__uidField'%)
           #ELSE
-            #ERROR(%'__uidField'%+' does not exist in '+filename+';  hint: use a non-dotted name for the default mapping and override in the USE statements for nested records mappings.')
+            #ERROR(%'__uidField'%+' does not exist in ' + filename + '. Hint: use a non-dotted name for the default mapping and override in the USE statements for nested records mappings.')
           #END
         #END
+        #SET(__uidFieldList,REGEXFIND('^([^,]+),(.*)$', %'__uidFieldList'%, 2));
+      #END
+    #END
+
+    RETURN %'__missingList'%[2..];
+  ENDMACRO;
+
+  EXPORT AppendFields(din,uidList) :=FUNCTIONMACRO
+    LOADXML('<xml/>');
+    #DECLARE(__uidFieldList) #SET(__uidFieldList,uidList)
+    #DECLARE(__layout) #SET(__layout,'{RECORDOF('+#TEXT(din)+')')
+
+    #LOOP
+      #IF(%'__uidFieldList'% = '')
+        #BREAK
+      #ELSE
+        #APPEND(__layout,',STRING '+ REGEXFIND('([^,]+)$', %'__uidFieldList'%, 0))
         #SET(__uidFieldList,REGEXREPLACE('^(.*)\\,[^,]+$', ','+%'__uidFieldList'%, '$1')[2..]);
       #END
     #END

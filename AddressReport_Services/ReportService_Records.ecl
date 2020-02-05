@@ -114,8 +114,8 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
   Property        := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(Prop_ids);
 
   // Below added on 03/30/2011 for criminal records, sex offenders, bookings, hunting and fire arm licences
-  Crims_filtered  := if(param.include_CriminalRecords,AddressReport_Services.functions.fCrimes());
-  sexOffender_filtered          := if(param.include_SexualOffenses,AddressReport_Services.functions.fSexOffendors());
+  Crims_filtered  := if(param.include_CriminalRecords,AddressReport_Services.functions.fCrimes(mod_access));
+  sexOffender_filtered          := if(param.include_SexualOffenses,AddressReport_Services.functions.fSexOffendors(mod_access));
   Hunting_Filtered              := if(param.include_HuntingFishingLicenses,AddressReport_Services.functions.fHuntingAndFishing(mod_access));
   formatedFilteredWeaponRecords := if(param.include_WeaponPermits ,AddressReport_Services.functions.fWeaponsPermits());
   // end 03/30/2011 maintenance
@@ -277,12 +277,12 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
                                                                                IsFCRA);
 
   //Criminals - Residents and Neighbors
-  crim_recs        := AddressReport_Services.functions.fCrimesRecords(all_dids);
+  crim_recs        := AddressReport_Services.functions.fCrimesRecords(all_dids, mod_access);
   res_crim_recs    := join(cur_dids, crim_recs, left.did = (unsigned)right.UniqueId, transform(right));
   nbr_crim_recs    := join(nbr_dids, crim_recs, left.did = (unsigned)right.UniqueId, transform(right));
 
   //Sex Offenders - Residents and Neighbors
-  so_recs         := AddressReport_Services.functions.fSexOffenderRecords(all_dids, mod_access.application_type);
+  so_recs         := AddressReport_Services.functions.fSexOffenderRecords(all_dids, mod_access);
   res_so_recs     := join(cur_dids, so_recs, left.did = (unsigned)right.UniqueId, transform(iesp.sexualoffender.t_OffenderRecord, self := right)); // layout transformed- FFD FCRA
   nbr_so_recs     := join(nbr_dids, so_recs, left.did = (unsigned)right.UniqueId, transform(right));
 

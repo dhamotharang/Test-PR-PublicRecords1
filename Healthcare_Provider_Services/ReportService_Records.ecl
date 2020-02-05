@@ -41,10 +41,10 @@ EXPORT ReportService_Records(Healthcare_Header_Services.IParams.ReportParams inp
 	Neighbors := map(isIndiv=>choosen(mod_person.dsNeighbors(inputData.IncludeNeighs),iesp.Constants.BR.MaxNeighborhood),dataset([],iesp.bpsreport.t_NeighborSlim));
 	Associates :=  if (inputData.IncludeRelativesOnlyWhenDeadOrWithSanctions,AssociatesDataWSanctionsFilter(HasLEIESanctions=true or HasEPLSSanctions=true or IsDeceased=true),AssociatesDataWSanctions);
 	//End logic to support IncludeRelativesOnlyWhenDeadOrWithSanctions for Relative and Associates
-	sexOff	:= map(isIndiv=>Healthcare_Provider_Services.SexualOffender_Records(inputData,dsDids).sexOffenderOffenses,
+	sexOff	:= map(isIndiv=>Healthcare_Provider_Services.SexualOffender_Records(inputData,mod_access,dsDids).sexOffenderOffenses,
 									dataset([],iesp.sexualoffender.t_SexOffReportRecord));
-	sexOffIDs := map(isIndiv=>Healthcare_Provider_Services.SexualOffender_Records(inputData,dsDids).sexOffenderOffenderIds,'');
-	crimOff	:= map(isIndiv=>Healthcare_Provider_Services.CriminalOffender_Records(inputData,dsDids).dsCriminalRecords(inputData.IncludeCriminalRecords),dataset([],iesp.criminal.t_CrimReportRecord));
+	sexOffIDs := map(isIndiv=>Healthcare_Provider_Services.SexualOffender_Records(inputData,mod_access,dsDids).sexOffenderOffenderIds,'');
+	crimOff	:= map(isIndiv=>Healthcare_Provider_Services.CriminalOffender_Records(inputData,mod_access,dsDids).dsCriminalRecords(inputData.IncludeCriminalRecords),dataset([],iesp.criminal.t_CrimReportRecord));
 	//Add logic to support IncludeCorporateAffiliationsOnlyWhenSanctions for Business Individuals and Companies
 	corpsInd := Healthcare_Provider_Services.Corps_Records(dsDids,dsBdids).dsCorporateAffiliations(inputData.IncludeCorporateAffiliations);	
 	corpsBus := Healthcare_Provider_Services.Corps_Records(dsDids,dsBdids).dsBusinessCorporateRecords(inputData.IncludeCorporateAffiliations and hasBDids);	

@@ -7,5 +7,5 @@ export layout_relative_dids_v3 := RECORD
 	boolean  same_lname;
   unsigned2 number_cohabits;
 	unsigned1 relative_title;
-	Relationship.layout_GetRelationship.InterfaceOuput -title;
+	Relationship.layout_GetRelationship.InterfaceOutput_new -title;
 END;

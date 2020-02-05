@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+﻿//HPCC Systems KEL Compiler Version 1.1.0
 IMPORT KEL11 AS KEL;
 IMPORT CFG_Compile,E_Input_P_I_I,E_Person FROM PublicRecords_KEL;
 IMPORT * FROM KEL11.Null;
 EXPORT B_Input_P_I_I_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_P_I_I(__in,__cfg).__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
-  SHARED __EE99613 := __E_Input_P_I_I;
-  EXPORT __ST96008_Layout := RECORD
+  SHARED __EE112755 := __E_Input_P_I_I;
+  EXPORT __ST109277_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -76,11 +76,13 @@ EXPORT B_Input_P_I_I_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr P___Inp_Addr_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST96008_Layout __ND99691__Project(E_Input_P_I_I(__in,__cfg).Layout __PP99253) := TRANSFORM
-    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP99253.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP99253.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP99253.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP99253.P___Inp_Addr_Line2_)));
-    SELF := __PP99253;
+  SHARED __ST109277_Layout __ND112833__Project(E_Input_P_I_I(__in,__cfg).Layout __PP112395) := TRANSFORM
+    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP112395.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP112395.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP112395.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP112395.P___Inp_Addr_Line2_)));
+    SELF := __PP112395;
   END;
-  EXPORT __ENH_Input_P_I_I_7 := PROJECT(__EE99613,__ND99691__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_7 := PROJECT(__EE112755,__ND112833__Project(LEFT));
 END;

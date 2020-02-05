@@ -25,7 +25,7 @@
       #END));
   
   // All Lexid Associations
-  LOCAL MatchingLexidAssociationsFull := DISTRIBUTE(Relationship.proc_GetRelationship(DistinctLexids, 
+  LOCAL Rels_Neutral:= Relationship.proc_GetRelationshipNeutral(DistinctLexids, 
     TRUE,   //RelativeFlag
     TRUE,   //AssociateFlag
     FALSE,  //AllFlag
@@ -42,10 +42,13 @@
     FALSE,  //excludeTransClosure2
     FALSE,  //excludeInactives
     COUNT(DistinctLexids)>IndexThreshold //doThor
-    ).result, HASH32(did1, did2));
+    ).result;
+
+  LOCAL Rels_Flat:= Relationship.functions_getRelationship.convertNeutralToFlat_new(Rels_Neutral); 
+  LOCAL MatchingLexidAssociationsFull := DISTRIBUTE(Rels_Flat, HASH32(did1, did2));
   
   // Exact Lexid to Lexid Association Matches.
-  LOCAL MatchingLexidAssociations:= DISTRIBUTE(Relationship.proc_GetRelationshipPairs(DistinctInputLexidAssociations,
+  LOCAL Rels_Pairs := Relationship.proc_GetRelationshipPairs(DistinctInputLexidAssociations,
     TRUE,   //RelativeFlag
     TRUE,   //AssociateFlag
     FALSE,  //AllFlag
@@ -61,7 +64,10 @@
     FALSE,  //excludeTransClosure2
     FALSE,  //excludeInactives
     COUNT(DistinctInputLexidAssociations)>IndexThreshold //doThor
-    ).result, HASH32(did1, did2));
+    ).result;
+  LOCAL Rels_Pairs_New := PROJECT(Rels_Pairs, 
+                           TRANSFORM(Relationship.layout_GetRelationship.InterfaceOutput_new, SELF:=LEFT, SELF:=[]));  
+  LOCAL MatchingLexidAssociations:= DISTRIBUTE(Rels_Pairs_New, HASH32(did1, did2));
 	
   // First Degree Detail with the Degree column added.
   LOCAL FirstDegreeAssociations := SORT(DISTRIBUTE(PROJECT(

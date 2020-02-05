@@ -4,9 +4,6 @@ EXPORT Records(DATASET(iesp.net_wise_search.t_NetWiseEmailSearchRequest) ds_requ
                Gateway.NetWiseSearch.IParams.SearchParams in_mod
               ) := FUNCTION
 
-  // Check the input 'gateways' ds for the correct servicename and grab the record.
-  ds_gateways_rec := in_mod.gateways(Gateway.Configuration.IsNetWise(servicename))[1];
-
   makeGatewayCall := TRUE; // always make the gw call since only gw data(no in-house data)
 
   //Project iesp query search input layout onto the iesp gateway layout 
@@ -18,16 +15,15 @@ EXPORT Records(DATASET(iesp.net_wise_search.t_NetWiseEmailSearchRequest) ds_requ
 
   // Call the attrribute that does the actual SoapCall
   ds_gw_scnw_out := Gateway.SoapCall_NetWise(ds_gateway_req_in, 
-                                             ds_gateways_rec, 
+                                             in_mod,
                                              Gateway.NetwiseSearch.Constants.GW_TIMEOUT, 
                                              Gateway.NetWiseSearch.Constants.GW_RETRIES, 
                                              makeGatewayCall, 
-                                             in_mod //,
-                                             //TRUE // for CCPA opt out/future use???
+                                             TRUE // TRUE=apply CCPA opt out logic
                                             );
 
   //Project iesp gateway response layout onto iesp query search response layout
-  ds_search_resp_out := PROJECT(ds_gw_scnw_out, //iesp.net_wise_search.t_NetWiseEmailSearchResponseEx
+  ds_search_resp_out := PROJECT(ds_gw_scnw_out,
                                 TRANSFORM(iesp.net_wise_search.t_NetWiseEmailSearchResponse,
                                   SELF._Header := LEFT.response._Header;
                                   SELF.Results := LEFT.response.Results));
@@ -35,7 +31,6 @@ EXPORT Records(DATASET(iesp.net_wise_search.t_NetWiseEmailSearchRequest) ds_requ
 
   // Outputs for debugging.  Un-comment them as needed!
   //OUTPUT(ds_request_in,    named('ds_request_in'));
-  //OUTPUT(in_mod.gateways,  named('ds_gateways'));
   //OUTPUT(ds_gateways_rec,    named('ds_gateways_rec'));
   //OUTPUT(ds_gateway_req_in, named('ds_gateway_req_in'));
   //OUTPUT(ds_gw_scnw_out,   named('ds_gw_scnw_out'));
