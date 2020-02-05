@@ -3,7 +3,7 @@
 	the best lexID to choose.
 */
 EXPORT append_segmentation(trimRes) := FUNCTIONMACRO;
-IMPORT InsuranceHeader_PostProcess;
+IMPORT InsuranceHeader_PostProcess, _Control;
  
 	#UNIQUENAME(normrec)
 	%normrec% := record  
@@ -20,8 +20,7 @@ IMPORT InsuranceHeader_PostProcess;
 
 	#UNIQUENAME(trimResNorm)
 	%trimResNorm% := NORMALIZE(trimRes,left.results,TRANSFORM(%normrec%,self.id := left.reference, self.res := right));
-	#UNIQUENAME(trimReswSegKey)
-	#UNIQUENAME(trimReswSegPull)
+	#UNIQUENAME(trimReswSegKey)	
 	#UNIQUENAME(trimReswSeg)
 														 
 	 %trimReswSegKey% := JOIN(%trimResNorm%,%seg%,
@@ -38,8 +37,9 @@ IMPORT InsuranceHeader_PostProcess;
 	 													 self.res.best_dob := right.dob,                             
                               self.res := left.res,                             
                               self := left), left outer, keep(1));
-
-  %trimReswSegPull% := JOIN(DISTRIBUTE(%trimResNorm%, RES.DID),DISTRIBUTE(pull(%seg%),DID),
+	#IF(_Control.ThisEnvironment.IsPlatformThor)
+		#UNIQUENAME(trimReswSegPull)
+  	%trimReswSegPull% := JOIN(DISTRIBUTE(%trimResNorm%, RES.DID),DISTRIBUTE(pull(%seg%),DID),
                       left.res.did = right.did,
                        transform(RECORDOF(LEFT),
 														 string tempInd := TRIM(right.ind); 
@@ -54,7 +54,10 @@ IMPORT InsuranceHeader_PostProcess;
                              self.res := left.res,                             
                              self := left), left outer, keep(1), LOCAL);
 
-	%trimReswSeg% := IF (thorlib.nodes() < 400 OR count(%trimResNorm%) < 50000000 , %trimReswSegKey%, %trimReswSegPull%);
+		%trimReswSeg% := IF (thorlib.nodes() < 400 OR count(%trimResNorm%) < 50000000 , %trimReswSegKey%, %trimReswSegPull%);
+	#ELSE 
+		%trimReswSeg% := %trimReswSegKey%;
+	#END;
 
 	// filter out lexIDs that are insurance only if enviroment is Boca/PR.	
   #UNIQUENAME(trimReswSegIns) 
