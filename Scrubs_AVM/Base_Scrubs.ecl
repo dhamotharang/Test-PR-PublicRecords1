@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ﻿IMPORT SALT38,STD;
+=======
+﻿IMPORT SALT311,STD;
+>>>>>>> 1c8bc40922d7eefcc396cc398ce8b80133af6973
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Base_Scrubs := MODULE
  
@@ -53,6 +57,106 @@ EXPORT Base_Scrubs := MODULE
   EXPORT  Bitmap_Layout := RECORD(Base_Layout_AVM)
     UNSIGNED8 ScrubsBits1;
   END;
+<<<<<<< HEAD
+=======
+  EXPORT Rule_Layout := RECORD(Base_Layout_AVM)
+    STRING Rules {MAXLENGTH(1000)};
+  END;
+  SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
+          ,'history_date:Invalid_Date:CUSTOM'
+          ,'ln_fares_id_ta:Invalid_Comps:ALLOW'
+          ,'ln_fares_id_pi:Invalid_Comps:ALLOW'
+          ,'unformatted_apn:Invalid_Comps:ALLOW'
+          ,'st:Invalid_Alpha:ALLOW'
+          ,'zip:Invalid_Num:ALLOW'
+          ,'zip4:Invalid_Num:ALLOW'
+          ,'fips_code:Invalid_Num:ALLOW'
+          ,'recording_date:Invalid_Date:CUSTOM'
+          ,'assessed_value_year:Invalid_Num:ALLOW'
+          ,'sales_price:Invalid_Num:ALLOW'
+          ,'assessed_total_value:Invalid_Num:ALLOW'
+          ,'market_total_value:Invalid_Num:ALLOW'
+          ,'tax_assessment_valuation:Invalid_Num:ALLOW'
+          ,'price_index_valuation:Invalid_Num:ALLOW'
+          ,'hedonic_valuation:Invalid_Num:ALLOW'
+          ,'automated_valuation:Invalid_Num:ALLOW'
+          ,'confidence_score:Invalid_Num:ALLOW'
+          ,'comp1:Invalid_Comps:ALLOW'
+          ,'comp2:Invalid_Comps:ALLOW'
+          ,'comp3:Invalid_Comps:ALLOW'
+          ,'comp4:Invalid_Comps:ALLOW'
+          ,'comp5:Invalid_Comps:ALLOW'
+          ,'nearby1:Invalid_Comps:ALLOW'
+          ,'nearby2:Invalid_Comps:ALLOW'
+          ,'nearby3:Invalid_Comps:ALLOW'
+          ,'nearby4:Invalid_Comps:ALLOW'
+          ,'nearby5:Invalid_Comps:ALLOW'
+          ,'history_history_date:Invalid_Date:CUSTOM'
+          ,'history_recording_date:Invalid_Date:CUSTOM'
+          ,'history_assessed_value_year:Invalid_Num:ALLOW'
+          ,'history_sales_price:Invalid_Num:ALLOW'
+          ,'history_assessed_total_value:Invalid_Num:ALLOW'
+          ,'history_market_total_value:Invalid_Num:ALLOW'
+          ,'history_tax_assessment_valuation:Invalid_Num:ALLOW'
+          ,'history_price_index_valuation:Invalid_Num:ALLOW'
+          ,'history_hedonic_valuation:Invalid_Num:ALLOW'
+          ,'history_automated_valuation:Invalid_Num:ALLOW'
+          ,'history_confidence_score:Invalid_Num:ALLOW'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
+  SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
+          ,Base_Fields.InvalidMessage_history_date(1)
+          ,Base_Fields.InvalidMessage_ln_fares_id_ta(1)
+          ,Base_Fields.InvalidMessage_ln_fares_id_pi(1)
+          ,Base_Fields.InvalidMessage_unformatted_apn(1)
+          ,Base_Fields.InvalidMessage_st(1)
+          ,Base_Fields.InvalidMessage_zip(1)
+          ,Base_Fields.InvalidMessage_zip4(1)
+          ,Base_Fields.InvalidMessage_fips_code(1)
+          ,Base_Fields.InvalidMessage_recording_date(1)
+          ,Base_Fields.InvalidMessage_assessed_value_year(1)
+          ,Base_Fields.InvalidMessage_sales_price(1)
+          ,Base_Fields.InvalidMessage_assessed_total_value(1)
+          ,Base_Fields.InvalidMessage_market_total_value(1)
+          ,Base_Fields.InvalidMessage_tax_assessment_valuation(1)
+          ,Base_Fields.InvalidMessage_price_index_valuation(1)
+          ,Base_Fields.InvalidMessage_hedonic_valuation(1)
+          ,Base_Fields.InvalidMessage_automated_valuation(1)
+          ,Base_Fields.InvalidMessage_confidence_score(1)
+          ,Base_Fields.InvalidMessage_comp1(1)
+          ,Base_Fields.InvalidMessage_comp2(1)
+          ,Base_Fields.InvalidMessage_comp3(1)
+          ,Base_Fields.InvalidMessage_comp4(1)
+          ,Base_Fields.InvalidMessage_comp5(1)
+          ,Base_Fields.InvalidMessage_nearby1(1)
+          ,Base_Fields.InvalidMessage_nearby2(1)
+          ,Base_Fields.InvalidMessage_nearby3(1)
+          ,Base_Fields.InvalidMessage_nearby4(1)
+          ,Base_Fields.InvalidMessage_nearby5(1)
+          ,Base_Fields.InvalidMessage_history_history_date(1)
+          ,Base_Fields.InvalidMessage_history_recording_date(1)
+          ,Base_Fields.InvalidMessage_history_assessed_value_year(1)
+          ,Base_Fields.InvalidMessage_history_sales_price(1)
+          ,Base_Fields.InvalidMessage_history_assessed_total_value(1)
+          ,Base_Fields.InvalidMessage_history_market_total_value(1)
+          ,Base_Fields.InvalidMessage_history_tax_assessment_valuation(1)
+          ,Base_Fields.InvalidMessage_history_price_index_valuation(1)
+          ,Base_Fields.InvalidMessage_history_hedonic_valuation(1)
+          ,Base_Fields.InvalidMessage_history_automated_valuation(1)
+          ,Base_Fields.InvalidMessage_history_confidence_score(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors','UNKNOWN');
+>>>>>>> 1c8bc40922d7eefcc396cc398ce8b80133af6973
 EXPORT FromNone(DATASET(Base_Layout_AVM) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.history_date_Invalid := Base_Fields.InValid_history_date((SALT38.StrType)le.history_date);

@@ -131,8 +131,10 @@ EXPORT modGenerateStatistics(STRING sVersion, STRING sInPrefix = '', STRING sEma
     SELF.iMode := dRows[1].mode;
     SELF.iCompareMode := dRows[1].compareMode;
     SELF.sDescription := dRows[1].description;    
-    SELF.sProfileBucket := dRows[1].profile_Bucket;    
+    SELF.sProfileBucket := dRows[1].profile_Bucket;
     SELF.iTotalCnt := COUNT(dRowsNoError);
+    SELF.iProdHits := IF(bStatsProxidLevel,COUNT(dRowsNoError(input_proxid<>0)),COUNT(dRowsNoError(input_seleid<>0)));  
+    SELF.nProdHits := SELF.iProdHits/SELF.iTotalCnt*100;  
     SELF.iBaselineHits := IF(bStatsProxidLevel,COUNT(dRowsNoError(iProxidOutOrig<>0)),COUNT(dRowsNoError(iSeleidOutOrig<>0)));
     SELF.nBaselineHits := SELF.iBaselineHits/SELF.iTotalCnt*100;
     SELF.iNewHits := IF(bStatsProxidLevel,COUNT(dRowsNoError(iProxidOutNew<>0)),COUNT(dRowsNoError(iSeleidOutNew<>0)));
@@ -150,14 +152,14 @@ EXPORT modGenerateStatistics(STRING sVersion, STRING sInPrefix = '', STRING sEma
     SELF.iFromZero := IF(bStatsProxidLevel,COUNT(dRowsNoError(iProxidOutOrig=0 AND iProxidOutNew<>0)),COUNT(dRowsNoError(iSeleidOutOrig=0 AND iSeleidOutNew<>0)));
     SELF.nFromZero := SELF.iFromZero/SELF.iTotalCnt*100;
     // Orig Header Accuracy
-    SELF.iHeaderOrigAccuracy := count(dRowsNoError(description = 'Header' and if(bStatsProxidLevel, iProxidOutOrig = input_proxid, iSeleidOutOrig = input_seleid)));
+    SELF.iHeaderOrigAccuracy := IF(bStatsProxidLevel, count(dRowsNoError(input_proxid != 0 AND iProxidOutOrig = input_proxid AND iProxidOutOrig != 0)), count(dRowsNoError(input_seleid != 0 AND iSeleidOutOrig = input_seleid AND iSeleidOutOrig != 0)));
     SELF.nHeaderOrigAccuracy := SELF.iHeaderOrigAccuracy/SELF.iBaselineHits*100;
-    SELF.iHeaderOrigDiff := count(dRowsNoError(description = 'Header' and if(bStatsProxidLevel, iProxidOutOrig != input_proxid and iProxidOutOrig != 0, iSeleidOutOrig != input_seleid and iSeleidOutOrig != 0)));    
+    SELF.iHeaderOrigDiff := IF(bStatsProxidLevel, count(dRowsNoError(input_proxid != 0 and iProxidOutOrig != input_proxid and iProxidOutOrig != 0)), count(dRowsNoError(input_seleid != 0 and iSeleidOutOrig != input_seleid and iSeleidOutOrig != 0)));    
     SELF.nHeaderOrigDiff := SELF.iHeaderOrigDiff/SELF.iBaselineHits*100;
     // New Header Accuracy
-    SELF.iHeaderNewAccuracy := count(dRowsNoError(description = 'Header' and if(bStatsProxidLevel, iProxidOutNew = input_proxid, iSeleidOutNew = input_seleid)));
+    SELF.iHeaderNewAccuracy := IF(bStatsProxidLevel, count(dRowsNoError(input_proxid != 0 AND iProxidOutNew = input_proxid AND iProxidOutNew != 0)), count(dRowsNoError(input_seleid != 0 AND iSeleidOutNew = input_seleid AND iSeleidOutNew!= 0)));
     SELF.nHeaderNewAccuracy := SELF.iHeaderNewAccuracy/SELF.iNewHits*100;
-    SELF.iHeaderNewDiff := count(dRowsNoError(description = 'Header' and if(bStatsProxidLevel, iProxidOutNew != input_proxid and iProxidOutNew != 0, iSeleidOutNew != input_seleid and iSeleidOutNew != 0)));    
+    SELF.iHeaderNewDiff := IF(bStatsProxidLevel, count(dRowsNoError(input_proxid != 0 and iProxidOutNew != input_proxid and iProxidOutNew != 0)), count(dRowsNoError(input_seleid != 0 and iSeleidOutNew != input_seleid and iSeleidOutNew != 0)));    
     SELF.nHeaderNewDiff := SELF.iHeaderNewDiff/SELF.iNewHits*100;
 
     SELF.nBaselineLatency := AVE(dRowsNoError, iCallLatencyOrig);
@@ -223,6 +225,8 @@ EXPORT modGenerateStatistics(STRING sVersion, STRING sInPrefix = '', STRING sEma
 			convertToString(sProfileBucket);
 			convertToString(sDescription);
 			convertToString(iTotalCnt); // 5
+			convertToString(iProdHits);
+			convertToString(nProdHits);
 			convertToString(iBaselineHits);
 			convertToString(nBaselineHits);
 			convertToString(iNewHits);
@@ -261,6 +265,8 @@ EXPORT modGenerateStatistics(STRING sVersion, STRING sInPrefix = '', STRING sEma
 			'ProfileBucket',
 			'Description',
 			'TotalCnt', // 5
+			'ProdHits',
+			'ProdHits%',
 			'BaselineHits',
 			'BaselineHits%',
 			'NewHits',

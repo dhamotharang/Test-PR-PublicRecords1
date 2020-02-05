@@ -21,7 +21,7 @@
 												'dt_last_seen_,score_,' +
                         'id_ssn_identity_count_max_,' + 
                         'nas9_flag_,nap3_flag_,cl_no_lex_id_gt22_count_,cl_death_prior_to_all_events_identity_count_,cl_high_risk_death_prior_to_all_events_identity_count_,cl_event_count_,cl_identity_count_,cl_full_identity_count_,cl_nas9_identity_count_,cl_nap3_identity_count_,' + 
-                        'kr_high_risk_flag_,kr_medium_risk_flag_,kr_event_after_last_known_risk_flag_,' +
+                        'kr_high_risk_flag_,kr_medium_risk_flag_,kr_low_risk_flag_,kr_event_after_last_known_risk_flag_,' +
 												'vl_event30_active_flag_,' +
                         'cl_identity_count_decile_,cl_p_r_identity_match_count_,cl_p_r_identity_match_percent_,cl_high_kr_identity_count_,cl_active7_identity_count_,cl_active30_identity_count_,cl_address_count_,cl_identity_event_avg_,cl_high_risk_pattern1_flag_,cl_high_risk_pattern2_flag_,cl_high_risk_pattern3_flag_,cl_high_risk_pattern4_flag_,cl_high_risk_pattern5_flag_,cl_nas9_identity_percent_,cl_nas9_top10_,cl_high_risk_death_prior_to_all_events_identity_percent_,cl_high_risk_death_prior_to_all_events_identity_top10_,cl_ip_high_risk_identity_percent_,cl_ip_high_risk_identity_top10_,cl_high_kr_identity_percent_,cl_high_kr_identity_top10_,cl_ip_not_us_identity_count_,cl_ip_vpn_identity_count_,cl_ip_high_risk_city_identity_count_,cl_ip_hosted_identity_count_,cl_ip_tor_identity_count_,cl_ip_high_risk_identity_count_,cl_ip_not_us_event_count_,cl_ip_vpn_event_count_,cl_ip_high_risk_city_event_count_,cl_ip_hosted_event_count_,cl_ip_tor_event_count_,cl_identity_count_percentile_,cl_event_count_percentile_,cl_active30_identity_count_percentile_,cl_active7_identity_count_percentile_,cl_impact_weight_');
  
