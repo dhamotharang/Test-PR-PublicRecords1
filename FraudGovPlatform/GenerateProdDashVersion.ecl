@@ -1,5 +1,5 @@
 ﻿Import Dops, FraudGovPlatform,std,_control;
-ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor','Thor400_Dev',	'Thor400_44');
+ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor','Thor400_Dev',	'Thor400_36');
 RIN_CERT_Version:= Dops.GetBuildVersion('FraudGovKeys','B','N','C');
 string currentBuildVersion := RIN_CERT_Version;
 

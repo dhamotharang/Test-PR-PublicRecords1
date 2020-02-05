@@ -44,9 +44,8 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		
 		processed := $.PreprocessNCF2(ilfn);
 		base2 := $.fn_constructBase2FromNCFEx(processed, version);				
-		reports := $.GetReports(ModifyFileName(ilfn, 'nac2'));
-		err_rate := reports.RejectedCount/reports.TotalRecords;
-		ExcessiveInvalidRecordsFound :=	err_rate	> treshld_;
+		reports := $.GetReports(processed, lfn);		//ModifyFileName(ilfn, 'nac2'));
+		ExcessiveInvalidRecordsFound :=	reports.RejectFile;
 		
 		MoveToTempOrReject := 	if(ExcessiveInvalidRecordsFound
 												,MoveSprayingToError
@@ -76,11 +75,11 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 				//,OUTPUT(err_rate, named('err_rate'))
 				,MoveToTempOrReject
 				,out_NCF_reports
-				,IF(EXISTS(reports.dsContacts), fn_ProcessContactRecord(reports.dsContacts))
+				,IF(EXISTS(reports.dsContacts(errors=0)), fn_ProcessContactRecord(reports.dsContacts(errors=0)))
 				,IF(EXISTS(reports.dsExceptions), fn_ProcessExceptionRecord(reports.dsExceptions))
-				,OUTPUT(base2,,ModifyFileName(ilfn, 'bas2'), COMPRESSED, OVERWRITE)
+				,IF(NOT ExcessiveInvalidRecordsFound,OUTPUT(base2,,ModifyFileName(ilfn, 'bas2'), COMPRESSED, OVERWRITE))
 				//,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfReady, ModifyFileName(ilfn, 'bas2')))
-				,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfOnboarding, ModifyFileName(ilfn, 'bas2')))
+				,IF(NOT ExcessiveInvalidRecordsFound,NOTHOR(Std.File.AddSuperFile($.Superfile_List.sfOnboarding, ModifyFileName(ilfn, 'bas2'))))
 				,despray_NCF_reports('ncx2')
 				,despray_NCF_reports('ncd2')
 				,despray_NCF_reports('ncr2')

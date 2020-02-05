@@ -808,7 +808,7 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
                             zip, 
                             ds_with_locid); 			
 		
-		export result		:= project(ds_CCPA, transform(l_dot, self.rcid:=0, self:=left)); // strip temporary rcids
+		export result		:= project(ds_with_locid, transform(l_dot, self.rcid:=0, self:=left)); // strip temporary rcids
 		export err_rec	:= mod_bct.err_rec + mod_filt.err_rec;
 		export err_summary := sort(table(err_rec, {string60 src_name:=BIPV2.mod_sources.TranslateSource_aggregate(source),source,remedy,reason,unsigned cnt:=count(group)}, source,remedy,reason, merge), record);
 		

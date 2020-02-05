@@ -22,7 +22,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'Source_Level_Base';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:record_sid';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,cellphoneidkey,source,household_flag,datefirstseen,datelastseen,datevendorfirstreported,datevendorlastreported,first_build_date,last_build_date,dt_nonglb_last_seen';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,cellphoneidkey,source,household_flag,did,datefirstseen,datelastseen,datevendorfirstreported,datevendorlastreported,first_build_date,last_build_date,dt_nonglb_last_seen';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := FALSE;
@@ -44,9 +44,10 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'SOURCEFIELD:source\n'
     + 'FILENAME:Source_Level_Base\n'
     + '\n'
-    + 'FIELD:cellphoneidkey:TYPE(DATA16):0,0  //cellphoneidkey is a hash of fname, last name, clean address, and phone7 so if any change, this will change and constitute a new record\n'
+    + 'FIELD:cellphoneidkey:TYPE(DATA16):0,0  //cellphoneidkey is a hash of fname, last name, clean address, and phone7\n'
     + 'FIELD:source:TYPE(STRING2):0,0\n'
     + 'FIELD:household_flag:TYPE(BOOLEAN):0,0\n'
+    + 'FIELD:did:TYPE(UNSIGNED6):0,0\n'
     + 'FIELD:datefirstseen:RECORDDATE(FIRST,YYYYMM):0,0\n'
     + 'FIELD:datelastseen:RECORDDATE(LAST,YYYYMM):0,0\n'
     + 'FIELD:datevendorfirstreported:RECORDDATE(FIRST,YYYYMM):0,0\n'
