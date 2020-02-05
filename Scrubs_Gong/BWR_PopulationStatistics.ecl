@@ -1,7 +1,7 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_Gong.BWR_PopulationStatistics - Population Statistics - SALT V3.3.0');
-IMPORT Scrubs_Gong,SALT33;
+#workunit('name','Scrubs_Gong.BWR_PopulationStatistics - Population Statistics - SALT V3.11.9');
+IMPORT Scrubs_Gong,SALT311;
 // In the line below substitute the file you want statistics for; and substitute any field names you can
   Scrubs_Gong.MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* ACTION_CODE_field */,/* RECORD_ID_field */,/* RECORD_TYPE_field */,/* TELEPHONE_field */,/* LISTING_TYPE_field */,/* BUSINESS_NAME_field */,/* BUSINESS_CAPTIONS_field */,/* CATEGORY_field */,/* INDENT_field */,/* LAST_NAME_field */,/* SUFFIX_NAME_field */,/* FIRST_NAME_field */,/* MIDDLE_NAME_field */,/* PRIMARY_STREET_NUMBER_field */,/* PRE_DIR_field */,/* PRIMARY_STREET_NAME_field */,/* PRIMARY_STREET_SUFFIX_field */,/* POST_DIR_field */,/* SECONDARY_ADDRESS_TYPE_field */,/* SECONDARY_RANGE_field */,/* CITY_field */,/* STATE_field */,/* ZIP_CODE_field */,/* ZIP_PLUS4_field */,/* LATITUDE_field */,/* LONGITUDE_field */,/* LAT_LONG_MATCH_LEVEL_field */,/* UNLICENSED_field */,/* ADD_DATE_field */,/* OMIT_ADDRESS_field */,/* DATA_SOURCE_field */,/* unknownField_field */,/* TransactionID_field */,/* Original_Suffix_field */,/* Original_First_Name_field */,/* Original_Middle_Name_field */,/* Original_Last_Name_field */,/* Original_Address_field */,/* Original_Last_Line_field */,/* filename_field */,outfile);
   OUTPUT(outfile,NAMED('PopulationStatistics'));
