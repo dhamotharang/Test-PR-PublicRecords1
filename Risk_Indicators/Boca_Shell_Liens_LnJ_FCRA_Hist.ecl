@@ -353,7 +353,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 					right.filing_type_desc not in Risk_Indicators.iid_constants.setMechanicsLiens and
 					right.filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50
 					and (INTEGER)right.Amount >= MinimumAmount
-					and right.AgencyID in NonExemptReportingSources
+					and right.AgencyID not in NonExemptReportingSources
 					and if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE),					
 					get_liens_main_raw(LEFT,RIGHT), left outer, 
 					ATMOST(keyed(LEFT.tmsid=RIGHT.tmsid) and keyed(left.rmsid=right.rmsid), 
@@ -371,7 +371,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 					right.filing_type_desc not in Risk_Indicators.iid_constants.setMechanicsLiens and
 					right.filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50
 					and (INTEGER)right.Amount >= MinimumAmount
-					and right.AgencyID in NonExemptReportingSources
+					and right.AgencyID not in NonExemptReportingSources
 					and if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE),					
 					get_liens_main_raw(LEFT,RIGHT), left outer, 
 					ATMOST((LEFT.tmsid=RIGHT.tmsid) and (left.rmsid=right.rmsid), 
