@@ -1852,6 +1852,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2020/116 Mali List','1839'},
 {'EC 2020/119 Ukraine List','1840'},
 {'SAT (Mexico) List of Taxpayers under Article  69-B','1841'},
-{'Taiwan MJIB Fugitive Online List','1842'}
+{'Taiwan MJIB Fugitive Online List','1842'},
+{'EC (CFSP) 2020/117 Tunisia List','1843'},
+{'EC 2020/115 Tunisia List','1844'}
 ],r);
 
