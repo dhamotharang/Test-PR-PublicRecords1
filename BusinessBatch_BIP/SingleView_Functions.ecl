@@ -185,7 +185,12 @@ export SingleView_Functions(BusinessBatch_Bip.iParam.SingleView.BatchParams inMo
       self := rin;
     end;
 
-    return project(best_ap, best_trans(left)) + noap_recs;
+    results_pre := project(best_ap, best_trans(left)) + noap_recs;
+    results_valid := results_pre(_valid_c);
+    results_clear := project(results_pre(not _valid_c), 
+      transform(layout_crosswalk_ex, self.consumer := [], self := left));
+
+    return results_valid + results_clear;
 
   end;
 
@@ -237,7 +242,12 @@ export SingleView_Functions(BusinessBatch_Bip.iParam.SingleView.BatchParams inMo
       left outer, keep(1), limit(0)
     );
 
-    return best_out + noap_recs;
+    results_pre := best_out + noap_recs;
+    results_valid := results_pre(_valid_b);
+    results_clear := project(results_pre(not _valid_b), 
+      transform(layout_crosswalk_ex, self.business := [], self := left));
+
+    return results_valid + results_clear;
 
   end;
 
