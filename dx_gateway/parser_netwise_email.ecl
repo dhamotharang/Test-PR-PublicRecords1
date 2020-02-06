@@ -1,7 +1,4 @@
-﻿// Currently as of the 02/11/2020 roxie release, this coding is not "batch compatible".
-// Will be attempting to add that functionality in the 02/11/2020 2nd cycle.
-
-// ****************** New module description *********************
+﻿// ****************** New module description *********************
 // Create a new dx_gateway.parser_netwise attribute: 
 // to parse the netwise gateway email search <Response><Results> 
 // in the iesp.net_wise.t_NetWiseQueryResponseEx.Results child dataset format
@@ -14,20 +11,32 @@
 IMPORT $, Address, doxie, iesp;
 
 EXPORT parser_netwise_email := MODULE
-
-  // Common temp record layout used by both functions below
+  
+  // Common temp record layouts used by both functions below
   SHARED rec_results_wseq := RECORD
-      UNSIGNED1 results_seq; // needed for joining later
-      iesp.net_wise_share.t_NetWiseResult;
-    END;
+    UNSIGNED1 results_seq; // needed for joining later
+    iesp.net_wise_share.t_NetWiseResult;
+  END;
+
+  SHARED rec_t_NetWiseQueryResponse := record
+	  iesp.share.t_ResponseHeader _Header {xpath('Header')};
+	  iesp.net_wise_share.t_NetWiseTransaction Transaction {xpath('Transaction')};
+	  DATASET(rec_results_wseq) Results {xpath('Results/Result'), MAXCOUNT(iesp.Constants.NETWISE.MAX_COUNT_RESULTS_RECORDS)};
+  END;
+
+  SHARED rec_response_wseq := RECORD
+    UNSIGNED1 response_seq; // needed for joining later
+    rec_t_NetWiseQueryResponse response {xpath('response')};
+  END;
 
 
-  EXPORT fn_parseResults(DATASET(rec_results_wseq) ds_in_results, 
-                         string16 transid_in 
-                        ) := FUNCTION
+  EXPORT fn_parseResponse(DATASET(rec_response_wseq) ds_in_response) := FUNCTION
 
-    rec_results_wseq_parsedname := RECORD
-      rec_results_wseq;
+    // First normalize all <Results> child dataset records on every <response> record using 
+    // a transform to parse/clean each of the Results.Name.Text field data which appears to have 
+    // the full name of the person associated with the query input email, in First (no middle?) Last format. 
+    rec_response_wseq_parsedname := RECORD
+      rec_response_wseq;
       $.Layouts.common_optout.title;
       $.Layouts.common_optout.fname;
       $.Layouts.common_optout.mname;
@@ -35,31 +44,38 @@ EXPORT parser_netwise_email := MODULE
       $.Layouts.common_optout.suffix;
     END;
 
-
-    rec_results_wseq_parsedname tf_parsename(rec_results_wseq L) := TRANSFORM
+    rec_response_wseq_parsedname tf_norm_parsename(rec_response_wseq L, integer norm_count) := TRANSFORM
       // use standard name cleaner to parse the (full) Name.text into standard name parts
-      clean_name  := Address.CleanPersonFML73_fields(L.Name.Text);
+      clean_name  := Address.CleanPersonFML73_fields(L.response.Results[norm_count].Name.Text);
       SELF.title  := clean_name.title;
       SELF.fname  := clean_name.fname;
       SELF.mname  := clean_name.mname;
       SELF.lname  := clean_name.lname;  
       SELF.suffix := clean_name.name_suffix;
-      SELF             := L;
+      SELF.response.Results := L.response.Results[norm_count];
+      SELF        := L; // stores response_seq and rest of the response.*** data
     END;
 
-    // Project in 'Results' ds thru a transform to parse the Results.Name.Text field data which appears to have 
-    // the full name of the person associated with the query input email, in First (no middle?) Last format.
-    ds_in_res_wseq_parsedname := PROJECT(ds_in_results, tf_parsename(LEFT));
-
+    ds_in_resp_name_parsed := NORMALIZE(ds_in_response, 
+                                        COUNT(LEFT.response.Results),
+                                        tf_norm_parsename(LEFT, COUNTER));
 
     // Use below to normalize all AddressRecords, using Results.Name.Text "name cleaned" from above, 
     // plus once for each PersonalContactInfo.AddressRecords
-    $.Layouts.common_optout tf_Norm_addrs(rec_results_wseq_parsedname L, integer norm_count) := TRANSFORM
+    $.Layouts.common_optout tf_Norm_addrs(rec_response_wseq_parsedname L,
+                                          integer norm_count) := TRANSFORM
 
-      SELF.seq            := L.results_seq;
+      SELF.seq            := L.response_seq; 
+
+      // NOTE: at this point there is only 1 record in each 'Results' child ds on each response record; 
+      // so the "...Results[1]..." can be used in multiple places below.
+      // Use common layout sec_id field to hold the 'Results' child ds results_seq#
+      SELF.section_id     := L.response.Results[1].results_seq;
+
+      SELF.transaction_id := L.response._Header.TransactionId;
 
       // clean/parse the gateway response.results person's full address
-      temp_addr_rec := L.PersonalContactInfo.AddressRecords[norm_count];
+      temp_addr_rec := L.response.Results[1].PersonalContactInfo.AddressRecords[norm_count];
       temp_addr :=iesp.ECL2ESP.SetAddress('', '', '', '', '','', '',  
                                           temp_addr_rec.City, temp_addr_rec.State, 
                                           temp_addr_rec.Zip, '', '', '', 
@@ -77,50 +93,54 @@ EXPORT parser_netwise_email := MODULE
       SELF.st          := clean_addr.st;
       SELF.z5          := clean_addr.zip;
       SELF.zip4        := clean_addr.zip4;
-      
-      SELF := L;
+
+      SELF := L;  // assign parsed name fields from left
       SELF := []; // null all other fields not already assigned (phone, ssn, dob, did, record_sid, etc.) 
-                  //some will be assigned later
+                  // some will be assigned later
     END;
 
-    ds_parse_res_addrs := NORMALIZE(ds_in_res_wseq_parsedname, 
-                                    COUNT(left.PersonalContactInfo.AddressRecords),
+    ds_parse_res_addrs := NORMALIZE(ds_in_resp_name_parsed,
+                                    COUNT(LEFT.response.Results[1].PersonalContactInfo.AddressRecords),
                                     tf_Norm_addrs(LEFT, COUNTER));
 
 
     // Use below to normalize all PhoneRecords, using Results.Name.Text "name cleaned" from above, 
     // plus once for each PersonalContactInfo.PhoneRecords
-    dx_gateway.Layouts.common_optout tf_Norm_phones(rec_results_wseq_parsedname L, 
-                                             integer norm_count
-                                            ) := TRANSFORM
+    $.Layouts.common_optout tf_Norm_phones(rec_response_wseq_parsedname L,
+                                           integer norm_count) := TRANSFORM
 
-      SELF.seq     := L.results_seq;
-      SELF.phone10 := L.PersonalContactInfo.PhoneRecords[norm_count].value;
+      SELF.seq            := L.response_seq; 
+
+      // NOTE: at this point there is only 1 record in each 'Results' child ds on each response record; 
+      // so the "...Results[1]..." can be used in multiple places below.
+      // Use common layout sec_id field to hold the 'Results' child ds results_seq#
+      SELF.section_id     := L.response.Results[1].results_seq;
+
+      SELF.phone10 := L.response.Results[1].PersonalContactInfo.PhoneRecords[norm_count].value;
+
       SELF := []; // null all other fields not already assigned (name, address, email, ssn, dob, did, record_sid, etc.)
     END;
 
-
-    ds_parse_res_phones := NORMALIZE(ds_in_res_wseq_parsedname, 
-                                     COUNT(left.PersonalContactInfo.PhoneRecords),
+    ds_parse_res_phones := NORMALIZE(ds_in_resp_name_parsed,
+                                     COUNT(LEFT.response.Results[1].PersonalContactInfo.PhoneRecords),
                                      tf_Norm_phones(LEFT, COUNTER));
 
     // Join to put all the normed data into 1 dataset keeping most data from left and only phone from right
     // and setting other common fields as needed.
     ds_parse_results_out := JOIN(ds_parse_res_addrs, ds_parse_res_phones,
-                                  LEFT.seq = RIGHT.seq,
-                                  TRANSFORM(dx_gateway.Layouts.common_optout,
-                                    SELF.seq            := LEFT.seq,
-                                    SELF.transaction_id := transid_in;
-                                    SELF.phone10        := RIGHT.phone10;
-                                    SELF.global_sid     := $.Constants.Netwise.GLOBAL_SID_EMAIL;
-                                    SELF := LEFT //rest of info (name, address, email, etc. comes from LEFT
-                                  ),
+                                   LEFT.seq = RIGHT.seq
+                                   AND
+                                   LEFT.section_id = RIGHT.section_id,
+                                 TRANSFORM($.Layouts.common_optout,
+                                   SELF.phone10    := RIGHT.phone10;
+                                   SELF.global_sid := $.Constants.Netwise.GLOBAL_SID_EMAIL;
+                                   SELF            := LEFT //rest of info (name, address, email, etc. comes from LEFT
+                                 ),
                                  FULL OUTER // 1 rec for every normed address
                                 );
-                                  
 
-    //OUTPUT(ds_in_results,             named('ds_in_results'));
-    //OUTPUT(ds_in_res_wseq_parsedname, named('ds_in_res_wseq_parsedname'));
+    //OUTPUT(ds_in_response,            named('ds_in_response'));
+    //OUTPUT(ds_in_resp_name_parsed,    named('ds_in_resp_name_parsed'));
     //OUTPUT(ds_parse_res_addrs,        named('ds_parse_res_addrs')); 
     //OUTPUT(ds_parse_res_phones,       named('ds_parse_res_phones')); 
     //OUTPUT(ds_parse_results_out,      named('ds_parse_results_out')); 
@@ -131,105 +151,94 @@ EXPORT parser_netwise_email := MODULE
 
   // ********************************************************************************************************
   // ********************************************************************************************************
-  EXPORT fn_CleanResponse(
-    DATASET(iesp.net_wise.t_NetWiseQueryResponseEx) ds_response_in,
-    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+  EXPORT fn_CleanResponse(DATASET(iesp.net_wise.t_NetWiseQueryResponseEx) ds_response_in,
+                          doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
-    // Pull off just the '<Results>' child dataset from the gateway <response>;
-    // which includes the PersonalContactInfo/PII data to be parsed and used to try to assign a LexId/did
-    ds_results_in := ds_response_in[1].response.Results;
-
-    // Add a sequence# to each Results child dataset record for joining on later
-    rec_results_wseq tf_add_seq(iesp.net_wise_share.t_NetWiseResult L, INTEGER C) := TRANSFORM
+    // Add a response sequence# and a results sequence# to each response 'Results' child dataset record 
+    // to be used for joining on later.
+    rec_results_wseq tf_add_results_seq(iesp.net_wise_share.t_NetWiseResult L, INTEGER C) := TRANSFORM
       SELF.results_seq := C;
       SELF             := L;
     END;
 
-    ds_results_in_wseq := PROJECT(ds_results_in , tf_add_seq(LEFT,COUNTER));
+    rec_response_wseq tf_add_resp_seq(iesp.net_wise.t_NetWiseQueryResponseEx L, INTEGER C) := TRANSFORM
+      SELF.response_seq     := C;
+      SELF.response.Results := PROJECT(L.response.Results, tf_add_results_seq(LEFT,COUNTER));
+      SELF                  := L;
+    END;
 
-    //First parse the sequenced 'Results' child dataset data
-    ds_results_parsed := fn_parseResults(ds_results_in_wseq,
-                                         ds_response_in[1].Response._Header.TransactionId);
+    ds_resp_in_wseq := PROJECT(ds_response_in, tf_add_resp_seq(LEFT,COUNTER));
 
-    // Try to assign a did/LexID to each normalized/parsed record (name plus address/phone) pair)
-    dx_gateway.mac_append_did(ds_results_parsed, 
-                              ds_results_did_append, 
+    // Next parse the sequenced response 'Results' child dataset records to normalize off all the PII data.
+    ds_resp_in_parsed := fn_parseResponse(ds_resp_in_wseq);
+
+    // Try to assign a did/LexID to each normalized/parsed record (name plus address/phone pair)
+    dx_gateway.mac_append_did(ds_resp_in_parsed,
+                              ds_resp_did_append,
                               mod_access, 
                               $.Constants.DID_APPEND_LOCAL);
 
-    // remove duplicate did recs for the same seq# to cut down on the number of opt_out key lookups
-    ds_results_did_app_dedup := DEDUP(SORT(ds_results_did_append, seq, did),
-                                      seq, did);
-   
-    dx_gateway.mac_flag_optout(ds_results_did_app_dedup, ds_results_did_optout, mod_access);
+    // Remove duplicate did recs for the same seq# and section_id# to cut down on the number of opt_out key lookups
+    ds_resp_did_app_dedup := DEDUP(SORT(ds_resp_did_append, seq, section_id, did),
+                                        seq, section_id, did);
+  
+    // Check deduped dids for opt_out
+    dx_gateway.mac_flag_optout(ds_resp_did_app_dedup, ds_resp_did_optout, mod_access);
 
-   // In case multiple LexIds for 1 input 'Results' record (normed recs with same seq value) were opted out, 
-   //  only need to keep 1 for each seq#, preferring any that are "suppressed" over those that are not.
+   // In case multiple LexIds for 1 response 'Results' record (normed recs with same seq & section_id values) 
+   // were opted out, only need to keep 1 for each seq & section_id combo, preferring any that are "suppressed" 
+   // over those that are not.
    // Note: "is_suppressed" is a boolean, so it has to be sorted descending.   
-   ds_results_did_optout_dedup := DEDUP(SORT(ds_results_did_optout,
-                                             seq, -is_suppressed), // is_suppressed TRUEs before FALSEs
-                                        seq);
+   ds_resp_did_optout_dedup := DEDUP(SORT(ds_resp_did_optout,
+                                          seq, section_id, -is_suppressed), // is_suppressed TRUEs before FALSEs
+                                     seq, section_id);
 
-   // Join the input 'Response.Results' child dataset that was sequenced with the 
-   // normed/parsed/did appended/opt-out checked/deduped dataset of records, joining on seq#.
-   // Looking for any records with a person(did) that is opted-out and is to be suppresed.
-   // If found, blank out all of the gw response 'Results' data (except the input/echoed email) on the corresponding 
-   // 'Results' child ds record.
-   ds_results_clean := JOIN(ds_results_in_wseq,  ds_results_did_optout_dedup,
-                              LEFT.results_seq = RIGHT.seq, 
-                            TRANSFORM(iesp.net_wise_share.t_NetWiseResult, // use orig layout without the temp results_seq
-                            // Had to add a SELF.xxx line for each iesp.net_wise_share.t_NetWiseResult field
-                              SELF.Email          := LEFT.email; 
-                              RIGHT_SUPPRESSED := RIGHT.is_suppressed; // for ease of use in lines below
-                              SELF.LinkedInProfileUrl      := IF(RIGHT_SUPPRESSED, '', LEFT.LinkedInProfileUrl);
-                              SELF.LinkedInProfileImageUrl := IF(RIGHT_SUPPRESSED, '', LEFT.LinkedInProfileImageUrl);
-                              SELF.Age                     := IF(RIGHT_SUPPRESSED, '', LEFT.Age);
-                              SELF.PersonalContactInfo.EmailRecords   := IF(RIGHT_SUPPRESSED, 
-                                                                            dataset([], iesp.share.t_StringArrayItem),
-                                                                            LEFT.PersonalContactInfo.EmailRecords);
-                              SELF.PersonalContactInfo.PhoneRecords   := IF(RIGHT_SUPPRESSED, 
-                                                                            dataset([], iesp.share.t_StringArrayItem),
-                                                                            LEFT.PersonalContactInfo.PhoneRecords);
-                              SELF.PersonalContactInfo.AddressRecords := IF(RIGHT_SUPPRESSED, 
-                                                                            dataset([], iesp.net_wise_share.t_NetWiseAddress),
-                                                                            LEFT.PersonalContactInfo.AddressRecords);
-                              SELF.WorkRecords      := IF(RIGHT_SUPPRESSED, dataset([], iesp.net_wise_share.t_NetWiseWork),
-                                                                            LEFT.WorkRecords);                                                                               
-                              SELF.EducationRecords := IF(RIGHT_SUPPRESSED, dataset([], iesp.net_wise_share.t_NetWiseEducation),
-                                                                            LEFT.EducationRecords);                                                                 
-                              SELF.Bio.Gender       := IF(RIGHT_SUPPRESSED, '', LEFT.Bio.Gender);
-                              SELF.Bio.Age          := IF(RIGHT_SUPPRESSED, '', LEFT.Bio.Age);
-                              SELF.NameRecords      := IF(RIGHT_SUPPRESSED, dataset([], iesp.share.t_StringArrayItem),
-                                                                            LEFT.NameRecords);
-                              SELF.Name.Text        := IF(RIGHT_SUPPRESSED, '', LEFT.Name.Text);
-                              SELF.ImageRecords     := IF(RIGHT_SUPPRESSED, dataset([], iesp.net_wise_share.t_NetWiseUrl),
-                                                                            LEFT.ImageRecords);
-                              SELF.PlaceRecords     := IF(RIGHT_SUPPRESSED, dataset([], iesp.net_wise_share.t_NetWiseUrl),
-                                                                            LEFT.PlaceRecords);
-                            ),
-                            INNER //(default but listed for clarity) 1 out rec for every left that matches a right
-                           );
+   // Finally, project the sequenced response in ds onto the original response layout (without seq#s) using a separate 
+   // transform to build each response 'Results' child ds and blanking out any child ds record that corresponds 
+   // to a lexid that was opted out.
+   iesp.net_wise_share.t_NetWiseResult tf_results_final(rec_results_wseq L,
+                                                        UNSIGNED1 resp_seq) := TRANSFORM
+                                                                                
+     // Find matching response_seq & results_seq in the ds_resp_did_optout_dedup dataset from above 
+     // for use in this transform and set a boolean for ease of use in the lines below.
+     boolean IS_SUPPRESSED := ds_resp_did_optout_dedup(seq        = resp_seq
+                                                       AND 
+                                                       section_id = L.results_seq)[1].is_suppressed;
+     // When ccpa opted out found (is_suppressed=true), only output the echoed input Email 
+     SELF.Email := L.Email;
+     // When opted out, all other gateway response 'Results' child dataset fields are to be blanked out
+     // Otherwise if NOT opted out, just output the original passed in gateway response 'Results' data
+     SELF.LinkedInProfileUrl      := IF(IS_SUPPRESSED, '', L.LinkedInProfileUrl);
+     SELF.LinkedInProfileImageUrl := IF(IS_SUPPRESSED, '', L.LinkedInProfileImageUrl);
+     SELF.Age                     := IF(IS_SUPPRESSED, '', L.Age);
+     SELF.PersonalContactInfo     := IF(IS_SUPPRESSED, ROW([], iesp.net_wise_share.t_NetWisePersonalContactInfo),
+                                                       L.PersonalContactInfo);
+     SELF.WorkRecords      := IF(IS_SUPPRESSED, dataset([], iesp.net_wise_share.t_NetWiseWork), L.WorkRecords);                                                                               
+     SELF.EducationRecords := IF(IS_SUPPRESSED, dataset([], iesp.net_wise_share.t_NetWiseEducation), L.EducationRecords);                                                                 
+     SELF.Bio.Gender       := IF(IS_SUPPRESSED, '', L.Bio.Gender);
+     SELF.Bio.Age          := IF(IS_SUPPRESSED, '', L.Bio.Age);
+     SELF.NameRecords      := IF(IS_SUPPRESSED, dataset([], iesp.share.t_StringArrayItem), L.NameRecords);
+     SELF.Name.Text        := IF(IS_SUPPRESSED, '', L.Name.Text);
+     SELF.ImageRecords     := IF(IS_SUPPRESSED, dataset([], iesp.net_wise_share.t_NetWiseUrl), L.ImageRecords);
+     SELF.PlaceRecords     := IF(IS_SUPPRESSED, dataset([], iesp.net_wise_share.t_NetWiseUrl), L.PlaceRecords);
+   END;
 
-    // Finally re-build the '<Response>' dataset (with 1 record) to be returned to be in 
-    // iesp.net_wise.t_NetWiseQueryResponseEx format
-    ds_resp_clean := PROJECT(ds_response_in,
-                             TRANSFORM(iesp.net_wise.t_NetWiseQueryResponseEx,
-                                SELF.response._Header     := LEFT.response._Header;
-                                SELF.response.Transaction := LEFT.response.Transaction;
-                                SELF.response.Results := ds_results_clean; //use the potentially revised '<Results>' child ds
-                             ));
+   ds_resp_clean := PROJECT(ds_resp_in_wseq, 
+                            TRANSFORM(iesp.net_wise.t_NetWiseQueryResponseEx, // use orig layout without the temp seq#s
+                              temp_response_seq := LEFT.response_seq; // need response_seq to pass into transform below
+                              SELF.response.Results := PROJECT(LEFT.response.Results, 
+                                                               tf_results_final(LEFT, temp_response_seq));
+                              SELF := LEFT;
+                           ));
 
 
     //OUTPUT(ds_response_in,           named('ds_response_in'));
-    //OUTPUT(ds_results_in,            named('ds_results_in'));
-    //OUTPUT(ds_results_in_wseq,       named('ds_results_in_wseq'));
-    //OUTPUT(ds_results_parsed,        named('ds_results_parsed'));
-    //OUTPUT(ds_results_did_append,    named('ds_results_did_append'));
-    //OUTPUT(ds_results_did_app_dedup, named('ds_results_did_app_dedup'));
-    //OUTPUT(ds_results_did_optout,    named('ds_results_did_optout'));
-    //OUTPUT(ds_results_did_optout_test, named('ds_results_did_optout_test')); 
-    //OUTPUT(ds_results_did_optout_dedup, named('ds_results_did_optout_dedup')); 
-    //OUTPUT(ds_results_clean,         named('ds_results_clean'));
+    //OUTPUT(ds_resp_in_wseq,          named('ds_resp_in_wseq'));
+    //OUTPUT(ds_resp_in_parsed,        named('ds_resp_in_parsed'));
+    //OUTPUT(ds_resp_did_append,       named('ds_resp_did_append'));
+    //OUTPUT(ds_resp_did_app_dedup,    named('ds_resp_did_app_dedup'));
+    //OUTPUT(ds_resp_did_optout,       named('ds_resp_did_optout'));
+    //OUTPUT(ds_resp_did_optout_dedup, named('ds_resp_did_optout_dedup')); 
     //OUTPUT(ds_resp_clean,            named('ds_resp_clean'));
 
     RETURN ds_resp_clean;
