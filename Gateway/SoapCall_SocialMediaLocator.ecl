@@ -6,7 +6,8 @@ resp_layout := iesp.social_media_locator_response.t_SocialMediaLocatorResponseEx
 EXPORT SoapCall_SocialMediaLocator(
   req_layout request,
   DATASET(Gateway.layouts.config) gateways,
-  INTEGER waittime=10,
+  // The waittime of 60 seconds is on purpose, the vendor gateway is very slow.
+  INTEGER waittime=60,
   INTEGER retries=0
 ) := FUNCTION
 
