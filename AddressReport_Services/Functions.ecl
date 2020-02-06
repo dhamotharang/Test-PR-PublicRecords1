@@ -732,7 +732,7 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
       export string2 state      := L.st;
       export string6 zip        := L.zip;
     end;
-    gw_results_res := choosen(doxie_raw.RealTimePhones_Raw(in_gateways, 30, 0, in_mod, call_gateway),  batchServices.constants.RealTime.REALTIME_PHONE_LIMIT);
+    gw_results_res := choosen(doxie_raw.RealTimePhones_Raw(in_mod, in_gateways, 30, 0, call_gateway),  batchServices.constants.RealTime.REALTIME_PHONE_LIMIT);
     self.gw_results := gw_results_res;
     self.rec_no := l.rec_no;
   end;
