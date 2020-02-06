@@ -60,7 +60,7 @@ SHARED invert_records := nfields_r + nfields18;
 SHARED DataForKey0 := Fn_Reduce_UBER_Local( invert_records );
 SHARED DataForValueKey0 := DEDUP(SORT(DISTRIBUTE(TABLE(invert_records,{word}),HASH(word)),word,LOCAL),word,LOCAL);
  
-EXPORT ValueKeyName := '~'+'key::HealthcareNoMatchHeader_ExternalLinking::nomatch_id::Words';
+EXPORT ValueKeyName := HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).ExternalKeys.Words.New;
 SHARED word_values := specMod.uber_values_persisted;
  
 EXPORT ValueKey := INDEX(word_values,{word},{word_values},ValueKeyName,OPT);
