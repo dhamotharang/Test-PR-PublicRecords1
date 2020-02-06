@@ -99,8 +99,8 @@ EXPORT FN_AppendQSentDetails(dataset(progressive_phone.layout_progressive_batch_
 		call_gateway := ((DO_QSENTV2_NAME_ADDR OR DO_QSENTV2_NAME_SSN) AND COUNT(QSENTV2_GW) > 0);
 
 		gw_results1 := IF(call_gateway,
-											choosen(Doxie_Raw.RealTimePhones_Raw(QSENTV2_GW, 30, 0, in_mod1, call_gateway),in_mod1.MaxResults), 																						
-											dataset([],gw_layout));
+			choosen(Doxie_Raw.RealTimePhones_Raw(in_mod1, QSENTV2_GW, 30, 0, call_gateway), in_mod1.MaxResults), 																						
+			dataset([],gw_layout));
 
 		self.gw_results := gw_results1;													 
 		self.acctno := L.acctno;

@@ -67,7 +67,7 @@ MODULE
 												EXPORT BOOLEAN   TUGatewayPhoneticMatch := inMod.PhoneticMatch;
 												EXPORT BOOLEAN   UseQSENTV2             := TRUE;
 								END;
-			SELF.qsent_recs := Doxie_Raw.RealTimePhones_Raw(DATASET(pGateway),timeoutSecs,,tmpMod,inMod.UseTransUnionPVS);
+			SELF.qsent_recs := Doxie_Raw.RealTimePhones_Raw(tmpMod, DATASET(pGateway), timeoutSecs, , inMod.UseTransUnionPVS);
 			SELF            := pInput;
 		END;
 		dPVSRecs := PROJECT(dInDedup,tGetPVSData(LEFT));
@@ -160,7 +160,7 @@ MODULE
 												EXPORT BOOLEAN                               UseQSentV2             := TRUE;
 												EXPORT DATASET(iesp.share.t_StringArrayItem) ExcludedPhones         := dPhones;
 								END;
-			SELF.qsent_recs := Doxie_Raw.RealTimePhones_Raw(DATASET(pGateway),timeoutSecs,,tmpMod,inMod.UseTransUnionIQ411);
+			SELF.qsent_recs := Doxie_Raw.RealTimePhones_Raw(tmpMod, DATASET(pGateway), timeoutSecs, , inMod.UseTransUnionIQ411);
 			SELF            := pInput;
 		END;
 

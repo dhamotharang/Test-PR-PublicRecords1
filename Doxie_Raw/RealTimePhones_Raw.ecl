@@ -6,10 +6,10 @@ DO NOT REMOVE!!!
 import AutoStandardI, BatchServices, PhonesPlus, ut, Phones, Gateway;
 
 export RealTimePhones_Raw(
+  batchServices.RealTimePhones_Params.params in_mod,
   dataset(Gateway.Layouts.Config) gateways, 
   integer waittime = 3, 
   integer retries =0, 
-  batchServices.RealTimePhones_Params.params in_mod,
   boolean call_gateway = false) 	
   := FUNCTION										 		
     
