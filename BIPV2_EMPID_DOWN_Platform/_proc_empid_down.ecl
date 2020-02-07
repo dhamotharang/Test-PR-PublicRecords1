@@ -13,7 +13,7 @@ BIPV2_EMPID_DOWN_Platform._proc_Empid_Down().MultIter_run (EmpStartIteration    
 );
 */
 IMPORT BIPV2_Files, BIPV2, BIPV2_EMPID_DOWN_Platform,wk_ut,tools,std,BIPV2_Testing;
-l_base := BIPV2_Testing.Test_Layout;
+l_base := BIPV2.CommonBase.Layout;
 EXPORT _proc_empid_down(
 	 DATASET(l_base) input      = BIPV2_EMPID_DOWN_Platform.In_EmpID
 	,STRING          iter       = ''
