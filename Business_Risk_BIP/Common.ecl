@@ -944,7 +944,7 @@ OUTPUT(converted, NAMED('Converted_Set'));
 					SalesAmount >= 1000000 AND SalesAmount < 2500000 	=> 70,
 					SalesAmount >= 2500000 AND SalesAmount < 5000000 	=> 80,
 					SalesAmount >= 5000000 AND SalesAmount < 10000000 => 90,
-					SalesAmount > 10000000 			                      => 100,
+					SalesAmount >= 10000000 			                    => 100,
 																														-1);
 			RETURN SalesIndex;
 		END;	
