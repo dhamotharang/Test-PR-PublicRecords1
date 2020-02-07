@@ -1,6 +1,6 @@
 import std, crim_offense_cat;
 //pUseProd must be set to true only when running on prod
-export update_keys(string new_input_folder = '20200116', pUseProd = false) := function
+export update_keys(string new_input_folder = '20200206', pUseProd = false) := function
         inSP := nothor(STD.File.SuperFileContents(crim_offense_cat.Filenames(pUseProd).basein));
         newName := crim_offense_cat.filenames(pUseProd).BaseIn+ '::'+ new_input_folder;
         isSameAsLast := count(inSP(name = newName[2..]))>0;
