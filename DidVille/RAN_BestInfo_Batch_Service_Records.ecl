@@ -450,7 +450,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	nbr_in_profile_in := If(Exists(f_in_nbrs_PB_in),Didville.Transforms.FMac_profile_input(ungroup(f_in_nbrs_PB_in)),Dataset([],PB_in_rec));
 	nbr_best_profile_in := If(Exists(f_best_nbrs_PB_in),Didville.Transforms.FMac_profile_input(ungroup(f_best_nbrs_PB_in)),Dataset([],PB_in_rec));
 
-  profile_in := rel_profile_in + roomie_profile_in  + nbr_in_profile_in + nbr_best_profile_in;
+  // check on IncludeProfileBooster to create final input PII or else pass empty dataset to avoid performance hit from profile booster
+  profile_in := IF(IncludeProfileBooster,rel_profile_in + roomie_profile_in  + nbr_in_profile_in + nbr_best_profile_in,Dataset([],PB_in_rec));
   dedup_profile_in := dedup(profile_in,Record);
   //add hash of fields to account number in the input dataset
   dedup_profile_wacct := Project(dedup_profile_in,DidVille.Transforms.Profile_acct(LEFT,COUNTER));
@@ -604,16 +605,6 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
                     denormalize(f_out_with_nbr_in, f_nbr_best_w_email_profile,
                                 left.seq = right.seqTarget,
                                 Didville.Transforms.get_out_nbr_best(left, right,counter)));
-
-  // Output(PB_nbr_in_cnt,named('PB_nbr_in_cnt'),overwrite);
-  // output(PB_nbr_best_cnt,named('PB_nbr_best_cnt'),overwrite);
-  // output(PbRelativesCount,named('PbRelativesCount'),overwrite);
-  // output(PbAssociatesCount,named('PbAssociatesCount'),overwrite);
-  // output(PbNeighborsCount,named('PbNeighborsCount'),overwrite);
-  // output(rel_profile_in,named('rel_profile_in'),overwrite);
-  // output(roomie_profile_in,named('roomie_profile_in'),overwrite);
-  // output(nbr_in_profile_in,named('nbr_in_profile_in'),overwrite);
-  // output(nbr_best_profile_in,named('nbr_best_profile_in'),overwrite);
 
   RETURN f_out_final;
 
