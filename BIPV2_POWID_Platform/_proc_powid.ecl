@@ -1,7 +1,7 @@
 ﻿import BIPV2_Files, BIPV2, MDR, BIPV2_POWID_Platform,wk_ut,tools,std,BIPV2_Testing;
 // Init receives a file in common layout, and widens it for use in all iterations. We thin
 // back to the common layout before promoting it to the base/father/grandfather superfiles.
-l_common := BIPV2_Testing.Test_Layout;
+l_common := BIPV2.CommonBase.Layout;
 l_base   := BIPV2_Files.files_powid().Layout_POWID;
 export _proc_powid(
 	 dataset(l_base)  input      = dataset([],l_base)
