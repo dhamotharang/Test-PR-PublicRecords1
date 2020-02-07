@@ -24,6 +24,8 @@ EXPORT Constants := MODULE
 				EXPORT BASE_PREFIX			:= '~prte::base::';
         EXPORT KEY_PREFIX				:= '~prte::key::BIPV2_Business_Header::';
 				EXPORT KEY_PREFIX2			:= '~prte::key::';
+				EXPORT dops_name_full := 'BIPV2FullKeys';
+				EXPORT dops_name_weekly := 'BIPV2WeeklyKeys';
         //EXPORT KEY_PREFIX_FCRA := '~prte::key::BIPV2_Business_Header::filtered::fcra::';
 
 	

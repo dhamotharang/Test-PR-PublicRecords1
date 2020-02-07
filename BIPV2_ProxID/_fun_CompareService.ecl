@@ -52,11 +52,12 @@ function
   ///////////
   //--norm all fields, trying to group them better into child datasets per field so easier to see
   ///////////
+  dedup_input := topn(mtch  ,1,-conf);
   layouttools2 := tools.macf_LayoutTools(recordof(mtch),false,'',true);
-  mtch_score2  := project(mtch,layouttools2.layout_record);
+  mtch_score2  := project(dedup_input,layouttools2.layout_record);
 
   // layspecs := {unsigned rid,string fieldname,string fieldvalue};
-  dnorm_specs2 := normalize(mtch,count(layouttools2.setAllFields),transform({unsigned rollupid,layspecs}
+  dnorm_specs2 := normalize(dedup_input,count(layouttools2.setAllFields),transform({unsigned rollupid,layspecs}
     ,self.fieldname 	:= layouttools2.fGetFieldName(counter);
     ,self.fieldvalue	:= (string)layouttools2.fGetFieldValue(counter,left)
     ,self.rid					:= counter

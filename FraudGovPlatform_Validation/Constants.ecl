@@ -24,7 +24,7 @@ module
 	export	string 		FDNMBSLandingZonePathBase_prod	:='/data/super_credit/fdn/in/mbs/prod';
 
 	export string		ThorName_Dev					:= 'thor400_dev_eclcc';
-	export string		ThorName_Prod				:= 'thor400_44_eclcc';
+	export string		ThorName_Prod				:= 'thor400_36_eclcc';
 
 	export string		hthor_Dev						:= 'hthor_dev_eclcc';
 	export string		hthor_Prod					:= 'hthor_eclcc';

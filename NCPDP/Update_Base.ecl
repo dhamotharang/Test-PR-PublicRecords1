@@ -1155,7 +1155,9 @@ export Update_Base	:= MODULE
 																	));
 			SELF											:= L;
 		END;
-		base_m0 := project(base_l, GetSourceRID(left)):persist('~thor_data400::persist::ncpdp_after_source_rid');
+		
+		dist_base_l	:= distribute(base_l);// get even distribution and order does not matter
+		base_m0 := project(dist_base_l, GetSourceRID(left));//:persist('~thor_data400::persist::ncpdp_after_source_rid');
 		base_m	:= dedup(sort(base_m0, record, local), record, local);
 		
 		base_m_dedup	:= dedup(sort(distribute(base_m, hash(ncpdp_provider_id, prov_info_clean_dr_fname, prov_info_clean_dr_mname,
@@ -1172,8 +1174,8 @@ export Update_Base	:= MODULE
 											prov_info_clean_dr_lname, prov_info_clean_dr_suffix, prov_info_phys_prim_range, prov_info_phys_prim_name, 
 											prov_info_phys_sec_range,	prov_info_phys_p_city_name, prov_info_phys_state, prov_info_phys_zip5, 
 											prov_info_contact_phone, state_code, state_license_number, prov_info_federal_tax_id, 
-											prov_info_DEA_registration_id, prov_info_national_provider_id, DID, BDID, source_rid, local)
-											:persist('~thor_data400::persist::ncpdp_before_lnpid');
+											prov_info_DEA_registration_id, prov_info_national_provider_id, DID, BDID, source_rid, local);
+											// :persist('~thor_data400::persist::ncpdp_before_lnpid');
 		
 		Health_Provider_Services.mac_get_best_lnpid_on_thor (
 				base_m_dedup
@@ -1294,9 +1296,12 @@ export Update_Base	:= MODULE
 			all_lnpid	:= dedup(sort(rejoin_lnpid, record, local), record, local);
 							
 			//base_o	:= dedup(base_n, all);		
-			dDistributed  := distribute(all_lnpid,hash(NCPDP_provider_id));	
-			BaseSort := SORT(dDistributed, ncpdp_provider_id,  dt_first_seen,	dt_last_seen, record_type, local);
-      BaseDedup := DEDUP(BaseSort,ncpdp_provider_id, dt_first_seen,	dt_last_seen, local); 
+			// dDistributed  := distribute(all_lnpid,hash(NCPDP_provider_id));	
+			dDistributed  := distribute(all_lnpid);	
+			// BaseSort := SORT(dDistributed, ncpdp_provider_id,  dt_first_seen,	dt_last_seen, record_type, local);
+			BaseSort := SORT(dDistributed, record);
+      // BaseDedup := DEDUP(BaseSort,ncpdp_provider_id, dt_first_seen,	dt_last_seen, local); 
+      BaseDedup := DEDUP(BaseSort,ncpdp_provider_id, dt_first_seen,	dt_last_seen); 
 			
 			BaseDedup add_sid(BaseDedup L) := TRANSFORM
 				SELF.global_sid								:= 23921;
@@ -1306,7 +1311,9 @@ export Update_Base	:= MODULE
 	
 			with_ccpa := project(BaseDedup, add_sid (left));
 			
-		return with_ccpa;
+			dist_with_ccpa	:= sort(distribute(with_ccpa), record);
+			
+		return dist_with_ccpa;
 	end;
 	
     export keybuild (string pversion)    := function
