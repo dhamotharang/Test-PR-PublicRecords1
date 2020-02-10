@@ -107,7 +107,7 @@ Industry_dedup := DEDUP(Industry_sort
   ,POWWeight								
   ,EmpWeight								
   ,DotWeight								
-	,LOCAL): persist('~thor::persist::cortera::As_Industry', REFRESH(TRUE), SINGLE);
+	,LOCAL): persist('~thor_data400::persist::cortera::As_Industry', REFRESH(TRUE), SINGLE);
 	
 RETURN Industry_dedup;
 

@@ -144,7 +144,7 @@ EXPORT As_Business_Linking() := FUNCTION
 																					     and left.contact_job_title_raw 			= right.contact_job_title_raw
 														              ),x4(left,right),local);
 
-	biz := link_rollup: persist('~thor::persist::Cortera::As_Business_Linking', REFRESH(TRUE), SINGLE);
+	biz := link_rollup: persist('~thor_data400::persist::Cortera::As_Business_Linking', REFRESH(TRUE), SINGLE);
 	
 	return biz;
 
