@@ -3,11 +3,13 @@
 trimUpper(STRING s) := 
   std.str.CleanSpaces(std.Str.ToUppercase(s));
 	
-EXPORT As_Industry(dataset(Cortera.Layout_Executives) base) := FUNCTION
+asIndustryBase := dataset('~thor::cortera::executives', cortera.Layout_Executives, thor);
+
+EXPORT As_Industry() := FUNCTION
 
 		Industry_Layout := TopBusiness_BIPV2.Layouts.rec_industry_combined_layout;
 
-		Industry_Layout	MapIndustry (Base L)	:=	TRANSFORM
+		Industry_Layout	MapIndustry (asIndustryBase L)	:=	TRANSFORM
 			SELF.bdid 										:=	L.bdid;
 			SELF.bdid_score								:=	L.bdid_score;
 			SELF.source       						:=	MDR.sourcetools.src_Cortera;
@@ -27,7 +29,7 @@ EXPORT As_Industry(dataset(Cortera.Layout_Executives) base) := FUNCTION
 			SELF 													:=	[];
 		END;
 
-		Industry := PROJECT(Base(cnt=1),MapIndustry(LEFT));
+		Industry := PROJECT(asIndustryBase(cnt=1),MapIndustry(LEFT));
 
 Industry_sort := SORT(Industry(siccode <> '' OR naics <> '' OR industry_description <> '' OR business_description <> '')
 	,bdid 										
@@ -105,7 +107,7 @@ Industry_dedup := DEDUP(Industry_sort
   ,POWWeight								
   ,EmpWeight								
   ,DotWeight								
-	,LOCAL);
+	,LOCAL): persist('~thor_data400::persist::cortera::As_Industry', REFRESH(TRUE), SINGLE);
 	
 RETURN Industry_dedup;
 
