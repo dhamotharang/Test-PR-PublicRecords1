@@ -362,7 +362,7 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
 		
   export dkeybuild      := Suppress.applyRegulatory.applyContactBIPV2(contacts_bipd_pst);
   
-  export Key := BIPV2_Contacts.key_contact_linkids.Key(dkeybuild, superfile_name);
+  export Key := BIPV2_Contacts.key_contact_linkids.Key(project(dkeybuild, BIPV2_Contacts.Layouts.contact_linkids.layoutOrigFile), superfile_name);
   
   // -- ensure easy access to different logical and super versions of the key
   export keyvs := BIPV2_Contacts.key_contact_linkids.keyvs;

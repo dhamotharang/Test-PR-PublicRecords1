@@ -31,8 +31,6 @@ module
 	export CorteraHeader(string lfn) := PromoteFiles(Constants.sfCorteraHdr, lfn);
 	export Attributes(string lfn) := PromoteFiles(Constants.sfAttributes, lfn);
 	export Executives(string lfn) := PromoteFiles(Constants.sfExecutives, lfn);
-	export CorteraAsLinking(string lfn) := PromoteFiles(Constants.sfLinking, lfn);
-	export Industry(string lfn) := PromoteFiles(Constants.sfIndustry, lfn);
 	export Hdr_in(string lfn) := PromoteFiles(Constants.sfHeaderIn, lfn);
 	export Attr_in(string lfn) := PromoteFiles(Constants.sfAttributesIn, lfn);
 	

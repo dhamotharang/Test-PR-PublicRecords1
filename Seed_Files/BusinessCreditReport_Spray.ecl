@@ -66,7 +66,7 @@ FUNCTION
 				setupSuperFiles('topbusoper'),
 				setupSuperFiles('topbusparent'),
 				setupSuperFiles('topbusconnect'),
-				setupSuperFiles('topbuscontact'),
+				setupSuperFiles('topbuscontacts'),
 				setupSuperFiles('topbusactivity'),
 				setupSuperFiles('crmatch'),
 				setupSuperFiles('corteraB2B'),

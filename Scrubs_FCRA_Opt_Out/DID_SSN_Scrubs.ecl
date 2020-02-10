@@ -1,4 +1,4 @@
-﻿IMPORT SALT38,STD;
+﻿IMPORT SALT311,STD;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT DID_SSN_Scrubs := MODULE
  
@@ -24,18 +24,57 @@ EXPORT DID_SSN_Scrubs := MODULE
   EXPORT  Bitmap_Layout := RECORD(DID_SSN_Layout_FCRA_Opt_Out)
     UNSIGNED8 ScrubsBits1;
   END;
+  EXPORT Rule_Layout := RECORD(DID_SSN_Layout_FCRA_Opt_Out)
+    STRING Rules {MAXLENGTH(1000)};
+  END;
+  SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
+          ,'ssn:Invalid_SSN:ALLOW'
+          ,'julian_date:Invalid_JullianDate:ALLOW','julian_date:Invalid_JullianDate:LENGTHS'
+          ,'inname_first:Invalid_Inname:ALLOW'
+          ,'inname_last:Invalid_Inname:ALLOW'
+          ,'state:Invalid_State:ALLOW','state:Invalid_State:LENGTHS'
+          ,'zip5:Invalid_Zip:ALLOW','zip5:Invalid_Zip:LENGTHS'
+          ,'ssn_append:Invalid_SSN_append:ALLOW','ssn_append:Invalid_SSN_append:LENGTHS'
+          ,'permanent_flag:Invalid_Flag:ENUM'
+          ,'opt_back_in:Invalid_Flag:ENUM'
+          ,'date_yyyymmdd:Invalid_Date:CUSTOM'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
+  SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
+          ,DID_SSN_Fields.InvalidMessage_ssn(1)
+          ,DID_SSN_Fields.InvalidMessage_julian_date(1),DID_SSN_Fields.InvalidMessage_julian_date(2)
+          ,DID_SSN_Fields.InvalidMessage_inname_first(1)
+          ,DID_SSN_Fields.InvalidMessage_inname_last(1)
+          ,DID_SSN_Fields.InvalidMessage_state(1),DID_SSN_Fields.InvalidMessage_state(2)
+          ,DID_SSN_Fields.InvalidMessage_zip5(1),DID_SSN_Fields.InvalidMessage_zip5(2)
+          ,DID_SSN_Fields.InvalidMessage_ssn_append(1),DID_SSN_Fields.InvalidMessage_ssn_append(2)
+          ,DID_SSN_Fields.InvalidMessage_permanent_flag(1)
+          ,DID_SSN_Fields.InvalidMessage_opt_back_in(1)
+          ,DID_SSN_Fields.InvalidMessage_date_yyyymmdd(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors','UNKNOWN');
 EXPORT FromNone(DATASET(DID_SSN_Layout_FCRA_Opt_Out) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.ssn_Invalid := DID_SSN_Fields.InValid_ssn((SALT38.StrType)le.ssn);
-    SELF.julian_date_Invalid := DID_SSN_Fields.InValid_julian_date((SALT38.StrType)le.julian_date);
-    SELF.inname_first_Invalid := DID_SSN_Fields.InValid_inname_first((SALT38.StrType)le.inname_first);
-    SELF.inname_last_Invalid := DID_SSN_Fields.InValid_inname_last((SALT38.StrType)le.inname_last);
-    SELF.state_Invalid := DID_SSN_Fields.InValid_state((SALT38.StrType)le.state);
-    SELF.zip5_Invalid := DID_SSN_Fields.InValid_zip5((SALT38.StrType)le.zip5);
-    SELF.ssn_append_Invalid := DID_SSN_Fields.InValid_ssn_append((SALT38.StrType)le.ssn_append);
-    SELF.permanent_flag_Invalid := DID_SSN_Fields.InValid_permanent_flag((SALT38.StrType)le.permanent_flag);
-    SELF.opt_back_in_Invalid := DID_SSN_Fields.InValid_opt_back_in((SALT38.StrType)le.opt_back_in);
-    SELF.date_yyyymmdd_Invalid := DID_SSN_Fields.InValid_date_yyyymmdd((SALT38.StrType)le.date_yyyymmdd);
+    SELF.ssn_Invalid := DID_SSN_Fields.InValid_ssn((SALT311.StrType)le.ssn);
+    SELF.julian_date_Invalid := DID_SSN_Fields.InValid_julian_date((SALT311.StrType)le.julian_date);
+    SELF.inname_first_Invalid := DID_SSN_Fields.InValid_inname_first((SALT311.StrType)le.inname_first);
+    SELF.inname_last_Invalid := DID_SSN_Fields.InValid_inname_last((SALT311.StrType)le.inname_last);
+    SELF.state_Invalid := DID_SSN_Fields.InValid_state((SALT311.StrType)le.state);
+    SELF.zip5_Invalid := DID_SSN_Fields.InValid_zip5((SALT311.StrType)le.zip5);
+    SELF.ssn_append_Invalid := DID_SSN_Fields.InValid_ssn_append((SALT311.StrType)le.ssn_append);
+    SELF.permanent_flag_Invalid := DID_SSN_Fields.InValid_permanent_flag((SALT311.StrType)le.permanent_flag);
+    SELF.opt_back_in_Invalid := DID_SSN_Fields.InValid_opt_back_in((SALT311.StrType)le.opt_back_in);
+    SELF.date_yyyymmdd_Invalid := DID_SSN_Fields.InValid_date_yyyymmdd((SALT311.StrType)le.date_yyyymmdd);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -45,6 +84,19 @@ EXPORT FromNone(DATASET(DID_SSN_Layout_FCRA_Opt_Out) h) := MODULE
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
+  STRING escQuotes(STRING s) := STD.Str.FindReplace(s,'\'','\\\'');
+  Rule_Layout IntoRule(BitmapInfile le, UNSIGNED c) := TRANSFORM
+    mask := 1<<(c-1);
+    hasError := (mask&le.ScrubsBits1)>0;
+    SELF.Rules := IF(hasError,TRIM(toRuleDesc(c))+':\''+escQuotes(TRIM(toErrorMessage(c)))+'\'',IF(le.ScrubsBits1=0 AND c=1,'',SKIP));
+    SELF := le;
+  END;
+  unrolled := NORMALIZE(BitmapInfile,NumRules,IntoRule(LEFT,COUNTER));
+  Rule_Layout toRoll(Rule_Layout le,Rule_Layout ri) := TRANSFORM
+    SELF.Rules := TRIM(le.Rules) + IF(LENGTH(TRIM(le.Rules))>0 AND LENGTH(TRIM(ri.Rules))>0,',','') + TRIM(ri.Rules);
+    SELF := le;
+  END;
+  EXPORT RulesInfile := ROLLUP(unrolled,toRoll(LEFT,RIGHT),EXCEPT Rules);
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
@@ -70,18 +122,18 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     TotalCnt := COUNT(GROUP); // Number of records in total
     ssn_ALLOW_ErrorCount := COUNT(GROUP,h.ssn_Invalid=1);
     julian_date_ALLOW_ErrorCount := COUNT(GROUP,h.julian_date_Invalid=1);
-    julian_date_LENGTH_ErrorCount := COUNT(GROUP,h.julian_date_Invalid=2);
+    julian_date_LENGTHS_ErrorCount := COUNT(GROUP,h.julian_date_Invalid=2);
     julian_date_Total_ErrorCount := COUNT(GROUP,h.julian_date_Invalid>0);
     inname_first_ALLOW_ErrorCount := COUNT(GROUP,h.inname_first_Invalid=1);
     inname_last_ALLOW_ErrorCount := COUNT(GROUP,h.inname_last_Invalid=1);
     state_ALLOW_ErrorCount := COUNT(GROUP,h.state_Invalid=1);
-    state_LENGTH_ErrorCount := COUNT(GROUP,h.state_Invalid=2);
+    state_LENGTHS_ErrorCount := COUNT(GROUP,h.state_Invalid=2);
     state_Total_ErrorCount := COUNT(GROUP,h.state_Invalid>0);
     zip5_ALLOW_ErrorCount := COUNT(GROUP,h.zip5_Invalid=1);
-    zip5_LENGTH_ErrorCount := COUNT(GROUP,h.zip5_Invalid=2);
+    zip5_LENGTHS_ErrorCount := COUNT(GROUP,h.zip5_Invalid=2);
     zip5_Total_ErrorCount := COUNT(GROUP,h.zip5_Invalid>0);
     ssn_append_ALLOW_ErrorCount := COUNT(GROUP,h.ssn_append_Invalid=1);
-    ssn_append_LENGTH_ErrorCount := COUNT(GROUP,h.ssn_append_Invalid=2);
+    ssn_append_LENGTHS_ErrorCount := COUNT(GROUP,h.ssn_append_Invalid=2);
     ssn_append_Total_ErrorCount := COUNT(GROUP,h.ssn_append_Invalid>0);
     permanent_flag_ENUM_ErrorCount := COUNT(GROUP,h.permanent_flag_Invalid=1);
     opt_back_in_ENUM_ErrorCount := COUNT(GROUP,h.opt_back_in_Invalid=1);
@@ -96,7 +148,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
     SELF.FieldsChecked_WithErrors := IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.julian_date_Total_ErrorCount > 0, 1, 0) + IF(le.inname_first_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inname_last_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_Total_ErrorCount > 0, 1, 0) + IF(le.zip5_Total_ErrorCount > 0, 1, 0) + IF(le.ssn_append_Total_ErrorCount > 0, 1, 0) + IF(le.permanent_flag_ENUM_ErrorCount > 0, 1, 0) + IF(le.opt_back_in_ENUM_ErrorCount > 0, 1, 0) + IF(le.date_yyyymmdd_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.julian_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.julian_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.inname_first_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inname_last_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LENGTH_ErrorCount > 0, 1, 0) + IF(le.zip5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip5_LENGTH_ErrorCount > 0, 1, 0) + IF(le.ssn_append_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ssn_append_LENGTH_ErrorCount > 0, 1, 0) + IF(le.permanent_flag_ENUM_ErrorCount > 0, 1, 0) + IF(le.opt_back_in_ENUM_ErrorCount > 0, 1, 0) + IF(le.date_yyyymmdd_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.julian_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.julian_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.inname_first_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inname_last_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.zip5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip5_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ssn_append_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ssn_append_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.permanent_flag_ENUM_ErrorCount > 0, 1, 0) + IF(le.opt_back_in_ENUM_ErrorCount > 0, 1, 0) + IF(le.date_yyyymmdd_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -106,8 +158,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT38.StrType ErrorMessage;
-    SALT38.StrType FieldContents;
+    SALT311.StrType ErrorMessage;
+    SALT311.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -115,18 +167,18 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,DID_SSN_Fields.InvalidMessage_ssn(le.ssn_Invalid),DID_SSN_Fields.InvalidMessage_julian_date(le.julian_date_Invalid),DID_SSN_Fields.InvalidMessage_inname_first(le.inname_first_Invalid),DID_SSN_Fields.InvalidMessage_inname_last(le.inname_last_Invalid),DID_SSN_Fields.InvalidMessage_state(le.state_Invalid),DID_SSN_Fields.InvalidMessage_zip5(le.zip5_Invalid),DID_SSN_Fields.InvalidMessage_ssn_append(le.ssn_append_Invalid),DID_SSN_Fields.InvalidMessage_permanent_flag(le.permanent_flag_Invalid),DID_SSN_Fields.InvalidMessage_opt_back_in(le.opt_back_in_Invalid),DID_SSN_Fields.InvalidMessage_date_yyyymmdd(le.date_yyyymmdd_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.ssn_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.julian_date_Invalid,'ALLOW','LENGTH','UNKNOWN')
+          ,CHOOSE(le.julian_date_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.inname_first_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.inname_last_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.state_Invalid,'ALLOW','LENGTH','UNKNOWN')
-          ,CHOOSE(le.zip5_Invalid,'ALLOW','LENGTH','UNKNOWN')
-          ,CHOOSE(le.ssn_append_Invalid,'ALLOW','LENGTH','UNKNOWN')
+          ,CHOOSE(le.state_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.zip5_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.ssn_append_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.permanent_flag_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.opt_back_in_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.date_yyyymmdd_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'ssn','julian_date','inname_first','inname_last','state','zip5','ssn_append','permanent_flag','opt_back_in','date_yyyymmdd','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'Invalid_SSN','Invalid_JullianDate','Invalid_Inname','Invalid_Inname','Invalid_State','Invalid_Zip','Invalid_SSN_append','Invalid_Flag','Invalid_Flag','Invalid_Date','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.ssn,(SALT38.StrType)le.julian_date,(SALT38.StrType)le.inname_first,(SALT38.StrType)le.inname_last,(SALT38.StrType)le.state,(SALT38.StrType)le.zip5,(SALT38.StrType)le.ssn_append,(SALT38.StrType)le.permanent_flag,(SALT38.StrType)le.opt_back_in,(SALT38.StrType)le.date_yyyymmdd,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.ssn,(SALT311.StrType)le.julian_date,(SALT311.StrType)le.inname_first,(SALT311.StrType)le.inname_last,(SALT311.StrType)le.state,(SALT311.StrType)le.zip5,(SALT311.StrType)le.ssn_append,(SALT311.StrType)le.permanent_flag,(SALT311.StrType)le.opt_back_in,(SALT311.StrType)le.date_yyyymmdd,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,10,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
@@ -134,54 +186,20 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(DID_SSN_Layout_FCRA_Opt_Out) prevDS = DATASET([], DID_SSN_Layout_FCRA_Opt_Out), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT38.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
-      SELF.ruledesc := CHOOSE(c
-          ,'ssn:Invalid_SSN:ALLOW'
-          ,'julian_date:Invalid_JullianDate:ALLOW','julian_date:Invalid_JullianDate:LENGTH'
-          ,'inname_first:Invalid_Inname:ALLOW'
-          ,'inname_last:Invalid_Inname:ALLOW'
-          ,'state:Invalid_State:ALLOW','state:Invalid_State:LENGTH'
-          ,'zip5:Invalid_Zip:ALLOW','zip5:Invalid_Zip:LENGTH'
-          ,'ssn_append:Invalid_SSN_append:ALLOW','ssn_append:Invalid_SSN_append:LENGTH'
-          ,'permanent_flag:Invalid_Flag:ENUM'
-          ,'opt_back_in:Invalid_Flag:ENUM'
-          ,'date_yyyymmdd:Invalid_Date:CUSTOM'
-          ,'field:Number_Errored_Fields:SUMMARY'
-          ,'field:Number_Perfect_Fields:SUMMARY'
-          ,'rule:Number_Errored_Rules:SUMMARY'
-          ,'rule:Number_Perfect_Rules:SUMMARY'
-          ,'rule:Number_OnFail_Rules:SUMMARY'
-          ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
-      SELF.ErrorMessage := CHOOSE(c
-          ,DID_SSN_Fields.InvalidMessage_ssn(1)
-          ,DID_SSN_Fields.InvalidMessage_julian_date(1),DID_SSN_Fields.InvalidMessage_julian_date(2)
-          ,DID_SSN_Fields.InvalidMessage_inname_first(1)
-          ,DID_SSN_Fields.InvalidMessage_inname_last(1)
-          ,DID_SSN_Fields.InvalidMessage_state(1),DID_SSN_Fields.InvalidMessage_state(2)
-          ,DID_SSN_Fields.InvalidMessage_zip5(1),DID_SSN_Fields.InvalidMessage_zip5(2)
-          ,DID_SSN_Fields.InvalidMessage_ssn_append(1),DID_SSN_Fields.InvalidMessage_ssn_append(2)
-          ,DID_SSN_Fields.InvalidMessage_permanent_flag(1)
-          ,DID_SSN_Fields.InvalidMessage_opt_back_in(1)
-          ,DID_SSN_Fields.InvalidMessage_date_yyyymmdd(1)
-          ,'Fields with errors'
-          ,'Fields without errors'
-          ,'Rules with errors'
-          ,'Rules without errors'
-          ,'Rules with possible edits'
-          ,'Records with at least one error'
-          ,'Records without errors','UNKNOWN');
+      SELF.ruledesc := toRuleDesc(c);
+      SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
           ,le.ssn_ALLOW_ErrorCount
-          ,le.julian_date_ALLOW_ErrorCount,le.julian_date_LENGTH_ErrorCount
+          ,le.julian_date_ALLOW_ErrorCount,le.julian_date_LENGTHS_ErrorCount
           ,le.inname_first_ALLOW_ErrorCount
           ,le.inname_last_ALLOW_ErrorCount
-          ,le.state_ALLOW_ErrorCount,le.state_LENGTH_ErrorCount
-          ,le.zip5_ALLOW_ErrorCount,le.zip5_LENGTH_ErrorCount
-          ,le.ssn_append_ALLOW_ErrorCount,le.ssn_append_LENGTH_ErrorCount
+          ,le.state_ALLOW_ErrorCount,le.state_LENGTHS_ErrorCount
+          ,le.zip5_ALLOW_ErrorCount,le.zip5_LENGTHS_ErrorCount
+          ,le.ssn_append_ALLOW_ErrorCount,le.ssn_append_LENGTHS_ErrorCount
           ,le.permanent_flag_ENUM_ErrorCount
           ,le.opt_back_in_ENUM_ErrorCount
           ,le.date_yyyymmdd_CUSTOM_ErrorCount
@@ -194,15 +212,15 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
           ,le.ssn_ALLOW_ErrorCount
-          ,le.julian_date_ALLOW_ErrorCount,le.julian_date_LENGTH_ErrorCount
+          ,le.julian_date_ALLOW_ErrorCount,le.julian_date_LENGTHS_ErrorCount
           ,le.inname_first_ALLOW_ErrorCount
           ,le.inname_last_ALLOW_ErrorCount
-          ,le.state_ALLOW_ErrorCount,le.state_LENGTH_ErrorCount
-          ,le.zip5_ALLOW_ErrorCount,le.zip5_LENGTH_ErrorCount
-          ,le.ssn_append_ALLOW_ErrorCount,le.ssn_append_LENGTH_ErrorCount
+          ,le.state_ALLOW_ErrorCount,le.state_LENGTHS_ErrorCount
+          ,le.zip5_ALLOW_ErrorCount,le.zip5_LENGTHS_ErrorCount
+          ,le.ssn_append_ALLOW_ErrorCount,le.ssn_append_LENGTHS_ErrorCount
           ,le.permanent_flag_ENUM_ErrorCount
           ,le.opt_back_in_ENUM_ErrorCount
-          ,le.date_yyyymmdd_CUSTOM_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,le.date_yyyymmdd_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -216,12 +234,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT38.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT311.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT38.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT311.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
@@ -236,7 +254,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT38.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -293,7 +311,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldPopStats := NORMALIZE(hygiene_summaryStats,15,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
-    SALT38.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -318,12 +336,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
 END;
  
 EXPORT StandardStats(DATASET(DID_SSN_Layout_FCRA_Opt_Out) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT38.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT38.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_FCRA_Opt_Out, DID_SSN_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_FCRA_Opt_Out, DID_SSN_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
@@ -334,10 +352,10 @@ EXPORT StandardStats(DATASET(DID_SSN_Layout_FCRA_Opt_Out) inFile, BOOLEAN doErro
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT38.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT311.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT38.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
  
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;

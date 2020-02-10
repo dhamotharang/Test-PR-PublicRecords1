@@ -61,8 +61,8 @@ END;
 	ut.CleanFields(dLatestSort, ClnLatest);
 	ut.CleanFields(dNewSort, ClnNew);
 	 
-	SlimLatest 	:= PROJECT(ClnLatest, TRANSFORM(Layout_Slim, SELF.UNIQUE_ID:=TRIM(LEFT.LICENSE_NBR) + '_' + TRIM(LEFT.STORE_NBR) + '_' + TRIM(LEFT.NAME_DBA); SELF := LEFT;)); 
-	SlimNew     := PROJECT(ClnNew, TRANSFORM(Layout_Slim, SELF.UNIQUE_ID:=TRIM(LEFT.LICENSE_NBR) + '_' + TRIM(LEFT.STORE_NBR) + '_' + TRIM(LEFT.NAME_DBA); SELF := LEFT;));
+	SlimLatest 	:= PROJECT(ClnLatest, TRANSFORM(Layout_Slim, SELF.UNIQUE_ID:=TRIM(LEFT.LICENSE_NBR) + '_' + TRIM(LEFT.STORE_NBR) + '_' + TRIM(LEFT.AGENCY_ID) + '_' + TRIM(LEFT.NAME_ORG); SELF := LEFT;)); 
+	SlimNew     := PROJECT(ClnNew, TRANSFORM(Layout_Slim, SELF.UNIQUE_ID:=TRIM(LEFT.LICENSE_NBR) + '_' + TRIM(LEFT.STORE_NBR) + '_' + TRIM(LEFT.AGENCY_ID) + '_' + TRIM(LEFT.NAME_ORG); SELF := LEFT;));
 
 
 	// Combine new and the latest update

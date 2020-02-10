@@ -14,7 +14,9 @@
     STRING50    external_source_code;                       //
     STRING50    source_code;                                //
     STRING50    source_type;                                //NAPP|PRCOD,SBFEC, GTWL, etc
+    STRING50    opt_out_category;                           //For future use
     STRING50    data_based_exemptions;                      //DDPA|FCRA|NONE, FCRA|GLBA, HIPAA, etc
     STRING50    usage_based_exemptions;                     //DPPA,FCRA,btpae,GLBA|utbws,DPPA |PRQA, etc
+    STRING50    category;                                   //CAT1..CAT11 where CAT9 is professional flag
     UNSIGNED8   rcid;
 END;

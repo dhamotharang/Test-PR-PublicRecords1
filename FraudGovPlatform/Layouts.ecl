@@ -1277,6 +1277,7 @@ RECORD
   integer8 cl_high_risk_pattern5_flag_;
   integer8 kr_high_risk_flag_;
   integer8 kr_medium_risk_flag_;
+  integer8 kr_low_risk_flag_;
   integer8 currently_incarcerated_flag_;
   integer8 fraud_offenses_flag_;
   integer8 associated_with_incarcerated_flag_;
@@ -1347,6 +1348,7 @@ RECORD
   unsigned8 connected_element_count_;
   DATASET(flagsrec) flags;
  END;
+
 
 
  Export	personassociationsdetails	:=	RECORD
@@ -2186,6 +2188,7 @@ RECORD
   integer8 cl_high_risk_pattern5_flag_;
   integer8 kr_high_risk_flag_;
   integer8 kr_medium_risk_flag_;
+  integer8 kr_low_risk_flag_;
   integer8 currently_incarcerated_flag_;
   integer8 fraud_offenses_flag_;
   integer8 associated_with_incarcerated_flag_;
@@ -2212,7 +2215,7 @@ RECORD
    unsigned1 __dt_first_seen__flags;
    unsigned4 dt_last_seen_;
    unsigned1 __dt_last_seen__flags;
-  unsigned2 date_first_seen_;
+   unsigned2 date_first_seen_;
    unsigned2 date_last_seen_;
    integer8 __recordcount;
   END) exp1_;

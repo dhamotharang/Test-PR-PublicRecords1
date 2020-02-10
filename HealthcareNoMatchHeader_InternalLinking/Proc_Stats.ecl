@@ -172,7 +172,9 @@
       SELF.HasNoLexID         :=  COUNT(dAllRows)=COUNT(dAllRows(LexID=0));
       SELF.HasUniqueLexID     :=  COUNT(dAllRows)=COUNT(dAllRows(LexID>0)) AND COUNT(DEDUP(SORT(dAllRows,LexID),LexID))=1;
       SELF.MultipleLexIDs     :=  COUNT(DEDUP(SORT(dAllRows(LexID>0),LexID),LexID))>1;
-      SELF.MultipleNames      :=  COUNT(DEDUP(SORT(dAllRows,input_full_name),input_full_name))>1;
+      SELF.MultipleNames      :=  COUNT(DEDUP(SORT(dAllRows,fname),fname))>1  OR
+                                  COUNT(DEDUP(SORT(dAllRows,mname),mname))>1  OR
+                                  COUNT(DEDUP(SORT(dAllRows,lname),lname))>1;
       SELF.MultipleDOBs       :=  COUNT(DEDUP(SORT(dAllRows(dob>0),dob),dob))>1;
       SELF.MultipleAddr       :=  COUNT(DEDUP(SORT(dAllRows,prim_name),prim_name))>1  OR
                                   COUNT(DEDUP(SORT(dAllRows,prim_range),prim_range))>1  OR
@@ -329,7 +331,9 @@
       SELF.HasNoLexID         :=  COUNT(dAllRows)=COUNT(dAllRows(LexID=0));
       SELF.HasUniqueLexID     :=  COUNT(dAllRows)=COUNT(dAllRows(LexID>0)) AND COUNT(DEDUP(SORT(dAllRows,LexID),LexID))=1;
       SELF.MultipleLexIDs     :=  COUNT(DEDUP(SORT(dAllRows(LexID>0),LexID),LexID))>1;
-      SELF.MultipleNames      :=  COUNT(DEDUP(SORT(dAllRows,input_full_name),input_full_name))>1;
+      SELF.MultipleNames      :=  COUNT(DEDUP(SORT(dAllRows,fname),fname))>1  OR
+                                  COUNT(DEDUP(SORT(dAllRows,mname),mname))>1  OR
+                                  COUNT(DEDUP(SORT(dAllRows,lname),lname))>1;
       SELF.MultipleDOBs       :=  COUNT(DEDUP(SORT(dAllRows(dob>0),dob),dob))>1;
       SELF.MultipleAddr       :=  COUNT(DEDUP(SORT(dAllRows,prim_name),prim_name))>1  OR
                                   COUNT(DEDUP(SORT(dAllRows,prim_range),prim_range))>1  OR

@@ -1,4 +1,4 @@
-import	NAC, lib_FileServices, lib_StringLib, lib_ThorLib, Ut;
+﻿import	NAC, lib_FileServices, lib_StringLib, lib_ThorLib, Ut;
 
 // ------------------------------------------------------------------------------------------------
 string		gLandingZoneServer		:=	NAC.Constants.LandingZoneServer				:	stored('LandingZoneServer');
@@ -6,7 +6,7 @@ string		gLandingZonePathBase	:=	NAC.Constants.LandingZonePathBase			:	stored('La
 string		gLandingZonePathIn		:=	gLandingZonePathBase + '/j1in'		:	stored('LandingZonePathIn');
 string		gLandingZonePathDone	:=	gLandingZonePathIn + '/done';
 string		gLandingZonePathOut		:=	gLandingZonePathBase + '/j1out'		:	stored('LandingZonePathOut');
-string		gJ1FileMask						:=	'XX_J1A_*_*.dat';
+string		gJ1FileMask						:=	'XX_J1A_*_*.dat'; 
 
 string		fPreserveRemoteFilenameCase(string pRemoteFileName)	:=	regexreplace('([A-Z])',pRemoteFileName,'^\\1');
 string		fRemoteFilenameAsThorName(string pRemoteFileName)		:=	'~file::' + gLandingZoneServer + regexreplace('/', gLandingZonePathIn + '/' + fPreserveRemoteFilenameCase(pRemoteFileName), '::');
@@ -543,14 +543,10 @@ function
 
 	dJ1_ForBatch	:=	project(dJ1_PrepForBatch, tJ1_ForBatch(left));
 
-	return	output(dJ1_ForBatch, , '~nac::out::' + regexreplace('_J1A_', pRemoteFileName, '_J1B_'), compressed);
+	return	output(sort(dJ1_ForBatch, ESPTransactionID), , '~nac::out::' + regexreplace('_J1A_', pRemoteFileName, '_J1B_'), compressed);
 end;
 
-dJ1InFiles	:=	lib_FileServices.FileServices.RemoteDirectory(gLandingZoneServer, gLandingZonePathIn, gJ1FileMask);
-
-if(lib_StringLib.StringLib.StringFind(lib_thorlib.thorlib.cluster(), 'hthor', 1) = 0,
-	 fail('Must be run on hthor')
-	) : priority(100);
+dJ1InFiles	:=	global(nothor(lib_FileServices.FileServices.RemoteDirectory(gLandingZoneServer, gLandingZonePathIn, gJ1FileMask)), few);
 
 iff(exists(dJ1InFiles),
 		sequential(

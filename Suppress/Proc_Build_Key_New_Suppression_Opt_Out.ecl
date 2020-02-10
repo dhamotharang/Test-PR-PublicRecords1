@@ -1,4 +1,4 @@
-import RoxieKeyBuild,Suppress,Orbit3,ut,dops, orbit;
+import RoxieKeyBuild,Suppress,Orbit3,ut,dops, Orbit3Insurance;
 
 export Proc_Build_Key_New_Suppression_Opt_Out(String pVersion) := 
 FUNCTION
@@ -24,21 +24,15 @@ update_idops 		:= dops.updateversion('SuppressOptOutKeys',pVersion,'christopher.
 create_build        := Orbit3.proc_Orbit3_CreateBuild('Suppression Opt Out',pVersion,'N|B');
 create_build_fcra   := Orbit3.proc_Orbit3_CreateBuild('FCRA Suppression Opt Out',pVersion,'F');
 
-tokenval 			:= orbit.GetToken();
-create_build_ins	:= orbit.CreateBuild(orbitIConstants().buildname,
-					 					 orbitIConstants().masterbuildname,
-					 					 pVersion,
-					 					 'Production NonFCRA',
-					 					 tokenval
-										);
-         										
+create_build_ins	:=  Orbit3Insurance.Proc_Orbit3I_CreateBuild ('Suppression Opt Out',pVersion,'N',
+                                         'christopher.brodeur@lexisnexisrisk.com,DataDevelopment-Ins@lexisnexis.com,InsDataOps@risk.lexisnexis.com');
 													
 RETURN Sequential(  parallel(bld_optout_key,bld_optout_key_fcra),
 				    parallel(mv_built_optout, mv_built_optout_fcra),
 				    parallel(mv_qa_optout, mv_qa_optout_fcra),
-					parallel(update_dops, update_dops_fcra,update_idops),
+					parallel(update_dops, /* DF-26984 update_dops_fcra,*/ update_idops),
 					if( ut.Weekday((integer)pVersion[1..8]) <> 'SATURDAY' and ut.Weekday((integer)pVersion[1..8]) <> 'SUNDAY',
-					    parallel(create_build,create_build_fcra/*, create_build_ins*/),
+					    parallel(create_build,create_build_fcra, create_build_ins),
 						output('No Orbit Entries Needed for weekend builds'))
                  );
 

@@ -1,4 +1,5 @@
 ﻿IMPORT Tools;
+
 EXPORT Constants(
 
 	BOOLEAN	pUseOtherEnvironment	= FALSE
