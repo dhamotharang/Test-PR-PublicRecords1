@@ -1,13 +1,15 @@
-﻿import AutoStandardI, BIPV2, tools;
+﻿import AutoStandardI, BIPV2, tools,MDR,STD,_control;;
 
 export Key_Contact_Linkids := 
 module
 
   export dkeybuild      := Files().base.Contacts.built;
-
+	
+  shared dkeybuild1:= MDR.macGetGlobalSid(dkeybuild,'BIPV2','source','global_sid');  
+	
 	shared superfile_name := keynames().contact_linkids.QA;
   
-  BIPV2.IDmacros.mac_IndexWithXLinkIDs(dkeybuild, k, superfile_name)
+  BIPV2.IDmacros.mac_IndexWithXLinkIDs(dkeybuild1, k, superfile_name)
   export Key := k;
   
   // -- ensure easy access to different logical and super versions of the key

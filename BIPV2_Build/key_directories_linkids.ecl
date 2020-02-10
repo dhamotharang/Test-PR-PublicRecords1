@@ -14,14 +14,14 @@ module
     ,dataset(recordof(ds_industry))  pindustry
   ) := 
   function
-    topbusiness_bipv2.layouts.rec_other_directories_layout xform_contacts(ds_contacts le) := transform
+    BIPV2_Build.Layout_Directories_Linkids_key xform_contacts(ds_contacts le) := transform
      self.rec_type        := 'C';
      self.contacts_fields := le;
      self                 := le;
      self                 := [];//for the industry fields
     end;
 
-    topbusiness_bipv2.layouts.rec_other_directories_layout xform_industry(ds_industry le) := transform
+    BIPV2_Build.Layout_Directories_Linkids_key xform_industry(ds_industry le) := transform
      self.rec_type        := 'I';
      self.industry_fields := le;
      self                 := le;

@@ -26,7 +26,14 @@ export Build_Base_V2 := module
 					shared full_build_member	:=  
 						sequential(				
 						 		 Build_member_Base
-								,Promote_V2.promote_base(pVersion, pUseProd, gcid, pHistMode).buildfiles.New2Built);
+								 ,if(pHistMode = 'A', UPI_DataBuild.Promote_V2.promote_base(pVersion,pUseProd,gcid,pHistMode).buildfiles.New2Built,
+								 sequential(
+										fileservices.startsuperfiletransaction()
+										,fileservices.addsuperfile('~ushc::crk::base::' + gcid + '::built_nosave',UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_base.new)
+										// ,fileservices.addsuperfile('~ushc::crk::base::' + gcid + '::qa_nosave',UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_base.new)
+										,fileservices.finishsuperfiletransaction()))); 
+									// only promote save all base files through normal promote - nosave base files should only go to QA, and will 
+									// eventually be deleted with the nosave cleanup process
 	
 					export member_all	:=
 						if(VersionControl.IsValidVersion(pVersion[1..8])

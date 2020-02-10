@@ -27,6 +27,7 @@ EXPORT  MAC_AppendCRK(
   pMaxNumIter     :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.maxNumIters;
   pPrimaryQueue   :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.primaryQueue;
   pWuPrefix       :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).WUPrefix;
+  pWuIterations   :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).WUIterations;
   pWuSuperfile    :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).MasterWUOutput_SF;
   pEmailTo        :=  pWorkmanEmailTo;
   pPollingFreq    :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.pollingFreq;
@@ -73,7 +74,7 @@ EXPORT  MAC_AppendCRK(
                         , //  pStartIteration       = '1'
                         , //  pNumMaxIterations     = '1'
                         , //  pNumMinIterations     = ''
-                        ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runIngest_Text) //  pOutputFilename
+                        ,pWuPrefix + pWuIterations + trim(runIngest_Text) //  pOutputFilename
                         ,pWuSuperfile       //  pOutputSuperfile
                         ,pIngestSetResults  //  pSetResults
                         , //  pStopCondition        = '\'\''
@@ -118,7 +119,7 @@ EXPORT  MAC_AppendCRK(
                           , //  pStartIteration       = '1'
                           ,pMaxNumIter                    //  pNumMaxIterations
                           , //  pNumMinIterations     = ''
-                          ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runIteration_Text) //  pOutputFilename  :=  
+                          ,pWuPrefix + pWuIterations + trim(runIteration_Text) //  pOutputFilename  :=  
                           ,pWuSuperfile                   //  pOutputSuperfile
                           ,pIterationSetResults           //  pSetResults
                           ,pIterationStopCondition        //  pStopCondition
@@ -171,7 +172,7 @@ EXPORT  MAC_AppendCRK(
                           , //  pStartIteration       = '1'
                           , //  pNumMaxIterations     = '1'
                           , //  pNumMinIterations     = ''
-                          ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runAppendCRK_Text) //  pOutputFilename
+                          ,pWuPrefix + pWuIterations + trim(runAppendCRK_Text) //  pOutputFilename
                           ,pWuSuperfile   //  pOutputSuperfile
                           ,pAppendCRKSetResults //  pSetResults
                           , //  pStopCondition        = '\'\''

@@ -5,96 +5,38 @@ EXPORT  Proc_RecallResults(
     , DATASET(HealthcareNoMatchHeader_InternalLinking.Layout_Header) pInput = HealthcareNoMatchHeader_Ingest.Files(pSrc).CRK
     , UNSIGNED  pSampleSize = 50
     , SET OF STRING pSetReviewers = ['Reviewer1', 'Reviewer2', 'Reviewer3']
-    , pWeight  = HealthcareNoMatchHeader_InternalLinking.Config.MatchThreshold
+    , UNSIGNED  pWeight  = HealthcareNoMatchHeader_InternalLinking.Config.MatchThreshold
+    , STRING  pServiceRoxieIP = '10.173.3.1'
 	)	:=	FUNCTION
 
   pReviewerCnt  :=  IF(COUNT(pSetReviewers)>10,10,COUNT(pSetReviewers));
-  dInputGrp     :=  GROUP(SORT(DISTRIBUTE(pInput,HASH( crk)),crk,LOCAL),crk,LOCAL);
-  // dSamples      :=  HAVING(dInputGrp,COUNT(ROWS(LEFT)) > 1);  //  Clusters (More than one record)
   dSamples      :=  pInput;
   
   fFragHunter   :=  HealthcareNoMatchHeader_ExternalLinking.fragHunter(pSrc,pVersion,,pWeight);
   dFragments    :=  fFragHunter.vFrags;
-
-  nomatchidCompareService(STRING nomatch_idonestr, STRING nomatch_idtwostr, STRING RIDonestr='', STRING RIDtwostr='*', STRING pSrc, STRING pVersion) := FUNCTION
-    UNSIGNED8 nomatch_idone0 := (UNSIGNED8)SALT311.utWord(nomatch_idonestr,1); // Allow for two token on a line input
-    UNSIGNED8 nomatch_idtwo0 := (UNSIGNED8)(IF(nomatch_idtwostr='*',SALT311.utWord(nomatch_idonestr,2),nomatch_idtwostr));
-    UNSIGNED8 RIDone0 := (UNSIGNED8)SALT311.utWord(RIDonestr,1); // Allow for two token on a line input
-    UNSIGNED8 RIDtwo0 := (UNSIGNED8)(IF(RIDtwostr='*',SALT311.utWord(RIDonestr,2),RIDtwostr));
-    UNSIGNED8 nomatch_idone := IF( nomatch_idone0>=nomatch_idtwo0, nomatch_idone0, nomatch_idtwo0 );
-    UNSIGNED8 nomatch_idtwo := IF( nomatch_idone0>=nomatch_idtwo0, nomatch_idtwo0, nomatch_idone0 );
-    UNSIGNED8 RIDone := IF( nomatch_idone0>=nomatch_idtwo0, RIDone0, RIDtwo0 );
-    UNSIGNED8 RIDtwo := IF( nomatch_idone0>=nomatch_idtwo0, RIDtwo0, RIDone0 );
-    BFile := HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).AllRecords;
-    odl := PROJECT(CHOOSEN(HealthcareNoMatchHeader_InternalLinking.Keys(pSrc,pVersion,BFile).Candidates(nomatch_id=nomatch_idone),100000),HealthcareNoMatchHeader_InternalLinking.match_candidates(pSrc,pVersion,BFile).layout_candidates);
-    odr := PROJECT(CHOOSEN(HealthcareNoMatchHeader_InternalLinking.Keys(pSrc,pVersion,BFile).Candidates(nomatch_id=nomatch_idTwo),100000),HealthcareNoMatchHeader_InternalLinking.match_candidates(pSrc,pVersion,BFile).layout_candidates);
-    k := HealthcareNoMatchHeader_InternalLinking.Keys(pSrc,pVersion,BFile).Specificities_Key;
-    s := GLOBAL(PROJECT(k,HealthcareNoMatchHeader_InternalLinking.Layout_Specificities.R)[1]);
-    odlv := HealthcareNoMatchHeader_InternalLinking.Debug(pSrc,pVersion, BFile, s).RolledEntities(odl);
-    odrv := HealthcareNoMatchHeader_InternalLinking.Debug(pSrc,pVersion, BFile, s).RolledEntities(odr);
-    odl_match := IF(RIDone > 0, odl(RID = RIDone), odl);
-    odr_match := IF(RIDtwo > 0, odr(RID = RIDtwo), odr);
-    mtch0 := HealthcareNoMatchHeader_InternalLinking.Debug(pSrc,pVersion, BFile, s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,nomatch_idone,nomatch_idtwo,0,0}],HealthcareNoMatchHeader_InternalLinking.match_candidates(pSrc,pVersion,BFile).layout_matches));
-    mtch1 := IF(RIDone > 0, mtch0(RID1 = RIDone OR RID2 = RIDone), mtch0);
-    mtch2 := IF(RIDtwo > 0, mtch1(RID1 = RIDtwo OR RID2 = RIDtwo), mtch1);
-    mtch  := CHOOSEN(SORT(mtch2,-Conf),20);
-    score := TABLE(mtch, {nomatch_id1, nomatch_id2, RID1, RID2, conf, SSN_score, DOB_score,DOB_score_prop, LEXID_score,LEXID_score_prop, SUFFIX_score,SUFFIX_score_prop, FNAME_score,FNAME_score_prop, MNAME_score,MNAME_score_prop, LNAME_score,LNAME_score_prop, GENDER_score, PRIM_NAME_score, PRIM_RANGE_score, SEC_RANGE_score, CITY_NAME_score, ST_score, ZIP_score, MAINNAME_score,MAINNAME_score_prop, ADDR1_score, LOCALE_score, ADDRESS_score, FULLNAME_score,FULLNAME_score_prop});
-    RETURN SORT(score,-Conf);
-  END;
-
-  rCompare := record
-    unsigned6 nomatch_id1;
-    unsigned6 nomatch_id2;
-    unsigned6 rid1;
-    unsigned6 rid2;
-    integer2 conf;
-    integer2 ssn_score;
-    integer2 dob_score;
-    integer2 dob_score_prop;
-    integer2 lexid_score;
-    integer2 lexid_score_prop;
-    integer2 suffix_score;
-    integer2 suffix_score_prop;
-    integer2 fname_score;
-    integer2 fname_score_prop;
-    integer2 mname_score;
-    integer2 mname_score_prop;
-    integer2 lname_score;
-    integer2 lname_score_prop;
-    integer2 gender_score;
-    integer2 prim_name_score;
-    integer2 prim_range_score;
-    integer2 sec_range_score;
-    integer2 city_name_score;
-    integer2 st_score;
-    integer2 zip_score;
-    integer2 mainname_score;
-    integer2 mainname_score_prop;
-    integer2 addr1_score;
-    integer2 locale_score;
-    integer2 address_score;
-    integer2 fullname_score;
-    integer2 fullname_score_prop;
-  end;
   
   rClusterCompares  :=  RECORD
     STRING10  nomatch_id1;
     STRING10  nomatch_id2;
-    STRING3   conf;
     STRING3   weight;
-    DATASET(RECORDOF(dSamples)) dRecords;
-    rCompare  dCompare;
+		STRING		hyperlink__html;
   END;
+		
+  // Strings to create a Hyperlink
+  pHyperlinkPreamble	:=	'<a href="http://';
+  pHyperlinkIP				:=	pServiceRoxieIP;
+  pHyperlinkService		:=	':8002/WsEcl/xslt/query/roxie_devoneway_1_eclcc/'
+                          +'healthcarenomatchheader_internallinking.nomatch_idcompareservice'
+                          +'?nomatch_idone=@nomatch_id1@&nomatch_idtwo=@nomatch_id2@">Compare: @nomatch_id1@, @nomatch_id2@</a>';
+  pHyperLink					:=	pHyperlinkPreamble+pHyperlinkIP+pHyperlinkService;
 
   rClusterCompares tClusterCompares(dFragments l, STRING8 src, STRING version) :=  TRANSFORM
     SELF.nomatch_id1  :=  (STRING)l.nomatch_id;
     SELF.nomatch_id2  :=  (STRING)l.NoMatchIDSource;
     SELF.weight       :=  (STRING)l.weight;
-    SELF.dRecords     :=  SORT(pInput(nomatch_id=l.nomatch_id)+pInput(nomatch_id=l.NoMatchIDSource),-(UNSIGNED)nomatch_id,-(UNSIGNED)rid);
-    SELF.dCompare     :=  nomatchidCompareService(SELF.nomatch_id1,SELF.nomatch_id2,,,src,version)[1];
-    SELF.Conf         :=  (STRING)SELF.dCompare.Conf;
+    SELF.hyperlink__html := STD.Str.FindReplace(STD.Str.FindReplace(pHyperLink,'@nomatch_id1@',(STRING)SELF.nomatch_id1),'@nomatch_id2@',(STRING)SELF.nomatch_id2);
   END;
-  
+   
   dFragmentResults  :=  PROJECT(dFragments, tClusterCompares(LEFT,pSrc,pVersion));
   
   totalSamples      :=  pSampleSize * pReviewerCnt;
@@ -102,12 +44,11 @@ EXPORT  Proc_RecallResults(
   
   runRecallResults  :=  SEQUENTIAL(
                           HealthcareNoMatchHeader_ExternalLinking.Proc_GoExternal(pSrc,pVersion,UNGROUP(dSamples)),
-                          OUTPUT(SORT(dFragments,nomatchidSource,nomatch_id,-weight),,'~thor::kmg::recall_testing::'+pSrc+'::'+pVersion,COMPRESSED,OVERWRITE),
+                          OUTPUT(SORT(dFragments,nomatchidSource,nomatch_id,-weight),,'~	ushc::healthcarenomatchheader::recall_testing::'+pSrc+'::'+pVersion,COMPRESSED,OVERWRITE),
                           PARALLEL(
                                OUTPUT(COUNT(dFragmentResults   ) ,named('TotalMatchSamples'   ))
                               ,OUTPUT('-----------------------------------' ,named('_'))
                               ,OUTPUT(allsamplerecs ,named('AllSamplesCombined'),all)
-                              // ,OUTPUT('-----------------------------------' ,named('__'))
                               ,IF(pReviewerCnt>=1,
                                 SEQUENTIAL(
                                   OUTPUT('-----------------------------------' ,named('___'))
