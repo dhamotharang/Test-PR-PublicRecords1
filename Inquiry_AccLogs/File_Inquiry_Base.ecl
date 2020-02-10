@@ -26,7 +26,7 @@ export history := project(inquiry_acclogs.File_Inquiry_BaseSourced.history, inqu
 
   // FileHistory:=dataset('~thor_data400::out::inquiry_tracking::weekly_historical_father',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor,opt);
 
-export fileFull:=FileHistory (~(bus_intel.industry = 'DIRECT TO CONSUMER' and 
+ shared  historyFiltered := FileHistory (~(bus_intel.industry = 'DIRECT TO CONSUMER' and 
 																search_info.function_description in [
 																'ADDRBEST.BESTADDRESSBATCHSERVICE'
 																,'BATCHSERVICES.AKABATCHSERVICE'
@@ -37,8 +37,11 @@ export fileFull:=FileHistory (~(bus_intel.industry = 'DIRECT TO CONSUMER' and
 																,'DIDVILLE.RANBESTINFOBATCHSERVICE'
 																,'PROGRESSIVEPHONE.PROGRESSIVEPHONEWITHFEEDBACKBATCHSERVICE']
 																)
-															)	
-															+ inquiry_acclogs.File_Inquiry_BaseSourcedToRisk.updates
-															; 
+															);
+
+export historyAll := project ( historyFiltered, inquiry_acclogs.Layout.common_indexes );
+
+export fileFull		:= historyFiltered + inquiry_acclogs.File_Inquiry_BaseSourced.updates ; 
+
 end; 
  
