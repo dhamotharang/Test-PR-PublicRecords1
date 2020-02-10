@@ -17,8 +17,8 @@ EXPORT NoSave_CleanUp := MODULE
 	export days_till_delete_NA	:= 9999;
 	export email_to 						:= 'jennifer.hennigar@lexisnexisrisk.com';
 	export send_email 					:= FALSE;						//SHOULD BE TRUE WHEN WE GO LIVE!!
-	export write_log 						:= FALSE; 						//SHOULD BE TRUE WHEN WE GO LIVE!!
-	export execute_deletes 			:= FALSE;	//SHOULD BE TRUE WHEN WE GO LIVE!!
+	export write_log 						:= TRUE; 						//SHOULD BE TRUE WHEN WE GO LIVE!!
+	export execute_deletes 			:= TRUE;	//SHOULD BE TRUE WHEN WE GO LIVE!!
 	export URL_details 					:= 'http://' + wk_ut._constants.LocalEsp + ':8010/?Wuid=' + Workunit + '&Sequence=0&Widget=ResultsWidget';
 	export string asOfDate			:= (string)std.date.today();
 	

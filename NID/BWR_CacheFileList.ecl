@@ -24,7 +24,11 @@ y := PROJECT(x, TRANSFORM(rx,
 	self.wuid := (string)STD.File.GetLogicalFileAttribute('~'+LEFT.name,'workunit');
 	));
 
-OUTPUT(SORT(y,-recnt), all, named('files'));
+OUTPUT(SORT(y,-modified), all, named('files'));
+OUTPUT(SORT(y(version='V1'),-modified), all, named('files1'));
+OUTPUT(SORT(y(version='V2'),-modified), all, named('files2'));
 OUTPUT(y(recnt=0), all, named('empties'));
 OUTPUT(SUM(y,recnt), named('total'));
+OUTPUT(SUM(y(version='V2'),recnt), named('total2'));
 OUTPUT(SORT(TABLE(y, {y.version, n := COUNT(GROUP)}, version, few), version));
+
