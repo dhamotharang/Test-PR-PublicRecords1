@@ -8,7 +8,7 @@ EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
 	Shared base := Files().Base.Main_Orig.built;
 
-	shared pii_current := Files().base.pii.built; //pii current build
+	shared pii_current :=Files().base.pii.built; //pii current build
 
 shared pii_previous := Files().base.pii.qa;			//pii previous build
 
@@ -597,8 +597,28 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			
 			
 			layout_in make_batch_in(pii_base L) := TRANSFORM
+
 					SELF.acctno := (string)L.record_id;
 					SELF.did := (string)L.did;
+					// SELF.ssn := L.SSN;
+					// SELF.dob := (string)L.dob;
+					// SELF.phoneno := L.home_phone;
+					// SELF.title := '';
+					// SELF.name_first := L.fname;
+					// SELF.name_middle := L.mname;
+					// SELF.name_last := L.lname;
+					// SELF.name_suffix := L.name_suffix;
+					// SELF.prim_range := L.prim_range;
+					// SELF.predir := '';
+					// SELF.prim_name := L.prim_name;
+					// SELF.suffix := '';
+					// SELF.postdir := '';
+					// SELF.unit_desig := '';
+					// SELF.sec_range := L.sec_range;
+					// SELF.p_city_name := '';
+					// SELF.st := L.st;
+					// SELF.z5 := L.ZIP;
+					// SELF.zip4 := '';			
 					SELF := [];
 			END;
 
@@ -607,26 +627,26 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 			layout_soap := RECORD
 				INTEGER ALLOWALL := 1;
 				STRING120 APPENDS := 'BEST_ALL, VERIFY_ALL';
-				// STRING APPENDTHRESHOLD := '';
-				// STRING APPLICATIONTYPE := '';
-				// STRING DATAPERMISSIONMASK := DataPermission;
+				STRING APPENDTHRESHOLD := '';
+				STRING APPLICATIONTYPE := '';
+				STRING DATAPERMISSIONMASK := DataPermission;
 				STRING DATARESTRICTIONMASK := DataRestriction;
-				// BOOLEAN DEDUPED := TRUE;
-				DATASET(layout_in) batch_in;
-				// BOOLEAN GLBDATA := FALSE;
+				BOOLEAN DEDUPED := TRUE;
+				DATASET(layout_in) did_batch_in;
+				BOOLEAN GLBDATA := FALSE;
 				INTEGER GLBPURPOSE := 5;
-				// BOOLEAN INCLUDEMINORS := FALSE;
-				// STRING5 INDUSTRYCLASS := '';
-				// UNSIGNED8 MAX_RESULTS_PER_ACCT := 1;
-				// BOOLEAN PATRIOTPROCESS := FALSE;
-				// STRING SSNMASK := '';
+				BOOLEAN INCLUDEMINORS := TRUE;
+				STRING5 INDUSTRYCLASS := '';
+				UNSIGNED8 MAX_RESULTS_PER_ACCT := 1;
+				BOOLEAN PATRIOTPROCESS := FALSE;
+				STRING SSNMASK := '';
 				STRING120 VERIFY := 'BEST_ALL, VERIFY_ALL';
-				// BOOLEAN INCLUDERANKING := FALSE;
+				BOOLEAN INCLUDERANKING := FALSE;
 			END;
 
 			layout_Soap trans(pii_base L) := TRANSFORM
 					batch := PROJECT(L, make_batch_in(LEFT));
-					SELF.batch_in := batch;
+					SELF.did_batch_in  := batch;
 					self := L;
 			END;
 
