@@ -1,6 +1,6 @@
 ﻿EXPORT BWR_BocaShell_54_w_params(STRING neutralroxieIP, STRING fcra_roxieIP, INTEGER no_of_threads, INTEGER no_of_recs_to_run, STRING filetag) := function
 
-import RiskWise, sghatti, std, ut, scoring_project_pip;
+import RiskWise, sghatti, std, ut, scoring_project_pip, Scoring_Project_Macros;
 
 Timeout := 120;
 Retry_time := 3;
