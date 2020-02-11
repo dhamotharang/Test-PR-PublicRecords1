@@ -256,9 +256,11 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 														,IF (holdpreviousforkeydiff
 																,sequential
 																		(
-																			if (previousfileinsuper
-																					,STD.File.RemoveOwnedSubFiles(originalsuper,true))
-																			,STD.File.ClearSuperFile(originalsuper)
+																			IF (STD.File.SuperFileExists(originalsuper)
+																				,if (previousfileinsuper
+																						,STD.File.RemoveOwnedSubFiles(originalsuper,true))
+																					,STD.File.ClearSuperFile(originalsuper)
+																			)
 																		)
 																)
 													)
