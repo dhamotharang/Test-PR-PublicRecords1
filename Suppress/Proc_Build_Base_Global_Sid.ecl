@@ -23,7 +23,8 @@ EXPORT Proc_Build_Base_Global_Sid(STRING pVersion) := FUNCTION
 		SELF.dt_vendor_last_reported 	:= (UNSIGNED4) pVersion[1..8];
 		SELF.process_date				:= (UNSIGNED4) thorlib.WUID()[2..9];
 		// SELF.professional_flag			:= IF(L.professional_flag='','N',L.professional_flag);
-		SELF.professional_flag			:= IF(REGEXFIND('CAT9',L.category),'Y','N');
+		// SELF.professional_flag			:= IF(REGEXFIND('CAT9',L.category),'Y','N');
+		SELF.professional_flag			:= IF(REGEXFIND('PROFF',L.opt_out_category),'Y','N');   // See Jira ORBITV3-4252
 		SELF 							:= L;
 	END;
 
