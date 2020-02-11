@@ -1,4 +1,4 @@
-﻿IMPORT FirstData, BuildLogger, VersionControl, STD, Orbit3, RoxieKeyBuild, dops;
+﻿IMPORT FirstData, BuildLogger, VersionControl, STD, Orbit3, RoxieKeyBuild, dops, Scrubs_FirstData;
 
 EXPORT Proc_FirstData_buildall(
 	STRING  pVersion   = (STRING)STD.Date.Today(),
@@ -43,7 +43,8 @@ EXPORT Proc_FirstData_buildall(
 		BuildLogger.PostStart(False),
 		FirstData.QA_Records(),
 		dops_update,
-		// FirstData.Strata_Population_Stats(pversion,pIsTesting).All,
+		FirstData.Strata_Population_Stats(pversion,pIsTesting).All,
+		Scrubs_FirstData.fn_RunScrubs(pversion,''),
 		BuildLogger.PostEnd(False),
 		BuildLogger.BuildEnd(false)
 	): 
