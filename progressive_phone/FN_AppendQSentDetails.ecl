@@ -62,7 +62,7 @@ EXPORT FN_AppendQSentDetails(dataset(progressive_phone.layout_progressive_batch_
 	without_qsent_dedup := project(finalout_without_qsent, phone_trans_dedupe(left, counter));
 	without_qsent_dedup_srt := sort((without_qsent_dedup + input_dedup), acctno, sort_order);
 
-	gw_layout := Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse;
+	gw_layout := Doxie_Raw.PhonesPlus_Layouts.PhoneplusSearchResponse_Ext;
 
 	gw_layout_out := record   //temporary structure to hold all resulting rows for each request (acct).
 		string20 acctno;
@@ -99,8 +99,8 @@ EXPORT FN_AppendQSentDetails(dataset(progressive_phone.layout_progressive_batch_
 		call_gateway := ((DO_QSENTV2_NAME_ADDR OR DO_QSENTV2_NAME_SSN) AND COUNT(QSENTV2_GW) > 0);
 
 		gw_results1 := IF(call_gateway,
-											choosen(Doxie_Raw.RealTimePhones_Raw(QSENTV2_GW, 30, 0, in_mod1, call_gateway),in_mod1.MaxResults), 																						
-											dataset([],gw_layout));
+			choosen(Doxie_Raw.RealTimePhones_Raw(in_mod1, QSENTV2_GW, 30, 0, call_gateway), in_mod1.MaxResults), 																						
+			dataset([],gw_layout));
 
 		self.gw_results := gw_results1;													 
 		self.acctno := L.acctno;

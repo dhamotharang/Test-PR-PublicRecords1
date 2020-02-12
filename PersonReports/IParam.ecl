@@ -43,7 +43,7 @@ EXPORT IParam := MODULE
   EXPORT corpaffil := INTERFACE (doxie.IDataAccess) //currently, no fields are used.
   END;
 
-  EXPORT criminal := INTERFACE
+  EXPORT criminal := INTERFACE (doxie.IDataAccess, _report) //only penalty-threshold is needed from report
     EXPORT boolean AllowGraphicDescription := FALSE;
     EXPORT boolean Include_BestAddress := FALSE;
     EXPORT boolean IncludeAllCriminalRecords := FALSE;
@@ -111,6 +111,9 @@ EXPORT IParam := MODULE
   END;
 
   EXPORT sanctions := INTERFACE (doxie.IDataAccess) //currently, no fields are used.
+  END;
+
+  EXPORT sexoffenses := INTERFACE (doxie.IDataAccess)
   END;
 
   EXPORT ucc := INTERFACE (doxie.IDataAccess)
@@ -306,7 +309,7 @@ EXPORT IParam := MODULE
     EXPORT boolean include_peopleatwork := TRUE;
   END;
 
-  EXPORT _finderreport := INTERFACE (_report, doxie.IDataAccess, personal, include, dl, vehicles)
+  EXPORT _finderreport := INTERFACE (_report, doxie.IDataAccess, personal, include, dl, emails, vehicles)
     EXPORT boolean use_verified_address_ra := TRUE;
     EXPORT boolean use_verified_address_nb := TRUE;
     EXPORT boolean nbrs_with_phones := TRUE;
@@ -361,7 +364,7 @@ EXPORT IParam := MODULE
     EXPORT boolean ignoreFidelity := FALSE;
   END;
 
-
+//TODO: remove old_smartlinxreport
   //Until we make all PersonReports components compatible with IDataAccess,
   //I will have to convert new Smartlinx input module to an old-style module.
   //To facilitate this, I define old_smartlinxreport interface -- same as original minus compliance parameters,
@@ -396,46 +399,6 @@ EXPORT IParam := MODULE
   EXPORT _smartlinxreport := INTERFACE (doxie.IDataAccess, emails, liens, watercrafts, old_smartlinxreport)
     EXPORT boolean include_BlankDOD := TRUE;
     EXPORT boolean smart_rollup := TRUE;
-  END;
-
-  EXPORT ConvertToOldSmartLinx (_smartlinxreport mod_smartlinx) := FUNCTION
-    mod_res := MODULE (PROJECT (mod_smartlinx, old_smartlinxreport))
-      EXPORT INTEGER FCRAPurpose := mod_smartlinx.FCRAPurpose;
-      EXPORT integer8 FFDOptionsMask := mod_smartlinx.FFDOptionsMask;
-
-      EXPORT unsigned1 GLBPurpose := mod_smartlinx.glb;
-      EXPORT unsigned1 DPPAPurpose := mod_smartlinx.dppa;
-      EXPORT string DataPermissionMask := mod_smartlinx.DataPermissionMask;
-      EXPORT string DataRestrictionMask := mod_smartlinx.DataRestrictionMask;
-      EXPORT boolean ln_branded := mod_smartlinx.ln_branded;
-      EXPORT string5 industryclass := mod_smartlinx.industry_class;
-      EXPORT string32 applicationtype := mod_smartlinx.application_type;
-      EXPORT unsigned3 dateval := mod_smartlinx.date_threshold;
-      EXPORT boolean IncludeMinors := mod_smartlinx.show_minors;
-      EXPORT string6 ssn_mask := mod_smartlinx.ssn_mask;
-      EXPORT boolean mask_dl := mod_smartlinx.dl_mask = 1;
-      EXPORT unsigned1 dob_mask := mod_smartlinx.dob_mask;
-
-      EXPORT boolean include_hri := mod_smartlinx.include_hri;
-      EXPORT boolean legacy_verified := mod_smartlinx.legacy_verified;
-      EXPORT unsigned1 score_threshold := mod_smartlinx.score_threshold;
-      EXPORT unsigned2 penalty_threshold := mod_smartlinx.penalty_threshold;
-      EXPORT unsigned1 max_hri := mod_smartlinx.max_hri;
-      EXPORT boolean include_BlankDOD := mod_smartlinx.include_BlankDOD;
-      EXPORT boolean smart_rollup := mod_smartlinx.smart_rollup;
-      EXPORT integer1 non_subject_suppression := mod_smartlinx.non_subject_suppression;
-
-      //fields that are likely should be removed
-      EXPORT boolean AllowAll := FALSE;
-      EXPORT boolean AllowGLB := FALSE;
-      EXPORT boolean AllowDPPA := FALSE;
-      EXPORT boolean ignoreFares := FALSE;
-      EXPORT boolean ignoreFidelity := FALSE;
-      EXPORT boolean restrictPreGLB := TRUE; //not used
-
-    END;
-
-    RETURN mod_res;
   END;
 
 END;

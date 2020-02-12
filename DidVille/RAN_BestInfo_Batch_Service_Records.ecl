@@ -3,7 +3,10 @@
 EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_BatchIn) f_in_raw = DATASET([],DidVille.Layout_RAN_BestInfo_BatchIn),
                                           boolean CompareInputAddrWithRel = false,
                                           boolean CompareInputAddrNameWithRel = false,
-                                          boolean UseBlankPhoneNumberRecords = false
+                                          boolean UseBlankPhoneNumberRecords = false,
+                                          unsigned4 PbRelativesCount = 0,
+                                          unsigned4 PbAssociatesCount = 0,
+                                          unsigned4 PbNeighborsCount = 0
                                            ) := FUNCTION
 
   //get input
@@ -19,11 +22,12 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
   boolean suppress_same_phone := false : stored('SuppressSamePhone');
   boolean dedup_with_same_phone := false : stored('DedupRelativesAssociatesOnPhone');
   unsigned relatives_depth := 2 : stored('RelativesDepth');
-  boolean IncludeProfileBooster := false : stored('IncludeProfileBooster'); // profilebooster option
+  boolean IncludeProfileBooster := false : stored('IncludeProfileBooster'); // profilebooster option - to populate profile booster fields or not
   boolean DirectMarketingUser := mod_access.isDirectMarketing();
   checkRNA := header.constants.checkRNA;
   death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
   //convert to standard input layout
+
 
   Didville.Layouts.in_seq_rec get_seq(f_in_raw l, unsigned cnt) := transform
     self.seq := cnt;
@@ -41,6 +45,15 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
   f_in_seq := project(f_in_raw, get_seq(left, counter));
   f_in_ready := project(f_in_seq(did=0), didville.Layout_Did_OutBatch);
+
+  /* Split the input count restriction for profile booster attributes for neighbors among the two neighbors datasets - nbr_in and nbr_best.
+     1) if profile booster count for neighbors less than 3 - count restriction only for nbr_best
+     2) if profile booster count for neighbors more than 3 and even - split equally between datasets
+     3) if profile booster count for neighbors more than 3 and odd - nbr_best gets higher weightage in split */
+
+  unsigned4 PB_nbr_in_cnt := if(PbNeighborsCount > 3, if(PbNeighborsCount % 2 = 0, PbNeighborsCount / 2,
+                                                                PbNeighborsCount - 3), 0);
+  unsigned4 PB_nbr_best_cnt := PbNeighborsCount - PB_nbr_in_cnt;
 
   /* Use the data provided by the customer to first find a DID for each record. Exclude any dids
      whose score is less than 75.
@@ -142,6 +155,9 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
   end;
 
   f_in_nbrs := project(f_in_nbrs_death, get_nbr_in_dod(left));
+
+  f_in_nbrs_PB_in := TopN(f_in_nbrs_wo_death, PB_nbr_in_cnt, nbr_rank); // profile booster input restriction for nbrs_in
+
   /* Find Neighbors for the search subject based on the Best address information. Return
      the top 3 Neighbors, i.e. closest addresses by distance.
   */
@@ -188,6 +204,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
   f_best_nbrs_death := dx_death_master.Append.byDid(f_best_nbrs_wo_death,did,death_params);
 
   f_best_nbrs := project(f_best_nbrs_death, get_nbr_in_dod(left));
+
+  f_best_nbrs_PB_in := TopN(f_best_nbrs_wo_death, PB_nbr_best_cnt, nbr_rank); // profile booster input restriction for nbrs_best
 
   /* Get Relatives and Roommates (Associates). That is, get the identities of everyone who
      lives in the same dwelling as the search subject. A Roommate differs from a Relative
@@ -318,6 +336,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
   f_rel_best_final :=	topN(f_rel_best_final_grp, 10, rel_rank);
 
+  f_rel_PB_in := topN(f_rel_best_final, PbRelativesCount, rel_rank); // profile booster input restriction for relatives
+
   /* Pick top ten Roommates. Retrieve Best Address and Phones information for each of them.
   */
   //get roomies - pick top 10
@@ -372,6 +392,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
   f_roomie_best_final :=	topN(f_roomie_best_final_grp, 10, rel_rank);
 
+  f_roomie_PB_in := topN(f_roomie_best_final, PbAssociatesCount, rel_rank); // profile booster input restriction for associates
+
   //generate output - initialize
 
   Didville.Layouts.out_with_seq_rec init_out(f_in_seq l) := transform
@@ -423,12 +445,13 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
 	PB_in_rec:= ProfileBooster.Layouts.Layout_PB_In;
 
-  rel_profile_in := Didville.Transforms.FMac_profile_input(ungroup(f_rel_best_final));
-	roomie_profile_in := Didville.Transforms.FMac_profile_input(ungroup(f_roomie_best_final));
-	nbr_in_profile_in := Didville.Transforms.FMac_profile_input(ungroup(f_in_nbrs));
-	nbr_best_profile_in := Didville.Transforms.FMac_profile_input(ungroup(f_best_nbrs));
+  rel_profile_in := If(Exists(f_rel_PB_in),Didville.Transforms.FMac_profile_input(ungroup(f_rel_PB_in)),Dataset([],PB_in_rec));
+	roomie_profile_in := If(Exists(f_roomie_PB_in),Didville.Transforms.FMac_profile_input(ungroup(f_roomie_PB_in)),Dataset([],PB_in_rec));
+	nbr_in_profile_in := If(Exists(f_in_nbrs_PB_in),Didville.Transforms.FMac_profile_input(ungroup(f_in_nbrs_PB_in)),Dataset([],PB_in_rec));
+	nbr_best_profile_in := If(Exists(f_best_nbrs_PB_in),Didville.Transforms.FMac_profile_input(ungroup(f_best_nbrs_PB_in)),Dataset([],PB_in_rec));
 
-  profile_in := rel_profile_in + roomie_profile_in  + nbr_in_profile_in + nbr_best_profile_in;
+  // check on IncludeProfileBooster to create final input PII or else pass empty dataset to avoid performance hit from profile booster
+  profile_in := IF(IncludeProfileBooster,rel_profile_in + roomie_profile_in  + nbr_in_profile_in + nbr_best_profile_in,Dataset([],PB_in_rec));
   dedup_profile_in := dedup(profile_in,Record);
   //add hash of fields to account number in the input dataset
   dedup_profile_wacct := Project(dedup_profile_in,DidVille.Transforms.Profile_acct(LEFT,COUNTER));
@@ -485,8 +508,6 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
                                 Didville.Transforms.get_out_rel(left, right,CompareInputAddrWithRel,CompareInputAddrNameWithRel,counter)));
 
   // call EmailAddressAppendSearch to get email address for associates
-
-
   f_roomie_best_w_email := Join(f_roomie_best_final,
                                   email_out.records,
                                   left.did = right.did,

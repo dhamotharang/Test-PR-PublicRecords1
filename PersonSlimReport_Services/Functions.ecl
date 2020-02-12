@@ -14,16 +14,16 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                                                   include_dailies := true,
                                                   ReturnLimit     := ut.limits.HEADER_PER_DID,
                                                   DoSearch        := false);
-	
-    EXPORT addressRecsByDid() := FUNCTION 											 																	 
+
+    EXPORT addressRecsByDid() := FUNCTION
         addr_unrolled := project(header_out, TRANSFORM(doxie.Layout_Comp_Addresses,SELF:=LEFT,SELF:=[]));
         doxie.MAC_Address_Rollup(addr_unrolled, iesp.Constants.PersonSlim.MaxAddresses, addresses_rolled);
-				
+
         addr_sorted  := sort(addresses_rolled,
-				                        prim_range, prim_name, sec_range, city_name, st, zip, -dt_last_seen, -dt_first_seen);
+                                prim_range, prim_name, sec_range, city_name, st, zip, -dt_last_seen, -dt_first_seen);
         addr_duped := dedup(addr_sorted, prim_range, prim_name, sec_range, city_name, st, zip);
         addr_duped_sorted := sort(addr_duped,st, city_name, prim_range, prim_name, sec_range,-dt_first_seen);
-																
+
         addr_final := project(addr_duped_sorted,
                            TRANSFORM(iesp.personslimreport.t_PersonSlimReportAddress,
                               self.streetnumber        := LEFT.prim_range,
@@ -41,10 +41,10 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                               self.zip4                := LEFT.zip4,
                               self.county              := LEFT.county_name,
                               self.postalcode          := '',
-                              self.statecityzip        := ''));													 
+                              self.statecityzip        := ''));
         RETURN addr_final;
-	  END;
-		
+    END;
+
     EXPORT deathRecsByDid(boolean IncludeBlankDOD) := FUNCTION
        death_raw_bdod := header_out(IncludeBlankDOD or dod <> 0);
        death_raw_sorted:= sort(death_raw_bdod,-dod,-dt_last_seen);
@@ -59,7 +59,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                           SELF.Day   := LEFT.DOD % 100));
       RETURN death_final;
     END;
-		
+
     EXPORT ssnRecsByDid() := FUNCTION
       ssn_raw := header_out((unsigned)ssn <> 0);
       ssn_raw_sorted:= sort(ssn_raw,ssn,-dt_last_seen);
@@ -72,34 +72,34 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                                SELF.SSN := LEFT.SSN));
       RETURN ssn_final;
     END;
-		
+
     EXPORT akaRecsByDid(DATASET(iesp.bps_share.t_BpsReportIdentity) akas) := FUNCTION
       akas_raw_sorted:= sort(akas,Name.Last,Name.First,-Name.Middle,ssninfoex.ssn );
       akas_final := dedup(akas_raw_sorted,Name.Last,Name.First,ssninfoex.ssn);
       RETURN akas_final;
     END;
-	 
+
     EXPORT imposterRecsByDid(DATASET(iesp.bps_share.t_BpsReportImposter) imposters) := FUNCTION
        imps_raw := project(imposters.AKAs, iesp.bps_share.t_BpsReportIdentity);
-			 imps_final := akaRecsByDid(imps_raw);
+       imps_final := akaRecsByDid(imps_raw);
        RETURN imps_final;
     END;
-		
+
     //we build the name section from the AKA section
     EXPORT nameRecsByDid(DATASET(iesp.bps_share.t_BpsReportIdentity) akas) := FUNCTION
         names_raw := project(akas,
                       TRANSFORM(iesp.personslimreport.t_PersonSlimReportName,
                          SELF.Full   := LEFT.Name.Full,
-                         SELF.First  := LEFT.Name.First, 
+                         SELF.First  := LEFT.Name.First,
                          SELF.Middle := LEFT.Name.Middle,
                          SELF.Last   := LEFT.Name.Last,
                          SELF.Suffix := LEFT.Name.Suffix,
-                         SELF.Prefix := LEFT.Name.Prefix));        																																
+                         SELF.Prefix := LEFT.Name.Prefix));
         names_raw_sorted:= sort(names_raw,Last,First,-Middle);
         names_final := dedup(names_raw_sorted,Last,First);
         RETURN names_final;
     END;
-		
+
     EXPORT dobRecsByDid() := FUNCTION
       dob_raw_bdod := header_out(dob <> 0);
       dob_raw_sorted:= sort(dob_raw_bdod,-dob,-dt_last_seen);
@@ -125,21 +125,21 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                                     SELF.Phone := LEFT.Phone));
        RETURN phones_final;
     END;
-	
-	EXPORT dlsRecsByDid():= FUNCTION 
+
+  EXPORT dlsRecsByDid():= FUNCTION
       dl_raw  := PersonReports.DL_records(in_did);
       //SmartRollup.fn_smart_rollup_dls
       dl_sorted := sort(dl_raw, OriginState, DriverLicense, -d2i(expirationDate),-d2i(issueDate));
       dl_duped  := dedup(dl_sorted, OriginState, DriverLicense);
       dl_duped_sorted := sort(dl_duped, -d2i(expirationDate),-d2i(issueDate), OriginState, DriverLicense);
       RETURN dl_duped_sorted;
-	END;
-	
-	EXPORT profLicRecsByDid(Ioptions in_mod):= FUNCTION
+  END;
+
+  EXPORT profLicRecsByDid(Ioptions in_mod):= FUNCTION
       pl_mod  := module (PersonReports.IParam.proflic)
         $.IParams.MAC_copy_old_report_fields(in_mod);
       end;
-      pl_raw  := PersonReports.proflic_records(in_did,pl_mod).proflicenses_v2;	 
+      pl_raw  := PersonReports.proflic_records(in_did,pl_mod).proflicenses_v2;
       pl_clean := project(pl_raw,
                     TRANSFORM(iesp.proflicense.t_ProfessionalLicenseRecord,
                         SELF.licensenumber := ut.rmv_ld_0_alp_num(LEFT.licensenumber),
@@ -156,32 +156,32 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
         //this brings some extras (like, include_BlankDOD), but there's no harm in it
         $.IParams.MAC_copy_old_report_fields(in_mod);
       END;
-  
+
       rec_reg_seq := record(iesp.motorvehicle.t_MotorVehicleReportRegistrant)
         unsigned4 seq := 0;
         string25  vin := '';
       end;
-  
+
       w_best_addr := project(bestRecs,TRANSFORM(doxie.Layout_Comp_Addresses,SELF:=LEFT,SELF:=[]));
       w_best_name := project(w_best_addr,doxie.layout_NameDID);
-  
-      //hit RTV GW - experian - DATASET(iesp.motorvehicle.t_MotorVehicleReport2Record) 
-      rtv_raw := doxie.Comp_RealTime_Vehicles(in_did,w_best_addr,w_best_name).do;   
-      rtv     := SmartRollup.fn_smart_rollup_veh(rtv_raw,in_did[1].did);      
-      
+
+      //hit RTV GW - experian - DATASET(iesp.motorvehicle.t_MotorVehicleReport2Record)
+      rtv_raw := doxie.Comp_RealTime_Vehicles(in_did,w_best_addr,w_best_name).do;
+      rtv     := SmartRollup.fn_smart_rollup_veh(rtv_raw,in_did[1].did);
+
       //extract nested registrants portion and add outer vin to each record as identitifer
       registrants := NORMALIZE(rtv, LEFT.registrants,
                               TRANSFORM(rec_reg_seq,
                                 SELF.vin := LEFT.vehicleinfo.vin,
                                 SELF     := RIGHT));
-  
-      //add ordered sequence number before hitting ADL best, 
+
+      //add ordered sequence number before hitting ADL best,
       //can't add seq in normalize or it will group the sequence numbers
       reg_w_seq := ITERATE(registrants,
                           TRANSFORM(rec_reg_seq,
                              SELF.seq := counter,
-                             SELF     := RIGHT)); 
-    
+                             SELF     := RIGHT));
+
       DidVille.Layout_Did_OutBatch prepare_layout(rec_reg_seq l) := TRANSFORM
           SELF.title        := l.registrantinfo.name.prefix;
           SELF.fname        := l.registrantinfo.name.first;
@@ -202,10 +202,10 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
           SELF              := l;
           SELF              := [];
       END;
-  
+
       //prepare the layout for ADL_BEST DID call
       ds_with_ADL_Layout := PROJECT(reg_w_seq,prepare_layout(LEFT));
-    
+
       //we call ADL_BEST just to get the scored dids....not to get the best data
       recsWithScoredDIDs := didville.did_service_common_function(ds_with_ADL_Layout
                                                 ,glb_flag          := mod_access.isValidGLB()
@@ -219,7 +219,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                                ,SELF.registrantinfo.uniqueid := INTFORMAT(RIGHT.did,12,1)
                                ,SELF := LEFT)
                                ,LIMIT(0),KEEP(1));
-                               
+
       //Put inner registrants back into parent record
       rtv_w_dids := DENORMALIZE(rtv, registrants_wdids,
                                 LEFT.vehicleinfo.vin = RIGHT.vin,
@@ -227,18 +227,18 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                                 TRANSFORM(iesp.motorvehicle.t_MotorVehicleReport2Record,
                                    SELF.registrants := project(ROWS(RIGHT),
                                             iesp.motorvehicle.t_MotorVehicleReportRegistrant),
-                                   SELF:=LEFT));                  
+                                   SELF:=LEFT));
     RETURN rtv_w_dids;
   END;
 
-	EXPORT vehicleRecsByDid(Ioptions in_mod,
-	                        DATASET(doxie.layout_best) bestRecs = DATASET([],doxie.layout_best)):= FUNCTION											
+  EXPORT vehicleRecsByDid(Ioptions in_mod,
+                          DATASET(doxie.layout_best) bestRecs = DATASET([],doxie.layout_best)):= FUNCTION
       vehicles_mod  := module (PersonReports.IParam.vehicles)
         $.IParams.MAC_copy_old_report_fields(in_mod);
       end;
       vehicles_v2  := PersonReports.vehicle_records(in_did,vehicles_mod).vehicles_v2;
       //hit RTV GW - experian
-      rtv := if(in_mod.IncludeRealTimeVehicles,getRealTimeVehicles(in_mod, bestRecs));				
+      rtv := if(in_mod.IncludeRealTimeVehicles,getRealTimeVehicles(in_mod, bestRecs));
 
       //combine all vehicle recs
       vehicle_raw := vehicles_v2 + rtv;
@@ -248,13 +248,13 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 
       vehicle_final := project(vehicle_duped,
                         transform(iesp.motorvehicle.t_MotorVehicleReport2Record,
-                        	self.registrants := dedup(sort(left.registrants, registrantinfo.uniqueid),registrantinfo.uniqueid),
-                        	self.owners      := dedup(sort(left.owners,      ownerinfo.uniqueid),     ownerinfo.uniqueid),
-                        	self := left));
+                          self.registrants := dedup(sort(left.registrants, registrantinfo.uniqueid),registrantinfo.uniqueid),
+                          self.owners      := dedup(sort(left.owners,      ownerinfo.uniqueid),     ownerinfo.uniqueid),
+                          self := left));
       RETURN vehicle_final;
-	END;
-	
-	EXPORT acRecsByDid(Ioptions in_mod):= FUNCTION
+  END;
+
+  EXPORT acRecsByDid(Ioptions in_mod):= FUNCTION
       ac_mod  := module (PersonReports.IParam.aircrafts)
         $.IParams.MAC_copy_old_report_fields(in_mod);
       end;
@@ -265,9 +265,9 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       ac_duped_sorted := sort(ac_duped,-d2i(datelastseen));
       ac_final := project(ac_duped_sorted,iesp.faaaircraft.t_aircraftReportRecord);
       RETURN ac_final;
-	END;
-	
-	EXPORT wcRecsByDid(Ioptions in_mod):= FUNCTION
+  END;
+
+  EXPORT wcRecsByDid(Ioptions in_mod):= FUNCTION
       wc_mod  := module (PersonReports.IParam.watercrafts)
         $.IParams.MAC_copy_old_report_fields(in_mod);
       end;
@@ -277,9 +277,10 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       wc_duped_sorted := sort(wc_duped,-d2i(datelastseen));
       wc_final := project(wc_duped_sorted,iesp.watercraft.t_WaterCraftReportRecord);
       RETURN wc_final;
-	END;
-	
-	EXPORT uccRecsByDid(Ioptions in_mod):= FUNCTION
+  END;
+
+
+  EXPORT uccRecsByDid(Ioptions in_mod):= FUNCTION
       ucc_mod  := module (PersonReports.IParam.ucc)
         $.IParams.MAC_copy_old_report_fields(in_mod);
         EXPORT string1 ucc_party_type := in_mod.ucc_party_type;
@@ -290,31 +291,35 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       ucc_duped  := dedup(ucc_sorted, filingJurisdiction, originFilingNumber);
       ucc_duped_sorted := sort(ucc_duped,-d2i(OriginFilingDate));
       RETURN ucc_duped_sorted;
-	END;
-	
-	EXPORT sexOffRecsByDid(Ioptions in_mod):= FUNCTION
-      sexOff_mod := module (project (in_mod, PersonReports.input.sexoffenses, opt)) end;
+  END;
+
+  EXPORT sexOffRecsByDid(Ioptions in_mod):= FUNCTION
+      sexOff_mod  := module (PersonReports.IParam.sexoffenses)
+        $.IParams.MAC_copy_old_report_fields(in_mod);
+      end;
       sexOff_raw := PersonReports.sexoffenses_records(in_did,sexOff_mod);
       sexOff_sorted := sort(sexOff_raw, primarykey, -d2i(datelastseen));
       sexOff_duped  := dedup(sexOff_sorted, primarykey);
       sexOff_duped_sorted := sort(sexOff_duped,-d2i(datelastseen));
       RETURN sexOff_duped_sorted;
-	END;
-	
-    EXPORT crimRecsByDid(Ioptions in_mod):= FUNCTION
-      crim_mod := module (project (in_mod, PersonReports.input.criminal, opt)) end;
+  END;
+
+  EXPORT crimRecsByDid(Ioptions in_mod):= FUNCTION
+      crim_mod  := module (PersonReports.IParam.criminal)
+        $.IParams.MAC_copy_old_report_fields(in_mod);
+      end;
       crim_raw := PersonReports.criminal_records(in_did,crim_mod);
       crim_sorted := sort(crim_raw, offenderid, -d2i(casefilingdate));
       crim_duped  := dedup(crim_sorted, offenderid);
       crim_duped_sorted := sort(crim_duped,-d2i(casefilingdate));
       RETURN crim_duped_sorted;
-    END;
-	
-	EXPORT cWeaponsRecsByDid(Ioptions in_mod):= FUNCTION
+  END;
+
+  EXPORT cWeaponsRecsByDid(Ioptions in_mod):= FUNCTION
        ccw_mod  := module (PersonReports.IParam.ccw)
          $.IParams.MAC_copy_old_report_fields(in_mod);
        end;
-	
+
        ccw_raw := PersonReports.ccw_records(in_did,ccw_mod);
        //SmartRollup.fn_smart_rollup_cweapons
        ccw_sorted := sort(ccw_raw, StateCode, Permit.PermitNumber,Permit.PermitType, -d2i(Permit.ExpirationDate));
@@ -322,8 +327,8 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
        ccw_duped_sorted := sort(ccw_duped,-d2i(Permit.ExpirationDate));
        ccw_final := project(ccw_duped_sorted,iesp.concealedweapon.t_WeaponRecord);
        RETURN ccw_final;
-	END;
-  
+  END;
+
   EXPORT liensRecsByDid(Ioptions in_mod):= FUNCTION
       liens_mod := module (PersonReports.IParam.liens)
          $.IParams.MAC_copy_old_report_fields(in_mod);
@@ -334,12 +339,12 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       liens_duped := SmartRollup.fn_smart_rollup_liens(liens_raw);
       liens_final := project(liens_duped,
                       transform(iesp.lienjudgement.t_LienJudgmentReportRecord,
-                      		self.Debtors := dedup(sort(left.Debtors, ssn, originname),ssn),
-                      		self := left));
+                          self.Debtors := dedup(sort(left.Debtors, ssn, originname),ssn),
+                          self := left));
       RETURN liens_final;
   END;
-	
-	EXPORT huntFishRecsByDid():= FUNCTION
+
+  EXPORT huntFishRecsByDid():= FUNCTION
        hfish_raw   := doxie.hunting_records(in_did);
        hfish_clean := SmartRollup.fn_hunting_iesp(hfish_raw);
        //SmartRollup.fn_smart_rollup_hunting
@@ -347,8 +352,8 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
        hfish_duped  := dedup(hfish_sorted, LicenseState, LicenseNumber, LicenseType);
        hfish_duped_sorted := sort(hfish_duped,-d2i(LicenseDate),LicenseState, licenseNumber, LicenseType);
        RETURN hfish_duped_sorted;
-	END;
-		
+  END;
+
     EXPORT firearmRecsByDid(ATF_Services.IParam.search_params fire_mod):= FUNCTION
        firearms_raw := ATF_Services.SearchService_Records.report(fire_mod);
        //SmartRollup.fn_smart_rollup_atf
@@ -358,17 +363,17 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
        firearms_final := project(firearms_duped_sorted,iesp.firearm.t_FirearmRecord);
        RETURN firearms_final;
     END;
-		
+
     EXPORT studentRecsByDid(American_Student_Services.IParam.reportParams student_mod):= FUNCTION
       student_raw := American_Student_Services.Functions.get_report_recs(in_did,
-                        student_mod,PersonSlimReport_Services.Constants.onlyCurrentStudentRecs);							 
+                        student_mod,PersonSlimReport_Services.Constants.onlyCurrentStudentRecs);
       student_raw_sorted:= sort(student_raw, CollegeData.Name, -d2i(firstreported), -iscurrent);
-      student_duped := dedup(student_raw_sorted, CollegeData.Name, firstreported.year, firstreported.month, 
-                             firstreported.day);									 
+      student_duped := dedup(student_raw_sorted, CollegeData.Name, firstreported.year, firstreported.month,
+                             firstreported.day);
       student_duped_sorted := sort(student_duped, -d2i(lastreported ));
       RETURN student_duped_sorted;
     END;
-		
+
     EXPORT marDivRecsByDid(Ioptions in_mod):= FUNCTION
       mardiv_mod := Module(PersonReports.IParam.mardiv)
           $.IParams.MAC_copy_old_report_fields(in_mod);
@@ -379,8 +384,8 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       marDiv_duped_sorted := sort(marDiv_duped, -d2i(marriagedate));
       RETURN marDiv_duped_sorted;
     END;
-		
-    shared accidentRollup(DATASET(iesp.accident.t_AccidentReportRecord) accidents) := 
+
+    shared accidentRollup(DATASET(iesp.accident.t_AccidentReportRecord) accidents) :=
       rollup(accidents,
             (LEFT.investigation.investigationagent.agentreportnumber = RIGHT.investigation.investigationagent.agentreportnumber)
             OR
@@ -392,7 +397,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
             LEFT.accidentlocation.stateroadhighwayname = RIGHT.accidentlocation.stateroadhighwayname
             OR
             LEFT.accidentlocation.ofintersectof = RIGHT.accidentlocation.ofintersectof
-            ) and 
+            ) and
             LEFT.conditions.investigationagent <> RIGHT.conditions.investigationagent)
             OR
             (d2i(LEFT.accidentdate) = d2i(RIGHT.accidentdate) and
@@ -401,26 +406,26 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
             OR
             (d2i(RIGHT.accidentdate)=0 and
             LEFT.accidentlocation.citytownname = RIGHT.accidentlocation.citytownname and
-            LEFT.accidentlocation.stateroadhighwayname = RIGHT.accidentlocation.stateroadhighwayname and 
+            LEFT.accidentlocation.stateroadhighwayname = RIGHT.accidentlocation.stateroadhighwayname and
             LEFT.accidentlocation.ofintersectof = RIGHT.accidentlocation.ofintersectof and
             LEFT.conditions.investigationagent <> RIGHT.conditions.investigationagent),
             TRANSFORM(iesp.accident.t_AccidentReportRecord,
                 SELF.accidentdate := pickLatestDate(LEFT.accidentdate,RIGHT.accidentdate),
-                SELF.accidentlocation.stateroadhighwayname := 
+                SELF.accidentlocation.stateroadhighwayname :=
                      pickLongestStr(LEFT.accidentlocation.stateroadhighwayname,
                                     RIGHT.accidentlocation.stateroadhighwayname),
-                SELF.accidentlocation.ofintersectof := 
+                SELF.accidentlocation.ofintersectof :=
                     pickLongestStr(LEFT.accidentlocation.ofintersectof,
                                    RIGHT.accidentlocation.ofintersectof),
-                SELF.investigation.investigationagent.agentreportnumber := 
+                SELF.investigation.investigationagent.agentreportnumber :=
                     pickLongestStr(LEFT.investigation.investigationagent.agentreportnumber,
                                    RIGHT.investigation.investigationagent.agentreportnumber),
                 SELF := LEFT)	);
 
     shared accVehiclesDuped(DATASET(iesp.accident.t_AccidentReportVehicle) vehicles) :=
          dedup(sort(vehicles,TagNumber,Make,Model,-(unsigned6)Owner.UniqueId),
-                             TagNumber,Make,Model); 
-                             
+                             TagNumber,Make,Model);
+
     EXPORT accidentRecsByDid(PersonReports.input.accidents acc_mod):= FUNCTION
       acc_raw   := PersonReports.accident_records(in_did, acc_mod);
       acc_clean := project(acc_raw,
@@ -443,11 +448,11 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                                SELF := LEFT));
       RETURN acc_final;
     END;
-	
+
     EXPORT pilotCertRecsByDid(Ioptions in_mod):= FUNCTION
       pil_mod  := module (PersonReports.IParam.faacerts)
         $.IParams.MAC_copy_old_report_fields(in_mod); //only report part is present in the input
-      end;  
+      end;
       pil_raw  := PersonReports.faacert_records(in_did,pil_mod).bps_view;
       //one certification for each STATE/COUNTY
       //similar logic to - SmartRollup.fn_smart_rollup_faa_cert
@@ -456,27 +461,27 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       pil_duped_sorted := sort(pil_duped,-d2i(DateCertifiedMedical));
       pil_final := project(pil_duped_sorted,iesp.bpsreport.t_BpsFAACertification);
       RETURN pil_final;
-	END;
-		
-	EXPORT propertyRecsByDid(Ioptions in_mod, doxie.IDataAccess mod_access):= FUNCTION
+  END;
+
+  EXPORT propertyRecsByDid(Ioptions in_mod, doxie.IDataAccess mod_access):= FUNCTION
       prop_mod  := module (PersonReports.IParam.property)
         $.IParams.MAC_copy_old_report_fields(in_mod); //only report part is present in the input
-      end;  
+      end;
       prop_raw   := PersonReports.Property_Records(in_did,mod_access,prop_mod).property_v2;
       prop_clean := project(prop_raw,
                      TRANSFORM(iesp.property.t_PropertyReport2Record,
                         SELF.parcelnumber:= STD.Str.FilterOut(LEFT.parcelnumber, '- '),
                         SELF := LEFT,));
-			//field parcelnumber is deprecated in ESP and they use the equivalent Assessment/deed ParcelId
+      //field parcelnumber is deprecated in ESP and they use the equivalent Assessment/deed ParcelId
       prop_sorted := sort(prop_clean, recordtype, -parcelnumber,
-                         -d2i(assessment.recordingdate),-d2i(deed.recordingdate));							 
+                         -d2i(assessment.recordingdate),-d2i(deed.recordingdate));
       prop_duped := dedup(prop_sorted, recordtype, parcelnumber);
       prop_duped_sorted := sort(prop_duped, -parcelnumber,
                                -d2i(assessment.recordingdate),-d2i(deed.recordingdate));
       RETURN prop_duped_sorted;
-   	END;
-	
-	EXPORT deaConSubRecsByDid(Ioptions in_mod):= FUNCTION
+     END;
+
+  EXPORT deaConSubRecsByDid(Ioptions in_mod):= FUNCTION
        dea_mod  := module (PersonReports.IParam.dea)
          $.IParams.MAC_copy_old_report_fields(in_mod);
        end;
@@ -486,13 +491,13 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
        dea_duped  := dedup(dea_sorted, RegistrationNumber);
        dea_duped_sorted := sort(dea_duped,-d2i(controlledSubstancesInfo[1].expirationDate));
        //only keep first name per registration number.
-       dea_final := project(dea_duped_sorted, 
+       dea_final := project(dea_duped_sorted,
                       transform(iesp.deacontrolledsubstance.t_DEAControlledSubstanceSearch2Record,
                          self.controlledSubstancesInfo := LEFT.controlledSubstancesInfo[1],
                          self := left ));
        RETURN dea_final;
-	END;
-	
+  END;
+
   EXPORT voterRecsByDid(Ioptions in_mod):= FUNCTION
       vote_mod := module (PersonReports.IParam.voters)
          $.IParams.MAC_copy_old_report_fields(in_mod);
@@ -510,13 +515,13 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                                  ResidentAddress.county = '', ResidentAddress.county);
       RETURN voter_rolled_sorted;
   END;
-	
+
 	EXPORT pawRecsByDid(Ioptions in_mod):= FUNCTION
        paw_mod := Module(PersonReports.IParam.peopleatwork)
            $.IParams.MAC_copy_old_report_fields(in_mod); //only report part is present in the input
        End;
        paw_raw := PersonReports.peopleatwork_records(in_did, paw_mod);
-       
+
        paw_raw_sorted:= sort(paw_raw,-businessids.ultid,-businessids.orgid,-businessids.seleid,
                             -companyname,-title,-d2i(datelastseen),-d2i(datefirstseen));
        paw_rolled := rollup(paw_raw_sorted,
@@ -530,15 +535,15 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
                                SELF.datefirstseen  := pickLatestDate(LEFT.datefirstseen, RIGHT.datefirstseen);
                                SELF.companyname    := pickLongestStr(LEFT.companyname, RIGHT.companyname);
                                SELF.title          := pickLongestStr(LEFT.title, RIGHT.title);
-                               SELF := LEFT)	);
+                               SELF := LEFT)  );
        //put latest on top
        paw_rolled_sorted := sort(paw_rolled,-d2i(datelastseen),-d2i(datefirstseen));
        RETURN paw_rolled_sorted;
-	END;
-	
-	EXPORT utilityRecsByDid(Ioptions in_mod):= FUNCTION
+  END;
+
+  EXPORT utilityRecsByDid(Ioptions in_mod):= FUNCTION
        utils := doxie.Util_records(in_did, in_mod.ssn_mask, in_mod.mask_dl, in_mod.GLBPurpose, in_mod.industry_class);
-       iesp.personslimreport.t_PersonSlimReportUtility transUtil(doxie_crs.layout_utility.record_layout_slim L)  := TRANSFORM 
+       iesp.personslimreport.t_PersonSlimReportUtility transUtil(doxie_crs.layout_utility.record_layout_slim L)  := TRANSFORM
        self.utiltype                := L.util_type;
        self.utilcategory            := L.util_category;
        self.utiltypedescription     := L.util_type_description;
@@ -560,12 +565,12 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
            LEFT.addr_suffix,LEFT.unit_desig,LEFT.sec_range,
            LEFT.city,LEFT.state,LEFT.zip,LEFT.zip4,LEFT.county_name)));
        END;
-       util_raw    := PROJECT(utils,transUtil(LEFT));									 
+       util_raw    := PROJECT(utils,transUtil(LEFT));
        util_sorted := sort(util_raw, UtilType, -d2i(RecordDate));
        util_duped  := dedup(util_sorted, UtilType, RecordDate.Year,
        RecordDate.Month, RecordDate.Day);
        util_duped_sorted := sort(util_duped,-d2i(RecordDate));
        RETURN util_duped_sorted;
     END;
-	
+
 END;

@@ -61,6 +61,7 @@
 	<part name="IncludeMari" type="xsd:boolean"/>
 	<part name="IncludeDeathDID" type="xsd:boolean"/>
 	<part name="IncludeVehicles" type="xsd:boolean"/>
+	<part name="IncludeCFPB" type="xsd:boolean"/>
  </message>
 */
 
@@ -69,7 +70,7 @@ import AutoStandardI, ut, riskwise, risk_indicators, didville, gong,
 			 ln_propertyv2,business_risk,paw,driversv2,certegy,inquiry_acclogs,email_data,yellowpages,
 			 business_header_ss,advo,daybatchpcnsr,easi,avm_v2,utilfile,liensv2,business_header, 
 			 _Control, watercraft, AlloyMedia_student_list, American_student_list, doxie_files,  
-			 prof_licenseV2,BankruptcyV2, BankruptcyV3, gateway, Royalty,Relationship,dx_header, suppress, VehicleV2, std;
+			 prof_licenseV2,BankruptcyV2, BankruptcyV3, gateway, Royalty,Relationship,dx_header, suppress, VehicleV2,dx_ConsumerFinancialProtectionBureau, std;
 
 export ProdData := MACRO
 
@@ -134,7 +135,8 @@ export ProdData := MACRO
 		'IncludeThrive',
 		'IncludeMari',
 		'IncludeDeathDID',
-		'IncludeVehicles'
+		'IncludeVehicles',
+		'IncludeCFPB'
 		));
 
 unsigned6 in_did := 0 	  : stored('did');
@@ -200,6 +202,7 @@ boolean Include_Mari := false : stored('IncludeMari');
 boolean Include_Thrive := false : stored('IncludeThrive');
 boolean Include_Death := false : stored('IncludeDeathDID');
 boolean Include_Vehicles := false : stored('IncludeVehicles');
+boolean Include_CFPB := false : stored('IncludeCFPB');
 boolean include_netacuitysearch := false : stored('IncludeNetacuitySearch');
 boolean include_targusgatewaysearch := false : stored('IncludeTargusGatewaySearch');
 unsigned3 history_date := 999999  		: stored('HistoryDateYYYYMM');
@@ -222,6 +225,7 @@ input_rec := record
 	string apn;
 	unsigned bdid;
 	string fein;
+  string statecode;
 end;
 
 input_rec addseq(emptyset le, integer C) := transform		
@@ -248,7 +252,7 @@ input_rec addseq(emptyset le, integer C) := transform
 	self.addr_status := clean_addr[179..182];
 	self.county := clean_addr[143..145];
 	self.geo_blk := clean_addr[171..177];
-	
+	self.statecode := clean_addr[141..142];
 	ssn_val := riskwise.cleanSSN(in_socs);	// blank out social if it is all 0's or isn't numeric and 9 bytes long
 	hphone_val := riskwise.cleanphone(in_phone);
 	dob_val := riskwise.cleanDOB(in_dob);
@@ -695,6 +699,38 @@ gateways := project(gateways_in, gw_switch(left));
 							
 	if(in_addr!='' and (include_all_files=true or include_census=true), output(withEASI, named('EASI')) );
 
+
+//CFPB keys
+
+CFPB_key_surnames := dx_ConsumerFinancialProtectionBureau.key_census_surnames(false);
+withCFPB_surnames := join(indata,CFPB_key_surnames,
+							        keyed(right.name=left.lname),
+							        transform(recordof(CFPB_key_surnames), self.name := left.lname,
+							        self := right, self := []), left outer,atmost(max_recs),keep(10));
+              
+if(include_all_files=true or include_CFPB=true, output(withCFPB_surnames, named('CFPB_surnames')) );
+
+CFPB_key_BLKGRP := dx_ConsumerFinancialProtectionBureau.key_BLKGRP(false);
+withCFPB_BLKGRP := join(indata,CFPB_key_BLKGRP,
+		             keyed(right.GEOID10_BlkGrp =left.statecode+left.county+left.geo_blk) ,
+                transform(recordof(CFPB_key_BLKGRP), 
+                self.State_FIPS10 := left.statecode,
+                self.County_FIPS10 := left.county,
+                self.Tract_FIPS10 := left.geo_blk[1..6],
+                self.BlkGrp_FIPS10 := (INTEGER)left.geo_blk[7],
+							      self := right, self := []), left outer,atmost(max_recs),keep(10));
+              
+if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP, named('withCFPB_BLKGRP')) );
+
+
+CFPB_key_BLKGRP_attr_over18 := dx_ConsumerFinancialProtectionBureau.key_BLKGRP_attr_over18(false);
+withCFPB_BLKGRP_attr_over18 := join(indata,CFPB_key_BLKGRP_attr_over18,
+							                  keyed(right.GeoInd = left.statecode+left.county+left.geo_blk),
+							                  transform(recordof(CFPB_key_BLKGRP_attr_over18),
+							                  self := right, self := []), left outer,atmost(max_recs),keep(10));
+              
+if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over18, named('withCFPB_BLKGRP_attr_over18')) );
+
 	avm_addr := join(inData, avm_v2.Key_AVM_Address,
 					left.prim_name!='' and left.z5!='' and
 					keyed(left.prim_name = right.prim_name) and
@@ -738,7 +774,6 @@ gateways := project(gateways_in, gw_switch(left));
 					transform(recordof(Business_Risk.Key_Business_Header_Address), self := right), 
 				   ATMOST(riskwise.max_atmost), keep(100));
 	if(in_addr!='' and (include_all_files=true or include_business_header=true), output(Business_Header_Address, named('Business_Header_Address')) );
-	
 //
 
 // FEIN section

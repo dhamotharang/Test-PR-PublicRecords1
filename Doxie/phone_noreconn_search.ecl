@@ -193,8 +193,8 @@ EXPORT phone_noreconn_search := MACRO
 	end;
 
 	PVS_gw_rslt := if(use_PVS and Call_PVS,
-											Doxie_Raw.RealTimePhones_Raw(gateways_in,3,,in_mod1, use_PVS and Call_PVS)
-										)	;
+		Doxie_Raw.RealTimePhones_Raw(in_mod1, gateways_in,3,, use_PVS and Call_PVS)
+	)	;
 
 	issueHint := (use_PVS and Call_PVS and SSNSearchLength = 9 and (~exists(PVS_gw_rslt) and (~exists(resultOut_w_tzone))));  // say they should try 4 digit ssn
 

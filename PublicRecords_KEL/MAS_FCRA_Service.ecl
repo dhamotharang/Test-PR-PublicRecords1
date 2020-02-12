@@ -17,6 +17,9 @@
 IMPORT Std, PublicRecords_KEL, Gateway;
 
 EXPORT MAS_FCRA_Service() := MACRO
+
+#OPTION('expandSelectCreateRow', TRUE);
+
   #WEBSERVICE(FIELDS(
 		'input',
 		'ScoreThreshold',

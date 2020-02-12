@@ -307,6 +307,24 @@ EXPORT Layouts := MODULE
     DATASET(Royalty.Layouts.RoyaltyForBatch) Royalties;
   END;
 
+  crs_raw_cleaned := RECORD(iesp.emailsearchv2.t_EmailSearchV2CleanData)
+    STRING10  Phone;
+    STRING9   ssn;
+    UNSIGNED4 dob;
+  END;
+  EXPORT crs_email_raw_rec := RECORD                         // to be used with source_counts reporting
+    crs_raw_cleaned Cleaned;
+    iesp.emailsearchv2.t_EmailSearchV2OriginalData - [FirstName,LastName,StreetAddress,City,State,Zip,Zip4] Original;
+  	unsigned8 LexId {xpath('LexId')};
+    STRING8 DateFirstSeen {xpath('DateFirstSeen')};
+    STRING8 DateLastSeen {xpath('DateLastSeen')};
+    STRING8 DateVendorFirstReported {xpath('DateVendorFirstReported')};
+    STRING8 DateVendorLastReported {xpath('DateVendorLastReported')};
+    STRING8 ProcessDate {xpath('ProcessDate')};
+    STRING2 Source {xpath('Source')};
+    UNSIGNED EmailId {xpath('EmailId')};
+  END;
+
   EXPORT crs_email_rec := RECORD(iesp.bpsreport.t_BpsReportEmailSearchRecord)
   END;
 

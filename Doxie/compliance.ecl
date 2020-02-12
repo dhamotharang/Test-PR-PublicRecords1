@@ -298,9 +298,14 @@ EXPORT compliance := MODULE
 
   // Marketing Restrictions
   EXPORT isMarketingAllowed(string src, string st = '') := FUNCTION
-                        RETURN (src IN MDR.sourceTools.set_Marketing_Sources
-            AND NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Asrs AND st IN ['ID','IL','KS','NM','SC','WA', ''])
-            AND NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs AND st IN ['ID','IL','KS','NM','SC','WA', '']));
+    Boolean  isAllowed := NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Asrs       AND st IN ['ID','IL','KS','NM','SC','WA', '']) AND
+                          NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs AND st IN ['ID','IL','KS','NM','SC','WA', '']) AND
+                          EXISTS(Codes.Key_Codes_V3(KEYED(file_name = 'VENDOR_SOURCES') AND
+                                                  KEYED(field_name= 'DIRECTMARKETING') AND
+                                                  KEYED(field_name2 = 'SCODE') AND
+                                                  KEYED(code = src)));
+    RETURN isAllowed;
+
     END;
 
   EXPORT Boolean isDirectMarketing(String _industry_class) := STD.Str.ToUpperCase(_industry_class) = 'DRMKT';

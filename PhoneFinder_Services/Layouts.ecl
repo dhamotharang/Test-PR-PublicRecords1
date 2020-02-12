@@ -235,7 +235,7 @@
       STRING3                                           Phone_Digits;
       STRING15                                          Encrypted_Experian_PIN;
       // QSent phone detail fields
-      Doxie_Raw.PhonesPlus_Layouts.t_RealTimePhone_Ext1 RealTimePhone_Ext;
+      Doxie_Raw.PhonesPlus_Layouts.t_RealTimePhone_Ext RealTimePhone_Ext;
       Porting;
       SpoofingData;
       OneTimePassword;
@@ -328,7 +328,7 @@
     END;
 
     EXPORT PhoneSlim :=
-    RECORD(Doxie_Raw.PhonesPlus_Layouts.t_RealTimePhone_Ext1)
+    RECORD(Doxie_Raw.PhonesPlus_Layouts.t_RealTimePhone_Ext)
       STRING20  acctno;
       UNSIGNED2 penalt;
       STRING2   vendor_id;

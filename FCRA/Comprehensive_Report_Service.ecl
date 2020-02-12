@@ -25,6 +25,7 @@ WSInput.MAC_FCRA_Comprehensive_Report_Service();
 boolean IsFCRA := true;
 BOOLEAN EquifaxDecisioningRequested := FALSE : STORED('IncludeEquifaxAcctDecisioning');
 input_params := AutoStandardI.GlobalModule(isFCRA);
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 doxie.MAC_Selection_Declare();
 
 // SOAPCALL to a neutral side to get LexId
@@ -35,11 +36,9 @@ remote_header_err := project (cr_neutral (errors.code != 0), transform (doxie.la
 dids := project (remote_header.best_information_children, doxie.layout_references);
 did_fcra := dids[1].did;
 
-application_type_value := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(isFCRA),AutoStandardI.InterfaceTranslator.application_type_val.params));
-
 // FFD - BEGIN				 
 integer  inFCRAPurpose := FCRA.FCRAPurpose.Get();
-integer8 inFFDMask := FFD.FFDMask.Get(inApplicationType:=application_type_value);
+integer8 inFFDMask := FFD.FFDMask.Get(inApplicationType:=mod_access.application_type);
 boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDMask);
 
 // get person context
@@ -63,7 +62,7 @@ boolean verify_did := false : stored ('VerifyUniqueID');
 ds_header := doxie.central_header (dids, IsFCRA, verify_did, false, slim_pc_recs, inFFDMask, ds_flags); // only one row at most
 
 fcra_subj_only := false : stored ('ApplyNonsubjectRestrictions');
-boolean isCollections := application_type_value IN AutoStandardI.Constants.COLLECTION_TYPES;
+boolean isCollections := mod_access.application_type IN AutoStandardI.Constants.COLLECTION_TYPES;
 nss_default := if(fcra_subj_only or isCollections, Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription, Suppress.Constants.NonSubjectSuppression.doNothing);
 nss := ut.GetNonSubjectSuppression(nss_default);
 
@@ -76,12 +75,13 @@ eq_act_dec_rec :=
   EquifaxDecisioning.getAttributes(besr, 
                                    gateways,
                                    EquifaxDecisioningRequested, 
-                                   input_params.DataPermissionMask,
+                                   mod_access.DataPermissionMask,
                                    suppress_results_due_alerts OR suppress_reseller_data_due_alerts, //if suppressed - no gateway call is made, only gateway usage code is repoted than
-                                   application_type_value
+                                   mod_access.application_type
                                   );
 
-tempmod := module(project(AutoStandardI.GlobalModule(IsFCRA),CriminalRecords_Services.IParam.report,opt))
+tempmod := module(project(input_params,CriminalRecords_Services.IParam.report,opt))
+  doxie.compliance.MAC_CopyModAccessValues(mod_access);
   export string14 did := (string) dids[1].did;
   export string25 doc_number := '';
   export string60 offender_key := '';

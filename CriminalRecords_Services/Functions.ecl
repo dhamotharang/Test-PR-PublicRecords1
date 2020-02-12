@@ -90,7 +90,7 @@ export Functions := module
 	// ------------------------
 	//	Generate search output
 	// ------------------------
-	export fnCrimSearchVal(dataset(CriminalRecords_Services.layouts.raw_with_offenses) in_recs, params in_mod) := function
+	export fnCrimSearchVal(dataset(CriminalRecords_Services.layouts.raw_with_offenses) in_recs) := function
 	
 		CriminalRecords_Services.layouts.t_CrimSearchRecordWithPenalty toSearch(CriminalRecords_Services.layouts.raw_with_offenses L) := transform
 			self._Penalty			:= L.penalt;
@@ -434,7 +434,7 @@ export Functions := module
 			self.NumberCounts							:= L.num_of_counts;
 			self.OffenseDate							:= iesp.ECL2ESP.toDatestring8(L.off_date);
 			self.OffenseType							:= L.off_typ;
-			self.Sentence									:= stringLib.stringcleanspaces(l.stc_desc_1 + ' ' + l.stc_desc_2 + ' ' + l.stc_desc_3 + ' ' + l.stc_desc_4);//'';
+			self.Sentence									:= STD.Str.CleanSpaces(l.stc_desc_1 + ' ' + l.stc_desc_2 + ' ' + l.stc_desc_3 + ' ' + l.stc_desc_4);//'';
 			self.SentenceLengthDescription:= L.stc_lgth_desc;
 			// self.SentenceDescription1     := L.stc_desc_1;
 			self.SentenceDate							:= iesp.ECL2ESP.toDatestring8(L.stc_dt);

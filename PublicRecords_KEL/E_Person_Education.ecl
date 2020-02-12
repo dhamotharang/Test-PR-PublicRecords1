@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+﻿//HPCC Systems KEL Compiler Version 1.1.0
 IMPORT KEL11 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Education,E_Person FROM PublicRecords_KEL;
@@ -22,29 +22,37 @@ EXPORT E_Person_Education(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     UNSIGNED8 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'subject(DEFAULT:Subject_:0),Edu_(DEFAULT:Edu_:0),did(DEFAULT:D_I_D_:\'\'),processdate(DEFAULT:Process_Date_:DATE),historicalflag(DEFAULT:Historical_Flag_:\'\'),class(DEFAULT:Class_:\'\'),collegeclass(DEFAULT:College_Class_:\'\'),collegemajor(DEFAULT:College_Major_:\'\'),newcollegemajor(DEFAULT:New_College_Major_:\'\'),headofhouseholdfirstname(DEFAULT:Head_Of_Household_First_Name_:\'\'),headofhouseholdgendercode(DEFAULT:Head_Of_Household_Gender_Code_:\'\'),headofhouseholdgender(DEFAULT:Head_Of_Household_Gender_:\'\'),rawaid(DEFAULT:Raw_A_I_D_:\'\'),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'did(OVERRIDE:Subject_:0|DEFAULT:D_I_D_:\'\'),Edu_(DEFAULT:Edu_:0),process_date(OVERRIDE:Process_Date_:DATE),historical_flag(OVERRIDE:Historical_Flag_:\'\'),class(OVERRIDE:Class_:\'\'),college_class(OVERRIDE:College_Class_:\'\'),college_major(OVERRIDE:College_Major_:\'\'),new_college_major(OVERRIDE:New_College_Major_:\'\'),head_of_household_first_name(OVERRIDE:Head_Of_Household_First_Name_:\'\'),head_of_household_gender_code(OVERRIDE:Head_Of_Household_Gender_Code_:\'\'),head_of_household_gender(OVERRIDE:Head_Of_Household_Gender_:\'\'),rawaid(OVERRIDE:Raw_A_I_D_:\'\'),source(OVERRIDE:Source_:\'\'),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED __Mapping := 'subject(DEFAULT:Subject_:0),Edu_(DEFAULT:Edu_:0),did(DEFAULT:D_I_D_:\'\'),processdate(DEFAULT:Process_Date_:DATE),historicalflag(DEFAULT:Historical_Flag_:\'\'),class(DEFAULT:Class_:\'\'),collegeclass(DEFAULT:College_Class_:\'\'),collegemajor(DEFAULT:College_Major_:\'\'),newcollegemajor(DEFAULT:New_College_Major_:\'\'),headofhouseholdfirstname(DEFAULT:Head_Of_Household_First_Name_:\'\'),headofhouseholdgendercode(DEFAULT:Head_Of_Household_Gender_Code_:\'\'),headofhouseholdgender(DEFAULT:Head_Of_Household_Gender_:\'\'),rawaid(DEFAULT:Raw_A_I_D_:\'\'),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH)';
+  SHARED __Mapping0 := 'did(OVERRIDE:Subject_:0|DEFAULT:D_I_D_:\'\'),Edu_(DEFAULT:Edu_:0),process_date(OVERRIDE:Process_Date_:DATE),historical_flag(OVERRIDE:Historical_Flag_:\'\'),class(OVERRIDE:Class_:\'\'),college_class(OVERRIDE:College_Class_:\'\'),college_major(OVERRIDE:College_Major_:\'\'),new_college_major(OVERRIDE:New_College_Major_:\'\'),head_of_household_first_name(OVERRIDE:Head_Of_Household_First_Name_:\'\'),head_of_household_gender_code(OVERRIDE:Head_Of_Household_Gender_Code_:\'\'),head_of_household_gender(OVERRIDE:Head_Of_Household_Gender_:\'\'),source(OVERRIDE:Source_:\'\'),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),date_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH),date_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
+    SELF.Raw_A_I_D_ := __CN('');
+    SELF := __r;
+  END;
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_American_student_list__key_DID,TRANSFORM(RECORDOF(__in.Dataset_American_student_list__key_DID),SELF:=RIGHT));
   EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)key != 0);
   SHARED __d0_Edu__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Edu_;
   END;
-  SHARED __d0_Edu__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d0_KELfiltered,'Key,rawaid','__in'),E_Education(__in,__cfg).Lookup,'' + '|' + TRIM((STRING)LEFT.Key) + '|' + TRIM((STRING)LEFT.rawaid) = RIGHT.KeyVal,TRANSFORM(__d0_Edu__Layout,SELF.Edu_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Missing_Edu__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_KELfiltered,'Key','__in');
+  SHARED __d0_Edu__Mapped := IF(__d0_Missing_Edu__UIDComponents = 'Key',PROJECT(__d0_KELfiltered,TRANSFORM(__d0_Edu__Layout,SELF.Edu_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_KELfiltered,__d0_Missing_Edu__UIDComponents),E_Education(__in,__cfg).Lookup,'' + '|' + TRIM((STRING)LEFT.Key) + '|' + '' = RIGHT.KeyVal,TRANSFORM(__d0_Edu__Layout,SELF.Edu_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH));
   SHARED __d0_Prefiltered := __d0_Edu__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  SHARED __Mapping1 := 'did(OVERRIDE:Subject_:0|DEFAULT:D_I_D_:\'\'),Edu_(DEFAULT:Edu_:0),process_date(OVERRIDE:Process_Date_:DATE),historicalflag(DEFAULT:Historical_Flag_:\'\'),class_rank(OVERRIDE:Class_:\'\'),collegeclass(DEFAULT:College_Class_:\'\'),major_code(OVERRIDE:College_Major_:\'\'),newcollegemajor(DEFAULT:New_College_Major_:\'\'),student_first_name(OVERRIDE:Head_Of_Household_First_Name_:\'\'),headofhouseholdgendercode(DEFAULT:Head_Of_Household_Gender_Code_:\'\'),gender_code(OVERRIDE:Head_Of_Household_Gender_:\'\'),rawaid(OVERRIDE:Raw_A_I_D_:\'\'),source(OVERRIDE:Source_:\'\'),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping0_Transform(LEFT)));
+  SHARED __Mapping1 := 'did(OVERRIDE:Subject_:0|DEFAULT:D_I_D_:\'\'),Edu_(DEFAULT:Edu_:0),process_date(OVERRIDE:Process_Date_:DATE),historicalflag(DEFAULT:Historical_Flag_:\'\'),class_rank(OVERRIDE:Class_:\'\'),collegeclass(DEFAULT:College_Class_:\'\'),major_code(OVERRIDE:College_Major_:\'\'),newcollegemajor(DEFAULT:New_College_Major_:\'\'),student_first_name(OVERRIDE:Head_Of_Household_First_Name_:\'\'),headofhouseholdgendercode(DEFAULT:Head_Of_Household_Gender_Code_:\'\'),gender_code(OVERRIDE:Head_Of_Household_Gender_:\'\'),rawaid(OVERRIDE:Raw_A_I_D_:\'\'),source(OVERRIDE:Source_:\'\'),date_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),date_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),date_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH),date_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_AlloyMedia_student_list__Key_DID,TRANSFORM(RECORDOF(__in.Dataset_AlloyMedia_student_list__Key_DID),SELF:=RIGHT));
   EXPORT __d1_KELfiltered := __d1_Norm((UNSIGNED)did != 0 AND (UNSIGNED)Sequence_Number != 0 AND (UNSIGNED)key_code != 0 AND (UNSIGNED)rawaid != 0);
   SHARED __d1_Edu__Layout := RECORD
     RECORDOF(__d1_KELfiltered);
     KEL.typ.uid Edu_;
   END;
-  SHARED __d1_Edu__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d1_KELfiltered,'Sequence_Number,key_code,rawaid','__in'),E_Education(__in,__cfg).Lookup,TRIM((STRING)LEFT.Sequence_Number) + '|' + TRIM((STRING)LEFT.key_code) + '|' + TRIM((STRING)LEFT.rawaid) = RIGHT.KeyVal,TRANSFORM(__d1_Edu__Layout,SELF.Edu_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Missing_Edu__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d1_KELfiltered,'Sequence_Number,key_code,rawaid','__in');
+  SHARED __d1_Edu__Mapped := IF(__d1_Missing_Edu__UIDComponents = 'Sequence_Number,key_code,rawaid',PROJECT(__d1_KELfiltered,TRANSFORM(__d1_Edu__Layout,SELF.Edu_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d1_KELfiltered,__d1_Missing_Edu__UIDComponents),E_Education(__in,__cfg).Lookup,TRIM((STRING)LEFT.Sequence_Number) + '|' + TRIM((STRING)LEFT.key_code) + '|' + TRIM((STRING)LEFT.rawaid) = RIGHT.KeyVal,TRANSFORM(__d1_Edu__Layout,SELF.Edu_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH));
   SHARED __d1_Prefiltered := __d1_Edu__Mapped;
   SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0 + __d1;
@@ -52,6 +60,8 @@ EXPORT E_Person_Education(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Layout := RECORD
@@ -71,22 +81,28 @@ EXPORT E_Person_Education(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Edu_,Subject_,D_I_D_,Process_Date_,Historical_Flag_,Class_,College_Class_,College_Major_,New_College_Major_,Head_Of_Household_First_Name_,Head_Of_Household_Gender_Code_,Head_Of_Household_Gender_,Raw_A_I_D_,ALL));
   Person_Education_Group := __PostFilter;
   Layout Person_Education__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
-    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Date_Last_Seen_,MAX,FALSE);
+    SELF.Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(__recs,Date_Vendor_First_Reported_,MIN,FALSE);
+    SELF.Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(__recs,Date_Vendor_Last_Reported_,MAX,FALSE);
     SELF := __r;
   END;
   Layout Person_Education__Single_Rollup(InLayout __r) := TRANSFORM
-    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
     SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_Last_Seen_,FALSE);
+    SELF.Date_Vendor_First_Reported_ := KEL.era.SimpleRollSingleRow(__r,Date_Vendor_First_Reported_,FALSE);
+    SELF.Date_Vendor_Last_Reported_ := KEL.era.SimpleRollSingleRow(__r,Date_Vendor_Last_Reported_,FALSE);
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Person_Education_Group,COUNT(ROWS(LEFT))=1),GROUP,Person_Education__Single_Rollup(LEFT)) + ROLLUP(HAVING(Person_Education_Group,COUNT(ROWS(LEFT))>1),GROUP,Person_Education__Rollup(LEFT, ROWS(LEFT)));
@@ -108,10 +124,11 @@ EXPORT E_Person_Education(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','head_of_household_first_name',COUNT(__d0(__NL(Head_Of_Household_First_Name_))),COUNT(__d0(__NN(Head_Of_Household_First_Name_)))},
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','head_of_household_gender_code',COUNT(__d0(__NL(Head_Of_Household_Gender_Code_))),COUNT(__d0(__NN(Head_Of_Household_Gender_Code_)))},
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','head_of_household_gender',COUNT(__d0(__NL(Head_Of_Household_Gender_))),COUNT(__d0(__NN(Head_Of_Household_Gender_)))},
-    {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','rawaid',COUNT(__d0(__NL(Raw_A_I_D_))),COUNT(__d0(__NN(Raw_A_I_D_)))},
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d0(Date_Vendor_First_Reported_=0)),COUNT(__d0(Date_Vendor_First_Reported_!=0))},
+    {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d0(Date_Vendor_Last_Reported_=0)),COUNT(__d0(Date_Vendor_Last_Reported_!=0))},
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','did',COUNT(__d1(__NL(Subject_))),COUNT(__d1(__NN(Subject_)))},
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Edu',COUNT(__d1(__NL(Edu_))),COUNT(__d1(__NN(Edu_)))},
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DID',COUNT(__d1(__NL(D_I_D_))),COUNT(__d1(__NN(D_I_D_)))},
@@ -127,6 +144,8 @@ EXPORT E_Person_Education(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','rawaid',COUNT(__d1(__NL(Raw_A_I_D_))),COUNT(__d1(__NN(Raw_A_I_D_)))},
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
     {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))}]
+    {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d1(Date_Vendor_First_Reported_=0)),COUNT(__d1(Date_Vendor_First_Reported_!=0))},
+    {'PersonEducation','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d1(Date_Vendor_Last_Reported_=0)),COUNT(__d1(Date_Vendor_Last_Reported_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;
