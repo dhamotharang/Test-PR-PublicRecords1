@@ -12,7 +12,7 @@ EXPORT Proc_Build_Ported_Metadata_DeltaFile_Temp(string version, string filename
 	//Build DeltaBaseFile, Using the Raw Delta Files
 	buildBaseDelta			:= output(PhonesInfo.Map_Ported_Metadata_DeltaFile_Temp(version),,'~thor_data400::base::phones::ported_metadata_deltamain_'+version, csv(heading(1), terminator('\n'), separator('\t')), overwrite, __compressed__);
 	
-	//Despray Processed DeltaBase File
+	//Despray Processed DeltaBase File - BASE DESPRAYED FOR DB TEAM
 	desprayBaseDelta		:= FileServices.DeSpray('~thor_data400::base::phones::ported_metadata_deltamain_'+version,
 																							eclsourceip,
 																							'/data/data_999/phones/delta_mobile_id/despray/'+version[1..8]+'/Ported_Metadata_DeltaMain_'+version+'.csv',
@@ -52,8 +52,8 @@ EXPORT Proc_Build_Ported_Metadata_DeltaFile_Temp(string version, string filename
 		
 		moveComBaseDelta := if(stringlib.stringtouppercase(trim(newDay, left, right)[1])='Y', newND, newHr);			
 	
-	//Build Common Metadata Ported DeltaBase Key
-	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhonesInfo.Key_PhonesDelta.Ported_MetadataDelta
+	//Build Common Metadata Ported DeltaBase Key - NOT ACTIVE IN ROXIE
+	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhonesInfo.Key_PhonesDelta_Temp.Ported_MetadataDelta
 																							,'~thor_data400::key::phones_ported_metadata_delta'
 																							,'~thor_data400::key::'+version+'::phones_ported_metadata_delta'
 																							,bkPhonesPortedmetadataDelta
