@@ -35,19 +35,21 @@ export NameTypes := enum(UNSIGNED2,
 			'?' => NameTypes.Unknown,
 			NameTypes.Unknown);
 			
-		export unsigned2 fn_setNameIndicator(string1 nametype, unsigned1 derivation, string1 gender='U', boolean FInitial = false) :=
+		export unsigned2 fn_setNameIndicator(string1 nametype, unsigned1 derivation, string1 gender='U', boolean IsParsedName = false) :=
 			fn_nameTypeToIndicator(nametype) |
 				IF(gender in ['M','N'],MaleName,0) |
 				IF(gender in ['F','N'],FemaleName,0) |
+				IF(IsParsedName,ParsedName,0) |
 				case(derivation,
 					1 => DerivedName,
 					2 => DerivedName2,
 					0);
 
-		export unsigned2 fn_setNameIndicators(integer2 nametype, unsigned2 quality, string1 gender='U', unsigned1 derivation=0) :=
-			nametype | quality |
+		export unsigned2 fn_setNameIndicators(integer2 nametype, unsigned2 quality, string1 gender='U', unsigned1 derivation=0, boolean IsParsedName = false) :=
+			nametype | (quality<<3) |
 				IF(gender in ['M','N'],MaleName,0) |
 				IF(gender in ['F','N'],FemaleName,0) |
+				IF(IsParsedName,ParsedName,0) |
 				case(derivation,
 					1 => DerivedName,
 					2 => DerivedName2,
