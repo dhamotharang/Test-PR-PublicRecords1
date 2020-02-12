@@ -1,6 +1,7 @@
 ﻿IMPORT Business_Risk_BIP, BIPV2, SALT28, Address, Risk_Indicators;
 
 // This function takes in a dataset of Layouts.Input and appends the various BIP Link ID's
+// NOTE: This function will NOT take only a SeleID as input and process it successfully.
 
 EXPORT BIP_LinkID_Append_NEW(DATASET(Business_Risk_BIP.Layouts.Input) Input, 
 																		 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -34,16 +35,8 @@ EXPORT BIP_LinkID_Append_NEW(DATASET(Business_Risk_BIP.Layouts.Input) Input,
     SELF.seleid := le.SeleID;
     SELF := [];  
  END; 
-  
-  CntSeleID := COUNT(Input(SeleID <> 0));   // AND CompanyName = '' AND City = '' AND State = ''));
-        
-  AppendBestsFromLexIDs := CntSeleid > 0;
-
-	BIPSearchInputMain := PROJECT(Input, prepBIPInput(LEFT));
-	    
-  BIPSearchInput := IF(AppendBestsFromLexIDs, Business_Risk_BIP.BIP_Append_FromSeleid(Input, Options, linkingOptions), BIPSearchInputMain);
-  
-	// BIPSearchInput := BIPSearchInputMain;
+	
+	BIPSearchInput := PROJECT(Input, prepBIPInput(LEFT));
 
   append := bipv2.IdAppendRoxie(BIPSearchInput
     ,scoreThreshold := Options.BIPAppend_ScoreThreshold
@@ -54,12 +47,6 @@ EXPORT BIP_LinkID_Append_NEW(DATASET(Business_Risk_BIP.Layouts.Input) Input,
 		,allowInvalidResults := FALSE //Options.BIPAppend_AllowInvalidResults
   );
 
-  withBest := append.WithBest(
-		fetchLevel := BIPV2.IdConstants.fetch_level_seleid,
-		allBest := true,
-    isMarketing := IF(Options.MarketingMode = 1, TRUE, FALSE)
-  );
-  
   idsOnly := append.IdsOnly(); 
   
 	tempLinkingRecord := RECORD
@@ -100,6 +87,7 @@ EXPORT BIP_LinkID_Append_NEW(DATASET(Business_Risk_BIP.Layouts.Input) Input,
 		SELF.PowID := LEFT.PowID;
 		SELF.PowIDWeight := LEFT.PowWeight;
 		SELF.PowIDScore := LEFT.PowScore;
+		SELF.Weight := LEFT.SeleWeight;  // For the new BIP-append function, use the SeleWeight as "Weight".
     SELF := []));
 
 	// Attempt to pick the "Best" ID's.  This is done by keeping the record which hits on the first of these rules:
@@ -110,70 +98,13 @@ EXPORT BIP_LinkID_Append_NEW(DATASET(Business_Risk_BIP.Layouts.Input) Input,
 		SELF.SeleID	:= ROW({ri.SeleID,	ri.SeleIDWeight,	ri.SeleIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs);
 		SELF.OrgID	:= ROW({ri.OrgID,		ri.OrgIDWeight,		ri.OrgIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs);
 		SELF.UltID	:= ROW({ri.UltID,		ri.UltIDWeight,		ri.UltIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs);
+		SELF.Weight := ri.Weight;
     SELF := [];
 	END;
 	
   finalBIPIDsAppended := JOIN(Input, SlimLinkIDsRaw, LEFT.Seq = RIGHT.Seq, setBestIDs(LEFT, RIGHT), LEFT OUTER, KEEP(1), ATMOST(100));
 	
-  
-  withCompanyName := JOIN(finalBIPIDsAppended, withBest, LEFT.seq = RIGHT.request_id,
-       TRANSFORM( Business_Risk_BIP.Layouts.Shell,
-       
-              SELF.Seq := RIGHT.request_id;
-
-              SELF.BIP_IDs := LEFT;
-              SELF.UltIDWeight := LEFT.UltID.Weight;
-              SELF.UltIDScore := LEFT.UltID.Score;
-              SELF.OrgIDWeight := LEFT.OrgID.Weight;
-              SELF.OrgIDScore := LEFT.OrgID.Score;
-              SELF.SeleIDWeight := LEFT.SeleID.Weight;
-              SELF.SeleIDScore := left.SeleID.Score;
-              SELF.ProxIDWeight := LEFT.ProxID.Weight;
-              SELF.ProxIDScore := LEFT.ProxID.Score;
-              SELF.PowIDWeight := LEFT.PowID.Weight;
-              SELF.PowIDScore := LEFT.PowID.Score;
-              
-              SELF.Clean_Input.StreetAddress1 := 	Risk_Indicators.MOD_AddressClean.street_address('', RIGHT.Prim_Range, RIGHT.Predir, RIGHT.Prim_Name, 
-																											RIGHT.Addr_Suffix, RIGHT.Postdir, RIGHT.Unit_Desig, RIGHT.Sec_Range);
-
-              SELF.Clean_Input.companyname := RIGHT.company_name;
-              SELF.Clean_Input.city := RIGHT.v_city_name;
-              SELF.Clean_Input.state := RIGHT.st;
-              SELF.Clean_Input.zip := RIGHT.zip;
-              SELF.Clean_Input.phone10 := RIGHT.company_phone;
-              SELF.Clean_Input.Prim_Range := RIGHT.Prim_Range;
-              SELF.Clean_Input.Prim_Name := RIGHT.Prim_Name;
-              SELF.Clean_Input.Addr_Suffix := RIGHT.Addr_Suffix;
-
-              SELF.Clean_Input.Predir := RIGHT.Predir;
-              SELF.Clean_Input.FEIN := RIGHT.company_fein;
-              SELF.Clean_Input.Postdir := RIGHT.Postdir;
-              SELF.Clean_Input.Unit_Desig := RIGHT.Unit_Desig;
-              SELF.Clean_Input.Sec_Range := RIGHT.Sec_Range;
-              
-              SELF := LEFT;
-              SELF := [];
-              ),
-					LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-          
-  // FinalResults := SORT((finalBIPIDsAppended), Seq);
-  FinalResults := SORT((withCompanyName), Seq);
-   
-  // OUTPUT(Input,NAMED('NEW_Append_Input'));
-  // OUTPUT(withBest, NAMED('withBest'));
-  // OUTPUT(withBest_Acct, NAMED('withBest_Acct'));
-  // OUTPUT(withBest_Acct[1], NAMED('withBest_Acct_firstRec'));
-  // OUTPUT(withCompanyName, NAMED('withRecords'));
-  // OUTPUT(FinalResults, NAMED('FinalResults'));
-  // OUTPUT(withBestDeDupped , NAMED('withBestDeDupped '));
-  // OUTPUT(AppendBestsFromLexIDs, NAMED('AppendBestsFromLexIDs'));
-  
-  // OUTPUT(idsOnly,NAMED('idsOnly'));
-  // OUTPUT(BIPSearchInput,NAMED('BIPSearchInput'));
-  // OUTPUT(BIPSearchInputMain,NAMED('BIPSearchInputMain'));
-  
-	RETURN(FinalResults);
-   
+	RETURN finalBIPIDsAppended;
 END;
 
 

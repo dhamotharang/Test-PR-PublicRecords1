@@ -3352,7 +3352,7 @@ Export Layouts.CombinedHeaderResults build_hms_facility_base (Layouts.hms_base_w
 	end;
 	export iesp.healthcareconsolidatedsearch.t_HealthCareConsolidatedSearchProvider formatSearchServiceProviderOutput(Layouts.CombinedHeaderResultsDoxieLayout resultRec, dataset(Layouts.autokeyInput) aInputData, dataset(Layouts.common_runtime_config) cfg)  := TRANSFORM 
 		searchCriteria := cfg[1];
-		self.ProviderId :=if(resultRec.issearchfailed,error(203,doxie.ErrorCodes(203)),(string)resultRec.lnpid);
+		self.ProviderId :=if(resultRec.issearchfailed and resultRec.lnpid=0,error(203,doxie.ErrorCodes(203)),(string)resultRec.lnpid);
 		self.ProviderSrc := resultRec.Src;
 		self.sex := resultRec.Names[1].Gender;
 		self.UniqueIds := choosen(project(resultRec.dids, transform (iesp.share.t_StringArrayItem, Self.value := (string)Left.did)),iesp.Constants.HPR.MAX_UNIQUEIDS);

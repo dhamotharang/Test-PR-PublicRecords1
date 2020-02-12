@@ -26,7 +26,7 @@ EXPORT getEmailInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE,
 							
 		EmailBatchParams := MODULE(project(InputParams, BatchServices.Email_BatchService_Interfaces.BatchParams, opt))
 				EXPORT unsigned8 MAX_EMAIL_PER_ACCTNO := 5; // implicitly defined by flat output layout.
-				EXPORT boolean useDMEmailSourcesOnly := false	: stored('UseDMEmailSourcesOnly');
+				// EXPORT boolean useDMEmailSourcesOnly := false	: stored('UseDMEmailSourcesOnly'); // Added this to Batch Input Parameters instead.
 		END;
 	
 	//Added flag to identify call from Memberpoint service

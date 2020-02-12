@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Risk_Indicators, SALT28, LNSmallBusiness, iesp, BusinessInstantID20_Services;
+﻿IMPORT BIPV2, Risk_Indicators, SALT28, LNSmallBusiness, iesp;
 
 EXPORT Layouts := MODULE
 
@@ -1839,8 +1839,8 @@ EXPORT Layouts := MODULE
 		STRING2 phone_st;
 		STRING5 phone_zip;
 		STRING10 name_addr_phone;
-		STRING6 ssa_date_first;
-		STRING6 ssa_date_last;
+		STRING8 ssa_date_first;
+		STRING8 ssa_date_last;
 		STRING2 ssa_state;
 		STRING20 ssa_state_name;
 		STRING20 current_fname;

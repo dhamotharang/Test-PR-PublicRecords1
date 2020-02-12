@@ -18,7 +18,7 @@ EXPORT search_functions := MODULE
                                   vehicle_key,iteration_key,sequence_key),
                            Vehicle_key, Iteration_key);
 
-		vehicle_mod := VehicleV2_Services.IParam.getSearchModule();
+    vehicle_mod := VehicleV2_Services.IParam.getSearchModule();
     // if desired the limit might be increased to 20000 which will cover all dids except 118 records
     vehicles_res := VehicleV2_Services.raw.get_vehicle_search(vehicle_mod, vehicles_grp);
     RETURN vehicles_res(is_current);
@@ -34,7 +34,7 @@ EXPORT search_functions := MODULE
           SELF := [];
         END;
         did_rec := DATASET ([prep_did()]);
-        RelativesAndAssociates := CHOOSEN(Relationship.proc_GetRelationship(did_rec,TRUE,TRUE,FALSE,FALSE,ut.limits.DEFAULT,,TRUE).result,500);
+        RelativesAndAssociates := CHOOSEN(Relationship.proc_GetRelationshipNeutral(did_rec,TRUE,TRUE,FALSE,FALSE,ut.limits.DEFAULT,,TRUE).result,500);
         self.MotorVehicle := Count(get_motorvehicles(l.did));
         self.DriversLicense := Count((Doxie_Raw.DLV2_Raw_Legacy(dataset([{l.did}],doxie.layout_references),'')((expiration_date >= (UNSIGNED)Std.Date.Today()-10000 and history = '') or expiration_date=0)));
         self.PossibleRelatives := count(RelativesAndAssociates(isRelative));
@@ -48,7 +48,7 @@ EXPORT search_functions := MODULE
                                           mod_access.dppa,,TRUE).w_timezoneSeenDt);
         self := l;
       END;
-      wealsofound_records := 	project(l,append_wealsofound(Left));
+      wealsofound_records :=   project(l,append_wealsofound(Left));
     return wealsofound_records;
   end;
 
@@ -60,34 +60,14 @@ EXPORT search_functions := MODULE
                      integer8 inFFDOptionsMask = 0) := function
 
 
-    mod_access := module(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
-      EXPORT glb := in_mod.GLBPurpose;
-      EXPORT dppa := in_mod.DPPAPurpose;
-      EXPORT datapermissionmask := in_mod.datapermissionmask;
-      EXPORT application_type := in_mod.ApplicationType;
-      EXPORT industry_class := in_mod.industryclass;
-      EXPORT show_minors := in_mod.includeminors OR in_mod.GLBPurpose = 2;
-
-      EXPORT unrestricted := IF (in_mod.allowglb, doxie.compliance.ALLOW.GLB, 0) |
-        IF (in_mod.allowdppa, doxie.compliance.ALLOW.DPPA, 0) |
-        IF (in_mod.allowall, doxie.compliance.ALLOW.ALL, 0);
-    END;
+    mod_access := PROJECT(in_mod, doxie.IDataAccess);
 
     // Used to replace spaces in date strings with zeroes so cast to integer works Ok,
     // since some dates only contain a yyyy or a yyyymm.
-    fixed_date(string8 dtin) := StringLib.StringFindReplace(dtin, ' ', '0');
+    fixed_date(string8 dtin) := STD.Str.FindReplace(dtin, ' ', '0');
 
     // Location Value
     lv := AutoStandardI.InterfaceTranslator.location_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.location_value.params));
-
-    p := module(AutoStandardI.PermissionI_Tools.params)
-      export boolean AllowAll := false;
-      export boolean AllowGLB := false;
-      export boolean AllowDPPA := false;
-      export unsigned1 DPPAPurpose := in_mod.DPPAPurpose;
-      export unsigned1 GLBPurpose := in_mod.GLBPurpose;
-      export boolean IncludeMinors := in_mod.IncludeMinors;
-    END;
 
     //******** spkpublic (offender) key file transform for AKA data
     iesp.share.t_Name spk_file_xform2(SexOffender_Services.Layouts.raw_rec l) := transform
@@ -118,7 +98,7 @@ EXPORT search_functions := MODULE
       self.OffenseDate            := iesp.ECL2ESP.toDate ((integer4) l.offense_date),
       self.OffenseCodeOrStatute   := l.offense_code_or_statute,
       self.OffenseDescription     := l.offense_description + ' ' + l.offense_description_2,
-      self.OffenseCategory				:= (string)l.offense_category;
+      self.OffenseCategory        := (string)l.offense_category;
       self.VictimIsMinor          := if (l.victim_minor='Y',true, false),
       self.VictimIsMinor2         := l.victim_minor,
       self.VictimAge              := (integer) l.victim_age,
@@ -152,13 +132,13 @@ EXPORT search_functions := MODULE
       self.OffenderStatus     := l.offender_status,
       self.OriginalState      := l.orig_state,
       self.OriginStateCode    := l.orig_state_code,
-      self.ScarsMarksTattoos	 := l.scars_marks_tattoos,
+      self.ScarsMarksTattoos  := l.scars_marks_tattoos,
       self.DateFirstSeen      := iesp.ECL2ESP.toDate ((integer4) l.dt_first_reported),
       self.DateLastSeen       := iesp.ECL2ESP.toDate ((integer4) l.dt_last_reported),
       self.DateOffenderLastUpdated := iesp.ECL2ESP.toDateYM ((integer4) l.addr_dt_last_seen),
       self.DOB                := iesp.ECL2ESP.toDate ((integer4) fixed_date(l.dob)),
       calculatedAge := IF (trim(l.dob) = '', '', (string)ut.Age((UNSIGNED)l.dob));//Calculate Age
-      self.Age				 := calculatedAge;
+      self.Age     := calculatedAge;
       self.Name    := iesp.ECL2ESP.SetName(l.fname, l.mname, l.lname, l.name_suffix, ''),
 
       self.Address := iesp.ECL2ESP.SetAddress(l.prim_name, l.prim_range, l.predir,
@@ -182,7 +162,7 @@ EXPORT search_functions := MODULE
       integer categoryInput := (integer)in_mod.offenseCategory;
       categoryPenalty := if (count(offenses(offense_category & categoryInput = categoryInput)) > 0 or categoryInput = 0, 0, 10);
 
-      self.SecondaryPenalty								:= l.penalt_osmt + categoryPenalty;
+      self.SecondaryPenalty                := l.penalt_osmt + categoryPenalty;
 
       // Sort Convictions by Conviction-Date reverse chron (descending)
       self.Convictions := if(in_mod.include_offenses,sort(project(offenses,
@@ -214,7 +194,7 @@ EXPORT search_functions := MODULE
       self.AlternativeAddresses := choosen(dedup(sort(
                                     project(key_enh(
                                             keyed(l.seisint_primary_key = sspk) AND
-                                            ~isFCRA and 				//currently we are not supporting the options for using SPK_Enh key for FCRA
+                                            ~isFCRA and         //currently we are not supporting the options for using SPK_Enh key for FCRA
                                             ((in_mod.include_regaddrs   AND alt_type='S') OR
                                              (in_mod.include_histaddrs  AND alt_type='H') OR
                                              (in_mod.include_assocaddrs AND alt_type='R') OR
@@ -250,11 +230,11 @@ EXPORT search_functions := MODULE
       //Do we want to allow WeAlsoFound Data for FCRA...? if so we would need FCRA keys for each of these MotorVehicle, DriversLicense, Relatives, ProfessionalLicense, PAW, PhonesPlus
       self.WeAlsoFound := if(~isFCRA and in_mod.include_wealsofound,fnSearchWeAlsoFoundData(mod_access, dataset([{(unsigned)l.did}],doxie.layout_references))[1]);
       self.PhysicalCharacteristics := row({calculatedAge, l.race, l.ethnicity, l.height, l.weight, l.scars_marks_tattoos}, iesp.sexualoffender.t_PhysicalCharacteristics);
-      self.StatementIDs 		 := l.StatementIDs;
+      self.StatementIDs      := l.StatementIDs;
       self.isDisputed        := l.isDisputed;
     END;
 
-    best_data := SexOffender_Services.Raw.GetBestAddressRec(in_recs, in_mod.dppapurpose, in_mod.glbpurpose);
+    best_data := SexOffender_Services.Raw.GetBestAddressRec(in_recs, mod_access);
     in_recs_with_best := join(in_recs, best_data,
                              left.did = right.did,
                              transform(SexOffender_Services.Layouts.raw_rec,
@@ -267,13 +247,6 @@ EXPORT search_functions := MODULE
     // NOTE: Passed-in in_recs contains 1 record for each spk to be returned.
     recs_fmtd := project(recs_out, spk_file_xform(LEFT));
 
-    //Uncomment lines below as needed to assist in debugging
-    //output(in_mod.include_regaddrs,named('func_include_regaddrs'));
-    //output(in_mod.include_unregaddrs,named('func_include_unregaddrs'));
-    //output(in_mod.include_histaddrs,named('func_include_histaddrs'));
-    //output(in_mod.include_assocaddrs,named('func_include_assocaddrs'));
-    //output(in_recs,named('func_in_recs'));
-    //output(recs_fmtd,named('func_recs_fmtd'));
     return(recs_fmtd);
 
   end;

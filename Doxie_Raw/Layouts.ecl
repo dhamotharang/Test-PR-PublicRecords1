@@ -66,8 +66,8 @@ MODULE
 		INTEGER3 	recent_cohabit;
 		UNSIGNED2 number_cohabits;
 		INTEGER2  prim_range;
-		Relationship.layout_GetRelationship.InterfaceOuput.isRelative;
-		Relationship.layout_GetRelationship.InterfaceOuput.title;
+		Relationship.layout_GetRelationship.InterfaceOutput_new.isRelative;
+		Relationship.layout_GetRelationship.InterfaceOutput_new.title;
 	END;
 	
 	EXPORT RelDetailsOut := {RelDetailsTemp - [did_of_interest,found_did_of_interest,title],STRING20 title};

@@ -944,7 +944,7 @@ OUTPUT(converted, NAMED('Converted_Set'));
 					SalesAmount >= 1000000 AND SalesAmount < 2500000 	=> 70,
 					SalesAmount >= 2500000 AND SalesAmount < 5000000 	=> 80,
 					SalesAmount >= 5000000 AND SalesAmount < 10000000 => 90,
-					SalesAmount > 10000000 			                      => 100,
+					SalesAmount >= 10000000 			                    => 100,
 																														-1);
 			RETURN SalesIndex;
 		END;	
@@ -1060,6 +1060,11 @@ EXPORT fn_isFoundInCompanyName( STRING CompanyName, STRING PersonName ) := FUNCT
     RETURN IF (length (strt) < max_len, strt, strt_trimmed); 
   END;
 	
-  
+	EXPORT isMarketingAllowedProperty(string src, string st = '') := FUNCTION
+		restrictedStates := ['ID','IL','KS','NM','SC','WA', ''];
+		restrictedSources := [MDR.sourceTools.src_LnPropV2_Lexis_Asrs,MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs];
+		isAllowed := 	NOT (src IN restrictedSources AND st IN restrictedStates);
+		RETURN isAllowed;
+	END;
   
 END;

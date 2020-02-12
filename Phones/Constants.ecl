@@ -202,7 +202,7 @@ MODULE
 	END;
 	EXPORT TransactionCodes :=
 	MODULE
-		EXPORT REACTIVATED			:= 'RE';
+		EXPORT REACTIVATED			:= 'RE';	// also an event type for react records for a phone
 		EXPORT PORT_DELETE			:=  'PD';
 		EXPORT PORT_ADD 			:= 'PA';
 		EXPORT ACTIVE_STATUS		:= 'AS';
@@ -219,12 +219,13 @@ MODULE
 		EXPORT PORT_LOWER_THRESHOLD 		:= -1;
 		EXPORT DISCONNECT_LOWER_THRESHOLD 		:= 6;
 		EXPORT DISCONNECT_UPPER_THRESHOLD 		:= 30;
-		EXPORT PORTED_PHONE			:= 'C';
-		EXPORT DISCONNECTED			:= 'D';
-		EXPORT PORTED_LINE			:= 'L';  //Line type is ported
-		EXPORT NUMBER_SWAPPED		:= 'DS'; // swap identifies both a disconnect and a number swap
-		EXPORT SUSPENDED			:= 'U';
-		EXPORT VERFICATION	        := 'V';
+		EXPORT PORTED_PHONE			:= 'C'; // event type : phone ported
+		EXPORT DISCONNECTED			:= 'D'; // event type: phone disconnected
+		EXPORT PORTED_LINE			:= 'L';  //event type: Line type is ported
+		EXPORT NUMBER_SWAPPED		:= 'DS'; //event type: swap identifies both a disconnect and a number swap
+		EXPORT SUSPENDED			:= 'U';	// event type: phone is suspended
+		EXPORT VERFICATION	        := 'V';	// event type : phone source is verification source -LERG6(L6) or ATT_LIDB_SRC(PB)
+		EXPORT ACTIVE_VERIFICATION := 'A'; // event type : phone source is OTP or any other AS source
 		EXPORT DEFAULT_BLOCK_ID:= 'A';
 		EXPORT PORTED := 'P';  //phone number is ported
 

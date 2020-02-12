@@ -91,8 +91,15 @@ EXPORT getB2BAttributes(
 	RecordsWithSeleID := BusinessInput(B_LexIDLegal > 0);
 	RecordsWithoutSeleID := BusinessInput(B_LexIDLegal <= 0);
   
-  LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(0,0,0,0,0).res0); //Will get new query from Laura/Andi
-	
+	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+																	0, // UltID
+																	0, // OrgID
+																	0, // SeleID
+																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
+																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
+																	0, // ArchiveDate
+																	0).res0); //DPM	
+																	
 	BusinessSeleAttributes_Results := PROJECT(BusinessInput, TRANSFORM(
           {INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
           SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
@@ -100,6 +107,8 @@ EXPORT getB2BAttributes(
             LEFT.B_LexIDUlt,
             LEFT.B_LexIDOrg,
             LEFT.B_LexIDLegal,
+						DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
+						DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
             (INTEGER)LEFT.B_InpClnArchDt[1..8],
             KEL_Options.KEL_Permissions_Mask, 
           FDCDataset).res0;

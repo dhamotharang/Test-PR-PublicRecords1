@@ -97,10 +97,6 @@ EXPORT Records := MODULE
   EXPORT PersonSummary(PublicProfileServices.IParam.searchParams rptByMod_new) := FUNCTION
     mod_access := PROJECT (rptByMod_new, doxie.IDataAccess);
 
-    //create a module compatible with the old person-report
-    rptByMod := MODULE (PersonReports.input._report)
-      PersonReports.input.mac_copy_report_fields(rptByMod_new);
-    END;
     getID(iesp.sexualoffender.t_SexOffRecordIdNumbers recID) := FUNCTION
       ID := MAP(TRIM(recID.OffenderId)!='' => recID.OffenderId,
                 TRIM(recID.DocNumber)!='' => recID.DocNumber,
@@ -121,6 +117,7 @@ EXPORT Records := MODULE
       EXPORT STRING14 did := (STRING)dids[1].did;
     END;
     crmMod := MODULE(PROJECT(glbMod,CriminalRecords_Services.IParam.report,opt))
+      doxie.compliance.MAC_CopyModAccessValues(mod_access);
       EXPORT STRING14 did := (STRING)dids[1].did;
       EXPORT STRING25 doc_number := '';
       EXPORT STRING60 offender_key := '';
@@ -143,7 +140,7 @@ EXPORT Records := MODULE
     accidents_mode := MODULE (project (glbMod, PersonReports.input.accidents, opt)) //?
       EXPORT boolean mask_dl := rptByMod_new.dl_mask = 1;
     END;
-    sexoffenses_mode := MODULE (project (rptByMod, PersonReports.input.sexoffenses)) END;
+    sexoffenses_mode := MODULE (project (rptByMod_new, PersonReports.IParam.sexoffenses)) END;
 
     iesp.public_profile_report.t_PublicProfileIndividual setIndividual() := TRANSFORM
       SELF.UniqueId := IF(dids[1].did>0,(STRING)dids[1].did,'');

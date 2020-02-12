@@ -20,15 +20,7 @@ EXPORT NetwiseSearchService() := MACRO
   first_row := ds_request_in[1] : INDEPENDENT;
 	iesp.ECL2ESP.SetInputUser(first_row.user);
 
-  // mod_Params is not really needed for phase 1, since we don't use any standard input 
-  // params (like DPPA, GLB) at all.
-  // However using it for consistency & for any future phase 2 CCPA changes use.
   mod_Params := Gateway.NetWiseSearch.IParams.GetParams();
-
-  // Check for an empty 'gateways' input ds here and fail if it is
-  IF(NOT EXISTS(mod_params.gateways),
-     FAIL(ut.constants_MessageCodes.GATEWAY_URL_MISSING, //errorcode=the closest one I could find 
-          Gateway.NetwiseSearch.Constants.GATEWAYS_EMPTY_MESSAGE));
 
   // Get the gateway response records
   ds_gw_recs_out := Gateway.NetwiseSearch.Records(ds_request_in, 

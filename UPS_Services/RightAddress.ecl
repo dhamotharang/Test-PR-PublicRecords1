@@ -237,15 +237,25 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 			export integer MaxNumPhoneSubject := TrueMaxNumPhoneSubject ;
 		end;
 	
-	// Choose top 1 DID 	
-	 topDid := project(choosen(highlighted_records(score > UPS_Services.Constants.SCORE_THRESHOLD_WATERFALL_PHONES and 
-	                            EntityType = UPS_Services.Constants.TAG_ENTITY_IND),1),
-									transform(doxie.layout_references_hh,
-							         self.DID := (unsigned) left.UniqueID ));
-											 
-	boolean doWaterfallPhones := exists(topDid) and ~isCanada and TrueMaxNumPhoneSubject > 0; 
+	// Choose top 5 DIDs
+	temp_rec := recordof(highlighted_records);   
+    
+	temp_rec xrollup(temp_rec l , temp_rec r) := transform 
+	 self := if(l.score > r.score, l, r );
+	end;
+	QualifyingRecords := highlighted_records(
+                                 score > UPS_Services.Constants.SCORE_THRESHOLD_WATERFALL_PHONES and 
+                                  EntityType = UPS_Services.Constants.TAG_ENTITY_IND);
+	RollupAndTopScoreUp := sort(rollup(QualifyingRecords,left.UniqueID = right.UniqueID, 
+                               xrollup(left,right) ),-score);
+   
+	topDids :=  project(choosen(RollupAndTopScoreUp,5),
+									 transform(doxie.layout_references_hh,
+							               self.DID := (unsigned) left.UniqueID ));
+  
+	boolean doWaterfallPhones := exists(topDids) and ~isCanada and TrueMaxNumPhoneSubject > 0; 
 	
-  wfpRecords := if( doWaterfallPhones, UPS_Services.fn_WaterfallPhonesLookup(topDid,PSearchMod));
+	wfpRecords := if( doWaterfallPhones, UPS_Services.fn_WaterfallPhonesLookup(topDids,PSearchMod));
 	
 	highlighted_records_with_phones := if( doWaterfallPhones, 
 				join(highlighted_records,wfpRecords,
@@ -254,13 +264,14 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 					left.UniqueID = (string)right.DID,
 					transform(recordof(highlighted_records),
 					firstAddress := left.Addresses[1];
-					phones := project(right.phones,transform(iesp.rightaddress.t_HighlightedPhoneInfo, 
+					phones_pre := project(right.phones,transform(iesp.rightaddress.t_HighlightedPhoneInfo, 
 														self.phone10 := left.phone10, self := [])) + 
 									firstAddress.phones;
+         phones := dedup(sort(phones_pre,phone10),phone10);         
 					firstAddressWithPhones := project(firstAddress,transform(iesp.rightaddress.t_RAAddressWithPhones, 
 																				self.phones := phones, self := left ));
 					self.addresses := firstAddressWithPhones + choosen(Left.Addresses,all,2),
-					self := left), left outer),
+					self := left), left outer,limit(0),keep(1)),
 					highlighted_records);
 
 	//**** START TEMP DEMO CODE FOR CUSTOMER REVIEW 
@@ -311,7 +322,6 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 	// export soap_response := project(response,
 	                                // transform(iesp.rightaddress.t_RightAddressSearchResponse), 
 																	            // self := left, 
-																							// self.ZipPostalLookup := zip_only_response );																						
-		export soap_response := response;																				
+	export soap_response := response;																				
 	
 END;

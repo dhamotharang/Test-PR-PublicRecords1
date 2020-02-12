@@ -59,7 +59,7 @@ MACRO
   END;
 
   did_rec := DATASET ([prep_did()]);
-  all_assoct := Relationship.proc_GetRelationship(
+  all_assoct := Relationship.proc_GetRelationshipNeutral(
     DID_ds := did_rec,
     RelativeFlag := TRUE,
     AssociateFlag := TRUE,

@@ -1,13 +1,14 @@
 ﻿IMPORT Doxie, dx_gateway, Gateway, iesp, Royalty;
 
 EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
-                        Gateway.Layouts.Config gateway_cfg,
+                        Gateway.NetWiseSearch.IParams.SearchParams in_mod,
                         INTEGER timeout=Gateway.NetwiseSearch.Constants.GW_TIMEOUT,
                         INTEGER retries=Gateway.NetWiseSearch.Constants.GW_RETRIES,
                         BOOLEAN makeGatewayCall = FALSE,
-                        Gateway.NetWiseSearch.IParams.SearchParams in_mod //,
-                        //BOOLEAN apply_opt_out = FALSE // CCPA opt out use
+                        BOOLEAN apply_opt_out = FALSE // CCPA opt out use
                        ) := FUNCTION
+
+  gateway_cfg := in_mod.gateways(Gateway.Configuration.IsNetWise(servicename))[1];
 
   // Use a transform to set certain fields.
   iesp.net_wise.t_NetWiseQueryRequest tf_IntoRequest(iesp.net_wise.t_NetWiseQueryRequest L)
@@ -50,7 +51,7 @@ EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
     SELF.Response._Header.Status  := FAILCODE;
     SELF.Response._Header.Message := FAILMESSAGE;
     SELF := [];
-  END;
+  END; 
 
   // Make the actual soapcall
 	ds_soapcall_out := IF (makeGatewayCall, 
@@ -85,27 +86,23 @@ EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
     SELF := L;
   END;
 
-	ds_final_out := PROJECT(ds_soapcall_out,tf_format_sc_out(LEFT));
+	ds_final_out_pre := PROJECT(ds_soapcall_out,tf_format_sc_out(LEFT));
 
-  // FOR FUTURE(Phase 2) use when CCPA opt-out coding is implemented???
-  /* v--- an example copied from Gateway.SoapCall_Targus
-  d_recs_out_clean := dx_gateway.parser_targus.CleanResponse(d_recs_out, mod_access);
-  return IF(apply_opt_out, d_recs_out_clean, d_recs_out);
-  */
-  //apply_opt_out = TRUE; // for initial phase 2 testing???
-  // //Project in_mod onto Doxie.IDataAccess to strip off 'gateways' dataset and special ESP_AppID param
-  //mod_access := PROJECT(in_mod, Doxie.IDataAccess); 
-  //ds_final_out_clean := dx_gateway.parser_netwise.fn_CleanResponse(ds_final_out, mod_access);
+  //Project in_mod onto Doxie.IDataAccess to strip off 'gateways' dataset and special AppID param
+  mod_access := PROJECT(in_mod, Doxie.IDataAccess); 
+
+  ds_final_out_clean := dx_gateway.parser_netwise_email.fn_CleanResponse(ds_final_out_pre, mod_access);
+
 
   // Outputs for debugging.  Un-comment them as needed!
   //OUTPUT(ds_recs_in,        named('ds_recs_in'));
+  //OUTPUT(in_mod.gateways,   named('in_mod_gateways'));
   //OUTPUT(gateway_cfg,       named('gateway_cfg'));
   //OUTPUT(ds_soap_request,   named('ds_soap_request'));
   //OUTPUT(ds_soapcall_out,   named('ds_soapcall_out'));
-  //OUTPUT(ds_final_out,      named('ds_final_out'));
+  //OUTPUT(ds_final_out_pre,  named('ds_final_out_pre'));
   //OUTPUT(ds_final_out_clean, named('ds_final_out_clean'));
 
-  RETURN ds_final_out;  //phase 1; revise for Phase2, see below
-  //RETURN IF(apply_opt_out, ds_final_out_clean, ds_final_out); //phase 2???
+  RETURN IF(apply_opt_out, ds_final_out_clean, ds_final_out_pre);
 
 END;

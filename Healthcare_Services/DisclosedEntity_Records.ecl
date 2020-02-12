@@ -1,4 +1,4 @@
-﻿import iesp,BatchServices,DidVille,AutoStandardI,Business_Header,Healthcare_Provider_Services,Healthcare_Header_Services,NPPES, address,doxie,Business_Header_SS,ut,BizLinkFull,Relationship;
+﻿import BatchServices,DidVille,AutoStandardI,Business_Header,Healthcare_Provider_Services,Healthcare_Header_Services,NPPES, address,Business_Header_SS,ut,BizLinkFull,Relationship;
 export DisclosedEntity_Records := module
 	shared defaults := BatchServices.RollupBusiness_BatchService_Constants.Defaults;
 
@@ -385,7 +385,7 @@ export DisclosedEntity_Records := module
 			// Use relationship proc to retrieve relative dids.
 			dsdids := project(dsCollectBestProviderDIDs,transform(Relationship.Layout_GetRelationship.DIDs_layout,SELF.did := LEFT.did,SELF := []));
 				
-			dsRelativeRecs := Relationship.proc_GetRelationship(dsdids,TRUE,TRUE,,,0,Healthcare_Services.DisclosedEntity_Constants.MAX_RECS_ON_JOIN,TRUE).result;
+			dsRelativeRecs := Relationship.proc_GetRelationshipNeutral(dsdids,TRUE,TRUE,,,0,Healthcare_Services.DisclosedEntity_Constants.MAX_RECS_ON_JOIN,TRUE).result;
 																		
 			matchRelatives := join(dsCollectBestProviderDIDs,dsRelativeRecs,
 																left.did=right.did1,

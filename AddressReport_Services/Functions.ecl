@@ -1,35 +1,35 @@
-﻿IMPORT eMerges, iesp,DriversV2_Services,ut,
-        LiensV2_Services,LN_PropertyV2_Services, AutoStandardI,
-        CriminalRecords_Services, SexOffender_Services,hunting_fishing_services,
-        CCW_Services, doxie,VehicleV2_Services,doxie_cbrs, LN_PropertyV2,
-        Gateway, BatchServices, Address, Doxie_Raw, std;
-        
+IMPORT eMerges, iesp, DriversV2_Services, ut,
+        LiensV2_Services, LN_PropertyV2_Services, AutoStandardI,
+        CriminalRecords_Services, SexOffender_Services, hunting_fishing_services,
+        CCW_Services, doxie, VehicleV2_Services, doxie_cbrs, LN_PropertyV2,
+        Gateway, BatchServices, Address, Doxie_Raw, std, Royalty;
+
 EXPORT Functions := MODULE
 /////////////////////////////////////////////////
-  
+
   shared ms(string70 a, string70 b, string70 c) :=
       map(a = '' => b,
           b = '' => a,
-          ut.StringSimilar(a,c) <= ut.StringSimilar(b,c) => a,b); 
-          
+          ut.StringSimilar(a,c) <= ut.StringSimilar(b,c) => a,b);
+
   shared fullNameValue(string fn, string mn, string lna, string name)  :=
          if (fn = '' AND mn = '' AND lna = '', name, '');
-         
+
   shared streetAddress1Value(string prim_name, string prim_range, string predir, string addr_suffix, string postdir) :=
               if (prim_name != '', '',
                           trim(prim_range,left,right) + ' ' + trim(predir,left,right) + ' ' +
-                          trim(prim_name,left,right) + ' ' + trim(addr_suffix) + ' ' + 
+                          trim(prim_name,left,right) + ' ' + trim(addr_suffix) + ' ' +
                           trim(postdir,left,right));
-  
-  shared streetAddress2Value(string p_city_name, string v_city_name, string param_city, string st, string zip) :=           
+
+  shared streetAddress2Value(string p_city_name, string v_city_name, string param_city, string st, string zip) :=
               if (trim(ms(p_city_name, v_city_name, param_city),left,right) != '', '',
                                       trim(ms(p_city_name, v_city_name, param_city),left,right) + ' ' +
                                       trim(st,left,right) + ' ' + trim(zip,left,right));
-                                      
+
   shared stateCityZipValue(string p_city_name, string v_city_name, string param_city, string st, string zip) :=
                if (trim(ms(p_city_name, v_city_name, param_city),left,right) != '' OR zip != '', '',
                           trim(st) + ' ' + trim(ms(p_city_name,v_city_name,param_city),left,right) + ' ' + trim(zip));
-                          
+
   shared string FormatCurrency (string currency_value, boolean contains_fractions = false, string1 currency_symbol = '$') := FUNCTION
     //limitations:
     // no check for alpha-characters is done (responsibility of a caller)
@@ -44,7 +44,7 @@ EXPORT Functions := MODULE
     rem := len_wholes % 3;
     start := IF (rem = 0, 3, rem);
     whole_value := MAP (
-      len_wholes > 9  => in_value[1..start] + ',' + in_value[start+1..start+3] + ',' + 
+      len_wholes > 9  => in_value[1..start] + ',' + in_value[start+1..start+3] + ',' +
                          in_value[start+4..start+6] + ',' + in_value[start+7..start+9],
       len_wholes > 6  => in_value[1..start] + ',' + in_value[start+1..start+3] + ',' +  in_value[start+4..start+6],
       len_wholes > 3  => in_value[1..start] + ',' + in_value[start+1..start+3],
@@ -62,7 +62,7 @@ EXPORT Functions := MODULE
     return
       if (trim (L.title) != '', trim (L.title), '') +
       if (trim (L.fname) != '', ' ' + trim (L.fname), '') +
-      if (trim (L.mname) != '', ' ' + trim (L.mname), '') + 
+      if (trim (L.mname) != '', ' ' + trim (L.mname), '') +
       if (trim (L.lname) != '', ' ' + trim (L.lname), '') +
       if (trim (L.name_suffix) != '', ' ' + trim (L.name_suffix), '');
   end;
@@ -72,20 +72,20 @@ EXPORT Functions := MODULE
   EXPORT iesp.bpsreport.t_BpsReportCensusData ProjectCensus (layouts.census_layout cens) := FUNCTION
     iesp.bpsreport.t_BpsReportCensusData SetCensus (layouts.census_layout cens) := TRANSFORM
       Self.Age := (integer) cens.age;
-      Self.Income := cens.income; 
+      Self.Income := cens.income;
       Self.HomeValue := cens.home_value;
       Self.Education := cens.education;
     END;
     RETURN PROJECT (cens, SetCensus (Left));
   END;
-  
+
   //****************************************************//
   // Phone Information Transform Function                  //
   //****************************************************//
   EXPORT iesp.share.t_PhoneInfo ProjectPhones (dataset(layouts.phone_out_layout) phones) := FUNCTION
     iesp.share.t_PhoneInfo SetPhones (layouts.phone_out_layout l) := TRANSFORM
-       self.Phone10:=l.phone;
-       self.PubNonpub:=l.publish_code;
+      self.Phone10:=l.phone;
+      self.PubNonpub:=l.publish_code;
       self.ListingPhone10:='';
       self.ListingName:=l.listing_name;
       self.TimeZone:=l.timezone;
@@ -95,18 +95,18 @@ EXPORT Functions := MODULE
   END;
   //****************************************************//
   // Drivers License Transform Function                  //
-  //****************************************************//  
-  
+  //****************************************************//
+
 
   EXPORT iesp.bps_share.t_BpsReportDriverLicense ProjectDL (dataset(DriversV2_Services.layouts.result_wide_tmp) dls) := FUNCTION
     dl_narrow := project (dls, DriversV2_Services.layouts.result_wide);
     RETURN project (PROJECT (dl_narrow, iesp.transform_dl_bps (Left)), iesp.bps_share.t_BpsReportDriverLicense);
   END;
-  
+
   //****************************************************//
   // LeinsandJudgement Transform Function               //
-  //****************************************************//  
-  
+  //****************************************************//
+
   EXPORT iesp.bizreport.t_BizLienJudgment ProjectLiens (dataset(LiensV2_Services.layout_lien_rollup) ljdata) := FUNCTION
     iesp.bizreport.t_BizLienJudgment projectLiensJudgments (ljdata ds):=transform
       Self.FilingType:=ds.filings[1].filing_type_desc;//ds.orig_filing_type;
@@ -136,10 +136,10 @@ EXPORT Functions := MODULE
       Self.Defendant.Page :=ds.filings[1].filing_page;
       Self.Defendant.OtherCaseNumber :='';
     end;
-  
+
     RETURN PROJECT (ljdata, projectLiensJudgments (Left));
   END;
-    
+
 
 
   //****************************************************//
@@ -148,25 +148,25 @@ EXPORT Functions := MODULE
   EXPORT iesp.addressreport.t_AddrReportPresentResident ProjectPresentResidents (dataset(AddressReport_Services.Layouts.residents_final_out) res,
                                                                                  boolean isLocationReport) := FUNCTION
     iesp.addressreport.t_AddrReportPresentResident SetCurrent (res l) := TRANSFORM
-      self.identity      := l.identity;
+      self.identity     := l.identity;
       self.AKAs         := choosen(l.akas,iesp.constants.AR.MaxAkas);
       self.Phones       := if(isLocationReport, l.CurrentPhone, dataset([], iesp.addressreport.t_AddrReportRealTimePhone));
-      hris              := project(L.hri_address, transform(iesp.share.t_RiskIndicator, 
-                                                                          self.RiskCode := left.hri, 
+      hris              := project(L.hri_address, transform(iesp.share.t_RiskIndicator,
+                                                                          self.RiskCode := left.hri,
                                                                           self.Description := left.desc));
       addr              := iesp.ECL2ESP.SetAddress (L.prim_name, L.prim_range, L.predir, L.postdir,
-                                                    L.suffix, L.unit_desig, L.sec_range, L.city_name, 
+                                                    L.suffix, L.unit_desig, L.sec_range, L.city_name,
                                                     L.st, L.zip, L.zip4, '');
       dt_last_seen      := iesp.ECL2ESP.toDateYM(L.addr_dt_last_seen);
-      dt_first_seen      := iesp.ECL2ESP.toDateYM(L.addr_dt_first_seen);
+      dt_first_seen     := iesp.ECL2ESP.toDateYM(L.addr_dt_first_seen);
       self.Address.HighRiskIndicators := if(isLocationReport, hris, dataset([], iesp.share.t_RiskIndicator));
-      Self.Address       := if(isLocationReport, addr, row([], iesp.share.t_Address));
+      Self.Address      := if(isLocationReport, addr, row([], iesp.share.t_Address));
       self.DateLastSeen := if(isLocationReport, dt_last_seen, row([], iesp.share.t_Date));
       self.DateFirstSeen:= if(isLocationReport, dt_first_seen, row([], iesp.share.t_Date));
-      self.Height        := if(isLocationReport, L.height, '');
-      self.Weight        := if(isLocationReport, L.weight, '');
+      self.Height       := if(isLocationReport, L.height, '');
+      self.Weight       := if(isLocationReport, L.weight, '');
       self.HairColor    := if(isLocationReport, L.hair_color, '');
-      self.EyeColor      := if(isLocationReport, L.eye_color, '');
+      self.EyeColor     := if(isLocationReport, L.eye_color, '');
     END;
 
     RETURN PROJECT (res, SetCurrent (Left));
@@ -181,16 +181,16 @@ EXPORT Functions := MODULE
       self.CurrentPhone := project(l.CurrentPhone, iesp.share.t_PhoneInfo)[1]; //Prior Residents only has one CurrentPhone record
     END;
     RETURN PROJECT (res, SetPrior (Left));
-  END;  
+  END;
   //****************************************************//
   // Business Data Transform Function                      //
   //****************************************************//
 
   EXPORT iesp.addressreport.t_AddrReportBusiness ProjectBusiness (dataset(layouts.layout_Business_out) bus) := FUNCTION
-    
+
     iesp.addressreport.t_AddrReportBusIdentity SetIdentity (bus l) := TRANSFORM
       self.Name                :=l.company_name;
-      self.phone10            :=(string) l.phone;
+      self.phone10             :=(string) l.phone;
       self.fein                :=(string) l.fein;
       self.uniqueid            :=(string) l.bdid;
       self.BusinessIds.DotID   := l.dotid;
@@ -202,7 +202,7 @@ EXPORT Functions := MODULE
       self.BusinessIds.OrgID   := l.orgid;
     END;
     identity_recs:=PROJECT (bus, SetIdentity (Left));
-    
+
     iesp.addressreport.t_AddrReportBusiness SetBus (bus l) := TRANSFORM
       Self.address := iesp.ECL2ESP.SetAddress (L.prim_name, L.prim_range, L.predir, L.postdir,
             L.addr_suffix, L.unit_desig, L.sec_range, L.city, L.state, L.zip, L.zip4, '');
@@ -210,10 +210,10 @@ EXPORT Functions := MODULE
     END;
 
     RETURN PROJECT (choosen(bus,1), SetBus (Left));
-    
-    
+
+
   END;
-  
+
   //****************************************************//
   // Property Transform Function                         //
   //****************************************************//
@@ -229,7 +229,7 @@ EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Ser
     seller :=  L.parties (party_type = 'S')[1];
 
     SELF.SellerAddress := iesp.ECL2ESP.SetAddress (
-          seller.prim_name, seller.prim_range, seller.predir, seller.postdir, seller.suffix, 
+          seller.prim_name, seller.prim_range, seller.predir, seller.postdir, seller.suffix,
           seller.unit_desig, seller.sec_range, seller.v_city_name, seller.st, seller.zip,
           seller.zip4, seller.county_name);
     SELF.ParcelNumber := if(l.fid_type='D',deed.fares_iris_apn,Assess.fares_iris_apn);//L.fapn;
@@ -240,11 +240,11 @@ EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Ser
     SELF.NameOwner1 := FormatName(buyer.entity[1]);//l.Name_Owner_1;
     SELF.NameOwner2 := FormatName(buyer.entity[2]);//l.Name_Owner_2;
     SELF.Address := iesp.ECL2ESP.SetAddress (
-          prop.prim_name, prop.prim_range, prop.predir, prop.postdir, prop.suffix, 
+          prop.prim_name, prop.prim_range, prop.predir, prop.postdir, prop.suffix,
           prop.unit_desig, prop.sec_range, prop.v_city_name, prop.st, prop.zip,
           prop.zip4, prop.county_name);
     SELF.OwnerAddress := iesp.ECL2ESP.SetAddress (
-          buyer.prim_name, buyer.prim_range, buyer.predir, buyer.postdir, buyer.suffix, 
+          buyer.prim_name, buyer.prim_range, buyer.predir, buyer.postdir, buyer.suffix,
           buyer.unit_desig, buyer.sec_range, buyer.v_city_name, buyer.st, buyer.zip,
           buyer.zip4, buyer.county_name);
 
@@ -270,7 +270,7 @@ EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Ser
     SELF.LegalDescription := if(l.fid_type='D',deed.legal_brief_description,assess.legal_brief_description);
     SELF.MortgageAmount := iesp.ECL2ESP.FormatDollarAmount (deed.first_td_loan_amount);
     // SELF.MortgageTermCode := '';//l.MortgageTermCode;
-    SELF.MortgageTerm := deed.fares_mortgage_term + if (deed.fares_mortgage_term_code_desc != '', 
+    SELF.MortgageTerm := deed.fares_mortgage_term + if (deed.fares_mortgage_term_code_desc != '',
                                                         ' ' + deed.fares_mortgage_term_code_desc, '');
     SELF.DocumentType := deed.document_type_desc;
     SELF.DocumentNumber := deed.document_number;
@@ -343,8 +343,8 @@ END;
 export projectRelativeAssociate(dataset(AddressReport_Services.Layouts.rel_asst_layout) in_ds) := function
   iesp.addressreport.t_AddrReportRelativeAssociate set_rel_assoc(in_ds L) := transform
     self.ResidentUniqueId := (string)L.person1;
-    self.UniqueId          := (string)L.person2;
-    self.Name              := iesp.ECL2ESP.SetName(L.fname, L.mname, L.lname, L.name_suffix, L.title, ''); 
+    self.UniqueId         := (string)L.person2;
+    self.Name             := iesp.ECL2ESP.SetName(L.fname, L.mname, L.lname, L.name_suffix, L.title, '');
     self.DOB              := iesp.ECL2ESP.toDate(L.dob);
     self.Address          := iesp.ECL2ESP.SetAddress (L.prim_name, L.prim_range, L.predir, L.postdir,
                                                       L.suffix, L.unit_desig, L.sec_range, L.city_name,
@@ -362,33 +362,33 @@ end;
 export projectVehicles(dataset(VehicleV2_Services.Layout_Report) in_ds,
                        AddressReport_Services.Layouts.in_address in_addr) := function
   AddressReport_Services.Layouts.iesp_addrpt_possveh_plusdid_layout set_vehicles(in_ds L) := transform
-    reg                     := L.registrants(prim_range = in_addr.prim_range and 
-                                            prim_name = in_addr.prim_name and 
+    reg                     := L.registrants(prim_range = in_addr.prim_range and
+                                            prim_name = in_addr.prim_name and
                                             addr_suffix = in_addr.suffix and
-                                            (v_city_name = in_addr.v_city_name or v_city_name = in_addr.p_city_name) and 
-                                            st = in_addr.st and 
+                                            (v_city_name = in_addr.v_city_name or v_city_name = in_addr.p_city_name) and
+                                            st = in_addr.st and
                                             zip5 = in_addr.zip);
-    // Set boolean if the Vehicle registrant address is the same as the reported on address 
+    // Set boolean if the Vehicle registrant address is the same as the reported on address
     boolean regaddr_sameas_rptaddr := exists(reg);
-    reg_to_use               := if(regaddr_sameas_rptaddr, reg[1], L.registrants[1]);
+    reg_to_use              := if(regaddr_sameas_rptaddr, reg[1], L.registrants[1]);
     self.YearMake           := (integer4) L.model_year;
     self.Make               := L.make_desc;
-    self.Model               := L.model_desc;
+    self.Model              := L.model_desc;
     self.MajorColor         := L.major_color_desc;
     self.MinorColor         := L.minor_color_desc;
-    self.BodyStyle           := L.body_style_desc;
-    self.RegistrantName     := iesp.ECL2ESP.SetName(reg_to_use.fname, reg_to_use.mname, reg_to_use.lname, reg_to_use.name_suffix, '', ''); 
-    self.RegistrantAddress   := iesp.ECL2ESP.SetAddress (reg_to_use.prim_name, reg_to_use.prim_range, reg_to_use.predir, reg_to_use.postdir,
-                                                      reg_to_use.addr_suffix, reg_to_use.unit_desig, reg_to_use.sec_range, reg_to_use.v_city_name,
-                                                      reg_to_use.st, reg_to_use.zip5, reg_to_use.zip4, '');
-    self.VIN                 := L.vin;
+    self.BodyStyle          := L.body_style_desc;
+    self.RegistrantName     := iesp.ECL2ESP.SetName(reg_to_use.fname, reg_to_use.mname, reg_to_use.lname, reg_to_use.name_suffix, '', '');
+    self.RegistrantAddress  := iesp.ECL2ESP.SetAddress (reg_to_use.prim_name, reg_to_use.prim_range, reg_to_use.predir, reg_to_use.postdir,
+                                                        reg_to_use.addr_suffix, reg_to_use.unit_desig, reg_to_use.sec_range, reg_to_use.v_city_name,
+                                                        reg_to_use.st, reg_to_use.zip5, reg_to_use.zip4, '');
+    self.VIN                := L.vin;
     self.PlateNumber        := reg_to_use.reg_license_plate;
     self.ResidentUniqueId          := ''; // null for now, will be filled in by the calling function
     self.AssociatedToReportAddress := regaddr_sameas_rptaddr;
     self.ReportedName := reg_to_use.Reported_Name;
     self.registrant_did            := (unsigned6) reg_to_use.append_did;
   end;
-  return project(in_ds, set_vehicles(left));  
+  return project(in_ds, set_vehicles(left));
 end;
 
   //**************************************************** //
@@ -397,20 +397,20 @@ end;
 export projectHuntFish(dataset(iesp.huntingfishing.t_HuntFishRecord) in_ds,
                                AddressReport_Services.Layouts.in_address in_addr) := function
   AddressReport_Services.Layouts.iesp_addrpt_posshf_plusdid_layout tf_hunt_fish(in_ds L) := transform
-    // Set boolean if the HF address is the same as the reported on address 
-    hfaddr_sameas_rptaddr := (L.Address.StreetNumber = in_addr.prim_range   and 
-                              L.Address.StreetName   = in_addr.prim_name    and 
-                              L.Address.StreetSuffix = in_addr.suffix       and 
+    // Set boolean if the HF address is the same as the reported on address
+    hfaddr_sameas_rptaddr := (L.Address.StreetNumber = in_addr.prim_range   and
+                              L.Address.StreetName   = in_addr.prim_name    and
+                              L.Address.StreetSuffix = in_addr.suffix       and
                               (L.Address.City = in_addr.v_city_name or
-                               L.Address.City = in_addr.p_city_name)        and 
-                              L.Address.State        = in_addr.st           and 
+                               L.Address.City = in_addr.p_city_name)        and
+                              L.Address.State        = in_addr.st           and
                               L.Address.Zip5         = in_addr.zip);
     self.Name               := L.Name;
     self.SSN                := L.SSN;
-    self.Address             := L.Address;
+    self.Address            := L.Address;
     self.LicenseType        := L.LicenseType;
     self.HomeState          := L.HomeState;
-    self.LicenseState        := L.LicenseState;
+    self.LicenseState       := L.LicenseState;
     self.IssueDate          := L.LicenseDate;
     self.ResidentUniqueId          := ''; // null for now, will be filled in by the calling function
     self.AssociatedToReportAddress := hfaddr_sameas_rptaddr;
@@ -441,12 +441,12 @@ end;
 export projectSexOffenders(dataset(SexOffender_Services.Layouts.t_OffenderRecord_plus) in_ds) := function
   iesp.addressreport.t_AddrReportPossibleSexOffense set_sex_off(in_ds L) := transform
     self.Name               := L.Name;
-    self.Address             := L.Address;
-    self.DOB                 := L.DOB;
+    self.Address            := L.Address;
+    self.DOB                := L.DOB;
     self.Height             := L.PhysicalCharacteristics.Height;
     self.Weight             := L.PhysicalCharacteristics.Weight;
     self.Race               := L.PhysicalCharacteristics.Race;
-    self.Convictions         := choosen(L.Convictions, iesp.Constants.SEXOFF_MAX_COUNT_CONVICTIONS);
+    self.Convictions        := choosen(L.Convictions, iesp.Constants.SEXOFF_MAX_COUNT_CONVICTIONS);
     self.OffenderStatus     := L.OffenderStatus;
     self.ScarsMarksTattoos  := if(L.ScarsMarksTattoos <> '', L.ScarsMarksTattoos, L.PhysicalCharacteristics.ScarsMarksTattoos);
     self.ImageLink          := L.ImageLink;
@@ -461,7 +461,7 @@ export projectOtherOccupants(dataset(iesp.bpsreport.t_NeighborAddressSlim) in_ds
   iesp.addressreport.t_AddrReportPossibleOccupants set_other_occupants(in_ds L) := transform
     self.Address          := L.Address;
     self.Occupants        := project(L.Residents, iesp.addressreport.t_AddrReportIdentitySlim);
-    self.Phones            := L.Phones;
+    self.Phones           := L.Phones;
   end;
   return project(in_ds, set_other_occupants(left));
 end;
@@ -471,120 +471,139 @@ end;
   //****************************************************//
 export projectPossibleOwner(dataset(AddressReport_Services.Layouts.possible_owner_layout) in_ds) := function
   iesp.addressreport.t_AddrReportPossibleOwner set_owner(in_ds L) := transform
-    self.Name              := iesp.ECL2ESP.SetNameAndCompany(L.fname, L.mname, L.lname, L.name_suffix, L.title, '', L.company_name); 
+    self.Name             := iesp.ECL2ESP.SetNameAndCompany(L.fname, L.mname, L.lname, L.name_suffix, L.title, '', L.company_name);
     self.Address          := iesp.ECL2ESP.SetAddress (L.prim_name, L.prim_range, L.predir, L.postdir,
                                                       L.suffix, L.unit_desig, L.sec_range, L.city_name,
                                                       L.st, L.zip, L.zip4, '');
     self.Phone10          := L.phone;
   end;
   return project(in_ds, set_owner(left));
-end;  
+end;
 
 shared inputParams:= AutoStandardI.GlobalModule();
 
-shared fCriminalRecords(dataset(CriminalRecords_Services.layouts.l_search) in_recs) := function
-  crim_mod := module(project(inputParams,CriminalRecords_Services.IParam.report,  opt))
-    export boolean   IncludeAllCriminalRecords := true;
-    export boolean   IncludeSexualOffenses := true; //shouldn't this be set to false...
-    export string25    doc_number:='';
-    export string60    offender_key:='';
+shared fCriminalRecords(dataset(CriminalRecords_Services.layouts.l_search) in_recs, doxie.IDataAccess mod_access) := function
+  crim_mod := module(project(inputParams,CriminalRecords_Services.IParam.report, opt))
+    doxie.compliance.MAC_CopyModAccessValues(mod_access);
+    export boolean  IncludeAllCriminalRecords := true;
+    export boolean  IncludeSexualOffenses := true; //shouldn't this be set to false...
+    export string25 doc_number:='';
+    export string60 offender_key:='';
   end;
   crim_recs   := CriminalRecords_Services.Raw.getOffenderraw(in_recs);
-  f_crim_recs  := CriminalRecords_Services.ReportService_Records.applyRulesAndFormatCrimRecs(crim_recs,crim_mod);
-  /* Note: the above call gets the Non-FCRA results in the FCRA layout. 
+  f_crim_recs := CriminalRecords_Services.ReportService_Records.applyRulesAndFormatCrimRecs(crim_recs,crim_mod);
+  /* Note: the above call gets the Non-FCRA results in the FCRA layout.
   So transform to Non-FCRA layout is needed. */
   result      := project(f_crim_recs.CriminalRecords,iesp.criminal.t_CrimReportRecord);
   return result;
-end;  
-                        
-export fCrimes():= function
+end;
+
+export fCrimes(doxie.IDataAccess mod_access):= function
   crim_module := module(project (inputParams,CriminalRecords_Services.IParam.ak_params,  opt))
     export boolean workHard := true;
     export boolean noFail := false;
     export boolean isdeepDive := false;
   end;
   crim_ids  := CriminalRecords_Services.Autokey_ids.val(crim_module);
-  result     := fCriminalRecords(crim_ids);
+  result    := fCriminalRecords(crim_ids, mod_access);
   return result;
 end;
 
-export fCrimesRecords(dataset(doxie.layout_references) in_dids) := function
+export fCrimesRecords(dataset(doxie.layout_references) in_dids, doxie.IDataAccess mod_access) := function
   crim_ids  := CriminalRecords_Services.Raw.getOffenderKeys.byDIDs(in_dids);
-  result     := fCriminalRecords(crim_ids);
+  result    := fCriminalRecords(crim_ids, mod_access);
   return result;
 end;
 
-export fSexOffendors():=FUNCTION   
+export fSexOffendors(doxie.IDataAccess mod_access):=FUNCTION
+  //a workaround for HPCC-23091 (or similar); see comments for fSexOffenderRecords below.
+  ma := doxie.compliance.GetGlobalDataAccessModuleTranslated(inputParams);
+
   OffenderTempmod := module(project(inputParams,SexOffender_Services.IParam.search,opt));
-     export boolean include_regaddrs   := false; 
-     export boolean include_unregaddrs := false;
-     export boolean include_histaddrs  := false;
-     export boolean include_assocaddrs := false;
-     export boolean include_offenses := true;
-     export boolean include_bestaddress := true;
+    doxie.compliance.MAC_CopyModAccessValues(ma);
+    export boolean include_regaddrs   := false;
+    export boolean include_unregaddrs := false;
+    export boolean include_histaddrs  := false;
+    export boolean include_assocaddrs := false;
+    export boolean include_offenses := true;
+    export boolean include_bestaddress := true;
   end;
   SexOffendorRawRecords:=sexOffender_Services.search_Records.val(OffenderTempmod);
     // set the maxresults_val that is used in Alerts.mac_ProcessAlerts
   unsigned8 maxresults_val := Constants.MaxSexualOffenses;
-    RESULT:=project(SexOffendorRawRecords, 
-  TRANSFORM(iesp.sexualoffender.t_OffenderRecord, 
+  RESULT:=project(SexOffendorRawRecords,
+  TRANSFORM(iesp.sexualoffender.t_OffenderRecord,
       SELF:=LEFT;
       SELF:=[];));
   RETURN RESULT;
-END;    
+END;
 
-export fSexOffenderRecords(dataset(doxie.layout_references) in_dids, 
-                           string32 ApplicationType) := function
-  so_dids      := project(in_dids, SexOffender_Services.layouts.search_did);
+export fSexOffenderRecords(dataset(doxie.layout_references) in_dids, doxie.IDataAccess mod_access) := function
+  so_dids     := project(in_dids, SexOffender_Services.layouts.search_did);
   so_id_recs  := SexOffender_Services.Raw.byDIDs(so_dids);
-  so_mod := module(project(inputParams,SexOffender_Services.IParam.search,opt));
-     export boolean include_regaddrs   := false; 
-     export boolean include_unregaddrs := false;
-     export boolean include_histaddrs  := false;
-     export boolean include_assocaddrs := false;
-     export boolean include_offenses := true;
-     export boolean include_bestaddress := true;
+
+  //a workaround for HPCC-23091 (or similar);
+  ma := doxie.compliance.GetGlobalDataAccessModuleTranslated(inputParams);
+  //This is probably safe, since mod_access must have the same values.
+
+  //if input mod_access is used instead, this code fails when compiling the query:
+  // SexOffender_Services.Layouts.t_OffenderRecord_plus form() := TRANSFORM
+  //   SELF.name_orig := so_mod.application_type + (string)so_mod.isValidGlb();
+  //   SELF := [];
+  // END;
+  // results := DATASET([form()]);
+
+  so_mod := module(project(inputParams,SexOffender_Services.IParam.search,opt))
+    doxie.compliance.MAC_CopyModAccessValues(ma);
+    // doxie.compliance.MAC_CopyModAccessValues(mod_access);
+    export boolean include_regaddrs   := false;
+    export boolean include_unregaddrs := false;
+    export boolean include_histaddrs  := false;
+    export boolean include_assocaddrs := false;
+    export boolean include_offenses := true;
+    export boolean include_bestaddress := true;
   end;
+
   results     := sexOffender_Services.search_Records.getRecordsAndApplyRules(so_id_recs, so_mod); //gives same results as sexOffender_Services/search_records.val, but gets so ids using DID
   return results;
 end;
 
-export fHuntingAndFishing(doxie.IDataAccess mod_access):=function 
-    hunting_ID_params  := module(project(inputParams, hunting_fishing_services.AutoKey_IDs.params,opt));
+export fHuntingAndFishing(doxie.IDataAccess mod_access):=function
+    hunting_ID_params := module(project(inputParams, hunting_fishing_services.AutoKey_IDs.params,opt));
                           end;
-    hunting_Rids      := hunting_fishing_services.AutoKey_IDs.val(hunting_ID_params); 
+    hunting_Rids      := hunting_fishing_services.AutoKey_IDs.val(hunting_ID_params);
     hunting_Raw_recs  := join(hunting_Rids,eMerges.Key_HuntFish_Rid(),
                               (keyed(left.rid= right.rid)),
                                transform(hunting_fishing_services.Layouts.raw_rec,
                                 self:=left,
-                                self:=right), 
+                                self:=right),
                               limit(0), keep(1));
     in_mod := module(project(inputParams,hunting_fishing_Services.Search_Records.params,  opt))
                 doxie.compliance.MAC_CopyModAccessValues(mod_access);
               end;
     hfSearch          := hunting_fishing_Services.Search_Records;
-    result            := hfSearch.formatandFilterRawRecords(hunting_Raw_recs,in_mod);    
+    result            := hfSearch.formatandFilterRawRecords(hunting_Raw_recs,in_mod);
     return result;
 end;
 
 shared fConcealedWeaponsPermits(dataset(ccw_services.Layouts.search_rid) in_recs) := function
-  cw_mod       := module(project(inputParams,CCW_services.SearchService_Records.params,  opt))end;
+  cw_mod      := module(project(inputParams,CCW_services.SearchService_Records.params,  opt))end;
   cw_rid_recs := CCW_services.Raw.byRids(in_recs);
   result      := ccw_services.SearchService_Records.getFormatedRecords(cw_rid_recs,cw_mod);
-  return result;                                
+  return result;
 end;
-                                
+
 export fWeaponsPermits():=Function
-  Weapons_ID_params  := module(project(inputParams,CCW_services.AutoKey_IDs.params,opt));
+  Weapons_ID_params := module(project(inputParams,CCW_services.AutoKey_IDs.params,opt));
                         end;
-  Weapons_IDs        := CCW_services.AutoKey_IDs.val(Weapons_ID_params); 
+  Weapons_IDs       := CCW_services.AutoKey_IDs.val(Weapons_ID_params);
   result            := fConcealedWeaponsPermits(Weapons_IDs);
   return result;
 end;
 
 export fWeaponsPermitsRecords(dataset(doxie.layout_references) in_dids) := function
   cw_id_recs := CCW_Services.Raw.byDIDs(project(in_dids, CCW_services.Layouts.search_did));
-  result      := fConcealedWeaponsPermits(cw_id_recs);
+  result     := fConcealedWeaponsPermits(cw_id_recs);
   return result;
 end;
 
@@ -594,13 +613,13 @@ export fAddDriverInfo(dataset(AddressReport_Services.Layouts.residents_final_out
   m_Resident xformDriverInfo(m_Resident L, ds_driver R) := transform
     self.height     := R.height;
     self.weight     := R.weight;
-    self.eye_color   := R.eye_color;
-    self.hair_color  := R.hair_color;
+    self.eye_color  := R.eye_color;
+    self.hair_color := R.hair_color;
     self            := L;
   end;
   result     := join(m_Resident, ds_driver,
                     left.did = right.did,
-                    xformDriverInfo(left, right), 
+                    xformDriverInfo(left, right),
                     left outer, limit(0), keep(1));
   return result;
 end;
@@ -610,7 +629,7 @@ export fPossibleOwners(dataset(AddressReport_Services.Layouts.in_address) in_rec
 
   owner_key := LN_PropertyV2.key_ownership.addr();
   id_rec1 := join(in_recs, owner_key,
-                  keyed(left.prim_range = right.prim_range) and 
+                  keyed(left.prim_range = right.prim_range) and
                   keyed(left.predir = right.predir) and
                   keyed(left.prim_name = right.prim_name) and
                   keyed(left.suffix = right.addr_suffix) and
@@ -619,11 +638,11 @@ export fPossibleOwners(dataset(AddressReport_Services.Layouts.in_address) in_rec
                   keyed(left.zip = right.zip5),
                   transform(right),
                   limit(ut.limits.DEFAULT));
-  
+
   // ...and when we don't get exact hits, try omitting the sec_range
   // narrow inputs to those not successfully handled in previous block
   in_recs2 := join(in_recs(sec_range<>''), id_rec1,
-                  left.prim_range = right.prim_range and 
+                  left.prim_range = right.prim_range and
                   left.predir = right.predir and
                   left.prim_name = right.prim_name and
                   left.suffix = right.addr_suffix and
@@ -633,7 +652,7 @@ export fPossibleOwners(dataset(AddressReport_Services.Layouts.in_address) in_rec
                   transform(recordof(in_recs), self.sec_range := '', self := left),
                   left only);
   id_rec2 := if(exists(in_recs2), join(in_recs2, owner_key,
-                                        keyed(left.prim_range = right.prim_range) and 
+                                        keyed(left.prim_range = right.prim_range) and
                                         keyed(left.predir = right.predir) and
                                         keyed(left.prim_name = right.prim_name) and
                                         keyed(left.suffix = right.addr_suffix) and
@@ -662,7 +681,7 @@ export fPossibleOwners(dataset(AddressReport_Services.Layouts.in_address) in_rec
   bdid_rec := project(own_filt(isBDID), transform(doxie_cbrs.layout_references, self.bdid := left.id));
   did_rec := project(own_filt(~isBDID), transform(doxie.layout_references, self.did := left.id));
 
-  bus_rec := project(doxie_cbrs.best_records_bdids(bdid_rec), 
+  bus_rec := project(doxie_cbrs.best_records_bdids(bdid_rec),
                       transform(AddressReport_Services.Layouts.possible_owner_layout,
                                 self := left,
                                 self.addr_dt_last_seen := (integer)left.dt_last_seen,
@@ -684,86 +703,88 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
     self.addr     := Address.Addr1FromComponents(L.prim_range, L.predir, L.prim_name,
                                                        L.suffix, L.postdir, L.unit_desig, L.sec_range);
     self          := L;
-  end; 
+  end;
   rtp_in := project(in_res, addCounter(left, counter));
-  
+
   in_gateways := Gateway.Configuration.Get();
-  
+
   rtp_mod := module(project(inputParams, BatchServices.RealTimePhones_Params.Params,opt));
     export boolean UseQSENTV2 := true;
-    export boolean failOnError := false; 
-    export string5 serviceType := ''; 
+    export boolean failOnError := false;
+    export string5 serviceType := '';
   end;
-  
+
   gw_out_rec := record   //temporary structure to hold all resulting rows for each request (acct).
     unsigned6 rec_no;
-    dataset(Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse) gw_results {maxcount(batchServices.constants.RealTime.REALTIME_PHONE_LIMIT)};  
+    dataset(Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext) gw_results {maxcount(batchServices.constants.RealTime.REALTIME_PHONE_LIMIT)};
   end;
-  qsent_out_rec := record(Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse)          //final gtw output layout = t_PhoneplusSearchResponse
+  qsent_out_rec := record(Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext)          //final gtw output layout = t_PhoneplusSearchResponse
    unsigned6 rec_no;                                                                       //with rec_no added
-  end;  
-  
+  end;
+
   gw_out_rec  getGateway(rtp_in L) := TRANSFORM
     in_mod := MODULE(project(rtp_mod,BatchServices.RealTimePhones_Params.params,opt))
       export string15 phone     := '';
-      export string30 firstname  := L.fname;
+      export string30 firstname := L.fname;
       export string30 lastname  := L.lname;
       export string200 addr     := L.addr;
       export string25 city      := L.city_name;
       export string2 state      := L.st;
       export string6 zip        := L.zip;
     end;
-    gw_results_res := choosen(doxie_raw.RealTimePhones_Raw(in_gateways, 30, 0, in_mod, call_gateway),  batchServices.constants.RealTime.REALTIME_PHONE_LIMIT);
-    self.gw_results := gw_results_res;                           
-    self.rec_no := l.rec_no;  
+    gw_results_res := choosen(doxie_raw.RealTimePhones_Raw(in_mod, in_gateways, 30, 0, call_gateway),  batchServices.constants.RealTime.REALTIME_PHONE_LIMIT);
+    self.gw_results := gw_results_res;
+    self.rec_no := l.rec_no;
   end;
-  gw_recs := project(rtp_in, getGateway(Left)) ;  
+  gw_recs := project(rtp_in, getGateway(Left)) ;
 
-  qsent_out_rec flat_recs(gw_out_rec L, Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse R) := transform
-   self.rec_no             := L.rec_no;
-   self.dt_first_seen     := iesp.ECL2ESP.t_DateToString8(R.RealTimePhone_Ext.ListingCreationDate);
-   self.dt_last_seen       := iesp.ECL2ESP.t_DateToString8(R.RealTimePhone_Ext.ListingTransactionDate);
-   self                   := R; 
+  qsent_out_rec flat_recs(gw_out_rec L, Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext R) := transform
+    self.rec_no := L.rec_no;
+    _dt_first_seen := iesp.ECL2ESP.t_DateToString8(R.RealTimePhone_Ext.ListingCreationDate);
+    _dt_last_seen := iesp.ECL2ESP.t_DateToString8(R.RealTimePhone_Ext.ListingTransactionDate);
+    self.dt_first_seen := _dt_first_seen;
+    self.dt_last_seen := IF(_dt_last_seen <> '', _dt_last_seen, _dt_first_seen);
+    self := R;
   end;
   //flatten results to filter and get hriPhone and timezone
   rtp_out   := NORMALIZE(gw_recs,LEFT.gw_results, flat_recs(LEFT, RIGHT));
-  rtp_filt  := sort(dedup(sort(rtp_out(ut.DaysApart(dt_last_seen, (STRING)Std.Date.Today()) < AddressReport_Services.Constants.DAYS_IN_YEAR), 
-                               rec_no, phone, -dt_last_seen), 
-                          rec_no, phone), 
+  rtp_filt  := sort(dedup(sort(rtp_out(ut.DaysApart(dt_last_seen, (STRING)Std.Date.Today()) < AddressReport_Services.Constants.DAYS_IN_YEAR),
+                               rec_no, phone, -dt_last_seen),
+                          rec_no, phone),
                     rec_no, -dt_last_seen);
   maxHriPer_value  := iesp.Constants.MaxCountHRI;
   doxie.mac_AddHRIPhone(rtp_filt,rtp_out_hri);
   ut.getTimeZone(rtp_out_hri,phone,timezone,rtp_out_hri_w_tzone);
-  
+
   //Calculate Royalties and carry in separate dataset
   Royalty.MAC_RoyaltyQSENT(rtp_out, qsent_royalties, false, call_gateway);
-  
+
   iesp.addressreport.t_AddrReportRealTimePhone xformPhones(qsent_out_rec R) := transform
     self.Phone10            :=r.phone;
     self.PubNonpub          :='';
-    self.ListingPhone10      :='';
+    self.ListingPhone10     :='';
     self.ListingName        :=r.Listed_Name;
-    self.TimeZone            :=r.timezone;
+    self.TimeZone           :=r.timezone;
     self.ListingTimeZone    :='';
-    hri_phones               := project(r.hri_phone, 
-                              transform(iesp.share.t_RiskIndicator, 
-                                        self.RiskCode := left.hri, 
+    hri_phones              := project(r.hri_phone,
+                              transform(iesp.share.t_RiskIndicator,
+                                        self.RiskCode := left.hri,
                                         self.Description := left.desc));
     self.HighRiskIndicators := choosen(hri_phones, iesp.Constants.MaxCountHRI);
     self.CarrierName        := r.carrier_name;
     self := []; //Messages
   end;
-  
+
   in_res add_phones(in_res L, dataset(qsent_out_rec) R):=transform
     self.CurrentPhone := project(R, xformPhones(left));
     self:=L;
   end;
-    
-  rtp_results := denormalize(rtp_in, rtp_out_hri_w_tzone, 
+
+  rtp_results := denormalize(rtp_in, rtp_out_hri_w_tzone,
                             left.rec_no = right.rec_no,
                             group,
                             add_phones(left, rows(right)));
-  
+
   AddressReport_Services.Layouts.residents_final_out_w_royalties xformRTPhones() := transform
     self.Royalties  := qsent_royalties;
     self.residents  := rtp_results;
