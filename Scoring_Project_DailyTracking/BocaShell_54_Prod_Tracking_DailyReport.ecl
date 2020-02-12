@@ -19,6 +19,8 @@ ds_curr := dataset(tag + 'scoringqa::out::fcra::bocashell_54_historydate_999999_
 
 filenames_details :=  nothor(STD.File.LogicalFileList('scoringqa::out::fcra::bocashell_54_historydate_999999_prod_*_1'));
 
+
+
 filelist := sort(filenames_details, -modified);
 
 p_file_name := filelist[2].name;
@@ -288,8 +290,8 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 																			SELF.line := (TRIM(LEFT.Field_Name) + filler)[1..70] +  (LEFT.Difference_count + filler)[1..25]  + LEFT.Difference_Percent + '%')),
 																			ds_no_diff);
 																			
-		// line_heading := ('Field Name' + filler)[1..70]  + 'Difference Count'[1..25] + 'Difference Percent';
-      line_heading := ('Field Name' + filler)[1..70]  + 'Difference Count'[1..16] + 'Difference Percent';
+		 line_heading := ('Field Name' + filler)[1..70]  + 'Difference Count'[1..25] + 'Difference Percent';
+      //line_heading := ('Field Name' + filler)[1..70]  + 'Difference Count'[1..16] + 'Difference Percent';
 
 		main_head := DATASET([{1,   'BocaShell 5.4 Prod Attributes Tracking Report' + '\n'
 													+ '*** This report is produced by Scoring QA ***' + '\n\n'
@@ -381,8 +383,10 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 		XtabOut := ITERATE(output_full, Xform(LEFT, RIGHT));
   	// OUTPUT(XtabOut, NAMED('XtabOut'));
 
-		final := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.general_list_all, 'BocaShell 5.4 Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
-									FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Bocashell_collections_fail_list,'BocaShell 5.4 Prod Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+		final := //FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.general_list_all, 'BocaShell 5.4 Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
+						FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.boca_54_list, 'BocaShell 5.4 Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
+												// FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Bocashell_collections_fail_list,'BocaShell 5.4 Prod Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+						FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Boca_54_list,'BocaShell 5.4 Prod Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
 
 		RETURN final;
 END;	
