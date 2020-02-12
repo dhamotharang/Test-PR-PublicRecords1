@@ -1,7 +1,8 @@
 //builds key and handles version control
 import crim_offense_cat, RoxieKeyBuild, dx_crim_offense_cat, std;
+#option('multiplePersistInstances',FALSE);
 export build_key(string filedate, boolean pUseProd = false)  := function
-    key_data := dataset(crim_offense_cat.Filenames(pUseProd).base, crim_offense_cat.layouts.base_layout, thor, __compressed__, opt):persist(crim_offense_cat.filenames(pUseProd).key + 'persist');   
+    key_data := dataset(crim_offense_cat.Filenames(pUseProd).base, crim_offense_cat.layouts.base_layout, thor, __compressed__):persist(crim_offense_cat.filenames(pUseProd).key + 'persist');   
     RoxieKeybuild.MAC_build_logical(
                                     dx_crim_offense_cat.key(pUseProd), 
                                     key_data, 

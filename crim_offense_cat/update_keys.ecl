@@ -23,6 +23,7 @@ export update_keys(string new_input_folder = '20200206', pUseProd = false) := fu
                                         )
                                 ),
                         crim_offense_cat.Mac_build_all(new_input_folder +'b', pUseProd), //runs key process once input is sprayed and version controlled
-                        update_orbit
+                        update_orbit,
+                        std.file.AddSuperFile(crim_offense_cat.filenames(pUseProd).processedIn, crim_offense_cat.filenames(pUseProd).BaseIn+ '::'+ new_input_folder)
                         );
 end;
