@@ -193,7 +193,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					
 					self := right;
 					self := left;
-					), LEFT OUTER, LOCAL);
+					), INNER, LOCAL);
 					
 	// add head of household as case name
 	ds3 := JOIN(DISTRIBUTE(ds2(case_last_name=''), HASH32(ProgramState,ProgramCode,CaseId)),
