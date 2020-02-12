@@ -1,4 +1,4 @@
-import liensV2,roxiekeybuild,ingenix_natlprof,ut,autokey,doxie,doxie_files;
+﻿import liensV2,roxiekeybuild,ingenix_natlprof,ut,autokey,doxie,doxie_files;
 
 export proc_build_liens_keys(string filedate) := function
 
@@ -15,7 +15,8 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(LiensV2.key_liens_irs_serial_number,'
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(LiensV2.key_liens_certificate_number,'~thor_data400::key::liensv2::main::certificate_number','~thor_data400::key::liensv2::'+filedate+'::main::certificate_number',liens_cert_nbr);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(doxie_files.Key_Bocashell_Liens_and_Evictions_V2,'~thor_data400::key::liensv2::bocashell_liens_and_evictions_did_v2','~thor_data400::key::liensv2::'+filedate+'::bocashell_liens_and_evictions_did_v2',liens_evic_v2);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(LiensV2.Key_LinkIds.key,'~thor_data400::key::liensv2::party::linkids','~thor_data400::key::liensv2::'+filedate+'::party::linkids',Liens_LinkID_key);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(liensV2.key_liens_party_ID_linkids,'~thor_data400::key::liensv2::party::tmsid.rmsid_linkids','~thor_data400::key::liensv2::'+filedate+'::party::tmsid.rmsid_linkids',liens_PID_linkids_key);
+//Deprecated Key - Jira DF-26975
+//RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(liensV2.key_liens_party_ID_linkids,'~thor_data400::key::liensv2::party::tmsid.rmsid_linkids','~thor_data400::key::liensv2::'+filedate+'::party::tmsid.rmsid_linkids',liens_PID_linkids_key);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(liensv2.key_liens_SourceRecID,'~thor_data400::key::liensv2::party::SourceRecId','~thor_data400::key::liensv2::'+filedate+'::party::SourceRecId',liens_SourceRecId_key);
 
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::liensv2::main::tmsid.rmsid', '~thor_data400::key::liensv2::'+filedate+'::main::TMSID.RMSID',mv_mid_key);
@@ -31,21 +32,21 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::liensv2::main::IRS_se
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::liensv2::main::certificate_number','~thor_data400::key::liensv2::'+filedate+'::main::certificate_number',mv_cert_nbr);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::liensv2::bocashell_liens_and_evictions_did_v2','~thor_data400::key::liensv2::'+filedate+'::bocashell_liens_and_evictions_did_v2',mv_liens_evic_v2);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::liensv2::party::linkids','~thor_data400::key::liensv2::'+filedate+'::party::linkids',mv_LinkID_key);
-RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::liensv2::party::tmsid.rmsid_linkids','~thor_data400::key::liensv2::'+filedate+'::party::tmsid.rmsid_linkids',mv_liens_PID_linkids_key);
+//RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::liensv2::party::tmsid.rmsid_linkids','~thor_data400::key::liensv2::'+filedate+'::party::tmsid.rmsid_linkids',mv_liens_PID_linkids_key);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::liensv2::party::SourceRecId', '~thor_data400::key::liensv2::'+filedate+'::party::SourceRecId', mv_SourceRecId_key);
                                         
 
 build_keys := sequential(
 														parallel
 														(	liens_MID_key,liens_PID_key, liens_DID_key,liens_BDID_key,liens_ssn_key,liens_taxID_key,liens_filing_key,
-															liens_case_number_key,liens_RMSID_key ,liens_IRS_key,liens_cert_nbr,liens_evic_v2,Liens_LinkID_key,liens_PID_linkids_key,liens_SourceRecId_key
+															liens_case_number_key,liens_RMSID_key ,liens_IRS_key,liens_cert_nbr,liens_evic_v2,Liens_LinkID_key,/*liens_PID_linkids_key,*/liens_SourceRecId_key
 														 ),
 														 liensv2.Proc_build_autokeys(filedate),
 														parallel
 														(	
 														mv_mid_key,mv_pid_key, mv_DID_key,mv_BDID_key,mv_ssn_key,mv_taxID_key,mv_filing_key,
 															mv_case_number_key, mv_RMSID_key,mv_IRS_key,mv_cert_nbr,mv_liens_evic_v2,
-															mv_LinkID_key,mv_liens_PID_linkids_key,mv_SourceRecId_key
+															mv_LinkID_key,/*mv_liens_PID_linkids_key,*/mv_SourceRecId_key
 														 ),
 														 LiensV2.proc_AcceptSK_ToQA,
 														 notify('LIENS KEY BUILD COMPLETE','*'),
