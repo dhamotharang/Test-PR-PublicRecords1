@@ -1183,6 +1183,9 @@
 		export string KEYWORD_SAMA									:= '869';
 		export string KEYWORD_CMLAGA								:= '870';
 		export string KEYWORD_EGMLCU								:= '871';
+		export string KEYWORD_FRAFA									:= '872';
+		export string KEYWORD_PTIMPIC								:= '873';
+		export string KEYWORD_JPCAA									:= '874';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

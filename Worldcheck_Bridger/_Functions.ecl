@@ -1285,6 +1285,9 @@
 				trim(kword, left, right) = 'SAMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_SAMA,
 				trim(kword, left, right) = 'CMLAGA' =>SubGroup_Constants.numKeywordsID.KEYWORD_CMLAGA,					
 				trim(kword, left, right) = 'EGMLCU' =>SubGroup_Constants.numKeywordsID.KEYWORD_EGMLCU,
+				trim(kword, left, right) = 'FRAFA' =>SubGroup_Constants.numKeywordsID.KEYWORD_FRAFA,
+				trim(kword, left, right) = 'PTIMPIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTIMPIC,
+				trim(kword, left, right) = 'JPCAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPCAA,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
