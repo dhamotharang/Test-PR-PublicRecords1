@@ -221,6 +221,14 @@ EXPORT parser_netwise_email := MODULE
      SELF.Name.Text        := IF(IS_SUPPRESSED, '', L.Name.Text);
      SELF.ImageRecords     := IF(IS_SUPPRESSED, dataset([], iesp.net_wise_share.t_NetWiseUrl), L.ImageRecords);
      SELF.PlaceRecords     := IF(IS_SUPPRESSED, dataset([], iesp.net_wise_share.t_NetWiseUrl), L.PlaceRecords);
+
+     // v--- 02/25/2020(RR-18527), chgs needed due to iesp.net_wise & iesp.net_wise_share ESP gw response.Results changes
+     SELF.PersonId             := IF(IS_SUPPRESSED, '', L.PersonId);
+     SELF.FullName             := IF(IS_SUPPRESSED, '', L.FullName);
+     SELF.FirstName            := IF(IS_SUPPRESSED, '', L.FirstName); 
+     SELF.LastName             := IF(IS_SUPPRESSED, '', L.LastName);
+     SELF.OptionalFieldMatches := IF(IS_SUPPRESSED, ROW([], iesp.net_wise_share.t_NetWiseOptionalFieldMatches),
+                                                    L.OptionalFieldMatches);
    END;
 
    ds_resp_clean := PROJECT(ds_resp_in_wseq, 
