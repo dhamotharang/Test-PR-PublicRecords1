@@ -19,6 +19,7 @@ export NameTypes := enum(UNSIGNED2,
 		export DerivedName2  	:= 1000000000000000b;		// second Individual name Derived from dual name
 		export MaleName  	 		:= 0000000001000000b;		// Likely Male Name
 		export FemaleName 	 	:= 0000000010000000b;		// Likely Female Name
+		export ParsedName 	 	:= 0000000100000000b;		// Originally Parsed Name
 
 		shared NameTypeBits := 111b;		// nametype bit map
 		shared NameQualityBits := 111000b;		// nametype bit map
