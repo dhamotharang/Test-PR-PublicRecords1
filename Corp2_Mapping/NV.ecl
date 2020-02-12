@@ -3,7 +3,7 @@
  
 export NV := module 
 
-	export Update(string fileDate, string version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false, pUseProd = Tools._Constants.IsDataland) := function
+	export Update(string fileDate, string version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false, pUseProd = false /*pUseProd = Tools._Constants.IsDataland*/) := function
 
 		state_origin 						:= 'NV';
 		state_fips	  					:= '32';	
@@ -197,7 +197,6 @@ export NV := module
 																											'EXPIRED' 						=> 'E',
 																											'ADMINISTRATIVE HOLD' => 'H',
 																											'');
-			self.corp_trademark_nbr                := corp2.t2u(l.Trademark_Number);
 			self.corp_trademark_filing_date        := Corp2_mapping.fValidateDate(l.Creation_Date).PastDate;
 			self.corp_trademark_expiration_date    := Corp2_mapping.fValidateDate(l.Expired_Date).GeneralDate;
 			self.recordorigin											 := 'C';

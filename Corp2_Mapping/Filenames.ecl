@@ -1098,15 +1098,18 @@ module
 			export Corporations            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporations::wa',landing_zone,,,,,pGroupname,,,'XML','Corporation',512*500,,,); 
 			export GoverningPersons        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::governingpersons::wa',landing_zone,,,,,pGroupname,,,'XML','Governor',512*500,,,); 
   		export DocumentTypes           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::documenttypes::wa',landing_zone,,,,,pGroupname,,,'XML','DocumentType',512*500,,,); 
+			export BusinessInfo            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::businessinfo::wa',landing_zone,,,,,pGroupname,,,'XML','BusinessInfo',512*500,,,); 
+
 
 			export dAll_filenames :=
 				  Corporations.dAll_filenames
 				+ GoverningPersons.dAll_filenames
 				+ DocumentTypes.dAll_filenames
+				+ BusinessInfo.dAll_filenames
 				;
 	
 	end;
-
+	
 	export wi_raw :=
 	module
 

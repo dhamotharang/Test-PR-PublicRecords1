@@ -2,14 +2,14 @@
 
 EXPORT Functions := Module
 		
+		EXPORT state_origin 					:= 'NV';
+		EXPORT state_desc	 						:= 'NEVADA';
+					 
 		//********************************************************************
 		//cleanName: Cleans up known issues with different Name fields
 		//********************************************************************		
 		EXPORT cleanName(string s) := FUNCTION
-					 state_origin 					:= 'NV';
-					 state_fips	  					:= '32';	
-					 state_desc	 						:= 'NEVADA';
-					 
+						 
 					 ucName := corp2.t2u(s);	
 					 
 				   ucNameMap :=  MAP(corp2.t2u(stringlib.stringFilterOut(ucName,'.X')) = ''           => '',
@@ -53,9 +53,6 @@ EXPORT Functions := Module
 		//cleanLegalName: Cleans up known issues with Legal name fields
 		//********************************************************************		
 		EXPORT cleanLegalName(string s) := FUNCTION
-					 state_origin 					:= 'NV';
-					 state_fips	  					:= '32';	
-					 state_desc	 						:= 'NEVADA';
 					 
 					 ucName := corp2.t2u(s);
 		

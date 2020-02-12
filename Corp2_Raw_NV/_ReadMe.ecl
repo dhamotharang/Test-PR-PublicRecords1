@@ -15,7 +15,7 @@ Source Structure:					Relational; There are five (5) ~ delimited text files in a
 																	4. Corporations.CrprtAct.998.currentdate  (Action records for AR & Events)
 																	5. Corporations.CrprtStc.998.currentdate  (Stock records)
 
-													Additionally, there are two (2) ~ delimited text files in a zip file with the  naming convention: 
+													Additionally, there are two (2) ~ delimited text files in a zip file with the naming convention: 
 															MARK.998.currentdate:  
 																 1. MARK.Mr.998.currentdate     (Trademark records)
 																 2. MARK.MrAct.998.currentdate  (Trademark Action records)			
