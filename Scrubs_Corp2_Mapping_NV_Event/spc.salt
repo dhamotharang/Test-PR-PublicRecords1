@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_NV_Event
 FILENAME:In_NV
 //Uncomment up to NINES for internal or external adl
@@ -16,11 +16,12 @@ FILENAME:In_NV
 //FIELDTYPE DEFINITIONS
 FIELDTYPE:invalid_corp_key:ALLOW(0123456789-):LENGTHS(4..)
 FIELDTYPE:invalid_corp_supp_key:ALLOW( 0123456789-)
-FIELDTYPE:invalid_charter_nbr:ALLOW(-.ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):LENGTHS(1..)
-FIELDTYPE:invalid_corp_vendor:ENUM(32)
-FIELDTYPE:invalid_state_origin:ENUM(NV)
+FIELDTYPE:invalid_charter_nbr:ALLOW(-.,ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):LENGTHS(1..)
+FIELDTYPE:invalid_corp_vendor:ENUM(32|32)
+FIELDTYPE:invalid_state_origin:ENUM(NV|NV)
 FIELDTYPE:invalid_mandatory:LENGTHS(1..)
 FIELDTYPE:invalid_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_pastDate>0)
+FIELDTYPE:invalid_future_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_GeneralDate>0)
 FIELDTYPE:invalid_date_type_cd:ENUM(FIL|EFF| )
 FIELDTYPE:invalid_date_type_desc:ENUM(FILING|EFFECTIVE| )
 
@@ -35,7 +36,7 @@ FIELD:corp_process_date:TYPE(STRING8):LIKE(invalid_date):0,0
 FIELD:corp_sos_charter_nbr:TYPE(STRING32):LIKE(invalid_charter_nbr):0,0
 FIELD:event_filing_reference_nbr:TYPE(STRING30):LIKE(invalid_mandatory):0,0
 FIELD:event_amendment_nbr:TYPE(STRING3):0,0
-FIELD:event_filing_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:event_filing_date:TYPE(STRING8):LIKE(invalid_future_date):0,0
 FIELD:event_date_type_cd:TYPE(STRING3):LIKE(invalid_date_type_cd):0,0
 FIELD:event_date_type_desc:TYPE(STRING30):LIKE(invalid_date_type_desc):0,0
 FIELD:event_filing_cd:TYPE(STRING8):0,0
