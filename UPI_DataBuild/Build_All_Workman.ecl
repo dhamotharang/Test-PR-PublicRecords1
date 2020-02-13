@@ -28,8 +28,6 @@ EXPORT  Build_All_Workman(
   //  Common Workman ECL Code
   workmanPreamble(STRING runText)  :=  FUNCTION
     workmanPreambleECL  :=  'IMPORT versioncontrol, _control, ut, tools, UPI_DataBuild;' +
-		
-                            // '\npSrc := \''+pSrc+'\';' +
                             '\npVersion  				:= \'@version@\';' +
 														'\npUseProd	 				:= '+IF(pUseProd,'TRUE','FALSE')+';' +
 														'\ngcid		 	 				:= \''+gcid+'\';' +
