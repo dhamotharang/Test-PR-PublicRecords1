@@ -152,11 +152,10 @@
 	//////////////////////////////////////////////////////////////////////////////////////////	
 	
 	//Add Record_SID to All Records
-	//Set Blank Serv/Line Types to Unknown: DF-26977
 	dx_PhonesInfo.Layouts.Phones_Type_Main trID(addGlobalSID l):= transform
 		self.record_sid := hash64(l.phone + l.source + l.account_owner + l.carrier_name + l.vendor_first_reported_dt + l.vendor_first_reported_time + l.spid + l.operator_fullname + l.serv + l.line + l.high_risk_indicator + l.prepaid + l.reference_id) + (integer)l.phone;	
-		self.serv				:= if(l.serv='', '3', l.serv);
-		self.line				:= if(l.line='', '3', l.line);	
+		//self.serv				:= if(l.serv='', '3', l.serv); //DF-27012
+		//self.line				:= if(l.line='', '3', l.line); //DF-27012	
 		self 						:= l;
 	end;
 	
