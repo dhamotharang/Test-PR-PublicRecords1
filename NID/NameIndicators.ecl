@@ -77,7 +77,7 @@ export NameTypes := enum(UNSIGNED2,
 				NameQuality.PossibleName => 'MAY',
 				NameQuality.ImprobableName => 'NO',
 				NameQuality.PossibleDualName => 'DUL',
-				'?');			
+				'');			
 		shared DerivedNameFlags := DerivedName | DerivedName2;
 		export boolean fn_IsDerivedName(unsigned2 name_ind) := (name_ind & DerivedNameFlags) > 0;
 		export boolean fn_IsMaleName(unsigned2 name_ind) := (name_ind & MaleName) > 0;
@@ -92,5 +92,20 @@ export NameTypes := enum(UNSIGNED2,
 			(name_ind & DerivedName) > 0 => '1',
 			(name_ind & DerivedName2) > 0 => '2',
 			'0');
+			
+		export fn_getFields(unsigned2	indicators) := FUNCTION
+
+			return MODULE
+				export unsigned2	nameind := indicators;
+				export string3		nameType := GetTypeFromInd(indicators);
+				export string3		quality := GetQualityFromInd(indicators);
+				export string3		gender := fn_getGender(indicators);;
+				export boolean		parsed := indicators & ParsedName;
+				export unsigned2	derivation := MAP(
+														(indicators & DerivedName) <> 0 => 1,
+														(indicators & DerivedName2) <> 0 => 2,
+														0);
+			END;
+		END;
 		
 	end;
