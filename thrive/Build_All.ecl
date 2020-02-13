@@ -1,5 +1,5 @@
 ﻿
-import versioncontrol, _control, ut, tools, RoxieKeyBuild,dops,DOPSGrowthCheck, Scrubs, Scrubs_Thrive;
+import versioncontrol, _control, ut, tools, RoxieKeyBuild,dops,DOPSGrowthCheck, Scrubs, Scrubs_Thrive, orbit3;
 export Build_all(string pversion, boolean pUseProd = false) := function
 
 spray_lt  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd).lt);
@@ -25,6 +25,11 @@ PersistenceCheckResults :=  DopsGrowthCheck.PersistenceCheck('~thor_data400::key
 DeltaCommands:=sequential(CalculateStatsResults,DeltaCommandResults,ChangesByFieldResults,PersistenceCheckResults);
 
 dops_update  := sequential(RoxieKeybuild.updateversion('ThriveKeys',pversion,'angela.herzberg@lexisneis.com; Melanie.Jackson@lexisnexis.com',,'N'));
+dops_updatefcra  := sequential(RoxieKeybuild.updateversion('FCRA_ThriveKeys',pversion,'angela.herzberg@lexisneis.com; Melanie.Jackson@lexisnexis.com',,'F'));
+orbit_update := Orbit3.proc_Orbit3_CreateBuild('Transactional Mortgage and Payday Lending',pversion,'N');
+orbit_updatefcra := Orbit3.proc_Orbit3_CreateBuild('FCRA Transactional Mortgage and Payday Lending',pversion,'F');
+
+
 
 built := sequential(
 					spray_lt
@@ -43,7 +48,10 @@ built := sequential(
 					,FileServices.ClearSuperFile(Filenames(pversion,pUseProd).lInputPdTemplate)
 					,FileServices.FinishSuperFileTransaction()
 					,dops_update
-					,DeltaCommands
+					,dops_updatefcra
+					,orbit_update
+					,orbit_updatefcra
+					,DeltaCommands			
 				): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure
 
 );

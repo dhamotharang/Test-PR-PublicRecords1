@@ -1,11 +1,12 @@
-﻿//
-//	Dataland PPA/RIN Scheduler
+﻿IMPORT _Control, STD;
+//
+//	Prod PPA/RIN Scheduler
 //
 envVars :=
  '#WORKUNIT(\'protect\',true);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
-+'#OPTION(\'AllowedClusters\',\'thor400_44_sla_eclcc,thor400_44_eclcc\');\n'
++'#OPTION(\'AllowedClusters\',\'thor400_sta_eclcc,thor400_deva_eclcc\');\n'
 +'#OPTION(\'AllowAutoQueueSwitch\',\'1\');\n'
 +'#OPTION(\'MultiplePersistInstances\',\'false\');\n'
 +'#STORED (\'_Validate_Year_Range_Low\', \'1800\');\n'
@@ -32,7 +33,7 @@ end;
 dNAC2ConfigForceLower	:=	project(nac_V2.dNAC2Config, tNAC2ConfigForceLower(left));
 
 sGroupId	:=	set(dNAC2ConfigForceLower, GroupID);
-dOKFiles	:=	files(Name[1..4] in sGroupId);
+dOKFiles	:=	files(Name[6..9] in sGroupId);
 
 r2 := RECORD
 	string		datadir;

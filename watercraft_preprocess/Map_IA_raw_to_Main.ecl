@@ -1,4 +1,4 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
 
 // translates ia_phase01_update.mp Ab intio graph into ECL
 
@@ -120,7 +120,7 @@ county_reg(string2 code)
 '99' => 'WRIGHT',
 '' );  
 				
-boat_desc ( string1 bt_type) 
+boat_desc ( string bt_type) 
 := case(bt_type,
 '1' => 'CABIN CRUISER',       
 '2'	=> 'CANOE',               
@@ -137,18 +137,33 @@ boat_desc ( string1 bt_type)
 '');
 
 
-reg_status_desc( string1 code) 
+reg_status_desc( string code) 
 := case(code,
-'1'	=> 'ACTIVE',                   
-'2'	=> 'SOLD OUT OF STATE',        
-'3'	=> 'LOST',                     
-'4'	=> 'STOLEN',                   
-'5'	=> 'CANCELLED',                
-'6'	=> 'ABANDONED',                
-'7'	=> 'INACTIVE',                 
-'8'	=> 'STORAGE',                  
-'9'	=> 'TRANSFERRED OUT OF COUNTY',
-'10'=> 'DESTROYED/JUNKED',         
+'5'	=> 'NEW',                   
+'10'	=> 'RENEWED',        
+'15'	=> 'TRANSFERRED',                     
+'17'	=> 'DUPLICATE ISSUED',                   
+'19'	=> 'IN STORAGE',                
+'20'	=> 'CANCELED-SOLD',
+'21'	=> 'CANCELED-TRADED',                
+'22'	=> 'CANCELED-DONATED',                
+'23'	=> 'CANCELED-SOLD OUT OF STATE',                
+'24'	=> 'CANCELED-ABANDONED',                
+'25'	=> 'CANCELED-DESTROYED',                
+'26'	=> 'CANCELED-LOST',                
+'27'	=> 'CANCELED-OTHER',                
+'28'	=> 'CANCELED-GAVE AWAY',                
+'29'	=> 'CANCELED-SOLD TO DEALER',                
+'35'	=> 'STOLEN',                
+'40'	=> 'RECOVERED',                
+'45'	=> 'SALVAGE', 
+'50'	=> 'ACTIVE',                
+'80'	=> 'REGISTRATION DENIED',                
+'85'	=> 'FLAGGED INVESTIGATE YES',                        
+ '90'	=> 'FLAGGED INVESTIGATE NO',                        
+  '95'	=> 'EXPIRED',                 
+'135'	=> 'UNKNOWN DISPOSITION',                  
+
 '');
 
 Watercraft.Macro_Clean_Hull_ID(watercraft_preprocess.file_IA_clean_in,Watercraft.Layout_IA_new, hull_clean_in)
@@ -169,9 +184,9 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := t
 	self.registration_number	:=	trim(L.REG_NUM,left,right);
 	self.hull_number					:=	L.hull_id;
 	self.propulsion_description		:=	L.PROP;
-	self.vehicle_type_Description	:=	map(L.VEH_TYPE <> '' and L.VEH_TYPE <> 'CABIN' => L.VEH_TYPE,
-	                                      L.BOAT_TYPE <> '' and L.VEH_TYPE = 'CABIN' => boat_desc(L.BOAT_TYPE),
-																				'');
+	//self.vehicle_type_Description	:=	map(L.VEH_TYPE <> '' and L.VEH_TYPE <> 'CABIN' => L.VEH_TYPE,
+	   //                                   L.BOAT_TYPE <> '' and L.VEH_TYPE = 'CABIN' => boat_desc(L.BOAT_TYPE),
+																			//	'');
 	self.fuel_description				:=	L.FUEL;
 	self.hull_type_description	:=	L.HULL;
 	self.use_description				:=	L.USE_1;
@@ -179,28 +194,26 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := t
 	self.model_year							:=	L.YEAR;
 	self.watercraft_make_description	:=	L.MAKE;
 	self.watercraft_model_description	:=	L.MODEL;
-	self.watercraft_width							:=	L.BOAT_WIDTH;
+	//self.watercraft_width							:=	L.BOAT_WIDTH;
 	IsValidRegDate										:=	STD.DATE.IsValidDate((integer)L.REG_DATE);
 	self.registration_date						:=	If(IsValidRegDate,L.REG_DATE,'');
 	IsValidExpireDate									:=	STD.DATE.IsValidDate((integer)L.EXPIRATION_Date);
 	self.registration_expiration_date	:=	If(IsValidExpireDate,L.EXPIRATION_Date,'');
 	self.registration_status_code			:=	L.REG_STATUS;
-	self.registration_status_description	:=	reg_status_desc(L.REG_STATUS);
+	self.registration_status_description	:=	reg_status_desc(trim(L.REG_STATUS));
 	self.title_number							:=	IF(L.TITLE_NUMBER <> '000000000', L.TITLE_NUMBER,'');
 	IsValidTitleDate							:=	STD.DATE.IsValidDate((integer)L.ISSUE_DATE);
 	self.title_issue_date					:=	If(IsValidTitleDate,L.ISSUE_DATE,'');
 	self.title_type_code					:=	L.REG_TYPE;
-	self.title_type_description		:=	case(L.REG_TYPE,
-	                                      '1' => 'REGULAR',
-																				'2' => 'DNR',
-																				'3' => 'FARM',
-																				'4' => 'DOCUMENTED',
-																				'5' => 'TITLE ONLY',
+	self.title_type_description		:=	case(trim(L.REG_TYPE),
+	                                                                                                    '5' => 'REGISTRATION',
+																				'10' => 'TITLE AND REGISTRATION',
+																				'32' => 'DOCUMENTED',
 																				'');
 	self.watercraft_status_code      := L.RECORD_STATUS;
-	self.watercraft_status_description := case(L.RECORD_STATUS,
-	                                          '1' => 'CURRENT',
-																						'2' => 'PREVIOUS','');
+	self.watercraft_status_description := case(trim(L.RECORD_STATUS),
+	                                                                                                                 '4' => 'COMPLETE',
+																						'');
 	self := L;
 	self := [];
   end;

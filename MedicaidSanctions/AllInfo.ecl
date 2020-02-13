@@ -3,9 +3,10 @@ EXPORT AllInfo(DATASET($.Layout_Sanctions) infile) := FUNCTION
 
 /***
 	1		DOB 				
-	2		Action
-	3		Occupation (Cred)
-
+	2		Occupation (Cred)
+	3		Action
+NOTE: Action is being moved to comments
+The code is included here in case it moves back to additional info
 ****/		
 
 
@@ -15,34 +16,38 @@ EXPORT AllInfo(DATASET($.Layout_Sanctions) infile) := FUNCTION
 												IF(infile.type_id = 'I' AND infile.DateOfBirth<>'0',
 													'DOB',
 													SKIP),
-												IF(infile.action<>'' OR 
+												IF(infile.cred<>'', 'Occupation', SKIP),
+												/*IF(infile.action<>'' OR 
 													infile.action_date not in ['','0'] or infile.action_start not in ['','0'] or 
 																				infile.action_end not in ['','0'] or infile.fine <>'',
-																	'Incident', SKIP),
-												IF(infile.cred<>'', 'Occupation', SKIP),
+																	'Incident', SKIP),*/
 												SKIP);
 		self.information := TRIM(CHOOSE(n,
 								infile.DateOfBirth,
-								infile.action,
 								infile.cred,
+								infile.action,
 								SKIP));
 		self.parsed := '';
 		self.comments := CHOOSE(n,
 									'',
+									'',
 									Std.Str.CleanSpaces(
 										IF(infile.action_date IN ['','0'], '', 'Action Date: ' + infile.action_date) + ' ' +
 										IF(infile.action_start IN ['','0'], '', 'Action Start: ' + infile.action_start) + ' ' +
+										IF(infile.action_end IN ['','0'], '', 'Action End: ' + infile.action_end) + ' ' +
 										IF(infile.fine='', '', 'Fine: ' + infile.fine)
 									),
 									'');
 		self.id := infile.key;
 END;
 
-	addlInfo := Normalize(infile(DateOfBirth<>'0' OR action<>'' OR
-													action_date not in ['','0'] or action_start not in ['','0'] or 
-																				action_end not in ['','0'] or fine <>''
-												OR cred<>''),
-												3, xform(LEFT, COUNTER))(type<>'');
+	addlInfo := Normalize(infile(
+													DateOfBirth<>'0' OR 
+													//action<>'' OR
+													//action_date not in ['','0'] or action_start not in ['','0'] or 
+													//							action_end not in ['','0'] or fine <>''
+												 cred<>''),
+												2, xform(LEFT, COUNTER))(type<>'');
 	
 	AddlSorted := SORT(DISTRIBUTE(addlInfo, id), id, Type, -parsed, information, comments, LOCAL);
 							

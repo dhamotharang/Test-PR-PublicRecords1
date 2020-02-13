@@ -1,4 +1,4 @@
-//****************Maps cellphones sources to a common layout********************
+﻿//****************Maps cellphones sources to a common layout********************
 import cellphone, ut, _validate;
 phone_file := Norm_Cellphone;
 
@@ -43,6 +43,8 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.orig_phone_reg_dt			:= (unsigned3) _validate.date.fCorrectedDateString(input.RegistrationDate) [1..6];
 	self.did						:= (unsigned)input.did;
 	self.vendor 			:= '';
+	self.source				:= input.Vendor; //DF-25784
+	self.cellphone 		:= self.npa + self.phone7; //DF-25784
 	self 							:= input; 
 	self.CellPhoneIDKey         	:= hashmd5((data)self.orig_phone [length(self.orig_phone) - 6 ..length(self.orig_phone)] + 
 											   (data)self.prim_range + 

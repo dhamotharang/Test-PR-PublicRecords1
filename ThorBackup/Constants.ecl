@@ -22,7 +22,7 @@ EXPORT Constants := module
 		export filename := fileservices.GetSuperFileSubName(superfilename,1);
 		export srcname := 'srcname=~'+filename + ' ';
 		export dstname := 'dstname=~'+filename + ' ';
-		export srcdali := 'srcdali=prod_dali.br.seisint.com '; // changing dali ip to dns
+		export srcdali := 'srcdali='+_Control.Config.prod_dali+' '; // changing dali ip to dns
 		export copyfilecmd := serv + if (usecredentials,'username='+dUserCreds[1].username+' password='+dUserCreds[1].password+' ','') + over + repl + action + dstcluster + dstname + srcname + nsplit + wrap + srcdali + transferbuffersize;
 		export emailerrors := 'bocaroxiepackageteam@lexisnexis.com';
 		export senderemail := 'charlene.ros@lexisnexis.com';
@@ -32,7 +32,7 @@ EXPORT Constants := module
 	end;
 	
 	export esp := module
-		export bocaprodthor := 'prod_esp.br.seisint.com';
+		export bocaprodthor := _Control.Config.LocalEsp;
 		export yogurtthorforboca := '10.173.26.7';
 	end;
 	// Set this value to get files older than n days

@@ -1158,6 +1158,36 @@
 		export string KEYWORD_OFAC_EO13848					:= '844';
 		export string KEYWORD_NFSRC									:= '845';
 		export string KEYWORD_SKFSRC								:= '846';
+		export string KEYWORD_TTFIU_TTPS						:= '847';
+		export string KEYWORD_OFAC_SYR_EO						:= '848';
+		export string KEYWORD_FRDGCCRF_CP						:= '849';
+		export string KEYWORD_FRDGCCRF							:= '850';
+		export string KEYWORD_OFAC_EO13884					:= '851';
+		export string KEYWORD_PTTC									:= '852';
+		export string KEYWORD_RBNZ_ALERT						:= '853';
+		export string KEYWORD_HRAZTN								:= '854';
+		export string KEYWORD_TTSEC									:= '855';
+		export string KEYWORD_ESCNMC								:= '856';
+		export string KEYWORD_PTANACOM							:= '857';
+		export string KEYWORD_EEPPA									:= '858';
+		export string KEYWORD_CANS_UN1373						:= '859';
+		export string KEYWORD_OFAC_MALI							:= '860';
+		export string KEYWORD_EU_MAL								:= '861';
+		export string KEYWORD_OFAC_EO13871					:= '862';
+		export string KEYWORD_LTLRC									:= '863';
+		export string KEYWORD_OFAC_NKSPEA						:= '864';
+		export string KEYWORD_PHAMLC								:= '865';
+		export string KEYWORD_PHDOF_IC							:= '866';
+		export string KEYWORD_PKCNGOA								:= '867';
+		export string KEYWORD_LUICIJ_WC							:= '868';
+		export string KEYWORD_SAMA									:= '869';
+		export string KEYWORD_CMLAGA								:= '870';
+		export string KEYWORD_EGMLCU								:= '871';
+		export string KEYWORD_FRAFA									:= '872';
+		export string KEYWORD_PTIMPIC								:= '873';
+		export string KEYWORD_JPCAA									:= '874';
+		export string KEYWORD_PHBOI									:= '875';
+		export string KEYWORD_PHBIR									:= '876';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

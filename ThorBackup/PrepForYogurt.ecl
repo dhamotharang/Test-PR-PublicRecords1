@@ -1,7 +1,7 @@
 ﻿/*2014-10-03T23:55:34Z (ananth_p venkatachalam)
 Move to new module
 */
-import lib_workunitservices,STD,ut, dops;
+import lib_workunitservices,STD,ut, dops,_Control;
 EXPORT PrepForYogurt(string location, string environment, string last_wuid = '') := module
 
 	shared filedate := thorbackup.constants.yogurt().enddate+thorbackup.constants.yogurt().l_time : independent;
@@ -74,7 +74,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																				or regexfind('hpccinternal',files,nocase)
 																				or regexfind('spill',files,nocase)
 																				or regexfind('persist',files,nocase)
-																				//or regexfind('::key::',files,nocase)
+																				or regexfind('::key::',files,nocase)
 																				or regexfind('yogurt',files,nocase)
 																				// or regexfind('foreign',files,nocase)
 																				or regexfind(':: ',files,nocase)
@@ -411,7 +411,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 													fileservices.deletelogicalfile('~yogurt::job::running'),
 													ReSubmit(),
 													fileservices.sendemail(thorbackup.constants.yogurt().emailerrors,
-			environment + ' ' + location + ' Yogurt Prep Process failed on http://prod_esp:8010 - ' + filedate,
+			environment + ' ' + location + ' Yogurt Prep Process failed on http://'+_Control.Config.LocalEsp+':8010 - ' + filedate,
 			'workunit: ' + workunit + '\n re-scheduled'+ '\r\n' + failmessage
 																	,
 																	,

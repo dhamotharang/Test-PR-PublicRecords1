@@ -2,8 +2,8 @@
 EXPORT  MAC_AppendCRK(
     	pSrc            //  Source code for Customer ex. UUID
     , pVersion        //  Build Version ex. (STRING)STD.Date.Today();
-    , pBase           //  Base File (Usually output from previous build
-    , pAsHeader       //  New AsHeader file to be ingested and linked
+    , pBaseName       //  Base File (Usually output from previous build
+    , pAsHeaderName   //  New AsHeader file to be ingested and linked
     
     // Email List for Workman Notifications
     , pWorkmanEmailTo = 'HealthcareNoMatchHeader_InternalLinking.proc_Constants.emailNotify'
@@ -18,13 +18,16 @@ EXPORT  MAC_AppendCRK(
     , doAppendCRK = TRUE // Append CRK to Internal Linking Base File
 )	:=	FUNCTIONMACRO
 
-  #WORKUNIT('NAME','Healthcare NoMatch Customer Record Key for SRC='+pSrc);
+  wuName  :=  'Healthcare NoMatch Customer Record Key for SRC='+pSrc;
+  #WORKUNIT('NAME',wuName);
+  isRunning :=  HealthcareNoMatchHeader_InternalLinking.Proc_CRKRunningCheck(wuName);
 
   //  Set Workman Variables
   isDataland      :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.isDataland;
   pMaxNumIter     :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.maxNumIters;
   pPrimaryQueue   :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.primaryQueue;
   pWuPrefix       :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).WUPrefix;
+  pWuIterations   :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).WUIterations;
   pWuSuperfile    :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).MasterWUOutput_SF;
   pEmailTo        :=  pWorkmanEmailTo;
   pPollingFreq    :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.pollingFreq;
@@ -71,7 +74,7 @@ EXPORT  MAC_AppendCRK(
                         , //  pStartIteration       = '1'
                         , //  pNumMaxIterations     = '1'
                         , //  pNumMinIterations     = ''
-                        ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runIngest_Text) //  pOutputFilename
+                        ,pWuPrefix + pWuIterations + trim(runIngest_Text) //  pOutputFilename
                         ,pWuSuperfile       //  pOutputSuperfile
                         ,pIngestSetResults  //  pSetResults
                         , //  pStopCondition        = '\'\''
@@ -116,7 +119,7 @@ EXPORT  MAC_AppendCRK(
                           , //  pStartIteration       = '1'
                           ,pMaxNumIter                    //  pNumMaxIterations
                           , //  pNumMinIterations     = ''
-                          ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runIteration_Text) //  pOutputFilename  :=  
+                          ,pWuPrefix + pWuIterations + trim(runIteration_Text) //  pOutputFilename  :=  
                           ,pWuSuperfile                   //  pOutputSuperfile
                           ,pIterationSetResults           //  pSetResults
                           ,pIterationStopCondition        //  pStopCondition
@@ -169,7 +172,7 @@ EXPORT  MAC_AppendCRK(
                           , //  pStartIteration       = '1'
                           , //  pNumMaxIterations     = '1'
                           , //  pNumMinIterations     = ''
-                          ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runAppendCRK_Text) //  pOutputFilename
+                          ,pWuPrefix + pWuIterations + trim(runAppendCRK_Text) //  pOutputFilename
                           ,pWuSuperfile   //  pOutputSuperfile
                           ,pAppendCRKSetResults //  pSetResults
                           , //  pStopCondition        = '\'\''
@@ -191,8 +194,15 @@ EXPORT  MAC_AppendCRK(
 
     //  Build Prep
   pCreateTempFiles  :=  SEQUENTIAL(
-                          OUTPUT(pBase,,HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.BaseTemp,COMPRESSED,OVERWRITE), // Create Temporary Base file.  This is the deafult base file for the build.
-                          OUTPUT(pAsHeader,,HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.AsHeaderTemp,COMPRESSED,OVERWRITE) // Create Temporary AsHeader file.  This is the deafult AsHeader file for the build.
+                          IF(pBaseName='', // If Basefile name is blank then create an empty basefile
+                            OUTPUT(DATASET([],HealthcareNoMatchHeader_InternalLinking.Layout_Header),,HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.BaseTemp,THOR,OVERWRITE),
+                            IF(pBaseName<>HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.BaseTemp,
+                              STD.File.Copy(pBaseName,tools.Constants('').Groupname,HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.BaseTemp,,,,,TRUE,,,TRUE)
+                            )
+                          ),
+                          IF(pAsHeaderName<>HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.AsHeaderTemp,
+                            STD.File.Copy(pAsHeaderName,tools.Constants('').Groupname,HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.AsHeaderTemp,,,,,TRUE,,,TRUE)
+                          )
                         );
     //  Build Cleanup
   pDeleteTempFiles  :=  SEQUENTIAL(
@@ -200,12 +210,16 @@ EXPORT  MAC_AppendCRK(
                           STD.File.DeleteLogicalFile(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.AsHeaderTemp)
                         );
                         
-  allSteps  :=  SEQUENTIAL(
-                  IFF(doIngest, SEQUENTIAL(pCreateTempFiles,pRunIngest,pDeleteTempFiles), OUTPUT('Ingest Skipped.'))                           //  Ingest
-                  ,IFF(doInternalLinking, pRunIterations, OUTPUT('Internal Linking Build Skipped.'))     //  Linking Iterations
-                  ,IFF(doAppendCRK, pRunAppendCRK, OUTPUT('Append Customer Record Key Skipped.')) //  Append Customer Record Key
+	alreadyRunningFail := OUTPUT('MAC_AppendCRK process is already running for SRC='+pSrc);
+                        
+  allSteps  :=  IFF(isRunning,
+                  alreadyRunningFail,
+                  SEQUENTIAL(
+                    IFF(doIngest, SEQUENTIAL(pCreateTempFiles,pRunIngest,pDeleteTempFiles), OUTPUT('Ingest Skipped.'))                           //  Ingest
+                    ,IFF(doInternalLinking, pRunIterations, OUTPUT('Internal Linking Build Skipped.'))     //  Linking Iterations
+                    ,IFF(doAppendCRK, pRunAppendCRK, OUTPUT('Append Customer Record Key Skipped.')) //  Append Customer Record Key
+                  )
                 );
                 
   RETURN  allSteps;
 ENDMACRO;
-

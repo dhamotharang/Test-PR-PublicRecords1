@@ -1,0 +1,41 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Infutor_NARB
+FILENAME:Infutor_NARB
+NAMESCOPE:Input
+
+//-------------------------
+//FIELDTYPE DEFINITIONS
+//-------------------------
+FIELDTYPE:invalid_mandatory:LENGTHS(1..)
+FIELDTYPE:invalid_pastdate8:CUSTOM(Scrubs_Infutor_NARB.Functions.fn_past_yyyymmdd > 0)
+FIELDTYPE:invalid_record_type:ENUM(C|H)
+FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Infutor_NARB.Functions.fn_numeric > 0)
+FIELDTYPE:invalid_st:CUSTOM(Scrubs_Infutor_NARB.Functions.fn_verify_state>0)
+FIELDTYPE:invalid_sic:CUSTOM(Scrubs.fn_valid_SicCode > 0)
+FIELDTYPE:invalid_url:CUSTOM(Scrubs_Infutor_NARB.Functions.fn_url > 0)
+FIELDTYPE:invalid_address_type_code:ENUM(F|G|H|P|R|S| )
+FIELDTYPE:invalid_norm_type:ENUM(B|P|T)
+FIELDTYPE:invalid_email:ALLOW( 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;'&)
+
+
+//--------------------------------------------------------------- 
+//FIELDS TO SCRUB 
+//---------------------------------------------------------------
+FIELD:dt_first_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate8):0,0
+FIELD:dt_last_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate8):0,0
+FIELD:dt_vendor_first_reported:TYPE(UNSIGNED4):LIKE(invalid_pastdate8):0,0
+FIELD:dt_vendor_last_reported:TYPE(UNSIGNED4):LIKE(invalid_pastdate8):0,0
+FIELD:process_date:TYPE(UNSIGNED4):LIKE(invalid_pastdate8):0,0
+FIELD:record_type:TYPE(STRING1):LIKE(invalid_record_type):0,0
+FIELD:pid:TYPE(STRING10):LIKE(invalid_numeric):0,0
+FIELD:address_type_code:TYPE(STRING1):LIKE(invalid_address_type_code):0,0
+FIELD:url:TYPE(STRING500):LIKE(invalid_url):0,0
+FIELD:sic1:TYPE(STRING8):LIKE(invalid_sic):0,0
+FIELD:sic2:TYPE(STRING8):LIKE(invalid_sic):0,0
+FIELD:sic3:TYPE(STRING8):LIKE(invalid_sic):0,0
+FIELD:sic4:TYPE(STRING8):LIKE(invalid_sic):0,0
+FIELD:sic5:TYPE(STRING8):LIKE(invalid_sic):0,0
+FIELD:incorporation_state:TYPE(STRING2):LIKE(invalid_st):0,0
+FIELD:email:TYPE(STRING500):LIKE(invalid_email):0,0
+FIELD:contact_title:TYPE(STRING100):LIKE(invalid_mandatory):0,0
+FIELD:normcompany_type:TYPE(STRING1):LIKE(invalid_norm_type):0,0

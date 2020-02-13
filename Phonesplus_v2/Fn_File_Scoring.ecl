@@ -1,5 +1,5 @@
-import experian_phones,ut, mdr;
-EXPORT fn_File_Scoring(dataset(recordof(Layout_In_Phonesplus.layout_in_common)) 
+﻿import experian_phones,ut, mdr;
+EXPORT fn_File_Scoring(dataset(recordof(Layout_Phonesplus_Base)) 
 											phplus_in = _keybuild_phonesplus_base):= function
 //Phonesplus excluding inquiry tracking data
 pplus := phplus_in(Translation_Codes.fGet_all_sources(src_all) != mdr.sourceTools.src_InquiryAcclogs);
@@ -19,7 +19,7 @@ File_Scoring.layout t_rollup (File_Scoring.layout le, File_Scoring.layout ri) :=
 											   flag = 'D'=> 5,
 											   1);
 self.datefirstseen := ut.EarliestDate(le.datefirstseen, ri.datefirstseen);
-self.datelastseen := ut.LatestDate(le.datelastseen, ri.datelastseen);
+self.datelastseen := MAX(le.datelastseen, ri.datelastseen);
 self.ListingType := if(stringlib.stringContains(le.ListingType, ri.ListingType, true),le.ListingType, le.ListingType + ri.ListingType);
 self.glb_dppa_flag := if(glb_priority(le.glb_dppa_flag) < glb_priority(ri.glb_dppa_flag), le.glb_dppa_flag,ri.glb_dppa_flag);
 self := ri;

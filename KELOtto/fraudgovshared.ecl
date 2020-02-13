@@ -20,8 +20,8 @@ SetTNUnemployment := [1613712331]; // SIU Account
 SetFLIrma := [1454157906]; // SIU Account
 
 DemoHashes := [3977509724, 2727638882, 1139485299, 2459821998, 3635312545, 1026679856, 4401323, 3005794324, 866735130];
-
-CustomerAddressPersonPrep1 := JOIN(KELOtto.fraudgovprep(/*clean_address.prim_range != '' AND clean_address.prim_name != '' and clean_address.zip != '' and */ did > 0),
+// take this distribute out jp
+CustomerAddressPersonPrep1 := JOIN(DISTRIBUTE(KELOtto.fraudgovprep)(/*clean_address.prim_range != '' AND clean_address.prim_name != '' and clean_address.zip != '' and */),
                                    KELOtto.SharingRules/*(targetcustomerhash not in demohashes)*/, 
                        //LEFT.classification_permissible_use_access.fdn_file_info_id=RIGHT.fdn_ind_type_gc_id_inclusion,
                        
@@ -124,5 +124,8 @@ or ssn in ['595637941','589650781','770703763'])
 */
                            : PERSIST('~temp::deleteme27');
                            
-                           
-EXPORT FraudGovShared := CustomerAddressPersonPrep1;
+// output this to setup ramps cert to be able to build without having all the appends.
+tempbuild := PULL(DATASET('~foreign::10.173.14.201::temp::fraudgovsharedbase', RECORDOF(CustomerAddressPersonPrep1), THOR));
+//output(distribute(KELOtto.FraudGovShared, HASH32(record_id)),, '~temp::fraudgovsharedbase', overwrite, EXPIRE(7));
+
+EXPORT FraudGovShared := CustomerAddressPersonPrep1; // tempbuild;

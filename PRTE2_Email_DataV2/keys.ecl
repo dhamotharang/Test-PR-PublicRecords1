@@ -17,6 +17,10 @@ EXPORT key_did := INDEX(FILES.did_file, {did, email_rec_key},
 	      {Files.Payload},
 		  	 Constants.key_prefix + doxie.Version_SuperKey + '::payload');
 				 
+	EXPORT Key_email_linkids := INDEX(Files.Email_linkids,{ultid, orgid, seleid, proxid, powid, empid,dotid},
+	      {Files.Email_linkids},
+		  	 Constants.key_prefix + doxie.Version_SuperKey + '::linkids');
+	
 	EXPORT Key_email_payload_FCRA := INDEX(Files.PayLoad_FCRA,{email_rec_key},
 	      {Files.Payload_FCRA},
 		  	 Constants.key_FCRA_prefix + doxie.Version_SuperKey + '::payload');

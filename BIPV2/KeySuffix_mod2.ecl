@@ -84,7 +84,11 @@ end;
 // export constant_ThisBuild_versionDate := '20190701'; // S72 BH-559
 // export constant_ThisBuild_versionDate := '20190801'; // S73 BH-560
 // export constant_ThisBuild_versionDate := '20190904'; // S74 BH-561
-export constant_ThisBuild_versionDate := '20191002'; // S75 BH-562
+// export constant_ThisBuild_versionDate := '20191002'; // S75 BH-562
+// export constant_ThisBuild_versionDate := '20191104'; // S76 BH-563
+// export constant_ThisBuild_versionDate := '20191127'; // S77 BH-564
+// export constant_ThisBuild_versionDate := '20200108'; // S78 BH-755
+export constant_ThisBuild_versionDate := '20200203'; // S79 BH-756
 
 
 export ds :=
@@ -177,6 +181,10 @@ dataset([
 ,{  73, '' ,  '20190801',  '20190801', '', '',         '',         'Ingested S72 base, applied BH-677 patch, BH-685,BH-663 . BH-560 -- BIP Build 73 - August 2019'}
 ,{  74, '' ,  '20190904',  '20190904', '', '',         '',         'Ingested S73 base. BH-694,BH-686, BH-573 . BH-561 -- BIP Build 74 - September 2019'}
 ,{  75, '' ,  '20191002',  '20191002', '', '',         '',         'Ingested S74 base, applied  BH-706 ND Corps Corpkey patching.   BH-714,BH-716,BH-721,BH-688,BH-697,BH-720. BH-562 -- BIP Build 75 - October 2019'}
+,{  76, '' ,  '20191104',  '20191104', '', '',         '',         'Ingested S75 base, applied  BH-727 & BH-738.   BH-655,DF-26308,BH-726,BH-739,BH-715,BH-687. BH-563 -- BIP Build 76 - November 2019'}
+,{  77, '' ,  '20191127',  '20191127', '', '',         '',         'Ingested S76 base, applied  BH-749. KS-4782, BH-687, BH-747,BH-749,BH-753,BH-738  . BH-564 -- BIP Build 77 - December 2019'}
+,{  78, '' ,  '20200108',  '20200108', '', '',         '',         'Ingested S77 base, applied  BH-738 & BH-754. BH-743, BH-789. BH-755 -- BIP Build 78 - January 2020'}
+,{  79, '' ,  '20200203',  '20200203', '', '',         '',         'Ingested S78 base, applied  BH-742 & DF-25635.  BH-756 -- BIP Build 79 - February 2020'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.

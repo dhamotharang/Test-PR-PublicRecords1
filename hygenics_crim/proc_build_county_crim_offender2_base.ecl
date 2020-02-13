@@ -202,7 +202,7 @@ Layout_almostfinal_offender to_crim_offender(with_ssn l, slim_off r) := transfor
  self.doc_num			:= l.docnumber;
  self.ins_num			:= l.aliennumber;
  self.id_num			:= l.inmatenumber;
- self.dl_num			:= l.dlnumber;
+ self.dl_num			:= map(vVendor = 'I0061' => regexreplace('-',l.dlnumber,' '),l.dlnumber);
  self.dl_state		:= l.dlstate;
 
  self.citizenship	:= if(l.uscitizenflag='Y','US','');	

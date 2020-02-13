@@ -1,4 +1,4 @@
-﻿IMPORT  versioncontrol, tools, Data_Services, HealthcareNoMatchHeader_InternalLinking;
+﻿IMPORT  STD, versioncontrol, tools, Data_Services, HealthcareNoMatchHeader_InternalLinking;
 EXPORT  Filenames(  STRING	  pSrc        = '',
                     STRING    pVersion    = '',
                     BOOLEAN	  pUseProd    = FALSE) :=  MODULE
@@ -27,8 +27,10 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
   
   EXPORT  Base  :=  MODULE
     EXPORT  allRecords    :=  versioncontrol.mBuildFilenameVersions(lBaseTemplate + 'AllRecords'  , pVersion);
+    EXPORT  history       :=  versioncontrol.mBuildFilenameVersions(lBaseTemplate + 'History'  , pVersion);
 		EXPORT	dAll_filenames	:=
-      allRecords.dAll_filenames
+      allRecords.dAll_filenames +
+      history.dAll_filenames
     ;
   END;
   
@@ -126,11 +128,13 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
     EXPORT  Sup_RID         :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'sup::RID'  , pVersion);
     EXPORT  Refs            :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'Refs'  , pVersion);
     EXPORT  Refs_NoMatch    :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'Refs::NOMATCH'  , pVersion);
+    EXPORT  Words           :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'Words'  , pVersion);
 		EXPORT	dAll_filenames	:=
       Meow.dAll_filenames  +
       Sup_RID.dAll_filenames  +
       Refs.dAll_filenames  +
-      Refs_NoMatch.dAll_filenames
+      Refs_NoMatch.dAll_filenames  +
+      Words.dAll_filenames
     ;
   END;
 
@@ -142,5 +146,41 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
  
   // workman files
   EXPORT  WUPrefix              :=  prefix    + pSrc  + '::' + pVersion + '::';
+  EXPORT  WUIterations          :=  'workunit_history::HealthcareNotMatchHeader.iterations.';
   EXPORT  MasterWUOutput_SF     :=  WUPrefix  + 'HealthcareNotMatchHeader::qa::workunit_history';
+  EXPORT  MasterWUOutput_AF     :=  PROJECT(ROW({MasterWUOutput_SF},tools.Layout_Names),
+                                      TRANSFORM(tools.Layout_FilenameVersions.builds,
+                                      SELF.dsuperfiles  :=  LEFT;
+                                      SELF  :=  [];
+                                    ));
+  
+  // For Cleanup
+  EXPORT  dAllSuperFiles    :=  
+            dAll_filenames+
+            Linking().dAll_filenames+
+            DebugKeys.dAll_filenames+
+            ExternalKeys.dAll_filenames+
+            MasterWUOutput_AF;
+            
+  EXPORT  dAllLogicalFiles  :=  
+            PROJECT(
+              STD.File.LogicalFileList(Input.AsHeaderTemp[2..])+
+              STD.File.LogicalFileList(Input.BaseTemp[2..])+
+              STD.File.LogicalFileList(lPersistTemplate[2..]+pVersion+'*')+
+              STD.File.LogicalFileList(IngestCache[2..])+
+              //  Linking files may be hanging around after removing from multiple Superfiles
+              STD.File.LogicalFileList(Linking('*').Iteration.New[2..])+
+              STD.File.LogicalFileList(Linking('*').Changes.New[2..])+
+              //  Workman files
+              STD.File.LogicalFileList(WUPrefix[2..] + WUIterations + '*')+
+              //  Add logical file names from Superfiles because not all files are added to Superfiles in SALT generated code
+              PROJECT(dAllSuperFiles(logicalname<>''),TRANSFORM(STD.File.FsLogicalFileInfoRecord,SELF.name:=LEFT.logicalname;SELF:=[])),
+              //  Add tilde(~) to name field because the Tools require it
+              TRANSFORM(
+                STD.File.FsLogicalFileInfoRecord,
+                SELF.name :=  IF(LEFT.name[1]<>'~','~','')+LEFT.name;
+                SELF      :=  LEFT
+              )
+            );
+            
 END;

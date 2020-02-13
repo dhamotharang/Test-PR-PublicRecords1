@@ -12,7 +12,7 @@ shared pii_current := Files().base.pii.built; //pii current build
 
 shared pii_previous := Files().base.pii.qa;			//pii previous build
 
-shared pii_updates := Join(pii_current,pii_previous,left=right,left only); //pii updates
+shared pii_updates := Join(pii_current,pii_previous,left.record_id=right.record_id,left only); //pii updates
 
 Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent; 
 
@@ -256,7 +256,7 @@ shared ciid_reladdr := AppendRelativesAddressMatch.macAppendRelativesAddressMatc
 
 //Assign fdn_file_info_ids
 shared ciid_base_map	:= Join(pii_input ,ciid_reladdr, left.record_id=right.record_id,Transform(Layouts.Ciid
-																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right)):independent;
+																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self.did_orig:=left.did,self:=right)):independent;
 
 //Anonymize if needed for a specific source
 
@@ -359,6 +359,7 @@ shared Crim_base_map	:= Join(pii_input , Crim_recid_map, left.record_id=right.re
 																	,self.lname_orig	:= left.lname
 																	,self.ssn_orig		:= left.ssn
 																	,self.dob_orig		:= left.dob
+																	,self.did_orig		:= left.did
 																	,self:=right)):independent;
 
 shared Crim_anon	:= Anonymize.Crim(Crim_base_map).all;
@@ -438,7 +439,7 @@ shared Death_recid_map	:= Join(Pii_Base_norm, P, left.record_id = right.record_i
 //Assign fdn_file_info_ids
 
 shared death_base_map	:= Join(pii_input ,Death_recid_map, left.record_id=right.record_id,Transform(Layouts.Death
-																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right)):independent;
+																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self.did_orig:=left.did,self:=right)):independent;
 
 //Anonymize if needed for a specific source
 shared Death_anon	:= Anonymize.Death(death_base_map).all;

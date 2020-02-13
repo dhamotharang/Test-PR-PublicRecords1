@@ -605,5 +605,10 @@ end;
     string3   addresstype;
   END;
 
+  EXPORT i_first_ingest := RECORD
+    unsigned6 rid;
+    unsigned4 first_ingest_date;
+  END;
+
 END;
   

@@ -1,4 +1,4 @@
-import 	Address, BIPV2, Ut, lib_stringlib, _Control, business_header,_Validate,
+﻿import 	Address, BIPV2, Ut, lib_stringlib, _Control, business_header,_Validate,
 				Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS,mdr;
 
 export Append_Ids :=	module
@@ -28,12 +28,12 @@ export Append_Ids :=	module
 				 ,											// use other environment?
 				 ,BIPV2.xlink_version_set  // BIP2 ids
 				 ,											// URL
-				 ,Business_Email_Id			// email
+				 ,											// email
 				 ,m_p_city_name					// city
 				 ,											// contact's first name
 				 ,											// contact's middle name
 				 ,											// contact's last name                 			 
-																					); 																			
+				); 																			
 
 			return dBDidOut;
       

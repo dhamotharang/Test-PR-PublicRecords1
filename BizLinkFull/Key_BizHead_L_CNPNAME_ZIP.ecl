@@ -1,7 +1,7 @@
 ﻿IMPORT SALT311,std;
 EXPORT Key_BizHead_L_CNPNAME_ZIP := MODULE
  
-//cnp_name:zip:?:prim_name:st:city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag
+//cnp_name:zip:?:prim_name:st:+:city:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag
 EXPORT KeyName := BizLinkFull.Filename_keys.L_CNPNAME_ZIP; /*HACK07*/
 SHARED h := CandidatesForKey;//The input file - distributed by proxid
  
@@ -19,8 +19,8 @@ layout := RECORD // project out required fields
   h.proxid; // The ID field
   h.prim_name;
   h.st;
-  h.city;
 // Extra credit fields
+  h.city;
   h.company_sic_code1;
   h.cnp_number;
   h.cnp_btype;
@@ -83,7 +83,9 @@ EXPORT BuildAll := BUILDINDEX(Key, OVERWRITE);
 // Compute shrinkage stats; the amount we could shrink the key for each extra credit removal
   KeyCnt := COUNT(Key);
   TSize := KeyCnt * SIZEOF(RECORDOF(Key)) / 1000000000; // Key size in gigs
-  Grpd := GROUP(Key,proxid,cnp_name,zip,prim_name,st,city,LOCAL); // Not perfect, does not need to be - for statistics
+  Grpd := GROUP(Key,proxid,cnp_name,zip,prim_name,st,LOCAL); // Not perfect, does not need to be - for statistics
+  Rem_city := GROUP( DEDUP( SORT( Grpd, EXCEPT city), EXCEPT city));
+  CntRed_city := (KeyCnt-COUNT(Rem_city))/KeyCnt;
   Rem_company_sic_code1 := GROUP( DEDUP( SORT( Grpd, EXCEPT company_sic_code1), EXCEPT company_sic_code1));
   CntRed_company_sic_code1 := (KeyCnt-COUNT(Rem_company_sic_code1))/KeyCnt;
   Rem_cnp_number := GROUP( DEDUP( SORT( Grpd, EXCEPT cnp_number), EXCEPT cnp_number));
@@ -110,34 +112,33 @@ EXPORT BuildAll := BUILDINDEX(Key, OVERWRITE);
   CntRed_org_flag := (KeyCnt-COUNT(Rem_org_flag))/KeyCnt;
   Rem_ult_flag := GROUP( DEDUP( SORT( Grpd, EXCEPT ult_flag), EXCEPT ult_flag));
   CntRed_ult_flag := (KeyCnt-COUNT(Rem_ult_flag))/KeyCnt;
-EXPORT Shrinkage := DATASET([{'L_CNPNAME_ZIP','company_sic_code1',CntRed_company_sic_code1*100,CntRed_company_sic_code1*TSize},{'L_CNPNAME_ZIP','cnp_number',CntRed_cnp_number*100,CntRed_cnp_number*TSize},{'L_CNPNAME_ZIP','cnp_btype',CntRed_cnp_btype*100,CntRed_cnp_btype*TSize},{'L_CNPNAME_ZIP','cnp_lowv',CntRed_cnp_lowv*100,CntRed_cnp_lowv*TSize},{'L_CNPNAME_ZIP','prim_range',CntRed_prim_range*100,CntRed_prim_range*TSize},{'L_CNPNAME_ZIP','sec_range',CntRed_sec_range*100,CntRed_sec_range*TSize},{'L_CNPNAME_ZIP','parent_proxid',CntRed_parent_proxid*100,CntRed_parent_proxid*TSize},{'L_CNPNAME_ZIP','sele_proxid',CntRed_sele_proxid*100,CntRed_sele_proxid*TSize},{'L_CNPNAME_ZIP','org_proxid',CntRed_org_proxid*100,CntRed_org_proxid*TSize},{'L_CNPNAME_ZIP','ultimate_proxid',CntRed_ultimate_proxid*100,CntRed_ultimate_proxid*TSize},{'L_CNPNAME_ZIP','sele_flag',CntRed_sele_flag*100,CntRed_sele_flag*TSize},{'L_CNPNAME_ZIP','org_flag',CntRed_org_flag*100,CntRed_org_flag*TSize},{'L_CNPNAME_ZIP','ult_flag',CntRed_ult_flag*100,CntRed_ult_flag*TSize}],SALT311.ShrinkLayout);
+EXPORT Shrinkage := DATASET([{'L_CNPNAME_ZIP','city',CntRed_city*100,CntRed_city*TSize},{'L_CNPNAME_ZIP','company_sic_code1',CntRed_company_sic_code1*100,CntRed_company_sic_code1*TSize},{'L_CNPNAME_ZIP','cnp_number',CntRed_cnp_number*100,CntRed_cnp_number*TSize},{'L_CNPNAME_ZIP','cnp_btype',CntRed_cnp_btype*100,CntRed_cnp_btype*TSize},{'L_CNPNAME_ZIP','cnp_lowv',CntRed_cnp_lowv*100,CntRed_cnp_lowv*TSize},{'L_CNPNAME_ZIP','prim_range',CntRed_prim_range*100,CntRed_prim_range*TSize},{'L_CNPNAME_ZIP','sec_range',CntRed_sec_range*100,CntRed_sec_range*TSize},{'L_CNPNAME_ZIP','parent_proxid',CntRed_parent_proxid*100,CntRed_parent_proxid*TSize},{'L_CNPNAME_ZIP','sele_proxid',CntRed_sele_proxid*100,CntRed_sele_proxid*TSize},{'L_CNPNAME_ZIP','org_proxid',CntRed_org_proxid*100,CntRed_org_proxid*TSize},{'L_CNPNAME_ZIP','ultimate_proxid',CntRed_ultimate_proxid*100,CntRed_ultimate_proxid*TSize},{'L_CNPNAME_ZIP','sele_flag',CntRed_sele_flag*100,CntRed_sele_flag*TSize},{'L_CNPNAME_ZIP','org_flag',CntRed_org_flag*100,CntRed_org_flag*TSize},{'L_CNPNAME_ZIP','ult_flag',CntRed_ult_flag*100,CntRed_ult_flag*TSize}],SALT311.ShrinkLayout);
 EXPORT CanSearch(Process_Biz_Layouts.InputLayout le) := le.cnp_name <> (TYPEOF(le.cnp_name))'' AND Fields.InValid_cnp_name((SALT311.StrType)le.cnp_name)=0 AND EXISTS(le.zip_cases);
 KeyRec := RECORDOF(Key);
  
-EXPORT RawFetch_server(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',UNSIGNED4 param_efr_bitmap = 0) := 
+EXPORT RawFetch_server(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',UNSIGNED4 param_efr_bitmap = 0) := 
   FUNCTION
  //Generate service attributes for GSS join
     wds := SALT311.fn_string_to_wordstream(param_cnp_name);
     indexOutputRecord := RECORDOF(Key);
     slimrec := { Key.gss_word_weight, Key.proxid, Key.seleid, Key.orgid, Key.ultid };
     BloomF := SALT311.Fn_Wordbag_To_Bloom(param_cnp_name); // Use for extra index filtering
-    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(KEY( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
+    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(LIMIT(KEY( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
       AND KEYED((zip IN SET(param_zip,zip)))
       AND ((param_prim_name = (TYPEOF(prim_name))'' OR prim_name = (TYPEOF(prim_name))'') OR (prim_name = param_prim_name) OR ((Config_BIP.WithinEditN(prim_name,prim_name_len,param_prim_name,param_prim_name_len,1, 0)) ))
-      AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))
-      AND ((param_city = (TYPEOF(city))'' OR city = (TYPEOF(city))'') OR (city = param_city) OR ( (metaphonelib.DMetaPhone1(city)=metaphonelib.DMetaPhone1(param_city))  OR (Config_BIP.WithinEditN(city,city_len,param_city,param_city_len,2, 0)) ))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
+      AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))),Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
     SALT311.MAC_collate_wordbag_matches4(wds,slimrec,doIndexRead,ultid,orgid,seleid,proxid,steppedmatches) // Perform N-way join
     res := JOIN( steppedmatches, Key, KEYED(RIGHT.GSS_Hash = wds[1].hsh)
       AND KEYED((RIGHT.zip IN SET(param_zip,zip))) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT));
     RETURN IF(COUNT(param_zip)>600,DATASET([],indexOutputRecord),IF(SUM(wds,spec) > (5+ LOG(COUNT(param_zip))/LOG(2)+(LOG(COUNT(param_zip))/LOG(2))),res,IF(SUM(wds,spec) = 0,DATASET([],indexOutputRecord) ,DATASET(ROW([],indexOutputRecord)))))/*HACK14*/; // Ensure at least spc of specificity in gss portion
   END;
  
-EXPORT RawFetch(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',UNSIGNED4 param_efr_bitmap = 0) := FUNCTION
+EXPORT RawFetch(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',UNSIGNED4 param_efr_bitmap = 0) := FUNCTION
 // Why not LOOP? - Because I am expecting FIRST one to win 99+ percent of the time - and don't want to impact it
-  RawData0 := RawFetch_server(param_cnp_name,param_zip,param_prim_name,param_prim_name_len,param_st,param_city,param_city_len,0,param_efr_bitmap);
-  RawData1 := RawFetch_server(param_cnp_name,param_zip,param_prim_name,param_prim_name_len,param_st,param_city,param_city_len,1,param_efr_bitmap);
-  RawData2 := RawFetch_server(param_cnp_name,param_zip,param_prim_name,param_prim_name_len,param_st,param_city,param_city_len,2,param_efr_bitmap);
-  Returnable(DATASET(RECORDOF(RawData0)) d) := COUNT(NOFOLD(d))<>1 OR EXISTS(NOFOLD(d((TYPEOF(cnp_name))cnp_name != (TYPEOF(cnp_name))'')));
+  RawData0 := RawFetch_server(param_cnp_name,param_zip,param_prim_name,param_prim_name_len,param_st,0,param_efr_bitmap);
+  RawData1 := RawFetch_server(param_cnp_name,param_zip,param_prim_name,param_prim_name_len,param_st,1,param_efr_bitmap);
+  RawData2 := RawFetch_server(param_cnp_name,param_zip,param_prim_name,param_prim_name_len,param_st,2,param_efr_bitmap);
+  Returnable(DATASET(RECORDOF(RawData0)) d) := COUNT(NOFOLD(d))>1 OR EXISTS(NOFOLD(d((TYPEOF(cnp_name))cnp_name != (TYPEOF(cnp_name))'')));
   res := MAP (
       param_fallback_value <= 0 AND Returnable(RawData0) => RawData0,
       param_fallback_value <= 1 AND Returnable(RawData1) => RawData1,
@@ -146,7 +147,7 @@ EXPORT RawFetch(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATAS
 END;
  
 EXPORT ScoredproxidFetch(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_range_len) param_prim_range_len = (TYPEOF(h.prim_range_len))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.sec_range_len) param_sec_range_len = (TYPEOF(h.sec_range_len))'',TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',UNSIGNED4 param_efr_bitmap = 0,BOOLEAN param_disableForce = FALSE) := FUNCTION
-  RawData := RawFetch(param_cnp_name,param_zip,param_prim_name,param_prim_name_len,param_st,param_city,param_city_len,param_fallback_value,param_efr_bitmap);
+  RawData := RawFetch(param_cnp_name,param_zip,param_prim_name,param_prim_name_len,param_st,param_fallback_value,param_efr_bitmap);
  
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
     SELF.keys_used := 1 << 1; // Set bitmap for keys used
@@ -460,15 +461,13 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
   J0 := JOIN(Recs2,Key,((HASH32(SALT311.fn_bow_bestword(LEFT.cnp_name))=RIGHT.gss_hash AND SALT311.MatchBagOfWords(RIGHT.cnp_name,LEFT.cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100))
      AND ((RIGHT.zip = LEFT.zip_cases[1].zip))
      AND ((LEFT.prim_name = (TYPEOF(RIGHT.prim_name))'' OR RIGHT.prim_name = (TYPEOF(RIGHT.prim_name))'') OR (RIGHT.prim_name = LEFT.prim_name) OR ((Config_BIP.WithinEditN(RIGHT.prim_name,RIGHT.prim_name_len,LEFT.prim_name,LEFT.prim_name_len,1, 0)) ))
-     AND ((LEFT.st = (TYPEOF(RIGHT.st))'' OR RIGHT.st = (TYPEOF(RIGHT.st))'') OR (RIGHT.st = LEFT.st))
-     AND ((LEFT.city = (TYPEOF(RIGHT.city))'' OR RIGHT.city = (TYPEOF(RIGHT.city))'') OR (RIGHT.city = LEFT.city) OR ( (metaphonelib.DMetaPhone1(RIGHT.city)=metaphonelib.DMetaPhone1(LEFT.city))  OR (Config_BIP.WithinEditN(RIGHT.city,RIGHT.city_len,LEFT.city,LEFT.city_len,2, 0)) )),Score_Batch(RIGHT,LEFT),
+     AND ((LEFT.st = (TYPEOF(RIGHT.st))'' OR RIGHT.st = (TYPEOF(RIGHT.st))'') OR (RIGHT.st = LEFT.st)),Score_Batch(RIGHT,LEFT),
     ATMOST(((HASH32(SALT311.fn_bow_bestword(LEFT.cnp_name))=RIGHT.gss_hash))
      AND ((RIGHT.zip = LEFT.zip_cases[1].zip)),Config_BIP.L_CNPNAME_ZIP_MAXBLOCKSIZE)); // Use indexed join (used for smaller batches
   J1 := JOIN(Recs2,PULL(Key),((HASH32(SALT311.fn_bow_bestword(LEFT.cnp_name))=RIGHT.gss_hash AND SALT311.MatchBagOfWords(RIGHT.cnp_name,LEFT.cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100))
      AND ((RIGHT.zip = LEFT.zip_cases[1].zip))
      AND ((LEFT.prim_name = (TYPEOF(RIGHT.prim_name))'' OR RIGHT.prim_name = (TYPEOF(RIGHT.prim_name))'') OR (RIGHT.prim_name = LEFT.prim_name) OR ((Config_BIP.WithinEditN(RIGHT.prim_name,RIGHT.prim_name_len,LEFT.prim_name,LEFT.prim_name_len,1, 0)) ))
-     AND ((LEFT.st = (TYPEOF(RIGHT.st))'' OR RIGHT.st = (TYPEOF(RIGHT.st))'') OR (RIGHT.st = LEFT.st))
-     AND ((LEFT.city = (TYPEOF(RIGHT.city))'' OR RIGHT.city = (TYPEOF(RIGHT.city))'') OR (RIGHT.city = LEFT.city) OR ( (metaphonelib.DMetaPhone1(RIGHT.city)=metaphonelib.DMetaPhone1(LEFT.city))  OR (Config_BIP.WithinEditN(RIGHT.city,RIGHT.city_len,LEFT.city,LEFT.city_len,2, 0)) )),Score_Batch(RIGHT,LEFT),
+     AND ((LEFT.st = (TYPEOF(RIGHT.st))'' OR RIGHT.st = (TYPEOF(RIGHT.st))'') OR (RIGHT.st = LEFT.st)),Score_Batch(RIGHT,LEFT),
     ATMOST(((HASH32(SALT311.fn_bow_bestword(LEFT.cnp_name))=RIGHT.gss_hash))
      AND ((RIGHT.zip = LEFT.zip_cases[1].zip)),Config_BIP.L_CNPNAME_ZIP_MAXBLOCKSIZE),HASH,UNORDERED); // PULL used to cause non-indexed join
   J2 := IF(AsIndex,J0,J1);

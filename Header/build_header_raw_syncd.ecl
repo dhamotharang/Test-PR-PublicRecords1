@@ -8,7 +8,7 @@ droppedRids:=join(hr,File_LAB_Pairs
 											,left only
 											,local):persist('~thor_data400::persist::missing_header_rid');
 
-maxAllowed:=200000;
+maxAllowed:=300000;
 droppedRidsNonBlankCnt:=count(droppedRids(lname<>'' OR fname<>''));
 droppedRidsBlankCnt:=   count(droppedRids(lname ='' ,  fname =''));
 duplicateRidsCount :=   count(table(Header.File_LAB_Pairs,{rid, rid_cnt := count(group)},rid,few,merge)(rid_cnt>1));
