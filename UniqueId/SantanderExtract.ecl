@@ -87,7 +87,7 @@ UnsprayReport(string lfn) := 		STD.file.Despray(
 			path + lfn + '.csv',
 			allowoverwrite := true);
 			
-DespryaSantnder := PARALLEL(
+DespraySantander := PARALLEL(
 	UnsprayReport('entities'),
 	UnsprayReport('akas'),
 	UnsprayReport('addresses'),
@@ -122,7 +122,7 @@ OUTPUT(Locations,,'~thor::uniqueid::santander::locations',
 OUTPUT(records,,'~thor::uniqueid::santander::counts',
 						CSV(HEADING('Watch List,Count',SINGLE),SEPARATOR(','),TERMINATOR('\n'),QUOTE('"')),OVERWRITE),
 
-DespryaSantnder
+DespraySantander
 );
 
 
