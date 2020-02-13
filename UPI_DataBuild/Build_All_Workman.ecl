@@ -40,6 +40,7 @@ EXPORT  Build_All_Workman(
 														'\npAppendOption		:= \''+pAppendOption+'\';' + 
                             '\n#WORKUNIT(\'name\',\'UPI_DataBuild '+runText+' \' + pVersion + \' gcid \' + gcid + \' Batch_JobID \' + pBatchJobID);' +
                             '\n#WORKUNIT(\'priority\',\'high\');' +
+														'\n#STORED(\'did_add_force\',\'thor\');' +
                             '\n';
 														
     RETURN workmanPreambleECL;
