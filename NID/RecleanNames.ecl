@@ -9,7 +9,7 @@ Nid.Layout_Repository xform(Nid.Layout_Repository R) := TRANSFORM
 		ntype := Nid.GetNameType(nm);
 		self.nameType := ntype;
 		self.nid		:= R.nid;
-		self.name	:= nm;
+		self.name	:= R.Name;		//nm;
 		//string140 cln_name := CleanName(name,ntype,'f');
 		string140 cln_name := IF(fullname,
 												Address.NameCleaner.CleanNameEx(nm, bSkipTrust := (ntype='T'), nmtype := ntype),
