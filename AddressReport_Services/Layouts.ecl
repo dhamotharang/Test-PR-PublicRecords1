@@ -119,7 +119,7 @@ export residents_final_out_w_royalties := record
 end;
 
 export rel_asst_layout := record
-	doxie.layout_relative_dids_v3;
+	doxie.layout_relative_dids;
 	doxie.layout_best;
 end;
 
