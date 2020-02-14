@@ -547,7 +547,7 @@ INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.Stri
 #if(ROUND1VALIDATION)
      sysdate := common.sas_date('20160501');	 
 #else
-    sysdate := common.sas_date(if(le.historydate=999999, (    STRING)ut.getdate, (    STRING6)le.historydate+'01'));
+    sysdate := common.sas_date(if(le.historydate=999999, (    STRING)std.date.today(), (    STRING6)le.historydate+'01'));
 #end
 //========================================================================================
 

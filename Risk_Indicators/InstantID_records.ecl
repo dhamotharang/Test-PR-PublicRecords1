@@ -419,17 +419,8 @@ insurance := If(TrackInsuranceRoyalties, Royalty.RoyaltyFDNDLDATA.GetWebRoyaltie
 																																											 
 tscore(UNSIGNED1 i) := IF(i=255,0,i);
 
-
-//  For ThreatMetrix reasoncodes
-TMX_model:=Models.IID1906_0_0(ret);
-DRM_threatmetrix:= DataRestriction[risk_indicators.iid_constants.IncludeDigitalIdentity]=risk_indicators.iid_constants.sFalse;
- retplus_tmx:= if(DRM_threatmetrix,join(ret,TMX_model,left.seq=right.seq,
- transform(risk_indicators.layout_output,
- self.iid_tmx.phonehighriskind:=RIGHT.phonehighriskind,
- self.iid_tmx.emailhighriskind:=Right.emailhighriskind,
- self:=LEFT),left outer),ungroup(ret));
  
-risk_indicators.Layout_InstantID_NuGenPlus format_out(retplus_tmx le) :=
+risk_indicators.Layout_InstantID_NuGenPlus format_out(ret le) :=
 TRANSFORM
 	SELF.acctNo := account_value;
 	SELF.transaction_id := 0;
@@ -802,7 +793,7 @@ END;
 	SELF := [];  // default models and red flags datasets to empty
 END;
 
-  ret_temp2 := ungroup(PROJECT(retplus_tmx, format_out(LEFT))); 
+  ret_temp2 := ungroup(PROJECT(ret, format_out(LEFT))); 
 /*---------use it to call the emailage gateway which will be going to use in future--------*/
 /*
   ret_temp2_temp := ungroup(PROJECT(retplus_tmx, format_out(LEFT)));
