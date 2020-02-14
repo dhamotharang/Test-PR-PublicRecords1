@@ -32,7 +32,7 @@ RETURN Sequential(  parallel(bld_optout_key,bld_optout_key_fcra),
 				    parallel(mv_qa_optout, mv_qa_optout_fcra),
 					parallel(update_dops, /* DF-26984 update_dops_fcra,*/ update_idops),
 					if( ut.Weekday((integer)pVersion[1..8]) <> 'SATURDAY' and ut.Weekday((integer)pVersion[1..8]) <> 'SUNDAY',
-					    parallel(create_build,create_build_fcra, create_build_ins),
+					    parallel(create_build,/*create_build_fcra,*/ create_build_ins),
 						output('No Orbit Entries Needed for weekend builds'))
                  );
 

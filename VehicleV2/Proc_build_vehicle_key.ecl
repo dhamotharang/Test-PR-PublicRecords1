@@ -1,4 +1,4 @@
-import Address_Attributes,roxiekeybuild,vehiclev2,Vehicle_Wildcard,VersionControl;
+﻿import Address_Attributes,roxiekeybuild,vehiclev2,Vehicle_Wildcard,VersionControl;
  
 export Proc_build_vehicle_key(string filedate) := function
 
@@ -43,8 +43,9 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Address_Attributes.key_vehicles_addr,
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::vehiclev2::vehicles_address', '~thor_data400::key::vehiclev2::'+filedate+'::vehicles_address', mv_vehicle_addr_key);
 
 //Bug 123614
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(vehiclev2.key_vehicle_Party_Key_Linkids,'~thor_data400::key::vehiclev2::Party_Key::Linkids','~thor_data400::key::vehiclev2::'+filedate+'::Party_Key::Linkids',vehicle_Party_Key_Linkids);
-Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::vehiclev2::Party_Key::Linkids', '~thor_data400::key::vehiclev2::'+filedate+'::Party_Key::Linkids', mv_Party_Key_linkids);
+//Deprecated key - Jira DF-26974
+//RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(vehiclev2.key_vehicle_Party_Key_Linkids,'~thor_data400::key::vehiclev2::Party_Key::Linkids','~thor_data400::key::vehiclev2::'+filedate+'::Party_Key::Linkids',vehicle_Party_Key_Linkids);
+//Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::vehiclev2::Party_Key::Linkids', '~thor_data400::key::vehiclev2::'+filedate+'::Party_Key::Linkids', mv_Party_Key_linkids);
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(VehicleV2.Key_Vehicle_Source_Rec_ID,'~thor_data400::key::vehiclev2::source_rec_id','~thor_data400::key::vehiclev2::'+filedate+'::source_rec_id',vehicle_SourceRecID_key);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::vehiclev2::source_rec_id', '~thor_data400::key::vehiclev2::'+filedate+'::source_rec_id', mv_SourceRecID_Key);
@@ -57,12 +58,12 @@ build_keys	:=	sequential(	parallel(	linkids_key,vehicle_DID_key,vehicle_BDID_key
 																			vehicle_Lic_Plate_key,vehicle_reverse_lic_plate_key,
 																			vehicle_MAIN_Key,vehicle_VIN_Key,vehicle_Party_Key,
 																			vehicle_Title_Number_Key,vehicle_lic_plate_blur_key,
-																			bocashell_did_key,vehicle_addr_key, vehicle_Party_Key_Linkids,
+																			bocashell_did_key,vehicle_addr_key, /*vehicle_Party_Key_Linkids,*/
 																			vehicle_SourceRecID_key,vehicle_MFDSrch_key
 																				),
 															parallel(	mv_linkids_key,mv_DID_key,mv_BDID_key,mv_DL_Number_key,mv_Lic_Plate_key,mv_reverse_lic_plate_key,
 																				mv_MAIN_Key,mv_VIN_Key,mv_Party_Key,mv_Title_Number_Key,
-																				mv_lic_plate_blur_key,mv_bocashell_did_key,mv_vehicle_addr_key,mv_Party_Key_linkids,
+																				mv_lic_plate_blur_key,mv_bocashell_did_key,mv_vehicle_addr_key,/*mv_Party_Key_linkids,*/
 																				mv_SourceRecID_Key,mv_MFDSrch_Key
 																				),
 															Vehiclev2.Proc_AutokeyBuild(filedate),

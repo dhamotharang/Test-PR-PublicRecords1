@@ -28,8 +28,6 @@ EXPORT  Build_All_Workman(
   //  Common Workman ECL Code
   workmanPreamble(STRING runText)  :=  FUNCTION
     workmanPreambleECL  :=  'IMPORT versioncontrol, _control, ut, tools, UPI_DataBuild;' +
-		
-                            // '\npSrc := \''+pSrc+'\';' +
                             '\npVersion  				:= \'@version@\';' +
 														'\npUseProd	 				:= '+IF(pUseProd,'TRUE','FALSE')+';' +
 														'\ngcid		 	 				:= \''+gcid+'\';' +
@@ -40,6 +38,7 @@ EXPORT  Build_All_Workman(
 														'\npAppendOption		:= \''+pAppendOption+'\';' + 
                             '\n#WORKUNIT(\'name\',\'UPI_DataBuild '+runText+' \' + pVersion + \' gcid \' + gcid + \' Batch_JobID \' + pBatchJobID);' +
                             '\n#WORKUNIT(\'priority\',\'high\');' +
+														'\n#STORED(\'did_add_force\',\'thor\');' +
                             '\n';
 														
     RETURN workmanPreambleECL;

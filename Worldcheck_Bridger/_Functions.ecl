@@ -1288,6 +1288,8 @@
 				trim(kword, left, right) = 'FRAFA' =>SubGroup_Constants.numKeywordsID.KEYWORD_FRAFA,
 				trim(kword, left, right) = 'PTIMPIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTIMPIC,
 				trim(kword, left, right) = 'JPCAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPCAA,
+				trim(kword, left, right) = 'PHBOI' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHBOI,
+				trim(kword, left, right) = 'PHBIR' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHBIR,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
