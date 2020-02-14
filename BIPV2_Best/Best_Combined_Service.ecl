@@ -15,7 +15,7 @@ IMPORT BIPV2, BIPV2_Best, BIPV2_Best_SBFE;
 
 #WEBSERVICE(
 	DESCRIPTION(
-	     '<h3>This service returns BIP Best values for Best, SBFE, & Marketing Best</h3>\n'
+	     '<h3>This service returns BIP Best values for Best, SBFE & Marketing Best</h3>\n'
 			 + '<p>Please enter the BIP ID for the level of hierarchy to return (Ult/Org/Sele/Prox).</p>'
 			 + '<p>Best is determined for both Sele and Prox level entities.  If the sele_level_only option is set (defaults to false), prox level results will be removed and only sele level Best will be shown.</p>'
 			 )
