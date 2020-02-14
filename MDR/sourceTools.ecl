@@ -1092,6 +1092,8 @@ MODULE
 	]; 
 
 // Marketing approved sources as of 11/2019.
+// Note, doxie.compliance.isMarketingAllowed should be used to determine if a source is marketing approved.
+// Any new sources should be added codes_v3 key. Jira DF-26837 is an example on how to update codes_v3 key for new sources.
 export set_Marketing_Sources           := [
 		 src_AMS											 ,src_AK_Busreg                 ,src_AK_Perm_Fund						   ,src_Accurint_Trade_Show			 
 		,src_Aircrafts								 ,src_Accurint_Arrest_Log				,src_AlloyMedia_consumer       ,src_Airmen    						 		 
