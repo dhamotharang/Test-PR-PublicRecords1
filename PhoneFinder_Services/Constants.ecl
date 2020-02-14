@@ -234,7 +234,7 @@ MODULE
     EXPORT UNSIGNED2 MaxOtherPhones := 100;
   END;
 
-   PFSourceCategory := MODULE
+   EXPORT PFSourceCategory := MODULE
      EXPORT STRING Inquiry := 'Inquiry';
      EXPORT STRING VehicleRegistration := 'VehicleRegistration';
      EXPORT STRING CreditHeader := 'CreditHeader';
@@ -257,13 +257,13 @@ MODULE
      EXPORT STRING Other := 'Other';
   END;
 
-  PFSourceType := MODULE
+  EXPORT PFSourceType := MODULE
      EXPORT STRING SelfReported := 'SelfReported';
      EXPORT STRING SelfReported_CreditInquiry := 'Self Reported-Credit Inquiry';
      EXPORT STRING Account := 'Account';
   END;
 
-  PFSourceCodes := MODULE
+  EXPORT PFSourceCodes := MODULE
     EXPORT STRING QsentIQ411 := 'I';
     EXPORT STRING EquifaxPhoneMart := 'EQ';
     EXPORT STRING EDALA := 'ES';
