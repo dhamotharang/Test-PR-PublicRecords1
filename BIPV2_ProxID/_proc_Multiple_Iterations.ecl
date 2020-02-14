@@ -1,4 +1,4 @@
-﻿import BIPV2_Files,tools,BIPV2,BIPV2_ProxID,bipv2_build;
+﻿import BIPV2_Files,tools,BIPV2,BIPV2_ProxID,bipv2_build,WsWorkunits;
 EXPORT _proc_Multiple_Iterations(
    pstartiter       = '\'\''    //default is to start where it left off
   ,pnumiters        = '3'
@@ -16,10 +16,11 @@ EXPORT _proc_Multiple_Iterations(
   ,pCompileTest     = 'false'
   ,pdo1Iteration    = 'false'
   ,pIsTesting       = 'false'
+  ,pds_debug        = '\'dataset([],WsWorkunits.Layouts.DebugValues)\''
 ) :=
 functionmacro
   
-  import workman,tools,bipv2,mdr,BIPV2_ProxID,SALTTOOLS22,BIPV2_Files,BIPV2_Build;
+  import workman,tools,bipv2,mdr,BIPV2_ProxID,SALTTOOLS22,BIPV2_Files,BIPV2_Build,WsWorkunits;
   
   lstartiter        := pstartiter                       ;
   lnumiters         := pnumiters                        ;
@@ -90,11 +91,13 @@ functionmacro
       ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::BIPV2_ProxID.proc_proxid.' + workman_preprocess_file
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly      := pCompileTest
+      ,pDebugValues      := pds_debug
   );
   kickSpecs := Workman.mac_WorkMan(ecltextSpecs  ,version,cluster,1         ,1        ,pBuildName := pUniqueOut + 'Specs',pNotifyEmails := pEmailList
       ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::BIPV2_ProxID.proc_proxid.Specificities'
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly      := pCompileTest
+      ,pDebugValues      := pds_debug
   );
   kickiters := Workman.mac_WorkMan(ecltextIterFix,version,cluster,pstartiter,lnumitersmax,lnumiters
       ,pSetResults          := eclsetResults
@@ -105,12 +108,14 @@ functionmacro
       ,pOutputFilename      := '~bipv2_build::@version@::workunit_history::BIPV2_ProxID.proc_proxid.iterations.' + trim(pUniqueOut)
       ,pOutputSuperfile     := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly         := pCompileTest
+      ,pDebugValues         := pds_debug
   );
  
   kickPost  := Workman.mac_WorkMan(ecltextPost,version ,cluster  ,1         ,1        ,pBuildName := pUniqueOut + 'PostProcess',pNotifyEmails := pEmailList
       ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::BIPV2_ProxID.proc_proxid.' + workman_postprocess_file
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly      := pCompileTest
+      ,pDebugValues      := pds_debug
   );
 
   //kickiters;

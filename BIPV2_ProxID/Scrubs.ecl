@@ -238,13 +238,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,'st:' + getFieldTypeText(h.st) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'prim_range_derived:' + getFieldTypeText(h.prim_range_derived) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'sbfe_id:' + getFieldTypeText(h.sbfe_id) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'company_charter_number:' + getFieldTypeText(h.company_charter_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'hist_enterprise_number:' + getFieldTypeText(h.hist_enterprise_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'ebr_file_number:' + getFieldTypeText(h.ebr_file_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'active_enterprise_number:' + getFieldTypeText(h.active_enterprise_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'hist_domestic_corp_key:' + getFieldTypeText(h.hist_domestic_corp_key) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'foreign_corp_key:' + getFieldTypeText(h.foreign_corp_key) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'unk_corp_key:' + getFieldTypeText(h.unk_corp_key) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'active_domestic_corp_key:' + getFieldTypeText(h.active_domestic_corp_key) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'hist_corp_key:' + getFieldTypeText(h.hist_corp_key) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'hist_duns_number:' + getFieldTypeText(h.hist_duns_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'active_duns_number:' + getFieldTypeText(h.active_duns_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'company_phone:' + getFieldTypeText(h.company_phone) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -255,6 +253,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,'prim_name_derived:' + getFieldTypeText(h.prim_name_derived) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'sec_range:' + getFieldTypeText(h.sec_range) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'v_city_name:' + getFieldTypeText(h.v_city_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'company_inc_state:' + getFieldTypeText(h.company_inc_state) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'cnp_btype:' + getFieldTypeText(h.cnp_btype) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'company_name_type_derived:' + getFieldTypeText(h.company_name_type_derived) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'company_name:' + getFieldTypeText(h.company_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -274,13 +273,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.populated_st_cnt
           ,le.populated_prim_range_derived_cnt
           ,le.populated_sbfe_id_cnt
+          ,le.populated_company_charter_number_cnt
           ,le.populated_hist_enterprise_number_cnt
           ,le.populated_ebr_file_number_cnt
           ,le.populated_active_enterprise_number_cnt
-          ,le.populated_hist_domestic_corp_key_cnt
-          ,le.populated_foreign_corp_key_cnt
-          ,le.populated_unk_corp_key_cnt
-          ,le.populated_active_domestic_corp_key_cnt
+          ,le.populated_hist_corp_key_cnt
           ,le.populated_hist_duns_number_cnt
           ,le.populated_active_duns_number_cnt
           ,le.populated_company_phone_cnt
@@ -291,6 +288,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.populated_prim_name_derived_cnt
           ,le.populated_sec_range_cnt
           ,le.populated_v_city_name_cnt
+          ,le.populated_company_inc_state_cnt
           ,le.populated_cnp_btype_cnt
           ,le.populated_company_name_type_derived_cnt
           ,le.populated_company_name_cnt
@@ -310,13 +308,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.populated_st_pcnt
           ,le.populated_prim_range_derived_pcnt
           ,le.populated_sbfe_id_pcnt
+          ,le.populated_company_charter_number_pcnt
           ,le.populated_hist_enterprise_number_pcnt
           ,le.populated_ebr_file_number_pcnt
           ,le.populated_active_enterprise_number_pcnt
-          ,le.populated_hist_domestic_corp_key_pcnt
-          ,le.populated_foreign_corp_key_pcnt
-          ,le.populated_unk_corp_key_pcnt
-          ,le.populated_active_domestic_corp_key_pcnt
+          ,le.populated_hist_corp_key_pcnt
           ,le.populated_hist_duns_number_pcnt
           ,le.populated_active_duns_number_pcnt
           ,le.populated_company_phone_pcnt
@@ -327,6 +323,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.populated_prim_name_derived_pcnt
           ,le.populated_sec_range_pcnt
           ,le.populated_v_city_name_pcnt
+          ,le.populated_company_inc_state_pcnt
           ,le.populated_cnp_btype_pcnt
           ,le.populated_company_name_type_derived_pcnt
           ,le.populated_company_name_pcnt
@@ -343,7 +340,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.populated_dt_last_seen_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,35,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,34,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -359,7 +356,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
  
     mod_Delta := Delta(prevDS, PROJECT(h, Layout_DOT_Base));
     deltaHygieneSummary := mod_Delta.DifferenceSummary(Glob);
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),35,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),34,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');

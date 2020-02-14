@@ -31,7 +31,7 @@ functionmacro
   FilesReadRegexFilter    := '^(?!.*?key.*)(?=.*?([[:digit:]]{5,}).*).*?(BIPV2_ProxID|dot).*$'    ;
   FilesWrittenRegexFilter := '^(?!.*?key.*)(?=.*?([[:digit:]]{5,}).*).*?(BIPV2_ProxID.*base).*$'  ;
   // outputwksummary := wk_ut.mac_createSALTSummaryReport(pversion,workunit,workunit,BIPV2_ProxID.filenames(combo).wkhistory.logical ,FilesReadRegexFilter,FilesWrittenRegexFilter,'Proxid',pOverwrite := true,pOutputEcl := false,pNumRecords := 1,pSALT28 := true);
-  constructTraceFiles:=BIPV2_ProxID._ConstructTracebackFiles(lversion, siter).outKeyFiles; 
+  // constructTraceFiles:=BIPV2_ProxID._ConstructTracebackFiles(lversion, siter).outKeyFiles; 
 	return sequential(
      output(choosen(BIPV2_ProxID.In_DOT_Base,100))
     ,clearsupers
@@ -42,9 +42,9 @@ functionmacro
     ,BIPV2_ProxID._Output_Review_Samples(pMatchThreshold)
     // ,outputwksummary
     ,if(BIPV2_ProxID._Constants().Add2WorkmanSuper  ,BIPV2_ProxID.promote(combo,'(wkhistory|changes)').new2qaMult)
-    ,BIPV2_Tools.mac_Check_Samples(BIPV2_ProxID.files(combo).base.logical,'Prox' + siter)
+    // ,BIPV2_Tools.mac_Check_Samples(BIPV2_ProxID.files(combo).base.logical,'Prox' + siter)
     // ,BIPV2_ProxID.fStatMissingProxIDLinks(BIPV2_ProxID.In_DOT_Base, piteration)
-		,if(BIPV2_ProxID._Constants().doTraceBackFiles  ,constructTraceFiles)//PUT BACK!!!
+		// ,if(BIPV2_ProxID._Constants().doTraceBackFiles  ,constructTraceFiles)//PUT BACK!!!
     ,BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,proxid ,pversion  ,piteration  ,BIPV2_Proxid.Config.MatchThreshold ,'BIPV2_Proxid')
     ,BIPV2_Build.mod_email.SendSuccessEmail(msg := wk_ut.get_Errors(workunit),subProduct := wk_ut.get_jobname(workunit))
   );
