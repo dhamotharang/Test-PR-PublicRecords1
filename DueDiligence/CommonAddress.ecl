@@ -105,5 +105,20 @@ EXPORT CommonAddress := MODULE
                                     KEEP(DueDiligence.Constants.MAX_ATMOST_1));
         RETURN addKeyAddr1History;
     ENDMACRO;
+    
+    //assumes inDS has a field named state and county
+    EXPORT GetAddressCounty(inDS) := FUNCTIONMACRO
+        IMPORT Census_Data, codes, STD;
+         
+        tempFIPS := PROJECT(inDS, TRANSFORM({RECORDOF(inDS), STRING5 tempFIPSCode, STRING countyNameText},
+                                            SELF.tempFIPSCode := codes.st2FipsCode(STD.Str.ToUpperCase(LEFT.state)) + LEFT.county;
+                                            SELF.countyNameText := '';
+                                            SELF := LEFT;));
+          
+                                                                                                                                                                                         
+        Census_Data.MAC_Fips2County_Keyed(tempFIPS, state, tempFIPSCode, countyNameText, addrWithCounty);
+        
+        RETURN addrWithCounty;
+    ENDMACRO;
 
 END;

@@ -118,6 +118,8 @@ EXPORT LayoutsInternal := MODULE
   END;
   
   EXPORT LegalFlags := RECORD
+    BOOLEAN trafficOffenseFound;
+    BOOLEAN otherOffenseFound;
     BOOLEAN currIncar;
     BOOLEAN currParole;
     BOOLEAN currProbation;
