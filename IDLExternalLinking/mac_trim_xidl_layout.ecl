@@ -1,4 +1,4 @@
-﻿export mac_trim_xidl_layout(inDataset, outDataset, inReference_field = 'reference') := macro
+export mac_trim_xidl_layout(inDataset, outDataset, inReference_field = 'reference') := macro
 	
 	/*-- Trim Layout ---*/
 	#UNIQUENAME(LayoutScoredFetch)
@@ -6,7 +6,6 @@
 		UNSIGNED6 reference;
 		UNSIGNED8 DID;
 		STRING ind := '';  // segmentation indicator
-		STRING3 lexID_type := '';
 		UNSIGNED8 cluster_cnt := 0;
 		UNSIGNED2 Weight;
 		UNSIGNED2 Score;
@@ -69,8 +68,7 @@
 		UNSIGNED6 reference;		
 	end;
 	
-	#UNIQUENAME(outDataset1)
-	%outDataset1% := PROJECT(inDataset,
+	outDataset := PROJECT(inDataset,
 				TRANSFORM(%OutputLayout_Base%, 
 					SELF.resolved := LEFT.resolved, 
 					SELF.reference := LEFT.inReference_field,																	
@@ -82,15 +80,14 @@
 													+ LEFT.DOBWeight_month
 													+ LEFT.DOBWeight_day;
 									ssnweight := left.ssn5weight + left.ssn4weight;
-									SELF.did := IF (
+									SELF.did := IF ( (InsuranceHeader_xLink.Environment.isCurrentBoca
+											AND LEFT.did > IDLExternalLinking.Constants.INSURANCE_LEXID)
+											OR (
 													((LEFT.stweight > 7 and LEFT.stweight <=12 and ~(SELF.DOBweight>=15 or SSNweight >=20)) 
 														OR (LEFT.stweight>12))
-													AND LEFT.prim_nameweight=0 AND LEFT.prim_rangeweight=0,
+													AND LEFT.prim_nameweight=0 AND LEFT.prim_rangeweight=0
+														),
 											SKIP, LEFT.did);																					 													
 													SELF := LEFT, self := []))
 					));
-
-	#UNIQUENAME(outDataset2)
-	%outDataset2% := IDLExternalLinking.append_segmentation(%outDataset1%);
-	outDataset := %outDataset2%;	
 endmacro;
