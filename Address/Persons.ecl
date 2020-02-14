@@ -1269,7 +1269,9 @@ shared string1 GetNameOrderFML(string rgx, string s, integer2 posf1, integer2 po
 				segs IN ['LFF','LFB','LFL','LFX','LBF','LBB','LBL','LBX','LXX','LXF','LXB','BFF','BBF','XBX','XFX','XFB','XXF','XFF','XBF','XBB'] => 'L',
 				segs in ['LLF','XLF','BLF','LLB'] => IF(nameTester.IsLoPctFirstName(REGEXFIND(rgx, s, posm1)), 'L', 'U'),
 				segs in ['XFL','XBL'] => IF(nameTester.IsLoPctFirstName(REGEXFIND(rgx, s, posl1)), 'L', 'F'),
-				segs in ['BFB'] => if(clue in ['l','L'], 'L', 'F'),
+				segs in ['BLB'] => IF(nameTester.IsHiPctFirstName(REGEXFIND(rgx, s, posl1)),
+														'U','F'),
+				segs in ['BFB'] => 'F',
 				clue in ['l','L'] => 'L',
 				'F'
 				//GetNameOrder(rgx, s, posf1, posf2, posl1, posl2, clue, posm1, posm2)
