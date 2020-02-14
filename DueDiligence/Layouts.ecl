@@ -536,6 +536,8 @@ EXPORT Layouts := MODULE
     STRING10 legalEventTypeFlags;
     STRING2 stateCriminalLegalEventsScore;
     STRING10 stateCriminalLegalEventsFlags;
+    BOOLEAN trafficOffenseFound;
+    BOOLEAN otherCriminalOffenseFound;
     STRING2 civilLegalEventsScore;
     STRING10 civilLegalEventsFlags;
     UNSIGNED3 numOfPositions;
@@ -656,6 +658,8 @@ EXPORT Layouts := MODULE
     UNSIGNED1 amlRelationshipDegree;
     STRING2 rawRelationshipType;
     STRING2 relationToInquired;
+    BOOLEAN offenseTrafficRelated;
+    BOOLEAN otherCriminalOffense;
     BOOLEAN currentlyIncarcerated;    
     BOOLEAN everIncarcerated;
     BOOLEAN potentialSexOffender;

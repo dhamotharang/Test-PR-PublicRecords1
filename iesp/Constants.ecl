@@ -457,6 +457,7 @@ EXPORT Constants := MODULE
     export unsigned2 MaxIndvAssociations   			:= 500;
     export unsigned2 MaxBusAssociations   			:= 500;
     export unsigned2 MaxResidence               := 500;
+    export unsigned2 MaxPersonAssociations      := 500;
 	end;
 
 	//Digital Mortgage Application Prefill (DMAP)
