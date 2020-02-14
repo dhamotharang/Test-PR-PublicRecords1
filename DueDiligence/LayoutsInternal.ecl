@@ -287,6 +287,40 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED6 maxBasePrice;
     DATASET(DueDiligence.Layouts.VehicleDataLayout) allVehicles {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)};
   END;
+  
+  
+  
+  EXPORT SharedSlimLiens := RECORD
+    InternalSeqAndIdentifiersLayout; 
+    UNSIGNED4 historyDate;
+    STRING50 rmsid;
+    STRING50 tmsid;
+    UNSIGNED4 global_sid;
+    UNSIGNED4 dateFirstSeen;
+    UNSIGNED4 dateLastSeen;
+    STRING20 filingNumber;
+    STRING20 filingJurisdiction;
+    STRING50 filingTypeDesc;
+    STRING30 filingStatus;
+    STRING75 agency;
+    STRING2 agencyState;
+    STRING25 agencyCounty;
+    STRING11 amount;
+    UNSIGNED4 releaseDate;
+    STRING1 eviction;
+    UNSIGNED4 origFilingDate;
+    UNSIGNED4 lapseDate;
+    STRING lienTypeCategory;
+    STRING judgmentCategory;
+    STRING filingStatusCategory;
+    UNSIGNED totalEvictions;
+    UNSIGNED totalEvictionsOver3Yrs;
+    UNSIGNED totalEvictionsPast3Yrs;
+    UNSIGNED totalUnreleasedLiens;
+    UNSIGNED totalUnreleasedLiensOver3Yrs;
+    UNSIGNED totalUnreleasedLiensPast3Yrs; 
+    UNSIGNED totalReleasedLiens;
+  END;
 
 
   //------                                      ------
@@ -340,22 +374,6 @@ EXPORT LayoutsInternal := MODULE
     plus_category_liens_judgments;
   END;
 
-  //------                                      ------
-  //------      For Individual                  ------
-  //------  Populated with Liens and Judgements ------
-  //------                                      ------
-
-  EXPORT LiensLayout_by_DID:= RECORD
-    unsigned4		seq := 0;
-    unsigned6 	did;
-    STRING50 		rmsid; // liens extras
-    common_layout_liens_judgments;  
-  END;
-
-  EXPORT 	ByDID_liens_judgments_categorized := RECORD
-    LiensLayout_by_DID;
-    plus_category_liens_judgments; 
-  END;
 
 
 
