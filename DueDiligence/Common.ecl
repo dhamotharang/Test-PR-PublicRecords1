@@ -1,10 +1,10 @@
-﻿IMPORT Address, codes, DueDiligence, Easi, Census_Data, iesp, Risk_Indicators, STD, ut;
+﻿IMPORT codes, DueDiligence, Easi, Census_Data, iesp, Risk_Indicators, STD, ut;
 
 
 EXPORT Common := MODULE
 
     EXPORT firstPopulatedString(field) := FUNCTIONMACRO
-      RETURN IF(LEFT.field = DueDiligence.Constants.EMPTY, RIGHT.field, LEFT.field);
+      RETURN IF(TRIM(LEFT.field) = DueDiligence.Constants.EMPTY, RIGHT.field, LEFT.field);
     ENDMACRO;
   
     EXPORT firstNonZeroNumber(field) := FUNCTIONMACRO
