@@ -1,11 +1,11 @@
-IMPORT _control,RoxieKeyBuild, enclarity;
+﻿IMPORT _control,RoxieKeyBuild, enclarity;
 
 EXPORT Email_Notification_Lists := MODULE
-   developer := 'jennifer.hennigar@lexisnexis.com;';
-   tester := _Control.MyInfo.EmailAddressNotify+ '; Senthilkumar.Periasamy@lexisnexis.com';
-	 //quality_assurance := 'qualityassurance@seisint.com;';
-	 quality_assurance := 'jennifer.hennigar@lexisnexis.com;';
-   all_hands := developer + tester + ';' + quality_assurance;
+   developer := 'jennifer.hennigar@lexisnexisrisk.com;';
+   tester := _Control.MyInfo.EmailAddressNotify+ '; Senthilkumar.Periasamy@lexisnexisrisk.com;';
+	 quality_assurance := 'lisa.brolsma@lnssi.com;';
+	 qa2							:= 'cassandra.howser@lexisnexisrisk.com;';
+   all_hands := developer + tester + quality_assurance + qa2;
 	 
    EXPORT BuildSuccess :=	IF(_Flags().IsTesting, developer + tester, all_hands);
    EXPORT BuildFailure := BuildSuccess;
