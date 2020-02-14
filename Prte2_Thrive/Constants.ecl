@@ -5,6 +5,5 @@ EXPORT Constants := MODULE
   SHARED Prefix := IF(_Control.ThisEnvironment.Name='Dataland', '~', Data_Services.foreign_prod);
   EXPORT Base_Prefix := '~prte::base::';
   EXPORT key_prefix  := '~prte::key::thrive::';
-  EXPORT fcra_key_prefix  := '~prte::key::fcra::thrive::';
 
 END;
