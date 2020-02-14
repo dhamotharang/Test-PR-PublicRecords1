@@ -36,13 +36,15 @@ bocashell_file_in := '~scoring_project::in::riskview_xml_generic_v3_v4_v5_201611
 
 //**********OUTPUT FILE NAMES**************//
 //bocashell_54_nonfcra
+//2/14/2020
+//replaced (STRING8)Std.Date.Today() with ut.getdate
 
-bocashell_54_nonfcra_file_out := '~scoringqa::out::nonfcra::bocashell_54_historydate_999999_cert_' + (STRING8)Std.Date.Today() + filetag;
-bocashell_54_nonfcra_file_out_HD := '~scoringqa::out::nonfcra::bocashell_54_historydate_201207_cert_' + (STRING8)Std.Date.Today() + filetag;
+bocashell_54_nonfcra_file_out := '~scoringqa::out::nonfcra::bocashell_54_historydate_999999_cert_' + ut.getdate + filetag;
+bocashell_54_nonfcra_file_out_HD := '~scoringqa::out::nonfcra::bocashell_54_historydate_201207_cert_' + ut.getdate + filetag;
 
 //bocashell_54_fcra
-bocashell_54_fcra_file_out := '~scoringqa::out::fcra::bocashell_54_historydate_999999_cert_' + (STRING8)Std.Date.Today() + filetag;
-bocashell_54_fcra_file_out_HD := '~scoringqa::out::fcra::bocashell_54_historydate_201207_cert_' + (STRING8)Std.Date.Today() + filetag;
+bocashell_54_fcra_file_out := '~scoringqa::out::fcra::bocashell_54_historydate_999999_cert_' + ut.getdate + filetag;
+bocashell_54_fcra_file_out_HD := '~scoringqa::out::fcra::bocashell_54_historydate_201207_cert_' + ut.getdate + filetag;
 
 //macros for 54
 Bocashell_54_nonfcra_999999 := Scoring_Project_PIP.BocaShell_54_nonFCRA_cert_MACRO( bs_version_54, neutralroxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,bocashell_file_in,bocashell_54_nonfcra_file_out,no_of_recs_to_run);
@@ -59,9 +61,9 @@ Fcra_54 := sequential(Bocashell_54_fcra_999999,Bocashell_54_fcra_201207);
 data_collection := parallel(Nonfcra_54, Fcra_54);
 
 //Run Collections in parallel
-sequential( data_collection)
+sequential(data_collection)
 
-			 : WHEN(CRON('00 8 * * *')), //4:30 am
+			 : WHEN(CRON('00 8 * * *')), //3:00 am Eastern
 			FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.fail_list,'Test Cert Bocashell collections job failed.','The failed workunit is: ' + workunit + FailMessage));
 		
 
