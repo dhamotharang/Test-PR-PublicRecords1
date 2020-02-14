@@ -218,14 +218,7 @@ EXPORT reportIndMobility(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                                   SELF.resTenInfo := DATASET([TRANSFORM(DueDiligence.LayoutsInternalReport.SlimResidentTenant, 
                                                                                                         SELF.relative := LEFT.residentDID IN rellyDIDs;
                                                                                                         SELF.busAssocs := LEFT.residentDID IN busAssocDIDs;
-                                                                                                        SELF := LEFT;)]);
-                                                                                                        
-                                                                  currAddrIndicator := tblCurrPrevAddrIndicator(seq = LEFT.inquiredSeq AND inquiredDID = LEFT.inquiredDID AND currentPreviousIndicator = CURRENT_ADDRESS_TEXT);
-                                                                  prevAddrIndicator := tblCurrPrevAddrIndicator(seq = LEFT.inquiredSeq AND inquiredDID = LEFT.inquiredDID AND currentPreviousIndicator = PRIOR_ADDRESS_TEXT);
-                                                                                       
-                                                                  SELF.numberOfCurrentAddresses := currAddrIndicator[1].indicatorCnt;
-                                                                  SELF.numberOfPriorAddresses := prevAddrIndicator[1].indicatorCnt;
-                                                                  
+                                                                                                        SELF := LEFT;)]);                                                                  
                                                                   SELF := LEFT;
                                                                   SELF := [];));
                                                                   
@@ -255,9 +248,6 @@ EXPORT reportIndMobility(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                       SELF.numberPotentialCrimArrest := COUNT(residentTenantInfo(potentialCrimArrest));
                                       SELF.numberOfPotentialSOs := COUNT(residentTenantInfo(potentialSOs));
                                       SELF.resTenInfo := residentTenantInfo;
-                                      
-                                      SELF.numberOfCurrentAddresses := RIGHT.numberOfCurrentAddresses;
-                                      SELF.numberOfPriorAddresses := RIGHT.numberOfPriorAddresses;
                                       
                                       SELF := LEFT;),
                             LEFT OUTER,
@@ -300,8 +290,11 @@ EXPORT reportIndMobility(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                       SELF.inquiredDID := LEFT.inquiredDID;
                                                       SELF.addressSeq := LEFT.addrs.seq;
                                                       
-                                                      SELF.currAddrCnt := LEFT.numberOfCurrentAddresses;
-                                                      SELF.prevAddrCnt := LEFT.numberOfPriorAddresses;
+                                                      currAddrIndicator := tblCurrPrevAddrIndicator(seq = LEFT.seq AND inquiredDID = LEFT.inquiredDID AND currentPreviousIndicator = CURRENT_ADDRESS_TEXT);
+                                                      prevAddrIndicator := tblCurrPrevAddrIndicator(seq = LEFT.seq AND inquiredDID = LEFT.inquiredDID AND currentPreviousIndicator = PRIOR_ADDRESS_TEXT);
+                                                                           
+                                                      SELF.currAddrCnt := currAddrIndicator[1].indicatorCnt;
+                                                      SELF.prevAddrCnt := prevAddrIndicator[1].indicatorCnt;
                                                       
                                                       SELF := [];));
                                                       
