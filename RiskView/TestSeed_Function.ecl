@@ -356,8 +356,18 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.PhoneInputSubjectCount	:= if(valid_attributes_requested, ri.PhoneInputSubjectCount	, '');
 		self.PhoneInputMobile 	:= if(valid_attributes_requested, ri.PhoneInputMobile 	, '');
 		self.AlertRegulatoryCondition	:= if(valid_attributes_requested, ri.AlertRegulatoryCondition	, '');
-	
-	
+    
+    //checking indicators section
+    self.CheckProfileIndex := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckProfileIndex	, '');
+    self.CheckTimeOldest := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckTimeOldest	, '');
+    self.CheckTimeNewest := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckTimeNewest	, '');
+    self.CheckNegTimeOldest := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckNegTimeOldest	, '');
+    self.CheckNegRiskDecTimeNewest := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckNegRiskDecTimeNewest	, '');
+    self.CheckNegPaidTimeNewest := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckNegPaidTimeNewest	, '');
+    self.CheckCountTotal := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckCountTotal	, '');
+    self.CheckAmountTotal := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckAmountTotal	, '');
+    self.CheckAmountTotalSinceNegPaid := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckAmountTotalSinceNegPaid	, '');
+    self.CheckAmountTotal03Month := if(STD.Str.ToLowerCase(AttributesVersionRequest) = 'rvcheckingattrv5', ri.CheckAmountTotal03Month	, '');	
 		
 		//lien-judment section
 		self.LnJEvictionTotalCount           := if(lnjattributes_requested, ri.LnJEvictionTotalCount	, '');         
