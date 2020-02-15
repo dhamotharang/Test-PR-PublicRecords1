@@ -146,7 +146,7 @@ functionmacro
     #SET(GET_BOOLEANS ,',' + %'GET_BOOLEANS'%)
   #ELSE
     #SET    (CODE_APPEND    ,'\n  export stopcondition := false;\n\n')
-    #SET    (CODE_GET_LOCAL ,'\n  export stopcondition_ := false;\n\n')
+    #SET    (CODE_GET_LOCAL ,'\n  export stopcondition_ := false;\n\n')  
   #END
 
   #LOOP
