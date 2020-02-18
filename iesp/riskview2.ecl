@@ -243,6 +243,7 @@ export t_RiskView2Options := record (iesp.share.t_BaseOption)
 	boolean IncludeLiensJudgmentsReport {xpath('IncludeLiensJudgmentsReport')};
 	t_RiskView2LiensJudgmentsReportOptions LiensJudgmentsReportOptions {xpath('LiensJudgmentsReportOptions')};
 	integer RVCheckingSubscriberId {xpath('RVCheckingSubscriberId')};//hidden[internal]
+	boolean IncludeStatusRefreshChecks {xpath('IncludeStatusRefreshChecks')};
 end;
 		
 export t_RiskView2SearchBy := record

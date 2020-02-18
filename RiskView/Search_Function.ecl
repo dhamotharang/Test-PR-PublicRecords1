@@ -1,4 +1,4 @@
-﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Models, iesp, personcontext, STD, RiskView;
+﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Models, iesp, personcontext, STD, RiskView, Risk_Reporting;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
@@ -39,7 +39,8 @@ EXPORT Search_Function(
 	boolean InsuranceBankruptcyAllow10Yr = FALSE, //Value is true for insurance only.
 	unsigned6 MinimumAmount = 0,
 	dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
-	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem)
+	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem),
+	boolean IncludeStatusRefreshChecks = FALSE
   ) := function
 
 
@@ -281,6 +282,8 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		in_ExcludeStates := ExcludeStates,
 		in_ExcludeReportingSources := ExcludeReportingSources
 	);
+	
+	Status_Refresh_GW_Call := if(IncludeStatusRefreshChecks, RiskView.InitiateStatusRefresh(clam[1].LnJ_datasets, gateways, 5, 0, true), DATASET([], iesp.okc_statusrefresh_request.t_OkcStatusRefreshResponseEx));
 	
 #if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
 
@@ -1303,6 +1306,21 @@ riskview5_wMLA_results := riskview5_search_results(Alert1 in ['100D','100E','100
 															 
 riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, riskview5_search_results);
 
+
+ /* ****************************************************************
+  *  Deferred Task ESP (DTE) Logging Functionality  *
+  ******************************************************************/
+		IF(IncludeStatusRefreshChecks, 
+			OUTPUT(Risk_Reporting.To_LOG_DTE.GetDTEOutput(
+						Status_Refresh_GW_Call[1].Response.Result.TaskID, 
+						'Status Refresh Task', 
+						/* Debugging specifically for JuLi Release 2, will change in JuLi Release 3 */
+						'<LiensRMSID>' + clam[1].LnJ_datasets.lnjliens[1].rmsid + '</LiensRMSID>' +
+						'<JudgmentsRMSID>' + clam[1].LnJ_datasets.lnjjudgments[1].rmsid + '</JudgmentsRMSID>' +
+						'<LiensTMSID>' + clam[1].LnJ_datasets.lnjliens[1].tmsid + '</LiensTMSID>' +
+						'<JudgmentsTMSID>' + clam[1].LnJ_datasets.lnjjudgments[1].tmsid + '</JudgmentsTMSID>'), 
+			NAMED('LOG_Deferred_Task_ESP')));
+	
  /* *************************************
   *   Boca Shell Logging Functionality  *
   ***************************************/
@@ -1363,7 +1381,7 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 	// output(isLnJRunningAlone, named('isLnJRunningAlone'));		
 // output(riskview5_search_results, named('riskview5_search_results'));
 // output(riskview5_search_results_tmp, named('riskview5_search_results_tmp'));
-
+	
 return riskview5_final_results;
 #else // Else, output the model results directly
 
