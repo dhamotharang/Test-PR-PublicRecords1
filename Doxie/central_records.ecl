@@ -3,8 +3,11 @@
   ATF_Services, American_Student_Services, AutoStandardI, suppress, fcra, doxie_raw, ut, EmailService,
   FFD;
 
-export central_records(boolean IsFCRA, string1 in_party_type,
+export central_records(
   dataset (doxie.layout_central_header) header_data,
+  doxie.IDataAccess mod_access,
+  boolean IsFCRA,
+  string1 in_party_type,
   integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
   dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
   integer8 inFFDMask = 0,
@@ -25,7 +28,6 @@ dids := project (besr, doxie.layout_references); //dids has no more than 1 recor
 
 // contains global input parameters
 global_mod := AutoStandardI.GlobalModule (IsFCRA);
-mod_access := $.compliance.GetGlobalDataAccessModuleTranslated(global_mod);
 
 // Individual single-source data (use version, include, etc. selectors here)
 PatA := if(IncludePatriot_val,doxie.CompPatriotSearch);
