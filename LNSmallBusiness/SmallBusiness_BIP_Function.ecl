@@ -1,6 +1,6 @@
 ﻿IMPORT Address, BIPv2, Business_Risk_BIP, BusinessCredit_Services, Cortera, Gateway, IESP, 
        Models, Risk_Indicators, Risk_Reporting, RiskWise, STD,
-       UT,LNSmallBusiness;
+       UT, LNSmallBusiness;
 
 EXPORT SmallBusiness_BIP_Function (
 											DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
@@ -312,7 +312,8 @@ EXPORT SmallBusiness_BIP_Function (
  bsversion := MAP(EXISTS(ModelsRequested(ModelName IN 
                                     [BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, 
                                     BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR, 
-                                    BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, 
+                                    BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP,
+                                    BusinessCredit_Services.Constants.BBFM1906_1_0,
                                     BusinessCredit_Services.Constants.CREDIT_SCORE_BOFM])) => 54,
                                     BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v22 => 51 , 50);
 
@@ -488,8 +489,10 @@ unsigned8 BSOptions :=
         setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, boca_shell_grouped)) ) + 
     IF( EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR)), 
         setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR, boca_shell_grouped,,IID)) ) + 
-     IF( EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP)), 
-        setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, boca_shell_grouped)) ) +    
+    IF( EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP)), 
+        setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, boca_shell_grouped)) ) + 
+    IF( EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BBFM1906_1_0)), 
+        setModelName(BusinessCredit_Services.Constants.BBFM1906_1_0, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BBFM1906_1_0, boca_shell_grouped)) ) + 
     IF( EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_BOFM)), 
         setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_BOFM, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_BOFM)) ) + 
     IF( EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)), 
@@ -664,8 +667,12 @@ unsigned8 BSOptions :=
 	// Attach the PhoneSources child dataset to the intermediateLayout for royalty purposes,
 	// and calculate BillingHit.
 	getBillingHitFromScores( DATASET(iesp.smallbusinessanalytics.t_SBAModelHRI) ModelResults ) := FUNCTION
-		BlendedScore := ModelResults(Name in [BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB,  BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM,BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL,BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR,BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP])[1].Scores[1].Value;
-		CreditScore  := ModelResults(Name in [BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO,BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL,BusinessCredit_Services.Constants.CREDIT_SCORE_BOFM])[1].Scores[1].Value;
+		BlendedScore := ModelResults(Name in [BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB,  
+                                          BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM,BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL,
+                                          BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR,BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, 
+                                          BusinessCredit_Services.Constants.BBFM1906_1_0])[1].Scores[1].Value;
+		CreditScore  := ModelResults(Name in [BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO,
+                                          BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL,BusinessCredit_Services.Constants.CREDIT_SCORE_BOFM])[1].Scores[1].Value;
 		isBillingHit := BlendedScore NOT IN [0,222] OR CreditScore NOT IN [0,222];
 		RETURN isBillingHit;
 	END;
