@@ -6,7 +6,6 @@ import std, ut, Scoring_Project, Scoring_Project_DailyTracking, ashirey,Scoring_
 dt := ut.getdate;
 //dt := (STRING8)Std.Date.Today();
 
-
 decimal19_2 thresh := 1.25;
 
 

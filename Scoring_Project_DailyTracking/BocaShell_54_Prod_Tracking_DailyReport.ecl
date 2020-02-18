@@ -4,8 +4,8 @@
 import std, ut, Scoring_Project, Scoring_Project_DailyTracking, ashirey,Scoring_Project_Macros;
 
 //making new//making new
-// dt := ut.getdate;
-dt := (STRING8)Std.Date.Today();
+ dt := ut.getdate;
+//dt := (STRING8)Std.Date.Today();
 
 decimal19_2 thresh := 1.25;
 
