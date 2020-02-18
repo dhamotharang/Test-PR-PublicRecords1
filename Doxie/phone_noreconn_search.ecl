@@ -561,13 +561,11 @@ EXPORT phone_noreconn_search := MACRO
   // ** END *** of mods for Reverse Search Plus to filter on dt_last/first_seen
 
   resultsWithDateSort := if(UseDateSort,sort(ds_results_ported_checkedFilteredDate,-dt_last_seen,penalt, lname, fname, record),ds_results_ported_checkedFilteredDate); 
-
-  doxie.MAC_Marshall_Results_NoCount(resultsWithDateSort,marshalled_results,,disp_cnt);												
-
+  
     // the string 'FB'  in attr names stands for phones FeedBack (FB)
-  PhonesFeedback_Services.Mac_Append_Feedback(marshalled_results, did, Phone, resultsPhnFB, mod_access);
+  PhonesFeedback_Services.Mac_Append_Feedback(resultsWithDateSort, did, Phone, resultsPhnFB, mod_access);
 
-  resultsWithPhnFB := if(IncludePhonesFeedback,resultsPhnFB,marshalled_results);
+  resultsWithPhnFB := if(IncludePhonesFeedback,resultsPhnFB,resultsWithDateSort);
 
   AddressFeedback_Services.MAC_Append_Feedback(resultsWithPhnFB, resultsAddrFB, address_feedback,,,,,,,,,,1);
 
@@ -576,10 +574,13 @@ EXPORT phone_noreconn_search := MACRO
   //resort incase either phone feedback or address feedback changed the UseDateSort sort logic
   results := if(UseDateSort AND (IncludePhonesFeedback OR IncludeAddressFeedback), sort(resultsWithAddrFB, -dt_last_seen,penalt, lname, fname, record), resultsWithAddrFB);
   
-  // Suppress records without full name and address, Royalties are calculated off of Non-suppressed results
-  results_suppress := IF(~SuppressBlankNameAddress OR (SuppressBlankNameAddress AND EXISTS(results(listed_name != '' OR (fname != '' AND lname != '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))))), results);
+  // Suppress records without full name and address and carrier name, Royalties are calculated off of Non-suppressed results
+	// Note: Even though option name is SuppressBlankNameAddress we look for carrier_name as well 
+  results_suppress := IF(~SuppressBlankNameAddress OR (SuppressBlankNameAddress AND EXISTS(results(listed_name != '' OR (fname != '' AND lname != '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))  OR carrier_name != ''))), results);
 
-  results_friendly := project(results_suppress, transform(recordof(results),
+	doxie.MAC_Marshall_Results_NoCount(results_suppress,marshalled_results,,disp_cnt);	
+
+  results_friendly := project(marshalled_results, transform(recordof(marshalled_results),
     self.COCDescription := [],
     self.SSCDescription := [],
     self.RealTimePhone_Ext := [],
@@ -598,7 +599,7 @@ EXPORT phone_noreconn_search := MACRO
 
   if(issueHint,ut.outputMessage(ut.constants_MessageCodes.TRYSSN4));
 
-  out_rslt := output(if(~batch_friendly,results_suppress,results_friendly), named('Results'));
+  out_rslt := output(if(~batch_friendly,marshalled_results,results_friendly), named('Results'));
 
   //OUTPUT(dt_filterOk, named('dt_filterOk'));
   // output(dt_first_seenValueTrimmed, named('dt_first_seenValueTrimmed'));
