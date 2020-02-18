@@ -1,4 +1,4 @@
-﻿IMPORT $, STD, Gateway, Phones, ThreatMetrix, Autokey_batch;
+﻿﻿IMPORT $, STD, Gateway, Phones, ThreatMetrix, Autokey_batch;
 
 EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)             dSearchResults,
                 DATASET($.Layouts.BatchInAppendDID)              dInBestInfo,
@@ -146,17 +146,18 @@ FUNCTION
                       LEFT OUTER,
                       LIMIT(100, SKIP));
 
- // ThreatMetrix                  
+ // ThreatMetrix
   dDupThreatMetrixIn := PROJECT(DEDUP(SORT(dPrepForRIs, phone), phone), Phones.Layouts.PhoneAcctno);
-  
+
   dThreatMetrixRecs := Phones.GetThreatMetrixRecords(dDupThreatMetrixIn, inMod.UseThreatMetrixRules, dGateways);
-                                
-  $.Layouts.PhoneFinder.Final getThreatMetrix($.Layouts.PhoneFinder.Final l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM  
+
+  $.Layouts.PhoneFinder.Final getThreatMetrix($.Layouts.PhoneFinder.Final l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM
    SELF.ReasonCodes := r.response.Summary.ReasonCodes;
    SELF.TmxVariables := r.response._data.TmxVariables;
+   SELF.phonestatus  := IF(l.PhoneOwnershipIndicator, $.Constants.PhoneStatus.Active, l.phonestatus); // PHPR- 483 If Phone verified by zumigo then update phonestatus to be ACTIVE;
    SELF := l;
   END;
- 
+
   dPrepThreatMetrix	:= JOIN(dPrepForRIs, dThreatMetrixRecs,
                             LEFT.phone = RIGHT.response._Data.AccountTelephone.Content_,
                             getThreatMetrix(LEFT, RIGHT), LEFT OUTER, LIMIT(0), KEEP(1));
