@@ -613,11 +613,6 @@ EXPORT phone_noreconn_search := MACRO
   // output(ds_results_ported_checked, named('ds_results_ported_checked'));
   // output(ds_results_ported_checkedFilteredSlimJustFirstSeen, named('ds_results_ported_checkedFilteredSlimJustFirstSeen'));
   // output(ds_results_ported_checkedFilteredDate, named('ds_results_ported_checkedFilteredDate'));
-  OUTPUT(use_PVS,NAMED('use_PVS'));
-  OUTPUT(PVS_gw_in,NAMED('PVS_gw_in'));
-  OUTPUT(PVS_gw_in_clean,NAMED('PVS_gw_in_clean'));
-  OUTPUT(PVS_gw_rslt_raw,NAMED('PVS_gw_rslt_raw'));
-  OUTPUT(PVS_gw_rslt_clean,NAMED('PVS_gw_rslt_clean'));
 
   // OUTPUT(call_pvs,NAMED('call_pvs'));
   // OUTPUT(PVS_GW_w_tzone,NAMED('PVS_GW_w_tzone'))
