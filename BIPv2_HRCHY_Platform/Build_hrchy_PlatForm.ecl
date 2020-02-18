@@ -5,7 +5,7 @@ import BIPv2_HRCHY_PlatForm, BIPV2_Files, DCAV2, DNB_DMI, Frandx,tools,BIPV2,BIP
 export Build_hrchy_PlatForm(
 
    string                                           pversion    = BIPV2.KeySuffix
-  ,dataset(BIPV2_Testing.Test_Layout) 							head        //= BIPV2_Files.files_proxid().DS_PROXID_BUILT
+  ,dataset(BIPV2.CommonBase.Layout) 				  			head        //= BIPV2_Files.files_proxid().DS_PROXID_BUILT
 	,dataset(DCAV2.layouts.Base.companies) 					  lncad       = BIPV2_Files.files_hrchy.lnca							
 	,dataset(recordof(BIPV2_Files.files_hrchy.duns))  dunsd       = BIPV2_Files.files_hrchy.duns					
 	,dataset(Frandx.layouts.Base)										  frand       = BIPV2_Files.files_hrchy.fran

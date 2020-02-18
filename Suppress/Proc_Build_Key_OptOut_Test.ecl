@@ -10,12 +10,15 @@ export Proc_Build_Key_OptOut_Test(String pVersion) := FUNCTION
                                                                  );
 																	
  
+	global_sid_pr_pd		:= Suppress.Files.Global_Sid.Basefile(history_flag='' and domain_id=$.Constants.Exemptions().Domain_Id_PR and prof_data_only='Y')[1].global_sids;
+	global_sid_pr_npd		:= Suppress.Files.Global_Sid.Basefile(history_flag='' and domain_id=$.Constants.Exemptions().Domain_Id_PR and prof_data_only='N')[1].global_sids;
 
 	Suppress.Layout_OptOut tInputC(Suppress.Layout_OptOut_In L) := TRANSFORM
 			SELF.date_added					:= L.DATE_OF_REQUEST;	
             SELF.exemptions                 := 64;
             SELF.act_id                     := 'CACCPA';
-            SELF.global_sids                := Suppress.Constants.OptOut().CACCPA_Global_Sid;																
+            // SELF.global_sids                := Suppress.Constants.OptOut().CACCPA_Global_Sid;																
+			SELF.global_sids			    := IF(L.prof_data='Y', global_sid_pr_pd, global_sid_pr_npd);
 			SELF							:= L;
 	END;
 	input_raw 	:= Suppress.Files.OptOut.Input_Raw(ENTRY_TYPE NOT IN ['','ROWCOUNT']);

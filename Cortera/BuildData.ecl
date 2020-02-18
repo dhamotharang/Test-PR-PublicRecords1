@@ -15,7 +15,8 @@
 				OUTPUT(ds,,lfnHdr, COMPRESSED, OVERWRITE),				
 				OUTPUT(exec,,lfnexecutives, COMPRESSED, OVERWRITE),
 				OUTPUT(attr,,lfnAttributes, COMPRESSED, OVERWRITE)
-			),
+			)
+			,
 			PARALLEL(
 				Cortera.Promote().CorteraHeader(lfnHdr),
 				Cortera.Promote().Executives(lfnexecutives),

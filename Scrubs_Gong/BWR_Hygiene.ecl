@@ -1,19 +1,19 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_Gong.BWR_Hygiene - Hygiene & Stats - SALT V3.3.0');
-IMPORT Scrubs_Gong,SALT33;
+#workunit('name','Scrubs_Gong.BWR_Hygiene - Hygiene & Stats - SALT V3.11.9');
+IMPORT Scrubs_Gong,SALT311;
 // First create an instantiated hygiene module
   infile := Scrubs_Gong.In_File_Neustar;
   ip := DISTRIBUTE(infile, SKEW(0.1));
-  h := Scrubs_Gong.Hygiene(ip);
+  h := Scrubs_Gong.hygiene(ip);
   p := h.AllProfiles; // Detailed profile of every field
-  OUTPUT(h.Summary('SummaryReport'),ALL);
+  OUTPUT(h.Summary('SummaryReport'),ALL,NAMED('Summary'));
   OUTPUT(h.invSummary,NAMED('InvertedSummary'),ALL);
   OUTPUT(p,NAMED('AllProfiles'),ALL); // Detailed profile of every field
   OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
   OUTPUT(h.ValidityErrors,NAMED('ValidityErrors'),ALL); // Violations of FieldType statements
-  OUTPUT(SALT33.MAC_Character_Counts.EclRecord(p,'Layout_File_Neustar'),NAMED('OptimizedLayout'));// File layout suggested by data
+  OUTPUT(SALT311.MAC_Character_Counts.EclRecord(p,'Layout_File_Neustar'),NAMED('OptimizedLayout'));// File layout suggested by data
   // Produces field types that match the most common 99.9% of your data. Change to 100 to match all your data
-  OUTPUT(SALT33.MAC_Character_Counts.FieldTypes(p,99.9),NAMED('Types'));
+  OUTPUT(SALT311.MAC_Character_Counts.FieldTypes(p,99.9),NAMED('Types'));
   // ****** Cross Tabs *******
-  // It is possible to create a cross table between any two fields, see documentation on SALT33.MAC_CrossTab
+  // It is possible to create a cross table between any two fields, see documentation on SALT311.MAC_CrossTab
