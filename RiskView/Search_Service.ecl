@@ -127,6 +127,7 @@ export Search_Service := MACRO
 	string20 HistoryDateTimeStamp := '' : STORED('HistoryDateTimeStamp');
 	
 	boolean IncludeLnJ := option.IncludeLiensJudgmentsReport;
+	boolean IncludeStatusRefreshChecks := option.IncludeStatusRefreshChecks;
 	boolean IncludeRecordsWithSSN := option.LiensJudgmentsReportOptions.IncludeRecordsWithSSN;
 	boolean IncludeBureauRecs := option.LiensJudgmentsReportOptions.IncludeBureauRecs;
  integer ReportingPeriod := if(option.LiensJudgmentsReportOptions.ReportingPeriod = 0, 84, 
@@ -217,10 +218,7 @@ export Search_Service := MACRO
 /* ***************************************
 	 *           Package Input:            *
    *************************************** */
-	emptyRecord := Risk_Indicators.iid_constants.ds_Record;
-
-	riskview.layouts.layout_riskview_input intoInput(emptyRecord le) := TRANSFORM	
-	// Sequence - This is hidden from the ESP to be used by the ECL Developers for testing purposes	
+	packagedInput := DATASET([TRANSFORM(riskview.layouts.layout_riskview_input,
 		SELF.Seq := (integer)search.seq;
 		self.unparsedfullname := search.name.full;
 		SELF.Name_First := search.Name.First;
@@ -242,22 +240,16 @@ export Search_Service := MACRO
 		self.LexID := LexID; 		
 		self.HistoryDateTimeStamp := HistoryDateTimeStamp;
 		self.Custom_Inputs := option.IncludeModels.ModelOptions;
-		SELF := [];
-	END;
-
-	packagedInput := PROJECT(emptyRecord, intoInput(LEFT));
+		SELF := [];)]);	
 	
-	Risk_Indicators.Layout_Input intoLayoutInput(emptyRecord le) := TRANSFORM
+	packagedTestseedInput := DATASET([TRANSFORM(Risk_Indicators.Layout_Input,
 		SELF.seq := (integer)search.seq;	// Sequence - This is to be used by the ECL Developers for testing purposes	
 		SELF.fname := STD.Str.ToUpperCase(search.Name.First);
 		SELF.lname := STD.Str.ToUpperCase(search.Name.Last);
 		SELF.ssn := SSN;
 		SELF.in_zipCode := Zip;
 		SELF.phone10 := HomePhone;
-		SELF := [];
-	END;
-
-	packagedTestseedInput := PROJECT(emptyRecord, intoLayoutInput(LEFT));
+		SELF := [];)]);
 
 /* ***************************************
 	 *            Validate Input:          *
@@ -345,7 +337,8 @@ search_results_temp := ungroup(
       		exception_score_reason,
       		MinimumAmount := MinimumAmount,
       		ExcludeStates := ExcludeStates,
-      		ExcludeReportingSources := ExcludeReportingSources
+      		ExcludeReportingSources := ExcludeReportingSources,
+			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks
       		) 
       	);
   
