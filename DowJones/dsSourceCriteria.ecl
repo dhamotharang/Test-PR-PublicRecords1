@@ -1840,6 +1840,21 @@ EXPORT dsSourceCriteria := DATASET([
 {'UN Security Council Resolution 1591 (2005) Sudan','1827'},
 {'UN Security Council Resolution 1988 (2011) List','1828'},
 {'UN Security Council Resolution 2127 (2013) Central African Republic List','1829'},
-{'UN Security Council Resolution 751 (1992) Somalia List','1830'}
+{'UN Security Council Resolution 751 (1992) Somalia List','1830'},
+{'EC (CFSP) 2020/9 Mali List','1831'},
+{'EC 2020/8 Mali List','1832'},
+{'Greater Jakarta Metropolitan Regional Police Wanted List','1833'},
+{'OFAC - North Korea Sanctions and Policy Enhancement Act of 2016','1834'},
+{'EC (CFSP) 2020/20 EU Terrorism List','1835'},
+{'EC 2020/19 Terrorism List','1836'},
+{'EC (CFSP) 2020/118 Mali List','1837'},
+{'EC (CFSP) 2020/120 Ukraine List','1838'},
+{'EC 2020/116 Mali List','1839'},
+{'EC 2020/119 Ukraine List','1840'},
+{'SAT (Mexico) List of Taxpayers under Article  69-B','1841'},
+{'Taiwan MJIB Fugitive Online List','1842'},
+{'EC (CFSP) 2020/117 Tunisia List','1843'},
+{'EC 2020/115 Tunisia List','1844'},
+{'EC 2020/184 ISIL (Da\'esh) and Al-Qaida List','1845'}
 ],r);
 

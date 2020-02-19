@@ -790,8 +790,11 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
   export allStats  := calculateStatsByState(all_clean_recs_with_state,  'All');
   export goldStats := calculateStatsByState(gold_clean_recs_with_state, 'Gold');
  
-  segCatagories := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, (string) reportDate); 
- 	 
+  segDsCleanCatagories := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, (string) reportDate); 
+  noSegRecords := join(header_rec, segDsCleanCatagories, left.seleid=right.seleid, transform(left), left only, local);
+  noSegOnlyCatagories := BIPV2_PostProcess.segmentation_category.perSeleid(distribute(noSegRecords,hash32(seleid)), (string) reportDate);  
+  segCatagories := segDsCleanCatagories + noSegOnlyCatagories;
+	
   shared generateSegStats(dataset(slim_rec) slim) := function
 					 SC := BIPV2_PostProcess.segmentation_category;
       allRecsWithSeg := join(slim, segCatagories, left.seleid=right.seleid, 
@@ -813,7 +816,7 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
 	 
   export rawSegStats   := generateSegStats(raw_slim_recs);
   export cleanSegStats := generateSegStats(clean_slim_recs);
-	 
+	
   export segSortOrder(x) := functionmacro
              return sort(x, state='NO SEG', state='Defunct', state='Inactive Noise', state='Inactive H-Merge', state='Inactive Valid', state='Active Noise',state='Active C-Merge', state='Active Valid', state='Gold', state='ALL');
     endmacro;

@@ -22,9 +22,9 @@ string2       STATE;
 string10      ZIP;
 string50      COUNTY;
 string5       FIPS;
-//string20      ID;
+string20      ID;
 string50      DESCRIPTION;
-string15      STATUS;
+string10      STATUS;
 string8       EXPIRATION_DATE;
 string20      MODEL;
 string3       COLOR_TYP_CODE_PRIMARY;
@@ -38,3 +38,4 @@ string30      SERIAL_NUMBER;
 string10      HORSEPOWER;
 string2       LF;
 end;
+

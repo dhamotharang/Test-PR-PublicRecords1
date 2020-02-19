@@ -22,7 +22,7 @@ EXPORT PreprocessNCF2(string ilfn) := function
 	r1 := RECORD
 		string	text;
 	END;
-	ds := dataset(ilfn, r1, CSV);
+	ds := dataset(ilfn, r1, CSV)(LENGTH(TRIM(text,left,right)) > 4);
 
 	nacin := PROJECT(ds, TRANSFORM(Nac_V2.Layouts2.rNac2,
 				string4 rc := left.text[1..4];

@@ -1,3 +1,5 @@
+﻿import corp2_raw_nv;
+
 export Layouts := module
 
 	export CorporationsLayoutIn 			:= record
@@ -14,7 +16,6 @@ export Layouts := module
       string  	no_par_share_count;
       string 		corp_foreign_name;
       string   	is_on_admin_hold;
-      string   	classification;
       string 		reservation_owner_name;
       string  	reservation_owner_addr1;
       string  	reservation_owner_addr2;
@@ -27,13 +28,8 @@ export Layouts := module
       string  	annual_lo_due_dt;
       string  	ra_resigned_dt;
       string  	expired_dt;
-	end;
-
-	export CorporationsLayoutBase 		:= record
-			string		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;
-			CorporationsLayoutIn;
+			string    NV_business_ID; // New field
+			string    exemption_code; // New field
 	end;
 
 	export RALayoutIn 								:= record
@@ -54,16 +50,17 @@ export Layouts := module
       string  	phone_no;
       string  	fax_no;
       string 		email_address;
+			string		CRA_Authority_name;		// New field
+			string		CRA_Authority_addr1; 	// New field			
+			string		CRA_Authority_addr2;	// New field
+			string		CRA_Authority_city; 	// New field
+			string		CRA_Authority_st; 	  // New field
+			string		CRA_Authority_zip; 		// New field
+			string		CRA_Authority_phone; 	// New field
+			string		agent_type; 					// New field
 	end;
 
-	export RALayoutBase 							:= record
-			string		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;
-			RALayoutIn;
-	end;
-
-  export OfficersLayoutIn 					:= record
+	export OfficersLayoutIn 					:= record
 			string  	officer_id; //raw data is integer
       string  	corp_id; 		//raw data is integer
       string  	officer_type;
@@ -83,13 +80,6 @@ export Layouts := module
       string   	resigned;
 		end;
 		
-	export OfficersLayoutBase 				:= record
-			string		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;
-			OfficersLayoutIn;
-		end;
-		
 	export ActionsLayoutIn 						:= record
 			string   	action_id;  //raw data is integer
       string   	corp_id;		 //raw data is integer
@@ -99,15 +89,9 @@ export Layouts := module
       string   	document_no;
       string   	effective_dt;
       string    has_stock; 
+			string		number_of_pages; // New field
     end;	   
 
-	export ActionsLayoutBase 					:= record
-			string		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;			
-			ActionsLayoutIn;
-    end;
-		
 	export StockLayoutIn 							:= record
 			string  	stock_id;		//raw data is integer
       string  	corp_id;		//raw data is integer
@@ -115,52 +99,108 @@ export Layouts := module
       string  	par_share_value; //raw data is numeric
     end;
 
-	export StockLayoutBase 						:= record
-			string		action_flag;
-			unsigned4	dt_first_received;
-			unsigned4	dt_last_received;
-			StockLayoutIn;
-    end;
+	export TMLayoutIn 							:= record  // New File
+			string  	TM_ID;
+			string  	Trademark_Type;
+			string  	Trademark_Category ;
+			string  	Trademark_Status; 
+			string  	Trademark_Name;
+			string  	Qualifying_State;
+			string  	Trademark_Number;
+			string  	IsOnAdminHold;
+			string  	Classification_Code;
+			string  	Reservation_Owner_Name;
+			string  	Reservation_Owner_Address_1;
+			string  	Reservation_Owner_Address_2;
+			string  	Reservation_Owner_City;
+			string  	Reservation_Owner_State;
+			string  	Reservation_Owner_Zip;
+			string  	Reservation_Owner_Country;
+			string  	Creation_Date;
+			string  	Status_Changed_Date;
+			string  	Expired_Date;
+		end;
+
+	export TMActionsLayoutIn 			:= record  // New File
+			string  	ActionID;
+			string  	EntityID;
+			string  	Action_Date;
+			string  	Action_Type;
+			string  	Action_Notes;
+			string  	Document_Number;
+			string  	Effective_Date;
+			string  	Has_Stock;
+			string  	Number_of_Pages;
+		end;
 
 	//********************************************************************
-	//CorpRALayout: Temporary layout used to hold the joined 
-	//							records from Corporations, and RA.
+	//TempNormRALayout: Temporary layout used for normalizing RA file 
+	//******************************************************************** 
+	export TempNormRALayout						:= record 
+			RALayoutIn;
+			string 		norm_name;
+      string  	norm_addr1;
+      string  	norm_addr2;
+      string  	norm_city;
+      string   	norm_st;
+      string  	norm_zip;
+			string    norm_country;
+			string    norm_phone;
+			string    norm_type;  // RA or CRA
+		end;
+		
+	//********************************************************************
+	//TempCorpRALayout: Temporary layout used for joining of 
+	//							    Corporations and RA
 	//******************************************************************** 
 	export TempCorpRALayout						:= record 
-			string corp_key;
 			CorporationsLayoutIn;
-			RALayoutIn -[ra_id];
-			string rawRA_country;
+			TempNormRALayout -[ra_id];
+	end;
+		
+	//********************************************************************
+	//TempOfficersCorpLayout: Temporary layout used for joining of 
+	//										    Officers and Corporations
+	//******************************************************************** 
+	export TempOfficersCorpLayout			:= record 
+			OfficersLayoutIn;
+			CorporationsLayoutIn.corp_name;
+			CorporationsLayoutIn.corp_no;
 		end;
 		
 	//********************************************************************
-	//CorpOfficersLayout: Temporary layout used to hold the joined 
-	//										records from Corporations, and Officers.
+	//TempStockCorpLayout: Temporary layout used for joining of 
+	//							         Stock and Corporations  
 	//******************************************************************** 
-	export TempCorpOfficersLayout			:= record 
-			string corp_key;
-			CorporationsLayoutIn;
-			OfficersLayoutIn -[corp_id];
+	export TempStockCorpLayout			:= record 
+			CorporationsLayoutIn.corp_id;
+			CorporationsLayoutIn.corp_no;
+      CorporationsLayoutIn.capital_amt;
+      CorporationsLayoutIn.no_par_share_count;
+			StockLayoutIn.par_share_count;  
+      StockLayoutIn.par_share_value;  
 		end;
-		
+
 	//********************************************************************
-	//ActionsLayout: Temporary layout used to represent the joined files
-	//							 from Corporations and Actions.
+	//TempActionsLayout: Temporary layout used for joining of 
+	//							         Actions and Corporations  
 	//******************************************************************** 
-	export TempCorpActionsLayout			:= record 
-			string corp_key;
-			CorporationsLayoutIn;
+	export TempActionsLayout			:= record 
+			CorporationsLayoutIn.corp_id;
+			CorporationsLayoutIn.corp_no;
+      CorporationsLayoutIn.annual_lo_due_dt; 
 			ActionsLayoutIn -[corp_id];
 		end;
-
+	
 	//********************************************************************
-	//CorpStockLayout: Temporary layout used to represent the joined files
-	//							   from Corporations and Stock.
-	//******************************************************************** 	
-	export TempCorpStockLayout				:= record 
-			string corp_key;
-			CorporationsLayoutIn;
-			StockLayoutIn -[corp_id];
-		end;
-
+	//TempTMActionsLayout: Temporary layout used for joining of 
+	//							         Trademark Actions and Trademark  
+	//******************************************************************** 
+	export TempTMActionsLayout			:= record 
+			TMLayoutIn.TM_id;
+			TMLayoutIn.trademark_number;
+      TMActionsLayoutIn;
+	end;
+		
 end;
+

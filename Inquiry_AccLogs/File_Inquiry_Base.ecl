@@ -1,4 +1,4 @@
-﻿import ut, did_add, dops;
+﻿import ut, did_add, dops, std;
 
 
 export File_Inquiry_Base := module
@@ -19,13 +19,14 @@ export history := project(inquiry_acclogs.File_Inquiry_BaseSourced.history, inqu
 	VP:=dops.Getbuildversion('InquiryTableKeys','B','N','P','prod');//did_add.get_EnvVariable('inquiry_build_version','http://roxiestaging.br.seisint.com:9876')[1..8];
 	
   father_sf_empty := count(dataset('~thor_data400::out::inquiry_tracking::weekly_historical_father',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor, opt)) = 0;
-
-  FileHistory:=if(vk=vp or father_sf_empty ,dataset('~thor_data400::out::inquiry_tracking::weekly_historical',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor),
+  sf_complete := count(nothor(fileservices.superfilecontents('~thor_data400::out::inquiry_tracking::weekly_historical'))) =2;
+	
+  FileHistory:=if((vk=vp and sf_complete) or father_sf_empty ,dataset('~thor_data400::out::inquiry_tracking::weekly_historical',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor),
                         dataset('~thor_data400::out::inquiry_tracking::weekly_historical_father',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor,opt));
 
   // FileHistory:=dataset('~thor_data400::out::inquiry_tracking::weekly_historical_father',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor,opt);
 
-export fileFull:=FileHistory (~(bus_intel.industry = 'DIRECT TO CONSUMER' and 
+ shared  historyFiltered := FileHistory (~(bus_intel.industry = 'DIRECT TO CONSUMER' and 
 																search_info.function_description in [
 																'ADDRBEST.BESTADDRESSBATCHSERVICE'
 																,'BATCHSERVICES.AKABATCHSERVICE'
@@ -36,8 +37,11 @@ export fileFull:=FileHistory (~(bus_intel.industry = 'DIRECT TO CONSUMER' and
 																,'DIDVILLE.RANBESTINFOBATCHSERVICE'
 																,'PROGRESSIVEPHONE.PROGRESSIVEPHONEWITHFEEDBACKBATCHSERVICE']
 																)
-															)	
-															+ inquiry_acclogs.File_Inquiry_BaseSourcedToRisk.updates
-															; 
+															);
+
+export historyAll := project ( historyFiltered, inquiry_acclogs.Layout.common_indexes );
+
+export fileFull		:= historyFiltered + inquiry_acclogs.File_Inquiry_BaseSourced.updates ; 
+
 end; 
  

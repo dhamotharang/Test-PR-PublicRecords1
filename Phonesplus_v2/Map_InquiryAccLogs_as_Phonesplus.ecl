@@ -6,7 +6,8 @@ import Gong, ut, _validate, InfutorCID, Mdr, Inquiry_Acclogs;
 
 /* Source 'IQ' is not being used in MDR.sourceTools and would make a good canidate if necessary */
 
-dBaseHistory := Inquiry_Acclogs.File_Inquiry_Base.History(
+// dBaseHistory := Inquiry_Acclogs.File_Inquiry_Base.History(
+dBaseHistory := Inquiry_Acclogs.File_Inquiry_Base.historyAll(
 									~inquiry_acclogs.fntranslations.is_Opt_Out(allow_flags.allowflags) and
 									 trim(person_q.lname,all) <> '' and
 									 trim(person_q.Personal_Phone + person_q.work_phone, all) <> '' and
