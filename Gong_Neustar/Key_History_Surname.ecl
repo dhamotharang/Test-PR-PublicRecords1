@@ -1,4 +1,4 @@
-Import Data_Services, doxie,ut, Phonesplus_v2;
+﻿Import Data_Services, doxie,ut, Phonesplus_v2;
 
 // Threshold for overly frequent combinations is 5000 instances
 // Any combination with less than 5000 instances will be excluded from the key (query will just search for these);
@@ -26,9 +26,9 @@ surnames_all := surnames_gong + surnames_pplus : PERSIST('~thor_data400::persist
 
 //get all of the permutations (lname is required; fname and state optional)
 surnames_l := TABLE(surnames_all, {name_last, cnt := COUNT(GROUP)}, name_last,local);
-surnames_lf := TABLE(surnames_all, {name_last,name_first, cnt := COUNT(GROUP)}, name_last, name_first,local);
-surnames_ls := TABLE(surnames_all, {name_last,st, cnt := COUNT(GROUP)}, name_last, st,local);
-surnames_lfs := TABLE(surnames_all, {name_last,name_first,st, cnt := COUNT(GROUP)}, name_last, name_first, st,local);
+surnames_lf := TABLE(surnames_all(name_first<>''), {name_last,name_first, cnt := COUNT(GROUP)}, name_last, name_first,local);
+surnames_ls := TABLE(surnames_all(st<>''), {name_last,st, cnt := COUNT(GROUP)}, name_last, st,local);
+surnames_lfs := TABLE(surnames_all(name_first<>'',st<>''), {name_last,name_first,st, cnt := COUNT(GROUP)}, name_last, name_first, st,local);
 
 // only save the most frequent combinations (cnt > freq_thold)
 surnames_l_f := surnames_l(cnt>freq_thold);
