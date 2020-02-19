@@ -221,7 +221,7 @@ functionmacro
     
   createwatcherworkunit := WorkMan.CreateWuid_Raw(
        '#workunit(\'name\',\'---WorkMan.mac_Watcher--- for wuid: ' + Iteration_Wuid_result + ', ' + if(pBuildName != '' , pBuildName ,'') +  ', version: ' + pversion + ' iteration: ' + Iteration + '\');\n'       
-     + 'WorkMan.mac_Watcher(\'' + Iteration_Wuid_result + '\',\'' + %'WORKMAN_CHILDRUNNER_EVENT'% + '\',\'' + %'FAILUREEMAILS'% + '\',\'' + %'WATCHER_POLLING_FREQUENCY'% + '\',\'' + localesp + '\');'
+     + 'WorkMan.mac_Watcher(\'' + Iteration_Wuid_result + '\',\'' + %'WORKMAN_CHILDRUNNER_EVENT'% + '\',\'' + %'FAILUREEMAILS'% + '\',\'' + %'WATCHER_POLLING_FREQUENCY'% + '\',\'' + localesp + '\',' + if(pOnlyCompile = true,'true','false') + ');'
     ,watchercluster
     ,localesp
     ,
