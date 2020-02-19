@@ -182,7 +182,7 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 		ReDID_Wrapper('ucc_party','fcra',FCRA.key_override_ucc.party_rec,did,flag_file_id,,uccpartyredid);
 		ReDID_Wrapper('consumerstatement_lexid','fcra',FCRA.Layout_Override_CnsmrStmt_In,lexid ,ssn,,cslexidredid);
 		ReDID_Wrapper('consumerstatement_ssn','fcra',FCRA.Layout_Override_CnsmrStmt_In,lexid ,ssn,,csssnredid);
-		ReDID_Wrapper('proflic_mari','fcra',FCRA.Key_Override_Proflic_Mari_ffid.proflic_mari_rec,did,flag_file_id,,mariredid);
+		ReDID_Wrapper('proflic_mari','fcra',FCRA.Key_Override_Proflic_Mari_ffid.Layout_Override_Proflic_Mari,did,flag_file_id,,mariredid);
 		ReDID_Wrapper('thrive','fcra',FCRA.Layout_Override_thrive,did,flag_file_id,,thriveredid);	
 		ReDID_Wrapper('address_data','fcra',AVM_V2.layouts.Layout_Override_AVM_Address,did,flag_file_id,,addressdataredid);	
 		ReDID_Wrapper('did_death','fcra',FCRA.key_override_death_master.Death_rec,did,flag_file_id,,deathredid);
