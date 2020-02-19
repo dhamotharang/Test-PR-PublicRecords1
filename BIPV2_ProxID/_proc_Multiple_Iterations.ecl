@@ -41,8 +41,6 @@ functionmacro
                       + ',false'
                       + ',false'
                       + ',false'
-                      + ',false'
-                      + ',false'
   #END
                       + ');';
                       
@@ -59,7 +57,8 @@ functionmacro
                   + ')\n);\n';
   
   ecltextIter     := 'import BIPV2,BIPV2_Build,BIPV2_ProxID,tools,mdr,BIPV2_Files;\n\n#OPTION(\'multiplePersistInstances\',FALSE);\niteration       := \'@iteration@\'                          ;\npversion        := \'@version@\'                            ;\npFirstIteration := false                                  ;\npInfile         := BIPV2_ProxID.In_DOT_Base               ;\npMatchThreshold := @matchthreshold@                                     ;\npDotFilename    := \'\'                                     ;/*done by BIPV2_ProxID._proc_Multiple_Iterations.  default is BIPV2_Files.files_dotid().FILE_DOTID_BASE*/\n\n#workunit(\'name\',BIPV2_ProxID._Constants().name + \' \' + pversion + \' iter \' + iteration);\n#workunit(\'priority\',\'high\');\n#workunit(\'protect\' ,true);\n\n'
-                    +'BIPV2_ProxID._Proc_Iterate(iteration,pversion,pFirstIteration,pInfile,pMatchThreshold,pDotFilename);\n';
+                    +'IsTesting := ' + if(pIsTesting = true ,'true' ,'false') + ';\n'
+                    +'BIPV2_ProxID._Proc_Iterate(iteration,pversion,pFirstIteration,pInfile,pMatchThreshold,pDotFilename,IsTesting);\n';
                     
   ecltextIterFix  := regexreplace('@matchthreshold@',ecltextIter,#TEXT(pMatchThreshold),nocase);
 

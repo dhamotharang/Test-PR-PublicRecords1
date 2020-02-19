@@ -7,6 +7,7 @@ export mac_Watcher(
   ,pNotifyEmails       = 'WorkMan._Config.EmailAddressNotify'
   ,pPollingFrequency   = '\'5\''                                // in minutes.  So 5 means poll every 5 minutes.
 	,pESP							   = 'WorkMan._Config.localesp'                	// ESP server & port for your environment(for soapcalls).  Boca OSS dataland is '10.241.3.242'
+  ,pCompiling          = 'false'
 
 ) :=
 functionmacro
@@ -67,7 +68,11 @@ functionmacro
   ;
   // : FAILURE(WorkMan.Clone_Thyself(,,,,emailsubject,emailbody));
     ;
+  #IF(pCompiling = true)
   set_completed_states := ['completed' ,'failed' ,'aborted' ,'unknown' ,'compiled'];
+  #ELSE
+  set_completed_states := ['completed' ,'failed' ,'aborted' ,'unknown' ];
+  #END
   
   completed_condition :=    trim(pWorkunit) = '' or
                       (     get_state_list  = get_state_soap 

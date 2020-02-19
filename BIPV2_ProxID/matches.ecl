@@ -7,7 +7,7 @@ SHARED split_patch := LinkBlockers(ih).Patches;
 SHARED h := match_candidates(ih).candidates;
 SHARED s := Specificities(ih).Specificities[1];
  
-SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layout_candidates le,match_candidates(ih).layout_candidates ri,UNSIGNED c=0,UNSIGNED outside=0,UNSIGNED cnp_name_support0 = 0) := TRANSFORM
+SHARED {boolean perfect_name_address_match,match_candidates(ih).layout_matches} match_join(match_candidates(ih).layout_candidates le,match_candidates(ih).layout_candidates ri,UNSIGNED c=0,UNSIGNED outside=0,UNSIGNED cnp_name_support0 = 0) := TRANSFORM
   SELF.Rule := c;
   SELF.Proxid1 := le.Proxid;
   SELF.Proxid2 := ri.Proxid;
@@ -191,6 +191,7 @@ iComp  := map( iComp1            >= MatchThreshold                              
               ,                                                                         iComp1
           );/*HACKScoreAssignment*/
   SELF.Conf := IF( iComp>=LowerMatchThreshold OR iComp-SELF.Conf_Prop >= LowerMatchThreshold,iComp,SKIP ); // Remove failing records asap
+  self.perfect_name_address_match := if(le.company_address = ri.company_address and le.cnp_name = ri.cnp_name ,true ,false);
 END;
 //Allow rule numbers to be converted to readable text.
 EXPORT RuleText(UNSIGNED n) :=  MAP (
@@ -260,9 +261,11 @@ AND ( ~left.prim_name_derived_isnull AND ~right.prim_name_derived_isnull ) AND (
       AND LEFT.prim_range_derived = RIGHT.prim_range_derived,1000)
       ,LOCAL); 
  // Will be distributed by DID1
-with_attr := attr_match + all_mjs;
+all_mjs_not_perfect_match := project(all_mjs(perfect_name_address_match = false),match_candidates(ih).layout_matches);
+all_mjs_perfect_match     := project(all_mjs(perfect_name_address_match = true ),match_candidates(ih).layout_matches);
+with_attr := project(attr_match,match_candidates(ih).layout_matches) + all_mjs_not_perfect_match ;
 all_matches1 := MOD_Attr_ActiveCorpKeys(ih).ForceFilter(ih,with_attr,Proxid1,Proxid2); // Restrict to those matches obeying force upon ActiveCorpKeys
-all_matches2 := MOD_Attr_RAAddresses(ih).ForceFilter(ih,all_matches1,Proxid1,Proxid2); // Restrict to those matches obeying force upon RAAddresses
+all_matches2 := MOD_Attr_RAAddresses(ih).ForceFilter(ih,all_matches1 + all_mjs_perfect_match,Proxid1,Proxid2); // Restrict to those matches obeying force upon RAAddresses
 all_matches3 := MOD_Attr_FilterPrimNames(ih).ForceFilter(ih,all_matches2,Proxid1,Proxid2); // Restrict to those matches obeying force upon FilterPrimNames
 not_blocked := JOIN(all_matches3,LinkBlockers(ih).Block,left.Proxid1=right.Proxid1 and left.Proxid2=right.Proxid2,TRANSFORM(LEFT),LEFT ONLY, SMART); // Remove all blocked links
 EXPORT All_Matches := not_blocked : PERSIST('~temp::Proxid::BIPV2_ProxID::all_m',EXPIRE(BIPV2_ProxID.Config.PersistExpire)); // To by used by rcid and Proxid
