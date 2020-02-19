@@ -16,7 +16,7 @@ rgxLast := '(DI |DA |DEL |DE LA |DE LOS |DES |DE |DELLA |DELLO |DOS |DU |LA |MC 
 rgxFccL := '^([A-Z]+),,(' + rgxLast + ')$';	// missing middle name
 rgxMrMrs := '\\b((MR|MRS|DR|REV) *(&| AND ) *(MR|MRS|MS))\\b';
 titles :=		
- '\\b(MR|MRS|MS|MMS|MISS|DR|RABBI|REVEREND|MSGR|PROF|PROFESSOR|FR|LT COL|COL|LCOL|LTCOL|LTC|CH|LT GEN|LT CDR|LCDR|LT CMDR|CDR|MAJ GEN|MAJ|RADM|SFC|SRTA|APCO|CAPT|LT|CPT|SGT|MSGT|SSG|MSG|MGR|CPL|CPO|SHRF|SMSG|SMSGT|SIR)\\b';
+ '\\b(MR|MRS|MS|MMS|MRMRS|MISS|DR|RABBI|REVEREND|MSGR|PROF|PROFESSOR|FR|LT COL|COL|LCOL|LTCOL|LTC|CH|LT GEN|LT CDR|LCDR|LT CMDR|CDR|MAJ GEN|MAJ|RADM|SFC|SRTA|APCO|CAPT|LT|CPT|SGT|MSGT|SSG|MSG|MGR|CPL|CPO|SHRF|SMSG|SMSGT|SIR)\\b';
 rgxConnector := 	'( AND |&| OR | AND/OR |&/OR |\\+)';
 rgxDegreesBracketed := 
  '\\((M\\.D\\.|D\\.M\\.D\\.|D\\.D\\.S\\.|D\\.P\\.M\\.|D\\.V\\.M\\.|R\\.N\\.|C\\.P\\.A\\.|J\\.D\\.|PH\\.D\\.|D\\.O\\.|M\\.S\\.N\\.)\\)$';
@@ -53,7 +53,7 @@ string RemoveMrMrs(string s1) := FUNCTION
 	REGEXFIND(rgxMrMrs, s) => REGEXREPLACE(rgxMrMrs, s, ''),
 	REGEXFIND('^SW ', s) => TRIM(s[4..],LEFT),
 	REGEXFIND('^ML ', s) => TRIM(s[4..],LEFT),
-	REGEXFIND('^EST ', s) => TRIM(s[5..],LEFT),
+	REGEXFIND('^(EST|ITF|TRT) ', s) => TRIM(s[5..],LEFT),
 	REGEXFIND('\\b(HUSBAND|WIFE) *( AND |&) *(WIFE|HUSBAND)$',s) => REGEXREPLACE('\\b(HUSBAND|WIFE) *( AND |&) *(WIFE|HUSBAND)$',s, ''),
 	REGEXFIND('( AND |&) *(HIS|HER) +(HUSBAND|WIFE)\\b',s) => REGEXREPLACE('\\b(HIS|HER) +(HUSBAND|WIFE)\\b',s, ''),
 	REGEXFIND('(' + rgxConnector + ' *(ANO|WIFE|WF|JLRS|GUEST(S)?|PARENT(S)?|CHILD(REN?)))$', s) => // ANO = ANOther (i.e. anonymous)
@@ -107,6 +107,8 @@ string ReverseGen(string s) :=
 string RemoveAKA(string s) := MAP(
 	s[1..4] in ['AKA ','FKA ','NKA '] => s[5..],
 	s[1..4] in ['AKA,','FKA,','NKA,'] => TRIM(s[5..],LEFT),
+	s[1..6] = 'A/K/A ' => TRIM(s[7..],LEFT),
+
 	// 'JOHN DOE AKA BARSHEE, M JOHNSON';
 	REGEXFIND(rgxJohnDoe1, s) => REGEXREPLACE(rgxJohnDoe1, s, '$2'),
 	// ORTEGA, ROBERT JOE AKA BOBB
