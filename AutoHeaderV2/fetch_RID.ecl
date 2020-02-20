@@ -1,8 +1,8 @@
-IMPORT ut,doxie,AutoHeaderV2;
+IMPORT dx_header,AutoHeaderV2;
 
 export fetch_RID (dataset (AutoHeaderV2.layouts.search) _in) := function
-  kHdrRid := doxie.key_header_rid(false,false);
-  kQHRid  := doxie.key_header_rid(true,false);
+  kHdrRid := dx_header.key_rid(, false,false);
+  kQHRid  := dx_header.key_rid(, true,false);
   
   //NB: inner join; we might want to change it for real batch implementation
   key_hdr_read := join (_in, kHdrRid,

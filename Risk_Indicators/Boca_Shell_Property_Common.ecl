@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster, risk_indicators;
+﻿IMPORT _Control, Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster, risk_indicators, STD;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_PropertyRecord) p_address,
@@ -165,8 +165,8 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_Propert
 	// We wouldn't ever want to use this id among, say, 1 million records, but among all
 	// the properties owned by a particular person, it's unique enough.
 	STRING8 unique_property_id(STRING prim_range, STRING prim_name) :=
-		StringLib.StringFilter(
-			StringLib.StringToUpperCase(
+		STD.str.Filter(
+			STD.str.ToUpperCase(
 				TRIM(prim_range) + TRIM(prim_name)
 			), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'	);
 	
@@ -178,7 +178,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_Propert
 		
 	getMortgageType(STRING mortgage_loan_type_code, STRING vendor_source_flag) :=
 		FUNCTION
-			loan_type_code := TRIM(stringlib.stringtouppercase(mortgage_loan_type_code));
+			loan_type_code := TRIM(STD.str.touppercase(mortgage_loan_type_code));
 			is_fares       := vendor_source_flag = FARES;
 			is_fidelity    := vendor_source_flag = FIDELITY;
 			mortgage_type  := risk_indicators.iid_constants.mortgage_type(is_fidelity, is_fares, loan_type_code);
@@ -187,7 +187,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_Propert
 
 	getFinancingType(STRING finance_type_code, STRING vendor_source_flag) :=
 		FUNCTION
-			finance_type_cd := TRIM(stringlib.stringtouppercase(finance_type_code));
+			finance_type_cd := TRIM(STD.str.touppercase(finance_type_code));
 			is_fares        := vendor_source_flag = FARES;
 			is_fidelity     := vendor_source_flag = FIDELITY;
 			mortgage_type   := risk_indicators.iid_constants.type_financing(is_fidelity, is_fares, finance_type_cd);
@@ -359,18 +359,20 @@ end;
 
 	// dataset named 'ids' coming in contains all input DIDs, relative DIDs and neighborhood DIDs.  
 	// going to dedup this down to all unique DIDs before searching property data
-	unique_dids := dedup( sort( distribute(ids, did), did, local), did, local ) ;
+	unique_dids := dedup( sort( distribute(ids, did), did, historydate, local), did, historydate, local ) ;
 	ids_plus_fares_by_did_thor :=
 
 		JOIN( 
 			unique_dids, 
-			distribute(pull(temp_key_property_did(source_code_2 = PROPERTY)), s_did), // LN_PropertyV2.key_Property_did(is_FCRA),
+			distribute(pull(temp_key_property_did)(source_code_2 = PROPERTY), s_did), // LN_PropertyV2.key_Property_did(is_FCRA),
 			LEFT.did = RIGHT.s_did,
 			append_fares_id_by_DID(left, right),
 			KEEP(100), 
 			ATMOST(left.did=right.s_did, RiskWise.max_atmost) ,
 			local
 		);
+
+
 
 #IF(onThor)
 	ids_plus_fares_by_did := group(ids_plus_fares_by_did_thor, seq); // add group by seq to make both branches have same grouping
@@ -384,19 +386,19 @@ end;
 		DEDUP(
 			SORT(
 				p_address,
-				seq, did, isrelat, fname, lname, prim_range, prim_name, sec_range, city_name, st, zip5
+				seq, did, historydate, isrelat, fname, lname, prim_range, prim_name, sec_range, city_name, st, zip5
 
 			),
-			seq, did, isrelat, fname, lname, prim_range, prim_name, sec_range, city_name, st, zip5
+			seq, did, historydate, isrelat, fname, lname, prim_range, prim_name, sec_range, city_name, st, zip5
 		);	
 	
 	p_addr_thor := 
 		DEDUP(
 			SORT(
 				distribute(p_address, did),
-				did, prim_range, prim_name, sec_range, city_name, st, zip5, isrelat, fname, lname, local
+				did, historydate, prim_range, prim_name, sec_range, city_name, st, zip5, isrelat, fname, lname, local
 			),
-			did, prim_range, prim_name, sec_range, city_name, st, zip5, local
+			did, historydate, prim_range, prim_name, sec_range, city_name, st, zip5, local
 		);
 		
 	#IF(onThor)
@@ -441,7 +443,7 @@ end;
 		ids_plus_fares_by_address_thor := 
 		JOIN(
 			distribute(p_addr(prim_name<>''), hash64(prim_name, prim_range, zip5, sec_range)), 
-			distribute(pull(kaf(source_code_2 = PROPERTY)), hash64(prim_name, prim_range, zip, sec_range)),
+			distribute(pull(kaf)(source_code_2 = PROPERTY), hash64(prim_name, prim_range, zip, sec_range)),
 			LEFT.prim_name = RIGHT.prim_name AND
 			LEFT.prim_range = RIGHT.prim_range AND
 			LEFT.zip5 = RIGHT.zip AND
@@ -481,6 +483,7 @@ end;
 			), 
 			seq, inp_did, ln_fares_id, local 
 		);
+
 		
 // dedup the dids and ln_fares_ids so we're only searching the property data 1 time with those combinations
 // do it now just for the thor job, but likely would be a good idea to do this in roxie version as well 
@@ -539,10 +542,10 @@ end;
 				SELF.assessment := LEFT.assessments[1];
 				SELF.parties    := LEFT.parties;
 	// need to extract state from deed and assessment record so we can filter out restricted states for Profile Booster
-				deed_comma 			:= stringlib.stringfind(LEFT.deeds[1].property_address_citystatezip, ',', 1);
+				deed_comma 			:= STD.str.find(LEFT.deeds[1].property_address_citystatezip, ',', 1);
 				deed_st    			:= LEFT.deeds[1].property_address_citystatezip[deed_comma+2..deed_comma+3];  //city is followed by comma and space, then state
 				SELF.deed_st    := deed_st;
-				assm_comma 			:= stringlib.stringfind(LEFT.assessments[1].property_city_state_zip, ',', 1);
+				assm_comma 			:= STD.str.find(LEFT.assessments[1].property_city_state_zip, ',', 1);
 				assm_st    			:= LEFT.assessments[1].property_city_state_zip[assm_comma+2..assm_comma+3];  //city is followed by comma and space, then state
 				SELF.assm_st    := assm_st;
 				SELF            := LEFT;
@@ -552,7 +555,7 @@ end;
 	// 2.c. And now project into a (much) slimmer layout to conserve memory.
 	property_records_full := 
 		PROJECT(if(is_from_PB,  //need to filter out restricted states if this is being called from Profile Booster
-			property_records_full_pre(TRIM(stringlib.stringtouppercase(deed_st)) not in ProfileBooster.Constants.setPropertyStatesRes and TRIM(stringlib.stringtouppercase(assm_st)) not in ProfileBooster.Constants.setPropertyStatesRes),
+			property_records_full_pre(TRIM(STD.str.touppercase(deed_st)) not in ProfileBooster.Constants.setPropertyStatesRes and TRIM(STD.str.touppercase(assm_st)) not in ProfileBooster.Constants.setPropertyStatesRes),
 			property_records_full_pre),
 			TRANSFORM( layout_properties_temp,
 				SELF.deed       := LEFT.deed;
@@ -589,7 +592,9 @@ end;
 			(UNSIGNED3)(RIGHT.sortby_date[1..6]) >= LEFT.p_address_dt_first_seen and 
 			((UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.p_address_dt_last_seen or LEFT.p_address_dt_last_seen=0) and
 			// remove records that are after the history date
-			(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate,
+			(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate and
+			(unsigned3)RIGHT.assessment.tax_year <= If(is_FCRA ,(((unsigned)((string)LEFT.historydate)[1..4])+1), 9999) and
+				(unsigned3)RIGHT.assessment.assessed_value_year <= If(is_FCRA ,(((unsigned)((string)LEFT.historydate)[1..4])+1), 9999 ), 
 			TRANSFORM( layout_full_plus_ids,
 				self.seq := left.seq,  // just for personal sanity sake, map the seq number from the left dataset
 				SELF := RIGHT, 
@@ -609,7 +614,9 @@ end;
 				(UNSIGNED3)(RIGHT.sortby_date[1..6]) >= LEFT.p_address_dt_first_seen and 
 				((UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.p_address_dt_last_seen or LEFT.p_address_dt_last_seen=0) and
 				// remove records that are after the history date
-				(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate,
+				(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate and
+				(unsigned3)RIGHT.assessment.tax_year <= If(is_FCRA ,(((unsigned)(string)LEFT.historydate[1..4])+1), 9999) and
+				(unsigned3)RIGHT.assessment.assessed_value_year <= If(is_FCRA ,(((unsigned)(string)LEFT.historydate[1..4])+1), 9999 ), 
 				TRANSFORM( layout_full_plus_ids,
 					self.seq := left.seq,  // just for personal sanity sake, map the seq number from the left dataset
 					SELF := RIGHT, 
@@ -1177,14 +1184,10 @@ end;
 	// output(onThor, named('onThor'));
 	
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_did, NAMED('ids_plus_fares_by_did') ) );
-	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_did_ddpd, NAMED('ids_plus_fares_by_did_ddpd') ) );
-	// IF( ViewDebugs, OUTPUT( p_address_filt_a, NAMED('p_address_filt_a') ) );
-	// IF( ViewDebugs, OUTPUT( p_address_filt_b, NAMED('p_address_filt_b') ) );
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_did, NAMED('ids_plus_fares_by_did') ) );
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_address, NAMED('ids_plus_fares_by_address') ) );
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares, NAMED('ids_plus_fares') ) );
 // OUTPUT( ids_plus_fares_temp, NAMED('ids_plus_fares_temp') );
-// OUTPUT( ids_plus_fares, NAMED('ids_plus_fares') );
 	
 	// IF( ViewDebugs, OUTPUT( ds_property_recs_raw_with_uniqueid, NAMED('property_recs_all') ) );
 	// IF( ViewDebugs, OUTPUT( ds_property_recs_filt_a, NAMED('property_recs_filt_a') ) );
@@ -1197,19 +1200,20 @@ end;
 	
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_FARES, NAMED('assess_recs_FARES') ) );
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_FIDELITY, NAMED('assess_recs_FIDELITY') ) );
+	// IF( ViewDebugs, OUTPUT( ds_property_recs_filt_a_roxie, NAMED('ds_property_recs_filt_a_roxie') ) );	
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_FIDELITY_rolled, NAMED('assess_recs_FIDELITY_rolled') ) );
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_most_recent, NAMED('assess_recs_most_recent') ) );
 	
 	// IF( ViewDebugs, OUTPUT( ds_deed_recs, NAMED('deed_recs') ) );
 	// IF( ViewDebugs, OUTPUT( ds_deed_recs_filt_b, NAMED('deed_recs_filt') ) );
 	// IF( ViewDebugs, OUTPUT( ds_deed_recs_most_recent, NAMED('deed_recs_most_recent') ) );
+	// IF( ViewDebugs, OUTPUT( ds_final_not_found, NAMED('final_not_found') ) );	
 	
 	// IF( ViewDebugs, OUTPUT( ds_assessments_and_deeds_most_recent, NAMED('all_recs_most_recent') ) );
 	// IF( ViewDebugs, OUTPUT( ds_assessments_and_deeds_best_vendor_source, NAMED('best_vendor_source') ) );
 	// IF( ViewDebugs, OUTPUT( ds_best_vendor_source_rolled, NAMED('best_vendor_source_rolled') ) );
-	// IF( ViewDebugs, OUTPUT( ds_final_found, NAMED('ds_final_found') ) );
+	// IF( ViewDebugs, OUTPUT( ds_final, NAMED('ds_final_found') ) );
 	// IF( ViewDebugs, OUTPUT( ds_final_pre, NAMED('final_pre') ) );
-	// IF( ViewDebugs, OUTPUT( ds_final_not_found, NAMED('final_not_found') ) );	
 	
 	// output(ids_only, named('ids_only'));
 	// output(p_address, named('p_address'));
@@ -1222,9 +1226,16 @@ end;
 	// output(property_records_full, named('property_records_full'));
 	// output(ds_property_recs_raw_with_uniqueid, named('ds_property_recs_raw_with_uniqueid'));
 	// output(ds_property_recs_filt_d2, named('ds_property_recs_filt_d2'));
+	// output(ds_property_recs_filt_a, NAMED('property_recs_filt_a'));
+	// output(ds_property_recs_filt_a);
+	// output(ds_property_recs_filt_b, NAMED('property_recs_filt_b'));
+	// output(ds_property_recs_filt_c, NAMED('property_recs_filt_c'));
+	// output(ds_property_recs_filt_d, NAMED('property_recs_filt_d'));
 	// output(ds_property_recs_filt_e, named('ds_property_recs_filt_e'));
 	// output(ds_assess_recs_FARES, named('ds_assess_recs_FARES'));
 	// output(ds_assess_recs_FIDELITY, named('ds_assess_recs_FIDELITY'));
+	// output(ids_plus_fares_roxie, NAMED('ids_plus_fares_roxie'));
+	// output(ds_property_recs_filt_a_roxie, NAMED('ds_property_recs_filt_a_roxie'));
 	// output(ds_assess_recs_FIDELITY_rolled, named('ds_assess_recs_FIDELITY_rolled'));
 	// output(ds_assess_recs_most_recent_pre, named('ds_assess_recs_most_recent_pre'));
 	// output(ds_assess_recs_most_recent, named('ds_assess_recs_most_recent'));
@@ -1240,7 +1251,7 @@ end;
 	// output(ds_property_sold_records, named('ds_property_sold_records'));
 	// output(ds_final, named('ds_final'));
 	// output(single_property, named('single_property'));
-
+																	
 	RETURN Single_Property;
 
 END;

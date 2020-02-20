@@ -1,5 +1,10 @@
-import doxie,doxie_build, ut, hygenics_search;
+﻿import doxie,doxie_build, ut, hygenics_search, vault, _control;
 
+
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export Key_SexOffender_DID (boolean IsFCRA = false) := vault.SexOffender.Key_SexOffender_DID(isFCRA);
+
+#ELSE
 export Key_SexOffender_DID (boolean IsFCRA = false) := function
 
 //TODO: apply fcra-filtering by source, state, etc.
@@ -33,3 +38,6 @@ return if (IsFCRA,
            index(df_all, {did}, {seisint_primary_key, lat, long}, file_name, OPT));
 
 end;
+
+
+#END;

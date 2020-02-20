@@ -1,4 +1,4 @@
-import Autokey_batch, LN_PropertyV2_Services, Suppress;
+import BatchServices, LN_PropertyV2_Services, Suppress;
 
 ///////////////////////////////////////////////////////////////////////////////
 // This code was previously in BatchServices.STR_Records. I'm moving it over here so
@@ -17,7 +17,7 @@ MODULE
 
 	fids1				:= fids_all(ln_fares_id[1] not in LN_PropertyV2_Services.input.srcRestrict, // blacklist FARES, Fidelity, or LnBranded as needed
 													search_status = BatchServices.STR_Constants.ErrorCodes.NO_ERROR);
-	Suppress.MAC_Suppress(fids1,fids2,in_mod.ApplicationType,,,Suppress.Constants.DocTypes.FaresID,ln_fares_id);													
+	Suppress.MAC_Suppress(fids1,fids2,in_mod.application_type,,,Suppress.Constants.DocTypes.FaresID,ln_fares_id);													
 	
 	export fids := project(fids2, TRANSFORM(BatchServices.STR_Layouts.Working_Property, SELF:=LEFT, SELF:=[]));																					
 	
@@ -51,8 +51,8 @@ MODULE
 	
 	fidsToPull1 := 
 		join(ds_props_with_parties, Suppress.Key_New_Suppression,
-					keyed(right.Product in map (in_mod.ApplicationType = Suppress.Constants.ApplicationTypes.PeopleWise => Suppress.Constants.SuppressPeopleWise,
-															 in_mod.ApplicationType = Suppress.Constants.ApplicationTypes.LE => Suppress.Constants.SuppressLE,
+					keyed(right.Product in map (in_mod.application_type = Suppress.Constants.ApplicationTypes.PeopleWise => Suppress.Constants.SuppressPeopleWise,
+															 in_mod.application_type = Suppress.Constants.ApplicationTypes.LE => Suppress.Constants.SuppressLE,
 															 Suppress.Constants.SuppressGeneral)) and 
 					keyed(right.Linking_type = Suppress.Constants.LinkTypes.DID) and
 				 (unsigned6)left.owners[1].owner_did<>0 and 
@@ -60,8 +60,8 @@ MODULE
 				 transform(LN_PropertyV2_Services.layouts.fid, self := left),keep(1));
 	fidsToPull2 := 
 		join(ds_props_with_parties, Suppress.Key_New_Suppression, 
-					keyed(right.Product in map (in_mod.ApplicationType = Suppress.Constants.ApplicationTypes.PeopleWise => Suppress.Constants.SuppressPeopleWise,
-															 in_mod.ApplicationType = Suppress.Constants.ApplicationTypes.LE => Suppress.Constants.SuppressLE,
+					keyed(right.Product in map (in_mod.application_type = Suppress.Constants.ApplicationTypes.PeopleWise => Suppress.Constants.SuppressPeopleWise,
+															 in_mod.application_type = Suppress.Constants.ApplicationTypes.LE => Suppress.Constants.SuppressLE,
 															 Suppress.Constants.SuppressGeneral)) and 
 					keyed(right.Linking_type = Suppress.Constants.LinkTypes.SSN) and
 				 length(trim((string60)left.owners[1].owner_ssn))<>0 and 

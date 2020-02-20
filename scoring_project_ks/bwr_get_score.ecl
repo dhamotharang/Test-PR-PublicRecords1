@@ -26,8 +26,6 @@ return( map(
 						(((integer8) score_in   < -1  or (integer8) score_in   > 999 ) and stringlib.stringfind(lay, 'paro', 1) > -1 )  =>  '-1',
 																			
 																
-																		
-																
 
                                     score_in
 					  ));

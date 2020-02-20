@@ -1,7 +1,7 @@
-﻿IMPORT AutoStandardI, Business_Header, doxie, ERO_Services, iesp, Prof_License_Mari, SANCTN, SANCTN_Mari, 
-       SANCTN_Services, lib_stringlib, BIPV2, MIDEX_Services;
+﻿IMPORT AutoStandardI,doxie,iesp,BIPV2,MIDEX_Services,STD;
 
-EXPORT MidexSearch_Records (MIDEX_Services.Iparam.searchrecords in_mod) := 
+EXPORT MidexSearch_Records (MIDEX_Services.Iparam.searchrecords in_mod,
+                            doxie.IDataAccess mod_access) := 
   FUNCTION
 
 
@@ -19,13 +19,13 @@ EXPORT MidexSearch_Records (MIDEX_Services.Iparam.searchrecords in_mod) :=
 
 
         // set all input variables to upper case for searching against the key files.
-        STRING20  in_lic_num           := StringLib.StringToUpperCase(in_mod.license_number);         
-        STRING40  in_lic_state         := StringLib.StringToUpperCase(in_mod.license_state);
+        STRING20  in_lic_num           := STD.STR.ToUpperCase(in_mod.license_number);         
+        STRING40  in_lic_state         := STD.STR.ToUpperCase(in_mod.license_state);
         UNSIGNED2 in_ssn_last4         := (UNSIGNED2)in_mod.ssn_last4;
-        STRING26  in_midex_rpt_num     := StringLib.StringToUpperCase(in_mod.midex_rpt_num);
-        STRING    in_tin               := StringLib.StringToUpperCase(in_mod.tin);  
+        STRING26  in_midex_rpt_num     := STD.STR.ToUpperCase(in_mod.midex_rpt_num);
+        STRING    in_tin               := STD.STR.ToUpperCase(in_mod.tin);  
         
-        setNonpubAccess := MIDEX_Services.Functions.fn_GetNonPubDataSources( in_mod.DataPermissionMask );  
+        setNonpubAccess := MIDEX_Services.Functions.fn_GetNonPubDataSources( mod_access.DataPermissionMask );  
 
         STRING8 MidexSearchType  := IF( AutoStandardI.InterfaceTranslator.lname_value.val(in_mod) != '' OR in_mod.DID != '',
                                         MIDEX_SERVICES.Constants.PERSON_REPORT,
@@ -50,7 +50,7 @@ EXPORT MidexSearch_Records (MIDEX_Services.Iparam.searchrecords in_mod) :=
         ds_all_nonPub_midexRptNums_sorted := DEDUP( SORT( ds_all_nonPub_midexRptNums, midex_rpt_nbr ), midex_rpt_nbr );
      
         ds_all_nonPubSanctnMari_recs := IF( COUNT(setNonpubAccess) > 0,
-                                            MIDEX_Services.Raw_Nonpublic.MIDEX.SEARCH_VIEW.fn_by_midex_rpt_num(ds_all_nonPub_midexRptNums_sorted, in_mod.ssnMask, in_mod.AlertVersion, setNonpubAccess, in_mod.StartLoadDate), 
+                                            MIDEX_Services.Raw_Nonpublic.MIDEX.SEARCH_VIEW.fn_by_midex_rpt_num(ds_all_nonPub_midexRptNums_sorted, mod_access.ssn_mask, in_mod.AlertVersion, setNonpubAccess, in_mod.StartLoadDate), 
                                             DATASET([],MIDEX_Services.Layouts.rec_temp_layout)
                                           );
 
@@ -65,7 +65,10 @@ EXPORT MidexSearch_Records (MIDEX_Services.Iparam.searchrecords in_mod) :=
        ds_pubSanctn_midexRptNums := MIDEX_Services.Search_IDs.Mari_Public_Sanct_val(in_mod);
        ds_pubSanctn_midexRptNum_sorted := DEDUP( SORT( ds_pubSanctn_midexRptNums, midex_rpt_nbr ), midex_rpt_nbr );
 
-       ds_all_pubSanctnMari_recs := MIDEX_Services.Raw_Public.MIDEX.SEARCH_VIEW.fn_by_midex_rpt_nums(ds_pubSanctn_midexRptNum_sorted,  in_mod.ssnMask, in_mod.AlertVersion, in_mod.StartLoadDate);
+       ds_all_pubSanctnMari_recs := MIDEX_Services.Raw_Public.MIDEX.SEARCH_VIEW.fn_by_midex_rpt_nums(ds_pubSanctn_midexRptNum_sorted,
+                                                                                                     mod_access,  
+                                                                                                     in_mod.AlertVersion, 
+                                                                                                     in_mod.StartLoadDate);
        
        // per product -- (Bonnie Taepakdee & Dawn Hill), the midex report number should be included in the 
        // deduping process because the comprehensive report uses the midex report number as the unique id to 

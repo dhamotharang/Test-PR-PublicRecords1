@@ -1,4 +1,4 @@
-﻿IMPORT advo, DueDiligence, iesp, STD, Suppress, ut;
+﻿IMPORT Advo, DueDiligence, iesp, STD, Suppress, ut;
 
 EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData, 
                          STRING6 ssnMask) := FUNCTION
@@ -6,8 +6,16 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                          
     //mask best ssn for the report    
     Suppress.MAC_Mask(inData, maskedBestData, bestSSN, '', TRUE, FALSE,,,, ssnMask);
+    
+    
+    //get Residential_OR_Business_Ind for Advo.Lookup_Descriptions.fn_resbus
+    formatCleanAddressType := DueDiligence.CommonAddress.GetKeyAddr1HistoryResidentialOrBusiness(maskedBestData, 'indvRawInput.cleanAddress');
+    formatBestAddressType  := DueDiligence.CommonAddress.GetKeyAddr1HistoryResidentialOrBusiness(formatCleanAddressType, 'bestaddress');
+    
+    //remove all duplicate values
+    addAddressTypesDeduped := DEDUP(formatBestAddressType, ALL);
                                                                                         
-    formatInquiredInfo := PROJECT(maskedBestData, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, iesp.duediligencepersonreport.t_DDRPersonInformation personalInfo},
+    formatInquiredInfo := PROJECT(addAddressTypesDeduped, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, iesp.duediligencepersonreport.t_DDRPersonInformation personalInfo},
                                                     SELF.seq := LEFT.seq;
                                                     SELF.did := LEFT.inquiredDID;
                                                     SELF.personalInfo.LexID := (STRING)LEFT.inquiredDID;
@@ -33,16 +41,13 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                                                                                                               bestAddr.streetAddress1, bestAddr.streetAddress2,
                                                                                                               TRIM(bestAddr.state) + TRIM(bestAddr.city) + TRIM(bestAddr.zip5));
                                                     
-                                                    SELF.personalInfo.inputAddressType := advo.Lookup_Descriptions.Record_Type_Description_lookup(LEFT.indvCleanInput.address.rec_type);
+                                                    SELF.personalInfo.inputAddressType := Advo.Lookup_Descriptions.fn_resbus(LEFT.Residential_OR_Business_Clean);
+                                                    SELF.personalInfo.bestAddressType := Advo.Lookup_Descriptions.fn_resbus(LEFT.Residential_OR_Business_Best);
                                                     
-                                                    //get the address type from best
-                                                    cleanAddr := DueDiligence.CitDDShared.cleanAddress(bestAddr);
-                                                    SELF.personalInfo.bestAddressType := advo.Lookup_Descriptions.Record_Type_Description_lookup(cleanAddr.rec_type);
-                                                    
-                                                    SELF.personalInfo.InputSSN := LEFT.inputSSN;
+                                                    SELF.personalInfo.InputSSN := LEFT.indvRawInput.ssn;
                                                     SELF.personalInfo.BestSSN := LEFT.bestSSN;
                                                     SELF.personalInfo.InputDOB := iesp.ECL2ESP.toDatestring8(LEFT.indvRawInput.dob);
-                                                    SELF.personalInfo.BestDOB := iesp.ECL2ESP.toDate(LEFT.bestDOB);;
+                                                    SELF.personalInfo.BestDOB := iesp.ECL2ESP.toDate(LEFT.bestDOB);
                                                     SELF.personalInfo.InputPhone := LEFT.indvRawInput.phone;
                                                     SELF.personalInfo.BestPhone := LEFT.bestPhone;
                                                     
@@ -71,8 +76,11 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
     
     
     // OUTPUT(maskedBestData, NAMED('maskedBestData'));
+    // OUTPUT(formatCleanAddressType, NAMED('formatCleanAddressType'));
+    // OUTPUT(formatBestAddressType, NAMED('formatBestAddressType'));
     // OUTPUT(formatInquiredInfo, NAMED('formatInquiredInfo'));
     // OUTPUT(addInquiredInfo, NAMED('addInquiredInfo'));
+    // OUTPUT(addAddressTypesDeduped, NAMED('addAddressTypesDeduped'));
     
     
     RETURN addInquiredInfo;

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Healthcare_SocioEconomic_Batch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="20"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -74,6 +74,12 @@ export Healthcare_SocioEconomic_Batch_Service := MACRO
 	unsigned3 history_date12 := myNewDate12;//To be used to accomodate the need to collect 12 month history on certain fields that the core does not support
 	unsigned3 history_date24 := myNewDate24;//To be used to accomodate the need to collect 24 month history on certain fields that the core does not support
 	
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+    
 	unsigned1 dppa := prep_dppa; //Remove DNC filter if(~DisableDoNotMailFilter, 0, prep_dppa);
 
 	LeadIntegrityVersion := Models.Healthcare_Constants.default_LeadIntegrity_Version;//We want version 4
@@ -121,23 +127,47 @@ export Healthcare_SocioEconomic_Batch_Service := MACRO
    *************************************** */
 	iid := Risk_Indicators.InstantID_Function(cleanIn, gateways, DPPA, GLB, isUtility, isLn, ofac_Only, 
 																						suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, ofacSearching, includeAdditionalWatchlists,
-																						in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions, in_DataPermission := DataPermission);
+																						in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions, in_DataPermission := DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID);
 	iidHist12 := Risk_Indicators.InstantID_Function(cleanInHist12, gateways, DPPA, GLB, isUtility, isLn, ofac_Only, 
 																						suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, ofacSearching, includeAdditionalWatchlists,
-																						in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions, in_DataPermission := DataPermission);
+																						in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions, in_DataPermission := DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID);
 	iidHist24 := Risk_Indicators.InstantID_Function(cleanInHist24, gateways, DPPA, GLB, isUtility, isLn, ofac_Only, 
 																						suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, ofacSearching, includeAdditionalWatchlists,
-																						in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions, in_DataPermission := DataPermission);
+																						in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions, in_DataPermission := DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID);
 
 	clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, DPPA, GLB, isUtility, isLn, doRelatives, doDL, 
 																							doVehicle, doDerogs, bsVersion, doScore, nugen, filterOutFares, DataRestriction := DataRestriction,
-																							BSOptions := BsOptions, DataPermission := DataPermission);
+																							BSOptions := BsOptions, DataPermission := DataPermission,
+                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                            TransactionID := TransactionID, 
+                                                                                            BatchUID := BatchUID, 
+                                                                                            GlobalCompanyID := GlobalCompanyID);
 	clamHist12 := Risk_Indicators.Boca_Shell_Function(iidHist12, gateways, DPPA, GLB, isUtility, isLn, doRelatives, doDL, 
 																							doVehicle, doDerogs, bsVersion, doScore, nugen, filterOutFares, DataRestriction := DataRestriction,
-																							BSOptions := BsOptions, DataPermission := DataPermission);
+																							BSOptions := BsOptions, DataPermission := DataPermission,
+                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                            TransactionID := TransactionID, 
+                                                                                            BatchUID := BatchUID, 
+                                                                                            GlobalCompanyID := GlobalCompanyID);
 	clamHist24 := Risk_Indicators.Boca_Shell_Function(iidHist24, gateways, DPPA, GLB, isUtility, isLn, doRelatives, doDL, 
 																							doVehicle, doDerogs, bsVersion, doScore, nugen, filterOutFares, DataRestriction := DataRestriction,
-																							BSOptions := BsOptions, DataPermission := DataPermission);
+																							BSOptions := BsOptions, DataPermission := DataPermission,
+                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                            TransactionID := TransactionID, 
+                                                                                            BatchUID := BatchUID, 
+                                                                                            GlobalCompanyID := GlobalCompanyID);
 
 	LeadIntegrity := Models.get_LeadIntegrity_Attributes(clam,LeadIntegrityVersion);
 	LeadIntegrityHist12 := Models.get_LeadIntegrity_Attributes(clamHist12,LeadIntegrityVersion);

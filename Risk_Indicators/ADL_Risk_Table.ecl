@@ -1,4 +1,4 @@
-﻿import header, ut, doxie, mdr, risk_indicators;
+﻿import header, ut, dx_header, mdr, risk_indicators;
 
 
 // hf is a dataset of header, filtered by the correct sources before this function is called
@@ -84,7 +84,7 @@ fixed4unique := rollup( sort(fixed4,did,ssn,local), fixedroll(left,right),did,ss
 
 today1 := ((string) risk_indicators.iid_constants.todaydate)[1..6];
 sysdate := today1 + '01';
-dk := choosen(doxie.key_max_dt_last_seen, 1);
+dk := choosen(dx_header.key_max_dt_last_seen(), 1);
 hdrBuildDate01 := ((string)dk[1].max_date_last_seen)[1..6]+'01';
 
 

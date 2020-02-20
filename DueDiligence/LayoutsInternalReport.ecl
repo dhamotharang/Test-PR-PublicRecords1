@@ -199,7 +199,110 @@ EXPORT LayoutsInternalReport := MODULE
   EXPORT ReportingOfBEOAssociatedBus := RECORD
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout  AssociatedBusLINKID;
-    DATASET (iesp.duediligencebusinessreport.t_DDRBusinessNameWithLexID) RptAssocBusNames;
+    DATASET(iesp.duediligencebusinessreport.t_DDRBusinessNameWithLexID) RptAssocBusNames;
+  END;
+  
+  EXPORT ReportIdentity := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID;
+    UNSIGNED estimatedAge;
+    iesp.duediligencepersonreport.t_DDRPersonSSNDetails inputSSNDetails;
+    iesp.duediligencepersonreport.t_DDRPersonSSNDetails bestSSNDetails; 
+    iesp.duediligencepersonreport.t_DDRPersonLexIDInformation identityDetails;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonLexIDSourcesReporting) allSourcesReporting;
+    UNSIGNED2 allSourcesCounts;
+  END;
+  
+  EXPORT PersonSSNDeviation := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID; 
+    UNSIGNED didTiedToSSN; 
+    UNSIGNED4 historyDate; 
+    STRING9 inputSSN; 
+    STRING9 ssnOnFile; 
+    STRING9 bestSSN; 
+    STRING9 inquiredBestSSN;
+    DueDiligence.Layouts.Name bestName; 
+    DueDiligence.Layouts.Address bestAddress;
+    UNSIGNED bestDOB;
+    UNSIGNED2 relation;  
+    STRING relationText;
+    UNSIGNED differentSSNs;
+    UNSIGNED differentBestSSNs;
+    STRING9 maskedInputSSN; 
+    STRING9 maskedSSNOnFile; 
+    STRING9 maskedBestSSN; 
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSSNDeviations) inputPersonDeviations;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSSNDeviations) bestPersonDeviations;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSSNLexID) reportedSSNs;
+  END;
+  
+  EXPORT IdentitySources := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID; 
+    STRING source;
+    UNSIGNED4 sourceCount;
+    UNSIGNED4 sourceFirstSeen;
+    UNSIGNED4 sourceLastSeen;
+    UNSIGNED2 sourceID;
+    STRING sourceCategory;
+    UNSIGNED4 sourceCategoryCount;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSources) espInputSourceDetails;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSources) espBestSourceDetails;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonLexIDSourcesReporting) espSourceDetailsWithDates;
+  END;
+  
+  EXPORT IdentityNestedData := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID;
+    DueDiligence.Layouts.Name aka;
+    DATASET(iesp.share.t_Name) espAKAs;
+    UNSIGNED4 dob;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonDOBAge) espDOBAge;
+  END;
+  
+  EXPORT SlimResidentTenant := RECORD
+    UNSIGNED6 residentDID;
+    DueDiligence.Layouts.Name;
+    BOOLEAN relative;
+    BOOLEAN busAssocs;
+    BOOLEAN highRiskProfServOfStudy;
+    BOOLEAN potentialCrimArrest;
+    BOOLEAN potentialSOs;
+  END;
+  
+  EXPORT CurrentResidentTenantInfo := RECORD
+    UNSIGNED6 inquiredSeq;
+    UNSIGNED6 inquiredDID;
+    UNSIGNED6 inquiredAddressSeq;
+    SlimResidentTenant;
+    DueDiligence.Layouts.AddressSlimDetail;
+    UNSIGNED4 residentLastSeenDate;
+    UNSIGNED4 residentFirstSeenDate;
+    UNSIGNED4 historyDate;
+  END;
+  
+  
+  EXPORT MobilityData := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID;
+    UNSIGNED4 historyDate;
+    DueDiligence.Layouts.AddressDetails addrs;
+    STRING countyName;
+    STRING movingDistances;
+    STRING50 addressType;
+    STRING10 currentPreviousIndicator;
+    STRING residencyType;
+    STRING25 areaRisk;
+    UNSIGNED3 numberOfCurrentAddresses;
+    UNSIGNED6 numberOfPriorAddresses;
+    UNSIGNED6 numberCurrentResidentTenants;
+    UNSIGNED6 numberOfRelatives;
+    UNSIGNED6 numberOfBusAssocs;
+    UNSIGNED6 numberHighRiskProfServOfStudy;
+    UNSIGNED6 numberPotentialCrimArrest;
+    UNSIGNED6 numberOfPotentialSOs;
+    DATASET(SlimResidentTenant) resTenInfo;
   END;
   
 END;

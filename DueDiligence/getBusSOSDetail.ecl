@@ -1,4 +1,4 @@
-﻿IMPORT Business_Risk, BIPV2, Business_Risk_BIP, DueDiligence, Corp2, business_header, STD, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, business_header, STD;
 
 
 EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
@@ -43,7 +43,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
     addSosStatusDates := IF(sosDataOptions.includeAll OR sosDataOptions.includeFilingStatuses, DueDiligence.getBusSOSDetailImpl.getFilingStatuses(addCorpSicNaic, corpFilingsFilt), addCorpSicNaic);
     
     //if requesting incorporations with loose laws
-    addIncLooseLaws := IF(sosDataOptions.includeAll OR sosDataOptions.includeIncorporatedWithLooseLaws, DueDiligence.getBusSOSDetailImpl.getIncoprorationWithLooseLaws(addSosStatusDates, corpFilingsFilt), addSosStatusDates);
+    addIncLooseLaws := IF(sosDataOptions.includeAll OR sosDataOptions.includeIncorporatedWithLooseLaws, DueDiligence.CommonBusiness.getIncoprorationWithLooseLaws(addSosStatusDates, corpFilingsFilt, 'corp_inc_state'), addSosStatusDates);
     
     //if requesting incorporations with loose laws
     addAgents := IF(sosDataOptions.includeAll OR sosDataOptions.includeRegisteredAgents, DueDiligence.getBusSOSDetailImpl.getRegisteredAgents(addIncLooseLaws, corpFilingsFilt), addIncLooseLaws);

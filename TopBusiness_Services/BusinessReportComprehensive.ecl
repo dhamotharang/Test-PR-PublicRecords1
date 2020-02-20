@@ -9,13 +9,13 @@
   <part name="UltID" type="xsd:string"/>
 	<part name="OrgID" type="xsd:string"/>
   <part name="SeleID" type="xsd:string"/>
-	<part name="ProxID" type="xsd:string"/>  
+	<part name="ProxID" type="xsd:string"/>
 	<part name="PowID" type="xsd:string"/>
 	<part name="EmpID" type="xsd:string"/>
 	<part name="DotID" type="xsd:string"/>
 
 	<part name="IncludeAircrafts" type="xsd:boolean"/>
-	<part name="IncludeAssociatedBusinesses" type="xsd:boolean"/>	
+	<part name="IncludeAssociatedBusinesses" type="xsd:boolean"/>
 	<part name="IncludeBankruptcies" type="xsd:boolean"/>
   <part name="IncludeBusinessRegistrations" type="xsd:boolean"/>
   <part name="IncludeCompanyVerification" type="xsd:boolean"/>
@@ -23,9 +23,9 @@
 	<part name="IncludeContacts" type="xsd:boolean"/>
   <part name="IncludeDunBradStreet" type="xsd:boolean"/>
   <part name="IncludeExperianBusinessReports" type="xsd:boolean"/>
-	<part name="IncludeFinances" type="xsd:boolean"/>		
+	<part name="IncludeFinances" type="xsd:boolean"/>
   <part name="IncludeIncorporation" type="xsd:boolean"/>
-	<part name="IncludeIndustries" type="xsd:boolean"/>		
+	<part name="IncludeIndustries" type="xsd:boolean"/>
 	<part name="IncludeInternetDomains" type="xsd:boolean"/>
   <part name="IncludeIRS5500" type="xsd:boolean"/>
 	<part name="IncludeProfessionalLicenses" type="xsd:boolean"/>
@@ -36,12 +36,12 @@
 	<part name="IncludeParents" type="xsd:boolean"/>
 	<part name="IncludeProperties" type="xsd:boolean"/>
 	<part name="IncludeUCCFilings" type="xsd:boolean"/>
-	<part name="IncludeUCCFilingsSecureds" type = "xsd:boolean"/>	
+	<part name="IncludeUCCFilingsSecureds" type = "xsd:boolean"/>
 	<part name="IncludeRegisteredAgents" type="xsd:boolean"/>
   <part name="IncludeSanctions" type="xsd:boolean"/>
-	<part name="IncludeWatercrafts" type="xsd:boolean"/>	
+	<part name="IncludeWatercrafts" type="xsd:boolean"/>
 	<part name="IncludeSourceCounts" type="xsd:boolean"/>
-	<part name="IncludeCriminalIndicators" type="xsd:boolean"/>	
+	<part name="IncludeCriminalIndicators" type="xsd:boolean"/>
 	<part name="LnBranded" type="xsd:boolean"/>
 	<part name="BusinessReportFetchLevel" type="xsd:string"/>
 	<part name="TopBusinessReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
@@ -55,13 +55,13 @@ export BusinessReportComprehensive() := macro
 	rec_in 		:= iesp.TopBusinessReport.t_TopBusinessReportRequest;
 	ds_in 		:= dataset([],rec_in) : stored('TopBusinessReportRequest',few);
 	first_row := ds_in[1] : independent;
-	
+
 	// Set some base options
 	iesp.ECL2ESP.SetInputBaseRequest (first_row);
-	
+
 	// Set DPPA, GLBA, DRM, etc.
 	iesp.ECL2ESP.SetInputUser (first_row.User);
-	
+
 	report_by 			:= global(first_row.ReportBy.BusinessIds);
 	report_options 	:= global(first_row.Options);
 	user_options 		:= global(first_row.User);
@@ -73,15 +73,15 @@ export BusinessReportComprehensive() := macro
 	#stored('ProxID',report_by.ProxID);
 	#stored('OrgID',report_by.OrgID);
 	#stored('UltID',report_by.UltID);
-	
+
 	string s_DotID  := '' : stored('DotID');
-	string s_EmpID  := '' : stored('EmpID'); 
-	string s_PowID  := '' : stored('PowID');	 
-	string s_ProxID := '' : stored('ProxID');	
+	string s_EmpID  := '' : stored('EmpID');
+	string s_PowID  := '' : stored('PowID');
+	string s_ProxID := '' : stored('ProxID');
 	string s_SeleID := '' : stored('SeleID');
 	string s_OrgID  := '' : stored('OrgID');
 	string s_UltID  := '' : stored('UltID');
-	
+
 	#stored('IncludeAircrafts',report_options.IncludeAircrafts);
 	#stored('IncludeAssociatedBusinesses',report_options.IncludeAssociatedBusinesses);
 	#stored('IncludeBankruptcies',report_options.IncludeBankruptcies);
@@ -89,7 +89,7 @@ export BusinessReportComprehensive() := macro
 	#stored('IncludeCompanyVerification', report_options.IncludeCompanyVerification);
 	#stored('IncludeConnectedBusinesses', report_options.IncludeConnectedBusinesses);
 	#stored('IncludeContacts',report_options.IncludeContacts);
-	#stored('IncludeFinances',report_options.IncludeFinances);	
+	#stored('IncludeFinances',report_options.IncludeFinances);
 	#stored('IncludeIncorporation',report_options.IncludeIncorporation);
 	#stored('IncludeIndustries',report_options.IncludeIndustries);
 	#stored('IncludeInternetDomains',report_options.IncludeInternetDomains);
@@ -102,7 +102,7 @@ export BusinessReportComprehensive() := macro
 	#stored('IncludeParents',report_options.IncludeParents);
 	#stored('IncludeProperties',report_options.IncludeProperties);
 	#stored('IncludeUCCFilings',report_options.IncludeUCCFilings);
-	#stored('IncludeUCCFilingsSecureds',report_options.IncludeUCCFilingsSecureds);	
+	#stored('IncludeUCCFilingsSecureds',report_options.IncludeUCCFilingsSecureds);
 	#stored('IncludeRegisteredAgents',report_options.IncludeRegisteredAgents);
 	#stored('IncludeSanctions',report_options.IncludeSanctions);
 	#stored('IncludeWatercrafts',report_options.IncludeWatercrafts);
@@ -111,7 +111,7 @@ export BusinessReportComprehensive() := macro
 	#stored('IncludeExperianBusinessReports',report_options.IncludeExperianBusinessReports);
 	#stored('IncludeCriminalIndicators',report_options.IncludeCriminalIndicators);
 	#stored('LnBranded',user_options.LnBranded);
-  
+
   #WEBSERVICE(FIELDS('ULTID',
 	                    'ORGID',
 											'SELEID',
@@ -148,16 +148,16 @@ export BusinessReportComprehensive() := macro
 											'IncludeDunBradStreet',
 											'IncludeExperianBusinessReports',
 											'IncludeCriminalIndicators',
-											'LnBranded',											 
+											'LnBranded',
 											'DataRestrictionMask',
 											'DataPermissionMask',
 											'DPPAPurpose',
 											'GLBPurpose',
 											'SSNMASK'));
 
-	boolean AssociateBus 					:= false :  stored('IncludeAssociatedBusinesses');	
+	boolean AssociateBus 					:= false :  stored('IncludeAssociatedBusinesses');
 	boolean Parent		 						:= false :  stored('IncludeParents');
-	boolean Con 									:= false :  stored('IncludeContacts');	
+	boolean Con 									:= false :  stored('IncludeContacts');
 	boolean Finance	 							:= false :  stored('IncludeFinances');
 	boolean OpsSites 							:= false :  stored('IncludeOpsSites');
 	boolean InCorp 								:= false : stored('IncludeIncorporation');
@@ -185,31 +185,31 @@ export BusinessReportComprehensive() := macro
 	boolean CriminalIndicators 		:= false : stored('IncludeCriminalIndicators');
 	boolean lnbranded 						:= false : stored('LnBranded');
 	// set DEFAULT for query level report fetches to be at the SELEID = S level.
-	string1 BusinessReportFetchLevel := 'S' : stored('BusinessReportFetchLevel'); 																
-		
-	TopBusiness_Services.BusinessReportComprehensive_Layouts init_options() := transform	  	 
-	  self.ApplicationType 								:= AutoStandardI.GlobalModule().ApplicationType;		
-	  self.IncludeAssociatedBusinesses 		:= AssociateBus; 
-		self.IncludeParents 								:= Parent; 
-		self.IncludeContacts  							:=  Con; 
+	string1 BusinessReportFetchLevel := 'S' : stored('BusinessReportFetchLevel');
+
+	TopBusiness_Services.BusinessReportComprehensive_Layouts init_options() := transform
+	  self.ApplicationType 								:= AutoStandardI.GlobalModule().ApplicationType;
+	  self.IncludeAssociatedBusinesses 		:= AssociateBus;
+		self.IncludeParents 								:= Parent;
+		self.IncludeContacts  							:=  Con;
 		self.IncludeFinances   							:= Finance;
-		self.IncludeOpsSites 								:= OpsSites; 
+		self.IncludeOpsSites 								:= OpsSites;
 		self.IncludeIncorporation 					:= InCorp;
-		self.IncludeIndustries 							:= Indust; 
-		self.IncludeInternetDomains 				:= URL; 
-		self.IncludeUCCFilings 							:= UCCSect; 
-		self.IncludeUCCFilingsSecureds 			:= (UCCsect and UCCSecureds); 
-		self.IncludeLiensJudgments 					:= Liens; 
-		self.IncludeAircrafts 							:= Aircraft; 
-		self.IncludeMotorVehicles 					:= MVR; 
-		self.IncludeWatercrafts 						:= Wc; 
-		self.IncludeBankruptcies 						:= Bk; 
-		self.IncludeProperties 							:= Prop; 
+		self.IncludeIndustries 							:= Indust;
+		self.IncludeInternetDomains 				:= URL;
+		self.IncludeUCCFilings 							:= UCCSect;
+		self.IncludeUCCFilingsSecureds 			:= (UCCsect and UCCSecureds);
+		self.IncludeLiensJudgments 					:= Liens;
+		self.IncludeAircrafts 							:= Aircraft;
+		self.IncludeMotorVehicles 					:= MVR;
+		self.IncludeWatercrafts 						:= Wc;
+		self.IncludeBankruptcies 						:= Bk;
+		self.IncludeProperties 							:= Prop;
 		self.IncludeRegisteredAgents 				:= RA;
 		self.IncludeConnectedBusinesses 		:= ConnectedBusinesses;
-		self.IncludeSourceCounts 						:= Source; 
+		self.IncludeSourceCounts 						:= Source;
 		self.IncludeProfessionalLicenses 		:= License;
-		self.IncludeNameVariations 					:= namevariations; 
+		self.IncludeNameVariations 					:= namevariations;
 		self.IncludeBusinessRegistrations 	:= businessRegistrations;
 		self.IncludeIRS5500 								:= IRSFiftyFive;
 		self.IncludeCompanyVerification 		:= companyVerification;
@@ -222,9 +222,9 @@ export BusinessReportComprehensive() := macro
 		self.BusinessReportFetchLevel 			:= topbusiness_services.functions.fn_fetchLevel(trim(stringlib.stringToUpperCase(BusinessReportFetchLevel),left,right)[1]);
 		self := [];
 	end;
-	
+
 	options := row(init_options()); // can uncomment later
-	
+
 	// Set some base options
 	iesp.ECL2ESP.SetInputBaseRequest (first_row);
 	// Create dataset
@@ -236,13 +236,11 @@ export BusinessReportComprehensive() := macro
 		 self.ProxID := (unsigned6) s_proxid,
 		 self.SeleID := (unsigned6) s_seleid,
 		 self.OrgID  := (unsigned6) s_orgid,
-		 self.UltID  := (unsigned6) s_ultid,     
+		 self.UltID  := (unsigned6) s_ultid,
 	end;
-	
+
 	ds := dataset([initialize()]);
-	
-	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
-	
+
 	tempmod := module(AutoStandardI.DataRestrictionI.params)
 		export boolean 		AllowAll 						:= false;
 		export boolean 		AllowDPPA 					:= false;
@@ -254,22 +252,20 @@ export BusinessReportComprehensive() := macro
 		export boolean 		ignoreFidelity 			:= false;
 		export boolean 		includeMinors 			:= false;
 	end;
-	       
+
 	// Get report
 	tmpresults := TopBusiness_Services.Guts.getReport(ds,options,tempmod);
-																																			
-  tmp2 := project(tmpresults, transform(iesp.TopBusinessReport.t_topBusinessReportRecord, 
-	                             self := left, self := []));	
-	
+
+  tmp2 := project(tmpresults, transform(iesp.TopBusinessReport.t_topBusinessReportRecord,
+	                             self := left, self := []));
+
 	iesp.topbusinessReport.t_TopBusinessReportResponse format() := transform
 		temp_cnt 				:= count(tmp2);
 		self._Header		:= iesp.ECL2ESP.GetHeaderRow(),
-		self.Businesses := if (temp_cnt > 0, tmp2[1])																										
+		self.Businesses := if (temp_cnt > 0, tmp2[1])
   end;
-	
-	results := dataset([format()]);
 
-    IF(EXISTS(results), doxie.compliance.logSoldToTransaction(mod_access));
+	results := dataset([format()]);
 	output(Results,named('Results'));
 
 endmacro;

@@ -4,7 +4,7 @@ If any of the 3 fields has a score between 80 to 100 inclusively, it is deemed v
 Hence there is some connection with the input phone.  
 Connections are further assessed to determined the most likely owner.
 */
-IMPORT Gateway,PhoneOwnership,Phones,Risk_Indicators,STD;
+IMPORT doxie,Gateway,PhoneOwnership,Phones,Risk_Indicators,STD;
 
 EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batch_in,
                             PhoneOwnership.IParams.BatchParams inMod) := FUNCTION
@@ -66,7 +66,7 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 		EXPORT DATASET(Gateway.Layouts.Config) gateways := inMod.gateways(Gateway.Configuration.IsZumigoIdentity(servicename));
 	END;
 	
-	dsZumigoScores := IF(EXISTS(dsZumigoRequest),Phones.GetZumigoIdentity(dsZumigoRequest,zMod,inMod.glb,inMod.dppa,inMod.DataRestrictionMask,inMod.industry_class,inMod.application_type),
+	dsZumigoScores := IF(EXISTS(dsZumigoRequest),Phones.GetZumigoIdentity(dsZumigoRequest,zMod, PROJECT(inMod, doxie.IDataAccess)),
 												DATASET([],Phones.Layouts.ZumigoIdentity.zOut));
 	// fields are only populated for output when Zumigo matches
 	// otherwise REAB data is preserved for Accudata search

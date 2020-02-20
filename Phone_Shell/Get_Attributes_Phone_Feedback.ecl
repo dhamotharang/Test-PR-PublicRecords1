@@ -1,11 +1,12 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * 			 This function gathers the Phone_Feedback attributes.							*
  ************************************************************************ */
 
-IMPORT PhonesFeedback, Phone_Shell, Risk_Indicators, RiskWise, UT;
+IMPORT PhonesFeedback, Phone_Shell, RiskWise, UT, doxie, Suppress;
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Phone_Feedback (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input) := FUNCTION
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getFeedback(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhonesFeedback.Key_PhonesFeedback_phone ri) := TRANSFORM
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Phone_Feedback (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} getFeedback(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhonesFeedback.Key_PhonesFeedback_phone ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		// These attributes were already calculated in Phone_Shell.Search_PhonesFeedback
 		SELF.Phone_Feedback.Phone_Feedback_Date := le.Phone_Feedback.Phone_Feedback_Date;
 		SELF.Phone_Feedback.Phone_Feedback_Result := le.Phone_Feedback.Phone_Feedback_Result;
@@ -13,7 +14,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 		SELF.Phone_Feedback.Phone_Feedback_Middle := le.Phone_Feedback.Phone_Feedback_Middle;
 		SELF.Phone_Feedback.Phone_Feedback_Last := le.Phone_Feedback.Phone_Feedback_Last;
 		SELF.Phone_Feedback.Phone_Feedback_Last_RPC_Date := le.Phone_Feedback.Phone_Feedback_Last_RPC_Date;
-			
+
 		// Only look for the reverse phone information if the DID based Phones Feedback attributes were not found
 		reversePhoneLookup := TRIM(le.Phone_Feedback.Phone_Feedback_Date) = '' AND le.Phone_Feedback.Phone_Feedback_Result = 0 AND
 														TRIM(le.Phone_Feedback.Phone_Feedback_First) = '' AND TRIM(le.Phone_Feedback.Phone_Feedback_Middle) = '' AND
@@ -35,10 +36,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 		SELF := le;
 	END;
 	
-	feedback := JOIN(Input, PhonesFeedback.Key_PhonesFeedback_phone, TRIM(LEFT.Gathered_Phone) <> '' AND
+	feedback_unsuppressed := JOIN(Input, PhonesFeedback.Key_PhonesFeedback_phone, TRIM(LEFT.Gathered_Phone) <> '' AND
 																	KEYED(LEFT.Gathered_Phone = RIGHT.phone_number),
 																	getFeedback(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
-	
+	feedback := Suppress.Suppress_ReturnOldLayout(feedback_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
 	// We want to keep the most recent record
 	feedbackSorted := SORT(feedback, Unique_Record_Sequence, Clean_Input.Seq, Gathered_Phone, -Phone_Feedback.Phone_Feedback_RP_Last_RPC_Date, -Phone_Feedback.Phone_Feedback_RP_Date);
 	

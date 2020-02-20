@@ -9,7 +9,7 @@
  * - DID, Below the Line (Confidence Score < 11):: Source: PPTH						*
  ************************************************************************ */
 
-IMPORT Autokey, Data_Services, Doxie, Phone_Shell, Phones, PhonesPlus_V2, RiskWise, UT, STD;
+IMPORT Autokey, Data_Services, Doxie, Phone_Shell, Phones, PhonesPlus_V2, RiskWise, UT, STD, Suppress;
 
 DEBUG_IGNORE_ALLOW_LIST := FALSE; // Set to TRUE if you do NOT want to filter by allow list
 
@@ -22,15 +22,21 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 			 UNSIGNED1 PhoneRestrictionMask, 
 			 STRING50 DataPermissionMask, 
 			 STRING30 IndustryClass, 
-			 STRING DataRestrictionMask
+			 STRING DataRestrictionMask,
+    UNSIGNED2 PhoneShellVersion = 10,
+    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 			 ) := FUNCTION	
 
 	 AddressAutoKey := AutoKey.Key_Address(Data_Services.Data_Location.Prefix('phonesPlus') + 'thor_data400::key::phonesplusv2_');
 	 
+  // Phone Shell version controls
+  IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1   
+   
 	 /* ***************************************************************
 		* 							Get the Phones Plus Data by DID									*
 	  *************************************************************** */
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus searchByDID(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phonesplus_V2.Key_PhonesPlus_DID ri) := TRANSFORM
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} searchByDID(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phonesplus_V2.Key_PhonesPlus_DID ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		
 		SElf.Gathered_Phone := TRIM(ri.cellphone);
 		
@@ -49,11 +55,14 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 		SELF.Sources.Source_Owner_Name_Last := ri.lname;
 		SELF.Sources.Source_Owner_Name_Suffix := ri.name_suffix;
 		SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+    
+  SELF.Sources.Source_List_All_Last_Seen := if(IncludeLexIDCounts, Phone_Shell.Common.parseDate(IF(ri.DateLastSeen <> 0, (STRING)ri.DateLastSeen, (STRING)ri.DateVendorLastReported)), '');
+  SELF.Sources.Source_Owner_All_DIDs := if(IncludeLexIDCounts,(string)ri.DID,'');
 		
-		didMatch := StringLib.StringFind(matchcode, 'L', 1) > 0;
-		nameMatch := StringLib.StringFind(matchcode, 'N', 1) > 0;
-		addrMatch := StringLib.StringFind(matchcode, 'A', 1) > 0;
-		ssnMatch := StringLib.StringFind(matchcode, 'S', 1) > 0;
+		didMatch := STD.Str.Find(matchcode, 'L', 1) > 0;
+		nameMatch := STD.Str.Find(matchcode, 'N', 1) > 0;
+		addrMatch := STD.Str.Find(matchcode, 'A', 1) > 0;
+		ssnMatch := STD.Str.Find(matchcode, 'S', 1) > 0;
 		
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := MAP(didMatch AND nameMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Subject,
 																															didMatch AND addrMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Household,
@@ -102,7 +111,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 		SELF := le;
 	END;
 	
-	byDID := JOIN(Input, Phonesplus_V2.Key_PhonesPlus_DID, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.L_DID) AND 
+	byDID_unsuppressed := JOIN(Input, Phonesplus_V2.Key_PhonesPlus_DID, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.L_DID) AND 
 																													Phones.Functions.IsPhoneRestricted(RIGHT.origstate, 
 																																														 GLBPurpose, 
 																																														 DPPAPurpose, 
@@ -121,11 +130,13 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
                               ,
 																			searchByDID(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
 
+	byDID := Suppress.Suppress_ReturnOldLayout(byDID_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
+	
 	 /* ***************************************************************
 		* 				Get the Phones Plus LastResort Data by DID						*
 	  *************************************************************** */
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus searchByDIDRoyalty(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phonesplus_V2.Key_PhonesPlus_DID ri) := TRANSFORM
-		
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} searchByDIDRoyalty(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phonesplus_V2.Key_PhonesPlus_DID ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.Gathered_Phone := TRIM(ri.cellphone);
 		
 		matchcode := Phone_Shell.Common.generateMatchcode(le.Clean_Input.FirstName, le.Clean_Input.LastName, le.Clean_Input.StreetAddress1, le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Addr_Suffix, le.Clean_Input.City, le.Clean_Input.State, le.Clean_Input.Zip5, le.Clean_Input.DateOfBirth, le.Clean_Input.SSN, le.DID, le.Clean_Input.HomePhone, le.Clean_Input.WorkPhone, 
@@ -145,10 +156,13 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 		SELF.Sources.Source_Owner_Name_Suffix := ri.name_suffix;
 		SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
 		
-		didMatch := StringLib.StringFind(matchcode, 'L', 1) > 0;
-		nameMatch := StringLib.StringFind(matchcode, 'N', 1) > 0;
-		addrMatch := StringLib.StringFind(matchcode, 'A', 1) > 0;
-		ssnMatch := StringLib.StringFind(matchcode, 'S', 1) > 0;
+  SELF.Sources.Source_List_All_Last_Seen := if(includeLexIDCounts,Phone_Shell.Common.parseDate(IF(ri.DateLastSeen <> 0, (STRING)ri.DateLastSeen, (STRING)ri.DateVendorLastReported)),'');
+  SELF.Sources.Source_Owner_All_DIDs := if(includeLexIDCounts,(string)ri.DID,'');    
+    
+		didMatch := STD.Str.Find(matchcode, 'L', 1) > 0;
+		nameMatch := STD.Str.Find(matchcode, 'N', 1) > 0;
+		addrMatch := STD.Str.Find(matchcode, 'A', 1) > 0;
+		ssnMatch := STD.Str.Find(matchcode, 'S', 1) > 0;
 		
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := MAP(didMatch AND nameMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Subject,
 																															didMatch AND addrMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Household,
@@ -201,7 +215,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 		SELF := le;
 	END;
 	
-	byDIDRoyaltyTemp := JOIN(Input, Phonesplus_v2.Key_Royalty_Did, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.L_DID) AND 
+	byDIDRoyaltyTemp_unsuppressed := JOIN(Input, Phonesplus_v2.Key_Royalty_Did, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.L_DID) AND 
 																													Phones.Functions.IsPhoneRestricted(RIGHT.origstate, 
 																																														 GLBPurpose, 
 																																														 DPPAPurpose, 
@@ -219,7 +233,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
                      #end
                              ,
 																			searchByDIDRoyalty(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
-	
+	byDIDRoyaltyTemp := Suppress.Suppress_ReturnOldLayout(byDIDRoyaltyTemp_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
 	// Only use Royalty Phones if Include Last Resort is turned on and the Data Permission Mask has the LastResort bit set to TRUE
 	byDIDRoyalty := IF(IncludeLastResort AND DataPermissionMask[6] NOT IN ['0', ''], byDIDRoyaltyTemp, DATASET([], Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus));
 
@@ -241,7 +255,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 																								KEYED(RIGHT.city_code IN doxie.Make_CityCodes(LEFT.City).rox) AND KEYED(RIGHT.zip = LEFT.Zip5) AND KEYED(RIGHT.sec_range = LEFT.Sec_Range),
 																				getFDID(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
 
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus searchByUniqueAddresses(layoutUniqueAddrTemp le, Phonesplus_v2.Key_Phonesplus_Fdid ri) := TRANSFORM
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} searchByUniqueAddresses(layoutUniqueAddrTemp le, Phonesplus_v2.Key_Phonesplus_Fdid ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		
 		SELF.Clean_Input.seq := le.seq; // Need to save this to join back to the input data in a moment
 		SELF.Gathered_Phone := TRIM(ri.cellphone);
@@ -261,12 +276,15 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 		SELF.Sources.Source_Owner_Name_Middle := ri.mname;
 		SELF.Sources.Source_Owner_Name_Last := ri.lname;
 		SELF.Sources.Source_Owner_Name_Suffix := ri.name_suffix;
-	  SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+	 SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+   
+  SELF.Sources.Source_List_All_Last_Seen := if(includeLexIDCounts,Phone_Shell.Common.parseDate(IF(ri.DateLastSeen <> 0, (STRING)ri.DateLastSeen, (STRING)ri.DateVendorLastReported)),'');
+  SELF.Sources.Source_Owner_All_DIDs := if(includeLexIDCounts,(string)ri.DID,'');
 	
-		didMatch := StringLib.StringFind(matchcode, 'L', 1) > 0;
-		nameMatch := StringLib.StringFind(matchcode, 'N', 1) > 0;
-		addrMatch := StringLib.StringFind(matchcode, 'A', 1) > 0;
-		ssnMatch := StringLib.StringFind(matchcode, 'S', 1) > 0;
+		didMatch := STD.Str.Find(matchcode, 'L', 1) > 0;
+		nameMatch := STD.Str.Find(matchcode, 'N', 1) > 0;
+		addrMatch := STD.Str.Find(matchcode, 'A', 1) > 0;
+		ssnMatch := STD.Str.Find(matchcode, 'S', 1) > 0;
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := MAP(didMatch AND nameMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Subject,
 																															didMatch AND addrMatch	=> Phone_Shell.Constants.Phone_Subject_Level.Household,
 																																												 Phone_Shell.Constants.Phone_Subject_Level.LeadToSubject);
@@ -315,7 +333,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 		SELF := [];
 	END;
 	// Only search for addresses seen within the last 6 months
-	uniqueAddressSearchResults := JOIN(getAddressFDID1, Phonesplus_v2.Key_Phonesplus_Fdid, LEFT.fdid <> 0 AND KEYED(LEFT.fdid = RIGHT.fdid) AND
+	uniqueAddressSearchResults_unsuppressed := JOIN(getAddressFDID1, Phonesplus_v2.Key_Phonesplus_Fdid, LEFT.fdid <> 0 AND KEYED(LEFT.fdid = RIGHT.fdid) AND
 																											  	Phones.Functions.IsPhoneRestricted(RIGHT.origstate, 
 																																														 GLBPurpose, 
 																																														 DPPAPurpose, 
@@ -333,7 +351,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
                       #end
                               ,
 																																				searchByUniqueAddresses(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
-	
+	uniqueAddressSearchResults := Suppress.Suppress_ReturnOldLayout(uniqueAddressSearchResults_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus combineInputAndUnique(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
 		
 		SELF.Gathered_Phone := ri.Gathered_Phone;
@@ -367,7 +385,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 																	KEYED(RIGHT.city_code IN doxie.Make_CityCodes(LEFT.Clean_Input.City).rox) AND KEYED(RIGHT.zip = LEFT.Clean_Input.Zip5) AND KEYED(RIGHT.sec_range = LEFT.Clean_Input.Sec_Range),
 															getFDID2(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
 	
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus searchByInputAddress(layoutAddrTemp le, Phonesplus_v2.key_phonesplus_fdid ri) := TRANSFORM
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} searchByInputAddress(layoutAddrTemp le, Phonesplus_v2.key_phonesplus_fdid ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.Gathered_Phone := TRIM(ri.cellphone);
 		
 		matchcode := Phone_Shell.Common.generateMatchcode(le.Clean_Input.FirstName, le.Clean_Input.LastName, le.Clean_Input.StreetAddress1, le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Addr_Suffix, le.Clean_Input.City, le.Clean_Input.State, le.Clean_Input.Zip5, le.Clean_Input.DateOfBirth, le.Clean_Input.SSN, le.DID, le.Clean_Input.HomePhone, le.Clean_Input.WorkPhone,
@@ -391,10 +410,13 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 		SELF.Sources.Source_Owner_Name_Suffix := ri.name_suffix;
 		SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
 		
-		didMatch := StringLib.StringFind(matchcode, 'L', 1) > 0;
-		nameMatch := StringLib.StringFind(matchcode, 'N', 1) > 0;
-		addrMatch := StringLib.StringFind(matchcode, 'A', 1) > 0;
-		ssnMatch := StringLib.StringFind(matchcode, 'S', 1) > 0;
+  SELF.Sources.Source_List_All_Last_Seen := if(includeLexIDCounts,Phone_Shell.Common.parseDate(IF(ri.DateLastSeen <> 0, (STRING)ri.DateLastSeen, (STRING)ri.DateVendorLastReported)),'');
+  SELF.Sources.Source_Owner_All_DIDs := if(includeLexIDCounts,(string)ri.DID,'');    
+    
+		didMatch := STD.Str.Find(matchcode, 'L', 1) > 0;
+		nameMatch := STD.Str.Find(matchcode, 'N', 1) > 0;
+		addrMatch := STD.Str.Find(matchcode, 'A', 1) > 0;
+		ssnMatch := STD.Str.Find(matchcode, 'S', 1) > 0;
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Level := MAP(didMatch AND nameMatch								=> Phone_Shell.Constants.Phone_Subject_Level.Subject, 
 																															didMatch AND addrMatch								=> Phone_Shell.Constants.Phone_Subject_Level.Household,
 																															Source_List_Temp IN ['PPFA', 'PPLA']	=> Phone_Shell.Constants.Phone_Subject_Level.Household,
@@ -445,7 +467,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 		SELF := le;
 	END;
 	 
-	byAddressAll := JOIN(getAddressFDID2, Phonesplus_v2.key_phonesplus_fdid, LEFT.fdid <> 0 AND KEYED(LEFT.fdid = RIGHT.fdid) AND
+	byAddressAll_unsuppressed := JOIN(getAddressFDID2, Phonesplus_v2.key_phonesplus_fdid, LEFT.fdid <> 0 AND KEYED(LEFT.fdid = RIGHT.fdid) AND
 																											Phones.Functions.IsPhoneRestricted(RIGHT.origstate, 
 																																												 GLBPurpose, 
 																																												 DPPAPurpose, 
@@ -463,12 +485,31 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
                   #end
                            ,
 																											searchByInputAddress(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
-																											
+	byAddressAll := Suppress.Suppress_ReturnOldLayout(byAddressAll_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);																										
 	// Don't keep the phones which didn't match on some part of the name
 	byAddress := byAddressAll (TRIM(Sources.Source_List) <> '');
 	
-	final := DEDUP(SORT((byDID + byDIDRoyalty + byUniqueAddresses + byAddress), Clean_Input.seq, Gathered_Phone, Royalties.LastResortPhones_Royalty, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code))), Clean_Input.seq, Gathered_Phone, Sources.Source_List);
-	
+	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus get_Alls(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
+   self.Sources.Source_List_All_Last_Seen := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID, 
+                                                   le.Sources.Source_List_All_Last_Seen, 
+                                                   trim(le.Sources.Source_List_All_Last_Seen) + ',' + trim(ri.Sources.Source_List_All_Last_Seen));
+   self.Sources.Source_Owner_All_DIDs := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID,
+                                               le.Sources.Source_Owner_All_DIDs,
+                                               trim(le.Sources.Source_Owner_All_DIDs) + ',' + trim(ri.Sources.Source_Owner_All_DIDs));
+   self := le;
+ end; 
+
+ sortedPP := SORT((byDID + byDIDRoyalty + byUniqueAddresses + byAddress), Clean_Input.seq, Gathered_Phone, Royalties.LastResortPhones_Royalty, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code)));
+  
+ final := if(includeLexIDCounts,
+             rollup(sortedPP,
+                 left.Clean_Input.seq     = right.Clean_Input.seq 
+             and left.Gathered_Phone      = right.Gathered_Phone 
+             and left.Sources.Source_List = right.Sources.Source_List,
+                 get_Alls(left,right)),
+             DEDUP(sortedPP, Clean_Input.seq, Gathered_Phone, Sources.Source_List)
+            );
+            
  // debug outputs
  //output(byDID,named('searchPP_byDID'));
  //output(byDIDRoyalty,named('searchPP_byDIDRoyalty'));

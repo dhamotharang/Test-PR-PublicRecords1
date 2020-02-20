@@ -1,9 +1,10 @@
-﻿IMPORT BIPV2, Address, Business_Risk, Business_Risk_BIP, DID_Add, MDR, Risk_Indicators, SALT28, UT, ADVO, Doxie; 
+﻿IMPORT BIPV2, Address, Business_Risk, Business_Risk_BIP, DID_Add, MDR, Risk_Indicators, SALT28, UT, ADVO, Doxie, STD; 
 
 EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 												 BIPV2.mod_sources.iParams linkingOptions,
-												 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+												 SET OF STRING2 AllowedSourcesSet,
+												 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	
 	// --------------- Business Header Build Date ----------------
 	BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
@@ -24,7 +25,8 @@ EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							Business_Risk_BIP.Constants.Limit_BusHeader,
 																							FALSE, /* dnbFullRemove */
 																							TRUE, /* bypassContactSuppression */
-																							Options.KeepLargeBusinesses);
+																							Options.KeepLargeBusinesses,
+																							mod_access := mod_access);
 																							
 		// clean up the business header before doing anything else
   Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderUltRaw1, BusinessHeaderUltRaw);	
@@ -268,52 +270,52 @@ END;
 		BusNameAuthRepPreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_PreferredFirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep_PreferredFirstName));
 		BusNameAuthRepLast	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_LastName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep_LastName));
 		BusNameAuthRepFull	:= Business_Risk_BIP.Common.SetBoolean((BusNameAuthRepFirst = '1' AND BusNameAuthRepLast = '1') OR (BusNameAuthRepPreferredFirst = '1' AND BusNameAuthRepLast = '1'));
-		RepAR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_FirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep_FirstName, 1) > 0);
-		RepAR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_LastName <> '' AND StringLib.StringFind(ri.lname, le.Clean_Input.Rep_LastName, 1) > 0);
-		RepAR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_PreferredFirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep_PreferredFirstName, 1) > 0);
+		RepAR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_FirstName <> '' AND STD.Str.Find(ri.fname, le.Clean_Input.Rep_FirstName, 1) > 0);
+		RepAR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_LastName <> '' AND STD.Str.Find(ri.lname, le.Clean_Input.Rep_LastName, 1) > 0);
+		RepAR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_PreferredFirstName <> '' AND STD.Str.Find(ri.fname, le.Clean_Input.Rep_PreferredFirstName, 1) > 0);
 		RepAR2BFullFile	:= Business_Risk_BIP.Common.SetBoolean((RepAR2BFNameFile = '1' AND RepAR2BLNameFile = '1') OR (RepAR2BPreferredNameFile = '1' AND RepAR2BLNameFile = '1'));
 
 		BusNameAuthRep2First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_FirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep2_FirstName));
 		BusNameAuthRep2PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_PreferredFirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep2_PreferredFirstName));
 		BusNameAuthRep2Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_LastName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep2_LastName));
 		BusNameAuthRep2Full	:= Business_Risk_BIP.Common.SetBoolean((BusNameAuthRep2First = '1' AND BusNameAuthRep2Last = '1') OR (BusNameAuthRep2PreferredFirst = '1' AND BusNameAuthRep2Last = '1'));
-		Rep2AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_FirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep2_FirstName, 1) > 0);
-		Rep2AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_LastName <> '' AND StringLib.StringFind(ri.lname, le.Clean_Input.Rep2_LastName, 1) > 0);
-		Rep2AR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_PreferredFirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep2_PreferredFirstName, 1) > 0);
+		Rep2AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_FirstName <> '' AND STD.Str.Find(ri.fname, le.Clean_Input.Rep2_FirstName, 1) > 0);
+		Rep2AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_LastName <> '' AND STD.Str.Find(ri.lname, le.Clean_Input.Rep2_LastName, 1) > 0);
+		Rep2AR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_PreferredFirstName <> '' AND STD.Str.Find(ri.fname, le.Clean_Input.Rep2_PreferredFirstName, 1) > 0);
 		Rep2AR2BFullFile	:= Business_Risk_BIP.Common.SetBoolean((Rep2AR2BFNameFile = '1' AND Rep2AR2BLNameFile = '1') OR (Rep2AR2BPreferredNameFile = '1' AND Rep2AR2BLNameFile = '1'));
 		
 		BusNameAuthRep3First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_FirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep3_FirstName));
 		BusNameAuthRep3PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_PreferredFirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep3_PreferredFirstName));
 		BusNameAuthRep3Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_LastName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep3_LastName));
 		BusNameAuthRep3Full	:= Business_Risk_BIP.Common.SetBoolean((BusNameAuthRep3First = '1' AND BusNameAuthRep3Last = '1') OR (BusNameAuthRep3PreferredFirst = '1' AND BusNameAuthRep3Last = '1'));
-		Rep3AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_FirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep3_FirstName, 1) > 0);
-		Rep3AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_LastName <> '' AND StringLib.StringFind(ri.lname, le.Clean_Input.Rep3_LastName, 1) > 0);
-		Rep3AR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_PreferredFirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep3_PreferredFirstName, 1) > 0);
+		Rep3AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_FirstName <> '' AND STD.Str.Find(ri.fname, le.Clean_Input.Rep3_FirstName, 1) > 0);
+		Rep3AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_LastName <> '' AND STD.Str.Find(ri.lname, le.Clean_Input.Rep3_LastName, 1) > 0);
+		Rep3AR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_PreferredFirstName <> '' AND STD.Str.Find(ri.fname, le.Clean_Input.Rep3_PreferredFirstName, 1) > 0);
 		Rep3AR2BFullFile	:= Business_Risk_BIP.Common.SetBoolean((Rep3AR2BFNameFile = '1' AND Rep3AR2BLNameFile = '1') OR (Rep3AR2BPreferredNameFile = '1' AND Rep3AR2BLNameFile = '1'));
 		
 		BusNameAuthRep4First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_FirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep4_FirstName));
 		BusNameAuthRep4PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_PreferredFirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep4_PreferredFirstName));
 		BusNameAuthRep4Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_LastName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep4_LastName));
 		BusNameAuthRep4Full	:= Business_Risk_BIP.Common.SetBoolean((BusNameAuthRep4First = '1' AND BusNameAuthRep4Last = '1') OR (BusNameAuthRep4PreferredFirst = '1' AND BusNameAuthRep4Last = '1'));
-		Rep4AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_FirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep4_FirstName, 1) > 0);
-		Rep4AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_LastName <> '' AND StringLib.StringFind(ri.lname, le.Clean_Input.Rep4_LastName, 1) > 0);
-		Rep4AR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_PreferredFirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep4_PreferredFirstName, 1) > 0);
+		Rep4AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_FirstName <> '' AND STD.Str.Find(ri.fname, le.Clean_Input.Rep4_FirstName, 1) > 0);
+		Rep4AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_LastName <> '' AND STD.Str.Find(ri.lname, le.Clean_Input.Rep4_LastName, 1) > 0);
+		Rep4AR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_PreferredFirstName <> '' AND STD.Str.Find(ri.fname, le.Clean_Input.Rep4_PreferredFirstName, 1) > 0);
 		Rep4AR2BFullFile	:= Business_Risk_BIP.Common.SetBoolean((Rep4AR2BFNameFile = '1' AND Rep4AR2BLNameFile = '1') OR (Rep4AR2BPreferredNameFile = '1' AND Rep4AR2BLNameFile = '1'));
 		
 		BusNameAuthRep5First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_FirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep5_FirstName));
 		BusNameAuthRep5PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_PreferredFirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep5_PreferredFirstName));
 		BusNameAuthRep5Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_LastName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep5_LastName));
 		BusNameAuthRep5Full	:= Business_Risk_BIP.Common.SetBoolean((BusNameAuthRep5First = '1' AND BusNameAuthRep5Last = '1') OR (BusNameAuthRep5PreferredFirst = '1' AND BusNameAuthRep5Last = '1'));
-		Rep5AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_FirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep5_FirstName, 1) > 0);
-		Rep5AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_LastName <> '' AND StringLib.StringFind(ri.lname, le.Clean_Input.Rep5_LastName, 1) > 0);
-		Rep5AR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_PreferredFirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep5_PreferredFirstName, 1) > 0);
+		Rep5AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_FirstName <> '' AND STD.Str.Find(ri.fname, le.Clean_Input.Rep5_FirstName, 1) > 0);
+		Rep5AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_LastName <> '' AND STD.Str.Find(ri.lname, le.Clean_Input.Rep5_LastName, 1) > 0);
+		Rep5AR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_PreferredFirstName <> '' AND STD.Str.Find(ri.fname, le.Clean_Input.Rep5_PreferredFirstName, 1) > 0);
 		Rep5AR2BFullFile	:= Business_Risk_BIP.Common.SetBoolean((Rep5AR2BFNameFile = '1' AND Rep5AR2BLNameFile = '1') OR (Rep5AR2BPreferredNameFile = '1' AND Rep5AR2BLNameFile = '1'));
 
 		
 		AddressPopulated		:= TRIM(le.Clean_Input.Prim_Name) <> '' AND TRIM(le.Clean_Input.Zip5) <> '' AND TRIM(ri.prim_name) <> '' AND TRIM(ri.Zip) <> '';
 		NoScoreValue				:= 255; // This is what the various score functions return if blank is passed in
 		ZIPScore						:= IF(le.Clean_Input.Zip5 <> '' AND ri.Zip <> '' AND le.Clean_Input.Zip5[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Clean_Input.Zip5, ri.Zip), NoScoreValue);
-		StateMatched				:= StringLib.StringToUpperCase(le.Clean_Input.State) = StringLib.StringToUpperCase(ri.st);
+		StateMatched				:= STD.Str.ToUpperCase(le.Clean_Input.State) = STD.Str.ToUpperCase(ri.st);
 		CityStateScore			:= IF(le.Clean_Input.City <> '' AND le.Clean_Input.State <> '' AND ri.p_city_name <> '' AND ri.st <> '' AND StateMatched, 
 															Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.City, le.Clean_Input.State, ri.p_city_name, ri.st, ''), NoScoreValue);
 		CityStateZipMatched	:= AddressPopulated AND Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore);
@@ -327,7 +329,7 @@ END;
 		//
 		BestAddressPopulated := TRIM(le.Best_Info.BestPrimName) <> '' AND TRIM(le.Best_Info.BestCompanyZip) <> '' AND TRIM(ri.prim_name) <> '' AND TRIM(ri.Zip) <> '';
 		BestZIPScore						:= IF(le.Best_Info.BestCompanyZip <> '' AND ri.Zip <> '' AND le.Best_Info.BestCompanyZip[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Best_Info.BestCompanyZip, ri.Zip), NoScoreValue);
-		BestStateMatched				:= StringLib.StringToUpperCase(le.Best_Info.BestCompanyState) = StringLib.StringToUpperCase(ri.st);
+		BestStateMatched				:= STD.Str.ToUpperCase(le.Best_Info.BestCompanyState) = STD.Str.ToUpperCase(ri.st);
 		BestCityStateScore			:= IF(le.Best_Info.BestCompanyCity <> '' AND le.Best_Info.BestCompanyState <> '' AND ri.p_city_name <> '' AND ri.st <> '' AND BestStateMatched, 
 															Risk_Indicators.AddrScore.CityState_Score(le.Best_Info.BestCompanyCity, le.Best_Info.BestCompanyState, ri.p_city_name, ri.st, ''), NoScoreValue);
 		BestCityStateZipMatched	:= BestAddressPopulated AND Risk_Indicators.iid_constants.ga(BestZIPScore) AND Risk_Indicators.iid_constants.ga(BestCityStateScore);
@@ -1481,7 +1483,7 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 																												NoScoreValue				:= 255;
 																												AddressPopulated		:= TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND TRIM(RIGHT.prim_name) <> '' AND TRIM(RIGHT.Zip) <> '';
 																												ZIPScore						:= IF(LEFT.Clean_Input.Zip5 <> '' AND RIGHT.Zip <> '' AND LEFT.Clean_Input.Zip5[1] = RIGHT.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(LEFT.Clean_Input.Zip5, RIGHT.Zip), NoScoreValue);
-																												StateMatched				:= StringLib.StringToUpperCase(LEFT.Clean_Input.State) = StringLib.StringToUpperCase(RIGHT.st);
+																												StateMatched				:= STD.Str.ToUpperCase(LEFT.Clean_Input.State) = STD.Str.ToUpperCase(RIGHT.st);
 																												CityStateScore			:= IF(LEFT.Clean_Input.City <> '' AND LEFT.Clean_Input.State <> '' AND RIGHT.p_city_name <> '' AND RIGHT.st <> '' AND LEFT.Clean_Input.State[1] = RIGHT.st[1], Risk_Indicators.AddrScore.CityState_Score(LEFT.Clean_Input.City, LEFT.Clean_Input.State, RIGHT.p_city_name, RIGHT.st, ''), NoScoreValue);
 																												CityStateZipMatched	:= Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore) AND AddressPopulated;
 																												AddressMatched			:= AddressPopulated AND Risk_Indicators.iid_constants.ga(IF(ZIPScore = NoScoreValue AND CityStateScore = NoScoreValue, NoScoreValue, 
@@ -1614,14 +1616,34 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 																										SELF.InputIDMatchStatus := calculateValueFor._InputIDMatchStatusBHeader(RawInputIDMatchStatus, GoldStatus);
 																										
 																									), LEFT OUTER, LIMIT(Business_Risk_BIP.Constants.Limit_BusHeader), KEEP(1)); 																
-	withIDMatchStatus := JOIN(withAddrResInd, BusinessHeaderIDStatus, LEFT.Seq = RIGHT.Seq,
+	
+  withIDMatchStatus := JOIN(withAddrResInd, BusinessHeaderIDStatus, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Verification.InputIDMatchCategory := RIGHT.InputIDMatchCategory,
 																							SELF.Verification.InputIDMatchStatus := RIGHT.InputIDMatchStatus,
+                                              SELF.Firmographic.FirmNonProfitFlag := IF( EXISTS(LEFT.Sources(Source = Business_Risk_BIP.Constants.Src_IRS_Non_Profit)), '1', '0' ),
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 	
-	withErrorCodes := JOIN(withIDMatchStatus, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
+  tbl_whetherPubliclyTraded := 
+    TABLE(
+      BusinessHeader,
+      {seq, FirmPublicFlag := IF( company_ticker != '', '1', '0' ) },
+      Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) 
+    ); 
+  
+  withFirmPublicFlag :=
+    JOIN(
+      withIDMatchStatus, tbl_whetherPubliclyTraded,
+      LEFT.Seq = RIGHT.Seq,
+      TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+        SELF.Firmographic.FirmPublicFlag := RIGHT.FirmPublicFlag,
+        SELF := LEFT
+      ),
+      LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW
+    );
+  
+	withErrorCodes := JOIN(withFirmPublicFlag, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeBusinessHeader := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
@@ -1636,6 +1658,7 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 	// OUTPUT(CHOOSEN(linkIDGroups, 100), NAMED('Sample_linkIDGroups'));
 	// OUTPUT(COUNT(BusinessHeader), NAMED('Total_BusinessHeader'));
 	// OUTPUT(CHOOSEN(BusinessHeader, 100), NAMED('Sample_BusinessHeader'));
+  // OUTPUT(CHOOSEN(Shell, 100), NAMED('Input_Shell'));
 	// OUTPUT(CHOOSEN(BusinessHeaderSourceStats, 100), NAMED('Sample_BusinessHeaderSourceStats'));
 	// OUTPUT(CHOOSEN(BusinessHeaderUniqueContactDIDs, 1000), NAMED('Sample_BusinessHeaderUniqueContactDIDs'));
 	// OUTPUT(CHOOSEN(getBestContactInfo, 1000), NAMED('Sample_getBestContactInfo'));
@@ -1656,6 +1679,6 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 	// OUTPUT(CHOOSEN(BusinessHeaderIDStatus, 100), NAMED('Sample_BusinessHeaderIDStatus'));
 	// OUTPUT(CHOOSEN(withIDMatchStatus, 100), NAMED('Sample_withIDMatchStatus'));
 	// OUTPUT(CHOOSEN(withErrorCodes, 100), NAMED('Sample_withErrorCodes'));
-	
+  
 	RETURN UNGROUP(withErrorCodes);
 END;

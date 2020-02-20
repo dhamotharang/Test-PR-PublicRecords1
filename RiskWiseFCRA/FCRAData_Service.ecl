@@ -64,6 +64,7 @@ export FCRAData_service := MACRO
 	'NonSubjectSuppression',
 	'SkipRiskviewFilters'));
 
+unsigned1 iType := data_services.data_env.iFCRA;
 
 boolean alpha_numeric := false : stored ('AlphaNumericInput');
 boolean IncludeAllHeaderResults := false : stored ('IncludeAllHeaderResults');
@@ -342,16 +343,13 @@ layout_person ChooseAddress (layout_person L, layout_person R ) := TRANSFORM
   self.did := if( L.did=0, R.did, L.did );
 END;
 
-layout_person GetPersonData (doxie.key_fcra_header R) := TRANSFORM
-  SELF := R;
-END;
 layout_person GetPersonDataQuick (header_quick.key_DID_fcra R) := TRANSFORM
   SELF := R;
 END;
 // Get all header records for given did(s); did != 0 here, but ds_dids might be empty
-dids_ssn1 := JOIN (bshell2, doxie.key_fcra_header,
+dids_ssn1 := JOIN (bshell2, dx_Header.key_header(iType),
                   keyed (Left.id[1].did = Right.s_did) AND Risk_Indicators.iid_constants.IsEligibleHeaderRec (Right, dppa_ok) AND left.id[1].did!=0,
-                  GetPersonData (Right),
+                  TRANSFORM(layout_person, SELF := Right),
                   LIMIT (MAX_HEADER_DID, SKIP));
 
 // Get all quick header records for given did(s); did != 0 here, but ds_dids might be empty
@@ -592,7 +590,8 @@ ssn_deduped := dedup(sort(ungroup(ssn_main1 + ssn_main2), record),all);
 ssn_recs1 := ssn_deduped + PROJECT( ssn_corr,
 		transform( Layout_ssn,
 									self.death_sources := '',
-									self := LEFT
+									self := LEFT,
+									self := []   // Commenting out source related fields (global_sid and record_sid) //
 							) );
 							
 // add the death_sources to the ssn_table result	
@@ -1104,7 +1103,7 @@ email_main  := join(dids, email_data.Key_Did_FCRA,
 											);
 email_deduped := dedup(sort(email_main,record),all);  // dedup all just in case the data has any dups
 
-email_recs1 := email_deduped + PROJECT( email_corr, transform( Layout_Email, self := LEFT) );
+email_recs1 := email_deduped + PROJECT( email_corr, transform( Layout_Email, self := LEFT, SELF:= []) ); // Blanking out global_sid & record_sid fields
 email_recs	:= sort(email_recs1, -date_last_seen, -date_first_seen);
 
 // ==========================================================

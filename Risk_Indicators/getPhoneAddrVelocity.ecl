@@ -2,16 +2,19 @@
 // ********  IF YOU CHANGE LOGIC IN THIS FUNCTION, ALSO MODIFY THE CORRESPONDING CODE WITHIN Risk_Indicators.get_IID_Best_Flags ATTRIBUTE ****************
 // *******************************************************************************************************************************************************
 
-import _Control, risk_indicators, gong, riskwise, ut, dx_header, doxie, mdr, drivers, FCRA;
+import _Control, risk_indicators, gong, riskwise, ut, dx_header, mdr, drivers, FCRA, data_services, Doxie, Suppress;
 onThor := _Control.Environment.OnThor;
 
 export getPhoneADDRVelocity (GROUPED DATASET(risk_indicators.iid_constants.layout_outx) iid, boolean isUtility=false, unsigned1 dppa,
 															boolean isFCRA=false,
 															string50 DataRestriction=iid_constants.default_DataRestriction, 
 															integer bsversion,
-															unsigned8 BSOptions) := FUNCTION
+															unsigned8 BSOptions,
+															doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
-dk := choosen(if(isFCRA, doxie.Key_FCRA_max_dt_last_seen, doxie.key_max_dt_last_seen), 1);
+unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+
+dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
 
 header_build_date := (unsigned3) ((string) dk[1].max_date_last_seen)[1..6] : global;
 
@@ -19,7 +22,8 @@ dppa_ok := iid_constants.dppa_ok(dppa, isFCRA);
 
 dedup_by_did := dedup(sort(iid, seq, did), seq, did);
 
-risk_indicators.iid_constants.layout_outx addPhone(iid le, gong.Key_History_did ri) := transform
+{risk_indicators.iid_constants.layout_outx, UNSIGNED4 global_sid} addPhone(iid le, gong.Key_History_did ri) := transform
+	self.global_sid := ri.global_sid;
 	self.phone_from_did := ri.phone10;
 	self.phones_per_adl := if(trim(ri.phone10)!='',1,0);
 	myGetDate := iid_constants.myGetDate(le.historydate);
@@ -31,21 +35,25 @@ risk_indicators.iid_constants.layout_outx addPhone(iid le, gong.Key_History_did 
 END;
 gong_history_did_key := if(isFCRA, gong.Key_FCRA_History_did, gong.key_history_did);
 
-gong_by_did_roxie := join(dedup_by_did, gong_history_did_key,
+gong_by_did_roxie_unsuppressed := join(dedup_by_did, gong_history_did_key,
 											left.did != 0 and keyed(left.did=right.l_did) and
 											// check date
 											((unsigned)RIGHT.dt_first_seen <= (unsigned)iid_constants.myGetDate(left.historydate)) AND
 											(RIGHT.current_flag OR iid_constants.myDaysApart(left.historydate,((STRING6)RIGHT.deletion_date[1..6]+'31'))), 
 											addPhone(LEFT,RIGHT), left outer, atmost(left.did=right.l_did, Riskwise.max_atmost), keep(100));
 
-gong_by_did_thor_did := join(distribute(dedup_by_did(did!=0), hash64(did)), 
+gong_by_did_roxie := Suppress.Suppress_ReturnOldLayout(gong_by_did_roxie_unsuppressed, mod_access, risk_indicators.iid_constants.layout_outx, iType);
+
+gong_by_did_thor_did_unsuppressed := join(distribute(dedup_by_did(did!=0), hash64(did)), 
 											distribute(pull(gong_history_did_key(did!=0)), hash64(did)),
 											(left.did=right.l_did) and
 											// check date
 											((unsigned)RIGHT.dt_first_seen <= (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)) AND
 											(RIGHT.current_flag OR risk_indicators.iid_constants.myDaysApart(left.historydate,((STRING6)RIGHT.deletion_date[1..6]+'31'))), 
 											addPhone(LEFT,RIGHT), left outer, atmost(left.did=right.l_did, Riskwise.max_atmost), keep(100), LOCAL);
-											
+
+gong_by_did_thor_did := Suppress.Suppress_ReturnOldLayout(gong_by_did_thor_did_unsuppressed, mod_access, risk_indicators.iid_constants.layout_outx, iType);
+						
 gong_by_did_thor := sort(gong_by_did_thor_did + dedup_by_did(did=0), seq, did);											
 											
 #IF(onThor)
@@ -84,9 +92,10 @@ slim_addr_rec := record
 	integer adls_per_addr_created_6months;
 end;
 
-header_address_key := if(isFCRA, Doxie.Key_FCRA_Header_Address, dx_header.Key_Header_Address());
+header_address_key := dx_header.key_header_address(iType);
 
-slim_addr_rec add_header_by_address(risk_indicators.iid_constants.layout_outx le, header_address_key rt) := transform
+{slim_addr_rec, UNSIGNED4 global_sid} add_header_by_address(risk_indicators.iid_constants.layout_outx le, header_address_key rt) := transform
+	self.global_sid := rt.global_sid;
   head_first_seen := ((string) rt.dt_first_seen)[1..6];	
 	self.DID_from_srch := rt.did;
 	self.ssn_from_addr := rt.ssn;	
@@ -101,7 +110,7 @@ slim_addr_rec add_header_by_address(risk_indicators.iid_constants.layout_outx le
 	self := le;
 end;	
 
-header_by_address_pre50_roxie := join(dedup_by_did, header_address_key,	
+header_by_address_pre50_roxie_unsuppressed := join(dedup_by_did, header_address_key,	
 															left.prim_name!='' and left.z5!='' and
 															keyed(left.prim_name=right.prim_name)/* and keyed(left.st=right.st)*/ and
 															keyed(left.z5=right.zip) and keyed(right.prim_range=left.prim_range) and
@@ -128,7 +137,9 @@ header_by_address_pre50_roxie := join(dedup_by_did, header_address_key,
 																		and right.prim_range=left.prim_range, 1000), 
 																		keep(500));
 																		
-header_by_address_pre50_thor_addr := join(distribute(dedup_by_did(prim_name!='' and z5!=''), hash64(prim_name, z5, prim_range)), 
+header_by_address_pre50_roxie := Suppress.Suppress_ReturnOldLayout(header_by_address_pre50_roxie_unsuppressed, mod_access, slim_addr_rec, iType);
+																		
+header_by_address_pre50_thor_addr_unsuppressed := join(distribute(dedup_by_did(prim_name!='' and z5!=''), hash64(prim_name, z5, prim_range)), 
 															distribute(pull(header_address_key), hash64(prim_name, zip, prim_range)),
 															(left.prim_name=right.prim_name)/* and keyed(left.st=right.st)*/ and
 															(left.z5=right.zip) and (right.prim_range=left.prim_range) and
@@ -153,6 +164,8 @@ header_by_address_pre50_thor_addr := join(distribute(dedup_by_did(prim_name!='' 
 																		and left.z5=right.zip
 																		and right.prim_range=left.prim_range, 1000), keep(500), local);																		
 
+header_by_address_pre50_thor_addr := Suppress.Suppress_ReturnOldLayout(header_by_address_pre50_thor_addr_unsuppressed, mod_access, slim_addr_rec, iType);
+
 header_by_address_pre50_thor := header_by_address_pre50_thor_addr + project(dedup_by_did(prim_name='' or z5=''), TRANSFORM(slim_addr_rec, self := left));
 
 #IF(onThor)
@@ -161,7 +174,7 @@ header_by_address_pre50_thor := header_by_address_pre50_thor_addr + project(dedu
 	header_by_address_pre50 := header_by_address_pre50_roxie;
 #END
 																		
-header_by_address_50_roxie := join(dedup_by_did, header_address_key,	
+header_by_address_50_roxie_unsuppressed := join(dedup_by_did, header_address_key,	
 															left.prim_name!='' and left.z5!='' and
 															keyed(left.prim_name=right.prim_name)/* and keyed(left.st=right.st)*/ and
 															keyed(left.z5=right.zip) and keyed(right.prim_range=left.prim_range) and
@@ -188,7 +201,9 @@ header_by_address_50_roxie := join(dedup_by_did, header_address_key,
 																		and left.sec_range=right.sec_range, 2001), 
 																		keep(2000));
 
-header_by_address_50_thor_addr := join(distribute(dedup_by_did(prim_name!='' and z5!=''), hash64(prim_name, z5, prim_range)), 
+header_by_address_50_roxie := Suppress.Suppress_ReturnOldLayout(header_by_address_50_roxie_unsuppressed, mod_access, slim_addr_rec, iType);
+
+header_by_address_50_thor_addr_unsuppressed := join(distribute(dedup_by_did(prim_name!='' and z5!=''), hash64(prim_name, z5, prim_range)), 
 															distribute(pull(header_address_key), hash64(prim_name, zip, prim_range)),															
 															(left.prim_name=right.prim_name)/* and keyed(left.st=right.st)*/ and
 															(left.z5=right.zip) and (right.prim_range=left.prim_range) and
@@ -212,7 +227,9 @@ header_by_address_50_thor_addr := join(distribute(dedup_by_did(prim_name!='' and
 														atmost(left.prim_name=right.prim_name 
 																		and left.z5=right.zip
 																		and right.prim_range=left.prim_range 
-																		and left.sec_range=right.sec_range, 2001), keep(2000), local);							
+																		and left.sec_range=right.sec_range, 2001), keep(2000), local);	
+																		
+header_by_address_50_thor_addr := Suppress.Suppress_ReturnOldLayout(header_by_address_50_thor_addr_unsuppressed, mod_access, slim_addr_rec, iType);
 
 header_by_address_50_thor := header_by_address_50_thor_addr + project(dedup_by_did(prim_name='' or z5=''), TRANSFORM(slim_addr_rec, self := left));
 
@@ -279,7 +296,7 @@ adls_from_address := project(counts_per_adl(DID_from_srch<>0),
 	transform(risk_indicators.Boca_Shell_Fraud.layout_identities_input, self.did := left.DID_from_srch;
 							 self.historydate := left.historydate;));
 							 
-suspicious_identities_hist := risk_indicators.Boca_Shell_Fraud.suspicious_identities_function_hist(adls_from_address);
+suspicious_identities_hist := risk_indicators.Boca_Shell_Fraud.suspicious_identities_function_hist(adls_from_address, mod_access);
 
 // if realtime production mode, search just the suspicious Identities key instead
 suspicious_identities_realtime := join(adls_from_address, Risk_Indicators.Key_Suspicious_Identities,

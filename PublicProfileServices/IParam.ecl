@@ -1,8 +1,8 @@
-import PersonReports;
+import PersonReports, doxie;
 
 EXPORT IParam := MODULE
 	
-	EXPORT searchParams := INTERFACE (PersonReports.IParam._report)
+	EXPORT searchParams := INTERFACE (doxie.IDataAccess, PersonReports.IParam._report)
 		EXPORT STRING12  UniqueID := '';
 		EXPORT STRING30  FirstName := '';
 		EXPORT STRING30  MiddleName := '';

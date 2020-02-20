@@ -31,7 +31,7 @@ EXPORT SearchServiceIds (VehicleV2_Services.IParam.searchParams aInputData) := m
 
 	//********* DIDS
 	shared dids :=if(aInputData.isDeepDive, doxie.get_dids(true,not isCRS));
-	shared commonParams := MODULE(PROJECT(aInputData, VehicleV2_Services.IParam.reportParams,opt)) END;
+	shared commonParams := MODULE(PROJECT(aInputData, VehicleV2_Services.IParam.reportParams)) END;
 	shared bydid := VehicleV2_Services.Raw.get_Vehicle_keys_from_dids(commonParams, dids);
 
 
@@ -63,7 +63,7 @@ EXPORT SearchServiceIds (VehicleV2_Services.IParam.searchParams aInputData) := m
 	
 	/* projecting input data to set getMinor to TRUE because the default should be false, but for 
 	the following searches it should be TRUE */
-	shared in_mod := module(project(aInputData, VehicleV2_Services.IParam.searchParams, opt))
+	shared in_mod := module(project(aInputData, VehicleV2_Services.IParam.searchParams))
 	      export boolean getMinors := TRUE;
   end;
 	shared get_from_plate :=VehicleV2_Services.Raw.get_vehicle_keys_from_lic_plate(in_mod, tagnum,,is_leading,MaxResultsThisTime_val,
@@ -87,7 +87,7 @@ EXPORT SearchServiceIds (VehicleV2_Services.IParam.searchParams aInputData) := m
 
 	//*********Driver's License
 	shared dlnum := dataset([{dl_value,state_value}], VehicleV2_Services.Layouts.Layout_Vehicle_DL_Number_New);
-	shared bydlnum := if(dl_value <>'', VehicleV2_Services.Raw.get_vehicle_keys_from_dl_number(dlnum));
+	shared bydlnum := if(dl_value <>'', VehicleV2_Services.Raw.get_vehicle_keys_from_dl_number(commonParams, dlnum));
 
 
 	//*********Driver's License - Cloned from Driversv2
@@ -110,7 +110,7 @@ EXPORT SearchServiceIds (VehicleV2_Services.IParam.searchParams aInputData) := m
 
 	//*********Title
 	shared ttlnum := dataset([{title_Num,state_value}], VehicleV2_Services.Layouts.Layout_Vehicle_Title_Number_New);
-	shared byttlnum := if(title_Num <>'', VehicleV2_Services.Raw.get_vehicle_keys_from_title(ttlnum));
+	shared byttlnum := if(title_Num <>'', VehicleV2_Services.Raw.get_vehicle_keys_from_title(commonParams, ttlnum));
 
 	//********* input DID
 	shared in_did := dataset([{did_value}], doxie.layout_references);

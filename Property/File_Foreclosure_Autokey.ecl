@@ -1,5 +1,5 @@
-
-file_in := Property.File_Foreclosure_Normalized(trim(deed_category)='U');
+﻿file_in := Property.File_Foreclosure_Normalized(trim(deed_category)='U');
+FC_ids := ['058118BANKOFAMERICA', '058118ESCOBARCARLOSG', '1079290090820TRUCAPREOCORP', '1079290090820TRUCAPGRANTORTRUST2010-1'];
 
 Autokey_layout:=record
 	string70		foreclosure_id;
@@ -25,6 +25,7 @@ Autokey_layout:=record
 	string2		site_st;
 	string5		site_zip;
 	string4		site_zip4;
+	string2		source;
 	unsigned 		zero :=0;
 	string1		blank :='';
 end;

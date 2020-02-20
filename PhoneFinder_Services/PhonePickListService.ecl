@@ -3,7 +3,7 @@
 	<part name="Phone" type="xsd:string"/>
 	<separator />
 	<part name="DPPAPurpose" type="xsd:byte" default="1" size="2"/>
-	<part name="GLBPurpose" type="xsd:byte" default="1" size="2"/> 
+	<part name="GLBPurpose" type="xsd:byte" default="1" size="2"/>
 	<part name="DataRestrictionMask" type="xsd:string" default="00000000000000"/>
 	<part name="DataPermissionMask" type="xsd:string" default="0000000000"/>
 	<separator />
@@ -16,16 +16,16 @@ MACRO
 	// parse ESDL input
   dIn             := DATASET([], iesp.phonepicklist.t_PhonePickListRequest) : STORED('PhonePickListRequest',FEW);
   pickListRequest := dIn[1] : INDEPENDENT;
-	
+
 	// Searchby request
 	pickListSearchBy:= GLOBAL(pickListRequest.SearchBy);
-	
+
 	// User setttings
 	pickListUser := GLOBAL(pickListRequest.User);
-	
+
   // Report options
   pickListOptions := GLOBAL(pickListRequest.Options);
-	
+
 	// #store some standard input parameters (generally, for search purpose)
   iesp.ECL2ESP.SetInputBaseRequest(pickListRequest);
   iesp.ECL2ESP.SetInputReportBy(PROJECT(pickListSearchBy,
@@ -35,16 +35,14 @@ MACRO
 																									SELF         := [])));
 	iesp.ECL2ESP.SetInputSearchOptions(PROJECT(pickListOptions,transform(iesp.share.t_BaseSearchOptionEx,SELF := LEFT;SELF := [])));
 	iesp.ECL2ESP.Marshall.Mac_Set(pickListOptions);
-	
+
 	// Global module
 	globalMod := AutoStandardI.GlobalModule();
-	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalMod);
-  
 	STRING15 vPhone := pickListSearchBy.PhoneNumber : STORED('Phone');
-	
+
 	// Search module
 	searchMod := PROJECT(globalMod,PhoneFinder_Services.iParam.DIDParams,OPT);
-	
+
 	PhoneFinder_Services.Layouts.BatchInAppendDID tFormat2Batch() :=
 	TRANSFORM
 		SELF.acctno    := '1';	// since there would only be one record
@@ -53,9 +51,9 @@ MACRO
 													vPhone);
 		SELF           := [];
 	END;
-	
+
 	dReqBatch := DATASET([tFormat2Batch()]);
-	
+
 	// Report module
 	reportMod := MODULE(PhoneFinder_Services.iParam.SearchParams)
 		EXPORT STRING32  ApplicationType     := AutoStandardI.InterfaceTranslator.application_type_val.val(searchMod);
@@ -71,20 +69,17 @@ MACRO
 		EXPORT BOOLEAN   UseTargus           := FALSE;
 		EXPORT BOOLEAN   IsPhone7Search      := TRUE;
 		EXPORT BOOLEAN   UseInhousePhones    := TRUE;
-    
+
 	END;
-	
+
 	dPhonePickList := PhoneFinder_Services.PhonePickList_Records(dReqBatch,reportMod);
-	
+
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(dPhonePickList,dMarshallResults,iesp.phonepicklist.t_PhonePickListResponse,,,,InputEcho,pickListSearchBy);
-	  
-  
-  IF (EXISTS(dPhonePickList), doxie.compliance.logSoldToTransaction(mod_access)); 
-     
+
 	MAP(vPhone = '' or LENGTH(TRIM(vPhone)) != 7                         => FAIL(301,doxie.ErrorCodes(301)),
 			COUNT(dPhonePickList) > PhoneFinder_Services.Constants.MaxPhones => FAIL(203,doxie.ErrorCodes(203)),
 			OUTPUT(dMarshallResults,named('Results')));
-	
+
 ENDMACRO;
 
 /*--HELP--

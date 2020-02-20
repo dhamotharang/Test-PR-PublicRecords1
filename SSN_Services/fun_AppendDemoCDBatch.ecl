@@ -1,8 +1,9 @@
-import DayBatchPCNSR,address;
+﻿import doxie, DayBatchPCNSR,address;
 outrec := ssn_services.layout_SSNBatchCD_output;
 export //outrec 
 	fun_AppendDemoCDBatch(
-	grouped dataset(layout_SSNBatchCD_wHead) inputs) := 
+	grouped dataset(layout_SSNBatchCD_wHead) inputs,
+  doxie.IDataAccess mod_access) := 
 FUNCTION
 
 temprec := record
@@ -47,7 +48,7 @@ end;
 
 fpa := project(iter, tra_forPCNSRAppend(left));
 
-frompa := DayBatchPCNSR.Fetch_Batch_PCNSR_Full(fpa, 'AC2A'/*'USPAGE_FL137Z'*/);
+frompa := DayBatchPCNSR.Fetch_Batch_PCNSR_Full(fpa, 'AC2A'/*'USPAGE_FL137Z'*/, mod_access);
 
 //***** Append back 
 outrec tra_ab(iter l, frompa r) := transform

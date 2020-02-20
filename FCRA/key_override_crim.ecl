@@ -1,4 +1,4 @@
-import corrections, data_services;
+﻿import corrections, data_services, vault, _control;
 /*
 // existing overrides (in the layout different from regular keys)
 FCRA.Key_Override_Crim_Offender_FFID
@@ -22,8 +22,16 @@ export key_override_crim := MODULE
   ds_offenders := dataset (fname_prefix + 'offenders', offenders_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
 	dailyds_offenders := dataset (daily_prefix + 'offenders', offenders_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_offenders, -flag_file_id), except flag_file_id);
-	FCRA.Mac_Replace_Records(kf,dailyds_offenders,offender_persistent_id,replaceds);  
+	FCRA.Mac_Replace_Records(kf,dailyds_offenders,offender_persistent_id,replaceds); 
+	
+
+#IF(_Control.Environment.onVault) 
+	export offenders := vault.fcra.Key_Override_Crim.Offenders;
+#ELSE
   export offenders := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'offenders');
+#END;	
+
+
 	
 	//offenders plus --- override for doxie_files.key_offenders_offenderKey
   ds_offenders_plus := dataset (fname_prefix + 'offenders_plus', offenders_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);

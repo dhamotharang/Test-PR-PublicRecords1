@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
 	<!-- COMPLIANCE SETTINGS -->
 	<part name="HealthCareConsolidatedSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
@@ -102,6 +102,8 @@ export SearchService := MACRO
 		self.hasFullNCPDP := hasFullNCPDP;
 		self.glb_ok := ut.glb_ok ((integer)first_row.user.GLBPurpose);
 		self.dppa_ok := ut.dppa_ok((integer)first_row.user.DLPurpose);
+		self.glb :=   (integer)first_row.user.GLBPurpose;
+		self.dppa :=  (integer)first_row.user.DLPurpose;
 		self.doDeepDive := if((integer)ProviderID_Raw>0 and ProvidSRC_Raw in ['H',''],false,first_row.options.IncludeAlsoFound);
 		self.excludeSourceAMS := first_row.options.ExcludeSourceAMS;
 		self.excludeSourceNPPES := first_row.options.ExcludeSourceNPPES;
@@ -127,9 +129,10 @@ export SearchService := MACRO
 	
 	convertedInput := Healthcare_Header_Services.Records.convertInputtoDataset(tmpMod);
 	rawRec := Healthcare_Header_Services.Records.getSearchServiceRecords(convertedInput, cfgData);
-	returnThresholdExceeded:=rawRec[1].ProcessingMessage = 203;
+	returnThresholdExceeded:=rawRec[1].ProcessingMessage = 203 and rawRec[1].lnpid=0;
+	hasoptout:=exists(rawRec(hasoptout = true));
 	recsFmt:= project(rawRec,Healthcare_Header_Services.Transforms.formatSearchServiceProviderOutput(left,convertedInput,cfgData));
-
+  		//marshall the output...
 	//marshall the output...
 	returnCnt := if((integer)ReturnCount=0,10,ReturnCount);
 	startRec := if((integer)StartingRecord=0,1,StartingRecord);
@@ -139,10 +142,10 @@ export SearchService := MACRO
 				string q_id := '' : stored ('_QueryId');
 				string t_id := '' : stored ('_TransactionId');
 				string msg	:= 'Too many subjects found.';
-				badheader := ROW ({203, msg, q_id, t_id, []}, iesp.share.t_ResponseHeader);
-				goodheader := ROW ({0, '', q_id, t_id, []}, iesp.share.t_ResponseHeader);
-				self._Header         := map(returnThresholdExceeded =>badheader,
-																		goodheader);
+				optoutMessage := if(hasoptout,DATASET([{'700',Healthcare_Provider_Services.Constants.optoutmsg}], iesp.share.t_ResultDisclaimer),DATASET([], iesp.share.t_ResultDisclaimer));
+				badheader := ROW ({203, msg, q_id, t_id, [],[]}, iesp.share.t_ResponseHeader);
+				goodheader := ROW ({0, '', q_id, t_id, [],optoutMessage}, iesp.share.t_ResponseHeader);
+				self._Header         := if(returnThresholdExceeded ,badheader,goodheader);
 				self.SearchBy				 := first_row.searchby;
 				self.Options				 := first_row.options;
 				self.RecordCount 		 := count(recsFmt);

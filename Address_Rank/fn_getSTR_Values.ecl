@@ -1,17 +1,13 @@
 IMPORT Address_Rank, BatchServices;
+
 EXPORT  fn_getSTR_Values(DATASET(Address_Rank.Layouts.Bestrec) recs, 
 												 Address_Rank.IParams.BatchParams in_mod) := FUNCTION
 												 
-	str_mod := MODULE (BatchServices.Interfaces.str_config)
-		EXPORT STRING32   ApplicationType			:= in_mod.application_type;
-    EXPORT BOOLEAN    IncludeMinors       := in_mod.show_minors;
+	str_mod := MODULE (PROJECT(in_mod, BatchServices.Interfaces.str_config, OPT))
 		EXPORT UNSIGNED2 	PenaltThreshold 		:= BatchServices.STR_Constants.Defaults.PENALT_THRESHOLD;
 		EXPORT UNSIGNED2 	ShortTermThreshold 	:= BatchServices.STR_Constants.Defaults.SHORT_TERM_THRESHOLD;//180 days
 		EXPORT BOOLEAN 		ExcludeDropIndCheck := FALSE;
-		EXPORT UNSIGNED1 	GLBPurpose 					:= in_mod.glb;
-					 BOOLEAN 		SkipDeceased 				:= FALSE;
-		EXPORT BOOLEAN 		ReturnDeceased 			:= ~SkipDeceased; // will return deceased subjects by default
-		EXPORT UNSIGNED8  MaxResultsPerAcct   := in_mod.MaxResultsPerAcct;
+		EXPORT BOOLEAN 		ReturnDeceased 			:= TRUE; // will return deceased subjects by default
 	end;
 	
 	str_batch := PROJECT(recs, TRANSFORM(BatchServices.STR_Layouts.batch_in, SELF.addr_suffix := LEFT.suffix, SELF := LEFT, SELF:=[]));		

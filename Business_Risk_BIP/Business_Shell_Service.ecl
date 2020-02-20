@@ -259,6 +259,11 @@
 /*--INFO-- Business Shell Service - This is the XML Service utilizing BIP linking. */
 
 #option('expandSelectCreateRow', true);
+// #option('optimizelevel', 0);  // NEVER RELEASE THIS LINE OF CODE TO PROD
+                                    // this is for deploying to a 100-way as 
+                                    // the service is large.
+                                    // This service won't run on a 1-way.
+																		
 IMPORT Business_Risk_BIP, Cortera, Gateway, iesp, UT, Risk_Indicators, OFAC_XG5;
 
 EXPORT Business_Shell_Service() := FUNCTION
@@ -506,9 +511,14 @@ EXPORT Business_Shell_Service() := FUNCTION
 	'Gateways',
 	'RunTargusGatewayAnywayForTesting',
 	'OverrideExperianRestriction',
-	'IncludeAuthRepInBIPAppend'
+	'IncludeAuthRepInBIPAppend',
+	'LexIdSourceOptout',
+	'_TransactionId',
+	'_BatchUID',
+	'_GCID'
 	));
 	
+  
 	/* ************************************************************************
 	 *                          Grab service inputs                           *
 	 ************************************************************************ */
@@ -733,7 +743,7 @@ EXPORT Business_Shell_Service() := FUNCTION
 	STRING2		Rep5_DLState          := '' : STORED('Rep5_DLState');
 	STRING100	Rep5_Email            := '' : STORED('Rep5_Email');
 	UNSIGNED6	Rep5_LexID            := 0  : STORED('Rep5_LexID');
-	STRING50			Rep5_BusinessTitle  := ''  : STORED('Rep5_BusinessTitle');
+	STRING50	Rep5_BusinessTitle  := ''  : STORED('Rep5_BusinessTitle');
   
  ds_CorteraRetrotestRecsRaw := DATASET([], Cortera.layout_Retrotest_raw) : STORED('CorteraRetrotestRecords', FEW);
 
@@ -744,6 +754,7 @@ EXPORT Business_Shell_Service() := FUNCTION
 	IndustryClass := StringLib.StringToUpperCase(TRIM(IndustryClass_In, LEFT, RIGHT));
 	STRING50	DataRestrictionMask  := Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('Data_Restriction_Mask');
 	STRING50	DataPermissionMask   := Business_Risk_BIP.Constants.Default_DataPermissionMask : STORED('Data_Permission_Mask');
+	#STORED('DataPermissionMask', DataPermissionMask); // Ensure our DataPermissionMask gets mapped in as AutostandardI DPM	
 	UNSIGNED6	HistoryDate          := 0  : STORED('HistoryDate');
 	UNSIGNED1	LinkSearchLevel      := Business_Risk_BIP.Constants.LinkSearch.Default : STORED('LinkSearchLevel');
 	UNSIGNED1	MarketingMode        := Business_Risk_BIP.Constants.Default_MarketingMode : STORED('MarketingMode');
@@ -764,6 +775,12 @@ EXPORT Business_Shell_Service() := FUNCTION
 	BOOLEAN IncludeAuthRepInBIPAppend := FALSE : STORED('IncludeAuthRepInBIPAppend');
 	BOOLEAN CorteraRetrotest := FALSE : STORED('CorteraRetrotest');
 	
+	//CCPA fields
+	unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 	Gateways := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
  
   layout_watchlists_temp := record
@@ -1037,8 +1054,12 @@ EXPORT Business_Shell_Service() := FUNCTION
 																																 OverrideExperianRestriction,
 																																 IncludeAuthRepInBIPAppend,
 																																 FALSE,
-                                                                 CorteraRetrotest,
-																																 ds_CorteraRetrotestRecsRaw);
+																																 CorteraRetrotest,
+																																 ds_CorteraRetrotestRecsRaw,
+																																 LexIdSourceOptout := LexIdSourceOptout, 
+																																 TransactionID := TransactionID, 
+																																 BatchUID := BatchUID, 
+																																 GlobalCompanyID := GlobalCompanyID );
 	
 	Final_Results := PROJECT(Shell_Results, TRANSFORM(Business_Risk_BIP.Layouts.OutputLayout, SELF := LEFT));
 

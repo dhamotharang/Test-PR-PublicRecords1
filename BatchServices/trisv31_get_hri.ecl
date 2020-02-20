@@ -7,7 +7,7 @@
   )  := function
 
 
-	 in_mod := module(project(args_in,BatchShare.IParam.BatchParamsV2,opt))
+	 in_mod := module(project(args_in,BatchShare.IParam.BatchParams,opt))
 			end;
 			
 			

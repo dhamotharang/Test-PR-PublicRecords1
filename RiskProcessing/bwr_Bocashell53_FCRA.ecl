@@ -18,7 +18,7 @@ IMPORT Risk_Indicators, RiskWise, riskprocessing, ut, Data_Services;
 unsigned record_limit :=   0;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 20;
-string DataRestrictionMask := '1000010001010100000000000'; // to restrict fares, experian, transunion and experian FCRA 
+string DataRestrictionMask := '1000010001000100000000000'; // to restrict fares, experian, transunion and experian FCRA 
 boolean RetainInputDID := FALSE; //Change to TRUE to retain the input LexID
 string IntendedPurpose := 'APPLICATION';
 unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 

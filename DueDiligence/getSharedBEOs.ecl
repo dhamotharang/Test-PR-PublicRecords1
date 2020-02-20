@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, BIPV2_Build, Business_Risk_BIP, DueDiligence, STD, UT;
+﻿IMPORT BIPV2, BIPV2_Build, Business_Risk_BIP, DueDiligence, STD, UT, Doxie;
 
 /*
 	Following Keys being used:
@@ -6,7 +6,8 @@
 */
 EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 										Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-										BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+										BIPV2.mod_sources.iParams linkingOptions,
+                                        doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
 
@@ -15,7 +16,7 @@ EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																										 0, // ScoreThreshold --> 0 = Give me everything
 																										 linkingOptions,
 																										 Business_Risk_BIP.Constants.Limit_Default,
-																										 Options.KeepLargeBusinesses)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
+																										 Options.KeepLargeBusinesses, mod_access)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
 																										 
 																										 
     //Add back our Seq numbers.
@@ -94,6 +95,7 @@ EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
     // OUTPUT(execsRawSeq, NAMED('execsRawSeq'));
     // OUTPUT(filterExecs, NAMED('filterExecs'));
+    // OUTPUT(pulledExecs, NAMED('pulledExecs'));
     // OUTPUT(withDIDs, NAMED('withDIDs'));
     // OUTPUT(addExecs, NAMED('addExecs'));
     // OUTPUT(withoutDIDs, NAMED('withoutDIDs'));

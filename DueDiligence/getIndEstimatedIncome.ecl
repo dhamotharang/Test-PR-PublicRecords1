@@ -14,7 +14,8 @@ EXPORT getIndEstimatedIncome(DATASET(DueDiligence.Layouts.Indv_Internal) inData)
                                 KEYED(LEFT.individual.geo_blk[1..6] = RIGHT.tract) AND 
                                 KEYED(LEFT.individual.geo_blk[7] = RIGHT.blkgrp),
                                 TRANSFORM(DueDiligence.Layouts.Indv_Internal, 
-                                            SELF.estimatedIncome  := (INTEGER)RIGHT.income;
+                                            SELF.estimatedIncome := (INTEGER)RIGHT.income;
+                                            SELF.incomeRecordExists := RIGHT.income <> DueDiligence.Constants.EMPTY;
                                             SELF := LEFT;), 
                                 LEFT OUTER,            
                                 ATMOST(DueDiligence.Constants.MAX_ATMOST_1000), 

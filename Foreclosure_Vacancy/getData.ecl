@@ -1,7 +1,7 @@
-/*2010-09-09T20:45:34Z (Adam Shirey)
+﻿/*2010-09-09T20:45:34Z (Adam Shirey)
 Returning iesp.intermediate_log.t_IntermediateLogRecord for customer support tool
 */
-import address, ut, Risk_Indicators, LN_PropertyV2, ADVO, AddrFraud, Property, iesp, models, std;
+import address, ut, Risk_Indicators, ADVO, AddrFraud, Property, iesp, models, std, MDR, Foreclosure_Services;
  
 //Data sources
 export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],Foreclosure_Vacancy.Layouts.in_data), boolean isRenewal = FALSE) := MODULE
@@ -85,13 +85,14 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		addADVO(left, right),Left Outer,
 			keep(1));
 
-	layouts.Foreclosure addAddrOnlyForeclosures(Cleaned l, Property.Key_Foreclosures_Addr r) := TRANSFORM
+	SHARED MAC_PREFILL_DATA := MACRO
 		//Calculate prefill data
 		tmp_data_date := if(r.filing_date >= r.recording_date, r.filing_date, r.recording_date);
 		
 		//Calculate fields per depricated ChoicePoint FC process see Mark McLean for details
 		self.CP_DATA_DATE            := tmp_data_date;//Derived newest of filing_date and record_date 
-		self.fc_unique_ID            := l.UniqueID_in;
+		self.source           							:= if(r.source=MDR.sourceTools.src_Foreclosures, Foreclosure_services.Constants('').src_Fares, 
+																																																																																					Foreclosure_services.Constants('').src_BlackKnight);																																																																																	 
 		self.DEED_EVENT_TYPE_CD      := r.deed_category;
 		self.DEED_EVENT_TYPE_DESC    := r.deed_desc;
 		self.DOC_TYPE_CD             := if( isRenewal, r.document_type, '' );
@@ -149,12 +150,17 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 												'UK')));
 		self.OWNER_TYPE := owner_type_calc;
 		
+	ENDMACRO;
+
+	Foreclosure_Vacancy.layouts.Foreclosure addAddrOnlyForeclosures(Cleaned l, Property.Key_Foreclosures_Addr r) := TRANSFORM
+		self.fc_unique_ID := l.UniqueID_in;
+		MAC_PREFILL_DATA();
 		self := r;
 		self := l;
 		self := [];
 	end;
 
-	EXPORT fn_Find_Foreclosure_By_Addr(DATASET(layouts.in_clean) clnd, DATASET(RECORDOF(Property.Key_Foreclosures_Addr)) keyfile) :=
+	EXPORT fn_Find_Foreclosure_By_Addr(DATASET(layouts.in_clean) clnd, DATASET(RECORDOF(Property.Key_Foreclosures_Addr)) keyfile, boolean includeBlackKnight=false) :=
 		FUNCTION
 			clnd_filtered := clnd(zip != '' and prim_range != '' and prim_name != '');
 			foreclosure_recs := 
@@ -163,12 +169,50 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 					keyed(left.prim_range = right.situs1_prim_range) and
 					keyed(left.prim_name = right.situs1_prim_name) and
 					keyed(left.suffix = right.situs1_addr_suffix) and
-					left.sec_range = right.situs1_sec_range,
+					left.sec_range = right.situs1_sec_range and
+					if (includeBlackKnight, true, right.source=MDR.sourceTools.src_Foreclosures),
 					addAddrOnlyForeclosures(left, right),Left Outer,atmost(100), keep(50));	
 					
 			RETURN foreclosure_recs;
 		END;
 		
+	EXPORT fn_Find_Foreclosure_By_Did(DATASET(Foreclosure_Services.Layouts.layout_batch_in) ds_batch_in,
+		BOOLEAN includeBlackKnight=FALSE) := FUNCTION
+
+		acctno_did:=PROJECT(ds_batch_in(uniqueID!=''),TRANSFORM({STRING30 acctno,UNSIGNED did},
+			SELF.acctno:=LEFT.acctno,SELF.did:=(UNSIGNED)LEFT.uniqueid));
+
+		// foreclosure fids
+		ds_FOR_fids:=JOIN(acctno_did,Property.Key_Foreclosure_DID,
+			KEYED(LEFT.did=RIGHT.did),LIMIT(ut.limits.Foreclosure_PER_DID,SKIP));
+
+		// forclosure payload
+		ds_FOR_recs:=JOIN(ds_FOR_fids,Property.Key_Foreclosures_FID,
+			KEYED(LEFT.fid=RIGHT.fid) AND
+			IF(includeBlackKnight,TRUE,RIGHT.source=MDR.sourceTools.src_Foreclosures),
+			LIMIT(ut.limits.Foreclosure_MAX,SKIP));
+
+		// notice of default fids
+		ds_NOD_fids:=JOIN(acctno_did,Property.Key_NOD_DID,
+			KEYED(LEFT.did=RIGHT.did),LIMIT(ut.limits.Foreclosure_PER_DID,SKIP));
+
+		// notice of default payload
+		ds_NOD_recs:=JOIN(ds_NOD_fids,Property.Key_NOD_FID,
+			KEYED(LEFT.fid=RIGHT.fid) AND
+			IF(includeBlackKnight,TRUE,RIGHT.source=MDR.sourceTools.src_Foreclosures),
+			LIMIT(ut.limits.Foreclosure_MAX,SKIP));
+
+		// foreclosure and notice of default payloads have same layout
+		Foreclosure_Vacancy.layouts.Foreclosure formatOutput(RECORDOF(ds_NOD_recs) R) := TRANSFORM
+			SELF.fc_unique_id := r.acctno; // used to join recs back to batch input
+			MAC_PREFILL_DATA();
+			SELF := R;
+			SELF := [];
+		END;
+
+		RETURN PROJECT(ds_FOR_recs+ds_NOD_recs,formatOutput(LEFT));
+	END;
+
 	export Find_Foreclosure_By_Addr := fn_Find_Foreclosure_By_Addr(Cleaned, Property.Key_Foreclosures_Addr);
 
 	foreclosure_records := Find_Foreclosure_By_Addr(CP_DATA_DATE  <> '');

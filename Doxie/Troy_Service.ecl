@@ -58,13 +58,14 @@ C_Rec := record
   Cands;
   unsigned1 Crim_Records;
   end;
-  
-C_Rec take_lu(cands le, doxie.Key_Did_Lookups ri) := transform
+
+key_lookups  := dx_header.key_did_Lookups();
+C_Rec take_lu(cands le, key_lookups ri) := transform
   self.crim_records := ri.crim_cnt+ri.sex_cnt;
   self := le;
   end;  
 		   
-Res := join(Cands,doxie.key_did_lookups,left.did=right.did,take_lu(left,right),left outer);		   
+Res := join(Cands,key_lookups,left.did=right.did,take_lu(left,right),left outer);		   
 doxie.MAC_Header_Field_Declare();
 doxie.Show_TroySearch(Res,[],,suppressDMVInfo_value,DemoMode=1,pGender);
 	 
@@ -74,3 +75,4 @@ doxie.Show_TroySearch(Res,[],,suppressDMVInfo_value,DemoMode=1,pGender);
 	 sequential( i1,i2,i3,output(choosen(ofile2,1000)) ) )*/
 
   endmacro;
+  

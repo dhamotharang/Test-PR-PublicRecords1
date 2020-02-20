@@ -85,7 +85,8 @@ request := MODULE
     boolean TestDataEnabled {xpath('TestDataEnabled')};//hidden[ecl_only]
     string32 TestDataTableName {xpath('TestDataTableName')};//hidden[ecl_only]
     boolean OutcomeTrackingOptOut {xpath('OutcomeTrackingOptOut')};//hidden[internal]
-    integer NonSubjectSuppression {xpath('NonSubjectSuppression')};//hidden[internal]
+    integer NonSubjectSuppression {xpath('NonSubjectSuppression')};//hidden[ecl_only]
+    integer NonSubjectSuppression2 {xpath('NonSubjectSuppression2')};//hidden[internal]
     string ProductType {xpath('ProductType')};//hidden[internal]
     string11 BatchJobId {xpath('BatchJobId')};//hidden[internal]
     string11 BatchSequenceNumber {xpath('BatchSequenceNumber')};//hidden[internal]
@@ -94,6 +95,8 @@ request := MODULE
     string ProductCode {xpath('ProductCode')};//hidden[internal]
     boolean AllowRoamingBypass {xpath('AllowRoamingBypass')};//hidden[internal]
     string DataSource {xpath('DataSource')};//hidden[internal]
+    string2 ResellerType {xpath('ResellerType')};//hidden[internal]
+    unsigned6 GCID {xpath('GCID')};//hidden[internal] // Xsd type: unsigned
     string OutputType {xpath('OutputType')}; 
   END;
 
@@ -110,6 +113,7 @@ request := MODULE
 
   EXPORT _lt_BaseOption := RECORD
     boolean Blind {xpath('Blind')};//hidden[internal]
+    string2 IntendedUse {xpath('IntendedUse')};//hidden[internal]
   END;
 
   EXPORT _lt_BaseReportOption := RECORD (_lt_BaseOption)
@@ -344,7 +348,8 @@ layouts := MODULE
     string100 IdValue {xpath('IdValue')};
     string60 LicenseType {xpath('LicenseType')};
     string20 LicenseNumber {xpath('LicenseNumber')};
-    integer ProviderNumber {xpath('ProviderNumber')};
+    string ProviderNumber2 {xpath('ProviderNumber2')};
+    string ProviderNumber {xpath('ProviderNumber')};
     string9 SSN {xpath('SSN')};
     _lt_Date DateLastSeen {xpath('DateLastSeen')};
     string60 ProfessionOrBoard {xpath('ProfessionOrBoard')};
@@ -661,6 +666,7 @@ layouts := MODULE
   EXPORT _lt_UCCReport2Person := RECORD (DiffMetaRec)
     string120 OriginName {xpath('OriginName')};
     dataset(_lt_UCCParsedParty) ParsedParties {xpath('ParsedParties/Party'), MAXCOUNT(iesp.Constants.UCCF.MaxPersonParsedParties * 2)};
+    dataset(_lt_UniversalAndRawAddress) AddressesOld {xpath('AddressesOld/Address'), MAXCOUNT(iesp.Constants.UCCF.MaxPersonAddresses * 2)};
     dataset(_lt_UniversalAndRawAddress) Addresses {xpath('Addresses/Address'), MAXCOUNT(iesp.Constants.UCCF.MaxPersonAddresses * 2)};
   END;
 
@@ -741,12 +747,18 @@ layouts := MODULE
     string8 FilingStatus {xpath('FilingStatus')};
     string500 Comment {xpath('Comment')};
     _lt_Date CommentEffectiveDate {xpath('CommentEffectiveDate')};
+    dataset(_lt_UCCReport2Person) Debtors {xpath('Debtors/Debtor'), MAXCOUNT(iesp.Constants.UCCF.MaxDebtors * 2)};
     dataset(_lt_UCCReport2Person) Debtors2 {xpath('Debtors2/Debtor'), MAXCOUNT(iesp.Constants.UCCF.MaxDebtors * 2)};
+    dataset(_lt_UCCReport2Person) Creditors {xpath('Creditors/Creditor'), MAXCOUNT(iesp.Constants.UCCF.MaxCreditors * 2)};
+    dataset(_lt_UCCReport2Person) Secureds {xpath('Secureds/Secured'), MAXCOUNT(iesp.Constants.UCCF.MaxSecureds * 2)};
+    dataset(_lt_UCCReport2Person) Assignees {xpath('Assignees/Assignee'), MAXCOUNT(iesp.Constants.UCCF.MaxAssignees * 2)};
+    dataset(_lt_UCCReport2Collateral) Collaterals {xpath('Collaterals/Collateral'), MAXCOUNT(iesp.Constants.UCCF.MaxCollaterals * 2)};
     dataset(_lt_UCCReport2Person) Creditors2 {xpath('Creditors2/Creditor'), MAXCOUNT(iesp.Constants.UCCF.MaxCreditors * 2)};
     dataset(_lt_UCCReport2Person) Secureds2 {xpath('Secureds2/Secured'), MAXCOUNT(iesp.Constants.UCCF.MaxSecureds * 2)};
     dataset(_lt_UCCReport2Person) Assignees2 {xpath('Assignees2/Assignee'), MAXCOUNT(iesp.Constants.UCCF.MaxAssignees * 2)};
     dataset(_lt_UCCReport2Collateral) Collaterals2 {xpath('Collaterals2/Collateral'), MAXCOUNT(iesp.Constants.UCCF.MaxCollaterals * 2)};
     dataset(_lt_UCCSigner) Signers {xpath('Signers/Signer'), MAXCOUNT(iesp.Constants.UCCF.MaxSigners * 2)};
+    dataset(_lt_UCCReport2Filing) Filings {xpath('Filings/Filing'), MAXCOUNT(iesp.Constants.UCCF.MaxFilings * 2)};
     dataset(_lt_UCCReport2Filing) Filings2 {xpath('Filings2/Filing'), MAXCOUNT(iesp.Constants.UCCF.MaxFilings * 2)};
     dataset(_lt_UCCFilingOffice) FilingOffices {xpath('FilingOffices/Office'), MAXCOUNT(iesp.Constants.UCCF.MaxFilingOffices * 2)};
   END;
@@ -977,6 +989,7 @@ layouts := MODULE
     string99 CaseTypeDescription {xpath('CaseTypeDescription')};
     string99 Count {xpath('Count')};
     string30 County {xpath('County')};
+    string OffenseTown {xpath('OffenseTown')};
     string99 Description {xpath('Description')};
     string35 MaximumTerm {xpath('MaximumTerm')};
     string35 MinimumTerm {xpath('MinimumTerm')};
@@ -1092,6 +1105,7 @@ layouts := MODULE
   EXPORT _lt_CrimReportRecord := RECORD (_lt_BaseCrimReportRecord)
     dataset(_lt_CrimReportOffense) Offenses {xpath('Offenses/Offense'), MAXCOUNT(iesp.constants.CRIM.MaxOffenses * 2)};
     dataset(_lt_CrimReportPrison) PrisonSentences {xpath('PrisonSentences/PrisonSentence'), MAXCOUNT(iesp.constants.CRIM.MaxPrisons * 2)};
+    dataset(_lt_CrimReportParoleEx) ParoleSentencesOld {xpath('ParoleSentencesOld/ParoleSentence'), MAXCOUNT(iesp.constants.CRIM.MaxParoles * 2)};
     dataset(_lt_CrimReportParoleEx) ParoleSentences {xpath('ParoleSentences/ParoleSentence'), MAXCOUNT(iesp.constants.CRIM.MaxParoles * 2)};
     dataset(_lt_CrimReportEvent) Activities {xpath('Activities/Activity'), MAXCOUNT(iesp.constants.CRIM.MaxEvents * 2)};
     boolean IsAccurintData {xpath('IsAccurintData')};//hidden[internal]
@@ -1220,6 +1234,7 @@ layouts := MODULE
     string30 Occupation {xpath('Occupation')};
     string25 Race {xpath('Race')};
     string7 Gender {xpath('Gender')};
+    _lt_Date RegistationDate {xpath('RegistationDate')};
     _lt_Date RegistrationDate {xpath('RegistrationDate')};
     _lt_Date LastVoteDate {xpath('LastVoteDate')};
     string25 PoliticalParty {xpath('PoliticalParty')};
@@ -1433,6 +1448,7 @@ layouts := MODULE
     string70 BusinessName {xpath('BusinessName')};
     string12 BusinessId {xpath('BusinessId')};
     string30 NameSource {xpath('NameSource')};
+    string30 ReportedName {xpath('ReportedName')};
   END;
 
   EXPORT _lt_MotorVehicleReportRegistrationInfo := RECORD (DiffMetaRec)
@@ -1457,6 +1473,7 @@ layouts := MODULE
     _lt_MotorVehicleReportPersonOrBusiness RegistrantInfo {xpath('RegistrantInfo')};
     _lt_MotorVehicleReportRegistrationInfo RegistrationInfo {xpath('RegistrationInfo')};
     _lt_Date TitleIssueDate {xpath('TitleIssueDate')};
+    string17 TitleNumber {xpath('TitleNumber')};
   END;
 
   EXPORT _lt_row_MotorVehicleReportRegistrant := RECORD  (_lt_MotorVehicleReportRegistrant)
@@ -1609,7 +1626,9 @@ layouts := MODULE
     string50 FirstContributingCause {xpath('FirstContributingCause')};
     string50 SecondContributingCause {xpath('SecondContributingCause')};
     string40 FirstContributingEnvirionment {xpath('FirstContributingEnvirionment')};
+    string40 FirstContributingEnvironment {xpath('FirstContributingEnvironment')};
     string40 SecondContributingEnvirionment {xpath('SecondContributingEnvirionment')};
+    string40 SecondContributingEnvironment {xpath('SecondContributingEnvironment')};
     string30 FirstTrafficControl {xpath('FirstTrafficControl')};
     string30 SecondTrafficControl {xpath('SecondTrafficControl')};
     string30 TrafficwayChar {xpath('TrafficwayChar')};
@@ -1971,6 +1990,7 @@ layouts := MODULE
     string FiledInError {xpath('FiledInError')}; 
     dataset(_lt_BankruptcyStatus) StatusHistory {xpath('StatusHistory/Status'), MAXCOUNT(iesp.Constants.BANKRPT.MaxStatusHistory * 2)};
     dataset(_lt_BankruptcyComment) Comments {xpath('Comments/Comment'), MAXCOUNT(iesp.Constants.BANKRPT.MaxComments * 2)};
+    dataset(_lt_BankruptcyReport2Debtor) DebtorsOld {xpath('DebtorsOld/Debtor'), MAXCOUNT(iesp.Constants.BANKRPT.MaxDebtors * 2)};
     dataset(_lt_BankruptcyReport2Debtor) Debtors {xpath('Debtors/Debtor'), MAXCOUNT(iesp.Constants.BANKRPT.MaxDebtors * 2)};
     dataset(_lt_BankruptcyPerson2) Attorneys {xpath('Attorneys/Attorney'), MAXCOUNT(2 * 2)};
     dataset(_lt_BankruptcyPerson2) Trustees {xpath('Trustees/Trustee'), MAXCOUNT(10)};
@@ -2304,6 +2324,7 @@ layouts := MODULE
     string3 BuildingClassCode {xpath('BuildingClassCode')};
     string9 NeighborhoodCode {xpath('NeighborhoodCode')};
     string AddlLegal {xpath('AddlLegal'), maxlength(1924)};
+    _lt_PropertyAssessmentSrcPrptyRcd Fares {xpath('Fares')};
     _lt_PropertyAssessmentSrcPrptyRcd SourcePropertyRecord {xpath('SourcePropertyRecord')};
     DATASET (DiffString) SchoolTaxDistricts {xpath('SchoolTaxDistricts/SchoolTaxDistrict'), MAXCOUNT(iesp.Constants.Prop.MaxSchoolTaxDistrict * 2)};
     DATASET (DiffString) TaxExemptions {xpath('TaxExemptions/TaxExemption'), MAXCOUNT(iesp.Constants.Prop.MaxTaxExemptions * 2)};
@@ -2679,6 +2700,7 @@ layouts := MODULE
     string12 UniqueId {xpath('UniqueId')};
     _lt_Name Name {xpath('Name')};
     string6 Gender {xpath('Gender')};
+    _lt_SSNInfoEx SSNInfo {xpath('SSNInfo')};
     _lt_SSNInfoEx SSNInfoEx {xpath('SSNInfoEx')};
     _lt_Date DOB {xpath('DOB')};
     _lt_Date DOD {xpath('DOD')};
@@ -2687,6 +2709,7 @@ layouts := MODULE
     string18 DeathCounty {xpath('DeathCounty')};
     string2 DeathState {xpath('DeathState')};
     string1 DeathVerificationCode {xpath('DeathVerificationCode')};
+    boolean IsLimitedAccessDMF {xpath('IsLimitedAccessDMF')};//hidden[internal]
     string1 Deceased {xpath('Deceased')}; 
   END;
 
@@ -3344,6 +3367,31 @@ EXPORT _df_Name(boolean is_active, string path) := MODULE
 
   EXPORT AsRecord (layouts._lt_Name _new, layouts._lt_Name _old) := FUNCTION
     RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_firstlast(layouts._lt_Name L, layouts._lt_Name R) := FUNCTION
+    boolean IsInner :=  (L.Last = R.Last AND L.First = R.First);
+
+    boolean IsOuterRight :=   (L.Last = '' AND L.First = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_firstlast (dataset(layouts._lt_Name) _n, dataset(layouts._lt_Name) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_Name, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_Name, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_firstlast(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_firstlast(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_Name);
   END;
   
 END;
@@ -4822,6 +4870,7 @@ EXPORT _df_UCCReport2Person(boolean is_active, string path) := MODULE
                               is_added => L.ParsedParties,
                               updated_ParsedParties);
       SELF.ParsedParties  := checked_ParsedParties;
+      SELF.AddressesOld  := L.AddressesOld;
       SELF.Addresses  := L.Addresses;
 
 
@@ -4843,6 +4892,7 @@ EXPORT _df_UCCReport2Person(boolean is_active, string path) := MODULE
                               is_added => L.ParsedParties,
                               updated_ParsedParties);
       SELF.ParsedParties  := checked_ParsedParties;
+      SELF.AddressesOld  := L.AddressesOld;
       SELF.Addresses  := L.Addresses;
 
     SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
@@ -4914,11 +4964,36 @@ EXPORT _df_UCCReport2Record(boolean is_active, string path) := MODULE
       SELF.OriginFilingDate  := L.OriginFilingDate;
       SELF.CommentEffectiveDate  := L.CommentEffectiveDate;
 
+      updated_Debtors := _df_UCCReport2Person(is_active, path + '/Debtors/Debtor').AsDataset_originname(L.Debtors, R.Debtors);
+      checked_Debtors := MAP (is_deleted => R.Debtors,
+                              is_added => L.Debtors,
+                              updated_Debtors);
+      SELF.Debtors  := checked_Debtors;
+
       updated_Debtors2 := _df_UCCReport2Person(is_active, path + '/Debtors2/Debtor').AsDataset_originname(L.Debtors2, R.Debtors2);
       checked_Debtors2 := MAP (is_deleted => R.Debtors2,
                               is_added => L.Debtors2,
                               updated_Debtors2);
       SELF.Debtors2  := checked_Debtors2;
+
+      updated_Creditors := _df_UCCReport2Person(is_active, path + '/Creditors/Creditor').AsDataset_originname(L.Creditors, R.Creditors);
+      checked_Creditors := MAP (is_deleted => R.Creditors,
+                              is_added => L.Creditors,
+                              updated_Creditors);
+      SELF.Creditors  := checked_Creditors;
+
+      updated_Secureds := _df_UCCReport2Person(is_active, path + '/Secureds/Secured').AsDataset_originname(L.Secureds, R.Secureds);
+      checked_Secureds := MAP (is_deleted => R.Secureds,
+                              is_added => L.Secureds,
+                              updated_Secureds);
+      SELF.Secureds  := checked_Secureds;
+
+      updated_Assignees := _df_UCCReport2Person(is_active, path + '/Assignees/Assignee').AsDataset_originname(L.Assignees, R.Assignees);
+      checked_Assignees := MAP (is_deleted => R.Assignees,
+                              is_added => L.Assignees,
+                              updated_Assignees);
+      SELF.Assignees  := checked_Assignees;
+      SELF.Collaterals  := L.Collaterals;
 
       updated_Creditors2 := _df_UCCReport2Person(is_active, path + '/Creditors2/Creditor').AsDataset_originname(L.Creditors2, R.Creditors2);
       checked_Creditors2 := MAP (is_deleted => R.Creditors2,
@@ -4939,6 +5014,7 @@ EXPORT _df_UCCReport2Record(boolean is_active, string path) := MODULE
       SELF.Assignees2  := checked_Assignees2;
       SELF.Collaterals2  := L.Collaterals2;
       SELF.Signers  := L.Signers;
+      SELF.Filings  := L.Filings;
       SELF.Filings2  := L.Filings2;
       SELF.FilingOffices  := L.FilingOffices;
 
@@ -4959,11 +5035,36 @@ EXPORT _df_UCCReport2Record(boolean is_active, string path) := MODULE
       SELF.OriginFilingDate  := L.OriginFilingDate;
       SELF.CommentEffectiveDate  := L.CommentEffectiveDate;
 
+      updated_Debtors := _df_UCCReport2Person(is_active, path + '/Debtors/Debtor').AsDataset_originname(L.Debtors, R.Debtors);
+      checked_Debtors := MAP (is_deleted => R.Debtors,
+                              is_added => L.Debtors,
+                              updated_Debtors);
+      SELF.Debtors  := checked_Debtors;
+
       updated_Debtors2 := _df_UCCReport2Person(is_active, path + '/Debtors2/Debtor').AsDataset_originname(L.Debtors2, R.Debtors2);
       checked_Debtors2 := MAP (is_deleted => R.Debtors2,
                               is_added => L.Debtors2,
                               updated_Debtors2);
       SELF.Debtors2  := checked_Debtors2;
+
+      updated_Creditors := _df_UCCReport2Person(is_active, path + '/Creditors/Creditor').AsDataset_originname(L.Creditors, R.Creditors);
+      checked_Creditors := MAP (is_deleted => R.Creditors,
+                              is_added => L.Creditors,
+                              updated_Creditors);
+      SELF.Creditors  := checked_Creditors;
+
+      updated_Secureds := _df_UCCReport2Person(is_active, path + '/Secureds/Secured').AsDataset_originname(L.Secureds, R.Secureds);
+      checked_Secureds := MAP (is_deleted => R.Secureds,
+                              is_added => L.Secureds,
+                              updated_Secureds);
+      SELF.Secureds  := checked_Secureds;
+
+      updated_Assignees := _df_UCCReport2Person(is_active, path + '/Assignees/Assignee').AsDataset_originname(L.Assignees, R.Assignees);
+      checked_Assignees := MAP (is_deleted => R.Assignees,
+                              is_added => L.Assignees,
+                              updated_Assignees);
+      SELF.Assignees  := checked_Assignees;
+      SELF.Collaterals  := L.Collaterals;
 
       updated_Creditors2 := _df_UCCReport2Person(is_active, path + '/Creditors2/Creditor').AsDataset_originname(L.Creditors2, R.Creditors2);
       checked_Creditors2 := MAP (is_deleted => R.Creditors2,
@@ -4984,6 +5085,7 @@ EXPORT _df_UCCReport2Record(boolean is_active, string path) := MODULE
       SELF.Assignees2  := checked_Assignees2;
       SELF.Collaterals2  := L.Collaterals2;
       SELF.Signers  := L.Signers;
+      SELF.Filings  := L.Filings;
       SELF.Filings2  := L.Filings2;
       SELF.FilingOffices  := L.FilingOffices;
 
@@ -5247,6 +5349,7 @@ EXPORT _df_CrimReportRecord(boolean is_active, string path) := MODULE
       SELF.AKAs  := L.AKAs;
       SELF.Offenses  := L.Offenses;
       SELF.PrisonSentences  := L.PrisonSentences;
+      SELF.ParoleSentencesOld  := L.ParoleSentencesOld;
       SELF.ParoleSentences  := L.ParoleSentences;
       SELF.Activities  := L.Activities;
 
@@ -5294,6 +5397,7 @@ EXPORT _df_CrimReportRecord(boolean is_active, string path) := MODULE
       SELF.AKAs  := L.AKAs;
       SELF.Offenses  := L.Offenses;
       SELF.PrisonSentences  := L.PrisonSentences;
+      SELF.ParoleSentencesOld  := L.ParoleSentencesOld;
       SELF.ParoleSentences  := L.ParoleSentences;
       SELF.Activities  := L.Activities;
 
@@ -5743,7 +5847,12 @@ EXPORT _df_FirearmRecord(boolean is_active, string path) := MODULE
                               is_added => L.PremiseAddress,
                               updated_PremiseAddress);
       SELF.PremiseAddress := checked_PremiseAddress;
-      SELF.LicenseNames  := L.LicenseNames;
+
+      updated_LicenseNames := _df_Name(is_active, path + '/LicenseNames/Name').AsDataset_firstlast(L.LicenseNames, R.LicenseNames);
+      checked_LicenseNames := MAP (is_deleted => R.LicenseNames,
+                              is_added => L.LicenseNames,
+                              updated_LicenseNames);
+      SELF.LicenseNames  := checked_LicenseNames;
 
 
       SELF := IF (is_deleted, R, L);
@@ -5787,7 +5896,12 @@ EXPORT _df_FirearmRecord(boolean is_active, string path) := MODULE
                               is_added => L.PremiseAddress,
                               updated_PremiseAddress);
       SELF.PremiseAddress := checked_PremiseAddress;
-      SELF.LicenseNames  := L.LicenseNames;
+
+      updated_LicenseNames := _df_Name(is_active, path + '/LicenseNames/Name').AsDataset_firstlast(L.LicenseNames, R.LicenseNames);
+      checked_LicenseNames := MAP (is_deleted => R.LicenseNames,
+                              is_added => L.LicenseNames,
+                              updated_LicenseNames);
+      SELF.LicenseNames  := checked_LicenseNames;
 
     SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
     SELF := IF (is_deleted, R, L);
@@ -6073,6 +6187,7 @@ EXPORT _df_VoterReport2Record(boolean is_active, string path) := MODULE
                               is_added => L.DOB,
                               updated_DOB);
       SELF.DOB := checked_DOB;
+      SELF.RegistationDate  := L.RegistationDate;
       SELF.RegistrationDate  := L.RegistrationDate;
       SELF.LastVoteDate  := L.LastVoteDate;
 
@@ -6127,6 +6242,7 @@ EXPORT _df_VoterReport2Record(boolean is_active, string path) := MODULE
                               is_added => L.DOB,
                               updated_DOB);
       SELF.DOB := checked_DOB;
+      SELF.RegistationDate  := L.RegistationDate;
       SELF.RegistrationDate  := L.RegistrationDate;
       SELF.LastVoteDate  := L.LastVoteDate;
 
@@ -6418,11 +6534,13 @@ EXPORT _df_MotorVehicleReportPersonOrBusiness(boolean is_active, string path) :=
     shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
     shared boolean updated_SSN := (L.SSN != R.SSN);
     shared boolean updated_DriverLicenseNumber := (L.DriverLicenseNumber != R.DriverLicenseNumber);
+    shared boolean updated_ReportedName := (L.ReportedName != R.ReportedName);
 
     shared is_updated := false
       OR updated_UniqueId
       OR updated_SSN
-      OR updated_DriverLicenseNumber;
+      OR updated_DriverLicenseNumber
+      OR updated_ReportedName;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -6433,7 +6551,8 @@ EXPORT _df_MotorVehicleReportPersonOrBusiness(boolean is_active, string path) :=
     // Get update information for all scalars
       _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow))
          +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow))
-         +  IF (updated_DriverLicenseNumber, DATASET ([{'DriverLicenseNumber', R.DriverLicenseNumber}], layouts.DiffMetaRow));
+         +  IF (updated_DriverLicenseNumber, DATASET ([{'DriverLicenseNumber', R.DriverLicenseNumber}], layouts.DiffMetaRow))
+         +  IF (updated_ReportedName, DATASET ([{'ReportedName', R.ReportedName}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -6532,8 +6651,10 @@ END;
 EXPORT _df_MotorVehicleReportRegistrant(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_MotorVehicleReportRegistrant L, layouts._lt_MotorVehicleReportRegistrant R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_TitleNumber := (L.TitleNumber != R.TitleNumber);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_TitleNumber;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -6542,7 +6663,7 @@ EXPORT _df_MotorVehicleReportRegistrant(boolean is_active, string path) := MODUL
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_TitleNumber, DATASET ([{'TitleNumber', R.TitleNumber}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -6957,10 +7078,8 @@ END;
 EXPORT _df_AccidentReportIndividualInvolved(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_AccidentReportIndividualInvolved L, layouts._lt_AccidentReportIndividualInvolved R, boolean is_deleted, boolean is_added) := MODULE
-    shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
 
-    shared is_updated := false
-      OR updated_UniqueId;
+    shared is_updated := false;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -6969,7 +7088,7 @@ EXPORT _df_AccidentReportIndividualInvolved(boolean is_active, string path) := M
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow));
+      _meta :=  DATASET ([], layouts.DiffMetaRow);
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -7155,26 +7274,26 @@ EXPORT _df_AccidentReportVehicle(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_driver_individual_uniqueid(layouts._lt_AccidentReportVehicle L, layouts._lt_AccidentReportVehicle R) := FUNCTION
-    boolean IsInner :=  (L.Driver.Individual.UniqueId = R.Driver.Individual.UniqueId);
+  EXPORT  integer1 CheckOuter_makemodeltagnumber(layouts._lt_AccidentReportVehicle L, layouts._lt_AccidentReportVehicle R) := FUNCTION
+    boolean IsInner :=  (L.TagNumber = R.TagNumber AND L.Make = R.Make AND L.Model = R.Model);
 
-    boolean IsOuterRight :=   (L.Driver.Individual.UniqueId = '');
+    boolean IsOuterRight :=   (L.TagNumber = '' AND L.Make = '' AND L.Model = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_driver_individual_uniqueid (dataset(layouts._lt_AccidentReportVehicle) _n, dataset(layouts._lt_AccidentReportVehicle) _o) := FUNCTION
+  EXPORT  AsDataset_makemodeltagnumber (dataset(layouts._lt_AccidentReportVehicle) _n, dataset(layouts._lt_AccidentReportVehicle) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_AccidentReportVehicle, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_AccidentReportVehicle, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.Driver.Individual.UniqueId = RIGHT.Driver.Individual.UniqueId,
+                  LEFT.TagNumber = RIGHT.TagNumber AND LEFT.Make = RIGHT.Make AND LEFT.Model = RIGHT.Model,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_driver_individual_uniqueid(LEFT, RIGHT)),
+                  CheckOuter_makemodeltagnumber(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.Driver.Individual.UniqueId = RIGHT.Driver.Individual.UniqueId,
+                  LEFT.TagNumber = RIGHT.TagNumber AND LEFT.Make = RIGHT.Make AND LEFT.Model = RIGHT.Model,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_driver_individual_uniqueid(LEFT, RIGHT)),
+                  CheckOuter_makemodeltagnumber(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_AccidentReportVehicle);
@@ -7231,7 +7350,7 @@ EXPORT _df_AccidentReportRecord(boolean is_active, string path) := MODULE
       SELF.Investigation := checked_Investigation;
       SELF.Statistics  := L.Statistics;
 
-      updated_Vehicles := _df_AccidentReportVehicle(is_active, path + '/Vehicles/Item').AsDataset_driver_individual_uniqueid(L.Vehicles, R.Vehicles);
+      updated_Vehicles := _df_AccidentReportVehicle(is_active, path + '/Vehicles/Item').AsDataset_makemodeltagnumber(L.Vehicles, R.Vehicles);
       checked_Vehicles := MAP (is_deleted => R.Vehicles,
                               is_added => L.Vehicles,
                               updated_Vehicles);
@@ -7276,7 +7395,7 @@ EXPORT _df_AccidentReportRecord(boolean is_active, string path) := MODULE
       SELF.Investigation := checked_Investigation;
       SELF.Statistics  := L.Statistics;
 
-      updated_Vehicles := _df_AccidentReportVehicle(is_active, path + '/Vehicles/Item').AsDataset_driver_individual_uniqueid(L.Vehicles, R.Vehicles);
+      updated_Vehicles := _df_AccidentReportVehicle(is_active, path + '/Vehicles/Item').AsDataset_makemodeltagnumber(L.Vehicles, R.Vehicles);
       checked_Vehicles := MAP (is_deleted => R.Vehicles,
                               is_added => L.Vehicles,
                               updated_Vehicles);
@@ -7472,13 +7591,13 @@ EXPORT _df_BankruptcyPerson2(boolean is_active, string path) := MODULE
       SELF._diffmeta := IF(is_active, m._diffmeta);
         SELF.BusinessIds  := L.BusinessIds;
 
-      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
+      updated_Names := _df_BankruptcySearch2Name(CASE(path + '/Names', '/Bankruptcies/Bankruptcy/DebtorsOld/Debtor/Names' => (false), '/Bankruptcies/Bankruptcy/Attorneys/Attorney/Names' => (false), '/Bankruptcies/Bankruptcy/Trustees/Trustee/Names' => (false), is_active), path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);
       SELF.Names  := checked_Names;
 
-      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      updated_Addresses := _df_Address(CASE(path + '/Addresses', '/Bankruptcies/Bankruptcy/DebtorsOld/Debtor/Addresses' => (false), '/Bankruptcies/Bankruptcy/Attorneys/Attorney/Addresses' => (false), '/Bankruptcies/Bankruptcy/Trustees/Trustee/Addresses' => (false), is_active), path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
       checked_Addresses := MAP (is_deleted => R.Addresses,
                               is_added => L.Addresses,
                               updated_Addresses);
@@ -7513,13 +7632,13 @@ EXPORT _df_BankruptcyPerson2(boolean is_active, string path) := MODULE
     SELF._diffmeta := IF(is_active, m._diffmeta);
          SELF.BusinessIds  := L.BusinessIds;
 
-      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
+      updated_Names := _df_BankruptcySearch2Name(CASE(path + '/Names', '/Bankruptcies/Bankruptcy/DebtorsOld/Debtor/Names' => (false), '/Bankruptcies/Bankruptcy/Attorneys/Attorney/Names' => (false), '/Bankruptcies/Bankruptcy/Trustees/Trustee/Names' => (false), is_active), path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);
       SELF.Names  := checked_Names;
 
-      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      updated_Addresses := _df_Address(CASE(path + '/Addresses', '/Bankruptcies/Bankruptcy/DebtorsOld/Debtor/Addresses' => (false), '/Bankruptcies/Bankruptcy/Attorneys/Attorney/Addresses' => (false), '/Bankruptcies/Bankruptcy/Trustees/Trustee/Addresses' => (false), is_active), path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
       checked_Addresses := MAP (is_deleted => R.Addresses,
                               is_added => L.Addresses,
                               updated_Addresses);
@@ -7581,13 +7700,13 @@ EXPORT _df_BankruptcyReport2Debtor(boolean is_active, string path) := MODULE
       SELF._diffmeta := IF(is_active, m._diffmeta);
         SELF.BusinessIds  := L.BusinessIds;
 
-      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
+      updated_Names := _df_BankruptcySearch2Name(CASE(path + '/Names', '/Bankruptcies/Bankruptcy/DebtorsOld/Debtor/Names' => (false), '/Bankruptcies/Bankruptcy/Attorneys/Attorney/Names' => (false), '/Bankruptcies/Bankruptcy/Trustees/Trustee/Names' => (false), is_active), path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);
       SELF.Names  := checked_Names;
 
-      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      updated_Addresses := _df_Address(CASE(path + '/Addresses', '/Bankruptcies/Bankruptcy/DebtorsOld/Debtor/Addresses' => (false), '/Bankruptcies/Bankruptcy/Attorneys/Attorney/Addresses' => (false), '/Bankruptcies/Bankruptcy/Trustees/Trustee/Addresses' => (false), is_active), path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
       checked_Addresses := MAP (is_deleted => R.Addresses,
                               is_added => L.Addresses,
                               updated_Addresses);
@@ -7625,13 +7744,13 @@ EXPORT _df_BankruptcyReport2Debtor(boolean is_active, string path) := MODULE
     SELF._diffmeta := IF(is_active, m._diffmeta);
          SELF.BusinessIds  := L.BusinessIds;
 
-      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
+      updated_Names := _df_BankruptcySearch2Name(CASE(path + '/Names', '/Bankruptcies/Bankruptcy/DebtorsOld/Debtor/Names' => (false), '/Bankruptcies/Bankruptcy/Attorneys/Attorney/Names' => (false), '/Bankruptcies/Bankruptcy/Trustees/Trustee/Names' => (false), is_active), path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);
       SELF.Names  := checked_Names;
 
-      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      updated_Addresses := _df_Address(CASE(path + '/Addresses', '/Bankruptcies/Bankruptcy/DebtorsOld/Debtor/Addresses' => (false), '/Bankruptcies/Bankruptcy/Attorneys/Attorney/Addresses' => (false), '/Bankruptcies/Bankruptcy/Trustees/Trustee/Addresses' => (false), is_active), path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
       checked_Addresses := MAP (is_deleted => R.Addresses,
                               is_added => L.Addresses,
                               updated_Addresses);
@@ -7736,6 +7855,7 @@ EXPORT _df_BankruptcyReport2Record(boolean is_active, string path) := MODULE
       SELF.BarDate  := L.BarDate;
       SELF.StatusHistory  := L.StatusHistory;
       SELF.Comments  := L.Comments;
+      SELF.DebtorsOld  := L.DebtorsOld;
 
       updated_Debtors := _df_BankruptcyReport2Debtor(is_active, path + '/Debtors/Debtor').AsDataset_uniqueid(L.Debtors, R.Debtors);
       checked_Debtors := MAP (is_deleted => R.Debtors,
@@ -7772,6 +7892,7 @@ EXPORT _df_BankruptcyReport2Record(boolean is_active, string path) := MODULE
       SELF.BarDate  := L.BarDate;
       SELF.StatusHistory  := L.StatusHistory;
       SELF.Comments  := L.Comments;
+      SELF.DebtorsOld  := L.DebtorsOld;
 
       updated_Debtors := _df_BankruptcyReport2Debtor(is_active, path + '/Debtors/Debtor').AsDataset_uniqueid(L.Debtors, R.Debtors);
       checked_Debtors := MAP (is_deleted => R.Debtors,
@@ -7955,7 +8076,12 @@ EXPORT _df_LienJudgmentDebtor(boolean is_active, string path) := MODULE
                               is_added => L.Address,
                               updated_Address);
       SELF.Address := checked_Address;
-      SELF.Addresses  := L.Addresses;
+
+      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      checked_Addresses := MAP (is_deleted => R.Addresses,
+                              is_added => L.Addresses,
+                              updated_Addresses);
+      SELF.Addresses  := checked_Addresses;
       SELF.Phones  := L.Phones;
 
       updated_ParsedParties := _df_LienJudgmentParty(is_active, path + '/ParsedParties/Party').AsDataset_uniqueid(L.ParsedParties, R.ParsedParties);
@@ -7986,7 +8112,12 @@ EXPORT _df_LienJudgmentDebtor(boolean is_active, string path) := MODULE
                               is_added => L.Address,
                               updated_Address);
       SELF.Address := checked_Address;
-      SELF.Addresses  := L.Addresses;
+
+      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      checked_Addresses := MAP (is_deleted => R.Addresses,
+                              is_added => L.Addresses,
+                              updated_Addresses);
+      SELF.Addresses  := checked_Addresses;
       SELF.Phones  := L.Phones;
 
       updated_ParsedParties := _df_LienJudgmentParty(is_active, path + '/ParsedParties/Party').AsDataset_uniqueid(L.ParsedParties, R.ParsedParties);
@@ -8151,20 +8282,12 @@ EXPORT _df_Property2Name(boolean is_active, string path) := MODULE
   EXPORT DiffScalars (layouts._lt_Property2Name L, layouts._lt_Property2Name R, boolean is_deleted, boolean is_added) := MODULE
     shared boolean updated_First := (L.First != R.First);
     shared boolean updated_Last := (L.Last != R.Last);
-    shared boolean updated_IdValue := (L.IdValue != R.IdValue);
     shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
-    shared boolean updated_BusinessId := (L.BusinessId != R.BusinessId);
-    shared boolean updated_AppendedSSN := (L.AppendedSSN != R.AppendedSSN);
-    shared boolean updated_LinkingWeight := (L.LinkingWeight != R.LinkingWeight);
 
     shared is_updated := false
       OR updated_First
       OR updated_Last
-      OR updated_IdValue
-      OR updated_UniqueId
-      OR updated_BusinessId
-      OR updated_AppendedSSN
-      OR updated_LinkingWeight;
+      OR updated_UniqueId;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -8174,11 +8297,7 @@ EXPORT _df_Property2Name(boolean is_active, string path) := MODULE
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
       _meta :=   IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
-         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow))+ IF (updated_IdValue, DATASET ([{'IdValue', R.IdValue}], layouts.DiffMetaRow))
-         +  IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow))
-         +  IF (updated_BusinessId, DATASET ([{'BusinessId', R.BusinessId}], layouts.DiffMetaRow))
-         +  IF (updated_AppendedSSN, DATASET ([{'AppendedSSN', R.AppendedSSN}], layouts.DiffMetaRow))
-         +  IF (updated_LinkingWeight, DATASET ([{'LinkingWeight', R.LinkingWeight}], layouts.DiffMetaRow));
+         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow))+ IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -8215,26 +8334,26 @@ EXPORT _df_Property2Name(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_uniqueid(layouts._lt_Property2Name L, layouts._lt_Property2Name R) := FUNCTION
-    boolean IsInner :=  (L.UniqueId = R.UniqueId);
+  EXPORT  integer1 CheckOuter_firstlastuniqueid(layouts._lt_Property2Name L, layouts._lt_Property2Name R) := FUNCTION
+    boolean IsInner :=  (L.Last = R.Last AND L.First = R.First AND L.UniqueId = R.UniqueId);
 
-    boolean IsOuterRight :=   (L.UniqueId = '');
+    boolean IsOuterRight :=   (L.Last = '' AND L.First = '' AND L.UniqueId = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_uniqueid (dataset(layouts._lt_Property2Name) _n, dataset(layouts._lt_Property2Name) _o) := FUNCTION
+  EXPORT  AsDataset_firstlastuniqueid (dataset(layouts._lt_Property2Name) _n, dataset(layouts._lt_Property2Name) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_Property2Name, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_Property2Name, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.UniqueId = RIGHT.UniqueId,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First AND LEFT.UniqueId = RIGHT.UniqueId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_uniqueid(LEFT, RIGHT)),
+                  CheckOuter_firstlastuniqueid(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.UniqueId = RIGHT.UniqueId,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First AND LEFT.UniqueId = RIGHT.UniqueId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_uniqueid(LEFT, RIGHT)),
+                  CheckOuter_firstlastuniqueid(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_Property2Name);
@@ -8245,8 +8364,10 @@ END;
 EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_Property2Entity L, layouts._lt_Property2Entity R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_EntityTypeCode := (L.EntityTypeCode != R.EntityTypeCode);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_EntityTypeCode;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -8255,7 +8376,7 @@ EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_EntityTypeCode, DATASET ([{'EntityTypeCode', R.EntityTypeCode}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -8266,7 +8387,7 @@ EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
       SELF._diff := IF(is_active, m._diff, '');
       SELF._diffmeta := IF(is_active, m._diffmeta);
   
-      updated_Names := _df_Property2Name(is_active, path + '/Names/Name').AsDataset_uniqueid(L.Names, R.Names);
+      updated_Names := _df_Property2Name(is_active, path + '/Names/Name').AsDataset_firstlastuniqueid(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);
@@ -8305,7 +8426,7 @@ EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
     SELF._diff := IF(is_active, m._diff, '');
     SELF._diffmeta := IF(is_active, m._diffmeta);
    
-      updated_Names := _df_Property2Name(is_active, path + '/Names/Name').AsDataset_uniqueid(L.Names, R.Names);
+      updated_Names := _df_Property2Name(is_active, path + '/Names/Name').AsDataset_firstlastuniqueid(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);
@@ -8340,26 +8461,26 @@ EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(layouts._lt_Property2Entity L, layouts._lt_Property2Entity R) := FUNCTION
-    boolean IsInner :=  (L.Address.UnitNumber = R.Address.UnitNumber AND L.Address.StreetNumber = R.Address.StreetNumber AND L.Address.Zip5 = R.Address.Zip5 AND L.Address.StreetName = R.Address.StreetName AND L.Address.City = R.Address.City AND L.Address.State = R.Address.State);
+  EXPORT  integer1 CheckOuter_entitytypecode(layouts._lt_Property2Entity L, layouts._lt_Property2Entity R) := FUNCTION
+    boolean IsInner :=  (L.EntityTypeCode = R.EntityTypeCode);
 
-    boolean IsOuterRight :=   (L.Address.UnitNumber = '' AND L.Address.StreetNumber = '' AND L.Address.Zip5 = '' AND L.Address.StreetName = '' AND L.Address.City = '' AND L.Address.State = '');
+    boolean IsOuterRight :=   (L.EntityTypeCode = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5 (dataset(layouts._lt_Property2Entity) _n, dataset(layouts._lt_Property2Entity) _o) := FUNCTION
+  EXPORT  AsDataset_entitytypecode (dataset(layouts._lt_Property2Entity) _n, dataset(layouts._lt_Property2Entity) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_Property2Entity, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_Property2Entity, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.Address.UnitNumber = RIGHT.Address.UnitNumber AND LEFT.Address.StreetNumber = RIGHT.Address.StreetNumber AND LEFT.Address.Zip5 = RIGHT.Address.Zip5 AND LEFT.Address.StreetName = RIGHT.Address.StreetName AND LEFT.Address.City = RIGHT.Address.City AND LEFT.Address.State = RIGHT.Address.State,
+                  LEFT.EntityTypeCode = RIGHT.EntityTypeCode,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(LEFT, RIGHT)),
+                  CheckOuter_entitytypecode(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.Address.UnitNumber = RIGHT.Address.UnitNumber AND LEFT.Address.StreetNumber = RIGHT.Address.StreetNumber AND LEFT.Address.Zip5 = RIGHT.Address.Zip5 AND LEFT.Address.StreetName = RIGHT.Address.StreetName AND LEFT.Address.City = RIGHT.Address.City AND LEFT.Address.State = RIGHT.Address.State,
+                  LEFT.EntityTypeCode = RIGHT.EntityTypeCode,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(LEFT, RIGHT)),
+                  CheckOuter_entitytypecode(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_Property2Entity);
@@ -8399,7 +8520,7 @@ EXPORT _df_PropertyReport2Record(boolean is_active, string path) := MODULE
       SELF.Assessment  := L.Assessment;
       SELF.Deed  := L.Deed;
 
-      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(L.Entities, R.Entities);
+      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_entitytypecode(L.Entities, R.Entities);
       checked_Entities := MAP (is_deleted => R.Entities,
                               is_added => L.Entities,
                               updated_Entities);
@@ -8422,7 +8543,7 @@ EXPORT _df_PropertyReport2Record(boolean is_active, string path) := MODULE
       SELF.Assessment  := L.Assessment;
       SELF.Deed  := L.Deed;
 
-      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(L.Entities, R.Entities);
+      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_entitytypecode(L.Entities, R.Entities);
       checked_Entities := MAP (is_deleted => R.Entities,
                               is_added => L.Entities,
                               updated_Entities);
@@ -8438,26 +8559,26 @@ EXPORT _df_PropertyReport2Record(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_parcelnumberrecordtype(layouts._lt_PropertyReport2Record L, layouts._lt_PropertyReport2Record R) := FUNCTION
-    boolean IsInner :=  (L.ParcelNumber = R.ParcelNumber AND L.RecordType = R.RecordType);
+  EXPORT  integer1 CheckOuter_assessment_parceliddeed_parcelidrecordtype(layouts._lt_PropertyReport2Record L, layouts._lt_PropertyReport2Record R) := FUNCTION
+    boolean IsInner :=  (L.RecordType = R.RecordType AND L.Assessment.ParcelId = R.Assessment.ParcelId AND L.Deed.ParcelId = R.Deed.ParcelId);
 
-    boolean IsOuterRight :=   (L.ParcelNumber = '' AND L.RecordType = '');
+    boolean IsOuterRight :=   (L.RecordType = '' AND L.Assessment.ParcelId = '' AND L.Deed.ParcelId = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_parcelnumberrecordtype (dataset(layouts._lt_PropertyReport2Record) _n, dataset(layouts._lt_PropertyReport2Record) _o) := FUNCTION
+  EXPORT  AsDataset_assessment_parceliddeed_parcelidrecordtype (dataset(layouts._lt_PropertyReport2Record) _n, dataset(layouts._lt_PropertyReport2Record) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_PropertyReport2Record, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_PropertyReport2Record, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.ParcelNumber = RIGHT.ParcelNumber AND LEFT.RecordType = RIGHT.RecordType,
+                  LEFT.RecordType = RIGHT.RecordType AND LEFT.Assessment.ParcelId = RIGHT.Assessment.ParcelId AND LEFT.Deed.ParcelId = RIGHT.Deed.ParcelId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_parcelnumberrecordtype(LEFT, RIGHT)),
+                  CheckOuter_assessment_parceliddeed_parcelidrecordtype(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.ParcelNumber = RIGHT.ParcelNumber AND LEFT.RecordType = RIGHT.RecordType,
+                  LEFT.RecordType = RIGHT.RecordType AND LEFT.Assessment.ParcelId = RIGHT.Assessment.ParcelId AND LEFT.Deed.ParcelId = RIGHT.Deed.ParcelId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_parcelnumberrecordtype(LEFT, RIGHT)),
+                  CheckOuter_assessment_parceliddeed_parcelidrecordtype(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_PropertyReport2Record);
@@ -8668,26 +8789,26 @@ EXPORT _df_StudentRecord(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(layouts._lt_StudentRecord L, layouts._lt_StudentRecord R) := FUNCTION
-    boolean IsInner :=  (L.AddressAtCollege.Zip5 = R.AddressAtCollege.Zip5 AND L.AddressAtCollege.State = R.AddressAtCollege.State AND L.FirstReported.Year = R.FirstReported.Year AND L.FirstReported.Day = R.FirstReported.Day AND L.FirstReported.Month = R.FirstReported.Month);
+  EXPORT  integer1 CheckOuter_collegedata_namefirstreported_dayfirstreported_monthfirstreported_year(layouts._lt_StudentRecord L, layouts._lt_StudentRecord R) := FUNCTION
+    boolean IsInner :=  (L.FirstReported.Year = R.FirstReported.Year AND L.FirstReported.Day = R.FirstReported.Day AND L.FirstReported.Month = R.FirstReported.Month AND L.CollegeData.Name = R.CollegeData.Name);
 
-    boolean IsOuterRight :=   (L.AddressAtCollege.Zip5 = '' AND L.AddressAtCollege.State = '' AND L.FirstReported.Year = 0 AND L.FirstReported.Day = 0 AND L.FirstReported.Month = 0);
+    boolean IsOuterRight :=   (L.FirstReported.Year = 0 AND L.FirstReported.Day = 0 AND L.FirstReported.Month = 0 AND L.CollegeData.Name = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year (dataset(layouts._lt_StudentRecord) _n, dataset(layouts._lt_StudentRecord) _o) := FUNCTION
+  EXPORT  AsDataset_collegedata_namefirstreported_dayfirstreported_monthfirstreported_year (dataset(layouts._lt_StudentRecord) _n, dataset(layouts._lt_StudentRecord) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_StudentRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_StudentRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.AddressAtCollege.Zip5 = RIGHT.AddressAtCollege.Zip5 AND LEFT.AddressAtCollege.State = RIGHT.AddressAtCollege.State AND LEFT.FirstReported.Year = RIGHT.FirstReported.Year AND LEFT.FirstReported.Day = RIGHT.FirstReported.Day AND LEFT.FirstReported.Month = RIGHT.FirstReported.Month,
+                  LEFT.FirstReported.Year = RIGHT.FirstReported.Year AND LEFT.FirstReported.Day = RIGHT.FirstReported.Day AND LEFT.FirstReported.Month = RIGHT.FirstReported.Month AND LEFT.CollegeData.Name = RIGHT.CollegeData.Name,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(LEFT, RIGHT)),
+                  CheckOuter_collegedata_namefirstreported_dayfirstreported_monthfirstreported_year(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.AddressAtCollege.Zip5 = RIGHT.AddressAtCollege.Zip5 AND LEFT.AddressAtCollege.State = RIGHT.AddressAtCollege.State AND LEFT.FirstReported.Year = RIGHT.FirstReported.Year AND LEFT.FirstReported.Day = RIGHT.FirstReported.Day AND LEFT.FirstReported.Month = RIGHT.FirstReported.Month,
+                  LEFT.FirstReported.Year = RIGHT.FirstReported.Year AND LEFT.FirstReported.Day = RIGHT.FirstReported.Day AND LEFT.FirstReported.Month = RIGHT.FirstReported.Month AND LEFT.CollegeData.Name = RIGHT.CollegeData.Name,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(LEFT, RIGHT)),
+                  CheckOuter_collegedata_namefirstreported_dayfirstreported_monthfirstreported_year(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_StudentRecord);
@@ -8739,8 +8860,10 @@ END;
 EXPORT _df_BpsReportIdentity(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_BpsReportIdentity L, layouts._lt_BpsReportIdentity R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_IsLimitedAccessDMF := (L.IsLimitedAccessDMF != R.IsLimitedAccessDMF);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_IsLimitedAccessDMF;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -8749,7 +8872,7 @@ EXPORT _df_BpsReportIdentity(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_IsLimitedAccessDMF, DATASET ([{'IsLimitedAccessDMF', IF(R.IsLimitedAccessDMF = true, 'true', 'false')}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -8769,14 +8892,15 @@ EXPORT _df_BpsReportIdentity(boolean is_active, string path) := MODULE
                               updated_Name);
       SELF.Name := checked_Name;
 
-      path_SSNInfoEx := path + '/SSNInfoEx';
+      path_SSNInfo := path + '/SSNInfo';
     
-      updated_SSNInfoEx := _df_SSNInfoEx(CASE(path_SSNInfoEx, '/Imposters/Imposter/SSNInfoEx' => (false), is_active), path_SSNInfoEx).AsRecord(L.SSNInfoEx, R.SSNInfoEx);
+      updated_SSNInfo := _df_SSNInfoEx(is_active, path_SSNInfo).AsRecord(L.SSNInfo, R.SSNInfo);
         
-      checked_SSNInfoEx := MAP (is_deleted => R.SSNInfoEx,
-                              is_added => L.SSNInfoEx,
-                              updated_SSNInfoEx);
-      SELF.SSNInfoEx := checked_SSNInfoEx;
+      checked_SSNInfo := MAP (is_deleted => R.SSNInfo,
+                              is_added => L.SSNInfo,
+                              updated_SSNInfo);
+      SELF.SSNInfo := checked_SSNInfo;
+      SELF.SSNInfoEx  := L.SSNInfoEx;
       SELF.DOB  := L.DOB;
       SELF.DOD  := L.DOD;
       SELF.UtilityFactorDate  := L.UtilityFactorDate;
@@ -8807,14 +8931,15 @@ EXPORT _df_BpsReportIdentity(boolean is_active, string path) := MODULE
                               updated_Name);
       SELF.Name := checked_Name;
 
-      path_SSNInfoEx := path + '/SSNInfoEx';
+      path_SSNInfo := path + '/SSNInfo';
     
-      updated_SSNInfoEx := _df_SSNInfoEx(CASE(path_SSNInfoEx, '/Imposters/Imposter/SSNInfoEx' => (false), is_active), path_SSNInfoEx).AsRecord(L.SSNInfoEx, R.SSNInfoEx);
+      updated_SSNInfo := _df_SSNInfoEx(is_active, path_SSNInfo).AsRecord(L.SSNInfo, R.SSNInfo);
         
-      checked_SSNInfoEx := MAP (is_deleted => R.SSNInfoEx,
-                              is_added => L.SSNInfoEx,
-                              updated_SSNInfoEx);
-      SELF.SSNInfoEx := checked_SSNInfoEx;
+      checked_SSNInfo := MAP (is_deleted => R.SSNInfo,
+                              is_added => L.SSNInfo,
+                              updated_SSNInfo);
+      SELF.SSNInfo := checked_SSNInfo;
+      SELF.SSNInfoEx  := L.SSNInfoEx;
       SELF.DOB  := L.DOB;
       SELF.DOD  := L.DOD;
       SELF.UtilityFactorDate  := L.UtilityFactorDate;
@@ -8832,26 +8957,26 @@ EXPORT _df_BpsReportIdentity(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_name_firstname_lastssninfoex_ssn(layouts._lt_BpsReportIdentity L, layouts._lt_BpsReportIdentity R) := FUNCTION
-    boolean IsInner :=  (L.Name.Last = R.Name.Last AND L.Name.First = R.Name.First AND L.SSNInfoEx.SSN = R.SSNInfoEx.SSN);
+  EXPORT  integer1 CheckOuter_name_firstname_lastssninfo_ssn(layouts._lt_BpsReportIdentity L, layouts._lt_BpsReportIdentity R) := FUNCTION
+    boolean IsInner :=  (L.SSNInfo.SSN = R.SSNInfo.SSN AND L.Name.Last = R.Name.Last AND L.Name.First = R.Name.First);
 
-    boolean IsOuterRight :=   (L.Name.Last = '' AND L.Name.First = '' AND L.SSNInfoEx.SSN = '');
+    boolean IsOuterRight :=   (L.SSNInfo.SSN = '' AND L.Name.Last = '' AND L.Name.First = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_name_firstname_lastssninfoex_ssn (dataset(layouts._lt_BpsReportIdentity) _n, dataset(layouts._lt_BpsReportIdentity) _o) := FUNCTION
+  EXPORT  AsDataset_name_firstname_lastssninfo_ssn (dataset(layouts._lt_BpsReportIdentity) _n, dataset(layouts._lt_BpsReportIdentity) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_BpsReportIdentity, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_BpsReportIdentity, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.Name.Last = RIGHT.Name.Last AND LEFT.Name.First = RIGHT.Name.First AND LEFT.SSNInfoEx.SSN = RIGHT.SSNInfoEx.SSN,
+                  LEFT.SSNInfo.SSN = RIGHT.SSNInfo.SSN AND LEFT.Name.Last = RIGHT.Name.Last AND LEFT.Name.First = RIGHT.Name.First,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_name_firstname_lastssninfoex_ssn(LEFT, RIGHT)),
+                  CheckOuter_name_firstname_lastssninfo_ssn(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.Name.Last = RIGHT.Name.Last AND LEFT.Name.First = RIGHT.Name.First AND LEFT.SSNInfoEx.SSN = RIGHT.SSNInfoEx.SSN,
+                  LEFT.SSNInfo.SSN = RIGHT.SSNInfo.SSN AND LEFT.Name.Last = RIGHT.Name.Last AND LEFT.Name.First = RIGHT.Name.First,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_name_firstname_lastssninfoex_ssn(LEFT, RIGHT)),
+                  CheckOuter_name_firstname_lastssninfo_ssn(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_BpsReportIdentity);
@@ -9046,15 +9171,15 @@ EXPORT _df_PersonSlimReportResponse(boolean is_active, string path) := MODULE
 
       SELF.LiensJudgments  := _df_LienJudgmentReportRecord(CASE(path + '/LiensJudgments', '/LiensJudgments' => (MonitorLienJudgment), is_active), path + '/LiensJudgments/LienJudgment').AsDataset_originfilingnumbertmsid(L.LiensJudgments, R.LiensJudgments);
 
-      SELF.Properties  := _df_PropertyReport2Record(CASE(path + '/Properties', '/Properties' => (MonitorProperty), is_active), path + '/Properties/Property').AsDataset_parcelnumberrecordtype(L.Properties, R.Properties);
+      SELF.Properties  := _df_PropertyReport2Record(CASE(path + '/Properties', '/Properties' => (MonitorProperty), is_active), path + '/Properties/Property').AsDataset_assessment_parceliddeed_parcelidrecordtype(L.Properties, R.Properties);
 
       SELF.MarriageDivorces  := _df_MarriageSearch2Record(CASE(path + '/MarriageDivorces', '/MarriageDivorces' => (MonitorMarriageDivorce), is_active), path + '/MarriageDivorces/MarriageDivorce').AsDataset_filingnumberfilingtypecodestateorigin(L.MarriageDivorces, R.MarriageDivorces);
 
-      SELF.Educations  := _df_StudentRecord(CASE(path + '/Educations', '/Educations' => (MonitorEducation), is_active), path + '/Educations/Education').AsDataset_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(L.Educations, R.Educations);
+      SELF.Educations  := _df_StudentRecord(CASE(path + '/Educations', '/Educations' => (MonitorEducation), is_active), path + '/Educations/Education').AsDataset_collegedata_namefirstreported_dayfirstreported_monthfirstreported_year(L.Educations, R.Educations);
 
-      SELF.AKAs  := _df_BpsReportIdentity(CASE(path + '/AKAs', '/AKAs' => (MonitorAKA), is_active), path + '/AKAs/AKA').AsDataset_name_firstname_lastssninfoex_ssn(L.AKAs, R.AKAs);
+      SELF.AKAs  := _df_BpsReportIdentity(CASE(path + '/AKAs', '/AKAs' => (MonitorAKA), is_active), path + '/AKAs/AKA').AsDataset_name_firstname_lastssninfo_ssn(L.AKAs, R.AKAs);
 
-      SELF.Imposters  := _df_BpsReportIdentity(CASE(path + '/Imposters', '/Imposters' => (MonitorImposter), is_active), path + '/Imposters/Imposter').AsDataset_name_firstname_lastssninfoex_ssn(L.Imposters, R.Imposters);
+      SELF.Imposters  := _df_BpsReportIdentity(CASE(path + '/Imposters', '/Imposters' => (MonitorImposter), is_active), path + '/Imposters/Imposter').AsDataset_name_firstname_lastssninfo_ssn(L.Imposters, R.Imposters);
 
       SELF.Utilities  := _df_PersonSlimReportUtility(CASE(path + '/Utilities', '/Utilities' => (MonitorUtility), is_active), path + '/Utilities/Utility').AsDataset_recorddate_dayrecorddate_monthrecorddate_yearutiltype(L.Utilities, R.Utilities);
 END;

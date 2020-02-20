@@ -1,6 +1,6 @@
-import ut,autokey, doxie, NID;
+import ut,autokey, doxie, NID, dx_header;
 
-i := doxie.Key_Address;
+i := dx_header.key_address();
 
 doxie.layout_references xt(i r) := TRANSFORM
                                 SELF := r;

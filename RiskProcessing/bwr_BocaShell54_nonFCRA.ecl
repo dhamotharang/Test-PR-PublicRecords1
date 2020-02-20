@@ -119,7 +119,7 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
 			                                                le.historydate
 	);
 	
- 
+	self.UseIngestDate := false;//  change this to true if they want to use Ingest date for retro test instead of dt_first_seen filtering
   SELF.IncludeScore := true;
   SELF.datarestrictionmask := datarestrictionmask;
   SELF.datapermissionmask := datapermissionmask;

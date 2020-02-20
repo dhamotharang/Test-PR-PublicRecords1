@@ -1,12 +1,12 @@
-IMPORT AddrBest, iesp, AutoStandardI, Address;
+IMPORT AddrBest, iesp, AutoStandardI, Address, Doxie;
 
-EXPORT AddressSummaryService_Records(iesp.addresssummary.t_AddressSummaryRequest in_recs) := FUNCTION
+EXPORT AddressSummaryService_Records(iesp.addresssummary.t_AddressSummaryRequest in_recs, Doxie.IDataAccess mod_access) := FUNCTION
 	// Module Values
 	tempmod := AutoStandardI.GlobalModule();
 	// Cleaned Address
 	Full_Addr := StringLib.StringToUpperCase(trim(tempmod.Addr, left, right));
-	Full_CSZ  := StringLib.StringToUpperCase(trim(tempmod.city + ' ' + 
-																								tempmod.state + ' ' + 
+	Full_CSZ  := StringLib.StringToUpperCase(trim(tempmod.city + ' ' +
+																								tempmod.state + ' ' +
 																								tempmod.zip, left, right));
 	Clean_Addr := Address.GetCleanAddress(Full_Addr, Full_CSZ, Address.Components.Country.US).results;
 	// Cleaned Name
@@ -37,15 +37,15 @@ EXPORT AddressSummaryService_Records(iesp.addresssummary.t_AddressSummaryRequest
 	END;
 
 	BestAddressInput := dataset([xfrm_bestaddr_in()]);
-	BestAddressCommon := AddrBest.BestAddr_common(BestAddressInput);
-	BestAddressWithSummary := AddressSummaryService_Functions.fnBestAddressWithSummary(BestAddressCommon, in_recs);
-	AddressSummaryResult := AddressSummaryService_Functions.fnAddressSummaryResult(in_recs, BestAddressWithSummary);
-	
+	BestAddressCommon := AddrBest.BestAddr_common(BestAddressInput, mod_access);
+	BestAddressWithSummary := AddressReport_Services.AddressSummaryService_Functions.fnBestAddressWithSummary(BestAddressCommon, in_recs, mod_access);
+	AddressSummaryResult := AddressReport_Services.AddressSummaryService_Functions.fnAddressSummaryResult(in_recs, BestAddressWithSummary);
+
 	// TESTING - START
 	// output(in_recs, named('AddressSummaryInput'));
 	// output(BestAddressInput, named('BestAddressInput'));
-	// output(BestAddressWithSummary, named('BestAddressWithSummary'));	
+	// output(BestAddressWithSummary, named('BestAddressWithSummary'));
 	// TESTING - END
-	
+
 	RETURN AddressSummaryResult;
 END;

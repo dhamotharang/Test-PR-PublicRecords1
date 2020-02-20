@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
 
 /*
 	Following Keys being used: 
@@ -6,27 +6,33 @@
 */
 EXPORT getBusHeaderImpl := MODULE
 
-    EXPORT getFilteredData(DATASET(DueDiligence.Layouts.Busn_Internal) inData, Business_Risk_BIP.LIB_Business_Shell_LIBIN options, BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+    EXPORT getFilteredData(DATASET(DueDiligence.Layouts.Busn_Internal) inData, Business_Risk_BIP.LIB_Business_Shell_LIBIN options, 
+                                                  BIPV2.mod_sources.iParams linkingOptions,
+                                                  doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+                                                  
+                                                  
+                                                  
         busHeaderRaw1 := BIPV2.Key_BH_Linking_Ids.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(inData),
-																													Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
-																													0, /*ScoreThreshold --> 0 = Give me everything*/
-																													linkingOptions,
-																													Business_Risk_BIP.Constants.Limit_BusHeader,
-																													FALSE, /* dnbFullRemove */
-																													TRUE, /* bypassContactSuppression */
-																													Options.KeepLargeBusinesses)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
+                                                          Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                                          0, /*ScoreThreshold --> 0 = Give me everything*/
+                                                          linkingOptions,
+                                                          Business_Risk_BIP.Constants.Limit_BusHeader,
+                                                          FALSE, /* dnbFullRemove */
+                                                          TRUE, /* bypassContactSuppression */
+                                                          Options.KeepLargeBusinesses,
+                                                          mod_access := mod_access)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
 																	
 				
-				// clean up the business header before doing anything else
+				//clean up the business header before doing anything else
 				Business_Risk_BIP.Common.mac_slim_header(busHeaderRaw1, busHeaderRaw);	
 					
-				// Add back our Seq numbers.
+				//Add back our Seq numbers.
 				busHeaderSeq := DueDiligence.CommonBusiness.AppendSeq(busHeaderRaw, indata, TRUE);
 				
 				//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
 				busHeaderCleanDate := DueDiligence.Common.CleanDatasetDateFields(busHeaderSeq, 'dt_first_seen, dt_vendor_first_reported, dt_last_seen');
 				
-				// Filter out records after our history date.
+				//Filter out records after our history date.
 				busHeaderFilt := DueDiligence.Common.FilterRecords(busHeaderCleanDate, dt_first_seen, dt_vendor_first_reported);
         
         RETURN busHeaderFilt;
@@ -268,35 +274,6 @@ EXPORT getBusHeaderImpl := MODULE
                           ATMOST(1));
                 
         RETURN addNoFein;
-    ENDMACRO;
-    
-    
-    
-    EXPORT getIncoprorationWithLooseLaws(inBusiness, filteredData) := FUNCTIONMACRO
-        projectLooseLaws := PROJECT(filteredData, TRANSFORM({RECORDOF(LEFT), BOOLEAN looseLawState, STRING2 CompanyIncorpSt}, 
-                                    SELF.looseLawState    := LEFT.company_inc_state IN DueDiligence.Constants.STATES_WITH_LOOSE_INCORPORATION_LAWS;
-                                    SELF.CompanyIncorpSt  := LEFT.company_inc_state;  
-                                    SELF := LEFT;));
-      
-        sortLooseLaws := SORT(projectLooseLaws, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
-        
-        rollLooseLaws := ROLLUP(sortLooseLaws,
-                                #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
-                                TRANSFORM({RECORDOF(LEFT)},
-                                            SELF.looseLawState := LEFT.looseLawState OR RIGHT.looseLawState;
-                                            SELF.CompanyIncorpSt := IF(LEFT.CompanyIncorpSt != '', LEFT.CompanyIncorpSt, RIGHT.CompanyIncorpSt); 
-                                            SELF := LEFT;));
-                                            
-        addIncLooseLaws := JOIN(inBusiness, rollLooseLaws,
-                                #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
-                                TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                      SELF.incorpWithLooseLaws := LEFT.incorpWithLooseLaws OR RIGHT.looseLawState;
-                                      SELF.CompanyIncorpState  := RIGHT.CompanyIncorpSt;                         //***To be printed on the shell shelf char section of report  
-                                      SELF := LEFT;),
-                                LEFT OUTER,
-                                ATMOST(1));
-                    
-        RETURN addIncLooseLaws;
     ENDMACRO;
     
     

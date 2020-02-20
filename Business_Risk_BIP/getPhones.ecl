@@ -1,9 +1,10 @@
-﻿IMPORT BIPV2, Risk_Indicators, SALT28, CellPhone, Gong, ut;
+﻿IMPORT BIPV2, Risk_Indicators, CellPhone, Gong, Doxie, Suppress, ut;
 
 EXPORT getPhones(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	calculateValueFor := Business_Risk_BIP.mod_BusinessShellVersionLogic(Options);
 
@@ -92,15 +93,19 @@ END;
 	 *  Get Phone Disconnect and Sic_Code																			*
 	 ************************************************************************ */
 	
-	Layout_Raw_Phone_Characteristics getDisconnectHRisk(Business_Risk_BIP.Layouts.Shell le, Risk_Indicators.key_phone_table_v2 ri) := TRANSFORM
+	{Layout_Raw_Phone_Characteristics, UNSIGNED4 global_sid, UNSIGNED4 did} getDisconnectHRisk(Business_Risk_BIP.Layouts.Shell le, Risk_Indicators.key_phone_table_v2 ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
+		SELF.did := ri.did;
 		SELF.Phone_Disconnected := IF(ri.potdisconnect, TRUE, FALSE);
 		SELF.Phone_High_Risk := IF(TRIM(ri.sic_code) <> '', 1, 0);
 		SELF := le.Clean_input;
 		SELF := [];
 	END;
-	phoneDisconnectHRiskTemp := JOIN(Shell, Risk_Indicators.key_phone_table_v2, KEYED(LEFT.Clean_Input.Phone10 = RIGHT.phone10), 
+	phoneDisconnectHRiskTemp_unsuppressed := JOIN(Shell, Risk_Indicators.key_phone_table_v2, KEYED(LEFT.Clean_Input.Phone10 = RIGHT.phone10), 
 																					getDisconnectHRisk(LEFT, RIGHT), KEEP(100), ATMOST(Business_Risk_BIP.Constants.Limit_Default), left outer);
 
+	phoneDisconnectHRiskTemp := Suppress.Suppress_ReturnOldLayout(phoneDisconnectHRiskTemp_unsuppressed, mod_access, Layout_Raw_Phone_Characteristics);
+	
 	Layout_Raw_Phone_Characteristics rollDisconnectHRisk(Layout_Raw_Phone_Characteristics le, Layout_Raw_Phone_Characteristics ri) := TRANSFORM
 		// In case there are multiple results, if one of them says the phone isn't disconnected then the phone isn't disconnected.  Only if all records are disconnected is the phone disconnected
 		SELF.Phone_Disconnected := le.Phone_Disconnected AND ri.Phone_Disconnected;
@@ -116,19 +121,22 @@ END;
 
 
 layout_gonghistory := {RECORDOF (Gong.Key_History_phone), unsigned4 seq, UNSIGNED3 HistoryDate};
-connectedPhones := JOIN (shell, Gong.Key_History_phone,
+connectedPhones_unsuppressed := JOIN (shell, Gong.Key_History_phone,
 															(integer) LEFT.Clean_Input.Phone10 <>0
 															AND keyed (LEFT.Clean_Input.Phone10[4..10] = RIGHT.p7 AND LEFT.Clean_Input.Phone10[1..3] = RIGHT.p3) and
 															((LEFT.Clean_Input.historydate = 999999 and RIGHT.current_flag = TRUE) or 
 																(LEFT.Clean_Input.historydate <> 999999 and (unsigned)RIGHT.dt_first_seen[1..6] < LEFT.Clean_Input.historydate))
 															AND (UNSIGNED)RIGHT.dt_first_seen > 0,
-															TRANSFORM (layout_gonghistory, SELF.SEQ := LEFT.seq, 
+															TRANSFORM (layout_gonghistory, 
+																															SELF.SEQ := LEFT.seq, 
 																															SELF.Historydate := LEFT.Clean_Input.Historydate, 
 																															SELF := Right), 
 																	ATMOST(keyed (LEFT.Clean_Input.Phone10[4..10] = RIGHT.p7 AND LEFT.Clean_Input.Phone10[1..3] = RIGHT.p3),
 																Business_Risk_BIP.Constants.Limit_Default),
 															keep(100));
 	// Count the unique "entities" per phone number (p3 + p7) where an entity is a DID/BDID that is non-zero
+	
+	connectedPhones := Suppress.MAC_SuppressSource(connectedPhones_unsuppressed, mod_access);
 	
 	ResidentialPhonesDD := DEDUP(SORT(connectedPhones, Seq, -dt_last_seen), Seq);
 	
@@ -186,9 +194,11 @@ connectedPhones := JOIN (shell, Gong.Key_History_phone,
 																			SELF := LEFT), LEFT OUTER);
 
 	// ---------------- Phone Risk Table - This contains Disconnect information via EDA/Gong ----------------------
-	potentialPhoneDisconnectRaw := JOIN(Shell, Risk_Indicators.Key_Phone_Table_V2, TRIM(LEFT.Clean_Input.Phone10) <> '' AND KEYED(LEFT.Clean_Input.Phone10 = RIGHT.Phone10),
+	potentialPhoneDisconnectRaw_unsuppressed := JOIN(Shell, Risk_Indicators.Key_Phone_Table_V2, TRIM(LEFT.Clean_Input.Phone10) <> '' AND KEYED(LEFT.Clean_Input.Phone10 = RIGHT.Phone10),
 																	TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq, UNSIGNED3 HistoryDate}, SELF.Seq := LEFT.Seq; SELF.HistoryDate := LEFT.Clean_Input.HistoryDate; SELF := RIGHT),
 																	ATMOST(Business_Risk_BIP.Constants.Limit_Default));
+	
+	potentialPhoneDisconnectRaw := Suppress.MAC_SuppressSource(potentialPhoneDisconnectRaw_unsuppressed, mod_access);
 	
 	potentialPhoneDisconnect := SORT(Business_Risk_BIP.Common.FilterRecords(potentialPhoneDisconnectRaw, dt_first_seen, (UNSIGNED)Business_Risk_BIP.Constants.MissingDate, '', AllowedSourcesSet), Seq, -((INTEGER)dt_first_seen), -potDisconnect);
 	
@@ -206,15 +216,16 @@ connectedPhones := JOIN (shell, Gong.Key_History_phone,
 	// output(SwitchTypeTZ, named('sample_SwitchTypeTZ'));
 	// output(ZipMatchTemp, named('sample_ZipMatchTemp'));
 	// output(ZipMatch, named('sample_ZipMatch'));
+  // output(phoneDisconnect, named('phoneDisconnect'));
 	// output(phoneDisconnectHRiskTemp, named('sample_phoneDisconnectHRiskTemp'));
 	// output(phoneDisconnectHRisk, named('sample_phoneDisconnectHRisk'));
 	// output(connectedPhones, named('sample_connectedPhones'));
 	// output(SortConnectedPhones, named('sample_SortConnectedPhones'));
 	// output(AddPhoneZip, named('AddPhoneZip'));
 	// output(AddPhoneDisc, named('AddPhoneDisc'));
-	// output(AddConnectedPhoneCnt, named('AddConnectedPhoneCnt'));
+	// output(AddConnectedPhoneCnt, named('AddConnectedPhoneCnt')); 
 	// output(AddphoneAttributes, named('AddphoneAttributes'));
-
+	// OUTPUT(AllowedSourcesSet,NAMED('Allowed_Srcs_Phones'));
 	
 	RETURN withPhoneDisconnect;
 	END;

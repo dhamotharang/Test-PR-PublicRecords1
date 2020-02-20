@@ -89,8 +89,8 @@ EXPORT LIBCALL_conversions := MODULE
   end;
 
 
-
-	EXPORT CleanSearchInputDataset (dataset (AutoHeaderV2.layouts.lib_search) ds_in, integer libVersion =AutoHeaderV2.Constants.LibVersion.LEGACY) := function
+  // libVersion is zero(legacy library) because there are other attributes that already calls this using the default version.
+	EXPORT CleanSearchInputDataset (dataset (AutoHeaderV2.layouts.lib_search) ds_in, integer libVersion=0) := function
     first_row := ds_in[1];
 
     HasWildcard (string str) := (Stringlib.StringFind(str, '*', 1) <> 0) or (Stringlib.StringFind(str, '?', 1) <> 0);
@@ -102,7 +102,7 @@ EXPORT LIBCALL_conversions := MODULE
       Self.did := (unsigned6) if (stringlib.stringfilterout (first_row.did, '0123456789') = '', first_row.did, '');
       Self.rid := (unsigned6) first_row.rid;    //AutoStandardI.InterfaceTranslator.rid_value.val
 
-						boolean isSaltFetch := libVersion = AutoHeaderV2.Constants.LibVersion.SALT;
+			boolean isSaltFetch := libVersion = AutoHeaderV2.Constants.LibVersion.SALT;
       // Name
       Self.tname := AutoheaderV2.translate.cname (first_row,isSaltFetch);
       // Address

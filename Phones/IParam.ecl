@@ -25,7 +25,7 @@ EXPORT IParam := MODULE
  	 RETURN in_mod;
   END;
 
-  EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParamsV2)
+  EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams)
     EXPORT BOOLEAN 		return_current                 := TRUE;
     EXPORT BOOLEAN		include_temp_susp_reactivate   := FALSE;
     EXPORT UNSIGNED		max_lidb_age_days              := Phones.Constants.PhoneAttributes.LastActivityThreshold; 
@@ -36,7 +36,7 @@ EXPORT IParam := MODULE
 		EXPORT getBatchParams() := 
 		FUNCTION
 			
-			mBaseParams := BatchShare.IParam.getBatchParamsV2();
+			mBaseParams := BatchShare.IParam.getBatchParams();
 			
 			in_mod := MODULE(PROJECT(mBaseParams, BatchParams, OPT))							
 				EXPORT BOOLEAN return_current								:= TRUE 	: STORED('return_current');									

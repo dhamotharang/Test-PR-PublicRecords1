@@ -1,4 +1,4 @@
-﻿IMPORT Address, Risk_Indicators, Models, RiskWise, Risk_Reporting, ut, dma, doxie, gateway;
+﻿IMPORT Address, Risk_Indicators, Models, RiskWise, ut, gateway, STD;
 
 EXPORT LeadIntegrity_Search_Function(
 														DATASET(Models.Layout_LeadIntegrity_In) indata,
@@ -11,7 +11,11 @@ EXPORT LeadIntegrity_Search_Function(
 														BOOLEAN DisableDoNotMailMask = FALSE,
 														STRING50 DataPermission = Risk_Indicators.iid_constants.default_DataPermission,
                             dataset(Gateway.Layouts.Config) gateways =  dataset([],Gateway.Layouts.Config),
-                            unsigned1 ofac_version = 1
+                            unsigned1 ofac_version = 1,
+                            unsigned1 LexIdSourceOptout = 1,
+                            string TransactionID = '',
+                            string BatchUID = '',
+                            unsigned6 GlobalCompanyId = 0
 													) := FUNCTION
 
 /* ***************************************
@@ -29,15 +33,15 @@ EXPORT LeadIntegrity_Search_Function(
 		SELF.seq := (INTEGER)le.Seq;	
 		SELF.ssn := IF(le.SSN='000000000', '', le.SSN);	// blank out social if it is all 0's
 		SELF.dob := cleanDOB;
-		SELF.age := IF(TRIM(cleanDOB) = '', '', (STRING3)ut.GetAgeI((INTEGER)cleanDOB));
+		SELF.age := IF(TRIM(cleanDOB) = '', '', (STRING3)ut.Age((INTEGER)cleanDOB));
 	
 		SELF.phone10 := le.HomePhone;
 		SELF.wphone10 := le.WorkPhone;
 	
-		SELF.fname := StringLib.StringToUpperCase(le.FirstName);
-		SELF.mname := StringLib.StringToUpperCase(le.MiddleName);
-		SELF.lname := StringLib.StringToUpperCase(le.LastName);
-		SELF.suffix := StringLib.StringToUpperCase(le.SuffixName);
+		SELF.fname := STD.Str.ToUpperCase(le.FirstName);
+		SELF.mname := STD.Str.ToUpperCase(le.MiddleName);
+		SELF.lname := STD.Str.ToUpperCase(le.LastName);
+		SELF.suffix := STD.Str.ToUpperCase(le.SuffixName);
 	
 		clean_addr := risk_indicators.MOD_AddressClean.clean_addr(le.streetAddr, le.City, le.State, le.Zip) ;											
 	
@@ -65,8 +69,8 @@ EXPORT LeadIntegrity_Search_Function(
 		SELF.county := Address.CleanFields(clean_addr).county[3..5]; // we only want the county fips, not all 5.  first 2 are the state fips
 		SELF.geo_blk := Address.CleanFields(clean_addr).geo_blk;
 	
-		SELF.dl_number := StringLib.StringToUpperCase(cleanDLNum);
-		SELF.dl_state := StringLib.StringToUpperCase(le.DLState);
+		SELF.dl_number := STD.Str.ToUpperCase(cleanDLNum);
+		SELF.dl_state := STD.Str.ToUpperCase(le.DLState);
 		self.historydate := historydate;
 		SELF := [];
 	END;
@@ -121,11 +125,19 @@ EXPORT LeadIntegrity_Search_Function(
 	iid := Risk_Indicators.InstantID_Function(cleanIn, gateways_BS, DPPAPurpose, GLBPurpose, isUtility, isLn, ofacOnly, 
 																					suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, include_ofac, includeAdditionalWatchlists, global_watchlist_threshold,
 																					in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions,
-																					in_DataPermission := DataPermission);
+																					in_DataPermission := DataPermission,
+                                                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                    TransactionID := TransactionID, 
+                                                                                    BatchUID := BatchUID, 
+                                                                                    GlobalCompanyID := GlobalCompanyID);
 
 	clam := Risk_Indicators.Boca_Shell_Function(iid, gateways_BS, DPPAPurpose, GLBPurpose, isUtility, isLn, doRelatives, doDL, 
 																						doVehicle, doDerogs, bsVersion, doScore, nugen, filterOutFares, DataRestriction := DataRestriction,
-																						BSOptions := BSOptions, DataPermission := DataPermission);
+																						BSOptions := BSOptions, DataPermission := DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID);
 
 /* ***************************************
 	 *       Gather ITA Attributes:        *
@@ -171,7 +183,7 @@ EXPORT LeadIntegrity_Search_Function(
 		// LI4 requirements state a 210 score override is thrown for DoNotMail hits.
 		override210 := Risk_Indicators.rcSet.isCodeFM(le.DoNotMail) and modelname in ['msn1106_0', 'msn1210_1'];
 
-		self.scorename1 := StringLib.StringToUpperCase(trim(modelname));
+		self.scorename1 := STD.Str.ToUpperCase(trim(modelname));
 		self.score1  := if( override210, '210', ri.score );
 		self.reason1 := if( override210, 'FM', ri.ri[1].hri );
 		SELF.reason2 := if( override210, '00', ri.ri[2].hri );
@@ -183,19 +195,7 @@ EXPORT LeadIntegrity_Search_Function(
 	END;
 
 	withModel := JOIN(withDNM, model, (INTEGER)LEFT.seq=RIGHT.seq, addScore(LEFT, RIGHT), FULL OUTER);
-	
- /* *************************************
-  *   Boca Shell Logging Functionality  *
-  * NOTE: Because of the #stored below  *
-  * this MUST go at the end of this     *
-  * function in order to compile.       *
-  ***************************************/
-	// productID := Risk_Reporting.ProductID.Models__LeadIntegrity_Service;
-	
-	// intermediate_Log := Risk_Reporting.To_LOG_Boca_Shell(clam, productID, bsVersion);
-	// #stored('Intermediate_Log', intermediate_log);  
- /* ************ End Logging ************/
 
 	RETURN(withModel);
-	// RETURN(model);
+
 END;

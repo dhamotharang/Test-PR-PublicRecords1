@@ -1,4 +1,4 @@
-import AddressReport_Services, AddrBest, iesp, ut, Census_Data, NID, doxie, header, header_quick, utilfile, std;
+import AddressReport_Services, AddrBest, iesp, ut, Census_Data, NID, doxie, header, header_quick, utilfile, Suppress, std, dx_header;
 
 EXPORT AddressSummaryService_Functions := MODULE
 	// Helper Functions
@@ -10,11 +10,11 @@ EXPORT AddressSummaryService_Functions := MODULE
 	SHARED pref_fname(string in_fname) := NID.PreferredFirstNew(in_fname, true);
 	SHARED split_lname(string in_lname, integer in_section) := Std.Str.SplitWords(in_lname, ' ')[in_section];
 
-	EXPORT fnVerifiedName(integer in_did, string in_fname, string in_mname, string in_lname, string in_name_suffix,
+	SHARED fnVerifiedName(integer in_did, doxie.IDataAccess mod_access, string in_fname, string in_mname, string in_lname, string in_name_suffix,
 							 string in_prim_range, string in_predir, string in_prim_name, string in_suffix, 
-							 string in_postdir, string in_sec_range, string in_city_name, string in_st, string in_zip) := FUNCTION
+							 string in_postdir, string in_sec_range, string in_city_name, string in_st, string in_zip
+							 ) := FUNCTION
 		
-		doxie.MAC_Header_Field_Declare()
 		// Constants - Set for exact name check
 		in_name_first_regex_all := trim_all(name_regex(in_fname));
 		in_name_last_regex_all := trim_all(name_regex(in_lname));
@@ -34,10 +34,13 @@ EXPORT AddressSummaryService_Functions := MODULE
 			Layouts.AddressSummaryHeaderSlim_layout;
 			unsigned did;
 			unsigned rid;
+			// for suppressions
+			UNSIGNED4 global_sid;
+    		UNSIGNED8 record_sid;
 		end;
-		header_slim0 := project(doxie.key_header(KEYED(s_did = in_did)), address_summary_rec_ext);
+		header_slim0 := project(dx_header.key_header()(KEYED(s_did = in_did)), address_summary_rec_ext);
 		header_slim_filt := Header.FilterDMVInfo(header_slim0);
-		header_slim := project(if(suppressDMVInfo_value, header_slim_filt, header_slim0), Layouts.AddressSummaryHeaderSlim_layout);
+		header_slim := project(if(mod_access.suppress_dmv, header_slim_filt, header_slim0), address_summary_rec_ext);
 		quick_slim := project(header_quick.key_DID(KEYED(did = in_did)), Layouts.AddressSummaryHeaderSlim_layout);
 		util_slim := project(utilfile.Key_Util_Daily_Did(KEYED(s_did = in_did)),transform(Layouts.AddressSummaryHeaderSlim_layout,
 																																							 self.dt_first_seen := (unsigned3)left.date_first_seen div 100;
@@ -46,8 +49,11 @@ EXPORT AddressSummaryService_Functions := MODULE
 																																							 self.suffix := left.addr_suffix;
 																																							 self.city_name := left.v_city_name;
 																																							 self := left;));
+
+		header_slim_recs:= PROJECT(Suppress.MAC_SuppressSource(header_slim, mod_access), Layouts.AddressSummaryHeaderSlim_layout);
+
 		// combine header results
-		header_names := header_slim + quick_slim + util_slim;
+		header_names := header_slim_recs + quick_slim + util_slim;
 		
 		// limit header results to only names for the input address
 		header_names_per_addr := header_names(prim_range = in_prim_range,
@@ -90,12 +96,13 @@ EXPORT AddressSummaryService_Functions := MODULE
 	END;
 
 	EXPORT fnBestAddressWithSummary(dataset(AddrBest.Layout_BestAddr.best_Out_common) ds_in_ab, 
-																	iesp.addresssummary.t_AddressSummaryRequest ds_in_as) := FUNCTION
+																	iesp.addresssummary.t_AddressSummaryRequest ds_in_as,
+																	doxie.IDataAccess mod_access) := FUNCTION
 		// Constants - First Row
 		ds_in_as_first_row := ds_in_as.SearchBy;		
 		
 		Layouts.BestAddressWithResponseCode_layout xfrm_AddressSummaryRules(AddrBest.Layout_BestAddr.best_Out_common L) := transform
-			VerifiedName := fnVerifiedName(L.did, ds_in_as_first_row.Name.First, ds_in_as_first_row.Name.Middle, ds_in_as_first_row.Name.Last, ds_in_as_first_row.Name.Suffix,
+			VerifiedName := fnVerifiedName(L.did, mod_access, ds_in_as_first_row.Name.First, ds_in_as_first_row.Name.Middle, ds_in_as_first_row.Name.Last, ds_in_as_first_row.Name.Suffix,
 																		 L.prim_range, L.predir, L.prim_name, L.suffix, L.postdir, L.sec_range, L.p_city_name, L.st, L.z5)[1];
 			
 			is_name_match := VerifiedName.IsVerified;

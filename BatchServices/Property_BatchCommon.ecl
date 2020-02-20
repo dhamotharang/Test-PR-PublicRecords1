@@ -57,7 +57,7 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 	// common batch settings, including a gateway to a remote Picklist
   //If this module will be passed as an input parameter, be sure to handle correctly
   //MaxResultsPerAcct and ReturnCurrentOnly fields: currently, those values are set in this very attribute.
-	  batch_params := module (BatchShare.IParam.getBatchParamsV2())
+	  batch_params := module (BatchShare.IParam.getBatchParams())
       export dataset (Gateway.layouts.config) gateways := gw_config;
 		  export integer1 non_subject_suppression := nss;
     end;

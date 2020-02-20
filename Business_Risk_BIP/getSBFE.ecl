@@ -1,14 +1,23 @@
-﻿/*2016-11-15T02:48:01Z (aleksandar tomovic)
-corrected as per code review 
-*/
-IMPORT BIPV2, Business_Credit, Business_Risk_BIP, MDR, ut, Business_Credit_KEL, risk_indicators, DID_Add, Business_Risk, STD;
+﻿IMPORT BIPV2, Business_Credit, Business_Credit_KEL,  Business_Risk,  Business_Risk_BIP, DID_Add, doxie, MDR, risk_indicators, ut, STD;
 
 EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
-	// Add fifteen minutes to the historydatetime to accommodate for delays in 
+	mod_access :=
+    MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+      EXPORT STRING DataRestrictionMask := linkingOptions.DataRestrictionMask;
+      EXPORT STRING DataPermissionMask := Options.DataPermissionMask;
+      EXPORT UNSIGNED1 glb := linkingOptions.GLBPurpose;
+      EXPORT UNSIGNED1 dppa := linkingOptions.DPPAPurpose;
+      EXPORT BOOLEAN show_minors := linkingOptions.IncludeMinors;
+      EXPORT UNSIGNED1 unrestricted := (UNSIGNED1)linkingOptions.AllowAll;
+      EXPORT BOOLEAN isPreGLBRestricted() := linkingOptions.restrictPreGLB;
+      EXPORT BOOLEAN ln_branded :=  linkingOptions.lnbranded;
+    END;
+
+  // Add fifteen minutes to the historydatetime to accommodate for delays in 
 	// the real time database information being available in production runs
 	Shell := 
 		PROJECT(
@@ -20,9 +29,9 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		);
 	
 	SBFERaw := Business_Credit.Key_LinkIds().kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-																		Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+																		mod_access,
+                                    Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																		0, /*ScoreThreshold --> 0 = Give me everything*/
-																		Options.DataPermissionMask,
 																		Business_Risk_BIP.Constants.Limit_SBFE_LinkIds,
 																		Options.KeepLargeBusinesses
 																		);
@@ -58,7 +67,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 	
   linkid_recs_loaddate := JOIN(SBFESeq, Business_Credit.Key_ReleaseDates(), LEFT.original_version=RIGHT.version, getacctno_loaddate(LEFT,RIGHT), LEFT OUTER);
 	
-	linkid_recs_loaddate_dedup := DEDUP(SORT(linkid_recs_loaddate, seq, acct_no, -load_date), seq, acct_no);
+	linkid_recs_loaddate_dedup := DEDUP(SORT(linkid_recs_loaddate, seq, acct_no, original_version, -load_date), seq, acct_no);
 
   linkid_recs := Business_Risk_BIP.Common.FilterRecords2(linkid_recs_loaddate_dedup, load_date, MDR.SourceTools.src_Business_Credit, AllowedSourcesSet);
 	

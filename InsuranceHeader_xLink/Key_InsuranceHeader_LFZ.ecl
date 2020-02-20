@@ -1,4 +1,4 @@
-﻿IMPORT SALT37,std;
+﻿IMPORT SALT37,std, vault, _control;
 EXPORT Key_InsuranceHeader_LFZ(BOOLEAN incremental=FALSE, UNSIGNED2  aBlockLimit= Config.LFZ_MAXBLOCKLIMIT) := MODULE/*HACK25*/
  
 //LNAME:FNAME:ZIP:+:CITY:PRIM_RANGE:PRIM_NAME:SSN5:SSN4:MNAME:SEC_RANGE:SNAME:DOB:ST
@@ -88,8 +88,12 @@ SHARED DataForKey := project(DataForKey0, transform(layout,	BOOLEAN emptyConcept
 		self.ZIP_weight100 := IF (emptyConcept AND left.ZIP_weight100 >=1000 AND left.ZIP_weight100<2000,  
 					left.ZIP_weight100/3, IF (emptyConcept AND left.ZIP_weight100>=2000, left.ZIP_weight100/4, left.ZIP_weight100)); 
 		self := left)); /*HACK15*/
- 
-EXPORT Key := INDEX(DataForKey,{DataForKey},{BOOLEAN IsIncremental := incremental},KeyName);
+
+#IF(_Control.Environment.onVault) 
+	EXPORT Key := vault.InsuranceHeader_xLink.Key_InsuranceHeader_LFZ().key;
+#ELSE
+	EXPORT Key := INDEX(DataForKey,{DataForKey},{BOOLEAN IsIncremental := incremental},KeyName);
+#END;
  
 EXPORT BuildAll := BUILDINDEX(Key, OVERWRITE);
 // Compute shrinkage stats; the amount we could shrink the key for each extra credit removal

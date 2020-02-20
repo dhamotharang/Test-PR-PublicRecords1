@@ -1,11 +1,11 @@
-﻿IMPORT FCRA, Risk_indicators;
+﻿IMPORT FCRA, Risk_Indicators;
 
 EXPORT Layouts_Derog_Info := MODULE
 
 	EXPORT layout_derog_process := RECORD
-		layouts.layout_derogs_input;
-		Layout_Derogs BJL;
-		Layouts.Layout_Liens Liens;
+		Risk_Indicators.layouts.layout_derogs_input;
+		Risk_Indicators.Layout_Derogs BJL;
+		Risk_Indicators.Layouts.Layout_Liens Liens;
 	END;
 	
   EXPORT layout_bk_chapter := record
@@ -169,19 +169,25 @@ EXPORT Layouts_Derog_Info := MODULE
 		string15 Amount             ;    
 		string8 ReleaseDate    ;    
 		string120 Defendant;
+    string60 StreetAddress1       ;
+    string60 StreetAddress2       ;
+    string25 City       ;
+    string2 State       ;
+    string5 Zip5       ;
 		string120 Plaintiff ;
 		string8 SatisfiedDate      ;           
 		string16 FilingDescription;
 		String1 Eviction;
 		string20 FilingNumber       ;    
 		string10 FilingBook         ;    
-		string10 FilingPage         ;    
+		string10 FilingPage         ;
 		string7 AgencyID						;
 		string60 Agency             ;    
 		string35 AgencyCounty       ;    
 		string2 AgencyState         ; 
 		string FileTypeDesc;
-		string8 VendorDateLastSeen   ;  
+		string8 VendorDateLastSeen   ;
+    string10 orig_rmsid         ;
 	END;
 
 	EXPORT 	layout_derog_process_plus_working := RECORD
@@ -212,15 +218,33 @@ EXPORT Layouts_Derog_Info := MODULE
 		string50 LienType           ;    
 		string15 Amount             ;    
 		string8 ReleaseDate    ;    
-		string8 DateLastSeen   ;    
+		string8 DateLastSeen   ; 
+    string120 Defendant   ;
+    string10 StreetNumber ;
+    string2 StreetPreDirection ;
+    string28 StreetName ;
+    string4 StreetSuffix ;
+    string2 StreetPostDirection ;
+    string10 UnitDesignation ;
+    string8 UnitNumber ;
+    string60 StreetAddress1       ;
+    string60 StreetAddress2       ;
+    string25 City       ;
+    string2 State       ;
+    string5 Zip5       ;
+    string4 Zip4 ;
+    string18 County ;
+    string9 PostalCode ;
+    string50  StateCityZip ;
 		string20 FilingNumber       ;    
 		string10 FilingBook         ;    
-		string10 FilingPage         ; 
+		string10 FilingPage         ;
 		string7	 AgencyID           ;
 		string60 Agency             ;    
 		string35 AgencyCounty       ;    
 		string2 AgencyState         ;  
 		unsigned ConsumerStatementId;
+    string10 orig_rmsid         ;
 	END;
 	
 	EXPORT Liens_seq := RECORD
@@ -239,17 +263,34 @@ EXPORT Layouts_Derog_Info := MODULE
 		string8 ReleaseDate      ;           
 		string16 FilingDescription;           
 		string8 DateLastSeen  ;                
-		string120 Defendant   ;                
+		string120 Defendant   ;
+    string10 StreetNumber ;
+    string2 StreetPreDirection ;
+    string28 StreetName ;
+    string4 StreetSuffix ;
+    string2 StreetPostDirection ;
+    string10 UnitDesignation ;
+    string8 UnitNumber ;
+    string60 StreetAddress1       ;
+    string60 StreetAddress2       ;
+    string25 City       ;
+    string2 State       ;
+    string5 Zip5       ;
+    string4 Zip4 ;
+    string18 County ;
+    string9 PostalCode ;
+    string50  StateCityZip ;
 		string120 Plaintiff   ;                
 		string20 FilingNumber ;                
 		string10 FilingBook   ;                
 		string10 FilingPage   ;                
-		string1 Eviction      ;  
+		string1 Eviction      ;
 		string7 AgencyID      ;
 		string60 Agency       ;                
 		string35 AgencyCounty ;                
 		string2 AgencyState    ;
 		unsigned ConsumerStatementId;
+    string10 orig_rmsid   ;
 	END;	
 	
 	EXPORT Judgments_seq := RECORD

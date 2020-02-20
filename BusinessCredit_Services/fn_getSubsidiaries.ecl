@@ -1,8 +1,22 @@
-﻿IMPORT BIPV2, BIPv2_HRCHY, BIPV2_Best,Business_Credit, BusinessCredit_Services, iesp;
+﻿IMPORT BIPV2, BIPv2_HRCHY, BIPV2_Best,Business_Credit, BusinessCredit_Services, doxie, iesp, suppress;
 
 EXPORT fn_getSubsidiaries (BusinessCredit_Services.Iparam.reportrecords inmod, boolean buzCreditAccess = FALSE,
                   dataset(recordof(Business_Credit.Key_BusinessOwnerInformation().Kfetch2(dataset([],BIPV2.IDlayouts.l_xlink_ids2)))) ownerInfokfetch ) := FUNCTION
 
+  mod_access := 
+    MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+      EXPORT STRING    DataPermissionMask := inmod.DataPermissionMask;
+      EXPORT STRING	   DataRestrictionMask := inmod.DataRestrictionMask;
+      EXPORT UNSIGNED1 unrestricted := (UNSIGNED1) inmod.AllowAll;
+      EXPORT UNSIGNED1 glb := inmod.DPPAPurpose;
+      EXPORT UNSIGNED1 dppa := inmod.GLBPurpose;
+      EXPORT BOOLEAN   show_minors := inmod.IncludeMinors;
+      EXPORT BOOLEAN   isPreGLBRestricted() := inmod.restrictPreGLB;
+      EXPORT STRING    ssn_mask := inmod.ssnmask;
+      EXPORT UNSIGNED1 dob_mask := suppress.date_mask_math.MaskIndicator (inmod.dobmask);    
+      EXPORT STRING32  application_type := inmod.ApplicationType;
+    END;
+    
 	subsidiaryRecs_raw   :=  ownerInfokfetch;
 	subsidiaryRecs 			:= DEDUP(SORT(subsidiaryRecs_raw, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()), Guarantor_Owner_Indicator),
 																		#EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()), Guarantor_Owner_Indicator);
@@ -13,18 +27,22 @@ EXPORT fn_getSubsidiaries (BusinessCredit_Services.Iparam.reportrecords inmod, b
 		Boolean isOwner 			:= FALSE;
 		Boolean isGuarantor 	:= FALSE;
 		Boolean isParentinBIP	:= FALSE;
+    UNSIGNED6 DID := 0;
+    UNSIGNED4 global_sid := 0;
+    UNSIGNED8 record_sid := 0;
 	END;
 
-	buzCredit_Subsidiary_Recs	:=	JOIN (subsidiaryRecs, Business_Credit.Key_BusinessInformation(),
-																			BusinessCredit_Services.Macros.mac_JoinBusAccounts() AND
-																			RIGHT.Record_Type = Business_Credit.Constants().AccountBase,
-																			TRANSFORM(temp_rec ,
-																				SELF.isOwner 			:= LEFT.Guarantor_Owner_Indicator = '001' or LEFT.Guarantor_Owner_Indicator = '003',
-																				SELF.isGuarantor 	:= LEFT.Guarantor_Owner_Indicator = '002' or LEFT.Guarantor_Owner_Indicator = '003',
-																				SELF							:= RIGHT,
-																				SELF							:= []), 
-																			LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT, SKIP));
-																				 
+	buzCredit_Subsidiary_Recs_Org	:=	JOIN (subsidiaryRecs, Business_Credit.Key_BusinessInformation(),
+                                          BusinessCredit_Services.Macros.mac_JoinBusAccounts() AND
+                                          RIGHT.Record_Type = Business_Credit.Constants().AccountBase,
+                                          TRANSFORM(temp_rec ,
+                                            SELF.isOwner 			:= LEFT.Guarantor_Owner_Indicator = '001' or LEFT.Guarantor_Owner_Indicator = '003',
+                                            SELF.isGuarantor 	:= LEFT.Guarantor_Owner_Indicator = '002' or LEFT.Guarantor_Owner_Indicator = '003',
+                                            SELF							:= RIGHT,
+                                            SELF							:= []), 
+                                          LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT, SKIP));
+  buzCredit_Subsidiary_Recs := Suppress.MAC_SuppressSource(buzCredit_Subsidiary_Recs_org, mod_access, did);
+  
 	//getting the BIP Children
 	bip_DirChilds_input :=	PROJECT(inmod.BusinessIds , {UNSIGNED6 seleid});
 	bip_DirChilds 			:= 	PROJECT(BIPv2_HRCHY.FunctionsShow.ShowDirectParentsChildren(bip_DirChilds_input), 
@@ -67,7 +85,7 @@ EXPORT fn_getSubsidiaries (BusinessCredit_Services.Iparam.reportrecords inmod, b
 		SELF.BusinessCreditIndicator 	:= BusinessCredit_Services.Functions.fn_BuzCreditIndicator( L.UltId, 
 																																															L.OrgID,
 																																															L.SeleID,
-																																															inmod.DataPermissionMask,
+																																															mod_access,
 																																															buzCreditAccess);
 		SELF := [];
 	END;

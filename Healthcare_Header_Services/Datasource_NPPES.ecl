@@ -1,4 +1,5 @@
-Import NPPES,UT;
+﻿Import NPPES,UT,suppress;
+
 EXPORT Datasource_NPPES := Module
 	Export get_nppes_entity (dataset(Layouts.searchKeyResults_plus_input) input, boolean isBusiness=false,dataset(Layouts.common_runtime_config) cfg):= function
 			// rawdataIndividual:= join(dedup(sort(input(lnpid>0),record),record), NPPES.Key_NPPES_lnpid,
@@ -24,8 +25,10 @@ EXPORT Datasource_NPPES := Module
 											keyed((string)left.vendorid = right.npi), 
 											transform(Layouts.npi_base_with_input,self.l_providerid:=if(isBusiness,(integer)right.npi,left.lnpid);self.vendorid:=right.npi;self:=right;self:=left), 
 											keep(Constants.MAX_RECS_ON_JOIN), limit(0)); 
-			// baseRecs := project(sort(rawdataIndividual+rawdataIndividualbyVendorid,acctno,-Provider_Enumeration_Date,-NPI_Reactivation_Date),Transforms.build_npi_base(left));
-			baseRecs := project(sort(rawdataIndividualbyVendorid,acctno,-Provider_Enumeration_Date,-NPI_Reactivation_Date),Transforms.build_npi_base(left));
+			mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);
+			supressmac:=Suppress.MAC_FlagSuppressedSource(rawdataIndividualbyVendorid,mod_access); 
+			setOptOut := project(supressmac, transform(healthcare_header_services.Layouts.npi_base_with_input,self.hasOptOut:= left.is_suppressed;self:=left;self:=[]));  			
+			baseRecs := project(sort(setOptOut,acctno,-Provider_Enumeration_Date,-NPI_Reactivation_Date),Transforms.build_npi_base(left));
 			npi_providers_final_sorted := sort(baseRecs, acctno, LNPID, Src);
 			npi_providers_final_grouped := group(npi_providers_final_sorted, acctno, LNPID, Src);
 			npi_providers_rolled := rollup(npi_providers_final_grouped, group, Transforms.doNPIBaseRecordSrcIdRollup(left,rows(left)));			

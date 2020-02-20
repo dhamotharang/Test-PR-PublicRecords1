@@ -1,5 +1,5 @@
-
-import doxie_raw, Doxie, business_header, drivers, ut, paw, BIPv2;
+﻿
+import AutoStandardI, doxie_raw, Doxie, business_header, ut, paw, BIPv2, Suppress;
 
 export paw_raw(
 	dataset(doxie.layout_references) dids,
@@ -8,10 +8,21 @@ export paw_raw(
 	unsigned1 glb_purpose = 0
 	
 ) := FUNCTION
+ global_mod := AutoStandardI.GlobalModule();
+ mod_access := module(doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod))
+                   EXPORT unsigned1 glb := glb_purpose;
+                   EXPORT unsigned1 dppa := dppa_purpose;
+                   EXPORT unsigned3 date_threshold := dateVal; // a.k.a. dateVal
+               end;
 
 outrec := RECORD
 	Business_Header.Layout_Employment_Out;
 	BIPV2.IDlayouts.l_header_ids;
+END;
+
+outrec_plus := RECORD(outrec)
+	unsigned4 global_sid;
+  unsigned8 record_sid;
 END;
 
 //***** KEYS
@@ -31,7 +42,7 @@ cids :=
 
 
 //***** TRANSFORM
-outrec keepr(cids l, kc r) := transform
+outrec_plus keepr(cids l, kc r) := transform
 	self.did := intformat(r.did, 12, 1);
 	self.bdid := intformat(r.bdid, 12, 1);
 	self.company_phone := if((unsigned)r.company_phone = 0, '', r.company_phone);
@@ -41,12 +52,13 @@ end;
 
 //***** PERMISSIONS
 mac_permissions() := macro
-	(Right.DPPA_State = '' or Drivers.state_dppa_ok(Right.DPPA_State, dppa_purpose,,RIGHT.source)) and
-	(Right.glb='N' or ut.glb_ok(glb_purpose))
+  (Right.DPPA_State = '' or mod_access.isValidDppaState(Right.DPPA_State, , RIGHT.source)) AND
+  (Right.glb='N' or mod_access.isValidGlb())
+
 endmacro;
 
 //***** PICK UP AND RETURN THE RECORDS
-fetched_out := 
+fetched_out_pre := 
 	join(
 		cids,
 		kc,
@@ -55,6 +67,7 @@ fetched_out :=
 		keepr(left, right),
 		limit(ut.limits.default, skip) //TODO: seems like keep(1), limit(0);
 	);
+fetched_out :=  project(suppress.mac_suppressSource(fetched_out_pre,mod_access),outrec);
 
 return sort(fetched_out, whole record);
 

@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, VehicleV2, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, VehicleV2, STD, Doxie;
 
 /*
 	Following Keys being used:
@@ -6,12 +6,13 @@
 */
 EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) indata, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-											 BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+											 BIPV2.mod_sources.iParams linkingOptions,
+                                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
 	busnKeys := DueDiligence.CommonBusiness.GetLinkIDsForKFetch(indata);
 
-	vehicleRaw := VehicleV2.Key_Vehicle_linkids.kFetch(busnKeys, 
+	vehicleRaw := VehicleV2.Key_Vehicle_linkids.kFetch(busnKeys,, 
                                                       Business_Risk_BIP.Common.SetLinkSearchLevel(options.LinkSearchLevel),
                                                       0,
                                                       linkingOptions);
@@ -32,7 +33,7 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) indata,
                                                           SELF := [];));
                                                           
                                                           
-  vehicleSummary := DueDiligence.getSharedVehicle(transformVehicles, options.DPPA_Purpose);   
+  vehicleSummary := DueDiligence.getSharedVehicle(transformVehicles, options.DPPA_Purpose, mod_access);   
   
   
   addVehicleDetails := JOIN(indata, vehicleSummary,

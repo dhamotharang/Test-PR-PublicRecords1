@@ -1,7 +1,7 @@
 ﻿IMPORT BatchShare, header;
 EXPORT IParams := MODULE
 
-	EXPORT BatchParams := INTERFACE (BatchShare.IParam.BatchParamsV2)
+	EXPORT BatchParams := INTERFACE (BatchShare.IParam.BatchParams)
 	  EXPORT BOOLEAN   IncludeShortTermRental := FALSE;
 	  EXPORT BOOLEAN   IncludeSTRSplitFlag    := FALSE;
 	  EXPORT STRING6   AddrSearchDate         := '';
@@ -13,7 +13,7 @@ EXPORT IParams := MODULE
 	END;
 	
 	EXPORT getBatchParams() := FUNCTION
-		base_params := BatchShare.IParam.getBatchParamsV2();
+		base_params := BatchShare.IParam.getBatchParams();
 		// project the base params to read shared parameters from store.
 		in_mod := module(PROJECT(base_params, BatchParams, opt))	
 			// query level input options

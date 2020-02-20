@@ -1,4 +1,4 @@
-import ut, doxie, NID,AutoHeaderV2,lib_metaphone;
+import ut, dx_header, NID, AutoHeaderV2, lib_metaphone;
 
 export fetch_phone (dataset (AutoHeaderV2.layouts.search) ds_search) := function
   _row := ds_search[1];
@@ -7,7 +7,7 @@ export fetch_phone (dataset (AutoHeaderV2.layouts.search) ds_search) := function
 	temp_lname_value := _row.tname.lname;
 	temp_phone_value := _row.tphone.phone10;
 
-	i := doxie.key_header_phone;
+	i := dx_header.key_phone();
 
 	pfe(string20 l, string20 r) := NID.mod_PFirstTools.SubLinPFR(l,r);
 

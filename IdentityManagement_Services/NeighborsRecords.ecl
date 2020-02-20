@@ -1,4 +1,5 @@
-IMPORT iesp, doxie_crs, Census_data, ut, Address, header, DidVille, doxie, DeathV2_Services, AutoStandardI;
+﻿﻿IMPORT Address, Census_data, DeathV2_Services, DidVille, doxie, doxie_crs, dx_death_master, header,  
+       IdentityManagement_Services, iesp, ut;
 
 EXPORT iesp.identitymanagementreport.t_IdmNeighborAddress NeighborsRecords(IdentityManagement_Services.IParam._report in_params, DATASET (doxie.layout_references) dids) := FUNCTION
 
@@ -31,20 +32,20 @@ END;
 
 fill_identities := PROJECT(aka_src,resident_section(LEFT)); // Lets fill identity info from best records.
 
-iesp.identitymanagementreport.t_IdmIdentity GetDead (iesp.identitymanagementreport.t_IdmIdentity L, RECORDOF(doxie.key_death_masterV2_ssa_DID) R):=transform
-	// there can be different DOB in key_death_masterV2_DID and best records, thus take DOB from the left side, if dead, get age at death
-	left_dob := (STRING4) L.DOB.year + INTFORMAT (L.DOB.month, 2, 1) + INTFORMAT (L.DOB.day, 2, 1);
-	SELF.Age := IF( r.l_did != 0,ut.Age((UNSIGNED8)left_dob, (UNSIGNED8)R.dod8), L.Age);
-	SELF := L; // copy about 25 fields
-END;
-
 rna_glb_ok := mod_access.isValidGLB(header.constants.checkRNA);
 death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
-nbrs_correct_age := JOIN (fill_identities, doxie.key_death_masterV2_ssa_DID, 
-											KEYED ((INTEGER)LEFT.UniqueId = RIGHT.l_did)
-											AND	NOT DeathV2_Services.Functions.Restricted(RIGHT.src, RIGHT.glb_flag, rna_glb_ok, death_params),
-                      GetDead (LEFT, RIGHT), LEFT OUTER, LIMIT(0), KEEP(1));
+nbrs_correct_age_w_d_appended := dx_death_master.Append.byDid(fill_identities, UniqueId, death_params,/*skip_glb_check=*/TRUE);
+nbrs_correct_age_w_d_glb_ok := nbrs_correct_age_w_d_appended(rna_glb_ok OR death.glb_flag <> 'Y');    
+
+iesp.identitymanagementreport.t_IdmIdentity GetDead (RECORDOF(nbrs_correct_age_w_d_glb_ok) L):=TRANSFORM
+  // there can be different DOB in key_death_masterV2_DID and best records, thus take DOB from the left side, if dead, get age at death
+  left_dob := (STRING4) L.DOB.year + INTFORMAT (L.DOB.month, 2, 1) + INTFORMAT (L.DOB.day, 2, 1);
+  SELF.Age := IF( L.death.is_deceased, ut.Age((UNSIGNED8)left_dob, (UNSIGNED8)L.death.dod8), L.Age);
+  SELF := L; // copy about 25 fields
+END;
+
+nbrs_correct_age := PROJECT(nbrs_correct_age_w_d_glb_ok, GetDead(LEFT));
 
 GetLocationID (iesp.share.t_Address addr) := FUNCTION
   STRING str_addr :=  TRIM (addr.City) + ';' + TRIM (addr.State) + ';' + TRIM (addr.StreetName) + ';' + TRIM (addr.StreetNumber) + ';' + 

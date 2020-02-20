@@ -16,7 +16,11 @@ IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Risk_Indicators, 
 EXPORT InstantID20_Service() := MACRO
 
 		#OPTION('embeddedWarningsAsErrors',0);
-
+    
+   // #option ('optimizelevel', 0); // NEVER RELEASE THIS LINE OF CODE TO PROD
+                                    // this is for deploying to a 100-way as 
+                                    // the service is large.
+                                    // This service won't run on a 1-way.
 		/* ************************************************************************
 		 *                      Force the order on the WsECL page                 *
 		 ************************************************************************ */
@@ -27,7 +31,11 @@ EXPORT InstantID20_Service() := MACRO
 		'DataRestrictionMask',
 		'DataPermissionMask',
 		'BIID20ProductType',
-    'Gateways'
+    'Gateways',
+		'LexIdSourceOptout',
+		'_TransactionId',
+		'_BatchUID',
+		'_GCID'
 		));
 
 		/* ************************************************************************
@@ -64,6 +72,10 @@ EXPORT InstantID20_Service() := MACRO
 			BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
 			BOOLEAN DisableOutcomeTracking  := False : STORED('OutcomeTrackingOptOut');
 			BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
+			unsigned1 LexIdSourceOptout 		:= 1 : STORED('LexIdSourceOptout');
+			string TransactionID 						:= '' : STORED('_TransactionId');
+			string BatchUID 								:= '' : STORED('_BatchUID');
+			unsigned6 GlobalCompanyId			  := 0 : STORED('_GCID');
 
 			//Look up the industry by the company ID.
 			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Business_Risk__InstantID_20_Service);
@@ -148,10 +160,18 @@ EXPORT InstantID20_Service() := MACRO
 			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway)); // Due to this RQ-14881 ExcludeWatchlists works with other versions of OFAC in this query. 
                                                             // Please refer to the ticket if needing further details.
 
-		// 4. Pass input to BIID 2.0 logic.
-		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists);
+		
+    
+    // 4. Pass input to BIID 2.0 logic.
+		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists,LexIdSourceOptout := LexIdSourceOptout, 
+	  TransactionID := TransactionID, 
+	  BatchUID := BatchUID, 
+	  GlobalCompanyID := GlobalCompanyID);
 
-		//4.5 Call Testseeds Function
+    #if(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
+	
+		
+    // 4.5 Call Testseeds Function
 		TestSeed_Results := BusinessInstantID20_Services.BIIDv2_TestSeed_Function(ds_Input, _TestData_TableName, , Options);
 
 		// 5. Project into IESP output.
@@ -195,6 +215,8 @@ EXPORT InstantID20_Service() := MACRO
 		Targus_royalties   := Royalty.RoyaltyTargus.GetOnlineRoyalties(Targus_PhoneSource, source, TargusType, TRUE, TRUE, FALSE, FALSE);
 
 		total_royalties := SBFE_royalties + Targus_royalties;
+		
+		
 		
 		OUTPUT(total_royalties, NAMED('RoyaltySet'));
 		
@@ -293,5 +315,10 @@ EXPORT InstantID20_Service() := MACRO
 
 	// 7. Results!
 	OUTPUT( results_iesp, NAMED('Results') );
+#else // Else, output the model results directly
+//return ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists);
+OUTPUT (ds_BIID_results, NAMED('MODELRESULTS'));
 
+#end
+	
 ENDMACRO;

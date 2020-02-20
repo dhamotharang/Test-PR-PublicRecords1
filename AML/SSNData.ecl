@@ -1,4 +1,4 @@
-import doxie, risk_indicators, doxie_raw, progressive_phone, ut,  riskwise;
+﻿import doxie, risk_indicators, doxie_raw, progressive_phone, ut,  riskwise, AML;
 
 EXPORT SSNData (  DATASET(Layouts.RelatLayoutV2) RelatsIn,    
 													 unsigned1 dppa, 
@@ -6,7 +6,8 @@ EXPORT SSNData (  DATASET(Layouts.RelatLayoutV2) RelatsIn,
 													 boolean isFCRA = false, 
 													 string50 DataRestriction, 
 													 boolean IsBusn,
-													 integer bsversion
+													 integer bsversion,
+													 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 													 ) := FUNCTION;
 
 IndDDIDs := dedup(sort(RelatsIn(origdid <> relatdid), seq, relatdid), seq, relatdid);
@@ -145,10 +146,10 @@ unsigned8 BSOptions := 0;
 ExactMatchLevel:=  risk_indicators.iid_constants.default_ExactMatchLevel;
 runSSNCodes := True;
 //aml  just ids with ssn flags		iid_getssnflags expects diff seq for each individual.																													
-withSSNFlags := risk_indicators.iid_getSSNFlags(group(ssnFlagsPrepseq, seq), dppa, glb, isFCRA, runSSNCodes ,  ExactMatchLevel, DataRestriction, BSversion, BSOptions );	
+withSSNFlags := risk_indicators.iid_getSSNFlags(group(ssnFlagsPrepseq, seq), dppa, glb, isFCRA, runSSNCodes ,  ExactMatchLevel, DataRestriction, BSversion, BSOptions, mod_access := mod_access);	
 
 
-withBSADL := Risk_Indicators.Boca_Shell_ADL(withSSNFlags, isFCRA, dppa, DataRestriction);  //ssn per adl   ssns_per_adl_seen_18months
+withBSADL := Risk_Indicators.Boca_Shell_ADL(withSSNFlags, isFCRA, dppa, DataRestriction, mod_access := mod_access);  //ssn per adl   ssns_per_adl_seen_18months
 
 
 

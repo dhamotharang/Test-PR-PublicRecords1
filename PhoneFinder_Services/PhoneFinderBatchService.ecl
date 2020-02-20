@@ -25,10 +25,11 @@
   <part name="UseInHousePhoneMetadata" type="xsd:boolean" default="false"/>
   <part name="VerifyPhoneName" type="xsd:boolean" default="false"/>
   <part name="VerifyPhoneNameAddress" type="xsd:boolean" default="false"/>
+  <part name="SuppressNonRelevantRecs" type="xsd:boolean" default="false"/>
 	<separator/>
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 	<separator/>
-	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
+	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>
   <separator/>
   <part name="BatchRequest" type="tns:XmlDataSet" cols="70" rows="25"/>
 </message>
@@ -37,7 +38,7 @@
 EXPORT PhoneFinderBatchService :=
 MACRO
 
-	IMPORT AutoStandardI,Gateway,PhoneFinder_Services;
+	IMPORT AutoStandardI,Gateway,PhoneFinder_Services, AutoheaderV2;
 	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
    #stored('useOnlyBestDID',true); // used to determine the 1 "best" did for the input criteria
 	// Batch input request
@@ -45,24 +46,30 @@ MACRO
 
 	// Gateway configurations
 	dGateways := Gateway.Configuration.Get();
-	
+
  reportMod := PhoneFinder_Services.iParam.GetBatchParams();
-		
+
 	modBatchRecords := PhoneFinder_Services.PhoneFinder_BatchRecords(dBatchReq,reportMod,
    																																		IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
    																																											dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways));
-   	
+
     royalties	 := modBatchRecords.dRoyalties;
-   	results   	:= modBatchRecords.dBatchOut;
+   	dPhones   	:= modBatchRecords.dBatchOut;
    	Zumigo_Log	:= modBatchRecords.Zumigo_History_Recs;
-    
-     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
-     IF (EXISTS(results), doxie.compliance.logSoldToTransaction(mod_access)); 
- 
+
+		// Suppress records that have blank identitty name, identity address and carrier name if option is set
+		// NOTE: Any changes to below non-blank logic will need to be communicated to the Batch team as well
+    dNonblankRelevantRecs := dPhones(identity1_full != '' OR (identity1_first != '' AND identity1_last!= '')
+													OR (identity1_streetname != '' AND ((identity1_city != '' AND identity1_state != '' ) OR identity1_zip5 != ''))
+													OR carrier <>'');
+
+
+		results := if(reportMod.SuppressNonRelevantRecs,dNonblankRelevantRecs,dPhones);
+
    OUTPUT(results,named('Results'));
    OUTPUT(royalties,named('RoyaltySet'));
    OUTPUT(Zumigo_Log,named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
-   
+
 
 ENDMACRO;
 

@@ -1,4 +1,4 @@
-IMPORT Address, Business_Header_SS, Risk_Indicators, RiskWise, ut, gateway;
+﻿IMPORT STD, Address, Business_Header_SS, Risk_Indicators, RiskWise, ut, gateway;
 
 // The default values should be set at the service level and passed into this function, don't assume any defaults here
 EXPORT ProviderScoring_Search_Function (DATASET(Risk_Indicators.Layout_Provider_Scoring.Input) Batch_Input, 
@@ -8,7 +8,11 @@ EXPORT ProviderScoring_Search_Function (DATASET(Risk_Indicators.Layout_Provider_
 																				STRING50 DataRestrictionMask, 
 																				UNSIGNED3 HistoryDate,
 																				DATASET(Gateway.Layouts.Config) gateways,
-																				string50 DataPermission=iid_constants.default_DataPermission) := FUNCTION
+																				string50 DataPermission=iid_constants.default_DataPermission,
+                                                                                unsigned1 LexIdSourceOptout = 1,
+                                                                                string TransactionID = '',
+                                                                                string BatchUID = '',
+                                                                                unsigned6 GlobalCompanyId = 0) := FUNCTION
 	layout_IID_Prep_AcctNo := RECORD
 		STRING30 AcctNo := '';
 		Risk_Indicators.Layout_Input;
@@ -34,11 +38,11 @@ EXPORT ProviderScoring_Search_Function (DATASET(Risk_Indicators.Layout_Provider_
 		cleaned_name := address.CleanPerson73(le.Provider_Full_Name);
 		BOOLEAN valid_cleaned := le.Provider_Full_Name <> '';
 		
-		SELF.fname  := StringLib.StringToUppercase(if(le.Provider_First_Name='' AND valid_cleaned, cleaned_name[6..25], le.Provider_First_Name));
-		SELF.lname  := StringLib.StringToUppercase(if(le.Provider_Last_Name='' AND valid_cleaned, cleaned_name[46..65], le.Provider_Last_Name));
-		SELF.mname  := StringLib.StringToUppercase(if(le.Provider_Middle_Name='' AND valid_cleaned, cleaned_name[26..45], le.Provider_Middle_Name));
-		SELF.suffix := StringLib.StringToUppercase(if(valid_cleaned, cleaned_name[66..70], ''));	
-		SELF.title  := StringLib.StringToUppercase(if(valid_cleaned, cleaned_name[1..5],''));
+		SELF.fname  := STD.STR.ToUpperCase(if(le.Provider_First_Name='' AND valid_cleaned, cleaned_name[6..25], le.Provider_First_Name));
+		SELF.lname  := STD.STR.ToUpperCase(if(le.Provider_Last_Name='' AND valid_cleaned, cleaned_name[46..65], le.Provider_Last_Name));
+		SELF.mname  := STD.STR.ToUpperCase(if(le.Provider_Middle_Name='' AND valid_cleaned, cleaned_name[26..45], le.Provider_Middle_Name));
+		SELF.suffix := STD.STR.ToUpperCase(if(valid_cleaned, cleaned_name[66..70], ''));	
+		SELF.title  := STD.STR.ToUpperCase(if(valid_cleaned, cleaned_name[1..5],''));
 		
 		clean_a2 := risk_indicators.MOD_AddressClean.clean_addr(le.StreetAddress1 + ' ' + le.StreetAddress2, le.City, le.St, le.Zip);											
 
@@ -110,10 +114,12 @@ EXPORT ProviderScoring_Search_Function (DATASET(Risk_Indicators.Layout_Provider_
 	 *********************************************** */
 	iid := Risk_Indicators.InstantID_Function(iid_prep, gateways, DPPAPurpose, GLBPurpose, isUtility, ln_branded, ofac_only, suppressNearDups, require2ele, isFCRA, from_biid, 
 																						ExcludeWatchLists, from_IT1O, ofac_version, include_ofac, addtl_watchlists, watchlist_threshold, dob_radius, BSVersion, 
-																						in_DataRestriction := DataRestrictionMask, in_append_best := AppendBest, in_DataPermission := DataPermission);
+																						in_DataRestriction := DataRestrictionMask, in_append_best := AppendBest, in_DataPermission := DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 	
 	clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, DPPAPurpose, GLBPurpose, isUtility, ln_branded, includeRel, includeDL, includeVeh, includeDerog, BSVersion, 
-																						doScore, nugen, DataRestriction := DataRestrictionMask, DataPermission := DataPermission);
+																						doScore, nugen, DataRestriction := DataRestrictionMask, DataPermission := DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 
 	bdidprep := PROJECT(prep_acct, TRANSFORM(Business_Header_SS.Layout_BDID_InBatch, SELF := LEFT));
 	

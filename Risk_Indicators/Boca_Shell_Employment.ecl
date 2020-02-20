@@ -1,10 +1,13 @@
-﻿import _Control, paw, riskwise, ut, mdr, fcra, risk_indicators;
+﻿import _Control, paw, riskwise, ut, mdr, fcra, risk_indicators, doxie, Suppress, data_services;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Employment(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_employment, 
 															boolean isFCRA, 
 															boolean isPreScreen, 
-															integer bsVersion) := FUNCTION
+															integer bsVersion,
+															doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
 patw := record
 	clam_pre_employment.seq;
@@ -27,7 +30,12 @@ patw := record
 	
 end;
 
-patw getPawDid(clam_pre_employment le, paw.Key_Did ri) := TRANSFORM
+patw_CCPA := record
+    unsigned4 global_sid; // CCPA changes
+	patw;
+end;
+
+patw_CCPA getPawDid(clam_pre_employment le, paw.Key_Did ri) := TRANSFORM
 	self.seq := le.seq;
 	self.did := le.did;
 	self.historydate := le.historydate;
@@ -54,7 +62,7 @@ with_paw_did_thor := join(distribute(clam_pre_employment, hash64(did)),
 	with_paw_did := with_paw_did_roxie;
 #END
 
-patw getPawFull(with_paw_did le, paw.Key_contactID ri) := TRANSFORM
+patw_CCPA getPawFull(with_paw_did le, paw.Key_contactID ri) := TRANSFORM
 	self.seq := le.seq;
 	self.did := le.did;
 	self.historydate := le.historydate;								
@@ -74,17 +82,37 @@ patw getPawFull(with_paw_did le, paw.Key_contactID ri) := TRANSFORM
 	self.Source_ct	:= if(ri.contact_id<>0, 1, 0);  // number of different PAW sources appeared on
 	self.sources := '';
 	self.active_phones := '';
+	self.global_sid := ri.global_sid;
 END;
 
-pawfile_full_nonfcra_roxie := join(with_paw_did, paw.Key_contactid,
+pawfile_full_nonfcra_roxie_unsuppressed := join(with_paw_did, paw.Key_contactid,
 						left.contact_id<>0 and 
 						keyed(left.contact_id=right.contact_id) 
 						and (unsigned)right.dt_first_seen[1..6] < left.historydate,
 						getPawFull(LEFT,RIGHT),
 						left outer,
 						atmost(riskwise.max_atmost), keep(1000));
+						
+pawfile_full_nonfcra_roxie_flagged := Suppress.MAC_FlagSuppressedSource(pawfile_full_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
 
-pawfile_full_nonfcra_thor := join(distribute(with_paw_did, hash64(contact_id)), 
+pawfile_full_nonfcra_roxie := PROJECT(pawfile_full_nonfcra_roxie_flagged, TRANSFORM(patw, 						
+	self.contact_id := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.contact_id);
+	self.bdid := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.bdid);
+	self.company_status := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.company_status);
+	self.source := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.source);
+	self.phone := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.phone);
+	self.active_phone_flag := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.active_phone_flag);
+	self.company_title := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.company_title);
+	self.First_seen_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.First_seen_date);
+	self.Last_seen_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Last_seen_date);
+	self.Business_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Business_ct);
+	self.Dead_business_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Dead_business_ct);
+	self.Business_active_phone_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Business_active_phone_ct);
+	self.Source_ct	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Source_ct);
+    SELF := LEFT;
+)); 
+
+pawfile_full_nonfcra_thor_unsuppressed := join(distribute(with_paw_did, hash64(contact_id)), 
 						distribute(pull(paw.Key_contactid), hash64(contact_id)),
 						left.contact_id<>0 and 
 						left.contact_id=right.contact_id 
@@ -92,7 +120,26 @@ pawfile_full_nonfcra_thor := join(distribute(with_paw_did, hash64(contact_id)),
 						getPawFull(LEFT,RIGHT),
 						left outer,
 						atmost(riskwise.max_atmost), keep(1000), LOCAL);
+																						
+pawfile_full_nonfcra_thor_flagged := Suppress.MAC_FlagSuppressedSource(pawfile_full_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
 
+pawfile_full_nonfcra_thor := PROJECT(pawfile_full_nonfcra_thor_flagged, TRANSFORM(patw, 						
+	self.contact_id := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.contact_id);
+	self.bdid := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.bdid);
+	self.company_status := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.company_status);
+	self.source := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.source);
+	self.phone := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.phone);
+	self.active_phone_flag := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.active_phone_flag);
+	self.company_title := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.company_title);
+	self.First_seen_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.First_seen_date);
+	self.Last_seen_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Last_seen_date);
+	self.Business_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Business_ct);
+	self.Dead_business_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Dead_business_ct);
+	self.Business_active_phone_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Business_active_phone_ct);
+	self.Source_ct	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Source_ct);
+    SELF := LEFT;
+)); 
+																									
 #IF(onThor)
 	pawfile_full_nonfcra := group(sort(pawfile_full_nonfcra_thor,seq),seq);
 #ELSE
@@ -234,7 +281,7 @@ sorted_pawfile_full := sort(grouped_pawfile, seq, -(unsigned)bdid, -last_seen_da
 
 rolled_paw := rollup(sorted_pawfile_full, true, roll_paw(left, right));
 
-dead_business_ct_per_bdid := table(grouped_pawfile, {seq, bdid, dead_business_count := count(group, dead_business_ct=1)}, 
+dead_business_ct_per_bdid := table(UNGROUP(grouped_pawfile), {seq, bdid, dead_business_count := count(group, dead_business_ct=1)}, 
 											seq, bdid);
 
 dead_business_ct_per_seq := table(dead_business_ct_per_bdid, {seq, dead_business_ct := count(group, dead_business_count>0)}, 

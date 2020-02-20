@@ -8,7 +8,7 @@
   <part name="Zip" type="xsd:string"/>
   <part name="Phone" type="xsd:string"/>
   <part name="DPPAPurpose" type="xsd:byte"/>
-  <part name="GLBPurpose" type="xsd:byte"/> 
+  <part name="GLBPurpose" type="xsd:byte"/>
   <part name="ScoreThreshold" type="xsd:unsignedInt"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
   <part name="DialContactPrecision" type="xsd:unsignedInt"/>
@@ -21,18 +21,16 @@
 */
 
 export AddressPreFillService := macro
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #constant('AllowLeadingLname',true);
 #constant('IncludeZeroDIDRefs',true);
 #stored('ScoreThreshold',fedex_services.Contants.ScoreThreshold);
 
 #constant('IsPRP', true);
 doxie.MAC_Header_Field_Declare();
-mod_access := doxie.compliance.GetGlobalDataAccessModule();
 res_unm := Fedex_Services.mod_AddressPreFill.Records;
 doxie.MAC_Marshall_Results(res_unm, res);
 
-IF (EXISTS(res), doxie.compliance.logSoldToTransaction(mod_access));
 output(res, named(doxie.strResultsName));
 output(Fedex_Services.mod_AddressPreFill.isMultiStateReturn, named('isMultiStateReturn'));
 

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Batch InfoTrace Collection Scores">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -13,7 +13,7 @@
 */
 /*--INFO-- Migrating it21, it37, it51, it60, it61, it90, at00, and i200 to boca.  */
 
-import address, risk_indicators, Models,AutoStandardI;
+import risk_indicators, AutoStandardI, Gateway;
 
 export IT1O_Batch_Service := macro
 
@@ -35,6 +35,12 @@ gateways_in := Gateway.Configuration.Get();
 
 batchin := dataset([],RiskWise.Layout_IT1O_BatchIn) : stored('batch_in');
 tribcode := StringLib.StringToLowerCase(tribCode_value);
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
@@ -66,7 +72,11 @@ RiskWise.Layout_IT1I addseq(batchin le, integer C) := transform
 end;
 indata := project(batchin, addseq(LEFT, counter));
 
-final := riskwise.IT1O_Function(indata, gateways, dppa_purpose, glb_purpose, DataRestriction:=DataRestriction,appType:=appType, DataPermission:=DataPermission);
+final := riskwise.IT1O_Function(indata, gateways, dppa_purpose, glb_purpose, DataRestriction:=DataRestriction,appType:=appType, DataPermission:=DataPermission,
+                                                      LexIdSourceOptout := LexIdSourceOptout, 
+                                                      TransactionID := TransactionID, 
+                                                      BatchUID := BatchUID, 
+                                                      GlobalCompanyID := GlobalCompanyID);
 
 output(final, named('Results'));
 

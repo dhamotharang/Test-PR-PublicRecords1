@@ -115,7 +115,7 @@
 */
 
 export InstantID_Batch_Service() := macro
-import doxie, address, AutoStandardI, OFAC_XG5;
+IMPORT OFAC_XG5, risk_indicators, business_risk, iesp, Patriot;
 
 // Can't have duplicate definitions of Stored with different default values, 
 // so add the default to #stored to eliminate the assignment of a default value.
@@ -150,7 +150,7 @@ boolean isFCRA := false;
 boolean use_dob_filter := FALSE :stored('UseDobFilter');
 integer2 dob_radius := 2 :stored('DobRadius');
 string  model_name_value := '' : stored('ModelName');
-model_name := StringLib.StringToLowerCase(model_name_value);
+model_name := STD.Str.toLowerCase(model_name_value);
 boolean IncludeTargus3220 := false : stored('IncludeTargusE3220');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
@@ -161,7 +161,7 @@ dob_radius_use := if(use_dob_filter,dob_radius,-1);
 
 gateways_in := Gateway.Configuration.Get();
 STRING AttributesVersionRequest := '' : STORED('AttributesVersionRequest');
-IncludeRepAttributes := StringLib.StringToUpperCase(AttributesVersionRequest) IN ['BIIDATTRIBUTESV1'];
+IncludeRepAttributes := STD.Str.toUpperCase(AttributesVersionRequest) IN ['BIIDATTRIBUTESV1'];
 boolean Include_ALL_Watchlist:= false : stored('Include_ALL_Watchlist');
 boolean Include_ALLV4_Watchlist:= false : stored('Include_ALLV4_Watchlist');
 boolean Include_BES_Watchlist:= false : stored('Include_BES_Watchlist');
@@ -194,6 +194,12 @@ boolean Include_OFFC_Watchlist:= false : stored('Include_OFFC_Watchlist');
 boolean Include_PMLC_Watchlist:= false : stored('Include_PMLC_Watchlist');
 boolean Include_PMLJ_Watchlist:= false : stored('Include_PMLJ_Watchlist');
 
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+    
 dWL := dataset([], iesp.share.t_StringArrayItem) +
 if(Include_ALL_Watchlist, dataset([{patriot.constants.wlALL}], iesp.share.t_StringArrayItem)) +
 if(Include_ALLV4_Watchlist, dataset([{patriot.constants.wlALLV4}], iesp.share.t_StringArrayItem)) +
@@ -285,7 +291,11 @@ ret := Business_Risk.InstantID_Batch_Service_records(//risk_indicators.Layout_Ga
 																 Model_name,
 																 IncludeFraudScores,
 																 IncludeRepAttributes,
-																 DataPermission
+																 DataPermission,
+                                                                 LexIdSourceOptout := LexIdSourceOptout, 
+                                                                 TransactionID := TransactionID, 
+                                                                 BatchUID := BatchUID, 
+                                                                 GlobalCompanyID := GlobalCompanyID
 																 );
 																 
 output(ret, named('RESULTS'));

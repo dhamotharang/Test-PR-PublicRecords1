@@ -380,7 +380,8 @@ export Report_Service := macro
 		EXPORT String50 	BoardCertifiedSpecialty :=	request.ReportBy2.BoardCertifiedSpecialty;
 	end;
 
-	recs := Healthcare_Provider_Services.ReportService_Records (params, ReportBy2,true,cfg);
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
+	recs := Healthcare_Provider_Services.ReportService_Records (params, mod_access, ReportBy2,true,cfg);
 	output(recs, named('Results'));
 endmacro;
 // Report_Service();

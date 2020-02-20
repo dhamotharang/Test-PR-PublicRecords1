@@ -3,7 +3,7 @@
 EXPORT IParams := MODULE
 
 	EXPORT BatchParams :=
-		INTERFACE (BatchShare.IParam.BatchParamsV2)
+		INTERFACE (BatchShare.IParam.BatchParams)
 			EXPORT STRING1 BIPFetchLevel;
       EXPORT BOOLEAN execsOnly; 
     END;
@@ -11,7 +11,7 @@ EXPORT IParams := MODULE
   // Function to initalize the batch params
 	EXPORT getBatchParams() :=	
     FUNCTION
-      BaseBatchParams := BatchShare.IParam.getBatchParamsV2();
+      BaseBatchParams := BatchShare.IParam.getBatchParams();
 
       inMod := MODULE(PROJECT(BaseBatchParams,BatchParams,OPT)) 
         BipFetchLevelTmp := BIPV2.IDconstants.Fetch_Level_SELEID : STORED('BIPFetchLevel');

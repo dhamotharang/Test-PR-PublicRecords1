@@ -228,7 +228,6 @@ end;
 
 export isCode9K( string1 out_addr_type ) := out_addr_type = 'H';
 
-
 export isCodeA0(string feinmatchcompany, string feinmatchaddr, string bestaddr) := feinmatchcompany != '' and ut.stringsimilar(feinmatchaddr, bestaddr) > 2;
 export isCodeA1(string bvi) := (integer)bvi = 0;
 export isCodeA2(unsigned2 bankruptcy_count, unsigned2 UnreleasedLienCount) := bankruptcy_count > 0 or UnreleasedLienCount > 0;
@@ -239,14 +238,14 @@ export isCodeA6(unsigned bdid, string goodstandingcode) := goodstandingcode='I' 
 export isCodeA7(boolean vernotrecentflag) := vernotrecentflag;
 export isCodeA8(string ar2bi, string inFname, string inLname, string inCmpy) := ((INTEGER)ar2bi = 0 ) and inFname != '' and inLname != '' and inCmpy != '';
 export isCodeA9( unsigned4 dt_first_seen_min, unsigned3 historydate ) := ((integer)(risk_indicators.iid_constants.myGetDate(historydate)[1..6]) - (INTEGER)((STRING)dt_first_seen_min)[1..6]) < 200;
-
 export isCodeAS(BOOLEAN IsShiptoBilltoDifferent) := IsShiptoBilltoDifferent; 
-
 export isCodeEA(INTEGER email_verification):=email_verification in [0, 1, 2, 3];         
-
+export isCodeEU(string VerifiedEmail,string email):= trim(StringLib.StringToUpperCase(VerifiedEmail))=''and trim(StringLib.StringToUpperCase(email))<>'';
+export isCodeER(STRING emailhighriskind):= emailhighriskind in ['ER'];
+export isCodePR(STRING phonehighriskind):= phonehighriskind in ['PR'];
 export isCodeEI(UNSIGNED6 DID, unsigned1 socsverlevel, string socsvalid):= DID = Risk_Indicators.iid_constants.EmailFakeIds or
 	(socsverlevel in [1,4,6,7,9,10,11,12] and socsvalid not in risk_indicators.iid_constants.set_valid_ssn_codes);         
-
+       
 export isCodeIA(string ipAddr, boolean hit) := ipAddr <> '' and ~hit;
 
 shared setIP_invalid_states := ['WEBTV', 'AOL'];
@@ -350,7 +349,7 @@ export isCodeFM( string1 DoNotMail ) := DoNotMail='1';
 export isCodeFV( string1 advo_address_vacancy ) := advo_address_vacancy='Y';
 
 export isCodeRS(STRING inSSN, STRING socsvalflag, STRING socslowissuedate, STRING socsRCISflag) := checkRS(inSSN, socsvalflag, socslowissuedate) AND socsRCISflag <> '1';
-export isCodeIS(STRING inSSN, STRING socsvalflag, STRING socslowissuedate, STRING socsRCISflag) := checkRS(inSSN, socsvalflag, socslowissuedate) AND ~isCode85(inSSN, socsRCISflag) AND socsRCISflag = '1';
+export isCodeIS(STRING inSSN, STRING socsvalflag, STRING socslowissuedate, STRING socsRCISflag) := checkRS(inSSN, socsvalflag, socslowissuedate) AND ~isCode85(inSSN, socslowissuedate) AND socsRCISflag = '1';
 export isCodeBO(string ver_sources) :=  function
 	identity_sources := models.common.zip2(ver_sources, ver_sources);  // put the sources into a dataset
 	credit_bureau_sourced := count(identity_sources(str1 in Risk_Indicators.iid_constants.bureau_sources)) > 0;
@@ -476,6 +475,8 @@ EXPORT isCodeOS_O5(unsigned2 btst_did_summary) := btst_did_summary = 0;
 EXPORT isCodeOS_O6(unsigned2 btst_did_summary) := btst_did_summary = 1;
 //WC7 = btst_did_summary = 2;	
 EXPORT isCodeOS_O7(unsigned2 btst_did_summary) := btst_did_summary = 2;
+// Exclude Minors
+export isCodeAM(Integer age, string dob) := age<18 and dob<>'';
 
 
 END;

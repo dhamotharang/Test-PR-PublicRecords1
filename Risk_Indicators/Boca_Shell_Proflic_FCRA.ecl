@@ -1,9 +1,9 @@
-﻿import _Control, prof_licenseV2, FCRA, riskwise, ut, RiskView;
+﻿import _Control, prof_licenseV2, FCRA, riskwise, ut, RiskView, doxie, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Proflic_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, 
 				boolean isPrescreen, boolean isDirectToConsumerPurpose = false) := FUNCTION
-
+        
 string8 proflic_build_date := Risk_Indicators.get_Build_date('proflic_build_version');
 myGetDate := proflic_build_date;
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;

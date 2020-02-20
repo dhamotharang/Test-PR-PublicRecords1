@@ -11,7 +11,7 @@ It is the responsibility of the calling attribute to set the following STORED va
 */
 EXPORT fetch_Criminal_recs( DATASET(doxie.layout_references_acctno) ds_acctno_refs ) :=
 	FUNCTION
-		batch_params := BatchShare.IParam.getBatchParamsV2();
+		batch_params := BatchShare.IParam.getBatchParams();
 		
 		crim_batch_params := MODULE( PROJECT(batch_params, CriminalRecords_BatchService.IParam.batch_params, OPT) )	
 			UNSIGNED2 MaxResults_val := 50 : STORED('MaxResults');

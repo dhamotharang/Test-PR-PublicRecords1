@@ -1,9 +1,9 @@
 ﻿/*
-This function gets Relatives, Employers, Associates, and Businesses (REAB) for accounts with input for 
+This function gets Relatives, Employers, Associates, and Businesses (REAB) for accounts with input for
 firstname, lastname, and (DID or SSN or full address or DOB).
 */
-IMPORT BatchServices,BIPV2,BIPV2_Build,Codes,DeathV2_Services,Doxie,Doxie_Raw,EmailService,Header,
-       PAW,PhoneOwnership,Phones,POE,STD,Suppress,ut;
+IMPORT BatchServices,BIPV2,BIPV2_Contacts,Codes,DeathV2_Services,Doxie,Doxie_Raw,dx_death_master,EmailService,
+       Header,PAW,PhoneOwnership,Phones,POE,STD,Suppress,ut;
 
 EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwnership.IParams.BatchParams inMod) :=FUNCTION //
 
@@ -12,42 +12,40 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 	Constants := PhoneOwnership.Constants;
 	//REA Utilities
 	validFullSSN(STRING ssn):= LENGTH(STD.Str.FilterOut(ssn,'0123456789')) = 9;
-	validAddress(STRING prim_range, STRING prim_name, STRING city,STRING state,STRING zip):= 
+	validAddress(STRING prim_range, STRING prim_name, STRING city,STRING state,STRING zip):=
 																																((prim_range<>'' AND prim_name<>'') OR ut.isPOBox(prim_name) OR ut.isRR(prim_name)) AND
 																																((city<>'' AND state<>'') OR  zip<>'');
 	validDOB(STRING dob) := Std.Date.IsValidDate((UNSIGNED)dob);
-	
-	needREA := DEDUP(SORT(dBatchIn(did>0 AND batch_in.name_first<>'' AND batch_in.name_last<>'' AND (batch_in.did > 0 OR 
-										validFullSSN(TRIM(batch_in.ssn,ALL)) OR 
-										validAddress(batch_in.prim_range,batch_in.prim_name,batch_in.p_city_name,batch_in.st,batch_in.zip) OR 
+
+	needREA := DEDUP(SORT(dBatchIn(did>0 AND batch_in.name_first<>'' AND batch_in.name_last<>'' AND (batch_in.did > 0 OR
+										validFullSSN(TRIM(batch_in.ssn,ALL)) OR
+										validAddress(batch_in.prim_range,batch_in.prim_name,batch_in.p_city_name,batch_in.st,batch_in.zip) OR
 										validDOB(batch_in.dob)))
 																,acctno,seq),acctno);
-	subjectDIDs := PROJECT(needREA,Doxie.layout_references);													
+	subjectDIDs := PROJECT(needREA,Doxie.layout_references);
 	// *** Relatives and associates
 	dsRA := Doxie_Raw.relative_raw(DEDUP(subjectDIDs,ALL), mod_access, , , Constants.MAX_RelativeDept);
 
 	dsUniqueRA := DEDUP(SORT(dsRA,srcdid,person2,-rel_dt_last_seen,rel_dt_first_seen,titleno),srcdid,person2);
   //TODO: death-specific parameters like DeathMasterPurpose are not being read?
-	deathParams := PROJECT(mod_access, DeathV2_Services.IParam.DeathRestrictions, OPT);
-	
-	PhoneOwnership.Layouts.Phone_Relationship updateRelatives(doxie_Raw.Layout_RelativeRawOutput l,Doxie.key_death_masterV2_ssa_DID r) :=TRANSFORM
-		SELF.did := l.person2;
-		SELF.titleno := l.titleno;
-		SELF.isDeceased := (BOOLEAN)(r.l_did != 0);
-		SELF.batch_in.did := l.srcdid;
-		SELF.dt_first_seen:=(STRING)l.rel_dt_first_seen,
-		SELF.dt_last_seen:=(STRING)l.rel_dt_last_seen,
-		SELF := [];
-	END;
-	dsRAwDeceased := JOIN(dsUniqueRA, Doxie.key_death_masterV2_ssa_DID,
-							KEYED(LEFT.person2 = RIGHT.l_did) AND
-							NOT DeathV2_Services.Functions.Restricted(RIGHT.src, RIGHT.glb_flag, mod_access.isValidGLB(), deathParams),
-							updateRelatives(LEFT,RIGHT),
-							LEFT OUTER,
-							LIMIT(0),KEEP(1));
+	death_params := PROJECT(mod_access, DeathV2_Services.IParam.DeathRestrictions, OPT);
 
-	dsRelatives:= JOIN(needREA,dsRAwDeceased,
-						LEFT.did = RIGHT.batch_in.did,	
+	dsRAwDeceasedAppend := dx_death_master.Append.byDid(dsUniqueRA, person2, death_params);
+
+  dsRAwDeceased :=
+    PROJECT(dsRAwDeceasedAppend,
+      TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
+        SELF.isDeceased := LEFT.death.is_deceased;
+        SELF.did := LEFT.person2;
+		    SELF.titleno := LEFT.titleno;
+		    SELF.batch_in.did := LEFT.srcdid;
+		    SELF.dt_first_seen :=(STRING)LEFT.rel_dt_first_seen,
+		    SELF.dt_last_seen :=(STRING)LEFT.rel_dt_last_seen,
+		    SELF := [];
+        ));
+
+  dsRelatives:= JOIN(needREA,dsRAwDeceased,
+						LEFT.did = RIGHT.batch_in.did,
 						TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
 									SELF.acctno := LEFT.acctno,
 									SELF.did := RIGHT.did,
@@ -55,14 +53,14 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 									SELF.subj2own_relationship := 'Possible ' + Header.relative_titles.fn_get_str_title(RIGHT.titleno);
 									SELF.isFirstDegree := (BOOLEAN)(RIGHT.titleno IN Header.relative_titles.set_FirstDegreeRelative);
 									SELF.dt_first_seen:=RIGHT.dt_first_seen,
-									SELF.dt_last_seen:=RIGHT.dt_last_seen,										 
+									SELF.dt_last_seen:=RIGHT.dt_last_seen,
 									SELF.batch_in := LEFT.batch_in;
 									SELF:=[]),
-						LIMIT(Constants.MAX_RECORDS,SKIP));				
-										 
+						LIMIT(Constants.MAX_RECORDS,SKIP));
+
 	relativesDid := DEDUP(PROJECT(dsRelatives(did<>0),doxie.layout_references),did,ALL);
 	dsRelativeBestRecs := Doxie.best_records(relativesDid, modAccess := mod_access);
-	ut.PermissionTools.GLB.mac_FilterOutMinors(dsRelativeBestRecs,dsRABest_noMinors,did,,dob);		
+	dsRABest_noMinors := doxie.compliance.MAC_FilterOutMinors(dsRelativeBestRecs, did, dob, mod_access.show_minors);
 	dsRelativesInfo := JOIN(dsRelatives,dsRABest_noMinors,
 							LEFT.did = RIGHT.did,
 							TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
@@ -72,9 +70,9 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 										SELF:=LEFT,
 										SELF:=[]),
 							LIMIT(Constants.MAX_RECORDS,SKIP));
-	// *** Employers										
-	dsPOE 			:= JOIN(needREA,POE.Keys().did.qa,
-							KEYED(LEFT.did = RIGHT.did),	
+	// *** Employers
+	dsPOE_all 			:= JOIN(needREA,POE.Keys().did.qa,
+							KEYED(LEFT.did = RIGHT.did),
 							TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
 										SELF.acctno := LEFT.acctno,
 										SELF.did := LEFT.did,
@@ -91,12 +89,12 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 										SELF:=LEFT,
 										SELF:=[]),
 							LIMIT(Constants.MAX_RECORDS,SKIP));
-										 
+	dsPOE := Suppress.MAC_SuppressSource(dsPOE_all, mod_access);
 	dsPAWContact 	:= JOIN(needREA,PAW.Key_Did,
-							KEYED(LEFT.did = RIGHT.did),	
-							LIMIT(Constants.MAX_RECORDS,SKIP));	
-	dsPAW		 	:= JOIN(dsPAWContact,PAW.Key_contactID,
-							KEYED(LEFT.contact_id = right.contact_id),	
+							KEYED(LEFT.did = RIGHT.did),
+							LIMIT(Constants.MAX_RECORDS,SKIP));
+	dsPAW_pre := JOIN(dsPAWContact,PAW.Key_contactID,
+							KEYED(LEFT.contact_id = right.contact_id),
 							TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
 										SELF.acctno := LEFT.acctno,
 										SELF.did := LEFT.did,
@@ -112,30 +110,30 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 										SELF.src:=RIGHT.source,
 										SELF:=RIGHT,
 										SELF:=LEFT,
-										SELF:=[]),										 
-							LIMIT(Constants.MAX_RECORDS,SKIP));	
-
+										SELF:=[]),
+							LIMIT(Constants.MAX_RECORDS,SKIP));
+  dsPAW := suppress.MAC_SuppressSource(dsPAW_pre,mod_access);
 	PhoneOwnership.Layouts.Phone_Relationship rollEmployer(PhoneOwnership.Layouts.Phone_Relationship l, PhoneOwnership.Layouts.Phone_Relationship r) := TRANSFORM
 		SELF.seq := 0;
 		SELF.dt_first_seen := (STRING)ut.Min2((INTEGER)l.dt_first_seen,(INTEGER)r.dt_first_seen);
 		SELF := l;
 		SELF := r;
 		SELF := [];
-	END;										 							 
+	END;
 	dsEmployerUnfiltered := ROLLUP(SORT(dsPOE + dsPAW,acctno,did,bdid,-dt_last_seen,dt_first_seen),
 						LEFT.acctno=RIGHT.acctno AND
 						LEFT.did=RIGHT.did AND
 						LEFT.bdid=RIGHT.bdid,
-						rollEmployer(LEFT,RIGHT)); 
-	// remove royalty sources					
+						rollEmployer(LEFT,RIGHT));
+	// remove royalty sources
 	dsEmployer := dsEmployerUnfiltered(src NOT IN BatchServices.WorkPlace_Constants.WP_ROYALTY_SOURCE_SET);
 	// *** Business
 	ds_results_w_acct := 	BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(PROJECT(subjectDIDs,TRANSFORM(BIPV2.IDFunctions.rec_SearchInput,SELF.contact_did:=LEFT.did,SELF:=[]))).uid_results_w_acct;
 	ds_BIPIDs := PROJECT(ds_results_w_acct,TRANSFORM( BIPV2.IDlayouts.l_xlink_ids,
 														SELF := LEFT));
-	bizContacts := BIPV2_Build.key_contact_linkids.kFetch(ds_BIPIDs,'S');	
+	bizContacts := BIPV2_Contacts.key_contact_linkids.kFetch(ds_BIPIDs, 'S',,,,, mod_access);
 	dsBiz 		:= JOIN(needREA,bizContacts(contact_did<>0),
-						LEFT.did = RIGHT.contact_did,	
+						LEFT.did = RIGHT.contact_did,
 						TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
 									SELF.acctno := LEFT.acctno,
 									SELF.did := LEFT.did,
@@ -150,28 +148,28 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 									SELF:=RIGHT,
 									SELF:=LEFT,
 									SELF:=[]),
-						LIMIT(Constants.MAX_RECORDS,SKIP));	
+						LIMIT(Constants.MAX_RECORDS,SKIP));
 	PhoneOwnership.Layouts.Phone_Relationship rollBusiness(PhoneOwnership.Layouts.Phone_Relationship l, PhoneOwnership.Layouts.Phone_Relationship r) := TRANSFORM
 		SELF.seq := 0;
 		SELF.dt_first_seen := (STRING)ut.Min2((INTEGER)l.dt_first_seen,(INTEGER)r.dt_first_seen);
 		SELF := l;
 		SELF := r;
 		SELF := [];
-	END;										 							 
+	END;
 	dsBusiness := ROLLUP(SORT(dsBiz,acctno,did,#expand(BIPV2.IDmacros.mac_ListAllLinkids()),-dt_last_seen,dt_first_seen),
 								LEFT.acctno=RIGHT.acctno AND
 								LEFT.did=RIGHT.did AND
 								BIPV2.IDmacros.mac_JoinAllLinkids(),
-								rollBusiness(LEFT,RIGHT)); 										 
-	
+								rollBusiness(LEFT,RIGHT));
+
 	Suppress.MAC_Suppress(dsRelativesInfo,dsRelativesUnrestricted,mod_access.application_type,Suppress.Constants.LinkTypes.DID,DID);
-	// Returns a max of 15 identities including max 2 employers and max 2 businesses	
-	REAB := UNGROUP(TOPN(GROUP(SORT(dsRelativesUnrestricted(fname <> '' AND lname <> ''),acctno,isdeceased,-isfirstdegree,titleno),acctno),Constants.MAXCOUNT_Relative,acctno) & 
-									TOPN(GROUP(SORT(dsEmployer,acctno,-dt_last_seen,dt_first_seen,bdid),acctno),Constants.MAXCOUNT_Employer,acctno) & 
+	// Returns a max of 15 identities including max 2 employers and max 2 businesses
+	REAB := UNGROUP(TOPN(GROUP(SORT(dsRelativesUnrestricted(fname <> '' AND lname <> ''),acctno,isdeceased,-isfirstdegree,titleno),acctno),Constants.MAXCOUNT_Relative,acctno) &
+									TOPN(GROUP(SORT(dsEmployer,acctno,-dt_last_seen,dt_first_seen,bdid),acctno),Constants.MAXCOUNT_Employer,acctno) &
 									TOPN(GROUP(SORT(dsBusiness,acctno,-dt_last_seen,dt_first_seen,#expand(BIPV2.IDmacros.mac_ListAllLinkids())),acctno),Constants.MAXCOUNT_Business,acctno));
-	sortedREAB :=	SORT(PROJECT(dBatchIn,TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,SELF:=LEFT,SELF:=[])) + REAB, 
+	sortedREAB :=	SORT(PROJECT(dBatchIn,TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,SELF:=LEFT,SELF:=[])) + REAB,
 														acctno,subj2own_relationship != Constants.Relationship.SUBJECT,seq=0,seq,isdeceased,-isfirstdegree,titleno=0,titleno);
-	// *** sequence output based on sorted significance of the relationship				
+	// *** sequence output based on sorted significance of the relationship
 	PhoneOwnership.Layouts.Phone_Relationship seqREAB(PhoneOwnership.Layouts.Phone_Relationship l, PhoneOwnership.Layouts.Phone_Relationship r) := TRANSFORM
 		match := l.acctno=r.acctno;
 		SELF.acctno := r.acctno;
@@ -188,9 +186,9 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 	layout_emails := RECORD
 		dsEmails.did;
 		DATASET(PhoneOwnership.Layouts.Emails) emails {MAXCOUNT(Constants.MAX_EMAILS_PER_PERSON)};
-	END;														
+	END;
 
-	layout_emails getEmails (EmailService.Assorted_Layouts.layout_report_rollup l) := TRANSFORM 
+	layout_emails getEmails (EmailService.Assorted_Layouts.layout_report_rollup l) := TRANSFORM
 		SELF.DID := l.DID;
 		SELF.emails := CHOOSEN(PROJECT(l.emails, TRANSFORM(PhoneOwnership.Layouts.Emails,SELF.DID := l.DID,SELF:=LEFT)),Constants.MAX_EMAILS_PER_PERSON);
 	END;
@@ -203,9 +201,9 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 								TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
 								SELF.emailAddress := RIGHT.clean_email,
 								SELF:=LEFT),
-								LEFT OUTER, KEEP(1));																		
-	
-	#IF(PhoneOwnership.Constants.Debug.REAB)			
+								LEFT OUTER, KEEP(1));
+
+	#IF(PhoneOwnership.Constants.Debug.REAB)
 		// OUTPUT(dBatchIn,NAMED('dBatchInREA'));
 		OUTPUT(needREA,NAMED('needREA'));
 		// OUTPUT(dsRA,NAMED('DoxieRelatives'));
@@ -217,8 +215,8 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 		// OUTPUT(dsRelativesInfo,NAMED('dsRelativesInfo'));
 		// OUTPUT(dsPOE,NAMED('dsPOE'));
 		// OUTPUT(dsPAW,NAMED('dsPAW'));
-		OUTPUT(ds_BIPIDs,NAMED('ds_BIPIDs'));	
-		OUTPUT(bizContacts,NAMED('bizContacts'));	
+		OUTPUT(ds_BIPIDs,NAMED('ds_BIPIDs'));
+		OUTPUT(bizContacts,NAMED('bizContacts'));
 		OUTPUT(dsBiz,NAMED('dsBiz'));
 		OUTPUT(dsBusiness,NAMED('dsBusiness'));
 		OUTPUT(dsEmployer,NAMED('dsEmployer'));
@@ -228,4 +226,4 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 		OUTPUT(sequencedREABwEmail,NAMED('sequencedREABwEmail'));
 	#END
 	RETURN sequencedREABwEmail;
-END;	
+END;

@@ -14,6 +14,7 @@ END
 INPUTS
     STRING JOBID: LABEL("Batch Job ID"),DESCRIPTION("The batch Job ID will be appended to the indexes names to avoid collision with previous runs"),DEFAULT("^GLOBAL|JOBID");
     STRING GCID: LABEL("GCID"),DESCRIPTION("GCID"),DEFAULT("^GLOBAL|GCID");
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("Inp");
 
     DATASET dsInputProvider: MAPBYNAME
         FIELD FirstName:LABEL("Provider First Name"),DESCRIPTION("Provider First Name"),OPTIONAL,NULL("");
@@ -88,6 +89,16 @@ END
 
 OUTPUTS
     ACTION dsBuildKeys;
+
+    DATASET PerStats:PREFIX(INPUTS.Prefix),SIDE, WUID 
+        STRING  FieldName;
+        INTEGER FieldPercent;
+    END 
+
+END
+
+VISUALIZE FacilityStats:LABEL("Facility Stats")
+    TABLE FieldPopulationPercentage(PerStats{FieldName, FieldPercent}) : VALUE (FieldName, FieldPercent), LABEL("FieldName", "FieldPercentage");	
 END
 
 GENERATES INLINE
@@ -461,6 +472,10 @@ GENERATES INLINE
         BUILDINDEX(kCityState, OVERWRITE),
         BUILDINDEX(kPayload, OVERWRITE)
     );  
+
+ IMPORT HealthCare;
+ PercentageResults := HealthCare.Mac_Field_Percentage (%dsInputFacility%, '%Prefix%');
+ %^ePerStats% := TABLE (PercentageResults,{%Prefix%FieldName, %Prefix%FieldPercent}); 
 
 ENDGENERATES
 

@@ -1,4 +1,4 @@
-﻿import advo,Risk_Indicators,Standard,ut,PhonesFeedback_Services,iesp,paw_services, AddressFeedback_Services, Royalty, progressive_phone;
+import advo,Risk_Indicators,Standard,ut,PhonesFeedback_Services,iesp,paw_services, AddressFeedback_Services, Royalty, progressive_phone;
 
 export Layout_Rollup := MODULE
 
@@ -144,6 +144,11 @@ export DobRec := RECORD
 	doxie.Layout_HeaderFileSearch.dob;
 	doxie.Layout_HeaderFileSearch.age;
 END;
+
+  export DobRecMasked := record
+    string8 dob;
+    doxie.Layout_HeaderFileSearch.age;
+  end;
 
 export DodRec := RECORD
 	doxie.Layout_HeaderFileSearch.dod;
@@ -302,9 +307,14 @@ export KeyRec_feedback := RECORD
 	DATASET(iesp.ContactPlus.t_ContactPlusProgPhoneRecord) progressive_phones {MAXCOUNT(doxie.rollup_limits.progressivePhone)};
 	unsigned2 output_seq_no;
   BOOLEAN BusinessCreditMatch  := FALSE; // added for SBFE project 
-	
   END;
 
+export KeyRec_feedback_sids := RECORD
+  KeyRec_feedback;
+  UNSIGNED4 global_sid := 0;  // added for CCPA suppression
+  UNSIGNED8 record_sid := 0;  // added for CCPA suppression
+  END;
+  
 // special record structure to support flattened results for batch requests.
 export KeyRec_feedback_batch := RECORD
   string20	acctno := '';
@@ -340,5 +350,11 @@ export KeyRec_feedback_batch := RECORD
 		DATASET(Royalty.Layouts.Royalty) Royalty;
 		UNSIGNED2 householdRecordsAvailable := 0;
 	END;		
+
+  // Layout to handle string DOB masking
+  EXPORT KeyRec_Feedback_Masked := RECORD
+    KeyRec_feedback - dobRecs;
+    dataset(DobRecMasked) dobRecs {MAXCOUNT(doxie.rollup_limits.dobs)};
+  END;
 
 END;

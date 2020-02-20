@@ -103,6 +103,7 @@
 		string10 	spid;
 		string60 	carrier_name;
 		string10 	phone_swap;
+		string6		ocn;
 		unsigned4 global_sid;		//CCPA Requirement
 		unsigned8 record_sid;		//CCPA Requirement
 	END;

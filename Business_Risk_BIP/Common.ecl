@@ -32,6 +32,7 @@ EXPORT Common := MODULE
 		linkIDsOnly := PROJECT(shell, grabLinkIDs(LEFT));
 		
 		RETURN linkIDsOnly;
+    
 	END;
 	
 	
@@ -39,190 +40,193 @@ EXPORT Common := MODULE
 	// 1. slim down the header layout to only the fields we need in business_risk_bip queries
   // 2. rollup the duplicate records per source where the only difference between the records is the vl_id
 	EXPORT mac_slim_header (RawData, SlimData) := MACRO
-  SlimData1 := table(RawData,
-{
-uniqueid,
-ultid,
-orgid,
-seleid,
-proxid,
-powid,
-empid,
-dotid,
-UltScore,
-OrgScore,
-SELEScore,
-ProxScore,
-POWScore,
-EmpScore,
-DotScore,
-UltWeight,
-OrgWeight,
-SELEWeight,
-ProxWeight,
-POWWeight,
-EmpWeight,
-DotWeight,
-company_name,
-company_fein,
-company_phone,
-prim_range,
-predir,
-prim_name,
-addr_suffix,
-postdir,
-unit_desig,
-sec_range,
-p_city_name,
-v_city_name,
-st,
-zip,
-zip4,
-fips_county,
-geo_lat,
-geo_long,
-dt_first_seen,
-dt_last_seen,
-dt_vendor_first_reported,
-dt_vendor_last_reported,
-source,
-fetch_error_code,
-has_lgid,
-is_sele_level,
-is_org_level,
-is_ult_level,
-parent_proxid,
-sele_proxid,
-org_proxid,
-ultimate_proxid,
-levels_from_top,
-nodes_below,
-nodes_total,
-ParentAboveSELE,
-sele_gold,
-ult_seg,
-org_seg,
-sele_seg,
-prox_seg,
-pow_seg,
-dba_name,
-company_org_structure_derived,
-company_sic_code1,
-company_sic_code2,
-company_sic_code3,
-company_sic_code4,
-company_sic_code5,
-company_naics_code1,
-company_naics_code2,
-company_naics_code3,
-company_naics_code4,
-company_naics_code5,
-company_inc_state,
-contact_did,
-fname,
-lname,
-contact_phone,
-contact_ssn,
-dt_first_seen1 := min(group, dt_first_seen),            // get the earliest first seen in the group
-dt_last_seen1 := max(group, dt_last_seen),             // get the latest last seen in the group
-dt_vendor_first_reported1 := min(group,dt_vendor_first_reported), // get the earliest first reported in the group
-dt_vendor_last_reported1 := max(group,dt_vendor_last_reported)  // get the latest last reported in the group
-},
+		SlimData1 := TABLE(RawData,
+			{
+				uniqueid,
+				ultid,
+				orgid,
+				seleid,
+				proxid,
+				powid,
+				empid,
+				dotid,
+				UltScore,
+				OrgScore,
+				SELEScore,
+				ProxScore,
+				POWScore,
+				EmpScore,
+				DotScore,
+				UltWeight,
+				OrgWeight,
+				SELEWeight,
+				ProxWeight,
+				POWWeight,
+				EmpWeight,
+				DotWeight,
+				company_name,
+				company_fein,
+				company_phone,
+				prim_range,
+				predir,
+				prim_name,
+				addr_suffix,
+				postdir,
+				unit_desig,
+				sec_range,
+				p_city_name,
+				v_city_name,
+				st,
+				zip,
+				zip4,
+				fips_county,
+				geo_lat,
+				geo_long,
+				dt_first_seen,
+				dt_last_seen,
+				dt_vendor_first_reported,
+				dt_vendor_last_reported,
+				source,
+				fetch_error_code,
+				has_lgid,
+				is_sele_level,
+				is_org_level,
+				is_ult_level,
+				parent_proxid,
+				sele_proxid,
+				org_proxid,
+				ultimate_proxid,
+				levels_from_top,
+				nodes_below,
+				nodes_total,
+				ParentAboveSELE,
+				sele_gold,
+				ult_seg,
+				org_seg,
+				sele_seg,
+				prox_seg,
+				pow_seg,
+				dba_name,
+				company_org_structure_derived,
+				company_sic_code1,
+				company_sic_code2,
+				company_sic_code3,
+				company_sic_code4,
+				company_sic_code5,
+				company_naics_code1,
+				company_naics_code2,
+				company_naics_code3,
+				company_naics_code4,
+				company_naics_code5,
+				company_ticker,
+				company_inc_state,
+				contact_did,
+				fname,
+				lname,
+				contact_phone,
+				contact_ssn,
+				dt_first_seen1 := min(group, dt_first_seen),						// get the earliest first seen in the group
+				dt_last_seen1 := max(group, dt_last_seen),						 // get the latest last seen in the group
+				dt_vendor_first_reported1 := min(group,dt_vendor_first_reported), // get the earliest first reported in the group
+				dt_vendor_last_reported1 := max(group,dt_vendor_last_reported)	// get the latest last reported in the group
+			},
+			// group by:
+			uniqueid,
+			ultid,
+			orgid,
+			seleid,
+			proxid,
+			powid,
+			empid,
+			dotid,
+			UltScore,
+			OrgScore,
+			SELEScore,
+			ProxScore,
+			POWScore,
+			EmpScore,
+			DotScore,
+			UltWeight,
+			OrgWeight,
+			SELEWeight,
+			ProxWeight,
+			POWWeight,
+			EmpWeight,
+			DotWeight,
+			company_name,
+			company_fein,
+			company_phone,
+			prim_range,
+			predir,
+			prim_name,
+			addr_suffix,
+			postdir,
+			unit_desig,
+			sec_range,
+			p_city_name,
+			v_city_name,
+			st,
+			zip,
+			zip4,
+			fips_county,
+			geo_lat,
+			geo_long,
+			dt_first_seen,
+			dt_last_seen,
+			dt_vendor_first_reported,
+			dt_vendor_last_reported,
+			source,
+			fetch_error_code,
+			has_lgid,
+			is_sele_level,
+			is_org_level,
+			is_ult_level,
+			parent_proxid,
+			sele_proxid,
+			org_proxid,
+			ultimate_proxid,
+			levels_from_top,
+			nodes_below,
+			nodes_total,
+			ParentAboveSELE,
+			sele_gold,
+			ult_seg,
+			org_seg,
+			sele_seg,
+			prox_seg,
+			pow_seg,
+			dba_name,
+			company_org_structure_derived,
+			company_sic_code1,
+			company_sic_code2,
+			company_sic_code3,
+			company_sic_code4,
+			company_sic_code5,
+			company_naics_code1,
+			company_naics_code2,
+			company_naics_code3,
+			company_naics_code4,
+			company_naics_code5,
+			company_ticker,
+			company_inc_state,
+			contact_did,
+			fname,
+			lname,
+			contact_phone,
+			contact_ssn
+		);
 
-uniqueid,
-ultid,
-orgid,
-seleid,
-proxid,
-powid,
-empid,
-dotid,
-UltScore,
-OrgScore,
-SELEScore,
-ProxScore,
-POWScore,
-EmpScore,
-DotScore,
-UltWeight,
-OrgWeight,
-SELEWeight,
-ProxWeight,
-POWWeight,
-EmpWeight,
-DotWeight,
-company_name,
-company_fein,
-company_phone,
-prim_range,
-predir,
-prim_name,
-addr_suffix,
-postdir,
-unit_desig,
-sec_range,
-p_city_name,
-v_city_name,
-st,
-zip,
-zip4,
-fips_county,
-geo_lat,
-geo_long,
-dt_first_seen,
-dt_last_seen,
-dt_vendor_first_reported,
-dt_vendor_last_reported,
-source,
-fetch_error_code,
-has_lgid,
-is_sele_level,
-is_org_level,
-is_ult_level,
-parent_proxid,
-sele_proxid,
-org_proxid,
-ultimate_proxid,
-levels_from_top,
-nodes_below,
-nodes_total,
-ParentAboveSELE,
-sele_gold,
-ult_seg,
-org_seg,
-sele_seg,
-prox_seg,
-pow_seg,
-dba_name,
-company_org_structure_derived,
-company_sic_code1,
-company_sic_code2,
-company_sic_code3,
-company_sic_code4,
-company_sic_code5,
-company_naics_code1,
-company_naics_code2,
-company_naics_code3,
-company_naics_code4,
-company_naics_code5,
-company_inc_state,
-contact_did,
-fname,
-lname,
-contact_phone,
-contact_ssn
-);
+		temp_layout := record
+			recordof(SlimData1) - dt_first_seen1 - dt_last_seen1 - dt_vendor_first_reported1 - dt_vendor_last_reported1;
+		end;
 
-temp_layout := record
-  recordof(SlimData1) - dt_first_seen1 - dt_last_seen1 - dt_vendor_first_reported1 - dt_vendor_last_reported1;
-end;
-
-SlimData := project(SlimData1, transform(temp_layout,
-self.dt_first_seen := left.dt_first_seen1;
-self.dt_last_seen := left.dt_last_seen1;
-self.dt_vendor_first_reported := left.dt_vendor_first_reported1;
-self.dt_vendor_last_reported := left.dt_vendor_last_reported1;
-self := left));
+		SlimData := project(SlimData1, transform(temp_layout,
+			self.dt_first_seen := left.dt_first_seen1;
+			self.dt_last_seen := left.dt_last_seen1;
+			self.dt_vendor_first_reported := left.dt_vendor_first_reported1;
+			self.dt_vendor_last_reported := left.dt_vendor_last_reported1;
+			self := left));
+			
 	ENDMACRO;
 	
 	// Have this here to be able to universally change between either Y/N or 1/0 depending on what product decides
@@ -501,6 +505,7 @@ OUTPUT(converted, NAMED('Converted_Set'));
 		END;
 	
 		RETURN (PROJECT(sources, groupMySources(LEFT)));
+    
 	ENDMACRO;
 	
 	// The following takes the somewhat ugly Corporations Business Type data and attempts to normalize it up into nicer groups.
@@ -925,6 +930,25 @@ OUTPUT(converted, NAMED('Converted_Set'));
 			RETURN SalesIndex;
 		END;	
 
+  EXPORT INTEGER getSalesRangeIndexV31(INTEGER SalesAmount) := FUNCTION
+			SalesIndex := MAP(
+					SalesAmount = -1																	=> -1,
+					SalesAmount = 0																		=>  0,
+					SalesAmount >= 1 AND SalesAmount < 25000			    =>  5,
+					SalesAmount >= 25000 AND SalesAmount < 50000			=> 10,
+					SalesAmount >= 50000 AND SalesAmount < 100000 		=> 20,
+					SalesAmount >= 100000 AND SalesAmount < 150000 	  => 30,
+					SalesAmount >= 150000 AND SalesAmount < 250000 	  => 40,
+					SalesAmount >= 250000 AND SalesAmount < 500000 	  => 50,
+					SalesAmount >= 500000 AND SalesAmount < 1000000 	=> 60,
+					SalesAmount >= 1000000 AND SalesAmount < 2500000 	=> 70,
+					SalesAmount >= 2500000 AND SalesAmount < 5000000 	=> 80,
+					SalesAmount >= 5000000 AND SalesAmount < 10000000 => 90,
+					SalesAmount >= 10000000 			                    => 100,
+																														-1);
+			RETURN SalesIndex;
+		END;	
+    
 	EXPORT INTEGER getEmployeeRangeIndex(INTEGER EmployeeCount) := FUNCTION
 			EmployeeIndex := MAP(
 					EmployeeCount = -1																 => -1,
@@ -950,6 +974,22 @@ OUTPUT(converted, NAMED('Converted_Set'));
 					EmployeeCount >= 250000 AND EmployeeCount < 300000 => 19,
 					EmployeeCount >= 300000														 => 20,
 																															 -1);
+			RETURN EmployeeIndex;
+		END;	
+    
+    EXPORT INTEGER getEmployeeRangeIndexV31(INTEGER EmployeeCount) := FUNCTION
+			EmployeeIndex := MAP(
+					EmployeeCount = -1													 => -1,
+          EmployeeCount = 0                            => 0,
+					EmployeeCount = 1 			                     => 10,
+					EmployeeCount >= 2 AND EmployeeCount < 5 		 => 20,
+					EmployeeCount >= 5 AND EmployeeCount < 10 	 => 30,
+					EmployeeCount >= 10 AND EmployeeCount < 20 	 => 40,
+					EmployeeCount >= 20 AND EmployeeCount < 50 	 => 50,
+					EmployeeCount >= 50 AND EmployeeCount < 100  => 60,
+					EmployeeCount >= 100 AND EmployeeCount < 250 => 70,
+					EmployeeCount >= 250		                     => 80,
+																											 -1);
 			RETURN EmployeeIndex;
 		END;	
 		
@@ -1020,6 +1060,11 @@ EXPORT fn_isFoundInCompanyName( STRING CompanyName, STRING PersonName ) := FUNCT
     RETURN IF (length (strt) < max_len, strt, strt_trimmed); 
   END;
 	
-  
+	EXPORT isMarketingAllowedProperty(string src, string st = '') := FUNCTION
+		restrictedStates := ['ID','IL','KS','NM','SC','WA', ''];
+		restrictedSources := [MDR.sourceTools.src_LnPropV2_Lexis_Asrs,MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs];
+		isAllowed := 	NOT (src IN restrictedSources AND st IN restrictedStates);
+		RETURN isAllowed;
+	END;
   
 END;

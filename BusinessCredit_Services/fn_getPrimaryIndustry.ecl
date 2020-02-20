@@ -1,16 +1,17 @@
-﻿IMPORT AutoStandardI, BIPV2, Business_Credit, iesp, ut, MDR, BusinessCredit_Services;
+﻿IMPORT AutoStandardI, BIPV2, Business_Credit, BusinessCredit_Services, doxie, iesp, MDR, ut;
+
 // efficiency here in last 2 params being defaulted
 EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids, 
-																	String DatapermissionMask, 
-																	Boolean IncludeBusinessCredit = FALSE, //data team always pass in IncludeBusinessCredit = TRUE for this.
-																	STRING FETCHLEVEL = BIPV2.IDconstants.Fetch_Level_SELEID																
-																	) := MODULE
-																	// note:  in addition to this module being called from BusinessCredit_Services.CreditReport_Records
-																	// Business_Credit_Scoring.fn_GetDBTAverage calls this BusinessCredit_Services.fn_getPrimaryIndustry from thor side
-																	// thus last 2 params defaulted purposely.
+                             doxie.IDataAccess mod_access, 
+                             Boolean IncludeBusinessCredit = FALSE, //data team always pass in IncludeBusinessCredit = TRUE for this.
+                             STRING FETCHLEVEL = BIPV2.IDconstants.Fetch_Level_SELEID																
+                             ) := MODULE
+                             // note:  in addition to this module being called from BusinessCredit_Services.CreditReport_Records
+                             // Business_Credit_Scoring.fn_GetDBTAverage calls this BusinessCredit_Services.fn_getPrimaryIndustry from thor side
+                             // thus last 2 params defaulted purposely.
 																	
 	// we need to select primary industry code from BIP unless Business is an SBFE Singleton, In which case use SBFE.
-	BOOLEAN buzCreditAccess	:= BusinessCredit_Services.Functions.fn_useBusinessCredit(DatapermissionMask ,IncludeBusinessCredit);	
+	BOOLEAN buzCreditAccess	:= BusinessCredit_Services.Functions.fn_useBusinessCredit(mod_access.DatapermissionMask ,IncludeBusinessCredit);	
 
 	slim_layout := RECORD
 		iesp.share.t_BusinessIdentity;
@@ -24,9 +25,9 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 	END;
 	
 	//Fetching Business Header Records. //  efficiency remove additional kfetch here.
-	ds_busHeaderRecsSlim := BusinessCredit_Services.Functions.BipKfetch(Linkids,FETCHLEVEL,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT,DatapermissionMask).bipbusHeaderRecsSlim;
+	ds_busHeaderRecsSlim := BusinessCredit_Services.Functions.BipKfetch(Linkids,mod_access,FETCHLEVEL,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT).bipbusHeaderRecsSlim;
 	
-	ds_sbfeLinkRecs 		:=   BusinessCredit_Services.Functions.BipKfetch(Linkids, FETCHLEVEL,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT,DatapermissionMask).BusCreditHeaderRecs;  
+	ds_sbfeLinkRecs 		:=   BusinessCredit_Services.Functions.BipKfetch(Linkids,mod_access,FETCHLEVEL,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT).BusCreditHeaderRecs;  
 
 	ds_sbfeSICNAICSRecs	:= JOIN(ds_sbfeLinkRecs , Business_Credit.Key_BusinessClassification(), 
 																			BusinessCredit_Services.Macros.mac_JoinBusAccounts(),  

@@ -20,7 +20,7 @@ EXPORT get_dids (dataset(AutoHeaderV2.layouts.unprocessed_input) ds_search_in, i
 	ds_search := project(ds_search_in, Preprocess (Left));
 
 	// read here from stored
-	integer libVersion := AutoHeaderV2.Constants.LibVersion.LEGACY : STORED('SearchLibraryVersion');
+	integer libVersion := AutoHeaderV2.Constants.LibVersion.SALT : STORED('SearchLibraryVersion');
 	lib_local := LIBCALL_header (ds_search, search_code, libVersion);
 
 	// remote search (note: no checking for temp_adl_service_ip='')

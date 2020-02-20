@@ -1,5 +1,4 @@
-import risk_indicators, didville,doxie,FCRA,header,header_quick,header_SlimSort,watchdog,ut,DID_Add,address,
-       gong,drivers,mdr,riskwise,suppress;
+﻿import risk_indicators, doxie;
 
 export AMLcommonFunction(grouped DATASET(risk_indicators.Layout_Output) with_did, 
 							unsigned1 dppa, unsigned1 glb, boolean isUtility=false, 
@@ -14,13 +13,27 @@ export AMLcommonFunction(grouped DATASET(risk_indicators.Layout_Output) with_did
 							unsigned4 EverOccupant_StartDate,
 							unsigned8 BSOptions,
 							unsigned3 LastSeenThreshold = risk_indicators.iid_constants.oneyear,
-							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission
+							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+                            unsigned1 LexIdSourceOptout = 1,
+                            string TransactionID = '',
+                            string BatchUID = '',
+                            unsigned6 GlobalCompanyId = 0
 							) :=  FUNCTION
 
-
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := ^.glb;
+	EXPORT dppa := ^.dppa;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 // returns the full list of raw header records for that did																								
-with_header := risk_indicators.iid_getHeader(with_did, dppa, glb, isFCRA, ln_branded, ExactMatchLevel, DataRestriction, CustomDataFilter, BSversion, DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, LastSeenThreshold);
+with_header := risk_indicators.iid_getHeader(with_did, dppa, glb, isFCRA, ln_branded, ExactMatchLevel, DataRestriction, CustomDataFilter, BSversion, DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, LastSeenThreshold,
+																				LexIdSourceOptout := LexIdSourceOptout, 
+																				TransactionID := TransactionID, 
+																				BatchUID := BatchUID, 
+																				GlobalCompanyID := GlobalCompanyID);
 
 
 // append address hierarchy seq # to the addresses from the header
@@ -30,7 +43,7 @@ with_hierarchy := Risk_Indicators.iid_append_address_hierarchy(with_header, isFC
 //  call to get miltary flags if shell version 5.0 or higher
 header_with_Military_addresses   := risk_indicators.iid_GetMilitaryAddr(with_hierarchy);
 
-with_ssn_addr_velocity := risk_indicators.getVelocityHist(header_with_Military_addresses, isFCRA, dppa, DataRestriction, BSversion);//  history BocaShell stuff
+with_ssn_addr_velocity := risk_indicators.getVelocityHist(header_with_Military_addresses, isFCRA, dppa, DataRestriction, BSversion, mod_access := mod_access);//  history BocaShell stuff
 
 	
 with_addr_history := risk_indicators.Boca_Shell_Address_History(with_ssn_addr_velocity, isFCRA, datarestriction);
@@ -53,7 +66,7 @@ MoverDIDs := join(with_hierarchy, Movers,
 GetZipDist := GetMoveDist(MoverDIDs);
 
 // iid_getSSNFlags was located prior to rolled_header. When entering a 4 byte ssn, flags were being set before the ssn was fixed.
-with_ssn_flags := risk_indicators.iid_getSSNFlags(rolled_header_normal, dppa, glb, isFCRA, runSSNCodes, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission );
+with_ssn_flags := risk_indicators.iid_getSSNFlags(rolled_header_normal, dppa, glb, isFCRA, runSSNCodes, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission, mod_access := mod_access);
 
 Indivslim := record
 

@@ -1,4 +1,4 @@
-import easi, ut, address, riskwise, risk_indicators, std;
+﻿import easi, ut, riskwise, risk_indicators, std;
 
 export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam, 
 		dataset(RiskWise.Layout_CD2I) indata,
@@ -86,7 +86,7 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 			cus_SHIPMODE           := ri.cd2i.shipmode;
 										
 			IP_topleveldomain      := le.ip2o.topleveldomain;
-			IP_connection          := StringLib.StringtoUppercase(trim(le.ip2o.ipconnection));
+			IP_connection          := STD.Str.ToUppercase(trim(le.ip2o.ipconnection));
 			IP_continent           := le.ip2o.continent;
 			IP_countrycode         := le.ip2o.countrycode;
 			IP_state               := le.ip2o.state;
@@ -179,8 +179,8 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 		 /******** end of AVS translation *********/
 
 		 v_in_avs_bad := (INTEGER)( v_in_avs in ['N','M','V','6','D','U'] );
-		 v_in_pmt := StringLib.StringtoUppercase(cus_pmttype);
-		 v_in_shipmode := StringLib.StringtoUppercase(cus_shipmode);
+		 v_in_pmt := STD.Str.ToUppercase(cus_pmttype);
+		 v_in_shipmode := STD.Str.ToUpperCase(cus_shipmode);
 		 v_in_AcqChannel := trim(cus_ACQ_CHANNE);
 
 
@@ -563,7 +563,7 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 			'WRONG'
 		);
 
-		v_add_apt_f := (StringLib.StringtoUppercase(dwelling_type)='A');
+		v_add_apt_f := (STD.Str.ToUpperCase(dwelling_type)='A');
 		v_add_mil_f := (zip_type = '3');
 
 
@@ -640,7 +640,7 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 
 		/************** IP ***************/
 
-		v_ip_topDomain := StringLib.StringtoUppercase(trim(IP_topleveldomain));
+		v_ip_topDomain := STD.Str.ToUpperCase(trim(IP_topleveldomain));
 		v_ip_domain_GovMil := (INTEGER)(v_ip_topDomain in ['GOV','MIL']);
 
 
@@ -655,8 +655,8 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 		);
 
 		 v_IP_continent   := trim(IP_continent);
-		 v_IP_countrycode := StringLib.StringtoUppercase(trim(IP_countrycode));
-		 v_ip_state := StringLib.StringtoUppercase(trim(IP_state));
+		 v_IP_countrycode := STD.Str.ToUpperCase(trim(IP_countrycode));
+		 v_ip_state := STD.Str.ToUpperCase(trim(IP_state));
 
 
 		vs_ip_connection_i_m := case( v_ip_connection_i,
@@ -1070,6 +1070,7 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 		self := le.Bill_To_Out.iid;
 		self := le.Bill_To_Out.shell_input;
 		self := le.bill_to_out;
+		self:=[];
 	END;
 	iidBT := project(clam, into_layout_output(left));
 
@@ -1106,6 +1107,7 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 		self := le.Ship_To_Out.iid;
 		self := le.Ship_To_Out.shell_input;
 		self := le.ship_to_out;
+		self :=[];
 	END;
 	iidST := project(clam, into_layout_output2(left));
 

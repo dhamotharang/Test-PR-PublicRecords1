@@ -1,4 +1,4 @@
-import riskwise, doxie, risk_indicators, advo, ut, header, address;
+import riskwise, dx_header, risk_indicators, advo, header, address, Data_Services;
 
 // function that appends address flags for a given address
 // accepts a dataset of header addresses or inquiry addresses, can include duplicate records
@@ -93,7 +93,8 @@ wAdvo  := join(wHRIRoll, Advo.Key_Addr1_FCRA,
 		getAdvoFlags(left, right), LEFT OUTER,
 		KEEP(1), atmost(riskwise.max_atmost));
 
-layout_working addUnitCount(layout_working le, doxie.Key_FCRA_AptBuildings ri) := transform
+key_apt_buildings := dx_Header.key_AptBuildings(data_services.data_env.iFCRA);
+layout_working addUnitCount(layout_working le, key_apt_buildings ri) := transform
 	SELF.addr_flags.unit_count := ri.apt_cnt;
 	
 	// clean the address here so that we can get valid, dwelling type
@@ -106,7 +107,7 @@ layout_working addUnitCount(layout_working le, doxie.Key_FCRA_AptBuildings ri) :
 	SELF := le;
 end;
 
-wUnitCount := join(wADVO, doxie.Key_FCRA_AptBuildings,	
+wUnitCount := join(wADVO, key_apt_buildings,	
 	left.zip <>'' and trim(left.prim_name)<>'' and
 		keyed(left.prim_range=right.prim_range) and 
 		keyed(left.prim_name=right.prim_name) and

@@ -28,7 +28,7 @@ export getBTSTrelInfo(grouped DATASET(Layout_CIID_BtSt_Output) indata) := FUNCTI
 		boolean   isRelative;
 		boolean   isAssociate;
 		string10 confidence;
-		relationship.layout_GetRelationship.InterfaceOuput;
+		Relationship.layout_GetRelationship.InterfaceOutput_new;
 	end;
 
 	max_relatives := 15;
@@ -38,7 +38,7 @@ export getBTSTrelInfo(grouped DATASET(Layout_CIID_BtSt_Output) indata) := FUNCTI
 	indata_ungrpd_bt := dedup(sort(indata_ungrpd,bill_to_output.did), bill_to_output.did);
 	justBTDids := PROJECT(indata_ungrpd_bt(bill_to_output.did<>0), 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.did := LEFT.bill_to_output.DID));
-	rellyids := Relationship.proc_GetRelationship(justBTDids,TopNCount:=100,
+	rellyids := Relationship.proc_GetRelationshipNeutral(justBTDids,TopNCount:=100,
 				RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result; 
 	//gets relatives for the bill to did
 	bt_rel := join(indata, rellyids, 
@@ -56,9 +56,9 @@ export getBTSTrelInfo(grouped DATASET(Layout_CIID_BtSt_Output) indata) := FUNCTI
 	indata_ungrpd_st := dedup(sort(indata_ungrpd,ship_to_output.did), ship_to_output.did);											
 	justSTDids := PROJECT(indata_ungrpd_st(ship_to_output.did<>0), 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.did := LEFT.ship_to_output.DID));
-	rellyids_st := Relationship.proc_GetRelationship(justSTDids,TopNCount:=100,
+	rellyids_st_neutral := Relationship.proc_GetRelationshipNeutral(justSTDids,TopNCount:=100,
 				RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result; 	
-				
+	rellyids_st := Relationship.functions_getRelationship.convertNeutralToFlat_new(rellyids_st_neutral);
 	//gets the relatives for the ship to did
 	st_rel := join(indata, rellyids_st, 
 									left.ship_to_output.did<>0 and 

@@ -1,4 +1,4 @@
-import ut, address, gateway;
+﻿import gateway, doxie, risk_indicators;
 
 export InstantId_BtSt_Function(dataset(risk_indicators.Layout_CIID_BtSt_In) inf, dataset(Gateway.Layouts.Config) gateways,
 													unsigned1 dppa, unsigned1 glb, 
@@ -12,9 +12,19 @@ export InstantId_BtSt_Function(dataset(risk_indicators.Layout_CIID_BtSt_In) inf,
 													string50 DataRestriction = risk_indicators.iid_constants.default_DataRestriction,
 													boolean runDLverification=false,
 													string50 DataPermission = risk_indicators.iid_constants.default_DataPermission,
-													unsigned8 BSOptions = 0
+													unsigned8 BSOptions = 0,
+                                                    unsigned1 LexIdSourceOptout = 1,
+                                                    string TransactionID = '',
+                                                    string BatchUID = '',
+                                                    unsigned6 GlobalCompanyId = 0
 													) := FUNCTION
 
+   mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
+    
 seqrec := record
 	inf;
 	unsigned4	seq;
@@ -27,7 +37,7 @@ seqrec into_seq(inf L) := transform
 end;
 
 	//CBD 51 - if digital order then run Doxie Best
-appendedSTinfo := Risk_Indicators.Boca_Shell_BtSt_ImputingST(inf, glb, dppa, ,DataRestriction);	
+appendedSTinfo := Risk_Indicators.Boca_Shell_BtSt_ImputingST(inf, glb, dppa, ,DataRestriction, mod_access);	
 inf_info := if(bsversion >= 51, appendedSTinfo, inf); 
 
 fs := project(inf_info, into_seq(LEFT));
@@ -43,7 +53,9 @@ outf1 := risk_indicators.InstantID_Function(df, gateways, dppa, glb, isUtility, 
 									suppressNearDups, require2Ele, from_BIID, isFCRA, ExcludeWatchLists, from_IT1O, ofac_version,
 									include_ofac, include_additional_watchlists, global_watchlist_threshold, dob_radius, 
 									BSversion, in_DataRestriction := DataRestriction, in_runDLverification:=runDLverification,
-									in_DataPermission := DataPermission, in_BSOptions := bsOptions);
+									in_DataPermission := DataPermission, in_BSOptions := bsOptions,
+                                    LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, 
+                                    BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 
 outseq := record
 	unsigned4	 seq;

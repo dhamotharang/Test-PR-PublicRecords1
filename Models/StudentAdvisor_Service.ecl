@@ -45,7 +45,7 @@
 */
 /*--INFO-- Contains Student Advisor 3, 5 and 9 */
 
-import risk_indicators, riskwise, ut, gateway, AutoStandardI;
+import risk_indicators, riskwise, ut, gateway, AutoStandardI, STD;
 
 
 export StudentAdvisor_Service := MACRO
@@ -96,7 +96,11 @@ export StudentAdvisor_Service := MACRO
 	'DOBRadius',	
 
 	'isStudent',					// may need to change this to the dataset that dermot is passing, or pick the field out of the dataset and pass as boolean here
-	'gateways'));
+	'gateways',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 string30  account_value := '' 		: stored('AccountNumber');
 string30  first_value := ''     		: stored('FirstName');
@@ -123,7 +127,7 @@ string30  formerlast_value := ''   	: stored('FormerName');
 unsigned1 DPPA_Purpose := 0 			: stored('DPPAPurpose');
 unsigned1 GLB_Purpose := AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
 string5   industry_class_val := '' 	: stored('IndustryClass');
-		industry_class_value := StringLib.StringToUpperCase(industry_class_val);
+		industry_class_value := STD.Str.ToUpperCase(industry_class_val);
 boolean   ln_branded_value := false 	: stored('LnBranded');
 unsigned3 history_date := 999999 		: stored('HistoryDateYYYYMM');
 boolean   ofac_only := true 			: stored('OfacOnly');
@@ -145,6 +149,12 @@ boolean   isStudent := false			: stored('isStudent');
 
 dobradius := if(usedobfilter,dobradius0,-1);
 gateways := Gateway.Configuration.Get();
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 if( OFACVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
@@ -175,14 +185,14 @@ risk_indicators.Layout_Input into(d l, integer C) := TRANSFORM
 	
 	self.ssn := ssn_val;
 	self.dob := dob_val;
-	self.age := if (age_value = 0 and (integer)dob_val != 0, (string3)ut.GetAgeI((integer)dob_val), (string3)age_value);
+	self.age := if (age_value = 0 and (integer)dob_val != 0, (string3)ut.Age((integer)dob_val), (string3)age_value);
 	self.phone10 := hphone_val;
 	self.wphone10 := wphone_val;
 	
-	self.fname := stringlib.stringtouppercase(first_value);
-	self.mname := stringlib.stringtouppercase(middle_value);
-	self.lname := stringlib.stringtouppercase(last_value);
-	self.suffix := stringlib.stringtouppercase(suffix_value);
+	self.fname := STD.Str.touppercase(first_value);
+	self.mname := STD.Str.touppercase(middle_value);
+	self.lname := STD.Str.touppercase(last_value);
+	self.suffix := STD.Str.touppercase(suffix_value);
 	
 	self.in_streetAddress := addr_value;
 	self.in_city := city_value;
@@ -210,14 +220,14 @@ risk_indicators.Layout_Input into(d l, integer C) := TRANSFORM
 	
 	self.country := country_value;
 	
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(drlcstate_value);
+	self.dl_number := STD.Str.touppercase(dl_num_clean);
+	self.dl_state := STD.Str.touppercase(drlcstate_value);
 	
 	self.email_address := email_value;
 	self.ip_address := ip_value;
 	
-	self.employer_name := stringlib.stringtouppercase(cmpy_value);
-	self.lname_prev := stringlib.stringtouppercase(formerlast_value);
+	self.employer_name := STD.Str.touppercase(cmpy_value);
+	self.lname_prev := STD.Str.touppercase(formerlast_value);
 	self.historydate := history_date;
 end;
 prep := PROJECT(d,into(left,counter));
@@ -225,11 +235,19 @@ prep := PROJECT(d,into(left,counter));
 
 iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, ofac_only,
 	suppressNearDups, require2Ele, from_biid, isFCRA, excludewatchlists, from_IT1O, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius,
-	in_DataRestriction := DataRestriction, in_DataPermission := DataPermission
+	in_DataRestriction := DataRestriction, in_DataPermission := DataPermission,
+    LexIdSourceOptout := LexIdSourceOptout, 
+    TransactionID := TransactionID, 
+    BatchUID := BatchUID, 
+    GlobalCompanyID := GlobalCompanyID
 );//check parameters here
 
 clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, false, false, true, true,
-DataRestriction := DataRestriction, DataPermission := DataPermission);// set some to false?
+DataRestriction := DataRestriction, DataPermission := DataPermission,
+LexIdSourceOptout := LexIdSourceOptout, 
+TransactionID := TransactionID, 
+BatchUID := BatchUID, 
+GlobalCompanyID := GlobalCompanyID);// set some to false?
 
 ret := Models.FD9607_1_0(clam, ofacSearching, isStudent, addtl_watchlists);
 

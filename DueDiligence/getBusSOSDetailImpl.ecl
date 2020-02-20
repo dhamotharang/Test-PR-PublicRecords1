@@ -189,39 +189,6 @@ EXPORT getBusSOSDetailImpl := MODULE
     
     
     
-    EXPORT getIncoprorationWithLooseLaws(inBusiness, filteredData) := FUNCTIONMACRO
-        projectLooseLaws := PROJECT(filteredData, TRANSFORM({BOOLEAN looseLawState, RECORDOF(LEFT)}, 
-                                                            SELF.looseLawState := LEFT.corp_inc_state IN DueDiligence.Constants.STATES_WITH_LOOSE_INCORPORATION_LAWS;
-                                                            SELF := LEFT;
-                                                            SELF := [];));
-        
-        sortLooseLaws := SORT(projectLooseLaws, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
-        
-        rollLooseLaws := ROLLUP(sortLooseLaws,
-                                LEFT.seq = RIGHT.seq AND
-                                LEFT.ultID = RIGHT.ultID AND
-                                LEFT.orgID = RIGHT.orgID AND
-                                LEFT.seleID = RIGHT.seleID,
-                                TRANSFORM({RECORDOF(LEFT)},
-                                            SELF.looseLawState := LEFT.looseLawState OR RIGHT.looseLawState;
-                                            SELF := LEFT;));
-                                            
-        addIncLooseLaws := JOIN(inBusiness, rollLooseLaws,
-                                LEFT.seq = RIGHT.seq AND
-                                LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-                                LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-                                LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
-                                TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                          SELF.incorpWithLooseLaws := LEFT.incorpWithLooseLaws OR RIGHT.looseLawState;
-                                          SELF := LEFT;),
-                                LEFT OUTER,
-                                ATMOST(1));
-                                
-        RETURN addIncLooseLaws;
-    ENDMACRO;
-    
-    
-    
     EXPORT getRegisteredAgents(inBusiness, filteredData) := FUNCTIONMACRO
         sosAgent := filteredData((corp_ra_cname1 <> DueDiligence.Constants.EMPTY OR corp_ra_lname1 <> DueDiligence.Constants.EMPTY) AND corp_ra_prim_name <> DueDiligence.Constants.EMPTY);
         sortSosAgent := SORT(sosAgent, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_ra_prim_range, corp_ra_predir, corp_ra_prim_name, corp_ra_addr_suffix, corp_ra_postdir, corp_ra_zip5, dt_first_seen);

@@ -1,4 +1,4 @@
-IMPORT Risk_indicators, ut, LN_PropertyV2_Services;
+﻿IMPORT Risk_indicators, ut, LN_PropertyV2_Services, AML;
 
 // EXPORT IndProperty(DATASET(Risk_indicators.layout_bocashell_neutral) IndivIds) := FUNCTION
 EXPORT IndProperty(DATASET(Layouts.LayoutAMLShellV2) IndivIds, 

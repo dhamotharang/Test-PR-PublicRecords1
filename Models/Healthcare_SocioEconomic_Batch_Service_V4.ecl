@@ -1,4 +1,4 @@
-
+﻿
 import Risk_indicators, Models, Std, Profilebooster, Luci, Ut;
 
 export Healthcare_SocioEconomic_Batch_Service_V4 := MACRO
@@ -8,9 +8,11 @@ export Healthcare_SocioEconomic_Batch_Service_V4 := MACRO
 	unsigned1 GLBPurpose_in := 0 : stored('GLBPurpose');
 	string DataRestrictionMask_in := '' : stored('DataRestrictionMask');
 	string50 DataPermissionMask_in := '' : stored('DataPermissionMask');
+	boolean SuppressResultsForOptOuts := FALSE : stored('SuppressResultsForOptOuts');
 	IF(DataRestrictionMask_in='', FAIL('A blank DataRestrictionMask value is supplied.'));
 	IF(DataPermissionMask_in='', FAIL('A blank DataPermissionMask value is supplied.'));
 	String Socio_Core_Option := '1' : stored('Options');
+	unsigned1 Socio_TC_Model_Version_in := 2 : stored('Socio_TC_Model_Version');
 	unsigned1 ofac_version_in     := 1        : stored('OFACVersion'); //TODO: Don't expose, set it to default
 	gateways_in_ds := Gateway.Configuration.Get();
 	IF(DPPAPurpose_in <> Models.Healthcare_Constants_Core.authorized_DPPA OR GLBPurpose_in <> Models.Healthcare_Constants_Core.authorized_GLBA, FAIL('Supplied Permissible Purpose Settings (GLBPurpose and/or DPPAPurpose) are invalid'));
@@ -35,6 +37,12 @@ export Healthcare_SocioEconomic_Batch_Service_V4 := MACRO
 	string10 MedicationAdherenceScore_Category_2_High_In := '79.9234' : stored('MedicationAdherenceScore_Category_2_High');
 	string10 MedicationAdherenceScore_Category_1_Low_In  := '79.9235' : stored('MedicationAdherenceScore_Category_1_Low');
 	
+     //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+    
 	DECIMAL7_4 ReadmissionScore_Category_5_Low := (DECIMAL7_4)ReadmissionScore_Category_5_Low_In ;
 	DECIMAL7_4 ReadmissionScore_Category_4_High := (DECIMAL7_4)ReadmissionScore_Category_4_High_In ;
 	DECIMAL7_4 ReadmissionScore_Category_4_Low := (DECIMAL7_4)ReadmissionScore_Category_4_Low_In ;
@@ -66,8 +74,12 @@ export Healthcare_SocioEconomic_Batch_Service_V4 := MACRO
 		MedicationAdherenceScore_Category_1_Low <= MedicationAdherenceScore_Category_2_High,
 		FAIL('Bad MedicationAdherenceScore_Category thresholds supplied.'));
 
-	Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, 
-											trim(STD.Str.ToUpperCase(Socio_Core_Option),left,right), ofac_version_in, gateways_in_ds, coreResults);
+	Models.Healthcare_SocioEconomic_Core(Socio_TC_Model_Version_in, SuppressResultsForOptOuts, isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, 
+											trim(STD.Str.ToUpperCase(Socio_Core_Option),left,right), ofac_version_in, gateways_in_ds, coreResults,
+                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                    TransactionID := TransactionID, 
+                                                    BatchUID := BatchUID, 
+                                                    GlobalCompanyID := GlobalCompanyID);
 	
 	FinalOutput := Models.Healthcare_SocioEconomic_Transforms_Batch_Service_V4.AddScoreCategories(
 											coreResults,

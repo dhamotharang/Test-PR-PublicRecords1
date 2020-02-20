@@ -1,9 +1,9 @@
-﻿IMPORT Address, AutoKey, BIPV2, Business_Risk, Data_Services, Business_Risk_BIP, DID_Add, Doxie, Drivers, Gong, dx_header,
-       MDR, Phones, Phonesplus_v2, Risk_Indicators, STD, Suppress, UT, Relationship;
+﻿IMPORT Address, AutoKey, Business_Risk, Data_Services, Business_Risk_BIP, DID_Add, Doxie, Drivers, Gong, dx_header,
+       MDR, Phones, Phonesplus_v2, Risk_Indicators, Suppress, UT, Relationship;
 
 EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-											 BIPV2.mod_sources.iParams linkingOptions,
+											 doxie.IDataAccess mod_access,
 												 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 												 
 	Shell_with_BIPIDs := Shell(BIP_IDs.PowID.LinkID <> 0 OR BIP_IDs.ProxID.LinkID <> 0 OR BIP_IDs.SeleID.LinkID <> 0 OR BIP_IDs.OrgID.LinkID <> 0 OR BIP_IDs.UltID.LinkID <> 0);
@@ -141,7 +141,8 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		INTEGER1 AR2BRep3AddrAssociateCHeader;
 		INTEGER1 AR2BRep4AddrAssociateCHeader;
 		INTEGER1 AR2BRep5AddrAssociateCHeader;
-		
+    UNSIGNED4 Global_sid;
+    UNSIGNED8 Record_sid;
 		DATASET({UNSIGNED6 LexID}) LexIDs;
 		DATASET({UNSIGNED4 Seq, BOOLEAN Rep1AddrMatched, BOOLEAN Rep2AddrMatched, BOOLEAN Rep3AddrMatched, BOOLEAN Rep4AddrMatched, BOOLEAN Rep5AddrMatched, STRING20 FName, STRING20 LName}) RepNames;
 	END;
@@ -209,11 +210,13 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 												DATASET([{le.Seq, Rep1AddrMatch, Rep2AddrMatch, Rep3AddrMatch, Rep4AddrMatch, Rep5AddrMatch, ri.fname, ri.lname}], 
 															{UNSIGNED4 Seq, BOOLEAN Rep1AddrMatched, BOOLEAN Rep2AddrMatched, BOOLEAN Rep3AddrMatched, BOOLEAN Rep4AddrMatched, BOOLEAN Rep5AddrMatched, STRING20 FName, STRING20 LName}),
 												DATASET([], {UNSIGNED4 Seq, BOOLEAN Rep1AddrMatched, BOOLEAN Rep2AddrMatched, BOOLEAN Rep3AddrMatched,  BOOLEAN Rep4AddrMatched, BOOLEAN Rep5AddrMatched, STRING20 FName, STRING20 LName}));		
+    SELF.global_sid := ri.global_sid;
+    SELF.record_sid := ri.record_sid;
 		SELF := []													
 	END;
 	
 	
-	ConsumerHeaderAddrRaw := JOIN(ShellSearchRecords, key_header_address, 
+	ConsumerHeaderAddrRaw_all := JOIN(ShellSearchRecords, key_header_address, 
 																		(TRIM(LEFT.Prim_Name) <> '' AND TRIM(LEFT.Zip5) <> '' AND
 																		KEYED(LEFT.Prim_Name = RIGHT.prim_name AND LEFT.Zip5 = RIGHT.zip AND LEFT.Prim_Range = RIGHT.prim_range) AND
 																		LEFT.PreDir = RIGHT.predir AND LEFT.PostDir = RIGHT.postdir AND
@@ -225,7 +228,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																			(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(dx_header.functions.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
 																		Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
 																	getConsumerHeaderAddrAttributes(LEFT, RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
-	
+	ConsumerHeaderAddrRaw:= Suppress.MAC_SuppressSource(ConsumerHeaderAddrRaw_all, mod_access, LexIDs[1].LexID); // There’s no more than one LexId here //
 	// Filter out records after our history date
 	ConsumerHeaderAddr := Business_Risk_BIP.Common.FilterRecords(ConsumerHeaderAddrRaw, Dt_First_Seen, (UNSIGNED)Business_Risk_BIP.Constants.MissingDate, '', AllowedSourcesSet);
 	
@@ -368,10 +371,12 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
     STRING  VerifiedConsumerZip;
     STRING VerifiedConsumerFEIN;
     STRING VerifiedConsumerPhone;
-    
+    UNSIGNED4 global_sid;
+    UNSIGNED8 record_sid;
 	END;
 
-	tempHeaderRec getDIDs(ShellSearchLayout le, doxie.Key_Header_SSN ri) := TRANSFORM
+	key_header_ssn := dx_header.key_ssn();
+	tempHeaderRec getDIDs(ShellSearchLayout le, key_header_ssn ri) := TRANSFORM
 		SELF.Seq := le.Seq;
 		SELF.RecordType := le.RecordType;
 		SELF.DID := ri.DID;
@@ -395,7 +400,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	END;
 	
 	// Grab all DID's associated with that SSN (FEIN) 
-	FEINSSN_DIDs := JOIN(ShellSearchRecords, doxie.Key_Header_SSN, //Input Business FEIN Matches Header SSN
+	FEINSSN_DIDs := JOIN(ShellSearchRecords, key_header_ssn, //Input Business FEIN Matches Header SSN
 																	(INTEGER)LEFT.FEINSSN > 0 AND LENGTH(TRIM(LEFT.FEINSSN)) = 9 AND
 																	KEYED(LEFT.FEINSSN[1] = RIGHT.S1 AND 
 																				LEFT.FEINSSN[2] = RIGHT.S2 AND 
@@ -444,7 +449,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																		
  
 	// Determine if the Address or Phone number from the consumer header matches the input Business Address or Phone, but only when the SSN matches the input SSN (Handled in join)
-	tempHeaderRec getConsumerHeaderDID(tempHeaderRec le, doxie.Key_Header ri) := TRANSFORM
+	tempHeaderRec getConsumerHeaderDID(tempHeaderRec le, dx_header.layout_key_header ri) := TRANSFORM
 		SELF.dt_first_seen  := IF(ri.dt_first_seen > 0, (STRING)ri.dt_first_seen, (STRING)ri.dt_vendor_first_reported);
 		IsBusinessRecord 	  := le.FEINMatched;
 		FEINMatched 			  := (INTEGER)le.FEIN > 0 AND le.FEIN = ri.SSN AND IsBusinessRecord;
@@ -520,11 +525,13 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		SELF.BNASRaw := calcBNAS(AddressMatched, NameSimilar);
 		SELF.AddressMatched := IF(AddressMatched, 1, 0); // Need to convert to integers so that the TABLE can grab the MAX of these, similar to a rollup with an OR statement
 		SELF.NameSimilar := IF(NameSimilar, 1, 0);
-		
+		SELF.global_sid := ri.global_sid;
+		SELF.record_sid := ri.record_sid;
+
 		SELF := le;
 		SELF := [];
 	END;
-	ConsumerHeaderDIDRaw := JOIN(uniqueDIDs, doxie.Key_Header, LEFT.DID > 0 AND KEYED(LEFT.DID = RIGHT.S_DID) AND
+	ConsumerHeaderDIDRaw_all := JOIN(uniqueDIDs, dx_header.Key_Header(), LEFT.DID > 0 AND KEYED(LEFT.DID = RIGHT.S_DID) AND
 																			(((INTEGER)LEFT.FEIN > 0 AND LEFT.FEIN = RIGHT.SSN) OR
 																			((INTEGER)LEFT.Rep1_SSN > 0 AND LEFT.Rep1_SSN = RIGHT.SSN) OR
 																			((INTEGER)LEFT.Rep2_SSN > 0 AND LEFT.Rep2_SSN = RIGHT.SSN) OR
@@ -539,6 +546,8 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																			Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
 																	getConsumerHeaderDID(LEFT, RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 	
+	ConsumerHeaderDIDRaw:= Suppress.MAC_SuppressSource(ConsumerHeaderDIDRaw_all, mod_access);
+
 	// Filter out records after our history date
 	ConsumerHeaderDID := Business_Risk_BIP.Common.FilterRecords(ConsumerHeaderDIDRaw, Dt_First_Seen, (UNSIGNED)Business_Risk_BIP.Constants.MissingDate, '', AllowedSourcesSet);
 
@@ -648,7 +657,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 		ConsumerHeaderDIDSlim := DEDUP(SORT(ConsumerHeaderDID(FEINMatched), Seq, DID), Seq, DID);
 		
-		HeaderRelatives :=  Relationship.proc_GetRelationship(PROJECT(ConsumerHeaderDIDSlim, TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID)),
+		HeaderRelatives :=  Relationship.proc_GetRelationshipNeutral(PROJECT(ConsumerHeaderDIDSlim, TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID)),
 																	TopNCount:=100,
 																	RelativeFlag :=TRUE,AssociateFlag:=TRUE,
 																	doAtmost:=TRUE,MaxCount:=Business_Risk_BIP.Constants.Limit_Default).result; 
@@ -1002,7 +1011,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		STRING2 AR2BRep5SSNBusHeaderLexID;
 	END;
 	
-	ConsumerShellContactInfoRaw := JOIN(seqContactInfo, dx_header.key_header(), LEFT.DID > 0 AND KEYED(LEFT.DID = RIGHT.S_DID) AND
+	ConsumerShellContactInfoRaw_all := JOIN(seqContactInfo, dx_header.key_header(), LEFT.DID > 0 AND KEYED(LEFT.DID = RIGHT.S_DID) AND
 																	// check permissions
 																	ut.PermissionTools.glb.SrcOk(Options.GLBA_Purpose, right.src, right.dt_first_seen) and
 																	RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(Options.DataRestrictionMask, FALSE /*isFCRA*/) AND
@@ -1011,7 +1020,9 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
 																	TRANSFORM({UNSIGNED4 Seq, UNSIGNED3 HistoryDate, RECORDOF(RIGHT)}, SELF.Seq := LEFT.Seq, SELF.HistoryDate := LEFT.HistoryDate, SELF := RIGHT),
 																	ATMOST(Business_Risk_BIP.Constants.Limit_Default));
-															
+
+	ConsumerShellContactInfoRaw:= Suppress.MAC_SuppressSource(ConsumerShellContactInfoRaw_all, mod_access);
+
 	ConsumerShellContactInfo := Business_Risk_BIP.Common.FilterRecords(ConsumerShellContactInfoRaw, Dt_First_Seen, dt_vendor_first_reported, '', AllowedSourcesSet);
 	
 	ConsumerShellContactVerification := JOIN(WithRepPhoneVerification, ConsumerShellContactInfo, LEFT.Seq = RIGHT.Seq, 

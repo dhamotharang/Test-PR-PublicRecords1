@@ -1,5 +1,8 @@
-Import fcra, data_services;
+﻿Import fcra, data_services, vault, _control;
 
+#IF(_Control.Environment.onVault) 
+EXPORT Key_Override_Student_New_FFID := vault.FCRA.Key_Override_Student_New_FFID;
+#ELSE
 EXPORT Key_Override_Student_New_FFID := FUNCTION
 
 	// Any record definitions can be exported, if needed
@@ -35,17 +38,4 @@ EXPORT Key_Override_Student_New_FFID := FUNCTION
 	
 END;
 
-/* ds_in := dataset( '~thor_data400::base::override::fcra::qa::american_student_new', FCRA.Layout_Override_Student_New, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt );
-   ds := dedup(sort(ds_in,-flag_file_id),except flag_file_id,keep(1));
-   
-   fcra.layout_override_student_new proj_recs(ds l) := transform
-   	self.key := (integer8)l.key;
-   	self.did := (unsigned6)l.did;
-   	self := l;
-   end;
-   
-   kf := project( ds, proj_recs(left) );
-   
-   export Key_Override_Student_New_FFID := index( kf, {flag_file_id}, {kf},
-   data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::student_new::qa::ffid' );
-*/
+#END;

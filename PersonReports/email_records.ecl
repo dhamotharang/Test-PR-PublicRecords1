@@ -4,7 +4,7 @@ out_rec := iesp.emailsearch.t_EmailSearchRecord;
 
 EXPORT out_rec email_records (
   DATASET (doxie.layout_references) dids,
-  input.emails in_params = MODULE(input.emails) END,
+  $.IParam.emails in_params = MODULE($.IParam.emails) END,
   BOOLEAN IsFCRA = FALSE
 ) := FUNCTION
 
@@ -55,7 +55,7 @@ EXPORT out_rec email_records (
 	END;
 
   // Same call as in comp report
-  rptRecs := doxie.email_records (dids, in_params.ssn_mask, in_params.ApplicationType);
+  rptRecs := doxie.email_records (dids, in_params.ssn_mask, in_params.application_type);
 
   RETURN PROJECT(rptRecs,toOut(LEFT));
 END;

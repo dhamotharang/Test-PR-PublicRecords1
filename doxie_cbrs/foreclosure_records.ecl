@@ -3,9 +3,12 @@
 // defaults to Foreclosure records, pass true for Notice of Defaults records
 export foreclosure_records(dataset(doxie_cbrs.layout_references) bdids, boolean isNodSearch=false) := MODULE
 
-nMod := module(project(AutoStandardI.GlobalModule(),Foreclosure_Services.Raw.params,opt));
- export IndustryClass := AutoStandardI.GlobalModule().industryclass;
-end;
+gmod := AutoStandardI.GlobalModule();
+nMod := MODULE(Foreclosure_Services.Raw.params);
+  EXPORT string5 industry_class := gmod.IndustryClass;
+  EXPORT string32 application_type := gmod.ApplicationType;
+  EXPORT string ssn_mask := gmod.ssnmask;
+END;
 
 for := Foreclosure_Services.Raw.report_view.by_bdid(bdids,nMod,false);
 nod := Foreclosure_Services.Raw.report_view.by_bdid(bdids,nMod,true);

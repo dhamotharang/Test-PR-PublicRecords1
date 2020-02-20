@@ -1,6 +1,6 @@
-import paw, riskwise, ut, risk_indicators, Business_Header;
+﻿import paw, riskwise, risk_indicators, Business_Header, doxie, Suppress, AML, STD;
 
-export AMLEmployment(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) AMLEmploy) := FUNCTION
+export AMLEmployment(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) AMLEmploy, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
 patw := record
@@ -78,11 +78,12 @@ with_paw_did := join(SICCodesDS, paw.Key_Did,
 						left outer, atmost(riskwise.max_atmost), keep(100));
 
 // pawfile_full_nonfcra := join(PawSicCodes, paw.Key_contactid,
-pawfile_full_nonfcra := join(with_paw_did, paw.Key_contactid,
+pawfile_full_nonfcra_unsuppressed := join(with_paw_did, paw.Key_contactid,
 						left.contact_id<>0 and 
 						keyed(left.contact_id=right.contact_id) 
 						and (unsigned)right.dt_first_seen[1..6] < left.historydate, 
-						transform(patw,
+						transform({patw, unsigned4 global_sid},
+											self.global_sid := right.global_sid;
 											self.seq := left.seq;
 											self.did := left.did;
 											self.historydate := left.historydate;								
@@ -98,7 +99,7 @@ pawfile_full_nonfcra := join(with_paw_did, paw.Key_contactid,
 											self.Dead_business_ct := if(right.contact_id<>0 and dead_company, 1, 0);  // number of different BDIDs worked for that are dead
 											self.Source_ct	:= if(right.contact_id<>0, 1, 0);  // number of different PAW sources appeared on
 											self.sources := '';
-											self.AMLOfficerPosition := AMLTitleRank(right.company_title);
+											self.AMLOfficerPosition := AML.AMLTitleRank(right.company_title);
 											self.AMLOfficePositionsCount := 0;
 											self.AMLHRBusiness := left.AMLHRBusiness;
 											self.AMLHRBusinessCount := left.AMLHRBusinessCount;
@@ -106,12 +107,29 @@ pawfile_full_nonfcra := join(with_paw_did, paw.Key_contactid,
 											),
 											left outer,
 						atmost(riskwise.max_atmost), keep(100));
+						
+pawfile_full_nonfcra_flagged := Suppress.MAC_FlagSuppressedSource(pawfile_full_nonfcra_unsuppressed, mod_access);
+
+pawfile_full_nonfcra := PROJECT(pawfile_full_nonfcra_flagged, TRANSFORM(patw, 						
+	self.contact_id := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.contact_id);
+	self.bid := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.bid);
+	self.company_status := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.company_status);
+	self.source := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.source);
+	self.company_title := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.company_title);
+	self.First_seen_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.First_seen_date);
+	self.Last_seen_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Last_seen_date);
+	self.Business_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Business_ct);
+	self.Dead_business_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Dead_business_ct);
+	self.Source_ct	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Source_ct);
+	self.AMLOfficerPosition := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.AMLOfficerPosition);
+    SELF := LEFT;
+)); 
 
 patw roll_paw(patw le, patw ri) := transform
 	self.company_title := if(le.company_title='', ri.company_title, if(le.last_seen_date>ri.last_seen_date,le.company_title,ri.company_title));
 	self.first_seen_date := if(ri.first_seen_date<le.first_seen_date and ri.first_seen_date<>0, ri.first_seen_date, le.first_seen_date);
 	self.last_seen_date := if(ri.last_seen_date>le.last_seen_date, ri.last_seen_date, le.last_seen_date);
-	source_seen := stringlib.stringfind(le.sources, le.source, 1)>0;
+	source_seen := STD.Str.find(le.sources, le.source, 1)>0;
 	self.sources := if(source_seen, le.sources, trim(le.sources) + ',' + le.source); 
 	self.source_ct := if(source_seen or le.sources='', le.source_ct, le.source_ct + ri.source_ct);
 	self.business_ct := if(le.bid=ri.bid, le.business_ct, le.business_ct + ri.business_ct);

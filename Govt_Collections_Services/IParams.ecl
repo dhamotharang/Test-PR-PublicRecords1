@@ -6,7 +6,7 @@ export IParams := module
     INTERFACE(AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full)
   end;
   
-	export BatchParams := interface (BatchShare.IParam.BatchParamsV2,Relationship.IParams.relationshipParams)
+	export BatchParams := interface (BatchShare.IParam.BatchParams,Relationship.IParams.relationshipParams)
 		export boolean AppendBest          := false; // We're calling another function to append Best.
 		export UNSIGNED3 DIDScoreThreshold := 0;
 		export string2 input_state         := '';		
@@ -26,7 +26,7 @@ export IParams := module
 	export getBatchParams() := 
 		function
 			
-			base_params := BatchShare.IParam.getBatchParamsV2();
+			base_params := BatchShare.IParam.getBatchParams();
 			
 			// Project the base params to read shared parameters from store. If necessary, you may 
 			// redefine default values for common parameters and/or define default values for domain-

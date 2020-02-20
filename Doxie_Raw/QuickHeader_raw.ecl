@@ -6,6 +6,12 @@ export QuickHeader_raw(
     boolean ApplyBpsFilter = false
 ) := FUNCTION
 
+Layout_records_CCPA:= RECORD
+    header_quick.layout_records; 
+    UNSIGNED4 global_sid;
+	UNSIGNED8 record_sid;
+END;
+
 //**** JOIN TO KEY
 k := join(dids, header_quick.key_DID, keyed(left.did = right.did) and
                                       (not ApplyBpsFilter or 
@@ -16,7 +22,7 @@ k := join(dids, header_quick.key_DID, keyed(left.did = right.did) and
                                       atmost(ut.limits .DID_PER_PERSON));
 
 //**** PROPER FORMAT
-comm := project(if(Doxie.DataRestriction.WH, k(~mdr.sourceTools.sourceisWeeklyHeader(src)),k), header_quick.layout_records);
+comm := project(if(Doxie.DataRestriction.WH, k(~mdr.sourceTools.sourceisWeeklyHeader(src)),k), Layout_records_CCPA);
 
 
 //***** CHECK PERMISSIONS

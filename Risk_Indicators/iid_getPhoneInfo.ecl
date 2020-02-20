@@ -1,4 +1,4 @@
-﻿import _Control, riskwise, did_add, ut, risk_indicators, NID, gateway;
+﻿﻿import _Control, riskwise, did_add, ut, risk_indicators, NID, gateway,phones, iesp,STD, Doxie;
 onThor := _Control.Environment.OnThor;
 
 export iid_getPhoneInfo(grouped dataset(risk_indicators.Layout_Output) with_address_info, dataset(Gateway.Layouts.Config) gateways,
@@ -11,36 +11,37 @@ export iid_getPhoneInfo(grouped dataset(risk_indicators.Layout_Output) with_addr
 													string20 companyID,
 													unsigned2 EverOccupant_PastMonths=0,
 													unsigned4 EverOccupant_StartDate = 99999999,
-													boolean IncludeNAPData = false
+													boolean IncludeNAPData = false,
+													doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 												) := function
 
-ExactFirstNameRequired := ExactMatchLevel[iid_constants.posExactFirstNameMatch]=iid_constants.sTrue;
-ExactLastNameRequired := ExactMatchLevel[iid_constants.posExactLastNameMatch]=iid_constants.sTrue;
-ExactAddrRequired := ExactMatchLevel[iid_constants.posExactAddrMatch]=iid_constants.sTrue;
-ExactPhoneRequired := ExactMatchLevel[iid_constants.posExactPhoneMatch]=iid_constants.sTrue;
-ExactFirstNameRequiredAllowNickname := ExactMatchLevel[iid_constants.posExactFirstNameMatchNicknameAllowed]=iid_constants.sTrue;
-ExactAddrZip5andPrimRange := ExactMatchLevel[iid_constants.posExactAddrZip5andPrimRange]=iid_constants.sTrue;
+ExactFirstNameRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactFirstNameMatch]=risk_indicators.iid_constants.sTrue;
+ExactLastNameRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactLastNameMatch]=risk_indicators.iid_constants.sTrue;
+ExactAddrRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactAddrMatch]=risk_indicators.iid_constants.sTrue;
+ExactPhoneRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactPhoneMatch]=risk_indicators.iid_constants.sTrue;
+ExactFirstNameRequiredAllowNickname := ExactMatchLevel[risk_indicators.iid_constants.posExactFirstNameMatchNicknameAllowed]=risk_indicators.iid_constants.sTrue;
+ExactAddrZip5andPrimRange := ExactMatchLevel[risk_indicators.iid_constants.posExactAddrZip5andPrimRange]=risk_indicators.iid_constants.sTrue;
 
 
 // As of 3/7/2012 per bug 97686 we are not going to EID3220 and will send all gateway traffic to PDE until further notice
 // so set doE3220 to false here for now and if it was going to go to EID3220, treat it like idp1 and send those phones to PDE
 doE3220 := false;//exists(gateways(servicename='targuse3220'));
 allowCellPhones := allowCellphonesIn OR exists(gateways(servicename='targuse3220'));
-doInquiries := (BSOptions & iid_constants.BSOptions.IncludeInquiries)>0;	// this flag is set in main query based off of several items being true, DRM 16, ~disable inquries and ciid v1 (for now)
+doInquiries := (BSOptions & risk_indicators.iid_constants.BSOptions.IncludeInquiries)>0;	// this flag is set in main query based off of several items being true, DRM 16, ~disable inquries and ciid v1 (for now)
 IIDv1 := (BSOptions & risk_indicators.iid_constants.BSOptions.IsInstantIDv1) > 0;
 cellPhoneTypes := ['04','55','60','01','57','62','64','65'];	
 
 // by searching the inquiry results this way, we are rolling them up like NAS does and not picking the best 1 result - 
 // using this newly created iid_getInquiryNAP for now but might want to change to use boca shell inquiries for code maintenance
 // bsversion must be >= 50 for historydatetimestamp enhancement [Bug 148853]
-withInquiriesNAP := if(doInquiries and ~isFCRA, risk_indicators.iid_getInquiryNAP(with_address_info, isFCRA, ExactMatchLevel, LastSeenThreshold, 50), with_address_info);
+withInquiriesNAP := if(doInquiries and ~isFCRA, risk_indicators.iid_getInquiryNAP(with_address_info, isFCRA, ExactMatchLevel, LastSeenThreshold, 50, mod_access), with_address_info);
 
 
 Risk_Indicators.Layouts.layout_input_plus_overrides prep_phones(risk_indicators.layout_output le, integer C) := transform
 	// use original phone as input, unless the dirsaddr_phone or utiliphone indicate a miskeyed phone
 	homephone := map(ExactPhoneRequired => le.phone10,
-									iid_constants.gn(le.dirsaddr_phonescore) and length(trim(le.dirsaddr_phone))=10 => le.dirsaddr_phone,
-									iid_constants.gn(le.utili_phonescore) and length(trim(le.utiliphone))=10 => le.utiliphone,
+									Risk_Indicators.iid_constants.gn(le.dirsaddr_phonescore) and length(trim(le.dirsaddr_phone))=10 => le.dirsaddr_phone,
+									Risk_Indicators.iid_constants.gn(le.utili_phonescore) and length(trim(le.utiliphone))=10 => le.utiliphone,
 									le.phone10);
 									
 	// only search the phone data with valid phones. blank out phone10 if invalid, and the dirsByPhone ignores blank phones on input
@@ -69,10 +70,10 @@ risk_indicators.layout_output phvertrans(risk_indicators.layout_output le, dirs_
 	firstscore := risk_indicators.FnameScore(le.fname, ri.name_first);
 	n1 := NID.PreferredFirstNew(le.fname);
 	n2 := NID.PreferredFirstNew(ri.name_first);
-	firstmatch := iid_constants.g(firstscore) and if(ExactFirstNameRequired, le.fname=ri.name_first, true) and
+	firstmatch := Risk_Indicators.iid_constants.g(firstscore) and if(ExactFirstNameRequired, le.fname=ri.name_first, true) and
 							  if(ExactFirstNameRequiredAllowNickname, le.fname=ri.name_first or n1=n2, true);			
 	lastscore := risk_indicators.LnameScore(le.lname, ri.name_last);
-	lastmatch := iid_constants.g(lastscore) and if(ExactLastNameRequired, le.lname=ri.name_last, true);
+	lastmatch := Risk_Indicators.iid_constants.g(lastscore) and if(ExactLastNameRequired, le.lname=ri.name_last, true);
 	
 	zip_score1 := Risk_Indicators.AddrScore.zip_score(le.in_zipcode, ri.z5);
 	primRange_score1 := Risk_Indicators.AddrScore.primRange_score(le.prim_range, ri.prim_range);
@@ -88,23 +89,23 @@ risk_indicators.layout_output phvertrans(risk_indicators.layout_output le, dirs_
 																													ri.prim_range, ri.prim_name, ri.sec_range,
 																													zip_score1, cityst_score1));
 																						
-	addrmatch := iid_constants.ga(addrmatch_score1) and if(ExactAddrRequired, le.prim_range=ri.prim_range and le.prim_name=ri.prim_name and 
+	addrmatch := Risk_Indicators.iid_constants.ga(addrmatch_score1) and if(ExactAddrRequired, le.prim_range=ri.prim_range and le.prim_name=ri.prim_name and 
 																																			(le.in_zipcode=ri.z5 or le.z5=ri.z5 or 
 																																						(le.in_city=ri.p_city_name and le.in_state=ri.st) or (le.p_city_name=ri.p_city_name and le.st=ri.st)) and
 																																			ut.nneq(le.sec_range,ri.sec_range), true);
 	phonescore := risk_indicators.PhoneScore(le.phone10, ri.phone10);
-	phonematch := iid_constants.gn(phonescore) and if(ExactPhoneRequired, le.phone10=ri.phone10, true);
+	phonematch := Risk_Indicators.iid_constants.gn(phonescore) and if(ExactPhoneRequired, le.phone10=ri.phone10, true);
 	cmpyscore := IF(ri.business_flag, did_add.company_name_match_score(le.employer_name, ri.listed_name), 255);
-	cmpymatch := iid_constants.gc(cmpyscore);
+	cmpymatch := Risk_Indicators.iid_constants.gc(cmpyscore);
 	
 	goodHit := IF(((INTEGER)firstmatch+(INTEGER)lastmatch+(INTEGER)addrmatch+(INTEGER)phonematch+(INTEGER)cmpymatch)>1,true,false);	// only keep the record if it matches at least 2 elements
 	
 	self.isPhoneConnected := ri.phone10<>'' and ri.current_flag and ri.src in ['GH','WP','TG'];	// new logic to determine if we have a connected phone for ciid v1
-	self.idtheftflag := MAP(lastscore < iid_constants.min_score and (ri.name_last<>'' or ri.geo_lat<>'') => '1',
+	self.idtheftflag := MAP(lastscore < Risk_Indicators.iid_constants.min_score and (ri.name_last<>'' or ri.geo_lat<>'') => '1',
 													//isDisjoint => 2,
 													'0');
 
-	disc_prior := IF (le.historydate=iid_constants.default_history_date,
+	disc_prior := IF (le.historydate=Risk_Indicators.iid_constants.default_history_date,
 															if(le.phonedissflag and ri.current_flag, false, le.phonedissflag),	// if realtime
 															if((((unsigned) (Ri.dt_first_seen[1..6]) < le.historydate) AND (le.historydate <= (unsigned) (Ri.dt_last_seen[1..6]))) or le.phone10='' or ri.phone10='', false, true));				
 					
@@ -119,11 +120,11 @@ risk_indicators.layout_output phvertrans(risk_indicators.layout_output le, dirs_
 												ri.current_flag = false and ri.p7 != '' => true,//old non-current phones so don't set as false		
 												le.phone10='' or ri.phone10='' => false,
 												le.phonedissflag);
-	disc_new := if(le.historydate = iid_constants.default_history_date, disc_realtime, disc_archive);
+	disc_new := if(le.historydate = Risk_Indicators.iid_constants.default_history_date, disc_realtime, disc_archive);
 
 	disc := if(BSVersion < 41, disc_prior, disc_new);
 	self.phonedissflag := disc;
-																	
+																	 
 	self.hriskphoneflag := if(le.hriskphoneflag='5' and ~disc, '0', le.hriskphoneflag);
 	
 	self.hphonetypeflag := le.hphonetypeflag;
@@ -186,12 +187,12 @@ risk_indicators.layout_output phvertrans(risk_indicators.layout_output le, dirs_
 				 if(ri.did!=0 and ~disc, 1, 0),
 				 if(ri.did!=0 and ~disc and ri.listing_type_res != '', 1, 0)); //don't count businesses
 	
-	self.adls_per_phone_created_6months := if(ri.did!=0 and ut.DaysApart(iid_constants.myGetDate(le.historydate), ri.dt_first_seen) < 183, 1, 0);
+	self.adls_per_phone_created_6months := if(ri.did!=0 and ut.DaysApart(Risk_Indicators.iid_constants.myGetDate(le.historydate), ri.dt_first_seen) < 183, 1, 0);
 	
 	p_street := trim(trim(ri.prim_range) + trim(ri.prim_name));
 	self.p_street := p_street;
 	self.addrs_per_phone := if(p_street!='', 1, 0);
-	self.addrs_per_phone_created_6months := if(p_street!='' and ut.DaysApart(iid_constants.myGetDate(le.historydate), ri.dt_first_seen) < 183, 1, 0);
+	self.addrs_per_phone_created_6months := if(p_street!='' and ut.DaysApart(Risk_Indicators.iid_constants.myGetDate(le.historydate), ri.dt_first_seen) < 183, 1, 0);
 	
 	self.targusgatewayused := ri.targusgatewayused;
 	self.targustype := ri.targustype;
@@ -216,29 +217,29 @@ END;
 
 biggestrec_history_roxie := join(withInquiriesNAP,dirs_by_phone,
 					left.phone10<>'' and
-								(IF(iid_constants.gn(left.dirsaddr_phonescore) and length(trim(left.dirsaddr_phone))=10,left.dirsaddr_phone[4..10],
-								IF(iid_constants.gn(left.utili_phonescore) and length(trim(left.utiliphone))=10,left.utiliphone[4..10],left.phone10[4..10]))=right.p7) and 
-								(IF(iid_constants.gn(left.dirsaddr_phonescore) and length(trim(left.dirsaddr_phone))=10,left.dirsaddr_phone[1..3],
-								IF(iid_constants.gn(left.utili_phonescore) and length(trim(left.utiliphone))=10,left.utiliphone[1..3],left.phone10[1..3]))=right.p3) and 
+								(IF(Risk_Indicators.iid_constants.gn(left.dirsaddr_phonescore) and length(trim(left.dirsaddr_phone))=10,left.dirsaddr_phone[4..10],
+								IF(Risk_Indicators.iid_constants.gn(left.utili_phonescore) and length(trim(left.utiliphone))=10,left.utiliphone[4..10],left.phone10[4..10]))=right.p7) and 
+								(IF(Risk_Indicators.iid_constants.gn(left.dirsaddr_phonescore) and length(trim(left.dirsaddr_phone))=10,left.dirsaddr_phone[1..3],
+								IF(Risk_Indicators.iid_constants.gn(left.utili_phonescore) and length(trim(left.utiliphone))=10,left.utiliphone[1..3],left.phone10[1..3]))=right.p3) and 
 					// check pullid
 					LEFT.pullidflag = '' AND					
 					// check date
-					((unsigned)RIGHT.dt_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) AND
-					(RIGHT.current_flag OR iid_constants.myDaysApart(left.historydate,((STRING6)RIGHT.deletion_date[1..6]+'31'), LastSeenThreshold)),
+					((unsigned)RIGHT.dt_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)) AND
+					(RIGHT.current_flag OR Risk_Indicators.iid_constants.myDaysApart(left.historydate,((STRING6)RIGHT.deletion_date[1..6]+'31'), LastSeenThreshold)),
 					phvertrans(left,right), left outer, many lookup, 
 					keep(300));
 
-with_InquiriesNAP_withPhone := withInquiriesNAP(phone10<>'' OR iid_constants.gn(dirsaddr_phonescore) or iid_constants.gn(utili_phonescore));
+with_InquiriesNAP_withPhone := withInquiriesNAP(phone10<>'' OR Risk_Indicators.iid_constants.gn(dirsaddr_phonescore) or Risk_Indicators.iid_constants.gn(utili_phonescore));
 with_InquiriesNAP_noPhone := withInquiriesNAP(phone10='' AND NOT risk_indicators.iid_constants.gn(dirsaddr_phonescore) AND NOT risk_indicators.iid_constants.gn(utili_phonescore));
 
 biggestrec_history_thor_pre := join(distribute( with_InquiriesNAP_withPhone, 
-								hash64(IF(iid_constants.gn(dirsaddr_phonescore) and length(trim(dirsaddr_phone))=10,dirsaddr_phone,
-																					IF(iid_constants.gn(utili_phonescore) and length(trim(utiliphone))=10,utiliphone,phone10)))),
+								hash64(IF(Risk_Indicators.iid_constants.gn(dirsaddr_phonescore) and length(trim(dirsaddr_phone))=10,dirsaddr_phone,
+																					IF(Risk_Indicators.iid_constants.gn(utili_phonescore) and length(trim(utiliphone))=10,utiliphone,phone10)))),
 								distribute(dirs_by_phone, hash64(p3+p7)),
-								(IF(iid_constants.gn(left.dirsaddr_phonescore) and length(trim(left.dirsaddr_phone))=10,left.dirsaddr_phone[4..10],
-								IF(iid_constants.gn(left.utili_phonescore) and length(trim(left.utiliphone))=10,left.utiliphone[4..10],left.phone10[4..10]))=right.p7) and 
-								(IF(iid_constants.gn(left.dirsaddr_phonescore) and length(trim(left.dirsaddr_phone))=10,left.dirsaddr_phone[1..3],
-								IF(iid_constants.gn(left.utili_phonescore) and length(trim(left.utiliphone))=10,left.utiliphone[1..3],left.phone10[1..3]))=right.p3) and 
+								(IF(Risk_Indicators.iid_constants.gn(left.dirsaddr_phonescore) and length(trim(left.dirsaddr_phone))=10,left.dirsaddr_phone[4..10],
+								IF(Risk_Indicators.iid_constants.gn(left.utili_phonescore) and length(trim(left.utiliphone))=10,left.utiliphone[4..10],left.phone10[4..10]))=right.p7) and 
+								(IF(Risk_Indicators.iid_constants.gn(left.dirsaddr_phonescore) and length(trim(left.dirsaddr_phone))=10,left.dirsaddr_phone[1..3],
+								IF(Risk_Indicators.iid_constants.gn(left.utili_phonescore) and length(trim(left.utiliphone))=10,left.utiliphone[1..3],left.phone10[1..3]))=right.p3) and 
 					// check pullid
 					LEFT.pullidflag = '' AND					
 					// check date
@@ -274,17 +275,14 @@ biggestrec_history_roxie_sort := IF(IsFCRA, sort(biggestrec_history_roxie,seq, -
 
 phone_velocity := risk_indicators.iid_roll_PhoneVelocity(biggestrec_history);
 
-
 risk_indicators.layout_output roll_phone_trans(risk_indicators.layout_output l,risk_indicators.layout_output r) := transform
-
 	countLeft := l.phonefirstcount+l.phonelastcount+l.phoneaddrcount+l.phonephonecount+l.phonecmpycount;
 	countRight := r.phonefirstcount+r.phonelastcount+r.phoneaddrcount+r.phonephonecount+r.phonecmpycount;
 
 	// change this phone chooser to look at the phone source for ciid v1 updates
 	phone_chooser := MAP(	~l.phone_disconnected AND r.phone_disconnected  AND l.phone_sources in ['GH,','WP,','TG,'] AND r.phone_sources in ['GH,','WP,','TG,']	=>	true,
 												l.phone_disconnected AND ~r.phone_disconnected  AND l.phone_sources in ['GH,','WP,','TG,']  AND r.phone_sources in ['GH,','WP,','TG,']	=>	false,
-												countLeft >= countRight);
-																				
+                  countleft>=countright);
 																
 	self.phoneSourceUsed := IF(phone_chooser, TRIM(l.phoneSourceused,all), TRIM(r.phoneSourceUsed,all));
 																
@@ -358,14 +356,15 @@ risk_indicators.layout_output roll_phone_trans(risk_indicators.layout_output l,r
 	self.targusgatewayused := l.targusgatewayused or r.targusgatewayused;
 	
 	phone_sources := l.phone_sources + r.phone_sources;
-	phone_sources_cat := if(stringlib.stringfind(phone_sources, 'GH', 1) > 0, 'GH,', '') + 
-												if(stringlib.stringfind(phone_sources, 'WP', 1) > 0, 'WP,', '') + 
-												if(stringlib.stringfind(phone_sources, 'TG', 1) > 0, 'TG,', '') + 
-												if(stringlib.stringfind(phone_sources, 'U', 1) > 0, 'U,', '') + 
-												if(stringlib.stringfind(phone_sources, 'IR', 1) > 0, 'IR,', '') +
-												if(stringlib.stringfind(phone_sources, 'IP', 1) > 0, 'IP,', '') +
-												if(stringlib.stringfind(phone_sources, 'PP', 1) > 0, 'PP,', '') +
-												if(stringlib.stringfind(phone_sources, 'S', 1) > 0, 'S,', '');	
+	phone_sources_cat := if(STD.Str.Find(phone_sources, 'GH', 1) > 0, 'GH,', '') + 
+												if(STD.Str.Find(phone_sources, 'WP', 1) > 0, 'WP,', '') + 
+												if(STD.Str.Find(phone_sources, 'TG', 1) > 0, 'TG,', '') + 
+												if(STD.Str.Find(phone_sources, 'U', 1) > 0, 'U,', '') + 
+												if(STD.Str.Find(phone_sources, 'IR', 1) > 0, 'IR,', '') +
+												if(STD.Str.Find(phone_sources, 'IP', 1) > 0, 'IP,', '') +
+												if(STD.Str.Find(phone_sources, 'PP', 1) > 0, 'PP,', '') +
+                  if(STD.Str.Find(phone_sources, 'EQ', 1) > 0, 'EQ,', '') +
+												if(STD.Str.Find(phone_sources, 'S', 1) > 0, 'S,', '');	
 	self.phone_sources := trim(phone_sources_cat);
 	self.targustype := if(l.targusgatewayused, l.targustype, r.targustype);
 
@@ -374,12 +373,101 @@ risk_indicators.layout_output roll_phone_trans(risk_indicators.layout_output l,r
 	self := l;
 END;
 
-phone_velocity_sorted :=sort(ungroup(phone_velocity), seq, src);
+phone_velocity_sorted := sort(ungroup(phone_velocity), seq, src);
 phone_velocity_grped := group(phone_velocity_sorted, seq);
 ds_for_rollup := if(BSversion>1, if(BSversion >= 50, phone_velocity_grped, phone_velocity),
 							biggestrec_history);
-biggestrec_rolled := rollup(ds_for_rollup,true,roll_phone_trans(left,right));
 
+biggestrec_rolled_temp := rollup(ds_for_rollup,true,roll_phone_trans(left,right));
+biggestrec_rolled_temp_nonFCRA := if(~isFCRA,biggestrec_rolled_temp);
+//Phone_metadata added.
+valid_phone_inputs:= Ungroup(with_address_info(phone10<>''));
+
+emptygateways := dataset([], gateway.layouts.config);	
+	
+	// Build input module for batch_mod.
+in_mod_batch := MODULE(Phones.IParam.BatchParams)					
+				EXPORT BOOLEAN return_current								:= TRUE ;									
+				EXPORT BOOLEAN include_temp_susp_reactivate	:= FALSE 	;			
+				EXPORT UNSIGNED max_lidb_age_days						:= Phones.Constants.PhoneAttributes.LastActivityThreshold;			
+				EXPORT BOOLEAN use_realtime_lidb						:= FALSE 	;			
+				EXPORT DATASET (Gateway.Layouts.Config) gateways := emptygateways; 
+	END;
+
+	dBatchPhonesIn := project(valid_phone_inputs, transform(Phones.Layouts.PhoneAttributes.BatchIn, self.acctno := (STRING)LEFT.SEQ, 
+                          self.phoneno:=LEFT.PHONE10));
+	
+	
+	dRecs := Phones.PhoneAttributes_BatchRecords(dBatchPhonesIn, in_mod_batch);
+	
+iesp.phonemetadatasearch.t_PhoneMetaDataSearchRecord tFormat2PhoneMetadata(Phones.Layouts.PhoneAttributes.BatchOut l) :=		TRANSFORM
+       SELF.PhoneNumber := l.phoneno;
+   	   SELF.isCurrent := l.is_current; 
+   		 SELF.CarrierInfo.id := l.carrier_id;
+   		 SELF.CarrierInfo.Name := l.carrier_name;
+   		 SELF.CarrierInfo.Category := l.carrier_category;
+   		 SELF.CarrierInfo.City := l.carrier_city;
+   		 SELF.CarrierInfo.State := l.carrier_state;
+   		 SELF.EventInfo.Date := iesp.ECL2ESP.toDate(l.event_date); 
+     // Some rare cases where we have the same phoneno and event_date, but event_type is C in one and CL in the other
+	    // I doubt we would have any other event_type cases with the same phoneno and event_date
+   		 SELF.EventInfo._Type := l.event_type; 
+   		 SELF.Operator.id := l.operator_id;
+   		 SELF.Operator.Name := l.operator_name;
+   		 SELF.PhoneLineType  := l.phone_line_type;
+   		 SELF.PhoneLineDescription  := l.phone_line_type_desc ;
+   		 SELF.PhoneServiceType   := l.phone_serv_type;
+   		 SELF.PhoneServiceDescription    := l.phone_serv_type_desc;
+      SELF.DisconnectDate := iesp.ECL2ESP.toDate(l.disconnect_date);
+      SELF.PortedDate := iesp.ECL2ESP.toDate(l.ported_date);
+      SELF.SuspendedDate := iesp.ECL2ESP.toDate(l.suspended_date);
+      SELF.ReactivatedDate := iesp.ECL2ESP.toDate(l.reactivated_date);
+      SELF.SwappedPhoneNumberDate := iesp.ECL2ESP.toDate(l.swapped_phone_number_date);
+      SELF.LineTypeLastSeen := iesp.ECL2ESP.toDate(l.line_type_last_seen);
+      SELF.NewPhoneNumberfromSwap := l.new_phone_number_from_swap;
+      SELF.Prepaid := l.prepaid;
+      SELF.Source := l.source;
+      SELF.Dialable := l.dialable;
+     END;
+     
+     dPhonesOut := PROJECT(CHOOSEN(dRecs, iesp.Constants.PhoneMetadata.MaxPhoneMetadataRecords), tFormat2PhoneMetadata(LEFT));
+phone_metadata_results:= dPhonesOut;
+
+mylayout_output:= record
+unsigned seq;
+string10 phone10;
+Boolean IsPhoneCurrent;
+string2 PhoneLineDescription ;
+string2 PhoneLineType ;
+END;
+
+with_phone_metadata:= join(biggestrec_rolled_temp_nonFCRA,phone_metadata_results,left.phone10=right.phonenumber,
+transform(mylayout_output,
+self.IsPhoneCurrent := right.iscurrent;
+self.PhoneLineDescription := right.phonelinedescription;
+self.PhoneLineType  := right.phonelinetype;
+self:=left;
+),left outer, keep(100));
+
+mylayout_output phoneroll(mylayout_output l, mylayout_output r):=transform
+     self:=l;
+     END;
+     
+sorted_meta_phone:= group(sort(with_phone_metadata,seq,phone10,-IsPhoneCurrent,-PhoneLineType),seq);
+rolled_meta_phone:= rollup(sorted_meta_phone,left.seq=right.seq,phoneroll(left,right));
+     
+  
+  Risk_indicators.Layout_Output add_metadata_phone(biggestrec_rolled_temp_nonFCRA l, rolled_meta_phone r):= transform
+  self.IsPhoneCurrent:=r.IsPhoneCurrent;
+  self.PhoneLineDescription:= r.PhoneLineDescription;
+  self.PhoneLineType:= r.PhoneLineType;
+  self:= l;
+  END;
+  
+ biggestrec_rolled_join:=join(biggestrec_rolled_temp, rolled_meta_phone, left.seq=right.seq, add_metadata_phone(left,right),left outer);
+ biggestrec_rolled:= group(biggestrec_rolled_join,seq);
+
+   //phone_metadata has been added. 
 
 risk_indicators.layout_output wphvertrans(risk_indicators.layout_output l, dirs_by_phone r) := transform
 	skip_hw_dist := length(trim(l.wphone10))<>10 OR l.hphonelat='' OR r.geo_lat='';
@@ -399,10 +487,10 @@ risk_indicators.layout_output wphvertrans(risk_indicators.layout_output l, dirs_
 	firstmatch_score := risk_indicators.FnameScore(l.fname, r.name_first);
 	n1 := NID.PreferredFirstNew(l.fname);
 	n2 := NID.PreferredFirstNew(r.name_first);
-	firstmatch := iid_constants.g(firstmatch_score) and if(ExactFirstNameRequired, l.fname=r.name_first, true) and
+	firstmatch := Risk_Indicators.iid_constants.g(firstmatch_score) and if(ExactFirstNameRequired, l.fname=r.name_first, true) and
 							  if(ExactFirstNameRequiredAllowNickname, l.fname=r.name_first or n1=n2, true);	
 	lastmatch_score := risk_indicators.LnameScore(l.lname, r.name_last);
-	lastmatch := iid_constants.g(lastmatch_score) and if(ExactLastNameRequired, l.lname=r.name_last, true);
+	lastmatch := Risk_Indicators.iid_constants.g(lastmatch_score) and if(ExactLastNameRequired, l.lname=r.name_last, true);
 	
 	zip_score2 := Risk_Indicators.AddrScore.zip_score(l.in_zipcode, r.z5);
 	primRange_score2 := Risk_Indicators.AddrScore.primRange_score(l.prim_range, r.prim_range);
@@ -417,14 +505,14 @@ risk_indicators.layout_output wphvertrans(risk_indicators.layout_output l, dirs_
 										Risk_Indicators.AddrScore.AddressScore( l.prim_range, l.prim_name, l.sec_range, 
 																														r.prim_range, r.prim_name, r.sec_range,
 																														zip_score2, cityst_score2));
-	addrmatch := iid_constants.ga(addrmatch_score2) and if(ExactAddrRequired, l.prim_range=r.prim_range and l.prim_name=r.prim_name and 
+	addrmatch := Risk_Indicators.iid_constants.ga(addrmatch_score2) and if(ExactAddrRequired, l.prim_range=r.prim_range and l.prim_name=r.prim_name and 
 																																						(l.in_zipcode=r.z5 or l.z5=r.z5 or 
 																																								(l.in_city=r.p_city_name and l.in_state=r.st) or (l.p_city_name=r.p_city_name and l.st=r.st)) and
 																																						ut.nneq(l.sec_range,r.sec_range), true);
 	wphonescore := risk_indicators.PhoneScore(l.wphone10, r.phone10);
-	wphonematch := iid_constants.gn(wphonescore) and if(ExactPhoneRequired, l.wphone10=r.phone10, true);
+	wphonematch := Risk_Indicators.iid_constants.gn(wphonescore) and if(ExactPhoneRequired, l.wphone10=r.phone10, true);
 	cmpyscore := IF(r.business_flag, did_add.company_name_match_score(l.employer_name, r.listed_name), 255);
-	cmpymatch := iid_constants.gc(cmpyscore);
+	cmpymatch := Risk_Indicators.iid_constants.gc(cmpyscore);
 	
 	goodHit := IF(((INTEGER)firstmatch+(INTEGER)lastmatch+(INTEGER)addrmatch+(INTEGER)wphonematch+(INTEGER)cmpymatch)>1,true,false);	// only keep the record if it matches at least 2 elements
 	
@@ -438,8 +526,8 @@ END;
 wphonerec_history_roxie := join(biggestrec_rolled,dirs_by_phone,
 						left.wphone10<>'' AND left.wphone10[4..10]=right.p7 and left.wphone10[1..3]=right.p3 and
 						// check date
-						((unsigned)RIGHT.dt_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) AND
-						(RIGHT.current_flag OR iid_constants.myDaysApart(left.historydate,((STRING6)RIGHT.deletion_date[1..6]+'31'), LastSeenThreshold)),
+						((unsigned)RIGHT.dt_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)) AND
+						(RIGHT.current_flag OR Risk_Indicators.iid_constants.myDaysApart(left.historydate,((STRING6)RIGHT.deletion_date[1..6]+'31'), LastSeenThreshold)),
 						wphvertrans(left,right), left outer, many lookup, 
 						ATMOST(
 							left.wphone10[4..10]=right.p7 and left.wphone10[1..3]=right.p3,
@@ -451,8 +539,8 @@ wphonerec_history_thor_pre := join(distribute(biggestrec_rolled(wphone10<>''), h
 						distribute(dirs_by_phone, hash64(p3+p7)),
 						left.wphone10<>'' AND left.wphone10[4..10]=right.p7 and left.wphone10[1..3]=right.p3 and
 						// check date
-						((unsigned)RIGHT.dt_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) AND
-						(RIGHT.current_flag OR iid_constants.myDaysApart(left.historydate,((STRING6)RIGHT.deletion_date[1..6]+'31'), LastSeenThreshold)),
+						((unsigned)RIGHT.dt_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)) AND
+						(RIGHT.current_flag OR Risk_Indicators.iid_constants.myDaysApart(left.historydate,((STRING6)RIGHT.deletion_date[1..6]+'31'), LastSeenThreshold)),
 						wphvertrans(left,right), left outer,
 						keep(300), LOCAL);
 
@@ -509,6 +597,7 @@ risk_indicators.layout_output naptrans(risk_indicators.layout_output le) := tran
 	try5 := IF(le.phoneAddrSourceUsed='PA,', comp_nap(le.phoneaddr_firstcount, le.phoneaddr_lastcount, le.phoneaddr_addrcount, le.phoneaddr_phonecount), 0);	// phonesplus, make this same priority as utility
 	try6 := comp_nap(le.inquiryNAPfirstcount, le.inquiryNAPlastcount, le.inquiryNAPaddrcount, le.inquiryNAPphonecount);	// inquiries, make this same priority as utility	
 	try7 := IF(le.phoneSourceUsed='IP,', comp_nap(le.phonefirstcount, le.phonelastcount, le.phoneaddrcount, le.phonephonecount), 0);	// insurance, make this same priority as utility
+	try8 := IF(le.phoneSourceUsed='EQ,', comp_nap(le.phonefirstcount, le.phonelastcount, le.phoneaddrcount, le.phonephonecount), 0);	// Equifax, make this same priority as phoneplus
 
 // 1.  If we have a current phone record "connected/current" use that for the NAP even if the Utility record has a better NAP
 // 2.  For a disconnect phone and a utility record scenario use the record with the higher NAP 
@@ -517,35 +606,41 @@ risk_indicators.layout_output naptrans(risk_indicators.layout_output le) := tran
 		
 	STRING2 m := 	MAP(
 										// new logic to not let targus gateway lower the nap result
-										le.targusgatewayused and try1 >= try2 and try1 >= try3 and try1 >= try4 => 'P',	// targusgatewayused means we got a hit on targus gateway (assumed current and at least level 1)
+										le.targusgatewayused and try1 >= try2 and try1 >= try3 and try1 >= try4 and try1>=try8 => 'P',	// targusgatewayused means we got a hit on targus gateway (assumed current and at least level 1)
 										// take either one if 1 is disconnected and the other one is not and it is better than or equal to all new searches
-										pgood AND ~agood and ~le.targusgatewayused and try1 >= try4 and try1 >= try5 and try1 >= try6 and try1 >= try7		=>	'P',	// use try1
-										~pgood AND agood and try2 >= try4 and try2 >= try5 and try2 >= try6 and try2 >= try7	=>	'A',	// use try2
+										pgood AND ~agood and ~le.targusgatewayused and try1 >= try4 and try1 >= try5 and try1 >= try6 and try1 >= try7 and try1 >= try8		=>	'P',	// use try1
+										~pgood AND agood and try2 >= try4 and try2 >= try5 and try2 >= try6 and try2 >= try7 and try2 >= try8	=>	'A',	// use try2
 										// if both are connected, take the better one if it is better than or equal to all new searches
-										pgood AND agood AND try1 >= try2 and try1 >= try4 and try1 >= try5 and try1 >= try6 and try1 >= try7 	=>	'P',
-										agood	and try2 >= try4 and try2 >= try5 and try2 >= try6 and try2 >= try7		=>	'A',
+										pgood AND agood AND try1 >= try2 and try1 >= try4 and try1 >= try5 and try1 >= try6 and try1 >= try7 and try1 >= try8 	=>	'P',
+										agood	and try2 >= try4 and try2 >= try5 and try2 >= try6 and try2 >= try7	and try2 >= try8	=>	'A',
 										// otherwise, both are disconnected and we'll consider using utility and inquiry and phonesplus and insurance
-										try1 >= try2 AND try1 >= try3 AND try1 >= try4 AND try1 >= try5 AND try1 >= try6 AND try1 >= try7		=> 	'P',
-										try2 >= try1 AND try2 >= try3 AND try2 >= try4 AND try2 >= try5 AND try2 >= try6 AND try2 >= try7		=>	'A',
-										try3 >= try1 AND try3 >= try2 AND try3 >= try4 AND try3 >= try5 AND try3 >= try6 AND try3 >= try7   =>  'U',
+										try1 >= try2 AND try1 >= try3 AND try1 >= try4 AND try1 >= try5 AND try1 >= try6 AND try1 >= try7	 and try1 >= try8	=> 	'P',
+										try2 >= try1 AND try2 >= try3 AND try2 >= try4 AND try2 >= try5 AND try2 >= try6 AND try2 >= try7	 and try2 >= try8	=>	'A',
+										try3 >= try1 AND try3 >= try2 AND try3 >= try4 AND try3 >= try5 AND try3 >= try6 AND try3 >= try7  and try3 >= try8  =>  'U',
 										// new cases
-										try4 >= try5 AND try4 >= try6 AND try4 >= try7   =>  'PP',	// phonesplus phone
-										try5 >= try6 AND try5 >= try7   =>  'PA',	// phonesplus address
-										try6 >= try7   =>  'S',	// inquiries
-										'I');	// insurance									
+										try4 >= try5 AND try4 >= try6 AND try4 >= try7 and try4 >= try8   =>  'PP',	// phonesplus phone
+										try5 >= try6 AND try5 >= try7 AND try5 >= try8   =>  'PA',	// phonesplus address
+										try6 >= try7 AND try6 >= try8   =>  'S',	// inquiries
+				         try7 >= try8 => 'I', // insurance
+               'EQ');						
 					
 	phoneverlevelTemp := CASE(m,	'P'	=> try1,
 																'A' => try2,
 																'U' => try3,
-																'PP' => try4,
+																'PP' => try4,                                                       
 																'PA' => try5,
 																'S' => try6,
-																try7);
+																'I' =>try7,
+                        try8);
 
 	// If instantid v1 and we would have output a nap=9, but we also have a nap=8, then set the nap=12
-	merge8_9 := IIDv1 AND phoneverlevelTemp = 9 AND (try2=8 OR try3=8 OR try5=8 OR try6=8);	
-
-	phoneverlevel := IF(merge8_9, 12, phoneverlevelTemp);
+   merge8_9 := IIDv1 AND (phoneverlevelTemp = 9 AND (try2=8 OR try3=8 OR try5=8 OR try6=8));	
+   merge_EQ_10_11:=(le.phoneSourceUsed='EQ,' AND phoneverlevelTemp IN [10,11] AND 
+                   ((le.phonefirstcount>=1 AND le.phoneaddrcount>=1 AND le.phonephonecount>=1)
+                   OR (le.phonelastcount>=1 AND le.phoneaddrcount>=1 AND le.phonephonecount>=1))) 
+                   AND (try2=8 OR try3=8 OR try5=8 OR try6=8);
+  
+	phoneverlevel := IF(merge8_9 or merge_EQ_10_11, 12, phoneverlevelTemp);
 	
 	// figure out which try we used so that we know which address to populate in the phone address
 	dirs_prim_range := MAP(	try2=8 => le.dirsaddr_prim_range,
@@ -635,6 +730,7 @@ risk_indicators.layout_output naptrans(risk_indicators.layout_output le) := tran
 	self.phoneverlevel := phoneverlevel;
 	convertedM := MAP(m='PP' => 'P',
 										m='PA' => 'A',
+               m='EQ' => 'P',
 										TRIM(m));
 	SELF.phonever_type := convertedM;	// even if we do the combine 8 and 9, the type should have been a 'P', so no need to modify it
 	SELF.NAP_Type := if(phoneverlevel>0, convertedM, '');
@@ -656,14 +752,14 @@ risk_indicators.layout_output naptrans(risk_indicators.layout_output le) := tran
 
 // bocashell version 50 doesn't count gong and targus white pages as a nonderog
 	self.num_nonderogs := le.num_nonderogs + if(bsversion>=50, 0, (integer)(le.phone_date_last_seen>0 or le.phoneaddr_date_last_seen>0));
-	myGetDate := iid_constants.myGetDate(le.historydate);
-	self.num_nonderogs30 := le.num_nonderogs30 +  if(bsversion>=50, 0, (integer)iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,30, le.historydate));
-	self.num_nonderogs90 := le.num_nonderogs90 +  if(bsversion>=50, 0, (integer)iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,90, le.historydate));
-	self.num_nonderogs180 := le.num_nonderogs180 +  if(bsversion>=50, 0, (integer)iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,180, le.historydate));
-	self.num_nonderogs12 := le.num_nonderogs12 +  if(bsversion>=50, 0, (integer)iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,iid_constants.oneyear, le.historydate));
-	self.num_nonderogs24 := le.num_nonderogs24 +  if(bsversion>=50, 0, (integer)iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,iid_constants.twoyears, le.historydate));
-	self.num_nonderogs36 := le.num_nonderogs36 +  if(bsversion>=50, 0, (integer)iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,iid_constants.threeyears, le.historydate));
-	self.num_nonderogs60 := le.num_nonderogs60 +  if(bsversion>=50, 0, (integer)iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,iid_constants.fiveyears, le.historydate));
+	myGetDate := Risk_Indicators.iid_constants.myGetDate(le.historydate);
+	self.num_nonderogs30 := le.num_nonderogs30 +  if(bsversion>=50, 0, (integer)Risk_Indicators.iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,30, le.historydate));
+	self.num_nonderogs90 := le.num_nonderogs90 +  if(bsversion>=50, 0, (integer)Risk_Indicators.iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,90, le.historydate));
+	self.num_nonderogs180 := le.num_nonderogs180 +  if(bsversion>=50, 0, (integer)Risk_Indicators.iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,180, le.historydate));
+	self.num_nonderogs12 := le.num_nonderogs12 +  if(bsversion>=50, 0, (integer)Risk_Indicators.iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,Risk_Indicators.iid_constants.oneyear, le.historydate));
+	self.num_nonderogs24 := le.num_nonderogs24 +  if(bsversion>=50, 0, (integer)Risk_Indicators.iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,Risk_Indicators.iid_constants.twoyears, le.historydate));
+	self.num_nonderogs36 := le.num_nonderogs36 +  if(bsversion>=50, 0, (integer)Risk_Indicators.iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,Risk_Indicators.iid_constants.threeyears, le.historydate));
+	self.num_nonderogs60 := le.num_nonderogs60 +  if(bsversion>=50, 0, (integer)Risk_Indicators.iid_constants.checkDays(myGetDate,(string)le.phone_date_last_seen,Risk_Indicators.iid_constants.fiveyears, le.historydate));
 		
 	self := le;
 END;
@@ -675,7 +771,7 @@ risk_indicators.layout_output mergeNap(pphonerec le) := transform
 
 	
 	addrOverlap := (integer)(le.phoneaddr_firstcount>0 and le.phonefirstcount>0) + (integer)(le.phoneaddr_lastcount>0 and le.phonelastcount>0) + (integer)(le.phoneaddr_addrcount>0 and 
-													(le.phoneaddrcount>0 or (le.targusgatewayused and le.dirs_prim_name=''/* and (/*~* /doE3220 or le.nxx_type /*not* / in cellPhoneTypes)*/)));// number of fields matching
+													(le.phoneaddrcount>0  or (le.targusgatewayused and le.dirs_prim_name=''/* and (/*~* /doE3220 or le.nxx_type /*not* / in cellPhoneTypes)*/)));// number of fields matching
 	utilOverlap := (integer)(le.utiliaddr_firstcount>0 and le.phonefirstcount>0) + (integer)(le.utiliaddr_lastcount>0 and le.phonelastcount>0) + (integer)(le.utiliaddr_addrcount>0 and 
 													(le.phoneaddrcount>0 or (le.targusgatewayused and le.dirs_prim_name=''/* and (~doE3220 or le.nxx_type /*not * /in cellPhoneTypes)*/))) + (integer)(le.utiliaddr_phonecount>0 and le.phonephonecount>0);// number of fields matching
 	overlap := map(le.targusgatewayused and le.nap_type = 'A' and (addrOverlap>1 or (addrOverlap=1 and le.phoneaddr_addrcount>0 and le.phoneaddrcount>0 and le.addr_type='S')) => 1, // merge with address results
@@ -745,7 +841,7 @@ risk_indicators.layout_output mergeNap(pphonerec le) := transform
 																	
 	getPhoneverlevel := if(le.phoneverlevel=3 and mergedNap=10, le.phoneverlevel, mergedNap);		// if original nap was 3 and merged nap is 10 then dont do it	
 	
-	override_nap1_to_0 := getPhoneverlevel=1 and (le.dirs_prim_name='' or le.dirsfirst='' or le.dirslast='');
+	override_nap1_to_0 := getPhoneverlevel=1 and (le.dirs_prim_name='' or le.dirsfirst='' or le.dirslast='');// and le.src!='EQ';
 	phoneverlevelTemp := if(override_nap1_to_0, 0, getPhoneverlevel);	// set the phoneverlevel to 0 if was 1 and no first or last or address found, per jim c.  has to be fully contrary to be a 1
 	self.phoneverlevel := phoneverlevelTemp;	// set the phoneverlevel to 0 if was 1 and no first or last or address found, per jim c.  has to be fully contrary to be a 1
 	nap_type := if(override_nap1_to_0, '', le.NAP_Type);	// set the nap_type to blank if we set the phoneverlevel back to 0
@@ -778,16 +874,16 @@ risk_indicators.layout_output mergeNap(pphonerec le) := transform
 	
 	CURRENT_OCCUPANT_MONTHS := 4; // from today, how many months back we'll consider someone a 'current' resident
 	
-	currOccFlag := if(phoneverlevelTemp in [8,12] and (unsigned3)OccupPhoneLastSeen_dt >= iid_constants.MonthRollback((string)le.historydate,CURRENT_OCCUPANT_MONTHS),  true, risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.CurrentOccupant, le.iid_flags )) ;
+	currOccFlag := if(phoneverlevelTemp in [8,12] and (unsigned3)OccupPhoneLastSeen_dt >= Risk_Indicators.iid_constants.MonthRollback((string)le.historydate,CURRENT_OCCUPANT_MONTHS),  true, risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.CurrentOccupant, le.iid_flags )) ;
 	
-	NAPCurrOccFlag := iid_constants.SetFlag(iid_constants.IIDFlag.CurrentOccupant, currOccFlag );
+	NAPCurrOccFlag := Risk_Indicators.iid_constants.SetFlag(Risk_Indicators.iid_constants.IIDFlag.CurrentOccupant, currOccFlag );
 	
 	everOccFlag := 	if(phoneverlevelTemp in [8,12] and (unsigned3)ever_past_date <= (unsigned3)OccupPhoneLastSeen_dt 
 										and  (unsigned3)ever_start_date >=  (unsigned3)OccupPhoneFirstSeen_dt,  
 										True, 
 									  risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.EverOccupant, le.iid_flags )) ;
 	
-	NAPEverOccFlag := iid_constants.SetFlag( iid_constants.IIDFlag.EverOccupant, everOccFlag );
+	NAPEverOccFlag := Risk_Indicators.iid_constants.SetFlag( Risk_Indicators.iid_constants.IIDFlag.EverOccupant, everOccFlag );
 
 	self.iid_flags := if(IncludeNAPData, NAPCurrOccFlag + NAPEverOccFlag, le.iid_flags);
 	
@@ -861,83 +957,83 @@ risk_indicators.layout_output mergeNap(pphonerec le) := transform
 	self.dirsfirst := if(weMerged,  map(betternameA in [1,5] or betternameU in [1,5] => le.dirsfirst, 
 																			betternameA in [2,6] => le.dirsaddr_first,
 																			betternameU in [2,6] => le.utilifirst,
-																			addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_firstscore) > iid_constants.tscore(le.dirs_firstscore) => le.dirsaddr_first,
-																			addrMatch = 4 and iid_constants.tscore(le.utili_firstscore) > iid_constants.tscore(le.dirs_firstscore) => le.utilifirst,
+																			addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_firstscore) > Risk_Indicators.iid_constants.tscore(le.dirs_firstscore) => le.dirsaddr_first,
+																			addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_firstscore) > Risk_Indicators.iid_constants.tscore(le.dirs_firstscore) => le.utilifirst,
 																			le.dirsfirst), 
 																	le.dirsfirst);
 	self.dirslast := if(weMerged, map(betternameA in [1,5] or betternameU in [1,5] => le.dirslast, 
 																		betternameA in [2,4] => le.dirsaddr_last,
 																		betternameU in [2,4] => le.utililast,
-																		addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_lastscore) > iid_constants.tscore(le.dirs_lastscore) => le.dirsaddr_last,
-																		addrMatch = 4 and iid_constants.tscore(le.utili_lastscore) > iid_constants.tscore(le.dirs_lastscore) => le.utililast,
+																		addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_lastscore) > Risk_Indicators.iid_constants.tscore(le.dirs_lastscore) => le.dirsaddr_last,
+																		addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_lastscore) > Risk_Indicators.iid_constants.tscore(le.dirs_lastscore) => le.utililast,
 																		le.dirslast), 
 																le.dirslast);
-	self.dirs_prim_range := if(weMerged,  map(addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_prim_range,
-																						addrMatch = 4 and iid_constants.tscore(le.utili_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.utili_prim_range,
+	self.dirs_prim_range := if(weMerged,  map(addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_prim_range,
+																						addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.utili_prim_range,
 																						le.dirs_prim_range), 
 																				le.dirs_prim_range);
-	self.dirs_predir := if(weMerged,  map(addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_predir,
-																				addrMatch = 4 and iid_constants.tscore(le.utili_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.utili_predir,
+	self.dirs_predir := if(weMerged,  map(addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_predir,
+																				addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.utili_predir,
 																				le.dirs_predir), 
 																		le.dirs_predir);
-	self.dirs_prim_name := if(weMerged, map(addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_prim_name,
-																					addrMatch = 4 and iid_constants.tscore(le.utili_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.utili_prim_name,
+	self.dirs_prim_name := if(weMerged, map(addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_prim_name,
+																					addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.utili_prim_name,
 																					le.dirs_prim_name), 
 																			le.dirs_prim_name);
-	self.dirs_suffix := if(weMerged,  map(addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_suffix,
-																				addrMatch = 4 and iid_constants.tscore(le.utili_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.utili_suffix,
+	self.dirs_suffix := if(weMerged,  map(addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_suffix,
+																				addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.utili_suffix,
 																				le.dirs_suffix), 
 																		le.dirs_suffix);
-	self.dirs_postdir := if(weMerged, map(addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_postdir,
-																				addrMatch = 4 and iid_constants.tscore(le.utili_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.utili_postdir,
+	self.dirs_postdir := if(weMerged, map(addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_postdir,
+																				addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.utili_postdir,
 																				le.dirs_postdir), 
 																		le.dirs_postdir);
-	self.dirs_unit_desig := if(weMerged,  map(addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_unit_desig,
-																						addrMatch = 4 and iid_constants.tscore(le.utili_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.utili_unit_desig,
+	self.dirs_unit_desig := if(weMerged,  map(addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_unit_desig,
+																						addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.utili_unit_desig,
 																						le.dirs_unit_desig), 
 																				le.dirs_unit_desig);
-	self.dirs_sec_range := if(weMerged, map(addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_sec_range,
-																					addrMatch = 4 and iid_constants.tscore(le.utili_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.utili_sec_range,
+	self.dirs_sec_range := if(weMerged, map(addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_sec_range,
+																					addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.utili_sec_range,
 																					le.dirs_sec_range), 
 																			le.dirs_sec_range);
-	self.dirscity := if(weMerged, map(addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_city,
-																		addrMatch = 4 and iid_constants.tscore(le.utili_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.utilicity,
+	self.dirscity := if(weMerged, map(addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_city,
+																		addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.utilicity,
 																		le.dirscity), 
 																le.dirscity);
-	self.dirsstate := if(weMerged,  map(addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_state,
-																			addrMatch = 4 and iid_constants.tscore(le.utili_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.utilistate,
+	self.dirsstate := if(weMerged,  map(addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_state,
+																			addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.utilistate,
 																			le.dirsstate), 
 																	le.dirsstate);
-	self.dirszip := if(weMerged,  map(addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_zip,
-																		addrMatch = 4 and iid_constants.tscore(le.utili_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.utilizip,
+	self.dirszip := if(weMerged,  map(addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_zip,
+																		addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.utilizip,
 																		le.dirszip), 
 																le.dirszip);	
-	self.dirscmpy := if(weMerged, map(addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_addrscore) > iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_cmpy,
+	self.dirscmpy := if(weMerged, map(addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) => le.dirsaddr_cmpy,
 																		le.dirscmpy), 
 																le.dirscmpy);
 																
 	self.dirs_firstscore := if(weMerged,  map(betternameA in [1,5] or betternameU in [1,5] => le.dirs_firstscore, 
 																						betternameA in [2,6] => le.dirsaddr_firstscore,
 																						betternameU in [2,6] => le.utili_firstscore,
-																						addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_firstscore) > iid_constants.tscore(le.dirs_firstscore) => le.dirsaddr_firstscore,
-																						addrMatch = 4 and iid_constants.tscore(le.utili_firstscore) > iid_constants.tscore(le.dirs_firstscore) => le.utili_firstscore,
+																						addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_firstscore) > Risk_Indicators.iid_constants.tscore(le.dirs_firstscore) => le.dirsaddr_firstscore,
+																						addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_firstscore) > Risk_Indicators.iid_constants.tscore(le.dirs_firstscore) => le.utili_firstscore,
 																						le.dirs_firstscore), 
 														 le.dirs_firstscore);
 	self.dirs_lastscore := if(weMerged, map(betternameA in [1,3] or betternameU in [1,3] => le.dirs_lastscore, 
 																					betternameA in [2,4] => le.dirsaddr_lastscore,
 																					betternameU in [2,4] => le.utili_lastscore,
-																					addrMatch in [1,3] and iid_constants.tscore(le.dirsaddr_lastscore) > iid_constants.tscore(le.dirs_lastscore) => le.dirsaddr_lastscore,
-																					addrMatch = 4 and iid_constants.tscore(le.utili_lastscore) > iid_constants.tscore(le.dirs_lastscore) => le.utili_lastscore,
+																					addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirsaddr_lastscore) > Risk_Indicators.iid_constants.tscore(le.dirs_lastscore) => le.dirsaddr_lastscore,
+																					addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.utili_lastscore) > Risk_Indicators.iid_constants.tscore(le.dirs_lastscore) => le.utili_lastscore,
 																					le.dirs_lastscore), 
 														le.dirs_lastscore);
-	self.dirs_addrscore := if(weMerged, if(addrMatch in [1,3], MAX(iid_constants.tscore(le.dirs_addrscore), iid_constants.tscore(le.dirsaddr_addrscore)), 
-																														 MAX(iid_constants.tscore(le.dirs_addrscore), iid_constants.tscore(le.utili_addrscore))), 
+	self.dirs_addrscore := if(weMerged, if(addrMatch in [1,3], MAX(Risk_Indicators.iid_constants.tscore(le.dirs_addrscore), Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore)), 
+																														 MAX(Risk_Indicators.iid_constants.tscore(le.dirs_addrscore), Risk_Indicators.iid_constants.tscore(le.utili_addrscore))), 
 																			le.dirs_addrscore);
-	self.dirs_citystatescore := if(weMerged, if(addrMatch in [1,3], MAX(iid_constants.tscore(le.dirs_citystatescore), iid_constants.tscore(le.dirsaddr_citystatescore)), 
-																														 MAX(iid_constants.tscore(le.dirs_citystatescore), iid_constants.tscore(le.utili_citystatescore))), 
+	self.dirs_citystatescore := if(weMerged, if(addrMatch in [1,3], MAX(Risk_Indicators.iid_constants.tscore(le.dirs_citystatescore), Risk_Indicators.iid_constants.tscore(le.dirsaddr_citystatescore)), 
+																														 MAX(Risk_Indicators.iid_constants.tscore(le.dirs_citystatescore), Risk_Indicators.iid_constants.tscore(le.utili_citystatescore))), 
 																			le.dirs_citystatescore);
-	self.dirs_zipscore := if(weMerged, if(addrMatch in [1,3], MAX(iid_constants.tscore(le.dirs_zipscore), iid_constants.tscore(le.dirsaddr_zipscore)), 
-																														 MAX(iid_constants.tscore(le.dirs_zipscore), iid_constants.tscore(le.utili_zipscore))), 
+	self.dirs_zipscore := if(weMerged, if(addrMatch in [1,3], MAX(Risk_Indicators.iid_constants.tscore(le.dirs_zipscore), Risk_Indicators.iid_constants.tscore(le.dirsaddr_zipscore)), 
+																														 MAX(Risk_Indicators.iid_constants.tscore(le.dirs_zipscore), Risk_Indicators.iid_constants.tscore(le.utili_zipscore))), 
 																			le.dirs_zipscore);
 																			
 	self.dirs_phonescore := le.dirs_phonescore;
@@ -945,41 +1041,41 @@ risk_indicators.layout_output mergeNap(pphonerec le) := transform
 	
 	self.dirsaddr_first := if(weMerged, map(betternameA in [1,5] => le.dirsfirst, 
 																					betternameA in [2,6] => le.dirsaddr_first,
-																					addrMatch in [1,3] and iid_constants.tscore(le.dirs_firstscore) > iid_constants.tscore(le.dirsaddr_firstscore) => le.dirsfirst,
+																					addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_firstscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_firstscore) => le.dirsfirst,
 																					le.dirsaddr_first), 
 																			le.dirsaddr_first);
 	self.dirsaddr_last := if(weMerged,  map(betternameA in [1,5] => le.dirslast, 
 																					betternameA in [2,4] => le.dirsaddr_last,
-																					addrMatch in [1,3] and iid_constants.tscore(le.dirs_lastscore) > iid_constants.tscore(le.dirsaddr_lastscore) => le.dirslast,
+																					addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_lastscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_lastscore) => le.dirslast,
 																					le.dirsaddr_last), 
 																			le.dirsaddr_last);
-	self.dirsaddr_prim_range := if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_prim_range, le.dirsaddr_prim_range);
-	self.dirsaddr_predir := if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_predir, le.dirsaddr_predir);
-	self.dirsaddr_prim_name := if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_prim_name, le.dirsaddr_prim_name);
-	self.dirsaddr_suffix := if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_suffix, le.dirsaddr_suffix);
-	self.dirsaddr_postdir := if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_postdir, le.dirsaddr_postdir);
-	self.dirsaddr_unit_desig := if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_unit_desig, le.dirsaddr_unit_desig);
-	self.dirsaddr_sec_range :=  if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_sec_range, le.dirsaddr_sec_range);
-	self.dirsaddr_city :=  if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirscity, le.dirsaddr_city);
-	self.dirsaddr_state :=  if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirsstate, le.dirsaddr_state);
-	self.dirsaddr_zip :=  if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirszip, le.dirsaddr_zip);
+	self.dirsaddr_prim_range := if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_prim_range, le.dirsaddr_prim_range);
+	self.dirsaddr_predir := if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_predir, le.dirsaddr_predir);
+	self.dirsaddr_prim_name := if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_prim_name, le.dirsaddr_prim_name);
+	self.dirsaddr_suffix := if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_suffix, le.dirsaddr_suffix);
+	self.dirsaddr_postdir := if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_postdir, le.dirsaddr_postdir);
+	self.dirsaddr_unit_desig := if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_unit_desig, le.dirsaddr_unit_desig);
+	self.dirsaddr_sec_range :=  if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_sec_range, le.dirsaddr_sec_range);
+	self.dirsaddr_city :=  if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirscity, le.dirsaddr_city);
+	self.dirsaddr_state :=  if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirsstate, le.dirsaddr_state);
+	self.dirsaddr_zip :=  if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirszip, le.dirsaddr_zip);
 	self.dirsaddr_phone :=  if(weMerged and addrMatch in [1,3], le.phone10, le.dirsaddr_phone);
 	self.dirsaddr_cmpy := le.dirsaddr_cmpy;
 	
 	self.dirsaddr_firstscore := if(weMerged,  map(betternameA in [1,5] => le.dirs_firstscore, 
 																								betternameA in [2,6] => le.dirsaddr_firstscore,
-																								addrMatch in [1,3] and iid_constants.tscore(le.dirs_firstscore) > iid_constants.tscore(le.dirsaddr_firstscore) => le.dirs_firstscore,
+																								addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_firstscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_firstscore) => le.dirs_firstscore,
 																								le.dirsaddr_firstscore), 
 																 le.dirsaddr_firstscore);
 	self.dirsaddr_lastscore := if(weMerged, map(betternameA in [1,5] => le.dirs_lastscore, 
 																							betternameA in [2,4] => le.dirsaddr_lastscore,
-																							addrMatch in [1,3] and iid_constants.tscore(le.dirs_lastscore) > iid_constants.tscore(le.dirsaddr_lastscore) => le.dirs_lastscore,
+																							addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_lastscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_lastscore) => le.dirs_lastscore,
 																							le.dirsaddr_lastscore), 
 															 le.dirsaddr_lastscore);
-	self.dirsaddr_addrscore := if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_addrscore, le.dirsaddr_addrscore);
+	self.dirsaddr_addrscore := if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_addrscore, le.dirsaddr_addrscore);
 // use the same selection logic to pick citystatescore and zipscore as the addrscore so they all refer to the same matched record
-	self.dirsaddr_citystatescore := if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_citystatescore, le.dirsaddr_citystatescore);
-	self.dirsaddr_zipscore := if(weMerged and addrMatch in [1,3] and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_zipscore, le.dirsaddr_zipscore);
+	self.dirsaddr_citystatescore := if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_citystatescore, le.dirsaddr_citystatescore);
+	self.dirsaddr_zipscore := if(weMerged and addrMatch in [1,3] and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.dirsaddr_addrscore), le.dirs_zipscore, le.dirsaddr_zipscore);
 
 	
 	self.dirsaddr_phonescore :=if(weMerged and addrMatch in [1,3], le.dirs_phonescore, le.dirsaddr_phonescore);
@@ -988,40 +1084,40 @@ risk_indicators.layout_output mergeNap(pphonerec le) := transform
 	
 	self.utilifirst := if(weMerged, map(betternameU in [1,5] => le.dirsfirst, 
 																			betternameU in [2,6] => le.utilifirst,
-																			addrMatch = 4 and iid_constants.tscore(le.dirs_firstscore) > iid_constants.tscore(le.utili_firstscore) => le.dirsfirst,
+																			addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_firstscore) > Risk_Indicators.iid_constants.tscore(le.utili_firstscore) => le.dirsfirst,
 																			le.utilifirst), 
 																	le.utilifirst);
 	self.utililast := if(weMerged,  map(betternameU in [1,5] => le.dirslast, 
 																			betternameU in [2,4] => le.utililast,
-																			addrMatch = 4 and iid_constants.tscore(le.dirs_lastscore) > iid_constants.tscore(le.utili_lastscore) => le.dirslast,
+																			addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_lastscore) > Risk_Indicators.iid_constants.tscore(le.utili_lastscore) => le.dirslast,
 																			le.utililast), 
 																	le.utililast);
-	self.utili_prim_range := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirs_prim_range, le.utili_prim_range);
-	self.utili_predir := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirs_predir, le.utili_predir);
-	self.utili_prim_name := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirs_prim_name, le.utili_prim_name);
-	self.utili_suffix := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirs_suffix, le.utili_suffix);
-	self.utili_postdir := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirs_postdir, le.utili_postdir);
-	self.utili_unit_desig := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirs_unit_desig, le.utili_unit_desig);
-	self.utili_sec_range := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirs_sec_range, le.utili_sec_range);
-	self.utilicity := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirscity, le.utilicity);
-	self.utilistate := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirsstate, le.utilistate);
-	self.utilizip := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirszip, le.utilizip);
+	self.utili_prim_range := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirs_prim_range, le.utili_prim_range);
+	self.utili_predir := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirs_predir, le.utili_predir);
+	self.utili_prim_name := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirs_prim_name, le.utili_prim_name);
+	self.utili_suffix := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirs_suffix, le.utili_suffix);
+	self.utili_postdir := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirs_postdir, le.utili_postdir);
+	self.utili_unit_desig := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirs_unit_desig, le.utili_unit_desig);
+	self.utili_sec_range := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirs_sec_range, le.utili_sec_range);
+	self.utilicity := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirscity, le.utilicity);
+	self.utilistate := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirsstate, le.utilistate);
+	self.utilizip := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirszip, le.utilizip);
 	self.utiliphone := if(weMerged and addrMatch = 4, le.phone10, le.utiliphone);
 	
 	self.utili_firstscore := if(weMerged, map(betternameU in [1,5] => le.dirs_firstscore, 
 																						betternameU in [2,6] => le.utili_firstscore,
-																						addrMatch = 4 and iid_constants.tscore(le.dirs_firstscore) > iid_constants.tscore(le.utili_firstscore) => le.dirs_firstscore,
+																						addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_firstscore) > Risk_Indicators.iid_constants.tscore(le.utili_firstscore) => le.dirs_firstscore,
 																						le.utili_firstscore), 
 														 le.utili_firstscore);
 	self.utili_lastscore := if(weMerged,  map(betternameU in [1,5] => le.dirs_lastscore, 
 																						betternameU in [2,4] => le.utili_lastscore,
-																						addrMatch = 4 and iid_constants.tscore(le.dirs_lastscore) > iid_constants.tscore(le.utili_lastscore) => le.dirs_lastscore,
+																						addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_lastscore) > Risk_Indicators.iid_constants.tscore(le.utili_lastscore) => le.dirs_lastscore,
 																						le.utili_lastscore), 
 														 le.utili_lastscore);
-	self.utili_addrscore := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirs_addrscore, le.utili_addrscore);
+	self.utili_addrscore := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirs_addrscore, le.utili_addrscore);
 	// use the same selection logic to pick citystatescore and zipscore as the addrscore so they all refer to the same matched record
-	self.utili_citystatescore := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirs_citystatescore, le.utili_citystatescore);
-	self.utili_zipscore := if(weMerged and addrMatch = 4 and iid_constants.tscore(le.dirs_addrscore) > iid_constants.tscore(le.utili_addrscore), le.dirs_zipscore, le.utili_zipscore);
+	self.utili_citystatescore := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirs_citystatescore, le.utili_citystatescore);
+	self.utili_zipscore := if(weMerged and addrMatch = 4 and Risk_Indicators.iid_constants.tscore(le.dirs_addrscore) > Risk_Indicators.iid_constants.tscore(le.utili_addrscore), le.dirs_zipscore, le.utili_zipscore);
 	
 	self.utili_phonescore := if(weMerged and addrMatch = 4, le.dirs_phonescore, le.utili_phonescore);
 	
@@ -1032,17 +1128,28 @@ risk_indicators.layout_output mergeNap(pphonerec le) := transform
 end;
 phonerec_merged := project(pphonerec, mergeNap(left));
 // output(phone_input, named('phone_input'));
- // output(withInquiriesNAP, named('withInquiriesNAP'));
- // output(biggestrec_history, named('biggestrec_history'));
-// output(phone_velocity, named('phone_velocity'));
  // output(dirs_by_phone, named('dirs_by_phone'));
+ // output(biggestrec_history_roxie, named('biggestrec_history_roxie'));
+ // output(phone_velocity, named('phone_velocity'));
+ // output(phone_velocity_sorted, named('phone_velocity_sorted'));
+ // output(phone_velocity_grped, named('phone_velocity_grped'));
+ // output(ds_for_rollup, named('ds_for_rollup')); 
+ // output(biggestrec_rolled_temp, named('biggestrec_rolled_temp')); 
+ // output(valid_phone_inputs, named('valid_phone_inputs')); 
+ // output(drecs,named('drecs'));
+ // output(phone_metadata_results,named('phone_metadata_results'));
+ // output(with_phone_metadata,named('with_phone_metadata'));
+ // output(sorted_meta_phone,named('sorted_meta_phone'));
+ // output(rolled_meta_phone,named('rolled_meta_phone'));
+ // output(biggestrec_rolled_join,named('biggestrec_rolled_join'));
+ // output(biggestrec_rolled,named('biggestrec_rolled'));
+ 
+ 
+ 
 // output(biggestrec_rolled, named('biggestrec_rolled'));
-// output(rollphonerecs, named('rollphonerecs'));
-// output(pphonerec, named('pphonerec'));
+ // output(rollphonerecs, named('rollphonerecs')); 
+ // output(pphonerec, named('pphonerec')); 
 // output(phonerec_merged, named('phonerec_merged'));
-// output(EverOccupant_StartDate, named('EverOccupant_StartDate'));
-// output(ever_start_dateTEST, named('ever_start_dateTEST'));
-// output(ever_past_dateTEST, named('ever_past_dateTEST'));
 
 
 return phonerec_merged;

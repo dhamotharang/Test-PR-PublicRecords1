@@ -37,11 +37,16 @@ export dataset(l_raw) fn_get_parties_raw(
 		atmost(max_raw)
 	);
 	
+	// filter out any did/ln_fares_id combos that are in the flag file
+	in_fids_thor := join(in_fids, flags,
+		left.search_did=(unsigned6)right.did and left.ln_fares_id=right.record_id,
+		transform(l_fid, self.search_did := left.search_did, self.ln_fares_id := left.ln_fares_id),
+		left only, lookup);
+	
 	ds_raw_thor := join(
-		distribute(in_fids, hash64(ln_fares_id)), 
+		distribute(in_fids_thor, hash64(ln_fares_id)), 
 		distribute(pull(k_search(isFCRA)), hash64(ln_fares_id)),
-	  left.ln_fares_id = right.ln_fares_id
-		and ~((string)right.persistent_record_id in set(flags((unsigned6)did=left.search_did ),record_id) and isFCRA),
+	  left.ln_fares_id = right.ln_fares_id,
 		transform(l_raw, self.search_did := left.search_did,self:=right, self := []),
 		keep(2*max_parties),
 		atmost(left.ln_fares_id=right.ln_fares_id, max_raw),

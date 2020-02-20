@@ -19,7 +19,7 @@
 /*--INFO-- This service returns the Address Summary for CITI*/
 
 
-IMPORT iesp, address;
+IMPORT iesp, address, doxie, AutoStandardI;
 
 EXPORT AddressSummaryService := MACRO
 
@@ -66,8 +66,8 @@ EXPORT AddressSummaryService := MACRO
     
 	//set "Options" criteria: Hard coded for CITI as these options do not come in from the ESP
 	#stored('MaxRecordsToReturn', iesp.Constants.BAP_MAX_COUNT_SEARCH_ADDRESS_RESPONSE_RECORDS);
-	
-	AddressSummaryRecs := AddressReport_Services.AddressSummaryService_Records(first_row);
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+	AddressSummaryRecs := AddressReport_Services.AddressSummaryService_Records(first_row, mod_access);
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(AddressSummaryRecs, results, iesp.addresssummary.t_AddressSummaryResponse, Result, true);
 	output(results, named('Results'));
 ENDMACRO;

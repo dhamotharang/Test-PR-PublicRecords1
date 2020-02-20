@@ -10,26 +10,40 @@
 
 // Development Comments: There is a dependency on the data team building the keys as part of the Phone Shell v2.0 project prior to implementing this requirement. 
 
-import Phonesplus_v2, riskwise, risk_indicators;
+import Phonesplus_v2, riskwise, risk_indicators, doxie, Suppress;
 
-EXPORT Boca_Shell_Insurance_Phones(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide) := function
+EXPORT Boca_Shell_Insurance_Phones(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
 rtemp := record
 	risk_indicators.Layout_Input;
 	risk_indicators.layouts.layout_insurance_phones_verification;
 end;
 
-phonesearch := join(ids_wide, Phonesplus_v2.Keys_Iverification().phone.qa,
+rtemp_CCPA := RECORD
+unsigned4 global_sid; // CCPA changes
+rtemp;
+END;
+
+phonesearch_unsuppressed := join(ids_wide, Phonesplus_v2.Keys_Iverification().phone.qa,
 	left.shell_input.phone10<>'' and 
 	keyed(right.phone=left.shell_input.phone10) and
 	right.dt_first_seen <= (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
-	transform(rtemp,
+	transform(rtemp_CCPA,
+    self.global_sid := right.global_sid;
 	self.insurance_phones_phone_hit := right.phone<>'';
 	self.insurance_phones_phonesearch_didmatch := right.did <> 0 and left.did=right.did;
 	self := left.shell_input;
 	self.historydate := left.historydate;
 	self := [];
 		), left outer, atmost(riskwise.max_atmost), keep(100));
+
+phonesearch_flagged := Suppress.MAC_FlagSuppressedSource(phonesearch_unsuppressed, mod_access);
+
+phonesearch := PROJECT(phonesearch_flagged, TRANSFORM(rtemp, 
+	self.insurance_phones_phone_hit := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.insurance_phones_phone_hit);
+	self.insurance_phones_phonesearch_didmatch := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.insurance_phones_phonesearch_didmatch);
+    SELF := LEFT;
+)); 
 		
 phonesearch_rolled := rollup(phonesearch, left.seq=right.seq, transform(rtemp, 
 	self.insurance_phones_phonesearch_didmatch := left.insurance_phones_phonesearch_didmatch or right.insurance_phones_phonesearch_didmatch,
@@ -58,7 +72,7 @@ didsearch_rolled := rollup(didsearch, left.seq=right.seq, transform(rtemp,
 																					right.Insurance_Phone_Verification,
 																					left.Insurance_Phone_Verification),
 	self := left));
-
+                                                  
 // output(phonesearch_rolled, named('phonesearch_rolled'));
 // output(didsearch, named('didsearch'));	
 // output(didsearch_rolled, named('didsearch_rolled'));

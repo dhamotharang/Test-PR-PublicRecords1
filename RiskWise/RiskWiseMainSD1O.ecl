@@ -70,7 +70,7 @@
 */
 /*--INFO-- 'ex02','ex03','ex06','ex07','ex08','ex09','ex10','ex22','ex70','sd01','sd50','cb61','cb62','2x08','2x10' */
 
-import Risk_Indicators,gateway, Royalty;
+IMPORT Risk_Indicators, gateway, Royalty, Riskwise, STD, seed_files, Inquiry_AccLogs;
 
 
 export RiskWiseMainSD1O := MACRO
@@ -147,7 +147,11 @@ export RiskWiseMainSD1O := MACRO
 	'runSeed',
 	'OFACversion',
 	'gateways',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 	
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -239,7 +243,13 @@ boolean   runSeed_value := false 							: stored('runSeed');
 unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribCode in ['2x08', '2x10', 'cb61', 'ex02', 'ex03', 'ex06', 'ex07', 'ex08', 'ex09', 'ex10', 'sd50'];
 
 productSet := ['ex02','ex03','ex06','ex07','ex08','ex09','ex10','ex22','ex70','sd01','sd50','cb61','cb62','2x08','2x10'];
@@ -350,7 +360,11 @@ END;
 final_seed := if(runSeed_value, project(seed_out, format_seed(left)), dataset([], RiskWise.Layout_SD1O));
 
 final_SD10 := RiskWise.SD1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, ofac_version, include_ofac, include_additional_watchlists, 
-                                     global_watchlist_threshold, DataRestriction, DataPermission);
+                                     global_watchlist_threshold, DataRestriction, DataPermission,
+                                     LexIdSourceOptout := LexIdSourceOptout, 
+                                     TransactionID := TransactionID, 
+                                     BatchUID := BatchUID, 
+                                     GlobalCompanyID := GlobalCompanyID);
 
 dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Royalties');
 

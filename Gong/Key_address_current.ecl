@@ -51,8 +51,9 @@ wcn := dedup (sort (project (g, addcn(left)), record), record); //"record" is te
 
 // TODO: decide on whether to include 'st' similar to "historical key"
 // export Key_address_current := index (wcn,
+//DF26180 - Add global_sid and record_sid to this key
 export Key_address_current := index (Gong.File_Address_Current,
   {prim_name, st, z5, prim_range, sec_range, predir, suffix}, 
   {phone10, listed_name, fname, mname, lname, name_suffix, dual_name_flag, 
-	 date_first_seen, listing_type, publish_code, omit_phone},
+	 date_first_seen, listing_type, publish_code, omit_phone,did,global_sid,record_sid},
    data_services.data_location.prefix() + 'thor_data400::key::gong_address_current_' + doxie.Version_SuperKey );

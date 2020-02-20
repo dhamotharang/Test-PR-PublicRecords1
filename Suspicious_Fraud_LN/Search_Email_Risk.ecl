@@ -1,10 +1,11 @@
-IMPORT Doxie, Email_Data, Inquiry_AccLogs, MDR, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
+﻿IMPORT Email_Data, MDR, RiskWise, Suspicious_Fraud_LN, UT, dx_header, Doxie, Suppress, STD;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Email_Risk (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
 																																				DATASET(Suspicious_Fraud_LN.layouts.Layout_Email_Inquiries) Inquiries,
 																																				UNSIGNED1 DPPAPurpose,
 																																				UNSIGNED1 GLBPurpose,
-																																				STRING50 DataRestrictionMask) := FUNCTION
+																																				STRING50 DataRestrictionMask,
+																																				doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	// Email Indexed Keys Used
 	EmailKey := Email_Data.Key_Email_Address;
@@ -12,7 +13,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Email_Risk (DATASET(
 	// For E-Mail data, don't use any Royalty Sources
 	RoyaltyEmailSources := [MDR.SourceTools.src_Acquiredweb, MDR.SourceTools.src_Entiera, MDR.SourceTools.src_MediaOne, MDR.SourceTools.src_OutwardMedia];
 
-	headerBuild := CHOOSEN(Doxie.Key_Max_Dt_Last_Seen, 1);
+	headerBuild := CHOOSEN(dx_header.key_max_dt_last_seen(), 1);
 	headerBuildDate := (((STRING)headerBuild[1].Max_Date_Last_Seen)[1..6]) + '01';
 
 	TempIdentityEmail := RECORD
@@ -28,13 +29,14 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Email_Risk (DATASET(
 		UNSIGNED3 UniqueDIDCount2Months			:= 0; // Only count unique DID's with a last seen date <= 2 months
 	END;
 	
-	TempIdentityEmail getEmailIdentities(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, EmailKey ri) := TRANSFORM
+	{TempIdentityEmail, unsigned4 global_sid} getEmailIdentities(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, EmailKey ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.Seq := le.Seq;
 		SELF.Email := le.Clean_Input.Email;
 		SELF.DID := ri.DID;
 		SELF.ArchiveDate := le.Clean_Input.ArchiveDate;
 		
-		todaysDateTemp := IF((INTEGER)ut.GetDate >= le.Clean_Input.ArchiveDate AND le.Clean_Input.ArchiveDate <> 999999, (STRING)le.Clean_Input.ArchiveDate + '01', ut.GetDate);
+		todaysDateTemp := IF((INTEGER)(STRING8)Std.Date.Today() >= le.Clean_Input.ArchiveDate AND le.Clean_Input.ArchiveDate <> 999999, (STRING)le.Clean_Input.ArchiveDate + '01', (STRING8)Std.Date.Today());
 		// If todaysDate is greater than the header build date, use the header build date
 		todaysDate := IF(todaysDateTemp >= headerBuildDate, headerBuildDate, todaysDateTemp);
 		
@@ -63,11 +65,14 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Email_Risk (DATASET(
 		SELF := le;
 	END;
 	
-	emailIdentities := JOIN(Input, EmailKey, LEFT.Clean_Input.Email <> '' AND KEYED(LEFT.Clean_Input.Email = RIGHT.Clean_Email) AND
+	emailIdentities_unsuppressed := JOIN(Input, EmailKey, LEFT.Clean_Input.Email <> '' AND KEYED(LEFT.Clean_Input.Email = RIGHT.Clean_Email) AND
 																					RIGHT.email_src NOT IN RoyaltyEmailSources AND RIGHT.DID <> 0 AND
 																					(((INTEGER)RIGHT.date_first_seen <> 0 AND (INTEGER)RIGHT.date_first_seen[1..6] <= LEFT.Clean_Input.ArchiveDate) OR
 																					 ((INTEGER)RIGHT.date_first_seen = 0 AND (INTEGER)RIGHT.date_vendor_first_reported <> 0 AND (INTEGER)RIGHT.date_vendor_first_reported[1..6] <= LEFT.Clean_Input.ArchiveDate)),
 																getEmailIdentities(LEFT, RIGHT), ATMOST(RiskWise.max_atmost));
+																
+	emailIdentities := Suppress.Suppress_ReturnOldLayout(emailIdentities_unsuppressed, mod_access, TempIdentityEmail);
+	
 	emailIdentitiesDeduped := DEDUP(SORT(emailIdentities, Seq, DID, -UniqueDIDCount2Months, DateFirstSeen), Seq, DID);
 	emailIdentitiesCounted := ROLLUP(emailIdentitiesDeduped, LEFT.Seq = RIGHT.Seq, TRANSFORM(TempIdentityEmail, SELF.DateFirstSeen := MAP((INTEGER)LEFT.DateFirstSeen = 0	=> RIGHT.DateFirstSeen,
 																																																																 (INTEGER)RIGHT.DateFirstSeen = 0 => LEFT.DateFirstSeen,

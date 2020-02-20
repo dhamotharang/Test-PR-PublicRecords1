@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, Citizenship, DueDiligence, Risk_Indicators, STD, WSInput;
+﻿IMPORT Business_Risk_BIP, DueDiligence, Risk_Indicators, STD, WSInput;
 
 EXPORT DueDiligence_Batch_Service() := FUNCTION
 	
@@ -30,6 +30,31 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
   //Citizenship specific field
   STRING modelName := DueDiligence.Constants.EMPTY : STORED('modelName');
 	BOOLEAN validateModel := FALSE : STORED('modelValidation');
+  
+  
+  //FBOP (Federal Bureau Of Prison) specific field
+  //FBOP Date Tolerance
+  UNSIGNED1 FBOP_DateTolerance := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_DateTolerance');
+  UNSIGNED1 FBOP_DateToleranceYearsPrior := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_DateToleranceYearsPrior');
+  
+  //FBOP Name Tolerance
+  BOOLEAN FBOP_includeRequiredExactInputLastName := FALSE : STORED('FBOP_IncludeExactInputLastName');
+  BOOLEAN FBOP_includeNicknames := FALSE : STORED('FBOP_IncludeNicknames');
+  UNSIGNED1 FBOP_nameOrderSearched := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_NameOrderSearched');
+  
+  //FBOP Age Tolerance
+  BOOLEAN FBOP_includeLexIDPrimaryDOBYear := FALSE : STORED('FBOP_IncludeLexIDPrimaryDOBYear');
+  BOOLEAN FBOP_includeDOBYearRadius := FALSE : STORED('FBOP_IncludeDOBYearRadius');
+  UNSIGNED1 FBOP_DOBNumberOfYearsRadius := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_DOBNumberOfYearsRadius');
+ 
+  //CCPA fields
+  unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+  string TransactionID := '' : STORED('_TransactionId');
+  string BatchUID := '' : STORED('_BatchUID');
+  unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+
+
 
   
   
@@ -39,7 +64,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
   
   requestedProducts := MAP(callCitizenship AND callDueDiligence => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.BOTH,
                             callCitizenship => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY,
-                            callDueDiligence => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY,
+                            callDueDiligence => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY,
                             DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.EMPTY);
                             
                             
@@ -56,6 +81,11 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                                       version := MAP(attributesVersion = DueDiligence.Constants.VERSION_3 AND customerType = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
                                                       attributesVersion = DueDiligence.Constants.VERSION_3 AND customerType = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
                                                       DueDiligence.Constants.INVALID);
+                                                      
+                                      productsRequested := MAP(requestedProducts = DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.BOTH => DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP,
+                                                               requestedProducts = DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY => DueDiligence.CitDDShared.VALID_PRODUCT_CITIZENSHIP_ONLY,
+                                                               requestedProducts = DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY => DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_ONLY,
+                                                               DueDiligence.Constants.INVALID);
                                     
                                     
                                       address_in := DATASET([TRANSFORM(DueDiligence.Layouts.Address,
@@ -112,6 +142,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                                       SELF.business := bus_in[1];
                                       SELF.historyDateYYYYMMDD := IF((UNSIGNED4)LEFT.HistoryDateYYYYMMDD = DueDiligence.Constants.NUMERIC_ZERO, DueDiligence.Constants.date8Nines, (UNSIGNED4)LEFT.HistoryDateYYYYMMDD);
                                       SELF.requestedVersion := version;
+                                      SELF.productRequested := productsRequested;
                                       
                                       //citizenship specific additions
                                       SELF.phone2 := LEFT.phone2;
@@ -119,13 +150,33 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                                       SELF.dlState := LEFT.dlState;
                                       
                                       SELF := [];));
+                                      
+                                      
+  //validate the requests
+  validatedRequests := DueDiligence.CommonQuery.ValidateRequest(wseq, glba, dppa, DueDiligence.Constants.ATTRIBUTES, modelName);
+  
+  //clean data
+  cleanData := DueDiligence.CommonQuery.GetCleanData(validatedRequests(validRequest));
+  
+  //retrieve options - used primarily in business calls
+  DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, dataRestriction, dataPermission, Business_Risk_BIP.Constants.Default_IndustryClass);
+  
+  //retrieve the data based on input to be used in searches (PII vs LexID vs Combo of PII and LexID)
+  dataToSearchBy := DueDiligence.fn_getProductInput(requestedProducts, cleanData, busOptions, busLinkingOptions,
+                                                                                               LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                               TransactionID := TransactionID, 
+                                                                                               BatchUID := BatchUID, 
+                                                                                               GlobalCompanyID := GlobalCompanyID);
+                                      
+                                      
+                                      
 	
  
   //Call the respective product(s)
   //each product is responsible for validating and cleaning data - those shared between
   //Citizenship and Due Diligence can be found in DueDiligence.CitDDShared
-  citResults := IF(requestedProducts IN DueDiligence.CitDDShared.CITIZENSHIP_PRODUCTS, Citizenship.CitizenshipBatchMain(wseq, glba, dppa, dataRestriction, dataPermission, TRIM(modelName), validateModel, debugIndicator), DATASET([], DueDiligence.Layouts.BatchOut)); 
-  ddResults := IF(requestedProducts IN DueDiligence.CitDDShared.DUEDILIGENCE_PRODUCTS, DueDiligence.DueDiligenceBatchMain(wseq, glba, dppa), DATASET([], DueDiligence.Layouts.BatchOut));
+  citResults := IF(requestedProducts IN DueDiligence.CitDDShared.CITIZENSHIP_PRODUCTS, DueDiligence.Citizenship.CitizenshipBatchMain(dataToSearchBy, validateModel), DATASET([], DueDiligence.Layouts.BatchOut)); 
+  ddResults := IF(requestedProducts IN DueDiligence.CitDDShared.DUEDILIGENCE_PRODUCTS, DueDiligence.DueDiligenceBatchMain(dataToSearchBy, busOptions, busLinkingOptions), DATASET([], DueDiligence.Layouts.BatchOut));
   
   allProducts := citResults + ddResults;
 
@@ -294,6 +345,9 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                                             SELF := LEFT;));
 
   
+  IF(debugIndicator, output(validatedRequests, NAMED('validatedRequests')));
+  IF(debugIndicator, output(cleanData, NAMED('cleanData')));
+  IF(debugIndicator, output(dataToSearchBy, NAMED('dataToSearchBy')));
   IF(debugIndicator, output(citResults, NAMED('citizenshipResults')));
   IF(debugIndicator, output(ddResults, NAMED('ddResults')));
   IF(debugIndicator, output(sortProducts, NAMED('sortProducts')));

@@ -10,7 +10,7 @@ EXPORT _Death_data(	dataset (doxie.layout_references) dids,
 
   // MAIN data
   key_main := doxie.key_death_masterV2_ssa_DID_fcra;
-  rec_main := recordof (key_main);
+  rec_main := recordof (key_main)- [global_sid, record_sid];
   
   raw_data := join (dids, key_main,
 		left.did<>0 and

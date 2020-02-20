@@ -11,7 +11,10 @@
 				Business_Risk_BIP.Layouts.LayoutBestInfo;
 				STRING1 AddrIsBest;
 			END;	
-			
+
+      runShell := Options.BusShellVersion;
+      ShellV31 := Business_Risk_BIP.Constants.BusShellVersion_v31;
+      
 			useSBFE := Options.DataPermissionMask[12] NOT IN Business_Risk_BIP.Constants.RESTRICTED_SET;
 
 			UCase := STD.Str.ToUpperCase;
@@ -55,8 +58,9 @@
 			ds_bestBusinessInfo := PROJECT( ds_BestInformationRawFilt, xfm_SelectBestInformation(LEFT) );
 
 			ds_best_records := SORT( ds_bestBusinessInfo, seq );
-			
-			withBestRecords := JOIN(Shell, ds_best_records, LEFT.Seq = RIGHT.Seq,
+
+      
+      withBestRecordsV31 := JOIN(Shell, ds_best_records, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Best_Info.BestCompanyName := RIGHT.BestCompanyName;
 																							SELF.Best_Info.BestCompanyAddress1 := RIGHT.BestCompanyAddress1;
@@ -72,14 +76,53 @@
 																							SELF.Best_Info.BestPostDir := RIGHT.BestPostDir;
 																							SELF.Best_Info.BestUnitDesig := RIGHT.BestUnitDesig;
 																							SELF.Best_Info.BestSecRange := RIGHT.BestSecRange;
+
+                                              UseBest := LEFT.input_echo.SeleID <> 0 AND (LEFT.input_echo.Companyname = '' 
+                                                                                     AND LEFT.input_echo.StreetAddress1 = ''
+                                                                                     AND LEFT.input_echo.City = ''
+                                                                                     AND LEFT.input_echo.State = ''
+                                                                                     AND LEFT.input_echo.Zip = '');
+                                              
+                                              SELF.Input_Echo.CompanyName := IF(UseBest, RIGHT.BestCompanyName, LEFT.Input_Echo.CompanyName);
+																							SELF.Input_Echo.StreetAddress1 := IF(UseBest, RIGHT.BestCompanyAddress1, LEFT.Input_Echo.StreetAddress1);
+																							SELF.Input_Echo.City := IF(UseBest, RIGHT.BestCompanyCity, LEFT.Input_Echo.City);
+																							SELF.Input_Echo.State := IF(UseBest, RIGHT.BestCompanyState, LEFT.Input_Echo.State);
+																							SELF.Input_Echo.Zip := IF(UseBest, RIGHT.BestCompanyZip, LEFT.Input_Echo.Zip);
+																							SELF.Input_Echo.fein := IF(UseBest, RIGHT.BestCompanyFEIN, LEFT.Input_Echo.fein);
+																							SELF.Input_Echo.Phone10 := IF(UseBest, RIGHT.BestCompanyPhone, LEFT.Input_Echo.Phone10);
+																							SELF.Input_Echo.prim_range := IF(UseBest, RIGHT.BestPrimRange, LEFT.Input_Echo.prim_range);
+																							SELF.Input_Echo.predir := IF(UseBest, RIGHT.BestPreDir, LEFT.Input_Echo.predir);
+																							SELF.Input_Echo.prim_name := IF(UseBest, RIGHT.BestPrimName, LEFT.Input_Echo.prim_name );
+																							SELF.Input_Echo.addr_suffix := IF(UseBest, RIGHT.BestAddrSuffix, LEFT.Input_Echo.addr_suffix);
+																							SELF.Input_Echo.postdir := IF(UseBest, RIGHT.BestPostDir, LEFT.Input_Echo.postdir);
+																							SELF.Input_Echo.unit_desig := IF(UseBest, RIGHT.BestUnitDesig, LEFT.Input_Echo.unit_desig);
+																							SELF.Input_Echo.sec_range := IF(UseBest, RIGHT.BestSecRange, LEFT.Input_Echo.sec_range);
+                                              
+                                              // Company Address Fields
+                                              SELF.Clean_Input.CompanyName := IF(UseBest, RIGHT.BestCompanyName, LEFT.Input_Echo.CompanyName);
+																							SELF.Clean_Input.StreetAddress1 := IF(UseBest, RIGHT.BestCompanyAddress1, LEFT.Input_Echo.StreetAddress1);;
+																							// SELF.Clean_Input.StreetAddress2 := IF(UseBest, RIGHT.BestCompanyAddress2, LEFT.Input_Echo.StreetAddress2);;
+																							SELF.Clean_Input.Prim_Range :=  IF(UseBest, RIGHT.BestPrimRange, LEFT.Input_Echo.prim_range);
+																							SELF.Clean_Input.Predir := IF(UseBest, RIGHT.BestPreDir, LEFT.Input_Echo.predir);
+																							SELF.Clean_Input.Prim_Name := IF(UseBest, RIGHT.BestPrimName, LEFT.Input_Echo.prim_name );
+																							SELF.Clean_Input.Addr_Suffix := IF(UseBest, RIGHT.BestAddrSuffix, LEFT.Input_Echo.addr_suffix);
+																							SELF.Clean_Input.Postdir := IF(UseBest, RIGHT.BestPostDir, LEFT.Input_Echo.postdir);
+																							SELF.Clean_Input.Unit_Desig := IF(UseBest, RIGHT.BestUnitDesig, LEFT.Input_Echo.unit_desig);
+																							SELF.Clean_Input.Sec_Range := IF(UseBest, RIGHT.BestSecRange, LEFT.Input_Echo.sec_range);
+																							SELF.Clean_Input.City := IF(UseBest, RIGHT.BestCompanyCity, LEFT.Input_Echo.City);
+																							SELF.Clean_Input.State := IF(UseBest, RIGHT.BestCompanyState, LEFT.Input_Echo.State);
+																							// SELF.Clean_Input.Zip := IF(UseBest, RIGHT.BestCompanyZip.Zip + RIGHT.BestCompanyZip4, LEFT.input_echo.Zip + LEFT.input_echo.Zip4);
+																							SELF.Clean_Input.Zip5 := IF(UseBest, RIGHT.BestCompanyZip, LEFT.Input_Echo.Zip);
+                                              
+                                              chkCompanyName := IF(UseBest, RIGHT.BestCompanyName, LEFT.Input_Echo.CompanyName);
+                                              SELF.Verification.VerWatchlistNameMatch := IF(chkCompanyName = '', '-1', '1');
 																							
-																							AddressPopulated		:= TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND TRIM(RIGHT.BestPrimName) <> '' AND RIGHT.BestCompanyZip <> '';
+                                              AddressPopulated		:= TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND TRIM(RIGHT.BestPrimName) <> '' AND RIGHT.BestCompanyZip <> '';
 																							NoScoreValue				:= 255; // This is what the various score functions return if blank is passed in
 																							ZIPScore						:= IF(LEFT.Clean_Input.Zip5 <> '' AND RIGHT.BestCompanyZip <> '' AND LEFT.Clean_Input.Zip5[1] = RIGHT.BestCompanyZip[1], Risk_Indicators.AddrScore.ZIP_Score(LEFT.Clean_Input.Zip5, RIGHT.BestCompanyZip), NoScoreValue);
 																							StateMatched				:= StringLib.StringToUpperCase(LEFT.Clean_Input.State) = StringLib.StringToUpperCase(RIGHT.BestCompanyState);
 																							CityStateScore			:= IF(LEFT.Clean_Input.City <> '' AND LEFT.Clean_Input.State <> '' AND RIGHT.BestCompanyCity <> '' AND RIGHT.BestCompanyState <> '' AND StateMatched, 
 																																				Risk_Indicators.AddrScore.CityState_Score(LEFT.Clean_Input.City, LEFT.Clean_Input.State, RIGHT.BestCompanyCity, RIGHT.BestCompanyState, ''), NoScoreValue);
-																							CityStateZipMatched	:= AddressPopulated AND Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore);
 		
 																							AddressScore := MAP(NOT AddressPopulated => NoScoreValue,
 																																		AddressPopulated AND ZIPScore = NoScoreValue AND CityStateScore = NoScoreValue => NoScoreValue,
@@ -91,7 +134,45 @@
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 
+			withBestRecordsEarly := JOIN(Shell, ds_best_records, LEFT.Seq = RIGHT.Seq,
+																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+																							SELF.Best_Info.BestCompanyName := RIGHT.BestCompanyName;
+																							SELF.Best_Info.BestCompanyAddress1 := RIGHT.BestCompanyAddress1;
+																							SELF.Best_Info.BestCompanyCity := RIGHT.BestCompanyCity;
+																							SELF.Best_Info.BestCompanyState := RIGHT.BestCompanyState;
+																							SELF.Best_Info.BestCompanyZip := RIGHT.BestCompanyZip;
+																							SELF.Best_Info.BestCompanyFEIN := RIGHT.BestCompanyFEIN;
+																							SELF.Best_Info.BestCompanyPhone := RIGHT.BestCompanyPhone;
+																							SELF.Best_Info.BestPrimRange := RIGHT.BestPrimRange;
+																							SELF.Best_Info.BestPreDir := RIGHT.BestPreDir;
+																							SELF.Best_Info.BestPrimName := RIGHT.BestPrimName;
+																							SELF.Best_Info.BestAddrSuffix := RIGHT.BestAddrSuffix;
+																							SELF.Best_Info.BestPostDir := RIGHT.BestPostDir;
+																							SELF.Best_Info.BestUnitDesig := RIGHT.BestUnitDesig;
+																							SELF.Best_Info.BestSecRange := RIGHT.BestSecRange;
+                                              
 
+                                                
+																							AddressPopulated		:= TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND TRIM(RIGHT.BestPrimName) <> '' AND RIGHT.BestCompanyZip <> '';
+																							NoScoreValue				:= 255; // This is what the various score functions return if blank is passed in
+																							ZIPScore						:= IF(LEFT.Clean_Input.Zip5 <> '' AND RIGHT.BestCompanyZip <> '' AND LEFT.Clean_Input.Zip5[1] = RIGHT.BestCompanyZip[1], Risk_Indicators.AddrScore.ZIP_Score(LEFT.Clean_Input.Zip5, RIGHT.BestCompanyZip), NoScoreValue);
+																							StateMatched				:= StringLib.StringToUpperCase(LEFT.Clean_Input.State) = StringLib.StringToUpperCase(RIGHT.BestCompanyState);
+																							CityStateScore			:= IF(LEFT.Clean_Input.City <> '' AND LEFT.Clean_Input.State <> '' AND RIGHT.BestCompanyCity <> '' AND RIGHT.BestCompanyState <> '' AND StateMatched, 
+																																				Risk_Indicators.AddrScore.CityState_Score(LEFT.Clean_Input.City, LEFT.Clean_Input.State, RIGHT.BestCompanyCity, RIGHT.BestCompanyState, ''), NoScoreValue);
+		
+																							AddressScore := MAP(NOT AddressPopulated => NoScoreValue,
+																																		AddressPopulated AND ZIPScore = NoScoreValue AND CityStateScore = NoScoreValue => NoScoreValue,
+																																		Risk_Indicators.AddrScore.AddressScore(LEFT.Clean_Input.Prim_Range, LEFT.Clean_Input.Prim_Name, LEFT.Clean_Input.Sec_Range, 
+																																		RIGHT.BestPrimRange, RIGHT.BestPrimName, RIGHT.BestSecRange,
+																																		ZIPScore, CityStateScore));
+																							AddressMatched			:= AddressPopulated AND Risk_Indicators.iid_constants.ga(AddressScore);
+																							SELF.Verification.AddrIsBest := IF(AddressMatched, '1', '0');
+																							SELF := LEFT),
+																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
+
+  withBestRecords := IF(runShell >= shellV31, withBestRecordsV31, withBestRecordsEarly);
+  
+  
 	// Get best property info
 	KAF := LN_PropertyV2.key_addr_fid(false);
 	KASF := LN_PropertyV2.key_assessor_fid(FALSE /*isFCRA*/);
@@ -356,6 +437,9 @@
 	// OUTPUT(CHOOSEN(ds_bestBusinessInfo, 100), NAMED('Sample_ds_bestBusinessInfo'));
 	// OUTPUT(CHOOSEN(ds_best_records, 100), NAMED('Sample_ds_best_records'));
 	// OUTPUT(CHOOSEN(withBestRecords, 100), NAMED('Sample_withBestRecords'));
+  // OUTPUT(CHOOSEN(withBestRecordsEarly, 100), NAMED('Sample_withBestRecordsEarly'));
+  // OUTPUT(CHOOSEN(withBestRecordsV31, 100), NAMED('Sample_withBestRecordsV31'));
+  // OUTPUT(CHOOSEN(Shell, 100), NAMED('Sample_ShellV31'));
 	// OUTPUT(CHOOSEN(property_by_address, 100), NAMED('Sample_property_by_address'));
 	// OUTPUT(CHOOSEN(PropertyAssessments, 100), NAMED('Sample_PropertyAssessments'));
 	// OUTPUT(CHOOSEN(PropertyBusnAssessRolled, 100), NAMED('Sample_PropertyBusnAssessRolled'));

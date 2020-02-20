@@ -1114,7 +1114,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_Core := MODULE
       SELF.v1_ProspectTimeLastUpdate        := (INTEGER4) Le.v1_ProspectTimeLastUpdate;
       SELF.v1_ProspectLastUpdate12Mo        := (INTEGER4) Le.v1_ProspectLastUpdate12Mo;
       SELF.v1_ProspectAge                   := (INTEGER4) Le.v1_ProspectAge;
-      SELF.v1_ProspectGender                := (VARSTRING) Le.v1_ProspectGender;
+      SELF.v1_ProspectGender                := (INTEGER4) Models.Healthcare_SocioEconomic_Functions_Core.Crosswalkv1_ProspectGender(Le.v1_ProspectGender);
       SELF.v1_ProspectMaritalStatus         := (INTEGER4) Le.Crosswalkv1_ProspectMaritalStatus;//Crosswalk
       SELF.v1_ProspectEstimatedIncomeRange  := (INTEGER4) Le.v1_ProspectEstimatedIncomeRange;
       SELF.v1_ProspectDeceased              := (INTEGER4) Le.v1_ProspectDeceased;
@@ -1159,7 +1159,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_Core := MODULE
       SELF.v1_ResCurrAVMCntyRatio           := (REAL8 ) Le.v1_ResCurrAVMCntyRatio;
       SELF.v1_ResCurrAVMTractRatio          := (REAL8 ) Le.v1_ResCurrAVMTractRatio;
       SELF.v1_ResCurrAVMBlockRatio          := (REAL8 ) Le.v1_ResCurrAVMBlockRatio;
-      SELF.v1_ResCurrDwellType              := (VARSTRING) Le.v1_ResCurrDwellType;
+      SELF.v1_ResCurrDwellType              := (INTEGER4) Models.Healthcare_SocioEconomic_Functions_Core.CrosswalkCurrAddrDwellType(Le.v1_ResCurrDwellType);
       SELF.v1_ResCurrDwellTypeIndex         := (INTEGER4) Le.v1_ResCurrDwellTypeIndex;
       SELF.v1_ResCurrMortgageType           := (INTEGER4) Le.v1_ResCurrMortgageType;
       SELF.v1_ResCurrMortgageAmount         := (INTEGER4) Le.v1_ResCurrMortgageAmount;
@@ -1173,7 +1173,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_Core := MODULE
       SELF.v1_ResInputAVMCntyRatio          := (REAL8 ) Le.v1_ResInputAVMCntyRatio;
       SELF.v1_ResInputAVMTractRatio         := (REAL8 ) Le.v1_ResInputAVMTractRatio;
       SELF.v1_ResInputAVMBlockRatio         := (REAL8 ) Le.v1_ResInputAVMBlockRatio;
-      SELF.v1_ResInputDwellType             := (VARSTRING) Le.v1_ResInputDwellType;
+      SELF.v1_ResInputDwellType             := (INTEGER4) Models.Healthcare_SocioEconomic_Functions_Core.CrosswalkCurrAddrDwellType(Le.v1_ResInputDwellType);
       SELF.v1_ResInputDwellTypeIndex        := (INTEGER4) Le.v1_ResInputDwellTypeIndex;
       SELF.v1_ResInputMortgageType          := (INTEGER4) Le.v1_ResInputMortgageType;
       SELF.v1_ResInputMortgageAmount        := (INTEGER4) Le.v1_ResInputMortgageAmount;
@@ -5759,8 +5759,7 @@ outRecord doXform(TYPEOF(RECORDOF(ds)) L) := TRANSFORM
    BPR2_52 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienFiledCount60 > -61 AND L.LienFiledCount60 <= 2, 0.497968773, 0);
    BPR2_53 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrDwellTypeIndex > 0 AND L.v1_ResCurrDwellTypeIndex <= 1, 0.497966235, 0);
    BPR2_54 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_LifeEvTimeLastMove > -1 AND L.v1_LifeEvTimeLastMove <= -0.9, 0.497966235, 0);
-   BPR2_55 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND 
-      Models.Healthcare_SocioEconomic_Functions_Core.CrosswalkCurrAddrDwellType(L.v1_ResCurrDwellType) > -1 AND Models.Healthcare_SocioEconomic_Functions_Core.CrosswalkCurrAddrDwellType(L.v1_ResCurrDwellType) <= -0.9, 0.497966235, 0);
+   BPR2_55 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrDwellType > -1 AND L.v1_ResCurrDwellType <= -0.9, 0.497966235, 0);
    BPR2_56 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecEvictionCnt12Mo > -18 AND L.v1_CrtRecEvictionCnt12Mo <= 1, 0.497951621, 0);
    BPR2_57 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_LifeEvEverResidedCnt > -36 AND L.v1_LifeEvEverResidedCnt <= 1, 0.497931234, 0);
    BPR2_58 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrValidation > 3 AND L.InputAddrValidation <= 3.1, 0.497906921, 0);
@@ -7055,7 +7054,7 @@ Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_5_SE_A_RS(Model
    SELF := [];
 END;
 
-Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_6_SE_A_HS(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_combined_flat Le,Models.Layouts_Healthcare_Core.PostProcessing_Layout_LUCI_Model Ri) := TRANSFORM
+Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_6_SE_A_HS(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_combined_flat Le, Models.Layouts_Healthcare_Core.Final_Output_Layout Ri) := TRANSFORM
    self.acctno                          := (string)Le.acctno;
    self.seq                             := (string)Le.seq;
    self.Lexid                           := (string)le.Lexid;
@@ -7505,7 +7504,23 @@ Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_6_SE_A_HS(Model
    SELF.SourceOrderActivity     								:= (String) Le.SourceOrderActivity;
    SELF.SourceOrderAgeLastOrder 								:= (String) Le.SourceOrderAgeLastOrder;
    SELF.SourceOrderSourceCount  								:= (String) Le.SourceOrderSourceCount;
-			SELF.Score                        			:= (String) Ri.Score;
+	SELF.Score                        	 := Ri.Score;
+   self.SeTC_Raw_Score                  := Ri.SeTC_Raw_Score     ;
+   self.TC_Driver_Hi1                   := Ri.TC_Driver_Hi1      ;
+   self.TC_Driver_Hi1_value             := Ri.TC_Driver_Hi1_value;
+   self.TC_Driver_Hi2                   := Ri.TC_Driver_Hi2      ;
+   self.TC_Driver_Hi2_value             := Ri.TC_Driver_Hi2_value;
+   self.TC_Driver_Hi3                   := Ri.TC_Driver_Hi3      ;
+   self.TC_Driver_Hi3_value             := Ri.TC_Driver_Hi3_value;
+   self.TC_Driver_Lo1                   := Ri.TC_Driver_Lo1      ;
+   self.TC_Driver_Lo1_value             := Ri.TC_Driver_Lo1_value;
+   self.TC_Driver_Lo2                   := Ri.TC_Driver_Lo2      ;
+   self.TC_Driver_Lo2_value             := Ri.TC_Driver_Lo2_value;
+   self.TC_Driver_Lo3                   := Ri.TC_Driver_Lo3      ;
+   self.TC_Driver_Lo3_value             := Ri.TC_Driver_Lo3_value;
+   self.SeTCModelUsed                   := Ri.SeTCModelUsed;
+   self.isSeTCInvalidLOB                := Ri.isSeTCInvalidLOB;
+   self.ADLScore                        := Ri.ADLScore;
    SELF := [];
 END;
 
@@ -7970,7 +7985,23 @@ Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_7_SE_A_HS_RS(Mo
    SELF.isSeRsInvalidDiag := (String) Ri.isSeRsInvalidDiag;
    SELF.isSeRsInvalidPatientType := (String) Ri.isSeRsInvalidPatientType;
    SELF.isSeRsInvalidFinancialClass := (String) Ri.isSeRsInvalidFinancialClass;
-   SELF.Score := (String) Ri.Score;
+ 	SELF.Score                        	 := Ri.Score;
+   self.SeTC_Raw_Score                  := Ri.SeTC_Raw_Score     ;
+   self.TC_Driver_Hi1                   := Ri.TC_Driver_Hi1      ;
+   self.TC_Driver_Hi1_value             := Ri.TC_Driver_Hi1_value;
+   self.TC_Driver_Hi2                   := Ri.TC_Driver_Hi2      ;
+   self.TC_Driver_Hi2_value             := Ri.TC_Driver_Hi2_value;
+   self.TC_Driver_Hi3                   := Ri.TC_Driver_Hi3      ;
+   self.TC_Driver_Hi3_value             := Ri.TC_Driver_Hi3_value;
+   self.TC_Driver_Lo1                   := Ri.TC_Driver_Lo1      ;
+   self.TC_Driver_Lo1_value             := Ri.TC_Driver_Lo1_value;
+   self.TC_Driver_Lo2                   := Ri.TC_Driver_Lo2      ;
+   self.TC_Driver_Lo2_value             := Ri.TC_Driver_Lo2_value;
+   self.TC_Driver_Lo3                   := Ri.TC_Driver_Lo3      ;
+   self.TC_Driver_Lo3_value             := Ri.TC_Driver_Lo3_value;
+   self.SeTCModelUsed                   := Ri.SeTCModelUsed;
+   self.isSeTCInvalidLOB                := Ri.isSeTCInvalidLOB;
+   self.ADLScore                        := Ri.ADLScore;
    SELF := [];
 END;
 
@@ -8466,7 +8497,23 @@ Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_8_SE_DEBUG(Mode
 			SELF.isSeRsInvalidDiag            			:= (String) Ri.isSeRsInvalidDiag;
 			SELF.isSeRsInvalidPatientType     			:= (String) Ri.isSeRsInvalidPatientType;
 			SELF.isSeRsInvalidFinancialClass  			:= (String) Ri.isSeRsInvalidFinancialClass;
-			SELF.Score                        			:= (String) Ri.Score;
+         SELF.Score                        	 := Ri.Score;
+         self.SeTC_Raw_Score                  := Ri.SeTC_Raw_Score     ;
+         self.TC_Driver_Hi1                   := Ri.TC_Driver_Hi1      ;
+         self.TC_Driver_Hi1_value             := Ri.TC_Driver_Hi1_value;
+         self.TC_Driver_Hi2                   := Ri.TC_Driver_Hi2      ;
+         self.TC_Driver_Hi2_value             := Ri.TC_Driver_Hi2_value;
+         self.TC_Driver_Hi3                   := Ri.TC_Driver_Hi3      ;
+         self.TC_Driver_Hi3_value             := Ri.TC_Driver_Hi3_value;
+         self.TC_Driver_Lo1                   := Ri.TC_Driver_Lo1      ;
+         self.TC_Driver_Lo1_value             := Ri.TC_Driver_Lo1_value;
+         self.TC_Driver_Lo2                   := Ri.TC_Driver_Lo2      ;
+         self.TC_Driver_Lo2_value             := Ri.TC_Driver_Lo2_value;
+         self.TC_Driver_Lo3                   := Ri.TC_Driver_Lo3      ;
+         self.TC_Driver_Lo3_value             := Ri.TC_Driver_Lo3_value;
+         self.SeTCModelUsed                   := Ri.SeTCModelUsed;
+         self.isSeTCInvalidLOB                := Ri.isSeTCInvalidLOB;
+         self.ADLScore                        := Ri.ADLScore;
    SELF := [];
 END;
 
@@ -8504,7 +8551,23 @@ EXPORT Add_SERS_Score_RD(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
                   self.RAR_Driver_Hi3 := (string) IF(right.RAR_Driver_Hi3 <>'', right.RAR_Driver_Hi3,'N/A');
                   self.RAR_Driver_Lo1 := (string) IF(right.RAR_Driver_Lo1 <>'', right.RAR_Driver_Lo1,'N/A');
                   self.RAR_Driver_Lo2 := (string) IF(right.RAR_Driver_Lo2 <>'', right.RAR_Driver_Lo2,'N/A');
-                  self.RAR_Driver_Lo3 := (string) IF(right.RAR_Driver_Lo3 <>'', right.RAR_Driver_Lo3,'N/A');  
+                  self.RAR_Driver_Lo3 := (string) IF(right.RAR_Driver_Lo3 <>'', right.RAR_Driver_Lo3,'N/A');
+                  self.SeTC_Raw_Score               := left.SeTC_Raw_Score     ;
+                  self.TC_Driver_Hi1                := left.TC_Driver_Hi1      ;
+                  self.TC_Driver_Hi1_value          := left.TC_Driver_Hi1_value;
+                  self.TC_Driver_Hi2                := left.TC_Driver_Hi2      ;
+                  self.TC_Driver_Hi2_value          := left.TC_Driver_Hi2_value;
+                  self.TC_Driver_Hi3                := left.TC_Driver_Hi3      ;
+                  self.TC_Driver_Hi3_value          := left.TC_Driver_Hi3_value;
+                  self.TC_Driver_Lo1                := left.TC_Driver_Lo1      ;
+                  self.TC_Driver_Lo1_value          := left.TC_Driver_Lo1_value;
+                  self.TC_Driver_Lo2                := left.TC_Driver_Lo2      ;
+                  self.TC_Driver_Lo2_value          := left.TC_Driver_Lo2_value;
+                  self.TC_Driver_Lo3                := left.TC_Driver_Lo3      ;
+                  self.TC_Driver_Lo3_value          := left.TC_Driver_Lo3_value;
+                  self.SeTCModelUsed                := left.SeTCModelUsed;
+                  self.isSeTCInvalidLOB             := left.isSeTCInvalidLOB;
+                  self.ADLScore                     := left.ADLScore;  
                   self := [];),left outer, keep(1), atmost(1));
    RETURN result;
 ENDMACRO;
@@ -8538,6 +8601,22 @@ EXPORT Add_SERS_Score_RD_DEBUG(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
                   SELF.isSeRsExcludedDiag           := (String) Right.isSeRsExcludedDiag;
                   SELF.isSeRsMinor                  := (String) Right.isSeRsMinor;
                   SELF.isSeRsM1ModelUsed            := (String) Right.isSeRsM1ModelUsed;
+                  self.SeTC_Raw_Score               := left.SeTC_Raw_Score     ;
+                  self.TC_Driver_Hi1                := left.TC_Driver_Hi1      ;
+                  self.TC_Driver_Hi1_value          := left.TC_Driver_Hi1_value;
+                  self.TC_Driver_Hi2                := left.TC_Driver_Hi2      ;
+                  self.TC_Driver_Hi2_value          := left.TC_Driver_Hi2_value;
+                  self.TC_Driver_Hi3                := left.TC_Driver_Hi3      ;
+                  self.TC_Driver_Hi3_value          := left.TC_Driver_Hi3_value;
+                  self.TC_Driver_Lo1                := left.TC_Driver_Lo1      ;
+                  self.TC_Driver_Lo1_value          := left.TC_Driver_Lo1_value;
+                  self.TC_Driver_Lo2                := left.TC_Driver_Lo2      ;
+                  self.TC_Driver_Lo2_value          := left.TC_Driver_Lo2_value;
+                  self.TC_Driver_Lo3                := left.TC_Driver_Lo3      ;
+                  self.TC_Driver_Lo3_value          := left.TC_Driver_Lo3_value;
+                  self.SeTCModelUsed                := left.SeTCModelUsed;
+                  self.isSeTCInvalidLOB             := left.isSeTCInvalidLOB;
+                  self.ADLScore                     := left.ADLScore;  
                   self := [];),left outer, keep(1), atmost(1));
    RETURN result;
 ENDMACRO;
@@ -8581,6 +8660,31 @@ EXPORT Add_SEMO_Score_RD(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
                   self.MO_Driver_Lo1 := (string) IF(right.MO_Driver_Lo1 <>'', right.MO_Driver_Lo1,'N/A');
                   self.MO_Driver_Lo2 := (string) IF(right.MO_Driver_Lo2 <>'', right.MO_Driver_Lo2,'N/A');
                   self.MO_Driver_Lo3 := (string) IF(right.MO_Driver_Lo3 <>'', right.MO_Driver_Lo3,'N/A');
+                  self := left;),left outer, keep(1), atmost(1));
+   RETURN result;
+ENDMACRO;
+
+EXPORT Add_SETC_Score_RD(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
+   result := Join(DS_LEFT, DS_RIGHT, left.seq=(string)right.seq, 
+                  transform(outRecord,
+                  self.SeTC_Raw_Score      := (string) IF(right.SeTC_Raw_Score      <>'', right.SeTC_Raw_Score     ,'N/A');
+                  self.Score               := (string) IF(right.SeTC_Score          <>'', right.SeTC_Score         ,'N/A');
+                  self.TC_Driver_Hi1       := (string) IF(right.TC_Driver_Hi1       <>'', right.TC_Driver_Hi1      ,'N/A');
+                  self.TC_Driver_Hi1_value := (string) IF(right.TC_Driver_Hi1_value <>'', right.TC_Driver_Hi1_value,'N/A');
+                  self.TC_Driver_Hi2       := (string) IF(right.TC_Driver_Hi2       <>'', right.TC_Driver_Hi2      ,'N/A');
+                  self.TC_Driver_Hi2_value := (string) IF(right.TC_Driver_Hi2_value <>'', right.TC_Driver_Hi2_value,'N/A');
+                  self.TC_Driver_Hi3       := (string) IF(right.TC_Driver_Hi3       <>'', right.TC_Driver_Hi3      ,'N/A');
+                  self.TC_Driver_Hi3_value := (string) IF(right.TC_Driver_Hi3_value <>'', right.TC_Driver_Hi3_value,'N/A');
+                  self.TC_Driver_Lo1       := (string) IF(right.TC_Driver_Lo1       <>'', right.TC_Driver_Lo1      ,'N/A');
+                  self.TC_Driver_Lo1_value := (string) IF(right.TC_Driver_Lo1_value <>'', right.TC_Driver_Lo1_value,'N/A');
+                  self.TC_Driver_Lo2       := (string) IF(right.TC_Driver_Lo2       <>'', right.TC_Driver_Lo2      ,'N/A');
+                  self.TC_Driver_Lo2_value := (string) IF(right.TC_Driver_Lo2_value <>'', right.TC_Driver_Lo2_value,'N/A');
+                  self.TC_Driver_Lo3       := (string) IF(right.TC_Driver_Lo3       <>'', right.TC_Driver_Lo3      ,'N/A');
+                  self.TC_Driver_Lo3_value := (string) IF(right.TC_Driver_Lo3_value <>'', right.TC_Driver_Lo3_value,'N/A');
+                  // self.SeTCModelUsed       := (string) IF(right.SeTCModelUsed       <>'', right.SeTCModelUsed      ,'N/A');
+                  // self.isSeTCInvalidLOB    := (string) IF(right.isSeTCInvalidLOB    <>'', right.isSeTCInvalidLOB   ,'N/A');
+                  self.SeTCModelUsed       := right.SeTCModelUsed;
+                  self.isSeTCInvalidLOB    := right.isSeTCInvalidLOB;
                   self := left;),left outer, keep(1), atmost(1));
    RETURN result;
 ENDMACRO;
@@ -9968,5 +10072,1828 @@ EXPORT getSeMO_RiskDrivers(ds) := FUNCTIONMACRO
                                        Denorm_RD_LO(LEFT, RIGHT));
    RETURN Risk_Drivers_DS_HI_LO;
 ENDMACRO;
+
+Export Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed SeTC_Pre_Processing_Xform(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed Le) := TRANSFORM
+      SELF.SeTCModelUsed := IF(Le.Payor_LOB IN [11,21,22,31,32,33,34,41,42], 2, IF(Le.Payor_LOB in [10,20,30,40], 1, 0));
+      DS_STATEAVGCOST := DATASET([{1 ,6815}, {2 ,9128}, {3 ,6272}, {4 ,6167}, {5 ,5434}, {6 ,6238}, {7 ,5994}, {8 ,8654}, {9 ,8480}, {10 ,7156}, {11 ,5467}, {12 ,6856}, {13 ,6921}, {14 ,5658}, {15 ,6756}, {16 ,6666}, {17 ,6782}, {18 ,6596}, {19 ,6795}, {20 ,9278}, {21 ,7492}, {22 ,8521}, {23 ,6618}, {24 ,7409}, {25 ,6967}, {26 ,6571}, {27 ,6640}, {28 ,6444}, {29 ,7749}, {30 ,7048}, {31 ,7839}, {32 ,7583}, {33 ,6651}, {34 ,5735}, {35 ,8341}, {36 ,7076}, {37 ,6532}, {38 ,6580}, {39 ,7730}, {40 ,8309}, {41 ,6323}, {42 ,7056}, {43 ,6411}, {44 ,5924}, {45 ,5031}, {46 ,6286}, {47 ,7635}, {48 ,6782}, {49 ,7233}, {50 ,7667}, {51 ,7040}, {52 ,6967}, {53 ,6967}, {54 ,6967}], {INTEGER4 ST_CD, INTEGER4 ST_AVG_COST});
+      STATEAVGCOST_DCT := DICTIONARY(DS_STATEAVGCOST, {ST_CD => ST_AVG_COST});
+      SELF.P_EstimatedHHIncomePerCapita := IF(Le.v1_HHCnt < 0, -1, MAX(1, Le.v1_HHEstimatedIncomeRange)/MAX(1, Le.v1_HHCnt));
+      SELF.EstIncome0_2_Pcnt := IF(((Le.ESTIMATEDANNUALINCOME > 0 ) & (Le.ESTIMATEDANNUALINCOME_24 > 0)), (Le.ESTIMATEDANNUALINCOME-Le.ESTIMATEDANNUALINCOME_24)/Le.ESTIMATEDANNUALINCOME_24, -25);
+      SELF.PropTaxPerRelative := IF(((Le.RELATIVESCOUNT > 0) & (Le.RELATIVESPROPOWNEDTAXTOTAL > 0)), Le.RELATIVESPROPOWNEDTAXTOTAL/Le.RELATIVESCOUNT, 0);
+      SELF.AVGSTATECOST := STATEAVGCOST_DCT[Le.ST+1].ST_AVG_COST;
+      SELF.HistorydateYYYYMM :=  Le.HistorydateYYYYMM;
+      ageRefYYYYMMDD := if((string) Le.HistorydateYYYYMM = '999999' OR (string) Le.HistorydateYYYYMM='0', (string)Std.Date.Today(), 
+                                 (string) Le.HistorydateYYYYMM+(string2)Models.Healthcare_SocioEconomic_Functions_Core.calcDaysInMonth((string) Le.HistorydateYYYYMM));
+      DECIMAL4_1 SeTC_Age_In_Years := (DECIMAL4_1) Models.Healthcare_SocioEconomic_Functions_Core.SeTCcalcAgeInYears( Le.DOB,(string)ageRefYYYYMMDD);
+      SELF.age_in_years :=(REAL8) SeTC_Age_In_Years;
+      SELF.AG_Pred_10K := Models.Healthcare_SocioEconomic_Functions_Core.calc_SeTC_AG_Pred_10k(SeTC_Age_In_Years, Le.FEMALE);
+      SELF.AG_Pred_10K_LOB := Models.Healthcare_SocioEconomic_Functions_Core.calc_SeTC_AG_Pred_10k_LOB(SeTC_Age_In_Years, Le.FEMALE, Le.Payor_LOB);
+      SELF.AG_Pred_10K_LOB_EXT := Models.Healthcare_SocioEconomic_Functions_Core.calc_SeTC_AG_Pred_10k_LOB_EXT(SeTC_Age_In_Years, Le.FEMALE, Le.Payor_LOB);
+      SELF := Le;
+END;
+
+EXPORT SeTC_Apply_Patterns(ds, outRecord) := FUNCTIONMACRO
+   // Note: If externally validating patterns in R, remember to crosswalk v1_ResCurrDwellType and v1_ResInputDwellType
+outRecord doXform(TYPEOF(RECORDOF(ds)) L) := TRANSFORM 
+    // Selected Patterns
+    PR1_1 := IF( L.AGE_IN_YEARS > 49 AND L.AGE_IN_YEARS <= 66 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -349.6523965, 0);
+    PR1_2 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrMedianIncome > 39586 AND L.InputAddrMedianIncome <= 62303, -289.4704363, 0);
+    PR1_3 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AVGSTATECOST > -4247 AND L.AVGSTATECOST <= 6438, -278.7857121, 0);
+    PR1_4 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.LP_TrajectoryIndex > -7 AND L.LP_TrajectoryIndex <= 1, -275.8073893, 0);
+    PR1_5 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.DivAddrSSNMSourceCount > 7 AND L.DivAddrSSNMSourceCount <= 18, -271.8059148, 0);
+    PR1_6 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_RaAPropOwnerAVMHighest > 191091 AND L.v1_RaAPropOwnerAVMHighest <= 573724, -270.5765313, 0);
+    PR1_7 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PrevAddrCarTheftIndex > 84 AND L.PrevAddrCarTheftIndex <= 143, -269.6677526, 0);
+    PR1_8 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.DivAddrSSNCount > 10 AND L.DivAddrSSNCount <= 27, -269.38875, 0);
+    PR1_9 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AddrMostRecentDistance > -1 AND L.AddrMostRecentDistance <= -0.9, -269.3542493, 0);
+    PR1_10 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AddrMostRecentMoveAge > -1 AND L.AddrMostRecentMoveAge <= -0.9, -269.3542493, 0);
+    PR1_11 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AddrMostRecentStateDiff > -1 AND L.AddrMostRecentStateDiff <= -0.9, -269.3542493, 0);
+    PR1_12 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AddrRecentEconTrajectory > -1 AND L.AddrRecentEconTrajectory <= -0.9, -269.3542493, 0);
+    PR1_13 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AddrRecentEconTrajectoryIndex > -1 AND L.AddrRecentEconTrajectoryIndex <= -0.9, -269.3542493, 0);
+    PR1_14 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PrevAddrCrimeIndex > 33 AND L.PrevAddrCrimeIndex <= 87, -268.3791558, 0);
+    PR1_15 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.CurrAddrOccupantOwned > 1 AND L.CurrAddrOccupantOwned <= 1.1, -268.2352897, 0);
+    PR1_16 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.CurrAddrCrimeIndex > 90 AND L.CurrAddrCrimeIndex <= 145, -268.0147156, 0);
+    PR1_17 := IF( L.SFDUAddrSSNCount > 9 AND L.SFDUAddrSSNCount <= 25 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -267.6429467, 0);
+    PR1_18 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrMedianValue > 288046 AND L.InputAddrMedianValue <= 516848, -266.4692035, 0);
+    PR1_19 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.DivAddrIdentityMSourceCount > 8 AND L.DivAddrIdentityMSourceCount <= 21, -266.4196031, 0);
+    PR1_20 := IF( L.SFDUAddrIdentitiesCount_24 > 12 AND L.SFDUAddrIdentitiesCount_24 <= 33 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -266.1765519, 0);
+    PR1_21 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.CurrAddrMedianValue > 276461 AND L.CurrAddrMedianValue <= 517593, -266.1187184, 0);
+    PR1_22 := IF( L.SubjectLastNameCount > -32 AND L.SubjectLastNameCount <= 3 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -265.4859272, 0);
+    PR1_23 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ResInputAVMRatioDiff12Mo > 1 AND L.v1_ResInputAVMRatioDiff12Mo <= 2, -265.4327274, 0);
+    PR1_24 := IF( L.SFDUAddrIdentitiesCount > 12 AND L.SFDUAddrIdentitiesCount <= 32 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -265.1243169, 0);
+    PR1_25 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.LP_RelativesCount > 3 AND L.LP_RelativesCount <= 8, -264.3520017, 0);
+    PR1_26 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_RaAHHCnt > 3 AND L.v1_RaAHHCnt <= 8, -264.3520017, 0);
+    PR1_27 := IF( L.SFDUAddrIdentitiesCount_12 > 12 AND L.SFDUAddrIdentitiesCount_12 <= 32 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -263.6096481, 0);
+    PR1_28 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.SearchVelocityRiskLevel > 3 AND L.SearchVelocityRiskLevel <= 5, -263.4644513, 0);
+    PR1_29 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.CorrelationRiskLevel > 8 AND L.CorrelationRiskLevel <= 18, -263.0821608, 0);
+    PR1_30 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrLenOfRes > -960 AND L.InputAddrLenOfRes <= 60, -262.9973379, 0);
+    PR1_31 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.OnlineDirectory > 0 AND L.OnlineDirectory <= 0.1, -262.5364715, 0);
+    PR1_32 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PrevAddrBurglaryIndex > 95 AND L.PrevAddrBurglaryIndex <= 148, -261.9086839, 0);
+    PR1_33 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.IdentityRiskLevel > 3 AND L.IdentityRiskLevel <= 5, -261.8836328, 0);
+    PR1_34 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrCarTheftIndex > 93 AND L.InputAddrCarTheftIndex <= 146, -261.3756347, 0);
+    PR1_35 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrCrimeIndex > 94 AND L.InputAddrCrimeIndex <= 147, -260.9262842, 0);
+    PR1_36 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AddrMostRecentCrimeDiff > -1 AND L.AddrMostRecentCrimeDiff <= -0.9, -259.9186301, 0);
+    PR1_37 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AddrMostRecentIncomeDiff > -1 AND L.AddrMostRecentIncomeDiff <= -0.9, -259.9186301, 0);
+    PR1_38 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AddrMostRecentValueDIff > -1 AND L.AddrMostRecentValueDIff <= -0.9, -259.9186301, 0);
+    PR1_39 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PRSearchOtherCount > -255 AND L.PRSearchOtherCount <= 3, -259.7885162, 0);
+    PR1_40 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PrevAddrDwellType > -1 AND L.PrevAddrDwellType <= -0.9, -259.1931498, 0);
+    PR1_41 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrMurderIndex > 52 AND L.InputAddrMurderIndex <= 102, -258.4946884, 0);
+    PR1_42 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.DivAddrIdentityCount > 13 AND L.DivAddrIdentityCount <= 35, -258.0557477, 0);
+    PR1_43 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PrevAddrOccupantOwned > 1 AND L.PrevAddrOccupantOwned <= 1.1, -257.9055245, 0);
+    PR1_44 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrOccupantOwned > 1 AND L.InputAddrOccupantOwned <= 1.1, -257.5141177, 0);
+    PR1_45 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrAgeOldestRecord > -961 AND L.InputAddrAgeOldestRecord <= 61, -257.4488464, 0);
+    PR1_46 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.StatusMostRecent > 3 AND L.StatusMostRecent <= 3.1, -257.1594901, 0);
+    PR1_47 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrAgeLastSale > 40 AND L.InputAddrAgeLastSale <= 116, -256.9978695, 0);
+    PR1_48 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_VerifiedName > 0 AND L.v1_VerifiedName <= 2, -256.5992015, 0);
+    PR1_49 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PrevAddrTaxYr > -23 AND L.PrevAddrTaxYr <= 2, -256.306748, 0);
+    PR1_50 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AssocCreditBureauOnlyCount > 1 AND L.AssocCreditBureauOnlyCount <= 3, -256.2566261, 0);
+    PR1_51 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PrevAddrLastSalesPrice > -2100000001 AND L.PrevAddrLastSalesPrice <= 9731546, -255.8273665, 0);
+    PR1_52 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.L_CurrAddrOwned > 2 AND L.L_CurrAddrOwned <= 6, -255.8068057, 0);
+    PR1_53 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.SourceOrderActivity > 0 AND L.SourceOrderActivity <= 0.1, -255.2664306, 0);
+    PR1_54 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.SourceOrderAgeLastOrder > -1 AND L.SourceOrderAgeLastOrder <= -0.9, -255.2664306, 0);
+    PR1_55 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.CurrAddrCarTheftIndex > 90 AND L.CurrAddrCarTheftIndex <= 145, -255.06886, 0);
+    PR1_56 := IF( L.ST > -53 AND L.ST <= 22 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -254.9866948, 0);
+    PR1_57 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.L_PrevAddrOwned > 2 AND L.L_PrevAddrOwned <= 6, -254.1272151, 0);
+    PR1_58 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PrevAddrMurderIndex > 34 AND L.PrevAddrMurderIndex <= 88, -253.9348993, 0);
+    PR1_59 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PrevAddrMedianValue > 259572 AND L.PrevAddrMedianValue <= 513168, -253.6853824, 0);
+    PR1_60 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.SourceRiskLevel > 7 AND L.SourceRiskLevel <= 18, -253.6611858, 0);
+    PR1_61 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.ComponentCharRiskLevel > 4 AND L.ComponentCharRiskLevel <= 6, -252.9046025, 0);
+    PR1_62 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ProspectEstimatedIncomeRange > 0 AND L.v1_ProspectEstimatedIncomeRange <= 3, -252.1176847, 0);
+    PR1_63 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrCrimeIndex > 44 AND L.InputAddrCrimeIndex <= 94, -251.9628923, 0);
+    PR1_64 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.WealthIndex > 4 AND L.WealthIndex <= 12, -251.659235, 0);
+    PR1_65 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.EstimatedAnnualIncome_12 > 49550 AND L.EstimatedAnnualIncome_12 <= 75268, -251.5842303, 0);
+    PR1_66 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ProspectBankingExperience > 1 AND L.v1_ProspectBankingExperience <= 1.1, -250.2592173, 0);
+    PR1_67 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.EstimatedAnnualIncome > 50321 AND L.EstimatedAnnualIncome <= 76289, -249.4202409, 0);
+    PR1_68 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AccidentCount > -29 AND L.AccidentCount <= 1, -249.4032797, 0);
+    PR1_69 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.L_InputAddrOwned > 2 AND L.L_InputAddrOwned <= 6, -249.3655358, 0);
+    PR1_70 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ProspectTimeLastUpdate > -1 AND L.v1_ProspectTimeLastUpdate <= -0.9, -248.9470019, 0);
+    PR1_71 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ProspectTimeOnRecord > -1 AND L.v1_ProspectTimeOnRecord <= -0.9, -248.9470019, 0);
+    PR1_72 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AccidentAge > -1 AND L.AccidentAge <= -0.9, -248.7501089, 0);
+    PR1_73 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ResInputDwellType > 1 AND L.v1_ResInputDwellType <= 4, -248.7302786, 0);
+    PR1_74 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrDwellType > 1 AND L.InputAddrDwellType <= 4, -248.5635423, 0);
+    PR1_75 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ResInputDwellTypeIndex > 0 AND L.v1_ResInputDwellTypeIndex <= 2, -248.5327301, 0);
+    PR1_76 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_HHCrtRecMmbrCnt > -85 AND L.v1_HHCrtRecMmbrCnt <= 1, -248.1633319, 0);
+    PR1_77 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.EstimatedAnnualIncome_24 > 49084 AND L.EstimatedAnnualIncome_24 <= 75190, -247.9294311, 0);
+    PR1_78 := IF( L.SrcsConfirmIDAddrCount > -19 AND L.SrcsConfirmIDAddrCount <= 4 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -247.9147405, 0);
+    PR1_79 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_RaAMedIncomeRange > 5 AND L.v1_RaAMedIncomeRange <= 7, -247.7648024, 0);
+    PR1_80 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.CurrAddrBurglaryIndex_24 > 38 AND L.CurrAddrBurglaryIndex_24 <= 92, -247.3997261, 0);
+    PR1_81 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AddrRecentEconTrajectory > 11 AND L.AddrRecentEconTrajectory <= 28, -247.2433279, 0);
+    PR1_82 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_LifeEvTimeLastMove > -1 AND L.v1_LifeEvTimeLastMove <= -0.9, -247.2009038, 0);
+    PR1_83 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ResCurrDwellType > -1 AND L.v1_ResCurrDwellType <= -0.9, -247.2009038, 0);
+    PR1_84 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.StatusNextPrevious > 3 AND L.StatusNextPrevious <= 3.1, -246.8825853, 0);
+    PR1_85 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.NonDerogCount > -15 AND L.NonDerogCount <= 5, -246.7737962, 0);
+    PR1_86 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.DivSSNAddrMSourceCount > -256 AND L.DivSSNAddrMSourceCount <= 4, -246.7525862, 0);
+    PR1_87 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PhoneOtherAgeNewestRecord > -1 AND L.PhoneOtherAgeNewestRecord <= -0.9, -246.648724, 0);
+    PR1_88 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PhoneOtherAgeOldestRecord > -1 AND L.PhoneOtherAgeOldestRecord <= -0.9, -246.648724, 0);
+    PR1_89 := IF( L.LastNameChangeCount60 > -15 AND L.LastNameChangeCount60 <= 1 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -245.7155876, 0);
+    PR1_90 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_LifeEvEconTrajectoryIndex > -7 AND L.v1_LifeEvEconTrajectoryIndex <= 1, -245.6091492, 0);
+    PR1_91 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.RecentActivityIndex > 2 AND L.RecentActivityIndex <= 5, -245.3855685, 0);
+    PR1_92 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ResCurrDwellTypeIndex > 0 AND L.v1_ResCurrDwellTypeIndex <= 2, -245.3841904, 0);
+    PR1_93 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.SearchSSNSearchCount > -256 AND L.SearchSSNSearchCount <= 4, -245.3140772, 0);
+    PR1_94 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PhoneEDAAgeNewestRecord > -1 AND L.PhoneEDAAgeNewestRecord <= -0.9, -245.2542901, 0);
+    PR1_95 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PhoneEDAAgeOldestRecord > -1 AND L.PhoneEDAAgeOldestRecord <= -0.9, -245.2542901, 0);
+    PR1_96 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ResInputAVMRatioDiff60Mo > 1 AND L.v1_ResInputAVMRatioDiff60Mo <= 2, -245.0639026, 0);
+    PR1_97 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PRSearchIdentitySSNs > -16 AND L.PRSearchIdentitySSNs <= 1, -244.965206, 0);
+    PR1_98 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.CurrAddrMedianIncome > 29098 AND L.CurrAddrMedianIncome <= 56463, -244.9592246, 0);
+    PR1_99 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_RaAMiddleAgeMmbrCnt > 1 AND L.v1_RaAMiddleAgeMmbrCnt <= 4, -244.6717616, 0);
+    PR1_100 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PRSearchOtherCount24 > -255 AND L.PRSearchOtherCount24 <= 4, -244.1510174, 0);
+    PR1_101 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_HHCollegeAttendedMmbrCnt > -19 AND L.v1_HHCollegeAttendedMmbrCnt <= 1, -243.8414798, 0);
+    PR1_102 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AddrChangeCount24 > 1 AND L.AddrChangeCount24 <= 3, -243.3825822, 0);
+    PR1_103 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrAgeNewestRecord > -688 AND L.InputAddrAgeNewestRecord <= 19, -243.1860354, 0);
+    PR1_104 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_HHYoungAdultMmbrCnt > -8 AND L.v1_HHYoungAdultMmbrCnt <= 1, -243.1117131, 0);
+    PR1_105 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_HHPropCurrOwnerMmbrCnt > -143 AND L.v1_HHPropCurrOwnerMmbrCnt <= 1, -243.0324138, 0);
+    PR1_106 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.DivAddrIdentityCountNew > -81 AND L.DivAddrIdentityCountNew <= 2, -242.9551163, 0);
+    PR1_107 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ResCurrOwnershipIndex > 0 AND L.v1_ResCurrOwnershipIndex <= 2, -242.9215562, 0);
+    PR1_108 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_CrtRecTimeNewest > -1 AND L.v1_CrtRecTimeNewest <= -0.9, -242.8805099, 0);
+    PR1_109 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.CurrAddrApplicantOwned > 0 AND L.CurrAddrApplicantOwned <= 0.1, -242.8592404, 0);
+    PR1_110 := IF( L.VerifiedAddress > 1 AND L.VerifiedAddress <= 1.1 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -242.6574452, 0);
+    PR1_111 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_CrtRecSeverityIndex > -6 AND L.v1_CrtRecSeverityIndex <= 1, -242.6573259, 0);
+    PR1_112 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.VoterRegistrationRecord > 0 AND L.VoterRegistrationRecord <= 0.1, -242.5994036, 0);
+    PR1_113 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_HHCrtRecMsdmeanMmbrCnt > -41 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 1, -242.5687973, 0);
+    PR1_114 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.CurrAddrMurderIndex > 44 AND L.CurrAddrMurderIndex <= 95, -242.538475, 0);
+    PR1_115 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.P_Time_First_Last_Purchase > -1 AND L.P_Time_First_Last_Purchase <= -0.9, -242.5160094, 0);
+    PR1_116 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_LifeEvTimeFirstAssetPurchase > -1 AND L.v1_LifeEvTimeFirstAssetPurchase <= -0.9, -242.5160094, 0);
+    PR1_117 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_LifeEvTimeLastAssetPurchase > -1 AND L.v1_LifeEvTimeLastAssetPurchase <= -0.9, -242.5160094, 0);
+    PR1_118 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_HHPropCurrAVMHighest > -10000000 AND L.v1_HHPropCurrAVMHighest <= 84315, -242.3545435, 0);
+    PR1_119 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrVacantPropCount > -255 AND L.InputAddrVacantPropCount <= 31, -242.3444321, 0);
+    PR1_120 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AddrChangeCount60 > -36 AND L.AddrChangeCount60 <= 2, -242.0723061, 0);
+    PR1_121 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PRSearchSSNIdentities > -11 AND L.PRSearchSSNIdentities <= 1, -242.0572744, 0);
+    PR1_122 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.NonDerogCount24 > 3 AND L.NonDerogCount24 <= 5, -241.966685, 0);
+    PR1_123 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.CurrAddrLenOfRes > -960 AND L.CurrAddrLenOfRes <= 64, -241.9094201, 0);
+    PR1_124 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ResCurrAVMCntyRatio > 0 AND L.v1_ResCurrAVMCntyRatio <= 1, -241.8361309, 0);
+    PR1_125 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrHistoricalMatch > 2 AND L.InputAddrHistoricalMatch <= 2.1, -241.8053111, 0);
+    PR1_126 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrNotPrimaryRes > 0 AND L.InputAddrNotPrimaryRes <= 0.1, -241.8053111, 0);
+    PR1_127 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrBurglaryIndex > 95 AND L.InputAddrBurglaryIndex <= 147, -241.7386908, 0);
+    PR1_128 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrApplicantOwned > 0 AND L.InputAddrApplicantOwned <= 0.1, -241.6056515, 0);
+    PR1_129 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PropAgeNewestPurchase > -1 AND L.PropAgeNewestPurchase <= -0.9, -241.5591488, 0);
+    PR1_130 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PropAgeOldestPurchase > -1 AND L.PropAgeOldestPurchase <= -0.9, -241.5591488, 0);
+    PR1_131 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ResCurrAVMValue > -10000000 AND L.v1_ResCurrAVMValue <= 71295, -241.5230593, 0);
+    PR1_132 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.VariationMSourcesSSNCount > -24 AND L.VariationMSourcesSSNCount <= 2, -241.4584668, 0);
+    PR1_133 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ResCurrAVMValue60Mo > -10000000 AND L.v1_ResCurrAVMValue60Mo <= 72732, -241.450065, 0);
+    PR1_134 := IF( L.FEMALE > 1 AND L.FEMALE <= 1.1 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -241.4251725, 0);
+    PR1_135 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_PropCurrOwnedAVMTtl > -10000000 AND L.v1_PropCurrOwnedAVMTtl <= 86131, -241.294096, 0);
+    PR1_136 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_RaAOccBusinessAssocMmbrCnt > -209 AND L.v1_RaAOccBusinessAssocMmbrCnt <= 2, -241.2694426, 0);
+    PR1_137 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.RelativesPropOwnedTaxTotal > -1 AND L.RelativesPropOwnedTaxTotal <= -0.9, -241.2368079, 0);
+    PR1_138 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_VerifiedCurrResMatchIndex > 0 AND L.v1_VerifiedCurrResMatchIndex <= 0.1, -240.9866359, 0);
+    PR1_139 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_PPCurrOwnedAutoCnt > -14 AND L.v1_PPCurrOwnedAutoCnt <= 1, -240.9792811, 0);
+    PR1_140 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_PPCurrOwnedCnt > -38 AND L.v1_PPCurrOwnedCnt <= 1, -240.9792811, 0);
+    PR1_141 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_PPCurrOwner > 0 AND L.v1_PPCurrOwner <= 0.1, -240.9792811, 0);
+    PR1_142 := IF( L.SubjectAddrCount > -85 AND L.SubjectAddrCount <= 6 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -240.9073022, 0);
+    PR1_143 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ProspectCollegeAttended > 0 AND L.v1_ProspectCollegeAttended <= 0.1, -240.8812347, 0);
+    PR1_144 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ResCurrAVMValue12Mo > -10000000 AND L.v1_ResCurrAVMValue12Mo <= 66122, -240.8675577, 0);
+    PR1_145 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.LP_CollegeProgramType > -4 AND L.LP_CollegeProgramType <= 1, -240.814576, 0);
+    PR1_146 := IF( L.SubjectSSNCount > -34 AND L.SubjectSSNCount <= 2 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -240.7160469, 0);
+    PR1_147 := IF( L.SSNAddrCount > -255 AND L.SSNAddrCount <= 6 AND L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1, -240.3974187, 0);
+    PR1_148 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_PropCurrOwnedCnt > -56 AND L.v1_PropCurrOwnedCnt <= 1, -240.3861696, 0);
+    PR1_149 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_PropCurrOwner > 0 AND L.v1_PropCurrOwner <= 0.1, -240.3861696, 0);
+    PR1_150 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_HHPPCurrOwnedAutoCnt > -106 AND L.v1_HHPPCurrOwnedAutoCnt <= 1, -240.2850197, 0);
+    PR1_151 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_HHPPCurrOwnedCnt > -141 AND L.v1_HHPPCurrOwnedCnt <= 1, -240.2493713, 0);
+    PR1_152 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_ProspectLastUpdate12Mo > 0 AND L.v1_ProspectLastUpdate12Mo <= 0.1, -240.2360396, 0);
+    PR1_153 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_PropEverOwnedCnt > -56 AND L.v1_PropEverOwnedCnt <= 1, -240.1970179, 0);
+    PR1_154 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PrevAddrDwellType > 6 AND L.PrevAddrDwellType <= 16, -240.0975967, 0);
+    PR1_155 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_OccBusinessAssociation > 0 AND L.v1_OccBusinessAssociation <= 0.1, -240.0749723, 0);
+    PR1_156 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_OccBusinessAssociationTime > -1 AND L.v1_OccBusinessAssociationTime <= -0.9, -240.0749723, 0);
+    PR1_157 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_OccBusinessTitleLeadership > 0 AND L.v1_OccBusinessTitleLeadership <= 0.1, -240.0749723, 0);
+    PR1_158 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PropertyOwner > 0 AND L.PropertyOwner <= 0.1, -240.034705, 0);
+    PR1_159 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PropOwnedCount > -48 AND L.PropOwnedCount <= 1, -240.034705, 0);
+    PR1_160 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.VariationMSourcesSSNUnrelCount > -23 AND L.VariationMSourcesSSNUnrelCount <= 2, -239.8975432, 0);
+    PR1_161 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrMultiFamilyCount > 201 AND L.InputAddrMultiFamilyCount <= 510, -239.8588717, 0);
+    PR1_162 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_HHOccBusinessAssocMmbrCnt > -69 AND L.v1_HHOccBusinessAssocMmbrCnt <= 1, -239.8179994, 0);
+    PR1_163 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.AssetOwner > 0 AND L.AssetOwner <= 0.1, -239.8149925, 0);
+    PR1_164 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_CrtRecMsdmeanTimeNewest > -1 AND L.v1_CrtRecMsdmeanTimeNewest <= -0.9, -239.7073345, 0);
+    PR1_165 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrSingleFamilyCount > 223 AND L.InputAddrSingleFamilyCount <= 510, -239.6972712, 0);
+    PR1_166 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.BusinessActiveAssociation > 0 AND L.BusinessActiveAssociation <= 0.1, -239.5369194, 0);
+    PR1_167 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.v1_HHPropCurrOwnedCnt > -214 AND L.v1_HHPropCurrOwnedCnt <= 2, -239.3456391, 0);
+    PR1_168 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.PRSearchOtherCount12 > -255 AND L.PRSearchOtherCount12 <= 3, -239.3136657, 0);
+    PR1_169 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.InputAddrLastSalesPrice > -1 AND L.InputAddrLastSalesPrice <= -0.9, -238.9965576, 0);
+    PR1_170 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.NonDerogCount01 > 2 AND L.NonDerogCount01 <= 4, -238.8240578, 0);
+    PR1_171 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.CurrAddrTaxYr > -23 AND L.CurrAddrTaxYr <= 2, -238.8202824, 0);
+    PR1_172 := IF( L.SSNNonUS > 1 AND L.SSNNonUS <= 1.1 AND L.SSNAfter5 > 0 AND L.SSNAfter5 <= 0.1, -238.7985644, 0);
+    PR2_1 := IF( L.CurrAddrBurglaryIndex_24 > -1 AND L.CurrAddrBurglaryIndex_24 <= -0.9 AND L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72, 130.1383996, 0);
+    PR2_2 := IF( L.EstimatedAnnualIncome_12 > -250999 AND L.EstimatedAnnualIncome_12 <= 49550 AND L.PRSearchPersonalFinanceCount > 4 AND L.PRSearchPersonalFinanceCount <= 16, 130.4329669, 0);
+    PR2_3 := IF( L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72 AND L.v1_RaACollege2yrAttendedMmbrCnt > 1 AND L.v1_RaACollege2yrAttendedMmbrCnt <= 3, 130.8960786, 0);
+    PR2_4 := IF( L.AddrRecentEconTrajectoryIndex > 0 AND L.AddrRecentEconTrajectoryIndex <= 2 AND L.VariationRiskLevel > 4 AND L.VariationRiskLevel <= 7, 131.1287344, 0);
+    PR2_5 := IF( L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47 AND L.v1_RaACollege2yrAttendedMmbrCnt > -17 AND L.v1_RaACollege2yrAttendedMmbrCnt <= 1, 131.5051458, 0);
+    PR2_6 := IF( L.WealthIndex > -5 AND L.WealthIndex <= 2 AND L.PRSearchPersonalFinanceCount > 4 AND L.PRSearchPersonalFinanceCount <= 16, 131.6277324, 0);
+    PR2_7 := IF( L.InputAddrBurglaryIndex > 147 AND L.InputAddrBurglaryIndex <= 400 AND L.PRSearchPersonalFinanceCount24 > 2 AND L.PRSearchPersonalFinanceCount24 <= 9, 131.9278712, 0);
+    PR2_8 := IF( L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72 AND L.v1_RaAMedIncomeRange > 2 AND L.v1_RaAMedIncomeRange <= 5, 131.9916639, 0);
+    PR2_9 := IF( L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72 AND L.VoterRegistrationRecord > 1 AND L.VoterRegistrationRecord <= 1.1, 132.0099884, 0);
+    PR2_10 := IF( L.SSNLowIssueAge > 193 AND L.SSNLowIssueAge <= 425 AND L.FelonyAge > 48 AND L.FelonyAge <= 144, 132.0527779, 0);
+    PR2_11 := IF( L.PRSearchPersonalFinanceCount > 4 AND L.PRSearchPersonalFinanceCount <= 16 AND L.v1_RaAMiddleAgeMmbrCnt > 8 AND L.v1_RaAMiddleAgeMmbrCnt <= 358, 132.2271567, 0);
+    PR2_12 := IF( L.SSNLowIssueAge > 193 AND L.SSNLowIssueAge <= 425 AND L.v1_CrtRecFelonyTimeNewest > 47 AND L.v1_CrtRecFelonyTimeNewest <= 143, 132.2661202, 0);
+    PR2_13 := IF( L.AgeOldestRecord > 125 AND L.AgeOldestRecord <= 266 AND L.AssocHighRiskTopologyCount > 4 AND L.AssocHighRiskTopologyCount <= 8, 132.3611117, 0);
+    PR2_14 := IF( L.AgeOldestRecord > 125 AND L.AgeOldestRecord <= 266 AND L.RelativesFelonyCount > 4 AND L.RelativesFelonyCount <= 8, 132.3611117, 0);
+    PR2_15 := IF( L.AddrRecentEconTrajectoryIndex > 0 AND L.AddrRecentEconTrajectoryIndex <= 2 AND L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72, 133.9918938, 0);
+    PR2_16 := IF( L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72 AND L.v1_RaACrtRecLienJudgMmbrCnt > 10 AND L.v1_RaACrtRecLienJudgMmbrCnt <= 244, 134.6153652, 0);
+    PR2_17 := IF( L.v1_ProspectAge > 18 AND L.v1_ProspectAge <= 46 AND L.v1_RaACrtRecFelonyMmbrCnt > 4 AND L.v1_RaACrtRecFelonyMmbrCnt <= 8, 134.7625822, 0);
+    PR2_18 := IF( L.SSNHighIssueAge > 173 AND L.SSNHighIssueAge <= 387 AND L.v1_CrtRecFelonyCnt > 2 AND L.v1_CrtRecFelonyCnt <= 10, 134.8437489, 0);
+    PR2_19 := IF( L.SSNHighIssueAge > 173 AND L.SSNHighIssueAge <= 387 AND L.FelonyCount > 2 AND L.FelonyCount <= 10, 135.0526016, 0);
+    PR2_20 := IF( L.PrevAddrMedianValue > -1031251 AND L.PrevAddrMedianValue <= 107884 AND L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72, 135.5372391, 0);
+    PR2_21 := IF( L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72 AND L.v1_RaACrtRecMsdmeanMmbrCnt > 9 AND L.v1_RaACrtRecMsdmeanMmbrCnt <= 18, 136.0992097, 0);
+    PR2_22 := IF( L.InputAddrBusinessCount > -255 AND L.InputAddrBusinessCount <= 32 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 136.3089422, 0);
+    PR2_23 := IF( L.WealthIndex > -5 AND L.WealthIndex <= 2 AND L.v1_CrtRecMsdmeanTimeNewest > -961 AND L.v1_CrtRecMsdmeanTimeNewest <= 41, 136.3256713, 0);
+    PR2_24 := IF( L.InputAddrCarTheftIndex > 42 AND L.InputAddrCarTheftIndex <= 93 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 136.3791516, 0);
+    PR2_25 := IF( L.AssocSuspicousIdentitiesCount > -48 AND L.AssocSuspicousIdentitiesCount <= 2 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 136.6245168, 0);
+    PR2_26 := IF( L.AgeOldestRecord > 125 AND L.AgeOldestRecord <= 266 AND L.v1_RaACrtRecFelonyMmbrCnt > 4 AND L.v1_RaACrtRecFelonyMmbrCnt <= 8, 136.6429773, 0);
+    PR2_27 := IF( L.InputAddrHistoricalMatch > -1 AND L.InputAddrHistoricalMatch <= -0.9 AND L.v1_RaAInterestSportPersonMmbrCnt > 4 AND L.v1_RaAInterestSportPersonMmbrCnt <= 8, 136.8005356, 0);
+    PR2_28 := IF( L.AddrMostRecentMoveAge > 60 AND L.AddrMostRecentMoveAge <= 164 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 136.8042447, 0);
+    PR2_29 := IF( L.ComponentCharRiskLevel > 8 AND L.ComponentCharRiskLevel <= 18 AND L.v1_RaAPPCurrOwnerWtrcrftMmbrCnt > 1 AND L.v1_RaAPPCurrOwnerWtrcrftMmbrCnt <= 3, 136.828949, 0);
+    PR2_30 := IF( L.v1_ResInputOwnershipIndex > 0 AND L.v1_ResInputOwnershipIndex <= 2 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 136.836207, 0);
+    PR2_31 := IF( L.v1_LifeEvEconTrajectory > 2 AND L.v1_LifeEvEconTrajectory <= 3 AND L.v1_RaACollegeAttendedMmbrCnt > 4 AND L.v1_RaACollegeAttendedMmbrCnt <= 248, 136.8831848, 0);
+    PR2_32 := IF( L.SFDUAddrIdentitiesCount_12 > 12 AND L.SFDUAddrIdentitiesCount_12 <= 32 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 136.8934681, 0);
+    PR2_33 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.v1_RaAYoungAdultMmbrCnt > 3 AND L.v1_RaAYoungAdultMmbrCnt <= 5, 137.0432142, 0);
+    PR2_34 := IF( L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4 AND L.L_PrevAddrOwned > 0 AND L.L_PrevAddrOwned <= 2, 137.0940741, 0);
+    PR2_35 := IF( L.PRSearchPersonalFinanceCount > 4 AND L.PRSearchPersonalFinanceCount <= 16 AND L.ComponentCharRiskLevel > 8 AND L.ComponentCharRiskLevel <= 18, 137.0961238, 0);
+    PR2_36 := IF( L.CurrAddrBurglaryIndex_12 > -1 AND L.CurrAddrBurglaryIndex_12 <= -0.9 AND L.PRSearchPersonalFinanceCount > 4 AND L.PRSearchPersonalFinanceCount <= 16, 137.2039726, 0);
+    PR2_37 := IF( L.PrevAddrAgeLastSale > -1 AND L.PrevAddrAgeLastSale <= -0.9 AND L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4, 137.2301225, 0);
+    PR2_38 := IF( L.PrevAddrLastSalesPrice > -1 AND L.PrevAddrLastSalesPrice <= -0.9 AND L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4, 137.2301225, 0);
+    PR2_39 := IF( L.SSNIssueState > 27 AND L.SSNIssueState <= 40 AND L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4, 137.2322717, 0);
+    PR2_40 := IF( L.v1_VerifiedName > 0 AND L.v1_VerifiedName <= 2 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 137.3590742, 0);
+    PR2_41 := IF( L.InputAddrLenOfRes > 60 AND L.InputAddrLenOfRes <= 161 AND L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4, 137.3652788, 0);
+    PR2_42 := IF( L.InputAddrSingleFamilyCount > 223 AND L.InputAddrSingleFamilyCount <= 510 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 137.5761934, 0);
+    PR2_43 := IF( L.v1_ProspectCollegeProgramType > 1 AND L.v1_ProspectCollegeProgramType <= 2 AND L.v1_RaACrtRecMsdmeanMmbrCnt > 9 AND L.v1_RaACrtRecMsdmeanMmbrCnt <= 18, 137.5900501, 0);
+    PR2_44 := IF( L.v1_CrtRecTimeNewest > -715 AND L.v1_CrtRecTimeNewest <= 31 AND L.LP_TrajectoryIndex > 1 AND L.LP_TrajectoryIndex <= 2, 137.60487, 0);
+    PR2_45 := IF( L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47 AND L.v1_RaAPropOwnerAVMMed > -10000000 AND L.v1_RaAPropOwnerAVMMed <= 89958, 137.7165046, 0);
+    PR2_46 := IF( L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72 AND L.v1_ProspectCollegeProgramType > 1 AND L.v1_ProspectCollegeProgramType <= 2, 137.7326919, 0);
+    PR2_47 := IF( L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47 AND L.v1_RaAMiddleAgeMmbrCnt > 1 AND L.v1_RaAMiddleAgeMmbrCnt <= 4, 137.8962179, 0);
+    PR2_48 := IF( L.InputAddrLenOfRes > -960 AND L.InputAddrLenOfRes <= 60 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 137.914944, 0);
+    PR2_49 := IF( L.PrevAddrOccupantOwned > 0 AND L.PrevAddrOccupantOwned <= 0.1 AND L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4, 137.9250357, 0);
+    PR2_50 := IF( L.InputAddrLenOfRes > -960 AND L.InputAddrLenOfRes <= 60 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 137.963139, 0);
+    PR2_51 := IF( L.LastNameChangeAge > 95 AND L.LastNameChangeAge <= 207 AND L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4, 138.0463511, 0);
+    PR2_52 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.v1_RaAYoungAdultMmbrCnt > 3 AND L.v1_RaAYoungAdultMmbrCnt <= 5, 138.0864541, 0);
+    PR2_53 := IF( L.WealthIndex > -5 AND L.WealthIndex <= 2 AND L.PRSearchIdentityPhones > 3 AND L.PRSearchIdentityPhones <= 7, 138.1354454, 0);
+    PR2_54 := IF( L.AddrChangeCount06 > 1 AND L.AddrChangeCount06 <= 3 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 138.1451635, 0);
+    PR2_55 := IF( L.SubjectAddrRecentCount > 1 AND L.SubjectAddrRecentCount <= 3 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 138.1451635, 0);
+    PR2_56 := IF( L.SubjectSSNCount > -34 AND L.SubjectSSNCount <= 2 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 138.172834, 0);
+    PR2_57 := IF( L.EducationProgram2Yr > 1 AND L.EducationProgram2Yr <= 1.1 AND L.v1_RaAMiddleAgeMmbrCnt > 8 AND L.v1_RaAMiddleAgeMmbrCnt <= 358, 138.1796657, 0);
+    PR2_58 := IF( L.SubPrimeOfferRequestCount60 > 1 AND L.SubPrimeOfferRequestCount60 <= 4 AND L.SourceOrderAgeLastOrder > 12 AND L.SourceOrderAgeLastOrder <= 38, 138.2117451, 0);
+    PR2_59 := IF( L.v1_RaAPPCurrOwnerMtrcycleMmbrCnt > 3 AND L.v1_RaAPPCurrOwnerMtrcycleMmbrCnt <= 6 AND L.L_InputAddrOwned > -1 AND L.L_InputAddrOwned <= -0.9, 138.2791078, 0);
+    PR2_60 := IF( L.InputAddrApplicantOwned > -1 AND L.InputAddrApplicantOwned <= -0.9 AND L.v1_RaAPPCurrOwnerMtrcycleMmbrCnt > 3 AND L.v1_RaAPPCurrOwnerMtrcycleMmbrCnt <= 6, 138.2791078, 0);
+    PR2_61 := IF( L.InputAddrFamilyOwned > -1 AND L.InputAddrFamilyOwned <= -0.9 AND L.v1_RaAPPCurrOwnerMtrcycleMmbrCnt > 3 AND L.v1_RaAPPCurrOwnerMtrcycleMmbrCnt <= 6, 138.2791078, 0);
+    PR2_62 := IF( L.InputAddrOccupantOwned > -1 AND L.InputAddrOccupantOwned <= -0.9 AND L.v1_RaAPPCurrOwnerMtrcycleMmbrCnt > 3 AND L.v1_RaAPPCurrOwnerMtrcycleMmbrCnt <= 6, 138.2791078, 0);
+    PR2_63 := IF( L.DerogCount > -200 AND L.DerogCount <= 4 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 138.2926233, 0);
+    PR2_64 := IF( L.AddrRecentEconTrajectoryIndex > 0 AND L.AddrRecentEconTrajectoryIndex <= 2 AND L.PRSearchPersonalFinanceCount12 > 1 AND L.PRSearchPersonalFinanceCount12 <= 5, 138.3253841, 0);
+    PR2_65 := IF( L.InputAddrAVMValue60 > -19900000 AND L.InputAddrAVMValue60 <= 78557 AND L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4, 138.3668963, 0);
+    PR2_66 := IF( L.PRSearchPersonalFinanceCount > 4 AND L.PRSearchPersonalFinanceCount <= 16 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 138.4185255, 0);
+    PR2_67 := IF( L.InputAddrBusinessCount > -255 AND L.InputAddrBusinessCount <= 32 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 138.487674, 0);
+    PR2_68 := IF( L.SFDUAddrSSNCount > 9 AND L.SFDUAddrSSNCount <= 25 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 138.4917441, 0);
+    PR2_69 := IF( L.EducationProgram4Yr > 0 AND L.EducationProgram4Yr <= 0.1 AND L.v1_CrtRecMsdmeanCnt > 3 AND L.v1_CrtRecMsdmeanCnt <= 12, 138.7954789, 0);
+    PR2_70 := IF( L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12 AND L.v1_RaAOccProfLicMmbrCnt > -207 AND L.v1_RaAOccProfLicMmbrCnt <= 2, 138.8169653, 0);
+    PR2_71 := IF( L.WealthIndex > -5 AND L.WealthIndex <= 2 AND L.PRSearchPersonalFinanceCount24 > 2 AND L.PRSearchPersonalFinanceCount24 <= 9, 138.9553306, 0);
+    PR2_72 := IF( L.SFDUAddrIdentitiesCount_24 > 12 AND L.SFDUAddrIdentitiesCount_24 <= 33 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 139.0649173, 0);
+    PR2_73 := IF( L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4 AND L.DivAddrIdentityMSourceCount > -211 AND L.DivAddrIdentityMSourceCount <= 8, 139.2294653, 0);
+    PR2_74 := IF( L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47 AND L.P_EstimatedHHIncomePerCapita > -11 AND L.P_EstimatedHHIncomePerCapita <= 2, 139.2531778, 0);
+    PR2_75 := IF( L.v1_ProspectAge > 18 AND L.v1_ProspectAge <= 46 AND L.v1_CrtRecFelonyCnt > 2 AND L.v1_CrtRecFelonyCnt <= 10, 139.2562483, 0);
+    PR2_76 := IF( L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12 AND L.v1_HHOccProfLicMmbrCnt > -52 AND L.v1_HHOccProfLicMmbrCnt <= 1, 139.3109262, 0);
+    PR2_77 := IF( L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47 AND L.v1_RaAYoungAdultMmbrCnt > 1 AND L.v1_RaAYoungAdultMmbrCnt <= 3, 139.3130111, 0);
+    PR2_78 := IF( L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4 AND L.DivAddrSSNCount > -255 AND L.DivAddrSSNCount <= 10, 139.4563202, 0);
+    PR2_79 := IF( L.SFDUAddrSSNCount > 9 AND L.SFDUAddrSSNCount <= 25 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 139.52987, 0);
+    PR2_80 := IF( L.VerifiedAddress > 0 AND L.VerifiedAddress <= 0.1 AND L.v1_RaAInterestSportPersonMmbrCnt > 4 AND L.v1_RaAInterestSportPersonMmbrCnt <= 8, 139.5902034, 0);
+    PR2_81 := IF( L.LienFiledCount24 > -58 AND L.LienFiledCount24 <= 1 AND L.v1_CrtRecCnt12Mo > 4 AND L.v1_CrtRecCnt12Mo <= 11, 139.6984656, 0);
+    PR2_82 := IF( L.EducationProgram4Yr > 0 AND L.EducationProgram4Yr <= 0.1 AND L.v1_ResCurrDwellType > 1 AND L.v1_ResCurrDwellType <= 5, 139.747358, 0);
+    PR2_83 := IF( L.LastNameChangeCount60 > 1 AND L.LastNameChangeCount60 <= 3 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 139.8661926, 0);
+    PR2_84 := IF( L.EducationProgram4Yr > 0 AND L.EducationProgram4Yr <= 0.1 AND L.VariationRiskLevel > 4 AND L.VariationRiskLevel <= 7, 139.8937464, 0);
+    PR2_85 := IF( L.InputAddrCarTheftIndex > 42 AND L.InputAddrCarTheftIndex <= 93 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 139.9417232, 0);
+    PR2_86 := IF( L.CurrAddrLenOfRes > -960 AND L.CurrAddrLenOfRes <= 64 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 139.9965439, 0);
+    PR2_87 := IF( L.AddrRecentEconTrajectory > 37 AND L.AddrRecentEconTrajectory <= 98 AND L.PRSearchIdentityPhones > 3 AND L.PRSearchIdentityPhones <= 7, 140.0090138, 0);
+    PR2_88 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.v1_RaAPropOwnerAVMMed > -10000000 AND L.v1_RaAPropOwnerAVMMed <= 89958, 140.1922548, 0);
+    PR2_89 := IF( L.LienReleasedAge > -1 AND L.LienReleasedAge <= -0.9 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 140.2646469, 0);
+    PR2_90 := IF( L.FelonyCount > 2 AND L.FelonyCount <= 10 AND L.v1_ProspectAge > 18 AND L.v1_ProspectAge <= 46, 140.2845944, 0);
+    PR2_91 := IF( L.CurrAddrCarTheftIndex > 145 AND L.CurrAddrCarTheftIndex <= 400 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 140.3051777, 0);
+    PR2_92 := IF( L.AddrRecentEconTrajectoryIndex > 0 AND L.AddrRecentEconTrajectoryIndex <= 2 AND L.SearchVelocityRiskLevel > 7 AND L.SearchVelocityRiskLevel <= 18, 140.3185749, 0);
+    PR2_93 := IF( L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72 AND L.InputAddrErrorCode > 1 AND L.InputAddrErrorCode <= 4, 140.4269101, 0);
+    PR2_94 := IF( L.v1_ResInputDwellTypeIndex > 2 AND L.v1_ResInputDwellTypeIndex <= 6 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 140.5868179, 0);
+    PR2_95 := IF( L.EstimatedAnnualIncome > -250999 AND L.EstimatedAnnualIncome <= 50321 AND L.PRSearchPersonalFinanceCount06 > 5 AND L.PRSearchPersonalFinanceCount06 <= 12, 140.5940229, 0);
+    PR2_96 := IF( L.PRSearchLocateCount > -255 AND L.PRSearchLocateCount <= 4 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 140.6397991, 0);
+    PR2_97 := IF( L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 140.654987, 0);
+    PR2_98 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.v1_RaAMiddleAgeMmbrCnt > 1 AND L.v1_RaAMiddleAgeMmbrCnt <= 4, 140.7077818, 0);
+    PR2_99 := IF( L.LienFiledCount24 > 1 AND L.LienFiledCount24 <= 6 AND L.v1_VerifiedName > 0 AND L.v1_VerifiedName <= 2, 140.7702163, 0);
+    PR2_100 := IF( L.v1_ProspectEstimatedIncomeRange > 0 AND L.v1_ProspectEstimatedIncomeRange <= 3 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 140.7886747, 0);
+    PR2_101 := IF( L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12 AND L.v1_CrtRecLienJudgTimeNewest > -1 AND L.v1_CrtRecLienJudgTimeNewest <= -0.9, 140.8898402, 0);
+    PR2_102 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.PhoneOtherAgeNewestRecord > -745 AND L.PhoneOtherAgeNewestRecord <= 26, 140.8983075, 0);
+    PR2_103 := IF( L.SSNLowIssueAge > 193 AND L.SSNLowIssueAge <= 425 AND L.v1_CrtRecFelonyCnt > 2 AND L.v1_CrtRecFelonyCnt <= 10, 140.9119986, 0);
+    PR2_104 := IF( L.CurrAddrBurglaryIndex > 146 AND L.CurrAddrBurglaryIndex <= 400 AND L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4, 140.9503709, 0);
+    PR2_105 := IF( L.AddrMostRecentIncomeDiff > 10616 AND L.AddrMostRecentIncomeDiff <= 39636 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 141.0251223, 0);
+    PR2_106 := IF( L.SubPrimeOfferRequestCount > 1 AND L.SubPrimeOfferRequestCount <= 4 AND L.v1_RaACrtRecLienJudgMmbrCnt > 10 AND L.v1_RaACrtRecLienJudgMmbrCnt <= 244, 141.1632938, 0);
+    PR2_107 := IF( L.PRSearchOtherCount24 > 4 AND L.PRSearchOtherCount24 <= 24 AND L.LP_TrajectoryIndex > 1 AND L.LP_TrajectoryIndex <= 2, 141.231796, 0);
+    PR2_108 := IF( L.CurrAddrCrimeIndex > -201 AND L.CurrAddrCrimeIndex <= 38 AND L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4, 141.3136475, 0);
+    PR2_109 := IF( L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47 AND L.v1_RaACrtRecEvictionMmbrCnt > -50 AND L.v1_RaACrtRecEvictionMmbrCnt <= 2, 141.3344569, 0);
+    PR2_110 := IF( L.VariationRiskLevel > 7 AND L.VariationRiskLevel <= 18 AND L.v1_RaAPPCurrOwnerWtrcrftMmbrCnt > 1 AND L.v1_RaAPPCurrOwnerWtrcrftMmbrCnt <= 3, 141.3374206, 0);
+    PR2_111 := IF( L.CurrAddrMedianValue > -1031251 AND L.CurrAddrMedianValue <= 133570 AND L.PRSearchIdentityAddrs > 3 AND L.PRSearchIdentityAddrs <= 13, 141.3428378, 0);
+    PR2_112 := IF( L.PRSearchIdentityPhones > 3 AND L.PRSearchIdentityPhones <= 7 AND L.v1_RaACollege2yrAttendedMmbrCnt > 1 AND L.v1_RaACollege2yrAttendedMmbrCnt <= 3, 141.4128425, 0);
+    PR2_113 := IF( L.SearchUnverifiedSSNCountYear > 1 AND L.SearchUnverifiedSSNCountYear <= 3 AND L.v1_RaAInterestSportPersonMmbrCnt > 4 AND L.v1_RaAInterestSportPersonMmbrCnt <= 8, 141.4160611, 0);
+    PR2_114 := IF( L.InputAddrMedianValue > -1031251 AND L.InputAddrMedianValue <= 149142 AND L.AddrChangeCount24 > 6 AND L.AddrChangeCount24 <= 40, 141.443937, 0);
+    PR2_115 := IF( L.LienReleasedCount60 > -35 AND L.LienReleasedCount60 <= 1 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 141.4830073, 0);
+    PR2_116 := IF( L.EstimatedAnnualIncome_12 > -250999 AND L.EstimatedAnnualIncome_12 <= 49550 AND L.PRSearchPersonalFinanceCount06 > 5 AND L.PRSearchPersonalFinanceCount06 <= 12, 141.5563646, 0);
+    PR2_117 := IF( L.SSNLowIssueAge > 193 AND L.SSNLowIssueAge <= 425 AND L.FelonyCount > 2 AND L.FelonyCount <= 10, 141.6852407, 0);
+    PR2_118 := IF( L.EstimatedAnnualIncome_24 > -250999 AND L.EstimatedAnnualIncome_24 <= 49084 AND L.PRSearchPersonalFinanceCount03 > 4 AND L.PRSearchPersonalFinanceCount03 <= 10, 141.7570884, 0);
+    PR2_119 := IF( L.SFDUAddrIdentitiesCount_24 > 86 AND L.SFDUAddrIdentitiesCount_24 <= 510 AND L.LP_CollegeProgramType > 1 AND L.LP_CollegeProgramType <= 2, 141.7797482, 0);
+    PR2_120 := IF( L.PRSearchOtherCount06 > 3 AND L.PRSearchOtherCount06 <= 39 AND L.v1_ProspectCollegeProgramType > 1 AND L.v1_ProspectCollegeProgramType <= 2, 141.7991751, 0);
+    PR2_121 := IF( L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12 AND L.v1_CrtRecLienJudgCnt > -101 AND L.v1_CrtRecLienJudgCnt <= 2, 141.8739986, 0);
+    PR2_122 := IF( L.BusinessInputAddrCount > -255 AND L.BusinessInputAddrCount <= 14 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 141.9382761, 0);
+    PR2_123 := IF( L.EvictionCount60 > -68 AND L.EvictionCount60 <= 2 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 141.9989921, 0);
+    PR2_124 := IF( L.LastNameChangeAge > -960 AND L.LastNameChangeAge <= 95 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 142.0364377, 0);
+    PR2_125 := IF( L.SearchSSNSearchCount > 40 AND L.SearchSSNSearchCount <= 510 AND L.L_InputAddrOwned > -1 AND L.L_InputAddrOwned <= -0.9, 142.0528019, 0);
+    PR2_126 := IF( L.InputAddrApplicantOwned > -1 AND L.InputAddrApplicantOwned <= -0.9 AND L.SearchSSNSearchCount > 40 AND L.SearchSSNSearchCount <= 510, 142.1178565, 0);
+    PR2_127 := IF( L.InputAddrFamilyOwned > -1 AND L.InputAddrFamilyOwned <= -0.9 AND L.SearchSSNSearchCount > 40 AND L.SearchSSNSearchCount <= 510, 142.1178565, 0);
+    PR2_128 := IF( L.InputAddrOccupantOwned > -1 AND L.InputAddrOccupantOwned <= -0.9 AND L.SearchSSNSearchCount > 40 AND L.SearchSSNSearchCount <= 510, 142.1178565, 0);
+    PR2_129 := IF( L.CurrAddrCrimeIndex > 145 AND L.CurrAddrCrimeIndex <= 400 AND L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4, 142.1494018, 0);
+    PR2_130 := IF( L.AddrChangeCount12 > 1 AND L.AddrChangeCount12 <= 3 AND L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4, 142.304947, 0);
+    PR2_131 := IF( L.EducationInstitutionRating > 4 AND L.EducationInstitutionRating <= 12 AND L.PRSearchPersonalFinanceCount > 4 AND L.PRSearchPersonalFinanceCount <= 16, 142.3402883, 0);
+    PR2_132 := IF( L.CurrAddrOccupantOwned > 0 AND L.CurrAddrOccupantOwned <= 0.1 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 142.3639126, 0);
+    PR2_133 := IF( L.EducationProgram2Yr > 1 AND L.EducationProgram2Yr <= 1.1 AND L.v1_CrtRecMsdmeanCnt > 3 AND L.v1_CrtRecMsdmeanCnt <= 12, 142.4489583, 0);
+    PR2_134 := IF( L.AddrRecentEconTrajectoryIndex > 0 AND L.AddrRecentEconTrajectoryIndex <= 2 AND L.PRSearchIdentityPhones > 3 AND L.PRSearchIdentityPhones <= 7, 142.4826416, 0);
+    PR2_135 := IF( L.InputAddrMultiFamilyCount > -255 AND L.InputAddrMultiFamilyCount <= 43 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 142.5097602, 0);
+    PR2_136 := IF( L.AddrChangeCount24 > 6 AND L.AddrChangeCount24 <= 40 AND L.v1_HHCrtRecMsdmeanMmbrCnt > 1 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 3, 142.5364219, 0);
+    PR2_137 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.v1_RaAYoungAdultMmbrCnt > 1 AND L.v1_RaAYoungAdultMmbrCnt <= 3, 142.8218435, 0);
+    PR2_138 := IF( L.PrevAddrDwellType > -1 AND L.PrevAddrDwellType <= -0.9 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 142.8380781, 0);
+    PR2_139 := IF( L.AddrMostRecentIncomeDiff > 10616 AND L.AddrMostRecentIncomeDiff <= 39636 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 142.8873572, 0);
+    PR2_140 := IF( L.SFDUAddrSSNCount > 61 AND L.SFDUAddrSSNCount <= 510 AND L.WealthIndex > -5 AND L.WealthIndex <= 2, 142.8933476, 0);
+    PR2_141 := IF( L.PRSearchLocateCount24 > 4 AND L.PRSearchLocateCount24 <= 15 AND L.LP_TrajectoryIndex > 1 AND L.LP_TrajectoryIndex <= 2, 142.9988926, 0);
+    PR2_142 := IF( L.LienFiledCount60 > -74 AND L.LienFiledCount60 <= 2 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 143.0367039, 0);
+    PR2_143 := IF( L.SearchSSNSearchCount > 15 AND L.SearchSSNSearchCount <= 40 AND L.v1_CrtRecMsdmeanCnt > 12 AND L.v1_CrtRecMsdmeanCnt <= 30, 143.1018454, 0);
+    PR2_144 := IF( L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47 AND L.v1_RaAYoungAdultMmbrCnt > 3 AND L.v1_RaAYoungAdultMmbrCnt <= 5, 143.1343362, 0);
+    PR2_145 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.DivAddrIdentityCountNew > 2 AND L.DivAddrIdentityCountNew <= 3, 143.1839415, 0);
+    PR2_146 := IF( L.CurrAddrMedianValue > -1031251 AND L.CurrAddrMedianValue <= 133570 AND L.SearchUnverifiedPhoneCountYear > 3 AND L.SearchUnverifiedPhoneCountYear <= 24, 143.1871082, 0);
+    PR2_147 := IF( L.v1_HHCrtRecMsdmeanMmbrCnt12Mo > 1 AND L.v1_HHCrtRecMsdmeanMmbrCnt12Mo <= 3 AND L.LP_TrajectoryIndex > 1 AND L.LP_TrajectoryIndex <= 2, 143.3035125, 0);
+    PR2_148 := IF( L.VariationMSourcesSSNCount > -24 AND L.VariationMSourcesSSNCount <= 2 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 143.3585883, 0);
+    PR2_149 := IF( L.SearchSSNSearchCount > 4 AND L.SearchSSNSearchCount <= 15 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 143.3934049, 0);
+    PR2_150 := IF( L.PRSearchPersonalFinanceCount > 4 AND L.PRSearchPersonalFinanceCount <= 16 AND L.v1_RaAYoungAdultMmbrCnt > 5 AND L.v1_RaAYoungAdultMmbrCnt <= 144, 143.4329523, 0);
+    PR2_151 := IF( L.PhoneEDAAgeOldestRecord > 41 AND L.PhoneEDAAgeOldestRecord <= 109 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 143.5672462, 0);
+    PR2_152 := IF( L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12 AND L.v1_HHMiddleAgemmbrCnt > -95 AND L.v1_HHMiddleAgemmbrCnt <= 1, 143.6135078, 0);
+    PR2_153 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.v1_CrtRecCnt > 3 AND L.v1_CrtRecCnt <= 10, 143.7656895, 0);
+    PR2_154 := IF( L.EducationProgram4Yr > 0 AND L.EducationProgram4Yr <= 0.1 AND L.SubPrimeOfferRequestCount > 1 AND L.SubPrimeOfferRequestCount <= 4, 143.8191382, 0);
+    PR2_155 := IF( L.EducationProgram2Yr > 1 AND L.EducationProgram2Yr <= 1.1 AND L.VariationRiskLevel > 4 AND L.VariationRiskLevel <= 7, 143.9009691, 0);
+    PR2_156 := IF( L.LastNameChangeAge > -960 AND L.LastNameChangeAge <= 95 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 143.9062425, 0);
+    PR2_157 := IF( L.PrevAddrMedianValue > -1031251 AND L.PrevAddrMedianValue <= 107884 AND L.ComponentCharRiskLevel > 8 AND L.ComponentCharRiskLevel <= 18, 143.9087364, 0);
+    PR2_158 := IF( L.AccidentCount > 1 AND L.AccidentCount <= 4 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 143.9158882, 0);
+    PR2_159 := IF( L.InputAddrMultiFamilyCount > -255 AND L.InputAddrMultiFamilyCount <= 43 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 144.0687932, 0);
+    PR2_160 := IF( L.EvictionCount60 > 2 AND L.EvictionCount60 <= 7 AND L.PRSearchOtherCount12 > 3 AND L.PRSearchOtherCount12 <= 15, 144.081425, 0);
+    PR2_161 := IF( L.v1_CrtRecCnt > 3 AND L.v1_CrtRecCnt <= 10 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 144.0950141, 0);
+    PR2_162 := IF( L.InputAddrDwellType > 1 AND L.InputAddrDwellType <= 4 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 144.2109087, 0);
+    PR2_163 := IF( L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12 AND L.v1_RaACrtRecLienJudgMmbrCnt12Mo > -14 AND L.v1_RaACrtRecLienJudgMmbrCnt12Mo <= 1, 144.378665, 0);
+    PR2_164 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.v1_ProspectBankingExperience > 0 AND L.v1_ProspectBankingExperience <= 0.1, 144.4504916, 0);
+    PR2_165 := IF( L.AssocCreditBureauOnlyCount > -27 AND L.AssocCreditBureauOnlyCount <= 1 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 144.4743956, 0);
+    PR2_166 := IF( L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47 AND L.v1_ResInputDwellType > 1 AND L.v1_ResInputDwellType <= 4, 144.5229277, 0);
+    PR2_167 := IF( L.AddrRecentEconTrajectoryIndex > 0 AND L.AddrRecentEconTrajectoryIndex <= 2 AND L.SearchUnverifiedPhoneCountYear > 3 AND L.SearchUnverifiedPhoneCountYear <= 24, 144.5943753, 0);
+    PR2_168 := IF( L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72 AND L.v1_RaACrtRecLienJudgMmbrCnt12Mo > 3 AND L.v1_RaACrtRecLienJudgMmbrCnt12Mo <= 6, 144.6100825, 0);
+    PR2_169 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.PhoneEDAAgeOldestRecord > 41 AND L.PhoneEDAAgeOldestRecord <= 109, 144.698316, 0);
+    PR2_170 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.LienFiledCount60 > 2 AND L.LienFiledCount60 <= 7, 144.71619, 0);
+    PR2_171 := IF( L.v1_ResCurrDwellTypeIndex > 0 AND L.v1_ResCurrDwellTypeIndex <= 2 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 144.9385766, 0);
+    PR2_172 := IF( L.SSNIssueState > 40 AND L.SSNIssueState <= 112 AND L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72, 144.981859, 0);
+    PR2_173 := IF( L.AddrRecentEconTrajectory > 37 AND L.AddrRecentEconTrajectory <= 98 AND L.SearchUnverifiedPhoneCountYear > 3 AND L.SearchUnverifiedPhoneCountYear <= 24, 145.3348865, 0);
+    PR2_174 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.AccidentCount > 1 AND L.AccidentCount <= 4, 145.3467266, 0);
+    PR2_175 := IF( L.LastNameChangeCount60 > 1 AND L.LastNameChangeCount60 <= 3 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 145.3770298, 0);
+    PR2_176 := IF( L.v1_ResInputDwellTypeIndex > 0 AND L.v1_ResInputDwellTypeIndex <= 2 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 145.4597083, 0);
+    PR2_177 := IF( L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12 AND L.v1_RaAOccBusinessAssocMmbrCnt > -209 AND L.v1_RaAOccBusinessAssocMmbrCnt <= 2, 145.5637435, 0);
+    PR2_178 := IF( L.EducationProgram2Yr > 1 AND L.EducationProgram2Yr <= 1.1 AND L.v1_ResCurrDwellType > 1 AND L.v1_ResCurrDwellType <= 5, 145.5975357, 0);
+    PR2_179 := IF( L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12 AND L.v1_HHCrtRecEvictionMmbrCnt > -9 AND L.v1_HHCrtRecEvictionMmbrCnt <= 1, 145.8796285, 0);
+    PR2_180 := IF( L.LienFiledCount60 > 2 AND L.LienFiledCount60 <= 7 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 145.8799212, 0);
+    PR2_181 := IF( L.v1_RaACrtRecEvictionMmbrCnt > 11 AND L.v1_RaACrtRecEvictionMmbrCnt <= 98 AND L.LP_CollegeProgramType > 1 AND L.LP_CollegeProgramType <= 2, 145.958374, 0);
+    PR2_182 := IF( L.EducationProgram2Yr > 1 AND L.EducationProgram2Yr <= 1.1 AND L.SubPrimeOfferRequestCount > 1 AND L.SubPrimeOfferRequestCount <= 4, 146.006349, 0);
+    PR2_183 := IF( L.VariationRiskLevel > 7 AND L.VariationRiskLevel <= 18 AND L.v1_RaACollegeLowTierMmbrCnt > 1 AND L.v1_RaACollegeLowTierMmbrCnt <= 4, 146.0280507, 0);
+    PR2_184 := IF( L.AddrChangeCount06 > -16 AND L.AddrChangeCount06 <= 1 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 146.0954589, 0);
+    PR2_185 := IF( L.SubjectAddrRecentCount > -16 AND L.SubjectAddrRecentCount <= 1 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 146.0954589, 0);
+    PR2_186 := IF( L.SubjectAddrCount > 6 AND L.SubjectAddrCount <= 13 AND L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4, 146.1780433, 0);
+    PR2_187 := IF( L.InputAddrCarTheftIndex > -201 AND L.InputAddrCarTheftIndex <= 42 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 146.4630603, 0);
+    PR2_188 := IF( L.SearchUnverifiedDOBCountYear > 1 AND L.SearchUnverifiedDOBCountYear <= 5 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo > 1 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo <= 2, 146.6272647, 0);
+    PR2_189 := IF( L.SearchUnverifiedPhoneCountYear > 3 AND L.SearchUnverifiedPhoneCountYear <= 24 AND L.v1_RaACollegeAttendedMmbrCnt > 4 AND L.v1_RaACollegeAttendedMmbrCnt <= 248, 146.9266815, 0);
+    PR2_190 := IF( L.v1_ProspectCollegeProgramType > 1 AND L.v1_ProspectCollegeProgramType <= 2 AND L.v1_CrtRecMsdmeanCnt > 3 AND L.v1_CrtRecMsdmeanCnt <= 12, 147.1641555, 0);
+    PR2_191 := IF( L.v1_VerifiedSSN > 0 AND L.v1_VerifiedSSN <= 0.1 AND L.v1_HHCrtRecFelonyMmbrCnt > 1 AND L.v1_HHCrtRecFelonyMmbrCnt <= 3, 147.1685691, 0);
+    PR2_192 := IF( L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47 AND L.v1_HHMiddleAgemmbrCnt > -95 AND L.v1_HHMiddleAgemmbrCnt <= 1, 147.2858059, 0);
+    PR2_193 := IF( L.CurrAddrMurderIndex > 148 AND L.CurrAddrMurderIndex <= 400 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 147.3359524, 0);
+    PR2_194 := IF( L.v1_CrtRecMsdmeanCnt12Mo > 1 AND L.v1_CrtRecMsdmeanCnt12Mo <= 4 AND L.LP_TrajectoryIndex > 1 AND L.LP_TrajectoryIndex <= 2, 147.44558, 0);
+    PR2_195 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.PhoneEDAAgeOldestRecord > 41 AND L.PhoneEDAAgeOldestRecord <= 109, 147.7403209, 0);
+    PR2_196 := IF( L.SearchUnverifiedPhoneCountYear > 1 AND L.SearchUnverifiedPhoneCountYear <= 3 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 147.8683301, 0);
+    PR2_197 := IF( L.AgeOldestRecord > 125 AND L.AgeOldestRecord <= 266 AND L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4, 148.2514715, 0);
+    PR2_198 := IF( L.PRSearchOtherCount > 10 AND L.PRSearchOtherCount <= 59 AND L.LP_TrajectoryIndex > 1 AND L.LP_TrajectoryIndex <= 2, 149.0100209, 0);
+    PR2_199 := IF( L.PRSearchPersonalFinanceCount24 > 2 AND L.PRSearchPersonalFinanceCount24 <= 9 AND L.LP_TrajectoryIndex > 1 AND L.LP_TrajectoryIndex <= 2, 149.1584987, 0);
+    PR2_200 := IF( L.v1_ProspectAge > 18 AND L.v1_ProspectAge <= 46 AND L.v1_CrtRecFelonyTimeNewest > 47 AND L.v1_CrtRecFelonyTimeNewest <= 143, 149.1836521, 0);
+    PR2_201 := IF( L.EvictionCount60 > 2 AND L.EvictionCount60 <= 7 AND L.SearchUnverifiedAddrCountYear > 1 AND L.SearchUnverifiedAddrCountYear <= 4, 149.2104821, 0);
+    PR2_202 := IF( L.ArrestCount60 > 1 AND L.ArrestCount60 <= 1.1 AND L.v1_ProspectCollegeAttended > 1 AND L.v1_ProspectCollegeAttended <= 1.1, 149.3734453, 0);
+    PR2_203 := IF( L.FelonyAge > 48 AND L.FelonyAge <= 144 AND L.v1_ProspectAge > 18 AND L.v1_ProspectAge <= 46, 149.424616, 0);
+    PR2_204 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.SearchUnverifiedPhoneCountYear > 1 AND L.SearchUnverifiedPhoneCountYear <= 3, 149.6970925, 0);
+    PR2_205 := IF( L.AddrStability > 1 AND L.AddrStability <= 3 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo > 1 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo <= 2, 149.7096545, 0);
+    PR2_206 := IF( L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4 AND L.NonDerogCount12 > 4 AND L.NonDerogCount12 <= 6, 149.8970772, 0);
+    PR2_207 := IF( L.AddrChangeCount06 > 1 AND L.AddrChangeCount06 <= 3 AND L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4, 149.9497416, 0);
+    PR2_208 := IF( L.SubjectAddrRecentCount > 1 AND L.SubjectAddrRecentCount <= 3 AND L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4, 149.9497416, 0);
+    PR2_209 := IF( L.InputAddrCarTheftIndex > -201 AND L.InputAddrCarTheftIndex <= 42 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 150.1013696, 0);
+    PR2_210 := IF( L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4 AND L.PRSearchIdentityPhones > 1 AND L.PRSearchIdentityPhones <= 3, 150.284257, 0);
+    PR2_211 := IF( L.AgeOldestRecord > 125 AND L.AgeOldestRecord <= 266 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 150.3139853, 0);
+    PR2_212 := IF( L.PRSearchPersonalFinanceCount24 > 2 AND L.PRSearchPersonalFinanceCount24 <= 9 AND L.v1_RaACrtRecMmbrCnt12Mo > 4 AND L.v1_RaACrtRecMmbrCnt12Mo <= 8, 150.368505, 0);
+    PR2_213 := IF( L.PRSearchIdentitySSNs > 3 AND L.PRSearchIdentitySSNs <= 6 AND L.v1_HHCollegeAttendedMmbrCnt > 1 AND L.v1_HHCollegeAttendedMmbrCnt <= 3, 150.5661297, 0);
+    PR2_214 := IF( L.PhoneOtherAgeOldestRecord > 48 AND L.PhoneOtherAgeOldestRecord <= 115 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 150.9813365, 0);
+    PR2_215 := IF( L.PrevAddrDwellType > -1 AND L.PrevAddrDwellType <= -0.9 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 151.096122, 0);
+    PR2_216 := IF( L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4 AND L.PRSearchLocateCount > 4 AND L.PRSearchLocateCount <= 13, 151.1415421, 0);
+    PR2_217 := IF( L.AgeOldestRecord > 125 AND L.AgeOldestRecord <= 266 AND L.v1_CrtRecMsdmeanCnt > 30 AND L.v1_CrtRecMsdmeanCnt <= 372, 151.218589, 0);
+    PR2_218 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.SearchSSNSearchCount > 4 AND L.SearchSSNSearchCount <= 15, 151.2220544, 0);
+    PR2_219 := IF( L.v1_CrtRecMsdmeanTimeNewest > 41 AND L.v1_CrtRecMsdmeanTimeNewest <= 122 AND L.v1_RaAPPCurrOwnerWtrcrftMmbrCnt > 3 AND L.v1_RaAPPCurrOwnerWtrcrftMmbrCnt <= 8, 151.2447931, 0);
+    PR2_220 := IF( L.CorrelationRiskLevel > 6 AND L.CorrelationRiskLevel <= 8 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 151.2544733, 0);
+    PR2_221 := IF( L.BusinessActiveAssociation > 0 AND L.BusinessActiveAssociation <= 0.1 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 151.2765605, 0);
+    PR2_222 := IF( L.RelativesFelonyCount > 1 AND L.RelativesFelonyCount <= 4 AND L.AddrChangeCount24 > 6 AND L.AddrChangeCount24 <= 40, 151.5011536, 0);
+    PR2_223 := IF( L.AddrChangeCount24 > 6 AND L.AddrChangeCount24 <= 40 AND L.AssocHighRiskTopologyCount > 1 AND L.AssocHighRiskTopologyCount <= 4, 151.5011536, 0);
+    PR2_224 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.PhoneOtherAgeOldestRecord > 48 AND L.PhoneOtherAgeOldestRecord <= 115, 151.8821529, 0);
+    PR2_225 := IF( L.InputAddrHistoricalMatch > 2 AND L.InputAddrHistoricalMatch <= 2.1 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 152.1729945, 0);
+    PR2_226 := IF( L.InputAddrNotPrimaryRes > 0 AND L.InputAddrNotPrimaryRes <= 0.1 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 152.1729945, 0);
+    PR2_227 := IF( L.LastNameChangeAge > -960 AND L.LastNameChangeAge <= 95 AND L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4, 152.5710755, 0);
+    PR2_228 := IF( L.EvictionCount60 > 2 AND L.EvictionCount60 <= 7 AND L.v1_RaACrtRecEvictionMmbrCnt > 11 AND L.v1_RaACrtRecEvictionMmbrCnt <= 98, 152.5806863, 0);
+    PR2_229 := IF( L.CurrAddrBurglaryIndex_12 > 146 AND L.CurrAddrBurglaryIndex_12 <= 400 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 152.5946985, 0);
+    PR2_230 := IF( L.AddrChangeCount24 > 1 AND L.AddrChangeCount24 <= 3 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 152.6388233, 0);
+    PR2_231 := IF( L.AssocHighRiskTopologyCount > 4 AND L.AssocHighRiskTopologyCount <= 8 AND L.SearchSSNSearchCount > 15 AND L.SearchSSNSearchCount <= 40, 152.9213416, 0);
+    PR2_232 := IF( L.RelativesFelonyCount > 4 AND L.RelativesFelonyCount <= 8 AND L.SearchSSNSearchCount > 15 AND L.SearchSSNSearchCount <= 40, 152.9213416, 0);
+    PR2_233 := IF( L.CurrAddrMedianValue > -1031251 AND L.CurrAddrMedianValue <= 133570 AND L.AddrChangeCount24 > 6 AND L.AddrChangeCount24 <= 40, 152.9618586, 0);
+    PR2_234 := IF( L.InputAddrBurglaryIndex > 147 AND L.InputAddrBurglaryIndex <= 400 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 153.1028035, 0);
+    PR2_235 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.CorrelationRiskLevel > 6 AND L.CorrelationRiskLevel <= 8, 153.126084, 0);
+    PR2_236 := IF( L.CurrAddrCrimeIndex > 145 AND L.CurrAddrCrimeIndex <= 400 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 153.3061593, 0);
+    PR2_237 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.LP_TrajectoryIndex > -7 AND L.LP_TrajectoryIndex <= 1, 153.4621801, 0);
+    PR2_238 := IF( L.CurrAddrMurderIndex > 148 AND L.CurrAddrMurderIndex <= 400 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 153.5876983, 0);
+    PR2_239 := IF( L.EstimatedAnnualIncome_12 > -250999 AND L.EstimatedAnnualIncome_12 <= 49550 AND L.PRSearchIdentitySSNs > 3 AND L.PRSearchIdentitySSNs <= 6, 153.7440812, 0);
+    PR2_240 := IF( L.PRSearchPersonalFinanceCount > 4 AND L.PRSearchPersonalFinanceCount <= 16 AND L.LP_TrajectoryIndex > 1 AND L.LP_TrajectoryIndex <= 2, 153.9039308, 0);
+    PR2_241 := IF( L.PRSearchIdentityPhones > 3 AND L.PRSearchIdentityPhones <= 7 AND L.v1_RaACollegeAttendedMmbrCnt > 4 AND L.v1_RaACollegeAttendedMmbrCnt <= 248, 154.0687542, 0);
+    PR2_242 := IF( L.AgeOldestRecord > 125 AND L.AgeOldestRecord <= 266 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 154.1094441, 0);
+    PR2_243 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.SearchSSNSearchCount > 4 AND L.SearchSSNSearchCount <= 15, 154.1330759, 0);
+    PR2_244 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.DivAddrSSNCountNew > 1 AND L.DivAddrSSNCountNew <= 4, 154.6517517, 0);
+    PR2_245 := IF( L.PRSearchOtherCount > 10 AND L.PRSearchOtherCount <= 59 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 154.7649723, 0);
+    PR2_246 := IF( L.PRSearchIdentityPhones > 1 AND L.PRSearchIdentityPhones <= 3 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 154.8487355, 0);
+    PR2_247 := IF( L.PRSearchIdentityAddrs > 3 AND L.PRSearchIdentityAddrs <= 13 AND L.v1_RaACollege2yrAttendedMmbrCnt > 1 AND L.v1_RaACollege2yrAttendedMmbrCnt <= 3, 154.8778654, 0);
+    PR2_248 := IF( L.PRSearchIdentityPhones > 3 AND L.PRSearchIdentityPhones <= 7 AND L.v1_HHCrtRecFelonyMmbrCnt > 1 AND L.v1_HHCrtRecFelonyMmbrCnt <= 3, 154.9114454, 0);
+    PR2_249 := IF( L.AddrChangeCount24 > 6 AND L.AddrChangeCount24 <= 40 AND L.v1_RaACrtRecFelonyMmbrCnt > 1 AND L.v1_RaACrtRecFelonyMmbrCnt <= 4, 154.9541004, 0);
+    PR2_250 := IF( L.SubPrimeOfferRequestCount60 > 1 AND L.SubPrimeOfferRequestCount60 <= 4 AND L.AVGSTATECOST > 7752 AND L.AVGSTATECOST <= 18556, 155.1193754, 0);
+    PR2_251 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.PRSearchOtherCount > 10 AND L.PRSearchOtherCount <= 59, 155.5688933, 0);
+    PR2_252 := IF( L.AddrChangeCount24 > 6 AND L.AddrChangeCount24 <= 40 AND L.DivSSNAddrMSourceCount > 15 AND L.DivSSNAddrMSourceCount <= 510, 155.8609783, 0);
+    PR2_253 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.CorrelationRiskLevel > 6 AND L.CorrelationRiskLevel <= 8, 155.8748805, 0);
+    PR2_254 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.PRSearchIdentityPhones > 1 AND L.PRSearchIdentityPhones <= 3, 155.8961871, 0);
+    PR2_255 := IF( L.BusinessActiveAssociation > 0 AND L.BusinessActiveAssociation <= 0.1 AND L.v1_CrtRecMsdmeanCnt12Mo > 4 AND L.v1_CrtRecMsdmeanCnt12Mo <= 12, 155.9045245, 0);
+    PR2_256 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.PRSearchOtherCount > 10 AND L.PRSearchOtherCount <= 59, 156.0096671, 0);
+    PR2_257 := IF( L.PRSearchOtherCount > 10 AND L.PRSearchOtherCount <= 59 AND L.v1_RaACrtRecMsdmeanMmbrCnt12Mo > 4 AND L.v1_RaACrtRecMsdmeanMmbrCnt12Mo <= 8, 156.1244092, 0);
+    PR2_258 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.DivAddrIdentityCountNew > 2 AND L.DivAddrIdentityCountNew <= 3, 156.5105319, 0);
+    PR2_259 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.DivAddrIdentityMSourceCount > 21 AND L.DivAddrIdentityMSourceCount <= 46, 156.7164098, 0);
+    PR2_260 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.SearchUnverifiedPhoneCountYear > 1 AND L.SearchUnverifiedPhoneCountYear <= 3, 156.7249209, 0);
+    PR2_261 := IF( L.AddrChangeCount24 > 3 AND L.AddrChangeCount24 <= 6 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo > 1 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo <= 2, 156.7792334, 0);
+    PR2_262 := IF( L.DivAddrIdentityMSourceCount > 21 AND L.DivAddrIdentityMSourceCount <= 46 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 156.8571836, 0);
+    PR2_263 := IF( L.SourceOrderActivity > 1 AND L.SourceOrderActivity <= 1.1 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 157.0611726, 0);
+    PR2_264 := IF( L.SSNLowIssueAge > 193 AND L.SSNLowIssueAge <= 425 AND L.v1_RaACrtRecFelonyMmbrCnt > 8 AND L.v1_RaACrtRecFelonyMmbrCnt <= 78, 157.3477484, 0);
+    PR2_265 := IF( L.PrevAddrMedianValue > -1031251 AND L.PrevAddrMedianValue <= 107884 AND L.AddrChangeCount24 > 6 AND L.AddrChangeCount24 <= 40, 157.420053, 0);
+    PR2_266 := IF( L.SSNHighIssueAge > 173 AND L.SSNHighIssueAge <= 387 AND L.v1_RaACrtRecFelonyMmbrCnt > 8 AND L.v1_RaACrtRecFelonyMmbrCnt <= 78, 157.9068302, 0);
+    PR2_267 := IF( L.v1_CrtRecMsdmeanTimeNewest > -961 AND L.v1_CrtRecMsdmeanTimeNewest <= 41 AND L.LP_TrajectoryIndex > 1 AND L.LP_TrajectoryIndex <= 2, 158.2142799, 0);
+    PR2_268 := IF( L.AddrChangeCount60 > 5 AND L.AddrChangeCount60 <= 72 AND L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4, 158.2340457, 0);
+    PR2_269 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.SearchVelocityRiskLevel > 7 AND L.SearchVelocityRiskLevel <= 18, 158.6212619, 0);
+    PR2_270 := IF( L.DivAddrIdentityCount > 93 AND L.DivAddrIdentityCount <= 510 AND L.LP_CollegeProgramType > 1 AND L.LP_CollegeProgramType <= 2, 158.9952582, 0);
+    PR2_271 := IF( L.v1_VerifiedName > 0 AND L.v1_VerifiedName <= 2 AND L.v1_LifeEvEconTrajectoryIndex > 1 AND L.v1_LifeEvEconTrajectoryIndex <= 4, 159.3560423, 0);
+    PR2_272 := IF( L.PRSearchPersonalFinanceCount06 > 1 AND L.PRSearchPersonalFinanceCount06 <= 5 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo > 1 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo <= 2, 159.3826208, 0);
+    PR2_273 := IF( L.VariationRiskLevel > 7 AND L.VariationRiskLevel <= 18 AND L.v1_HHCrtRecFelonyMmbrCnt > 1 AND L.v1_HHCrtRecFelonyMmbrCnt <= 3, 159.6186344, 0);
+    PR2_274 := IF( L.StatusMostRecent > 2 AND L.StatusMostRecent <= 2.1 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 160.3746574, 0);
+    PR2_275 := IF( L.SSNLowIssueAge > 193 AND L.SSNLowIssueAge <= 425 AND L.AssocHighRiskTopologyCount > 8 AND L.AssocHighRiskTopologyCount <= 78, 160.786943, 0);
+    PR2_276 := IF( L.SSNLowIssueAge > 193 AND L.SSNLowIssueAge <= 425 AND L.RelativesFelonyCount > 8 AND L.RelativesFelonyCount <= 78, 160.786943, 0);
+    PR2_277 := IF( L.SearchUnverifiedPhoneCountYear > 3 AND L.SearchUnverifiedPhoneCountYear <= 24 AND L.v1_HHCrtRecFelonyMmbrCnt > 1 AND L.v1_HHCrtRecFelonyMmbrCnt <= 3, 161.4712327, 0);
+    PR2_278 := IF( L.SSNHighIssueAge > 173 AND L.SSNHighIssueAge <= 387 AND L.AssocHighRiskTopologyCount > 8 AND L.AssocHighRiskTopologyCount <= 78, 161.5566985, 0);
+    PR2_279 := IF( L.SSNHighIssueAge > 173 AND L.SSNHighIssueAge <= 387 AND L.RelativesFelonyCount > 8 AND L.RelativesFelonyCount <= 78, 161.5566985, 0);
+    PR2_280 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.PhoneOtherAgeOldestRecord > 48 AND L.PhoneOtherAgeOldestRecord <= 115, 162.0628006, 0);
+    PR2_281 := IF( L.PRSearchIdentityAddrs > 3 AND L.PRSearchIdentityAddrs <= 13 AND L.v1_RaACrtRecMmbrCnt12Mo > 4 AND L.v1_RaACrtRecMmbrCnt12Mo <= 8, 163.0185269, 0);
+    PR2_282 := IF( L.EvictionCount > 2 AND L.EvictionCount <= 9 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 163.1380143, 0);
+    PR2_283 := IF( L.PRSearchOtherCount > 10 AND L.PRSearchOtherCount <= 59 AND L.v1_RaACrtRecEvictionMmbrCnt12Mo > 3 AND L.v1_RaACrtRecEvictionMmbrCnt12Mo <= 5, 163.283773, 0);
+    PR2_284 := IF( L.CurrAddrBurglaryIndex_12 > -1 AND L.CurrAddrBurglaryIndex_12 <= -0.9 AND L.v1_RaAInterestSportPersonMmbrCnt > 4 AND L.v1_RaAInterestSportPersonMmbrCnt <= 8, 164.833226, 0);
+    PR2_285 := IF( L.PhoneOtherAgeNewestRecord > 26 AND L.PhoneOtherAgeNewestRecord <= 73 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 164.9609709, 0);
+    PR2_286 := IF( L.PRSearchPersonalFinanceCount > 4 AND L.PRSearchPersonalFinanceCount <= 16 AND L.v1_RaACrtRecEvictionMmbrCnt > 11 AND L.v1_RaACrtRecEvictionMmbrCnt <= 98, 165.509275, 0);
+    PR2_287 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.PhoneOtherAgeNewestRecord > 26 AND L.PhoneOtherAgeNewestRecord <= 73, 167.2936126, 0);
+    PR2_288 := IF( L.AccidentAge > 24 AND L.AccidentAge <= 84 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 168.1985523, 0);
+    PR2_289 := IF( L.ST > 39 AND L.ST <= 46 AND L.SubjectSSNRecentCount > 1 AND L.SubjectSSNRecentCount <= 3, 169.3225811, 0);
+    PR2_290 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.AccidentAge > 24 AND L.AccidentAge <= 84, 169.8937237, 0);
+    PR2_291 := IF( L.FelonyCount60 > 1 AND L.FelonyCount60 <= 4 AND L.AccidentAge > 24 AND L.AccidentAge <= 84, 175.1906968, 0);
+    PR2_292 := IF( L.FelonyCount24 > 1 AND L.FelonyCount24 <= 4 AND L.v1_ProspectCollegeAttended > 1 AND L.v1_ProspectCollegeAttended <= 1.1, 177.8057954, 0);
+    PR2_293 := IF( L.PRSearchOtherCount24 > 4 AND L.PRSearchOtherCount24 <= 24 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 178.3255752, 0);
+    PR2_294 := IF( L.FelonyAge > -961 AND L.FelonyAge <= 48 AND L.SourceOrderAgeLastOrder > 38 AND L.SourceOrderAgeLastOrder <= 76, 178.3668855, 0);
+    PR2_295 := IF( L.SourceOrderAgeLastOrder > 38 AND L.SourceOrderAgeLastOrder <= 76 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 182.6067276, 0);
+    PR2_296 := IF( L.CurrAddrMedianIncome > -262275 AND L.CurrAddrMedianIncome <= 29098 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 185.1696777, 0);
+    PR2_297 := IF( L.FEMALE > 1 AND L.FEMALE <= 1.1 AND L.v1_CrtRecFelonyTimeNewest > -961 AND L.v1_CrtRecFelonyTimeNewest <= 47, 186.4408365, 0);
+    PR2_298 := IF( L.FEMALE > 1 AND L.FEMALE <= 1.1 AND L.FelonyAge > -961 AND L.FelonyAge <= 48, 186.9130913, 0);
+    PR2_299 := IF( L.FelonyAge > 48 AND L.FelonyAge <= 144 AND L.PRSearchPersonalFinanceCount06 > 1 AND L.PRSearchPersonalFinanceCount06 <= 5, 215.8665861, 0);
+    PR2_300 := IF( L.PRSearchPersonalFinanceCount06 > 1 AND L.PRSearchPersonalFinanceCount06 <= 5 AND L.v1_CrtRecFelonyTimeNewest > 47 AND L.v1_CrtRecFelonyTimeNewest <= 143, 216.7948911, 0);
+    PR3_1 := IF( L.ST > 22 AND L.ST <= 39 AND L.v1_ProspectDeceased > 1 AND L.v1_ProspectDeceased <= 1.1, -341.8656134, 0);
+    PR3_2 := IF( L.PrevAddrMedianValue > 513168 AND L.PrevAddrMedianValue <= 2062500 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -298.2925467, 0);
+    PR3_3 := IF( L.InputAddrMortgageType > 3 AND L.InputAddrMortgageType <= 3.1 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -296.7087884, 0);
+    PR3_4 := IF( L.EstimatedAnnualIncome > 102069 AND L.EstimatedAnnualIncome <= 501998 AND L.AssocSuspicousIdentitiesCount > 10 AND L.AssocSuspicousIdentitiesCount <= 96, -284.2885935, 0);
+    PR3_5 := IF( L.AGE_IN_YEARS > 49 AND L.AGE_IN_YEARS <= 66 AND L.SSNProblems > 1 AND L.SSNProblems <= 3, -282.731262, 0);
+    PR3_6 := IF( L.CurrAddrMortgageType > 3 AND L.CurrAddrMortgageType <= 3.1 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -280.9728917, 0);
+    PR3_7 := IF( L.AGE_IN_YEARS > 49 AND L.AGE_IN_YEARS <= 66 AND L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193, -277.7294598, 0);
+    PR3_8 := IF( L.v1_PropCurrOwnedAVMTtl > 322794 AND L.v1_PropCurrOwnedAVMTtl <= 998769 AND L.v1_ResInputAVMRatioDiff60Mo > 2 AND L.v1_ResInputAVMRatioDiff60Mo <= 13, -277.0249959, 0);
+    PR3_9 := IF( L.PropAgeNewestSale > 94 AND L.PropAgeNewestSale <= 168 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -276.9417032, 0);
+    PR3_10 := IF( L.PrevAddrAVMValue > 346730 AND L.PrevAddrAVMValue <= 2118608 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -276.5938295, 0);
+    PR3_11 := IF( L.EstimatedAnnualIncome_12 > 100327 AND L.EstimatedAnnualIncome_12 <= 501998 AND L.AssocSuspicousIdentitiesCount > 10 AND L.AssocSuspicousIdentitiesCount <= 96, -274.8038949, 0);
+    PR3_12 := IF( L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6 AND L.v1_ResCurrAVMValue > 233660 AND L.v1_ResCurrAVMValue <= 591903, -274.2819849, 0);
+    PR3_13 := IF( L.AGE_IN_YEARS > 49 AND L.AGE_IN_YEARS <= 66 AND L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173, -272.0840267, 0);
+    PR3_14 := IF( L.EstimatedAnnualIncome_24 > 100312 AND L.EstimatedAnnualIncome_24 <= 501998 AND L.AssocSuspicousIdentitiesCount > 10 AND L.AssocSuspicousIdentitiesCount <= 96, -271.7946766, 0);
+    PR3_15 := IF( L.AGE_IN_YEARS > 49 AND L.AGE_IN_YEARS <= 66 AND L.LastNameChangeCount24 > 3 AND L.LastNameChangeCount24 <= 6, -271.5389972, 0);
+    PR3_16 := IF( L.v1_ResInputAVMRatioDiff60Mo > 2 AND L.v1_ResInputAVMRatioDiff60Mo <= 13 AND L.v1_ResInputMortgageAmount > 76486 AND L.v1_ResInputMortgageAmount <= 269291, -271.3327493, 0);
+    PR3_17 := IF( L.AssocSuspicousIdentitiesCount > 10 AND L.AssocSuspicousIdentitiesCount <= 96 AND L.v1_ResInputAVMValue > 293039 AND L.v1_ResInputAVMValue <= 1129714, -271.0694436, 0);
+    PR3_18 := IF( L.v1_ResCurrAVMRatioDiff60Mo > 2 AND L.v1_ResCurrAVMRatioDiff60Mo <= 14 AND L.v1_ResInputMortgageAmount > 76486 AND L.v1_ResInputMortgageAmount <= 269291, -270.5146669, 0);
+    PR3_19 := IF( L.InputAddrAVMValue > 314898 AND L.InputAddrAVMValue <= 2710112 AND L.AssocSuspicousIdentitiesCount > 10 AND L.AssocSuspicousIdentitiesCount <= 96, -270.0599249, 0);
+    PR3_20 := IF( L.PropNewestSalePrice > 162979 AND L.PropNewestSalePrice <= 80651663 AND L.SourceRiskLevel > 7 AND L.SourceRiskLevel <= 18, -269.3866804, 0);
+    PR3_21 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.EstimatedAnnualIncome > 76289 AND L.EstimatedAnnualIncome <= 102069, -269.3180317, 0);
+    PR3_22 := IF( L.VerifiedDOB > 3 AND L.VerifiedDOB <= 5 AND L.PropNewestSalePrice > 162979 AND L.PropNewestSalePrice <= 80651663, -267.8509624, 0);
+    PR3_23 := IF( L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6 AND L.v1_HHPropCurrAVMHighest > 308712 AND L.v1_HHPropCurrAVMHighest <= 1472227, -267.8421275, 0);
+    PR3_24 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.EstimatedAnnualIncome_24 > 75190 AND L.EstimatedAnnualIncome_24 <= 100312, -267.0631383, 0);
+    PR3_25 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.EstimatedAnnualIncome_12 > 100327 AND L.EstimatedAnnualIncome_12 <= 501998, -266.2922335, 0);
+    PR3_26 := IF( L.InputAddrMedianValue > 288046 AND L.InputAddrMedianValue <= 516848 AND L.v1_RaAOccProfLicMmbrCnt > 10 AND L.v1_RaAOccProfLicMmbrCnt <= 32, -265.7285853, 0);
+    PR3_27 := IF( L.ST > -53 AND L.ST <= 22 AND L.v1_ResCurrMortgageType > 2 AND L.v1_ResCurrMortgageType <= 2.1, -264.1988415, 0);
+    PR3_28 := IF( L.ST > -53 AND L.ST <= 22 AND L.v1_ResInputMortgageType > 2 AND L.v1_ResInputMortgageType <= 2.1, -263.5060335, 0);
+    PR3_29 := IF( L.EstimatedAnnualIncome_12 > 100327 AND L.EstimatedAnnualIncome_12 <= 501998 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -262.0484132, 0);
+    PR3_30 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.CurrAddrAVMValue > 328933 AND L.CurrAddrAVMValue <= 2720413, -261.667366, 0);
+    PR3_31 := IF( L.v1_VerifiedSSN > -1 AND L.v1_VerifiedSSN <= -0.9 AND L.v1_ProspectDeceased > 1 AND L.v1_ProspectDeceased <= 1.1, -261.3044079, 0);
+    PR3_32 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.EstimatedAnnualIncome_12 > 100327 AND L.EstimatedAnnualIncome_12 <= 501998, -261.2555139, 0);
+    PR3_33 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.EstimatedAnnualIncome_24 > 100312 AND L.EstimatedAnnualIncome_24 <= 501998, -260.4641944, 0);
+    PR3_34 := IF( L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6 AND L.v1_ResCurrAVMValue12Mo > 211277 AND L.v1_ResCurrAVMValue12Mo <= 498886, -260.2722295, 0);
+    PR3_35 := IF( L.EstimatedAnnualIncome_24 > 100312 AND L.EstimatedAnnualIncome_24 <= 501998 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -260.1672675, 0);
+    PR3_36 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.InputAddrMedianValue > 516848 AND L.InputAddrMedianValue <= 2062500, -260.1208494, 0);
+    PR3_37 := IF( L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6 AND L.v1_ResCurrAVMValue60Mo > 254493 AND L.v1_ResCurrAVMValue60Mo <= 4192036, -259.5672601, 0);
+    PR3_38 := IF( L.PrevAddrApplicantOwned > 1 AND L.PrevAddrApplicantOwned <= 1.1 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -259.0808579, 0);
+    PR3_39 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.v1_ResCurrAVMRatioDiff60Mo > 2 AND L.v1_ResCurrAVMRatioDiff60Mo <= 14, -258.0582431, 0);
+    PR3_40 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.CurrAddrMedianValue > 517593 AND L.CurrAddrMedianValue <= 2062500, -257.9922404, 0);
+    PR3_41 := IF( L.v1_ResCurrMortgageAmount > 76894 AND L.v1_ResCurrMortgageAmount <= 274879 AND L.v1_ResInputAVMRatioDiff60Mo > 2 AND L.v1_ResInputAVMRatioDiff60Mo <= 13, -257.9786256, 0);
+    PR3_42 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.v1_ResInputAVMValue60Mo > 484315 AND L.v1_ResInputAVMValue60Mo <= 19999998, -257.5832655, 0);
+    PR3_43 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.v1_HHPropCurrAVMHighest > 308712 AND L.v1_HHPropCurrAVMHighest <= 1472227, -257.2892913, 0);
+    PR3_44 := IF( L.AGE_IN_YEARS > 49 AND L.AGE_IN_YEARS <= 66 AND L.LastNameChangeCount60 > 3 AND L.LastNameChangeCount60 <= 6, -256.9585436, 0);
+    PR3_45 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.InputAddrMedianValue > 516848 AND L.InputAddrMedianValue <= 2062500, -256.0431055, 0);
+    PR3_46 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.CurrAddrMedianValue > 517593 AND L.CurrAddrMedianValue <= 2062500, -255.0600684, 0);
+    PR3_47 := IF( L.InputAddrAVMValue > 314898 AND L.InputAddrAVMValue <= 2710112 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -254.9993548, 0);
+    PR3_48 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.v1_PropCurrOwnedAVMTtl > 322794 AND L.v1_PropCurrOwnedAVMTtl <= 998769, -254.7163961, 0);
+    PR3_49 := IF( L.EstimatedAnnualIncome > 102069 AND L.EstimatedAnnualIncome <= 501998 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -254.0866723, 0);
+    PR3_50 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.EstimatedAnnualIncome_12 > 75268 AND L.EstimatedAnnualIncome_12 <= 100327, -254.0802308, 0);
+    PR3_51 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.CurrAddrAVMValue12 > 282793 AND L.CurrAddrAVMValue12 <= 1331337, -253.8967486, 0);
+    PR3_52 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.EstimatedAnnualIncome > 102069 AND L.EstimatedAnnualIncome <= 501998, -253.5995558, 0);
+    PR3_53 := IF( L.PropAgeNewestSale > 30 AND L.PropAgeNewestSale <= 94 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -253.5642259, 0);
+    PR3_54 := IF( L.InputAddrAVMValue60 > 262385 AND L.InputAddrAVMValue60 <= 6713938 AND L.AssocSuspicousIdentitiesCount > 10 AND L.AssocSuspicousIdentitiesCount <= 96, -253.4662809, 0);
+    PR3_55 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.CurrAddrAVMValue > 328933 AND L.CurrAddrAVMValue <= 2720413, -253.1437571, 0);
+    PR3_56 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.CurrAddrMedianValue > 517593 AND L.CurrAddrMedianValue <= 2062500, -252.9325548, 0);
+    PR3_57 := IF( L.SourceRiskLevel > 7 AND L.SourceRiskLevel <= 18 AND L.v1_PropCurrOwnedAVMTtl > 322794 AND L.v1_PropCurrOwnedAVMTtl <= 998769, -252.7811204, 0);
+    PR3_58 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.InputAddrMedianValue > 516848 AND L.InputAddrMedianValue <= 2062500, -252.3063125, 0);
+    PR3_59 := IF( L.InputAddrAVMValue12 > 213957 AND L.InputAddrAVMValue12 <= 494716 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -251.4908431, 0);
+    PR3_60 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.EstimatedAnnualIncome_24 > 100312 AND L.EstimatedAnnualIncome_24 <= 501998, -251.4723413, 0);
+    PR3_61 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.v1_ResCurrAVMValue60Mo > 254493 AND L.v1_ResCurrAVMValue60Mo <= 4192036, -251.0815949, 0);
+    PR3_62 := IF( L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6 AND L.v1_ResInputAVMValue > 293039 AND L.v1_ResInputAVMValue <= 1129714, -250.8388488, 0);
+    PR3_63 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.EstimatedAnnualIncome > 102069 AND L.EstimatedAnnualIncome <= 501998, -250.2436574, 0);
+    PR3_64 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.CurrAddrAVMValue > 328933 AND L.CurrAddrAVMValue <= 2720413, -250.0229823, 0);
+    PR3_65 := IF( L.CurrAddrMedianValue > 517593 AND L.CurrAddrMedianValue <= 2062500 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -249.9173727, 0);
+    PR3_66 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.v1_HHPropCurrAVMHighest > 308712 AND L.v1_HHPropCurrAVMHighest <= 1472227, -249.8980039, 0);
+    PR3_67 := IF( L.PropNewestSalePurchaseIndex > 0 AND L.PropNewestSalePurchaseIndex <= 11 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -249.5473152, 0);
+    PR3_68 := IF( L.SourceRiskLevel > 6 AND L.SourceRiskLevel <= 7 AND L.v1_PropCurrOwnedAVMTtl > 322794 AND L.v1_PropCurrOwnedAVMTtl <= 998769, -249.3565099, 0);
+    PR3_69 := IF( L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6 AND L.v1_ResInputAVMValue12Mo > 212737 AND L.v1_ResInputAVMValue12Mo <= 489654, -249.3457464, 0);
+    PR3_70 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.v1_PropEverSoldCnt > 1 AND L.v1_PropEverSoldCnt <= 4, -248.6411311, 0);
+    PR3_71 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.v1_ResInputAVMValue60Mo > 484315 AND L.v1_ResInputAVMValue60Mo <= 19999998, -248.5585594, 0);
+    PR3_72 := IF( L.PropAgeNewestPurchase > 55 AND L.PropAgeNewestPurchase <= 150 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -248.1088736, 0);
+    PR3_73 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.PropAgeNewestSale > 94 AND L.PropAgeNewestSale <= 168, -247.8655253, 0);
+    PR3_74 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.v1_ResInputAVMValue > 293039 AND L.v1_ResInputAVMValue <= 1129714, -247.7215071, 0);
+    PR3_75 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.v1_ResCurrAVMValue60Mo > 254493 AND L.v1_ResCurrAVMValue60Mo <= 4192036, -247.6565464, 0);
+    PR3_76 := IF( L.CurrAddrAVMValue > 328933 AND L.CurrAddrAVMValue <= 2720413 AND L.AssocSuspicousIdentitiesCount > 10 AND L.AssocSuspicousIdentitiesCount <= 96, -247.5219013, 0);
+    PR3_77 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.EstimatedAnnualIncome > 76289 AND L.EstimatedAnnualIncome <= 102069, -247.3349214, 0);
+    PR3_78 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.CurrAddrAVMValue12 > 282793 AND L.CurrAddrAVMValue12 <= 1331337, -247.2845435, 0);
+    PR3_79 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.EstimatedAnnualIncome_24 > 75190 AND L.EstimatedAnnualIncome_24 <= 100312, -247.0749103, 0);
+    PR3_80 := IF( L.AssocSuspicousIdentitiesCount > 10 AND L.AssocSuspicousIdentitiesCount <= 96 AND L.v1_ResInputAVMValue60Mo > 202862 AND L.v1_ResInputAVMValue60Mo <= 484315, -247.0699253, 0);
+    PR3_81 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.EstimatedAnnualIncome_24 > 75190 AND L.EstimatedAnnualIncome_24 <= 100312, -247.0502003, 0);
+    PR3_82 := IF( L.FEMALE > 1 AND L.FEMALE <= 1.1 AND L.v1_RaAOccProfLicMmbrCnt > 10 AND L.v1_RaAOccProfLicMmbrCnt <= 32, -246.8672317, 0);
+    PR3_83 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.InputAddrAVMValue > 314898 AND L.InputAddrAVMValue <= 2710112, -246.8380069, 0);
+    PR3_84 := IF( L.SourceRiskLevel > 6 AND L.SourceRiskLevel <= 7 AND L.v1_PropTimeLastSale > 108 AND L.v1_PropTimeLastSale <= 178, -246.6406731, 0);
+    PR3_85 := IF( L.PrevAddrMedianValue > 513168 AND L.PrevAddrMedianValue <= 2062500 AND L.ProfLicExpired > 0 AND L.ProfLicExpired <= 0.1, -246.3267784, 0);
+    PR3_86 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.v1_PropCurrOwnedAVMTtl > 322794 AND L.v1_PropCurrOwnedAVMTtl <= 998769, -246.3257836, 0);
+    PR3_87 := IF( L.ST > -53 AND L.ST <= 22 AND L.v1_RaAOccProfLicMmbrCnt > 10 AND L.v1_RaAOccProfLicMmbrCnt <= 32, -246.3193712, 0);
+    PR3_88 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.v1_OccBusinessTitleLeadership > 2 AND L.v1_OccBusinessTitleLeadership <= 2.1, -246.3175227, 0);
+    PR3_89 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.PropAgeNewestSale > 94 AND L.PropAgeNewestSale <= 168, -246.2252421, 0);
+    PR3_90 := IF( L.v1_ResCurrAVMRatioDiff60Mo > 2 AND L.v1_ResCurrAVMRatioDiff60Mo <= 14 AND L.v1_ResCurrMortgageAmount > 76894 AND L.v1_ResCurrMortgageAmount <= 274879, -246.061764, 0);
+    PR3_91 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.InputAddrAVMValue > 314898 AND L.InputAddrAVMValue <= 2710112, -245.7925095, 0);
+    PR3_92 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.EstimatedAnnualIncome > 76289 AND L.EstimatedAnnualIncome <= 102069, -245.7476663, 0);
+    PR3_93 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.v1_ResCurrAVMRatioDiff60Mo > 2 AND L.v1_ResCurrAVMRatioDiff60Mo <= 14, -245.6080088, 0);
+    PR3_94 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.v1_OccBusinessTitleLeadership > 2 AND L.v1_OccBusinessTitleLeadership <= 2.1, -245.1511654, 0);
+    PR3_95 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.PropAgeNewestSale > 30 AND L.PropAgeNewestSale <= 94, -244.9412321, 0);
+    PR3_96 := IF( L.PrevAddrMedianValue > 513168 AND L.PrevAddrMedianValue <= 2062500 AND L.ProfLicCount > 1 AND L.ProfLicCount <= 3, -244.8806961, 0);
+    PR3_97 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -244.637887, 0);
+    PR3_98 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.v1_ResCurrAVMValue > 233660 AND L.v1_ResCurrAVMValue <= 591903, -244.523151, 0);
+    PR3_99 := IF( L.ST > -53 AND L.ST <= 22 AND L.ProfLicCount > 1 AND L.ProfLicCount <= 3, -244.4053578, 0);
+    PR3_100 := IF( L.ST > -53 AND L.ST <= 22 AND L.ProfLicExpired > 0 AND L.ProfLicExpired <= 0.1, -244.3392185, 0);
+    PR3_101 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.CurrAddrAVMValue60 > 274633 AND L.CurrAddrAVMValue60 <= 6422521, -243.851613, 0);
+    PR3_102 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.InputAddrAVMValue > 314898 AND L.InputAddrAVMValue <= 2710112, -243.4210349, 0);
+    PR3_103 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.EstimatedAnnualIncome_12 > 75268 AND L.EstimatedAnnualIncome_12 <= 100327, -243.3572429, 0);
+    PR3_104 := IF( L.InputAddrMedianValue > 516848 AND L.InputAddrMedianValue <= 2062500 AND L.v1_ResInputMortgageAmount > 76486 AND L.v1_ResInputMortgageAmount <= 269291, -243.2811259, 0);
+    PR3_105 := IF( L.PrevAddrAgeNewestRecord > 231 AND L.PrevAddrAgeNewestRecord <= 1688 AND L.v1_ResCurrAVMValue > 233660 AND L.v1_ResCurrAVMValue <= 591903, -243.1937852, 0);
+    PR3_106 := IF( L.AddrRecentEconTrajectory > -50 AND L.AddrRecentEconTrajectory <= 11 AND L.ProfLicExpired > 0 AND L.ProfLicExpired <= 0.1, -242.8170693, 0);
+    PR3_107 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.CurrAddrAVMValue12 > 282793 AND L.CurrAddrAVMValue12 <= 1331337, -242.7048934, 0);
+    PR3_108 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.CurrAddrAVMValue60 > 274633 AND L.CurrAddrAVMValue60 <= 6422521, -242.5197671, 0);
+    PR3_109 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.EstIncome0_2 > 8173 AND L.EstIncome0_2 <= 423998, -242.4656679, 0);
+    PR3_110 := IF( L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6 AND L.v1_ResInputAVMValue60Mo > 202862 AND L.v1_ResInputAVMValue60Mo <= 484315, -242.3310328, 0);
+    PR3_111 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.EstimatedAnnualIncome_12 > 75268 AND L.EstimatedAnnualIncome_12 <= 100327, -242.3113126, 0);
+    PR3_112 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.ProfLicCount > 1 AND L.ProfLicCount <= 3, -242.0059825, 0);
+    PR3_113 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.v1_ResInputAVMValue > 293039 AND L.v1_ResInputAVMValue <= 1129714, -241.4060545, 0);
+    PR3_114 := IF( L.ST > -53 AND L.ST <= 22 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -240.7479006, 0);
+    PR3_115 := IF( L.v1_RaAOccProfLicMmbrCnt > 10 AND L.v1_RaAOccProfLicMmbrCnt <= 32 AND L.PROPOWNEDTAXTOTAL0_d_1 > -829.4 AND L.PROPOWNEDTAXTOTAL0_d_1 <= 1, -240.6027174, 0);
+    PR3_116 := IF( L.SSNIssueState > -56 AND L.SSNIssueState <= 12 AND L.v1_PropCurrOwnedAVMTtl > 322794 AND L.v1_PropCurrOwnedAVMTtl <= 998769, -240.1473103, 0);
+    PR3_117 := IF( L.PropAgeOldestPurchase > 173 AND L.PropAgeOldestPurchase <= 283 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -239.8088498, 0);
+    PR3_118 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.PropNewestSalePrice > 162979 AND L.PropNewestSalePrice <= 80651663, -239.7570142, 0);
+    PR3_119 := IF( L.CurrAddrAVMValue > 328933 AND L.CurrAddrAVMValue <= 2720413 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -239.667506, 0);
+    PR3_120 := IF( L.PropOwnedHistoricalCount > 2 AND L.PropOwnedHistoricalCount <= 5 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -239.5898158, 0);
+    PR3_121 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.InputAddrAVMValue12 > 213957 AND L.InputAddrAVMValue12 <= 494716, -239.5680199, 0);
+    PR3_122 := IF( L.InputAddrAVMValue12 > 213957 AND L.InputAddrAVMValue12 <= 494716 AND L.AssocSuspicousIdentitiesCount > 10 AND L.AssocSuspicousIdentitiesCount <= 96, -239.3306383, 0);
+    PR3_123 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.v1_ResInputAVMValue12Mo > 212737 AND L.v1_ResInputAVMValue12Mo <= 489654, -239.190965, 0);
+    PR3_124 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.AssocCreditBureauOnlyCount > 3 AND L.AssocCreditBureauOnlyCount <= 6, -239.1446652, 0);
+    PR3_125 := IF( L.SSNProblems > 1 AND L.SSNProblems <= 3 AND L.EstIncome1_2 > 7449 AND L.EstIncome1_2 <= 228000, -239.1406388, 0);
+    PR3_126 := IF( L.SSNLowIssueAge > -961 AND L.SSNLowIssueAge <= 193 AND L.InputAddrAVMValue60 > 262385 AND L.InputAddrAVMValue60 <= 6713938, -239.0546653, 0);
+    PR3_127 := IF( L.AssocSuspicousIdentitiesCount > 10 AND L.AssocSuspicousIdentitiesCount <= 96 AND L.v1_ResInputAVMValue12Mo > 212737 AND L.v1_ResInputAVMValue12Mo <= 489654, -238.9249119, 0);
+    PR3_128 := IF( L.SSNHighIssueAge > -793 AND L.SSNHighIssueAge <= 173 AND L.v1_ResInputAVMValue > 293039 AND L.v1_ResInputAVMValue <= 1129714, -238.7976381, 0);
+
+    SELF.P1 := IF(PR1_1 <0,1,0) + IF(PR1_2 <0,1,0) + IF(PR1_3 <0,1,0) + IF(PR1_4 <0,1,0) + IF(PR1_5 <0,1,0) + IF(PR1_6 <0,1,0) + IF(PR1_7 <0,1,0) + IF(PR1_8 <0,1,0) + IF(PR1_9 <0,1,0) + IF(PR1_10 <0,1,0) + IF(PR1_11 <0,1,0) + IF(PR1_12 <0,1,0) + IF(PR1_13 <0,1,0) + IF(PR1_14 <0,1,0) + IF(PR1_15 <0,1,0) + IF(PR1_16 <0,1,0) + IF(PR1_17 <0,1,0) + IF(PR1_18 <0,1,0) + IF(PR1_19 <0,1,0) + IF(PR1_20 <0,1,0) + IF(PR1_21 <0,1,0) + IF(PR1_22 <0,1,0) + IF(PR1_23 <0,1,0) + IF(PR1_24 <0,1,0) + IF(PR1_25 <0,1,0) + IF(PR1_26 <0,1,0) + IF(PR1_27 <0,1,0) + IF(PR1_28 <0,1,0) + IF(PR1_29 <0,1,0) + IF(PR1_30 <0,1,0) + IF(PR1_31 <0,1,0) + IF(PR1_32 <0,1,0) + IF(PR1_33 <0,1,0) + IF(PR1_34 <0,1,0) + IF(PR1_35 <0,1,0) + IF(PR1_36 <0,1,0) + IF(PR1_37 <0,1,0) + IF(PR1_38 <0,1,0) + IF(PR1_39 <0,1,0) + IF(PR1_40 <0,1,0) + IF(PR1_41 <0,1,0) + IF(PR1_42 <0,1,0) + IF(PR1_43 <0,1,0) + IF(PR1_44 <0,1,0) + IF(PR1_45 <0,1,0) + IF(PR1_46 <0,1,0) + IF(PR1_47 <0,1,0) + IF(PR1_48 <0,1,0) + IF(PR1_49 <0,1,0) + IF(PR1_50 <0,1,0) + IF(PR1_51 <0,1,0) + IF(PR1_52 <0,1,0) + IF(PR1_53 <0,1,0) + IF(PR1_54 <0,1,0) + IF(PR1_55 <0,1,0) + IF(PR1_56 <0,1,0) + IF(PR1_57 <0,1,0) + IF(PR1_58 <0,1,0) + IF(PR1_59 <0,1,0) + IF(PR1_60 <0,1,0) + IF(PR1_61 <0,1,0) + IF(PR1_62 <0,1,0) + IF(PR1_63 <0,1,0) + IF(PR1_64 <0,1,0) + IF(PR1_65 <0,1,0) + IF(PR1_66 <0,1,0) + IF(PR1_67 <0,1,0) + IF(PR1_68 <0,1,0) + IF(PR1_69 <0,1,0) + IF(PR1_70 <0,1,0) + IF(PR1_71 <0,1,0) + IF(PR1_72 <0,1,0) + IF(PR1_73 <0,1,0) + IF(PR1_74 <0,1,0) + IF(PR1_75 <0,1,0) + IF(PR1_76 <0,1,0) + IF(PR1_77 <0,1,0) + IF(PR1_78 <0,1,0) + IF(PR1_79 <0,1,0) + IF(PR1_80 <0,1,0) + IF(PR1_81 <0,1,0) + IF(PR1_82 <0,1,0) + IF(PR1_83 <0,1,0) + IF(PR1_84 <0,1,0) + IF(PR1_85 <0,1,0) + IF(PR1_86 <0,1,0) + IF(PR1_87 <0,1,0) + IF(PR1_88 <0,1,0) + IF(PR1_89 <0,1,0) + IF(PR1_90 <0,1,0) + IF(PR1_91 <0,1,0) + IF(PR1_92 <0,1,0) + IF(PR1_93 <0,1,0) + IF(PR1_94 <0,1,0) + IF(PR1_95 <0,1,0) + IF(PR1_96 <0,1,0) + IF(PR1_97 <0,1,0) + IF(PR1_98 <0,1,0) + IF(PR1_99 <0,1,0) + IF(PR1_100 <0,1,0) + IF(PR1_101 <0,1,0) + IF(PR1_102 <0,1,0) + IF(PR1_103 <0,1,0) + IF(PR1_104 <0,1,0) + IF(PR1_105 <0,1,0) + IF(PR1_106 <0,1,0) + IF(PR1_107 <0,1,0) + IF(PR1_108 <0,1,0) + IF(PR1_109 <0,1,0) + IF(PR1_110 <0,1,0) + IF(PR1_111 <0,1,0) + IF(PR1_112 <0,1,0) + IF(PR1_113 <0,1,0) + IF(PR1_114 <0,1,0) + IF(PR1_115 <0,1,0) + IF(PR1_116 <0,1,0) + IF(PR1_117 <0,1,0) + IF(PR1_118 <0,1,0) + IF(PR1_119 <0,1,0) + IF(PR1_120 <0,1,0) + IF(PR1_121 <0,1,0) + IF(PR1_122 <0,1,0) + IF(PR1_123 <0,1,0) + IF(PR1_124 <0,1,0) + IF(PR1_125 <0,1,0) + IF(PR1_126 <0,1,0) + IF(PR1_127 <0,1,0) + IF(PR1_128 <0,1,0) + IF(PR1_129 <0,1,0) + IF(PR1_130 <0,1,0) + IF(PR1_131 <0,1,0) + IF(PR1_132 <0,1,0) + IF(PR1_133 <0,1,0) + IF(PR1_134 <0,1,0) + IF(PR1_135 <0,1,0) + IF(PR1_136 <0,1,0) + IF(PR1_137 <0,1,0) + IF(PR1_138 <0,1,0) + IF(PR1_139 <0,1,0) + IF(PR1_140 <0,1,0) + IF(PR1_141 <0,1,0) + IF(PR1_142 <0,1,0) + IF(PR1_143 <0,1,0) + IF(PR1_144 <0,1,0) + IF(PR1_145 <0,1,0) + IF(PR1_146 <0,1,0) + IF(PR1_147 <0,1,0) + IF(PR1_148 <0,1,0) + IF(PR1_149 <0,1,0) + IF(PR1_150 <0,1,0) + IF(PR1_151 <0,1,0) + IF(PR1_152 <0,1,0) + IF(PR1_153 <0,1,0) + IF(PR1_154 <0,1,0) + IF(PR1_155 <0,1,0) + IF(PR1_156 <0,1,0) + IF(PR1_157 <0,1,0) + IF(PR1_158 <0,1,0) + IF(PR1_159 <0,1,0) + IF(PR1_160 <0,1,0) + IF(PR1_161 <0,1,0) + IF(PR1_162 <0,1,0) + IF(PR1_163 <0,1,0) + IF(PR1_164 <0,1,0) + IF(PR1_165 <0,1,0) + IF(PR1_166 <0,1,0) + IF(PR1_167 <0,1,0) + IF(PR1_168 <0,1,0) + IF(PR1_169 <0,1,0) + IF(PR1_170 <0,1,0) + IF(PR1_171 <0,1,0) + IF(PR1_172 <0,1,0);
+    SELF.P2 := IF(PR2_1 >0,1,0) + IF(PR2_2 >0,1,0) + IF(PR2_3 >0,1,0) + IF(PR2_4 >0,1,0) + IF(PR2_5 >0,1,0) + IF(PR2_6 >0,1,0) + IF(PR2_7 >0,1,0) + IF(PR2_8 >0,1,0) + IF(PR2_9 >0,1,0) + IF(PR2_10 >0,1,0) + IF(PR2_11 >0,1,0) + IF(PR2_12 >0,1,0) + IF(PR2_13 >0,1,0) + IF(PR2_14 >0,1,0) + IF(PR2_15 >0,1,0) + IF(PR2_16 >0,1,0) + IF(PR2_17 >0,1,0) + IF(PR2_18 >0,1,0) + IF(PR2_19 >0,1,0) + IF(PR2_20 >0,1,0) + IF(PR2_21 >0,1,0) + IF(PR2_22 >0,1,0) + IF(PR2_23 >0,1,0) + IF(PR2_24 >0,1,0) + IF(PR2_25 >0,1,0) + IF(PR2_26 >0,1,0) + IF(PR2_27 >0,1,0) + IF(PR2_28 >0,1,0) + IF(PR2_29 >0,1,0) + IF(PR2_30 >0,1,0) + IF(PR2_31 >0,1,0) + IF(PR2_32 >0,1,0) + IF(PR2_33 >0,1,0) + IF(PR2_34 >0,1,0) + IF(PR2_35 >0,1,0) + IF(PR2_36 >0,1,0) + IF(PR2_37 >0,1,0) + IF(PR2_38 >0,1,0) + IF(PR2_39 >0,1,0) + IF(PR2_40 >0,1,0) + IF(PR2_41 >0,1,0) + IF(PR2_42 >0,1,0) + IF(PR2_43 >0,1,0) + IF(PR2_44 >0,1,0) + IF(PR2_45 >0,1,0) + IF(PR2_46 >0,1,0) + IF(PR2_47 >0,1,0) + IF(PR2_48 >0,1,0) + IF(PR2_49 >0,1,0) + IF(PR2_50 >0,1,0) + IF(PR2_51 >0,1,0) + IF(PR2_52 >0,1,0) + IF(PR2_53 >0,1,0) + IF(PR2_54 >0,1,0) + IF(PR2_55 >0,1,0) + IF(PR2_56 >0,1,0) + IF(PR2_57 >0,1,0) + IF(PR2_58 >0,1,0) + IF(PR2_59 >0,1,0) + IF(PR2_60 >0,1,0) + IF(PR2_61 >0,1,0) + IF(PR2_62 >0,1,0) + IF(PR2_63 >0,1,0) + IF(PR2_64 >0,1,0) + IF(PR2_65 >0,1,0) + IF(PR2_66 >0,1,0) + IF(PR2_67 >0,1,0) + IF(PR2_68 >0,1,0) + IF(PR2_69 >0,1,0) + IF(PR2_70 >0,1,0) + IF(PR2_71 >0,1,0) + IF(PR2_72 >0,1,0) + IF(PR2_73 >0,1,0) + IF(PR2_74 >0,1,0) + IF(PR2_75 >0,1,0) + IF(PR2_76 >0,1,0) + IF(PR2_77 >0,1,0) + IF(PR2_78 >0,1,0) + IF(PR2_79 >0,1,0) + IF(PR2_80 >0,1,0) + IF(PR2_81 >0,1,0) + IF(PR2_82 >0,1,0) + IF(PR2_83 >0,1,0) + IF(PR2_84 >0,1,0) + IF(PR2_85 >0,1,0) + IF(PR2_86 >0,1,0) + IF(PR2_87 >0,1,0) + IF(PR2_88 >0,1,0) + IF(PR2_89 >0,1,0) + IF(PR2_90 >0,1,0) + IF(PR2_91 >0,1,0) + IF(PR2_92 >0,1,0) + IF(PR2_93 >0,1,0) + IF(PR2_94 >0,1,0) + IF(PR2_95 >0,1,0) + IF(PR2_96 >0,1,0) + IF(PR2_97 >0,1,0) + IF(PR2_98 >0,1,0) + IF(PR2_99 >0,1,0) + IF(PR2_100 >0,1,0) + IF(PR2_101 >0,1,0) + IF(PR2_102 >0,1,0) + IF(PR2_103 >0,1,0) + IF(PR2_104 >0,1,0) + IF(PR2_105 >0,1,0) + IF(PR2_106 >0,1,0) + IF(PR2_107 >0,1,0) + IF(PR2_108 >0,1,0) + IF(PR2_109 >0,1,0) + IF(PR2_110 >0,1,0) + IF(PR2_111 >0,1,0) + IF(PR2_112 >0,1,0) + IF(PR2_113 >0,1,0) + IF(PR2_114 >0,1,0) + IF(PR2_115 >0,1,0) + IF(PR2_116 >0,1,0) + IF(PR2_117 >0,1,0) + IF(PR2_118 >0,1,0) + IF(PR2_119 >0,1,0) + IF(PR2_120 >0,1,0) + IF(PR2_121 >0,1,0) + IF(PR2_122 >0,1,0) + IF(PR2_123 >0,1,0) + IF(PR2_124 >0,1,0) + IF(PR2_125 >0,1,0) + IF(PR2_126 >0,1,0) + IF(PR2_127 >0,1,0) + IF(PR2_128 >0,1,0) + IF(PR2_129 >0,1,0) + IF(PR2_130 >0,1,0) + IF(PR2_131 >0,1,0) + IF(PR2_132 >0,1,0) + IF(PR2_133 >0,1,0) + IF(PR2_134 >0,1,0) + IF(PR2_135 >0,1,0) + IF(PR2_136 >0,1,0) + IF(PR2_137 >0,1,0) + IF(PR2_138 >0,1,0) + IF(PR2_139 >0,1,0) + IF(PR2_140 >0,1,0) + IF(PR2_141 >0,1,0) + IF(PR2_142 >0,1,0) + IF(PR2_143 >0,1,0) + IF(PR2_144 >0,1,0) + IF(PR2_145 >0,1,0) + IF(PR2_146 >0,1,0) + IF(PR2_147 >0,1,0) + IF(PR2_148 >0,1,0) + IF(PR2_149 >0,1,0) + IF(PR2_150 >0,1,0) + IF(PR2_151 >0,1,0) + IF(PR2_152 >0,1,0) + IF(PR2_153 >0,1,0) + IF(PR2_154 >0,1,0) + IF(PR2_155 >0,1,0) + IF(PR2_156 >0,1,0) + IF(PR2_157 >0,1,0) + IF(PR2_158 >0,1,0) + IF(PR2_159 >0,1,0) + IF(PR2_160 >0,1,0) + IF(PR2_161 >0,1,0) + IF(PR2_162 >0,1,0) + IF(PR2_163 >0,1,0) + IF(PR2_164 >0,1,0) + IF(PR2_165 >0,1,0) + IF(PR2_166 >0,1,0) + IF(PR2_167 >0,1,0) + IF(PR2_168 >0,1,0) + IF(PR2_169 >0,1,0) + IF(PR2_170 >0,1,0) + IF(PR2_171 >0,1,0) + IF(PR2_172 >0,1,0) + IF(PR2_173 >0,1,0) + IF(PR2_174 >0,1,0) + IF(PR2_175 >0,1,0) + IF(PR2_176 >0,1,0) + IF(PR2_177 >0,1,0) + IF(PR2_178 >0,1,0) + IF(PR2_179 >0,1,0) + IF(PR2_180 >0,1,0) + IF(PR2_181 >0,1,0) + IF(PR2_182 >0,1,0) + IF(PR2_183 >0,1,0) + IF(PR2_184 >0,1,0) + IF(PR2_185 >0,1,0) + IF(PR2_186 >0,1,0) + IF(PR2_187 >0,1,0) + IF(PR2_188 >0,1,0) + IF(PR2_189 >0,1,0) + IF(PR2_190 >0,1,0) + IF(PR2_191 >0,1,0) + IF(PR2_192 >0,1,0) + IF(PR2_193 >0,1,0) + IF(PR2_194 >0,1,0) + IF(PR2_195 >0,1,0) + IF(PR2_196 >0,1,0) + IF(PR2_197 >0,1,0) + IF(PR2_198 >0,1,0) + IF(PR2_199 >0,1,0) + IF(PR2_200 >0,1,0) + IF(PR2_201 >0,1,0) + IF(PR2_202 >0,1,0) + IF(PR2_203 >0,1,0) + IF(PR2_204 >0,1,0) + IF(PR2_205 >0,1,0) + IF(PR2_206 >0,1,0) + IF(PR2_207 >0,1,0) + IF(PR2_208 >0,1,0) + IF(PR2_209 >0,1,0) + IF(PR2_210 >0,1,0) + IF(PR2_211 >0,1,0) + IF(PR2_212 >0,1,0) + IF(PR2_213 >0,1,0) + IF(PR2_214 >0,1,0) + IF(PR2_215 >0,1,0) + IF(PR2_216 >0,1,0) + IF(PR2_217 >0,1,0) + IF(PR2_218 >0,1,0) + IF(PR2_219 >0,1,0) + IF(PR2_220 >0,1,0) + IF(PR2_221 >0,1,0) + IF(PR2_222 >0,1,0) + IF(PR2_223 >0,1,0) + IF(PR2_224 >0,1,0) + IF(PR2_225 >0,1,0) + IF(PR2_226 >0,1,0) + IF(PR2_227 >0,1,0) + IF(PR2_228 >0,1,0) + IF(PR2_229 >0,1,0) + IF(PR2_230 >0,1,0) + IF(PR2_231 >0,1,0) + IF(PR2_232 >0,1,0) + IF(PR2_233 >0,1,0) + IF(PR2_234 >0,1,0) + IF(PR2_235 >0,1,0) + IF(PR2_236 >0,1,0) + IF(PR2_237 >0,1,0) + IF(PR2_238 >0,1,0) + IF(PR2_239 >0,1,0) + IF(PR2_240 >0,1,0) + IF(PR2_241 >0,1,0) + IF(PR2_242 >0,1,0) + IF(PR2_243 >0,1,0) + IF(PR2_244 >0,1,0) + IF(PR2_245 >0,1,0) + IF(PR2_246 >0,1,0) + IF(PR2_247 >0,1,0) + IF(PR2_248 >0,1,0) + IF(PR2_249 >0,1,0) + IF(PR2_250 >0,1,0) + IF(PR2_251 >0,1,0) + IF(PR2_252 >0,1,0) + IF(PR2_253 >0,1,0) + IF(PR2_254 >0,1,0) + IF(PR2_255 >0,1,0) + IF(PR2_256 >0,1,0) + IF(PR2_257 >0,1,0) + IF(PR2_258 >0,1,0) + IF(PR2_259 >0,1,0) + IF(PR2_260 >0,1,0) + IF(PR2_261 >0,1,0) + IF(PR2_262 >0,1,0) + IF(PR2_263 >0,1,0) + IF(PR2_264 >0,1,0) + IF(PR2_265 >0,1,0) + IF(PR2_266 >0,1,0) + IF(PR2_267 >0,1,0) + IF(PR2_268 >0,1,0) + IF(PR2_269 >0,1,0) + IF(PR2_270 >0,1,0) + IF(PR2_271 >0,1,0) + IF(PR2_272 >0,1,0) + IF(PR2_273 >0,1,0) + IF(PR2_274 >0,1,0) + IF(PR2_275 >0,1,0) + IF(PR2_276 >0,1,0) + IF(PR2_277 >0,1,0) + IF(PR2_278 >0,1,0) + IF(PR2_279 >0,1,0) + IF(PR2_280 >0,1,0) + IF(PR2_281 >0,1,0) + IF(PR2_282 >0,1,0) + IF(PR2_283 >0,1,0) + IF(PR2_284 >0,1,0) + IF(PR2_285 >0,1,0) + IF(PR2_286 >0,1,0) + IF(PR2_287 >0,1,0) + IF(PR2_288 >0,1,0) + IF(PR2_289 >0,1,0) + IF(PR2_290 >0,1,0) + IF(PR2_291 >0,1,0) + IF(PR2_292 >0,1,0) + IF(PR2_293 >0,1,0) + IF(PR2_294 >0,1,0) + IF(PR2_295 >0,1,0) + IF(PR2_296 >0,1,0) + IF(PR2_297 >0,1,0) + IF(PR2_298 >0,1,0) + IF(PR2_299 >0,1,0) + IF(PR2_300 >0,1,0);
+    SELF.P3 := IF(PR3_1 >0,1,0) + IF(PR3_2 >0,1,0) + IF(PR3_3 >0,1,0) + IF(PR3_4 >0,1,0) + IF(PR3_5 >0,1,0) + IF(PR3_6 >0,1,0) + IF(PR3_7 >0,1,0) + IF(PR3_8 >0,1,0) + IF(PR3_9 >0,1,0) + IF(PR3_10 >0,1,0) + IF(PR3_11 >0,1,0) + IF(PR3_12 >0,1,0) + IF(PR3_13 >0,1,0) + IF(PR3_14 >0,1,0) + IF(PR3_15 >0,1,0) + IF(PR3_16 >0,1,0) + IF(PR3_17 >0,1,0) + IF(PR3_18 >0,1,0) + IF(PR3_19 >0,1,0) + IF(PR3_20 >0,1,0) + IF(PR3_21 >0,1,0) + IF(PR3_22 >0,1,0) + IF(PR3_23 >0,1,0) + IF(PR3_24 >0,1,0) + IF(PR3_25 >0,1,0) + IF(PR3_26 >0,1,0) + IF(PR3_27 >0,1,0) + IF(PR3_28 >0,1,0) + IF(PR3_29 >0,1,0) + IF(PR3_30 >0,1,0) + IF(PR3_31 >0,1,0) + IF(PR3_32 >0,1,0) + IF(PR3_33 >0,1,0) + IF(PR3_34 >0,1,0) + IF(PR3_35 >0,1,0) + IF(PR3_36 >0,1,0) + IF(PR3_37 >0,1,0) + IF(PR3_38 >0,1,0) + IF(PR3_39 >0,1,0) + IF(PR3_40 >0,1,0) + IF(PR3_41 >0,1,0) + IF(PR3_42 >0,1,0) + IF(PR3_43 >0,1,0) + IF(PR3_44 >0,1,0) + IF(PR3_45 >0,1,0) + IF(PR3_46 >0,1,0) + IF(PR3_47 >0,1,0) + IF(PR3_48 >0,1,0) + IF(PR3_49 >0,1,0) + IF(PR3_50 >0,1,0) + IF(PR3_51 >0,1,0) + IF(PR3_52 >0,1,0) + IF(PR3_53 >0,1,0) + IF(PR3_54 >0,1,0) + IF(PR3_55 >0,1,0) + IF(PR3_56 >0,1,0) + IF(PR3_57 >0,1,0) + IF(PR3_58 >0,1,0) + IF(PR3_59 >0,1,0) + IF(PR3_60 >0,1,0) + IF(PR3_61 >0,1,0) + IF(PR3_62 >0,1,0) + IF(PR3_63 >0,1,0) + IF(PR3_64 >0,1,0) + IF(PR3_65 >0,1,0) + IF(PR3_66 >0,1,0) + IF(PR3_67 >0,1,0) + IF(PR3_68 >0,1,0) + IF(PR3_69 >0,1,0) + IF(PR3_70 >0,1,0) + IF(PR3_71 >0,1,0) + IF(PR3_72 >0,1,0) + IF(PR3_73 >0,1,0) + IF(PR3_74 >0,1,0) + IF(PR3_75 >0,1,0) + IF(PR3_76 >0,1,0) + IF(PR3_77 >0,1,0) + IF(PR3_78 >0,1,0) + IF(PR3_79 >0,1,0) + IF(PR3_80 >0,1,0) + IF(PR3_81 >0,1,0) + IF(PR3_82 >0,1,0) + IF(PR3_83 >0,1,0) + IF(PR3_84 >0,1,0) + IF(PR3_85 >0,1,0) + IF(PR3_86 >0,1,0) + IF(PR3_87 >0,1,0) + IF(PR3_88 >0,1,0) + IF(PR3_89 >0,1,0) + IF(PR3_90 >0,1,0) + IF(PR3_91 >0,1,0) + IF(PR3_92 >0,1,0) + IF(PR3_93 >0,1,0) + IF(PR3_94 >0,1,0) + IF(PR3_95 >0,1,0) + IF(PR3_96 >0,1,0) + IF(PR3_97 >0,1,0) + IF(PR3_98 >0,1,0) + IF(PR3_99 >0,1,0) + IF(PR3_100 >0,1,0) + IF(PR3_101 >0,1,0) + IF(PR3_102 >0,1,0) + IF(PR3_103 >0,1,0) + IF(PR3_104 >0,1,0) + IF(PR3_105 >0,1,0) + IF(PR3_106 >0,1,0) + IF(PR3_107 >0,1,0) + IF(PR3_108 >0,1,0) + IF(PR3_109 >0,1,0) + IF(PR3_110 >0,1,0) + IF(PR3_111 >0,1,0) + IF(PR3_112 >0,1,0) + IF(PR3_113 >0,1,0) + IF(PR3_114 >0,1,0) + IF(PR3_115 >0,1,0) + IF(PR3_116 >0,1,0) + IF(PR3_117 >0,1,0) + IF(PR3_118 >0,1,0) + IF(PR3_119 >0,1,0) + IF(PR3_120 >0,1,0) + IF(PR3_121 >0,1,0) + IF(PR3_122 >0,1,0) + IF(PR3_123 >0,1,0) + IF(PR3_124 >0,1,0) + IF(PR3_125 >0,1,0) + IF(PR3_126 >0,1,0) + IF(PR3_127 >0,1,0) + IF(PR3_128 >0,1,0);
+
+    SELF.PV1 := MIN( PR1_1, PR1_2, PR1_3, PR1_4, PR1_5, PR1_6, PR1_7, PR1_8, PR1_9, PR1_10, PR1_11, PR1_12, PR1_13, PR1_14, PR1_15, PR1_16, PR1_17, PR1_18, PR1_19, PR1_20, PR1_21, PR1_22, PR1_23, PR1_24, PR1_25, PR1_26, PR1_27, PR1_28, PR1_29, PR1_30, PR1_31, PR1_32, PR1_33, PR1_34, PR1_35, PR1_36, PR1_37, PR1_38, PR1_39, PR1_40, PR1_41, PR1_42, PR1_43, PR1_44, PR1_45, PR1_46, PR1_47, PR1_48, PR1_49, PR1_50, PR1_51, PR1_52, PR1_53, PR1_54, PR1_55, PR1_56, PR1_57, PR1_58, PR1_59, PR1_60, PR1_61, PR1_62, PR1_63, PR1_64, PR1_65, PR1_66, PR1_67, PR1_68, PR1_69, PR1_70, PR1_71, PR1_72, PR1_73, PR1_74, PR1_75, PR1_76, PR1_77, PR1_78, PR1_79, PR1_80, PR1_81, PR1_82, PR1_83, PR1_84, PR1_85, PR1_86, PR1_87, PR1_88, PR1_89, PR1_90, PR1_91, PR1_92, PR1_93, PR1_94, PR1_95, PR1_96, PR1_97, PR1_98, PR1_99, PR1_100, PR1_101, PR1_102, PR1_103, PR1_104, PR1_105, PR1_106, PR1_107, PR1_108, PR1_109, PR1_110, PR1_111, PR1_112, PR1_113, PR1_114, PR1_115, PR1_116, PR1_117, PR1_118, PR1_119, PR1_120, PR1_121, PR1_122, PR1_123, PR1_124, PR1_125, PR1_126, PR1_127, PR1_128, PR1_129, PR1_130, PR1_131, PR1_132, PR1_133, PR1_134, PR1_135, PR1_136, PR1_137, PR1_138, PR1_139, PR1_140, PR1_141, PR1_142, PR1_143, PR1_144, PR1_145, PR1_146, PR1_147, PR1_148, PR1_149, PR1_150, PR1_151, PR1_152, PR1_153, PR1_154, PR1_155, PR1_156, PR1_157, PR1_158, PR1_159, PR1_160, PR1_161, PR1_162, PR1_163, PR1_164, PR1_165, PR1_166, PR1_167, PR1_168, PR1_169, PR1_170, PR1_171, PR1_172);
+    SELF.PV2 := MAX( PR2_1, PR2_2, PR2_3, PR2_4, PR2_5, PR2_6, PR2_7, PR2_8, PR2_9, PR2_10, PR2_11, PR2_12, PR2_13, PR2_14, PR2_15, PR2_16, PR2_17, PR2_18, PR2_19, PR2_20, PR2_21, PR2_22, PR2_23, PR2_24, PR2_25, PR2_26, PR2_27, PR2_28, PR2_29, PR2_30, PR2_31, PR2_32, PR2_33, PR2_34, PR2_35, PR2_36, PR2_37, PR2_38, PR2_39, PR2_40, PR2_41, PR2_42, PR2_43, PR2_44, PR2_45, PR2_46, PR2_47, PR2_48, PR2_49, PR2_50, PR2_51, PR2_52, PR2_53, PR2_54, PR2_55, PR2_56, PR2_57, PR2_58, PR2_59, PR2_60, PR2_61, PR2_62, PR2_63, PR2_64, PR2_65, PR2_66, PR2_67, PR2_68, PR2_69, PR2_70, PR2_71, PR2_72, PR2_73, PR2_74, PR2_75, PR2_76, PR2_77, PR2_78, PR2_79, PR2_80, PR2_81, PR2_82, PR2_83, PR2_84, PR2_85, PR2_86, PR2_87, PR2_88, PR2_89, PR2_90, PR2_91, PR2_92, PR2_93, PR2_94, PR2_95, PR2_96, PR2_97, PR2_98, PR2_99, PR2_100, PR2_101, PR2_102, PR2_103, PR2_104, PR2_105, PR2_106, PR2_107, PR2_108, PR2_109, PR2_110, PR2_111, PR2_112, PR2_113, PR2_114, PR2_115, PR2_116, PR2_117, PR2_118, PR2_119, PR2_120, PR2_121, PR2_122, PR2_123, PR2_124, PR2_125, PR2_126, PR2_127, PR2_128, PR2_129, PR2_130, PR2_131, PR2_132, PR2_133, PR2_134, PR2_135, PR2_136, PR2_137, PR2_138, PR2_139, PR2_140, PR2_141, PR2_142, PR2_143, PR2_144, PR2_145, PR2_146, PR2_147, PR2_148, PR2_149, PR2_150, PR2_151, PR2_152, PR2_153, PR2_154, PR2_155, PR2_156, PR2_157, PR2_158, PR2_159, PR2_160, PR2_161, PR2_162, PR2_163, PR2_164, PR2_165, PR2_166, PR2_167, PR2_168, PR2_169, PR2_170, PR2_171, PR2_172, PR2_173, PR2_174, PR2_175, PR2_176, PR2_177, PR2_178, PR2_179, PR2_180, PR2_181, PR2_182, PR2_183, PR2_184, PR2_185, PR2_186, PR2_187, PR2_188, PR2_189, PR2_190, PR2_191, PR2_192, PR2_193, PR2_194, PR2_195, PR2_196, PR2_197, PR2_198, PR2_199, PR2_200, PR2_201, PR2_202, PR2_203, PR2_204, PR2_205, PR2_206, PR2_207, PR2_208, PR2_209, PR2_210, PR2_211, PR2_212, PR2_213, PR2_214, PR2_215, PR2_216, PR2_217, PR2_218, PR2_219, PR2_220, PR2_221, PR2_222, PR2_223, PR2_224, PR2_225, PR2_226, PR2_227, PR2_228, PR2_229, PR2_230, PR2_231, PR2_232, PR2_233, PR2_234, PR2_235, PR2_236, PR2_237, PR2_238, PR2_239, PR2_240, PR2_241, PR2_242, PR2_243, PR2_244, PR2_245, PR2_246, PR2_247, PR2_248, PR2_249, PR2_250, PR2_251, PR2_252, PR2_253, PR2_254, PR2_255, PR2_256, PR2_257, PR2_258, PR2_259, PR2_260, PR2_261, PR2_262, PR2_263, PR2_264, PR2_265, PR2_266, PR2_267, PR2_268, PR2_269, PR2_270, PR2_271, PR2_272, PR2_273, PR2_274, PR2_275, PR2_276, PR2_277, PR2_278, PR2_279, PR2_280, PR2_281, PR2_282, PR2_283, PR2_284, PR2_285, PR2_286, PR2_287, PR2_288, PR2_289, PR2_290, PR2_291, PR2_292, PR2_293, PR2_294, PR2_295, PR2_296, PR2_297, PR2_298, PR2_299, PR2_300);
+    SELF.PV3 := MAX( PR3_1, PR3_2, PR3_3, PR3_4, PR3_5, PR3_6, PR3_7, PR3_8, PR3_9, PR3_10, PR3_11, PR3_12, PR3_13, PR3_14, PR3_15, PR3_16, PR3_17, PR3_18, PR3_19, PR3_20, PR3_21, PR3_22, PR3_23, PR3_24, PR3_25, PR3_26, PR3_27, PR3_28, PR3_29, PR3_30, PR3_31, PR3_32, PR3_33, PR3_34, PR3_35, PR3_36, PR3_37, PR3_38, PR3_39, PR3_40, PR3_41, PR3_42, PR3_43, PR3_44, PR3_45, PR3_46, PR3_47, PR3_48, PR3_49, PR3_50, PR3_51, PR3_52, PR3_53, PR3_54, PR3_55, PR3_56, PR3_57, PR3_58, PR3_59, PR3_60, PR3_61, PR3_62, PR3_63, PR3_64, PR3_65, PR3_66, PR3_67, PR3_68, PR3_69, PR3_70, PR3_71, PR3_72, PR3_73, PR3_74, PR3_75, PR3_76, PR3_77, PR3_78, PR3_79, PR3_80, PR3_81, PR3_82, PR3_83, PR3_84, PR3_85, PR3_86, PR3_87, PR3_88, PR3_89, PR3_90, PR3_91, PR3_92, PR3_93, PR3_94, PR3_95, PR3_96, PR3_97, PR3_98, PR3_99, PR3_100, PR3_101, PR3_102, PR3_103, PR3_104, PR3_105, PR3_106, PR3_107, PR3_108, PR3_109, PR3_110, PR3_111, PR3_112, PR3_113, PR3_114, PR3_115, PR3_116, PR3_117, PR3_118, PR3_119, PR3_120, PR3_121, PR3_122, PR3_123, PR3_124, PR3_125, PR3_126, PR3_127, PR3_128);
+
+    // Binary Patterns
+    BPR1_1 := IF( L.AddrStability > 1 AND L.AddrStability <= 3 AND L.DivSSNAddrMSourceCount > -256 AND L.DivSSNAddrMSourceCount <= 4, 0.321953605, 0);
+    BPR1_2 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.AddrChangeCount06 > 1 AND L.AddrChangeCount06 <= 3, 0.317911355, 0);
+    BPR1_3 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.AddrChangeCount12 > 1 AND L.AddrChangeCount12 <= 3, 0.32020794, 0);
+    BPR1_4 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.AddrMostRecentMoveAge > -961 AND L.AddrMostRecentMoveAge <= 60, 0.320522633, 0);
+    BPR1_5 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.AddrRecentEconTrajectory > 11 AND L.AddrRecentEconTrajectory <= 28, 0.310404456, 0);
+    BPR1_6 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.AddrRecentEconTrajectoryIndex > 3 AND L.AddrRecentEconTrajectoryIndex <= 12, 0.313550297, 0);
+    BPR1_7 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.AddrStability > 1 AND L.AddrStability <= 3, 0.303154588, 0);
+    BPR1_8 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125, 0.306456616, 0);
+    BPR1_9 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.AssocCreditBureauOnlyCount > 1 AND L.AssocCreditBureauOnlyCount <= 3, 0.319612366, 0);
+    BPR1_10 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.CurrAddrBurglaryIndex_24 > -1 AND L.CurrAddrBurglaryIndex_24 <= -0.9, 0.324019737, 0);
+    BPR1_11 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.CurrAddrMedianValue > 276461 AND L.CurrAddrMedianValue <= 517593, 0.246404579, 0);
+    BPR1_12 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.DivAddrIdentityCount > 35 AND L.DivAddrIdentityCount <= 93, 0.308612047, 0);
+    BPR1_13 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.DivAddrIdentityMSourceCount > 21 AND L.DivAddrIdentityMSourceCount <= 46, 0.322733632, 0);
+    BPR1_14 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.DivAddrSSNCount > 27 AND L.DivAddrSSNCount <= 75, 0.302134269, 0);
+    BPR1_15 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.DivSSNAddrMSourceCount > -256 AND L.DivSSNAddrMSourceCount <= 4, 0.319596373, 0);
+    BPR1_16 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.EstimatedAnnualIncome > 50321 AND L.EstimatedAnnualIncome <= 76289, 0.30630452, 0);
+    BPR1_17 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.EstimatedAnnualIncome_12 > 49550 AND L.EstimatedAnnualIncome_12 <= 75268, 0.313413605, 0);
+    BPR1_18 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.EstimatedAnnualIncome_24 > 49084 AND L.EstimatedAnnualIncome_24 <= 75190, 0.312313817, 0);
+    BPR1_19 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.IdentityRiskLevel > 3 AND L.IdentityRiskLevel <= 5, 0.28592098, 0);
+    BPR1_20 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.InputAddrAgeOldestRecord > -961 AND L.InputAddrAgeOldestRecord <= 61, 0.312457392, 0);
+    BPR1_21 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.InputAddrCarTheftIndex > 93 AND L.InputAddrCarTheftIndex <= 146, 0.320977331, 0);
+    BPR1_22 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.InputAddrLenOfRes > -960 AND L.InputAddrLenOfRes <= 60, 0.314631413, 0);
+    BPR1_23 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.InputAddrMedianValue > 288046 AND L.InputAddrMedianValue <= 516848, 0.246021573, 0);
+    BPR1_24 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.LastNameChangeAge > -960 AND L.LastNameChangeAge <= 95, 0.314605083, 0);
+    BPR1_25 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.LastNameChangeCount60 > 1 AND L.LastNameChangeCount60 <= 3, 0.300929105, 0);
+    BPR1_26 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.PrevAddrMedianValue > 259572 AND L.PrevAddrMedianValue <= 513168, 0.266797166, 0);
+    BPR1_27 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.SFDUAddrIdentitiesCount > 32 AND L.SFDUAddrIdentitiesCount <= 76, 0.308283258, 0);
+    BPR1_28 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.SFDUAddrIdentitiesCount_12 > 32 AND L.SFDUAddrIdentitiesCount_12 <= 79, 0.30876048, 0);
+    BPR1_29 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.SFDUAddrIdentitiesCount_24 > 33 AND L.SFDUAddrIdentitiesCount_24 <= 86, 0.30587373, 0);
+    BPR1_30 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.SFDUAddrSSNCount > 25 AND L.SFDUAddrSSNCount <= 61, 0.305576868, 0);
+    BPR1_31 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.SSNAddrRecentCount > 1 AND L.SSNAddrRecentCount <= 13, 0.315665124, 0);
+    BPR1_32 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.SSNIssueState > -56 AND L.SSNIssueState <= 12, 0.293165858, 0);
+    BPR1_33 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.SubjectAddrRecentCount > 1 AND L.SubjectAddrRecentCount <= 3, 0.317911355, 0);
+    BPR1_34 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.v1_CrtRecSeverityIndex > -6 AND L.v1_CrtRecSeverityIndex <= 1, 0.320285976, 0);
+    BPR1_35 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.v1_HHCrtRecMmbrCnt > -85 AND L.v1_HHCrtRecMmbrCnt <= 1, 0.319814119, 0);
+    BPR1_36 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.v1_ResInputAVMRatioDiff60Mo > 1 AND L.v1_ResInputAVMRatioDiff60Mo <= 2, 0.323320935, 0);
+    BPR1_37 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34 AND L.WealthIndex > 4 AND L.WealthIndex <= 12, 0.284148379, 0);
+    BPR1_38 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.AddrChangeCount06 > 1 AND L.AddrChangeCount06 <= 3, 0.305648657, 0);
+    BPR1_39 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.AddrChangeCount12 > 1 AND L.AddrChangeCount12 <= 3, 0.315584217, 0);
+    BPR1_40 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.AddrChangeCount24 > 1 AND L.AddrChangeCount24 <= 3, 0.322253656, 0);
+    BPR1_41 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.AddrChangeCount60 > 2 AND L.AddrChangeCount60 <= 5, 0.323227969, 0);
+    BPR1_42 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.AddrMostRecentMoveAge > -961 AND L.AddrMostRecentMoveAge <= 60, 0.310230487, 0);
+    BPR1_43 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.AddrRecentEconTrajectoryIndex > 3 AND L.AddrRecentEconTrajectoryIndex <= 12, 0.297400577, 0);
+    BPR1_44 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.AssocRiskLevel > 2 AND L.AssocRiskLevel <= 5, 0.321570802, 0);
+    BPR1_45 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.AssocSuspicousIdentitiesCount > 2 AND L.AssocSuspicousIdentitiesCount <= 5, 0.312582022, 0);
+    BPR1_46 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.AVGSTATECOST > 6438 AND L.AVGSTATECOST <= 6933, 0.322403667, 0);
+    BPR1_47 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.CorrelationRiskLevel > 6 AND L.CorrelationRiskLevel <= 8, 0.309198324, 0);
+    BPR1_48 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.CurrAddrMedianValue > 276461 AND L.CurrAddrMedianValue <= 517593, 0.284635999, 0);
+    BPR1_49 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.DivAddrIdentityMSourceCount > 21 AND L.DivAddrIdentityMSourceCount <= 46, 0.324081827, 0);
+    BPR1_50 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.DivAddrSSNMSourceCount > 18 AND L.DivAddrSSNMSourceCount <= 38, 0.318654942, 0);
+    BPR1_51 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.EstimatedAnnualIncome > 50321 AND L.EstimatedAnnualIncome <= 76289, 0.304955086, 0);
+    BPR1_52 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.EstimatedAnnualIncome_12 > 49550 AND L.EstimatedAnnualIncome_12 <= 75268, 0.304600826, 0);
+    BPR1_53 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.EstimatedAnnualIncome_24 > 49084 AND L.EstimatedAnnualIncome_24 <= 75190, 0.305577503, 0);
+    BPR1_54 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.IDVerRiskLevel > -10 AND L.IDVerRiskLevel <= 2, 0.318431366, 0);
+    BPR1_55 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.LastNameChangeCount24 > 1 AND L.LastNameChangeCount24 <= 3, 0.321123695, 0);
+    BPR1_56 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.LP_CollegeProgramType > 1 AND L.LP_CollegeProgramType <= 2, 0.307841597, 0);
+    BPR1_57 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.LP_RelativesCount > 3 AND L.LP_RelativesCount <= 8, 0.314046724, 0);
+    BPR1_58 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.NonDerogCount03 > 4 AND L.NonDerogCount03 <= 6, 0.319568324, 0);
+    BPR1_59 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.NonDerogCount06 > 4 AND L.NonDerogCount06 <= 6, 0.315908449, 0);
+    BPR1_60 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.NonDerogCount12 > 4 AND L.NonDerogCount12 <= 6, 0.319881832, 0);
+    BPR1_61 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.NonDerogCount24 > 3 AND L.NonDerogCount24 <= 5, 0.322645109, 0);
+    BPR1_62 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.P_EstimatedHHIncomePerCapita > 6 AND L.P_EstimatedHHIncomePerCapita <= 20, 0.30537839, 0);
+    BPR1_63 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.PrevAddrAgeOldestRecord > -961 AND L.PrevAddrAgeOldestRecord <= 66, 0.315944621, 0);
+    BPR1_64 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.PrevAddrLenOfRes > -961 AND L.PrevAddrLenOfRes <= 61, 0.321296076, 0);
+    BPR1_65 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.PRSearchIdentityAddrs > 1 AND L.PRSearchIdentityAddrs <= 3, 0.307242554, 0);
+    BPR1_66 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.PRSearchIdentityPhones > 1 AND L.PRSearchIdentityPhones <= 3, 0.280549759, 0);
+    BPR1_67 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.PRSearchIdentitySSNs > 1 AND L.PRSearchIdentitySSNs <= 3, 0.304563371, 0);
+    BPR1_68 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.PRSearchSSNIdentities > 1 AND L.PRSearchSSNIdentities <= 3, 0.277018365, 0);
+    BPR1_69 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.RecentActivityIndex > 0 AND L.RecentActivityIndex <= 2, 0.322352364, 0);
+    BPR1_70 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.RelativesCount > 5 AND L.RelativesCount <= 12, 0.316620687, 0);
+    BPR1_71 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.RelativesPropOwnedCount > 2 AND L.RelativesPropOwnedCount <= 5, 0.322797923, 0);
+    BPR1_72 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.SearchUnverifiedPhoneCountYear > 1 AND L.SearchUnverifiedPhoneCountYear <= 3, 0.280758686, 0);
+    BPR1_73 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.SFDUAddrIdentitiesCount > 32 AND L.SFDUAddrIdentitiesCount <= 76, 0.322607321, 0);
+    BPR1_74 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.SFDUAddrSSNCount > 25 AND L.SFDUAddrSSNCount <= 61, 0.321034096, 0);
+    BPR1_75 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.SourceOrderActivity > 1 AND L.SourceOrderActivity <= 1.1, 0.321389432, 0);
+    BPR1_76 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.SrcsConfirmIDAddrCount > 4 AND L.SrcsConfirmIDAddrCount <= 7, 0.310522178, 0);
+    BPR1_77 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.SSNAddrCount > 6 AND L.SSNAddrCount <= 11, 0.315398281, 0);
+    BPR1_78 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.SSNHighIssueAge > 173 AND L.SSNHighIssueAge <= 387, 0.317852154, 0);
+    BPR1_79 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.SSNLowIssueAge > 193 AND L.SSNLowIssueAge <= 425, 0.319107394, 0);
+    BPR1_80 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.SubjectAddrRecentCount > 1 AND L.SubjectAddrRecentCount <= 3, 0.305648657, 0);
+    BPR1_81 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_HHCollegeAttendedMmbrCnt > 1 AND L.v1_HHCollegeAttendedMmbrCnt <= 3, 0.319141813, 0);
+    BPR1_82 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_HHEstimatedIncomeRange > 6 AND L.v1_HHEstimatedIncomeRange <= 7, 0.312812185, 0);
+    BPR1_83 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_ProspectCollegeAttended > 1 AND L.v1_ProspectCollegeAttended <= 1.1, 0.317820704, 0);
+    BPR1_84 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaACollegeAttendedMmbrCnt > 2 AND L.v1_RaACollegeAttendedMmbrCnt <= 4, 0.320719787, 0);
+    BPR1_85 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaACrtRecLienJudgMmbrCnt > 2 AND L.v1_RaACrtRecLienJudgMmbrCnt <= 5, 0.322681587, 0);
+    BPR1_86 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaACrtRecMmbrCnt > 3 AND L.v1_RaACrtRecMmbrCnt <= 9, 0.32193314, 0);
+    BPR1_87 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaACrtRecMsdmeanMmbrCnt > 3 AND L.v1_RaACrtRecMsdmeanMmbrCnt <= 9, 0.312997041, 0);
+    BPR1_88 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaAHHCnt > 3 AND L.v1_RaAHHCnt <= 8, 0.314457945, 0);
+    BPR1_89 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaAMedIncomeRange > 5 AND L.v1_RaAMedIncomeRange <= 7, 0.319977764, 0);
+    BPR1_90 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaAMedIncomeRange > 7 AND L.v1_RaAMedIncomeRange <= 22, 0.308470615, 0);
+    BPR1_91 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaAMmbrCnt > 5 AND L.v1_RaAMmbrCnt <= 12, 0.316691254, 0);
+    BPR1_92 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaAOccBusinessAssocMmbrCnt > 2 AND L.v1_RaAOccBusinessAssocMmbrCnt <= 7, 0.320934724, 0);
+    BPR1_93 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaAPPCurrOwnerAutoMmbrCnt > 3 AND L.v1_RaAPPCurrOwnerAutoMmbrCnt <= 8, 0.318368211, 0);
+    BPR1_94 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaAPropCurrOwnerMmbrCnt > 1 AND L.v1_RaAPropCurrOwnerMmbrCnt <= 4, 0.322289139, 0);
+    BPR1_95 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaAPropCurrOwnerMmbrCnt > 4 AND L.v1_RaAPropCurrOwnerMmbrCnt <= 8, 0.30673181, 0);
+    BPR1_96 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.v1_RaAPropOwnerAVMHighest > 191091 AND L.v1_RaAPropOwnerAVMHighest <= 573724, 0.283659127, 0);
+    BPR1_97 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125 AND L.WealthIndex > 4 AND L.WealthIndex <= 12, 0.316092757, 0);
+    BPR1_98 := IF( L.NonDerogCount > -15 AND L.NonDerogCount <= 5 AND L.PRSearchSSNIdentities > 1 AND L.PRSearchSSNIdentities <= 3, 0.316723098, 0);
+    BPR1_99 := IF( L.ST > -53 AND L.ST <= 22 AND L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 34, 0.211520599, 0);
+    BPR1_100 := IF( L.ST > -53 AND L.ST <= 22 AND L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 125, 0.296588815, 0);
+    BPR2_1 := IF( L.AccidentAge > -1 AND L.AccidentAge <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.728773034, 0);
+    BPR2_2 := IF( L.AccidentCount > -29 AND L.AccidentCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.748845751, 0);
+    BPR2_3 := IF( L.AddrChangeCount01 > -4 AND L.AddrChangeCount01 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.845197834, 0);
+    BPR2_4 := IF( L.AddrChangeCount03 > -6 AND L.AddrChangeCount03 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.900578, 0);
+    BPR2_5 := IF( L.AddrChangeCount06 > -16 AND L.AddrChangeCount06 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.987979646, 0);
+    BPR2_6 := IF( L.AddrChangeCount12 > -17 AND L.AddrChangeCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.988220928, 0);
+    BPR2_7 := IF( L.AddrChangeCount24 > -20 AND L.AddrChangeCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.016231005, 0);
+    BPR2_8 := IF( L.AddrChangeCount60 > -36 AND L.AddrChangeCount60 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.710985955, 0);
+    BPR2_9 := IF( L.AddrMostRecentDistance > -7940 AND L.AddrMostRecentDistance <= 451 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.806778386, 0);
+    BPR2_10 := IF( L.AddrMostRecentTaxDiff > -1 AND L.AddrMostRecentTaxDiff <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.606281204, 0);
+    BPR2_11 := IF( L.AddrStability > 5 AND L.AddrStability <= 12 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.365399677, 0);
+    BPR2_12 := IF( L.AGE_IN_YEARS > 49 AND L.AGE_IN_YEARS <= 66 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 15.23485337, 0);
+    BPR2_13 := IF( L.AgeNewestRecord > -565 AND L.AgeNewestRecord <= 28 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.732009384, 0);
+    BPR2_14 := IF( L.AgeRiskIndicator > 10 AND L.AgeRiskIndicator <= 47 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.55127323, 0);
+    BPR2_15 := IF( L.AircraftCount > -22 AND L.AircraftCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_16 := IF( L.AircraftCount01 > 0 AND L.AircraftCount01 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_17 := IF( L.AircraftCount03 > 0 AND L.AircraftCount03 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_18 := IF( L.AircraftCount06 > 0 AND L.AircraftCount06 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_19 := IF( L.AircraftCount12 > -6 AND L.AircraftCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_20 := IF( L.AircraftCount24 > -8 AND L.AircraftCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_21 := IF( L.AircraftCount60 > -10 AND L.AircraftCount60 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_22 := IF( L.AircraftOwner > 0 AND L.AircraftOwner <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_23 := IF( L.ArrestAge > -1 AND L.ArrestAge <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.712918615, 0);
+    BPR2_24 := IF( L.ArrestCount > -4 AND L.ArrestCount <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_25 := IF( L.ArrestCount01 > 0 AND L.ArrestCount01 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_26 := IF( L.ArrestCount03 > 0 AND L.ArrestCount03 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_27 := IF( L.ArrestCount06 > 0 AND L.ArrestCount06 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.841316659, 0);
+    BPR2_28 := IF( L.ArrestCount12 > 0 AND L.ArrestCount12 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.835984086, 0);
+    BPR2_29 := IF( L.ArrestCount24 > 0 AND L.ArrestCount24 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.838410036, 0);
+    BPR2_30 := IF( L.ArrestCount60 > 0 AND L.ArrestCount60 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.841842928, 0);
+    BPR2_31 := IF( L.AssetOwner > 0 AND L.AssetOwner <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.26366381, 0);
+    BPR2_32 := IF( L.BankruptcyAge > -1 AND L.BankruptcyAge <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.774014802, 0);
+    BPR2_33 := IF( L.BankruptcyCount > -18 AND L.BankruptcyCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.774014802, 0);
+    BPR2_34 := IF( L.BankruptcyCount01 > 0 AND L.BankruptcyCount01 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_35 := IF( L.BankruptcyCount03 > 0 AND L.BankruptcyCount03 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.8471397, 0);
+    BPR2_36 := IF( L.BankruptcyCount06 > -5 AND L.BankruptcyCount06 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_37 := IF( L.BankruptcyCount12 > -5 AND L.BankruptcyCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.847635934, 0);
+    BPR2_38 := IF( L.BankruptcyCount24 > -7 AND L.BankruptcyCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.863219616, 0);
+    BPR2_39 := IF( L.BankruptcyCount60 > -8 AND L.BankruptcyCount60 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.860953139, 0);
+    BPR2_40 := IF( L.BankruptcyStatus > -1 AND L.BankruptcyStatus <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.812861396, 0);
+    BPR2_41 := IF( L.BankruptcyType > -1 AND L.BankruptcyType <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.771933679, 0);
+    BPR2_42 := IF( L.BusinessActiveAssociation > 0 AND L.BusinessActiveAssociation <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.952238262, 0);
+    BPR2_43 := IF( L.BusinessAssociationAge > -1 AND L.BusinessAssociationAge <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.275730727, 0);
+    BPR2_44 := IF( L.BusinessInactiveAssociation > 0 AND L.BusinessInactiveAssociation <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.74789889, 0);
+    BPR2_45 := IF( L.BusinessInputAddrCount > 61 AND L.BusinessInputAddrCount <= 166 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 12.45070729, 0);
+    BPR2_46 := IF( L.CreditBureauRecord > 1 AND L.CreditBureauRecord <= 1.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.054042783, 0);
+    BPR2_47 := IF( L.CurrAddrActivePhoneList > 0 AND L.CurrAddrActivePhoneList <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.060944579, 0);
+    BPR2_48 := IF( L.CurrAddrAgeNewestRecord > -513 AND L.CurrAddrAgeNewestRecord <= 28 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.516580011, 0);
+    BPR2_49 := IF( L.CurrAddrApplicantOwned > 0 AND L.CurrAddrApplicantOwned <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.833719428, 0);
+    BPR2_50 := IF( L.CurrAddrAVMValue > -19600001 AND L.CurrAddrAVMValue <= 94649 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.369562456, 0);
+    BPR2_51 := IF( L.CurrAddrAVMValue12 > -18600001 AND L.CurrAddrAVMValue12 <= 82573 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.343765648, 0);
+    BPR2_52 := IF( L.CurrAddrAVMValue60 > -19900001 AND L.CurrAddrAVMValue60 <= 79169 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.157563296, 0);
+    BPR2_53 := IF( L.CurrAddrBlockIndex > 0 AND L.CurrAddrBlockIndex <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.619590967, 0);
+    BPR2_54 := IF( L.CurrAddrCountyIndex > 0 AND L.CurrAddrCountyIndex <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.277571707, 0);
+    BPR2_55 := IF( L.CurrAddrDwellType > 7 AND L.CurrAddrDwellType <= 16 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.260923706, 0);
+    BPR2_56 := IF( L.CurrAddrFamilyOwned > 0 AND L.CurrAddrFamilyOwned <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.665042806, 0);
+    BPR2_57 := IF( L.CurrAddrLastSalesPrice > -1000000001 AND L.CurrAddrLastSalesPrice <= 10869351 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.613899445, 0);
+    BPR2_58 := IF( L.CurrAddrMortgageType > -1 AND L.CurrAddrMortgageType <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.937523134, 0);
+    BPR2_59 := IF( L.CurrAddrOccupantOwned > 0 AND L.CurrAddrOccupantOwned <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.112186345, 0);
+    BPR2_60 := IF( L.CurrAddrTaxMarketValue > -802000001 AND L.CurrAddrTaxMarketValue <= 10869176 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.748908597, 0);
+    BPR2_61 := IF( L.CurrAddrTaxValue > -456000001 AND L.CurrAddrTaxValue <= 12976077 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.7555282, 0);
+    BPR2_62 := IF( L.CurrAddrTaxYr > -23 AND L.CurrAddrTaxYr <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.749403099, 0);
+    BPR2_63 := IF( L.CurrAddrTractIndex > 0 AND L.CurrAddrTractIndex <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.607844237, 0);
+    BPR2_64 := IF( L.DerogAge > -1 AND L.DerogAge <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 7.812372714, 0);
+    BPR2_65 := IF( L.DerogCount > -200 AND L.DerogCount <= 4 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.421790483, 0);
+    BPR2_66 := IF( L.DerogRecentCount > -77 AND L.DerogRecentCount <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.836950848, 0);
+    BPR2_67 := IF( L.DerogSeverityIndex > -5 AND L.DerogSeverityIndex <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 7.773221139, 0);
+    BPR2_68 := IF( L.EducationAttendedCollege > 0 AND L.EducationAttendedCollege <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.012944087, 0);
+    BPR2_69 := IF( L.EducationFieldofStudyType > -1 AND L.EducationFieldofStudyType <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.012944087, 0);
+    BPR2_70 := IF( L.EducationInstitutionPrivate > -1 AND L.EducationInstitutionPrivate <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.023095164, 0);
+    BPR2_71 := IF( L.EducationInstitutionRating > -1 AND L.EducationInstitutionRating <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.014287864, 0);
+    BPR2_72 := IF( L.EducationProgram2Yr > -1 AND L.EducationProgram2Yr <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.023095164, 0);
+    BPR2_73 := IF( L.EducationProgram4Yr > -1 AND L.EducationProgram4Yr <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.023095164, 0);
+    BPR2_74 := IF( L.EducationProgramGraduate > -1 AND L.EducationProgramGraduate <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.023095164, 0);
+    BPR2_75 := IF( L.EstimatedAnnualIncome > -250999 AND L.EstimatedAnnualIncome <= 50321 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.678563583, 0);
+    BPR2_76 := IF( L.EstimatedAnnualIncome_12 > -250999 AND L.EstimatedAnnualIncome_12 <= 49550 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.637414552, 0);
+    BPR2_77 := IF( L.EstimatedAnnualIncome_24 > -250999 AND L.EstimatedAnnualIncome_24 <= 49084 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.636713419, 0);
+    BPR2_78 := IF( L.EvictionAge > -1 AND L.EvictionAge <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.496337458, 0);
+    BPR2_79 := IF( L.EvictionCount > -99 AND L.EvictionCount <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.604688699, 0);
+    BPR2_80 := IF( L.EvictionCount01 > -4 AND L.EvictionCount01 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_81 := IF( L.EvictionCount03 > -6 AND L.EvictionCount03 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.837923929, 0);
+    BPR2_82 := IF( L.EvictionCount06 > -10 AND L.EvictionCount06 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.840352971, 0);
+    BPR2_83 := IF( L.EvictionCount12 > -16 AND L.EvictionCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.822836379, 0);
+    BPR2_84 := IF( L.EvictionCount24 > -28 AND L.EvictionCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.813487865, 0);
+    BPR2_85 := IF( L.EvictionCount60 > -68 AND L.EvictionCount60 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.792339911, 0);
+    BPR2_86 := IF( L.FelonyAge > -1 AND L.FelonyAge <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.469042657, 0);
+    BPR2_87 := IF( L.FelonyCount > -179 AND L.FelonyCount <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.625841038, 0);
+    BPR2_88 := IF( L.FelonyCount01 > -10 AND L.FelonyCount01 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_89 := IF( L.FelonyCount03 > -20 AND L.FelonyCount03 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_90 := IF( L.FelonyCount06 > -20 AND L.FelonyCount06 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.841316659, 0);
+    BPR2_91 := IF( L.FelonyCount12 > -20 AND L.FelonyCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.835984086, 0);
+    BPR2_92 := IF( L.FelonyCount24 > -20 AND L.FelonyCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.849580896, 0);
+    BPR2_93 := IF( L.FelonyCount60 > -36 AND L.FelonyCount60 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.851585816, 0);
+    BPR2_94 := IF( L.InputAddrActivePhoneList > 0 AND L.InputAddrActivePhoneList <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.290908796, 0);
+    BPR2_95 := IF( L.InputAddrAgeNewestRecord > -1 AND L.InputAddrAgeNewestRecord <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.75025016, 0);
+    BPR2_96 := IF( L.InputAddrAgeOldestRecord > -1 AND L.InputAddrAgeOldestRecord <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.73949274, 0);
+    BPR2_97 := IF( L.InputAddrApplicantOwned > 0 AND L.InputAddrApplicantOwned <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.82025619, 0);
+    BPR2_98 := IF( L.InputAddrAVMValue > -19600000 AND L.InputAddrAVMValue <= 94101 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.514410798, 0);
+    BPR2_99 := IF( L.InputAddrAVMValue12 > -18600000 AND L.InputAddrAVMValue12 <= 69437 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.487482116, 0);
+    BPR2_100 := IF( L.InputAddrAVMValue60 > -19900000 AND L.InputAddrAVMValue60 <= 78557 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.328407716, 0);
+    BPR2_101 := IF( L.InputAddrBlockIndex > -99 AND L.InputAddrBlockIndex <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.251139278, 0);
+    BPR2_102 := IF( L.InputAddrCountyIndex > -99 AND L.InputAddrCountyIndex <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.304471186, 0);
+    BPR2_103 := IF( L.InputAddrDelivery > -1 AND L.InputAddrDelivery <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.994579661, 0);
+    BPR2_104 := IF( L.InputAddrDwellType > 6 AND L.InputAddrDwellType <= 16 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.203910377, 0);
+    BPR2_105 := IF( L.InputAddrFamilyOwned > 0 AND L.InputAddrFamilyOwned <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.654901986, 0);
+    BPR2_106 := IF( L.InputAddrHistoricalMatch > -1 AND L.InputAddrHistoricalMatch <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.76102915, 0);
+    BPR2_107 := IF( L.InputAddrLastSalesPrice > -1 AND L.InputAddrLastSalesPrice <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.862769915, 0);
+    BPR2_108 := IF( L.InputAddrLenOfRes > -1 AND L.InputAddrLenOfRes <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.73949274, 0);
+    BPR2_109 := IF( L.InputAddrMedianValue > -1031251 AND L.InputAddrMedianValue <= 149142 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.92940242, 0);
+    BPR2_110 := IF( L.InputAddrMobilityIndex > -63 AND L.InputAddrMobilityIndex <= 3 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.841316659, 0);
+    BPR2_111 := IF( L.InputAddrMortgageType > -1 AND L.InputAddrMortgageType <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.971861711, 0);
+    BPR2_112 := IF( L.InputAddrNotPrimaryRes > 1 AND L.InputAddrNotPrimaryRes <= 1.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.13841557, 0);
+    BPR2_113 := IF( L.InputAddrOccupantOwned > 0 AND L.InputAddrOccupantOwned <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.54565116, 0);
+    BPR2_114 := IF( L.InputAddrPhoneCount > -83 AND L.InputAddrPhoneCount <= 4 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 7.881976746, 0);
+    BPR2_115 := IF( L.InputAddrPhoneRecentCount > -45 AND L.InputAddrPhoneRecentCount <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.651387544, 0);
+    BPR2_116 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.AgeOldestRecord_GT_Age > 0 AND L.AgeOldestRecord_GT_Age <= 0.1, 8.837923929, 0);
+    BPR2_117 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.AssocCreditBureauOnlyCount > -27 AND L.AssocCreditBureauOnlyCount <= 1, 8.888473184, 0);
+    BPR2_118 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.AssocCreditBureauOnlyCountMonth > -4 AND L.AssocCreditBureauOnlyCountMonth <= 2, 8.839377349, 0);
+    BPR2_119 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.AssocCreditBureauOnlyCountNew > -14 AND L.AssocCreditBureauOnlyCountNew <= 1, 8.829661165, 0);
+    BPR2_120 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.AssocHighRiskTopologyCount > -39 AND L.AssocHighRiskTopologyCount <= 1, 7.852377854, 0);
+    BPR2_121 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.AssocRiskLevel > -10 AND L.AssocRiskLevel <= 2, 7.850076612, 0);
+    BPR2_122 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.AssocSuspicousIdentitiesCount > -48 AND L.AssocSuspicousIdentitiesCount <= 2, 8.320354698, 0);
+    BPR2_123 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.CorrelationRiskLevel > 8 AND L.CorrelationRiskLevel <= 18, 9.967438479, 0);
+    BPR2_124 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.CurrAddrCorrectional > 0 AND L.CurrAddrCorrectional <= 0.1, 8.620448202, 0);
+    BPR2_125 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DivAddrIdentityCount > -255 AND L.DivAddrIdentityCount <= 13, 9.885229806, 0);
+    BPR2_126 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DivAddrIdentityCountNew > -81 AND L.DivAddrIdentityCountNew <= 2, 8.607019677, 0);
+    BPR2_127 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DivAddrSSNCount > -255 AND L.DivAddrSSNCount <= 10, 9.687192628, 0);
+    BPR2_128 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DivAddrSSNCountNew > -80 AND L.DivAddrSSNCountNew <= 1, 8.756598491, 0);
+    BPR2_129 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DivAddrSSNMSourceCount > -155 AND L.DivAddrSSNMSourceCount <= 7, 9.973949393, 0);
+    BPR2_130 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DivAddrSuspIdentityCountNew > -80 AND L.DivAddrSuspIdentityCountNew <= 1, 8.984097388, 0);
+    BPR2_131 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DivRiskLevel > -8 AND L.DivRiskLevel <= 2, 8.98581142, 0);
+    BPR2_132 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DivSearchAddrSuspIdentityCount > -15 AND L.DivSearchAddrSuspIdentityCount <= 1, 9.269898176, 0);
+    BPR2_133 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DivSSNIdentityMSourceCount > -256 AND L.DivSSNIdentityMSourceCount <= 2, 8.469212268, 0);
+    BPR2_134 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DivSSNIdentityMSourceUrelCount > -97 AND L.DivSSNIdentityMSourceUrelCount <= 2, 8.782380953, 0);
+    BPR2_135 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DivSSNLNameCountNew > -256 AND L.DivSSNLNameCountNew <= 1, 8.883182556, 0);
+    BPR2_136 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.DoNotMail > 0 AND L.DoNotMail <= 0.1, 8.8471397, 0);
+    BPR2_137 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.EstIncome0_1 > -125174 AND L.EstIncome0_1 <= 2214, 9.004596453, 0);
+    BPR2_138 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.EstIncome0_1_Pcnt > 0 AND L.EstIncome0_1_Pcnt <= 9.9762, 8.891288714, 0);
+    BPR2_139 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.EstIncome0_2 > -63832 AND L.EstIncome0_2 <= 8173, 9.074090484, 0);
+    BPR2_140 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.EstIncome0_2_Pcnt > 0 AND L.EstIncome0_2_Pcnt <= 10.4359, 9.014624332, 0);
+    BPR2_141 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.EstIncome1_2 > -68529 AND L.EstIncome1_2 <= 7449, 9.045575647, 0);
+    BPR2_142 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.EstIncome1_2_Pcnt > 0 AND L.EstIncome1_2_Pcnt <= 4.2308, 8.854811632, 0);
+    BPR2_143 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.HistoricalAddrCorrectional > 0 AND L.HistoricalAddrCorrectional <= 0.1, 8.700681335, 0);
+    BPR2_144 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.IdentityRiskLevel > 1 AND L.IdentityRiskLevel <= 3, 9.115624693, 0);
+    BPR2_145 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.IDVerAddressAssocCount > -67 AND L.IDVerAddressAssocCount <= 2, 9.456545184, 0);
+    BPR2_146 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.IDVerRiskLevel > 4 AND L.IDVerRiskLevel <= 7, 10.61782281, 0);
+    BPR2_147 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.IDVerSSNCreditBureauCount > 2 AND L.IDVerSSNCreditBureauCount <= 6, 9.083537013, 0);
+    BPR2_148 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.IDVerSSNCreditBureauDelete > 0 AND L.IDVerSSNCreditBureauDelete <= 0.1, 8.928798899, 0);
+    BPR2_149 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.InputAddrErrorCode > 9 AND L.InputAddrErrorCode <= 28.3, 8.864251507, 0);
+    BPR2_150 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 8.839377349, 0);
+    BPR2_151 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.InputAddrProblems > -4 AND L.InputAddrProblems <= 2, 8.859318551, 0);
+    BPR2_152 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.InputAddrValidation > 3 AND L.InputAddrValidation <= 3.1, 8.859318551, 0);
+    BPR2_153 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.L_CurrAddrOwned > 0 AND L.L_CurrAddrOwned <= 2, 9.24316117, 0);
+    BPR2_154 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.L_InputAddrOwned > 0 AND L.L_InputAddrOwned <= 2, 11.02534852, 0);
+    BPR2_155 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.L_PrevAddrOwned > 0 AND L.L_PrevAddrOwned <= 2, 9.17997528, 0);
+    BPR2_156 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.LP_CollegeProgramType > -4 AND L.LP_CollegeProgramType <= 1, 9.207331693, 0);
+    BPR2_157 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.LP_PropertyOwned > -60 AND L.LP_PropertyOwned <= 2, 9.081996946, 0);
+    BPR2_158 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.LP_TrajectoryIndex > 4 AND L.LP_TrajectoryIndex <= 12, 9.780931696, 0);
+    BPR2_159 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.P_PercentHHCollegeAttended > 0 AND L.P_PercentHHCollegeAttended <= 2, 8.806060322, 0);
+    BPR2_160 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.P_PercentHHPfofLic > 0 AND L.P_PercentHHPfofLic <= 2, 8.806060322, 0);
+    BPR2_161 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.P_PercentHHSport > 0 AND L.P_PercentHHSport <= 2, 8.806060322, 0);
+    BPR2_162 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.P_Time_First_Last_Purchase > -1 AND L.P_Time_First_Last_Purchase <= -0.9, 9.164426633, 0);
+    BPR2_163 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.PrevAddrCorrectional > 0 AND L.PrevAddrCorrectional <= 0.1, 8.871375029, 0);
+    BPR2_164 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.ProfileBooster_missing > 0 AND L.ProfileBooster_missing <= 0.1, 8.806060322, 0);
+    BPR2_165 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.PROPOWNEDTAXTOTAL0_d_1 > -829.4 AND L.PROPOWNEDTAXTOTAL0_d_1 <= 1, 9.148317958, 0);
+    BPR2_166 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.PROPOWNEDTAXTOTAL0_d_2 > -829.4 AND L.PROPOWNEDTAXTOTAL0_d_2 <= 1, 9.15627497, 0);
+    BPR2_167 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.PROPOWNEDTAXTOTAL1_d_2 > -329.6 AND L.PROPOWNEDTAXTOTAL1_d_2 <= 1, 9.110129212, 0);
+    BPR2_168 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.PropTax_EstIncome > -545.21 AND L.PropTax_EstIncome <= 1, 9.208812745, 0);
+    BPR2_169 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.PropTaxPerRelative > -69400000 AND L.PropTaxPerRelative <= 47786, 9.159739089, 0);
+    BPR2_170 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SearchAddrSearchCount > -255 AND L.SearchAddrSearchCount <= 6, 9.309769539, 0);
+    BPR2_171 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SearchComponentRiskLevel > -8 AND L.SearchComponentRiskLevel <= 2, 8.855756933, 0);
+    BPR2_172 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 8.839377349, 0);
+    BPR2_173 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SearchSSNSearchCount > -256 AND L.SearchSSNSearchCount <= 4, 8.960355297, 0);
+    BPR2_174 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SearchUnverifiedAddrCountYear > -22 AND L.SearchUnverifiedAddrCountYear <= 1, 8.731848187, 0);
+    BPR2_175 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SearchUnverifiedDOBCountYear > -30 AND L.SearchUnverifiedDOBCountYear <= 1, 8.86710136, 0);
+    BPR2_176 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SearchUnverifiedPhoneCountYear > -43 AND L.SearchUnverifiedPhoneCountYear <= 1, 8.922634044, 0);
+    BPR2_177 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SearchUnverifiedSSNCountYear > -15 AND L.SearchUnverifiedSSNCountYear <= 1, 8.684732387, 0);
+    BPR2_178 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SourceOrderActivity > 0 AND L.SourceOrderActivity <= 0.1, 9.956081246, 0);
+    BPR2_179 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SourceOrderAgeLastOrder > -1 AND L.SourceOrderAgeLastOrder <= -0.9, 9.956081246, 0);
+    BPR2_180 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SourceOrderSourceCount > -147 AND L.SourceOrderSourceCount <= 3, 9.099872115, 0);
+    BPR2_181 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.SourceWatchList > 0 AND L.SourceWatchList <= 0.1, 8.829043914, 0);
+    BPR2_182 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.ST_EQ_SSNISSUESTATE > 1 AND L.ST_EQ_SSNISSUESTATE <= 1.1, 8.898451934, 0);
+    BPR2_183 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_AssetCurrOwner > 0 AND L.v1_AssetCurrOwner <= 0.1, 8.94659592, 0);
+    BPR2_184 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecBkrptCnt > -19 AND L.v1_CrtRecBkrptCnt <= 1, 8.764836067, 0);
+    BPR2_185 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecBkrptCnt12Mo > 0 AND L.v1_CrtRecBkrptCnt12Mo <= 2, 8.808111105, 0);
+    BPR2_186 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecBkrptTimeNewest > -1 AND L.v1_CrtRecBkrptTimeNewest <= -0.9, 8.803408466, 0);
+    BPR2_187 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecCnt > -241 AND L.v1_CrtRecCnt <= 3, 7.794700784, 0);
+    BPR2_188 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecCnt12Mo > -50 AND L.v1_CrtRecCnt12Mo <= 1, 8.822664092, 0);
+    BPR2_189 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecEvictionCnt > -100 AND L.v1_CrtRecEvictionCnt <= 2, 8.568776456, 0);
+    BPR2_190 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecEvictionCnt12Mo > -18 AND L.v1_CrtRecEvictionCnt12Mo <= 1, 8.788342006, 0);
+    BPR2_191 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecEvictionTimeNewest > -1 AND L.v1_CrtRecEvictionTimeNewest <= -0.9, 8.496100852, 0);
+    BPR2_192 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecFelonyCnt > -180 AND L.v1_CrtRecFelonyCnt <= 2, 8.570181891, 0);
+    BPR2_193 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecFelonyCnt12Mo > -21 AND L.v1_CrtRecFelonyCnt12Mo <= 1, 8.804486425, 0);
+    BPR2_194 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecFelonyTimeNewest > -1 AND L.v1_CrtRecFelonyTimeNewest <= -0.9, 8.476758243, 0);
+    BPR2_195 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecLienJudgAmtTtl > -10000000 AND L.v1_CrtRecLienJudgAmtTtl <= 220515, 8.777183624, 0);
+    BPR2_196 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecLienJudgCnt > -101 AND L.v1_CrtRecLienJudgCnt <= 2, 8.669904502, 0);
+    BPR2_197 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecLienJudgCnt12Mo > -48 AND L.v1_CrtRecLienJudgCnt12Mo <= 1, 8.846243182, 0);
+    BPR2_198 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecLienJudgTimeNewest > -1 AND L.v1_CrtRecLienJudgTimeNewest <= -0.9, 8.494635899, 0);
+    BPR2_199 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecMsdmeanCnt > -187 AND L.v1_CrtRecMsdmeanCnt <= 3, 8.19582757, 0);
+    BPR2_200 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecMsdmeanCnt12Mo > -40 AND L.v1_CrtRecMsdmeanCnt12Mo <= 1, 8.795261623, 0);
+    BPR2_201 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecMsdmeanTimeNewest > -1 AND L.v1_CrtRecMsdmeanTimeNewest <= -0.9, 7.79243052, 0);
+    BPR2_202 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_CrtRecTimeNewest > -1 AND L.v1_CrtRecTimeNewest <= -0.9, 7.209565845, 0);
+    BPR2_203 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_DoNotMail > 0 AND L.v1_DoNotMail <= 0.1, 8.814269188, 0);
+    BPR2_204 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCnt > -256 AND L.v1_HHCnt <= 4, 8.74585611, 0);
+    BPR2_205 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCollege2yrAttendedMmbrCnt > 0 AND L.v1_HHCollege2yrAttendedMmbrCnt <= 2, 8.794703662, 0);
+    BPR2_206 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCollege4yrAttendedMmbrCnt > 0 AND L.v1_HHCollege4yrAttendedMmbrCnt <= 1, 9.011323682, 0);
+    BPR2_207 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCollegeAttendedMmbrCnt > -19 AND L.v1_HHCollegeAttendedMmbrCnt <= 1, 9.295817202, 0);
+    BPR2_208 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCollegeGradAttendedMmbrCnt > 0 AND L.v1_HHCollegeGradAttendedMmbrCnt <= 0.1, 8.808111105, 0);
+    BPR2_209 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCollegePrivateMmbrCnt > 0 AND L.v1_HHCollegePrivateMmbrCnt <= 1, 8.876501119, 0);
+    BPR2_210 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCollegeTierMmbrHighest > -7 AND L.v1_HHCollegeTierMmbrHighest <= 1, 9.038834084, 0);
+    BPR2_211 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecBkrptMmbrCnt > -36 AND L.v1_HHCrtRecBkrptMmbrCnt <= 1, 8.703921969, 0);
+    BPR2_212 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecBkrptMmbrCnt12Mo > 0 AND L.v1_HHCrtRecBkrptMmbrCnt12Mo <= 2, 8.798335177, 0);
+    BPR2_213 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecBkrptMmbrCnt24Mo > 0 AND L.v1_HHCrtRecBkrptMmbrCnt24Mo <= 1, 8.830703036, 0);
+    BPR2_214 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecEvictionMmbrCnt > -9 AND L.v1_HHCrtRecEvictionMmbrCnt <= 1, 8.387041362, 0);
+    BPR2_215 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecEvictionMmbrCnt12Mo > -7 AND L.v1_HHCrtRecEvictionMmbrCnt12Mo <= 1, 8.773249431, 0);
+    BPR2_216 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecFelonyMmbrCnt > -10 AND L.v1_HHCrtRecFelonyMmbrCnt <= 1, 8.269947489, 0);
+    BPR2_217 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecFelonyMmbrCnt12Mo > 0 AND L.v1_HHCrtRecFelonyMmbrCnt12Mo <= 2, 8.806060322, 0);
+    BPR2_218 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecLienJudgAmtTtl > -10000000 AND L.v1_HHCrtRecLienJudgAmtTtl <= 266764, 8.7931177, 0);
+    BPR2_219 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecLienJudgMmbrCnt > -35 AND L.v1_HHCrtRecLienJudgMmbrCnt <= 1, 8.374125371, 0);
+    BPR2_220 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecLienJudgMmbrCnt12Mo > 0 AND L.v1_HHCrtRecLienJudgMmbrCnt12Mo <= 2, 8.810162843, 0);
+    BPR2_221 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecMmbrCnt12Mo > -7 AND L.v1_HHCrtRecMmbrCnt12Mo <= 1, 8.807532158, 0);
+    BPR2_222 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecMsdmeanMmbrCnt > -41 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 1, 7.559989192, 0);
+    BPR2_223 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHCrtRecMsdmeanMmbrCnt12Mo > 0 AND L.v1_HHCrtRecMsdmeanMmbrCnt12Mo <= 1, 8.796019948, 0);
+    BPR2_224 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHElderlyMmbrCnt > -30 AND L.v1_HHElderlyMmbrCnt <= 1, 9.483652204, 0);
+    BPR2_225 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHEstimatedIncomeRange > 3 AND L.v1_HHEstimatedIncomeRange <= 6, 10.08902006, 0);
+    BPR2_226 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHInterestSportPersonMmbrCnt > -13 AND L.v1_HHInterestSportPersonMmbrCnt <= 1, 8.807230764, 0);
+    BPR2_227 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHMiddleAgemmbrCnt > -95 AND L.v1_HHMiddleAgemmbrCnt <= 1, 8.076213408, 0);
+    BPR2_228 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHOccBusinessAssocMmbrCnt > -69 AND L.v1_HHOccBusinessAssocMmbrCnt <= 1, 9.312064144, 0);
+    BPR2_229 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHOccProfLicMmbrCnt > -52 AND L.v1_HHOccProfLicMmbrCnt <= 1, 8.869278709, 0);
+    BPR2_230 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHPPCurrOwnedAircrftCnt > -10 AND L.v1_HHPPCurrOwnedAircrftCnt <= 1, 8.808111105, 0);
+    BPR2_231 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHPPCurrOwnedAutoCnt > -106 AND L.v1_HHPPCurrOwnedAutoCnt <= 1, 9.054500949, 0);
+    BPR2_232 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHPPCurrOwnedCnt > -141 AND L.v1_HHPPCurrOwnedCnt <= 1, 9.041743932, 0);
+    BPR2_233 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHPPCurrOwnedMtrcycleCnt > -13 AND L.v1_HHPPCurrOwnedMtrcycleCnt <= 1, 8.837438889, 0);
+    BPR2_234 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHPPCurrOwnedWtrcrftCnt > -60 AND L.v1_HHPPCurrOwnedWtrcrftCnt <= 1, 8.830611773, 0);
+    BPR2_235 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHPropCurrAVMHighest > -10000000 AND L.v1_HHPropCurrAVMHighest <= 84315, 9.1110347, 0);
+    BPR2_236 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHPropCurrOwnedCnt > -214 AND L.v1_HHPropCurrOwnedCnt <= 2, 9.123167729, 0);
+    BPR2_237 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHPropCurrOwnerMmbrCnt > -143 AND L.v1_HHPropCurrOwnerMmbrCnt <= 1, 9.179490364, 0);
+    BPR2_238 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHSeniorMmbrCnt > -144 AND L.v1_HHSeniorMmbrCnt <= 1, 8.558476278, 0);
+    BPR2_239 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHTeenagerMmbrCnt > 0 AND L.v1_HHTeenagerMmbrCnt <= 1, 8.804486425, 0);
+    BPR2_240 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_HHYoungAdultMmbrCnt > -8 AND L.v1_HHYoungAdultMmbrCnt <= 1, 9.171095026, 0);
+    BPR2_241 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_InterestSportPerson > 0 AND L.v1_InterestSportPerson <= 0.1, 8.819863262, 0);
+    BPR2_242 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_LifeEvEconTrajectory > -13 AND L.v1_LifeEvEconTrajectory <= 2, 8.85944342, 0);
+    BPR2_243 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_LifeEvEverResidedCnt > -58 AND L.v1_LifeEvEverResidedCnt <= 2, 8.784635771, 0);
+    BPR2_244 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_LifeEvLastMoveTaxRatioDiff > -100 AND L.v1_LifeEvLastMoveTaxRatioDiff <= 1, 8.808111105, 0);
+    BPR2_245 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_LifeEvNameChange > 0 AND L.v1_LifeEvNameChange <= 0.1, 8.865918488, 0);
+    BPR2_246 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_LifeEvNameChangeCnt12Mo > 0 AND L.v1_LifeEvNameChangeCnt12Mo <= 0.1, 8.831213879, 0);
+    BPR2_247 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_LifeEvTimeFirstAssetPurchase > -1 AND L.v1_LifeEvTimeFirstAssetPurchase <= -0.9, 9.164426633, 0);
+    BPR2_248 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_LifeEvTimeLastAssetPurchase > -1 AND L.v1_LifeEvTimeLastAssetPurchase <= -0.9, 9.164426633, 0);
+    BPR2_249 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_LifeEvTimeLastMove > -1 AND L.v1_LifeEvTimeLastMove <= -0.9, 8.678961609, 0);
+    BPR2_250 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_OccBusinessAssociation > 0 AND L.v1_OccBusinessAssociation <= 0.1, 9.178606718, 0);
+    BPR2_251 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_OccBusinessAssociationTime > -1 AND L.v1_OccBusinessAssociationTime <= -0.9, 9.191489316, 0);
+    BPR2_252 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_OccBusinessTitleLeadership > 0 AND L.v1_OccBusinessTitleLeadership <= 0.1, 9.178606718, 0);
+    BPR2_253 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_OccProfLicense > 0 AND L.v1_OccProfLicense <= 0.1, 8.854935618, 0);
+    BPR2_254 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_OccProfLicenseCategory > 0 AND L.v1_OccProfLicenseCategory <= 2, 8.84426114, 0);
+    BPR2_255 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PPCurrOwnedAircrftCnt > -10 AND L.v1_PPCurrOwnedAircrftCnt <= 1, 8.806060322, 0);
+    BPR2_256 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PPCurrOwnedAutoCnt > -14 AND L.v1_PPCurrOwnedAutoCnt <= 1, 9.023272884, 0);
+    BPR2_257 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PPCurrOwnedCnt > -38 AND L.v1_PPCurrOwnedCnt <= 1, 9.010144394, 0);
+    BPR2_258 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PPCurrOwnedMtrcycleCnt > -9 AND L.v1_PPCurrOwnedMtrcycleCnt <= 1, 8.814757641, 0);
+    BPR2_259 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PPCurrOwnedWtrcrftCnt > -37 AND L.v1_PPCurrOwnedWtrcrftCnt <= 1, 8.819286872, 0);
+    BPR2_260 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PPCurrOwner > 0 AND L.v1_PPCurrOwner <= 0.1, 9.010144394, 0);
+    BPR2_261 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PropCurrOwnedAssessedTtl > -10000000 AND L.v1_PropCurrOwnedAssessedTtl <= 93869, 9.06628134, 0);
+    BPR2_262 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PropCurrOwnedAVMTtl > -10000000 AND L.v1_PropCurrOwnedAVMTtl <= 86131, 9.032267788, 0);
+    BPR2_263 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PropCurrOwnedCnt > -56 AND L.v1_PropCurrOwnedCnt <= 1, 9.066935447, 0);
+    BPR2_264 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PropCurrOwner > 0 AND L.v1_PropCurrOwner <= 0.1, 9.066935447, 0);
+    BPR2_265 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PropEverOwnedCnt > -56 AND L.v1_PropEverOwnedCnt <= 1, 9.068919391, 0);
+    BPR2_266 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PropEverSoldCnt > -52 AND L.v1_PropEverSoldCnt <= 1, 8.866403546, 0);
+    BPR2_267 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PropPurchaseCnt12Mo > -16 AND L.v1_PropPurchaseCnt12Mo <= 1, 8.821927353, 0);
+    BPR2_268 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PropSoldCnt12Mo > 0 AND L.v1_PropSoldCnt12Mo <= 1, 8.810527035, 0);
+    BPR2_269 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PropSoldRatio > -100 AND L.v1_PropSoldRatio <= 4, 8.810162843, 0);
+    BPR2_270 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_PropTimeLastSale > -1 AND L.v1_PropTimeLastSale <= -0.9, 8.897423786, 0);
+    BPR2_271 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ProspectBankingExperience > 1 AND L.v1_ProspectBankingExperience <= 1.1, 9.11639845, 0);
+    BPR2_272 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ProspectCollegeAttended > 0 AND L.v1_ProspectCollegeAttended <= 0.1, 9.169038564, 0);
+    BPR2_273 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ProspectCollegeAttending > 0 AND L.v1_ProspectCollegeAttending <= 0.1, 8.872722229, 0);
+    BPR2_274 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ProspectCollegePrivate > 0 AND L.v1_ProspectCollegePrivate <= 0.1, 8.863413021, 0);
+    BPR2_275 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ProspectCollegeProgramType > 0 AND L.v1_ProspectCollegeProgramType <= 1, 8.938513789, 0);
+    BPR2_276 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ProspectCollegeTier > -7 AND L.v1_ProspectCollegeTier <= 1, 8.949231431, 0);
+    BPR2_277 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ProspectDeceased > 0 AND L.v1_ProspectDeceased <= 0.1, 8.862426935, 0);
+    BPR2_278 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ProspectLastUpdate12Mo > 0 AND L.v1_ProspectLastUpdate12Mo <= 0.1, 9.015304113, 0);
+    BPR2_279 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ProspectMaritalStatus > 0 AND L.v1_ProspectMaritalStatus <= 0.1, 8.908814824, 0);
+    BPR2_280 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ProspectTimeLastUpdate > -1 AND L.v1_ProspectTimeLastUpdate <= -0.9, 8.647938696, 0);
+    BPR2_281 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ProspectTimeOnRecord > -1 AND L.v1_ProspectTimeOnRecord <= -0.9, 8.647938696, 0);
+    BPR2_282 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACollege2yrAttendedMmbrCnt > -17 AND L.v1_RaACollege2yrAttendedMmbrCnt <= 1, 8.324032292, 0);
+    BPR2_283 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACollege4yrAttendedMmbrCnt > -60 AND L.v1_RaACollege4yrAttendedMmbrCnt <= 1, 8.790335133, 0);
+    BPR2_284 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACollegeAttendedMmbrCnt > 0 AND L.v1_RaACollegeAttendedMmbrCnt <= 2, 8.230163337, 0);
+    BPR2_285 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACollegeGradAttendedMmbrCnt > 0 AND L.v1_RaACollegeGradAttendedMmbrCnt <= 2, 8.808111105, 0);
+    BPR2_286 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACollegeLowTierMmbrCnt > -22 AND L.v1_RaACollegeLowTierMmbrCnt <= 1, 8.294229742, 0);
+    BPR2_287 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACollegeMidTierMmbrCnt > -51 AND L.v1_RaACollegeMidTierMmbrCnt <= 1, 8.676791, 0);
+    BPR2_288 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACollegePrivateMmbrCnt > -18 AND L.v1_RaACollegePrivateMmbrCnt <= 1, 8.973859378, 0);
+    BPR2_289 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACollegeTopTierMmbrCnt > -41 AND L.v1_RaACollegeTopTierMmbrCnt <= 1, 8.962382749, 0);
+    BPR2_290 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACrtRecBkrptMmbrCnt36Mo > -102 AND L.v1_RaACrtRecBkrptMmbrCnt36Mo <= 1, 8.716058022, 0);
+    BPR2_291 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACrtRecEvictionMmbrCnt > -50 AND L.v1_RaACrtRecEvictionMmbrCnt <= 2, 7.945804429, 0);
+    BPR2_292 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACrtRecEvictionMmbrCnt12Mo > -11 AND L.v1_RaACrtRecEvictionMmbrCnt12Mo <= 1, 8.697742019, 0);
+    BPR2_293 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACrtRecFelonyMmbrCnt > -40 AND L.v1_RaACrtRecFelonyMmbrCnt <= 1, 7.787578686, 0);
+    BPR2_294 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo > -7 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo <= 1, 8.758179347, 0);
+    BPR2_295 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACrtRecLienJudgAmtMax > -10000000 AND L.v1_RaACrtRecLienJudgAmtMax <= 240834, 8.797513824, 0);
+    BPR2_296 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACrtRecLienJudgMmbrCnt > -123 AND L.v1_RaACrtRecLienJudgMmbrCnt <= 2, 8.490545933, 0);
+    BPR2_297 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACrtRecLienJudgMmbrCnt12Mo > -14 AND L.v1_RaACrtRecLienJudgMmbrCnt12Mo <= 1, 8.802995765, 0);
+    BPR2_298 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACrtRecMmbrCnt12Mo > -52 AND L.v1_RaACrtRecMmbrCnt12Mo <= 1, 8.530386267, 0);
+    BPR2_299 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACrtRecMsdmeanMmbrCnt > -85 AND L.v1_RaACrtRecMsdmeanMmbrCnt <= 3, 7.790504433, 0);
+    BPR2_300 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaACrtRecMsdmeanMmbrCnt12Mo > -19 AND L.v1_RaACrtRecMsdmeanMmbrCnt12Mo <= 1, 8.539528342, 0);
+    BPR2_301 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAElderlyMmbrCnt > -104 AND L.v1_RaAElderlyMmbrCnt <= 1, 8.494671444, 0);
+    BPR2_302 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAInterestSportPersonMmbrCnt > -48 AND L.v1_RaAInterestSportPersonMmbrCnt <= 1, 8.630152127, 0);
+    BPR2_303 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAOccBusinessAssocMmbrCnt > -209 AND L.v1_RaAOccBusinessAssocMmbrCnt <= 2, 8.876258296, 0);
+    BPR2_304 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAOccProfLicMmbrCnt > -207 AND L.v1_RaAOccProfLicMmbrCnt <= 2, 8.785810467, 0);
+    BPR2_305 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAPPCurrOwnerAircrftMmbrCnt > 0 AND L.v1_RaAPPCurrOwnerAircrftMmbrCnt <= 0.1, 8.812215537, 0);
+    BPR2_306 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAPPCurrOwnerAutoMmbrCnt > -130 AND L.v1_RaAPPCurrOwnerAutoMmbrCnt <= 3, 8.604771223, 0);
+    BPR2_307 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAPPCurrOwnerMmbrCnt > -132 AND L.v1_RaAPPCurrOwnerMmbrCnt <= 3, 8.644738828, 0);
+    BPR2_308 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAPPCurrOwnerMtrcycleMmbrCnt > -13 AND L.v1_RaAPPCurrOwnerMtrcycleMmbrCnt <= 1, 8.813307533, 0);
+    BPR2_309 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAPPCurrOwnerWtrcrftMmbrCnt > -21 AND L.v1_RaAPPCurrOwnerWtrcrftMmbrCnt <= 1, 8.925373604, 0);
+    BPR2_310 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAPropOwnerAVMHighest > -10000000 AND L.v1_RaAPropOwnerAVMHighest <= 191091, 9.391376717, 0);
+    BPR2_311 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAPropOwnerAVMMed > -10000000 AND L.v1_RaAPropOwnerAVMMed <= 89958, 9.408542417, 0);
+    BPR2_312 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaASeniorMmbrCnt > -79 AND L.v1_RaASeniorMmbrCnt <= 1, 8.736580267, 0);
+    BPR2_313 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaATeenageMmbrCnt > 0 AND L.v1_RaATeenageMmbrCnt <= 2, 8.806060322, 0);
+    BPR2_314 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_RaAYoungAdultMmbrCnt > -73 AND L.v1_RaAYoungAdultMmbrCnt <= 1, 8.422737064, 0);
+    BPR2_315 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrAVMBlockRatio > 0 AND L.v1_ResCurrAVMBlockRatio <= 2, 8.818208988, 0);
+    BPR2_316 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrAVMCntyRatio > 0 AND L.v1_ResCurrAVMCntyRatio <= 1, 8.981047271, 0);
+    BPR2_317 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrAVMRatioDiff12Mo > -100 AND L.v1_ResCurrAVMRatioDiff12Mo <= 1, 8.784141571, 0);
+    BPR2_318 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrAVMRatioDiff60Mo > -100 AND L.v1_ResCurrAVMRatioDiff60Mo <= 1, 8.872508091, 0);
+    BPR2_319 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrAVMTractRatio > 0 AND L.v1_ResCurrAVMTractRatio <= 2, 8.797334999, 0);
+    BPR2_320 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrAVMValue > -10000000 AND L.v1_ResCurrAVMValue <= 71295, 9.172035563, 0);
+    BPR2_321 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrAVMValue12Mo > -10000000 AND L.v1_ResCurrAVMValue12Mo <= 66122, 9.159903241, 0);
+    BPR2_322 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrAVMValue60Mo > -10000000 AND L.v1_ResCurrAVMValue60Mo <= 72732, 9.045728694, 0);
+    BPR2_323 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrBusinessCnt > -256 AND L.v1_ResCurrBusinessCnt <= 14, 8.840026567, 0);
+    BPR2_324 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrDwellType > -1 AND L.v1_ResCurrDwellType <= -0.9, 8.678961609, 0);
+    BPR2_325 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrDwellTypeIndex > 0 AND L.v1_ResCurrDwellTypeIndex <= 2, 8.857850564, 0);
+    BPR2_326 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrMortgageAmount > -10000000 AND L.v1_ResCurrMortgageAmount <= 76894, 8.858252452, 0);
+    BPR2_327 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrMortgageType > -1 AND L.v1_ResCurrMortgageType <= -0.9, 8.841316659, 0);
+    BPR2_328 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResCurrOwnershipIndex > 0 AND L.v1_ResCurrOwnershipIndex <= 2, 8.966641212, 0);
+    BPR2_329 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputAVMBlockRatio > -100 AND L.v1_ResInputAVMBlockRatio <= 1, 9.209995272, 0);
+    BPR2_330 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputAVMCntyRatio > 0 AND L.v1_ResInputAVMCntyRatio <= 1, 9.296810712, 0);
+    BPR2_331 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputAVMRatioDiff12Mo > -100 AND L.v1_ResInputAVMRatioDiff12Mo <= 1, 9.318499689, 0);
+    BPR2_332 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputAVMRatioDiff60Mo > -100 AND L.v1_ResInputAVMRatioDiff60Mo <= 1, 9.112665304, 0);
+    BPR2_333 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputAVMTractRatio > 0 AND L.v1_ResInputAVMTractRatio <= 2, 8.794492371, 0);
+    BPR2_334 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputAVMValue > -10000000 AND L.v1_ResInputAVMValue <= 89459, 9.506344064, 0);
+    BPR2_335 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputAVMValue12Mo > -10000000 AND L.v1_ResInputAVMValue12Mo <= 69081, 9.466709734, 0);
+    BPR2_336 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputAVMValue60Mo > -10000000 AND L.v1_ResInputAVMValue60Mo <= 66134, 9.297104334, 0);
+    BPR2_337 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputBusinessCnt > -256 AND L.v1_ResInputBusinessCnt <= 10, 8.372549626, 0);
+    BPR2_338 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputDwellType > 6 AND L.v1_ResInputDwellType <= 16, 9.184984929, 0);
+    BPR2_339 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputDwellTypeIndex > 2 AND L.v1_ResInputDwellTypeIndex <= 6, 9.148608474, 0);
+    BPR2_340 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputMortgageAmount > -10000000 AND L.v1_ResInputMortgageAmount <= 76486, 8.861768764, 0);
+    BPR2_341 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputMortgageType > -1 AND L.v1_ResInputMortgageType <= -0.9, 8.843256821, 0);
+    BPR2_342 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_ResInputOwnershipIndex > 0 AND L.v1_ResInputOwnershipIndex <= 2, 10.33871521, 0);
+    BPR2_343 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_VerifiedCurrResMatchIndex > 0 AND L.v1_VerifiedCurrResMatchIndex <= 0.1, 9.261046206, 0);
+    BPR2_344 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_VerifiedName > 2 AND L.v1_VerifiedName <= 6, 8.955466835, 0);
+    BPR2_345 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 8.839377349, 0);
+    BPR2_346 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_VerifiedProspectFound > 1 AND L.v1_VerifiedProspectFound <= 1.1, 8.806060322, 0);
+    BPR2_347 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.v1_VerifiedSSN > -1 AND L.v1_VerifiedSSN <= -0.9, 9.021510853, 0);
+    BPR2_348 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.ValidationRiskLevel > -8 AND L.ValidationRiskLevel <= 3, 8.803009864, 0);
+    BPR2_349 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.VariationDOBCount > -8 AND L.VariationDOBCount <= 2, 8.647943336, 0);
+    BPR2_350 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.VariationDOBCountNew > -4 AND L.VariationDOBCountNew <= 2, 8.834045095, 0);
+    BPR2_351 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.VariationIdentityCount > -30 AND L.VariationIdentityCount <= 2, 8.665196576, 0);
+    BPR2_352 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.VariationMSourcesSSNCount > -24 AND L.VariationMSourcesSSNCount <= 2, 8.406035232, 0);
+    BPR2_353 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.VariationMSourcesSSNUnrelCount > -23 AND L.VariationMSourcesSSNUnrelCount <= 2, 8.480475243, 0);
+    BPR2_354 := IF( L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229 AND L.VariationRiskLevel > -10 AND L.VariationRiskLevel <= 2, 8.800075754, 0);
+    BPR2_355 := IF( L.InputAddrSingleFamilyCount > 223 AND L.InputAddrSingleFamilyCount <= 510 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.883036571, 0);
+    BPR2_356 := IF( L.InputAddrTaxMarketValue > -488000000 AND L.InputAddrTaxMarketValue <= 3882567 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.822498669, 0);
+    BPR2_357 := IF( L.InputAddrTaxValue > -450000000 AND L.InputAddrTaxValue <= 3398374 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.448805996, 0);
+    BPR2_358 := IF( L.InputAddrTaxYr > -22 AND L.InputAddrTaxYr <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.869396878, 0);
+    BPR2_359 := IF( L.InputAddrTractIndex > -99 AND L.InputAddrTractIndex <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.234913276, 0);
+    BPR2_360 := IF( L.InputAddrVacantPropCount > -255 AND L.InputAddrVacantPropCount <= 31 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.381190973, 0);
+    BPR2_361 := IF( L.InputAreaCodeChange > -1 AND L.InputAreaCodeChange <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_362 := IF( L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_363 := IF( L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_364 := IF( L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_365 := IF( L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_366 := IF( L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_367 := IF( L.LastNameChangeCount01 > -6 AND L.LastNameChangeCount01 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.843748572, 0);
+    BPR2_368 := IF( L.LastNameChangeCount03 > -8 AND L.LastNameChangeCount03 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.876900441, 0);
+    BPR2_369 := IF( L.LastNameChangeCount06 > -8 AND L.LastNameChangeCount06 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.895657181, 0);
+    BPR2_370 := IF( L.LastNameChangeCount12 > -11 AND L.LastNameChangeCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.968895045, 0);
+    BPR2_371 := IF( L.LastNameChangeCount24 > -11 AND L.LastNameChangeCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.089383418, 0);
+    BPR2_372 := IF( L.LastNameChangeCount60 > -15 AND L.LastNameChangeCount60 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.329589724, 0);
+    BPR2_373 := IF( L.LienCount > -100 AND L.LienCount <= 3 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.643944835, 0);
+    BPR2_374 := IF( L.LienFiledAge > -1 AND L.LienFiledAge <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.162047864, 0);
+    BPR2_375 := IF( L.LienFiledCount > -100 AND L.LienFiledCount <= 3 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.650804649, 0);
+    BPR2_376 := IF( L.LienFiledCount01 > -11 AND L.LienFiledCount01 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.841316659, 0);
+    BPR2_377 := IF( L.LienFiledCount03 > -11 AND L.LienFiledCount03 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.845691825, 0);
+    BPR2_378 := IF( L.LienFiledCount06 > -16 AND L.LienFiledCount06 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.860341383, 0);
+    BPR2_379 := IF( L.LienFiledCount12 > -47 AND L.LienFiledCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.860953139, 0);
+    BPR2_380 := IF( L.LienFiledCount24 > -58 AND L.LienFiledCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.842879443, 0);
+    BPR2_381 := IF( L.LienFiledCount60 > -74 AND L.LienFiledCount60 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.805749283, 0);
+    BPR2_382 := IF( L.LienFiledTotal > -327000000 AND L.LienFiledTotal <= 7561041 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_383 := IF( L.LienReleasedAge > -1 AND L.LienReleasedAge <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.775685013, 0);
+    BPR2_384 := IF( L.LienReleasedCount > -78 AND L.LienReleasedCount <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.847304304, 0);
+    BPR2_385 := IF( L.LienReleasedCount01 > 0 AND L.LienReleasedCount01 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_386 := IF( L.LienReleasedCount03 > 0 AND L.LienReleasedCount03 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.841316659, 0);
+    BPR2_387 := IF( L.LienReleasedCount06 > -4 AND L.LienReleasedCount06 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_388 := IF( L.LienReleasedCount12 > -30 AND L.LienReleasedCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.83064683, 0);
+    BPR2_389 := IF( L.LienReleasedCount24 > -30 AND L.LienReleasedCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.836467955, 0);
+    BPR2_390 := IF( L.LienReleasedCount60 > -35 AND L.LienReleasedCount60 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.8682945, 0);
+    BPR2_391 := IF( L.LienReleasedTotal > -126000000 AND L.LienReleasedTotal <= 803509 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_392 := IF( L.NonDerogCount01 > 2 AND L.NonDerogCount01 <= 4 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.048476631, 0);
+    BPR2_393 := IF( L.NonDerogCount03 > 2 AND L.NonDerogCount03 <= 4 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.196879191, 0);
+    BPR2_394 := IF( L.NonDerogCount60 > 2 AND L.NonDerogCount60 <= 5 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.924160647, 0);
+    BPR2_395 := IF( L.OnlineDirectory > 0 AND L.OnlineDirectory <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.793063586, 0);
+    BPR2_396 := IF( L.PhoneIdentitiesCount > 0 AND L.PhoneIdentitiesCount <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_397 := IF( L.PhoneIdentitiesRecentCount > 0 AND L.PhoneIdentitiesRecentCount <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_398 := IF( L.PhoneOther > -1 AND L.PhoneOther <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_399 := IF( L.PhoneOtherAgeNewestRecord > -1 AND L.PhoneOtherAgeNewestRecord <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.301821588, 0);
+    BPR2_400 := IF( L.PhoneOtherAgeOldestRecord > -1 AND L.PhoneOtherAgeOldestRecord <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.301821588, 0);
+    BPR2_401 := IF( L.PrevAddrAgeLastSale > -1 AND L.PrevAddrAgeLastSale <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.886535771, 0);
+    BPR2_402 := IF( L.PrevAddrAgeNewestRecord > -845 AND L.PrevAddrAgeNewestRecord <= 35 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.800806174, 0);
+    BPR2_403 := IF( L.PrevAddrApplicantOwned > 0 AND L.PrevAddrApplicantOwned <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.314681395, 0);
+    BPR2_404 := IF( L.PrevAddrAVMValue > -16500001 AND L.PrevAddrAVMValue <= 93436 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.598978732, 0);
+    BPR2_405 := IF( L.PrevAddrBlockIndex > 0 AND L.PrevAddrBlockIndex <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.914036409, 0);
+    BPR2_406 := IF( L.PrevAddrCountyIndex > 0 AND L.PrevAddrCountyIndex <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.008315294, 0);
+    BPR2_407 := IF( L.PrevAddrDwellType > 6 AND L.PrevAddrDwellType <= 16 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.366381891, 0);
+    BPR2_408 := IF( L.PrevAddrFamilyOwned > 0 AND L.PrevAddrFamilyOwned <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.076939312, 0);
+    BPR2_409 := IF( L.PrevAddrLastSalesPrice > -1 AND L.PrevAddrLastSalesPrice <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.886535771, 0);
+    BPR2_410 := IF( L.PrevAddrOccupantOwned > 0 AND L.PrevAddrOccupantOwned <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.069780733, 0);
+    BPR2_411 := IF( L.PrevAddrTaxMarketValue > -1030000001 AND L.PrevAddrTaxMarketValue <= 15466554 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.916933442, 0);
+    BPR2_412 := IF( L.PrevAddrTaxValue > -630000001 AND L.PrevAddrTaxValue <= 14579569 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.954373726, 0);
+    BPR2_413 := IF( L.PrevAddrTractIndex > 0 AND L.PrevAddrTractIndex <= 3 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.902350633, 0);
+    BPR2_414 := IF( L.ProfLicAge > -1 AND L.ProfLicAge <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.885749956, 0);
+    BPR2_415 := IF( L.ProfLicCount > -9 AND L.ProfLicCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.832084635, 0);
+    BPR2_416 := IF( L.ProfLicCount01 > -6 AND L.ProfLicCount01 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.854915696, 0);
+    BPR2_417 := IF( L.ProfLicCount03 > -6 AND L.ProfLicCount03 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.858808822, 0);
+    BPR2_418 := IF( L.ProfLicCount06 > -7 AND L.ProfLicCount06 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.850080472, 0);
+    BPR2_419 := IF( L.ProfLicCount12 > -9 AND L.ProfLicCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.871556511, 0);
+    BPR2_420 := IF( L.ProfLicCount24 > -37 AND L.ProfLicCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.877431714, 0);
+    BPR2_421 := IF( L.ProfLicCount60 > -43 AND L.ProfLicCount60 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.877600161, 0);
+    BPR2_422 := IF( L.ProfLicExpired > -1 AND L.ProfLicExpired <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.832084635, 0);
+    BPR2_423 := IF( L.ProfLicTypeCategory > -1 AND L.ProfLicTypeCategory <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.900062464, 0);
+    BPR2_424 := IF( L.PropAgeNewestPurchase > -1 AND L.PropAgeNewestPurchase <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.244505439, 0);
+    BPR2_425 := IF( L.PropAgeNewestSale > -1 AND L.PropAgeNewestSale <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.046122398, 0);
+    BPR2_426 := IF( L.PropAgeOldestPurchase > -1 AND L.PropAgeOldestPurchase <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.244505439, 0);
+    BPR2_427 := IF( L.PropertyOwner > 0 AND L.PropertyOwner <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.24455686, 0);
+    BPR2_428 := IF( L.PropNewestSalePrice > -1 AND L.PropNewestSalePrice <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.080671152, 0);
+    BPR2_429 := IF( L.PropNewestSalePurchaseIndex > -1 AND L.PropNewestSalePurchaseIndex <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.080671152, 0);
+    BPR2_430 := IF( L.PropOwnedCount > -48 AND L.PropOwnedCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.24455686, 0);
+    BPR2_431 := IF( L.PropOwnedHistoricalCount > -60 AND L.PropOwnedHistoricalCount <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.076570882, 0);
+    BPR2_432 := IF( L.PropOwnedTaxTotal > -44500000 AND L.PropOwnedTaxTotal <= 126858 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.086848709, 0);
+    BPR2_433 := IF( L.PropOwnedTaxTotal_12 > -44400000 AND L.PropOwnedTaxTotal_12 <= 121592 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.105079784, 0);
+    BPR2_434 := IF( L.PropOwnedTaxTotal_24 > -44400000 AND L.PropOwnedTaxTotal_24 <= 113140 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.146291296, 0);
+    BPR2_435 := IF( L.PropPurchasedCount01 > 0 AND L.PropPurchasedCount01 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_436 := IF( L.PropPurchasedCount03 > 0 AND L.PropPurchasedCount03 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.843256821, 0);
+    BPR2_437 := IF( L.PropPurchasedCount06 > -7 AND L.PropPurchasedCount06 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_438 := IF( L.PropPurchasedCount12 > -14 AND L.PropPurchasedCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.85102599, 0);
+    BPR2_439 := IF( L.PropPurchasedCount24 > -14 AND L.PropPurchasedCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.846223619, 0);
+    BPR2_440 := IF( L.PropPurchasedCount60 > -14 AND L.PropPurchasedCount60 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.899225223, 0);
+    BPR2_441 := IF( L.PropSoldCount01 > 0 AND L.PropSoldCount01 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_442 := IF( L.PropSoldCount03 > 0 AND L.PropSoldCount03 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.85102599, 0);
+    BPR2_443 := IF( L.PropSoldCount06 > -7 AND L.PropSoldCount06 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.857369306, 0);
+    BPR2_444 := IF( L.PropSoldCount12 > -11 AND L.PropSoldCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.861368735, 0);
+    BPR2_445 := IF( L.PropSoldCount24 > -12 AND L.PropSoldCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.867501557, 0);
+    BPR2_446 := IF( L.PropSoldCount60 > -37 AND L.PropSoldCount60 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.881038002, 0);
+    BPR2_447 := IF( L.PRSearchAddrIdentities > -118 AND L.PRSearchAddrIdentities <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.378698781, 0);
+    BPR2_448 := IF( L.PRSearchIdentityAddrs > -24 AND L.PRSearchIdentityAddrs <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.920021203, 0);
+    BPR2_449 := IF( L.PRSearchIdentityPhones > -43 AND L.PRSearchIdentityPhones <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.931454196, 0);
+    BPR2_450 := IF( L.PRSearchIdentitySSNs > -16 AND L.PRSearchIdentitySSNs <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.951861174, 0);
+    BPR2_451 := IF( L.PRSearchLocateCount > -255 AND L.PRSearchLocateCount <= 4 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.52576333, 0);
+    BPR2_452 := IF( L.PRSearchLocateCount01 > -23 AND L.PRSearchLocateCount01 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.842317139, 0);
+    BPR2_453 := IF( L.PRSearchLocateCount03 > -30 AND L.PRSearchLocateCount03 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.812105547, 0);
+    BPR2_454 := IF( L.PRSearchLocateCount06 > -45 AND L.PRSearchLocateCount06 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.787570623, 0);
+    BPR2_455 := IF( L.PRSearchLocateCount12 > -57 AND L.PRSearchLocateCount12 <= 3 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.806603784, 0);
+    BPR2_456 := IF( L.PRSearchLocateCount24 > -167 AND L.PRSearchLocateCount24 <= 4 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.816923057, 0);
+    BPR2_457 := IF( L.PRSearchOtherCount > -255 AND L.PRSearchOtherCount <= 3 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.797042719, 0);
+    BPR2_458 := IF( L.PRSearchOtherCount01 > -182 AND L.PRSearchOtherCount01 <= 35 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_459 := IF( L.PRSearchOtherCount03 > -185 AND L.PRSearchOtherCount03 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.843855706, 0);
+    BPR2_460 := IF( L.PRSearchOtherCount06 > -255 AND L.PRSearchOtherCount06 <= 3 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.803009864, 0);
+    BPR2_461 := IF( L.PRSearchOtherCount12 > -255 AND L.PRSearchOtherCount12 <= 3 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.802729002, 0);
+    BPR2_462 := IF( L.PRSearchOtherCount24 > -255 AND L.PRSearchOtherCount24 <= 4 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.789860466, 0);
+    BPR2_463 := IF( L.PRSearchPersonalFinanceCount > -255 AND L.PRSearchPersonalFinanceCount <= 4 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.78605843, 0);
+    BPR2_464 := IF( L.PRSearchPersonalFinanceCount01 > -23 AND L.PRSearchPersonalFinanceCount01 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.825777434, 0);
+    BPR2_465 := IF( L.PRSearchPersonalFinanceCount03 > -33 AND L.PRSearchPersonalFinanceCount03 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.834999225, 0);
+    BPR2_466 := IF( L.PRSearchPersonalFinanceCount06 > -47 AND L.PRSearchPersonalFinanceCount06 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.842337691, 0);
+    BPR2_467 := IF( L.PRSearchPersonalFinanceCount12 > -79 AND L.PRSearchPersonalFinanceCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.875045012, 0);
+    BPR2_468 := IF( L.PRSearchPersonalFinanceCount24 > -255 AND L.PRSearchPersonalFinanceCount24 <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.825679156, 0);
+    BPR2_469 := IF( L.PRSearchPhoneIdentities > 0 AND L.PRSearchPhoneIdentities <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_470 := IF( L.PRSearchSSNIdentities > -11 AND L.PRSearchSSNIdentities <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.139761059, 0);
+    BPR2_471 := IF( L.RecentActivityIndex > 2 AND L.RecentActivityIndex <= 5 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.473045293, 0);
+    BPR2_472 := IF( L.RecentUpdate > 1 AND L.RecentUpdate <= 1.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.682343975, 0);
+    BPR2_473 := IF( L.RelativesBankruptcyCount > -95 AND L.RelativesBankruptcyCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.273112926, 0);
+    BPR2_474 := IF( L.RelativesDistanceClosest > 0 AND L.RelativesDistanceClosest <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.854699512, 0);
+    BPR2_475 := IF( L.RelativesFelonyCount > -39 AND L.RelativesFelonyCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 7.852377854, 0);
+    BPR2_476 := IF( L.RelativesPropOwnedCount > -106 AND L.RelativesPropOwnedCount <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.076288588, 0);
+    BPR2_477 := IF( L.RelativesPropOwnedTaxTotal > -1 AND L.RelativesPropOwnedTaxTotal <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.07252908, 0);
+    BPR2_478 := IF( L.SFDUAddrIdentitiesCount > -256 AND L.SFDUAddrIdentitiesCount <= 12 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.01562406, 0);
+    BPR2_479 := IF( L.SFDUAddrIdentitiesCount_12 > -256 AND L.SFDUAddrIdentitiesCount_12 <= 12 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.996619084, 0);
+    BPR2_480 := IF( L.SFDUAddrIdentitiesCount_24 > -256 AND L.SFDUAddrIdentitiesCount_24 <= 12 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.02485266, 0);
+    BPR2_481 := IF( L.SrcsConfirmIDAddrCount > -19 AND L.SrcsConfirmIDAddrCount <= 4 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.36576404, 0);
+    BPR2_482 := IF( L.SSN3Years > 0 AND L.SSN3Years <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.91808516, 0);
+    BPR2_483 := IF( L.SSNAddrRecentCount > -255 AND L.SSNAddrRecentCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.891712847, 0);
+    BPR2_484 := IF( L.SSNAfter5 > 0 AND L.SSNAfter5 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.948634595, 0);
+    BPR2_485 := IF( L.SSNAgeDeceased > -1 AND L.SSNAgeDeceased <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.80947231, 0);
+    BPR2_486 := IF( L.SSNFoundOther > 0 AND L.SSNFoundOther <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.97142813, 0);
+    BPR2_487 := IF( L.SSNIdentitiesCount > -255 AND L.SSNIdentitiesCount <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 7.864388719, 0);
+    BPR2_488 := IF( L.SSNIdentitiesRecentCount > -255 AND L.SSNIdentitiesRecentCount <= 13 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_489 := IF( L.SSNLastNameCount > 0 AND L.SSNLastNameCount <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.89411605, 0);
+    BPR2_490 := IF( L.SSNLowIssueAge > 425 AND L.SSNLowIssueAge <= 653 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 13.79691071, 0);
+    BPR2_491 := IF( L.SSNNonUS > 0 AND L.SSNNonUS <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.92277149, 0);
+    BPR2_492 := IF( L.SSNNotFound > 0 AND L.SSNNotFound <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.977020431, 0);
+    BPR2_493 := IF( L.SSNProblems > 0 AND L.SSNProblems <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.926386362, 0);
+    BPR2_494 := IF( L.SSNRecent > 0 AND L.SSNRecent <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.91808516, 0);
+    BPR2_495 := IF( L.StatusNextPrevious > -1 AND L.StatusNextPrevious <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.35255035, 0);
+    BPR2_496 := IF( L.StatusPrevious > 3 AND L.StatusPrevious <= 3.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.476444584, 0);
+    BPR2_497 := IF( L.SubjectAddrRecentCount > -16 AND L.SubjectAddrRecentCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.987979646, 0);
+    BPR2_498 := IF( L.SubjectLastNameCount > -32 AND L.SubjectLastNameCount <= 3 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.714036778, 0);
+    BPR2_499 := IF( L.SubjectPhoneCount > -16 AND L.SubjectPhoneCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.173609017, 0);
+    BPR2_500 := IF( L.SubjectPhoneRecentCount > -5 AND L.SubjectPhoneRecentCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.894722243, 0);
+    BPR2_501 := IF( L.SubjectSSNCount > -34 AND L.SubjectSSNCount <= 2 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.18000509, 0);
+    BPR2_502 := IF( L.SubjectSSNRecentCount > -11 AND L.SubjectSSNRecentCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.874570985, 0);
+    BPR2_503 := IF( L.SubPrimeOfferRequestCount > -33 AND L.SubPrimeOfferRequestCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.820823487, 0);
+    BPR2_504 := IF( L.SubPrimeOfferRequestCount01 > 0 AND L.SubPrimeOfferRequestCount01 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_505 := IF( L.SubPrimeOfferRequestCount03 > 0 AND L.SubPrimeOfferRequestCount03 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_506 := IF( L.SubPrimeOfferRequestCount06 > 0 AND L.SubPrimeOfferRequestCount06 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_507 := IF( L.SubPrimeOfferRequestCount12 > 0 AND L.SubPrimeOfferRequestCount12 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_508 := IF( L.SubPrimeOfferRequestCount24 > 0 AND L.SubPrimeOfferRequestCount24 <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_509 := IF( L.SubPrimeOfferRequestCount60 > -20 AND L.SubPrimeOfferRequestCount60 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.852970416, 0);
+    BPR2_510 := IF( L.VerificationFailure > 0 AND L.VerificationFailure <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.794239118, 0);
+    BPR2_511 := IF( L.VerifiedAddress > 0 AND L.VerifiedAddress <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.66824323, 0);
+    BPR2_512 := IF( L.VerifiedDOB > 5 AND L.VerifiedDOB <= 14 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.634141918, 0);
+    BPR2_513 := IF( L.VerifiedName > 3 AND L.VerifiedName <= 3.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.824947006, 0);
+    BPR2_514 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.839377349, 0);
+    BPR2_515 := IF( L.VerifiedSSN > 2 AND L.VerifiedSSN <= 2.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.985706265, 0);
+    BPR2_516 := IF( L.VoterRegistrationRecord > 0 AND L.VoterRegistrationRecord <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 9.605547515, 0);
+    BPR2_517 := IF( L.WatercraftCount > -37 AND L.WatercraftCount <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.869480027, 0);
+    BPR2_518 := IF( L.WatercraftCount01 > -20 AND L.WatercraftCount01 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.841316659, 0);
+    BPR2_519 := IF( L.WatercraftCount03 > -27 AND L.WatercraftCount03 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.843256821, 0);
+    BPR2_520 := IF( L.WatercraftCount06 > -27 AND L.WatercraftCount06 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.8471397, 0);
+    BPR2_521 := IF( L.WatercraftCount12 > -27 AND L.WatercraftCount12 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.852970416, 0);
+    BPR2_522 := IF( L.WatercraftCount24 > -27 AND L.WatercraftCount24 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.861268655, 0);
+    BPR2_523 := IF( L.WatercraftCount60 > -27 AND L.WatercraftCount60 <= 1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.866207863, 0);
+    BPR2_524 := IF( L.WatercraftOwner > 0 AND L.WatercraftOwner <= 0.1 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 8.869480027, 0);
+    BPR2_525 := IF( L.WealthIndex > 4 AND L.WealthIndex <= 12 AND L.InputAddrSICCode > 7519 AND L.InputAddrSICCode <= 8229, 10.52555337, 0);
+    BPR3_1 := IF( L.AddrChangeCount24 > -20 AND L.AddrChangeCount24 <= 1 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.620957146, 0);
+    BPR3_2 := IF( L.AddrChangeCount60 > -36 AND L.AddrChangeCount60 <= 2 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.588265266, 0);
+    BPR3_3 := IF( L.AddrRecentEconTrajectory > 28 AND L.AddrRecentEconTrajectory <= 37 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.879478668, 0);
+    BPR3_4 := IF( L.AddrStability > 5 AND L.AddrStability <= 12 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.697071406, 0);
+    BPR3_5 := IF( L.AGE_IN_YEARS > 49 AND L.AGE_IN_YEARS <= 66 AND L.BusinessInputAddrCount > 61 AND L.BusinessInputAddrCount <= 166, 4.595206759, 0);
+    BPR3_6 := IF( L.AGE_IN_YEARS > 49 AND L.AGE_IN_YEARS <= 66 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 6.398825127, 0);
+    BPR3_7 := IF( L.AgeOldestRecord > 266 AND L.AgeOldestRecord <= 387 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.089917335, 0);
+    BPR3_8 := IF( L.BusinessInputAddrCount > 61 AND L.BusinessInputAddrCount <= 166 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 6.507797744, 0);
+    BPR3_9 := IF( L.CurrAddrCarTheftIndex > 145 AND L.CurrAddrCarTheftIndex <= 400 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.635260085, 0);
+    BPR3_10 := IF( L.CurrAddrCrimeIndex > 145 AND L.CurrAddrCrimeIndex <= 400 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.599939262, 0);
+    BPR3_11 := IF( L.CurrAddrMedianIncome > 29098 AND L.CurrAddrMedianIncome <= 56463 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.554579554, 0);
+    BPR3_12 := IF( L.CurrAddrMedianValue > -1031251 AND L.CurrAddrMedianValue <= 133570 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.211272231, 0);
+    BPR3_13 := IF( L.CurrAddrMurderIndex > 148 AND L.CurrAddrMurderIndex <= 400 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.586651775, 0);
+    BPR3_14 := IF( L.EstimatedAnnualIncome > -250999 AND L.EstimatedAnnualIncome <= 50321 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.570383665, 0);
+    BPR3_15 := IF( L.EstimatedAnnualIncome_12 > -250999 AND L.EstimatedAnnualIncome_12 <= 49550 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.55624293, 0);
+    BPR3_16 := IF( L.InputAddrAgeNewestRecord > -1 AND L.InputAddrAgeNewestRecord <= -0.9 AND L.BusinessInputAddrCount > 61 AND L.BusinessInputAddrCount <= 166, 4.599205342, 0);
+    BPR3_17 := IF( L.InputAddrAgeNewestRecord > -1 AND L.InputAddrAgeNewestRecord <= -0.9 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.193904956, 0);
+    BPR3_18 := IF( L.InputAddrAgeOldestRecord > -1 AND L.InputAddrAgeOldestRecord <= -0.9 AND L.BusinessInputAddrCount > 61 AND L.BusinessInputAddrCount <= 166, 4.596444383, 0);
+    BPR3_19 := IF( L.InputAddrAgeOldestRecord > -1 AND L.InputAddrAgeOldestRecord <= -0.9 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.190098702, 0);
+    BPR3_20 := IF( L.InputAddrApplicantOwned > 0 AND L.InputAddrApplicantOwned <= 0.1 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.805152032, 0);
+    BPR3_21 := IF( L.InputAddrBurglaryIndex > 95 AND L.InputAddrBurglaryIndex <= 147 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.414353654, 0);
+    BPR3_22 := IF( L.InputAddrBusinessCount > 32 AND L.InputAddrBusinessCount <= 87 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.855746093, 0);
+    BPR3_23 := IF( L.InputAddrCarTheftIndex > 146 AND L.InputAddrCarTheftIndex <= 400 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.551813404, 0);
+    BPR3_24 := IF( L.InputAddrDwellType > 6 AND L.InputAddrDwellType <= 16 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.544440743, 0);
+    BPR3_25 := IF( L.InputAddrFamilyOwned > 0 AND L.InputAddrFamilyOwned <= 0.1 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.684194323, 0);
+    BPR3_26 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.AVGSTATECOST > -4247 AND L.AVGSTATECOST <= 6438, 4.965427085, 0);
+    BPR3_27 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.ComponentCharRiskLevel > -8 AND L.ComponentCharRiskLevel <= 4, 4.679139552, 0);
+    BPR3_28 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.CorrelationRiskLevel > 8 AND L.CorrelationRiskLevel <= 18, 4.789085572, 0);
+    BPR3_29 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.DivAddrIdentityCount > 93 AND L.DivAddrIdentityCount <= 510, 7.393515406, 0);
+    BPR3_30 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.DivAddrIdentityMSourceCount > 46 AND L.DivAddrIdentityMSourceCount <= 422, 6.894388736, 0);
+    BPR3_31 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.DivAddrSSNMSourceCount > 38 AND L.DivAddrSSNMSourceCount <= 310, 7.071720232, 0);
+    BPR3_32 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.IDVerRiskLevel > 4 AND L.IDVerRiskLevel <= 7, 5.067903523, 0);
+    BPR3_33 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.L_InputAddrOwned > 0 AND L.L_InputAddrOwned <= 2, 5.165101622, 0);
+    BPR3_34 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.LP_TrajectoryIndex > 4 AND L.LP_TrajectoryIndex <= 12, 4.512142983, 0);
+    BPR3_35 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.P_EstimatedHHIncomePerCapita > 4 AND L.P_EstimatedHHIncomePerCapita <= 6, 4.777447047, 0);
+    BPR3_36 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.v1_HHEstimatedIncomeRange > 3 AND L.v1_HHEstimatedIncomeRange <= 6, 4.82150598, 0);
+    BPR3_37 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.v1_RaACrtRecLienJudgMmbrCnt > -123 AND L.v1_RaACrtRecLienJudgMmbrCnt <= 2, 4.547439537, 0);
+    BPR3_38 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.v1_RaAMiddleAgeMmbrCnt > -180 AND L.v1_RaAMiddleAgeMmbrCnt <= 1, 4.889725803, 0);
+    BPR3_39 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.v1_RaAMmbrCnt > -256 AND L.v1_RaAMmbrCnt <= 5, 4.728488444, 0);
+    BPR3_40 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.v1_RaAPropCurrOwnerMmbrCnt > -202 AND L.v1_RaAPropCurrOwnerMmbrCnt <= 1, 4.565407087, 0);
+    BPR3_41 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.v1_RaAPropOwnerAVMHighest > -10000000 AND L.v1_RaAPropOwnerAVMHighest <= 191091, 4.56793686, 0);
+    BPR3_42 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.v1_RaAPropOwnerAVMMed > -10000000 AND L.v1_RaAPropOwnerAVMMed <= 89958, 4.589089725, 0);
+    BPR3_43 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.v1_ResInputBusinessCnt > 10 AND L.v1_ResInputBusinessCnt <= 60, 5.175072025, 0);
+    BPR3_44 := IF( L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1 AND L.v1_ResInputOwnershipIndex > 0 AND L.v1_ResInputOwnershipIndex <= 2, 4.706052005, 0);
+    BPR3_45 := IF( L.InputAddrHistoricalMatch > -1 AND L.InputAddrHistoricalMatch <= -0.9 AND L.BusinessInputAddrCount > 61 AND L.BusinessInputAddrCount <= 166, 4.612504249, 0);
+    BPR3_46 := IF( L.InputAddrHistoricalMatch > -1 AND L.InputAddrHistoricalMatch <= -0.9 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.203718149, 0);
+    BPR3_47 := IF( L.InputAddrLenOfRes > -1 AND L.InputAddrLenOfRes <= -0.9 AND L.BusinessInputAddrCount > 61 AND L.BusinessInputAddrCount <= 166, 4.596444383, 0);
+    BPR3_48 := IF( L.InputAddrLenOfRes > -1 AND L.InputAddrLenOfRes <= -0.9 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.190098702, 0);
+    BPR3_49 := IF( L.InputAddrMedianIncome > 39586 AND L.InputAddrMedianIncome <= 62303 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.52320891, 0);
+    BPR3_50 := IF( L.InputAddrMedianValue > -1031251 AND L.InputAddrMedianValue <= 149142 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.192604173, 0);
+    BPR3_51 := IF( L.InputAddrMultiFamilyCount > 201 AND L.InputAddrMultiFamilyCount <= 510 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.83553077, 0);
+    BPR3_52 := IF( L.InputAddrNotPrimaryRes > 1 AND L.InputAddrNotPrimaryRes <= 1.1 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.692287828, 0);
+    BPR3_53 := IF( L.InputAddrOccupantOwned > 0 AND L.InputAddrOccupantOwned <= 0.1 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.881284239, 0);
+    BPR3_54 := IF( L.InputAddrPhoneCount > 4 AND L.InputAddrPhoneCount <= 13 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 6.00318611, 0);
+    BPR3_55 := IF( L.InputAddrTaxYr > -22 AND L.InputAddrTaxYr <= 1 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.776716536, 0);
+    BPR3_56 := IF( L.NonDerogCount24 > -11 AND L.NonDerogCount24 <= 3 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.181449223, 0);
+    BPR3_57 := IF( L.OnlineDirectory > 0 AND L.OnlineDirectory <= 0.1 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.19331692, 0);
+    BPR3_58 := IF( L.PrevAddrMedianValue > -1031251 AND L.PrevAddrMedianValue <= 107884 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.222394583, 0);
+    BPR3_59 := IF( L.PRSearchIdentityAddrs > -24 AND L.PRSearchIdentityAddrs <= 1 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.590665588, 0);
+    BPR3_60 := IF( L.PRSearchIdentitySSNs > -16 AND L.PRSearchIdentitySSNs <= 1 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.626429142, 0);
+    BPR3_61 := IF( L.PRSearchOtherCount > -255 AND L.PRSearchOtherCount <= 3 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.665541072, 0);
+    BPR3_62 := IF( L.PRSearchSSNIdentities > -11 AND L.PRSearchSSNIdentities <= 1 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.527819559, 0);
+    BPR3_63 := IF( L.RelativesCount > -100 AND L.RelativesCount <= 5 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.710678284, 0);
+    BPR3_64 := IF( L.SFDUAddrIdentitiesCount > 76 AND L.SFDUAddrIdentitiesCount <= 510 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 6.783580273, 0);
+    BPR3_65 := IF( L.SFDUAddrIdentitiesCount_12 > 79 AND L.SFDUAddrIdentitiesCount_12 <= 510 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 7.181258264, 0);
+    BPR3_66 := IF( L.SFDUAddrIdentitiesCount_24 > 86 AND L.SFDUAddrIdentitiesCount_24 <= 510 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 7.534844955, 0);
+    BPR3_67 := IF( L.SFDUAddrSSNCount > 61 AND L.SFDUAddrSSNCount <= 510 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 7.161468813, 0);
+    BPR3_68 := IF( L.SSNHighIssueAge > 387 AND L.SSNHighIssueAge <= 557 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.157038136, 0);
+    BPR3_69 := IF( L.SSNLowIssueAge > 425 AND L.SSNLowIssueAge <= 653 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.709565709, 0);
+    BPR3_70 := IF( L.ST > 39 AND L.ST <= 46 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 8.69825973, 0);
+    BPR3_71 := IF( L.ST > -53 AND L.ST <= 22 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.532163725, 0);
+    BPR3_72 := IF( L.StatusNextPrevious > -1 AND L.StatusNextPrevious <= -0.9 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.917134448, 0);
+    BPR3_73 := IF( L.VerifiedAddress > 0 AND L.VerifiedAddress <= 0.1 AND L.BusinessInputAddrCount > 61 AND L.BusinessInputAddrCount <= 166, 4.73892452, 0);
+    BPR3_74 := IF( L.VerifiedAddress > 0 AND L.VerifiedAddress <= 0.1 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 5.14978, 0);
+    BPR3_75 := IF( L.WealthIndex > 4 AND L.WealthIndex <= 12 AND L.InputAddrHighRisk > 1 AND L.InputAddrHighRisk <= 1.1, 4.569772764, 0);
+
+    SELF.BP1 := IF(BPR1_1 >0,1,0) + IF(BPR1_2 >0,1,0) + IF(BPR1_3 >0,1,0) + IF(BPR1_4 >0,1,0) + IF(BPR1_5 >0,1,0) + IF(BPR1_6 >0,1,0) + IF(BPR1_7 >0,1,0) + IF(BPR1_8 >0,1,0) + IF(BPR1_9 >0,1,0) + IF(BPR1_10 >0,1,0) + IF(BPR1_11 >0,1,0) + IF(BPR1_12 >0,1,0) + IF(BPR1_13 >0,1,0) + IF(BPR1_14 >0,1,0) + IF(BPR1_15 >0,1,0) + IF(BPR1_16 >0,1,0) + IF(BPR1_17 >0,1,0) + IF(BPR1_18 >0,1,0) + IF(BPR1_19 >0,1,0) + IF(BPR1_20 >0,1,0) + IF(BPR1_21 >0,1,0) + IF(BPR1_22 >0,1,0) + IF(BPR1_23 >0,1,0) + IF(BPR1_24 >0,1,0) + IF(BPR1_25 >0,1,0) + IF(BPR1_26 >0,1,0) + IF(BPR1_27 >0,1,0) + IF(BPR1_28 >0,1,0) + IF(BPR1_29 >0,1,0) + IF(BPR1_30 >0,1,0) + IF(BPR1_31 >0,1,0) + IF(BPR1_32 >0,1,0) + IF(BPR1_33 >0,1,0) + IF(BPR1_34 >0,1,0) + IF(BPR1_35 >0,1,0) + IF(BPR1_36 >0,1,0) + IF(BPR1_37 >0,1,0) + IF(BPR1_38 >0,1,0) + IF(BPR1_39 >0,1,0) + IF(BPR1_40 >0,1,0) + IF(BPR1_41 >0,1,0) + IF(BPR1_42 >0,1,0) + IF(BPR1_43 >0,1,0) + IF(BPR1_44 >0,1,0) + IF(BPR1_45 >0,1,0) + IF(BPR1_46 >0,1,0) + IF(BPR1_47 >0,1,0) + IF(BPR1_48 >0,1,0) + IF(BPR1_49 >0,1,0) + IF(BPR1_50 >0,1,0) + IF(BPR1_51 >0,1,0) + IF(BPR1_52 >0,1,0) + IF(BPR1_53 >0,1,0) + IF(BPR1_54 >0,1,0) + IF(BPR1_55 >0,1,0) + IF(BPR1_56 >0,1,0) + IF(BPR1_57 >0,1,0) + IF(BPR1_58 >0,1,0) + IF(BPR1_59 >0,1,0) + IF(BPR1_60 >0,1,0) + IF(BPR1_61 >0,1,0) + IF(BPR1_62 >0,1,0) + IF(BPR1_63 >0,1,0) + IF(BPR1_64 >0,1,0) + IF(BPR1_65 >0,1,0) + IF(BPR1_66 >0,1,0) + IF(BPR1_67 >0,1,0) + IF(BPR1_68 >0,1,0) + IF(BPR1_69 >0,1,0) + IF(BPR1_70 >0,1,0) + IF(BPR1_71 >0,1,0) + IF(BPR1_72 >0,1,0) + IF(BPR1_73 >0,1,0) + IF(BPR1_74 >0,1,0) + IF(BPR1_75 >0,1,0) + IF(BPR1_76 >0,1,0) + IF(BPR1_77 >0,1,0) + IF(BPR1_78 >0,1,0) + IF(BPR1_79 >0,1,0) + IF(BPR1_80 >0,1,0) + IF(BPR1_81 >0,1,0) + IF(BPR1_82 >0,1,0) + IF(BPR1_83 >0,1,0) + IF(BPR1_84 >0,1,0) + IF(BPR1_85 >0,1,0) + IF(BPR1_86 >0,1,0) + IF(BPR1_87 >0,1,0) + IF(BPR1_88 >0,1,0) + IF(BPR1_89 >0,1,0) + IF(BPR1_90 >0,1,0) + IF(BPR1_91 >0,1,0) + IF(BPR1_92 >0,1,0) + IF(BPR1_93 >0,1,0) + IF(BPR1_94 >0,1,0) + IF(BPR1_95 >0,1,0) + IF(BPR1_96 >0,1,0) + IF(BPR1_97 >0,1,0) + IF(BPR1_98 >0,1,0) + IF(BPR1_99 >0,1,0) + IF(BPR1_100 >0,1,0);
+    SELF.BP2 := IF(BPR2_1 >0,1,0) + IF(BPR2_2 >0,1,0) + IF(BPR2_3 >0,1,0) + IF(BPR2_4 >0,1,0) + IF(BPR2_5 >0,1,0) + IF(BPR2_6 >0,1,0) + IF(BPR2_7 >0,1,0) + IF(BPR2_8 >0,1,0) + IF(BPR2_9 >0,1,0) + IF(BPR2_10 >0,1,0) + IF(BPR2_11 >0,1,0) + IF(BPR2_12 >0,1,0) + IF(BPR2_13 >0,1,0) + IF(BPR2_14 >0,1,0) + IF(BPR2_15 >0,1,0) + IF(BPR2_16 >0,1,0) + IF(BPR2_17 >0,1,0) + IF(BPR2_18 >0,1,0) + IF(BPR2_19 >0,1,0) + IF(BPR2_20 >0,1,0) + IF(BPR2_21 >0,1,0) + IF(BPR2_22 >0,1,0) + IF(BPR2_23 >0,1,0) + IF(BPR2_24 >0,1,0) + IF(BPR2_25 >0,1,0) + IF(BPR2_26 >0,1,0) + IF(BPR2_27 >0,1,0) + IF(BPR2_28 >0,1,0) + IF(BPR2_29 >0,1,0) + IF(BPR2_30 >0,1,0) + IF(BPR2_31 >0,1,0) + IF(BPR2_32 >0,1,0) + IF(BPR2_33 >0,1,0) + IF(BPR2_34 >0,1,0) + IF(BPR2_35 >0,1,0) + IF(BPR2_36 >0,1,0) + IF(BPR2_37 >0,1,0) + IF(BPR2_38 >0,1,0) + IF(BPR2_39 >0,1,0) + IF(BPR2_40 >0,1,0) + IF(BPR2_41 >0,1,0) + IF(BPR2_42 >0,1,0) + IF(BPR2_43 >0,1,0) + IF(BPR2_44 >0,1,0) + IF(BPR2_45 >0,1,0) + IF(BPR2_46 >0,1,0) + IF(BPR2_47 >0,1,0) + IF(BPR2_48 >0,1,0) + IF(BPR2_49 >0,1,0) + IF(BPR2_50 >0,1,0) + IF(BPR2_51 >0,1,0) + IF(BPR2_52 >0,1,0) + IF(BPR2_53 >0,1,0) + IF(BPR2_54 >0,1,0) + IF(BPR2_55 >0,1,0) + IF(BPR2_56 >0,1,0) + IF(BPR2_57 >0,1,0) + IF(BPR2_58 >0,1,0) + IF(BPR2_59 >0,1,0) + IF(BPR2_60 >0,1,0) + IF(BPR2_61 >0,1,0) + IF(BPR2_62 >0,1,0) + IF(BPR2_63 >0,1,0) + IF(BPR2_64 >0,1,0) + IF(BPR2_65 >0,1,0) + IF(BPR2_66 >0,1,0) + IF(BPR2_67 >0,1,0) + IF(BPR2_68 >0,1,0) + IF(BPR2_69 >0,1,0) + IF(BPR2_70 >0,1,0) + IF(BPR2_71 >0,1,0) + IF(BPR2_72 >0,1,0) + IF(BPR2_73 >0,1,0) + IF(BPR2_74 >0,1,0) + IF(BPR2_75 >0,1,0) + IF(BPR2_76 >0,1,0) + IF(BPR2_77 >0,1,0) + IF(BPR2_78 >0,1,0) + IF(BPR2_79 >0,1,0) + IF(BPR2_80 >0,1,0) + IF(BPR2_81 >0,1,0) + IF(BPR2_82 >0,1,0) + IF(BPR2_83 >0,1,0) + IF(BPR2_84 >0,1,0) + IF(BPR2_85 >0,1,0) + IF(BPR2_86 >0,1,0) + IF(BPR2_87 >0,1,0) + IF(BPR2_88 >0,1,0) + IF(BPR2_89 >0,1,0) + IF(BPR2_90 >0,1,0) + IF(BPR2_91 >0,1,0) + IF(BPR2_92 >0,1,0) + IF(BPR2_93 >0,1,0) + IF(BPR2_94 >0,1,0) + IF(BPR2_95 >0,1,0) + IF(BPR2_96 >0,1,0) + IF(BPR2_97 >0,1,0) + IF(BPR2_98 >0,1,0) + IF(BPR2_99 >0,1,0) + IF(BPR2_100 >0,1,0) + IF(BPR2_101 >0,1,0) + IF(BPR2_102 >0,1,0) + IF(BPR2_103 >0,1,0) + IF(BPR2_104 >0,1,0) + IF(BPR2_105 >0,1,0) + IF(BPR2_106 >0,1,0) + IF(BPR2_107 >0,1,0) + IF(BPR2_108 >0,1,0) + IF(BPR2_109 >0,1,0) + IF(BPR2_110 >0,1,0) + IF(BPR2_111 >0,1,0) + IF(BPR2_112 >0,1,0) + IF(BPR2_113 >0,1,0) + IF(BPR2_114 >0,1,0) + IF(BPR2_115 >0,1,0) + IF(BPR2_116 >0,1,0) + IF(BPR2_117 >0,1,0) + IF(BPR2_118 >0,1,0) + IF(BPR2_119 >0,1,0) + IF(BPR2_120 >0,1,0) + IF(BPR2_121 >0,1,0) + IF(BPR2_122 >0,1,0) + IF(BPR2_123 >0,1,0) + IF(BPR2_124 >0,1,0) + IF(BPR2_125 >0,1,0) + IF(BPR2_126 >0,1,0) + IF(BPR2_127 >0,1,0) + IF(BPR2_128 >0,1,0) + IF(BPR2_129 >0,1,0) + IF(BPR2_130 >0,1,0) + IF(BPR2_131 >0,1,0) + IF(BPR2_132 >0,1,0) + IF(BPR2_133 >0,1,0) + IF(BPR2_134 >0,1,0) + IF(BPR2_135 >0,1,0) + IF(BPR2_136 >0,1,0) + IF(BPR2_137 >0,1,0) + IF(BPR2_138 >0,1,0) + IF(BPR2_139 >0,1,0) + IF(BPR2_140 >0,1,0) + IF(BPR2_141 >0,1,0) + IF(BPR2_142 >0,1,0) + IF(BPR2_143 >0,1,0) + IF(BPR2_144 >0,1,0) + IF(BPR2_145 >0,1,0) + IF(BPR2_146 >0,1,0) + IF(BPR2_147 >0,1,0) + IF(BPR2_148 >0,1,0) + IF(BPR2_149 >0,1,0) + IF(BPR2_150 >0,1,0) + IF(BPR2_151 >0,1,0) + IF(BPR2_152 >0,1,0) + IF(BPR2_153 >0,1,0) + IF(BPR2_154 >0,1,0) + IF(BPR2_155 >0,1,0) + IF(BPR2_156 >0,1,0) + IF(BPR2_157 >0,1,0) + IF(BPR2_158 >0,1,0) + IF(BPR2_159 >0,1,0) + IF(BPR2_160 >0,1,0) + IF(BPR2_161 >0,1,0) + IF(BPR2_162 >0,1,0) + IF(BPR2_163 >0,1,0) + IF(BPR2_164 >0,1,0) + IF(BPR2_165 >0,1,0) + IF(BPR2_166 >0,1,0) + IF(BPR2_167 >0,1,0) + IF(BPR2_168 >0,1,0) + IF(BPR2_169 >0,1,0) + IF(BPR2_170 >0,1,0) + IF(BPR2_171 >0,1,0) + IF(BPR2_172 >0,1,0) + IF(BPR2_173 >0,1,0) + IF(BPR2_174 >0,1,0) + IF(BPR2_175 >0,1,0) + IF(BPR2_176 >0,1,0) + IF(BPR2_177 >0,1,0) + IF(BPR2_178 >0,1,0) + IF(BPR2_179 >0,1,0) + IF(BPR2_180 >0,1,0) + IF(BPR2_181 >0,1,0) + IF(BPR2_182 >0,1,0) + IF(BPR2_183 >0,1,0) + IF(BPR2_184 >0,1,0) + IF(BPR2_185 >0,1,0) + IF(BPR2_186 >0,1,0) + IF(BPR2_187 >0,1,0) + IF(BPR2_188 >0,1,0) + IF(BPR2_189 >0,1,0) + IF(BPR2_190 >0,1,0) + IF(BPR2_191 >0,1,0) + IF(BPR2_192 >0,1,0) + IF(BPR2_193 >0,1,0) + IF(BPR2_194 >0,1,0) + IF(BPR2_195 >0,1,0) + IF(BPR2_196 >0,1,0) + IF(BPR2_197 >0,1,0) + IF(BPR2_198 >0,1,0) + IF(BPR2_199 >0,1,0) + IF(BPR2_200 >0,1,0) + IF(BPR2_201 >0,1,0) + IF(BPR2_202 >0,1,0) + IF(BPR2_203 >0,1,0) + IF(BPR2_204 >0,1,0) + IF(BPR2_205 >0,1,0) + IF(BPR2_206 >0,1,0) + IF(BPR2_207 >0,1,0) + IF(BPR2_208 >0,1,0) + IF(BPR2_209 >0,1,0) + IF(BPR2_210 >0,1,0) + IF(BPR2_211 >0,1,0) + IF(BPR2_212 >0,1,0) + IF(BPR2_213 >0,1,0) + IF(BPR2_214 >0,1,0) + IF(BPR2_215 >0,1,0) + IF(BPR2_216 >0,1,0) + IF(BPR2_217 >0,1,0) + IF(BPR2_218 >0,1,0) + IF(BPR2_219 >0,1,0) + IF(BPR2_220 >0,1,0) + IF(BPR2_221 >0,1,0) + IF(BPR2_222 >0,1,0) + IF(BPR2_223 >0,1,0) + IF(BPR2_224 >0,1,0) + IF(BPR2_225 >0,1,0) + IF(BPR2_226 >0,1,0) + IF(BPR2_227 >0,1,0) + IF(BPR2_228 >0,1,0) + IF(BPR2_229 >0,1,0) + IF(BPR2_230 >0,1,0) + IF(BPR2_231 >0,1,0) + IF(BPR2_232 >0,1,0) + IF(BPR2_233 >0,1,0) + IF(BPR2_234 >0,1,0) + IF(BPR2_235 >0,1,0) + IF(BPR2_236 >0,1,0) + IF(BPR2_237 >0,1,0) + IF(BPR2_238 >0,1,0) + IF(BPR2_239 >0,1,0) + IF(BPR2_240 >0,1,0) + IF(BPR2_241 >0,1,0) + IF(BPR2_242 >0,1,0) + IF(BPR2_243 >0,1,0) + IF(BPR2_244 >0,1,0) + IF(BPR2_245 >0,1,0) + IF(BPR2_246 >0,1,0) + IF(BPR2_247 >0,1,0) + IF(BPR2_248 >0,1,0) + IF(BPR2_249 >0,1,0) + IF(BPR2_250 >0,1,0) + IF(BPR2_251 >0,1,0) + IF(BPR2_252 >0,1,0) + IF(BPR2_253 >0,1,0) + IF(BPR2_254 >0,1,0) + IF(BPR2_255 >0,1,0) + IF(BPR2_256 >0,1,0) + IF(BPR2_257 >0,1,0) + IF(BPR2_258 >0,1,0) + IF(BPR2_259 >0,1,0) + IF(BPR2_260 >0,1,0) + IF(BPR2_261 >0,1,0) + IF(BPR2_262 >0,1,0) + IF(BPR2_263 >0,1,0) + IF(BPR2_264 >0,1,0) + IF(BPR2_265 >0,1,0) + IF(BPR2_266 >0,1,0) + IF(BPR2_267 >0,1,0) + IF(BPR2_268 >0,1,0) + IF(BPR2_269 >0,1,0) + IF(BPR2_270 >0,1,0) + IF(BPR2_271 >0,1,0) + IF(BPR2_272 >0,1,0) + IF(BPR2_273 >0,1,0) + IF(BPR2_274 >0,1,0) + IF(BPR2_275 >0,1,0) + IF(BPR2_276 >0,1,0) + IF(BPR2_277 >0,1,0) + IF(BPR2_278 >0,1,0) + IF(BPR2_279 >0,1,0) + IF(BPR2_280 >0,1,0) + IF(BPR2_281 >0,1,0) + IF(BPR2_282 >0,1,0) + IF(BPR2_283 >0,1,0) + IF(BPR2_284 >0,1,0) + IF(BPR2_285 >0,1,0) + IF(BPR2_286 >0,1,0) + IF(BPR2_287 >0,1,0) + IF(BPR2_288 >0,1,0) + IF(BPR2_289 >0,1,0) + IF(BPR2_290 >0,1,0) + IF(BPR2_291 >0,1,0) + IF(BPR2_292 >0,1,0) + IF(BPR2_293 >0,1,0) + IF(BPR2_294 >0,1,0) + IF(BPR2_295 >0,1,0) + IF(BPR2_296 >0,1,0) + IF(BPR2_297 >0,1,0) + IF(BPR2_298 >0,1,0) + IF(BPR2_299 >0,1,0) + IF(BPR2_300 >0,1,0) + IF(BPR2_301 >0,1,0) + IF(BPR2_302 >0,1,0) + IF(BPR2_303 >0,1,0) + IF(BPR2_304 >0,1,0) + IF(BPR2_305 >0,1,0) + IF(BPR2_306 >0,1,0) + IF(BPR2_307 >0,1,0) + IF(BPR2_308 >0,1,0) + IF(BPR2_309 >0,1,0) + IF(BPR2_310 >0,1,0) + IF(BPR2_311 >0,1,0) + IF(BPR2_312 >0,1,0) + IF(BPR2_313 >0,1,0) + IF(BPR2_314 >0,1,0) + IF(BPR2_315 >0,1,0) + IF(BPR2_316 >0,1,0) + IF(BPR2_317 >0,1,0) + IF(BPR2_318 >0,1,0) + IF(BPR2_319 >0,1,0) + IF(BPR2_320 >0,1,0) + IF(BPR2_321 >0,1,0) + IF(BPR2_322 >0,1,0) + IF(BPR2_323 >0,1,0) + IF(BPR2_324 >0,1,0) + IF(BPR2_325 >0,1,0) + IF(BPR2_326 >0,1,0) + IF(BPR2_327 >0,1,0) + IF(BPR2_328 >0,1,0) + IF(BPR2_329 >0,1,0) + IF(BPR2_330 >0,1,0) + IF(BPR2_331 >0,1,0) + IF(BPR2_332 >0,1,0) + IF(BPR2_333 >0,1,0) + IF(BPR2_334 >0,1,0) + IF(BPR2_335 >0,1,0) + IF(BPR2_336 >0,1,0) + IF(BPR2_337 >0,1,0) + IF(BPR2_338 >0,1,0) + IF(BPR2_339 >0,1,0) + IF(BPR2_340 >0,1,0) + IF(BPR2_341 >0,1,0) + IF(BPR2_342 >0,1,0) + IF(BPR2_343 >0,1,0) + IF(BPR2_344 >0,1,0) + IF(BPR2_345 >0,1,0) + IF(BPR2_346 >0,1,0) + IF(BPR2_347 >0,1,0) + IF(BPR2_348 >0,1,0) + IF(BPR2_349 >0,1,0) + IF(BPR2_350 >0,1,0) + IF(BPR2_351 >0,1,0) + IF(BPR2_352 >0,1,0) + IF(BPR2_353 >0,1,0) + IF(BPR2_354 >0,1,0) + IF(BPR2_355 >0,1,0) + IF(BPR2_356 >0,1,0) + IF(BPR2_357 >0,1,0) + IF(BPR2_358 >0,1,0) + IF(BPR2_359 >0,1,0) + IF(BPR2_360 >0,1,0) + IF(BPR2_361 >0,1,0) + IF(BPR2_362 >0,1,0) + IF(BPR2_363 >0,1,0) + IF(BPR2_364 >0,1,0) + IF(BPR2_365 >0,1,0) + IF(BPR2_366 >0,1,0) + IF(BPR2_367 >0,1,0) + IF(BPR2_368 >0,1,0) + IF(BPR2_369 >0,1,0) + IF(BPR2_370 >0,1,0) + IF(BPR2_371 >0,1,0) + IF(BPR2_372 >0,1,0) + IF(BPR2_373 >0,1,0) + IF(BPR2_374 >0,1,0) + IF(BPR2_375 >0,1,0) + IF(BPR2_376 >0,1,0) + IF(BPR2_377 >0,1,0) + IF(BPR2_378 >0,1,0) + IF(BPR2_379 >0,1,0) + IF(BPR2_380 >0,1,0) + IF(BPR2_381 >0,1,0) + IF(BPR2_382 >0,1,0) + IF(BPR2_383 >0,1,0) + IF(BPR2_384 >0,1,0) + IF(BPR2_385 >0,1,0) + IF(BPR2_386 >0,1,0) + IF(BPR2_387 >0,1,0) + IF(BPR2_388 >0,1,0) + IF(BPR2_389 >0,1,0) + IF(BPR2_390 >0,1,0) + IF(BPR2_391 >0,1,0) + IF(BPR2_392 >0,1,0) + IF(BPR2_393 >0,1,0) + IF(BPR2_394 >0,1,0) + IF(BPR2_395 >0,1,0) + IF(BPR2_396 >0,1,0) + IF(BPR2_397 >0,1,0) + IF(BPR2_398 >0,1,0) + IF(BPR2_399 >0,1,0) + IF(BPR2_400 >0,1,0) + IF(BPR2_401 >0,1,0) + IF(BPR2_402 >0,1,0) + IF(BPR2_403 >0,1,0) + IF(BPR2_404 >0,1,0) + IF(BPR2_405 >0,1,0) + IF(BPR2_406 >0,1,0) + IF(BPR2_407 >0,1,0) + IF(BPR2_408 >0,1,0) + IF(BPR2_409 >0,1,0) + IF(BPR2_410 >0,1,0) + IF(BPR2_411 >0,1,0) + IF(BPR2_412 >0,1,0) + IF(BPR2_413 >0,1,0) + IF(BPR2_414 >0,1,0) + IF(BPR2_415 >0,1,0) + IF(BPR2_416 >0,1,0) + IF(BPR2_417 >0,1,0) + IF(BPR2_418 >0,1,0) + IF(BPR2_419 >0,1,0) + IF(BPR2_420 >0,1,0) + IF(BPR2_421 >0,1,0) + IF(BPR2_422 >0,1,0) + IF(BPR2_423 >0,1,0) + IF(BPR2_424 >0,1,0) + IF(BPR2_425 >0,1,0) + IF(BPR2_426 >0,1,0) + IF(BPR2_427 >0,1,0) + IF(BPR2_428 >0,1,0) + IF(BPR2_429 >0,1,0) + IF(BPR2_430 >0,1,0) + IF(BPR2_431 >0,1,0) + IF(BPR2_432 >0,1,0) + IF(BPR2_433 >0,1,0) + IF(BPR2_434 >0,1,0) + IF(BPR2_435 >0,1,0) + IF(BPR2_436 >0,1,0) + IF(BPR2_437 >0,1,0) + IF(BPR2_438 >0,1,0) + IF(BPR2_439 >0,1,0) + IF(BPR2_440 >0,1,0) + IF(BPR2_441 >0,1,0) + IF(BPR2_442 >0,1,0) + IF(BPR2_443 >0,1,0) + IF(BPR2_444 >0,1,0) + IF(BPR2_445 >0,1,0) + IF(BPR2_446 >0,1,0) + IF(BPR2_447 >0,1,0) + IF(BPR2_448 >0,1,0) + IF(BPR2_449 >0,1,0) + IF(BPR2_450 >0,1,0) + IF(BPR2_451 >0,1,0) + IF(BPR2_452 >0,1,0) + IF(BPR2_453 >0,1,0) + IF(BPR2_454 >0,1,0) + IF(BPR2_455 >0,1,0) + IF(BPR2_456 >0,1,0) + IF(BPR2_457 >0,1,0) + IF(BPR2_458 >0,1,0) + IF(BPR2_459 >0,1,0) + IF(BPR2_460 >0,1,0) + IF(BPR2_461 >0,1,0) + IF(BPR2_462 >0,1,0) + IF(BPR2_463 >0,1,0) + IF(BPR2_464 >0,1,0) + IF(BPR2_465 >0,1,0) + IF(BPR2_466 >0,1,0) + IF(BPR2_467 >0,1,0) + IF(BPR2_468 >0,1,0) + IF(BPR2_469 >0,1,0) + IF(BPR2_470 >0,1,0) + IF(BPR2_471 >0,1,0) + IF(BPR2_472 >0,1,0) + IF(BPR2_473 >0,1,0) + IF(BPR2_474 >0,1,0) + IF(BPR2_475 >0,1,0) + IF(BPR2_476 >0,1,0) + IF(BPR2_477 >0,1,0) + IF(BPR2_478 >0,1,0) + IF(BPR2_479 >0,1,0) + IF(BPR2_480 >0,1,0) + IF(BPR2_481 >0,1,0) + IF(BPR2_482 >0,1,0) + IF(BPR2_483 >0,1,0) + IF(BPR2_484 >0,1,0) + IF(BPR2_485 >0,1,0) + IF(BPR2_486 >0,1,0) + IF(BPR2_487 >0,1,0) + IF(BPR2_488 >0,1,0) + IF(BPR2_489 >0,1,0) + IF(BPR2_490 >0,1,0) + IF(BPR2_491 >0,1,0) + IF(BPR2_492 >0,1,0) + IF(BPR2_493 >0,1,0) + IF(BPR2_494 >0,1,0) + IF(BPR2_495 >0,1,0) + IF(BPR2_496 >0,1,0) + IF(BPR2_497 >0,1,0) + IF(BPR2_498 >0,1,0) + IF(BPR2_499 >0,1,0) + IF(BPR2_500 >0,1,0) + IF(BPR2_501 >0,1,0) + IF(BPR2_502 >0,1,0) + IF(BPR2_503 >0,1,0) + IF(BPR2_504 >0,1,0) + IF(BPR2_505 >0,1,0) + IF(BPR2_506 >0,1,0) + IF(BPR2_507 >0,1,0) + IF(BPR2_508 >0,1,0) + IF(BPR2_509 >0,1,0) + IF(BPR2_510 >0,1,0) + IF(BPR2_511 >0,1,0) + IF(BPR2_512 >0,1,0) + IF(BPR2_513 >0,1,0) + IF(BPR2_514 >0,1,0) + IF(BPR2_515 >0,1,0) + IF(BPR2_516 >0,1,0) + IF(BPR2_517 >0,1,0) + IF(BPR2_518 >0,1,0) + IF(BPR2_519 >0,1,0) + IF(BPR2_520 >0,1,0) + IF(BPR2_521 >0,1,0) + IF(BPR2_522 >0,1,0) + IF(BPR2_523 >0,1,0) + IF(BPR2_524 >0,1,0) + IF(BPR2_525 >0,1,0);
+    SELF.BP3 := IF(BPR3_1 >0,1,0) + IF(BPR3_2 >0,1,0) + IF(BPR3_3 >0,1,0) + IF(BPR3_4 >0,1,0) + IF(BPR3_5 >0,1,0) + IF(BPR3_6 >0,1,0) + IF(BPR3_7 >0,1,0) + IF(BPR3_8 >0,1,0) + IF(BPR3_9 >0,1,0) + IF(BPR3_10 >0,1,0) + IF(BPR3_11 >0,1,0) + IF(BPR3_12 >0,1,0) + IF(BPR3_13 >0,1,0) + IF(BPR3_14 >0,1,0) + IF(BPR3_15 >0,1,0) + IF(BPR3_16 >0,1,0) + IF(BPR3_17 >0,1,0) + IF(BPR3_18 >0,1,0) + IF(BPR3_19 >0,1,0) + IF(BPR3_20 >0,1,0) + IF(BPR3_21 >0,1,0) + IF(BPR3_22 >0,1,0) + IF(BPR3_23 >0,1,0) + IF(BPR3_24 >0,1,0) + IF(BPR3_25 >0,1,0) + IF(BPR3_26 >0,1,0) + IF(BPR3_27 >0,1,0) + IF(BPR3_28 >0,1,0) + IF(BPR3_29 >0,1,0) + IF(BPR3_30 >0,1,0) + IF(BPR3_31 >0,1,0) + IF(BPR3_32 >0,1,0) + IF(BPR3_33 >0,1,0) + IF(BPR3_34 >0,1,0) + IF(BPR3_35 >0,1,0) + IF(BPR3_36 >0,1,0) + IF(BPR3_37 >0,1,0) + IF(BPR3_38 >0,1,0) + IF(BPR3_39 >0,1,0) + IF(BPR3_40 >0,1,0) + IF(BPR3_41 >0,1,0) + IF(BPR3_42 >0,1,0) + IF(BPR3_43 >0,1,0) + IF(BPR3_44 >0,1,0) + IF(BPR3_45 >0,1,0) + IF(BPR3_46 >0,1,0) + IF(BPR3_47 >0,1,0) + IF(BPR3_48 >0,1,0) + IF(BPR3_49 >0,1,0) + IF(BPR3_50 >0,1,0) + IF(BPR3_51 >0,1,0) + IF(BPR3_52 >0,1,0) + IF(BPR3_53 >0,1,0) + IF(BPR3_54 >0,1,0) + IF(BPR3_55 >0,1,0) + IF(BPR3_56 >0,1,0) + IF(BPR3_57 >0,1,0) + IF(BPR3_58 >0,1,0) + IF(BPR3_59 >0,1,0) + IF(BPR3_60 >0,1,0) + IF(BPR3_61 >0,1,0) + IF(BPR3_62 >0,1,0) + IF(BPR3_63 >0,1,0) + IF(BPR3_64 >0,1,0) + IF(BPR3_65 >0,1,0) + IF(BPR3_66 >0,1,0) + IF(BPR3_67 >0,1,0) + IF(BPR3_68 >0,1,0) + IF(BPR3_69 >0,1,0) + IF(BPR3_70 >0,1,0) + IF(BPR3_71 >0,1,0) + IF(BPR3_72 >0,1,0) + IF(BPR3_73 >0,1,0) + IF(BPR3_74 >0,1,0) + IF(BPR3_75 >0,1,0);
+    SELF.BPV1 := MAX(BPR1_1, BPR1_2, BPR1_3, BPR1_4, BPR1_5, BPR1_6, BPR1_7, BPR1_8, BPR1_9, BPR1_10, BPR1_11, BPR1_12, BPR1_13, BPR1_14, BPR1_15, BPR1_16, BPR1_17, BPR1_18, BPR1_19, BPR1_20, BPR1_21, BPR1_22, BPR1_23, BPR1_24, BPR1_25, BPR1_26, BPR1_27, BPR1_28, BPR1_29, BPR1_30, BPR1_31, BPR1_32, BPR1_33, BPR1_34, BPR1_35, BPR1_36, BPR1_37, BPR1_38, BPR1_39, BPR1_40, BPR1_41, BPR1_42, BPR1_43, BPR1_44, BPR1_45, BPR1_46, BPR1_47, BPR1_48, BPR1_49, BPR1_50, BPR1_51, BPR1_52, BPR1_53, BPR1_54, BPR1_55, BPR1_56, BPR1_57, BPR1_58, BPR1_59, BPR1_60, BPR1_61, BPR1_62, BPR1_63, BPR1_64, BPR1_65, BPR1_66, BPR1_67, BPR1_68, BPR1_69, BPR1_70, BPR1_71, BPR1_72, BPR1_73, BPR1_74, BPR1_75, BPR1_76, BPR1_77, BPR1_78, BPR1_79, BPR1_80, BPR1_81, BPR1_82, BPR1_83, BPR1_84, BPR1_85, BPR1_86, BPR1_87, BPR1_88, BPR1_89, BPR1_90, BPR1_91, BPR1_92, BPR1_93, BPR1_94, BPR1_95, BPR1_96, BPR1_97, BPR1_98, BPR1_99, BPR1_100);
+    SELF.BPV2 := MAX(BPR2_1, BPR2_2, BPR2_3, BPR2_4, BPR2_5, BPR2_6, BPR2_7, BPR2_8, BPR2_9, BPR2_10, BPR2_11, BPR2_12, BPR2_13, BPR2_14, BPR2_15, BPR2_16, BPR2_17, BPR2_18, BPR2_19, BPR2_20, BPR2_21, BPR2_22, BPR2_23, BPR2_24, BPR2_25, BPR2_26, BPR2_27, BPR2_28, BPR2_29, BPR2_30, BPR2_31, BPR2_32, BPR2_33, BPR2_34, BPR2_35, BPR2_36, BPR2_37, BPR2_38, BPR2_39, BPR2_40, BPR2_41, BPR2_42, BPR2_43, BPR2_44, BPR2_45, BPR2_46, BPR2_47, BPR2_48, BPR2_49, BPR2_50, BPR2_51, BPR2_52, BPR2_53, BPR2_54, BPR2_55, BPR2_56, BPR2_57, BPR2_58, BPR2_59, BPR2_60, BPR2_61, BPR2_62, BPR2_63, BPR2_64, BPR2_65, BPR2_66, BPR2_67, BPR2_68, BPR2_69, BPR2_70, BPR2_71, BPR2_72, BPR2_73, BPR2_74, BPR2_75, BPR2_76, BPR2_77, BPR2_78, BPR2_79, BPR2_80, BPR2_81, BPR2_82, BPR2_83, BPR2_84, BPR2_85, BPR2_86, BPR2_87, BPR2_88, BPR2_89, BPR2_90, BPR2_91, BPR2_92, BPR2_93, BPR2_94, BPR2_95, BPR2_96, BPR2_97, BPR2_98, BPR2_99, BPR2_100, BPR2_101, BPR2_102, BPR2_103, BPR2_104, BPR2_105, BPR2_106, BPR2_107, BPR2_108, BPR2_109, BPR2_110, BPR2_111, BPR2_112, BPR2_113, BPR2_114, BPR2_115, BPR2_116, BPR2_117, BPR2_118, BPR2_119, BPR2_120, BPR2_121, BPR2_122, BPR2_123, BPR2_124, BPR2_125, BPR2_126, BPR2_127, BPR2_128, BPR2_129, BPR2_130, BPR2_131, BPR2_132, BPR2_133, BPR2_134, BPR2_135, BPR2_136, BPR2_137, BPR2_138, BPR2_139, BPR2_140, BPR2_141, BPR2_142, BPR2_143, BPR2_144, BPR2_145, BPR2_146, BPR2_147, BPR2_148, BPR2_149, BPR2_150, BPR2_151, BPR2_152, BPR2_153, BPR2_154, BPR2_155, BPR2_156, BPR2_157, BPR2_158, BPR2_159, BPR2_160, BPR2_161, BPR2_162, BPR2_163, BPR2_164, BPR2_165, BPR2_166, BPR2_167, BPR2_168, BPR2_169, BPR2_170, BPR2_171, BPR2_172, BPR2_173, BPR2_174, BPR2_175, BPR2_176, BPR2_177, BPR2_178, BPR2_179, BPR2_180, BPR2_181, BPR2_182, BPR2_183, BPR2_184, BPR2_185, BPR2_186, BPR2_187, BPR2_188, BPR2_189, BPR2_190, BPR2_191, BPR2_192, BPR2_193, BPR2_194, BPR2_195, BPR2_196, BPR2_197, BPR2_198, BPR2_199, BPR2_200, BPR2_201, BPR2_202, BPR2_203, BPR2_204, BPR2_205, BPR2_206, BPR2_207, BPR2_208, BPR2_209, BPR2_210, BPR2_211, BPR2_212, BPR2_213, BPR2_214, BPR2_215, BPR2_216, BPR2_217, BPR2_218, BPR2_219, BPR2_220, BPR2_221, BPR2_222, BPR2_223, BPR2_224, BPR2_225, BPR2_226, BPR2_227, BPR2_228, BPR2_229, BPR2_230, BPR2_231, BPR2_232, BPR2_233, BPR2_234, BPR2_235, BPR2_236, BPR2_237, BPR2_238, BPR2_239, BPR2_240, BPR2_241, BPR2_242, BPR2_243, BPR2_244, BPR2_245, BPR2_246, BPR2_247, BPR2_248, BPR2_249, BPR2_250, BPR2_251, BPR2_252, BPR2_253, BPR2_254, BPR2_255, BPR2_256, BPR2_257, BPR2_258, BPR2_259, BPR2_260, BPR2_261, BPR2_262, BPR2_263, BPR2_264, BPR2_265, BPR2_266, BPR2_267, BPR2_268, BPR2_269, BPR2_270, BPR2_271, BPR2_272, BPR2_273, BPR2_274, BPR2_275, BPR2_276, BPR2_277, BPR2_278, BPR2_279, BPR2_280, BPR2_281, BPR2_282, BPR2_283, BPR2_284, BPR2_285, BPR2_286, BPR2_287, BPR2_288, BPR2_289, BPR2_290, BPR2_291, BPR2_292, BPR2_293, BPR2_294, BPR2_295, BPR2_296, BPR2_297, BPR2_298, BPR2_299, BPR2_300, BPR2_301, BPR2_302, BPR2_303, BPR2_304, BPR2_305, BPR2_306, BPR2_307, BPR2_308, BPR2_309, BPR2_310, BPR2_311, BPR2_312, BPR2_313, BPR2_314, BPR2_315, BPR2_316, BPR2_317, BPR2_318, BPR2_319, BPR2_320, BPR2_321, BPR2_322, BPR2_323, BPR2_324, BPR2_325, BPR2_326, BPR2_327, BPR2_328, BPR2_329, BPR2_330, BPR2_331, BPR2_332, BPR2_333, BPR2_334, BPR2_335, BPR2_336, BPR2_337, BPR2_338, BPR2_339, BPR2_340, BPR2_341, BPR2_342, BPR2_343, BPR2_344, BPR2_345, BPR2_346, BPR2_347, BPR2_348, BPR2_349, BPR2_350, BPR2_351, BPR2_352, BPR2_353, BPR2_354, BPR2_355, BPR2_356, BPR2_357, BPR2_358, BPR2_359, BPR2_360, BPR2_361, BPR2_362, BPR2_363, BPR2_364, BPR2_365, BPR2_366, BPR2_367, BPR2_368, BPR2_369, BPR2_370, BPR2_371, BPR2_372, BPR2_373, BPR2_374, BPR2_375, BPR2_376, BPR2_377, BPR2_378, BPR2_379, BPR2_380, BPR2_381, BPR2_382, BPR2_383, BPR2_384, BPR2_385, BPR2_386, BPR2_387, BPR2_388, BPR2_389, BPR2_390, BPR2_391, BPR2_392, BPR2_393, BPR2_394, BPR2_395, BPR2_396, BPR2_397, BPR2_398, BPR2_399, BPR2_400, BPR2_401, BPR2_402, BPR2_403, BPR2_404, BPR2_405, BPR2_406, BPR2_407, BPR2_408, BPR2_409, BPR2_410, BPR2_411, BPR2_412, BPR2_413, BPR2_414, BPR2_415, BPR2_416, BPR2_417, BPR2_418, BPR2_419, BPR2_420, BPR2_421, BPR2_422, BPR2_423, BPR2_424, BPR2_425, BPR2_426, BPR2_427, BPR2_428, BPR2_429, BPR2_430, BPR2_431, BPR2_432, BPR2_433, BPR2_434, BPR2_435, BPR2_436, BPR2_437, BPR2_438, BPR2_439, BPR2_440, BPR2_441, BPR2_442, BPR2_443, BPR2_444, BPR2_445, BPR2_446, BPR2_447, BPR2_448, BPR2_449, BPR2_450, BPR2_451, BPR2_452, BPR2_453, BPR2_454, BPR2_455, BPR2_456, BPR2_457, BPR2_458, BPR2_459, BPR2_460, BPR2_461, BPR2_462, BPR2_463, BPR2_464, BPR2_465, BPR2_466, BPR2_467, BPR2_468, BPR2_469, BPR2_470, BPR2_471, BPR2_472, BPR2_473, BPR2_474, BPR2_475, BPR2_476, BPR2_477, BPR2_478, BPR2_479, BPR2_480, BPR2_481, BPR2_482, BPR2_483, BPR2_484, BPR2_485, BPR2_486, BPR2_487, BPR2_488, BPR2_489, BPR2_490, BPR2_491, BPR2_492, BPR2_493, BPR2_494, BPR2_495, BPR2_496, BPR2_497, BPR2_498, BPR2_499, BPR2_500, BPR2_501, BPR2_502, BPR2_503, BPR2_504, BPR2_505, BPR2_506, BPR2_507, BPR2_508, BPR2_509, BPR2_510, BPR2_511, BPR2_512, BPR2_513, BPR2_514, BPR2_515, BPR2_516, BPR2_517, BPR2_518, BPR2_519, BPR2_520, BPR2_521, BPR2_522, BPR2_523, BPR2_524, BPR2_525);
+    SELF.BPV3 := MAX(BPR3_1, BPR3_2, BPR3_3, BPR3_4, BPR3_5, BPR3_6, BPR3_7, BPR3_8, BPR3_9, BPR3_10, BPR3_11, BPR3_12, BPR3_13, BPR3_14, BPR3_15, BPR3_16, BPR3_17, BPR3_18, BPR3_19, BPR3_20, BPR3_21, BPR3_22, BPR3_23, BPR3_24, BPR3_25, BPR3_26, BPR3_27, BPR3_28, BPR3_29, BPR3_30, BPR3_31, BPR3_32, BPR3_33, BPR3_34, BPR3_35, BPR3_36, BPR3_37, BPR3_38, BPR3_39, BPR3_40, BPR3_41, BPR3_42, BPR3_43, BPR3_44, BPR3_45, BPR3_46, BPR3_47, BPR3_48, BPR3_49, BPR3_50, BPR3_51, BPR3_52, BPR3_53, BPR3_54, BPR3_55, BPR3_56, BPR3_57, BPR3_58, BPR3_59, BPR3_60, BPR3_61, BPR3_62, BPR3_63, BPR3_64, BPR3_65, BPR3_66, BPR3_67, BPR3_68, BPR3_69, BPR3_70, BPR3_71, BPR3_72, BPR3_73, BPR3_74, BPR3_75);
+    SELF := L;
+	END;
+result := PROJECT(ds, doXform(LEFT));
+RETURN result;
+ENDMACRO;
+
+EXPORT getSeTC_RiskDrivers(ds) := FUNCTIONMACRO 
+   Models.Layouts_Healthcare_Core.RiskDrivers_Normalized_Attributes_Layout NormIt(TYPEOF(RECORDOF(ds)) L, INTEGER C) := TRANSFORM
+      SELF := L;
+      SELF.Raw_Score := (REAL8)L.SeTC_Raw_Score;
+      //Using the model input with raw score ds layout.
+      SELF.AttributeValue := CHOOSE(C,
+      (REAL8) L.seq,
+      (REAL8) L.AcctNo,
+      (REAL8) L.DOB,
+      (REAL8) L.LexID,
+      (REAL8) L.ST,
+      (REAL8) L.AGE_IN_YEARS,
+      (REAL8) L.FEMALE,
+      (REAL8) L.AgeOldestRecord,
+      (REAL8) L.SubjectSSNCount,
+      (REAL8) L.SrcsConfirmIDAddrCount,
+      (REAL8) L.SubjectAddrCount,
+      (REAL8) L.SSNAddrCount,
+      (REAL8) L.InputAddrPhoneCount,
+      (REAL8) L.SubjectLastNameCount,
+      (REAL8) L.LastNameChangeAge,
+      (REAL8) L.SFDUAddrIdentitiesCount,
+      (REAL8) L.SFDUAddrIdentitiesCount_12,
+      (REAL8) L.SFDUAddrIdentitiesCount_24,
+      (REAL8) L.SFDUAddrSSNCount,
+      (REAL8) L.SSNLowIssueAge,
+      (REAL8) L.SSNHighIssueAge,
+      (REAL8) L.SSNIssueState,
+      (REAL8) L.RelativesCount,
+      (REAL8) L.RelativesPropOwnedTaxTotal,
+      (REAL8) L.InputAddrAgeOldestRecord,
+      (REAL8) L.InputAddrLenOfRes,
+      (REAL8) L.InputAddrAgeLastSale,
+      (REAL8) L.InputAddrTaxValue,
+      (REAL8) L.InputAddrTaxMarketValue,
+      (REAL8) L.InputAddrMedianIncome,
+      (REAL8) L.InputAddrMedianValue,
+      (REAL8) L.InputAddrMurderIndex,
+      (REAL8) L.InputAddrCarTheftIndex,
+      (REAL8) L.InputAddrBurglaryIndex,
+      (REAL8) L.InputAddrCrimeIndex,
+      (REAL8) L.InputAddrMobilityIndex,
+      (REAL8) L.InputAddrVacantPropCount,
+      (REAL8) L.InputAddrBusinessCount,
+      (REAL8) L.InputAddrSingleFamilyCount,
+      (REAL8) L.InputAddrMultiFamilyCount,
+      (REAL8) L.CurrAddrAgeOldestRecord,
+      (REAL8) L.CurrAddrLenOfRes,
+      (REAL8) L.CurrAddrAgeLastSale,
+      (REAL8) L.CurrAddrTaxMarketValue,
+      (REAL8) L.CurrAddrTractIndex,
+      (REAL8) L.CurrAddrMedianIncome,
+      (REAL8) L.CurrAddrMedianValue,
+      (REAL8) L.CurrAddrMurderIndex,
+      (REAL8) L.CurrAddrCarTheftIndex,
+      (REAL8) L.CurrAddrBurglaryIndex,
+      (REAL8) L.CurrAddrBurglaryIndex_12,
+      (REAL8) L.CurrAddrBurglaryIndex_24,
+      (REAL8) L.CurrAddrCrimeIndex,
+      (REAL8) L.PrevAddrAgeOldestRecord,
+      (REAL8) L.PrevAddrAgeNewestRecord,
+      (REAL8) L.PrevAddrLenOfRes,
+      (REAL8) L.PrevAddrAgeLastSale,
+      (REAL8) L.PrevAddrMedianIncome,
+      (REAL8) L.PrevAddrMedianValue,
+      (REAL8) L.PrevAddrMurderIndex,
+      (REAL8) L.PrevAddrCarTheftIndex,
+      (REAL8) L.PrevAddrBurglaryIndex,
+      (REAL8) L.PrevAddrCrimeIndex,
+      (REAL8) L.AddrMostRecentDistance,
+      (REAL8) L.AddrMostRecentMoveAge,
+      (REAL8) L.AddrMostRecentIncomeDiff,
+      (REAL8) L.AddrMostRecentValueDIff,
+      (REAL8) L.AddrMostRecentCrimeDiff,
+      (REAL8) L.AddrRecentEconTrajectory,
+      (REAL8) L.EstimatedAnnualIncome,
+      (REAL8) L.EstimatedAnnualIncome_12,
+      (REAL8) L.EstimatedAnnualIncome_24,
+      (REAL8) L.PropAgeOldestPurchase,
+      (REAL8) L.PropAgeNewestPurchase,
+      (REAL8) L.BusinessInputAddrCount,
+      (REAL8) L.DerogSeverityIndex,
+      (REAL8) L.DerogCount,
+      (REAL8) L.DerogAge,
+      (REAL8) L.FelonyAge,
+      (REAL8) L.LienFiledAge,
+      (REAL8) L.LienReleasedAge,
+      (REAL8) L.BankruptcyAge,
+      (REAL8) L.AccidentCount,
+      (REAL8) L.AccidentAge,
+      (REAL8) L.NonDerogCount,
+      (REAL8) L.VoterRegistrationRecord,
+      (REAL8) L.PRSearchLocateCount,
+      (REAL8) L.PRSearchLocateCount12,
+      (REAL8) L.PRSearchLocateCount24,
+      (REAL8) L.PRSearchOtherCount,
+      (REAL8) L.PhoneEDAAgeOldestRecord,
+      (REAL8) L.PhoneEDAAgeNewestRecord,
+      (REAL8) L.PhoneOtherAgeOldestRecord,
+      (REAL8) L.PhoneOtherAgeNewestRecord,
+      (REAL8) L.InputAddrSICCode,
+      (REAL8) L.InputAddrErrorCode,
+      (REAL8) L.InputAddrHighRisk,
+      (REAL8) L.IDVerAddressAssocCount,
+      (REAL8) L.SourceOrderSourceCount,
+      (REAL8) L.SourceOrderAgeLastOrder,
+      (REAL8) L.CorrelationRiskLevel,
+      (REAL8) L.DivSSNAddrMSourceCount,
+      (REAL8) L.DivAddrIdentityCount,
+      (REAL8) L.DivAddrIdentityMSourceCount,
+      (REAL8) L.DivAddrSSNCount,
+      (REAL8) L.DivAddrSSNMSourceCount,
+      (REAL8) L.SearchSSNSearchCount,
+      (REAL8) L.SearchAddrSearchCount,
+      (REAL8) L.v1_ProspectTimeOnRecord,
+      (REAL8) L.v1_ProspectTimeLastUpdate,
+      (REAL8) L.v1_ProspectAge,
+      (REAL8) L.v1_ProspectEstimatedIncomeRange,
+      (REAL8) L.v1_LifeEvTimeLastMove,
+      (REAL8) L.v1_LifeEvTimeFirstAssetPurchase,
+      (REAL8) L.v1_LifeEvTimeLastAssetPurchase,
+      (REAL8) L.v1_ResInputBusinessCnt,
+      (REAL8) L.v1_CrtRecCnt,
+      (REAL8) L.v1_CrtRecTimeNewest,
+      (REAL8) L.v1_CrtRecFelonyTimeNewest,
+      (REAL8) L.v1_CrtRecMsdmeanCnt,
+      (REAL8) L.v1_CrtRecMsdmeanTimeNewest,
+      (REAL8) L.v1_CrtRecLienJudgCnt,
+      (REAL8) L.v1_CrtRecLienJudgTimeNewest,
+      (REAL8) L.v1_CrtRecLienJudgAmtTtl,
+      (REAL8) L.v1_CrtRecBkrptTimeNewest,
+      (REAL8) L.v1_HHEstimatedIncomeRange,
+      (REAL8) L.v1_RaAMiddleAgeMmbrCnt,
+      (REAL8) L.v1_RaAMmbrCnt,
+      (REAL8) L.v1_RaAPropOwnerAVMHighest,
+      (REAL8) L.v1_RaAPropOwnerAVMMed,
+      (REAL8) L.v1_RaACrtRecMmbrCnt,
+      (REAL8) L.v1_RaACrtRecMsdmeanMmbrCnt,
+      (REAL8) L.v1_RaACrtRecEvictionMmbrCnt,
+      (REAL8) L.v1_RaACrtRecLienJudgMmbrCnt,
+      (REAL8) L.P_EstimatedHHIncomePerCapita,
+      (REAL8) L.PropTaxPerRelative,
+      (REAL8) L.AG_Pred_10K,
+      (REAL8) L.AVGSTATECOST,
+      (REAL8) L.P2,
+      (REAL8) L.PV2,
+      (REAL8) L.BP2,
+      (REAL8) L.BPV2,
+      (REAL8) L.Payor_LOB,
+      (REAL8) L.AG_Pred_10K_LOB,
+      (REAL8) L.AG_Pred_10K_LOB_EXT,
+      (REAL8) L.EstIncome0_2_Pcnt,
+      (REAL8) L.BP1,
+      (REAL8) L.BPV1,
+      (REAL8) L.BP3,
+      (REAL8) L.SeTCModelUsed,
+      (REAL8) L.isSeTCInvalidLOB,
+      (REAL8) L.TransactionID,
+      (REAL8) L.do_Model1,
+      (REAL8) L.SeTC_Raw_Score,
+      (REAL8) L.SeTC_Score
+      );
+      SELF.AttributeName := CHOOSE(C,
+      'seq',
+      'AcctNo',
+      'DOB',
+      'LexID',
+      'ST',
+      'AGE_IN_YEARS',
+      'FEMALE',
+      'AgeOldestRecord',
+      'SubjectSSNCount',
+      'SrcsConfirmIDAddrCount',
+      'SubjectAddrCount',
+      'SSNAddrCount',
+      'InputAddrPhoneCount',
+      'SubjectLastNameCount',
+      'LastNameChangeAge',
+      'SFDUAddrIdentitiesCount',
+      'SFDUAddrIdentitiesCount_12',
+      'SFDUAddrIdentitiesCount_24',
+      'SFDUAddrSSNCount',
+      'SSNLowIssueAge',
+      'SSNHighIssueAge',
+      'SSNIssueState',
+      'RelativesCount',
+      'RelativesPropOwnedTaxTotal',
+      'InputAddrAgeOldestRecord',
+      'InputAddrLenOfRes',
+      'InputAddrAgeLastSale',
+      'InputAddrTaxValue',
+      'InputAddrTaxMarketValue',
+      'InputAddrMedianIncome',
+      'InputAddrMedianValue',
+      'InputAddrMurderIndex',
+      'InputAddrCarTheftIndex',
+      'InputAddrBurglaryIndex',
+      'InputAddrCrimeIndex',
+      'InputAddrMobilityIndex',
+      'InputAddrVacantPropCount',
+      'InputAddrBusinessCount',
+      'InputAddrSingleFamilyCount',
+      'InputAddrMultiFamilyCount',
+      'CurrAddrAgeOldestRecord',
+      'CurrAddrLenOfRes',
+      'CurrAddrAgeLastSale',
+      'CurrAddrTaxMarketValue',
+      'CurrAddrTractIndex',
+      'CurrAddrMedianIncome',
+      'CurrAddrMedianValue',
+      'CurrAddrMurderIndex',
+      'CurrAddrCarTheftIndex',
+      'CurrAddrBurglaryIndex',
+      'CurrAddrBurglaryIndex_12',
+      'CurrAddrBurglaryIndex_24',
+      'CurrAddrCrimeIndex',
+      'PrevAddrAgeOldestRecord',
+      'PrevAddrAgeNewestRecord',
+      'PrevAddrLenOfRes',
+      'PrevAddrAgeLastSale',
+      'PrevAddrMedianIncome',
+      'PrevAddrMedianValue',
+      'PrevAddrMurderIndex',
+      'PrevAddrCarTheftIndex',
+      'PrevAddrBurglaryIndex',
+      'PrevAddrCrimeIndex',
+      'AddrMostRecentDistance',
+      'AddrMostRecentMoveAge',
+      'AddrMostRecentIncomeDiff',
+      'AddrMostRecentValueDIff',
+      'AddrMostRecentCrimeDiff',
+      'AddrRecentEconTrajectory',
+      'EstimatedAnnualIncome',
+      'EstimatedAnnualIncome_12',
+      'EstimatedAnnualIncome_24',
+      'PropAgeOldestPurchase',
+      'PropAgeNewestPurchase',
+      'BusinessInputAddrCount',
+      'DerogSeverityIndex',
+      'DerogCount',
+      'DerogAge',
+      'FelonyAge',
+      'LienFiledAge',
+      'LienReleasedAge',
+      'BankruptcyAge',
+      'AccidentCount',
+      'AccidentAge',
+      'NonDerogCount',
+      'VoterRegistrationRecord',
+      'PRSearchLocateCount',
+      'PRSearchLocateCount12',
+      'PRSearchLocateCount24',
+      'PRSearchOtherCount',
+      'PhoneEDAAgeOldestRecord',
+      'PhoneEDAAgeNewestRecord',
+      'PhoneOtherAgeOldestRecord',
+      'PhoneOtherAgeNewestRecord',
+      'InputAddrSICCode',
+      'InputAddrErrorCode',
+      'InputAddrHighRisk',
+      'IDVerAddressAssocCount',
+      'SourceOrderSourceCount',
+      'SourceOrderAgeLastOrder',
+      'CorrelationRiskLevel',
+      'DivSSNAddrMSourceCount',
+      'DivAddrIdentityCount',
+      'DivAddrIdentityMSourceCount',
+      'DivAddrSSNCount',
+      'DivAddrSSNMSourceCount',
+      'SearchSSNSearchCount',
+      'SearchAddrSearchCount',
+      'v1_ProspectTimeOnRecord',
+      'v1_ProspectTimeLastUpdate',
+      'v1_ProspectAge',
+      'v1_ProspectEstimatedIncomeRange',
+      'v1_LifeEvTimeLastMove',
+      'v1_LifeEvTimeFirstAssetPurchase',
+      'v1_LifeEvTimeLastAssetPurchase',
+      'v1_ResInputBusinessCnt',
+      'v1_CrtRecCnt',
+      'v1_CrtRecTimeNewest',
+      'v1_CrtRecFelonyTimeNewest',
+      'v1_CrtRecMsdmeanCnt',
+      'v1_CrtRecMsdmeanTimeNewest',
+      'v1_CrtRecLienJudgCnt',
+      'v1_CrtRecLienJudgTimeNewest',
+      'v1_CrtRecLienJudgAmtTtl',
+      'v1_CrtRecBkrptTimeNewest',
+      'v1_HHEstimatedIncomeRange',
+      'v1_RaAMiddleAgeMmbrCnt',
+      'v1_RaAMmbrCnt',
+      'v1_RaAPropOwnerAVMHighest',
+      'v1_RaAPropOwnerAVMMed',
+      'v1_RaACrtRecMmbrCnt',
+      'v1_RaACrtRecMsdmeanMmbrCnt',
+      'v1_RaACrtRecEvictionMmbrCnt',
+      'v1_RaACrtRecLienJudgMmbrCnt',
+      'P_EstimatedHHIncomePerCapita',
+      'PropTaxPerRelative',
+      'AG_Pred_10K',
+      'AVGSTATECOST',
+      'P2',
+      'PV2',
+      'BP2',
+      'BPV2',
+      'Payor_LOB',
+      'AG_Pred_10K_LOB',
+      'AG_Pred_10K_LOB_EXT',
+      'EstIncome0_2_Pcnt',
+      'BP1',
+      'BPV1',
+      'BP3',
+      'SeTCModelUsed',
+      'isSeTCInvalidLOB',
+      'TransactionID',
+      'do_Model1',
+      'SeTC_Raw_Score',
+      'SeTC_Score'
+      );
+   END;
+      Normalized_SeTC_Attributes_ZERO_Model := NORMALIZE(ds(SeTCModelUsed=0), 155,NormIt(LEFT, COUNTER));
+      Normalized_SeTC_Attributes_LOB_Model := NORMALIZE(ds(SeTCModelUsed=1), 155,NormIt(LEFT, COUNTER));
+      Normalized_SeTC_Attributes_LOB_EXT_Model := NORMALIZE(ds(SeTCModelUsed=2), 155,NormIt(LEFT, COUNTER));
+   // OUTPUT(Normalized_SeTC_Attributes, NAMED('Normalized_SeTC_Attributes'));
+
+   Models.Layouts_Healthcare_Core.RiskDrivers_Attributes_Weight_Layout ComputeAttributeWeights(Normalized_SeTC_Attributes_ZERO_Model L, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SETC_V3_ZERO_COEFFICIENTS_DS R) := TRANSFORM
+         SELF.seq := L.seq;
+         SELF.Raw_Score := L.Raw_Score;
+         SELF.CATEGORY := R.CATEGORY;
+         SELF.RD_CATEGORY := R.RD_CATEGORY;
+         SELF.AttributeWeight := If(L.Raw_Score>= R.START_GT_EQ AND L.Raw_Score< R.STOP_LT,  (REAL8)L.AttributeValue * R.COEFFICIENT,0);
+         SELF := L;
+         SELF := R;
+   END;
+
+   AttributeWeight_DS_ZERO := JOIN(Normalized_SeTC_Attributes_ZERO_Model, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SETC_V3_ZERO_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   AttributeWeight_DS_LOB := JOIN(Normalized_SeTC_Attributes_LOB_Model, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SETC_V3_LOB_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   AttributeWeight_DS_LOB_EXT := JOIN(Normalized_SeTC_Attributes_LOB_EXT_Model, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SETC_V3_LOB_EXT_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   AttributeWeight_DS := AttributeWeight_DS_ZERO + AttributeWeight_DS_LOB + AttributeWeight_DS_LOB_EXT;
+   // OUTPUT(AttributeWeight_DS, NAMED('AttributeWeight_DS'));
+   TABLE_DS := TABLE(AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY);
+
+   SORTED_HI := SORT(GROUP(SORT(TABLE_DS, seq), seq), -SumOfWeights);
+
+   SORTED_LO := SORT(GROUP(SORT(TABLE_DS, seq), seq), SumOfWeights);
+
+   Sorted_Ranked_layout:= RECORD
+      TABLE_DS;
+      Integer _Rank;
+   END;
+
+   Sorted_Ranked_layout AddRank(SORTED_HI L, INTEGER C=1):= TRANSFORM
+      SELF._Rank:= C;
+      SELF:= L;
+   END;
+
+   HI_Rank_Added:= PROJECT(SORTED_HI, AddRank(LEFT, COUNTER));
+   // OUTPUT(HI_Rank_Added, NAMED('HI_Rank_Added'));
+   LO_Rank_Added:= PROJECT(SORTED_LO, AddRank(LEFT, COUNTER));
+   // OUTPUT(LO_Rank_Added, NAMED('LO_Rank_Added'));
+
+   HI_Ranked_Filtered := HI_Rank_Added(_Rank < 4);
+
+   LO_Ranked_Filtered := LO_Rank_Added(_Rank < 4);
+
+   Models.Layouts_Healthcare_Core.SeTC_Risk_Drivers_Only_Layout CreateEmpty_SeTC_Risk_Drivers(ds L):=  TRANSFORM
+		string10 TC_Driver_Hi1 := 'N/A';
+		string30 TC_Driver_Hi1_value:= 'N/A';
+		string10 TC_Driver_Hi2 := 'N/A';
+		string30 TC_Driver_Hi2_value := 'N/A';
+		string10 TC_Driver_Hi3 := 'N/A';
+		string30 TC_Driver_Hi3_value := 'N/A';
+		string10 TC_Driver_Lo1 := 'N/A';
+		string30 TC_Driver_Lo1_value := 'N/A';
+		string10 TC_Driver_Lo2 := 'N/A';
+		string30 TC_Driver_Lo2_value := 'N/A';
+		string10 TC_Driver_Lo3 := 'N/A';
+		string30 TC_Driver_Lo3_value := 'N/A';
+      SELF.seq := L.seq;
+      SELF := L;
+   END;
+
+   Risk_Drivers_DS := PROJECT(ds, CreateEmpty_SeTC_Risk_Drivers(LEFT));
+
+   Models.Layouts_Healthcare_Core.SeTC_Risk_Drivers_Only_Layout Denorm_RD_HI(Risk_Drivers_DS L, HI_Ranked_Filtered R) := TRANSFORM
+      SELF.TC_Driver_Hi1 := IF(R._Rank = 1, R.RD_CATEGORY, L.TC_Driver_Hi1);
+      SELF.TC_Driver_Hi2 := IF(R._Rank = 2, R.RD_CATEGORY, L.TC_Driver_Hi2);
+      SELF.TC_Driver_Hi3 := IF(R._Rank = 3, R.RD_CATEGORY, L.TC_Driver_Hi3);
+      SELF.TC_Driver_Hi1_value := IF(R._Rank = 1, (string)R.SumOfWeights, L.TC_Driver_Hi1_value);
+      SELF.TC_Driver_Hi2_value := IF(R._Rank = 2, (string)R.SumOfWeights, L.TC_Driver_Hi2_value);
+      SELF.TC_Driver_Hi3_value := IF(R._Rank = 3, (string)R.SumOfWeights, L.TC_Driver_Hi3_value);
+      SELF := L;
+   END;
+
+   Models.Layouts_Healthcare_Core.SeTC_Risk_Drivers_Only_Layout Denorm_RD_LO(Risk_Drivers_DS L, LO_Ranked_Filtered R) := TRANSFORM
+      SELF.TC_Driver_Lo1 := IF(R._Rank = 1, R.RD_CATEGORY, L.TC_Driver_Lo1);
+      SELF.TC_Driver_Lo2 := IF(R._Rank = 2, R.RD_CATEGORY, L.TC_Driver_Lo2);
+      SELF.TC_Driver_Lo3 := IF(R._Rank = 3, R.RD_CATEGORY, L.TC_Driver_Lo3);
+      SELF.TC_Driver_Lo1_value := IF(R._Rank = 1, (string)R.SumOfWeights, L.TC_Driver_Lo1_value);
+      SELF.TC_Driver_Lo2_value := IF(R._Rank = 2, (string)R.SumOfWeights, L.TC_Driver_Lo2_value);
+      SELF.TC_Driver_Lo3_value := IF(R._Rank = 3, (string)R.SumOfWeights, L.TC_Driver_Lo3_value);
+      SELF := L;
+      SELF := L;
+   END;
+
+   Risk_Drivers_DS_HI := DENORMALIZE(Risk_Drivers_DS, HI_Ranked_Filtered,
+                                       LEFT.seq = RIGHT.seq,
+                                       Denorm_RD_HI(LEFT, RIGHT));
+
+   Risk_Drivers_DS_HI_LO := DENORMALIZE(Risk_Drivers_DS_HI, LO_Ranked_Filtered,
+                                       LEFT.seq = RIGHT.seq,
+                                       Denorm_RD_LO(LEFT, RIGHT));
+   RETURN Risk_Drivers_DS_HI_LO;
+ENDMACRO;
+
+
+EXPORT Models.Layouts_Healthcare_Core.Final_Output_Layout_W_OptOutFlag SuppressResultsDueToOptOut_xForm(Models.Layouts_Healthcare_Core.Final_Output_Layout_W_OptOutFlag L) := TRANSFORM 
+      _OptOutMsg := 'OO';
+      SELF.seq                         := L.seq;
+      SELF.acctno                      := L.acctno;
+      SELF.lexid                       := L.lexid;
+      SELF.ADLScore                    := L.ADLScore;
+      SELF.isLexIdInOptOut             := L.isLexIdInOptOut;
+      SELF.PATIENT_TYPE                := L.PATIENT_TYPE;
+      SELF.FINANCIAL_CLASS             := L.FINANCIAL_CLASS;
+      SELF.RSMemberAge                 := L.RSMemberAge;
+      SELF.AGE_GROUP                   := L.AGE_GROUP;
+      SELF.ADMIT_DIAG                  := L.ADMIT_DIAG;
+      SELF.READMIT_DIAG                := L.READMIT_DIAG;
+      SELF.READMIT_LIFT                := L.READMIT_LIFT;
+      SELF.isSeRsExcludedDiag          := L.isSeRsExcludedDiag;
+      SELF.isSeRsMinor                 := L.isSeRsMinor;
+      SELF.isSeRsInvalidDiag           := L.isSeRsInvalidDiag;
+      SELF.isSeRsInvalidPatientType    := L.isSeRsInvalidPatientType;
+      SELF.isSeRsInvalidFinancialClass := L.isSeRsInvalidFinancialClass;
+      SELF.isSeRsM1ModelUsed           := L.isSeRsM1ModelUsed;
+      SELF.Score                       := _OptOutMsg;
+      SELF.SeRs_Score                  := _OptOutMsg;
+      SELF.SeRs_Raw_Score              := _OptOutMsg;
+      SELF.RAR_Driver_Hi1              := _OptOutMsg;
+      SELF.RAR_Driver_Hi2              := _OptOutMsg;
+      SELF.RAR_Driver_Hi3              := _OptOutMsg;
+      SELF.RAR_Driver_Lo1              := _OptOutMsg;
+      SELF.RAR_Driver_Lo2              := _OptOutMsg;
+      SELF.RAR_Driver_Lo3              := _OptOutMsg;
+      SELF.SeMA_Score                  := _OptOutMsg;
+      SELF.SeMA_Raw_Score              := _OptOutMsg;
+      SELF.MA_Driver_Hi1               := _OptOutMsg;
+      SELF.MA_Driver_Hi2               := _OptOutMsg;
+      SELF.MA_Driver_Hi3               := _OptOutMsg;
+      SELF.MA_Driver_Lo1               := _OptOutMsg;
+      SELF.MA_Driver_Lo2               := _OptOutMsg;
+      SELF.MA_Driver_Lo3               := _OptOutMsg;
+      SELF.SeMO_Score                  := _OptOutMsg;
+      SELF.SeMO_Raw_Score              := _OptOutMsg;
+      SELF.MO_Driver_Hi1               := _OptOutMsg;
+      SELF.MO_Driver_Hi2               := _OptOutMsg;
+      SELF.MO_Driver_Hi3               := _OptOutMsg;
+      SELF.MO_Driver_Lo1               := _OptOutMsg;
+      SELF.MO_Driver_Lo2               := _OptOutMsg;
+      SELF.MO_Driver_Lo3               := _OptOutMsg;
+      self.SeTC_Raw_Score              := _OptOutMsg;
+      self.TC_Driver_Hi1               := _OptOutMsg;
+      self.TC_Driver_Hi1_value         := _OptOutMsg;
+      self.TC_Driver_Hi2               := _OptOutMsg;
+      self.TC_Driver_Hi2_value         := _OptOutMsg;
+      self.TC_Driver_Hi3               := _OptOutMsg;
+      self.TC_Driver_Hi3_value         := _OptOutMsg;
+      self.TC_Driver_Lo1               := _OptOutMsg;
+      self.TC_Driver_Lo1_value         := _OptOutMsg;
+      self.TC_Driver_Lo2               := _OptOutMsg;
+      self.TC_Driver_Lo2_value         := _OptOutMsg;
+      self.TC_Driver_Lo3               := _OptOutMsg;
+      self.TC_Driver_Lo3_value         := _OptOutMsg;
+      SELF := [];
+END;
 
 End;

@@ -1,5 +1,7 @@
 ﻿EXPORT DDT_DailyReport(string historydate = '', string email) := function
 
+		Import std;
+		
 		// environment = 'P' or 'Q'
 		// location [optional] = 'B' or 'Q' or '' or '*'
 		// cluster [optional] = 'N' or 'F' or '' or '*' or 'S' - Customer Support or 'FS' - FCRA Customer Support or 'T' - Customer Test
@@ -9,6 +11,8 @@
 		qa_ddt_ds := Scoring_Project_DailyTracking.DDT_GetDeployedDatasets('Q', 'B', '', '');
 		prod_ddt_ds := Scoring_Project_DailyTracking.DDT_GetDeployedDatasets('P', 'B', '', '');
 		full_ds := qa_ddt_ds + prod_ddt_ds;
+
+		WriteCertHistoryFile := if(std.file.fileexists('~scoringqa::out::DDT_CERT_NonFCRA_Master_' + (String8)std.date.today())= false, Scoring_Project_DailyTracking.DDT_NonFCRA_HistoryTracking(qa_ddt_ds));
 
 		// Generate report
 		// Dataset with data
@@ -67,5 +71,8 @@
 		// email := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.DDT_general_list, 'TEST: Data Deployment Tracking Report', final_results):
 		email_send := FileServices.SendEmail(email, 'Data Deployment Tracking Report', final_results):
 																	FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.DDT_fail_list,'DDT tracking job failed','The failed workunit is: ' + WORKUNIT + '; ' + FAILMESSAGE));
-		return email_send;
+
+		seq := sequential(WriteCertHistoryFile, email_send);
+
+		return seq;
 end;

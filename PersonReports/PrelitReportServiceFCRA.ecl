@@ -50,7 +50,7 @@ EXPORT PrelitReportServiceFCRA () := MACRO
 #constant ('IncludeNonDMVSources', true);
 
   // stores XML options, which are not BpsReport "compatible", for subsequent reading
-  SetInputLocalOptions (PersonReports.input._prelitreport options_esdl) := FUNCTION
+  SetInputLocalOptions (PersonReports.IParam._prelitreport options_esdl) := FUNCTION
     #stored ('ReturnAlsoFound', options_esdl.include_alsofound);
     return output (dataset ([],{integer x}), named('__internal__'), extend);
   end;
@@ -67,7 +67,7 @@ EXPORT PrelitReportServiceFCRA () := MACRO
   #stored('did', UniqueId);
 
   // set up default options -- those, which must be always chosen in ESDL mode
-  options_esdl := module (PersonReports.input._prelitreport)
+  options_esdl := module (PersonReports.IParam._prelitreport)
     export boolean bk_suppress_withdrawn := first_row.Options.SuppressWithdrawnBankruptcy;
 
     // this coming not from the t_FcraPrelitReportOption but from the t_User structure
@@ -75,7 +75,7 @@ EXPORT PrelitReportServiceFCRA () := MACRO
   end;
 
   // store XML options for subsequent legacy-style reading
-  PersonReports.functions.SetInputSearchOptions (module (project (options_esdl, PersonReports.input._compoptions, opt)) end);
+  PersonReports.functions.SetInputSearchOptions (module (project (options_esdl, PersonReports.IParam._compoptions, opt)) end);
   SetInputLocalOptions (options_esdl);
 
   // Read from stored and set parameters from SOAP (rather debug purpose). 

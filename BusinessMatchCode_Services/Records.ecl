@@ -1,4 +1,4 @@
-﻿import AutoStandardI,BusinessMatchCode_Services,MDR,STD, BIPV2, Batchshare, TopBusiness_Services,
+﻿import AutoStandardI,BusinessMatchCode_Services,MDR,STD, BIPV2, TopBusiness_Services,
        Suppress;
 
 EXPORT Records( DATASET(BusinessMatchCode_Services.Layouts.Input_Processed) ds_BatchIn,
@@ -20,8 +20,8 @@ in_mod2 := module(AutoStandardI.DataRestrictionI.params)
 		export boolean AllowDPPA := false;
 		export boolean AllowGLB := false;
 		export string DataRestrictionMask := inmod.datarestrictionmask;
-		export unsigned1 DPPAPurpose := inmod.dppapurpose;
-		export unsigned1 GLBPurpose := inmod.glbpurpose;
+		export unsigned1 DPPAPurpose := inmod.dppa;
+		export unsigned1 GLBPurpose := inmod.glb;
 		export boolean ignoreFares := false;
 		export boolean ignoreFidelity := false;
 		export boolean includeMinors := false;	
@@ -93,7 +93,7 @@ in_mod2 := module(AutoStandardI.DataRestrictionI.params)
 	
 	string6 ssnMaskVal := inmod.ssn_mask;
 	
-	application_type_value := inmod.applicationtype;
+	application_type_value := inmod.application_type;
 	
 	// suppress by ssn
 	Suppress.MAC_Suppress(ProxidLevelResultsDedup, 

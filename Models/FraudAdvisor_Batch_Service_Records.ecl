@@ -3,9 +3,21 @@
 
 
 EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_Interfaces.Input args ,
-																					  dataset(Models.FraudAdvisor_Batch_Service_Layouts.BatchInput) batchin ,
-																					  dataset(Gateway.Layouts.Config) gateways,
-																						dataset(riskwise.Layout_IP2O) inIPdata = dataset([], riskwise.Layout_IP2O)) :=  function
+                                            dataset(Models.FraudAdvisor_Batch_Service_Layouts.BatchInput) batchin ,
+                                            dataset(Gateway.Layouts.Config) gateways,
+                                            dataset(riskwise.Layout_IP2O) inIPdata = dataset([], riskwise.Layout_IP2O),
+                                            unsigned1 LexIdSourceOptout = 1,
+                                            string TransactionID = '',
+                                            string BatchUID = '',
+                                            unsigned6 GlobalCompanyId = 0) :=  function
+
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := args.glb;
+	EXPORT dppa := args.dppa;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 Boolean VALIDATION := false; //True when validating model, false for production mode.
 
@@ -13,22 +25,22 @@ Boolean VALIDATION := false; //True when validating model, false for production 
     boolean  doVersion1               := args.doVersion1;
     boolean  doVersion2               := args.doVersion2;
     boolean  doParo                   := args.doParo_attrs;
-    string   requestedattributegroups := StringLib.StringToLowerCase(args.requestedattributegroups);
+    string   requestedattributegroups := STD.Str.ToLowerCase(args.requestedattributegroups);
 		
-		string	model_name 	:= StringLib.StringToLowerCase(args.ModelName_in);
+		string	model_name 	:= STD.Str.ToLowerCase(args.ModelName_in);
 		boolean	isUtility 	:= Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(args.industry_class_val));
 
 		fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2'];
 		fraudpoint3_models := ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; // FP3 Flagship models
 		FP3_models_requiring_GLB	:= ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; //these models require valid GLB, else fail
-		fraudpoint3_custom_models := ['fp1702_2','fp1702_1','fp1508_1','fp1705_1'];
+		fraudpoint3_custom_models := ['fp1702_2','fp1702_1','fp1508_1','fp1705_1','fp1902_1'];
 
 		bill_to_ship_to_models := ['fp1409_2']; // Populate with real model ids when the time comes.
   
-		bsVersion := MAP( doParo or requestedattributegroups IN ['fraudpointattrv202','fraudpointattrv203'] or model_name IN ['fp1508_1','msn1803_1','rsn804_1','msnrsn_1'] => 53, // bs 53
+		bsVersion := MAP( model_name IN ['fp1902_1'] => 54,
+                      doParo or requestedattributegroups IN ['fraudpointattrv202','fraudpointattrv203'] or model_name IN ['fp1508_1','msn1803_1','rsn804_1','msnrsn_1'] => 53, // bs 53
                       model_name IN ['fp1705_1'] => 52,
-                      model_name IN ['fp3fdn1505_0', 'fp31505_0', 'fp3fdn1505_9', 
-                                     'fp31505_9','fp1702_2','fp1702_1'] => 51, //run 51 shell for both FP3 models
+                      model_name IN [fraudpoint3_models,'fp1702_2','fp1702_1'] => 51,
                       requestedattributegroups IN ['fraudpointattrv201'] => 50,
 											model_name IN ['fp1210_1', 'fp1307_2', 'fp1409_2'] => 41, 
 											doVersion2 or model_name in fraudpoint2_models	=> 4,
@@ -37,8 +49,8 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 										);
 
 		// Add model name to this list if clam_ip/netacuity is used. 
-		boolean	trackNetacuityRoyalties := ~exists(inIPdata) AND model_name IN ['fp1109_0', 'fp1109_9', 'fp1307_2', 'fp3710_0', 'fp31105_1', 
-																																						'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9'];
+		boolean	trackNetacuityRoyalties := ~exists(inIPdata) AND model_name IN ['fp1109_0', 'fp1109_9', 'fp1307_2', 'fp3710_0',
+                                                                            'fp31105_1',fraudpoint3_models,'fp1902_1'];
 
 		// add sequence to any input Ipdata to matchup later in a Models.getFDAttributes join
 		RiskWise.Layout_IP2O tf_seq_ipdata(inIPdata le, integer C) := TRANSFORM
@@ -49,12 +61,12 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 
 		// new options for fp attributes 2.0
 		IncludeDLverification := doVersion2 OR requestedattributegroups IN ['fraudpointattrv201','fraudpointattrv202','fraudpointattrv203'] ;
-		unsigned8 BSOptions := if(doVersion2 OR requestedattributegroups IN ['fraudpointattrv201','fraudpointattrv202','fraudpointattrv203'] or model_name in ['fp1210_1','fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 
-		                                                       'fp3fdn1505_9','fp1702_2','fp1702_1','fp1508_1','fp1705_1'], 
-			risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary +
-			risk_indicators.iid_constants.BSOptions.IncludeDoNotMail +
-			risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
-			0);
+		unsigned8 BSOptions := if(doVersion2 OR requestedattributegroups IN ['fraudpointattrv201','fraudpointattrv202','fraudpointattrv203']
+                              or model_name in ['fp1210_1',fraudpoint3_models,fraudpoint3_custom_models], 
+                                risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary +
+                                risk_indicators.iid_constants.BSOptions.IncludeDoNotMail +
+                                risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
+                                0);
 
 		// add sequence to matchup later to add acctno to output
 		Models.FraudAdvisor_Batch_Service_Layouts.BatchInput into_seq(batchin le, integer C) := TRANSFORM
@@ -83,17 +95,17 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 			self.wphone10 := le.Work_Phone;
 			
       //Use LFM format name cleaning for Paro
-      cleaned_name := IF(doParo or model_name IN models.FraudAdvisor_Constants.Paro_models,
+      cleaned_name := IF(doParo or model_name IN [models.FraudAdvisor_Constants.Paro_models, 'msnrsn_1'],
                              Address.CleanPersonLFM73(le.UnParsedFullName), 
                              Address.CleanPerson73(le.UnParsedFullName)
                         );
 			boolean valid_cleaned := le.UnParsedFullName <> '';
 			
-			self.fname := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
-			self.lname := stringlib.stringtouppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
-			self.mname := stringlib.stringtouppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
-			self.suffix := stringlib.stringtouppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
-			self.title := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
+			self.fname := STD.Str.touppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
+			self.lname := STD.Str.touppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
+			self.mname := STD.Str.touppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
+			self.suffix := STD.Str.touppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
+			self.title := STD.Str.touppercase(if(valid_cleaned, cleaned_name[1..5],''));
 
 			street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 			clean_a2 := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;											
@@ -123,9 +135,9 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 			self.county := clean_a2[143..145];
 			self.geo_blk := clean_a2[171..177];
 			
-			self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-			self.dl_state := stringlib.stringtouppercase(le.dl_state);
-			//self.email_address := stringlib.stringtouppercase(le.email);
+			self.dl_number := STD.Str.touppercase(dl_num_clean);
+			self.dl_state := STD.Str.touppercase(le.dl_state);
+			//self.email_address := STD.Str.touppercase(le.email);
 			self.email_address := le.email;
 			
 			self.ip_address := le.ip_addr;
@@ -138,14 +150,14 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 			self.seq    := le.seq;
 			
 			// Allow for one person / two addresses if second person name data is blank.
-			self.fname  := IF( le.Name_First2 != '' , stringlib.stringtouppercase(le.Name_First2) , stringlib.stringtouppercase(le.Name_First) );
-			self.mname  := IF( le.Name_Middle2 != '', stringlib.stringtouppercase(le.Name_Middle2), stringlib.stringtouppercase(le.Name_Middle) );
-			self.lname  := IF( le.Name_Last2 != ''  , stringlib.stringtouppercase(le.Name_Last2)  , stringlib.stringtouppercase(le.Name_Last) );
-			self.suffix := IF( le.Name_Suffix2 != '', stringlib.stringtouppercase(le.Name_Suffix2), stringlib.stringtouppercase(le.Name_Suffix) );
+			self.fname  := IF( le.Name_First2 != '' , STD.Str.touppercase(le.Name_First2) , STD.Str.touppercase(le.Name_First) );
+			self.mname  := IF( le.Name_Middle2 != '', STD.Str.touppercase(le.Name_Middle2), STD.Str.touppercase(le.Name_Middle) );
+			self.lname  := IF( le.Name_Last2 != ''  , STD.Str.touppercase(le.Name_Last2)  , STD.Str.touppercase(le.Name_Last) );
+			self.suffix := IF( le.Name_Suffix2 != '', STD.Str.touppercase(le.Name_Suffix2), STD.Str.touppercase(le.Name_Suffix) );
 			
-			SELF.in_streetAddress := stringlib.stringtouppercase(le.Street_Addr2);
-			SELF.in_city          := stringlib.stringtouppercase(le.p_City_name2);
-			SELF.in_state         := stringlib.stringtouppercase(le.St2);
+			SELF.in_streetAddress := STD.Str.touppercase(le.Street_Addr2);
+			SELF.in_city          := STD.Str.touppercase(le.p_City_name2);
+			SELF.in_state         := STD.Str.touppercase(le.St2);
 			SELF.in_zipCode       := le.Z52;
 			SELF.phone10          := le.Home_Phone2;	
 			SELF.historydate      := if(le.historydateyyyymm=0, 999999, le.historydateyyyymm);
@@ -158,10 +170,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		boolean   isLn := false;	// not needed anymore
 		boolean   doRelatives := true;
 		boolean   doDL := false;
-		boolean   doVehicle := MAP(
-																model_name IN ['fp31105_1','fp1702_2','fp1702_1','fp1508_1','fp1705_1'] or doVersion2 => TRUE,
-																															 FALSE
-															 );
+		boolean   doVehicle := IF(model_name IN ['fp31105_1','fp1702_2','fp1702_1','fp1508_1','fp1705_1'] or doVersion2, TRUE, FALSE);
 		boolean   doDerogs := true;
 		boolean   suppressNearDups := false;
 		boolean   fromBIID := false;
@@ -176,25 +185,37 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		if(InvalidFP3GLBRequest, fail('Valid Gramm-Leach-Bliley Act (GLBA) purpose required'));
 
 		iid := risk_indicators.InstantID_Function(cleanIn, gateways, args.dppa, args.glb, isUtility, isLn, args.ofac_only, 
-																							suppressNearDups, require2Ele, fromBIID, isFCRA, args.excludewatchlists, fromIT1O, 
-																							args.OFACVersion, args.IncludeOfac, args.addtl_watchlists, args.gwThreshold, dobradius, BSversion, 
-																							in_runDLverification:=IncludeDLverification,
-																							in_DataRestriction:=args.DataRestriction,
-																							in_BSOptions := BSOptions,
-																							in_DataPermission := args.DataPermission);
+                                              suppressNearDups, require2Ele, fromBIID, isFCRA, args.excludewatchlists, fromIT1O, 
+                                              args.OFACVersion, args.IncludeOfac, args.addtl_watchlists, args.gwThreshold, dobradius, BSversion, 
+                                              in_runDLverification:=IncludeDLverification,
+                                              in_DataRestriction:=args.DataRestriction,
+                                              in_BSOptions := BSOptions,
+                                              in_DataPermission := args.DataPermission,
+                                              LexIdSourceOptout := LexIdSourceOptout, 
+                                              TransactionID := TransactionID, 
+                                              BatchUID := BatchUID, 
+                                              GlobalCompanyID := GlobalCompanyID);
 
 		clam := risk_indicators.Boca_Shell_Function(iid, gateways, args.dppa, args.glb, isUtility, isLn, doRelatives, doDL, 
-																								doVehicle, doDerogs, bsVersion, doScore, nugen, DataRestriction:=args.DataRestriction,
-																								BSOptions := BSOptions, DataPermission:=args.DataPermission);
+                                                doVehicle, doDerogs, bsVersion, doScore, nugen, DataRestriction:=args.DataRestriction,
+                                                BSOptions := BSOptions, DataPermission:=args.DataPermission,
+                                                LexIdSourceOptout := LexIdSourceOptout, 
+                                                TransactionID := TransactionID, 
+                                                BatchUID := BatchUID, 
+                                                GlobalCompanyID := GlobalCompanyID);
 
 		// Run Bill-to-Ship-to Shell if necessary.
 		clam_BtSt := 
 			IF( model_name IN bill_to_ship_to_models,
-						Models.FraudAdvisor_BtSt_Function(cleanIn, cleanIn2, gateways, args.dppa, args.glb, isUtility, isLn,
-																							args.ofac_only, suppressNearDups, require2Ele, fromBIID, isFCRA, args.excludewatchlists,
-																							fromIT1O, args.OFACVersion, args.IncludeOfac, args.addtl_watchlists, args.gwThreshold, dobradius,
-																							bsVersion, args.DataRestriction, IncludeDLverification, args.DataPermission,
-																							doRelatives, doDL, doVehicle, doDerogs, doScore, nugen, BSOptions)
+          Models.FraudAdvisor_BtSt_Function(cleanIn, cleanIn2, gateways, args.dppa, args.glb, isUtility, isLn,
+                                            args.ofac_only, suppressNearDups, require2Ele, fromBIID, isFCRA, args.excludewatchlists,
+                                            fromIT1O, args.OFACVersion, args.IncludeOfac, args.addtl_watchlists, args.gwThreshold, dobradius,
+                                            bsVersion, args.DataRestriction, IncludeDLverification, args.DataPermission,
+                                            doRelatives, doDL, doVehicle, doDerogs, doScore, nugen, BSOptions,
+                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                            TransactionID := TransactionID, 
+                                            BatchUID := BatchUID, 
+                                            GlobalCompanyID := GlobalCompanyID)
 			);
 	
 		ip_prep := project( batchinseq( ip_addr!='' ), transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq ) );
@@ -224,7 +245,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
   full_skiptrace := join(skiptrace_call, iid, LEFT.seq= RIGHT.seq, get_confidence(left,right) );
     								
     easi_census := join(ungroup(iid), Easi.Key_Easi_Census,
-                        keyed(left.st+left.county+left.geo_blk=right.geolink) and model_name IN Models.FraudAdvisor_Constants.Paro_models,
+                        keyed(left.st+left.county+left.geo_blk=right.geolink) and model_name IN [Models.FraudAdvisor_Constants.Paro_models, 'msnrsn_1'],
                         transform(easi.layout_census, 
                               self.state:= left.st,
                               self.county:=left.county,
@@ -249,7 +270,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
                                            model_name);
 
 		attr := if(doVersion1 or doVersion2 or requestedattributegroups IN ['fraudpointattrv201','fraudpointattrv202','fraudpointattrv203'] or doParo,
-			Models.getFDAttributes(clam, iid, ''/*account_value*/, ipdata, model_indicator),
+			Models.getFDAttributes(clam, iid, ''/*account_value*/, ipdata, model_indicator, mod_access := mod_access),
 			project(group(clam), transform(Models.Layout_FraudAttributes, self.input.seq:=left.seq, self := []) )
 		);
 
@@ -967,17 +988,18 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 			dataset( [], Models.Layouts.layout_fp1109 )
 		);
 
-		model_fraudpoint3 := case( model_name,
-			'fp31505_0' 		=> Models.FP31505_0_Base( clam_ip, 6, false), 
-			'fp1702_2'	  	=> Models.fp1702_2_0( ungroup(clam), 6), 
-			'fp1702_1'	  	=> Models.fp1702_1_0( ungroup(clam), 6), 
-			'fp3fdn1505_0'	=> Models.FP3FDN1505_0_Base( clam_ip, 6, false), 
-			'fp31505_9' 		=> Models.FP31505_0_Base( clam_ip, 6, true), // '_9' indicates to use criminal data
-			'fp3fdn1505_9'	=> Models.FP3FDN1505_0_Base( clam_ip, 6, true), // '_9' indicates to use criminal data
-			'fp1508_1'	=> Models.fp1508_1_0( ungroup(clam), 6), 
-			'fp1705_1'	=> Models.fp1705_1_0( ungroup(clam), 6), 
-												 dataset( [], Models.Layouts.layout_fp1109 )
-		);
+    model_fraudpoint3 := case( model_name,
+      'fp31505_0'     => Models.FP31505_0_Base( clam_ip, 6, false), 
+      'fp1702_2'      => Models.fp1702_2_0( ungroup(clam), 6), 
+      'fp1702_1'      => Models.fp1702_1_0( ungroup(clam), 6), 
+      'fp3fdn1505_0'  => Models.FP3FDN1505_0_Base( clam_ip, 6, false), 
+      'fp31505_9'     => Models.FP31505_0_Base( clam_ip, 6, true), // '_9' indicates to use criminal data
+      'fp3fdn1505_9'  => Models.FP3FDN1505_0_Base( clam_ip, 6, true), // '_9' indicates to use criminal data
+      'fp1508_1'      => Models.fp1508_1_0( ungroup(clam), 6), 
+      'fp1705_1'      => Models.fp1705_1_0( ungroup(clam), 6), 
+      'fp1902_1'      => Models.FP1902_1_0( clam_ip, 6), 
+                         dataset( [], Models.Layouts.layout_fp1109 )
+    );
     
     Second_model_score := CASE(model_name,
                                'msnrsn_1' => Models.RSN804_1_0( clam, full_skiptrace, easi_census ),
@@ -1018,32 +1040,31 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 					model_name='rsn804_1' => Risk_Indicators.BillingIndex.RSN804_1,
 					model_name='msnrsn_1' => Risk_Indicators.BillingIndex.MSNRSN_1,
 					model_name='fp1705_1' => Risk_Indicators.BillingIndex.FP1705_1,
+					model_name='fp1902_1' => Risk_Indicators.BillingIndex.FP1902_1,
 					''
 				),
 				
-				self.modelname1 := map(
-					model_name IN ['fp3710_0', 'fp31105_1', 'fp1109_0', 'fp1109_9', 'fp1210_1', 'fp1307_2', 
-												 'fp1409_2'] 																															=> 'FraudPoint',
-					model_name IN ['fp31505_0'] 																														=> 'FraudPointFP31505_0',
-					model_name IN ['fp3fdn1505_0'] 																													=> 'FraudPointFP3FDN1505_0',
-					model_name IN ['fp31505_9'] 																														=> 'FraudPointFP31505_9',
-					model_name IN ['fp3fdn1505_9'] 																													=> 'FraudPointFP3FDN1505_9',
-					model_name IN ['fp1702_2'] 																													    => 'FraudPointfp1702_2',
-					model_name IN ['fp1702_1'] 																													    => 'FraudPointfp1702_1',
-					model_name IN ['fp1508_1'] 																													    => 'FraudPointfp1508_1',
-					model_name IN ['fp1705_1'] 																													    => 'FraudPointFP1705_1',
-					model_name IN ['msn1803_1', 'msnrsn_1'] 																								=> 'FraudPointMSN1803_1',
-					model_name IN ['rsn804_1'] 																													    => 'FraudPointRSN804_1',
-					''
-				),
+        self.modelname1 := map(
+          model_name IN ['fp3710_0', 'fp31105_1', 'fp1109_0', 'fp1109_9', 'fp1210_1', 'fp1307_2', 
+                         'fp1409_2']               => 'FraudPoint',
+          model_name IN ['fp31505_0']              => 'FraudPointFP31505_0',
+          model_name IN ['fp3fdn1505_0']           => 'FraudPointFP3FDN1505_0',
+          model_name IN ['fp31505_9']              => 'FraudPointFP31505_9',
+          model_name IN ['fp3fdn1505_9']           => 'FraudPointFP3FDN1505_9',
+          model_name IN ['fp1702_2']               => 'FraudPointfp1702_2',
+          model_name IN ['fp1702_1']               => 'FraudPointfp1702_1',
+          model_name IN ['fp1508_1']               => 'FraudPointfp1508_1',
+          model_name IN ['fp1705_1']               => 'FraudPointFP1705_1',
+          model_name IN ['msn1803_1', 'msnrsn_1']  => 'FraudPointMSN1803_1',
+          model_name IN ['rsn804_1']               => 'FraudPointRSN804_1',
+          model_name IN ['fp1902_1']               => 'FraudPointFP1902_1',
+                                                      ''
+        ),
 				
-				self.scorename1 := map(
-					model_name IN ['fp3710_0', 'fp31105_1', 'fp1109_0', 'fp1109_9', 'fp1210_1', 'fp1307_2', 
-												 'fp1409_2', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9',
-												 'fp1702_2','fp1702_1','fp1508_1', 'msn1803_1', 'msnrsn_1','fp1705_1'] 		=> '0 to 999',
-          model_name IN ['rsn804_1'] => '250 to 999',
-					''
-				),
+				self.scorename1 := map( model_name IN ['fp3710_0', 'fp31105_1', 'fp1210_1', 'fp1409_2', 'msn1803_1', 'msnrsn_1',
+                                fraudpoint2_models, fraudpoint3_models, fraudpoint3_custom_models ] 		=> '0 to 999',
+                                model_name IN ['rsn804_1']                                              => '250 to 999',
+                                                                                                           '' ),
 				self.reason1 := right.ri[1].hri,  
 				self.reason2 := right.ri[2].hri,
 				self.reason3 := right.ri[3].hri,

@@ -1,4 +1,4 @@
-﻿import _Control, prof_licenseV2, riskwise, ut, RiskView, risk_indicators;
+﻿import _Control, prof_licenseV2, riskwise, ut, RiskView, risk_indicators, doxie;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Proflic_Hist_FCRA(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, 

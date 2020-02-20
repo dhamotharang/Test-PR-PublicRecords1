@@ -1,4 +1,4 @@
-﻿import BatchServices, doxie, doxie_cbrs, iesp, MDR, POE, ut, suppress, AutoStandardI, Std;
+﻿import BatchServices, doxie, doxie_cbrs, iesp, MDR, POE, ut, suppress, Std;
 
 export ReportService_Records := module
 
@@ -22,7 +22,7 @@ export ReportService_Records := module
 	  string1 in_spouse_indicator := if(IsSpouse,'Y','N');
     string in_excluded_sources  := in_mod.excluded_sources;
 		BOOLEAN IncludeCorp:= TRUE;	// Defined to use in WorkPlace_Services.Functions.getParentCompany for shared code  in Batch and Report Services
-		
+
     mod_access := PROJECT (in_mod, doxie.IDataAccess);
 
 		// Edit the input ExcludedSources string as needed for processing below.
@@ -34,13 +34,13 @@ export ReportService_Records := module
     layout_source := record
 	    string2 source;
 	  end;
-	
-    ds_excluded_sources := 
+
+    ds_excluded_sources :=
 	     if(in_excluded_sources_edited = '',
 	        dataset([], layout_source),
 			    dataset(Std.Str.SplitWords(in_excluded_sources_edited, ','), layout_source));
 
-    // 2. Use the input to create a dataset of 1 record in the layout needed by the  
+    // 2. Use the input to create a dataset of 1 record in the layout needed by the
 	  //    getPoeRecs function.
     BatchServices.WorkPlace_Layouts.POE_lookup xfm_make_single_record() := transform
       self.acctno           := 'acctno1';
@@ -54,16 +54,16 @@ export ReportService_Records := module
     ds_did_in := dataset([xfm_make_single_record()]);
 
 	  //  3. Get all the POE recs for the passed in did.
-    ds_poe_recs := WorkPlace_Services.Functions.getPoeRecs(ds_did_in);
-		
+    ds_poe_recs := WorkPlace_Services.Functions.getPoeRecs(ds_did_in, mod_access);
+
 		//		Get all the PSS recs for the passed in did.
 		ds_pss_recs	:=	WorkPlace_Services.Functions.getPSSRecs(ds_did_in);
-		
-		
+
+
 		//     Get PAW data only for the dids with POE data.
-		ds_paw_recs	:=	WorkPlace_Services.Functions.getPawRecs(ds_poe_recs);
-		
-    // 5. Combine POE & PSS slimmed recs into 1 dataset here and 
+		ds_paw_recs	:=	WorkPlace_Services.Functions.getPawRecs(ds_poe_recs, mod_access);
+
+    // 5. Combine POE & PSS slimmed recs into 1 dataset here and
 	  //    join to POE source_hierarchy key file to assign the source_order.
 	  ds_all_recs := join(ds_poe_recs	+ ds_pss_recs	+ ds_paw_recs,
 	                              POE.Keys().source_hierarchy.qa,
@@ -84,7 +84,7 @@ export ReportService_Records := module
 		// 7.1 Applying GLB restrictions to utility records.
 		ds_all_recs_glb_ok := ds_all_recs_not_restricted(doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, source, dt_first_seen, 0));
 
-    // 7. Next do a "left only" join to the excluded_sources dataset to pass through         ??? 
+    // 7. Next do a "left only" join to the excluded_sources dataset to pass through         ???
     //    all sources that are not excluded.
     ds_all_recs_included := join(ds_all_recs_glb_ok, ds_excluded_sources,
 	                                 left.source = right.source,
@@ -99,30 +99,30 @@ export ReportService_Records := module
 
     // 9.  Get "best" company name/address/phone if missing and then clean the data.
 		//
-	  // 9.1 First try to add any missing company info using the business-header best file. 
-	  ds_all_recs_bhbest_added := 
+	  // 9.1 First try to add any missing company info using the business-header best file.
+	  ds_all_recs_bhbest_added :=
 		   BatchServices.WorkPlace_Functions.AddBestInfo(ds_all_recs_pulled);
-		
+
 	  // 9.2 Remove invalid/disconnected/residential numbers in the company_phone1/2 fields.
-	  ds_all_recs_phones_cleaned := 
+	  ds_all_recs_phones_cleaned :=
 		   BatchServices.WorkPlace_Functions.CleanPhones(ds_all_recs_bhbest_added);
 
 	  // 9.3 Remove company_names with only invalid terms.
-	  ds_all_recs_cname_cleaned := 
+	  ds_all_recs_cname_cleaned :=
 		   BatchServices.WorkPlace_Functions.CleanCompName(ds_all_recs_phones_cleaned);
 
     // 10.  Try to fill in phone1/2 and any company info still missing.
 		//
     // 10.1 Get any missing company name/address info from gong history phone# key.
-    ds_all_recs_gongcomp := 
-     	 WorkPlace_Services.Functions.getCompInfoFromGong(ds_all_recs_cname_cleaned);
-					
+    ds_all_recs_gongcomp :=
+     	 WorkPlace_Services.Functions.getCompInfoFromGong(ds_all_recs_cname_cleaned, mod_access);
+
 	  // 10.2 Get phone1/2 for bdid from the gong history bdid key.
-    ds_all_recs_gongphone := 
-     	 WorkPlace_Services.Functions.getPhoneFromGong(ds_all_recs_gongcomp);
+    ds_all_recs_gongphone :=
+     	 WorkPlace_Services.Functions.getPhoneFromGong(ds_all_recs_gongcomp, mod_access);
 
     // 10.3 Get phone1/2 for the bdid from the yellow pages bdid key.
-    ds_all_recs_ypphone :=	 
+    ds_all_recs_ypphone :=
 	     WorkPlace_Services.Functions.getPhoneFromYP(ds_all_recs_gongphone);
 
 		// 10.4 Show only phone numbers which do not exist in PSS or that match the criteria of phone status = A and is in the 30 day window
@@ -130,27 +130,27 @@ export ReportService_Records := module
 
 	  // 11. Identify the 1 most complete/"best candidate" record
 	  //
-	  // 11.1 First filter to only use "complete" info recs, which according to the 
-	  //      product specs are those records with a non-blank company_name and a 
+	  // 11.1 First filter to only use "complete" info recs, which according to the
+	  //      product specs are those records with a non-blank company_name and a
 	  //      non-blank company phone1.
     ds_most_complete_all := ds_suppress_badphones(	company_name<>'' and  // need a comp name
 																										company_phone1<>'');  // need a phone
 
-	  // 11.2 Sort all complete recs by: 
+	  // 11.2 Sort all complete recs by:
 	  //      1. did (puts all recs for the subject together)
-	  //      2. descending dt_last_seen (puts most recent first) and 
+	  //      2. descending dt_last_seen (puts most recent first) and
 	  //      3. source_code order (in case multiple recs have the same most recent date)
 	  ds_most_complete_srtd := sort(ds_most_complete_all,
-	                                did, -dt_last_seen, source_order, record); 
+	                                did, -dt_last_seen, source_order, record);
 
     // 11.3 Then dedup by did to identify the 1 most current record for the did.
     ds_most_current1 := dedup(ds_most_complete_srtd(~from_PAW), did);
 
-    // 11.4 Match all complete recs for a did to the most current one for a did to keep 
-	  //      any recs for the did that have the same bdid/company name & phone1 as the 
+    // 11.4 Match all complete recs for a did to the most current one for a did to keep
+	  //      any recs for the did that have the same bdid/company name & phone1 as the
 	  //      most current one and are within 14 days of the most current dt_last_seen.
     ds_best_recs_for_did := join(ds_most_complete_srtd(~from_PAW),ds_most_current1,
-	                               left.did = right.did                            and 
+	                               left.did = right.did                            and
 	                               // check for bdids the same in case company names are slightly different
 	                               ((left.bdid !=0 and left.bdid = right.bdid) or
 													        left.company_name = right.company_name)        and
@@ -165,25 +165,25 @@ export ReportService_Records := module
 												         limit(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
 
     // 11.5 Sort the best recs for a did in order by:
-		//        1. ascending source_order 
+		//        1. ascending source_order
 		//        2. descending dt_last_seen
-		//      Then dedup to only keep the 1 "best candidate" (lowest source_order) record 
+		//      Then dedup to only keep the 1 "best candidate" (lowest source_order) record
 		//      for the did.
 	  ds_best_candidate := dedup(sort(ds_best_recs_for_did,
 	                                  did, source_order, -dt_last_seen, record),
-													     did); 
+													     did);
 
-    // 16. For the main WP company, get the corporation status and 
+    // 16. For the main WP company, get the corporation status and
 		//     the optional (if requested) extra Secretary Of State Info.
 	  //
-	  // 16.1 Project a record with a non-zero bdid onto the appropriate layout and 
+	  // 16.1 Project a record with a non-zero bdid onto the appropriate layout and
 	  //      then call a function to get the corp/SOS info.
     ds_best_cand_bdid_corpstat := BatchServices.WorkPlace_Functions.getCorpStatus(
-													          project(ds_best_candidate(bdid!=0), 
-												                    doxie_cbrs.layout_references), 
+													          project(ds_best_candidate(bdid!=0),
+												                    doxie_cbrs.layout_references),
 																		IncludeSosInfo);
-  
-    // 16.2 Join the bdid with a corp status back to the ds of most_current record 
+
+    // 16.2 Join the bdid with a corp status back to the ds of most_current record
 	  //      to attach the corp status to it.
     ds_best_cand_wcorpstat := join(ds_best_candidate, ds_best_cand_bdid_corpstat,
 				                             left.bdid=right.bdid,
@@ -202,7 +202,7 @@ export ReportService_Records := module
 																		 self.sos_comp_sec_range   := right.sos_comp_sec_range,
                                      self.sos_comp_city        := right.sos_comp_city,
                                      self.sos_comp_state       := right.sos_comp_state,
-                                     self.sos_comp_zip         := right.sos_comp_zip, 
+                                     self.sos_comp_zip         := right.sos_comp_zip,
 																		 self.sos_comp_zip4        := right.sos_comp_zip4,
   	                                 self.sos_address_type     := right.sos_address_type,
                                      self.sos_status           := right.sos_status,
@@ -232,12 +232,12 @@ export ReportService_Records := module
 
 	  // 17. Get additional (history) company info
 	  //
-    // 17.1 First filter the most complete recs to only include any non-royalty sources, 
+    // 17.1 First filter the most complete recs to only include any non-royalty sources,
 		//      because royalty sources are not to be used for additional data.
     ds_most_complete_fltrd := ds_most_complete_srtd(
                                 source not in BatchServices.WorkPlace_Constants.WP_ROYALTY_SOURCE_SET);
 
-    // 17.2 Next sort/dedup the filtered recs to only keep the recs with a  
+    // 17.2 Next sort/dedup the filtered recs to only keep the recs with a
 	  //      unique company_name.
     ds_most_complete_unique_compname := dedup(sort(ds_most_complete_fltrd,
 		                                               company_name, from_PAW, -dt_last_seen, source_order, record),
@@ -246,13 +246,13 @@ export ReportService_Records := module
     // 17.3 Next sort/dedup again to only keep 1 rec for each unique bdid.
     ds_most_complete_unique_bdid := dedup(sort(ds_most_complete_unique_compname,
 		                                           bdid, from_PAW, -dt_last_seen, source_order, record),
-	                                        bdid);		
-	
-    // 17.4 Next do a left only join to remove the current rec from the 
+	                                        bdid);
+
+    // 17.4 Next do a left only join to remove the current rec from the
 	  //      ds with all the potential additional/history recs.
-    ds_most_complete_addl := join(ds_most_complete_unique_bdid,ds_best_candidate,		
-	                                  left.did          = right.did and 
-															      left.dt_last_seen = right.dt_last_seen and 
+    ds_most_complete_addl := join(ds_most_complete_unique_bdid,ds_best_candidate,
+	                                  left.did          = right.did and
+															      left.dt_last_seen = right.dt_last_seen and
 															      left.source_order = right.source_order,
 															    transform(WorkPlace_Services.Layouts.poe_didkey_plus,
 															      self := left),
@@ -267,14 +267,14 @@ export ReportService_Records := module
 
     // 17.6 Get optional corp status info for the additional(history) recs.
 	  //
-	  // 17.6.1 Sort/dedup on non-zero bdids (to reduce the number of lookups), then 
+	  // 17.6.1 Sort/dedup on non-zero bdids (to reduce the number of lookups), then
 	  //        project onto appropriate layout and call a function to get the status.
     ds_addl_4recs_bdids_corpstat := BatchServices.WorkPlace_Functions.getCorpStatus(
-																	    dedup(sort(project(ds_addl_4recs(bdid!=0), 
-																			                   doxie_cbrs.layout_references), 
+																	    dedup(sort(project(ds_addl_4recs(bdid!=0),
+																			                   doxie_cbrs.layout_references),
 																								 bdid), bdid));
 
-    // 17.6.2 Join the bdids with a corp status back to the ds of addl/hist records 
+    // 17.6.2 Join the bdids with a corp status back to the ds of addl/hist records
 	  //        to attach the corp status to them.
 	  ds_addl_4recs_wcorpstat := join(ds_addl_4recs, ds_addl_4recs_bdids_corpstat,
 				                              left.bdid=right.bdid,
@@ -285,42 +285,40 @@ export ReportService_Records := module
                                       self             := left),
 											              left outer,  // keep all the recs from the left ds
 												            atmost(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
-	
+
     ds_best_cand_wcorpstat_srted := TOPN(ds_addl_4recs_wcorpstat, BatchServices.WorkPlace_Constants.Limits.KEEP_HIST,
 	                                        did, from_PAW, -dt_last_seen, source_order, RECORD);
-		
-		// 18. Get some additional detailed POE data for specific sources from the 
+
+		// 18. Get some additional detailed POE data for specific sources from the
 		//     individual sources' did key file.
 		//     As of 01/04/11, we only need to get:
-		temp_best_cand_walldetail:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best_cand_wcorpstat, mod_access);
-		
-		ds_best_cand_walldetail:= DEDUP(SORT(temp_best_cand_walldetail, did), did);
-		
+		ds_best_cand_walldetail:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best_cand_wcorpstat, mod_access);
+
 		WorkPlace_Services.Layouts.Email_Layout normXform(ds_best_cand_walldetail le ,integer c ) := TRANSFORM
 				temp_email:= choose(c ,le.email1, le.email2, le.email3);
-				self.EmailAddress :=  IF(temp_email<>'', temp_email, SKIP);																
+				self.EmailAddress :=  IF(temp_email<>'', temp_email, SKIP);
 				self.EmailSource := IF(temp_email<>'',choose(c , le.email_src1, le.email_src2, le.email_src3), SKIP);
 		END;
-			 
+
     ds_email_info := normalize(ds_best_cand_walldetail,3,normXform(left,counter));
-		
-		
+
+
 		// 19. Get parent company info.
-    // NOTE: In DCA, the root-sub expression is a compound value: 
+    // NOTE: In DCA, the root-sub expression is a compound value:
 	  // the root (nine digits), followed by a dash, followed by the sub(sidiary) value
-	  // (four digits). e.g. 123456789-1234. 
-	  // The root denotes the top-level company at the head of a conglomerate or set of 
-	  // subsidiaries. e.g. LexisNexis RiskSolution's root is Reed-Elsevier. 
-	  // The sub is simply a surrogate identifier denoting a particular subsidiary in the 
-	  // root's tree. 
+	  // (four digits). e.g. 123456789-1234.
+	  // The root denotes the top-level company at the head of a conglomerate or set of
+	  // subsidiaries. e.g. LexisNexis RiskSolution's root is Reed-Elsevier.
+	  // The sub is simply a surrogate identifier denoting a particular subsidiary in the
+	  // root's tree.
 	  // Therefore in the code below you'll see the expression:
     //     left.parent_number[1..9]  = right.root AND
     //     left.parent_number[11..14] = right.sub
-    // Where [1..9] refers to the root portion of the parent_number and [11..14] refers 
+    // Where [1..9] refers to the root portion of the parent_number and [11..14] refers
 	  // to the sub portion of the parent_number. We omit [10] of course, which is a dash.
-		
-		ds_best_cand_wpar_corpstat:= WorkPlace_Services.Functions.getParentCompany(ds_best_cand_wcorpstat, IncludeCorp);		
- 		
+
+		ds_best_cand_wpar_corpstat:= WorkPlace_Services.Functions.getParentCompany(ds_best_cand_wcorpstat, IncludeCorp);
+
 		// 20. Get any Professional License data.
 		ds_best_cand_wprolic:= WorkPlace_Services.Functions.getProfLicInfo(ds_best_cand_wpar_corpstat, mod_access);
 
@@ -331,7 +329,7 @@ export ReportService_Records := module
 														 self.SourceCode      := left.source,
 		                         self.Name.Prefix     := left.name_title,
 														 self.Name.First      := left.subject_first_name,
-		                         self.Name.Middle     := left.middle_name, 
+		                         self.Name.Middle     := left.middle_name,
 														 self.Name.Last       := left.subject_last_name,
 		                         self.Name.Suffix     := left.name_suffix,
 														 self.IsSpouse        := left.spouse_indicator,
@@ -345,7 +343,7 @@ export ReportService_Records := module
 													   self.Company.Address.UnitNumber          := left.company_sec_range,
 													   self.Company.Address.City  := left.company_city,
 														 self.Company.Address.State := left.company_state,
-														 self.Company.Address.Zip5  := left.company_zip5, 
+														 self.Company.Address.Zip5  := left.company_zip5,
 														 self.Company.Address.Zip4  := left.company_zip4,
 														 self.Company.Phone1        := left.company_phone1,
 														 self.Company.Phone2        := left.company_phone2,
@@ -363,7 +361,7 @@ export ReportService_Records := module
 													   self.ParentCompany.Address.UnitNumber          := left.parent_company_sec_range,
 													   self.ParentCompany.Address.City  := left.parent_company_city,
 														 self.ParentCompany.Address.State := left.parent_company_state,
-														 self.ParentCompany.Address.Zip5  := left.parent_company_zip5, 
+														 self.ParentCompany.Address.Zip5  := left.parent_company_zip5,
 														 self.ParentCompany.Address.Zip4  := left.parent_company_zip4,
 														 self.ParentCompany.Phone1        := left.parent_company_phone,
 														 self.ParentCompany.Status        := left.parent_company_status,
@@ -374,7 +372,7 @@ export ReportService_Records := module
 																																										SELF.EmailAddress := LEFT.EmailAddress,
 																																										SELF.EmailSource	:= LEFT.EmailSource));
 														 // Additional Companies Info Upto 4
-														 SELF.AdditionalCompanies				:= PROJECT(ds_best_cand_wcorpstat_srted, 
+														 SELF.AdditionalCompanies				:= PROJECT(ds_best_cand_wcorpstat_srted,
 																																				 TRANSFORM(iesp.workplace.t_WPCompanyInfo,
 																																										self.CompanyName                 := stringlib.StringToUpperCase(left.company_name),
 																																										self.Address.StreetName          := left.company_prim_name,
@@ -386,7 +384,7 @@ export ReportService_Records := module
 																																										self.Address.UnitNumber          := left.company_sec_range,
 																																										self.Address.City  := left.company_city,
 																																										self.Address.State := left.company_state,
-																																										self.Address.Zip5  := left.company_zip5, 
+																																										self.Address.Zip5  := left.company_zip5,
 																																										self.Address.Zip4  := left.company_zip4,
 																																										self.Phone1        := left.company_phone1,
 																																										self.Phone2        := left.company_phone2,
@@ -493,7 +491,7 @@ export ReportService_Records := module
 
     //return ds_all_recs_included;
     return ds_rs_final;
-		
+
   end;  // end of val function
 
 end; // end of ReportService_Records module

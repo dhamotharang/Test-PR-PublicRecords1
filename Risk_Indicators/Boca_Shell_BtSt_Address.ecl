@@ -9,7 +9,7 @@ Common Addrs Shared Distance - btst_addr_dists_in_common - Total linear distance
 Common Addrs Unique Num States - btst_addr_states_in_common - Number of unique states found for common addresses
 */
 
-import Risk_Indicators, dx_header, address, ut, RiskWise, doxie;
+import Risk_Indicators, dx_header, address, ut, RiskWise;
 
 export Boca_Shell_BtSt_Address(grouped dataset(Risk_Indicators.layout_ciid_btst_Output) input,
 	unsigned1 dppa, unsigned1 glb, string50 DataRestriction=Risk_Indicators.iid_constants.default_DataRestriction,
@@ -76,7 +76,7 @@ export Boca_Shell_BtSt_Address(grouped dataset(Risk_Indicators.layout_ciid_btst_
 	
 //start: modified version of Risk_Indicators.Boca_Shell_Address_Occupancy code was copied here and modified for BTST
 // only use this variable in realtime mode to simulate the header build date rather than todays date
-	// dk := choosen(doxie.key_max_dt_last_seen, 1);
+	// dk := choosen(dx_header.key_max_dt_last_seen(), 1);
 	// hdrBuildDate01 := dk[1].max_date_last_seen[1..6]+'01';
 	// header_build_date := (unsigned)(dk[1].max_date_last_seen[1..6]);
 	

@@ -1,4 +1,4 @@
-IMPORT SANCTN, standard;
+﻿IMPORT SANCTN, standard;
 
 
 EXPORT layouts := module
@@ -8,6 +8,10 @@ EXPORT layouts := module
   EXPORT layoutSanctnClean :=
     RECORD
       SANCTN.layout_SANCTN_party_clean_orig;
+      unsigned4 global_sid;
+      unsigned8 record_sid;
+      unsigned6 DID;
+       boolean is_suppressed := false;
     END;
   
   EXPORT id := RECORD
@@ -30,19 +34,20 @@ EXPORT layouts := module
     unsigned2 ORDER_NUMBER;
     string party_text {MAXLENGTH (16000)};
   END;
-
-  EXPORT rec_party := record
+ 
+ EXPORT rec_party := record
     unsigned1 penalt;
     SANCTN.layout_SANCTN_party_in AND NOT [RECORD_TYPE, ORDER_NUMBER];
     DATASET (PartyInfo) info {MAXCOUNT (1)}; // =1 by usage; probably, a design defect
     standard.Name name;
     string45 cname := '';
     AddressTranslated address;
+    BOOLEAN is_suppressed;
   end;
-
+  
   // this may be redundant, but I want the output to be same as before
   EXPORT Party := RECORD
-    rec_party and not [penalt, BATCH_NUMBER, INCIDENT_NUMBER];
+    rec_party and not [penalt, BATCH_NUMBER, INCIDENT_NUMBER, is_suppressed];
   END;
 
   // those 2 layouts, generally, inherit from SANCTN.layout_SANCTN_incident_in
@@ -68,12 +73,13 @@ EXPORT layouts := module
     STRING1  OK_FOR_FCR;
   	string8 incident_date_clean := '';
     string8 fcr_date_clean := '';
+    BOOLEAN is_suppressed;
   END;
 
   // Complete stand-alone SOURCE/REPORT service
   EXPORT SourceOutput := RECORD
     unsigned1 penalt := 0;
-    Incident;
+    Incident - [is_suppressed];
     DATASET (Party) parties {MAXCOUNT (Constants.PARTY_PER_INCIDENT)};
   END; 
 

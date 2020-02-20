@@ -1,7 +1,7 @@
 ﻿IMPORT BatchShare, Doxie, Gateway, PhoneOwnership, Phones;
 EXPORT IParams := MODULE
 
-		EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParamsV2,Phones.IParam.inZumigoParams)
+		EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams,Phones.IParam.inZumigoParams)
 			EXPORT BOOLEAN	 contactRiskFlag		 						:= FALSE;
 			EXPORT UNSIGNED1 search_level										:= 0;	
 			EXPORT BOOLEAN 	 returnCurrent									:= FALSE;
@@ -13,7 +13,7 @@ EXPORT IParams := MODULE
 
 		EXPORT getBatchParams() := FUNCTION
 			
-			mBaseParams := BatchShare.IParam.getBatchParamsV2();
+			mBaseParams := BatchShare.IParam.getBatchParams();
 			
 			in_mod := MODULE(PROJECT(mBaseParams, BatchParams, OPT))					
 				EXPORT BOOLEAN   contactRiskFlag				:= FALSE 	: STORED('contact_risk_flag');						

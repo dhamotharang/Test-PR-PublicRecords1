@@ -4,7 +4,7 @@
 
 	export IParam := module
 		
-		export BatchParams := interface (BatchShare.IParam.BatchParamsV2)			
+		export BatchParams := interface (BatchShare.IParam.BatchParams)			
 			export string1 AddressConfidenceThreshold := MPD.AddressConfidenceThreshold ;
 			export string	DeceasedMatchCodes := MPD.DeceasedMatchCodes;
 			export boolean IncludeAddress := MPD.IncludeAddress;
@@ -12,6 +12,7 @@
 			export boolean IncludeEmail := MPD.IncludeEmail;
 			export boolean IncludeGender := MPD.IncludeGender;
 			export boolean IncludePhone := MPD.IncludePhone;
+			export boolean IncludeDOB := MPD.IncludeDOB;
 			export boolean IncludeSSN := MPD.IncludeSSN;
 			EXPORT STRING5 industry_class := MPD.IndustryClass;
 			export string25 Phones_Score_Model := MPD.Phones_Score_Model;
@@ -80,6 +81,7 @@
 			EXPORT BOOLEAN NoDIDAppend:= MPD.NoDIDAppend;
 			EXPORT BOOLEAN PartialNameMatchCodes:= MPD.PartialNameMatchCodes;
 			//Email: All common
+			EXPORT BOOLEAN useDMEmailSourcesOnly:= MPD.UseDMEmailSourcesOnly;
 			//PhoneFinder
 			EXPORT STRING1 PhoneFilter:= MPD.PhoneFilter;
 			EXPORT STRING1 StrTransactionType:= MPD.TransactionType;
@@ -107,7 +109,7 @@
 		//	 The module parameter should be passed along to the underlying attributes.
 		// **************************************************************************************			
 		export getBatchParams():= FUNCTION
-			base_params := BatchShare.IParam.getBatchParamsV2();
+			base_params := BatchShare.IParam.getBatchParams();
 			// project the base params to read shared parameters from store.
 			in_mod := MODULE(project(base_params, BatchParams, opt))
 				export string1	AddressConfidenceThreshold := MPD.AddressConfidenceThreshold  : stored('AddressConfidenceThreshold');
@@ -117,6 +119,7 @@
 				export boolean IncludeEmail := MPD.IncludeEmail  : stored('IncludeEmail');
 				export boolean IncludeGender := MPD.IncludeGender  : stored('IncludeGender');
 				export boolean IncludePhone := MPD.IncludePhone  : stored('IncludePhone');
+				export boolean IncludeDOB := MPD.IncludeDOB  : stored('IncludeDOB');
 				export boolean IncludeSSN := MPD.IncludeSSN  : stored('IncludeSSN');
 				EXPORT STRING5 industry_class := MPD.IndustryClass : STORED('IndustryClass');
 				EXPORT STRING25 Phones_Score_Model := MPD.Phones_Score_Model:STORED('Phone_Score_Model');
@@ -185,6 +188,7 @@
    			EXPORT BOOLEAN NoDIDAppend:= MPD.NoDIDAppend : STORED('NoDIDAppend');
    			EXPORT BOOLEAN PartialNameMatchCodes:= MPD.PartialNameMatchCodes : STORED('PartialNameMatchCodes');
 				//Email: All common
+			EXPORT boolean useDMEmailSourcesOnly := MPD.UseDMEmailSourcesOnly : STORED('UseDMEmailSourcesOnly');
 				//PhoneFinder
    			EXPORT UNSIGNED2 PenaltThreshold:= MPD.PenaltyThreshold : STORED('PenaltThreshold');
    			EXPORT STRING1 PhoneFilter:= MPD.PhoneFilter : STORED('PhoneFilter');

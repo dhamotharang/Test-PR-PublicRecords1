@@ -1,91 +1,96 @@
 ﻿/*--SOAP--
 <message name="FlexID (aka IID Model)">
-	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="33"/>
-	<part name="DPPAPurpose" type="xsd:byte"/>
-	<part name="GLBPurpose" type="xsd:byte"/> 
-	<part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="DataPermissionMask" type="xsd:string"/>
-	<part name="IndustryClass" type="xsd:string"/>
-	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
-	<part name="PoBoxCompliance" type="xsd:boolean"/>	
-	<part name="UseDOBFilter" type="xsd:boolean"/>
-	<part name="DOBRadius" type="xsd:unsignedInt"/>	
-	<part name="Model" type="xsd:string"/>
-	<part name="Targus" type="xsd:boolean"/>
-	<part name="IncludeTargusE3220" type="xsd:boolean"/>
-	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
-	<part name="IncludeMSoverride" type="xsd:boolean"/>
-	<part name="IncludeCLOverride" type="xsd:boolean"/>
+    <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="33"/>
+    <part name="DPPAPurpose" type="xsd:byte"/>
+    <part name="GLBPurpose" type="xsd:byte"/> 
+    <part name="DataRestrictionMask" type="xsd:string"/>
+    <part name="DataPermissionMask" type="xsd:string"/>
+    <part name="IndustryClass" type="xsd:string"/>
+    <part name="HistoryDateYYYYMM" type="xsd:integer"/>
+    <part name="PoBoxCompliance" type="xsd:boolean"/>	
+    <part name="UseDOBFilter" type="xsd:boolean"/>
+    <part name="DOBRadius" type="xsd:unsignedInt"/>	
+    <part name="Model" type="xsd:string"/>
+    <part name="Targus" type="xsd:boolean"/>
+    <part name="IncludeTargusE3220" type="xsd:boolean"/>
+    <part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
+    <part name="IncludeMSoverride" type="xsd:boolean"/>
+    <part name="IncludeCLOverride" type="xsd:boolean"/>
 
-	<part name="ExactFirstNameMatch" type="xsd:boolean"/>
-	<part name="ExactLastNameMatch" type="xsd:boolean"/>
-	<part name="ExactFirstNameMatchAllowNicknames" type="xsd:boolean"/>
-	<part name="ExactPhoneMatch" type="xsd:boolean"/>
-	<part name="ExactSSNMatch" type="xsd:boolean"/>
-	<part name="ExactDOBMatch" type="xsd:boolean"/>
-	<part name="ExactAddrMatch" type="xsd:boolean"/>
-	<part name="ExactDriverLicenseMatch" type="xsd:boolean"/>
+    <part name="ExactFirstNameMatch" type="xsd:boolean"/>
+    <part name="ExactLastNameMatch" type="xsd:boolean"/>
+    <part name="ExactFirstNameMatchAllowNicknames" type="xsd:boolean"/>
+    <part name="ExactPhoneMatch" type="xsd:boolean"/>
+    <part name="ExactSSNMatch" type="xsd:boolean"/>
+    <part name="ExactDOBMatch" type="xsd:boolean"/>
+    <part name="ExactAddrMatch" type="xsd:boolean"/>
+    <part name="ExactDriverLicenseMatch" type="xsd:boolean"/>
 
-	<part name="IncludeAllRiskIndicators" type="xsd:boolean"/>
-	<part name="IncludeVerifiedElementSummary" type="xsd:boolean"/>
-	<part name="IncludeDLverification" type="xsd:boolean"/>
-	<part name="DOBMatchType" type="xsd:string"/>
-	<part name="DOBMatchYearRadius" type="xsd:unsignedInt"/>
+    <part name="IncludeAllRiskIndicators" type="xsd:boolean"/>
+    <part name="IncludeVerifiedElementSummary" type="xsd:boolean"/>
+    <part name="IncludeDLverification" type="xsd:boolean"/>
+    <part name="DOBMatchType" type="xsd:string"/>
+    <part name="DOBMatchYearRadius" type="xsd:unsignedInt"/>
 
-	<part name="IncludeRiskIndices" type="xsd:boolean"/>
-	<part name="CustomCVIModelName" type="xsd:string"/>
-	<part name="LastSeenThreshold" type="xsd:string"/>
-	<part name="IncludeMIoverride" type="xsd:boolean"/>
-	<part name="IncludeDOBinCVI" type="xsd:boolean"/>
-	<part name="IncludeDriverLicenseInCVI" type="xsd:boolean"/>
-	<part name="DisableInquiriesInCVI" type="xsd:boolean"/>
-	<part name="IncludeVerifiedSSN" type="xsd:boolean"/>
-	<part name="DisallowInsurancePhoneHeaderGateway" type="xsd:boolean"/>
-	<part name="CompanyID" type="xsd:string"/>
-	<part name="ProductCode" type="xsd:string"/>
-	<part name="InstantIDVersion" type="xsd:string"/>
-	<part name="IIDVersionOverride" type="xsd:boolean"/>
-	
-	<part name="Include_ALL_Watchlist" type="xsd:boolean"/>
-	<part name="Include_BES_Watchlist" type="xsd:boolean"/>
-	<part name="Include_CFTC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_DTC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_EUDT_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FBI_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FCEN_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FAR_Watchlist" type="xsd:boolean"/>
-	<part name="Include_IMW_Watchlist" type="xsd:boolean"/>
-	<part name="Include_OFAC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_OCC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_OSFI_Watchlist" type="xsd:boolean"/>
-	<part name="Include_PEP_Watchlist" type="xsd:boolean"/>
-	<part name="Include_SDT_Watchlist" type="xsd:boolean"/>
-	<part name="Include_BIS_Watchlist" type="xsd:boolean"/>
-	<part name="Include_UNNT_Watchlist" type="xsd:boolean"/>
-	<part name="Include_WBIF_Watchlist" type="xsd:boolean"/>
+    <part name="IncludeRiskIndices" type="xsd:boolean"/>
+    <part name="CustomCVIModelName" type="xsd:string"/>
+    <part name="LastSeenThreshold" type="xsd:string"/>
+    <part name="IncludeMIoverride" type="xsd:boolean"/>
+    <part name="IncludeDOBinCVI" type="xsd:boolean"/>
+    <part name="IncludeDriverLicenseInCVI" type="xsd:boolean"/>
+    <part name="DisableInquiriesInCVI" type="xsd:boolean"/>
+    <part name="IncludeVerifiedSSN" type="xsd:boolean"/>
+    <part name="DisallowInsurancePhoneHeaderGateway" type="xsd:boolean"/>
+    <part name="CompanyID" type="xsd:string"/>
+    <part name="ProductCode" type="xsd:string"/>
+    <part name="InstantIDVersion" type="xsd:string"/>
+    <part name="IIDVersionOverride" type="xsd:boolean"/>
+    
+    <part name="Include_ALL_Watchlist" type="xsd:boolean"/>
+    <part name="Include_BES_Watchlist" type="xsd:boolean"/>
+    <part name="Include_CFTC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_DTC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_EUDT_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FBI_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FCEN_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FAR_Watchlist" type="xsd:boolean"/>
+    <part name="Include_IMW_Watchlist" type="xsd:boolean"/>
+    <part name="Include_OFAC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_OCC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_OSFI_Watchlist" type="xsd:boolean"/>
+    <part name="Include_PEP_Watchlist" type="xsd:boolean"/>
+    <part name="Include_SDT_Watchlist" type="xsd:boolean"/>
+    <part name="Include_BIS_Watchlist" type="xsd:boolean"/>
+    <part name="Include_UNNT_Watchlist" type="xsd:boolean"/>
+    <part name="Include_WBIF_Watchlist" type="xsd:boolean"/>
 
-	<part name="Include_ADFA_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FAJC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FATF_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FBIH_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FBIS_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FBIT_Watchlist" type="xsd:boolean"/>
-	<part name="Include_FBIW_Watchlist" type="xsd:boolean"/>
-	<part name="Include_HKMA_Watchlist" type="xsd:boolean"/>
-	<part name="Include_MASI_Watchlist" type="xsd:boolean"/>
-	<part name="Include_OFFC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_PMLC_Watchlist" type="xsd:boolean"/>
-	<part name="Include_PMLJ_Watchlist" type="xsd:boolean"/>
+    <part name="Include_ADFA_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FAJC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FATF_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FBIH_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FBIS_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FBIT_Watchlist" type="xsd:boolean"/>
+    <part name="Include_FBIW_Watchlist" type="xsd:boolean"/>
+    <part name="Include_HKMA_Watchlist" type="xsd:boolean"/>
+    <part name="Include_MASI_Watchlist" type="xsd:boolean"/>
+    <part name="Include_OFFC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_PMLC_Watchlist" type="xsd:boolean"/>
+    <part name="Include_PMLJ_Watchlist" type="xsd:boolean"/>
 
-	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
-	<part name="EnableEmergingID" type="xsd:boolean"/>	
-	<part name="NameInputOrder" type="xsd:string"/>	
-	<part name="IncludeOFAC" type="xsd:boolean"/>	
-	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>	
-	<part name="ExcludeWatchLists" type="xsd:boolean"/>	
-	<part name="OFACOnly" type="xsd:boolean"/>	
-	<part name="GlobalWatchlistThreshold" type="xsd:real"/>	
-	<part name="OFACversion" type="xsd:unsignedInt"/>	
+    <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
+    <part name="EnableEmergingID" type="xsd:boolean"/>	
+    <part name="NameInputOrder" type="xsd:string"/>	
+    <part name="IncludeOFAC" type="xsd:boolean"/>	
+    <part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>	
+    <part name="ExcludeWatchLists" type="xsd:boolean"/>	
+    <part name="OFACOnly" type="xsd:boolean"/>	
+    <part name="GlobalWatchlistThreshold" type="xsd:real"/>	
+    <part name="OFACversion" type="xsd:unsignedInt"/>
+    <part name="disablenongovernmentdldata" type="xsd:boolean"/>
+    <part name="IncludeEmailVerification" type="xsd:boolean"/>
+    <part name="IncludeITIN" type="xsd:boolean"/>
+    <part name="IncludeComplianceCap" type="xsd:boolean"/>
+    <part name="IncludeDigitalIdentity" type="xsd:boolean"/>
  </message>
 */
 /*--HELP--
@@ -126,7 +131,7 @@
 </pre>
 */
 
-import address, iesp, identifier2, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway, OFAC_XG5;
+import STD, address, iesp, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway, OFAC_XG5;
 
 export FlexID_Batch_Service := MACRO
 
@@ -226,6 +231,11 @@ string1 IIDVersion := '0'										: STORED('InstantIDVersion');		// set this ve
 boolean IIDVersionOverride := false					: STORED('IIDVersionOverride');	// back office tag that, if true, allows a version lower than the lowestAllowedVersion
 boolean EnableEmergingID := false						: STORED('EnableEmergingID');	// back office tag that, if true, invokes additional logic for appending DID
 string3 NameInputOrder := ''								: STORED('NameInputOrder');	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
+boolean IncludeEmailverification := false : STORED('IncludeEmailverification');
+boolean disablenongovernmentdldata := false : STORED('disablenongovernmentdldata'); //to exclude non government data in DL Verification
+boolean IncludeITIN := false                : STORED('IncludeITIN'); // to disable override option when ITIN exists.
+boolean IncludeComplianceCap  := false      : STORED('IncludeComplianceCap');  // to prevent cvi increase when dob and license are included in NAS and NAP combination.
+boolean IncludeDigitalIdentity  := false      : STORED('IncludeDigitalIdentity');
 
 unsigned1 lowestAllowedVersion := 1;	// lowest allowed version according to product, unless the IIDVersionOveride is true
 unsigned1 maxAllowedVersion := 1;	// maximum allowed version as of 1/28/2014
@@ -235,7 +245,7 @@ unsigned1 maxAllowedVersion := 1;	// maximum allowed version as of 1/28/2014
 // to choose the version they want to use.  This version cannot be lower than the lowest allowed version unless the override tag is set to true, in which case
 // the customer can choose any version and if no version is passed in, it will be considered version 0.
 actualIIDVersion := map((unsigned)IIDVersion > maxAllowedVersion => 99,	// they asked for a version that doesn't exist
-												IIDVersionOverride = false => ut.imin2(ut.max2((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
+												IIDVersionOverride = false => MIN(MAX((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
 												(unsigned)IIDversion); // they can override, give them whatever they asked for
 if(actualIIDVersion=99, FAIL('Not an allowable InstantIDVersion.  Currently versions 0 and 1 are supported'));
 
@@ -347,6 +357,13 @@ unsigned1 OFACVersion :=2 :stored('OFACversion');
 boolean IncludeAdditionalWatchlists := FALSE: stored('IncludeAdditionalWatchlists');
 boolean IncludeOfac := FALSE: stored('IncludeOfac');
 real GlobalWatchListThreshold_temp := 0 :stored('GlobalWatchlistThreshold');
+
+// CCPA Fields
+  unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+  string TransactionID := '' : stored ('_TransactionId');
+  string BatchUID := '' : stored('_BatchUID');
+  unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+  
 			GlobalWatchListThreshold := Map( 
 																		OFACVersion >= 4	and GlobalWatchListThreshold_temp = 0	 => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
 																		OFACVersion < 4  and GlobalWatchListThreshold_temp = 0  => OFAC_XG5.Constants.DEF_THRESHOLD_REAL,
@@ -357,7 +374,7 @@ unsigned1 AppendBest := 1;		// search best file
 boolean doInquiries := ~DisableInquiriesInCVI AND dataRestriction[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue AND
 												actualIIDVersion=1;
 boolean AllowInsuranceDL := true;
-ModelName := StringLib.StringToLowerCase( ModelIn );
+ModelName := STD.STR.ToLowerCase( ModelIn );
 
 boolean OFAC := true;	// used in cviScore override, FlexID has been hardcoded to TRUE, so I am doing that here now
 
@@ -380,6 +397,7 @@ integer BSVersion := MAP (
 													ModelName in ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9'] => 51,	
 													51);  //for the Emerging Identities project, default BS version to 51
 
+enableEquifaxPhoneMart:= DataRestriction[Risk_indicators.iid_constants.enableEquifaxPhoneMart]=Risk_indicators.iid_constants.sFalse;
 unsigned8 BSOptions := 	if(doInquiries, risk_indicators.iid_constants.BSOptions.IncludeInquiries, 0) +
 												if(~DisallowInsurancePhoneHeaderGateway and actualIIDVersion=1, risk_indicators.iid_constants.BSOptions.IncludeInsNAP, 0) +
 												if(actualIIDVersion=1, risk_indicators.iid_constants.BSOptions.IsInstantIDv1, 0) +
@@ -389,11 +407,13 @@ unsigned8 BSOptions := 	if(doInquiries, risk_indicators.iid_constants.BSOptions.
 														0) +
 												if(AllowInsuranceDL, risk_indicators.iid_constants.BSOptions.AllowInsuranceDLInfo, 0) +  //Allows use of Insurance DL information
 												if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0) +
-												if(bsversion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0);	//Invokes additional DID append logic
-												
+												if(bsversion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0)+	//Invokes additional DID append logic
+												if(IncludeDigitalIdentity,Risk_indicators.iid_constants.BSOptions.runthreatmetrix,0)+
+                  if(disablenongovernmentdldata, risk_indicators.iid_constants.BSOptions.disablenongovernmentdldata, 0) + //check to disable use of Non Governmental DL information
+                  if(enableEquifaxPhoneMart,Risk_indicators.iid_constants.BSOptions.enableEquifaxPhoneMart,0);
 // JRP 02/12/2008 - Dataset of actioncode and reasoncode settings which are passed to the getactioncodes and reasoncodes functions.
 boolean IsInstantID := true;
-reasoncode_settings := dataset([{IsInstantID,actualIIDVersion,EnableEmergingID}],riskwise.layouts.reasoncode_settings);
+reasoncode_settings := dataset([{IsInstantID,actualIIDVersion,EnableEmergingID,false,false,false,false,false,includeemailverification}],riskwise.layouts.reasoncode_settings);
 
 
 gateways_in := Gateway.Configuration.Get();
@@ -431,23 +451,23 @@ risk_indicators.Layout_Input into(fs le) := transform
 	self.seq := le.seq;	
 	self.ssn := le.ssn;
 	self.dob := dob_val;
-	self.age := if ((integer)le.age = 0 and (integer)dob_val != 0,(STRING3)ut.GetAgeI((integer)dob_val), (le.age));
+	self.age := if ((integer)le.age = 0 and (integer)dob_val != 0,(STRING3)ut.Age((integer)dob_val), (le.age));
 	
 	self.phone10 := le.Home_Phone;
 	self.wphone10 := le.Work_Phone;
 
-	cleaned_name := Stringlib.StringToUppercase(
-										map(trim(Stringlib.StringToUppercase(NameInputOrder)) = 'FML' => Address.CleanPersonFML73(le.UnParsedFullName),
-												trim(Stringlib.StringToUppercase(NameInputOrder)) = 'LFM' => Address.CleanPersonLFM73(le.UnParsedFullName),
+	cleaned_name := STD.STR.ToUpperCase(
+										map(trim(STD.STR.ToUpperCase(NameInputOrder)) = 'FML' => Address.CleanPersonFML73(le.UnParsedFullName),
+												trim(STD.STR.ToUpperCase(NameInputOrder)) = 'LFM' => Address.CleanPersonLFM73(le.UnParsedFullName),
 																																										 Address.CleanPerson73(le.UnParsedFullName)));
 	
 	boolean valid_cleaned := le.UnParsedFullName <> '';
 	
-	self.fname := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
-	self.lname := stringlib.stringtouppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
-	self.mname := stringlib.stringtouppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
-	self.suffix := stringlib.stringtouppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
-	self.title := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
+	self.fname := STD.STR.ToUpperCase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
+	self.lname := STD.STR.ToUpperCase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
+	self.mname := STD.STR.ToUpperCase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
+	self.suffix := STD.STR.ToUpperCase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
+	self.title := STD.STR.ToUpperCase(if(valid_cleaned, cleaned_name[1..5],''));
 
 	street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 	clean_a2 := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;		
@@ -475,8 +495,8 @@ risk_indicators.Layout_Input into(fs le) := transform
 	self.county := clean_a2[143..145];
 	self.geo_blk := clean_a2[171..177];
 	
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(le.dl_state);
+	self.dl_number := STD.STR.ToUpperCase(dl_num_clean);
+	self.dl_state := STD.STR.ToUpperCase(le.dl_state);
 	
 	self.ip_address := le.ip_addr;
 	self.email_address := le.email;
@@ -511,7 +531,8 @@ ret := risk_indicators.InstantID_Function(prep, gateways, DPPAPurpose, GLBPurpos
 														fromIT1O, OFACVersion, IncludeOFAC, IncludeAdditionalWatchlists, GlobalWatchListThreshold, DobRadiusUse,
 														BSVersion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones,
 														ExactMatchLevel, DataRestriction, CustomDataFilter, IncludeDLverification, watchlists_request, DOBMatchOptions,
-														EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold, CompanyID, DataPermission);
+														EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold, CompanyID, DataPermission,
+                                                        LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 
 if(exists(ret(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
 
@@ -521,7 +542,16 @@ LayoutFlexIDBatchOutExt := RECORD
 	boolean insurance_dl_used;
 END;
 
-LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
+//  For ThreatMetrix reasoncodes
+TMX_model:=Models.IID1906_0_0(ret);
+DRM_threatmetrix:= DataRestriction[Risk_indicators.iid_constants.IncludeDigitalIdentity]=Risk_indicators.iid_constants.sFalse;
+ retplus_tmx:= if(DRM_threatmetrix,join(ret,TMX_model,left.seq=right.seq,
+ transform(risk_indicators.layout_output,
+ self.iid_tmx.phonehighriskind:=RIGHT.phonehighriskind,
+ self.iid_tmx.emailhighriskind:=Right.emailhighriskind,
+ self:=LEFT),left outer),ungroup(ret));
+ 
+LayoutFlexIDBatchOutExt format_out(retplus_tmx le, fs ri) := TRANSFORM
 	SELF.seq := (string)ri.seq;
 	SELF.acctNo := ri.acctno;
 	
@@ -537,17 +567,19 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 	verlast := IF(le.combo_lastcount>0, le.combo_last, '');
 	veraddr := IF(le.combo_addrcount>0, Risk_Indicators.MOD_AddressClean.street_address('', le.combo_prim_range, le.combo_predir, le.combo_prim_name, le.combo_suffix,
 																													le.combo_postdir,le.combo_unit_desig,le.combo_sec_range), '');
-	cvi_temp := if(actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel, le.socsverlevel, le, le.correctssn, le.correctaddr, le.correcthphone, '', veraddr, verlast,
-																															OFAC),
-																			risk_indicators.cviScoreV1(le.phoneverlevel, le.socsverlevel, le, le.correctssn, le.correctaddr, le.correcthphone, '', veraddr, verlast,
-																																	OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI));
-	isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
-	SELF.ComprehensiveVerificationIndex := MAP(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
-							IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
-							IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)cvi_temp > 10 => '10', 
-							IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)cvi_temp > 10 => '10',
-							isCodeDI AND (INTEGER)cvi_temp > 10 => '10',
-							cvi_temp);
+	
+            OverrideOptions := MODULE(Risk_Indicators.iid_constants.IOverrideOptions) 
+            EXPORT isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) AND actualIIDVersion=1;
+            EXPORT isCodePO := risk_indicators.rcSet.isCodePO(le.addr_type) AND IsPOBoxCompliant;
+            EXPORT isCodeCL := risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) AND IncludeCLoverride;
+            EXPORT isCodeMI := risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) AND IncludeMIoverride;
+            EXPORT isCodeMS := risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) AND IncludeMSoverride;
+            END;
+            
+			SELF.ComprehensiveVerificationIndex :=  if(actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast,
+																														OFAC,OverrideOptions),	
+																					risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast,
+																														OFAC, IncludeDOBinCVI, IncludeDriverLicenseInCVI,,,OverrideOptions));
 																																									
 	
 	// allow up to 20 reason codes (seemed like a high enough amount to show all reason codes returned)
@@ -595,6 +627,7 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 		
 	// Summary Verification flags
 	SELF.VerifiedElementSummaryFirstName := if(IncludeSummaryFlags, if(le.combo_firstcount>0, '1', '0'), '');
+	SELF.VerifiedElementSummaryMiddleName := if(IncludeSummaryFlags, if(le.combo_middlecount>0, '1', '0'), '');
 	SELF.VerifiedElementSummaryLastName := if(IncludeSummaryFlags, if(le.combo_lastcount>0, '1', '0'), '');
 	addrScore := Risk_Indicators.AddrScore.AddressScore(	le.combo_prim_range, le.combo_prim_name, le.combo_sec_range,
 																			le.prim_range, le.prim_name, le.sec_range);																					
@@ -603,19 +636,20 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 	SELF.VerifiedElementSummaryStreetAddress := if(IncludeSummaryFlags, 	if(addrMatch, '1', '0'), 
 																								'');
 																								
-	CityA := stringlib.stringtouppercase(trim(le.combo_city));
-	CityB := stringlib.stringtouppercase(trim(ri.p_City_name));
+	CityA := STD.STR.ToUpperCase(trim(le.combo_city));
+	CityB := STD.STR.ToUpperCase(trim(ri.p_City_name));
 	CityScore := 100 - MAX(ut.StringSimilar100(CityA, CityB), ut.StringSimilar100(CityB, CityA));
 	CityMatch := (ExactAddrMatch and CityA=CityB and CityB<>'') or (~ExactAddrMatch and CityScore between 80 and 100 and CityB<>'');
 		
 	SELF.VerifiedElementSummaryCity := if(IncludeSummaryFlags, if(CityMatch, '1', '0'), '');																							
-	SELF.VerifiedElementSummaryState := if(IncludeSummaryFlags, if(trim(le.combo_state)=trim(stringlib.stringtouppercase(ri.st)) and trim(ri.st)<>'', '1', '0'), '');
+	SELF.VerifiedElementSummaryState := if(IncludeSummaryFlags, if(trim(le.combo_state)=trim(STD.STR.ToUpperCase(ri.st)) and trim(ri.st)<>'', '1', '0'), '');
 	SELF.VerifiedElementSummaryZip := if(IncludeSummaryFlags, if(trim(le.combo_zip[1..5])=trim(ri.z5) and trim(ri.z5)<>'', '1', '0'), '');
 	SELF.VerifiedElementSummaryHomePhone := if(IncludeSummaryFlags, if(le.combo_hphonecount>0, '1', '0'), '');
 	SELF.VerifiedElementSummarySSN := if(IncludeSummaryFlags, if(le.combo_ssncount>0, '1', '0'), '');
 	SELF.VerifiedElementSummaryDOB := if(le.combo_dobcount>0, '1', '0');
 	SELF.VerifiedElementSummaryDOBMatchLevel := le.dobmatchlevel;
 	SELF.VerifiedElementSummaryDL := if(IncludeDLVerification, if(le.verified_dl<>'', '1', '0'), '');
+	SELF.VerifiedElementSummaryEmail := if(IncludeEmailVerification, if(le.VerifiedEmail<>'', '1', '0'), '');
 	
 	// Summary Validation flags
 	SELF.ValidElementSummarySSNDeceased := if(le.decsflag='1', '1', '0');
@@ -647,10 +681,14 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 																						le.sec_range <> '' and isReasonCodeSR															=> 'M',	 //input sec range, but our data shows different sec range
 																						le.sec_range = '' and ~isReasonCodeSR															=> 'N',	 //no input sec range and our data does not have one
 																																																								 'V'); //input sec range matches our data
-	
-	SELF := [];
+ SELF.BureauDeleted  := if(le.header_summary.EQ_ssn_nlr or le.header_summary.EN_ssn_nlr or le.header_summary.TN_ssn_nlr, true, false);
+ SELF.ITINExpired:=le.ITINExpired;
+ SELF.IsPhoneCurrent:=le.IsPhoneCurrent;
+ SELF.PhoneLineType:=le.PhoneLineType;
+ SELF.PhoneLineDescription:=le.PhoneLineDescription;
+ SELF := [];
 END;
-formedbeforeAdvo := join(ret, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
+formedbeforeAdvo := join(retplus_tmx, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
 formedWithAdvo := join(formedbeforeAdvo, with_advo, (integer)left.seq = right.seq, 
 									TRANSFORM(LayoutFlexIDBatchOutExt,
 										self.ValidElementSummaryAddressCMRA := IF(LEFT.ValidElementSummaryAddressCMRA = '1' OR RIGHT.ADVODropIndicator = 'C', '1', '0');
@@ -685,7 +723,11 @@ clam :=  risk_indicators.Boca_Shell_Function(	ret,
 															FilterOutFares,
 															DataRestriction,
 															BSOptions,
-															DataPermission);
+															DataPermission,
+                                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                                            TransactionID := TransactionID, 
+                                                            BatchUID := BatchUID, 
+                                                            GlobalCompanyID := GlobalCompanyID);
 															
 															
 

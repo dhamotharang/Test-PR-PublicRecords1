@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="NCPDP_SearchService">
 	<!-- COMPLIANCE SETTINGS -->
 	<part name="PharmacySearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
@@ -14,8 +14,19 @@ export NCPDP_SearchService := MACRO
 	iesp.ECL2ESP.Marshall.Mac_Set(first_row.options);
 	iesp.ECL2ESP.SetInputUser(first_row.user);
 	hasFullNCPDP := first_row.Options.IncludeFullNCPDPInfo;
+	Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
+		self.MaxResults := first_row.options.MaxResults;
+		self.DRM := first_row.user.DataRestrictionMask;
+		self.glb_ok := ut.glb_ok ((integer)first_row.user.GLBPurpose);
+		self.dppa_ok := ut.dppa_ok((integer)first_row.user.DLPurpose);	
+		self.doDeepDive := first_row.options.IncludeAlsoFound;		
+		self.IncludeAlsoFound := first_row.options.IncludeAlsoFound;
+		self.includeCustomerData := true;
+		self.hasFullNCPDP:=false;
+		end;
+	cfgData:=dataset([buildConfig()]);
 	convertedInput := project(first_row.searchBy,Healthcare_Services.NCPDP_Transforms.convertIESPtoSearchInput(left));
-	recs := Healthcare_Services.NCPDP_Records().getRecords(dataset([convertedInput],Healthcare_Services.NCPDP_Layouts.autokeyInput));	
+	recs := Healthcare_Services.NCPDP_Records().getRecords(dataset([convertedInput],Healthcare_Services.NCPDP_Layouts.autokeyInput),cfgData);	
 	fmtRecs:=project(recs,Healthcare_Services.NCPDP_Transforms.fmtSearchResults(left,hasFullNCPDP));
 	// Format output to iesp
 	// iesp.ncpdp.t_PharmacySearchResponse format() := transform

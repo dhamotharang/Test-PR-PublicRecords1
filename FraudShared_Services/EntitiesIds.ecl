@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, FraudShared;
+﻿IMPORT AutoStandardI, BIPV2, doxie, FraudShared;
 
 EXPORT EntitiesIds(
   DATASET(FraudShared_Services.Layouts.BatchIn_Valid_rec) ds_valid_in,
@@ -42,8 +42,10 @@ EXPORT EntitiesIds(
   END;
 
   EXPORT GetLinkIds() := FUNCTION
+    global_mod := AutoStandardI.GlobalModule();
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
     fetchIn := PROJECT(ds_valid_in(hasBusiness), BIPV2.IDlayouts.l_xlink_ids);
-    fetchedRecs := FraudShared.Key_Linkids_kFetch(fetchIn, fraud_platform, BIPV2.IDconstants.Fetch_Level_SELEID);
+    fetchedRecs := FraudShared.Key_Linkids_kFetch(fetchIn, fraud_platform, mod_access, BIPV2.IDconstants.Fetch_Level_SELEID);
     results := JOIN(
       ds_valid_in(hasBusiness), fetchedRecs,
       BIPV2.IDmacros.mac_JoinTop3Linkids(),

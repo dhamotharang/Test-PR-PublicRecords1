@@ -4,7 +4,7 @@
 </message>
 */
 
-IMPORT BatchShare,doxie, FraudShared_Services, iesp, WSInput;
+IMPORT BatchShare,doxie,FraudShared,FraudShared_Services, iesp, WSInput;
 
 EXPORT ReportService() := MACRO
   #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -177,12 +177,53 @@ EXPORT ReportService() := MACRO
 	//for searches, not just card details.
 	isValidInput := (inputCount = 1 OR ~Options.IsOnline OR Options.UseAllSearchFields) AND isValidDate;
 
+	// Validate Input DID (if provided)?
+	BOOLEAN DidFoundInPR := report_in[1].did <> 0 AND EXISTS(IDLExternalLinking.did_getAllRecs(report_in[1].did)(s_did > 0));
+
+	// Validate Input DID and check if it's a RINID. 
+	BOOLEAN IsInputDidRINID := ~DidFoundInPR AND
+															report_in[1].did > 900000000000 AND //This is the number RIN ID sequence starts in index.
+															EXISTS(FraudShared.Key_Did(FraudShared_Services.Constants.Platform.FraudGov)(KEYED(did = report_in[1].did)));
+	
+
 	// **************************************************************************************
 	// Append DID for Input PII
 	// **************************************************************************************	  
-	ds_in_with_did := BatchShare.MAC_Get_Scored_DIDs(report_in, report_mod, usePhone:=TRUE);
+
+	//prepare the layout for ADL_BEST DID call
+	ds_in_didville_layout := PROJECT(report_in, TRANSFORM(DidVille.Layout_Did_OutBatch,
+                                                  SELF.seq		:= (UNSIGNED)LEFT.acctno;
+                                                  SELF.fname	:= LEFT.name_first;
+                                                  SELF.mname	:= LEFT.name_middle;
+                                                  SELF.lname	:= LEFT.name_last;
+                                                  SELF.suffix	:= LEFT.name_suffix;
+                                                  SELF.ssn 		:= stringlib.stringfilter(LEFT.ssn,'0123456789');
+                                                  SELF.did 		:= 0; //Purposefully sending DID = 0, so we can resolve the adl best did for Input PII. 
+                                                  SELF.phone10:= LEFT.phoneno;
+                                                  SELF				:= LEFT;
+                                                  SELF				:= []));
 	
-	ds_in_final := IF(Options.IsOnline, report_in, ds_in_with_did);
+	ds_in_w_adl_did_appended := DidVille.did_service_common_function(ds_in_didville_layout,
+                                                                   glb_flag := report_mod.isValidGLB(),
+                                                                   glb_purpose_value := report_mod.glb,
+                                                                   appType := report_mod.application_type,
+                                                                   include_minors := TRUE,
+                                                                   IndustryClass_val := report_mod.industry_class,
+                                                                   DRM_val := report_mod.DataRestrictionMask);
+																																			 
+	ds_in_w_adl_did_appended_ungrup := UNGROUP(ds_in_w_adl_did_appended);
+	
+	ds_in_with_did := JOIN(report_in, ds_in_w_adl_did_appended_ungrup, 
+											LEFT.acctno = (string)RIGHT.seq,
+											TRANSFORM(FraudShared_Services.Layouts.BatchIn_rec, 
+												SELF.did := MAP(~DidFoundInPR => RIGHT.DID, 
+																				DidFoundInPR OR IsInputDidRINID => LEFT.DID,
+																				0); 
+												SELF := LEFT));
+												
+	report_in_final := PROJECT(report_in, FraudShared_Services.Layouts.BatchIn_rec);
+	
+	ds_in_final := IF(Options.IsOnline, report_in_final, ds_in_with_did);
 
 	ds_reportrecords := FraudGovPlatform_Services.ReportRecords(ds_in_final, 
 																															report_mod,
@@ -195,9 +236,34 @@ EXPORT ReportService() := MACRO
 	
 	//Final iESP Form Conversion
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(ds_reportrecords.esdl_out, results, iesp.fraudgovreport.t_FraudGovReportResponse);
+	
+	/*-------- Following code is to generate Deltabase Log Input (This only happens for the API service) ---------------------*/
+	// GRP-3288
+	// Following booleans are created for the rules listed in GRP-3288. These will be used to conditionally fill Did and PII.
+	BOOLEAN isPII_Input := ~Options.IsOnline AND (ReportBy.Name.Last <> '' OR ReportBy.SSN <> '' OR ReportBy.Phone10 <> '' OR
+												 ReportBy.Address.StreetAddress1 <> '' OR (ReportBy.Address.StreetName <> '' AND 
+													 ((ReportBy.Address.City <> '' AND ReportBy.Address.State <> '') OR ReportBy.Address.Zip5 <> '')));
+	//Condition 2(a)
+	BOOLEAN PIIDid_W_ValidDid_PIINoSameDid := ReportBy.UniqueId <> '' AND isPII_Input AND DidFoundInPR AND (ds_in_w_adl_did_appended[1].did = 0 OR (ReportBy.UniqueId  <> (string)ds_in_w_adl_did_appended[1].did));
+	
+	delta_log_input := PROJECT(first_row,
+														TRANSFORM(iesp.fraudgovreport.t_FraudGovReportRequest,
+																SELF.ReportBy.UniqueId := (string) ds_in_with_did[1].did;
+																SELF.ReportBy.Name := 
+																	IF(PIIDid_W_ValidDid_PIINoSameDid, ROW([], iesp.share.t_Name),  LEFT.ReportBy.Name);
+																SELF.ReportBy.Address := 
+																	IF(PIIDid_W_ValidDid_PIINoSameDid, ROW([], iesp.share.t_Address),  LEFT.ReportBy.Address);
+																SELF.ReportBy.DOB := 
+																	IF(PIIDid_W_ValidDid_PIINoSameDid, ROW([], iesp.share.t_Date),  LEFT.ReportBy.DOB);
+																SELF.ReportBy.SSN := 
+																	IF(PIIDid_W_ValidDid_PIINoSameDid, '',  LEFT.ReportBy.SSN);
+																SELF.ReportBy.Phone10 := 
+																	IF(PIIDid_W_ValidDid_PIINoSameDid, '',  LEFT.ReportBy.Phone10);
+																SELF := LEFT
+														));	
 
 	deltabase_inquiry_log := FraudGovPlatform_Services.Functions.GetDeltabaseLogDataSet(
-														first_row,
+														delta_log_input,
 														FraudGovPlatform_Services.Constants.ServiceType.REPORT);
 
 	IF(isValidInput,

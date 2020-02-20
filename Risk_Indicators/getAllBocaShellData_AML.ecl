@@ -1,18 +1,31 @@
-﻿IMPORT Ut, riskwise, american_student_list, models, easi, doxie, doxie_files, dma, fcra_opt_out, USPIS_HotList, AML, paw, gateway;
+﻿IMPORT Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, risk_indicators;
 
 EXPORT getAllBocaShellData_AML (
-  GROUPED DATASET (Layout_output) iid, 
-  GROUPED DATASET (layout_bocashell_neutral) ids_wide, //if IsFCRA ids_wide also contains corr. flags
-  GROUPED DATASET (Layout_Boca_Shell) p,
+  GROUPED DATASET (risk_indicators.Layout_output) iid, 
+  GROUPED DATASET (risk_indicators.layout_bocashell_neutral) ids_wide, //if IsFCRA ids_wide also contains corr. flags
+  GROUPED DATASET (risk_indicators.Layout_Boca_Shell) p,
   boolean IsFCRA, boolean isLN, unsigned1 dppa, boolean dppa_ok,
 
   // optimization options
   boolean includeRelativeInfo=true, boolean includeDLInfo=true,
   boolean includeVehInfo=true, boolean includeDerogInfo=true, 
   unsigned1 BSversion=1, boolean isPreScreen=false, boolean doScore=false, boolean filter_out_fares=false,
-	string50 DataRestriction=iid_constants.default_DataRestriction,
+	string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 	unsigned8 BSOptions = 0,  UNSIGNED1 glb=0,
-	string50 DataPermission=iid_constants.default_DataPermission) := FUNCTION
+	string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+    unsigned1 LexIdSourceOptout = 1,
+    string TransactionID = '',
+    string BatchUID = '',
+    unsigned6 GlobalCompanyId = 0) := FUNCTION
+    
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := ^.glb;
+	EXPORT dppa := ^.dppa;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
+
 	
   // IsAML  := (BSOptions & iid_constants.BSOptions.IsAML) > 0;
   IsAML  := true;  // hard code this to true for now
@@ -355,7 +368,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 
   // =============== Vehicles ===============
   vehicles := Risk_Indicators.Boca_Shell_Vehicles(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion);
-  vehicles_hist := Risk_Indicators.Boca_Shell_Vehicles_Hist(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion);
+  vehicles_hist := Risk_Indicators.Boca_Shell_Vehicles_Hist(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion, mod_access);
   vehicles_rolled := if (production_realtime_mode, vehicles, vehicles_hist);
 
 
@@ -364,10 +377,10 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
   derogs := IF (IsFCRA,
                 Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, 
 									BSOptions, IncludeLnJ, iid),
-                Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion));
+                Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion, mod_access));
   derogs_hist := IF (IsFCRA,
                      Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion),
-                     Risk_Indicators.Boca_Shell_Derogs_Hist      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion));
+                     Risk_Indicators.Boca_Shell_Derogs_Hist      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, mod_access));
   doc_rolled := if (production_realtime_mode, derogs, derogs_hist);
 	
 	relat_derogs := doc_rolled(isrelat);
@@ -377,10 +390,10 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== Watercraft ===============
 	watercraft := IF (IsFCRA,
 											Risk_Indicators.Boca_Shell_Watercraft_FCRA (ids_only(~isrelat), isPreScreen, bsVersion), 
-											Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/));
+											Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
 	watercraft_hist := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Watercraft_Hist_FCRA (ids_only(~isrelat), isPreScreen, bsVersion),
-													Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/));
+													Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
 	watercraft_rolled := if (production_realtime_mode, watercraft, watercraft_hist);
   
 	watercraft_relat := watercraft_rolled(isrelat);
@@ -390,10 +403,18 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== Professional Licenses ===============
 	proflic := IF (IsFCRA,
 											Risk_Indicators.Boca_Shell_Proflic_FCRA (ids_only(~isrelat), bsversion, isPreScreen),
-											Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion));
+											Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion,
+                                                                                                                 LexIdSourceOptout,
+                                                                                                                 TransactionID,
+                                                                                                                 BatchUID,
+                                                                                                                 GlobalCompanyId));
 	proflic_hist := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Proflic_Hist_FCRA (ids_only(~isrelat), bsversion, isPreScreen),
-													Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion));
+													Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion,
+                                                                                                                         LexIdSourceOptout,
+                                                                                                                         TransactionID,
+                                                                                                                         BatchUID,
+                                                                                                                         GlobalCompanyId));
 	proflic_rolled := if (production_realtime_mode, proflic, proflic_hist);
 
  
@@ -401,7 +422,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== Student File ===============
 	student_rolled := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Student_FCRA (ids_only(~isrelat), bsversion),
-													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion, filter_out_fares));
+													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion, filter_out_fares, mod_access));
 
 
 // =============== Aircraft ===============
@@ -424,19 +445,19 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	//=========== Gong ============
 	gong_rolled := IF (IsFCRA,
 												Risk_Indicators.Boca_Shell_Gong_FCRA (ids_wide(~isrelat)),
-												Risk_Indicators.Boca_Shell_Gong			 (ids_wide(~isrelat)));
+												Risk_Indicators.Boca_Shell_Gong			 (ids_wide(~isrelat), mod_access));
 												
 												
 	// ============ Infutor =============
 	infutor_rolled := IF(IsFCRA,
 													Risk_Indicators.Boca_Shell_Infutor_FCRA (ids_wide(~isrelat)),
-													Risk_Indicators.Boca_Shell_Infutor      (ids_wide(~isrelat)));
+													Risk_Indicators.Boca_Shell_Infutor      (ids_wide(~isrelat), mod_access));
 													
 													
 	// =========== Impulse ==============
 	impulse_rolled := IF(IsFCRA,
 													Risk_Indicators.Boca_Shell_Impulse_FCRA (ids_wide(~isrelat), bsversion),
-													Risk_indicators.Boca_Shell_Impulse      (ids_wide(~isrelat), bsversion));
+													Risk_indicators.Boca_Shell_Impulse      (ids_wide(~isrelat), bsversion, mod_access));
 													
 													
 													
@@ -520,7 +541,7 @@ ssnFlagsPrepforAddr := group(project(ssnFlagsPrep, transform(risk_indicators.Lay
 ExactMatchLevel:=iid_constants.default_ExactMatchLevel;
 
 //aml  just ids with ssn flags				fixed memory limit error - iid_getssnflags expects diff seq for each individual.																													
-withSSNFlags := iid_getSSNFlags(group(ssnFlagsPrepseq, seq), dppa, glb, isFCRA, false/*runSSNCodes*/, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission );	
+withSSNFlags := iid_getSSNFlags(group(ssnFlagsPrepseq, seq), dppa, glb, isFCRA, false/*runSSNCodes*/, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission, mod_access := mod_access);	
 
 SSNFlagsOrigSeq := join(withSSNFlags, ssnFlagsPrep, (integer)left.account = right.origseq and left.did = right.did, 
 												transform({recordof(withSSNFlags)}, self.seq := right.origseq, self.account := right.account, self := left));
@@ -544,12 +565,12 @@ ids_full_ssn := join(	SSNFlagsOrigSeq, pre_ids_only, left.seq=right.seq and left
 											
 //AML position title   all ids
 
-relatEmpl :=  AML.AMLEmployment(pre_ids_only);
+relatEmpl :=  AML.AMLEmployment(pre_ids_only, mod_access);
 
 //AML  degree
-relatStudent := AML.AMLStudent(ids_only);
+relatStudent := AML.AMLStudent(ids_only, mod_access);
 //  AML professional license
-relatProfLic :=  AML.AMLProfLicense(ids_only);
+relatProfLic :=  AML.AMLProfLicense(ids_only, mod_access);
 
 
 RelatInput :=  join(ssnFlagsPrepforAddr, pre_ids_only,
@@ -580,7 +601,7 @@ relatAddr  := AML.AMLAddrAttrib(ssnFlagsPrepforAddr);
 
 
 //  AML  header info
-relatHeader :=  AML.AMLGetHeader(group(RelatInput,seq), dppa, glb, isFCRA, DataRestriction);
+relatHeader :=  AML.AMLGetHeader(group(RelatInput,seq), dppa, glb, isFCRA, DataRestriction, mod_access);
 
 //AML   relates parents
 
@@ -598,7 +619,7 @@ RelatInfo :=  join(SSNFlagsOrigSeq, pre_ids_only(isrelat),
 															self.RelatParentPubRec10yrs := 0;
 															self := []));
 								
-relatParentPubRec := AML.AMLRelativesAssocs(group(RelatInfo, seq), dppa, glb, isFCRA,  DataRestriction);
+relatParentPubRec := AML.AMLRelativesAssocs(group(RelatInfo, seq), dppa, glb, isFCRA,  DataRestriction, mod_access);
 
 
 
@@ -1159,12 +1180,12 @@ shell3_bsdata := map(
 
 // new sections of data for shell 4.0 content
 advo_rolled := boca_shell_advo(ids_wide(~isrelat), isFCRA, datarestriction, isPreScreen, bsversion);  // change to neutral layout
-employment_rolled := boca_shell_employment(ids_wide(~isrelat), isFCRA, isPreScreen, bsversion);
+employment_rolled := boca_shell_employment(ids_wide(~isrelat), isFCRA, isPreScreen, bsversion, mod_access);
 
 gateways := Gateway.Constants.void_gateway;  // AML won't use the collection shell neutral gateway, just hard code gateways to empty dataset
-inquiries_rolled := boca_shell_inquiries(ids_wide(~isrelat), BSOptions, bsversion, gateways, datapermission);
+inquiries_rolled := boca_shell_inquiries(ids_wide(~isrelat), BSOptions, bsversion, gateways, datapermission, mod_access);
 LastSeenThreshold := risk_indicators.iid_constants.oneyear;	// set this to default like what it was prior to my BSOptions change									
-email_summary_rolled := boca_shell_email(ids_wide(~isrelat), isFCRA, bsversion, LastSeenThreshold, BSOptions);
+email_summary_rolled := boca_shell_email(ids_wide(~isrelat), isFCRA, bsversion, LastSeenThreshold, BSOptions, mod_access);
 
 with_advo := JOIN(shell3_bsdata, advo_rolled,
 									LEFT.seq=RIGHT.seq,
@@ -1361,7 +1382,7 @@ final := if(production_realtime_mode and ~doScore, BSdata, group(wModels,seq));	
 // gateways := DATASET([],risk_indicators.Layout_Gateways_In);	// net acuity is not used for version 41 attributes in the shell
 ipdata := DATASET([],riskwise.Layout_IP2O);	// net acuity is not used for version 41 attributes in the shell
 // fdAttributesV2 := Models.getFDAttributes(final, iid, '', gateways, dppa, 0, '');	// hardcoding glb = 0 here as it is not really needed for anything
-fdAttributesV2 := Models.getFDAttributes(final, iid, '', ipdata);
+fdAttributesV2 := Models.getFDAttributes(final, iid, '', ipdata, mod_access := mod_access);
 
 Layout_Boca_Shell addFDattributesV2(bsData le, fdAttributesV2 ri) := TRANSFORM
 	self.fdAttributesv2 := ri.version2;

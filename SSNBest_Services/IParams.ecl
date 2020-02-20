@@ -7,19 +7,19 @@ EXPORT IParams := MODULE
 		EXPORT BOOLEAN   check_RNA_         := FALSE;
 	END;
 
-	EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParamsV2,HardCodedFlags)
+	EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams,HardCodedFlags)
 		EXPORT BOOLEAN   Display_HRI        := FALSE;
 	  EXPORT UNSIGNED3 DIDScoreThreshold  := SSNBest_Services.Constants.DIDScoreThreshold;
 		EXPORT BOOLEAN   IsGlbRequired      := FALSE;
 	END;
 
 	EXPORT getBatchParams() := FUNCTION
-		base_params := BatchShare.IParam.getBatchParamsV2();
+		base_params := BatchShare.IParam.getBatchParams();
 		in_mod := MODULE(PROJECT(base_params, BatchParams, OPT))
 			EXPORT BOOLEAN   Display_HRI        := FALSE : STORED('Display_HRI');
 			EXPORT UNSIGNED3 DIDScoreThreshold  := SSNBest_Services.Constants.DIDScoreThreshold : STORED('DIDScoreThreshold'); //internal
 			EXPORT BOOLEAN   IsGlbRequired      := FALSE : STORED('IsGlbRequired');
-			EXPORT TYPEOF(BatchShare.IParam.BatchParams.IncludeMinors) IncludeMinors:= FALSE : STORED('IncludeMinors'); 
+			EXPORT BOOLEAN IncludeMinors:= FALSE : STORED('IncludeMinors'); 
 		END;
 		RETURN in_mod;
 	END;

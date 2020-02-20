@@ -1,9 +1,13 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, MDR, Risk_Reporting, LNSmallBusiness, BusinessInstantID20_Services, iesp, std, Models, Risk_Indicators;
+﻿IMPORT BIPV2, Business_Risk_BIP, Risk_Reporting, LNSmallBusiness, BusinessInstantID20_Services, iesp, std, Models, Risk_Indicators;
 
 EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
                              BusinessInstantID20_Services.iOptions Options,
 														 BIPV2.mod_sources.iParams linkingOptions,
-                             Boolean ExcludeWatchlists) := 
+                             Boolean ExcludeWatchlists,
+				unsigned1 LexIdSourceOptout								  = 1,
+			string TransactionID 												= '',
+			string BatchUID														  = '',
+			unsigned6 GlobalCompanyId 									= 0) := 
 	FUNCTION
 
 		AllowedSourcesSet := BusinessInstantID20_Services.set_AllowedSources( Options );
@@ -46,7 +50,7 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 		ds_VerificationInfo := BusinessInstantID20_Services.fn_GetVerificationInfo(ds_CleanedInput, ds_BusinessHeaderRecs, ds_Shell_Results, Options);
 		
 		// 8. Get Firmographics info.
-		ds_FirmographicsInfo := BusinessInstantID20_Services.fn_GetFirmographics(ds_CleanedInput, ds_BIPIDsFound, Options, linkingOptions, AllowedSourcesSet);
+		ds_FirmographicsInfo := BusinessInstantID20_Services.fn_GetFirmographics(ds_CleanedInput, ds_BIPIDsFound, Options, AllowedSourcesSet);
 		
 		// 9. Get Parent company info.
 		ds_ParentInfo := BusinessInstantID20_Services.fn_getParentInfo(ds_CleanedInput, ds_BusinessHeaderRecs, Options, linkingOptions);
@@ -73,7 +77,11 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 				)
 			);
 			
-		ds_ConsumerInstantIDInfo := BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs( ds_CleanedInputWithValidAuthReps, Options, ds_GlobalWatchlistInfo );
+		ds_ConsumerInstantIDInfo := BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs( ds_CleanedInputWithValidAuthReps, Options, ds_GlobalWatchlistInfo,
+		LexIdSourceOptout := LexIdSourceOptout, 
+	  TransactionID := TransactionID, 
+	  BatchUID := BatchUID, 
+	  GlobalCompanyID := GlobalCompanyID );
 		
 		// 15. Get Person titles within the Business.
 		ds_PersonRoleInfo := BusinessInstantID20_Services.fn_GetPersonRoles(ds_WithLexIDs, ds_BIPIDsFound, Options, linkingOptions, AllowedSourcesSet);
@@ -87,8 +95,18 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
       Models.Layout_ModelOut;
       STRING ModelName := '';
     END;
-    // ds_Models_temp := BusinessInstantID20_Services.fn_GetModels(Input,ds_Shell_Results,ds_OriginalInput,LinkSearchLevel,MarketingMode,Options,AppendBestsFromLexIDs);
-    ds_Models_temp := DATASET([], Layout_ModelOut_Plus);
+    
+   
+    
+    ds_Models_temp := BusinessInstantID20_Services.fn_GetModels(Input,ds_Shell_Results,ds_OriginalInput,LinkSearchLevel,MarketingMode,Options,AppendBestsFromLexIDs,LexIdSourceOptout := LexIdSourceOptout, 
+	  TransactionID := TransactionID, 
+	  BatchUID := BatchUID, 
+	  GlobalCompanyID := GlobalCompanyID);
+   // ds_Models_temp := DATASET([], Layout_ModelOut_Plus);
+  
+  #if(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
+    
+    
     iesp.smallbusinessanalytics.t_SBAScoreHRI getScoreResults(Layout_ModelOut_Plus le) := TRANSFORM
       SELF._Type := IF((INTEGER)le.Score=0,'','0-999');
       SELF.Value := (INTEGER)le.Score;
@@ -332,6 +350,14 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 		// OUTPUT( ds_OutputWithAddressRisk, named('ds_OutputWithAddressRisk') );
     // OUTPUT( ds_OutputWithEcho, named('ds_OutputWithEcho') );
 		RETURN ds_Final;
+#else // Else, output the model results directly
 
-	END;
+	// return Models.LIB_BusinessRisk_Models(shell_res_grpd,,boca_shell_grouped,iid,,DPPA_Purpose,GLBA_Purpose,DataRestrictionMask_in,DataPermissionMask,appType).ValidatingModel;
+ //return Models.LIB_BusinessRisk_Models(shell_res_grpd , bocaShell := boca_shell_grouped).ValidatingModel; 
+RETURN ds_Models_temp;
+#end
+	
+  
+  
+  END;
 

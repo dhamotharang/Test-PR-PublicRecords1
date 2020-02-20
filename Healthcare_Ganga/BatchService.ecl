@@ -18,14 +18,19 @@ import Healthcare_Ganga,Healthcare_Shared,Healthcare_Header_Services,AutoStandar
 EXPORT BatchService := MACRO
 	batch_in_layout := Healthcare_Ganga.Layouts.IdentityInput;
 	ds_batch_in_stored := DATASET([], batch_in_layout) : STORED('batch_in', FEW);
-	gm := AutoStandardI.GlobalModule();
+	gm := AutoStandardI.GlobalModule();	
+	/*Glbpurpose value is set to true for CCPA based on discussion in the  CCPA metings*/
+	#CONSTANT('GLBPurpose', 7);
+	
 	Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
+	 self.GLB := 7;
 	 self.glb_ok := ut.glb_ok (gm.GLBPurpose);
 	 self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
 	 self.DRM := gm.DataRestrictionMask;
 		self.IncludeSpecialties  := Healthcare_Shared.Constants.CFG_False;
 		self.IncludeLicenses  := Healthcare_Shared.Constants.CFG_False;
 		self.IncludeResidencies  := Healthcare_Shared.Constants.CFG_False;
+		self.doDeepDive := Healthcare_Shared.Constants.CFG_True;
 		//self:=[];Do not uncomment otherwise the default values will not get set.
 	end;
 	cfg := dataset([buildConfig()]);

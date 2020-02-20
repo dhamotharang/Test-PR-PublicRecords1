@@ -74,7 +74,7 @@ MODULE
   END;  
 
   EXPORT ExecAtHomeV2.Layouts.expandedLayout xfmGetPawData(ExecAtHomeV2.Layouts.SearchSlimLayout l, 
-                                                           RECORDOF(paw.Key_LinkIDs.kFetch) r) := 
+                                                           RECORDOF(paw.Key_LinkIDs.kFetch2) r) := 
   TRANSFORM
     SELF.Acctno := l.acctno;
     SELF.UltID := l.UltID;

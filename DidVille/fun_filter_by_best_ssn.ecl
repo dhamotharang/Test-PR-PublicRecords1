@@ -1,7 +1,8 @@
-import doxie, header, didville, ut, mdr;
+import doxie, header, didville, ut, mdr, dx_header;
 
 export fun_filter_by_best_ssn(grouped dataset(header.layout_header) hdr_data,
                               dataset(didville.layout_bestInfo_batchin) in_data,
+							  doxie.IDataAccess mod_access,
 						unsigned1 scr_thr_val) := function
 				
 header.layout_header refine_hdr(hdr_data l) := transform
@@ -73,16 +74,15 @@ did_to_rt := join(did_to_rt_raw, hdr_data,
                   left.did = right.did, 
 		        transform({did_to_rt_raw}, self := left), left only);
 
-header.layout_header get_hdr_rt(did_to_rt l, doxie.key_header r) := transform
+header.layout_header get_hdr_rt(did_to_rt l, dx_header.layout_key_header r) := transform
 	self.rid := (unsigned6)l.acctno,
 	self.did := l.did,
 	self := r,
 end;
 
-fixed_DRM := Doxie.DataRestriction.fixed_DRM;
-hdr_rt_data := join(did_to_rt, doxie.key_header, 
+hdr_rt_data := join(did_to_rt, dx_header.key_header(), 
                      keyed(left.did = right.s_did) and
-										 ~Doxie.DataRestriction.isHeaderSourceRestricted(right.src, fixed_DRM),
+										 ~Doxie.compliance.isHeaderSourceRestricted(right.src, mod_access.DataRestrictionMask),
      	           get_hdr_rt(left, right), LIMIT(500,SKIP));
 		
 hdr_w_rt := group(hdr_data) + hdr_rt_data;

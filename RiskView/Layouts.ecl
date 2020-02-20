@@ -897,20 +897,21 @@ end;
 				#BREAK;
 			#ELSE
 				#APPEND(Liens,
-							'string30 Liens' + %'cntLiens'% + '_Seq;' +
-							'STRING8 Liens' + %'cntLiens'% + '_DateFiled;' +
-       'string2 Liens' + %'cntLiens'% + '_LienTypeID;' + 
-							'string50 Liens' + %'cntLiens'% + '_LienType;' +
-							'string15 Liens' + %'cntLiens'% + '_Amount;'+ 
-							'STRING8 Liens' + %'cntLiens'% + '_ReleaseDate;' +
-							'STRING8 Liens' + %'cntLiens'% + '_DateLastSeen;' +
-							'string20 Liens' + %'cntLiens'% + '_FilingNumber;'+ 
-							'string10 Liens' + %'cntLiens'% + '_FilingBook;'+ 
-							'STRING10 Liens' + %'cntLiens'% + '_FilingPage;' +
-							'STRING60 Liens' + %'cntLiens'% + '_Agency;' +
-							'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
-							'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
-							'string25 Liens' + %'cntLiens'% + '_ConsumerStatementId;');										
+                'string30 Liens' + %'cntLiens'% + '_Seq;' +
+                'STRING8 Liens' + %'cntLiens'% + '_DateFiled;' +
+                'string2 Liens' + %'cntLiens'% + '_LienTypeID;' + 
+                'string50 Liens' + %'cntLiens'% + '_LienType;' +
+                'string15 Liens' + %'cntLiens'% + '_Amount;'+ 
+                'STRING8 Liens' + %'cntLiens'% + '_ReleaseDate;' +
+                'STRING8 Liens' + %'cntLiens'% + '_DateLastSeen;' +
+                'string20 Liens' + %'cntLiens'% + '_FilingNumber;'+ 
+                'string10 Liens' + %'cntLiens'% + '_FilingBook;'+ 
+                'STRING10 Liens' + %'cntLiens'% + '_FilingPage;' +
+                'STRING60 Liens' + %'cntLiens'% + '_Agency;' +
+                'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
+                'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
+                'string25 Liens' + %'cntLiens'% + '_ConsumerStatementId;' +
+                'string10 Liens' + %'cntLiens'% + '_orig_rmsid;');
 								
 				#SET(cntLiens,%cntLiens% + 1)
 			#END
@@ -928,24 +929,26 @@ end;
 				#BREAK;
 			#ELSE
 				#APPEND(Jgmts,
-						'string30 Jgmts' + %'cntJgmts'% + '_Seq;' +
-						'STRING8 Jgmts' + %'cntJgmts'% + '_DateFiled;' +
-      'string2 Jgmts' + %'cntJgmts'% + '_JudgmentTypeID;' +
-						'string50 Jgmts' + %'cntJgmts'% + '_JudgmentType;' +
-						'string15 Jgmts' + %'cntJgmts'% + '_Amount;'+ 
-						'STRING8 Jgmts' + %'cntJgmts'% + '_ReleaseDate;' +
-						'string16 Jgmts' + %'cntJgmts'% + '_FilingDescription;' +
-						'STRING8 Jgmts' + %'cntJgmts'% + '_DateLastSeen;' +
-						'string120 Jgmts' + %'cntJgmts'% + '_Defendant;' +
-						'string120 Jgmts' + %'cntJgmts'% + '_Plaintiff;' +
-						'string20 Jgmts' + %'cntJgmts'% + '_FilingNumber;'+ 
-						'string10 Jgmts' + %'cntJgmts'% + '_FilingBook;'+ 
-						'STRING10 Jgmts' + %'cntJgmts'% + '_FilingPage;' +
-						'STRING1 Jgmts' + %'cntJgmts'% + '_Eviction;' +
-						'STRING60 Jgmts' + %'cntJgmts'% + '_Agency;' +
-						'string35 Jgmts' + %'cntJgmts'% + '_AgencyCounty;' +
-						'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' +
-						'string25 Jgmts' + %'cntJgmts'% + '_ConsumerStatementId;');											
+                'string30 Jgmts' + %'cntJgmts'% + '_Seq;' +
+                'STRING8 Jgmts' + %'cntJgmts'% + '_DateFiled;' +
+                'string2 Jgmts' + %'cntJgmts'% + '_JudgmentTypeID;' +
+                'string50 Jgmts' + %'cntJgmts'% + '_JudgmentType;' +
+                'string15 Jgmts' + %'cntJgmts'% + '_Amount;'+ 
+                'STRING8 Jgmts' + %'cntJgmts'% + '_ReleaseDate;' +
+                'string16 Jgmts' + %'cntJgmts'% + '_FilingDescription;' +
+                'STRING8 Jgmts' + %'cntJgmts'% + '_DateLastSeen;' +
+                'string120 Jgmts' + %'cntJgmts'% + '_Defendant;' +
+                'string120 Jgmts' + %'cntJgmts'% + '_Plaintiff;' +
+                'string20 Jgmts' + %'cntJgmts'% + '_FilingNumber;'+ 
+                'string10 Jgmts' + %'cntJgmts'% + '_FilingBook;'+ 
+                'STRING10 Jgmts' + %'cntJgmts'% + '_FilingPage;' +
+                'STRING1 Jgmts' + %'cntJgmts'% + '_Eviction;' +
+                'STRING60 Jgmts' + %'cntJgmts'% + '_Agency;' +
+                'string35 Jgmts' + %'cntJgmts'% + '_AgencyCounty;' +
+                'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' + 
+                'string25 Jgmts' + %'cntJgmts'% + '_ConsumerStatementId;' +
+                'string10 Jgmts' + %'cntJgmts'% + '_orig_rmsid;');
+
 				#SET(cntJgmts,%cntJgmts% + 1)
 			#END
 		#END
@@ -955,6 +958,47 @@ export layout_riskview_lnj_batch := record
 	%Jgmts%
 end;
 
+// Flattened version of iesp.riskview2.t_Rv2ReportSummaryRecord
+export layout_riskview5_batch_consumer_summary := record
+	//iesp.share.t_Name
+	string62 Full;
+	string20 First;
+	string20 Middle;
+	string20 Last;
+	string5 Suffix;
+	string3 Prefix;
+	//iesp.share.t_Address;
+	string10 StreetNumber;
+	string2 StreetPreDirection;
+	string28 StreetName;
+	string4 StreetSuffix;
+	string2 StreetPostDirection;
+	string10 UnitDesignation;
+	string8 UnitNumber;
+	string60 StreetAddress1;
+	string60 StreetAddress2;
+	string25 City;
+	string2 State;
+	string5 Zip5;
+	string4 Zip4;
+	string18 County;
+	string9 PostalCode;
+	string50 StateCityZip;
+	string9 SSN;
+	string10 Phone;
+	//iesp.share.t_MaskableDate;
+	string4 Year;
+	string2 Month;
+	string2 Day;
+	string12 UniqueId;
+	string1 AddressStability;
+	string1 InquiriesRestricted;
+	string1 SSNMismatch;
+	string1 DOBMismatch;
+	string1 AddressMismatch;
+	string1 PhoneMismatch;
+	string1 UniqueIDMismatch;
+end;
 
 export layout_riskview5_batch_response := record
 	string30 acctno;
@@ -963,6 +1007,7 @@ export layout_riskview5_batch_response := record
 	string3	 Billing_Index2 := '';
 	layout_riskview_lnj_batch;
 	STRING12 inquiry_lexid := '';
+	layout_riskview5_batch_consumer_summary;
 end;
 
 export attributes_internal_layout := record

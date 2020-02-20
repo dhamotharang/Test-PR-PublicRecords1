@@ -66,7 +66,7 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 		//non-subject suppression
 		nss := ut.getNonSubjectSuppression (Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription);
 		gm := AutoStandardI.GlobalModule(isFCRA);	
-		batch_params		:= BatchShare.IParam.getBatchParamsV2();
+		batch_params		:= BatchShare.IParam.getBatchParams();
 		
 		jl_batch_params := module(PROJECT(batch_params, LiensV2_Services.IParam.batch_params, opt))
 			EXPORT UNSIGNED8 MaxResults   										:= 10000 : STORED('MaxResults');	

@@ -1,12 +1,21 @@
-import Risk_Indicators, Utilfile, gong, ut, RiskWise, Phone_Shell, Targus;
+﻿import Utilfile, gong, ut, RiskWise, suppress, doxie, Targus, VerificationOfOccupancy;
 
-EXPORT getUtility(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOShell, integer glba, boolean isUtility) := FUNCTION
+EXPORT getUtility(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOShell, 
+                                  integer glba, 
+                                  boolean isUtility,
+                                  doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 // *******************************************************************************************************************
 // For attribute 'AddressUtilityHistoryIndex' - join to phone and utility by DID and indicate if hits match target addr or not 
 // *******************************************************************************************************************
-
-	VerificationOfOccupancy.Layouts.Layout_VOOShell getPhone(VOOShell l, gong.Key_History_did r) := transform
+    Layout_VOOShell_CCPA := RECORD
+      VerificationOfOccupancy.Layouts.Layout_VOOShell;
+      Unsigned4 Global_sid; 
+    end;
+     
+	Layout_VOOShell_CCPA getPhone(VOOShell l, gong.Key_History_did r) := transform
+    SELF.Global_Sid := r.Global_Sid;
+    self.did := (unsigned6)r.did;
 		addrmatch								:= if(trim(l.z5) = trim(r.z5) and
 																	trim(l.prim_range) = trim(r.prim_range) and
 																	ut.NNEQ(trim(l.sec_range), trim(r.sec_range)) and
@@ -35,18 +44,42 @@ EXPORT getUtility(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOSh
 		self										:= l;
 	end;
 	
-	phone_hits := JOIN(VOOShell, gong.Key_History_did, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.l_DID) AND 
+	phone_hits_unsuppressed := JOIN(VOOShell, gong.Key_History_did, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.l_DID) AND 
 																					UT.PermissionTools.GLB.OK(glba) AND   // StringLib.StringToUpperCase(TRIM(IndustryClass)) <> 'UTILI' AND
 																					RIGHT.dt_first_seen <= (string)LEFT.historydate + '01', 
 																							getPhone(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
+	phone_hits_flagged := Suppress.MAC_FlagSuppressedSource(phone_hits_unsuppressed, mod_access);
 
+	phone_hits := PROJECT(phone_hits_flagged, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+		self.did := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.did);
+		self.util_prim_range		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_prim_range);
+		self.util_predir				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_predir);	
+		self.util_prim_name			:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_prim_name);
+		self.util_suffix				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_suffix);
+		self.util_postdir				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_postdir);	
+		self.util_unit_desig		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_unit_desig);
+		self.util_sec_range			:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_sec_range);
+		self.util_p_city_name		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_p_city_name);
+		self.util_v_city_name		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_v_city_name);
+		self.util_st						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_st);
+		self.util_z5						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_z5);
+		self.util_dt_first_seen	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_dt_first_seen);
+		self.util_dt_last_seen	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_dt_last_seen);
+		self.util_deletion_date	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_deletion_date);
+		self.util_target_addr		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.util_target_addr);
+		self.util_other_addr 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.util_other_addr);
+		self.util_disconnect		:= IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.util_disconnect);
+		SELF := LEFT;
+	)); 
 //dedup to keep only the most recent utility hit for each unique address
 	dedup_phone := dedup(sort(phone_hits, seq, util_prim_range, util_predir, util_prim_name, util_suffix, util_postdir, util_sec_range, util_z5, -util_dt_last_seen, -util_dt_first_seen), 
 																				seq, util_prim_range, util_predir, util_prim_name, util_suffix, util_postdir, util_sec_range, util_z5);
 
 //Begin Targus
-	VerificationOfOccupancy.Layouts.Layout_VOOShell getTargus(VOOShell l, Targus.Key_Targus_DID r) := transform
-		addrmatch								:= if(trim(l.z5) = trim(r.zip) and
+	Layout_VOOShell_CCPA getTargus(VOOShell l, Targus.Key_Targus_DID r) := transform
+		SELF.Global_Sid := r.Global_Sid;
+    self.did := (unsigned6)r.did;
+    addrmatch								:= if(trim(l.z5) = trim(r.zip) and
 																	trim(l.prim_range) = trim(r.prim_range) and
 																	ut.NNEQ(trim(l.sec_range), trim(r.sec_range)) and
 																	trim(l.prim_name) = trim(r.prim_name) and
@@ -73,11 +106,32 @@ EXPORT getUtility(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOSh
 		self										:= l;
 	end;
 	
-	targus_hits := JOIN(VOOShell, Targus.Key_Targus_DID, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID) AND 
+	targus_hits_unsuppressed := JOIN(VOOShell, Targus.Key_Targus_DID, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID) AND 
 																					UT.PermissionTools.GLB.OK(glba) AND   // StringLib.StringToUpperCase(TRIM(IndustryClass)) <> 'UTILI' AND
 																					RIGHT.dt_first_seen <= LEFT.historydate, 
 																							getTargus(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
+	targus_hits_flagged := Suppress.MAC_FlagSuppressedSource(targus_hits_unsuppressed, mod_access);
 
+	targus_hits := PROJECT(targus_hits_flagged, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+		self.did := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.did);
+		self.util_prim_range		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_prim_range);
+		self.util_predir				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_predir);	
+		self.util_prim_name			:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_prim_name);
+		self.util_suffix				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_suffix);
+		self.util_postdir				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_postdir);	
+		self.util_unit_desig		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_unit_desig);
+		self.util_sec_range			:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_sec_range);
+		self.util_p_city_name		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_p_city_name);
+		self.util_v_city_name		:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_v_city_name);
+		self.util_st						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_st);
+		self.util_z5						:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_z5);
+		self.util_dt_first_seen	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_dt_first_seen);
+		self.util_dt_last_seen	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_dt_last_seen);
+		self.util_deletion_date	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.util_deletion_date);
+		self.util_target_addr		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.util_target_addr);
+		self.util_other_addr 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.util_other_addr);
+		SELF := LEFT;
+	)); 
 //dedup to keep only the most recent utility hit for each unique address
 	dedup_Targus := dedup(sort(targus_hits, seq, util_prim_range, util_predir, util_prim_name, util_suffix, util_postdir, util_sec_range, util_z5, -util_dt_last_seen, -util_dt_first_seen), 
 																					seq, util_prim_range, util_predir, util_prim_name, util_suffix, util_postdir, util_sec_range, util_z5);

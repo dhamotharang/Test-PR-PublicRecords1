@@ -1,6 +1,9 @@
-﻿IMPORT DidVille,BatchServices,Gateway,MDR,Phones,PhoneOwnership, Risk_Indicators,Royalty, STD, Suppress, ut;
+﻿IMPORT doxie, DidVille, BatchServices, Gateway, Phones, PhoneOwnership, Risk_Indicators, Royalty, STD, Suppress, ut;
+
 EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 							PhoneOwnership.IParams.BatchParams inMod) := FUNCTION
+
+  mod_access := PROJECT(inMod, doxie.IDataAccess);
 
 	// 1. Resolved DIDs
 	// 2. GetBestInfo and keep input name if best lastname differs
@@ -26,7 +29,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 													SELF.phone10 := LEFT.phone_number,
 													SELF.z5 := LEFT.zip,
 													SELF:=LEFT,SELF:=[]));
-	dsBatchwDIDs := Phones.Functions.GetDIDs(dsBatch,inMod.application_type,inMod.glb,inMod.dppa);
+	dsBatchwDIDs := Phones.Functions.GetDIDs(dsBatch,mod_access);
 	dsBatchwInput := JOIN(ds_batch_in,dsBatchwDIDs, 
 							LEFT.acctno = (STRING)RIGHT.seq,
 							TRANSFORM(PhoneOwnership.Layouts.PhonesCommon,
@@ -43,7 +46,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 												SELF := LEFT,
 												SELF :=[]),
 							LEFT OUTER, LIMIT(0),KEEP(1));
-	Suppress.MAC_Suppress(dsBatchwInput,dsBatchUnrestricted,inMod.application_type,Suppress.Constants.LinkTypes.DID,DID);
+	Suppress.MAC_Suppress(dsBatchwInput,dsBatchUnrestricted,mod_access.application_type,Suppress.Constants.LinkTypes.DID,DID);
 	dsBatchwBestInfo := Functions.GetBestInfo(dsBatchUnrestricted);//Get bestinfo for name variations.
 
 	//*******************Get Phone Metadata - ATT LIDB(Carrier data) and porting info - reuse PhoneAttributes code***************************
@@ -142,7 +145,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.AppendedFirstDate := IF(r.phone = r.batch_in.phone_number,(UNSIGNED)r.dt_first_seen,l.AppendedFirstDate);
 		businessMatch := IF(r.subj2own_relationship IN Constants.BUSINESS_RELATIONS,Phones.Constants.ListingType.Business,''); //could check bip also
 		SELF.AppendedRecordType := businessMatch;
-		inNameMatch := Functions.evaluateNameMatch(l.name_first,l.name_last,r.fname,r.lname);
+		inNameMatch := Functions.callerNameMatch(l.name_first,l.name_last,r.fname,r.lname);
 		fullNameMatch := inNameMatch = Constants.NameMatch.FIRSTLAST; 	
 		nameMatch := IF(STD.Str.Contains(l.LexisNexisMatchCode,Constants.LNMatch.NAME,false) OR //accounting for name match from accudata results - LexisNexisMatchCode
 										inNameMatch > Constants.NameMatch.NONE,Constants.LNMatch.NAME,'');							
@@ -194,7 +197,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 	//Send unique phones avoid sending identified invalid numbers											
 	dsAccudataRequest := DEDUP(SORT(dsCallerIDRequest(LexisNexisMatchCode != Constants.LNMatch.INVALID),phone),phone);
 	dsPhones:= PROJECT(dsAccudataRequest(NOT validatedRecord),TRANSFORM(Phones.Layouts.PhoneAcctno, SELF.acctno:=LEFT.acctno, SELF.phone:=LEFT.phone));// only get CallerName for phones not validated.
-	dsAccuData := IF(EXISTS(dsPhones) AND inMod.useAccudataCNAM,Phones.GetAccuData_CallerName(dsPhones,inMod.gateways,inMod.application_type,inMod.glb,inMod.dppa),
+	dsAccuData := IF(EXISTS(dsPhones) AND inMod.useAccudataCNAM,Phones.GetAccuData_CallerName(dsPhones,inMod.gateways,mod_access),
 													DATASET([],Phones.Layouts.AccuDataCNAM));	
 	dsPhoneswCallerName := IF(inMod.useAccudataCNAM,PhoneOwnership.AppendCallerName(dsAccuData, dsCallerIDRequest),dsCallerIDRequest);
 	// selecting by account since accudata phone results were appended to acctno and returned relatives is based on input subject
@@ -254,7 +257,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		noRelationship := NOT confirmedDisconnected AND l.subj2own_relationship = Constants.Relationship.NONE; 
 		finalOwnershipIndex := IF(noRelationship,Functions.checkOwnership(l.name_first,l.name_last,l.AppendedFirstName,l.AppendedSurname,'',Constants.Relationship.NONE),Constants.Ownership.enumIndex.UNDETERMINED);
 		ownership := MAP(confirmedDisconnected OR isInvalid => Constants.Ownership.enumIndex.INVALID,//both invalid and confirmedDisconnected have an ownership index of zero
-							NOT l.validatedRecord => Constants.Ownership.enumIndex.UNDETERMINED,
+							~ownershipPossible OR (~l.validatedRecord AND ~availableListingName) => Constants.Ownership.enumIndex.UNDETERMINED,
 							FullNameMatch => Constants.Ownership.enumIndex.HIGH, //will update Zumigo index
 							noRelationship => finalOwnershipIndex,
 							ownershipPossible =>  l.ownership_index, 
@@ -270,7 +273,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 										Functions.getOwnershipValue(ownershipStatus));			
 		SELF.subj2own_relationship := MAP(	confirmedDisconnected => Constants.Relationship.NO_OWNER,
 											isInvalid => Constants.Relationship.INVALID,
-											NOT l.validatedRecord => Constants.Relationship.NO_IDENTITY,
+											~ownershipPossible OR (~l.validatedRecord AND ~availableListingName) => Constants.Relationship.NO_IDENTITY,
 											FullNameMatch => Constants.Relationship.SUBJECT,
 											noRelationship => Functions.getRelationship(finalOwnershipIndex),
 											ownershipPossible => l.subj2own_relationship,
@@ -278,6 +281,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.reason_codes := MAP(isInvalid => Constants.Reason_Codes.INVALID_NUMBER,
 									confirmedDisconnected => Constants.Reason_Codes.CONFIRMED_DISCONNECTED,
 									zumigoSource => l.reason_codes,
+									~ownershipPossible => Constants.Reason_Codes.NO_IDENTITY,
 									Functions.getReasonCodes(SELF.ownership_index = Constants.Ownership.enumIndex.HIGH,SELF.ownership_index = Constants.Ownership.enumIndex.UNDETERMINED,l.ph_poss_disconnect_date > 0,isSuspended));
 		SELF:=l;
 	END;

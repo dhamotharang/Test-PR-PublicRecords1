@@ -93,9 +93,10 @@ frcl := if(include_foreclosures_val, nod_for.foreclosure);
 phpl := if(Include_PhonesPlus_val,
   moxie_phonesplus_server.phonesplus_did_records(dids, con.max_phonesplus, score_threshold_value,glb_purpose,dppa_purpose,,true,true).w_timezone);
 
-email := map(Include_Email_Addresses_val and email_dedup_val => doxie.fn_dedup_email(dids,ssn_mask_value,application_type_value,industry_class_value), // checking if to dedup emails
-  Include_Email_Addresses_val  => doxie.email_records(dids,ssn_mask_value,application_type_value,,industry_class_value),
+email := map(Include_Email_Addresses_val and EmailVersion in [0,1] and email_dedup_val => doxie.fn_dedup_email(dids,ssn_mask_value,application_type_value,industry_class_value), // checking if to dedup emails
+  Include_Email_Addresses_val and EmailVersion in [0,1] => doxie.email_records(dids,ssn_mask_value,application_type_value,,industry_class_value),
   dataset([],EmailService.Assorted_Layouts.layout_report_rollup));
+emailV2 := IF(Include_Email_Addresses_val and EmailVersion=2, doxie.emailV2_records(dids, mod_access));
 // Premium Phones
 dedup_phones:=dataset(dedupPremiumPhones,doxie.premium_phone.phone_rec)+
 project(phpl,transform(doxie.premium_phone.phone_rec,self.phone:=left.phoneno));
@@ -175,6 +176,8 @@ doxie.layout_central_records tra (layout_central_header l) := transform
   self.phonesplus_children                := IF (~IsFCRA,choosen(phpl, con.max_phonesplus));
   self.premium_phone_children             := IF (check_cond, choosen(prph, con.max_phonesplus));
   self.Email_children                     := IF (~ISFCRA, global(email));
+  self.EmailV2Records                     := IF (~ISFCRA, global(emailV2.EmailV2Records));
+  self.EmailV2Royalties                   := IF (~ISFCRA, global(emailV2.EmailV2Royalties));
 
   self.verification                       := IF (~ISFCRA, verification);
   self.phone_summary                      := IF (~ISFCRA, phone_summary);
@@ -200,5 +203,3 @@ end;
 return project (header_data, tra(left));
 
 END;
-
-

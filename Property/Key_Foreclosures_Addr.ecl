@@ -1,4 +1,4 @@
-import doxie, property, Data_Services;
+﻿import doxie, property, Data_Services;
 
 Foreclosure_Address := property.file_Foreclosure;
 
@@ -103,9 +103,9 @@ Layout_Foreclosure_In_Slim :=  record
   string9  property_address_zip_code_2;
   string4  carrier_code_2;
   string60 full_site_address_unparsed_2;
-  string2  property_indicator;
+  string3  property_indicator;
   string55 property_desc;
-  string3  use_code;
+  string4  use_code;
   string55 use_desc;
   string5  number_of_units;
   string9  living_area_square_feet;

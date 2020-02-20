@@ -1,18 +1,27 @@
-/*
+﻿/*
  * Searches the foreclosure key by Zip, Street Number, Street Name, Street Suffix
  * and Street Pre Direction.  Eventually this key should be updated to use Address
  * ID (AID).
  */
 
-IMPORT ut, Property;
+IMPORT ut, Property,suppress,doxie, MDR;
 
-EXPORT Address_Shell.layoutPropertyCharacteristics searchForeclosures (DATASET(Address_Shell.layoutPropertyCharacteristics) working, UNSIGNED1 attributesVersion = 1) := FUNCTION
+EXPORT Address_Shell.layoutPropertyCharacteristics searchForeclosures (DATASET(Address_Shell.layoutPropertyCharacteristics) working,
+                                                                        UNSIGNED1 attributesVersion = 1,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 /* ************************************************************
 	 * Get all foreclosures at the input address - This can     *
    * result in multiple records per input address.            *
 	 ************************************************************ */
-	Address_Shell.layoutPropertyCharacteristics getForeclosuresV1(Address_Shell.layoutPropertyCharacteristics le, Property.Key_Foreclosures_Addr ri) := TRANSFORM
-		SELF.PropertyAttributes.Version1.Foreclosure_Recording_Date := ri.recording_date;
+	Address_Shell_searchForeclosures_CCPA := RECORD
+	 Address_Shell.layoutPropertyCharacteristics;
+	 Unsigned4 Global_sid;
+   Unsigned6 DID;
+   end;
+  Address_Shell_searchForeclosures_CCPA getForeclosuresV1(Address_Shell.layoutPropertyCharacteristics le, Property.Key_Foreclosures_Addr ri) := TRANSFORM
+		Self.Global_sid := ri.Global_sid;
+	  
+    SELF.PropertyAttributes.Version1.Foreclosure_Recording_Date := ri.recording_date;
+    
 		SELF.PropertyAttributes.Version1.Foreclosure_Count := IF(TRIM(ri.recording_date) <> '', '1', '0'); // Every record found with a non-blank date should be a foreclosure.
 		
 		// Keep everything already calculated
@@ -24,10 +33,13 @@ EXPORT Address_Shell.layoutPropertyCharacteristics searchForeclosures (DATASET(A
 																																AND TRIM(LEFT.Input.StreetSuffix) <> '' AND TRIM(LEFT.Input.StreetPreDirection) <> '')
 																																AND KEYED(LEFT.Input.Zip5 = RIGHT.situs1_zip AND LEFT.Input.StreetNumber = RIGHT.situs1_prim_range
 																																AND LEFT.Input.StreetName = RIGHT.situs1_prim_name AND LEFT.Input.StreetSuffix = RIGHT.situs1_addr_suffix
-																																AND LEFT.Input.StreetPreDirection = RIGHT.situs1_predir), 
+																																AND LEFT.Input.StreetPreDirection = RIGHT.situs1_predir)
+																																AND RIGHT.source=MDR.sourceTools.src_Foreclosures, 
 																getForeclosuresV1(LEFT, RIGHT), LEFT OUTER, KEEP(200), ATMOST(1000));
+                    
+   getForeclosuresV1_Address_Shell_searchForeclosures_CCPA := Suppress.Suppress_ReturnOldLayout(version1Temp, mod_access,Address_Shell.layoutPropertyCharacteristics );
 
-	version1Dedup := DEDUP(SORT(version1Temp, Input.seq, PropertyAttributes.Version1.Foreclosure_Recording_Date), Input.seq, PropertyAttributes.Version1.Foreclosure_Recording_Date);
+	version1Dedup := DEDUP(SORT(getForeclosuresV1_Address_Shell_searchForeclosures_CCPA, Input.seq, PropertyAttributes.Version1.Foreclosure_Recording_Date), Input.seq, PropertyAttributes.Version1.Foreclosure_Recording_Date);
 /* ************************************************************
 	 * Count all foreclosures at the input address and keep     *
    * the most recent foreclosure date:                        *

@@ -182,7 +182,7 @@
   export unsigned1 SaltLeadThreshold := 15; // default is no threshold
 		
 		EXPORT LibVersion := module
-			EXPORT integer LEGACY := 0;
+			EXPORT integer LEGACY := 0 :DEPRECATED('Use AutoHeaderV2.LIB_header_salt instead');
 			EXPORT integer SALT := 1;
 		END;
 end;

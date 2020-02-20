@@ -2,12 +2,17 @@ IMPORT iesp, doxie, VehicleV2_Services;
 
 EXPORT  vehicle_records (
   dataset (doxie.layout_references) dids,
-  input.vehicles in_params = module (input.vehicles) end,
+  $.IParam.vehicles in_params = module ($.IParam.vehicles) end,
   boolean IsFCRA = false
 ) := MODULE
 
-  shared vehi := VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report (dids, in_params.ssn_mask) 
-  (~in_params.Use_CurrentlyOwnedVehicles or is_current); 
+  isCNSMR := in_params.isConsumer();
+
+  report_mod := VehicleV2_Services.IParam.getReportModule();
+  vehicle_crs_report := if(~isCNSMR, VehicleV2_Services.raw.get_vehicle_crs_report(report_mod, dids));
+
+  shared vehi := vehicle_crs_report(~in_params.Use_CurrentlyOwnedVehicles or is_current);
+
 
   // iesp.motorvehicle.t_MVReportRecord
   export vehicles := if (~IsFCRA, iesp.transform_vehicles (vehi));

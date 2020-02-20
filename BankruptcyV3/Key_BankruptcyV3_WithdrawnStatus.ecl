@@ -1,4 +1,12 @@
-IMPORT	BankruptcyV3,	BankruptcyV2,	FCRA,	STD;
+﻿IMPORT	BankruptcyV3,	BankruptcyV2,	FCRA,	STD, vault, _control;
+
+
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+EXPORT	Key_BankruptcyV3_WithdrawnStatus(	STRING	pVersion	=	(STRING8)Std.Date.Today(),
+																					BOOLEAN	pUseProd	=	FALSE,
+																					BOOLEAN	isFCRA		=	FALSE)	:=	vault.BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus(pversion,pUseProd, isFCRA);
+#ELSE
+																					
 EXPORT	Key_BankruptcyV3_WithdrawnStatus(	STRING	pVersion	=	(STRING8)Std.Date.Today(),
 																					BOOLEAN	pUseProd	=	FALSE,
 																					BOOLEAN	isFCRA		=	FALSE)	:=	FUNCTION
@@ -36,3 +44,5 @@ EXPORT	Key_BankruptcyV3_WithdrawnStatus(	STRING	pVersion	=	(STRING8)Std.Date.Tod
 
 	RETURN	INDEX(dWSWithLinkIDsDist,{TMSID,CaseID,DefendantID},{dWSWithLinkIDsDist},key_name);
 END;
+
+#END;

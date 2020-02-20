@@ -1,5 +1,5 @@
-﻿IMPORT AddressFeedback, AddressFeedback_Services, BusinessCredit_Services, DriversV2,  
-       PhonesFeedback, PhonesFeedback_Services, Suppress, ut, iesp, doxie;
+﻿IMPORT $, AddressFeedback, AddressFeedback_Services, AutoStandardI, BusinessCredit_Services, doxie, DriversV2, iesp,  
+       PhonesFeedback, PhonesFeedback_Services, Suppress, ut;
 
 EXPORT HeaderFileRollupService_Records := 
   MODULE
@@ -59,6 +59,12 @@ EXPORT HeaderFileRollupService_Records :=
 			FUNCTION
 
         useBusinessCreditSorting := BusinessCredit_Services.Functions.fn_useBusinessCredit( ta2_iparam_mod.dataPermissionMask, ta2_iparam_mod.Include_BusinessCredit );
+        global_mod := AutoStandardI.GlobalModule();
+        mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(global_mod))
+         EXPORT string32 application_type := ta2_iparam_mod.application_type_val; 
+         EXPORT string DataPermissionMask := ta2_iparam_mod.dataPermissionMask;
+        END;
+
 
         // ----------------------------------------------------------------------
         // Addr/Phone feedback section
@@ -71,6 +77,7 @@ EXPORT HeaderFileRollupService_Records :=
                                                         ,did
                                                         ,Phone
                                                         ,phnRecsWithFeedback
+                                                        ,mod_access
                                                         );
             SELF.PhoneRecs        := IF(ta2_iparam_mod.Include_PhonesFeedback,phnRecsWithFeedback,_phoneRecs);
             SELF.address_feedback := [];
@@ -110,7 +117,7 @@ EXPORT HeaderFileRollupService_Records :=
         ta2_preBusinessCredit := IF(ta2_iparam_mod.Smart_Rollup, ta1Smart, ta1);
         
         // Business Credit / SBFE - request is to resort SBFE records to the top of the results list
-        ds_ta2_BusinessCredit_atTop := BusinessCredit_Services.Functions.fn_BusinessCreditSorting ( ta2_preBusinessCredit, ta2_iparam_mod.SeleId, ta2_iparam_mod.OrgId, ta2_iparam_mod.UltId ); 
+        ds_ta2_BusinessCredit_atTop := BusinessCredit_Services.Functions.fn_BusinessCreditSorting ( ta2_preBusinessCredit, mod_access, ta2_iparam_mod.SeleId, ta2_iparam_mod.OrgId, ta2_iparam_mod.UltId ); 
          
 				ta2 := IF( useBusinessCreditSorting, ds_ta2_BusinessCredit_atTop, ta2_preBusinessCredit );
       				

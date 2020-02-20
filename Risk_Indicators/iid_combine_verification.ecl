@@ -1,4 +1,4 @@
-﻿import _Control, ut, did_add, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR;
+﻿import _Control, ut, did_add, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR, data_services, Suppress;
 onThor := _Control.Environment.OnThor;
 
 export iid_combine_verification(grouped dataset(risk_indicators.Layout_Output) ssnrecs, 
@@ -6,8 +6,10 @@ export iid_combine_verification(grouped dataset(risk_indicators.Layout_Output) s
 								boolean from_IT1O=false, string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel,
 								boolean isFCRA, unsigned8 BSOptions,
 								integer bsVersion, string50 DataPermission=iid_constants.default_DataPermission, 
-								string50 DataRestriction=iid_constants.default_DataRestriction) := function	
+								string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
+								doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function	
 								
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
 ExactAddrRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactAddrMatch]=iid_constants.sTrue;								
 ExactAddrZip5andPrimRange := ExactMatchLevel[risk_indicators.iid_constants.posExactAddrZip5andPrimRange]=iid_constants.sTrue;
@@ -34,14 +36,27 @@ temp combo(temp le, temp ri) := TRANSFORM
 	self.did := le.did;
   self.truedid := le.truedid;
 	self.firstscore := le.firstscore;
+	self.middlescore := le.middlescore;
 	self.lastscore := le.lastscore;
 	self.addrscore := le.addrscore;
 	self.citystatescore := le.citystatescore;
 	self.zipscore := le.zipscore;
 	self.socsscore := le.socsscore;
+	
+use_inquiry_dob :=	map(
+	risk_indicators.iid_constants.tscore(le.dobscore) = 255                                         => true,
+	risk_indicators.iid_constants.tscore(le.dobscore)<risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore)
+	AND TRIM(le.verdob[5..8]) IN ['','0000']
+	AND ri.inquiryNAPdob[1..4]=le.verdob[1..4]                                    => true,
+	risk_indicators.iid_constants.tscore(le.dobscore)<risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore)
+	AND TRIM(le.verdob[7..8]) IN ['','00']
+	AND ri.inquiryNAPdob[1..6]=le.verdob[1..6]                                    => true,
+	false);
+																							 
 	// choose the higher of header dob or inquiry dob
-	self.dobscore := if(risk_indicators.iid_constants.tscore(le.dobscore)>=risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore), le.dobscore, ri.inquiryNAPdobScore);
+	self.dobscore := if(use_inquiry_dob,  ri.inquiryNAPdobScore, le.dobscore );
 	self.verfirst := 	le.verfirst;
+	self.vermiddle := 	le.vermiddle;
 	self.verlast := 	le.verlast;
 	self.vercmpy := 	le.vercmpy;
 	self.verprim_range := 	le.verprim_range;
@@ -59,15 +74,8 @@ temp combo(temp le, temp ri) := TRANSFORM
 	self.verhphone := 	le.verhphone;
 	self.verwphone := 	le.verwphone;
 	self.versocs := 	le.versocs;
-	self.verdob := map(
-		risk_indicators.iid_constants.tscore(le.dobscore) = 255                                         => ri.inquiryNAPdob,
-		risk_indicators.iid_constants.tscore(le.dobscore)<risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore)
-			AND TRIM(le.verdob[5..8]) IN ['','0000']
-			AND ri.inquiryNAPdob[1..4]=le.verdob[1..4]                                    => ri.inquiryNAPdob,
-		risk_indicators.iid_constants.tscore(le.dobscore)<risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore)
-			AND TRIM(le.verdob[7..8]) IN ['','00']
-			AND ri.inquiryNAPdob[1..6]=le.verdob[1..6]                                    => ri.inquiryNAPdob,
-																							 le.verdob);
+	self.verdob := if(use_inquiry_dob, ri.inquiryNAPdob, le.verdob);
+	
 	self.pullidflag := le.pullidflag;
 	self.watchlists := le.watchlists;
 	
@@ -135,6 +143,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonblank(lastnamesources);
 	nonblank(addrsources);
 	nonblank(socssources);
+	nonzero(middlecount);
 	nonzero(firstcount);
 	nonzero(lastcount);
 	nonzero(addrcount);	
@@ -142,9 +151,9 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonzero(wphonecount);
 	nonzero(socscount);
 	// add the inquiry nap dob count to the header dob count (inquiry dob count is always an exact match check)
-	self.dobcount := le.dobcount + if(ri.inquiryNAPdobcount>0, 1, 0);
+	self.dobcount := le.dobcount + if(use_inquiry_dob and ri.inquiryNAPdobcount>0, 1, 0);
 	nonzero(cmpycount);
-	self.dobsources := TRIM(le.dobsources) + if(ri.inquiryNAPdobcount>0, 'S ,','');
+	self.dobsources := TRIM(le.dobsources) + if(use_inquiry_dob and ri.inquiryNAPdobcount>0, 'S ,','');
 	
 	// num_nonderogs are calculated in both the NAP side and the NAS side,  we should be adding them together instead of just picking a non-zero result
 		nonzero(num_nonderogs);
@@ -186,6 +195,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 // End Boca Shell Section
 	
 	nonzero(phonefirstcount);
+	nonzero(phonemiddlecount);
 	nonzero(phonelastcount);
 	nonzero(phoneaddrcount);
 	nonzero(phonephonecount);
@@ -238,6 +248,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonblank(formerzip2);
 	
 	nonblank(dirsfirst);
+	nonblank(dirsmiddle);
 	nonblank(dirslast);
 	nonblank(dirs_prim_range);
 	nonblank(dirs_predir);
@@ -251,6 +262,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonblank(dirszip);
 	nonblank(dirscmpy);
 	nonzero(dirs_firstscore);
+	nonzero(dirs_middlescore);
 	nonzero(dirs_lastscore);
 	nonzero(dirs_addrscore);
 	// these fields come from the phone side, the rest of them should also be changed when we get a chance instead of using nonzero
@@ -261,6 +273,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonzero(phone_date_last_seen);
 	
 	nonblank(dirsaddr_first);
+	nonblank(dirsaddr_middle);
 	nonblank(dirsaddr_last);
 	nonblank(dirsaddr_prim_range);
 	nonblank(dirsaddr_predir);
@@ -274,6 +287,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonblank(dirsaddr_zip);
 	nonblank(dirsaddr_cmpy);
 	nonzero(dirsaddr_firstscore);
+	nonzero(dirsaddr_middlescore);
 	nonzero(dirsaddr_lastscore);
 	nonzero(dirsaddr_addrscore);
 	self.dirsaddr_citystatescore := ri.dirsaddr_citystatescore;
@@ -283,6 +297,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonzero(phoneaddr_date_last_seen);
 	
 	nonblank(utilifirst);
+	nonblank(utilimiddle);
 	nonblank(utililast);
 	nonblank(utili_prim_range);
 	nonblank(utili_predir);
@@ -296,6 +311,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonblank(utilizip);
 	nonblank(utiliphone);
 	nonzero(utili_firstscore);
+	nonzero(utili_middlescore);
 	nonzero(utili_lastscore);
 	nonzero(utili_addrscore);
 	self.utili_citystatescore := ri.utili_citystatescore;
@@ -303,6 +319,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonzero(utili_phonescore);
 	
 	self.inquiryNAPfirstcount := ri.inquiryNAPfirstcount; 
+	self.inquiryNAPmiddlecount := ri.inquiryNAPmiddlecount; 
 	self.inquiryNAPlastcount := ri.inquiryNAPlastcount; 
 	self.inquiryNAPaddrcount := ri.inquiryNAPaddrcount;  
 	self.inquiryNAPphonecount := ri.inquiryNAPphonecount;
@@ -319,12 +336,14 @@ temp combo(temp le, temp ri) := TRANSFORM
 	self.InquiryNAPst := ri.inquiryNAPst;
 	self.InquiryNAPz5 := ri.inquiryNAPz5;
 	self.InquiryNAPfname := ri.inquiryNAPfname;
+	self.InquiryNAPmname := ri.inquiryNAPmname;
 	self.InquiryNAPlname := ri.inquiryNAPlname;
 	self.InquiryNAPssn := ri.inquiryNAPssn;
 	self.InquiryNAPdob := ri.inquiryNAPdob;
 	self.InquiryNAPphone := ri.inquiryNAPphone;
 	self.InquiryNAPaddrScore := ri.inquiryNAPaddrScore;
 	self.InquiryNAPfnameScore := ri.inquiryNAPfnameScore;
+	self.InquiryNAPmnameScore := ri.inquiryNAPmnameScore;
 	self.InquiryNAPlnameScore := ri.inquiryNAPlnameScore;
 	self.InquiryNAPssnScore := ri.inquiryNAPssnScore;
 	self.InquiryNAPdobScore := ri.inquiryNAPdobScore;
@@ -554,7 +573,9 @@ temp combo(temp le, temp ri) := TRANSFORM
 	self.iid_flags := le.iid_flags | ri.iid_flags;
 	
 	self.chrono_addr_flags := le.chrono_addr_flags;	// these are on the ssn records
-	
+	self.isphonecurrent:= ri.isphonecurrent;
+	self.phonelinedescription:=ri.phonelinedescription;
+	self.phonelinetype:=ri.phonelinetype;
 	SELF := le;
 END;
 
@@ -713,6 +734,19 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 					    '');
 	self.combo_first := combo_first;
 	
+	//for middle name
+  combo_middle := MAP(le.middlescore=100 OR (le.phonever_type IN ['P','I'] and iid_constants.tscore(le.middlescore)>=iid_constants.tscore(le.dirs_middlescore)) OR 
+										(le.phonever_type='A' and iid_constants.tscore(le.middlescore)>=iid_constants.tscore(le.dirsaddr_middlescore)) OR
+										(le.phonever_type='U' and iid_constants.tscore(le.middlescore)>=iid_constants.tscore(le.utili_middlescore)) OR
+										(le.phonever_type='S' and iid_constants.tscore(le.middlescore)>=iid_constants.tscore(le.inquiryNAPmnameScore)) => le.vermiddle,
+					    le.phonever_type IN ['P','I'] => le.dirsmiddle,
+					    le.phonever_type = 'A' => le.dirsaddr_middle,
+					    le.phonever_type = 'U' => le.utilimiddle,
+							le.phonever_type = 'S' => le.inquiryNAPmname,
+							le.middlecount > 0			 => le.vermiddle, 
+					    '');
+	self.combo_middle := combo_middle;
+	
 	combo_last := MAP(le.lastscore=100 OR (le.phonever_type IN ['P','I'] and iid_constants.tscore(le.lastscore)>=iid_constants.tscore(le.dirs_lastscore)) OR 
 									   (le.phonever_type='A' and iid_constants.tscore(le.lastscore)>=iid_constants.tscore(le.dirsaddr_lastscore)) OR
 									   (le.phonever_type='U' and iid_constants.tscore(le.lastscore)>=iid_constants.tscore(le.utili_lastscore)) OR
@@ -770,6 +804,9 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 	combo_firstscore := risk_indicators.FnameScore(combo_first, le.fname);
 	self.combo_firstscore := combo_firstscore;
 	
+	combo_middlescore := risk_indicators.FnameScore(combo_middle, le.mname);
+	self.combo_middlescore := combo_middlescore;
+	
 	combo_lastscore := risk_indicators.LnameScore(combo_last, le.lname);
 	self.combo_lastscore := combo_lastscore;
 	
@@ -800,6 +837,7 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 	
 	// Only give a count of 1 if that count was used as part of the nap level
 	phonefirst := IF((le.phonever_type in ['P','I'] and le.phonefirstcount>0) or (le.phonever_type='A' and le.phoneaddr_firstcount>0),1,0);	
+	phonemiddle := IF((le.phonever_type in ['P','I'] and le.phonemiddlecount>0) or (le.phonever_type='A' and le.phoneaddr_middlecount>0),1,0);	
 	phonelast := IF((le.phonever_type in ['P','I']  and le.phonelastcount >0) or (le.phonever_type='A' and le.phoneaddr_lastcount >0),1,0);
 	phoneaddr := IF((le.phonever_type in ['P','I']  and le.phoneaddrcount >0) or (le.phonever_type='A' and le.phoneaddr_addrcount >0),1,0);
 	phonephone := IF((le.phonever_type in ['P','I'] and le.phoneverlevel > 1 and le.phonephonecount>0) or (le.phonever_type='A' and le.phoneaddr_phonecount>0),1,0);
@@ -807,12 +845,14 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 	
 	// Only count the utility verification if it was used in the nap level
 	utiliFcount := IF(le.phonever_type='U' and le.utiliaddr_firstcount>0, 1,0);
+	utiliMcount := IF(le.phonever_type='U' and le.utiliaddr_middlecount>0, 1,0);
 	utiliLcount := IF(le.phonever_type='U' and le.utiliaddr_lastcount >0, 1,0);
 	utiliAcount := IF(le.phonever_type='U' and le.utiliaddr_addrcount >0, 1,0);
 	utiliPcount := IF(le.phonever_type='U' and le.utiliaddr_phonecount>0, 1,0);
 	
 	// Only count the inquiry verification if it was used in the nap level
 	inquiryFcount := IF(le.phonever_type='S' and le.inquiryNAPfirstcount>0, 1,0);
+	inquiryMcount := IF(le.phonever_type='S' and le.inquiryNAPmiddlecount>0, 1,0);
 	inquiryLcount := IF(le.phonever_type='S' and le.inquiryNAPlastcount >0, 1,0);
 	
 	merged8_9 := le.phonever_type='S' and le.phoneverlevel=12 and 
@@ -823,6 +863,9 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 	
 	combo_firstcount := le.firstcount + phonefirst + utiliFcount + inquiryFcount;
 	self.combo_firstcount := combo_firstcount;
+	
+	combo_middlecount:= le.middlecount + phonemiddle + utiliMcount + inquiryMcount;
+  self.combo_middlecount := combo_middlecount;
 	
 	combo_lastcount := le.lastcount + phonelast + utiliLcount + inquiryLcount;
 	self.combo_lastcount := combo_lastcount;
@@ -1170,8 +1213,11 @@ END;
 with_advo_rolled := rollup(with_advo_temp, left.seq = right.seq, rollWithAdvo(left,right));
 //don't append ADVO data if it's restricted in the DRM	
 with_advo := if(isFCRA or datarestriction[iid_constants.posADVORestriction] = '1', flagrecs, project(with_advo_rolled, Risk_Indicators.Layout_Output));					
+
+did_deceased_key := if(isfcra, doxie.key_death_masterV2_ssa_DID_fcra, doxie.key_death_masterV2_ssa_DID);
 		
-Risk_Indicators.Layout_Output getDIDdeceased(with_advo le, 	doxie.key_death_masterV2_ssa_DID ri) := TRANSFORM
+{Risk_Indicators.Layout_Output, UNSIGNED4 global_sid} getDIDdeceased(with_advo le, 	did_deceased_key ri) := TRANSFORM
+																	SELF.global_sid := ri.global_sid;
 																	SELF.DIDdeceased := ri.l_did<>0;
 																	SELF.DIDdeceasedDate := (UNSIGNED)ri.dod8;
 																	SELF.DIDdeceasedDOB := (UNSIGNED)ri.dob8;
@@ -1180,41 +1226,67 @@ Risk_Indicators.Layout_Output getDIDdeceased(with_advo le, 	doxie.key_death_mast
 																	SELF := le;
 END;
 	
-withDIDdeceased_nonfcra_roxie := JOIN(with_advo, doxie.key_death_masterV2_ssa_DID, 
+withDIDdeceased_nonfcra_roxie_unsuppressed := JOIN(with_advo, did_deceased_key, 
 												LEFT.did<>0 AND KEYED(LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
 												getDIDdeceased(LEFT, RIGHT),	
 												LEFT OUTER, ATMOST(riskwise.max_atmost), KEEP(100));
 
-withDIDdeceased_nonfcra_thor := JOIN(distribute(with_advo, hash64(did)), 
-												distribute(pull(doxie.key_death_masterV2_ssa_DID), hash64(l_did)), 
+withDIDdeceased_nonfcra_roxie_flagged := Suppress.MAC_FlagSuppressedSource(withDIDdeceased_nonfcra_roxie_unsuppressed, mod_access, data_env := data_environment);
+
+withDIDdeceased_nonfcra_roxie := PROJECT(withDIDdeceased_nonfcra_roxie_flagged, TRANSFORM(Risk_Indicators.Layout_Output, 
+	SELF.DIDdeceased := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.DIDdeceased);
+	SELF.DIDdeceasedDate := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.DIDdeceasedDate);
+	SELF.DIDdeceasedDOB := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.DIDdeceasedDOB);
+	SELF.DIDdeceasedfirst := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DIDdeceasedfirst);
+	SELF.DIDdeceasedlast := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DIDdeceasedlast);
+    SELF := LEFT;
+)); 
+
+withDIDdeceased_nonfcra_thor_unsuppressed := JOIN(distribute(with_advo, hash64(did)), 
+												distribute(pull(did_deceased_key), hash64(l_did)), 
 												LEFT.did<>0 AND (LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
 												getDIDdeceased(LEFT, RIGHT),	
 												LEFT OUTER, ATMOST(LEFT.did=RIGHT.l_did, riskwise.max_atmost), KEEP(100), LOCAL);
 										
+withDIDdeceased_nonfcra_thor_flagged := Suppress.MAC_FlagSuppressedSource(withDIDdeceased_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
+
+withDIDdeceased_nonfcra_thor := PROJECT(withDIDdeceased_nonfcra_thor_flagged, TRANSFORM(Risk_Indicators.Layout_Output, 
+	SELF.DIDdeceased := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.DIDdeceased);
+	SELF.DIDdeceasedDate := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.DIDdeceasedDate);
+	SELF.DIDdeceasedDOB := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.DIDdeceasedDOB);
+	SELF.DIDdeceasedfirst := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DIDdeceasedfirst);
+	SELF.DIDdeceasedlast := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DIDdeceasedlast);
+    SELF := LEFT;
+)); 
+
 #IF(onThor)
 	withDIDdeceased_nonfcra := group(sort(distribute(withDIDdeceased_nonfcra_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
 #ELSE
 	withDIDdeceased_nonfcra := withDIDdeceased_nonfcra_roxie;
 #END
 
-withDIDdeceased_FCRA_roxie := JOIN(with_advo, doxie.key_death_masterV2_ssa_DID_fcra, 
+withDIDdeceased_FCRA_roxie_unformatted := JOIN(with_advo, did_deceased_key, 
 												LEFT.did<>0 AND KEYED(LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
 													getDIDdeceased(LEFT,RIGHT),												
 												LEFT OUTER, ATMOST(riskwise.max_atmost), KEEP(100));
+												
+withDIDdeceased_FCRA_roxie := PROJECT(withDIDdeceased_FCRA_roxie_unformatted, TRANSFORM(Risk_Indicators.Layout_Output, SELF := LEFT));
 
-withDIDdeceased_FCRA_thor := JOIN(distribute(with_advo, hash64(did)), 
-												distribute(pull(doxie.key_death_masterV2_ssa_DID_fcra), hash64(l_did)), 
+withDIDdeceased_FCRA_thor_unformatted := JOIN(distribute(with_advo, hash64(did)), 
+												distribute(pull(did_deceased_key), hash64(l_did)), 
 												LEFT.did<>0 AND (LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
 													getDIDdeceased(LEFT,RIGHT),												
 												LEFT OUTER, ATMOST(LEFT.did=RIGHT.l_did, riskwise.max_atmost), KEEP(100), LOCAL);
+
+withDIDdeceased_FCRA_thor := PROJECT(withDIDdeceased_FCRA_thor_unformatted, TRANSFORM(Risk_Indicators.Layout_Output, SELF := LEFT));
 
 #IF(onThor)
 	withDIDdeceased_FCRA := group(sort(distribute(withDIDdeceased_FCRA_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
@@ -1231,19 +1303,21 @@ END;
 
 rolledDeceased := ROLLUP(SORT(withDIDdeceased, -DIDdeceasedfirst,-DIDdeceasedlast,-DIDdeceasedDate,-DIDdeceasedDOB), TRUE, rollDeceased(LEFT,RIGHT));	
 
-combinedFinal := if((BSOptions & iid_constants.BSOptions.IsInstantIDv1) > 0 or bsVersion >= 50, rolledDeceased, with_advo);	// only do the deceased by DID for CIID/FLEXID											
+combinedFinal := if((BSOptions & iid_constants.BSOptions.IsInstantIDv1) > 0 or bsVersion >= 50, 
+group(rolledDeceased, seq), 
+group(with_advo, seq));	// only do the deceased by DID for CIID/FLEXID											
 //combinedFinal := project(combinedFinal_tmp, Risk_Indicators.Layout_Output);
 
- //output(ssnrecs, named('ssnrecs'));
- //output(pphonerecs, named('pphonerecs'));
- //output(combined_records, named('combined_records'));
- //output(combine_Scores, named('combine_Scores'));
- //output(finalCombo, named('finalCombo'));
- //output(biggerrec);
- //output(flagrecs);
- //output(with_hotlist);
- //output(with_advo_temp);
- //OUTPUT(	with_advo_rolled);	
+ // output(ssnrecs, named('ssnrecs'));
+ // output(pphonerecs, named('pphonerecs'));
+ // output(combined_records, named('combined_records'));
+ // output(combine_Scores, named('combine_Scores'));
+ // output(finalCombo, named('finalCombo'));
+ // output(biggerrec);
+ // output(flagrecs);
+ // output(with_hotlist);
+ // output(with_advo_temp);
+ // OUTPUT(	with_advo_rolled);	
 return combinedFinal;
 
 end;

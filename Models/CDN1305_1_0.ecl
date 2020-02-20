@@ -1,4 +1,4 @@
-IMPORT EASI, Business_Risk, ut, RiskWise, RiskWiseFCRA, Risk_Indicators;
+﻿IMPORT EASI, RiskWise, Risk_Indicators,STD;
 
 EXPORT cdn1305_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
 										DATASET(Models.Layout_CD_CustomModelInputs) customInputs,
@@ -294,9 +294,9 @@ pf_pmt_type := map(
     (PAY_METHOD in ['WT'])       => 'Wire Transfer   ',
                                     'OTHER');
 
-bt_add_apt := StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or out_unit_desig != ' ' or out_sec_range != ' ';
+bt_add_apt := STD.Str.ToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or STD.Str.ToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or out_unit_desig != ' ' or out_sec_range != ' ';
 
-st_add_apt := StringLib.StringToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'H' or out_unit_desig_s != ' ' or out_sec_range_s != ' ';
+st_add_apt := STD.Str.ToUpperCase(trim((string)rc_dwelltype_s, LEFT, RIGHT)) = 'A' or STD.Str.ToUpperCase(trim((string)out_addr_type_s, LEFT, RIGHT)) = 'H' or out_unit_desig_s != ' ' or out_sec_range_s != ' ';
 
 bt_bus_addr_match_count := if(not(add1_pop), NULL, bus_addr_match_count);
 
@@ -434,7 +434,7 @@ bt_adls_per_sfd_addr := map(
     bt_add_apt    => -1,
                      adls_per_addr);
 
-ip_state_match := if(out_st = '' or state = '', '', if(StringLib.StringToUpperCase(trim(out_st, LEFT, RIGHT)) = StringLib.StringToUpperCase(trim(state, LEFT, RIGHT)), '1', '0'));
+ip_state_match := if(out_st = '' or state = '', '', if(STD.Str.ToUpperCase(trim(out_st, LEFT, RIGHT)) = STD.Str.ToUpperCase(trim(state, LEFT, RIGHT)), '1', '0'));
 
 addr_match := 80 <= (integer)addrscore AND (integer)addrscore <= 100 or not((boolean)(integer)addrpop_s);
 
@@ -1063,6 +1063,7 @@ cdn1305_1_0 := min(if(max(round(pts * (final_score - ln(odds)) / 2 + base), 300)
 		SELF := le.bs.Bill_To_Out.iid;
 		SELF := le.bs.Bill_To_Out.shell_input;
 		SELF := le.bs.bill_to_out;
+		SELF :=[];
 
 	END;
 	iidBT := PROJECT(clam_with_easi, into_layout_output(LEFT));
@@ -1110,6 +1111,7 @@ cdn1305_1_0 := min(if(max(round(pts * (final_score - ln(odds)) / 2 + base), 300)
 		SELF := le.bs.Ship_To_Out.iid;
 		SELF := le.bs.Ship_To_Out.shell_input;
 		SELF := le.bs.ship_to_out;
+		SELF :=[];
 	END;
 	iidST := PROJECT(clam_with_easi, into_layout_output2(LEFT));
 

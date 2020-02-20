@@ -1,4 +1,4 @@
-﻿import Risk_indicators, inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master, risk_indicators;
+﻿import Risk_indicators, inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master, STD, doxie, suppress;
 
 isFCRA := false;
 
@@ -7,13 +7,18 @@ export Boca_Shell_Inquiries(
 	unsigned8 BSOptions,
 	integer bsVersion,
 	dataset(Gateway.Layouts.Config) gateways,
-	string DataPermission) := FUNCTION
-
+	string DataPermission,
+    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+		
 // when running in FCRA historical mode, this function will call over to neutral roxie
 // to count up collection transactions that happened prior to project july moving
 // collection inquiries to the FCRA roxie
 isCollectionRetro :=  (BSOptions & risk_indicators.iid_constants.BSOptions.Collections_Neutral_Service) > 0;
 FDN_ok := Risk_Indicators.iid_constants.FDNcftf_ok(DataPermission); //per FP3 CR#8, use DPM instead of DRM to determine permission to virtual fraud
+
+turnOffTumblings := (BSOptions & risk_indicators.iid_constants.BSOptions.TurnOffTumblings) > 0;
+// default behavior for shell 5.3 and higher is to include the tumblings code.  if the query doesn't need it, turn it off 
+includeTumblings := bsversion >= 53 and ~TurnOffTumblings;
 
 high_risk_fraud_cutoff := 575;  // b)	High Risk = 575 and below
 low_risk_fraud_cutoff := 725;  // a)	Low Risk = 725 and above 
@@ -82,8 +87,15 @@ layout_temp := record
 	boolean good_inquiry;
 	boolean good_cbd_inquiry;
 	risk_indicators.layouts.layout_virtual_fraud Virtual_Fraud;
-
+	
+	boolean attended_college := false; // calculate the inquiries piece of this in here instead of searching inquiries again in Risk_Indicators.Boca_Shell_College_Attendance
 end;
+
+layout_temp_ccpa := RECORD
+    unsigned4 global_sid; // CCPA changes
+    layout_temp;
+END;
+
 //can have multiple gateways so account for them
 deltabase_check := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1].url;
 deltabase_Name := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1].servicename;
@@ -101,18 +113,19 @@ clam_pre_Inquiries_deltabase := ungroup(clam_pre_Inquiries);
 
 MAC_raw_did_transform (trans_name, key_did) := MACRO
 
-layout_temp trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) := transform
+layout_temp_ccpa trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) := transform
+    self.global_sid := rt.ccpa.global_sid;
 	self.seq := le.seq;
 	self.did := le.did;
 	self.truedid := le.truedid;	//MS-104 and MS-105 
-	industry := trim(StringLib.StringToUpperCase(rt.bus_intel.industry));
-	vertical := trim(StringLib.StringToUpperCase(rt.bus_intel.vertical));
-	sub_market := trim(StringLib.StringToUpperCase(rt.bus_intel.sub_market));
-	func := trim(StringLib.StringToUpperCase(rt.search_info.function_description));
+	industry := trim(std.str.ToUpperCase(rt.bus_intel.industry));
+	vertical := trim(std.str.ToUpperCase(rt.bus_intel.vertical));
+	sub_market := trim(std.str.ToUpperCase(rt.bus_intel.sub_market));
+	func := trim(std.str.ToUpperCase(rt.search_info.function_description));
 	product_code := trim(rt.search_info.product_code);
 	logdate := rt.search_info.datetime[1..8];
 	
-	is_banko_inquiry := func in Inquiry_AccLogs.shell_constants.banko_functions or (stringlib.stringfind(func, 'MONITORING', 1) > 0 AND product_code='5'); // monitoring transactions with product code=5 are also banko_batch
+	is_banko_inquiry := func in Inquiry_AccLogs.shell_constants.banko_functions or (std.str.find(func, 'MONITORING', 1) > 0 AND product_code='5'); // monitoring transactions with product code=5 are also banko_batch
 
 	function_is_ok := func in Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions(bsversion);
 	
@@ -191,14 +204,14 @@ layout_temp trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) 
 			
 	// anything with the vertical or industry of collection goes into collections bucket
 	collections_bucket := if(bsversion>=50, Inquiry_AccLogs.shell_constants.collections_vertical_set, 	['COLLECTIONS','1PC','3PC']);		
-	method := trim(StringLib.StringToUpperCase(rt.search_info.method));
+	method := trim(std.str.ToUpperCase(rt.search_info.method));
 	//methodFltr := method not in Inquiry_AccLogs.shell_constants.InvalidMethod(bsversion);
 	boolean methodFltr := if(bsversion >= 41, method not in ['BATCH','MONITORING'], true); 
 
 	boolean isCollection := inquiry_hit and 
 			(~isFCRA or trim(rt.permissions.fcra_purpose) IN Inquiry_AccLogs.shell_constants.collections_purpose_set) and
 			(vertical in collections_bucket or industry IN Inquiry_AccLogs.shell_constants.collection_industry or
-				StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1) > 0);	
+				std.str.find(std.str.ToUpperCase(sub_market),'FIRST PARTY', 1) > 0);	
 	boolean isAuto       					:= not isCollection and inquiry_hit and industry in Inquiry_AccLogs.shell_constants.auto_industry
 				and methodFltr;	
 	boolean isBanking    					:= not isCollection and inquiry_hit and industry in 
@@ -507,10 +520,10 @@ layout_temp trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) 
 	inquiryphone := trim(rt.person_q.personal_phone) ;
 	inquirydob := trim(rt.person_q.DOB);
 	
-	self.unverifiedSSNsPerADL := if(good_inquiry and inquiryssn<>'' and stringlib.stringfind(le.header_summary.ssns_on_file, inquiryssn, 1)=0 , 1, 0);
-	self.unverifiedAddrsPerADL := if(good_inquiry and inquirystreet<>'' and stringlib.stringfind(le.header_summary.streets_on_file, inquirystreet, 1)=0, 1, 0);
-	self.unverifiedPhonesPerADL := if(good_inquiry and inquiryphone<>'' and stringlib.stringfind(le.header_summary.phones_on_file, inquiryphone, 1)=0, 1, 0);
-	self.unverifiedDOBsPerADL := if(good_inquiry and inquirydob<>'' and stringlib.stringfind(le.header_summary.dobs_on_file, inquirydob, 1)=0,  1, 0);
+	self.unverifiedSSNsPerADL := if(good_inquiry and inquiryssn<>'' and std.str.find(le.header_summary.ssns_on_file, inquiryssn, 1)=0 , 1, 0);
+	self.unverifiedAddrsPerADL := if(good_inquiry and inquirystreet<>'' and std.str.find(le.header_summary.streets_on_file, inquirystreet, 1)=0, 1, 0);
+	self.unverifiedPhonesPerADL := if(good_inquiry and inquiryphone<>'' and std.str.find(le.header_summary.phones_on_file, inquiryphone, 1)=0, 1, 0);
+	self.unverifiedDOBsPerADL := if(good_inquiry and inquirydob<>'' and std.str.find(le.header_summary.dobs_on_file, inquirydob, 1)=0,  1, 0);
 
 	// banko fields
 	self.am_first_seen_date := if(~isFCRA and is_banko_inquiry and rt.bus_intel.use='AM', logdate, '');
@@ -624,6 +637,9 @@ layout_temp trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) 
 	self.Inq_BillGroup_count24 := 0;
 
 	self.historyDateTimeStamp := le.historyDateTimeStamp;
+	
+	self.attended_college := industry in Inquiry_AccLogs.shell_constants.StudentLoans_industry;  // used in college_attendance variable later
+	
 	self := [];
 	
 end;
@@ -650,23 +666,287 @@ MAC_raw_did_transform (add_inquiry_raw_update, Inquiry_AccLogs.Key_Inquiry_DID_U
 MAC_raw_did_transform (add_inquiry_raw_deltabase, deltaBase_did_results);
 
 
-j_raw_nonfcra_full := join(clam_pre_Inquiries, Inquiry_AccLogs.Key_Inquiry_DID, 
+j_raw_nonfcra_full_unsuppressed := join(clam_pre_Inquiries, Inquiry_AccLogs.Key_Inquiry_DID, 
 						left.shell_input.did<>0 and keyed(left.shell_input.did=right.s_did) and
 						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 						add_inquiry_raw(left, right),
 						left outer, atmost(5000));	
 
+j_raw_nonfcra_full_flagged := Suppress.MAC_FlagSuppressedSource(j_raw_nonfcra_full_unsuppressed, mod_access);
+
+j_raw_nonfcra_full := PROJECT(j_raw_nonfcra_full_flagged, TRANSFORM(layout_temp, 
+	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
+	self.Sequence_Number := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Sequence_Number);
+	self.first_log_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.first_log_date);
+	self.last_log_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.last_log_date);
+	self.noncbd_first_log_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.noncbd_first_log_date);
+	self.noncbd_last_log_date  := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.noncbd_last_log_date);
+	self.cbd_first_log_date    := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.cbd_first_log_date);
+	self.cbd_last_log_date     := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.cbd_last_log_date);
+	self.Inquiry_addr_ver_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiry_addr_ver_ct);
+	self.Inquiry_fname_ver_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiry_fname_ver_ct);
+	self.Inquiry_lname_ver_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiry_lname_ver_ct);
+	self.Inquiry_ssn_ver_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiry_ssn_ver_ct);
+	self.Inquiry_dob_ver_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiry_dob_ver_ct);
+	self.Inquiry_phone_ver_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiry_phone_ver_ct);
+	self.Inquiry_email_ver_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiry_email_ver_ct);
+	self.Inquiries.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiries.CBDCountTotal);
+	self.Inquiries.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiries.CBDCount01);
+	self.Inquiries.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiries.CountTotal);
+	self.Inquiries.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiries.CountDay);
+	self.Inquiries.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiries.CountWeek);
+	self.Inquiries.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiries.Count01);
+	self.Inquiries.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiries.Count03);
+	self.Inquiries.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiries.Count06);
+	self.Inquiries.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiries.Count12);
+	self.Inquiries.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Inquiries.Count24);
+		self.Collection.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Collection.CBDCountTotal);
+	self.Collection.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Collection.CBDCount01);
+	self.Collection.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Collection.CountTotal);
+	self.Collection.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Collection.CountDay);
+	self.Collection.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Collection.CountWeek);
+	self.Collection.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Collection.Count01);
+	self.Collection.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Collection.Count03);
+	self.Collection.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Collection.Count06);
+	self.Collection.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Collection.Count12);
+	self.Collection.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Collection.Count24);
+	self.Auto.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Auto.CBDCountTotal);
+	self.Auto.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Auto.CBDCount01);
+	self.Auto.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Auto.CountTotal);
+	self.Auto.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Auto.CountDay);
+	self.Auto.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Auto.CountWeek);
+	self.Auto.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Auto.Count01);
+	self.Auto.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Auto.Count03);
+	self.Auto.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Auto.Count06);
+	self.Auto.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Auto.Count12);
+	self.Auto.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Auto.Count24);
+	self.Banking.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Banking.CBDCountTotal);
+	self.Banking.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Banking.CBDCount01);
+	self.Banking.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Banking.CountTotal);
+	self.Banking.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Banking.CountDay);
+	self.Banking.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Banking.CountWeek);
+	self.Banking.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Banking.Count01);
+	self.Banking.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Banking.Count03);
+	self.Banking.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Banking.Count06);
+	self.Banking.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Banking.Count12);
+	self.Banking.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Banking.Count24);
+	self.Mortgage.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Mortgage.CBDCountTotal);
+	self.Mortgage.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Mortgage.CBDCount01);
+	self.Mortgage.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Mortgage.CountTotal);
+	self.Mortgage.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Mortgage.CountDay);
+	self.Mortgage.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Mortgage.CountWeek);	
+	self.Mortgage.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Mortgage.Count01);
+	self.Mortgage.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Mortgage.Count03);
+	self.Mortgage.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Mortgage.Count06);
+	self.Mortgage.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Mortgage.Count12);
+	self.Mortgage.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Mortgage.Count24);
+	self.HighRiskCredit.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HighRiskCredit.CBDCountTotal);
+	self.HighRiskCredit.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HighRiskCredit.CBDCount01);
+	self.HighRiskCredit.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HighRiskCredit.CountTotal);
+	self.HighRiskCredit.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HighRiskCredit.CountDay);
+	self.HighRiskCredit.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HighRiskCredit.CountWeek);
+	self.HighRiskCredit.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HighRiskCredit.Count01);
+	self.HighRiskCredit.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HighRiskCredit.Count03);
+	self.HighRiskCredit.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HighRiskCredit.Count06);
+	self.HighRiskCredit.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HighRiskCredit.Count12);
+	self.HighRiskCredit.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HighRiskCredit.Count24);
+	self.Retail.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Retail.CBDCountTotal);
+	self.Retail.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Retail.CBDCount01);
+	self.Retail.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Retail.CountTotal);
+	self.Retail.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Retail.CountDay);
+	self.Retail.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Retail.CountWeek);	
+	self.Retail.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Retail.Count01);
+	self.Retail.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Retail.Count03);
+	self.Retail.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Retail.Count06);
+	self.Retail.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Retail.Count12);
+	self.Retail.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Retail.Count24);
+	self.Communications.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Communications.CBDCountTotal);
+	self.Communications.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Communications.CBDCount01);
+	self.Communications.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Communications.CountTotal);
+	self.Communications.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Communications.CountDay);
+	self.Communications.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Communications.CountWeek);
+	self.Communications.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Communications.Count01);
+	self.Communications.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Communications.Count03);
+	self.Communications.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Communications.Count06);
+	self.Communications.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Communications.Count12);
+	self.Communications.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Communications.Count24);
+	self.Other.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Other.CBDCountTotal);
+	self.Other.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Other.CBDCount01);
+	self.Other.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Other.CountTotal);
+	self.Other.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Other.CountDay);
+	self.Other.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Other.CountWeek);
+	self.Other.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Other.Count01);
+	self.Other.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Other.Count03);
+	self.Other.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Other.Count06);
+	self.Other.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Other.Count12);
+	self.Other.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Other.Count24);
+	self.FraudSearches.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FraudSearches.CountTotal);
+	self.FraudSearches.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FraudSearches.CountDay);
+	self.FraudSearches.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FraudSearches.CountWeek);
+	self.FraudSearches.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FraudSearches.Count01);
+	self.FraudSearches.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FraudSearches.Count03);
+	self.FraudSearches.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FraudSearches.Count06);
+	self.FraudSearches.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FraudSearches.Count12);
+	self.FraudSearches.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.FraudSearches.Count24);
+	self.PrepaidCards.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.PrepaidCards.CBDCountTotal);
+	self.PrepaidCards.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.PrepaidCards.CBDCount01);
+	self.PrepaidCards.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.PrepaidCards.CountTotal);
+	self.PrepaidCards.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.PrepaidCards.CountDay);
+	self.PrepaidCards.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.PrepaidCards.CountWeek);	
+	self.PrepaidCards.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.PrepaidCards.Count01);
+	self.PrepaidCards.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.PrepaidCards.Count03);
+	self.PrepaidCards.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.PrepaidCards.Count06);
+	self.PrepaidCards.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.PrepaidCards.Count12);
+	self.PrepaidCards.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.PrepaidCards.Count24);
+	self.RetailPayments.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.RetailPayments.CBDCountTotal);
+	self.RetailPayments.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.RetailPayments.CBDCount01);
+	self.RetailPayments.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.RetailPayments.CountTotal);
+	self.RetailPayments.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.RetailPayments.CountDay);
+	self.RetailPayments.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.RetailPayments.CountWeek);
+	self.RetailPayments.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.RetailPayments.Count01);
+	self.RetailPayments.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.RetailPayments.Count03);
+	self.RetailPayments.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.RetailPayments.Count06);
+	self.RetailPayments.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.RetailPayments.Count12);
+	self.RetailPayments.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.RetailPayments.Count24);
+	self.Utilities.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Utilities.CBDCountTotal);
+	self.Utilities.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Utilities.CBDCount01);
+	self.Utilities.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Utilities.CountTotal);
+	self.Utilities.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Utilities.CountDay);
+	self.Utilities.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Utilities.CountWeek);	
+	self.Utilities.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Utilities.Count01);
+	self.Utilities.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Utilities.Count03);
+	self.Utilities.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Utilities.Count06);
+	self.Utilities.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Utilities.Count12);
+	self.Utilities.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Utilities.Count24);
+	self.QuizProvider.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.QuizProvider.CBDCountTotal);
+	self.QuizProvider.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.QuizProvider.CBDCount01);
+	self.QuizProvider.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.QuizProvider.CountTotal);
+	self.QuizProvider.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.QuizProvider.CountDay);
+	self.QuizProvider.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.QuizProvider.CountWeek);	
+	self.QuizProvider.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.QuizProvider.Count01);
+	self.QuizProvider.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.QuizProvider.Count03);
+	self.QuizProvider.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.QuizProvider.Count06);
+	self.QuizProvider.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.QuizProvider.Count12);
+	self.QuizProvider.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.QuizProvider.Count24);
+	self.StudentLoans.CBDCountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.StudentLoans.CBDCountTotal);
+	self.StudentLoans.CBDCount01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.StudentLoans.CBDCount01);
+	self.StudentLoans.CountTotal := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.StudentLoans.CountTotal);
+	self.StudentLoans.CountDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.StudentLoans.CountDay);
+	self.StudentLoans.CountWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.StudentLoans.CountWeek);	
+	self.StudentLoans.Count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.StudentLoans.Count01);
+	self.StudentLoans.Count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.StudentLoans.Count03);
+	self.StudentLoans.Count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.StudentLoans.Count06);
+	self.StudentLoans.Count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.StudentLoans.Count12);
+	self.StudentLoans.Count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.StudentLoans.Count24);
+	self.good_inquiry     := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.good_inquiry);
+	self.good_cbd_inquiry := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.good_cbd_inquiry);
+	self.inquiryPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerADL);
+	self.inq_peradl_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_peradl_count_day);
+	self.inq_peradl_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_peradl_count_week);
+	self.inq_peradl_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_peradl_count01);
+	self.inq_peradl_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_peradl_count03);
+	self.inq_peradl_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_peradl_count06);
+	self.inquirySSNsPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquirySSNsPerADL);
+	self.inquirySSNsFromADL := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquirySSNsFromADL);
+	self.inq_ssnsperadl_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_ssnsperadl_count_day);
+	self.inq_ssnsperadl_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_ssnsperadl_count_week);
+	self.inq_ssnsperadl_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_ssnsperadl_count01);
+	self.inq_ssnsperadl_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_ssnsperadl_count03);
+	self.inq_ssnsperadl_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_ssnsperadl_count06);
+	self.cbd_inquiryAddrsPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.cbd_inquiryAddrsPerADL);
+	self.inquiryAddrsPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryAddrsPerADL);
+	self.inquiryAddrsFromADL := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryAddrsFromADL);
+	self.inq_addrsperadl_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_addrsperadl_count_day);
+	self.inq_addrsperadl_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_addrsperadl_count_week);
+	self.inq_addrsperadl_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_addrsperadl_count01);
+	self.inq_addrsperadl_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_addrsperadl_count03);
+	self.inq_addrsperadl_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_addrsperadl_count06);
+	self.inquiryPrimRangeFromADL :=IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryPrimRangeFromADL);
+	self.inquiryLnamesPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryLnamesPerADL);
+	self.inquiryLnamesFromADL := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryLnamesFromADL);
+	self.inq_lnamesperadl_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperadl_count_day);
+	self.inq_lnamesperadl_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperadl_count_week);
+	self.inq_lnamesperadl_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperadl_count01);
+	self.inq_lnamesperadl_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperadl_count03);
+	self.inq_lnamesperadl_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperadl_count06);
+	self.inquiryFnamesPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryFnamesPerADL);
+	self.inquiryFnamesFromADL := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryFnamesFromADL);
+	self.inq_fnamesperadl_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_fnamesperadl_count_day);
+	self.inq_fnamesperadl_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_fnamesperadl_count_week);
+	self.inq_fnamesperadl_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_fnamesperadl_count01);
+	self.inq_fnamesperadl_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_fnamesperadl_count03);
+	self.inq_fnamesperadl_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_fnamesperadl_count06);
+	self.inquiryPhonesPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPhonesPerADL);
+	self.inquiryPhonesFromADL := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryPhonesFromADL);
+	self.inq_phonesperadl_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_phonesperadl_count_day);
+	self.inq_phonesperadl_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_phonesperadl_count_week);
+	self.inq_phonesperadl_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_phonesperadl_count01);
+	self.inq_phonesperadl_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_phonesperadl_count03);
+	self.inq_phonesperadl_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_phonesperadl_count06);
+	self.cbd_inquiryPhonesPerADL  := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.cbd_inquiryPhonesPerADL);
+	self.cbd_inquiryPhonesFromADL := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.cbd_inquiryPhonesFromADL);
+	self.inquiryDOBsPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryDOBsPerADL);
+	self.inquiryDOBsFromADL := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryDOBsFromADL);
+	self.inq_dobsperadl_count_day	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_dobsperadl_count_day);
+	self.inq_dobsperadl_count_week	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_dobsperadl_count_week);
+	self.inq_dobsperadl_count01	:=IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_dobsperadl_count01);
+	self.inq_dobsperadl_count03	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_dobsperadl_count03);
+	self.inq_dobsperadl_count06	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_dobsperadl_count06);
+	self.inquiryEmailsPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryEmailsPerADL);
+	self.inquiryEmailsFromADL := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryEmailsFromADL);
+	self.inq_emailsperadl_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_emailsperadl_count_day);
+	self.inq_emailsperadl_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_emailsperadl_count_week);
+	self.inq_emailsperadl_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_emailsperadl_count01);
+	self.inq_emailsperadl_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_emailsperadl_count03);
+	self.inq_emailsperadl_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_emailsperadl_count06);
+	self.unverifiedSSNsPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.unverifiedSSNsPerADL);
+	self.unverifiedAddrsPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.unverifiedAddrsPerADL);
+	self.unverifiedPhonesPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.unverifiedPhonesPerADL);
+	self.unverifiedDOBsPerADL := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.unverifiedDOBsPerADL);
+	self.am_first_seen_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.am_first_seen_date);
+	self.am_last_seen_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.am_last_seen_date);
+	self.cm_first_seen_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.cm_first_seen_date);
+	self.cm_last_seen_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.cm_last_seen_date);
+	self.om_first_seen_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.om_first_seen_date);
+	self.om_last_seen_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.om_last_seen_date);
+	self.virtual_fraud.hi_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.hi_risk_ct);
+	self.virtual_fraud.lo_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.lo_risk_ct);
+	self.virtual_fraud.LexID_phone_hi_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.LexID_phone_hi_risk_ct);
+	self.virtual_fraud.LexID_phone_lo_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.LexID_phone_lo_risk_ct);
+	self.virtual_fraud.LexID_addr_hi_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.LexID_addr_hi_risk_ct);
+	self.virtual_fraud.LexID_addr_lo_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.LexID_addr_lo_risk_ct);
+	self.virtual_fraud.LexID_ssn_hi_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.LexID_ssn_hi_risk_ct);
+	self.virtual_fraud.LexID_ssn_lo_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.LexID_ssn_lo_risk_ct);
+	self.inq_corrnameaddr_adl 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnameaddr_adl);
+	self.inq_corrnamessn_adl 				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnamessn_adl);
+	self.inq_corrnamephone_adl			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnamephone_adl);
+	self.inq_corraddrssn_adl				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corraddrssn_adl);
+	self.inq_corrdobaddr_adl				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrdobaddr_adl);
+	self.inq_corraddrphone_adl			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corraddrphone_adl);
+	self.inq_corrdobssn_adl					:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrdobssn_adl);
+	self.inq_corrphonessn_adl				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrphonessn_adl);
+	self.inq_corrdobphone_adl				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrdobphone_adl);
+	self.inq_corrnameaddrssn_adl		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnameaddrssn_adl);
+	self.inq_corrnamephonessn_adl		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnamephonessn_adl);
+	self.inq_corrnameaddrphnssn_adl	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnameaddrphnssn_adl);
+    SELF := LEFT;
+)); 
+
 // update keys are only built for non-fcra						
-j_raw_nonfcra_update := join(clam_pre_Inquiries, Inquiry_AccLogs.Key_Inquiry_DID_Update, 
+j_raw_nonfcra_update_unsuppressed := join(clam_pre_Inquiries, Inquiry_AccLogs.Key_Inquiry_DID_Update, 
 						left.shell_input.did<>0 and keyed(left.shell_input.did=right.s_did) and
 						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 						add_inquiry_raw_update(left, right),
 						atmost(5000));
 						
-j_raw_nonfcra_deltabase := join(clam_pre_Inquiries, deltaBase_did_results, 
+j_raw_nonfcra_update := Suppress.Suppress_ReturnOldLayout(j_raw_nonfcra_update_unsuppressed, mod_access, layout_temp);
+						
+j_raw_nonfcra_deltabase_unformatted := join(clam_pre_Inquiries, deltaBase_did_results, 
 						left.shell_input.did<>0 and left.shell_input.did=right.s_did,	
 						add_inquiry_raw_deltabase(left, right));
 		
+j_raw_nonfcra_deltabase := PROJECT(j_raw_nonfcra_deltabase_unformatted, TRANSFORM(layout_temp, SELF := LEFT));
+
 j_raw := if(bsversion >= 50, dedup(sort(ungroup(j_raw_nonfcra_full + j_raw_nonfcra_update + j_raw_nonfcra_deltabase), seq, transaction_id, -(unsigned3) first_log_date, Sequence_Number), seq, transaction_id),
 						dedup(sort(ungroup(j_raw_nonfcra_full + j_raw_nonfcra_update), seq, transaction_id, Sequence_Number), seq, transaction_id, Sequence_Number));
 
@@ -974,18 +1254,20 @@ layout_temp roll( layout_temp le, layout_temp rt ) := TRANSFORM
 	self.virtual_fraud.LexID_ssn_hi_risk_ct := cap125(le.virtual_fraud.LexID_ssn_hi_risk_ct + rt.virtual_fraud.LexID_ssn_hi_risk_ct);	
 	self.virtual_fraud.LexID_ssn_lo_risk_ct := cap125(le.virtual_fraud.LexID_ssn_lo_risk_ct + rt.virtual_fraud.LexID_ssn_lo_risk_ct);
 
+	self.attended_college := le.attended_college or rt.attended_college;
+	
 	self := rt;
 end;
 	
 // the first time this is sorted by ssnfromADL to calculate ssnsperadl	
-grouped_raw := group(sort( j_raw, seq, -inquirySSNsFromADL), seq);
+grouped_raw := group(sort( j_raw, seq, -inquirySSNsFromADL, -first_log_date), seq);
 
 rolled_raw := rollup( grouped_raw, roll(left,right), true);
 
 
 
 // sort and roll addresses per adl
-sorted_addrs_per_adl := group(sort(j_raw, seq, -inquiryAddrsFromADL, -unverifiedAddrsPerAdl, -cbd_inquiryAddrsFromADL), seq);
+sorted_addrs_per_adl := group(sort(j_raw, seq, -inquiryAddrsFromADL, -unverifiedAddrsPerAdl, -cbd_inquiryAddrsFromADL, -first_log_date), seq);
 
 layout_temp count_addrs_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.unverifiedAddrsPerADL     := le.unverifiedAddrsPerADL     + IF(le.inquiryAddrsFromADL     = rt.inquiryAddrsFromADL, 0, rt.unverifiedAddrsPerADL);
@@ -1001,7 +1283,7 @@ end;
 rolled_addrs_per_adl := rollup( sorted_addrs_per_adl, count_addrs_per_adl(left,right), true);
 
 // sort and roll fnames per adl
-sorted_fnames_per_adl := group(sort(j_raw, seq,  -inquiryfnamesFromADL), seq);
+sorted_fnames_per_adl := group(sort(j_raw, seq,  -inquiryfnamesFromADL, -first_log_date), seq);
 
 layout_temp count_fnames_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquiryfnamesPerADL := le.inquiryfnamesPerADL + IF(le.inquiryfnamesFromADL=rt.inquiryfnamesFromADL, 0, rt.inquiryfnamesPerADL);
@@ -1016,7 +1298,7 @@ rolled_fnames_per_adl := rollup( sorted_fnames_per_adl, count_fnames_per_adl(lef
 
 
 // sort and roll lnames per adl
-sorted_lnames_per_adl := group(sort(j_raw, seq,  -inquirylnamesFromADL), seq);
+sorted_lnames_per_adl := group(sort(j_raw, seq,  -inquirylnamesFromADL, -first_log_date), seq);
 
 layout_temp count_lnames_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirylnamesPerADL := le.inquirylnamesPerADL + IF(le.inquirylnamesFromADL=rt.inquirylnamesFromADL, 0, rt.inquirylnamesPerADL);
@@ -1031,8 +1313,8 @@ end;
 rolled_lnames_per_adl := rollup( sorted_lnames_per_adl, count_lnames_per_adl(left,right), true);
 
 // sort and roll phoness per adl
-sorted_phones_per_adl_cbd := group(sort(j_raw, seq,  -cbd_inquiryphonesFromADL), seq);
-sorted_phones_per_adl := group(sort(j_raw, seq,  -inquiryphonesFromADL, -unverifiedphonesPerADL), seq);
+sorted_phones_per_adl_cbd := group(sort(j_raw, seq,  -cbd_inquiryphonesFromADL, -first_log_date), seq);
+sorted_phones_per_adl := group(sort(j_raw, seq,  -inquiryphonesFromADL, -unverifiedphonesPerADL, -first_log_date), seq);
 
 layout_temp count_phones_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.unverifiedphonesPerADL     := le.unverifiedphonesPerADL     + IF(le.inquiryphonesFromADL     = rt.inquiryphonesFromADL,     0, rt.unverifiedphonesPerADL);			
@@ -1049,7 +1331,7 @@ rolled_phones_per_adl_cbd := rollup( sorted_phones_per_adl_cbd, count_phones_per
 rolled_phones_per_adl := rollup( sorted_phones_per_adl, count_phones_per_adl(left,right), true);
 
 // sort and roll DOB per adl
-sorted_DOBs_per_adl := group(sort(j_raw, seq,  -inquiryDOBsFromADL, -unverifiedDOBsPerADL), seq);
+sorted_DOBs_per_adl := group(sort(j_raw, seq,  -inquiryDOBsFromADL, -unverifiedDOBsPerADL, -first_log_date), seq);
 
 layout_temp count_DOBs_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.unverifiedDOBsPerADL := le.unverifiedDOBsPerADL + 
@@ -1065,7 +1347,7 @@ end;
 rolled_DOBs_per_adl := rollup( sorted_DOBs_per_adl, count_DOBs_per_adl(left,right), true);
 
 // sort and roll emails per adl
-sorted_Emails_per_adl := group(sort(j_raw, seq,  -inquiryEmailsFromADL), seq);
+sorted_Emails_per_adl := group(sort(j_raw, seq,  -inquiryEmailsFromADL, -first_log_date), seq);
 
 layout_temp count_Emails_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM			
 	self.inquiryEmailsPerADL := le.inquiryEmailsPerADL + IF(le.inquiryEmailsFromADL=rt.inquiryEmailsFromADL, 0, rt.inquiryEmailsPerADL);			
@@ -1082,7 +1364,7 @@ rolled_Emails_per_adl := rollup( sorted_Emails_per_adl, left.seq=right.seq, coun
 
 // MS-104 - calculate how many inquiry records have first name/s that are different by one character ***
 // get all unique first names for this DID
-deduped_fnames_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryfnamesFromADL<>''), seq, inquiryfnamesFromADL), seq, inquiryfnamesFromADL),seq);
+deduped_fnames_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryfnamesFromADL<>''), seq, inquiryfnamesFromADL, -first_log_date), seq, inquiryfnamesFromADL),seq);
 
 slim_fnames := project(deduped_fnames_per_adl,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1090,12 +1372,16 @@ slim_fnames := project(deduped_fnames_per_adl,
 											self.subsString 	:= left.inquiryFnamesFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfFnames(slim_fnames le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfFnames(slim_fnames le, slim_fnames rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_fnames,slim_fnames[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
 end;
-substitutedFnames := project(slim_fnames, tfFnames(left, counter));
+
+substitutedFnames := join(slim_fnames, slim_fnames, left.seq=right.seq and 
+STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+tfFnames(left, right), keep(1), left outer);
+
 
 //rollup here to get the sum of all inquiries being off by 1 character
 Risk_Indicators.iid_constants.subsLayout rollSubs(Risk_Indicators.iid_constants.subsLayout le, Risk_Indicators.iid_constants.subsLayout ri) := transform
@@ -1107,7 +1393,7 @@ rolledSubFnames := rollup(substitutedFnames, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have last name/s that are different by one character ***
-deduped_lnames_per_adl := group(dedup(sort(j_raw(good_inquiry and inquirylnamesFromADL<>''), seq, inquirylnamesFromADL), seq, inquirylnamesFromADL),seq);
+deduped_lnames_per_adl := group(dedup(sort(j_raw(good_inquiry and inquirylnamesFromADL<>''), seq, inquirylnamesFromADL, -first_log_date), seq, inquirylnamesFromADL),seq);
 
 slim_lnames := project(deduped_lnames_per_adl,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1115,18 +1401,20 @@ slim_lnames := project(deduped_lnames_per_adl,
 											self.subsString 	:= left.inquiryLnamesFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfLnames(slim_lnames le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfLnames(slim_lnames le, slim_lnames rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_lnames,slim_lnames[c].subsString);	
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
 end;
-substitutedLnames := project(slim_lnames, tfLnames(left, counter));
+substitutedLnames := join(slim_lnames,  slim_lnames, 
+left.seq=right.seq and STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+tfLnames(left, right), keep(1), left outer);
 
 rolledSubLnames := rollup(substitutedLnames, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have SSNs that are different by one character ***
-deduped_SSN_per_adl := group(dedup(sort(j_raw(good_inquiry and inquirySSNsFromADL<>''), seq, inquirySSNsFromADL), seq, inquirySSNsFromADL),seq);
+deduped_SSN_per_adl := group(dedup(sort(j_raw(good_inquiry and inquirySSNsFromADL<>''), seq, inquirySSNsFromADL, -first_log_date), seq, inquirySSNsFromADL),seq);
 
 slim_SSNs := project(deduped_SSN_per_adl,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1134,18 +1422,20 @@ slim_SSNs := project(deduped_SSN_per_adl,
 											self.subsString 	:= left.inquirySSNsFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfSSNs(slim_SSNs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfSSNs(slim_SSNs le, slim_SSNs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_SSNs,slim_SSNs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
 end;
-substitutedSSNs := project(slim_SSNs, tfSSNs(left, counter));
+substitutedSSNs := join(slim_SSNs, slim_SSNs,  
+left.seq=right.seq and STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+tfSSNs(left, right), keep(1), left outer);
 
 rolledSubSSNs := rollup(substitutedSSNs, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have phones that are different by one character ***
-deduped_Phones_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryPhonesFromADL<>''), seq, inquiryPhonesFromADL), seq, inquiryPhonesFromADL),seq);
+deduped_Phones_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryPhonesFromADL<>''), seq, inquiryPhonesFromADL, -first_log_date), seq, inquiryPhonesFromADL),seq);
 
 slim_phones := project(deduped_phones_per_adl,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1153,18 +1443,20 @@ slim_phones := project(deduped_phones_per_adl,
 											self.subsString 	:= left.inquiryPhonesFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfPhones(slim_phones le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfPhones(slim_phones le, slim_phones rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_phones,slim_phones[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
 end;
-substitutedPhones := project(slim_phones, tfPhones(left, counter));
+substitutedPhones := join(slim_phones, slim_phones,
+left.seq=right.seq and STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+tfPhones(left, right), keep(1), left outer);
 
 rolledSubPhones := rollup(substitutedPhones, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have primary range that are different by one character ***
-deduped_Primrange_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryPrimRangeFromADL<>''), seq, inquiryPrimRangeFromADL), seq, inquiryPrimRangeFromADL),seq);
+deduped_Primrange_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryPrimRangeFromADL<>''), seq, inquiryPrimRangeFromADL, -first_log_date), seq, inquiryPrimRangeFromADL),seq);
 
 slim_primrange := project(deduped_primrange_per_adl,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1172,18 +1464,20 @@ slim_primrange := project(deduped_primrange_per_adl,
 											self.subsString 	:= left.inquiryPrimRangeFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfPrimrange(slim_primrange le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfPrimrange(slim_primrange le, slim_primrange rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_primrange,slim_primrange[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
 end;
-substitutedPrimrange := project(slim_primrange, tfPrimrange(left, counter));
+substitutedPrimrange := join(slim_primrange, slim_primrange,
+left.seq=right.seq and STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+ tfPrimrange(left, right), keep(1), left outer);
 
 rolledSubPrimrange := rollup(substitutedPrimrange, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have DOB that are different by one character ***
-deduped_DOBs_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryDOBsFromADL<>''), seq, inquiryDOBsFromADL), seq, inquiryDOBsFromADL),seq);
+deduped_DOBs_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryDOBsFromADL<>''), seq, inquiryDOBsFromADL, -first_log_date), seq, inquiryDOBsFromADL),seq);
 
 slim_DOBs := project(deduped_DOBs_per_adl,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1191,89 +1485,105 @@ slim_DOBs := project(deduped_DOBs_per_adl,
 											self.subsString 	:= left.inquiryDOBsFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfDOBs(slim_DOBs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfDOBs(slim_DOBs le, slim_DOBs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
-end;
-substitutedDOBs := project(slim_DOBs, tfDOBs(left, counter));
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
+	end;
+substitutedDOBs := join(slim_DOBs, slim_DOBs,
+left.seq=right.seq and STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+tfDOBs(left, right), keep(1), left outer);
 
 rolledSubDOBs := rollup(substitutedDOBs, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have DOB that match year and month but have different day ***
-Risk_Indicators.iid_constants.subsLayout tfDOBDay(slim_DOBs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfDOBDay(slim_DOBs le, slim_DOBs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubDOBDay(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we have same year, month, but not day
 end;
-substitutedDOBDay := project(slim_DOBs, tfDOBDay(left, counter));
+substitutedDOBDay := join(slim_DOBs, slim_DOBs,
+left.seq=right.seq and left.subsString[1..6] = right.subsString[1..6] and left.subsString[7..8] <> right.subsString[7..8], 
+tfDOBDay(left, right), keep(1), left outer);
 
 rolledSubDOBDay := rollup(substitutedDOBDay, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have DOB that match year and day but have different month ***
-Risk_Indicators.iid_constants.subsLayout tfDOBMonth(slim_DOBs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfDOBMonth(slim_DOBs le, slim_DOBs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubDOBMonth(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we have same year, day, but not month
 end;
-substitutedDOBMonth := project(slim_DOBs, tfDOBMonth(left, counter));
+substitutedDOBMonth := join(slim_DOBs, slim_DOBs,
+left.seq=right.seq and left.subsString[1..4] = right.subsString[1..4] and left.subsString[7..8] = right.subsString[7..8] and left.subsString[5..6] <> right.subsString[5..6], 
+tfDOBMonth(left, right), keep(1), left outer);
 
 rolledSubDOBMonth := rollup(substitutedDOBMonth, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have DOB that match month and day but have different year ***
-Risk_Indicators.iid_constants.subsLayout tfDOBYear(slim_DOBs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfDOBYear(slim_DOBs le, slim_DOBs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubDOBYear(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we have different year, but same day and month
 end;
-substitutedDOBYear := project(slim_DOBs, tfDOBYear(left, counter));
+substitutedDOBYear := join(slim_DOBs, slim_DOBs, 
+left.seq=right.seq and left.subsString[1..4] <> right.subsString[1..4] and left.subsString[5..8] = right.subsString[5..8], 
+tfDOBYear(left, right), keep(1), left outer);
 
 rolledSubDOBYear := rollup(substitutedDOBYear, rollSubs(left,right), seq);
 
 
 // MS-105 - calculate how many inquiry records have SSN that has 1 digit that is off by 1 sequentially ***
-Risk_Indicators.iid_constants.subsLayout tfssnsperadl_1dig(slim_SSNs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfssnsperadl_1dig(slim_SSNs le, slim_SSNs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_SSNs,slim_SSNs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0); //if the difference in the two values is any of the numbers in the set, than only 1 digit is off by 1
 end;
-ssnsperadl_1dig := project(slim_SSNs, tfssnsperadl_1dig(left, counter));
+ssnsperadl_1dig := join(slim_SSNs, slim_SSNs,
+	left.seq=right.seq and ( abs((integer)right.subsString - (integer)left.subsString) ) in risk_indicators.iid_constants.diffValues1Dig, 
+tfssnsperadl_1dig(left, right), keep(1), left outer);
 
 rolledssnsperadl_1dig := rollup(ssnsperadl_1dig, rollSubs(left,right), seq);
 
 
 // MS-105 - calculate how many inquiry records have phone that has 1 digit that is off by 1 sequentially ***
-Risk_Indicators.iid_constants.subsLayout tfphonesperadl_1dig(slim_phones le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfphonesperadl_1dig(slim_phones le, slim_phones rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_phones,slim_phones[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0); //if the difference in the two values is any of the numbers in the set, than only 1 digit is off by 1
 end;
-phonesperadl_1dig := project(slim_phones, tfphonesperadl_1dig(left, counter));
+phonesperadl_1dig := join(slim_phones, slim_phones,
+	left.seq=right.seq and ( abs((integer)right.subsString - (integer)left.subsString) ) in risk_indicators.iid_constants.diffValues1Dig, 
+tfphonesperadl_1dig(left, right), keep(1), left outer);
 
 rolledphonesperadl_1dig := rollup(phonesperadl_1dig, rollSubs(left,right), seq);
 
 
 // MS-105 - calculate how many inquiry records have primary range that has 1 digit that is off by 1 sequentially ***
-Risk_Indicators.iid_constants.subsLayout tfprimrangesperadl_1dig(slim_phones le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfprimrangesperadl_1dig(slim_primrange le, slim_primrange rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_primrange,slim_primrange[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0); //if the difference in the two values is any of the numbers in the set, than only 1 digit is off by 1
 end;
-primrangesperadl_1dig := project(slim_primrange, tfprimrangesperadl_1dig(left, counter));
+primrangesperadl_1dig := join(slim_primrange, slim_primrange,
+	left.seq=right.seq and ( abs((integer)right.subsString - (integer)left.subsString) ) in risk_indicators.iid_constants.diffValues1Dig, 
+tfprimrangesperadl_1dig(left, right), keep(1), left outer);
 
 rolledprimrangesperadl_1dig := rollup(primrangesperadl_1dig, rollSubs(left,right), seq);
 
 
 // MS-105 - calculate how many inquiry records have DOB that has 1 digit that is off by 1 sequentially ***
-Risk_Indicators.iid_constants.subsLayout tfDOBsperadl_1dig(slim_DOBs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfDOBsperadl_1dig(slim_DOBs le, slim_dobs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0); //if the difference in the two values is any of the numbers in the set, than only 1 digit is off by 1
 end;
-DOBsperadl_1dig := project(slim_DOBs, tfDOBsperadl_1dig(left, counter));
+DOBsperadl_1dig := join(slim_DOBs, slim_DOBs,
+	left.seq=right.seq and ( abs((integer)right.subsString - (integer)left.subsString) ) in risk_indicators.iid_constants.diffValues1Dig, 
+ tfDOBsperadl_1dig(left, right), keep(1), left outer);
 
 rolledDOBsperadl_1dig := rollup(DOBsperadl_1dig, rollSubs(left,right), seq);
 
@@ -1460,14 +1770,15 @@ with_DOBsperadl_1dig := join(with_primrangesperadl_1dig, rolledDOBsperadl_1dig, 
 											self := left), left outer);
 
 // for BS 5.3 and higher, take the file that has all the new fields that were appended in 5.3.											
-with_all_per_adl := if(BSversion >= 53, with_DOBsperadl_1dig, with_Emails_per_adl);
+with_all_per_adl := if(includeTumblings, with_DOBsperadl_1dig, with_Emails_per_adl);
 
 // -----------------------------------------------------
 // start of the SSN velocity counter section
 // -----------------------------------------------------
 MAC_raw_ssn_transform (trans_name, ssn_key) := MACRO
 
-layout_temp trans_name(layout_temp le, ssn_key rt) := transform
+layout_temp_CCPA trans_name(layout_temp le, ssn_key rt) := transform
+    self.global_sid := rt.ccpa.global_sid;
 	// self.raw_ssn := rt;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
@@ -1638,29 +1949,91 @@ MAC_raw_ssn_transform(add_ssn_raw_update, Inquiry_AccLogs.Key_Inquiry_SSN_update
 MAC_raw_ssn_transform(add_ssn_raw_deltabase, deltabase_ssn_results);
 
 
-ssn_raw_base := join(with_all_per_adl, Inquiry_AccLogs.Key_Inquiry_SSN,	//MS-104 and MS-105
+ssn_raw_base_unsuppressed := join(with_all_per_adl, Inquiry_AccLogs.Key_Inquiry_SSN,	//MS-104 and MS-105
 								left.shell_input.ssn<>'' and 
 								keyed(left.shell_input.ssn=right.ssn) and
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_ssn_raw(left, right), left outer, atmost(riskwise.max_atmost));
 
+ssn_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(ssn_raw_base_unsuppressed, mod_access);
+
+ssn_raw_base := PROJECT(ssn_raw_base_flagged, TRANSFORM(layout_temp, 
+	self.good_inquiry     := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.good_inquiry);
+	self.inquiryPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerSSN);												
+	self.inquiryADLsPerSSN:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsPerSSN);
+	self.inquiryADLsFromSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsFromSSN);
+	self.inquiryLNamesPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryLNamesPerSSN);
+	self.inquiryLNamesFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryLNamesFromSSN);
+	self.inquiryAddrsPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryAddrsPerSSN);
+	self.inquiryAddrsFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryAddrsFromSSN);
+	self.inquiryDOBsPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryDOBsPerSSN);
+	self.inquiryDOBsFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryDOBsFromSSN);
+	self.inquiryPrimRangeFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryPrimRangeFromSSN);
+	self.fraudSearchInquiryPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerSSN);
+	self.fraudSearchInquiryPerSSNYear := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerSSNYear);
+	self.fraudSearchInquiryPerSSNMonth := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerSSNMonth);
+	self.fraudSearchInquiryPerSSNWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerSSNWeek);
+	self.fraudSearchInquiryPerSSNDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerSSNDay);
+	self.virtual_fraud.AltLexID_ssn_hi_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.AltLexID_ssn_hi_risk_ct);
+	self.virtual_fraud.AltLexID_ssn_lo_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.AltLexID_ssn_lo_risk_ct);
+	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
+	self.Sequence_Number := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Sequence_Number);
+	self.inq_perssn_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_perssn_count_day);
+	self.inq_perssn_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_perssn_count_week);
+	self.inq_perssn_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_perssn_count01);
+	self.inq_perssn_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_perssn_count03);
+	self.inq_perssn_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_perssn_count06);
+	self.inq_adlsperssn_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperssn_count_day);
+	self.inq_adlsperssn_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperssn_count_week);
+	self.inq_adlsperssn_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperssn_count01);
+	self.inq_adlsperssn_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperssn_count03);
+	self.inq_adlsperssn_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperssn_count06);
+	self.inq_lnamesperssn_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperssn_count_day);
+	self.inq_lnamesperssn_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperssn_count_week);
+	self.inq_lnamesperssn_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperssn_count01);
+	self.inq_lnamesperssn_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperssn_count03);
+	self.inq_lnamesperssn_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperssn_count06);
+	self.inq_addrsperssn_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_addrsperssn_count_day);
+	self.inq_addrsperssn_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_addrsperssn_count_week);
+	self.inq_addrsperssn_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_addrsperssn_count01);
+	self.inq_addrsperssn_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_addrsperssn_count03);
+	self.inq_addrsperssn_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_addrsperssn_count06);
+	self.inq_dobsperssn_count_day :=IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_dobsperssn_count_day);
+	self.inq_dobsperssn_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_dobsperssn_count_week);
+	self.inq_dobsperssn_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_dobsperssn_count01);
+	self.inq_dobsperssn_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_dobsperssn_count03);
+	self.inq_dobsperssn_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_dobsperssn_count06);
+	self.inq_corrnamessn 				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnamessn);
+	self.inq_corraddrssn 				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corraddrssn);
+	self.inq_corrdobssn 				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrdobssn);
+	self.inq_corrphonessn 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrphonessn);
+	self.inq_corrnameaddrssn		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnameaddrssn);
+	self.inq_corrnamephonessn		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnamephonessn);
+	self.inq_corrnameaddrphnssn	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnameaddrphnssn);
+    SELF := LEFT;
+)); 
+
 // update keys are only built for non-fcra
-ssn_raw_updates := join(with_all_per_adl, Inquiry_AccLogs.Key_Inquiry_SSN_update,	//MS-104 and MS-105
+ssn_raw_updates_unsuppressed := join(with_all_per_adl, Inquiry_AccLogs.Key_Inquiry_SSN_update,	//MS-104 and MS-105
 								left.shell_input.ssn<>'' and 
 								keyed(left.shell_input.ssn=right.ssn) and	
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_ssn_raw_update(left, right), atmost(riskwise.max_atmost));
-								
-ssn_raw_deltabase := join(with_all_per_adl, deltaBase_ssn_results,	//MS-104 and MS-105
+
+ssn_raw_updates := Suppress.Suppress_ReturnOldLayout(ssn_raw_updates_unsuppressed, mod_access, layout_temp);
+				
+ssn_raw_deltabase_unformatted := join(with_all_per_adl, deltaBase_ssn_results,	//MS-104 and MS-105
 								Death_Master.fn_clean_death_ssn(left.shell_input.ssn, true) <> '' and
 								left.shell_input.ssn=right.ssn,
 								add_ssn_raw_deltabase(left, right)/*, atmost(riskwise.max_atmost)*/);
+								
+ssn_raw_deltabase := PROJECT(ssn_raw_deltabase_unformatted, TRANSFORM(layout_temp, SELF := LEFT));
 
 ssn_raw := if(bsversion >= 50, dedup(sort(ungroup(ssn_raw_base + ssn_raw_updates + ssn_raw_deltabase), seq, transaction_id, -(unsigned3) first_log_date, Sequence_Number), seq, transaction_id),
 							dedup(sort(ungroup(ssn_raw_base + ssn_raw_updates), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number));
 
 
-grouped_ssn_raw := group(sort( ssn_raw, seq, -inquiryADLsFromSSN), seq);
+grouped_ssn_raw := group(sort( ssn_raw, seq, -inquiryADLsFromSSN, -first_log_date), seq);
 
 layout_temp roll_ssn( layout_temp le, layout_temp rt ) := TRANSFORM	
 	self.inquiryPerSSN := le.inquiryPerSSN + rt.inquiryPerSSN;
@@ -1716,7 +2089,7 @@ rolled_ssn_raw := rollup( grouped_ssn_raw, roll_ssn(left,right), true);
 
 
 // sort and roll lnames per SSN
-sorted_lnames_per_SSN := group(sort(ssn_raw, seq,  -inquiryLnamesFromSSN), seq);
+sorted_lnames_per_SSN := group(sort(ssn_raw, seq,  -inquiryLnamesFromSSN, -first_log_date), seq);
 layout_temp count_lnames_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirylnamesPerSSN := le.inquirylnamesPerSSN + IF(le.inquirylnamesFromSSN=rt.inquirylnamesFromSSN, 0, rt.inquirylnamesPerSSN);	
 	
@@ -1731,7 +2104,7 @@ rolled_lnames_per_SSN := rollup( sorted_lnames_per_SSN, count_lnames_per_SSN(lef
 
 
 // sort and roll Addrs per SSN
-sorted_Addrs_per_SSN := group(sort(ssn_raw, seq,  -inquiryAddrsFromSSN), seq);
+sorted_Addrs_per_SSN := group(sort(ssn_raw, seq,  -inquiryAddrsFromSSN, -first_log_date), seq);
 layout_temp count_Addrs_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquiryAddrsPerSSN := le.inquiryAddrsPerSSN + IF(le.inquiryAddrsFromSSN=rt.inquiryAddrsFromSSN, 0, rt.inquiryAddrsPerSSN);		
 	self.inq_addrsperssn_count_day := le.inq_addrsperssn_count_day + IF(le.inquiryAddrsFromSSN=rt.inquiryAddrsFromSSN, 0, rt.inq_addrsperssn_count_day);	
@@ -1745,7 +2118,7 @@ rolled_Addrs_per_SSN := rollup( sorted_Addrs_per_SSN, count_Addrs_per_SSN(left,r
 
 
 // sort and roll DOBs per SSN
-sorted_DOBs_per_SSN := group(sort(ssn_raw, seq,  -inquiryDOBsFromSSN), seq);
+sorted_DOBs_per_SSN := group(sort(ssn_raw, seq,  -inquiryDOBsFromSSN, -first_log_date), seq);
 layout_temp count_DOBs_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquiryDOBsPerSSN := le.inquiryDOBsPerSSN + IF(le.inquiryDOBsFromSSN=rt.inquiryDOBsFromSSN, 0, rt.inquiryDOBsPerSSN);	
 	self.inq_dobsperssn_count_day := le.inq_dobsperssn_count_day + IF(le.inquiryDOBsFromSSN=rt.inquiryDOBsFromSSN, 0, rt.inq_dobsperssn_count_day);	
@@ -1758,7 +2131,7 @@ end;
 rolled_DOBs_per_SSN := rollup( sorted_DOBs_per_SSN, count_DOBs_per_SSN(left,right), true);
 
 // MS-105 - calculate how many inquiry records have primary range that are different by one character ***
-deduped_Primrange_per_SSN := group(dedup(sort(ssn_raw(good_inquiry and inquiryPrimRangeFromSSN<>''), seq, inquiryPrimRangeFromSSN), seq, inquiryPrimRangeFromSSN),seq);
+deduped_Primrange_per_SSN := group(dedup(sort(ssn_raw(good_inquiry and inquiryPrimRangeFromSSN<>''), seq, inquiryPrimRangeFromSSN, -first_log_date), seq, inquiryPrimRangeFromSSN),seq);
 
 slim_primrangeFromSSN := project(deduped_Primrange_per_SSN,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1776,7 +2149,7 @@ primrangesperSSN_1dig := project(slim_primrangeFromSSN, tfprimrangesperSSN_1dig(
 rolledprimrangesperSSN_1dig := rollup(primrangesperSSN_1dig, rollSubs(left,right), seq);											
 
 // MS-105 - calculate how many inquiry records have DOB that are different by one character ***
-deduped_DOBs_per_SSN := group(dedup(sort(ssn_raw(good_inquiry and inquiryDOBsFromSSN<>''), seq, inquiryDOBsFromSSN), seq, inquiryDOBsFromSSN),seq);
+deduped_DOBs_per_SSN := group(dedup(sort(ssn_raw(good_inquiry and inquiryDOBsFromSSN<>''), seq, inquiryDOBsFromSSN, -first_log_date), seq, inquiryDOBsFromSSN),seq);
 
 slim_DOBsFromSSN := project(deduped_DOBs_per_SSN,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1837,13 +2210,14 @@ with_DOBsperssn_1dig := join(with_primrangesperssn_1dig, rolledDOBsperSSN_1dig, 
 																																																																	 right.subsCount);
 											self := left), left outer);
 											
-with_all_per_ssn := if(BSversion >= 53, with_DOBsperssn_1dig, with_ssn_velocity);
+with_all_per_ssn := if(includeTumblings, with_DOBsperssn_1dig, with_ssn_velocity);
 
 // -----------------------------------------------------
 // start of the Address velocity counter section
 // -----------------------------------------------------
 MAC_raw_addr_transform (trans_name, addr_key) := MACRO
-layout_temp trans_name(layout_temp le, addr_key rt) := transform
+layout_temp_CCPA trans_name(layout_temp le, addr_key rt) := transform
+    self.global_sid := rt.ccpa.global_sid;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -1974,7 +2348,7 @@ MAC_raw_addr_transform(add_Addr_raw, Inquiry_AccLogs.Key_Inquiry_Address);
 MAC_raw_addr_transform(add_Addr_raw_Update, Inquiry_AccLogs.Key_Inquiry_Address_update);
 MAC_raw_addr_transform(add_Addr_raw_deltabase, deltaBase_address_results);
 
-Addr_raw_base := join(with_all_per_ssn, Inquiry_AccLogs.Key_Inquiry_Address,	//MS104 and MS-105
+Addr_raw_base_unsuppressed := join(with_all_per_ssn, Inquiry_AccLogs.Key_Inquiry_Address,	//MS104 and MS-105
 								left.shell_input.prim_name<>'' and 
 								left.shell_input.z5<>'' and
 								keyed(left.shell_input.z5=right.zip) and 
@@ -1985,9 +2359,55 @@ Addr_raw_base := join(with_all_per_ssn, Inquiry_AccLogs.Key_Inquiry_Address,	//M
 								left.shell_input.addr_suffix=right.person_q.addr_suffix and
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Addr_raw(left, right), left outer, atmost(riskwise.max_atmost));
+
+Addr_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(Addr_raw_base_unsuppressed, mod_access);
+
+Addr_raw_base := PROJECT(Addr_raw_base_flagged, TRANSFORM(layout_temp, 
+	self.good_inquiry     := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.good_inquiry);
+	self.inquiryPerAddr := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerAddr);												
+	self.inquiryADLsPerAddr:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsPerAddr);
+	self.inquiryADLsFromAddr := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsFromAddr);
+	self.inquiryLNamesPerAddr := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryLNamesPerAddr);
+	self.inquiryLNamesFromAddr := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryLNamesFromAddr);
+	self.inquirySSNsPerAddr := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquirySSNsPerAddr);
+	self.inquirySSNsFromAddr := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquirySSNsFromAddr);
+	self.cbd_inquiryadlsperaddr := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.cbd_inquiryadlsperaddr);
+	self.fraudSearchInquiryPerAddr := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerAddr);
+	self.fraudSearchInquiryPerAddrYear := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerAddrYear);
+	self.fraudSearchInquiryPerAddrMonth := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerAddrMonth);
+	self.fraudSearchInquiryPerAddrWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerAddrWeek);
+	self.fraudSearchInquiryPerAddrDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerAddrDay);
+	self.virtual_fraud.AltLexID_addr_hi_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.AltLexID_addr_hi_risk_ct);
+	self.virtual_fraud.AltLexID_addr_lo_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.AltLexID_addr_lo_risk_ct);
+	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
+	self.Sequence_Number := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Sequence_Number);
+	self.inq_peraddr_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_peraddr_count_day);
+	self.inq_peraddr_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_peraddr_count_week);
+	self.inq_peraddr_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_peraddr_count01);
+	self.inq_peraddr_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_peraddr_count03);
+	self.inq_peraddr_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_peraddr_count06);
+	self.inq_adlsperaddr_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperaddr_count_day);
+	self.inq_adlsperaddr_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperaddr_count_week);
+	self.inq_adlsperaddr_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperaddr_count01);
+	self.inq_adlsperaddr_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperaddr_count03);
+	self.inq_adlsperaddr_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperaddr_count06);
+	self.inq_lnamesperaddr_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperaddr_count_day);
+	self.inq_lnamesperaddr_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperaddr_count_week);
+	self.inq_lnamesperaddr_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperaddr_count01);
+	self.inq_lnamesperaddr_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperaddr_count03);
+	self.inq_lnamesperaddr_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_lnamesperaddr_count06);
+	self.inq_ssnsperaddr_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_ssnsperaddr_count_day);
+	self.inq_ssnsperaddr_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_ssnsperaddr_count_week);
+	self.inq_ssnsperaddr_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_ssnsperaddr_count01);
+	self.inq_ssnsperaddr_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_ssnsperaddr_count03);
+	self.inq_ssnsperaddr_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_ssnsperaddr_count06);
+	self.inq_corrnameaddr 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnameaddr);
+	self.inq_corrdobaddr 				:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrdobaddr);
+    SELF := LEFT;
+)); 
 								
 // update keys are only built for non-fcra
-Addr_raw_updates := join(with_all_per_ssn, Inquiry_AccLogs.Key_Inquiry_Address_update,	//MS104 and MS-105
+Addr_raw_updates_unsuppressed := join(with_all_per_ssn, Inquiry_AccLogs.Key_Inquiry_Address_update,	//MS104 and MS-105
 								left.shell_input.prim_name<>'' and 
 								left.shell_input.z5<>'' and
 								keyed(left.shell_input.z5=right.zip) and 
@@ -1998,8 +2418,10 @@ Addr_raw_updates := join(with_all_per_ssn, Inquiry_AccLogs.Key_Inquiry_Address_u
 								left.shell_input.addr_suffix=right.person_q.addr_suffix and
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Addr_raw_Update(left, right), atmost(riskwise.max_atmost));
-								
-Addr_raw_deltabase := join(with_all_per_ssn, deltabase_address_results,	//MS104 and MS-105
+
+Addr_raw_updates := Suppress.Suppress_ReturnOldLayout(Addr_raw_updates_unsuppressed, mod_access, layout_temp);
+						
+Addr_raw_deltabase_unformatted := join(with_all_per_ssn, deltabase_address_results,	//MS104 and MS-105
 								left.shell_input.prim_name<>'' and 
 								left.shell_input.z5<>'' and
 								left.shell_input.z5=right.zip5 and 
@@ -2010,6 +2432,8 @@ Addr_raw_deltabase := join(with_all_per_ssn, deltabase_address_results,	//MS104 
 								left.shell_input.addr_suffix=right.person_q.addr_suffix,
 								add_Addr_raw_deltabase(left, right)/*, atmost(riskwise.max_atmost)*/);
 
+Addr_raw_deltabase := PROJECT(Addr_raw_deltabase_unformatted, TRANSFORM(layout_temp, SELF := LEFT));
+
 addr_raw := if(bsversion >= 50, dedup(sort(ungroup(addr_raw_base + addr_raw_updates + Addr_raw_deltabase), seq, transaction_id, -(unsigned3) first_log_date, Sequence_Number), seq, transaction_id),
 							dedup(sort(ungroup(addr_raw_base + addr_raw_updates), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number) );
 						
@@ -2018,7 +2442,7 @@ adls_from_address := project(addr_raw(inquiryADLsFromAddr<>0),
 	transform(risk_indicators.Boca_Shell_Fraud.layout_identities_input, self.did := left.inquiryADLsFromAddr;
 							 self.historydate := left.historydate;));
 
-suspicious_identities_hist := risk_indicators.Boca_Shell_Fraud.suspicious_identities_function_hist(adls_from_address);
+suspicious_identities_hist := risk_indicators.Boca_Shell_Fraud.suspicious_identities_function_hist(adls_from_address, mod_access);
 
 
 // if realtime production mode, search just the suspicious Identities key instead
@@ -2047,7 +2471,7 @@ with_suspcious_ids := join(addr_raw, suspicious_identities,
 // only do the suspicious identity searching in fraudpoint
 isFraudpoint :=  (BSOptions & risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity) > 0;
 address_velocity_raw := if(isFraudpoint or bsversion>=41, with_suspcious_ids, addr_raw);
-grouped_addr_raw := group(sort(address_velocity_raw, seq, -inquiryADLsFromAddr), seq);
+grouped_addr_raw := group(sort(address_velocity_raw, seq, -inquiryADLsFromAddr, -first_log_date), seq);
 
 
 layout_temp roll_Addr( layout_temp le, layout_temp rt ) := TRANSFORM	
@@ -2092,7 +2516,7 @@ end;
 rolled_Addr_raw := rollup( grouped_addr_raw, roll_addr(left,right), true);
 
 // sort and roll lnames per Addr
-sorted_lnames_per_Addr := group(sort(Addr_raw, seq,  -inquiryLnamesFromAddr), seq);
+sorted_lnames_per_Addr := group(sort(Addr_raw, seq,  -inquiryLnamesFromAddr, -first_log_date), seq);
 layout_temp count_lnames_per_Addr( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirylnamesPerAddr := le.inquirylnamesPerAddr + IF(le.inquirylnamesFromAddr=rt.inquirylnamesFromAddr, 0, rt.inquirylnamesPerAddr);		
 	self.inq_lnamesperaddr_count_day := le.inq_lnamesperaddr_count_day + IF(le.inquirylnamesFromAddr=rt.inquirylnamesFromAddr, 0, rt.inq_lnamesperaddr_count_day);	
@@ -2106,7 +2530,7 @@ rolled_lnames_per_Addr := rollup( sorted_lnames_per_Addr, count_lnames_per_Addr(
 
 
 // sort and roll SSNs per Addr
-sorted_SSNs_per_Addr := group(sort(Addr_raw, seq,  -inquirySSNsFromAddr), seq);
+sorted_SSNs_per_Addr := group(sort(Addr_raw, seq,  -inquirySSNsFromAddr, -first_log_date), seq);
 layout_temp count_SSNs_per_Addr( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirySSNsPerAddr := le.inquirySSNsPerAddr + IF(le.inquirySSNsFromAddr=rt.inquirySSNsFromAddr, 0, rt.inquirySSNsPerAddr);				
 	self.inq_ssnsperaddr_count_day := le.inq_ssnsperaddr_count_day + IF(le.inquirySSNsFromAddr=rt.inquirySSNsFromAddr, 0, rt.inq_ssnsperaddr_count_day);
@@ -2119,7 +2543,7 @@ end;
 rolled_SSNs_per_Addr := rollup( sorted_SSNs_per_Addr, count_SSNs_per_Addr(left,right), true);
 
 // MS-105 - calculate how many inquiry records by address have SSN that is different by one character ***
-deduped_SSN_per_addr := group(dedup(sort(addr_raw(good_inquiry and inquirySSNsFromAddr<>''), seq, inquirySSNsFromAddr), seq, inquirySSNsFromAddr),seq);
+deduped_SSN_per_addr := group(dedup(sort(addr_raw(good_inquiry and inquirySSNsFromAddr<>''), seq, inquirySSNsFromAddr, -first_log_date), seq, inquirySSNsFromAddr),seq);
 
 slim_SSNsFromAddr := project(deduped_SSN_per_addr,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -2167,13 +2591,14 @@ with_SSNsFromAddr_1dig := join(with_address_velocities, rolledSSNsFromAddr_1dig,
 																																																														 right.subsCount);
 											self := left), left outer);
 
-with_all_per_addr := if(BSversion >= 53, with_SSNsFromAddr_1dig, with_address_velocities);
+with_all_per_addr := if(includeTumblings, with_SSNsFromAddr_1dig, with_address_velocities);
 
 // -----------------------------------------------------
 // start of the Phone velocity counter section
 // -----------------------------------------------------
 MAC_raw_phone_transform (trans_name, phone_key) := MACRO
-layout_temp trans_name(layout_temp le, phone_key rt) := transform
+layout_temp_CCPA trans_name(layout_temp le, phone_key rt) := transform
+    self.global_sid := rt.ccpa.global_sid;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -2289,29 +2714,64 @@ MAC_raw_phone_transform(add_Phone_raw, Inquiry_AccLogs.Key_Inquiry_Phone);
 MAC_raw_phone_transform(add_Phone_raw_update, Inquiry_AccLogs.Key_Inquiry_Phone_update);
 MAC_raw_phone_transform(add_Phone_raw_deltabase, deltaBase_phone_results);
 
-Phone_raw_base := join(with_all_per_addr, Inquiry_AccLogs.Key_Inquiry_Phone,	//MS-104 and MS-105
+Phone_raw_base_unsuppressed := join(with_all_per_addr, Inquiry_AccLogs.Key_Inquiry_Phone,	//MS-104 and MS-105
 								left.shell_input.phone10<>'' and 
 								keyed(left.shell_input.phone10=right.phone10) and 
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Phone_raw(left, right), left outer, atmost(riskwise.max_atmost));
-								
+						
+Phone_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(Phone_raw_base_unsuppressed, mod_access);
+
+Phone_raw_base := PROJECT(Phone_raw_base_flagged, TRANSFORM(layout_temp, 								
+	self.inquiryPerPhone := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerPhone);												
+	self.inquiryADLsPerPhone := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsPerPhone); 
+	self.inquiryADLsFromPhone := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsFromPhone);
+	self.fraudSearchInquiryPerPhone := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerPhone);
+	self.fraudSearchInquiryPerPhoneYear := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerPhoneYear);
+	self.fraudSearchInquiryPerPhoneMonth := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerPhoneMonth);
+	self.fraudSearchInquiryPerPhoneWeek := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerPhoneWeek);
+	self.fraudSearchInquiryPerPhoneDay := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.fraudSearchInquiryPerPhoneDay);
+	self.virtual_fraud.AltLexID_Phone_hi_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.AltLexID_Phone_hi_risk_ct);
+	self.virtual_fraud.AltLexID_Phone_lo_risk_ct := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.virtual_fraud.AltLexID_Phone_lo_risk_ct);
+	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
+	self.Sequence_Number := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Sequence_Number);
+	self.inq_perphone_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_perphone_count_day);
+	self.inq_perphone_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_perphone_count_week);
+	self.inq_perphone_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_perphone_count01);
+	self.inq_perphone_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_perphone_count03);
+	self.inq_perphone_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_perphone_count06);
+	self.inq_adlsperphone_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperphone_count_day);
+	self.inq_adlsperphone_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperphone_count_week);
+	self.inq_adlsperphone_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperphone_count01);
+	self.inq_adlsperphone_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperphone_count03);
+	self.inq_adlsperphone_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperphone_count06);
+	self.inq_corrnamephone 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrnamephone);
+	self.inq_corrdobphone 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corrdobphone);
+	self.inq_corraddrphone 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_corraddrphone);
+    SELF := LEFT;
+)); 
+
 // update keys are only built for non-fcra
-Phone_raw_updates := join(with_all_per_addr, Inquiry_AccLogs.Key_Inquiry_Phone_update,	//MS-104 and MS-105
+Phone_raw_updates_unsuppressed := join(with_all_per_addr, Inquiry_AccLogs.Key_Inquiry_Phone_update,	//MS-104 and MS-105
 								left.shell_input.phone10<>'' and 
 								keyed(left.shell_input.phone10=right.phone10) and
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Phone_raw_update(left, right), atmost(riskwise.max_atmost));			
-								
-Phone_raw_deltabase := join(with_all_per_addr, deltaBase_phone_results,	//MS-104 and MS-105
+
+Phone_raw_updates := Suppress.Suppress_ReturnOldLayout(Phone_raw_updates_unsuppressed, mod_access, layout_temp);
+				
+Phone_raw_deltabase_unformatted := join(with_all_per_addr, deltaBase_phone_results,	//MS-104 and MS-105
 								left.shell_input.phone10<>'' and 
 								left.shell_input.phone10=right.phone10,
 								add_Phone_raw_deltabase(left, right)/*, atmost(riskwise.max_atmost)*/);	
+
+Phone_raw_deltabase := PROJECT(Phone_raw_deltabase_unformatted, TRANSFORM(layout_temp, SELF := LEFT));
 
 phone_raw := if(bsversion >= 50, dedup(sort(ungroup(phone_raw_base + phone_raw_updates + Phone_raw_deltabase), seq, transaction_id, -(unsigned3) first_log_date, Sequence_Number), seq, transaction_id),
 												dedup(sort(ungroup(phone_raw_base + phone_raw_updates), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number) );		
 
 
-grouped_Phone_raw := group(sort(Phone_raw, seq, -inquiryADLsFromPhone), seq);
+grouped_Phone_raw := group(sort(Phone_raw, seq, -inquiryADLsFromPhone, -first_log_date), seq);
 
 
 layout_temp roll_Phone( layout_temp le, layout_temp rt ) := TRANSFORM	
@@ -2360,7 +2820,8 @@ with_phone_velocities := rollup( grouped_Phone_raw, roll_Phone(left,right), true
 // start of the Email velocity counter section
 // -----------------------------------------------------
 MAC_raw_email_transform (trans_name, email_key) := MACRO
-layout_temp trans_name(layout_temp le, email_key rt) := transform
+layout_temp_CCPA trans_name(layout_temp le, email_key rt) := transform
+    self.global_sid := rt.ccpa.global_sid;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -2406,29 +2867,46 @@ MAC_raw_email_transform(add_email_raw, Inquiry_AccLogs.Key_Inquiry_Email);
 MAC_raw_email_transform(add_email_raw_update, Inquiry_AccLogs.Key_Inquiry_Email_update);
 MAC_raw_email_transform(add_email_raw_deltabase, deltaBase_email_results);
 
-Email_raw_base := join(with_phone_velocities, Inquiry_AccLogs.Key_Inquiry_Email,
+Email_raw_base_unsuppressed := join(with_phone_velocities, Inquiry_AccLogs.Key_Inquiry_Email,
 								left.shell_input.email_address<>'' and 
 								keyed(left.shell_input.email_address=right.email_address) and
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Email_raw(left, right), left outer, atmost(riskwise.max_atmost));
+								
+Email_raw_base_flagged := Suppress.MAC_FlagSuppressedSource(Email_raw_base_unsuppressed, mod_access);
 
+Email_raw_base := PROJECT(Email_raw_base_flagged, TRANSFORM(layout_temp, 													
+	self.inquiryPerEmail := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerEmail);											
+	self.inquiryADLsPerEmail := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsPerEmail);
+	self.inquiryADLsFromEmail := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsFromEmail);
+	self.inq_adlsperemail_count_day := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperemail_count_day);
+	self.inq_adlsperemail_count_week := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperemail_count_week);
+	self.inq_adlsperemail_count01 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperemail_count01);
+	self.inq_adlsperemail_count03 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperemail_count03);
+	self.inq_adlsperemail_count06 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inq_adlsperemail_count06);
+    SELF := LEFT;
+));
 // update keys are only built for non-fcra
-Email_raw_updates := join(with_phone_velocities, Inquiry_AccLogs.Key_Inquiry_Email_update,
+Email_raw_updates_unsuppressed := join(with_phone_velocities, Inquiry_AccLogs.Key_Inquiry_Email_update,
 								left.shell_input.email_address<>'' and 
 								keyed(left.shell_input.email_address=right.email_address) and
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Email_raw_update(left, right), atmost(riskwise.max_atmost));					
 								
-Email_raw_deltabase := join(with_phone_velocities, deltaBase_email_results,
+Email_raw_updates := Suppress.Suppress_ReturnOldLayout(Email_raw_updates_unsuppressed, mod_access, layout_temp);
+
+Email_raw_deltabase_unformatted := join(with_phone_velocities, deltaBase_email_results,
 								left.shell_input.email_address<>'' and 
 								left.shell_input.email_address=right.Email,
 								add_Email_raw_deltabase(left, right)/*, atmost(riskwise.max_atmost)*/);				
+
+Email_raw_deltabase := PROJECT(Email_raw_deltabase_unformatted, TRANSFORM(layout_temp, SELF := LEFT));
 
 email_raw:= if(bsversion >= 50, dedup(sort(ungroup(Email_raw_base + Email_raw_updates + Email_raw_deltabase), seq, transaction_id, -(unsigned3) first_log_date, Sequence_Number), seq, transaction_id),
 									dedup(sort(ungroup(Email_raw_base + Email_raw_updates), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number) );
 
 									
-grouped_Email_raw := group(sort(Email_raw, seq, -inquiryADLsFromEmail), seq);
+grouped_Email_raw := group(sort(Email_raw, seq, -inquiryADLsFromEmail, -first_log_date), seq);
 
 layout_temp roll_Email( layout_temp le, layout_temp rt ) := TRANSFORM	
 	self.inquiryPerEmail := le.inquiryPerEmail + rt.inquiryPerEmail;
@@ -2447,13 +2925,13 @@ with_email_velocities := rollup( grouped_Email_raw, roll_Email(left,right), true
 
 // email velocity is nonfcra only and only shell 5.0 and higher
 with_all_velocities := if(bsversion>=50, with_email_velocities, with_phone_velocities);
-
+                                                  			
 with_inquiries := group(join(clam_pre_Inquiries, with_all_velocities, left.seq=right.seq,
 													transform(risk_indicators.layout_boca_shell,
 													self.acc_logs := right,
 													self.virtual_fraud := right.virtual_fraud,
-													self := left)), seq);				
-
+													self.attended_college := right.attended_college;
+													self := left)), seq);		
 
 // append the pre-calculated billgroup counts
 billgroup_key := Inquiry_AccLogs.Key_Inquiry_Billgroups_DID;

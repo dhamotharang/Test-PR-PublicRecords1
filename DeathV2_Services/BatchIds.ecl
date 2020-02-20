@@ -1,4 +1,4 @@
-IMPORT AutokeyB2, Autokey_batch, BatchServices, DeathV2_Services, doxie;
+﻿IMPORT AutokeyB2, Autokey_batch, BatchServices, DeathV2_Services, doxie, dx_death_master;
 
 EXPORT BatchIds(DeathV2_Services.IParam.BatchParams inMod) := MODULE
 
@@ -27,7 +27,7 @@ EXPORT BatchIds(DeathV2_Services.IParam.BatchParams inMod) := MODULE
 	
   END;	
 
-	EXPORT DeepDiveIds(dataset(Autokey_batch.Layouts.rec_inBatchMaster) dBatchIn, BOOLEAN IsGLBOk, DeathV2_Services.IParam.DeathRestrictions deathRestrictions) := function
+	EXPORT DeepDiveIds(dataset(Autokey_batch.Layouts.rec_inBatchMaster) dBatchIn, DeathV2_Services.IParam.DeathRestrictions death_params) := function
 		// Grab adl ids for candidates in ds_batch_in. 
 		dDidsAcctno := BatchServices.Functions.fn_find_dids_and_append_to_acctno(dBatchIn(did=0)); // excluding records with DIDs to avoid extra work.
 
@@ -39,25 +39,26 @@ EXPORT BatchIds(DeathV2_Services.IParam.BatchParams inMod) := MODULE
 											SELF := LEFT,
 											SELF := RIGHT),
 				INNER,
-				LIMIT(Constants.DEATH_SERVICE_JOIN_LIMIT, SKIP)));
+				LIMIT(DeathV2_Services.Constants.DEATH_SERVICE_JOIN_LIMIT, SKIP)));
 
 		/* 	Look for dids from input and use them to get state_death_ids and slim.
 				These are labelled as 'deepdive' since they are coming from dids, 
 				even though they are input to the query. This allows us to accurately tell which matches 
 				are from DIDs and which are from autokeys */		
 	
-		dInputDids := dBatchIn(did != 0) + dDDBatchIn;
-		dDDDids := 
-			JOIN(dInputDids, doxie.Key_Death_MasterV2_ssa_Did, 
-				LEFT.did = RIGHT.l_did
-				AND	NOT DeathV2_Services.Functions.Restricted(RIGHT.src, RIGHT.glb_flag, IsGLBOk, deathRestrictions),
-			TRANSFORM(DeathV2_Services.Layouts.search_ID_with_matchcode,
-				SELF.isdeepdive := true,
-				SELF := LEFT,
-				SELF := RIGHT),
-				LIMIT(Constants.DEATH_SERVICE_JOIN_LIMIT, SKIP));
+    dInputDids := dBatchIn(did != 0) + dDDBatchIn;
 		
-		RETURN dDDDids;
+    ds_death_recs_raw  := dx_death_master.Get.byDid(dInputDids, did, death_params,,100);
+    dDDDids := 
+      JOIN(dInputDids, ds_death_recs_raw, 
+      LEFT.did = RIGHT.did,
+      TRANSFORM(DeathV2_Services.Layouts.search_ID_with_matchcode,
+        SELF.isdeepdive := TRUE;
+        SELF.state_death_id := RIGHT.death.state_death_id;
+        SELF := LEFT;
+      ),LIMIT(Constants.DEATH_SERVICE_JOIN_LIMIT, SKIP));
+
+    RETURN dDDDids;
 	END;	
 	
 END;

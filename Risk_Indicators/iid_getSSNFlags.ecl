@@ -1,22 +1,24 @@
-﻿import _Control, risk_indicators, suppress, doxie, address, riskwise, NID, FCRA, Death_Master, MDR, Relationship, dx_header;
-import STD;
+﻿import _Control, risk_indicators, suppress, doxie, address, riskwise, NID, FCRA, Death_Master, MDR, Relationship, dx_header,STD,data_services;
 onThor := _Control.Environment.OnThor;
 
 export iid_getSSNFlags(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
 							boolean isFCRA=false, boolean runSSNCodes=false,
-							string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel,
+							string10 ExactMatchLevel=risk_indicators.iid_constants.default_ExactMatchLevel,
 							string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 							UNSIGNED1 BSversion = 3, 
 							unsigned8 BSOptions=0,
-							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := function
+							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+							doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
-glb_ok := iid_constants.glb_ok(glb, isFCRA);
+unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, 0);
+
+glb_ok := risk_indicators.iid_constants.glb_ok(glb, isFCRA);
 
 todays_date := (string) risk_indicators.iid_constants.todaydate;
 
-ExactFirstNameRequired := ExactMatchLevel[iid_constants.posExactFirstNameMatch]=iid_constants.sTrue;
-ExactLastNameRequired := ExactMatchLevel[iid_constants.posExactLastNameMatch]=iid_constants.sTrue;
-ExactFirstNameRequiredAllowNickname := ExactMatchLevel[iid_constants.posExactFirstNameMatchNicknameAllowed]=iid_constants.sTrue;
+ExactFirstNameRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactFirstNameMatch]=risk_indicators.iid_constants.sTrue;
+ExactLastNameRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactLastNameMatch]=risk_indicators.iid_constants.sTrue;
+ExactFirstNameRequiredAllowNickname := ExactMatchLevel[risk_indicators.iid_constants.posExactFirstNameMatchNicknameAllowed]=risk_indicators.iid_constants.sTrue;
 
 layout_output_DE_src := RECORD
 	risk_indicators.layout_output;
@@ -36,11 +38,11 @@ layout_output_DE_src trans_name (layout_output_DE_src le, key_ssntable ri, INTEG
 	ssnCorrectionHit := i=3 and trim(ri.ssn)<>'';
 
 	// determine which section of the table is permitted for use based on the data restriction mask
-	header_version := map(DataRestriction[iid_constants.posEquifaxRestriction]=iid_constants.sFalse and
-												DataRestriction[iid_constants.posTransUnionRestriction]=iid_constants.sFalse and
-												((~isFCRA and DataRestriction[iid_constants.posExperianRestriction]=iid_constants.sFalse) or (isFCRA and DataRestriction[iid_constants.posExperianFCRARestriction]=iid_constants.sFalse)) => ri.combo,
-												((~isFCRA and DataRestriction[iid_constants.posExperianRestriction]=iid_constants.sFalse) or (isFCRA and DataRestriction[iid_constants.posExperianFCRARestriction]=iid_constants.sFalse)) => ri.en,
-												~isFCRA and DataRestriction[iid_constants.posTransUnionRestriction]=iid_constants.sFalse => ri.tn,
+	header_version := map(DataRestriction[Risk_Indicators.iid_constants.posEquifaxRestriction]=Risk_Indicators.iid_constants.sFalse and
+												DataRestriction[Risk_Indicators.iid_constants.posTransUnionRestriction]=Risk_Indicators.iid_constants.sFalse and
+												((~isFCRA and DataRestriction[Risk_Indicators.iid_constants.posExperianRestriction]=Risk_Indicators.iid_constants.sFalse) or (isFCRA and DataRestriction[Risk_Indicators.iid_constants.posExperianFCRARestriction]=Risk_Indicators.iid_constants.sFalse)) => ri.combo,
+												((~isFCRA and DataRestriction[Risk_Indicators.iid_constants.posExperianRestriction]=Risk_Indicators.iid_constants.sFalse) or (isFCRA and DataRestriction[Risk_Indicators.iid_constants.posExperianFCRARestriction]=Risk_Indicators.iid_constants.sFalse)) => ri.en,
+												~isFCRA and DataRestriction[Risk_Indicators.iid_constants.posTransUnionRestriction]=Risk_Indicators.iid_constants.sFalse => ri.tn,
 												ri.eq);  // default to the EQ version														
 
 	pre_history := header_version.header_first_seen < le.historydate;
@@ -59,7 +61,9 @@ layout_output_DE_src trans_name (layout_output_DE_src le, key_ssntable ri, INTEG
 																		le.socsvalflag);
 	
 	self.socsvalflag := socsvalflag_temp;
-	
+  
+	self.ITINExpired := IF(vssn.isITINPOtentiallyExpired, true,false);
+  
 	PWsocsvalflag_temp := IF(i = 1 or ssnCorrectionHit,MAP(
 																					trim(le.ssn)='' => '6',
 																				 (trim(ri.ssn)<>'' and pre_history and ~ri.isValidFormat) or 
@@ -175,10 +179,10 @@ layout_output_DE_src trans_name (layout_output_DE_src le, key_ssntable ri, INTEG
 						   header_version.lname4.lname=le.lname AND header_version.lname4.first_seen < le.historydate),
 					    le.lastssnmatch);
 	
-	self.lastssnmatch2 := IF(i=1,pre_history and (iid_constants.g(risk_indicators.LnameScore(header_version.lname1.lname, le.lname)) and if(ExactLastNameRequired, header_version.lname1.lname=le.lname, true) AND header_version.lname1.first_seen < le.historydate or
-						    iid_constants.g(risk_indicators.LnameScore(header_version.lname2.lname, le.lname)) and if(ExactLastNameRequired, header_version.lname2.lname=le.lname, true) AND header_version.lname2.first_seen < le.historydate or
-						    iid_constants.g(risk_indicators.LnameScore(header_version.lname3.lname, le.lname)) and if(ExactLastNameRequired, header_version.lname3.lname=le.lname, true) AND header_version.lname3.first_seen < le.historydate or
-						    iid_constants.g(risk_indicators.LnameScore(header_version.lname4.lname, le.lname)) and if(ExactLastNameRequired, header_version.lname4.lname=le.lname, true) AND header_version.lname4.first_seen < le.historydate),
+	self.lastssnmatch2 := IF(i=1,pre_history and (Risk_Indicators.iid_constants.g(risk_indicators.LnameScore(header_version.lname1.lname, le.lname)) and if(ExactLastNameRequired, header_version.lname1.lname=le.lname, true) AND header_version.lname1.first_seen < le.historydate or
+						    Risk_Indicators.iid_constants.g(risk_indicators.LnameScore(header_version.lname2.lname, le.lname)) and if(ExactLastNameRequired, header_version.lname2.lname=le.lname, true) AND header_version.lname2.first_seen < le.historydate or
+						    Risk_Indicators.iid_constants.g(risk_indicators.LnameScore(header_version.lname3.lname, le.lname)) and if(ExactLastNameRequired, header_version.lname3.lname=le.lname, true) AND header_version.lname3.first_seen < le.historydate or
+						    Risk_Indicators.iid_constants.g(risk_indicators.LnameScore(header_version.lname4.lname, le.lname)) and if(ExactLastNameRequired, header_version.lname4.lname=le.lname, true) AND header_version.lname4.first_seen < le.historydate),
 						le.lastssnmatch2);
 						
 	nleft := NID.PreferredFirstNew(le.fname);
@@ -187,29 +191,29 @@ layout_output_DE_src trans_name (layout_output_DE_src le, key_ssntable ri, INTEG
 	n3 := NID.PreferredFirstNew(header_version.lname3.fname);
 	n4 := NID.PreferredFirstNew(header_version.lname4.fname);						
 	self.firstssnmatch := IF(i=1, pre_history and (
-								(iid_constants.g(risk_indicators.FnameScore(header_version.lname1.fname, le.fname)) and 
+								(Risk_Indicators.iid_constants.g(risk_indicators.FnameScore(header_version.lname1.fname, le.fname)) and 
 									if(ExactFirstNameRequired, header_version.lname1.fname=le.fname, true) AND 
 									if(ExactFirstNameRequiredAllowNickname, header_version.lname1.fname=le.fname or nleft=n1, true) and 
 									header_version.lname1.first_seen < le.historydate) 
 								or								
-						    (iid_constants.g(risk_indicators.FnameScore(header_version.lname2.fname, le.fname)) and 
+						    (Risk_Indicators.iid_constants.g(risk_indicators.FnameScore(header_version.lname2.fname, le.fname)) and 
 									if(ExactFirstNameRequired, header_version.lname2.fname=le.fname, true) AND 
 									if(ExactFirstNameRequiredAllowNickname, header_version.lname2.fname=le.fname or nleft=n2, true) and
 									header_version.lname2.first_seen < le.historydate)
 								or
-						    (iid_constants.g(risk_indicators.FnameScore(header_version.lname3.fname, le.fname)) and 
+						    (Risk_Indicators.iid_constants.g(risk_indicators.FnameScore(header_version.lname3.fname, le.fname)) and 
 									if(ExactFirstNameRequired, header_version.lname3.fname=le.fname, true) AND
 									if(ExactFirstNameRequiredAllowNickname, header_version.lname3.fname=le.fname or nleft=n3, true) and
 									header_version.lname3.first_seen < le.historydate) 
 								or
-						    (iid_constants.g(risk_indicators.FnameScore(header_version.lname4.fname, le.fname)) and 
+						    (Risk_Indicators.iid_constants.g(risk_indicators.FnameScore(header_version.lname4.fname, le.fname)) and 
 									if(ExactFirstNameRequired, header_version.lname4.fname=le.fname, true) AND 
 									if(ExactFirstNameRequiredAllowNickname, header_version.lname4.fname=le.fname or nleft=n4, true) and
 									header_version.lname4.first_seen < le.historydate)),
 						le.firstssnmatch);
 	
 	// Death and Bankrupt are both nonglb
-	full_history_date := risk_indicators.iid_constants.full_history_date(le.historydate);
+	full_history_date := Risk_Indicators.iid_constants.full_history_date(le.historydate);
 	bansflag_temp := IF(i=1,MAP(ri.isBankrupt AND ((string)ri.dt_first_bankrupt < full_history_date) => '1',
 						   // a 2 would be for a full name and address match
 						   trim(le.ssn)='' OR trim(le.lname)='' OR trim(le.prim_name)='' => '3',	// does not appear that st. cloud will return a 3 anymore
@@ -245,10 +249,10 @@ layout_output_DE_src trans_name (layout_output_DE_src le, key_ssntable ri, INTEG
 		self.deceasedfirst := le.deceasedfirst;
 		self.deceasedlast := le.deceasedlast;
 		// these fields are only on the non-fcra key, they were added for fraudpoint
-		self.lnames_per_ssn := iid_constants.capVelocity(IF(i=1, header_version.lname_ct, le.lnames_per_ssn));
-		self.lnames_per_ssn_created_6months := iid_constants.capVelocity(IF(i=1, header_version.lname_ct_c6, le.lnames_per_ssn_created_6months));
-		self.addrs_per_ssn_multiple_use := iid_constants.capVelocity(IF(i=1, header_version.addr_ct_multiple_use, le.addrs_per_ssn_multiple_use));
-		self.adls_per_ssn_multiple_use := iid_constants.capVelocity(IF(i=1, header_version.didcount_multiple_use, le.adls_per_ssn_multiple_use));
+		self.lnames_per_ssn := Risk_Indicators.iid_constants.capVelocity(IF(i=1, header_version.lname_ct, le.lnames_per_ssn));
+		self.lnames_per_ssn_created_6months := Risk_Indicators.iid_constants.capVelocity(IF(i=1, header_version.lname_ct_c6, le.lnames_per_ssn_created_6months));
+		self.addrs_per_ssn_multiple_use := Risk_Indicators.iid_constants.capVelocity(IF(i=1, header_version.addr_ct_multiple_use, le.addrs_per_ssn_multiple_use));
+		self.adls_per_ssn_multiple_use := Risk_Indicators.iid_constants.capVelocity(IF(i=1, header_version.didcount_multiple_use, le.adls_per_ssn_multiple_use));
 		self.adls_per_ssn_multiple_use_non_relative := 0; // needs to be calculated at runtime to know what the input DID is to check relatives
 	#end
 	
@@ -275,17 +279,17 @@ layout_output_DE_src trans_name (layout_output_DE_src le, key_ssntable ri, INTEG
 																																																																	 '0'),
 														le.pwsocsdobflag);
 	self.socsdidCount := IF(i=1,header_version.DidCount,le.socsdidcount);
-	self.adls_per_ssn_seen_18months := iid_constants.capVelocity(IF(i=1,header_version.RecentCount,le.adls_per_ssn_seen_18months));
-	self.addrs_per_ssn := iid_constants.capVelocity(IF(i=1, header_version.addr_ct, le.addrs_per_ssn)); 
-	self.adls_per_ssn_created_6months := iid_constants.capVelocity(IF(i=1, header_version.DidCount_c6, le.adls_per_ssn_created_6months));
-	self.addrs_per_ssn_created_6months := iid_constants.capVelocity(IF(i=1, header_version.addr_ct_c6, le.addrs_per_ssn_created_6months));
+	self.adls_per_ssn_seen_18months := Risk_Indicators.iid_constants.capVelocity(IF(i=1,header_version.RecentCount,le.adls_per_ssn_seen_18months));
+	self.addrs_per_ssn := Risk_Indicators.iid_constants.capVelocity(IF(i=1, header_version.addr_ct, le.addrs_per_ssn)); 
+	self.adls_per_ssn_created_6months := Risk_Indicators.iid_constants.capVelocity(IF(i=1, header_version.DidCount_c6, le.adls_per_ssn_created_6months));
+	self.addrs_per_ssn_created_6months := Risk_Indicators.iid_constants.capVelocity(IF(i=1, header_version.addr_ct_c6, le.addrs_per_ssn_created_6months));
 
 
 	// added these for dl validation stuff
-	self.dlMatch := IF(i=2,iid_constants.g(risk_indicators.LnameScore(header_version.lname1.lname,le.lname)) and if(ExactLastNameRequired, header_version.lname1.lname=le.lname, true) AND header_version.lname1.first_seen < le.historydate or 
-						 iid_constants.g(risk_indicators.LnameScore(header_version.lname2.lname,le.lname)) and if(ExactLastNameRequired, header_version.lname2.lname=le.lname, true) AND header_version.lname2.first_seen < le.historydate or 
-						 iid_constants.g(risk_indicators.LnameScore(header_version.lname3.lname,le.lname)) and if(ExactLastNameRequired, header_version.lname3.lname=le.lname, true) AND header_version.lname3.first_seen < le.historydate or 
-						 iid_constants.g(risk_indicators.LnameScore(header_version.lname4.lname,le.lname)) and if(ExactLastNameRequired, header_version.lname4.lname=le.lname, true) AND header_version.lname4.first_seen < le.historydate,
+	self.dlMatch := IF(i=2,Risk_Indicators.iid_constants.g(risk_indicators.LnameScore(header_version.lname1.lname,le.lname)) and if(ExactLastNameRequired, header_version.lname1.lname=le.lname, true) AND header_version.lname1.first_seen < le.historydate or 
+						 Risk_Indicators.iid_constants.g(risk_indicators.LnameScore(header_version.lname2.lname,le.lname)) and if(ExactLastNameRequired, header_version.lname2.lname=le.lname, true) AND header_version.lname2.first_seen < le.historydate or 
+						 Risk_Indicators.iid_constants.g(risk_indicators.LnameScore(header_version.lname3.lname,le.lname)) and if(ExactLastNameRequired, header_version.lname3.lname=le.lname, true) AND header_version.lname3.first_seen < le.historydate or 
+						 Risk_Indicators.iid_constants.g(risk_indicators.LnameScore(header_version.lname4.lname,le.lname)) and if(ExactLastNameRequired, header_version.lname4.lname=le.lname, true) AND header_version.lname4.first_seen < le.historydate,
 							 le.dlMatch);
 	vdl := risk_indicators.Validate_SSN(le.dl_number[1..9],le.dob);			    
 	dlsocsvalflag_temp := IF(i=2,MAP(le.dl_number[1..9]='' => '6',
@@ -316,7 +320,7 @@ got_SSNTable_fcra_roxie := join (inrec_DE_src, risk_indicators.key_ssn_table_v4_
 									 trim((string12)right.ssn) not in left.ssn_correct_record_id, 
                    get_ssnTable_FCRA(left,right,1),left outer, ATMOST(keyed(left.ssn=right.ssn),500));
 
-key_legacy_ssn := if(isFCRA, doxie.Key_FCRA_legacy_ssn, doxie.Key_legacy_ssn);
+key_legacy_ssn := dx_Header.key_legacy_ssn(iType);
 
 legacy_ssn_thor := join (distribute(inrec_DE_src(ssn<>'' and did<>0), hash64(ssn,did)), 
 									 distribute(pull(key_legacy_ssn), hash64(ssn, did)),
@@ -384,10 +388,10 @@ got_SSNTableDL_fcra_thor := group(sort(distribute(got_SSNTableDL_fcra_thor_pre +
 	
 deathSSNKey := Death_Master.key_ssn_ssa(isFCRA);
 
-layout_output_DE_src getDeathSSN (layout_output_DE_src le, deathSSNKey ri) := transform
-
+{layout_output_DE_src, UNSIGNED4 global_sid} getDeathSSN (layout_output_DE_src le, deathSSNKey ri) := transform
+	self.global_sid := ri.global_sid;
 	ssnDeathHit := trim(ri.ssn)<>'';
-	full_history_date := risk_indicators.iid_constants.full_history_date(le.historydate);
+	full_history_date := Risk_Indicators.iid_constants.full_history_date(le.historydate);
 	pre_history := (string)ri.dod8 < full_history_date;
 	vssn := Risk_Indicators.Validate_SSN(le.ssn,'');
 	socsvalflag_temp := MAP(trim(le.ssn)='' 														=> '3',
@@ -411,7 +415,7 @@ layout_output_DE_src getDeathSSN (layout_output_DE_src le, deathSSNKey ri) := tr
 	self := [];
 END;
 
-got_death_fcra_roxie := join (got_SSNTableDL_fcra, deathSSNKey,
+got_death_fcra_roxie_unformatted := join (got_SSNTableDL_fcra, deathSSNKey,
                    left.ssn!='' and keyed(left.ssn=right.ssn) and
 									 (((integer)right.DOD8 <> 0 and (string)right.DOD8[1..6] <= (string)left.historydate) or
 									  ((integer)right.filedate <> 0 and (string)right.filedate[1..6] <= (string)left.historydate)) and
@@ -419,8 +423,10 @@ got_death_fcra_roxie := join (got_SSNTableDL_fcra, deathSSNKey,
 									 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) and
 									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(keyed(left.ssn=right.ssn),500));
- 
-got_death_fcra_thor_pre := join (distribute(got_SSNTableDL_fcra(ssn <> ''), hash64(ssn)), 
+
+got_death_fcra_roxie := PROJECT(got_death_fcra_roxie_unformatted, TRANSFORM(layout_output_DE_src, SELF := LEFT));
+
+got_death_fcra_thor_pre_unformatted := join (distribute(got_SSNTableDL_fcra(ssn <> ''), hash64(ssn)), 
 									 distribute(pull(deathSSNKey), hash64(ssn)),
                    (left.ssn=right.ssn) and
 									 (((integer)right.DOD8 <> 0 and (string)right.DOD8[1..6] <= (string)left.historydate) or
@@ -429,6 +435,8 @@ got_death_fcra_thor_pre := join (distribute(got_SSNTableDL_fcra(ssn <> ''), hash
 									 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) and
 									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(left.ssn=right.ssn,500), LOCAL);
+
+got_death_fcra_thor_pre := PROJECT(got_death_fcra_thor_pre_unformatted, TRANSFORM(layout_output_DE_src, SELF := LEFT));
 
 got_death_fcra_thor := got_death_fcra_thor_pre + got_SSNTableDL_fcra(ssn='');
 									 
@@ -484,7 +492,7 @@ got_SSNTableDL_nonfcra_thor := got_SSNTableDL_nonfcra_thor_pre +
 																				self.dlsocsdobflag := '2',
 																				self := left));
 
-got_death_nonfcra_roxie := join (got_SSNTableDL_nonfcra_roxie, deathSSNKey,
+got_death_nonfcra_roxie_unsuppressed := join (got_SSNTableDL_nonfcra_roxie, deathSSNKey,
                    left.ssn!='' and keyed(left.ssn=right.ssn) and
 									 (((integer)right.DOD8 <> 0 and (string)right.DOD8[1..6] <= (string)left.historydate) or
 									  ((integer)right.filedate <> 0 and (string)right.filedate[1..6] <= (string)left.historydate)) and									 
@@ -492,8 +500,19 @@ got_death_nonfcra_roxie := join (got_SSNTableDL_nonfcra_roxie, deathSSNKey,
 									 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(keyed(left.ssn=right.ssn),500));
-									 
-got_death_nonfcra_thor := join (distribute(got_SSNTableDL_nonfcra_thor, hash64(ssn)), 
+									
+got_death_nonfcra_roxie_flagged := Suppress.MAC_FlagSuppressedSource(got_death_nonfcra_roxie_unsuppressed, mod_access, data_env := iType);
+
+got_death_nonfcra_roxie := PROJECT(got_death_nonfcra_roxie_flagged, TRANSFORM(layout_output_DE_src, 
+	self.deceasedDate := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.deceasedDate);	
+	self.deceasedDOB := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.deceasedDOB);
+	self.deceasedfirst := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deceasedfirst);
+	self.deceasedlast := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deceasedlast);
+	self.deathsource := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deathsource);
+    SELF := LEFT;
+)); 
+
+got_death_nonfcra_thor_unsuppressed := join (distribute(got_SSNTableDL_nonfcra_thor, hash64(ssn)), 
 									 distribute(pull(deathSSNKey), hash64(ssn)),
                    left.ssn!='' and (left.ssn=right.ssn) and
 									 (((integer)right.DOD8 <> 0 and (string)right.DOD8[1..6] <= (string)left.historydate) or
@@ -502,7 +521,18 @@ got_death_nonfcra_thor := join (distribute(got_SSNTableDL_nonfcra_thor, hash64(s
 									 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(left.ssn=right.ssn,500), LOCAL);
-									 
+	
+got_death_nonfcra_thor_flagged := Suppress.MAC_FlagSuppressedSource(got_death_nonfcra_thor_unsuppressed, mod_access, data_env := iType);
+
+got_death_nonfcra_thor := PROJECT(got_death_nonfcra_thor_flagged, TRANSFORM(layout_output_DE_src, 
+	self.deceasedDate := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.deceasedDate);	
+	self.deceasedDOB := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.deceasedDOB);
+	self.deceasedfirst := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deceasedfirst);
+	self.deceasedlast := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deceasedlast);
+	self.deathsource := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deathsource);
+    SELF := LEFT;
+)); 
+
 #IF(onThor)
 	got_death_nonfcra := group(sort(got_death_nonfcra_thor, seq),seq);
 #ELSE
@@ -574,7 +604,7 @@ ssn_table_results1 := if(isFCRA, got_SSNTable_corr_proj, got_death_nonfcra_proj	
 		iids_dedp := dedup(sort(ungroup(multiple_use_ssns_with_wildcard_did)(did<>0),did), did);
 		justDids := PROJECT(iids_dedp, 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
-		rellyids := Relationship.proc_GetRelationship(justDids, topnCount:=500,
+		rellyids := Relationship.proc_GetRelationshipNeutral(justDids, topnCount:=500,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result;
 
 		multiple_use_ssn_with_relative_flag := join(multiple_use_ssns_with_wildcard_did, rellyids, 
@@ -598,12 +628,13 @@ ssn_table_results1 := if(isFCRA, got_SSNTable_corr_proj, got_death_nonfcra_proj	
 				self.adls_per_ssn_multiple_use_non_relative := min(left.adls_per_ssn_multiple_use, right.non_relative_adls_per_ssn);
 				self := left), left outer);
 //
-isFraudpoint :=  not isFCRA and (BSOptions & iid_constants.BSOptions.IncludeFraudVelocity) > 0;
+isFraudpoint :=  not isFCRA and (BSOptions & Risk_Indicators.iid_constants.BSOptions.IncludeFraudVelocity) > 0;
 ssn_table_results := if(isFraudpoint or (bsversion>=41 and ~isFCRA), group(ssn_table_results2, seq), group(ssn_table_results1, seq));
 // ssn_table_results := if(isFraudpoint or (bsversion>=41 and ~isFCRA), group(ssn_table_results2, seq), group(ssn_table_results1, seq));
 
+SSNMapKey := if(isFCRA, doxie.Key_SSN_FCRA_Map, doxie.Key_SSN_Map);
     									
-risk_indicators.layout_output get_ssnMap (risk_indicators.layout_output le, doxie.Key_SSN_Map ri, INTEGER i) := transform
+risk_indicators.layout_output get_ssnMap (risk_indicators.layout_output le, SSNMapKey ri, INTEGER i) := transform
 	hasCorrection := le.ssn_correct_ffid <> [];
 	
   // new ssn-issue data have '20990101' for the current date intervals
@@ -625,7 +656,7 @@ risk_indicators.layout_output get_ssnMap (risk_indicators.layout_output le, doxi
 					
 	self.socllowissue  := IF(i=1, ssnLowIssue, le.socllowissue);	
 	self.soclhighissue := IF(i=1, IF ((unsigned)ssnHighIssue in [0, 20990101, 20991231], '', ssnHighIssue), le.soclhighissue);
-	SELF.soclstate := IF(i=1,IF(hasCorrection, le.soclstate, Address.Map_State_Name_To_Abbrev(Stringlib.StringToUpperCase(ri.state))),le.soclstate);
+	SELF.soclstate := IF(i=1,IF(hasCorrection, le.soclstate, Address.Map_State_Name_To_Abbrev(STD.Str.ToUpperCase(ri.state))),le.soclstate);
 	
 	socsdobflag_temp := IF(i=1,risk_indicators.validate_ssn(le.ssn,le.dob).ssnDobFlag (end_yyyymm),le.socsdobflag);
 	self.socsdobflag := socsdobflag_temp;
@@ -647,7 +678,7 @@ risk_indicators.layout_output get_ssnMap (risk_indicators.layout_output le, doxi
 	SELF := le;
 END;
 
-SSNMapKey := if(isFCRA, doxie.Key_SSN_FCRA_Map, doxie.Key_SSN_Map);
+
 
 got_SSNMap_roxie := join(ssn_table_results, SSNMapKey,
 												(left.ssn!='' AND LENGTH(StringLib.StringFilter(LEFT.ssn, '0123456789')) = 9 AND LENGTH(TRIM(LEFT.ssn)) = 9) and 
@@ -680,7 +711,6 @@ got_SSNMap_thor := got_SSNMap_thor_pre +
 got_SSNMapDL_roxie := join(got_SSNMap, SSNMapKey,
 																(left.dl_number!='') and
 																keyed(left.dl_number[1..5]=right.ssn5) AND
-																//TODO: not clear if check for start/end_serial for DL
 																// check date
 																((unsigned3)(RIGHT.start_date[1..6]) < left.historydate),
 																get_ssnMap(left,right, 2),
@@ -689,7 +719,6 @@ got_SSNMapDL_roxie := join(got_SSNMap, SSNMapKey,
 got_SSNMapDL_thor_pre := join(distribute(got_SSNMap(dl_number<>''), hash64(dl_number[1..5])), 
 																distribute(pull(SSNMapKey), hash64(ssn5)),
 																(left.dl_number[1..5]=right.ssn5) AND
-																//TODO: not clear if check for start/end_serial for DL
 																// check date
 																((unsigned3)(RIGHT.start_date[1..6]) < left.historydate),
 																get_ssnMap(left,right, 2),

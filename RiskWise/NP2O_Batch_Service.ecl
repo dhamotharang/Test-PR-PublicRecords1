@@ -14,7 +14,7 @@
 /*--INFO-- 'np21','np22','np24','np25','np27','np31','np50','np60','np80','np81','np82','np90', 'np91', 'np92' */
 		 
 		 
-import Address, Risk_Indicators, gateway;
+IMPORT Address, Risk_Indicators, gateway, STD;
 
 export NP2O_Batch_Service := MACRO
 
@@ -32,7 +32,13 @@ string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission 
 batchin := dataset([],riskwise.Layout_PR2I_BatchIn)			: stored('batch_in',few);
 unsigned1 ofac_version      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
-tribcode := StringLib.StringToLowerCase(tribcode_value);
+tribcode := STD.Str.ToLowerCase(tribcode_value);
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 productSet := ['np21','np22','np24','np25','np27','np50','np60','np80','np81','np82','np90', 'np91', 'np92'];
 
@@ -89,7 +95,11 @@ RiskWise.Layout_PRII addseq(batchin le, integer C) := transform
 end;
 f := project(batchin, addseq(LEFT,COUNTER));
 
-almost_final := RiskWise.NP2O_Function(f, gateways, glb, dppa, tribCode, DataRestriction, DataPermission, OFACversion);
+almost_final := RiskWise.NP2O_Function(f, gateways, glb, dppa, tribCode, DataRestriction, DataPermission, OFACversion,
+                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                        TransactionID := TransactionID, 
+                                                                        BatchUID := BatchUID, 
+                                                                        GlobalCompanyID := GlobalCompanyID);
 final := project(almost_final, RiskWise.Layout_NP2O);
 
 ret := if(tribCode in productSet, final, dataset([],RiskWise.Layout_NP2O));

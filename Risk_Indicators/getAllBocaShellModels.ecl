@@ -2,9 +2,10 @@
 onThor := _Control.Environment.OnThor;
 
 EXPORT getAllBocaShellModels(grouped dataset(risk_indicators.Layout_Boca_Shell) bsData_pre, 
-	boolean isFCRA, 
-	dataset(easi.layout_census) easi_census,
-  boolean adl_based_shell= false) := function
+                             boolean isFCRA, 
+                             dataset(easi.layout_census) easi_census,
+                             boolean adl_based_shell= false,
+                             GROUPED DATASET (risk_indicators.Layout_output) iid) := function
 
 #IF(onThor)
 	bsData := group(sort(distribute(bsData_pre, hash64(seq)), seq, local), seq, local);
@@ -69,6 +70,7 @@ fp := Models.FP3710_0_0(ungroup(clam_ip));
 fp2 := Models.FP1109_0_0(ungroup(clam_ip), 6, false);	// do we want the criminal reason codes output?
 fp3 := Models.FP31505_0_Base(ungroup(clam_ip), 6, false, false);	// false, false = no criminal or FDN reason codes
 fp3_FDN := Models.FP3FDN1505_0_Base(ungroup(clam_ip), 6, false);	// false = no criminal reason codes, but we do want FDN reason codes
+DI := Models.DI31906_0_0( ungroup(iid)); //Digital Insights flagship model
 
 rvBank5 := models.RVB1503_0_0(bsdata);
 rvAuto5 := models.RVA1503_0_0(bsdata);
@@ -186,40 +188,44 @@ input_Adl_based_shell:=if((
             
 input_ok:= If(adl_based_shell,input_Adl_based_shell,input_ok_normal);
 
-						
+// RQ-14868.  Making deceased logic in RV v5 alerts, models and attributes consistent	
+InputProvidedSSN_Check := Risk_Indicators.iid_constants.inputssnflag_Lookup(trim(le.shell_input.ssn), le.ADL_Shell_Flags.in_ssnpop, le.ADL_Shell_Flags.adl_ssn);	//same as rv v5 inputprovidedssn
+deceased := risk_indicators.iid_constants.LexidDeceased_Lookup(le.truedid, le.header_summary.ver_sources, le.iid.DIDDeceased)  = '1' or 
+							Risk_Indicators.iid_constants.SSNDeceased_Lookup(le.truedid, InputProvidedSSN_Check, le.iid.decsflag)  = '1' ;					
 
 
 		// flagship v5
-	self.rv_scores.bankcardv5  := if( i=26 and input_ok, ri.score, le.rv_scores.bankcardv5 );
-	self.rv_scores.reason1bv5  := if( i=26 and input_ok, ri.ri[1].hri, le.rv_scores.reason1bv5 );
-	self.rv_scores.reason2bv5  := if( i=26 and input_ok, ri.ri[2].hri, le.rv_scores.reason2bv5 );
-	self.rv_scores.reason3bv5  := if( i=26 and input_ok, ri.ri[3].hri, le.rv_scores.reason3bv5 );
-	self.rv_scores.reason4bv5  := if( i=26 and input_ok, ri.ri[4].hri, le.rv_scores.reason4bv5 );
+  self.rv_scores.bankcardv5  := MAP(input_ok and deceased => '200', i=26 and input_ok => ri.score, le.rv_scores.bankcardv5 );
+	self.rv_scores.reason1bv5  := MAP( input_ok and deceased => le.rv_scores.reason1bv5, i=26 and input_ok => ri.ri[1].hri, le.rv_scores.reason1bv5 );
+	self.rv_scores.reason2bv5  := MAP( input_ok and deceased => le.rv_scores.reason2bv5, i=26 and input_ok => ri.ri[2].hri, le.rv_scores.reason2bv5 );
+	self.rv_scores.reason3bv5  := MAP( input_ok and deceased => le.rv_scores.reason3bv5, i=26 and input_ok => ri.ri[3].hri, le.rv_scores.reason3bv5 );
+	self.rv_scores.reason4bv5  := MAP( input_ok and deceased => le.rv_scores.reason4bv5, i=26 and input_ok => ri.ri[4].hri, le.rv_scores.reason4bv5 );
 	// self.rv_scores.reason5bv5  := if( i=26, ri.ri[5].hri, le.rv_scores.reason5bv5 );  // bankcard doesn't have a 5th reason code since it doesn't use inquiries data
-	self.rv_scores.autov5      := if( i=27 and input_ok, ri.score, le.rv_scores.autov5 );
-	self.rv_scores.reason1av5  := if( i=27 and input_ok, ri.ri[1].hri, le.rv_scores.reason1av5 );
-	self.rv_scores.reason2av5  := if( i=27 and input_ok, ri.ri[2].hri, le.rv_scores.reason2av5 );
-	self.rv_scores.reason3av5  := if( i=27 and input_ok, ri.ri[3].hri, le.rv_scores.reason3av5 );
-	self.rv_scores.reason4av5  := if( i=27 and input_ok, ri.ri[4].hri, le.rv_scores.reason4av5 );
-	self.rv_scores.reason5av5  := if( i=27 and input_ok, ri.ri[5].hri, le.rv_scores.reason5av5 );
-	self.rv_scores.telecomv5   := if( i=28 and input_ok, ri.score, le.rv_scores.telecomv5 );
-	self.rv_scores.reason1tv5  := if( i=28 and input_ok, ri.ri[1].hri, le.rv_scores.reason1tv5 );
-	self.rv_scores.reason2tv5  := if( i=28 and input_ok, ri.ri[2].hri, le.rv_scores.reason2tv5 );
-	self.rv_scores.reason3tv5  := if( i=28 and input_ok, ri.ri[3].hri, le.rv_scores.reason3tv5 );
-	self.rv_scores.reason4tv5  := if( i=28 and input_ok, ri.ri[4].hri, le.rv_scores.reason4tv5 );
-	self.rv_scores.reason5tv5  := if( i=28 and input_ok, ri.ri[5].hri, le.rv_scores.reason5tv5 );
-	self.rv_scores.msbv5       := if( i=29 and input_ok, ri.score, le.rv_scores.msbv5 );
-	self.rv_scores.reason1mv5  := if( i=29 and input_ok, ri.ri[1].hri, le.rv_scores.reason1mv5 );
-	self.rv_scores.reason2mv5  := if( i=29 and input_ok, ri.ri[2].hri, le.rv_scores.reason2mv5 );
-	self.rv_scores.reason3mv5  := if( i=29 and input_ok, ri.ri[3].hri, le.rv_scores.reason3mv5 );
-	self.rv_scores.reason4mv5  := if( i=29 and input_ok, ri.ri[4].hri, le.rv_scores.reason4mv5 );
-	self.rv_scores.reason5mv5  := if( i=29 and input_ok, ri.ri[5].hri, le.rv_scores.reason5mv5 );
-	self.rv_scores.crossindv5  := if( i=30 and input_ok, ri.score, le.rv_scores.crossindv5 );
-	self.rv_scores.reason1cv5  := if( i=30 and input_ok, ri.ri[1].hri, le.rv_scores.reason1cv5 );
-	self.rv_scores.reason2cv5  := if( i=30 and input_ok, ri.ri[2].hri, le.rv_scores.reason2cv5 );
-	self.rv_scores.reason3cv5  := if( i=30 and input_ok, ri.ri[3].hri, le.rv_scores.reason3cv5 );
-	self.rv_scores.reason4cv5  := if( i=30 and input_ok, ri.ri[4].hri, le.rv_scores.reason4cv5 );
-	self.rv_scores.reason5cv5  := if( i=30 and input_ok, ri.ri[5].hri, le.rv_scores.reason5cv5 );
+	self.rv_scores.autov5      := MAP( input_ok and deceased => '200', i=27 and input_ok => ri.score, le.rv_scores.autov5 );
+	self.rv_scores.reason1av5  := MAP( input_ok and deceased => le.rv_scores.reason1av5, i=27 and input_ok => ri.ri[1].hri, le.rv_scores.reason1av5 );
+	self.rv_scores.reason2av5  := MAP( input_ok and deceased => le.rv_scores.reason2av5, i=27 and input_ok => ri.ri[2].hri, le.rv_scores.reason2av5 );
+	self.rv_scores.reason3av5  := MAP( input_ok and deceased => le.rv_scores.reason3av5, i=27 and input_ok => ri.ri[3].hri, le.rv_scores.reason3av5 );
+	self.rv_scores.reason4av5  := MAP( input_ok and deceased => le.rv_scores.reason4av5, i=27 and input_ok => ri.ri[4].hri, le.rv_scores.reason4av5 );
+	self.rv_scores.reason5av5  := MAP( input_ok and deceased => le.rv_scores.reason5av5, i=27 and input_ok => ri.ri[5].hri, le.rv_scores.reason5av5 );
+	self.rv_scores.telecomv5   := MAP( input_ok and deceased => '200', i=28 and input_ok => ri.score, le.rv_scores.telecomv5 );
+	self.rv_scores.reason1tv5  := MAP( input_ok and deceased => le.rv_scores.reason1tv5, i=28 and input_ok => ri.ri[1].hri, le.rv_scores.reason1tv5 );
+	self.rv_scores.reason2tv5  := MAP( input_ok and deceased => le.rv_scores.reason2tv5, i=28 and input_ok => ri.ri[2].hri, le.rv_scores.reason2tv5 );
+	self.rv_scores.reason3tv5  := MAP( input_ok and deceased => le.rv_scores.reason3tv5, i=28 and input_ok => ri.ri[3].hri, le.rv_scores.reason3tv5 );
+	self.rv_scores.reason4tv5  := MAP( input_ok and deceased => le.rv_scores.reason4tv5, i=28 and input_ok => ri.ri[4].hri, le.rv_scores.reason4tv5 );
+	self.rv_scores.reason5tv5  := MAP( input_ok and deceased => le.rv_scores.reason5tv5, i=28 and input_ok => ri.ri[5].hri, le.rv_scores.reason5tv5 );
+	self.rv_scores.msbv5       := MAP( input_ok and deceased => '200' ,i=29 and input_ok => ri.score, le.rv_scores.msbv5 );
+	self.rv_scores.reason1mv5  := MAP( input_ok and deceased => le.rv_scores.reason1mv5, i=29 and input_ok => ri.ri[1].hri, le.rv_scores.reason1mv5 );
+	self.rv_scores.reason2mv5  := MAP( input_ok and deceased => le.rv_scores.reason2mv5, i=29 and input_ok => ri.ri[2].hri, le.rv_scores.reason2mv5 );
+	self.rv_scores.reason3mv5  := MAP( input_ok and deceased => le.rv_scores.reason3mv5, i=29 and input_ok => ri.ri[3].hri, le.rv_scores.reason3mv5 );
+	self.rv_scores.reason4mv5  := MAP( input_ok and deceased => le.rv_scores.reason4mv5, i=29 and input_ok => ri.ri[4].hri, le.rv_scores.reason4mv5 );
+	self.rv_scores.reason5mv5  := MAP( input_ok and deceased => le.rv_scores.reason5mv5, i=29 and input_ok => ri.ri[5].hri, le.rv_scores.reason5mv5 );
+	self.rv_scores.crossindv5  := MAP( input_ok and deceased => '200' , i=30 and input_ok => ri.score, le.rv_scores.crossindv5 );
+	self.rv_scores.reason1cv5  := MAP( input_ok and deceased => le.rv_scores.reason1cv5, i=30 and input_ok => ri.ri[1].hri, le.rv_scores.reason1cv5 );
+	self.rv_scores.reason2cv5  := MAP( input_ok and deceased => le.rv_scores.reason2cv5, i=30 and input_ok => ri.ri[2].hri, le.rv_scores.reason2cv5 );
+	self.rv_scores.reason3cv5  := MAP( input_ok and deceased => le.rv_scores.reason3cv5, i=30 and input_ok => ri.ri[3].hri, le.rv_scores.reason3cv5 );
+	self.rv_scores.reason4cv5  := MAP( input_ok and deceased => le.rv_scores.reason4cv5, i=30 and input_ok => ri.ri[4].hri, le.rv_scores.reason4cv5 );
+	self.rv_scores.reason5cv5  := MAP( input_ok and deceased => le.rv_scores.reason5cv5, i=30 and input_ok => ri.ri[5].hri, le.rv_scores.reason5cv5 );
+
 	
 	self.fd_scores.fd3 := if(i=9, ri.score, le.fd_scores.fd3);
 	self.fd_scores.fd6 := if(i=10, ri.score, le.fd_scores.fd6);
@@ -478,7 +484,26 @@ end;
 	wFP3_FDN := join(wFP3, fp3_FDN, left.seq=right.seq, doFP3FDN1505Model(LEFT,RIGHT), left outer);
 #END
 
-wModels1 := if(isFCRA, wCrossInd5, wFP3_FDN);
+//New Digital Insights Flagship model
+Layout_Boca_Shell doDIModel(Layout_Boca_Shell le, models.layouts.layout_fp1109 rt) := transform
+
+  self.fd_scores.digital_insight_score := rt.score;
+  self.fd_scores.digital_insight_reason1 := rt.ri[1].hri;
+  self.fd_scores.digital_insight_reason2 := rt.ri[2].hri;
+  self.fd_scores.digital_insight_reason3 := rt.ri[3].hri;
+  self.fd_scores.digital_insight_reason4 := rt.ri[4].hri;
+  self.fd_scores.digital_insight_reason5 := rt.ri[5].hri;
+  self.fd_scores.digital_insight_reason6 := rt.ri[6].hri;	
+  self := le;
+end;
+
+#IF(onThor)
+	wDigitalInsights := join(wFP3_FDN, distribute(DI, hash64(seq)), left.seq=right.seq, doDIModel(LEFT,RIGHT), left outer, local);
+#ELSE
+	wDigitalInsights := join(wFP3_FDN, DI, left.seq=right.seq, doDIModel(LEFT,RIGHT), left outer);
+#END
+
+wModels1 := if(isFCRA, wCrossInd5, wDigitalInsights);
 
 
 
@@ -591,8 +616,14 @@ self.fd_scores.reason3FP_V3_fdn	:= if(left.fd_scores.reason3FP_V3_fdn	in ['00', 
 self.fd_scores.reason4FP_V3_fdn	:= if(left.fd_scores.reason4FP_V3_fdn	in ['00', '000'], '', left.fd_scores.reason4FP_V3_fdn	);
 self.fd_scores.reason5FP_V3_fdn	:= if(left.fd_scores.reason5FP_V3_fdn	in ['00', '000'], '', left.fd_scores.reason5FP_V3_fdn	);
 self.fd_scores.reason6FP_V3_fdn	:= if(left.fd_scores.reason6FP_V3_fdn	in ['00', '000'], '', left.fd_scores.reason6FP_V3_fdn	);
-	
-	self := left));
+self.fd_scores.digital_insight_reason1	:= if(left.fd_scores.digital_insight_reason1	in ['00', '000'], '', left.fd_scores.digital_insight_reason1	);
+self.fd_scores.digital_insight_reason2	:= if(left.fd_scores.digital_insight_reason2	in ['00', '000'], '', left.fd_scores.digital_insight_reason2	);
+self.fd_scores.digital_insight_reason3	:= if(left.fd_scores.digital_insight_reason3	in ['00', '000'], '', left.fd_scores.digital_insight_reason3	);
+self.fd_scores.digital_insight_reason4	:= if(left.fd_scores.digital_insight_reason4	in ['00', '000'], '', left.fd_scores.digital_insight_reason4	);
+self.fd_scores.digital_insight_reason5	:= if(left.fd_scores.digital_insight_reason5	in ['00', '000'], '', left.fd_scores.digital_insight_reason5	);
+self.fd_scores.digital_insight_reason6	:= if(left.fd_scores.digital_insight_reason6	in ['00', '000'], '', left.fd_scores.digital_insight_reason6	);
+
+self := left));
 
 #end
 

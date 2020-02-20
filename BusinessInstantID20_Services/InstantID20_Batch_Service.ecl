@@ -98,7 +98,7 @@
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
 
-IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Patriot, Risk_Indicators, Royalty, STD;
+IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5,Phones ,BusinessInstantID20_Services, Patriot, Risk_Indicators, Royalty, STD;
 
 EXPORT InstantID20_Batch_Service() := MACRO
 
@@ -192,7 +192,12 @@ EXPORT InstantID20_Batch_Service() := MACRO
 		'Include_MASI_Watchlist',
 		'Include_OFFC_Watchlist',
 		'Include_PMLC_Watchlist',
-		'Include_PMLJ_Watchlist'
+		'Include_PMLJ_Watchlist',
+		'LexIdSourceOptout',
+		'_TransactionId',
+		'_BatchUID',
+		'_GCID'
+		
 		));
 
 		/* ************************************************************************
@@ -231,6 +236,10 @@ EXPORT InstantID20_Batch_Service() := MACRO
 		boolean Include_OFFC_Watchlist:= false : stored('Include_OFFC_Watchlist');
 		boolean Include_PMLC_Watchlist:= false : stored('Include_PMLC_Watchlist');
 		boolean Include_PMLJ_Watchlist:= false : stored('Include_PMLJ_Watchlist');
+		unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+		string TransactionID := '' : STORED('_TransactionId');
+		string BatchUID := '' : STORED('_BatchUID');
+		unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 		dWL := dataset([], iesp.share.t_StringArrayItem) +
 				if(Include_ALL_Watchlist, dataset([{patriot.constants.wlALL}], iesp.share.t_StringArrayItem)) +
@@ -357,7 +366,10 @@ EXPORT InstantID20_Batch_Service() := MACRO
 		ds_Input := PROJECT( ds_Input_pre, BusinessInstantID20_Services.Transforms(Options).xfm_LoadInput(LEFT,COUNTER) );
 	
 		// 8. Pass all input to BIID 2.0 logic.
-		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists);
+		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists,LexIdSourceOptout := LexIdSourceOptout,
+TransactionID := TransactionID,
+BatchUID := BatchUID,
+GlobalCompanyID := GlobalCompanyID);
 				
 		// 9. Product output:
 		results_batch := PROJECT( ds_BIID_results, BusinessInstantID20_Services.xfm_ToBatchLayout(LEFT, Options) );

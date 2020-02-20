@@ -1,6 +1,9 @@
-Import Data_Services, census_data,ln_property,doxie, ut,fcra;
+﻿Import Data_Services, census_data,ln_property,doxie, ut,fcra, vault, _control;
 
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export Key_Deed_FID(boolean IsFCRA = false) := vault.LN_PropertyV2.key_deed_fid(isFCRA);
 
+#ELSE
 export Key_Deed_FID(boolean IsFCRA = false) := function
 
 KeyName 			:= 'thor_data400::key::ln_propertyv2::';
@@ -19,7 +22,11 @@ return_file		:= INDEX(base_file,{ln_fares_id, unsigned6 proc_date := (unsigned)(
 													
 return(return_file);		
 
-END;				  
+END;	
+
+#END;
+
+			  
 
 
 

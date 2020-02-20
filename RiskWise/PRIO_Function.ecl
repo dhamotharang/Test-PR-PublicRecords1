@@ -1,8 +1,12 @@
-﻿import ut, Risk_Indicators, Risk_Reporting, Models, gateway, riskwise;
+﻿import ut, Risk_Indicators, Risk_Reporting, Models, gateway, riskwise, STD;
 
 export PRIO_Function(DATASET(Layout_PRII) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 glb, unsigned1 dppa, 
 	string4 tribCode, string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-	string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := FUNCTION
+	string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+    unsigned1 LexIdSourceOptout = 1,
+    string TransactionID = '',
+    string BatchUID = '',
+    unsigned6 GlobalCompanyId = 0) := FUNCTION
 
 risk_indicators.layout_input into(indata le) := TRANSFORM
 
@@ -20,12 +24,12 @@ risk_indicators.layout_input into(indata le) := TRANSFORM
 	self.dob := dob_val;
 	self.phone10 := hphone_val;	
 	self.wphone10 := wphone_val;
-	self.fname := stringlib.stringtouppercase(le.first);
-	self.mname := stringlib.stringtouppercase(le.middleini);
-	self.lname := stringlib.stringtouppercase(le.last);
-	self.in_streetAddress := stringlib.stringtouppercase(le.addr);
-	self.in_city := stringlib.stringtouppercase(le.city);
-	self.in_state := stringlib.stringtouppercase(le.state);
+	self.fname := STD.Str.touppercase(le.first);
+	self.mname := STD.Str.touppercase(le.middleini);
+	self.lname := STD.Str.touppercase(le.last);
+	self.in_streetAddress := STD.Str.touppercase(le.addr);
+	self.in_city := STD.Str.touppercase(le.city);
+	self.in_state := STD.Str.touppercase(le.state);
 	self.in_zipCode := le.zip;
 	self.prim_range := clean_a[1..10];
 	self.predir := clean_a[11..12];
@@ -49,12 +53,12 @@ risk_indicators.layout_input into(indata le) := TRANSFORM
 	self.addr_status := clean_a[179..182];
 	self.county := clean_a[143..145];
 	self.geo_blk := clean_a[171..177];
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(le.drlcstate);
-	self.age := if ((integer)dob_val != 0, (string3)ut.GetAgeI((integer)dob_val), '');
+	self.dl_number := STD.Str.touppercase(dl_num_clean);
+	self.dl_state := STD.Str.touppercase(le.drlcstate);
+	self.age := if ((integer)dob_val != 0, (string3)ut.Age((integer)dob_val), '');
 	self.email_address := le.email;
-	self.employer_name := stringlib.stringtouppercase(le.cmpy);
-	self.lname_prev := stringlib.stringtouppercase(le.formerlast);
+	self.employer_name := STD.Str.touppercase(le.cmpy);
+	self.lname_prev := STD.Str.touppercase(le.formerlast);
 	self.country := le.countrycode;
 	
 	self := [];
@@ -63,7 +67,11 @@ prep := PROJECT(indata,into(LEFT));
 
 bs_version := if(tribcode='pi02', 2, 1);																					
 ret := Risk_Indicators.InstantID_Function(prep, gateways, dppa, glb, false, false, true, true, false, 
-	in_BSversion := bs_version,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission);
+	in_BSversion := bs_version,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission,
+    LexIdSourceOptout := LexIdSourceOptout, 
+    TransactionID := TransactionID, 
+    BatchUID := BatchUID, 
+    GlobalCompanyID := GlobalCompanyID);
 
 // intermediate results
 working_layout := RECORD
@@ -351,7 +359,11 @@ mapped_results := join(ret, indata, left.seq = right.seq, format_out(left,right)
 include_vehicles := NOT tribcode IN ['pi02','pi05','flfn'];
 clam := if(tribCode in ['pi02','pi04','pi05','pi09','pi14','pi60','flfn','bnk2'], 
 Risk_Indicators.Boca_Shell_Function(ret, gateways, dppa, glb, false, false, true, false, include_vehicles, true, 
-BSversion:=bs_version, DataRestriction := DataRestriction, DataPermission := DataPermission),
+BSversion:=bs_version, DataRestriction := DataRestriction, DataPermission := DataPermission,
+LexIdSourceOptout := LexIdSourceOptout, 
+TransactionID := TransactionID, 
+BatchUID := BatchUID, 
+GlobalCompanyID := GlobalCompanyID),
 		 group(dataset([],Risk_Indicators.Layout_Boca_Shell),seq));	
 		 
 bs_with_ip := record

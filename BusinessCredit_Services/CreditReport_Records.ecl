@@ -18,11 +18,11 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
 		BOOLEAN isBusinessIdExists	:= EXISTS(inmod.BusinessIds(UltID != 0 AND SeleID != 0 AND OrgID != 0));
           
        
-		//GET BIP Header Records.    // this also does the filter of 2 experian sources.
-		 busHeaderRecs 				      :=  BusinessCredit_Services.Functions.BipKfetch(inmod.BusinessIds,inmod.FetchLevel,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT,inmod.DataPermissionMask).BIPBusHeaderRecsSlim;
-		bipv2BestRecsTmp                           :=  BusinessCredit_Services.Functions.bipkfetch(inmod.BusinessIds,inmod.FetchLevel,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT,inmod.DataPermissionMask).BIpv2bestKeyResults;
+    //GET BIP Header Records.    // this also does the filter of 2 experian sources.
+    busHeaderRecs               :=  BusinessCredit_Services.Functions.BipKfetch(inmod.BusinessIds,mod_access,inmod.FetchLevel,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT).BIPBusHeaderRecsSlim;
+    bipv2BestRecsTmp            :=  BusinessCredit_Services.Functions.bipkfetch(inmod.BusinessIds,mod_access,inmod.FetchLevel,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT).BIpv2bestKeyResults;
 		 
-		  bipv2BestRecs := Business_Risk_BIP.fnMac_ExcludeExperian_ChildDataset(bipv2BestRecsTmp, 
+    bipv2BestRecs := Business_Risk_BIP.fnMac_ExcludeExperian_ChildDataset(bipv2BestRecsTmp, 
                                                          company_name[1].sources, 
                                                          source);
 		
@@ -30,7 +30,8 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
 		verificationCode :=   BusinessCredit_services.functions.getVerificationInfo(busHeaderRecs, inMod);
 		
 		//GET SBFE Header Records.
-          buzCreditHeader                       :=  BusinessCredit_Services.Functions.BipKfetch(inmod.BusinessIds, inmod.FetchLevel, BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT, inmod.DatapermissionMask).BusCreditHeaderRecs;  
+
+    buzCreditHeader         :=  BusinessCredit_Services.Functions.BipKfetch(inmod.BusinessIds, mod_access, inmod.FetchLevel, BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT).BusCreditHeaderRecs;  
 		buzCreditHeader_ABOnly	:= buzCreditHeader(record_type = Business_Credit.Constants().AccountBase);
 		buzCreditHeader_slim 		:= DEDUP(SORT(PROJECT(buzCreditHeader_ABOnly , BusinessCredit_Services.Layouts.buzCredit_AccNo_Slim),
 																		#EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts())), 
@@ -50,9 +51,11 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
    		
    		//GET All the Report Data.
 		// efficiency added these 2 lines.
-		IndustryCode :=	BusinessCredit_Services.fn_getPrimaryIndustry(inmod.BusinessIds , inmod.DataPermissionMask , inmod.Include_BusinessCredit, inmod.FetchLevel).bestIndustryCode[1].Best_Code;	
-		ownerInfokfetch := Business_Credit.Key_BusinessOwnerInformation().Kfetch2(inmod.BusinessIds, inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT);
-		// efficiency remove rest of topbusines sections not needed within fn_getBusiness_BestInformation
+
+		IndustryCode :=	BusinessCredit_Services.fn_getPrimaryIndustry(inmod.BusinessIds, mod_access, inmod.Include_BusinessCredit, inmod.FetchLevel).bestIndustryCode[1].Best_Code;	
+		ownerInfokfetch := Business_Credit.Key_BusinessOwnerInformation().Kfetch2(inmod.BusinessIds, mod_access, inmod.FetchLevel,,BusinessCredit_Services.Constants.JOIN_LIMIT);
+	
+        // efficiency remove rest of topbusines sections not needed within fn_getBusiness_BestInformation
 		BusBestInformation 		:= BusinessCredit_Services.fn_getBusiness_BestInformation(inmod, 
 	                                                PROJECT(topBusiness_recs_raw,TRANSFORM(BusinessCredit_Services.Layouts.TopBusinessRecord,
 																									 SELF.BestSection := LEFT.BestSection;
@@ -78,7 +81,7 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
 											));
 	                                              
 	
-  BusInquiries 					:=  if (inmod.BusinessCreditReportType =  BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport,
+  BusInquiries 					:=  if (inmod.BusinessCreditReportType NOT IN BusinessCredit_Services.Constants.LNOnlyCreditSet,
 	                      BusinessCredit_Services.fn_getBusInquiries(inmod));
 		
   buzCreditTradeLineMod	:= BusinessCredit_Services.fn_getBuzCreditTrades(inmod, buzCreditHeader_recs,IndustryCode); 
@@ -89,25 +92,25 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
   creditUtilRecs				:= IF(buzCreditAccess, buzCreditTradeLineMod.CreditUtil_recs_combined , DATASET([],iesp.businesscreditreport.t_BusinessCreditUtilized));
   dbtRecs								:= IF(buzCreditAccess, buzCreditTradeLineMod.DBT_Recs, DATASET([],iesp.businesscreditreport.t_BusinessCreditDBT));
    
-   buzCreditSubsidiaries := IF(buzCreditAccess, BusinessCredit_Services.fn_getSubsidiaries(inmod, buzCreditAccess,ownerInfokfetch), 
+  buzCreditSubsidiaries := IF(buzCreditAccess, BusinessCredit_Services.fn_getSubsidiaries(inmod, buzCreditAccess,ownerInfokfetch), 
 	                                  DATASET([],iesp.businesscreditreport.t_BusinessCreditSubsidiary));
   buzCreditOwnerGuars 	:= IF(buzCreditAccess, BusinessCredit_Services.fn_getOwnersGuarantors(inmod, ds_indOwnrGuarOnlyDids, buzCreditAccess), 
 	                                  DATASET([],iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor));
 	
    // efficiency reduce what is passed into function 
-  BusAdditionalInfo			:= BusinessCredit_Services.fn_getAdditionalInfo(inmod, 
-	                                                                                                                                    topBusiness_recs_raw,
-	                                                                                                                                      buzCreditHeader_recs);
+  BusAdditionalInfo			:= BusinessCredit_Services.fn_getAdditionalInfo(topBusiness_recs_raw,
+                                                                        buzCreditHeader_recs,
+                                                                        mod_access);
 
   buzCreditScoreMod			:= BusinessCredit_Services.fn_getBusiness_CreditScore(inmod, 	                                                                                                                                                     
-																													BipOrSBFEBestInfo,																																															
-																													authRep_BestRec);
+                                                                              BipOrSBFEBestInfo,																																															
+                                                                              authRep_BestRec);
 	
   buzCreditScores				:= IF(buzCreditAccess AND inmod.IncludeScores, buzCreditScoreMod.final_scores, DATASET([],iesp.businesscreditreport.t_BusinessCreditScoring));
   PhoneSources0					:= IF(inmod.IncludeScores, buzCreditScoreMod.Phone_Sources, DATASET([],iesp.businesscreditreport.t_BusinessCreditPhoneSources));
   PhoneSources          := PhoneSources0(source not in BusinessCredit_Services.Constants.EXCLUDED_EXPERIAN_SRC); // restricting ER and Q3 experian sources
 			
-  SIC_NAICS_List 	:= BusinessCredit_Services.fn_getPrimaryIndustry(inmod.BusinessIds, inmod.DataPermissionMask, buzCreditAccess,inmod.FetchLevel).recs_rollup_sort; 
+  SIC_NAICS_List 	:= BusinessCredit_Services.fn_getPrimaryIndustry(inmod.BusinessIds, mod_access, buzCreditAccess,inmod.FetchLevel).recs_rollup_sort; 
    
   iesp.businesscreditreport.t_BusinessCreditCodeDescription activity_trans(STRING Activity_Code,STRING Activity_Desc) := TRANSFORM
    			SELF.Code 			:= Activity_Code;
@@ -156,10 +159,8 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
    			SELF.AccountDetail			      := choosen(accountDetails, iesp.constants.BusinessCredit.MaxSection);
 			SELF.TotalAccountDetailCount   :=   accountDetailsCount;
    			SELF.CreditUtils				      := choosen(creditUtilRecs, iesp.constants.BusinessCredit.MaxSection);
-   			SELF.DBTs						      := choosen(dbtRecs, iesp.constants.BusinessCredit.MaxSection);
-				
-   			SELF.Inquiries					      := if (inmod.BusinessCreditReportType =  BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport,
-				                                    choosen(BusInquiries, iesp.constants.BusinessCredit.MaxSection) );
+   			SELF.DBTs						      := choosen(dbtRecs, iesp.constants.BusinessCredit.MaxSection);				
+   			SELF.Inquiries					      := choosen(BusInquiries, iesp.constants.BusinessCredit.MaxSection);
    			SELF.Subsidiaries				:= choosen(buzCreditSubsidiaries, iesp.constants.BusinessCredit.MaxSection);
    			SELF.OwnerGuarantors		      := choosen(buzCreditOwnerGuars, iesp.constants.BusinessCredit.MaxSection);
    			SELF.TopBusinessRecord  	      := topBusinessRecs[1];

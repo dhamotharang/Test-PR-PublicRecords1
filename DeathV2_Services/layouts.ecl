@@ -39,7 +39,7 @@ export base_internal := record
 end;
 
 shared supp_additional := record
-	header.layout_death_master_supplemental;
+	header.layout_death_master_supplemental - [global_sid, record_sid, ScrubsBits1, ScrubsBits2, ScrubsBits3];
   string300 CAUSE_OF_DEATH;				
 end;
 
@@ -50,7 +50,7 @@ end;
 
 export base_external := record
   base_additional;
-	header.Layout_Did_Death_MasterV2 - [state_death_id];
+	header.Layout_Did_Death_MasterV2 - [state_death_id, global_sid, record_sid];
 end;
 
 export report_external := record

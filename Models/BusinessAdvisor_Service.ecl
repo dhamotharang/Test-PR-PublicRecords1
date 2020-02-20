@@ -54,7 +54,7 @@
 */
 /*--INFO--  */
 
-import ut,codes,address, doxie, seed_files, risk_indicators, riskwise, business_risk,Gateway, AutoStandardI;
+import ut, doxie, seed_files, risk_indicators, riskwise, business_risk,Gateway, AutoStandardI, STD;
  
 export BusinessAdvisor_Service := MACRO
 
@@ -113,7 +113,11 @@ export BusinessAdvisor_Service := MACRO
 	'TestDataEnabled',
 	'TestDataTableName',	
 
-	'gateways'));
+	'gateways',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 
 string30 AccountNumber_value := '' 			: stored('AccountNumber');
@@ -149,7 +153,7 @@ unsigned1 DPPA_Purpose := 0 		: stored('DPPAPurpose');
 unsigned1 GLB_Purpose := AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
  
 STRING5 industry_class_val := '' 	: STORED('IndustryClass');
-industry_class_value 			:= StringLib.StringToUpperCase(industry_class_val);
+industry_class_value 			:= STD.Str.toUpperCase(industry_class_val);
 boolean ln_branded_value := false 	: STORED('LnBranded');
 unsigned3 history_date := 999999 	: stored('HistoryDateYYYYMM');
 boolean IsPOBoxCompliant := false : STORED('PoBoxCompliance');
@@ -180,9 +184,15 @@ string10 CustomDataFilter:='';
 boolean   Test_Data_Enabled := false   	: stored('TestDataEnabled');
 string20  Test_Data_Table_Name := ''   	: stored('TestDataTableName');
 
-
 dobradius:= if(usedobFilter,dobradius0,-1);
 gateways := Gateway.Configuration.Get();
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+
 
 if( OFACVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
@@ -217,14 +227,14 @@ risk_indicators.Layout_Input into(d l) := transform
 	
 	self.ssn := Rep_SSN;
 	self.dob := dob_val;
-	self.age := if (Rep_Age = 0 and (integer)dob_val != 0, (STRING3)ut.GetAgeI((integer)dob_val), (string3)Rep_Age);
+	self.age := if (Rep_Age = 0 and (integer)dob_val != 0, (STRING3)ut.Age((integer)dob_val), (string3)Rep_Age);
 	self.phone10 := hphone_val;
 	self.wphone10 := wphone_val;
 	
-	self.fname := stringlib.stringtouppercase(Rep_fName);
-	self.mname := stringlib.stringtouppercase(Rep_MName);
-	self.lname := stringlib.stringtouppercase(Rep_LName);
-	self.suffix := stringlib.stringtouppercase(Rep_Name_Suffix);
+	self.fname := STD.Str.toUpperCase(Rep_fName);
+	self.mname := STD.Str.toUpperCase(Rep_MName);
+	self.lname := STD.Str.toUpperCase(Rep_LName);
+	self.suffix := STD.Str.toUpperCase(Rep_Name_Suffix);
 	
 	SELF.in_streetAddress := Rep_Addr;
 	SELF.in_city := Rep_City;
@@ -253,14 +263,14 @@ risk_indicators.Layout_Input into(d l) := transform
 	
 	self.country := '';
 	
-	SELF.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	SELF.dl_state := stringlib.stringtouppercase(Rep_DL_State);
+	SELF.dl_number := STD.Str.toUpperCase(dl_num_clean);
+	SELF.dl_state := STD.Str.toUpperCase(Rep_DL_State);
 	
 	SELF.email_address := Rep_Email;
 	SELF.ip_address := Bus_IP;
 	
-	SELF.employer_name := stringlib.stringtouppercase(Company_Name);
-	SELF.lname_prev := stringlib.stringtouppercase(alt_Co_Name);
+	SELF.employer_name := STD.Str.toUpperCase(Company_Name);
+	SELF.lname_prev := STD.Str.toUpperCase(alt_Co_Name);
 end;
 prep := PROJECT(d,into(LEFT));
 
@@ -268,11 +278,16 @@ prep := PROJECT(d,into(LEFT));
 iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, ofac_only,
 	suppressNearDups, require2Ele, from_biid, isFCRA, excludewatchlists, from_IT1O, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius,
 	bsversion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowcellphones,
-	exactMatchLevel,DataRestriction,CustomDataFilter,in_DataPermission:=DataPermission
+	exactMatchLevel,DataRestriction,CustomDataFilter,in_DataPermission:=DataPermission, LexIdSourceOptout := LexIdSourceOptout, 
+    TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID
 );//check parameters here
 
 
-clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, false, false, false, true, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
+clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, false, false, false, true, DataRestriction:=DataRestriction, DataPermission:=DataPermission,
+                                                                              LexIdSourceOptout := LexIdSourceOptout, 
+                                                                              TransactionID := TransactionID, 
+                                                                              BatchUID := BatchUID, 
+                                                                              GlobalCompanyID := GlobalCompanyID);
 
 
 business_risk.Layout_Input into_input(d L) := transform
@@ -284,8 +299,8 @@ business_risk.Layout_Input into_input(d L) := transform
 	self.Account := AccountNumber_value;
 	self.bdid	:= (integer)BDID_value;
 	self.score := 0;
-	self.company_name := stringlib.stringtouppercase(company_name);
-	self.alt_company_name := stringlib.stringtouppercase(alt_co_name);
+	self.company_name := STD.Str.toUpperCase(company_name);
+	self.alt_company_name := STD.Str.toUpperCase(alt_co_name);
 	self.prim_range := clean_bus_addr[1..10];
 	self.predir	 := clean_bus_addr[11..12];
 	self.prim_name	 := clean_bus_addr[13..40];
@@ -308,11 +323,11 @@ business_risk.Layout_Input into_input(d L) := transform
 	self.fein		 := fein;
 	self.phone10    := Busphone_value;
 	self.ip_addr	 := bus_ip;
-	self.rep_fname	 := stringlib.stringtouppercase(rep_fname);
-	self.rep_mname  := stringlib.stringtouppercase(rep_mname);
-	self.rep_lname  := stringlib.stringtouppercase(rep_lname);
-	self.rep_name_suffix := stringlib.stringtouppercase(rep_name_suffix);
-	self.rep_alt_Lname := stringlib.stringtouppercase(rep_alt_lname);
+	self.rep_fname	 := STD.Str.toUpperCase(rep_fname);
+	self.rep_mname  := STD.Str.toUpperCase(rep_mname);
+	self.rep_lname  := STD.Str.toUpperCase(rep_lname);
+	self.rep_name_suffix := STD.Str.toUpperCase(rep_name_suffix);
+	self.rep_alt_Lname := STD.Str.toUpperCase(rep_alt_lname);
 	self.rep_prim_range := clean_rep_addr[1..10];
 	self.rep_predir	:= clean_rep_addr[11..12];
 	self.rep_prim_name	:= clean_rep_addr[13..40];
@@ -323,8 +338,8 @@ business_risk.Layout_Input into_input(d L) := transform
 	self.rep_p_city_name := clean_rep_addr[65..89];
 	self.rep_st		:= clean_rep_addr[115..116];
 	self.rep_z5		:= clean_rep_addr[117..121];
-	self.rep_orig_city 	:= stringlib.stringtouppercase(rep_city);
-	self.rep_orig_st	:=  stringlib.stringtouppercase(rep_state);
+	self.rep_orig_city 	:= STD.Str.toUpperCase(rep_city);
+	self.rep_orig_st	:=  STD.Str.toUpperCase(rep_state);
 	self.rep_orig_z5	:=  rep_zip;
 	self.rep_zip4		:= clean_rep_addr[122..125];
 	self.rep_lat		:= clean_rep_addr[146..155];
@@ -336,19 +351,19 @@ business_risk.Layout_Input into_input(d L) := transform
 	self.rep_phone		:= rep_phone;
 	self.rep_age 		:= (string)rep_age;
 	self.rep_dl_num	:= rep_dl_num;
-	self.rep_dl_state	:= stringlib.stringtouppercase(rep_dl_state);
-	self.rep_email		:= stringlib.stringtouppercase(rep_email);
+	self.rep_dl_state	:= STD.Str.toUpperCase(rep_dl_state);
+	self.rep_email		:= STD.Str.toUpperCase(rep_email);
 end;
 
 df2 := project(d,into_input(LEFT));
 
 business_risk.Layout_Input into_test_input(d L) := transform
-	self.company_name := stringlib.stringtouppercase(company_name);
+	self.company_name := STD.Str.toUpperCase(company_name);
 	self.z5		 := Zip;	
 	self.fein		 := fein;
 	self.phone10    := Busphone_value;
-	self.rep_fname	 := stringlib.stringtouppercase(rep_fname);
-	self.rep_lname  := stringlib.stringtouppercase(rep_lname);
+	self.rep_fname	 := STD.Str.toUpperCase(rep_fname);
+	self.rep_lname  := STD.Str.toUpperCase(rep_lname);
 
 end;
 
@@ -358,7 +373,10 @@ isUtility  := false;
 ln_branded := false;
 tribcode   := '';
 biid := business_risk.InstantID_Function(df2, gateways, if (bdid_value = '', false, true),dppa_purpose,glb_purpose,isUtility,ln_branded, tribcode, ExcludeWatchLists,
-	ofac_only, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius, IsPOBoxCompliant
+	ofac_only, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius, IsPOBoxCompliant, LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID
 );
 
 /*
@@ -382,12 +400,12 @@ biid := business_risk.InstantID_Function(df2, gateways, if (bdid_value = '', fal
 
 riskwise.Layout_BusReasons_Input into_orig_input(biid le) := transform
 	self.seq := le.seq;
-	self.orig_addr := stringlib.stringtouppercase(addr);
-	self.orig_city := stringlib.stringtouppercase(city);
-	self.orig_state := stringlib.stringtouppercase(state);
+	self.orig_addr := STD.Str.toUpperCase(addr);
+	self.orig_city := STD.Str.toUpperCase(city);
+	self.orig_state := STD.Str.toUpperCase(state);
 	self.orig_zip := zip;
 	self.orig_fax := '';
-	self.orig_cmpy := stringlib.stringtouppercase(company_name);
+	self.orig_cmpy := STD.Str.toUpperCase(company_name);
 	self.orig_wphone := busphone_value;
 	self.telcoPhoneType := le.TelcordiaPhoneType;
 	

@@ -169,7 +169,8 @@
 </pre>
 */
 
-IMPORT progressive_phone, addrbest,iesp,PhonesFeedback_Services,ut,phonesFeedback,Phonesplus_v2,Royalty;
+IMPORT  AutoStandardI, doxie, progressive_phone, addrbest, iesp, PhonesFeedback_Services, ut,
+        phonesFeedback, Phonesplus_v2, Royalty, Suppress;
 
 EXPORT progressive_phone_with_feedback_online_service := MACRO
 		rec_in := iesp.progressivephones.t_ProgressivePhonesSearchRequest;
@@ -184,6 +185,8 @@ EXPORT progressive_phone_with_feedback_online_service := MACRO
 		iesp.ECL2ESP.Marshall.Mac_Set (first_row.options);
 		iesp.ECL2ESP.SetInputName (search_by.Name);
 		iesp.ECL2ESP.SetInputAddress (search_by.Address);
+    global_mod := AutoStandardI.GlobalModule();
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
 
 		#stored('DID', search_by.UniqueId);
 		#stored('DedupePhones', search_by.DedupeInfo.phones );
@@ -291,7 +294,7 @@ EXPORT progressive_phone_with_feedback_online_service := MACRO
 					  ,did
 					  ,subj_phone10
 					  ,f_out_w_fb	// Output file with feedback dataset
-					  );
+					  ,mod_access);
 			
 			Royalty.MAC_RoyaltyLastResort(f_out, lastresort_royalties, vendor, subj_phone10)	
 			output(lastresort_royalties,named('RoyaltySet'));					

@@ -22,7 +22,14 @@ g := modAccess.isValidGLB (checkRNA);
 
 DRM := modAccess.DataRestrictionMask;
 
-doxie.mac_best_records(di,did,o,d,g,useNonBlankKey,DRM,,,,includeDOD);
+doxie.mac_best_records(di,did,o_info,d,g,useNonBlankKey,DRM,,,,includeDOD);
+Death_source_sort := SORT(o_info, did, dod);
+
+Death_source_grp:= Sort(group(Death_source_sort,did,dod), did, dod, if(IsLimitedAccessDMF, 1,0));
+o := UNGROUP(iterate(Death_source_grp, TRANSFORM(doxie.layout_best, 
+									SELF.IsLimitedAccessDMF :=if(COUNTER = 1 , ((INTEGER)RIGHT.dod != 0 AND RIGHT.IsLimitedAccessDMF),
+	                                            LEFT.IsLimitedAccessDMF ) ,
+									SELF :=right)));
 
 ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(modAccess,
 																													 suppress_and_mask_:=FALSE, //since suppression is done later by all services that currently call getSSNBest

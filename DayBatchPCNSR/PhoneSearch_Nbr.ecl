@@ -1,4 +1,8 @@
-export PhoneSearch_Nbr(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) pcnsrInput,UNSIGNED1 max_count) := FUNCTION
+﻿IMPORT  $, Doxie, Suppress;
+
+EXPORT PhoneSearch_Nbr(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) pcnsrInput,
+                       UNSIGNED1 max_count,
+                       Doxie.IDataAccess mod_access) := FUNCTION
 	
 	K := DayBatchPCNSR.Key_PCNSR_Nbr;
 	
@@ -142,7 +146,12 @@ export PhoneSearch_Nbr(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) pcnsrI
 							match_SecRange_z2(matchCode <> '') + match_z4(matchCode <> '') + 
 							match_z3(matchCode <> '') + match_z2(matchCode <> '') + match_z2(cnt = 1);
 
-	ungroupedMatch := UNGROUP(allMatch);
+
+  allMatch_flagged := Suppress.MAC_FlagSuppressedSource(allMatch, mod_access, outdata.did, outdata.global_sid);  
+  
+  allMatch_suppressed := PROJECT(allMatch_flagged, TRANSFORM($.Layout_PCNSR_Linked, SELF.outdata := IF(~LEFT.is_suppressed, lEFT.outdata), SELF := LEFT));
+  
+	ungroupedMatch := UNGROUP(allMatch_suppressed);
 	
 	grpMatch := GROUP(SORT(ungroupedMatch,indata.acctno),indata.acctno);
 	

@@ -31,8 +31,10 @@ export RV_V3_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_v3_v
 export IV_Attributes_infile := '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20160419';
 
 //**************Non FCRA Input Samples Names****************************
+EXPORT SOCIO_Monitoring_v5_infile       := '~scoringqa::in::socio_v5';        
+//EXPORT SocioEconomic_V5_infile          := '~scoringqa::out::socioeconomic_v5_batch_20190621_1';
 // Export Profile_booster_Capone_infile := '~scoring_project::in::Profile_Booster_Capone_20160912';
-Export Profile_booster_Capone_infile := '~scoring_project::in::Profile_Booster_Capone_20180226';
+Export Profile_booster_Capone_infile    := '~scoring_project::in::Profile_Booster_Capone_20180226';
 
 // export BC10_Scores_Chase_BNK4_infile := '~Scoring_Project::in::BC1O_XML_Chase_bnk4_20141110';
 // export BC10_Scores_Chase_BNK4_infile := '~scoring_project::in::bc1o_xml_chase_bnk4_20160525';

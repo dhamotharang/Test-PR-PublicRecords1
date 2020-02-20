@@ -1,4 +1,4 @@
-import easi, Models, risk_indicators, riskwise, ut, std;
+﻿import easi, Models, risk_indicators, riskwise, std;
 
 bs_with_ip := record
 	risk_indicators.Layout_Boca_Shell bs;
@@ -552,7 +552,7 @@ Models.Layout_FP31505 doTopLevel(clam le, Easi.Key_Easi_Census ri) := TRANSFORM
 	addr_stability_v2                := (integer)le.bs.addr_stability;
 	estimated_income                 := le.bs.estimated_income;
 
-NULL := -999999999;
+NULL := models.common.NULL;
 
 
 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
@@ -3815,7 +3815,7 @@ nf_seg_fraudpoint_3_0 := map(
 			self.estimated_income	:=	estimated_income	;
 			//pick up all needed fields from the EASI census file here
 			self.c_POP00	:=	if(ri.POP00 = '', NULL, (real)ri.POP00)	;
-			self.c_FAMILIES	:=	if(ri.FAMILIES = '', NULL, (real)ri.FAMILIES)	;
+			self.c_FAMILIES	:=	if(ri.FAMILIES = '', NULL, (real)503.118697144368);
 			self.c_HH00	:=	if(ri.HH00 = '', NULL, (real)ri.HH00)	;
 			self.c_HHSIZE	:=	if(ri.HHSIZE = '', NULL, (real)ri.HHSIZE)	;
 			self.c_MED_AGE	:=	if(ri.MED_AGE = '', NULL, (real)ri.MED_AGE)	;
@@ -3825,9 +3825,9 @@ nf_seg_fraudpoint_3_0 := map(
 			self.c_MED_HHINC	:=	if(ri.MED_HHINC = '', NULL, (real)ri.MED_HHINC)	;
 			self.c_URBAN_P	:=	if(ri.URBAN_P = '', NULL, (real)ri.URBAN_P)	;
 			self.c_RURAL_P	:=	if(ri.RURAL_P = '', NULL, (real)ri.RURAL_P)	;
-			self.c_FAMMAR_P	:=	if(ri.FAMMAR_P = '', NULL, (real)ri.FAMMAR_P)	;
-			self.c_FAMMAR18_P	:=	if(ri.FAMMAR18_P = '', NULL, (real)ri.FAMMAR18_P)	;
-			self.c_FAMOTF18_P	:=	if(ri.FAMOTF18_P = '', NULL, (real)ri.FAMOTF18_P)	;
+			self.c_FAMMAR_P	:=	if(ri.FAMMAR_P = '', NULL, (real)75.922350982431);
+			self.c_FAMMAR18_P	:=	if(ri.FAMMAR18_P = '', NULL, (real)35.1609726337807);
+			self.c_FAMOTF18_P	:=	if(ri.FAMOTF18_P = '', NULL, (real)11.6471701137404);
 			self.c_POP_0_5_P	:=	if(ri.POP_0_5_P = '', NULL, (real)ri.POP_0_5_P)	;
 			self.c_POP_6_11_P	:=	if(ri.POP_6_11_P = '', NULL, (real)ri.POP_6_11_P)	;
 			self.c_POP_12_17_P	:=	if(ri.POP_12_17_P = '', NULL, (real)ri.POP_12_17_P)	;
@@ -3841,8 +3841,8 @@ nf_seg_fraudpoint_3_0 := map(
 			self.c_POP_85P_P	:=	if(ri.POP_85P_P = '', NULL, (real)ri.POP_85P_P)	;
 			self.c_CHILD	:=	if(ri.CHILD = '', NULL, (real)ri.CHILD)	;
 			self.c_YOUNG	:=	if(ri.YOUNG = '', NULL, (real)ri.YOUNG)	;
-			self.c_RETIRED	:=	if(ri.RETIRED = '', NULL, (real)ri.RETIRED)	;
-			self.c_FEMDIV_P	:=	if(ri.FEMDIV_P = '', NULL, (real)ri.FEMDIV_P)	;
+			self.c_RETIRED	:=	if(ri.RETIRED = '', NULL, (real)12.6118637038462);
+			self.c_FEMDIV_P	:=  if(ri.FEMDIV_P = '', NULL, (real)4.75019023519441);
 			self.c_HH1_P	:=	if(ri.HH1_P = '', NULL, (real)ri.HH1_P)	;
 			self.c_HH2_P	:=	if(ri.HH2_P = '', NULL, (real)ri.HH2_P)	;
 			self.c_HH3_P	:=	if(ri.HH3_P = '', NULL, (real)ri.HH3_P)	;
@@ -3917,7 +3917,7 @@ nf_seg_fraudpoint_3_0 := map(
 			self.c_LARCENY	:=	if(ri.LARCENY = '', NULL, (real)ri.LARCENY)	;
 			self.c_CARTHEFT	:=	if(ri.CARTHEFT = '', NULL, (real)ri.CARTHEFT)	;
 			self.c_TOTCRIME	:=	if(ri.TOTCRIME = '', NULL, (real)ri.TOTCRIME)	;
-			self.c_EASIQLIFE	:=	if(ri.EASIQLIFE = '', NULL, (real)ri.EASIQLIFE)	;
+			self.c_EASIQLIFE	:=	if(ri.EASIQLIFE = '', NULL, (real)111.48985712826);
 			self.c_CPIALL	:=	if(ri.CPIALL = '', NULL, (real)ri.CPIALL)	;
 			self.c_HOUSINGCPI	:=	if(ri.HOUSINGCPI = '', NULL, (real)ri.HOUSINGCPI)	;
 			self.c_DOMIN_PROF	:=	if(ri.DOMIN_PROF = '', NULL, (real)ri.DOMIN_PROF)	;
@@ -3939,7 +3939,7 @@ nf_seg_fraudpoint_3_0 := map(
 			self.c_AMUS_INDX	:=	if(ri.AMUS_INDX = '', NULL, (real)ri.AMUS_INDX)	;
 			self.c_REST_INDX	:=	if(ri.REST_INDX = '', NULL, (real)ri.REST_INDX)	;
 			self.c_MEDI_INDX	:=	if(ri.MEDI_INDX = '', NULL, (real)ri.MEDI_INDX)	;
-			self.c_RELIG_INDX	:=	if(ri.RELIG_INDX = '', NULL, (real)ri.RELIG_INDX)	;
+			self.c_RELIG_INDX	:=	if(ri.RELIG_INDX = '', NULL, (real)105.712938197103);
 			self.c_EDU_INDX	:=	if(ri.EDU_INDX = '', NULL, (real)ri.EDU_INDX)	;
 			self.c_BARGAINS	:=	if(ri.BARGAINS = '', NULL, (real)ri.BARGAINS)	;
 			self.c_EXP_PROD	:=	if(ri.EXP_PROD = '', NULL, (real)ri.EXP_PROD)	;
@@ -3951,7 +3951,7 @@ nf_seg_fraudpoint_3_0 := map(
 			self.c_PRESCHL	:=	if(ri.PRESCHL = '', NULL, (real)ri.PRESCHL)	;
 			self.c_BEL_EDU	:=	if(ri.BEL_EDU = '', NULL, (real)ri.BEL_EDU)	;
 			self.c_BLUE_EMPL	:=	if(ri.BLUE_EMPL = '', NULL, (real)ri.BLUE_EMPL)	;
-			self.c_BORN_USA	:=	if(ri.BORN_USA = '', NULL, (real)ri.BORN_USA)	;
+			self.c_BORN_USA	:=	if(ri.BORN_USA = '', NULL, (real)87.0113840587115);
 			self.c_EXP_HOMES	:=	if(ri.EXP_HOMES = '', NULL, (real)ri.EXP_HOMES)	;
 			self.c_NO_TEENS	:=	if(ri.NO_TEENS = '', NULL, (real)ri.NO_TEENS)	;
 			self.c_FOR_SALE	:=	if(ri.FOR_SALE = '', NULL, (real)ri.FOR_SALE)	;
@@ -3970,17 +3970,17 @@ nf_seg_fraudpoint_3_0 := map(
 			self.c_SERV_EMPL	:=	if(ri.SERV_EMPL = '', NULL, (real)ri.SERV_EMPL)	;
 			self.c_SUB_BUS	:=	if(ri.SUB_BUS = '', NULL, (real)ri.SUB_BUS)	;
 			self.c_TRAILER	:=	if(ri.TRAILER = '', NULL, (real)ri.TRAILER)	;
-			self.c_UNATTACH	:=	if(ri.UNATTACH = '', NULL, (real)ri.UNATTACH)	;
+			self.c_UNATTACH	:=	if(ri.UNATTACH = '', NULL, (real)98.0527729860013);
 			self.c_UNEMPL	:=	if(ri.UNEMPL = '', NULL, (real)ri.UNEMPL)	;
-			self.c_ASIAN_LANG	:=	if(ri.ASIAN_LANG = '', NULL, (real)ri.ASIAN_LANG)	;
-			self.c_RICH_ASIAN	:=	if(ri.RICH_ASIAN = '', NULL, (real)ri.RICH_ASIAN)	;
-			self.c_RICH_BLK	:=	if(ri.RICH_BLK = '', NULL, (real)ri.RICH_BLK)	;
+			self.c_ASIAN_LANG	:=	if(ri.ASIAN_LANG = '', NULL, (real)117.33803561876);
+			self.c_RICH_ASIAN	:=	if(ri.RICH_ASIAN = '', NULL, (real)112.713374966691);
+			self.c_RICH_BLK	:=	if(ri.RICH_BLK = '', NULL, (real)108.946649997295);
 			self.c_RICH_FAM	:=	if(ri.RICH_FAM = '', NULL, (real)ri.RICH_FAM)	;
-			self.c_RICH_HISP	:=	if(ri.RICH_HISP = '', NULL, (real)ri.RICH_HISP)	;
+			self.c_RICH_HISP	:=	if(ri.RICH_HISP = '', NULL, (real)110.862655999872);
 			self.c_VERY_RICH	:=	if(ri.VERY_RICH = '', NULL, (real)ri.VERY_RICH)	;
-			self.c_RICH_NFAM	:=	if(ri.RICH_NFAM = '', NULL, (real)ri.RICH_NFAM)	;
-			self.c_RICH_WHT	:=	if(ri.RICH_WHT = '', NULL, (real)ri.RICH_WHT)	;
-			self.c_SPAN_LANG	:=	if(ri.SPAN_LANG = '', NULL, (real)ri.SPAN_LANG)	;
+			self.c_RICH_NFAM	:=	if(ri.RICH_NFAM = '', NULL, (real)112.611775949223);
+			self.c_RICH_WHT	:=	if(ri.RICH_WHT = '', NULL, (real)110.494763773769);
+			self.c_SPAN_LANG	:=	if(ri.SPAN_LANG = '', NULL, (real)107.305718676308);
 			self.c_WORK_HOME	:=	if(ri.WORK_HOME = '', NULL, (real)ri.WORK_HOME)	;
 			self.c_RICH_YOUNG	:=	if(ri.RICH_YOUNG = '', NULL, (real)ri.RICH_YOUNG)	;
 			self.c_TOTSALES	:=	if(ri.POP00 = '', NULL, (real)ri.TOTSALES)	;
@@ -3993,8 +3993,6 @@ nf_seg_fraudpoint_3_0 := map(
 		(left.bs.shell_input.st<>'' and left.bs.shell_input.county <>''	and left.bs.shell_input.geo_blk <> '' and 
 		 left.bs.addrpop and 
 		 keyed(right.geolink=left.bs.shell_input.st+left.bs.shell_input.county+left.bs.shell_input.geo_blk)) or
-		 //to match the modeler's code, search by current address as well but only if the input geo link fields are all blank
-		// (left.bs.shell_input.st= '' and left.bs.shell_input.county =''	and left.bs.shell_input.geo_blk = '' and
 		(left.bs.addrpop2 and ~left.bs.addrpop and
 		 left.bs.Address_Verification.Address_History_1.st<>'' and left.bs.Address_Verification.Address_History_1.county <>''	and left.bs.Address_Verification.Address_History_1.geo_blk <> '' and 
 		 keyed(right.geolink=left.bs.Address_Verification.Address_History_1.st+left.bs.Address_Verification.Address_History_1.county+left.bs.Address_Verification.Address_History_1.geo_blk)), 
@@ -4372,9 +4370,36 @@ nf_seg_fraudpoint_3_0 := map(
 		self.final_score_343	:= subModel[1].final_score_343;
 		self.final_score_344	:= subModel[1].final_score_344;
 		self.final_score_345	:= subModel[1].final_score_345;
-		self.final_score_346	:= subModel[1].final_score_346;		
-		self.FP3_woFDN_LGT		:= subModel[1].FP3_woFDN_LGT;		
-		self									:= le;
+		self.final_score_346	:= subModel[1].final_score_346;	
+    self.final_adj_score0  :=  subModel[1].final_adj_score0;
+    self.final_adj_score1  :=  subModel[1].final_adj_score1;
+    self.final_adj_score2  :=  subModel[1].final_adj_score2;
+    self.final_adj_score3  :=  subModel[1].final_adj_score3;
+    self.final_adj_score4  :=  subModel[1].final_adj_score4;
+    self.final_adj_score5  :=  subModel[1].final_adj_score5;
+    self.final_adj_score6  :=  subModel[1].final_adj_score6;
+    self.final_adj_score7  :=  subModel[1].final_adj_score7;
+    self.final_adj_score8  :=  subModel[1].final_adj_score8;
+    self.final_adj_score9  :=  subModel[1].final_adj_score9;
+    self.final_adj_score10 :=  subModel[1].final_adj_score10;
+    self.final_adj_score11 :=  subModel[1].final_adj_score11;
+    self.final_adj_score12 :=  subModel[1].final_adj_score12;
+    self.final_adj_score13 :=  subModel[1].final_adj_score13;
+    self.final_adj_score14 :=  subModel[1].final_adj_score14;
+    self.final_adj_score15 :=  subModel[1].final_adj_score15;
+    self.final_adj_score16 :=  subModel[1].final_adj_score16;
+    self.final_adj_score17 :=  subModel[1].final_adj_score17;
+    self.final_adj_score18 :=  subModel[1].final_adj_score18;
+    self.final_adj_score19 :=  subModel[1].final_adj_score19;
+    self.final_adj_score20 :=  subModel[1].final_adj_score20;
+    self.orig_FDN_FLAPSD_LGT  := subModel[1].orig_FDN_FLAPSD_LGT;
+    self.adj_FDN_FLAPSD_LGT  := subModel[1].adj_FDN_FLAPSD_LGT;
+    self.orig_FDN_FLAPS__LGT  := subModel[1].orig_FDN_FLAPS__LGT;
+    self.adj_FDN_FLAPS__LGT  := subModel[1].adj_FDN_FLAPS__LGT;
+    self.orig_FDN_FLA_SD_LGT  := subModel[1].orig_FDN_FLA_SD_LGT;
+    self.adj_FDN_FLA_SD_LGT  := subModel[1].adj_FDN_FLA_SD_LGT;
+		self.FP3_woFDN_LGT		 := subModel[1].FP3_woFDN_LGT;		
+		self									 := le;
 	end;
 
 	withModel := PROJECT(topLevelVars, projModel(LEFT));
@@ -4545,16 +4570,8 @@ nf_seg_fraudpoint_3_0 := map(
 	friendlyc_fp31505_0_0 := if(friendlyfraud = 1, fp31505_0_0, 299);
 
 	stolidindex := map(
-			FP3_woFDN_LGT = -999																			=> 0, //kh-delta
+			FP3_woFDN_LGT = -999																			=> 0,
 			stolenc_fp31505_0_0 = 299                                 => 1,
-			// 300 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 450  => 9,	//kh-delta
-			// 450 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 520  => 8,
-			// 520 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 560  => 7,
-			// 560 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 600  => 6,
-			// 600 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 645  => 5,
-			// 645 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 670  => 4,
-			// 670 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 700  => 3,
-			// 700 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 <= 999 => 2,
 			300 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 600  => 9,
 			600 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 670  => 8,
 			670 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 710  => 7,
@@ -4562,19 +4579,12 @@ nf_seg_fraudpoint_3_0 := map(
 			750 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 795  => 5,
 			795 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 820  => 4,
 			820 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 < 850  => 3,
-			850 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 <= 999 => 2,																																	 99);
+			850 <= stolenc_fp31505_0_0 AND stolenc_fp31505_0_0 <= 999 => 2,
+                                                                   99);
 
 	manipidindex := map(
-			FP3_woFDN_LGT = -999																			=> 0, //kh-delta
+			FP3_woFDN_LGT = -999																			=> 0,
 			manip2c_fp31505_0_0 = 299                                 => 1,
-			// 300 <= manip2c_fp31505_0_0 AND manip2c_fp31505_0_0 < 470  => 9,	//kh-delta
-			// 470 <= manip2c_fp31505_0_0 AND manip2c_fp31505_0_0 < 545  => 8,
-			// 545 <= manip2c_fp31505_0_0 AND manip2c_fp31505_0_0 < 590  => 7,
-			// 590 <= manip2c_fp31505_0_0 AND manip2c_fp31505_0_0 < 620  => 6,
-			// 620 <= manip2c_fp31505_0_0 AND manip2c_fp31505_0_0 < 645  => 5,
-			// 645 <= manip2c_fp31505_0_0 AND manip2c_fp31505_0_0 < 670  => 4,
-			// 670 <= manip2c_fp31505_0_0 AND manip2c_fp31505_0_0 < 700  => 3,
-			// 700 <= manip2c_fp31505_0_0 AND manip2c_fp31505_0_0 <= 999 => 2,
 			300 <= manip2c_fp31505_0_0 AND manip2c_fp31505_0_0 < 620  => 9,
 			620 <= manip2c_fp31505_0_0 AND manip2c_fp31505_0_0 < 695  => 8,
 			695 <= manip2c_fp31505_0_0 AND manip2c_fp31505_0_0 < 740  => 7,
@@ -4586,16 +4596,8 @@ nf_seg_fraudpoint_3_0 := map(
 																																	 99);
 
 	synthidindex := map(
-			FP3_woFDN_LGT = -999																		=> 0, //kh-delta
+			FP3_woFDN_LGT = -999																		=> 0,
 			synthc_fp31505_0_0 = 299                                => 1,
-			// 300 <= synthc_fp31505_0_0 AND synthc_fp31505_0_0 < 440  => 9,	//kh-delta
-			// 440 <= synthc_fp31505_0_0 AND synthc_fp31505_0_0 < 500  => 8,
-			// 500 <= synthc_fp31505_0_0 AND synthc_fp31505_0_0 < 550  => 7,
-			// 550 <= synthc_fp31505_0_0 AND synthc_fp31505_0_0 < 600  => 6,
-			// 600 <= synthc_fp31505_0_0 AND synthc_fp31505_0_0 < 630  => 5,
-			// 630 <= synthc_fp31505_0_0 AND synthc_fp31505_0_0 < 660  => 4,
-			// 660 <= synthc_fp31505_0_0 AND synthc_fp31505_0_0 < 700  => 3,
-			// 700 <= synthc_fp31505_0_0 AND synthc_fp31505_0_0 <= 999 => 2,
 			300 <= synthc_fp31505_0_0 AND synthc_fp31505_0_0 < 590  => 9,
 			590 <= synthc_fp31505_0_0 AND synthc_fp31505_0_0 < 650  => 8,
 			650 <= synthc_fp31505_0_0 AND synthc_fp31505_0_0 < 700  => 7,
@@ -4607,16 +4609,8 @@ nf_seg_fraudpoint_3_0 := map(
 																																 99);
 
 	suspactindex := map(
-			FP3_woFDN_LGT = -999																				=> 0, //kh-delta
+			FP3_woFDN_LGT = -999																				=> 0,
 			suspactc_fp31505_0_0 = 299                                  => 1,
-			// 300 <= suspactc_fp31505_0_0 AND suspactc_fp31505_0_0 < 430  => 9,	//kh-delta
-			// 430 <= suspactc_fp31505_0_0 AND suspactc_fp31505_0_0 < 500  => 8,
-			// 500 <= suspactc_fp31505_0_0 AND suspactc_fp31505_0_0 < 540  => 7,
-			// 540 <= suspactc_fp31505_0_0 AND suspactc_fp31505_0_0 < 600  => 6,
-			// 600 <= suspactc_fp31505_0_0 AND suspactc_fp31505_0_0 < 645  => 5,
-			// 645 <= suspactc_fp31505_0_0 AND suspactc_fp31505_0_0 < 680  => 4,
-			// 680 <= suspactc_fp31505_0_0 AND suspactc_fp31505_0_0 < 710  => 3,
-			// 710 <= suspactc_fp31505_0_0 AND suspactc_fp31505_0_0 <= 999 => 2,
 			300 <= suspactc_fp31505_0_0 AND suspactc_fp31505_0_0 < 580  => 9,
 			580 <= suspactc_fp31505_0_0 AND suspactc_fp31505_0_0 < 650  => 8,
 			650 <= suspactc_fp31505_0_0 AND suspactc_fp31505_0_0 < 690  => 7,
@@ -4628,16 +4622,8 @@ nf_seg_fraudpoint_3_0 := map(
 																																		 99);
 
 	vulnvicindex := map(
-			FP3_woFDN_LGT = -999																				=> 0, //kh-delta
+			FP3_woFDN_LGT = -999																				=> 0,
 			vulnvicc_fp31505_0_0 = 299                                  => 1,
-			// 300 <= vulnvicc_fp31505_0_0 AND vulnvicc_fp31505_0_0 < 420  => 9,	//kh-delta
-			// 420 <= vulnvicc_fp31505_0_0 AND vulnvicc_fp31505_0_0 < 550  => 8,
-			// 550 <= vulnvicc_fp31505_0_0 AND vulnvicc_fp31505_0_0 < 615  => 7,
-			// 615 <= vulnvicc_fp31505_0_0 AND vulnvicc_fp31505_0_0 < 660  => 6,
-			// 660 <= vulnvicc_fp31505_0_0 AND vulnvicc_fp31505_0_0 < 685  => 5,
-			// 685 <= vulnvicc_fp31505_0_0 AND vulnvicc_fp31505_0_0 < 700  => 4,
-			// 700 <= vulnvicc_fp31505_0_0 AND vulnvicc_fp31505_0_0 < 720  => 3,
-			// 720 <= vulnvicc_fp31505_0_0 AND vulnvicc_fp31505_0_0 <= 999 => 2,
 			300 <= vulnvicc_fp31505_0_0 AND vulnvicc_fp31505_0_0 < 570  => 9,
 			570 <= vulnvicc_fp31505_0_0 AND vulnvicc_fp31505_0_0 < 700  => 8,
 			700 <= vulnvicc_fp31505_0_0 AND vulnvicc_fp31505_0_0 < 765  => 7,
@@ -4649,16 +4635,8 @@ nf_seg_fraudpoint_3_0 := map(
 																																		 99);
 
 	friendfrdindex := map(
-			FP3_woFDN_LGT = -999																					=> 0, //kh-delta
+			FP3_woFDN_LGT = -999																					=> 0,
 			friendlyc_fp31505_0_0 = 299                                   => 1,
-			// 300 <= friendlyc_fp31505_0_0 AND friendlyc_fp31505_0_0 < 450  => 9,	//kh-delta
-			// 450 <= friendlyc_fp31505_0_0 AND friendlyc_fp31505_0_0 < 515  => 8,
-			// 515 <= friendlyc_fp31505_0_0 AND friendlyc_fp31505_0_0 < 565  => 7,
-			// 565 <= friendlyc_fp31505_0_0 AND friendlyc_fp31505_0_0 < 615  => 6,
-			// 615 <= friendlyc_fp31505_0_0 AND friendlyc_fp31505_0_0 < 660  => 5,
-			// 660 <= friendlyc_fp31505_0_0 AND friendlyc_fp31505_0_0 < 690  => 4,
-			// 690 <= friendlyc_fp31505_0_0 AND friendlyc_fp31505_0_0 < 720  => 3,
-			// 720 <= friendlyc_fp31505_0_0 AND friendlyc_fp31505_0_0 <= 999 => 2,
 			300 <= friendlyc_fp31505_0_0 AND friendlyc_fp31505_0_0 < 600  => 9,
 			600 <= friendlyc_fp31505_0_0 AND friendlyc_fp31505_0_0 < 665  => 8,
 			665 <= friendlyc_fp31505_0_0 AND friendlyc_fp31505_0_0 < 715  => 7,
@@ -4721,6 +4699,7 @@ nf_seg_fraudpoint_3_0 := map(
 	self.vulnvicindex                     := if(pii_profile_n = Risk_Indicators.iid_constants.error_con, 0, vulnvicindex);
 	self.friendfrdindex                   := if(pii_profile_n = Risk_Indicators.iid_constants.error_con, 0, friendfrdindex);
 	self.clam															:= ri.bs;
+	// self.clam															:= [];
 	self.seq															:= le.seqa;
 	self.score														:= if(pii_profile_n = Risk_Indicators.iid_constants.error_con, '', (string)fp31505_0_0);
 	ritmp 																:= Models.fraudpoint3_reasons(ri.bs, ri.ip, num_reasons, criminal, include_FDN, nf_seg_fraudpoint_3_0, r_C10_M_Hdr_FS_d );

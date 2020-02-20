@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ProviderScoring_Service" wuTimeout="300000">
 	<part name="ProviderIntegrityScoreRequest" type="tns:XmlDataSet" cols="200" rows="25"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
@@ -73,7 +73,7 @@
 */
 
 
-IMPORT Address, Business_Header_SS, iesp, Models, Risk_Indicators, RiskWise, ut, gateway, AutoStandardI;
+IMPORT Address, iesp, Models, Risk_Indicators, ut, gateway, AutoStandardI;
 
 EXPORT ProviderScoring_Service := MACRO
 
@@ -95,24 +95,27 @@ EXPORT ProviderScoring_Service := MACRO
 	UNSIGNED1 DPPAPurpose					  := IF(TRIM(users.DLPurpose) = '', 0, (UNSIGNED)users.DLPurpose);
 	STRING DataRestrictionMaskOOB   := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	STRING50 DataRestrictionMask    := IF(TRIM(users.DataRestrictionMask) = '', DataRestrictionMaskOOB, users.DataRestrictionMask);
-	// STRING10 DataPermissionMaskOOB 	:= Risk_Indicators.iid_constants.default_DataPermission : STORED('DataRestrictionMask');
 	string10 DataPermissionMaskOOB 	:= AutoStandardI.GlobalModule().DataPermissionMask;
 	STRING10 DataPermissionMask    	:= IF(TRIM(users.DataPermissionMask) = '', DataPermissionMaskOOB, users.DataPermissionMask);
 	UNSIGNED3 HistoryDate					  := Risk_Indicators.iid_constants.default_history_date : STORED('HistoryDateYYYYMM');
 	UNSIGNED1 NumWarningCodes			  := IF(option.IncludeModels.IncludeAllRiskIndicators = TRUE, 8, 4);
 	
+    // CCPA Fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+    
 	// This product has no gateways
 	gateways := Gateway.Constants.void_gateway;
 	
 	/* ********************************************
 	 *              Clean Up Inputs               *
 	 ********************************************** */
-	emptyRecord := ut.ds_oneRecord;
-	
-	Risk_Indicators.Layout_Provider_Scoring.Input sequenceInput(emptyRecord le, UNSIGNED6 seqCounter) := TRANSFORM
-		SELF.seq := IF(TRIM(search.Seq) IN ['', '0'], seqCounter, (INTEGER)search.Seq);
-		
-		SELF.AcctNo := TRIM(users.AccountNumber); // Provider ID
+  
+	ProviderScoringRequest_Sequenced := DATASET(1, TRANSFORM(Risk_Indicators.Layout_Provider_Scoring.Input,
+        SELF.seq := IF(TRIM(search.Seq) IN ['', '0'], COUNTER, (INTEGER)search.Seq);
+        SELF.AcctNo := TRIM(users.AccountNumber); // Provider ID
 		
 		// Name
 		SELF.Provider_Full_Name := TRIM(search.Name.Full);
@@ -142,12 +145,8 @@ EXPORT ProviderScoring_Service := MACRO
 		SELF.Medical_License := TRIM(search.LicenseNumber);
 		SELF.NPI := TRIM(search.NPINumber);
 		SELF.UPIN := TRIM(search.UPINNumber);
-
 		SELF.HistoryDateYYYYMM := HistoryDate;
-		
-		SELF := [];
-	END;
-	ProviderScoringRequest_Sequenced := PROJECT(emptyRecord, sequenceInput(LEFT, COUNTER));
+        SELF := []) );
 	
 	Model_Request := StringLib.StringToUpperCase(Model_Request_Raw);
 
@@ -162,7 +161,8 @@ EXPORT ProviderScoring_Service := MACRO
 	 *    Get Boca Shell and Healthcare Data      *
 	 ********************************************** */
 	// Don't do the work if we don't have a valid model request!
-	BocaShell_HealthcareShell := IF(BocaShellVersion > 0, Risk_Indicators.ProviderScoring_Search_Function(ProviderScoringRequest_Sequenced, BocaShellVersion, DPPAPurpose, GLBPurpose, DataRestrictionMask, HistoryDate, gateways, DataPermissionMask),
+	BocaShell_HealthcareShell := IF(BocaShellVersion > 0, Risk_Indicators.ProviderScoring_Search_Function(ProviderScoringRequest_Sequenced, BocaShellVersion, DPPAPurpose, GLBPurpose, DataRestrictionMask, HistoryDate, gateways, DataPermissionMask,
+    LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID),
 																												DATASET([], Risk_Indicators.Layout_Provider_Scoring.Clam_Plus_Healthcare));
 
 	/* ********************************************

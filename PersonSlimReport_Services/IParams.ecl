@@ -1,4 +1,4 @@
-﻿IMPORT PersonSlimReport_Services, BatchShare, ut, iesp, doxie;
+﻿IMPORT PersonSlimReport_Services, BatchShare, ut, iesp, doxie, suppress;
 EXPORT IParams := MODULE
 
 	EXPORT PersonSlimReportOptions := INTERFACE
@@ -10,6 +10,8 @@ EXPORT IParams := MODULE
 		EXPORT STRING6   ssn_mask                := BatchShare.Constants.Defaults.SSNMask; //'NONE'
 		EXPORT BOOLEAN   IncludeMinors           := FALSE;
 		EXPORT BOOLEAN   mask_dl                 := FALSE; //for accidents
+		EXPORT unsigned1 dob_mask                := suppress.constants.dateMask.ALL;
+
 		EXPORT STRING    RealTimePermissibleUse  := '';
 		EXPORT BOOLEAN   IncludeNonRegulatedVehicleSources      := FALSE;
 		EXPORT BOOLEAN   IncludeNonRegulatedDMVSources          := FALSE;
@@ -54,23 +56,6 @@ EXPORT IParams := MODULE
 		EXPORT BOOLEAN IncludeImposters            := FALSE;
 		EXPORT BOOLEAN IncludeUtility              := FALSE;
 	END;
-	
-	//convert current parameters' module into IDataAccess - 
-	//temporarily until Vlad completes the IDataAccess work and updates the whole mod
-  EXPORT convertToDataAccess (PersonSlimReportOptions mod) := FUNCTION
-    //note: using (most restrictive) defaults for fields not defined in the current module
-    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated(AutostandardI.GlobalModule()))
-      EXPORT unsigned1 glb := mod.GLBPurpose;
-      EXPORT unsigned1 dppa := mod.DPPAPurpose;
-      EXPORT string DataRestrictionMask := mod.DataRestrictionMask;
-      EXPORT string5 industry_class := mod.industry_class;
-      EXPORT string32 application_type := mod.ApplicationType;
-      EXPORT boolean show_minors := mod.IncludeMinors OR (mod.GLBPurpose = 2);
-      EXPORT string ssn_mask := mod.ssn_mask;
-      EXPORT unsigned1 dl_mask := IF (mod.mask_dl, 1, 0);
-    END;
-    RETURN PROJECT (mod_access, doxie.IDataAccess);
-  END;
 
 	EXPORT getOptions(iesp.personslimreport.t_PersonSlimReportRequest inIesp) := FUNCTION
 		in_mod := MODULE(PersonSlimReportOptions)
@@ -81,6 +66,7 @@ EXPORT IParams := MODULE
 			EXPORT STRING5   industry_class            := inIesp.user.industryclass;
 			EXPORT STRING6   ssn_mask                  := inIesp.user.ssnmask;
 			EXPORT BOOLEAN   mask_dl                   := inIesp.user.dlmask;
+			EXPORT unsigned1 dob_mask                  := suppress.date_mask_math.MaskIndicator (inIesp.user.dobmask);
 
 			EXPORT BOOLEAN IncludeAddresses            := inIesp.Options.IncludeAddresses;
 			EXPORT BOOLEAN IncludePhones               := inIesp.Options.IncludePhones;
@@ -151,4 +137,18 @@ EXPORT IParams := MODULE
 		RETURN OUTPUT (dataset ([],{integer x}), named('__internal__'), extend);
 	END;
 
+  //Copies values available in PersonSlimReportOptions to PersonReports.IParam._report (compatible with IDataAccess)
+	//temporarily until Vlad completes the IDataAccess work and updates the whole mod
+  EXPORT MAC_copy_old_report_fields (in_mod) := MACRO
+    EXPORT unsigned1 glb := in_mod.GLBPurpose;
+    EXPORT unsigned1 dppa := in_mod.DPPAPurpose;
+    EXPORT string DataRestrictionMask := in_mod.DataRestrictionMask;
+    EXPORT string5 industry_class :=  in_mod.industry_class;
+    EXPORT string32 application_type :=  in_mod.ApplicationType;
+    EXPORT boolean show_minors := in_mod.IncludeMinors OR (in_mod.GLBPurpose = 2);;
+    EXPORT string ssn_mask := in_mod.ssn_mask;
+    EXPORT unsigned1 dl_mask := IF (in_mod.mask_dl, 1, 0);
+    EXPORT unsigned1 dob_mask := in_mod.dob_mask;
+    EXPORT boolean include_BlankDOD := in_mod.IncludeBlankDOD;
+  ENDMACRO;    
 END;

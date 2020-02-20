@@ -1,10 +1,11 @@
-import business_header, doxie_raw, ut, risk_indicators, paw, doxie, STD;
+﻿IMPORT business_header, doxie_raw, ut, risk_indicators, paw, doxie, STD, suppress;
 
-export Add_Phones(DATASET(layout_references) in_dids, 
-									DATASET(doxie.layout_relative_dids_v3) rels, integer dbd_value = 0) :=
+EXPORT Add_Phones(DATASET(layout_references) in_dids,
+	DATASET(doxie.layout_relative_dids_v3) rels,
+  Doxie.IDataAccess mod_access,
+  integer dbd_value = 0) :=
 FUNCTION
 
-doxie.MAC_Header_Field_Declare()
 
 phonesplus :=
 RECORD
@@ -13,20 +14,25 @@ RECORD
 	DATASET(layout_phones) RelativePhones{MAXCOUNT(50)};
 END;
 
+ Layout_Employment_Out_plus := record(business_header.Layout_Employment_Out)
+  unsigned4 global_sid;
+  unsigned8 record_sid;
+ end;
 
-business_header.Layout_Employment_Out get_paw(paw.Key_Did le, paw.Key_contactID ri) :=
+ Layout_Employment_Out_plus get_paw(paw.Key_Did le, paw.Key_contactID ri) :=
 TRANSFORM
 	SELF.did := intformat(ri.did,12,1);
 	SELF.bdid := intformat(ri.bdid,12,1);
 	SELF := ri;
 END;
 
-paw := JOIN(JOIN(in_dids,paw.Key_Did,keyed(left.did=right.did),transform(right), LIMIT(ut.limits.DEFAULT, SKIP)),paw.Key_contactID,
-						keyed(LEFT.contact_id=RIGHT.contact_id) AND
+paw_did := JOIN(in_dids,paw.Key_Did,keyed(left.did=right.did),transform(right), LIMIT(ut.limits.DEFAULT, SKIP));
+paw_pre := JOIN(paw_did,paw.Key_contactID,keyed(LEFT.contact_id=RIGHT.contact_id) AND
 						ut.DaysApart(RIGHT.dt_last_seen, (string) STD.Date.Today()) < 365,
 						get_paw(LEFT,RIGHT),
 						LIMIT(ut.limits.PAW_PER_CONTACTID,SKIP)); // < 26  in index
-						
+paw := project(suppress.MAC_SuppressSource(paw_pre,mod_access),business_header.Layout_Employment_Out);
+
 layout_phones form_paw_phones(paw le) :=
 TRANSFORM
 	SELF.listed := false;
@@ -44,7 +50,7 @@ TRANSFORM
 		length(trim(ri_phone,all))=10 and
 		keyed(ri_phone[1..3]=npa) and
 		keyed(ri_phone[4..6]=nxx))[1]);
-	SELF.timezone := ut.TimeZone_Convert((unsigned1) telcordia.timezone,telcordia.state);		
+	SELF.timezone := ut.TimeZone_Convert((unsigned1) telcordia.timezone,telcordia.state);
 	SELF := le;
 END;
 
@@ -63,12 +69,12 @@ paw_pres := PROJECT(paw, form_paw(LEFT));
 doxie_raw.Layout_HeaderRawBatchInput tra_for_Batch(rels l) := transform
 	self.input.seq := l.person1;
 	self.input.did := l.person2;
-	self.input.dateVal := dateVal;
-	self.input.dppa_purpose := dppa_purpose;
-	self.input.glb_purpose := glb_purpose;
-	self.input.ssn_mask_value := ssn_mask_value;
-	self.input.ln_branded_value := ln_branded_value;
-	self.input.probation_override_value := probation_override_value;
+	self.input.dateVal := mod_access.date_threshold;
+	self.input.dppa_purpose := mod_access.dppa;
+	self.input.glb_purpose := mod_access.glb;
+	self.input.ssn_mask_value := mod_access.ssn_mask;
+	self.input.ln_branded_value := mod_access.ln_branded;
+	self.input.probation_override_value := mod_access.probation_override;
 	SELF := [];
 	// self.industry_class_value := industry_class_value;
 end;
@@ -77,7 +83,9 @@ best_rel := DEDUP(SORT(rels,person1,-number_cohabits),person1,KEEP(2))+
 						DEDUP(SORT(rels,person1,-recent_cohabit),person1,KEEP(2));
 for_batch := GROUP(DEDUP(SORT(project(best_rel, tra_for_Batch(left)),input.seq,input.did),input.seq,input.did),input.seq,input.did);
 rel_header := CHOOSEN(SORT(DEDUP(SORT(doxie_Raw.Header_Raw_batch(for_batch),did,-dt_last_seen),did,KEEP(2)),-dt_last_seen),10);
-rel_appended := append_gong(PROJECT(rel_header,TRANSFORM(doxie.Layout_presentation,SELF := LEFT,SELF := [])),rels,2);
+rel_appended := doxie.append_gong(PROJECT(rel_header, TRANSFORM(doxie.Layout_presentation,SELF := LEFT,SELF := [])),
+  rels, mod_access, 2);
+
 rel_appended patch_did(rel_appended le, for_batch ri) :=
 TRANSFORM
 	SELF.did := ri.input.seq;

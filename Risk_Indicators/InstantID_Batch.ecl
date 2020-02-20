@@ -86,9 +86,15 @@
 	<part name="IIDVersionOverride" type="xsd:boolean"/>
 	<part name="IncludeDPBC" type="xsd:boolean"/>
 
-	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
-	<part name="EnableEmergingID" type="xsd:boolean"/>	
-	<part name="NameInputOrder" type="xsd:string"/>	
+ <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
+ <part name="EnableEmergingID" type="xsd:boolean"/>	
+ <part name="NameInputOrder" type="xsd:string"/>	
+ <part name="disablenongovernmentdldata" type="xsd:boolean"/>
+ <part name="IncludeEmailVerification" type="xsd:boolean"/>
+ <part name="IncludeITIN" type="xsd:boolean"/>
+ <part name="ExcludeMinors" type="xsd:boolean"/>
+ <part name="IncludeComplianceCap" type="xsd:boolean"/>
+ <part name="IncludeDigitalIdentity" type="xsd:boolean"/>
 </message>
 */
 /*--HELP--
@@ -129,7 +135,7 @@
 </pre>
 */
 
-import ut, address, codes, models, riskwise, iesp, patriot, intliid, address, royalty, AutoStandardI, OFAC_XG5, STD;
+import ut, address, codes, models, riskwise, iesp, patriot, intliid, royalty, AutoStandardI, OFAC_XG5, STD, risk_indicators;
 
 export InstantID_Batch := macro
 
@@ -137,6 +143,11 @@ export InstantID_Batch := macro
 // so add the default to #stored to eliminate the assignment of a default value.
 #stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
 
+// NEVER RELEASE THIS LINE OF CODE TO PROD
+ #option ('optimizelevel', 2);  // this is for deploying to cert
+ // #option ('optimizelevel', 0);  // this is for deploying to a 100-way as the service is large.
+                                    
+                                  
 unsigned1 DPPA_Purpose := 0 : stored('DPPAPurpose');
 unsigned1 GLB_Purpose := AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
 STRING5 industry_class_val := '' : STORED('IndustryClass');
@@ -293,7 +304,19 @@ string1 IIDVersion := '0'										: STORED('InstantIDVersion');	// this is pass
 boolean IncludeDPBC := false 								: stored('IncludeDPBC');
 boolean EnableEmergingID := false 					: stored('EnableEmergingID');
 string3 NameInputOrder := ''								: STORED('NameInputOrder');	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
+boolean IncludeEmailverification := false : STORED('IncludeEmailverification');
+boolean disablenongovernmentdldata := false : STORED('disablenongovernmentdldata'); //to exclude non government data in DL Verification
+boolean IncludeITIN := false                : STORED('IncludeITIN'); // to disable override option when ITIN exists.
+boolean ExcludeMinors := false              : STORED('ExcludeMinors'); //to exclude minors(age 18 and below)
+boolean IncludeComplianceCap  := false      : STORED('IncludeComplianceCap');  // to prevent cvi increase when dob and license are included in NAS and NAP combination.
+boolean IncludeDigitalIdentity  := false      : STORED('IncludeDigitalIdentity');
 
+// CCPA Fields
+
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 unsigned1 lowestAllowedVersion := 1;	// lowest allowed version according to product, unless the IIDVersionOveride is true
 unsigned1 maxAllowedVersion := 1;	// maximum allowed version as of 1/28/2014
@@ -412,7 +435,7 @@ fs := project(f, into_seq(LEFT,COUNTER));
 
 // JRP 02/12/2008 - Dataset of actioncode and reasoncode settings which are passed to the getactioncodes and reasoncodes functions.
 boolean IsInstantID := true;
-reasoncode_settings := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, '', ischase}],riskwise.layouts.reasoncode_settings);
+reasoncode_settings := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID,false, ischase,false,false,false,includeemailverification}],riskwise.layouts.reasoncode_settings);
 actioncode_settings := dataset([{IsPOBoxCompliant, IsInstantID}],riskwise.layouts.actioncode_settings);
 
 
@@ -507,6 +530,8 @@ unsigned1 AppendBest := 1;		// search best file
 boolean doInquiries := ~DisableInquiriesInCVI AND dataRestriction[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue AND
 												actualIIDVersion=1;
 boolean AllowInsuranceDL := true;
+enableEquifaxPhoneMart:=   DataRestriction[Risk_indicators.iid_constants.enableEquifaxPhoneMart]=Risk_indicators.iid_constants.sFalse;
+
 unsigned8 BSOptions := 
 								if(bsversion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0) +
                 if(doInquiries, risk_indicators.iid_constants.BSOptions.IncludeInquiries, 0) +
@@ -517,14 +542,18 @@ unsigned8 BSOptions :=
 																					risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
 										0) +
 								if(AllowInsuranceDL, risk_indicators.iid_constants.BSOptions.AllowInsuranceDLInfo, 0) + //Allows use of Insurance DL information
-								if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0);	//Invokes additional DID append logic
+								if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0)+
+            if(IncludeDigitalIdentity,Risk_indicators.iid_constants.BSOptions.runthreatmetrix,0)+
+            if(disablenongovernmentdldata, risk_indicators.iid_constants.BSOptions.disablenongovernmentdldata, 0) + //check to disable use of Non Governmental DL information
+            if(enableEquifaxPhoneMart,Risk_indicators.iid_constants.BSOptions.enableEquifaxPhoneMart,0);
 
 
 ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, ofac_only, suppressNearDups, 
 									require2ele, fromBiid, isFCRA, runExcludeWatchLists ,FALSE,ofc_version,include_ofac,include_additional_watchlists,Global_WatchList_Threshold,dob_radius_use,
 									bsversion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones, ExactMatchLevel, DataRestriction, CustomDataFilter, 
 									IncludeDLverification, watchlists_request, DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold,
-									CompanyID, DataPermission);
+									CompanyID, DataPermission,
+                                    LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 
 if(exists(ret(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
 							
@@ -536,22 +565,38 @@ Layout_InstandID_NuGenExt := record
 	boolean insurance_dl_used;
 end;
 
-Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
-	SELF.acctNo		:=R.acctno;
-	
-	SELF.transaction_id := 0;
+//  For ThreatMetrix reasoncodes
+TMX_model:=Models.IID1906_0_0(ret);
+// DRM_threatmetrix:= ~doxie.DataRestriction.allowDigitalIdentity;
+DRM_threatmetrix:= DataRestriction[Risk_indicators.iid_constants.IncludeDigitalIdentity]=Risk_indicators.iid_constants.sFalse;
+ retplus_tmx:= if(DRM_threatmetrix,join(ret,TMX_model,left.seq=right.seq,
+ transform(risk_indicators.layout_output,
+ self.iid_tmx.phonehighriskind:=RIGHT.phonehighriskind,
+ self.iid_tmx.emailhighriskind:=Right.emailhighriskind,
+ self:=LEFT),left outer),ungroup(ret));
 
+Layout_InstandID_NuGenExt format_out(retplus_tmx le, fs R) := TRANSFORM
+  SELF.acctNo		:=R.acctno;
+    
+  SELF.transaction_id := 0;
+  
 	isFirstExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression + '|' + Risk_Indicators.iid_constants.endingInc_expression, TRIM(STD.STR.ToUpperCase(r.Name_First)), NOCASE), TRUE, FALSE), FALSE);
 	verfirst := Map(ischase AND isFirstExpressionFound => '',
 											 le.combo_firstcount>0 => le.combo_first,
 											 '');
-	self.verfirst := verfirst;
+  SELF.verfirst := verfirst;
+  
+isMiddleExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression, TRIM(STD.STR.ToUpperCase(r.Name_Middle)), NOCASE), TRUE, FALSE), FALSE);
+	vermiddle := Map(ischase AND isMiddleExpressionFound => '',
+											 le.combo_middlecount>0 => le.combo_middle,
+											 '');
+  SELF.vermiddle := vermiddle;
 
 	isLastExpressionFound  := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression + '|' + Risk_Indicators.iid_constants.lastEndsWith_expression + '|' + Risk_Indicators.iid_constants.endingInc_expression, TRIM(STD.STR.ToUpperCase(r.Name_Last)), NOCASE), TRUE, FALSE), FALSE);
 	verlast := Map(ischase AND isLastExpressionFound => '',
 											le.combo_lastcount>0 => le.combo_last, 
 											'');
-		self.verlast := verlast;
+  SELF.verlast := verlast;
 
 	isAddrExpressionFound := if(ischase AND le.addr_type ='P', TRUE,FALSE);
 
@@ -673,6 +718,7 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	SELF.ssa_state_name := Codes.GENERAL.STATE_LONG(le.soclstate);
 	
 	SELF.current_fname := le.verfirst;
+	SELF.current_mname := le.vermiddle;
 	SELF.current_lname := le.verlast;
 	
 	addr1 := Risk_Indicators.MOD_AddressClean.street_address('',le.chronoprim_range, le.chronopredir, 
@@ -755,23 +801,28 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 
 	SELF.fua := if(ischase and chase_expressions, risk_indicators.getActionCodes(le,4, NAS_summary1, NAP_summary1, ac_settings := actioncode_settings),risk_indicators.getActionCodes(le,4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings /*, rc*/));
 	
-	cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI),
-									ischase => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI),
-										actualIIDVersion=0 => risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC),	
-										risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI));
-		//need two chase checks here because chase would like their model returned in the normal CVI slot even though it is a custom model call. one for Custom model with modification, and one without.																		
-									
-	isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
+	OverrideOptions := MODULE(Risk_Indicators.iid_constants.IOverrideOptions) 
+	EXPORT isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) AND actualIIDVersion=1;
+    EXPORT isCodePO := IF(CustomCVIModelName = 'CCVI1909_1', risk_indicators.rcSet.isCodePO(le.addr_type), risk_indicators.rcSet.isCodePO(le.addr_type) AND IsPOBoxCompliant);
+    EXPORT isCodeCL := risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) AND IncludeCLoverride;
+    EXPORT isCodeMI := risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) AND IncludeMIoverride AND actualIIDVersion=1;
+    EXPORT isCodeMS := risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) AND IncludeMSoverride;
+    END;
+
+    //chase wants their custom cvi mapped to the normal and custom cvi and reason codes. 
+     SELF.CVI :=                        map(CustomCVIModelName = 'CCVI1810_1' => Models.CVI1810_1_0(NAP_summary1,NAS_summary1,le,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
+                                                            actualIIDVersion=0 => risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast, ,OverrideOptions),
+                                                            risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions));
+
+     // Chase custom score is calculated in SELF.CVI if it's requested, no need to call the attribute here too
+     SELF.cviCustomScore := MAP(CustomCVIModelName = 'CCVI1909_1' => Models.CVI1909_1_0(NAP_summary1,NAS_summary1,SELF.CVI, SELF.verify_dob, le.addr_type, le.zipclass, (STRING)le.socsverlevel, le.ssn, le.ssnExists, le.lastssnmatch2),
+                                                            CustomCVIModelName = 'CCVI1501_1' => Models.CVI1501_1_0(NAP_summary1,NAS_summary1,le,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
+                                                            CustomCVIModelName <> '' => SELF.CVI,
+                                                            '');
 	
-	SELF.CVI := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
-							IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
-							IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)cvi_temp > 10 => '10',
-							IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)cvi_temp > 10 and actualIIDVersion=1 => '10',
-							isCodeDI AND (INTEGER)cvi_temp > 10 => '10',
-							cvi_temp);
-	
-	
-	self.verdl := le.verified_dl;
+	 SELF.verdl := if(IncludeDLverification,le.verified_dl,'');
+  SELF.corrected_dl:= IF(self.verdl <>le.dl_number,le.verified_dl,'');
+  SELF.VerifiedEmail:= IF(IncludeEmailverification,le.VerifiedEmail,'');
 		
 	self.SubjectSSNCount := if(risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months), (string)le.ssns_per_adl_seen_18months, '');
 
@@ -785,29 +836,35 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	isCode02 := risk_indicators.rcSet.isCode02(le.decsflag);
 
 	self.deceasedDate := MAP(	ssn_verified and isCode02 => if(le.deceasedDate=0, '', (string)le.deceasedDate),
-														isCodeDI => if(le.DIDdeceasedDate=0, '', (STRING)le.DIDdeceasedDate),
+														OverrideOptions.isCodeDI => if(le.DIDdeceasedDate=0, '', (STRING)le.DIDdeceasedDate),
 														
 														'');
 	self.deceasedDOB := MAP(ssn_verified and isCode02 => if(le.deceasedDOB=0, '', (string)le.deceasedDOB),
-													isCodeDI => if(le.DIDdeceasedDOB=0, '', (STRING)le.DIDdeceasedDOB),
+													OverrideOptions.isCodeDI => if(le.DIDdeceasedDOB=0, '', (STRING)le.DIDdeceasedDOB),
 													'');
 													
 	self.deceasedFirst := MAP( ssn_verified and isCode02 => le.deceasedFirst,
-														isCodeDI => le.DIDdeceasedFirst,
+														OverrideOptions.isCodeDI => le.DIDdeceasedFirst,
 														'');
 	self.deceasedLast := MAP(	ssn_verified and isCode02 => le.deceasedLast,
-														isCodeDI => le.DIDdeceasedLast,
+														OverrideOptions.isCodeDI => le.DIDdeceasedLast,
 														'');
 	
 	risk_indicators.mac_add_sequence(le.watchlists, watchlists_with_seq);
 	self.watchlists := watchlists_with_seq;
 	
-	reasoncode_settings_chase := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, '', ischase, isFirstExpressionFound, isLastExpressionFound, isAddrExpressionFound}],riskwise.layouts.reasoncode_settings);
+	reasoncode_settings_chase := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID,false, ischase, isFirstExpressionFound, isLastExpressionFound, isAddrExpressionFound,includeemailverification}],riskwise.layouts.reasoncode_settings);
 
 	// add a sequence number to the reason codes for sorting in XML
-	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings), reasons_with_seq);
-	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings_chase), reason_with_seq_chase);
+	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings), original_reasons_with_seq);
+	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings_chase), original_reason_with_seq_chase);
+ 
+ Excluded_Minor := if(Excludeminors,risk_indicators.rcSet.isCodeAM((INTEGER)le.age,le.dob),false);
 
+  risk_indicators.mac_add_sequence(dataset([{risk_indicators.iid_constants.minor_reasoncode, risk_indicators.getHRIDesc(risk_indicators.iid_constants.minor_reasoncode)}], risk_indicators.Layout_Desc), excluded_minors_set);
+  reasons_with_seq := if(Excluded_Minor, excluded_minors_set, original_reasons_with_seq);
+  reason_with_seq_chase := if(Excluded_Minor, excluded_minors_set, original_reason_with_seq_chase);
+  
 	self.ri := if(ischase and chase_expressions, reason_with_seq_chase, reasons_with_seq);
 		
 	passportline := r.PassportUpperLine + r.PassportLowerLine;
@@ -820,20 +877,7 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 															 FALSE);
 	self.addressPOBox := (Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass)) and actualIIDVersion=1;
 	self.addressCMRA := (le.hrisksic in risk_indicators.iid_constants.setCRMA or le.ADVODropIndicator='C') and actualIIDVersion=1;
-	
-	custom_cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName_in),
-													CustomCVIModelName_in <> '' => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName_in),
-													'');
-	
-	SELF.cviCustomScore := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)custom_cvi_temp > 10 => '10',
-							IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)custom_cvi_temp > 10 => '10',
-							IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)custom_cvi_temp > 10 => '10',
-							IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)custom_cvi_temp > 10 and actualIIDVersion=1 => '10',
-							isCodeDI AND (INTEGER)custom_cvi_temp > 10 => '10',
-							custom_cvi_temp);	
-							
 
-	
 	self.InstantIDVersion := (string)actualIIDVersion;	
 	
 	//new for Emerging Identities
@@ -849,12 +893,75 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	self.StreetAddress1 := address.Addr1FromComponents(le.prim_range,le.predir,le.prim_name,le.addr_suffix,le.postdir,le.unit_desig,le.sec_range);
 	self.StreetAddress2 := address.Addr2FromComponents(le.p_city_name,le.st,le.z5);
 	self.DID := if(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, 0, le.DID); //if DID is fake, zero it out
-	
-	SELF := le;
+  
+  SELF.BureauDeleted  := if(le.header_summary.EQ_ssn_nlr or le.header_summary.EN_ssn_nlr or le.header_summary.TN_ssn_nlr, true, false);
+  SELF.ITINExpired:=le.ITINExpired;
+  SELF.IsPhoneCurrent:=le.IsPhoneCurrent;
+  SELF.PhoneLineType:=le.PhoneLineType;
+  SELF.PhoneLineDescription:=le.PhoneLineDescription;
+  SELF := le;
 	SELF := [];  // default models and red flags datasets to empty
 END;
 
-formed_pre1 := join(ret, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
+formed_pre1_temp := join(retplus_tmx, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
+
+
+Layout_InstandID_NuGenExt minorsTransform(formed_pre1_temp l) := transform
+                self.acctNo:=l.acctno;
+                self.seq:=(Integer)l.seq;
+                self.DID:=(Integer)l.did;                      
+                self.title :=l.title;
+                self.fname:=l.fname;
+                self.mname:=l.mname;
+                self.lname:=l.lname;
+                self.suffix:=l.suffix;
+                self.in_streetAddress:=l.in_streetAddress;
+                self.in_city:=l.in_city;
+                self.in_state:=l.in_state;
+                self.in_zipCode:=l.in_zipCode;
+                self.in_country:=l.in_country;
+                self.prim_range:=l.prim_range;
+                self.predir:=l.predir;
+                self.prim_name:=l.prim_name;
+                self.addr_suffix:=l.addr_suffix;
+                self.postdir:=l.postdir;
+                self.unit_desig:=l.unit_desig;
+                self.sec_range:=l.sec_range;
+                self.p_city_name:=l.p_city_name;
+                self.st:=l.st;
+                self.z5:=l.z5;
+                self.zip4:=l.zip4;
+                self.lat :=l.lat;
+                self.long :=l.long;
+                self.county :=l.county;
+                self.geo_blk :=l.geo_blk;          
+                self.addr_type:=l.addr_type;
+                self.addr_status:=l.addr_status;                
+                self.country:=l.country;                
+                self.ssn:=l.ssn;
+                self.dob:=l.dob;
+                self.age:=l.age;                
+                self.dl_number :=l.dl_number;
+                self.dl_state :=l.dl_state;               
+                self.email_address:=l.email_address;
+                self.ip_address:=l.ip_address;
+                self.phone10:=l.phone10;
+                self.wphone10:=l.wphone10;
+                self.employer_name :=l.employer_name;
+                self.lname_prev :=l.lname_prev;
+								Excluded_Minor := if(Excludeminors,risk_indicators.rcSet.isCodeAM((INTEGER)l.age,l.dob),false);
+                minor_ri:= Dataset([transform(risk_indicators.layouts.layout_desc_plus_seq,
+                          self.seq:=1;
+                          self.hri:=risk_indicators.iid_constants.minor_reasoncode;
+                          self.desc:=risk_indicators.getHRIDesc(risk_indicators.iid_constants.minor_reasoncode) )]);
+								self.ri := if(excluded_minor, minor_ri, l.ri);
+								self := [];
+                
+END;
+minors_output:= Project(formed_pre1_temp(ri[1].hri=risk_indicators.iid_constants.minor_reasoncode),minorsTransform(LEFT));
+everyone_else := formed_pre1_temp(ri[1].hri<>risk_indicators.iid_constants.minor_reasoncode);
+
+formed_pre1:=if(excludeminors,minors_output + everyone_else,formed_pre1_temp);
 
 //for Emerging Identities, return standardized county name
 formed_pre := join(formed_pre1, census_data.Key_Fips2County, 
@@ -871,7 +978,8 @@ InsuranceRoyalties 	:= if(TrackInsuranceRoyalties, Royalty.RoyaltyFDNDLDATA.GetB
 
 // this section is all to include the fraud scores if the boolean is set to true
 	clam := risk_indicators.Boca_Shell_Function(ret, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value,  
-					true, false, false, true, bsversion, DataRestriction := DataRestriction, DataPermission := DataPermission);
+					true, false, false, true, bsversion, DataRestriction := DataRestriction, DataPermission := DataPermission,
+                    LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 
 	ip_prep := project( fs, transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq ) );
 	ip_out  := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose);
@@ -1311,6 +1419,7 @@ just_red_flags := join(iid_results, red_flags_ret, (unsigned)left.seq=right.seq,
 												self := []), // blank out all other fields if RedFlagsOnly is selected
 												left outer);												
 final := if(RedFlagsOnly, just_red_flags, with_red_flags);
+
 output(final,named('RESULTS')) ;
 
 BOOLEAN  ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
@@ -1318,6 +1427,5 @@ dIPIn := PROJECT(fs,TRANSFORM(Royalty.RoyaltyNetAcuity.IPData,SELF.AcctNo := LEF
 dRoyaltiesByAcctno 	:= IF(trackNetacuityRoyalties, Royalty.RoyaltyNetAcuity.GetBatchRoyaltiesByAcctno(gateways, dIPIn, formed, TRUE));
 dRoyalties 					:= Royalty.GetBatchRoyalties(dRoyaltiesByAcctno + InsuranceRoyalties, ReturnDetailedRoyalties);
 output(dRoyalties,NAMED('RoyaltySet'));
-
 endmacro;
 // risk_indicators.InstantID_Batch();

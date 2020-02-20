@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP;
+﻿IMPORT AutoStandardI, BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP, doxie, suppress;
 
 	// The following function reads Business Header Records, which'll be used in at least two other 
 	// functions a bit later. Slims 'em down too, for a lighter footprint.
@@ -64,11 +64,22 @@
 				RECORDOF(Business_Credit_KEL.File_SBFE_temp);
 			END;
 
+      _mod_access := 
+        MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+          EXPORT STRING DataRestrictionMask := linkingOptions.DataRestrictionMask;
+          EXPORT UNSIGNED1 glb := linkingOptions.GLBPurpose;
+          EXPORT UNSIGNED1 dppa := linkingOptions.DPPAPurpose;
+          EXPORT BOOLEAN show_minors := linkingOptions.IncludeMinors;
+          EXPORT UNSIGNED1 unrestricted := (UNSIGNED1)linkingOptions.AllowAll;
+          EXPORT BOOLEAN isPreGLBRestricted() := linkingOptions.restrictPreGLB;
+          EXPORT BOOLEAN ln_branded :=  linkingOptions.lnbranded;
+        END;
+          
 			ds_SBFERaw := 
 					Business_Credit.Key_LinkIds().kFetch2(inputs             := ds_BIPIDs,
-																								Level              := Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
+																								mod_access         := _mod_access,
+                                                Level              := Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
 																								ScoreThreshold     := 0, // ScoreThreshold --> 0 = Give me everything
-																								DataPermissionMask := Options.DataPermissionMask,
 																								JoinLimit          := Business_Risk_BIP.Constants.Limit_SBFE_LinkIds,
 																								JoinType           := Options.KeepLargeBusinesses );				
 
@@ -112,7 +123,7 @@
 			END;
 
 			// Hit Key_BusinessInformation to get BII (company name, address, etc., etc.).
-			BusinessInformation_recs := 
+			BusinessInformation_recs_org := 
 				JOIN(
 					ds_SBFE_filt, Business_Credit.Key_BusinessInformation(),
 					KEYED(RIGHT.contract_account_number = LEFT.contract_account_number) AND 
@@ -121,8 +132,9 @@
 					xfm_BusinessInformation_recs(LEFT,RIGHT,COUNTER), 
 					ATMOST(Business_Risk_BIP.Constants.Limit_SBFE)
 				);
+			BusinessInformation_recs := Suppress.MAC_SuppressSource(BusinessInformation_recs_org, _mod_access, did);
 			
-			// Join back to BIPIDs to filter out non-matching Businesses.
+      // Join back to BIPIDs to filter out non-matching Businesses.
 			BusinessInformation_filt :=
 				JOIN(
 					BusinessInformation_recs(record_type = 'AB'), ds_BIPIDs,

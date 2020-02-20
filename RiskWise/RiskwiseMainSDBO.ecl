@@ -73,7 +73,7 @@
  </message>
 */
 /*--INFO-- Migrating b2b2, b2bz, b2bc, ex24, ex41, ex98, b2b4 to boca. */
-import gateway;
+IMPORT gateway, Inquiry_AccLogs, Riskwise, Risk_Indicators, STD;
 
 export RiskwiseMainSDBO := MACRO
 
@@ -153,7 +153,11 @@ export RiskwiseMainSDBO := MACRO
 	'HistoryDateYYYYMM',
 	'OFACversion',
 	'gateways',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -246,10 +250,17 @@ unsigned3 history_date := 999999 	: stored('HistoryDateYYYYMM');
 boolean   isUtility := false;
 boolean   ln_branded := false;
 unsigned1 ofac_version_      := 1        : stored('OFACVersion');
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 boolean   suppressNearDups := true;
 boolean   require2Ele := true;
 
-tribcode := StringLib.StringToLowerCase(tribCode_value);
+tribcode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribCode in ['ex24', 'ex98'];
 
 ofac_version := ofac_version_;
@@ -346,7 +357,11 @@ final_seed := if(runSeed_value, riskwise.seedSDBO(tribcode, socs_value, account_
 ret := if(tribcode in ['b2b2', 'b2bz', 'b2bc', 'ex24', 'ex41', 'ex98', 'b2b4'], 
 		if(count(final_seed)>0 and runSeed_value, final_seed, 
 		RiskWise.SDBO_Function(f, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded, tribcode, ofac_version, include_ofac, include_additional_watchlists, global_watchlist_threshold, 
-                           DataRestriction, DataPermission)),
+                           DataRestriction := DataRestriction, DataPermission := DataPermission,
+                           LexIdSourceOptout := LexIdSourceOptout, 
+                           TransactionID := TransactionID, 
+                           BatchUID := BatchUID, 
+                           GlobalCompanyID := GlobalCompanyID)),
 		dataset([{0,'', account_value}], riskwise.Layout_SDBO));
 
 dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Royalties');

@@ -1,4 +1,4 @@
-﻿IMPORT _Control, doxie, LN_PropertyV2, ut, Codes, suppress, fcra;
+﻿IMPORT _Control, doxie, LN_PropertyV2, suppress, fcra, LN_propertyV2_Services, STD;
 onThor := _Control.Environment.OnThor;
 
 l_sid		:= LN_PropertyV2_Services.layouts.search_fid;
@@ -19,107 +19,19 @@ export dataset(l_out) fn_get_report_2(
 ) := function
  
 
-	// Local datasets, functions.
-	suppress_set :=
-		CASE( in_mod.application_type_value,
-
-			// Suppress.Constants.ApplicationTypes.PeopleWise => Suppress.Constants.SuppressPeopleWise, // commenting this out to remove the compiler warning message since peoplewise and consumer are both 'CON'
-			Suppress.Constants.ApplicationTypes.Consumer => Suppress.Constants.SuppressConsumer,
-			Suppress.Constants.ApplicationTypes.LE => Suppress.Constants.SuppressLE,
-			Suppress.Constants.SuppressGeneral
-		);
-
-	FormatID(STRING str_ID, STRING _type) := 
-		CASE( stringlib.StringToUppercase(_type),
-			Suppress.Constants.LinkTypes.DID => INTFORMAT( (INTEGER)str_ID, 12, 1 ),
-			Suppress.Constants.LinkTypes.SSN => INTFORMAT( (INTEGER)str_ID, 9, 1 ),
-			str_ID
-		);
-
-	NumericID(STRING str_ID) := 
-		IF(ut.isNumeric(str_ID),(STRING)(UNSIGNED)str_ID,str_ID);
-
 	// ---------- Main ----------
 	
  	did_rec := if(isFCRA, project(in_fids, transform(doxie.layout_best, self.did:=left.search_did,self:=left,self:=[])));
 	// adding a dedup of the DID and SSN so we don't end up with so many records coming out of GetFlagFile for same person
 	did_rec_deduped := if(isFCRA, dedup(sort(did_rec, did, ssn), did, ssn));
-	ds_flags := if (IsFCRA, FCRA.GetFlagFile(did_rec_deduped), fcra.compliance.blank_flagfile);
+	ds_flags := if (IsFCRA and ~OnThor, FCRA.GetFlagFile(did_rec_deduped), fcra.compliance.blank_flagfile);
 
 	// Apply FaresID-based restrictions
 	fids1 := in_fids(ln_fares_id[1] not in in_mod.srcRestrict);	// blacklist FARES, Fidelity, or LnBranded as needed
 	
-	// Apply suppression.
-	fids2_roxie := 
-		JOIN(
-			fids1, suppress.Key_New_Suppression, 
-			keyed(right.product in suppress_set) and
-			keyed(right.linking_type = '') and keyed (right.Linking_ID = '') and
-			keyed(right.document_type = Suppress.Constants.DocTypes.FaresID) and
-			keyed(right.Document_ID = (string)left.ln_fares_id),
-			transform( recordof(fids1), self := left), 
-			left only
-		 );
-		 
-	#IF(onThor)
-    fids2 := fids1;
-  #ELSE
-    fids2 := fids2_roxie;
-  #END
-  
-	// Get raw parties based on fid suppression so far
-	parties_extraRaw := LN_PropertyV2_Services.fn_get_parties_raw(fids2,nonSS,isFCRA,ds_flags);
-	
-	// Suppress records (fids) and parties based on DID and SSN
-	suppressed_dids := 
-		JOIN(
-			parties_extraRaw, suppress.Key_New_Suppression,
-			// prevent suppressing records where IDs are blank or contain zeros only
-			((integer) left.did != 0) and
-			keyed(right.product in suppress_set) and
-			keyed(right.linking_type = Suppress.Constants.LinkTypes.DID) and
-			keyed(
-				right.Linking_ID = (string)left.did or 
-				right.Linking_ID = FormatID((string)left.did, (string)Suppress.Constants.LinkTypes.DID) or
-				right.Linking_ID = NumericID((string)left.did)
-			),
-			transform( {STRING12 ln_fares_id}, self.ln_fares_id := left.ln_fares_id)
-		);
-	
-	fids2_having_removed_suppressed_DIDs := 
-		JOIN(
-			fids2, suppressed_dids,
-			left.ln_fares_id = right.ln_fares_id,
-			transform( recordof(fids2), self := left ),
-			left only
-		);
-
-	suppressed_ssns := 
-		JOIN(
-			parties_extraRaw, suppress.Key_New_Suppression,
-			// prevent suppressing records where IDs are blank or contain zeros only
-			((integer) left.app_ssn != 0) and
-			keyed(right.product in suppress_set) and
-			keyed(right.linking_type = Suppress.Constants.LinkTypes.SSN) and
-			keyed(
-				right.Linking_ID = (string)left.app_ssn or 
-				right.Linking_ID = FormatID((string)left.app_ssn, (string)Suppress.Constants.LinkTypes.SSN) or
-				right.Linking_ID = NumericID((string)left.app_ssn)
-			),
-			transform( {STRING12 ln_fares_id}, self := left)
-		);
-	
-	fids2_having_removed_suppressed_DIDs_and_SSNs := 
-		JOIN(
-			fids2_having_removed_suppressed_DIDs, suppressed_ssns,
-			left.ln_fares_id = right.ln_fares_id,
-			transform( recordof(fids2), self := left ),
-			left only
-		);
-				
-	// retrieve raw results with minimal processing (just the JOINs)
-	deeds_raw		:= LN_PropertyV2_Services.fn_get_deeds_raw_2(fids2_having_removed_suppressed_DIDs_and_SSNs,isFCRA,ds_flags,in_mod);
-	assess_raw	:= LN_PropertyV2_Services.fn_get_assessments_raw_2(fids2_having_removed_suppressed_DIDs_and_SSNs,isFCRA,ds_flags,in_mod);
+	parties_extraRaw := LN_PropertyV2_Services.fn_get_parties_raw(fids1,nonSS,isFCRA,ds_flags);	
+	deeds_raw		:= LN_PropertyV2_Services.fn_get_deeds_raw_2(fids1,isFCRA,ds_flags,in_mod);
+	assess_raw	:= LN_PropertyV2_Services.fn_get_assessments_raw_2(fids1,isFCRA,ds_flags,in_mod);
 	
   parties := LN_PropertyV2_Services.fn_get_parties_2(parties_extraRaw,isFCRA,in_mod);
 	deeds		:= LN_PropertyV2_Services.fn_get_deeds_2(deeds_raw,in_mod);
@@ -199,7 +111,7 @@ needed to put this code back in for the roxie query to work within bocashell for
 																					or ~in_mod.DisplayMatchedParty_val);
 
 	// If CurrentByVendor is set, only keep APNs if _all_ of their records have a perfect sec_range match in the property address
-	sec_clean(string s) := StringLib.StringFilter(Stringlib.StringToUpperCase(s),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+	sec_clean(string s) := STD.str.Filter(STD.str.ToUpperCase(s),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 	apns_bad := project(partied_xadl2_thresh(sec_clean(parties(party_type='P')[1].sec_range)<>sec_clean(in_mod.entity1.sec_range)), transform({partied_xadl2_thresh.apn},self.apn:=LN_PropertyV2.fn_strip_pnum(left.apn)));
 	apns_set := set(table(apns_bad, {apn}, apn), apn);
 	partied_out := if(in_mod.currentVend, partied_xadl2_thresh(LN_PropertyV2.fn_strip_pnum(apn) not in apns_set), partied_xadl2_thresh);

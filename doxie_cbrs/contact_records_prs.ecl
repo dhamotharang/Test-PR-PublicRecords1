@@ -1,11 +1,12 @@
-/*2005-05-05T14:02:37Z (Chad Morton)
+﻿﻿/*2005-05-05T14:02:37Z (Chad Morton)
 add reverse phone lookup and deathfile indicator to contacts
 */
-import doxie, business_header, ut, NID, DeathV2_Services, AutoStandardI;
+import AutoStandardI, business_header, DeathV2_Services, doxie, doxie_cbrs, 
+       dx_death_master, NID, STD, Suppress, ut;
 
 export contact_records_prs(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
-deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-glb_ok := deathparams.isValidGlb();
+death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+glb_ok := death_params.isValidGlb();
 
 contacts := doxie_cbrs.contact_records(bdids);
 
@@ -52,12 +53,10 @@ outrec := record
 	cr.address_id;
 end;
 
-
-
 cleantitle(string src, string title) := map(
 	//specific requests
 	trim(title,left,right) in ['DOMAIN ADMINISTRATIVE CONTACT', 'DOMAIN TECHNICAL CONTACT'] => '',
-	src = 'D' => stringlib.StringFindReplace(title,'PROJECT ',''),
+	src = 'D' => STD.Str.FindReplace(title,'PROJECT ',''),
 	title);
 
 
@@ -154,17 +153,15 @@ ddpd := project(rlld4, nodup(left));
 
 
 //** add death indicator
+wdthAppend := dx_death_master.Append.byDID(ddpd, did, death_params);
 
-outrec addd(ddpd l, dk r) := transform
-	self.has_death_record := r.l_did > 0;
-	self.company_title := '';
-	self := l;
-end;
-
-wdth := join(ddpd, dk, LEFT.did<>0 AND keyed(left.did = right.l_did)
-   		and not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-			addd(left, right), KEEP(1), left outer);
-
+wdth := 
+  project(wdthAppend,
+    transform(outrec,
+      self.has_death_record := left.death.is_deceased;
+      self.company_title := '';
+      self := left;
+    ));
 
 //** add SSN
 // well, it seems we actually just need to let it through

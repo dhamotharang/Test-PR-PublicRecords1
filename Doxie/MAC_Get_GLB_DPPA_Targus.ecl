@@ -1,4 +1,4 @@
-import targus, address, riskwise, ut, gateway, doxie, didville, gong,Phones, MDR;
+import targus, address, riskwise, ut, gateway, doxie, didville, Phones, MDR, STD;
 
 export MAC_Get_GLB_DPPA_Targus(boolean  phone_only_search,
 															string10 phone,
@@ -16,8 +16,7 @@ export MAC_Get_GLB_DPPA_Targus(boolean  phone_only_search,
 															STRING2 st,
 															STRING5 zip5,  
 															STRING4 zip4,
-															unsigned1 glb, 
-															unsigned1 dppa, 
+															doxie.IDataAccess mod_access,
 															unsigned1 scr_thr_val,
 															gateway.Layouts.Config gateway_cfg,
 															string120 company_name='\'\'',
@@ -30,8 +29,8 @@ targus_init := dataset([{name_last, company_name, prim_name, zip5}],
 
 //set input for basic lookup
 targus.layout_targus_in prep_for_basic(targus_init le) := transform
-	self.user.GLBPurpose := glb;
-	self.user.DLPurpose := dppa;
+	self.user.GLBPurpose := mod_access.glb;
+	self.user.DLPurpose := mod_access.dppa;
 	self.user.QueryID := '1';
 	self.SearchBy.ConsumerName.Fname := name_first;
 	self.SearchBy.ConsumerName.Middle := name_middle;
@@ -67,8 +66,8 @@ targus_basic_in := project(targus_init(z5<>'' and
 
 //set input for reverse lookup
 targus.layout_targus_in prep_for_reverse(targus_init le) := transform
-	self.user.GLBPurpose := glb;
-	self.user.DLPurpose := dppa;
+	self.user.GLBPurpose := mod_access.glb;
+	self.user.DLPurpose := mod_access.dppa;
 	self.user.QueryID := '2';
 	self.SearchBy.PhoneNumber := phone;
 	self.options.IncludePhoneDataExpressSearch := ~isPFR;
@@ -80,9 +79,10 @@ targus_reverse_in := project(targus_init, prep_for_reverse(left));
 
 targus_in := if(phone_only_search, targus_reverse_in, targus_basic_in);
 
+applyOptOut := TRUE; // temporary, until we can remove applyOptout parameter from SOAPCALL_Targus() below.
 vMakeGWCall := targus_gateway_url!='' and exists(targus_in);
 gateway_result := if(vMakeGWCall, 
-                     gateway.SoapCall_Targus(targus_in, gateway_cfg, 6, 0, vMakeGWCall), dataset([],targus.layout_targus_out));
+                     gateway.SoapCall_Targus(targus_in, gateway_cfg, 6, 0, vMakeGWCall, mod_access, applyOptOut), dataset([],targus.layout_targus_out));
 
 targus_out_rec := doxie.layout_pp_raw_common;
 
@@ -133,7 +133,7 @@ targus_out_rec tran_reverse(gateway_result l) := transform
 	self.fname := if(hit, gatewayRes.FirstName, '');
 	self.mname := if(hit, gatewayRes.MiddleName, '');
 	self.lname := if(hit, gatewayRes.LastName, '');
-	self.listed_name := stringlib.StringToUpperCase(
+	self.listed_name := STD.STR.ToUpperCase(
 	                      map(~hit => '',
 	                          self.lname<>''and self.fname<>'' => trim(self.fname) + ' ' + trim(self.lname), 
 					      self.lname<>'' => self.lname,
@@ -169,8 +169,8 @@ dirs_reverse := project(gateway_result(searchby.phonenumber=phone, phone<>''), t
 
 //set input for wireless connection search
 targus.layout_targus_in prep_for_wireless(targus_init le) := transform
-	self.user.GLBPurpose := glb;
-	self.user.DLPurpose := dppa;
+	self.user.GLBPurpose := mod_access.glb;
+	self.user.DLPurpose := mod_access.dppa;
 	self.user.QueryID := '3';
 	self.SearchBy.PhoneNumber := phone;
 	self.options.IncludeWirelessConnectionSearch := true;
@@ -181,7 +181,7 @@ targus_wireless_in := if(targus_gateway_url!='' and exists(dirs_reverse) and ~ex
                          project(targus_init, prep_for_wireless(left)), dataset([],targus.layout_targus_in));
 
 wireless_result := IF(doxie.DataPermission.use_confirm,
-											gateway.SoapCall_Targus(targus_wireless_in, gateway_cfg, 3));
+											gateway.SoapCall_Targus(targus_wireless_in, gateway_cfg, 3,,, mod_access, applyOptOut)); // <- not passing makegatewaycall?
 		
 targus_out_rec tran_wireless(dirs_reverse l, wireless_result r) := transform
 	self.fname := r.response.WirelessConnectionSearchResult.ConsumerName.Frst;

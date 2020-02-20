@@ -1,7 +1,4 @@
-﻿/*2015-11-06T19:44:02Z (Krishna Gummadi)
-RRBug 193228 - Midex report upgrade changes
-*/
-/*--SOAP--
+﻿/*--SOAP--
 <message name="MidexReportService">
 
 	<!-- COMPLIANCE/USER SETTINGS -->
@@ -33,7 +30,7 @@ RRBug 193228 - Midex report upgrade changes
 //       to a request from Jiafu and Joe Gayda (engineering lead). Per Jiafu, using the 
 //       data restriction mask, we didn't have to do a database sweep.
 
-IMPORT AutoStandardI, iesp, lib_stringlib, MIDEX_Services, BIPV2;
+IMPORT AutoStandardI, BIPV2, iesp, MIDEX_Services, STD;
 
 EXPORT MidexReportService  := 
   MACRO
@@ -118,7 +115,7 @@ EXPORT MidexReportService  :=
     #CONSTANT( 'ZipRadius',                 0   );
     
     STRING MIDEXReportNumber    := '' : STORED( 'midexReportNumber' );
-    in_midexReportNum_inDataset := DATASET([{TRIM(StringLib.StringToUpperCase(MIDEXReportNumber), LEFT, RIGHT),'','',''}],MIDEX_Services.Layouts.rec_midex_payloadKeyField);
+    in_midexReportNum_inDataset := DATASET([{TRIM(STD.STR.ToUpperCase(MIDEXReportNumber), LEFT, RIGHT),'','',''}],MIDEX_Services.Layouts.rec_midex_payloadKeyField);
     
     MIDEX_Services.Macros.MAC_getIncidentNumFromMidexReportNum( in_midexReportNum_inDataset, ds_MidexRptNbrDatasetWithBatchIncidentAndPartyNbrs);  
     
@@ -199,14 +196,14 @@ EXPORT MidexReportService  :=
 			EXPORT STRING25  ExecutiveHash										 := AlertHashes.Executive.HashValue;
 			EXPORT STRING25  SOSHash													 := AlertHashes.SecretaryOfStateFiling.HashValue;
 			EXPORT DATASET 	 LinkIds													 := bip_ds;
-			EXPORT STRING1	 BusinessReportFetchLevel 				 := trim(stringlib.stringToUpperCase(BusinessReportFetchLevel),left,right);
+			EXPORT STRING1	 BusinessReportFetchLevel 				 := trim(STD.STR.ToUpperCase(BusinessReportFetchLevel),left,right);
     END;
-
-  // *** call service records
-  ds_results := Midex_Services.MidexReport_Records(tempmod);
   
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
-  IF (EXISTS(ds_results), doxie.compliance.logSoldToTransaction(mod_access)); 
+   
+  // *** call service records
+  ds_results := Midex_Services.MidexReport_Records(tempmod, mod_access);
+  
   OUTPUT(ds_results, named('Results')); 
 
 ENDMACRO;

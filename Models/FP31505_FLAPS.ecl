@@ -1,3 +1,4 @@
+﻿Import Models;
 
 export FP31505_FLAPS( dataset(Models.Layout_FP31505) allVars ) := FUNCTION
 
@@ -1260,7 +1261,7 @@ c_WORK_HOME	:= le.c_WORK_HOME	;
 c_RICH_YOUNG	:= le.c_RICH_YOUNG	;
 c_TOTSALES	:= le.c_TOTSALES	;
 
-NULL := -999999999;
+NULL := models.common.NULL;
 
 // *** Here begins the actual tree code that came directly from the Modeler and is unchanged...
 
@@ -7140,6 +7141,419 @@ woFDN_FLAPS__lgt_267 := map(
    (f_mos_inq_banko_om_fseen_d = NULL) => -0.0178234448, -0.0178234448),
 (r_Phn_Cell_n = NULL) => -0.0041098463, -0.0041098463);
 
+//Adjustment trees FA: 6/2019
+
+adj_FLAPS__tree_0 :=  0.163855267651009;
+
+// Tree: 1
+adj_FLAPS__tree_1 := map(
+(NULL < f_srchfraudsrchcountyr_i and f_srchfraudsrchcountyr_i < 3.5) => map(
+   (NULL < r_A46_Curr_AVM_AutoVal_d and r_A46_Curr_AVM_AutoVal_d < 21517.5) => map(
+      (NULL < f_inputaddractivephonelist_d and f_inputaddractivephonelist_d < 0.5) => 0.183332361517891, 
+      (f_inputaddractivephonelist_d >= 0.5) => -0.0279742157898046, 
+      (f_inputaddractivephonelist_d = NULL) => 0.0756602202146065, 0.0756602202146065), 
+   (r_A46_Curr_AVM_AutoVal_d >= 21517.5) => map(
+      (NULL < C_RENTOCC_P and C_RENTOCC_P < 59.25) => -0.0070814213298003, 
+      (C_RENTOCC_P >= 59.25) => map(
+         (NULL < f_add_input_nhood_VAC_pct_i and f_add_input_nhood_VAC_pct_i < 0.0295682016) => 0.10853087118508, 
+         (f_add_input_nhood_VAC_pct_i >= 0.0295682016) => -0.020065992029323, 
+         (f_add_input_nhood_VAC_pct_i = NULL) => 0.0526117564628593, 0.0526117564628593), 
+      (C_RENTOCC_P = NULL) => 0.084472284190992, -0.00214081322062784), 
+   (r_A46_Curr_AVM_AutoVal_d = NULL) => 0.00503214728466964, 0.00157834147809342), 
+(f_srchfraudsrchcountyr_i >= 3.5) => map(
+   (NULL < c_unemp and c_unemp < 8.05) => -0.0229743152912442, 
+   (c_unemp >= 8.05) => -0.171581316069175, 
+   (c_unemp = NULL) => -0.0409220206992069, -0.0409220206992069), 
+(f_srchfraudsrchcountyr_i = NULL) => map(
+   (NULL < c_high_ed and c_high_ed < 33.7) => 0.0798365361703904, 
+   (c_high_ed >= 33.7) => -0.0596205071872524, 
+   (c_high_ed = NULL) => 0.0255131530020063, 0.0255131530020063), 0.000869831459313212);
+
+// Tree: 2
+adj_FLAPS__tree_2 := map(
+(NULL < f_attr_arrest_recency_d and f_attr_arrest_recency_d < 79.5) => map(
+   (NULL < c_bel_edu and c_bel_edu < 99.5) => 0.000778729271649572, 
+   (c_bel_edu >= 99.5) => 0.198427442194092, 
+   (c_bel_edu = NULL) => 0.112354615598835, 0.112354615598835), 
+(f_attr_arrest_recency_d >= 79.5) => map(
+   (NULL < f_addrchangevaluediff_d and f_addrchangevaluediff_d < -99113) => map(
+      (NULL < r_C14_Addr_Stability_v2_d and r_C14_Addr_Stability_v2_d < 5.5) => map(
+         (NULL < f_fp_prevaddrcrimeindex_i and f_fp_prevaddrcrimeindex_i < 101.5) => -0.0232080841086061, 
+         (f_fp_prevaddrcrimeindex_i >= 101.5) => 0.126003777576166, 
+         (f_fp_prevaddrcrimeindex_i = NULL) => 0.0234206226678852, 0.0234206226678852), 
+      (r_C14_Addr_Stability_v2_d >= 5.5) => 0.153343985546812, 
+      (r_C14_Addr_Stability_v2_d = NULL) => 0.0621125332431141, 0.0621125332431141), 
+   (f_addrchangevaluediff_d >= -99113) => -0.00936216226446402, 
+   (f_addrchangevaluediff_d = NULL) => map(
+      (NULL < c_lux_prod and c_lux_prod < 66.5) => 0.0367195656603145, 
+      (c_lux_prod >= 66.5) => -0.0110834359108314, 
+      (c_lux_prod = NULL) => -0.0212527235119888, -0.00178157986733792), -0.00646338054054102), 
+(f_attr_arrest_recency_d = NULL) => map(
+   (NULL < c_bel_edu and c_bel_edu < 71.5) => -0.0449708542932644, 
+   (c_bel_edu >= 71.5) => 0.0684745378727438, 
+   (c_bel_edu = NULL) => 0.0198550840873117, 0.0198550840873117), -0.00543934631066116);
+
+// Tree: 3
+adj_FLAPS__tree_3 := map(
+(NULL < f_addrchangecrimediff_i and f_addrchangecrimediff_i < 7.5) => -0.00512386250240073, 
+(f_addrchangecrimediff_i >= 7.5) => map(
+   (NULL < C_INC_15K_P and C_INC_15K_P < 23.35) => 0.018886837346081, 
+   (C_INC_15K_P >= 23.35) => map(
+      (NULL < c_rape and c_rape < 167.5) => 0.205280103269253, 
+      (c_rape >= 167.5) => 0.029388753563438, 
+      (c_rape = NULL) => 0.121580081685106, 0.121580081685106), 
+   (C_INC_15K_P = NULL) => 0.0404049304518017, 0.0404049304518017), 
+(f_addrchangecrimediff_i = NULL) => map(
+   (NULL < f_M_Bureau_ADL_FS_noTU_d and f_M_Bureau_ADL_FS_noTU_d < 877) => map(
+      (NULL < c_hh2_p and c_hh2_p < 26.45) => map(
+         (NULL < k_inq_per_ssn_i and k_inq_per_ssn_i < 0.5) => 0.00285501437010574, 
+         (k_inq_per_ssn_i >= 0.5) => 0.0764652439557234, 
+         (k_inq_per_ssn_i = NULL) => 0.0344022556210848, 0.0344022556210848), 
+      (c_hh2_p >= 26.45) => -0.010109989459435, 
+      (c_hh2_p = NULL) => -0.02561460480206, -0.00156277487514778), 
+   (f_M_Bureau_ADL_FS_noTU_d >= 877) => 0.125518381018075, 
+   (f_M_Bureau_ADL_FS_noTU_d = NULL) => map(
+      (NULL < c_pop_55_64_p and c_pop_55_64_p < 8.15) => -0.0471488897121975, 
+      (c_pop_55_64_p >= 8.15) => 0.0701307339065852, 
+      (c_pop_55_64_p = NULL) => 0.0276168703447764, 0.0276168703447764), 0.00128169600372157), -0.00198537485930037);
+
+// Tree: 4
+adj_FLAPS__tree_4 := map(
+(NULL < f_attr_arrest_recency_d and f_attr_arrest_recency_d < 79.5) => map(
+   (NULL < c_no_car and c_no_car < 121) => 0.0115710494384064, 
+   (c_no_car >= 121) => 0.165821936926364, 
+   (c_no_car = NULL) => 0.0730394482118032, 0.0730394482118032), 
+(f_attr_arrest_recency_d >= 79.5) => map(
+   (NULL < f_divrisktype_i and f_divrisktype_i < 5.5) => map(
+      (NULL < f_corrssnaddrcount_d and f_corrssnaddrcount_d < 1.5) => 0.0319563844522797, 
+      (f_corrssnaddrcount_d >= 1.5) => -0.00314199549816915, 
+      (f_corrssnaddrcount_d = NULL) => -0.00148732242644509, -0.00148732242644509), 
+   (f_divrisktype_i >= 5.5) => map(
+      (NULL < f_addrs_per_ssn_i and f_addrs_per_ssn_i < 11.5) => 0.174570845170186, 
+      (f_addrs_per_ssn_i >= 11.5) => -0.0825549604105004, 
+      (f_addrs_per_ssn_i = NULL) => 0.0779628835358241, 0.0779628835358241), 
+   (f_divrisktype_i = NULL) => -0.000752773172946132, -0.000752773172946132), 
+(f_attr_arrest_recency_d = NULL) => map(
+   (NULL < c_preschl and c_preschl < 126.5) => map(
+      (NULL < c_hh1_p and c_hh1_p < 22.55) => 0.0517101853542913, 
+      (c_hh1_p >= 22.55) => -0.0789277318060157, 
+      (c_hh1_p = NULL) => -0.0244095459044703, -0.0244095459044703), 
+   (c_preschl >= 126.5) => 0.0934628403257147, 
+   (c_preschl = NULL) => 0.0088877383413447, 0.0088877383413447), -0.0001447457098793);
+
+// Tree: 5
+adj_FLAPS__tree_5 := map(
+(NULL < r_L79_adls_per_addr_curr_i and r_L79_adls_per_addr_curr_i < 17.5) => map(
+   (NULL < f_attr_arrest_recency_d and f_attr_arrest_recency_d < 79.5) => map(
+      (NULL < c_pop_65_74_p and c_pop_65_74_p < 4.75) => -0.0250305589316534, 
+      (c_pop_65_74_p >= 4.75) => 0.16306733129639, 
+      (c_pop_65_74_p = NULL) => 0.0783514876058971, 0.0783514876058971), 
+   (f_attr_arrest_recency_d >= 79.5) => map(
+      (NULL < C_INC_15K_P and C_INC_15K_P < 3.55) => -0.0299201699252172, 
+      (C_INC_15K_P >= 3.55) => map(
+         (NULL < f_liens_rel_CJ_total_amt_i and f_liens_rel_CJ_total_amt_i < 1205) => 0.0035864284780403, 
+         (f_liens_rel_CJ_total_amt_i >= 1205) => map(
+            (NULL < f_srchfraudsrchcount_i and f_srchfraudsrchcount_i < 3.5) => -0.0330766582978137, 
+            (f_srchfraudsrchcount_i >= 3.5) => -0.181326199251853, 
+            (f_srchfraudsrchcount_i = NULL) => -0.0757333658364759, -0.0757333658364759), 
+         (f_liens_rel_CJ_total_amt_i = NULL) => 0.00233525315105538, 0.00233525315105538), 
+      (C_INC_15K_P = NULL) => 0.0126658573617719, -0.00572958832909401), 
+   (f_attr_arrest_recency_d = NULL) => -0.0051441402081477, -0.0051441402081477), 
+(r_L79_adls_per_addr_curr_i >= 17.5) => 0.14710843841864, 
+(r_L79_adls_per_addr_curr_i = NULL) => map(
+   (NULL < c_hval_80k_p and c_hval_80k_p < 1.45) => -0.0360642085743402, 
+   (c_hval_80k_p >= 1.45) => 0.081828806987355, 
+   (c_hval_80k_p = NULL) => 0.00448498149146575, 0.00448498149146575), -0.00466155358028328);
+
+// Tree: 6
+adj_FLAPS__tree_6 := map(
+(NULL < r_C12_NonDerog_Recency_i and r_C12_NonDerog_Recency_i < 30) => map(
+   (NULL < c_lowinc and c_lowinc < 70.25) => map(
+      (NULL < f_assocsuspicousidcount_i and f_assocsuspicousidcount_i < 7.5) => map(
+         (NULL < r_D33_eviction_count_i and r_D33_eviction_count_i < 4.5) => -0.00246138042697716, 
+         (r_D33_eviction_count_i >= 4.5) => -0.0954931655313686, 
+         (r_D33_eviction_count_i = NULL) => -0.00277058227834453, -0.00277058227834453), 
+      (f_assocsuspicousidcount_i >= 7.5) => map(
+         (NULL < f_sourcerisktype_i and f_sourcerisktype_i < 6.5) => map(
+            (NULL < c_pop_65_74_p and c_pop_65_74_p < 2.15) => 0.126122124187478, 
+            (c_pop_65_74_p >= 2.15) => 0.0111570818069996, 
+            (c_pop_65_74_p = NULL) => 0.0261833388875553, 0.0261833388875553), 
+         (f_sourcerisktype_i >= 6.5) => 0.124428404253294, 
+         (f_sourcerisktype_i = NULL) => 0.0367752161217054, 0.0367752161217054), 
+      (f_assocsuspicousidcount_i = NULL) => -0.000780044001272412, -0.000780044001272412), 
+   (c_lowinc >= 70.25) => map(
+      (NULL < c_rental and c_rental < 181.5) => 0.0311994673127894, 
+      (c_rental >= 181.5) => 0.184400085831376, 
+      (c_rental = NULL) => 0.0680109233525912, 0.0680109233525912), 
+   (c_lowinc = NULL) => -0.0140127808042089, -6.09554423206251e-05), 
+(r_C12_NonDerog_Recency_i >= 30) => 0.150387013097293, 
+(r_C12_NonDerog_Recency_i = NULL) => -0.00619586812078219, 0.000332355103219493);
+
+// Tree: 7
+adj_FLAPS__tree_7 := map(
+(NULL < f_attr_arrest_recency_d and f_attr_arrest_recency_d < 79.5) => 0.0893449923331927, 
+(f_attr_arrest_recency_d >= 79.5) => map(
+   (NULL < f_srchfraudsrchcount_i and f_srchfraudsrchcount_i < 4.5) => 0.0016638603634485, 
+   (f_srchfraudsrchcount_i >= 4.5) => map(
+      (NULL < c_old_homes and c_old_homes < 162.5) => map(
+         (NULL < f_mos_inq_banko_cm_lseen_d and f_mos_inq_banko_cm_lseen_d < 12.5) => map(
+            (NULL < f_inq_QuizProvider_count_i and f_inq_QuizProvider_count_i < 0.5) => -0.158123383678441, 
+            (f_inq_QuizProvider_count_i >= 0.5) => -0.00417377786843741, 
+            (f_inq_QuizProvider_count_i = NULL) => -0.0891114914187844, -0.0891114914187844), 
+         (f_mos_inq_banko_cm_lseen_d >= 12.5) => -0.00793510747475755, 
+         (f_mos_inq_banko_cm_lseen_d = NULL) => -0.0160318061312555, -0.0160318061312555), 
+      (c_old_homes >= 162.5) => map(
+         (NULL < f_add_input_nhood_MFD_pct_i and f_add_input_nhood_MFD_pct_i < 0.1991548099) => 0.0240148084752992, 
+         (f_add_input_nhood_MFD_pct_i >= 0.1991548099) => -0.136909497171588, 
+         (f_add_input_nhood_MFD_pct_i = NULL) => -0.0870323731991613, -0.0870323731991613), 
+      (c_old_homes = NULL) => -0.0253181284308695, -0.0253181284308695), 
+   (f_srchfraudsrchcount_i = NULL) => -0.000274947928092824, -0.000274947928092824), 
+(f_attr_arrest_recency_d = NULL) => map(
+   (NULL < c_rnt750_p and c_rnt750_p < 10.25) => -0.0775577608001979, 
+   (c_rnt750_p >= 10.25) => 0.0689210019299077, 
+   (c_rnt750_p = NULL) => 0.00976611698121121, 0.00976611698121121), 0.000445358074995534);
+
+// Tree: 8
+adj_FLAPS__tree_8 := map(
+(NULL < r_D33_eviction_count_i and r_D33_eviction_count_i < 1.5) => map(
+   (NULL < r_A46_Curr_AVM_AutoVal_d and r_A46_Curr_AVM_AutoVal_d < 21798) => map(
+      (NULL < c_rnt1000_p and c_rnt1000_p < 2.05) => -0.0276365527722743, 
+      (c_rnt1000_p >= 2.05) => 0.205297128626885, 
+      (c_rnt1000_p = NULL) => 0.0935519166043154, 0.0935519166043154), 
+   (r_A46_Curr_AVM_AutoVal_d >= 21798) => map(
+      (NULL < f_inq_HighRiskCredit_count24_i and f_inq_HighRiskCredit_count24_i < 7.5) => -0.00737945925149796, 
+      (f_inq_HighRiskCredit_count24_i >= 7.5) => 0.0869574596184389, 
+      (f_inq_HighRiskCredit_count24_i = NULL) => -0.00690980680714786, -0.00690980680714786), 
+   (r_A46_Curr_AVM_AutoVal_d = NULL) => 0.00620546629752181, -0.00050491502802557), 
+(r_D33_eviction_count_i >= 1.5) => map(
+   (NULL < f_mos_inq_banko_om_lseen_d and f_mos_inq_banko_om_lseen_d < 30.5) => -0.137002500703316, 
+   (f_mos_inq_banko_om_lseen_d >= 30.5) => map(
+      (NULL < f_rel_incomeover75_count_d and f_rel_incomeover75_count_d < 1.5) => -0.0510690975298575, 
+      (f_rel_incomeover75_count_d >= 1.5) => 0.0427480507206296, 
+      (f_rel_incomeover75_count_d = NULL) => -0.00261408689499053, -0.00261408689499053), 
+   (f_mos_inq_banko_om_lseen_d = NULL) => -0.0416076162901524, -0.0416076162901524), 
+(r_D33_eviction_count_i = NULL) => map(
+   (NULL < c_old_homes and c_old_homes < 48.5) => 0.080750236266903, 
+   (c_old_homes >= 48.5) => -0.0410247880043521, 
+   (c_old_homes = NULL) => -0.00427611204083726, -0.00427611204083726), -0.00137424213962878);
+
+// Tree: 9
+adj_FLAPS__tree_9 := map(
+(NULL < f_divrisktype_i and f_divrisktype_i < 4.5) => map(
+   (NULL < k_nap_phn_verd_d and k_nap_phn_verd_d < 0.5) => map(
+      (NULL < k_comb_age_d and k_comb_age_d < 32.5) => -0.0129568650657548, 
+      (k_comb_age_d >= 32.5) => map(
+         (NULL < f_prevaddrmedianvalue_d and f_prevaddrmedianvalue_d < 230158.5) => 0.00432668157425887, 
+         (f_prevaddrmedianvalue_d >= 230158.5) => 0.0652321323883177, 
+         (f_prevaddrmedianvalue_d = NULL) => 0.0304740216651221, 0.0304740216651221), 
+      (k_comb_age_d = NULL) => 0.0124215747913782, 0.0124215747913782), 
+   (k_nap_phn_verd_d >= 0.5) => -0.0116427330875441, 
+   (k_nap_phn_verd_d = NULL) => -0.0026225090152055, -0.0026225090152055), 
+(f_divrisktype_i >= 4.5) => map(
+   (NULL < f_add_input_nhood_MFD_pct_i and f_add_input_nhood_MFD_pct_i < 0.1984840542) => 0.151819774766039, 
+   (f_add_input_nhood_MFD_pct_i >= 0.1984840542) => 0.016385804913821, 
+   (f_add_input_nhood_MFD_pct_i = NULL) => 0.0565143885737376, 0.0565143885737376), 
+(f_divrisktype_i = NULL) => map(
+   (NULL < c_hh3_p and c_hh3_p < 13.05) => -0.0753575215497896, 
+   (c_hh3_p >= 13.05) => map(
+      (NULL < c_blue_empl and c_blue_empl < 74.5) => -0.0222345584690939, 
+      (c_blue_empl >= 74.5) => 0.110240898607278, 
+      (c_blue_empl = NULL) => 0.0440031700690921, 0.0440031700690921), 
+   (c_hh3_p = NULL) => -0.000124115923342923, -0.000124115923342923), -0.00165520770203227);
+
+// Tree: 10
+adj_FLAPS__tree_10 := map(
+(NULL < r_A46_Curr_AVM_AutoVal_d and r_A46_Curr_AVM_AutoVal_d < 21939) => map(
+   (NULL < c_rental and c_rental < 98.5) => -0.00327521023423288, 
+   (c_rental >= 98.5) => 0.164998830089151, 
+   (c_rental = NULL) => 0.0900897411709994, 0.0900897411709994), 
+(r_A46_Curr_AVM_AutoVal_d >= 21939) => map(
+   (NULL < f_corrssnaddrcount_d and f_corrssnaddrcount_d < 1.5) => map(
+      (NULL < f_add_curr_nhood_VAC_pct_i and f_add_curr_nhood_VAC_pct_i < 0.0523238562) => map(
+         (NULL < c_rnt1000_p and c_rnt1000_p < 27.7) => 0.0354980123818416, 
+         (c_rnt1000_p >= 27.7) => 0.162506294073715, 
+         (c_rnt1000_p = NULL) => 0.0743780986140478, 0.0743780986140478), 
+      (f_add_curr_nhood_VAC_pct_i >= 0.0523238562) => -0.0497698778073171, 
+      (f_add_curr_nhood_VAC_pct_i = NULL) => 0.0486361297497753, 0.0486361297497753), 
+   (f_corrssnaddrcount_d >= 1.5) => map(
+      (NULL < f_attr_arrest_recency_d and f_attr_arrest_recency_d < 99.5) => 0.0805085461289756, 
+      (f_attr_arrest_recency_d >= 99.5) => -0.00711205196609591, 
+      (f_attr_arrest_recency_d = NULL) => -0.00618291049393298, -0.00618291049393298), 
+   (f_corrssnaddrcount_d = NULL) => -0.00422361834263346, -0.00422361834263346), 
+(r_A46_Curr_AVM_AutoVal_d = NULL) => map(
+   (NULL < r_C10_M_Hdr_FS_d and r_C10_M_Hdr_FS_d < 2.5) => -0.0921933493275584, 
+   (r_C10_M_Hdr_FS_d >= 2.5) => 0.00078322005041517, 
+   (r_C10_M_Hdr_FS_d = NULL) => 0.0211577947614648, 0.000537196911274637), -0.00138173072152949);
+
+// Tree: 11
+adj_FLAPS__tree_11 := map(
+(NULL < r_C21_M_Bureau_ADL_FS_d and r_C21_M_Bureau_ADL_FS_d < 1.5) => -0.109414631655583, 
+(r_C21_M_Bureau_ADL_FS_d >= 1.5) => map(
+   (NULL < r_P88_Phn_Dst_to_Inp_Add_i and r_P88_Phn_Dst_to_Inp_Add_i < 1435) => map(
+      (NULL < f_srchphonesrchcount_i and f_srchphonesrchcount_i < 19.5) => -0.0109501388109629, 
+      (f_srchphonesrchcount_i >= 19.5) => 0.125144792208565, 
+      (f_srchphonesrchcount_i = NULL) => -0.0103342332695881, -0.0103342332695881), 
+   (r_P88_Phn_Dst_to_Inp_Add_i >= 1435) => map(
+      (NULL < c_hval_250k_p and c_hval_250k_p < 10.4) => -0.0546588625170117, 
+      (c_hval_250k_p >= 10.4) => 0.183384532844235, 
+      (c_hval_250k_p = NULL) => 0.0299091858350101, 0.0299091858350101), 
+   (r_P88_Phn_Dst_to_Inp_Add_i = NULL) => map(
+      (NULL < k_inq_per_addr_i and k_inq_per_addr_i < 7.5) => 0.00813649468598967, 
+      (k_inq_per_addr_i >= 7.5) => map(
+         (NULL < c_ab_av_edu and c_ab_av_edu < 104.5) => 0.130155187121935, 
+         (c_ab_av_edu >= 104.5) => -0.00815344859750324, 
+         (c_ab_av_edu = NULL) => 0.0705964444676315, 0.0705964444676315), 
+      (k_inq_per_addr_i = NULL) => 0.0106940435708968, 0.0106940435708968), -0.00423809519761458), 
+(r_C21_M_Bureau_ADL_FS_d = NULL) => map(
+   (NULL < c_low_ed and c_low_ed < 48.55) => -0.0530237195672569, 
+   (c_low_ed >= 48.55) => 0.0564034829548291, 
+   (c_low_ed = NULL) => -0.0161238489493441, -0.0161238489493441), -0.00469325791037568);
+
+// Tree: 12
+adj_FLAPS__tree_12 := map(
+(NULL < r_C20_email_verification_d and r_C20_email_verification_d < 4.5) => map(
+   (NULL < k_comb_age_d and k_comb_age_d < 44.5) => 0.0128219950529174, 
+   (k_comb_age_d >= 44.5) => map(
+      (NULL < c_burglary and c_burglary < 78) => 0.29503368693678, 
+      (c_burglary >= 78) => 0.00428112167275001, 
+      (c_burglary = NULL) => 0.138474613333072, 0.138474613333072), 
+   (k_comb_age_d = NULL) => 0.0442351496229559, 0.0442351496229559), 
+(r_C20_email_verification_d >= 4.5) => -0.0766130827433241, 
+(r_C20_email_verification_d = NULL) => map(
+   (NULL < c_exp_prod and c_exp_prod < 38.5) => map(
+      (NULL < f_phone_ver_insurance_d and f_phone_ver_insurance_d < 3.5) => map(
+         (NULL < r_D31_attr_bankruptcy_recency_d and r_D31_attr_bankruptcy_recency_d < 30) => map(
+            (NULL < f_rel_ageover40_count_d and f_rel_ageover40_count_d < 6.5) => 0.0499581943045022, 
+            (f_rel_ageover40_count_d >= 6.5) => 0.165726860579712, 
+            (f_rel_ageover40_count_d = NULL) => 0.065430208320181, 0.065430208320181), 
+         (r_D31_attr_bankruptcy_recency_d >= 30) => -0.0972968890067359, 
+         (r_D31_attr_bankruptcy_recency_d = NULL) => 0.0550433723205905, 0.0550433723205905), 
+      (f_phone_ver_insurance_d >= 3.5) => -0.0159092250624399, 
+      (f_phone_ver_insurance_d = NULL) => 0.0254394677708202, 0.0254394677708202), 
+   (c_exp_prod >= 38.5) => -0.00544422478827285, 
+   (c_exp_prod = NULL) => -0.00812668907028771, -0.00271654521262722), -0.00204979266267207);
+
+// Tree: 13
+adj_FLAPS__tree_13 := map(
+(NULL < f_srchaddrsrchcount_i and f_srchaddrsrchcount_i < 38.5) => map(
+   (NULL < k_comb_age_d and k_comb_age_d < 76.5) => -0.00184181424386601, 
+   (k_comb_age_d >= 76.5) => map(
+      (NULL < k_inq_per_addr_i and k_inq_per_addr_i < 1.5) => map(
+         (NULL < r_C10_M_Hdr_FS_d and r_C10_M_Hdr_FS_d < 494.5) => map(
+            (NULL < f_util_adl_count_n and f_util_adl_count_n < 1.5) => -0.0575508896367053, 
+            (f_util_adl_count_n >= 1.5) => 0.0816932523346461, 
+            (f_util_adl_count_n = NULL) => -0.0109793691800709, -0.0109793691800709), 
+         (r_C10_M_Hdr_FS_d >= 494.5) => 0.150744371117306, 
+         (r_C10_M_Hdr_FS_d = NULL) => 0.0162774409824084, 0.0162774409824084), 
+      (k_inq_per_addr_i >= 1.5) => 0.139045597805689, 
+      (k_inq_per_addr_i = NULL) => 0.0342363320284998, 0.0342363320284998), 
+   (k_comb_age_d = NULL) => -0.00104003493265429, -0.00104003493265429), 
+(f_srchaddrsrchcount_i >= 38.5) => 0.104301726047, 
+(f_srchaddrsrchcount_i = NULL) => map(
+   (NULL < c_pop_85p_p and c_pop_85p_p < 1.75) => map(
+      (NULL < f_add_input_nhood_VAC_pct_i and f_add_input_nhood_VAC_pct_i < 0.0338161815) => -0.0273416393630978, 
+      (f_add_input_nhood_VAC_pct_i >= 0.0338161815) => 0.103605287353112, 
+      (f_add_input_nhood_VAC_pct_i = NULL) => 0.0265155643669563, 0.0265155643669563), 
+   (c_pop_85p_p >= 1.75) => -0.0968188822694103, 
+   (c_pop_85p_p = NULL) => -0.010415089145628, -0.010415089145628), -0.000754711197056651);
+
+// Tree: 14
+adj_FLAPS__tree_14 := map(
+(NULL < c_exp_prod and c_exp_prod < 23.5) => map(
+   (NULL < r_L79_adls_per_addr_curr_i and r_L79_adls_per_addr_curr_i < 6.5) => map(
+      (NULL < c_pop_45_54_p and c_pop_45_54_p < 8.55) => 0.00948915162592489, 
+      (c_pop_45_54_p >= 8.55) => 0.104083095684266, 
+      (c_pop_45_54_p = NULL) => 0.060218968399148, 0.060218968399148), 
+   (r_L79_adls_per_addr_curr_i >= 6.5) => -0.0669033893178121, 
+   (r_L79_adls_per_addr_curr_i = NULL) => 0.0466368677547189, 0.0466368677547189), 
+(c_exp_prod >= 23.5) => map(
+   (NULL < f_srchfraudsrchcount_i and f_srchfraudsrchcount_i < 5.5) => -0.00185277858572094, 
+   (f_srchfraudsrchcount_i >= 5.5) => map(
+      (NULL < c_rich_old and c_rich_old < 143.5) => -0.0549007521103039, 
+      (c_rich_old >= 143.5) => map(
+         (NULL < f_add_input_nhood_BUS_pct_i and f_add_input_nhood_BUS_pct_i < 0.01905417085) => 0.110323820882831, 
+         (f_add_input_nhood_BUS_pct_i >= 0.01905417085) => -0.0177898338352743, 
+         (f_add_input_nhood_BUS_pct_i = NULL) => 0.022089903041957, 0.022089903041957), 
+      (c_rich_old = NULL) => -0.0315781324752159, -0.0315781324752159), 
+   (f_srchfraudsrchcount_i = NULL) => map(
+      (NULL < c_robbery and c_robbery < 107.5) => 0.0607631513282263, 
+      (c_robbery >= 107.5) => -0.068273004830009, 
+      (c_robbery = NULL) => 0.00481740530157887, 0.00481740530157887), -0.00328841101761281), 
+(c_exp_prod = NULL) => -0.00467424998786349, -0.00109661472867957);
+
+// Tree: 15
+adj_FLAPS__tree_15 := map(
+(NULL < r_D33_Eviction_Recency_d and r_D33_Eviction_Recency_d < 30) => map(
+   (NULL < f_curraddrmurderindex_i and f_curraddrmurderindex_i < 136.5) => 0.126640401493878, 
+   (f_curraddrmurderindex_i >= 136.5) => -0.0460505919185805, 
+   (f_curraddrmurderindex_i = NULL) => 0.0635417692854796, 0.0635417692854796), 
+(r_D33_Eviction_Recency_d >= 30) => map(
+   (NULL < f_corrphonelastnamecount_d and f_corrphonelastnamecount_d < 0.5) => map(
+      (NULL < f_rel_under100miles_cnt_d and f_rel_under100miles_cnt_d < 0.5) => map(
+         (NULL < f_corrssnaddrcount_d and f_corrssnaddrcount_d < 2.5) => 0.145387114627159, 
+         (f_corrssnaddrcount_d >= 2.5) => 0.0363541602805703, 
+         (f_corrssnaddrcount_d = NULL) => 0.0662920223214979, 0.0662920223214979), 
+      (f_rel_under100miles_cnt_d >= 0.5) => map(
+         (NULL < f_mos_liens_unrel_SC_fseen_d and f_mos_liens_unrel_SC_fseen_d < 111.5) => -0.0690348914182311, 
+         (f_mos_liens_unrel_SC_fseen_d >= 111.5) => map(
+            (NULL < c_urban_p and c_urban_p < 98.55) => -0.0200873242354249, 
+            (c_urban_p >= 98.55) => 0.0188147591843922, 
+            (c_urban_p = NULL) => -0.0352271231100717, 0.0055248182603306), 
+         (f_mos_liens_unrel_SC_fseen_d = NULL) => 0.00357243399178045, 0.00357243399178045), 
+      (f_rel_under100miles_cnt_d = NULL) => 0.00202934580334548, 0.00578938419534766), 
+   (f_corrphonelastnamecount_d >= 0.5) => -0.0167361202783347, 
+   (f_corrphonelastnamecount_d = NULL) => -0.00686403956742061, -0.00686403956742061), 
+(r_D33_Eviction_Recency_d = NULL) => -0.0144542684471085, -0.00635819759487695);
+
+// Tree: 16
+adj_FLAPS__tree_16 := map(
+(NULL < f_corrssnaddrcount_d and f_corrssnaddrcount_d < 4.5) => map(
+   (NULL < f_phone_ver_experian_d and f_phone_ver_experian_d < 0.5) => map(
+      (NULL < c_exp_prod and c_exp_prod < 36.5) => 0.0867593524748027, 
+      (c_exp_prod >= 36.5) => map(
+         (NULL < c_hh00 and c_hh00 < 499.5) => -0.0200886921265646, 
+         (c_hh00 >= 499.5) => 0.0339740119980223, 
+         (c_hh00 = NULL) => 0.017028985332107, 0.017028985332107), 
+      (c_exp_prod = NULL) => -0.0620733231080428, 0.0194352653679009), 
+   (f_phone_ver_experian_d >= 0.5) => -0.0162465194964168, 
+   (f_phone_ver_experian_d = NULL) => map(
+      (NULL < c_unemp and c_unemp < 6.45) => -0.000782066556323642, 
+      (c_unemp >= 6.45) => map(
+         (NULL < r_C14_Addr_Stability_v2_d and r_C14_Addr_Stability_v2_d < 1.5) => 0.0211532738409373, 
+         (r_C14_Addr_Stability_v2_d >= 1.5) => map(
+            (NULL < c_cpiall and c_cpiall < 209.3) => 0.163268379975364, 
+            (c_cpiall >= 209.3) => 0.0366823489870545, 
+            (c_cpiall = NULL) => 0.0661953843017447, 0.0661953843017447), 
+         (r_C14_Addr_Stability_v2_d = NULL) => 0.0543520136422777, 0.0543520136422777), 
+      (c_unemp = NULL) => 0.0553365264823032, 0.012700395407729), 0.00199561603749899), 
+(f_corrssnaddrcount_d >= 4.5) => -0.0196157477107025, 
+(f_corrssnaddrcount_d = NULL) => 0.0122343586320248, -0.00693704097111136);
+
+// Tree: 17
+adj_FLAPS__tree_17 := map(
+(NULL < r_D31_ALL_Bk_i and r_D31_ALL_Bk_i < 1.5) => map(
+   (NULL < r_C22_stl_recency_d and r_C22_stl_recency_d < 9) => map(
+      (NULL < f_rel_homeover50_count_d and f_rel_homeover50_count_d < 48.5) => 0.00291386486581267, 
+      (f_rel_homeover50_count_d >= 48.5) => 0.119461482945618, 
+      (f_rel_homeover50_count_d = NULL) => 0.000289332591953896, 0.00352769534664828), 
+   (r_C22_stl_recency_d >= 9) => 0.0948198915760125, 
+   (r_C22_stl_recency_d = NULL) => 0.00392807630198436, 0.00392807630198436), 
+(r_D31_ALL_Bk_i >= 1.5) => map(
+   (NULL < r_I60_inq_hiRiskCred_recency_d and r_I60_inq_hiRiskCred_recency_d < 9) => -0.102270150167381, 
+   (r_I60_inq_hiRiskCred_recency_d >= 9) => map(
+      (NULL < f_inq_QuizProvider_count24_i and f_inq_QuizProvider_count24_i < 0.5) => -0.0356460386548599, 
+      (f_inq_QuizProvider_count24_i >= 0.5) => map(
+         (NULL < c_hval_175k_p and c_hval_175k_p < 3.45) => -0.0341171514848466, 
+         (c_hval_175k_p >= 3.45) => 0.194311400996749, 
+         (c_hval_175k_p = NULL) => 0.0910219685702882, 0.0910219685702882), 
+      (f_inq_QuizProvider_count24_i = NULL) => -0.0270418916785504, -0.0270418916785504), 
+   (r_I60_inq_hiRiskCred_recency_d = NULL) => -0.0295752633970669, -0.0295752633970669), 
+(r_D31_ALL_Bk_i = NULL) => map(
+   (NULL < c_child and c_child < 25.8) => -0.036239452161316, 
+   (c_child >= 25.8) => 0.0779944956030516, 
+   (c_child = NULL) => 0.00139055416106391, 0.00139055416106391), 0.000819894244631229);
+
+
 // Final Score Sum 
 
    woFDN_FLAPS__lgt := sum(
@@ -7198,10 +7612,15 @@ woFDN_FLAPS__lgt_267 := map(
       woFDN_FLAPS__lgt_260, woFDN_FLAPS__lgt_261, woFDN_FLAPS__lgt_262, woFDN_FLAPS__lgt_263, woFDN_FLAPS__lgt_264, 
       woFDN_FLAPS__lgt_265, woFDN_FLAPS__lgt_266, woFDN_FLAPS__lgt_267); 
 
+      adjusted_tree_score := sum(adj_FLAPS__tree_0, adj_FLAPS__tree_1, adj_FLAPS__tree_2, adj_FLAPS__tree_3, 
+      adj_FLAPS__tree_4, adj_FLAPS__tree_5, adj_FLAPS__tree_6, adj_FLAPS__tree_7, adj_FLAPS__tree_8,
+      adj_FLAPS__tree_9, adj_FLAPS__tree_10, adj_FLAPS__tree_11, adj_FLAPS__tree_12, adj_FLAPS__tree_13, 
+      adj_FLAPS__tree_14, adj_FLAPS__tree_15, adj_FLAPS__tree_16, adj_FLAPS__tree_17);
+      
 // *** Here begins the code to populate the output of the transform.  Note the variable names from each sub model must
 //     be transformed to their "final_score" equivalent name so that all sub models can use the same layout.
-			
-		FP3_woFDN_LGT := woFDN_FLAPS__lgt;
+    
+		FP3_woFDN_LGT := woFDN_FLAPS__lgt + adjusted_tree_score;
 			
 self.final_score_0	:= 	woFDN_FLAPS__lgt_0	;
 self.final_score_1	:= 	woFDN_FLAPS__lgt_1	;
@@ -7471,8 +7890,28 @@ self.final_score_264	:= 	woFDN_FLAPS__lgt_264	;
 self.final_score_265	:= 	woFDN_FLAPS__lgt_265	;
 self.final_score_266	:= 	woFDN_FLAPS__lgt_266	;
 self.final_score_267	:= 	woFDN_FLAPS__lgt_267	;
+self.final_adj_score0 :=  adj_FLAPS__tree_0     ;
+self.final_adj_score1 :=  adj_FLAPS__tree_1     ;
+self.final_adj_score2 :=  adj_FLAPS__tree_2     ;
+self.final_adj_score3 :=  adj_FLAPS__tree_3     ;
+self.final_adj_score4 :=  adj_FLAPS__tree_4     ;
+self.final_adj_score5 :=  adj_FLAPS__tree_5     ;
+self.final_adj_score6 :=  adj_FLAPS__tree_6     ;
+self.final_adj_score7 :=  adj_FLAPS__tree_7     ;
+self.final_adj_score8 :=  adj_FLAPS__tree_8     ;
+self.final_adj_score9 :=  adj_FLAPS__tree_9     ;
+self.final_adj_score10 :=  adj_FLAPS__tree_10   ;
+self.final_adj_score11 :=  adj_FLAPS__tree_11   ;
+self.final_adj_score12 :=  adj_FLAPS__tree_12   ;
+self.final_adj_score13 :=  adj_FLAPS__tree_13   ;
+self.final_adj_score14 :=  adj_FLAPS__tree_14   ;
+self.final_adj_score15 :=  adj_FLAPS__tree_15   ;
+self.final_adj_score16 :=  adj_FLAPS__tree_16   ;
+self.final_adj_score17 :=  adj_FLAPS__tree_17   ;
 // self.woFDN_submodel_lgt	:= 	woFDN_FLAPS__lgt	;
-self.FP3_woFDN_LGT		:= 	woFDN_FLAPS__lgt	;
+self.orig_FDN_FLAPS__LGT := woFDN_FLAPS__lgt;
+self.adj_FDN_FLAPS__LGT := adjusted_tree_score;
+self.FP3_woFDN_LGT		:= 	FP3_woFDN_LGT	;
 self	:= le;
 self	:= [];
 

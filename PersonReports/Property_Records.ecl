@@ -1,4 +1,4 @@
-﻿import iesp, doxie, LN_PropertyV2_Services, address, fcra, std, FFD, AutoStandardI;
+﻿import $, iesp, doxie, LN_PropertyV2_Services, address, fcra, std, FFD;
 
 iesp.share.t_Address SetPartyAddress (LN_PropertyV2_Services.layouts.parties.pparty P) := iesp.ECL2ESP.SetAddress (
   P.prim_name, P.prim_range, P.predir, P.postdir, P.suffix, P.unit_desig, P.sec_range,
@@ -6,25 +6,12 @@ iesp.share.t_Address SetPartyAddress (LN_PropertyV2_Services.layouts.parties.ppa
 
 EXPORT property_records (
   dataset (doxie.layout_references) dids,
-  input.property in_params = module (input.property) end,
+  doxie.IDataAccess mod_access,
+  $.IParam.property in_params = module ($.IParam.property) end,
   boolean IsFCRA = false,
 	dataset (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
 	dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
 ) := MODULE
-
-  gmod := AutoStandardI.GlobalModule (IsFCRA);
-
-  shared mod_access := MODULE (PROJECT (in_params, doxie.IDataAccess, DataPermissionMask, DataRestrictionMask, ln_branded, probation_override))
-    EXPORT unsigned1 glb := in_params.GLBPurpose;
-    EXPORT unsigned1 dppa := in_params.DPPAPurpose;
-    EXPORT string5 industry_class := in_params.industryclass; 
-    EXPORT string32 application_type := AutoStandardI.InterfaceTranslator.application_type_val.val(project(gmod,AutoStandardI.InterfaceTranslator.application_type_val.params));
-    EXPORT boolean no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(gmod,AutoStandardI.InterfaceTranslator.no_scrub.params));
-    EXPORT unsigned3 date_threshold := in_params.dateVal;
-    EXPORT boolean suppress_dmv := gmod.SuppressDMVInfo;
-    EXPORT string ssn_mask := in_params.ssn_mask; 
-    EXPORT unsigned1 dl_mask :=	AutoStandardI.InterfaceTranslator.dl_mask_val.val(project(gmod,AutoStandardI.InterfaceTranslator.dl_mask_val.params)); ;
-  END;
 
   shared input_dids_set := SET (dids, did);
 
@@ -313,8 +300,6 @@ EXPORT property_records (
 	export fids := LN_PropertyV2_Services.Raw.get_fids_from_dids (dids,isFCRA);
 	export all_records := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(fids,,,in_params.non_subject_suppression,
 																																								isFCRA,slim_pc_recs,in_params.FFDOptionsMask, flagfile);
-                            // (in_params.use_nonsubjectproperty or owned,
-                             // ~in_params.use_currentlyownedproperty or current_record='Y');
 
   assess_ext format_assess_all (LN_PropertyV2_Services.layouts.combined.widest l) := TRANSFORM
     MAC_SetAssessments (true);

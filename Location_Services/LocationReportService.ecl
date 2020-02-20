@@ -27,7 +27,7 @@
 /*--INFO-- This service searches the Header for address variations, then uses joins against the property data.*/
 
 
-import Doxie_Raw,address,Royalty;
+import Doxie_Raw,address,Royalty, Doxie, AutoStandardI;
 export LocationReportService := MACRO
 #option('spotThroughAggregate', 0);
 #constant('isLocationReportService',true); //hacky workaround for bug 25247
@@ -53,8 +53,8 @@ Doxie_Raw.Layout_address_input caseFormat(Doxie_Raw.Layout_address_input L):= tr
     self := L;
 end;
 inputUp := project(inputOrig, caseFormat(left));
-
-locReport := Location_Services.location_report(inputUp, , useBusinessIds);
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+locReport := Location_Services.location_report(inputUp, mod_access, , useBusinessIds);
 
 
 doxie_raw.Layout_input intoInput(Doxie_Raw.Layout_address_input L) := transform
@@ -66,7 +66,7 @@ end;
 
 inputAllSrcs := PROJECT(inputUp, intoInput(LEFT));
 
-locSources := Location_Services.location_sources(inputAllSrcs, useBusinessIds);
+locSources := Location_Services.location_sources(inputAllSrcs, mod_access, useBusinessIds);
 
 Royalty.RoyaltyFares.MAC_SetC(locReport(do_royal=1), locReport(do_royal=0), royalties);
 

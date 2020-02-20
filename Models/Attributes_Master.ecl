@@ -1,4 +1,4 @@
-﻿import risk_indicators, ut, mdr, easi, riskwise, aml, riskview, std; 
+﻿import risk_indicators, ut, mdr, easi, riskwise, aml, riskview; 
 
 blankEasi := row( [], EASI.Layout_Easi_Census );
 blankBTST := row( [], Risk_Indicators.Layout_BocaShell_BtSt_Out );
@@ -2108,11 +2108,7 @@ shared BureauLastSeen_v5_temp := fixYYYY00((unsigned)max(bureau_source_last_seen
 shared BureauFirstSeen_v5 := if(clam.historydate=999999 and BureauFirstSeen_v5_temp>=clam.header_summary.header_build_date, clam.header_summary.header_build_date, BureauFirstSeen_v5_temp);
 shared BureauLastSeen_v5 := if(clam.historydate=999999 and BureauLastSeen_v5_temp>=clam.header_summary.header_build_date, clam.header_summary.header_build_date, BureauLastSeen_v5_temp);
 
-export string2 SubjectDeceased := map(not clam.truedid => '-1',
-	clam.iid.DIDDeceased => '1', 
-	StringLib.StringFind(clam.header_summary.ver_sources,mdr.sourcetools.src_Death_Master, 1) > 0 or
-	StringLib.StringFind(clam.header_summary.ver_sources,mdr.sourcetools.src_Death_State, 1) > 0 => '1', 
-	'0');
+export string2 SubjectDeceased := risk_indicators.iid_constants.LexidDeceased_Lookup(clam.truedid, clam.header_summary.ver_sources, clam.iid.DIDDeceased);
 
 	shared attr_felonies90 := clam.bjl.criminal_count90;	// criminal_count90 is felonies only in FCRA
 	shared attr_eviction_count90 := clam.bjl.eviction_count90;
@@ -2194,12 +2190,9 @@ export string1 InputProvidedState	:= if(trim(clam.shell_input.in_state)<>'', '1'
 export string1 InputProvidedZipCode	:= if(trim(clam.shell_input.in_zipcode)<>'', '1', '0');
 	
 	shared string in_ssn := trim(clam.shell_input.ssn);
-export string1 InputProvidedSSN := map(	
-		in_ssn in ['000000000','111111111','222222222','333333333','444444444','555555555','666666666','777777777','888888888','999999999'] => '0', // set repeating digits as not provided on input
-		clam.ADL_Shell_Flags.in_ssnpop=0 and clam.ADL_Shell_Flags.adl_ssn=1 => '1',
-		length(in_ssn)=4 => '2',
-		in_ssn<>'' and length(in_ssn)=9 => '3', 
-		'0');
+
+	export string1 InputProvidedSSN := Risk_Indicators.iid_constants.inputssnflag_Lookup(trim(clam.shell_input.ssn), clam.ADL_Shell_Flags.in_ssnpop, clam.ADL_Shell_Flags.adl_ssn); 
+  //moved into Risk_Indicators.iid_constants.inputssnflag_Lookup for deceased changes RQ-14868.  Making deceased logic in RV v5 alerts, models and attributes consistent
 
 export	string in_dob := clam.shell_input.dob;
 shared	yearofbirth := (unsigned)in_dob[1..4];
@@ -2609,7 +2602,7 @@ export string2 InquiryShortTerm12Month	:= if(not clam.truedid, '-1', checkboolea
 export string2 InquiryCollections12Month	:= if(not clam.truedid, '-1', checkboolean(clam.acc_logs.collection.count12>0) );
 
 export string3 SSNSubjectCount := if(not clam.truedid or InputProvidedSSN='0', '-1', capS( (string)clam.velocity_counters.adls_per_ssn_seen_18months, capZero, cap255) );
-export string2	SSNDeceased	:= map(not clam.truedid or InputProvidedSSN='0' => '-1', clam.iid.decsflag='1' => '1', '0');
+export string2	SSNDeceased	:= Risk_Indicators.iid_constants.SSNDeceased_Lookup(clam.truedid, InputProvidedSSN, clam.iid.decsflag);
 
 export string8 SSNDateLowIssued := if(not clam.truedid 
                                         or InputProvidedSSN='0' 

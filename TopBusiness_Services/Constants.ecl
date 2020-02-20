@@ -1,9 +1,15 @@
-import MDR, TopBusiness, BIPV2;
+﻿import MDR, TopBusiness, BIPV2;
 
 export constants:= module;
 
   EXPORT STRINGSIMILARCONSTANT := 5;
-
+  //v--- per the product requirements document, "... data is in hundreds(?) of thousands",
+  //     but on 09/21/12 Debra Winkleman in Risk Data Receiving contacted the data  
+  //     supplier and their contact person says it is in thousands.
+  // RQ-14844 - Sales is now in 100s;	
+  // RQ-16262 - Sales back to 1000s
+  EXPORT EbrAnnSalesMultiplier :=	1000;
+  
   // v--- leftover from BIP1?, no longer needed?
 	export unsigned4 section_ContactID                     :=  1 << 1;
 	//section_feinID                                       := 2;
@@ -54,7 +60,7 @@ export constants:= module;
 	export unsigned4 SearchFidKeyConstant := 10;	
 	export unsigned4 PropertyKeepConstant := 5;
 	export unsigned4 PropertyKeepDeedConstant := 50;
-	export unsigned4 PropertyKfetchMaxLimit := 10000;
+	export unsigned4 PropertyKfetchMaxLimit := 5000;
 	export unsigned4 ForeclosureNODKfetchMaxLimit := 500;
 	export unsigned4 OtherCompanyNamesVariationsMax := 199;
 	export unsigned4 BusHeaderKfetchMaxLimitLarger := 17000;
@@ -106,6 +112,8 @@ export constants:= module;
 		MDR.SourceTools.SourceIsSheila_Greco(src),
 		MDR.SourceTools.SourceIsINFOUSA_DEAD_COMPANIES(src),
 		MDR.SourceTools.SourceIsSpoke(src),
+		MDR.SourceTools.SourceIsEquifax_Business_Data(src),
+		MDR.SourceTools.SourceIsInfutor_NARB (src),
 		true);
 
 	export unsigned2 CompanyNameSourceOrder(string2 src) := which(
@@ -151,6 +159,8 @@ export constants:= module;
 		MDR.SourceTools.SourceIsIRS_Non_Profit(src),
 		MDR.SourceTools.SourceIsSheila_Greco(src),
 		MDR.SourceTools.SourceIsZoom(src),
+		MDR.SourceTools.SourceIsEquifax_Business_Data(src),
+		MDR.SourceTools.SourceIsInfutor_NARB (src),
 		true);
 
 	export unsigned2 PhoneSourceOrder(string2 src) := which(
@@ -281,6 +291,7 @@ export constants:= module;
 	 export string corpkey          := 'corpkey';          // for Corp/Incorporation data
 	 export string enterprisenumber := 'enterprisenumber'; // for DCAV2/LNCA
 	 export string filenumber       := 'filenumber';       // for EBR
+	 export string efxid := 'efx_id';  // for Experian bus data
 	 export string foreclosureid    := 'foreclosureid';    // for foreclosure & nod
 	 export string propertykeys     := 'ln_fares_id';      // for real property
 	 export string sourcerecid      := 'source_rec_id';    // for BusRegs & ???

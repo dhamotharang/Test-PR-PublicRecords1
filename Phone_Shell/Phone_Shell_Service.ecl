@@ -132,7 +132,7 @@
 */
 
 
-IMPORT Gateway, Phone_Shell, Relocations, Risk_Indicators;
+IMPORT Gateway, Phone_Shell, Relocations, Risk_Indicators, doxie;
 
 EXPORT Phone_Shell_Service() := FUNCTION
 // comment out these top 3 if running locally
@@ -212,7 +212,11 @@ EXPORT Phone_Shell_Service() := FUNCTION
                 'UsePremiumSource_A',
                 'PremiumSource_A_limit',
                 'Batch_Input',
-																'RunRelocation'
+				'RunRelocation',
+                'LexIdSourceOptout',
+                '_TransactionId',
+                '_BatchUID',
+                '_GCID'
                 ));
 
 
@@ -274,7 +278,7 @@ EXPORT Phone_Shell_Service() := FUNCTION
 	BOOLEAN Strict_APSX															:= FALSE : STORED('Strict_APSX_Match');
 	Unsigned2 Score_Threshold												:= Phone_Shell.constants.Default_PhoneScore : STORED('Score_Threshold');
 	// Boca Shell Options, Phone Shell version uses 2-digit notation so 10 value = phone shell 1.0
-	UNSIGNED1 PhoneShell_Version 										:= 10 : STORED('PhoneShell_Version');
+	UNSIGNED1 PhoneShell_Version 										:= 21 : STORED('PhoneShell_Version');
 	BOOLEAN BocaShell_IncludeRelatives 							:= TRUE : STORED('BocaShell_IncludeRelatives');
 	BOOLEAN BocaShell_IncludeDL 										:= FALSE : STORED('BocaShell_IncludeDL');
 	BOOLEAN BocaShell_IncludeVehicle 								:= FALSE : STORED('BocaShell_IncludeVehicle');
@@ -297,6 +301,22 @@ EXPORT Phone_Shell_Service() := FUNCTION
 	BOOLEAN UsePremiumSource_A											:= FALSE :STORED('UsePremiumSource_A');
 	INTEGER PremiumSource_A_limit										:= Phone_Shell.Constants.maxEQP_Phones :STORED('PremiumSource_A_limit');
  BOOLEAN RunRelocation														:= FALSE :STORED('RunRelocation');
+ 
+ //CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+
+mod_access := MODULE(Doxie.IDataAccess)
+	  EXPORT glb := glbpurpose;
+	  EXPORT dppa := dppapurpose;
+	  EXPORT DataRestrictionMask := ^.DataRestrictionMask;
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
+
 	Phone_Score_Model := StringLib.StringToUpperCase(Phone_Score_Model_Temp);
  ModelVersion      := StringLib.StringToUpperCase(ModelVersion_Temp);
 
@@ -374,22 +394,25 @@ EXPORT Phone_Shell_Service() := FUNCTION
 																							BocaShell_DoScore, BocaShell_SuppressNearDups, BocaShell_Require2Elements, BocaShell_AppendBest,
 																							BocaShell_OFAC_Version, BocaShell_Watchlist_Threshold, BocaShell_DOB_Radius,
 																							EnforceTestAccounts, EXISTS(batch), SX_Match_Restriction_Limit, Strict_APSX, BlankOutDuplicatePhones,  	
-																							UsePremiumSource_A, RunRelocation);
+																							UsePremiumSource_A, RunRelocation, mod_access);
 	//If batch has 1 using gateway and one not a the batch level they will all go against the gateway.
 	//As we don't have a way to call the gateway at the record level. It's at the dataset level.
 
 	model_results := MAP(Phone_Score_Model not in ['PHONESCORE_V2','COLLECTIONSCORE_V3'] => results,	// If no models called, just return the shell and attributes
 											           ModelVersion in ['V2'] and allowPremiumSource_A                 => Phone_Shell.PhoneScore_cp3_v2(results, Score_Threshold), 
 											           ModelVersion in ['V2'] and not allowPremiumSource_A             => Phone_Shell.PhoneScore_wf8_v2(results, Score_Threshold), 
-                      // Basically, ModelVersion = V2 calls the old models (above). This is the ONLY way to call the old v2 models. 
-                      // Anything else in ModelVersion (blank, V3, XYZ, etc) will call the new v3 models (below).
-                      allowPremiumSource_A                                            => Phone_Shell.PhoneScore_cp3_v3(results, Score_Threshold),
-											                                                                              Phone_Shell.PhoneScore_wf8_v3(results, Score_Threshold)
+                      // Basically, ModelVersion = V2 calls the old models (above). This is the ONLY way to call the old v2 models.
+                      ModelVersion in ['V3'] and allowPremiumSource_A                 => Phone_Shell.PhoneScore_cp3_v3(results, Score_Threshold),
+                      ModelVersion in ['V3'] and not allowPremiumSource_A             => Phone_Shell.PhoneScore_wf8_v3(results, Score_Threshold),
+                      // Basically, ModelVersion = V3 calls the next-older models (above). This is the ONLY way to call the v3 models.
+                      // Anything else in ModelVersion (blank, V4, XYZ, etc) will call the new combined model (below).
+                                                                                         Phone_Shell.PhoneModel_V21_1(results, Score_Threshold)
                      ); 
 
 // for debug, pick model
 // model_results := Phone_Shell.PhoneScore_cp3_v3(results, Score_Threshold); 
 // model_results := Phone_Shell.PhoneScore_wf8_v3(results, Score_Threshold); 
+// model_results := Phone_Shell.PhoneModel_V21_1(results, Score_Threshold); 
 
 // for debug, comment out the rest (start comment-out section)
 

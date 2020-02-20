@@ -1,9 +1,11 @@
-﻿import doxie, fcra, inquiry_acclogs, riskwise, gong, risk_indicators, ut, mdr;
+﻿import doxie, fcra, inquiry_acclogs, riskwise, gong, risk_indicators, ut, mdr, dx_header, data_services;
 
 EXPORT _Inquiries_data(	dataset (doxie.layout_references) bshell_dids, 
                       dataset (fcra.Layout_override_flag) ds_flagfile
 ) := function
-	
+
+  unsigned1 iType := data_services.data_env.iFCRA;
+
 	unsigned2 MAX_OVERRIDE_LIMIT := 100;
 					
 	temp := record
@@ -181,9 +183,10 @@ with_Lexids_per_ssn := join(with_lexids_per_phone, risk_indicators.key_ssn_table
 									 ),
 									 left outer, ATMOST(500), keep(1));
 									 
-dk := choosen(doxie.Key_FCRA_max_dt_last_seen, 1);
+dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
 header_build_date := (unsigned3)dk[1].max_date_last_seen[1..6];
-temp add_header_by_address(temp le, Doxie.Key_FCRA_Header_Address rt) := transform
+key_header_address := dx_header.key_header_address(iType);
+temp add_header_by_address(temp le, key_header_address rt) := transform
 	self.DID_from_addr_search := rt.did;
 	self.ssn_from_addr_search := rt.ssn;	
 	self.lexids_per_inquiry_address := if(rt.did!=0,1,0);
@@ -191,7 +194,7 @@ temp add_header_by_address(temp le, Doxie.Key_FCRA_Header_Address rt) := transfo
 	self := le;
 end;	
 
-header_by_inquiry_address := Join(with_Lexids_per_ssn, Doxie.Key_FCRA_Header_Address,
+header_by_inquiry_address := Join(with_Lexids_per_ssn, key_header_address,
 															left.person_q.prim_name!='' and left.person_q.zip5!='' and
 															keyed(left.person_q.prim_name=right.prim_name)/* and keyed(left.st=right.st)*/ and
 															keyed(left.person_q.zip5=right.zip) and keyed(left.person_q.prim_range=right.prim_range) and
@@ -274,4 +277,3 @@ return final;
 
 
 end;
-

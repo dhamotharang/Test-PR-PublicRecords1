@@ -30,7 +30,10 @@ boolean RetainInputDID := FALSE; //Change to TRUE to retain the input LexID
 
 // infile_name := '~scoringqa::phoneshell::in::jul18_pii.csv';
 // infile_name := '~scoringqa::in::shell_2_0_testfile_may_july_2018_input.csv';
-infile_name := '~scoringqa::phoneshell::nuestar_only_records_5k.csv';                   //Neustar only sample
+// infile_name := '~scoringqa::phoneshell::nuestar_only_records_5k.csv';                   //Neustar only sample
+// infile_name := '~scoringqa::in::phoneshell_testsample_nov18_jan19_input_3k_3of4.csv';               //Newest Sample subset From Blake/Ben W  3k
+infile_name := '~scoringqa::in::phoneshell_testsample_nov18_jan19_input_3k_4of4.csv';               //Newest Sample subset From Blake/Ben W  3k
+
 
 // outfile_name := '~Scoring::out::phoneshell_project_bocashell_41_nonFCRA_May_July_NoRestrictions' + '_PhonesPlusv2_Gong_Base_' + thorlib.wuid();          //Run with No Restrictions
 // outfile_name := '~Scoring::out::phoneshell_project_bocashell_41_nonFCRA_May_July_Restrictions' + '_PhonesPlusv2_Gong_Base_' + thorlib.wuid();           //Run with Restrictions
@@ -66,7 +69,7 @@ bs_service := 'risk_indicators.boca_shell';
 // roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP; 
 // roxieIP := RiskWise.Shortcuts.Dev156; 
 // RoxieIP := Riskwise.shortcuts.core_97_roxieIP; // Core Roxie
-RoxieIP := Roxie; // Core Roxie
+RoxieIP := Roxie;
 
 
 //====================================================
@@ -160,7 +163,7 @@ res_err := res (errorcode<>'');
 // OUTPUT (choosen(res_err, eyeball), NAMED ('res_err'));
 // output(count(res_err), named('error_count'));
 
-OUTPUT (res, , outfile_name, __compressed__);
+OUTPUT (res, , outfile_name, thor, __compressed__, overwrite);
 
 // the conversion portion-----------------------------------------------------------------------
 
@@ -171,6 +174,6 @@ isFCRA := false;
 edina := Risk_Indicators.ToEdina_v41(f, isFCRA, DataRestrictionMask);
 
 // OUTPUT(CHOOSEN(edina,eyeball), NAMED('edina'));
-Return OUTPUT(edina,, outfile_name + '_edina_v41_' + ThorLib.wuid() + '.csv',CSV(HEADING(single), QUOTE('"')), OVERWRITE); // Write to disk.
-
+// OUTPUT(edina,, outfile_name + '_edina_v41_' + ThorLib.wuid() + '.csv',CSV(HEADING(single), QUOTE('"')), OVERWRITE); // Write to disk.
+Return 0;
 END;

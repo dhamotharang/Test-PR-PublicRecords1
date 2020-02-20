@@ -1,4 +1,4 @@
-﻿import ut, riskwise, risk_indicators, AutoStandardI;
+﻿import ut, riskwise, risk_indicators, AutoStandardI, doxie, Gateway;
 
 export Boca_Shell := MACRO
 
@@ -44,7 +44,13 @@ export Boca_Shell := MACRO
 	'IncludeOfac',
 	'IncludeAdditionalWatchLists',
 	'GlobalWatchlistThreshold',
-	'gateways'));
+	'gateways',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID',
+		'TurnOffTumblings',
+		'UseIngestDate'));
 
 string30 account_value := '' 		: stored('AccountNumber');
 string30 fname_val := ''     		: stored('FirstName');
@@ -99,6 +105,14 @@ real watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
 unsigned1 ofac_version      := 1        : stored('OFACVersion');
 boolean   include_ofac       := false    : stored('IncludeOfac');
 boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
+boolean   TurnOffTumblings  := false    : stored('TurnOffTumblings');
+boolean UseIngestDate             := FALSE : stored('UseIngestDate'); 
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 rec := record
   unsigned4 seq;
@@ -125,7 +139,7 @@ risk_indicators.layout_input into(rec l) := transform
 	self.ssn := ssn_value;
 	self.dob := dob_value;
 				temp_age :=  if (age_value = 0 and (integer)dob_value != 0, 
-														(STRING)ut.GetAgeI_asOf((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING)ut.Age((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
 														(STRING)age_value);
 	self.age := if((integer)temp_age > 99, '99',temp_age);
 	
@@ -176,7 +190,7 @@ gateways_in := Gateway.Configuration.Get();
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(
-  bsversion >= 55 and stringlib.StringToLowerCase(trim(le.servicename)) = Gateway.Constants.ServiceName.ThreatMetrix => le.url, // TMX allowed for shell 5.5 and higher
+	bsversion >= 55 and stringlib.StringToLowerCase(trim(le.servicename)) in [Gateway.Constants.ServiceName.ThreatMetrix,Gateway.Constants.ServiceName.ThreatMetrix_test]  => le.url, // TMX allowed for shell 5.5 and higher
   bsversion >= 50 and stringlib.StringToLowerCase(trim(le.servicename))in[Gateway.Constants.ServiceName.InsurancePhoneHeader, Gateway.Constants.ServiceName.DeltaInquiry] => le.url, // insurance phones gateway allowed if shell version 50 or higher
                  le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
                   '');
@@ -216,7 +230,11 @@ unsigned8 BSOptions :=
 										 risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
 											0) +
 	if(RetainInputDID, Risk_Indicators.iid_constants.BSOptions.RetainInputDID, 0 ) +
-	if(bsVersion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0);
+	if(bsVersion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0) +
+	if(bsVersion >= 55, risk_indicators.iid_constants.BSOptions.RunThreatMetrix, 0) + 
+	if(TurnOffTumblings, risk_indicators.iid_constants.BSOptions.TurnOffTumblings, 0) +
+	if(UseIngestDate, risk_indicators.iid_constants.BSOptions.UseIngestDate, 0);
+
 
 
 prep := risk_indicators.InstantID_Function(iid_prep, 
@@ -243,10 +261,18 @@ prep := risk_indicators.InstantID_Function(iid_prep,
 																						in_append_best := append_best,
 																						in_BSOptions := bsOptions,
 																						in_LastSeenThreshold := LastSeenThreshold,
-																						in_dataPermission:=DataPermission);
+																						in_dataPermission:=DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID
+                                                                                        );
 													
 ret := risk_indicators.Boca_Shell_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value),false, ~no_rel, true, true, true, bsversion, doScore, 
-										nugen := nugen, filter_out_fares := RemoveFares, DataRestriction:=DataRestriction,BSOptions := BSOptions, DataPermission:=DataPermission);
+										nugen := nugen, filter_out_fares := RemoveFares, DataRestriction:=DataRestriction,BSOptions := BSOptions, DataPermission:=DataPermission, 
+                                        LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
+
+
 
 adl_based_ret := risk_indicators.ADL_Based_Modeling_Function(iid_prep,
 																		gateways, 
@@ -274,67 +300,20 @@ adl_based_ret := risk_indicators.ADL_Based_Modeling_Function(iid_prep,
 																		doScore, 
 																		nugen,
 																		DataRestriction:=DataRestriction, 
-																		DataPermission:=DataPermission);
+																		DataPermission:=DataPermission,
+                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                        TransactionID := TransactionID, 
+                                                                        BatchUID := BatchUID, 
+                                                                        GlobalCompanyID := GlobalCompanyID
+                                                                        );
 
-final_temp := if(ADL_Based_Shell, adl_based_ret, ret);																		
-
-
-// TMX attributes are built with KEL shell 6.0 in mind, so we are going to clean the inputs the same way they are cleaning the inputs in the KEL shell prior to sending request to TMX gateway
-PublicRecords_KEL.ECL_Functions.Input_Layout_Slim into_raw_dataset(rec le) := transform  
-  SELF.InputUIDAppend := le.seq;
-	self.historydate := if(historyDateTimeStamp<>'',historyDateTimeStamp[1..6], (string)history_date);
-	self.LexID := did_value; 
-  self.account := (string)le.seq;
-	self.firstname := fname_val;
-	self.middlename := mname_val;
-	self.lastname := lname_val;
-	SELF.streetAddress := addr1_val;
-	SELF.city := city_val;
-	SELF.state := state_val;
-	SELF.zip := zip_value;
-	self.homephone := phone_value;
-	self.ssn := ssn_value;
-	self.dateofbirth := dob_value;	
-	self.WorkPhone := wphone_value;
-	SELF.dlnumber := dl_number_value;
-	SELF.dlstate := dl_state_value;
-	SELF.email := email_value;
-  self := [];
-end;
-raw_slim := PROJECT(d,into_raw_dataset(LEFT));													
-              
-// Echo input
-InputEcho := PublicRecords_KEL.ECL_Functions.Fn_InputEcho_Roxie( raw_slim );	
-
-// Clean input
-cleanInput := PublicRecords_KEL.ECL_Functions.Fn_CleanInput_Roxie( InputEcho );
-TMX_input := Risk_indicators.prep_for_TMX(cleanInput, 'LNRS_testMerchantName', 'LNRS_testMerchantID' ); // TODO:  when plugging TMX gateway into a product query instead of the shell, need to pass the CompanyName and CompanyID through to the gateway
-NoPIIPersistence := true;  // TODO:  when plugging TMX into a product query, set NoPIIPersistence to false.  set to TRUE in shell processing because they are not live customer transactions
-TMX_results := Risk_Indicators.getThreatMetrix(TMX_input, gateways, NoPIIPersistence);  
+final := if(ADL_Based_Shell, adl_based_ret, ret);																		
 
 // output(raw_slim, named('raw_slim'));
 // output(InputEcho, named('InputEcho'));
-// output(cleanInput, named('KEL_Shell_cleaned_input'));
 // output(iid_prep, named('iid_prep'));
-// output(TMX_input, named('TMX_input'));
-// output(TMX_results, named('TMX_results'));
 
-final55 := join(final_temp, TMX_results, left.seq=right.seq,
-  transform(risk_indicators.Layout_Boca_Shell, 
-  self.ThreatMetrix := right, 
-  // stubbing these in here.  they will need to be populated here after the TMX gateway call instead of inside getAllBocaShellModels
-  self.FD_scores.digital_insight_score := '';
-	self.FD_scores.digital_insight_reason1 := '';
-	self.FD_scores.digital_insight_reason2 := '';
-  self.FD_scores.digital_insight_reason3 := '';
-  self.FD_scores.digital_insight_reason4 := '';
-  self.FD_scores.digital_insight_reason5 := '';
-  self.FD_scores.digital_insight_reason6 := '';
-  self := left), left outer);
-  
-final := if(bsversion>=55, group(final55, seq), final_temp);   
 output(final,NAMED('Results'))
-
 
 ENDMACRO;
 
@@ -383,6 +362,8 @@ ENDMACRO;
 	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>
 	<part name="RemoveQuickHeader" type="xsd:boolean"/> 
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
+	<part name="TurnOffTumblings" type="xsd:boolean"/> 
+
  </message>
 */
 

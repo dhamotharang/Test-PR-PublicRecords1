@@ -109,7 +109,7 @@ ConsumerAttributesReportRequest XML:
 */
 
 
-import risk_indicators, ut, iesp, address, riskwise, seed_files, gateway, OFAC_XG5;
+import risk_indicators, ut, iesp, address, riskwise, seed_files,std, gateway, OFAC_XG5;
 
 export ConsumerAttributes_Service := MACRO
 
@@ -117,6 +117,10 @@ export ConsumerAttributes_Service := MACRO
 	// Get XML input 
 	ds_in    		:= dataset([], iesp.consumerattributesreport.t_ConsumerAttributesReportRequest)  	: stored('ConsumerAttributesReportRequest', few);
   unsigned1 ofac_version_      := 1        : stored('OFACVersion');
+  unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 	gateways_in := Gateway.Configuration.Get();
 
 	optionsIn 	:= ds_in[1].options;
@@ -147,11 +151,12 @@ export ConsumerAttributes_Service := MACRO
 	end;
 
 	attribElt getVersions(iesp.share.t_StringArrayItem le) := TRANSFORM
-		attr := StringLib.StringToLowerCase(TRIM(le.Value));
+		attr := STD.Str.ToLowerCase(TRIM(le.Value));
 		self.attr := attr;
 		self.bsversion := CASE( attr,
 															'bocashellattrv3' => 3,
 															'bocashellattrv4' => 4,
+															'bocashellattrv4novoter' => 4,
 															'riskviewattrv3'  => 3,
 															'riskviewattrv4'  => 4,
 													 0);
@@ -160,6 +165,7 @@ export ConsumerAttributes_Service := MACRO
 	attributesIn := project(optionsIn.RequestedAttributeGroups, getVersions(left));
 
 	isLeadIntegrity := exists(attributesIn(attr[1..9]='leadinteg'));
+	isFilterVoter   := exists(attributesIn(attr='bocashellattrv4novoter'));
 	
 	DPPA := map(  isLeadIntegrity => 0,
 								userIn.DLPurpose='' => 0,
@@ -167,8 +173,9 @@ export ConsumerAttributes_Service := MACRO
 	GLBA := map(	isLeadIntegrity => 5,
 								userIn.GLBPurpose='' 	=> 8, 
 								(unsigned1)userIn.GLBPurpose);
-								
+	
 	RemoveFares	:= if(isLeadIntegrity, true, optionsIn.RemoveFares);
+	FilterVoter := if(isFilterVoter, true, false);
 			
 	temp := record
 		dataset(iesp.share.t_StringArrayItem) WatchList {xpath('WatchList/Name'), MAXCOUNT(iesp.Constants.MaxCountWatchLists)};
@@ -206,11 +213,11 @@ export ConsumerAttributes_Service := MACRO
 		lname  := if(l.searchby.name.last  ='' and fullname!='', trim((cleanname[46..65])), l.searchby.name.last  );
 		suffix := if(l.searchby.name.suffix='' and fullname!='', trim((cleanname[66..70])), l.searchby.name.suffix);
 		
-		self.title  := stringlib.stringtouppercase(title);
-		self.fname  := stringlib.stringtouppercase(fname);
-		self.mname  := stringlib.stringtouppercase(mname);
-		self.lname  := stringlib.stringtouppercase(lname);
-		self.suffix := stringlib.stringtouppercase(suffix);
+		self.title  := STD.Str.touppercase(title);
+		self.fname  := STD.Str.touppercase(fname);
+		self.mname  := STD.Str.touppercase(mname);
+		self.lname  := STD.Str.touppercase(lname);
+		self.suffix := STD.Str.touppercase(suffix);
 		
 		addr_value := if(trim(l.searchby.address.streetaddress1)!='', l.searchby.address.streetaddress1,
 				Address.Addr1FromComponents(l.searchby.address.streetnumber, l.searchby.address.streetpredirection, l.searchby.address.streetname,
@@ -240,8 +247,8 @@ export ConsumerAttributes_Service := MACRO
 		self.county          := clean_a2[143..145];
 		self.geo_blk         := clean_a2[171..177];
 		dl_num_clean := riskwise.cleanDL_num(l.searchby.DriverLicenseNumber);
-		self.dl_number       := stringlib.stringtouppercase(dl_num_clean);
-		self.dl_state        := stringlib.stringtouppercase(l.searchby.DriverLicenseState);
+		self.dl_number       := STD.Str.touppercase(dl_num_clean);
+		self.dl_state        := STD.Str.touppercase(l.searchby.DriverLicenseState);
 		self.phone10 			:= l.searchby.homephone;
 		self.wphone10			:= l.searchby.workphone;
 		self.email_address	:= l.searchby.email;
@@ -260,8 +267,8 @@ export ConsumerAttributes_Service := MACRO
 		cleanname := address.CleanPerson73( fullname );
 		fname  := if(l.searchby.name.first ='' and fullname!='', trim((cleanname[6..25])) , l.searchby.name.first );
 		lname  := if(l.searchby.name.last  ='' and fullname!='', trim((cleanname[46..65])), l.searchby.name.last  );
-		self.fname := stringlib.stringtouppercase(fname);
-		self.lname := stringlib.stringtouppercase(lname);
+		self.fname := STD.Str.touppercase(fname);
+		self.lname := STD.Str.touppercase(lname);
 		SELF.in_zipCode := l.searchby.address.zip5;
 		self := [];
 	end;
@@ -300,7 +307,7 @@ export ConsumerAttributes_Service := MACRO
 	unsigned2 EverOccupant_PastMonths := 0;
 	unsigned4 EverOccupant_StartDate  := 99999999;
 	unsigned1 AppendBest 					:= 1;	// search the best file
-	unsigned8 BSOptions 					:= risk_indicators.iid_constants.BSOptions.DIDRIDSearchOnly;
+	unsigned8 BSOptions 					:= risk_indicators.iid_constants.BSOptions.DIDRIDSearchOnly + if(FilterVoter, risk_indicators.iid_constants.BSOptions.FilterVoter, 0 );
 
 IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
@@ -340,7 +347,11 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 															EverOccupant_StartDate, 
 															AppendBest,
 															BSOptions,
-															in_DataPermission:=DataPermission);
+															in_DataPermission:=DataPermission,
+                              LexIdSourceOptout := LexIdSourceOptout, 
+                              TransactionID := TransactionID, 
+                              BatchUID := BatchUID, 
+                              GlobalCompanyID := GlobalCompanyID);
 														
 																							
 																										
@@ -359,7 +370,12 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 															nugen, 
 															RemoveFares, 
 															DataRestrictionMask,
-															DataPermission:=DataPermission);
+															BSOptions,
+															DataPermission:=DataPermission,
+                              LexIdSourceOptout := LexIdSourceOptout, 
+                              TransactionID := TransactionID, 
+                              BatchUID := BatchUID, 
+                              GlobalCompanyID := GlobalCompanyID);
 																
 	adlBasedClam(unsigned1 bsversion) := risk_indicators.ADL_Based_Modeling_Function(iid_prep,
 															gateways, 
@@ -387,14 +403,20 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 															doScore, 
 															nugen,
 															DataRestriction:=DataRestrictionMask,
-															DataPermission:=DataPermission);
+															DataPermission:=DataPermission,
+															BSOptions:=BSOptions,
+                              LexIdSourceOptout := LexIdSourceOptout, 
+                              TransactionID := TransactionID, 
+                              BatchUID := BatchUID, 
+                              GlobalCompanyID := GlobalCompanyID);
 																	
 
 	finalClam(unsigned1 bsversion) := if(ADLBasedShell, adlBasedClam(bsversion), clam(bsversion));
 
   clamTestSeeds := ISS.CAR_Test_Seed_Function(test_prep, ds_in[1].searchby.accountNumber, TestDataTableName, IsFCRA);
 	clamOrSeed(unsigned1 bsversion) := if( TestDataEnabled, group(clamTestSeeds, seq), finalClam(bsversion));										
-
+  // clamOrSeed(unsigned1 bsversion) := finalClam(bsversion);
+  
 	bsversion := MAX(attributesIn, attributesIn.bsversion);
 
 	clamAndSeed := clamOrSeed(bsversion);
@@ -414,7 +436,8 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 			self.Name := le.attr;
 			self.Attributes := CASE( le.attr,
 																'bocashellattrv3' => bocaV3, // this isn't active yet, but serves as a placeholder.
-																'bocashellattrv4' => bocaV4
+																'bocashellattrv4' => bocaV4,
+																'bocashellattrv4novoter' => bocaV4
 					);
 	end;
 	

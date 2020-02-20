@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="St. Cloud Main Service CBDO">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="account" type="xsd:string"/>
@@ -42,7 +42,7 @@
 /*--INFO-- This process is batch only and this will not be used */
 
       
-import address, Risk_Indicators, gateway;
+import Risk_Indicators, gateway, STD, Riskwise;
 
 
 export RiskWiseMainCBDO := MACRO
@@ -90,7 +90,11 @@ export RiskWiseMainCBDO := MACRO
 	'GLBPurpose',
 	'DataRestrictionMask',
 	'DataPermissionMask',
-	'HistoryDateYYYYMM'));
+	'HistoryDateYYYYMM',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 string4  tribCode_value := '' 	: stored('tribcode');
 string30 account_value := '' 		: stored('account');
@@ -133,7 +137,13 @@ string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission
 
 gateways := Gateway.Constants.void_gateway;
 
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 
 productSet := ['cd02'];
 
@@ -176,7 +186,11 @@ Riskwise.Layout_CBDI addseq(d le, INTEGER C) := TRANSFORM
 end;
 indata := project(d, addseq(LEFT,COUNTER));
 
-finalOutput := if(tribCode in productSet, RiskWise.CBDO_Function(indata, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction, DataPermission), dataset([],RiskWise.Layout_CBDO));
+finalOutput := if(tribCode in productSet, RiskWise.CBDO_Function(indata, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction, DataPermission,
+                                                                                                                   LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                                   TransactionID := TransactionID, 
+                                                                                                                   BatchUID := BatchUID, 
+                                                                                                                   GlobalCompanyID := GlobalCompanyID), dataset([],RiskWise.Layout_CBDO));
 
 output(finalOutput, named('Results'));
 

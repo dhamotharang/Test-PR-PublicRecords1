@@ -1,4 +1,4 @@
-import  RoxieKeyBuild,ut,autokey,doxie, header_services;
+﻿import  RoxieKeyBuild,ut,autokey,doxie, header_services, vault, _control;
 
 // per Legal request, we removed the following sources that were in the original release of FCRA PAW:
 // AT           Accurint Trade Show
@@ -24,4 +24,14 @@ PAW_FCRA_sources :=
 KeyName       := cluster.cluster_out+'Key::pAW::';
 dBase_filtered 	      := paw.File_base_cleanAddr_keybuild(did>0 and source in PAW_FCRA_sources);
 
+
+
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+EXPORT Key_DID_FCRA := vault.paw.Key_DID_FCRA;
+
+#ELSE
 EXPORT Key_DID_FCRA := INDEX(dBase_filtered  ,{did},{dBase_filtered},KeyName +doxie.Version_SuperKey+ '::did_FCRA');
+
+
+#END;
+

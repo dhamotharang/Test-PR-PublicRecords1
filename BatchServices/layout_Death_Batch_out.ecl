@@ -20,5 +20,5 @@ export layout_Death_Batch_out := RECORD
 			header.layout_death_master_supplemental.address;
 			header.layout_death_master_supplemental.COUNTY_RESIDENCE;
 			header.layout_death_master_supplemental.COUNTY_DEATH;
-			header.Layout_Did_Death_MasterV2 AND NOT CRLF;
+			header.Layout_Did_Death_MasterV2 - [CRLF, global_sid, record_sid];
 END;

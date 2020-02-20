@@ -1,5 +1,4 @@
-
-IMPORT Gateway, Risk_Indicators, RiskWise;
+﻿IMPORT Gateway, Risk_Indicators, STD;
 
 EXPORT FraudAdvisor_BtSt_Function( DATASET(Risk_Indicators.layout_input) indata1,
 			DATASET(Risk_Indicators.layout_input) indata2,
@@ -30,7 +29,11 @@ EXPORT FraudAdvisor_BtSt_Function( DATASET(Risk_Indicators.layout_input) indata1
 			boolean includeDerogInfo = true, 
 			boolean doScore = false, 
 			boolean nugen = false,
-			unsigned8 BSOptions = 0
+			unsigned8 BSOptions = 0,
+            unsigned1 LexIdSourceOptout = 1,
+            string TransactionID = '',
+            string BatchUID = '',
+            unsigned6 GlobalCompanyId = 0
 	) := FUNCTION
 
 	Risk_Indicators.Layout_CIID_BtSt_In into_btst_in(Risk_Indicators.layout_input le, Risk_Indicators.layout_input ri) := 
@@ -42,9 +45,9 @@ EXPORT FraudAdvisor_BtSt_Function( DATASET(Risk_Indicators.layout_input) indata1
 			self.Bill_To_In.mname         := le.mname;
 			self.Bill_To_In.lname         := le.lname;
 			self.Bill_To_In.suffix        := le.suffix;
-			self.Bill_To_In.in_streetAddress := stringlib.stringtouppercase(le.in_streetAddress);
-			self.Bill_To_In.in_city       := stringlib.stringtouppercase(le.in_city);
-			self.Bill_To_In.in_state      := stringlib.stringtouppercase(le.in_state);
+			self.Bill_To_In.in_streetAddress := STD.Str.touppercase(le.in_streetAddress);
+			self.Bill_To_In.in_city       := STD.Str.touppercase(le.in_city);
+			self.Bill_To_In.in_state      := STD.Str.touppercase(le.in_state);
 			self.Bill_To_In.in_zipCode    := le.in_zipCode;
 			self.Bill_To_In.prim_range    := le.prim_range;
 			self.Bill_To_In.predir        := le.predir;
@@ -76,13 +79,13 @@ EXPORT FraudAdvisor_BtSt_Function( DATASET(Risk_Indicators.layout_input) indata1
 					
 			self.Ship_To_In.seq         := ri.seq;
 			self.Ship_To_In.historydate := ri.historydate;
-			self.Ship_To_In.fname       := stringlib.stringtouppercase(ri.fname);
-			self.Ship_To_In.mname       := stringlib.stringtouppercase(ri.mname);
-			self.Ship_To_In.lname       := stringlib.stringtouppercase(ri.lname);
-			self.Ship_To_In.suffix      := stringlib.stringtouppercase(ri.suffix);
-			self.Ship_To_In.in_streetAddress := stringlib.stringtouppercase(ri.in_streetAddress);
-			self.Ship_To_In.in_city     := stringlib.stringtouppercase(ri.in_city);
-			self.Ship_To_In.in_state    := stringlib.stringtouppercase(ri.in_state);
+			self.Ship_To_In.fname       := STD.Str.touppercase(ri.fname);
+			self.Ship_To_In.mname       := STD.Str.touppercase(ri.mname);
+			self.Ship_To_In.lname       := STD.Str.touppercase(ri.lname);
+			self.Ship_To_In.suffix      := STD.Str.touppercase(ri.suffix);
+			self.Ship_To_In.in_streetAddress := STD.Str.touppercase(ri.in_streetAddress);
+			self.Ship_To_In.in_city     := STD.Str.touppercase(ri.in_city);
+			self.Ship_To_In.in_state    := STD.Str.touppercase(ri.in_state);
 			self.Ship_To_In.in_zipCode  := ri.in_zipCode;
 			self.Ship_To_In.prim_range  := clean_a2[1..10];
 			self.Ship_To_In.predir      := clean_a2[11..12];
@@ -128,7 +131,11 @@ EXPORT FraudAdvisor_BtSt_Function( DATASET(Risk_Indicators.layout_input) indata1
 		require2Ele,
 		bsversion := BSversion,
 		dataRestriction := DataRestriction,
-		dataPermission := DataPermission
+		dataPermission := DataPermission,
+        LexIdSourceOptout := LexIdSourceOptout, 
+        TransactionID := TransactionID, 
+        BatchUID := BatchUID, 
+        GlobalCompanyID := GlobalCompanyID
 	);
 	
 	clam_btst := Risk_Indicators.BocaShell_BtSt_Function(
@@ -147,7 +154,11 @@ EXPORT FraudAdvisor_BtSt_Function( DATASET(Risk_Indicators.layout_input) indata1
 		nugen, // nugen
 		DataRestriction,
 		BSOptions,
-		DataPermission
+		DataPermission,
+        LexIdSourceOptout := LexIdSourceOptout, 
+        TransactionID := TransactionID, 
+        BatchUID := BatchUID, 
+        GlobalCompanyID := GlobalCompanyID
 	);
 	
 	return clam_btst;

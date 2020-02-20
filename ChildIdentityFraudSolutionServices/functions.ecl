@@ -1,14 +1,14 @@
-﻿import BatchServices, BatchShare, ut, VehicleV2_Services, Autokey_batch, 
+﻿import BatchServices, AutoStandardI, BatchShare, ut, VehicleV2_Services, Autokey_batch, 
        doxie, AddrBest, LiensV2_Services, paw_services, DidVille, prof_LicenseV2_Services, FaaV2_Services,
 			 SexOffender_Services, WatercraftV2_Services, Foreclosure_Services, LN_PropertyV2_Services, Suppress,
 			 BIPV2, Royalty, STD;
 
 export Functions := module
-
+  global_mod := AutoStandardI.GlobalModule();
+  shared mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
+  
 //These are the common batch parameters that may be used to call other batch services. 
-BatchParams := BatchShare.IParam.getBatchParams();				 										 
-// temporarily: until we move all batches to BatchShare.IParam.BatchParamsV2
-shared mod_batchV2 := BatchShare.IParam.GetFromLegacy (BatchParams);
+shared mod_batchV2 := BatchShare.IParam.getBatchParams();
 //---------------------------------------------------------------------------------------------------------//	
 	export getBest(dataset(Layouts.BatchIn) BatchIn)  := function
 	
@@ -123,7 +123,7 @@ shared mod_batchV2 := BatchShare.IParam.GetFromLegacy (BatchParams);
 																										self.acctno := left.acctno,
 																										self.ssn := left.ssn,
 																										self := []));
-		dsPAW := paw_services.Batch_Service_Records(BatchInCommonSSN);
+		dsPAW := paw_services.Batch_Service_Records(BatchInCommonSSN, mod_access);
 		return dsPAW;
 	end;
 

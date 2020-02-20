@@ -1,19 +1,22 @@
-import doxie, risk_indicators, doxie_raw, progressive_phone, ut, mdr, header, drivers, Riskwise, Relationship;
+﻿import doxie, risk_indicators, doxie_raw, ut, mdr, header, drivers, Riskwise, Relationship, Suppress, Data_Services, AML, STD;
 
-EXPORT AMLRelativesAssocs ( Grouped DATASET(Layouts.RelativeParentLayout) iid_res,    
+EXPORT AMLRelativesAssocs ( Grouped DATASET(AML.Layouts.RelativeParentLayout) iid_res,    
 													 unsigned1 dppa, 
 													 unsigned1 glb,
 													 boolean isFCRA = false, 
-													 string50 DataRestriction
+													 string50 DataRestriction,
+                                                     doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 													 ) := FUNCTION;
 
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+	
 Relationship.mac_read_application_type();  
 glb_ok := glb > 0 and glb < 8 or glb=11 or glb=12;
 dppa_ok := dppa > 0 and dppa < 8;
 
 boolean isUtility := false;
 
-Layouts.RelativeParentLayout addSeq(iid_res le, Integer C) := TRANSFORM
+AML.Layouts.RelativeParentLayout addSeq(iid_res le, Integer C) := TRANSFORM
                 SELF.seq := le.seq;
 								self.DIDseq := c;
                 SELF := le;
@@ -38,7 +41,7 @@ END;
 
 justDids := PROJECT(relIdsWseq, 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.relatdid));
-rellyids := Relationship.proc_GetRelationship(justDids,TopNCount:= 100,
+rellyids := Relationship.proc_GetRelationshipNeutral(justDids,TopNCount:= 100,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost, 
 			HighConfidenceRelatives:= HighConfidenceRelatives_Value ,
 			HighConfidenceAssociates := HighConfidenceAssociates_Value ,
@@ -96,19 +99,23 @@ relatives_slim := record
 end;
 								
 
-
-
 AllDIDs :=  rel_ids + SubjectDIDS ;
 
-	Doxie_Raw.Layout_HeaderRawOutput getHeaderRaw(AllDIDs le, Doxie.Key_Header ri) := TRANSFORM
+Doxie_Raw_CCPA := RECORD
+  unsigned4 global_sid;
+  Doxie_Raw.Layout_HeaderRawOutput;
+END;
+
+	Doxie_Raw_CCPA getHeaderRaw(AllDIDs le, Doxie.Key_Header ri) := TRANSFORM
 		SELF.rid := le.seq;
 		self.did := le.did;
+        self.global_sid := ri.global_sid;
 		SELF := ri;
 		SELF := [];
 	END;
 	
 
-header_raw := JOIN(allDids, Doxie.Key_Header, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.s_did) AND
+header_raw_unsuppressed := JOIN(allDids, Doxie.Key_Header, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.s_did) AND
 
 														(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 														(header.isPreGLB(RIGHT) OR glb_ok) AND
@@ -117,8 +124,10 @@ header_raw := JOIN(allDids, Doxie.Key_Header, LEFT.DID <> 0 AND KEYED(LEFT.DID =
 														~risk_indicators.iid_constants.filtered_source(right.src, right.st)
 														 and	~Doxie.DataRestriction.isHeaderSourceRestricted(RIGHT.src, DataRestriction),
 															getHeaderRaw(LEFT, RIGHT),   atmost(200), keep(100)); //LIMIT(UT.limits.HEADER_PER_DID, SKIP));
-                                                              
-ParentIDs := rel_ids(stringlib.stringtolowercase(relation)  in ['father','mother', 'parent'] );
+               
+header_raw := Suppress.Suppress_ReturnOldLayout(header_raw_unsuppressed, mod_access, Doxie_Raw.Layout_HeaderRawOutput, data_environment := data_environment);			
+				 
+ParentIDs := rel_ids(STD.Str.tolowercase(relation)  in ['father','mother', 'parent'] );
 
 relatives_slim getParentHistDt(ParentIDs le, RelidsWseq ri ) := TRANSFORM
   self.did := le.did;
@@ -189,12 +198,11 @@ rollRelatPar := rollup(ParentHdrTenYrs, left.seq=right.seq, rollrelatives(left, 
 
 RelateParentResults := 	join(RelidsWseq, rollRelatPar,
 												 left.didseq=right.seq ,
-												 transform(Layouts.RelativeParentLayout, 
+												 transform(AML.Layouts.RelativeParentLayout, 
 																	 self.RelatParentPubRec10yrs := right.RelatParentPubRec10yrs,
 																	 self := left),
 												left outer);
-							
-
+                                                   
 // output(iid_res, named('iid_res'));
 // output(RelidsWseq, named('RelidsWseq'));
 // output(rel_ids, named('rel_ids'), overwrite);

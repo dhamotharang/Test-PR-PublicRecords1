@@ -2,7 +2,7 @@
 
 EXPORT IParams := MODULE
 
-	EXPORT Params := INTERFACE(BatchShare.IParam.BatchParamsV2)
+	EXPORT Params := INTERFACE(BatchShare.IParam.BatchParams)
 		EXPORT UNSIGNED3 DidScoreThreshold := 0;
 		EXPORT UNSIGNED3 MaxProperties := 0;
 		EXPORT STRING4 TaxYear := '';
@@ -13,7 +13,7 @@ EXPORT IParams := MODULE
 	END;
 
 	EXPORT getParams() := FUNCTION
-		bs_mod := BatchShare.IParam.getBatchParamsV2();
+		bs_mod := BatchShare.IParam.getBatchParams();
 
 		UNSIGNED3 propCount := HomesteadExemptionV2_Services.Constants.DEFAULT_PROPERTIES : STORED('MaxProperties');
 

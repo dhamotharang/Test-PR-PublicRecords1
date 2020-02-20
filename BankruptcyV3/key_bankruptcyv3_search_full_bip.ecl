@@ -1,4 +1,9 @@
-import BankruptcyV2, fcra, Doxie, ut, std;
+﻿import BankruptcyV2, fcra, Doxie, ut, std, vault, _control;
+
+
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export key_bankruptcyv3_search_full_bip(boolean isFCRA=false) := vault.BankruptcyV3.key_bankruptcyv3_search_full_bip(isFCRA);
+#ELSE
 
 export key_bankruptcyv3_search_full_bip(boolean isFCRA=false) := function
 
@@ -36,3 +41,5 @@ export key_bankruptcyv3_search_full_bip(boolean isFCRA=false) := function
 
 	return index(joinedForLatest,{tmsid},{joinedForLatest},key_name);
 end;
+
+#END;

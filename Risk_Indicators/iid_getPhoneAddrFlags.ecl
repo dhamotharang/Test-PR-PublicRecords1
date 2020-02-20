@@ -1,11 +1,13 @@
 ﻿
-import _Control, address, riskwise, risk_indicators, gong;
+import _Control, riskwise, risk_indicators, gong, Doxie, data_services, Suppress;
 onThor := _Control.Environment.OnThor;
 
 export iid_getPhoneAddrFlags(grouped dataset(risk_indicators.Layout_Output) with_did, 
-								boolean isFCRA, boolean runAreaCodeSplitSearch = true, unsigned1 BSversion = 1) := function
+								boolean isFCRA, boolean runAreaCodeSplitSearch = true, unsigned1 BSversion = 1,
+								doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
-
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+	
 // with_zip_flags := iid_getZipFlags(with_DID);	// moved to iid combine verification
 
 // one of the optimization options in IID v2 is to allow this search to be skipped when not needed.
@@ -22,7 +24,7 @@ ac_split := if(runAreaCodeSplitSearch, with_ac_split, with_did);
 // Find out which phones are connected (both home and business)
 layout_gonghistory := RECORDOF (Gong.Key_History_phone);
 gong_key := if(isFCRA, Gong.Key_FCRA_History_phone, Gong.Key_History_phone);
-connected_h_phones_roxie := JOIN (ac_split, gong_key,
+connected_h_phones_roxie_unsuppressed := JOIN (ac_split, gong_key,
 															(integer) Left.phone10 != 0
 															AND keyed (Left.phone10[4..10] = Right.p7 AND Left.phone10[1..3] = Right.p3)
 															AND ((unsigned) (Right.dt_first_seen[1..6]) < left.historydate)
@@ -32,8 +34,10 @@ connected_h_phones_roxie := JOIN (ac_split, gong_key,
 																keyed (Left.phone10[4..10] = Right.p7 AND Left.phone10[1..3] = Right.p3),
 																RiskWise.max_atmost),
 															keep(100));
+
+connected_h_phones_roxie := Suppress.MAC_SuppressSource(connected_h_phones_roxie_unsuppressed, mod_access, data_env := data_environment);
 															
-connected_h_phones_thor := JOIN (distribute(ac_split((integer)phone10 !=0), hash64(phone10)), 
+connected_h_phones_thor_unsuppressed := JOIN (distribute(ac_split((integer)phone10 !=0), hash64(phone10)), 
 															distribute(pull(gong_key((integer)(p3+p7) != 0)), hash64(p3+p7)),
 															(Left.phone10[4..10] = Right.p7 AND Left.phone10[1..3] = Right.p3)
 															AND ((unsigned) (Right.dt_first_seen[1..6]) < left.historydate)
@@ -42,7 +46,9 @@ connected_h_phones_thor := JOIN (distribute(ac_split((integer)phone10 !=0), hash
 																	ATMOST(
 																 (Left.phone10[4..10] = Right.p7 AND Left.phone10[1..3] = Right.p3),
 																RiskWise.max_atmost),
-															keep(100), LOCAL);							
+															keep(100), LOCAL);					
+															
+connected_h_phones_thor := Suppress.MAC_SuppressSource(connected_h_phones_thor_unsuppressed, mod_access, data_env := data_environment);
 														
 #IF(onThor)
 	connected_h_phones := connected_h_phones_thor;
@@ -50,7 +56,7 @@ connected_h_phones_thor := JOIN (distribute(ac_split((integer)phone10 !=0), hash
 	connected_h_phones := connected_h_phones_roxie;
 #END
 
-connected_w_phones_roxie := JOIN (ac_split, gong_key,
+connected_w_phones_roxie_unsuppressed := JOIN (ac_split, gong_key,
 															(integer) Left.wphone10 != 0
 															AND keyed (Left.wphone10[4..10] = Right.p7 AND Left.wphone10[1..3] = Right.p3)
 															AND ((unsigned) (Right.dt_first_seen[1..6]) < left.historydate)
@@ -61,7 +67,9 @@ connected_w_phones_roxie := JOIN (ac_split, gong_key,
 																		RiskWise.max_atmost),
 																	keep(100));
 																	
-connected_w_phones_thor := JOIN (distribute(ac_split((integer)wphone10!=0), hash64(wphone10)), 
+connected_w_phones_roxie := Suppress.MAC_SuppressSource(connected_w_phones_roxie_unsuppressed, mod_access, data_env := data_environment);
+
+connected_w_phones_thor_unsuppressed := JOIN (distribute(ac_split((integer)wphone10!=0), hash64(wphone10)), 
 															distribute(pull(gong_key((integer)(p3+p7)!=0)), hash64(p3+p7)),
 															(Left.wphone10[4..10] = Right.p7 AND Left.wphone10[1..3] = Right.p3)
 															AND ((unsigned) (Right.dt_first_seen[1..6]) < left.historydate)
@@ -72,6 +80,8 @@ connected_w_phones_thor := JOIN (distribute(ac_split((integer)wphone10!=0), hash
 																		RiskWise.max_atmost),
 																	keep(100), LOCAL);
 																	
+connected_w_phones_thor := Suppress.MAC_SuppressSource(connected_w_phones_thor_unsuppressed, mod_access, data_env := data_environment);
+											
 #IF(onThor)
 	connected_w_phones := connected_w_phones_thor;
 #ELSE
@@ -190,13 +200,12 @@ jphonerecs_roxie := if (isFCRA,
 					keyed(left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
 					phtrans_FCRA(left,right,1),left outer,
 					ATMOST( keyed(left.phone10=right.phone10), RiskWise.max_atmost), keep(100)),
-					
 				join(with_phone_disconnect_hist,risk_indicators.key_phone_table_v2,
 					(integer)left.phone10 != 0 and
 					keyed(left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
 					phtrans_nonFCRA(left,right,1),left outer,
 					ATMOST( keyed(left.phone10=right.phone10), RiskWise.max_atmost), keep(100)));
-	
+						
 jphonerecs_thor_pre := if (isFCRA,
 				join(distribute(with_phone_disconnect_hist(phone10 != ''), hash64(phone10)),
 					distribute(pull(Gong.Key_FCRA_Business_Header_Phone_Table_Filtered_V2((integer)phone10 != 0)), hash64(phone10)),
@@ -303,8 +312,9 @@ jphonerecs2_thor := jphonerecs2_thor_pre + jphonerecs2_thor_nowphone;
 // rollup again here before searching telcordia
 jphonerecs2rolled := rollup(jphonerecs2,true,flagroll(LEFT,RIGHT));
 
+telecordia_key := if(isFCRA, risk_indicators.Key_FCRA_Telcordia_tpm_slim, risk_indicators.Key_Telcordia_tpm_slim);
 
-risk_indicators.layout_output teltrans(risk_indicators.layout_output le, risk_indicators.Key_Telcordia_tpm_slim ri, INTEGER i) := transform
+risk_indicators.layout_output teltrans(risk_indicators.layout_output le, telecordia_key ri, INTEGER i) := transform
 	self.nxx_type := IF(i=1,IF(le.nxx_type='',ri.nxx_type,le.nxx_type), le.nxx_type);
 	self.phonetype := IF(i=1,risk_indicators.PRIIPhoneRiskFlag('').telcordiaPhoneType(ri.dial_ind, ri.point_id),le.phonetype);
 	self.hriskphoneflag := IF(i=1,IF(le.nxx_type='',risk_indicators.PRIIPhoneRiskFlag(le.phone10).phoneRiskFlag(ri.nxx_type, le.phonedissflag, ''),le.hriskphoneflag), le.hriskphoneflag);
@@ -343,7 +353,6 @@ risk_indicators.layout_output teltrans(risk_indicators.layout_output le, risk_in
 	self := le;
 END;
 
-telecordia_key := if(isFCRA, risk_indicators.Key_FCRA_Telcordia_tpm_slim, risk_indicators.Key_Telcordia_tpm_slim);
 
 telphonerecs0_roxie := group(join(jphonerecs2rolled, telecordia_key,
 												LEFT.phone10!='' AND

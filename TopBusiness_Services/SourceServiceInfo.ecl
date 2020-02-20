@@ -32,7 +32,8 @@ EXPORT SourceServiceInfo := MODULE
 			MDR.sourceTools.set_Dunn_Bradstreet_Fein,
 			MDR.sourceTools.set_DCA,
 			MDR.SourceTools.set_EBR,
-			MDR.SourceTools.set_Sheila_Greco
+			MDR.SourceTools.set_Sheila_Greco,
+			MDR.sourceTools.set_Equifax_Business_Data
 	];
 	
 	EXPORT IndustrySectionSources := [
@@ -89,6 +90,7 @@ EXPORT SourceServiceInfo := MODULE
 			MDR.sourceTools.set_Diversity_Cert,
 			MDR.sourceTools.set_Dunn_Bradstreet_Fein,
 			MDR.SourceTools.set_EBR, 
+	           MDR.SourceTools.set_Equifax_Business_Data,
 			MDR.SourceTools.set_Experian_CRDB,
 			MDR.SourceTools.set_Experian_FEIN,
 			MDR.sourceTools.set_Fbnv2,
@@ -103,6 +105,7 @@ EXPORT SourceServiceInfo := MODULE
 			MDR.sourceTools.set_Insurance_Certification,
 			MDR.sourceTools.set_INFOUSA_ABIUS_USABIZ,
 			MDR.sourceTools.set_INFOUSA_DEAD_COMPANIES,
+			MDR.sourceTools.set_Infutor_NARB,
 			MDR.sourceTools.set_IRS_5500,
 			MDR.sourceTools.set_IRS_Non_Profit,
 			MDR.sourceTools.set_LaborActions_WHD,
@@ -259,6 +262,11 @@ EXPORT SourceServiceInfo := MODULE
 						MDR.sourceTools.set_EBR[1] in sectionToCheck(section));
 	END;
 	
+	EXPORT IncludeRptEquifaxBusData(string source, string section) := FUNCTION
+		 RETURN(MDR.sourceTools.SourceIsEquifax_Business_Data(source) or
+						MDR.sourceTools.set_Equifax_Business_Data[1] in sectionToCheck(section));
+	END;
+	
 	EXPORT IncludeRptEXPCRDB(string source, string section) := FUNCTION
 		 RETURN(MDR.sourceTools.SourceIsExperian_CRDB(source) or
 						MDR.sourceTools.set_Experian_CRDB[1] in sectionToCheck(section));
@@ -317,6 +325,11 @@ EXPORT SourceServiceInfo := MODULE
 	EXPORT IncludeRptInfoUSA_Deadco(string source, string section) := FUNCTION
 		 RETURN(MDR.sourceTools.SourceIsINFOUSA_DEAD_COMPANIES(source) or
 						MDR.sourceTools.set_INFOUSA_DEAD_COMPANIES[1] in sectionToCheck(section));
+	END;
+	
+	EXPORT IncludeRptInfutorNarb(string source, string section) := FUNCTION
+		 RETURN(MDR.sourceTools.SourceIsInfutor_NARB(source) or
+						MDR.sourceTools.set_Infutor_NARB[1] in sectionToCheck(section));
 	END;
 
 	EXPORT IncludeRptInsuranceCert(string source, string section) := FUNCTION

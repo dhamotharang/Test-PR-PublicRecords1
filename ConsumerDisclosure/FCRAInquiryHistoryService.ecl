@@ -29,6 +29,7 @@ EXPORT FCRAInquiryHistoryService() := FUNCTION
     SELF._Header.Status        := L.SearchStatus;
     SELF._Header.Message       := L.Message;
     SELF._Header.Exceptions    := L.SearchExceptions;
+    SELF._Header.Disclaimers   := service_header.Disclaimers;
     
     SELF.Records      := CHOOSEN(PROJECT(L.IndividualResults, 
                                  TRANSFORM(iesp.fcrainquiryhistory.t_FCRAInquiryHistoryRecord, 

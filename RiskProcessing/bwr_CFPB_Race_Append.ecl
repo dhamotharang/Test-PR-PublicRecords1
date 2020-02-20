@@ -9,16 +9,16 @@ outfile :=  	'~hmccarl::out::reg_6601_test_cfpb_race';
 
 #workunit('name','CFPB Race Append');
 
-import zz_cfpb_race_proxy, address, std, riskprocessing; 
+import address, std, riskprocessing; 
 //////////////////////////////////////////////////////////////////;
 //  CENSUS FILES NEEDED //
-blkgrp := dataset('~hmccarl::cfpb_race_proxy::blkgrp',zz_cfpb_race_proxy.layouts.blkgrp_layout,csv(quote('"')));
-blkgrp_attr_over18 := dataset('~hmccarl::cfpb_race_proxy::blkgrp_attr_over18',zz_cfpb_race_proxy.layouts.attr_over18_layout,csv(quote('"')));
-tract := dataset('`hmccarl::cfpb_race_proxy::tract',zz_cfpb_race_proxy.layouts.tract_layout,csv(quote('"')));
-tract_attr_over18 := dataset('~hmccarl::cfpb_race_proxy::tract_attr_over18',zz_cfpb_race_proxy.layouts.attr_over18_layout,csv(quote('"')));
-zip5 := dataset('~hmccarl::cfpb_race_proxy::zip',zz_cfpb_race_proxy.layouts.zip_layout,csv(quote('"')));
-zip5_attr_over18 := dataset('~hmccarl::cfpb_race_proxy::zip_attr_over18',zz_cfpb_race_proxy.layouts.attr_over18_layout,csv(quote('"')));
-census_surnames := dataset('~hmccarl::cfpb_race_proxy::names_2010census',zz_cfpb_race_proxy.layouts.surnames_layout,csv(quote('"'))); 
+blkgrp := dataset('~hmccarl::cfpb_race_proxy::blkgrp',RiskProcessing.cfpb_race_proxy_layouts.blkgrp_layout,csv(quote('"')));
+blkgrp_attr_over18 := dataset('~hmccarl::cfpb_race_proxy::blkgrp_attr_over18',RiskProcessing.cfpb_race_proxy_layouts.attr_over18_layout,csv(quote('"')));
+tract := dataset('`hmccarl::cfpb_race_proxy::tract',RiskProcessing.cfpb_race_proxy_layouts.tract_layout,csv(quote('"')));
+tract_attr_over18 := dataset('~hmccarl::cfpb_race_proxy::tract_attr_over18',RiskProcessing.cfpb_race_proxy_layouts.attr_over18_layout,csv(quote('"')));
+zip5 := dataset('~hmccarl::cfpb_race_proxy::zip',RiskProcessing.cfpb_race_proxy_layouts.zip_layout,csv(quote('"')));
+zip5_attr_over18 := dataset('~hmccarl::cfpb_race_proxy::zip_attr_over18',RiskProcessing.cfpb_race_proxy_layouts.attr_over18_layout,csv(quote('"')));
+census_surnames := dataset('~hmccarl::cfpb_race_proxy::names_2010census',RiskProcessing.cfpb_race_proxy_layouts.surnames_layout,csv(quote('"'))); 
 ///////////////////////////////////////////////////////////////////;
 
 layout_input := RECORD
@@ -247,7 +247,7 @@ GetCensusData(geoname,filename,geofile,outgeofile) := MACRO
 #UNIQUENAME(geo_join_layout); 
 	%geo_join_layout% := RECORD
 		recordof(filename);
-		zz_cfpb_race_proxy.layouts.attr_over18_layout;
+		RiskProcessing.cfpb_race_proxy_layouts.attr_over18_layout;
 	END; 
 	outgeofile := join(DISTRIBUTE(sort(filename,HASH64(geoname)), HASH64(geoname)), 
 										 DISTRIBUTE(sort(geofile,HASH64(GeoInd)), HASH64(GeoInd)), 

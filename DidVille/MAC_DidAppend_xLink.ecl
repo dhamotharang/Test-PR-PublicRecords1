@@ -24,7 +24,7 @@ import ut, Email_Data, IDLExternalLinking, InsuranceHeader_xLink;
 IDLExternalLinking.mac_xlinking_on_roxie(%file_in_xadl2%, did ,name_suffix ,fname ,mname ,lname ,
 																, ,prim_name, prim_range, sec_range, city, state, 
 																		zip, ssn, DOB, phone,  dl_state, dl_nbr,
-																		%file_out_xlink%,  30,3, true)																		
+																		%file_out_xlink%,  30,3, true, relative_fname, relative_lname)
  
 
 // only return the dids by email when the email address is the only thing provided in the search.		

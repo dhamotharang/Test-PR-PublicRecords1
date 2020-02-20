@@ -1,22 +1,12 @@
-IMPORT AutoStandardI, ADDRESS, DIDVILLE, iesp;
+IMPORT doxie, DIDVILLE;
+
 EXPORT Log_Functions := MODULE
 
-  EXPORT fn_getDidVille(dataset(Inquiry_Services.Log_layouts.in_layout_w_cleanAddr) ds_in, 
-												unsigned1 glb_purpose_value,
-												unsigned1 dppa_purpose_value,
+  EXPORT fn_getDidVille(dataset(Inquiry_Services.Log_layouts.in_layout_w_cleanAddr) ds_in,
+											  doxie.IDataAccess mod_access, 
 												string120 append_l,
-												string32 appType,
-												string5 IndustryClass,
 												string120 verify_l = '') := function
-			p := module(AutoStandardI.PermissionI_Tools.params)
-				export boolean AllowAll := false;
-				export boolean AllowGLB := false;
-				export boolean AllowDPPA := false;
-				export unsigned1 DPPAPurpose := dppa_purpose_value;
-				export unsigned1 GLBPurpose := glb_purpose_value;
-				export boolean IncludeMinors := false;
-			END;
-			GLB := AutoStandardI.PermissionI_Tools.val(p).glb.ok(glb_purpose_value);
+			GLB := mod_access.isValidGlb();
 			hhidplus := stringlib.stringfind(append_l,'HHID_PLUS',1)<>0;
       edabest := stringlib.stringfind(append_l,'BEST_EDA',1)<>0;
 
@@ -51,9 +41,9 @@ EXPORT Log_Functions := MODULE
 			                                                       verify_value := verify_l,
 																														 appends_value := append_l, 
 																														 glb_flag := GLB, 
-																														 glb_purpose_value := glb_purpose_value, 
-																														 appType := appType,
-																														 IndustryClass_val := IndustryClass);
+																														 glb_purpose_value := mod_access.glb, 
+																														 appType := mod_access.application_type,
+																														 IndustryClass_val := mod_access.industry_class);
 
 			return out_recs;
 	end;

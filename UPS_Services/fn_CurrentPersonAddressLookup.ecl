@@ -1,8 +1,8 @@
-﻿Import Doxie, ut, std, UPS_Services;
+﻿Import dx_header, ut, std, UPS_Services;
 
 EXPORT fn_CurrentPersonAddressLookup(dataset(UPS_Services.layout_Common)dsPreCurrent) := function 
-/* The 31st bit of lookups field in Doxie.Key_Address  indicates if the person is a current resident of the address or not*/
-	dsWithCurrent := join(dsPreCurrent , Doxie.Key_Address, 
+/* The 31st bit of lookups field in key_address  indicates if the person is a current resident of the address or not*/
+	dsWithCurrent := join(dsPreCurrent , dx_header.key_address(),
 										  keyed(
 											 ut.StripOrdinal(left.prim_name) = right.prim_name and
 											 left.prim_range = right.prim_range and

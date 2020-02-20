@@ -1,4 +1,4 @@
-import Healthcare_Provider_Services,NCPDP;
+﻿import Healthcare_Provider_Services,NCPDP;
 EXPORT NCPDP_Layouts := Module
 
 	Export NCPDP_providerid_rec := RECORD
@@ -29,6 +29,8 @@ EXPORT NCPDP_Layouts := Module
 	end;
 
 	Export LayoutOutput := Record
+	    unsigned4 	global_sid :=0;
+		  boolean hasOptout := false;
 			string20 acctno := '';
 			unsigned2 record_penalty := 0;
 			unsigned2 compName_penalty := 0;

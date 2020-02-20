@@ -1,4 +1,4 @@
-﻿IMPORT AutoKeyI, AutoStandardI, iesp, BIPV2;
+﻿IMPORT AutoKeyI, AutoStandardI, BIPV2, doxie, iesp;
 
 EXPORT IParam := MODULE
 	
@@ -31,11 +31,6 @@ EXPORT IParam := MODULE
     searchIds,
     AutoStandardI.LIBIN.PenaltyI_Indv.base,
     AutoStandardI.LIBIN.PenaltyI_Biz.base,
-    AutoStandardI.InterfaceTranslator.glb_purpose.params,
-    AutoStandardI.InterfaceTranslator.dppa_purpose.params,
-    AutoStandardI.InterfaceTranslator.ssn_mask_value.params,
-    AutoStandardI.InterfaceTranslator.dob_mask_value.params,
-    AutoStandardI.InterfaceTranslator.application_type_val.params,
     AutoStandardI.InterfaceTranslator.penalt_threshold_value.params,
 		searchAlertOptions)
 	END;
@@ -99,11 +94,6 @@ EXPORT IParam := MODULE
 	END;
 	
 	EXPORT reportrecords := INTERFACE(
-    AutoStandardI.InterfaceTranslator.glb_purpose.params,
-    AutoStandardI.InterfaceTranslator.dppa_purpose.params,
-    AutoStandardI.InterfaceTranslator.ssn_mask_value.params,
-    AutoStandardI.InterfaceTranslator.dob_mask_value.params,
-    AutoStandardI.InterfaceTranslator.application_type_val.params,
     AutoStandardI.InterfaceTranslator.penalt_threshold_value.params,
 		AutoStandardI.InterfaceTranslator.did_value.params,
 		AutoStandardI.InterfaceTranslator.bdid_value.params,
@@ -113,8 +103,6 @@ EXPORT IParam := MODULE
 		EXPORT DATASET  MariRidNumbers := DATASET([], MIDEX_Services.Layouts.rec_profLicMari_payloadKeyField) ;
     EXPORT BOOLEAN  includeSourceDocs := FALSE;
     EXPORT STRING1  searchType := 'I';
-    EXPORT STRING   DataPermissionMask  := AutoStandardI.Constants.DataPermissionMask_default;
-    EXPORT STRING   DataRestrictionMask := '11111111111111111111';
     EXPORT STRING8  StartLoadDate := '';
 		EXPORT DATASET 	LinkIds								:= DATASET([], BIPV2.IDlayouts.l_xlink_ids);
 		EXPORT STRING1  BusinessIDFetchLevel 	:= BIPV2.IDconstants.Fetch_Level_SELEID;

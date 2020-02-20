@@ -13,7 +13,7 @@
 */
 /*--INFO--'ex02','ex03','ex06','ex07','ex08','ex09','ex10','ex22','ex70','sd01','sd50','cb61','2x08','2x10' */
 
-import Address, Risk_Indicators, gateway;
+IMPORT Risk_Indicators, gateway, Riskwise, Risk_Indicators, STD;
 
 export SD1O_Batch_Service := MACRO
 
@@ -23,7 +23,7 @@ export SD1O_Batch_Service := MACRO
 #stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
 
 string4	tribcode_value := ''							: stored('tribcode');
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 unsigned1 dppa := RiskWise.permittedUse.fraudDPPA 			: stored('DPPAPurpose');
 unsigned1 glb := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 unsigned3 history_date := 999999  							: stored('HistoryDateYYYYMM');
@@ -32,6 +32,12 @@ string DataRestriction := risk_indicators.iid_constants.default_DataRestriction 
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 batchin := dataset([],riskwise.Layout_SD1I_BatchIn)			: stored('batch_in',few);
 gateways_in := Gateway.Configuration.Get();
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 productSet := ['ex02','ex03','ex06','ex07','ex08','ex09','ex10','ex22','ex70','sd01','sd50','cb61','2x08','2x10'];
 
@@ -119,7 +125,11 @@ end;
 f := project(batchin, addseq(LEFT,COUNTER));
 
 ret := if(tribCode in productSet, RiskWise.SD1O_Function(f, gateways, glb, dppa, tribCode, ofac_version, include_ofac, include_additional_watchlists, 
-                                                         global_watchlist_threshold, datarestriction, DataPermission), dataset([],RiskWise.Layout_SD1O));
+                                                         global_watchlist_threshold, datarestriction, DataPermission,
+                                                         LexIdSourceOptout := LexIdSourceOptout, 
+                                                         TransactionID := TransactionID, 
+                                                         BatchUID := BatchUID, 
+                                                         GlobalCompanyID := GlobalCompanyID), dataset([],RiskWise.Layout_SD1O));
 
 output(ret, named('Results'));
 

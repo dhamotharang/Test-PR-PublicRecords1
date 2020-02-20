@@ -44,7 +44,7 @@
 &lt;/dataset&gt;
 </pre>
 */
-import address, riskwise, ut, gateway, AutoStandardI;
+import STD, address, riskwise, ut, gateway, AutoStandardI, risk_indicators;
 
 export CDIP3_Batch_Service := MACRO
 
@@ -61,6 +61,12 @@ export CDIP3_Batch_Service := MACRO
 	batch_in       := dataset([],Risk_Indicators.CDIP_Layouts.Batch_In) : STORED('batch_in',few);
 	gateways_in := Gateway.Configuration.Get();
 	history_date   := 999999 : stored('HistoryDateYYYYMM');
+  
+    // CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
   
   Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := if(ofac_version_ = 4 and le.servicename = 'bridgerwlc', le.servicename, '');
@@ -114,7 +120,7 @@ if(ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(
 		self.ssn := le.ssn;
 		self.dob := le.dob;
 		self.age := if ((integer)le.age = 0 and (integer)le.dob != 0,
-						(STRING3)ut.GetAgeI_asOf((unsigned)le.dob, (unsigned)risk_indicators.iid_constants.myGetDate(historydate)), 
+						(STRING3)ut.Age((unsigned)le.dob, (unsigned)risk_indicators.iid_constants.myGetDate(historydate)), 
 						(string)((integer)le.age));
 		self.phone10  := le.home_phone;
 		self.wphone10 := le.work_phone;
@@ -122,11 +128,11 @@ if(ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(
 		cleaned_name := address.CleanPerson73(le.UnParsedFullName);
 		boolean valid_cleaned := le.UnParsedFullName <> '';
 		
-		self.fname  := StringLib.StringToUppercase(if(le.Name_First=''   AND valid_cleaned, cleaned_name[6..25], le.Name_First));
-		self.lname  := StringLib.StringToUppercase(if(le.Name_Last=''    AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
-		self.mname  := StringLib.StringToUppercase(if(le.Name_Middle=''  AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
-		self.suffix := StringLib.StringToUppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
-		self.title  := StringLib.StringToUppercase(if(valid_cleaned, cleaned_name[1..5],''));
+		self.fname  := STD.STR.ToUpperCase(if(le.Name_First=''   AND valid_cleaned, cleaned_name[6..25], le.Name_First));
+		self.lname  := STD.STR.ToUpperCase(if(le.Name_Last=''    AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
+		self.mname  := STD.STR.ToUpperCase(if(le.Name_Middle=''  AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
+		self.suffix := STD.STR.ToUpperCase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
+		self.title  := STD.STR.ToUpperCase(if(valid_cleaned, cleaned_name[1..5],''));
 
 		street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 		clean_a2 := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;											
@@ -155,8 +161,8 @@ if(ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(
 		self.county        := clean_a2[143..145];
 		self.geo_blk       := clean_a2[171..177];
 
-		self.dl_number := StringLib.StringToUppercase(riskwise.cleanDL_num(le.dl_number));
-		self.dl_state  := StringLib.StringToUppercase(le.dl_state);
+		self.dl_number := STD.STR.ToUpperCase(riskwise.cleanDL_num(le.dl_number));
+		self.dl_state  := STD.STR.ToUpperCase(le.dl_state);
 
 		SELF.ip_address := le.ip_addr;
 
@@ -166,8 +172,10 @@ if(ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(
 
 	iid_prep := project( iid_prep_acct, risk_indicators.Layout_Input );
 	iid := risk_indicators.InstantID_Function(iid_prep, gateways, dppa, glb, isUtility, ln_branded, ofac_only, suppressNearDups, require2ele, isFCRA, from_biid, ExcludeWatchLists, from_IT1O, 
-																						ofac_version, include_ofac, addtl_watchlists, watchlist_threshold, dob_radius, bsversion, in_DataRestriction := DataRestriction, in_append_best := AppendBest, in_DataPermission := DataPermission);
-	clam := risk_indicators.Boca_Shell_Function( iid, gateways, dppa, glb, isUtility, ln_branded, includeRel, includeDL, includeVeh, includeDerog, bsversion, doScore, nugen, DataRestriction := DataRestriction, DataPermission := DataPermission);
+																						ofac_version, include_ofac, addtl_watchlists, watchlist_threshold, dob_radius, bsversion, in_DataRestriction := DataRestriction, in_append_best := AppendBest, in_DataPermission := DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
+	clam := risk_indicators.Boca_Shell_Function( iid, gateways, dppa, glb, isUtility, ln_branded, includeRel, includeDL, includeVeh, includeDerog, bsversion, doScore, nugen, DataRestriction := DataRestriction, DataPermission := DataPermission,
+                                                                                  LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 
 	layout_final := record
 		STRING AccountNumber;

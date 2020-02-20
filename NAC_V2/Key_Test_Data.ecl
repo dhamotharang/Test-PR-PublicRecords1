@@ -8,7 +8,10 @@ rNACCannedResponseBase	:=
 record
 	unsigned4		RequestHash;
 	string20		TestDataTableName;
-	iesp.nac2_search.t_NAC2SearchResponse;
+	// iesp.nac2_search.t_NAC2SearchResponse;
+	iesp.share.t_ResponseHeader - Disclaimers _Header {xpath('Header')};
+	integer RecordCount {xpath('RecordCount')};
+	dataset(iesp.nac2_search.t_NAC2SearchResultRecord) Records {xpath('Records/Record'), MAXCOUNT(60)};
 end;
 
 dNACCannedResponseBase := DATASET('~nac::test::canned_response_base', rNACCannedResponseBase, thor);

@@ -1,4 +1,4 @@
-/***
+﻿/***
 /***
  ** Function gathers output from various requested services and returns them packed nicely into a dataset record.
 ***/
@@ -75,7 +75,7 @@ EXPORT Report(DATASET (doxie.layout_references) dids, IdentityManagement_Service
 	p_proflicense 	 := CHOOSEN(pers.proflicense, iesp.constants.IDM.MaxProfLicenses);
 
 	// Internet Domain Names
-	p_domain_names		:= CHOOSEN(pers.domain_names, iesp.Constants.INTERNETDOMAIN_MAX_COUNT_SEARCH_RESPONSE_RECORDS);
+	p_domain_names		:= CHOOSEN(pers.domain_names, iesp.Constants.IDM.MaxInternetDomains);
 
   //Combine all of them together
   out_rec Format () := TRANSFORM

@@ -5,7 +5,7 @@
 import iesp;
 
 export phonefinder := MODULE
-			
+
 export t_PhoneFinderSearchBy := record
 	iesp.share.t_Name Name {xpath('Name')};
 	iesp.share.t_Address Address {xpath('Address')};
@@ -13,7 +13,7 @@ export t_PhoneFinderSearchBy := record
 	string SSN {xpath('SSN')};
 	string PhoneNumber {xpath('PhoneNumber')};
 end;
-		
+
 export t_PhoneFinderVerificationSearchOption := record
 	boolean VerifyPhoneName {xpath('VerifyPhoneName')};
 	boolean VerifyPhoneNameAddress {xpath('VerifyPhoneNameAddress')};
@@ -26,8 +26,9 @@ export t_PhoneFinderVerificationSearchOption := record
 	integer LengthOfTimeThreshold {xpath('LengthOfTimeThreshold')};
 	boolean VerifyPhoneLastNameAddress {xpath('VerifyPhoneLastNameAddress')};
 	boolean VerifyPhoneAddress {xpath('VerifyPhoneAddress')};
+	boolean VerifyPhoneLastName {xpath('VerifyPhoneLastName')};
 end;
-		
+
 export t_ZumigoOption := record
 	boolean NameAddressValidation {xpath('NameAddressValidation')};
 	boolean NameAddressInfo {xpath('NameAddressInfo')};
@@ -38,7 +39,7 @@ export t_ZumigoOption := record
 	boolean DeviceChangeInfo {xpath('DeviceChangeInfo')};
 	boolean DeviceHistory {xpath('DeviceHistory')};
 end;
-		
+
 export t_PhoneFinderRiskIndicator := record
 	string Category {xpath('Category')};
 	string Level {xpath('Level')}; //values['','L','M','H','']
@@ -51,13 +52,13 @@ export t_PhoneFinderRiskIndicator := record
 	boolean OTP {xpath('OTP')};
 	boolean Active {xpath('Active')};
 end;
-		
+
 export t_PhoneFinderSwitchModeOptions := record
 	boolean Enabled {xpath('Enabled')};
 	string AccountNumber {xpath('AccountNumber')};
 	string Workflow {xpath('Workflow')};
 end;
-		
+
 export t_PhoneFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	integer ReturnCount {xpath('ReturnCount')};
 	integer StartingRecord {xpath('StartingRecord')};
@@ -88,20 +89,22 @@ export t_PhoneFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	boolean IsRDPRequest {xpath('IsRDPRequest')};//hidden[internal]
 	string PrimarySearchCriteria {xpath('PrimarySearchCriteria')}; //values['Phone','PII','']
 	t_PhoneFinderSwitchModeOptions RDPSwitchModeOptions {xpath('RDPSwitchModeOptions')};//hidden[internal]
+	boolean SuppressNonRelevantRecs {xpath('SuppressNonRelevantRecs')};//hidden[internal]
+	boolean SuppressRiskIndicatorWarnStatus {xpath('SuppressRiskIndicatorWarnStatus')};//hidden[internal]
 end;
-		
+
 export t_SpoofCommon := record
 	boolean Spoofed {xpath('Spoofed')};
 	integer SpoofedCount {xpath('SpoofedCount')};
 	iesp.share.t_Date FirstSpoofedDate {xpath('FirstSpoofedDate')};
 	iesp.share.t_Date LastSpoofedDate {xpath('LastSpoofedDate')};
 end;
-		
+
 export t_SpoofHistory := record
 	string1 PhoneOrigin {xpath('PhoneOrigin')};
 	iesp.share.t_Date EventDate {xpath('EventDate')};
 end;
-		
+
 export t_Spoofing := record
 	t_SpoofCommon Spoof {xpath('Spoof')};
 	t_SpoofCommon Destination {xpath('Destination')};
@@ -111,12 +114,12 @@ export t_Spoofing := record
 	iesp.share.t_Date LastEventSpoofedDate {xpath('LastEventSpoofedDate')};
 	dataset(t_SpoofHistory) SpoofingHistory {xpath('SpoofingHistory/SpoofHistory'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxSpoofs)};
 end;
-		
+
 export t_OTPHistory := record
 	boolean OTPStatus {xpath('OTPStatus')};
 	iesp.share.t_Date EventDate {xpath('EventDate')};
 end;
-		
+
 export t_OneTimePassword := record
 	boolean OTP {xpath('OTP')};
 	integer OTPCount {xpath('OTPCount')};
@@ -125,19 +128,19 @@ export t_OneTimePassword := record
 	boolean LastOTPStatus {xpath('LastOTPStatus')};
 	dataset(t_OTPHistory) OTPHistory {xpath('OTPHistory/History'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxOTPs)};
 end;
-		
+
 export t_PhoneFinderAlertIndicator := record
 	integer RiskId {xpath('RiskId')};
 	string Level {xpath('Level')}; //values['','L','M','H','']
 	string Flag {xpath('Flag')};
 	string256 Messages {xpath('Messages')};
 end;
-		
+
 export t_PhoneFinderAlert := record
 	string Flag {xpath('Flag')};
 	dataset(iesp.share.t_StringArrayItem) Messages {xpath('Messages/Message'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxAlertMessages)};
 end;
-		
+
 export t_ZumigoDeviceInfo := record
 	iesp.share.t_Date IMSISeenSince {xpath('IMSISeenSince')};
 	iesp.share.t_Date IMSIChangeDate {xpath('IMSIChangeDate')};
@@ -151,12 +154,18 @@ export t_ZumigoDeviceInfo := record
 	boolean LostStolen {xpath('LostStolen')};
 	iesp.share.t_Date LostStolenDate {xpath('LostStolenDate')};
 end;
-		
+
 export t_InquiryInfo := record
 	integer InquiryRecordsReturned {xpath('InquiryRecordsReturned')};
 	dataset(iesp.share.t_Date) InquiryDates {xpath('InquiryDates/InquiryDate'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxInquiries)};
 end;
-		
+
+export t_PhoneFinderSourceIndicator := record
+	string Category {xpath('Category')};
+	string _Type {xpath('Type')};
+	unsigned2 Count {xpath('Count')};
+end;
+
 export t_BasePhoneInfo := record
 	string Number {xpath('Number')};
 	string _Type {xpath('Type')};
@@ -166,8 +175,10 @@ export t_BasePhoneInfo := record
 	string ListingName {xpath('ListingName')};
 	string PhoneStatus {xpath('PhoneStatus')};
 	string2 PhoneAddressState {xpath('PhoneAddressState')};
+	string Source {xpath('Source')};
+	dataset(t_PhoneFinderSourceIndicator) SourceDetails {xpath('SourceDetails/SourceDetail'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxSources)};//hidden[ecl_only]
 end;
-		
+
 export t_PhoneFinderInfo := record (t_BasePhoneInfo)
 	iesp.share.t_Address Address {xpath('Address')};
 	iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};
@@ -185,7 +196,7 @@ export t_PhoneFinderInfo := record (t_BasePhoneInfo)
 	t_InquiryInfo InquiryDetails {xpath('InquiryDetails')};//hidden[internal]
 	t_ZumigoDeviceInfo ZumigoDeviceDetails {xpath('ZumigoDeviceDetails')};//hidden[internal]
 end;
-		
+
 export t_PhoneIdentityInfo := record
 	string UniqueId {xpath('UniqueId')};
 	string Deceased {xpath('Deceased')};
@@ -198,15 +209,17 @@ export t_PhoneIdentityInfo := record
 	string PrimaryAddressType {xpath('PrimaryAddressType')};
 	string1 RecordType {xpath('RecordType')};
 	boolean PhoneOwnershipIndicator {xpath('PhoneOwnershipIndicator')};
+	string SSN {xpath('SSN')};//hidden[internal]
+	dataset(t_PhoneFinderSourceIndicator) SourceDetails {xpath('SourceDetails/SourceDetail'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxSources)};//hidden[ecl_only]
 end;
-		
+
 export t_PhoneFinderHistory := record
 	iesp.share.t_Name Name {xpath('Name')};
 	iesp.share.t_Address Address {xpath('Address')};
 	iesp.share.t_Date FirstSeen {xpath('FirstSeen')};
 	iesp.share.t_Date LastSeen {xpath('LastSeen')};
 end;
-		
+
 export t_PhoneFinderOperatingCompany := record
 	string CompanyNumber {xpath('CompanyNumber')};
 	string Name {xpath('Name')};
@@ -219,18 +232,18 @@ export t_PhoneFinderOperatingCompany := record
 	string ContactPhoneExt {xpath('ContactPhoneExt')};
 	string Fax {xpath('Fax')};
 end;
-		
+
 export t_PhoneFinderVerificationStatus := record
 	string100 PhoneVerificationDescription {xpath('PhoneVerificationDescription')};
 	boolean PhoneVerified {xpath('PhoneVerified')};
 end;
-		
+
 export t_PortingHistory := record
 	string ServiceProvider {xpath('ServiceProvider')};
 	iesp.share.t_Date PortStartDate {xpath('PortStartDate')};
 	iesp.share.t_Date PortEndDate {xpath('PortEndDate')};
 end;
-		
+
 export t_PhoneFinderDetailedInfo := record (t_BasePhoneInfo)
 	string ListingType {xpath('ListingType')};
 	string PrivacyIndicator {xpath('PrivacyIndicator')};
@@ -266,29 +279,29 @@ export t_PhoneFinderDetailedInfo := record (t_BasePhoneInfo)
 	t_InquiryInfo InquiryDetails {xpath('InquiryDetails')};//hidden[internal]
 	t_ZumigoDeviceInfo ZumigoDeviceDetails {xpath('ZumigoDeviceDetails')};//hidden[internal]
 end;
-		
+
 export t_PhoneFinderSearchRecord := record
 	dataset(t_PhoneIdentityInfo) Identities {xpath('Identities/Identity'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxIdentities)};
 	dataset(t_PhoneFinderInfo) OtherPhones {xpath('OtherPhones/Phone'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxOtherPhones)};
 	dataset(t_PhoneFinderHistory) PhonesHistory {xpath('PhonesHistory/Phone'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxPhoneHistory)};
 	t_PhoneFinderDetailedInfo PrimaryPhoneDetails {xpath('PrimaryPhoneDetails')};
 end;
-		
+
 export t_PhoneFinderSearchResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
 	dataset(t_PhoneFinderSearchRecord) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxPhoneFinderRecords)};
 	t_PhoneFinderSearchBy InputEcho {xpath('InputEcho')};
 end;
-		
+
 export t_PhoneFinderSearchRequest := record (iesp.share.t_BaseRequest)
 	t_PhoneFinderSearchBy SearchBy {xpath('SearchBy')};
 	t_PhoneFinderSearchOption Options {xpath('Options')};
 end;
-		
+
 export t_PhoneFinderSearchResponseEx := record
 	t_PhoneFinderSearchResponse response {xpath('response')};
 end;
-		
+
 
 end;
 

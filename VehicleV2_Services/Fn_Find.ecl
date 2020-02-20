@@ -16,7 +16,9 @@ export Fn_Find(
 							boolean includeCriminalIndicators=FALSE,
 							boolean include_non_regulated_data = false) 
 							:= module 
-	
+  global_mod := AutoStandardI.GlobalModule();
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
+
 	isCNSMR := ut.IndustryClass.is_Knowx;
 	includeNonRegulatedData := include_non_regulated_data and ~doxie.DataRestriction.InfutorMV;
 
@@ -109,7 +111,7 @@ export Fn_Find(
 														(source_code in MDR.sourceTools.set_infutor_all_veh and ut.PermissionTools.dppa.ok(dppa_purpose))));
 	
 	// Similar issue: 3,000,000 by vehicle-key, ~4,500 by vehicle-, iteration-, sequence-key.
-	owner_recs0_info :=join(in_veh_keys, vehiclev2.Key_Vehicle_Party_Key,
+	owner_recs0_info_pre :=join(in_veh_keys, vehiclev2.Key_Vehicle_Party_Key,
 									keyed(left.vehicle_key=right.vehicle_key[1..length(trim(left.vehicle_key))]) and
 									keyed(left.iteration_key='' or left.Iteration_key = right.Iteration_key) and// and
 									keyed(left.sequence_key=''  or left.sequence_key= right.sequence_key) and
@@ -118,7 +120,7 @@ export Fn_Find(
                   // TODO: should rather be PARTIES_PER_VEHICLE
 									keep(VehicleV2_services.Constant.VEHICLE_PER_KEY), limit (10000));
 	
-									
+	owner_recs0_info := suppress.MAC_SuppressSource(owner_recs0_info_pre,mod_access,append_did);								
 	owner_recs0 := if(~isCNSMR, owner_recs0_info);
 									
 	vehiclev2.Layout_Base_Party get_dob_sex(owner_recs0 l, driversv2.Key_DL_DID r) := transform

@@ -30,6 +30,7 @@
   END;
 	
 	EXPORT IDENTITY_RESOLVED_REALTIME := 'R';
+	EXPORT UNSIGNED2 RECENT_ACTIVITY_DAYS := 30;
 
   // GOV FDN id key classification_entity.entity_type field possible data values
   EXPORT Entity_Types := MODULE
@@ -275,5 +276,10 @@
 		EXPORT STRING _IPADDRESS := '_18';
 		EXPORT STRING _BANKACCOUNT := '_19';
 		EXPORT STRING _DLNUMBER := '_20';
-	END;	
+	END;
+	
+	EXPORT KelIndicatorType := MODULE
+		EXPORT STRING KNOWN_RISK := 'KR';
+		EXPORT STRING IDENTITY := 'ID';
+	END;
 END;

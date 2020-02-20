@@ -1,4 +1,6 @@
-﻿IMPORT AddrBest, Address, BatchShare, DeathV2_Services, DidVille, Std, Suppress, ut;
+﻿IMPORT AddrBest, Address, Autokey_batch, AutokeyB2, BatchServices, 
+	   BatchShare, DeathV2_Services, DidVille, LN_PropertyV2, 
+	   LN_PropertyV2_Services, Std, Suppress, ut;
 
 EXPORT Functions := MODULE
 
@@ -59,7 +61,7 @@ EXPORT Functions := MODULE
 			RETURN PROJECT(SORT(ds_normalized,(UNSIGNED)acctno),HomesteadExemptionV2_Services.Layouts.workRecSlim);
 		END;
 
-	/************************************************/
+	//************************************************/
 	EXPORT clean_Names (DATASET(HomesteadExemptionV2_Services.Layouts.workRecSlim) ds_work_in) := FUNCTION
 
 		HomesteadExemptionV2_Services.Layouts.workRecSlim cleanName(ds_work_in L) := TRANSFORM
@@ -76,12 +78,13 @@ EXPORT Functions := MODULE
 		RETURN PROJECT(ds_work_in,cleanName(LEFT));
 	END;
 
-	/************************************************/
+	//************************************************/
 	EXPORT validate_Input (DATASET(HomesteadExemptionV2_Services.Layouts.workRecSlim) ds_work_in,
 					HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
 
 		BatchShare.MAC_CapitalizeInput(ds_work_in,ds_cap_recs);
 		BatchShare.MAC_CleanAddresses(ds_cap_recs,ds_cln_recs); // does not fill addr,zip4 or county_name
+		
 		ds_validate_name_addr:=PROJECT(ds_cln_recs,
 			TRANSFORM(HomesteadExemptionV2_Services.Layouts.workRecSlim,
 				SELF.error_code:=IF(BatchShare.MAC_IsInputValid(LEFT,BatchShare.Constants.Valid_Min_Cri.DID_OR_Name_Address),
@@ -103,7 +106,7 @@ EXPORT Functions := MODULE
 		RETURN PROJECT(ds_validate_name_addr,validateYear(LEFT));
 	END;
 
-	/************************************************/
+	//************************************************/
 	SHARED do_Didville (DATASET(DidVille.Layout_Did_OutBatch) ds_didville_in, UNSIGNED1 ScoreThreshold) := FUNCTION
 
 		didRollRec := RECORD
@@ -129,7 +132,7 @@ EXPORT Functions := MODULE
 		RETURN ROLLUP(ds_didville_sort,LEFT.seq=RIGHT.seq,countDids(LEFT,RIGHT));
 	END;
 
-	/************************************************/
+	//************************************************/
 	EXPORT append_Dids (DATASET(HomesteadExemptionV2_Services.Layouts.workRecSlim) ds_work_in,
 					HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
 
@@ -148,7 +151,7 @@ EXPORT Functions := MODULE
 
 		Constants:=HomesteadExemptionV2_Services.Constants;
 		Suppress.MAC_Suppress(ds_didville_out,ds_dids,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did);
-
+		
 		HomesteadExemptionV2_Services.Layouts.workRecSlim appendDids(ds_work_in L, ds_didville_out R) := TRANSFORM
 			lowLexIdScore:=R.score<in_mod.didScoreThreshold;
 			tooManySubjects:=lowLexIdScore AND R.cnt>1;
@@ -178,7 +181,141 @@ EXPORT Functions := MODULE
 			LEFT OUTER,KEEP(1));
 	END;
 
-	/************************************************/
+	//************************************************/
+	EXPORT append_LexIdsByProperty (
+				DATASET(HomesteadExemptionV2_Services.Layouts.workRecSlim) ds_work_in,
+				HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
+
+		ak_batch_in := PROJECT(ds_work_in, Autokey_batch.Layouts.rec_inBatchMaster);
+
+		// 1. Define values for obtaining autokeys and payloads.
+		ak_keyname	:= LN_PropertyV2.Constants.ak_keyname;   //  ln_propertyv2.cluster + 'key::ln_propertyv2::autokey::'
+		ak_dataset	:= LN_PropertyV2.Constants.ak_dataset;   //  LN_PropertyV2.file_search_autokey
+		ak_typeStr	:= LN_PropertyV2.Constants.ak_typeStr;   //  '\'AK\''
+			
+		// 2. Configure the autokey search.	
+		ak_config := MODULE(BatchServices.Interfaces.i_AK_Config)
+			export workHard        := TRUE; // for Autokey_batch.Fetch_Address_Batch to run at all.
+			export useAllLookups   := TRUE; // for Autokey_batch.Fetch_SSN_Batch to run SSN2 key. SSN key is empty.
+			export isTestHarness   := FALSE;
+			export skip_set        := LN_PropertyV2.Constants.ak_skipSet + auto_skip + ['P'];
+		END;
+
+		ds_fids := Autokey_batch.get_fids(ak_batch_in, ak_keyname, ak_config);
+		AutokeyB2.mac_get_payload( UNGROUP(ds_fids), ak_keyname, ak_dataset, outpl, did, zero, ak_typeStr )
+		ds_fares_ids_by_autokey := DEDUP(SORT( PROJECT(outpl, 
+										BatchServices.Layouts.LN_Property.rec_acctnos_fids), 
+											acctno, ln_fares_id ), 
+									acctno, ln_fares_id);
+
+		prop_match_rec := RECORD
+			BatchShare.Layouts.ShareAcct;
+			BatchShare.Layouts.ShareDid;
+			BatchShare.Layouts.ShareName;
+			BatchShare.Layouts.ShareAddress;	
+			STRING8 process_date;
+			BOOLEAN isExactNameMatch := FALSE;
+			BOOLEAN isFuzzyNameMatch := FALSE;
+			BOOLEAN isAddrMatch := FALSE;
+			BOOLEAN isSecRangeIgnored := FALSE;
+		END;
+
+		prop_match_rec xform_with_prop(BatchServices.Layouts.LN_Property.rec_acctnos_fids l,
+									   RECORDOF(LN_PropertyV2.key_search_fid) r) := TRANSFORM
+			SELF.acctno := l.acctno,
+			SELF.name_first := r.fname,
+			SELF.name_middle := r.mname,
+			SELF.name_last := r.lname,
+			SELF.name_suffix := r.name_suffix,
+			SELF.addr_suffix := r.suffix,
+			SELF.z5 := r.zip,
+			SELF := r,
+		END;
+	
+		ds_props := JOIN(ds_fares_ids_by_autokey, LN_PropertyV2.key_search_fid(),
+						KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id) AND
+						(RIGHT.source_code_1 = HomesteadExemptionV2_Services.Constants.OWNER OR 
+						RIGHT.source_code_1 = HomesteadExemptionV2_Services.Constants.BORROWER) AND
+						RIGHT.source_code_2 = HomesteadExemptionV2_Services.Constants.PROPERTY, //Property
+						xform_with_prop(LEFT, RIGHT), ATMOST(LN_PropertyV2_Services.consts.max_raw));
+
+		// Compare name & address of the property records with the name & address of the input
+		// records to set match criteria for determining DID.
+		prop_match_rec xform_prop_matches(prop_match_rec l, HomesteadExemptionV2_Services.Layouts.workRecSlim r ) := TRANSFORM
+			isAddrMatch := l.prim_range = r.prim_range AND 
+						   l.predir = r.predir AND 
+						   l.prim_name = r.prim_name AND
+						   l.addr_suffix = r.addr_suffix AND 
+						   l.postdir = r.postdir AND 
+						   l.st = r.st AND 
+						   l.z5 = r.z5;
+
+			isNameSuffixMatch := l.name_suffix = '' OR r.name_suffix = '' OR l.name_suffix = r.name_suffix;
+
+			isExactNameMatch := l.name_first = r.name_first AND 
+								l.name_last = r.name_last AND 
+								isNameSuffixMatch;
+
+			isFuzzyNameMatch := metaphonelib.DMetaPhone1(trim(l.name_first,all)) =  metaphonelib.DMetaPhone1(trim(r.name_first,all)) AND 
+								metaphonelib.DMetaPhone1(trim(l.name_last,all)) =  metaphonelib.DMetaPhone1(trim(r.name_last,all)) AND 
+								isNameSuffixMatch;
+											
+			SELF.isAddrMatch := isAddrMatch;
+			SELF.isSecRangeIgnored := NOT(l.sec_range = r.sec_range);
+
+			SELF.isExactNameMatch := isExactNameMatch;
+			SELF.isFuzzyNameMatch := isFuzzyNameMatch;
+			SELF := l;
+		END;
+		
+		ds_props_matches := JOIN(ds_props, ds_work_in,
+								LEFT.acctno = RIGHT.acctno,
+								xform_prop_matches(LEFT, RIGHT), LEFT OUTER);
+
+		ds_props_good_lexid := ds_props_matches(did <> 0 AND 
+												isAddrMatch AND 
+												isFuzzyNameMatch);	
+
+		prop_match_rec xdenorm_props(HomesteadExemptionV2_Services.Layouts.workRecSlim l, 
+								  	 DATASET(prop_match_rec) r) := TRANSFORM
+
+			// If the property records contain more than one DID, use the input tax_year 
+			// to select one.							
+			num_prop_dids := COUNT(DEDUP(SORT(r, did), did));
+			prop_recs := IF(num_prop_dids = 1, r, r(process_date[1..4] = l.tax_year));
+			// Sort so the best match is on top.  isSecRangeIgnored=false ranks higher
+			// than isSecRangeIgnored=true.
+			prop_recs_sorted := SORT(prop_recs, -isAddrMatch, -isExactNameMatch, -isFuzzyNameMatch, isSecRangeIgnored);
+			SELF.did := prop_recs_sorted[1].did;
+			SELF.process_date := prop_recs_sorted[1].process_date;
+			SELF.isAddrMatch := prop_recs_sorted[1].isAddrMatch;
+			SELF.isSecRangeIgnored := prop_recs_sorted[1].isSecRangeIgnored;
+			SELF.isExactNameMatch := prop_recs_sorted[1].isExactNameMatch;
+			SELF.isFuzzyNameMatch := prop_recs_sorted[1].isFuzzyNameMatch;
+			SELF := l;
+		END;
+
+		// Get the best match.
+		ds_props_denorm := DENORMALIZE(ds_work_in, ds_props_good_lexid,
+								LEFT.acctno = RIGHT.acctno,
+								GROUP,
+									xdenorm_props(LEFT, ROWS(RIGHT)));
+
+		ds_with_LexIdByProperty := JOIN(ds_work_in, ds_props_denorm,
+									LEFT.acctno = RIGHT.acctno,
+									TRANSFORM(HomesteadExemptionV2_Services.Layouts.workRecSlim,
+										SELF.did := IF(RIGHT.did <> 0, RIGHT.did, LEFT.did);
+										// If a LexId was found from Property, replace the 
+										// Didville score with 100.  Otherwise, use the 
+										// Didville score.
+										SELF.score := IF(RIGHT.did <> 0, 100, LEFT.score);
+										SELF := LEFT));
+
+		RETURN ds_with_LexIdByProperty;
+
+	END;
+
+	//************************************************/
 	EXPORT append_Best (DATASET(HomesteadExemptionV2_Services.Layouts.workRecSlim) ds_work_in,
 					HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
 
@@ -218,7 +355,7 @@ EXPORT Functions := MODULE
 		RETURN ds_with_best;
 	END;
 
-	/************************************************/
+	//************************************************/
 	EXPORT append_deceased (DATASET(HomesteadExemptionV2_Services.Layouts.workRec) ds_work_in,
 					HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
 
@@ -255,7 +392,7 @@ EXPORT Functions := MODULE
 		RETURN ds_with_death;
 	END;
 
-	/************************************************/
+	//************************************************/
 	EXPORT getPropertyID(HomesteadExemptionV2_Services.Layouts.addrMin addr, STRING APN) := FUNCTION
 		smashedAddr:=TRIM(addr.prim_range+addr.prim_name+addr.st+addr.z5,ALL);
 		hasMinAddr:=(addr.prim_range!='' OR ut.isPOBox(addr.prim_name) OR ut.isRR(addr.prim_name))
@@ -263,14 +400,14 @@ EXPORT Functions := MODULE
 		RETURN IF(hasMinAddr,smashedAddr,APN);
 	END;
 
-	/************************************************/
+	//************************************************/
 	EXPORT compare2Addresses(HomesteadExemptionV2_Services.Layouts.addrMin addr1, HomesteadExemptionV2_Services.Layouts.addrMin addr2, BOOLEAN includeSecondaryRange=TRUE) := FUNCTION
 		RETURN addr1.prim_range=addr2.prim_range AND addr1.prim_name=addr2.prim_name AND
 			((addr1.p_city_name=addr2.p_city_name AND addr1.st=addr2.st) OR addr1.z5=addr2.z5) AND
 			IF(includeSecondaryRange,addr1.sec_range=addr2.sec_range,TRUE);
 	END;
 
-	/************************************************/
+	//************************************************/
 	EXPORT previousYears(STRING4 year, INTEGER cnt) := FUNCTION
 		rec:=RECORD
 			STRING4 year;

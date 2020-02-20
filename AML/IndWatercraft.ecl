@@ -1,6 +1,6 @@
-IMPORT Watercraft, RiskWise;
+﻿IMPORT Watercraft, RiskWise, doxie, Suppress;
 
-EXPORT IndWatercraft(DATASET(Layouts.LayoutAMLShellV2) IndivIds) := FUNCTION
+EXPORT IndWatercraft(DATASET(Layouts.LayoutAMLShellV2) IndivIds, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 //version 2
 watercraftLayout := RECORD
@@ -13,10 +13,15 @@ watercraftLayout := RECORD
 	string15 history_flag;
 	unsigned4 watercraftCount := 0;
 END;
+
+watercraftLayout_CCPA := RECORD
+  unsigned4 global_sid;
+  watercraftLayout;
+END;
 	
 WCidKey := Watercraft.key_watercraft_did(false); 
  
-watercraftLayout  getWCKey(IndivIds le, WCidKey ri) := TRANSFORM
+watercraftLayout_CCPA  getWCKey(IndivIds le, WCidKey ri) := TRANSFORM
  	lenDate := length(trim(ri.sequence_key));
 	SELF.watercraft_key := ri.watercraft_key;
 	self.sequence_key := ri.sequence_key;
@@ -24,6 +29,7 @@ watercraftLayout  getWCKey(IndivIds le, WCidKey ri) := TRANSFORM
 	self.seq := le.seq;
 	self.historydate := le.historydate;
 	self.state_origin := ri.state_origin;
+    self.global_sid := 0;
 	self := [];
 END;
  
@@ -37,7 +43,7 @@ WatercraftKeys :=  join(IndivIds, WCidKey,
 											
 WCDetailskey := watercraft.key_watercraft_sid(false);
 											
-watercraftLayout  getWCDetails(WatercraftKeys le, WCDetailskey ri) := TRANSFORM
+watercraftLayout_CCPA  getWCDetails(WatercraftKeys le, WCDetailskey ri) := TRANSFORM
 	SELF.watercraft_key := le.watercraft_key;
 	self.sequence_key := le.sequence_key;
 	self.did := le.did;
@@ -49,6 +55,7 @@ watercraftLayout  getWCDetails(WatercraftKeys le, WCDetailskey ri) := TRANSFORM
 														'');
 	self.watercraftCount := if(ri.history_flag = '' and le.watercraft_key <> '' , 1, 0)	;
 	self.state_origin := le.state_origin;
+    self.global_sid := ri.global_sid;
 
 END;
 
@@ -62,7 +69,7 @@ WatercraftDetails :=  join(WatercraftKeys, WCDetailskey,
 												 				 
 SortWCdetails :=  sort(WatercraftDetails, seq, did, watercraft_key, -sequence_key);
 
-watercraftLayout rollWatercrafts(WatercraftDetails le, WatercraftDetails ri) := TRANSFORM
+watercraftLayout_CCPA rollWatercrafts(WatercraftDetails le, WatercraftDetails ri) := TRANSFORM
 	SELF.watercraft_key := le.watercraft_key;
 	self.sequence_key := le.sequence_key;
 	self.did := le.did;
@@ -72,14 +79,17 @@ watercraftLayout rollWatercrafts(WatercraftDetails le, WatercraftDetails ri) := 
 	self.watercraftCount := le.watercraftCount + iF(le.watercraft_key=ri.watercraft_key, 0,	ri.watercraftCount);	
 	self.historydate := le.historydate;
 	self.state_origin := le.state_origin;
+    self.global_sid := le.global_sid;
 
 END;
 
-RolledWC :=  rollup(SortWCdetails, left.seq = right.seq and left.did = right.did,
-										rollWatercrafts(left, right));
+RolledWC :=  Suppress.MAC_SuppressSource(rollup(SortWCdetails, left.seq = right.seq and left.did = right.did,
+										rollWatercrafts(left, right)), mod_access);
 										
-	
-AddWCCount := join(IndivIds, RolledWC, 
+rolled_watercraft := PROJECT(RolledWC, TRANSFORM(watercraftLayout,
+                                                  SELF := LEFT));	
+  
+AddWCCount := join(IndivIds, rolled_watercraft, 
 										left.did = right.did and
 										left.seq = right.seq,
 										transform(Layouts.LayoutAMLShellV2,

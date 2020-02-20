@@ -2,7 +2,7 @@
 // This library performs person fetches.
 // All logic for performing the fetch should be based here.
 
-IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
+IMPORT dx_header,doxie,_Control,AutoStandardI,AutoheaderV2;
 
 #if(not _Control.LibraryUse.ForceOff_AutoHeaderI__LIB_FetchI_Hdr_Indv)
   export LIB_header_saltplus(dataset (AutoheaderV2.layouts.lib_search) ds_search_in, integer search_code=0) := MODULE, LIBRARY (AutoheaderV2.ILIB.IHeaderSearch)
@@ -12,8 +12,8 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
 
   // here we must make a choice whether to clean the input inside the library
   shared ds_search := AutoheaderV2.LIBCALL_conversions.CleanSearchInputDataset (ds_search_in, AutoHeaderV2.Constants.LibVersion.SALT);  // input requires full cleaning
-		shared ds_search_legacy := AutoheaderV2.LIBCALL_conversions.CleanSearchInputDataset (ds_search_in, AutoHeaderV2.Constants.LibVersion.LEGACY);  
-		shared _row := ds_search_legacy[1];
+	shared ds_search_legacy := AutoheaderV2.LIBCALL_conversions.CleanSearchInputDataset (ds_search_in);  
+	shared _row := ds_search_legacy[1];
   shared _options := ds_search_legacy[1].options;
   shared temp_ssn_value := _row.tssn.ssn;
 
@@ -91,11 +91,11 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
                                                      self     := left));
 																										 
 	EXPORT dataset (AutoHeaderV2.layouts.search_out) all_dids := lib_dids;
-  																												
+  fetched := lib_dids(did!=0);
   // choose best DIDs, if requested
   bd := if(_options.only_best_did, 
-           lib_dids(score>=75), 
-           lib_dids);
+           fetched(score>=75),
+           fetched);
 
   boolean no_fail := search_code & AutoheaderV2.Constants.SearchCode.NOFAIL > 0;
     
@@ -105,7 +105,7 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
   hr1 := IF(no_fail, Fetch_nofail, Fetch_fail);
 
   //prune old SSNs; ssn_set contains at least an input ssn
-  hr1_pruned := JOIN(hr1, doxie.Key_DID_SSN_Date (), 
+  hr1_pruned := JOIN(hr1, dx_header.key_DID_SSN_date (), 
                      keyed (LEFT.did = RIGHT.did and RIGHT.ssn in _row.tssn.ssn_set),
                      transform (Left), LEFT ONLY);
                        

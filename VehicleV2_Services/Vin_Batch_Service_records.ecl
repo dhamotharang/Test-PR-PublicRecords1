@@ -1,7 +1,10 @@
-import Autokey_batch, VehicleV2_Services, Address, VehicleV2, BatchServices, AutokeyB2, AutoStandardI, BIPV2, STD;
+﻿import Autokey_batch, VehicleV2_Services, Address, VehicleV2, BatchServices, 
+       AutokeyB2, AutoStandardI, BIPV2, STD, doxie, Suppress;
 
 export Vin_Batch_Service_records(dataset(VehicleV2_Services.Batch_Layout.Vin_BatchIn) data_in,
 																 VehicleV2_Services.IParam.RTBatch_V2_params in_param) := function
+
+mod_access := project(in_param,doxie.IDataAccess,opt);
 
 // Keys
 	keyVDID := VehicleV2.Key_Vehicle_DID;
@@ -52,6 +55,10 @@ export Vin_Batch_Service_records(dataset(VehicleV2_Services.Batch_Layout.Vin_Bat
 		UNSIGNED6	did := 0;
 		VehicleV2_Services.Batch_Layout.bip_ids;
 	END;
+  AcctRec_Plus := RECORD(AcctRec)
+   unsigned4 global_sid;
+   unsigned8 record_sid;
+  END;
 
 	AcctRec fromKeyVDID(AcctRec l, keyVDID r) := TRANSFORM
 		SELF.did := r.Append_DID;
@@ -59,7 +66,7 @@ export Vin_Batch_Service_records(dataset(VehicleV2_Services.Batch_Layout.Vin_Bat
 		SELF := l;
 	END;
 
-	AcctRec fromKeyVPK(AcctRec l, keyVPK r) := TRANSFORM
+	AcctRec_Plus fromKeyVPK(AcctRec l, keyVPK r) := TRANSFORM
 		SELF.did := r.Append_DID;
 		SELF := r;
 		SELF := l;
@@ -502,7 +509,7 @@ export Vin_Batch_Service_records(dataset(VehicleV2_Services.Batch_Layout.Vin_Bat
 	// Main
 	BOOLEAN return_current_only := in_param.ReturnCurrent;
 	BOOLEAN return_fullname_only := in_param.FullNameMatch; 
-	UNSIGNED2 rsltsPerInput := AutoStandardI.InterfaceTranslator.MaxResults_val.val(PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.InterfaceTranslator.MaxResults_val.params));
+	UNSIGNED2 rsltsPerInput :=  AutoStandardI.InterfaceTranslator.MaxResults_val.val(PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.InterfaceTranslator.MaxResults_val.params));
 
 	cfgs := MODULE(BatchServices.Interfaces.i_AK_Config)
 		EXPORT useAllLookups := TRUE;
@@ -537,7 +544,7 @@ export Vin_Batch_Service_records(dataset(VehicleV2_Services.Batch_Layout.Vin_Bat
 
 	// Search via BIP Linkids
 	ds_linkIds := PROJECT(data_in(ultid !=0),BIPV2.IDlayouts.l_xlink_ids2);
-	ds_from_linkids := PROJECT(VehicleV2.Key_Vehicle_linkids.kFetch(ds_linkIds,in_param.BIPFetchLevel),
+	ds_from_linkids := PROJECT(VehicleV2.Key_Vehicle_linkids.kFetch(ds_linkIds,,in_param.BIPFetchLevel),
 															 TRANSFORM(AcctRec,
 																					SELF := LEFT,
 																					SELF.vin := '',
@@ -570,13 +577,13 @@ export Vin_Batch_Service_records(dataset(VehicleV2_Services.Batch_Layout.Vin_Bat
 											 KEYED(trimBoth(LEFT.vin) = RIGHT.vin),
 											 TRANSFORM(AcctRec, SELF := RIGHT, SELF := LEFT),
 											 LIMIT(VehicleV2_Services.Constant.VEHICLE_BATCH_LIMIT));
-	withVINInput_pk := JOIN(withVINInput, keyVPK,
+	withVINInput_pk_pre := JOIN(withVINInput, keyVPK,
 													KEYED(LEFT.Vehicle_Key = RIGHT.Vehicle_Key AND
 																LEFT.Iteration_Key = RIGHT.Iteration_Key),
 													fromKeyVPK(LEFT, RIGHT),
 													LIMIT(VehicleV2_Services.Constant.VEHICLE_BATCH_LIMIT));
-
-	vin_acctno := DEDUP(SORT(withVINInput_pk, acctno, Vehicle_Key, Iteration_Key, Sequence_Key, state_origin),
+  withVINInput_pk := suppress.MAC_SuppressSource(withVINInput_pk_pre,mod_access);
+	vin_acctno := DEDUP(SORT(project(withVINInput_pk,AcctRec), acctno, Vehicle_Key, Iteration_Key, Sequence_Key, state_origin),
 											acctno, Vehicle_Key, Iteration_Key, Sequence_Key, state_origin);
 
 	acctNos := DEDUP(SORT(did_acctno + vin_acctno, acctno, Vehicle_Key, Iteration_Key, Sequence_Key, state_origin),

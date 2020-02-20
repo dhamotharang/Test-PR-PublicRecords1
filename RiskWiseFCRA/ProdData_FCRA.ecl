@@ -1,11 +1,16 @@
 ﻿/*--SOAP--
 <message name="Prod Data FCRA - Raw">
 	<part name="did" type="xsd:integer"/>
+	<part name="first" type="xsd:string"/>
+	<part name="middle" type="xsd:string"/>
+	<part name="last" type="xsd:string"/>
 	<part name="addr" type="xsd:string"/>
 	<part name="city" type="xsd:string"/>
 	<part name="state" type="xsd:string"/>
 	<part name="zip" type="xsd:string"/>
 	<part name="socs" type="xsd:string"/>
+	<part name="dob" type="xsd:string"/>
+	<part name="phone" type="xsd:string"/>
 	<part name="IncludeAllFiles" type="xsd:boolean"/>
 	<part name="IncludeAircraft" type="xsd:boolean"/>
 	<part name="IncludeStudent" type="xsd:boolean"/>
@@ -34,23 +39,30 @@
   <part name="DisplayDeployedEnvironment" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string"/>
   <part name="IntendedPurpose" type="xsd:string"/>
+  <part name="neutral_gateway" type="xsd:string"/>
+  <part name="IncludeCFPB" type="xsd:string"/>
  </message>
 */
 
 import american_student_list, avm_v2, doxie, doxie_files, fcra, liensv2, ln_propertyv2, riskwise, risk_indicators,
        watercraft, bankruptcyv3, bankruptcyv2, gong, impulse_email, infutorcid, email_data, paw,
        advo, inquiry_acclogs,  prof_licenseV2, header_quick, AlloyMedia_student_list,
-       SexOffender, _Control, watchdog;
+	 SexOffender, _Control, watchdog, data_services, std, gateway,dx_ConsumerFinancialProtectionBureau;
 
 export ProdData_FCRA := MACRO
 
 #WEBSERVICE(FIELDS(
 	'did',
+	'first',
+	'middle',
+	'last',
 	'addr',
 	'city',
 	'state',
 	'zip',
 	'socs',
+	'dob',
+	'phone',
 	'IncludeAllFiles',	
 	'IncludeADVO',
   'IncludeAircraft',
@@ -76,19 +88,26 @@ export ProdData_FCRA := MACRO
   'IncludeStudent',
 	'IncludeThrive',
 	'IncludeWatercraft',	
+	'IncludeCFPB',	
 	'DisplayDeployedEnvironment',
 	'DataRestrictionMask',
-  'IntendedPurpose'
+  'IntendedPurpose',
+	'neutral_gateway'
 	));
 
 boolean	isFCRA := true;
-unsigned1 ENV := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
-unsigned6 in_did := 0    : stored('did');
+unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+unsigned6 input_did := 0    : stored('did');
 string9 in_socs := ''	   : stored('socs');
 string120 in_addr := ''	 : stored('addr');
 string25 in_city := ''	 : stored('city');
 string2 in_state := ''	 : stored('state');
 string5 in_zip := ''	   : stored('zip');
+string in_first := '' 		: stored('first');
+string in_middle := '' 		: stored('middle');
+string in_last := '' 			: stored('last');
+string in_dob := '' 			: stored('dob');
+string10 in_phone := ''   : stored('phone');
 
 boolean Include_All_Files := false : stored('IncludeAllFiles');
 boolean Include_Aircraft := false : stored('IncludeAircraft');
@@ -113,6 +132,7 @@ boolean Include_Overrides := false : stored('IncludeOverrides');
 boolean Include_Mari := false : stored('IncludeMari');
 boolean Include_Thrive := false : stored('IncludeThrive');
 boolean Include_DeathMaster := false : stored('IncludeDeathMaster');
+boolean Include_CFPB := false : stored('IncludeCFPB');
 	
 unsigned1 DPPA := RiskWise.permittedUse.fraudDPPA : stored('DPPAPurpose');
 unsigned1 GLB := RiskWise.permittedUse.fraudGLBA  : stored('GLBPurpose');
@@ -121,6 +141,7 @@ string DataRestrictionMask := '' : STORED('DataRestrictionMask');
 string IntendedPurpose := '' : STORED('IntendedPurpose');
 string delta_PersonContext_gateway := '' : STORED('delta_PersonContext_gateway');
 boolean Include_PersonContext := false : STORED('IncludePersonContext');
+string neutral_ip := riskwise.shortcuts.QA_neutral_roxieIP : stored('neutral_gateway');
 
 max_recs := 100;
 
@@ -129,8 +150,18 @@ a := record
 end;
 emptyset := dataset([{''}],a);
 
-risk_indicators.layout_input parseAddr(emptySet l) := transform
-	self.did := in_did;
+input_rec := Record
+risk_indicators.Layout_Input;
+string statecode;
+END;
+
+input_rec parseAddr(emptySet l) := transform
+	self.did := input_did;
+	self.score := if(input_did<>0, 100, 0);
+	self.fname := std.str.touppercase(in_first);
+	self.mname := std.str.touppercase(in_middle);
+	self.lname := std.str.touppercase(in_last);
+	
 	clean_addr := Risk_Indicators.MOD_AddressClean.clean_addr(in_addr, in_city, in_state, in_zip);
 	
 	self.in_streetaddress := in_addr;
@@ -155,15 +186,34 @@ risk_indicators.layout_input parseAddr(emptySet l) := transform
 	self.addr_status := clean_addr[179..182];
 	self.county := clean_addr[143..145];
 	self.geo_blk := clean_addr[171..177];
+	self.statecode := clean_addr[141..142];
 	self.ssn := in_socs;
-	
+	self.dob := in_dob;
+	self.phone10 := in_phone;
 	self := [];
 end;
-clean_a2 := project(emptyset, parseAddr(left));
+
+clean_a2_geolink := project(emptyset, parseAddr(left));
+output(clean_a2_geolink, named('clean_a2_geolink'));
+
+InputLayout := RECORD
+input_rec-statecode;
+END;
+
+clean_a2 := Project(clean_a2_geolink,TRANSFORM(InputLayout,self := LEFT));
 output(clean_a2, named('cleaned_input'));
-	
+
+bsversion := 54; 
+neutral_gateways := DATASET ([{'neutralroxie', neutral_ip}], Gateway.Layouts.Config);
+								
+neutral_did_response := if(input_did=0, Risk_Indicators.Neutral_DID_Soapcall(clean_a2, neutral_gateways, bsversion, 2, DataRestrictionMask, true),
+	project(clean_a2, transform(Risk_Indicators.Layouts.Layout_Neutral_DID_Service, self := left, self := []) ) );
+output(neutral_did_response, named('neutral_did_response'));
+
+in_did := neutral_did_response[1].did;
+
 // DID section
-	header_recs := choosen(doxie.Key_FCRA_Header(keyed(s_did=in_did)), 200);
+	header_recs := choosen(dx_header.key_header(iType)(keyed(s_did=in_did)), 200);
 	if(include_header or Include_All_Files, output(header_recs, named('header_records'))) ;	
 	
 	qheader_recs := choosen(header_quick.key_DID_fcra(keyed(did=in_did)), 200);
@@ -172,8 +222,11 @@ output(clean_a2, named('cleaned_input'));
 	header_corr := choosen(FCRA.Key_Override_Header_DID(keyed(did=in_did)), 500);
 	if(include_header or Include_All_Files, output(header_corr, named('header_corrections'))) ;
 	
-	address_hierarchy_recs := choosen(dx_header.key_addr_hist(ENV)(keyed(s_did=in_did)), 200);
+	address_hierarchy_recs := choosen(dx_header.key_addr_hist(iType)(keyed(s_did=in_did)), 200);
 	if(include_header or Include_All_Files, output(sort(address_hierarchy_recs,address_history_seq) , named('address_hierarchy_recs'))) ;	
+	
+  address_hierarchy_unique_recs := choosen(dx_header.Key_Addr_Unique_Expanded(iType)(keyed(did=in_did)), 200);
+	if(include_header or Include_All_Files, output(sort(address_hierarchy_unique_recs,addr_ind) , named('address_hierarchy_unique_recs'))) ;	
 	
 	deathMaster_Recs := choosen(doxie.key_death_masterV2_ssa_DID_fcra(keyed(l_did=in_did)), 10);
 	if(Include_DeathMaster or Include_All_Files, output(deathMaster_Recs, named('deathMaster_Recs')));
@@ -449,10 +502,40 @@ input_with_did := project(clean_a2, transform(risk_indicators.layout_output, sel
 gw_personcontext := dataset( [{'delta_personcontext',delta_PersonContext_gateway}], risk_indicators.layout_gateways_in );
 gateways := project(gw_personContext, transform(gateway.layouts.config, self := left, self := []) );
 
-bsversion := 50;
+
     
 pc := Risk_Indicators.checkPersonContext(group(input_with_did, seq), gateways, bsversion, intendedPurpose);
 if(include_personContext or delta_personcontext_gateway <> '', output(pc, named('person_context')) );
 
-//
+//CFPB keys
+
+CFPB_key_surnames := dx_ConsumerFinancialProtectionBureau.key_census_surnames(isFCRA);
+withCFPB_surnames := join(clean_a2,CFPB_key_surnames,
+							        keyed(right.name=left.lname),
+							        transform(recordof(CFPB_key_surnames), self.name := left.lname,
+							        self := right, self := []), left outer,atmost(max_recs),keep(10));
+              
+if(include_all_files=true or include_CFPB=true, output(withCFPB_surnames, named('CFPB_surnames')) );
+
+CFPB_key_BLKGRP := dx_ConsumerFinancialProtectionBureau.key_BLKGRP(isFCRA);
+withCFPB_BLKGRP := join(clean_a2_geolink,CFPB_key_BLKGRP,
+		             keyed(right.GEOID10_BlkGrp =left.statecode+left.county+left.geo_blk) ,
+                transform(recordof(CFPB_key_BLKGRP), 
+                self.State_FIPS10 := left.statecode,
+                self.County_FIPS10 := left.county,
+                self.Tract_FIPS10 := left.geo_blk[1..6],
+                self.BlkGrp_FIPS10 := (INTEGER)left.geo_blk[7],
+							      self := right, self := []), left outer,atmost(max_recs),keep(10));
+              
+if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP, named('withCFPB_BLKGRP')) );
+
+
+CFPB_key_BLKGRP_attr_over18 := dx_ConsumerFinancialProtectionBureau.key_BLKGRP_attr_over18(isFCRA);
+withCFPB_BLKGRP_attr_over18 := join(clean_a2_geolink,CFPB_key_BLKGRP_attr_over18,
+							                  keyed(right.GeoInd = left.statecode+left.county+left.geo_blk),
+							                  transform(recordof(CFPB_key_BLKGRP_attr_over18),
+							                  self := right, self := []), left outer,atmost(max_recs),keep(10));
+              
+if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over18, named('withCFPB_BLKGRP_attr_over18')) );
+
 ENDMACRO;

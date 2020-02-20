@@ -2,13 +2,13 @@
 // ====== RETURNS CORPORATE AFFILIATION RECORDS FOR A GIVEN PERSON IN ESP-COMPLIANT WAY ======
 // ===========================================================================================
 
-IMPORT iesp, doxie, doxie_crs, doxie_raw;
+IMPORT $, iesp, doxie, doxie_crs, doxie_raw;
 
 out_rec := iesp.bpsreport.t_BpsCorpAffiliation;
 
 EXPORT out_rec CorpAffiliation_records (
   dataset (doxie.layout_references) dids,
-  input.corpaffil in_params = module (input.corpaffil) end,
+  $.IParam.corpaffil in_params = module ($.IParam.corpaffil) end, //currently, a placeholder
   boolean IsFCRA = false
 ) := FUNCTION
 

@@ -33,7 +33,7 @@
 */
 /*--INFO-- 'pi01','pi02','pi04','pi05','pi07','pi09','pi14','pi60','allv','hdx1','flfn','bnk2','bnk3' */
 
-import Risk_Reporting, Risk_Indicators,gateway;
+IMPORT Risk_Reporting, Risk_Indicators, gateway, Riskwise, STD, seed_files;
 
 export RiskWiseMainPRIO := MACRO
 
@@ -72,7 +72,11 @@ export RiskWiseMainPRIO := MACRO
 	'HistoryDateYYYYMM',
 	'runSeed',
 	'OutcomeTrackingOptOut',
-	'gateways'));
+	'gateways',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 	
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -119,7 +123,7 @@ string30 cmpy_value := ''          : stored('cmpy');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribcode in ['allv', 'flfn', 'pi02', 'pi07', 'pi60'];
 
 unsigned1 DPPA_Purpose := RiskWise.permittedUse.fraudDPPA 	: stored('DPPAPurpose');
@@ -127,6 +131,12 @@ unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 unsigned3 history_date := 999999  						: stored('HistoryDateYYYYMM');
 boolean runSeed_value := false 						: stored('runSeed');
 gateways_in := Gateway.Configuration.Get();
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 #stored('DisableBocaShellLogging', DisableOutcomeTracking);
 
@@ -192,7 +202,11 @@ end;
 final_seed := if(runSeed_value, project(prii_seed_output, format_seed(left)), dataset([],RiskWise.Layout_PRIO) );
 
 
-almost_final := RiskWise.PRIO_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode,DataRestriction, DataPermission);
+almost_final := RiskWise.PRIO_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode,DataRestriction, DataPermission,
+                                                                       LexIdSourceOptout := LexIdSourceOptout, 
+                                                                       TransactionID := TransactionID, 
+                                                                       BatchUID := BatchUID, 
+                                                                       GlobalCompanyID := GlobalCompanyID);
 
 //don't track royalties for testseeds
 dRoyalties := if(runSeed_value, dataset([], Royalty.Layouts.Royalty),

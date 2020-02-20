@@ -1,11 +1,14 @@
-﻿import _Control, DriversV2, Certegy, RiskWise, Risk_Indicators, InsuranceHeader_BestOfBest, Business_Risk_BIP, Drivers;
+﻿import _Control, DriversV2, Certegy, RiskWise, Risk_Indicators, InsuranceHeader_BestOfBest, Business_Risk_BIP, Drivers, Doxie, Suppress, Data_Services;
 onThor := _Control.Environment.OnThor;
 
 // this function accepts layout_output instead of just a slim layout_input so that we can check if the drlc is valid before searching anyting
 export iid_DL_verification(grouped DATASET(Risk_Indicators.Layout_Output) indata, integer dppa, boolean isFCRA=false,
 													 string10 ExactMatchLevel=risk_indicators.iid_constants.default_ExactMatchLevel, unsigned8 BSOptions,
 													 string50 DataPermission=risk_indicators.iid_constants.default_DataPermission, 
-													 unsigned1 BSversion) := function
+													 unsigned1 BSversion,
+													 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
+	
+	data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 	
 	// check that user has permissible purpose to see DL data
 	dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
@@ -27,6 +30,8 @@ export iid_DL_verification(grouped DATASET(Risk_Indicators.Layout_Output) indata
 	
 
 ExactDriverLicenseRequired := ExactMatchLevel[Risk_Indicators.iid_constants.posExactDLMatch]=Risk_Indicators.iid_constants.sTrue;	
+
+TurnOffNongovSources := BSOptions & Risk_Indicators.iid_constants.BSOptions.disablenongovernmentdldata > 0; //from bsoptions;
 
 mytemp := record
 	string dl_source;
@@ -149,9 +154,10 @@ rolled_insurance_did := rollup(group(sort(with_insurance_dl_did, seq, -verified_
 
 //Search Certegy keys by DID
 
-dl_did_rolled := if(allowInsuranceDL,rolled_insurance_did, rolled_dl_did);
+dl_did_rolled := if(allowInsuranceDL AND NOT TurnOffNongovSources,rolled_insurance_did, rolled_dl_did);
 
-dl_temp get_certegy(dl_did_rolled le, certegy.key_certegy_did ri) := TRANSFORM
+{dl_temp, UNSIGNED4 global_sid} get_certegy(dl_did_rolled le, certegy.key_certegy_did ri) := TRANSFORM
+	self.global_sid := ri.global_sid;
 	self.dl_searched := le.dl_searched or (le.did<>0 and le.dl_number<>'' and le.dl_state<>'' and le.verified_dl='');
 	certegy_dl_score := Risk_Indicators.DLscore(le.dl_number, ri.orig_dl_num, le.dl_state, ri.orig_dl_state);
 	use_certegy := risk_indicators.iid_constants.tscore(certegy_dl_score) > risk_indicators.iid_constants.tscore(le.dl_score);
@@ -166,19 +172,39 @@ dl_temp get_certegy(dl_did_rolled le, certegy.key_certegy_did ri) := TRANSFORM
 END;
 
 
-with_certegy_roxie := join(dl_did_rolled, certegy.key_certegy_did, 
+with_certegy_roxie_unsuppressed := join(dl_did_rolled, certegy.key_certegy_did, 
 					dppa_ok and 
 					left.did<>0 and left.dl_number<>'' and left.dl_state<>'' and 
 					keyed(left.did=right.did),
 					get_certegy(LEFT,RIGHT),
 					left outer, atmost(riskwise.max_atmost), keep(100));
+					
+with_certegy_roxie_flagged := Suppress.MAC_FlagSuppressedSource(with_certegy_roxie_unsuppressed, mod_access, data_env := data_environment);
 
-with_certegy_thor_pre := join(distribute(dl_did_rolled(did<>0 and dl_number<>'' and dl_state<>''), hash64(did)), 
+with_certegy_roxie := PROJECT(with_certegy_roxie_flagged, TRANSFORM(dl_temp, 
+	self.dl_score := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dl_score);
+	self.verified_dl := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.verified_dl);
+	self.any_dl_found := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.any_dl_found);
+	self.dl_exists := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.dl_exists);
+    SELF := LEFT;
+)); 
+
+with_certegy_thor_pre_unsuppressed := join(distribute(dl_did_rolled(did<>0 and dl_number<>'' and dl_state<>''), hash64(did)), 
 					distribute(pull(certegy.key_certegy_did), hash64(did)), 
 					dppa_ok and 
 					(left.did=right.did),
 					get_certegy(LEFT,RIGHT),
 					left outer, atmost(riskwise.max_atmost), keep(100), local);
+
+with_certegy_thor_pre_flagged := Suppress.MAC_FlagSuppressedSource(with_certegy_thor_pre_unsuppressed, mod_access, data_env := data_environment);
+
+with_certegy_thor_pre := PROJECT(with_certegy_thor_pre_flagged, TRANSFORM(dl_temp, 
+	self.dl_score := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dl_score);
+	self.verified_dl := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.verified_dl);
+	self.any_dl_found := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.any_dl_found);
+	self.dl_exists := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.dl_exists);
+    SELF := LEFT;
+)); 
 
 with_certegy_thor := group(with_certegy_thor_pre + dl_did_rolled(did=0 or dl_number='' or dl_state=''), seq);
 
@@ -189,9 +215,9 @@ with_certegy_thor := group(with_certegy_thor_pre + dl_did_rolled(did=0 or dl_num
 #END
 
 rolled_certegy := rollup(group(sort(with_certegy, seq, -verified_dl), seq), true, roll_dl(left,right));
-
+temp_certegy:= IF(TurnOffNongovSources,dl_did_rolled, rolled_certegy);
 //Search State keys by DL
-dl_temp get_dl(rolled_certegy le, DriversV2.Key_DL_Number ri) := TRANSFORM
+dl_temp get_dl(temp_certegy le, DriversV2.Key_DL_Number ri) := TRANSFORM
 	self.dl_searched := le.dl_searched or (le.dl_number<>''  and le.dl_state<>'' and le.fname<>'' and le.lname<>'' and le.verified_dl='');
 	firstscore := risk_indicators.FnameScore(le.fname, ri.fname);
 	lastscore := risk_indicators.LnameScore(le.lname, ri.lname);
@@ -205,7 +231,7 @@ dl_temp get_dl(rolled_certegy le, DriversV2.Key_DL_Number ri) := TRANSFORM
 	self := le;
 END;
 
-with_dl_roxie := join(rolled_certegy, DriversV2.Key_DL_Number, 
+with_dl_roxie := join(temp_certegy, DriversV2.Key_DL_Number, 
 							left.dl_number<>'' and  left.dl_state<>'' and 
 							left.fname<>'' and left.lname<>'' and drivers.state_dppa_ok(left.dl_state,dppa) and 
 							right.source_code IN risk_indicators.iid_constants.SetValidStateSrcs AND
@@ -213,7 +239,7 @@ with_dl_roxie := join(rolled_certegy, DriversV2.Key_DL_Number,
 							get_dl(LEFT,RIGHT),
 							left outer, atmost(riskwise.max_atmost), keep(100));
 
-with_dl_thor_pre := join(distribute(rolled_certegy(dl_number<>'' and  dl_state<>''), hash64(dl_number)), 
+with_dl_thor_pre := join(distribute(temp_certegy(dl_number<>'' and  dl_state<>''), hash64(dl_number)), 
 							distribute(pull(DriversV2.Key_DL_Number), hash64(s_dl)),
 							left.fname<>'' and left.lname<>'' and
 							drivers.state_dppa_ok(left.dl_state,dppa) and 
@@ -222,7 +248,7 @@ with_dl_thor_pre := join(distribute(rolled_certegy(dl_number<>'' and  dl_state<>
 							get_dl(LEFT,RIGHT),
 							left outer, atmost(riskwise.max_atmost), keep(100), local);
 
-with_dl_thor := group(with_dl_thor_pre + rolled_certegy(dl_number='' or  dl_state=''), seq);
+with_dl_thor := group(with_dl_thor_pre + temp_certegy(dl_number='' or  dl_state=''), seq);
 
 #IF(onThor)
 	with_dl := with_dl_thor;
@@ -277,7 +303,7 @@ with_insurance_dl_dl_thor := with_insurance_dl_dl_thor_pre + rolled_dl(dl_number
 //We should have the highest verified record at this point.
 rolled_insurance_dl := rollup(group(sort(with_insurance_dl_dl, seq, -verified_dl), seq), true, roll_dl(left,right));
 
-Final_dl_temp := if(allowInsuranceDL, rolled_insurance_dl, rolled_dl);
+Final_dl_temp := if(allowInsuranceDL AND NOT TurnOffNongovSources, rolled_insurance_dl, rolled_dl);
 
 final_dl := project(final_dl_temp, transform(risk_indicators.Layout_Output,
 	deduped_dl_sources := dedup(sort(left.dl_verified_sources, dl_source), dl_source);

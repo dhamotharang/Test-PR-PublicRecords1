@@ -1,5 +1,5 @@
-import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,suppress,enclarity,
-	Healthcare_Shared,STD,dx_BestRecords;
+import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,suppress,enclarity,
+	Healthcare_Shared,STD,dx_BestRecords,dx_Header;
 
 export Fn_do_Validation := Module
 		shared currentDate := (string)ut.GetDate;
@@ -133,8 +133,8 @@ export Fn_do_Validation := Module
 																			self.FlipFName := STD.Str.ToUpperCase(right.LastName[1..2]); 
 																			self.FlipLName:=STD.Str.ToUpperCase(right.FirstName);self:=left;self:=[];)),record),record);
 			// output(nameRecs,named('NameRecs'));
-			//Check Doxie SSN for anything matching the user supplied information and if the first name is close keep it
-			checkDidFromSSN := dedup(sort(Join(SSNSupplied,Doxie.Key_Header_SSN,
+			//Check header SSN for anything matching the user supplied information and if the first name is close keep it
+			checkDidFromSSN := dedup(sort(Join(SSNSupplied,dx_Header.key_SSN(),
 																	keyed(right.s1=left.userinput.ssn[1]) and keyed(right.s2=left.userinput.ssn[2]) and
 																	keyed(right.s3=left.userinput.ssn[3]) and keyed(right.s4=left.userinput.ssn[4]) and
 																	keyed(right.s5=left.userinput.ssn[5]) and keyed(right.s6=left.userinput.ssn[6]) and

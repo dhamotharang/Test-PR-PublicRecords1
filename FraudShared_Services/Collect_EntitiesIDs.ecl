@@ -6,7 +6,7 @@ EXPORT Collect_EntitiesIDs(
 	unsigned join_limit = FraudShared_Services.Constants.MAX_RECS_ON_JOIN
 ) := FUNCTION
 
-  ds_valid_in := FraudShared_Services.ValidateInput.BuildValidityRecs(ds_batch_in);
+  ds_valid_in := FraudShared_Services.ValidateInput.BuildValidityRecs(ds_batch_in, fraud_platform);
 	_GetEntitiesIds := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type, join_limit);
 
   ds_did                  := _GetEntitiesIds.GetLexID();

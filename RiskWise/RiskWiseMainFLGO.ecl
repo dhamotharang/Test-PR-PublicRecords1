@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Internal Flags Process">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="account" type="xsd:string"/>
@@ -23,7 +23,7 @@
 */
 /*--INFO-- FLGO processes */
 
-import address, risk_indicators, ut, gateway;
+import risk_indicators, ut, gateway, Riskwise, STD;
 
 export RiskWiseMainFLGO := MACRO
 
@@ -52,7 +52,11 @@ export RiskWiseMainFLGO := MACRO
 	'DataPermissionMask',
 	'DPPAPurpose',
 	'GLBPurpose', 
-	'HistoryDateYYYYMM'));
+	'HistoryDateYYYYMM',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 string4  tribCode_value := ''  : stored('tribcode');
 string30 account_value := ''   : stored('account');
@@ -73,13 +77,19 @@ string10 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission
 unsigned1 DPPA_Purpose := RiskWise.permittedUse.fraudDPPA 	: stored('DPPAPurpose');
 unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 STRING5   industry_class_val := '' 					: STORED('IndustryClass');
-industry_class_value := StringLib.StringToUpperCase(industry_class_val);
+industry_class_value := STD.Str.ToUpperCase(industry_class_val);
 boolean   ln_branded_value := false 					: STORED('LnBranded');
 unsigned3 history_date := 999999 						: stored('HistoryDateYYYYMM');
 boolean   ofac_only := true				 			: stored('OfacOnly');
 gateways := Gateway.Constants.void_gateway;
 
-tribcode := StringLib.StringToLowerCase(tribCode_value);
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+tribcode := STD.Str.ToLowerCase(tribCode_value);
 
 r := record
 	unsigned seq;
@@ -101,12 +111,12 @@ risk_indicators.layout_input into(t le, INTEGER C) := TRANSFORM
 	self.dob := dob_val;
 	self.phone10 := hphone_val;	
 	self.wphone10 := wphone_val;
-	self.fname := stringlib.stringtouppercase(first_value);
+	self.fname := STD.Str.touppercase(first_value);
 	self.mname := '';
-	self.lname := stringlib.stringtouppercase(last_value);
-	SELF.in_streetAddress := stringlib.stringtouppercase(addr_value);
-	SELF.in_city := stringlib.stringtouppercase(city_value);
-	SELF.in_state := stringlib.stringtouppercase(state_value);
+	self.lname := STD.Str.touppercase(last_value);
+	SELF.in_streetAddress := STD.Str.touppercase(addr_value);
+	SELF.in_city := STD.Str.touppercase(city_value);
+	SELF.in_state := STD.Str.touppercase(state_value);
 	SELF.in_zipCode := zip_value;
 	self.prim_range := clean_a[1..10];
 	self.predir := clean_a[11..12];
@@ -125,9 +135,9 @@ risk_indicators.layout_input into(t le, INTEGER C) := TRANSFORM
 	self.addr_status := clean_a[179..182];
 	self.county := clean_a[143..145];
 	self.geo_blk := clean_a[171..177];
-	SELF.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	SELF.dl_state := stringlib.stringtouppercase(drlcstate_value);
-	self.age := if ((integer)dob_val != 0, (STRING3)ut.GetAgeI((integer)dob_val), '');
+	SELF.dl_number := STD.Str.touppercase(dl_num_clean);
+	SELF.dl_state := STD.Str.touppercase(drlcstate_value);
+	self.age := if ((integer)dob_val != 0, (STRING3)ut.Age((integer)dob_val), '');
 	SELF.email_address := '';
 	SELF.employer_name := '';
 	SELF.lname_prev := '';
@@ -138,7 +148,11 @@ prep := PROJECT(t,into(LEFT,COUNTER));
 
 
 iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, 
-					ofac_only, false,false,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission);
+					ofac_only, false,false,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission,
+                    LexIdSourceOptout := LexIdSourceOptout, 
+                    TransactionID := TransactionID, 
+                    BatchUID := BatchUID, 
+                    GlobalCompanyID := GlobalCompanyID);
 
 RiskWise.Layout_FLGO format_out(iid le) := TRANSFORM					
 	SELF.account := account_value;
@@ -162,7 +176,7 @@ END;
 Results := ungroup(PROJECT(iid, format_out(LEFT)));
 
 emptyset := dataset([{account_value}], riskwise.Layout_FLGO);
-ret := if(StringLib.StringToLowerCase(tribCode_value) in ['flg1'], Results, emptyset);
+ret := if(STD.Str.ToLowerCase(tribCode_value) in ['flg1'], Results, emptyset);
 
 output(ret,NAMED('Results'));
 

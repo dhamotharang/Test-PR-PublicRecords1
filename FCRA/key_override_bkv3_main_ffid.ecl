@@ -1,4 +1,4 @@
-import bankruptcyv2, address, ut, data_services, std;
+﻿import bankruptcyv2, address, ut, data_services, std, vault, _control;
 
 kfMain	 := dataset(data_services.foreign_prod + 'thor_data400::base::override::fcra::qa::bankrupt_main',FCRA.Layout_Override_bk_filing,flat);
 
@@ -59,7 +59,11 @@ end;
 
 kv3 := project(kfMain, toV3Main(left));
 
+#IF(_Control.Environment.onVault) 
+export key_override_bkv3_main_ffid := vault.FCRA.key_override_bkv3_main_ffid;
+#ELSE
 export key_override_bkv3_main_ffid := index (kv3, 
                                              {flag_file_id}, 
                                              {kv3}, 
                                              data_services.data_location.prefix() + 'thor_data400::key::override::fcra::bankrupt_filing::qa::ffid_v3');
+#END;																						 

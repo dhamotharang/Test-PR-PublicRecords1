@@ -1,10 +1,11 @@
-import DayBatchPCNSR,Address,DayBatchUtils;
+﻿import $, Address, DayBatchUtils, Doxie, Suppress;
 
-export PhoneSearch_13Z_Exact(GROUPED DATASET(DayBatchPCNSR.Layout_pcnsr_linked) pcnsrInput) := FUNCTION
+export PhoneSearch_13Z_Exact(GROUPED DATASET($.Layout_pcnsr_linked) pcnsrInput,
+                             Doxie.IDataAccess mod_access) := FUNCTION
 	
-	PCNSRData := DayBatchPCNSR.Key_PCNSR_Z317LF;
+	PCNSRData := $.Key_PCNSR_Z317LF;
 
-	DayBatchPCNSR.Layout_PCNSR_Linked formatOutput(pcnsrInput l,PCNSRData r,STRING m) := TRANSFORM
+	$.Layout_PCNSR_Linked formatOutput(pcnsrInput l,PCNSRData r,STRING m) := TRANSFORM
 		MAC_Link_PCNSR_To_Input(l,r,m)
 	END;
 	
@@ -17,6 +18,11 @@ export PhoneSearch_13Z_Exact(GROUPED DATASET(DayBatchPCNSR.Layout_pcnsr_linked) 
 									KEYED(LEFT.indata.prim_name = RIGHT.prim_name),
 									formatOutput(LEFT,RIGHT,'13Z'),LEFT OUTER,ATMOST(7500));
 
-	RETURN match13Z;
+
+  match13Z_flagged := Suppress.MAC_FlagSuppressedSource(match13Z, mod_access, outdata.did, outdata.global_sid);  
+  
+  match13Z_suppressed := PROJECT(match13Z_flagged, TRANSFORM($.Layout_PCNSR_Linked, SELF.outdata := IF(~LEFT.is_suppressed, lEFT.outdata), SELF := LEFT));
+  
+	RETURN match13Z_suppressed;
 
 END;

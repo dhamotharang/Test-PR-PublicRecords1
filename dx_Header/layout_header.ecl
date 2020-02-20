@@ -94,4 +94,6 @@ EXPORT layout_header := RECORD
   unsigned2  address_ind:=0;  // address indicator bitmap
   unsigned2  name_ind:=0;  // name indicator bitmap
   unsigned8 persistent_record_ID := 0; //tracking the record between full header and individual dataset
+  unsigned4 global_sid:=0;
+  unsigned8 record_sid:=0;
 END;

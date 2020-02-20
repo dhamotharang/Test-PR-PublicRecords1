@@ -1,12 +1,12 @@
-﻿import doxie, ut, suppress, death_master, census_data, _validate, codes, AutoStandardI, MDR;
+﻿import AutoStandardI, _validate, census_data, codes, death_master, doxie, dx_death_master,
+       MDR, STD, suppress, ut;
 
 export raw := 
 MODULE
 
 shared rec := deathv2_services.layouts;
-shared deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-shared glb_ok := deathparams.isValidGlb();
-shared appType := deathparams.application_type;
+shared death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+shared appType := death_params.application_type;
 
 //****** GET DEATH IDS
 
@@ -16,15 +16,15 @@ MODULE
 		dataset(doxie.layout_references) dids,
 		boolean checkRNA=false) := 
 	FUNCTION
-	  loc_glb_ok := deathparams.isValidGlb(checkRNA);
-		key := doxie.key_death_masterV2_ssa_DID;
-		res := join(dedup(dids, all),key,
-									keyed(left.did = right.l_did)
-									 and	not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, loc_glb_ok, deathparams), 	
-									transform(rec.death_id,
-														self := right),
-									keep(ut.limits.DEATH_PER_DID), limit (0))(state_death_id <> '');		
-		return dedup(res, all);
+    loc_glb_ok := death_params.isValidGlb(checkRNA); 
+    death_raw_recs := dx_death_master.Get.byDid(dedup(dids, all), did, death_params, /*skip_glb_check=*/TRUE, ut.limits.DEATH_PER_DID);
+    death_raw_recs_glb_ok := death_raw_recs(loc_glb_ok OR death.glb_flag <> 'Y');
+    res := 
+      PROJECT(death_raw_recs_glb_ok(death.state_death_id <> ''), 
+        TRANSFORM(rec.death_id, 
+        SELF := LEFT.death));
+
+		RETURN DEDUP(res, ALL);
 	END;
 END;
 
@@ -37,23 +37,23 @@ MODULE
 		string ssn_mask_value								
 		) := 
 	FUNCTION
-		key := Death_Master.key_death_id_base_ssa;		
-		jnd := join(dedup(ids, all),key,
-									keyed(left.state_death_id = right.state_death_id)
-									and	not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-									transform(rec.base_internal,
-														self.dead_age := ut.Age((unsigned8)right.dob8, (unsigned8)right.dod8),
-														self.dead_age_unit := '',
-														self.county_name := '',
-														self.death_location := '',
-														self.base.did := if((unsigned)right.did > 0, right.did, ''),
-														self.base := right,
-														self.src := right.src,
-														self := left),
-									keep(1), limit(0)); // m:1
-		
-	  census_data.MAC_Fips2County_Keyed(jnd,base.state,base.fipscounty,county_name,wct);
-		return dedup(wct, all);
+		death_ids := dedup(ids, all);
+	  death_raw := dx_death_master.Get.byDeathId(death_ids, state_death_id, death_params);
+    death_recs := project(death_raw, transform(rec.base_internal,
+      self.dead_age := ut.Age((unsigned8)left.death.dob8, (unsigned8)left.death.dod8);
+      self.dead_age_unit := '';
+      self.county_name := '';
+      self.death_location := '';
+      self.base.did := if((unsigned)left.death.did > 0, left.death.did, '');
+      self.base := left.death;
+      self.src := left.death.src;
+	  // establishing this flag earlier since IsLimitedAccessDMF is included in output layout
+	  self.IsLimitedAccessDMF := left.death.src = MDR.sourceTools.src_Death_Restricted;	
+      self := left));
+
+	  census_data.MAC_Fips2County_Keyed(death_recs,base.state,base.fipscounty,county_name,wct);
+
+    return dedup(wct, all);
 	END;
 
 
@@ -74,10 +74,10 @@ FUNCTION
 	return ut.Word(ucd,pos + adjustment,';');
  END;
  
- prim_decode			:= stringlib.StringToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,ut.word(prim_code,1,';')));			
- under_decode1		:= stringlib.StringToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,1)));
- under_decode2 		:= stringlib.StringToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,2)));
- under_decode3 		:= stringlib.StringToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,3)));
+ prim_decode			:= STD.STR.ToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,ut.word(prim_code,1,';')));			
+ under_decode1		:= STD.STR.ToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,1)));
+ under_decode2 		:= STD.STR.ToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,2)));
+ under_decode3 		:= STD.STR.ToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,3)));
  
  sep := '; ';
  dec := map(cause = '' and 
@@ -101,50 +101,35 @@ MODULE
 		string ssn_mask_value
 		) := 
 	FUNCTION
-		key := Death_Master.key_death_id_supplemental_ssa;
-		sea := get_base.from_death_ids(ids, ssn_mask_value);
+    sea := get_base.from_death_ids(ids, ssn_mask_value);
+	
+    state_death_ids_ddp := dedup(sort(project(sea, transform(rec.death_id, SELF := LEFT)), 
+      state_death_id), state_death_id);
+    supp_recs := dx_death_master.Append.supplementalByDeathId(state_death_ids_ddp, state_death_id);
 
-	  //some date formatting code
-		val(string date) := _Validate.Date.fIsValid(date,,true,true);
-		string8 flipdate(string8 indate) := indate[5..8] + indate[1..4];
-	
-		mac_fixdate(date) := macro
-			self.supp.date := map(val(right.date)							=> right.date,
-													  val(flipdate(right.date))		=> flipdate(right.date),
-													  ''),
-		endmacro;
-	
-		//join to supp key
-		jnd := join(sea, key,
-									keyed(left.state_death_id = right.state_death_id),
+		jnd := join(sea, supp_recs,
+									left.state_death_id = right.state_death_id,
 									transform(rec.report_internal,
-														self.dead_age := if(right.decedent_age = '', 
+														death_supp := right.death_supp; 
+														self.dead_age := if(death_supp.decedent_age = '', 
 																								left.dead_age,
-																								DeathV2_Services.splitAge(right.decedent_age).int);
+																								DeathV2_Services.splitAge(death_supp.decedent_age).int);
 														self.dead_age_unit := 
-																						 if(right.decedent_age = '' and left.dead_age > 0,
+																						 if(death_supp.decedent_age = '' and left.dead_age > 0,
 																								'YEARS',
-																								DeathV2_Services.splitAge(right.decedent_age).unit);
-														SELF.IsLimitedAccessDMF := (left.src = MDR.sourceTools.src_Death_Restricted);
-														self.supp.state_death_flag := if(right.source_state in death_master.Constants('').set_EmptySuppStates,
+																								DeathV2_Services.splitAge(death_supp.decedent_age).unit);
+														self.supp.state_death_flag := if(death_supp.source_state in death_master.Constants('').set_EmptySuppStates,
 																													   '', 
-																														 right.state_death_flag);
+																														 death_supp.state_death_flag);
 														self.death_location := 
-															map(right.hospital_status <> '' and right.place_of_death <> '' 	=> trim(right.hospital_status) + ', ' + trim(right.place_of_death),
-																  right.hospital_status <> '' 																=> right.hospital_status,
-																																																 right.place_of_death);
-														self.supp.cause_of_death := fn_cause_of_death(right.CAUSE,right.PRIMARY_CAUSE_OF_DEATH,right.UNDERLYING_CAUSE_OF_DEATH);
-														mac_fixdate(process_date)
-														 mac_fixdate(filed_date)
-														 mac_fixdate(disposition_date)
-														 mac_fixdate(injury_date)
-														 mac_fixdate(surgery_date)
-														 mac_fixdate(date_last_trans)										
-														self.supp := right,
+															map(death_supp.hospital_status <> '' and death_supp.place_of_death <> '' 	=> trim(death_supp.hospital_status) + ', ' + trim(death_supp.place_of_death),
+																  death_supp.hospital_status <> '' 																=> death_supp.hospital_status,
+																																																 death_supp.place_of_death);
+														self.supp.cause_of_death := fn_cause_of_death(death_supp.CAUSE,death_supp.PRIMARY_CAUSE_OF_DEATH,death_supp.UNDERLYING_CAUSE_OF_DEATH);							
+														self.supp := death_supp,
 														self := left),
 									left outer,
-									keep(1));
-	
+									keep(1), limit(0));
 	
 		//*** PULL
 		Suppress.MAC_Suppress(jnd,pl1,appType,Suppress.Constants.LinkTypes.DID,base.DID);

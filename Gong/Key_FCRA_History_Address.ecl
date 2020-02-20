@@ -1,5 +1,5 @@
-//gong key based on some address fields
-Import Data_Services, doxie, gong, data_services, mdr;
+﻿//gong key based on some address fields
+Import Data_Services, doxie, gong, data_services, mdr, vault, _control;
 
 hist_in := Gong.File_History_Full_Prepped_for_FCRA_Keys(trim(prim_name)<>'', trim(z5)<>'');
 gong.mac_hist_full_slim_fcra(hist_in, ghhist_out);
@@ -52,6 +52,11 @@ hist_out := rollup(srtHistOut, transform(recordof(ghhist_out),
 														disc_cnt18,persistent_record_id);
 														
 
+
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export Key_FCRA_History_Address := vault.Gong.Key_FCRA_History_Address;
+
+#ELSE
 export Key_FCRA_History_Address := 
        index(hist_out,
              {prim_name,
@@ -63,3 +68,6 @@ export Key_FCRA_History_Address :=
 		    boolean business_flag := if(listing_type_bus='B',true,false)},
 		    {hist_out},
 					  Data_Services.Data_location.Prefix('Gong_History') + 'thor_data400::key::gong_history::fcra::'+doxie.Version_SuperKey + '::address');
+
+#END;
+

@@ -1,4 +1,4 @@
-﻿IMPORT AutoKeyI, AutoStandardI, census_data, iesp, lib_stringlib, SANCTN_Mari, Suppress, ut, BIPV2, MIDEX_Services;
+﻿IMPORT AutoKeyI, AutoStandardI, BIPV2, census_data, iesp, MIDEX_Services, SANCTN_Mari, STD, Suppress, ut;
 
 // ==============================================================================================================	
 //  MARI MIDEX "NON-PUBLIC" DATA (SANCTN_Mari) related functions
@@ -63,8 +63,8 @@ EXPORT Raw_Nonpublic :=
     EXPORT fn_get_nonPublicLicNbrData( STRING20 in_licNbr, STRING30 in_licState) :=
       FUNCTION
        
-       upperCaseLicense  := TRIM(StringLib.StringToUpperCase(in_licNbr));
-			 upperCaseLicState := TRIM(StringLib.StringToUpperCase(in_licState));
+       upperCaseLicense  := TRIM(STD.STR.ToUpperCase(in_licNbr));
+			 upperCaseLicState := TRIM(STD.STR.ToUpperCase(in_licState));
         
        ds_SANCTN_Mari_lic_recs := CHOOSEN(SANCTN_Mari.Key_License_NBR( KEYED( cln_license_number = upperCaseLicense AND
                                                                               (upperCaseLicState = '' OR license_state = upperCaseLicState) ) AND
@@ -179,7 +179,7 @@ EXPORT Raw_Nonpublic :=
               // Add the nmlsID to recordset if one exists.
               sanctNP_recs_nmlsID := JOIN (sanctNP_recs_wlicInfo,SANCTN_Mari.key_nmls_midex,
                                          KEYED(LEFT.report_number = RIGHT.midex_rpt_nbr) AND
-                                         nmls_type = Stringlib.StringToUpperCase(RIGHT.license_type),
+                                         nmls_type = STD.STR.ToUpperCase(RIGHT.license_type),
                                          TRANSFORM(MIDEX_Services.Layouts.LicenseReport_Layout,
                                                     SELF.nmls_id :=(INTEGER) RIGHT.nmls_id,
                                                     SELF := LEFT),
@@ -273,7 +273,7 @@ EXPORT Raw_Nonpublic :=
     EXPORT MIDEX := MODULE
       EXPORT REPORT_VIEW := MODULE
                       
-        EXPORT fn_nonPub_by_midexReportNumbers (DATASET( MIDEX_Services.Layouts.rec_midex_payloadKeyField ) ds_nonPubMidexReportNumbers, SET OF STRING1 set_nonPubAccess = [], BOOLEAN alert = FALSE, STRING1 in_searchType, STRING ssnMask, STRING dobMask, STRING8 StartLoadDate = '') := 
+        EXPORT fn_nonPub_by_midexReportNumbers (DATASET( MIDEX_Services.Layouts.rec_midex_payloadKeyField ) ds_nonPubMidexReportNumbers, SET OF STRING1 set_nonPubAccess = [], BOOLEAN alert = FALSE, STRING1 in_searchType, STRING ssnMask, UNSIGNED1 dobMask, STRING8 StartLoadDate = '') := 
           FUNCTION                                        
             //  An incident can be associated with multiple parties. These parties are contained in a
             // separate key file. For the child dataset, the parties key is joined to the midex report
@@ -474,13 +474,13 @@ EXPORT Raw_Nonpublic :=
                     SANCTN_Mari.key_nmls_midex,
                     KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr) AND
                     ( (in_searchType = MIDEX_Services.Constants.INDIV_SEARCH AND 
-                       Stringlib.StringToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_INDIV ) OR
+                       STD.STR.ToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_INDIV ) OR
                       
                       (in_searchType = MIDEX_Services.Constants.COMP_SEARCH AND  
-                       Stringlib.StringToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_COMP ) OR
+                       STD.STR.ToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_COMP ) OR
                       
                       (in_searchType = MIDEX_Services.Constants.COMP_SEARCH AND  
-                       Stringlib.StringToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_BR )
+                       STD.STR.ToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_BR )
                     ),
                     TRANSFORM( MIDEX_Services.Layouts.compReport_PartyTempLayout,
                                SELF.nmlsType    := RIGHT.license_type,
@@ -630,13 +630,13 @@ EXPORT Raw_Nonpublic :=
                   SANCTN_Mari.key_nmls_midex,
                   KEYED( LEFT.NP_subject_rpt_nbr = RIGHT.midex_rpt_nbr ) AND
                   ( (in_searchType = MIDEX_Services.Constants.INDIV_SEARCH AND 
-                     Stringlib.StringToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_INDIV ) OR
+                     STD.STR.ToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_INDIV ) OR
                     
                     (in_searchType = MIDEX_Services.Constants.COMP_SEARCH AND  
-                     Stringlib.StringToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_COMP ) OR
+                     STD.STR.ToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_COMP ) OR
                     
                     (in_searchType = MIDEX_Services.Constants.COMP_SEARCH AND  
-                     Stringlib.StringToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_BR )
+                     STD.STR.ToUpperCase(RIGHT.license_type) = MIDEX_Services.Constants.NMLS_BR )
                   ),
                   TRANSFORM( MIDEX_Services.Layouts.compReport_PartyTempLayout,
                              SELF.nmlsType       := RIGHT.license_type,
@@ -1123,7 +1123,7 @@ EXPORT Raw_Nonpublic :=
           END; // end fn_nonPub_by_midexReportNumbers
         
     // TRANSFORM expanded nonpublic key layout into slimmed nonpublic layout output
-      EXPORT fn_nonpublicLayoutRecs(DATASET (MIDEX_Services.Layouts.CompReport_TempLayout) ds_midexRptNumberPayloadRecs, STRING dobMask) := 
+      EXPORT fn_nonpublicLayoutRecs(DATASET (MIDEX_Services.Layouts.CompReport_TempLayout) ds_midexRptNumberPayloadRecs, UNSIGNED1 dobMask) := 
         FUNCTION 
           ds_resultsRaw :=
             PROJECT( ds_midexRptNumberPayloadRecs, 
@@ -1145,7 +1145,7 @@ EXPORT Raw_Nonpublic :=
         END;  // end fn_nonpublicLayoutRecs
                                  
         
-      EXPORT fn_freddieMacLayoutRecords(DATASET (MIDEX_Services.Layouts.CompReport_TempLayout) ds_midexRptNumberPayloadRecs, SET OF STRING1 set_nonPubAccess = [], STRING dobMask) := 
+      EXPORT fn_freddieMacLayoutRecords(DATASET (MIDEX_Services.Layouts.CompReport_TempLayout) ds_midexRptNumberPayloadRecs, SET OF STRING1 set_nonPubAccess = [], UNSIGNED1 dobMask) := 
         FUNCTION
           ds_resultsRaw :=
             PROJECT( ds_midexRptNumberPayloadRecs, 

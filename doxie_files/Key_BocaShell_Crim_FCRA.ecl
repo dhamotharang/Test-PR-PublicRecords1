@@ -1,4 +1,4 @@
-Import Data_Services, doxie, ut, crimsrch, hygenics_crim, hygenics_search;
+﻿Import Data_Services, doxie, ut, crimsrch, hygenics_crim, hygenics_search, vault, _control;
 
 f := doxie_files.file_fcra_offenders (Vendor not in hygenics_search.sCourt_Vendors_To_Omit);
 o := hygenics_crim.file_courtoffenses_keybuilding (Vendor not in hygenics_search.sCourt_Vendors_To_Omit and (stringlib.stringfind(court_disp_desc_1, 'DISMISSED', 1) > 0 or stringlib.stringfind(court_disp_desc_2, 'DISMISSED', 1) > 0));
@@ -73,4 +73,8 @@ END;
 doc_rolled 	:= ROLLUP(SORT(DISTRIBUTE(doc_added,HASH(did)),did,offender_key, local), LEFT.did=RIGHT.did, roll_doc(LEFT,RIGHT), local);
 doc_final 	:= PROJECT (doc_rolled, transform (slimrec, SELF := Left));
 
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export Key_BocaShell_Crim_FCRA := vault.doxie_files.Key_BocaShell_Crim_FCRA;
+#ELSE
 export Key_BocaShell_Crim_FCRA := index(doc_final, {did}, {doc_final}, Data_Services.Data_location.Prefix('Criminal')+'thor_data400::key::corrections_offenders::fcra::bocashell_did_' + doxie.Version_SuperKey);
+#END;

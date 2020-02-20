@@ -30,7 +30,7 @@
 */
 /*--INFO-- Invitation to Apply Search Service*/
 
-IMPORT Address, Risk_Indicators, Models, RiskWise, ut, dma, Doxie;
+IMPORT Risk_Indicators, Models, RiskWise, ut;
 	
 EXPORT ITA_Search_Service := MACRO
 
@@ -67,7 +67,11 @@ EXPORT ITA_Search_Service := MACRO
   'gateways',  
   'OFACversion',
 	'Version',
-	'HistoryDateYYYYMM'));
+	'HistoryDateYYYYMM',
+        'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 
 /* ***************************************
@@ -94,7 +98,7 @@ STRING10  wphone_value := ''  	: stored('WorkPhone');
 UNSIGNED1 DPPA := 0			: stored('DPPAPurpose');
 UNSIGNED1 GLB := RiskWise.permittedUse.GLBA : stored('GLBPurpose');
 STRING ModelName_in := ''				: stored('ModelName');
-model_name := StringLib.StringToLowerCase( modelname_in );
+model_name := STD.Str.ToLowerCase( modelname_in );
 UNSIGNED1 ofac_version      := 1        : stored('OFACVersion');
 UNSIGNED1 attributesVersion   := 1 : stored('Version');
 UNSIGNED3 historyDate := 999999 : stored('HistoryDateYYYYMM');
@@ -102,6 +106,12 @@ STRING DataRestriction := risk_indicators.iid_constants.default_DataRestriction 
 STRING50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
 gateways_in := Gateway.Configuration.Get();
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := if(ofac_version = 4 and le.servicename = 'bridgerwlc',le.servicename, '');
@@ -115,10 +125,9 @@ if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail
 /* ***************************************
 	 *           Package Input:            *
    *************************************** */
-emptyRecord := ut.ds_oneRecord;
 
-Models.Layout_LeadIntegrity_In intoInput(emptyRecord le) := TRANSFORM
-	SELF.Seq := (STRING)seq;
+packagedInput := DATASET([TRANSFORM(Models.Layout_LeadIntegrity_In,
+    SELF.Seq := (STRING)seq;
 	SELF.FirstName := first_value;
 	SELF.MiddleName := middle_value;
 	SELF.LastName := last_value;
@@ -135,15 +144,16 @@ Models.Layout_LeadIntegrity_In intoInput(emptyRecord le) := TRANSFORM
 	SELF.DLNumber := drlc_value;
 	SELF.DLState := drlcstate_value;
 	SELF.AccountNumber := account_value;
-	SELF := [];
-END;
-	
-packagedInput := project(emptyRecord, intoInput(LEFT));
+	SELF := [])] );
 
 /* ***************************************
 	 *      Gather Attributes/Scores:      *
    *************************************** */
-results := Models.LeadIntegrity_Search_Function(packagedInput, GLB, DPPA, historyDate, DataRestriction, attributesVersion, model_name, false, DataPermission, gateways, ofac_version);
+results := Models.LeadIntegrity_Search_Function(packagedInput, GLB, DPPA, historyDate, DataRestriction, attributesVersion, model_name, false, DataPermission, gateways, ofac_version,
+                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                            TransactionID := TransactionID, 
+                                                                                            BatchUID := BatchUID, 
+                                                                                            GlobalCompanyID := GlobalCompanyID);
 
 OUTPUT(results, NAMED('Results'));
 	

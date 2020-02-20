@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Collection Shell Service" wuTimeout="300000">
 	<part name="AccountNumber" type="xsd:string"/>
 	<part name="FirstName" type="xsd:string"/>
@@ -55,6 +55,13 @@ export Collection_Shell_Service := MACRO
 	string10  in_DataRestriction := AutoStandardI.GlobalModule().DataRestrictionMask; 
   string 	  in_DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 	string    in_model := '' : stored('model');
+  
+  // CCPA Fields
+  unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+  string TransactionID := '' : stored ('_TransactionId');
+  string BatchUID := '' : stored('_BatchUID');
+  unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+  
 	model := STD.Str.ToLowerCase(trim(in_model));
 		
 	rec := record
@@ -138,7 +145,11 @@ export Collection_Shell_Service := MACRO
 		export string50 DataPermission := in_dataPermission;
 	END;
 
-	coll_shell := Risk_Indicators.Collection_Shell_Function( progressive_prep, params );
+	coll_shell := Risk_Indicators.Collection_Shell_Function( progressive_prep, params, 
+  LexIdSourceOptout := LexIdSourceOptout, 
+  TransactionID := TransactionID, 
+  BatchUID := BatchUID, 
+  GlobalCompanyID := GlobalCompanyID);
 	
 	model_result := case( model,
 		'csn1007_0' => models.CSN1007_0_0( coll_shell ),

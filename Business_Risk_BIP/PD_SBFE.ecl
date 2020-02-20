@@ -1,13 +1,11 @@
-/*2016-01-05T00:34:45Z (Chris Albee_prod)
-Fix SBFE data. RR Bug # 196604.
-*/
-IMPORT BIPV2, Business_Credit, Business_Risk_BIP, MDR, ut, Business_Credit_KEL;
+﻿
+IMPORT AutoStandardI, BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP, doxie, MDR;
 
 EXPORT PD_SBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet) := MODULE
-											 
+										 
 	// Add fifteen minutes to the historydatetime to accommodate for delays in 
 	// the real time database information being available in production runs
 	SHARED Shell := 
@@ -19,10 +17,22 @@ EXPORT PD_SBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 			)
 		);
 		
+
+  mod_access := 
+    MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+      EXPORT STRING DataPermissionMask := '00000000000100000000'; // Flip Pos 12 on
+      EXPORT UNSIGNED1 glb := linkingOptions.GLBPurpose;
+      EXPORT UNSIGNED1 dppa := linkingOptions.DPPAPurpose;
+      EXPORT BOOLEAN show_minors := linkingOptions.IncludeMinors;
+      EXPORT UNSIGNED1 unrestricted := (UNSIGNED1)linkingOptions.AllowAll;
+      EXPORT BOOLEAN isPreGLBRestricted() := linkingOptions.restrictPreGLB;
+      EXPORT BOOLEAN ln_branded :=  linkingOptions.lnbranded;
+    END;
+ 
 	SHARED SBFERaw := Business_Credit.Key_LinkIds().kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-																		Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+																		mod_access,
+                                    Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																		0, // ScoreThreshold --> 0 = Give me everything
-																		'00000000000100000000', // Flip Pos 12 on
 																		Business_Risk_BIP.Constants.Limit_SBFE_LinkIds,
 																		Options.KeepLargeBusinesses
 																		);

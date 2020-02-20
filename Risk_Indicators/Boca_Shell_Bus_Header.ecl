@@ -1,7 +1,7 @@
 ﻿/*2014-12-03T01:11:33Z (David Schlangen)
 change for bug 165691
 */
-import ut, business_risk, did_add;
+import ut, business_risk, did_add, Risk_Indicators;
 
 export Boca_Shell_Bus_Header(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam_pre_bus_header, integer bsversion) := FUNCTION
 

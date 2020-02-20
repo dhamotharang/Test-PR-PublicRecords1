@@ -56,6 +56,8 @@ MODULE
 	export src_Bankruptcy_Trustee        := 'BT';
 	export src_BBB_Member                := 'BM';  // Better Business Bureau members
 	export src_BBB_Non_Member            := 'BN';  // Better Business Bureau non-members
+	export src_Best_Business             := 'BB';
+	export src_Best_Person               := 'BP';  // Best Person
 	export src_Business_Credit					 := 'BC';  // SBFE Business Credit
 	export src_Business_Registration     := 'BR';
 	export src_Calbus										 := 'C#';  // California business locator/CA sales & use tax permit holders
@@ -129,6 +131,7 @@ MODULE
 	export src_Cortera_Tradeline         := '7K';
 	export src_CrashCarrier							 := 'KC';  // aka US DOT "Safer Census" data for BIP
 	export src_Credit_Unions             := 'CU';
+	export src_DataBridge								 := 'RQ';
 	export src_Datagence								 := 'DG';
 	export src_DCA                       := 'DF';  // Directory of Corporate Affiliations; aka LNCA
 	export src_DEA                       := 'DA';  // US Drug Enforcement Administration
@@ -197,6 +200,7 @@ MODULE
 	export src_Daily_Utilities           := 'DU';    
 	export src_Dunn_Bradstreet           := 'D ';  // aka D&B DMI
 	export src_Dunn_Bradstreet_Fein      := 'DN';
+	export src_Dunndata_Consumer		     := 'A3';  //DF-23679 Dunndata Consumer Masterfile
 	export src_EBR                       := 'ER';  // Experian Business Reports	
 	export src_Edgar                     := 'E ';  // US Securities and Exchange Commission, "Edgar" system data
 	export src_Emdeon                    := '7U';  // Emdeon Healthcare Claims
@@ -306,6 +310,8 @@ MODULE
 	export src_Lobbyists                 := 'LB';
 	export src_Mari_Prof_Lic		 				 :=	'MP'; // Mortgage Assest Research Institute Professional Licenses
 	export src_Mari_Public_Sanc					 :=	'MQ'; // Mortgage Assest Research Institute Public sanctions
+	export src_Marketing_Relatives_Data  := 'AZ';
+	export src_Relatives_Data 					 := 'RL';
 	export src_Marriage					 				 :=	'MR';
 	export src_MartinDale_Hubbell        := 'MH';
 	export src_MediaOne									 := 'M1';
@@ -351,6 +357,7 @@ MODULE
 	export src_SalesChannel              := 'SC';
 	export src_CA_Sales_Tax              := 'FT';  // California sales & use tax permit holders
 	export src_IA_Sales_Tax              := 'IT';  // Iowa sales tax 
+	export src_SAM_Gov_Debarred          := 'DB';
 	export src_SDA                       := 'SA';  // Standard Directory of Advertisers
 	export src_SDAA                      := 'AA';  // Standard Directory of Advertising Agencies
 	export src_SEC_Broker_Dealer         := 'SB';  // US Securities & Exchange Commission  
@@ -1084,7 +1091,7 @@ MODULE
 		,src_ZOOM                      ,src_TUCS_Ptrack
 	]; 
 
-// Marketing approved sources as of 3/2019.
+// Marketing approved sources as of 11/2019.
 export set_Marketing_Sources           := [
 		 src_AMS											 ,src_AK_Busreg                 ,src_AK_Perm_Fund						   ,src_Accurint_Trade_Show			 
 		,src_Aircrafts								 ,src_Accurint_Arrest_Log				,src_AlloyMedia_consumer       ,src_Airmen    						 		 
@@ -1098,13 +1105,13 @@ export set_Marketing_Sources           := [
 		,src_IRS_Non_Profit    				 ,src_InfutorNarc								,src_InfutorTRK  							 ,src_InfutorCID    						
 		,src_Infutor_Motorcycle_Veh 	 ,src_InfutorNare 							,src_Ingenix_Sanctions				 ,src_LaborActions_EBSA					
 		,src_LaborActions_WHD				   /*,src_Liens										  ,src_Liens_v2  */  					 ,src_LnPropV2_Fares_Asrs			 
-		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists								  ,src_MO_DL   
+		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists								  ,src_MO_DL                     ,src_Dunndata_Consumer 
 		,src_Marriage 								 ,src_MediaOne								  ,src_NaturalDisaster_Readiness ,src_NJ_Gaming_Licenses			 
 		,src_OR_Worker_Comp						 ,src_OSHAIR										,src_PBSA											 ,src_Professional_License			 
 		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard
 		,src_Vickers									 ,src_ZOOM											,src_Cortera									 ,src_Equifax_Business_Data		
-    ,src_FBNV2_Hist_Choicepoint
-    /*updated set_Marketing_Corp*/		
+		,src_FBNV2_Hist_Choicepoint		 ,src_DCA												,src_Infutor_NARB							 ,src_DataBridge
+		/*updated set_Marketing_Corp*/		
     ,src_AK_Corporations					 ,src_AL_Corporations						,src_AZ_Corporations					 ,src_AR_Corporations 
 		,src_CA_Corporations					 ,src_CO_Corporations						,src_CT_Corporations					 ,src_DC_Corporations
 		,src_FL_Corporations					 ,src_GA_Corporations						,src_HI_Corporations					 ,src_IA_Corporations 
@@ -1128,7 +1135,7 @@ export set_Marketing_Sources           := [
     // additional items
     ,src_Edgar                     ,src_Bankruptcy_Trustee        ,src_Infutor_Veh               ,src_MS_Worker_Comp
     ,src_Liens_v2_Chicago_Law      ,src_Liens_v2_ILFDLN           ,src_Liens_v2_Hogan            ,src_Liens_v2_MA
-    ,src_Liens_v2_NYC              ,src_Liens_v2_NYFDLN
+    ,src_Liens_v2_NYC              ,src_Liens_v2_NYFDLN           ,src_LnPropV2_Lexis_Asrs       ,src_LnPropV2_Fares_Deeds
 	]; 
 	
 export set_Marketing_Restricted := [
@@ -1676,6 +1683,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_WY_Corporations           := [src_WY_Corporations           ];
 	export set_CrashCarrier              := [src_CrashCarrier              ];	
 	export set_Credit_Unions             := [src_Credit_Unions             ];
+	export set_DataBridge                := [src_DataBridge                ];
 	export set_Datagence                 := [src_Datagence                 ];
 	export set_DCA                       := [src_DCA                       ];
 	export set_Death_Michigan            := [src_Death_Michigan            ];
@@ -2191,6 +2199,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsCrashCarrier               (string  sr) := sr               in set_CrashCarrier               ;	
 	export SourceIsCredit_Unions              (string  sr) := sr               in set_Credit_Unions              ;		
 	export SourceIsCriminal_History           (string  sr) := sr               in set_Criminal_History           ;
+	export SourceIsDataBridge                 (string  sr) := sr               in set_DataBridge                 ;
 	export SourceDatagence                    (string  sr) := sr               in set_Datagence;
 	export SourceIsDCA                        (string  sr) := sr               in set_DCA                        ;
 	export SourceIsDea                        (string  sr) := sr               in set_Dea                        ;

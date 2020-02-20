@@ -1,5 +1,5 @@
-﻿import Doxie, Doxie_Raw, doxie_ln, utilfile, header_quick, autokeyb, ut, moxie_phonesplus_server,
-       LN_PropertyV2_Services, mdr, iesp, AutoStandardI, CriminalRecords_Services, American_Student_Services;
+import Doxie, Doxie_Raw, doxie_ln, utilfile, header_quick, autokeyb, ut, moxie_phonesplus_server,
+  LN_PropertyV2_Services, mdr, iesp, AutoStandardI, CriminalRecords_Services, American_Student_Services, Suppress;
 
 doxie.MAC_Header_Field_Declare();
 doxie.MAC_Selection_Declare ();
@@ -16,7 +16,8 @@ export ViewSourceDid(
     VoterVersion = 0,
     DeaVersion =0,
     CriminalRecordVersion =0,
-    string1 in_party_type = ''
+    string1 in_party_type = '',
+    EmailVersion = 0
 ) := FUNCTION
 
 global_mod := AutoStandardI.GlobalModule();
@@ -43,7 +44,8 @@ boolean viewStateDeath(string20 sect) := viewAll(sect) OR sect = 'statedeath';
 boolean viewProfLic(string20 sect)    := IF (IsCRS, Include_ProfessionalLicenses_val, viewAll(sect) OR sect = 'proflic');
 boolean viewSanc(string20 sect)				:= IF (IsCRS, Include_Sanctions_val, viewAll(sect) OR sect = 'sanc');
 boolean viewProv(string20 sect)				:= IF (IsCRS, Include_Providers_val, viewAll(sect) OR sect = 'prov');
-boolean viewEmail(string20 sect)			:= IF (isCRS, Include_Email_addresses_val, viewAll(sect) or sect = 'email');
+boolean viewEmail(string20 sect)			:= EmailVersion in [0,1] and IF (isCRS, Include_Email_addresses_val, viewAll(sect) or sect = 'email');
+boolean viewEmailV2(string20 sect)		:= EmailVersion = 2 and IF (isCRS, Include_Email_addresses_val, viewAll(sect) or sect = 'email_v2');
 boolean viewVeh(string20 sect)        := VehicleVersion in [0,1] and IF (IsCRS, Include_MotorVehicles_val, viewAll(sect) OR sect = 'veh');
 boolean viewVehV2(string20 sect)      := VehicleVersion in [0,2] and IF (IsCRS, Include_MotorVehicles_val, viewAll(sect) OR sect = 'veh_v2');
 boolean viewDea(string20 sect)        := DeaVersion in [0,1] and IF (IsCRS, Include_DEA_Val, viewAll(sect) OR sect = 'dea');
@@ -114,6 +116,7 @@ Doxie_Raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     SELF.did := did;
     dids := dataset([{did}],Doxie.layout_references);
     ds_email_child := if(viewEmail(fileL.section), Doxie.email_records(dids,mod_access.ssn_mask,mod_access.application_type));
+    ds_email_v2_child := if(viewEmailV2(fileL.section), Doxie_Raw.emailv2_raw(dids,mod_access));
     ds_death_child := if(viewDeath(fileL.section),Doxie_Raw.death_raw(dids, , mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask)(IncludeBlankDOD or (integer)DOD8 > 0 ));
     ds_state_death_child := if(viewStateDeath(fileL.section),Doxie_Raw.state_death_raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask));
     ds_atf_child := if(viewAtf(fileL.section), Doxie_Raw.atf_raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask));
@@ -127,7 +130,7 @@ Doxie_Raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     ds_sanc_child := if(viewSanc(fileL.section),Doxie_Raw.Sanc_Raw(dids,,mod_access.date_threshold));
     ds_prov_child := if(viewProv(fileL.section),Doxie_Raw.Prov_Raw(dids));
     ds_veh_child := if(viewVeh(fileL.section), Doxie_Raw.Veh_Raw(dids, , , , , , , mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.ln_branded,mod_access.ssn_mask,dl_mask_value,,,,mod_access.application_type,IncludeNonRegulatedVehicleSources));
-    ds_veh_v2_child := if(viewVehV2(fileL.section), Doxie_Raw.VehV2_Raw(dids,,,mod_access.ssn_mask,mod_access.date_threshold));
+    ds_veh_v2_child := if(viewVehV2(fileL.section), Doxie_Raw.VehV2_Raw(dids,,mod_access.ssn_mask,mod_access.date_threshold));
     ds_dea_child := if(viewDea(fileL.section), Doxie_Raw.Dea_Raw(dids, bdid0, mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.ssn_mask));
     ds_dea_v2_child := if(viewDeaV2(fileL.section), Doxie_Raw.DeaV2_Raw(dids, bdid0,, mod_access.dppa, mod_access.glb, mod_access.ssn_mask,mod_access.application_type));
     ds_airc_child := if(viewAircraft(fileL.section), Doxie_Raw.AirCraft_Raw(dids, bdid0, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask,mod_access.application_type));
@@ -183,6 +186,7 @@ Doxie_Raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     ds_doc_events_child := if(viewDOC(fileL.section),Doxie_Raw.DOC_Events_Raw(doc_persons,true,true,true,true,true,,,,mod_access.date_threshold,mod_access.dppa,mod_access.glb));
     // same as in doxie@Comprehensive_Report_Service
     tempmod := module(project(global_mod,CriminalRecords_Services.IParam.report,opt))
+      doxie.compliance.MAC_CopyModAccessValues(mod_access);    
       export string14 did := input[1].id;
       export string25   doc_number   := '' ;
       export string60   offender_key := '' ;
@@ -196,7 +200,7 @@ Doxie_Raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     ds_sexoffender_people_child := if(viewSexOffender(fileL.section),sexoffender_persons);
     ds_sexoffender_events_child := if(viewSexOffender(fileL.section),Doxie_Raw.SexOffender_Events_Raw(sexoffender_persons,,mod_access.date_threshold,mod_access.dppa,mod_access.glb,mod_access.application_type));
     ds_quickHeader_child := if(viewQuickHeader(fileL.section), Doxie_Raw.QuickHeader_raw(PROJECT(dids, doxie.layout_references_hh),mod_access));
-    ds_targ_child := if(viewTargus(fileL.section), Doxie_Raw.Targus_Raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.industry_class));
+    ds_targ_child := if(viewTargus(fileL.section), Doxie_Raw.Targus_Raw(dids, mod_access));
     ds_pp_child := if(viewPP(fileL.section), moxie_phonesplus_server.phonesplus_did_records(dids, ut.limits.CRS_SOURCE_COUNT.default, score_threshold_value,mod_access.glb,mod_access.dppa,,true).wo_timezone);
     ds_fbn_v2_child := if(viewFBNv2(fileL.section), iesp.transform_FBN(Doxie_Raw.FBNV2_Raw(dids)));
     studentMod:= MODULE(mod_access, global_mod)
@@ -264,6 +268,7 @@ Doxie_Raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     self.targ_child := CHOOSEN (ds_targ_child, ut.limits.CRS_SOURCE_COUNT.default);
     self.phonesPlus_child := CHOOSEN(ds_pp_child, ut.limits.CRS_SOURCE_COUNT.default);
     self.email_child := CHOOSEN(ds_email_child,ut.limits.CRS_SOURCE_COUNT.default); //this should always be 1 record
+    self.email_v2_child := CHOOSEN(ds_email_v2_child,ut.limits.CRS_SOURCE_COUNT.default);
     self.FBNv2_child := CHOOSEN (ds_fbn_v2_child, ut.limits.CRS_SOURCE_COUNT.default);
     self.student_child := CHOOSEN(ds_student, ut.limits.CRS_SOURCE_COUNT.default);
     self.busHdr_child := [];
@@ -298,7 +303,7 @@ util_out := project(utils_in,dailyUtility(left));
 //gong records
 
 input_dids := PROJECT(input(idtype = 'DID',viewPhone(section)), TRANSFORM(doxie.layout_references, SELF.did := (unsigned6)LEFT.id;));
-gong_did_recs := PROJECT(Doxie_Raw.Phone_Raw(input_dids), TRANSFORM(Doxie_Raw.Layout_crs_raw, SELF.did := 0; SELF.rid := 0;
+gong_did_recs := PROJECT(Doxie_Raw.Phone_Raw(input_dids, mod_access), TRANSFORM(Doxie_Raw.Layout_crs_raw, SELF.did := 0; SELF.rid := 0;
                                                    SELF.phone_child := LEFT; SELF := []));;
 
 gong_in := input(is_gong(id));
@@ -311,7 +316,7 @@ doxie.layout_references getD(gong_in le) := TRANSFORM
 end;
 
 dids_from_rids := project(gong_in, getD(left));
-gong_raw_recs := Doxie_Raw.Phone_Raw(dids_from_rids);
+gong_raw_recs := Doxie_Raw.Phone_Raw(dids_from_rids, mod_access);
 
 // bug 26751 -- only require phone match
 gong_rid_recs := join(gong_raw_recs, gong_in, left.phone10 = phone_from_gong_rid(right.id),
@@ -321,6 +326,12 @@ gong_out := gong_did_recs + gong_rid_recs;
 
 //QuickHeader records
 QuickHeader_in := input(is_QuickHeader(id));
+
+header_quick_temp:= record
+    header_quick.layout_records;
+    unsigned4 global_sid;
+  unsigned8 record_sid;
+end;
 
 Doxie_Raw.Layout_crs_raw QuickHeader(QuickHeader_in L) := transform
   id := l.id;
@@ -336,10 +347,12 @@ Doxie_Raw.Layout_crs_raw QuickHeader(QuickHeader_in L) := transform
 
   w_weekly(string2 src) := if(doxie.DataRestriction.WH,~mdr.sourceTools.sourceisWeeklyHeader(src),TRUE);
 
- self.QuickHeader_child :=
-   if(isfake,
-    project(header_quick.key_AutokeyPayload(fakeid = iDID and rid = iRID and w_weekly(src) ), header_quick.layout_records),
-    project(header_quick.key_DID(DID = iDID and rid = iRID and w_weekly(src) ), header_quick.layout_records));
+  QH_recs := if(isfake,
+    project(header_quick.key_AutokeyPayload(fakeid = iDID and rid = iRID and w_weekly(src)), header_quick_temp),
+    project(header_quick.key_DID(DID = iDID and rid = iRID and w_weekly(src) ), header_quick_temp));
+
+ self.QuickHeader_child := project(Suppress.MAC_SuppressSource(QH_recs, mod_access), header_quick.layout_records);
+
  self := [];
 end;
 

@@ -23,7 +23,7 @@
  </message>
 */
 
-import OFAC_XG5;
+import OFAC_XG5, STD, iesp, Patriot, ut, Risk_Indicators, Gateway, Doxie;
 
 export Patriot_Search := MACRO
 
@@ -38,25 +38,32 @@ unsigned8 SkipRecords_val := 0 : stored('SkipRecords');
 set_validOFACVersions := Risk_Indicators.iid_constants.set_validOFACVersions;  
 unsigned OFAC_version_Null := 0 			: stored('OFACversion');
 unsigned1 OFAC_version_temp := if(OFAC_version_Null NOT IN set_validOFACVersions, 1, OFAC_version_Null);
-	OFAC_version := if(trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
+	OFAC_version := if(trim(STD.Str.ToLowerCase(_LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
 	
 real global_watchlist_threshold_temp := 0 			: stored('Threshold');
  // need to change once all customers are on Version 4
-	global_watchlist_threshold := MAP(trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'] and global_watchlist_threshold_temp=0 => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
+	global_watchlist_threshold := MAP(trim(STD.Str.ToLowerCase(_LoginID)) in ['keyxml','keydevxml'] and global_watchlist_threshold_temp=0 => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
 																		OFAC_version >= 4 and global_watchlist_threshold_temp = 0 		=> OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,  // All customers using XG5 - V4 should use .85 as threshold
 																		OFAC_version < 4 and global_watchlist_threshold_temp = 0 			=> OFAC_XG5.Constants.DEF_THRESHOLD_REAL, // V1-2 should use .84 as default
 																		global_watchlist_threshold_temp);
-	
+
+STRING20 country_value := '' : STORED('Country');	
 STRING50 firstname_value := '' : STORED('FirstName');
 STRING50 middlename_value := '' : STORED('MiddleName');
 STRING50 lastname_value := '' : STORED('LastName');
-STRING150 unparsed_value := '' : STORED('UnParsedName');
+STRING150 unparsed_value_temp := '' : STORED('UnParsedName');
+
+	cl := LENGTH(TRIM(country_value));
+	country_decoded := IF(cl=2 AND ut.Country_ISO2_To_Name(country_value)<>'',ut.Country_ISO2_To_Name(country_value),
+												IF(cl=3 AND ut.Country_ISO3_To_Name(country_value)<>'',ut.Country_ISO3_To_Name(country_value), country_value));
+					unparsed_value := if( OFAC_version = 4 and firstname_value = '' and middlename_value = '' and lastname_value = '' and unparsed_value_temp = '' and country_value <> '', 
+																country_decoded, unparsed_value_temp);
 string8 dob_value := ''      : stored('DateOfBirth');
 // I-Individual, N-NonIndividual, B-Both
 STRING1 searchtype_value := 'B' : STORED('SearchType');
 boolean ofaconly_value := false : STORED('OfacOnly');
 
-STRING20 country_value := '' : STORED('Country');
+
 boolean Include_Additional_watchlists := FALSE: stored('IncludeAdditionalWatchlists');
 boolean Include_Ofac := FALSE: stored('IncludeOfac');
 
@@ -75,15 +82,21 @@ end;
 watchlist_options := dataset([],temp) :stored('WatchList', few);
 watchlists_request := watchlist_options[1].WatchList;
 
-in_data := GROUP(SORTED(DATASET([{'1',1,Stringlib.StringToUpperCase(firstname_value),
-																				Stringlib.StringToUpperCase(middlename_value),
-																				Stringlib.StringToUpperCase(lastname_value),
-																				Stringlib.StringToUpperCase(unparsed_value), 
-																				Stringlib.StringToUpperCase(searchtype_value), 
-																				Stringlib.StringToUpperCase(country_value),
+in_data := GROUP(SORTED(DATASET([{'1',1,STD.Str.ToUpperCase(firstname_value),
+																				STD.Str.ToUpperCase(middlename_value),
+																				STD.Str.ToUpperCase(lastname_value),
+																				STD.Str.ToUpperCase(unparsed_value), 
+																				STD.Str.ToUpperCase(searchtype_value), 
+																				STD.Str.ToUpperCase(country_value),
 																				dob_value}],patriot.Layout_batch_in),acctno),acctno);
                                         
 REAL ESP_version := 1.000000 : STORED('_espclientinterfaceversion');
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 ofac_version_from_ESP := 
   MAP(
@@ -112,7 +125,8 @@ if( ofac_version_from_ESP = 4 and not exists(gateways(servicename = 'bridgerwlc'
 IF( ofac_version_from_ESP != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
-a := SORT(patriot.Search_Function(in_data,ofaconly_value,global_watchlist_threshold,ofac_version_from_ESP,Include_Ofac_from_ESP,Include_Additional_watchlists_from_ESP,dob_radius_use,watchlists_request),-score,pty_key);
+a := SORT(patriot.Search_Function(in_data,ofaconly_value,global_watchlist_threshold,ofac_version_from_ESP,Include_Ofac_from_ESP,Include_Additional_watchlists_from_ESP,dob_radius_use,watchlists_request,
+																LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyID),-score,pty_key);
 // output(a, named('Results'));
 
 

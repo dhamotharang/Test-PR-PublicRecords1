@@ -1,4 +1,4 @@
-﻿import _Control, risk_indicators, riskwise, ut, dx_header, doxie, mdr, drivers, FCRA, gateway;
+﻿import _Control, risk_indicators, riskwise, ut, dx_header, mdr, drivers, FCRA, gateway, data_services, doxie, Suppress;
 onThor := _Control.Environment.OnThor;
 
 export get_IID_Best_Flags (GROUPED DATASET(risk_indicators.layout_output) iid_input,  
@@ -8,12 +8,15 @@ export get_IID_Best_Flags (GROUPED DATASET(risk_indicators.layout_output) iid_in
 															string datarestriction, 
 															string datapermission, 
 															integer bsversion,
-															unsigned8 BSOptions) := FUNCTION
+															unsigned8 BSOptions,
+															doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+
+unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
 // a few of the functions in here need the input in layout_output instead of layout_outx
 // iid_input := project(iid, transform(risk_indicators.layout_output, self := left));
 
-dk := choosen(if(isFCRA, doxie.Key_FCRA_max_dt_last_seen, doxie.key_max_dt_last_seen), 1);
+dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
 header_build_date := (unsigned3) ((string) dk[1].max_date_last_seen)[1..6] : global;
 require2ele := false;
 isUtility := true; // turn off the utility searching in this function, don't need it for the couple counters we need here
@@ -42,10 +45,11 @@ slim_addr_rec := record
 	integer adls_per_addr_created_6months;
 end;
 
-Header_Address_Key := if(isFCRA, Doxie.Key_FCRA_Header_Address, dx_header.key_header_address());
+Header_Address_Key := dx_header.key_header_address(iType);
 
-slim_addr_rec add_header_by_address(risk_indicators.layout_output le, Header_Address_Key rt) := transform
-  head_first_seen := ((string) rt.dt_first_seen)[1..6];
+{slim_addr_rec, UNSIGNED4 global_sid} add_header_by_address(risk_indicators.layout_output le, Header_Address_Key rt) := transform
+	self.global_sid := rt.global_sid;
+	head_first_seen := ((string) rt.dt_first_seen)[1..6];
 	self.DID_from_srch := rt.did;
 	self.ssn_from_addr := rt.ssn;	
 	self.adls_per_addr := if(rt.did!=0,1,0);
@@ -60,7 +64,7 @@ slim_addr_rec add_header_by_address(risk_indicators.layout_output le, Header_Add
 end;	
 		
 // Risk_Indicators.getPhoneAddrVelocity has branch of code to handle prior to 50, but this function will only be called for shell 52 and higher, so we have removed that branch here
-header_by_address_roxie := join(iid_input, Header_Address_Key,	
+header_by_address_roxie_unsuppressed := join(iid_input, Header_Address_Key,	
 															left.prim_name!='' and left.z5!='' and
 															keyed(left.prim_name=right.prim_name)/* and keyed(left.st=right.st)*/ and
 															keyed(left.z5=right.zip) and keyed(right.prim_range=left.prim_range) and
@@ -87,7 +91,10 @@ header_by_address_roxie := join(iid_input, Header_Address_Key,
 																		and left.sec_range=right.sec_range, 2001), 
 																		keep(2000));
 
-header_by_address_thor_addr := join(distribute(iid_input(prim_name!='' and z5!=''), hash64(prim_name,z5,prim_range,sec_range)), 
+header_by_address_roxie := Suppress.Suppress_ReturnOldLayout(header_by_address_roxie_unsuppressed, mod_access, slim_addr_rec, iType);
+
+
+header_by_address_thor_addr_unsuppressed := join(distribute(iid_input(prim_name!='' and z5!=''), hash64(prim_name,z5,prim_range,sec_range)), 
 															distribute(pull(Header_Address_Key), hash64(prim_name,zip,prim_range,sec_range)),	
 															(left.prim_name=right.prim_name)/* and (left.st=right.st)*/ and
 															(left.z5=right.zip) and (right.prim_range=left.prim_range) and
@@ -112,6 +119,9 @@ header_by_address_thor_addr := join(distribute(iid_input(prim_name!='' and z5!='
 																		and right.prim_range=left.prim_range 
 																		and left.sec_range=right.sec_range, 2001), 
 																		keep(2000), LOCAL);
+																		
+header_by_address_thor_addr := Suppress.Suppress_ReturnOldLayout(header_by_address_thor_addr_unsuppressed, mod_access, slim_addr_rec, iType);
+
 header_by_address_thor := header_by_address_thor_addr + PROJECT(iid_input(prim_name='' or z5=''), TRANSFORM(slim_addr_rec, SELF := LEFT, SELF := []));
 
 #IF(onThor)
@@ -223,7 +233,8 @@ with_best_address_counts := join(with_adls_per_addr_counts, phone_counts_per_bes
 
 // for optimization, set bsoptions := 0 and bsversion := 40 for this function call
 best_ssn_flags := risk_indicators.iid_getSSNFlags(iid_input, dppa, glb, isFCRA, runSSNCodes, 
-											ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission );
+											ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission, 
+											mod_access := mod_access);
 
 with_best_ssn_flags := join(with_best_address_counts, best_ssn_flags, left.seq=right.seq,
 		transform(risk_indicators.layout_output,
@@ -245,7 +256,7 @@ with_best_ssn_flags := join(with_best_address_counts, best_ssn_flags, left.seq=r
 runAreaCodeSplitSearch := false;
 
 best_zip_flags := risk_indicators.iid_getZipFlags(iid_input);
-best_phone_flags := risk_indicators.iid_getPhoneAddrFlags(best_zip_flags, isFCRA, runAreaCodeSplitSearch, bsversion);
+best_phone_flags := risk_indicators.iid_getPhoneAddrFlags(best_zip_flags, isFCRA, runAreaCodeSplitSearch, bsversion, mod_access);
 
 with_best_phone_flags := join(with_best_ssn_flags, best_phone_flags, left.seq=right.seq,
 		transform(risk_indicators.layout_output,
@@ -267,7 +278,7 @@ allowcellphones := false;  // not going to targus gateway for this function anyw
 companyId := '';
 
 best_phoneInfo := risk_indicators.iid_getPhoneInfo(group(with_best_phone_flags, seq), gateways, dppa, glb, isfcra, require2ele, bsversion,
-		allowcellphones, exactmatchlevel, lastseenthreshold, bsoptions, companyID);  // leave the rest of the parameters as the defaults
+		allowcellphones, exactmatchlevel, lastseenthreshold, bsoptions, companyID, mod_access := mod_access);  // leave the rest of the parameters as the defaults
 
 with_best_phoneInfo := best_phoneInfo;
 		
@@ -294,7 +305,8 @@ layout_output_tmp flagroll(layout_output_tmp l, layout_output_tmp r) := transfor
 		r, l);	
 END;
 
-layout_output_tmp bestaddr_highrisk_transform(risk_indicators.layout_output l,risk_indicators.key_HRI_Address_To_SIC r) := transform
+hri_key := if(isFCRA, risk_indicators.key_HRI_Address_To_SIC_filtered_FCRA, risk_indicators.key_HRI_Address_To_SIC); 
+layout_output_tmp bestaddr_highrisk_transform(risk_indicators.layout_output l,hri_key r) := transform
 	// override the address type to a P if the high risk database finds a match to 'UNITED STATES POSTAL SERVICE'													
 	addr_type := if(trim(r.sic_code)='2265', 'P', l.addr_type);	
 	self.hriskaddrflag := MAP(trim(l.zipclass) = 'P' => '1',
@@ -312,7 +324,7 @@ layout_output_tmp bestaddr_highrisk_transform(risk_indicators.layout_output l,ri
 END;
 
 with_bestaddr_hriskaddrflag_tmp_roxie := if (isFCRA,
-			join(bestaddr_zipclass,risk_indicators.key_HRI_Address_To_SIC_filtered_FCRA,
+			join(bestaddr_zipclass,hri_key,
 				left.z5!='' and left.prim_name != '' and
 				keyed(left.z5=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.addr_suffix=right.suffix) and 
 				keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and 
@@ -322,7 +334,7 @@ with_bestaddr_hriskaddrflag_tmp_roxie := if (isFCRA,
 				ATMOST(keyed(left.z5=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.addr_suffix=right.suffix) and
 					  keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and
 						keyed(ut.NNEQ(left.sec_range, right.sec_range)), RiskWise.max_atmost), keep(100)),
-			join(bestaddr_zipclass,risk_indicators.key_HRI_Address_To_SIC,
+			join(bestaddr_zipclass,hri_key,
 				left.z5!='' and left.prim_name != '' and
 				keyed(left.z5=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.addr_suffix=right.suffix) and 
 				keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and 
@@ -335,7 +347,7 @@ with_bestaddr_hriskaddrflag_tmp_roxie := if (isFCRA,
 
 with_bestaddr_hriskaddrflag_tmp_thor := if (isFCRA,
 			join(distribute(bestaddr_zipclass, hash64(z5, prim_name, addr_suffix, predir, postdir, prim_range)),
-				distribute(pull(risk_indicators.key_HRI_Address_To_SIC_filtered_FCRA), hash64(z5, prim_name, suffix, predir, postdir, prim_range)),
+				distribute(pull(hri_key), hash64(z5, prim_name, suffix, predir, postdir, prim_range)),
 				left.z5!='' and left.prim_name != '' and
 				(left.z5=right.z5) and (left.prim_name=right.prim_name) and (left.addr_suffix=right.suffix) and 
 				(left.predir=right.predir) and (left.postdir=right.postdir) and (left.prim_range=right.prim_range) and 
@@ -345,7 +357,7 @@ with_bestaddr_hriskaddrflag_tmp_thor := if (isFCRA,
 				ATMOST(left.z5=right.z5 and left.prim_name=right.prim_name and left.addr_suffix=right.suffix and
 					  left.predir=right.predir and left.postdir=right.postdir and left.prim_range=right.prim_range, RiskWise.max_atmost), keep(100), LOCAL),
 			join(distribute(bestaddr_zipclass, hash64(z5, prim_name, addr_suffix, predir, postdir, prim_range)),
-				distribute(pull(risk_indicators.key_HRI_Address_To_SIC), hash64(z5, prim_name, suffix, predir, postdir, prim_range)),
+				distribute(pull(hri_key), hash64(z5, prim_name, suffix, predir, postdir, prim_range)),
 				left.z5!='' and left.prim_name != '' and
 				(left.z5=right.z5) and (left.prim_name=right.prim_name) and (left.addr_suffix=right.suffix) and 
 				(left.predir=right.predir) and (left.postdir=right.postdir) and (left.prim_range=right.prim_range) and 

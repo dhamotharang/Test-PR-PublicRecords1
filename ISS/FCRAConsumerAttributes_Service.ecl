@@ -109,7 +109,7 @@ FCRAConsumerAttributesReportRequest XML:
 */
 
 
-import risk_indicators, ut, iesp, address, riskwise, seed_files, gateway, Consumerstatement;
+import risk_indicators, ut, iesp, address, riskwise, gateway, Models, ISS;
 
 export FCRAConsumerAttributes_Service := MACRO
  #onwarning(4207, ignore);
@@ -203,7 +203,7 @@ export FCRAConsumerAttributes_Service := MACRO
 		    + intformat((integer1)l.searchby.dob.day,   2, 1);
 		self.dob := if((unsigned)dob=0, '', dob);
 		self.age := if (l.searchby.age = 0 and (integer)dob != 0, 
-														(STRING3)ut.GetAgeI_asOf((unsigned8)dob, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING3)ut.Age((unsigned8)dob, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
 														if(l.searchby.age=0, '', (STRING3)l.searchby.age));	
 		fullname := trim(l.searchby.name.full);
 		cleanname := address.CleanPerson73( fullname );
@@ -300,7 +300,9 @@ export FCRAConsumerAttributes_Service := MACRO
       
   unsigned8 BSOptions 					:= risk_indicators.iid_constants.BSOptions.DIDRIDSearchOnly +
 			if(FilterLiens, risk_indicators.iid_constants.BSOptions.FilterLiens, 0 ) + //DRM to drive Liens/Judgments
-    	Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException;
+    	Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException  +
+      Risk_Indicators.iid_constants.BSOptions.InsuranceFCRASODataFilter;  // Filter SO Derog Data
+
 										
 	clam(unsigned1 bsVersion) := Risk_Indicators.Boca_Shell_Function_FCRA(
 		iid_prep, gateways, dppa, glba, isUtility, isLN,
@@ -322,7 +324,7 @@ export FCRAConsumerAttributes_Service := MACRO
 	finalClam(unsigned1 bsversion) := if(ADLBasedShell, adl_clam(bsversion), clam(bsversion));
 
   clamTestSeeds := ISS.CAR_Test_Seed_Function(test_prep, ds_in[1].searchby.accountNumber, TestDataTableName, IsFCRA);
-	clamOrSeed(unsigned1 bsversion) := if( TestDataEnabled, group(clamTestSeeds, seq), finalClam(bsversion));										
+	clamOrSeed(unsigned1 bsversion) := if( TestDataEnabled, group(clamTestSeeds, seq), finalClam(bsversion));																			
 
  attributesInSorted := sort(attributesIn, -bsversion);	
 	bsversion := attributesInSorted[1].bsversion;	 

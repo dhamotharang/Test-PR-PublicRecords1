@@ -1,11 +1,16 @@
-import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build, std;
+import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build,mdr,PRTE2_Header,dx_header;
 
-head := doxie_build.file_header_building; 
+head0 := doxie_build.file_header_building; 
+head:=project(head0,transform({head0}
+												,self.ssn:=if(mdr.sourceTools.sourceIsUtility(left.src),'',left.ssn)
+												,self.valid_ssn:=if(mdr.sourceTools.sourceIsUtility(left.src),'',left.valid_ssn)
+												,self:=left)
+												);
 
 /* **************** get County Name from Count Code ****************** */
 xHead_Layout :=
 RECORD
-	head;
+	dx_header.layout_header;
 	string1 valid_dob := '';
 	unsigned6 hhid := 0;
 	STRING18 county_name := '';
@@ -70,8 +75,17 @@ TRANSFORM
 	SELF.VorP_code := ri.VorP_code;
 	SELF := le;
 END;
-with_death := JOIN(with_lookups, DISTRIBUTE(header.File_Did_Death_Master((unsigned6)did != 0), HASH((unsigned6)did)),
-			    LEFT.did = (unsigned6)RIGHT.did, getDeath(LEFT, RIGHT), FULL OUTER, LOCAL);
+//dedup death by did; many dids have more than one VorP_code - a value in this field means death was verified
+death0:=sort(DISTRIBUTE(header.File_Did_Death_Master((unsigned6)did != 0), HASH((unsigned6)did)),did,local);
+death:=rollup(death0
+				,left.did=right.did
+				,transform({death0}
+					,self.dod8:=max(left.dod8,right.dod8)
+					,self.VorP_code:=max(left.VorP_code,right.VorP_code)
+					,self:=left)
+				,local);
+
+with_death := JOIN(with_lookups, death, LEFT.did = (unsigned6)RIGHT.did, getDeath(LEFT, RIGHT), FULL OUTER, LOCAL);
 
 Combined_Layout getBest(Combined_Layout le, Watchdog.File_Best ri) :=
 TRANSFORM
@@ -94,7 +108,7 @@ TRANSFORM
 	SELF.dob := IF(le.dob=ri.dob,le.dob,0);
 	SELF := le;
 END;
-with_best := JOIN(with_best_try, Watchdog.File_Best_nonglb_nonutility, 
+with_best := JOIN(with_best_try, Watchdog.File_Best_nonglb, 
 					LEFT.did = RIGHT.did, checkBest(LEFT, RIGHT), LEFT OUTER, LOCAL);
 
 
@@ -113,7 +127,7 @@ TRANSFORM
 	SELF.dod := (unsigned)ri.dod8;
 	SELF.death_code := ri.VorP_code;
 	
-	SELF.TNT := IF(addrMatch1(), 'C', 'H');
+	SELF.TNT := 'H';
 	self.dob := IF(le.dob=0,ri.dob,le.dob);
 	self.valid_dob := IF(le.dob=0 and ri.dob<>0,'M',le.valid_dob);
 	self.ssn := IF((unsigned)le.ssn=0,ri.ssn,le.ssn);
@@ -144,81 +158,20 @@ with_appends := JOIN(with_county, with_best,
 				LEFT.did = RIGHT.did, getHHid(LEFT, RIGHT), LEFT OUTER, LOCAL);
 
 
-/* ****************** determine if this is a verified address **************** */
-xxHead_Layout :=
-RECORD
-	xHead_Layout;
-	INTEGER gong_score;
-END;
+set_external_srcs:=['TN','TS','TU','LT'];
+segmented_h := Header.fn_ADLSegmentation_v2(head(src not in set_external_srcs)).core_check;
 
-
-addrMatch2 := MACRO
-	DID_Add.Address_Match_Score(LEFT.prim_range, LEFT.prim_name, LEFT.sec_range, LEFT.zip, 
-							RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range, RIGHT.z5) > 75 AND
-	DID_Add.Address_Match_Score(LEFT.prim_range, LEFT.prim_name, LEFT.sec_range, LEFT.zip, 
-							RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range, RIGHT.z5) < 255 AND LEFT.prim_range=RIGHT.prim_range
-ENDMACRO;
-
-// check Gong by DID
-xxHead_Layout checkgDID(xHead_Layout le, Watchdog.DID_Gong ri) :=
+xHead_Layout get_lookups(with_appends le, segmented_h ri) :=
 TRANSFORM
-	SELF.listed_name := ri.listed_name;
-	SELF.listed_phone := ri.phone10;
-	SELF.gong_score := IF(ri.listed_name = '', 500, 
-					  datalib.nameMatch(le.fname, le.mname, le.lname, 
-									ri.name_first, ri.name_middle, ri.name_last));
-	SELF.TNT := MAP(ri.did != 0 AND le.TNT = 'C' => 'B',
-				 le.TNT = 'C' => 'C',
-				 ri.did != 0 AND ut.DaysApart(le.dt_last_seen+'00', (STRING8)Std.Date.Today()) < 31*6 => 'P',
-				 le.TNT);
-	SELF := le;
-END;
-gongByDID := JOIN(with_appends, DISTRIBUTE(gong.File_Gong_Did(did != 0), HASH(did)), 
-				LEFT.did = RIGHT.did AND addrMatch2(), checkgDID(LEFT, RIGHT), LEFT OUTER, LOCAL);
-
-// check Gong by HHID
-xxHead_Layout getGong(xxHead_Layout le, Gong.Gong_HHID ri) :=
-TRANSFORM
-	new_gong_score := datalib.nameMatch(le.fname, le.mname, le.lname, ri.name_first, ri.name_middle, ri.name_last);
-	choose_new_gong := new_gong_score < le.gong_score;
-	SELF.listed_name := IF(choose_new_gong, ri.listed_name, le.listed_name);
-	SELF.listed_phone := IF(choose_new_gong, ri.phone10, le.listed_phone);
-	SELF.gong_score := IF(choose_new_gong, new_gong_score, le.gong_score);
-	SELF.TNT := MAP(le.TNT = 'B' => 'B',
-				 ri.hhid != 0 AND le.TNT = 'C' => 'V',
-				 le.TNT = 'C' => 'C',
-				 ri.hhid != 0 AND ut.DaysApart(le.dt_last_seen+'00', (STRING8)Std.Date.Today()) < 31*6 => 'P',
-				 le.TNT = 'P' => 'P',
-				 ri.hhid != 0 => 'R',
-				 le.TNT);
-	SELF := le;
-END;
-with_gong := JOIN(DISTRIBUTE(gongByDID(hhid != 0), HASH(hhid)), 
-			   DISTRIBUTE(Gong.Gong_HHID(hhid != 0), HASH(hhid)), 
-			   LEFT.hhid = RIGHT.hhid AND addrMatch2(), getGong(LEFT, RIGHT), LEFT OUTER, LOCAL)+gongByDID(hhid = 0);
-
-xxHead_Layout keepBestTNT(xxHead_Layout le, xxHead_Layout ri) :=
-TRANSFORM
-	SELF.dod := IF(le.dod = 0, ri.dod, max(le.dod, ri.dod));
-	SELF.death_code := IF(le.dod = 0, ri.death_code,
-						IF(le.dod >= ri.dod, le.death_code, ri.death_code));	
-	SELF.listed_name := IF(le.listed_phone != '', le.listed_name, ri.listed_name);
-	SELF.listed_phone := IF(le.listed_phone != '', le.listed_phone, ri.listed_phone);
-	SELF.TNT := MAP(le.TNT = 'B' OR ri.TNT = 'B' => 'B',
-				 le.TNT = 'V' OR ri.TNT = 'V' => 'V',
-				 le.TNT = 'C' OR ri.TNT = 'C' => 'C',
-				 le.TNT = 'P' OR ri.TNT = 'P' => 'P',
-				 le.TNT = 'R' OR ri.TNT = 'R' => 'R', 'H');
-	SELF := le;
+	SELF.lookup_did := le.lookup_did | ut.bit_set(0,doxie.lookup_bit(ri.ind));
+	self := le;
 END;
 
-ddp := ROLLUP(SORT(DISTRIBUTE(with_gong, HASH(rid)), rid, gong_score, LOCAL), rid, keepBestTNT(LEFT, RIGHT), LOCAL);
 
-xHead_Layout backOne(xxHead_Layout le) :=
-TRANSFORM
-	SELF := le;
-END;
+with_segmented := JOIN(with_appends,segmented_h,left.did=right.did,get_lookups(LEFT,RIGHT), LOCAL): PERSIST('persist::header_pre_keybuild');
 
-rm_score := PROJECT(ddp, backOne(LEFT)) : PERSIST('persist::header_pre_keybuild');
-
-export header_pre_keybuild := rm_score;
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export header_pre_keybuild := project(prte2_header.pre_keys.header_pre_keybuild,{xHead_Layout});
+#ELSE
+export header_pre_keybuild := with_segmented;
+#END;

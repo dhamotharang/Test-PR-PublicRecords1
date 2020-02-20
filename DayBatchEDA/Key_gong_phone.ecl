@@ -1,4 +1,4 @@
-import gong, doxie, data_services;
+﻿import gong, doxie, data_services;
 
 valid_gong_full := gong.File_Gong_full(trim(phone10) <> '');
 

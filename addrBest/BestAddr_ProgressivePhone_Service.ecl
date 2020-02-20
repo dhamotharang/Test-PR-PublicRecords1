@@ -1,22 +1,22 @@
 ﻿/*--SOAP--
 <message name="BestAddress and Progressive Phones Batch_Service">
-  <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>  
-  <part name="DateLastSeen"		type="xsd:string"/>	
-  <part name="MaxRecordsToReturn" type="xsd:unsignedInt"/>	
+  <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
+  <part name="DateLastSeen"		type="xsd:string"/>
+  <part name="MaxRecordsToReturn" type="xsd:unsignedInt"/>
   <part name="PhoneticMatch" type="xsd:boolean"/>
   <part name="AllowNickNames" type="xsd:boolean"/>
   <part name="DPPAPurpose" type="xsd:unsignedInt"/>
   <part name="GLBPurpose" type="xsd:unsignedInt"/>
   <part name="UseNameUniqueDID" type="xsd:boolean"/>
   <part name="PartialAddressDedup" type="xsd:boolean"/>
-  <part name="InputAddressDedup" type="xsd:boolean"/>	
+  <part name="InputAddressDedup" type="xsd:boolean"/>
   <part name="StartWithNextMostCurrent" type="xsd:boolean"/>
   <part name="EndWithNextMostCurrent" type="xsd:boolean"/>
-  <part name="FirstNameLastNameMatch" type="xsd:boolean"/>	
-  <part name="FirstNameMatch" type="xsd:boolean"/>	
-  <part name="LastNameMatch" type="xsd:boolean"/>	
-  <part name="FullNameMatch" type="xsd:boolean"/>	
-  <part name="FirstInitialLastNameMatch" type="xsd:boolean"/>	
+  <part name="FirstNameLastNameMatch" type="xsd:boolean"/>
+  <part name="FirstNameMatch" type="xsd:boolean"/>
+  <part name="LastNameMatch" type="xsd:boolean"/>
+  <part name="FullNameMatch" type="xsd:boolean"/>
+  <part name="FirstInitialLastNameMatch" type="xsd:boolean"/>
   <part name="ReturnDedupFlag" type="xsd:boolean"/>
   <part name="KeepSamePhoneInDiffLevels" type="xsd:boolean"/>
   <part name="DedupAgainstInputPhones" type="xsd:boolean"/>
@@ -59,13 +59,13 @@
 	<part name="ExcludeNonCellPhonesPlusData" type="xsd:boolean"/>
 	<part name="StrictAPSXMatch" type="xsd:boolean"/>
 	<part name="BlankOutDuplicatePhones" type="xsd:boolean"/>
-  <part name="DataRestrictionMask" type="xsd:string"/>	
+  <part name="DataRestrictionMask" type="xsd:string"/>
  	<part name="IncludeLastResort" type="xsd:boolean"/>
   <part name="DataPermissionMask" type="xsd:string"/>
 	<part name="DLMask"	type="xsd:string"/>
   <part name="SkipPhoneScoring" type="xsd:boolean"/>
   <part name="ReturnScore" type="xsd:boolean"/>
-  <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
+  <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>
   <part name="Phone_Score_Model" type="xsd:string"/>
   <part name="MaxNumAssociate" type="xsd:unsignedInt"/>
 	<part name="MaxNumAssociateOther" type="xsd:unsignedInt"/>
@@ -79,7 +79,7 @@
 </message>
 */
 /*--INFO-- This service returns best addresses and progressive phones */
-/*--HELP-- 
+/*--HELP--
 <pre>
 &lt;batch_in&gt;
   &lt;Row&gt;
@@ -171,8 +171,8 @@
 */
 
 //************** This service was not updated part of Waterfall phones V8/Contact plus V3 project because it is a R0 service so batch doesn't update their plugins for it on Version 7/8
-//This is because it is currently running WFP V6 / CP V1 
-import AddrBest, progressive_phone, ut, WSInput;
+//This is because it is currently running WFP V6 / CP V1
+import AutoStandardI, AddrBest, doxie, progressive_phone, ut, WSInput;
 
 export BestAddr_ProgressivePhone_Service := macro
 #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -180,9 +180,10 @@ export BestAddr_ProgressivePhone_Service := macro
  WSInput.MAC_AddrBest_bestaddr_progressivephone_service();
 
 gateways_in := Gateway.Configuration.Get();
+mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 //WFP v7 only.  Returns the input phone along with any other selected countTypes.
-BOOLEAN includeInputPhone := FALSE : STORED('IncludeInputPhone'); 
+BOOLEAN includeInputPhone := FALSE : STORED('IncludeInputPhone');
 
 boolean include_driverslicense := false : stored('IncludeDriversLicense');
 boolean include_deceased_date  := false : stored('IncludeDeceasedDate');
@@ -200,26 +201,26 @@ UNSIGNED2 MaxNumSubject := 0 : STORED('MaxNumSubject');
 UNSIGNED2 MaxNumNeighbor := 0 : STORED('MaxNumNeighbor');
 
 currentDt := (UNSIGNED4) StringLib.getDateYYYYMMDD();
- 
+
 f_in_raw := dataset([],AddrBest.Layout_BestAddr.Batch_in_both) : stored('batch_in',few);
-  
+
 dl_recs := AddrBest.functions.fn_getDIDfromDL(f_in_raw);
-	
+
 AddrBest.Layout_BestAddr.Batch_in_both load_did(f_in_raw l, dl_recs r) := transform
    self.did := if (l.did = 0, r.did, l.did);
 	 self := l;
-end;  	
+end;
 	f_in_raw_dlDIDs := join(f_in_raw, dl_recs, left.acctno = right.acctno, load_did(left,right), LEFT OUTER, LIMIT(1000,SKIP));
-	
-	
+
+
 f_in_best_addr := project(f_in_raw_dlDIDs,AddrBest.Layout_BestAddr.Batch_in);
 
-bestaddrs := AddrBest.BestAddr_common(f_in_best_addr);
+bestaddrs := AddrBest.BestAddr_common(f_in_best_addr, mod_access);
 
 f_in_progressive_phone := project(f_in_raw_dlDIDs, transform(progressive_phone.layout_progressive_batch_in,
 																			self.did :=0,
 																			self := left));
-																			
+
 ProgressivePhones := AddrBest.Progressive_phone_common(f_in_progressive_phone,
 																											 ,
 																											 ,
@@ -262,7 +263,7 @@ end;
 
 both_wo_dl_dead := project(bestaddrs, out_format(left,counter)) + project(ProgressivePhones, out_format2(left,counter));
 
-//add drivers license 
+//add drivers license
 both_w_dl := if (include_driverslicense, project(AddrBest.functions.fn_addDL(both_wo_dl_dead),out_recp), both_wo_dl_dead);
 
 //add deceased date
@@ -272,6 +273,6 @@ out_recs := sort(project(both,out_rec),acctno,ind,cnt);
 
 results := progressive_phone.FN_BatchFinalAssignments(out_recs, out_rec);
 
-output(results, named('Results'));	
+output(results, named('Results'));
 
 endmacro;

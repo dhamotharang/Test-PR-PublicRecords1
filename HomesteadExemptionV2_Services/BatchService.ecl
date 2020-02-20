@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BatchService">
 	<part name="DPPAPurpose"             type="xsd:byte"/>
 	<part name="GLBPurpose"              type="xsd:byte"/>
@@ -24,7 +24,7 @@ IMPORT WSInput, Royalty;
 
 EXPORT BatchService := MACRO
 
-	#CONSTANT('SearchLibraryVersion',AutoheaderV2.Constants.LibVersion.LEGACY);
+	#CONSTANT('SearchLibraryVersion',AutoheaderV2.Constants.LibVersion.SALT);
 	WSInput.MAC_HomesteadExemption_BatchService();
 
 	in_mod:=HomesteadExemptionV2_Services.IParams.getParams();

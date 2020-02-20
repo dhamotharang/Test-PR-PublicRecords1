@@ -10,7 +10,7 @@ EXPORT Transforms := MODULE
 		SELF.SSN := l.ssn;
 		SELF.Name := iesp.ECL2ESP.SetName(l.fname, l.mname, l.lname, l.name_suffix,'');
 		SELF.Address := iesp.ECL2ESP.SetAddress('','','','','','','', l.p_city_name,l.st, l.zip, l.zip4,'','', 
-																						'', '', stringlib.stringcleanspaces(l.p_city_name + ' ' + 
+																						'', '', STD.Str.CleanSpaces(l.p_city_name + ' ' + 
 																						l.st + ' '+ l.zip + l.zip4));
 		SELF.DOB := iesp.ECL2ESP.toDatestring8(l.dob8);
 		SELF.DOD := iesp.ECL2ESP.toDatestring8(l.dod8);
@@ -48,7 +48,7 @@ EXPORT Transforms := MODULE
 		SELF.DOB := iesp.ECL2ESP.toDateString8(l.dob);																		
 		SELF.Address := iesp.ECL2ESP.setAddress(l.prim_range, l.prim_name, l.addr_suffix, '','','','', l.p_city_name, 
 																					  l.st, l.zip5,  '','','', '', '',
-																						stringlib.stringcleanspaces(l.p_city_name + ' ' + l.st + ' '+ l.zip5));
+																						STD.Str.CleanSpaces(l.p_city_name + ' ' + l.st + ' '+ l.zip5));
 		SELF.DataSource := l.datasource;
 		
 		//****************************************************************
@@ -291,7 +291,7 @@ EXPORT Transforms := MODULE
 		SELF.CustomerPersonId := L.customer_person_id;
 		SELF.CustomerEventId := L.customer_event_id;
 		SELF.ReportedDateTime :=  iesp.ECL2ESP.toTimeStamp(reported_date_time);
-		SELF.ReportedBy := L.reported_by;
+		SELF.ReportedBy := IF(L.reported_by = '', 'File', L.reported_by);
 		SELF.EventDate := iesp.ECL2ESP.toDatestring8(L.event_date);
 		SELF.EventEndDate := iesp.ECL2ESP.toDatestring8(L.event_end_date);
 		SELF.EventLocation := L.event_location;
@@ -312,7 +312,7 @@ EXPORT Transforms := MODULE
 																										L.clean_address.addr_suffix, L.clean_address.unit_desig, L.clean_address.sec_range, 
 																										L.clean_address.p_city_name, L.clean_address.st, L.clean_address.zip, L.clean_address.zip4, 
 																										'', '', STD.Str.CleanSpaces(L.Street_1 + ' ' + L.Street_2), 
-																										STD.Str.CleanSpaces(Address.Addr2FromComponents(TRIM(L.City), TRIM(L.State), L.Zip)),'');
+																										STD.Str.CleanSpaces(Address.Addr2FromComponents(L.City, L.State, L.Zip)),'');
 		SELF.MailingAddress := iesp.ECL2ESP.SetAddress(L.additional_address.clean_address.prim_name, L.additional_address.clean_address.prim_range, L.additional_address.clean_address.predir, L.additional_address.clean_address.postdir, 
 																										L.additional_address.clean_address.addr_suffix, L.additional_address.clean_address.unit_desig, L.additional_address.clean_address.sec_range, 
 																										L.additional_address.clean_address.p_city_name, L.additional_address.clean_address.st, L.additional_address.clean_address.zip, L.additional_address.clean_address.zip4, 
@@ -346,6 +346,16 @@ EXPORT Transforms := MODULE
 		SELF.DeviceRiskCode := L.device_risk_code;
 		SELF.GeoLocation.Latitude := L.clean_address.geo_lat;
 		SELF.GeoLocation.Longitude := L.clean_address.geo_long;
+		SELF.FEIN := L.fein;
+		SELF.InvestigatorId := L.investigator_id;
+		SELF.InvestigationReferralCaseId := L.investigation_referral_case_id;
+		SELF.ReferralReason := L.referral_reason;
+		SELF.Disposition := L.disposition;
+		SELF.BusinessName := L.clean_business_name;
+		SELF.BusinessRiskCode := L.business_risk_code;
+		SELF.ReportingAgencyState := L.classification_source.customer_state;
+		SELF.ClearedFraud := L.cleared_fraud;
+		SELF.ReasonClearedCode := L.reason_cleared_code;
 	END;
 
 	EXPORT FraudGovPlatform_Services.Layouts.entity_information_recs xform_elements_Information(FraudGovPlatform_Services.Layouts.fragment_w_value_recs L,

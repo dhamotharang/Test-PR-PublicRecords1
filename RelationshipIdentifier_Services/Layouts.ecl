@@ -1,4 +1,4 @@
-IMPORT BatchShare, relationship, topbusiness_services, bipv2,iesp, risk_indicators;
+﻿IMPORT BatchShare, relationship, topbusiness_services, bipv2,iesp, risk_indicators;
 EXPORT Layouts := MODULE
 
 export Local_tRelationshipIdentifierSearch := record
@@ -10,10 +10,6 @@ end;
 		BOOLEAN lnbranded;		
 		BOOLEAN IncludeNeighbors;		
 		STRING8 AsOfDate;
-		STRING6  SSNMaskVal;
-		string32 application_type;		
-		string datarestrictionmask;
-		string dataPermissionMask;
 		//boolean PDF;
  END;
 
@@ -77,7 +73,7 @@ end;
    STRING30 mname2;
    STRING30 lname2;
    STRING30 title_str;
-	 Relationship.layout_GetRelationship.InterfaceOuput;   	 
+	 Relationship.layout_GetRelationship.InterfaceOutput_new;   	 
  END;
  FETCH_LEVEL := BIPV2.IDconstants.Fetch_Level_SELEID;
  FETCH_LIMIT := TopBusiness_Services.Constants.ContactsKfetchMaxLimit;
@@ -240,7 +236,7 @@ END;
 			STRING30 mname2;
 			STRING30 lname2;
 			STRING30 title_str;
-			Relationship.layout_GetRelationship.InterfaceOuput;			
+			Relationship.layout_GetRelationship.InterfaceOutput_new;			
 		END;
 		EXPORT BatchSELEIDRelationshipFunctionRec := RECORD
 	   // these are only fields needed here from this payload:

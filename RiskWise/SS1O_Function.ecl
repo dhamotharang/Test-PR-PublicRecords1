@@ -1,4 +1,4 @@
-﻿import ut, codes, address, business_risk, Risk_Indicators, Models, gateway;
+﻿IMPORT ut, business_risk, Risk_Indicators, Models, gateway, STD;
 
 export SS1O_Function(DATASET(Layout_SS1I) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 glb, unsigned1 dppa, 
 boolean isUtility=false, boolean ln_branded=false,
@@ -6,7 +6,11 @@ string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
 unsigned1 ofac_version = 1,
 boolean include_ofac = false,
-real global_watchlist_threshold = 0.84
+real global_watchlist_threshold = 0.84,
+unsigned1 LexIdSourceOptout = 1,
+string TransactionID = '',
+string BatchUID = '',
+unsigned6 GlobalCompanyId = 0
 ) := function
 
 	tribCode := indata[1].tribcode;
@@ -23,11 +27,11 @@ risk_indicators.Layout_CIID_BtSt_In into_btst_in(indata le) := transform
 
 	self.Bill_To_In.seq := le.seq;
 	self.Bill_To_In.historydate := le.historydate;
-	self.Bill_To_In.fname := stringlib.stringtouppercase(le.first);
-	self.Bill_To_In.lname := stringlib.stringtouppercase(le.last);
-	self.Bill_To_In.in_streetAddress := stringlib.stringtouppercase(le.addr);
-	self.Bill_To_In.in_city := stringlib.stringtouppercase(le.city);
-	self.Bill_To_In.in_state := stringlib.stringtouppercase(le.state);
+	self.Bill_To_In.fname := STD.Str.touppercase(le.first);
+	self.Bill_To_In.lname := STD.Str.touppercase(le.last);
+	self.Bill_To_In.in_streetAddress := STD.Str.touppercase(le.addr);
+	self.Bill_To_In.in_city := STD.Str.touppercase(le.city);
+	self.Bill_To_In.in_state := STD.Str.touppercase(le.state);
 	self.Bill_To_In.in_zipCode := le.zip;
 	self.Bill_To_In.prim_range := clean_a[1..10];
 	self.Bill_To_In.predir := clean_a[11..12];
@@ -48,13 +52,13 @@ risk_indicators.Layout_CIID_BtSt_In into_btst_in(indata le) := transform
 	self.Bill_To_In.geo_blk := clean_a[171..177];
 	self.Bill_To_In.ssn		:= ssn_val;
 	self.Bill_To_In.dob		:= dob_val;
-	self.Bill_To_In.age 		:= if ((integer)dob_val != 0, (STRING3)ut.GetAgeI((integer)dob_val), '');
-	self.Bill_To_In.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.Bill_To_In.dl_state := stringlib.stringtouppercase(le.drlcstate);
+	self.Bill_To_In.age 		:= if ((integer)dob_val != 0, (STRING3)ut.Age((integer)dob_val), '');
+	self.Bill_To_In.dl_number := STD.Str.touppercase(dl_num_clean);
+	self.Bill_To_In.dl_state := STD.Str.touppercase(le.drlcstate);
 	self.Bill_To_In.email_address	:= le.emailaddr;
 	self.Bill_To_In.phone10 := hphone_val;
 	self.Bill_To_In.wphone10 := wphone_val;
-	self.Bill_To_In.employer_name := stringlib.stringtouppercase(le.cmpy);	
+	self.Bill_To_In.employer_name := STD.Str.touppercase(le.cmpy);	
 	
 	clean_a2 := Risk_Indicators.MOD_AddressClean.clean_addr(le.addr2, le.city2, le.state2, le.zip2);
 	
@@ -64,11 +68,11 @@ risk_indicators.Layout_CIID_BtSt_In into_btst_in(indata le) := transform
 
 	self.Ship_To_In.seq := le.seq;
 	self.Ship_To_In.historydate := le.historydate;
-	self.Ship_To_In.fname := stringlib.stringtouppercase(le.first2);
-	self.Ship_To_In.lname := stringlib.stringtouppercase(le.last2);
-	self.Ship_To_In.in_streetAddress := stringlib.stringtouppercase(le.addr2);
-	self.Ship_To_In.in_city := stringlib.stringtouppercase(le.city2);
-	self.Ship_To_In.in_state := stringlib.stringtouppercase(le.state2);
+	self.Ship_To_In.fname := STD.Str.touppercase(le.first2);
+	self.Ship_To_In.lname := STD.Str.touppercase(le.last2);
+	self.Ship_To_In.in_streetAddress := STD.Str.touppercase(le.addr2);
+	self.Ship_To_In.in_city := STD.Str.touppercase(le.city2);
+	self.Ship_To_In.in_state := STD.Str.touppercase(le.state2);
 	self.Ship_To_In.in_zipCode := le.zip2;
 	self.Ship_To_In.prim_range := clean_a2[1..10];
 	self.Ship_To_In.predir := clean_a2[11..12];
@@ -95,14 +99,18 @@ risk_indicators.Layout_CIID_BtSt_In into_btst_in(indata le) := transform
 	self.Ship_To_In.email_address	:= '';
 	self.Ship_To_In.phone10 := hphone_val2;
 	self.Ship_To_In.wphone10 := '';
-	self.Ship_To_In.employer_name := stringlib.stringtouppercase(le.cmpy2);	
+	self.Ship_To_In.employer_name := STD.Str.touppercase(le.cmpy2);	
 	self := [];
 end;
 
 prep := project(indata,into_btst_in(LEFT));
 
 iid_results := risk_indicators.InstantId_BtSt_Function(prep,gateways,dppa,glb,isUtility,ln_branded, true, true, true, ofac_version := ofac_version, include_ofac := include_ofac, 
-                                                       global_watchlist_threshold := global_watchlist_threshold,datarestriction:=datarestriction, datapermission:=datapermission);
+                                                       global_watchlist_threshold := global_watchlist_threshold,datarestriction:=datarestriction, datapermission:=datapermission,
+                                                       LexIdSourceOptout := LexIdSourceOptout, 
+                                                       TransactionID := TransactionID, 
+                                                       BatchUID := BatchUID, 
+                                                       GlobalCompanyID := GlobalCompanyID);
 
 xlayout := record
 	RiskWise.Layout_SS1O;
@@ -210,7 +218,11 @@ end;
 
 mapped_results := join(iid_results, indata, left.bill_to_output.seq = (right.seq * 2), fill_output(left,right), left outer);
 												// turned off dl and vehicle searching since that data isn't used in these models
-getBS := Risk_Indicators.BocaShell_BtSt_Function(iid_results, gateways, dppa, glb, false, false, true, false, false, true,datarestriction:=datarestriction,datapermission:=datapermission);	
+getBS := Risk_Indicators.BocaShell_BtSt_Function(iid_results, gateways, dppa, glb, false, false, true, false, false, true,datarestriction:=datarestriction,datapermission:=datapermission,
+                                                                                         LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                         TransactionID := TransactionID, 
+                                                                                         BatchUID := BatchUID, 
+                                                                                         GlobalCompanyID := GlobalCompanyID);	
 
 withScore := MAP(tribCode = 'fds7' => Models.CDN605_1_0(getBS, false, true),
 			  tribCode = 'fdsl' => Models.CDN605_1_0(getBS, false, false),

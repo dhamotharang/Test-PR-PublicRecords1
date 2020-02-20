@@ -50,16 +50,16 @@ EXPORT reportSharedLegal := MODULE
                                                            SELF.Source := LEFT.source;
                                                            SELF.CaseNumber := LEFT.caseNumber;
                                                            SELF.OffenseStatute := LEFT.offenseStatute;
-                                                           SELF.OffenseDDFirstReported := iesp.ECL2ESP.toDatestring8(LEFT.offenseDDFirstReportedActivity);
+                                                           SELF.OffenseDDFirstReported := iesp.ECL2ESP.toDate(LEFT.offenseDDFirstReportedActivity);
                                                            SELF.OffenseDDLastReportedActivity := iesp.ECL2ESP.toDate(LEFT.offenseDDLastReportedActivity);
                                                            SELF.OffenseDDMostRecentCourtDispDate := iesp.ECL2ESP.toDate(LEFT.offenseDDLastCourtDispDate);
                                                            
-                                                           offenseTypeDetails := DueDiligence.translateExpression.dctByPriority[LEFT.offenseDDLegalEventTypeCode];
+                                                           offenseTypeDetails := DueDiligence.translateExpression.expressionDCT[LEFT.offenseCategoryID];
                                                            
                                                            SELF.OffenseID := offenseTypeDetails.id;
                                                            SELF.OffensePriorityOrder := offenseTypeDetails.priorityOrder;
                                                            SELF.offenseLevel := offenseTypeDetails.level;
-                                                           SELF.OffenseDDLegalEventTypeMapped := offenseTypeDetails.description;
+                                                           SELF.OffenseDDLegalEventTypeMapped := LEFT.offenseCategoryDescription;
                                                            
                                                            SELF.OffenseCharge := LEFT.offenseCharge;
                                                            SELF.OffenseDDChargeLevelCalculated := DueDiligence.translateCodeToText.OffenseLevelText(LEFT.offenseDDChargeLevelCalculated);
@@ -86,18 +86,18 @@ EXPORT reportSharedLegal := MODULE
                                                            // sources
                                                            SELF.Sources := PROJECT(sortedSources[1..iesp.Constants.DDRAttributesConst.MaxLegalSources], 
                                                                                    TRANSFORM(iesp.duediligenceshared.t_DDRLegalSourceInfo,
-                                                                                              SELF.OffenseCharge := LEFT.offenseCharge;
-                                                                                              SELF.OffenseConviction := DueDiligence.translateCodeToText.YesNoUnknownText(LEFT.offenseConviction);
-                                                                                              SELF.OffenseChargeLevelReported := LEFT.offenseChargeLevelReported;
+                                                                                              SELF.OffenseCharge := LEFT.charge;
+                                                                                              SELF.OffenseConviction := DueDiligence.translateCodeToText.YesNoUnknownText(LEFT.conviction);
+                                                                                              SELF.OffenseChargeLevelReported := LEFT.chargeLevelReported;
                                                                                               SELF.Source := LEFT.source;
                                                                                               SELF.CourtDisposition1 := LEFT.courtDisposition1;
                                                                                               SELF.CourtDisposition2 := LEFT.courtDisposition2;
-                                                                                              SELF.OffenseReportedDate := iesp.ECL2ESP.toDate(LEFT.offenseReportedDate);
-                                                                                              SELF.OffenseArrestDate := iesp.ECL2ESP.toDate(LEFT.offenseArrestDate);
-                                                                                              SELF.OffenseCourtDispDate := iesp.ECL2ESP.toDate(LEFT.offenseCourtDispDate);
-                                                                                              SELF.OffenseAppealDate := iesp.ECL2ESP.toDate(LEFT.offenseAppealDate);
-                                                                                              SELF.OffenseSentenceDate := iesp.ECL2ESP.toDate(LEFT.offenseSentenceDate);
-                                                                                              SELF.OffenseSentenceStartDate := iesp.ECL2ESP.toDate(LEFT.offenseSentenceStartDate);
+                                                                                              SELF.OffenseReportedDate := iesp.ECL2ESP.toDate(LEFT.reportedDate);
+                                                                                              SELF.OffenseArrestDate := iesp.ECL2ESP.toDate(LEFT.arrestDate);
+                                                                                              SELF.OffenseCourtDispDate := iesp.ECL2ESP.toDate(LEFT.courtDispDate);
+                                                                                              SELF.OffenseAppealDate := iesp.ECL2ESP.toDate(LEFT.appealDate);
+                                                                                              SELF.OffenseSentenceDate := iesp.ECL2ESP.toDate(LEFT.sentenceDate);
+                                                                                              SELF.OffenseSentenceStartDate := iesp.ECL2ESP.toDate(LEFT.sentenceStartDate);
                                                                                               SELF.DOCConvictionOverrideDate := iesp.ECL2ESP.toDate(LEFT.DOCConvictionOverrideDate);
                                                                                               SELF.DOCScheduledReleaseDate := iesp.ECL2ESP.toDate(LEFT.DOCScheduledReleaseDate);
                                                                                               SELF.DOCActualReleaseDate := iesp.ECL2ESP.toDate(LEFT.DOCActualReleaseDate);
@@ -115,7 +115,7 @@ EXPORT reportSharedLegal := MODULE
                                                                                               
                                                                                               SELF.DOCInmateStatus := LEFT.DOCInmateStatus;
                                                                                               SELF.DOCParoleStatus := LEFT.DOCParoleStatus;
-                                                                                              SELF.OffenseMaxTerm := LEFT.offenseMaxTerm;
+                                                                                              SELF.OffenseMaxTerm := LEFT.maxTerm;
                                                                                               SELF.PartyNames := PROJECT(LEFT.partyNames[1..iesp.Constants.DDRAttributesConst.MaxLegalPartyNames], 
                                                                                                                          TRANSFORM(iesp.share.t_StringArrayItem,
                                                                                                                                    SELF.value := LEFT.name;));));));

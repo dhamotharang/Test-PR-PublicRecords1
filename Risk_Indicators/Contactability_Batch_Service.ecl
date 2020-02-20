@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Contactability Batch Service" wuTimeout="300000">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -48,7 +48,7 @@
 Valid models: csn1007_0_0
 </pre>
 */
-import AutoStandardI, risk_indicators, models, address;
+import STD, AutoStandardI, risk_indicators, models, address;
  
 export Contactability_Batch_Service := MACRO
   // Can't have duplicate definitions of Stored with different default values, 
@@ -67,6 +67,12 @@ export Contactability_Batch_Service := MACRO
 	string in_model             := '' : stored('model');
 
 	batch_in                 := dataset([],Risk_Indicators.Layout_Batch_In) : STORED('batch_in',few);
+  
+    // CCPA Fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 	in_bsversion := 3;
 
@@ -75,7 +81,7 @@ export Contactability_Batch_Service := MACRO
 		risk_indicators.Layout_Input;
 	end;
 	layout_acct into(batch_in l, integer i) := transform
-		cleanedName 					:= StringLib.StringToUpperCase(Address.CleanPerson73(l.unparsedfullname));
+		cleanedName 					:= STD.STR.ToUpperCase(Address.CleanPerson73(l.unparsedfullname));
 		BOOLEAN validCleaned := cleanedName <> '';
 		
 		self.acctno           := l.acctno;
@@ -87,11 +93,11 @@ export Contactability_Batch_Service := MACRO
 		self.ssn              := l.ssn;
 		self.dob              := l.dob;
 		self.phone10          := l.home_phone;
-		self.title  					:= StringLib.StringToUppercase(if(validCleaned, cleanedName[1..5], ''));
-		self.fname            := StringLib.StringToUppercase(if(l.Name_First='' AND validCleaned, cleanedName[6..25], l.Name_First));
-		self.mname            := StringLib.StringToUppercase(if(l.Name_Middle='' AND validCleaned, cleanedName[26..45], l.Name_Middle));
-		self.lname            := StringLib.StringToUppercase(if(l.Name_Last='' AND validCleaned, cleanedName[46..65], l.Name_Last));
-		self.suffix           := StringLib.StringToUppercase(if(l.Suffix='' AND validCleaned, cleanedName[66..70], l.Suffix));
+		self.title  					:= STD.STR.ToUpperCase(if(validCleaned, cleanedName[1..5], ''));
+		self.fname            := STD.STR.ToUpperCase(if(l.Name_First='' AND validCleaned, cleanedName[6..25], l.Name_First));
+		self.mname            := STD.STR.ToUpperCase(if(l.Name_Middle='' AND validCleaned, cleanedName[26..45], l.Name_Middle));
+		self.lname            := STD.STR.ToUpperCase(if(l.Name_Last='' AND validCleaned, cleanedName[46..65], l.Name_Last));
+		self.suffix           := STD.STR.ToUpperCase(if(l.Suffix='' AND validCleaned, cleanedName[66..70], l.Suffix));
 		clean_a2              := Risk_Indicators.MOD_AddressClean.clean_addr(l.street_addr, l.p_city_name, l.st, l.z5[1..5]);
 		self.prim_range       := clean_a2[1..10];
 		self.predir           := clean_a2[11..12];
@@ -153,9 +159,15 @@ export Contactability_Batch_Service := MACRO
 		export string50 DataPermission := in_dataPermission;
 	END;
 
-	cclam := Risk_Indicators.Collection_Shell_Function( progressive_prep, params );
+	cclam := Risk_Indicators.Collection_Shell_Function( progressive_prep, 
+  params, 
+  LexIdSourceOptout := LexIdSourceOptout, 
+  TransactionID := TransactionID, 
+  BatchUID := BatchUID, 
+  GlobalCompanyID := GlobalCompanyID
+);
 	
-	model_out := case( StringLib.StringToLowerCase(trim(in_model)),
+	model_out := case( STD.STR.ToLowerCase(trim(in_model)),
 		'csn1007_0_0' => models.CSN1007_0_0( cclam ),
 		dataset( [], models.layout_modelout )
 	);

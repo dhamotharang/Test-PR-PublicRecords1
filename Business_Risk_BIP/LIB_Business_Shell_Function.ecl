@@ -1,4 +1,4 @@
-﻿IMPORT _Control, BIPV2, Business_Risk_BIP, Cortera, Gateway, iesp, UT;
+﻿IMPORT _Control, Business_Risk_BIP, Cortera, Gateway, iesp;
 
 Use_Business_Shell_Library := NOT _Control.LibraryUse.ForceOff_Business_Risk_BIP__LIB_Business_Shell;
 
@@ -24,9 +24,14 @@ EXPORT LIB_Business_Shell_Function (
 											BOOLEAN OverrideExperianRestriction_In = FALSE,
 											BOOLEAN IncludeAuthRepInBIPAppend = FALSE,
 											BOOLEAN IsBIID20_In								= FALSE,
-                      BOOLEAN CorteraRetrotest_In       = FALSE,
-           DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw)
-																							) := FUNCTION
+											BOOLEAN CorteraRetrotest_In       = FALSE,
+											DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw),
+											unsigned1 LexIdSourceOptout = 1,
+											string TransactionID = '',
+											string BatchUID = '',
+											unsigned6 GlobalCompanyId = 0,
+ 											BOOLEAN UseOldBIPAppend_In = FALSE
+											) := FUNCTION
 
 options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 	// Clean up the Options and make sure that defaults are enforced
@@ -61,6 +66,10 @@ options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 	EXPORT BOOLEAN    DoNotUseAuthRepInBIPAppend  := NOT IncludeAuthRepInBIPAppend;
 	EXPORT BOOLEAN		IsBIID20										:= IsBIID20_In;	
   EXPORT BOOLEAN    CorteraRetrotest            := CorteraRetrotest_In;
+	export unsigned1 bus_LexIdSourceOptout := LexIdSourceOptout;
+	export string16 bus_TransactionID := (string16)TransactionID;
+	export string16 bus_BatchUID := (string16)BatchUID;
+	export unsigned6 bus_GlobalCompanyId := GlobalCompanyId;
 END;
 
 #if(Use_Business_Shell_Library)

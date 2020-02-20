@@ -1,4 +1,4 @@
-IMPORT EASI, Business_Risk, ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
+﻿IMPORT EASI, Business_Risk, ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 EXPORT cdn1506_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
 										DATASET(Models.Layout_CD_CustomModelInputs) customInputs,
@@ -21950,6 +21950,7 @@ self.final_score_685                    :=final_score_685  ;
 		SELF := le.bs.Bill_To_Out.iid;
 		SELF := le.bs.Bill_To_Out.shell_input;
 		SELF := le.bs.bill_to_out;
+		SELF := [];
 	END;
 	iidBT := PROJECT(clam_with_easi, into_layout_output(LEFT));
 
@@ -21993,6 +21994,7 @@ self.final_score_685                    :=final_score_685  ;
 		SELF := le.bs.Ship_To_Out.iid;
 		SELF := le.bs.Ship_To_Out.shell_input;
 		SELF := le.bs.ship_to_out;
+		SELF := [];
 	END;
 	iidST := PROJECT(clam_with_easi, into_layout_output2(LEFT));
 

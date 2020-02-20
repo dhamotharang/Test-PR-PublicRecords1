@@ -1,4 +1,4 @@
-IMPORT ingenix_natlprof,Healthcare_Provider_Services,NPPES;
+IMPORT ingenix_natlprof;
 
 EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 

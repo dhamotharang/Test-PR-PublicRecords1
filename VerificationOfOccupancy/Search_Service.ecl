@@ -8,7 +8,7 @@
  </message>
 */
 
-IMPORT Address, AutoStandardI, iesp, Risk_indicators, Riskwise, ut, STD, Inquiry_AccLogs, Risk_Reporting;
+IMPORT Address, AutoStandardI, iesp, Risk_indicators, AutoheaderV2,Doxie, VerificationOfOccupancy, ut, STD, Inquiry_AccLogs, Risk_Reporting;
 
 EXPORT Search_Service() := MACRO
  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -19,7 +19,12 @@ EXPORT Search_Service() := MACRO
 		'VerificationOfOccupancyRequest',
 		'HistoryDateYYYYMM',
 		'DataRestrictionMask',
-		'DataPermissionMask'));
+		'DataPermissionMask',
+    'LexIdSourceOptout',
+	'_TransactionId',
+	'_BatchUID',
+	'_GCID'
+    ));
 
 	// Get XML input 
 	requestIn   := dataset([], iesp.verificationofoccupancy.t_VerificationOfOccupancyRequest)  	: stored('VerificationOfOccupancyRequest', few);
@@ -46,12 +51,17 @@ EXPORT Search_Service() := MACRO
 	BOOLEAN ExcludeDMVPII           := userIn.ExcludeDMVPII;
 	BOOLEAN DisableOutcomeTracking  := False : STORED('OutcomeTrackingOptOut');
 	BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
-	
+	 
+    unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 	//Look up the industry by the company ID.
 	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.VerificationOfOccupancy__Search_Service);
 /* ************* End Scout Fields **************/
 	
 	string6  outOfBandHistoryDate := '' : STORED('HistoryDateYYYYMM');
+  
 	string8  OOBHistoryDate := if(outOfBandHistoryDate <> '', outOfBandHistoryDate + '01', '');
 	
 	asOf 				:= search.AsOf.year
@@ -75,7 +85,7 @@ EXPORT Search_Service() := MACRO
 
 	TestDataEnabled 			:= userIn.TestDataEnabled;
 	TestDataTableName 		:= Trim(userIn.TestDataTableName);
-	attributesVersion 		:= StringLib.StringToUpperCase(optionsIn.AttributesVersionRequest);
+	attributesVersion 		:= STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest);
 	IncludeModel 					:= optionsIn.IncludeModel;
 	IncludeReport 				:= optionsIn.IncludeReport;
 	
@@ -153,8 +163,8 @@ EXPORT Search_Service() := MACRO
 
 	Risk_Indicators.Layout_Input intoLayoutInput(ut.ds_oneRecord le, INTEGER c) := TRANSFORM
 		SELF.seq 				:= c;
-		SELF.fname 			:= trim(stringlib.stringtouppercase(fname));
-		SELF.lname 			:= trim(stringlib.stringtouppercase(lname));
+		SELF.fname 			:= trim(STD.Str.touppercase(fname));
+		SELF.lname 			:= trim(STD.Str.touppercase(lname));
 		SELF.ssn 				:= trim(search.SSN);
 		SELF.in_zipCode := trim(search.address.zip5);
 		SELF.phone10 		:= trim(search.Phone);
@@ -165,7 +175,10 @@ EXPORT Search_Service() := MACRO
 
 	searchResults := IF(TestDataEnabled, 
 		PROJECT(VerificationOfOccupancy.TestSeed_Function(packagedTestseedInput, TestDataTableName, IncludeModel,IncludeReport), TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOBatchOutReport, SELF := LEFT; SELF := [])),	// TestSeed Values
-		VerificationOfOccupancy.Search_Function(VOO_Input, DataRestriction, glba, dppa, isUtility, AttributesVersion, IncludeModel, DataPermission, IncludeReport).VOOReport // Realtime Values
+		VerificationOfOccupancy.Search_Function(VOO_Input, DataRestriction, glba, dppa, isUtility, AttributesVersion, IncludeModel, DataPermission, IncludeReport,LexIdSourceOptout := LexIdSourceOptout, 
+	TransactionID := TransactionID, 
+	BatchUID := BatchUID, 
+	GlobalCompanyID := GlobalCompanyID).VOOReport // Realtime Values
 	);
 	
 	// searchResults :=  VerificationOfOccupancy.Search_Function(VOO_Input, DataRestriction, glba, dppa, isUtility, AttributesVersion, IncludeModel, DataPermission, IncludeReport).VOOReport; // Realtime Values);

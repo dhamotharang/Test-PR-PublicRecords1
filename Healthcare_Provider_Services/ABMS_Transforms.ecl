@@ -1,4 +1,4 @@
-Import iesp, ABMS;
+﻿Import iesp, ABMS;
 EXPORT ABMS_Transforms := MODULE
 	Shared myFn := Healthcare_Provider_Services.ABMS_Functions;
 
@@ -65,6 +65,8 @@ EXPORT ABMS_Transforms := MODULE
 			boolean isNPIMatched := inCriteria.NPI<>'' and inRec.npi = inCriteria.NPI and inCriteria.DerivedNPI = false;
 			self.DataIndicator :=  inRec.record_type;
 			self.isInputNPIMatched := isNPIMatched;
+      self.global_sid:=inrec.global_sid;
+      self.did :=inCriteria.did;
 			self.isDerivedNPIMatched := isNPIDerivedMatched;
 			self.DerivedNPI := '';//Not currently Used
 			self.isAddressSuppressed := inRec.address_suppress_ind = 'Y';
@@ -106,37 +108,39 @@ EXPORT ABMS_Transforms := MODULE
 			self.DataIndicator :=  inRec.DataIndicator;//Work to do here if we add another source.
 			self.isInputNPIMatched := if(exists(allrows(isInputNPIMatched=true)),true,false);
 			self.isDerivedNPIMatched := if(exists(allrows(isDerivedNPIMatched=true)),true,false);
-			self.DerivedNPI := allrows(DerivedNPI<>'')[1].DerivedNPI;
+			self.DerivedNPI := allrows(DerivedNPI<>'' and hasoptout=false)[1].DerivedNPI;
 			self.isAddressSuppressed := if(exists(allrows(isAddressSuppressed=true)),true,false);
 			self.isAutoKeyResults := if(exists(allrows(isAutoKeyResults=true)),true,false);	
 			self._Penalty := min(allrows,_Penalty);
 			self.AccountNumber :=  inRec.AccountNumber;
 			self.ABMSBiogID:= inRec.ABMSBiogID;
-			self.Name := inRec.Name;
-			self.Addresses := choosen(SORT(DEDUP(NORMALIZE(allRows, LEFT.Addresses, TRANSFORM(iesp.abms.t_ABMSAddressInfo, SELF := RIGHT)), RECORD, ALL, HASH ), -DateLastSeen)(Address.StreetName<>''),iesp.Constants.HPR.Max_ABMS_ADDRESSES);
-			self.Contacts := choosen(SORT(DEDUP(NORMALIZE(allRows, LEFT.Contacts, TRANSFORM(iesp.abms.t_ABMSContactInfo, SELF := RIGHT)), RECORD, ALL, HASH ), -DateLastSeen)(ContactType<>''),iesp.Constants.HPR.Max_ABMS_Contacts);
-			self.Organization := allrows(Organization<>'')[1].Organization;
-			self.Gender := allrows(Gender<>'')[1].Gender;
-			self.BoardCertified := if(exists(allrows(BoardCertified='Y')),'Y','N');
-			self.NPINumber :=  allrows(NPINumber<>'')[1].NPINumber;
-			self.isDeceased := if(exists(allrows(isDeceased=true)),true,false);
-			self.DOD := if(exists(allrows(dod.Year>0)),allrows(dod.Year>0)[1].dod);
-			self.DOB := if(exists(allrows(dob.Year>0)),allrows(dob.Year>0)[1].dob);
-			self.DOBCity := if(exists(allrows(DOBCity<>'')),allrows(DOBCity<>'')[1].DOBCity,''); 
-			self.DOBState := if(exists(allrows(DOBState<>'')),allrows(DOBState<>'')[1].DOBState,''); 
-			self.DOBNation := if(exists(allrows(DOBNation<>'')),allrows(DOBNation<>'')[1].DOBNation,''); 
-			self.MOCParticipation := if(exists(allrows(MOCParticipation<>'')),allrows(MOCParticipation<>'')[1].MOCParticipation,''); 
+			self.Name := allrows(hasoptout=false)[1].name;
+			self.Addresses := choosen(SORT(DEDUP(NORMALIZE(allRows(hasoptout=false), LEFT.Addresses, TRANSFORM(iesp.abms.t_ABMSAddressInfo, SELF := RIGHT)), RECORD, ALL, HASH ), -DateLastSeen)(Address.StreetName<>''),iesp.Constants.HPR.Max_ABMS_ADDRESSES);
+			self.Contacts := choosen(SORT(DEDUP(NORMALIZE(allRows(hasoptout=false), LEFT.Contacts, TRANSFORM(iesp.abms.t_ABMSContactInfo, SELF := RIGHT)), RECORD, ALL, HASH ), -DateLastSeen)(ContactType<>''),iesp.Constants.HPR.Max_ABMS_Contacts);
+			self.Organization := allrows(Organization<>'' and hasoptout=false)[1].Organization;
+			self.Gender := allrows(Gender<>'' and hasoptout=false)[1].Gender;
+			self.BoardCertified := if(exists(allrows(BoardCertified='Y' and hasoptout=false)),'Y','N');
+			self.NPINumber :=  allrows(NPINumber<>''and hasoptout=false)[1].NPINumber;
+			self.isDeceased := if(exists(allrows(isDeceased=true and hasoptout=false)),true,false);
+			self.DOD := if(exists(allrows(dod.Year>0 and hasoptout=false)),allrows(dod.Year>0)[1].dod);
+			self.DOB := if(exists(allrows(dob.Year>0 and hasoptout=false)),allrows(dob.Year>0)[1].dob);
+			self.DOBCity := if(exists(allrows(DOBCity<>'' and hasoptout=false)),allrows(DOBCity<>'')[1].DOBCity,''); 
+			self.DOBState := if(exists(allrows(DOBState<>'' and hasoptout=false)),allrows(DOBState<>'')[1].DOBState,''); 
+			self.DOBNation := if(exists(allrows(DOBNation<>'' and hasoptout=false)),allrows(DOBNation<>'')[1].DOBNation,''); 
+			self.MOCParticipation := if(exists(allrows(MOCParticipation<>'' and hasoptout=false)),allrows(MOCParticipation<>'')[1].MOCParticipation,''); 
 			self.DateFirstSeen := sort(allrows,DateFirstSeen)[1].DateFirstSeen;
 			self.DateLastSeen := sort(allrows,-DateLastSeen)[1].DateLastSeen;
-			self.UniqueIds := choosen(DEDUP(project(allRows.UniqueIds, TRANSFORM(iesp.share.t_StringArrayItem, SELF := Left)), RECORD, ALL, HASH),iesp.Constants.HPR.Max_Small_Cnt);
-			self.BusinessIds := choosen(DEDUP(project(allRows.BusinessIds, TRANSFORM(iesp.share.t_StringArrayItem, SELF := left)), RECORD, ALL, HASH),iesp.Constants.HPR.Max_Small_Cnt);
-			self.RecordSources := choosen(DEDUP(NORMALIZE(allRows, inRec.RecordSources, TRANSFORM(iesp.share.t_StringArrayItem, SELF := RIGHT)), RECORD, ALL, HASH),iesp.Constants.HPR.Max_Small_Cnt);
+			self.UniqueIds := choosen(DEDUP(project(allRows(hasoptout=false).UniqueIds, TRANSFORM(iesp.share.t_StringArrayItem, SELF := Left)), RECORD, ALL, HASH),iesp.Constants.HPR.Max_Small_Cnt);
+			self.BusinessIds := choosen(DEDUP(project(allRows(hasoptout=false).BusinessIds, TRANSFORM(iesp.share.t_StringArrayItem, SELF := left)), RECORD, ALL, HASH),iesp.Constants.HPR.Max_Small_Cnt);
+			self.RecordSources := choosen(DEDUP(NORMALIZE(allRows(hasoptout=false), inRec.RecordSources, TRANSFORM(iesp.share.t_StringArrayItem, SELF := RIGHT)), RECORD, ALL, HASH),iesp.Constants.HPR.Max_Small_Cnt);
 			self.TypeOfPractices := dataset([],iesp.abms.t_ABMSTypeOfPractice); //Will be filled in later via Join
 			self.Certifications := dataset([],iesp.abms.t_ABMSCertificate); //Will be filled in later via Join
 			self.CareerHistory := dataset([],iesp.abms.t_ABMSCareer); //Will be filled in later via Join
 			self.EducationHistory := dataset([],iesp.abms.t_ABMSEducation); //Will be filled in later via Join
 			self.ProfessionalAssociations := dataset([],iesp.abms.t_ABMSProfessionalAssociation); //Will be filled in later via Join
 			self.Specialty :=inRec.Specialty;
+                        self.hasoptout:=allRows[1].hasoptout;
+			self:=inrec;
 	end;
 	export filterZeroes(string inDate):= function
 		return if(inDate = '00000000','',inDate);

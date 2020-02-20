@@ -529,8 +529,6 @@ EXPORT Layouts := MODULE
 			string8  	 sec_range := ''; 
 			string1		 typeflag := '';
 			string2		 vendor_id := '';
-      unsigned4    global_sid := 0;
-	    unsigned8    record_sid := 0;
 		end;
 	  export rec_batch_RTPhones_input := record, maxlength(150630)
       layout_batch_common_acct;

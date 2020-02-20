@@ -1,4 +1,4 @@
-import data_services, faa;
+﻿import data_services, faa, vault, _control;
 
 // TODO: OPT options should be removed from basefile and index definitions;
 //       'temp' should be removed from index names
@@ -23,7 +23,14 @@ export key_override_faa := MODULE
 	dailyds_aircraft := dataset (daily_prefix + 'aircraft', aircraft_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_aircraft, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_aircraft,persistent_record_id,replaceds);
+	
+
+#IF(_Control.Environment.onVault) 
+ export aircraft := vault.FCRA.key_override_faa.aircraft;
+
+#ELSE
   export aircraft := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'aircrafts::qa::ffid', OPT);
+#END;
 
 
   // aircraft detailed info record

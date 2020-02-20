@@ -1,9 +1,9 @@
 ﻿/*2016-09-13T22:58:22Z (Michele Walklin)
 RR-10587
 */
-import Address, GlobalWatchLists, GlobalWatchLists_Services, iesp, Patriot, Risk_Indicators, ut, OFAC_XG5, Gateway;
+import Business_Risk, GlobalWatchLists, iesp, Patriot, Risk_Indicators, ut, OFAC_XG5, Gateway, STD;
 
-export getWatchLists2(GROUPED DATASET(Layout_Output) inl, boolean ofac_only = false, boolean From_BIID = false,
+export getWatchLists2(GROUPED DATASET(Business_Risk.Layout_Output) inl, boolean ofac_only = false, boolean From_BIID = false,
 											unsigned1 ofac_version=1,boolean include_ofac=FALSE,boolean include_additional_watchlists=FALSE,
 											real Global_WatchList_Threshold =0.00,
 											dataset(iesp.share.t_StringArrayItem) watchlists_requested=dataset([], iesp.share.t_StringArrayItem),
@@ -63,7 +63,7 @@ layout_output rejoin(inl le, patOut ri) := transform
 										transform(recordof(GlobalWatchLists.Key_GlobalWatchLists_Key), 
 											name_matches := right.first_name=left.first_name AND ut.NBEQ(right.last_name,left.last_name);
 											cmpy_matches := ut.NBEQ(right.cname,left.cname);
-											country_matches := stringlib.stringtouppercase(right.name_type)='COUNTRY' AND ut.NBEQ(right.address_country, left.country);
+											country_matches := STD.Str.ToUpperCase(right.name_type)='COUNTRY' AND ut.NBEQ(right.address_country, left.country);
 											something_matched := name_matches or cmpy_matches or country_matches;
 											self.first_name := if(something_matched, right.first_name, skip);
 											self := right), atmost(5000), keep(1));
@@ -225,89 +225,89 @@ END;
  XG5AddInData := join(inl, XG5Formatted, left.seq = right.seq,
 			transform(Business_Risk.Layout_Output, 
 
-				SELF.watchlist_table := RIGHT.watchlist_table;
-				SELF.watchlist_program := RIGHT.watchlist_program;
-				SELF.watchlist_record_number := RIGHT.watchlist_record_number;
-				SELF.watchlist_country := RIGHT.watchlist_country;
-				SELF.watchlist_fname := RIGHT.watchlist_fname;
-				SELF.watchlist_lname := RIGHT.watchlist_lname;
-				SELF.watchlist_address := RIGHT.watchlist_address;
-				SELF.watchlist_city := RIGHT.watchlist_city;
-				SELF.watchlist_state := RIGHT.watchlist_state;
-				SELF.watchlist_zip := RIGHT.watchlist_zip;
-				SELF.watchlist_cmpy := RIGHT.watchlist_cmpy;
+				SELF.watchlist_table := STD.Str.ToUpperCase(RIGHT.watchlist_table);
+				SELF.watchlist_program := STD.Str.ToUpperCase(RIGHT.watchlist_program);
+				SELF.watchlist_record_number := STD.Str.ToUpperCase(RIGHT.watchlist_record_number);
+				SELF.watchlist_country := STD.Str.ToUpperCase(RIGHT.watchlist_country);
+				SELF.watchlist_fname := STD.Uni.ToUpperCase(RIGHT.watchlist_fname);
+				SELF.watchlist_lname := STD.Uni.ToUpperCase(RIGHT.watchlist_lname);
+				SELF.watchlist_address := STD.Str.ToUpperCase(RIGHT.watchlist_address);
+				SELF.watchlist_city := STD.Str.ToUpperCase(RIGHT.watchlist_city);
+				SELF.watchlist_state := STD.Str.ToUpperCase(RIGHT.watchlist_state);
+				SELF.watchlist_zip := STD.Str.ToUpperCase(RIGHT.watchlist_zip);
+				SELF.watchlist_cmpy := STD.Uni.ToUpperCase(RIGHT.watchlist_cmpy);
 				
-				SELF.watchlist_table_2 := RIGHT.watchlist_table_2;
-				SELF.watchlist_program_2 := RIGHT.watchlist_program_2;
-				SELF.watchlist_record_number_2 := RIGHT.watchlist_record_number_2;
-				SELF.watchlist_country_2 := RIGHT.watchlist_country_2;
-				SELF.watchlist_fname_2 := RIGHT.watchlist_fname_2;
-				SELF.watchlist_lname_2 := RIGHT.watchlist_lname_2;
-				SELF.watchlist_address_2 := RIGHT.watchlist_address_2;
-				SELF.watchlist_city_2 := RIGHT.watchlist_city_2;
-				SELF.watchlist_state_2 := RIGHT.watchlist_state_2;
-				SELF.watchlist_zip_2 := RIGHT.watchlist_zip_2;
-				SELF.watchlist_cmpy_2 := RIGHT.watchlist_cmpy_2;
+				SELF.watchlist_table_2 := STD.Str.ToUpperCase(RIGHT.watchlist_table_2);
+				SELF.watchlist_program_2 := STD.Str.ToUpperCase(RIGHT.watchlist_program_2);
+				SELF.watchlist_record_number_2 := STD.Str.ToUpperCase(RIGHT.watchlist_record_number_2);
+				SELF.watchlist_country_2 := STD.Str.ToUpperCase(RIGHT.watchlist_country_2);
+				SELF.watchlist_fname_2 := STD.Uni.ToUpperCase(RIGHT.watchlist_fname_2);
+				SELF.watchlist_lname_2 := STD.Uni.ToUpperCase(RIGHT.watchlist_lname_2);
+				SELF.watchlist_address_2 := STD.Str.ToUpperCase(RIGHT.watchlist_address_2);
+				SELF.watchlist_city_2 := STD.Str.ToUpperCase(RIGHT.watchlist_city_2);
+				SELF.watchlist_state_2 := STD.Str.ToUpperCase(RIGHT.watchlist_state_2);
+				SELF.watchlist_zip_2 := STD.Str.ToUpperCase(RIGHT.watchlist_zip_2);
+				SELF.watchlist_cmpy_2 := STD.Uni.ToUpperCase(RIGHT.watchlist_cmpy_2);
 
-				SELF.watchlist_table_3 := RIGHT.watchlist_table_3;
-				SELF.watchlist_program_3 := RIGHT.watchlist_program_3;
-				SELF.watchlist_record_number_3 := RIGHT.watchlist_record_number_3;
-				SELF.watchlist_country_3 := RIGHT.watchlist_country_3;
-				SELF.watchlist_fname_3 := RIGHT.watchlist_fname_3;
-				SELF.watchlist_lname_3 := RIGHT.watchlist_lname_3;
-				SELF.watchlist_address_3 := RIGHT.watchlist_address_3;
-				SELF.watchlist_city_3 := RIGHT.watchlist_city_3;
-				SELF.watchlist_state_3 := RIGHT.watchlist_state_3;
-				SELF.watchlist_zip_3 := RIGHT.watchlist_zip_3;
-				SELF.watchlist_cmpy_3 := RIGHT.watchlist_cmpy_3;
+				SELF.watchlist_table_3 := STD.Str.ToUpperCase(RIGHT.watchlist_table_3);
+				SELF.watchlist_program_3 := STD.Str.ToUpperCase(RIGHT.watchlist_program_3);
+				SELF.watchlist_record_number_3 := STD.Str.ToUpperCase(RIGHT.watchlist_record_number_3);
+				SELF.watchlist_country_3 := STD.Str.ToUpperCase(RIGHT.watchlist_country_3);
+				SELF.watchlist_fname_3 := STD.Uni.ToUpperCase(RIGHT.watchlist_fname_3);
+				SELF.watchlist_lname_3 := STD.Uni.ToUpperCase(RIGHT.watchlist_lname_3);
+				SELF.watchlist_address_3 := STD.Str.ToUpperCase(RIGHT.watchlist_address_3);
+				SELF.watchlist_city_3 := STD.Str.ToUpperCase(RIGHT.watchlist_city_3);
+				SELF.watchlist_state_3 := STD.Str.ToUpperCase(RIGHT.watchlist_state_3);
+				SELF.watchlist_zip_3 := STD.Str.ToUpperCase(RIGHT.watchlist_zip_3);
+				SELF.watchlist_cmpy_3 := STD.Uni.ToUpperCase(RIGHT.watchlist_cmpy_3);
 
-				SELF.watchlist_table_4 := RIGHT.watchlist_table_4;
-				SELF.watchlist_program_4 := RIGHT.watchlist_program_4;
-				SELF.watchlist_record_number_4 := RIGHT.watchlist_record_number_4;
-				SELF.watchlist_country_4 := RIGHT.watchlist_country_4;
-				SELF.watchlist_fname_4 := RIGHT.watchlist_fname_4;
-				SELF.watchlist_lname_4 := RIGHT.watchlist_lname_4;
-				SELF.watchlist_address_4 := RIGHT.watchlist_address_4;
-				SELF.watchlist_city_4 := RIGHT.watchlist_city_4;
-				SELF.watchlist_state_4 := RIGHT.watchlist_state_4;
-				SELF.watchlist_zip_4 := RIGHT.watchlist_zip_4;
-				SELF.watchlist_cmpy_4 := RIGHT.watchlist_cmpy_4;
+				SELF.watchlist_table_4 := STD.Str.ToUpperCase(RIGHT.watchlist_table_4);
+				SELF.watchlist_program_4 := STD.Str.ToUpperCase(RIGHT.watchlist_program_4);
+				SELF.watchlist_record_number_4 := STD.Str.ToUpperCase(RIGHT.watchlist_record_number_4);
+				SELF.watchlist_country_4 := STD.Str.ToUpperCase(RIGHT.watchlist_country_4);
+				SELF.watchlist_fname_4 := STD.Uni.ToUpperCase(RIGHT.watchlist_fname_4);
+				SELF.watchlist_lname_4 := STD.Uni.ToUpperCase(RIGHT.watchlist_lname_4);
+				SELF.watchlist_address_4 := STD.Str.ToUpperCase(RIGHT.watchlist_address_4);
+				SELF.watchlist_city_4 := STD.Str.ToUpperCase(RIGHT.watchlist_city_4);
+				SELF.watchlist_state_4 := STD.Str.ToUpperCase(RIGHT.watchlist_state_4);
+				SELF.watchlist_zip_4 := STD.Str.ToUpperCase(RIGHT.watchlist_zip_4);
+				SELF.watchlist_cmpy_4 := STD.Uni.ToUpperCase(RIGHT.watchlist_cmpy_4);
 
-				SELF.watchlist_table_5 := RIGHT.watchlist_table_5;
-				SELF.watchlist_program_5 := RIGHT.watchlist_program_5;
-				SELF.watchlist_record_number_5 := RIGHT.watchlist_record_number_5;
-				SELF.watchlist_country_5 := RIGHT.watchlist_country_5;
-				SELF.watchlist_fname_5 := RIGHT.watchlist_fname_5;
-				SELF.watchlist_lname_5 := RIGHT.watchlist_lname_5;
-				SELF.watchlist_address_5 := RIGHT.watchlist_address_5;
-				SELF.watchlist_city_5 := RIGHT.watchlist_city_5;
-				SELF.watchlist_state_5 := RIGHT.watchlist_state_5;
-				SELF.watchlist_zip_5 := RIGHT.watchlist_zip_5;
-				SELF.watchlist_cmpy_5 := RIGHT.watchlist_cmpy_5;
+				SELF.watchlist_table_5 := STD.Str.ToUpperCase(RIGHT.watchlist_table_5);
+				SELF.watchlist_program_5 := STD.Str.ToUpperCase(RIGHT.watchlist_program_5);
+				SELF.watchlist_record_number_5 := STD.Str.ToUpperCase(RIGHT.watchlist_record_number_5);
+				SELF.watchlist_country_5 := STD.Str.ToUpperCase(RIGHT.watchlist_country_5);
+				SELF.watchlist_fname_5 := STD.Uni.ToUpperCase(RIGHT.watchlist_fname_5);
+				SELF.watchlist_lname_5 := STD.Uni.ToUpperCase(RIGHT.watchlist_lname_5);
+				SELF.watchlist_address_5 := STD.Str.ToUpperCase(RIGHT.watchlist_address_5);
+				SELF.watchlist_city_5 := STD.Str.ToUpperCase(RIGHT.watchlist_city_5);
+				SELF.watchlist_state_5 := STD.Str.ToUpperCase(RIGHT.watchlist_state_5);
+				SELF.watchlist_zip_5 := STD.Str.ToUpperCase(RIGHT.watchlist_zip_5);
+				SELF.watchlist_cmpy_5 := STD.Uni.ToUpperCase(RIGHT.watchlist_cmpy_5);
 
-				SELF.watchlist_table_6 := RIGHT.watchlist_table_6;
-				SELF.watchlist_program_6 := RIGHT.watchlist_program_6;
-				SELF.watchlist_record_number_6 := RIGHT.watchlist_record_number_6;
-				SELF.watchlist_country_6 := RIGHT.watchlist_country_6;
-				SELF.watchlist_fname_6 := RIGHT.watchlist_fname_6;
-				SELF.watchlist_lname_6 := RIGHT.watchlist_lname_6;
-				SELF.watchlist_address_6 := RIGHT.watchlist_address_6;
-				SELF.watchlist_city_6 := RIGHT.watchlist_city_6;
-				SELF.watchlist_state_6 := RIGHT.watchlist_state_6;
-				SELF.watchlist_zip_6 := RIGHT.watchlist_zip_6;
-				SELF.watchlist_cmpy_6 := RIGHT.watchlist_cmpy_6;
+				SELF.watchlist_table_6 := STD.Str.ToUpperCase(RIGHT.watchlist_table_6);
+				SELF.watchlist_program_6 := STD.Str.ToUpperCase(RIGHT.watchlist_program_6);
+				SELF.watchlist_record_number_6 := STD.Str.ToUpperCase(RIGHT.watchlist_record_number_6);
+				SELF.watchlist_country_6 := STD.Str.ToUpperCase(RIGHT.watchlist_country_6);
+				SELF.watchlist_fname_6 := STD.Uni.ToUpperCase(RIGHT.watchlist_fname_6);
+				SELF.watchlist_lname_6 := STD.Uni.ToUpperCase(RIGHT.watchlist_lname_6);
+				SELF.watchlist_address_6 := STD.Str.ToUpperCase(RIGHT.watchlist_address_6);
+				SELF.watchlist_city_6 := STD.Str.ToUpperCase(RIGHT.watchlist_city_6);
+				SELF.watchlist_state_6 := STD.Str.ToUpperCase(RIGHT.watchlist_state_6);
+				SELF.watchlist_zip_6 := STD.Str.ToUpperCase(RIGHT.watchlist_zip_6);
+				SELF.watchlist_cmpy_6 := STD.Uni.ToUpperCase(RIGHT.watchlist_cmpy_6);
 
-				SELF.watchlist_table_7 := RIGHT.watchlist_table_7;
-				SELF.watchlist_program_7 := RIGHT.watchlist_program_7;
-				SELF.watchlist_record_number_7 := RIGHT.watchlist_record_number_7;
-				SELF.watchlist_country_7 := RIGHT.watchlist_country_7;
-				SELF.watchlist_fname_7 := RIGHT.watchlist_fname_7;
-				SELF.watchlist_lname_7 := RIGHT.watchlist_lname_7;
-				SELF.watchlist_address_7 := RIGHT.watchlist_address_7;
-				SELF.watchlist_city_7 := RIGHT.watchlist_city_7;
-				SELF.watchlist_state_7 := RIGHT.watchlist_state_7;
-				SELF.watchlist_zip_7 := RIGHT.watchlist_zip_7;
-				SELF.watchlist_cmpy_7 := RIGHT.watchlist_cmpy_7;			
+				SELF.watchlist_table_7 := STD.Str.ToUpperCase(RIGHT.watchlist_table_7);
+				SELF.watchlist_program_7 := STD.Str.ToUpperCase(RIGHT.watchlist_program_7);
+				SELF.watchlist_record_number_7 := STD.Str.ToUpperCase(RIGHT.watchlist_record_number_7);
+				SELF.watchlist_country_7 := STD.Str.ToUpperCase(RIGHT.watchlist_country_7);
+				SELF.watchlist_fname_7 := STD.Uni.ToUpperCase(RIGHT.watchlist_fname_7);
+				SELF.watchlist_lname_7 := STD.Uni.ToUpperCase(RIGHT.watchlist_lname_7);
+				SELF.watchlist_address_7 := STD.Str.ToUpperCase(RIGHT.watchlist_address_7);
+				SELF.watchlist_city_7 := STD.Str.ToUpperCase(RIGHT.watchlist_city_7);
+				SELF.watchlist_state_7 := STD.Str.ToUpperCase(RIGHT.watchlist_state_7);
+				SELF.watchlist_zip_7 := STD.Str.ToUpperCase(RIGHT.watchlist_zip_7);
+				SELF.watchlist_cmpy_7 := STD.Uni.ToUpperCase(RIGHT.watchlist_cmpy_7);			
 				self := LEFT , 
 				self := RIGHT ;//do we need this still????? 
 				), left outer);

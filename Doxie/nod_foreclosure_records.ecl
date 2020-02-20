@@ -7,9 +7,9 @@ EXPORT nod_foreclosure_records (dataset (doxie.layout_references) dids, string s
 
   
   shared nMod := module (Foreclosure_Services.Raw.params)
-    export string6 ssnmask := ssn_mask;
-    export string32 ApplicationType := app_type;
-		  export string5 IndustryClass := industry_class;
+    export string ssn_mask := ^.ssn_mask;
+    export string32 application_type := app_type;
+    export string5 industry_class := ^.industry_class;
   end;
 
   // NOD is in the ESDL layout, jsut need to project it from report to search

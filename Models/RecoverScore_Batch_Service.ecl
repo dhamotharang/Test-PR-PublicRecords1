@@ -66,7 +66,7 @@ Moxie_RecoverScore2_Server.RecoverScore2_Scores_Search on Roxie
 </pre>
 */
 
-import address, risk_indicators, models, riskwise, ut,AutoStandardI, gateway;
+import address, risk_indicators, models, riskwise, ut,AutoStandardI, gateway, STD;
 
 export RecoverScore_Batch_Service := MACRO
 
@@ -85,9 +85,16 @@ unsigned1 ofac_version      := 1        : stored('OFACVersion');
 boolean   excludewatchlists := false 		: stored('ExcludeWatchLists');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+
 appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
-model := trim(StringLib.StringToUpperCase(Model_val)) ;
+model := trim(STD.Str.ToUpperCase(Model_val)) ;
 valid_models := [
 									'RSN1108_1_0', 'RSN1108_2_0', 'RSN1108_3_0', // unifund
 									'RSN803_2_0', // AXIANT_CUSTOM
@@ -120,13 +127,13 @@ gateways_in := Gateway.Configuration.Get();
 model_name := if(model in valid_models, model, ERROR(301,'Missing or Invalid Model Name') );
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform  
-	self.servicename := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and StringLib.StringToUpperCase(model_name) not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.servicename);
-	self.url := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and StringLib.StringToUpperCase(model_name) not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.url);
+	self.servicename := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and STD.Str.ToUpperCase(model_name) not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.servicename);
+	self.url := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and STD.Str.ToUpperCase(model_name) not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.url);
   self := le;																																								
 end;
 gateways := project(gateways_in, gw_switch(left));
 
-if(ofac_version = 4 and StringLib.StringToUpperCase(model_name) in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+if(ofac_version = 4 and STD.Str.ToUpperCase(model_name) in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 // add sequence to matchup later to add acctno to output
 Models.Layout_RecoverScore_Batch_Input into_seq(batchin le, integer C) := TRANSFORM
@@ -148,7 +155,7 @@ risk_indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	self.seq := le.seq;
 	self.ssn := le.ssn;
 	self.dob := dob_val;
-	self.age := if ((integer)le.age = 0 and (integer)le.dob != 0, (string3)ut.GetAgeI((integer)le.dob), (le.age));
+	self.age := if ((integer)le.age = 0 and (integer)le.dob != 0, (string3)ut.Age((integer)le.dob), (le.age));
 	
 	self.phone10 := le.home_phone;
 	self.wphone10 := le.work_phone;
@@ -156,11 +163,11 @@ risk_indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	cleaned_name := address.CleanPerson73(le.UnParsedFullName);
 	boolean valid_cleaned := le.UnParsedFullName <> '';
 	
-	self.fname := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
-	self.lname := stringlib.stringtouppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
-	self.mname := stringlib.stringtouppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
-	self.suffix := stringlib.stringtouppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
-	self.title := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
+	self.fname := STD.Str.touppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
+	self.lname := STD.Str.touppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
+	self.mname := STD.Str.touppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
+	self.suffix := STD.Str.touppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
+	self.title := STD.Str.touppercase(if(valid_cleaned, cleaned_name[1..5],''));
 
 	street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 	clean_a2 := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;											
@@ -188,8 +195,8 @@ risk_indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	self.county := clean_a2[143..145];
 	self.geo_blk := clean_a2[171..177];
 	
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(le.dl_state);
+	self.dl_number := STD.Str.touppercase(dl_num_clean);
+	self.dl_state := STD.Str.touppercase(le.dl_state);
 	
 	self := [];
 END;
@@ -250,7 +257,11 @@ iid_results := Risk_Indicators.InstantID_Function(iid_prep, gateways, DPPA_Purpo
 																									ofac_only, suppressNearDups, require2ele, 
 																									fromBIID, isFCRA, excludeWatchLists, 
 																									from_IT1O, in_BSversion:=bsVersion, in_DataRestriction := DataRestriction,
-																									in_DataPermission := DataPermission);
+																									in_DataPermission := DataPermission,
+                                                                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                    TransactionID := TransactionID, 
+                                                                                                    BatchUID := BatchUID, 
+                                                                                                    GlobalCompanyID := GlobalCompanyID);
 
 riskwise.Layout_SkipTrace get_confidence(skiptrace le, iid_results rt) := transform	
 	self.addr_confidence_a := map(le.addr_type_a='X' => '',
@@ -285,7 +296,11 @@ skip_trace_results_mapped_to_batchin := join(batchinseq, full_skip_trace, left.s
 
 clam := Risk_Indicators.Boca_Shell_Function(iid_results, gateways, DPPA_Purpose, GLB_Purpose, isUtility,ln_branded ,
 							includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo,
-							bsVersion, doScore, nugen,DataRestriction := DataRestriction, DataPermission := DataPermission);
+							bsVersion, doScore, nugen,DataRestriction := DataRestriction, DataPermission := DataPermission,
+                            LexIdSourceOptout := LexIdSourceOptout, 
+                            TransactionID := TransactionID, 
+                            BatchUID := BatchUID, 
+                            GlobalCompanyID := GlobalCompanyID);
 
 
 clam_adl := risk_indicators.ADL_Based_Modeling_Function(prep,
@@ -314,7 +329,11 @@ clam_adl := risk_indicators.ADL_Based_Modeling_Function(prep,
 																		doScore, 
 																		nugen,
 																		DataRestriction := DataRestriction,
-																		DataPermission := DataPermission);	
+																		DataPermission := DataPermission,
+                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                        TransactionID := TransactionID, 
+                                                                        BatchUID := BatchUID, 
+                                                                        GlobalCompanyID := GlobalCompanyID);	
 																		
    	score := map( model_name='RSN803_2_0' => models.RSN803_2_0(clam, full_skip_trace),  // axiant   
    								model_name='RSN807_0_0' => models.RSN807_0_0(clam_adl), // Use ADL append boca shell

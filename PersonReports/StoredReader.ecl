@@ -1,4 +1,4 @@
-IMPORT doxie, iesp, PersonReports;
+﻿IMPORT doxie, iesp, PersonReports;
 doxie.MAC_Selection_Declare ();
 doxie.MAC_Header_Field_Declare (); // only for versions
 
@@ -10,7 +10,7 @@ export StoredReader := MODULE
 // real translations are done in PersonReports@functions attribute
 
 
-  export relatives_options := MODULE (PersonReports.input.relatives)
+  export relatives_options := MODULE (PersonReports.IParam.relatives)
     export unsigned1 relative_depth           := min (max (^.Relative_Depth, 1), 3); //1
     export unsigned1 max_relatives            := min (^.max_relatives, iesp.Constants.BR.MaxRelatives); //100
     export boolean  include_relativeaddresses := Include_RelativeAddresses_val; //false
@@ -20,7 +20,7 @@ export StoredReader := MODULE
     export boolean use_verified_address_ra := false : stored ('UnverifiedAddresses');    // enforce returning of verified addresses only
   end;
 
-  export neighbors_options := MODULE (PersonReports.input.neighbors)
+  export neighbors_options := MODULE (PersonReports.IParam.neighbors)
     export unsigned1 neighborhoods := min (max (Max_Neighborhoods, 0), iesp.Constants.BR.MaxNeighborhood); //0
     export unsigned1 neighbors_per_address := Neighbors_PerAddress; //3
     export unsigned1 addresses_per_neighbor := Addresses_PerNeighbor; //3
@@ -31,16 +31,16 @@ export StoredReader := MODULE
     // -- generally, the radius of neighbors' units: houses, or appartments or etc.
   end;
 
-  export imposters_options := MODULE (PersonReports.input.imposters)
+  export imposters_options := MODULE (PersonReports.IParam.imposters)
     export boolean return_AllImposterRecords := false : stored('ReturnAllImposters'); //new
   end;
 
-  export phones_options := MODULE (PersonReports.input.phones)
+  export phones_options := MODULE (PersonReports.IParam.phones)
     export boolean include_phonesfeedback := IncludePhonesFeedback;
     export boolean indicate_restricted    := false : stored ('IndicateUnpub'); //new
   end;
 
-  export providers_options := MODULE (PersonReports.input.providers)
+  export providers_options := MODULE (PersonReports.IParam.providers)
     // same exactly way as in doxie@prov_records
     export boolean include_groupaffiliations    := false : stored('IncludeGroupAffiliations');
     export boolean include_hospitalaffiliations := false : stored('IncludeHospitalAffiliations');
@@ -49,7 +49,7 @@ export StoredReader := MODULE
   end;
 
 // Reads from the SOAP section, to ensure backward compatibility with non-ESDL mode.
-  export global_options := MODULE (PersonReports.input.include, phones_options)
+  export global_options := MODULE (PersonReports.IParam.include, phones_options)
     export select_individually := Select_Indiv;
 
     export boolean include_akas            := Include_AKAs_val;
@@ -117,13 +117,15 @@ export StoredReader := MODULE
     // export boolean Exclude_ResidentsForAssociatesAddresses_val 			:= false : stored('ExcludeResidentsForAssociatesAddresses');
     boolean Exclude_Sources_val := false : stored('ExcludeSources');
     export boolean include_sources := Include_Them_All or ~Exclude_Sources_val;
+    export boolean Include_AddressSourceInfo := false : stored('IncludeAddressSourceInfo');   // defined outside of mac_selection
   end;
 
-  export versions := MODULE (PersonReports.input.versions)
+  export versions := MODULE (PersonReports.IParam.versions)
     export unsigned1 bankruptcy_version     := min (max (bankruptcyversion,     0), 4);
     export unsigned1 crimrecords_version    := min (max (CriminalRecordVersion, 0), 4);
     export unsigned1 dea_version            := min (max (deaversion,            0), 4);
     export unsigned1 dl_version             := min (max (dlversion,             0), 4);
+    export unsigned1 email_version          := min (max (emailversion,          0), 4);
     export unsigned1 liensjudgments_version := min (max (judgmentlienversion,   0), 4);
     export unsigned1 property_version       := min (max (propertyversion,       0), 4);
     export unsigned1 ucc_version            := min (max (uccversion,            0), 4);
@@ -133,6 +135,12 @@ export StoredReader := MODULE
     // those were not used in doxie version
 
   end;
+
+  export email_options := MODULE //(PersonReports.IParam.emails)
+      export unsigned MaxEmailResults := 5 : STORED('MaxEmailResults');;
+      export string   EmailSearchTier := '' : STORED('EmailSearchTier');
+  end;
+
 
 END;
 /*

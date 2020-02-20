@@ -1,4 +1,4 @@
-IMPORT AutoKeyI, DidVille, Gateway, iesp;
+IMPORT AutoKeyI, DidVille, Gateway, iesp, doxie;
 
 EXPORT SoapCall_DidVille(DATASET(DidVille.Layout_Did_InBatchRaw) batch_in,
 	Gateway.IParam.DidVilleParams in_mod,
@@ -27,21 +27,21 @@ EXPORT SoapCall_DidVille(DATASET(DidVille.Layout_Did_InBatchRaw) batch_in,
 	END;
 
 	soapRequestRec setSoapRequest():=TRANSFORM
-		SELF.AllowAll:=in_mod.AllowAll;
+		SELF.AllowAll := in_mod.unrestricted & doxie.compliance.ALLOW.ALL = doxie.compliance.ALLOW.ALL;
 		SELF.Appends:=in_mod.Appends;
 		SELF.AppendThreshold:=in_mod.AppendThreshold;
-		SELF.ApplicationType:=in_mod.ApplicationType;
+		SELF.ApplicationType:=in_mod.application_type;
 		SELF.DataPermissionMask:=in_mod.DataPermissionMask;
 		SELF.DataRestrictionMask:=in_mod.DataRestrictionMask;
 		SELF.Deduped:=in_mod.Deduped;
-		SELF.GLBData:=in_mod.AllowGLB;
-		SELF.GLBPurpose:=in_mod.GLBPurpose;
-		SELF.IncludeMinors:=in_mod.IncludeMinors;
+		SELF.GLBData := in_mod.unrestricted & doxie.compliance.ALLOW.GLB = doxie.compliance.ALLOW.GLB;
+		SELF.GLBPurpose:=in_mod.glb;
+		SELF.IncludeMinors:=in_mod.show_minors;
 		SELF.IncludeRanking:=in_mod.IncludeRanking;
-		SELF.IndustryClass:=in_mod.IndustryClass;
+		SELF.IndustryClass:=in_mod.industry_class;
 		SELF.PatriotProcess:=in_mod.PatriotProcess;
 		SELF.Max_Results_Per_Acct:=in_mod.MaxResultsPerAcct;
-		SELF.SSNMask:=in_mod.SSN_Mask;
+		SELF.SSNMask:=in_mod.ssn_mask;
 		SELF.Verify:=in_mod.Verify;
 		SELF.did_batch_in:=batch_in;
 	END;

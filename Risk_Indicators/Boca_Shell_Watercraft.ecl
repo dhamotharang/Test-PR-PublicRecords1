@@ -1,28 +1,40 @@
-﻿import watercraft, riskwise, ut, risk_indicators;
+﻿import watercraft, riskwise, ut, risk_indicators, doxie, Suppress;
 
-export Boca_Shell_Watercraft(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsVersion ) := FUNCTION
+export Boca_Shell_Watercraft(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsVersion, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 string8 watercraft_build_date := Risk_Indicators.get_Build_date('watercraft_build_version');
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
 
-key_did := watercraft.key_watercraft_did (); //non-fcra version
+key_did := watercraft.key_watercraft_did(); //non-fcra version
+key_wid := watercraft.key_watercraft_wid();
 
-riskwise.layouts.Layout_Watercraft_Plus watercraft_nonFCRA(ids_only le, key_did ri) := transform
+Layout_Watercraft_Plus_CCPA := RECORD
+  string8 earliest_date;
+  string8 myGetDate;
+  integer lenDate;
+  string seqDate;
+  integer8 did; // CCPA changes
+  unsigned4 global_sid; // CCPA changes
+  riskwise.layouts.Layout_Watercraft_Plus;
+END;
+
+// riskwise.layouts.Layout_Watercraft_Plus watercraft_nonFCRA(ids_only le, key_did ri) := transform
+Layout_Watercraft_Plus_CCPA watercraft_nonFCRA(ids_only le, key_did ri) := transform
 	// to account for people running in history mode with current date, use the minimum of either the history date or the build date, jira MS-48 
-	earliest_date := min(watercraft_build_date, risk_indicators.iid_constants.full_history_date(le.historydate));
-	myGetDate := if(le.historydate=999999, watercraft_build_date, earliest_date);
+                self.earliest_date := min(watercraft_build_date, risk_indicators.iid_constants.full_history_date(le.historydate));
+                self.myGetDate := if(le.historydate=999999, watercraft_build_date, self.earliest_date);
                 self.watercraft_key := ri.watercraft_key;
                 self.sequence_key := ri.sequence_key;
-                lenDate := length(trim(ri.sequence_key));
-                seqDate := if(lenDate=8,ri.sequence_key, if(lenDate=6, ri.sequence_key+'31', '99999999'));       // put the date in future if there is no date, so that it gets sorted to the end and we keep the oldest record
+                self.lenDate := length(trim(ri.sequence_key));
+                self.seqDate := if(self.lenDate=8,ri.sequence_key, if(self.lenDate=6, ri.sequence_key+'31', '99999999'));       // put the date in future if there is no date, so that it gets sorted to the end and we keep the oldest record
                 self.watercraft_count := if(trim(ri.watercraft_key)!='', 1, 0);// not really current here, just total
-                self.watercraft_count30 := if(trim(ri.watercraft_key)!='' and trim(seqDate)!='' and checkDays(myGetDate,seqDate,30), 1, 0);
-                self.watercraft_count90 := if(trim(ri.watercraft_key)!='' and trim(seqDate)!='' and checkDays(myGetDate,seqDate,90), 1, 0);
-                self.watercraft_count180 := if(trim(ri.watercraft_key)!='' and trim(seqDate)!='' and checkDays(myGetDate,seqDate,180), 1, 0);
-                self.watercraft_count12 := if(trim(ri.watercraft_key)!='' and trim(seqDate)!='' and checkDays(myGetDate,seqDate,ut.DaysInNYears(1)), 1, 0);
-                self.watercraft_count24 := if(trim(ri.watercraft_key)!='' and trim(seqDate)!='' and checkDays(myGetDate,seqDate,ut.DaysInNYears(2)), 1, 0);
-                self.watercraft_count36 := if(trim(ri.watercraft_key)!='' and trim(seqDate)!='' and checkDays(myGetDate,seqDate,ut.DaysInNYears(3)), 1, 0);
-                self.watercraft_count60 := if(trim(ri.watercraft_key)!='' and trim(seqDate)!='' and checkDays(myGetDate,seqDate,ut.DaysInNYears(5)), 1, 0);
+                self.watercraft_count30 := if(trim(ri.watercraft_key)!='' and trim(self.seqDate)!='' and checkDays(self.myGetDate,self.seqDate,30), 1, 0);
+                self.watercraft_count90 := if(trim(ri.watercraft_key)!='' and trim(self.seqDate)!='' and checkDays(self.myGetDate,self.seqDate,90), 1, 0);
+                self.watercraft_count180 := if(trim(ri.watercraft_key)!='' and trim(self.seqDate)!='' and checkDays(self.myGetDate,self.seqDate,180), 1, 0);
+                self.watercraft_count12 := if(trim(ri.watercraft_key)!='' and trim(self.seqDate)!='' and checkDays(self.myGetDate,self.seqDate,ut.DaysInNYears(1)), 1, 0);
+                self.watercraft_count24 := if(trim(ri.watercraft_key)!='' and trim(self.seqDate)!='' and checkDays(self.myGetDate,self.seqDate,ut.DaysInNYears(2)), 1, 0);
+                self.watercraft_count36 := if(trim(ri.watercraft_key)!='' and trim(self.seqDate)!='' and checkDays(self.myGetDate,self.seqDate,ut.DaysInNYears(3)), 1, 0);
+                self.watercraft_count60 := if(trim(ri.watercraft_key)!='' and trim(self.seqDate)!='' and checkDays(self.myGetDate,self.seqDate,ut.DaysInNYears(5)), 1, 0);
 								self.watercraft_build_date := watercraft_build_date;
 								self := le;
                 self := [];
@@ -32,8 +44,38 @@ watercraft_recs := join(ids_only, key_did,
 									(unsigned3)(right.sequence_key[1..6]) < left.historydate,
 									watercraft_nonFCRA(left,right), left outer, atmost(right.l_did=left.did, riskwise.max_atmost));
 
+Layout_Watercraft_Plus_CCPA watercraft_nonFCRA_CCPA(watercraft_recs le, key_wid ri) := transform
+                self.earliest_date := le.earliest_date;
+                self.myGetDate := le.myGetDate;
+                self.lenDate := le.lenDate;
+                self.seqDate := le.seqDate;
+                self.watercraft_key := le.watercraft_key;
+                self.sequence_key := le.sequence_key;
+                self.watercraft_count := le.watercraft_count;
+                self.watercraft_count30 := le.watercraft_count30;
+                self.watercraft_count90 := le.watercraft_count90;
+                self.watercraft_count180 := le.watercraft_count180;
+                self.watercraft_count12 := le.watercraft_count12;
+                self.watercraft_count24 := le.watercraft_count24;
+                self.watercraft_count36 := le.watercraft_count36;
+                self.watercraft_count60 := le.watercraft_count60;
+				self.watercraft_build_date := watercraft_build_date;
+                self.global_sid := ri.global_sid;
+				self := le;
+                self := [];
+end;
 
-riskwise.layouts.Layout_Watercraft_Plus roll_watercraft(riskwise.layouts.Layout_Watercraft_Plus le, riskwise.layouts.Layout_Watercraft_Plus ri) := transform
+watercraft_rec_join :=  join(watercraft_recs, key_wid,
+												 keyed(right.watercraft_key = left.watercraft_key and
+                                                             right.state_origin = left.state_origin and
+                                                             right.sequence_key = left.sequence_key),
+												 watercraft_nonFCRA_CCPA(left,right), 
+                                                 left outer,
+												 atmost(right.watercraft_key = left.watercraft_key 
+                                                 and right.state_origin = left.state_origin 
+                                                 and right.sequence_key = left.sequence_key, riskwise.max_atmost));
+
+Layout_Watercraft_Plus_CCPA roll_watercraft(Layout_Watercraft_Plus_CCPA le, Layout_Watercraft_Plus_CCPA ri) := transform
                 self.watercraft_count := le.watercraft_count+IF(le.watercraft_key=ri.watercraft_key,0,ri.watercraft_count);  // don't increment if the key is a duplicate
                 self.watercraft_count30 := le.watercraft_count30+IF(le.watercraft_key=ri.watercraft_key,0,ri.watercraft_count30);
                 self.watercraft_count90 := le.watercraft_count90+IF(le.watercraft_key=ri.watercraft_key,0,ri.watercraft_count90);
@@ -45,12 +87,15 @@ riskwise.layouts.Layout_Watercraft_Plus roll_watercraft(riskwise.layouts.Layout_
                 self := ri;
 end;
 
-watercraft_deduped := dedup(sort(watercraft_recs, seq, did, watercraft_key[1..10], -sequence_key), seq, did, watercraft_key[1..10]);
-watercraft_sorted := sort(watercraft_recs, seq, did, watercraft_key, -sequence_key);
+watercraft_deduped := dedup(sort(watercraft_rec_join, seq, did, watercraft_key[1..10], -sequence_key), seq, did, watercraft_key[1..10]);
+watercraft_sorted := sort(watercraft_rec_join, seq, did, watercraft_key, -sequence_key);
 
 watercraft_recs_sorted := if(bsversion < 50, watercraft_sorted, watercraft_deduped);
-rolled_watercraft := rollup(watercraft_recs_sorted, left.seq=right.seq and left.did=right.did, roll_watercraft(left,right));     
+watercraft_suppressed := Suppress.MAC_SuppressSource(rollup(watercraft_recs_sorted, left.seq=right.seq and left.did=right.did, roll_watercraft(left,right)),mod_access);     
 
+rolled_watercraft := PROJECT(watercraft_suppressed, TRANSFORM(  riskwise.layouts.Layout_Watercraft_Plus,
+                                                  SELF := LEFT));
+                                                  
 rollWatercraftFinal := group(sort(rolled_watercraft, seq),seq);
 
 

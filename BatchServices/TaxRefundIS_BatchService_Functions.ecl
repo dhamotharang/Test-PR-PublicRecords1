@@ -1,4 +1,4 @@
-﻿import Autokey_batch, Address, AddrBest, AutoStandardI, Doxie,
+﻿import Autokey_batch, Address, AddrBest, Doxie,
 Didville, CriminalRecords_BatchService, risk_indicators, riskwise,
 ut, iesp, NID, BatchShare, Models, STD, gateway, BatchServices;
 
@@ -164,24 +164,11 @@ export TaxRefundIS_BatchService_Functions := MODULE
 	end;
 	
 	/*--- Function to get BestSSN from ADLBest -> DidVille.Did_Batch_Service_Raw ---*/
-	export getBestSSNInfo(dataset(in_batch_rec) in_clean_batch, 
-												unsigned1 glb_purpose_value,
-												unsigned1 dppa_purpose_value,
-												string120 append_l,
-												string32 appType,
-												string5  IndustryClass,
-												string120 verify_l = '') := function
-			p := module(AutoStandardI.PermissionI_Tools.params)
-				export boolean AllowAll := false;
-				export boolean AllowGLB := false;
-				export boolean AllowDPPA := false;
-				export unsigned1 DPPAPurpose := dppa_purpose_value;
-				export unsigned1 GLBPurpose := glb_purpose_value;
-				export boolean IncludeMinors := false;
-			END;
-			GLB := AutoStandardI.PermissionI_Tools.val(p).glb.ok(glb_purpose_value);
-			hhidplus := stringlib.stringfind(append_l,'HHID_PLUS',1)<>0;
-      edabest := stringlib.stringfind(append_l,'BEST_EDA',1)<>0;
+	export getBestSSNInfo(dataset(in_batch_rec) in_clean_batch,
+												BatchServices.TaxRefundIS_BatchService_Interfaces.Input args) := function
+			GLB := args.isValidGlb();
+			hhidplus := stringlib.stringfind(args.append_l,'HHID_PLUS',1)<>0;
+      edabest := stringlib.stringfind(args.append_l,'BEST_EDA',1)<>0;
 
 			DidVille.Layout_Did_OutBatch into(in_batch_rec l) := transform
 				 self.seq := l.seq;
@@ -201,12 +188,12 @@ export TaxRefundIS_BatchService_Functions := MODULE
 			bestSsn_res := didville.did_service_common_function(recs, 
 																													hhidplus_value := hhidplus, 
 																													edabest_value := edabest, 
-																													verify_value := verify_l,
-																													appends_value := append_l, 
+																													verify_value := args.verify_l,
+																													appends_value := args.append_l, 
 																													glb_flag := GLB, 
-																													glb_purpose_value := glb_purpose_value, 
-																													appType := appType,
-																													IndustryClass_val := IndustryClass);
+																													glb_purpose_value := args.glb, 
+																													appType := args.application_type,
+																													IndustryClass_val := args.industry_class);
 			return bestSsn_res;
 	end;
 	
@@ -244,7 +231,7 @@ export TaxRefundIS_BatchService_Functions := MODULE
 			self := [];
 		end;
 		crim_batch := project(in_clean_batch, xformToCrimBatch(left));
-		batch_params		:= BatchShare.IParam.getBatchParamsV2();
+		batch_params		:= BatchShare.IParam.getBatchParams();
 		crim_batch_params := module(project(batch_params, CriminalRecords_BatchService.IParam.batch_params, opt))	
 			unsigned2 MaxResults_val := 50 : stored('MaxResults');
 		end;
@@ -524,8 +511,7 @@ export TaxRefundIS_BatchService_Functions := MODULE
         self.hri_6 := if (count(RI) >= 6 and RI[6].hri in Instant_ID_Codes, RI[6].hri, '');
         self.hri_desc_6 := if (count(RI) >= 6 and RI[6].hri in Instant_ID_Codes, RI[6].desc, '');
         self.nas_summary := (string)L.socsverlevel;
-        cvi_temp := risk_indicators.cviScore(L.phoneverlevel,L.socsverlevel,L,L.correctssn,
-                                              L.correctaddr,L.correcthphone,'',veraddr,verlast);	
+        cvi_temp := risk_indicators.cviScore(L.phoneverlevel,L.socsverlevel,L,'',veraddr,verlast);	
         self.CVI := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(L.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
                 IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(L.addr_type) and (integer)cvi_temp > 10 => '10',
                 IncludeCLoverride and risk_indicators.rcSet.isCodeCL(L.ssn, L.bestSSN, L.socsverlevel, L.combo_ssn) and (integer)cvi_temp > 10 => '10',

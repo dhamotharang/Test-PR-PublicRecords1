@@ -1,4 +1,5 @@
-IMPORT IdentityManagement_Services, AutoHeaderV2, iesp, AutoStandardI, doxie, ut, Suppress;
+IMPORT IdentityManagement_Services, AutoHeaderV2, iesp, AutoStandardI, doxie, dx_header, ut, Suppress;
+
 export Functions := module
 	export streetAddress1Value(string prim_name, string prim_range, string predir, string addr_suffix, string postdir) :=
 										if (prim_name = '', '',
@@ -126,7 +127,7 @@ export add_ssn_issue(dataset(doxie.layout_presentation) inrecs) := FUNCTION
   end;
 	
 	// check if SSN was seen before randomization:
-	ssn_w_legacy_info := join (inrecs, doxie.key_legacy_ssn,
+	ssn_w_legacy_info := join (inrecs, dx_header.key_legacy_ssn(),
 														 keyed (Left.ssn = Right.ssn) AND
 														 ((unsigned6) Left.did = Right.did),
 														 transform (ext_rec, Self.legacy_ssn := Right.ssn != '', Self := Left),

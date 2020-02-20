@@ -2,11 +2,11 @@
  * 			 This function gathers the Inquiries attributes.									*
  ************************************************************************ */
 
-IMPORT Inquiry_AccLogs, Phone_Shell, RiskWise, UT, STD;
+IMPORT Inquiry_AccLogs, Phone_Shell, RiskWise, STD, doxie, Suppress;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inquiries (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input,
-                                                                                        UNSIGNED2 PhoneShellVersion = 10 // PhoneShell V1.0 default
-                                                                                       ) := FUNCTION
+                                                                                        UNSIGNED2 PhoneShellVersion = 10, // PhoneShell V1.0 default
+                                                                                       doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	layoutInquiries := RECORD
 		Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus;
 		STRING description := '';
@@ -26,7 +26,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 	/* ************************************************************************
 	 *  Get the Inquiry Records																								*
 	 ************************************************************************ */
-	layoutInquiries getInquiries(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Inquiry_AccLogs.Key_Inquiry_Phone ri) := TRANSFORM
+	{layoutInquiries, unsigned4 global_sid} getInquiries(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Inquiry_AccLogs.Key_Inquiry_Phone ri) := TRANSFORM
+		SELF.global_sid := ri.ccpa.global_sid;
 		good_inquiry := Inquiry_AccLogs.Shell_Constants.Valid_Phone_Shell_Inquiry(ri.search_info.function_description,
 																																							ri.bus_intel.use,
 																																							ri.search_info.product_code);
@@ -51,12 +52,14 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		// Only count if the date is populated (inquiryMonths >= 0) and is within 6 months
 		SELF.Inquiries.Inq_Num_Addresses_06 := IF(inquiryMonths >= 0 AND inquiryMonths <= 6, '1', '');
     
-  // PhoneShell V2+ implement a fix here to include sameADL for ADL-based counts  
-		SELF.Inquiries.Inq_Num_ADLs := if(PhoneShellVersion >= 20, if(sameADL, '1',''), '1');
+  // When this is rolled up in countedDID, will count 1 per unique DID in the group of inquiries for the given phone  
+		SELF.Inquiries.Inq_Num_ADLs := '1';
 		// Only count if the date is populated (inquiryMonths >= 0) and is within 6 months
-		SELF.Inquiries.Inq_Num_ADLs_06 := IF(inquiryMonths >= 0 AND inquiryMonths <= 6,
-                                        if(PhoneShellVersion >= 20, if(sameADL, '1',''), '1')
-                                      , '');
+		SELF.Inquiries.Inq_Num_ADLs_06 := IF(inquiryMonths >= 0 AND inquiryMonths <= 6, '1', '');
+    
+  // Phone Shell V2.1 brings back the count of inquiries that match the input ADL/DID
+  SELF.Inquiries.Inq_Num_MatchADL := if(PhoneShellVersion >= 21 and sameADL, '1', '');
+  SELF.Inquiries.Inq_Num_MatchADL_06 := if(PhoneShellVersion >= 21 and sameADL and inquiryMonths >= 0 and inquiryMonths <= 6, '1', '');
     
 		SELF.Inquiries.Inq_FirstSeen := (STRING)inquiryMonths;
 		SELF.Inquiries.Inq_LastSeen := (STRING)inquiryMonths;
@@ -82,9 +85,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		SELF := le;
 	END;
 	
-	inquiryResults := JOIN(Input, Inquiry_AccLogs.Key_Inquiry_Phone, TRIM(LEFT.Gathered_Phone) <> '' AND	KEYED(LEFT.Gathered_Phone = RIGHT.phone10),
+	inquiryResults_unsuppressed := JOIN(Input, Inquiry_AccLogs.Key_Inquiry_Phone, TRIM(LEFT.Gathered_Phone) <> '' AND	KEYED(LEFT.Gathered_Phone = RIGHT.phone10),
 																	getInquiries(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (good_inquiry = TRUE);
-																	
+	inquiryResults := Suppress.Suppress_ReturnOldLayout(inquiryResults_unsuppressed, mod_access, layoutInquiries);									
 	/* ************************************************************************
 	 *  Count the various inquiry records																			*
 	 ************************************************************************ */
@@ -118,6 +121,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
   // For Phone Shell V2 fix this rollup to roll up the correct field
 		SELF.Inquiries.Inq_Num_06 := (STRING)(if(PhoneShellVersion >= 20,(integer)le.inquiries.inq_num_06 + (integer)ri.inquiries.inq_num_06,
                                                                    (INTEGER)le.Inquiries.Inq_Num + (INTEGER)ri.Inquiries.Inq_Num));
+  
+  // For Phone Shell V2.1 roll up the matchADL counts here
+  SELF.Inquiries.Inq_Num_MatchADL := (string)((integer)le.Inquiries.Inq_Num_MatchADL + (integer)ri.Inquiries.Inq_Num_MatchADL);
+  SELF.Inquiries.Inq_Num_MatchADL_06 := (string)((integer)le.Inquiries.Inq_Num_MatchADL_06 + (integer)ri.Inquiries.Inq_Num_MatchADL_06);
                                                                    
                                                                    
 		SELF.Inquiries.Inq_FirstSeen := MAP((INTEGER)le.Inquiries.Inq_FirstSeen = 0 => ri.Inquiries.Inq_FirstSeen,
@@ -137,7 +144,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		rightInq := TRIM(ri.Inquiries.Inq_ADL_Phone_Industry_List_12);
 		SELF.Inquiries.Inq_ADL_Phone_Industry_List_12 := MAP(leftInq = '' 																	=> rightInq,
 																												                           rightInq = '' 																=> leftInq,
-																												          StringLib.StringFind(leftInq, rightInq, 1) > 0 => leftInq,
+																												          STD.Str.Find(leftInq, rightInq, 1) > 0 => leftInq,
 																																																					                                   leftInq + ',' + rightInq);
 		
 		SELF := le;
@@ -165,6 +172,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 	withInquiries := JOIN(withAddress, countedInquiries, LEFT.Unique_Record_Sequence = RIGHT.Unique_Record_Sequence, TRANSFORM(layoutInquiries,
 																																																									SELF.Inquiries.Inq_Num := RIGHT.Inquiries.Inq_Num;
 																																																									SELF.Inquiries.Inq_Num_06 := RIGHT.Inquiries.Inq_Num_06;
+                                                         SELF.Inquiries.Inq_Num_MatchADL := RIGHT.Inquiries.Inq_Num_MatchADL;
+                                                         SELF.Inquiries.Inq_Num_MatchADL_06 := RIGHT.Inquiries.Inq_Num_MatchADL_06;
 																																																									SELF.Inquiries.Inq_FirstSeen := RIGHT.Inquiries.Inq_FirstSeen;
 																																																									SELF.Inquiries.Inq_LastSeen := RIGHT.Inquiries.Inq_LastSeen;
 																																																									SELF.Inquiries.Inq_ADL_FirstSeen := RIGHT.Inquiries.Inq_ADL_FirstSeen;
@@ -179,6 +188,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		SELF.Inquiries.Inq_Num_06 := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_06) = '', '0', le.Inquiries.Inq_Num_06);
 		SELF.Inquiries.Inq_Num_ADLs := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_ADLs) = '', '0', le.Inquiries.Inq_Num_ADLs);
 		SELF.Inquiries.Inq_Num_ADLs_06 := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_ADLs_06) = '', '0', le.Inquiries.Inq_Num_ADLs_06);
+		SELF.Inquiries.Inq_Num_MatchADL := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_MatchADL) = '', '0', le.Inquiries.Inq_Num_MatchADL);
+		SELF.Inquiries.Inq_Num_MatchADL_06 := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_MatchADL_06) = '', '0', le.Inquiries.Inq_Num_MatchADL_06);
 		SELF.Inquiries.Inq_Num_Addresses := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_Addresses) = '', '0', le.Inquiries.Inq_Num_Addresses);
 		SELF.Inquiries.Inq_Num_Addresses_06 := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_Num_Addresses_06) = '', '0', le.Inquiries.Inq_Num_Addresses_06);
 		SELF.Inquiries.Inq_FirstSeen := IF(le.good_inquiry AND TRIM(le.Inquiries.Inq_FirstSeen) = '', '0', le.Inquiries.Inq_FirstSeen);

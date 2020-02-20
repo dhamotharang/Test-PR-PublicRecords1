@@ -1,6 +1,6 @@
-﻿import InfutorCID, ut, riskwise, risk_indicators;
+﻿import InfutorCID, ut, riskwise, risk_indicators, doxie, Suppress;
 
-export Boca_Shell_Infutor(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide) := FUNCTION
+export Boca_Shell_Infutor(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 Layout_Infutor := RECORD
 	unsigned4 seq;
@@ -8,8 +8,13 @@ Layout_Infutor := RECORD
 	risk_indicators.Layouts.Layout_Infutor;
 END;
 
+Layout_Infutor_CCPA := RECORD
+	integer8 did; // CCPA changes
+    unsigned4 global_sid; // CCPA changes
+    Layout_Infutor;
+END;
 
-Layout_Infutor getInfutor(ids_wide le, InfutorCID.Key_Infutor_DID ri) := transform	
+Layout_Infutor_CCPA getInfutor(ids_wide le, InfutorCID.Key_Infutor_DID ri) := transform	
 	firstscore := risk_indicators.FnameScore(le.shell_input.fname, ri.fname);
 	firstmatch := risk_indicators.iid_constants.g(firstscore);
 	lastscore := risk_indicators.LnameScore(le.shell_input.lname, ri.lname);
@@ -27,13 +32,23 @@ Layout_Infutor getInfutor(ids_wide le, InfutorCID.Key_Infutor_DID ri) := transfo
 	self.infutor_date_last_seen := if(ri.dt_last_seen > myGetDate, myGetDate, ri.dt_last_seen);  
 							
 	self.infutor_nap := risk_indicators.iid_constants.comp_nap(firstmatch, lastmatch, addrmatch, phonematch);
+    self.global_sid := ri.global_sid;
 	self := le;
 end;
-wInfutor := join(ids_wide, InfutorCID.Key_Infutor_DID,	
+wInfutor_unsuppressed := join(ids_wide, InfutorCID.Key_Infutor_DID,	
 									left.did<>0 and
 									keyed(left.did=right.did) and
 									right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
 									getInfutor(left,right), left outer, atmost(riskwise.max_atmost), KEEP(100));
+									
+wInfutor_flagged := Suppress.MAC_FlagSuppressedSource(wInfutor_unsuppressed, mod_access);
+
+wInfutor := PROJECT(wInfutor_flagged, TRANSFORM(Layout_Infutor,
+	self.infutor_date_first_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.infutor_date_first_seen);
+	self.infutor_date_last_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.infutor_date_last_seen);			
+	self.infutor_nap := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.infutor_nap);
+    SELF := LEFT;
+)); 
 									
 Layout_Infutor rollInfutor(Layout_Infutor le, Layout_Infutor ri) := transform
 	self.infutor_date_first_seen := ut.min2(le.infutor_date_first_seen, ri.infutor_date_first_seen);
@@ -42,6 +57,7 @@ Layout_Infutor rollInfutor(Layout_Infutor le, Layout_Infutor ri) := transform
 	
 	self := le;
 end;
+
 rolledInfutor := rollup(wInfutor, true, rollInfutor(left,right));
 
 return rolledInfutor;

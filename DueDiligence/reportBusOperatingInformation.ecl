@@ -54,8 +54,6 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
                                         //Expecting API request to have the SSN_MASK of ALL, NONE, FIRST5, LAST4 or '' based on customer's setting in MBS 
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEIN := IF(LEFT.FEINSourceContainsE5 = true, LEFT.FEIN_Masked_For_Report, LEFT.busn_info.fein);
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEINIsSSN := LEFT.feinIsSSN;
-                                        //TO REMOVE AFTER EVOLUTION GOES TO PROD
-                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SSNAssociatedWith := RIGHT.names;
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SSNAssociatedWithFEIN := RIGHT.personsAssocWithFEIN;
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.OperatesOutOfAHomeOffice := LEFT.busIsSOHO;
                                         SELF := LEFT;),

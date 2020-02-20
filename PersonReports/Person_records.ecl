@@ -2,32 +2,19 @@
 // to ESP output layouts as well (some sections' implementation can be found
 // in the history of PersonReports.Addrs_Imposters_Rels_Assocs)
 
-IMPORT ut, DeathV2_Services, doxie_crs, doxie, suppress, DriversV2_Services, iesp, header, CriminalRecords_Services, FCRA, FFD, MDR;
+IMPORT $, CriminalRecords_Services, DeathV2_Services, doxie, doxie_crs, DriversV2_Services, dx_death_master, 
+       FCRA, FFD, header, iesp, MDR, suppress, ut;
 
 EXPORT Person_records (
   dataset (doxie.layout_references) dids,
-  PersonReports.input.personal in_params = module (PersonReports.input.personal) end,
+  doxie.IDataAccess mod_access,
+  $.IParam.personal in_params = module ($.IParam.personal) end,
   boolean IsFCRA = false,
 	dataset(fcra.Layout_override_flag) ds_flags = dataset([],fcra.Layout_override_flag),
 	dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
 ) := MODULE
 
-// Get values missing from the input from global.
-// Can't project from {input} because of different type of ssn_mask (string vs. string6);
-shared mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
-  EXPORT unsigned1 glb := in_params.GLBPurpose;
-  EXPORT unsigned1 dppa := in_params.DPPAPurpose;
-  EXPORT string DataPermissionMask := in_params.DataPermissionMask;
-  EXPORT string DataRestrictionMask := in_params.DataRestrictionMask;
-  EXPORT boolean ln_branded := in_params.ln_branded;
-  EXPORT string5 industry_class := in_params.industryclass;
-  EXPORT string32 application_type := in_params.applicationtype;
-  EXPORT unsigned3 date_threshold := in_params.dateVal;
-  EXPORT string ssn_mask := in_params.ssn_mask;
-END;
-
 shared input_dids_set := SET (dids, did);
-
 
 shared fcra_csa_wrap :=FCRA.comp_subject (dids, 
 																					mod_access.dppa,
@@ -56,8 +43,8 @@ ssnr_pre_fcra := fcra_csa_wrap.ssn_recs;
 shared src_ssn_main := if (IsFCRA,ssnr_pre_fcra,ssnr_pre_reg);
 
 src_residents_reg := if (in_params.include_residents,
-                            project (doxie.Resident_Records, transform (PersonReports.layouts.comp_names, self :=left))); 
-src_residents_fcra := dataset([],PersonReports.layouts.comp_names);
+                            project (doxie.Resident_Records, transform ($.layouts.comp_names, self :=left))); 
+src_residents_fcra := dataset([],$.layouts.comp_names);
 shared src_residents := if(IsFCRA , src_residents_fcra , src_residents_reg);
 
 
@@ -69,6 +56,7 @@ shared idid := max(dids(did > 0), did);//dids has no more than 1 record here. se
 glb_ok := mod_access.isValidGLB ();
 rna_glb_ok := mod_access.isValidGLB (header.constants.checkRNA);
 death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
+
 //NB: FCRA does not have permission to use/return RNA  
 
 // Get all DIDs that will be used in the report; set "is subject" indicator for a subject
@@ -85,30 +73,34 @@ all_dids_pre_fcra := project (dids, transform (rec_did_owner, Self.did := Left.d
 all_dids_pre :=  if(IsFCRA ,all_dids_pre_fcra ,all_dids_pre_reg );
 dids_owners := dedup (sort (all_dids_pre, did, ~is_subject), did);
 
+dear_raw_recs := dx_death_master.Append.byDid(dids_owners, did, death_params,/*skip_GLB_check*/true,ut.limits.DEATH_PER_DID);
+dear_glb_ok := project(dear_raw_recs, TRANSFORM(RECORDOF(dear_raw_recs),
+  loc_glb_ok := if(left.is_subject, glb_ok, rna_glb_ok) or left.death.glb_flag <> 'Y';
+  self.death := if(loc_glb_ok,left.death);
+  self := left;
+  ));
 
-doxie_crs.layout_deathfile_records GetDeadRecords (rec_did_owner L, doxie.key_death_masterV2_ssa_DID R) := transform
-  self.age_at_death := ut.Age((unsigned8)R.dob8,(unsigned8)R.dod8);
-  self.did := (string)((integer)(R.did));
-  self.IsLimitedAccessDMF := (R.src = MDR.sourceTools.src_Death_Restricted);
-  self := R;
-end;
+dear_recs := PROJECT(dear_glb_ok, TRANSFORM(doxie_crs.layout_deathfile_records,
+  SELF.age_at_death := ut.Age((unsigned8)Left.death.dob8,(unsigned8)Left.death.dod8);
+  SELF.IsLimitedAccessDMF := Left.death.src = MDR.sourceTools.src_Death_Restricted;
+  SELF.did := (string)((integer)(Left.death.did));
+  SELF := left.death));
+dear := if(~IsFCRA, dear_recs);
+               
+Death_source_sort := SORT(dear, did, dod8);
 
-dear  := if(~IsFCRA,JOIN (dids_owners, doxie.key_death_masterV2_ssa_DID, 
-               keyed (Left.did = Right.l_did) 
-               and not DeathV2_Services.Functions.Restricted (right.src, right.glb_flag,if (Left.is_subject, glb_ok, rna_glb_ok), death_params),
-               GetDeadRecords (Left, Right),
-               left outer, limit (ut.limits.HEADER_PER_DID), keep (ut.limits.DEATH_PER_DID)));
-
-							 
-// dear := doxie.deathfile_records (in_params.include_BlankDOD or (unsigned)dod8 != 0);
-
-
+Death_source_grp:= Sort(group(Death_source_sort,did,dod8), did, dod8, if(IsLimitedAccessDMF, 1,0));
+Death_source_info := UNGROUP(iterate(Death_source_grp, TRANSFORM(doxie_crs.layout_deathfile_records, 
+									SELF.IsLimitedAccessDMF :=if(COUNTER = 1 , ((INTEGER)RIGHT.dod8 != 0 AND RIGHT.IsLimitedAccessDMF),
+	                                LEFT.IsLimitedAccessDMF ) ,
+									SELF :=right))); 
 //============================  
 
 // for the purpose of deceased indicator we need only one record per person, preferrably with a county
 
-shared src_deceased := dedup (sort (dear, did, -dod8, trim (county_name) = ''), did, dod8);	  
- 
+shared src_deceased := dedup (sort (Death_source_info, did, -dod8, trim (county_name) = ''), did, dod8);	  
+
+
 besr_choice := IF(EXISTS(bestrecs), bestrecs, project (dids, transform (doxie.layout_best , 
                                                                             Self.did := Left.did, Self := [])));
 
@@ -157,13 +149,13 @@ shared address_orig := doxie.Comp_Addresses; //doxie/Layout_Comp_Addresses
 
 // some name variations are missing in the source addresses; try to append from complete residents' list
 // this may improve address-phone linking, since names can be used.
-address_expanded := Functions.Address (in_params).ExpandWithResidents (address_orig, src_residents);
+address_expanded := $.Functions.Address (in_params).ExpandWithResidents (address_orig, src_residents);
 shared src_address := if (in_params.expand_address, address_expanded, address_orig);
 
 
 // This is performance fix for the cases when no other data than address itself 
 // is required (like in eAuth); can be extended with risk indicators, etc. if needed.
-PersonReports.layouts.t_AddressTimeLine GetSubjectShortAddress (doxie.Layout_Comp_Addresses L) := transform
+$.layouts.t_AddressTimeLine GetSubjectShortAddress (doxie.Layout_Comp_Addresses L) := transform
   	Self.StreetName          := L.prim_name;
   	Self.StreetNumber        := L.prim_range;
   	Self.StreetPreDirection  := L.predir;
@@ -203,8 +195,8 @@ phor := project (phor_pre, transform (phones_rec, Self.lname := Left.name_last, 
 
 // FinderReport style: verifies phones by last residents' names, among other things
 // Address-phone match is done at that point, so "extra" addresses appended (if any) from residents list can be removed.
-export addr_base := Functions.Address (in_params).AttachPhones (src_address, phor) 
-  (address_seq_no != Constants.APPENDED_BY_RESIDENTS);
+export addr_base := $.Functions.Address (in_params).AttachPhones (src_address, phor) 
+  (address_seq_no != $.Constants.APPENDED_BY_RESIDENTS);
 // ---------- Now have addresses with phones ----------
 
 
@@ -217,17 +209,17 @@ shared ssn_lookups := doxie.SSN_Lookups; // doxie_crs/layout_SSN_Lookups
 // flat table of residents with SSN, death, etc. info;
 // contains DID and address sequence, which can be used for linking.
 // Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently). 
-shared residents_base := Functions.GetPersonBase (src_residents, ssn_lookups, src_deceased, in_params);
+shared residents_base := $.Functions.GetPersonBase (src_residents, ssn_lookups, src_deceased, mod_access, in_params);
 
 // ------------------------- expanded residents -------------------------
 // a serious of transformations to produce most complete identity
 // all DID-linking should be done before the rollup
 
-res_expanded := project (residents_base, Functions.ExpandIdentity (Left));
+res_expanded := project (residents_base, $.Functions.ExpandIdentity (Left));
 
 res_grouped := group (sort (res_expanded, address_seq_no), address_seq_no);
 
-PersonReports.layouts.identity_bps_rolled RollIdentity (PersonReports.layouts.identity_bps l, dataset(PersonReports.layouts.identity_bps) r):=transform
+$.layouts.identity_bps_rolled RollIdentity ($.layouts.identity_bps l, dataset($.layouts.identity_bps) r):=transform
   self.did := L.did; // note: DID can be unreliable here, if input is grouped by seq_no
   self.address_seq_no := l.address_seq_no;
   self.akas := choosen (project (r, iesp.bps_share.t_BpsReportIdentity), iesp.Constants.BR.MaxAddress_Residents);
@@ -240,7 +232,7 @@ shared residents_wide := rollup (res_grouped, group, RollIdentity (Left, rows (L
 // shared res_slim := group(sort (residents_base, address_seq_no), address_seq_no);
 res_slim_grouped := group (sort (residents_base, address_seq_no), address_seq_no);
 
-PersonReports.layouts.identity_slim_rolled RollIdentitySlim (PersonReports.layouts.identity_slim l, dataset(PersonReports.layouts.identity_slim) r):=transform
+$.layouts.identity_slim_rolled RollIdentitySlim ($.layouts.identity_slim l, dataset($.layouts.identity_slim) r):=transform
   self.did := L.did; // note: DID can be unreliable here, if input is grouped by seq_no
   self.address_seq_no := l.address_seq_no;
   self.akas := choosen (project (r, iesp.bpsreport.t_BpsReportIdentitySlim), iesp.Constants.BR.MaxAddress_Residents);
@@ -256,7 +248,7 @@ export residents_slim := if (~IsFCRA, rollup (res_slim_grouped, group, RollIdent
 // Thus, some of the addresses from address sequence table will not have residents yet (say, historical neighbors)
 
 // ------------------------- wide addresses -------------------------
-shared addr_wide := Functions.Address (in_params).AddResidents (addr_base, residents_wide);
+shared addr_wide := $.Functions.Address (in_params).AddResidents (addr_base, residents_wide);
 // NOTE: these addresses don't contain properties, census, etc. data;
 //       Since they are used in relatives and neighbors sections so far, it is not required. 
 //       But, if either is needed, it should be done here.
@@ -267,7 +259,7 @@ subj_addr := addr_wide (did IN input_dids_set);
 
 // Get Census info (only by request and only for subject's:
 subj_addr_census := if (in_params.include_censusdata,
-                               Functions.Address (in_params).AddCensus (subj_addr),
+                               $.Functions.Address (in_params).AddCensus (subj_addr),
                                subj_addr);
 
 // TODO: add properties, etc. here
@@ -276,7 +268,7 @@ EXPORT SubjectAddresses := if (~IsFCRA, project (x_SubjectAddresses, iesp.bpsrep
 
 
 // -------------------------------- slim --------------------------------
-shared addr_slim := Functions.Address (in_params).AddResidentsSlim (addr_base, residents_slim);
+shared addr_slim := $.Functions.Address (in_params).AddResidentsSlim (addr_base, residents_slim);
 EXPORT x_SubjectAddressesSlim := if (~IsFCRA, sort (addr_slim (did IN input_dids_set), -DateLastSeen, -DateFirstSeen, Address.Zip4, Address.StreetNumber));
 EXPORT SubjectAddressesSlim := if (~IsFCRA, project (x_SubjectAddressesSlim, iesp.bpsreport.t_BpsReportAddressSlim));
 
@@ -291,9 +283,9 @@ EXPORT SubjectAddressesSlim := if (~IsFCRA, project (x_SubjectAddressesSlim, ies
 
 // flat table of ssn records, containing imposters and subject's AKAs
 // contains DID, which can be used for linking 
-shared all_persons := Functions.GetSSNRecordsBase (src_ssn_main, src_deceased, in_params, IsFCRA);
+shared all_persons := $.Functions.GetSSNRecordsBase (src_ssn_main, src_deceased, in_params, IsFCRA);
 
-EXPORT Imposters := if(~IsFCRA,Functions.GetImposters (all_persons (did NOT IN input_dids_set), bestrecs, in_params));
+EXPORT Imposters := if(~IsFCRA,$.Functions.GetImposters (all_persons (did NOT IN input_dids_set), bestrecs, in_params));
 
 
 
@@ -311,12 +303,12 @@ EXPORT Imposters := if(~IsFCRA,Functions.GetImposters (all_persons (did NOT IN i
 // Eventually, doxie/ssn_records MUST be modified to return all persons, and all this code will be gone.
 //--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
-aka_best := Functions.GetSubjectBestAKA (bestrecs_ffd, src_deceased, in_params ,IsFCRA);
+aka_best := $.Functions.GetSubjectBestAKA (bestrecs_ffd, src_deceased, in_params ,IsFCRA);
 
 
 // append DL: only "best" record will have DLs, all other AKAs won't (ESP defect, actually)
 //shared iesp.bps_share.t_BpsReportIdentity AppendDL (layouts.identity_slim L) := transform
-PersonReports.layouts.CommonPreLitigationReportIdentity AppendDL (PersonReports.layouts.identity_slim L) := transform
+$.layouts.CommonPreLitigationReportIdentity AppendDL ($.layouts.identity_slim L) := transform
   Self.DriverLicenses := driver_licenses;
   Self.DriverLicenses2 := [];
   Self.CriminalHistories := [];
@@ -331,7 +323,7 @@ aka_best_dl := project (aka_best, AppendDL (Left));
 // add together AKA from "best" file and all other AKAs
 // TODO: use filter instead of join
 other_akas := project (join (all_persons, dids, left.did=right.did, keep (1)), 
-                                    transform (PersonReports.layouts.CommonPreLitigationReportIdentity,
+                                    transform ($.layouts.CommonPreLitigationReportIdentity,
 			Self.SubjectSSNIndicator := IF(Left.SSNInfo.SSN!='' and 
 			Left.SSNInfo.SSN=bestrecs[1].SSN,'yes','no'),
 			Self := Left, Self := []));
@@ -369,18 +361,18 @@ rel_dids := project (rel_assoc, transform (doxie.layout_references, Self.did := 
 best_akas := doxie.best_records (rel_dids, IsFCRA, , , true, header.constants.checkRNA, modAccess := mod_access);
 
 aka_src := if (in_params.use_bestaka_ra,
-               project (best_akas, transform (PersonReports.layouts.comp_names, Self.address_seq_no := 0; Self:=Left)),
-               project (src_names, transform (PersonReports.layouts.comp_names, Self.address_seq_no := 0; Self:=Left)));
+               project (best_akas, transform ($.layouts.comp_names, Self.address_seq_no := 0; Self:=Left)),
+               project (src_names, transform ($.layouts.comp_names, Self.address_seq_no := 0; Self:=Left)));
 // alternatively relative_records or relative_summary can be used, utilizing records' counts
 
 // attach SSN and death information; this is in effect AKAs
-shared relassoc_base := Functions.GetPersonBase (aka_src, ssn_lookups, src_deceased, in_params);
+shared relassoc_base := $.Functions.GetPersonBase (aka_src, ssn_lookups, src_deceased, mod_access, in_params);
 
 // ------------------------- expanded relatives/associates -------------------------
 // choose appropriate rel/assoc addresses
 relassoc_addr := addr_wide (did NOT IN input_dids_set,
                                    ~in_params.use_verified_address_ra or Verified);
-shared all_relassoc := Functions.CreateRelativesBps (rel_assoc, relassoc_base, relassoc_addr, in_params);
+shared all_relassoc := $.Functions.CreateRelativesBps (rel_assoc, relassoc_base, relassoc_addr, in_params);
 
 // TODO: verify that this sorting will work (alternatively, sort right before the output)
 
@@ -399,7 +391,7 @@ relassoc_addr_slim := addr_slim (did NOT IN input_dids_set,
 
 
 
-shared all_relassoc_slim := Functions.CreateRelativesSlim (rel_assoc, relassoc_base, relassoc_addr_slim, in_params);
+shared all_relassoc_slim := $.Functions.CreateRelativesSlim (rel_assoc, relassoc_base, relassoc_addr_slim, in_params);
 
 // TODO: verify that this sorting will work (alternatively, sort right before the output)
 EXPORT RelativesSlim := if (~IsFCRA, sort (PROJECT (all_relassoc_slim (RelativeDepth > 0), iesp.bpsreport.t_BpsReportRelativeSlim), RelativeDepth));
@@ -473,7 +465,7 @@ layout_nbr_addr_ext := record (iesp.bpsreport.t_NeighborAddress)
   integer3 seqtarget; // subject's address (neighbourhood) indicator
 end;
 
-layout_nbr_addr_ext SetNeighborsAddresses (rec_neighb_ext L, PersonReports.layouts.address_bps R) := transform
+layout_nbr_addr_ext SetNeighborsAddresses (rec_neighb_ext L, $.layouts.address_bps R) := transform
   Self.seq := L.seq;
   Self.seqtarget := L.base_address_seq_no;
   Self.AddressEx := project (R.Address, transform (iesp.share.t_AddressEx, self.HighRiskIndicators := []; self := Left));
@@ -518,7 +510,7 @@ END;
 
 
 // Finally, set subject's address
-iesp.bpsreport.t_Neighbor SetSubjectAddress (layout_nbr_ext L, PersonReports.layouts.address_bps R) := transform
+iesp.bpsreport.t_Neighbor SetSubjectAddress (layout_nbr_ext L, $.layouts.address_bps R) := transform
   //Self.seqtarget := L.seqtarget; // subject's neighbourhood indicator
   Self.SubjectAddress.LocationId := R.LocationId;
   phones := choosen (project (R.phones, BpsPhone2Phone (Left)), iesp.Constants.BR.Neigbors_Phones);
@@ -552,7 +544,7 @@ iesp.bpsreport.t_BpsReportIdentitySlim UnfoldResidentsSlim (iesp.bpsreport.t_Bps
   Self := L;
 end;
 
-layout_nbr_addr_ext_slim SetNeighborsAddressesSlim (rec_neighb_ext L, PersonReports.layouts.address_slim R) := transform
+layout_nbr_addr_ext_slim SetNeighborsAddressesSlim (rec_neighb_ext L, $.layouts.address_slim R) := transform
   Self.seq := L.seq;
   Self.seqtarget := L.base_address_seq_no;
   Self.Address := R.Address;
@@ -592,7 +584,7 @@ END;
 ds_neighborhoods_slim := rollup (nb_addr_grp_slim, group, SetNeighborhoodsSlim (left, rows (left)));
 
 // Finally, set subject's address
-iesp.bpsreport.t_NeighborSlim SetSubjectAddressSlim (layout_nbr_ext_slim L, PersonReports.layouts.address_slim R) := transform
+iesp.bpsreport.t_NeighborSlim SetSubjectAddressSlim (layout_nbr_ext_slim L, $.layouts.address_slim R) := transform
   phones := choosen (project (R.phones, BpsPhone2Phone (Left)), iesp.Constants.BR.Neigbors_Phones);
   Self.SubjectAddress := project (R, transform (iesp.bpsreport.t_NeighborAddressSlim, 
                                                 Self.Phones := phones; Self := Left));

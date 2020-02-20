@@ -1,6 +1,6 @@
 ﻿import _Control,AutoHeaderV2;
 
-shared LIBCALL_header (dataset (AutoHeaderV2.layouts.lib_search) ds_search_in, integer search_code=0, integer libVersion = AutoHeaderV2.Constants.LibVersion.LEGACY) := module
+shared LIBCALL_header (dataset (AutoHeaderV2.layouts.lib_search) ds_search_in, integer search_code=0, integer libVersion) := module
 
   // Example of calculating derived search criteria
   // Note: values the derived criteria are based upon must be "cleaned"

@@ -1,26 +1,46 @@
 // calculates and adds best_phone number using Gong daily data (updated by did and hhid);
 // output records' number is as least as in the input;
 
-import didville, gong;
+import didville, Doxie, gong, Suppress;
 
-export Gong_Append(GROUPED DATASET(didville.Layout_Did_OutBatch) infile, boolean ismarketing=false) :=
+export Gong_Append(GROUPED DATASET(didville.Layout_Did_OutBatch) infile,
+  Doxie.IDataAccess mod_access,
+  boolean ismarketing=false) :=
 FUNCTION
 
 lx := RECORD
 	infile;
 	unsigned3 dl := 0;
+  UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
+  UNSIGNED6 key_did := 0;
 END;
 
 // JOIN against DID
 lx take_did(didville.Layout_Did_OutBatch le, gong.key_did ri) := TRANSFORM
 	SELF.best_phone := IF((unsigned)ri.phone10=0,'',ri.phone10);
 	SELF.dl := (unsigned3)(ri.filedate[1..6]);
+  SELF.global_sid := ri.global_sid;
+  SELF.record_sid := ri.record_sid;
+  SELF.key_did := ri.l_did;
 	SELF := le;
 END;
-j_did := JOIN (infile, gong.key_did, 
+
+_j_did := JOIN (infile, gong.key_did,
                LEFT.did<>0 AND keyed(LEFT.did=RIGHT.l_did) AND
                (~ismarketing OR RIGHT.cr_sort_sz<>'Y'),
                take_did (Left, Right), LEFT OUTER, ATMOST(20));
+
+j_did_suppressed := Suppress.MAC_FlagSuppressedSource(_j_did, mod_access, key_did);
+
+j_did := PROJECT(j_did_suppressed, TRANSFORM(lx,
+  SELF.best_phone := IF(LEFT.is_suppressed, '', LEFT.best_phone);
+  SELF.dl := IF(LEFT.is_suppressed, 0, LEFT.dl);
+  SELF.global_sid := IF(LEFT.is_suppressed, 0, LEFT.global_sid);
+  SELF.record_sid := IF(LEFT.is_suppressed, 0, LEFT.record_sid);
+  SELF.key_did := IF(LEFT.is_suppressed, 0, LEFT.key_did);
+  SELF := LEFT
+));
 
 //this is done for the case when several did-records belong to one sequence
 done_by_did := DEDUP(SORT(j_did, did, -dl, -LENGTH(TRIM(best_phone)), best_phone), did);
@@ -32,7 +52,7 @@ TRANSFORM
 	SELF.dl := IF((unsigned)ri.phone10=0,le.dl,(unsigned3)(ri.filedate[1..6]));
 	SELF := le;
 END;
-j_hhid := JOIN (done_by_did, gong.Key_HHID, 
+j_hhid := JOIN (done_by_did, gong.Key_HHID,
 								LEFT.best_phone='' AND
 								LEFT.hhid<>0 AND keyed(LEFT.hhid=RIGHT.s_hhid) AND
                (~ismarketing OR RIGHT.cr_sort_sz<>'Y'),

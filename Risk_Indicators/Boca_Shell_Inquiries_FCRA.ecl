@@ -1,4 +1,4 @@
-﻿import _Control, inquiry_acclogs, ut, did_add, riskwise, fcra, riskwisefcra, gateway, risk_indicators;
+﻿import _Control, inquiry_acclogs, ut, did_add, riskwise, fcra, gateway, risk_indicators, STD;
 onThor := _Control.Environment.OnThor;
 
 isFCRA := True;
@@ -1187,7 +1187,7 @@ grouped_raw := group(sort( j_raw, seq, isOffsetRec, log_date_temp, -inquirySSNsF
 rolled_raw := rollup( grouped_raw, roll(left,right), true);
 
 // sort and roll SSNs per adl
-sorted_SSNs_per_adl := group(sort(j_raw, seq,  -inquirySSNsFromADL), seq);
+sorted_SSNs_per_adl := group(sort(j_raw, seq,  -inquirySSNsFromADL, -log_date_temp), seq);
 
 layout_temp count_ssns_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirySSNsPerADL := le.inquirySSNsPerADL + 
@@ -1211,7 +1211,7 @@ rolled_SSNs_per_adl := rollup( sorted_SSNs_per_adl, count_SSNs_per_adl(left,righ
 
 
 // sort and roll addresses per adl
-sorted_addrs_per_adl := group(sort(j_raw, seq, -inquiryAddrsFromADL, -unverifiedAddrsPerAdl, -cbd_inquiryAddrsFromADL), seq);
+sorted_addrs_per_adl := group(sort(j_raw, seq, -inquiryAddrsFromADL, -unverifiedAddrsPerAdl, -cbd_inquiryAddrsFromADL, -log_date_temp), seq);
 
 layout_temp count_addrs_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.unverifiedAddrsPerADL     := le.unverifiedAddrsPerADL     + IF(le.inquiryAddrsFromADL     = rt.inquiryAddrsFromADL, 0, rt.unverifiedAddrsPerADL);
@@ -1228,7 +1228,7 @@ end;
 rolled_addrs_per_adl := rollup( sorted_addrs_per_adl, count_addrs_per_adl(left,right), true);
 
 // sort and roll fnames per adl
-sorted_fnames_per_adl := group(sort(j_raw, seq,  -inquiryfnamesFromADL), seq);
+sorted_fnames_per_adl := group(sort(j_raw, seq,  -inquiryfnamesFromADL, -log_date_temp), seq);
 
 layout_temp count_fnames_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquiryfnamesPerADL := le.inquiryfnamesPerADL + 
@@ -1245,7 +1245,7 @@ rolled_fnames_per_adl := rollup( sorted_fnames_per_adl, count_fnames_per_adl(lef
 
 
 // sort and roll lnames per adl
-sorted_lnames_per_adl := group(sort(j_raw, seq,  -inquirylnamesFromADL), seq);
+sorted_lnames_per_adl := group(sort(j_raw, seq,  -inquirylnamesFromADL, -log_date_temp), seq);
 
 layout_temp count_lnames_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirylnamesPerADL := le.inquirylnamesPerADL + 
@@ -1262,8 +1262,8 @@ rolled_lnames_per_adl := rollup( sorted_lnames_per_adl, count_lnames_per_adl(lef
 
 
 // sort and roll phoness per adl
-sorted_phones_per_adl_cbd := group(sort(j_raw, seq,  -cbd_inquiryphonesFromADL), seq);
-sorted_phones_per_adl := group(sort(j_raw, seq,  -inquiryphonesFromADL, -unverifiedphonesPerADL), seq);
+sorted_phones_per_adl_cbd := group(sort(j_raw, seq,  -cbd_inquiryphonesFromADL, -log_date_temp), seq);
+sorted_phones_per_adl := group(sort(j_raw, seq,  -inquiryphonesFromADL, -unverifiedphonesPerADL, -log_date_temp), seq);
 
 layout_temp count_phones_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.unverifiedphonesPerADL     := le.unverifiedphonesPerADL     + IF(le.inquiryphonesFromADL     = rt.inquiryphonesFromADL,     0, rt.unverifiedphonesPerADL);			
@@ -1282,7 +1282,7 @@ rolled_phones_per_adl := rollup( sorted_phones_per_adl, count_phones_per_adl(lef
 
 
 // sort and roll DOB per adl
-sorted_DOBs_per_adl := group(sort(j_raw, seq,  -inquiryDOBsFromADL, -unverifiedDOBsPerADL), seq);
+sorted_DOBs_per_adl := group(sort(j_raw, seq,  -inquiryDOBsFromADL, -unverifiedDOBsPerADL, -log_date_temp), seq);
 
 layout_temp count_DOBs_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.unverifiedDOBsPerADL := le.unverifiedDOBsPerADL + 
@@ -1301,7 +1301,7 @@ rolled_DOBs_per_adl := rollup( sorted_DOBs_per_adl, count_DOBs_per_adl(left,righ
 
 
 // sort and roll emails per adl
-sorted_Emails_per_adl := group(sort(j_raw, seq,  -inquiryEmailsFromADL), seq);
+sorted_Emails_per_adl := group(sort(j_raw, seq,  -inquiryEmailsFromADL, -log_date_temp), seq);
 
 layout_temp count_Emails_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM			
 	self.inquiryEmailsPerADL := le.inquiryEmailsPerADL + 
@@ -1318,7 +1318,7 @@ rolled_Emails_per_adl := rollup( sorted_Emails_per_adl, left.seq=right.seq, coun
 
 // MS-104 - calculate how many inquiry records have first name/s that are different by one character ***
 // get all unique first names for this DID
-deduped_fnames_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryfnamesFromADL<>'' and ~isOffsetRec), seq, inquiryfnamesFromADL), seq, inquiryfnamesFromADL),seq);
+deduped_fnames_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryfnamesFromADL<>'' and ~isOffsetRec), seq, inquiryfnamesFromADL, -log_date_temp), seq, inquiryfnamesFromADL),seq);
 
 // project first name records into slim layout
 slim_fnames := project(deduped_fnames_per_adl,  
@@ -1327,12 +1327,15 @@ slim_fnames := project(deduped_fnames_per_adl,
 											self.subsString 	:= left.inquiryFnamesFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfFnames(slim_fnames le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfFnames(slim_fnames le, slim_fnames rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_fnames,slim_fnames[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
 end;
-substitutedFnames := project(slim_fnames, tfFnames(left, counter));
+
+substitutedFnames := join(slim_fnames, slim_fnames, left.seq=right.seq and 
+STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+tfFnames(left, right), keep(1), left outer);
 
 //just rollup here to get the sum of all inquiries being off by 1 character
 Risk_Indicators.iid_constants.subsLayout rollSubs(Risk_Indicators.iid_constants.subsLayout le, Risk_Indicators.iid_constants.subsLayout ri) := transform
@@ -1344,7 +1347,7 @@ rolledSubFnames := rollup(substitutedFnames, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have last name/s that are different by one character ***
-deduped_lnames_per_adl := group(dedup(sort(j_raw(good_inquiry and inquirylnamesFromADL<>'' and ~isOffsetRec), seq, inquirylnamesFromADL), seq, inquirylnamesFromADL),seq);
+deduped_lnames_per_adl := group(dedup(sort(j_raw(good_inquiry and inquirylnamesFromADL<>'' and ~isOffsetRec), seq, inquirylnamesFromADL, -log_date_temp), seq, inquirylnamesFromADL),seq);
 
 slim_lnames := project(deduped_lnames_per_adl,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1352,18 +1355,20 @@ slim_lnames := project(deduped_lnames_per_adl,
 											self.subsString 	:= left.inquiryLnamesFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfLnames(slim_lnames le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfLnames(slim_lnames le, slim_lnames rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_lnames,slim_lnames[c].subsString);	
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
 end;
-substitutedLnames := project(slim_lnames, tfLnames(left, counter));
+substitutedLnames := join(slim_lnames,  slim_lnames, 
+left.seq=right.seq and STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+tfLnames(left, right), keep(1), left outer);
 
 rolledSubLnames := rollup(substitutedLnames, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have SSNs that are different by one character ***
-deduped_SSN_per_adl := group(dedup(sort(j_raw(good_inquiry and inquirySSNsFromADL<>'' and ~isOffsetRec), seq, inquirySSNsFromADL), seq, inquirySSNsFromADL),seq);
+deduped_SSN_per_adl := group(dedup(sort(j_raw(good_inquiry and inquirySSNsFromADL<>'' and ~isOffsetRec), seq, inquirySSNsFromADL, -log_date_temp), seq, inquirySSNsFromADL),seq);
 
 slim_SSNs := project(deduped_SSN_per_adl,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1371,18 +1376,20 @@ slim_SSNs := project(deduped_SSN_per_adl,
 											self.subsString 	:= left.inquirySSNsFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfSSNs(slim_SSNs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfSSNs(slim_SSNs le, slim_SSNs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_SSNs,slim_SSNs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
 end;
-substitutedSSNs := project(slim_SSNs, tfSSNs(left, counter));
+substitutedSSNs := join(slim_SSNs, slim_SSNs,  
+left.seq=right.seq and STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+tfSSNs(left, right), keep(1), left outer);
 
 rolledSubSSNs := rollup(substitutedSSNs, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have phones that are different by one character ***
-deduped_Phones_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryPhonesFromADL<>'' and ~isOffsetRec), seq, inquiryPhonesFromADL), seq, inquiryPhonesFromADL),seq);
+deduped_Phones_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryPhonesFromADL<>'' and ~isOffsetRec), seq, inquiryPhonesFromADL, -log_date_temp), seq, inquiryPhonesFromADL),seq);
 
 slim_phones := project(deduped_phones_per_adl,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1390,18 +1397,20 @@ slim_phones := project(deduped_phones_per_adl,
 											self.subsString 	:= left.inquiryPhonesFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfPhones(slim_phones le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfPhones(slim_phones le, slim_phones rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_phones,slim_phones[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
 end;
-substitutedPhones := project(slim_phones, tfPhones(left, counter));
+substitutedPhones := join(slim_phones, slim_phones,
+left.seq=right.seq and STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+tfPhones(left, right), keep(1), left outer);
 
 rolledSubPhones := rollup(substitutedPhones, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have primary range that are different by one character ***
-deduped_Primrange_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryPrimRangeFromADL<>'' and ~isOffsetRec), seq, inquiryPrimRangeFromADL), seq, inquiryPrimRangeFromADL),seq);
+deduped_Primrange_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryPrimRangeFromADL<>'' and ~isOffsetRec), seq, inquiryPrimRangeFromADL, -log_date_temp), seq, inquiryPrimRangeFromADL),seq);
 
 slim_primrange := project(deduped_primrange_per_adl,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1409,18 +1418,20 @@ slim_primrange := project(deduped_primrange_per_adl,
 											self.subsString 	:= left.inquiryPrimRangeFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfPrimrange(slim_primrange le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfPrimrange(slim_primrange le, slim_primrange rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_primrange,slim_primrange[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
 end;
-substitutedPrimrange := project(slim_primrange, tfPrimrange(left, counter));
-
+substitutedPrimrange := join(slim_primrange, slim_primrange,
+left.seq=right.seq and STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+ tfPrimrange(left, right), keep(1), left outer);
+ 
 rolledSubPrimrange := rollup(substitutedPrimrange, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have DOB that are different by one character ***
-deduped_DOBs_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryDOBsFromADL<>'' and ~isOffsetRec), seq, inquiryDOBsFromADL), seq, inquiryDOBsFromADL),seq);
+deduped_DOBs_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryDOBsFromADL<>'' and ~isOffsetRec), seq, inquiryDOBsFromADL, -log_date_temp), seq, inquiryDOBsFromADL),seq);
 
 slim_DOBs := project(deduped_DOBs_per_adl,  
 											transform(Risk_Indicators.iid_constants.subsLayout,
@@ -1428,89 +1439,106 @@ slim_DOBs := project(deduped_DOBs_per_adl,
 											self.subsString 	:= left.inquiryDOBsFromADL,
 											self.subsCount		:= 0));
 
-Risk_Indicators.iid_constants.subsLayout tfDOBs(slim_DOBs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfDOBs(slim_DOBs le, slim_DOBs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
-end;
-substitutedDOBs := project(slim_DOBs, tfDOBs(left, counter));
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we are 1 edit distance away
+	end;
+substitutedDOBs := join(slim_DOBs, slim_DOBs,
+left.seq=right.seq and STD.Str.EditDistance(left.subsString,right.subsString)=1, 
+tfDOBs(left, right), keep(1), left outer);
 
 rolledSubDOBs := rollup(substitutedDOBs, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have DOB that match year and month but have different day ***
-Risk_Indicators.iid_constants.subsLayout tfDOBDay(slim_DOBs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfDOBDay(slim_DOBs le, slim_DOBs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubDOBDay(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we have same year, month, but not day
 end;
-substitutedDOBDay := project(slim_DOBs, tfDOBDay(left, counter));
+substitutedDOBDay := join(slim_DOBs, slim_DOBs,
+left.seq=right.seq and left.subsString[1..6] = right.subsString[1..6] and left.subsString[7..8] <> right.subsString[7..8], 
+tfDOBDay(left, right), keep(1), left outer);
 
 rolledSubDOBDay := rollup(substitutedDOBDay, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have DOB that match year and day but have different month ***
-Risk_Indicators.iid_constants.subsLayout tfDOBMonth(slim_DOBs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfDOBMonth(slim_DOBs le, slim_DOBs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubDOBMonth(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we have same year, day, but not month
 end;
-substitutedDOBMonth := project(slim_DOBs, tfDOBMonth(left, counter));
+substitutedDOBMonth := join(slim_DOBs, slim_DOBs,
+left.seq=right.seq and left.subsString[1..4] = right.subsString[1..4] and left.subsString[7..8] = right.subsString[7..8] and left.subsString[5..6] <> right.subsString[5..6], 
+tfDOBMonth(left, right), keep(1), left outer);
+
 
 rolledSubDOBMonth := rollup(substitutedDOBMonth, rollSubs(left,right), seq);
 
 
 // MS-104 - calculate how many inquiry records have DOB that match month and day but have different year ***
-Risk_Indicators.iid_constants.subsLayout tfDOBYear(slim_DOBs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfDOBYear(slim_DOBs le, slim_DOBs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countSubDOBYear(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0);  // if the record is coming into this join, we have different year, but same day and month
 end;
-substitutedDOBYear := project(slim_DOBs, tfDOBYear(left, counter));
+substitutedDOBYear := join(slim_DOBs, slim_DOBs, 
+left.seq=right.seq and left.subsString[1..4] <> right.subsString[1..4] and left.subsString[5..8] = right.subsString[5..8], 
+tfDOBYear(left, right), keep(1), left outer);
 
 rolledSubDOBYear := rollup(substitutedDOBYear, rollSubs(left,right), seq);
 
 
 // MS-105 - calculate how many inquiry records have SSN that has 1 digit that is off by 1 sequentially ***
-Risk_Indicators.iid_constants.subsLayout tfssnsperadl_1dig(slim_SSNs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfssnsperadl_1dig(slim_SSNs le, slim_SSNs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_SSNs,slim_SSNs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0); //if the difference in the two values is any of the numbers in the set, than only 1 digit is off by 1
 end;
-ssnsperadl_1dig := project(slim_SSNs, tfssnsperadl_1dig(left, counter));
+ssnsperadl_1dig := join(slim_SSNs, slim_SSNs,
+	left.seq=right.seq and ( abs((integer)right.subsString - (integer)left.subsString) ) in risk_indicators.iid_constants.diffValues1Dig, 
+tfssnsperadl_1dig(left, right), keep(1), left outer);
 
 rolledssnsperadl_1dig := rollup(ssnsperadl_1dig, rollSubs(left,right), seq);
 
 
 // MS-105 - calculate how many inquiry records have phone that has 1 digit that is off by 1 sequentially ***
-Risk_Indicators.iid_constants.subsLayout tfphonesperadl_1dig(slim_phones le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfphonesperadl_1dig(slim_phones le, slim_phones rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_phones,slim_phones[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0); //if the difference in the two values is any of the numbers in the set, than only 1 digit is off by 1
 end;
-phonesperadl_1dig := project(slim_phones, tfphonesperadl_1dig(left, counter));
+phonesperadl_1dig := join(slim_phones, slim_phones,
+	left.seq=right.seq and ( abs((integer)right.subsString - (integer)left.subsString) ) in risk_indicators.iid_constants.diffValues1Dig, 
+tfphonesperadl_1dig(left, right), keep(1), left outer);
 
 rolledphonesperadl_1dig := rollup(phonesperadl_1dig, rollSubs(left,right), seq);
 
 
 // MS-105 - calculate how many inquiry records have primary range that has 1 digit that is off by 1 sequentially ***
-Risk_Indicators.iid_constants.subsLayout tfprimrangesperadl_1dig(slim_phones le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfprimrangesperadl_1dig(slim_primrange le, slim_primrange rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_primrange,slim_primrange[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0); //if the difference in the two values is any of the numbers in the set, than only 1 digit is off by 1
 end;
-primrangesperadl_1dig := project(slim_primrange, tfprimrangesperadl_1dig(left, counter));
+primrangesperadl_1dig := join(slim_primrange, slim_primrange,
+	left.seq=right.seq and ( abs((integer)right.subsString - (integer)left.subsString) ) in risk_indicators.iid_constants.diffValues1Dig, 
+tfprimrangesperadl_1dig(left, right), keep(1), left outer);
 
 rolledprimrangesperadl_1dig := rollup(primrangesperadl_1dig, rollSubs(left,right), seq);
 
 
 // MS-105 - calculate how many inquiry records have DOB that has 1 digit that is off by 1 sequentially ***
-Risk_Indicators.iid_constants.subsLayout tfDOBsperadl_1dig(slim_DOBs le, INTEGER c) := TRANSFORM
+Risk_Indicators.iid_constants.subsLayout tfDOBsperadl_1dig(slim_DOBs le, slim_dobs rt) := TRANSFORM
 	SELF.seq 						:= le.seq;	
 	SELF.subsString 		:= le.subsString;
-	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+	SELF.subsCount 			:= if(rt.seq=le.seq, 1, 0); //if the difference in the two values is any of the numbers in the set, than only 1 digit is off by 1
 end;
-DOBsperadl_1dig := project(slim_DOBs, tfDOBsperadl_1dig(left, counter));
+DOBsperadl_1dig := join(slim_DOBs, slim_DOBs,
+	left.seq=right.seq and ( abs((integer)right.subsString - (integer)left.subsString) ) in risk_indicators.iid_constants.diffValues1Dig, 
+ tfDOBsperadl_1dig(left, right), keep(1), left outer);
 
 rolledDOBsperadl_1dig := rollup(DOBsperadl_1dig, rollSubs(left,right), seq);
 
@@ -1815,7 +1843,7 @@ ssn_raw_base_fcra_thor := join(distribute(with_all_per_adl(shell_input.ssn<>''),
 // only append the ssn_raw_updates for non-fcra
 ssn_raw := ssn_raw_base_fcra;
 
-grouped_ssn_raw := group(sort( ssn_raw, seq, -inquiryADLsFromSSN), seq);
+grouped_ssn_raw := group(sort( ssn_raw, seq, -inquiryADLsFromSSN, -log_date_temp), seq);
 
 layout_temp roll_ssn( layout_temp le, layout_temp rt ) := TRANSFORM	
 	self.inquiryPerSSN := le.inquiryPerSSN + rt.inquiryPerSSN;
@@ -1846,7 +1874,7 @@ rolled_ssn_raw := rollup( grouped_ssn_raw, roll_ssn(left,right), true);
 
 
 // sort and roll lnames per SSN
-sorted_lnames_per_SSN := group(sort(ssn_raw, seq,  -inquiryLnamesFromSSN), seq);
+sorted_lnames_per_SSN := group(sort(ssn_raw, seq,  -inquiryLnamesFromSSN, -log_date_temp), seq);
 layout_temp count_lnames_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirylnamesPerSSN := le.inquirylnamesPerSSN + 
 								IF(le.inquirylnamesFromSSN=rt.inquirylnamesFromSSN, 0, rt.inquirylnamesPerSSN);				
@@ -1861,7 +1889,7 @@ rolled_lnames_per_SSN := rollup( sorted_lnames_per_SSN, count_lnames_per_SSN(lef
 
 
 // sort and roll Addrs per SSN
-sorted_Addrs_per_SSN := group(sort(ssn_raw, seq,  -inquiryAddrsFromSSN), seq);
+sorted_Addrs_per_SSN := group(sort(ssn_raw, seq,  -inquiryAddrsFromSSN, -log_date_temp), seq);
 layout_temp count_Addrs_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquiryAddrsPerSSN := le.inquiryAddrsPerSSN + 
 								IF(le.inquiryAddrsFromSSN=rt.inquiryAddrsFromSSN, 0, rt.inquiryAddrsPerSSN);				
@@ -1876,7 +1904,7 @@ rolled_Addrs_per_SSN := rollup( sorted_Addrs_per_SSN, count_Addrs_per_SSN(left,r
 
 
 // sort and roll DOBs per SSN
-sorted_DOBs_per_SSN := group(sort(ssn_raw, seq,  -inquiryDOBsFromSSN), seq);
+sorted_DOBs_per_SSN := group(sort(ssn_raw, seq,  -inquiryDOBsFromSSN, -log_date_temp), seq);
 layout_temp count_DOBs_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquiryDOBsPerSSN := le.inquiryDOBsPerSSN + 
 								IF(le.inquiryDOBsFromSSN=rt.inquiryDOBsFromSSN, 0, rt.inquiryDOBsPerSSN);				
@@ -2030,7 +2058,7 @@ Addr_raw_base_fcra_thor := join(distribute(with_ssn_velocity(shell_input.prim_na
 
 addr_raw := addr_raw_base_fcra;								
 
-grouped_addr_raw := group(sort(addr_raw, seq, -inquiryADLsFromAddr), seq);
+grouped_addr_raw := group(sort(addr_raw, seq, -inquiryADLsFromAddr, -log_date_temp), seq);
 
 
 layout_temp roll_Addr( layout_temp le, layout_temp rt ) := TRANSFORM	
@@ -2065,7 +2093,7 @@ rolled_Addr_raw := rollup( grouped_addr_raw, roll_addr(left,right), true);
 
 
 // sort and roll lnames per Addr
-sorted_lnames_per_Addr := group(sort(Addr_raw, seq,  -inquiryLnamesFromAddr), seq);
+sorted_lnames_per_Addr := group(sort(Addr_raw, seq,  -inquiryLnamesFromAddr, -log_date_temp), seq);
 layout_temp count_lnames_per_Addr( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirylnamesPerAddr := le.inquirylnamesPerAddr + 
 								IF(le.inquirylnamesFromAddr=rt.inquirylnamesFromAddr, 0, rt.inquirylnamesPerAddr);				
@@ -2080,7 +2108,7 @@ rolled_lnames_per_Addr := rollup( sorted_lnames_per_Addr, count_lnames_per_Addr(
 
 
 // sort and roll SSNs per Addr
-sorted_SSNs_per_Addr := group(sort(Addr_raw, seq,  -inquirySSNsFromAddr), seq);
+sorted_SSNs_per_Addr := group(sort(Addr_raw, seq,  -inquirySSNsFromAddr, -log_date_temp), seq);
 layout_temp count_SSNs_per_Addr( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirySSNsPerAddr := le.inquirySSNsPerAddr + 
 								IF(le.inquirySSNsFromAddr=rt.inquirySSNsFromAddr, 0, rt.inquirySSNsPerAddr);				
@@ -2198,7 +2226,7 @@ Phone_raw_base_fcra_thor := join(distribute(with_address_velocities(shell_input.
 
 phone_raw := Phone_raw_base_fcra;								
 
-grouped_Phone_raw := group(sort(Phone_raw, seq, -inquiryADLsFromPhone), seq);
+grouped_Phone_raw := group(sort(Phone_raw, seq, -inquiryADLsFromPhone, -log_date_temp), seq);
 
 
 layout_temp roll_Phone( layout_temp le, layout_temp rt ) := TRANSFORM	
@@ -2309,6 +2337,9 @@ inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inq
 // output(with_inquiries_temp1, named('with_inquiries_temp1'));
 // output(with_inquiries_temp2, named('with_inquiries_temp2'));
 
+// output(sorted_addrs_per_adl, named('sorted_addrs_per_adl'));
+// output(slim_fnames, named('slim_fnames_new'));
+// output(rolledSubFnames, named('rolledSubFnames_new'));
 
 	return inquiry_summary;
 END;

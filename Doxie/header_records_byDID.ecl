@@ -172,7 +172,7 @@ f3 := JOIN(f2, headerCleaned, LEFT.did=0 AND
 						scoreOutside(LEFT),LEFT ONLY, LOOKUP);
 
 // combine everything, including records wiht no DID, if desired
-Fetch1 := headerCleaned+IF(include_dailies,f3(includeZeroDids_value OR did<>0));
+Fetch1 := PROJECT(headerCleaned, doxie.Layout_presentation) +IF(include_dailies,f3(includeZeroDids_value OR did<>0));
 
 // We'll prune non-current and historical records here if CurrentResidentsOnly is checked.
 Fetch2 := IF( currentResidentsOnly,

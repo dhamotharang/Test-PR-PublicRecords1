@@ -12,7 +12,7 @@ rids_fr := project(myHeader, Doxie.Layout_ref_rid);
 rids_fr_dedup := dedup(sort(rids_fr, rid), rid);
 ds_fr := Doxie_Raw.ViewSourceRid(rids_fr_dedup, mod_access, ['FR']);
 
-Property.Layout_Fares_Foreclosure getFR(Property.Layout_Fares_Foreclosure L) := transform
+Property.Layout_Fares_Foreclosure_Ex_Sids getFR(Property.Layout_Fares_Foreclosure_Ex_Sids L) := transform
  self := l;
 end;
 

@@ -7,7 +7,6 @@ eyeball := 100;
 Threads := 30;
 RecordsToRun := 0; // Set to 0 to run all, otherwise set to the number of records from the inputFile you wish to run
 
-
 //Business Shell 2.1 accepts YYYYMM, YYYMMDD, and YYYYMMDDTTTT dates. HistDate can be in any of these forms.
 histDate := 0; // Set to 0 to use the HistoryDateYYYYMM that is on the inputFile, set to anything other than 0 to use that history date for every record overwriting what was on the inputFile
 

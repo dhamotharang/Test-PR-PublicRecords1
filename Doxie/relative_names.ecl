@@ -1,4 +1,4 @@
-import standard,ut,Infutor,Relationship, doxie;
+﻿import standard,ut,Infutor,Relationship, doxie;
 
 export	relative_names(GROUPED	DATASET(doxie.layout_references)	dids,boolean	glb_ok,boolean	consumerflag)	:=
 FUNCTION
@@ -13,7 +13,7 @@ FUNCTION
 	
 	// Use relationship proc to retrieve relative recs
 	rdid_ds := UNGROUP(project(dids,transform(Relationship.Layout_GetRelationship.DIDs_layout,SELF:=LEFT,SELF := [])));
-	rel_recs := Relationship.proc_GetRelationship(rdid_ds,TRUE,TRUE,FALSE,FALSE,ut.limits.DEFAULT,ut.limits.RELATIVES_PER_PERSON,TRUE).result;
+	rel_recs := Relationship.proc_GetRelationshipNeutral(rdid_ds,TRUE,TRUE,FALSE,FALSE,ut.limits.DEFAULT,ut.limits.RELATIVES_PER_PERSON,TRUE).result;
 	rel_dids := GROUP(rel_recs(isRelative),did1);
 	
 	// eliminate minors as necessary
@@ -37,7 +37,7 @@ FUNCTION
 													limit(0),
 													keep(1)
 												);
-
+  // No suppression by source for CCPA needed as we’re only selecting dids.
 	dids_use	:=	if(consumerflag,consumer_dids,choosend_dids);
 
 	doxie.mac_best_records(dids_use,did,best_names,true,glb_ok,,doxie.DataRestriction.fixed_DRM,consumerflag);	

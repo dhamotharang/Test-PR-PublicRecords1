@@ -14,7 +14,6 @@ The service requires the customer number and either a License number, or Name an
 </pre>
 */
 
-import Healthcare_Provider_Services;
 EXPORT Customer_License_Search_Batch := MACRO
 	shared myRecords := Healthcare_Services.Customer_License_Search_Records;
 	batch_in_layout := Healthcare_Services.Customer_License_Search_Layouts.autokeyInput;

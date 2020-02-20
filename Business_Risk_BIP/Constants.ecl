@@ -44,7 +44,8 @@ EXPORT Constants := MODULE
 	EXPORT BusShellVersion_v21					:= 21; // Business Shell v2.1: Business Shell with SBFE enhancement attributes. This is what SBA uses.
 	EXPORT BusShellVersion_v22					:= 22; // Business Shell v2.2: Business Shell with SBFE enhancement attributes and Business Shell Enhancement attributes.
 	EXPORT BusShellVersion_v30					:= 30; // Business Shell v3.0: Business Shell v2.2 with Cortera data and enhancement attributes.
-
+	EXPORT BusShellVersion_v31					:= 31; // Business Shell v3.1: Business Shell v3.0 with enhanced attributes and BIP-append change.
+  
 	EXPORT RESTRICTED_SET := ['0',''];
 	EXPORT BVI_NOHIT_VALUES := ['','0'];
 	EXPORT BVI_DESC_KEY_NOHIT_VALUES := ['311','411','412'];
@@ -535,6 +536,12 @@ EXPORT Constants := MODULE
 												{MDR.sourceTools.src_KY_Watercraft_LN,					'B'}, // $W
 												{MDR.sourceTools.src_MO_Watercraft_LN,					'B'}, // )W
 												{MDR.sourceTools.src_Yellow_Pages,							'B'}, // Y
+                        //DCB - RR16297
+                        {MDR.sourceTools.src_Equifax_Business_Data,     'B'}, // Z1 RR-16297: EFX Business Marketing    
+                        {MDR.sourceTools.src_Infutor_NARB,              'B'}, // Z2
+                        {MDR.sourceTools.src_DataBridge,                'B'}, // RQ
+                        {MDR.sourceTools.src_Cortera_Tradeline,         'B'},  //7K RR-16297: Cortera Header
+                        //END - RR16297 updates
 												{MDR.sourceTools.src_INFOUSA_DEAD_COMPANIES,		'C'}, // IC
 												{MDR.sourceTools.src_Diversity_Cert,						'C'}, // WB
 												{MDR.sourceTools.src_FCC_Radio_Licenses,				'C'}, // FK
@@ -579,4 +586,12 @@ EXPORT Constants := MODULE
 												{MDR.sourceTools.src_Daily_ZUtilities,					'C'}, // ZU
 												{MDR.sourceTools.src_Vickers,										'C'}  // V
 												], Layout_AllowedSources);
+                        
+EXPORT Set_NewV31Sources := [  
+  MDR.sourceTools.src_Equifax_Business_Data,   
+  MDR.sourceTools.src_Infutor_NARB,
+  MDR.sourceTools.src_DataBridge, 
+  MDR.sourceTools.src_Cortera_Tradeline
+  ];
+  
 end;

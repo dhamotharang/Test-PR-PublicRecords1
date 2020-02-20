@@ -53,7 +53,7 @@
 /*--INFO-- 'dl01' */
 
       
-import Risk_Indicators, Gateway;
+import Risk_Indicators, Gateway, STD, Riskwise;
       
 	 
 export RiskWiseMainDLLO := MACRO
@@ -112,7 +112,11 @@ export RiskWiseMainDLLO := MACRO
 	'DataPermissionMask',
 	'HistoryDateYYYYMM',
 	'gateways',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -184,7 +188,14 @@ string DataRestriction := risk_indicators.iid_constants.default_DataRestriction 
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 gateways_in := Gateway.Configuration.Get();
 
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribCode in ['dl01'];
 
 targusGatewaySet := ['dl01'];
@@ -248,7 +259,11 @@ RiskWise.Layout_DLLI into(d le, INTEGER C) := TRANSFORM
 END;
 prep := PROJECT(d,into(LEFT,COUNTER));
 
-DLLO_Royalties := RiskWise.DLLO_Function(prep, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction, DataPermission);
+DLLO_Royalties := RiskWise.DLLO_Function(prep, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction, DataPermission,
+                                                                                LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                TransactionID := TransactionID, 
+                                                                                BatchUID := BatchUID, 
+                                                                                GlobalCompanyID := GlobalCompanyID);
 dRoyalties :=Royalty.RoyaltyTargus.GetOnlineRoyalties(DLLO_Royalties, src, TargusType, TRUE, FALSE, FALSE, TRUE);
 
 DLLO_final := PROJECT(dllo_Royalties, RiskWise.Layout_DLLO);

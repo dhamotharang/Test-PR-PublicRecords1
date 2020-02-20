@@ -1,8 +1,8 @@
-/***
+﻿﻿/***
  ** Module to filter/transform Header records into desired format for Relatives and Associates
 ***/
 
-import doxie, doxie_crs, iesp, ut, DeathV2_Services, Risk_Indicators, Address, header, DidVille;
+import Address, DeathV2_Services, DidVille, doxie, doxie_crs, dx_death_master, header, iesp, Risk_Indicators, STD, ut;
 
 //Relatives and associates for IDM services.
 int_rec := iesp.identitymanagementreport.t_IdmReportRNASlim;
@@ -16,12 +16,12 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 			string6 title;
 		END;
 		
-		identity_exp_slim := record
-			unsigned6 did;
-			string1 Deceased;
-			string DeathVerificationCode;
-			iesp.identitymanagementreport.t_IdmIdentity; // [UniqueID, Name, DOB, Age]
-		END;
+    identity_exp_slim := record
+      unsigned6 did;
+      string1 Deceased;
+      string DeathVerificationCode;
+      iesp.identitymanagementreport.t_IdmIdentity; // [UniqueID, Name, DOB, Age]
+    END;
 		
 		rel_exp := record (int_rec)
 			boolean is_relative;
@@ -56,7 +56,7 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 		
 		// Format AKAs
 		iesp.share.t_Name FormatThisPersonAKA (relative_src L) := TRANSFORM
-			string full_name 	:= StringLib.StringCleanSpaces (L.fname + ' ' + L.mname + ' ' + L.lname);
+			string full_name 	:= STD.STR.CleanSpaces (L.fname + ' ' + L.mname + ' ' + L.lname);
 			self.Full    		 	:= full_name;
 			Self.First 				:= L.fname;
 			Self.Middle 			:= L.mname;
@@ -108,28 +108,26 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 		
 		aka := project(aka_src, ToIdentity(left));
 
-		//Mark dead people
-		identity_exp_slim GetDead (identity_exp_slim L, recordof(doxie.key_death_masterV2_ssa_DID) R):=transform
-				// there can be different DOB in key_death_masterV2_DID and source dataset (for example: DID=002644313020),
-				// thus it is safer to take DOB from the left side
-				left_dob := (string4) L.DOB.year + intformat (L.DOB.month, 2, 1) + intformat (L.DOB.day, 2, 1);
-				Self.DeathVerificationCode := r.vorp_code; //death_code in header index
-				self.Deceased := if ( r.l_did != 0 , 'Y','N');
-				self.Age := if( r.l_did != 0,ut.Age((unsigned8)left_dob, (unsigned8)R.dod8), L.Age); //if dead, get age at death
-				Self := L; // copy about 25 fields
-		END;
-
 		rna_glb_ok := mod_access.isValidGLB(header.constants.checkRNA);
 		death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
-		rel_w_d_pre := JOIN (aka, doxie.key_death_masterV2_ssa_DID, 
-                            keyed (Left.did = Right.l_did)
-														and	not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, rna_glb_ok, death_params),
-                            GetDead (Left, Right),
-                            left outer, 
-														limit (0), keep (1));
-												
-		issuance_w_d_info := dedup (sort (rel_w_d_pre, did, record, if (DeathVerificationCode<>'',0,1)),
+    rel_w_d_appended := dx_death_master.Append.byDid(aka, did, death_params, /*skip_glb_check*/ true);
+    rel_w_d_glb_ok := rel_w_d_appended(rna_glb_ok OR death.glb_flag <> 'Y');    
+
+		//Mark dead people
+    identity_exp_slim GetDead (recordof(rel_w_d_appended) L):=transform
+      // there can be different DOB in key_death_masterV2_DID and source dataset (for example: DID=002644313020),
+      // thus it is safer to take DOB from the left side
+      left_dob := (string4) L.DOB.year + intformat (L.DOB.month, 2, 1) + intformat (L.DOB.day, 2, 1);
+      Self.DeathVerificationCode := L.death.vorp_code; //death_code in header index
+      Self.Deceased := if ( L.death.is_deceased, 'Y','N');
+      Self.Age := if( L.death.is_deceased, ut.Age((unsigned8)left_dob, (unsigned8)L.death.dod8), L.Age); //if dead, get age at death
+      Self := L; // copy about 25 fields
+    END;
+
+    rel_w_d_pre := project(rel_w_d_glb_ok,GetDead(left));
+    
+    issuance_w_d_info := dedup (sort (rel_w_d_pre, did, record, if (DeathVerificationCode<>'',0,1)),
                                    did, record, except DeathVerificationCode);
 
 		// fetch relatives and associates (dedup by DID, 1st degree relatives goes atop)
@@ -188,11 +186,11 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 			Self.DateFirstSeen := iesp.ECL2ESP.toDate ((unsigned4) (L.dt_first_seen + '00'));
 			Self._Shared := (L.shared_address='S');
 			// filter Address if not shared with subject, or if first and last in same month
-			Self.filtered := stringlib.stringtouppercase(L.shared_address) <> 'S' OR L.dt_first_seen = L.dt_last_seen;
+			Self.filtered := STD.STR.touppercase(L.shared_address) <> 'S' OR L.dt_first_seen = L.dt_last_seen;
 		end;
 		
 		// defenestrate any "PO BOX" before deduping into the "ready" address
-		addr_ready := dedup(project(doxie.Comp_Addresses(stringlib.stringtouppercase(prim_name[1..6]) <> 'PO BOX'),
+		addr_ready := dedup(project(doxie.Comp_Addresses(STD.STR.touppercase(prim_name[1..6]) <> 'PO BOX'),
                               ProjAddr (Left)), record); 
 
 		// Format rel/assoc addresses

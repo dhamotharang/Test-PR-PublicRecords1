@@ -1,12 +1,12 @@
-﻿/* PublicRecords_KEL.BWR_nonFCRA_MAS_Roxie */
+﻿﻿/* PublicRecords_KEL.BWR_nonFCRA_MAS_Roxie */
 IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 
 threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 
-InputFile := '~temp::kel::consumer_nonfcra_100k.csv';
-// InputFile := '~temp::kel::consumer_nonfcra_1mm.csv'; //1 million
+InputFile := '~mas::uatsamples::consumer_nonfcra_100k_07102019.csv ';
+//InputFile := '~mas::uatsamples::consumer_nonfcra_1m_07092019.csv';
 
 /*
 Data Setting 		NonFCRA
@@ -26,6 +26,12 @@ DPPA := 1;
 DataPermissionMask := '0000000001101';  
 DataRestrictionMask := '0000000000000000000000000000000000000000000000000'; 
 
+// CCPA Options;
+LexIdSourceOptout := 1;
+TransactionId := '';
+BatchUID := '';
+GCID := 0;
+
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
 histDate := '0';
 // histDate := '20190116';
@@ -36,8 +42,8 @@ Score_threshold := 80;
 
 // Output additional file in Master Layout
 // Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
-Output_Master_Results := FALSE;
-// Output_Master_Results := TRUE; 
+// Output_Master_Results := FALSE;
+Output_Master_Results := TRUE; 
 
 // Toggle to include/exclude SALT profile of results file
 // Output_SALT_Profile := FALSE;
@@ -46,14 +52,15 @@ Output_SALT_Profile := TRUE;
 RecordsToRun := 0;
 eyeball := 120;
 
-OutputFile := '~AFA::Consumer_KS1832_100K_RoxieDev_current_12312018_NonFCRA'+ ThorLib.wuid() ;
+OutputFile := '~lweiner::out::PersonNonFCRA_Roxie_100k_Archive_KS-4216_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
     STRING FirstName           ;
     STRING MiddleName          ;
     STRING LastName            ;
-    STRING StreetAddress       ;
+    STRING StreetAddressLine1  ;
+    STRING StreetAddressLine2  ;
     STRING City                ;
     STRING State               ;
     STRING Zip                 ;
@@ -76,7 +83,7 @@ prii_layout := RECORD
     STRING Proj;
 END;
 
-p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
+p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
 p := IF (RecordsToRun = 0, p_in, CHOOSEN (p_in, RecordsToRun));
 PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
 SELF.historydate := if(histDate = '0', LEFT.historydate, histDate); 
@@ -90,10 +97,14 @@ soapLayout := RECORD
 	INTEGER ScoreThreshold;
 	STRING DataRestrictionMask;
 	STRING DataPermissionMask;
-	UNSIGNED1 GLBA_Purpose;
-	UNSIGNED1 DPPA_Purpose;
+	UNSIGNED1 GLBPurpose;
+	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
+  UNSIGNED1 LexIdSourceOptout;
+  STRING _TransactionId;
+  STRING _BatchUID;
+  UNSIGNED6 _GCID;
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -124,7 +135,7 @@ END;
 layout_MAS_Test_Service_output := RECORD
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
-	STRING ErrorCode := '';
+	STRING G_ProcErrorCode := '';
 END;
 
 soapLayout trans (pp le):= TRANSFORM 
@@ -135,10 +146,14 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.ScoreThreshold := Settings.LexIDThreshold;
 	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
-	SELF.GLBA_Purpose := Settings.GLBAPurpose;
-	SELF.DPPA_Purpose := Settings.DPPAPurpose;
+	SELF.GLBPurpose := Settings.GLBAPurpose;
+	SELF.DPPAPurpose := Settings.DPPAPurpose;
 	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
+	SELF.LexIdSourceOptout := LexIdSourceOptout;
+	SELF._TransactionId := TransactionId;
+	SELF._BatchUID := BatchUID;
+	SELF._GCID := GCID;
 END;
 
 soap_in := PROJECT(pp, trans(LEFT));
@@ -147,7 +162,7 @@ OUTPUT(CHOOSEN(P, eyeball), NAMED('Sample_Input'));
 OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 
 layout_MAS_Test_Service_output myFail(soap_in le) := TRANSFORM
-	SELF.ErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
+	SELF.G_ProcErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
 	// SELF.Account := le.Account;
 	SELF := [];
 END;
@@ -163,17 +178,16 @@ bwr_results :=
 				PARALLEL(threads), 
         onFail(myFail(LEFT)));
 
-Passed := bwr_results(TRIM(ErrorCode) = ''); // Use as input to KEL query.
-Failed := bwr_results(TRIM(ErrorCode) <> '');
+Passed := bwr_results(TRIM(G_ProcErrorCode) = ''); // Use as input to KEL query.
+Failed := bwr_results(TRIM(G_ProcErrorCode) <> '');
 
 OUTPUT( CHOOSEN(Passed,eyeball), NAMED('bwr_results_Passed') );
 OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
-
 LayoutMaster_With_Extras := RECORD
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
-	STRING ErrorCode;
+	STRING G_ProcErrorCode;
 	STRING ln_project_id;
 	STRING pf_fraud;
 	STRING pf_bad;
@@ -186,26 +200,30 @@ END;
 
 Layout_Person := RECORD
 	PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA;
-	STRING ErrorCode;
+	STRING G_ProcErrorCode;
 END;
 
 Passed_with_Extras := 
-	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.InputAccountEcho, 
+	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.P_InpAcct, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
 			SELF := LEFT, //input performance fields
-			SELF.ErrorCode := RIGHT.ErrorCode,
+			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
 		INNER, KEEP(1));
 	
 Passed_Person := 
-	JOIN(p, Passed, LEFT.Account = RIGHT.Results.InputAccountEcho, 
+	JOIN(p, Passed, LEFT.Account = RIGHT.Results.P_InpAcct, 
 		TRANSFORM(Layout_Person,
 			SELF := RIGHT.Results, //fields from passed
 			SELF := LEFT, //input performance fields
-			SELF.ErrorCode := RIGHT.ErrorCode,
+			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
 		INNER, KEEP(1));
+    
+Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY); 
+OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE);
+
 	
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_NonFCRA_Layout'));

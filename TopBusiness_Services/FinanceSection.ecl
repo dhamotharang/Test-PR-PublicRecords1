@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, BIPV2, iesp, MDR, TopBusiness_Services;
+﻿IMPORT AutoStandardI, BIPV2, iesp, MDR, TopBusiness_Services, STD;
 
 EXPORT FinanceSection := MODULE;
 
@@ -49,7 +49,7 @@ EXPORT FinanceSection := MODULE;
   // *** Key fetch to get EBR 5600(Demographic) data.
   ds_ebr_key5600recs := TopBusiness_Services.Key_Fetches(ds_in_ids_only, // input file to join key with
 								                                         FETCH_LEVEL,
-																												 TopBusiness_Services.Constants.defaultJoinLimit).ds_ebr5600_linkidskey_recs;
+										TopBusiness_Services.Constants.defaultJoinLimit).ds_ebr5600_linkidskey_recs;
 
   // Filter to only use the Current (record_type=C) records and then
   // project EBR key recs onto common layout with just the fields needed for the section 
@@ -79,7 +79,7 @@ EXPORT FinanceSection := MODULE;
   // *** Key fetch to get Shelia Greco data.
   ds_sg_keyrecs := TopBusiness_Services.Key_Fetches(ds_in_ids_only, // input file to join key with
 								                                     FETCH_LEVEL,
-																										 TopBusiness_Services.Constants.defaultJoinLimit).ds_sg_linkidskey_recs;
+															TopBusiness_Services.Constants.defaultJoinLimit).ds_sg_linkidskey_recs;
 
   // Filter to only use the recs with a non-blank "sales" amount.
 	ds_sg_keyrecs_wsales := ds_sg_keyrecs(rawfields.sales !='');
@@ -97,12 +97,40 @@ EXPORT FinanceSection := MODULE;
 			 self.sales_as_of_date    := left.clean_dates.lastupdate; //???
 			 self := left, // to preserve ids
 			 )); 
+			 
+      // *** Key fetch to get EquifaxBusData
+ 
+     ds_equifax_bus_data_keyRecs := Topbusiness_Services.Key_fetches(ds_in_ids_only, FETCH_LEVEL, 
+                                                       TopBusiness_Services.Constants.defaultJoinLimit).ds_equifax_bus_data_linkidskey_recs;
+																											 
+     // filter to use recs with a non blank 'sales' amount
+                 																																						
+     ds_equifax_bus_data_wsales := ds_equifax_bus_data_keyRecs(EFX_corpamount != '');
+											 
+    ds_equifax_bus_data_slimmed := Project(ds_equifax_bus_data_wsales,
+		     Transform(FinanceSection_Layouts.rec_ids_withdata_slimmed,
+				 self.source := MDR.sourceTools.src_Equifax_Business_Data;
+				 self.source_docid := LEFT.efx_id;
+			       self.annual_sales_amount  := ((UNSIGNED4)(trim(LEFT.EFX_corpamount,left,right) )) * 1000;
+				  self.sales_as_of_date := (unsigned4) left.dt_last_seen;	
+				  self := left));
+
+ ds_equifax_bus_data_deduped := choosen(sort(dedup(sort(ds_equifax_bus_data_slimmed,
+	                                                                                                         #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+						                                                                               source_docid,
+                                                                                                               -sales_as_of_date, 
+						                                                                               -annual_sales_amount),
+	                                                                                     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), 
+													                     source_docid ),
+															            -sales_as_of_date),
+																  1);					
 
 
   // Concatenate recs from all sources
 	ds_finrecs_all := ds_dca_slimmed +
 										ds_ebr_deduped +
-										ds_sg_slimmed;
+										ds_sg_slimmed +
+										  ds_equifax_bus_data_deduped;
 
   // Sort/dedup all recs from combined file that have non-zero sales amounts, 
 	// to only keep 1 records per set of linkids/source/source_docid.
@@ -126,7 +154,8 @@ EXPORT FinanceSection := MODULE;
     self.IdType      := //depends upon source 
 		                    if(l.source=MDR.sourceTools.src_DCA,Constants.enterprisenumber,
 												   if(l.source=MDR.sourceTools.src_EBR,Constants.filenumber,
-													    '')),  // otherwise SheilaGreco, but no SG has no specific id field
+													   if (l.source=MDR.sourceTools.src_Equifax_Business_Data,Constants.EfxID,														     
+													    ''))),  // otherwise SheilaGreco, but no SG has no specific id field
 		self.IdValue     := l.source_docid,
 		self.Section     := Constants.FinanceSectionName,
 		self.Source      := l.source,
@@ -257,7 +286,7 @@ fin_sec := TopBusiness_Services.FinanceSection.fn_FullView(
                       //{'sg2bp', 0, 0, 0, 0, 94560, 94560, 94560} //sales amount w/decimals issue
                       //{'multi1p0', 0, 0, 0, 0, 46506520, 233, 233} // bug 155186 test case 0?, fix to output <SourceDocs> for all srcs/recs with fin data; ?? DCA, ?? EBR & ?? SG recs
                       //{'ebr9p', 0, 0, 0, 0, 4827787, 4827787, 4827787} // bug 155186 test case 1 GOOGLE INC., fix to output <SourceDoc> recs for all srcs/recs with fin data; linkids recs = 0 DCA, 35 EBR & 0 SG recs
-
+                      //{equifaxBusdata',0,0,0,0,20040,20040,20040} // adding equifax bus data to the finance section ult/org/seleid :for subway, greenville, PA
                      ],topbusiness_services.Layouts.rec_input_ids)
  						,ds_options[1]
 					  ,tempmod

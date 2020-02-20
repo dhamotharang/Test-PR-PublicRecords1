@@ -1,4 +1,5 @@
-IMPORT NAC_V2_Services,NAC_V2,BatchServices,Autokey_batch,AutoStandardI,didville,ut,STD;
+IMPORT NAC_V2_Services, NAC_V2, BatchServices, Autokey_batch, didville, ut, STD;
+
 EXPORT Raw := MODULE
 	EXPORT byDIDs(DATASET(NAC_V2_Services.layouts.search_layout) in_dids) := FUNCTION 
 
@@ -69,11 +70,9 @@ EXPORT Raw := MODULE
 		RETURN deep_dids_DEDUP;		
 	END;
 
-	EXPORT IdsByAdlBest(DATASET(NAC_V2_Services.Layouts.process_layout) ds_in, 
+	SHARED IdsByAdlBest(DATASET(NAC_V2_Services.Layouts.process_layout) ds_in, 
 										        	NAC_V2_Services.IParams.commonParams in_mod) := FUNCTION
-		tempMod := ut.PopulateDRI_Mod(in_mod);
-		p       := AutoStandardI.PermissionI_Tools.val(tempMod);
-		GLB     := p.glb.ok(in_mod.GLBPurpose);
+		GLB     := in_mod.isValidGlb();
 
 		ds_filt := ds_in(dob = '' OR ut.Age((UNSIGNED4)dob) >= NAC_V2_Services.Constants.MAX_AGE_ADL_BEST);
 		DidVille.Layout_Did_OutBatch xformAddr1(NAC_V2_Services.Layouts.process_layout l) := TRANSFORM
@@ -125,15 +124,14 @@ EXPORT Raw := MODULE
 		recs_addr1 		:= PROJECT(ds_filt, xformAddr1(LEFT));
 		recs_addr2 		:= PROJECT(ds_filt(addr2_prim_range <> '' AND addr2_prim_name <> ''), xformAddr2(LEFT));
 		recs					:= recs_addr1 + recs_addr2;
-		IndustryClass := ut.IndustryClass.Get();
 		// We don't care about glb,dppa,industry class, app type etc here since we are only getting DIDs 
 		//and we are not getting any other BEST info....
 		didville_recs	:= didville.did_service_common_FUNCTION(recs, 
 																												  glb_flag          := GLB, 
-																													glb_purpose_value := in_mod.GLBPurpose, 
+																													glb_purpose_value := in_mod.glb, 
 																													include_minors    := TRUE, 
-																													appType           := in_mod.ApplicationType,
-																													IndustryClass_val := IndustryClass);
+																													appType           := in_mod.application_type,
+																													IndustryClass_val := in_mod.industry_class);
 		// Don't RETURN DID's whose score < ADL threshold
 		adl_best 			:= PROJECT(didville_recs(score >= NAC_V2_Services.Constants.MIN_ADL_SCORE), 
 														TRANSFORM(NAC_V2_Services.Layouts.search_layout, 

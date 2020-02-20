@@ -1,4 +1,4 @@
-IMPORT Autokey_batch, AutoStandardI, BatchServices, Doxie, ut;
+IMPORT Autokey_batch, AutoStandardI, BatchServices, Doxie, ut, dx_Header;
 
 penalize_fullname(Autokey_batch.Layouts.rec_inBatchMaster l, BatchServices.Layouts.OthersUsingSSN.rec_results_raw r) :=
 	FUNCTION				
@@ -84,7 +84,7 @@ EXPORT OthersUsingSSN_BatchService_Records(DATASET(Autokey_batch.Layouts.rec_inB
 
 		// 4. Find DIDs of other people using the same SSN.
 		ds_other_people_using_same_ssn := 
-										JOIN(ds_best_ssns, doxie.Key_Header_SSN,
+										JOIN(ds_best_ssns, dx_Header.key_SSN(),
 												 KEYED(RIGHT.s1 = LEFT.ssn[1]) AND
 												 KEYED(RIGHT.s2 = LEFT.ssn[2]) AND
 												 KEYED(RIGHT.s3 = LEFT.ssn[3]) AND

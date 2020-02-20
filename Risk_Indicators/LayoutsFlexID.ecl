@@ -1,6 +1,4 @@
-/*2016-05-21T00:43:24Z (Kevin Huls)
-Automated reinstate from 2016-05-19T17:50:17Z
-*/
+﻿Import Risk_Indicators;
 export LayoutsFlexID := MODULE
 
 // batch input, originally created for FlexID batch
@@ -22,6 +20,7 @@ END;
 
 export LayoutVerifiedElementSummary := RECORD
 	string1 VerifiedElementSummaryFirstName := '';
+	string1 VerifiedElementSummaryMiddleName := '';
 	string1 VerifiedElementSummaryLastName := '';
 	string1 VerifiedElementSummaryStreetAddress := '';
 	string1 VerifiedElementSummaryCity := '';
@@ -32,6 +31,7 @@ export LayoutVerifiedElementSummary := RECORD
 	string1 VerifiedElementSummaryDOBMatchLevel := '';
 	string1 VerifiedElementSummarySSN := '';
 	string1 VerifiedElementSummaryDL := '';
+	string1 VerifiedElementSummaryEmail := '';
 END;
 
 
@@ -126,9 +126,14 @@ export LayoutFlexIDBatchOut := RECORD
 	string1 ValidElementSummarySSNFoundForLexID;
 	string9 verSSN;
 	string3 cviCustomScore;
-	string1 InstantIDVersion;	// output the version that was run
+	string1 InstantIDVersion;
 	boolean EmergingID;
 	string1 AddressSecondaryRangeMismatch;	// New for EmergingIdentities
+  boolean BureauDeleted;
+  boolean ITINExpired;
+  boolean IsPhoneCurrent;
+  string2 PhoneLineType;
+  string2 PhoneLineDescription;
 END;
 
 END;

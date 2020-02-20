@@ -1,8 +1,9 @@
-﻿IMPORT AutoStandardI,Address,ut, std;
+﻿IMPORT doxie, AutoStandardI, Address, std;
 
 EXPORT RealTime_Batch_Service_Records(DATASET(Batch_Layout.RealTime_InLayout) inputData,UNSIGNED1 Operation,Boolean GatewayNameMatch = False,Boolean Is_UseDate = False) := FUNCTION
 
 	inputParams := AutoStandardI.GlobalModule();
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(inputParams);//? TODO: pass in the input.
 
 	layoutAcctNoRpt := RECORD
 		Batch_Layout.RealTime_InLayout.AcctNo;
@@ -31,6 +32,7 @@ EXPORT RealTime_Batch_Service_Records(DATASET(Batch_Layout.RealTime_InLayout) in
 		BOOLEAN fullName := L.name_full != '' AND L.name_last = '';
 		cln := address.CleanNameFields(address.CleanPerson73(L.name_full));
 		tempmod := MODULE(PROJECT(inputParams,VehicleV2_Services.IParam.polkParams,opt))
+			doxie.compliance.MAC_CopyModAccessValues(mod_access);
 			EXPORT STRING30  firstName := IF(fullName,cln.fName,L.name_first);
 			EXPORT STRING30  middleName := IF(fullName,cln.mName,L.name_middle);
 			EXPORT STRING30  lastName := IF(fullName,cln.lName,L.name_last);

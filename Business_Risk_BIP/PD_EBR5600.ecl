@@ -8,7 +8,7 @@ EXPORT PD_EBR5600(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound,
 									SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
 	// ---------------- EBR - Experian Business Records ------------------
-	EBR5600Raw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(kFetchLinkIDs,
+	EBR5600Raw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(kFetchLinkIDs, ,
 																						  kFetchLinkSearchLevel,
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							linkingOptions,

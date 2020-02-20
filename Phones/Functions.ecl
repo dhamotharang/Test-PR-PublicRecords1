@@ -20,7 +20,7 @@ MODULE
 																	 STRING data_restriction_mask
 																	) :=
 	FUNCTION
-				
+
  		// Set some easier to understand booleans
     GLB_OK  := ut.glb_ok(glb_purpose, checkRNA);
     DPPA_OK := ut.dppa_ok(dppa_purpose, checkRNA);
@@ -44,7 +44,7 @@ MODULE
     // Use mutiple filters against the dataset of all sources to check for specific sources
 		// that are restricted via: GLB/preGLB or DPPA or Utility/Industry_Class or DRM.
     // A phone is restricted if:
-    boolean restricted (string2 src) :=
+    boolean restricted (string2 src, string2 state) :=
        // Sources that might be restricted via GLB
 			 (src in MDR.sourceTools.set_GLB
 			   and NOT GLB_OK
@@ -72,12 +72,13 @@ MODULE
 	      OR (src = MDR.sourceTools.src_Equifax         and data_restriction_mask[8] not in ['0',''])
 		     OR (src = MDR.sourceTools.src_TU_CreditHeader and data_restriction_mask[10] not in ['0',''])
  		    OR (src = MDR.sourceTools.src_InquiryAcclogs  and data_restriction_mask[16] not in ['0',''])
-			    OR(src in D2C.Constants.PhonesPlusV2RestrictedSources and is_CNSMR);
+          OR(src in D2C.Constants.PhonesPlusV2RestrictedSources and is_CNSMR)
+          OR(Doxie.compliance.isDirectMarketing(industry_class) and (Not Doxie.compliance.isMarketingAllowed(src,state)));
       //end of filters
 
 		// remove restricted sources from the dataset of all sources
-    ds_srcs_not_restricted := ds_src_all (NOT restricted (src));
-
+    ds_srcs_not_restricted := ds_src_all (NOT restricted (src,state));
+    // output(ds_srcs_not_restricted,named('ds_srcs_not_restricted'),Extend);
     // debugging outputs have to be here before the "RETURN"
 		//output(GLB_OK,                 NAMED('GLB_OK'),EXTEND);
 		//output(DPPA_OK,                NAMED('DPPA_OK'),EXTEND);
@@ -105,24 +106,17 @@ MODULE
 														isPhone7Search    = FALSE
 													) :=
 	FUNCTIONMACRO
-		IMPORT Autokey_Batch,AutokeyB2_batch,Data_Services,Doxie, Header,MDR,Phones,Phonesplus,Phonesplus_v2,ut, Suppress;
-		
+		IMPORT Autokey_Batch,AutokeyB2_batch,Data_Services,Doxie, Header,MDR,Phones,Phonesplus,Phonesplus_v2,ut, Suppress, STD;
+
 		l_BatchIn := Phones.Layouts.BatchIn;
 		l_Common  := Phones.Layouts.PhonesCommon;
 
 		modpenalty := Phones.GetPenalty;
-    
-    mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
-        EXPORT UNSIGNED1 dppa := inAKMod.DPPAPurpose;
-		    EXPORT UNSIGNED1 glb :=  inAKMod.GLBPurpose;
-		    EXPORT STRING5   industry_class := inAKMod.IndustryClass;
-		    EXPORT STRING32  application_type := inAKMod.ApplicationType;
-		    EXPORT STRING    ssn_mask := inAKMod.SSNMask;
-		    EXPORT UNSIGNED1 dob_mask := (UNSIGNED)inAKMod.DOBMask;
+
+    mod_access := MODULE(PROJECT(inAKMod, doxie.IDataAccess))
 		    EXPORT STRING    transaction_id := inAKMod.TransactionID;
-    
     END;
-     
+
  	// BOOLEAN variables for phone sources
    		BOOLEAN isPhonesPlus   := phoneSrc = MDR.SourceTools.src_Phones_Plus;
    		BOOLEAN isLastResort   := phoneSrc = MDR.SourceTools.src_wired_Assets_Royalty;
@@ -163,10 +157,9 @@ MODULE
 			l_BatchIn batch_in;
 			STRING120 listed_name;
 			BOOLEAN   isDeepDive := FALSE;
-      UNSIGNED8 global_sid := 0;
-	    UNSIGNED8 record_sid := 0;
+      unsigned8 src_all;
 		END;
-    
+
 		// Search by DID
 		#IF(~doPhoneOnlySearch)
 			rPhones_Layout tGetByDID(dInReformat le,RECORDOF(keyDID)	ri) :=
@@ -174,9 +167,9 @@ MODULE
 				SELF.glb_dppa_flag :=
 				                   #IF(isPhonesPlus or isLastResort)
 				                      IF( Phones.Functions.isPhoneRestricted(ri.origstate,
-																																		 inAKMod.GLBPurpose,
-																																		 inAKMod.DPPAPurpose,
-																																		 inAKMod.IndustryClass,
+																																		 inAKMod.glb,
+																																		 inAKMod.dppa,
+																																		 inAKMod.industry_class,
 																																		 , //checkRNA
 																																		 ri.datefirstseen,
 																																		 ri.dt_nonglb_last_seen,
@@ -197,6 +190,7 @@ MODULE
         SELF.global_sid    := ri.global_sid;
         SELF.record_sid    := ri.record_sid;
         #END
+        SELF.src_all       := ri.src_all;
 				SELF               := ri;
 			END;
 
@@ -205,7 +199,7 @@ MODULE
 										KEYED(LEFT.did = RIGHT.l_did),
 										tGetByDID(LEFT,RIGHT),
 										LIMIT(ut.Limits.PHONE_PER_PERSON,SKIP));
-                    
+
 		#END
 
 		// Autokey Fake DIDs
@@ -244,9 +238,9 @@ MODULE
 			SELF.glb_dppa_flag   :=
 			                     #IF(isPhonesPlus or isLastResort)
 				                      IF( Phones.Functions.isPhoneRestricted(ri.origstate,
-																																		 inAKMod.GLBPurpose,
-																																		 inAKMod.DPPAPurpose,
-																																		 inAKMod.IndustryClass,
+																																		 inAKMod.glb,
+																																		 inAKMod.dppa,
+																																		 inAKMod.industry_class,
 																																		 , //checkRNA
 																																		 ri.datefirstseen,
 																																		 ri.dt_nonglb_last_seen,
@@ -274,7 +268,7 @@ MODULE
 													KEYED(LEFT.id = RIGHT.fdid),
 													tGetByFDID(LEFT,RIGHT),
 													LIMIT(ut.Limits.PHONE_PER_PERSON,SKIP));
-                           
+
 		// Append input data to the phone recs for use in penalty calculations
 		rPhones_Layout tAppendInputData(dInReformat le,dFDIDsPayload ri) :=
 		TRANSFORM
@@ -297,8 +291,8 @@ MODULE
 										dPayloadWInput);
 		#ELSE
 			dPPRecs_pre := IF(skipAutoKeys,dDIDs,dDIDs + dPayloadWInput);
-      dPPRecs := Suppress.MAC_SuppressSource(dPPRecs_pre, mod_access);  
-      
+      dPPRecs := Suppress.MAC_SuppressSource(dPPRecs_pre, mod_access);
+
 		#END
 
 		// Filter records below the confidence score threshold
@@ -344,6 +338,13 @@ MODULE
 			SELF.zip                      := pInput.zip5;
 			SELF.vendor_dt_last_seen_used := pInput.datelastseen = 0 and pInput.datevendorlastreported <> 0;
 			SELF.county_code              := IF(pInput.ace_fips_st='','00',pInput.ace_fips_st) + pInput.ace_fips_county;
+
+			STRING src_all_decoded := Phonesplus_v2.Translation_Codes.fGet_all_sources(pInput.src_all);
+			// Use the decoded src_all string to create a set
+			SET OF STRING2 set_src_all := STD.Str.SplitWords(src_all_decoded,' ');
+			// Turn the set into a dataset
+			ds_src_all := DATASET(set_src_all, {STRING3 src});
+			SELF.Phn_src_all              := ds_src_all;
 			SELF                          := pInput;
 		END;
 
@@ -394,12 +395,12 @@ MODULE
 		#END
 
 
-     
+
      #IF(~doPhoneOnlySearch)
          doxie.compliance.logSoldToSources (dPPRecs, mod_access);
      #END;
 
-    
+
 		RETURN dPPPenaltyFilter;
 	ENDMACRO;
 
@@ -432,9 +433,9 @@ MODULE
 		2 => Phones.Constants.PhoneServiceType.VoIP,
 		Phones.Constants.PhoneServiceType.Other);
 
-	EXPORT GetDIDs(DATASET(DidVille.Layout_Did_OutBatch) dBatchIn, STRING32 ApplicationType='',UNSIGNED1 GLBPurpose,UNSIGNED1 DPPAPurpose) := FUNCTION
+	EXPORT GetDIDs(DATASET(DidVille.Layout_Did_OutBatch) dBatchIn, doxie.IDataAccess mod_access) := FUNCTION
 
-		dDIDsbyAcctno	:= didville.did_service_common_function(dBatchIn,appType := ApplicationType,glb_purpose_value:=GLBPurpose,dppa_purpose_value:=DPPAPurpose);
+		dDIDsbyAcctno	:= didville.did_service_common_function(dBatchIn, appType := mod_access.application_type, glb_purpose_value:=mod_access.glb, dppa_purpose_value:=mod_access.dppa);
 
 		dBatchInwDID	:= JOIN(dBatchIn, dDIDsbyAcctno,
 								LEFT.seq = RIGHT.seq,
@@ -456,11 +457,18 @@ MODULE
 	END;
 	EXPORT BOOLEAN isValidZumigo(INTEGER zumigoScore):= FUNCTION
 		RETURN	zumigoScore BETWEEN 0 AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX;
-	END;	
+	END;
 	EXPORT GetCleanCompanyName(STRING inputCompanyName) := FUNCTION
 		dInputPrep:=DATASET([{1,inputCompanyName}],{UNSIGNED rid; STRING company_name;});
 		BIPV2_Company_Names.functions.mac_go(dInputPrep,dsCleanCompanyName,rid,company_name);
-		RETURN dsCleanCompanyName[1].cnp_name; 
-	END;			
+		RETURN dsCleanCompanyName[1].cnp_name;
+	END;
 
+    //RQ-16410: Added IsValidIdentity to filter out 'City, State' names in Accudata ListingName
+    EXPORT IsValidIdentity(STRING ListingName) := FUNCTION
+        WordCount := STD.Str.CountWords(ListingName, ' ');
+        LastWord := STD.Str.GetNthWord(ListingName, WordCount);
+        result := IF(LENGTH(LastWord) = 2, ~ut.valid_st(LastWord), TRUE);
+        RETURN result;
+    END;
 END;

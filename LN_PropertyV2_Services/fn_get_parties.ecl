@@ -85,9 +85,9 @@ end;
 			export allow_wildcard := false;
 		end;
 		self.penalt_1 := AutoStandardI.LIBCALL_PenaltyI_Addr.val(temp_addr_mod(temp_mod_1));
-		self.penalt_2 := AutoStandardI.LIBCALL_PenaltyI_Addr.val(temp_addr_mod(temp_mod_2));
+		self.penalt_2 := IF (TwoPartySearch, AutoStandardI.LIBCALL_PenaltyI_Addr.val(temp_addr_mod(temp_mod_2)), 0);
 		self.cPenalt_1 := if(input.cname='', max_penalt, min_penalt);
-		self.cPenalt_2 := if(input.cname_2='', max_penalt, min_penalt);
+		self.cPenalt_2 := IF (TwoPartySearch, if(input.cname_2='', max_penalt, min_penalt), max_penalt);
 		self := L;
 	end;
 	
@@ -173,12 +173,15 @@ end;
 		pen_addr_2	:= if(input.paSearch, max_penalt, AutoStandardI.LIBCALL_PenaltyI_Addr.val(temp_addr_mod(temp_mod_2)));
 		pen_paddr_2	:= if(exists(paRec), paRec[1].penalt_2, max_penalt);
 		self.penalt_1 := pen_ssn_1 + pen_did_1 + pen_bdid_1 + pen_name_1 + pen_phone_1 + pen_cname_1 + fn_penaltySourceCode(L.source_code) + if(pen_addr_1<pen_paddr_1,pen_addr_1,pen_paddr_1);
-		self.penalt_2 := pen_ssn_2 + pen_did_2 + pen_bdid_2 + pen_name_2 + pen_phone_2 + pen_cname_2 + if(pen_addr_2<pen_paddr_2,pen_addr_2,pen_paddr_2);
+		self.penalt_2 := IF (TwoPartySearch, 
+                         pen_ssn_2 + pen_did_2 + pen_bdid_2 + pen_name_2 + pen_phone_2 + pen_cname_2 + if(pen_addr_2<pen_paddr_2,pen_addr_2,pen_paddr_2),
+                         0);
 		self.cPenalt_1 := map(
 			input.cname=''	=> 0,
 			L.cname=''			=> 100,
 			ut.stringsimilar100(L.cname,input.cname));
 		self.cPenalt_2 := map(
+      ~TwoPartySearch => 0,
 			input.cname_2=''	=> 0,
 			L.cname=''			=> 100,
 			ut.stringsimilar100(L.cname,input.cname_2));
@@ -214,7 +217,7 @@ end;
 			export county_field := '';
 		end;
 		self.county_pen_1	:= AutoStandardI.LIBCALL_PenaltyI_County.val(temp_county_mod(temp_mod_1));
-		self.county_pen_2	:= AutoStandardI.LIBCALL_PenaltyI_County.val(temp_county_mod(temp_mod_2));
+		self.county_pen_2	:= IF (TwoPartySearch, AutoStandardI.LIBCALL_PenaltyI_County.val(temp_county_mod(temp_mod_2)), 0);
 		self.entity				:= dataset([],l_entity);
 		self.orig_names 	:= dataset([], layouts.parties.orig);
 		self.orig_addr		:= '';
@@ -244,7 +247,7 @@ end;
 				export county_field := right.county_name;
 			end;
 			self.county_pen_1	:= AutoStandardI.LIBCALL_PenaltyI_County.val(temp_county_mod(temp_mod_1));
-			self.county_pen_2	:= AutoStandardI.LIBCALL_PenaltyI_County.val(temp_county_mod(temp_mod_2));
+			self.county_pen_2	:= IF (TwoPartySearch, AutoStandardI.LIBCALL_PenaltyI_County.val(temp_county_mod(temp_mod_2)), 0);
 			self:=left),
 		left outer, limit(max_raw), keep(1)
 	);
@@ -375,8 +378,8 @@ end;
 		         ,SORT(par, /* by */ 
 										AutoStandardI.LIBCALL_PenaltyI_Addr.val(temp_addr_mod(temp_mod_1,
 											predir, prim_range, prim_name, suffix, postdir, v_city_name, p_city_name, st, zip)) +
-										AutoStandardI.LIBCALL_PenaltyI_Addr.val(temp_addr_mod(temp_mod_2,
-											predir, prim_range, prim_name, suffix, postdir, v_city_name, p_city_name, st, zip)),
+										if (TwoPartySearch, AutoStandardI.LIBCALL_PenaltyI_Addr.val(temp_addr_mod(temp_mod_2,
+											predir, prim_range, prim_name, suffix, postdir, v_city_name, p_city_name, st, zip)), 0),
 										
 		               if(party_type='P',0,1),
 									 record)

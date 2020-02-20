@@ -1,9 +1,10 @@
-import doxie,PersonReports,AutoStandardI,iesp,ut,DeathV2_Services,doxie_crs,suppress, DriversV2_Services, header,Healthcare_Header_Services;
+﻿import doxie,dx_death_master,PersonReports,AutoStandardI,iesp,ut,DeathV2_Services,doxie_crs,suppress, DriversV2_Services, header,Healthcare_Header_Services;
 
-export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData,dataset(doxie.layout_references) dsDids=dataset([],doxie.layout_references)) := MODULE
+export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData, 
+                       doxie.IDataAccess mod_access, dataset(doxie.layout_references) dsDids) := MODULE
 
   shared gmod := AutoStandardI.GlobalModule();
-	shared in_params:= MODULE(PROJECT(gmod, PersonReports.input.personal,opt)) 
+	shared in_params:= MODULE(PROJECT(gmod, PersonReports.IParam.personal, OPT)) 
 		export unsigned1 neighborhoods := inputData.NeighborhoodCount;
 		export unsigned1 historical_neighborhoods := inputData.HistoricalNeighborhoodCount;
 		export unsigned1 relative_depth := inputData.RelativeDepth;
@@ -11,22 +12,6 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 		export boolean include_relativeaddresses := inputData.IncludeRelativeAddresses;
 		export unsigned1 max_relatives_addresses  := inputData.MaxRelativeAddresses;
 		export boolean include_BlankDOD := inputData.IncludeBlankDOD; // allows to return death records with no DOD
-	END;
-
-	shared mod_access := MODULE (doxie.IDataAccess)
-    EXPORT unsigned1 glb := in_params.glbpurpose;
-    EXPORT unsigned1 dppa := in_params.dppapurpose;
-    EXPORT string DataPermissionMask := in_params.DataPermissionMask;
-    EXPORT string DataRestrictionMask := in_params.DataRestrictionMask;
-    EXPORT boolean ln_branded := in_params.ln_branded;
-    EXPORT boolean probation_override := gmod.probationoverride;
-    EXPORT string5 industry_class := in_params.industryclass;
-    EXPORT string32 application_type := AutoStandardI.InterfaceTranslator.application_type_val.val(project(gmod,AutoStandardI.InterfaceTranslator.application_type_val.params));
-    EXPORT boolean no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(gmod,AutoStandardI.InterfaceTranslator.no_scrub.params));
-		EXPORT unsigned3 date_threshold := in_params.dateVal;
-    EXPORT boolean suppress_dmv := gmod.suppressDMVInfo;
-    EXPORT string ssn_mask := in_params.ssn_mask;
-    EXPORT unsigned1 dl_mask := IF (in_params.mask_dl, 1, 0);
 	END;
 
 	//Taken from PersonReports.Person_records modified to actually work correctly
@@ -65,15 +50,8 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 		self.did := (string)((integer)(R.did));
 		self := R;
 	end;
-	dear  := JOIN (dids_owners, doxie.key_death_masterV2_DID, 
-								 keyed (Left.did = Right.l_did) 
-								 and not DeathV2_Services.Functions.Restricted (right.src, right.glb_flag, if (Left.is_subject, glb_ok, rna_glb_ok), death_params),
-								 GetDeadRecords (Left, Right),
-								 left outer, limit (ut.limits.HEADER_PER_DID), keep (ut.limits.DEATH_PER_DID)); //
-	//============================
-
-	// dear := doxie.deathfile_records (in_params.include_BlankDOD or (unsigned)dod8 != 0);
-	// for the purpose of deceased indicator we need only one record per person, preferrably with a county
+dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(doxie_crs.layout_deathfile_records,self.did:=(string)left.did;self:=left;self:=[];))	;
+		// for the purpose of deceased indicator we need only one record per person, preferrably with a county
 	export src_deceased := dedup (sort (dear, did, -dod8, trim (county_name) = ''), did, dod8);
 
 		besr_choice := IF(EXISTS(bestrecs), bestrecs, project (dsDids, transform (doxie.layout_best, 
@@ -190,7 +168,7 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 	// flat table of residents with SSN, death, etc. info;
 	// contains DID and address sequence, which can be used for linking.
 	// Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently). 
-	shared residents_base := PersonReports.Functions.GetPersonBase (src_residents, ssn_lookups, src_deceased, in_params);
+	shared residents_base := PersonReports.Functions.GetPersonBase (src_residents, ssn_lookups, src_deceased, mod_access, in_params);
 
 
 	// ------------------------- expanded residents -------------------------
@@ -342,7 +320,7 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 	// alternatively relative_records or relative_summary can be used, utilizing records' counts
 
 	// attach SSN and death information; this is in effect AKAs
-	export relassoc_base := PersonReports.Functions.GetPersonBase (aka_src, ssn_lookups, src_deceased, in_params);
+	export relassoc_base := PersonReports.Functions.GetPersonBase (aka_src, ssn_lookups, src_deceased, mod_access, in_params);
 
 
 	// ------------------------- expanded relatives/associates -------------------------
@@ -571,14 +549,12 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 	shared nbrRelsFinal := if(nbrRels=0,iesp.Constants.HPR.MAX_Relatives,min(nbrRels,iesp.Constants.BR.MaxRelatives));
 	export dsRelatives := if(count(dsDids(did>0))>0,choosen(relativesSlim,nbrRelsFinal));
 	export dsNeighbors := if(count(dsDids(did>0))>0,choosen(neighborsslim,iesp.Constants.HPR.MAX_Relatives));
-	export dsAssociates := if(count(dsDids(did>0))>0,choosen(associates, iesp.constants.BR.MaxAssociates));
-	export dsHistoricalNeighbors := if(count(dsDids(did>0))>0,choosen(neighbors_historical, iesp.constants.BR.MaxHistoricalNeighborhood));
-	export dsDOD := if(count(dsDids(did>0))>0,project(bestrecs(length(trim(dod,all))>1),transform(iesp.share.t_Date, self := iesp.ECL2ESP.toDatestring8(Left.dod))));
-	shared dsDODBlank := JOIN (dsDids, doxie.key_death_masterV2_DID, 
-											keyed (Left.did = Right.l_did),
-											keep(1),limit(0));
-	shared dsDodBlankVerified := dsDODBlank(dod8='');
-	shared blankDODExists := count(dsDodBlankVerified)>=1 and inputData.IncludeBlankDOD;
-	export DeceasedFlag := if(count(dsDOD)>0 or blankDODExists,true,false);
+	export dsAssociates := if(exists(dsDids(did>0)),choosen(associates, iesp.constants.BR.MaxAssociates));
+	export dsHistoricalNeighbors := if(exists(dsDids(did>0)),choosen(neighbors_historical, iesp.constants.BR.MaxHistoricalNeighborhood));
+	export dsDOD := if(exists(dsDids),project(bestrecs(length(trim(dod,all))>1),transform(iesp.share.t_Date, self := iesp.ECL2ESP.toDatestring8(Left.dod))));
+	 dsDODBlank := dx_death_master.Get.byDid(dsDids,did,death_params);
+	 dsDodBlankVerified := dsDODBlank(death.dod8='');
+	 blankDODExists := exists(dsDodBlankVerified) and inputData.IncludeBlankDOD;
+	export DeceasedFlag := exists (dsDOD )or blankDODExists;
 	export echo := dsDids; 
 end;

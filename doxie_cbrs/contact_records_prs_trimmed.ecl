@@ -1,30 +1,11 @@
-import doxie, ut, DeathV2_Services;
+﻿﻿import DeathV2_Services, doxie, doxie_cbrs, dx_death_master, Suppress, ut;
 
 export contact_records_prs_trimmed(dataset(doxie_cbrs.layout_references) bdids) := 
 MODULE
 
 doxie_cbrs.mac_Selection_Declare()
-deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
-cr := doxie_cbrs.contact_records_standardized(bdids)(Include_AssociatedPeople_val);
-dk := doxie.key_death_masterV2_ssa_DID;
-
-outrec := record
-	cr;
-	boolean has_death_record;
-end;
-
-outrec addd(cr l, dk r) := transform
-	self.has_death_record := r.l_did > 0;
-	self := l;
-end;
-	
-		
-contact_recs := dedup(
-		join(cr, dk, LEFT.did<>0 AND keyed(left.did = right.l_did)
-		and not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams), 
-         addd(left, right), left outer, KEEP (1)),
-		all);
+contact_recs := doxie_cbrs.contact_records_standardized(bdids)(Include_AssociatedPeople_val);
 
 company_title_rec := RECORD
 	contact_recs.company_title;

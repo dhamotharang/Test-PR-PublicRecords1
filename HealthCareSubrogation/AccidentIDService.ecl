@@ -118,7 +118,7 @@ export AccidentIDService :=  MACRO
 		carrier_service_resp := project (apply_restriction_ds,transform(iesp.healthcareaccidentidsearch.t_HealthcareAccidentIDSearchRespData, self.AccidentNumber := left.incident.AccidentNumber; self := left;));
 				
     iesp.healthcareaccidentidsearch.t_HealthcareAccidentIDSearchResponse marshall() := transform	
-		  self._Header                   := IF (isValidOrder,row([],iesp.share.t_ResponseHeader),row({-1,'','','',[]},iesp.share.t_ResponseHeader));
+		  self._Header                   := IF (isValidOrder,row([],iesp.share.t_ResponseHeader),row({-1,'','','',[],[]},iesp.share.t_ResponseHeader));
 			self.InputEcho.vin             := search_by.vin;
 			//not recognizing the namesuffix global
 			self.InputEcho.name            := iesp.ecl2esp.setnameandcompany(search_by.Name.First,search_by.Name.Middle,search_by.Name.Last,search_by.Name.Suffix,search_by.Name.Prefix,search_by.Name.Full,'');

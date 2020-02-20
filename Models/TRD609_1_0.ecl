@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+﻿import Risk_Indicators, RiskWise, RiskWiseFCRA;
 
 export TRD609_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean inCalif) := 
 
@@ -166,11 +166,12 @@ Risk_Indicators.Layout_Output into_layout_output(clam le) := TRANSFORM
 	self := le.iid;
 	self := le.shell_input;
 	self := le;
+	self := [];
 END;
 iid := project(clam, into_layout_output(left));
 
 
-Layout_ModelOut addReasons(Layout_ModelOut le, iid ri) := TRANSFORM
+Models.Layout_ModelOut addReasons(Models.Layout_ModelOut le, iid ri) := TRANSFORM
 	self.ri := if(le.ri[1].hri <> '00', le.ri, RiskWise.mmReasonCodes(ri, 4, OFAC, inCalif));
 	self := le;
 END;

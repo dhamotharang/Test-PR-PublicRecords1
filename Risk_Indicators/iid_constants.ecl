@@ -1,5 +1,5 @@
 ﻿
-IMPORT ut, risk_indicators, header, mdr, suppress, did_add, doxie, fcra, riskwise, STD;
+IMPORT ut, risk_indicators, header, mdr, suppress, did_add, dx_header, fcra, riskwise, STD, data_services;
 
 // line 4 and line 9 are 2 different constants.  one is the date as a string, the other is a date as unsigned value.  
 // to toggle the system date, update both of them to the date you want the system to be.
@@ -154,6 +154,7 @@ export posExactAddrZip5andPrimRange := 9;
 export default_DataRestriction := '0000010001001100000000000'; 
 export posFaresRestriction := 1;
 export posExperianEBR := 3;
+export posFidelityRestriction := 5;
 export posExperianRestriction := 6;
 export posCertegyRestriction := 7;
 export posEquifaxRestriction := 8;
@@ -163,10 +164,14 @@ export posBureauDeceasedRestriction := 13;
 export posExperianFCRARestriction := 14;
 export posExperianPhonesRestriction := 15;
 export posInquiriesRestriction := 16;
+export posInfutorMVRestriction := 17;
+export posInfutorWCRestriction := 18;
 export posRestrictPreGLB := 23; //this is high level check use other code not just this if checking in future
 export posFDNvfRestriction := 25; //FDN Virtual Fraud data
 export posLiensJudgRestriction := 41; //Liens/Judgments 
 export posCortera := 42;
+export IncludeDigitalIdentity:=26;
+export enableEquifaxPhoneMart:=24;
 
 export FDNvf_ok(string DataRestriction) := DataRestriction[posFDNvfRestriction]=sFalse;
 
@@ -318,7 +323,7 @@ export EvictionFltrs := ['FORCIBLE ENTRY/DETAINER', 'FORCIBLE ENTRY/DETAINER REL
 									'FORECLOSURE SATISFIED','DISMISSED FORECLOSURE','FORECLOSURE',
 									'FORCIBLE ENTRY/DETAINER RELEAS','FORECLOSURE PAID'];
 
-export LnJDefault := '11111111';		
+export LnJDefault := '111111111';		
 
 export CreateFullName(string title, string fname, string mname, string lname, string name_suffix) := function
  return (if(trim(title) != '', trim(title) + ' ','') +
@@ -329,7 +334,7 @@ export CreateFullName(string title, string fname, string mname, string lname, st
 end;
 
 export override_addr_type(string street_addr, string addr_type, string carr_rte) := function
-	s := stringlib.stringtouppercase(street_addr);
+	s := STD.Str.touppercase(street_addr);
 	checked_rare_PO := if(
 		REGEXFIND( '^(P[\\s\\.]*[O0BM]?[\\.\\s]*)?((B([O0]X)?)|X)[\\s\\d\\.#]*', s )  // po boxes (abbreviated)
 		OR REGEXFIND( '^POST[\\s\\.]*OFFICE[\\.\\s]*BOX[\\s\\d\\.#]*', s ) // po boxes (spelled out)
@@ -339,7 +344,7 @@ export override_addr_type(string street_addr, string addr_type, string carr_rte)
 end;
 //iid logic with chase pio2 logic
 export override_addr_type_chase(string street_addr_chase, string addr_type_chase) := function
-	s_chase := stringlib.stringtouppercase(street_addr_chase);
+	s_chase := STD.Str.touppercase(street_addr_chase);
 	checked_rare_PO_chase := if(
 		REGEXFIND( '^(P[\\s\\.]*[O0BM]?[\\.\\s]*)?((B([O0]X)?)|X)[\\s\\d\\.#]*', s_chase )  // po boxes (abbreviated)
 		OR REGEXFIND( '^POST[\\s\\.]*OFFICE[\\.\\s]*BOX[\\s\\d\\.#]*', s_chase ) // po boxes (spelled out)
@@ -477,7 +482,7 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 	export unsigned8 AppendFlags (IIDFlag leftFlags, IIDFlag rightFlags) := (leftFlags) + (rightFlags);
 
 	// options to turn on/off in the boca shell
-	export BSOptions := enum(
+	export BSOptions := enum(UNSIGNED8,
 		IncludePreScreen = 1 << 0,
 		IncludeDoNotmail = 1 << 1,
 		IsCapOneBatch    = 1 << 2,
@@ -509,8 +514,16 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		SSNLienFtlr = 1									<< 28,
 		BCBLienFtlr = 1									<< 29,
 		InsuranceFCRABankruptcyException = 1 << 30,
-		InsuranceFCRABankruptcyAllow10Yr = 1 << 31
-		);
+		InsuranceFCRABankruptcyAllow10Yr = 1 << 31,
+		FilterVoter = 1									<< 32,
+		InsuranceFCRASODataFilter    = 1 << 33,
+		RunThreatMetrix= 1          << 34,
+		disablenongovernmentdldata =1 << 35,
+		enableEquifaxPhoneMart   =1 << 36,
+		TurnOffTumblings=1 << 37,  // option to speed up bocashell 5.3 and higher if it's not needed
+	 UseIngestDate=1 << 38, // archive filtering by IngestDate instead of dt_first_seen and vendor date first reported
+    	ReleasedCaseFltr = 1		<< 39
+  );
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);
 
@@ -525,6 +538,7 @@ export FlagLiensOptions(string FilterLienTypes) := function
 	OtherLiens := CheckifFlagged(LiensInput, 6);
 	Judgments := CheckifFlagged(LiensInput, 7);
 	Evictions := CheckifFlagged(LiensInput, 8);
+	ReleasedCases := CheckifFlagged(LiensInput, 9);
 	return (if(CityTaxLiens, BSOptions.CityTaxLien, 0) +
 		if(CountyTaxLiens, BSOptions.CountyTaxLien, 0) +
 		if(StateTaxWarrants, BSOptions.StateTaxWarrant, 0) +
@@ -532,7 +546,8 @@ export FlagLiensOptions(string FilterLienTypes) := function
 		if(FederalTaxLiens, BSOptions.FederalTaxLien, 0) +
 		if(OtherLiens, BSOptions.OtherLien, 0) +
 		if(Judgments, BSOptions.Judgment, 0) +
-		if(Evictions, BSOptions.Eviction, 0)) ;
+		if(Evictions, BSOptions.Eviction, 0) +
+		if(ReleasedCases, BSOptions.ReleasedCaseFltr, 0));
 end;
 
 export GoodSSNLength(string9 inSSN) :=  inSSN != '' and 
@@ -542,7 +557,8 @@ export GoodSSNLength(string9 inSSN) :=  inSSN != '' and
 	// Check to see if a particular BSOption is turned on
 	export boolean CheckBSOptionFlag (BSOptions Flag, UNSIGNED8 Options) := (Options & Flag) > 0;
 	
-	export boolean IsEligibleHeaderRec (doxie.key_fcra_header KeyHeader, boolean dppa_ok) := 
+  key_header := dx_header.key_header(data_services.data_env.iFCRA);
+	export boolean IsEligibleHeaderRec (key_header KeyHeader, boolean dppa_ok) := 
 																		~mdr.Source_is_Utility (KeyHeader.src) AND // rm Utility from NAS
 																		~mdr.Source_is_on_Probation (KeyHeader.src) AND // we won't use probation data 
 																		~(dppa_ok AND KeyHeader.src[2] IN ['E','X']) AND // we won't use experian dl's/vehicles (requires LN branding)
@@ -588,7 +604,9 @@ export GoodSSNLength(string9 inSSN) :=  inSSN != '' and
 													AddressType, 		// 25
 													DropIndicator,	// 26
 													Unit_count,			// 27
-													Mail_usage);		// 28
+													Mail_usage,		// 28
+													title, // 29
+													dod); // 30
 	
 	export unsigned1 capVelocity(unsigned vcounter) := min(255, vcounter);
 											
@@ -1055,7 +1073,7 @@ export Get_chase_NAS_NAP( string chase_f, string chase_l, string chase_addr,  in
 	return Chase_nas_nap;
 end;
 
-export IntendedPurposeCodes(string IntendedPurpose) := case( stringlib.stringtouppercase(IntendedPurpose),
+export IntendedPurposeCodes(string IntendedPurpose) := case( STD.Str.touppercase(IntendedPurpose),
 'APPLICATION' => ['110'],
 'CREDIT TRANSACTION' => ['110'],
 'CREDIT MORTGAGE' => ['110'],
@@ -1152,5 +1170,46 @@ input_ok_fp3 := (in_first<>''and in_last<>''and in_ssn<>'') or (in_streetaddress
 						
 return input_ok_fp3;						
 end;
+
+Export LexidDeceased_Lookup (boolean truedid, string ver_sources, boolean diddeceased):= function
+lexidDecFlag := Map(not truedid => '-1',
+								diddeceased => '1', //check ssa lexid key
+								STD.Str.Find(ver_sources,mdr.sourcetools.src_Death_Master, 1) > 0 => '1', //check header for DE source,  DS sources are converted to DE in iid_getheader
+								'0');	
+return lexidDecFlag;
+end;
+
+Export SSNDeceased_Lookup (boolean truedid, string In_SSN, string decsflag):= function
+
+SSNDecFlag := Map(not truedid or In_SSN='0' => '-1', 
+									decsflag='1' => '1', 
+									'0');
+
+return SSNDecFlag;
+end;
+
+Export inputssnflag_Lookup (string in_ssn, integer in_ssnpop, integer adl_ssn):= function
+
+inputssnflag := map(	
+		in_ssn in ['000000000','111111111','222222222','333333333','444444444','555555555','666666666','777777777','888888888','999999999'] => '0', // set repeating digits as not provided on input
+		in_ssnpop=0 and adl_ssn=1 => '1',
+		length(in_ssn)=4 => '2',
+		in_ssn<>'' and length(in_ssn)=9 => '3', 
+		'0');
+
+return inputssnflag;
+end;
+
+Export minor_reasoncode := 'AM';
+
+EXPORT IOverrideOptions := INTERFACE
+    EXPORT BOOLEAN isCodeDI := FALSE;
+    EXPORT BOOLEAN isCodePO := FALSE;
+    EXPORT BOOLEAN isCodeCL := FALSE;
+    EXPORT BOOLEAN isCodeMI := FALSE;
+    EXPORT BOOLEAN isCodeMS := FALSE;
+    EXPORT BOOLEAN isCode12 := FALSE;
+    EXPORT BOOLEAN isCode72 := FALSE;
+END;
 
 end;

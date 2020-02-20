@@ -1,4 +1,4 @@
-﻿import doxie, address, risk_indicators, iesp, business_risk, models, ut, riskwise, Gateway;
+﻿IMPORT address, risk_indicators, iesp, business_risk, models, ut, riskwise, Gateway, STD;
 export InstantID_Batch_Service_records(dataset(Gateway.Layouts.Config)  gateways_in,
                                  dataset(business_risk.Layout_Input_Moxie_2) df,
 																 boolean hb,
@@ -32,7 +32,11 @@ export InstantID_Batch_Service_records(dataset(Gateway.Layouts.Config)  gateways
 																 string Model_name,
 																 boolean IncludeFraudScores,
 																 boolean IncludeRepAttributes,
-																 string50 DataPermission=Risk_Indicators.iid_constants.default_DataPermission
+																 string50 DataPermission=Risk_Indicators.iid_constants.default_DataPermission,
+                                                                 unsigned1 LexIdSourceOptout = 1,
+                                                                 string TransactionID = '',
+                                                                 string BatchUID = '',
+                                                                 unsigned6 GlobalCompanyId = 0
 																 ) := function																 
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
@@ -49,8 +53,8 @@ gateways := project(gateways_in, gw_switch(left));
 business_risk.layout_input into_in(df L, integer C) := transform
 	self.seq := C;
 	self.account		:= L.acctno;
-	self.company_name 	:= stringlib.stringtouppercase(L.name_company);
-	self.alt_company_name := stringlib.stringtouppercase(L.alt_company_name);
+	self.company_name 	:= STD.Str.toUpperCase(L.name_company);
+	self.alt_company_name := STD.Str.toUpperCase(L.alt_company_name);
 	
 	street_address := risk_indicators.MOD_AddressClean.street_address(l.street_addr, l.prim_range, l.predir, l.prim_name, l.addr_suffix, l.postdir, l.unit_desig, l.sec_range);
 	clean_bus_addr := risk_indicators.MOD_AddressClean.clean_addr( street_address, l.p_City_name, l.St, l.Z5 ) ;	
@@ -81,15 +85,15 @@ business_risk.layout_input into_in(df L, integer C) := transform
 	cleaned_name :=address.CleanPerson73(l.UnParsedFullName);
 	boolean valid_cleaned := l.UnParsedFullName <>'';
 	
-	self.rep_fname :=stringlib.stringtouppercase(if(l.Name_First='' AND valid_cleaned,cleaned_name[6..25],L.Name_First));
-	self.rep_lname :=stringlib.stringtouppercase(if(l.Name_Last='' AND valid_cleaned,cleaned_name[46..65],L.Name_Last));
-	self.rep_mname :=stringlib.stringtouppercase(if(l.Name_Middle='' AND valid_cleaned,cleaned_name[26..45],L.Name_Middle));
-	self.rep_name_suffix :=stringlib.stringtouppercase(if(l.Name_Suffix ='' AND valid_cleaned,cleaned_name[66..70],L.Name_Suffix));	
+	self.rep_fname :=STD.Str.toUpperCase(if(l.Name_First='' AND valid_cleaned,cleaned_name[6..25],L.Name_First));
+	self.rep_lname :=STD.Str.toUpperCase(if(l.Name_Last='' AND valid_cleaned,cleaned_name[46..65],L.Name_Last));
+	self.rep_mname :=STD.Str.toUpperCase(if(l.Name_Middle='' AND valid_cleaned,cleaned_name[26..45],L.Name_Middle));
+	self.rep_name_suffix :=STD.Str.toUpperCase(if(l.Name_Suffix ='' AND valid_cleaned,cleaned_name[66..70],L.Name_Suffix));	
 		
-	self.rep_alt_lname	:= stringlib.stringtouppercase(L.name_last_alt);
+	self.rep_alt_lname	:= STD.Str.toUpperCase(L.name_last_alt);
 	self.rep_ssn		:= L.ssn;
 	self.rep_dob		:= L.dob;
-	self.rep_age := if ((integer)l.dob != 0, (STRING3)ut.GetAgeI((integer)l.dob), '');
+	self.rep_age := if ((integer)l.dob != 0, (STRING3)ut.Age((integer)l.dob), '');
 	self.rep_phone		:= L.phone_2;
 
 	street_address2 := risk_indicators.MOD_AddressClean.street_address(l.street_addr2, l.prim_range_2, l.predir_2, l.prim_name_2, l.addr_suffix_2, l.postdir_2, l.unit_desig_2, l.sec_range_2);
@@ -105,8 +109,8 @@ business_risk.layout_input into_in(df L, integer C) := transform
 	self.rep_p_city_name := clean_rep_addr[65..89];
 	self.rep_st		:= clean_rep_addr[115..116];
 	self.rep_z5		:= clean_rep_addr[117..121];
-	self.rep_orig_city 	:= stringlib.stringtouppercase(L.p_city_name_2);
-	self.rep_orig_st	:=  stringlib.stringtouppercase(l.st_2);
+	self.rep_orig_city 	:= STD.Str.toUpperCase(L.p_city_name_2);
+	self.rep_orig_st	:=  STD.Str.toUpperCase(l.st_2);
 	self.rep_orig_z5	:=  l.z5_2;
 	self.rep_zip4		:= clean_rep_addr[122..125];
 	self.rep_lat		:= clean_rep_addr[146..155];
@@ -116,11 +120,11 @@ business_risk.layout_input into_in(df L, integer C) := transform
 	self.rep_county := clean_rep_addr[143..145];
 	self.rep_geo_blk := clean_rep_addr[171..177];
 	
-	dl_num := stringlib.stringFilterOut(L.dl_number,'-');
-	dl_num2 := stringlib.stringFilterOut(dl_num,' ');
+	dl_num := STD.Str.FilterOut(L.dl_number,'-');
+	dl_num2 := STD.Str.FilterOut(dl_num,' ');
 	
-	self.rep_dl_num	:= stringlib.stringtouppercase(dl_num2);
-	self.rep_dl_state	:= stringlib.stringtouppercase(L.dl_state);
+	self.rep_dl_num	:= STD.Str.toUpperCase(dl_num2);
+	self.rep_dl_state	:= STD.Str.toUpperCase(L.dl_state);
 	self.rep_email := l.rep_email;
 	
 	self.historydate := if(l.HistoryDateYYYYMM=0, risk_indicators.iid_constants.default_history_date, l.HistoryDateYYYYMM);
@@ -138,7 +142,10 @@ AppendBest := 1;
 biid := business_risk.InstantID_Function(df2,gateways,hb,dppa,glb,isUtility,ln_branded_value,tribcode,ExcludeWatchLists, 
 																			ofac_only,ofac_version,include_ofac,include_additional_watchlists,Global_WatchList_Threshold,dob_radius_use,
 																			IsPOBoxCompliant, bsversion, exactMatchLevel, DataRestriction, IncludeMSoverride, IncludeDLverification, watchlists_request,
-																			AppendBest, IncludeRepAttributes, false, DataPermission);
+																			AppendBest, IncludeRepAttributes, false, DataPermission, LexIdSourceOptout := LexIdSourceOptout, 
+                                                                            TransactionID := TransactionID, 
+                                                                            BatchUID := BatchUID, 
+                                                                            GlobalCompanyID := GlobalCompanyID);
 
 // this code is all to append the fraud scores if the boolean IncludeFraudScores is set to true
 	risk_indicators.layout_input into(df2 l) := transform
@@ -209,10 +216,18 @@ string10 CustomDataFilter:='';
 										suppressNearDups, require2ele, fromBiid, isFCRA, ExcludeWatchlists, from_IT1O, 
 										ofac_version, include_ofac, include_additional_watchlists, Global_WatchList_Threshold, 
 										dob_radius_use, bsversion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowcellphones,
-										exactMatchLevel,DataRestriction,CustomDataFilter, IncludeDLverification, watchlists_request, in_DataPermission:=DataPermission);
+										exactMatchLevel,DataRestriction,CustomDataFilter, IncludeDLverification, watchlists_request, in_DataPermission:=DataPermission,
+                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                        TransactionID := TransactionID, 
+                                        BatchUID := BatchUID, 
+                                        GlobalCompanyID := GlobalCompanyID);
 										
 	
-	clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA, GLB, isUtility, ln_branded_value, true, false, false, true, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
+	clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA, GLB, isUtility, ln_branded_value, true, false, false, true, DataRestriction:=DataRestriction, DataPermission:=DataPermission,
+                                                                                  LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                  TransactionID := TransactionID, 
+                                                                                  BatchUID := BatchUID, 
+                                                                                  GlobalCompanyID := GlobalCompanyID);
 
 	riskwise.Layout_BusReasons_Input into_orig_input(biid l) := transform
 		self.seq := l.seq;
@@ -226,8 +241,8 @@ string10 CustomDataFilter:='';
 		self.orig_wphone := l.phone10;
 		self.telcoPhoneType := l.TelcordiaPhoneType;
 		
-		bans_current := if(((integer)(ut.GetDate[1..6]) - (integer)(l.RecentBkDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
-		lien_current := if(((integer)(ut.GetDate[1..6]) - (integer)(l.RecentLienDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
+		bans_current := if(((integer)((STRING8)STD.Date.Today()[1..6]) - (integer)(l.RecentBkDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
+		lien_current := if(((integer)((STRING8)STD.Date.Today()[1..6]) - (integer)(l.RecentLienDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
 		self.cmpy_bans :=  map(l.fein='' or (l.company_name='' and addr1='') => '3',
 												  l.bkbdidflag and l.lienbdidflag and bans_current and lien_current => '5',
 												  l.bkbdidflag and bans_current => '2', 

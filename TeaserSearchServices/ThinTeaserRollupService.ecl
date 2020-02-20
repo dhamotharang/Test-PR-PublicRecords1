@@ -40,7 +40,7 @@
 */
 /*--INFO-- Special Thin teaser extended search (originally developed for Intelius) cloned from the ThinTeaserService.
 */
-import iesp, AutoStandardI, ut, doxie, Royalty;
+import iesp, AutoStandardI, doxie, Royalty;
 export ThinTeaserRollupService := MACRO
 	
   rec_in := iesp.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchRequest;
@@ -114,8 +114,13 @@ export ThinTeaserRollupService := MACRO
 	// so thus below logic in next 2 lines is coded to flip the value of this boolean
 	// IF its passed in from ESP to roxie.  Defaults to False which means to Mask in roxie output
 	boolean InFROMESP_DtcPhoneAddressTeaserMask := false : stored('DtcPhoneAddressTeaserMask');
-  boolean In_DtcPhoneAddressTeaserMask := NOT(InFROMESP_DtcPhoneAddressTeaserMask);
+     boolean In_DtcPhoneAddressTeaserMask := NOT(InFROMESP_DtcPhoneAddressTeaserMask);
+	
+	 #stored ('SortAgeRange', search_options.SortAgeRange);
+       boolean in_SortAgeRange := false : stored('SortAgeRange');
+	
 	input_params := AutoStandardI.GlobalModule();
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (input_params);
 	tempmod := module(project(input_params,TeaserSearchServices.Search_Records.params,opt))
 		export IncludeAllAddresses := in_IncludeAllAddresses;
 		export IncludeFullHistory := IF(IncludeAllAddresses, true, in_IncludeFullHistory);
@@ -130,6 +135,7 @@ export ThinTeaserRollupService := MACRO
 		export RelaxedMiddleNameMatch := in_RelaxedMiddleNameMatch;
 		export AlwaysReturnRecords := in_AlwaysReturnRecords;
 		export applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
+		export SortAgeRange := in_SortAgeRange;
 	end;
 	
 	tempresults := TeaserSearchServices.Search_Records.val(tempmod);
@@ -169,7 +175,6 @@ export ThinTeaserRollupService := MACRO
 	// output(w_addition_data_counts, named('w_addition_data_counts'));
 	//output(dtcCounts, named('dtcCounts'));
 	output(results, named('Results'));
-	
 	// Generate Royalty Billing information if this is ForceLogging event
 	Royalty.MAC_RoyaltyTeaser(getExtendedFakeAddress, royalties, lastID);
 	if(forceLogging, output(royalties, named('RoyaltySet')));

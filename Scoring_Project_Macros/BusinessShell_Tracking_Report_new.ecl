@@ -96,7 +96,7 @@ ds_results := ds_results2(field <> 'time_ms');
 		 final := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.business_reports, 'BusinessShell Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
 		 // final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com;' , 'Business Shell Cert Attributes Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
 	
-									FAILURE(FileServices.SendEmail('Isabel.ma@lexisnexisrisk.com','Business Shell Cert Tracking job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+									FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Bocashell_collections_fail_list,'Business Shell Cert Tracking job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
 
 		RETURN final;
 END;	

@@ -1,15 +1,16 @@
-import RelationshipIdentifier_Services,  doxie_crs, doxie_raw,
+﻿import RelationshipIdentifier_Services,  doxie_crs, doxie_raw,
 doxie, Batchshare, ut, iesp, bipv2, TopBusiness_Services, 
 Relationship, header, BIPV2_Best, Suppress, STD;
+
 EXPORT BatchReport_Records(  
 	dataset( RelationshipIdentifier_Services.Layouts.Batch.intermediateLayoutExt) ds_batchReportInRecs,
-	RelationshipIdentifier_Services.iParam.BatchParams inMod	
+	RelationshipIdentifier_Services.iParam.BatchParams inMod
 	) := FUNCTION
 	
-	dppa_ok := ut.dppa_ok(inMod.dppaPurpose); 
-  glb_ok := ut.glb_ok(InMod.glbPurpose);
 	DRM := InMod.DataRestrictionMask;
-		
+	dppa_ok := inMod.isValidDppa();
+  glb_ok := inMod.isValidGlb();
+  
 	integer CurDate := STD.Date.today();
 	unsigned4 endDateTmp := (unsigned4) inMod.EndDate;	
 	unsigned4 endDate := if (endDateTmp = 0, (unsigned4) curDate, endDateTmp);
@@ -30,8 +31,8 @@ EXPORT BatchReport_Records(
 	     SELF.did := LEFT.DID));
 	
 	neighbor_results := doxie_crs.NeighBorRecords(neighborsbaseline,
-	                                     inMod.dppaPurpose, 
-																			 inMod.glbPurpose,
+	                                     inMod.dppa, 
+																			 inMod.glb,
 																			 inmod.DataRestrictionMask,
 																			 inMod.ssn_mask);
 		
@@ -93,7 +94,7 @@ EXPORT BatchReport_Records(
 	AssociateFlag := TRUE;
 	AllFlag := TRUE; // getting all relationship types
 									 
-	DS_relationships := Relationship.proc_GetRelationship(ds_Batchinput_didsForRelationshipKey,
+	DS_relationships_Neutral := Relationship.proc_GetRelationshipNeutral(ds_Batchinput_didsForRelationshipKey,
                                   RelativeFlag,
 																	AssociateFlag,
 																	AllFlag,
@@ -115,7 +116,8 @@ EXPORT BatchReport_Records(
 																	,
 																	//Relationship.Layout_GetRelationship.TransactionalFlags_layout txflag = notx
 																	).Result;
-	 															
+	DS_relationships:= Relationship.functions_getRelationship.convertNeutralToFlat_new(DS_relationships_Neutral);
+
 // KEEP This documentation notes
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DS_relationships DOCS: DID1 is original did input and DID2 is the result did if a relationship exists. /
@@ -130,7 +132,7 @@ dsrelativesDids := 	PROJECT(DS_relationships(TYPE = RelationshipIdentifier_Servi
 													));
 // 2nd pass only get relatives
 
-ds_2ndDegreeRelatives := Relationship.proc_GetRelationship(dsrelativesDiDs,
+ds_2ndDegreeRelatives := Relationship.proc_GetRelationshipNeutral(dsrelativesDiDs,
                                   TRUE, // relative Flag
 																	TRUE, // associate flag
 																	FALSE, // all flag
@@ -758,7 +760,7 @@ ds_norm_final := tmpds_norm_final(PrimaryEntity < SecondaryEntity);
 ds_Results := PROJECT(ds_norm_final, TRANSFORM(Final, SELF := LEFT));
 
 ssnMaskVal := inmod.ssn_mask;
-application_type_value := inmod.applicationType;
+application_type_value := inmod.application_type;
 
 // DO suppression here
  // ********** do suppression of SSN. 
@@ -812,3 +814,4 @@ application_type_value := inmod.applicationType;
 	return(ds_ResultsFinal);
 	
 	END;
+  

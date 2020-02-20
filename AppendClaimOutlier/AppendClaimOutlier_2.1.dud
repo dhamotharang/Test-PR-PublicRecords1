@@ -486,6 +486,15 @@ OUTPUTS
 		STRING10  ClaimCount;
 		STRING25  HistKey;
 	END
+
+	DATASET PerStats:PREFIX(INPUTS.Prefix),SIDE, WUID 
+		STRING  FieldName;
+	        INTEGER FieldPercent;
+	END 
+END
+
+VISUALIZE ClaimOutlierStats:LABEL("Claim Outlier Append Stats")
+    TABLE FieldPopulationPercentage(PerStats{FieldName, FieldPercent}) : VALUE (FieldName, FieldPercent), LABEL("FieldName", "FieldPercentage");	
 END
 
 GENERATES INLINE
@@ -1467,6 +1476,11 @@ GENERATES INLINE
 	CombinedHistoryDs :=  TreatingDeceasedPatientDs + TreatingPatientLivingAtSameAddressDs + FlaggedDistanceDs + ProviderAddressMatchesWithPatientDs + SingleAddressDs;
 
 	%^edsHistorical% := CombinedHistoryDs %^p%;
+
+
+	 IMPORT HealthCare;
+	 PercentageResults := HealthCare.Mac_Field_Percentage (%dsOutput%, '%Prefix%');
+	 %^ePerStats% := TABLE (PercentageResults,{%Prefix%FieldName, %Prefix%FieldPercent}); 
 
 ENDGENERATES
 

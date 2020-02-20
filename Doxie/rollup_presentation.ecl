@@ -75,7 +75,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
     SELF := le;
   END;
 
-  nondidHBR := doxie.header_base_rollup(with_risk((INTEGER)did=0));
+  nondidHBR := doxie.header_base_rollup(with_risk((INTEGER)did=0), mod_access);
 
   doxie.Layout_Rollup.KeyRec nondidFormat(nondidHBR le) := TRANSFORM
     SELF.nameRecs := PROJECT(le,noDidNames(LEFT));
@@ -561,7 +561,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
   END;
 
   whichRids := join(tagrp, ta2, LEFT.did = RIGHT.did, getRids(LEFT));
-  srcRids := doxie.lookup_rid_src(dedup(sort(whichRids,record),record));
+  srcRids := doxie.lookup_rid_src(dedup(sort(whichRids,record),record), mod_access);
 
   mod_access_local := MODULE (mod_access)
     EXPORT unsigned1 glb := 1;
@@ -615,7 +615,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
   proj4 := if(reduced_data_value, proj3, proj4_orig);
 
   l_dids := get_dids(noFail := true);
-  morePhones := IF(count(l_dids)<100,doxie.Add_Phones(l_dids,doxie.relative_dids(l_dids),dial_bouncedistance_value));
+  morePhones := IF(count(l_dids)<100,doxie.Add_Phones(l_dids,doxie.relative_dids(l_dids),mod_access,dial_bouncedistance_value));
 
   ta2 addBounce(ta2 le, morePhones ri) := TRANSFORM
     SELF.WorkPhones := CHOOSEN(ri.WorkPhones, doxie.rollup_limits.phones);

@@ -59,6 +59,8 @@
 </pre>
 */
 
+IMPORT ConsumerProfile_Services, Gateway, iesp, Inquiry_AccLogs, Risk_Indicators, Risk_Reporting, STD;
+
 EXPORT ReportServiceFCRA := MACRO
 		rec_in := iesp.fcraconsumerprofilereport.t_FCRAConsumerProfileReportRequest;
 		ds_in := DATASET ([], rec_in) : STORED ('FCRAConsumerProfileReportRequest', FEW);
@@ -76,7 +78,37 @@ EXPORT ReportServiceFCRA := MACRO
 		drm_mod := module (project(global_mod,AutoStandardI.DataRestrictionI.params))
 			export string datarestrictionmask := risk_indicators.iid_constants.default_DataRestriction : STORED('DataRestrictionMask');
 		end;
-		
+    
+    /* **********************************************
+			 *  Fields needed for improved Scout Logging  *
+			 **********************************************/
+			string32 _LoginID               := ''	: STORED('_LoginID');
+			outofbandCompanyID							:= '' : STORED('_CompanyID');
+			string20 CompanyID              := if(first_row.User.CompanyId != '', first_row.User.CompanyId, outofbandCompanyID);
+			string20 FunctionName           := '' : STORED('_LogFunctionName');
+			string50 ESPMethod              := '' : STORED('_ESPMethodName');
+			string10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
+			string5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
+			string5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
+			outofbandssnmask                := '' : STORED('SSNMask');
+			string10 SSN_Mask               := if(first_row.User.SSNMask != '', first_row.User.SSNMask, outofbandssnmask);
+			string10 DOB_Mask               := if(first_row.User.DOBMask != '', first_row.User.DOBMask, global_mod.dobmask);
+			BOOLEAN DL_Mask                 := first_row.User.DLMask;
+			BOOLEAN ExcludeDMVPII           := first_row.User.ExcludeDMVPII;
+			BOOLEAN DisableOutcomeTracking  := False : STORED('OutcomeTrackingOptOut');
+			BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
+			unsigned1 LexIdSourceOptout 		:= 1  : STORED('LexIdSourceOptout');
+			string TransactionID 						:= '' : STORED('_TransactionId');
+			string BatchUID 								:= '' : STORED('_BatchUID');
+			unsigned6 GlobalCompanyId			  := 0  : STORED('_GCID');
+      
+      BOOLEAN outofband_TestDataEnabled := false : STORED('testdataenabled');
+      BOOLEAN _TestData_Enabled := first_row.User.TestDataEnabled or outofband_TestDataEnabled;
+      
+			//Look up the industry by the company ID.
+			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(TRUE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.ConsumerProfile_Services__ReportServiceFCRA);
+		/* ************* End Scout Fields **************/
+    
 		// options 
 		ConsumerProfile_mod := module (ConsumerProfile_Services.IParam.options)
 			export boolean is_california   := first_row.Options.CAInPersonApplication;
@@ -84,7 +116,7 @@ EXPORT ReportServiceFCRA := MACRO
 			export string intended_purpose := first_row.Options.IntendedPurpose;
 			export boolean test_data_enabled := false : STORED('TestDataEnabled');
 			string TestDataTableName := '' : STORED('TestDataTableName');
-			export string test_data_table_name := stringlib.stringtouppercase(TestDataTableName);
+			export string test_data_table_name := STD.STR.ToUpperCase(TestDataTableName);
 			export integer1 BS_version := 41;
 			export string5 industry_class := '' : STORED('IndustryClass');
 			string6 DOBMask := '' : STORED('DOBMask');
@@ -108,4 +140,54 @@ EXPORT ReportServiceFCRA := MACRO
 		royalty := rec_out[1].royalty;
 		output(results, named('Results'));
 		if(not ConsumerProfile_mod.isECHRestricted, output(royalty, named ('RoyaltySet')));
+    
+    
+    //Improved Scout Logging
+		Deltabase_Logging_prep := project(results, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
+                                                  self.company_id := (Integer)CompanyID,
+                                                  self.login_id := _LoginID,
+                                                  self.product_id := Risk_Reporting.ProductID.ConsumerProfile_Services__ReportServiceFCRA,
+                                                  self.function_name := FunctionName,
+                                                  self.esp_method := ESPMethod,
+                                                  self.interface_version := InterfaceVersion,
+                                                  self.delivery_method := DeliveryMethod,
+                                                  self.date_added := (STRING8)Std.Date.Today(),
+                                                  self.death_master_purpose := DeathMasterPurpose,
+                                                  self.ssn_mask := SSN_Mask,
+                                                  self.dob_mask := DOB_Mask,
+                                                  self.dl_mask := (String)(Integer)DL_Mask,
+                                                  self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
+                                                  self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
+                                                  self.archive_opt_in := (String)(Integer)ArchiveOptIn,
+                                                  self.glb := (Integer)first_row.User.GLBPurpose,
+                                                  self.dppa := (Integer)first_row.User.DLPurpose,
+                                                  self.data_restriction_mask := first_row.User.DataRestrictionMask,
+                                                  self.data_permission_mask := first_row.User.DataPermissionMask,
+                                                  self.industry := Industry_Search[1].Industry,
+                                                  //self.i_attributes_name := Attributes_Requested[1].AttributeGroup,
+                                                  self.i_ssn := first_row.ReportBy.SSN,
+                                                  tmpDOB := iesp.ECL2ESP.DateToString(first_row.ReportBy.DOB);
+                                                  self.i_dob := IF(tmpDOB = '00000000', '', tmpDOB);
+                                                  self.i_name_full := first_row.ReportBy.Name.Full,
+                                                  self.i_name_first := first_row.ReportBy.Name.First,
+                                                  self.i_name_last := first_row.ReportBy.Name.Last,
+                                                  self.i_lexid := (Integer)first_row.ReportBy.UniqueId,
+                                                  self.i_address := If(trim(first_row.ReportBy.address.streetaddress1)!='',
+                                                                        trim(first_row.ReportBy.address.streetaddress1 + ' ' + first_row.ReportBy.address.streetaddress2),
+                                                                        Address.Addr1FromComponents(first_row.ReportBy.address.streetnumber,
+                                                                        first_row.ReportBy.address.streetpredirection, first_row.ReportBy.address.streetname,
+                                                                        first_row.ReportBy.address.streetsuffix, first_row.ReportBy.address.streetpostdirection,
+                                                                        first_row.ReportBy.address.unitdesignation, first_row.ReportBy.address.unitnumber)),
+                                                  self.i_city := first_row.ReportBy.address.City,
+                                                  self.i_state := first_row.ReportBy.address.State,
+                                                  self.i_zip := first_row.ReportBy.address.Zip5,
+                                                  self.i_home_phone := first_row.ReportBy.Phone10,
+                                                  self.o_lexid := (Integer)left.Consumer.Lexid,
+                                                  self := left,
+                                                  self := [] ));
+		Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
+
+		//Log to Deltabase
+		IF(~DisableOutcomeTracking and NOT _TestData_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
+
 ENDMACRO;

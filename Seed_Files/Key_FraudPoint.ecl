@@ -1,9 +1,9 @@
-import data_services;
+﻿import data_services, Seed_Files;
 
-d :=  file_FraudPoint;
+d :=  Seed_Files.file_FraudPoint;
 
 newrec := record
-	data16 hashvalue := Hash_InstantID(d.fname, d.lname, d.ssn, '', d.zip, d.hphone, '');
+	data16 hashvalue := Seed_Files.Hash_InstantID(d.fname, d.lname, d.ssn, '', d.zip, d.hphone, '');
 	d;
 end;
 newtable := table(d, newrec);

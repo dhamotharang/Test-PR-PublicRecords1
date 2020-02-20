@@ -13,7 +13,7 @@
 */
 /*--INFO-- 'ex01','ex04','ex05','ex11','ex12','ex39','ex40','ex73','ex90','ex91','ex94','ex95','sc51','2x01' */
 
-import Address, Risk_Indicators, gateway;
+IMPORT Risk_Indicators, gateway, Riskwise, STD;
 
 export SC1O_Batch_Service := MACRO
 
@@ -31,9 +31,15 @@ unsigned3 history_date := 999999  							: stored('HistoryDateYYYYMM');
 batchin := dataset([],riskwise.Layout_SD1I_BatchIn)			: stored('batch_in',few);
 unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
-tribcode := StringLib.StringToLowerCase(tribcode_value);
+tribcode := STD.Str.ToLowerCase(tribcode_value);
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 productSet := ['ex01','ex04','ex05','ex11','ex12','ex39','ex40','ex73','ex90','ex91','ex94','ex95','sc51','2x01'];
 
@@ -121,7 +127,11 @@ end;
 f := project(batchin, addseq(LEFT,COUNTER));
 
 almost_final := RiskWise.SC1O_Function(f, gateways, glb, dppa, tribCode, ofac_version, include_ofac, include_additional_watchlists, 
-                                       global_watchlist_threshold, datarestriction, datapermission);
+                                       global_watchlist_threshold, datarestriction, datapermission, 
+                                       LexIdSourceOptout := LexIdSourceOptout, 
+                                       TransactionID := TransactionID, 
+                                       BatchUID := BatchUID, 
+                                       GlobalCompanyID := GlobalCompanyID);
 final := project(almost_final, RiskWise.Layout_SC1O);
 
 ret := if(tribCode in productSet, final, dataset([],RiskWise.Layout_SC1O));

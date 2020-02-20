@@ -42,7 +42,7 @@
 </message>
 */
  
-EXPORT Header_xlinking_Service := MACRO
+EXPORT Header_xlinking_Service() := MACRO
   #WEBSERVICE(FIELDS(
 	'SNAME', 'FNAME', 'MNAME', 'LNAME', 'NAME', 'DERIVED_GENDER',
 	'ADDRESS1', 'ADDRESS2', 'PRIM_RANGE', 'PRIM_NAME', 'SEC_RANGE', 'CITY',
@@ -60,7 +60,7 @@ EXPORT Header_xlinking_Service := MACRO
 	'<li>RID<br/><li>SRC,SOURCE_RID,FNAME,DOB,CITY,DERIVED_GENDER,SNAME</li></ul>'),
 	DESCRIPTION('<p>SALT V3.7</p>' + 
 	'<p>By default all records of all clusters where the CLUSTER matches the field will be returned. To force a single record to match use MatchAllInOneRecord. To only return matching records use RecordsOnly.</p>'));/*FIELDS HACK*/	
-  IMPORT SALT37,InsuranceHeader_xLink;
+  IMPORT SALT37,InsuranceHeader_xLink,InsuranceHeader_PostProcess;
 	
 	STRING Input_NAME := '' : STORED('NAME');
 	clean_n := address.CleanPersonFML73(Input_NAME);
@@ -161,9 +161,8 @@ EXPORT Header_xlinking_Service := MACRO
  
  pm := InsuranceHeader_xLink.MEOW_xIDL(Input_Data); // This module performs regular xDID functions
 	ds1 := pm.Raw_Results; 
-	KeyLayout := recordof(InsuranceHeader_xLink.Key_InsuranceHeader_DID);
-	resultsLayout := InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch;
-	segKey := InsuranceHeader_PostProcess.segmentation_keys.key_did_ind;
+	KeyLayout := recordof(InsuranceHeader_xLink.Key_InsuranceHeader_DID) - [global_sid, record_sid];
+	resultsLayout := InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch;	
 	resTrimLayout := record
 		ds1.uniqueid,
 		ds1.results.weight,
@@ -172,6 +171,7 @@ EXPORT Header_xlinking_Service := MACRO
 		ds1.results.did,
 		ds1.results.rid,
 		STRING Segmentation;
+		STRING LexId_Type;
 		STRING KeysUsedDesc;
 		STRING KeysFailedDesc;
 	end;
@@ -184,8 +184,8 @@ EXPORT Header_xlinking_Service := MACRO
 	END;
 	
 	ds1Norm := Normalize(ds1, left.results, xResultsChildren(right));
-		
-	ds1Did := dataset([{Input_UniqueID, 0, 0, 0, e_DID, 0, segKey(DID=e_DID)[1].ind, '', ''}] , resTrimLayout);
+	
+	ds1Did := dataset([{Input_UniqueID, 0, 0, 0, e_DID, 0, '', '', '', ''}] , resTrimLayout);
 	didBatchLayout := {unsigned6 uid, unsigned8 did};
 	
 	dsNorm := IF(e_DID>0, ds1Did, ds1Norm);
@@ -196,15 +196,14 @@ EXPORT Header_xlinking_Service := MACRO
  allRecs := IDLExternalLinking.did_getAllRecs_batch(didRes, did, uid);
  finalLayout := {resTrimLayout AND NOT [did,rid], keyLayout};
  finalRes1 := join(dsNorm, allRecs, left.did=right.inputDid, transform(finalLayout, 
+   self.did := right.did,
 	 self.rid := right.rid,
+	 self.s_did := if(right.s_did=0, right.did, right.s_did);
 		self := left, 
-		self := right));
+		self := right),left outer);
 		
-		//assign segmenation to the records
-		finalRes := JOIN(finalRes1, segKey, LEFT.s_did=RIGHT.did, TRANSFORM(finalLayout, 
-				SELF.segmentation := RIGHT.ind,
-				SELF := LEFT), LEFT OUTER, KEEP(10000), LIMIT(0));
-			
+	finalRes := InsuranceHeader_PostProcess.mod_segmentation.appendIndicatorType(finalRes1, s_did, segmentation, LexID_type);
+
   FieldNumber(SALT37.StrType fn) := CASE(fn,'NAME_SUFFIX' => 1,'FNAME' => 2,'MNAME' => 3,'LNAME' => 4, 
 			'PRIM_RANGE' => 5,'PRIM_NAME' => 6,'SEC_RANGE' => 7,'CITY_NAME' => 8,'ST' => 9,'ZIP' => 10,
 			'SSN' => 11,'DOB' => 12,'PHONE' => 13,'RID' => 14,'DT_FIRST_SEEN' => 15,'DT_LAST_SEEN' => 16,31);
@@ -228,6 +227,11 @@ EXPORT Header_xlinking_Service := MACRO
 					SORT(finalRes,-weight,DID,RECORD));
 	recCount := {integer Total_Records};
 	output(DATASET([{count(result)}], recCount),named('RecordCount'));
+	// output(input_data, named('input_data'));
+	// output(ds1, named('ds1'));
+	// output(dsNorm, named('dsNorm'));
+	// output(allRecs, named('allRecs'));
+	// output(finalRes, named('finalRes'));
 	// OUTPUT(SORT(RESULT, -WEIGHT, DID, LNAME, RECORD), NAMED('LNAMESORT'));
 	// OUTPUT(Input_SortBy, NAMED('Input_SortBy'));
 	// OUTPUT(FieldNumber(Input_SortBy), NAMED('FIELDNUMBER'));	

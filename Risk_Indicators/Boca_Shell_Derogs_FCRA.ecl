@@ -1,10 +1,16 @@
-﻿import FCRA, Risk_Indicators, RiskView, ut;
+﻿import FCRA, Risk_Indicators, RiskView, ut, _Control, iesp;
+
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Derogs_FCRA (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, 
 	integer bsVersion, unsigned8 BSOptions=0, 
 	boolean IncludeLnJ = false,
 	GROUPED DATASET (risk_indicators.Layout_output) iid_withPersonContext,
-	integer2 ReportingPeriod = 84) := function
+	integer2 ReportingPeriod = 84,
+	unsigned6 MinimumAmount = 0,
+	dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
+	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem)
+	) := function
 
   todaysdate := (string) risk_indicators.iid_constants.todaydate;
 
@@ -16,7 +22,7 @@ export Boca_Shell_Derogs_FCRA (GROUPED DATASET(risk_indicators.layouts.layout_de
 		
 		// date_filed on the override search file isn't populated (bug 58380), so we need to look at the main file to check the date
 		// if bug 58380 gets fixed, we can simply do one lookup of the search file to get everything we need to count bankruptcies
-		bk_corr_main := PROJECT(CHOOSEN(fcra.key_override_bkv3_main_ffid(keyed(flag_file_id IN le.bankrupt_correct_ffid)),100),
+		bk_corr_main := PROJECT(CHOOSEN(fcra.key_override_bkv3_main_ffid(keyed(flag_file_id IN le.bankrupt_correct_ffid)),100), 
 													transform(fcra.Layout_Override_bk_filing, 
 													self.date_filed := left.date_filed;
 													self := left;
@@ -110,7 +116,14 @@ export Boca_Shell_Derogs_FCRA (GROUPED DATASET(risk_indicators.layouts.layout_de
 		SELF := le;
 		SELF := [];
 	END;
-	w_corrections := nofold(PROJECT (ids, fetch_corrections(LEFT)));
+	w_corrections_roxie := nofold(PROJECT (ids, fetch_corrections(LEFT)));
+	w_corrections_thor := nofold(PROJECT (ids, transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus, self := left, self := [])));  // work around this issue on Thor for now
+
+#IF(onThor)
+	w_corrections := w_corrections_thor;
+#ELSE
+	w_corrections := w_corrections_roxie;
+#END
 
 //new
 	Bankruptcy := Risk_Indicators.Boca_Shell_Bankruptcy_FCRA(bsVersion, BSOptions, w_corrections); 
@@ -121,7 +134,7 @@ export Boca_Shell_Derogs_FCRA (GROUPED DATASET(risk_indicators.layouts.layout_de
 	BankLiensCrimSO := Risk_Indicators.Boca_Shell_SO_FCRA(bsVersion, BSOptions, BankLiensCrim); 
 
 	BankLiensCrimSO_LNJ :=	Risk_Indicators.Boca_Shell_Liens_LnJ_FCRA(bsVersion, BSOptions, w_corrections, 
-		IncludeLnJ, iid_withPersonContext, ReportingPeriod);								
+		IncludeLnJ, iid_withPersonContext, ReportingPeriod, MinimumAmount, ExcludeStates, ExcludeReportingSources);								
 	DerogsLNJ := JOIN(BankLiensCrimSO, BankLiensCrimSO_LNJ,
 					LEFT.Did = Right.Did,
 					RiskView.Transforms.GetLnJInfo(LEFT, RIGHT),

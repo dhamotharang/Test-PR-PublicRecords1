@@ -1,4 +1,4 @@
-import ut, doxie, NID,AutoHeaderV2,lib_stringlib;
+import ut, dx_header, NID, AutoHeaderV2, lib_stringlib;
 
 export dataset (AutoheaderV2.layouts.search_out) fetch_DOBName (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
 
@@ -21,7 +21,7 @@ export dataset (AutoheaderV2.layouts.search_out) fetch_DOBName (dataset (Autohea
 	temp_allowFuzzyDOBMatch := _row.tdob.fuzzy_dob;
 	temp_state_value := _row.taddress.state;
 
-	i := doxie.Key_Header_DOBName;
+	i := dx_header.key_DOBName();
 
   // more precise boundaries -- based on today's date (year stays the same)
 	unsigned8 todays_date := (unsigned8)Stringlib.getDateYYYYMMDD();

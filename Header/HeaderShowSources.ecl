@@ -1,6 +1,6 @@
 ﻿import doxie, Doxie_Raw, Doxie_crs, suppress, ut, mdr, watercraft, 
        census_data, DEAV2_Services, DeathV2_Services,
-       Property, VotersV2_services, Header, faa;
+       Property, VotersV2_services, Header, dx_header, faa;
 
 export HeaderShowSources(
     dataset(Doxie.Layout_ref_rid) rid_data,
@@ -13,8 +13,8 @@ export HeaderShowSources(
 boolean glb_ok := mod_access.isValidGLB();
 boolean dppa_ok := mod_access.isValidDPPA();
 
-key_hdr_rid  := doxie.Key_Header_Rid(false,false);
-key_qhdr_rid := doxie.Key_Header_Rid(true,false);
+key_hdr_rid  := dx_header.key_rid( , false, false);
+key_qhdr_rid := dx_header.key_rid( , true, false);
 
 //Get only RIDs with correct permissions
 key_data_rec := record
@@ -23,6 +23,8 @@ key_data_rec := record
   unsigned6 first_seen;
   unsigned3 dt_nonglb_last_seen;
   Header.Layout_Source_ID;
+  unsigned4 global_sid;
+  unsigned8 record_sid; 
 end;
 
 key_data_rec  loadit(Doxie.Layout_ref_rid l, recordof(key_hdr_rid) r) := transform
@@ -30,6 +32,7 @@ key_data_rec  loadit(Doxie.Layout_ref_rid l, recordof(key_hdr_rid) r) := transfo
   self := r;
   self.uid := 0;
   self.src := '';
+  self := []; // commenting out source related fields (global_sid & record_sid)
 end;
 
 withDIDFromHeader := join(rid_data,key_hdr_rid,
@@ -48,32 +51,39 @@ withDID := withDIDFromHeader + withDIDFromQHeader;
 
 allRIDs := dedup(withDID,all);
 
+key_rid_src := dx_header.key_rid_SrcID( , false, false);
+key_qhri_src := dx_header.key_rid_SrcID( , true, false);
+
 //Pull by RID
-key_data_rec getRids(key_data_rec L, recordof(header.Key_Rid_SrcID(pCombo := false)) R) := transform
+key_data_rec getRids(key_data_rec L, key_rid_src R) := transform
   self.rid := l.rid;
   self.did := l.did;
   self.first_seen := l.first_seen;
   self.dt_nonglb_last_seen := l.dt_nonglb_last_seen;
   self.uid := r.uid;
   self.src := r.src;
+  self.global_sid := r.global_sid;
+  self.record_sid := r.record_sid;
 end;
 
-srcIDFromHeader := join(withDIDFromHeader,header.Key_Rid_SrcID(false,false),
+srcIDFromHeader := join(withDIDFromHeader,key_rid_src,
                         keyed((unsigned)left.rid=right.rid),
                         getRids(left, right))(src in sources OR 'FI' in sources);
 
-srcIDFromQHeader := join(withDIDFromQHeader,header.Key_Rid_SrcID(true,false),
+srcIDFromQHeader := join(withDIDFromQHeader,key_qhri_src,
                           keyed((unsigned)left.rid=right.rid),
                           getRids(left, right))(src in sources OR 'FI' in sources);
 
 with_rid_all := srcIDFromHeader + srcIDFromQHeader;
 
+with_rid_optout := Suppress.MAC_SuppressSource(with_rid_all, mod_access, did);
+
 //filters for GLB, DPPA, headerSourceRestrictions
-with_rid_filtered := with_rid_all((glb_ok or mod_access.isHeaderPreGLB((unsigned3)dt_nonglb_last_seen, (unsigned3)first_seen, src))
+with_rid_filtered := with_rid_optout((glb_ok or mod_access.isHeaderPreGLB((unsigned3)dt_nonglb_last_seen, (unsigned3)first_seen, src))
                                    AND
                                    (~mdr.SourceTools.SourceIsDPPA(src) OR (dppa_ok AND 
                                    mod_access.isValidDPPAState (header.translateSource(src), src)))
-                                   AND (NOT doxie.DataRestriction.isHeaderSourceRestricted(src, doxie.DataRestriction.fixed_DRM))
+                                   AND (NOT doxie.compliance.isHeaderSourceRestricted(src, doxie.DataRestriction.fixed_DRM))
                                   );
 
 //pull records with restricted dids
@@ -185,14 +195,14 @@ for_rid := IF ('FR' IN sources,
                 join(en_rid,header.Key_Src_for,
                       left.src='FR' and 
                       keyed(left.uid=right.uid) and keyed(left.src=right.src),
-                      transform(rid_rec, self.for_child := project(right.for_child, property.Layout_Fares_Foreclosure), self := left),
+                      transform(rid_rec, self.for_child := project(right.for_child, property.Layout_Fares_Foreclosure_Ex_Sids), self := left),
                       left outer,LIMIT(ut.limits.CRS_SOURCE_COUNT.DEFAULT,SKIP)),
                 en_rid);
 
 nod_rid := IF ('NT' IN sources,
                 join(for_rid,header.Key_Src_NOD,left.src='NT' and 
                       keyed(left.uid=right.uid) and keyed(left.src=right.src),
-                      transform(rid_rec, self.nod_child := project(right.nod_child, property.Layout_Fares_Foreclosure), self := left),
+                      transform(rid_rec, self.nod_child := project(right.nod_child, property.Layout_Fares_Foreclosure_Ex_Sids), self := left),
                       left outer,LIMIT(ut.limits.CRS_SOURCE_COUNT.DEFAULT,SKIP)),
                 for_rid);
 
@@ -320,12 +330,19 @@ qhdr_rid := join(left_over,key_qhdr_rid,
 
 hdr_rid_all := hdr_rid + qhdr_rid;
 
-doxie_raw.layout_header_raw getHeadAll(doxie.Key_Header L) := transform
+Layout_header_raw_CCPA:= RECORD
+      doxie_raw.layout_header_raw;
+      unsigned4 global_sid;
+      unsigned8 record_sid; 
+END;
+
+key_header := dx_header.key_header();
+Layout_header_raw_CCPA getHeadAll(key_header  L) := transform
  self.did := l.s_did ;  // 138824 : make sure to get the DID
  self := l;
 end;
 
-hdr_rec := join(hdr_rid_all,doxie.Key_Header,keyed(left.did=right.s_did) and left.rid=right.rid,getheadall(right),LIMIT(ut.limits.HEADER_PER_DID,SKIP));
+hdr_rec := join(hdr_rid_all,key_header,keyed(left.did=right.s_did) and left.rid=right.rid,getheadall(right),LIMIT(ut.limits.HEADER_PER_DID,SKIP));
 
 header.MAC_GlbClean_Header(hdr_rec,hdr_rec_cleaned, , , mod_access);
 ut.MAC_Slim_Back(hdr_rec_cleaned, doxie_raw.layout_header_raw, hdr_rec_ready);

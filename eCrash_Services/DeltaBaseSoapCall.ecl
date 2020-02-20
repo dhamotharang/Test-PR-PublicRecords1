@@ -88,9 +88,10 @@ EXPORT DeltaBaseSoapCall(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 				//Added contrib_source
 				self.contrib_source       := DeltaRecord.contrib_source;
 				
-				self.unit_number					:= DeltaRecord.unitNumber;
-				self.officer_id						:= DeltaRecord.officerID;
-				self.date_report_submitted          := DeltaRecord.date_report_submitted;
+				self.unit_number					 := DeltaRecord.unitNumber;
+				self.officer_id						 := DeltaRecord.officerID;
+				self.date_report_submitted := DeltaRecord.date_report_submitted;
+				self.releasable            := DeltaRecord.releasable;
 				self := [];
 		END;
 		

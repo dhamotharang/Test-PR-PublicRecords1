@@ -1,4 +1,4 @@
-import doxie, business_header, prof_LicenseV2_Services, AutoStandardI,Healthcare_Header_Services,Address,Codes,ut,STD;
+﻿import doxie, business_header, prof_LicenseV2_Services, AutoStandardI,Healthcare_Header_Services,Address,Codes,ut,STD;
 
 // similar to searchservice_records..
 
@@ -112,6 +112,8 @@ export val(params in_params) := FUNCTION
 	Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
 		self.glb_ok :=  ut.glb_ok (gm.GLBPurpose);
 		self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
+		self.glb :=  gm.GLBPurpose;
+		self.dppa := gm.DPPAPurpose;
 		self.DRM := gm.DataRestrictionMask;
 		self.IncludeSanctions := true;
 		// self:=[];Do not uncomment otherwise the default values will not get set.
@@ -248,19 +250,7 @@ export val(params in_params) := FUNCTION
 			sort(f_srt,if(isDeepDive,1,0), penalt,
 			company_name,lname,fname,mname, providerid,prolic_seq_id,sanc_id, status, orig_license_number, -date_last_seen,record));
 
-	// output(ids_prolic, named('ids_prolic'));
-	// output(ids_Prov, named('ids_Prov'));
-	// output(ds_prov, named('ds_prov'));
-	// output(headerRawData, named('headerRawData'));
-	// output(normProviderAddr, named('normProviderAddr'));
-	// output(normProviders, named('normProviders'));
-	// output(headerFmtProvData, named('headerFmtProvData'));
-	// output(normSanctions, named('normSanctions'));
-	// output(headerFmtSancData, named('headerFmtSancData'));
-	// output(ids_sanc, named('ids_Sanc'));
-	// output(ids_prov, named('ids_prov'));
-	// output(in_params.ssn, named('in_params_ssn'));
-	// output(in_params.Include_Prof_Lic, named('Include_Prof_Lic'));
+	
 	
 	RETURN rsrt;
 

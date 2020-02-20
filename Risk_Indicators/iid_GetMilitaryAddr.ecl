@@ -93,7 +93,7 @@ MilitaryOut_roxie := group(join(HeaderIn, DIDMilitaryEver,
 										// left.h.prim_name = right.hdr.prim_name and
 										// left.h.zip = right.hdr.zip
 										,
-										AddMilityflag(left,right)), seq, did);
+										AddMilityflag(left,right), left outer), seq, did);
 
 MilitaryOut_thor := group(join(distribute(HeaderIn, hash64(seq, did)), DIDMilitaryEver, 
 										left.seq = right.seq and
@@ -103,7 +103,7 @@ MilitaryOut_thor := group(join(distribute(HeaderIn, hash64(seq, did)), DIDMilita
 										// left.h.prim_name = right.hdr.prim_name and
 										// left.h.zip = right.hdr.zip
 										,
-										AddMilityflag(left,right), LOCAL), seq, did, LOCAL);
+										AddMilityflag(left,right), left outer, LOCAL), seq, did, LOCAL);
 
 #IF(onThor)
 	MilitaryOut := MilitaryOut_thor;

@@ -4,8 +4,8 @@ Threads := 1;
 
 roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
 
-InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
-// InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
+InputFile := '~mas::uatsamples::business_nfcra_100k_07102019.csv'; //100k file
+// InputFile := '~mas::uatsamples::business_nfcra_1m_07092019.csv'; //1m file
 
 /* Data Setting 	NonFCRA 	
 DRMFares = 0 //FARES - bit 1
@@ -29,6 +29,11 @@ DPPA := 3;
 DataPermissionMask  := '00000000000000000000000000000000000000000000000000'; 
 DataRestrictionMask := '00100000000000000000000000000000000000000000000000'; 
 
+// CCPA Options;
+LexIdSourceOptout := 1;
+TransactionId := '';
+BatchUID := '';
+GCID := 0;
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
 historyDate := '0';
@@ -54,7 +59,7 @@ Output_Master_Results := FALSE;
 Output_SALT_Profile := FALSE;
 // Output_SALT_Profile := TRUE;
 
-Exclude_Consumer_Shell := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
+Exclude_Consumer_Attributes := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
 RecordsToRun := 10;
 eyeball := 120;
@@ -65,118 +70,125 @@ OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings o
 OutputFile := '~lweiner::out::PublicRecs::Business_AnalyticalLibrary_'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
-	STRING AccountNumber         ;  
-	STRING CompanyName           ;
-	STRING AlternateCompanyName  ;
-	STRING Addr1                 ;
-	STRING City1                 ;
-	STRING State1                ;
-	STRING Zip1                  ;
-	STRING BusinessPhone         ;
-	STRING BusinessTin           ;
-	STRING BusinessIPAddress     ;
-	STRING BusinessURL           ;
-	STRING BusinessEmailAddress  ;
-	STRING Rep1firstname         ;
-	STRING Rep1MiddleName        ;
-	STRING Rep1lastname          ;
-	STRING Rep1NameSuffix        ;
-	STRING Rep1Addr              ;
-	STRING Rep1City              ;
-	STRING Rep1State             ;
-	STRING Rep1Zip               ;
-	STRING Rep1SSN               ;
-	STRING Rep1DOB               ;
-	STRING Rep1Age               ;
-	STRING Rep1DLNumber          ;
-	STRING Rep1DLState           ;
-	STRING Rep1HomePhone         ;
-	STRING Rep1EmailAddress      ;
-	STRING Rep1FormerLastName    ;
-	STRING Rep1LexID             ;
-	STRING ArchiveDate           ;
-	STRING PowID                 ;
-	STRING ProxID                ;
-	STRING SeleID                ;
-	STRING OrgID                 ;
-	STRING UltID                 ;
-	STRING SIC_Code              ;
-	STRING NAIC_Code             ;
-	STRING Rep2firstname         ;
-	STRING Rep2MiddleName        ;
-	STRING Rep2lastname          ;
-	STRING Rep2NameSuffix        ;
-	STRING Rep2Addr              ;
-	STRING Rep2City              ;
-	STRING Rep2State             ;
-	STRING Rep2Zip               ;
-	STRING Rep2SSN               ;
-	STRING Rep2DOB               ;
-	STRING Rep2Age               ;
-	STRING Rep2DLNumber          ;
-	STRING Rep2DLState           ;
-	STRING Rep2HomePhone         ;
-	STRING Rep2EmailAddress      ;
-	STRING Rep2FormerLastName    ;
-	STRING Rep2LexID             ;
-	STRING Rep3firstname         ;
-	STRING Rep3MiddleName        ;
-	STRING Rep3lastname          ;
-	STRING Rep3NameSuffix        ;
-	STRING Rep3Addr              ;
-	STRING Rep3City              ;
-	STRING Rep3State             ;
-	STRING Rep3Zip               ;
-	STRING Rep3SSN               ;
-	STRING Rep3DOB               ;
-	STRING Rep3Age               ;
-	STRING Rep3DLNumber          ;
-	STRING Rep3DLState           ;
-	STRING Rep3HomePhone         ;
-	STRING Rep3EmailAddress      ;
-	STRING Rep3FormerLastName    ;
-	STRING Rep3LexID             ;
-	STRING Rep4firstname         ;
-	STRING Rep4MiddleName        ;
-	STRING Rep4lastname          ;
-	STRING Rep4NameSuffix        ;
-	STRING Rep4Addr              ;
-	STRING Rep4City              ;
-	STRING Rep4State             ;
-	STRING Rep4Zip               ;
-	STRING Rep4SSN               ;
-	STRING Rep4DOB               ;
-	STRING Rep4Age               ;
-	STRING Rep4DLNumber          ;
-	STRING Rep4DLState           ;
-	STRING Rep4HomePhone         ;
-	STRING Rep4EmailAddress      ;
-	STRING Rep4FormerLastName    ;
-	STRING Rep4LexID             ;
-	STRING Rep5firstname         ;
-	STRING Rep5MiddleName        ;
-	STRING Rep5lastname          ;
-	STRING Rep5NameSuffix        ;
-	STRING Rep5Addr              ;
-	STRING Rep5City              ;
-	STRING Rep5State             ;
-	STRING Rep5Zip               ;
-	STRING Rep5SSN               ;
-	STRING Rep5DOB               ;
-	STRING Rep5Age               ;
-	STRING Rep5DLNumber          ;
-	STRING Rep5DLState           ;
-	STRING Rep5HomePhone         ;
-	STRING Rep5EmailAddress      ;
-	STRING Rep5FormerLastName    ;
-	STRING Rep5LexID             ;
-	STRING ln_project_id         ;
-	STRING pf_fraud              ;
-	STRING pf_bad                ;
-	STRING pf_funded             ;
-	STRING pf_declined           ;
-	STRING pf_approved_not_funded; 
+	STRING AccountNumber;
+	STRING CompanyName;
+	STRING AlternateCompanyName;
+	STRING StreetAddressLine1;
+	STRING StreetAddressLine2;
+	STRING City1;
+	STRING State1;
+	STRING Zip1;
+	STRING BusinessPhone;
+	STRING BusinessTIN;
+	STRING BusinessIPAddress;
+	STRING BusinessURL;
+	STRING BusinessEmailAddress;
+	STRING Rep1FirstName;
+	STRING Rep1MiddleName;
+	STRING Rep1LastName;
+	STRING Rep1NameSuffix;
+	STRING Rep1StreetAddressLine1;
+	STRING Rep1StreetAddressLine2;
+	STRING Rep1City;
+	STRING Rep1State;
+	STRING Rep1Zip;
+	STRING Rep1SSN;
+	STRING Rep1DOB;
+	STRING Rep1Age;
+	STRING Rep1DLNumber;
+	STRING Rep1DLState;
+	STRING Rep1HomePhone;
+	STRING Rep1EmailAddress;
+	STRING Rep1FormerLastName;
+	STRING Rep1LexID;
+	STRING ArchiveDate;
+	STRING PowID;
+	STRING ProxID;
+	STRING SeleID;
+	STRING OrgID;
+	STRING UltID;
+	STRING SIC_Code;
+	STRING NAIC_Code;
+	STRING Rep2FirstName;
+	STRING Rep2MiddleName;
+	STRING Rep2LastName;
+	STRING Rep2NameSuffix;
+	STRING Rep2StreetAddressLine1;
+	STRING Rep2StreetAddressLine2;
+	STRING Rep2City;
+	STRING Rep2State;
+	STRING Rep2Zip;
+	STRING Rep2SSN;
+	STRING Rep2DOB;
+	STRING Rep2Age;
+	STRING Rep2DLNumber;
+	STRING Rep2DLState;
+	STRING Rep2HomePhone;
+	STRING Rep2EmailAddress;
+	STRING Rep2FormerLastName;
+	STRING Rep2LexID;
+	STRING Rep3FirstName;
+	STRING Rep3MiddleName;
+	STRING Rep3LastName;
+	STRING Rep3NameSuffix;
+	STRING Rep3StreetAddressLine1;
+	STRING Rep3StreetAddressLine2;
+	STRING Rep3City;
+	STRING Rep3State;
+	STRING Rep3Zip;
+	STRING Rep3SSN;
+	STRING Rep3DOB;
+	STRING Rep3Age;
+	STRING Rep3DLNumber;
+	STRING Rep3DLState;
+	STRING Rep3HomePhone;
+	STRING Rep3EmailAddress;
+	STRING Rep3FormerLastName;
+	STRING Rep3LexID;
+	STRING Rep4FirstName;
+	STRING Rep4MiddleName;
+	STRING Rep4LastName;
+	STRING Rep4NameSuffix;
+	STRING Rep4StreetAddressLine1;
+	STRING Rep4StreetAddressLine2;
+	STRING Rep4City;
+	STRING Rep4State;
+	STRING Rep4Zip;
+	STRING Rep4SSN;
+	STRING Rep4DOB;
+	STRING Rep4Age;
+	STRING Rep4DLNumber;
+	STRING Rep4DLState;
+	STRING Rep4HomePhone;
+	STRING Rep4EmailAddress;
+	STRING Rep4FormerLastName;
+	STRING Rep4LexID;
+	STRING Rep5FirstName;
+	STRING Rep5MiddleName;
+	STRING Rep5LastName;
+	STRING Rep5NameSuffix;
+	STRING Rep5StreetAddressLine1;
+	STRING Rep5StreetAddressLine2;
+	STRING Rep5City;
+	STRING Rep5State;
+	STRING Rep5Zip;
+	STRING Rep5SSN;
+	STRING Rep5DOB;
+	STRING Rep5Age;
+	STRING Rep5DLNumber;
+	STRING Rep5DLState;
+	STRING Rep5HomePhone;
+	STRING Rep5EmailAddress;
+	STRING Rep5FormerLastName;
+	STRING Rep5LexID;
+	STRING ln_project_id;
+	STRING pf_fraud;
+	STRING pf_bad;
+	STRING pf_funded;
+	STRING pf_declined;
+	STRING pf_approved_not_funded;
 END;
+
 inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
 OUTPUT(CHOOSEN(inData, eyeball), NAMED('inData'));
 inDataRecs := IF (RecordsToRun = 0, inData, CHOOSEN (inData, RecordsToRun));
@@ -194,10 +206,10 @@ soapLayout := RECORD
 	INTEGER ScoreThreshold;
 	STRING DataRestrictionMask;
 	STRING DataPermissionMask;
-	UNSIGNED1 GLBA_Purpose;
-	UNSIGNED1 DPPA_Purpose;
+	UNSIGNED1 GLBPurpose;
+	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
-	BOOLEAN ExcludeConsumerShell;
+	BOOLEAN ExcludeConsumerAttributes;
 	BOOLEAN IsMarketing;
 	
 	UNSIGNED BIPAppendScoreThreshold;
@@ -205,8 +217,12 @@ soapLayout := RECORD
 	BOOLEAN BIPAppendPrimForce;
 	BOOLEAN BIPAppendReAppend;
 	BOOLEAN BIPAppendIncludeAuthRep;
-	BOOLEAN OverrideExperianRestriction;
-
+  BOOLEAN OverrideExperianRestriction;
+	
+	UNSIGNED1 LexIdSourceOptout;
+  STRING _TransactionId;
+  STRING _BatchUID;
+  UNSIGNED6 _GCID;
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -228,7 +244,6 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT BOOLEAN BusinessLexIDReAppend := BIPAppend_ReAppend;
 	EXPORT BOOLEAN BusinessLexIDIncludeAuthRep := BIPAppend_Include_AuthRep;
 END;
-
 // Uncomment this code to run as test harness on Thor instead of SOAPCALL to Roxie
 // Options := MODULE(PublicRecords_KEL.Interface_Options)
 	// EXPORT INTEGER ScoreThreshold := Score_threshold;
@@ -239,7 +254,7 @@ END;
 layout_MAS_Business_Service_output := RECORD
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
-	STRING ErrorCode := '';
+	STRING G_ProcErrorCode := '';
 END;
 
 soapLayout trans (inDataReadyDist le):= TRANSFORM 
@@ -250,17 +265,21 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.ScoreThreshold := Settings.LexIDThreshold;
 	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
-	SELF.GLBA_Purpose := Settings.GLBAPurpose;
-	SELF.DPPA_Purpose := Settings.DPPAPurpose;
+	SELF.GLBPurpose := Settings.GLBAPurpose;
+	SELF.DPPAPurpose := Settings.DPPAPurpose;
+	SELF.OverrideExperianRestriction := Settings.Override_Experian_Restriction;
 	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
-	SELF.ExcludeConsumerShell := Exclude_Consumer_Shell;
+	SELF.ExcludeConsumerAttributes := Exclude_Consumer_Attributes;
 	SELF.BIPAppendScoreThreshold := Settings.BusinessLexIDThreshold;
 	SELF.BIPAppendWeightThreshold := Settings.BusinessLexIDWeightThreshold;
 	SELF.BIPAppendPrimForce := Settings.BusinessLexIDPrimForce;
 	SELF.BIPAppendReAppend := Settings.BusinessLexIDReAppend;
 	SELF.BIPAppendIncludeAuthRep := Settings.BusinessLexIDIncludeAuthRep;
-	SELF.OverrideExperianRestriction := Settings.Override_Experian_Restriction;
+	SELF.LexIdSourceOptout := LexIdSourceOptout;
+	SELF._TransactionId := TransactionId;
+	SELF._BatchUID := BatchUID;
+	SELF._GCID := GCID;	
 END;
 
 soap_in := PROJECT(inDataReadyDist, trans(LEFT));
@@ -268,7 +287,7 @@ soap_in := PROJECT(inDataReadyDist, trans(LEFT));
 OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 
 layout_MAS_Business_Service_output myFail(soap_in le) := TRANSFORM
-	SELF.ErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
+	SELF.G_ProcErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
 	// SELF.Account := le.Account;
 	SELF := [];
 END;
@@ -289,8 +308,8 @@ OUTPUT(CHOOSEN(inDataReady, eyeball), NAMED('Raw_input'));
 OUTPUT( ResultSet, NAMED('Results') );
 
 
-Passed := ResultSet(TRIM(Results.BusInputAccountEcho) <> '');
-Failed := ResultSet(TRIM(Results.BusInputAccountEcho) = ''); 
+Passed := ResultSet(TRIM(Results.B_InpAcct) <> '');
+Failed := ResultSet(TRIM(Results.B_InpAcct) = ''); 
 
 OUTPUT( CHOOSEN(Passed,eyeball), NAMED('bwr_results_Passed') );
 OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
@@ -298,7 +317,7 @@ OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 LayoutMaster_With_Extras := RECORD
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
-	STRING ErrorCode;
+	STRING G_ProcErrorCode;
 	STRING ln_project_id;
 	STRING pf_fraud;
 	STRING pf_bad;
@@ -311,27 +330,31 @@ END;
 
 Layout_Business := RECORD
 	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA;
-	STRING ErrorCode;
+	STRING G_ProcErrorCode;
 END;
 
 Passed_with_Extras := 
-	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.MasterResults.BusInputAccountEcho, 
+	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.MasterResults.B_InpAcct, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
 			SELF := LEFT, //input performance fields
-			SELF.ErrorCode := RIGHT.ErrorCode,
+			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
 		INNER, KEEP(1));
 	
 Passed_Business := 
-	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.Results.BusInputAccountEcho, 
+	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.Results.B_InpAcct, 
 		TRANSFORM(Layout_Business,
 			SELF := RIGHT.Results, //fields from passed
 			SELF := LEFT, //input performance fields
-			SELF.Errorcode := RIGHT.ErrorCode,
+			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
 		INNER, KEEP(1));
-	
+       
+Error_Inputs := JOIN(DISTRIBUTE(inDataRecs, HASH64(AccountNumber)), DISTRIBUTE(Passed_Business, HASH64(B_InpAcct)), LEFT.AccountNumber = RIGHT.B_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY);  
+OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE);
+  
+  
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Business, eyeball), NAMED('Sample_NonFCRA_Layout'));
 

@@ -1,4 +1,4 @@
-﻿import address, risk_indicators, gateway;
+﻿import risk_indicators, gateway, business_risk;
 
 export InstantId_Function_BtSt(dataset(Layout_BIID_BtSt) inf, dataset(Gateway.Layouts.Config) gateways, boolean hasbdids = false, 
                                unsigned1 dppa, 
@@ -11,7 +11,11 @@ export InstantId_Function_BtSt(dataset(Layout_BIID_BtSt) inf, dataset(Gateway.La
                                boolean include_additional_watchlists = false,
                                real global_watchlist_threshold = 0.84, 
                                string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-                               string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := function
+                               string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+                               unsigned1 LexIdSourceOptout = 1,
+                               string TransactionID = '',
+                               string BatchUID = '',
+                               unsigned6 GlobalCompanyId = 0) := function
 
 
 seqrec := record
@@ -34,7 +38,11 @@ end;
 df2 := normalize(df, 2, norm_to_input(LEFT,COUNTER));
 
 outf1 := business_risk.InstantID_Function(df2, gateways, hasbdids, dppa, glb, isUtility, ln_branded, tribcode, , , ofac_version, include_ofac, include_additional_watchlists, 
-                                          global_watchlist_threshold, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
+                                          global_watchlist_threshold, DataRestriction:=DataRestriction, DataPermission:=DataPermission,
+                                          LexIdSourceOptout := LexIdSourceOptout, 
+                                          TransactionID := TransactionID, 
+                                          BatchUID := BatchUID, 
+                                          GlobalCompanyID := GlobalCompanyID);
 
 out_seqrec := record
 	unsigned4	seq;

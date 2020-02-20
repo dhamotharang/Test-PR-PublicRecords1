@@ -5,6 +5,8 @@ export VehicleV2_Services.Layout_Report
 		dataset(doxie.layout_references) in_dids, 
 		boolean currentlyOwnedVehicles = false) := 
 function
-	all_veh := vehiclev2_services.Vehicle_raw.get_vehicle_crs_report (in_dids);
+  report_mod := VehicleV2_Services.IParam.getReportModule();  
+
+	all_veh := vehiclev2_services.raw.get_vehicle_crs_report (report_mod, in_dids);
 	return all_veh(~currentlyOwnedVehicles or is_current);
 end;

@@ -45,7 +45,7 @@ _did_Fetched_row := join(dids,key_did,
                     (~IsFCRA or right.prolic_key not in proflic_ids),
                     xt(left,right), ATMOST (ut.limits.PROFLICENSE_PER_DID));
 
-did_Fetched_row_suppressed := Suppress.MAC_SuppressSource(_did_Fetched_row, mod_access, did, global_sid, data_env);
+did_Fetched_row_suppressed := Suppress.MAC_SuppressSource(_did_Fetched_row, mod_access, did, global_sid, data_env := data_env);
 doxie.compliance.logSoldToSources(did_Fetched_row_suppressed, mod_access);
 did_Fetched_row := PROJECT(did_Fetched_row_suppressed, TRANSFORM(Prof_License.layout_doxie, SELF := LEFT));
 

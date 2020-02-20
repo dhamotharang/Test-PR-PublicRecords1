@@ -16,15 +16,20 @@ EXPORT Records := MODULE
 			TRANSFORM(Prof_LicenseV2.Layouts_ProfLic.Layout_Base,SELF:=RIGHT,SELF:=[]),
 			KEEP(FCRA.compliance.MAX_OVERRIDE_LIMIT),LIMIT(0));
 
-		// get license records less overwritten records
+		// get license records
 		ds_proflic_recs:=JOIN(ds_dids,Prof_LicenseV2.Key_Proflic_Did(TRUE),
-			KEYED(LEFT.did=RIGHT.did)
-			AND RIGHT.prolic_key!='' AND RIGHT.prolic_key NOT IN SET(ds_FlagFile((UNSIGNED)did=LEFT.did),TRIM(record_id)),
+			KEYED(LEFT.did=RIGHT.did) AND RIGHT.prolic_key!='',
 			TRANSFORM(Prof_LicenseV2.Layouts_ProfLic.Layout_Base,SELF.did:=(STRING)RIGHT.did,SELF:=RIGHT),
 			KEEP(prof_LicenseV2_Services.Constants.FCRA.MaxProfLicPerDID),
 			LIMIT(prof_LicenseV2_Services.Constants.FCRA.MaxProfLicRecords,SKIP));
 
-		ds_proflic_raw:=ds_proflic_recs+ds_override_recs;
+		// less overwritten records
+		ds_proflic_less_overwritten:=JOIN(ds_proflic_recs,ds_FlagFile,
+			(UNSIGNED)LEFT.did=(UNSIGNED)RIGHT.did
+			AND LEFT.prolic_key=TRIM(RIGHT.record_id),
+			TRANSFORM(Prof_LicenseV2.Layouts_ProfLic.Layout_Base,SELF:=LEFT),LEFT ONLY);
+
+		ds_proflic_raw:=ds_proflic_less_overwritten+ds_override_recs;
 
 		// apply suppressions
 		Suppress.MAC_Suppress(ds_proflic_raw,ds_dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did);

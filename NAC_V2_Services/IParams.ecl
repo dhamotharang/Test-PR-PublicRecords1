@@ -1,4 +1,5 @@
-IMPORT NAC_V2_Services,STD,AutoKeyI,AutoHeaderI,iesp,BatchShare;
+IMPORT NAC_V2_Services, STD, AutoKeyI, AutoHeaderI, iesp, BatchShare;
+
 EXPORT IParams := MODULE
 
   // Returns a SET with the programs that they are allowed to see/search
@@ -82,15 +83,7 @@ EXPORT IParams := MODULE
 		RETURN in_mod;
 	END;
 
-	EXPORT AK_params := INTERFACE(CommonParams,
-																AutoKeyI.AutoKeyStandardFetchBaseInterface,
-																AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full)
-		EXPORT BOOLEAN   AllowAll 			:= FALSE;
-		EXPORT BOOLEAN   AllowGLB 			:= FALSE;
-		EXPORT BOOLEAN   AllowDPPA 			:= FALSE;
-		EXPORT UNSIGNED1 GLBPurpose 	  := BatchShare.Constants.Defaults.GLBPurpose;
-		EXPORT UNSIGNED1 DPPAPurpose	  := BatchShare.Constants.Defaults.DPPAPurpose;
-		EXPORT BOOLEAN   IncludeMinors	:= FALSE;
+	EXPORT AK_params := INTERFACE(AutoKeyI.AutoKeyStandardFetchBaseInterface)
 		EXPORT BOOLEAN   workHard 			:= TRUE;
 		EXPORT BOOLEAN   isdeepDive 		:= FALSE;
 	END;

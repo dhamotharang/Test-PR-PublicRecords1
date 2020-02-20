@@ -111,7 +111,7 @@ layout_soap_boca transform_input_boca(f le, INTEGER c) := TRANSFORM
 	SELF.adl_based_shell := true;
 	SELF.DataRestrictionMask := '0000000000000000000000000';  // to allow use of both Equifax and Experian, this is the default value for all legacy scoring products
 	// SELF.HistoryDateYYYYMM := le.historyDateYYYYMM;
-	SELF.HistoryDateYYYYMM := (Integer) le.historydateyyyymm[1..6];
+	SELF.HistoryDateYYYYMM := (Integer)(((String)le.HistoryDateYYYYMM)[1..6]);
 	SELF.Version := version;
 	SELF := le;
 	SELF := [];
@@ -161,6 +161,10 @@ layout_soap transform_input_request(ita_input_temp le) := TRANSFORM
 	o := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.leadintegrity.t_LeadIntegrityOptions,
 		SELF.AttributesVersionRequest := (STRING)VERSION;
 		self.IncludeModels.Integrity := model,
+    SELF.HistoryDate.Year := (Integer)(((String)le.HistoryDateYYYYMM)[1..4]);
+    SELF.HistoryDate.Month := (Integer)(((String)le.HistoryDateYYYYMM)[5..6]);
+    SELF.HistoryDate.Day := 1; //first day of the month
+    // SELF.HistoryDate.Day := le.HistoryDateYYYYMM[7..8];
 		SELF := [])
 	);
 	

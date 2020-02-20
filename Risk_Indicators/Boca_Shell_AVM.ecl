@@ -1,7 +1,8 @@
-﻿import _Control, avm_V2, riskwise, ut;
+﻿import _Control, avm_V2, riskwise, ut, risk_indicators;
+
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_AVM(GROUPED DATASET(layout_bocashell_neutral) ids_wide) := FUNCTION
+export Boca_Shell_AVM(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide) := FUNCTION
 
 Layout_AVM := RECORD
 	unsigned4 seq;
@@ -14,8 +15,6 @@ Layout_AVM_Plus := RECORD
 	Layout_Address_Information Address_History_2;
 	Layout_AVM AVM;
 END;
-
-
 
 Layout_AVM_Plus add_AVM(ids_wide le, avm_v2.Key_AVM_Address ri) := transform
 	full_history_date := iid_constants.full_history_date(le.historydate);

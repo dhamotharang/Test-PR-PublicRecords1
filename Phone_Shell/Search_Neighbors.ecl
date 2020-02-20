@@ -1,17 +1,21 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function searches Neighbors by:																		*
  * - Address :: Source: NE																								*
  **************************************************************************
  * This code is directly adapted from progressive_phone.mac_get_type_h    *
  ************************************************************************ */
 
-IMPORT Address, Doxie, Gong, NID, Phone_Shell, Progressive_Phone, RiskWise;
+IMPORT Address, Doxie, Gong, NID, Phone_Shell, Progressive_Phone, RiskWise, STD;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
     DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, 
     UNSIGNED1 PhoneRestrictionMask, STRING50 DataRestrictionMask, UNSIGNED1 GLBPurpose, UNSIGNED1 DPPAPurpose, 
     UNSIGNED3 Max_Neighborhoods = 0, Neighbors_Per_NA = 6, Neighbor_Recency = 3, BOOLEAN probation_override_value = FALSE, 
-    BOOLEAN no_scrub = FALSE, STRING ssn_mask_value = '', STRING industry_class_value = '') := FUNCTION
+    BOOLEAN no_scrub = FALSE, STRING ssn_mask_value = '', STRING industry_class_value = '',
+    UNSIGNED2 PhoneShellVersion = 10,
+	doxie.IDataAccess in_mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+    
+  IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1
 
   mod_access := MODULE (doxie.IDataAccess)
     EXPORT unsigned1 glb := GLBPurpose;
@@ -29,6 +33,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
     EXPORT string ssn_mask := ssn_mask_value;
     // EXPORT unsigned1 dl_mask := 1;
     // EXPORT unsigned1 dob_mask := suppress.constants.dateMask.ALL;
+	EXPORT unsigned1 lexid_source_optout := in_mod_access.lexid_source_optout;
+	EXPORT string transaction_id := in_mod_access.transaction_id; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := in_mod_access.global_company_id; // mbs gcid
   END;
 
 	Subj_Best_Rec := RECORD
@@ -120,7 +127,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
 	
 	neighbors := TOPN(neighbors_ready, 100, nbr_rank);
 	
-	Progressive_Phone.Layout_Progressive_Batch_Out_With_DID by_addr_lastname(neighbors le, Gong.key_Address_current ri) := TRANSFORM
+	{Progressive_Phone.Layout_Progressive_Batch_Out_With_DID, unsigned4 global_sid} by_addr_lastname(neighbors le, Gong.key_Address_current ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.AcctNo := (STRING20)le.seqTarget;
 		SELF.Subj_First := le.fname;
 		SELF.Subj_Middle := le.mname;
@@ -156,7 +164,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
 		SELF := [];
 	END;
 	
-	neighbor_out_ready := JOIN(neighbors, Gong.key_Address_current,
+	neighbor_out_ready_unsuppressed := JOIN(neighbors, Gong.key_Address_current,
 																							KEYED(LEFT.prim_name = RIGHT.prim_name) AND
 																							KEYED(LEFT.st = RIGHT.st) AND
 																							KEYED(LEFT.zip = RIGHT.z5) AND
@@ -164,20 +172,21 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
 																							TRIM(RIGHT.phone10) <> '' AND
 																							(LEFT.lname = RIGHT.lname OR
 																							(LENGTH(TRIM(LEFT.lname)) > 6 and LENGTH(TRIM(RIGHT.lname)) > 6 AND 
-																							StringLib.EditDistance(LEFT.lname, RIGHT.lname) < 2) OR
+																							STD.Str.EditDistance(LEFT.lname, RIGHT.lname) < 2) OR
 																							(LENGTH(TRIM(LEFT.lname)) > 4 AND 
 																							LEFT.lname = RIGHT.listed_name[1..LENGTH(TRIM(LEFT.lname))]) OR 
-																							(StringLib.StringFind(RIGHT.lname, '-' + TRIM(LEFT.lname), 1) > 0 OR 
-																							StringLib.StringFind(RIGHT.lname, TRIM(LEFT.lname) + '-', 1) > 0) OR  
+																							(STD.Str.Find(RIGHT.lname, '-' + TRIM(LEFT.lname), 1) > 0 OR 
+																							STD.Str.Find(RIGHT.lname, TRIM(LEFT.lname) + '-', 1) > 0) OR  
 																							LEFT.fname = RIGHT.fname AND 
-																							(StringLib.EditDistance(LEFT.lname, RIGHT.lname) < 2 OR
+																							(STD.Str.EditDistance(LEFT.lname, RIGHT.lname) < 2 OR
 																							LENGTH(TRIM(LEFT.lname)) > 5 AND 
-																							StringLib.EditDistance(LEFT.lname, RIGHT.lname) < 3)) AND
+																							STD.Str.EditDistance(LEFT.lname, RIGHT.lname) < 3)) AND
 																							(LEFT.sec_range = '' OR LEFT.sec_range = RIGHT.sec_range OR
 																							NID.mod_PFirstTools.PFLeqPFR(LEFT.fname, RIGHT.fname) OR 
 																							LENGTH(TRIM(RIGHT.fname)) = 1 AND LEFT.fname[1] = RIGHT.fname),					          
 		                         by_addr_lastname(LEFT, RIGHT), LIMIT(ut.limits.PHONE_PER_PERSON, SKIP));
-														 
+	neighbor_out_ready := Suppress.Suppress_ReturnOldLayout(neighbor_out_ready_unsuppressed, mod_access, Progressive_Phone.Layout_Progressive_Batch_Out_With_DID);
+	
 	neighbor_out_dedup := UNGROUP(DEDUP(SORT(neighbor_out_ready, AcctNo, Subj_Phone10, -subj_date_last, -subj_date_first),
 																															 AcctNo, Subj_Phone10));
 	
@@ -202,6 +211,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
 		SELF.Sources.Source_Owner_Name_Last := ri.subj_last;
 		SELF.Sources.Source_Owner_Name_Suffix := ri.subj_suffix;
 		SELF.Sources.Source_Owner_DID := (STRING)ri.DID;
+    
+  SELF.Sources.Source_List_All_Last_Seen := if(IncludeLexIDCounts, Phone_Shell.Common.parseDate((STRING)ri.subj_date_last), '');
+  SELF.Sources.Source_Owner_All_DIDs := if(IncludeLexIDCounts, (string)ri.DID, '');
 		
 		// Neighbor search... only results in neighbors
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Title := 'Neighbor';
@@ -212,8 +224,27 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
 	END;
 	withNeighbors := JOIN(Input, neighbor_out_dedup, (STRING)LEFT.Clean_Input.seq = RIGHT.AcctNo, getSkipTrace(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
 	
-	final := DEDUP(SORT(withNeighbors, Clean_Input.seq, Gathered_Phone, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code))), 
-																		 Clean_Input.seq, Gathered_Phone, Sources.Source_List);
-	
+	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus get_Alls(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
+   self.Sources.Source_List_All_Last_Seen := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID, 
+                                                   le.Sources.Source_List_All_Last_Seen, 
+                                                   le.Sources.Source_List_All_Last_Seen + ',' + ri.Sources.Source_List_All_Last_Seen);
+   self.Sources.Source_Owner_All_DIDs := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID,
+                                               le.Sources.Source_Owner_All_DIDs,
+                                               le.Sources.Source_Owner_All_DIDs + ',' + ri.Sources.Source_Owner_All_DIDs);
+   self := le;
+ end;
+ 
+ sortedNeighbors := SORT(withNeighbors, Clean_Input.seq, Gathered_Phone, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code)));
+  
+	final := if(IncludeLexIDCounts, 
+             ROLLUP(sortedNeighbors,
+               left.Clean_Input.seq = right.Clean_Input.seq and 
+               left.Gathered_Phone = right.Gathered_Phone and 
+               left.Sources.Source_List = right.Sources.Source_List,
+               get_Alls(left,right)),
+             DEDUP(sortedNeighbors, 
+																		 Clean_Input.seq, Gathered_Phone, Sources.Source_List)
+            );
+            
 	RETURN(final);
 END;

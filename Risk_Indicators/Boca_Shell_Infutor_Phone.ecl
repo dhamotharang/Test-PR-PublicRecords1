@@ -41,9 +41,7 @@ infutor_correct_roxie := join(bs, FCRA.Key_Override_Infutor_FFID,
 												keyed(right.flag_file_id in left.infutor_correct_ffid),
 												getInfutor(left, row(right, xform_Infutor_phone(LEFT))),/*left outer,*/ atmost(right.flag_file_id in left.infutor_correct_ffid, 100));
 
-infutor_correct_thor := join(bs(infutor_correct_ffid <> []), FCRA.Key_Override_Infutor_FFID,
-												right.flag_file_id in left.infutor_correct_ffid,
-												getInfutor(left, row(right, xform_Infutor_phone(LEFT))),/*left outer,*/ atmost(right.flag_file_id in left.infutor_correct_ffid, 100));
+infutor_correct_thor := dataset([],risk_indicators.layout_bocashell_neutral);  // don't need to do corrections in thor jobs on Vault
 
 #IF(onThor)
 	infutor_correct := infutor_correct_thor;

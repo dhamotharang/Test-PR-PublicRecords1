@@ -1,4 +1,4 @@
-import Risk_Indicators, Business_Risk, Models, iesp, doxie, Gateway;
+﻿import Risk_Indicators, Business_Risk, Models, iesp, doxie, Gateway;
 
 EXPORT getAMLattributes(DATASET(Risk_Indicators.Layout_Input) iid_prep, 
 																						string50 DataRestrictionMask, 
@@ -6,8 +6,14 @@ EXPORT getAMLattributes(DATASET(Risk_Indicators.Layout_Input) iid_prep,
 																						unsigned1 GLBA, 
                                             DATASET(Gateway.Layouts.Config) gateways, 
 																						boolean NegNewsInd, integer bsversion,
-																						string50 DataPermissionMask
+																						string50 DataPermissionMask,
+                                                                                        doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 																						 ) := FUNCTION
+                                             
+    unsigned1 LexIdSourceOptout := mod_access.lexid_source_optout;
+    string TransactionID := mod_access.transaction_id;
+    string BatchUID := '';
+    unsigned6 GlobalCompanyId := mod_access.global_company_id;
 
 	boolean 	isFCRA							:= false;
 	boolean   isUtility 					:= false;  //userIn.industryClass = 'UTILI';
@@ -146,7 +152,12 @@ seq_map := join( bestappended, bestappended_deduped,
 																						EverOccupant_StartDate, 
 																						AppendBest,
 																						BSOptions,
-																						in_DataPermission := DataPermissionMask);
+																						in_DataPermission := DataPermissionMask,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID
+                                                                                        );
 														
 																							
 																										
@@ -166,7 +177,12 @@ seq_map := join( bestappended, bestappended_deduped,
 																								RemoveFares, 
 																								DataRestrictionMask,
 																								BSOptions := BSOptions,
-																								DataPermission := DataPermissionMask);
+																								DataPermission := DataPermissionMask,
+                                                                                                LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                TransactionID := TransactionID, 
+                                                                                                BatchUID := BatchUID, 
+                                                                                                GlobalCompanyID := GlobalCompanyID
+                                                                                                );
 
 Layouts.RelativeInLayout  NewNewsNames(clam le) := TRANSFORM
 	self.seq            := le.seq;

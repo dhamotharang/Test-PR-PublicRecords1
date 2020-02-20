@@ -1,9 +1,9 @@
-﻿import ut, ln_propertyv2, riskwise;
+﻿import ut, ln_propertyv2, riskwise, risk_indicators;
 
-export Boca_Shell_Property (GROUPED DATASET(layout_PropertyRecord) p_address,
-                            GROUPED DATASET(Layout_Boca_Shell_ids) ids, 
+export Boca_Shell_Property (GROUPED DATASET(risk_indicators.layout_PropertyRecord) p_address,
+                            GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids, 
                             boolean includeRelatives = true, 
-									 boolean filter_out_fares=false) := function
+							boolean filter_out_fares=false) := function
 
 
 layout_PropertyRecordPlus := RECORD

@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, iesp, doxie, prof_LicenseV2_Services;
+IMPORT iesp, doxie, prof_LicenseV2_Services;
 IMPORT $;
 
 iesp.proflicense.t_PL2Action SetAction (
@@ -13,7 +13,7 @@ iesp.proflicense.t_PL2Action SetAction (
     Self.Description := description;
     Self.Status := status;
     Self.PostingDate := iesp.ECL2ESP.toDatestring8 (posting_date);
-		Self := [];
+    Self := [];
   end;
   return Row (xform ());
 END;
@@ -30,15 +30,13 @@ END;
 
 EXPORT proflic_records (
   dataset (doxie.layout_references) dids,
-  $.input.proflic in_params = module ($.input.proflic) end,
+  $.IParam.proflic in_params,
   boolean IsFCRA = false
 ) := MODULE
 
-  mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
-    EXPORT log_record_source := ~isFCRA;
-  END;
+  mod_access := PROJECT (in_params, doxie.IDataAccess);
 
-  ds_raw := prof_LicenseV2_Services.Prof_Lic_Raw.source_view.by_did(dids, mod_access := mod_access, isFCRA := isFCRA);
+  ds_raw := prof_LicenseV2_Services.Prof_Lic_Raw.source_view.by_did(dids, , mod_access, isFCRA);
 
   iesp.proflicense.t_ProfessionalLicenseRecord FormatReport (prof_LicenseV2_Services.Assorted_Layouts.Layout_report L) := transform
     self.LicenseType := L.license_type;
@@ -93,7 +91,7 @@ EXPORT proflic_records (
     self.AdditionalLicensingSpecs := L.additional_licensing_specifics;
     self.PlaceOfBirth := L.personal_pob_desc;
     self.Race := L.personal_race_desc;
-		self := [];
+    self := [];
   end;
 
   EXPORT proflicenses_v2 := if (~IsFCRA, PROJECT (ds_raw, FormatReport (Left)));

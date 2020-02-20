@@ -1,8 +1,9 @@
-﻿IMPORT BIPv2, Business_Risk_BIP, DueDiligence, iesp;
+﻿IMPORT BIPv2, Business_Risk_BIP, DueDiligence, iesp, Doxie;
 
 EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inData,
                                   Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                                  BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+                                  BIPV2.mod_sources.iParams linkingOptions,
+                                  doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
     
     
     
@@ -15,7 +16,7 @@ EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inD
 																																												SELF.inputEcho.business.accountNumber := IF(agentsAreBusiness, (STRING)COUNTER, DueDiligence.Constants.EMPTY);
 																																												
 																																												
-																																												SELF.cleanedInput.fullAddressProvided := TRUE;
+																																												SELF.cleanedInput.fullCleanAddressExists := TRUE;
 																																												SELF.cleanedInput.individual.name := IF(agentsAreBusiness = FALSE, LEFT.agent);
 																																												SELF.cleanedInput.individual.address := IF(agentsAreBusiness = FALSE, LEFT.agent);
 																																												
@@ -61,9 +62,8 @@ EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inD
     
     
     //get LexIDs
-    busLexIDs := DueDiligence.getBusInfo(cleanBusAgent.clean, options, linkingOptions);
-    indLexIDs := DueDiligence.getIndDID(cleanIndAgent.clean, options.DataRestrictionMask, options.DPPA_Purpose, options.GLBA_Purpose,
-                                        DueDiligence.CitDDShared.DEFAULT_BS_VERSION, DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS);
+    busLexIDs := DueDiligence.getBusInformation(options, linkingOptions).GetBusinessBestDataWithPII(cleanBusAgent.clean);
+    indLexIDs := DueDiligence.getIndInformation(options, mod_access).GetIndividualBestDataWithPII(cleanIndAgent.clean);
    
 
                                                   

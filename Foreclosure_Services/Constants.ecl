@@ -1,4 +1,4 @@
-IMPORT property;
+﻿IMPORT property;
 export Constants(string filedate='') := module
 	export str_autokeyname := '~thor_data400::key::foreclosure::autokey::qa::';
 	export ak_keyname	:= '~thor_data400::key::foreclosure::autokey::@version@::';
@@ -13,6 +13,9 @@ export Constants(string filedate='') := module
 	export ak_nod_dataset				:=  Property.File_NOD_Autokey;
 	export ak_nod_skipSet				:= ['P','Q','F'];
 	export ak_nod_typeStr				:= 'AK';
+	
+	export src_Fares := 'A';
+	export src_BlackKnight := 'B';
 end;
 
 //P in this set to skip personal phones

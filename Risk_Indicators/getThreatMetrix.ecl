@@ -1,7 +1,7 @@
 ﻿import ThreatMetrix, Risk_Indicators, Gateway, iesp, Models, riskwise, ut, address, PublicRecords_KEL;
 
 // this function assumes the indata has been run through the KEL cleaning functions for shell 5.5 and higher
-export getThreatMetrix(dataset(Risk_Indicators.layouts.layout_trustdefender_in) indata, dataset(Gateway.Layouts.Config) gateways, boolean NoPIIPersistence = true) := function
+export getThreatMetrix(dataset(Risk_Indicators.layouts.layout_trustdefender_in) indata, dataset(Gateway.Layouts.Config) gateways) := Function
 
 gateway_cfg	:= gateways(Gateway.Configuration.IsThreatMetrix(servicename))[1];
 
@@ -12,7 +12,9 @@ ThreatMetrix.gateway_trustdefender.t_TrustDefenderRequest prep(indata le) := tra
 	self.Options.Policy := trim(le.Policy);
 	self.Options.serviceType := trim(le.serviceType);
   self.Options.ApiType := trim(le.ApiType);
-  self.Options.NoPIIPersistence := NoPIIPersistence;   
+  self.Options.NoPIIPersistence := le.NoPIIPersistence;
+  self.Options.DigitalIdReadOnly := le.DigitalIdReadOnly;
+  self.Options.EventType := trim(le.Event_Type);
 	self.searchby.MerchantData.MerchantId := trim(le.MerchantID);
 	self.searchby.MerchantData.MerchantName := trim(le.MerchantName);
 

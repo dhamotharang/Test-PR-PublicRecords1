@@ -1,4 +1,4 @@
-﻿import ut, address, Risk_Indicators, Models, Business_Risk, gateway;
+﻿import Risk_Indicators, Models, Business_Risk, gateway, STD, Riskwise;
 
 export CDxO_Function(DATASET(Layout_CD2I) indata, 
 										 dataset(Gateway.Layouts.Config) gateways, 
@@ -9,7 +9,11 @@ export CDxO_Function(DATASET(Layout_CD2I) indata,
                      boolean include_ofac = false,
                      real global_watchlist_threshold = 0.84,
 										 string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-										 string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := 
+										 string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+                     unsigned1 LexIdSourceOptout = 1,
+                     string TransactionID = '',
+                     string BatchUID = '',
+                     unsigned6 GlobalCompanyId = 0) := 
 
 FUNCTION
 
@@ -26,11 +30,11 @@ Risk_Indicators.Layout_CIID_BtSt_In into_btst_in(indata le) := TRANSFORM
 	
 	self.Bill_To_In.seq := le.seq;
 	self.Bill_To_In.historydate := le.historydate;
-	self.Bill_To_In.fname := stringlib.stringtouppercase(le.first);
-	self.Bill_To_In.lname := stringlib.stringtouppercase(le.last);
-	self.Bill_To_In.in_streetAddress := stringlib.stringtouppercase(le.addr);
-	self.Bill_To_In.in_city := stringlib.stringtouppercase(le.city);
-	self.Bill_To_In.in_state := stringlib.stringtouppercase(le.state);
+	self.Bill_To_In.fname := STD.Str.touppercase(le.first);
+	self.Bill_To_In.lname := STD.Str.touppercase(le.last);
+	self.Bill_To_In.in_streetAddress := STD.Str.touppercase(le.addr);
+	self.Bill_To_In.in_city := STD.Str.touppercase(le.city);
+	self.Bill_To_In.in_state := STD.Str.touppercase(le.state);
 	self.Bill_To_In.in_zipCode := le.zip;
 	self.Bill_To_In.prim_range := clean_a[1..10];
 	self.Bill_To_In.predir := clean_a[11..12];
@@ -49,12 +53,12 @@ Risk_Indicators.Layout_CIID_BtSt_In into_btst_in(indata le) := TRANSFORM
 	self.Bill_To_In.addr_status := clean_a[179..182];
 	self.Bill_To_In.county := clean_a[143..145];
 	self.Bill_To_In.geo_blk := clean_a[171..177];
-	self.Bill_To_In.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.Bill_To_In.dl_state := stringlib.stringtouppercase(le.drlcstate);
+	self.Bill_To_In.dl_number := STD.Str.touppercase(dl_num_clean);
+	self.Bill_To_In.dl_state := STD.Str.touppercase(le.drlcstate);
 	self.Bill_To_In.email_address	:= le.email;
 	self.Bill_To_In.phone10 := hphone_val;
 	self.Bill_To_In.wphone10 := wphone_val;
-	self.Bill_To_In.employer_name := stringlib.stringtouppercase(le.cmpy);
+	self.Bill_To_In.employer_name := STD.Str.touppercase(le.cmpy);
 	self.bill_to_in.ip_address := le.ipaddr;
 	
 	// Clean ShipTo
@@ -64,11 +68,11 @@ Risk_Indicators.Layout_CIID_BtSt_In into_btst_in(indata le) := TRANSFORM
 	
 	self.Ship_To_In.seq := le.seq;
 	self.Ship_To_In.historydate := le.historydate;
-	self.Ship_To_In.fname := stringlib.stringtouppercase(le.first2);
-	self.Ship_To_In.lname := stringlib.stringtouppercase(le.last2);
-	self.Ship_To_In.in_streetAddress := stringlib.stringtouppercase(le.addr2);
-	self.Ship_To_In.in_city := stringlib.stringtouppercase(le.city2);
-	self.Ship_To_In.in_state := stringlib.stringtouppercase(le.state2);
+	self.Ship_To_In.fname := STD.Str.touppercase(le.first2);
+	self.Ship_To_In.lname := STD.Str.touppercase(le.last2);
+	self.Ship_To_In.in_streetAddress := STD.Str.touppercase(le.addr2);
+	self.Ship_To_In.in_city := STD.Str.touppercase(le.city2);
+	self.Ship_To_In.in_state := STD.Str.touppercase(le.state2);
 	self.Ship_To_In.in_zipCode := le.zip2;
 	self.Ship_To_In.prim_range := clean_a2[1..10];
 	self.Ship_To_In.predir := clean_a2[11..12];
@@ -88,7 +92,7 @@ Risk_Indicators.Layout_CIID_BtSt_In into_btst_in(indata le) := TRANSFORM
 	self.Ship_To_In.county := clean_a2[143..145];
 	self.Ship_To_In.geo_blk := clean_a2[171..177];
 	self.Ship_To_In.phone10 := hphone_val2;
-	self.Ship_To_In.employer_name := stringlib.stringtouppercase(le.cmpy2);	
+	self.Ship_To_In.employer_name := STD.Str.touppercase(le.cmpy2);	
 	self := [];
 END;
 prep := project(indata,into_btst_in(LEFT));
@@ -100,7 +104,11 @@ BSversion           := map(tribcode='nd11' => 51,
                           
 iid_results := risk_indicators.InstantId_BtSt_Function(prep, gateways, dppa, glb, false, false, true, true, true, ofac_version := ofac_version, include_ofac := include_ofac, 
                                                        global_watchlist_threshold := global_watchlist_threshold, bsversion:=bsversion,DataRestriction := DataRestriction,
-                                                       DataPermission := DataPermission);
+                                                       DataPermission := DataPermission,
+                                                       LexIdSourceOptout := LexIdSourceOptout, 
+                                                       TransactionID := TransactionID, 
+                                                       BatchUID := BatchUID, 
+                                                       GlobalCompanyID := GlobalCompanyID);
 
 // intermediate results
 working_layout := RECORD
@@ -166,7 +174,7 @@ working_layout fill_output(iid_results le, indata ri) := TRANSFORM
 	self.wphonetypeflag2 := if(tribcode in ['nd03','nd04','nd05','nd06'], 'B', '');
 	self.dwelltypeflag2 := le.ship_to_output.dwelltype;
 	ip := trim(ri.ipaddr);
-	self.billing := if(Stringlib.StringFilterOut(ip[1],'0123456789')='' and ip<>'' and tribcode in ['nd10','nd11'], 
+	self.billing := if(STD.Str.FilterOut(ip[1],'0123456789')='' and ip<>'' and tribcode in ['nd10','nd11'], 
 					dataset([{'na99',1}], risk_indicators.Layout_Billing),
 					dataset([],risk_indicators.Layout_Billing));
 	self.input := ri;
@@ -182,39 +190,44 @@ includeDLInfo       := false;
 includeVehInfo      := false;
 includeDerogInfo    := if(tribcode='nd11', true, false);
 
-getBS := Risk_Indicators.BocaShell_BtSt_Function(iid_results, gateways, dppa, glb, false, false, includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo, bsversion,DataRestriction := DataRestriction,DataPermission := DataPermission);	
+getBS := Risk_Indicators.BocaShell_BtSt_Function(iid_results, gateways, dppa, glb, false, false, includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo, bsversion,
+                                                                                          DataRestriction := DataRestriction,DataPermission := DataPermission,
+                                                                                          LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                          TransactionID := TransactionID, 
+                                                                                          BatchUID := BatchUID, 
+                                                                                          GlobalCompanyID := GlobalCompanyID);	
 
 
 working_layout addIP(mapped_results le, getBS ri) := TRANSFORM
-	override := map(( (integer)ri.eddo.firstscore between 80 and 100 ) and ( (integer)ri.eddo.lastscore between 80 and 100 ) and (integer)ri.eddo.addrscore < 80 and StringLib.StringToUpperCase(le.input.pymtmethod) <> 'B' and 
-					StringLib.StringToUpperCase(le.input.shipmode) <> 'R' and le.input.shipmode <> '' and StringLib.StringToUpperCase(le.input.avscode) = 'Y' and 
+	override := map(( (integer)ri.eddo.firstscore between 80 and 100 ) and ( (integer)ri.eddo.lastscore between 80 and 100 ) and (integer)ri.eddo.addrscore < 80 and STD.Str.ToUpperCase(le.input.pymtmethod) <> 'B' and 
+					STD.Str.ToUpperCase(le.input.shipmode) <> 'R' and le.input.shipmode <> '' and STD.Str.ToUpperCase(le.input.avscode) = 'Y' and 
 					(real)le.input.orderamt > 95 and ri.bill_to_out.iid.combo_addrcount = 0 and le.phoneverlevel2 in ['1','2','3','4','5','8','12'] and 
-					StringLib.StringToUpperCase(ri.ip2o.countrycode[1..2]) = 'US' and tribcode in ['nd03','nd04','nd05','nd06'] => '01',
-				 StringLib.StringToUpperCase(ri.ip2o.countrycode[1..2]) = 'US'
+					STD.Str.ToUpperCase(ri.ip2o.countrycode[1..2]) = 'US' and tribcode in ['nd03','nd04','nd05','nd06'] => '01',
+				 STD.Str.ToUpperCase(ri.ip2o.countrycode[1..2]) = 'US'
 				     and ri.Bill_To_Out.shell_input.fname <> ri.Ship_To_Out.shell_input.fname
 				     and ri.Bill_To_Out.shell_input.lname <> ri.Ship_To_Out.shell_input.lname
 				     and ( (integer)ri.eddo.addrscore between 80 and 100 )
-				     and StringLib.StringToUpperCase(le.input.pymtmethod) <> 'B' and
-					StringLib.StringToUpperCase(le.input.shipmode) <> 'R' and le.input.shipmode <> '' and tribcode in ['nd03','nd04','nd05','nd06'] => '02',
-				 StringLib.StringToUpperCase(ri.ip2o.countrycode[1..2]) = 'US' // US IP
+				     and STD.Str.ToUpperCase(le.input.pymtmethod) <> 'B' and
+					STD.Str.ToUpperCase(le.input.shipmode) <> 'R' and le.input.shipmode <> '' and tribcode in ['nd03','nd04','nd05','nd06'] => '02',
+				 STD.Str.ToUpperCase(ri.ip2o.countrycode[1..2]) = 'US' // US IP
 					and le.input.shipmode = '' // instore pickup order
 					and le.input.channel = '01' // internet order
 					and ri.ip2o.state != '' // IP state not missing
-					and StringLib.StringToUpperCase(ri.ip2o.state) != 'AOL' // ip state not AOL
-					and StringLib.StringToUpperCase(ri.ip2o.state) != 'NO REGION' // ip state not 'NO REGION'
+					and STD.Str.ToUpperCase(ri.ip2o.state) != 'AOL' // ip state not AOL
+					and STD.Str.ToUpperCase(ri.ip2o.state) != 'NO REGION' // ip state not 'NO REGION'
 					and trim(ri.Bill_to_Out.shell_input.in_state) != '' // billing state not missing
-					and StringLib.StringToUpperCase(trim(ri.Bill_to_Out.shell_input.in_state)) != StringLib.StringToUpperCase(trim(ri.ip2o.state)) // billing state differs from IP state
+					and STD.Str.ToUpperCase(trim(ri.Bill_to_Out.shell_input.in_state)) != STD.Str.ToUpperCase(trim(ri.ip2o.state)) // billing state differs from IP state
 					and tribcode in ['nd03','nd04','nd05','nd06'] => '03',
 				 '');				 
 
 	self.ipcontinent := ri.ip2o.continent;
-	self.ipcountry := if(override <> '', override, StringLib.StringToUpperCase(ri.ip2o.countrycode));
-	self.iproutingtype := if(Stringlib.StringFilterOut(ri.ip2o.ipaddr[1],'0123456789') = '', ri.ip2o.iproutingmethod, '');
-	self.ipstate := if(StringLib.StringToUpperCase(ri.ip2o.countrycode[1..2]) = 'US', StringLib.StringToUpperCase(ri.ip2o.state), '');
-	self.ipzip:= if(StringLib.StringToUpperCase(ri.ip2o.countrycode[1..2]) = 'US' and tribcode in ['nd03','nd04','nd05','nd06'], ri.ip2o.zip, '');
+	self.ipcountry := if(override <> '', override, STD.Str.ToUpperCase(ri.ip2o.countrycode));
+	self.iproutingtype := if(STD.Str.FilterOut(ri.ip2o.ipaddr[1],'0123456789') = '', ri.ip2o.iproutingmethod, '');
+	self.ipstate := if(STD.Str.ToUpperCase(ri.ip2o.countrycode[1..2]) = 'US', STD.Str.ToUpperCase(ri.ip2o.state), '');
+	self.ipzip:= if(STD.Str.ToUpperCase(ri.ip2o.countrycode[1..2]) = 'US' and tribcode in ['nd03','nd04','nd05','nd06'], ri.ip2o.zip, '');
 	self.ipareacode := if(tribcode in ['nd03','nd04','nd05','nd06'] and ri.ip2o.areacode <> '0', ri.ip2o.areacode, '');	
-	self.topleveldomain := if(tribcode in ['nd10','nd11'], StringLib.StringToUpperCase(ri.ip2o.topleveldomain), '');
-     self.secondleveldomain := if(tribcode in ['nd10','nd11'], StringLib.StringToUpperCase(ri.ip2o.secondleveldomain), '');
+	self.topleveldomain := if(tribcode in ['nd10','nd11'], STD.Str.ToUpperCase(ri.ip2o.topleveldomain), '');
+     self.secondleveldomain := if(tribcode in ['nd10','nd11'], STD.Str.ToUpperCase(ri.ip2o.secondleveldomain), '');
 	
 	self := le;
 END;

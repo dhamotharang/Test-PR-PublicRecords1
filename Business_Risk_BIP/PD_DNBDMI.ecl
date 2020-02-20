@@ -9,7 +9,7 @@ EXPORT PD_DNBDMI(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound,
 
 	// ---------------- DNB DMI - Dunn Bradstreet DMI ------------------
 	DNBDMIRaw := IF(StringLib.StringFind(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0, // Only grab DNB DMI data if it is explicitly passed in as allowed
-									DNB_DMI.Key_LinkIds.kFetch2(kFetchLinkIDs,
+									DNB_DMI.Key_LinkIds.kFetch2(kFetchLinkIDs, ,
 																						 kFetchLinkSearchLevel,
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,

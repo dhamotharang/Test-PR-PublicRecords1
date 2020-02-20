@@ -24,7 +24,9 @@ CHOOSEN(
 	IF(Risk_Indicators.rcSet.isCodeEI(layout.DID, layout.socsverlevel, layout.socsvalid) AND (rc_settings[1].EnableEmergingID),DATASET([{'EI',risk_indicators.getHRIDesc('EI')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCodeIT(layout.ssn),DATASET([{'IT',risk_indicators.getHRIDesc('IT')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCodeWL(layout.watchlist_table, layout.watchlist_record_number),DATASET([{'WL',risk_indicators.getHRIDesc('WL')}],risk_indicators.Layout_Desc)) &
-	IF(Risk_Indicators.rcSet.isCode19(layout.combo_lastcount, layout.combo_addrcount, layout.combo_hphonecount, layout.combo_ssncount),DATASET([{'19',risk_indicators.getHRIDesc('19')}],risk_indicators.Layout_Desc)) &
+  IF(Risk_Indicators.rcSet.isCodeER(layout.iid_tmx.emailhighriskind),DATASET([{'ER',risk_indicators.getHRIDesc('ER')}],risk_indicators.Layout_Desc))&
+  IF(Risk_Indicators.rcSet.isCodePR(layout.iid_tmx.phonehighriskind),DATASET([{'PR',risk_indicators.getHRIDesc('PR')}],risk_indicators.Layout_Desc))&
+  IF(Risk_Indicators.rcSet.isCode19(layout.combo_lastcount, layout.combo_addrcount, layout.combo_hphonecount, layout.combo_ssncount),DATASET([{'19',risk_indicators.getHRIDesc('19')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode51(layout.lname, layout.ssn, layout.lastssnmatch2, layout.socsverlevel, layout.ssnExists),DATASET([{'51',risk_indicators.getHRIDesc('51')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode66(layout.lname, layout.fname, layout.ssn, layout.lastcount, layout.socscount, layout.firstcount),DATASET([{'66',risk_indicators.getHRIDesc('66')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode71(layout.ssnExists, layout.ssn, layout.socsvalflag) AND rc_settings[1].IsInstantID, DATASET([{'71',risk_indicators.getHRIDesc('71')}],risk_indicators.Layout_Desc)) &
@@ -116,8 +118,12 @@ CHOOSEN(
 	IF(Risk_Indicators.rcSet.isCodeDM(layout.dl_searched, layout.dl_score, layout.verified_dl) AND rc_settings[1].IsInstantID,
 																		DATASET([{'DM',risk_indicators.getHRIDesc('DM')}],risk_indicators.Layout_Desc)) &	
 	IF(Risk_Indicators.rcSet.isCodeDF(layout.dl_searched, layout.dl_exists, layout.verified_dl, layout.drlcvalflag) AND rc_settings[1].IsInstantID,
-																		DATASET([{'DF',risk_indicators.getHRIDesc(IF(rc_settings[1].IIDVersion>0,'DFN','DF'))}],risk_indicators.Layout_Desc)),	// call the new description for versions > 0
+																		DATASET([{'DF',risk_indicators.getHRIDesc(IF(rc_settings[1].IIDVersion>0,'DFN','DF'))}],risk_indicators.Layout_Desc))&
+IF(Risk_Indicators.rcSet.isCodeEU(layout.VerifiedEmail,layout.email_address) AND rc_settings[1].includeemailverification,DATASET([{'EU',risk_indicators.getHRIDesc('EU')}],risk_indicators.Layout_Desc)),
 cnt)
+  
+
+
 
 
 ENDMACRO;

@@ -1,5 +1,5 @@
 ﻿IMPORT STD;
-EXPORT Fn_Clean_DLState(STRING InputDLStateEcho) := FUNCTION
+EXPORT Fn_Clean_DLState(STRING P_InpDLState) := FUNCTION
 
 ValidStates  := ['AL','AK','AS','AZ','AR','CA','CO','CT','DE','DC','FM','FL',
                  'GA','GU','HI','ID','IL','IN','IA','KS','KY','LA','ME','MH',
@@ -7,7 +7,7 @@ ValidStates  := ['AL','AK','AS','AZ','AR','CA','CO','CT','DE','DC','FM','FL',
 										 'NY','NC','ND','MP','OH','OK','OR','PW','PA','PR','RI','SC',
 										 'SD','TN','TX','UT','VT','VI','VA','WA','WV','WI','WY'];
 										 
-UpperDL        := STD.str.ToUpperCase(InputDLStateEcho);
+UpperDL        := STD.str.ToUpperCase(P_InpDLState);
 										 
 Statecheck     := UpperDL IN ValidStates; 
 

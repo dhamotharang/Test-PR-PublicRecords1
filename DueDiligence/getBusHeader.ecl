@@ -1,11 +1,12 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, BusinessInstantID20_Services, DueDiligence, STD, MDR;
+﻿IMPORT BIPV2, Business_Risk_BIP, BusinessInstantID20_Services, DueDiligence, doxie;
 
 
 EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
                     Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
                     BIPV2.mod_sources.iParams linkingOptions,
                     BOOLEAN includeAllBusinessData,
-                    BOOLEAN includeReportData) := FUNCTION
+                    BOOLEAN includeReportData,
+                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	
   
   
@@ -14,7 +15,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
     
     allBusinesses := inData + linkedBus;	
 
-    busHeaderFilt := DueDiligence.getBusHeaderImpl.getFilteredData(inData, options, linkingOptions);
+    busHeaderFilt := DueDiligence.getBusHeaderImpl.getFilteredData(inData, options, linkingOptions, mod_access);
     
     //if we are processing from a business perspective, we want all data
     //if we are processing from a person perspective, we only need certain information about the business
@@ -67,7 +68,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
     addNoFein := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeFEIN, DueDiligence.getBusHeaderImpl.getFEIN(addAddrFirstSeen, busHeaderFilt), addAddrFirstSeen);
       
     //if requesting incorporated in a state with loose laws
-    addIncLooseLaws := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeIncorporatedWithLooseLaws, DueDiligence.getBusHeaderImpl.getIncoprorationWithLooseLaws(addNoFein, busHeaderFilt), addNoFein);
+    addIncLooseLaws := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeIncorporatedWithLooseLaws, DueDiligence.CommonBusiness.getIncoprorationWithLooseLaws(addNoFein, busHeaderFilt, 'company_inc_state'), addNoFein);
       
     //if requesting unique POWIDs
     addUniquePows := IF(regBusDataOptions.includeAll OR regBusDataOptions.includeUniquePowIDsForASeleID, DueDiligence.getBusHeaderImpl.getUniquePowIDs(addIncLooseLaws, busHeaderFilt), addIncLooseLaws);

@@ -1,7 +1,7 @@
 ﻿
-import american_student_list, Riskwise, AlloyMedia_student_list, MDR, risk_indicators;
+import american_student_list, Riskwise, AlloyMedia_student_list, MDR, risk_indicators, doxie, Suppress, ut;
 
-export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean isMarketing) := FUNCTION
+export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean isMarketing, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 		
 	Layout_AS_Plus := RECORD
 		Riskwise.Layouts.Layout_American_Student student;
@@ -10,8 +10,13 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 		unsigned3 historydate;
 		string1 src; // used to identify source ('A'=alloy vs 'C' or 'H' = american student) so we can tiebreak on rollup
 	end;
+  
+  	Layout_AS_Plus_CCPA := RECORD
+        unsigned4 global_sid; // CCPA changes
+		Layout_AS_Plus;
+	end;
 	 
-	Layout_AS_Plus student(ids_only le, american_student_list.key_DID ri) := TRANSFORM
+	Layout_AS_Plus_CCPA student(ids_only le, american_student_list.key_DID ri) := TRANSFORM
 		self.did := le.did;
 		self.seq := le.seq;
 		self.historydate := le.historydate;
@@ -20,8 +25,10 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 		self.student := ri;
 		self.student.college_tier := if(bsversion>=50, ri.tier2, ri.tier);
 		self.src := ri.historical_flag; // ASL records will be indicated by a historical (H) or current (C) indicator
+        self.global_sid := ri.global_sid;
 	end;
-	student_file := join(ids_only, american_student_list.key_DID, 
+	
+	student_file_unsuppressed := join(ids_only, american_student_list.key_DID, 
 		left.did!=0 
 		and if(bsversion >= 4, true, if(right.source = MDR.sourceTools.src_OKC_Student_List, false, true)) 
 		and (~(right.source=mdr.sourceTools.src_OKC_Student_List and right.collegeid in Risk_Indicators.iid_constants.Set_Restricted_Colleges_For_Marketing) or isMarketing=false)
@@ -29,6 +36,17 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 		and (unsigned3)(right.date_first_seen[1..6]) < left.historydate,
 		student(left,right), left outer, atmost(keyed(left.did=right.l_did), 100)
 	);
+	
+student_file_flagged := Suppress.MAC_FlagSuppressedSource(student_file_unsuppressed, mod_access);
+
+student_file := PROJECT(student_file_flagged, TRANSFORM(Layout_AS_Plus, 
+		self.student.date_last_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.date_last_seen);
+		self.student.file_type2 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.file_type2);
+		self.student.college_tier := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_tier);
+		self.src := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.src);
+		self.student := IF(~left.is_suppressed, left.student);
+		SELF := LEFT;
+)); 
 
 	Layout_AS_Plus roll( Layout_AS_Plus le, Layout_AS_Plus ri ) := TRANSFORM
 		self := map(
@@ -60,7 +78,8 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 
 
 	// alloy
-	Layout_AS_Plus alloy_main(ids_only le, AlloyMedia_student_list.Key_DID ri) := TRANSFORM
+	Layout_AS_Plus_CCPA alloy_main(ids_only le, AlloyMedia_student_list.Key_DID ri) := TRANSFORM
+		self.global_sid := ri.global_sid;
 		self.did := le.did;
 		self.seq := le.seq;
 		self.historydate := le.historydate;
@@ -142,15 +161,30 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 		self := [];
 	end;
 
-
-
-	alloy_file := join(ids_only, AlloyMedia_student_list.Key_DID, 
+	alloy_file_unsuppressed := join(ids_only, AlloyMedia_student_list.Key_DID, 
 			left.did!=0
 			and keyed(left.did=right.did)
 			and right.date_vendor_first_reported < risk_indicators.iid_constants.myGetDate(left.historydate),
 			alloy_main(left, right), atmost(keyed(left.did=right.did), 100));
 
+	alloy_file_flagged := Suppress.MAC_FlagSuppressedSource(alloy_file_unsuppressed, mod_access);
+
+	alloy_file := PROJECT(alloy_file_flagged, TRANSFORM(Layout_AS_Plus, 
+		self.student.college_major := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_major);
+		self.student.file_type  := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.file_type);
+		self.student.file_type2 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.file_type2);
+		self.student.college_type := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_type);
+		self.student.college_code := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_code);
+		self.student.class := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.class);
+		self.student.date_first_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.date_first_seen);
+		self.student.date_last_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.date_last_seen);
+		self.student.college_name := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_name);
+		self.student.college_tier := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_tier);
+		self.student.rec_type := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.rec_type);
+		SELF := LEFT;
+	)); 
 
 	student_all := group(rollup(sort(ungroup(student_file + alloy_file),seq,record /* use record to avoid indeterminate code */), roll(left,right), seq),seq);
 	return student_all;
+
 end;

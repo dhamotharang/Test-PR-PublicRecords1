@@ -11,7 +11,7 @@ MODULE
 	EXPORT getBatchParams() :=
 	FUNCTION
 			BaseBatchParams := BatchShare.IParam.getBatchParams();			
-			inMod := MODULE(PROJECT(BaseBatchParams,BatchParams,OPT))			
+			inMod := MODULE (PROJECT(BaseBatchParams,BatchParams))
 			END;			
 			RETURN inMod;
 		END;

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SSNBatchConfirmDiscrepantService">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
   <part name="searchType" type="xsd:string"/>
@@ -11,8 +11,8 @@
 export SSNBatchConfirmDiscrepantService() := macro
 
 String5 searchType := '' : stored('searchType');
-unsigned1 DPPA_Purpose := 0 : stored('DPPAPurpose');
-unsigned1 GLB_Purpose := 8 : stored('GLBPurpose');
+
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 rec_out := ssn_services.layout_SSNBatchCD_output;
 
@@ -30,7 +30,7 @@ dids := ssn_services.fun_GetDIDsBySSN(forfun);
 //****** GET HEADER RECS FOR DIDS
 forhead := join(ds_in, dids, 
 								left.seq = right.seq,
-								ssn_services.transform_SSNForHead(left, right, dppa_purpose, glb_purpose), many lookup);
+								ssn_services.transform_SSNForHead(left, right, mod_access.dppa, mod_access.glb), many lookup);
 								
 head := doxie_raw.Header_Raw_batch(forhead)(prim_name[1..4]<>'DOD ');
 
@@ -40,7 +40,7 @@ mrkd := ssn_services.fun_MarkConfirmDiscrepant(ds_in, head, isConfirmBatch, isDi
 
 
 //****** APPEND WHITE PAGES AND DEMOGRAPHICS
-wdemo := ssn_services.fun_AppendDemoCDBatch(mrkd);
+wdemo := ssn_services.fun_AppendDemoCDBatch(mrkd, mod_access);
 
 if(hasNoSearchType, fail('No searchType given.'), output(wdemo, named('Result')));
 

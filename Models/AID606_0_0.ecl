@@ -1,4 +1,4 @@
-/* Modeling group is calling this model AID606_0_1 as it is the second version with score caps added. We are keeping the 
+﻿/* Modeling group is calling this model AID606_0_1 as it is the second version with score caps added. We are keeping the 
 		original name AID606_0_0.  */
 
 import ut, risk_indicators, RiskWise, RiskWiseFCRA, std;
@@ -243,6 +243,7 @@ Risk_Indicators.Layout_Output into_layout_output(clam le) := TRANSFORM
 	self := le.iid;
 	self := le.shell_input;
 	self := le;
+	self :=[];
 END;
 iid := project(clam, into_layout_output(left));
 

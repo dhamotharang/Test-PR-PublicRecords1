@@ -113,6 +113,7 @@ export RiskView_Batch_Service := MACRO
 	));
 
 VALIDATING := False;
+// VALIDATING :=true;
 
 batchin := dataset([],risk_indicators.Layout_Batch_In_Plus_Custom) 	: stored('batch_in',few);
 
@@ -398,12 +399,8 @@ End;
 
 custom_adl_clam := group(join(adl_clam, batchinseq_temp, left.seq=right.seq, getcustom(left, right)),seq);
 
-#if(VALIDATING)
-// final := adl_clam;
-// final := ungroup(Models.RVC1405_4_0(adl_clam, false)); // select correct clam here...adl_clam or clam.
-final := ungroup(Models.RVC1805_1_0(adl_clam, false)); 
-//OUTPUT(final, NAMED('Results'));
-#else
+#if(VALIDATING = false)
+
 attr := Models.getRVAttributes(clam, ''/*account_value*/, IsPreScreenTemp, false, DataRestriction);
 
 
@@ -2008,7 +2005,8 @@ final := map(
 	isPreScreen => after_suppressions,
 	project(filtered_pre_screen_recs, models.Layout_RiskView_Batch_Out)
 );
-#end
+
+
 
 
 
@@ -2054,7 +2052,12 @@ ConsumerStatementResults := join(final, ConsumerStatementResults_temp, (unsigned
 
 			
 output(ConsumerStatementResults, named('CSDResults'));  
-
+#else
+// final := adl_clam;
+// final := ungroup(Models.RVC1805_2_0(adl_clam, false)); // select correct clam here...adl_clam or clam.
+final := ungroup(Models.RVC1805_2_0(clam, false)); 
+OUTPUT(final, NAMED('Results'));
+#end
 
 ENDMACRO;
 

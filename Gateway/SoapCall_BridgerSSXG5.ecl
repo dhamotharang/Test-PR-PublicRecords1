@@ -1,5 +1,5 @@
-
-import iesp;
+﻿
+import iesp, _Control, OFAC_XG5;
 
 // 
 // 
@@ -29,16 +29,20 @@ end;
 		SELF := [];
 	END;
 
+STRING serviceName := 'Search';
 
-	searchReq_r := project(searchReq, 
+gateway_URL := gateway_cfg.url;
+	 
+ searchReq_r := project(searchReq, 
 											transform(iesp.WsSearchCore.t_SearchRequest,
 																self := left));
+                                
+ENV := _Control.ThisEnvironment.RoxieEnv;
 
-	STRING serviceName := 'Search';
+searchResp_PRCT := OFAC_XG5.PRCT_Function(searchReq);
 
-	gateway_URL := gateway_cfg.url;
 	
-	searchResp := if( gateway_url != '', SOAPCALL(searchReq_r,
+searchResp_PROD := if( gateway_url != '', SOAPCALL(searchReq_r,
 											gateway_cfg.Url,
 											serviceName,
 											{searchReq_r},
@@ -46,16 +50,19 @@ end;
 											XPATH('SearchResponse'),
 											ONFAIL(failx(LEFT)),
 											RETRY(retries),
-											TIMEOUT(waittime)));
-											
-											
+											TIMEOUT(waittime)));                     
 
-	
+
+// searchResp := if(ENV = 'QA', searchResp_PRCT, searchResp_PROD);
+// searchResp := if(ENV = 'QA', searchResp_PROD, searchResp_PRCT);
+searchResp := if(ENV = 'DProd' or ENV = 'DQA', searchResp_PRCT, searchResp_PROD);
+
+
 	// output(searchReq_r, named('searchReq_r'));
 	// output(gateway_cfg, named('gateway_cfg'));
 	// output(gateway_url, named('gateway_url'));
 	// output(searchResp, named('searchResp'));
-	
-  RETURN searchResp;
+
+return searchResp;
 
 END;	

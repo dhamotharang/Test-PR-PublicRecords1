@@ -1,4 +1,4 @@
-﻿import doxie, ut, doxie_crs, suppress, header;
+﻿import doxie, dx_header, ut, doxie_crs, suppress, header;
 
 export fn_SSN_Records(
 	dataset(doxie.layout_best) best_info_mult,
@@ -110,7 +110,7 @@ ssn_info := doxie_crs.layout_ssn_records;
 
 // check if SSN was seen before randomization:
 // TODO: making it after validation may be more efficient
-ssn_w_legacy_info := join (find_rels, doxie.key_legacy_ssn,
+ssn_w_legacy_info := join (find_rels, dx_header.key_legacy_ssn(),
                            keyed (Left.ssn = Right.ssn) AND
                            (Left.did = Right.did),
                            transform (p_sum, Self.legacy_ssn := Right.ssn != '', Self := Left),

@@ -1,4 +1,4 @@
-﻿IMPORT Gateway, Inquiry_Deltabase, Inquiry_AccLogs, Risk_Indicators, RiskWise, Suspicious_Fraud_LN;
+﻿IMPORT Gateway, Inquiry_Deltabase, Suspicious_Fraud_LN;
 
 EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltabase.Layouts.Input_Deltabase_All) SearchInput,
 																																SET OF STRING100 FunctionDescriptions, // Example: Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions
@@ -69,7 +69,7 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltaba
     SQLSelectFieldTransactionID := ', \'8\' AS Search_Type ';
     SQLFrom         := ' FROM delta_shell.inquiry_nonfcra i ';
     SQLWhereMain      := ' WHERE ';
-    SQLWhereAddress   := IF(NOT Valid_Query_Address,'',' IFNULL(i.Clean_Zip5,\'\') = \'' + Zip5 + '\' AND IFNULL(i.Clean_Prim_Name,\'\') = \'' + Prim_Name + '\' AND IFNULL(i.Clean_Prim_Range,\'\') = \'' + Prim_Range + '\' AND IFNULL(i.Clean_Sec_Range,\'\') = \'' + Sec_Range + '\' ' );
+    SQLWhereAddress   := IF(NOT Valid_Query_Address,'',' i.Clean_Zip5 = NULLIF(\'' + Zip5 + '\',\'\') AND i.Clean_Prim_Name = NULLIF(\'' + Prim_Name + '\',\'\') AND i.Clean_Prim_Range = NULLIF(\'' + Prim_Range + '\',\'\') AND i.Clean_Sec_Range = NULLIF(\'' + Sec_Range + '\',\'\') ' );
     SQLWhereDID       := IF(NOT Valid_Query_DID,'',' i.Response_LexID = \'' + (STRING)DID + '\' ');
     SQLWhereEmail     := IF(NOT Valid_Query_Email,'',' i.Email = \'' + Email + '\' ');
     SQLWhereIPAddr    := IF(NOT Valid_Query_IPAddr,'',' i.IPAddr = \'' + IPAddr + '\' ');
@@ -199,5 +199,6 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltaba
   
 	DeltabaseResults := PROJECT(DeltabaseResponse.Response, intoKeyLayout(LEFT));
 	// OUTPUT(SelectStatements);
+	// OUTPUT(DeltabaseResponse);
 	RETURN(DeltabaseResults);
 END;

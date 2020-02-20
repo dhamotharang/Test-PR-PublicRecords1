@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Phone Identification">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="account" type="xsd:string"/>
@@ -21,7 +21,7 @@
 */
 /*--INFO-- Migrating pil2 and trg1 to boca */
 
-import address, risk_indicators, gateway;
+import risk_indicators, gateway, Riskwise, STD, risk_indicators;
 
 export RiskWiseMainPI2O := MACRO
 
@@ -48,7 +48,11 @@ export RiskWiseMainPI2O := MACRO
 	'HistoryDateYYYYMM',
 	'DataRestrictionMask',
 	'DataPermissionMask',
-	'gateways'));
+	'gateways',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 string4  tribCode_value := ''  	: stored('tribcode');	// not used in prii
 string30 account_value := ''  	: stored('account');
@@ -73,7 +77,14 @@ boolean suppressNearDups := true;
 boolean require2Ele := false;
 
 gateways_in := Gateway.Configuration.Get();
-tribcode := StringLib.StringToLowerCase(tribCode_value);
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+tribcode := STD.Str.ToLowerCase(tribCode_value);
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
@@ -95,11 +106,11 @@ risk_indicators.layout_input into_input(d le, integer C) := transform
 	
 	self.seq := c;
 	self.historydate := history_date;
-	self.fname := stringlib.stringtouppercase(first_value);
-	self.lname := stringlib.stringtouppercase(last_value);
-	self.in_streetAddress := stringlib.stringtouppercase(addr_value);
-	self.in_city := stringlib.stringtouppercase(city_value);
-	self.in_state := stringlib.stringtouppercase(state_value);
+	self.fname := STD.Str.touppercase(first_value);
+	self.lname := STD.Str.touppercase(last_value);
+	self.in_streetAddress := STD.Str.touppercase(addr_value);
+	self.in_city := STD.Str.touppercase(city_value);
+	self.in_state := STD.Str.touppercase(state_value);
 	self.in_zipCode := zip_value;
 	self.prim_range := clean_a[1..10];
 	self.predir := clean_a[11..12];
@@ -119,14 +130,18 @@ risk_indicators.layout_input into_input(d le, integer C) := transform
 	self.county := clean_a[143..145];
 	self.geo_blk := clean_a[171..177];
 	self.phone10 := hphone_val;
-	self.employer_name := stringlib.stringtouppercase(cmpy_value);	
+	self.employer_name := STD.Str.touppercase(cmpy_value);	
 	self := [];
 end;
 
 prep := project(d,into_input(LEFT, counter));
   
 iid_results := risk_indicators.InstantID_Function(prep,gateways,dppa_purpose,glb_purpose,isUtility,ln_branded, 
-			ofac_only, suppressneardups, require2Ele,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission);
+			ofac_only, suppressneardups, require2Ele,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission,
+            LexIdSourceOptout := LexIdSourceOptout, 
+            TransactionID := TransactionID, 
+            BatchUID := BatchUID, 
+            GlobalCompanyID := GlobalCompanyID);
 //output(iid_results);
 dRoyalties :=Royalty.RoyaltyTargus.GetOnlineRoyalties(UNGROUP(iid_results), src, TargusType, TRUE, FALSE, FALSE, TRUE);
 

@@ -1,4 +1,4 @@
-import doxie, header_slimsort, header;
+import doxie, header_slimsort, dx_header;
 
 CN := PhilipMorris.Constants;
 LT := PhilipMorris.Layouts;
@@ -18,8 +18,8 @@ export fn_getSearchPassRobustCandidates(DATASET(LT.Clean.FullRecordNorm) SearchD
 		
 	searchpass_candidates_dids := join(
 			 searchDataLocal, 
-			 doxie.Key_Address, //prim_name, prim_range, st, city_code, zip, sec_Range, dph_lname, lname, pfname, fname
-				keyed(doxie.StripOrdinal(left.SearchAddress.Prim_Name) = right.prim_name) and	//note that previous index did not use doxie.StripOrdinal in the build.  doxie.Key_Address does.		 
+			 dx_header.key_address(), //prim_name, prim_range, st, city_code, zip, sec_Range, dph_lname, lname, pfname, fname
+				keyed(doxie.StripOrdinal(left.SearchAddress.Prim_Name) = right.prim_name) and	//note that previous index did not use doxie.StripOrdinal in the build.  key_address does.		 
 				keyed(left.SearchAddress.Prim_Range = right.prim_range) and
 				keyed(left.SearchAddress.st = right.st or left.SearchAddress.st = '') and				
 				wild(right.city_code) and
@@ -37,7 +37,7 @@ export fn_getSearchPassRobustCandidates(DATASET(LT.Clean.FullRecordNorm) SearchD
 						 
 	searchpass_candidates_dids_sorted  := sort(searchpass_candidates_dids, InternalSeqNo, SearchAddress.ADDRESSID, did);
 	searchpass_candidates_dids_deduped := dedup(searchpass_candidates_dids_sorted, InternalSeqNo, SearchAddress.ADDRESSID, did);
-	dirty_header_records	:= join (searchpass_candidates_dids_deduped, doxie.key_header,
+	dirty_header_records	:= join (searchpass_candidates_dids_deduped, dx_header.key_header(),
 														keyed(LEFT.did = RIGHT.s_did) and
 														left.SearchAddress.Prim_Name	!= '' and				
 														// conditions from did search also apply here.. don't need the extra records 

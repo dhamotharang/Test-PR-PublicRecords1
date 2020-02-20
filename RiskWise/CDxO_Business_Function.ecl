@@ -1,4 +1,4 @@
-﻿import ut, address, Risk_Indicators, Models, Business_Risk, gateway;
+﻿import Risk_Indicators, Models, Business_Risk, gateway, Riskwise;
 
 export CDxO_Business_Function(DATASET(Layout_CD2I) indata, 
 															dataset(Gateway.Layouts.Config) gateways, 
@@ -9,7 +9,11 @@ export CDxO_Business_Function(DATASET(Layout_CD2I) indata,
                               boolean include_ofac = false,
                               real global_watchlist_threshold = 0.84,
 															string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-															string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := 
+															string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+                                                            unsigned1 LexIdSourceOptout = 1,
+                                                            string TransactionID = '',
+                                                            string BatchUID = '',
+                                                            unsigned6 GlobalCompanyId = 0) := 
 
 FUNCTION
 
@@ -136,7 +140,11 @@ BSversion           := map(tribcode='nd11' => 51,
 													 1);
 
 biid_results := Business_Risk.InstantId_Function_BtSt(prep, gateways, false, dppa, glb, false, false, tribcode, ofac_version, include_ofac, , global_watchlist_threshold, 
-                                                      dataRestriction:=DataRestriction, dataPermission:=dataPermission);
+                                                      dataRestriction:=DataRestriction, dataPermission:=dataPermission,
+                                                      LexIdSourceOptout := LexIdSourceOptout, 
+                                                      TransactionID := TransactionID, 
+                                                      BatchUID := BatchUID, 
+                                                      GlobalCompanyID := GlobalCompanyID);
 
 
 // intermediate results
@@ -324,7 +332,12 @@ risk_indicators.Layout_CIID_BtSt_In convertIt(prep le) := TRANSFORM
 END;
 BTSTInput := PROJECT(prep, convertIt(LEFT));
 
-iid_results := risk_indicators.InstantId_BtSt_Function(BTSTInput,gateways,dppa,glb,false,false, true, true, true,BSversion, DataRestriction:=DataRestriction, dataPermission:= dataPermission);
+iid_results := risk_indicators.InstantId_BtSt_Function(BTSTInput,gateways,dppa,glb,false,false, true, true, true,BSversion, 
+DataRestriction:=DataRestriction, dataPermission:= dataPermission,
+LexIdSourceOptout := LexIdSourceOptout, 
+TransactionID := TransactionID, 
+BatchUID := BatchUID, 
+GlobalCompanyID := GlobalCompanyID);
 									// turned off dl,vehicle, and derogs because cdn606_2_0 doesn't use that data
 									// now passing in BSversion as nd11 needs version 3
 									
@@ -335,7 +348,11 @@ includeDerogInfo    := if(tribcode='nd11', true, false);
 									
 getBS := Risk_Indicators.BocaShell_BtSt_Function(iid_results, gateways, dppa, glb, false, false, 
 	includeRelativeInfo, includeDLInfo,includeVehInfo,includeDerogInfo,
-	BSversion, DataRestriction:=DataRestriction, dataPermission:=dataPermission);	
+	BSversion, DataRestriction:=DataRestriction, dataPermission:=dataPermission,
+    LexIdSourceOptout := LexIdSourceOptout, 
+    TransactionID := TransactionID, 
+    BatchUID := BatchUID, 
+    GlobalCompanyID := GlobalCompanyID);	
 
 working_layout addIP(mapped_results le, getBS ri) := TRANSFORM
 	self.ipcontinent := ri.ip2o.continent;

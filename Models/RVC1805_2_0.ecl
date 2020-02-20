@@ -1,5 +1,5 @@
 ﻿/************************************************************************************
- * RVC1805.2.0                       Version 00                               BY AO *
+ * RVC1805.2.1                       Version 00                               BY AO *
  * Phillips & Cohen Custom Payment Score for Probate                     07/25/2018 *
  ************************************************************************************
  ************************************************************************************
@@ -23,14 +23,15 @@
  * Model Requirements:                                                              *
  *  Fields from FCRA 4.1 Modeling Shell                                             *
  ************************************************************************************
- * ECL Developer: Jack Francis Jr                                        08/15/2018 *
+ * ECL Developer: Jack Francis Jr   08/15/2018 *
+ * ECL Developer: AT  08/26/2019 *
  ************************************************************************************/
 
 IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators, riskview;
 
-EXPORT rvc1805_2_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, Boolean isCalifornia = False) := FUNCTION
+EXPORT RVC1805_2_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, Boolean isCalifornia = False) := FUNCTION
 
-	MODEL_DEBUG := False;
+	MODEL_DEBUG := false;
 
 	#if(MODEL_DEBUG)
 	Layout_Debug := RECORD
@@ -38,7 +39,6 @@ EXPORT rvc1805_2_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, Boo
 	/* Model Intermediate Variables */
           unsigned  seq;
           Integer sysdate;
-          String iv_add_apt;
           String iv_db001_bankruptcy;
           String iv_phnpop_x_nap_summary;
           Integer lien_adl_li_count_pos;
@@ -47,6 +47,7 @@ EXPORT rvc1805_2_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, Boo
           Integer lien_adl_count_l2;
           Integer _src_lien_adl_count;
           Integer iv_src_liens_adl_count;
+          Integer _src_prop_adl_count;
           Integer iv_avg_lres;
           String iv_bst_own_prop_x_addr_naprop;
           Integer iv_in001_estimated_income;
@@ -56,20 +57,19 @@ EXPORT rvc1805_2_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, Boo
           Integer _prop_adl_lseen_p;
           Integer _src_prop_adl_lseen;
           Integer iv_mos_src_property_adl_lseen;
-          Integer iv_ssns_per_sfd_addr;
-          Integer _reported_dob;
-          Integer reported_age;
-          Integer iv_combined_age;
           Real iv_avg_prop_assess_purch_amt;
           Integer iv_addrs_per_adl;
+          string iv_inq_per_addr;
           Integer _gong_did_first_seen;
           Integer iv_mos_since_gong_did_fst_seen;
           Integer iv_prv_addr_avm_auto_val;
           String iv_rec_vehx_level;
           Integer iv_inq_ssns_per_adl;
+          Integer iv_src_property_adl_count;
           Integer iv_input_addr_not_most_recent;
-          String iv_prof_license_category;
           Integer iv_lnames_per_adl;
+          Integer prop_adl_count_p;
+          Integer prop_adl_p_count_pos;
           Real pr_v01_w;
           Real pr_aa_dist_01;
           String pr_aa_code_01;
@@ -124,15 +124,11 @@ EXPORT rvc1805_2_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, Boo
           Real pr_v18_w;
           Real pr_aa_dist_18;
           String pr_aa_code_18;
-          Real pr_v19_w;
-          Real pr_aa_dist_19;
-          Real pr_rcvalue9k;
           Real pr_rcvalue27;
           Real pr_rcvalue9m;
           Real pr_rcvalue9a;
           Real pr_rcvalue9c;
           Real pr_rcvalue36;
-          Real pr_rcvalue9g;
           Real pr_rcvalue9f;
           Real pr_rcvalue99;
           Real pr_rcvalue98;
@@ -183,11 +179,11 @@ EXPORT rvc1805_2_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, Boo
           Real r_vl18;
           Real r_vl19;
           String _rc_inq;
-          Integer iv_rv5_unscorable;
+          integer iv_rv5_unscorable;
           Integer base;
           Integer pts;
           Real lgt;
-          Integer rvc1805_2_0;
+          Integer RVC1805_2_0;
           String rc3;
           String rc4;
           String rc5;
@@ -251,6 +247,7 @@ EXPORT rvc1805_2_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, Boo
 	ssns_per_addr                    := le.velocity_counters.ssns_per_addr;
 	inq_count12                      := le.acc_logs.inquiries.count12;
 	inq_ssnsperadl                   := le.acc_logs.inquiryssnsperadl;
+  inq_peraddr                      := le.acc_logs.inquiryperaddr;
 	attr_num_aircraft                := le.aircraft.aircraft_count;
 	bankrupt                         := le.bjl.bankrupt;
 	disposition                      := le.bjl.disposition;
@@ -267,23 +264,17 @@ EXPORT rvc1805_2_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, Boo
 	/* ***********************************************************
 	 *   Generated ECL         *
 	 ************************************************************* */
-
-
 NULL := -999999999;
-
-
-INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
 string zero_fill(string src_string, integer len) := function
 		return ('00000' + src_string)[length(src_string) + 5 - len + 1..];
 	end;
+INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
 sysdate := common.sas_date(if(le.historydate=999999, (string8)Std.Date.Today(), (string6)le.historydate+'01'));
 
-iv_add_apt := if(StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or not(out_unit_desig = '') or not(out_sec_range = ''), '1', '0');
-
 iv_db001_bankruptcy := map(
-    not(truedid or (integer)ssnlength > 0)                                                                                      => '-1               ',
+    not(truedid or (integer)ssnlength > 0)                                                                                               => '-1               ',
     (disposition in ['Discharge NA', 'Discharged'])                                                                             => '1 - BK Discharged',
     (disposition in ['Dismissed'])                                                                                              => '2 - BK Dismissed ',
     (rc_bansflag in ['1', '2']) or bankrupt or contains_i(ver_sources, 'BA') > 0 or filing_count > 0 or bk_recent_count > 0 => '3 - BK Other     ',
@@ -292,11 +283,11 @@ iv_db001_bankruptcy := map(
 iv_phnpop_x_nap_summary := map(
     not(hphnpop or addrpop) => '-1 ',
     hphnpop                 => (string)(nap_summary + 100),
-                               zero_fill((string)nap_summary, 3));
-
+                               zero_fill((string)nap_summary, 3)); 
+                               
 lien_adl_li_count_pos := Models.Common.findw_cpp(ver_sources, 'LI' , ', ', 'E');
 
-lien_adl_count_li := if(lien_adl_li_count_pos = 0, NULL, (integer)Models.Common.getw(ver_sources_count, lien_adl_li_count_pos, ', '));
+lien_adl_count_li := if(lien_adl_li_count_pos = 0, NULL, (integer)Models.Common.getw(ver_sources_count, lien_adl_li_count_pos, ','));
 
 lien_adl_l2_count_pos := Models.Common.findw_cpp(ver_sources, 'L2' , ', ', 'E');
 
@@ -311,14 +302,16 @@ iv_src_liens_adl_count := map(
 
 iv_avg_lres := if(not(truedid), NULL, avg_lres);
 
-iv_bst_own_prop_x_addr_naprop_c9 := if(property_owned_total > 0, Intformat((INTEGER)add1_naprop + 10, 2, 1)[1..2], Intformat((Integer)add1_naprop, 2, 1)[1..2]);
 
-iv_bst_own_prop_x_addr_naprop_c10 := if(property_owned_total > 0, Intformat((INTEGER)add2_naprop + 10, 2, 1)[1..2], Intformat((Integer)add2_naprop, 2, 1)[1..2]);
+iv_bst_own_prop_x_addr_naprop_c8 :=__common__( if(property_owned_total > 0, (string)(add1_naprop + 10), zero_fill((string)add1_naprop, 2)));
+
+
+iv_bst_own_prop_x_addr_naprop_c9 :=__common__( if(property_owned_total > 0, (string)(add2_naprop + 10), zero_fill((string)add2_naprop, 2)));
 
 iv_bst_own_prop_x_addr_naprop := map(
     not(truedid)     => '-1',
-    add1_isbestmatch => iv_bst_own_prop_x_addr_naprop_c9,
-                        iv_bst_own_prop_x_addr_naprop_c10);
+    add1_isbestmatch => (STRING)iv_bst_own_prop_x_addr_naprop_c8,
+                        (STRING)iv_bst_own_prop_x_addr_naprop_c9);
 
 iv_in001_estimated_income := if(not(truedid), NULL, estimated_income);
 
@@ -336,24 +329,6 @@ iv_mos_src_property_adl_lseen := map(
     not(truedid)               => NULL,
     _src_prop_adl_lseen = NULL => -1,
                                   if ((sysdate - _src_prop_adl_lseen) / (365.25 / 12) >= 0, truncate((sysdate - _src_prop_adl_lseen) / (365.25 / 12)), roundup((sysdate - _src_prop_adl_lseen) / (365.25 / 12))));
-
-iv_ssns_per_sfd_addr := map(
-    not(add1_pop)    => NULL,
-    iv_add_apt = '1' => -1,
-                        ssns_per_addr);
-
-_reported_dob := common.sas_date((string)(reported_dob));
-
-reported_age := if(min(sysdate, _reported_dob) = NULL, NULL, truncate((sysdate - _reported_dob) / 365.25));
-
-iv_combined_age := map(
-    not(truedid or dobpop)      => NULL,
-    age > 0                     => age,
-    (integer)input_dob_age > 0  => (integer)input_dob_age,
-    inferred_age > 0            => inferred_age,
-    reported_age > 0            => reported_age,
-    (integer)ams_age > 0        => (integer)ams_age,
-                                   -1);
 
 iv_avg_prop_assess_purch_amt := map(
     not(truedid or add1_pop)          => NULL,
@@ -378,51 +353,59 @@ iv_rec_vehx_level := map(
     not(truedid)                                   => '-1',
     attr_num_aircraft > 0 and watercraft_count > 0 => 'AW',
     attr_num_aircraft > 0                          => 'AO',
-    watercraft_count > 0                           => 'W' + (string)min(if(watercraft_count = NULL, -NULL, watercraft_count), 3),
+    watercraft_count > 0                           => trim('W', LEFT, RIGHT) + trim((STRING)min(if(watercraft_count = NULL, -NULL, watercraft_count), 3), LEFT, RIGHT),
                                                       'XX');
 
 iv_inq_ssns_per_adl := if(not(truedid), NULL, inq_ssnsperadl);
 
-iv_input_addr_not_most_recent := if(not(truedid), -1, (integer)(rc_input_addr_not_most_recent));
-
-iv_prof_license_category := map(
-    not(truedid)                 => '-2',
-    prof_license_category = ''   => '-1',
-                                    prof_license_category);
+iv_input_addr_not_most_recent := if(not(truedid), -1, (integer)rc_input_addr_not_most_recent);
 
 iv_lnames_per_adl := if(not(truedid), NULL, lnames_per_adl);
 
+iv_inq_per_addr := if(not(add1_pop), NULL, inq_peraddr);
+
+prop_adl_p_count_pos := Models.Common.findw_cpp(ver_sources, 'P' , ', ', 'E');
+
+prop_adl_count_p := if(prop_adl_p_count_pos = 0, NULL, (integer)Models.Common.getw(ver_sources_count, prop_adl_p_count_pos, ','));
+
+_src_prop_adl_count := max(prop_adl_count_p, (real)0);
+
+iv_src_property_adl_count := map(
+    not(truedid)               => NULL,
+    _src_prop_adl_count = NULL => -1,
+                                  _src_prop_adl_count);
+
 pr_v01_w := map(
-    iv_db001_bankruptcy = ''                                       => 0,
+    iv_db001_bankruptcy = (STRING)NULL                                     => 0,
     (iv_db001_bankruptcy in ['-1'])                                => 0,
-    (iv_db001_bankruptcy in ['0 - No BK'])                         => 0.51935964435114,
-    (iv_db001_bankruptcy in ['1 - BK Discharged', '3 - BK Other']) => -0.526337067642199,
-    (iv_db001_bankruptcy in ['2 - BK Dismissed'])                  => -0.845881537739416,
+    (iv_db001_bankruptcy in ['0 - No BK'])                         => 0.532875823525413,
+    (iv_db001_bankruptcy in ['1 - BK Discharged', '3 - BK Other']) => -0.538362103231024,
+    (iv_db001_bankruptcy in ['2 - BK Dismissed'])                  => -0.872827827219129,
                                                                       0);
 
 pr_aa_code_01_1 := map(
-    iv_db001_bankruptcy = ''                                       => '',
+    iv_db001_bankruptcy = (STRING)NULL                                     => '',
     (iv_db001_bankruptcy in ['-1'])                                => '',
     (iv_db001_bankruptcy in ['0 - No BK'])                         => '9W',
     (iv_db001_bankruptcy in ['1 - BK Discharged', '3 - BK Other']) => '9W',
     (iv_db001_bankruptcy in ['2 - BK Dismissed'])                  => '9W',
                                                                       '9W');
 
-pr_aa_dist_01 := 0.51935964435114 - pr_v01_w;
+pr_aa_dist_01 := 0.532875823525413 - pr_v01_w;
 
 pr_aa_code_01 := if(pr_aa_dist_01 = 0, '', pr_aa_code_01_1);
 
 pr_v02_w := map(
-    iv_phnpop_x_nap_summary = ''                                            => 0,
+    iv_phnpop_x_nap_summary = (STRING)NULL                                          => 0,
     (iv_phnpop_x_nap_summary in ['-1'])                                     => 0,
-    (iv_phnpop_x_nap_summary in ['000', '003', '005', '008'])               => -0.455329831951737,
-    (iv_phnpop_x_nap_summary in ['100'])                                    => 0.178390631810483,
-    (iv_phnpop_x_nap_summary in ['101', '103', '104', '105', '106'])        => 0.309114194744984,
-    (iv_phnpop_x_nap_summary in ['107', '108', '109', '110', '111', '112']) => 0.397142093660449,
+    (iv_phnpop_x_nap_summary in ['000', '003', '005', '008'])               => -0.460923464571853,
+    (iv_phnpop_x_nap_summary in ['100'])                                    => 0.1630074173855,
+    (iv_phnpop_x_nap_summary in ['101', '103', '104', '105', '106'])        => 0.29080459599449,
+    (iv_phnpop_x_nap_summary in ['107', '108', '109', '110', '111', '112']) => 0.414504903481762,
                                                                                0);
 
 pr_aa_code_02_1 := map(
-    iv_phnpop_x_nap_summary = ''                                            => '',
+    iv_phnpop_x_nap_summary = (STRING)NULL                                          => '',
     (iv_phnpop_x_nap_summary in ['-1'])                                     => '',
     (iv_phnpop_x_nap_summary in ['000', '003', '005', '008'])               => '80',
     (iv_phnpop_x_nap_summary in ['100'])                                    => '27',
@@ -430,15 +413,15 @@ pr_aa_code_02_1 := map(
     (iv_phnpop_x_nap_summary in ['107', '108', '109', '110', '111', '112']) => '27',
                                                                                '27');
 
-pr_aa_dist_02 := 0.397142093660449 - pr_v02_w;
+pr_aa_dist_02 := 0.414504903481762 - pr_v02_w;
 
 pr_aa_code_02 := if(pr_aa_dist_02 = 0, '', pr_aa_code_02_1);
 
 pr_v03_w := map(
     iv_src_liens_adl_count = NULL => 0,
     iv_src_liens_adl_count = -1   => 0,
-    iv_src_liens_adl_count <= 0.5 => 0.379690065947241,
-                                     -0.458901541830779);
+    iv_src_liens_adl_count <= 0.5 => 0.401355927324539,
+                                     -0.476496641604834);
 
 pr_aa_code_03_1 := map(
     iv_src_liens_adl_count = NULL => '',
@@ -446,21 +429,21 @@ pr_aa_code_03_1 := map(
     iv_src_liens_adl_count <= 0.5 => '98',
                                      '98');
 
-pr_aa_dist_03 := 0.379690065947241 - pr_v03_w;
+pr_aa_dist_03 := 0.401355927324539 - pr_v03_w;
 
 pr_aa_code_03 := if(pr_aa_dist_03 = 0, '', pr_aa_code_03_1);
 
 pr_v04_w := map(
     iv_avg_lres = NULL   => 0,
     iv_avg_lres = -1     => 0,
-    iv_avg_lres <= 64.5  => -0.380298967010422,
-    iv_avg_lres <= 78.5  => -0.246724463870569,
-    iv_avg_lres <= 104.5 => -0.148861251451945,
-    iv_avg_lres <= 142.5 => -0.0623091128913088,
-    iv_avg_lres <= 184.5 => 0.0171448952961551,
-    iv_avg_lres <= 213.5 => 0.0939872465684746,
-    iv_avg_lres <= 280.5 => 0.243735592907905,
-                            0.344374081400186);
+    iv_avg_lres <= 64.5  => -0.42535345714486,
+    iv_avg_lres <= 78.5  => -0.305823903980823,
+    iv_avg_lres <= 104.5 => -0.190327216300318,
+    iv_avg_lres <= 142.5 => -0.0704941437875574,
+    iv_avg_lres <= 184.5 => 0.0261033568917136,
+    iv_avg_lres <= 213.5 => 0.121269796786007,
+    iv_avg_lres <= 280.5 => 0.283056160362662,
+                            0.399900074673182);
 
 pr_aa_code_04_1 := map(
     iv_avg_lres = NULL   => '',
@@ -474,47 +457,23 @@ pr_aa_code_04_1 := map(
     iv_avg_lres <= 280.5 => '9C',
                             '9C');
 
-pr_aa_dist_04 := 0.344374081400186 - pr_v04_w;
+pr_aa_dist_04 := 0.399900074673182 - pr_v04_w;
 
 pr_aa_code_04 := if(pr_aa_dist_04 = 0, '', pr_aa_code_04_1);
 
 pr_v05_w := map(
-    iv_bst_own_prop_x_addr_naprop = ''                                => 0,
-    (iv_bst_own_prop_x_addr_naprop in ['-1'])                         => 0,
-    (iv_bst_own_prop_x_addr_naprop in ['00'])                         => -0.165741665247493,
-    (iv_bst_own_prop_x_addr_naprop in ['01'])                         => -0.341062890775223,
-    (iv_bst_own_prop_x_addr_naprop in ['02', '03'])                   => -0.0586696864217944,
-    (iv_bst_own_prop_x_addr_naprop in ['04', '10', '11', '12', '13']) => 0.0750071482829804,
-    (iv_bst_own_prop_x_addr_naprop in ['14'])                         => 0.231673649002297,
-                                                                         0);
-
-pr_aa_code_05_1 := map(
-    iv_bst_own_prop_x_addr_naprop = ''                                => '',
-    (iv_bst_own_prop_x_addr_naprop in ['-1'])                         => '',
-    (iv_bst_own_prop_x_addr_naprop in ['00'])                         => '9A',
-    (iv_bst_own_prop_x_addr_naprop in ['01'])                         => '9A',
-    (iv_bst_own_prop_x_addr_naprop in ['02', '03'])                   => '9A',
-    (iv_bst_own_prop_x_addr_naprop in ['04', '10', '11', '12', '13']) => '36',
-    (iv_bst_own_prop_x_addr_naprop in ['14'])                         => '36',
-                                                                         '36');
-
-pr_aa_dist_05 := 0.231673649002297 - pr_v05_w;
-
-pr_aa_code_05 := if(pr_aa_dist_05 = 0, '', pr_aa_code_05_1);
-
-pr_v06_w := map(
     iv_in001_estimated_income = NULL    => 0,
     iv_in001_estimated_income = -1      => 0,
-    iv_in001_estimated_income <= 0      => -0.276828633774171,
-    iv_in001_estimated_income <= 32500  => -0.173535638262777,
-    iv_in001_estimated_income <= 35500  => -0.0866261265553533,
-    iv_in001_estimated_income <= 37500  => -0.0595276485981668,
-    iv_in001_estimated_income <= 42500  => -0.0309072062007268,
-    iv_in001_estimated_income <= 84500  => 0.0568895074096151,
-    iv_in001_estimated_income <= 105500 => 0.424523269573347,
-                                           0.522682791010774);
+    iv_in001_estimated_income <= 0      => -0.225882352249119,
+    iv_in001_estimated_income <= 32500  => -0.157801572603298,
+    iv_in001_estimated_income <= 35500  => -0.0769262955201202,
+    iv_in001_estimated_income <= 37500  => -0.0543124096761274,
+    iv_in001_estimated_income <= 42500  => -0.0298385344841242,
+    iv_in001_estimated_income <= 84500  => 0.0396401573594357,
+    iv_in001_estimated_income <= 105500 => 0.386416966286984,
+                                           0.533699421639451);
 
-pr_aa_code_06_1 := map(
+pr_aa_code_05_1 := map(
     iv_in001_estimated_income = NULL    => '',
     iv_in001_estimated_income = -1      => '',
     iv_in001_estimated_income <= 0      => '9M',
@@ -526,39 +485,45 @@ pr_aa_code_06_1 := map(
     iv_in001_estimated_income <= 105500 => '9M',
                                            '9M');
 
-pr_aa_dist_06 := 0.522682791010774 - pr_v06_w;
+pr_aa_dist_05 := 0.533699421639451 - pr_v05_w;
+
+pr_aa_code_05 := if(pr_aa_dist_05 = 0, '', pr_aa_code_05_1);
+
+pr_v06_w := map(
+    iv_bst_own_prop_x_addr_naprop = (String)NULL                              => 0,
+    (iv_bst_own_prop_x_addr_naprop in ['-1'])                         => 0,
+    (iv_bst_own_prop_x_addr_naprop in ['00'])                         => -0.15814623850514,
+    (iv_bst_own_prop_x_addr_naprop in ['01'])                         => -0.314923255020376,
+    (iv_bst_own_prop_x_addr_naprop in ['02', '03'])                   => -0.0467207845445412,
+    (iv_bst_own_prop_x_addr_naprop in ['04', '10', '11', '12', '13']) => 0.0669687262465346,
+    (iv_bst_own_prop_x_addr_naprop in ['14'])                         => 0.216988146268781,
+                                                                         0);
+
+pr_aa_code_06_1 := map(
+    iv_bst_own_prop_x_addr_naprop = (String)NULL                              => '',
+    (iv_bst_own_prop_x_addr_naprop in ['-1'])                         => '',
+    (iv_bst_own_prop_x_addr_naprop in ['00'])                         => '9A',
+    (iv_bst_own_prop_x_addr_naprop in ['01'])                         => '9A',
+    (iv_bst_own_prop_x_addr_naprop in ['02', '03'])                   => '9A',
+    (iv_bst_own_prop_x_addr_naprop in ['04', '10', '11', '12', '13']) => '36',
+    (iv_bst_own_prop_x_addr_naprop in ['14'])                         => '36',
+                                                                         '36');
+
+pr_aa_dist_06 := 0.216988146268781 - pr_v06_w;
 
 pr_aa_code_06 := if(pr_aa_dist_06 = 0, '', pr_aa_code_06_1);
 
 pr_v07_w := map(
-    iv_iq001_inq_count12 = NULL => 0,
-    iv_iq001_inq_count12 = -1   => 0,
-    iv_iq001_inq_count12 <= 0.5 => 0.201787244756406,
-    iv_iq001_inq_count12 <= 1.5 => -0.167949285278603,
-                                   -0.426781506949801);
+    iv_mos_src_property_adl_lseen = NULL  => 0,
+    iv_mos_src_property_adl_lseen = -1    => -0.190748939516534,
+    iv_mos_src_property_adl_lseen <= 8.5  => 0.21479786633955,
+    iv_mos_src_property_adl_lseen <= 26.5 => 0.126289372774268,
+    iv_mos_src_property_adl_lseen <= 64.5 => 0.089218504124946,
+    iv_mos_src_property_adl_lseen <= 78.5 => 0.0260241850397308,
+    iv_mos_src_property_adl_lseen <= 92.5 => -0.00849701509091417,
+                                             -0.0567138793181413);
 
 pr_aa_code_07_1 := map(
-    iv_iq001_inq_count12 = NULL => '',
-    iv_iq001_inq_count12 = -1   => '9Q',
-    iv_iq001_inq_count12 <= 0.5 => '9Q',
-    iv_iq001_inq_count12 <= 1.5 => '9Q',
-                                   '9Q');
-
-pr_aa_dist_07 := 0.201787244756406 - pr_v07_w;
-
-pr_aa_code_07 := if(pr_aa_dist_07 = 0, '', pr_aa_code_07_1);
-
-pr_v08_w := map(
-    iv_mos_src_property_adl_lseen = NULL  => 0,
-    iv_mos_src_property_adl_lseen = -1    => -0.292911032427812,
-    iv_mos_src_property_adl_lseen <= 8.5  => 0.275273242192953,
-    iv_mos_src_property_adl_lseen <= 26.5 => 0.178753597737334,
-    iv_mos_src_property_adl_lseen <= 64.5 => 0.130559268024168,
-    iv_mos_src_property_adl_lseen <= 78.5 => 0.0500441164433872,
-    iv_mos_src_property_adl_lseen <= 92.5 => -0.00138450840794729,
-                                             -0.0420440582057485);
-
-pr_aa_code_08_1 := map(
     iv_mos_src_property_adl_lseen = NULL  => '',
     iv_mos_src_property_adl_lseen = -1    => '9A',
     iv_mos_src_property_adl_lseen <= 8.5  => '9F',
@@ -568,85 +533,41 @@ pr_aa_code_08_1 := map(
     iv_mos_src_property_adl_lseen <= 92.5 => '9F',
                                              '9F');
 
-pr_aa_dist_08 := 0.275273242192953 - pr_v08_w;
+pr_aa_dist_07 := 0.21479786633955 - pr_v07_w;
+
+pr_aa_code_07 := if(pr_aa_dist_07 = 0, '', pr_aa_code_07_1);
+
+pr_v08_w := map(
+    iv_inq_per_addr = NULL => 0,
+    iv_inq_per_addr = -1   => 0,
+    iv_inq_per_addr <= 0.5 => 0.163656793820406,
+    iv_inq_per_addr <= 3.5 => -0.215359877468145,
+                              -0.43511390579968);
+
+pr_aa_code_08_1 := map(
+    iv_inq_per_addr = NULL => '',
+    iv_inq_per_addr = -1   => '9Q',
+    iv_inq_per_addr <= 0.5 => '9Q',
+    iv_inq_per_addr <= 3.5 => '9Q',
+                              '9Q');
+
+pr_aa_dist_08 := 0.163656793820406 - pr_v08_w;
 
 pr_aa_code_08 := if(pr_aa_dist_08 = 0, '', pr_aa_code_08_1);
 
 pr_v09_w := map(
-    iv_ssns_per_sfd_addr = NULL  => 0,
-    iv_ssns_per_sfd_addr = -1    => -0.108118364506001,
-    iv_ssns_per_sfd_addr <= 2.5  => 0.329261417919001,
-    iv_ssns_per_sfd_addr <= 6.5  => 0.156966776893504,
-    iv_ssns_per_sfd_addr <= 11.5 => -0.054998030554521,
-    iv_ssns_per_sfd_addr <= 13.5 => -0.084628925805136,
-                                    -0.266046532246423);
-
-pr_aa_code_09_1 := map(
-    iv_ssns_per_sfd_addr = NULL  => '',
-    iv_ssns_per_sfd_addr = -1    => '9K',
-    iv_ssns_per_sfd_addr <= 2.5  => '',
-    iv_ssns_per_sfd_addr <= 6.5  => '',
-    iv_ssns_per_sfd_addr <= 11.5 => '',
-    iv_ssns_per_sfd_addr <= 13.5 => '',
-                                    '');
-
-pr_aa_dist_09 := 0.329261417919001 - pr_v09_w;
-
-pr_aa_code_09 := if(pr_aa_dist_09 = 0, '', pr_aa_code_09_1);
-
-pr_v10_w := map(
-    iv_combined_age = NULL  => 0,
-    iv_combined_age = -1    => 0,
-    iv_combined_age <= 41.5 => -0.308983156087184,
-    iv_combined_age <= 56.5 => -0.209758683641585,
-    iv_combined_age <= 62   => -0.020541861065437,
-                               0.162851492930386);
-
-pr_aa_code_10_1 := map(
-    iv_combined_age = NULL  => '',
-    iv_combined_age = -1    => '9G',
-    iv_combined_age <= 41.5 => '9G',
-    iv_combined_age <= 56.5 => '9G',
-    iv_combined_age <= 62   => '9G',
-                               '9G');
-
-pr_aa_dist_10 := 0.162851492930386 - pr_v10_w;
-
-pr_aa_code_10 := if(pr_aa_dist_10 = 0, '', pr_aa_code_10_1);
-
-pr_v11_w := map(
-    iv_avg_prop_assess_purch_amt = NULL              => 0,
-    iv_avg_prop_assess_purch_amt = -1                => 0,
-    iv_avg_prop_assess_purch_amt <= 30965.8333333333 => -0.529238696565172,
-    iv_avg_prop_assess_purch_amt <= 106482.5         => -0.188505370683503,
-    iv_avg_prop_assess_purch_amt <= 133075.75        => 0.0276676062951836,
-                                                        0.19200453559884);
-
-pr_aa_code_11_1 := map(
-    iv_avg_prop_assess_purch_amt = NULL              => '',
-    iv_avg_prop_assess_purch_amt = -1                => '9A',
-    iv_avg_prop_assess_purch_amt <= 30965.8333333333 => 'PV',
-    iv_avg_prop_assess_purch_amt <= 106482.5         => 'PV',
-    iv_avg_prop_assess_purch_amt <= 133075.75        => 'PV',
-                                                        'PV');
-
-pr_aa_dist_11 := 0.19200453559884 - pr_v11_w;
-
-pr_aa_code_11 := if(pr_aa_dist_11 = 0, '', pr_aa_code_11_1);
-
-pr_v12_w := map(
     iv_addrs_per_adl = NULL  => 0,
     iv_addrs_per_adl = -1    => 0,
-    iv_addrs_per_adl <= 1.5  => 0.256040647739624,
-    iv_addrs_per_adl <= 3.5  => 0.209405514966421,
-    iv_addrs_per_adl <= 4.5  => 0.0876193863635634,
-    iv_addrs_per_adl <= 5.5  => 0.00732909602393968,
-    iv_addrs_per_adl <= 8.5  => -0.0239455005923131,
-    iv_addrs_per_adl <= 9.5  => -0.0491337869637065,
-    iv_addrs_per_adl <= 17.5 => -0.137833026503762,
-                                -0.354859325831201);
+    iv_addrs_per_adl <= 1.5  => 0.297923664618421,
+    iv_addrs_per_adl <= 3.5  => 0.245737786880149,
+    iv_addrs_per_adl <= 4.5  => 0.107103405590356,
+    iv_addrs_per_adl <= 5.5  => 0.0271187424159102,
+    iv_addrs_per_adl <= 8.5  => -0.0234418905460414,
+    iv_addrs_per_adl <= 9.5  => -0.0614648993371279,
+    iv_addrs_per_adl <= 17.5 => -0.171775507257462,
+                                -0.398544016760631);
 
-pr_aa_code_12_1 := map(
+pr_aa_code_09_1 := map(
     iv_addrs_per_adl = NULL  => '',
     iv_addrs_per_adl = -1    => '9D',
     iv_addrs_per_adl <= 1.5  => '9D',
@@ -658,19 +579,57 @@ pr_aa_code_12_1 := map(
     iv_addrs_per_adl <= 17.5 => '9D',
                                 '9D');
 
-pr_aa_dist_12 := 0.256040647739624 - pr_v12_w;
+pr_aa_dist_09 := 0.297923664618421 - pr_v09_w;
 
-pr_aa_code_12 := if(pr_aa_dist_12 = 0, '', pr_aa_code_12_1);
+pr_aa_code_09 := if(pr_aa_dist_09 = 0, '', pr_aa_code_09_1);
 
-pr_v13_w := map(
+pr_v10_w := map(
+    iv_avg_prop_assess_purch_amt = NULL              => 0,
+    iv_avg_prop_assess_purch_amt = -1                => 0,
+    iv_avg_prop_assess_purch_amt <= 30965.8333333333 => -0.500706711280354,
+    iv_avg_prop_assess_purch_amt <= 106482.5         => -0.188513257775024,
+    iv_avg_prop_assess_purch_amt <= 133075.75        => 0.049756052339838,
+                                                        0.204122389798817);
+
+pr_aa_code_10_1 := map(
+    iv_avg_prop_assess_purch_amt = NULL              => '',
+    iv_avg_prop_assess_purch_amt = -1                => '9A',
+    iv_avg_prop_assess_purch_amt <= 30965.8333333333 => 'PV',
+    iv_avg_prop_assess_purch_amt <= 106482.5         => 'PV',
+    iv_avg_prop_assess_purch_amt <= 133075.75        => 'PV',
+                                                        'PV');
+
+pr_aa_dist_10 := 0.204122389798817 - pr_v10_w;
+
+pr_aa_code_10 := if(pr_aa_dist_10 = 0, '', pr_aa_code_10_1);
+
+pr_v11_w := map(
+    iv_iq001_inq_count12 = NULL => 0,
+    iv_iq001_inq_count12 = -1   => 0,
+    iv_iq001_inq_count12 <= 0.5 => 0.149802995809747,
+    iv_iq001_inq_count12 <= 1.5 => -0.115034639273072,
+                                   -0.363332460968312);
+
+pr_aa_code_11_1 := map(
+    iv_iq001_inq_count12 = NULL => '',
+    iv_iq001_inq_count12 = -1   => '9Q',
+    iv_iq001_inq_count12 <= 0.5 => '9Q',
+    iv_iq001_inq_count12 <= 1.5 => '9Q',
+                                   '9Q');
+
+pr_aa_dist_11 := 0.149802995809747 - pr_v11_w;
+
+pr_aa_code_11 := if(pr_aa_dist_11 = 0, '', pr_aa_code_11_1);
+
+pr_v12_w := map(
     iv_mos_since_gong_did_fst_seen = NULL   => 0,
-    iv_mos_since_gong_did_fst_seen = -1     => -0.0931405182992504,
-    iv_mos_since_gong_did_fst_seen <= 107.5 => -0.159572945673179,
-    iv_mos_since_gong_did_fst_seen <= 205.5 => 0.0768102837388936,
-    iv_mos_since_gong_did_fst_seen <= 207.5 => 0.379501154712758,
-                                               0.615315032559177);
+    iv_mos_since_gong_did_fst_seen = -1     => -0.0991725317958002,
+    iv_mos_since_gong_did_fst_seen <= 107.5 => -0.172491583351049,
+    iv_mos_since_gong_did_fst_seen <= 205.5 => 0.0871513727000322,
+    iv_mos_since_gong_did_fst_seen <= 207.5 => 0.412051900070383,
+                                               0.619730341815681);
 
-pr_aa_code_13_1 := map(
+pr_aa_code_12_1 := map(
     iv_mos_since_gong_did_fst_seen = NULL   => '',
     iv_mos_since_gong_did_fst_seen = -1     => '9R',
     iv_mos_since_gong_did_fst_seen <= 107.5 => '9R',
@@ -678,17 +637,35 @@ pr_aa_code_13_1 := map(
     iv_mos_since_gong_did_fst_seen <= 207.5 => '9R',
                                                '9R');
 
-pr_aa_dist_13 := 0.615315032559177 - pr_v13_w;
+pr_aa_dist_12 := 0.619730341815681 - pr_v12_w;
+
+pr_aa_code_12 := if(pr_aa_dist_12 = 0, '', pr_aa_code_12_1);
+
+pr_v13_w := map(
+    iv_rec_vehx_level = (String)NULL                              => 0,
+    (iv_rec_vehx_level in ['-1'])                         => 0,
+    (iv_rec_vehx_level in ['AO', 'AW', 'W1', 'W2', 'W3']) => -0.00562177519304683,
+    (iv_rec_vehx_level in ['XX'])                         => -0.133102972046686,
+                                                             0);
+
+pr_aa_code_13_1 := map(
+    iv_rec_vehx_level = (String)NULL                              => '',
+    (iv_rec_vehx_level in ['-1'])                         => '',
+    (iv_rec_vehx_level in ['AO', 'AW', 'W1', 'W2', 'W3']) => '',
+    (iv_rec_vehx_level in ['XX'])                         => '',
+                                                             '');
+
+pr_aa_dist_13 := 0 - pr_v13_w;
 
 pr_aa_code_13 := if(pr_aa_dist_13 = 0, '', pr_aa_code_13_1);
 
 pr_v14_w := map(
     iv_prv_addr_avm_auto_val = NULL      => 0,
     iv_prv_addr_avm_auto_val = -1        => 0,
-    iv_prv_addr_avm_auto_val <= 113742.5 => -0.125595490187369,
-    iv_prv_addr_avm_auto_val <= 137544.5 => -0.104081228386436,
-    iv_prv_addr_avm_auto_val <= 675183.5 => 0.0859221348368754,
-                                            0.314112088757678);
+    iv_prv_addr_avm_auto_val <= 113742.5 => -0.112009400865291,
+    iv_prv_addr_avm_auto_val <= 137544.5 => -0.101713827694093,
+    iv_prv_addr_avm_auto_val <= 675183.5 => 0.0751700594903301,
+                                            0.294180995088591);
 
 pr_aa_code_14_1 := map(
     iv_prv_addr_avm_auto_val = NULL      => '',
@@ -698,151 +675,85 @@ pr_aa_code_14_1 := map(
     iv_prv_addr_avm_auto_val <= 675183.5 => '9V',
                                             '9V');
 
-pr_aa_dist_14 := 0.314112088757678 - pr_v14_w;
+pr_aa_dist_14 := 0.294180995088591 - pr_v14_w;
 
 pr_aa_code_14 := if(pr_aa_dist_14 = 0, '', pr_aa_code_14_1);
 
 pr_v15_w := map(
-    iv_rec_vehx_level = ''                                => 0,
-    (iv_rec_vehx_level in ['-1'])                         => 0,
-    (iv_rec_vehx_level in ['AO', 'AW', 'W1', 'W2', 'W3']) => -0.0123554450831391,
-    (iv_rec_vehx_level in ['XX'])                         => -0.137654849882468,
-                                                             0);
-
-pr_aa_code_15_1 := map(
-    iv_rec_vehx_level = ''                                => '',
-    (iv_rec_vehx_level in ['-1'])                         => '',
-    (iv_rec_vehx_level in ['AO', 'AW', 'W1', 'W2', 'W3']) => '',
-    (iv_rec_vehx_level in ['XX'])                         => '',
-                                                             '');
-
-pr_aa_dist_15 := 0 - pr_v15_w;
-
-pr_aa_code_15 := if(pr_aa_dist_15 = 0, '', pr_aa_code_15_1);
-
-pr_v16_w := map(
     iv_inq_ssns_per_adl = NULL => 0,
     iv_inq_ssns_per_adl = -1   => 0,
-    iv_inq_ssns_per_adl <= 0.5 => 0.141323227835463,
-    iv_inq_ssns_per_adl <= 1.5 => -0.0182226352785369,
-                                  -0.455252154380974);
+    iv_inq_ssns_per_adl <= 0.5 => 0.146878430035023,
+    iv_inq_ssns_per_adl <= 1.5 => -0.0176963087685786,
+                                  -0.463672814077517);
 
-pr_aa_code_16_1 := map(
+pr_aa_code_15_1 := map(
     iv_inq_ssns_per_adl = NULL => '',
     iv_inq_ssns_per_adl = -1   => '9Q',
     iv_inq_ssns_per_adl <= 0.5 => '9Q',
     iv_inq_ssns_per_adl <= 1.5 => '9Q',
                                   '9Q');
 
-pr_aa_dist_16 := 0.141323227835463 - pr_v16_w;
+pr_aa_dist_15 := 0.146878430035023 - pr_v15_w;
+
+pr_aa_code_15 := if(pr_aa_dist_15 = 0, '', pr_aa_code_15_1);
+
+pr_v16_w := map(
+    iv_input_addr_not_most_recent = NULL      => 0,
+    (iv_input_addr_not_most_recent = -1) => 0,
+    (iv_input_addr_not_most_recent = 0)  => 0.110273880371717,
+    (iv_input_addr_not_most_recent = 1)  => -0.141206327914049,
+                                                 0);
+
+pr_aa_code_16_1 := map(
+    iv_input_addr_not_most_recent = NULL      => '',
+    (iv_input_addr_not_most_recent = -1) => '99',
+    (iv_input_addr_not_most_recent = 0)  => '99',
+    (iv_input_addr_not_most_recent = 1)  => '99',
+                                                 '99');
+
+pr_aa_dist_16 := 0.110273880371717 - pr_v16_w;
 
 pr_aa_code_16 := if(pr_aa_dist_16 = 0, '', pr_aa_code_16_1);
 
 pr_v17_w := map(
-    iv_input_addr_not_most_recent = NULL      => 0,
-    (iv_input_addr_not_most_recent in [-1])   => 0,
-    (iv_input_addr_not_most_recent in [0])    => 0.102713993909273,
-    (iv_input_addr_not_most_recent in [1])    => -0.135895957315621,
-                                                 0);
+    iv_lnames_per_adl = NULL => 0,
+    iv_lnames_per_adl = -1   => 0,
+    iv_lnames_per_adl <= 1.5 => 0.0843645730408038,
+    iv_lnames_per_adl <= 2.5 => 0.0305588853735407,
+    iv_lnames_per_adl <= 3.5 => -0.0784586297753108,
+    iv_lnames_per_adl <= 4.5 => -0.131556474212466,
+                                -0.339812712941437);
 
 pr_aa_code_17_1 := map(
-    iv_input_addr_not_most_recent = NULL      => '',
-    (iv_input_addr_not_most_recent in [-1])   => '99',
-    (iv_input_addr_not_most_recent in [0])    => '99',
-    (iv_input_addr_not_most_recent in [1])    => '99',
-                                                 '99');
+    iv_lnames_per_adl = NULL => '',
+    iv_lnames_per_adl = -1   => '',
+    iv_lnames_per_adl <= 1.5 => '',
+    iv_lnames_per_adl <= 2.5 => '',
+    iv_lnames_per_adl <= 3.5 => '',
+    iv_lnames_per_adl <= 4.5 => '',
+                                '');
 
-pr_aa_dist_17 := 0.102713993909273 - pr_v17_w;
+pr_aa_dist_17 := 0.0843645730408038 - pr_v17_w;
 
 pr_aa_code_17 := if(pr_aa_dist_17 = 0, '', pr_aa_code_17_1);
 
 pr_v18_w := map(
-    iv_prof_license_category = ''                      => 0,
-    (iv_prof_license_category in ['-1', '-2'])         => 0,
-    (iv_prof_license_category in ['0', '1', '2', '3']) => -0.14557820351931,
-    (iv_prof_license_category in ['4'])                => 0.349553971008189,
-    (iv_prof_license_category in ['5'])                => 0.756869090531894,
-                                                          0);
+    iv_src_property_adl_count = NULL => 0,
+    iv_src_property_adl_count = -1   => 0,
+    iv_src_property_adl_count <= 0.5 => -0.201099014470446,
+    iv_src_property_adl_count <= 6.5 => 0.0212067828605403,
+                                        0.316716917644956);
 
 pr_aa_code_18_1 := map(
-    iv_prof_license_category = ''                      => '',
-    (iv_prof_license_category in ['-1', '-2'])         => '36',
-    (iv_prof_license_category in ['0', '1', '2', '3']) => '36',
-    (iv_prof_license_category in ['4'])                => '36',
-    (iv_prof_license_category in ['5'])                => '36',
-                                                          '36');
+    iv_src_property_adl_count = NULL => '',
+    iv_src_property_adl_count = -1   => '36',
+    iv_src_property_adl_count <= 0.5 => '36',
+    iv_src_property_adl_count <= 6.5 => '36',
+                                        '36');
 
-pr_aa_dist_18 := 0.756869090531894 - pr_v18_w;
+pr_aa_dist_18 := 0.316716917644956 - pr_v18_w;
 
 pr_aa_code_18 := if(pr_aa_dist_18 = 0, '', pr_aa_code_18_1);
-
-pr_v19_w := map(
-    iv_lnames_per_adl = NULL => 0,
-    iv_lnames_per_adl = -1   => 0,
-    iv_lnames_per_adl <= 1.5 => 0.0606286337937274,
-    iv_lnames_per_adl <= 2.5 => 0.0296941096868792,
-    iv_lnames_per_adl <= 3.5 => -0.066173041619258,
-    iv_lnames_per_adl <= 4.5 => -0.105727760946477,
-                                -0.285460496957539);
-
-pr_aa_dist_19 := 0.0606286337937274 - pr_v19_w;
-
-pr_rcvalue9k := (integer)(pr_aa_code_01 = '9K') * pr_aa_dist_01 +
-    (integer)(pr_aa_code_02 = '9K') * pr_aa_dist_02 +
-    (integer)(pr_aa_code_03 = '9K') * pr_aa_dist_03 +
-    (integer)(pr_aa_code_04 = '9K') * pr_aa_dist_04 +
-    (integer)(pr_aa_code_05 = '9K') * pr_aa_dist_05 +
-    (integer)(pr_aa_code_06 = '9K') * pr_aa_dist_06 +
-    (integer)(pr_aa_code_07 = '9K') * pr_aa_dist_07 +
-    (integer)(pr_aa_code_08 = '9K') * pr_aa_dist_08 +
-    (integer)(pr_aa_code_09 = '9K') * pr_aa_dist_09 +
-    (integer)(pr_aa_code_10 = '9K') * pr_aa_dist_10 +
-    (integer)(pr_aa_code_11 = '9K') * pr_aa_dist_11 +
-    (integer)(pr_aa_code_12 = '9K') * pr_aa_dist_12 +
-    (integer)(pr_aa_code_13 = '9K') * pr_aa_dist_13 +
-    (integer)(pr_aa_code_14 = '9K') * pr_aa_dist_14 +
-    (integer)(pr_aa_code_15 = '9K') * pr_aa_dist_15 +
-    (integer)(pr_aa_code_16 = '9K') * pr_aa_dist_16 +
-    (integer)(pr_aa_code_17 = '9K') * pr_aa_dist_17 +
-    (integer)(pr_aa_code_18 = '9K') * pr_aa_dist_18;
-
-pr_rcvalue27 := (integer)(pr_aa_code_01 = '27') * pr_aa_dist_01 +
-    (integer)(pr_aa_code_02 = '27') * pr_aa_dist_02 +
-    (integer)(pr_aa_code_03 = '27') * pr_aa_dist_03 +
-    (integer)(pr_aa_code_04 = '27') * pr_aa_dist_04 +
-    (integer)(pr_aa_code_05 = '27') * pr_aa_dist_05 +
-    (integer)(pr_aa_code_06 = '27') * pr_aa_dist_06 +
-    (integer)(pr_aa_code_07 = '27') * pr_aa_dist_07 +
-    (integer)(pr_aa_code_08 = '27') * pr_aa_dist_08 +
-    (integer)(pr_aa_code_09 = '27') * pr_aa_dist_09 +
-    (integer)(pr_aa_code_10 = '27') * pr_aa_dist_10 +
-    (integer)(pr_aa_code_11 = '27') * pr_aa_dist_11 +
-    (integer)(pr_aa_code_12 = '27') * pr_aa_dist_12 +
-    (integer)(pr_aa_code_13 = '27') * pr_aa_dist_13 +
-    (integer)(pr_aa_code_14 = '27') * pr_aa_dist_14 +
-    (integer)(pr_aa_code_15 = '27') * pr_aa_dist_15 +
-    (integer)(pr_aa_code_16 = '27') * pr_aa_dist_16 +
-    (integer)(pr_aa_code_17 = '27') * pr_aa_dist_17 +
-    (integer)(pr_aa_code_18 = '27') * pr_aa_dist_18;
-
-pr_rcvalue9m := (integer)(pr_aa_code_01 = '9M') * pr_aa_dist_01 +
-    (integer)(pr_aa_code_02 = '9M') * pr_aa_dist_02 +
-    (integer)(pr_aa_code_03 = '9M') * pr_aa_dist_03 +
-    (integer)(pr_aa_code_04 = '9M') * pr_aa_dist_04 +
-    (integer)(pr_aa_code_05 = '9M') * pr_aa_dist_05 +
-    (integer)(pr_aa_code_06 = '9M') * pr_aa_dist_06 +
-    (integer)(pr_aa_code_07 = '9M') * pr_aa_dist_07 +
-    (integer)(pr_aa_code_08 = '9M') * pr_aa_dist_08 +
-    (integer)(pr_aa_code_09 = '9M') * pr_aa_dist_09 +
-    (integer)(pr_aa_code_10 = '9M') * pr_aa_dist_10 +
-    (integer)(pr_aa_code_11 = '9M') * pr_aa_dist_11 +
-    (integer)(pr_aa_code_12 = '9M') * pr_aa_dist_12 +
-    (integer)(pr_aa_code_13 = '9M') * pr_aa_dist_13 +
-    (integer)(pr_aa_code_14 = '9M') * pr_aa_dist_14 +
-    (integer)(pr_aa_code_15 = '9M') * pr_aa_dist_15 +
-    (integer)(pr_aa_code_16 = '9M') * pr_aa_dist_16 +
-    (integer)(pr_aa_code_17 = '9M') * pr_aa_dist_17 +
-    (integer)(pr_aa_code_18 = '9M') * pr_aa_dist_18;
 
 pr_rcvalue9a := (integer)(pr_aa_code_01 = '9A') * pr_aa_dist_01 +
     (integer)(pr_aa_code_02 = '9A') * pr_aa_dist_02 +
@@ -863,100 +774,24 @@ pr_rcvalue9a := (integer)(pr_aa_code_01 = '9A') * pr_aa_dist_01 +
     (integer)(pr_aa_code_17 = '9A') * pr_aa_dist_17 +
     (integer)(pr_aa_code_18 = '9A') * pr_aa_dist_18;
 
-pr_rcvalue9c := (integer)(pr_aa_code_01 = '9C') * pr_aa_dist_01 +
-    (integer)(pr_aa_code_02 = '9C') * pr_aa_dist_02 +
-    (integer)(pr_aa_code_03 = '9C') * pr_aa_dist_03 +
-    (integer)(pr_aa_code_04 = '9C') * pr_aa_dist_04 +
-    (integer)(pr_aa_code_05 = '9C') * pr_aa_dist_05 +
-    (integer)(pr_aa_code_06 = '9C') * pr_aa_dist_06 +
-    (integer)(pr_aa_code_07 = '9C') * pr_aa_dist_07 +
-    (integer)(pr_aa_code_08 = '9C') * pr_aa_dist_08 +
-    (integer)(pr_aa_code_09 = '9C') * pr_aa_dist_09 +
-    (integer)(pr_aa_code_10 = '9C') * pr_aa_dist_10 +
-    (integer)(pr_aa_code_11 = '9C') * pr_aa_dist_11 +
-    (integer)(pr_aa_code_12 = '9C') * pr_aa_dist_12 +
-    (integer)(pr_aa_code_13 = '9C') * pr_aa_dist_13 +
-    (integer)(pr_aa_code_14 = '9C') * pr_aa_dist_14 +
-    (integer)(pr_aa_code_15 = '9C') * pr_aa_dist_15 +
-    (integer)(pr_aa_code_16 = '9C') * pr_aa_dist_16 +
-    (integer)(pr_aa_code_17 = '9C') * pr_aa_dist_17 +
-    (integer)(pr_aa_code_18 = '9C') * pr_aa_dist_18;
-
-pr_rcvalue36 := (integer)(pr_aa_code_01 = '36') * pr_aa_dist_01 +
-    (integer)(pr_aa_code_02 = '36') * pr_aa_dist_02 +
-    (integer)(pr_aa_code_03 = '36') * pr_aa_dist_03 +
-    (integer)(pr_aa_code_04 = '36') * pr_aa_dist_04 +
-    (integer)(pr_aa_code_05 = '36') * pr_aa_dist_05 +
-    (integer)(pr_aa_code_06 = '36') * pr_aa_dist_06 +
-    (integer)(pr_aa_code_07 = '36') * pr_aa_dist_07 +
-    (integer)(pr_aa_code_08 = '36') * pr_aa_dist_08 +
-    (integer)(pr_aa_code_09 = '36') * pr_aa_dist_09 +
-    (integer)(pr_aa_code_10 = '36') * pr_aa_dist_10 +
-    (integer)(pr_aa_code_11 = '36') * pr_aa_dist_11 +
-    (integer)(pr_aa_code_12 = '36') * pr_aa_dist_12 +
-    (integer)(pr_aa_code_13 = '36') * pr_aa_dist_13 +
-    (integer)(pr_aa_code_14 = '36') * pr_aa_dist_14 +
-    (integer)(pr_aa_code_15 = '36') * pr_aa_dist_15 +
-    (integer)(pr_aa_code_16 = '36') * pr_aa_dist_16 +
-    (integer)(pr_aa_code_17 = '36') * pr_aa_dist_17 +
-    (integer)(pr_aa_code_18 = '36') * pr_aa_dist_18;
-
-pr_rcvalue9g := (integer)(pr_aa_code_01 = '9G') * pr_aa_dist_01 +
-    (integer)(pr_aa_code_02 = '9G') * pr_aa_dist_02 +
-    (integer)(pr_aa_code_03 = '9G') * pr_aa_dist_03 +
-    (integer)(pr_aa_code_04 = '9G') * pr_aa_dist_04 +
-    (integer)(pr_aa_code_05 = '9G') * pr_aa_dist_05 +
-    (integer)(pr_aa_code_06 = '9G') * pr_aa_dist_06 +
-    (integer)(pr_aa_code_07 = '9G') * pr_aa_dist_07 +
-    (integer)(pr_aa_code_08 = '9G') * pr_aa_dist_08 +
-    (integer)(pr_aa_code_09 = '9G') * pr_aa_dist_09 +
-    (integer)(pr_aa_code_10 = '9G') * pr_aa_dist_10 +
-    (integer)(pr_aa_code_11 = '9G') * pr_aa_dist_11 +
-    (integer)(pr_aa_code_12 = '9G') * pr_aa_dist_12 +
-    (integer)(pr_aa_code_13 = '9G') * pr_aa_dist_13 +
-    (integer)(pr_aa_code_14 = '9G') * pr_aa_dist_14 +
-    (integer)(pr_aa_code_15 = '9G') * pr_aa_dist_15 +
-    (integer)(pr_aa_code_16 = '9G') * pr_aa_dist_16 +
-    (integer)(pr_aa_code_17 = '9G') * pr_aa_dist_17 +
-    (integer)(pr_aa_code_18 = '9G') * pr_aa_dist_18;
-
-pr_rcvalue9f := (integer)(pr_aa_code_01 = '9F') * pr_aa_dist_01 +
-    (integer)(pr_aa_code_02 = '9F') * pr_aa_dist_02 +
-    (integer)(pr_aa_code_03 = '9F') * pr_aa_dist_03 +
-    (integer)(pr_aa_code_04 = '9F') * pr_aa_dist_04 +
-    (integer)(pr_aa_code_05 = '9F') * pr_aa_dist_05 +
-    (integer)(pr_aa_code_06 = '9F') * pr_aa_dist_06 +
-    (integer)(pr_aa_code_07 = '9F') * pr_aa_dist_07 +
-    (integer)(pr_aa_code_08 = '9F') * pr_aa_dist_08 +
-    (integer)(pr_aa_code_09 = '9F') * pr_aa_dist_09 +
-    (integer)(pr_aa_code_10 = '9F') * pr_aa_dist_10 +
-    (integer)(pr_aa_code_11 = '9F') * pr_aa_dist_11 +
-    (integer)(pr_aa_code_12 = '9F') * pr_aa_dist_12 +
-    (integer)(pr_aa_code_13 = '9F') * pr_aa_dist_13 +
-    (integer)(pr_aa_code_14 = '9F') * pr_aa_dist_14 +
-    (integer)(pr_aa_code_15 = '9F') * pr_aa_dist_15 +
-    (integer)(pr_aa_code_16 = '9F') * pr_aa_dist_16 +
-    (integer)(pr_aa_code_17 = '9F') * pr_aa_dist_17 +
-    (integer)(pr_aa_code_18 = '9F') * pr_aa_dist_18;
-
-pr_rcvalue99 := (integer)(pr_aa_code_01 = '99') * pr_aa_dist_01 +
-    (integer)(pr_aa_code_02 = '99') * pr_aa_dist_02 +
-    (integer)(pr_aa_code_03 = '99') * pr_aa_dist_03 +
-    (integer)(pr_aa_code_04 = '99') * pr_aa_dist_04 +
-    (integer)(pr_aa_code_05 = '99') * pr_aa_dist_05 +
-    (integer)(pr_aa_code_06 = '99') * pr_aa_dist_06 +
-    (integer)(pr_aa_code_07 = '99') * pr_aa_dist_07 +
-    (integer)(pr_aa_code_08 = '99') * pr_aa_dist_08 +
-    (integer)(pr_aa_code_09 = '99') * pr_aa_dist_09 +
-    (integer)(pr_aa_code_10 = '99') * pr_aa_dist_10 +
-    (integer)(pr_aa_code_11 = '99') * pr_aa_dist_11 +
-    (integer)(pr_aa_code_12 = '99') * pr_aa_dist_12 +
-    (integer)(pr_aa_code_13 = '99') * pr_aa_dist_13 +
-    (integer)(pr_aa_code_14 = '99') * pr_aa_dist_14 +
-    (integer)(pr_aa_code_15 = '99') * pr_aa_dist_15 +
-    (integer)(pr_aa_code_16 = '99') * pr_aa_dist_16 +
-    (integer)(pr_aa_code_17 = '99') * pr_aa_dist_17 +
-    (integer)(pr_aa_code_18 = '99') * pr_aa_dist_18;
+pr_rcvalue27 := (integer)(pr_aa_code_01 = '27') * pr_aa_dist_01 +
+    (integer)(pr_aa_code_02 = '27') * pr_aa_dist_02 +
+    (integer)(pr_aa_code_03 = '27') * pr_aa_dist_03 +
+    (integer)(pr_aa_code_04 = '27') * pr_aa_dist_04 +
+    (integer)(pr_aa_code_05 = '27') * pr_aa_dist_05 +
+    (integer)(pr_aa_code_06 = '27') * pr_aa_dist_06 +
+    (integer)(pr_aa_code_07 = '27') * pr_aa_dist_07 +
+    (integer)(pr_aa_code_08 = '27') * pr_aa_dist_08 +
+    (integer)(pr_aa_code_09 = '27') * pr_aa_dist_09 +
+    (integer)(pr_aa_code_10 = '27') * pr_aa_dist_10 +
+    (integer)(pr_aa_code_11 = '27') * pr_aa_dist_11 +
+    (integer)(pr_aa_code_12 = '27') * pr_aa_dist_12 +
+    (integer)(pr_aa_code_13 = '27') * pr_aa_dist_13 +
+    (integer)(pr_aa_code_14 = '27') * pr_aa_dist_14 +
+    (integer)(pr_aa_code_15 = '27') * pr_aa_dist_15 +
+    (integer)(pr_aa_code_16 = '27') * pr_aa_dist_16 +
+    (integer)(pr_aa_code_17 = '27') * pr_aa_dist_17 +
+    (integer)(pr_aa_code_18 = '27') * pr_aa_dist_18;
 
 pr_rcvalue98 := (integer)(pr_aa_code_01 = '98') * pr_aa_dist_01 +
     (integer)(pr_aa_code_02 = '98') * pr_aa_dist_02 +
@@ -977,25 +812,6 @@ pr_rcvalue98 := (integer)(pr_aa_code_01 = '98') * pr_aa_dist_01 +
     (integer)(pr_aa_code_17 = '98') * pr_aa_dist_17 +
     (integer)(pr_aa_code_18 = '98') * pr_aa_dist_18;
 
-pr_rcvalue9d := (integer)(pr_aa_code_01 = '9D') * pr_aa_dist_01 +
-    (integer)(pr_aa_code_02 = '9D') * pr_aa_dist_02 +
-    (integer)(pr_aa_code_03 = '9D') * pr_aa_dist_03 +
-    (integer)(pr_aa_code_04 = '9D') * pr_aa_dist_04 +
-    (integer)(pr_aa_code_05 = '9D') * pr_aa_dist_05 +
-    (integer)(pr_aa_code_06 = '9D') * pr_aa_dist_06 +
-    (integer)(pr_aa_code_07 = '9D') * pr_aa_dist_07 +
-    (integer)(pr_aa_code_08 = '9D') * pr_aa_dist_08 +
-    (integer)(pr_aa_code_09 = '9D') * pr_aa_dist_09 +
-    (integer)(pr_aa_code_10 = '9D') * pr_aa_dist_10 +
-    (integer)(pr_aa_code_11 = '9D') * pr_aa_dist_11 +
-    (integer)(pr_aa_code_12 = '9D') * pr_aa_dist_12 +
-    (integer)(pr_aa_code_13 = '9D') * pr_aa_dist_13 +
-    (integer)(pr_aa_code_14 = '9D') * pr_aa_dist_14 +
-    (integer)(pr_aa_code_15 = '9D') * pr_aa_dist_15 +
-    (integer)(pr_aa_code_16 = '9D') * pr_aa_dist_16 +
-    (integer)(pr_aa_code_17 = '9D') * pr_aa_dist_17 +
-    (integer)(pr_aa_code_18 = '9D') * pr_aa_dist_18;
-
 pr_rcvalue9q := (integer)(pr_aa_code_01 = '9Q') * pr_aa_dist_01 +
     (integer)(pr_aa_code_02 = '9Q') * pr_aa_dist_02 +
     (integer)(pr_aa_code_03 = '9Q') * pr_aa_dist_03 +
@@ -1014,25 +830,6 @@ pr_rcvalue9q := (integer)(pr_aa_code_01 = '9Q') * pr_aa_dist_01 +
     (integer)(pr_aa_code_16 = '9Q') * pr_aa_dist_16 +
     (integer)(pr_aa_code_17 = '9Q') * pr_aa_dist_17 +
     (integer)(pr_aa_code_18 = '9Q') * pr_aa_dist_18;
-
-pr_rcvaluepv := (integer)(pr_aa_code_01 = 'PV') * pr_aa_dist_01 +
-    (integer)(pr_aa_code_02 = 'PV') * pr_aa_dist_02 +
-    (integer)(pr_aa_code_03 = 'PV') * pr_aa_dist_03 +
-    (integer)(pr_aa_code_04 = 'PV') * pr_aa_dist_04 +
-    (integer)(pr_aa_code_05 = 'PV') * pr_aa_dist_05 +
-    (integer)(pr_aa_code_06 = 'PV') * pr_aa_dist_06 +
-    (integer)(pr_aa_code_07 = 'PV') * pr_aa_dist_07 +
-    (integer)(pr_aa_code_08 = 'PV') * pr_aa_dist_08 +
-    (integer)(pr_aa_code_09 = 'PV') * pr_aa_dist_09 +
-    (integer)(pr_aa_code_10 = 'PV') * pr_aa_dist_10 +
-    (integer)(pr_aa_code_11 = 'PV') * pr_aa_dist_11 +
-    (integer)(pr_aa_code_12 = 'PV') * pr_aa_dist_12 +
-    (integer)(pr_aa_code_13 = 'PV') * pr_aa_dist_13 +
-    (integer)(pr_aa_code_14 = 'PV') * pr_aa_dist_14 +
-    (integer)(pr_aa_code_15 = 'PV') * pr_aa_dist_15 +
-    (integer)(pr_aa_code_16 = 'PV') * pr_aa_dist_16 +
-    (integer)(pr_aa_code_17 = 'PV') * pr_aa_dist_17 +
-    (integer)(pr_aa_code_18 = 'PV') * pr_aa_dist_18;
 
 pr_rcvalue80 := (integer)(pr_aa_code_01 = '80') * pr_aa_dist_01 +
     (integer)(pr_aa_code_02 = '80') * pr_aa_dist_02 +
@@ -1072,24 +869,119 @@ pr_rcvalue9r := (integer)(pr_aa_code_01 = '9R') * pr_aa_dist_01 +
     (integer)(pr_aa_code_17 = '9R') * pr_aa_dist_17 +
     (integer)(pr_aa_code_18 = '9R') * pr_aa_dist_18;
 
-pr_rcvalue9w := (integer)(pr_aa_code_01 = '9W') * pr_aa_dist_01 +
-    (integer)(pr_aa_code_02 = '9W') * pr_aa_dist_02 +
-    (integer)(pr_aa_code_03 = '9W') * pr_aa_dist_03 +
-    (integer)(pr_aa_code_04 = '9W') * pr_aa_dist_04 +
-    (integer)(pr_aa_code_05 = '9W') * pr_aa_dist_05 +
-    (integer)(pr_aa_code_06 = '9W') * pr_aa_dist_06 +
-    (integer)(pr_aa_code_07 = '9W') * pr_aa_dist_07 +
-    (integer)(pr_aa_code_08 = '9W') * pr_aa_dist_08 +
-    (integer)(pr_aa_code_09 = '9W') * pr_aa_dist_09 +
-    (integer)(pr_aa_code_10 = '9W') * pr_aa_dist_10 +
-    (integer)(pr_aa_code_11 = '9W') * pr_aa_dist_11 +
-    (integer)(pr_aa_code_12 = '9W') * pr_aa_dist_12 +
-    (integer)(pr_aa_code_13 = '9W') * pr_aa_dist_13 +
-    (integer)(pr_aa_code_14 = '9W') * pr_aa_dist_14 +
-    (integer)(pr_aa_code_15 = '9W') * pr_aa_dist_15 +
-    (integer)(pr_aa_code_16 = '9W') * pr_aa_dist_16 +
-    (integer)(pr_aa_code_17 = '9W') * pr_aa_dist_17 +
-    (integer)(pr_aa_code_18 = '9W') * pr_aa_dist_18;
+pr_rcvalue9m := (integer)(pr_aa_code_01 = '9M') * pr_aa_dist_01 +
+    (integer)(pr_aa_code_02 = '9M') * pr_aa_dist_02 +
+    (integer)(pr_aa_code_03 = '9M') * pr_aa_dist_03 +
+    (integer)(pr_aa_code_04 = '9M') * pr_aa_dist_04 +
+    (integer)(pr_aa_code_05 = '9M') * pr_aa_dist_05 +
+    (integer)(pr_aa_code_06 = '9M') * pr_aa_dist_06 +
+    (integer)(pr_aa_code_07 = '9M') * pr_aa_dist_07 +
+    (integer)(pr_aa_code_08 = '9M') * pr_aa_dist_08 +
+    (integer)(pr_aa_code_09 = '9M') * pr_aa_dist_09 +
+    (integer)(pr_aa_code_10 = '9M') * pr_aa_dist_10 +
+    (integer)(pr_aa_code_11 = '9M') * pr_aa_dist_11 +
+    (integer)(pr_aa_code_12 = '9M') * pr_aa_dist_12 +
+    (integer)(pr_aa_code_13 = '9M') * pr_aa_dist_13 +
+    (integer)(pr_aa_code_14 = '9M') * pr_aa_dist_14 +
+    (integer)(pr_aa_code_15 = '9M') * pr_aa_dist_15 +
+    (integer)(pr_aa_code_16 = '9M') * pr_aa_dist_16 +
+    (integer)(pr_aa_code_17 = '9M') * pr_aa_dist_17 +
+    (integer)(pr_aa_code_18 = '9M') * pr_aa_dist_18;
+
+pr_rcvalue36 := (integer)(pr_aa_code_01 = '36') * pr_aa_dist_01 +
+    (integer)(pr_aa_code_02 = '36') * pr_aa_dist_02 +
+    (integer)(pr_aa_code_03 = '36') * pr_aa_dist_03 +
+    (integer)(pr_aa_code_04 = '36') * pr_aa_dist_04 +
+    (integer)(pr_aa_code_05 = '36') * pr_aa_dist_05 +
+    (integer)(pr_aa_code_06 = '36') * pr_aa_dist_06 +
+    (integer)(pr_aa_code_07 = '36') * pr_aa_dist_07 +
+    (integer)(pr_aa_code_08 = '36') * pr_aa_dist_08 +
+    (integer)(pr_aa_code_09 = '36') * pr_aa_dist_09 +
+    (integer)(pr_aa_code_10 = '36') * pr_aa_dist_10 +
+    (integer)(pr_aa_code_11 = '36') * pr_aa_dist_11 +
+    (integer)(pr_aa_code_12 = '36') * pr_aa_dist_12 +
+    (integer)(pr_aa_code_13 = '36') * pr_aa_dist_13 +
+    (integer)(pr_aa_code_14 = '36') * pr_aa_dist_14 +
+    (integer)(pr_aa_code_15 = '36') * pr_aa_dist_15 +
+    (integer)(pr_aa_code_16 = '36') * pr_aa_dist_16 +
+    (integer)(pr_aa_code_17 = '36') * pr_aa_dist_17 +
+    (integer)(pr_aa_code_18 = '36') * pr_aa_dist_18;
+
+pr_rcvalue9f := (integer)(pr_aa_code_01 = '9F') * pr_aa_dist_01 +
+    (integer)(pr_aa_code_02 = '9F') * pr_aa_dist_02 +
+    (integer)(pr_aa_code_03 = '9F') * pr_aa_dist_03 +
+    (integer)(pr_aa_code_04 = '9F') * pr_aa_dist_04 +
+    (integer)(pr_aa_code_05 = '9F') * pr_aa_dist_05 +
+    (integer)(pr_aa_code_06 = '9F') * pr_aa_dist_06 +
+    (integer)(pr_aa_code_07 = '9F') * pr_aa_dist_07 +
+    (integer)(pr_aa_code_08 = '9F') * pr_aa_dist_08 +
+    (integer)(pr_aa_code_09 = '9F') * pr_aa_dist_09 +
+    (integer)(pr_aa_code_10 = '9F') * pr_aa_dist_10 +
+    (integer)(pr_aa_code_11 = '9F') * pr_aa_dist_11 +
+    (integer)(pr_aa_code_12 = '9F') * pr_aa_dist_12 +
+    (integer)(pr_aa_code_13 = '9F') * pr_aa_dist_13 +
+    (integer)(pr_aa_code_14 = '9F') * pr_aa_dist_14 +
+    (integer)(pr_aa_code_15 = '9F') * pr_aa_dist_15 +
+    (integer)(pr_aa_code_16 = '9F') * pr_aa_dist_16 +
+    (integer)(pr_aa_code_17 = '9F') * pr_aa_dist_17 +
+    (integer)(pr_aa_code_18 = '9F') * pr_aa_dist_18;
+
+pr_rcvalue9d := (integer)(pr_aa_code_01 = '9D') * pr_aa_dist_01 +
+    (integer)(pr_aa_code_02 = '9D') * pr_aa_dist_02 +
+    (integer)(pr_aa_code_03 = '9D') * pr_aa_dist_03 +
+    (integer)(pr_aa_code_04 = '9D') * pr_aa_dist_04 +
+    (integer)(pr_aa_code_05 = '9D') * pr_aa_dist_05 +
+    (integer)(pr_aa_code_06 = '9D') * pr_aa_dist_06 +
+    (integer)(pr_aa_code_07 = '9D') * pr_aa_dist_07 +
+    (integer)(pr_aa_code_08 = '9D') * pr_aa_dist_08 +
+    (integer)(pr_aa_code_09 = '9D') * pr_aa_dist_09 +
+    (integer)(pr_aa_code_10 = '9D') * pr_aa_dist_10 +
+    (integer)(pr_aa_code_11 = '9D') * pr_aa_dist_11 +
+    (integer)(pr_aa_code_12 = '9D') * pr_aa_dist_12 +
+    (integer)(pr_aa_code_13 = '9D') * pr_aa_dist_13 +
+    (integer)(pr_aa_code_14 = '9D') * pr_aa_dist_14 +
+    (integer)(pr_aa_code_15 = '9D') * pr_aa_dist_15 +
+    (integer)(pr_aa_code_16 = '9D') * pr_aa_dist_16 +
+    (integer)(pr_aa_code_17 = '9D') * pr_aa_dist_17 +
+    (integer)(pr_aa_code_18 = '9D') * pr_aa_dist_18;
+
+pr_rcvalue99 := (integer)(pr_aa_code_01 = '99') * pr_aa_dist_01 +
+    (integer)(pr_aa_code_02 = '99') * pr_aa_dist_02 +
+    (integer)(pr_aa_code_03 = '99') * pr_aa_dist_03 +
+    (integer)(pr_aa_code_04 = '99') * pr_aa_dist_04 +
+    (integer)(pr_aa_code_05 = '99') * pr_aa_dist_05 +
+    (integer)(pr_aa_code_06 = '99') * pr_aa_dist_06 +
+    (integer)(pr_aa_code_07 = '99') * pr_aa_dist_07 +
+    (integer)(pr_aa_code_08 = '99') * pr_aa_dist_08 +
+    (integer)(pr_aa_code_09 = '99') * pr_aa_dist_09 +
+    (integer)(pr_aa_code_10 = '99') * pr_aa_dist_10 +
+    (integer)(pr_aa_code_11 = '99') * pr_aa_dist_11 +
+    (integer)(pr_aa_code_12 = '99') * pr_aa_dist_12 +
+    (integer)(pr_aa_code_13 = '99') * pr_aa_dist_13 +
+    (integer)(pr_aa_code_14 = '99') * pr_aa_dist_14 +
+    (integer)(pr_aa_code_15 = '99') * pr_aa_dist_15 +
+    (integer)(pr_aa_code_16 = '99') * pr_aa_dist_16 +
+    (integer)(pr_aa_code_17 = '99') * pr_aa_dist_17 +
+    (integer)(pr_aa_code_18 = '99') * pr_aa_dist_18;
+
+pr_rcvaluepv := (integer)(pr_aa_code_01 = 'PV') * pr_aa_dist_01 +
+    (integer)(pr_aa_code_02 = 'PV') * pr_aa_dist_02 +
+    (integer)(pr_aa_code_03 = 'PV') * pr_aa_dist_03 +
+    (integer)(pr_aa_code_04 = 'PV') * pr_aa_dist_04 +
+    (integer)(pr_aa_code_05 = 'PV') * pr_aa_dist_05 +
+    (integer)(pr_aa_code_06 = 'PV') * pr_aa_dist_06 +
+    (integer)(pr_aa_code_07 = 'PV') * pr_aa_dist_07 +
+    (integer)(pr_aa_code_08 = 'PV') * pr_aa_dist_08 +
+    (integer)(pr_aa_code_09 = 'PV') * pr_aa_dist_09 +
+    (integer)(pr_aa_code_10 = 'PV') * pr_aa_dist_10 +
+    (integer)(pr_aa_code_11 = 'PV') * pr_aa_dist_11 +
+    (integer)(pr_aa_code_12 = 'PV') * pr_aa_dist_12 +
+    (integer)(pr_aa_code_13 = 'PV') * pr_aa_dist_13 +
+    (integer)(pr_aa_code_14 = 'PV') * pr_aa_dist_14 +
+    (integer)(pr_aa_code_15 = 'PV') * pr_aa_dist_15 +
+    (integer)(pr_aa_code_16 = 'PV') * pr_aa_dist_16 +
+    (integer)(pr_aa_code_17 = 'PV') * pr_aa_dist_17 +
+    (integer)(pr_aa_code_18 = 'PV') * pr_aa_dist_18;
 
 pr_rcvalue9v := (integer)(pr_aa_code_01 = '9V') * pr_aa_dist_01 +
     (integer)(pr_aa_code_02 = '9V') * pr_aa_dist_02 +
@@ -1110,7 +1002,45 @@ pr_rcvalue9v := (integer)(pr_aa_code_01 = '9V') * pr_aa_dist_01 +
     (integer)(pr_aa_code_17 = '9V') * pr_aa_dist_17 +
     (integer)(pr_aa_code_18 = '9V') * pr_aa_dist_18;
 
-pr_lgt := -2.6711414015142 +
+pr_rcvalue9w := (integer)(pr_aa_code_01 = '9W') * pr_aa_dist_01 +
+    (integer)(pr_aa_code_02 = '9W') * pr_aa_dist_02 +
+    (integer)(pr_aa_code_03 = '9W') * pr_aa_dist_03 +
+    (integer)(pr_aa_code_04 = '9W') * pr_aa_dist_04 +
+    (integer)(pr_aa_code_05 = '9W') * pr_aa_dist_05 +
+    (integer)(pr_aa_code_06 = '9W') * pr_aa_dist_06 +
+    (integer)(pr_aa_code_07 = '9W') * pr_aa_dist_07 +
+    (integer)(pr_aa_code_08 = '9W') * pr_aa_dist_08 +
+    (integer)(pr_aa_code_09 = '9W') * pr_aa_dist_09 +
+    (integer)(pr_aa_code_10 = '9W') * pr_aa_dist_10 +
+    (integer)(pr_aa_code_11 = '9W') * pr_aa_dist_11 +
+    (integer)(pr_aa_code_12 = '9W') * pr_aa_dist_12 +
+    (integer)(pr_aa_code_13 = '9W') * pr_aa_dist_13 +
+    (integer)(pr_aa_code_14 = '9W') * pr_aa_dist_14 +
+    (integer)(pr_aa_code_15 = '9W') * pr_aa_dist_15 +
+    (integer)(pr_aa_code_16 = '9W') * pr_aa_dist_16 +
+    (integer)(pr_aa_code_17 = '9W') * pr_aa_dist_17 +
+    (integer)(pr_aa_code_18 = '9W') * pr_aa_dist_18;
+
+pr_rcvalue9c := (integer)(pr_aa_code_01 = '9C') * pr_aa_dist_01 +
+    (integer)(pr_aa_code_02 = '9C') * pr_aa_dist_02 +
+    (integer)(pr_aa_code_03 = '9C') * pr_aa_dist_03 +
+    (integer)(pr_aa_code_04 = '9C') * pr_aa_dist_04 +
+    (integer)(pr_aa_code_05 = '9C') * pr_aa_dist_05 +
+    (integer)(pr_aa_code_06 = '9C') * pr_aa_dist_06 +
+    (integer)(pr_aa_code_07 = '9C') * pr_aa_dist_07 +
+    (integer)(pr_aa_code_08 = '9C') * pr_aa_dist_08 +
+    (integer)(pr_aa_code_09 = '9C') * pr_aa_dist_09 +
+    (integer)(pr_aa_code_10 = '9C') * pr_aa_dist_10 +
+    (integer)(pr_aa_code_11 = '9C') * pr_aa_dist_11 +
+    (integer)(pr_aa_code_12 = '9C') * pr_aa_dist_12 +
+    (integer)(pr_aa_code_13 = '9C') * pr_aa_dist_13 +
+    (integer)(pr_aa_code_14 = '9C') * pr_aa_dist_14 +
+    (integer)(pr_aa_code_15 = '9C') * pr_aa_dist_15 +
+    (integer)(pr_aa_code_16 = '9C') * pr_aa_dist_16 +
+    (integer)(pr_aa_code_17 = '9C') * pr_aa_dist_17 +
+    (integer)(pr_aa_code_18 = '9C') * pr_aa_dist_18;
+
+pr_lgt := -2.71014315492637 +
     pr_v01_w +
     pr_v02_w +
     pr_v03_w +
@@ -1128,8 +1058,8 @@ pr_lgt := -2.6711414015142 +
     pr_v15_w +
     pr_v16_w +
     pr_v17_w +
-    pr_v18_w +
-    pr_v19_w;
+    pr_v18_w;
+
 
 //*************************************************************************************//
 // I have no idea how the reason code logic gets implemented in ECL, so everything below 
@@ -1139,73 +1069,73 @@ pr_lgt := -2.6711414015142 +
 //*************************************************************************************//
 
 ds_layout := {STRING rc, REAL value};
+
+
  
 //*************************************************************************************//
-rc_dataset_r := DATASET([
-    {'9K', pr_rcvalue9K},
-    {'27', pr_rcvalue27},
-    {'9M', pr_rcvalue9M},
+rc_dataset_pr := DATASET([
     {'9A', pr_rcvalue9A},
-    {'9C', pr_rcvalue9C},
-    {'36', pr_rcvalue36},
-    {'9G', pr_rcvalue9G},
-    {'9F', pr_rcvalue9F},
-    {'99', pr_rcvalue99},
+    {'27', pr_rcvalue27},
     {'98', pr_rcvalue98},
-    {'9D', pr_rcvalue9D},
     {'9Q', pr_rcvalue9Q},
-    {'PV', pr_rcvaluePV},
     {'80', pr_rcvalue80},
     {'9R', pr_rcvalue9R},
+    {'9M', pr_rcvalue9M},
+    {'36', pr_rcvalue36},
+    {'9F', pr_rcvalue9F},
+    {'9D', pr_rcvalue9D},
+    {'99', pr_rcvalue99},
+    {'PV', pr_rcvaluePV},
+    {'9V', pr_rcvalue9V},
     {'9W', pr_rcvalue9W},
-    {'9V', pr_rcvalue9V}
+    {'9C', pr_rcvalue9C}
     ], ds_layout)(value > 0);
 
 //*************************************************************************************//
 // IMPORTANT NOTE:  Select ONLY reason codes with an RCValue < 0.  I'll leave the 
 //   implementation of this to the Engineer
 //*************************************************************************************//
-rc_dataset_r_sorted := sort(rc_dataset_r, -rc_dataset_r.value);
+//rc_dataset_pr_sorted := sort(rc_dataset_pr, rc_dataset_pr.value);
+rc_dataset_pr_sorted := sort(rc_dataset_pr, -rc_dataset_pr.value);
 
-r_rc1 := rc_dataset_r_sorted[1].rc;
-r_rc2 := rc_dataset_r_sorted[2].rc;
-r_rc3 := rc_dataset_r_sorted[3].rc;
-r_rc4 := rc_dataset_r_sorted[4].rc;
-r_rc5 := rc_dataset_r_sorted[5].rc;
-r_rc6 := rc_dataset_r_sorted[6].rc;
-r_rc7 := rc_dataset_r_sorted[7].rc;
-r_rc8 := rc_dataset_r_sorted[8].rc;
-r_rc9 := rc_dataset_r_sorted[9].rc;
-r_rc10 := rc_dataset_r_sorted[10].rc;
-r_rc11 := rc_dataset_r_sorted[11].rc;
-r_rc12 := rc_dataset_r_sorted[12].rc;
-r_rc13 := rc_dataset_r_sorted[13].rc;
-r_rc14 := rc_dataset_r_sorted[14].rc;
-r_rc15 := rc_dataset_r_sorted[15].rc;
-r_rc16 := rc_dataset_r_sorted[16].rc;
-r_rc17 := rc_dataset_r_sorted[17].rc;
-// r_rc18 := rc_dataset_r_sorted[18].rc;
-// r_rc19 := rc_dataset_r_sorted[19].rc;
+r_rc1 := rc_dataset_pr_sorted[1].rc;
+r_rc2 := rc_dataset_pr_sorted[2].rc;
+r_rc3 := rc_dataset_pr_sorted[3].rc;
+r_rc4 := rc_dataset_pr_sorted[4].rc;
+r_rc5 := rc_dataset_pr_sorted[5].rc;
+r_rc6 := rc_dataset_pr_sorted[6].rc;
+r_rc7 := rc_dataset_pr_sorted[7].rc;
+r_rc8 := rc_dataset_pr_sorted[8].rc;
+r_rc9 := rc_dataset_pr_sorted[9].rc;
+r_rc10 := rc_dataset_pr_sorted[10].rc;
+r_rc11 := rc_dataset_pr_sorted[11].rc;
+r_rc12 := rc_dataset_pr_sorted[12].rc;
+r_rc13 := rc_dataset_pr_sorted[13].rc;
+r_rc14 := rc_dataset_pr_sorted[14].rc;
+r_rc15 := rc_dataset_pr_sorted[15].rc;
+r_rc16 := rc_dataset_pr_sorted[16].rc;
+r_rc17 := rc_dataset_pr_sorted[17].rc;
+r_rc18 := rc_dataset_pr_sorted[18].rc;
 
-r_vl1 := rc_dataset_r_sorted[1].value;
-r_vl2 := rc_dataset_r_sorted[2].value;
-r_vl3 := rc_dataset_r_sorted[3].value;
-r_vl4 := rc_dataset_r_sorted[4].value;
-r_vl5 := rc_dataset_r_sorted[5].value;
-r_vl6 := rc_dataset_r_sorted[6].value;
-r_vl7 := rc_dataset_r_sorted[7].value;
-r_vl8 := rc_dataset_r_sorted[8].value;
-r_vl9 := rc_dataset_r_sorted[9].value;
-r_vl10 := rc_dataset_r_sorted[10].value;
-r_vl11 := rc_dataset_r_sorted[11].value;
-r_vl12 := rc_dataset_r_sorted[12].value;
-r_vl13 := rc_dataset_r_sorted[13].value;
-r_vl14 := rc_dataset_r_sorted[14].value;
-r_vl15 := rc_dataset_r_sorted[15].value;
-r_vl16 := rc_dataset_r_sorted[16].value;
-r_vl17 := rc_dataset_r_sorted[17].value;
-r_vl18 := 0;
-r_vl19 := 0;
+
+r_vl1 := rc_dataset_pr_sorted[1].value;
+r_vl2 := rc_dataset_pr_sorted[2].value;
+r_vl3 := rc_dataset_pr_sorted[3].value;
+r_vl4 := rc_dataset_pr_sorted[4].value;
+r_vl5 := rc_dataset_pr_sorted[5].value;
+r_vl6 := rc_dataset_pr_sorted[6].value;
+r_vl7 := rc_dataset_pr_sorted[7].value;
+r_vl8 := rc_dataset_pr_sorted[8].value;
+r_vl9 := rc_dataset_pr_sorted[9].value;
+r_vl10 := rc_dataset_pr_sorted[10].value;
+r_vl11 := rc_dataset_pr_sorted[11].value;
+r_vl12 := rc_dataset_pr_sorted[12].value;
+r_vl13 := rc_dataset_pr_sorted[13].value;
+r_vl14 := rc_dataset_pr_sorted[14].value;
+r_vl15 := rc_dataset_pr_sorted[15].value;
+r_vl16 := rc_dataset_pr_sorted[16].value;
+r_vl17 := rc_dataset_pr_sorted[17].value;
+r_vl18 := rc_dataset_pr_sorted[18].value;
 //*************************************************************************************//
 
 rc1_2 := r_rc1;
@@ -1216,100 +1146,108 @@ rc3_2 := r_rc3;
 
 rc4_2 := r_rc4;
 
-_rc_inq := if(r_rc1 = '9Q' or r_rc2 = '9Q' or r_rc3 = '9Q' or r_rc4 = '9Q' or r_rc5 = '9Q' or r_rc6 = '9Q' or r_rc7 = '9Q' or r_rc8 = '9Q' or r_rc9 = '9Q' or r_rc10 = '9Q' or r_rc11 = '9Q' or r_rc12 = '9Q' or r_rc13 = '9Q' or r_rc14 = '9Q' or r_rc15 = '9Q' or r_rc16 = '9Q' /*or rc_rc17 = '9Q' or rc_rc18 = '9Q' or rc_rc19 = '9Q'*/, '9Q', '');
+_rc_inq := map(
+    r_rc1 = '9Q' or r_rc2 = '9Q' or r_rc3 = '9Q' or r_rc4 = '9Q' 
+    or r_rc5 = '9Q' or r_rc6 = '9Q' or r_rc7 = '9Q' or r_rc8 = '9Q' 
+    or r_rc9 = '9Q' or r_rc10 = '9Q' or r_rc11 = '9Q' or r_rc12 = '9Q' 
+    or r_rc13 = '9Q' or r_rc14 = '9Q' or r_rc15 = '9Q' or r_rc16 = '9Q' 
+    or r_rc17 = '9Q' or r_rc18 = '9Q' => '9Q',
+    r_rc1 = '9P' or r_rc2 = '9P' or r_rc3 = '9P' or r_rc4 = '9P' 
+    or r_rc5 = '9P' or r_rc6 = '9P' or r_rc7 = '9P' or r_rc8 = '9P' 
+    or r_rc9 = '9P' or r_rc10 = '9P' or r_rc11 = '9P' or r_rc12 = '9P' 
+    or r_rc13 = '9P' or r_rc14 = '9P' or r_rc15 = '9P' or r_rc16 = '9P' 
+    or r_rc17 = '9P' or r_rc18 = '9P' => '9P',
+                                            '');
 
-rc3_c85 := map(
-    // trim((string)rc1_2, LEFT, RIGHT) = '' => '',
-    // trim((string)rc2_2, LEFT, RIGHT) = '' => '',
-    trim((string)rc3_2, LEFT, RIGHT) = '' => _rc_inq,
-    // trim((string)rc4_2, LEFT, RIGHT) = '' => '',
-                                             rc3_2);
 
-rc4_c85 := map(
-    // trim((string)rc1_2, LEFT, RIGHT) = '' => '',
-    // trim((string)rc2_2, LEFT, RIGHT) = '' => '',
-    // trim((string)rc3_2, LEFT, RIGHT) = '' => '',
-    trim((string)rc4_2, LEFT, RIGHT) = '' => _rc_inq,
-                                             rc4_2);
+ rc2_c81 := map(
+    //trim(rc1_2, LEFT, RIGHT) = '' => '',
+    trim(rc2_2, LEFT, RIGHT) = '' => _rc_inq,
+    //trim(rc3_2, LEFT, RIGHT) = '' => '',
+   // trim(rc4_2, LEFT, RIGHT) = '' => '',
+                                     rc2_2);                              
 
-rc5_c85 := map(
-    trim((string)rc1_2, LEFT, RIGHT) = '' => '',
-    trim((string)rc2_2, LEFT, RIGHT) = '' => '',
-    trim((string)rc3_2, LEFT, RIGHT) = '' => '',
-    trim((string)rc4_2, LEFT, RIGHT) = '' => '',
-                                             _rc_inq);
+                                     
+rc3_c81 := map(
+   // trim(rc1_2, LEFT, RIGHT) = '' => '',
+   // trim(rc2_2, LEFT, RIGHT) = '' => '',
+    trim(rc3_2, LEFT, RIGHT) = '' => _rc_inq,
+   // trim(rc4_2, LEFT, RIGHT) = '' => '',
+                                     rc3_2);
 
-rc1_c85 := map(
-    trim((string)rc1_2, LEFT, RIGHT) = '' => _rc_inq,
-    // trim((string)rc2_2, LEFT, RIGHT) = '' => '',
-    // trim((string)rc3_2, LEFT, RIGHT) = '' => '',
-    // trim((string)rc4_2, LEFT, RIGHT) = '' => '',
-                                             rc1_2
-                                             );
+rc1_c81 := map(
+    trim(rc1_2, LEFT, RIGHT) = '' => _rc_inq,
+   // trim(rc2_2, LEFT, RIGHT) = '' => '',
+    //trim(rc3_2, LEFT, RIGHT) = '' => '',
+   // trim(rc4_2, LEFT, RIGHT) = '' => '',
+                                     rc1_2);
+                                     
+ 
 
-rc2_c85 := map(
-    // trim((string)rc1_2, LEFT, RIGHT) = '' => '',
-    trim((string)rc2_2, LEFT, RIGHT) = '' => _rc_inq,
-    // trim((string)rc3_2, LEFT, RIGHT) = '' => '',
-    // trim((string)rc4_2, LEFT, RIGHT) = '' => '',
-                                             rc2_2);
+rc4_c81 := map(
+    //trim(rc1_2, LEFT, RIGHT) = '' => '',
+    //trim(rc2_2, LEFT, RIGHT) = '' => '',
+    //trim(rc3_2, LEFT, RIGHT) = '' => '',
+    trim(rc4_2, LEFT, RIGHT) = '' => _rc_inq,
+                                     rc4_2);
 
-rc5_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and not((rc3_2 in ['9Q', '9P'])) and not((rc4_2 in ['9Q', '9P'])), rc5_c85, '');
 
-rc2_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and not((rc3_2 in ['9Q', '9P'])) and not((rc4_2 in ['9Q', '9P'])), rc2_2, rc2_c85);
+                                     
+rc5_c81 := map(
+    trim(rc1_2, LEFT, RIGHT) = '' => '',
+    trim(rc2_2, LEFT, RIGHT) = '' => '',
+    trim(rc3_2, LEFT, RIGHT) = '' => '',
+    trim(rc4_2, LEFT, RIGHT) = '' => '',
+                                     _rc_inq);                                     
+                                     
+                                     
 
-rc1_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and not((rc3_2 in ['9Q', '9P'])) and not((rc4_2 in ['9Q', '9P'])), rc1_2, rc1_c85);
+rc1_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and not((rc3_2 in ['9Q', '9P'])) and not((rc4_2 in ['9Q', '9P'])),rc1_2, rc1_c81 );
 
-rc3_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and not((rc3_2 in ['9Q', '9P'])) and not((rc4_2 in ['9Q', '9P'])), rc3_2, rc3_c85);
+rc3_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and not((rc3_2 in ['9Q', '9P'])) and not((rc4_2 in ['9Q', '9P'])), rc3_2, rc3_c81);
 
-rc4_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and not((rc3_2 in ['9Q', '9P'])) and not((rc4_2 in ['9Q', '9P'])), rc4_2, rc4_c85);
+rc2_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and not((rc3_2 in ['9Q', '9P'])) and not((rc4_2 in ['9Q', '9P'])), rc2_2, rc2_c81);
+
+rc5_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and not((rc3_2 in ['9Q', '9P'])) and not((rc4_2 in ['9Q', '9P'])), rc5_c81, '');
+
+rc4_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and not((rc3_2 in ['9Q', '9P'])) and not((rc4_2 in ['9Q', '9P'])), rc4_2, rc4_c81);
+
+
 
 
 iv_rv5_unscorable := if(riskview.constants.noscore(NAS_Summary,NAP_Summary, add1_naprop, TrueDID), 1, 0);
-
 base := 700;
 
 pts := 40;
 
 lgt := ln(0.1475 / (1 - 0.1475));
 
-rvc1805_2_0 := if(iv_rv5_unscorable = 1, 
-                  222, 
-                  round(max((real)501, 
-                             min(900, 
-                                 if(base + pts * (pr_lgt - lgt) / ln(2) = NULL, 
-                                    NULL, 
-                                    base + pts * (pr_lgt - lgt) / ln(2)
-                                   )
-                                 )
-                           )
-                       ));
-
-rc5 := map(
-    rvc1805_2_0 = 222 => '',
-    rvc1805_2_0 = 900 => '',
-                         rc5_1);
-
-rc2 := map(
-    rvc1805_2_0 = 222 => '',
-    rvc1805_2_0 = 900 => '',
-                         rc2_1);
+RVC1805_2_0 := if(iv_rv5_unscorable =1, 222, round(max((real)501, min(900, if(base + pts * (pr_lgt - lgt) / ln(2) = NULL, -NULL, base + pts * (pr_lgt - lgt) / ln(2))))));
 
 rc1 := map(
-    rvc1805_2_0 = 222 => '9X',
-    rvc1805_2_0 = 900 => '',
+    RVC1805_2_0 = 222 => '9X',
+    RVC1805_2_0 = 900 => '',
                          rc1_1);
 
 rc3 := map(
-    rvc1805_2_0 = 222 => '',
-    rvc1805_2_0 = 900 => '',
+    RVC1805_2_0 = 222 => '',
+    RVC1805_2_0 = 900 => '',
                          rc3_1);
 
-rc4 := map(
-    rvc1805_2_0 = 222 => '',
-    rvc1805_2_0 = 900 => '',
-                         rc4_1);
+rc2 := map(
+    RVC1805_2_0 = 222 => '',
+    RVC1805_2_0 = 900 => '',
+                         rc2_1);
 
+rc5 := map(
+    RVC1805_2_0 = 222 => '',
+    RVC1805_2_0 = 900 => '',
+                         rc5_1);
+
+rc4 := map(
+    RVC1805_2_0 = 222 => '',
+    RVC1805_2_0 = 900 => '',
+                         rc4_1);
 
 
 //*************************************************************************************//
@@ -1332,11 +1270,11 @@ rc4 := map(
 
 	reasonsOverrides := MAP(
 													inCalif           =>	DATASET([{'35'}], HRILayout),
-													rvc1805_2_0 = 200 =>	DATASET([{'02'}], HRILayout),
-													rvc1805_2_0 = 222 =>	DATASET([{'9X'}], HRILayout),
-													rvc1805_2_0 = 900 =>	DATASET([{' '}], HRILayout),
-													rvc1805_2_0 BETWEEN 501 AND 720 AND reasons[1].HRI NOT IN ['', '36'] AND reasons[2].HRI = '' => DATASET([{reasons[1].HRI}, {'36'}], HRILayout),
-													rvc1805_2_0 BETWEEN 501 AND 720 AND reasons[1].HRI != '9E' AND reasons[2].HRI = ''					 => DATASET([{reasons[1].HRI}, {'9E'}], HRILayout),
+													RVC1805_2_0 = 200 =>	DATASET([{'02'}], HRILayout),
+													RVC1805_2_0 = 222 =>	DATASET([{'9X'}], HRILayout),
+													RVC1805_2_0 = 900 =>	DATASET([{' '}], HRILayout),
+													RVC1805_2_0 BETWEEN 501 AND 720 AND reasons[1].HRI NOT IN ['', '36'] AND reasons[2].HRI = '' => DATASET([{reasons[1].HRI}, {'36'}], HRILayout),
+													RVC1805_2_0 BETWEEN 501 AND 720 AND reasons[1].HRI != '9E' AND reasons[2].HRI = ''					 => DATASET([{reasons[1].HRI}, {'9E'}], HRILayout),
 																								DATASET([], HRILayout)
 													);
 	// If we have corrections reason codes, use them, otherwise if we have score overrides use them, else use the normal reason codes
@@ -1359,7 +1297,6 @@ rc4 := map(
 		/* Model Input Variables */
                     self.seq                              := le.seq;
                     self.sysdate                          := sysdate;
-                    self.iv_add_apt                       := iv_add_apt;
                     self.iv_db001_bankruptcy              := iv_db001_bankruptcy;
                     self.iv_phnpop_x_nap_summary          := iv_phnpop_x_nap_summary;
                     self.lien_adl_li_count_pos            := lien_adl_li_count_pos;
@@ -1368,6 +1305,7 @@ rc4 := map(
                     self.lien_adl_count_l2                := lien_adl_count_l2;
                     self._src_lien_adl_count              := _src_lien_adl_count;
                     self.iv_src_liens_adl_count           := iv_src_liens_adl_count;
+                    self._src_prop_adl_count              := _src_prop_adl_count;
                     self.iv_avg_lres                      := iv_avg_lres;
                     self.iv_bst_own_prop_x_addr_naprop    := iv_bst_own_prop_x_addr_naprop;
                     self.iv_in001_estimated_income        := iv_in001_estimated_income;
@@ -1377,20 +1315,19 @@ rc4 := map(
                     self._prop_adl_lseen_p                := _prop_adl_lseen_p;
                     self._src_prop_adl_lseen              := _src_prop_adl_lseen;
                     self.iv_mos_src_property_adl_lseen    := iv_mos_src_property_adl_lseen;
-                    self.iv_ssns_per_sfd_addr             := iv_ssns_per_sfd_addr;
-                    self._reported_dob                    := _reported_dob;
-                    self.reported_age                     := reported_age;
-                    self.iv_combined_age                  := iv_combined_age;
                     self.iv_avg_prop_assess_purch_amt     := iv_avg_prop_assess_purch_amt;
                     self.iv_addrs_per_adl                 := iv_addrs_per_adl;
+                    self.iv_inq_per_addr                  := (string)iv_inq_per_addr;
                     self._gong_did_first_seen             := _gong_did_first_seen;
                     self.iv_mos_since_gong_did_fst_seen   := iv_mos_since_gong_did_fst_seen;
                     self.iv_prv_addr_avm_auto_val         := iv_prv_addr_avm_auto_val;
                     self.iv_rec_vehx_level                := iv_rec_vehx_level;
                     self.iv_inq_ssns_per_adl              := iv_inq_ssns_per_adl;
+                    self.iv_src_property_adl_count        := iv_src_property_adl_count;
                     self.iv_input_addr_not_most_recent    := iv_input_addr_not_most_recent;
-                    self.iv_prof_license_category         := iv_prof_license_category;
                     self.iv_lnames_per_adl                := iv_lnames_per_adl;
+                    self.prop_adl_count_p                 := prop_adl_count_p;
+                    self.prop_adl_p_count_pos             := prop_adl_p_count_pos;
                     self.pr_v01_w                         := pr_v01_w;
                     self.pr_aa_dist_01                    := pr_aa_dist_01;
                     self.pr_aa_code_01                    := pr_aa_code_01;
@@ -1445,15 +1382,11 @@ rc4 := map(
                     self.pr_v18_w                         := pr_v18_w;
                     self.pr_aa_dist_18                    := pr_aa_dist_18;
                     self.pr_aa_code_18                    := pr_aa_code_18;
-                    self.pr_v19_w                         := pr_v19_w;
-                    self.pr_aa_dist_19                    := pr_aa_dist_19;
-                    self.pr_rcvalue9k                     := pr_rcvalue9k;
                     self.pr_rcvalue27                     := pr_rcvalue27;
                     self.pr_rcvalue9m                     := pr_rcvalue9m;
                     self.pr_rcvalue9a                     := pr_rcvalue9a;
                     self.pr_rcvalue9c                     := pr_rcvalue9c;
                     self.pr_rcvalue36                     := pr_rcvalue36;
-                    self.pr_rcvalue9g                     := pr_rcvalue9g;
                     self.pr_rcvalue9f                     := pr_rcvalue9f;
                     self.pr_rcvalue99                     := pr_rcvalue99;
                     self.pr_rcvalue98                     := pr_rcvalue98;
@@ -1508,7 +1441,7 @@ rc4 := map(
                     self.base                             := base;
                     self.pts                              := pts;
                     self.lgt                              := lgt;
-                    self.rvc1805_2_0                      := rvc1805_2_0;
+                    self.RVC1805_2_0                      := RVC1805_2_0;
                     self.rc3                              := rc3;
                     self.rc4                              := rc4;
                     self.rc5                              := rc5;
@@ -1522,7 +1455,7 @@ rc4 := map(
 																					));
 		SELF.score := MAP(reasonCodes[1].HRI IN ['91','92','93','94'] => (STRING3)((INTEGER)reasonCodes[1].HRI + 10),
 											reasonCodes[1].HRI = '35'										=> '100',
-																																		 (STRING)rvc1805_2_0);
+																																		 (STRING)RVC1805_2_0);
 
 		SELF.seq := le.seq;
 	#end

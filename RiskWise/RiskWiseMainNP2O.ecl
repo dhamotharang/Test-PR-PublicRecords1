@@ -36,7 +36,7 @@
 /*--INFO-- 'np21','np22','np24','np25','np27','np31','np50','np60','np80','np81','np82',
 'np90', 'np91', 'np92' */
 
-import Risk_Indicators,gateway;
+import Risk_Indicators, gateway, Riskwise, STD;
 
 
 export RiskWiseMainNP2O := MACRO
@@ -78,7 +78,11 @@ export RiskWiseMainNP2O := MACRO
 	'runSeed',
   'OFACversion',
 	'gateways',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -132,9 +136,15 @@ boolean   runSeed_value := false 		: stored('runSeed');
 unsigned1 ofac_version      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 productSet := ['np21','np22','np24','np25','np27','np31','np50','np60','np80','np81','np82','np90', 'np91', 'np92'];
 
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribcode in ['np21', 'np22'];
 
 targusGatewaySet := ['np21','np22','np24','np25','np27','np31','np50','np60','np80','np81','np82','np90', 'np91', 'np92'];
@@ -142,7 +152,7 @@ attusSet := ['np80','np81','np82'];
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
-	self.url := map(tribcode in attusSet and trim(StringLib.StringToLowerCase(le.servicename)) = 'attus' => le.url,  // attus gateway
+	self.url := map(tribcode in attusSet and trim(STD.Str.ToLowerCase(le.servicename)) = 'attus' => le.url,  // attus gateway
 				 tribcode in targusGatewaySet and le.servicename = 'targus' => le.url,  // targus gateway
          tribcode in ['np21', 'np25', 'np27', 'np50', 'np60', 'np90', 'np91', 'np92'] and le.servicename = 'bridgerwlc' => le.url, // bridger gateway
 				 ''); // default to no gateway call			 
@@ -185,7 +195,11 @@ f := project(d, addseq(LEFT,COUNTER));
 
 final_seed := if(runSeed_value, RiskWise.seedNP2O(tribcode, socs_value, account_value), dataset([],RiskWise.Layout_NP2O));
 
-almost_final := RiskWise.NP2O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, DataRestriction, DataPermission, ofac_version);
+almost_final := RiskWise.NP2O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, DataRestriction, DataPermission, ofac_version,
+                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                        TransactionID := TransactionID, 
+                                                                        BatchUID := BatchUID, 
+                                                                        GlobalCompanyID := GlobalCompanyID);
 //don't track royalties for testseeds
 dRoyalties := if(runSeed_value, dataset([], Royalty.Layouts.Royalty),
 	Royalty.RoyaltyTargus.GetOnlineRoyalties(almost_final, src, TargusType, TRUE, FALSE, FALSE, TRUE));

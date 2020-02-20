@@ -3,7 +3,7 @@
 
 // Currently almost all of these are "fake": just synonyms of a superset input
 
-IMPORT AutoHeaderI, doxie, suppress, relationship, FCRA, PAW_Services, AutoStandardI;
+IMPORT AutoHeaderI, doxie, suppress, relationship, FCRA, AutoStandardI;
 
 EXPORT IParam := MODULE
 
@@ -14,7 +14,7 @@ EXPORT IParam := MODULE
 
 
   //Some things common for all (or most of the) reports. Any report can redefine these.
-  EXPORT _report := INTERFACE (doxie.IDataAccess, FCRA.iRules)
+  EXPORT _report := INTERFACE (FCRA.iRules)
     //other common parameters
     EXPORT boolean include_hri := FALSE;
     EXPORT boolean legacy_verified := TRUE;
@@ -28,33 +28,58 @@ EXPORT IParam := MODULE
 
 
   /////////////// STAND ALONE (SINGLE SOURCE)  ///////////////
+  EXPORT aircrafts := INTERFACE (_report, doxie.IDataAccess)
+  END;
 
-  EXPORT bankruptcy := INTERFACE
+  EXPORT bankruptcy := INTERFACE (_report)
     EXPORT string1 bk_party_type := 'D'; //enforces to return records with subject as Debtor only
     EXPORT boolean bk_include_dockets := FALSE;
     EXPORT boolean bk_suppress_withdrawn := FALSE;
   END;
 
-  EXPORT criminal := INTERFACE
+  EXPORT ccw := INTERFACE (doxie.IDataAccess)
+  END;
+
+  EXPORT corpaffil := INTERFACE (doxie.IDataAccess) //currently, no fields are used.
+  END;
+
+  EXPORT criminal := INTERFACE (doxie.IDataAccess, _report) //only penalty-threshold is needed from report
     EXPORT boolean AllowGraphicDescription := FALSE;
     EXPORT boolean Include_BestAddress := FALSE;
     EXPORT boolean IncludeAllCriminalRecords := FALSE;
     EXPORT boolean IncludeSexualOffenses := FALSE;
   END;
 
-  EXPORT dl := INTERFACE
+  EXPORT dea := INTERFACE (doxie.IDataAccess)
+  END;
+
+  EXPORT dl := INTERFACE //currently, no fields are used.
     // defines whether Certegy data will be used in addition to the Government+Experian
     EXPORT boolean use_nonDMVSources := FALSE;
   END;
 
-  EXPORT liens := INTERFACE
+  EXPORT emails := INTERFACE (doxie.IDataAccess)
+      // options used in V2:
+      export unsigned MaxEmailResults := 0;
+      export string   EmailSearchTier := '';
+  END;
+
+  EXPORT faacerts := INTERFACE (doxie.IDataAccess, _report)
+  END;
+
+  EXPORT liens := INTERFACE (doxie.IDataAccess, _report)
     EXPORT string1 liens_party_type := '';
     EXPORT string50 tmsid_value := ''; // reserved for future needs if any
   END;
 
-  EXPORT peopleatwork := INTERFACE (_report) // changed to just include _report for ssn_mask information
+  EXPORT mardiv := INTERFACE (doxie.IDataAccess) //currently, no fields are used.
   END;
 
+  EXPORT peopleatwork := INTERFACE (doxie.IDataAccess, _report)
+  END;
+
+  EXPORT proflic := INTERFACE (doxie.IDataAccess, _report)
+  END;
 
   // general (vs. productwise) phones options
   EXPORT phones := INTERFACE
@@ -62,12 +87,15 @@ EXPORT IParam := MODULE
     EXPORT boolean include_phonesfeedback := FALSE;
   END;
 
-  EXPORT property := INTERFACE
+  EXPORT phonesplus := INTERFACE (phones, _report, doxie.IDataAccess)
+  END;
+
+  EXPORT property := INTERFACE(_report)
     EXPORT boolean ignoreFares := FALSE;
     EXPORT boolean ignoreFidelity := FALSE;
     EXPORT boolean use_nonsubjectproperty     := FALSE; // former "include_priorproperties"
     EXPORT boolean use_currentlyownedproperty := FALSE; //meaning, current ONLY!
-  
+
     // if TRUE, brings this-subject-owned properties on top of the results.
     // Probably, will be sparsely used (see #40087)
     EXPORT boolean sort_deeds_by_ownership := FALSE;
@@ -75,26 +103,36 @@ EXPORT IParam := MODULE
   END;
 
   // health care providers
-  EXPORT providers := INTERFACE
+  EXPORT providers := INTERFACE //currently, no fields are used.
     EXPORT boolean include_groupaffiliations    := FALSE;
     EXPORT boolean include_hospitalaffiliations := FALSE;
     EXPORT boolean include_education            := FALSE;
     EXPORT boolean include_businessaddress      := FALSE;
   END;
 
-  EXPORT ucc := INTERFACE
+  EXPORT sanctions := INTERFACE (doxie.IDataAccess) //currently, no fields are used.
+  END;
+
+  EXPORT sexoffenses := INTERFACE (doxie.IDataAccess)
+  END;
+
+  EXPORT ucc := INTERFACE (doxie.IDataAccess)
     EXPORT boolean includemultiplesecured := FALSE;
     EXPORT boolean returnrolleddebtors := FALSE;
     EXPORT string1 ucc_party_type := '';
   END;
 
-  EXPORT vehicles := INTERFACE
+  EXPORT vehicles := INTERFACE (doxie.IDataAccess)
     EXPORT boolean  Use_CurrentlyOwnedVehicles := FALSE;
   END;
 
-  EXPORT watercrafts := INTERFACE
+  EXPORT voters := INTERFACE (doxie.IDataAccess)
+  END;
+
+  EXPORT watercrafts := INTERFACE (_report, doxie.IDataAccess)
     EXPORT boolean include_NonRegulated_WatercraftSources := FALSE;
   END;
+
 
   /////////////// INTERFACES REPRESENTING A PERSON ///////////////
   EXPORT address := INTERFACE
@@ -142,10 +180,14 @@ EXPORT IParam := MODULE
   END;
 
 
+  // parameters required for "we also found" functionality
+  EXPORT count_param := INTERFACE (_report, property, bankruptcy)
+  end;
+
   /////////////// INTERFACES REPRESENTING A PERSON ///////////////
   // Defines all "personal" data: relatives, neighbors, associates, etc. Also defines most frequent defaults
   // (cannot use "person" -- something for Gavin to take a look at)
-  EXPORT personal := INTERFACE (address, imposters, relatives, neighbors, phones)
+  EXPORT personal := INTERFACE (_report, address, imposters, relatives, neighbors, phones)
   // //   unfortunate artefact: DL should really be a stand alone data
     EXPORT boolean include_driverslicenses := FALSE;
     EXPORT string9 _ssn := ''; // needed, if comp report (and alike) are provided with input SSN
@@ -211,11 +253,12 @@ EXPORT IParam := MODULE
     EXPORT boolean include_weaponpermits := FALSE; // aka CCW?
     EXPORT boolean include_sources := FALSE;
     EXPORT boolean include_criminalindicators := FALSE;
+    EXPORT boolean include_AddressSourceInfo  := FALSE; // Added 9/2019
   END;
 
 
   // =========================================================================
-  // ================= Central Records, Comprehensive Report ================= 
+  // ================= Central Records, Comprehensive Report =================
   // =========================================================================
 
   // NB: "pseudo": not for real versioning, but rather to suppress corresponding section and/or count
@@ -225,7 +268,7 @@ EXPORT IParam := MODULE
     EXPORT unsigned1 dea_version := 0;
     EXPORT unsigned1 dl_version := 0;
     EXPORT unsigned1 en_version := 0; //pseudo. //TODO: what's that???
-    EXPORT unsigned1 email_version := 0; //pseudo
+    EXPORT unsigned1 email_version := 0;
     EXPORT unsigned1 liensjudgments_version := 0;
     EXPORT unsigned1 phonesplus_version := 0; // pseudo
     EXPORT unsigned1 proflicense_version := 0; // pseudo
@@ -240,15 +283,16 @@ EXPORT IParam := MODULE
   EXPORT _sources := INTERFACE (include, versions)
   END;
 
-  //IParam._report isn't compatible with input._report, projecting from new to old will not work.
-  //To facilitate converting the modules until we make all PersonReports components
-  //compatible with IDataAccess, I will define a set of "old_report" interfaces
-  //-- same as original interfaces, minus _report part.
-  //Thus, "new" report module can be projected to the "old",
-  //and _report can be copied manually.
-  
-  //Same as $.input._assetreport, minus _report part
-  EXPORT old_assetreport := INTERFACE (address, bankruptcy, property, vehicles, watercrafts, imposters, relatives, include, dl, ucc)
+  EXPORT _compoptions := INTERFACE (doxie.IDataAccess, _report, personal, property, dl, include, versions, providers, emails)
+  END;
+
+
+  // =========================================================================
+  // =================            Person reports             =================
+  // =========================================================================
+
+  EXPORT _assetreport := INTERFACE (_report, doxie.IDataAccess, address, bankruptcy, property, imposters, relatives, include, dl,
+                                    ucc, vehicles, watercrafts)
     EXPORT boolean use_bestaka_ra := false;
     EXPORT boolean use_NonDMVSources := TRUE;
     EXPORT boolean include_relativeaddresses := TRUE; // if include relatives, then addresses must be included
@@ -265,21 +309,31 @@ EXPORT IParam := MODULE
     EXPORT boolean include_peopleatwork := TRUE;
   END;
 
-  EXPORT _assetreport := INTERFACE (_report, old_assetreport)
-  END;
+  EXPORT _finderreport := INTERFACE (_report, doxie.IDataAccess, personal, include, dl, emails, vehicles)
+    EXPORT boolean use_verified_address_ra := TRUE;
+    EXPORT boolean use_verified_address_nb := TRUE;
+    EXPORT boolean nbrs_with_phones := TRUE;
+    EXPORT boolean rels_with_phones := TRUE;
 
-  //Same as $.input._finderreport, minus _report part
-  EXPORT old_finderreport := INTERFACE (personal, include, vehicles, dl)
+    EXPORT boolean include_akas        := TRUE;
+    EXPORT boolean include_associates  := TRUE;
+    EXPORT boolean include_bankruptcy  := TRUE;
+    EXPORT boolean include_bpsaddress  := TRUE;
+    EXPORT boolean include_corpaffiliations := TRUE;
+    EXPORT boolean include_imposters   := TRUE;
+    EXPORT boolean include_neighbors   := TRUE;
+    EXPORT boolean include_oldphones   := TRUE;
+    EXPORT boolean include_relatives   := TRUE;
+    EXPORT boolean include_relativeaddresses := TRUE;
+    EXPORT boolean use_NonDMVSources       := TRUE;
+
     //these are not used by Finder; will be removed eventually.
     EXPORT boolean ignoreFares := FALSE;
     EXPORT boolean ignoreFidelity := FALSE;
   END;
 
-  EXPORT _finderreport := INTERFACE (_report, old_finderreport)
-  END;
-
-  //Same as $.input._prelitreport, minus _report part
-  EXPORT old_prelitreport := INTERFACE (address, include, property, vehicles, imposters, relatives, dl, bankruptcy, watercrafts)
+  EXPORT _prelitreport := INTERFACE (_report, doxie.IDataAccess, address, include, property, imposters, relatives, dl, bankruptcy,
+                                     vehicles, watercrafts)
     EXPORT boolean use_NonDMVSources       := TRUE;
     EXPORT boolean include_relativeaddresses := TRUE; // if include relatives, then addresses must be included
 
@@ -300,12 +354,8 @@ EXPORT IParam := MODULE
     EXPORT unsigned1 bankruptcy_version := 1;
     EXPORT unsigned1 liensjudgments_version := 1;
   end;
-  
-  EXPORT _prelitreport := INTERFACE (_report, old_prelitreport)
-  END;
 
-  //Same as $.input._rnareport, minus _report part
-  EXPORT old_rnareport := INTERFACE (AutoStandardI.InterfaceTranslator.clean_address.params, include, personal)
+  EXPORT _rnareport := INTERFACE (_report, doxie.IDataAccess, AutoStandardI.InterfaceTranslator.clean_address.params, include, personal)
     EXPORT boolean use_verified_address_nb := TRUE;
     EXPORT boolean nbrs_with_phones := TRUE;
     EXPORT unsigned1 neighbors_per_address := 6;
@@ -313,16 +363,18 @@ EXPORT IParam := MODULE
     EXPORT boolean ignoreFares := FALSE;
     EXPORT boolean ignoreFidelity := FALSE;
   END;
-  EXPORT _rnareport := INTERFACE (_report, old_rnareport)
-  END;
 
-  //Same as $.input._smartlinxreport, minus _report part
-  EXPORT old_smartlinxreport := INTERFACE (_sources, personal, providers, dl, property, criminal, liens, bankruptcy, watercrafts)
+//TODO: remove old_smartlinxreport
+  //Until we make all PersonReports components compatible with IDataAccess,
+  //I will have to convert new Smartlinx input module to an old-style module.
+  //To facilitate this, I define old_smartlinxreport interface -- same as original minus compliance parameters,
+  //and will copy compliance from IDataAccess-part of a service module.
+
+  //Same as (former) $.input._smartlinxreport, minus compliance parameters
+  EXPORT old_smartlinxreport := INTERFACE (_report, _sources, personal, providers, dl, property, criminal, bankruptcy)
     // define defaults for those just declared
-    //EXPORT boolean include_bpsaddress      := TRUE;
     EXPORT boolean include_BlankDOD := TRUE;
     EXPORT unsigned1 max_relatives := 100;
-    //EXPORT boolean include_residents := TRUE;
     EXPORT boolean use_bestaka_ra := FALSE;
     EXPORT boolean include_relativeaddresses := TRUE; // if include relatives, then addresses must be included
     EXPORT unsigned1 bankruptcy_version := 2;
@@ -342,93 +394,11 @@ EXPORT IParam := MODULE
     EXPORT unsigned1 neighbors_per_address := 20;
     EXPORT unsigned1 neighbors_per_na := 2;
     EXPORT boolean sort_deeds_by_ownership := TRUE; //sets property ownership flag that is needed for determining Current/Prior
-  END;  
+  END;
 
-  EXPORT _smartlinxreport := INTERFACE (_report, old_smartlinxreport)
+  EXPORT _smartlinxreport := INTERFACE (doxie.IDataAccess, emails, liens, watercrafts, old_smartlinxreport)
     EXPORT boolean include_BlankDOD := TRUE;
     EXPORT boolean smart_rollup := TRUE;
   END;
-
-  EXPORT ConvertToOldSmartLinx (_smartlinxreport mod_smartlinx) := FUNCTION
-    mod_res := MODULE (PROJECT (mod_smartlinx, old_smartlinxreport))
-      EXPORT INTEGER FCRAPurpose := mod_smartlinx.FCRAPurpose;
-      EXPORT integer8 FFDOptionsMask := mod_smartlinx.FFDOptionsMask;
-    
-      EXPORT unsigned1 GLBPurpose := mod_smartlinx.glb;
-      EXPORT unsigned1 DPPAPurpose := mod_smartlinx.dppa;
-      EXPORT string DataPermissionMask := mod_smartlinx.DataPermissionMask;
-      EXPORT string DataRestrictionMask := mod_smartlinx.DataRestrictionMask;
-      EXPORT boolean ln_branded := mod_smartlinx.ln_branded;
-      EXPORT string5 industryclass := mod_smartlinx.industry_class;
-      EXPORT string32 applicationtype := mod_smartlinx.application_type;
-      EXPORT unsigned3 dateval := mod_smartlinx.date_threshold;
-      EXPORT boolean IncludeMinors := mod_smartlinx.show_minors;
-      EXPORT string6 ssn_mask := mod_smartlinx.ssn_mask;
-      EXPORT boolean mask_dl := mod_smartlinx.dl_mask = 1;
-      EXPORT unsigned1 dob_mask := mod_smartlinx.dob_mask;
-
-      EXPORT boolean include_hri := mod_smartlinx.include_hri;
-      EXPORT boolean legacy_verified := mod_smartlinx.legacy_verified;
-      EXPORT unsigned1 score_threshold := mod_smartlinx.score_threshold;
-      EXPORT unsigned2 penalty_threshold := mod_smartlinx.penalty_threshold;
-      EXPORT unsigned1 max_hri := mod_smartlinx.max_hri;
-      EXPORT boolean include_BlankDOD := mod_smartlinx.include_BlankDOD;
-      EXPORT boolean smart_rollup := mod_smartlinx.smart_rollup;
-      EXPORT integer1 non_subject_suppression := mod_smartlinx.non_subject_suppression;
-
-      //fields that are likely should be removed
-      EXPORT boolean AllowAll := FALSE;
-      EXPORT boolean AllowGLB := FALSE;
-      EXPORT boolean AllowDPPA := FALSE;
-      EXPORT boolean ignoreFares := FALSE;
-      EXPORT boolean ignoreFidelity := FALSE;
-      EXPORT boolean restrictPreGLB := TRUE; //not used
-
-      // defined individually in _property interface
-      EXPORT boolean probation_override := mod_smartlinx.probation_override;
-    END;
-
-    RETURN mod_res;
-  END;  
-
-  // Creates a module in a new _report format -- compatible with IDataAccess -- from a module implementing old _report interface
-  EXPORT MAC_CreateIDataAccessReportModule (old_style) := FUNCTIONMACRO
-    local report := MODULE (PersonReports.IParam._report)
-      // IDataAccessPart
-      EXPORT unsigned1 glb := old_style.GLBPurpose;
-      EXPORT unsigned1 dppa := old_style.DPPAPurpose;
-      EXPORT string DataPermissionMask := old_style.DataPermissionMask;
-      EXPORT string DataRestrictionMask := old_style.DataRestrictionMask;
-      EXPORT boolean ln_branded :=  old_style.ln_branded;
-      // EXPORT boolean probation_override := FALSE;
-      EXPORT string5 industry_class :=  old_style.industryclass;
-      EXPORT string32 application_type :=  old_style.applicationtype;
-      // EXPORT boolean no_scrub := FALSE;
-      EXPORT unsigned3 date_threshold := old_style.dateval;
-      // EXPORT boolean suppress_dmv := TRUE;
-      // EXPORT unsigned1 reseller_type := 0;
-      // EXPORT unsigned1 intended_use := 0;
-      // EXPORT boolean log_record_source := TRUE;
-      // EXPORT boolean lexid_source_optout := TRUE;
-      EXPORT boolean show_minors := old_style.IncludeMinors;
-      //masking
-      EXPORT string ssn_mask := old_style.ssn_mask;
-      EXPORT unsigned1 dl_mask := IF (old_style.mask_dl, 1, 0);
-      EXPORT unsigned1 dob_mask := old_style.dob_mask;
-      // EXPORT string transaction_id := '';
-      // EXPORT unsigned6 global_company_id := 0;
-      // ----------------------------------------------------
-
-      EXPORT boolean include_hri := old_style.include_hri;
-      EXPORT boolean legacy_verified := old_style.legacy_verified;
-      EXPORT unsigned1 score_threshold := old_style.score_threshold;
-      EXPORT unsigned2 penalty_threshold := old_style.penalty_threshold;
-      EXPORT unsigned1 max_hri := old_style.max_hri;
-      EXPORT boolean include_BlankDOD := old_style.include_BlankDOD;
-      EXPORT boolean smart_rollup := old_style.smart_rollup;
-      EXPORT integer1 non_subject_suppression := old_style.non_subject_suppression;
-    END;
-    RETURN report;  
-  ENDMACRO;    
 
 END;

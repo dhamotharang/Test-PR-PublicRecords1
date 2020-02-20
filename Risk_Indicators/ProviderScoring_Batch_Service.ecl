@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ProviderScoring_Batch_Service" wuTimeout="300000">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="Model" type="xsd:string"/>
@@ -44,7 +44,7 @@
 */
 
 
-IMPORT Business_Header_SS, Models, Risk_Indicators, RiskWise, gateway, AutoStandardI;
+IMPORT STD, Models, Risk_Indicators, RiskWise, gateway, AutoStandardI;
 
 EXPORT ProviderScoring_Batch_Service := MACRO
 
@@ -64,6 +64,12 @@ EXPORT ProviderScoring_Batch_Service := MACRO
 	STRING50 DataPermission 			:= Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 	UNSIGNED3 HistoryDate					:= Risk_Indicators.iid_constants.default_history_date : STORED('HistoryDateYYYYMM');
 	UNSIGNED1 NumWarningCodes			:= 4 : STORED('NumberOfWarningCodes');
+  
+  // CCPA Fields
+  unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+  string TransactionID := '' : stored ('_TransactionId');
+  string BatchUID := '' : stored('_BatchUID');
+  unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 	
 	// This product has no gateways
 	gateways := Gateway.Constants.void_gateway;
@@ -77,7 +83,7 @@ EXPORT ProviderScoring_Batch_Service := MACRO
 	END;
 	Batch_Input_Sequenced := PROJECT(Batch_Input, sequenceInput(LEFT, COUNTER));
 	
-	Model_Request := StringLib.StringToUpperCase(Model_Request_Raw);
+	Model_Request := STD.STR.ToUpperCase(Model_Request_Raw);
 
 	BocaShellVersion := MAP(
 													Model_Request = 'HCP1206_0' => 4,
@@ -90,7 +96,8 @@ EXPORT ProviderScoring_Batch_Service := MACRO
 	 *    Get Boca Shell and Healthcare Data      *
 	 ********************************************** */
 	// Don't do the work if we don't have a valid model request!
-	BocaShell_HealthcareShell := IF(BocaShellVersion > 0, Risk_Indicators.ProviderScoring_Search_Function(Batch_Input_Sequenced, BocaShellVersion, DPPAPurpose, GLBPurpose, DataRestrictionMask, HistoryDate, gateways, DataPermission),
+	BocaShell_HealthcareShell := IF(BocaShellVersion > 0, Risk_Indicators.ProviderScoring_Search_Function(Batch_Input_Sequenced, BocaShellVersion, DPPAPurpose, GLBPurpose, DataRestrictionMask, HistoryDate, gateways, DataPermission, 
+    LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID),
 																												DATASET([], Risk_Indicators.Layout_Provider_Scoring.Clam_Plus_Healthcare));
 
 	/* ********************************************

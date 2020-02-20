@@ -1,7 +1,10 @@
 export gong_append_utils := MODULE
 	
 	export MAC_lookupAptCount(infile, outfile, lookupApt = true) := MACRO
-    import header;
+    import dx_header;
+
+		#uniquename(key_apt_buildings)
+    %key_apt_buildings% := dx_header.Key_AptBuildings();
 
 		#uniquename(outLayout)
 		%outLayout% := RECORD(infile),
@@ -10,13 +13,13 @@ export gong_append_utils := MODULE
 	
 		// Join to header.Key_AptBuildings to pick up apt_count.
 		#uniquename(xfm_join_apt_counts)
-		%outLayout% %xfm_join_apt_counts%(infile l, header.Key_AptBuildings r) := TRANSFORM
+		%outLayout% %xfm_join_apt_counts%(infile l, %key_apt_buildings% r) := TRANSFORM
 			SELF.apt_cnt := r.apt_cnt;
 			SELF         := l;
 		END;
 	
 		#uniquename(withApt)
-		%withApt% := JOIN(infile, header.Key_AptBuildings,
+		%withApt% := JOIN(infile, %key_apt_buildings%,
 										KEYED(RIGHT.prim_range = LEFT.prim_range AND
 													RIGHT.prim_name  = LEFT.prim_name  AND
 													RIGHT.zip        = LEFT.zip        AND

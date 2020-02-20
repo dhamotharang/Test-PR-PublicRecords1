@@ -6,6 +6,7 @@ EXPORT Boca_Shell_SO_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 
 	todaysdate := (string) risk_indicators.iid_constants.todaydate;
 	insurance_fcra_filter := (BSOptions & risk_indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
+	insurance_fcra_SODatafilter := (BSOptions & risk_indicators.iid_constants.BSOptions.InsuranceFCRASODataFilter) > 0;
 
 	// sex offender records aren't in the doxie_files.Key_BocaShell_Crim_FCRA key, need to add them here
 	fcra_sex_offender_did_key := SexOffender.Key_SexOffender_DID(true);
@@ -61,7 +62,7 @@ EXPORT Boca_Shell_SO_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 
 	with_sex_offenders := join(w_BankLiesCrim, sex_offenders_rolled, left.seq=right.seq,
 		transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus,
-			self.BJL.criminal_count := if(insurance_fcra_filter, left.BJL.criminal_count, //can't return a SO count for insurance
+			self.BJL.criminal_count := if(insurance_fcra_filter or insurance_fcra_SODatafilter, left.BJL.criminal_count, //can't return a SO count for insurance
 				left.BJL.criminal_count + right.BJL.criminal_count);
 			self := left), left outer, keep(1));
 

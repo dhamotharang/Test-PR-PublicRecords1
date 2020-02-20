@@ -17,16 +17,21 @@ EXPORT Records := MODULE
 				TRANSFORM(FCRA.Layout_Override_Gong,SELF:=RIGHT),
 				KEEP(FCRA.compliance.MAX_OVERRIDE_LIMIT),LIMIT(0));
 
-			// get gong records less overwritten records
+			// get gong records
 			ds_gong_recs:=JOIN(ds_dids,gong.Key_FCRA_History_did,
-				KEYED(LEFT.did=RIGHT.l_did)
-				AND TRIM((STRING)RIGHT.did+(STRING)RIGHT.phone10+(STRING)RIGHT.dt_first_seen) NOT IN override_ids // old way - prior to 11/13/2012
-				AND TRIM((STRING)RIGHT.persistent_record_id) NOT IN override_ids, // new way - using persistent_record_id
+				KEYED(LEFT.did=RIGHT.l_did),
 				TRANSFORM(FCRA.Layout_Override_Gong,SELF:=RIGHT,SELF:=[]),
 				KEEP(Gong_Services.Constants.FCRA.MaxGongPerDID),
 				LIMIT(Gong_Services.Constants.FCRA.MaxGongRecords,SKIP));
 
-			ds_gong_raw:=ds_gong_recs+ds_override_recs;
+			// less overwritten records
+			ds_gong_less_overwritten:=JOIN(ds_gong_recs,ds_FlagFile,
+				LEFT.did=(UNSIGNED)RIGHT.did
+				AND ((STRING)LEFT.did+(STRING)LEFT.phone10+(STRING)LEFT.dt_first_seen=TRIM(RIGHT.record_id) // old way - prior to 11/13/2012
+				OR (STRING)LEFT.persistent_record_id=TRIM(RIGHT.record_id)), // new way - using persistent_record_id
+				TRANSFORM(FCRA.Layout_Override_Gong,SELF:=LEFT),LEFT ONLY);
+
+			ds_gong_raw:=ds_gong_less_overwritten+ds_override_recs;
 
 			// apply suppressions
 			Suppress.MAC_Suppress(ds_gong_raw,ds_dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,l_did);

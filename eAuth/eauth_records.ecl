@@ -1,4 +1,4 @@
-IMPORT doxie, iesp, AutoStandardI, PersonReports, ut,VehicleV2_Services, LN_PropertyV2_Services, suppress;
+IMPORT doxie, iesp, AutoStandardI, PersonReports, ut, VehicleV2_Services, LN_PropertyV2_Services, suppress;
 
 out_rec := record (iesp.eauth.t_EAuthResponse)
   // dataset (layouts.question_matrix) ver;
@@ -16,7 +16,8 @@ unsigned1 ANSWERS_MAX := iesp.Constants.EAUTHORIZE.MaxAnswers; //20
 // atmost one DID, actually
 EXPORT out_rec eauth_records (
   dataset (doxie.layout_references) dids,
-  IParam.records param,
+  $.IParam.records param,
+  doxie.IDataAccess mod_access,
   boolean IsFCRA = false) := FUNCTION
 
   input_dids_set := SET (dids, did);
@@ -59,7 +60,7 @@ EXPORT out_rec eauth_records (
 // ------------------------- Fetch personal records -------------------------
 // --------------------------------------------------------------------------
   // best records
-  pers := PersonReports.Person_records (dids, module (project (param, PersonReports.input.personal, opt)) end, IsFCRA);
+  pers := PersonReports.Person_records (dids, mod_access, module (project (param, PersonReports.IParam.personal, opt)) end, IsFCRA);
   ds_best := pers.bestrecs;  //doxie.layout_best
 
   // Note: addresses must be sorted from most recent to the oldest one.
@@ -186,7 +187,8 @@ EXPORT out_rec eauth_records (
 
 
   // vehicle
-  p_vehicles := choosen(VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report (dids), iesp.Constants.BR.MaxVehicles)
+  report_mod := VehicleV2_Services.IParam.getReportModule();  
+  p_vehicles := choosen(VehicleV2_Services.raw.get_vehicle_crs_report (report_mod, dids), iesp.Constants.BR.MaxVehicles)
   : GLOBAL;  
 //TODO: check use current only HistoryFlag = 'CURRENT'
 

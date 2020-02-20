@@ -2,7 +2,7 @@
 
 EXPORT IParam := MODULE
 
-	EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParamsV2)
+	EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams)
 		EXPORT BOOLEAN 		AddSupplemental 					:= FALSE;
 		EXPORT BOOLEAN 		ExtraMatchCodes 					:= FALSE;
 		EXPORT BOOLEAN 		IncludeBlankDOD 					:= FALSE;
@@ -20,7 +20,7 @@ EXPORT IParam := MODULE
 	EXPORT getBatchParams() := 
 	FUNCTION
 		
-		mBaseParams := BatchShare.IParam.getBatchParamsV2();
+		mBaseParams := BatchShare.IParam.getBatchParams();
 		
 		in_mod := module(project(mBaseParams, BatchParams, opt))							
 			EXPORT BOOLEAN 		AddSupplemental 				:= FALSE : STORED('AddSupplemental');

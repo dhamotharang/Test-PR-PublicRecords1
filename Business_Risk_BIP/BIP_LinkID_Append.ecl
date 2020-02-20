@@ -1,11 +1,13 @@
-IMPORT Business_Risk_BIP, BIPV2, SALT28;
+﻿IMPORT Business_Risk_BIP, BIPV2, SALT28;
 
 // This function takes in a dataset of Layouts.Input and appends the various BIP Link ID's
 
 EXPORT BIP_LinkID_Append (DATASET(Business_Risk_BIP.Layouts.Input) Input, BOOLEAN ForceAppend = FALSE, BOOLEAN DoNotUseAuthRepInBIPAppend = FALSE) := FUNCTION
-	// If we aren't forcing the append process, pull out the records on input that have the BIP ID fields populated, use those BIP IDs
+	
+  // If we aren't forcing the append process, pull out the records on input that have the BIP ID fields populated, use those BIP IDs
 	UseInputBIPIDs := IF(ForceAppend = FALSE, Input (PowID > 0 AND ProxID > 0 AND SeleID > 0 AND OrgID > 0 AND UltID > 0), DATASET([], Business_Risk_BIP.Layouts.Input));
-	// If we aren't forcing the append process, pull out the records on input that don't have the BIP ID fields all populated, append new BIP IDs
+	
+  // If we aren't forcing the append process, pull out the records on input that don't have the BIP ID fields all populated, append new BIP IDs
 	AppendBIPIDs := IF(ForceAppend = FALSE, Input (PowID = 0 OR ProxID = 0 OR SeleID = 0 OR OrgID = 0 OR UltID = 0), Input);
 
 	// Prepare the BIP Append input - These should be clean coming in
@@ -35,6 +37,7 @@ EXPORT BIP_LinkID_Append (DATASET(Business_Risk_BIP.Layouts.Input) Input, BOOLEA
 		SELF.allow7DigitMatch := FALSE; // Allows for 7 digit match on Phone10
 		SELF.HSort := FALSE;
 	END;
+  
 	// Check to see if there was a unique AltCompanyName entered as well - attempt to use that for linking in case the primary company name finds nothing
 	AlsoSearchFor := AppendBIPIDs (AltCompanyName NOT IN ['', CompanyName]);
 
@@ -80,10 +83,12 @@ EXPORT BIP_LinkID_Append (DATASET(Business_Risk_BIP.Layouts.Input) Input, BOOLEA
 		UNSIGNED4 Seq;
 		DATASET(Business_Risk_BIP.Layouts.CompanyNames) Names;
 	END;
+  
 	tempNamesLayout cleanNames(RECORDOF(UniqueCompanyNames) le) := TRANSFORM
 		SELF.Seq := le.Seq;
 		SELF.Names := DATASET([{le.Name, le.LinkCount}], Business_Risk_BIP.Layouts.CompanyNames);
 	END;
+  
 	cleanedCompanyNames := PROJECT(UniqueCompanyNames, cleanNames(LEFT));
 	
 	// Rollup our Unique Link ID's by Seq so that we can combine everything by Seq below
@@ -100,6 +105,7 @@ EXPORT BIP_LinkID_Append (DATASET(Business_Risk_BIP.Layouts.Input) Input, BOOLEA
 																																			SELF.PowIDs := RIGHT.Links;
 																																			SELF := []), // For the first JOIN to our Input we need to blank out the other sets just in case an input Seq doesn't find Link IDs 
 													LEFT OUTER, KEEP(1), ATMOST(100), FEW);
+                          
 	withProxIDs := JOIN(withPowIDs, rolledProxIDs, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.LinkID_Results,
 																																			SELF.ProxIDs := RIGHT.Links;
 																																			SELF := LEFT), 
@@ -108,14 +114,17 @@ EXPORT BIP_LinkID_Append (DATASET(Business_Risk_BIP.Layouts.Input) Input, BOOLEA
 																																			SELF.SeleIDs := RIGHT.Links;
 																																			SELF := LEFT), 
 													LEFT OUTER, KEEP(1), ATMOST(100), FEW);
+                          
 	withOrgIDs := JOIN(withSeleIDs, rolledOrgIDs, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.LinkID_Results,
 																																			SELF.OrgIDs := RIGHT.Links;
 																																			SELF := LEFT), 
 													LEFT OUTER, KEEP(1), ATMOST(100), FEW);
+                          
 	withUltIDs := JOIN(withOrgIDs, rolledUltIDs, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.LinkID_Results,
 																																			SELF.UltIDs := RIGHT.Links;
 																																			SELF := LEFT), 
 													LEFT OUTER, KEEP(1), ATMOST(100), FEW);
+                          
 	withCompanyNames := JOIN(withUltIDs, rolledCompanyNames, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.LinkID_Results,
 																																			SELF.CompanyNames := RIGHT.Names;
 																																			SELF := LEFT), 
@@ -189,6 +198,7 @@ EXPORT BIP_LinkID_Append (DATASET(Business_Risk_BIP.Layouts.Input) Input, BOOLEA
 		
 		SELF := le;
 	END;
+  
 	finalBIPIDsAppended := JOIN(withCompanyNames, RolledLinkIDsRaw, LEFT.Seq = RIGHT.Seq, setBestIDs(LEFT, RIGHT), LEFT OUTER, KEEP(1), ATMOST(100));
 	
 	Business_Risk_BIP.Layouts.LinkID_Results setInputIDs(UseInputBIPIDs le) := TRANSFORM
@@ -225,4 +235,5 @@ EXPORT BIP_LinkID_Append (DATASET(Business_Risk_BIP.Layouts.Input) Input, BOOLEA
 	// *****************
 	
 	RETURN(FinalResults);
+  
 END;

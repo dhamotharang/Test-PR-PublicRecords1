@@ -7,7 +7,10 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
  globalMod := AutoStandardI.GlobalModule();
  
  //filter out minors and suppress DID(s) before attempting to fetch any data....
-  mod_access    := PersonSlimReport_Services.IParams.convertToDataAccess(in_mod);
+  mod_access  := MODULE(doxie.IDataAccess)
+    //this brings some extras (like, include_BlankDOD), but there's no harm in it
+    $.IParams.MAC_copy_old_report_fields(in_mod);
+  END;
   did_minorSafe := doxie.compliance.MAC_FilterOutMinors(in_did, , , mod_access.show_minors);
   Suppress.MAC_Suppress(did_minorSafe,did_safe,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
  
@@ -48,7 +51,7 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
  
  //***PEOPLE AT WORK RECS***\\ // DATASET([],iesp.peopleatwork.t_PeopleAtWorkRecord);
  paws := if(in_mod.IncludePeopleAtWork,
-            CHOOSEN(PersonSlimReport_Services.Functions(did_safe).pawRecsByDid(in_mod.ssn_mask),
+            CHOOSEN(PersonSlimReport_Services.Functions(did_safe).pawRecsByDid(in_mod),
                     iesp.Constants.PersonSlim.MaxPeopleAtWork));
 												
  //***AIRCRAFT RECS***\\ // DATASET([],iesp.faaaircraft.t_AircraftReportRecord);											
@@ -123,38 +126,37 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
                         iesp.Constants.PersonSlim.MaxAccidents));
 												
  //***BANKRUPTCY RECS***\\ // DATASET([],iesp.bankruptcy.t_BankruptcyReport2Record);
- bk_mod      := module (project(in_mod, PersonReports.input.bankruptcy, opt)) end;
+ bk_mod      := module (PersonReports.IParam.bankruptcy)
+                  $.IParams.MAC_copy_old_report_fields(in_mod);
+                end;
  bankruptcies:= if(in_mod.IncludeBankruptcies,
-                  CHOOSEN(SmartRollup.fn_smart_rollup_bankruptcy(PersonReports.bankruptcy_records(did_safe, bk_mod).bankruptcy_v2),
+                  CHOOSEN(SmartRollup.fn_smart_rollup_bankruptcy(PersonReports.bankruptcy_records(did_safe, mod_access, bk_mod).bankruptcy_v2),
                           iesp.Constants.PersonSlim.MaxBankruptcies));
- 	
+
  //***LIEN RECS***\\ // DATASET([],iesp.lienjudgement.t_LienJudgmentReportRecord);
- liens_mod := MODULE (project(in_mod, PersonReports.input.liens, opt))
-                EXPORT string1 leins_party_type := PersonSlimReport_Services.Constants.DEBTOR;
-              END;
  liens := if(in_mod.IncludeLiens,
-            CHOOSEN(SmartRollup.fn_smart_rollup_liens(project(PersonReports.lienjudgment_records(did_safe, liens_mod).liensjudgment_v2,
-                    iesp.lienjudgement.t_LienJudgmentReportRecord)),iesp.Constants.PersonSlim.MaxLiens));
+            CHOOSEN(PersonSlimReport_Services.Functions(did_safe).liensRecsByDid(in_mod),
+                    iesp.Constants.PersonSlim.MaxLiens));
 												 
-  //***PROPERTY RECS***\\ // DATASET([],iesp.property.t_PropertyReport2Record);
+ //***PROPERTY RECS***\\ // DATASET([],iesp.property.t_PropertyReport2Record);
  properties := if(in_mod.IncludeProperties,
-                  CHOOSEN(PersonSlimReport_Services.Functions(did_safe).propertyRecsByDid(in_mod),
+                  CHOOSEN(PersonSlimReport_Services.Functions(did_safe).propertyRecsByDid(in_mod, mod_access),
                          iesp.Constants.PersonSlim.MaxProperties));
 												 
  //***MARRIAGE & DIVORCE RECS***\\ // DATASET([],iesp.marriagedivorce.t_MarriageSearch2Record);
  marrDivorces := if(in_mod.IncludeMarriageDivorces,
-                    CHOOSEN(PersonSlimReport_Services.Functions(did_safe).marDivRecsByDid(),
+                    CHOOSEN(PersonSlimReport_Services.Functions(did_safe).marDivRecsByDid(in_mod),
                            iesp.Constants.PersonSlim.MaxMarriageDiv));
 													 
  //***STUDENT EDUCATION RECS***\\ // DATASET([],iesp.student.t_StudentRecord);
- student_mod := module(project(mod_access, American_Student_Services.IParam.reportParams)) end;							
+ student_mod := project(mod_access, American_Student_Services.IParam.reportParams); 						
  eduStudentV2 := if(in_mod.IncludeEducation,
                  CHOOSEN(PersonSlimReport_Services.Functions(did_safe).studentRecsByDid(student_mod),
                         iesp.Constants.PersonSlim.MaxStudent));
  
  // this get's generic person records by DID that will be used below 
- pers_mod := module (project (in_mod, PersonReports.input.personal, opt)) end;
- pers     := PersonReports.Person_records (did_safe, pers_mod);
+ pers_mod := module (project (in_mod, PersonReports.IParam.personal, opt)) end;
+ pers     := PersonReports.Person_records (did_safe, mod_access, pers_mod);
 														 
  //***VEHICLE RECS***\\ // DATASET([],iesp.motorvehicle.t_MotorVehicleReport2Record);
  bestRecs := if(in_mod.IncludeRealTimeVehicles, pers.bestrecs, DATASET([],doxie.layout_best));
@@ -195,15 +197,15 @@ iesp.personslimreport.t_PersonSlimReportResponse xformOut() := TRANSFORM
 	SELF.Addresses              := addresses;
 	// SELF.Addresses              := DATASET([],iesp.personslimreport.t_PersonSlimReportAddress);
 	SELF.Phones                 := phones;
-	// SELF.Phones                 := DATASET([],iesp.personslimreport.t_PersonSlimReportPhone;
+	// SELF.Phones                 := DATASET([],iesp.personslimreport.t_PersonSlimReportPhone);
 	SELF.Names                  := names;
 	// SELF.Names                  := DATASET([],iesp.personslimreport.t_PersonSlimReportName);
 	SELF.Deaths                 := deaths;
-	// SELF.Deaths                 := DATASET([],iesp.personslimreport.t_PersonSlimReportDeath;
+	// SELF.Deaths                 := DATASET([],iesp.personslimreport.t_PersonSlimReportDeath);
 	SELF.SSNs                   := ssns;
 	// SELF.SSNs                   := DATASET([],iesp.personslimreport.t_PersonSlimReportSSN);
 	SELF.DOBs                   := dobs;
-	// SELF.Addresses              := DATASET([],iesp.personslimreport.t_PersonSlimReportDOB);
+	// SELF.DOBs                   := DATASET([],iesp.personslimreport.t_PersonSlimReportDOB);
 	SELF.ProfessionalLicenses   := profLics;
 	// SELF.ProfessionalLicenses   := DATASET([],iesp.proflicense.t_ProfessionalLicenseRecord);
 	SELF.PeopleAtWorks          := paws;

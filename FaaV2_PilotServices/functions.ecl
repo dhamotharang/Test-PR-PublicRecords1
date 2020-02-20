@@ -5,7 +5,7 @@ import Census_Data, faav2_pilotservices, iesp, Codes, lib_stringlib;
   shared CreateDate (string4 year, string2 month, string2 day = '') :=
   row ({(integer2) year, (integer2) month, (integer2) day}, iesp.share.t_Date);
 
-  shared decode_region(String regionInStr):= function
+  export decode_region(String regionInStr):= function
 	  result:= map(regionInStr='AL'=>'ALASKAN',
 							 regionInStr='CE'=>'CENTRAL',
 							 regionInStr='NE'=>'NEW ENGLAND',

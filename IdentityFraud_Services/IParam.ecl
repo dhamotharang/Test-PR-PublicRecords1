@@ -1,8 +1,8 @@
-﻿import PersonReports;
+﻿import PersonReports, doxie;
 
 export IParam := module
 
-  export _identityfraudreport := INTERFACE (PersonReports.IParam._report)
+  export _identityfraudreport := INTERFACE (doxie.IDataAccess, PersonReports.IParam._report)
     export unsigned max_imposters := 20;
     export boolean include_ri_uspis := false;
     export boolean include_ri_advo := false;

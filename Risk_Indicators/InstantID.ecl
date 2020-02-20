@@ -101,10 +101,16 @@
 	<part name="AllowEmergingID" type="xsd:boolean"/>
 	<part name="NameInputOrder" type="xsd:string"/>
 	<part name="outcometrackingoptout" type="xsd:boolean"/>
+	<part name="disablenongovernmentdldata" type="xsd:boolean"/>
+	<part name="IncludeEmailVerification" type="xsd:boolean"/>
+ <part name="IncludeITIN" type="xsd:boolean"/>
+	<part name="ExcludeMinors" type="xsd:boolean"/>
+	<part name="IncludeComplianceCap" type="xsd:boolean"/>
+	<part name="IncludeDigitalIdentity" type="xsd:boolean"/>
  </message>
 */
 
-import ut, codes, address, models, riskwise, suppress, seed_files, Royalty;
+import address, models, riskwise, suppress, Royalty,STD, Risk_Indicators, Inquiry_Acclogs, Risk_Reporting, AutoStandardI;
 
 export InstantID := MACRO
 
@@ -211,7 +217,17 @@ export InstantID := MACRO
 		'EnableEmergingID',
 		'AllowEmergingID',
 		'NameInputOrder',
-		'outcometrackingoptout'
+		'outcometrackingoptout',
+    'LexIdSourceOptout',
+	'_TransactionId',
+	'_BatchUID',
+	'_GCID',
+   'disablenongovernmentdldata',
+   'IncludeEmailVerification',
+   'IncludeITIN',
+   'IncludeComplianceCap',
+   'ExcludeMinors',
+   'IncludeDigitalIdentity'
 	));
 
 Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
@@ -232,6 +248,7 @@ Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suf
 	string1 ExcludeDMVPII       := '' : STORED('ExcludeDMVPII');
 	BOOLEAN DisableOutcomeTracking := FALSE : STORED('OutcomeTrackingOptOut');
 	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
+    
 	
 	//Look up the industry by the company ID.
 	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Risk_Indicators__InstantID);
@@ -240,6 +257,9 @@ Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suf
 boolean Test_Data_Enabled := FALSE   	: stored('TestDataEnabled');
 string120 addr1_val := ''    : stored('StreetAddress');
 string200 addr2_val := ''		 : stored('Addr');
+
+
+
 // Parsed address input
 string10 PrimRange := AutoStandardI.GlobalModule().primrange;
 string2 PreDir := AutoStandardI.GlobalModule().predir;
@@ -248,6 +268,7 @@ string4 AddrSuffix := '' : stored('AddrSuffix');
 string2 PostDir := AutoStandardI.GlobalModule().postdir;
 string10 UnitDesignation := '' : stored('UnitDesignation');
 string8 SecRange := AutoStandardI.GlobalModule().secrange;
+
 
 addr_value := map( 
 										trim(addr2_val)!='' => addr2_val,
@@ -271,13 +292,13 @@ string DataRestriction := AutoStandardI.GlobalModule().DataRestrictionMask;
 string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
 model_url := dataset([],Models.Layout_Score_Chooser) : STORED('scores',few);
-fa_params := model_url(StringLib.StringToLowerCase(name)='models.fraudadvisor_service')[1].parameters;
-model_version := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='version')[1].value));
-custom_modelname := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='custom')[1].value));
+fa_params := model_url(STD.Str.ToLowerCase(name)='models.fraudadvisor_service')[1].parameters;
+model_version := trim(STD.Str.ToUppercase(fa_params(STD.Str.ToLowerCase(name)='version')[1].value));
+custom_modelname := trim(STD.Str.ToUppercase(fa_params(STD.Str.ToLowerCase(name)='custom')[1].value));
 modelname := if(model_version='', custom_modelname, model_version);
 
 string128 In_CustomCVIModelName := '' : STORED('CustomCVIModelName');
-LoggedCCVI := StringLib.StringToUppercase(In_CustomCVIModelName);
+LoggedCCVI := STD.Str.ToUppercase(In_CustomCVIModelName);
 
 
 iid := Risk_Indicators.InstantID_records;
@@ -373,4 +394,5 @@ IF(~DisableOutcomeTracking and not Test_Data_Enabled, OUTPUT(Deltabase_Logging, 
 dRoyalties := royalties4us;
 output(dRoyalties, named('RoyaltySet'));
 
+// output(iid,named('Results'));
 ENDMACRO;

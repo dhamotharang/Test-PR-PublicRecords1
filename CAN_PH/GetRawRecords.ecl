@@ -19,12 +19,15 @@ import canadianphones_v2,canadianphones, doxie, Suppress;
 									   in canadianphones_v2  (and not available in canadianphones_v2 )  */
 		end;
 
-		#uniquename(raw_recs_all);
-		%raw_recs_all% := JOIN (ids, key,
+		
+		raw_recs := JOIN (ids, key,
 						keyed (Left.id = Right.fdid),
 						%get_out_recs% (Right),
 						KEEP (1));
-		raw_recs := Suppress.MAC_SuppressSource(%raw_recs_all%, mod_access, fdid); 							 
+
+		// CanadianPhonesV1Keys and CanadianPhonesV1Keys are out of scope for CCPA phase-I, when DID field is added to these keys 
+		// FDID should be changed to valid DID and Source suppression can be uncommented				
+		// raw_recs := Suppress.MAC_SuppressSource(%raw_recs_all%, mod_access, fdid); 							 
 	endmacro;
 
 // Main Attribute
@@ -46,6 +49,6 @@ EXPORT GetRawRecords(boolean isV2) := function
 		
 		// get the right version raw records
 		raw_recs := if(isV2,raw_recs2,raw_recs1);							 
-		doxie.compliance.logSoldToSources (raw_recs, mod_access, fdid);
+		// doxie.compliance.logSoldToSources (raw_recs, mod_access, fdid);
    return raw_recs;
 end;

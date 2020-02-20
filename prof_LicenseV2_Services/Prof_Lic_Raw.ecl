@@ -34,21 +34,26 @@ export Prof_Lic_raw := Module
       return if(in_limit = 0,ded,choosen(ded,in_limit));
   end;
 
+  export get_Prolic_from_dids(dataset(doxie.layout_references) in_dids,
+    Doxie.IDataAccess mod_access,boolean isFCRA=false) := function
+
+    proflic_recs := join(dedup(sort(in_dids,did),did),Prof_LicenseV2.Key_Proflic_Did(isFCRA),
+      keyed(left.did=right.did),transform(right),
+      limit(Prof_LicenseV2.Constants.JOIN_LIMIT_LARGE,skip));
+
+    res_suppressed := Suppress.MAC_SuppressSource(proflic_recs,mod_access,data_env:=data_env(isFCRA));
+    doxie.compliance.logSoldToSources(res_suppressed,mod_access);
+
+    return dedup(sort(res_suppressed,Prolic_Seq_ID),Prolic_Seq_ID);
+  end;
+
   export get_Prolic_seq_id_from_dids(dataset(doxie.layout_references) in_dids,
    unsigned in_limit = 0, Doxie.IDataAccess mod_access, boolean isFCRA = false) := function
 
-    layout_w_compliance_fields := add_compliance_fields(prof_LicenseV2_Services.Layout_Search_Ids_Prolic);
-    key := Prof_LicenseV2.Key_Proflic_Did();
-    _res := join(dedup(sort(in_dids, did), did), key,
-      keyed(left.did = right.did), transform(layout_w_compliance_fields, self := right),
-      limit(Prof_LicenseV2.Constants.JOIN_LIMIT_LARGE, skip));
+    proflic_recs := project(get_Prolic_from_dids(in_dids,mod_access,isFCRA),
+      prof_LicenseV2_Services.Layout_Search_Ids_Prolic);
 
-    res_suppressed := Suppress.MAC_SuppressSource(_res, mod_access, data_env := data_env(isFCRA));
-    doxie.compliance.logSoldToSources(res_suppressed, mod_access);
-    res := PROJECT(res_suppressed, prof_LicenseV2_Services.Layout_Search_Ids_Prolic);
-    ded := dedup(sort(res,Prolic_Seq_ID),Prolic_Seq_ID);
-
-    return if(in_limit = 0,ded,choosen(ded,in_limit));
+    return if(in_limit = 0,proflic_recs,choosen(proflic_recs,in_limit));
   end;
 
   export get_prolic_seq_ids_from_licnum(dataset(prof_LicenseV2_Services.Layout_Licnum) in_licnum,

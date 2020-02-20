@@ -1,5 +1,6 @@
-import ut,autokey, doxie, NID;
-i := doxie.Key_Header_Name;
+import doxie, dx_header, NID;
+
+i := dx_header.key_name();
 
 doxie.layout_references xt(i r) := TRANSFORM
                                         SELF := r;
@@ -28,3 +29,4 @@ export Fetch_Header_Name_Function(string20 fname_value
 								);
 			EXPORT outrec := idsp;
 	END;
+  

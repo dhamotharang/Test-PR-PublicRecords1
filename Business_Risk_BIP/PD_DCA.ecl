@@ -8,7 +8,7 @@ EXPORT PD_DCA(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound,
 									SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
 	// ---------------- DCA - Directory of Corporate Affiliations AKA LNCA ------------------
-	DCARaw := DCAV2.Key_LinkIds.kFetch2(kFetchLinkIDs,
+	DCARaw := DCAV2.Key_LinkIds.kFetch2(kFetchLinkIDs, ,
 																						 kFetchLinkSearchLevel,
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,

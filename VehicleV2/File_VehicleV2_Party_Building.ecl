@@ -58,6 +58,11 @@ transform
 	self.UltID														:= pInput.UltID;
 	self.UltScore													:= pInput.UltScore;
 	self.UltWeight												:= pInput.UltWeight;
+	//Added for CCPA-103
+	self.global_sid                       := pInput.global_sid;
+	self.record_sid                       := pInput.record_sid;
+	//Added for DF-25578
+	self.raw_name                         := pInput.raw_name;
 	self																	:=	pInput;
 end;
 

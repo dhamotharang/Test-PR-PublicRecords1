@@ -20,7 +20,8 @@ export _Gong_data (dataset (doxie.layout_references) dids,
 
   res := gong_deduped + PROJECT( gong_corr, transform (Layout_Gong,
                                                        self.l_did := left.did,
-                                                       self := LEFT));
+                                                       self := LEFT,
+                                                       SELF :=[]));
 
   return res;
 end;

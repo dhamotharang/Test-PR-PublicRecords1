@@ -1,19 +1,18 @@
-﻿import AutoStandardI,Foreclosure_Services,doxie,Property,iesp,ut, BIPV2;
+import AutoStandardI, Foreclosure_Services, doxie, iesp;
 
 export Records := module
 	export params := interface(
-		Foreclosure_Services.SearchService_IDs.params,
-		AutoStandardI.LIBIN.PenaltyI_Indv.base,
-		AutoStandardI.InterfaceTranslator.glb_purpose.params,
-		AutoStandardI.InterfaceTranslator.dppa_purpose.params,
-		AutoStandardI.InterfaceTranslator.penalt_threshold_value.params)
-		export string6 ssnmask;
+											Foreclosure_Services.SearchService_IDs.params,
+											AutoStandardI.LIBIN.PenaltyI_Indv.base,
+											AutoStandardI.InterfaceTranslator.penalt_threshold_value.params)
 	end;
-	export val(params in_mod, boolean isNodSearch=false) := function
+
+	export val(params in_mod, doxie.IDataAccess mod_access, boolean isNodSearch=false, boolean includeBlackKnight=false) := function
+
 		// Get the IDs, pull the payload records and add Foreclosure_id.
 		ids := Foreclosure_services.SearchService_IDs.val(in_mod,isNodSearch);
-																 
-		recs:=Foreclosure_Services.Raw.GetRawRecs(ids,isNodSearch, in_mod.IndustryClass);
+
+		recs:=Foreclosure_Services.Raw.GetRawRecs(ids, isNodSearch, mod_access.industry_class, includeBlackKnight);
 		// Calculate the penalty on the records
 
 		recs_plus_pen := project(recs,transform(Foreclosure_Services.Layouts.rawrec,
@@ -222,7 +221,7 @@ export Records := module
 			self.penalt := if (left.isDeepDive, 0, tempPenaltIndv + tempPenaltBiz),
 			self := left));
     
-		added_in_mod := project(in_mod, functions.params);
+		added_in_mod := project(mod_access, Foreclosure_Services.functions.params);
 		
 		recs_fmt := Foreclosure_Services.Functions.fnForeclosureSearchval(recs_plus_pen,added_in_mod);
 
@@ -242,9 +241,8 @@ export Records := module
 		// output(recs_plus_pen,named('SSREcs_recs_plus_pen'));
 		// output(recs_sort,named('SSREcs_recs_sort'));
 		
-		return if(not doxie.DataRestriction.Fares,tempresults_slim,dataset([],iesp.foreclosure.t_ForeclosureSearchRecord));
+		return if(not doxie.DataRestriction.Fares,tempresults_slim,tempresults_slim(VendorSource!=Foreclosure_services.Constants('').src_Fares));
 		
 		end;
 		
 end;
-

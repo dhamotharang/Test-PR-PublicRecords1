@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="CBDOBatchService">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -9,7 +9,7 @@
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 </message>
 */
-import gateway;
+IMPORT gateway;
 export CBDO_Batch_Service := macro
 
 // Can't have duplicate definitions of Stored with different default values, 
@@ -27,6 +27,12 @@ string10 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission
 batchin := dataset([],riskwise.Layout_CBDI_BatchIn) : stored('batch_in', few);
 gateways := Gateway.Constants.void_gateway;	// no gateways for this
 tribcode := StringLib.StringToLowerCase(tribcode_value);
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 productSet := ['cd02'];
 
@@ -70,7 +76,12 @@ RiskWise.Layout_CBDI addseq(batchin le, integer C) := transform
 end;
 indata := project(batchin, addseq(LEFT,COUNTER));
 
-ret := if(tribCode in productSet, RiskWise.CBDO_Function(indata, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction, DataPermission), dataset([],RiskWise.Layout_CBDO));
+ret := if(tribCode in productSet, RiskWise.CBDO_Function(indata, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction, DataPermission,
+                                                                                                      LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                      TransactionID := TransactionID, 
+                                                                                                      BatchUID := BatchUID, 
+                                                                                                      GlobalCompanyID := GlobalCompanyID), 
+                                                                                                      dataset([],RiskWise.Layout_CBDO));
 
 output(ret, named('Results'));
 

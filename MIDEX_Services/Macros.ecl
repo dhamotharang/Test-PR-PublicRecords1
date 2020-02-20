@@ -13,7 +13,7 @@
                                  ) :=    
                                 
       FUNCTIONMACRO
-        IMPORT ut, AutoStandardI;
+        IMPORT AutoStandardI,STD,ut;
        	
         // Calculate the penalty on the records
         ds_recs_plus_pen := PROJECT(ds_recs_in,TRANSFORM(transformLayout,   
@@ -75,7 +75,7 @@
                             in_mod.nmls_id = (STRING)LEFT.nmlsID_layoutName  => 0, 
                             /* default */                                      99);
 																				 
-				license_number := TRIM(StringLib.StringToUpperCase(in_mod.license_number));
+				license_number := TRIM(STD.STR.ToUpperCase(in_mod.license_number));
 				licPenalt := MAP(license_number = ''                            => 0, 
                          LEFT.licenseNumber_layoutName = license_number => 0, 
                          /* default */                                    99);
@@ -114,7 +114,7 @@
       // Calculating the party number for future need.
                                    
       MACRO
-        IMPORT SANCTN_Mari;
+        IMPORT SANCTN_Mari,STD;
         
         ds_inWithDBCODE := JOIN( inDataset,
                                  SANCTN_Mari.key_MIDEX_RPT_NBR,
@@ -128,9 +128,9 @@
                                           
         outDatasetAll := PROJECT( ds_inWithDBCODE, 
                                   TRANSFORM( MIDEX_Services.Layouts.rec_midex_payloadKeyField, //{MIDEX_Services.Layouts.rec_midex_payloadKeyField, STRING8 pubSanctIncidentNum, STRING8 pubSanctnPartyNum},
-                                             dash1Pos := stringlib.StringFind( LEFT.inMidexRptNbr, '-', 1);  
-                                             dash2Pos := stringlib.StringFind( LEFT.inMidexRptNbr, '-', 2);  
-                                             dash3Pos := stringlib.StringFind( LEFT.inMidexRptNbr, '-', 3);  
+                                             dash1Pos := STD.STR.Find( LEFT.inMidexRptNbr, '-', 1);  
+                                             dash2Pos := STD.STR.Find( LEFT.inMidexRptNbr, '-', 2);  
+                                             dash3Pos := STD.STR.Find( LEFT.inMidexRptNbr, '-', 3);  
                                              batchNumHasDash          := dash3Pos  > 0; 
                                              incidentRaw              := IF( batchNumHasDash, 
                                                                              LEFT.inMidexRptNbr[dash2Pos+1..dash3Pos-1],

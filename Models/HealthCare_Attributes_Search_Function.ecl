@@ -1,12 +1,24 @@
-IMPORT Address, Models, ut, risk_indicators, easi, doxie, Header, dx_header, MDR, drivers, Riskwise, gateway, DeathV2_Services, AutoStandardI;
+﻿IMPORT STD, Address, Models, ut, risk_indicators, easi, doxie, Header, dx_header, MDR, drivers, Riskwise, gateway, DeathV2_Services, AutoStandardI, Suppress;
 
 EXPORT HealthCare_Attributes_Search_Function(
 														DATASET(Models.layouts.Layout_HealthCare_Attributes_In) indata,
 														UNSIGNED1 GLBPurpose,
 														UNSIGNED1 DPPAPurpose,
 														STRING50 DataRestriction = risk_indicators.iid_constants.default_DataRestriction,
-														STRING50 DataPermission = risk_indicators.iid_constants.default_DataPermission
+														STRING50 DataPermission = risk_indicators.iid_constants.default_DataPermission,
+                                                        unsigned1 LexIdSourceOptout = 1,
+                                                        string TransactionID = '',
+                                                        string BatchUID = '',
+                                                        unsigned6 GlobalCompanyId = 0
 													) := FUNCTION
+
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := GLBPurpose;
+	EXPORT dppa := DPPAPurpose;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 /* ***************************************
 	 *            Clean Input:             *
@@ -88,10 +100,18 @@ EXPORT HealthCare_Attributes_Search_Function(
    *************************************** */
 	iid := Risk_Indicators.InstantID_Function(cleanIn, gateways, DPPAPurpose, GLBPurpose, isUtility, isLn, ofacOnly, 
 																					suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, ofacSearching, includeAdditionalWatchlists,
-																					in_BSversion := bsVersion, in_DataRestriction := DataRestriction, in_DataPermission := DataPermission);
+																					in_BSversion := bsVersion, in_DataRestriction := DataRestriction, in_DataPermission := DataPermission,
+                                                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                    TransactionID := TransactionID, 
+                                                                                    BatchUID := BatchUID, 
+                                                                                    GlobalCompanyID := GlobalCompanyID);
 
 	clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, DPPAPurpose, GLBPurpose, isUtility, isLn, doRelatives, doDL, 
-																						doVehicle, doDerogs, bsVersion, doScore, nugen, filterOutFares, DataRestriction := DataRestriction, DataPermission := DataPermission);
+																						doVehicle, doDerogs, bsVersion, doScore, nugen, filterOutFares, DataRestriction := DataRestriction, DataPermission := DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID);
 		
 /* ***************************************
 	 *       Gather Health Care Attributes:        *
@@ -181,7 +201,7 @@ end;
 glb_ok 	:= Risk_Indicators.iid_constants.glb_ok(GLBPurpose, isFCRA);
 dppa_ok := Risk_Indicators.iid_constants.dppa_ok(DPPApurpose, isFCRA);
 
-hdr_Recs := join(clam, header_addr,									
+hdr_Recs_unsuppressed := join(clam, header_addr,									
 								keyed(left.Shell_Input.prim_name = right.prim_name) and
 								keyed(left.Shell_Input.z5 = right.zip) and
 								keyed(left.Shell_Input.prim_range = right.prim_range) and
@@ -201,14 +221,16 @@ hdr_Recs := join(clam, header_addr,
 								ut.DaysApart(Risk_Indicators.iid_constants.myGetDate(left.historydate), (string)right.dt_last_seen) <= LastSeenThreshold,
 								getHeader(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));
 
+hdr_Recs := Suppress.MAC_SuppressSource(hdr_Recs_unsuppressed, mod_access);
 
 //Dedup the header address file by DID, keeping record with most recent last seen date
 hdr_Rec_DID := dedup(sort(hdr_Recs, did, -dt_last_seen),did);		
 
 
 //Join the address record to Death Master - pick up DOD and build AID, GEOlink and determine age for counting adults and children 
-rDemo getDemos(hdr_Rec_DID l, doxie.key_death_masterV2_ssa_DID r) := transform
-		self.addrID := Header.AddressID_fromparts(l.prim_range,l.predir,l.prim_name,l.suffix,l.postdir,l.sec_range,l.zip,l.st);
+{rDemo, UNSIGNED4 global_sid} getDemos(hdr_Rec_DID l, doxie.key_death_masterV2_ssa_DID r) := transform
+		self.global_sid := r.global_sid;
+        self.addrID := Header.AddressID_fromparts(l.prim_range,l.predir,l.prim_name,l.suffix,l.postdir,l.sec_range,l.zip,l.st);
 		address_cat := l.prim_range + ' ' + l.predir + ' ' + l.prim_name + ' ' + l.suffix + ' ' + l.postdir + ' ' + l.unit_desig + ' ' + l.sec_range;
 		clean_address := Risk_Indicators.MOD_AddressClean.clean_addr(address_cat, l.city_name, l.st, l.zip);
 		self.geolink := clean_address[115..116]+clean_address[143..145]+clean_address[171..177];
@@ -216,7 +238,7 @@ rDemo getDemos(hdr_Rec_DID l, doxie.key_death_masterV2_ssa_DID r) := transform
 		self.did := (string)l.did;
 		self.prim_name := l.prim_name;
 		self.dod := (integer)r.dod8;
-		ages := if(l.dob > 0,(integer)ut.getdate[1..4] - (integer)l.dob[1..4],0);
+		ages := if(l.dob > 0,(INTEGER)((STRING8)Std.Date.Today())[1..4] - (integer)((STRING)l.dob)[1..4],0);
 		self.age := ages;
 		self.HHID_count := if((integer)r.dod8 = 0, 1, 0);
 		self.HHID_parent_count := if(ages >=25, 1, 0);		
@@ -227,13 +249,13 @@ rDemo getDemos(hdr_Rec_DID l, doxie.key_death_masterV2_ssa_DID r) := transform
 end;
 
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-hdr_Rec_DOD := join(hdr_Rec_DID, doxie.key_death_masterV2_ssa_DID,  
+hdr_Rec_DOD_unsuppressed := join(hdr_Rec_DID, doxie.key_death_masterV2_ssa_DID,  
 					left.did <> 0 and																					  
 					keyed(left.did = right.l_did) and
 					not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
 					getDemos(left, right), left outer, keep(1), ATMOST(RiskWise.max_atmost));
 
-
+hdr_Rec_DOD := Suppress.Suppress_ReturnOldLayout(hdr_Rec_DOD_unsuppressed, mod_access, rDemo);
 //Sort by address ID to again get all same household members grouped together
 //*** kwh - changed to sort by addrID instead of seq. Is the sort by geolink necessary...would it always be the same within addrID?
 srtd_by_AID := sort(hdr_Rec_DOD, addrID, geolink, dod);  //12/27 - add sort by DOD to ensure that a deceased person is not the only record kept later in the rollup

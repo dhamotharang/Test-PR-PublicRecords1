@@ -41,48 +41,23 @@ Hit Flags:
   NO - No Hit
 
 ----------------------------------------------------------------------------
-</pre>
-*/
-/*--HELP-- 
 <pre>
-&lt;batch_in&gt;
-&lt;row&gt;
-&lt;acctno&gt;&lt;/acctno&gt;
-&lt;addr&gt;&lt;/addr&gt;
-&lt;prim_range&gt;&lt;/prim_range&gt;
-&lt;predir&gt;&lt;/predir&gt;
-&lt;prim_name&gt;&lt;/prim_name&gt;
-&lt;addr_suffix&gt;&lt;/addr_suffix&gt;
-&lt;postdir&gt;&lt;/postdir&gt;
-&lt;sec_range&gt;&lt;/sec_range&gt;
-&lt;p_city_name&gt;&lt;/p_city_name&gt;
-&lt;st&gt;&lt;/st&gt;
-&lt;z5&gt;&lt;/z5&gt;
-&lt;owner1_first&gt;&lt;/owner1_first&gt;
-&lt;owner1_middle&gt;&lt;/owner1_middle&gt;
-&lt;owner1_last&gt;&lt;/owner1_last&gt;
-&lt;owner2_first&gt;&lt;/owner2_first&gt;
-&lt;owner2_middle&gt;&lt;/owner2_middle&gt;
-&lt;owner2_last&gt;&lt;/owner2_last&gt;
-&lt;year&gt;&lt;/year&gt;
-&lt;years_to_search&gt;&lt;/years_to_search&gt;
-&lt;/row&gt;
-&lt;/batch_in&gt;
-</pre>
 */
 
 IMPORT BatchServices;
 
 EXPORT STR_BatchService := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
-in_mod := module (BatchServices.Interfaces.str_config)
-	export string32 	ApplicationType 		:= '' : stored('ApplicationType');
-	export unsigned2 	PenaltThreshold 		:= 10 : stored('PenaltThreshold');
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+#CONSTANT('TwoPartySearch', FALSE);
+
+base_batch := BatchShare.IParam.getBatchParams();
+in_mod := module (PROJECT(base_batch, BatchServices.Interfaces.str_config, OPT))
+	export unsigned2 	PenaltThreshold 		:= BatchServices.STR_Constants.Defaults.PENALT_THRESHOLD : stored('PenaltThreshold'); // different from base default value
 	export unsigned2 	ShortTermThreshold 	:= BatchServices.STR_Constants.Defaults.SHORT_TERM_THRESHOLD : stored('ShortTermThreshold');
 	export boolean 		ExcludeDropIndCheck := false : stored('ExcludeDropIndCheck');
 	boolean 					SkipDeceased 				:= false : STORED('SkipDeceasedSubjects');
 	export boolean 		ReturnDeceased 			:= ~SkipDeceased; // will return deceased subjects by default to keep backward compatibility.
-	export boolean    IncludeMinors       := false : STORED('IncludeMinors');
+	export boolean    show_minors         := false : STORED('IncludeMinors'); // may be different from base value
 	export boolean    GetSSNBest          := true  : STORED('GetSSNBest');
 	export unsigned8  MaxResultsPerAcct		:= BatchServices.STR_Constants.Defaults.MaxResults_Per_Acct : STORED('Max_Results_Per_Acct');
 end;

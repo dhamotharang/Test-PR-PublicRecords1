@@ -1,4 +1,4 @@
-import ut, census_data, ln_propertyv2, riskwise, risk_indicators;
+﻿import ut, ln_propertyv2, riskwise, risk_indicators;
 
 export AMLProperty (GROUPED DATASET(risk_indicators.layout_PropertyRecord) p_address,
                             GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids, 

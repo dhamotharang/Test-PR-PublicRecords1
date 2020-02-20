@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="USOBatchService">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -11,7 +11,7 @@
 </message>
 */
 /*--INFO-- '1usa' */
-import gateway;
+import gateway, STD, riskwise, risk_indicators;
 
 export USO_Batch_Service := macro
 
@@ -28,7 +28,14 @@ string DataRestriction := risk_indicators.iid_constants.default_DataRestriction 
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 batchin := dataset([],riskwise.Layout_1USI_BatchIn) 			: stored('batch_in', few);
 gateways_in := Gateway.Configuration.Get();
-tribcode := StringLib.StringToLowerCase(tribcode_value);
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+tribcode := STD.Str.ToLowerCase(tribcode_value);
 
 productSet := ['1usa'];
 
@@ -62,7 +69,11 @@ RiskWise.Layout_1USI addseq(batchin le, integer C) := transform
 end;
 indata := project(batchin, addseq(LEFT,COUNTER));
 
-ret := RiskWise.USO_Function(indata, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction, DataPermission);
+ret := RiskWise.USO_Function(indata, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction, DataPermission,
+                                                      LexIdSourceOptout := LexIdSourceOptout, 
+                                                      TransactionID := TransactionID, 
+                                                      BatchUID := BatchUID, 
+                                                      GlobalCompanyID := GlobalCompanyID);
 
 output(ret, named('Results'));
 

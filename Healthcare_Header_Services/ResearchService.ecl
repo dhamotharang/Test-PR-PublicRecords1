@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
 	<!-- COMPLIANCE SETTINGS -->
 	<part name="HealthCareConsolidatedSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
@@ -126,7 +126,7 @@ export ResearchService := MACRO
 	BusinessData := Healthcare_Header_Services.Header_Records_Data.getBusRecords(getBusLNPIDs,cfgData);
 	output(BusinessData,Named('Business_Records'));
 	NoHitsforIndivDeepDive := join (IndividualRecords,IndividualData,left.acctno=right.acctno,transform(Healthcare_Header_Services.Layouts.autokeyInput,self:=left;),left only);
-	IndivDeepDiveData := Healthcare_Header_Services.Datasource_Boca_Header.get_boca_header_entity(NoHitsforIndivDeepDive(cfgData[1].doDeepDive = true));
+	IndivDeepDiveData := Healthcare_Header_Services.Datasource_Boca_Header.get_boca_header_entity(NoHitsforIndivDeepDive(cfgData[1].doDeepDive = true),cfgData);
 	output(IndivDeepDiveData,Named('Individual_DeepDive_Records'));
 	NoHitsforBusDeepDive := join (BusinessRecords,BusinessData,left.acctno=right.acctno,transform(Healthcare_Header_Services.Layouts.autokeyInput,self:=left;),left only);
 	BusDeepDiveData := Healthcare_Header_Services.Datasource_Boca_Bus_Header.get_boca_bus_header_entity(NoHitsforBusDeepDive(cfgData[1].doDeepDive = true));

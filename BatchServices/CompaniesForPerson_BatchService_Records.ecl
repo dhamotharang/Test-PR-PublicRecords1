@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, Business_Header, Census_data, DCA, doxie, doxie_cbrs, ut, Suppress, STD;
+﻿IMPORT AutoStandardI, Business_Header, Census_data, DCA, doxie, doxie_cbrs, ut, Suppress, STD;
 
 EXPORT CompaniesForPerson_BatchService_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION 
 
@@ -56,17 +56,25 @@ EXPORT CompaniesForPerson_BatchService_Records(BOOLEAN useCannedRecs = FALSE) :=
 														SELF             := RIGHT),
 													LIMIT(BatchServices.Constants.CFP_JOIN_LIMIT));
 
+
 	// 5. Sort/dedup by fp.
   ds_fps_deduped := dedup(sort(ds_fps_for_dids,fp),fp);
 	
   // 6. Join the deduped fp recs to the Business_Contacts key "fp" file matching on fp,
 	//    to get the majority of the company/person info to be output and 
 	//    transforming into the final output layout.
-  ds_bcinfo_for_fps := JOIN(ds_fps_deduped, 
+  
+  rec_f_suppress := record
+    rec_final_output;
+    unsigned4 	global_sid := 0;
+    unsigned8 	record_sid := 0;
+  end;
+  
+  ds_bcinfo_for_fps_pre := JOIN(ds_fps_deduped, 
 													  Business_Header.Key_Business_Contacts_FP,
 		                          keyed(LEFT.fp = RIGHT.fp) and
 															right.from_hdr = 'N', // We don't want 'Y' which means the BC recs were created from matching person & bus hdrs
-													  TRANSFORM(rec_final_output,
+													  TRANSFORM(rec_f_suppress,
 															// For phones, fein & ssn, convert integer value to string
 															SELF.company_phone := IF(RIGHT.company_phone<>0,(string) RIGHT.company_phone,'');
 															SELF.company_fein  := IF(RIGHT.company_fein<>0,(string) RIGHT.company_fein,'');
@@ -78,6 +86,10 @@ EXPORT CompaniesForPerson_BatchService_Records(BOOLEAN useCannedRecs = FALSE) :=
 																											 '');
 															SELF := RIGHT),
 													  LIMIT(BatchServices.Constants.CFP_JOIN_LIMIT));
+
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+
+  ds_bcinfo_for_fps := Suppress.MAC_SuppressSource(ds_bcinfo_for_fps_pre, mod_access);
 
   // 7. Join recs with bus contact info back to the acctno/did file (out of step 2) 
 	//    matching on the did to attach acctnos back to the temp recs only for those 

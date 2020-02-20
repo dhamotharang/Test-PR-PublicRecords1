@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name = 'Ranking Inviation To Apply (Thindex Lite) BATCH Service'>
 	<part name='batch_in'    				type='tns:XmlDataSet' cols='70' rows='25'/>
 	<part name='DPPAPurpose'  				type='xsd:byte'/>
@@ -43,6 +43,12 @@ boolean   ofac_only := true;
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string10 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+
 // add sequence to matchup later to add acctno to output
 Risk_Indicators.Layout_Batch_In into_seq(batchin le, integer C) := TRANSFORM
 	self.seq := C;
@@ -63,7 +69,7 @@ risk_indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	self.seq := le.seq;
 	self.ssn := ssn_val;
 	self.dob := dob_val;
-	self.age := if ((integer)le.age = 0 and (integer)le.dob != 0, (string3)ut.GetAgeI((integer)le.dob), (le.age));
+	self.age := if ((integer)le.age = 0 and (integer)le.dob != 0, (string3)ut.Age((integer)le.dob), (le.age));
 	
 	self.phone10 := hphone_val;
 	self.wphone10 := wphone_val;
@@ -71,11 +77,11 @@ risk_indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	cleaned_name := address.CleanPerson73(le.UnParsedFullName);
 	boolean valid_cleaned := le.UnParsedFullName <> '';
 	
-	self.fname := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
-	self.lname := stringlib.stringtouppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
-	self.mname := stringlib.stringtouppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
-	self.suffix := stringlib.stringtouppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
-	self.title := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
+	self.fname := STD.Str.touppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
+	self.lname := STD.Str.touppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
+	self.mname := STD.Str.touppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
+	self.suffix := STD.Str.touppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
+	self.title := STD.Str.touppercase(if(valid_cleaned, cleaned_name[1..5],''));
 	
 	street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 	clean_a2 := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;	
@@ -104,8 +110,8 @@ risk_indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	self.county := clean_a2[143..145];
 	self.geo_blk := clean_a2[171..177];
 	
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(le.dl_state);
+	self.dl_number := STD.Str.touppercase(dl_num_clean);
+	self.dl_state := STD.Str.touppercase(le.dl_state);
 	self.historydate := if(le.HistoryDateYYYYMM=0, history_date, le.historydateYYYYMM); 
 	self := [];
 END;
@@ -113,8 +119,16 @@ cleanIn := project(batchinseq, into_in(left));
 
 
 iid := risk_indicators.InstantID_Function(cleanIn, gateways, dppa, glba, isUtility, ln_branded, ofac_only, suppressNearDups, require2Ele, fromBIID, isFCRA, ExcludeWatchLists,
-								  fromIT1O, ofac_version, include_ofac, Include_Additional_watchlists, Global_WatchList_Threshold,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission);
-clam := risk_indicators.Boca_Shell_Function(iid, gateways, dppa, glba, isUtility, ln_branded, true, false, false, true,DataRestriction := DataRestriction, DataPermission := DataPermission);
+								  fromIT1O, ofac_version, include_ofac, Include_Additional_watchlists, Global_WatchList_Threshold,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission,
+                                  LexIdSourceOptout := LexIdSourceOptout, 
+                                  TransactionID := TransactionID, 
+                                  BatchUID := BatchUID, 
+                                  GlobalCompanyID := GlobalCompanyID);
+clam := risk_indicators.Boca_Shell_Function(iid, gateways, dppa, glba, isUtility, ln_branded, true, false, false, true,DataRestriction := DataRestriction, DataPermission := DataPermission,
+                                                                              LexIdSourceOptout := LexIdSourceOptout, 
+                                                                              TransactionID := TransactionID, 
+                                                                              BatchUID := BatchUID, 
+                                                                              GlobalCompanyID := GlobalCompanyID);
 
 
 	

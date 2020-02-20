@@ -1,4 +1,4 @@
-﻿IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, gateway;
+﻿IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, gateway, doxie, AML, STD;
 
 EXPORT AML_Batch_Service() := FUNCTION
 
@@ -10,7 +10,11 @@ EXPORT AML_Batch_Service() := FUNCTION
                 'IncludeNewsProfile',
                 'DataRestrictionMask',
 								'DataPermissionMask',
-                'gateways'
+                'gateways',
+                'LexIdSourceOptout',
+                '_TransactionId',
+                '_BatchUID',
+                '_GCID'
                 ));
 
 	#STORED('GLBPurpose', 5);
@@ -25,12 +29,25 @@ EXPORT AML_Batch_Service() := FUNCTION
 	string	DataRestriction 						:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	gateways 														:= Gateway.Configuration.Get();
   string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+ 
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+    
+    mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
+    
 	integer bsversion := if(AttributesVersion = 1, 41, 50);
 
 	wseq := project( batch_in, transform( AML.Layouts.AMLBatchInLayout, self.seq := counter, self := left ) );
 	
-	IndRecs :=  wseq(StringLib.StringToUpperCase(CustType) = 'INDIVIDUAL');
-  BusRecs :=  wseq(StringLib.StringToUpperCase(CustType) = 'BUSINESS');
+	IndRecs :=  wseq(STD.Str.ToUpperCase(CustType) = 'INDIVIDUAL');
+  BusRecs :=  wseq(STD.Str.ToUpperCase(CustType) = 'BUSINESS');
 
 	// '0' - do not call XG5
 	// '1' - full XG5 response will be returned for AML report
@@ -53,9 +70,9 @@ Risk_Indicators.Layout_Input into(IndRecs l) := TRANSFORM
 		mname  :=  l.Name_Middle;
 		lname  :=  l.Name_Last ;
 
-		self.fname  := stringlib.stringtouppercase(fname);
-		self.mname  := stringlib.stringtouppercase(mname);
-		self.lname  := stringlib.stringtouppercase(lname);
+		self.fname  := STD.Str.touppercase(fname);
+		self.mname  := STD.Str.touppercase(mname);
+		self.lname  := STD.Str.touppercase(lname);
 		self.suffix := l.Name_Suffix;
 		
 		addr_value := trim(l.street_addr);
@@ -98,7 +115,8 @@ Risk_Indicators.Layout_Input into(IndRecs l) := TRANSFORM
 																						 gateways,
 																						 IncludeNegNewsCounts, 
 																						 bsversion,
-																						 DataPermission); 
+																						 DataPermission,
+                                                                                         mod_access);
 	
 																						 
 consumerAttributesV2 := AML.getAMLAttributesV2(iid_prep, 
@@ -108,6 +126,7 @@ consumerAttributesV2 := AML.getAMLAttributesV2(iid_prep,
 																						 gateways, 
 																						 bsversion,
 																						 DataPermission,
+                                                                                         mod_access,
 																						 UseXG5,
 																						 IncludeNewsProfile
 																						 );  
@@ -172,7 +191,7 @@ Business_risk.Layout_Input into_input(BusRecs L) := transform
 	self.bdid := (integer)l.LexId;
 	self.historydate := if(l.historyDateYYYYMM=0, 999999, l.historyDateYYYYMM);
 	self.Account := l.AcctNo;
-	self.company_name := if(stringlib.stringtouppercase(l.Business_Name)<>'',stringlib.stringtouppercase(l.Business_Name),stringlib.stringtouppercase(l.DBA)) ;
+	self.company_name := if(STD.Str.touppercase(l.Business_Name)<>'',STD.Str.touppercase(l.Business_Name),STD.Str.touppercase(l.DBA)) ;
 	
 	addr_value := trim(l.street_addr);
 		
@@ -209,7 +228,8 @@ busInput := project(BusRecs,into_input(LEFT));
 																												GLBA,
 																												IncludeNegNewsCounts, 
 																												bsversion, 
-																												DataPermission));  
+																												DataPermission,
+																												mod_access));  
 
 
 	 businessResultsV2 := group(AML.GetAMLAttribBusnV2(busInput,
@@ -218,6 +238,10 @@ busInput := project(BusRecs,into_input(LEFT));
 																												GLBA,
 																												gateways,
 																												bsversion,
+                                                                                                                LexIdSourceOptout,
+                                                                                                                TransactionID,
+                                                                                                                BatchUID,
+                                                                                                                GlobalCompanyId,
 																												UseXG5,
 																												IncludeNewsProfile)); 
 														 

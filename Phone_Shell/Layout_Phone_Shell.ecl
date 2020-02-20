@@ -97,6 +97,16 @@ EXPORT Layout_Sources := RECORD
 	STRING200 Source_Owner_Name_Suffix	:= '';
 	STRING200 Source_List_Last_Seen			:= '';
 	STRING200 Source_List_First_Seen		:= '';
+ STRING400 Source_Owner_All_DIDs := ''; // experimenting if just doubling the size will be enough
+ STRING400 Source_List_All_Last_Seen := ''; // same
+ UNSIGNED2 Source_Count_All_DIDs := 0;
+ UNSIGNED2 Source_Count_DIDs_3yr := 0;
+ UNSIGNED2 Source_Count_DIDs_2yr := 0;
+ UNSIGNED2 Source_Count_DIDs_18mo := 0;
+ UNSIGNED2 Source_Count_DIDs_12mo := 0;
+ UNSIGNED2 Source_Count_DIDs_9mo := 0;
+ UNSIGNED2 Source_Count_DIDs_6mo := 0;
+ UNSIGNED2 Source_Count_DIDs_3mo := 0;
 END;
 
 EXPORT Layout_Raw_Phone_Characteristics := RECORD
@@ -243,6 +253,8 @@ EXPORT Layout_Inquiries := RECORD
 	STRING8 Inq_Num_Addresses_06 := '';
 	STRING8 Inq_Num_ADLs := '';
 	STRING8 Inq_Num_ADLs_06 := '';
+ STRING8 Inq_Num_MatchADL := '';
+ STRING8 Inq_Num_MatchADL_06 := '';
 	STRING8 Inq_FirstSeen := '';
 	STRING8 Inq_LastSeen := '';
 	STRING8 Inq_ADL_FirstSeen := '';

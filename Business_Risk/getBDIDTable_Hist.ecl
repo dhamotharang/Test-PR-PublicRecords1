@@ -1,6 +1,7 @@
-﻿import RiskWise, Gong, ut, business_header_ss, mdr, std;
+﻿import RiskWise, Gong, ut, business_header_ss, mdr, std, Doxie, Suppress;
 
-export getBDIDTable_Hist(dataset(Business_Risk.Layout_Output) biid, unsigned1 glb) := FUNCTION
+export getBDIDTable_Hist(dataset(Business_Risk.Layout_Output) biid, unsigned1 glb,
+                                              doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 // instead of using the bdid_table, and bdid_risk_table, which aren't historical,
 // we need to search all sources on those tables by bdid, and filter the raw data by the history_date.
@@ -68,16 +69,17 @@ layout_gong_slim := record
 	kgh.disc_cnt18;
 end;
 
-gh_slim := join(biid, kgh,
+gh_slim_unsuppressed := join(biid, kgh,
 				 left.bdid!=0 and 
 				  keyed(left.bdid=right.bdid) and 
 				 (unsigned)right.dt_first_seen[1..6] < left.historydate,
-				 transform(layout_gong_slim, self.dt_first_seen := (unsigned4)right.dt_first_seen,
+				 transform({layout_gong_slim, UNSIGNED4 global_sid, UNSIGNED6 did}, self.dt_first_seen := (unsigned4)right.dt_first_seen,
 											 self.dt_last_seen := (unsigned4)right.dt_last_seen,
 											 self.deletion_date := (unsigned4)right.deletion_date,
 											 self := right),
 				 ATMOST(keyed(left.bdid=right.bdid), RiskWise.max_atmost), keep(1000));
 
+gh_slim := Suppress.Suppress_ReturnOldLayout(gh_slim_unsuppressed, mod_access, layout_gong_slim);
 
 layout_gong_history_stats := record
 	gh_slim.bdid;

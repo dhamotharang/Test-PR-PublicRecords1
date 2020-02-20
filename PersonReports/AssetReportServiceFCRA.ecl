@@ -63,13 +63,13 @@ EXPORT AssetReportServiceFCRA () := MACRO
   options_in := GetInputOptions (global (first_row.Options));
 
   // set up default options -- those, which must be always chosen in ESDL mode
-  options_esdl := module (project (options_in, PersonReports.input._assetreport, opt))
+  options_esdl := module (project (options_in, PersonReports.IParam._assetreport, opt))
     // this coming not from the t_FcraAssetReportOption but from the t_User structure
     export integer1 non_subject_suppression := ut.getNonSubjectSuppression (first_row.User.NonSubjectSuppression);
   end;
 
   // store XML options for subsequent legacy-style reading
-  PersonReports.functions.SetInputSearchOptions (module (project (options_esdl, PersonReports.input._compoptions, opt)) end);
+  PersonReports.functions.SetInputSearchOptions (module (project (options_esdl, PersonReports.IParam._compoptions, opt)) end);
 
   // Read from stored and set parameters from SOAP (rather debug purpose). 
   SR := PersonReports.StoredReader;

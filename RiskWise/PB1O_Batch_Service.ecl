@@ -12,7 +12,7 @@
 </message>
 */
 
-import Gateway, Risk_Indicators, RiskWise;
+import Gateway, Risk_Indicators, RiskWise, STD;
 
 export PB1O_Batch_Service := macro
 
@@ -28,10 +28,16 @@ unsigned3 history_date := 999999 	: stored('HistoryDateYYYYMM');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 batchin := dataset([],Riskwise.Layout_PB1O_BatchIn) : stored('batch_in', few);
-tribcode := StringLib.StringToLowerCase(tribcode_value);
+tribcode := STD.Str.ToLowerCase(tribcode_value);
 unsigned1 ofac_version      := 1        : stored('OFACVersion');
 
 gateways_in := Gateway.Configuration.Get();
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 BridgerGateway := gateways_in(servicename='bridgerwlc')[1].url!='';
 
@@ -89,7 +95,11 @@ end;
 f := project(batchin, addseq(LEFT,COUNTER));
 //output(f, named('PB1I'));
 
-ret := RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction:=DataRestriction, DataPermission:=DataPermission, OFACversion:=OFACversion);
+ret := RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction:=DataRestriction, DataPermission:=DataPermission, OFACversion:=OFACversion,
+                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                        TransactionID := TransactionID, 
+                                                        BatchUID := BatchUID, 
+                                                        GlobalCompanyID := GlobalCompanyID);
 output(ret, named('Results'));
 
 endmacro;

@@ -1,9 +1,10 @@
-﻿IMPORT BIPV2, Risk_Indicators, SALT28, UT;
+﻿IMPORT BIPV2, Risk_Indicators, SALT28, UT, doxie;
 
 EXPORT getBusinessByPhone(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 												 BIPV2.mod_sources.iParams linkingOptions,
-												 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+												 SET OF STRING2 AllowedSourcesSet,
+												 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
 	tempVerificationLayout := RECORD
@@ -46,7 +47,8 @@ EXPORT getBusinessByPhone(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							Business_Risk_BIP.Constants.Limit_BusHeader,
 																							FALSE, /* dnbFullRemove */
 																							TRUE, /* bypassContactSuppression */
-																							Options.KeepLargeBusinesses);
+																							Options.KeepLargeBusinesses,
+																							mod_access := mod_access);
 
 	// clean up the business header before doing anything else
   Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderRawPhone1, BusinessHeaderRawPhone);	
@@ -134,5 +136,7 @@ EXPORT getBusinessByPhone(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT(CHOOSEN(PhoneVerification, 100), NAMED('Sample_PhoneVerification'));
 	// OUTPUT(CHOOSEN(PhoneVerificationRolled, 100), NAMED('Sample_PhoneVerificationRolled'));
 	// OUTPUT(CHOOSEN(withPhoneVerification, 100), NAMED('Sample_withPhoneVerification'));
+  // OUTPUT(AllowedSourcesSet,NAMED('Allowed_Srcs_BusPhone'));
+          
 	RETURN withPhoneVerification;
 END;						

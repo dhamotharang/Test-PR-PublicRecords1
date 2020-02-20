@@ -22,7 +22,9 @@ doxie.MAC_Selection_Declare();
 idid := max(dids(did > 0, did < header.constants.QH_start_rid), did);//dids has no more than 1 record here.  this is just a technique for turning it into an integer value.  see #stored('useOnlyBestDID',true) in doxie.Comprehensive_Report_Service
 boolean IncludeBlankDOD := false : stored('IncludeBlankDOD');
 
-dear0 := doxie.Deathfile_Records(IncludeBlankDOD or (unsigned)dod8 != 0); 
+deathfile_with_src := doxie.Deathfile_Records(IncludeBlankDOD or (unsigned)dod8 != 0);
+
+dear0 := project(deathfile_with_src, doxie_crs.layout_deathfile_records);
 death_filtered := dear0((unsigned)did = idid);//creating a common filter
 best_full := doxie.best_records (dids, FALSE, useNonBlankKey := true, getSSNBest := in_getSSNBest, modAccess := mod_access);
 
@@ -40,6 +42,46 @@ besr_pre := project(best_full,
                       if(exists(ssnr_pre(did = idid and ssn = ssn_value)), ssn_value, ''));
       self := left)
 );
+
+//code to add best supplemental info
+
+rec_best_supplemental := record
+  unsigned6 did;
+  string9 ssn;
+  doxie_crs.layout_best_supplemental_info;
+  string3 death_rec_src;
+end;
+
+//Getting best supplemental info for did in best information section.
+//join best information section with death children section to get age at death, death county, death state
+death_recs_sorted := sort(deathfile_with_src, if(death_rec_src = 'SSA', 0, 1), -county_name, -state);
+
+death_info := join(best_full,death_recs_sorted,
+                   left.did = (unsigned6) right.did,
+                   transform(rec_best_supplemental,
+                     self.age_at_death  := right.age_at_death,
+                     self.death_county  := right.county_name,
+                     self.death_state   := right.state,
+                     self.death_rec_src := right.death_rec_src,
+                     self               := left,
+                     self               := []
+                   ), left outer, keep(1), limit(0));
+
+//join best information and death information with ssn children dataset
+//to get required ssn information for the did in best infromation section                           
+best_supplemental := join(death_info, ssnr_pre,
+                          left.did = right.did and
+                          left.ssn = right.ssn,
+                          transform(doxie_crs.layout_best_supplemental_info,
+                            self.is_valid_ssn         := right.valid,
+                            self.ssn_issued_location  := right.ssn_issue_place,
+                            self.ssn_issued_startdate := right.ssn_issue_early,
+                            self.ssn_issued_enddate   := right.ssn_issue_last,
+                            self                      := left
+                          ), left outer, keep(1), limit(0));
+
+best_supplemental_info := if(~IsFCRA, best_supplemental);
+//best supplemental info code ends here
 
 // TODO: It looks like there's no reliable way to fetch flag records by SSN in the FCRA context:
 //   consider just taking it from the input, if any.
@@ -183,26 +225,27 @@ fdnrecs := if(NOT IsFCRA and FDN_Any,
 // end of the coding section added for FDN changes
 
 doxie.layout_central_header Format () := transform
-         self.best_information_children    := global(besr);
-         self.hri_ssn_children             := IF (~IsFCRA, global(shrr));
-         self.deathfile_children           := IF (~IsFCRA, global(dear));
-         self.ssn_children                 := global(ssnr);
-         self.addresses_children           := global(addr);
-         self.resident_links_children      := global(resr);
-         self.phones_children              := global(phor);
-         self.phones_old_children          := if (Include_OldPhones_Val, global(phOld));
-         self.ssn_lookups_children         := global(sslr);
-         self.names_children               := namr;
-         self.relative_summary_children    := IF (~IsFCRA, global(relr(relative = true)) );
-         self.associate_summary_children   := IF (~IsFCRA, global(assr) );
-         self.nbrs_summary_children        := IF (~IsFCRA, global(nbrr) );
-         self.nbrs_summary2_children       := IF (~IsFCRA, global(nbrr2) );
-         self.nbrhoods_children            := IF (~IsFCRA, global(nbhr) );
-         self.fdn_children                 := IF(~IsFCRA, global(fdnrecs) );
+         self.best_information_children             := global(besr);
+         self.best_supplemental_info_children       := global(best_supplemental_info);
+         self.hri_ssn_children                      := IF (~IsFCRA, global(shrr));
+         self.deathfile_children                    := IF (~IsFCRA, global(dear));
+         self.ssn_children                          := global(ssnr);
+         self.addresses_children                    := global(addr);
+         self.resident_links_children               := global(resr);
+         self.phones_children                       := global(phor);
+         self.phones_old_children                   := if (Include_OldPhones_Val, global(phOld));
+         self.ssn_lookups_children                  := global(sslr);
+         self.names_children                        := namr;
+         self.relative_summary_children             := IF (~IsFCRA, global(relr(relative = true)) );
+         self.associate_summary_children            := IF (~IsFCRA, global(assr) );
+         self.nbrs_summary_children                 := IF (~IsFCRA, global(nbrr) );
+         self.nbrs_summary2_children                := IF (~IsFCRA, global(nbrr2) );
+         self.nbrhoods_children                     := IF (~IsFCRA, global(nbhr) );
+         self.fdn_children                          := IF(~IsFCRA, global(fdnrecs) );
          // these two datasets were not returned from neutral or central_record services before,
          // but were calculated in central records for use in certain single-sources
-         self.subject_names                := global(csa_names);
-         self.subject_addresses            := global(csa_addresses);
+         self.subject_names                         := global(csa_names);
+         self.subject_addresses                     := global(csa_addresses);
          self.errors := []; // this can be eventually removed from the layout
 end;
 

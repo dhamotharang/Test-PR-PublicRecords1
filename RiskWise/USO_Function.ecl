@@ -1,8 +1,12 @@
-import ut, address, Risk_Indicators, Models,gateway;
+﻿IMPORT ut, Risk_Indicators, Models, gateway, STD;
 
 export USO_Function(DATASET(Layout_1USI) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 glb, unsigned1 dppa, 
 			string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-			string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := function
+			string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+            unsigned1 LexIdSourceOptout = 1,
+            string TransactionID = '',
+            string BatchUID = '',
+            unsigned6 GlobalCompanyId = 0) := function
 
 
 risk_indicators.layout_input into(indata le) := TRANSFORM
@@ -19,11 +23,11 @@ risk_indicators.layout_input into(indata le) := TRANSFORM
 	self.dob := dob_val;
 	self.phone10 := hphone_val;	
 	self.wphone10 := wphone_val;
-	self.fname := stringlib.stringtouppercase(le.first);
-	self.lname := stringlib.stringtouppercase(le.last);
-	SELF.in_streetAddress := stringlib.stringtouppercase(le.addr);
-	SELF.in_city := stringlib.stringtouppercase(le.city);
-	SELF.in_state := stringlib.stringtouppercase(le.state);
+	self.fname := STD.Str.touppercase(le.first);
+	self.lname := STD.Str.touppercase(le.last);
+	SELF.in_streetAddress := STD.Str.touppercase(le.addr);
+	SELF.in_city := STD.Str.touppercase(le.city);
+	SELF.in_state := STD.Str.touppercase(le.state);
 	SELF.in_zipCode := le.zip;
 	self.prim_range := clean_a[1..10];
 	self.predir := clean_a[11..12];
@@ -42,15 +46,19 @@ risk_indicators.layout_input into(indata le) := TRANSFORM
 	self.addr_status := clean_a[179..182];
 	self.county := clean_a[143..145];
 	self.geo_blk := clean_a[171..177];
-	self.age := if ((integer)dob_val != 0, (STRING3)ut.GetAgeI((integer)dob_val), '');
-	SELF.employer_name := stringlib.stringtouppercase(le.cmpy);
+	self.age := if ((integer)dob_val != 0, (STRING3)ut.Age((integer)dob_val), '');
+	SELF.employer_name := STD.Str.touppercase(le.cmpy);
 	
 	self := [];
 END;
 prep := PROJECT(indata,into(LEFT));
 
 
-ret := risk_indicators.InstantID_Function(prep, gateways, dppa, glb, false, false, true, true, false, in_DataRestriction:=DataRestriction,in_DataPermission:=DataPermission);
+ret := risk_indicators.InstantID_Function(prep, gateways, dppa, glb, false, false, true, true, false, in_DataRestriction:=DataRestriction,in_DataPermission:=DataPermission,
+                                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                                    TransactionID := TransactionID, 
+                                                                    BatchUID := BatchUID, 
+                                                                    GlobalCompanyID := GlobalCompanyID);
 
 working_layout := RECORD
 	unsigned seq;
@@ -133,7 +141,11 @@ working_layout addIndata(mappedResults le, indata ri) := transform
 end;
 withInput := join(mappedResults, indata, left.seq=right.seq, addIndata(left,right));
 
-clam := risk_indicators.Boca_Shell_Function(ret, gateways, dppa, glb, false, false, false, false, false, false,DataRestriction:=Datarestriction,DataPermission:=DataPermission);
+clam := risk_indicators.Boca_Shell_Function(ret, gateways, dppa, glb, false, false, false, false, false, false,DataRestriction:=Datarestriction,DataPermission:=DataPermission,
+                                                                              LexIdSourceOptout := LexIdSourceOptout, 
+                                                                              TransactionID := TransactionID, 
+                                                                              BatchUID := BatchUID, 
+                                                                              GlobalCompanyID := GlobalCompanyID);
 getScore := ungroup(Models.CEN509_0_0(clam));
 			 
 Layout_1USO addModel(withInput le, getScore ri) := transform
