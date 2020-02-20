@@ -6,15 +6,10 @@ rule_based_test := (real) 2.0;
 
 req_date := (integer) ut.GetDate;
 
-//prev_date := '20191029' + '_50';
-//curr_date := '20191029' + '_51';
 
 curr_date := req_date + '_1';
 prev_date := scoring_project_ks.get_past_date(req_date, 1) + '_1';
-//prev_date := req_date + '_5';
-//prev_date := '_1';
-//curr_date := '20191029' + '_51';
-
+//prev_date := '20191029_1';
 
 //previous = base
 //current  = test
@@ -1176,7 +1171,7 @@ output(dataset_curr,named('line_248'));
    			self.prev_mean 	:= right.prev_mean ;
    			self.prev_std_dev := right.prev_std_dev;
    			self.prev_max_value 	:= right.prev_max_value ;
-   			self.prev_min_value 	:= right.prev_min_value ;
+   			self.prev_min_value 	:= left.prev_min_value ;/////////////////HERE
    			self.prev_invalid := left.prev_invalid;	
    			self.curr_response_count := left.curr_response_count;			
         self.curr_mean := right.curr_mean;		 
@@ -1708,8 +1703,6 @@ output(dataset_curr,named('line_248'));
    
 
 sequential(out_file1,send_file1,IF(count(alert_file_list)>0,send_file2));                                                                                                                                                                                                                                                                                                                       
-
-//out_file1;
 
 
 EXPORT bwr_SOCIO_ks_test := 'todo';

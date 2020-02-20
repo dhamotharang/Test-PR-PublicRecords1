@@ -116,11 +116,67 @@ EXPORT LayoutsInternal := MODULE
     InternalSeqAndIdentifiersLayout;
     DATASET(DueDiligence.Layouts.RelatedParty) executives {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};
   END;
+  
+  EXPORT LegalFlags := RECORD
+    BOOLEAN currIncar;
+    BOOLEAN currParole;
+    BOOLEAN currProbation;
+    BOOLEAN prevIncar;
+    BOOLEAN potentialSO;
+    BOOLEAN felonyPast3Years;
+  END;
+  
+  SHARED RelatedPartySSNInfo := RECORD
+    BOOLEAN hasSSN;
+    BOOLEAN hasITIN;
+    BOOLEAN hasImmigrantSSN;
+    BOOLEAN validSSN;
+    UNSIGNED4 ssnLowIssue;
+    UNSIGNED3 ssnMultiIdentities;
+    UNSIGNED3 ssnPerADL;
+    BOOLEAN ssnRisk;
+    BOOLEAN atleastOneParentHasSSN;
+    BOOLEAN atleastOneParentHasITIN;
+    BOOLEAN atleastOneParentHasImmigrantSSN;
+    UNSIGNED4 mostRecentParentSSNIssuanceDate;
+  END;
+  
+  EXPORT LegalAttributes := RECORD
+    BOOLEAN attr_stateLegalEvent9;
+    BOOLEAN attr_stateLegalEvent8;
+    BOOLEAN attr_stateLegalEvent7;
+    BOOLEAN attr_stateLegalEvent6;
+    BOOLEAN attr_stateLegalEvent5;
+    BOOLEAN attr_stateLegalEvent4;
+    BOOLEAN attr_stateLegalEvent3;
+    BOOLEAN attr_stateLegalEvent2;
+    
+    BOOLEAN attr_offenseType9;
+    BOOLEAN attr_offenseType8;
+    BOOLEAN attr_offenseType7;
+    BOOLEAN attr_offenseType6;
+    BOOLEAN attr_offenseType5;
+    BOOLEAN attr_offenseType4;
+    BOOLEAN attr_offenseType3;
+    BOOLEAN attr_offenseType2;
+    BOOLEAN attr_offenseType0;
+  END;
 
   EXPORT RelatedParty := RECORD
     InternalSeqAndIdentifiersLayout;
-    UNSIGNED4	  historydate;
+    UNSIGNED4 historydate;
     DueDiligence.Layouts.RelatedParty party;
+    LegalFlags;
+    UNSIGNED4 headerFirstSeen;
+    RelatedPartySSNInfo;
+    LegalAttributes;
+  END;
+  
+  EXPORT SlimRelationWithHistoryDate := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID;
+    UNSIGNED4 historyDate;
+    DueDiligence.Layouts.SlimRelation;
   END;
 
   EXPORT PartyLicenses := RECORD
@@ -314,10 +370,13 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED4 seq;
     UNSIGNED6 inquiredDID;
     UNSIGNED6 did;
+    STRING9 inputSSN;
+    STRING9 bestSSN;
     STRING2 indvType;
     UNSIGNED4 historydate;
     DueDiligence.Layouts.Name;
     STRING ssn;
+    STRING1 validSSN;
     DueDiligence.Layouts.Address;
     UNSIGNED4 dateFirstSeen;
     STRING50 src;
@@ -340,11 +399,9 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED4 historyDate;
     STRING sort_key;
     UNSIGNED category;
-    BOOLEAN currIncar;
-    BOOLEAN currParole;
-    BOOLEAN currProbation;
-    BOOLEAN prevIncar;
-    DueDiligence.Layouts.CriminalOffenses
+    LegalFlags;
+    DueDiligence.Layouts.CriminalOffenses;
+    LegalAttributes;
   END;
 
   EXPORT IndCrimLayoutFlat := RECORD
@@ -377,14 +434,7 @@ EXPORT LayoutsInternal := MODULE
     STRING120 partyName;
     DATASET({STRING120 name}) uniquePartyNames;
   END;
-  
-  EXPORT addressDetails := RECORD
-    UNSIGNED6 addressSeq;
-    DueDiligence.Layouts.AddressSlimDetail;
-    UNSIGNED4 dateFirstSeen;
-    UNSIGNED4 dateLastSeen;
-  END;
-  
+
   EXPORT chronoAddressesLayout := RECORD
     UNSIGNED6 seq;
     UNSIGNED6 did;
@@ -408,7 +458,9 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED3 chronodate_last := 0;
     UNSIGNED3 address_history_seq;
     STRING2 src := '';
-    DATASET(addressDetails) chronoAddresses;
+    STRING tempMoveDist;
+    UNSIGNED6 addrSeq;
+    DATASET(DueDiligence.Layouts.AddressDetails) chronoAddresses;
   END;
   
   EXPORT DistanceZipLayout := RECORD

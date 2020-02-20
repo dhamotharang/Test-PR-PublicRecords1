@@ -79,13 +79,16 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   ds_results_unmasked := IF(~in_mod.KeepRawData, ds_results_chsn, email_recs_srtd);
 
   // masking
-  Suppress.Mac_mask(ds_results_unmasked, ds_results_best_ssnmasked, bestinfo.ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
-  Suppress.Mac_mask(ds_results_best_ssnmasked, ds_results_clean_ssnmasked,cleaned.clean_ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
-  Suppress.Mac_mask(ds_results_clean_ssnmasked, ds_results_ssnmasked,original.ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
+  ssn_mask_use := IF(in_mod.isDirectMarketing(), Suppress.Constants.SSN_MASK_TYPE.ALL, in_mod.ssn_mask);
+  Suppress.Mac_mask(ds_results_unmasked, ds_results_best_ssnmasked, bestinfo.ssn, null, TRUE, FALSE, maskVal:=ssn_mask_use);
+  Suppress.Mac_mask(ds_results_best_ssnmasked, ds_results_clean_ssnmasked,cleaned.clean_ssn, null, TRUE, FALSE, maskVal:=ssn_mask_use);
+  Suppress.Mac_mask(ds_results_clean_ssnmasked, ds_results_ssnmasked,original.ssn, null, TRUE, FALSE, maskVal:=ssn_mask_use);
 
+  dob_mask_use := IF(in_mod.isDirectMarketing(), Suppress.Constants.datemask.ALL, in_mod.dob_mask);
+  ds_results_ssndob_masked := PROJECT(ds_results_ssnmasked, $.Transforms.ApplyDobMask(LEFT,dob_mask_use));
 
   // combine results and rejected input
-  ds_results_ready := ds_results_ssnmasked + ds_rejected_input + ds_rejected_nolexid;
+  ds_results_ready := ds_results_ssndob_masked + ds_rejected_input + ds_rejected_nolexid;
 
   //OUTPUT(email_ddpd_recs, NAMED('email_ddpd_recs'));
   //OUTPUT(email_recs_srtd, NAMED('email_recs_srtd'));

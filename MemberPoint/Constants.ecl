@@ -8,6 +8,13 @@
 			EXPORT STRING1 WaterfallPhones:= 'W';
 		END;
 		
+		EXPORT EmailTransactionType:= MODULE
+			EXPORT STRING1 Basic:= '1';
+			EXPORT BOOLEAN Basic_UseDMEmailSourcesOnly:= TRUE;
+			EXPORT STRING1 Premium:= '2';
+			EXPORT BOOLEAN Premium_UseDMEmailSourcesOnly:= FALSE;
+		END;
+		
 		EXPORT PhoneFilterType:= MODULE, VIRTUAL
 			EXPORT STRING1 CellPhones:= 'C';
 			EXPORT STRING1 Landlines:= 'L';
@@ -40,12 +47,22 @@
 			export boolean IncludePhone := true;
 			export boolean IncludeAddress := true;
 			export boolean IncludeDeceased := true;
+			export boolean IncludeDOB := true;
 			export boolean IncludeSSN := true;
 			export boolean IncludeGender := true;
 			export string25 Phones_Score_Model := 'PHONESCORE_V2';
 			export string1	AddressConfidenceThreshold := 'M';
 			export string1	PhonesReturnCutoff := 'M';
 			
+			//Reportservice defaults
+			export boolean rpt_IncludeAddress := false;
+			export boolean rpt_IncludeDeceased := false;
+			export boolean rpt_IncludeDOB := false;
+			export boolean rpt_IncludeGender := false;
+			export boolean rpt_IncludeSSN := false;
+			export boolean rpt_IncludeEmail := false;
+			export boolean rpt_IncludePhone := false;
+
 			//MP Enhancements
 
 			EXPORT STRING5 IndustryClass := '';
@@ -109,6 +126,7 @@
 			EXPORT BOOLEAN NoDIDAppend:= FALSE;
 			EXPORT BOOLEAN PartialNameMatchCodes:= TRUE;
 			//Email: All common
+			EXPORT BOOLEAN UseDMEmailSourcesOnly := FALSE;
 			//PhoneFinder
 			EXPORT UNSIGNED PenaltyThreshold:= 10;
 			EXPORT STRING1 PhoneFilter:= PhoneFilterType.None;

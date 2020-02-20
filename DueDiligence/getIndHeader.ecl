@@ -1,5 +1,4 @@
-﻿Import doxie, drivers, header, mdr, Risk_Indicators, riskwise, header_quick, ut, STD, Suppress, data_services;
-IMPORT drivers, DueDiligence, dx_header, header, header_quick, MDR, Risk_Indicators, ut;
+﻿IMPORT data_services, doxie, drivers, DueDiligence, dx_header, header, header_quick, MDR, Risk_Indicators, Suppress, ut;
 
 /*
 	Following Keys being used:
@@ -23,38 +22,62 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
 
 
-    parents := DueDiligence.CommonIndividual.getRelationship(inData, parents, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);																																																							
-    allInd := parents + inData;
+    parents := DueDiligence.CommonIndividual.GetRelationshipAsInquired(inData, parents, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);																																																							
+    spouse := DueDiligence.CommonIndividual.GetRelationshipAsInquired(inData, spouses, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);																																																							
+    associates := DueDiligence.CommonIndividual.GetRelationshipAsInquired(inData, associates, DueDiligence.Constants.INQUIRED_INDIVIDUAL_OTHER_RELATION);
+    
+    //remove any duplices - make sure we do not have any spouse/parents in associates
+    removeDups := DEDUP(SORT(spouse + parents + associates, seq, individual.did, indvType), seq, individual.did);
+    
+    allInd := removeDups + inData;
 
     getHeaderData(key, didField, atmostValue, keepValue) := FUNCTIONMACRO
         results_unsuppressed := JOIN(allInd, key, 
-                        KEYED(LEFT.individual.did = RIGHT.didField) AND
-                        RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(dataRestrictionMask, isFCRA) AND 
-                        (header.isPreGLB(RIGHT) OR glb_ok) AND 
-                        (~mdr.Source_is_DPPA(RIGHT.src) OR (dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src), dppa, RIGHT.src))) AND 
-                        ~Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st, bsVersion), 
-                        TRANSFORM({unsigned4 global_sid, DueDiligence.LayoutsInternal.IndSlimHeader}, 
-                                  SELF.global_sid := RIGHT.global_sid;
-                                  SELF.seq := LEFT.seq;
-                                  SELF.inquiredDID := LEFT.inquiredDID;
-                                  SELF.did := LEFT.individual.did;
-                                  SELF.indvType := LEFT.indvType;
-                                  SELF.historydate := LEFT.historyDate;
-                                  SELF.dateFirstSeen := IF(RIGHT.dt_first_seen = 0, RIGHT.dt_vendor_first_reported, RIGHT.dt_first_seen);
-                                  SELF.dateLastSeen := IF(RIGHT.dt_last_seen = 0, RIGHT.dt_vendor_last_reported, RIGHT.dt_last_seen);
-                                  SELF.addr_suffix := RIGHT.suffix;
-                                  SELF.city := RIGHT.city_name;
-                                  SELF.state := RIGHT.st;
-                                  SELF.zip5 := RIGHT.zip;
-                                  SELF.firstName := RIGHT.fname;
-                                  SELF.middleName := RIGHT.mname;
-                                  SELF.lastName := RIGHT.lname;
-                                  SELF.suffix := RIGHT.name_suffix;
-                                  SELF := RIGHT;
-                                  SELF := [];),  
-                        LEFT OUTER, 
-                        ATMOST(atmostValue), 
-                        KEEP(keepValue));
+                                      KEYED(LEFT.individual.did = RIGHT.didField) AND
+                                      RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(dataRestrictionMask, isFCRA) AND 
+                                      (header.isPreGLB(RIGHT) OR glb_ok) AND 
+                                      (~mdr.Source_is_DPPA(RIGHT.src) OR (dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src), dppa, RIGHT.src))) AND 
+                                      ~Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st, bsVersion), 
+                                      TRANSFORM({UNSIGNED4 global_sid, DueDiligence.LayoutsInternal.IndSlimHeader}, 
+                                                SELF.global_sid := RIGHT.global_sid;
+                                                SELF.seq := LEFT.seq;
+                                                SELF.inquiredDID := LEFT.inquiredDID;
+                                                SELF.did := LEFT.individual.did;
+                                                SELF.indvType := LEFT.indvType;
+                                                SELF.historydate := LEFT.historyDate;
+                                                                                  
+                                                SELF.firstName := RIGHT.fname;
+                                                SELF.middleName := RIGHT.mname;
+                                                SELF.lastName := RIGHT.lname;
+                                                SELF.suffix := RIGHT.name_suffix;
+                                                
+                                                SELF.inputSSN := LEFT.indvRawInput.ssn;
+                                                SELF.bestSSN := LEFT.bestSSN;
+                                                SELF.ssn := RIGHT.ssn;
+                                                SELF.validSSN := RIGHT.valid_ssn;
+                                                
+                                                SELF.prim_range := RIGHT.prim_range;
+                                                SELF.predir := RIGHT.predir;
+                                                SELF.prim_name := RIGHT.prim_name;
+                                                SELF.addr_suffix := RIGHT.suffix;
+                                                SELF.postdir := RIGHT.postdir;
+                                                SELF.unit_desig := RIGHT.unit_desig;
+                                                SELF.sec_range := RIGHT.sec_range;
+                                                SELF.city := RIGHT.city_name;
+                                                SELF.state := RIGHT.st;
+                                                SELF.zip5 := RIGHT.zip;
+                                                SELF.zip4 := RIGHT.zip4;
+                                                SELF.county := RIGHT.county;
+                                                SELF.geo_blk := RIGHT.geo_blk;
+                                                
+                                                SELF.dateFirstSeen := IF(RIGHT.dt_first_seen = 0, RIGHT.dt_vendor_first_reported, RIGHT.dt_first_seen);
+                                                SELF.dateLastSeen := IF(RIGHT.dt_last_seen = 0, RIGHT.dt_vendor_last_reported, RIGHT.dt_last_seen);
+                                                SELF.src := RIGHT.src;
+
+                                                SELF := [];),  
+                                      LEFT OUTER, 
+                                      ATMOST(atmostValue), 
+                                      KEEP(keepValue));
                         
         results := Suppress.MAC_SuppressSource(results_unsuppressed, mod_access, data_env := data_environment);
         
@@ -75,6 +98,9 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     //only inquired records
     inquiredHeaderData := filterHeader(indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL);
+    
+    //only parent and inquired records
+    inquiredWithParentHeaderData := filterHeader(indvType IN [DueDiligence.Constants.INQUIRED_INDIVIDUAL, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT]);
 
 
     //first seen date for a given inquired did
@@ -83,18 +109,46 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     addDateFirstReported := JOIN(inData, dedupHeaderDateFirstSeen,
                                   LEFT.seq = RIGHT.seq AND
-                                  LEFT.individual.did = RIGHT.did,
+                                  LEFT.inquiredDID = RIGHT.did,
                                   TRANSFORM(DueDiligence.Layouts.Indv_Internal,
                                             SELF.firstReportedDate := RIGHT.dateFirstSeen;
                                             SELF := LEFT;),
                                   LEFT OUTER,
                                   ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
+      
+      
+    //get the earliest first seen date for the inquireds relationships (spouses, parents, other relations)
+    nonInquiredHeaderData := filterHeader(indvType <> DueDiligence.Constants.INQUIRED_INDIVIDUAL);
+    
+    sortRelativeDateFirstSeen := SORT(nonInquiredHeaderData(dateFirstSeen <> 0), seq, did, dateFirstSeen);
+    dedupRelativeDateFirstSeen := DEDUP(sortRelativeDateFirstSeen, seq, did);
+    
+    convertToRelatedParty := DueDiligence.CommonIndividual.CreateRelatedPartyDataset(removeDups);
+    
+    addRelativeFirstSeen := JOIN(convertToRelatedParty, dedupRelativeDateFirstSeen,
+                                  LEFT.seq = RIGHT.seq AND
+                                  LEFT.party.did = RIGHT.did,
+                                  TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
+                                            SELF.headerfirstseen := RIGHT.dateFirstSeen;
+                                            SELF := LEFT;),
+                                  LEFT OUTER,
+                                  ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
+
+    perAssocOptions := MODULE(DueDiligence.DataInterface.iAttributePerAssoc)
+                          EXPORT BOOLEAN includeLegalData := FALSE;
+                          EXPORT BOOLEAN includeSSNData := FALSE;
+                          EXPORT BOOLEAN includeHeaderData := TRUE;
+                       END;
+                                             
+    updateRelatives := DueDiligence.CommonIndividual.UpdateRelationships(addDateFirstReported, addRelativeFirstSeen, perAssocOptions);
 
                                
                                
-    addVoterInfo := DueDiligence.getIndVoterData(addDateFirstReported, filterHeader);
+    addVoterInfo := DueDiligence.getIndVoterData(updateRelatives, inquiredWithParentHeaderData);
 
-    addMobilityInfo := DueDiligence.getIndMobility(addVoterInfo, inquiredHeaderData, isFCRA, bsVersion);
+    addMobilityInfo := DueDiligence.getIndMobility(addVoterInfo, inquiredHeaderData, isFCRA, bsVersion, includeReport);
+    
+    addReportData := IF(includeReport, DueDiligence.getIndHeaderReportData(addMobilityInfo, inquiredHeaderData), addMobilityInfo);
 
                                                                           
 
@@ -116,12 +170,20 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     // output(sortHeaderDateFirstSeen, named('sortHeaderDateFirstSeen'));
     // output(dedupHeaderDateFirstSeen, named('dedupHeaderDateFirstSeen'));
     // output(addDateFirstReported, named('addDateFirstReported'));
+    
+    // output(nonInquiredHeaderData, named('nonInquiredHeaderData'));
+    // output(sortRelativeDateFirstSeen, named('sortRelativeDateFirstSeen'));
+    // output(dedupRelativeDateFirstSeen, named('dedupRelativeDateFirstSeen'));
+    // output(convertToRelatedParty, named('convertToRelatedParty'));
+    // output(addRelativeFirstSeen, named('addRelativeFirstSeen'));
+    // output(updateRelatives, named('updateRelatives'));
 
     // output(addVoterInfo, named('addVoterInfo'));
     // output(addMobilityInfo, named('addMobilityInfo'));
+    // output(addReportData, named('addReportData'));
 
 
 
 
-    RETURN addMobilityInfo;
+    RETURN addReportData;
 END;

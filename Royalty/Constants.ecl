@@ -64,6 +64,7 @@ export Constants := module
 		export unsigned2 EAH_DB_SALES		:= 361;
 		export unsigned2 EAH_DB_EMPS		:= 362;
 		export unsigned2 DNB						:= 370;
+		export unsigned2 SMLOCATOR			:= 400;
 		export unsigned2 POWERVIEW			:= 428;
 		export unsigned2 FICOSCOREXD		:= 429;
 		export unsigned2 TU_FRAUD_ALERT	:= 431;
@@ -85,7 +86,7 @@ export Constants := module
 		export unsigned2 ACCUDATA_CNAM_CNM2   := 711;
 		export unsigned2 ACCUDATA_OCN_LNP   := 712;
 		export unsigned2 BRITE_VERIFY_EMAIL := 720;
-    
+    export unsigned2 NETWISE_EMAIL := 750;
 	end;
 
 	export RoyaltyType := module
@@ -151,6 +152,7 @@ export Constants := module
 		export EAH_DB_SALES		:= _TYPE(RoyaltyCode.EAH_DB_SALES);
 		export EAH_DB_EMPS		:= _TYPE(RoyaltyCode.EAH_DB_EMPS);
 		export DNB						:= _TYPE(RoyaltyCode.DNB);
+		export SMLOCATOR			:= _TYPE(RoyaltyCode.SMLOCATOR);
 		export POWERVIEW			:= _TYPE(RoyaltyCode.POWERVIEW);
 		export FICOSCOREXD		:= _TYPE(RoyaltyCode.FICOSCOREXD);
 		export TU_FRAUD_ALERT	:= _TYPE(RoyaltyCode.TU_FRAUD_ALERT);
@@ -172,6 +174,7 @@ export Constants := module
 		export ACCUDATA_CNAM_CNM2				:= _TYPE(RoyaltyCode.ACCUDATA_CNAM_CNM2);
 		export ACCUDATA_OCN_LNP					:= _TYPE(RoyaltyCode.ACCUDATA_OCN_LNP);
 		export BRITE_VERIFY_EMAIL  			:= _TYPE(RoyaltyCode.BRITE_VERIFY_EMAIL);
+    export NETWISE_EMAIL            := _TYPE(RoyaltyCode.NETWISE_EMAIL);
 	end;
 
 	// *** DO NOT USE: TO BE DEPRECATED AND DELETED once batch can handle RoyaltySet dataset.

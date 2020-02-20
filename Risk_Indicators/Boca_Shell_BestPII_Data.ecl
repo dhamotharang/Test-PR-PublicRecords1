@@ -147,9 +147,16 @@ inquiries_prep := project(iid_prep, transform(risk_indicators.layout_bocashell_n
 	self.age := 0;
 	self := left;
 	self := [];) );
-	
-best_inquiries := if(isFCRA, risk_indicators.Boca_Shell_Inquiries_FCRA(inquiries_prep, bsoptions, bsversion, gateways),
-														risk_indicators.Boca_Shell_Inquiries(inquiries_prep, bsoptions, bsversion, gateways, datapermissionmask, mod_access) );
+
+// turn off Tumblings always as they aren't used in best_inquiries
+best_bsoptions := 
+if(Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.TurnOffTumblings, BSOptions), 0, risk_indicators.iid_constants.BSOptions.TurnOffTumblings)
++
+BSOptions;
+
+best_gateways := dataset([], Gateway.Layouts.Config);	// don't use the deltabase again when running with the best PII instead of input PII
+best_inquiries := if(isFCRA, risk_indicators.Boca_Shell_Inquiries_FCRA(inquiries_prep, best_bsoptions, bsversion, best_gateways),
+														risk_indicators.Boca_Shell_Inquiries(inquiries_prep, best_bsoptions, bsversion, best_gateways, datapermissionmask, mod_access) );
 
 with_best_inquiries := join(with_match_flags, best_inquiries, left.seq=right.seq,
 	transform(risk_indicators.Layout_Boca_Shell,

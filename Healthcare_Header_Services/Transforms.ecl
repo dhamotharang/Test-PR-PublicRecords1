@@ -586,6 +586,7 @@ EXPORT Transforms := MODULE
 		self.hasStateRestrict := l.state_restrict_flag='Y';
 		self.hasOIG := l.oig_flag='Y';
 		self.hasOPM := l.opm_flag='Y';
+    self.hasoptout:=l.hasoptout;
 		self.status := l.provider_status;
 		self.names := if(l.hasoptout=false,project(l,transform(Layouts.layout_nameinfo,
 																			self.nameSeq := 1;
@@ -1869,7 +1870,13 @@ EXPORT Transforms := MODULE
 		self.dids := dataset([{(integer)l.rawdata.did}],Layouts.layout_did)(did>0);
 		self.bdids := dataset([{(integer)l.rawdata.bdid}],Layouts.layout_bdid)(bdid>0);
 		self.dobs := dataset([{l.rawdata.dob}],Layouts.layout_dob)(dob<>'');
-		self.StateLicenses := dataset([{l.acctno,l.lnpid,0,l.rawdata.source_st,l.rawdata.license_number,'','',l.rawdata.issue_date,l.rawdata.expiration_date}],Layouts.layout_licenseinfo)(LicenseNumber<>'');
+		self.StateLicenses := project(l,transform(Layouts.layout_licenseinfo,
+																								self.LicenseState := left.rawdata.source_st;	
+																								self.LicenseNumber := left.rawdata.License_Number;
+																								self.LicenseType := left.rawdata.License_Type;	
+																								self.Effective_Date :=left.rawdata.issue_date;	
+																								self.Termination_Date:=left.rawdata.expiration_date;	
+																								self:=[];));
 		self.ProfLicRaw := project(l,build_ProflicRaw(left));
 		Self.SrcRecRaw :=  project(l,transform(Layouts.layout_SrcRec,
 																		self.Src := constants.SRC_PROFLIC;
@@ -3345,7 +3352,7 @@ Export Layouts.CombinedHeaderResults build_hms_facility_base (Layouts.hms_base_w
 	end;
 	export iesp.healthcareconsolidatedsearch.t_HealthCareConsolidatedSearchProvider formatSearchServiceProviderOutput(Layouts.CombinedHeaderResultsDoxieLayout resultRec, dataset(Layouts.autokeyInput) aInputData, dataset(Layouts.common_runtime_config) cfg)  := TRANSFORM 
 		searchCriteria := cfg[1];
-		self.ProviderId :=if(resultRec.issearchfailed,error(203,doxie.ErrorCodes(203)),(string)resultRec.lnpid);
+		self.ProviderId :=if(resultRec.issearchfailed and resultRec.lnpid=0,error(203,doxie.ErrorCodes(203)),(string)resultRec.lnpid);
 		self.ProviderSrc := resultRec.Src;
 		self.sex := resultRec.Names[1].Gender;
 		self.UniqueIds := choosen(project(resultRec.dids, transform (iesp.share.t_StringArrayItem, Self.value := (string)Left.did)),iesp.Constants.HPR.MAX_UNIQUEIDS);

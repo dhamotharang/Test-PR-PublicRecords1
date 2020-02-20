@@ -56,7 +56,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_Batch_Service_V5 := MODULE
 								SeTC_Score_Str = 'N/A' => 'N/A',
 								SeTC_Score_Str = _blank => _blank,
 								(string)Socio_Index_Value), _blank);
-		SELF.Socio_Rank := IF(Socio_TC_Model_Version_in=3, (string) MAP(
+		val_Socio_Rank := IF(Socio_TC_Model_Version_in=3, (string) MAP(
 								_SuppressOutput = TRUE => _OptOutMessage,
 								SeTC_Score_Str = 'N/A' => 'N/A',
 								SeTC_Score_Str = _blank => _blank,
@@ -161,15 +161,16 @@ EXPORT Healthcare_SocioEconomic_Transforms_Batch_Service_V5 := MODULE
 								SeTC_Score < (DECIMAL9_4)batch_params.TotalCostRiskScore_Rank_99_Max => '99',
 								SeTC_Score >= (DECIMAL9_4)batch_params.TotalCostRiskScore_Rank_99_Max => '100',
 								'N/A'), _blank);
+		SELF.Socio_Rank := val_Socio_Rank;
 		SELF.Socio_Category := IF(Socio_TC_Model_Version_in=3, (string) MAP(
 								_SuppressOutput = TRUE => _OptOutMessage,
-								SeTC_Score_Str = 'N/A' => 'N/A',
-								SeTC_Score_Str = _blank => _blank,
-   								SeTC_Score  < (DECIMAL9_4)batch_params.TotalCostRiskScore_Category_2_Low => '1',
-   								SeTC_Score  < (DECIMAL9_4)batch_params.TotalCostRiskScore_Category_3_Low => '2',
-   								SeTC_Score  < (DECIMAL9_4)batch_params.TotalCostRiskScore_Category_4_Low => '3',
-   								SeTC_Score  < (DECIMAL9_4)batch_params.TotalCostRiskScore_Category_5_Low => '4',
-   								SeTC_Score >= (DECIMAL9_4)batch_params.TotalCostRiskScore_Category_5_Low => '5',
+								val_Socio_Rank = 'N/A' => 'N/A',
+								val_Socio_Rank = _blank => _blank,
+   								(UNSIGNED1) val_Socio_Rank  < (UNSIGNED1) batch_params.TotalCostRiskScore_Category_2_Low => '1',
+   								(UNSIGNED1) val_Socio_Rank  < (UNSIGNED1) batch_params.TotalCostRiskScore_Category_3_Low => '2',
+   								(UNSIGNED1) val_Socio_Rank  < (UNSIGNED1) batch_params.TotalCostRiskScore_Category_4_Low => '3',
+   								(UNSIGNED1) val_Socio_Rank  < (UNSIGNED1) batch_params.TotalCostRiskScore_Category_5_Low => '4',
+   								(UNSIGNED1) val_Socio_Rank >= (UNSIGNED1) batch_params.TotalCostRiskScore_Category_5_Low => '5',
    								'N/A'), _blank);
 		SELF := L;
 		END;
@@ -300,10 +301,10 @@ EXPORT Healthcare_SocioEconomic_Transforms_Batch_Service_V5 := MODULE
 		(DECIMAL9_4)batch_params.TotalCostRiskScore_Rank_100_Min < (DECIMAL9_4)batch_params.TotalCostRiskScore_Rank_99_Max,
 		FAIL('Bad TotalCostRiskScore_Rank thresholds supplied.'));
 
-	 IF((DECIMAL9_4)batch_params.TotalCostRiskScore_Category_2_Low < (DECIMAL9_4)batch_params.TotalCostRiskScore_Category_1_High OR
-		(DECIMAL9_4)batch_params.TotalCostRiskScore_Category_3_Low < (DECIMAL9_4)batch_params.TotalCostRiskScore_Category_2_High OR
-		(DECIMAL9_4)batch_params.TotalCostRiskScore_Category_4_Low < (DECIMAL9_4)batch_params.TotalCostRiskScore_Category_3_High OR
-		(DECIMAL9_4)batch_params.TotalCostRiskScore_Category_5_Low < (DECIMAL9_4)batch_params.TotalCostRiskScore_Category_4_High,
+	 IF((UNSIGNED1)batch_params.TotalCostRiskScore_Category_2_Low < (UNSIGNED1)batch_params.TotalCostRiskScore_Category_1_High OR
+		(UNSIGNED1)batch_params.TotalCostRiskScore_Category_3_Low < (UNSIGNED1)batch_params.TotalCostRiskScore_Category_2_High OR
+		(UNSIGNED1)batch_params.TotalCostRiskScore_Category_4_Low < (UNSIGNED1)batch_params.TotalCostRiskScore_Category_3_High OR
+		(UNSIGNED1)batch_params.TotalCostRiskScore_Category_5_Low < (UNSIGNED1)batch_params.TotalCostRiskScore_Category_4_High,
 		FAIL('Bad TotalCostRiskScore_Category thresholds supplied.'));
 
 	ENDMACRO;

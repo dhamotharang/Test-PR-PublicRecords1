@@ -1,11 +1,3 @@
-/*
-
-This common function is called by:
-
-AddressHistory_Service and
-AddressHistory_Batch_Service
-
-*/
 import address, doxie, dx_header, header, mdr, suppress, STD;
 
 export AddressHistory_Common(dataset(didville.Layout_Did_OutBatch) infile,

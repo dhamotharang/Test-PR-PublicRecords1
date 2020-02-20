@@ -1,5 +1,5 @@
 ﻿IMPORT autostandardI, BIPV2, BIPV2_Best,
-  BIPV2_WAF, BusinessCredit_Services, Census_Data, Doxie,
+  BIPV2_WAF, Census_Data, Doxie,
   gong, iesp, MDR, std, Suppress, TopBusiness_Services, ut;
 
 EXPORT BusinessSearch_Records := MODULE
@@ -21,9 +21,13 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 
  string6 ssn_mask_value := mod_access.ssn_mask;
 
-		string8 CurDate  := (STRING8) std.Date.Today();
-		BOOLEAN useBusinessCreditSorting := BusinessCredit_Services.Functions.fn_useBusinessCredit( global_mod.dataPermissionMask, In_Options.IncludeBusinessCredit );
-
+		string8 CurDate  := (STRING8) std.Date.Today();		
+           Boolean   useBusinessCreditSorting  := AutoStandardI.DataPermissionI.val(
+           MODULE( AutoStandardI.DataPermissionI.params )
+			EXPORT dataPermissionMask := global_mod.dataPermissionMask;
+		END
+                  ).use_SBFEData AND In_Options.IncludeBusinessCredit;                                   
+                  
 		// needed for project into userpermits for salt WAF (we also found) key.
 		in_mod_WAF_KEY := PROJECT(global_mod, BIPV2.mod_sources.iParams,OPT);
 		unsigned userpermits_SALT := BIPV2.mod_sources.in_mod_values(in_mod_WAF_KEY).my_bmap;
@@ -904,8 +908,9 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 							// exists.
 							// THIS WAF key is indexed at the proxid level
 							//
-
-			 SELEIDWAFBooleans := project(tmp_return_results_NEW, transform({
+                SELEIDWAFBooleans := project( dedup(sort(tmp_return_results_NEW, ultid, orgid, seleid),
+                                                                                                ultid, orgid, seleid)
+                                                                         , transform({		
 			                                                   BIPV2_WAF.Process_Biz_Layouts.id_stream_layout;
 			                                                      boolean incorp;
 																														boolean uccs;
@@ -930,7 +935,10 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 												// by proxid following project to acccount for this.
 												// to reduce the left side of the join to the WAF key.
 												//
-       ultWAFBooleans := dedup(sort(project(tmp_return_results_New(ultimate.businessIDs.seleid > 0),
+                        TmpUltWAFBooleans := dedup(sort( tmp_return_results_New(ultimate.businessIDs.seleid > 0),
+                                                                                    ultimate.businessIds.ultid,ultimate.businessIds.orgid, ultimate.businessIds.seleid),
+                                                                                      ultimate.businessIds.ultid,ultimate.businessIds.orgid, ultimate.businessIds.seleid);       
+         ultWAFBooleans := project(tmpUltWAFBooleans,       
 			 transform({BIPV2_WAF.Process_Biz_Layouts.id_stream_layout;
 			                                                      boolean incorp;
 																														boolean uccs;
@@ -944,7 +952,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 											 self.proxid := 0;
 											 self.UniqueID := counter;
 											 self := []
-											 )), seleid, record), seleid);
+											 ));                                    
 
        SELEIDWAFBooleansIn := project(SELEIDWAFBooleans, transform(BIPV2_WAF.Process_Biz_Layouts.id_stream_layout,
 			                           self.ultid := left.ultid;
@@ -1127,12 +1135,12 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 							 self.FromDate := tmpFromDate;
 						   self.ToDate := tmpToDate;
 
-							 // override the header data with phone data if we have it.
-							 // only if particular row on header has the companyPhone data will this override take place
+							 // override the header data with phone data if we have it for defunct
+							 // only if particular row on header has an active phone and that phone is a companyPhone  will this override take place
 							 // ** THESE 2 fields isActive and isDefunct not displayed on the BIP GUI.
 							 //
 							 self.isActive := left.isActive OR tmp_active_eda;
-							 self.IsDefunct := left.isDefunct and not(tmp_active_eda);
+							 self.IsDefunct := left.isDefunct and (not(tmp_active_eda and tmp_listing_type  ='B'));
 							 self := left;
 						));
 
@@ -1179,8 +1187,10 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 				                   (ut.StringSimilar(tmpcname ,right.listed_name) <= TopBusiness_Services.Constants.STRINGSIMILARCONSTANT));
 				 //                         and gongLinkidsHasCurrentPhone);
 			                             // for isActive and isDefunct
-			                             // using phone data to override the best data (i.e. header data even though from SELEIDBEST EXPORT)
-         self.Best.IsDefunct := left.Best.isDefunct and NOT(right.active_EDA = 'Y'); // and gongLinkidskeyOverride)
+			                             // using phone data to override the best data (i.e. header data even though from SELEIDBEST EXPORT)         
+         
+         self.Best.IsDefunct := left.Best.isDefunct and (NOT(right.active_EDA = 'Y' and right.listing_type = 'B'));
+                               
 			   self := left;
 			   self := []),
 		   left outer);
@@ -1354,32 +1364,18 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
     lafn := if (count(xrecords_LAFN(isLafn)) > 0, DATASET( [ LAFNxFORM() ] )
 		            );
 
-// OUTPUT(useBusinessCreditSorting, NAMED('useBusinessCreditSorting'));
-// OUTPUT(ds_HeaderAndBusinessCreditRecs, NAMED('ds_HeaderAndBusinessCreditRecs'));
-// OUTPUT(ds_rolled_Suppressed, NAMED('ds_rolled_Suppressed'));
-
-    // output(ds_add_UltWAF, named('ds_add_UltWAF'));
-    // output(ds_sortedBySELEID_results, named('ds_sortedBySELEID_results'));
-//		output(ds_rolled_results, named('ds_rolled_results'));
-		// output(ds_rolled_final, named('ds_rolled_final'));
 
 		// DEBUG INFO
-//    output(ds_seleidMatch, named('ds_seleidMatch'));
+
 //		output(inputSearch, named('inputSearch'));
-		// output(cntRecsReturned, named('cntRecsReturned'));
-//		output(DRM);
 //		output(in_options, named('in_options'));
 		// output(userpermits_SALT, named('userpermits_SALT'));
 //		output(lafn, named('lafn'));
 		// output(choosen(ds_linkIDsNonRestricted, 500),  named('ds_linkIDsNonRestricted'));
 		// OUTPUT(ds_rolled_Suppressed, NAMED('ds_rolled_Suppressed'));
     // OUTPUT(useBusinessCreditSorting, NAMED('useBusinessCreditSorting'));
-
-		// output(choosen(ds_linkIDsRestricted,50), named('ds_linkIDsRestricted'));
-		// output(choosen(ds_linkIDsNonRestricted,500), named('ds_linkIDsNonRestricted'));
 		// OUTPUT(ds_rolled_final, NAMED('ds_rolled_final'));
 
-    // output(trimmedResultSet, named('trimmedResultSet'));
 		// OUTPUT(resultSetSlim, named('resultSetSlim'));
 		// OUTPUT(NonSourceDSELEIDs, named('NonSourceDSELEIDs'));
 		// OUTPUT(SourceDSELEIDs, named('SourceDSELEIDs'));
@@ -1389,10 +1385,9 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 //		output(SourceDNBDMISingleTonSELEIDsInSearchResults, named('SourceDNBDMISingleTonSELEIDsInSearchResults'));
 
 		// output(topResultsPreSuppress, named('topResultsPreSuppress'));
+           // output(topResults, named('TopResults'));
 		// output(tmpTopResultsScored, named('tmpTopResultsScored'));
-//		output(topResults, named('TopResults'));
-		// output(topResultsScored_ultProxidFilter, named('topResultsScored_ultProxidfilter'));
-		// output(topResultsScored_orgidDiffProxid, named('topResultsScored_orgidDiffProxid'));
+	
 //	  output(possible_Lafn, named('possible_lafn'));
 //	  output(possible_truncation, named('possible_truncation'));
 //	  output(ds_linkIDsNonRestricted, named('ds_linkIDsNonRestricted'));
@@ -1410,7 +1405,6 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 	//	output(ds_seleidBestWirelessIndicator, named('ds_seleidBestWirelessIndicator'));
 		// output(TopResultsScored_WirelessIndicator, named('TopResultsScored_WirelessIndicator'));
 		//output(ds_ultInfo, named('ds_ultInfo'));
-		// output(choosen(ds_linkIDsNonRestricted, 4500), named('ds_linkIDsNonRestricted'));
 		 // output(ds_linkIDsRestricted, named('ds_linkIDsRestricted'));
 		// output(count(ds_seleidBest), named('count_ds_seleidBest'));
 
@@ -1420,27 +1414,17 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 //		output(ds_rolled_Suppressed, named('ds_rolled_Suppressed'));
 		// output(ds_rolled_finalMatch, named('ds_rolled_finalMatch'));
     // output(tmp, named('tmp'));
-		 // output(choosen(ds_linkIDsNonRestricted,5999), named('ds_linkidsNonRestricted'));
-		// output(choosen(ds_linkIDsRestricted,5999), named('ds_linkidsRestricted'));
 		// output(SeleidWAFResult, named('SeleidWAFResult'));
 		// output(UltIDWAFResult, named('UltIDWAFResult'));
-//		output(TopResultsScored, named('TopResultsScored'));
+		// output(TopResultsScored, named('TopResultsScored'));
 		// output(tmpTopResultsScored, named('tmpTopResultsScored'));
-	  // OUTPUT(sort(choosen(ResultSetSlim(proxweight = firstproxweight and record_score = firstRecScore) , 5000), -dt_last_seen, record),
-	          // NAMED('ResultSetSlim'));
 	  // output(search_results_slimSicCode, named('search_results_slimSicCode'));
 		// output(sorted_add_metadata_3, named('sorted_add_metadata_3'));
 		 //output(ResultSetSlim, named('ResultSetSlim'));
 
     // output(topResultsPreSuppress, named('topResultsPreSuppress'));
 	  // output(TopResultsScored_wirelessIndicator, named('TopResultsScored_wirelessIndicator'));
-	  //output(tmp_return_results_NEW, named('tmp_return_results_new'));
-		// output(tmp_return_results_NEW_sorted, named('tmp_return_results_new_sorted'));
-
-		// output(tmp_return_results_NEWExpFein, named('tmp_return_results_NEWExpFein'));
-		// output(tmp_return_results_NEWExpFeinSuppressed, named('tmp_return_results_NEWExpFeinSuppressed'));
-		// output(tmp_return_results_NEW2, named('tmp_return_results_new2'));
-		// output(CountNumOfSourcesPerProxid, named('CountNumOfSourcesPerProxid'));
+	  // output(choosen(tmp_return_results_NEW,500), named('tmp_return_results_new'));		
 
 		// output(unique_phones, named('unique_phones'));
 		// output(unique_phones_wgongdata_0, named('unique_phones_wgongdata_0'));
@@ -1463,12 +1447,12 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 
 		// output(proxidWAFBooleans, named('proxWAFBooleans'));
 		// output(ultWAFBooleans, named('ultWAFBooleans'));
-	  // output(SeleidWAFResult, named('SeleidWAFResult'));
+	     // output(SeleidWAFResult, named('SeleidWAFResult'));
 		// output(SELE_SALT_WAF_FETCH, named('SELE_SALT_WAF_FETCH'));
 		// output(ULTidWAFResult, named('ULTIDWAFRESULT'));
 		// output(tmpDs_add_WAF, named('tmpDs_add_WAF'));
 		// output(tmpDs_add_UltWAF, named('tmpDs_add_UltWAF'));
-	   //output(ds_add_waf, named('ds_add_waf'));
+	      //output(ds_add_waf, named('ds_add_waf'));
 		// output(ds_add_ultwaf, named('ds_add_ult_waf'));
 
 	 // output(unique_phones_SELEID, named('unique_phones_SELEID'));
@@ -1478,13 +1462,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 		// output(TopResultsScored, named('TopResultsScored'));
 		//output(choosen(add_metadata_2,25), named('add_metadata_2'));
 		// output(sorted_add_metadata_2, named('sorted_add_metadata_2'));
-
-
-    //**
 		// output(ds_rolled_results_sorted,named('ds_rolled_results_sorted'));
-
-
-		//**
 		// output(ds_rolled_final2, named('ds_rolled_final2'));
 	// output(ds_seleidBest, named('ds_seleidBest'));
 
@@ -1501,8 +1479,23 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 //		output(ds_rolledFinalMatchSuppressFinalGroup, named('ds_rolledFinalMatchSuppressFinalGroup'));
 		// output(ds_rolled_Suppressed, named('ds_rolled_Suppressed'));
 		//output(gongLinkidsHasCurrentPhone, named('gongLinkidsHasCurrentPhone'));
-
-
+// output(ds_seleidBest, named('ds_seleidBest1'));
+                     // output(SELE_SALT_WAF_FETCH, named('SELE_SALT_WAF_FETCH'));
+                     
+                     // output(count(SeleidWAFResult), named('count_SeleidWAFResult'));
+                     // output(count(ds_add_waf), named('count_ds_add_waf'));
+                // output(count(tmp_return_results_NEW), named('count_tmp_return_results_NEW1'));
+                // output(tmp_return_results_NEW, named('tmp_return_results_NEW'));
+                // output(count(SELEIDWAFBooleans), named('count_SELEIDWAFBooleans'));
+                // output(SELEIDWAFBooleans, named('SELEIDWAFBooleans'));
+                // output(tmpSeleidWAFresult, named('tmpSeleidWAFresult'));
+                // output(SeleidWAFResult, named('SeleidWAFResult'));
+       // output(count(ds_add_UltWAF), named('count_ds_add_UltWAF'));
+   // output(count(unique_phones_gong_rolled), named('count_unique_phones_gong_rolled'));
+   // output(count(unique_phones_gong_rolled_SELEID), named('unique_phones_gong_rolled_SELEID'));
+   // output(count(add_metadata_1), named('count_add_metadata_1'));
+  // output(count(ultWAFBooleans) , named('count_ultWAFBooleans'));
+  // output(tmpULTWAFresult, named('tmpULTWAFresult'));
 
      export recs := if (noRecsReturned, lafn, tmpRecs);
 	END;

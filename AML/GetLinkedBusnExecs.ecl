@@ -1,6 +1,6 @@
-Import business_header, ut,PAW, RiskWise, doxie, Business_Risk, Business_Header_SS, did_add,Risk_Indicators, Address, Header,Relationship;
+﻿Import business_header, PAW, RiskWise, doxie, Business_Risk, Business_Header_SS, did_add,Risk_Indicators, Address, Header,Relationship, Suppress, AML;
 
-EXPORT GetLinkedBusnExecs(DATASET(Layouts.BusnLayoutV2) BusnIds) := FUNCTION
+EXPORT GetLinkedBusnExecs(DATASET(Layouts.BusnLayoutV2) BusnIds, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 gScore(UNSIGNED1 i) := i BETWEEN 5 AND 79;
 
@@ -192,7 +192,7 @@ ContactsPAW := join(SDRelatBusnCont, paw.Key_Did,
 
 ddContactsPaw := dedup(sort(ContactsPAW, seq, origbdid, bdid, did, contact_id), seq, origbdid, bdid, did, contact_id);
 
-pawTitle := join(ddContactsPaw, paw.Key_contactid,
+pawTitle_unsuppressed := join(ddContactsPaw, paw.Key_contactid,
 						right.contact_id<>0 and 
 						right.bdid <> 0 and
 						right.company_title <> '' and
@@ -200,7 +200,8 @@ pawTitle := join(ddContactsPaw, paw.Key_contactid,
 						(AMLTitleRank(right.company_title) <= 3) and
 						keyed(left.contact_id=right.contact_id) 
 						and (unsigned)right.dt_first_seen[1..6] < left.historydate, 
-						transform(patw,
+						transform({patw, unsigned4 global_sid},
+											self.global_sid := right.global_sid;
 											self.seq := left.seq;
 											self.origbdid := left.origbdid;
 											self.bdid := left.bdid;
@@ -217,7 +218,7 @@ pawTitle := join(ddContactsPaw, paw.Key_contactid,
 											// left outer,
 											atmost(riskwise.max_atmost), keep(50));
 						
-
+pawTitle := Suppress.Suppress_ReturnOldLayout(pawTitle_unsuppressed, mod_access, patw);
 						
 BusnExecs := sort(pawTitle, seq,origbdid,bdid,did);
 
@@ -370,10 +371,10 @@ execBdidsBestAdded := join(DDBexecBdids, ExecBdidbest,
 	SDExecs_dids := PROJECT(SDExecs_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 
-	rellyids := Relationship.proc_GetRelationship(SDExecs_dids,TopNCount:=50,
+	rellyids := Relationship.proc_GetRelationshipNeutral(SDExecs_dids,TopNCount:=50,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result; 
 
-	Layouts.BusnExecsLayoutV2  Getparents(EverybodySD le, rellyids ri) := TRANSFORM
+	Layouts.BusnExecsLayoutV2  Getparents(EverybodySD le, Relationship.layout_GetRelationship.interfaceOutputNeutral ri) := TRANSFORM
 		
 			self.seq := le.seq;
 			self.Origbdid := le.Origbdid;

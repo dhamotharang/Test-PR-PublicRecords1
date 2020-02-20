@@ -23,15 +23,15 @@ EXPORT SmallBusiness_BIP_Function (
 											BOOLEAN IncludeTargusGateway = FALSE,
 											BOOLEAN RunTargusGateway = FALSE,
 											UNSIGNED2 BIPIDWeightThreshold = LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.DEFAULT_VALUE,
-                                            BOOLEAN CorteraRetrotest = FALSE,
-                                            DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw),
-                                            BOOLEAN AppendBestsFromLexIDs = FALSE, 
-                                            BOOLEAN DisableSBFE = FALSE,
-                                            unsigned1 LexIdSourceOptout = 1,
-                                            string TransactionID = '',
-                                            string BatchUID = '',
-                                            unsigned6 GlobalCompanyId = 0
-																							) := FUNCTION
+											BOOLEAN CorteraRetrotest = FALSE,
+											DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw),
+											BOOLEAN AppendBestsFromLexIDs = FALSE, 
+											BOOLEAN DisableSBFE = FALSE,
+											unsigned1 LexIdSourceOptout = 1,
+											string TransactionID = '',
+											string BatchUID = '',
+											unsigned6 GlobalCompanyId = 0
+											) := FUNCTION
 
 	RESTRICTED_SET := ['0', ''];
 	
@@ -50,10 +50,19 @@ EXPORT SmallBusiness_BIP_Function (
 /* ************************************************************************
 	 *                    Set common Business Shell Options                 *
 	 ************************************************************************ */
-	UNSIGNED1	BusShellVersion	:= MAP((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = 'SMALLBUSINESSATTRV')[1].AttributeGroup[19..] = 2 => Business_Risk_BIP.Constants.BusShellVersion_v30,
-                                    BusShellv22_scores_requested                                                                           => Business_Risk_BIP.Constants.BusShellVersion_v22,
-                                   (UNSIGNED)AttributesRequested(AttributeGroup[1..18] = 'SMALLBUSINESSATTRV')[1].AttributeGroup[19..] = 1 => Business_Risk_BIP.Constants.BusShellVersion_v21,
-                                                                                                                                              Business_Risk_BIP.Constants.Default_BusShellVersion);
+	BusShellVersion	:= 
+		MAP(
+			EXISTS(AttributesRequested(TRIM(AttributeGroup) = 'SMALLBUSINESSATTRV21')) => 
+							Business_Risk_BIP.Constants.BusShellVersion_v31,
+			EXISTS(AttributesRequested(TRIM(AttributeGroup) = 'SMALLBUSINESSATTRV2')) => 
+							Business_Risk_BIP.Constants.BusShellVersion_v30,
+			BusShellv22_scores_requested => 
+							Business_Risk_BIP.Constants.BusShellVersion_v22,
+			EXISTS(AttributesRequested(TRIM(AttributeGroup) = 'SMALLBUSINESSATTRV1')) => 
+							Business_Risk_BIP.Constants.BusShellVersion_v21,
+			// default:
+			Business_Risk_BIP.Constants.Default_BusShellVersion
+		);
 	
   
 	// Create a datarow to add to the intermediate log.
@@ -247,10 +256,10 @@ EXPORT SmallBusiness_BIP_Function (
 																																 FALSE,
 																																 CorteraRetrotest,
 																																 ds_CorteraRetrotestRecsRaw,
-                                                                                                                                 LexIdSourceOptout := LexIdSourceOptout, 
-                                                                                                                                 TransactionID := TransactionID, 
-                                                                                                                                 BatchUID := BatchUID, 
-                                                                                                                                 GlobalCompanyID := GlobalCompanyID);
+																																 LexIdSourceOptout := LexIdSourceOptout, 
+																																 TransactionID := TransactionID, 
+																																 BatchUID := BatchUID, 
+																																 GlobalCompanyID := GlobalCompanyID);
 
   Shell_Results_nosbfe := 
 	  PROJECT(Shell_Results_pre, TRANSFORM(Business_Risk_BIP.Layouts.Shell, SELF.SBFE := [], SELF := LEFT));

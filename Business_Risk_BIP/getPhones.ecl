@@ -216,15 +216,16 @@ connectedPhones_unsuppressed := JOIN (shell, Gong.Key_History_phone,
 	// output(SwitchTypeTZ, named('sample_SwitchTypeTZ'));
 	// output(ZipMatchTemp, named('sample_ZipMatchTemp'));
 	// output(ZipMatch, named('sample_ZipMatch'));
+  // output(phoneDisconnect, named('phoneDisconnect'));
 	// output(phoneDisconnectHRiskTemp, named('sample_phoneDisconnectHRiskTemp'));
 	// output(phoneDisconnectHRisk, named('sample_phoneDisconnectHRisk'));
 	// output(connectedPhones, named('sample_connectedPhones'));
 	// output(SortConnectedPhones, named('sample_SortConnectedPhones'));
 	// output(AddPhoneZip, named('AddPhoneZip'));
 	// output(AddPhoneDisc, named('AddPhoneDisc'));
-	// output(AddConnectedPhoneCnt, named('AddConnectedPhoneCnt'));
+	// output(AddConnectedPhoneCnt, named('AddConnectedPhoneCnt')); 
 	// output(AddphoneAttributes, named('AddphoneAttributes'));
-
+	// OUTPUT(AllowedSourcesSet,NAMED('Allowed_Srcs_Phones'));
 	
 	RETURN withPhoneDisconnect;
 	END;

@@ -1097,6 +1097,7 @@ export Layouts := MODULE
 		string26		UserCity := '';
 		string9			UserState := '';
 		string9			UserZip := '';
+		boolean isDeepDiveResults:=false;
 		dataset(layout_did) dids := dataset([],layout_did);
 		dataset(layout_clianumber) clianumbers := dataset([],layout_clianumber);
 		dataset(layout_npi) npis := dataset([],layout_npi);

@@ -304,7 +304,8 @@ EXPORT Functions := MODULE
 
 	EXPORT getMatchedEntityTypes(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
 															 DATASET(FraudShared_Services.Layouts.Raw_payload_rec) ds_payload,
-															 Boolean isSearchRequest = FALSE) := FUNCTION	
+															 Boolean isSearchRequest = FALSE,
+															 string platform = '') := FUNCTION	
 
 		FraudShared_Services.Layouts.layout_velocity_matches xform_velocity_matches(FraudShared_Services.Layouts.BatchInExtended_rec l,
 																																								FraudShared_Services.Layouts.Raw_Payload_rec r) := TRANSFORM	
@@ -380,9 +381,11 @@ EXPORT Functions := MODULE
 													{STRING fragmentType}));
 										
 			driversLicenseNumber :=  IF(l.dl_number <> '' AND 
-																	l.dl_state <> '' AND
+																	((l.dl_state <> '' AND
 																	l.dl_state = r.drivers_license_state AND
-																	l.dl_number  = r.drivers_license, 
+																	l.dl_number  = r.drivers_license)
+																	OR (platform = FraudShared_Services.Constants.Platform.FraudGov AND
+																	l.dl_number  = r.drivers_license)), 
 																	DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT}], 
 																			{STRING fragmentType}));
 																			

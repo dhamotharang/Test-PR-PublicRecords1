@@ -1,4 +1,4 @@
-import AMS,Address,AutoStandardI,DEA,iesp,doxie,suppress,deathv2_Services,NPPES,STD,Healthcare_Affiliations;
+﻿import AMS,Address,AutoStandardI,DEA,iesp,doxie,suppress,deathv2_Services,NPPES,STD,Healthcare_Affiliations;
 EXPORT Functions := MODULE
 	shared gm := AutoStandardI.GlobalModule();
 	//Cleaning Functions
@@ -938,6 +938,7 @@ EXPORT Functions := MODULE
 															self.UserState := right.st;
 															self.UserZip := right.z5;
 															self.dids := left.dids;
+															self.isDeepDiveResults := left.src = Constants.SRC_BOCA_PERSON_HEADER;
 															self.clianumbers := dataset([{right.CLIANumber}],layouts.layout_clianumber);
 															self.npis := left.npis;),
 												keep(Constants.MAX_RECS_ON_JOIN), limit(0));
@@ -1014,37 +1015,23 @@ EXPORT Functions := MODULE
 			glb_ok := deathparams.isValidGlb();
 			byDids := normalize(input,left.dids,transform(Layouts.layout_death_DID,self.acctno := left.acctno;self.ProviderID:=left.ProviderID;self.did:=right.did;self.ssn:=if(left.UserSSNFound,left.UserSSN,'');self.freq:=right.freq;self.dob:=if(left.UserDOBFound,left.UserDOB[1..6],'');self.UserSSNFound:=left.UserSSNFound;self:=[]));
 			byDids_BestFreq := dedup(sort(byDids,acctno,ProviderID,-freq),acctno,ProviderID);
-			deathRecs := join(byDids(SSN<>''),doxie.Key_Death_MasterV2_ssa_Did,
-									keyed(left.did = right.l_did)
-									and	not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
+      deathRecs			:=dx_death_master.Get.byDid(byDids,did, deathparams);
+			death_BestHit := join(byDids(SSN<>''),deathRecs,			
+									left.did = right.did,
 									transform(layouts.layout_death_BestHit,
-										matchbyDOB := left.dob <> '' and left.dob[1..6]=right.dob8[1..6];
-										matchbySSN := left.UserSSNFound and left.SSN = right.ssn;
+										matchbyDOB := left.dob <> '' and left.dob[1..6]=right.death.dob8[1..6];
+										matchbySSN := left.UserSSNFound and left.SSN = right.death.ssn;
 										keepRecord := map(matchbyDOB or matchbySSN => true,
 																		 left.dob <> '' and not matchbyDOB => false,
 																		 left.ssn <> '' and not matchbySSN => false,
 																		 true);
-										self.acctno:=if(keepRecord,left.acctno,skip); self.providerid :=left.providerid;self.death_ind:=true;self.dod:=right.dod8;self.besthit:=if(left.UserSSNFound and left.SSN=right.SSN,true,false)),
+										self.acctno:=if(keepRecord,left.acctno,skip); self.providerid :=left.providerid;self.death_ind:=true;self.dod:=right.death.dod8;self.besthit:=if(left.UserSSNFound and left.SSN=right.death.SSN,true,false)),
 									keep(1), limit(0));
-			death_BestHit := project(deathRecs(besthit=true),layouts.layout_death);
+			death_BestHitFmt := project(death_BestHit(besthit=true),layouts.layout_death);
 			//if you don't have the best record based on a match to user input, use the best freq.
-			death_NotBestHit := join(byDids_BestFreq,death_BestHit,left.acctno=right.acctno and left.ProviderID= right.ProviderID,left only);
-			death_BestFreq := join(death_NotBestHit,doxie.Key_Death_MasterV2_ssa_Did,
-									keyed(left.did = right.l_did)
-									and	not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-									transform(layouts.layout_death, 
-										matchbyDOB := left.dob <> '' and left.dob[1..6]=right.dob8[1..6];
-										matchbySSN := left.UserSSNFound and left.SSN = right.ssn;
-										keepRecord := map(matchbyDOB or matchbySSN => true,
-																		 left.dob <> '' and not matchbyDOB => false,
-																		 left.ssn <> '' and not matchbySSN => false,
-																		 true);
-										self.acctno:=if(keepRecord,left.acctno,skip); self.providerid :=left.providerid;self.death_ind:=true;self.dod:=right.dod8),
-									keep(1), limit(0));
-			death_final := sort(death_BestHit+death_BestFreq,acctno,ProviderID);
-
-			// output(input);
-			// output(death_final);
+			death_NotBestHit := join(byDids_BestFreq,death_BestHit(besthit=false),left.acctno=right.acctno and left.ProviderID= right.ProviderID,transform(right));
+			death_NotBestHitFmt := project(death_NotBestHit,layouts.layout_death);
+			death_final := death_BestHitFmt+death_NotBestHitFmt;
 		return death_final;
 	end;
 	Export appendDeath (dataset(layouts.layout_slim) inputSlim, 

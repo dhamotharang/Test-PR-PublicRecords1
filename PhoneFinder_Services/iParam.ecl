@@ -112,6 +112,7 @@ MODULE
     EXPORT BOOLEAN hasActivePhoneTransactionCountRule := FALSE;
     EXPORT BOOLEAN IsGovSearch := FALSE;
     EXPORT BOOLEAN UseInHousePhoneMetadataOnly := FALSE;
+    EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus := FALSE;
   END;
 
   EXPORT PhoneVerificationParams :=
@@ -286,6 +287,7 @@ MODULE
       EXPORT BOOLEAN hasActiveIdentityCountRules        := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId = $.Constants.RiskRules.IdentityCount AND Active)));
       EXPORT BOOLEAN hasActivePhoneTransactionCountRule := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount AND ACTIVE));
       EXPORT BOOLEAN IsGovsearch := application_type in AutoStandardI.Constants.GOV_TYPES;
+      EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus            :=  pfOptions.SuppressRiskIndicatorWarnStatus : STORED('SuppressRiskIndicatorWarnStatus'); // Need to read from stored for options defined in MBS for API transactions as they would come under the root tag;
     END;
 
     RETURN in_params;
@@ -399,6 +401,7 @@ MODULE
                                                       IncludeDeviceInfo OR IncludeDeviceChangeInfo;
       EXPORT BOOLEAN UseZumigoIdentity	          := IncludeZumigoOptions AND BillingId <>'' AND doxie.compliance.use_ZumigoIdentity(dpm);
       EXPORT BOOLEAN IsGovsearch := mod_access.application_type in AutoStandardI.Constants.GOV_TYPES;
+      EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus                 :=  FALSE : STORED('SuppressRiskIndicatorWarnStatus');
     END;
 
     RETURN input_Mod;

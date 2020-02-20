@@ -140,7 +140,8 @@ export Boca_Shell_BtSt_Service := macro
     'LexIdSourceOptout',
     '_TransactionId',
     '_BatchUID',
-    '_GCID'
+    '_GCID',
+		'UseIngestDate'
 	));
 
 string30 account_value := '' : stored('AccountNumber');
@@ -205,6 +206,7 @@ string20  DeviceProvider2_value := ''       				  : stored('DeviceProvider2');
 string20  DeviceProvider3_value := ''          	: stored('DeviceProvider3');
 string20 DeviceProvider4_value := ''       	: stored('DeviceProvider4');	
 string TypeOfOrder_value := risk_indicators.iid_constants.PhysicalOrder : stored('TypeOfOrder');
+boolean UseIngestDate             := FALSE : stored('UseIngestDate'); 
 
 //CCPA fields
 unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
@@ -348,7 +350,8 @@ if(FraudPointMode,
 	risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
 	0) +
 if(RetainInputDID, risk_indicators.iid_constants.BSOptions.RetainInputDID, 0) +
-if(version >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0);
+if(version >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0) +
+if(UseIngestDate, risk_indicators.iid_constants.BSOptions.UseIngestDate, 0);
 
 ln_branded := false;
 ofac_only := true;

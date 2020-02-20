@@ -25,7 +25,9 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     getBusinessAssociationReportData := DueDiligence.reportIndBusAssoc(getAircraftData, options, linkingOptions, mod_access);
     
-    getIdentityReportData := DueDiligence.reportIndIdentity(getBusinessAssociationReportData);
+    getIdentityReportData := DueDiligence.reportIndIdentity(getBusinessAssociationReportData, options, ssnMask, mod_access);
+    
+    getMobilityReportData := DueDiligence.reportIndMobility(getIdentityReportData, options, mod_access);
 
 
 
@@ -38,7 +40,8 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     // OUTPUT(getVehicleData, NAMED('getVehicleData'));
     // OUTPUT(getBusinessAssociationReportData, NAMED('getBusinessAssociationReportData'));
     // OUTPUT(getIdentityReportData, NAMED('getIdentityReportData'));
+    // OUTPUT(getMobilityReportData, NAMED('getMobilityReportData'));
 
 
-    RETURN getIdentityReportData;     
+    RETURN getMobilityReportData;     
 END;

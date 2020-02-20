@@ -1616,14 +1616,34 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 																										SELF.InputIDMatchStatus := calculateValueFor._InputIDMatchStatusBHeader(RawInputIDMatchStatus, GoldStatus);
 																										
 																									), LEFT OUTER, LIMIT(Business_Risk_BIP.Constants.Limit_BusHeader), KEEP(1)); 																
-	withIDMatchStatus := JOIN(withAddrResInd, BusinessHeaderIDStatus, LEFT.Seq = RIGHT.Seq,
+	
+  withIDMatchStatus := JOIN(withAddrResInd, BusinessHeaderIDStatus, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Verification.InputIDMatchCategory := RIGHT.InputIDMatchCategory,
 																							SELF.Verification.InputIDMatchStatus := RIGHT.InputIDMatchStatus,
+                                              SELF.Firmographic.FirmNonProfitFlag := IF( EXISTS(LEFT.Sources(Source = Business_Risk_BIP.Constants.Src_IRS_Non_Profit)), '1', '0' ),
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 	
-	withErrorCodes := JOIN(withIDMatchStatus, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
+  tbl_whetherPubliclyTraded := 
+    TABLE(
+      BusinessHeader,
+      {seq, FirmPublicFlag := IF( company_ticker != '', '1', '0' ) },
+      Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) 
+    ); 
+  
+  withFirmPublicFlag :=
+    JOIN(
+      withIDMatchStatus, tbl_whetherPubliclyTraded,
+      LEFT.Seq = RIGHT.Seq,
+      TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+        SELF.Firmographic.FirmPublicFlag := RIGHT.FirmPublicFlag,
+        SELF := LEFT
+      ),
+      LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW
+    );
+  
+	withErrorCodes := JOIN(withFirmPublicFlag, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeBusinessHeader := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
@@ -1638,6 +1658,7 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 	// OUTPUT(CHOOSEN(linkIDGroups, 100), NAMED('Sample_linkIDGroups'));
 	// OUTPUT(COUNT(BusinessHeader), NAMED('Total_BusinessHeader'));
 	// OUTPUT(CHOOSEN(BusinessHeader, 100), NAMED('Sample_BusinessHeader'));
+  // OUTPUT(CHOOSEN(Shell, 100), NAMED('Input_Shell'));
 	// OUTPUT(CHOOSEN(BusinessHeaderSourceStats, 100), NAMED('Sample_BusinessHeaderSourceStats'));
 	// OUTPUT(CHOOSEN(BusinessHeaderUniqueContactDIDs, 1000), NAMED('Sample_BusinessHeaderUniqueContactDIDs'));
 	// OUTPUT(CHOOSEN(getBestContactInfo, 1000), NAMED('Sample_getBestContactInfo'));
@@ -1658,6 +1679,6 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 	// OUTPUT(CHOOSEN(BusinessHeaderIDStatus, 100), NAMED('Sample_BusinessHeaderIDStatus'));
 	// OUTPUT(CHOOSEN(withIDMatchStatus, 100), NAMED('Sample_withIDMatchStatus'));
 	// OUTPUT(CHOOSEN(withErrorCodes, 100), NAMED('Sample_withErrorCodes'));
-	
+  
 	RETURN UNGROUP(withErrorCodes);
 END;

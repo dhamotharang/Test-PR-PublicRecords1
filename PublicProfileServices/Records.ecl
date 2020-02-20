@@ -97,10 +97,6 @@ EXPORT Records := MODULE
   EXPORT PersonSummary(PublicProfileServices.IParam.searchParams rptByMod_new) := FUNCTION
     mod_access := PROJECT (rptByMod_new, doxie.IDataAccess);
 
-    //create a module compatible with the old person-report
-    rptByMod := MODULE (PersonReports.input._report)
-      PersonReports.input.mac_copy_report_fields(rptByMod_new);
-    END;
     getID(iesp.sexualoffender.t_SexOffRecordIdNumbers recID) := FUNCTION
       ID := MAP(TRIM(recID.OffenderId)!='' => recID.OffenderId,
                 TRIM(recID.DocNumber)!='' => recID.DocNumber,
@@ -121,6 +117,7 @@ EXPORT Records := MODULE
       EXPORT STRING14 did := (STRING)dids[1].did;
     END;
     crmMod := MODULE(PROJECT(glbMod,CriminalRecords_Services.IParam.report,opt))
+      doxie.compliance.MAC_CopyModAccessValues(mod_access);
       EXPORT STRING14 did := (STRING)dids[1].did;
       EXPORT STRING25 doc_number := '';
       EXPORT STRING60 offender_key := '';
@@ -131,6 +128,7 @@ EXPORT Records := MODULE
       EXPORT STRING14 did := (STRING)dids[1].did;
     END;
     hntMod := MODULE(PROJECT(glbMod,Hunting_Fishing_Services.Search_Records.params,opt))
+      doxie.compliance.MAC_CopyModAccessValues(mod_access);
       EXPORT STRING14 did := (STRING)dids[1].did;
     END;
     intMod := MODULE(PROJECT(glbMod,InternetDomain_Services.SearchService_Records.params,opt))
@@ -142,7 +140,7 @@ EXPORT Records := MODULE
     accidents_mode := MODULE (project (glbMod, PersonReports.input.accidents, opt)) //?
       EXPORT boolean mask_dl := rptByMod_new.dl_mask = 1;
     END;
-    sexoffenses_mode := MODULE (project (rptByMod, PersonReports.input.sexoffenses)) END;
+    sexoffenses_mode := MODULE (project (rptByMod_new, PersonReports.IParam.sexoffenses)) END;
 
     iesp.public_profile_report.t_PublicProfileIndividual setIndividual() := TRANSFORM
       SELF.UniqueId := IF(dids[1].did>0,(STRING)dids[1].did,'');
@@ -155,7 +153,7 @@ EXPORT Records := MODULE
       SELF.FictitiousBusinesses := CHOOSEN(GLOBAL(doxie.Comp_FBN2Search(dids)),iesp.Constants.BR.MaxFictitiousBusinesses);
       SELF.NoticesOfDefaults := CHOOSEN(GLOBAL(Foreclosure_Services.Records.val(nodMod,mod_access,TRUE)),IESP.CONSTANTS.PUBLICPROFILE.MAX_NOTICE_OF_DEFAULTS);
       SELF.Foreclosures := CHOOSEN(GLOBAL(Foreclosure_Services.ReportService_Records.val(forMod,mod_access)),IESP.CONSTANTS.PUBLICPROFILE.MAX_FORECLOSURES);
-      ucc_mode := module (project(rptByMod_new, PersonReports.IParam.ucc, OPT)) 
+      ucc_mode := module (project(rptByMod_new, PersonReports.IParam.ucc, OPT))
         export string1 ucc_party_type := 'D';
       end;
       SELF.UCCFilings := CHOOSEN(GLOBAL(PersonReports.ucc_records(dids, ucc_mode).ucc_v2),iesp.Constants.BR.MaxUCCFilings);
@@ -178,7 +176,7 @@ EXPORT Records := MODULE
       props_mod := module (project(rptByMod_new, PersonReports.IParam.property, opt)) end;
       SELF.Properties := CHOOSEN(GLOBAL(PersonReports.Property_Records(dids,mod_access,props_mod).property_v2),iesp.Constants.BR.MaxProperties);
       SELF.HasProperty := COUNT(SELF.Properties)>0;
-      liens_mod := module (project(rptByMod_new, PersonReports.IParam.liens, OPT)) 
+      liens_mod := module (project(rptByMod_new, PersonReports.IParam.liens, OPT))
         export string1 leins_party_type := 'D';
       end;
       SELF.LiensJudgments := CHOOSEN(GLOBAL(project(PersonReports.lienjudgment_records(dids, liens_mod).liensjudgment_v2,iesp.lienjudgement.t_LienJudgmentReportRecord)),iesp.Constants.BR.MaxLiensJudgments);
@@ -200,7 +198,7 @@ EXPORT Records := MODULE
       SELF.WaterCrafts := CHOOSEN(GLOBAL(PersonReports.Watercraft_Records(dids, watercrafts_mod).watercrafts_v2),iesp.Constants.BR.MaxWatercrafts);
       pp_mod := module (PROJECT(rptByMod_new, PersonReports.IParam.phonesplus, OPT)) end;
       SELF.PhonesPluses := CHOOSEN(GLOBAL(PersonReports.phonesplus_records(dids, pp_mod).phonesplus_v2),iesp.Constants.BR.MaxPhonesPlus);
-      SELF.EmailAddresses := CHOOSEN(GLOBAL(PersonReports.email_records(dids,PROJECT(rptByMod_new,PersonReports.IParam.emails))),iesp.Constants.BR.MaxEmails);
+      SELF.EmailAddresses := CHOOSEN(GLOBAL(PersonReports.email_records(dids,PROJECT(rptByMod_new,PersonReports.IParam.emails, OPT))),iesp.Constants.BR.MaxEmails);
     END;
 
     RETURN ROW(setIndividual());

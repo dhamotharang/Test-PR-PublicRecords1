@@ -1,8 +1,8 @@
-IMPORT paw, riskwise, ut, risk_indicators, Business_Header, doxie, Business_Header_SS, did_add, 
-Address, header, Relationship;
+﻿IMPORT paw, riskwise, risk_indicators, Business_Header, doxie, Business_Header_SS, did_add, Suppress, 
+Address, header, Relationship, AML;
 
-export IndGetBusnAssoc( DATASET(Layouts.LayoutAMLShellV2) BusnIndv
-													 ) := FUNCTION;
+export IndGetBusnAssoc( DATASET(Layouts.LayoutAMLShellV2) BusnIndv,
+											doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION;
 //version 2
 patw := record
   unsigned4 seq;
@@ -42,7 +42,7 @@ withPAW := join(BusnIndv, paw.Key_Did,
 
 
 
-pawTitle := join(withPAW, paw.Key_contactid,
+pawTitle_unsuppressed := join(withPAW, paw.Key_contactid,
 						right.contact_id<>0 and 
 						right.bdid <> 0 and
 						right.company_title <> '' and
@@ -51,7 +51,8 @@ pawTitle := join(withPAW, paw.Key_contactid,
 						(AMLTitleRank(right.company_title) <= 3) and
 						keyed(left.contact_id=right.contact_id) 
 						and (unsigned)right.dt_first_seen[1..6] < left.historydate, 
-						transform(patw,
+						transform({patw, unsigned4 global_sid},
+											self.global_sid := right.global_sid;
 											self.seq := left.seq;
 											self.did := left.did;
 											self.origdid := left.origdid;
@@ -67,7 +68,7 @@ pawTitle := join(withPAW, paw.Key_contactid,
 											// left outer,
 						atmost(riskwise.max_atmost), keep(1));  //KEEP 1  - ABOUT THE INDIVIDUAL IF YOU CAN FILTER ON COMPANY TITLE
 						
-
+pawTitle := Suppress.Suppress_ReturnOldLayout(pawTitle_unsuppressed, mod_access, patw);
 						
 BusnExecs := dedup(sort(pawTitle(BusnExec <= 3), seq,did,bid), seq,did,bid);
 
@@ -117,7 +118,7 @@ withAssocPAW := join(DDBusnExecNetw, paw.Key_Did,
 											self := []),
 						 atmost(riskwise.max_atmost), keep(200));  //removed left outer
 											
-pawAssocTitle := join(withAssocPAW, paw.Key_contactid,
+pawAssocTitle_unsuppressed := join(withAssocPAW, paw.Key_contactid,
 						right.contact_id<>0 and 
 						right.bdid <> 0 and
 						right.bdid = (integer)left.bid and
@@ -126,7 +127,8 @@ pawAssocTitle := join(withAssocPAW, paw.Key_contactid,
 						trim(right.company_status)<>'DEAD' and
 						keyed(left.contact_id=right.contact_id) 
 						and (unsigned)right.dt_first_seen[1..6] < left.historydate, 
-						transform(patw,
+						transform({patw, unsigned4 global_sid},
+											self.global_sid := right.global_sid;
 											self.seq := left.seq;
 											self.did := left.did;
 											self.origdid := left.origdid;
@@ -140,6 +142,7 @@ pawAssocTitle := join(withAssocPAW, paw.Key_contactid,
 											),
 						atmost(riskwise.max_atmost), keep(200)); 
 						
+pawAssocTitle := Suppress.Suppress_ReturnOldLayout(pawAssocTitle_unsuppressed, mod_access, patw);
 
  AssocBusnExecs := dedup(sort(pawAssocTitle, seq,did,bid), seq,did,bid);  
  
@@ -165,10 +168,10 @@ pawAssocTitle := join(withAssocPAW, paw.Key_contactid,
 	DDAssocExecs_dids := PROJECT(DDAssocExecs_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.Assocdid));
 
-	rellyids := Relationship.proc_GetRelationship(DDAssocExecs_dids,TopNCount:=100,
+	rellyids := Relationship.proc_GetRelationshipNeutral(DDAssocExecs_dids,TopNCount:=100,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result; 
 
- Layouts.AMLExecLayoutV2  Getparents(DDAssocExecs le, rellyids ri) := TRANSFORM 
+ Layouts.AMLExecLayoutV2  Getparents(DDAssocExecs le, Relationship.layout_GetRelationship.interfaceOutputNeutral ri) := TRANSFORM 
 	
 		self.seq := le.seq;
 		self.origdid := le.origdid;

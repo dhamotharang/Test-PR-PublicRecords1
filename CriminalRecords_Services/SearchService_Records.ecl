@@ -1,11 +1,11 @@
-﻿import AutoStandardI, doxie_files, ut, doxie, suppress, iesp, NID, FCRA, FFD, Gateway;
+﻿import AutoStandardI, ut, doxie, suppress, iesp, NID, FCRA, FFD, Gateway;
 
 export SearchService_Records := module
 
   export shared_val(CriminalRecords_Services.IParam.search in_params,
              boolean isFCRA = false) := function
     
-    is_cnsmr := ut.IndustryClass.is_Knowx;
+    is_cnsmr := in_params.isConsumer();
     // corrections on FCRA side require using overrides flag file. If isFCRA, then we have a DID in incoming in_params
     did_rec := if(isFCRA, project(dataset([{in_params.did}], doxie.layout_references), transform(doxie.layout_best, self:=left,self:=[])));
     
@@ -153,20 +153,19 @@ export SearchService_Records := module
     
     quality_recs := if(in_params.StrictMatch, recs_strict, recs_plus_pen(penalt <= pthreshold_translated));
     
-    Suppress.MAC_Suppress(quality_recs,pull_1,in_params.ApplicationType,Suppress.Constants.LinkTypes.DID,did);
-    Suppress.MAC_Suppress(pull_1,pull_2,in_params.ApplicationType,Suppress.Constants.LinkTypes.SSN,ssn);
-    Suppress.MAC_Suppress(pull_2,pull_3,in_params.ApplicationType,,,Suppress.Constants.DocTypes.OffenderKey,offender_key);
+    Suppress.MAC_Suppress(quality_recs,pull_1,in_params.application_type,Suppress.Constants.LinkTypes.DID,did);
+    Suppress.MAC_Suppress(pull_1,pull_2,in_params.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
+    Suppress.MAC_Suppress(pull_2,pull_3,in_params.application_type,,,Suppress.Constants.DocTypes.OffenderKey,offender_key);
     
     doxie.MAC_PruneOldSSNs(pull_3, out_f_p1, ssn, did, isFCRA);
     doxie.MAC_PruneOldSSNs(out_f_p1, out_f_p2, ssn_appended, did, isFCRA);
 
-    doxie.MAC_Header_Field_Declare(isFCRA);
-    suppress.MAC_Mask(out_f_p2, out_intm, ssn, blank, true, false);
-    suppress.MAC_Mask(out_intm, out_mskd, ssn_appended, blank, true, false);
+    suppress.MAC_Mask(out_f_p2, out_intm, ssn, blank, true, false, maskVal := in_params.ssn_mask);
+    suppress.MAC_Mask(out_intm, out_mskd, ssn_appended, blank, true, false, maskVal := in_params.ssn_mask);
 
     // ---- Final formatting ----
-    added_in_mod := project(in_params, functions.params);
-    recs_fmt := CriminalRecords_Services.Functions.fnCrimSearchVal(out_mskd, added_in_mod);
+    ds_with_offenses := CriminalRecords_Services.Functions.fnAppendOffenses(out_mskd,in_params,isFCRA);
+    recs_fmt := CriminalRecords_Services.Functions.fnCrimSearchVal(ds_with_offenses);
     
     recs_sort := sort(
       recs_fmt,

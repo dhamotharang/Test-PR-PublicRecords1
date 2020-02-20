@@ -22,9 +22,8 @@ MACRO
     KEYED(udid=did) AND ~(isCNSMR AND email_src IN D2C.Constants.EmailRestrictedSources))),1,0);
 
   //PhonePlus Count------------------------------------------------------------------
-  doxie.MAC_Get_GLB_DPPA_PhonesPlus(dataset ([{udid}], doxie.layout_references),
-    phplus_key, TRUE, TRUE, mod_access.glb, mod_access.dppa, mod_access.industry_class,
-    ,,,,mod_access.DataRestrictionMask,
+  phplus_key := doxie.MAC_Get_GLB_DPPA_PhonesPlus(dataset ([{udid}], doxie.layout_references), mod_access,
+    TRUE, TRUE,,,,,,
     TRUE); // skip penalizing;
 
   // Need to apply the same deduping / filtering as in doxie.phone_noreconn_search.
@@ -60,7 +59,7 @@ MACRO
   END;
 
   did_rec := DATASET ([prep_did()]);
-  all_assoct := Relationship.proc_GetRelationship(
+  all_assoct := Relationship.proc_GetRelationshipNeutral(
     DID_ds := did_rec,
     RelativeFlag := TRUE,
     AssociateFlag := TRUE,

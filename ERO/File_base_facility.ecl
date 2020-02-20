@@ -1,1 +1,0 @@
-EXPORT File_base_facility := dataset('~thor_data400::base::facility_list',ERO.Layout_Facility_base,flat);

@@ -1,4 +1,4 @@
-﻿IMPORT Autokey_batch, DeltabaseGateway, Doxie, BatchServices, BatchShare, iesp, Phones, PhonesInfo;
+﻿IMPORT Autokey_batch, DeltabaseGateway, Doxie, BatchServices, BatchShare, iesp, Phones;
 
 EXPORT Layouts :=
 MODULE
@@ -12,6 +12,7 @@ MODULE
 	EXPORT PhonesCommon :=
 	RECORD(doxie.layout_pp_raw_common)
 		BatchIn batch_in;
+    DATASET({STRING3 src}) Phn_src_all;
 	END;
 	EXPORT PhoneAcctno := RECORD
 		STRING20 acctno;
@@ -207,6 +208,7 @@ MODULE
 		string2			high_risk_indicator;
 		string2			prepaid;
 		string10 		phone_swap;
+		string2			transaction_code;
 		unsigned8		swap_start_dt;
 		string6			swap_start_time;
 		unsigned8		swap_end_dt;
@@ -233,6 +235,7 @@ MODULE
 		unsigned	count_otp_180;
 		unsigned	count_otp_365;
 		unsigned	count_otp_730;
+
 	END;
 
 	EXPORT PhoneAttributes := MODULE
@@ -265,7 +268,7 @@ MODULE
 			BatchIn;
 			boolean 	is_current;
 			unsigned8 	event_date;
-			string4 	event_type;
+			string 	event_type;
 			unsigned8	disconnect_date;
 			unsigned8	ported_date;
 			string		carrier_id;

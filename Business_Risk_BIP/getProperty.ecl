@@ -18,8 +18,25 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Figure out if the kFetch was successful
 	kFetchErrorCodes := Business_Risk_BIP.Common.GrabFetchErrorCode(PropertySeq);
 	
-	// Filter out records after our history date
-	Property := Business_Risk_BIP.Common.FilterRecords(PropertySeq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_LnPropV2_Fares_Asrs, AllowedSourcesSet);
+	// Filter out records after our history date. Set sourceCode to null string for FilterRecords so all Property 
+	// records return whether Marketing restriction is indicated or not.
+	Property_pre := Business_Risk_BIP.Common.FilterRecords(PropertySeq, dt_first_seen, dt_vendor_first_reported, '', AllowedSourcesSet);
+
+	// Under the most recent definition for source codes that are allowed for Marketing purposes, all Property
+	// are ALLOWED with the exception of the following states ['ID','IL','KS','NM','SC','WA', ''] when they are
+	// in records whose src type is src_LnPropV2_Lexis_Asrs or src_LnPropV2_Lexis_Deeds_Mtgs (i.e. 'LA','LP').
+	Property_with_src := 
+		PROJECT(
+			Property_pre,
+			TRANSFORM( { RECORDOF(Property_pre), STRING src },
+				SELF.src := MDR.SourceTools.fProperty(LEFT.ln_fares_id),
+				SELF := LEFT
+			)
+		);
+	
+	Property := IF( Options.MarketingMode = 1,
+			Property_with_src(src IN AllowedSourcesSet AND Business_Risk_BIP.Common.isMarketingAllowedProperty(src, st)),
+			Property_with_src);
 	
 	PropertyWithBest := JOIN(DEDUP(SORT(Property, Seq, LN_Fares_ID), Seq, LN_Fares_ID), Shell, LEFT.Seq = RIGHT.Seq,
 															TRANSFORM({RECORDOF(LEFT), BOOLEAN AddrIsBest},
@@ -168,6 +185,7 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		
 		
 	END;
+  
 	RepPropertyOwned := JOIN(Shell, OwnershipKey, (LEFT.Clean_Input.Rep_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep_LexID = RIGHT.DID) or
 																									LEFT.Clean_Input.Rep2_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep2_LexID = RIGHT.DID) or
 																									LEFT.Clean_Input.Rep3_LexID > 0 AND KEYED(LEFT.Clean_Input.Rep3_LexID = RIGHT.DID) or

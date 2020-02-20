@@ -597,7 +597,7 @@ DiffPct_Avg_matched_TopOne := (Diff_Avg_matched_TopOne)/Prev_Avg_matched_TopOne*
 	XtabOut := ITERATE(output_full, Xform(LEFT, RIGHT));
 
 // final := FileServices.SendEmail('Benjamin.Karnatz@lexisnexisrisk.com', 'PhoneShell Cert Tracking Report: MaxDiff ' + max_diff + ' Max Unexpected Diff ' + max_unexpected_diff, XtabOut[COUNT(XtabOut)].line);
-final := FileServices.SendEmail('Benjamin.Karnatz@lexisnexisrisk.com;Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;Blake.Huebner@lexisnexisrisk.com;Barbara.Gress@lexisnexisrisk.com;Brent.Sorenson@lexisnexisrisk.com;jim.corbin@lexisnexisrisk.com', 'PhoneShell Cert Tracking Report: MaxDiff ' + max_diff + ' Max Unexpected Diff ' + max_unexpected_diff, XtabOut[COUNT(XtabOut)].line);
+final := FileServices.SendEmail('Benjamin.Karnatz@lexisnexisrisk.com;Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;Blake.Huebner@lexisnexisrisk.com;Barbara.Gress@lexisnexisrisk.com;Brent.Sorenson@lexisnexisrisk.com;jim.corbin@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com', 'PhoneShell Cert Tracking Report: MaxDiff ' + max_diff + ' Max Unexpected Diff ' + max_unexpected_diff, XtabOut[COUNT(XtabOut)].line);
 
 return final;
 

@@ -1,5 +1,5 @@
 ﻿
-IMPORT BusinessInstantID20_Services, iesp, Risk_Indicators, RiskWise, Seed_Files, STD;
+IMPORT BusinessInstantID20_Services, iesp, Risk_Indicators, Seed_Files, STD;
 
 EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) inData = DATASET([],BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo),
 																STRING32 TestDataTableName_in = '',
@@ -25,13 +25,13 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 		self.dataset_name := TestDataTableName_in;
 
 		self.hashkey := Seed_Files.Hash_InstantID(
-		                    StringLib.StringToUpperCase(trim(le.AuthReps[1].FirstName)), // fname,
-		                    StringLib.StringToUpperCase(trim(le.AuthReps[1].LastName)),  // lname,
+		                    STD.STR.ToUpperCase(trim(le.AuthReps[1].FirstName)), // fname,
+		                    STD.STR.ToUpperCase(trim(le.AuthReps[1].LastName)),  // lname,
 		                    risk_indicators.nullstring,  // ssn -- not used in business products,
-		                    StringLib.StringToUpperCase(trim(le.FEIN)),         // fein,
-		                    StringLib.StringToUpperCase(trim(le.Zip)),          // zip,
-		                    StringLib.StringToUpperCase(trim(le.Phone10)),      // phone,
-		                    StringLib.StringToUpperCase(trim(le.CompanyName))); // company_name
+		                    STD.STR.ToUpperCase(trim(le.FEIN)),         // fein,
+		                    STD.STR.ToUpperCase(trim(le.Zip)),          // zip,
+		                    STD.STR.ToUpperCase(trim(le.Phone10)),      // phone,
+		                    STD.STR.ToUpperCase(trim(le.CompanyName))); // company_name
 		self := [];
 	END;
 	

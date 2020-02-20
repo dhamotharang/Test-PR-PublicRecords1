@@ -4,7 +4,8 @@
   SHARED boolean hasNum(integer n1) := n1>0;
 
   EXPORT BuildValidityRecs(
-    DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in
+    DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
+		string fraud_platform = ''
   ) := FUNCTION
 
     FraudShared_Services.Layouts.BatchIn_Valid_rec xfm_ValidRecs(FraudShared_Services.Layouts.BatchIn_rec L) := TRANSFORM
@@ -27,7 +28,7 @@
       boolean hasTin := hasTxt(L.tin);
       boolean hasGeo := hasTxt(L.geo_lat) AND hasTxt(L.geo_long);
       boolean hasBankAccount := hasTxt(L.bank_account_number);
-      boolean hasDL := hasTxt(L.dl_state) AND hasTxt(L.dl_number);
+      boolean hasDL := IF(fraud_platform = FraudShared_Services.Constants.Platform.FraudGov, hasTxt(L.dl_number), hasTxt(L.dl_state) AND hasTxt(L.dl_number));
 
       SELF.hasFullName           := hasFullName;
       SELF.hasPhysicalAddress    := hasPhysicalAddress;

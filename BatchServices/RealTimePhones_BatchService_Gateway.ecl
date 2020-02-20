@@ -7,7 +7,7 @@ EXPORT RealTimePhones_BatchService_Gateway(dataset(in_layout) f_in,
 																					 BatchServices.RealTimePhones_Params.Params g_mod, string10 searchtype)
 			 := FUNCTION
  
-  gw_rec := Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse;
+  gw_rec := Doxie_Raw.PhonesPlus_Layouts.PhonePlusSearchResponse_Ext;
 	flat_out := BatchServices.Layouts.RTPhones.rec_output_internal;
 	gw_out_rec := record   //temporary structure to hold all resulting rows for each request (acct).
 	    string20 acctno;
@@ -34,9 +34,9 @@ EXPORT RealTimePhones_BatchService_Gateway(dataset(in_layout) f_in,
     end;
 		
 		call_gateway := ~(L.resultcount >= g_mod.maxResults);
-		gw_results1 := IF ( ~call_gateway,dataset([],gw_rec),choosen(doxie_raw.RealTimePhones_Raw(in_gateways, 30, 0, in_mod1, call_gateway),		
-		                               g_mod.maxResults));
-		self.gw_results := gw_results1;													 
+		self.gw_results := IF (~call_gateway, dataset([],gw_rec),
+			choosen(doxie_raw.RealTimePhones_Raw(in_mod1, in_gateways, 30, 0, call_gateway), g_mod.maxResults)
+			);													 
 		self.acctno := l.acctno;  
 		self.orig_acctno := l.orig_acctno;  
 		self := l;
@@ -76,9 +76,7 @@ EXPORT RealTimePhones_BatchService_Gateway(dataset(in_layout) f_in,
 				export string20 acctno := L2.ORIG_ACCTNO;
 				export string uid := g_mod.uid;
 			end;
-			gw_results2 := choosen(doxie_raw.RealTimePhones_Raw(in_gateways, 30, 0, in_mod2),	    
-																 g_mod.maxResults);
-	    self.gw_results := gw_results2; 
+	    self.gw_results := choosen(doxie_raw.RealTimePhones_Raw(in_mod2, in_gateways, 30, 0),	g_mod.maxResults); 
     	self.acctno := l2.acctno;
 	    self := [];
   end;

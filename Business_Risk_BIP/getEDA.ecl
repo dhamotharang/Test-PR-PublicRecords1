@@ -103,12 +103,14 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		// A BNAP of 4, 5, or 8 should also update the PhoneMatch flag as we effectively have verified the input phone against the input Business Name AND/OR Business Address
 		SELF.PhoneMatch := Business_Risk_BIP.Common.SetBoolean(BNAPCalc IN ['4', '5', '8']);
 		
-		Sources  := DATASET([{MDR.SourceTools.src_Gong_History, 
+		Sources  := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31 AND Options.MarketingMode = 1,
+                    DATASET([], Business_Risk_BIP.Layouts.LayoutSources),
+                    DATASET([{MDR.SourceTools.src_Gong_History, 
 													Business_Risk_BIP.Common.checkInvalidDate(((STRING)ri.dt_first_Seen), Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate)[1..6], 
 													Business_Risk_BIP.Constants.MissingDate, //no vendor dates 
 													Business_Risk_BIP.Common.checkInvalidDate(((STRING)ri.dt_last_seen), Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate)[1..6], 
 													Business_Risk_BIP.Constants.MissingDate, //no vendor dates
-													1}], Business_Risk_BIP.Layouts.LayoutSources);
+													1}], Business_Risk_BIP.Layouts.LayoutSources));
 																													
 		SELF.PhoneSources := IF(BNAPCalc IN ['4', '5', '8'], Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
 		SELF.NameSources := IF(Options.BusShellVersion >= 22 AND BNAPCalc IN ['5', '8'], Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources)); // Require Name and Phone match and Business shell version of 2.2 or higher to retain source

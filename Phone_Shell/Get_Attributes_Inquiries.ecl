@@ -2,7 +2,7 @@
  * 			 This function gathers the Inquiries attributes.									*
  ************************************************************************ */
 
-IMPORT Inquiry_AccLogs, Phone_Shell, RiskWise, STD, doxie;
+IMPORT Inquiry_AccLogs, Phone_Shell, RiskWise, STD, doxie, Suppress;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inquiries (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input,
                                                                                         UNSIGNED2 PhoneShellVersion = 10, // PhoneShell V1.0 default
@@ -26,7 +26,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 	/* ************************************************************************
 	 *  Get the Inquiry Records																								*
 	 ************************************************************************ */
-	layoutInquiries getInquiries(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Inquiry_AccLogs.Key_Inquiry_Phone ri) := TRANSFORM
+	{layoutInquiries, unsigned4 global_sid} getInquiries(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Inquiry_AccLogs.Key_Inquiry_Phone ri) := TRANSFORM
+		SELF.global_sid := ri.ccpa.global_sid;
 		good_inquiry := Inquiry_AccLogs.Shell_Constants.Valid_Phone_Shell_Inquiry(ri.search_info.function_description,
 																																							ri.bus_intel.use,
 																																							ri.search_info.product_code);
@@ -84,9 +85,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		SELF := le;
 	END;
 	
-	inquiryResults := JOIN(Input, Inquiry_AccLogs.Key_Inquiry_Phone, TRIM(LEFT.Gathered_Phone) <> '' AND	KEYED(LEFT.Gathered_Phone = RIGHT.phone10),
+	inquiryResults_unsuppressed := JOIN(Input, Inquiry_AccLogs.Key_Inquiry_Phone, TRIM(LEFT.Gathered_Phone) <> '' AND	KEYED(LEFT.Gathered_Phone = RIGHT.phone10),
 																	getInquiries(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (good_inquiry = TRUE);
-																	
+	inquiryResults := Suppress.Suppress_ReturnOldLayout(inquiryResults_unsuppressed, mod_access, layoutInquiries);									
 	/* ************************************************************************
 	 *  Count the various inquiry records																			*
 	 ************************************************************************ */

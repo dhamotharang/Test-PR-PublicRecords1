@@ -69,11 +69,16 @@
   EXPORT PhoneFinder :=
   MODULE
 
+    EXPORT Src_Rec :=
+    RECORD
+      STRING3 Src;
+    END;
     // Phones common layout
     EXPORT Common :=
     RECORD(doxie.layout_pp_raw_common)
       BatchInAppendDID batch_in;
       UNSIGNED1        phone_source;
+      DATASET(Src_Rec) Phn_src_all;
     END;
     // ACCUDATA IN LAYOUT
     EXPORT Accudata_in := RECORD
@@ -230,7 +235,7 @@
       STRING3                                           Phone_Digits;
       STRING15                                          Encrypted_Experian_PIN;
       // QSent phone detail fields
-      Doxie_Raw.PhonesPlus_Layouts.t_RealTimePhone_Ext1 RealTimePhone_Ext;
+      Doxie_Raw.PhonesPlus_Layouts.t_RealTimePhone_Ext RealTimePhone_Ext;
       Porting;
       SpoofingData;
       OneTimePassword;
@@ -268,6 +273,8 @@
       INTEGER                                               imei_Tenure_MaxDays;
       INTEGER                                               sim_Tenure_MinDays;
       INTEGER                                               sim_Tenure_MaxDays;
+      DATASET(Src_Rec)                                      Phn_src_all;
+      DATASET(iesp.phonefinder.t_PhoneFinderSourceIndicator) SourceInfo;
     END;
 
     EXPORT ExcludePhones :=
@@ -317,10 +324,11 @@
       BOOLEAN   is_identity_verified;
       BOOLEAN   is_phone_verified;
       STRING100 verification_desc;
+      DATASET(Src_Rec) Phn_src_all;
     END;
 
     EXPORT PhoneSlim :=
-    RECORD(Doxie_Raw.PhonesPlus_Layouts.t_RealTimePhone_Ext1)
+    RECORD(Doxie_Raw.PhonesPlus_Layouts.t_RealTimePhone_Ext)
       STRING20  acctno;
       UNSIGNED2 penalt;
       STRING2   vendor_id;
@@ -381,6 +389,7 @@
       INTEGER  sim_Tenure_MaxDays;
       INTEGER  imei_Tenure_MinDays;
       INTEGER  imei_Tenure_MaxDays;
+      DATASET(Src_Rec) Phn_src_all;
     END;
 
     EXPORT IdentityIesp :=

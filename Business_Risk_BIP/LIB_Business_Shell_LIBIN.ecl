@@ -30,4 +30,9 @@ EXPORT LIB_Business_Shell_LIBIN := INTERFACE
 	export string16 bus_TransactionID := '';
 	export string16 bus_BatchUID := '';
 	export unsigned6 bus_GlobalCompanyId := 0;
+	EXPORT BOOLEAN    BIPAppend_AllowInvalidResults                   := FALSE;
+  EXPORT UNSIGNED1  BIPAppend_ScoreThreshold                        := 75;
+	EXPORT UNSIGNED1  BipAppend_WeightThreshold                       := 44;
+	EXPORT BOOLEAN    BIPAppend_primForce                             := FALSE;
+
 END;

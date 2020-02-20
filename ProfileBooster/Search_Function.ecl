@@ -11,20 +11,21 @@ EXPORT Search_Function(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_In,
 												unsigned1 LexIdSourceOptout = 1,
 												string TransactionID = '',
 												string BatchUID = '',
-												unsigned6 GlobalCompanyId = 0
+												unsigned6 GlobalCompanyId = 0,
+												unsigned1 GLBA = 0,
+												unsigned1 DPPA = 0
 												) := FUNCTION
 
 mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := GLBA;
+	EXPORT dppa := ^.DPPA;
 	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
 	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
 	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
 END;
 
 BOOLEAN DEBUG := FALSE;
-
 	isFCRA 			:= false;
-	GLBA 				:= 0;
-	DPPA 				:= 0;
 	BSOptions := Risk_Indicators.iid_constants.BSOptions.RetainInputDID;
 	bsversion := 50;
 	append_best := 0;	
@@ -246,7 +247,13 @@ donotmail_key := dma.key_DNM_Name_Address;
 									keyed(left.DID = right.l_did),
 									getDeceasedDID(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));
 	
-	withDeceasedDID_roxie := Suppress.Suppress_ReturnOldLayout(withDeceasedDID_roxie_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
+	withDeceasedDID_roxie_flagged := Suppress.MAC_FlagSuppressedSource(withDeceasedDID_roxie_unsuppressed, mod_access);
+
+	withDeceasedDID_roxie := PROJECT(withDeceasedDID_roxie_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		SELF.dod 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dod);
+		SELF.dodSSA := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dodSSA);
+    SELF := LEFT;
+)); 
 
 	withDeceasedDID_thor_unsuppressed := join(distribute(withVerification, did), 
 														 distribute(pull(Doxie.key_Death_masterV2_ssa_DID), l_did),
@@ -255,8 +262,13 @@ donotmail_key := dma.key_DNM_Name_Address;
 									left.DID = right.l_did,
 									getDeceasedDID(left, right), left outer, keep(200), local);
 
-	withDeceasedDID_thor := Suppress.Suppress_ReturnOldLayout(withDeceasedDID_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
+	withDeceasedDID_thor_flagged := Suppress.MAC_FlagSuppressedSource(withDeceasedDID_thor_unsuppressed, mod_access);
 
+	withDeceasedDID_thor := PROJECT(withDeceasedDID_thor_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		SELF.dod 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dod);
+		SELF.dodSSA := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dodSSA);
+    SELF := LEFT;
+)); 
 	#IF(onThor)
 		withDeceasedDID := withDeceasedDID_thor;
 	#ELSE
@@ -290,8 +302,15 @@ donotmail_key := dma.key_DNM_Name_Address;
 		getInfutor(left,right), left outer, keep(1)
 	);
 	
-	withInfutor_roxie := Suppress.Suppress_ReturnOldLayout(withInfutor_roxie_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
-	
+	withInfutor_roxie_flagged := Suppress.MAC_FlagSuppressedSource(withInfutor_roxie_unsuppressed, mod_access);
+
+	withInfutor_roxie := PROJECT(withInfutor_roxie_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		self.marital_status	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.marital_status);
+		self.gender				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gender);
+		self.DOB				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DOB);
+		self.ProspectAge	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ProspectAge);
+    SELF := LEFT;)); 
+
 	withInfutor_thor_unsuppressed := join(distribute(rolledDeceased, did), 
 													 distribute(pull(ProfileBooster.Key_Infutor_DID), did),
 		left.DID = right.DID, 
@@ -299,8 +318,14 @@ donotmail_key := dma.key_DNM_Name_Address;
 	// ;	
 	: PERSIST('~PROFILEBOOSTER::with_infutor_thor_full'); // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
-	withInfutor_thor := Suppress.Suppress_ReturnOldLayout(withInfutor_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Shell);
+	withInfutor_thor_flagged := Suppress.MAC_FlagSuppressedSource(withInfutor_thor_unsuppressed, mod_access);
 
+	withInfutor_thor := PROJECT(withInfutor_thor_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		self.marital_status	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.marital_status);
+		self.gender				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gender);
+		self.DOB				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DOB);
+		self.ProspectAge	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ProspectAge);
+    SELF := LEFT;)); 
 
 	#IF(onThor)
 		withInfutor := withInfutor_thor;
@@ -426,7 +451,7 @@ end;
 	RelativeMax := 300;
 	withCurrBus_dids := PROJECT(withCurrBus_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
-	rellyids := Relationship.proc_GetRelationship(withCurrBus_dids,TopNCount:=RelativeMax,
+	rellyids := Relationship.proc_GetRelationshipNeutral(withCurrBus_dids,TopNCount:=RelativeMax,
 		RelativeFlag:=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RelativeMax, doThor := onThor).result; 
 	
 	relativeDIDs_roxie := join(withCurrBus, rellyids,

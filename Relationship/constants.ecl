@@ -17,6 +17,12 @@ EXPORT Personal   := 'PERSONAL';
 EXPORT TransClosure  := 'TRANS CLOSURE';
 EXPORT Try2Recover := [SSNOnly,PolicyOnly,ClaimOnly,Watercraft,Aircraft,UCC,VehicleOnly,RealEstate,ECrashSV,Business];
 
+//Relationship Restrictions
+EXPORT RelKeyFlag := MODULE
+    EXPORT DM := 'MARKETING';
+    EXPORT D2C := 'D2C';
+END;
+
 //Relationship Sources
 EXPORT cohabit 						:= 'COHABIT';
 EXPORT coapt 							:= 'COAPT';
@@ -52,19 +58,19 @@ SHARED relationship_sources := DATASET([
                         {cossn,   'Possibly associated to same SSN'},
                         {coproperty,  'Co-named on a property record'},
                         {bcoproperty,  'Coappeared On Property Transaction'},
-                        {covehicle, 'Co-registered for vehicle'}, 
-                        {coexperian, 'Co-named on a consumer inquiry'}, 
-                        {cotransunion, 'Co-named on a consumer inquiry'}, 
-                        {cowatercraft, 'Co-registered for watercraft'}, 
-                        {coaircraft, 'Co-registered for aircraft'}, 
-                        {comarriagedivorce, 'Co-named on a marriage/divorce record'}, 
+                        {covehicle, 'Co-registered for vehicle'},
+                        {coexperian, 'Co-named on a consumer inquiry'},
+                        {cotransunion, 'Co-named on a consumer inquiry'},
+                        {cowatercraft, 'Co-registered for watercraft'},
+                        {coaircraft, 'Co-registered for aircraft'},
+                        {comarriagedivorce, 'Co-named on a marriage/divorce record'},
                         {coenclarity, 'Possibly share office space'},
                         {coucc, 'Co-named on a UCC filing'},
                         {cobankruptcy, 'Co-named on a bankruptcy'},
                         {bcobankruptcy, 'Coappeared on a public records filing'},
                         {coforeclosure,  'Co-named on a foreclosure record'},
                         {bcoforeclosure, 'Coappeared on a public records filing'},
-                        {colien, 'Co-named on a lien filing'}, 
+                        {colien, 'Co-named on a lien filing'},
                         {bcolien, 'Coappeared on a public records filing'},
                         {bcoecrash, bcoecrash}, // need to update with proper description if this  will be used
                         {coecrash, coecrash},   // need to update with proper description if this  will be used
@@ -73,7 +79,7 @@ SHARED relationship_sources := DATASET([
                         {coclue, coclue},       // need to update with proper description if this  will be used
                         {cocc, cocc}           // need to update with proper description if this  will be used
                       ], {STRING source, STRING description});
-  
+
 EXPORT setRels := SET(relationship_sources, source);
 
 dict_relsources := DICTIONARY(relationship_sources, {source => description});

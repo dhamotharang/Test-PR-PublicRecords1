@@ -26,7 +26,6 @@ END;
 
 unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
-
 ExactFirstNameRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactFirstNameMatch]=risk_indicators.iid_constants.sTrue;
 ExactLastNameRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactLastNameMatch]=risk_indicators.iid_constants.sTrue;
 ExactSSNRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactSSNMatch]=risk_indicators.iid_constants.sTrue;
@@ -47,6 +46,7 @@ dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
 EnableEmergingID := (BSOptions & risk_indicators.iid_constants.BSOptions.EnableEmergingID) > 0;
 FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens) > 0;
 FilterVoter := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterVoter) > 0;
+UseIngestDate := (BSOptions & risk_indicators.iid_constants.BSOptions.UseIngestDate) > 0;
 
 // only use this variable in realtime mode to simulate the header build date rather than todays date
 dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
@@ -62,6 +62,11 @@ Layout_Header_Data := RECORD
 	Risk_Indicators.Layouts.Layout_Addr_Flags Addr_Flags;
 	boolean came_from_fastheader;
 END;
+
+layout_header_data_plus := record
+	unsigned4 first_ingest_date;
+	layout_header_data;
+end;
 
 Layout_working := RECORD
 	Layout_Header_Data;
@@ -193,9 +198,6 @@ j_pre_roxie_unsuppressed := join (g_inrec, header_key,
 														(right.src in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
                             ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and 
 													 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
-													 // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
-													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
-                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(RIGHT.src)) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -217,7 +219,15 @@ j_pre_roxie_unsuppressed := join (g_inrec, header_key,
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(ut.limits.HEADER_PER_DID));
-		  	 j_pre_roxie := Suppress.Suppress_ReturnOldLayout(j_pre_roxie_unsuppressed, mod_access,Layout_Header_Data, iType);
+
+j_pre_roxie_flagged := Suppress.MAC_FlagSuppressedSource(j_pre_roxie_unsuppressed, mod_access, data_env := iType);
+
+j_pre_roxie := PROJECT(j_pre_roxie_flagged, TRANSFORM(Layout_Header_Data, 
+	self.h := IF(~left.is_suppressed, left.h); 
+	self.valid_dob :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.valid_dob);
+	self.hhid_summary.hhid := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hhid_summary.hhid);
+    SELF := LEFT;
+)); 
 
 j_pre_thor_unsuppressed := join (distribute(g_inrec(did<>0), hash64(did)), 
 										distribute(pull(header_key(s_did<>0)), hash64(s_did)), 
@@ -227,10 +237,7 @@ j_pre_thor_unsuppressed := join (distribute(g_inrec(did<>0), hash64(did)),
 														(right.src in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
                             ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
 													 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
-													 // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
-													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
-                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
-
+													
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(RIGHT.src)) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -252,7 +259,15 @@ j_pre_thor_unsuppressed := join (distribute(g_inrec(did<>0), hash64(did)),
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(left.did=right.s_did, ut.limits.HEADER_PER_DID), LOCAL);
-		  	 j_pre_thor := Suppress.Suppress_ReturnOldLayout(j_pre_thor_unsuppressed, mod_access,Layout_Header_Data, iType);
+
+j_pre_thor_flagged := Suppress.MAC_FlagSuppressedSource(j_pre_thor_unsuppressed, mod_access, data_env := iType);
+
+j_pre_thor := PROJECT(j_pre_thor_flagged, TRANSFORM(Layout_Header_Data, 
+	self.h := IF(~left.is_suppressed, left.h); 
+	self.valid_dob :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.valid_dob);
+	self.hhid_summary.hhid := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hhid_summary.hhid);
+    SELF := LEFT;
+)); 
 
 j_pre_thor_nodid := project(g_inrec(did=0), transform(Layout_Header_Data, self := left, self := []));
 
@@ -281,10 +296,7 @@ j_quickpre_roxie_unsuppressed := join (g_inrec, header_quick_key,
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
 													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
                            ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
-													  // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
-													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
-                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
-													 (
+													 	 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src))) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
 																								right.dt_first_seen, 
@@ -315,10 +327,7 @@ j_quickpre_thor_unsuppressed := join (distribute(g_inrec(did<>0), hash64(did)),
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
 													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
                            ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
-													 // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
-													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
-                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
-
+													
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src))) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -353,8 +362,43 @@ real_header_all_roxie := group( sort( ungroup(header_recs_combined), seq ,did), 
 real_header_all_thor := group( sort( distribute( ungroup(header_recs_combined), hash64(seq)), seq ,did, LOCAL), seq, did, LOCAL);
 real_header_all := if(onThor, real_header_all_thor, real_header_all_roxie);
 
-real_header := if(DataRestriction[risk_indicators.iid_constants.posEquifaxRestriction]=risk_indicators.iid_constants.sTrue, real_header_all (h.src NOT IN [MDR.sourceTools.src_Equifax, MDR.sourcetools.src_Equifax_Quick, MDR.sourcetools.src_Equifax_Weekly]), real_header_all);
+real_header_nodate_filtering := if(DataRestriction[risk_indicators.iid_constants.posEquifaxRestriction]=risk_indicators.iid_constants.sTrue, real_header_all (h.src NOT IN [MDR.sourceTools.src_Equifax, MDR.sourcetools.src_Equifax_Quick, MDR.sourcetools.src_Equifax_Weekly]), real_header_all);
 
+real_header_with_ingestdate_appended := join(real_header_nodate_filtering, dx_Header.key_first_ingest(iType), 
+	left.h.rid<>0 and keyed(left.h.rid=right.rid),
+transform(Layout_Header_Data_plus,
+self.first_ingest_date := right.first_ingest_date;
+self := left;
+), left outer, atmost(1000), keep(1));
+
+// original filtering	
+// ======================================================
+real_header1 := join(g_inrec, real_header_nodate_filtering, 
+	left.seq=right.seq and 
+ RIGHT.h.dt_first_seen < left.historydate and // check dt_first_seen 
+(right.h.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)), // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
+transform(Layout_Header_Data,
+self := right,
+self := left),
+left outer );
+
+// new filter by ingest date
+// ======================================================
+real_header2 := join(g_inrec, real_header_with_ingestdate_appended, 
+	left.seq=right.seq and 
+(
+(right.first_ingest_date<>0 and right.first_ingest_date < (unsigned)((string)left.historydate + '01') ) or
+(right.first_ingest_date=0 and right.h.dt_first_seen < left.historydate and right.h.dt_vendor_first_reported < left.historydate) // use old logic if ingest_date=0
+),
+transform(Layout_Header_Data,
+self := right,
+self := left),
+left outer );
+
+real_header_toggle := if(UseIngestDate and ~isFCRA, real_header2, real_header1);
+
+real_header := group(real_header_toggle, seq, did);		// put the grouping back in after the joins											 
+													 
 
 
 // now that we have header and quick header together, join them to corrections and see which fields changed so that we can correct all records

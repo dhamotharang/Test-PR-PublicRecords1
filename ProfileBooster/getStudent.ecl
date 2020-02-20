@@ -22,7 +22,17 @@ students_roxie_unsuppressed := join(PBslim, american_student_list.key_DID,
 		and ~(right.source=mdr.sourceTools.src_OKC_Student_List and right.collegeid in Risk_Indicators.iid_constants.Set_Restricted_Colleges_For_Marketing), // can't use this source in marketing products
 		addStudent(left,right), left outer, atmost(keyed(left.did2=right.l_did), 100));
 
-students_roxie := Suppress.Suppress_ReturnOldLayout(students_roxie_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Slim_student);
+students_roxie_flagged := Suppress.MAC_FlagSuppressedSource(students_roxie_unsuppressed, mod_access);
+
+students_roxie := PROJECT(students_roxie_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Slim_student, 
+	self.student_date_first_seen	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student_date_first_seen);
+	self.student_date_last_seen		:=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student_date_last_seen);
+	self.student_college_code			:=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student_college_code);
+	self.student_college_type			:=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student_college_type);
+	self.student_college_tier			:=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student_college_tier);
+	self.src :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.src);
+    SELF := LEFT;
+)); 
 
 students_thor_unsuppressed := join(
 	distribute(PBslim, did2), 
@@ -33,7 +43,17 @@ students_thor_unsuppressed := join(
 		and ~(right.source=mdr.sourceTools.src_OKC_Student_List and right.collegeid in Risk_Indicators.iid_constants.Set_Restricted_Colleges_For_Marketing), // can't use this source in marketing products
 		addStudent(left,right), left outer, local);
 
-students_thor := Suppress.Suppress_ReturnOldLayout(students_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Slim_student);
+students_thor_flagged := Suppress.MAC_FlagSuppressedSource(students_thor_unsuppressed, mod_access);
+
+students_thor := PROJECT(students_thor_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Slim_student, 
+	self.student_date_first_seen	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student_date_first_seen);
+	self.student_date_last_seen		:=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student_date_last_seen);
+	self.student_college_code			:=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student_college_code);
+	self.student_college_type			:=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student_college_type);
+	self.student_college_tier			:=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student_college_tier);
+	self.src :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.src);
+    SELF := LEFT;
+)); 
 
 #IF(onThor)
 	students := students_thor;

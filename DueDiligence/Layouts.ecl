@@ -426,6 +426,7 @@ EXPORT Layouts := MODULE
     UNSIGNED4 dob;
     STRING10 phone;
     Address;
+    UNSIGNED1 relationship;
   END;
 
   EXPORT CriminalTopLevel := RECORD
@@ -437,7 +438,8 @@ EXPORT Layouts := MODULE
     UNSIGNED4 offenseDDFirstReportedActivity;
     UNSIGNED4 offenseDDLastReportedActivity;
     UNSIGNED4 offenseDDLastCourtDispDate;
-    UNSIGNED1 offenseDDLegalEventTypeCode;
+    UNSIGNED2 offenseCategoryID;
+    STRING100 offenseCategoryDescription;
     STRING75 offenseCharge;
     STRING1 offenseDDChargeLevelCalculated;
     STRING35 offenseChargeLevelReported; 
@@ -648,6 +650,56 @@ EXPORT Layouts := MODULE
     STRING14 phone;
     STRING11 fein;
   END;
+  
+  EXPORT SlimRelation := RECORD
+    SlimIndividual;
+    UNSIGNED1 amlRelationshipDegree;
+    STRING2 rawRelationshipType;
+    STRING2 relationToInquired;
+    BOOLEAN currentlyIncarcerated;    
+    BOOLEAN everIncarcerated;
+    BOOLEAN potentialSexOffender;
+    BOOLEAN currentlyParoleOrProbation;
+    BOOLEAN felonyPast3Yrs;
+    UNSIGNED4 headerFirstSeenDate;
+    BOOLEAN validSSN;
+    UNSIGNED4 ssnLowIssueDate;
+    UNSIGNED2 ssnMultiIdentities;
+    UNSIGNED2 ssnPerADL;
+    BOOLEAN hasSSN;
+    BOOLEAN ssnRisk;
+  END;
+  
+  EXPORT SourceDetailsLayout := RECORD
+    STRING2 source;
+    UNSIGNED sourceCount;
+    UNSIGNED sourceFirstSeen;
+    UNSIGNED sourceLastSeen;
+  END;
+  
+  EXPORT ssnDetails := RECORD
+    STRING9 ssn;
+    UNSIGNED4 firstSeen;
+    UNSIGNED4 lastSeen;
+    UNSIGNED4 issuedLowDate;
+    UNSIGNED4 issuedHighDate;
+    STRING2 issuedState;
+    BOOLEAN randomized;
+    BOOLEAN enumerationAtEntry;
+    BOOLEAN isITIN;
+    BOOLEAN invalid;
+    BOOLEAN issuedPriorToDOB;
+    BOOLEAN randomlyIssuedInvalid;
+    BOOLEAN reportedDeceased;
+    DATASET(SourceDetailsLayout) sourceInfo;
+  END;
+  
+  EXPORT AddressDetails := RECORD
+    UNSIGNED6 seq;
+    AddressSlimDetail;
+    UNSIGNED4 dateFirstSeen;
+    UNSIGNED4 dateLastSeen;
+  END;
 
   EXPORT BusReportDetails := RECORD
     SlimBusiness bestBusInfo;
@@ -677,10 +729,10 @@ EXPORT Layouts := MODULE
   END;
 
   EXPORT IndReportDetails := RECORD
-    STRING9 inputSSN;
     STRING9 bestSSN;
     STRING10 bestPhone;
     UNSIGNED4 bestDOB;
+    UNSIGNED4 dateLastReported;
     Name bestName;
     Address bestAddress;
     DATASET(IndPropertyDataLayout) perProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
@@ -688,6 +740,12 @@ EXPORT Layouts := MODULE
     DATASET(VehicleDataLayout) perVehicle {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)};  
     DATASET(AircraftDataLayout) perAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};
     DATASET(BusAsscoiations) perBusinessAssociations;// {MAXCOUNT(DueDiligence.Constants.MAX_BUS_ASSOCIATIONS)}; 
+    ssnDetails inputSSNDetails;
+    ssnDetails bestSSNDetails;
+    DATASET({STRING9 ssn}) ssnOnFile;
+    DATASET({STRING8 dob}) dobOnFile;
+    DATASET(Name) akas;
+    DATASET(addressDetails) residences {MAXCOUNT(DueDiligence.Constants.MAX_RESIDENCES)};
   END;
 
 
@@ -704,9 +762,11 @@ EXPORT Layouts := MODULE
     RelatedParty individual;											  //populated in DueDiligence.getIndAttributes, DueDiligence.getIndInformation
     GeographicRiskLayout; 
     UNSIGNED4 numberOfSpouses;																							
-    DATASET(SlimIndividual) spouses;																												//populated in DueDiligence.getIndRelatives
+    DATASET(SlimRelation) spouses;																												//populated in DueDiligence.getIndRelationships
     UNSIGNED4 numberOfParents;
-    DATASET(SlimIndividual) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			  //populated in DueDiligence.getIndRelatives
+    DATASET(SlimRelation) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			  //populated in DueDiligence.getIndRelationships
+    UNSIGNED4 numberOfAssociates;
+    DATASET(SlimRelation) associates;
     STRING2 indvType;                         		  //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
     
     INTEGER2 cit_inputSSNInvalid;

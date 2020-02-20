@@ -61,6 +61,7 @@ ds_input_didsForRelationshipKey := PROJECT(DS_dataInreportBy,
 	RelativeFlag := TRUE;
 	AssociateFlag := TRUE;
 	AllFlag := TRUE; // getting all relationship types
+ RelKeyFlag := IF(mod_access.isConsumer(), 'D2C', '');
 
 // KEEP This documentation notes
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +71,7 @@ ds_input_didsForRelationshipKey := PROJECT(DS_dataInreportBy,
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // just call this function with the did in this DS:  DS_input_didsForRelationshipKey
-DS_relationships := Relationship.proc_GetRelationship(ds_input_didsForRelationshipKey,
+DS_relationships_Neutral := Relationship.proc_GetRelationshipNeutral(ds_input_didsForRelationshipKey,
                                   RelativeFlag,
 																	AssociateFlag,
 																	AllFlag,
@@ -90,8 +91,11 @@ DS_relationships := Relationship.proc_GetRelationship(ds_input_didsForRelationsh
 																	,
 																	,
 																	,
-																	//Relationship.Layout_GetRelationship.TransactionalFlags_layout txflag = notx
+																	,//Relationship.Layout_GetRelationship.TransactionalFlags_layout txflag = notx
+                 RelKeyFLag
 																	).Result;
+
+DS_relationships:= Relationship.functions_getRelationship.convertNeutralToFlat_new(DS_relationships_Neutral);
 
 dsrelativesDids := 	PROJECT(DS_relationships(TYPE = RelationshipIdentifier_Services.Constants.RELTYPE_PERSONAL and
                                              CONFIDENCE = RelationshipIdentifier_Services.Constants.HIGH) ,
@@ -99,7 +103,7 @@ dsrelativesDids := 	PROJECT(DS_relationships(TYPE = RelationshipIdentifier_Servi
 										  SELF.DID := LEFT.DID2;
 											));
 // 2nd pass only get relatives
-ds_2ndDegreeRelatives := Relationship.proc_GetRelationship(dsrelativesDiDs,
+ds_2ndDegreeRelatives := Relationship.proc_GetRelationshipNeutral(dsrelativesDiDs,
                                   TRUE, // relative Flag
 																	TRUE, // associate flag // may switch this back.
 																	FALSE, // all flag
@@ -119,9 +123,11 @@ ds_2ndDegreeRelatives := Relationship.proc_GetRelationship(dsrelativesDiDs,
 																	,
 																	,
 																	,
-																	//Relationship.Layout_GetRelationship.TransactionalFlags_layout txflag = notx
+																	,//Relationship.Layout_GetRelationship.TransactionalFlags_layout txflag = notx
+                 RelKeyFlag
 																	).Result(TYPE = RelationshipIdentifier_Services.Constants.RELTYPE_PERSONAL and
                                              CONFIDENCE = RelationshipIdentifier_Services.Constants.HIGH);
+
 NamesAdded := PROJECT(DS_relationships,
 									 TRANSFORM(RelationshipIdentifier_Services.Layouts.RelationshipFunctionRec,
 														 SELF.title_str := Header.relative_titles.fn_get_str_title(LEFT.title);

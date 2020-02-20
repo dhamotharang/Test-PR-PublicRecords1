@@ -1,10 +1,11 @@
 IMPORT Gateway, iesp, Std;
 
-	EXPORT makeBatchParams(iesp.memberpointreport.t_MemberPointReportOption inOpts) := FUNCTION
+	EXPORT makeBatchParams(iesp.keepcontactreport.t_KeepContactReportOption inOpts) := FUNCTION
 		optAddressConfidenceThreshold:=IF(inOpts.BestAddressReturnCutoff='',(STRING1)MemberPoint.Constants.Defaults.AddressConfidenceThreshold,(STRING1)inOpts.BestAddressReturnCutoff);
 		optDeceasedMatchCodes:=IF(inOpts.DeceasedMatchCodes='',MemberPoint.Constants.Defaults.DeceasedMatchCodes,inOpts.DeceasedMatchCodes);
 		optPhonesReturnCutoff:=IF(inOpts.PhonesReturnCutoff='',MemberPoint.Constants.Defaults.PhonesReturnCutoff,inOpts.PhonesReturnCutoff);
 		optTransactionType:=IF(inOpts.PhoneTransactionType='',MemberPoint.Constants.PhoneTransactionType.WaterfallPhones,inOpts.PhoneTransactionType);
+		optUseDMEmailSourcesOnly:=IF(inOpts.EmailTransactionType = MemberPoint.Constants.EmailTransactionType.Premium, MemberPoint.Constants.EmailTransactionType.Premium_UseDMEmailSourcesOnly, MemberPoint.Constants.EmailTransactionType.Basic_UseDMEmailSourcesOnly);
 		optUniqueIdScoreThreshold:=IF(inOpts.UniqueIdScoreThreshold='',MemberPoint.Constants.Defaults.UniqueIdScoreThreshold,(INTEGER)inOpts.UniqueIdScoreThreshold);
 		// optUniqueIdScoreThreshold:=IF(inOpts.UniqueIdScoreThreshold='',MemberPoint.Constants.Defaults.UniqueIdScoreThreshold,(unsigned)inOpts.UniqueIdScoreThreshold);
 
@@ -14,12 +15,13 @@ IMPORT Gateway, iesp, Std;
 		// Specefic to memberpoint
 			export string	DeceasedMatchCodes := optDeceasedMatchCodes;
 			export boolean UseDOBDeathMatch := MemberPoint.Util.binStrToBool(inOpts.UseDOBDeathMatch, MemberPoint.Constants.Defaults.UseDOBDeathMatch);
-			export boolean IncludeEmail := MemberPoint.Util.binStrToBool(inOpts.IncludeEmailProcess, MemberPoint.Constants.Defaults.IncludeEmail);
-			export boolean IncludePhone := MemberPoint.Util.binStrToBool(inOpts.IncludePhoneProcess, MemberPoint.Constants.Defaults.IncludePhone);
-			export boolean IncludeAddress := MemberPoint.Util.binStrToBool(inOpts.IncludeAddressProcess, MemberPoint.Constants.Defaults.IncludeAddress);
-			export boolean IncludeDeceased := MemberPoint.Util.binStrToBool(inOpts.IncludeDeceasedProcess, MemberPoint.Constants.Defaults.IncludeDeceased);
-			export boolean IncludeSSN := MemberPoint.Util.binStrToBool(inOpts.IncludeSSN, MemberPoint.Constants.Defaults.IncludeSSN);
-			export boolean IncludeGender := MemberPoint.Util.binStrToBool(inOpts.IncludeGender, MemberPoint.Constants.Defaults.IncludeGender);
+			export boolean IncludeEmail := MemberPoint.Util.binStrToBool(inOpts.IncludeEmailProcess, MemberPoint.Constants.Defaults.rpt_IncludeEmail);
+			export boolean IncludePhone := MemberPoint.Util.binStrToBool(inOpts.IncludePhoneProcess, MemberPoint.Constants.Defaults.rpt_IncludePhone);
+			export boolean IncludeAddress := MemberPoint.Util.binStrToBool(inOpts.IncludeAddressProcess, MemberPoint.Constants.Defaults.rpt_IncludeAddress);
+			export boolean IncludeDeceased := MemberPoint.Util.binStrToBool(inOpts.IncludeDeceasedProcess, MemberPoint.Constants.Defaults.rpt_IncludeDeceased);
+			export boolean IncludeDOB := MemberPoint.Util.binStrToBool(inOpts.IncludeDOB, MemberPoint.Constants.Defaults.rpt_IncludeDOB);
+			export boolean IncludeSSN := MemberPoint.Util.binStrToBool(inOpts.IncludeSSN, MemberPoint.Constants.Defaults.rpt_IncludeSSN);
+			export boolean IncludeGender := MemberPoint.Util.binStrToBool(inOpts.IncludeGender, MemberPoint.Constants.Defaults.rpt_IncludeGender);
 			export string1 PhonesReturnCutoff := optPhonesReturnCutoff; 
 			export INTEGER UniqueIdScoreThreshold := optUniqueIdScoreThreshold;
 			export string1 AddressConfidenceThreshold :=  optAddressConfidenceThreshold;
@@ -30,6 +32,7 @@ IMPORT Gateway, iesp, Std;
 			//Deceased
 			EXPORT BOOLEAN IncludeBlankDOD:= inOpts.IncludeBlankDOD;
 			//Email: All covered by inheritance
+			EXPORT BOOLEAN UseDMEmailSourcesOnly:= optUseDMEmailSourcesOnly;
 			//ADLBest: All covered by inheritance
 			//BestAddress
 			EXPORT BOOLEAN IncludeBlankDateLastSeen:= inOpts.IncludeBlankDateLastSeen;

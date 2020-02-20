@@ -1,4 +1,4 @@
-﻿Import RISK_INDICATORS, ln_propertyv2, doxie, ut, header, mdr, drivers, riskwise;
+﻿Import RISK_INDICATORS, ln_propertyv2, doxie, ut, header, mdr, drivers, riskwise, Suppress, data_services, AML, STD;
 
 
 export AMLGetHeader(GROUPED DATASET(AML.Layouts.RelativeInLayout) idsOnly,
@@ -9,7 +9,8 @@ export AMLGetHeader(GROUPED DATASET(AML.Layouts.RelativeInLayout) idsOnly,
                                                     doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
   													) := FUNCTION
 
-
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+	
 glb_ok := glb > 0 and glb < 8 or glb=11 or glb=12;
 dppa_ok := dppa > 0 and dppa < 8;
 
@@ -56,8 +57,8 @@ relatives_slim := record
 
 end;
 
-relatives_slim get_relat_info(idsOnly le, doxie.Key_Header ri) := TRANSFORM
-
+{relatives_slim, unsigned4 global_sid} get_relat_info(idsOnly le, doxie.Key_Header ri) := TRANSFORM
+	SELF.global_sid := ri.global_sid;
 	SELF.DID := LE.DID;
 	SELF.historydate := le.historydate;
 	SELF.relation := le.relation;																					
@@ -85,7 +86,7 @@ relatives_slim get_relat_info(idsOnly le, doxie.Key_Header ri) := TRANSFORM
 	
 END;
 			
-relatheader :=  JOIN(idsOnly, doxie.Key_Header, 
+relatheader_unsuppressed :=  JOIN(idsOnly, doxie.Key_Header, 
 														keyed(LEFT.did=RIGHT.s_did) AND
 														right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
 														RIGHT.dt_first_seen < left.historydate 
@@ -100,6 +101,26 @@ relatheader :=  JOIN(idsOnly, doxie.Key_Header,
 														, 
 														get_relat_info(LEFT,RIGHT), LEFT OUTER,atmost(RiskWise.max_atmost), keep(100));
 	
+relatheader_flagged := Suppress.MAC_FlagSuppressedSource(relatheader_unsuppressed, mod_access, data_env := data_environment);
+
+relatheader := PROJECT(relatheader_flagged, TRANSFORM(relatives_slim, 																		
+	SELF.prim_range := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prim_range);
+	SELF.predir := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.predir);
+	SELF.prim_name := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prim_name);
+	SELF.addr_suffix := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.addr_suffix);
+	SELF.postdir := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.postdir);
+	SELF.unit_desig := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.unit_desig);
+	SELF.sec_range := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.sec_range);
+	SELF.zip5 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.zip5);
+	SELF.state := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.state);
+	SELF.county := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.county);
+	SELF.geo_blk := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.geo_blk);
+	SELF.age := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.age);
+	SELF.dt_first_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_first_seen);
+	SELF.dt_last_seen :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dt_last_seen);
+	SELF.sources := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.sources);
+    SELF := LEFT;
+)); 
 
 // dedup by address then determine addr_last,   rollup and count, move final count to field back in join back to all records.
 
@@ -143,8 +164,8 @@ relatives_slim getHDRVote(relatHeaderSrt le) := TRANSFORM
      fsDate31 := le.dt_first_seen[1..6]+'31';
 		 myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		 self.relatIsVoter := if (le.sources = 'VO' , 1,0);
-		 self.parentIsVoter  := if (le.sources = 'VO' and stringlib.stringtolowercase(le.relation) in ['father','mother', 'parent'], 1,0);
-	   self.parent_pubRec_10yrs := if(stringlib.stringtolowercase(le.relation) in ['father','mother', 'parent'] and (ut.DaysApart((string)le.dt_first_seen, (string)risk_indicators.iid_constants.myGetDate(le.historydate)) >= ut.DaysInNYears(10)),1,0);
+		 self.parentIsVoter  := if (le.sources = 'VO' and STD.Str.tolowercase(le.relation) in ['father','mother', 'parent'], 1,0);
+	   self.parent_pubRec_10yrs := if(STD.Str.tolowercase(le.relation) in ['father','mother', 'parent'] and (ut.DaysApart((string)le.dt_first_seen, (string)risk_indicators.iid_constants.myGetDate(le.historydate)) >= ut.DaysInNYears(10)),1,0);
      self.firstSeenDt := (string)le.dt_first_seen;
 		 self := le;
 END;

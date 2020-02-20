@@ -1,4 +1,4 @@
-import _Control, doxie, ut, mdr, header, drivers, census_data, dx_header, FCRA, riskwise, models, risk_indicators, data_services;
+﻿import _Control, doxie, ut, mdr, header, drivers, census_data, dx_header, FCRA, riskwise, models, risk_indicators, data_services;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_FCRA_Neutral_Function_AML(grouped DATASET(risk_indicators.Layout_output) iid,
@@ -45,7 +45,7 @@ TRANSFORM
 	verlast := IF(le.socsverlevel in [2,5,7,8,9,11,12] OR le.phoneverlevel in [2,5,7,8,9,11,12], le.combo_last, '');
 	veraddr := IF(le.socsverlevel in [3,5,6,8,10,11,12] OR le.phoneverlevel in [3,5,6,8,10,11,12], Risk_Indicators.MOD_AddressClean.street_address('',le.combo_prim_range,
 										le.combo_predir,le.combo_prim_name,le.combo_suffix,le.combo_postdir,le.combo_unit_desig,le.combo_sec_range),'');			
-	SELF.iid.CVI := (INTEGER)risk_indicators.cviScore(SELF.iid.NAP_Summary,SELF.iid.NAS_summary,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast);
+	SELF.iid.CVI := (INTEGER)risk_indicators.cviScore(SELF.iid.NAP_Summary,SELF.iid.NAS_summary,le,'',veraddr,verlast);
 	ri := Risk_indicators.reasonCodes(le, 6, reasoncode_settings); 	
 	self.iid.reason1 := ri[1].hri;
   self.iid.reason2 := ri[2].hri;

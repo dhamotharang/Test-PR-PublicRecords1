@@ -34,4 +34,36 @@ MODULE
 			
 			RETURN inMod;
 		END;
+
+  // Batch Params for Single-View Service
+  // -------------------------------------------------
+  EXPORT SingleView := 
+  MODULE
+
+    EXPORT BatchParams :=
+    INTERFACE(BatchShare.IParam.BatchParams)
+      EXPORT UNSIGNED1 Score_Threshold;
+      EXPORT UNSIGNED1 Biz_Score_Threshold;
+      EXPORT UNSIGNED1 History_Limit_Years;
+      EXPORT BOOLEAN ExcludeMarketing;
+    END;
+
+    EXPORT getSVBatchParams() := 
+    FUNCTION
+      BaseBatchParams := BatchShare.IParam.getBatchParams();
+      
+      inMod := MODULE(PROJECT(BaseBatchParams, BatchParams, OPT))
+        EXPORT UNSIGNED8 MaxResultsPerAcct := BusinessBatch_BIP.Constants.SingleView.MaxResultsPerAcctno : STORED('Max_Results_Per_Acct');
+        EXPORT UNSIGNED1 Score_Threshold := 75 : STORED('Score_Threshold');
+        EXPORT UNSIGNED1 Biz_Score_Threshold := 75 : STORED('Biz_Score_Threshold');
+        EXPORT UNSIGNED1 History_Limit_Years := 2 : STORED('History_Limit_Years');
+        EXPORT BOOLEAN ExcludeMarketing := BaseBatchParams.isDirectMarketing();
+  
+        EXPORT DATASET(Gateway.Layouts.Config) Gateways := Gateway.Configuration.Get();
+      END;
+      
+      RETURN inMod;
+    END;
+
+  END;
 END;

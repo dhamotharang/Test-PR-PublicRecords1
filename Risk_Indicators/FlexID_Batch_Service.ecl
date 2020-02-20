@@ -567,17 +567,19 @@ LayoutFlexIDBatchOutExt format_out(retplus_tmx le, fs ri) := TRANSFORM
 	verlast := IF(le.combo_lastcount>0, le.combo_last, '');
 	veraddr := IF(le.combo_addrcount>0, Risk_Indicators.MOD_AddressClean.street_address('', le.combo_prim_range, le.combo_predir, le.combo_prim_name, le.combo_suffix,
 																													le.combo_postdir,le.combo_unit_desig,le.combo_sec_range), '');
-	cvi_temp := if(actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel, le.socsverlevel, le, le.correctssn, le.correctaddr, le.correcthphone, '', veraddr, verlast,
-																															OFAC),
-																			risk_indicators.cviScoreV1(le.phoneverlevel, le.socsverlevel, le, le.correctssn, le.correctaddr, le.correcthphone, '', veraddr, verlast,
-																																	OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,'',IncludeITIN,IncludeComplianceCap));
-	isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
-	SELF.ComprehensiveVerificationIndex := MAP(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
-							IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
-							IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)cvi_temp > 10 => '10', 
-							IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)cvi_temp > 10 => '10',
-							isCodeDI AND (INTEGER)cvi_temp > 10 => '10',
-							cvi_temp);
+	
+            OverrideOptions := MODULE(Risk_Indicators.iid_constants.IOverrideOptions) 
+            EXPORT isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) AND actualIIDVersion=1;
+            EXPORT isCodePO := risk_indicators.rcSet.isCodePO(le.addr_type) AND IsPOBoxCompliant;
+            EXPORT isCodeCL := risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) AND IncludeCLoverride;
+            EXPORT isCodeMI := risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) AND IncludeMIoverride;
+            EXPORT isCodeMS := risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) AND IncludeMSoverride;
+            END;
+            
+			SELF.ComprehensiveVerificationIndex :=  if(actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast,
+																														OFAC,OverrideOptions),	
+																					risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast,
+																														OFAC, IncludeDOBinCVI, IncludeDriverLicenseInCVI,,,OverrideOptions));
 																																									
 	
 	// allow up to 20 reason codes (seemed like a high enough amount to show all reason codes returned)

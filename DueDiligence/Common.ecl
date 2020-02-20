@@ -363,6 +363,8 @@ EXPORT Common := MODULE
 
     END;
 		
+    
+    //Moving to CommonDate
 		EXPORT IsValidDOB(UNSIGNED inputDOB) := FUNCTION
 		  validDOB := MAP(
 				//just year (no month, no day)
@@ -648,6 +650,33 @@ EXPORT Common := MODULE
       
       RETURN UNGROUP(maxedRecords);
     ENDMACRO;
+    
+    
+    EXPORT GetSourceDetailsAsDataset(STRING sources, STRING sourceCounts, STRING sourceFirstSeens, STRING sourceLastSeens) := FUNCTION
+
+        splitSources := STD.Str.SplitWords(sources, ',');
+        splitSourceCnts := STD.Str.SplitWords(sourceCounts, ',');
+        splitSourceFSeen := STD.Str.SplitWords(sourceFirstSeens, ',');
+        splitSourceLSeen := STD.Str.SplitWords(sourceLastSeens, ',');
+
+        sourceDetails := DATASET(COUNT(splitSources), TRANSFORM(DueDiligence.Layouts.SourceDetailsLayout, 
+                                                                SELF.source := STD.Str.CleanSpaces(splitSources[COUNTER]);
+                                                                SELF.sourceCount := (UNSIGNED)STD.Str.CleanSpaces(splitSourceCnts[COUNTER]);
+                                                                SELF.sourceFirstSeen := (UNSIGNED)STD.Str.CleanSpaces(splitSourceFSeen[COUNTER]);
+                                                                SELF.sourceLastSeen := (UNSIGNED)STD.Str.CleanSpaces(splitSourceLSeen[COUNTER]);)); 
+
+        RETURN sourceDetails;
+    END;
+    
+    
+    EXPORT GetStringListAsDataset(STRING listOfData) := FUNCTION
+
+        splitInfo := STD.Str.SplitWords(listOfData, ',');
+
+        listAsDataset := DATASET(COUNT(splitInfo), TRANSFORM({STRING info}, SELF.info := STD.Str.CleanSpaces(splitInfo[COUNTER]);)); 
+
+        RETURN listAsDataset;
+    END;
 
 
 

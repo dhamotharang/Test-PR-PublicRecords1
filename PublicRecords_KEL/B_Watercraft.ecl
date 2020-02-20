@@ -1,13 +1,12 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+﻿//HPCC Systems KEL Compiler Version 1.1.0
 IMPORT KEL11 AS KEL;
 IMPORT CFG_Compile,E_Watercraft,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL11.Null;
 EXPORT B_Watercraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Watercraft(__in,__cfg).__Result) __E_Watercraft := E_Watercraft(__in,__cfg).__Result;
-  SHARED __EE1697272 := __E_Watercraft;
-  EXPORT __ST66485_Layout := RECORD
+  SHARED __EE1930308 := __E_Watercraft;
+  EXPORT __ST76314_Layout := RECORD
     KEL.typ.nuid UID;
-    KEL.typ.ndataset(E_Watercraft(__in,__cfg).Date_Information_Layout) Date_Information_;
     KEL.typ.nstr Watercraft_Key_;
     KEL.typ.nstr Sequence_Key_;
     KEL.typ.ndataset(E_Watercraft(__in,__cfg).Origin_States_Layout) Origin_States_;
@@ -15,11 +14,13 @@ EXPORT B_Watercraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.nkdate Current_Date_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST66485_Layout __ND1697344__Project(E_Watercraft(__in,__cfg).Layout __PP1697189) := TRANSFORM
+  SHARED __ST76314_Layout __ND1930351__Project(E_Watercraft(__in,__cfg).Layout __PP1930246) := TRANSFORM
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('watercraft_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP1697189;
+    SELF := __PP1930246;
   END;
-  EXPORT __ENH_Watercraft := PROJECT(__EE1697272,__ND1697344__Project(LEFT));
+  EXPORT __ENH_Watercraft := PROJECT(__EE1930308,__ND1930351__Project(LEFT));
 END;

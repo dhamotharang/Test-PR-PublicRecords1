@@ -52,13 +52,16 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     indProfLic := DueDiligence.getIndProfessionalData(indGeoRisk, mod_access);
 
     //get relatives of the inquired individual  
-    indRelatives := DueDiligence.getIndRelatives(indProfLic, options, mod_access);
+    indRelationships := DueDiligence.getIndRelationships(indProfLic, options, mod_access);
+    
+    //get business associations
+    indBusAssoc := DueDiligence.getIndBusAssoc(indRelationships, options, linkingOptions, mod_access);
 
     //get header information
-    indHeader := DueDiligence.getIndHeader(indRelatives, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, includeReport, mod_access);
+    indHeader := DueDiligence.getIndHeader(indBusAssoc, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, includeReport, mod_access);
 
     //get information pertaining to SSN
-    indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, mod_access);
+    indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, bsOptions, mod_access);
 
     //get property information
     indProperty := DueDiligence.getIndProperty(indSSNData, dataRestrictionMask);
@@ -75,19 +78,26 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     //get legal information
     indCriminalData := DueDiligence.getIndLegalEvents(indAircraft);
 
-    //get business associations
-    indBusAssoc := DueDiligence.getIndBusAssoc(indCriminalData, options, linkingOptions, mod_access);
+    //get person associations
+    indPerAssoc := DueDiligence.getIndPerAssoc(indCriminalData);
     
     //get identity risk
-    indIDRisk := DueDiligence.getIndIdentityRisk(indBusAssoc, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, mod_access);
-
-    //if a person report is being requested, populate the report
-    indReportData :=  IF(includeReport, DueDiligence.getIndReport(indIDRisk, options, linkingOptions, ssnMask, mod_access), indIDRisk);
-
+    indIDRisk := DueDiligence.getIndIdentityRisk(indPerAssoc, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, bsOptions, mod_access);
 
     //populate the attributes and flags
-    indKRI := DueDiligence.getIndKRI(indReportData + noDIDFound);
+    indKRI := DueDiligence.getIndKRI(indIDRisk);
+
+    //if a person report is being requested, populate the report
+    indReportData :=  IF(includeReport, DueDiligence.getIndReport(indKRI, options, linkingOptions, ssnMask, mod_access), indKRI);
+
+    //populate the attributes and flags for those without a DID
+    indNoDIDKRI := DueDiligence.getIndKRINoDID(noDIDFound);
+
+    //add both did and didless individuals
+    finalInd := SORT(indReportData + indNoDIDKRI, seq);
     
+    
+
     
 
     //debugging section
@@ -97,7 +107,8 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     IF(debugMode, OUTPUT(indEstIncome, NAMED('indEstIncome')));
     IF(debugMode, OUTPUT(indGeoRisk, NAMED('indGeoRisk')));
     IF(debugMode, OUTPUT(indProfLic, NAMED('indProfLic')));
-    IF(debugMode, OUTPUT(indRelatives, NAMED('indRelatives')));
+    IF(debugMode, OUTPUT(indRelationships, NAMED('indRelationships')));
+    IF(debugMode, OUTPUT(indBusAssoc, NAMED('indBusAssoc')));
     IF(debugMode, OUTPUT(indHeader, NAMED('indHeader')));
     IF(debugMode, OUTPUT(indSSNData, NAMED('indSSNData')));
     IF(debugMode, OUTPUT(indProperty, NAMED('indProperty')));
@@ -105,12 +116,14 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     IF(debugMode, OUTPUT(indVehicle, NAMED('indVehicle')));
     IF(debugMode, OUTPUT(indAircraft, NAMED('indAircraft')));
     IF(debugMode, OUTPUT(indCriminalData, NAMED('indCriminalData')));
-    IF(debugMode, OUTPUT(indBusAssoc, NAMED('indBusAssoc')));
+    IF(debugMode, OUTPUT(indPerAssoc, NAMED('indPerAssoc')));
     IF(debugMode, OUTPUT(indIDRisk, NAMED('indIDRisk')));
-    IF(debugMode, OUTPUT(indReportData, NAMED('indReportData')));
     IF(debugMode, OUTPUT(indKRI, NAMED('indKRI')));
+    IF(debugMode, OUTPUT(indReportData, NAMED('indReportData')));
+    IF(debugMode, OUTPUT(indNoDIDKRI, NAMED('indNoDIDKRI')));
+    IF(debugMode, OUTPUT(finalInd, NAMED('finalInd')));
 
 
 
-    RETURN indKRI;
+    RETURN finalInd;
 END;

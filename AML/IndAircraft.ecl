@@ -1,7 +1,7 @@
 ﻿
-IMPORT FAA, RiskWise, doxie;
+IMPORT FAA, RiskWise, AML;
 
-EXPORT IndAircraft(DATASET(Layouts.LayoutAMLShellV2) IndivIds, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+EXPORT IndAircraft(DATASET(Layouts.LayoutAMLShellV2) IndivIds) := FUNCTION
 
 //version 2
 ACIdsKey := faa.key_aircraft_did(false);

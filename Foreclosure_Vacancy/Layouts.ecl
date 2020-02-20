@@ -1,4 +1,4 @@
-import ut, iesp;
+﻿import ut, iesp;
 
 EXPORT Layouts := MODULE
 	export Foreclosure_Full :=  record
@@ -95,9 +95,9 @@ EXPORT Layouts := MODULE
 		string9  property_address_zip_code_2;
 		string4  carrier_code_2;
 		string60 full_site_address_unparsed_2;
-		string2  property_indicator;
+		string3  property_indicator;
 		string55 property_desc;
-		string3  use_code;
+		string4  use_code;
 		string55 use_desc;
 		string5  number_of_units;
 		string9  living_area_square_feet;
@@ -324,7 +324,7 @@ EXPORT Layouts := MODULE
 		STRING10	CP_DFLT_DT;  	 						//date_of_default, format YYYYMMDD
 		STRING10	CP_AUCTION_DT; 	 					//auction_date, format YYYYMMDD
 		STRING30	LNDR_CMPNY_NAME; 	 				//lender_beneficiary_company_name
-		STRING2		PROPERTY_TYPE_CD; 	 			//property_indicator
+		STRING3		PROPERTY_TYPE_CD; 	 			//property_indicator
 		STRING55	PROPERTY_TYPE_DESC; 	 		//property_desc
 		STRING30	OWNR_1_FIRST_NAME; 	 			//first_defendant_borrower_owner_first_name
 		STRING30	OWNR_1_LAST_NAME; 	 			//first_defendant_borrower_owner_last_name

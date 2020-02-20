@@ -1,0 +1,2 @@
+﻿import RiskWise,Scoring_Project_Macros,sghatti,scoring_project_pip,ut,Scoring_Project_DailyTracking;
+Scoring_Project_DailyTracking.DDT_DailyReport('', Scoring_Project_DailyTracking.email_distribution.DDT_general_list); 

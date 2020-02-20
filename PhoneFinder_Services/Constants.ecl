@@ -115,7 +115,9 @@ MODULE
                                                 {'Phone Association','H','1','-1','No phone associated with subject',0,0,'',true,true}
                                               ],
                                               iesp.phonefinder.t_PhoneFinderRiskIndicator);
+
   EXPORT SET OF STRING enumCategory := ['Phone Association','Phone Activity','Phone Criteria'];
+  EXPORT SET OF INTEGER PhoneRiskAssessmentExceptions := [1, 5];// Phone Association exceptions reqested in LRA
 
   EXPORT SpoofPhoneOrigin :=
     MODULE
@@ -232,6 +234,110 @@ MODULE
     EXPORT UNSIGNED2 MaxOtherPhones := 100;
   END;
 
+   PFSourceCategory := MODULE
+     EXPORT STRING Inquiry := 'Inquiry';
+     EXPORT STRING VehicleRegistration := 'VehicleRegistration';
+     EXPORT STRING CreditHeader := 'CreditHeader';
+     EXPORT STRING CreditInquiry := 'CreditInquiry';
+     EXPORT STRING DirectoryAssistance := 'DirectoryAssistance';
+     EXPORT STRING DriverLicense := 'DriverLicense';
+     EXPORT STRING EmployementData := 'EmployementData';
+     EXPORT STRING MarketingData := 'MarketingData';
+     EXPORT STRING LNRSInquiry := 'LNRSInquiry';
+     EXPORT STRING MNOCarrier := 'MNOCarrier';
+     EXPORT STRING NonProfessionalLicense := 'NonProfessionalLicense';
+     EXPORT STRING ProfessionalLicense := 'ProfessionalLicense';
+     EXPORT STRING PropertyRecord := 'PropertyRecord';
+     EXPORT STRING StudentData := 'StudentData';
+     EXPORT STRING UtilityRecord := 'UtilityRecord';
+     EXPORT STRING VoterRecords := 'VoterRecords';
+     EXPORT STRING WhitePages := 'WhitePages';
+     EXPORT STRING WirelessPhoneContent := 'WirelessPhoneContent';
+     EXPORT STRING EmploymentData := 'EmploymentData';
+     EXPORT STRING Other := 'Other';
+  END;
+
+  PFSourceType := MODULE
+     EXPORT STRING SelfReported := 'SelfReported';
+     EXPORT STRING SelfReported_CreditInquiry := 'Self Reported-Credit Inquiry';
+     EXPORT STRING Account := 'Account';
+  END;
+
+  PFSourceCodes := MODULE
+    EXPORT STRING QsentIQ411 := 'I';
+    EXPORT STRING EquifaxPhoneMart := 'EQ';
+    EXPORT STRING EDALA := 'ES';
+    EXPORT STRING EDACA := 'AP';
+    EXPORT STRING EDADID := 'SE';
+    EXPORT STRING Zumigo := 'MNO';
+    EXPORT STRING UNDEFINED := 'UNDEFINED';
+    EXPORT STRING PeopleAtWork := 'WK';
+  END;
+
+  EXPORT CategoryCodes := DATASET([
+        {PFSourceCategory.Inquiry, MDR.sourceTools.src_Wired_Assets_Royalty, PFSourceType.SelfReported}, //WR
+        {PFSourceCategory.Inquiry, MDR.sourceTools.src_Wired_Assets_Owned, PFSourceType.SelfReported}, //WO
+        {PFSourceCategory.VehicleRegistration, MDR.sourceTools.src_MO_Watercraft, PFSourceType.Account},//BW
+        {PFSourceCategory.VehicleRegistration, MDR.sourceTools.src_MD_Watercraft, PFSourceType.Account},//DW
+        {PFSourceCategory.VehicleRegistration, MDR.sourceTools.src_EMerge_Boat, PFSourceType.Account},//EB
+        {PFSourceCategory.VehicleRegistration, MDR.sourceTools.src_KY_Watercraft, PFSourceType.Account},//KW
+        {PFSourceCategory.VehicleRegistration, MDR.sourceTools.src_VA_Watercraft, PFSourceType.Account},//VW
+        {PFSourceCategory.VehicleRegistration, MDR.sourceTools.src_MO_Experian_Veh, PFSourceType.Account},//YE
+        {PFSourceCategory.CreditHeader, MDR.sourceTools.src_Experian_Credit_Header, PFSourceType.Account},//EN
+        {PFSourceCategory.CreditHeader, MDR.sourceTools.src_Equifax, PFSourceType.Account},//EQ
+        {PFSourceCategory.CreditHeader, MDR.sourceTools.src_TU_CreditHeader, PFSourceType.Account},//TN
+        {PFSourceCategory.CreditHeader, MDR.sourceTools.src_TUCS_Ptrack, PFSourceType.Account},//TS
+        {PFSourceCategory.CreditInquiry, PFSourceCodes.QsentIQ411, PFSourceType.SelfReported_CreditInquiry}, //I
+        {PFSourceCategory.CreditInquiry, PFSourceCodes.EquifaxPhoneMart, PFSourceType.SelfReported_CreditInquiry},//EQ  ??
+        {PFSourceCategory.DirectoryAssistance, PFSourceCodes.EDALA, PFSourceType.Account},//EDA ES
+        {PFSourceCategory.DirectoryAssistance, PFSourceCodes.EDACA, PFSourceType.Account},//EDA AP
+        {PFSourceCategory.DirectoryAssistance, PFSourceCodes.EDADID, PFSourceType.Account},//EDA SE
+        {PFSourceCategory.DirectoryAssistance, MDR.sourceTools.src_Intrado, PFSourceType.Account},//IO
+        {PFSourceCategory.DirectoryAssistance, MDR.sourceTools.src_Gong_History, PFSourceType.Account},//GO
+        {PFSourceCategory.DirectoryAssistance, MDR.sourceTools.src_Gong_phone_append, PFSourceType.Account},//PH
+        {PFSourceCategory.DriverLicense, MDR.sourceTools.src_Certegy, PFSourceType.Account},//CY
+        {PFSourceCategory.DriverLicense, MDR.sourceTools.src_MO_DL, PFSourceType.Account},//MD
+        {PFSourceCategory.EmployementData, MDR.sourceTools.src_Thrive_LT, PFSourceType.Account},//TM
+        {PFSourceCategory.EmployementData, MDR.sourceTools.src_Thrive_PD, PFSourceType.Account},//T$
+        {PFSourceCategory.LNRSInquiry, MDR.sourceTools.src_InquiryAcclogs, PFSourceType.SelfReported_CreditInquiry},//IQ
+        {PFSourceCategory.MarketingData, MDR.sourceTools.src_InfutorCID, PFSourceType.SelfReported},//IR
+        {PFSourceCategory.MarketingData, MDR.sourceTools.src_Ibehavior, PFSourceType.SelfReported},//IB
+        {PFSourceCategory.MarketingData, MDR.sourceTools.src_AlloyMedia_consumer, PFSourceType.SelfReported},//AO
+        {PFSourceCategory.MarketingData, MDR.sourceTools.src_Cellphones_nextones, PFSourceType.SelfReported},//05
+        {PFSourceCategory.MarketingData, MDR.sourceTools.src_Cellphones_traffix, PFSourceType.SelfReported},//02
+        {PFSourceCategory.MarketingData, MDR.sourceTools.src_Cellphones_kroll, PFSourceType.SelfReported},//01
+        {PFSourceCategory.MNOCarrier, PFSourceCodes.Zumigo, PFSourceType.Account},//MNO
+        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_MO_Veh, PFSourceType.Account},//SV
+        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_NC_Watercraft, PFSourceType.Account},//NW
+        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_Federal_Firearms, PFSourceType.Account},//FF
+        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_Federal_Explosives, PFSourceType.Account},//FE
+        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Master, PFSourceType.Account},//EM
+        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Cens, PFSourceType.Account},//E4
+        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Fish, PFSourceType.Account},//E2
+        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Hunt, PFSourceType.Account},//E1
+        {PFSourceCategory.Other, PFSourceCodes.UNDEFINED, PFSourceType.Account},
+        {PFSourceCategory.Other, MDR.sourceTools.src_Miscellaneous, PFSourceType.Account},//PQ
+        {PFSourceCategory.EmploymentData, MDR.sourceTools.src_Professional_License, PFSourceType.Account},//PL
+        {PFSourceCategory.PropertyRecord, MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs, PFSourceType.Account},//LP
+        {PFSourceCategory.PropertyRecord, MDR.sourceTools.src_LnPropV2_Lexis_Asrs, PFSourceType.Account},//LA
+        {PFSourceCategory.PropertyRecord, MDR.sourceTools.src_LnPropV2_Fares_Asrs, PFSourceType.Account},//FA
+        {PFSourceCategory.StudentData, MDR.sourceTools.src_American_Students_List, PFSourceType.Account},//SL
+        {PFSourceCategory.UtilityRecord, MDR.sourceTools.src_ZUtilities, PFSourceType.Account},//ZT
+        {PFSourceCategory.UtilityRecord, MDR.sourceTools.src_ZUtil_Work_Phone, PFSourceType.Account},//ZK
+        {PFSourceCategory.UtilityRecord, MDR.sourceTools.src_Util_Work_Phone, PFSourceType.Account},//UW
+        {PFSourceCategory.UtilityRecord, MDR.sourceTools.src_Utilities, PFSourceType.Account},//UT
+        {PFSourceCategory.VoterRecords, MDR.sourceTools.src_Voters_v2, PFSourceType.Account},//VO
+        {PFSourceCategory.WhitePages, MDR.sourceTools.src_Targus_White_pages, PFSourceType.Account},//WP
+        {PFSourceCategory.WhitePages, MDR.sourceTools.src_pcnsr, PFSourceType.Account},//PN
+        {PFSourceCategory.WirelessPhoneContent, MDR.sourceTools.src_NeustarWireless, PFSourceType.Account},//N2
+        {PFSourceCategory.WirelessPhoneContent, MDR.sourceTools.src_Targus_Gateway, PFSourceType.Account},//TG
+        {PFSourceCategory.EmploymentData, PFSourceCodes.PeopleAtWork, PFSourceType.Account}//People at Work - WK
+        ], {string35 ctg; string3 src; string35 src_type;});
+
+        CategoryDCT := DICTIONARY(CategoryCodes, {src => ctg});
+        EXPORT MapCategoryDCT(STRING3 src) := CategoryDCT[src].ctg;
+        SourceTypeDCT := DICTIONARY(CategoryCodes, {src => src_type});
+        EXPORT MapSourceTypeDCT(STRING3 src) := SourceTypeDCT[src].src_type;
   // Batch only
   EXPORT BatchRestrictedDirectMarketingSourcesSet :=
                                       [MDR.sourceTools.src_AL_Experian_Veh,

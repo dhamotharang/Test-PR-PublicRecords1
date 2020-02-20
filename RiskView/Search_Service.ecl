@@ -135,6 +135,7 @@ export Search_Service := MACRO
 	//Default the options to be ON which is '1'. If excluded, then change to 0
 	string tmpFilterLienTypes := Risk_Indicators.iid_constants.LnJDefault;
 
+	// JuLi exclusion options
 	boolean ExcludeCityTaxLiens := option.LiensJudgmentsReportOptions.ExcludeCityTaxLiens;
 	boolean ExcludeCountyTaxLiens := option.LiensJudgmentsReportOptions.ExcludeCountyTaxLiens;
 	boolean ExcludeStateTaxWarrants := option.LiensJudgmentsReportOptions.ExcludeStateTaxWarrants;
@@ -143,7 +144,10 @@ export Search_Service := MACRO
 	boolean ExcludeOtherLiens := option.LiensJudgmentsReportOptions.ExcludeOtherLiens;
 	boolean ExcludeJudgments := option.LiensJudgmentsReportOptions.ExcludeJudgments;
 	boolean ExcludeEvictions := option.LiensJudgmentsReportOptions.ExcludeEvictions;
-	
+	boolean ExcludeReleasedCases := option.LiensJudgmentsReportOptions.ExcludeReleasedCases;
+	unsigned6 MinimumAmount := MIN(option.LiensJudgmentsReportOptions.MinimumAmount, 999999999);
+	dataset(iesp.share.t_StringArrayItem) ExcludeStates := option.LiensJudgmentsReportOptions.ExcludeStates;
+	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources := option.LiensJudgmentsReportOptions.ExcludeReportingSources;
 	// if the boolean flag is true, use the boolean flags
 	// if the boolean flag is not true, then check to ensure the user didn't enter a FilterlienType
 		
@@ -155,6 +159,7 @@ export Search_Service := MACRO
 	tmpLiensFltr := if(ExcludeOtherLiens,'0', tmpFilterLienTypes[6..6]);
 	tmpJdgmtsFltr := if(ExcludeJudgments, '0', tmpFilterLienTypes[7..7]);
 	tmpEvictionsFltr := if(ExcludeEvictions, '0', tmpFilterLienTypes[8..8]);
+	tmpReleasedCasesFltr := if(ExcludeReleasedCases, '0', tmpFilterLienTypes[9..9]);
 		//We now have boolean options for each of these filters. We built the code to use a bit (string)
 		//saying which ones they want and which ones they want to filter. I take the boolean flags and 
 		//turn them into the string the code is expecting. FlagLiensOptions in constants will convert to 
@@ -166,7 +171,8 @@ export Search_Service := MACRO
 		tmpFedFltr +
 		tmpLiensFltr +
 		tmpJdgmtsFltr +
-		tmpEvictionsFltr;
+		tmpEvictionsFltr +
+		tmpReleasedCasesFltr;
 		
 	boolean RetainInputDID := false		: stored('RetainInputDID');		// to be used by modelers in R&D mode
 	
@@ -296,43 +302,45 @@ input_ok := map(((
 	 *      Gather Attributes/Scores:      *
    *************************************** */
 
-	search_results_temp := ungroup(
-	riskview.Search_Function(packagedInput,
-		gateways,
-		DataRestriction,
-		AttributesVersionRequest, 
-		auto_model_name, 
-		bankcard_model_name, 
-		Short_term_lending_model_name, 
-		Telecommunications_model_name, 
-		Crossindustry_model_name, 
-		Custom_model_name,
-		Custom2_model_name,
-		Custom3_model_name,
-		Custom4_model_name,
-		Custom5_model_name,
-		intended_purpose,
-		prescreen_score_threshold, 
-		isCalifornia_in_person,
-		riskview.constants.online,
-		run_riskview_report,//riskview.constants.no_riskview_report // don't run report in initial deployment
-		DataPermission,
-		SSNMask,
-		DOBMask,
-		DLMask,
-		FilterLienTypes, 
-		EndUserCompanyName,
-		CustomerNumber,
-		SecurityCode, 
-		IncludeRecordsWithSSN,
-	 IncludeBureauRecs, 
-		ReportingPeriod, 
-		IncludeLnJ,
-		RetainInputDID,
-		exception_score_reason
-
-		) 
-	);
+search_results_temp := ungroup(
+      	riskview.Search_Function(packagedInput,
+      		gateways,
+      		DataRestriction,
+      		AttributesVersionRequest, 
+      		auto_model_name, 
+      		bankcard_model_name, 
+      		Short_term_lending_model_name, 
+      		Telecommunications_model_name, 
+      		Crossindustry_model_name, 
+      		Custom_model_name,
+      		Custom2_model_name,
+      		Custom3_model_name,
+      		Custom4_model_name,
+      		Custom5_model_name,
+      		intended_purpose,
+      		prescreen_score_threshold, 
+      		isCalifornia_in_person,
+      		riskview.constants.online,
+      		run_riskview_report,//riskview.constants.no_riskview_report // don't run report in initial deployment
+      		DataPermission,
+      		SSNMask,
+      		DOBMask,
+      		DLMask,
+      		FilterLienTypes, 
+      		EndUserCompanyName,
+      		CustomerNumber,
+      		SecurityCode, 
+      		IncludeRecordsWithSSN,
+      	 IncludeBureauRecs, 
+      		ReportingPeriod, 
+      		IncludeLnJ,
+      		RetainInputDID,
+      		exception_score_reason,
+      		MinimumAmount := MinimumAmount,
+      		ExcludeStates := ExcludeStates,
+      		ExcludeReportingSources := ExcludeReportingSources
+      		) 
+      	);
   
 	#if(Models.LIB_RiskView_Models().TurnOnValidation) // If TRUE, output the model results directly
 		output(search_results_temp, named('Results'));
@@ -358,8 +366,8 @@ input_ok := map(((
 				includeLnj),	// TestSeed Values
 		  search_results_temp
 	 )
-   );	
-
+   );			
+	 
 /* ***************************************
 	 *    Convert Search Results to name/value pairs for ESDL:   *
    *************************************** */
@@ -1041,13 +1049,13 @@ input_ok := map(((
 			  self.Result.AttributesGroup.attributes := nameValuePairsVersion5;
 				self.Result.Alerts := nameValuePairsAlerts;
 				// self.Result.Report.ConsumerStatement := left.ConsumerStatementText;
-				self.Result.Report := left.report;
+				self.Result.LiensJudgmentsReports.Summary := IF(IncludeLNJ, left.report.summary);
+				self.Result.Report := IF(run_riskview_report, left.report);
 				
 				self.Result.ConsumerStatements := if(OutputConsumerStatements, left.ConsumerStatements);
 				self.Result.LiensJudgmentsReports.Liens := LnJ_liens;
 				self.Result.LiensJudgmentsReports.Judgments := LnJ_jdgmts;
-				self.Result.LiensJudgmentsReports.LnJAttributes := LnJReport; 
-
+				self.Result.LiensJudgmentsReports.LnJAttributes := LnJReport;
         
         // for inquiry logging, populate the consumer section with the DID and input fields
         // don't log the lexid if the person got a noscore

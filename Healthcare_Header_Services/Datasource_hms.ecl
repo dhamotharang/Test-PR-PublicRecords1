@@ -14,6 +14,7 @@ Export get_hms_Indiv (dataset(healthcare_header_services.Layouts.searchKeyResult
 																													self.rawdata.status:=right.mapped_status;
 																													self.rawdata.license_class_type:=right.mapped_class;
 																													self.rawData:=right;
+                                                          self:=right;
 																													self:=left;self:=[]),keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)); 
 			 rawdataIndividualbyVendoridSorted:=dedup(sort(rawdataIndividualbyVendorid,record),record);
        																									
