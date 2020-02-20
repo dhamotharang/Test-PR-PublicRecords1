@@ -586,9 +586,9 @@ EXPORT phone_noreconn_search := MACRO
     self.RealTimePhone_Ext := [],
     self := left));
 
-  Royalty.MAC_RoyaltyLastResort(results,lastresort_royalties)
-  targus_royalties := Royalty.RoyaltyTargus.GetOnlineRoyalties(results,,,trackPDE:=phoneOnlySearch,trackWCS:=doxie.DataPermission.use_confirm, trackVE:=~phoneOnlySearch);
-  Royalty.MAC_RoyaltyQSENT(results, qsent_royalties, use_qt, call_PVS and use_PVS)
+  Royalty.MAC_RoyaltyLastResort(marshalled_results,lastresort_royalties)
+  targus_royalties := Royalty.RoyaltyTargus.GetOnlineRoyalties(marshalled_results,,,trackPDE:=phoneOnlySearch,trackWCS:=doxie.DataPermission.use_confirm, trackVE:=~phoneOnlySearch);
+  Royalty.MAC_RoyaltyQSENT(marshalled_results, qsent_royalties, use_qt, call_PVS and use_PVS)
 
   royalties := dataset([], Royalty.Layouts.Royalty)
     + if(use_tg and ~call_PVS, targus_royalties)
