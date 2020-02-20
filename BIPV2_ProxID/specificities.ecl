@@ -17,6 +17,7 @@ EXPORT input_layout := RECORD // project out required fields
   h.active_enterprise_number;
   h.company_inc_state;
   h.company_charter_number;
+  h.active_corp_key;
   h.sbfe_id;
   h.hist_enterprise_number;
   h.hist_duns_number;
@@ -881,32 +882,32 @@ SHARED Fn_Reduce_Uber_Local(DATASET(Layout_Uber_Plus) in_ds) := FUNCTION
   RETURN DEDUP(SORT(in_ds,uid,word,field,LOCAL),uid,word,field,LOCAL);
 END;
 Layout_Uber_Plus IntoInversion(input_file le,UNSIGNED2 c) := TRANSFORM
-  SELF.word := CHOOSE(c,(SALT311.StrType)le.active_duns_number,(SALT311.StrType)le.active_enterprise_number,(SALT311.StrType)le.company_inc_state,(SALT311.StrType)le.company_charter_number,(SALT311.StrType)le.sbfe_id,(SALT311.StrType)le.hist_enterprise_number,(SALT311.StrType)le.hist_duns_number,(SALT311.StrType)le.hist_corp_key,(SALT311.StrType)le.ebr_file_number,(SALT311.StrType)le.company_fein,(SALT311.StrType)le.company_name,(SALT311.StrType)le.cnp_name_phonetic,'',(SALT311.StrType)le.company_name_type_raw,(SALT311.StrType)le.company_name_type_derived,(SALT311.StrType)le.cnp_hasnumber,(SALT311.StrType)le.cnp_number,(SALT311.StrType)le.cnp_btype,(SALT311.StrType)le.cnp_lowv,(SALT311.StrType)le.cnp_translated,(SALT311.StrType)le.cnp_classid,(SALT311.StrType)le.company_foreign_domestic,(SALT311.StrType)le.company_bdid,(SALT311.StrType)le.company_phone,(SALT311.StrType)le.prim_name,'',(SALT311.StrType)le.sec_range,(SALT311.StrType)le.v_city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.prim_range,(SALT311.StrType)le.prim_range_derived,SKIP,SKIP,SKIP,'','',SKIP);
+  SELF.word := CHOOSE(c,(SALT311.StrType)le.active_duns_number,(SALT311.StrType)le.active_enterprise_number,(SALT311.StrType)le.company_inc_state,(SALT311.StrType)le.company_charter_number,(SALT311.StrType)le.active_corp_key,(SALT311.StrType)le.sbfe_id,(SALT311.StrType)le.hist_enterprise_number,(SALT311.StrType)le.hist_duns_number,(SALT311.StrType)le.hist_corp_key,(SALT311.StrType)le.ebr_file_number,(SALT311.StrType)le.company_fein,(SALT311.StrType)le.company_name,(SALT311.StrType)le.cnp_name_phonetic,'',(SALT311.StrType)le.company_name_type_raw,(SALT311.StrType)le.company_name_type_derived,(SALT311.StrType)le.cnp_hasnumber,(SALT311.StrType)le.cnp_number,(SALT311.StrType)le.cnp_btype,(SALT311.StrType)le.cnp_lowv,(SALT311.StrType)le.cnp_translated,(SALT311.StrType)le.cnp_classid,(SALT311.StrType)le.company_foreign_domestic,(SALT311.StrType)le.company_bdid,(SALT311.StrType)le.company_phone,(SALT311.StrType)le.prim_name,'',(SALT311.StrType)le.sec_range,(SALT311.StrType)le.v_city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.prim_range,(SALT311.StrType)le.prim_range_derived,SKIP,SKIP,SKIP,'','',SKIP);
   SELF.field := c;
   SELF.uid := le.Proxid;
   SELF := le;
 END;
-nfields_r := Fn_Reduce_UBER_Local(NORMALIZE(input_file,37,IntoInversion(LEFT,COUNTER))(word<>''));
-SALT311.MAC_Expand_Wordbag_Field(input_file,cnp_name,13,Proxid,layout_uber_plus,nfields13);
-SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,26,Proxid,layout_uber_plus,nfields26);
-SALT311.MAC_Expand_Normal_Field(input_file,v_city_name,33,Proxid,layout_uber_plus,nfields7689);
-SALT311.MAC_Expand_Normal_Field(input_file,st,33,Proxid,layout_uber_plus,nfields7690);
-SALT311.MAC_Expand_Normal_Field(input_file,zip,33,Proxid,layout_uber_plus,nfields7691);
-nfields33 := nfields7689+nfields7690+nfields7691;//Collect wordbags for parts of concept field
-SALT311.MAC_Expand_Normal_Field(input_file,prim_range_derived,34,Proxid,layout_uber_plus,nfields7922);
-SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,34,Proxid,layout_uber_plus,nfields7923);
-SALT311.MAC_Expand_Normal_Field(input_file,sec_range,34,Proxid,layout_uber_plus,nfields7924);
+nfields_r := Fn_Reduce_UBER_Local(NORMALIZE(input_file,38,IntoInversion(LEFT,COUNTER))(word<>''));
+SALT311.MAC_Expand_Wordbag_Field(input_file,cnp_name,14,Proxid,layout_uber_plus,nfields14);
+SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,27,Proxid,layout_uber_plus,nfields27);
+SALT311.MAC_Expand_Normal_Field(input_file,v_city_name,34,Proxid,layout_uber_plus,nfields7922);
+SALT311.MAC_Expand_Normal_Field(input_file,st,34,Proxid,layout_uber_plus,nfields7923);
+SALT311.MAC_Expand_Normal_Field(input_file,zip,34,Proxid,layout_uber_plus,nfields7924);
 nfields34 := nfields7922+nfields7923+nfields7924;//Collect wordbags for parts of concept field
-SALT311.MAC_Expand_Normal_Field(input_file,prim_range_derived,35,Proxid,layout_uber_plus,nfields1900115);
-SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,35,Proxid,layout_uber_plus,nfields1900116);
-SALT311.MAC_Expand_Normal_Field(input_file,sec_range,35,Proxid,layout_uber_plus,nfields1900117);
-nfields8155 := nfields1900115+nfields1900116+nfields1900117;//Collect wordbags for parts of concept field
-SALT311.MAC_Expand_Normal_Field(input_file,v_city_name,35,Proxid,layout_uber_plus,nfields1900348);
-SALT311.MAC_Expand_Normal_Field(input_file,st,35,Proxid,layout_uber_plus,nfields1900349);
-SALT311.MAC_Expand_Normal_Field(input_file,zip,35,Proxid,layout_uber_plus,nfields1900350);
-nfields8156 := nfields1900348+nfields1900349+nfields1900350;//Collect wordbags for parts of concept field
-nfields35 := nfields8155+nfields8156;//Collect wordbags for parts of concept field
-NumberBaseFields := 37;
+SALT311.MAC_Expand_Normal_Field(input_file,prim_range_derived,35,Proxid,layout_uber_plus,nfields8155);
+SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,35,Proxid,layout_uber_plus,nfields8156);
+SALT311.MAC_Expand_Normal_Field(input_file,sec_range,35,Proxid,layout_uber_plus,nfields8157);
+nfields35 := nfields8155+nfields8156+nfields8157;//Collect wordbags for parts of concept field
+SALT311.MAC_Expand_Normal_Field(input_file,prim_range_derived,36,Proxid,layout_uber_plus,nfields1954404);
+SALT311.MAC_Expand_Wordbag_Field(input_file,prim_name_derived,36,Proxid,layout_uber_plus,nfields1954405);
+SALT311.MAC_Expand_Normal_Field(input_file,sec_range,36,Proxid,layout_uber_plus,nfields1954406);
+nfields8388 := nfields1954404+nfields1954405+nfields1954406;//Collect wordbags for parts of concept field
+SALT311.MAC_Expand_Normal_Field(input_file,v_city_name,36,Proxid,layout_uber_plus,nfields1954637);
+SALT311.MAC_Expand_Normal_Field(input_file,st,36,Proxid,layout_uber_plus,nfields1954638);
+SALT311.MAC_Expand_Normal_Field(input_file,zip,36,Proxid,layout_uber_plus,nfields1954639);
+nfields8389 := nfields1954637+nfields1954638+nfields1954639;//Collect wordbags for parts of concept field
+nfields36 := nfields8388+nfields8389;//Collect wordbags for parts of concept field
+NumberBaseFields := 38;
  
 infileSrcRidVlid := file_SrcRidVlid;
 Layout_Uber_Plus IntoInversion0(infileSrcRidVlid le,UNSIGNED2 c,UNSIGNED el=1) := TRANSFORM
@@ -952,7 +953,7 @@ Layout_Uber_Plus IntoInversion7(infileUnderLinks le,UNSIGNED2 c,UNSIGNED el=1) :
   SELF := le;
 END;
 afields7 := NORMALIZE(infileUnderLinks,1,IntoInversion7(LEFT,COUNTER))(word<>'');
-SHARED invert_records := nfields_r + nfields13 + nfields26 + afields0 + afields3 + afields5 + afields6 + afields7;
+SHARED invert_records := nfields_r + nfields14 + nfields27 + afields0 + afields3 + afields5 + afields6 + afields7;
 uber_values_deduped0 := Fn_Reduce_UBER_Local( DISTRIBUTE(invert_records,HASH(uid)));
 // minimize otherwise required changes to the macros used by uber and specificities!
 Layout_Uber_Plus_Spec := RECORD(Layout_Uber_Plus AND NOT uid)

@@ -34,6 +34,7 @@ FIELD:active_duns_number:PROP:18,78
 FIELD:active_enterprise_number:FORCE(--):PROP:20,15
 FIELD:company_inc_state:6,34
 FIELD:company_charter_number:CONTEXT(company_inc_state):26,110
+FIELD:active_corp_key:CARRY:0,0
 FIELD:sbfe_id:SWITCH0:27,475
 // Historical and non-domestic IDs from reliable sources
 // If match, add to score, if not, don't care(SWITCH0)

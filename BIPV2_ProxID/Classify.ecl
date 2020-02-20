@@ -40,7 +40,7 @@ EXPORT MultiTokenKeyName := '~'+'key::BIPV2_ProxID::Proxid::Token::MultiTokenKey
 EXPORT MultiTokenKey := INDEX(all_tokens0(SALT311.WordCount(TokenValue)>1),{UNSIGNED4 TokenHash := HASH32(TokenValue),TokenType},{all_tokens0},MultiTokenKeyName);
   company_addr1_tokens := PROJECT(Specificities(h).company_addr1_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.company_addr1; SELF.TokenType := 14; SELF.Spc := LEFT.field_Specificity ));
   company_csz_tokens := PROJECT(Specificities(h).company_csz_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.company_csz; SELF.TokenType := 16; SELF.Spc := LEFT.field_Specificity ));
-  company_address_tokens := PROJECT(Specificities(h).company_address_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.company_address; SELF.TokenType := 35; SELF.Spc := LEFT.field_Specificity ));
+  company_address_tokens := PROJECT(Specificities(h).company_address_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.company_address; SELF.TokenType := 36; SELF.Spc := LEFT.field_Specificity ));
 SHARED all_tokens1 := company_addr1_tokens + company_csz_tokens + company_address_tokens;
  
 EXPORT ConceptKeyName := '~'+'key::BIPV2_ProxID::Proxid::Token::ConceptKey';
@@ -109,7 +109,7 @@ shared company_csz_templates := project(company_csz_combinations,Into(LEFT));
   END;
   t := table(ih,company_address_filled_rec);
   company_address_filled_rec_totals := RECORD
-    UNSIGNED2 TokenType := 35;
+    UNSIGNED2 TokenType := 36;
     t.company_addr1_filled;
     t.company_csz_filled;
     UNSIGNED Cnt := COUNT(GROUP);

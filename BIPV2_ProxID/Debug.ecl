@@ -9,6 +9,10 @@ SHARED LowerMatchThreshold := MatchThreshold-3; // Keep extra 'borderlines' for 
 EXPORT Layout_Sample_Matches := RECORD(match_candidates(ih).Layout_Matches)
   INTEGER2 Attribute_Conf := 0; // Score provided by attribute files
   SALT311.StrType   Matching_Attributes := ''; // Keys from attribute files which match
+	string cnp_name_match_info := '';
+	string2 left_salt_partition;
+  string2 right_salt_partition;
+  INTEGER2 salt_partition_score;/*HACKDebug01*/
   TYPEOF(h.cnp_number) left_cnp_number;
   INTEGER1 cnp_number_match_code;
   INTEGER2 cnp_number_score;
@@ -125,6 +129,8 @@ EXPORT Layout_Sample_Matches := RECORD(match_candidates(ih).Layout_Matches)
   INTEGER2 company_name_type_derived_score;
   INTEGER2 company_name_type_derived_score_prop;
   TYPEOF(h.company_name_type_derived) right_company_name_type_derived;
+  TYPEOF(h.active_corp_key) left_active_corp_key;
+  TYPEOF(h.active_corp_key) right_active_corp_key;
   TYPEOF(h.company_name) left_company_name;
   TYPEOF(h.company_name) right_company_name;
   TYPEOF(h.company_name_type_raw) left_company_name_type_raw;
@@ -164,6 +170,9 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
   SELF.rcid1 := le.rcid;
   SELF.rcid2 := ri.rcid;
   SELF.DateOverlap := SALT311.fn_ComputeDateOverlap(((UNSIGNED)le.dt_first_seen),((UNSIGNED)le.dt_last_seen),((UNSIGNED)ri.dt_first_seen),((UNSIGNED)ri.dt_last_seen));
+  SELF.left_salt_partition  := le.salt_partition;
+  SELF.right_salt_partition := ri.salt_partition;
+  SELF.salt_partition_score := if(le.SALT_Partition = ri.SALT_Partition OR le.SALT_Partition='' OR ri.SALT_Partition = ''  ,0,-9999);/*HACKDebug02*/
   SELF.left_cnp_number := le.cnp_number;
   SELF.right_cnp_number := ri.cnp_number;
   SELF.cnp_number_match_code := MAP(
@@ -302,6 +311,8 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
                         le.company_name_type_derived_isnull OR ri.company_name_type_derived_isnull => 0,
                         le.company_name_type_derived = ri.company_name_type_derived  => le.company_name_type_derived_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.company_name_type_derived_weight100,ri.company_name_type_derived_weight100),s.company_name_type_derived_switch));
+  SELF.left_active_corp_key := le.active_corp_key;
+  SELF.right_active_corp_key := ri.active_corp_key;
   SELF.left_company_name := le.company_name;
   SELF.right_company_name := ri.company_name;
   SELF.left_company_name_type_raw := le.company_name_type_raw;
@@ -440,9 +451,39 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
                         SALT311.Fn_Fail_Scale(AVE(le.zip_weight100,ri.zip_weight100),s.zip_switch))*IF(company_csz_score_scale=0,1,company_csz_score_scale)*IF(company_address_score_scale=0,1,company_address_score_scale);
   SELF.support_cnp_name := cnp_name_support0; // Add support
   INTEGER2 cnp_name_score_supp := MIN(IF(SELF.support_cnp_name>0,MAX(cnp_name_score_temp,SELF.support_cnp_name*100),cnp_name_score_temp),s.cnp_name_MAXIMUM*100); // Add support
-  SELF.cnp_name_score := IF ( cnp_name_score_supp >= Config.cnp_name_Force * 100 OR SELF.company_charter_number_score > Config.cnp_name_OR1_company_charter_number_Force*100 OR SELF.active_duns_number_score > Config.cnp_name_OR2_active_duns_number_Force*100 OR SELF.company_fein_score > Config.cnp_name_OR3_company_fein_Force*100 OR SELF.cnp_name_phonetic_score > Config.cnp_name_OR4_cnp_name_phonetic_Force*100 OR SELF.sbfe_id_score > Config.cnp_name_OR5_sbfe_id_Force*100, cnp_name_score_supp, -9999 ); // Enforce FORCE parameter
+    import tools;
+  cnp_name_bow_most_38    := SALT311.MatchBagOfWords(le.cnp_name,ri.cnp_name,38   ,1);  //threshold of 800
+  string_similarity_ratio := tools.string_similarity_ratio(trim(le.cnp_name_phonetic),trim(ri.cnp_name_phonetic));
+  not_both_legal_names    := ~(regexfind('legal',le.company_name_type_derived,nocase) and regexfind('legal',ri.company_name_type_derived,nocase) );
+
+  self.cnp_name_match_info := 
+     'cnp_name_score_supp:'       + (string)cnp_name_score_supp 
+   + ' cnp_name_support0:'        + (string)cnp_name_support0 
+   + ' cnp_name_score_temp:'      + (string)cnp_name_score_temp
+   + ' cnp_name_bow_most_38:'     + (string)cnp_name_bow_most_38
+   + ' cnp_name_phonetic_score:'  + (string)self.cnp_name_phonetic_score
+   + ' string_similarity_ratio:'  + (string)string_similarity_ratio
+   ;
+  SELF.cnp_name_score := MAP ( 
+        le.cnp_name          = ri.cnp_name 
+    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_support0 = 0)
+    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_support0 > 0)  
+                                                                                                                                                                             => cnp_name_score_supp
+    ,self.company_charter_number_score   > Config.company_charter_number_Force  *100  and not_both_legal_names                                                               => 0
+    ,self.active_duns_number_score       > Config.active_duns_number_Force      *100  and not_both_legal_names                                                               => 0
+    ,self.company_fein_score             > Config.company_fein_Force            *100  and not_both_legal_names  and (le.SALT_Partition = '' and ri.SALT_Partition = '')  => 0                    /*no partitioned sources allowed*/
+    ,self.sbfe_id_score                  > Config.sbfe_id_Force                 *100  and not_both_legal_names  and (le.SALT_Partition = '' and ri.SALT_Partition = '')  => 0                    /*no partitioned sources allowed*/
+
+    ,(cnp_name_bow_most_38           >= 800 or self.cnp_name_phonetic_score        >= 700) and string_similarity_ratio >= 0.70/* or string_similarity_ratio >= 0.80 */   => map(cnp_name_bow_most_38 > self.cnp_name_phonetic_score and cnp_name_bow_most_38 > 800 => cnp_name_bow_most_38  
+                                                                                                                                                                           ,self.cnp_name_phonetic_score  >= 700                                                   => self.cnp_name_phonetic_score
+                                                                                                                                                                           ,0
+                                                                                                                                                                           )    // ,cnp_name_phonetic_score        >= 700 and string_similarity >= 0.70                                                                                            => 0                    //this is already counted as a regular field, so don't double count
+
+    ,                                                                                                                                                                      -9999 
+  );/*HACKCompanyNameScore*/ // Enforce FORCE parameter
+
   SELF.cnp_name_skipped := SELF.cnp_name_score < -5000;// Enforce FORCE parameter
-  SELF.prim_name_derived_score := IF ( prim_name_derived_score_temp >= Config.prim_name_derived_Force * 100 OR company_addr1_score_pre > 0 OR company_address_score_pre > 0, prim_name_derived_score_temp, -9999 ); // Enforce FORCE parameter
+  SELF.prim_name_derived_score := IF ( le.prim_name_derived = ri.prim_name_derived/*HACKPrimName*/ or prim_name_derived_score_temp >= Config.prim_name_derived_Force * 100 OR company_addr1_score_pre > 0 OR company_address_score_pre > 0, prim_name_derived_score_temp, -9999 ); // Enforce FORCE parameter
   SELF.prim_name_derived_skipped := SELF.prim_name_derived_score < -5000;// Enforce FORCE parameter
   SELF.st_score := IF ( st_score_temp > Config.st_Force * 100 OR company_csz_score_pre > 0 OR company_address_score_pre > 0, st_score_temp, -9999 ); // Enforce FORCE parameter
   SELF.st_skipped := SELF.st_score < -5000;// Enforce FORCE parameter
@@ -478,37 +519,79 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
   SELF.company_name_type_derived_score_prop := MAX(le.company_name_type_derived_prop,ri.company_name_type_derived_prop)*SELF.company_name_type_derived_score; // Score if either field propogated
   SELF.company_address_score_prop := IF(le.company_address_prop+ri.company_address_prop>0,SELF.company_address_score*(0+IF(le.company_addr1_prop+ri.company_addr1_prop>0,s.company_addr1_specificity,0))/( s.company_addr1_specificity),0);
   SELF.Conf_Prop := (0 + SELF.cnp_number_score_prop + SELF.prim_range_derived_score_prop + SELF.hist_enterprise_number_score_prop + SELF.ebr_file_number_score_prop + SELF.active_enterprise_number_score_prop + SELF.hist_corp_key_score_prop + SELF.hist_duns_number_score_prop + SELF.active_duns_number_score_prop + SELF.company_phone_score_prop + SELF.company_fein_score_prop + SELF.company_addr1_score_prop + SELF.sec_range_score_prop + SELF.company_name_type_derived_score_prop + SELF.company_address_score_prop) / 100; // Score based on propogated fields
-  SELF.Conf := (SELF.cnp_number_score + SELF.sbfe_id_score + SELF.company_charter_number_score + SELF.hist_enterprise_number_score + SELF.ebr_file_number_score + SELF.active_enterprise_number_score + SELF.hist_corp_key_score + SELF.hist_duns_number_score + SELF.active_duns_number_score + SELF.company_phone_score + SELF.company_fein_score /*+ SELF.cnp_name_phonetic_score*/ /*HACKcnp_name_phonetic_score*/ + SELF.cnp_name_score + SELF.company_inc_state_score + SELF.cnp_btype_score + SELF.company_name_type_derived_score + IF(SELF.company_address_score>0,MAX(SELF.company_address_score,IF(SELF.company_addr1_score>0,MAX(SELF.company_addr1_score,SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score),SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score) + IF(SELF.company_csz_score>0,MAX(SELF.company_csz_score,SELF.v_city_name_score + SELF.st_score + SELF.zip_score),SELF.v_city_name_score + SELF.st_score + SELF.zip_score)),IF(SELF.company_addr1_score>0,MAX(SELF.company_addr1_score,SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score),SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score) + IF(SELF.company_csz_score>0,MAX(SELF.company_csz_score,SELF.v_city_name_score + SELF.st_score + SELF.zip_score),SELF.v_city_name_score + SELF.st_score + SELF.zip_score))) / 100 + outside;
+  import ut;
+iComp1 := (self.salt_partition_score + SELF.cnp_number_score + SELF.sbfe_id_score + SELF.company_charter_number_score + SELF.hist_enterprise_number_score + SELF.ebr_file_number_score + SELF.active_enterprise_number_score + SELF.hist_corp_key_score + SELF.hist_duns_number_score + SELF.active_duns_number_score + SELF.company_phone_score + SELF.company_fein_score /*+ SELF.cnp_name_phonetic_score HACK HACKScoreAssignment*/ + SELF.cnp_name_score + SELF.company_inc_state_score + SELF.cnp_btype_score + SELF.company_name_type_derived_score + IF(SELF.company_address_score>0,MAX(SELF.company_address_score,IF(SELF.company_addr1_score>0,MAX(SELF.company_addr1_score,SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score),SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score) + IF(SELF.company_csz_score>0,MAX(SELF.company_csz_score,SELF.v_city_name_score + SELF.st_score + SELF.zip_score),SELF.v_city_name_score + SELF.st_score + SELF.zip_score)),IF(SELF.company_addr1_score>0,MAX(SELF.company_addr1_score,SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score),SELF.prim_range_derived_score + SELF.prim_name_derived_score + SELF.sec_range_score) + IF(SELF.company_csz_score>0,MAX(SELF.company_csz_score,SELF.v_city_name_score + SELF.st_score + SELF.zip_score),SELF.v_city_name_score + SELF.st_score + SELF.zip_score))) / 100 + outside;
+iComp  := map( iComp1            >= MatchThreshold                                   => iComp1 
+              ,le.company_address = ri.company_address and le.cnp_name = ri.cnp_name and ut.nneq(le.active_duns_number,ri.active_duns_number)=> 9000 + iComp1
+              ,le.cnp_name = ri.cnp_name and  le.prim_range_derived = ri.prim_range_derived and le.prim_name_derived = ri.prim_name_derived and ut.nneq(le.v_city_name,ri.v_city_name) and le.st = ri.st and le.zip = ri.zip and ut.nneq(le.active_duns_number,ri.active_duns_number)=> 9000 + iComp1
+              ,                                                                         iComp1
+          );
+SELF.Conf := iComp;/*HACKScoreAssignment*/
 END;
 SHARED AppendAttribs(DATASET(layout_sample_matches) am,DATASET(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION
   Layout_Sample_Matches add_attr(am le, ia ri) := TRANSFORM
     SELF.Attribute_Conf := ri.Conf;
     SELF.Matching_Attributes := ri.Source_Id;
     SELF.Conf := le.Conf + ri.Conf;
-  SELF.support_cnp_name := le.support_cnp_name+ri.support_cnp_name;
+  // SELF.support_cnp_name := le.support_cnp_name+ri.support_cnp_name;
+  SELF.support_cnp_name := le.support_cnp_name;
     SELF := le;
   END;
   RETURN JOIN(am,ia,LEFT.Proxid1=RIGHT.Proxid1 AND LEFT.Proxid2=RIGHT.Proxid2,add_attr(LEFT,RIGHT),LEFT OUTER,HASH);
 END;
- 
-EXPORT AnnotateMatchesFromData(DATASET(match_candidates(ih).layout_candidates) in_data,DATASET(match_candidates(ih).layout_matches)  im,dataset(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION
+  
+/*HACKDebug03*/
+EXPORT AnnotateMatchesFromRecordData(DATASET(match_candidates(ih).layout_candidates) in_data  ,DATASET(match_candidates(ih).layout_matches)  im,DATASET(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION//Faster form when rcid known
+
+  p0 := project(im,transform(match_candidates(ih).layout_attribute_matches,self := left,self := []));
+  j0 := join(p0,ia,left.proxid1 = right.proxid1 and left.proxid2 = right.proxid2,transform(match_candidates(ih).layout_attribute_matches,self.support_cnp_name := right.support_cnp_name,self.source_id := right.source_id,self := left,self := []),left outer,hash);
+  
+  j1 := JOIN(in_data,j0,LEFT.rcid = RIGHT.rcid1,HASH);
+  match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
+    SELF := le;
+  END;
+//  output(topn(ia,100,proxid1,proxid2),named('ia'));
+//  output(topn(ia,100,proxid2,proxid1),named('ia_reverse'));
+//  output(choosen(p0,100),named('p0'));
+//  output(choosen(p0(rule = 10000),100),named('p0_rule10000'));
+//  output(choosen(j0,100),named('j0'));
+//  output(choosen(j0(support_cnp_name > 0),100),named('j0_withsupport'));
+  returndataset := JOIN(j1,in_data,LEFT.rcid2 = RIGHT.rcid  ,sample_match_join( PROJECT(LEFT,strim(LEFT)) ,RIGHT,left.rule,,left.support_cnp_name) ,HASH); //-- NEED RULE HERE
+//  output(choosen(returndataset(support_cnp_name > 0),100),named('returndataset'));
+  
+  RETURN returndataset;
+END;
+
+// -- USED BY THE KEYS ATTRIBUTE TO BUILD THE MATCH SAMPLE KEY
+EXPORT AnnotateMatches(DATASET(match_candidates(ih).layout_matches)  im,dataset(Match_Candidates(ih).layout_attribute_matches) ia) := FUNCTION
+  RETURN AppendAttribs( AnnotateMatchesFromRecordData(h,im,ia), ia );
+END;
+///////////////
+
+// -- USED BY SALT_REGRESSION_TESTING.mac_Rollup_Match_Scores TO GET EXAMPLES
+EXPORT AnnotateMatchesFromData(DATASET(match_candidates(ih).layout_candidates) in_data,DATASET(match_candidates(ih).layout_matches)  im,dataset(Match_Candidates(ih).layout_attribute_matches) ia) := FUNCTION
   j1 := JOIN(in_data,im,LEFT.Proxid = RIGHT.Proxid1,HASH);
   match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
     SELF := le;
   END;
-  r := JOIN(j1,in_data,LEFT.Proxid2 = RIGHT.Proxid,sample_match_join( PROJECT(LEFT,strim(LEFT)),RIGHT),HASH);
-  d := DEDUP( r(rcid1 <> rcid2), ALL, WHOLE RECORD ); // keep all matches and allow downstream processes to filter
+
+  r1 := JOIN(j1,in_data,LEFT.Proxid2 = RIGHT.Proxid,transform({unsigned6 proxid1,unsigned6 proxid2,recordof(left) leftrec,recordof(right) rightrec},self.leftrec := left,self.rightrec := right,self := left),HASH);  //new hack
+
+  r2 := JOIN(r1,ia,LEFT.Proxid1 = RIGHT.Proxid1 and left.proxid2 = right.proxid2,transform({recordof(left),unsigned rule,unsigned support_cnp_name}
+    ,self.rule              := if(right.proxid1 != 0,right.rule,left.leftrec.rule)
+    ,self.support_cnp_name  := right.support_cnp_name
+    ,self                   := left
+  ),HASH,left outer);
+
+  r := project(distribute(r2),sample_match_join( PROJECT(LEFT.leftrec,strim(LEFT)),left.rightrec,left.rule,,left.support_cnp_name));
+  // r := JOIN(r1,ia,LEFT.Proxid1 = RIGHT.Proxid1 and left.proxid2 = right.proxid2,sample_match_join( PROJECT(LEFT.leftrec,strim(LEFT)),left.rightrec,left.leftrec.rule,,right.support_cnp_name),HASH,left outer);
+  // d := DEDUP( SORT( r, Proxid1, Proxid2, -Conf, LOCAL ), Proxid1, Proxid2, LOCAL ); // Proxid2 distributed by join
+  d := DEDUP( SORT( r, Proxid1, Proxid2, -map(Conf between 30 and 7000 => conf ,conf > 7000  => 29 ,conf - 1), LOCAL ), Proxid1, Proxid2, LOCAL ); // Proxid2 distributed by join
   RETURN AppendAttribs( d, ia );
+
+  // RETURN AppendAttribs( AnnotateMatchesFromRecordData(in_data,im,ia), ia );
 END;
- 
-EXPORT AnnotateMatchesFromRecordData(DATASET(match_candidates(ih).layout_candidates) in_data,DATASET(match_candidates(ih).layout_matches)  im) := FUNCTION//Faster form when rcid known
-  j1 := JOIN(in_data,im,LEFT.rcid = RIGHT.rcid1,HASH);
-  match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
-    SELF := le;
-  END;
-  RETURN JOIN(j1,in_data,LEFT.rcid2 = RIGHT.rcid,sample_match_join( PROJECT(LEFT,strim(LEFT)),RIGHT),HASH);
-END;
- 
+
 EXPORT AnnotateClusterMatches(DATASET(match_candidates(ih).layout_candidates) in_data,SALT311.UIDType BaseRecord) := FUNCTION//Faster form when rcid known
   j1 := in_data(rcid = BaseRecord);
   match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
@@ -516,35 +599,27 @@ EXPORT AnnotateClusterMatches(DATASET(match_candidates(ih).layout_candidates) in
   END;
   RETURN JOIN(in_data(rcid<>BaseRecord),j1,TRUE,sample_match_join( PROJECT(LEFT,strim(LEFT)),RIGHT),ALL);
 END;
- 
-EXPORT AnnotateMatches(DATASET(match_candidates(ih).layout_matches) im,dataset(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION
-  am := AnnotateMatchesFromRecordData(h,im);
-  am restoreRule(am le,im ri) := TRANSFORM
-    SELF.rule := ri.rule;
-    SELF := le;
-  END;
-  annotated_matches := JOIN(am,im,LEFT.rcid1=RIGHT.rcid1 AND LEFT.rcid2=RIGHT.rcid2,restoreRule(LEFT,RIGHT),HASH);
-  RETURN AppendAttribs( annotated_matches, ia );
-END;
-EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)
+
+EXPORT Layout_RolledEntity /*HACKDebug_Layout_RolledEntity*/:= RECORD,MAXLENGTH(63000)
   SALT311.UIDType Proxid;
-  DATASET(SALT311.Layout_FieldValueList) cnp_number_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) sbfe_id_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) company_name_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) company_address_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) active_corp_key_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) company_inc_state_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) company_charter_number_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) active_duns_number_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) company_fein_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) sbfe_id_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) hist_enterprise_number_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) ebr_file_number_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) active_enterprise_number_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) hist_corp_key_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) hist_duns_number_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) active_duns_number_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) company_phone_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) company_fein_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) cnp_name_phonetic_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) hist_duns_number_Values := DATASET([],SALT311.Layout_FieldValueList); 
   DATASET(SALT311.Layout_FieldValueList) cnp_name_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) company_inc_state_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) cnp_number_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) company_phone_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) cnp_btype_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) company_name_type_derived_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) company_name_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) company_name_type_raw_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) cnp_hasnumber_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) cnp_lowv_Values := DATASET([],SALT311.Layout_FieldValueList);
@@ -552,12 +627,12 @@ EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)
   DATASET(SALT311.Layout_FieldValueList) cnp_classid_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) company_foreign_domestic_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) company_bdid_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) prim_name_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) prim_range_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) company_address_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) prim_name_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) dt_first_seen_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) dt_last_seen_Values := DATASET([],SALT311.Layout_FieldValueList);
 END;
+
  
 SHARED RollEntities(dataset(Layout_RolledEntity) infile) := FUNCTION
   Layout_RolledEntity RollValues(Layout_RolledEntity le,Layout_RolledEntity ri) := TRANSFORM
@@ -573,11 +648,12 @@ SHARED RollEntities(dataset(Layout_RolledEntity) infile) := FUNCTION
     SELF.active_duns_number_values := SALT311.fn_combine_fieldvaluelist(le.active_duns_number_values,ri.active_duns_number_values);
     SELF.company_phone_values := SALT311.fn_combine_fieldvaluelist(le.company_phone_values,ri.company_phone_values);
     SELF.company_fein_values := SALT311.fn_combine_fieldvaluelist(le.company_fein_values,ri.company_fein_values);
-    SELF.cnp_name_phonetic_values := SALT311.fn_combine_fieldvaluelist(le.cnp_name_phonetic_values,ri.cnp_name_phonetic_values);
+    //SELF.cnp_name_phonetic_values := SALT311.fn_combine_fieldvaluelist(le.cnp_name_phonetic_values,ri.cnp_name_phonetic_values);/*HACKDebug remove cnp_name_phonetic_values*/
     SELF.cnp_name_values := SALT311.fn_combine_fieldvaluelist(le.cnp_name_values,ri.cnp_name_values);
     SELF.company_inc_state_values := SALT311.fn_combine_fieldvaluelist(le.company_inc_state_values,ri.company_inc_state_values);
     SELF.cnp_btype_values := SALT311.fn_combine_fieldvaluelist(le.cnp_btype_values,ri.cnp_btype_values);
     SELF.company_name_type_derived_values := SALT311.fn_combine_fieldvaluelist(le.company_name_type_derived_values,ri.company_name_type_derived_values);
+    SELF.active_corp_key_values := SALT311.fn_combine_fieldvaluelist(le.active_corp_key_values,ri.active_corp_key_values);
     SELF.company_name_values := SALT311.fn_combine_fieldvaluelist(le.company_name_values,ri.company_name_values);
     SELF.company_name_type_raw_values := SALT311.fn_combine_fieldvaluelist(le.company_name_type_raw_values,ri.company_name_type_raw_values);
     SELF.cnp_hasnumber_values := SALT311.fn_combine_fieldvaluelist(le.cnp_hasnumber_values,ri.cnp_hasnumber_values);
@@ -592,7 +668,11 @@ SHARED RollEntities(dataset(Layout_RolledEntity) infile) := FUNCTION
     SELF.dt_first_seen_values := SALT311.fn_combine_fieldvaluelist(le.dt_first_seen_values,ri.dt_first_seen_values);
     SELF.dt_last_seen_values := SALT311.fn_combine_fieldvaluelist(le.dt_last_seen_values,ri.dt_last_seen_values);
   END;
-  ds_roll := ROLLUP( SORT( DISTRIBUTE( infile, HASH(Proxid) ), Proxid, LOCAL ), LEFT.Proxid = RIGHT.Proxid, RollValues(LEFT,RIGHT),LOCAL);
+  //ds_roll := ROLLUP( SORT( DISTRIBUTE( infile, HASH(Proxid) ), Proxid, LOCAL ), LEFT.Proxid = RIGHT.Proxid, RollValues(LEFT,RIGHT),LOCAL);
+rollup1 :=  ROLLUP( SORT( distribute(infile  ,random()) , Proxid ,local), LEFT.Proxid = RIGHT.Proxid, RollValues(LEFT,RIGHT),local); /*HACKDebug04*/
+rollup2 :=  ROLLUP( SORT( distribute(rollup1 ,random()) , Proxid ,local), LEFT.Proxid = RIGHT.Proxid, RollValues(LEFT,RIGHT),local); /*HACKDebug04*/
+rollup3 :=  ROLLUP( SORT( distribute(rollup2 ,proxid)   , Proxid ,local), LEFT.Proxid = RIGHT.Proxid, RollValues(LEFT,RIGHT),local); /*HACKDebug04*/
+ds_roll := rollup3; 
   Layout_RolledEntity SortValues(Layout_RolledEntity le) := TRANSFORM
     SELF.Proxid := le.Proxid;
     SELF.cnp_number_values := SORT(le.cnp_number_values, -cnt, val, LOCAL);
@@ -606,11 +686,12 @@ SHARED RollEntities(dataset(Layout_RolledEntity) infile) := FUNCTION
     SELF.active_duns_number_values := SORT(le.active_duns_number_values, -cnt, val, LOCAL);
     SELF.company_phone_values := SORT(le.company_phone_values, -cnt, val, LOCAL);
     SELF.company_fein_values := SORT(le.company_fein_values, -cnt, val, LOCAL);
-    SELF.cnp_name_phonetic_values := SORT(le.cnp_name_phonetic_values, -cnt, val, LOCAL);
+    //SELF.cnp_name_phonetic_values := SORT(le.cnp_name_phonetic_values, -cnt, val, LOCAL);/*HACKDebug remove cnp_name_phonetic_values*/
     SELF.cnp_name_values := SORT(le.cnp_name_values, -cnt, val, LOCAL);
     SELF.company_inc_state_values := SORT(le.company_inc_state_values, -cnt, val, LOCAL);
     SELF.cnp_btype_values := SORT(le.cnp_btype_values, -cnt, val, LOCAL);
     SELF.company_name_type_derived_values := SORT(le.company_name_type_derived_values, -cnt, val, LOCAL);
+    SELF.active_corp_key_values := SORT(le.active_corp_key_values, -cnt, val, LOCAL);
     SELF.company_name_values := SORT(le.company_name_values, -cnt, val, LOCAL);
     SELF.company_name_type_raw_values := SORT(le.company_name_type_raw_values, -cnt, val, LOCAL);
     SELF.cnp_hasnumber_values := SORT(le.cnp_hasnumber_values, -cnt, val, LOCAL);
@@ -644,11 +725,12 @@ Layout_RolledEntity into(in_data le) := TRANSFORM
   SELF.active_duns_number_Values := IF ( (le.active_duns_number  IN SET(s.nulls_active_duns_number,active_duns_number) OR le.active_duns_number = (TYPEOF(le.active_duns_number))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.active_duns_number)}],SALT311.Layout_FieldValueList));
   SELF.company_phone_Values := IF ( (le.company_phone  IN SET(s.nulls_company_phone,company_phone) OR le.company_phone = (TYPEOF(le.company_phone))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.company_phone)}],SALT311.Layout_FieldValueList));
   SELF.company_fein_Values := IF ( (le.company_fein  IN SET(s.nulls_company_fein,company_fein) OR le.company_fein = (TYPEOF(le.company_fein))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.company_fein)}],SALT311.Layout_FieldValueList));
-  SELF.cnp_name_phonetic_Values := IF ( (le.cnp_name_phonetic  IN SET(s.nulls_cnp_name_phonetic,cnp_name_phonetic) OR le.cnp_name_phonetic = (TYPEOF(le.cnp_name_phonetic))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.cnp_name_phonetic)}],SALT311.Layout_FieldValueList));
+  //SELF.cnp_name_phonetic_Values := IF ( (le.cnp_name_phonetic  IN SET(s.nulls_cnp_name_phonetic,cnp_name_phonetic) OR le.cnp_name_phonetic = (TYPEOF(le.cnp_name_phonetic))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.cnp_name_phonetic)}],SALT311.Layout_FieldValueList));/*HACKDebug remove cnp_name_phonetic_values*/
   SELF.cnp_name_Values := IF ( (le.cnp_name  IN SET(s.nulls_cnp_name,cnp_name) OR le.cnp_name = (TYPEOF(le.cnp_name))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.cnp_name)}],SALT311.Layout_FieldValueList));
   SELF.company_inc_state_Values := IF ( (le.company_inc_state  IN SET(s.nulls_company_inc_state,company_inc_state) OR le.company_inc_state = (TYPEOF(le.company_inc_state))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.company_inc_state)}],SALT311.Layout_FieldValueList));
   SELF.cnp_btype_Values := IF ( (le.cnp_btype  IN SET(s.nulls_cnp_btype,cnp_btype) OR le.cnp_btype = (TYPEOF(le.cnp_btype))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.cnp_btype)}],SALT311.Layout_FieldValueList));
   SELF.company_name_type_derived_Values := IF ( (le.company_name_type_derived  IN SET(s.nulls_company_name_type_derived,company_name_type_derived) OR le.company_name_type_derived = (TYPEOF(le.company_name_type_derived))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.company_name_type_derived)}],SALT311.Layout_FieldValueList));
+  SELF.active_corp_key_Values := DATASET([{TRIM((SALT311.StrType)le.active_corp_key)}],SALT311.Layout_FieldValueList);
   SELF.company_name_Values := DATASET([{TRIM((SALT311.StrType)le.company_name)}],SALT311.Layout_FieldValueList);
   SELF.company_name_type_raw_Values := DATASET([{TRIM((SALT311.StrType)le.company_name_type_raw)}],SALT311.Layout_FieldValueList);
   SELF.cnp_hasnumber_Values := DATASET([{TRIM((SALT311.StrType)le.cnp_hasnumber)}],SALT311.Layout_FieldValueList);
@@ -680,11 +762,12 @@ Layout_RolledEntity into(ih le) := TRANSFORM
   SELF.active_duns_number_Values := IF ( (le.active_duns_number  IN SET(s.nulls_active_duns_number,active_duns_number) OR le.active_duns_number = (TYPEOF(le.active_duns_number))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.active_duns_number)}],SALT311.Layout_FieldValueList));
   SELF.company_phone_Values := IF ( (le.company_phone  IN SET(s.nulls_company_phone,company_phone) OR le.company_phone = (TYPEOF(le.company_phone))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.company_phone)}],SALT311.Layout_FieldValueList));
   SELF.company_fein_Values := IF ( (le.company_fein  IN SET(s.nulls_company_fein,company_fein) OR le.company_fein = (TYPEOF(le.company_fein))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.company_fein)}],SALT311.Layout_FieldValueList));
-  SELF.cnp_name_phonetic_Values := IF ( (le.cnp_name_phonetic  IN SET(s.nulls_cnp_name_phonetic,cnp_name_phonetic) OR le.cnp_name_phonetic = (TYPEOF(le.cnp_name_phonetic))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.cnp_name_phonetic)}],SALT311.Layout_FieldValueList));
+  //SELF.cnp_name_phonetic_Values := IF ( (le.cnp_name_phonetic  IN SET(s.nulls_cnp_name_phonetic,cnp_name_phonetic) OR le.cnp_name_phonetic = (TYPEOF(le.cnp_name_phonetic))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.cnp_name_phonetic)}],SALT311.Layout_FieldValueList));/*HACKDebug remove cnp_name_phonetic_values*/
   SELF.cnp_name_Values := IF ( (le.cnp_name  IN SET(s.nulls_cnp_name,cnp_name) OR le.cnp_name = (TYPEOF(le.cnp_name))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.cnp_name)}],SALT311.Layout_FieldValueList));
   SELF.company_inc_state_Values := IF ( (le.company_inc_state  IN SET(s.nulls_company_inc_state,company_inc_state) OR le.company_inc_state = (TYPEOF(le.company_inc_state))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.company_inc_state)}],SALT311.Layout_FieldValueList));
   SELF.cnp_btype_Values := IF ( (le.cnp_btype  IN SET(s.nulls_cnp_btype,cnp_btype) OR le.cnp_btype = (TYPEOF(le.cnp_btype))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.cnp_btype)}],SALT311.Layout_FieldValueList));
   SELF.company_name_type_derived_Values := IF ( (le.company_name_type_derived  IN SET(s.nulls_company_name_type_derived,company_name_type_derived) OR le.company_name_type_derived = (TYPEOF(le.company_name_type_derived))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.company_name_type_derived)}],SALT311.Layout_FieldValueList));
+  SELF.active_corp_key_Values := DATASET([{TRIM((SALT311.StrType)le.active_corp_key)}],SALT311.Layout_FieldValueList);
   SELF.company_name_Values := DATASET([{TRIM((SALT311.StrType)le.company_name)}],SALT311.Layout_FieldValueList);
   SELF.company_name_type_raw_Values := DATASET([{TRIM((SALT311.StrType)le.company_name_type_raw)}],SALT311.Layout_FieldValueList);
   SELF.cnp_hasnumber_Values := DATASET([{TRIM((SALT311.StrType)le.cnp_hasnumber)}],SALT311.Layout_FieldValueList);
@@ -767,7 +850,8 @@ Layout_Chubbies0 := RECORD,MAXLENGTH(63000)
   UNSIGNED1 active_duns_number_size := 0;
   UNSIGNED1 company_phone_size := 0;
   UNSIGNED1 company_fein_size := 0;
-  UNSIGNED1 cnp_name_phonetic_size := 0;
+  //UNSIGNED1 cnp_name_phonetic_size := 0;/*HACKDebug remove cnp_name_phonetic_size in layout*/
+
   UNSIGNED1 cnp_name_size := 0;
   UNSIGNED1 company_inc_state_size := 0;
   UNSIGNED1 cnp_btype_size := 0;
@@ -787,7 +871,8 @@ Layout_Chubbies0 NoteSize(Layout_Chubbies0 le) := TRANSFORM
   SELF.active_duns_number_size := SALT311.Fn_SwitchSpec(s.active_duns_number_switch,count(le.active_duns_number_values));
   SELF.company_phone_size := SALT311.Fn_SwitchSpec(s.company_phone_switch,count(le.company_phone_values));
   SELF.company_fein_size := SALT311.Fn_SwitchSpec(s.company_fein_switch,count(le.company_fein_values));
-  SELF.cnp_name_phonetic_size := SALT311.Fn_SwitchSpec(s.cnp_name_phonetic_switch,count(le.cnp_name_phonetic_values));
+  //SELF.cnp_name_phonetic_size := SALT311.Fn_SwitchSpec(s.cnp_name_phonetic_switch,count(le.cnp_name_phonetic_values));/*HACKDebug remove cnp_name_phonetic_size*/
+
   SELF.cnp_name_size := SALT311.Fn_SwitchSpec(s.cnp_name_switch,count(le.cnp_name_values));
   SELF.company_inc_state_size := SALT311.Fn_SwitchSpec(s.company_inc_state_switch,count(le.company_inc_state_values));
   SELF.cnp_btype_size := SALT311.Fn_SwitchSpec(s.cnp_btype_switch,count(le.cnp_btype_values));
@@ -797,7 +882,7 @@ Layout_Chubbies0 NoteSize(Layout_Chubbies0 le) := TRANSFORM
 END;  t := PROJECT(t0,NoteSize(LEFT));
 Layout_Chubbies := RECORD,MAXLENGTH(63000)
   t;
-  UNSIGNED2 Size := t.cnp_number_size+t.sbfe_id_size+t.company_charter_number_size+t.hist_enterprise_number_size+t.ebr_file_number_size+t.active_enterprise_number_size+t.hist_corp_key_size+t.hist_duns_number_size+t.active_duns_number_size+t.company_phone_size+t.company_fein_size+t.cnp_name_phonetic_size+t.cnp_name_size+t.company_inc_state_size+t.cnp_btype_size+t.company_name_type_derived_size+t.company_address_size;
+  UNSIGNED2 Size := t.cnp_number_size+t.sbfe_id_size+t.company_charter_number_size+t.hist_enterprise_number_size+t.ebr_file_number_size+t.active_enterprise_number_size+t.hist_corp_key_size+t.hist_duns_number_size+t.active_duns_number_size+t.company_phone_size+t.company_fein_size/*+t.cnp_name_phonetic_size*//*HACKDebug remove cnp_name_phonetic_size from score add*/+t.cnp_name_size+t.company_inc_state_size+t.cnp_btype_size+t.company_name_type_derived_size+t.company_address_size;
 END;
 EXPORT Chubbies := TABLE(t,Layout_Chubbies);
 END;

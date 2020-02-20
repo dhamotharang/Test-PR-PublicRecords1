@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_active_duns_number = '',Input_active_enterprise_number = '',Input_company_inc_state = '',Input_company_charter_number = '',Input_sbfe_id = '',Input_hist_enterprise_number = '',Input_hist_duns_number = '',Input_hist_corp_key = '',Input_ebr_file_number = '',Input_company_fein = '',Input_company_name = '',Input_cnp_name_phonetic = '',Input_cnp_name = '',Input_company_name_type_raw = '',Input_company_name_type_derived = '',Input_cnp_hasnumber = '',Input_cnp_number = '',Input_cnp_btype = '',Input_cnp_lowv = '',Input_cnp_translated = '',Input_cnp_classid = '',Input_company_foreign_domestic = '',Input_company_bdid = '',Input_company_phone = '',Input_prim_name = '',Input_prim_name_derived = '',Input_sec_range = '',Input_v_city_name = '',Input_st = '',Input_zip = '',Input_prim_range = '',Input_prim_range_derived = '',Input_company_csz = '',Input_company_addr1 = '',Input_company_address = '',Input_dt_first_seen = '',Input_dt_last_seen = '',OutFile) := MACRO
+EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_active_duns_number = '',Input_active_enterprise_number = '',Input_company_inc_state = '',Input_company_charter_number = '',Input_active_corp_key = '',Input_sbfe_id = '',Input_hist_enterprise_number = '',Input_hist_duns_number = '',Input_hist_corp_key = '',Input_ebr_file_number = '',Input_company_fein = '',Input_company_name = '',Input_cnp_name_phonetic = '',Input_cnp_name = '',Input_company_name_type_raw = '',Input_company_name_type_derived = '',Input_cnp_hasnumber = '',Input_cnp_number = '',Input_cnp_btype = '',Input_cnp_lowv = '',Input_cnp_translated = '',Input_cnp_classid = '',Input_company_foreign_domestic = '',Input_company_bdid = '',Input_company_phone = '',Input_prim_name = '',Input_prim_name_derived = '',Input_sec_range = '',Input_v_city_name = '',Input_st = '',Input_zip = '',Input_prim_range = '',Input_prim_range_derived = '',Input_company_csz = '',Input_company_addr1 = '',Input_company_address = '',Input_dt_first_seen = '',Input_dt_last_seen = '',OutFile) := MACRO
   IMPORT SALT311,BIPV2_ProxID;
   #uniquename(of)
   %of% := RECORD
@@ -33,6 +33,12 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_active_duns_number
       '' 
     #ELSE
         IF( le.Input_company_charter_number = (TYPEOF(le.Input_company_charter_number))'','',':company_charter_number')
+    #END
+ 
++    #IF( #TEXT(Input_active_corp_key)='' )
+      '' 
+    #ELSE
+        IF( le.Input_active_corp_key = (TYPEOF(le.Input_active_corp_key))'','',':active_corp_key')
     #END
  
 +    #IF( #TEXT(Input_sbfe_id)='' )

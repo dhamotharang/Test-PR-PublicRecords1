@@ -22,7 +22,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'DOT_Base';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:rcid';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_Proxid */,/* MY_lgid3 */,/* MY_orgid */,/* MY_ultid */,active_duns_number,active_enterprise_number,company_inc_state,company_charter_number,sbfe_id,hist_enterprise_number,hist_duns_number,hist_corp_key,ebr_file_number,company_fein,company_name,cnp_name_phonetic,cnp_name,company_name_type_raw,company_name_type_derived,cnp_hasnumber,cnp_number,cnp_btype,cnp_lowv,cnp_translated,cnp_classid,company_foreign_domestic,company_bdid,company_phone,prim_name,prim_name_derived,sec_range,v_city_name,st,zip,prim_range,prim_range_derived,company_csz,company_addr1,company_address,dt_first_seen,dt_last_seen,/* MY_SALT_Partition */';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_Proxid */,/* MY_lgid3 */,/* MY_orgid */,/* MY_ultid */,active_duns_number,active_enterprise_number,company_inc_state,company_charter_number,active_corp_key,sbfe_id,hist_enterprise_number,hist_duns_number,hist_corp_key,ebr_file_number,company_fein,company_name,cnp_name_phonetic,cnp_name,company_name_type_raw,company_name_type_derived,cnp_hasnumber,cnp_number,cnp_btype,cnp_lowv,cnp_translated,cnp_classid,company_foreign_domestic,company_bdid,company_phone,prim_name,prim_name_derived,sec_range,v_city_name,st,zip,prim_range,prim_range_derived,company_csz,company_addr1,company_address,dt_first_seen,dt_last_seen,/* MY_SALT_Partition */';
   EXPORT spc_HAS_TWOSTEP := TRUE;
   EXPORT spc_HAS_PARTITION := TRUE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -74,6 +74,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:active_enterprise_number:FORCE(--):PROP:20,15\n'
     + 'FIELD:company_inc_state:6,34\n'
     + 'FIELD:company_charter_number:CONTEXT(company_inc_state):26,110\n'
+    + 'FIELD:active_corp_key:CARRY:0,0\n'
     + 'FIELD:sbfe_id:SWITCH0:27,475\n'
     + '// Historical and non-domestic IDs from reliable sources\n'
     + '// If match, add to score, if not, don\'t care(SWITCH0)\n'

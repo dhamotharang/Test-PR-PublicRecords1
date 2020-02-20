@@ -46,6 +46,7 @@ IMPORT BIPV2_ProxID,SALT311;
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,active_enterprise_number,Examples),NAMED('active_enterprise_numberBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,company_inc_state,Examples),NAMED('company_inc_stateBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,company_charter_number,Examples),NAMED('company_charter_numberBysource'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,active_corp_key,Examples),NAMED('active_corp_keyBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,sbfe_id,Examples),NAMED('sbfe_idBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,hist_enterprise_number,Examples),NAMED('hist_enterprise_numberBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,hist_duns_number,Examples),NAMED('hist_duns_numberBysource'));
