@@ -1,6 +1,6 @@
 ﻿IMPORT UT, MDR, PromoteSupers, std, Prte2, Address, AID, AID_Support, Thrive, PRTE2_Thrive, AccountMonitoring, EPLS;
 
-EXPORT Proc_Build_Base := function
+EXPORT Proc_Build_Base (STRING version)  := function
 
     //Input Files
     PRTE2.CleanFields(PRTE2_Thrive.Files.Input_INS, ds_clean_INS);
@@ -39,10 +39,10 @@ EXPORT Proc_Build_Base := function
                                                  SELF.dbpc        :=  LEFT.Clean_Address.dbpc;
                                                  SELF.chk_digit   :=  LEFT.Clean_Address.chk_digit;
                                                  SELF.rec_type    :=  LEFT.Clean_Address.rec_type;
-                                                 SELF.fips_st        :=  LEFT.Clean_Address.fips_county;
-                                                 SELF.fips_county    :=  LEFT.Clean_Address.fips_county;
-                                                 SELF.SRC            :=  LEFT.SRC;                                                 
-                                                 SELF.persistent_record_id := if(SELF.src = 'TM', 'LT'+'20200124', 'PD'+'20200124')+intformat(Counter,10,1);  
+                                                 SELF.fips_st     := LEFT.Clean_Address.fips_state;
+                                                 SELF.fips_county :=  LEFT.Clean_Address.fips_county;
+                                                 SELF.SRC         :=  LEFT.SRC;                                                 
+                                                 SELF.persistent_record_id := if(left.src = 'TM', 'LT'+version, 'PD'+version)+intformat(Counter,10,1);  
                                                  SELF.geo_lat     :=  LEFT.Clean_Address.geo_lat;
                                                  SELF.geo_long    :=  LEFT.Clean_Address.geo_long;
                                                  SELF.msa         :=  LEFT.Clean_Address.msa;
