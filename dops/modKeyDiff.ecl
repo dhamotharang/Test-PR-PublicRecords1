@@ -115,6 +115,7 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 																	,l.iskeydiff
 													);
 			self.previousfileinsuper := if (l.previousfile 
+																			// any superfile besides forkeydiff superfile
 																		,if(count(l.dSuperFileList(~regexfind('forkeydiff',name))) > 0
 																				,true
 																				,false)
@@ -254,14 +255,14 @@ export modKeyDiff(string p_esp = 'prod_esp.br.seisint.com'
 															,STD.File.SetFileDescription(keydifffile,previouslogicalfile+'|'+newlogicalfile))
 														,fSuperFileTransaction(superfile,keydifffile,'keydiff')
 														,IF (holdpreviousforkeydiff
-																,sequential
-																		(
-																			IF (STD.File.SuperFileExists(originalsuper)
-																				,if (previousfileinsuper
-																						,STD.File.RemoveOwnedSubFiles(originalsuper,true))
-																					,STD.File.ClearSuperFile(originalsuper)
+																,IF (STD.File.SuperFileExists(originalsuper)
+																				,	if (~previousfileinsuper // if the previous logical file is not in another super
+																																		// besides forkeydiff super
+																								,STD.File.RemoveOwnedSubFiles(originalsuper,true) // attempting to delete file
+																								,STD.File.ClearSuperFile(originalsuper)
+																							)
 																			)
-																		)
+																		
 																)
 													)
 												)
