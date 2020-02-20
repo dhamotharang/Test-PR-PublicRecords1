@@ -399,6 +399,7 @@
       // Source details will be populated in Identities  only in a Phone Search.
       SELF.SourceDetails                     := IF(~inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
       SELF.TotalSourceCount                  := IF(~inMod.isPrimarySearchPII, pInput.TotalSourceCount, 0);
+      SELF.SelfReportedSourcesOnly           := IF(~inMod.isPrimarySearchPII, pInput.SelfReportedSourcesOnly, FALSE);
       SELF                                   := pInput;
     END;
 
@@ -507,6 +508,8 @@
       SELF                                  := pInput.RealTimePhone_Ext;
       // Source details will be populated in Primary Phone Details  in a PII Search.
       SELF.SourceDetails                    := IF(inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
+      SELF.TotalSourceCount                 := IF(inMod.isPrimarySearchPII, pInput.TotalSourceCount, 0);
+      SELF.SelfReportedSourcesOnly          := IF(inMod.isPrimarySearchPII, pInput.SelfReportedSourcesOnly, FALSE);
       SELF                                  := pInput;
 
       // Below two fields are not being used currently
@@ -552,7 +555,7 @@
                                           inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
                                           '');
       // Source details will be populated in OtherPhones in a PII Search.
-      SELF.SourceDetails           := IF(inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
+      SELF.SourceDetails           := PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT));
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
 
