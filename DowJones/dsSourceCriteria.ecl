@@ -1855,6 +1855,10 @@ EXPORT dsSourceCriteria := DATASET([
 {'Taiwan MJIB Fugitive Online List','1842'},
 {'EC (CFSP) 2020/117 Tunisia List','1843'},
 {'EC 2020/115 Tunisia List','1844'},
-{'EC 2020/184 ISIL (Da\'esh) and Al-Qaida List','1845'}
+{'EC 2020/184 ISIL (Da\'esh) and Al-Qaida List','1845'},
+{'EC (CFSP) 2020/190 Democratic Republic of the Congo List','1846'},
+{'EC (CFSP) 2020/212 Syria List','1847'},
+{'EC 2020/189 Democratic Republic of the Congo List','1848'},
+{'EC 2020/211 Syria List','1849'}
 ],r);
 
