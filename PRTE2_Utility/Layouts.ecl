@@ -2,9 +2,6 @@
 
 EXPORT Layouts := module
 
-
-
-
 	export incoming := record
 			string15  id;
 			string10  exchange_serial_number;
