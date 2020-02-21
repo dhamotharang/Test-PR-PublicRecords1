@@ -3,12 +3,15 @@
 EXPORT Keys := module
 
 shared file_util_orig_in := project(files.full_did_for_index, layouts.slimrec);
+
+shared file_util_orig_in_address := project(files.full_did_for_index_address, layouts.slimrec);
+
 export Address := 
-       index(file_util_orig_in(trim(prim_name)<>''),
+       index(file_util_orig_in_address(trim(prim_name)<>''),
              {prim_name,st,zip,prim_range,sec_range},
-						 {file_util_orig_in},
+						 {file_util_orig_in_address},
 						 constants.key_prefix_util +doxie.Version_SuperKey+ '::utility_address');
-						
+					
 export DID := index(file_util_orig_in,
              {unsigned6 s_did := (unsigned6)did},
 						 {file_util_orig_in},
