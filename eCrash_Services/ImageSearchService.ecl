@@ -55,6 +55,7 @@ EXPORT ImageSearchService() := FUNCTION
 	RequestColoredImage := Request[1].Options.ColoredImage;
 	RequestRedact       := Request[1].Options.Redact;
 	RequestType         := Request[1].Options.RequestType;
+	RequestMaxWaitSeconds := Request[1].User.MaxWaitSeconds;
 
 	RequestReportIdRaw := Request[1].ReportBy.ReportID;
 	//blanking out RequestReportId for KYCrashLogic since we need to get an image for it straigt away without search performed. 
@@ -94,6 +95,15 @@ EXPORT ImageSearchService() := FUNCTION
 		
 	ReportHashKeysFromKeyFinal := ReportsDeltabaseResult.reportHashKeysFromKeyFinal;
 	SuperReportRow := ReportsDeltabaseResult.superReportRow;
+
+	// TODO: When Centralized Logging is implemented in Boca, replace this with a CL call instead.
+	// Except for Kentucky (which we don't have data for anyway), if we SHOULD have the data,
+	// but don't, such as for test cases from QC, just note that so we can find this in the logs later.
+	IF ((RequestVendorCode != eCrash_Services.Constants.VENDOR_CRASHLOGIC) AND
+	    (NOT(EXISTS(ReportHashKeysFromKey) OR EXISTS(ReportHashKeysFromKeyFinal))),
+		Std.System.Log.DbgLog(
+			'eCrash_Services.ImageSearchService: For Vendor ' + RequestVendorCode + ', Report ID ' + RequestReportId +
+			', nothing found in either the keys or the deltabase.'));
 
 	ReportsAll := IF (
 		ReportHashKeysFromKey[1].Vendor_Code IN eCrash_Services.Constants.VENDOR_CODES_BYPASS_DELTABASE, 
@@ -152,7 +162,8 @@ EXPORT ImageSearchService() := FUNCTION
 		isOnlyTm,
 		RequestColoredImage,
 		RequestRedact,
-		RequestType
+		RequestType,
+		RequestMaxWaitSeconds
 	);
 
 	//We don't know which report_id was used to retreive image for TM that's why we are searching by all the possible report ids. ESP inserts report_id from the request.

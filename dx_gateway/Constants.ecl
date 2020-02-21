@@ -18,4 +18,8 @@ EXPORT Constants := MODULE
     EXPORT GLOBAL_SID := 28431; // hard-coded here, but coming from Orbit.
   END;
 
+  EXPORT QSent := MODULE
+    EXPORT GLOBAL_SID := 28421;
+  END;
+
 END;

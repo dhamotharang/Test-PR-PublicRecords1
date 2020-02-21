@@ -398,6 +398,7 @@
       SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;
       // Source details will be populated in Identities  only in a Phone Search.
       SELF.SourceDetails                     := IF(~inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
+      SELF.TotalSourceCount                  := IF(~inMod.isPrimarySearchPII, pInput.TotalSourceCount, 0);
       SELF                                   := pInput;
     END;
 
@@ -699,7 +700,7 @@
                                     ri.RecentAddress.County, ri.RecentAddress.PostalCode, ri.RecentAddress.StateCityZip},
                                   {ri.FirstSeenWithPrimaryPhone.Year, ri.FirstSeenWithPrimaryPhone.Month, ri.FirstSeenWithPrimaryPhone.Day},
                                   {ri.LastSeenWithPrimaryPhone.Year, ri.LastSeenWithPrimaryPhone.Month, ri.LastSeenWithPrimaryPhone.Day},
-                                  ri.TimeWithPrimaryPhone, ri.TimeSinceLastSeenWithPrimaryPhone, ri.PrimaryAddressType, ri.RecordType, ri.phoneownershipindicator, ri.SSN, ri.SourceDetails},
+                                  ri.TimeWithPrimaryPhone, ri.TimeSinceLastSeenWithPrimaryPhone, ri.PrimaryAddressType, ri.RecordType, ri.phoneownershipindicator, ri.SSN, ri.SourceDetails, ri.selfreportedsourcesonly, ri.totalsourcecount},
                                 iesp.phonefinder.t_PhoneIdentityInfo);
       SELF               := le;
       SELF               := [];

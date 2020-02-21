@@ -27,6 +27,8 @@ export t_NetWiseAddress := record
 end;
 		
 export t_NetWisePersonalContactInfo := record
+	string CurrentCity {xpath('CurrentCity')};
+	string CurrentState {xpath('CurrentState')};
 	dataset(iesp.share.t_StringArrayItem) EmailRecords {xpath('EmailRecords/Email'), MAXCOUNT(iesp.Constants.NETWISE.MAX_COUNT_EMAIL_RECORDS)};
 	dataset(iesp.share.t_StringArrayItem) PhoneRecords {xpath('PhoneRecords/Phone'), MAXCOUNT(iesp.Constants.NETWISE.MAX_COUNT_PHONE_RECORDS)};
 	dataset(t_NetWiseAddress) AddressRecords {xpath('AddressRecords/Address'), MAXCOUNT(iesp.Constants.NETWISE.MAX_COUNT_ADDRESS_RECORDS)};
@@ -37,8 +39,10 @@ export t_NetWiseWork := record
 	string Domain {xpath('Domain')};
 	string Email {xpath('Email')};
 	string Title {xpath('Title')};
+	string Seniority {xpath('Seniority')};
 	string Level {xpath('Level')};
 	string FunctionalArea {xpath('FunctionalArea')};
+	string SubFunctionalArea {xpath('SubFunctionalArea')};
 	string StartYear {xpath('StartYear')};
 	string EndYear {xpath('EndYear')};
 	string Phone {xpath('Phone')};
@@ -65,6 +69,14 @@ export t_NetWiseUrl := record
 	string Url {xpath('Url')};
 end;
 		
+export t_NetWiseOptionalFieldMatches := record
+	boolean EmailMatch {xpath('EmailMatch')};
+	boolean PhoneMatch {xpath('PhoneMatch')};
+	boolean AgeMatch {xpath('AgeMatch')};
+	boolean ZipMatch {xpath('ZipMatch')};
+	boolean CityMatch {xpath('CityMatch')};
+end;
+		
 export t_NetWiseTransaction := record
 	string Id {xpath('Id')};
 	string Version {xpath('Version')};
@@ -73,8 +85,12 @@ end;
 		
 export t_NetWiseResult := record
 	string Email {xpath('Email')};
+	string PersonId {xpath('PersonId')};
+	string FullName {xpath('FullName')};
 	string LinkedInProfileUrl {xpath('LinkedInProfileUrl')};
 	string LinkedInProfileImageUrl {xpath('LinkedInProfileImageUrl')};
+	string FirstName {xpath('FirstName')};
+	string LastName {xpath('LastName')};
 	string Age {xpath('Age')};
 	t_NetWisePersonalContactInfo PersonalContactInfo {xpath('PersonalContactInfo')};
 	dataset(t_NetWiseWork) WorkRecords {xpath('WorkRecords/Work'), MAXCOUNT(iesp.Constants.NETWISE.MAX_COUNT_WORK_RECORDS)};
@@ -84,6 +100,7 @@ export t_NetWiseResult := record
 	t_NetWiseName Name {xpath('Name')};
 	dataset(t_NetWiseUrl) ImageRecords {xpath('ImageRecords/Image'), MAXCOUNT(iesp.Constants.NETWISE.MAX_COUNT_IMAGE_RECORDS)};
 	dataset(t_NetWiseUrl) PlaceRecords {xpath('PlaceRecords/Place'), MAXCOUNT(iesp.Constants.NETWISE.MAX_COUNT_PLACE_RECORDS)};
+	t_NetWiseOptionalFieldMatches OptionalFieldMatches {xpath('OptionalFieldMatches')};
 end;
 		
 

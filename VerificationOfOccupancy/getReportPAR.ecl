@@ -1,7 +1,7 @@
 ﻿// THIS REPORT IS XML ONLY - NOT BATCH  
 // Several assumptions are made to simplify the code that requires this function to only be called for XML transactions.
 
-IMPORT AddrBest, Address, AutoStandardI, Codes, DeathV2_Services, DidVille, 
+IMPORT AddrBest, Address, AutoStandardI, DeathV2_Services, DidVille, 
        Drivers, Doxie, Email_Data, Gong, Header, dx_header, Header_Quick, IESP, MDR, 
 			 PersonReports, Risk_Indicators, RiskWise, SmartRollup, Targus, UT, Utilfile, 
 			 VerificationOfOccupancy, Relationship,suppress, std;
@@ -651,7 +651,7 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
 	shellDids := PROJECT(shellres_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 
-	rellyids := Relationship.proc_GetRelationship(shellDids,TopNCount:=100,
+	rellyids := Relationship.proc_GetRelationshipNeutral(shellDids,TopNCount:=100,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result; 
 	
 	RelativesLayout getSubjectRelatives(ShellResults le, rellyids ri) := TRANSFORM

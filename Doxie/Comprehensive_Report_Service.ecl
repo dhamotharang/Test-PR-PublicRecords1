@@ -179,7 +179,7 @@
 */
 /*--INFO-- This service searches all available datafiles.*/
 
-import doxie, CriminalRecords_Services, doxie_crs, doxie_raw, DriversV2_Services, images, Royalty;
+import AutoheaderV2, Gateway, doxie, CriminalRecords_Services, doxie_crs, doxie_raw, DriversV2_Services, images, Royalty, ut;
 
 export Comprehensive_Report_Service := MACRO
 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -212,11 +212,12 @@ if( OFACversion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(
 doxie.MAC_Header_Field_Declare();
 mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 doxie.MAC_Selection_Declare();
+boolean is_consumer := mod_access.isConsumer();
 
-  // use non-remote header data; non-fcra;
-  dids := doxie.get_dids();
-  ds_header := doxie.central_header (dids, false, false, in_getSSNBest); //TODO: pass mod_access
-  cent := doxie.central_records (false, 'D', ds_header);
+// use non-remote header data; non-fcra;
+dids := doxie.get_dids();
+ds_header := doxie.central_header (dids, mod_access, false, false, in_getSSNBest);
+cent := doxie.central_records (ds_header, mod_access, false, 'D');
 
 //pick up the distributed records
 
@@ -242,7 +243,7 @@ progressivePhones := if (IncludeProgressivePhone, doxie.fn_progressivePhone.Comp
 // comment                                                                                                                                                                                                                         ^^^^^^^^^^^^^^^^^^^
 // comment                                                                                                                                                                                         from doxie.MAC_Header_Field_Declare above
 global_mod := AutoStandardI.GlobalModule();
-tempmod := module(project(global_mod,CriminalRecords_Services.IParam.report,opt))
+crim_mod := module(project(global_mod,CriminalRecords_Services.IParam.report,opt))
     doxie.compliance.MAC_CopyModAccessValues(mod_access);
     export string14 did := (string) dids[1].did;
     export string25 doc_number   := '' ;
@@ -250,7 +251,7 @@ tempmod := module(project(global_mod,CriminalRecords_Services.IParam.report,opt)
     export boolean  IncludeAllCriminalRecords := true;
     export boolean  IncludeSexualOffenses := false;
 end;
-crmr := CriminalRecords_Services.ReportService_Records.val(tempmod);
+crmr := CriminalRecords_Services.ReportService_Records.val(crim_mod);
 docr2 := IF (CriminalRecordVersion = 2 and Include_CriminalRecords_val,crmr[1].CriminalRecords);
 
 
@@ -258,12 +259,12 @@ docr2 := IF (CriminalRecordVersion = 2 and Include_CriminalRecords_val,crmr[1].C
 outrec := doxie_crs.layout_report;
 
 outrec patch(cent l) := transform
-  self.vehicle_children := IF(not ut.IndustryClass.is_knowx,global(vehi));
-  self.vehicle2_children := IF(not ut.IndustryClass.is_knowx,global(vehV2));
+  self.vehicle_children := IF(not is_consumer,global(vehi));
+  self.vehicle2_children := IF(not is_consumer,global(vehV2));
   self.RealTime_Vehicle_children := IF(IncludeRTVeh_val,l.RealTime_Vehicle_children);
   self.sex_offenses_children := global(sexo);
-  self.drivers_licenses_children := IF(not ut.IndustryClass.is_knowx,global(dlsr));
-  self.drivers_licenses2_children := IF(not ut.IndustryClass.is_knowx,global(dlsr2));
+  self.drivers_licenses_children := IF(not is_consumer,global(dlsr));
+  self.drivers_licenses2_children := IF(not is_consumer,global(dlsr2));
   self.DOC_children := global(docr);
   self.images_children:= global(imar);
   self.DOC2_children := global(docr2);
@@ -348,7 +349,7 @@ end;
 
 recflags1 := normalize(src_recs,55,into_flags(LEFT,COUNTER));
 
-header_recs := Doxie_Raw.Header_Raw(dids, mod_access); 
+header_recs := Doxie_Raw.Header_Raw(dids, mod_access);
 
 layout_flag into_flags2(header_recs L, integer C) := transform
   self.field_present := choose(C,
@@ -392,7 +393,7 @@ Royalty.RoyaltyVehicles.MAC_ReportSet(all_records.RealTime_Vehicle_children, roy
 Royalty.RoyaltyEFXDataMart.MAC_GetWebRoyalties(all_records.premium_phone_children,equifax_royalties,vendor,MDR.sourceTools.src_EQUIFAX);
 FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDNrecords_table);
 //----------------------------------------
-trackFares := not ut.IndustryClass.is_knowx and (Include_Properties_val or Include_PriorProperties or Include_foreclosures_val);
+trackFares := not is_consumer and (Include_Properties_val or Include_PriorProperties or Include_foreclosures_val);
 royalties := if(trackFares,royalties_fares) +
              if(Include_Email_Addresses_val,if(EmailVersion=2, cent.EmailV2Royalties, royalties_email)) +
              if(IncludeRTVeh_val, royalties_rtv) +

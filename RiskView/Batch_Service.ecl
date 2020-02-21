@@ -38,7 +38,7 @@
 */
 /*--INFO-- Contains RiskView Scores and attributes version 5.0 and higher */
 
-import iesp, gateway, risk_indicators, FFD, STD;
+import iesp, gateway, risk_indicators, FFD, STD, Riskview, Models, Royalty;
 
 export Batch_Service := MACRO
 
@@ -65,7 +65,7 @@ gateways_in := Gateway.Configuration.Get();
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
 	SELF.servicename := le.servicename;
-	SELF.url := IF(le.servicename IN ['targus'], '', le.url); // Don't allow Targus Gateway
+	SELF.url := IF(le.servicename IN ['targus', 'first_data'], '', le.url); // Don't allow Targus Gateway or First Data/Fiserv Gateway
 	SELF := le;
 END;
 gateways := PROJECT(gateways_in, gw_switch(LEFT));

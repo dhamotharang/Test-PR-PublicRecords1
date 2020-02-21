@@ -62,7 +62,7 @@ IMPORT InsuranceHeader_PostProcess, _Control;
 	// filter out lexIDs that are insurance only if enviroment is Boca/PR.	
   #UNIQUENAME(trimReswSegIns) 
   #IF(InsuranceHeader_xLink.Environment.isCurrentBoca)
-     %trimReswSegIns% := %trimReswSeg%(res.LexID_type<>IDLExternalLinking.Constants.INSURANCE_LEXID);
+     %trimReswSegIns% := %trimReswSeg%(res.LexID_type<>IDLExternalLinking.Constants.INSURANCE_LEXID and res.did < IDLExternalLinking.Constants.INSURANCE_LEXID_NUMBER);
   #ELSE
      %trimReswSegIns% := %trimReswSeg%
   #END;

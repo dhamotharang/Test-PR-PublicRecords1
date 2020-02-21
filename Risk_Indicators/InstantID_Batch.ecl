@@ -342,7 +342,7 @@ gateways_in := Gateway.Configuration.Get();
 
 Custom_Model_Name := trim(STD.Str.ToUpperCase(CustomCVIModelName));
 Valid_CCVI := Custom_Model_Name in ['','CCVI1810_1'];
-CustomCVIModelName_in := if(Valid_CCVI, Custom_Model_Name, error('Invalid Custom CVI model name.'));
+CustomCVIModelName_in := if(Valid_CCVI, Custom_Model_Name, error('Invalid Custom CVI model name.')):INDEPENDENT;
 ischase := if(CustomCVIModelName_in = 'CCVI1810_1', TRUE,FALSE);
 
 in_format := record
@@ -565,34 +565,33 @@ Layout_InstandID_NuGenExt := record
 	boolean insurance_dl_used;
 end;
 
-//  For ThreatMetrix reasoncodes
-TMX_model:=Models.IID1906_0_0(ret);
-// DRM_threatmetrix:= ~doxie.DataRestriction.allowDigitalIdentity;
-DRM_threatmetrix:= DataRestriction[Risk_indicators.iid_constants.IncludeDigitalIdentity]=Risk_indicators.iid_constants.sFalse;
- retplus_tmx:= if(DRM_threatmetrix,join(ret,TMX_model,left.seq=right.seq,
- transform(risk_indicators.layout_output,
- self.iid_tmx.phonehighriskind:=RIGHT.phonehighriskind,
- self.iid_tmx.emailhighriskind:=Right.emailhighriskind,
- self:=LEFT),left outer),ungroup(ret));
-
-Layout_InstandID_NuGenExt format_out(retplus_tmx le, fs R) := TRANSFORM
+Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
   SELF.acctNo		:=R.acctno;
     
   SELF.transaction_id := 0;
   
-	isFirstExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression + '|' + Risk_Indicators.iid_constants.endingInc_expression, TRIM(STD.STR.ToUpperCase(r.Name_First)), NOCASE), TRUE, FALSE), FALSE);
+	isFirstExpressionFound := if(ischase, nofold(if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + 
+																											Risk_Indicators.iid_constants.contains_expression + '|' + 
+																											Risk_Indicators.iid_constants.endsWith_expression + '|' + 
+																											Risk_Indicators.iid_constants.endingInc_expression, TRIM(STD.STR.ToUpperCase(r.Name_First)), NOCASE), TRUE, FALSE) ), FALSE);
 	verfirst := Map(ischase AND isFirstExpressionFound => '',
 											 le.combo_firstcount>0 => le.combo_first,
 											 '');
   SELF.verfirst := verfirst;
   
-isMiddleExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression, TRIM(STD.STR.ToUpperCase(r.Name_Middle)), NOCASE), TRUE, FALSE), FALSE);
+isMiddleExpressionFound := if(ischase, nofold(if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + 
+																													 Risk_Indicators.iid_constants.contains_expression + '|' + 
+																													 Risk_Indicators.iid_constants.endsWith_expression, TRIM(STD.STR.ToUpperCase(r.Name_Middle)), NOCASE), TRUE, FALSE) ), FALSE);
 	vermiddle := Map(ischase AND isMiddleExpressionFound => '',
 											 le.combo_middlecount>0 => le.combo_middle,
 											 '');
   SELF.vermiddle := vermiddle;
 
-	isLastExpressionFound  := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression + '|' + Risk_Indicators.iid_constants.lastEndsWith_expression + '|' + Risk_Indicators.iid_constants.endingInc_expression, TRIM(STD.STR.ToUpperCase(r.Name_Last)), NOCASE), TRUE, FALSE), FALSE);
+	isLastExpressionFound  := if(ischase, nofold(if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + 
+																														Risk_Indicators.iid_constants.contains_expression + '|' + 
+																														Risk_Indicators.iid_constants.endsWith_expression + '|' + 
+																														Risk_Indicators.iid_constants.lastEndsWith_expression + '|' + 
+																														Risk_Indicators.iid_constants.endingInc_expression, TRIM(STD.STR.ToUpperCase(r.Name_Last)), NOCASE), TRUE, FALSE) ), FALSE);
 	verlast := Map(ischase AND isLastExpressionFound => '',
 											le.combo_lastcount>0 => le.combo_last, 
 											'');
@@ -903,8 +902,7 @@ isMiddleExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constant
 	SELF := [];  // default models and red flags datasets to empty
 END;
 
-formed_pre1_temp := join(retplus_tmx, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
-
+formed_pre1_temp := join(ret, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
 
 Layout_InstandID_NuGenExt minorsTransform(formed_pre1_temp l) := transform
                 self.acctNo:=l.acctno;
@@ -1427,5 +1425,6 @@ dIPIn := PROJECT(fs,TRANSFORM(Royalty.RoyaltyNetAcuity.IPData,SELF.AcctNo := LEF
 dRoyaltiesByAcctno 	:= IF(trackNetacuityRoyalties, Royalty.RoyaltyNetAcuity.GetBatchRoyaltiesByAcctno(gateways, dIPIn, formed, TRUE));
 dRoyalties 					:= Royalty.GetBatchRoyalties(dRoyaltiesByAcctno + InsuranceRoyalties, ReturnDetailedRoyalties);
 output(dRoyalties,NAMED('RoyaltySet'));
+
+
 endmacro;
-// risk_indicators.InstantID_Batch();

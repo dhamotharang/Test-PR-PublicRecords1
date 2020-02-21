@@ -259,10 +259,10 @@ EXPORT functions := MODULE
     progressive_phone.mac_get_type_e(f_with_did, f_in_batch, f_out_type_e, mod_access, inMod.IncludeRelativeCellPhones);
     progressive_phone.mac_get_type_f(f_with_did, f_in_batch, f_out_type_f, mod_access, sx_match_restriction_limit);
     progressive_phone.mac_get_type_g(f_with_did, f_in_batch, f_out_type_g, mod_access);
-		progressive_phone.mac_get_type_h(f_with_did, f_in_batch, f_out_type_h, mod_access);
+    progressive_phone.mac_get_type_h(f_with_did, f_in_batch, f_out_type_h, mod_access);
     progressive_phone.mac_get_type_r(f_with_did, f_in_batch, f_out_type_r);
     progressive_phone.mac_get_type_v(f_with_did, f_in_batch, f_out_type_v,, mod_access);  // unrated
-    progressive_phone.mac_get_type_w(f_with_did, f_in_batch, f_out_type_w);
+    progressive_phone.mac_get_type_w(f_with_did, f_in_batch, f_out_type_w, mod_access);
     progressive_phone.mac_get_type_t(f_with_did, f_in_batch, f_out_type_t, mod_access);
 
     batch_out_with_did := progressive_phone.layout_progressive_batch_out_with_did;

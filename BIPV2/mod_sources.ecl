@@ -118,6 +118,7 @@ export mod_sources := module
 			+ if(~DRM.Fidelity AND LnBranded, [code.PROP_DAYTON], [])
 			+ if(~DRM.InfutorMV AND DPPA.ok(DPPA.stored_value), [code.MV_INFUTOR], [])
 			+ if(~DRM.InfutorWC AND DPPA.ok(DPPA.stored_value), [code.WC_INFUTOR], [])
+                +  [code.MARKETING_UNRESTRICTED]
 		);
 	end;
 

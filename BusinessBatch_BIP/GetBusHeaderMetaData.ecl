@@ -139,8 +139,8 @@ EXPORT GetBusHeaderMetaData := MODULE
                        ( ( siccode <> '' OR naics <> '' ) AND
                          ( IF(inMod.ExcludeExperian, source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source), TRUE)) );
 
-    // additionally filter marketing-restricted records out
-    ds_IndustryRecsMark := ds_IndustryRecsRaw(source IN MDR.sourceTools.set_Marketing_Sources);
+    // additionally filter marketing-restricted records out.
+    ds_IndustryRecsMark := ds_IndustryRecsRaw(Doxie.compliance.isMarketingAllowed(source));
 
     ds_IndustryRecs := IF (inMod.ExcludeMarketing, ds_IndustryRecsMark, ds_IndustryRecsRaw);
 
@@ -327,8 +327,8 @@ EXPORT GetBusHeaderMetaData := MODULE
                                                                    ( IF(inMod.ExcludeExperian, source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source), TRUE)));
 
     // also conditionally remove marketing-restricted sources
-    ds_busHeaderRecsMark := ds_busHeaderRecsRaw(source IN MDR.sourceTools.set_Marketing_Sources);
-
+    ds_busHeaderRecsMark := ds_busHeaderRecsRaw(Doxie.compliance.isMarketingAllowed(source));
+		
     ds_busHeaderRecsSlim := IF (inMod.ExcludeMarketing, ds_busHeaderRecsMark, ds_busHeaderRecsRaw);
 
 		// slim layout before dedup/sort to reduce footprint.
@@ -460,6 +460,7 @@ EXPORT GetBusHeaderMetaData := MODULE
 		// output(ds_AllCodesRecsWAcctno, named('ds_AllCodesRecsWAcctno'));
 		// output(ds_allMetadata, named('ds_allMetadata'));
 	//output(ds_resultsTmp, named('ds_resultsTmp'));
+	
 
     EXPORT ds_results := ds_resultsTmp;
   END;

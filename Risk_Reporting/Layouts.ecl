@@ -2082,4 +2082,10 @@ EXPORT LOG_Deltabase_Layout := RECORD
 	DATASET(LOG_Deltabase_Layout_Record) Records {XPATH('Records/Rec'), MAXCOUNT(1)};
 END;
 
+EXPORT LOG_DTE_Layout := RECORD
+	STRING36 TaskID;
+	STRING256 TaskDescription;
+	STRING1024 Request_XML;
+END;
+
 END;
