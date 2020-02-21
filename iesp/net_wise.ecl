@@ -6,6 +6,18 @@ import iesp;
 
 export net_wise := MODULE
 			
+export t_NetWisePiiParams := record (iesp.net_wise_share.t_NetWiseRequestParams)
+	string FirstName {xpath('FirstName')};
+	string LastName {xpath('LastName')};
+	integer Age {xpath('Age')};
+	string City {xpath('City')};
+	string Zip {xpath('Zip')};
+	string State {xpath('State')};
+	string Phone {xpath('Phone')};
+	integer Limit {xpath('Limit')};
+	string Mode {xpath('Mode')}; //values['Email','PII','']
+end;
+		
 export t_NetWiseQueryResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
 	iesp.net_wise_share.t_NetWiseTransaction Transaction {xpath('Transaction')};
@@ -15,7 +27,7 @@ end;
 export t_NetWiseQueryRequest := record (iesp.share.t_BaseRequest)
 	iesp.share.t_GatewayParams GatewayParams {xpath('GatewayParams')};
 	iesp.net_wise_share.t_NetWiseOptions Options {xpath('Options')};
-	iesp.net_wise_share.t_NetWiseRequestParams SearchBy {xpath('SearchBy')};
+	t_NetWisePiiParams SearchBy {xpath('SearchBy')};
 end;
 		
 export t_NetWiseQueryResponseEx := record

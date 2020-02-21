@@ -12,7 +12,7 @@
 */
 /*--INFO-- Contains RiskView Alerts, Scores, Attributes, Report version 5.0 and higher */
 
-IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView;
+IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView, Royalty;
 
 export Search_Service := MACRO
 
@@ -20,7 +20,7 @@ export Search_Service := MACRO
 	// so add the default to #stored to eliminate the assignment of a default value.
 	#stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
 	#stored('DataPermissionMask',risk_indicators.iid_constants.default_DataPermission);
-
+  
 #WEBSERVICE(FIELDS(
 		'RiskView2Request',
 		'HistoryDateTimeStamp',
@@ -127,6 +127,7 @@ export Search_Service := MACRO
 	string20 HistoryDateTimeStamp := '' : STORED('HistoryDateTimeStamp');
 	
 	boolean IncludeLnJ := option.IncludeLiensJudgmentsReport;
+	boolean IncludeStatusRefreshChecks := option.IncludeStatusRefreshChecks;
 	boolean IncludeRecordsWithSSN := option.LiensJudgmentsReportOptions.IncludeRecordsWithSSN;
 	boolean IncludeBureauRecs := option.LiensJudgmentsReportOptions.IncludeBureauRecs;
  integer ReportingPeriod := if(option.LiensJudgmentsReportOptions.ReportingPeriod = 0, 84, 
@@ -175,11 +176,18 @@ export Search_Service := MACRO
 		tmpReleasedCasesFltr;
 		
 	boolean RetainInputDID := false		: stored('RetainInputDID');		// to be used by modelers in R&D mode
+  
+  //Used only by Checking Indicators
+  STRING8 SubscriberId :=  (string8)option.RVCheckingSubscriberId;
 	
 	gateways_in := Gateway.Configuration.Get();
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
 		SELF.servicename := le.servicename;
 		SELF.url := IF(le.servicename IN ['targus'], '', le.url); // Don't allow Targus Gateway
+    self.properties := if(le.servicename IN ['first_data'], dataset([transform(Gateway.Layouts.ConfigProperties,
+                        self.name := 'SubscriberId';
+                        self.val := SubscriberId;)]),
+    Dataset([], Gateway.Layouts.ConfigProperties));
 		SELF := le;
 	END;
 	gateways := PROJECT(gateways_in, gw_switch(LEFT));
@@ -206,14 +214,11 @@ export Search_Service := MACRO
   STRING20 EndUserCompanyName 		:= context.MLAGatewayInfo.EndUserCompanyName;
   STRING20 CustomerNumber					:= context.MLAGatewayInfo.CustomerNumber ;
   STRING20 SecurityCode 					:= context.MLAGatewayInfo.SecurityCode  ;
-	
+
 /* ***************************************
 	 *           Package Input:            *
    *************************************** */
-	emptyRecord := Risk_Indicators.iid_constants.ds_Record;
-
-	riskview.layouts.layout_riskview_input intoInput(emptyRecord le) := TRANSFORM	
-	// Sequence - This is hidden from the ESP to be used by the ECL Developers for testing purposes	
+	packagedInput := DATASET([TRANSFORM(riskview.layouts.layout_riskview_input,
 		SELF.Seq := (integer)search.seq;
 		self.unparsedfullname := search.name.full;
 		SELF.Name_First := search.Name.First;
@@ -235,22 +240,16 @@ export Search_Service := MACRO
 		self.LexID := LexID; 		
 		self.HistoryDateTimeStamp := HistoryDateTimeStamp;
 		self.Custom_Inputs := option.IncludeModels.ModelOptions;
-		SELF := [];
-	END;
-
-	packagedInput := PROJECT(emptyRecord, intoInput(LEFT));
+		SELF := [];)]);	
 	
-	Risk_Indicators.Layout_Input intoLayoutInput(emptyRecord le) := TRANSFORM
+	packagedTestseedInput := DATASET([TRANSFORM(Risk_Indicators.Layout_Input,
 		SELF.seq := (integer)search.seq;	// Sequence - This is to be used by the ECL Developers for testing purposes	
 		SELF.fname := STD.Str.ToUpperCase(search.Name.First);
 		SELF.lname := STD.Str.ToUpperCase(search.Name.Last);
 		SELF.ssn := SSN;
 		SELF.in_zipCode := Zip;
 		SELF.phone10 := HomePhone;
-		SELF := [];
-	END;
-
-	packagedTestseedInput := PROJECT(emptyRecord, intoLayoutInput(LEFT));
+		SELF := [];)]);
 
 /* ***************************************
 	 *            Validate Input:          *
@@ -338,7 +337,8 @@ search_results_temp := ungroup(
       		exception_score_reason,
       		MinimumAmount := MinimumAmount,
       		ExcludeStates := ExcludeStates,
-      		ExcludeReportingSources := ExcludeReportingSources
+      		ExcludeReportingSources := ExcludeReportingSources,
+			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks
       		) 
       	);
   
@@ -566,6 +566,16 @@ search_results_temp := ungroup(
 			c=190	=> 'PhoneInputSubjectCount',
 			c=191	=> 'PhoneInputMobile',
 			c=192	=> 'AlertRegulatoryCondition',
+			c=193	=> 'CheckProfileIndex',
+			c=194	=> 'CheckTimeOldest',
+			c=195	=> 'CheckTimeNewest',
+			c=196	=> 'CheckNegTimeOldest',
+			c=197	=> 'CheckNegRiskDecTimeNewest',
+			c=198	=> 'CheckNegPaidTimeNewest',
+			c=199	=> 'CheckCountTotal',
+			c=200	=> 'CheckAmountTotal',
+			c=201	=> 'CheckAmountTotalSinceNegPaid',
+			c=202	=> 'CheckAmountTotal03Month',
 			''
 		);
 
@@ -762,10 +772,20 @@ search_results_temp := ungroup(
 			c=190	=>  le.PhoneInputSubjectCount	,
 			c=191	=>  le.PhoneInputMobile 	,
 			c=192	=>  le.AlertRegulatoryCondition	,
+      c=193	=>  le.CheckProfileIndex,
+			c=194	=>  le.CheckTimeOldest,
+			c=195	=>  le.CheckTimeNewest,
+			c=196	=>  le.CheckNegTimeOldest,
+			c=197	=>  le.CheckNegRiskDecTimeNewest,
+			c=198	=>  le.CheckNegPaidTimeNewest,
+			c=199	=>  le.CheckCountTotal,
+			c=200	=>  le.CheckAmountTotal,
+			c=201	=>  le.CheckAmountTotalSinceNegPaid,
+			c=202	=>  le.CheckAmountTotal03Month,
 			''
 		);
 	END;
-	nameValuePairsVersion5 :=  NORMALIZE(search_results, 192, 
+	nameValuePairsVersion5 :=  NORMALIZE(search_results, 202, 
 		intoVersion5(LEFT, COUNTER))(trim(value)<>'');  // if the value is blank, that attribute isn't part of the AttributesVersionRequest
 
 /* ***************************************
@@ -1079,6 +1099,7 @@ search_results_temp := ungroup(
 																			 custom5_model_name = 'mla1608_0') and left.Exception_code <> '',
 																			ds_excep, 
 																			ds_excep_blank);
+        SELF.result.fdcheckingindicator := left.FDGatewayCalled;
 
 				SELF._Header := [];
 	));
@@ -1096,8 +1117,10 @@ output( riskview_xml, named( 'Results' ) );
 // output(LnJ_jdgmts, named('LnJ_jdgmts'));
 // output(LnJReport, named('LnJReport'));
 MLA_royalties := IF(TestDataEnabled, Royalty.RoyaltyMLA.GetNoRoyalties(), Royalty.RoyaltyMLA.GetOnlineRoyalties(search_results_temp));
+First_Data_Royalties := IF(TestDataEnabled, Royalty.RoyaltyFirst_Data.GetNoRoyalties(), Royalty.RoyaltyFirst_Data.GetOnlineRoyalties(search_results_temp));
+FinalRoyalties := MLA_royalties + First_Data_Royalties;
 
-OUTPUT(MLA_royalties, NAMED('RoyaltySet'));
+OUTPUT(FinalRoyalties, NAMED('RoyaltySet'));
 
 // ****************************** temporarily turn off intermediate logging in Riskview to see how much latency improves ****************************
 
@@ -1263,6 +1286,6 @@ IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED
   &lt;/Row&gt;
 &lt;/RiskView2Request&gt;
 </pre>
-*/ 
-
+*/
+ 
 ENDMACRO;

@@ -224,7 +224,7 @@
       UNSIGNED1                                         phone_source;
       // Fields pertaining only to waterfall process
       STRING8                                           matchcodes;
-      INTEGER                                           error_code;
+      UNSIGNED                                          error_code;
       STRING2                                           subj_phone_type;
       STRING2                                           subj_phone_type_new;
       UNSIGNED                                          sort_order;
@@ -251,30 +251,32 @@
       STRING                                                imsi_seensince;
       STRING8                                               imsi_changedate;
       STRING8                                               imsi_ActivationDate;
-      INTEGER                                               imsi_changedthis_time;
-      INTEGER                                               iccid_changedthis_time;
+      UNSIGNED                                              imsi_changedthis_time;
+      UNSIGNED                                              iccid_changedthis_time;
       STRING                                                iccid_seensince;
       STRING                                                imei_seensince;
       STRING8                                               imei_changedate;
-      INTEGER                                               imei_changedthis_time;
+      UNSIGNED                                              imei_changedthis_time;
       STRING8                                               imei_ActivationDate;
-      INTEGER                                               loststolen;
+      UNSIGNED                                              loststolen;
       STRING8                                               loststolen_date;
       BOOLEAN                                               is_verified;
       STRING100                                             verification_desc;
       ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.ReasonCodes;
       ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.TmxVariables;
       UNSIGNED2                                             identity_count := 0;
-      INTEGER                                               phone_inresponse_count;
+      UNSIGNED                                              phone_inresponse_count;
       BOOLEAN                                               isLNameMatch;
-      INTEGER                                               imsi_Tenure_MinDays;
-      INTEGER                                               imsi_Tenure_MaxDays;
-      INTEGER                                               imei_Tenure_MinDays;
-      INTEGER                                               imei_Tenure_MaxDays;
-      INTEGER                                               sim_Tenure_MinDays;
-      INTEGER                                               sim_Tenure_MaxDays;
+      UNSIGNED                                              imsi_Tenure_MinDays;
+      UNSIGNED                                              imsi_Tenure_MaxDays;
+      UNSIGNED                                              imei_Tenure_MinDays;
+      UNSIGNED                                              imei_Tenure_MaxDays;
+      UNSIGNED                                              sim_Tenure_MinDays;
+      UNSIGNED                                              sim_Tenure_MaxDays;
       DATASET(Src_Rec)                                      Phn_src_all;
       DATASET(iesp.phonefinder.t_PhoneFinderSourceIndicator) SourceInfo;
+      BOOLEAN                                               SelfReportedSourcesOnly;
+      UNSIGNED                                              TotalSourceCount;
     END;
 
     EXPORT ExcludePhones :=

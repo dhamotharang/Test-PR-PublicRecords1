@@ -162,7 +162,8 @@ EXPORT Header_xlinking_Service() := MACRO
  pm := InsuranceHeader_xLink.MEOW_xIDL(Input_Data); // This module performs regular xDID functions
 	ds1 := pm.Raw_Results; 
 	KeyLayout := recordof(InsuranceHeader_xLink.Key_InsuranceHeader_DID) - [global_sid, record_sid];
-	resultsLayout := InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch;	
+	resultsLayout := InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch;
+	segKey := InsuranceHeader_PostProcess.segmentation_keys.key_did_ind;
 	resTrimLayout := record
 		ds1.uniqueid,
 		ds1.results.weight,
@@ -171,7 +172,6 @@ EXPORT Header_xlinking_Service() := MACRO
 		ds1.results.did,
 		ds1.results.rid,
 		STRING Segmentation;
-		STRING LexId_Type;
 		STRING KeysUsedDesc;
 		STRING KeysFailedDesc;
 	end;
@@ -184,8 +184,8 @@ EXPORT Header_xlinking_Service() := MACRO
 	END;
 	
 	ds1Norm := Normalize(ds1, left.results, xResultsChildren(right));
-	
-	ds1Did := dataset([{Input_UniqueID, 0, 0, 0, e_DID, 0, '', '', '', ''}] , resTrimLayout);
+		
+	ds1Did := dataset([{Input_UniqueID, 0, 0, 0, e_DID, 0, segKey(DID=e_DID)[1].ind, '', ''}] , resTrimLayout);
 	didBatchLayout := {unsigned6 uid, unsigned8 did};
 	
 	dsNorm := IF(e_DID>0, ds1Did, ds1Norm);
@@ -198,11 +198,10 @@ EXPORT Header_xlinking_Service() := MACRO
  finalRes1 := join(dsNorm, allRecs, left.did=right.inputDid, transform(finalLayout, 
    self.did := right.did,
 	 self.rid := right.rid,
-	 self.s_did := if(right.s_did=0, right.did, right.s_did);
 		self := left, 
-		self := right),left outer);
+		self := right));
 		
-	finalRes := InsuranceHeader_PostProcess.mod_segmentation.appendIndicatorType(finalRes1, s_did, segmentation, LexID_type);
+	finalRes := InsuranceHeader_PostProcess.mod_segmentation.appendIndicator(finalRes1, s_did, segmentation);
 
   FieldNumber(SALT37.StrType fn) := CASE(fn,'NAME_SUFFIX' => 1,'FNAME' => 2,'MNAME' => 3,'LNAME' => 4, 
 			'PRIM_RANGE' => 5,'PRIM_NAME' => 6,'SEC_RANGE' => 7,'CITY_NAME' => 8,'ST' => 9,'ZIP' => 10,
@@ -227,11 +226,6 @@ EXPORT Header_xlinking_Service() := MACRO
 					SORT(finalRes,-weight,DID,RECORD));
 	recCount := {integer Total_Records};
 	output(DATASET([{count(result)}], recCount),named('RecordCount'));
-	// output(input_data, named('input_data'));
-	// output(ds1, named('ds1'));
-	// output(dsNorm, named('dsNorm'));
-	// output(allRecs, named('allRecs'));
-	// output(finalRes, named('finalRes'));
 	// OUTPUT(SORT(RESULT, -WEIGHT, DID, LNAME, RECORD), NAMED('LNAMESORT'));
 	// OUTPUT(Input_SortBy, NAMED('Input_SortBy'));
 	// OUTPUT(FieldNumber(Input_SortBy), NAMED('FIELDNUMBER'));	
@@ -240,5 +234,3 @@ EXPORT Header_xlinking_Service() := MACRO
   // OUTPUT(pm.Data_0,NAMED('Attribute0'));
 
 ENDMACRO;
-
-

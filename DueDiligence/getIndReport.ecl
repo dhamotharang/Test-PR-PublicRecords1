@@ -28,6 +28,8 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     getIdentityReportData := DueDiligence.reportIndIdentity(getBusinessAssociationReportData, options, ssnMask, mod_access);
     
     getMobilityReportData := DueDiligence.reportIndMobility(getIdentityReportData, options, mod_access);
+    
+    getPersonAssociateReportData := DueDiligence.reportIndAssociates(getMobilityReportData, ssnMask);
 
 
 
@@ -41,7 +43,8 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     // OUTPUT(getBusinessAssociationReportData, NAMED('getBusinessAssociationReportData'));
     // OUTPUT(getIdentityReportData, NAMED('getIdentityReportData'));
     // OUTPUT(getMobilityReportData, NAMED('getMobilityReportData'));
+    // OUTPUT(getPersonAssociateReportData, NAMED('getPersonAssociateReportData'));
 
 
-    RETURN getMobilityReportData;     
+    RETURN getPersonAssociateReportData;     
 END;

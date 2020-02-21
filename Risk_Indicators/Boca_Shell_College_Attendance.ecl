@@ -1,7 +1,6 @@
-﻿
-import risk_indicators, doxie;
+﻿IMPORT risk_indicators;
 
-EXPORT Boca_Shell_College_Attendance( grouped dataset(risk_indicators.layout_boca_shell) input_clam, boolean isFCRA, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
+EXPORT Boca_Shell_College_Attendance( grouped dataset(risk_indicators.layout_boca_shell) input_clam, boolean isFCRA) := function
 
 with_college_attendance := project(input_clam,
 	transform(risk_indicators.layout_boca_shell,

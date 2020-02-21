@@ -41,6 +41,7 @@ EXPORT Constants :=
         BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM + 
         BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BOFM + 
         BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_SBFEATTR + 
+        BusinessCredit_Services.Constants.MODEL_NAME_SETS.BBFM1906_1_0 + 
         BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_NSBFEWITHEXP + 
         BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBBNFEL_SLBONFEL;
 

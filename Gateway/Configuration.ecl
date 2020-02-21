@@ -86,6 +86,7 @@ export Configuration := module
 	export IsNews				(string40 svcName) := FALSE;  // should never be used
 	export IsEquifaxSts (string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.EquifaxSts;
 	export IsThreatMetrix	(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.ThreatMetrix;
+  export IsFirstData	(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.FirstData;
 	export IsAttIapQuery(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.AttIapQuery;
 	export IsZumigoIdentity(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ZumigoIdentity;
   export IsEquifaxAcctDecisioning(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.EquifaxAcctDecisioning;

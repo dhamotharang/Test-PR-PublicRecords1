@@ -373,6 +373,42 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
     SELF.PerAssociates := (STRING)(10-STD.Str.Find(perAssoc_Flag_Final, DueDiligence.Constants.T_INDICATOR, 1));
     
     
+    //PERSON CIVIL EVENTS(LIENS, JUDGEMENTS and EVICTIONS)
+    totalCivilCount := le.liensUnreleasedCntInThePastNYR + le.evictionsCntInThePastNYR;
+    totalCivilCountOlder := le.liensUnreleasedCntOVNYR + le.evictionsCntOVNYR; 
+     
+    perCivilEvent_Flag9 := IF(totalCivilCount >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    
+    perCivilEvent_Flag8 := IF(totalCivilCount BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);   											
+    perCivilEvent_Flag7 := IF(totalCivilCount BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    										
+    perCivilEvent_Flag6 := IF(totalCivilCount BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perCivilEvent_Flag5 := IF(totalCivilCountOlder >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perCivilEvent_Flag4 := IF(totalCivilCountOlder BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 						
+    perCivilEvent_Flag3 := IF(totalCivilCountOlder BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 										
+    perCivilEvent_Flag2 := IF(totalCivilCountOlder BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perCivilEvent_Flag1 := IF(perCivilEvent_Flag9 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag8 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag7 = DueDiligence.Constants.F_INDICATOR AND
+                              perCivilEvent_Flag6 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag5 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag4 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag3 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag2 = DueDiligence.Constants.F_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+     
+    perCivilEvent_Flag_final := DueDiligence.Common.calcFinalFlagField(perCivilEvent_Flag9,
+                                                                        perCivilEvent_Flag8,
+                                                                        perCivilEvent_Flag7,
+                                                                        perCivilEvent_Flag6,
+                                                                        perCivilEvent_Flag5,
+                                                                        perCivilEvent_Flag4,
+                                                                        perCivilEvent_Flag3,
+                                                                        perCivilEvent_Flag2,
+                                                                        perCivilEvent_Flag1); 
+
+     SELF.PerCivilLegalEvent_Flag :=  perCivilEvent_Flag_final;
+     SELF.PerCivilLegalEvent := (STRING)(10 - STD.Str.Find(perCivilEvent_Flag_final, DueDiligence.Constants.T_INDICATOR, 1)); 																																																	 
+     
+    
+    
     
     
 
