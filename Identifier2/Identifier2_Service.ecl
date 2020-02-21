@@ -390,7 +390,7 @@ export Identifier2_Service := MACRO
 	// With Emerging Identities changes, bump from BS version 3 to 51
 	#stored( 'BSVersion', 51 );
   
-  recs2 := Identifier2.Identifier2records;
+  recs2 := Identifier2.Identifier2records : INDEPENDENT;
 	 recs := iesp.transform_identifier2(recs2);
 	 
 	 dRoyalties := Project(recs2, transform(Royalty.Layouts.Royalty,
@@ -411,7 +411,7 @@ export Identifier2_Service := MACRO
 	results := PROJECT (recs, SetResponse (Left));
   
   
-	Deltabase_Logging_prep := project(recs, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
+	Deltabase_Logging_prep := project(recs2, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
                                   self.company_id := (Integer)CompanyID,
                                   self.login_id := _LoginID,
                                   self.product_id := Risk_Reporting.ProductID.Identifier2__Identifier2_Service,
@@ -453,16 +453,17 @@ export Identifier2_Service := MACRO
                                   self.o_reason_1_4 := left.RiskIndicators[4].riskcode,
                                   self.o_reason_1_5 := left.RiskIndicators[5].riskcode,
                                   self.o_reason_1_6 := left.RiskIndicators[6].riskcode,
-                                  self.o_score_2 := IF(self.i_model_name_2 != '', (STRING)left.Models[1].Scores[1].value, ''),
-                                  self.o_reason_2_1 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].RiskIndicators[1].riskcode, ''),
-                                  self.o_reason_2_2 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].RiskIndicators[2].riskcode, ''),
-                                  self.o_reason_2_3 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].RiskIndicators[3].riskcode, ''),
-                                  self.o_reason_2_4 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].RiskIndicators[4].riskcode, ''),
-                                  self.o_reason_2_5 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].RiskIndicators[5].riskcode, ''),
-                                  self.o_reason_2_6 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].RiskIndicators[6].riskcode, ''),
+                                  self.o_score_2 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].i, ''),
+                                  self.o_reason_2_1 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[1].Reason_Code, ''),
+                                  self.o_reason_2_2 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[2].Reason_Code, ''),
+                                  self.o_reason_2_3 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[3].Reason_Code, ''),
+                                  self.o_reason_2_4 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[4].Reason_Code, ''),
+                                  self.o_reason_2_5 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[5].Reason_Code, ''),
+                                  self.o_reason_2_6 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[6].Reason_Code, ''),
                                   self.o_lexid := (INTEGER)left.UniqueId,
                                   self := left,
                                   self := [] ));
+																	
 	Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
   
   IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));

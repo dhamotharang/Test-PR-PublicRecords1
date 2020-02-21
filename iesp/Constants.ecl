@@ -457,6 +457,7 @@ EXPORT Constants := MODULE
     export unsigned2 MaxIndvAssociations   			:= 500;
     export unsigned2 MaxBusAssociations   			:= 500;
     export unsigned2 MaxResidence               := 500;
+    export unsigned2 MaxPersonAssociations      := 500;
 	end;
 
 	//Digital Mortgage Application Prefill (DMAP)
@@ -1345,9 +1346,9 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxSpoofs := 100;
 		export unsigned1 MaxOTPs := 100;
 		export unsigned1 MaxInquiries := 100;
-		export unsigned1 MaxPRIRules := 20;
-		export unsigned1 MaxAlerts := 20;
-		export unsigned1 MaxAlertMessages := 20;
+		export unsigned1 MaxPRIRules := 100;
+		export unsigned1 MaxAlerts := 100;
+		export unsigned1 MaxAlertMessages := 100;
 		export unsigned1 MaxSources := 20;
 	end;
   // Phone History Report

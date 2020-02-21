@@ -743,7 +743,7 @@ export EI_set_valid_ssn_codes := ['G','Z','R','O','U'];
 
 export boolean isFakeDID (UNSIGNED8 DID) := DID > EmailFakeIds;
 
-export ds_Record := dataset([{1}], {unsigned a});
+export ds_Record := dataset([{1}], {unsigned a}) : DEPRECATED('Replace with: ds := DATASET ([my_transform()])');
 
 
 export stripLeadingZeros(string ZeroedNumber) := function

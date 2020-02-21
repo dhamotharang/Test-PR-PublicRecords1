@@ -911,7 +911,7 @@
 		SHARED	rolledHdr_dids := PROJECT(rolledHdr_dedp, 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 		SHARED max_relatives := 500;
-		SHARED	rolledHdrdids := Relationship.proc_GetRelationship(rolledHdr_dids,TopNCount:=max_relatives,
+		SHARED	rolledHdrdids := Relationship.proc_GetRelationshipNeutral(rolledHdr_dids,TopNCount:=max_relatives,
 				RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=max_relatives).result; 
 				
 		SHARED VerificationOfOccupancy.Layouts.Layout_VOOShell getRelatives(roll_allHeader le, rolledHdrdids ri) := TRANSFORM

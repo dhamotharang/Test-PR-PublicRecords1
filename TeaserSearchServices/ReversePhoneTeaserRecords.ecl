@@ -145,7 +145,7 @@ EXPORT Records(AutoStandardI.DataRestrictionI.params tempMod,
 	 // suppress the relative dids after retrieving them.
 	 rel_dids := doxie.relative_dids(did_recs);
            Suppress.MAC_Suppress(rel_Dids,rel_DIDsPulled,
-		            application_type_value,Suppress.Constants.LinkTypes.DID,DID1);
+		            application_type_value,Suppress.Constants.LinkTypes.DID,person1); 
 
 	 // Risk_Indicators.Key_Telcordia_tpm (123) 456-7890
 		 //Risk_Indicators.Key_Telcordia_tpm(npa = '123' and nxx = '456' and tb = '7890'));

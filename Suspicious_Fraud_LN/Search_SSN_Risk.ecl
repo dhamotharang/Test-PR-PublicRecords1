@@ -276,7 +276,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 	uRelatDids := PROJECT(uniqueDIDs, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 
-	rellyids := Relationship.proc_GetRelationship(uRelatDids,TopNCount:=500,
+	rellyids := Relationship.proc_GetRelationshipNeutral(uRelatDids,TopNCount:=500,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,
 			doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result; 
 	
