@@ -5,7 +5,7 @@ dops_datasetname:=header._info.dops_datasetname;
 qhdr := '*QuickHeader*';
 valid_state := ['','unknown','submitted', 'compiling','compiled','blocked','running','wait'];
 d := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=qhdr))(wuid <> thorlib.wuid() and state in valid_state), -wuid):independent;
-qh_running :=  exists(d);
+qh_running :=  false;//exists(d);
 
 /*
 Directly set the version(yyyymmdd) here instead of calling version_build
@@ -20,14 +20,14 @@ wname := build_version + ' Header Move, FCRA and Boolean';
 
 dlog(string bld_cmp_nm):=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,bld_cmp_nm);
 
-sf_name := '~thor_data400::out::header_post_move_status';
+sf_name := header_ops._Constant.postmove_build_sf;
 update_status(unsigned2 new_status) := Header.LogBuildStatus(sf_name,build_version,new_status).Write;
 
 status := Header.LogBuildStatus(sf_name, build_version).GetLatestVersionCompletedStatus:INDEPENDENT;
 
 step1 := Header.proc_postHeaderBuilds(build_version).finalize;
 step2 := STD.File.MoveExternalFile(_control.IPAddress.bctlpedata10, _Constant.QH_path_done + _Constant.QH_filename, _Constant.QH_path_ready + _Constant.QH_filename);
-step3 := Header.proc_postHeaderBuilds(build_version).FCRAheader;
+// step3 := Header.proc_postHeaderBuilds(build_version).FCRAheader;
 step4 := Header.proc_postHeaderBuilds(build_version).booleanSrch;
 
 seq := sequential(
@@ -35,7 +35,7 @@ seq := sequential(
             ,dlog('KEY BUILD:POST MOVE')
             ,if(status<1,sequential(step1,update_status(1)))
             ,if(status<2,sequential(step2,update_status(2)))
-            ,if(status<3,sequential(step3,update_status(3)))
+            // ,if(status<3,sequential(step3,update_status(3)))
             ,if(status<4,sequential(step4,update_status(4)))
 //In order to keep consistency across all builds and 
 //reserving status to add future steps, the end status is set as 9
