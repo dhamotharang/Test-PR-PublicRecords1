@@ -9,23 +9,21 @@ elist:=         'gabriel.marcan@lexisnexisrisk.com'
 // // // // // // // // // FullHeader DOPS update
 
 // h_version := Header.version_build;
-h_version := '20180926'; // 821)), 724, 626, 522, 423, 320
+h_version := '20191226'; // 821)), 724, 626, 522, 423, 320
 
 dops.updateversion('SourceKeys'             ,h_version,elist,,'N'); // header // Show Sources <=== NOTE !! RELEASE THE DAY AFTER
 dops.updateversion('PersonHeaderKeys'       ,h_version,elist,,'N'); // header // Header
-dops.updateversion('PersonHeaderWeeklyKeys' ,h_version,elist,,'N'); // header // Header
+// dops.updateversion('PersonHeaderWeeklyKeys' ,h_version,elist,,'N'); // we already have the latest from IKB
 dops.updateversion('PersonSlimsortKeys'     ,h_version,elist,,'N'); // header // Slimsorts
 dops.updateversion('PersonLabKeys'          ,h_version,elist,,'N'); // header // PersonXLAB
 dops.updateversion('RelativeV3Keys'         ,h_version,elist,,'N'); // header // RelativesV3
 dops.updateversion('PersonAncillaryKeys'    ,h_version,elist,,'N'); // header // PersonAncillaryKeys
 dops.updateversion('AddressRawAIDKeys'      ,h_version,elist,,'N'); // header // AddressRawAIDKeys
 
-dops.updateversion('FCRA_PersonHeaderKeys'  ,h_version,elist,,'F'); // header // FCRA_Header
+// dops.updateversion('FCRA_PersonHeaderKeys'  ,h_version,elist,,'F'); // we already have the latest from IKB
 dops.updateversion('AddressRawAIDKeys'      ,h_version,elist,,'F'); // header // FCRA_Header
 
 dops.updateversion('RemoteLinkingKeys'      ,h_version,elist,,'N'); // header // RemoteLinkingKeys
-
-
 
 dops.updateversion('PersonHeaderKeys'       ,h_version,elist,,'B'); // header // <=== NOTE !! RELEASE THE DAY AFTER
 dops.updateversion('PowerSearchKeys'        ,h_version,elist,,'B'); // header // <=== NOTE !! RELEASE THE DAY AFTER
@@ -33,10 +31,10 @@ dops.updateversion('PowerSearchKeys'        ,h_version,elist,,'B'); // header //
 // // // // // // // // // QuickHeader DOPS update
 
 // qh_version := Header.Sourcedata_month.v_eq_as_of_date; // 'thor_data400::flag::version::equifax_weekly'
-qh_version := '20181028';
+qh_version := '20200121';
 
 // rt_version := qh_version;//+'a';
-rt_version := '20181028';
+rt_version := '20200121';
 
 dops.updateversion('QuickHeaderKeys'     ,qh_version,elist,,'N'); // orbit: Quick Header
 dops.updateversion('QHsourceKeys'        ,qh_version,elist,,'N'); // orbit: QHsourceKeys
@@ -47,7 +45,8 @@ dops.updateversion('FCRA_RiskTableKeys'  ,rt_version,elist,,'F'); // orbit: FCRA
 
 // Previous runs:
 // --------------
-
+// 20191226(FH) 20200121(QH) W20200128-104101
+// 20191128(FH) 20200102(QH) W20200103-134227
 // 20180724 W20180827-111117, W20180827-112227
 // 20180626 W20180717-130929, W20180719-090656
 // 20180522 W20180621-131050
