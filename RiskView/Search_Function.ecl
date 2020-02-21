@@ -368,7 +368,36 @@ attrLnJ :=  if( IncludeLnJ /*and FilterLnJ = false*/, // uses clam_noScore
 
 emptyGateways := dataset([],Gateway.Layouts.Config); 
 
-FirstData_results := RiskView.getFirstData(bsprep, if(AttributesVersionRequest = 'RVCheckingAttrV5', gateways, emptyGateways));
+ CI_Layout := RECORD
+ unsigned4 seq;
+ string10 CheckProfileIndex;
+ string10 CheckTimeOldest;
+ string10 CheckTimeNewest;
+ string10 CheckNegTimeOldest;
+ string10 CheckNegRiskDecTimeNewest;
+ string10 CheckNegPaidTimeNewest;
+ string10 CheckCountTotal;
+ string10 CheckAmountTotal;
+ string10 CheckAmountTotalSinceNegPaid;
+ string10 CheckAmountTotal03Month;
+ boolean  FDGatewayCalled;
+ END;
+
+FirstData_results :=  if(AttributesVersionRequest = 'RVCheckingAttrV5', RiskView.getFirstData(bsprep,gateways),
+PROJECT(bsprep, TRANSFORM(CI_Layout,
+SELF.SEQ := LEFT.Seq;
+SELF.CheckProfileIndex := '-1';
+SELF.CheckTimeOldest := '-1';
+SELF.CheckTimeNewest := '-1'; 
+SELF.CheckNegTimeOldest := '-1';
+SELF.CheckNegRiskDecTimeNewest := '-1';
+SELF.CheckNegPaidTimeNewest := '-1';
+SELF.CheckCountTotal := '-1';
+SELF.CheckAmountTotal := '-1';
+SELF.CheckAmountTotalSinceNegPaid := '-1';
+SELF.CheckAmountTotal03Month := '-1';
+SELF.FDGatewayCalled := FALSE;
+SELF := left;)));
 
 riskview5_attr_search_results_attrv5 := join(clam, attrv5, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
@@ -723,7 +752,6 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
 	// If the score is being overridden to a 100, don't return a 200 or 222 score alert code.
 	ds_alerts := IF(score_override_alert_returned, ds_alerts_temp (alert_code NOT IN ['200A', '222A']), ds_alerts_temp);
 	ReportSuppressAlerts := (UT.Exists2(ds_alerts (alert_code = '222A')) or UT.Exists2(ds_alerts (alert_code = '200A')));
-
 	
 	self.alert1 := ds_alerts[1].alert_code;
 	self.alert2 := ds_alerts[2].alert_code;

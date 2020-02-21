@@ -1132,7 +1132,7 @@ export layout_RV5capOneBatch_searchResults := record
 	string30  AcctNo;
 	string12  LexID;
 	layout_RV5capOneBatch_modelResults-seq;  //Seq was used in the service to join the model results back to attribute results.
-	layout_riskview_attributes_5 -Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes; //CapOne is not running Juli so remove from output
+	layout_riskview_attributes_5 -Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes - layout_checkingindicators; //CapOne is not running Juli so remove from output
   layout_riskview5_alerts-ConsumerStatementText;
   STRING12 inquiry_lexid := '';
 end;
