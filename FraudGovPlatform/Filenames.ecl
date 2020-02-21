@@ -129,7 +129,7 @@ module
 		export IPMetaData		:= tools.mod_FilenamesBuild(Template('IPMetaData'),pversion);
 		export Advo					:= tools.mod_FilenamesBuild(Template('Advo'),pversion);
 		export BestInfo			:= tools.mod_FilenamesBuild(Template('BestInfo'),pversion);
-		
+		export CoverageDates		:= tools.mod_FilenamesBuild(Template('CoverageDates'),pversion);
 		
 		//Kel Files
 		export kel_customeraddress	:= tools.mod_FilenamesBuild(Template('kel::customeraddress'),pversion);
