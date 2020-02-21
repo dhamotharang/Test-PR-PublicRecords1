@@ -70,7 +70,7 @@ function
 		outAttr := DATASET([
 
 			{pMBSFDNServerIP
-			,pMBSFDNDirectory
+			,pMBSFDNDirectory + '/mbs/prod'
 			,pRemoteFilename
 			,0
 			,pLocalFilename.Template
