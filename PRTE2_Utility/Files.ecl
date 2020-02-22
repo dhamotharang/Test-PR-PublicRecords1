@@ -20,6 +20,9 @@ export full_did_for_index := full_did_out2(did!='0');
 
 export full_did_for_index_bdid := full_did_out2(did='0');
 
+export full_did_for_index_address := full_did_out2;
+
+
 layouts.did_out t(full_did_for_index le, unsigned6 i) :=
 TRANSFORM
 	SELF.fdid := (unsigned6)le.did + i;
